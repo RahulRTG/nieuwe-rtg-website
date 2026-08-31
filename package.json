@@ -143,6 +143,7 @@
     "deuren": "node scripts/deuren.js",
     "leugens": "node scripts/leugendetector.js",
     "mutatie": "node scripts/mutatie.js",
+    "mutatie:scherm": "node scripts/schermmutatie.js",
     "grenslijst": "node scripts/grenslijst.js",
     "wetten": "node scripts/wetten.js",
     "sabotage": "node scripts/sabotage.js",

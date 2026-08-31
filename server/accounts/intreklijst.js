@@ -77,6 +77,43 @@ module.exports = function maakIntreklijst(strikt) {
       return true;
     } catch (e) { return false; }
   }
+  /* EEN SESSIE INTREKKEN ZONDER HET TOKEN TE HEBBEN.
+
+     Dit is wat "log die andere telefoon uit" nodig heeft, en het kon hiervoor
+     niet. De lijst hierboven sleutelt op de handtekening van het TOKEN, en dat
+     token heeft alleen de houder -- precies degene die je buiten wilt zetten.
+     Wie een sessie van een ander toestel wil sluiten, heeft dus niets in handen
+     om in te trekken.
+
+     De sid uit het token (accounts/tokens.js) lost dat op: die identificeert de
+     sessie zonder het geheim te zijn. Hij ligt in dezelfde tabel maar in een
+     eigen NAAMRUIMTE ('sessie:'), zodat een sid nooit per ongeluk als een
+     tokenhandtekening kan worden gelezen of andersom -- twee soorten sleutels in
+     een tabel zonder scheiding is hoe je ze door elkaar gaat halen.
+
+     De vervaldatum komt van de aanroeper en niet uit de sid: een sid draagt geen
+     tijd. Wie hem niet weet, geeft de maximale levensduur van een token op; het
+     ergste gevolg is dan dat een regel iets langer blijft liggen dan nodig. */
+  function trekInSessie(sid, verlooptOp) {
+    if (typeof sid !== 'string' || !/^[A-Za-z0-9_-]{12}$/.test(sid)) return false;
+    const exp = Number(verlooptOp) || 0;
+    if (!exp || exp < klok.nu()) return true; // al verlopen: niets te onthouden
+    try {
+      S.zin('DELETE FROM ingetrokken_tokens WHERE verloopt < ?').run(klok.nu());
+      S.zin('INSERT OR REPLACE INTO ingetrokken_tokens (hash, verloopt) VALUES (?, ?)')
+        .run(kluis.sign('sessie:' + sid), exp);
+      return true;
+    } catch (e) { return false; }
+  }
+  function sessieIngetrokken(sid) {
+    if (typeof sid !== 'string' || !/^[A-Za-z0-9_-]{12}$/.test(sid)) return false;
+    try {
+      const r = S.zin('SELECT verloopt FROM ingetrokken_tokens WHERE hash = ?')
+        .get(kluis.sign('sessie:' + sid));
+      return !!r && Number(r.verloopt) >= klok.nu();
+    } catch (e) { return false; }
+  }
+
   function isIngetrokken(token) {
     token = strikt(token);
     if (!token) return true; // geen geldige vorm: behandel als ongeldig
@@ -88,5 +125,5 @@ module.exports = function maakIntreklijst(strikt) {
   }
 
 
-  return { trekIn, trekInActie, isIngetrokken };
+  return { trekIn, trekInActie, isIngetrokken, trekInSessie, sessieIngetrokken };
 };

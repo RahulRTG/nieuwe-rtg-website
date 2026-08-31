@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Post van RTG</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+  :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--card2:var(--rtg-card2);--line:var(--rtg-line);
+    --txt:var(--rtg-txt);--soft:var(--rtg-soft);--gold:#C9A24B;--rood:#DE6E92;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;min-height:100dvh;}
+  .kop{display:flex;align-items:center;gap:0.7rem;padding:calc(env(safe-area-inset-top,0px) + 0.9rem) 1.1rem 0.6rem;}
+  .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.35rem;}
+  .kop .rek{flex:1;}
+  .kop a{color:var(--txt);text-decoration:none;font-size:1.1rem;min-width:24px;min-height:24px;
+    display:inline-flex;align-items:center;justify-content:center;}
+  main{padding:0 1.1rem calc(env(safe-area-inset-bottom,0px) + 3rem);max-width:660px;margin:0 auto;}
+  h2{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);margin:1.7rem 0 0.6rem;}
+  .stil{color:var(--soft);font-size:0.82rem;line-height:1.6;}
+  button{font:inherit;cursor:pointer;}
+  .knop{background:var(--card);border:1px solid var(--line);border-radius:0;color:var(--txt);
+    font-size:0.85rem;padding:0.6rem 0.95rem;min-height:44px;}
+  .knop.rood{border-color:rgba(222,110,146,0.55);color:var(--rood);}
+  .knop:focus-visible,.kanaal:focus-visible,summary:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  .knop[disabled],.kanaal[disabled]{opacity:0.5;cursor:default;}
+
+  .soort{background:var(--card);border:1px solid var(--line);padding:1.15rem;margin:0.75rem 0;}
+  .soort .naam{font-family:'Bodoni Moda',serif;font-size:1.1rem;}
+  .soort .wat{font-size:0.82rem;line-height:1.55;color:var(--soft);margin-top:0.35rem;}
+  /* DE STAND IN WOORDEN, BOVEN DE SCHAKELAARS. Drie vinkjes waarvan er nul
+     aanstaan zien er hetzelfde uit als drie vinkjes die je nog niet hebt
+     gelezen; een zin doet dat verschil wel. */
+  .stand{font-size:0.78rem;line-height:1.5;margin-top:0.8rem;padding-top:0.7rem;border-top:1px solid var(--line);}
+  .stand.uit{color:var(--soft);}
+  .stand .bron{display:block;color:var(--soft);font-size:0.68rem;margin-top:0.25rem;}
+  .kanalen{display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.8rem;}
+  /* Een kanaal is een schakelaar en geen knop: hij draagt zijn stand zelf,
+     zodat een schermlezer hem als schakelaar aankondigt en niet als iets dat
+     je een keer indrukt. */
+  .kanaal{background:transparent;border:1px solid var(--line);color:var(--soft);
+    font-size:0.8rem;padding:0.5rem 0.9rem;min-height:44px;display:inline-flex;align-items:center;gap:0.5rem;}
+  .kanaal i{width:8px;height:8px;border:1px solid var(--soft);flex:0 0 auto;}
+  .kanaal[aria-pressed="true"]{border-color:var(--gold);color:var(--txt);}
+  .kanaal[aria-pressed="true"] i{background:var(--gold);border-color:var(--gold);}
+
+  .let{border:1px solid var(--line);border-left:3px solid var(--gold);background:var(--card2);
+    padding:0.85rem 1rem;margin:0.9rem 0;font-size:0.8rem;line-height:1.6;}
+  .grens{border:1px solid var(--line);padding:0.85rem 1rem;margin:0.6rem 0;font-size:0.8rem;line-height:1.6;}
+  .grens b{font-weight:600;}
+  .grens span{color:var(--soft);display:block;margin-top:0.2rem;}
+  .regel{border-top:1px solid var(--line);padding:0.6rem 0;font-size:0.8rem;line-height:1.5;}
+  .regel:first-of-type{border-top:0;}
+  .regel .meta{display:block;color:var(--soft);font-size:0.68rem;margin-top:0.2rem;}
+  .melding{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 1rem);transform:translateX(-50%);
+    background:var(--card2);border:1px solid var(--line);padding:0.55rem 1rem;font-size:0.8rem;
+    max-width:88vw;opacity:0;pointer-events:none;transition:opacity 0.25s;}
+  .melding.zien{opacity:1;}
+  details summary{cursor:pointer;font-size:0.74rem;color:var(--soft);padding:0.6rem 0;min-height:24px;
+    display:flex;align-items:center;gap:0.5rem;list-style:none;}
+  details summary::-webkit-details-marker{display:none;}
+  details summary::before{content:'+';font-size:0.9rem;line-height:1;width:0.9rem;text-align:center;color:var(--gold);}
+  details[open] summary::before{content:'\2013';}
+  details[open] summary{color:var(--txt);}
+  @media (prefers-reduced-motion: reduce){ *{transition:none !important;} }
+</style>
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<script src="/shared/seizoen.js" defer></script>
+<link href="/shared/ios.css" rel="stylesheet">
+</head>
+<body class="rtg-stijl">
+<header class="kop">
+  <a href="/apps/app.html" aria-label="Terug naar de app">&#8592;</a>
+  <h1>Post van RTG</h1>
+  <span class="rek"></span>
+</header>
+<main>
+  <p class="stil" id="uitleg">Bezig met ophalen&#8230;</p>
+  <div id="lijst"></div>
+  <div id="afmeld"></div>
+  <div id="altijd"></div>
+  <div id="historie"></div>
+</main>
+<div class="melding" id="melding" role="status" aria-live="polite"></div>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const token = (() => { try { return localStorage.getItem('rtg_member_token'); } catch (e) { return null; } })();
+  const api = (pad, body) => fetch(pad, { method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
+    body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+  let meldT;
+  const zeg = t => { const m = $('#melding'); m.textContent = t; m.classList.add('zien');
+    clearTimeout(meldT); meldT = setTimeout(() => m.classList.remove('zien'), 5000); };
+  const maak = (tag, klas) => { const e = document.createElement(tag); if (klas) e.className = klas; return e; };
+  const tekst = (el, t) => { el.textContent = t; return el; };
+  const datum = s => { const d = new Date(s); return isNaN(d) ? String(s || '') : d.toLocaleDateString('nl-NL',
+    { day: 'numeric', month: 'long', year: 'numeric' }); };
+
+  let kanalen = [];
+
+  /* EEN SCHAKELAAR STUURT DE HELE LIJST OP, en niet "dit kanaal erbij". De
+     server kent maar een handeling -- zet soort op deze kanalen -- en die vorm
+     is met opzet overgenomen: twee clients die elk hun eigen deelmutatie
+     verzinnen, komen vroeg of laat met een andere stand terug dan er staat. */
+  async function wissel(soort, kanaal, aan, huidig, el) {
+    const nieuw = aan ? huidig.filter(k => k !== kanaal) : huidig.concat([kanaal]);
+    el.disabled = true;
+    const r = await api('/api/mijn/post/zet', { soort: soort.id, kanalen: nieuw, bron: 'post' });
+    el.disabled = false;
+    if (r.body.error) return zeg(r.body.error);
+    zeg(nieuw.length ? (aan ? 'Kanaal uitgezet.' : 'Toestemming vastgelegd.')
+      : 'Ingetrokken. U krijgt hierover geen post meer.');
+    toon(r.body.stand);
+  }
+
+  function kaartVoor(s) {
+    const el = maak('article', 'soort');
+    el.appendChild(tekst(maak('div', 'naam'), s.naam));
+    el.appendChild(tekst(maak('div', 'wat'), s.wat));
+
+    const stand = maak('div', 'stand' + (s.aan ? '' : ' uit'));
+    if (s.aan) {
+      stand.appendChild(document.createTextNode('Staat aan voor ' +
+        s.kanalen.map(k => (kanalen.find(x => x.id === k) || { naam: k }).naam.toLowerCase()).join(' en ') + '.'));
+      /* De herkomst hoort bij het lid te staan en niet alleen in een dossier:
+         wie leest waar hij ja zei, herkent het -- of juist niet, en dat tweede
+         is het begin van een terechte klacht. */
+      if (s.sinds) stand.appendChild(tekst(maak('span', 'bron'),
+        'Door u gegeven op ' + datum(s.sinds) + (s.gegevenVia ? ' via ' + s.gegevenVia : '') + '.'));
+    } else {
+      stand.textContent = 'Staat uit. RTG stuurt u hier niets over.';
+    }
+    el.appendChild(stand);
+
+    const rij = maak('div', 'kanalen');
+    for (const k of kanalen) {
+      const aan = s.kanalen.includes(k.id);
+      const b = maak('button', 'kanaal');
+      b.type = 'button';
+      b.setAttribute('aria-pressed', aan ? 'true' : 'false');
+      b.setAttribute('aria-label', k.naam + ' voor ' + s.naam + ': ' + (aan ? 'staat aan' : 'staat uit'));
+      b.appendChild(maak('i'));
+      b.appendChild(document.createTextNode(k.naam));
+      b.addEventListener('click', () => wissel(s, k.id, aan, s.kanalen, b));
+      rij.appendChild(b);
+    }
+    el.appendChild(rij);
+    return el;
+  }
+
+  function toon(stand) {
+    kanalen = stand.kanalen || [];
+    $('#uitleg').textContent = stand.uitleg || '';
+
+    const lijst = $('#lijst'); lijst.textContent = '';
+    lijst.appendChild(tekst(maak('h2'), 'Waarvoor u toestemming kunt geven'));
+    for (const s of stand.soorten || []) lijst.appendChild(kaartVoor(s));
+
+    /* AFMELDEN MOET NET ZO MAKKELIJK ZIJN ALS AANMELDEN. Een knop die alles in
+       een handeling uitzet staat er daarom altijd, ook als er nu niets aanstaat
+       -- weghalen zodra het niet nodig is, betekent dat je hem moet zoeken op
+       het moment dat hij wel nodig is. */
+    const af = $('#afmeld'); af.textContent = '';
+    const aantalAan = (stand.soorten || []).filter(s => s.aan).length;
+    const knop = maak('button', 'knop rood');
+    knop.type = 'button';
+    knop.textContent = 'Zet alle post van RTG uit';
+    knop.disabled = !aantalAan;
+    knop.addEventListener('click', async () => {
+      knop.disabled = true;
+      const r = await api('/api/mijn/post/alles-uit', {});
+      if (r.body.error) { knop.disabled = false; return zeg(r.body.error); }
+      zeg(r.body.uitgezet + ' soort(en) uitgezet.');
+      toon(r.body.stand); laadHistorie();
+    });
+    af.appendChild(knop);
+    af.appendChild(tekst(maak('p', 'stil'), aantalAan
+      ? 'Dit trekt alle ' + aantalAan + ' toestemming(en) hierboven in een keer in.'
+      : 'Er staat op dit moment niets aan, dus er valt niets uit te zetten.'));
+
+    /* WAT HIER NOOIT ONDER VALT, even groot ernaast. Een scherm dat alleen
+       toont wat je KUNT uitzetten, laat denken dat de rest ook uit kan. */
+    const al = $('#altijd'); al.textContent = '';
+    al.appendChild(tekst(maak('h2'), 'Wat u hoe dan ook blijft krijgen'));
+    for (const a of stand.altijd || []) {
+      const d = maak('div', 'grens');
+      d.appendChild(tekst(maak('b'), a.naam));
+      d.appendChild(tekst(maak('span'), a.reden));
+      al.appendChild(d);
+    }
+  }
+
+  async function laadHistorie() {
+    const r = await api('/api/mijn/post/geschiedenis', {});
+    const h = $('#historie'); h.textContent = '';
+    if (r.body.error) return;
+    const rijen = r.body.geschiedenis || [];
+    const d = maak('details');
+    const sam = maak('summary');
+    sam.textContent = rijen.length ? 'Wat u eerder heeft aan- en uitgezet (' + rijen.length + ')'
+      : 'Wat u eerder heeft aan- en uitgezet';
+    d.appendChild(sam);
+    d.appendChild(tekst(maak('p', 'stil'), r.body.uitleg || ''));
+    if (!rijen.length) d.appendChild(tekst(maak('p', 'stil'), 'Er is hier nog niets gewijzigd.'));
+    for (const g of rijen) {
+      const el = maak('div', 'regel');
+      el.appendChild(document.createTextNode(g.handeling + ': ' + g.soort +
+        (g.naar && g.naar.length ? ' (' + g.naar.join(', ') + ')' : '')));
+      el.appendChild(tekst(maak('span', 'meta'), datum(g.op) + ' · via ' + g.bron));
+      d.appendChild(el);
+    }
+    h.appendChild(d);
+  }
+
+  async function laad() {
+    const r = await api('/api/mijn/post', {});
+    if (r.status === 401) { $('#uitleg').textContent = 'Log in om dit te zien.'; return; }
+    if (r.body.error) { $('#uitleg').textContent = r.body.error; return; }
+    toon(r.body);
+    laadHistorie();
+  }
+
+  laad();
+})();
+</script>
+<script src="/shared/toestelsleutel.js"></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+</body>
+</html>

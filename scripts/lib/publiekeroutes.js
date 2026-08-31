@@ -108,6 +108,14 @@ const PUBLIEK = new Map([
     ['/api/aanmeld/start', 'het aanmeldgesprek begint voor er een account is; rem van 40 berichten per minuut per ip'],
     ['/api/webauthn/opties', 'de uitdaging moet er zijn VOOR je hem kunt beantwoorden; het bewijs volgt bij /login'],
     ['/api/auth/verify-email', 'de bevestigingslink IS de geloofsbrief (verifyActionToken); ongeldig of verlopen geeft 400'],
+    /* Zelfde vorm, en om dezelfde reden publiek: deze bevestiging komt uit de
+       mailbox van het NIEUWE adres en dus zonder sessie. Dat is het hele punt --
+       hij bewijst dat de aanvrager daar bij kan. De aanvraag zelf zit wel achter
+       auth EN het wachtwoord (routes/member/herstelkanaal.js).
+
+       Deze regel stond in scripts/check.js en is met de lijst meeverhuisd toen
+       main hem naar dit bestand bracht; twee kopieen zouden uiteenlopen. */
+    ['/api/mijn/herstelkanaal/email/bevestig', 'de bevestigingslink IS de geloofsbrief (verifyActionToken, doel mailwissel); komt uit de mailbox van het nieuwe adres en heeft dus geen sessie'],
 
     // ---- publiek, maar met een code in het lijf als geloofsbrief ----
     /* Dezelfde familie als metPartner hiernaast: clubs en stadspartners hebben

@@ -34,6 +34,7 @@
 'use strict';
 
 const ctx = require('./sessiecontext');
+const { standVan } = require('./vertrouwen');
 const klok = require('../../lib/klok');
 
 /* Een sessie zonder gebruik verdwijnt hier eerder dan het token zelf verloopt.
@@ -136,6 +137,7 @@ function maakSessieregister({ db, save }) {
          graad ("bewezen dus een passkey"), en dat is precies zo lang waar tot er
          een derde manier van inloggen bij komt. De soort is geen persoonsgegeven
          en geen bewijs -- hij zegt WAT het was, de graad zegt hoe zeker. */
+      const st = ctx.stand(rij.context, nu);
       uit.push({ sid, geopendOp: rij.geopendOp, gezienOp: rij.gezienOp,
         soort: (rij.context.authenticator && rij.context.authenticator.type) || null,
         /* De toestelId reist mee, de toestelNAAM niet: die woont in het
@@ -148,7 +150,12 @@ function maakSessieregister({ db, save }) {
            hem bezit; een sessie draagt geen namen. */
         contextSoort: (rij.context.context && rij.context.context.contextSoort) || null,
         contextId: (rij.context.context && rij.context.context.contextId) || null,
-        stand: ctx.stand(rij.context, nu) });
+        stand: st,
+        /* DE VERTROUWENSSTAND WORDT HIER BEREKEND EN NERGENS BEWAARD. Hij leest
+           de stand-per-veld die er net boven uit komt, dus hij kan nooit iets
+           zien wat het scherm niet ziet -- en hij kan niet verouderen, want hij
+           bestaat alleen op het moment dat iemand hem vraagt. */
+        vertrouwen: standVan(st, (rij.context.authenticator && rij.context.authenticator.type) || null) });
     }
     return uit.sort((a, b) => new Date(b.gezienOp) - new Date(a.gezienOp));
   }

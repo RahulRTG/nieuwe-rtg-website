@@ -129,7 +129,7 @@ standaard of de wereld is er nog niet klaar voor.
 | 1 | Intent-based beheer ("deel locatie alleen tijdens een rit") | **besluit** | De doelbinding bestaat nog niet (zie 8). Zonder die laag kan de intentie niet gecompileerd worden. |
 | 2 | Persoonlijke command bar | **stap weg** | `kern/stuur/beleid.js` heeft `toegestanePaden()` al: de bewijspoort die een geschorste capability uit de keuzelijst laat vallen. De intentparser wordt de tweede aanroeper daarvan, niet een tweede poort. |
 | 3 | Trust graph | **stap weg** | `command.toegang.graaf()` bestaat, office-only. Zie 1.2. |
-| 4 | Continu vertrouwen / step-up per actie | **besluit** na sessieverrijking | De risicoassen zijn een beleidskeuze, geen afleiding. |
+| 4 | Continu vertrouwen / step-up per actie | **half** | De VERTROUWENSSTAND staat (`kern/identiteit/vertrouwen.js`, 31 augustus 2026), op harde feiten en nergens bewaard -- zie par. 5c. Step-up PER ACTIE bestaat als `bezitsbewijs` op vijftien zware paden. Wat er niet is, is een risicoweging: dat vraagt beleidskeuzes die de eigenaar bewust niet heeft gemaakt. |
 | 5 | Action-bound authentication | **stap weg** | `kern/webauthn.js` heeft de ceremonieopslag al (`zetChallenge`/`pakChallenge` met `extra`). De actie in de challenge binden is een kleine, echte stap. |
 | 6 | Permission firewall ("wie heeft nu toegang tot mij?") | **staat** | 31 augustus 2026: `kern/consent-relaties.js`, scherm `/apps/mijn-relaties.html`. Geen nieuwe laag -- het Consent Center dééd dit al per soort; dit legt dezelfde negen lagen per PARTIJ. Meten wees ook uit dat de boardroom geen toegangsregister is en dat de bureau-delegatie RTG machtigt en geen buitenstaander; die staan met die reden bij "wat dit scherm niet dekt". |
 | 7 | Tijdelijke rechten als standaard (wie+wat+waarom+hoelang) | **staat, verkeerde doelgroep** | `recht/geef` kent `minuten`, `mandaat` kent `tot`. Voor leden bestaat het niet. |
@@ -310,6 +310,34 @@ rij met `status: 'actief'`, en deze laag `ingetrokken: null` gebruikt. Dat is
 precies het gat dat `consent-register.js` in zijn eigen kop benoemt ("wat die
 scan NIET vindt is een andere vorm") -- het is dus niet onverwacht, maar het was
 wel onopgemerkt.
+
+## 5c. De vertrouwensstand: afgeleid, niet bewaard
+
+Besluit van de eigenaar, 31 augustus 2026: de stand rust **alleen op harde
+feiten** -- authenticator, toestelbinding, sleutelbinding. Geen locatiesprongen
+(die zouden een landcode in elke sessie vragen, en een sessie repliceert over een
+bus), geen gedrag (dat vraagt een gedragslogboek per lid, en dit huis houdt
+tellers bij en geen journaal van wat iemand doet).
+
+**Hij wordt niet opgeslagen, en dat is de kern.** Het veld `vertrouwen` stond in
+`sessievelden.js` en werd door niemand geschreven. Dat was geen achterstand maar
+een aanwijzing: een vertrouwensstand is geen waarneming maar een gevolgtrekking
+uit claims die er al staan. Zo'n gevolgtrekking bewaren maakt er een tweede
+waarheid van die veroudert -- de sessie zegt dan "sterk" terwijl het toestel er
+inmiddels uit ligt. Het veld is er daarom uit gehaald in plaats van gevuld.
+
+**Vier standen, geen cijfer.** `onbekend` (nooit vastgelegd), `kennis` (iets dat
+u weet, en dus over te dragen), `bezit` (een sleutel of toestel heeft bezit
+aangetoond) en `gebonden` (bezit én het token zit aan die sleutel vast). Een
+mens die "72" leest weet niet of hij iets moet doen; wie leest "alleen iets dat u
+weet" weet dat wel.
+
+**De regel die hem eerlijk houdt: een conclusie is nooit harder dan haar zachtste
+premisse.** Een sessie kan `Bezit en binding` heten en toch graad `gemeten`
+dragen, omdat de inlog zelf een wachtwoord was. Zonder die regel lezen drie halve
+zekerheden samen als een hele -- precies het samengestelde cijfer dat LAT-regel
+11 verbiedt. En elke stand draagt zijn `nietMeegewogen`: een stand die zwijgt
+over wat hij niet bekeek, laat een mens denken dat hij alles bekeek.
 
 ## 6. De volgorde
 

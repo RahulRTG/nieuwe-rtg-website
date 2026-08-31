@@ -1,112 +1,149 @@
-/* DE VERVALSTATEN, NAGETROKKEN. PROOF.md paragraaf 2 belooft een staatmachine;
-   dit bestand laat hem elke overgang echt maken (LAT.md regel 10: een meter
-   die je niet hebt zien uitslaan meet niets). De volgorde van de gevallen is
-   de rangorde van de staten zelf: gezakt wint van alles, dan de vloer
-   (ongemeten), dan het gat (verzwakt), dan de leeftijd (verschaald), en pas
-   als niets daarvan speelt is het bewezen.
+/* ============================================================================
+   DE VERTROUWENSSTAND -- afgeleid uit harde feiten, en nergens bewaard.
 
-   Draai los: node --experimental-sqlite --test test/vertrouwen.test.js */
+   DE BEWERING DIE ERTOE DOET staat in toets 3: een conclusie is nooit harder
+   dan haar zachtste premisse. Zonder die regel lezen drie halve zekerheden
+   samen als een hele, en dat is precies het samengestelde groene cijfer dat
+   LAT-regel 11 en check.js regel 48 verbieden.
+
+   En toets 5, die structureel is: deze stand wordt NIET opgeslagen. Een
+   afgeleide waarde die je bewaart is een tweede waarheid die veroudert -- de
+   sessie zegt dan "sterk" terwijl het toestel er inmiddels uit ligt. Het veld
+   `vertrouwen` is daarom uit sessievelden.js gehaald in plaats van gevuld.
+
+   Draai los: node --test test/vertrouwen.test.js
+   ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('fs');
+const path = require('path');
+const { standVan, STANDEN, NIET_MEEGEWOGEN } = require('../server/kern/identiteit/vertrouwen');
 
-const v = require('../scripts/vertrouwen.js');
+const g = (x) => ({ graad: x, aanwezig: x !== 'onbekend' });
 
-/* Elf cellen bouwen met een defaultstaat en gerichte afwijkingen, zodat elk
-   geval leest als wat hij verandert en niet als een muur JSON. */
-const SCHAKELS = ['AUTH', 'ACL', 'INPUT', 'OUTPUT', 'STATE', 'SIDE_EFFECT',
-  'AUDIT', 'IDEMPOTENCY', 'FAILURE', 'ROLLBACK', 'PRIVACY'];
-function cellen(basis, afwijking) {
-  const uit = {};
-  for (const s of SCHAKELS) uit[s] = { staat: (afwijking || {})[s] || basis };
-  return uit;
-}
-
-test('de staatmachine maakt elke overgang, in rangorde', () => {
-  /* BEWEZEN: alles gedragen en vers. */
-  const groen = v.staatVan(cellen('bewezen', { AUTH: 'nvt' }), 3, 30);
-  assert.equal(groen.staat, 'bewezen');
-  assert.match(groen.heropent, /vervalt zodra/, 'een bewezen staat noemt zijn vervalvoorwaarden');
-
-  /* VERSCHAALD: zelfde bewijs, maar de meting is over de halfwaardetijd. De
-     ENIGE verandering is de leeftijd -- dat is de hele overgang. */
-  const oud = v.staatVan(cellen('bewezen', { AUTH: 'nvt' }), 31, 30);
-  assert.equal(oud.staat, 'verschaald');
-  assert.match(oud.reden, /vorige wereld/);
-
-  /* VERZWAKT: een gat weegt zwaarder dan leeftijd; ook een VERSE meting met
-     een ongemeten schakel is verzwakt, en de reden noemt de schakel. */
-  const gat = v.staatVan(cellen('bewezen', { AUDIT: 'ongemeten' }), 3, 30);
-  assert.equal(gat.staat, 'verzwakt');
-  assert.match(gat.reden, /AUDIT/);
-
-  /* GESCHORST: een gezakte cel wint van ALLES -- ook van tien bewezen cellen
-     en een verse meting. Het bewijs zegt zelf dat het niet klopt. */
-  const zakt = v.staatVan(cellen('bewezen', { ROLLBACK: 'gezakt' }), 1, 30);
-  assert.equal(zakt.staat, 'geschorst');
-  assert.match(zakt.heropent, /hermeting/, 'de enige weg omhoog is hermeting, geen hand');
-
-  /* En gezakt wint ook van ongemeten gaten: geschorst, niet verzwakt. */
-  assert.equal(v.staatVan(cellen('ongemeten', { STATE: 'gezakt', AUTH: 'bewezen' }), 1, 30).staat,
-    'geschorst');
-
-  /* ONGEMETEN: de eerlijke vloer. Nvt draagt niet: een route met alleen
-     nvt-cellen heeft geen bewijs, hij heeft een vrijstelling. */
-  assert.equal(v.staatVan(cellen('ongemeten'), 1, 30).staat, 'ongemeten');
-  assert.equal(v.staatVan(cellen('nvt'), 1, 30).staat, 'ongemeten');
-
-  /* En verklaard draagt WEL: dat is een gemeten uitspraak. */
-  assert.equal(v.staatVan(cellen('verklaard'), 1, 30).staat, 'bewezen');
+/* ---------------------------------------------------------------------------
+   1. DE VIER STANDEN, en wat ze betekenen.
+   ------------------------------------------------------------------------- */
+test('1. zonder authenticator is de stand onbekend, niet zwak', () => {
+  const s = standVan({});
+  assert.equal(s.stand, 'onbekend');
+  assert.equal(s.graad, 'onbekend');
+  assert.match(s.graadReden, /niets vastgesteld/,
+    '"wij hebben nooit vastgelegd" is iets anders dan "dit is zwak"');
 });
 
-test('een staat zonder invoer is een gezakte meting, geen vloer', () => {
-  /* LAT.md regel 3. Geen cellen is niet "ongemeten" -- ongemeten is een
-     uitslag over een route die bestaat; dit is een meting die faalde. */
-  assert.throws(() => v.staatVan(null, 3, 30), /gezakte meting/);
-  assert.throws(() => v.staatVan({}, 3, 30), /gezakte meting/);
-  /* En een onbekende ouderdom maakt elke versheidsuitspraak verzonnen. */
-  assert.throws(() => v.staatVan(cellen('bewezen'), NaN, 30), /versheid/);
-  assert.throws(() => v.staatVan(cellen('bewezen'), undefined, 30), /versheid/);
+test('1b. een wachtwoord is KENNIS en dat is over te dragen', () => {
+  const s = standVan({ authenticator: g('gemeten') }, 'wachtwoord');
+  assert.equal(s.stand, 'kennis');
+  assert.match(s.uitleg, /over te dragen/,
+    'het verschil tussen weten en hebben is de hele reden dat deze stand bestaat');
 });
 
-test('bereken() telt de staten en sleutelt op methode + pad', () => {
-  const rijen = [
-    { methode: 'POST', pad: '/api/a', cellen: cellen('bewezen') },
-    { methode: 'POST', pad: '/api/b', cellen: cellen('bewezen', { OUTPUT: 'gezakt' }) },
-    { methode: 'GET', pad: '/api/a', cellen: cellen('ongemeten') }
-  ];
-  const uit = v.bereken(rijen, 2, 30);
-  assert.deepEqual(uit.telling, { bewezen: 1, verschaald: 0, verzwakt: 0, geschorst: 1, ongemeten: 1 });
-  /* Methode + pad, want dezelfde weg kan met GET open en met POST dicht
-     staan -- zelfde sleutel als de bewijsmatrix. */
-  assert.equal(uit.perRoute['POST /api/a'].staat, 'bewezen');
-  assert.equal(uit.perRoute['GET /api/a'].staat, 'ongemeten');
+test('1c. een passkey is BEZIT', () => {
+  assert.equal(standVan({ authenticator: g('bewezen') }, 'passkey').stand, 'bezit');
 });
 
-test('de ouderdom is die van het OUDSTE been, en zonder stempels zakt hij', () => {
-  const dag = 86400000;
-  const nu = Date.parse('2026-08-20T12:00:00Z');
-  /* De lezer is injecteerbaar (zelfde snit als telBewijslaag in norm.js), dus
-     de toets voert hem precies wat hij wil zien: twee gestempelde bronnen van
-     verschillende leeftijd -> het OUDSTE been telt. Een verse outputproef
-     naast een rolproef van vorig kwartaal maakt het geheel niet vers. */
-  const lees = (per) => (naam) => {
-    if (!(naam in per)) throw new Error('bestaat niet');
-    return JSON.stringify({ stempel: { op: new Date(nu - per[naam] * dag).toISOString() } });
-  };
-  const uit = v.ouderdom(nu, lees({ 'OUTPUTPROEF.json': 2, 'ROLPROEF.json': 80 }));
-  assert.equal(Math.round(uit.dagen), 80, 'het oudste been telt, niet het jongste');
-  assert.equal(Object.keys(uit.bronnen).length, 2, 'beide gelezen bronnen staan in het antwoord');
+test('1d. een bewezen toestelbinding tilt een wachtwoordsessie naar bezit', () => {
+  const s = standVan({ authenticator: g('gemeten'), toestel: g('bewezen') }, 'wachtwoord');
+  assert.equal(s.stand, 'bezit', 'het toestel heeft een sleutel aangetoond die het niet kan verlaten');
+});
 
-  /* Een bron ZONDER stempel telt niet mee -- en als geen enkele bron er een
-     draagt, is de versheid niet te meten en hoort dat een gezakte meting te
-     zijn, geen verzonnen nul (LAT.md regel 3). */
-  const zonderStempel = () => JSON.stringify({ telling: { iets: 1 } });
-  assert.throws(() => v.ouderdom(nu, zonderStempel), /gezakte meting/);
-  assert.throws(() => v.ouderdom(nu, () => { throw new Error('weg'); }), /gezakte meting/);
+test('1e. sleutelbinding tilt naar gebonden, maar alleen boven op bezit', () => {
+  assert.equal(standVan({ authenticator: g('bewezen'), sleutelbinding: g('bewezen') }).stand, 'gebonden');
+  assert.equal(standVan({ authenticator: g('gemeten'), sleutelbinding: g('bewezen') }).stand, 'kennis',
+    'een gebonden token boven op alleen kennis is nog steeds kennis: er is niets bezeten aangetoond');
+});
 
-  /* En tegen het echte huis: de registers in de wortel dragen stempels. Zakt
-     dit, dan is een register zijn stempel kwijt en dat is zelf een bevinding. */
-  const echt = v.ouderdom(Date.now());
-  assert.ok(Number.isFinite(echt.dagen), 'de echte ouderdom is een getal');
-  assert.ok(Object.keys(echt.bronnen).length >= 2, 'minstens twee gestempelde bronregisters');
+/* ---------------------------------------------------------------------------
+   2. HET IS GEEN SCORE.
+   ------------------------------------------------------------------------- */
+test('2. er komt geen cijfer uit', () => {
+  const s = standVan({ authenticator: g('bewezen'), toestel: g('bewezen'), sleutelbinding: g('bewezen') });
+  const plat = JSON.stringify(s);
+  assert.equal(/"(score|punten|percentage|cijfer)"/.test(plat), false,
+    'een mens die "72" leest weet niet of hij iets moet doen');
+  for (const k of Object.keys(s)) assert.equal(typeof s[k] === 'number', false, k + ' is een getal');
+});
+
+/* ---------------------------------------------------------------------------
+   3. DE KERN: nooit harder dan de zachtste premisse.
+   ------------------------------------------------------------------------- */
+test('3. een vermoede authenticator maakt de hele stand vermoed', () => {
+  const s = standVan({ authenticator: g('vermoed'), toestel: g('bewezen'), sleutelbinding: g('bewezen') }, 'overdracht');
+  assert.equal(s.stand, 'gebonden', 'de stand zelf mag best hoog zijn');
+  assert.equal(s.graad, 'vermoed', 'maar de zekerheid erover is die van het zwakste feit eronder');
+  assert.match(s.graadReden, /zwakste feit/);
+});
+
+test('3b. alles bewezen geeft ook bewezen', () => {
+  const s = standVan({ authenticator: g('bewezen'), toestel: g('bewezen'), sleutelbinding: g('bewezen') });
+  assert.equal(s.graad, 'bewezen');
+});
+
+test('3c. een zacht feit dat NIET meetelt, verzwakt de graad ook niet', () => {
+  const s = standVan({ authenticator: g('bewezen'), toestel: g('vermoed') });
+  assert.equal(s.graad, 'bewezen',
+    'de vermoede toestelbinding draagt deze stand niet, dus hij hoort hem ook niet omlaag te halen');
+  const grond = s.gronden.find(x => x.feit === 'Toestelbinding');
+  assert.equal(grond.staat, 'vermoed', 'maar hij staat er wel eerlijk bij');
+});
+
+/* ---------------------------------------------------------------------------
+   4. HIJ ZEGT WAT HIJ NIET BEKEEK.
+   ------------------------------------------------------------------------- */
+test('4. wat niet meeweegt staat erbij, met een reden per regel', () => {
+  const s = standVan({ authenticator: g('bewezen') });
+  assert.ok(s.nietMeegewogen.length >= 3);
+  for (const n of s.nietMeegewogen) {
+    assert.ok(n.wat && n.reden && n.reden.length > 25,
+      n.wat + ' staat er zonder reden bij; een stand die zwijgt over wat hij niet bekeek, laat een mens denken dat hij alles bekeek');
+  }
+  assert.ok(s.nietMeegewogen.some(n => /gedrag/i.test(n.wat)), 'gedrag hoort hier expliciet buiten te staan');
+});
+
+test('4b. elke grond draagt een betekenis en niet alleen een woord', () => {
+  const s = standVan({ authenticator: g('gemeten') }, 'wachtwoord');
+  for (const grond of s.gronden) {
+    assert.ok(grond.feit && grond.staat && grond.betekenis && grond.betekenis.length > 15,
+      grond.feit + ' zegt niet wat het betekent');
+  }
+});
+
+/* ---------------------------------------------------------------------------
+   5. HIJ WORDT NIET BEWAARD -- structureel, niet als belofte.
+   ------------------------------------------------------------------------- */
+test('5. het veld vertrouwen bestaat niet meer in de sessie', () => {
+  const { VELDEN } = require('../server/kern/identiteit/sessievelden');
+  assert.equal(VELDEN.vertrouwen, undefined,
+    'een afgeleide waarde opslaan maakt er een tweede waarheid van die veroudert');
+});
+
+test('5b. de module kent geen opslag', () => {
+  const bron = fs.readFileSync(path.join(__dirname, '..', 'server', 'kern', 'identiteit', 'vertrouwen.js'), 'utf8');
+  const code = bron.replace(/\/\*[\s\S]*?\*\//g, '');
+  for (const verboden of ['db.data', 'save(', 'eigencollectie', 'require(\'../eigencollectie\')']) {
+    assert.equal(code.includes(verboden), false,
+      'kern/identiteit/vertrouwen.js raakt "' + verboden + '" aan; deze stand hoort te worden berekend en niet bewaard');
+  }
+});
+
+test('5c. het register levert hem mee zonder hem op te slaan', () => {
+  const { maakSessieregister } = require('../server/kern/identiteit/sessieregister');
+  const db = { data: {} };
+  const reg = maakSessieregister({ db, save() {} });
+  const nu = new Date().toISOString();
+  reg.open('aaaaaaaaaaaa', 'user-1', { authenticator: { type: 'passkey', authenticatorId: 'c1',
+    herkomst: { bron: 't', methode: 'cryptografisch', vastgesteldOp: nu, regelversie: 'v1' } } });
+  assert.equal(reg.vanLid('user-1')[0].vertrouwen.stand, 'bezit');
+  assert.equal(JSON.stringify(db.data.sessiecontext).includes('vertrouwen'), false,
+    'de berekende stand hoort niet in de opslag te belanden');
+});
+
+test('6. de standen zijn geordend en compleet', () => {
+  const rangen = Object.values(STANDEN).map(s => s.rang).sort();
+  assert.deepEqual(rangen, [0, 1, 2, 3]);
+  for (const [id, s] of Object.entries(STANDEN)) {
+    assert.ok(s.naam && s.uitleg && s.uitleg.length > 25, id + ' mist een uitleg die een mens iets zegt');
+  }
+  assert.ok(NIET_MEEGEWOGEN.length >= 3);
 });

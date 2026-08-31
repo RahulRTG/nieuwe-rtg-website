@@ -73,14 +73,17 @@ const VELDEN = {
        dan moet elke sessie bij MIJN RTG weer open. */
     vorm: { contextId: 'sleutel', contextSoort: 'tekst', contextVersie: 'getal' }
   },
-  vertrouwen: {
-    soort: 'claim', persoonsgegeven: false, verval: 12 * UUR,
-    uitleg: 'De vertrouwensstand zoals die bij de laatste weging gold.',
-    /* Een MOMENTOPNAME met een verwijzing, geen waarheid. De echte weging leeft
-       in de bron; hier staat wat eruit kwam en wanneer. Daarom vervalt hij ook:
-       een weging van gisteren zegt niets over een handeling van nu. */
-    vorm: { stand: 'tekst', bewijsRef: 'sleutel', beleidVersie: 'tekst' }
-  },
+  /* HIER STOND `vertrouwen`, en hij is er op 31 augustus 2026 UIT gehaald.
+
+     Niemand schreef hem ooit, en dat was geen achterstand maar een aanwijzing:
+     een vertrouwensstand is geen waarneming maar een GEVOLGTREKKING uit de
+     claims die hier al staan (authenticator, toestel, sleutelbinding). Zo'n
+     gevolgtrekking opslaan maakt er een tweede waarheid van die veroudert -- de
+     sessie zegt dan "sterk" terwijl het toestel er inmiddels uit ligt.
+
+     Hij wordt nu berekend op het moment dat iemand hem vraagt, in
+     ./vertrouwen.js, en nergens bewaard. Een veld dat niemand vult is een
+     belofte die niemand nakomt; die hoort weg en niet stil te blijven staan. */
   risico: {
     soort: 'verwijzing', persoonsgegeven: false, verval: 1 * UUR,
     uitleg: 'Sleutel naar het risicodossier van deze sessie.',

@@ -47,6 +47,14 @@
   .samen .los{color:var(--soft);font-size:0.82rem;}
   /* Een sessie die namens iemand anders loopt, hoort op te vallen. */
   .samen .namens{color:var(--gold);font-size:0.85rem;}
+  /* De stand en zijn graad naast elkaar: de graad hoort niet IN de stand
+     verwerkt te worden, want dan leest een zachte premisse als een harde. */
+  .vertrouwen{display:flex;align-items:baseline;gap:0.6rem;margin-top:0.85rem;
+    border-top:1px solid var(--line);padding-top:0.7rem;}
+  .vertrouwen .vnaam{font-size:0.92rem;}
+  .vertrouwen .vgraad{font-size:0.63rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);}
+  .vertrouwen .vgraad.bewezen{color:var(--gold);}
+  .vuitleg{font-size:0.78rem;color:var(--soft);line-height:1.55;margin-top:0.25rem;}
   .techkop{margin-top:1rem;border-top:1px solid var(--line);}
 
   /* DE BEWIJSRAIL. Drie segmenten: vermoed vult er een, gemeten twee, bewezen
@@ -140,6 +148,10 @@
     sleutelbinding: 'Sleutelbinding'
   };
   const NIVEAU = { onbekend: 0, vermoed: 1, gemeten: 2, bewezen: 3 };
+  /* `vertrouwen` staat NIET in NAAM: hij is geen veld van de sessie maar een
+     gevolgtrekking uit de drie velden erboven (server/kern/identiteit/
+     vertrouwen.js). Hem tussen de gemeten velden zetten zou hem laten lezen
+     als nog een meting, en dat is hij niet. */
 
   const wanneer = iso => {
     if (!iso) return 'onbekend';
@@ -243,6 +255,19 @@
     blok.appendChild(tekst(maak('div', 'los'), sam.tweede));
     el.appendChild(blok);
 
+    /* DE VERTROUWENSSTAND, met zijn graad ernaast en niet erin verwerkt. Een
+       stand die "Bezit en binding" heet terwijl hij op iets vermoeds rust, is
+       precies de samengestelde zekerheid die hier niet mag -- dus staan de twee
+       naast elkaar en niet als een cijfer. */
+    if (s.vertrouwen) {
+      const v = maak('div', 'vertrouwen');
+      v.appendChild(tekst(maak('span', 'vnaam'), s.vertrouwen.naam));
+      v.appendChild(tekst(maak('span', 'vgraad' + (s.vertrouwen.graad === 'bewezen' ? ' bewezen' : '')),
+        s.vertrouwen.graad));
+      el.appendChild(v);
+      el.appendChild(tekst(maak('div', 'vuitleg'), s.vertrouwen.uitleg));
+    }
+
     /* DE TECHNISCHE STAND, ingeklapt. Niets weggelaten -- alle zes de velden
        staan er met hun graad en hun reden. Alleen niet meer even hard als de
        vraag "herken ik deze sessie". */
@@ -262,6 +287,16 @@
        staat daarom hier. Het blijft nodig: de bevestigingsvraag noemt het, en
        bij een melding aan de klantenservice is dit het enige wat een lid en RTG
        allebei kunnen aanwijzen zonder iets gevoeligs uit te wisselen. */
+    if (s.vertrouwen) {
+      det.appendChild(tekst(maak('p', 'reden'), 'Vertrouwensstand: ' + s.vertrouwen.graadReden));
+      for (const g of s.vertrouwen.gronden) {
+        det.appendChild(tekst(maak('p', 'reden'), g.feit + ' (' + g.staat + '): ' + g.betekenis));
+      }
+      det.appendChild(tekst(maak('p', 'reden'), 'Wat hier NIET in meeweegt:'));
+      for (const n of s.vertrouwen.nietMeegewogen) {
+        det.appendChild(tekst(maak('p', 'reden'), n.wat + ': ' + n.reden));
+      }
+    }
     det.appendChild(tekst(maak('div', 'kenmerk'), 'KENMERK ' + kenmerkVan(s.sid)));
     el.appendChild(det);
 

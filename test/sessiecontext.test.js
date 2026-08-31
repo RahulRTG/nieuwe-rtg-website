@@ -47,18 +47,23 @@ test('1b. alleen een handtekening haalt "bewezen"', () => {
 /* ---------------------------------------------------------------------------
    2. VERVALLEN BEWIJS IS GEEN BEWIJS (BESTUUR.md).
    ------------------------------------------------------------------------- */
+/* Het voorbeeld is `risico` en niet `vertrouwen`: dat laatste veld is er op
+   31 augustus 2026 uit gehaald omdat niemand het ooit schreef. Een
+   vertrouwensstand is een gevolgtrekking en geen waarneming, en die hoort niet
+   te worden bewaard -- zie kern/identiteit/vertrouwen.js. Het GEDRAG dat deze
+   toets bewaakt is ongewijzigd. */
 test('2. een verlopen meting zakt naar vermoed en zegt dat erbij', () => {
-  const oud = nu - 13 * 3600 * 1000;                 // vertrouwen vervalt na 12 uur
-  const { context } = ctx.bouw({ vertrouwen: { stand: 'normaal', herkomst: hk('gemeten', oud) } });
-  const s = ctx.stand(context, nu).vertrouwen;
+  const oud = nu - 2 * 3600 * 1000;                  // risico vervalt na een uur
+  const { context } = ctx.bouw({ risico: { risicoRef: 'r1', herkomst: hk('gemeten', oud) } });
+  const s = ctx.stand(context, nu).risico;
   assert.equal(s.graad, 'vermoed');
   assert.equal(s.vervallen, true);
   assert.match(s.reden, /vervallen bewijs is geen bewijs/);
 });
 
 test('2b. maar zakt niet naar onbekend -- wij hebben het wel degelijk gemeten', () => {
-  const { context } = ctx.bouw({ vertrouwen: { stand: 'normaal', herkomst: hk('gemeten', nu - 40 * 24 * 3600 * 1000) } });
-  assert.equal(ctx.stand(context, nu).vertrouwen.graad, 'vermoed',
+  const { context } = ctx.bouw({ risico: { risicoRef: 'r1', herkomst: hk('gemeten', nu - 40 * 24 * 3600 * 1000) } });
+  assert.equal(ctx.stand(context, nu).risico.graad, 'vermoed',
     '"nooit vastgesteld" en "ooit vastgesteld, nu verlopen" zijn twee verschillende dingen');
 });
 

@@ -115,6 +115,37 @@ voelen.
 
 ---
 
+## Het materiaal is licht, geen verf
+
+Gevonden op 31 augustus 2026 door naar het scherm te kijken in plaats van naar
+de code. `rtg-worlds-2026.css` zette het materiaal van een wereld als
+**paginagrond**: `body[data-rtg-world="living"]{ background:var(--bordeaux-diep) }`
+en WorkOS de royal-glans. Over de volle hoogte van een scherm gaf dat een waas
+waarin kaarten, randen en tekst allemaal even hard riepen — en `--bordeaux-glans`
+begint op `#9E1C40`, dat is `--burgundy-bright`, in `CLAUDE.md` genoteerd als
+**hover-state**.
+
+Dat botst met drie merkregels tegelijk: bordeaux is een accent, er komt geen
+gradient-grond, en het ritme is stark zwart/wit.
+
+**De regel luidt daarom: de grond is zwart, en het materiaal is het licht dat
+erop valt.** Eén radiale gloed uit een hoek, en verder niets — precies één
+signatuurelement. De schermen deden dat al goed en werden overschilderd;
+`/apps/rtg.html` droeg
+`radial-gradient(circle at 38% 4%, rgba(127,22,52,.25), transparent 42%)` over
+`#030303`. Die behandeling staat nu in de wereldlaag, zodat elke wereld hem
+krijgt in plaats van hem te moeten overschrijven.
+
+Champagne is de uitzondering en blijft dat: een donkere grond met een lichte
+gloed erover is bij het enige lichte materiaal precies verkeerd om.
+
+Wie hier een materiaal weer als vlakvulling wil gebruiken, verandert een
+merkregel en geen instelling. `npm run wereldstijl` meet de gemeten grond per
+scherm tegen het palet, dus een afwijking valt op — maar hij kan niet zien of
+een grond mooi is, alleen of hij uit het palet komt.
+
+---
+
 ## De sociale kant staat op Pearl, en dat is een besluit
 
 Gemeten op 31 augustus 2026 met `npm run wereldstijl`: de sociale schermen van

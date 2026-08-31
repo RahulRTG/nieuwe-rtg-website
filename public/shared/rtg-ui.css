@@ -282,7 +282,102 @@ body.rtg-stijl progress{accent-color:var(--rtg-goud);}
 .rtg-melder.fout{background:color-mix(in srgb,var(--rtg-rood) 16%,transparent);border-color:var(--rtg-leesrood,var(--rtg-rood));}
 
 /* --------------------------------------------------------- rest & rust -----*/
-.rtg-leeg{color:var(--rtg-soft);font-size:.9rem;padding:2.2rem 0;text-align:center;}
+/* ---------------------------------------------------- de lege staat ---
+   Hij bestond al als EEN regel gecentreerde tekst, en dat is te weinig voor
+   wat hij moet doen. Een scherm dat leeg is, is namelijk niet stuk: het is
+   leeg omdat er nog niets is, omdat u niet bent aangemeld, of omdat een bron
+   niets te melden had -- en dat zijn drie verschillende mededelingen. Op de
+   meeste schermen stond er daarom een kale zin ("Niet ingelogd.") midden in
+   een vlak van driehonderd pixels niets.
+
+   De vorm volgt de kop van een scherm en niet die van een foutmelding: een
+   klein gouden opschrift, een regel in de displayletter, en een zin eronder.
+   Wie een uitweg heeft, zet er een `.rtg-leeg-actie` bij; wie er geen heeft,
+   laat hem weg -- een knop die nergens heen gaat is erger dan geen knop. */
+.rtg-leeg{
+  color:var(--rtg-soft);
+  font-size:.9rem;
+  padding:2.2rem 0;
+  text-align:center;
+}
+.rtg-leeg-vlak{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:.55rem;
+  padding:clamp(2.4rem,7vh,4.5rem) 1.5rem;
+  border:1px solid var(--rtg-line);
+  border-radius:0;
+  background:var(--rtg-card,rgba(255,255,255,.02));
+  text-align:center;
+}
+.rtg-leeg-vlak .rtg-leeg-ey{
+  font-size:.58rem;
+  letter-spacing:.24em;
+  text-transform:uppercase;
+  color:var(--rtg-leesgoud,var(--rtg-goud));
+}
+.rtg-leeg-vlak b{
+  font-family:var(--rtg-display,"Bodoni Moda",Georgia,serif);
+  font-weight:500;
+  font-size:clamp(1.15rem,2.4vw,1.5rem);
+  color:var(--rtg-txt);
+  text-wrap:balance;
+}
+.rtg-leeg-vlak p{
+  margin:0;
+  max-width:44ch;
+  color:var(--rtg-muted);
+  font-size:.84rem;
+  line-height:1.6;
+}
+.rtg-leeg-actie{
+  margin-top:.7rem;
+  display:inline-block;
+  border:1px solid var(--rtg-line);
+  border-radius:0;
+  padding:.6rem 1.1rem;
+  color:var(--rtg-txt);
+  text-decoration:none;
+  font-weight:600;
+  font-size:.78rem;
+}
+.rtg-leeg-actie:hover{ border-color:var(--rtg-leesgoud,var(--rtg-goud)); }
+
+/* ------------------------------------------------- de paginakop ---
+   Elk scherm bouwde dezelfde drie dingen zelf: een klein gouden opschrift,
+   een kop in de displayletter en een dunne gouden streep eronder. Dat gaf
+   veertig keer bijna dezelfde maten en nergens precies dezelfde. Hier staat
+   de maat; wie hem overneemt, hoeft niets meer te kiezen. */
+.rtg-paginakop{ margin:0 0 clamp(1.2rem,3vh,2rem); }
+.rtg-paginakop .rtg-ey{
+  font-size:.58rem;
+  letter-spacing:.26em;
+  text-transform:uppercase;
+  color:var(--rtg-leesgoud,var(--rtg-goud));
+}
+.rtg-paginakop h1{
+  font-family:var(--rtg-display,"Bodoni Moda",Georgia,serif);
+  font-weight:500;
+  font-size:clamp(1.8rem,3.6vw,2.9rem);
+  line-height:1.05;
+  margin:.6rem 0 0;
+  text-wrap:balance;
+}
+.rtg-paginakop p{
+  margin:.7rem 0 0;
+  max-width:62ch;
+  color:var(--rtg-muted);
+  line-height:1.6;
+}
+.rtg-paginakop::after{
+  content:"";
+  display:block;
+  width:44px;
+  height:1px;
+  background:var(--rtg-leesgoud,var(--rtg-goud));
+  margin-top:clamp(.9rem,2vh,1.1rem);
+}
 .rtg-voet{color:var(--rtg-soft);font-size:.78rem;margin:0 0 1rem;}
 /* een logregel: wat er gebeurde, en eronder klein wanneer en door wie */
 .rtg-logrij{display:flex;flex-direction:column;gap:.1rem;padding:.55rem 0;border-top:1px solid var(--rtg-line);}

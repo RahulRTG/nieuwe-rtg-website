@@ -125,5 +125,17 @@ module.exports = (kern) => {
     (req, res) => veilig(res, () => rtfos.gift.plan.vastleggen(req.body, kern.boardroomWie && kern.boardroomWie(req))));
   app.post('/api/rtfos/gift/stand/zet', kern.boardroomAuth || officeAuth,
     (req, res) => veilig(res, () => rtfos.gift.standZet(req.body, kern.boardroomWie && kern.boardroomWie(req))));
+  /* De winkelkant van het kantoor: artikelen zetten en bestellingen afhandelen.
+     De STAND van een bestelling zet een MENS -- software die zelf "verstuurd"
+     aanvinkt, liegt over de enige stap die telt. */
+  app.post('/api/rtfos/winkel/artikelen', officeAuth,
+    (req, res) => veilig(res, () => rtfos.winkel.etalage()));
+  app.post('/api/rtfos/winkel/artikel/zet', officeAuth,
+    (req, res) => veilig(res, () => rtfos.winkel.artikelZet(req.body, kern.boardroomWie && kern.boardroomWie(req))));
+  app.post('/api/rtfos/winkel/bestellingen', officeAuth,
+    (req, res) => veilig(res, () => rtfos.winkel.bestellingen()));
+  app.post('/api/rtfos/winkel/stand', officeAuth,
+    (req, res) => veilig(res, () => rtfos.winkel.standZet(req.body, kern.boardroomWie && kern.boardroomWie(req))));
+
   require('./portalen')({ app, rtfos, veilig });
 };

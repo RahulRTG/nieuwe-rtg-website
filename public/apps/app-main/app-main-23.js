@@ -122,6 +122,7 @@
     klimaat:     { naam: 'Klimaatfonds', url: '/apps/foundation/klimaatfonds.html' },
     buurtruil:   { naam: 'Buurtruil', url: '/apps/foundation/buurtruil.html' },
     geven:       { naam: 'Geven', url: '/apps/foundation/geven.html' },
+    rtfwinkel:   { naam: 'Winkel van de RTFoundation', url: '/apps/foundation/winkel.html' },
     spelen:      { naam: 'Spelen',       url: '/apps/spelen.html?pas=' + encodeURIComponent(pas) },
     vrienden:    { naam: 'Vrienden',     url: '/apps/foundation/vrienden.html' },
     juridisch:   { naam: 'Juridisch',    url: '/apps/juridisch.html' },

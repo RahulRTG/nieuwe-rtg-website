@@ -352,3 +352,45 @@ juridische toets op de machtigingstekst is mensenwerk; die claim ik niet.
   en hier een stand met vier waarden, waarvan `onbekend` met opzet iets anders
   is dan `nee`. Een boolean kan die twee niet uit elkaar houden, dus als er ooit
   één plek komt, is het deze vorm en niet die.
+
+---
+
+## 9. De winkel, en waarom hij hier staat (31 augustus 2026)
+
+De RTFoundation heeft een winkel. Hij staat in dit document en niet ergens
+anders, omdat de scherpste grens van de giftlaag er precies doorheen loopt:
+**een aankoop is geen gift.** `kern/rtfos/herkomst.js` weigert een donatie waar
+iets tegenover staat, en de giftlaag geeft dan een factuur in plaats van een
+giftbewijs. In een winkel staat er per definitie iets tegenover. De winkel loopt
+daarom **niet** langs de giftweg, en er komt nooit een giftbewijs uit — ook niet
+als iemand meer betaalt dan het ding kost.
+
+**Een correctie op wat ik eerder zei.** Ik meldde eerst dat een winkel op de
+bestaande commerce-laag kon, daarna dat dat niet kon. Nagemeten in de code klopt
+de eerste versie, met een grens: `kern/mall/aanbod.js` is een leeslaag die
+domeinen op één vorm projecteert, `kern/commerce/mand.js` is de mand en
+`kern/commerce/afrekening.js` rekent een afrekening **per verkoper** uit — maar
+bevestigen en betalen doet elk domein zelf (`bevestigBij`); RTG bevestigt niets
+namens een verkoper. `kern/rtfos/winkel.js` is dus dat laatste stuk voor de
+stichting en geen tweede winkel.
+
+Vier grendels: geen voorraad geen verkoop; de prijs komt nooit uit de browser
+(een meegestuurd bedrag wordt **gemeld**, niet stil genegeerd); het geld landt in
+de wallet van de stichting langs `pay.partnerIn`, dezelfde weg als een gift; en
+wat er met een bestelling gebeurt zet een **mens** — software die zelf
+"verstuurd" aanvinkt, liegt over de enige stap die telt.
+
+**Afhalen, en daarom geen gegevenspoort.** De poort stond er even wel, met soort
+`bestelling` — en die vraagt een telefoonnummer met de reden *"de zaak moet je
+kunnen bereiken als er iets verandert aan je TAFEL of je bestelling"*. Een
+horecareden onder een webwinkel van een stichting: waar genoeg om door een
+keuring te komen, en onwaar op het scherm. Deze winkel verstuurt niets; je haalt
+op, en de stichting ziet een codenaam. Komt er bezorging bij, dan hoort de poort
+er wél bij (soort `bezorging`) en hoort de vrijstelling in `scripts/check.js`
+weg. Dat staat op alle drie de plekken opgeschreven waar iemand het zou raken.
+
+Wat er niet in zit: geen bezorging, geen verzendkosten, geen retour en geen
+btw-berekening. De btw hoort in `kern/fiscaal/tarief.js` en nergens anders;
+zolang deze winkel geen fiscale behandeling per artikel draagt, staat er geen
+btw-bedrag op het scherm — een 0 die niemand heeft gerekend is erger dan een
+lege plek.

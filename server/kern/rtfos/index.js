@@ -46,6 +46,7 @@
      meldcode         de vijf wettelijke stappen bij zorg om een kind
      ruil             de buurtruil tussen leden: spullen, zonder geld
      gift             de giftstand, het voornemen en de bevestigde gift
+     winkel           kopen bij de stichting -- en dat is met opzet GEEN gift
 
    WAT DIT NIET IS. Geen tweede ledenadministratie en geen tweede boekhouding.
    De 30%-afdracht van RTG naar de stichting blijft in kern/fonds.js; dit OS
@@ -95,6 +96,14 @@ module.exports = (state) => {
   const ruil = require('./ruil')(ctx);
   ctx.bronUitGift = (x) => geld.bronUitGift(x);
   const gift = require('./gift')(ctx);
+  /* De winkel. Hij leunt op de giftstand voor EEN ding: waar het geld landt.
+     Twee walletcodes naast elkaar zou betekenen dat de opbrengst van een boek
+     ergens anders binnenkomt dan een gift, en dan klopt geen enkel overzicht. */
+  ctx.winkelOntvanger = () => {
+    const o = gift.stand().ontvanger;
+    return o && o.soort === 'wallet' && o.code ? o.code : null;
+  };
+  const winkel = require('./winkel')(ctx);
   const activiteiten = require('./activiteiten')(ctx, { vogGeldig: vrijwilligers.vogGeldig });
   const berichten = require('./berichten')(ctx);
   /* Fase vier: het netwerkeffect. Delen, samen kopen, mensen uitwisselen en
@@ -143,7 +152,7 @@ module.exports = (state) => {
     vlagZet: steden.vlagZet, limietZet: steden.limietZet, zetelZet: steden.zetelZet,
     zetelWeg: steden.zetelWeg, kernteamZet: steden.kernteamZet,
     partners, projecten, vrijwilligers, geld, casus, integriteit, rapport, gemeente, ondernemers,
-    subsidies, voorraad, ruil, gift, activiteiten, berichten,
+    subsidies, voorraad, ruil, gift, winkel, activiteiten, berichten,
     netwerk, inkoop, uitwisseling, campagnes, koppeling,
     bestuur, beleid, jaarverslag, risico, herkomst, meldcode,
     vrijwilligerportaal, deelnemerportaal, publiek,

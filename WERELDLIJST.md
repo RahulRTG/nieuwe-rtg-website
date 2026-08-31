@@ -156,6 +156,11 @@ beginscherm (`WERELDEN.md`, *RTG Core*). Maar het hoort wel zichtbaar te
 staan, want het verschil tussen "met opzet overal" en "per ongeluk
 nergens" is van buiten niet te zien.
 
-Er is geen onderdeel zonder plek: alles wat de registry kent, wordt door
-een map genoemd.
+**Deze onderdelen hebben geen plek en dat is een gat.** Ze bestaan in de
+registry, maar geen enkele map noemt ze — een lid vindt ze alleen als
+hij het pad al kent:
+
+- `link:rtfwinkel` (Winkel van de RTFoundation)
+
+Geef ze een map, of haal ze weg. Een derde uitkomst is er niet.
 

@@ -2,7 +2,7 @@
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
   "vastgelegd": "2026-08-31",
   "gemeten": {
-    "bestanden": 1895,
+    "bestanden": 1896,
     "domeinenTotaal": 538,
     "koopbareVormen": 514,
     "koopbareDomeinen": 108,
@@ -17,9 +17,9 @@
     "wagenVormen": 31,
     "wagenVormenUniek": 28,
     "wagenDomeinen": 20,
-    "optellingen": 103,
+    "optellingen": 104,
     "optelDomeinen": 52,
-    "optelCenten": 54,
+    "optelCenten": 55,
     "optelEuro": 5,
     "optelGemengd": 0,
     "optelOnbekend": 44
@@ -324,7 +324,7 @@
         "prijs": "sleutelSom",
         "beschikbaarheid": "agendaBij",
         "reserveer": "gereserveerd",
-        "bevestig": "bevestig",
+        "bevestig": "bestellingen",
         "lever": "uitgifte"
       },
       "telt": 6
@@ -2293,6 +2293,16 @@
       ]
     },
     {
+      "domein": "kern/rtfos",
+      "plekken": 4,
+      "waar": [
+        "server/kern/rtfos/donateur.js",
+        "server/kern/rtfos/geld.js",
+        "server/kern/rtfos/inkoop-sluiten.js",
+        "server/kern/rtfos/winkel.js"
+      ]
+    },
+    {
       "domein": "kern/command",
       "plekken": 3,
       "waar": [
@@ -2317,15 +2327,6 @@
         "server/kern/gast/betalen.js",
         "server/kern/gast/foodcourt.js",
         "server/kern/gast/order.js"
-      ]
-    },
-    {
-      "domein": "kern/rtfos",
-      "plekken": 3,
-      "waar": [
-        "server/kern/rtfos/donateur.js",
-        "server/kern/rtfos/geld.js",
-        "server/kern/rtfos/inkoop-sluiten.js"
       ]
     },
     {

@@ -879,6 +879,19 @@ console.log('\n16) elk leden-pad met een derde partij gaat langs de gegevenspoor
     ['/api/member/rechterhand/logboek/regel', 'idem: een onderhoudsregel bij eigen bezit'],
     ['/api/member/rechterhand/logboek/regel/weg', 'idem'],
     ['/api/tickets/aanbod', 'het aanbod bekijken; er gebeurt nog niets'],
+    /* De winkel van de RTFoundation. Deze route KWAM eerst door de poort met
+       soort 'bestelling', en dat was fout op een manier die het waard is op te
+       schrijven: die soort vraagt een telefoonnummer met de reden "de zaak moet
+       je kunnen bereiken als er iets verandert aan je TAFEL of je bestelling".
+       Een horeca-reden onder een webwinkel van een stichting -- waar en klopt
+       alleen omdat de tekst niemand opvalt.
+
+       Deze winkel verstuurt niets: je haalt op bij de stichting, en die ziet
+       een codenaam en een bestelling. Er gaat dus geen contactgegeven naar een
+       derde. Komt er ooit bezorging bij, dan hoort de poort er WEL bij (soort
+       'bezorging': telefoon en adres), en dan hoort deze regel hier weg. Dat
+       staat ook in de kop van kern/rtfos/winkel.js. */
+    ['/api/rtfos/winkel/koop', 'afhalen bij de stichting; die ziet een codenaam en een bestelling, geen contactgegeven'],
     /* De gastkant van de horeca. Bestellen loopt WEL door de poort (zie
        routes/gast/bezorgen.js); deze twee delen niets: een kaart lezen is het
        aanbod bekijken, en je eigen lopende bestelling teruglezen geeft de zaak

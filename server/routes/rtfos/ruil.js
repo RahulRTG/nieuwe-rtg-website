@@ -87,6 +87,30 @@ module.exports = ({ app, auth, geenGast, liveCodename, rtfos, veilig }) => {
     veilig(res, () => rtfos.gift.plan.stop(ik(req), lijf(req)));
   });
 
+  /* DE WINKEL. Hij hangt bij de ledendeur en niet bij de giftroutes, en dat is
+     het hele punt: een aankoop is geen gift. De etalage mag iedereen met een
+     account zien; kopen doet de sessie zelf, en de prijs komt van de server. */
+  app.post('/api/rtfos/winkel', auth, leesRem, (req, res) => {
+    if (geenGast(req, res)) return;
+    veilig(res, () => rtfos.winkel.etalage());
+  });
+  app.post('/api/rtfos/winkel/koop', auth, schrijfRem, (req, res) => {
+    if (geenGast(req, res)) return;
+    /* GEEN GEGEVENSPOORT, EN DAT IS EEN BESLUIT MET EEN HOUDBAARHEIDSDATUM.
+       Hij stond er even wel, met soort 'bestelling' -- maar die vraagt een
+       telefoonnummer met de reden "de zaak moet je kunnen bereiken als er iets
+       verandert aan je tafel". Een horecareden onder een webwinkel van een
+       stichting. Deze winkel verstuurt niets: je haalt op, en de stichting ziet
+       een codenaam. Komt er bezorging bij, dan hoort hier
+       `gegevensStop(req, res, 'bezorging')` te staan en gaat de regel in
+       scripts/check.js weg. Zie kern/rtfos/winkel.js. */
+    veilig(res, () => rtfos.winkel.koop(Object.assign({}, lijf(req), { codenaam: ik(req) })));
+  });
+  app.post('/api/rtfos/winkel/mijn', auth, leesRem, (req, res) => {
+    if (geenGast(req, res)) return;
+    veilig(res, () => rtfos.winkel.mijn(ik(req)));
+  });
+
   /* WAAR EEN GEOORMERKTE GIFT HEEN KAN. Een lijst en geen vrij tekstveld: het
      oormerk wees hiervoor nergens op na te kijken heen. `soort` is een beeld en
      geen grens -- zie kern/rtfos/gift-projecten.js. */

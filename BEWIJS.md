@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1416 bestanden en 9969 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1417 bestanden en 9974 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1416 |
-| losse beweringen (`test(...)`) | 9969 |
+| toetsbestanden | 1417 |
+| losse beweringen (`test(...)`) | 9974 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 50 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 971 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 39 |
 | alleen in de kop *genoemd*, nog niet gemeten | 117 |
-| niets van beide | 279 |
+| niets van beide | 280 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1239 bestanden, 9666 beweringen.
+1240 bestanden, 9671 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -920,6 +920,7 @@ toets omvalt.
 | `rtfos-portalen.test.js` | 8 | gezakt op `liegpoort /api/` | HET FOUNDATION OS: DE PORTALEN EN DE DOSSIERS Dit derde toetsbestand dekt wat de eerste twee lieten liggen: de code-deuren naar buiten (partnerstichting en lokale ondernemer), en de dossierkant van projecten,... |
 | `rtfos-ruil.test.js` | 8 | -- | DE BUURTRUIL -- de vijf grendels uit kern/rtfos/ruil.js, elk apart. Waarom deze toets bestaat: dit is de ENIGE rtfos-deur die op een gewone ledensessie opengaat. |
 | `rtfos-uitvoering.test.js` | 8 | gezakt op `liegpoort /api/` | HET FOUNDATION OS, FASE TWEE: SUBSIDIES, VOORRAAD, ACTIVITEITEN, BERICHTEN test/rtfos.test.js toetst de governance-grendels (oormerk, vier ogen, limiet, VOG, toestemming, scheiding tussen steden). Dit bestand gaat... |
+| `rtfos-winkel.test.js` | 5 | -- | DE WINKEL VAN DE RTFOUNDATION -- en waarom een aankoop geen gift is. Dit is de scherpste grens van deze laag, en hij stond al in dit huis: kern/rtfos/herkomst.js weigert een donatie waar iets tegenover staat, en de... |
 | `rtfos.test.js` | 12 | gezakt op `liegpoort /api/` | HET FOUNDATION OS: DE GRENDELS DIE DE GOVERNANCE DRAGEN Dit toetsbestand gaat NIET over of de schermen vullen. Het gaat over de acht dingen die een federatieve stichting stukmaken zodra ze niet in code staan, en die... |
 | `rtfschool.test.js` | 6 | gezakt op `liegpoort /api/` | De School-Bibliotheek (10.000 school-apps per leeftijdsgroep, altijd gratis, met de leeftijdspoort) en Samen voor de gezinsapps (kindveilig: alleen gezin en bevestigde vrienden). Draai los: node --test... |
 | `rtfschool2.test.js` | 3 | gezakt op `liegpoort /api/` | RTF-golf 2: school en de toetsplanner in samenhang. De gezinsagenda leest school alleen mee (open huiswerk en toetsen als bron 'school', net als de RTG-ecosysteemlaag), de leerplanner zet huiswerk, leerstappen en... |

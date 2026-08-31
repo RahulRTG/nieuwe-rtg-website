@@ -726,7 +726,7 @@ Een scherm dat "mijn AI mag bestellingen zelfstandig plaatsen ✓" toont terwijl
 een fractie van de bestelroutes onder bewijs ligt, is een schermleugen
 (`SCHERMLEUGEN.json` bestaat niet voor niets).
 
-### Blok 8 — Intelligence router · **een besluit nodig, en deels nieuw werk**
+### Blok 8 — Intelligence router · **GEBOUWD, in de schaduw**
 
 De selectievolgorde als huisregel: kan het met een regel → regel; met een exact
 algoritme → algoritme; met optimalisatie → optimizer; met statistiek →
@@ -740,6 +740,47 @@ grootboek, expliciet geen zwarte doos), `kern/reisoplosser.js`,
 constraint solver (par. 3, punt 4). En intern hoort het onderscheid ook in de
 taal te zitten: **AUTOMATISERING, OPTIMALISATIE, VOORSPELLING, REGELS, AI** zijn
 vijf dingen en niet één woord.
+
+**De vondst die dit blok opende: de volgorde staat vandaag omgekeerd.** De
+regellaag bestaat al — `kern/ai/demoantwoorden.js` levert vaste antwoorden zonder
+model — maar in `kern/ai.js` staat hij **ná** het model: is er een sleutel, dan
+antwoordt het model altijd, en het regelantwoord vangt alleen een storing op. De
+huisregel zegt het omgekeerde.
+
+**Wat er staat** (`server/kern/ai/router.js`, aangehaakt in `kern/ai.js`): vijf
+technieken in volgorde van goedkoop en zeker naar duur en vaag, een register van
+motoren die **aantoonbaar bestaan**, en een uitslag die altijd een techniek én
+een reden draagt.
+
+**Hij beslist niets, en dat is een besluit.** De router draait in de **schaduw**:
+hij zegt welke techniek erbij zou horen en telt dat, terwijl de modelaanroep
+gewoon doorgaat. De volgorde omdraaien betekent namelijk dat een matig
+regelantwoord een goed modelantwoord kan verdringen — en dat merkt niemand, want
+er komt gewoon een antwoord. Eerst het getal, dan de omkering; dezelfde afspraak
+als `CONTROLPLANE.md`: je kunt niet afdwingen wat nooit in de schaduw heeft
+gelopen. Een mutatie die er een modelaanroep in zet, laat de suite zakken.
+
+**Hij wijst alleen naar motoren die bestaan**, en de toets laadt ze allemaal:
+`demoantwoorden.js` (regels), `fiscaal/btwtelling.js` en `navigatie/wegennet.js`
+(algoritme), `voorspel/index.js` en `kosten/vooruitblik.js` (voorspelling),
+`ai/prompt.js` (ai).
+
+**En de ontbrekende techniek wordt hardop genoemd.** Er is géén optimizer:
+`kern/agent.js` maakt roostervoorstellen op weekdagfactoren, en dat is een
+heuristiek. "Maak volgende week een beter rooster" valt daarom terug op het
+model — mét de reden erbij dat de techniek die erbij hoort hier niet bestaat.
+Twee mutaties bewaken die eerlijkheid: de gatenlijst leegmaken zakt, en een
+verzonnen `roosteroptimizer.js` in het register zakt ook. Dat is de `rooms`-fout
+in beide richtingen.
+
+**Elk antwoord draagt nu zijn techniek en de reden** (`techniek`, `waarom`,
+`schaduw` op het antwoord van Rahul), zodat achteraf narekenbaar is waarom er een
+model aan te pas kwam.
+
+**Wat er open blijft:** de omkering zelf, en die hoort te wachten op de meting.
+De tellers leven in het proces en overleven een herstart niet — dat staat in de
+uitslag, want een schaduwmeting die zichzelf groter voordoet dan zij is, is
+erger dan geen meting.
 
 ### Blok 9 — Commandbalk · **jaren weg**
 

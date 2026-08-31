@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1423 bestanden en 10008 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1424 bestanden en 10018 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1423 |
-| losse beweringen (`test(...)`) | 10008 |
+| toetsbestanden | 1424 |
+| losse beweringen (`test(...)`) | 10018 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 50 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 971 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 39 |
 | alleen in de kop *genoemd*, nog niet gemeten | 118 |
-| niets van beide | 285 |
+| niets van beide | 286 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1246 bestanden, 9705 beweringen.
+1247 bestanden, 9715 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -62,6 +62,7 @@ toets omvalt.
 | `ai-optioneel.test.js` | 12 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `ai-regie.test.js` | 4 | gezakt op `liegpoort /api/` | De AI-regie van de boardroom: het kantoor vult Rahuls karakter en verhaal AAN (nooit vervangen: de vaste kern staat in de code en wordt door test/rahul-eerlijk.test.js bewaakt). De aanvulling komt live mee in elke... |
 | `ai-rem.test.js` | 3 | -- | DE REM PER AANROEPER. De meter ernaast (./ai-meter.test.js) draait de kraan dicht op een DAGbedrag. |
+| `ai-router.test.js` | 10 | -- | DE INTELLIGENTIEROUTER (server/kern/ai/router.js, EXECUTIE.md blok 8). De huisregel is: kan het met een regel, dan een regel; pas als er taal, dubbelzinnigheid of redenering nodig is, komt een model. |
 | `ai-uitwijk.test.js` | 10 | gezakt op `===->!==` | De AI-uitwijk: onze eigen dunne clients voor Claude, OpenAI en Gemini (allemaal in de Claude-vorm: messages.create in, Claude-vormig antwoord uit) plus server/ai.js die naar de volgende aanbieder overstapt als er een... |
 | `aidata.test.js` | 3 | gezakt op `liegpoort /api/` | De eigen-AI-dataset: de boardroom-knop die alle logs (Rahul-gesprekken, ballotage, audit, transacties, kantoorchat) als JSONL bewaart om later een eigen model te trainen. Getest: het bord telt, de export is geldig... |
 | `aikosten-route.test.js` | 8 | -- | HET LUIK OP DE MODELKRAAN. server/ai-meter.js telt wat er aan externe modellen omgaat. |

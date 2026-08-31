@@ -818,7 +818,18 @@ graden, en over de 176 bereikbare paden zijn dat er 36 `gemeten`, 44
 elkaar lopen: "de proef kwam er niet bij" is iets anders dan "er gebeurt niets",
 en een plan dat "raakt niets aan" zegt terwijl niemand keek is een geruststelling
 zonder grond. Wat er NIET staat is een echte droogloop: het plan wordt niet in de
-zandbak uitgevoerd, er wordt een eerdere meting op geprojecteerd. Hij verandert geen bevoegdheid en kan dat ook niet
+zandbak uitgevoerd, er wordt een eerdere meting op geprojecteerd. **Blok 8 staat in de
+SCHADUW** (`kern/ai/router.js`): vijf technieken in volgorde -- regels,
+algoritme, optimalisatie, voorspelling, ai -- met een register van motoren die
+aantoonbaar bestaan en een uitslag die altijd een techniek EN een reden draagt.
+De vondst die het opende: de volgorde staat vandaag OMGEKEERD, want
+`demoantwoorden.js` levert al regelantwoorden maar staat in `kern/ai.js` NA het
+model. De router beslist daarom niets: hij meet hoe vaak een goedkopere techniek
+het gedekt zou hebben, en pas met dat getal is omdraaien een besluit in plaats
+van een gok (een matig regelantwoord dat een goed modelantwoord verdringt, merkt
+niemand). Hij wijst alleen naar motoren die laden, en de ontbrekende techniek
+staat er hardop bij: er is GEEN constraint solver -- kern/agent.js roostert op
+weekdagfactoren, en dat is een heuristiek. Hij verandert geen bevoegdheid en kan dat ook niet
 (hij filtert de lijst die `beleid.js` al goedkeurde, en toets 1 houdt vast dat de
 uitkomst altijd een deelverzameling is), en zijn woordenschat komt uit de
 padsegmenten zelf zodat er geen tweede routelijst ontstaat. Twee dingen daar niet

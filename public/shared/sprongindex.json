@@ -885,6 +885,19 @@
       "url": "/apps/foundation/schrift.html"
     },
     {
+      "naam": "Klimaatfonds",
+      "wereld": "FoundationOS",
+      "soort": "link",
+      "sleutel": "klimaat",
+      "url": "/apps/foundation/klimaatfonds.html",
+      "woorden": [
+        "straat",
+        "koelt",
+        "bedenkt",
+        "zelf"
+      ]
+    },
+    {
       "naam": "RTFoundation in jouw buurt",
       "wereld": "FoundationOS",
       "soort": "link",

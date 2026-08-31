@@ -107,7 +107,7 @@ prijs of doelgroep; ze moeten elk een stabiele menselijke context zijn.
 | **LivingOS** | `/apps/rtg.html` | mijn dagelijks leven | 59 |
 | **WorkOS** | `/apps/kantoor.html` | mijn werk en organisaties | 13 |
 | **TravelOS** | `/apps/reizen.html` | mijn reizen en onderweg zijn | 14 |
-| **FoundationOS** | `/apps/foundation/os-publiek.html` | RTFoundation en haar maatschappelijke werk | 4 |
+| **FoundationOS** | `/apps/foundation/os-publiek.html` | RTFoundation en haar maatschappelijke werk | 5 |
 
 Die laatste kolom telt items in `MAPPEN` en geen schermen. De tabel wordt
 machinaal vergeleken met de code, dus als hij niet meer klopt zakt de bouw.
@@ -217,6 +217,13 @@ een plek, alles wat eraan komt, uit alle reisapps tegelijk"*
 De operationele en digitale wereld van de stichting: bestuur, donateurs,
 vrijwilligers, deelnemers, veldwerk, het onderzoekslab, het labfonds, de
 onderwijsprogramma's, de stadsraad, het RTF-kantoor, maatschappelijke projecten.
+
+Het **Klimaatfonds** hangt er sinds 31 augustus 2026 als vijfde onderdeel in, en
+het is met opzet een VENSTER en geen nieuw lab: klimaat is de soort `duurzaam`
+in `server/kern/livinglab/kader.js`, en dat lab telt al 23 modules met studies,
+ethiek, bewijsgraden en een thema-trechter voor bewoners. Een eigen klimaatlab
+zou die hele laag dupliceren -- de toetsvraag van `PLATFORM.md` par. 0b
+beantwoordt zichzelf hier: tweede ingang, geen zelfstandige capability.
 
 Gemeten: van de 71 schermen onder `public/apps/foundation/` gaan er acht over de
 stichting als organisatie (`os-bestuur`, `os-donateur`, `os-vrijwilliger`,

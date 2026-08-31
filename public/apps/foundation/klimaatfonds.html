@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0C0C0B">
+<title>Klimaatfonds · RTFoundation</title>
+<link rel="icon" href="/icons/foundation.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<link href="premium.css" rel="stylesheet">
+<style>
+  :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--line:var(--rtg-line);--txt:var(--rtg-txt);--muted:var(--rtg-muted);--soft:var(--rtg-soft);--burgundy:#A6002F;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
+  h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;}
+  main{padding:1rem;max-width:1000px;margin:0 auto;display:flex;flex-direction:column;gap:1.1rem;}
+  .kfkaart{background:var(--card);border:1px solid var(--line);padding:.95rem 1rem;}
+  .kfsec{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--rtg-goud,#C9A24B);margin-bottom:.6rem;}
+  .kfknop{background:transparent;color:var(--txt);border:1px solid var(--line);padding:.6rem 1rem;font:inherit;font-weight:500;font-size:.88rem;cursor:pointer;min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:.4rem;text-decoration:none;}
+  .kfknop.vol{background:var(--burgundy);color:#fff;border-color:var(--burgundy);font-weight:600;}
+  .kfveld{flex:1;min-width:12rem;background:var(--bg);border:1px solid var(--line);color:var(--txt);font:inherit;font-size:.9rem;padding:.6rem .7rem;min-height:44px;}
+  .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
+  .uitleg{font-size:.86rem;color:var(--muted);line-height:1.65;}
+  .leeg{color:var(--muted);font-size:.9rem;padding:.5rem 0;}
+  .melder{font-size:.88rem;padding:.6rem .8rem;border:1px solid #5C1B2C;color:#F0A9BB;}
+  .ruimte{margin-top:.7rem;}
+  .verborgen{display:none;}
+
+  /* ONYX EN GEEN GROEN. Hier stond een groen verloop, omdat klimaat groen is --
+     maar groen staat niet in de merkkleuren (CLAUDE.md) en een wereld mag geen
+     eigen palet beginnen. De materialen van dit huis zijn Pearl, Gold, Onyx,
+     Bordeaux en Royal; dit is Onyx met goud, zoals de rest van de donkere
+     schermen. */
+  .onthaal{position:relative;overflow:hidden;padding:2rem 2rem 1.8rem;
+    background:linear-gradient(155deg,#1B1817 0%,#151312 54%,#0C0C0B 100%);color:#F4F0E9;border:1px solid var(--line);}
+  .onthaal::before{content:"";position:absolute;inset:0;opacity:.22;pointer-events:none;
+    background:repeating-linear-gradient(112deg,rgba(201,162,75,.07) 0 2px,transparent 2px 28px);}
+  .onthaal > *{position:relative;}
+  .onthaal .ey{font-size:.66rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--rtg-goud,#C9A24B);margin-bottom:.6rem;}
+  #kfkop{font-size:clamp(1.7rem,4vw,2.5rem);line-height:1.14;font-family:'Bodoni Moda',Georgia,serif!important;font-weight:400!important;text-transform:none!important;}
+  .onthaal p{font-size:.98rem;line-height:1.6;max-width:46ch;margin-top:.9rem;color:#F4F0E9;}
+
+  .steden{display:grid;grid-template-columns:repeat(auto-fill,minmax(9rem,1fr));gap:.6rem;}
+  .stadknop{background:transparent;border:1px solid var(--line);color:inherit;font:inherit;padding:.7rem .8rem;text-align:left;cursor:pointer;min-height:44px;}
+  .stadknop[aria-pressed="true"]{border-color:var(--rtg-goud,#C9A24B);box-shadow:inset 0 -3px 0 var(--rtg-goud,#C9A24B);}
+  .stadknop b{display:block;font-size:.9rem;font-weight:600;}
+  .stadknop span{font-size:.74rem;color:var(--muted);}
+
+  .idee{border-bottom:1px solid var(--line);padding:.75rem 0;display:flex;gap:.8rem;align-items:flex-start;}
+  .idee:last-child{border-bottom:none;}
+  .idee .vraag{flex:1;min-width:0;font-size:.92rem;line-height:1.5;}
+  .idee .meta{font-size:.74rem;color:var(--muted);margin-top:.25rem;}
+  .stem{flex-shrink:0;min-width:44px;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.1rem;
+    background:transparent;border:1px solid var(--line);color:inherit;font:inherit;cursor:pointer;padding:.2rem .5rem;}
+  .stem b{font-size:.95rem;}
+  .stem span{font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);}
+
+  .studie{border-bottom:1px solid var(--line);padding:.75rem 0;}
+  .studie:last-child{border-bottom:none;}
+  .studie b{font-size:.92rem;}
+  .stap{display:inline-block;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);padding:.15rem .55rem;color:var(--muted);margin-left:.4rem;}
+  .balk{display:flex;gap:2px;margin-top:.5rem;}
+  .balk i{height:5px;flex:1;background:var(--line);}
+  .balk i.aan{background:var(--rtg-goud,#C9A24B);}
+
+  @media (max-width:760px){ .onthaal{padding:1.4rem 1.1rem 1.2rem;} }
+</style>
+<link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
+</head>
+<body class="rtg-stijl" data-rtg-world="foundation">
+<main id="main">
+
+  <section class="onthaal" aria-labelledby="kfkop">
+    <div class="ey">FoundationOS · Klimaatfonds</div>
+    <h1 id="kfkop">Wat je straat koelt,<br>bedenkt je straat zelf.</h1>
+    <p>Het Klimaatfonds is het klimaatvenster op het Living Lab van de RTFoundation: hier staan de
+      vragen die bewoners aandragen over duurzaamheid, en de onderzoeken die eruit voortkomen.</p>
+  </section>
+
+  <!-- WAT DIT SCHERM WEL EN NIET IS. Het is een VENSTER: een eigen ingang op
+       dezelfde kern (server/kern/livinglab, 23 modules). Er is met opzet geen
+       tweede lab, geen tweede thema-lijst en geen tweede stemming gebouwd --
+       dat zou het subsysteem dupliceren dat PLATFORM.md juist beschermt. Wat
+       hier gebeurt, gebeurt in het Living Lab en is daar ook te zien. -->
+  <div class="kfkaart">
+    <div class="kfsec">Kies je stad</div>
+    <div class="steden" id="labs"><div class="leeg">Laden...</div></div>
+    <div id="melding"></div>
+  </div>
+
+  <div id="inhoud" class="verborgen">
+    <div class="kfkaart ruimte">
+      <div class="kfsec">Wat bewoners willen weten</div>
+      <div id="themas"><div class="leeg">Laden...</div></div>
+      <!-- DE ALIAS WORDT GEVRAAGD EN NIET VERZONNEN. kern/livinglab/themas.js
+           telt een stem per alias en weigert een tweede van dezelfde. Zou dit
+           scherm er zelf een bedenken, dan is die drempel weg -- en dan koopt
+           wie tien keer klikt tien stemmen. Hij blijft in deze browser staan,
+           gaat niet naar een account, en is te wissen. -->
+      <div class="rij ruimte verborgen" id="aliasrij">
+        <input class="kfveld" id="alias" maxlength="40" placeholder="Onder welke naam stem je?" aria-label="Je naam of alias">
+        <button class="kfknop" id="aliasOk">Onthoud dit</button>
+      </div>
+      <div class="rij ruimte">
+        <input class="kfveld" id="nieuwIdee" maxlength="180" placeholder="Wat zou je willen uitzoeken over het klimaat in je buurt?" aria-label="Je vraag of idee">
+        <button class="kfknop vol" id="stuur">Zet erbij</button>
+      </div>
+      <div class="uitleg ruimte">Je vraag komt in het Living Lab van je stad te staan, waar bewoners erop kunnen stemmen.
+        Een vraag met draagvlak kan een onderzoek worden &mdash; en dan blijft zichtbaar waar hij vandaan kwam.</div>
+    </div>
+
+    <div class="kfkaart ruimte">
+      <div class="kfsec">Wat er onderzocht wordt</div>
+      <div id="studies"><div class="leeg">Laden...</div></div>
+      <div class="uitleg ruimte" id="soortuitleg"></div>
+    </div>
+
+    <div class="kfkaart ruimte">
+      <div class="kfsec">Het fonds</div>
+      <div class="uitleg">Onderzoek uit dit lab wordt betaald uit het labfonds van de RTFoundation.
+        Wat een lab te besteden heeft en waaraan, staat in het fonds zelf &mdash; niet hier, want dan
+        stonden er twee boekhoudingen naast elkaar.</div>
+      <div class="rij ruimte"><a class="kfknop" href="/apps/geld.html#labfonds">Bekijk het labfonds</a>
+        <a class="kfknop" href="/apps/livinglab.html">Het hele Living Lab</a></div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+/* Het Klimaatfonds: een VENSTER op het Living Lab, geen tweede lab.
+
+   WAAROM DIT GEEN EIGEN DOMEIN HEEFT. Er ligt al een lab van 23 modules met
+   studies, ethiek, bewijsgraden en een thema-trechter waar bewoners hun eigen
+   vragen in leggen. Klimaat is daarin een SOORT ('duurzaam' in
+   kern/livinglab/kader.js), geen apart systeem. Een eigen klimaatlab zou die
+   hele laag dupliceren -- precies de vraag die PLATFORM.md stelt: is dit een
+   zelfstandige capability, of een tweede ingang naar dezelfde?
+
+   HET FILTER IS EEN BEELD EN GEEN GRENS. Deze pagina laat de duurzaamheidsvragen
+   zien uit een lijst die openbaar is; dat is een keuze in de weergave, niet een
+   beveiliging. Wat een voorbijganger niet mag zien, stuurt de server sowieso
+   niet mee (kern/livinglab/studie.js kent drie ringen en deze pagina vraagt de
+   buitenste). */
+const $ = s => document.querySelector(s);
+const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+/* De soort waar dit venster op staat. Eén soort, en niet een handvol dat er
+   ongeveer bij hoort: 'mobiliteit' en 'leefomgeving' rááken het klimaat, maar
+   wie ze hier stilzwijgend bijtelt, zegt namens de bewoner dat zijn fietsvraag
+   een klimaatvraag was. */
+const SOORT = 'duurzaam';
+
+const api = (pad, body) => fetch('/api/lab2/bewoner/' + pad, {
+  method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {})
+}).then(async r => {
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok || d.error) throw new Error(d.error || 'Er ging iets mis.');
+  return d;
+});
+
+let LAB = null;
+
+/* De alias staat in deze browser en nergens anders: hij hoort bij het stemmen
+   en niet bij een account. Kan localStorage niet (privémodus, geblokkeerd),
+   dan werkt alles behalve stemmen gewoon door. */
+function alias() { try { return (localStorage.getItem('rtf_lab_alias') || '').trim(); } catch (e) { return ''; } }
+function aliasZet(v) { try { localStorage.setItem('rtf_lab_alias', v); } catch (e) {} }
+const STAPPEN = ['vraagstuk', 'hypothese', 'plan', 'deelnemers', 'experiment', 'observaties', 'reflectie', 'resultaten', 'besluit', 'vervolg'];
+
+async function start() {
+  try {
+    const r = await api('labs');
+    $('#labs').innerHTML = r.labs.length
+      ? r.labs.map(l => '<button type="button" class="stadknop" data-lab="' + esc(l.id) + '" aria-pressed="false">' +
+          '<b>' + esc(l.stad) + '</b><span>' + esc(l.naam) + '</span></button>').join('')
+      : '<div class="leeg">Er is nog geen lab open. Zodra er in een stad een start, staat hij hier.</div>';
+    $('#labs').querySelectorAll('[data-lab]').forEach(k =>
+      k.addEventListener('click', () => kiesLab(k.dataset.lab)));
+  } catch (e) { $('#labs').innerHTML = '<div class="melder">' + esc(e.message) + '</div>'; }
+}
+
+async function kiesLab(id) {
+  LAB = id;
+  $('#labs').querySelectorAll('[data-lab]').forEach(k =>
+    k.setAttribute('aria-pressed', k.dataset.lab === id ? 'true' : 'false'));
+  $('#inhoud').classList.remove('verborgen');
+  await Promise.all([tekenThemas(), tekenStudies()]);
+}
+
+async function tekenThemas() {
+  try {
+    const r = await api('themas', { labId: LAB });
+    const mijn = (r.themas || []).filter(t => t.soort === SOORT);
+    $('#themas').innerHTML = mijn.length ? mijn.map(t =>
+      '<div class="idee"><div class="vraag">' + esc(t.vraag) +
+        '<div class="meta">' + (t.studieId ? 'hier loopt een onderzoek op' : 'nog geen onderzoek') + '</div></div>' +
+      '<button type="button" class="stem" data-stem="' + esc(t.id) + '">' +
+        '<b>' + (Number(t.stemmen) || 0) + '</b><span>steun</span></button></div>').join('')
+      : '<div class="leeg">Nog geen vraag over duurzaamheid in dit lab. De eerste mag van jou zijn.</div>';
+    $('#themas').querySelectorAll('[data-stem]').forEach(b => b.addEventListener('click', async () => {
+      const wie = alias();
+      if (!wie) {
+        $('#aliasrij').classList.remove('verborgen');
+        $('#melding').innerHTML = '<div class="uitleg ruimte">Een stem draagt een naam of alias, zodat er per persoon &eacute;&eacute;n telt. Vul er een in en stem daarna opnieuw.</div>';
+        $('#alias').focus();
+        return;
+      }
+      try { await api('stem', { id: b.dataset.stem, alias: wie }); $('#melding').innerHTML = ''; await tekenThemas(); }
+      catch (e) { $('#melding').innerHTML = '<div class="melder ruimte">' + esc(e.message) + '</div>'; }
+    }));
+  } catch (e) { $('#themas').innerHTML = '<div class="melder">' + esc(e.message) + '</div>'; }
+}
+
+async function tekenStudies() {
+  try {
+    const r = await api('overzicht', { labId: LAB });
+    const mijn = (r.studies || []).filter(s => s.soort === SOORT);
+    $('#studies').innerHTML = mijn.length ? mijn.map(s => {
+      const i = STAPPEN.indexOf(s.stap);
+      return '<div class="studie"><b>' + esc(s.titel) + '</b>' +
+        '<span class="stap">' + esc(s.stap || 'onbekend') + '</span>' +
+        '<div class="balk" aria-hidden="true">' + STAPPEN.map((_, n) =>
+          '<i class="' + (n <= i ? 'aan' : '') + '"></i>').join('') + '</div></div>';
+    }).join('') : '<div class="leeg">Hier loopt nog geen onderzoek over duurzaamheid.</div>';
+
+    /* HET GETAL VAN DE SERVER EN NIET MIJN EIGEN TELLING. perSoort wordt in de
+       kern geteld; wat hierboven staat is de lijst die de buitenste ring mag
+       tonen. Lopen die twee uiteen, dan is dat geen fout maar de scheiding:
+       een gescheiden studie telt wel mee en staat niet in de lijst. */
+    const so = (r.perSoort || []).find(x => x.soort === SOORT);
+    $('#soortuitleg').textContent = so
+      ? 'Dit lab telt ' + so.aantal + ' onderzoek(en) onder ' + so.naam + '; hierboven staan er ' + mijn.length +
+        ' die openbaar te tonen zijn. Een onderzoek dat gescheiden loopt, telt wel mee en staat niet in de lijst.'
+      : '';
+  } catch (e) { $('#studies').innerHTML = '<div class="melder">' + esc(e.message) + '</div>'; }
+}
+
+$('#stuur').addEventListener('click', async () => {
+  const vraag = $('#nieuwIdee').value.trim();
+  if (!LAB || !vraag) return;
+  try {
+    await api('thema', { labId: LAB, vraag, soort: SOORT, door: 'bewoner' });
+    $('#nieuwIdee').value = '';
+    $('#melding').innerHTML = '';
+    await tekenThemas();
+  } catch (e) { $('#melding').innerHTML = '<div class="melder ruimte">' + esc(e.message) + '</div>'; }
+});
+
+$('#aliasOk').addEventListener('click', () => {
+  const v = $('#alias').value.trim();
+  if (v.length < 2) { $('#melding').innerHTML = '<div class="melder ruimte">Een alias is minstens twee tekens.</div>'; return; }
+  aliasZet(v);
+  $('#aliasrij').classList.add('verborgen');
+  $('#melding').innerHTML = '<div class="uitleg ruimte">Genoteerd als <b>' + esc(v) + '</b>. Je kunt nu stemmen.</div>';
+});
+
+start();
+</script>
+<script src="/shared/deelmenu.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/levendekleur.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+<script src="/shared/ios.js" defer></script>
+<script src="schil-os.js" defer></script>
+<script src="premium.js" defer></script>
+</body>
+</html>

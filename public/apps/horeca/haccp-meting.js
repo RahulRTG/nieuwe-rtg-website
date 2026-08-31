@@ -18,8 +18,18 @@
   function $(id) { return document.getElementById(id); }
   var esc = K.esc;
 
+  /* Elke vraag krijgt een nummer, en alleen het antwoord op de LAATSTE vraag
+     mag schrijven. Zonder dat overschreef een trager antwoord van een eerdere
+     ronde het verse logboek: de zojuist vastgelegde meting verdween en het
+     meetpunt stond weer als "vandaag niet gemeten". Een logboek dat een
+     registratie stil laat verdwijnen is precies wat een inspecteur niet mag
+     zien -- dus dit is een schermfout en geen toetsfout. */
+  var ronde = 0;
+
   function logboek() {
+    var mijn = ++ronde;
     K.api('/haccp/logboek', { van: $('aVan').value.trim(), tot: $('aTot').value.trim() }).then(function (r) {
+      if (mijn !== ronde) return;
       var d = r.body;
       if (d.error) return K.meld(d.error);
       $('aAantal').textContent = d.aantal;

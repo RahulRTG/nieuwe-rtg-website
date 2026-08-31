@@ -367,6 +367,82 @@ test('roomservice komt op de gastrekening, de nachtrun boekt geen twee nachten, 
   }
 });
 
+/* HET LOGBOEK MAG EEN VASTGELEGDE METING NIET STIL LATEN VERDWIJNEN.
+
+   Het scherm haalt zijn logboek op na elke handeling. Landde het antwoord van
+   een EERDERE ronde later dan dat van de laatste, dan schreef die oude stand
+   eroverheen: de zojuist vastgelegde afwijking was weg en het meetpunt stond
+   weer als "vandaag nog niet gemeten". Op een druk moment is dat precies de
+   registratie die een inspecteur mist. Deze toets maakt die volgorde met
+   opzet verkeerd -- het eerste logboek-antwoord wordt vertraagd -- en eist
+   dat de meting blijft staan. */
+test('een traag antwoord van een eerdere ronde schrijft niet over het verse logboek heen',
+  { skip: geenBrowser(pw) }, async () => {
+  const TMP = versDir();
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  let browser;
+  try {
+    browser = await pw.chromium.launch(browserOpties(pw));
+    const ctx = await browser.newContext({ serviceWorkers: 'block' });
+    const page = await ctx.newPage();
+    const fouten = [];
+    letOpFouten(page, fouten);
+    const token = await zaakToken(base);
+    const api = horeca(base, token);
+    await api('/haccp/punt', { naam: 'Koeling 9', min: 0, max: 7 });
+    await open(page, base, token, '/apps/horeca-haccp.html');
+    await wachtTot(page, () => [...document.querySelectorAll('#aPunt option')].some(o => /Koeling 9/.test(o.textContent)),
+      null, { wat: 'het meetpunt in de keuzelijst', ms: 20000 });
+
+    /* het EERSTVOLGENDE logboek-antwoord wordt opgehouden; dat is de ronde die
+       nog van voor de meting is */
+    let traag = 0, traagBinnen = false;
+    await page.route('**/api/supplier/horeca/haccp/logboek', async (route) => {
+      if (traag === 1) {
+        traag = 2;
+        /* eerst OPHALEN (dus met de stand van nu), dan pas laat afleveren --
+           anders is het antwoord niet oud maar alleen traag, en dat is precies
+           het verschil dat deze toets moet maken */
+        const antwoord = await route.fetch();
+        const lijf = await antwoord.text();
+        await new Promise(r => setTimeout(r, 3000));
+        await route.fulfill({ response: antwoord, body: lijf });
+        traagBinnen = true;
+        return;
+      }
+      await route.continue();
+    });
+
+    traag = 1;
+    await page.click('#aToon');                 // ronde 1: wordt opgehouden
+    await page.selectOption('#aPunt', { label: 'Koeling 9 (0 tot 7 C)' });
+    await page.fill('#aWaarde', '9');
+    await page.fill('#aActie', 'teruggekoeld, monteur gebeld');
+    await page.click('#aMeting');               // ronde 2: komt er zo langs
+    await wachtOpTekst(page, /teruggekoeld, monteur gebeld/, { in: '#aLog' });
+
+    // pas oordelen als het opgehouden antwoord van ronde 1 echt binnen is
+    const grens = Date.now() + 25000;
+    while (!traagBinnen && Date.now() < grens) await new Promise(r => setTimeout(r, 100));
+    assert.ok(traagBinnen, 'het opgehouden logboek-antwoord is binnengekomen');
+    /* het binnengekomen antwoord nog laten afhandelen door de pagina zelf:
+       twee frames, geen klok -- de afhandeling staat al in de rij */
+    await page.evaluate(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))));
+    const log = await page.evaluate(() => document.getElementById('aLog').innerText);
+    assert.match(log, /teruggekoeld, monteur gebeld/,
+      'de vastgelegde afwijking staat er nog nadat het trage antwoord binnenkwam: ' + log);
+    const gemist = await page.evaluate(() => document.getElementById('aGemist').textContent);
+    assert.ok(!/Koeling 9/.test(gemist),
+      'en het meetpunt staat niet weer als niet-gemeten: ' + gemist);
+
+    assert.deepEqual(fouten, [], 'geen paginafouten: ' + fouten.join(' | '));
+  } finally {
+    if (browser) try { await browser.close(); } catch (e) {}
+    if (child) try { child.kill('SIGKILL'); } catch (e) {}
+    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+  }
+});
+
 test('een polsband kan niet onder nul, de deur weigert met het getal erbij, en een afwijking vraagt een actie',
   { skip: geenBrowser(pw) }, async () => {
   const TMP = versDir();

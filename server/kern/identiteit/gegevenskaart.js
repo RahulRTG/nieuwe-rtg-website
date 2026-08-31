@@ -23,6 +23,27 @@
 'use strict';
 
 const { SOORTEN, WAAR, HERKOMST, GRONDEN } = require('./gegevenssoorten');
+/* DE TERMIJN KOMT UIT HET BELEID EN NIET UIT EEN ZIN. Hij stond eerst als
+   "zeven jaar" in het register, en dat is precies hoe een document van de code
+   wegdrijft: bij het narekenen bleek het inzagejournaal niet "altijd" te
+   blijven maar twee jaar. Wie een bewaartermijn overtypt, heeft hem binnen een
+   jaar mis. */
+const { BELEID } = require('../../bewaartermijnen');
+
+function termijnVan(tak) {
+  if (!tak) return null;
+  const r = (BELEID || []).find(x => x.tak === tak);
+  /* Een tak die niet meer bestaat levert GEEN stilte op: dan staat er op de
+     kaart dat de termijn niet is vast te stellen, en dat is de eerlijke stand.
+     Een verdwenen regel als "geen termijn" tonen zou zeggen dat het eeuwig
+     blijft staan, en dat is de gevaarlijke kant van de fout. */
+  if (!r) return { bekend: false, waarom: 'De bewaarregel voor dit gegeven is niet gevonden; hoe lang het blijft staan is hier niet vast te stellen.' };
+  return {
+    bekend: true, dagen: r.dagen, grond: r.grond,
+    inWoorden: r.dagen >= 365 ? Math.round(r.dagen / 365) + ' jaar' : r.dagen + ' dagen',
+    waarom: r.waarom
+  };
+}
 
 /* De rand van deze kaart, in de woorden van een lid. Alle vier komen ze uit
    hoe dit huis werkelijk in elkaar zit en niet uit voorzichtigheid. */
@@ -97,6 +118,7 @@ function maakGegevenskaart({ accounts, sessieregister, toestellen, commercieel, 
         /* De grond reist mee als UITLEG en niet als code: 'wettelijk' zegt een
            jurist iets en een lid niets. */
         weg: Object.assign({}, s.weg, s.weg.grond ? { grondUitleg: GRONDEN[s.weg.grond] } : {}),
+        ...(s.bewaartak ? { termijn: termijnVan(s.bewaartak) } : {}),
         aanwezig: p.aanwezig,
         /* De reden reist mee met de rij en niet als losse lijst onderaan: een
            onbekende die je pas drie schermen verder kunt verklaren, wordt
@@ -126,7 +148,19 @@ function maakGegevenskaart({ accounts, sessieregister, toestellen, commercieel, 
          weg" verdient het eerlijke antwoord, en dat is nee -- maar alleen om
          deze twee. */
       naOpheffen: SOORTEN.filter(s => s.weg && s.weg.grond && s.weg.grond !== 'account-nodig')
-        .map(s => ({ naam: s.naam, grond: s.weg.grond, reden: s.weg.reden })),
+        .map(s => ({ naam: s.naam, grond: s.weg.grond, reden: s.weg.reden, termijn: termijnVan(s.bewaartak) })),
+      /* EN DE DERDE UITKOMST, die het scherm eerst niet noemde. kern/vergeten.js
+         kent vier soorten en de tweede is "de persoon eruit, de rest blijft":
+         een reactie in andermans draad, de helft van iemands gesprek, de bel van
+         een zaak. Dat is geen wissen en geen bewaren. Wie leest "alles gaat weg"
+         en later zijn eigen zin nog ziet staan zonder naam, is verkeerd
+         voorgelicht -- ook al is er niets fout gegaan. */
+      geanonimiseerd: {
+        wat: 'Wat van u in het werk van een ander zit -- een reactie in andermans draad, uw helft van een gesprek, een beoordeling bij een zaak.',
+        hoe: 'Daar wordt u uit gehaald in plaats van dat het verdwijnt: de tekst blijft staan, uw naam en uw codenaam gaan eraf.',
+        waarom: 'Het is ook het gesprek van iemand anders, en dat kunt u niet namens hem weghalen.',
+        bron: 'server/kern/vergeten/anoniem.js'
+      },
       /* En los daarvan: wat er niet APART weg kan zolang het account bestaat. */
       accountNodig: SOORTEN.filter(s => s.weg && s.weg.grond === 'account-nodig')
         .map(s => ({ naam: s.naam, reden: s.weg.reden }))

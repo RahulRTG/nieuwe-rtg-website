@@ -82,6 +82,26 @@ test('Gegevenskaart: soorten en geen inhoud, met onbekend als eigen uitslag',
     assert.match(await page.textContent('#opheffen details'), /Uw naam/,
       'en daar staat hij wel');
 
+    /* 4b. DE TERMIJN STAAT ER ALS GETAL. "Blijft staan" zonder hoe lang laat
+       een mens denken dat het altijd is -- en bij het inzagejournaal was dat
+       precies de fout: het beleid veegt het na twee jaar. */
+    assert.match(opheffen, /7 jaar/, 'de fiscale termijn staat er als getal');
+    assert.match(opheffen, /2 jaar/, 'en die van het inzagejournaal ook, want "altijd" was onwaar');
+    assert.match(await page.textContent('#lijst'), /Bewaartermijn:/,
+      'en bij het gegeven zelf ook, niet alleen onderaan');
+
+    /* 4c. DE DERDE UITKOMST. Wissen, bewaren EN anonimiseren -- die derde
+       ontbrak, en dan leest "alles gaat weg" als een belofte die je later je
+       eigen zin nog ziet tegenspreken. */
+    /* Op het BLOK en niet op de tekst van #opheffen als geheel: die eerste
+       versie matchte de inleidende zin erboven, en overleefde daardoor een
+       mutatie die het blok zelf wegnam. Een toets die de verkeerde regel leest,
+       staat groen om niets. */
+    const derde = page.locator('#opheffen .let');
+    assert.equal(await derde.count(), 1, 'de derde uitkomst heeft een eigen blok');
+    assert.match(await derde.textContent(), /uw naam en uw codenaam gaan eraf/i,
+      'en zegt wat er dan gebeurt: u wordt eruit gehaald, de tekst blijft staan');
+
     /* 5. DE RAND VAN DE KAART. */
     const grenzen = await page.textContent('#grenzen');
     assert.match(grenzen, /Zegel/, 'wat hier niet op kan komen, staat erbij');

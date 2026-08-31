@@ -133,6 +133,15 @@
     weg.appendChild(tekst(maak('b'), r.weg.kan ? 'Weghalen kan. ' : 'Dit kan niet weg. '));
     weg.appendChild(document.createTextNode(r.weg.kan ? r.weg.hoe : r.weg.reden));
     if (r.weg.grondUitleg) { weg.appendChild(maak('br')); weg.appendChild(tekst(maak('span'), r.weg.grondUitleg)); }
+    /* De termijn komt uit het bewaarbeleid en staat er als GETAL bij. "Blijft
+       staan" zonder hoe lang, laat een mens denken dat het altijd is -- en bij
+       het inzagejournaal was dat precies de fout die deze regel repareert. */
+    if (r.termijn) {
+      weg.appendChild(maak('br'));
+      weg.appendChild(tekst(maak('span'), r.termijn.bekend
+        ? 'Bewaartermijn: ' + r.termijn.inWoorden + ' \u2014 ' + r.termijn.waarom + '.'
+        : r.termijn.waarom));
+    }
     el.appendChild(weg);
     return el;
   }
@@ -162,12 +171,22 @@
     const o = $('#opheffen'); o.textContent = '';
     o.appendChild(tekst(maak('h2'), 'Als u uw account opheft'));
     o.appendChild(tekst(maak('p', 'stil'),
-      'Alles hierboven gaat dan weg, op deze na. Dat is geen keuze van RTG.'));
+      'Er gebeuren dan drie dingen, en ze zijn niet hetzelfde: het meeste gaat weg, twee dingen blijven met een termijn, en van wat in het werk van een ander zit wordt u eruit gehaald.'));
     for (const b of k.naOpheffen) {
       const d = maak('div', 'grens');
-      d.appendChild(tekst(maak('b'), b.naam));
+      d.appendChild(tekst(maak('b'), b.naam + (b.termijn && b.termijn.bekend ? ' \u2014 nog ' + b.termijn.inWoorden : '')));
       d.appendChild(tekst(maak('span'), b.reden));
       o.appendChild(d);
+    }
+    /* DE DERDE UITKOMST. kern/vergeten.js kent hem als "de persoon eruit, de
+       rest blijft"; het scherm noemde hem niet, en dan leest "alles gaat weg"
+       als een belofte die je later je eigen zin nog ziet tegenspreken. */
+    if (k.geanonimiseerd) {
+      const g = maak('div', 'let');
+      g.appendChild(tekst(maak('b'), 'En wat van u in het werk van een ander zit'));
+      g.appendChild(maak('br'));
+      g.appendChild(document.createTextNode(k.geanonimiseerd.hoe + ' ' + k.geanonimiseerd.waarom));
+      o.appendChild(g);
     }
     const d2 = maak('details');
     d2.appendChild(tekst(maak('summary'), 'Wat niet los weg kan zolang uw account bestaat (' + k.accountNodig.length + ')'));

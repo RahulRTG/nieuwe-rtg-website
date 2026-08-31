@@ -426,6 +426,24 @@ per zaak, dus RTG kan hem niet aan uw account terugkoppelen), en de kaart schrij
 niets -- hem openen laat geen spoor achter, anders wordt uw eigen kaart voller
 door ernaar te kijken.
 
+**De termijn komt uit het beleid en niet uit een zin.** Hij stond eerst als
+"zeven jaar" in het register, en het narekenen tegen `server/bewaartermijnen.js`
+legde meteen een fout bloot die ik zelf had geschreven: het inzagejournaal
+"blijft", zei de kaart -- terwijl het beleid het na **730 dagen** veegt. "Blijft
+altijd" en "blijft twee jaar" zijn niet hetzelfde, en het tweede is wat er
+gebeurt. Elk gegeven met een termijn draagt daarom een `bewaartak` die naar de
+regel in het beleid wijst, en de kaart haalt het getal daar op. Verdwijnt die
+regel, dan zegt de kaart dat de termijn niet is vast te stellen -- want een
+verdwenen regel als "geen termijn" tonen zou zeggen dat het eeuwig blijft staan,
+en dat is de gevaarlijke kant van de fout.
+
+**Er zijn drie uitkomsten bij opheffen en niet twee.** `kern/vergeten.js` kent
+vier soorten, en de tweede is *de persoon eruit, de rest blijft*: een reactie in
+andermans draad, uw helft van een gesprek, de bel van een zaak. Dat is geen
+wissen en geen bewaren. Het scherm noemde die derde eerst niet, en dan leest
+"alles gaat weg" als een belofte die iemand later zijn eigen zin nog ziet
+tegenspreken -- ook al is er niets fout gegaan.
+
 Er komt met opzet **geen wisknop** op dit scherm. Weghalen doe je waar het gegeven
 woont; zou het hier ook kunnen, dan bestond er van elk gegeven twee plekken om het
 weg te halen, en dan is er binnen een jaar een die het net iets anders doet.

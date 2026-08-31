@@ -21,6 +21,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const path = require('path');
 const { SOORTEN, WAAR, HERKOMST, GRONDEN } = require('../server/kern/identiteit/gegevenssoorten');
+const { BELEID } = require('../server/bewaartermijnen');
 const { maakGegevenskaart } = require('../server/kern/identiteit/gegevenskaart');
 
 const WORTEL = path.join(__dirname, '..');
@@ -100,6 +101,40 @@ test('2b. en de kaart splitst "gaat mee bij opheffen" van "blijft daarna staan"'
   assert.ok(naam(k.naOpheffen).includes('Uw facturen en betalingen'),
     'en de fiscale bewaarplicht staat er wel, want die blijft echt');
   for (const b of k.naOpheffen) assert.notEqual(b.grond, 'account-nodig');
+});
+
+test('2c. een bewaartermijn wordt opgehaald uit het beleid en nooit overgetypt', () => {
+  /* HIER ZAT EEN ECHTE FOUT. Het register zei dat het inzagejournaal blijft;
+     server/bewaartermijnen.js veegt het na 730 dagen. "Blijft altijd" en
+     "blijft twee jaar" zijn niet hetzelfde. Deze toets houdt de twee aan
+     elkaar vast: elke bewaartak moet in het beleid bestaan, en het getal op de
+     kaart moet DAT getal zijn. */
+  const met = SOORTEN.filter(s => s.bewaartak);
+  assert.ok(met.length >= 2, 'er zijn gegevens met een bewaartermijn');
+  for (const s of met) {
+    const r = BELEID.find(x => x.tak === s.bewaartak);
+    assert.ok(r, s.id + ' wijst naar bewaartak ' + s.bewaartak + ', en die staat niet in het beleid');
+    assert.ok(!/\b(zeven|seven|7)\s*jaar/i.test(s.weg.reden || ''),
+      s.id + ' typt de termijn over in zijn tekst; dan drijft hij weg van het beleid');
+  }
+  const k = opzet().kaartVan('lid-1', { id: 1 });
+  const f = k.rijen.find(r => r.id === 'facturen');
+  assert.equal(f.termijn.dagen, BELEID.find(x => x.tak === 'invoices').dagen,
+    'de kaart toont het getal uit het beleid en niet een eigen getal');
+  assert.equal(f.termijn.inWoorden, '7 jaar');
+  const i = k.rijen.find(r => r.id === 'inzagejournaal');
+  assert.equal(i.termijn.inWoorden, '2 jaar', 'en het inzagejournaal blijft twee jaar, niet altijd');
+});
+
+test('2d. en de derde uitkomst -- geanonimiseerd -- staat er ook', () => {
+  /* kern/vergeten.js kent vier soorten en de tweede is "de persoon eruit, de
+     rest blijft". Wie leest "alles gaat weg" en later zijn eigen zin nog ziet
+     staan zonder naam, is verkeerd voorgelicht -- ook al ging er niets fout. */
+  const k = opzet().kaartVan('lid-1', { id: 1 });
+  assert.ok(k.geanonimiseerd, 'wissen, bewaren EN anonimiseren; die derde ontbrak');
+  assert.ok(k.geanonimiseerd.waarom.length > 20, 'met de reden erbij');
+  assert.ok(fs.existsSync(path.join(WORTEL, k.geanonimiseerd.bron)),
+    'en die verwijst naar code die bestaat: ' + k.geanonimiseerd.bron);
 });
 
 /* ---------------------------------------------------------------------------

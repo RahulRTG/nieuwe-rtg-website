@@ -39,37 +39,7 @@
    ========================================================================== */
 'use strict';
 
-/* De vier plaatsen waar iets van u kan staan. `afgeleid` is er een: het staat
-   NERGENS en wordt bij elke vraag opnieuw berekend, en dat is een geruststelling
-   die je alleen kunt geven als je hem apart benoemt. */
-const WAAR = {
-  kluis: 'In de identiteitskluis: versleuteld, gebonden aan uw rij, en gescheiden van de rest van RTG.',
-  dossier: 'In uw ledendossier: versleuteld, en alleen leesbaar met uw eigen sleutel.',
-  operationeel: 'In de gewone gegevens van RTG, onder uw codenaam en niet onder uw naam.',
-  afgeleid: 'Nergens. Dit wordt bij elke vraag opnieuw uitgerekend en niet bewaard.'
-};
-
-const HERKOMST = {
-  opgegeven: 'U heeft dit zelf opgegeven.',
-  gemeten: 'RTG heeft dit waargenomen terwijl u de app gebruikte.',
-  overgenomen: 'Overgenomen van een document dat een medewerker van RTG heeft gezien.',
-  afgeleid: 'Uitgerekend uit iets anders dat RTG al van u wist.'
-};
-
-/* DRIE REDENEN WAAROM IETS NIET WEG KAN, en ze zijn niet inwisselbaar. Ze
-   stonden eerst alle drie als een kale `kan: false`, en dan komt uw naam op
-   dezelfde lijst als uw facturen -- terwijl het ene meegaat als u uw account
-   opheft en het andere zeven jaar blijft staan. Dat is het verschil waar deze
-   kaart voor bestaat, dus het is een veld en geen zinsnede.
-
-     account-nodig  het account kan niet zonder; het gaat mee als u opheft
-     wettelijk      het blijft ook NA het opheffen staan, en dat is geen keuze
-     beschermt-u    wissen zou het onbruikbaar maken als bescherming */
-const GRONDEN = {
-  'account-nodig': 'Dit kan niet los weg, maar het verdwijnt wel als u uw account opheft.',
-  wettelijk: 'Dit blijft ook na het opheffen van uw account staan. Dat is een wettelijke plicht en geen keuze van RTG.',
-  'beschermt-u': 'Dit kan niet weg omdat het er voor u is: kon u het wissen, dan kon iemand anders dat ook.'
-};
+const { WAAR, HERKOMST, GRONDEN } = require('./gegevenswoorden');
 
 /* Elk gegeven met de vier vragen. `meet` zegt WELKE peiling de kaart mag doen;
    een soort zonder `meet` komt op de kaart met "dit peilen wij hier niet" en
@@ -133,12 +103,22 @@ const SOORTEN = [
   /* DE TWEE DIE NIET WEG KUNNEN, en ze staan er juist daarom in. */
   { id: 'facturen', naam: 'Uw facturen en betalingen', waar: 'operationeel', herkomst: 'gemeten',
     doel: 'De uitvoering van een overeenkomst, en de administratie die de wet van RTG eist.',
-    weg: { kan: false, grond: 'wettelijk', reden: 'De fiscale bewaarplicht is zeven jaar. Ook na het verwijderen van uw account blijven deze regels staan -- zonder uw naam waar dat kan, maar ze blijven. Een belofte dat alles weg kan, zou hier een leugen zijn.' },
+    /* HET GETAL STAAT HIER NIET. Het stond er eerst wel ("zeven jaar") en dat
+       is precies de vorm waarin een document van de code wegdrijft: de termijn
+       woont in server/bewaartermijnen.js en wordt daar gehandhaafd. `bewaartak`
+       wijst ernaar, en de kaart haalt het getal op. Verandert het beleid, dan
+       verandert de kaart mee in plaats van te blijven staan. */
+    bewaartak: 'invoices',
+    weg: { kan: false, grond: 'wettelijk', reden: 'Ook na het verwijderen van uw account blijven deze regels staan -- zonder uw naam waar dat kan, maar ze blijven. Een belofte dat alles weg kan, zou hier een leugen zijn.' },
     bron: 'server/kern/vergeten.js' },
 
   { id: 'inzagejournaal', naam: 'Wie er in uw dossier keek', waar: 'operationeel', herkomst: 'gemeten', meet: 'inzage',
     doel: 'U kunnen laten zien wie uw echte naam achter uw codenaam opvroeg, en waarom.',
-    weg: { kan: false, grond: 'beschermt-u', reden: 'Dit spoor bestaat om u te beschermen. Zou u het kunnen wissen, dan zou iemand die bij u keek dat ook kunnen -- en dan beschermt het niemand meer.' },
+    /* HIER STOND EEN FOUT. De kaart zei dat dit spoor blijft; het beleid veegt
+       het na de termijn hieronder. "Blijft altijd" en "blijft twee jaar" zijn
+       niet hetzelfde, en het tweede is wat er gebeurt. */
+    bewaartak: 'inzageLog',
+    weg: { kan: false, grond: 'beschermt-u', reden: 'Dit spoor bestaat om u te beschermen. Zou u het kunnen wissen, dan zou iemand die bij u keek dat ook kunnen -- en dan beschermt het niemand meer. Het verdwijnt wel vanzelf na de termijn hieronder.' },
     bron: 'server/inzagelog.js' }
 ];
 

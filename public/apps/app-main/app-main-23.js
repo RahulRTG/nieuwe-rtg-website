@@ -131,3 +131,4 @@
     residentie:  { naam: 'Verblijven', url: '/apps/residentie.html' },
     wbw:         { naam: 'Samen betalen', url: '/apps/geld.html#wbw' },
     passkeys:    { naam: 'Passkeys',     url: '/apps/passkeys.html' },
+    sessies:     { naam: 'Waar ben ik aanwezig', url: '/apps/mijn-sessies.html' },

@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Waar ben ik aanwezig</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+  :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--card2:var(--rtg-card2);--line:var(--rtg-line);
+    --txt:var(--rtg-txt);--soft:var(--rtg-soft);--gold:#C9A24B;--rood:#DE6E92;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;min-height:100dvh;}
+  .kop{display:flex;align-items:center;gap:0.7rem;padding:calc(env(safe-area-inset-top,0px) + 0.9rem) 1.1rem 0.6rem;}
+  .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.35rem;}
+  .kop .rek{flex:1;}
+  .kop a{color:var(--txt);text-decoration:none;font-size:1.1rem;min-width:24px;min-height:24px;
+    display:inline-flex;align-items:center;justify-content:center;}
+  main{padding:0 1.1rem calc(env(safe-area-inset-bottom,0px) + 3rem);max-width:660px;margin:0 auto;}
+  h2{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);margin:1.6rem 0 0.6rem;}
+  .stil{color:var(--soft);font-size:0.82rem;line-height:1.6;}
+  button{font:inherit;cursor:pointer;}
+  .knop{background:var(--card);border:1px solid var(--line);border-radius:0;color:var(--txt);
+    font-size:0.85rem;padding:0.6rem 0.95rem;min-height:44px;}
+  .knop.rood{border-color:rgba(222,110,146,0.55);color:var(--rood);}
+  .knop:focus-visible,summary:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  .knop[disabled]{opacity:0.5;cursor:default;}
+
+  /* De sessiekaart. Geen ronde hoeken, veel lucht, en de nadruk op het BEWIJS
+     in plaats van op een geruststellend vinkje. */
+  .sessie{background:var(--card);border:1px solid var(--line);padding:1.15rem;margin:0.75rem 0;}
+  .sessie.hier{border-left:3px solid var(--gold);}
+  .sessiekop{display:flex;align-items:baseline;gap:0.6rem;flex-wrap:wrap;}
+  .sessiekop .titel{font-family:'Bodoni Moda',serif;font-size:1.05rem;}
+  .hierlabel{font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);}
+  .tijd{font-size:0.72rem;color:var(--soft);margin-top:0.15rem;}
+  .kenmerk{font-size:0.62rem;letter-spacing:0.18em;color:var(--soft);margin-top:0.5rem;
+    font-variant-numeric:tabular-nums;}
+
+  /* DE BEWIJSRAIL. Drie segmenten: vermoed vult er een, gemeten twee, bewezen
+     drie, en onbekend laat ze alle drie leeg. Zo is "wij weten dit niet" te zien
+     als een LEGE rail in plaats van als een ontbrekende regel -- precies het
+     verschil waar dit scherm om draait. */
+  .veld{display:flex;align-items:center;gap:0.75rem;padding:0.62rem 0;border-top:1px solid var(--line);
+    background:transparent !important;border-left:0 !important;border-right:0 !important;border-bottom:0 !important;}
+  .veld:first-of-type{margin-top:0.9rem;}
+  .rail{display:flex;gap:3px;flex:0 0 auto;}
+  .rail i{width:14px;height:6px;border:1px solid var(--line);background:transparent;display:block;}
+  .rail i.aan{background:var(--gold);border-color:var(--gold);}
+  .rail.onbekend i{border-style:dotted;}
+  .veldnaam{flex:1;font-size:0.85rem;}
+  .graad{font-size:0.63rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);white-space:nowrap;}
+  .graad.bewezen{color:var(--gold);}
+  .reden{font-size:0.74rem;color:var(--soft);line-height:1.55;padding:0 0 0.55rem 0;}
+  details summary{cursor:pointer;font-size:0.72rem;color:var(--soft);padding:0.5rem 0;min-height:24px;
+    display:flex;align-items:center;}
+  details[open] summary{color:var(--txt);}
+  .acties{display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:1rem;}
+
+  .let{border:1px solid var(--line);border-left:3px solid var(--gold);background:var(--card2);
+    padding:0.85rem 1rem;margin:0.9rem 0;font-size:0.8rem;line-height:1.6;color:var(--txt);}
+  .melding{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 1rem);transform:translateX(-50%);
+    background:var(--card2);border:1px solid var(--line);padding:0.55rem 1rem;font-size:0.8rem;
+    max-width:88vw;opacity:0;pointer-events:none;transition:opacity 0.25s;}
+  .melding.zien{opacity:1;}
+  .weg{display:none !important;}
+  @media (prefers-reduced-motion: reduce){ *{transition:none !important;} }
+</style>
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<script src="/shared/seizoen.js" defer></script>
+<link href="/shared/ios.css" rel="stylesheet">
+</head>
+<body class="rtg-stijl">
+<header class="kop">
+  <a href="/apps/app.html" aria-label="Terug naar de app">←</a>
+  <h1>Waar ben ik aanwezig</h1>
+  <span class="rek"></span>
+</header>
+<main>
+  <p class="stil">Dit zijn de sessies waarmee er op dit moment op uw account gewerkt kan worden. Per onderdeel
+    staat erbij hoe zeker RTG het weet. Wat wij nooit hebben vastgesteld, staat er als <em>onbekend</em>;
+    daar vullen wij niets voor in.</p>
+
+  <div id="uitleg"></div>
+  <h2>Mijn sessies</h2>
+  <div id="lijst"><p class="stil">Bezig met ophalen…</p></div>
+
+  <section id="overigeBlok" class="weg">
+    <h2>Alles behalve deze</h2>
+    <div class="let">
+      Hiermee wordt elke andere sessie ingetrokken. Dat is <strong>niet ongedaan te maken</strong>: die toestellen
+      moeten opnieuw inloggen. Deze sessie blijft open, zodat u zichzelf niet buitensluit terwijl u bezig bent.
+    </div>
+    <div class="acties">
+      <button class="knop rood" id="alles" type="button">Sluit alle andere sessies</button>
+    </div>
+  </section>
+</main>
+<div class="melding" id="melding" role="status" aria-live="polite"></div>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const token = (() => { try { return localStorage.getItem('rtg_member_token'); } catch (e) { return null; } })();
+  const api = (pad, body) => fetch(pad, { method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
+    body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+  let meldT;
+  const zeg = t => { const m = $('#melding'); m.textContent = t; m.classList.add('zien');
+    clearTimeout(meldT); meldT = setTimeout(() => m.classList.remove('zien'), 4200); };
+  const tekst = (el, t) => { el.textContent = t; return el; };
+  const maak = (tag, klas) => { const e = document.createElement(tag); if (klas) e.className = klas; return e; };
+
+  /* De namen die een mens leest. De sleutels komen uit kern/identiteit/sessievelden.js;
+     de vertaling staat HIER en niet daar, want de kern hoort geen schermtaal te
+     dragen -- en een naam veranderen mag nooit een bewijsregel raken. */
+  const NAAM = {
+    authenticator: 'Waarmee ingelogd',
+    toestel: 'Toestelbinding',
+    context: 'Namens wie',
+    vertrouwen: 'Vertrouwensstand',
+    risico: 'Risicoweging',
+    sleutelbinding: 'Sleutelbinding'
+  };
+  const NIVEAU = { onbekend: 0, vermoed: 1, gemeten: 2, bewezen: 3 };
+
+  const wanneer = iso => {
+    if (!iso) return 'onbekend';
+    const d = new Date(iso), nu = new Date();
+    const min = Math.round((nu - d) / 60000);
+    if (min < 1) return 'zojuist';
+    if (min < 60) return min + ' min geleden';
+    if (min < 60 * 24) return Math.round(min / 60) + ' uur geleden';
+    return d.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long' });
+  };
+
+  function veldRij(sleutel, stand) {
+    const rij = maak('div', 'veld');
+    const n = NIVEAU[stand.graad] || 0;
+    const rail = maak('div', 'rail' + (n ? '' : ' onbekend'));
+    rail.setAttribute('role', 'img');
+    rail.setAttribute('aria-label', NAAM[sleutel] + ': ' + stand.graad);
+    for (let i = 0; i < 3; i++) rail.appendChild(maak('i', i < n ? 'aan' : ''));
+    rij.appendChild(rail);
+    rij.appendChild(tekst(maak('span', 'veldnaam'), NAAM[sleutel] || sleutel));
+    rij.appendChild(tekst(maak('span', 'graad' + (stand.graad === 'bewezen' ? ' bewezen' : '')), stand.graad));
+    return rij;
+  }
+
+  function kaart(s, huidige) {
+    const el = maak('article', 'sessie' + (s.sid === huidige ? ' hier' : ''));
+    const kop = maak('div', 'sessiekop');
+    /* GEEN VERZONNEN TOESTELNAAM. De sessie draagt er geen (dat is met opzet zo,
+       zie kern/identiteit/sessievelden.js), dus staat hier wat wij WEL weten:
+       waarmee zij begon. Een gok als "iPhone 16 Pro" zou hier vanzelf ontstaan. */
+    const auth = s.stand.authenticator;
+    const titel = auth.aanwezig
+      ? (auth.graad === 'bewezen' ? 'Sessie met sleutelbewijs' : 'Sessie met wachtwoord')
+      : 'Sessie zonder vastgelegde herkomst';
+    kop.appendChild(tekst(maak('span', 'titel'), titel));
+    if (s.sid === huidige) kop.appendChild(tekst(maak('span', 'hierlabel'), 'U bent hier'));
+    el.appendChild(kop);
+    el.appendChild(tekst(maak('div', 'tijd'),
+      'Geopend ' + wanneer(s.geopendOp) + ' · laatst gezien ' + wanneer(s.gezienOp)));
+    /* HET KENMERK. Drie sessies die op dezelfde middag begonnen zien er verder
+       identiek uit -- er staat met opzet geen toestelnaam op (kern/identiteit/
+       sessievelden.js). Zonder iets om ze aan te wijzen staat er dus een
+       onomkeerbare knop onder een regel die je niet van de volgende kunt
+       onderscheiden. Dit is de kortste vorm die dat oplost: een vast merkteken
+       per sessie, dat dezelfde blijft zolang zij bestaat. */
+    el.appendChild(tekst(maak('div', 'kenmerk'), 'KENMERK ' + s.sid.slice(0, 4).toUpperCase()));
+
+    for (const sleutel of Object.keys(NAAM)) {
+      if (!s.stand[sleutel]) continue;
+      el.appendChild(veldRij(sleutel, s.stand[sleutel]));
+    }
+
+    /* "Waarom vertrouwt RTG dit?" -- de bewijsroute, ingeklapt. Transparantie
+       hoort beschikbaar te zijn zonder het gewone gebruik te belasten. */
+    const det = maak('details');
+    det.appendChild(tekst(maak('summary'), 'Waarom weet RTG dit?'));
+    for (const sleutel of Object.keys(NAAM)) {
+      const st = s.stand[sleutel]; if (!st) continue;
+      det.appendChild(tekst(maak('p', 'reden'), NAAM[sleutel] + ': ' + st.reden));
+    }
+    el.appendChild(det);
+
+    const acties = maak('div', 'acties');
+    const knop = maak('button', 'knop rood');
+    knop.type = 'button';
+    knop.textContent = s.sid === huidige ? 'Sluit deze sessie (uitloggen)' : 'Sluit deze sessie';
+    knop.addEventListener('click', () => sluit(s.sid, s.sid === huidige));
+    knop.setAttribute('aria-label', knop.textContent + ', kenmerk ' + s.sid.slice(0, 4).toUpperCase());
+    acties.appendChild(knop);
+    el.appendChild(acties);
+    return el;
+  }
+
+  async function sluit(sid, ikzelf) {
+    const merk = sid.slice(0, 4).toUpperCase();
+    const vraag = ikzelf
+      ? 'Sessie ' + merk + ' sluiten? Dat is deze sessie: u wordt hier uitgelogd en moet opnieuw inloggen.'
+      : 'Sessie ' + merk + ' sluiten? Dat toestel moet daarna opnieuw inloggen. Dit is niet ongedaan te maken.';
+    if (!window.confirm(vraag)) return;
+    const r = await api('/api/mijn/sessies/sluit', { sid });
+    if (r.body.error) return zeg(r.body.error);
+    zeg(r.body.bewijs || 'Sessie gesloten.');
+    if (r.body.ditWasUzelf) { try { localStorage.removeItem('rtg_member_token'); } catch (e) {}
+      setTimeout(() => { location.href = '/apps/app.html'; }, 1600); return; }
+    laad();
+  }
+
+  async function laad() {
+    const r = await api('/api/mijn/sessies');
+    const lijst = $('#lijst');
+    lijst.textContent = '';
+    if (r.status === 401) { lijst.appendChild(tekst(maak('p', 'stil'), 'Log in om uw sessies te zien.')); return; }
+    if (r.body.error) { lijst.appendChild(tekst(maak('p', 'stil'), r.body.error)); return; }
+
+    const u = $('#uitleg'); u.textContent = '';
+    if (r.body.nietGetoond) u.appendChild(tekst(maak('div', 'let'), r.body.nietGetoond));
+
+    const rijen = r.body.sessies || [];
+    if (!rijen.length) {
+      lijst.appendChild(tekst(maak('p', 'stil'),
+        'Er staan geen sessies met een identiteit op uw account. Dat betekent niet dat er niets open staat; het betekent dat wij het niet kunnen aanwijzen.'));
+    }
+    for (const s of rijen) lijst.appendChild(kaart(s, r.body.huidige));
+    $('#overigeBlok').classList.toggle('weg', rijen.filter(s => s.sid !== r.body.huidige).length === 0);
+  }
+
+  $('#alles').addEventListener('click', async () => {
+    if (!window.confirm('Alle andere sessies sluiten? Die toestellen moeten opnieuw inloggen. Dit is niet ongedaan te maken.')) return;
+    const r = await api('/api/mijn/sessies/sluit-overige');
+    if (r.body.error) return zeg(r.body.error);
+    zeg(r.body.aantal + ' sessie(s) gesloten. ' + (r.body.nietGeraakt || ''));
+    laad();
+  });
+
+  laad();
+})();
+</script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+</body>
+</html>

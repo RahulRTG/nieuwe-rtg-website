@@ -75,7 +75,7 @@ function maakTokens(getUserById) {
      ./intreklijst.js: dat deel schrijft als enige naar de database, de rest van
      dit bestand is pure cryptografie. Hij krijgt de strikte vorm mee, zodat er
      maar EEN opvatting bestaat van wat een token is. */
-  const { trekIn, trekInActie, isIngetrokken } = require('./intreklijst')(strikt);
+  const { trekIn, trekInActie, isIngetrokken, trekInSessie, sessieIngetrokken } = require('./intreklijst')(strikt);
 
   function verifyToken(token) {
     token = strikt(token);
@@ -90,9 +90,13 @@ function maakTokens(getUserById) {
          uitgerekend deze deur, waar elk verzoek langskomt, stond nog op de
          kale vergelijking. */
       if (!veiligGelijk(kluis.sign(body), sig)) return null;
-      const [id, exp, uitgegeven] = body.split('.');
+      const [id, exp, uitgegeven, sid] = body.split('.');
       if (Number(exp) < Date.now()) return null;
       if (isIngetrokken(token)) return null; // uitgelogd: de handtekening klopt, wij niet meer
+      /* En de sessie zelf. Dit is de tweede deur, en hij bestaat omdat de eerste
+         het token nodig heeft -- dat heeft alleen de houder. Zonder deze regel
+         is "sluit die andere sessie" een knop die niets doet. */
+      if (sid && sessieIngetrokken(sid)) return null;
       const u = getUserById(Number(id));
       /* De grens per account: alles wat voor sessies_vanaf is uitgegeven, geldt
          niet meer. Een wachtwoordwijziging zet die grens (zie setPassword), en
@@ -138,7 +142,7 @@ function maakTokens(getUserById) {
      aanroepers niets merken van de knip. */
   const herstel = require('./herstel').maakHerstel(getUserById);
 
-  return { issueToken, verifyToken, sessieVan, trekIn, trekInActie, isIngetrokken, issueActionToken, verifyActionToken,
+  return { issueToken, verifyToken, sessieVan, trekIn, trekInActie, isIngetrokken, trekInSessie, issueActionToken, verifyActionToken,
     setEmailVerified: herstel.setEmailVerified, createReset: herstel.createReset,
     findByReset: herstel.findByReset, setPassword: herstel.setPassword };
 }

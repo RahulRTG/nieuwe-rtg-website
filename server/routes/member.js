@@ -91,6 +91,7 @@ module.exports = (kern) => {
   require('./member/nieuws')(kern);
   // De AVG-rechten: dossier downloaden en definitief verwijderen.
   require('./member/privacy')(kern);
+  require('./member/sessies')(kern);
   // De persoonlijke AI en Rahul/concierge-chat.
   require('./member/assistent')(kern);
   // Rahul kijkt mee met een foto (kern/kijken.js) en zegt waar die foto heen kan

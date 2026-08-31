@@ -235,6 +235,10 @@ opleverbaar en los terug te draaien.
    de sessie. Zonder dit is blok 2, 5 en 7 verzonnen. *(par. 2)*
 2. **Sessies & toestellen voor het lid** — lijst, uitloggen per sessie,
    contextbinding intrekken. Het enige gat dat vandaag schade kan doen.
+   *(Staat, 31 augustus 2026: `routes/member/sessies.js`, scherm
+   `/apps/mijn-sessies.html`. De intrekking loopt op de SID en niet op het
+   token -- het token van dat andere toestel heb je niet, en dat is nou juist
+   het toestel dat je kwijt bent. Contextbinding intrekken wacht op blok 7.)*
 3. **2FA en herstel voor leden** — `kern/totp.js` bestaat, maar alleen met
    `OFFICE_TOTP_SECRET`. Eén herstelcode is geen herstelcodeset.
 4. **De permission firewall** — projectie over vier bestaande bronnen. Het eerste

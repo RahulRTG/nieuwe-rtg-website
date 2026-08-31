@@ -17,7 +17,7 @@ const herkomstDrempels = require('./herkomst');
 
 /* VORMEN komt van hiernaast en staat hier niet nog een keer. Een tweede lijst
    met dezelfde drie woorden is precies hoe twee bestanden uiteen gaan lopen. */
-const { VORMEN } = require('./gift-vormen');
+const { VORMEN, anbiZin } = require('./gift-vormen');
 
 module.exports = (ctx, { standVan, uitlegVan, ontbreektVan }) => {
   const { schoon, naarCenten, euro } = ctx;
@@ -61,7 +61,12 @@ module.exports = (ctx, { standVan, uitlegVan, ontbreektVan }) => {
         euro: euro(centen), vorm, project: schoon(b.project, 60) || null,
         anoniem: b.anoniem === true,
         /* Wat dit IS, en niet wat de gever hoopte. */
-        soort: tegenprestatie ? 'sponsoring' : (vorm === 'periodiek' ? 'maandelijkse_donatie' : 'donatie'),
+        /* EEN PERIODIEKE GIFT IS HIER JAARLIJKS, en de bronsoort
+           `maandelijkse_donatie` zou dus over de frequentie liegen. De
+           periodiciteit hoort bij het PLAN (./gift-periodiek.js) en niet bij de
+           losse bron: het plan weet dat er vijf termijnen zijn en welke voldaan
+           is. De bron is gewoon een donatie -- dat is wat er die dag binnenkwam. */
+        soort: tegenprestatie ? 'sponsoring' : 'donatie',
         beoordeeldVooraf: beoordeeld,
         aftrekbaar,
         /* DRIE STUKKEN EN NIET TWEE. Bij een tegenprestatie is het geen gift maar
@@ -81,20 +86,11 @@ module.exports = (ctx, { standVan, uitlegVan, ontbreektVan }) => {
         beoordeeld
           ? 'Dit bedrag wordt eerst beoordeeld door het landelijke bestuur. Zolang dat loopt, wordt er niets mee gedaan.'
           : 'Dit bedrag gaat direct naar de stichting.',
-        /* VIER ANBI-STANDEN, VIER ZINNEN. De knop van de eigenaar en de zin die
-           de gever leest, bewegen samen -- dat was de opdracht. `aangevraagd`
-           zegt wat we weten (de aanvraag loopt) en niet wat we hopen (dat het
-           straks alsnog aftrekbaar is): of dat zo is, hangt af van de
-           beschikking en haar datum, en dat stelt dit systeem niet vast. */
+        /* Vier ANBI-standen, vier zinnen -- en ze staan in ./gift-vormen.js,
+           want het plan en het kantoor zeggen hetzelfde. */
         tegenprestatie
           ? 'Je krijgt een factuur en geen giftbewijs. Een sponsorbedrag is geen aftrekbare gift.'
-          : (aftrekbaar
-            ? 'Je krijgt een giftbewijs; de RTFoundation is een ANBI (RSIN ' + g.rsin + ').'
-            : (g.anbi === 'aangevraagd'
-              ? 'Je krijgt een ontvangstbevestiging. De RTFoundation is op dit moment geen ANBI; de aanvraag loopt. Of deze gift daarmee alsnog aftrekbaar wordt, hangt af van de beschikking \u2014 dat zeggen wij niet toe.'
-              : (g.anbi === 'onbekend'
-                ? 'Je krijgt een ontvangstbevestiging. Of deze gift aftrekbaar is, ligt niet vast; wij zeggen daar niets over dat wij niet weten.'
-                : 'Je krijgt een ontvangstbevestiging. Deze gift is niet aftrekbaar.'))),
+          : anbiZin(g.anbi, g.rsin, 'los'),
         vorm === 'periodiek'
           ? 'Een periodieke gift loopt ten minste vijf jaar en vraagt een vastgelegde overeenkomst. Zonder die overeenkomst is het een gewone gift.'
           : null

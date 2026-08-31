@@ -209,7 +209,7 @@ test('geld beweegt in precies EEN bestand, en de giftlaag blijft binnen het eige
      (gift-betalen.js, met zijn eigen toets hieronder) en de andere drie blijven
      schoon. Dat is de vorm die je wilt kunnen nalopen -- een laag waarin drie
      van de vier bestanden niets met geld doen, is te overzien. */
-  const delen = ['gift.js', 'gift-voornemen.js', 'gift-vormen.js'];
+  const delen = ['gift.js', 'gift-voornemen.js', 'gift-vormen.js', 'gift-periodiek.js'];
   for (const deel of delen) {
     const code = fs.readFileSync(path.join(__dirname, '..', 'server', 'kern', 'rtfos', deel), 'utf8')
       .replace(/\/\*[\s\S]*?\*\//g, ' ')
@@ -217,8 +217,14 @@ test('geld beweegt in precies EEN bestand, en de giftlaag blijft binnen het eige
       .replace(/'(?:[^'\\]|\\.)*'/g, "''")
       .replace(/"(?:[^"\\]|\\.)*"/g, '""');
 
+    /* MET EEN SLUITENDE WOORDGRENS, en dat is een correctie op mijn eigen toets.
+       Zonder die grens zakte gift-periodiek.js op `p.betaald` -- een VELDNAAM
+       die zegt dat een termijn voldaan is, niet een aanroep naar de betaallaag.
+       Een toets die op zulke woorden zakt, leert je velden hernoemen in plaats
+       van code verbeteren. Wat hier telt is een AANROEP: `pay.` haalt zijn
+       grens uit de punt erachter, `betaal` uit het ontbreken van een letter. */
     for (const weg of ['pay', 'poort', 'grootboek', 'saldo', 'boeking', 'betaal', 'incasso', 'sepa', 'wallet']) {
-      assert.ok(!new RegExp('\\b' + weg, 'i').test(code),
+      assert.ok(!new RegExp('\\b' + weg + '\\b', 'i').test(code),
         deel + ' reikt naar "' + weg + '" -- klaarzetten is klaarzetten, en betalen hoort langs kern/pay/poort.js met een eigen besluit');
     }
   }
@@ -229,7 +235,7 @@ test('geld beweegt in precies EEN bestand, en de giftlaag blijft binnen het eige
     const ruw = fs.readFileSync(path.join(__dirname, '..', 'server', 'kern', 'rtfos', deel), 'utf8');
     for (const m of ruw.match(/require\((['"])([^'"]+)\1\)/g) || []) {
       const pad = m.replace(/require\(['"]|['"]\)/g, '');
-      assert.match(pad, /^\.\/(gift-vormen|gift-voornemen|gift-betalen|herkomst)$/,
+      assert.match(pad, /^\.\/(gift-vormen|gift-voornemen|gift-betalen|gift-periodiek|herkomst)$/,
         deel + ' haalt ' + pad + ' binnen; de giftlaag hoort binnen kern/rtfos te blijven -- de betaallaag komt via de ctx en niet via een require');
     }
   }
@@ -259,7 +265,7 @@ function bouwMetPay(payAntwoord) {
   const gift = require('../server/kern/rtfos/gift')(ctx);
   gift.standZet({ ontvanger: { soort: 'wallet', code: 'RTF-WALLET' },
     vormen: ['eenmalig', 'geoormerkt', 'periodiek'], anbi: 'aangevraagd', stand: 'open' }, 'toets');
-  return { gift, geboekt, bronnen };
+  return { gift, geboekt, bronnen, db };
 }
 
 test('de gift gaat naar de wallet uit de stand, met de codenaam uit de sessie', async () => {
@@ -331,4 +337,164 @@ test('de betaallaag wordt op precies een manier aangeroepen', () => {
     'de giftlaag roept meer van de betaallaag aan dan partnerIn -- een tweede weg naar hetzelfde geld');
   assert.ok(!/uitbetaal|sepa|iban/i.test(bron),
     'uitbetalen naar de bank doet de stichting zelf langs /api/pay/zaak/uitbetalen; hier hoort geen tweede pad');
+});
+
+/* ---------------------------------------------------------------------------
+   HET MEERJARIGE PLAN -- de periodieke gift als afspraak en niet als vinkje.
+   --------------------------------------------------------------------------- */
+function bouwPlan(anbi) {
+  const b = bouwMetPay();
+  b.gift.standZet({ anbi: anbi || 'aangevraagd' }, 'toets');
+  return b;
+}
+
+test('een periodieke gift loopt ten minste vijf jaar, en dat getal staat op een plek', () => {
+  const { gift } = bouwPlan();
+  const kort = gift.plan.voorstel('Poolvos 1BE9', { euroPerJaar: 100, jaren: 4 });
+  assert.equal(kort.status, 400);
+  const MIN = require('../server/kern/rtfos/gift-vormen').JAREN_MIN;
+  assert.match(kort.error, new RegExp('ten minste ' + MIN + ' jaar'),
+    'de ondergrens in de melding komt niet uit dezelfde bron als de controle');
+  assert.ok(gift.plan.voorstel('Poolvos 1BE9', { euroPerJaar: 100, jaren: MIN }).ok);
+});
+
+test('een voorstel is nog geen overeenkomst, en zegt dat ook', () => {
+  const { gift } = bouwPlan();
+  const p = gift.plan.voorstel('Poolvos 1BE9', { euroPerJaar: 100, jaren: 5 }).plan;
+  assert.equal(p.stand, 'voorgesteld');
+  assert.equal(p.aftrekbaar, false);
+  assert.ok(p.zegt.some(z => /nog een voorstel/i.test(z)));
+  assert.ok(p.zegt.some(z => /gewone gift/i.test(z)),
+    'tot het vastleggen is elke betaling een gewone gift; dat hoort de gever te weten');
+});
+
+test('vastleggen vraagt een vindbaar stuk, en doet de stichting', () => {
+  const { gift } = bouwPlan();
+  const id = gift.plan.voorstel('Poolvos 1BE9', { euroPerJaar: 100, jaren: 5 }).plan.id;
+  /* ELK APART, en dat is een correctie na een mutatietoets. Eerst stond hier
+     `vastleggen({ id })` voor het kenmerk; haalde je de kenmerk-controle weg,
+     dan zakte die aanroep alsnog op de ONTBREKENDE EINDDATUM en bleef de toets
+     groen. Een toets die door de volgende grendel wordt gered, toetst de eerste
+     niet. */
+  const zonderKenmerk = gift.plan.vastleggen({ id, tot: '2031-12-31' }, 'kantoor');
+  assert.equal(zonderKenmerk.status, 400, 'vastgelegd zonder kenmerk');
+  assert.match(zonderKenmerk.error, /kenmerk/i);
+  const zonderDatum = gift.plan.vastleggen({ id, kenmerk: 'RTF-1' }, 'kantoor');
+  assert.equal(zonderDatum.status, 400, 'vastgelegd zonder einddatum');
+  assert.match(zonderDatum.error, /wanneer/i);
+  const ok = gift.plan.vastleggen({ id, kenmerk: 'RTF-1', tot: '2031-12-31' }, 'kantoor');
+  assert.equal(ok.plan.stand, 'vastgelegd');
+  assert.ok(ok.plan.zegt.some(z => /RTF-1/.test(z)));
+});
+
+test('aftrekbaar volgt de ANBI-stand, ook als de overeenkomst is vastgelegd', () => {
+  for (const [stand, verwacht] of [['aangevraagd', false], ['nee', false], ['onbekend', false], ['ja', true]]) {
+    const { gift } = bouwMetPay();
+    gift.standZet(stand === 'ja' ? { anbi: 'ja', rsin: '123456789' } : { anbi: stand }, 'toets');
+    const id = gift.plan.voorstel('Poolvos 1BE9', { euroPerJaar: 100, jaren: 5 }).plan.id;
+    const p = gift.plan.vastleggen({ id, kenmerk: 'RTF-1', tot: '2031-12-31' }, 'kantoor').plan;
+    assert.equal(p.aftrekbaar, verwacht,
+      'bij ANBI-stand "' + stand + '" stond aftrekbaar op ' + p.aftrekbaar +
+      ' -- een vastgelegde overeenkomst maakt een gift niet aftrekbaar, een ANBI-status doet dat');
+  }
+});
+
+test('elke ANBI-stand geeft een eigen zin, en geen ervan belooft te veel', () => {
+  const zinnen = new Set();
+  for (const stand of ['onbekend', 'nee', 'aangevraagd', 'ja']) {
+    const { gift } = bouwMetPay();
+    gift.standZet(stand === 'ja' ? { anbi: 'ja', rsin: '123456789' } : { anbi: stand }, 'toets');
+    const p = gift.plan.voorstel('Poolvos 1BE9', { euroPerJaar: 100, jaren: 5 }).plan;
+    const zin = p.zegt.join(' ');
+    zinnen.add(zin);
+    if (stand !== 'ja') {
+      assert.ok(!/aftrekbaar zonder drempel/.test(zin),
+        'bij ANBI-stand "' + stand + '" werd toch "aftrekbaar zonder drempel" beloofd');
+    }
+  }
+  assert.equal(zinnen.size, 4, 'twee ANBI-standen leverden dezelfde tekst op');
+});
+
+test('de termijnen worden afgeleid, en een betaalde termijn wijst naar zijn bron', async () => {
+  const { gift } = bouwPlan();
+  const id = gift.plan.voorstel('Poolvos 1BE9', { euroPerJaar: 100, jaren: 5 }).plan.id;
+  gift.plan.vastleggen({ id, kenmerk: 'RTF-1', tot: '2031-12-31' }, 'kantoor');
+
+  const voor = gift.plan.mijn('Poolvos 1BE9').plannen[0];
+  assert.equal(voor.termijnen.length, 5);
+  assert.ok(voor.termijnen.every(t => !t.voldaan));
+
+  const r = await gift.bevestig({ codenaam: 'Poolvos 1BE9', euro: 100, vorm: 'periodiek', planId: id });
+  assert.equal(r.ok, true, JSON.stringify(r).slice(0, 140));
+  assert.equal(r.soort, 'donatie',
+    'een jaarlijkse termijn kreeg het bronsoort "maandelijkse_donatie" -- dat liegt over de frequentie');
+
+  const na = gift.plan.mijn('Poolvos 1BE9').plannen[0];
+  assert.equal(na.termijnen.filter(t => t.voldaan).length, 1);
+  assert.ok(na.termijnen[0].bron, 'de voldane termijn wijst niet naar de bron die eruit ontstond');
+});
+
+test('een termijn wordt een keer per jaar afgetekend, ook bij twee betalingen', async () => {
+  const { gift, db } = bouwPlan();
+  const id = gift.plan.voorstel('Poolvos 1BE9', { euroPerJaar: 100, jaren: 5 }).plan.id;
+  gift.plan.vastleggen({ id, kenmerk: 'RTF-1', tot: '2031-12-31' }, 'kantoor');
+  await gift.bevestig({ codenaam: 'Poolvos 1BE9', euro: 100, vorm: 'periodiek', planId: id, idem: 'a' });
+  await gift.bevestig({ codenaam: 'Poolvos 1BE9', euro: 100, vorm: 'periodiek', planId: id, idem: 'b' });
+
+  const p = gift.plan.mijn('Poolvos 1BE9').plannen[0];
+  assert.equal(p.termijnen.filter(t => t.voldaan).length, 1);
+
+  /* EN IN DE OPSLAG ZELF, want in het beeld is dit niet te zien: beeld() zoekt
+     per jaar de EERSTE aantekening, dus een dubbele bleef onzichtbaar en de
+     mutatietoets liep er groen doorheen. Een rij die stilletjes aangroeit is
+     precies wat je later niet meer uit elkaar krijgt. */
+  const ruw = db.data.rtfos.giftplannen.find(x => x.id === id);
+  assert.equal(ruw.betaald.length, 1,
+    'twee betalingen in hetzelfde jaar zetten twee aantekeningen op dezelfde termijn');
+});
+
+test('stoppen kan alleen de gever zelf, en belooft niets over de aangifte', () => {
+  const { gift } = bouwPlan();
+  const id = gift.plan.voorstel('Poolvos 1BE9', { euroPerJaar: 100, jaren: 5 }).plan.id;
+  assert.equal(gift.plan.stop('Iemand Anders', { id }).status, 403);
+  const r = gift.plan.stop('Poolvos 1BE9', { id, reden: 'even niet' });
+  assert.equal(r.plan.stand, 'gestopt');
+  assert.match(r.melding, /daar gaan wij niet over/i,
+    'het systeem deed een uitspraak over wat stoppen betekent voor de aangifte');
+  assert.equal(gift.plan.stop('Poolvos 1BE9', { id }).status, 409);
+});
+
+test('er wordt nergens automatisch afgeschreven, en dat staat er ook', () => {
+  const { gift } = bouwPlan();
+  const p = gift.plan.voorstel('Poolvos 1BE9', { euroPerJaar: 100, jaren: 5 }).plan;
+  assert.ok(p.zegt.some(z => /niets automatisch/i.test(z)));
+
+  const bron = fs.readFileSync(path.join(__dirname, '..', 'server', 'kern', 'rtfos', 'gift-periodiek.js'), 'utf8')
+    .replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/\/\/[^\n]*/g, ' ')
+    .replace(/'(?:[^'\\]|\\.)*'/g, "''");
+  for (const weg of ['incasso', 'machtiging', 'setInterval', 'cron', 'pay', 'boekAsync']) {
+    assert.ok(!new RegExp('\\b' + weg + '\\b', 'i').test(bron),
+      'het plan reikt naar "' + weg + '" -- een termijn wordt door de gever bevestigd, niet geïnd');
+  }
+});
+
+test('alleen de termijn van DIT jaar staat open, en een dubbele betaling meldt er geen', async () => {
+  const { gift } = bouwPlan();
+  const id = gift.plan.voorstel('Poolvos 1BE9', { euroPerJaar: 100, jaren: 5 }).plan.id;
+  gift.plan.vastleggen({ id, kenmerk: 'RTF-1', tot: '2031-12-31' }, 'kantoor');
+
+  const voor = gift.plan.mijn('Poolvos 1BE9').plannen[0];
+  assert.equal(voor.openDitJaar, true);
+
+  const eerste = await gift.bevestig({ codenaam: 'Poolvos 1BE9', euro: 100, vorm: 'periodiek', planId: id, idem: 'a' });
+  assert.ok(eerste.termijn, 'de eerste betaling tekende geen termijn af');
+
+  const na = gift.plan.mijn('Poolvos 1BE9').plannen[0];
+  assert.equal(na.openDitJaar, false,
+    'de knop zou blijven staan terwijl dit jaar al voldaan is -- dan betaalt iemand zonder dat er iets wordt afgetekend');
+
+  const tweede = await gift.bevestig({ codenaam: 'Poolvos 1BE9', euro: 100, vorm: 'periodiek', planId: id, idem: 'b' });
+  assert.equal(tweede.ok, true, 'de betaling zelf hoort gewoon door te gaan: het geld is echt gegeven');
+  assert.equal(tweede.termijn, null,
+    'een tweede betaling in hetzelfde jaar meldde een termijn die niet is afgetekend');
 });

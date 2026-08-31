@@ -206,6 +206,36 @@ Vier dingen die uit het bouwen zelf kwamen:
 - **Zonder betaallaag gebeurt er niets en wordt dat gezegd** (503, "er is niets
   afgeschreven"), in plaats van een lege tak die "ok" antwoordt.
 
+### De periodieke gift (31 augustus 2026)
+
+`kern/rtfos/gift-periodiek.js` maakt er een **plan** van in plaats van een vinkje
+op één gift. Dat was de fout eronder: `donateur.js` hing `periodiek` aan één
+bron, terwijl de afspraak over vijf jaar en vijf bedragen gaat — de volgende
+termijn, de vraag of er al betaald is en wat er gebeurt als iemand stopt,
+bestonden domweg niet.
+
+Wat er nu staat: een gever stelt voor (bedrag per jaar, minstens vijf jaar), de
+stichting legt de overeenkomst vast met een vindbaar kenmerk, en de termijnen
+worden **afgeleid** uit startjaar en looptijd. Elke betaalde termijn wijst terug
+naar de bron die eruit ontstond. Stoppen kan de gever zelf; wat dat betekent voor
+zijn aangifte staat in de overeenkomst en niet in dit systeem.
+
+Vier dingen die daarbij zijn rechtgezet of vastgelegd:
+
+- **De ondergrens van vijf jaar stond op twee plekken.** Nu één keer, in
+  `gift-vormen.js`; `donateur.js` leest hem daar.
+- **De oude slotzin beloofde te veel.** `periodiekVast` zei onvoorwaardelijk
+  *"aftrekbaar zonder drempel"*. Dat klopt alleen als de stichting een ANBI ís —
+  zolang de aanvraag loopt is die zin onwaar op precies het moment dat iemand hem
+  in zijn aangifte overneemt. Hij volgt nu de ANBI-stand.
+- **Een jaarlijkse termijn heette `maandelijkse_donatie`.** Dat bronsoort loog
+  over de frequentie; de periodiciteit hoort bij het plan, de bron is gewoon een
+  donatie.
+- **Alleen de termijn van dít jaar staat open.** Anders blijft er een knop staan
+  terwijl het jaar al voldaan is: dan betaalt iemand wél en wordt er níéts
+  afgetekend. Een tweede betaling in hetzelfde jaar gaat gewoon door — het geld
+  is echt gegeven — maar meldt eerlijk dat er geen termijn mee is afgetekend.
+
 ### Het scherm (31 augustus 2026)
 
 `/apps/foundation/geven.html` — twee stappen, en de eerste is niet decoratief.
@@ -224,9 +254,9 @@ zetten alleen de boardroom — en dat oordeel valt op de server.
 - **Het uitbetalen is niet gebouwd en hoeft dat ook niet**: de stichting logt in
   als houder van haar wallet en gebruikt `/api/pay/zaak/uitbetalen`. Daar een
   eigen knop naast zetten zou een tweede pad zijn voor dezelfde handeling.
-- **De periodieke gift** kan als vorm aan staan, maar de overeenkomst van vijf
-  jaar wordt nog steeds door een mens vastgelegd (`donateur.js: periodiekVast`).
-  Een incasso is er niet en komt er niet zonder een eigen besluit.
+- **De incasso.** Er is er geen, en hij komt er niet uit zichzelf: elke termijn
+  wordt door de gever zelf bevestigd. Geld dat vanzelf van iemands rekening gaat,
+  vraagt een machtiging en een eigen besluit.
 - **En let op een derde plek waar ANBI al leeft.** `kern/rtfos/jaarverslag.js`
   opent met *"Een ANBI moet publiceren. Dat is geen nette gewoonte maar een
   voorwaarde"* en bouwt die publicatieplicht ook uit, onder `/publiek` en niet

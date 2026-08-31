@@ -161,13 +161,20 @@ module.exports = (ctx) => {
   });
   /* En de enige plek waar geld beweegt, ook apart: dit bestand gaat over de
      stand, dat over de handeling. */
+  const periodiek = require('./gift-periodiek')(ctx, { standVan: stand });
+  /* donateur.js legt de overeenkomst vast en zei daarbij "aftrekbaar zonder
+     drempel". Dat hangt af van de ANBI-stand, en die woont hier. Via de ctx,
+     zodat er niet twee plekken zijn die hem bijhouden. */
+  ctx.giftAnbi = () => stand().anbi;
+  ctx.giftRsin = () => stand().rsin;
   const betalen = require('./gift-betalen')(ctx, {
     standVan: d, voorbereidVan: voornemen.voorbereid,
-    bronUitGift: (x) => ctx.bronUitGift(x)
+    bronUitGift: (x) => ctx.bronUitGift(x),
+    termijnAf: periodiek.termijnAf
   });
 
   return { stand, standZet, voorbereid: voornemen.voorbereid, bevestig: betalen.bevestig,
-    ontbreekt, STANDEN, VORMEN, ANBI_STANDEN };
+    plan: periodiek, ontbreekt, STANDEN, VORMEN, ANBI_STANDEN };
 };
 module.exports.STANDEN = STANDEN;
 module.exports.VORMEN = VORMEN;

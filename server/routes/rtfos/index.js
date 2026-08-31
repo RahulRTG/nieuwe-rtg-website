@@ -117,6 +117,12 @@ module.exports = (kern) => {
      accepteert, want dan bepaalt de sessie niet meer wat je mag. */
   app.post('/api/rtfos/gift/stand/kantoor', kern.boardroomAuth || officeAuth,
     (req, res) => veilig(res, () => rtfos.gift.stand()));
+  /* De overeenkomst vastleggen: kantoorwerk, want er hoort een vindbaar stuk
+     bij. Een voorstel van een gever wordt hier pas een periodieke gift. */
+  app.post('/api/rtfos/gift/plan/lijst', officeAuth,
+    (req, res) => veilig(res, () => rtfos.gift.plan.lijst()));
+  app.post('/api/rtfos/gift/plan/vastleggen', officeAuth,
+    (req, res) => veilig(res, () => rtfos.gift.plan.vastleggen(req.body, kern.boardroomWie && kern.boardroomWie(req))));
   app.post('/api/rtfos/gift/stand/zet', kern.boardroomAuth || officeAuth,
     (req, res) => veilig(res, () => rtfos.gift.standZet(req.body, kern.boardroomWie && kern.boardroomWie(req))));
   require('./portalen')({ app, rtfos, veilig });

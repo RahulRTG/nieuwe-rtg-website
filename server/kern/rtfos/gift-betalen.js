@@ -34,7 +34,7 @@
    Zie GIFT.md par. 5. */
 'use strict';
 
-module.exports = (ctx, { standVan, voorbereidVan, bronUitGift }) => {
+module.exports = (ctx, { standVan, voorbereidVan, bronUitGift, termijnAf }) => {
   const { schoon, naarCenten, nu, audit } = ctx;
 
   async function bevestig(b) {
@@ -82,12 +82,20 @@ module.exports = (ctx, { standVan, voorbereidVan, bronUitGift }) => {
       bron = bronUitGift({
         stad: schoon(b.stad, 20) || null,
         projectId: v.voornemen.project ? schoon(b.projectId, 20) || null : null,
-        soort: v.voornemen.soort === 'sponsoring' ? 'sponsoring'
-          : (v.voornemen.vorm === 'periodiek' ? 'maandelijkse_donatie' : 'donatie'),
+        soort: v.voornemen.soort,
         centen, gever: codenaam, anoniem: v.voornemen.anoniem,
         kenmerk: 'online gift', door: codenaam
       });
     } catch (e) { bronFout = String((e && e.message) || e); }
+
+    /* Hoort deze gift bij een meerjarig plan, teken hem dan af als termijn.
+       NA de boeking en na de bron: een termijn die als voldaan staat terwijl er
+       niets is betaald, is precies het verkeerde soort fout. */
+    let termijn = null;
+    if (b.planId) {
+      const p = termijnAf ? termijnAf(codenaam, schoon(b.planId, 20), bron ? bron.id : null) : null;
+      termijn = p ? { plan: p.id, jaren: p.jaren } : null;
+    }
 
     audit(codenaam, 'gift.bevestigd', bron ? bron.id : 'zonder-bron', v.voornemen.euro + ' euro');
 
@@ -101,6 +109,7 @@ module.exports = (ctx, { standVan, voorbereidVan, bronUitGift }) => {
          scherm dat "100% gaat naar" zou beweren, zou liegen. */
       kosten: betaald.kosten || 0,
       bron: bron ? bron.id : null,
+      termijn,
       beoordeeldVooraf: v.voornemen.beoordeeldVooraf,
       bronFout,
       zegt: v.zegt.concat(bronFout

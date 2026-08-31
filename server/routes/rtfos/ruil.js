@@ -71,6 +71,22 @@ module.exports = ({ app, auth, geenGast, liveCodename, rtfos, veilig }) => {
     if (geenGast(req, res)) return;
     veilig(res, () => rtfos.gift.voorbereid(lijf(req)));
   });
+  /* Het meerjarige plan: voorstellen, bekijken en stoppen doet de GEVER zelf.
+     Vastleggen doet de stichting -- die route staat bij de andere kantoorroutes,
+     want een voorstel van een gever is nog geen overeenkomst. */
+  app.post('/api/rtfos/gift/plan/voorstel', auth, schrijfRem, (req, res) => {
+    if (geenGast(req, res)) return;
+    veilig(res, () => rtfos.gift.plan.voorstel(ik(req), lijf(req)));
+  });
+  app.post('/api/rtfos/gift/plan/mijn', auth, leesRem, (req, res) => {
+    if (geenGast(req, res)) return;
+    veilig(res, () => rtfos.gift.plan.mijn(ik(req)));
+  });
+  app.post('/api/rtfos/gift/plan/stop', auth, schrijfRem, (req, res) => {
+    if (geenGast(req, res)) return;
+    veilig(res, () => rtfos.gift.plan.stop(ik(req), lijf(req)));
+  });
+
   /* De bevestiging: hier beweegt er geld. De codenaam komt uit de SESSIE en
      niet uit het lijf -- anders geeft de een namens de ander. */
   app.post('/api/rtfos/gift/bevestig', auth, schrijfRem, (req, res) => {

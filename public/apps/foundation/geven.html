@@ -139,6 +139,22 @@
       <div class="uitleg ruimte" id="vNiets"></div>
     </div>
 
+    <!-- HET MEERJARIGE PLAN. Alleen zichtbaar als de vorm "periodiek" openstaat;
+         een periodieke gift is namelijk een AFSPRAAK en niet een bedrag, dus hij
+         hoort niet in het formulier hierboven maar hier. -->
+    <div class="gkaart verborgen" id="planKaart">
+      <div class="gsec">Meerjarig geven</div>
+      <div class="uitleg">Een periodieke gift is een afspraak voor meerdere jaren, vastgelegd in een
+        overeenkomst. Er wordt niets automatisch afgeschreven: je bevestigt elke termijn zelf.</div>
+      <div class="rij ruimte">
+        <input class="gveld" id="planEuro" type="number" min="1" step="1" placeholder="Bedrag per jaar" aria-label="Bedrag per jaar">
+        <input class="gveld" id="planJaren" type="number" min="5" step="1" value="5" placeholder="Aantal jaren" aria-label="Aantal jaren">
+        <button class="gknop" id="planVoorstel">Voorstellen</button>
+      </div>
+      <div id="planMeld"></div>
+      <div id="planLijst"></div>
+    </div>
+
     <div class="gkaart verborgen" id="klaar">
       <div class="gsec">Gelukt</div>
       <div id="klaarIn"></div>
@@ -210,6 +226,7 @@ async function start() {
   $('#vorm').innerHTML = STAND.vormen.map(v =>
     '<option value="' + esc(v) + '">' + esc(VORMNAAM[v] || v) + '</option>').join('');
   toonProjectrij();
+  if (STAND.vormen.includes('periodiek')) { $('#planKaart').classList.remove('verborgen'); planTeken(); }
 }
 
 function toonProjectrij() {
@@ -280,6 +297,59 @@ $('#bevestig').addEventListener('click', async () => {
 $('#nogeen').addEventListener('click', () => {
   $('#klaar').classList.add('verborgen');
   window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+/* ---------------------------------------------------------------- het plan */
+const planApi = (pad, body) => api('plan/' + pad, body);
+
+async function planTeken() {
+  try {
+    const r = await planApi('mijn', {});
+    $('#planLijst').innerHTML = (r.plannen || []).length ? r.plannen.map(p =>
+      '<div class="gevolg"><b>' + esc(eur(p.euroPerJaar)) + ' per jaar, ' + p.jaren + ' jaar</b>' +
+        ' &middot; ' + esc(p.stand) +
+        '<div class="kosten">' + p.termijnen.map(t =>
+          t.jaar + (t.voldaan ? ' voldaan' : ' open')).join(' &middot; ') + '</div>' +
+        p.zegt.map(z => '<div class="kosten">' + esc(z) + '</div>').join('') +
+        (p.stand !== 'gestopt'
+          ? '<div class="rij ruimte">' +
+              /* openDitJaar komt van de server: alleen de termijn van DIT jaar
+                 kan afgetekend worden, dus alleen dan hoort de knop er te staan. */
+              (p.openDitJaar
+                ? '<button class="gknop vol" data-termijn="' + esc(p.id) + '" data-euro="' + p.euroPerJaar + '">Termijn ' + p.ditJaar + ' geven</button>'
+                : '<span class="kosten">De termijn van ' + p.ditJaar + ' is voldaan.</span>') +
+              '<button class="gknop" data-stop="' + esc(p.id) + '">Stoppen</button></div>'
+          : '') +
+      '</div>').join('') : '<div class="kosten">Je hebt nog geen meerjarige afspraak.</div>';
+
+    $('#planLijst').querySelectorAll('[data-stop]').forEach(b => b.addEventListener('click', async () => {
+      try { const r2 = await planApi('stop', { id: b.dataset.stop });
+        $('#planMeld').innerHTML = '<div class="melder goed ruimte">' + esc(r2.melding) + '</div>'; planTeken(); }
+      catch (e) { $('#planMeld').innerHTML = '<div class="melder ruimte">' + esc(e.message) + '</div>'; }
+    }));
+    /* De termijn loopt langs DEZELFDE bevestiging als een gewone gift, met het
+       plan erbij. Geen tweede betaalweg, en dus ook geen tweede plek waar de
+       gevolgen worden uitgerekend. */
+    $('#planLijst').querySelectorAll('[data-termijn]').forEach(b => b.addEventListener('click', async () => {
+      b.disabled = true;
+      try {
+        const r2 = await api('bevestig', { euro: Number(b.dataset.euro), vorm: 'periodiek',
+          planId: b.dataset.termijn, idem: RTGId('termijn') });
+        $('#planMeld').innerHTML = '<div class="melder goed ruimte">Termijn voldaan: ' + esc(eur(r2.gegeven)) + '.</div>';
+        planTeken();
+      } catch (e) { $('#planMeld').innerHTML = '<div class="melder ruimte">' + esc(e.message) + '</div>'; }
+      finally { b.disabled = false; }
+    }));
+  } catch (e) { $('#planLijst').innerHTML = '<div class="melder">' + esc(e.message) + '</div>'; }
+}
+
+$('#planVoorstel').addEventListener('click', async () => {
+  try {
+    await planApi('voorstel', { euroPerJaar: Number($('#planEuro').value), jaren: Number($('#planJaren').value) });
+    $('#planEuro').value = '';
+    $('#planMeld').innerHTML = '<div class="melder goed ruimte">Voorgesteld. De stichting legt de overeenkomst vast; tot dat moment is een betaling een gewone gift.</div>';
+    planTeken();
+  } catch (e) { $('#planMeld').innerHTML = '<div class="melder ruimte">' + esc(e.message) + '</div>'; }
 });
 
 start();

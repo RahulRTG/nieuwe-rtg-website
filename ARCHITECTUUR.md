@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 4748 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 4754 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,13 +18,13 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 4748 |
-| servermodules (`server/**/*.js`) | 2861 |
-| routebestanden (`server/routes/**`) | 541 |
-| kernmodules (`server/kern/**`) | 1797 |
-| schermen (`public/**/*.html`) | 278 |
+| API-endpoints | 4754 |
+| servermodules (`server/**/*.js`) | 2863 |
+| routebestanden (`server/routes/**`) | 542 |
+| kernmodules (`server/kern/**`) | 1798 |
+| schermen (`public/**/*.html`) | 279 |
 | gedeelde browsermodules (`public/shared/*.js`) | 285 |
-| toetsbestanden (`test/*.test.js`) | 1236 |
+| toetsbestanden (`test/*.test.js`) | 1237 |
 | schermtoetsen (`test/*.e2e.js`) | 177 |
 
 ## 2. De weg van een verzoek
@@ -125,7 +125,7 @@ lessen en schoolborden van de RTFoundation bijvoorbeeld) en hebben dus geen
 bewakerslaag. Regel 28 van de keuring eist per route een poort **of** een plek op de
 publieke lijst met reden. Deze kolom is een wegwijzer, geen verdict.
 
-Daarnaast 3176 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 3182 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 
@@ -147,9 +147,9 @@ domein. Alle vijf getallen staan in `NORM.json` aan een ratel en mogen alleen za
 domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 
 ```
-app(189) auth(115) supplierAuth(63) officeAuth(41) db(37) liveCodename(34) status(28)
+app(189) auth(116) supplierAuth(63) officeAuth(41) db(37) liveCodename(35) status(28)
 accounts(25) schoon(23) managerOnly(18) codenaamVan(17) save(16) rtf(15)
-boardroomWie(14) geenGast(13) crypto(12) tooManyTries(11) express(11) findSupplier(11)
+boardroomWie(14) geenGast(14) crypto(12) tooManyTries(11) express(11) findSupplier(11)
 pay(11) anthropic(11) keyVanCodenaam(10) rtmail(10) gegevensStop(9) logActivity(9)
 boardroomAuth(9) sseToOffice(9) payrollOS(9) kern(8) stuur(8) appUrl(7) mail(7)
 noteFailedTry(7) sseToSupplier(7) onboarding(6) notifySupplier(6) talen(6) tenant(5)

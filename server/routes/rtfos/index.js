@@ -104,5 +104,9 @@ module.exports = (kern) => {
   require('./doelgroepen')({ app, officeAuth, rtfos, veilig, H });
   require('./governance')({ app, officeAuth, rtfos, veilig, H });
   require('./afmaak')({ app, officeAuth, rtfos, veilig, H });
+  /* De buurtruil hangt aan de LEDENdeur en niet aan de kantoordeur; hij krijgt
+     daarom andere onderdelen mee dan de rest van dit domein. */
+  require('./ruil')({ app, auth: kern.auth, geenGast: kern.geenGast,
+    liveCodename: kern.liveCodename, rtfos, veilig });
   require('./portalen')({ app, rtfos, veilig });
 };

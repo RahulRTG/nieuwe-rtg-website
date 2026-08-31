@@ -77,6 +77,8 @@ module.exports = ({ db, save, crypto, boardroomWie, magBoardroom }) => {
     casussen: [], bronnen: [], uitgaven: [], subsidies: [], incidenten: [],
     gemeenten: [], ondernemers: [], voorraad: [], activiteiten: [], berichten: [],
     blauwdrukken: [], inkoop: [], uitleen: [], campagnes: [],
+    // de buurtruil: spullen tussen leden, zonder geld (./ruil.js)
+    ruil: [],
     // fase drie, de governance-laag: het bestuur zelf, de regels die het stelt,
     // de verantwoording achteraf en de dingen die mis kunnen gaan
     vergaderingen: [], beleid: [], jaarverslagen: [], risicos: [], meldcodes: [],

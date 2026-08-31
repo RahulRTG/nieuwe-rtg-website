@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '8827f18d';
+var RTG_BOUW = '7147e08b';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -4035,6 +4035,7 @@ var RTG_BOUW = '8827f18d';
     partnernetwerk:{ naam: 'Partner Network', url: '/apps/partner-network.html' },
     rtfbuurt:    { naam: 'RTFoundation in jouw buurt', url: '/apps/foundation/os-publiek.html' },
     klimaat:     { naam: 'Klimaatfonds', url: '/apps/foundation/klimaatfonds.html' },
+    buurtruil:   { naam: 'Buurtruil', url: '/apps/foundation/buurtruil.html' },
     spelen:      { naam: 'Spelen',       url: '/apps/spelen.html?pas=' + encodeURIComponent(pas) },
     vrienden:    { naam: 'Vrienden',     url: '/apps/foundation/vrienden.html' },
     juridisch:   { naam: 'Juridisch',    url: '/apps/juridisch.html' },
@@ -4419,7 +4420,7 @@ var RTG_BOUW = '8827f18d';
        bestonden en hingen nergens aan. */
     /* Het Klimaatfonds is een VENSTER op het Living Lab en geen tweede lab:
        klimaat is daar de soort 'duurzaam' (kern/livinglab/kader.js). */
-      'link:rtfbord', 'link:rtfschrift', 'link:klimaat'] }
+      'link:rtfbord', 'link:rtfschrift', 'link:klimaat', 'link:buurtruil'] }
   ];
   /* Afgesplitst van app-main-24a2.js toen dat over de 10 KB ging. De snede loopt
      langs een echte grens, en het is dezelfde grens waar WERELDEN.md over gaat:

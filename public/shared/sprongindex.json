@@ -863,6 +863,19 @@
       "url": "/apps/vluchten.html"
     },
     {
+      "naam": "Buurtruil",
+      "wereld": "FoundationOS",
+      "soort": "link",
+      "sleutel": "buurtruil",
+      "url": "/apps/foundation/buurtruil.html",
+      "woorden": [
+        "niet",
+        "gebruikt",
+        "zoekt",
+        "iemand"
+      ]
+    },
+    {
       "naam": "FoundationOS",
       "wereld": "FoundationOS",
       "soort": "link",

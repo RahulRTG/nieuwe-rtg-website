@@ -90,6 +90,7 @@ module.exports = (state) => {
      plaats van hem opnieuw te bedenken (LAT.md regel 4). */
   const subsidies = require('./subsidies')(ctx, { bronUitSubsidie: geld.bronUitSubsidie });
   const voorraad = require('./voorraad')(ctx);
+  const ruil = require('./ruil')(ctx);
   const activiteiten = require('./activiteiten')(ctx, { vogGeldig: vrijwilligers.vogGeldig });
   const berichten = require('./berichten')(ctx);
   /* Fase vier: het netwerkeffect. Delen, samen kopen, mensen uitwisselen en
@@ -157,7 +158,7 @@ module.exports = (state) => {
     vlagZet: steden.vlagZet, limietZet: steden.limietZet, zetelZet: steden.zetelZet,
     zetelWeg: steden.zetelWeg, kernteamZet: steden.kernteamZet,
     partners, projecten, vrijwilligers, geld, casus, integriteit, rapport, gemeente, ondernemers,
-    subsidies, voorraad, activiteiten, berichten,
+    subsidies, voorraad, ruil, activiteiten, berichten,
     netwerk, inkoop, uitwisseling, campagnes, koppeling,
     bestuur, beleid, jaarverslag, risico, herkomst, meldcode,
     vrijwilligerportaal, deelnemerportaal, publiek,

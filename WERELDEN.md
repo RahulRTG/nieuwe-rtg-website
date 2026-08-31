@@ -107,7 +107,7 @@ prijs of doelgroep; ze moeten elk een stabiele menselijke context zijn.
 | **LivingOS** | `/apps/rtg.html` | mijn dagelijks leven | 59 |
 | **WorkOS** | `/apps/kantoor.html` | mijn werk en organisaties | 13 |
 | **TravelOS** | `/apps/reizen.html` | mijn reizen en onderweg zijn | 14 |
-| **FoundationOS** | `/apps/foundation/os-publiek.html` | RTFoundation en haar maatschappelijke werk | 6 |
+| **FoundationOS** | `/apps/foundation/os-publiek.html` | RTFoundation en haar maatschappelijke werk | 7 |
 
 Die laatste kolom telt items in `MAPPEN` en geen schermen. De tabel wordt
 machinaal vergeleken met de code, dus als hij niet meer klopt zakt de bouw.

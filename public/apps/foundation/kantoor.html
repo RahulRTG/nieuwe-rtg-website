@@ -64,6 +64,15 @@
     <div class="sec">De Stadsraad -- samen met de stadspartners beslissen over lab-uitslagen</div>
     <div id="raadIn"><div class="leeg">Laden...</div></div>
   </div>
+  <div class="deel">Giften</div>
+  <!-- DE STAND VAN DE DONEERKNOP. Lezen mag ieder kantoor; ZETTEN doet alleen de
+       boardroom, en dat oordeel valt op de server (routes/rtfos/index.js). Dit
+       scherm verzint geen rechten: het toont de knoppen en laat de weigering
+       zien als hij komt. Zie GIFT.md. -->
+  <div class="kaart" id="giftKaart">
+    <div class="sec">Neemt RTG giften aan voor de stichting?</div>
+    <div id="giftIn"><div class="leeg">Laden...</div></div>
+  </div>
   <!-- rtgdeel-vast: het kamerdetail hoort bij geen enkel deel. De pagina zet
        het zelf open en dicht bij het rooster hierboven; zo blijft dat werken
        met het menu erbij. -->
@@ -227,6 +236,63 @@ if (TOKEN) {
   laad().catch(e => { const el = $('#top'); if (el) el.innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; });
   raadLaad();
 }
+
+/* ---------------------------------------------------------------- de giftstand
+   De schakelaar uit GIFT.md, hier bedienbaar. Vier ANBI-standen als WISSEL: de
+   zin die de gever leest hangt eraan, en die zin staat niet hier maar in
+   kern/rtfos/gift-voornemen.js -- dit scherm zet alleen de stand. */
+const giftApi = (pad, body) => fetch('/api/rtfos/gift/' + pad, {
+  method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
+  body: JSON.stringify(body || {})
+}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok || d.error) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+
+const ANBI_TEKST = { onbekend: 'Niet vastgelegd', nee: 'Geen ANBI', aangevraagd: 'Aanvraag loopt', ja: 'ANBI' };
+
+async function giftTeken() {
+  try {
+    const g = await giftApi('stand/kantoor', {});
+    const open = g.stand === 'open';
+    $('#giftIn').innerHTML =
+      '<div class="rij" style="justify-content:space-between;align-items:baseline;">' +
+        '<b style="font-size:1rem;">' + (open ? 'Ja, giften staan open' : 'Nee, giften staan dicht') + '</b>' +
+        '<button class="knop' + (open ? ' stil' : '') + '" id="giftWissel">' + (open ? 'Dicht zetten' : 'Open zetten') + '</button>' +
+      '</div>' +
+      '<div class="kpi" style="margin-top:.4rem;">' + esc(g.uitleg) + '</div>' +
+      (g.ontbreekt.length
+        ? '<div style="margin-top:.6rem;">' + g.ontbreekt.map(x =>
+            '<div class="kpi">Besluit ' + x.besluit + ': ' + esc(x.vraag) +
+            (x.blokkeert === false ? ' <i>(houdt de knop niet tegen)</i>' : '') + '</div>').join('') + '</div>'
+        : '') +
+      '<div class="rij" style="margin-top:.7rem;gap:.4rem;">' +
+        '<input class="veld" id="giftWallet" style="max-width:14rem;" placeholder="Walletcode van de stichting" value="' +
+          esc((g.ontvanger && g.ontvanger.code) || '') + '">' +
+        '<button class="knop stil" id="giftWalletZet">Wallet vastleggen</button>' +
+      '</div>' +
+      '<div class="kpi" style="margin-top:.3rem;">De stichting betaalt zichzelf vanuit deze wallet uit naar haar eigen bankrekening, langs dezelfde weg als elke zaak.</div>' +
+      '<div style="margin-top:.7rem;"><div class="sec">ANBI-status</div><div class="rij" id="giftAnbi">' +
+        ['nee', 'aangevraagd', 'ja', 'onbekend'].map(x =>
+          '<button class="knop' + (g.anbi === x ? '' : ' stil') + '" data-anbi="' + x + '">' + ANBI_TEKST[x] + '</button>').join('') +
+      '</div>' +
+      (g.anbi === 'ja' ? '<div class="kpi" style="margin-top:.3rem;">RSIN ' + esc(g.rsin) + '</div>' : '') +
+      '<div class="rij" style="margin-top:.4rem;"><input class="veld" id="giftRsin" style="max-width:12rem;" placeholder="RSIN (9 cijfers)" value="' + esc(g.rsin || '') + '"></div>' +
+      '</div>' +
+      '<div id="giftMeld"></div>';
+
+    $('#giftWissel').addEventListener('click', () => giftZet({ stand: open ? 'dicht' : 'open' }));
+    $('#giftWalletZet').addEventListener('click', () =>
+      giftZet({ ontvanger: { soort: 'wallet', code: $('#giftWallet').value.trim() } }));
+    $('#giftAnbi').querySelectorAll('[data-anbi]').forEach(b => b.addEventListener('click', () =>
+      giftZet(b.dataset.anbi === 'ja'
+        ? { anbi: 'ja', rsin: $('#giftRsin').value.trim() }
+        : { anbi: b.dataset.anbi })));
+  } catch (e) { $('#giftIn').innerHTML = '<div class="melder fout">' + esc(e.message) + '</div>'; }
+}
+
+async function giftZet(lijf) {
+  try { await giftApi('stand/zet', lijf); giftTeken(); }
+  catch (e) { const m = $('#giftMeld'); if (m) m.innerHTML = '<div class="melder fout">' + esc(e.message) + '</div>'; }
+}
+giftTeken();
 </script>
 <script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>

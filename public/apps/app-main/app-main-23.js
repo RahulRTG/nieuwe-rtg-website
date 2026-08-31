@@ -121,6 +121,7 @@
     rtfbuurt:    { naam: 'RTFoundation in jouw buurt', url: '/apps/foundation/os-publiek.html' },
     klimaat:     { naam: 'Klimaatfonds', url: '/apps/foundation/klimaatfonds.html' },
     buurtruil:   { naam: 'Buurtruil', url: '/apps/foundation/buurtruil.html' },
+    geven:       { naam: 'Geven', url: '/apps/foundation/geven.html' },
     spelen:      { naam: 'Spelen',       url: '/apps/spelen.html?pas=' + encodeURIComponent(pas) },
     vrienden:    { naam: 'Vrienden',     url: '/apps/foundation/vrienden.html' },
     juridisch:   { naam: 'Juridisch',    url: '/apps/juridisch.html' },

@@ -206,10 +206,21 @@ Vier dingen die uit het bouwen zelf kwamen:
 - **Zonder betaallaag gebeurt er niets en wordt dat gezegd** (503, "er is niets
   afgeschreven"), in plaats van een lege tak die "ok" antwoordt.
 
+### Het scherm (31 augustus 2026)
+
+`/apps/foundation/geven.html` — twee stappen, en de eerste is niet decoratief.
+Het scherm rekent zelf niets uit: het vraagt de server wat er zou gebeuren, toont
+die zinnen letterlijk, en pas daarna kan er bevestigd worden. Dat is de volgorde
+uit `GRAMMATICA.md`: een handeling met geld is plechtig, en die maakt een mens af
+nadat hij de gevolgen heeft gezien. De transactiekosten staan er vooraf bij en na
+afloop met het bedrag erbij dat werkelijk bij de stichting landt.
+
+De schakelaar staat op het RTF-kantoor (`kantoor.html`, deel *Giften*): open of
+dicht, de walletcode, en de ANBI-wissel met vier standen. Lezen mag het kantoor,
+zetten alleen de boardroom — en dat oordeel valt op de server.
+
 ## 7. Wat er nog niet is
 
-- **Het scherm voor de gever.** De routes staan (`gift/stand`, `gift/voorbereid`,
-  `gift/bevestig`); er is nog geen pagina die ze gebruikt.
 - **Het uitbetalen is niet gebouwd en hoeft dat ook niet**: de stichting logt in
   als houder van haar wallet en gebruikt `/api/pay/zaak/uitbetalen`. Daar een
   eigen knop naast zetten zou een tweede pad zijn voor dezelfde handeling.

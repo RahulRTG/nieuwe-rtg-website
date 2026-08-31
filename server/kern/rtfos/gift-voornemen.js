@@ -91,7 +91,7 @@ module.exports = (ctx, { standVan, uitlegVan, ontbreektVan }) => {
           : (aftrekbaar
             ? 'Je krijgt een giftbewijs; de RTFoundation is een ANBI (RSIN ' + g.rsin + ').'
             : (g.anbi === 'aangevraagd'
-              ? 'Je krijgt een ontvangstbevestiging. De RTFoundation is op dit moment geen ANBI; de aanvraag loopt. Of deze gift daarmee alsnog aftrekbaar wordt, hangt af van de beschikking -- dat zeggen wij niet toe.'
+              ? 'Je krijgt een ontvangstbevestiging. De RTFoundation is op dit moment geen ANBI; de aanvraag loopt. Of deze gift daarmee alsnog aftrekbaar wordt, hangt af van de beschikking \u2014 dat zeggen wij niet toe.'
               : (g.anbi === 'onbekend'
                 ? 'Je krijgt een ontvangstbevestiging. Of deze gift aftrekbaar is, ligt niet vast; wij zeggen daar niets over dat wij niet weten.'
                 : 'Je krijgt een ontvangstbevestiging. Deze gift is niet aftrekbaar.'))),

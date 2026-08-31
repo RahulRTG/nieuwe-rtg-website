@@ -25,7 +25,13 @@
   .leeg{color:var(--muted);font-size:.9rem;padding:.5rem 0;}
   .melder{font-size:.88rem;padding:.6rem .8rem;border:1px solid #5C1B2C;color:#F0A9BB;}
   .ruimte{margin-top:.7rem;}
-  .verborgen{display:none;}
+  /* !important, en dat is hier geen luiheid. shared/rtg-ui.css zet
+     `body.rtg-stijl .rij{display:flex}` -- twee klassen en een element, dus
+     zwaarder dan deze ene klasse. Zonder dit bleef elk verborgen blok dat OOK
+     een .rij is gewoon staan: op dit scherm het projectveld, op
+     klimaatfonds.html het aliasveld. Een verbergklasse die soms niet verbergt,
+     is erger dan geen verbergklasse. */
+  .verborgen{display:none!important;}
 
   /* ONYX EN GEEN GROEN. Hier stond een groen verloop, omdat klimaat groen is --
      maar groen staat niet in de merkkleuren (CLAUDE.md) en een wereld mag geen

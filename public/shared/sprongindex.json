@@ -884,6 +884,13 @@
       "huis": true
     },
     {
+      "naam": "Geven",
+      "wereld": "FoundationOS",
+      "soort": "link",
+      "sleutel": "geven",
+      "url": "/apps/foundation/geven.html"
+    },
+    {
       "naam": "Het bord",
       "wereld": "FoundationOS",
       "soort": "link",

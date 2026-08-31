@@ -27,7 +27,13 @@
   .melder{font-size:.88rem;padding:.6rem .8rem;border:1px solid #5C1B2C;color:#F0A9BB;}
   .melder.goed{border-color:#2F5E42;color:#9FD6B4;}
   .ruimte{margin-top:.7rem;}
-  .verborgen{display:none;}
+  /* !important, en dat is hier geen luiheid. shared/rtg-ui.css zet
+     `body.rtg-stijl .rij{display:flex}` -- twee klassen en een element, dus
+     zwaarder dan deze ene klasse. Zonder dit bleef elk verborgen blok dat OOK
+     een .rij is gewoon staan: op dit scherm het projectveld, op
+     klimaatfonds.html het aliasveld. Een verbergklasse die soms niet verbergt,
+     is erger dan geen verbergklasse. */
+  .verborgen{display:none!important;}
 
   .onthaal{position:relative;overflow:hidden;padding:2rem 2rem 1.8rem;
     background:linear-gradient(155deg,#1B1817 0%,#151312 54%,#0C0C0B 100%);color:#F4F0E9;border:1px solid var(--line);}

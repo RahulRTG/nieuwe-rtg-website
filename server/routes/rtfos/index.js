@@ -110,6 +110,13 @@ module.exports = (kern) => {
     liveCodename: kern.liveCodename, rtfos, veilig });
   /* De schakelaar zelf: alleen de boardroom. Hij staat hier en niet bij de
      ledendeur hierboven, want dat is de hele grens (GIFT.md par. 4). */
+  /* En de LEESkant voor het kantoor. De ledendeur heeft er al een
+     (routes/rtfos/ruil.js), maar die draait op een ledensessie; het RTF-kantoor
+     draait op een kantoortoken en kwam daar dus niet door. Twee soorten lezers,
+     twee deuren, een antwoord -- en niet een deur die allebei de sessies
+     accepteert, want dan bepaalt de sessie niet meer wat je mag. */
+  app.post('/api/rtfos/gift/stand/kantoor', kern.boardroomAuth || officeAuth,
+    (req, res) => veilig(res, () => rtfos.gift.stand()));
   app.post('/api/rtfos/gift/stand/zet', kern.boardroomAuth || officeAuth,
     (req, res) => veilig(res, () => rtfos.gift.standZet(req.body, kern.boardroomWie && kern.boardroomWie(req))));
   require('./portalen')({ app, rtfos, veilig });

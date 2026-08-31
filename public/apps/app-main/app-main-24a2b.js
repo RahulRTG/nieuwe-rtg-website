@@ -29,5 +29,5 @@
        bestonden en hingen nergens aan. */
     /* Het Klimaatfonds is een VENSTER op het Living Lab en geen tweede lab:
        klimaat is daar de soort 'duurzaam' (kern/livinglab/kader.js). */
-      'link:rtfbord', 'link:rtfschrift', 'link:klimaat', 'link:buurtruil'] }
+      'link:rtfbord', 'link:rtfschrift', 'link:klimaat', 'link:buurtruil', 'link:geven'] }
   ];

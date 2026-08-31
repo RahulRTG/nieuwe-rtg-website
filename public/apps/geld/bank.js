@@ -120,7 +120,7 @@
       (top.length ? top.map(function (s) {
         return '<div style="margin-top:0.5rem;font-size:.78rem;">' + Geld.esc(s.soort) + ' · ' + Geld.euro(s.centen) +
           '<div class="bk-staaf"><i style="width:' + Math.max(4, Math.round(100 * s.centen / max)) + '%;"></i></div></div>';
-      }).join('') : '<p class="stil">Nog geen uitgaven deze maand.</p>');
+      }).join('') : '<p class="leeg">Nog geen uitgaven deze maand.</p>');
   };
 
   /* Het volledige afschrift van een rekening als CSV-download. De ene plek

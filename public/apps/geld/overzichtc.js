@@ -75,7 +75,7 @@
         '<p class="stil">Kijken: Rahul signaleert. Voorstellen: hij stelt voor. Klaarzetten: ' +
           'hij vult in, u bevestigt. Automatisch: alleen reserveren in eigen potten. ' +
           'Geld verlaat het huis nooit vanzelf.</p>' +
-        (rr.length ? rr.map(regelRij).join('') : '<p class="stil">Nog geen regels.</p>') +
+        (rr.length ? rr.map(regelRij).join('') : '<p class="leeg">Nog geen regels.</p>') +
         '<form id="ovRegelForm" class="ov-doe"><select id="ovRSoort" aria-label="Soort">' +
           Object.keys(SOORT).map(function (s) { return '<option value="' + s + '">' + SOORT[s] + '</option>'; }).join('') +
         '</select><input id="ovRDrempel" inputmode="decimal" placeholder="Bedrag in euro" aria-label="Bedrag">' +
@@ -85,7 +85,7 @@
           pp.map(function (p) { return '<option value="' + esc(p.id) + '">' + esc(p.naam) + '</option>'; }).join('') +
         '</select><button class="knop hoofd" type="submit">Regel toevoegen</button></form></div>' +
       '<div class="kaart"><h2>Potten</h2>' +
-        (pp.length ? pp.map(potRij).join('') : '<p class="stil">Nog geen potten.</p>') +
+        (pp.length ? pp.map(potRij).join('') : '<p class="leeg">Nog geen potten.</p>') +
         '<form id="ovPotForm" class="ov-doe">' +
           '<input id="ovPNaam" maxlength="40" placeholder="Naam" aria-label="Naam">' +
           '<input id="ovPDoel" inputmode="decimal" placeholder="Doel in euro" aria-label="Doel">' +

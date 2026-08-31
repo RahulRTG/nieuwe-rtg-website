@@ -37,6 +37,13 @@ body.rtg-suite-page{
   --rtg-soft:#625f57;
   --rtg-line:var(--suite-line);
   --rtg-goud:var(--suite-gold);
+  /* WIE DE GROND VERFT, ZET OOK HET LEESBARE GOUD. Dit blok maakt de grond
+     pearl maar liet --rtg-leesgoud staan zoals hij op een DONKERE grond hoort
+     (#C0A544, het hoogsel). Daardoor haalde elk klein gouden opschrift hier
+     2,2:1 -- gevonden door scripts/a11y.js in de zaak-ronde, op het opschrift
+     van de lege stand. Op pearl is het leesbare goud --gold-diep; dat is
+     precies waarvoor rtg-themas.css die token per materiaal uitrekent. */
+  --rtg-leesgoud:var(--gold-diep);
   --bg:var(--suite-paper);
   --card:var(--suite-paper-2);
   --card2:var(--pearl-diep);

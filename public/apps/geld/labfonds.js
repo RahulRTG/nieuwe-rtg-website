@@ -67,7 +67,7 @@
           ' aria-label="Bedrag in euro voor ' + esc(l.naam) + '" data-b="' + esc(l.id) + '">' +
         '<button class="knop hoofd" type="button" data-doneer="' + esc(l.id) + '">Zamel in</button></div>' +
       '</div>';
-    }).join('') : '<p class="stil">Nog geen locaties.</p>';
+    }).join('') : '<p class="leeg">Nog geen locaties.</p>';
   }
 
   var WOORD = { steun: 'Steunt', twijfel: 'Twijfelt', afraden: 'Raadt af' };
@@ -91,7 +91,7 @@
           '<span class="telling">' + (v.voor || 0) + ' voor · ' + (v.tegen || 0) + ' tegen</span>' +
         '</div>' +
       '</div>';
-    }).join('') : '<p class="stil">Nog geen open voorstellen. Doe hieronder het eerste voorstel.</p>';
+    }).join('') : '<p class="leeg">Nog geen open voorstellen. Doe hieronder het eerste voorstel.</p>';
   }
 
   /* Meenemen (shared/uitvoer.js), zoals de oude pagina: de potten per

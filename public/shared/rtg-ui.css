@@ -706,7 +706,32 @@ body.rtg-stijl .veld:focus,body.rtg-stijl input:focus,body.rtg-stijl select:focu
 body.rtg-stijl input::placeholder,body.rtg-stijl textarea::placeholder{color:var(--rtg-soft);}
 
 /* leegte en meldingen */
-body.rtg-stijl .leeg{color:var(--rtg-soft);font-size:.9rem;padding:2.2rem 0;text-align:center;}
+/* .leeg is de klasse van de LEGE STAND, en die staat op ruim tachtig plekken
+   in LivingOS: "Nog geen kijkers", "Nog geen volgers", "Nog geen boekingen".
+   Ze delen deze ene regel, dus ze delen ook zijn fouten.
+
+   Hij was GECENTREERD met 2,2rem lucht boven en onder. Gecentreerde tekst
+   hoort bij een affiche of bij een foutmelding; een lijst die nog leeg is, is
+   geen van beide -- die hoort te beginnen waar de rij zou beginnen. En een
+   zin die over de volle breedte van een paneel uitwaaiert leest niemand.
+
+   Wat blijft: de kleur. `--rtg-soft` is per materiaal uitgerekend tegen de
+   grond waarop hij landt (rtg-themas.css, met de contrastwaarden erbij), en
+   die vervangen door iets dat currentColor mengt zou dat weggooien.
+
+   Wat er niet bij komt: een rand, een pictogram of een kop. Tachtig plekken
+   die alle tachtig een blok worden is luider dan de leegte zelf. Wie meer
+   nodig heeft dan een zin -- omdat er iets te DOEN valt -- gebruikt
+   .rtg-leeg-vlak; dat is de grote broer van deze regel en staat hierboven. */
+body.rtg-stijl .leeg{
+  color:var(--rtg-soft);
+  font-size:.86rem;
+  line-height:1.6;
+  max-width:46ch;
+  padding:1.4rem 0 1.3rem;
+  text-align:left;
+  text-wrap:pretty;
+}
 body.rtg-stijl .melding{font-size:.85rem;line-height:1.5;border-radius:0;
   border:1px solid var(--rtg-line);background:var(--rtg-card2);padding:.65rem .9rem;margin-bottom:1rem;}
 body.rtg-stijl .melding.goed{background:color-mix(in srgb,var(--rtg-groen) 16%,transparent);border-color:var(--rtg-groen);}

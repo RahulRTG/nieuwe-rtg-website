@@ -49,14 +49,14 @@
     try {
       var h = await Geld.api('/api/bank/hart', { limit: 25 });
       B.hart = h.regels || [];
-      $('#bkHart').innerHTML = B.hart.length ? B.hart.map(B.hrow).join('') : '<p class="stil">Nog geen boekingen.</p>';
+      $('#bkHart').innerHTML = B.hart.length ? B.hart.map(B.hrow).join('') : '<p class="leeg">Nog geen boekingen.</p>';
     } catch (e) { vang('#bkHart', e); }
     try { $('#bkInz').innerHTML = B.inzicht(await Geld.api('/api/bank/inzichten')); }
     catch (e) { vang('#bkInz', e); }
     try {
       var v = await Geld.api('/api/bank/vastelasten');
       $('#bkVast').innerHTML = (v.vasteLasten && v.vasteLasten.length)
-        ? v.vasteLasten.map(B.vrow).join('') : '<p class="stil">Nog geen vaste lasten herkend.</p>';
+        ? v.vasteLasten.map(B.vrow).join('') : '<p class="leeg">Nog geen vaste lasten herkend.</p>';
     } catch (e) { vang('#bkVast', e); }
     $('#bkVeeg').addEventListener('click', async function () {
       try {

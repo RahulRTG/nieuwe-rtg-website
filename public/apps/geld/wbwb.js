@@ -187,7 +187,7 @@
             '<div class="wb-rij"><button class="knop hoofd" id="wbVoeg" type="button">Ik heb dit betaald</button></div>' +
           '</div>' +
           '<h2>Het lijstje</h2>' +
-          '<div class="kaart wb-log" id="wbLog"><p class="stil">Nog geen uitgaven.</p></div>' +
+          '<div class="kaart wb-log" id="wbLog"><p class="leeg">Nog geen uitgaven.</p></div>' +
         '</section>' +
       '</div>',
     start: start,

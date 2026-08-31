@@ -448,7 +448,7 @@
     const r = await api('reacties', { id: c.id });
     $('#reactieLijst').innerHTML = (r.body.reacties || []).map(x =>
       '<div class="reactieRij"><b>' + esc(x.codenaam) + '</b> ' + esc(x.tekst) + '</div>').join('') ||
-      '<p class="stil">Nog geen reacties.</p>';
+      '<p class="leeg">Nog geen reacties.</p>';
     $('#reactieSheet').classList.add('open');
   }
   $('#reactieForm').addEventListener('submit', async e => {

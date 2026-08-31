@@ -159,7 +159,7 @@
       </div>
     </div>
     <h2>Reacties</h2>
-    <div class="kaart"><div class="reacties" id="reacties"><p class="stil">Nog geen reacties.</p></div>
+    <div class="kaart"><div class="reacties" id="reacties"><p class="leeg">Nog geen reacties.</p></div>
       <form class="rij" id="reactieForm">
         <label for="reactieVeld" style="position:absolute;left:-999px;">Reactie</label>
         <input id="reactieVeld" maxlength="300" placeholder="Reageer (op codenaam)" autocomplete="off">
@@ -681,7 +681,7 @@
     const r = await api('reacties', { id: open.id });
     const el = $('#reacties');
     const rijen = (r.body.reacties || []);
-    el.innerHTML = rijen.length ? '' : '<p class="stil">Nog geen reacties.</p>';
+    el.innerHTML = rijen.length ? '' : '<p class="leeg">Nog geen reacties.</p>';
     for (const x of rijen) {
       const d = document.createElement('div'); d.className = 'r';
       const wie = document.createElement('span'); wie.className = 'wie'; wie.textContent = x.codenaam;

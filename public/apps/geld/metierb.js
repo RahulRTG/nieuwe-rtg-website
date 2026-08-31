@@ -43,7 +43,7 @@
       ((p.aanbevelingen || []).length ? p.aanbevelingen.map(function (a) {
         return '<div class="rij"><div class="mt-tx"><b>' + esc(a.van) + '</b><div class="sub">' + esc(a.tekst) + '</div></div>' +
           (a.vanMij ? '<button class="mt-mini" data-mtatrek="' + esc(a.id) + '">intrekken</button>' : '') + '</div>';
-      }).join('') : '<p class="stil">Nog geen aanbevelingen.</p>') +
+      }).join('') : '<p class="leeg">Nog geen aanbevelingen.</p>') +
       '<label class="stil lbl" for="mtAtekst">Schrijf een aanbeveling</label>' +
       '<textarea id="mtAtekst" rows="3" maxlength="500" placeholder="Een paar zinnen over hoe het is om met deze persoon te werken."></textarea>' +
       '<div class="mt-knoppen"><button class="knop hoofd" id="mtBaanbeveel" type="button">Plaatsen</button></div></div>';

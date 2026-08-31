@@ -181,7 +181,7 @@
     <section id="kraamBeheer" class="weg" aria-label="Uw kraam"></section>
     <h2>Kijkers</h2>
     <p class="stil" style="margin-top:-0.3rem;">Uw uitzending draagt onbeperkt veel kijkers: elke kijker geeft het beeld door aan een paar volgende, dus u zendt zelf maar naar een handvol.</p>
-    <div id="kijkerLijst"><p class="stil">Nog geen kijkers.</p></div>
+    <div id="kijkerLijst"><p class="leeg">Nog geen kijkers.</p></div>
   </section>
 
 </main>
@@ -553,7 +553,7 @@
     lijst.innerHTML = best.length
       ? best.map(b => '<p class="stil">' + esc(b.codenaam) + ' · ' + esc(b.naam) + ' · ' + eur(b.centen) +
           (b.levering ? ' · ' + esc(b.levering) : '') + '</p>').join('')
-      : '<p class="stil">Nog geen bestellingen.</p>';
+      : '<p class="leeg">Nog geen bestellingen.</p>';
     el.appendChild(lijst);
   }
   async function waarZet(data) {
@@ -580,7 +580,7 @@
   function tekenKijkers(lijst) {
     $('#studioTel').textContent = lijst.length + ' kijkers';
     const el = $('#kijkerLijst'); el.innerHTML = '';
-    if (!lijst.length) { el.innerHTML = '<p class="stil">Nog geen kijkers.</p>'; return; }
+    if (!lijst.length) { el.innerHTML = '<p class="leeg">Nog geen kijkers.</p>'; return; }
     for (const x of lijst) {
       const rij = document.createElement('div'); rij.className = 'rij';
       const naam = document.createElement('span'); naam.className = 'stil'; naam.style.flex = '1'; naam.textContent = x.codenaam;

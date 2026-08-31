@@ -19,7 +19,10 @@
 const { meetpoort } = require('../../meetpoort');
 
 module.exports = (ctx) => {
-  const { app, officeAuth, veilig, wie, command, bezitsbewijs } = ctx;
+  const { app, officeAuth, veilig, wie, command } = ctx;
+  /* bezitsbewijs en doelpoort staan hier niet meer: die twee zijn met de
+     schaduwmeters mee verhuisd naar ./schaduwmeters.js, en een naam pakken die
+     je niet gebruikt is precies wat regel 39 van de keuring tegenhoudt. */
   /* De routes die iets INRICHTEN (koppelingen, landen, steden, overname) staan
      in ./inrichten.js: dit bestand gaat over meten en uitrollen. Ze zijn uit
      elkaar gehaald toen dit bestand over de 10 kB-grens ging, op de naad die er
@@ -156,20 +159,5 @@ module.exports = (ctx) => {
     res.json(r);
   });
 
-  /* DE SCHADUWMETER VAN HET BEZITSBEWIJS (MIJNRTG.md blok 4).
-
-     Waarom hier: dit is een meting en geen instelling. Er staat dan ook GEEN
-     route naast om de stand aan te zetten -- dat gebeurt met RTG_BEZITSBEWIJS
-     bij het opstarten, en dat is bewust een besluit van wie de omgeving beheert
-     en niet iets dat een kantoorsessie even omzet. Een knop die stilletjes de
-     betalingen van elk gebonden lid kan weigeren, hoort niet naast een grafiek
-     te staan.
-
-     Het antwoord draagt zijn eigen beperking mee (`nietGemeten`): de tellers
-     lopen per werkproces en beginnen opnieuw bij een herstart. Dit huis draait
-     er meerdere, dus dit is een steekproef. Wie hem als totaal leest, telt te
-     laag -- en dat is de gevaarlijke kant, want te laag lijkt "nog niet klaar". */
-  app.post('/api/command/bezitsbewijs', officeAuth, (req, res) => veilig(res, () =>
-    (bezitsbewijs ? bezitsbewijs.stand()
-      : { nietGebouwd: 'De bezitsbewijslaag draait niet in dit proces.' })));
+  require('./schaduwmeters')(ctx);
 };

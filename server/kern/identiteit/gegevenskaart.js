@@ -23,28 +23,14 @@
 'use strict';
 
 const { SOORTEN, WAAR, HERKOMST, GRONDEN } = require('./gegevenssoorten');
-/* DE TERMIJN KOMT UIT HET BELEID EN NIET UIT EEN ZIN. Hij stond eerst als
-   "zeven jaar" in het register, en dat is precies hoe een document van de code
-   wegdrijft: bij het narekenen bleek het inzagejournaal niet "altijd" te
-   blijven maar twee jaar. Wie een bewaartermijn overtypt, heeft hem binnen een
-   jaar mis. */
-const { BELEID } = require('../../bewaartermijnen');
+const { termijnVan } = require('./gegevenstermijn');
 const { maakPeilingen } = require('./gegevenspeiling');
-
-function termijnVan(tak) {
-  if (!tak) return null;
-  const r = (BELEID || []).find(x => x.tak === tak);
-  /* Een tak die niet meer bestaat levert GEEN stilte op: dan staat er op de
-     kaart dat de termijn niet is vast te stellen, en dat is de eerlijke stand.
-     Een verdwenen regel als "geen termijn" tonen zou zeggen dat het eeuwig
-     blijft staan, en dat is de gevaarlijke kant van de fout. */
-  if (!r) return { bekend: false, waarom: 'De bewaarregel voor dit gegeven is niet gevonden; hoe lang het blijft staan is hier niet vast te stellen.' };
-  return {
-    bekend: true, dagen: r.dagen, grond: r.grond,
-    inWoorden: r.dagen >= 365 ? Math.round(r.dagen / 365) + ' jaar' : r.dagen + ' dagen',
-    waarom: r.waarom
-  };
-}
+/* DE DOELEN ERBIJ. De kaart noemde per gegeven EEN doel, in een zin -- en dat
+   was precies de belofte in tekst waar LAT-regel 6 voor waarschuwt. Nu komt de
+   lijst uit ./doelen.js, waar hij ook wordt AFGEDWONGEN, en de zin blijft staan
+   als samenvatting. Twee bronnen voor hetzelfde zou LAT-regel 4 breken; daarom
+   is die zin een samenvatting en geen tweede waarheid: de poort leest hem nooit. */
+const { doelenVoor, GRONDEN: DOELGRONDEN } = require('./doelen');
 
 /* De rand van deze kaart, in de woorden van een lid. Alle vier komen ze uit
    hoe dit huis werkelijk in elkaar zit en niet uit voorzichtigheid. */
@@ -101,6 +87,17 @@ function maakGegevenskaart({ accounts, sessieregister, toestellen, commercieel, 
         waar: s.waar, waarUitleg: WAAR[s.waar],
         herkomst: s.herkomst, herkomstUitleg: HERKOMST[s.herkomst],
         doel: s.doel,
+        /* Waarvoor dit gegeven werkelijk gebruikt mag worden, uit de laag die
+           het ook handhaaft. `weigerbaar` staat per doel, want dat is het enige
+           dat een lid hier kan veranderen -- en een lijst waarin dat niet staat,
+           laat denken dat alles een knop is. */
+        doelen: doelenVoor(s.id).map(d => ({
+          id: d.id, naam: d.naam, wat: d.wat,
+          grond: d.grond, grondNaam: DOELGRONDEN[d.grond].naam,
+          grondUitleg: DOELGRONDEN[d.grond].uitleg,
+          weigerbaar: DOELGRONDEN[d.grond].weigerbaar,
+          ...(d.viaPost ? { viaPost: d.viaPost } : {})
+        })),
         /* De grond reist mee als UITLEG en niet als code: 'wettelijk' zegt een
            jurist iets en een lid niets. */
         weg: Object.assign({}, s.weg, s.weg.grond ? { grondUitleg: GRONDEN[s.weg.grond] } : {}),

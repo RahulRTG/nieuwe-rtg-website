@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1422 bestanden en 10075 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1423 bestanden en 10087 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1422 |
-| losse beweringen (`test(...)`) | 10075 |
+| toetsbestanden | 1423 |
+| losse beweringen (`test(...)`) | 10087 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 50 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 969 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 38 |
-| alleen in de kop *genoemd*, nog niet gemeten | 123 |
+| alleen in de kop *genoemd*, nog niet gemeten | 124 |
 | niets van beide | 282 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1245 bestanden, 9772 beweringen.
+1246 bestanden, 9784 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -263,6 +263,7 @@ toets omvalt.
 | `demozaken.test.js` | 4 | gezakt op `liegpoort /api/` | DE LIVEGANG-SCHOONMAAK: welke zaken verdwijnen er zonder RTG_DEMO, en welke niet. WAT ER MISGING De opruiming stond in initdata/deel7-salon.js en draaide dus VOOR deel8, deel9 en deel10. |
 | `denkfout.test.js` | 9 | -- | De Misconception Graph: een fout is geen fout maar een denkfout. De beloftes die hier hard worden gemaakt: - 3 x 7 = 10 wordt geduid als optellen in plaats van vermenigvuldigen, en daar komt meteen een ANDERE uitleg... |
 | `directpay.test.js` | 9 | gezakt op `liegpoort /api/` | Rechtstreeks betalen van klant naar leverancier, met Face ID, via de AI en de Salon. Het lid betaalt zelf of rekent een betaalverzoek van de partner af; het geld gaat rechtstreeks naar de leverancier (ontvangst-teller). |
+| `doelbinding.test.js` | 12 | genoemd | DOELBINDING -- waarvoor mag dit gegeven gebruikt worden? DE TOETS DIE DE TWEE REGISTERS AAN ELKAAR HOUDT staat in 1. |
 | `doelen.test.js` | 8 | gezakt op `liegpoort /api/` | De doelenmotor (kern/doelen.js). Het punt van deze motor is dat mijlpalen worden AFGELEID en niet bewaard: een gemiste week is dan geen mislukking maar een ander pad. |
 | `domeinalleen.test.js` | 2 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `domeingrens.test.js` | 8 | gezakt op `===->!==#0` | DE DOMEINGRENS: laat hij door wat mag, en houdt hij tegen wat niet mag? Waar dit over gaat: server.js geeft elke router hetzelfde object `kern` met ruim negenhonderd eigenschappen, dus kan elk domein bij alles van... |

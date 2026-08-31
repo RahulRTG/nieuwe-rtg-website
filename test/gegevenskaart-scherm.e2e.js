@@ -164,6 +164,27 @@ test('Gegevenskaart: soorten en geen inhoud, met onbekend als eigen uitslag',
     assert.match(await derde.textContent(), /uw naam en uw codenaam gaan eraf/i,
       'en zegt wat er dan gebeurt: u wordt eruit gehaald, de tekst blijft staan');
 
+    /* 4e. WAARVOOR HET GEBRUIKT MAG WORDEN, en het verschil dat ertoe doet:
+       welke doelen een KEUZE zijn en welke niet. Een lijst waarin dat verschil
+       niet te zien is, laat een lid denken dat alles een knop is -- en dat is
+       precies de leugen waar doelbinding tegen moet beschermen. */
+    const tel = page.locator('#lijst .rij').filter({ hasText: 'Uw telefoonnummer' }).first();
+    const doelen = tel.locator('.doel');
+    assert.ok(await doelen.count() >= 3, 'een telefoonnummer wordt voor meerdere dingen gebruikt');
+    assert.ok(await tel.locator('.doel.keuze').count() >= 1, 'daarvan is er minstens een een keuze');
+    assert.ok(await tel.locator('.doel:not(.keuze)').count() >= 1, 'en minstens een niet');
+    const merk = await page.evaluate(() => {
+      const k = s => { const e = document.querySelector(s); return e ? getComputedStyle(e).backgroundColor : null; };
+      return { keuze: k('.doel.keuze i'), vast: k('.doel:not(.keuze) i') };
+    });
+    assert.notEqual(merk.keuze, merk.vast,
+      'een keuze moet er anders uitzien dan iets dat vaststaat; anders bestaat het verschil alleen in de JSON');
+    /* En de grond staat erbij: WAAROM iets niet te weigeren is, is het antwoord
+       op de vraag die een lid hier stelt. */
+    assert.match(await tel.locator('.doel:not(.keuze)').first().textContent(),
+      /Nodig voor wat u vroeg|kan RTG niet leveren|wet schrijft/i,
+      'bij een doel dat vaststaat staat de reden erbij');
+
     /* 5. DE RAND VAN DE KAART. */
     const grenzen = await page.textContent('#grenzen');
     assert.match(grenzen, /Zegel/, 'wat hier niet op kan komen, staat erbij');

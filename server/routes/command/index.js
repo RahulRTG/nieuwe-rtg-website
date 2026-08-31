@@ -30,7 +30,7 @@ module.exports = (kern) => {
     catch (e) { console.error('[command]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
   };
   const wie = (req) => boardroomWie(req) || 'kantoor (gedeelde code)';
-  const ctx = { stuur, veilig, wie, officeAuth, app, command, apiSpoor, bezitsbewijs: kern.bezitsbewijs };
+  const ctx = { stuur, veilig, wie, officeAuth, app, command, apiSpoor, bezitsbewijs: kern.bezitsbewijs, doelpoort: kern.doelpoort };
 
   /* HET BEGINSCHERM IN ÉÉN VERZOEK. Vier losse verzoeken op een beginscherm
      zijn vier momenten waarop het scherm half gevuld kan blijven staan; dit is

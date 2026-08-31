@@ -2,15 +2,15 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-08-31",
   "gemeten": {
-    "bestanden": 1899,
-    "vormen": 1291,
-    "velden": 1842,
-    "modules": 691,
-    "domeinen": 245,
+    "bestanden": 1902,
+    "vormen": 1293,
+    "velden": 1843,
+    "modules": 692,
+    "domeinen": 246,
     "envelopDrempel": 15,
     "envelop": 32,
-    "veldenDomeineigen": 1293,
-    "veldenGedeeldVanafVier": 184,
+    "veldenDomeineigen": 1294,
+    "veldenGedeeldVanafVier": 185,
     "gelijkendeVormparen": 19
   },
   "envelop": [

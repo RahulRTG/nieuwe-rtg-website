@@ -135,6 +135,11 @@ const tweefactor = require('../kern/identiteit/tweefactor').maakTweefactor({ acc
    "wie mag mij benaderen" op hetzelfde scherm staat als "wie mag iets van mij
    zien" -- een lid hoort niet te moeten weten dat dat twee lagen zijn. */
 const commercieel = require('../kern/identiteit/commercieel').maakCommercieel({ db, save });
+/* De doelpoort hoort HIER en niet bij de gegevenskaart: hij leunt op de
+   commerciele laag hierboven (daar woont de toestemming, en er komt geen tweede
+   boekhouding bij) en hij moet meetbaar zijn vanuit het kantoor. Hij weigert in
+   de standaardstand nog niets -- zie de kop van kern/identiteit/doelpoort.js. */
+const doelpoort = require('../kern/identiteit/doelpoort').maakDoelpoort({ commercieel });
 
 /* Een token kan een demo-sessie zijn (in-memory) of een echt account-token
    (ondertekend, staatloos). Beide leveren een sessie met tier + unieke key.
@@ -247,6 +252,7 @@ function auth(req, res, next) {
     aiPoort, antivirus, archief, atelierweb, auth, automatisering, beveilig, naamlaag, 
     resolveSession, sessieregister, toestellen, bezitsbewijs, tweefactor, commercieel,
     commercieelStand: (k) => commercieel.standVan(k),
+    doelpoort,
     commercieelZet: (k, s2, kan, bron) => commercieel.zet(k, s2, kan, bron), mailQ, mailIn, mailAuth, mailBijlage, mailSleutel, rtmailAi, rtmail, rtmailTeam, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar, mailAanname, scanNet, wacht, werkmail
   };
 };

@@ -133,7 +133,7 @@ standaard of de wereld is er nog niet klaar voor.
 | 5 | Action-bound authentication | **stap weg** | `kern/webauthn.js` heeft de ceremonieopslag al (`zetChallenge`/`pakChallenge` met `extra`). De actie in de challenge binden is een kleine, echte stap. |
 | 6 | Permission firewall ("wie heeft nu toegang tot mij?") | **staat** | 31 augustus 2026: `kern/consent-relaties.js`, scherm `/apps/mijn-relaties.html`. Geen nieuwe laag -- het Consent Center dééd dit al per soort; dit legt dezelfde negen lagen per PARTIJ. Meten wees ook uit dat de boardroom geen toegangsregister is en dat de bureau-delegatie RTG machtigt en geen buitenstaander; die staan met die reden bij "wat dit scherm niet dekt". |
 | 7 | Tijdelijke rechten als standaard (wie+wat+waarom+hoelang) | **staat, verkeerde doelgroep** | `recht/geef` kent `minuten`, `mandaat` kent `tot`. Voor leden bestaat het niet. |
-| 8 | Purpose-bound data | **besluit — het duurste gat** | De boardroom schakelt per *capability*, niet per *doel*. Zie par. 5. |
+| 8 | Purpose-bound data | **staat, in de schaduw** | `kern/identiteit/doelen.js` + `doelpoort.js`; zichtbaar op de gegevenskaart, meetbaar op `/api/command/doelbinding`. Zie par. 5f. |
 | 9 | Credential wallet (VC 2.0) | **jaren, vooruitcompatibel ontwerpen** | W3C VC 2.0 is Recommendation; de Digital Credentials API is Working Draft. Ontwerp de kluis zo dat een credential ernaast kan, maak hem geen afhankelijkheid. |
 | 10 | Zero-copy identity (ask → prove → forget) | **stap weg voor nieuwe modules, jaren voor bestaande** | `kern/gegevenspoort.js` is het aanknopingspunt. De 100 bestaande domeinen bewaren al kopieën; dat is een migratie en geen schakelaar. |
 | 11 | Gegevenskaart | **staat** | `kern/identiteit/gegevenssoorten.js` + `gegevenskaart.js`, scherm `/apps/mijn-gegevens.html`. Zie par. 5e. |
@@ -447,6 +447,70 @@ tegenspreken -- ook al is er niets fout gegaan.
 Er komt met opzet **geen wisknop** op dit scherm. Weghalen doe je waar het gegeven
 woont; zou het hier ook kunnen, dan bestond er van elk gegeven twee plekken om het
 weg te halen, en dan is er binnen een jaar een die het net iets anders doet.
+
+## 5f. Doelbinding: waarvoor mag dit gegeven gebruikt worden?
+
+Dit was het duurste gat van de lijst, en het gat zat niet in wat er ontbrak maar
+in wat er stond. De boardroom van een lid schakelt per **functie** -- reizen aan,
+Salon uit. Dat is een goede laag en hij blijft. Maar een functie is geen doel:
+"RTG Pay staat aan" zegt niets over de vraag of uw telefoonnummer gebruikt mag
+worden om u een aanbieding te sturen. De gegevenskaart noemde per gegeven een
+doel, in een **zin**, en niemand dwong die zin af. Doelbinding was daarmee een
+belofte in tekst -- LAT-regel 6.
+
+**De grond is het scharnier, en hij bepaalt of u nee mag zeggen.** Dat is geen
+nuance maar de kern: een kaart die zegt "u kunt elk doel weigeren" liegt, want
+uw adres gebruiken om uw bestelling te bezorgen is de uitvoering van wat u zelf
+vroeg. Vier gronden, en maar één ervan is een keuze:
+
+| grond | te weigeren | waarom |
+|---|---|---|
+| `overeenkomst` | nee | zonder dit gebruik kan RTG niet leveren wat u zelf in gang zette |
+| `wettelijk` | nee | de wet schrijft het voor; niemand hier kan dat wegklikken |
+| `bescherming` | nee | kon u het uitzetten, dan kon een ander dat ook |
+| `toestemming` | **ja** | staat standaard uit, en is altijd in te trekken |
+
+**Er komt geen tweede toestemmingsboekhouding bij.** Een doel met grond
+`toestemming` vraagt het aan `kern/identiteit/commercieel.js` -- dezelfde laag
+die het scherm en het Consent Center lezen. Zou de poort een eigen ja/nee
+bewaren, dan zijn er binnen een jaar twee waarheden over hetzelfde, en verschilt
+de ene van de andere precies wanneer het ertoe doet (LAT-regel 4).
+
+**Vier uitkomsten en niet twee**, in de geest van CONTROLPLANE.md: `onbekend` is
+met opzet geen synoniem van `geweigerd`. Een doel dat niemand kent is een fout
+van de aanroeper; een storing is geen overtreding. En een storing weigert nooit,
+ook niet in de stand `afdwingen` -- als de toestemmingslaag stuk is, weten we het
+niet, en de app stilzetten om een reden die niets met het lid te maken heeft is
+erger dan doorgaan. Wel geteld, en juist die teller hoort op te vallen.
+
+**Twee standen en niet drie.** Bij het bezitsbewijs bestaat `aanbevolen` omdat
+een waarschuwing aan een MENS daar betekenis heeft ("bind uw toestel"). Hier
+staat geen mens: hier vraagt code of zij dit gegeven mag gebruiken, en
+"eigenlijk niet" is geen antwoord waar een aanroeper iets mee kan. Een derde
+stand die niemand kan uitvoeren, is een knop die niets doet.
+
+**Twee dingen die de handhaver meteen vond.** De toets die de twee registers aan
+elkaar houdt, ontdekte dat `post` -- uw eigen postvoorkeuren -- geen enkel doel
+had: een gegeven waarvan niemand meer kon zeggen waarom RTG het heeft. Het is
+nu het doel *toestemmingsbewijs*, met grond `wettelijk`, want wie zich op
+toestemming beroept moet kunnen aantonen dat die er was (AVG art. 7 lid 1). Let
+op de vorm: uw voorkeuren zijn zelf níét weigerbaar terwijl waar ze over gaan dat
+wel is -- kon u dat bewijs wegdrukken, dan kon RTG niet meer aantonen dat u ooit
+nee zei, en dan werkt uw nee tegen u.
+
+Het tweede vond een **mutatie die overleefde**: `identiteitsbewijs` toevoegen aan
+een doel dat er niets mee te maken heeft, ging door alle toetsen heen. Machinaal
+is niet te bepalen welk doel welk gegeven nódig heeft -- dat is een afweging.
+Wat wel kan is hem vastleggen, zoals `GRENZEN.json` dat doet: de doel-gegeven-
+matrix staat in `test/doelbinding.test.js`, en wie een doel verbreedt moet daar
+opschrijven dat hij het wilde. Zo verwatert dataminimalisatie niet met een regel
+erbij omdat het handig uitkwam.
+
+**En hij begint in de schaduw.** `RTG_DOELBINDING` staat op `schaduw` en weigert
+niets; hij rekent alleen uit wat er zou zijn gebeurd en telt dat, leesbaar op
+`/api/command/doelbinding`. CONTROLPLANE.md: je kunt niet afdwingen wat nooit in
+de schaduw heeft gelopen. De overstap naar `afdwingen` is een besluit van de
+eigenaar, en er hoort productieverkeer onder te liggen voordat het genomen wordt.
 
 ## 6. De volgorde
 

@@ -48,6 +48,18 @@
   .feit span{color:var(--soft);}
   .waarom{border-left:2px solid var(--rood);padding:0.4rem 0 0.4rem 0.7rem;margin-top:0.7rem;
     font-size:0.78rem;line-height:1.5;color:var(--soft);}
+  /* DE DOELEN. Een lijst, geen kaartjes: het gaat om het VERSCHIL tussen de
+     regels (vast of keuze), en dat verschil verdrinkt in vier randjes. */
+  .doelen{border-top:1px solid var(--line);margin-top:0.85rem;padding-top:0.7rem;}
+  .doelen h4{font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);margin-bottom:0.5rem;}
+  .doel{display:flex;gap:0.7rem;padding:0.4rem 0;font-size:0.79rem;line-height:1.5;}
+  .doel b{font-weight:600;}
+  .doel span{color:var(--soft);display:block;margin-top:0.15rem;}
+  /* Het merkteken links zegt in een oogopslag of hier iets te kiezen valt.
+     Goud is een keuze, grijs is het niet -- en dat verschil is de hele reden
+     dat deze lijst er staat. */
+  .doel i{width:10px;height:1px;flex:0 0 auto;margin-top:0.6rem;background:var(--soft);}
+  .doel.keuze i{background:var(--gold);height:3px;margin-top:0.55rem;}
   .weg{border-top:1px solid var(--line);margin-top:0.85rem;padding-top:0.7rem;font-size:0.79rem;line-height:1.55;}
   .weg.vast{color:var(--soft);}
   .weg b{font-weight:600;color:var(--txt);}
@@ -133,6 +145,27 @@
        helft komt alleen bij een harde nee -- bij onbekend zou hij een
        afwezigheid bevestigen die niet is vastgesteld. */
     if (r.bijAfwezig) el.appendChild(tekst(maak('div', 'waarom'), r.bijAfwezig));
+
+    /* WAARVOOR DIT GEGEVEN GEBRUIKT MAG WORDEN, uit de laag die het ook
+       afdwingt. De regel `Waarvoor:` hierboven blijft als samenvatting staan;
+       deze lijst is wat er werkelijk geldt. */
+    if ((r.doelen || []).length) {
+      const dl = maak('div', 'doelen');
+      dl.appendChild(tekst(maak('h4'), 'Waarvoor RTG dit gebruikt'));
+      for (const d of r.doelen) {
+        const el = maak('div', 'doel' + (d.weigerbaar ? ' keuze' : ''));
+        el.appendChild(maak('i'));
+        const t = maak('div');
+        t.appendChild(tekst(maak('b'), d.naam));
+        /* De grond staat erbij en niet als aparte kolom: WAAROM iets niet te
+           weigeren is, is het antwoord op de vraag die een lid hier stelt. Een
+           lijst met alleen namen laat hem denken dat alles een knop is. */
+        t.appendChild(tekst(maak('span'), d.wat + ' ' + d.grondUitleg));
+        el.appendChild(t);
+        dl.appendChild(el);
+      }
+      el.appendChild(dl);
+    }
 
     const weg = maak('div', 'weg' + (r.weg.kan ? '' : ' vast'));
     weg.appendChild(tekst(maak('b'), r.weg.kan ? 'Weghalen kan. ' : 'Dit kan niet weg. '));

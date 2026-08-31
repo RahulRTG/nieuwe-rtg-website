@@ -24,6 +24,9 @@ const assert = require('node:assert/strict');
 const { startServer, stop, kantoorAlsPersoon } = require('./helper');
 
 let srv, base, board;
+/* De code en de PIN uit het aanmaken: de PIN is daarna niet meer op te vragen
+   (dat is de bedoeling), dus de uitbetaaltoets hieronder leunt op deze twee. */
+let WCODE = null, WPIN = null;
 
 const api = (pad, body, token) => fetch(base + pad, {
   method: 'POST',
@@ -55,6 +58,7 @@ test('de stichting krijgt een positie, en er is er precies een', async () => {
   assert.equal(r.status, 200, JSON.stringify(r.body));
   assert.ok(r.body.code, 'geen bedrijfscode');
   assert.ok(r.body.pin, 'geen beheer-PIN -- dan kan niemand uitbetalen');
+  WCODE = r.body.code; WPIN = r.body.pin;
   assert.equal(r.body.wereldFout, null, 'de economische wereld is niet gezet: ' + r.body.wereldFout);
   assert.equal(r.body.giftFout, null, 'de ontvanger van de giftstand is niet ingevuld: ' + r.body.giftFout);
 
@@ -104,4 +108,71 @@ test('de stichting is niet aan te vragen en niet aan te sluiten', async () => {
   assert.equal(lijst.status, 200);
   assert.ok(!(lijst.body.genres || []).some(x => x.id === 'rtfoundation'),
     'de stichting stond in de lijst van aan te sluiten instellingen -- dan is er een tweede weg');
+});
+
+/* ---------------------------------------------------------------------------
+   EN DAN DE HELE KETEN: aanmaken, geven, uitbetalen.
+
+   Dit is de vraag van de eigenaar in een toets: "RTF krijgt een eigen wallet
+   zoals een partner, waarbij ze het zelf naar een rekening kunnen storten."
+   Elke stap apart stond al; deze toets loopt hem in EEN keer door, want dat is
+   waar de naden zitten. Hij vindt bijvoorbeeld dat een uitbetaling zonder
+   bekende bankrekening weigert VOORDAT het saldo van de wallet af gaat -- de
+   fout die kern/pay/zaakrekening.js repareerde. */
+test('de stichting krijgt een gift binnen en betaalt zichzelf uit', async () => {
+  const w = await api('/api/office/rtfwallet', {}, board);
+  assert.equal(w.body.bestaat, true, 'de vorige toets heeft de positie al gemaakt');
+  const code = w.body.wallet.code;
+
+  /* De giftstand kan nu open: de ontvanger staat er. */
+  await api('/api/rtfos/gift/stand/zet',
+    { vormen: ['eenmalig', 'geoormerkt', 'periodiek'], anbi: 'aangevraagd' }, board);
+  const open = await api('/api/rtfos/gift/stand/zet', { stand: 'open' }, board);
+  assert.equal(open.body.stand, 'open', JSON.stringify(open.body));
+
+  const t = Date.now();
+  const reg = await api('/api/auth/register', { name: 'Gulle Gever',
+    email: 'rtfw-' + t + '@toets.example', password: 'geheim123',
+    geboortedatum: '1980-01-01', tier: 'rtg' });
+  assert.ok(reg.body.token, JSON.stringify(reg.body).slice(0, 200));
+
+  const gift = await api('/api/rtfos/gift/bevestig', { euro: 40, vorm: 'eenmalig', idem: 'k1' }, reg.body.token);
+  assert.equal(gift.status, 200, JSON.stringify(gift.body).slice(0, 300));
+  assert.equal(gift.body.gegeven, 40);
+  /* ZOLANG DE AANVRAAG LOOPT IS HET GEEN GIFTBEWIJS. Dat is de ANBI-regel op
+     het echte pad en niet alleen in een eenheidstoets. */
+  assert.equal(gift.body.stuk, 'ontvangstbevestiging');
+
+  /* DE BEHEERDER LOGT IN MET DE PIN UIT HET AANMAKEN en doet wat de eigenaar
+     vroeg: zelf naar de eigen bankrekening storten. */
+  const roster = (await api('/api/supplier/roster', { code: WCODE })).body;
+  const beheer = (roster.staff || []).find(x => x.role === 'manager');
+  assert.ok(beheer && beheer.id, 'de stichting heeft geen beheerder: ' + JSON.stringify(roster).slice(0, 200));
+
+  const inlog = await (await fetch(base + '/api/supplier/login', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code: WCODE, staffId: beheer.id, pin: WPIN })
+  })).json();
+  assert.ok(inlog.token, 'de beheerder van de stichting kan niet inloggen: ' + JSON.stringify(inlog).slice(0, 200));
+
+  const pot = await api('/api/supplier/pay/overzicht', {}, inlog.token);
+  assert.ok(pot.body.saldo > 0, 'de gift landde niet in de wallet van de stichting');
+
+  /* ZONDER REKENING GEEN UITBETALING, EN HET SALDO BLIJFT STAAN. Dit is de
+     fout die kern/pay/zaakrekening.js repareerde: eerst ging het saldo eraf en
+     pas daarna bleek er geen bestemming. */
+  const zonder = await api('/api/supplier/pay/uitbetaal', { idem: 'rtf-0' }, inlog.token);
+  assert.equal(zonder.status, 409, 'uitbetalen kon zonder bekende bankrekening');
+  assert.equal((await api('/api/supplier/pay/overzicht', {}, inlog.token)).body.saldo, pot.body.saldo,
+    'de geweigerde uitbetaling had het saldo al afgeboekt');
+
+  const rek = await api('/api/supplier/pay/rekening',
+    { iban: 'NL91 ABNA 0417 1643 00', naam: 'Stichting RTFoundation' }, inlog.token);
+  assert.equal(rek.status, 200, JSON.stringify(rek.body));
+
+  const uit = await api('/api/supplier/pay/uitbetaal', { idem: 'rtf-1' }, inlog.token);
+  assert.equal(uit.status, 200, JSON.stringify(uit.body));
+  assert.equal(uit.body.uitbetaald, pot.body.saldo, 'niet het hele beschikbare saldo ging eruit');
+  assert.equal(uit.body.naarRekening, '4300', 'de uitbetaling ging de rail op zonder rekening');
+  assert.equal((await api('/api/supplier/pay/overzicht', {}, inlog.token)).body.saldo, 0);
 });

@@ -431,7 +431,16 @@ wachtOpSchoneBoom();
   try { register = JSON.parse(fs.readFileSync(path.join(WORTEL, 'IDEMBESLUIT.json'), 'utf8')); } catch (e) {}
   const besluiten = register.routes || {};
 
-  const uit = await draaiIdemproef({ post, routes, tokenVoor, hernieuw,
+  /* DE WERELDWACHT loopt MEE, en de extras staan hier al vast. Zie
+     ./lib/wereldcontrole.js voor waarom een venster meer waard is dan een
+     eindoordeel. */
+  const { maakWereldwacht } = require('./lib/wereldcontrole');
+  const wereldExtras = { school: schoolWereld.extra, rtfos: rtfosWereld.extra,
+    festival: festivalWereld.extra, lab2: lab2Wereld.extra, spel: spelWereld.extra };
+  const wacht = maakWereldwacht({ post, tokenVoor, extras: wereldExtras,
+    elke: Number(process.env.RTG_WERELDWACHT || 250) });
+
+  const uit = await draaiIdemproef({ post, routes, tokenVoor, hernieuw, wacht,
     /* DE VOLGORDE IS EEN BESLUIT. Het geoogste object staat NA het plausibele
        lijf (dat raadt) en VOOR het geldlijf en de lijfsleutel (die weten het
        zeker). Een id dat de applicatie zelf heeft uitgegeven, hoort te winnen
@@ -520,14 +529,20 @@ wachtOpSchoneBoom();
   const { controleerWerelden } = require('./lib/wereldcontrole');
   const wereldStand = await controleerWerelden({
     post, tokenVoor, hernieuw,
-    extras: { school: schoolWereld.extra, rtfos: rtfosWereld.extra,
-      festival: festivalWereld.extra, lab2: lab2Wereld.extra, spel: spelWereld.extra }
+    extras: wereldExtras
   });
   const gesneuveld = wereldStand.filter(w => w.gecontroleerd && !w.ok);
   console.log('\n  de werelden NA afloop                : ' +
     wereldStand.filter(w => w.ok).length + ' overeind, ' + gesneuveld.length + ' gesneuveld, ' +
     wereldStand.filter(w => !w.gecontroleerd).length + ' niet gecontroleerd');
   for (const w of wereldStand) if (!w.ok) console.log('      ' + w.wereld + ': ' + w.waarom);
+  const wachtVerslag = wacht.verslag();
+  console.log('  de wereldwacht onderweg              : ' + wachtVerslag.peilingen +
+    ' peilingen (elke ' + wachtVerslag.stap + ' routes), ' + wachtVerslag.gebeurtenissen.length + ' omslag(en)');
+  for (const g of wachtVerslag.gebeurtenissen) {
+    console.log('      ' + g.wereld + ' ging van ' + g.van + ' naar ' + g.naar +
+      ' tussen route ' + g.vanafRoute + ' en ' + g.totRoute + ' (laatste: ' + g.laatstePad + ')');
+  }
 
   fs.writeFileSync(UITSLAG, JSON.stringify({
     stempel: stempel(),
@@ -555,7 +570,7 @@ wachtOpSchoneBoom();
          veld, en een familie die niet is gebouwd dekt niets. */
       objectenGemaakt: objecten.gelukt, objectTakken: objecten.takken,
       schoolwereld: schoolWereld.klaar, horecawereld: horecaWereld.klaar,
-      werelden: wereldStand,
+      werelden: wereldStand, wereldwacht: wachtVerslag,
       rolOpgewaardeerd: opgewaardeerd.length, rolOpwaarderingGeweigerd: geweigerd.length,
       schoolwereldStappen: schoolWereld.stappen.map(x => ({ naam: x.naam, ok: x.ok, waarom: x.waarom })),
       lijfsleutelsGebouwd: lijfsleutels.gebouwd.map(g => g.naam),

@@ -101,4 +101,60 @@ async function controleerWerelden({ post, extras, tokenVoor, hernieuw }) {
   return uit;
 }
 
-module.exports = { CONTROLES, controleerWerelden };
+/* ---------------------------------------------------------------------------
+   DE WACHT TIJDENS DE RIT.
+
+   De controle hierboven kijkt aan het EIND, en dat is precies genoeg om te
+   zien dat er iets stuk is en veel te weinig om te weten waardoor. Toen de
+   spelwereld sneuvelde kostte het een sweep over alle 3091 routes -- met
+   herstel na elke misser -- om /api/privacy/delete aan te wijzen. Dat werkte,
+   maar het is geen manier van werken: de volgende keer is het weer een middag.
+
+   En er is een tweede gat dat de eindcontrole per definitie niet ziet: een
+   route die op plek 800 iets sloopt en op plek 2000 door een andere route
+   wordt hersteld. Aan het eind staat alles overeind en toch zijn er 1200
+   routes op een kapotte wereld gemeten.
+
+   Deze wacht kijkt daarom TUSSENDOOR, elke `elke` routes. Zij meldt geen
+   route maar een VENSTER -- "tussen route 1550 en 1600 ging de spelwereld
+   stuk" -- want tussen twee peilingen liggen er meer. Dat is eerlijker dan
+   een naam noemen die maar half klopt, en het is precies genoeg om er met
+   een sweep over vijftig routes op af te gaan in plaats van over drieduizend.
+
+   DE PRIJS is vijf goedkope oproepen per peiling. Bij `elke = 250` is dat op
+   3091 routes ongeveer zestig oproepen -- een half procent van de ronde. */
+function maakWereldwacht({ post, tokenVoor, extras, elke }) {
+  const stap = Math.max(25, Number(elke) || 250);
+  let vorige = null;
+  let laatstePeiling = 0;
+  const gebeurtenissen = [];
+  let peilingen = 0;
+
+  return {
+    /* Aanroepen na elke route. `n` is hoeveelste route we net deden en `pad`
+       welke -- die twee samen maken het venster. */
+    async naRoute(n, pad) {
+      if (n - laatstePeiling < stap) return;
+      const stand = await controleerWerelden({ post, extras, tokenVoor });
+      peilingen++;
+      if (vorige) {
+        for (const nu of stand) {
+          const oud = vorige.find(x => x.wereld === nu.wereld);
+          if (!oud || oud.ok === nu.ok) continue;
+          gebeurtenissen.push({
+            wereld: nu.wereld,
+            van: oud.ok ? 'overeind' : 'stuk',
+            naar: nu.ok ? 'overeind' : 'stuk',
+            vanafRoute: laatstePeiling + 1, totRoute: n, laatstePad: pad,
+            waarom: nu.waarom || null
+          });
+        }
+      }
+      vorige = stand;
+      laatstePeiling = n;
+    },
+    verslag: () => ({ peilingen, stap, gebeurtenissen })
+  };
+}
+
+module.exports = { CONTROLES, controleerWerelden, maakWereldwacht };

@@ -224,7 +224,7 @@ function weegHerhaling(a, b, c, staat, diepeStaat) {
   return { stand: 'onbeschermd', reden: 'de herhaling gaf een ander antwoord: hij deed het opnieuw' };
 }
 
-async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, koppenVoor, hernieuw, maxRoutes, staatVan, vastlegging, staatDiep }) {
+async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, koppenVoor, hernieuw, maxRoutes, staatVan, vastlegging, staatDiep, wacht }) {
   const perRoute = {};
   let gedaan = 0, hernieuwd = 0, uitOpslag = 0, verworpen = 0;
   const tel = { beschermd: 0, onbeschermd: 0, ongemeten: 0 };
@@ -263,6 +263,11 @@ async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, koppenVoor, h
     const o = weegHerhaling(a, b, c, staat, staatDiep);
     if (o.bron === 'opslag') uitOpslag++;
     tel[o.stand]++;
+    /* DE WERELDWACHT. Zie ./wereldcontrole.js: zij peilt om de zoveel routes
+       of de opgezette werelden er nog staan, zodat een route die er een sloopt
+       een VENSTER krijgt in plaats van een sweep achteraf. Faalt de peiling
+       zelf, dan mag dat de ronde niet omgooien -- de meting is het doel. */
+    if (wacht) { try { await wacht.naRoute(Object.keys(perRoute).length, r.pad); } catch (e) {} }
     const rij = { methode, pad: r.pad, rol: r.rol,
       idempotentie: o.stand, reden: o.reden, statussen: [a.status, b.status, c.status] };
     if (o.bron) rij.bron = o.bron;

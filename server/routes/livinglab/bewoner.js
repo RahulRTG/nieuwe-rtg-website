@@ -101,6 +101,16 @@ module.exports = (kern, hulp) => {
   /* Zich terugtrekken uit het onderzoek. Dit is de kant waarop de scheiding uit
      kern/livinglab/mensen.js zich moet bewijzen: het werkt op de pas, dus ook
      bij een gescheiden studie waar niemand weet wie erachter zit. */
+  /* EERST KIJKEN, DAN PAS WISSEN. Deze deur rekent voor wat er zou gebeuren en
+     verandert niets: wat verdwijnt, wat in een dataset is opgegaan en welke
+     conclusies in bewijsgraad zakken. Een deelnemer die dat pas ná het wissen
+     hoort, heeft geen keuze gehad maar een mededeling gekregen. */
+  app.post('/api/lab2/mijn/terugtrekken/gevolg', remBron, remCode, (req, res) => veilig(res, () => {
+    const wie = livinglab.mensen.opPas(codeUit(req));
+    if (!wie) return { status: 404, error: 'Deze labpas kennen we niet.' };
+    return livinglab.terugtrekken.gevolg(wie.studieId, wie.alias);
+  }));
+
   app.post('/api/lab2/mijn/terugtrekken', remBron, remCode, (req, res) => veilig(res, () => {
     const wie = livinglab.mensen.opPas(codeUit(req));
     if (!wie) return { status: 404, error: 'Deze labpas kennen we niet.' };

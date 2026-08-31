@@ -114,6 +114,36 @@ vangt de stem van mensen die niets hebben verleend) en **doorlopend meten** (dat
 is een sensor in iemands huis, en die loopt langs de apparatuurlaag met haar
 bevoegdheden).
 
+## Terugtrekken: eerst kijken, dan pas wissen
+
+Een knop "verwijder mijn gegevens" is een halve belofte. Sinds 31 augustus 2026
+rekent `kern/livinglab/terugtrekken.js` eerst voor wat terugtrekken betekent, en
+verandert daarbij niets:
+
+| wat | hoe het wordt vastgesteld |
+|---|---|
+| wat verdwijnt | de observaties en de metingen van deze alias, geteld per protocolversie |
+| welke conclusies zakken | het bewijs dat naar zijn observaties wijst valt weg, en dan zegt `graden.js` wat het plafond nog is |
+| wat blijft | een dataset is een momentopname: wat daarin is opgegaan, is er niet meer los uit te halen -- en dat staat er |
+| welk spoor blijft | dát er is teruggetrokken, met aantallen en zonder inhoud |
+
+**Dat "welke conclusies zakken" is de bewijsladder van dit lab en geen verzonnen
+statistiek.** Een conclusie draagt bewijs; valt een drager weg, dan zakt haar
+plafond -- exact narekenbaar, vooraf, zonder iets te wissen. Wat RTG met opzet
+NIET doet is een steekproefomvang, een effectgrootte of een p-waarde herrekenen:
+die analyse gebeurt buiten dit systeem, en een getal verzinnen dat wetenschappelijk
+klinkt is erger dan geen getal. Dat staat als `nietTeZeggen` in het antwoord zelf,
+en een toets zakt zodra er wel zo'n getal in verschijnt.
+
+Uitvoeren doet daarna precies wat de vooruitblik aankondigde: de gegevens weg, de
+conclusies herijkt (ze worden niet gewist -- dat zou het onderzoek herschrijven --
+maar ze blijven ook niet staan op een graad die niet meer klopt), en een
+terugtrekking geteld in het dossier.
+
+Onderweg bleek het oude `deelnemerWeg` alleen observaties te wissen. Sinds er ook
+metingen bestaan, liet dat gegevens achter van iemand die zich had teruggetrokken;
+beide wegen lopen nu langs dezelfde functie.
+
 ## Wat er nog niet is, met de reden
 
 - **Labfonds ↔ studie.** Het fonds financiert onderzoek en weet niet welk. Dit is
@@ -122,9 +152,6 @@ bevoegdheden).
 - **Publicatie.** Er is geen openbare onderzoekskaart. De impactmodule telt
   herziene conclusies en gestopte studies al intern; wat ontbreekt is de kant die
   een gemeente leest.
-- **Terugtrekken met terugwerkende kracht.** Toestemming en stopcriteria staan
-  er; een deelnemer kan niet zien wat er met de conclusie gebeurt als hij eruit
-  stapt.
 - **Reproductiecapsule en conclusieversies.** De bewijsmotor weegt al per studie;
   een conclusie is nog geen object met een geschiedenis.
 

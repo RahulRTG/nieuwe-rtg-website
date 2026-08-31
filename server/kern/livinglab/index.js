@@ -85,6 +85,10 @@ module.exports = ({ db, save, crypto, anthropic, lab, kosten, economie }) => {
      invult. Hij staat NA de apparatuur omdat hij de kalibratiestand van een
      apparaat bevriest op het moment van meten, en die rekensom staat daar. */
   ctx.instrument = require('./instrument')(ctx);
+  /* Terugtrekken (./terugtrekken.js) leest de conclusies en de metingen en staat
+     dus na allebei. ./mensen.js roept hem aan via `ctx` en niet via een kopie:
+     die is eerder gebouwd, en een kopie zou hier `undefined` bevriezen. */
+  ctx.terugtrekken = require('./terugtrekken')(ctx);
   ctx.doorbraak = require('./doorbraak')(ctx);
   ctx.impact = require('./impact')(ctx);
   ctx.ai = require('./ai')(ctx);

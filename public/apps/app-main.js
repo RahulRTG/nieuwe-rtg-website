@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = 'e5f6d511';
+var RTG_BOUW = '0c3a78ef';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -4048,6 +4048,7 @@ var RTG_BOUW = 'e5f6d511';
     passkeys:    { naam: 'Passkeys',     url: '/apps/passkeys.html' },
     sessies:     { naam: 'Waar ben ik aanwezig', url: '/apps/mijn-sessies.html' },
     relaties:    { naam: 'Wie heeft toegang tot mij', url: '/apps/mijn-relaties.html' },
+    post:        { naam: 'Post van RTG', url: '/apps/mijn-post.html' },
     /* Veiligheid en verbinding. Hier stonden VIER tegels -- Thuiswacht,
        Codewoord, Vitaal en Thuisrust -- op een gedeelde kern. Ze zijn nu vier
        standen van een app (/apps/veilig.html), want een systeem dat een systeem
@@ -4294,7 +4295,7 @@ var RTG_BOUW = 'e5f6d511';
        in de voet. Vandaar `paneel`: geen vijfde wereldtegel, geen tweede
        instellingenscherm. wereldBij() in 29c filtert deze map er vanzelf uit. */
     { sleutel: 'map-instellingen', naam: 'Instellingen', paneel: '#osCcBtn', items: [
-      'link:ik', 'link:veilig', 'link:passkeys', 'link:sessies', 'link:relaties', 'link:juridisch'] },
+      'link:ik', 'link:veilig', 'link:passkeys', 'link:sessies', 'link:relaties', 'link:post', 'link:juridisch'] },
     /* WORKOS IS EEN CONTEXT EN GEEN PRODUCT MET EEN PRIJS. De naam ging van
        "RTG Kantoor" naar WorkOS omdat er twee verschillende toegangsmodellen in
        dezelfde wereld wonen, en die verschillen mogen de wereld niet splitsen:

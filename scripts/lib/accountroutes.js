@@ -48,7 +48,14 @@ const VOORVOEGSELS = [
   { pad: '/api/webauthn/',      gemeten: 4, waarom: 'een passkey hangt aan een account en niet aan een pas' },
   { pad: '/api/pin/',           gemeten: 4, waarom: 'de algemene pin hoort bij een echt RTG-account' },
   { pad: '/api/sleutelwoorden/', gemeten: 3, waarom: 'sleutelwoorden horen bij een echt RTG-account; alle drie weigeren erop' },
-  { pad: '/api/vonk/',          gemeten: 6, waarom: 'Vonk is voor RTG-leden met een eigen account (de 18+-poort staat daar los achter)' },
+  /* /api/vonk STOND HIER, en dat was fout zodra ./signatureroutes.js bestond.
+     Vonk deelt de ontmoetpoort met Rendez-vous en vraagt drie dingen tegelijk:
+     een pas, een geverifieerd account en 18 jaar. Een gewoon gratis account is
+     dus niet genoeg -- en omdat dit register EERDER staat in de keten, kaapte
+     het de zes vonkroutes en kwamen ze nooit bij de zwaardere eis aan. De
+     signature-regel was daarmee dode code.
+     Gevonden door test/sessieverfijning.test.js, die sinds deze ronde meet of
+     twee registers hetzelfde pad claimen. */
   { pad: '/api/ik',             gemeten: 6, waarom: 'het eigen dossier bestaat alleen bij een account; uid(req) is bij een passessie leeg' }
 ];
 

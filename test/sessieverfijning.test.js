@@ -5,9 +5,25 @@ const assert = require('node:assert');
 const { REGISTERS, verfijn } = require('../scripts/lib/sessieverfijning');
 const alles = () => true;
 
-test('elk register verfijnt een andere uitgangsrol', () => {
-  const van = REGISTERS.map(r => r.van);
-  assert.equal(new Set(van).size, van.length, 'twee registers op dezelfde uitgangsrol: dan telt de volgorde');
+/* HIER STOND "elk register verfijnt een andere uitgangsrol", en dat was een
+   PROXY. Hij hield tot er een vijfde register bij kwam: `pas` verfijnt net als
+   `account` vanaf `member`, en de toets zakte terecht -- maar op het verkeerde
+   kenmerk. Wat er werkelijk toe doet is dat geen PAD door twee registers wordt
+   geclaimd; dan kan de volgorde nooit beslissen wat er gebeurt. */
+test('geen pad wordt door twee registers geclaimd', () => {
+  const alle = [];
+  for (const r of REGISTERS) {
+    assert.ok(Array.isArray(r.paden), r.naam + ' hoort zijn paden te noemen, anders is dit niet te toetsen');
+    for (const p of r.paden) alle.push({ register: r.naam, pad: p });
+  }
+  assert.ok(alle.length > 5, 'er horen paden te zijn om te vergelijken');
+  const botsingen = [];
+  for (const a of alle) for (const b of alle) {
+    if (a.register === b.register) continue;
+    const raakt = a.pad === b.pad || a.pad.startsWith(b.pad + '/') || b.pad.startsWith(a.pad + '/');
+    if (raakt) botsingen.push(a.register + ' ' + a.pad + '  <->  ' + b.register + ' ' + b.pad);
+  }
+  assert.deepEqual(botsingen, [], 'twee registers claimen hetzelfde pad; dan beslist de volgorde');
 });
 
 test('elk register verfijnt naar een andere rol', () => {

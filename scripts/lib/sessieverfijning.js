@@ -9,6 +9,7 @@
      supplier -> zaak-persoonlijk  er moet een PERSOON achter de zaak zitten
      office   -> kantoor-op-naam   er moet iemand ZITTEN, geen gedeelde code
      een lid  -> member-signature  het lid moet aantoonbaar zijn wie het zegt
+     member   -> een zwaardere pas  de deur vraagt Lifestyle of Business
 
    Alle drie zijn ze een verfijning en geen tegenspraak: de soort deur blijft
    dezelfde, alleen wie er aanklopt wordt scherper. En alle drie dragen ze
@@ -23,24 +24,47 @@
    eigen redenering, want die verschilt per geval en hoort bij de data. */
 'use strict';
 
-const { accountRolVoor } = require('./accountroutes');
-const { persoonsRolVoor } = require('./persoonsroutes');
-const { kantoorRolVoor } = require('./kantoorroutes');
-const { signatureRolVoor } = require('./signatureroutes');
+const { accountRolVoor, VOORVOEGSELS: ACCOUNT_V, PADEN: ACCOUNT_P } = require('./accountroutes');
+const { persoonsRolVoor, VOORVOEGSELS: PERSOON_V, PADEN: PERSOON_P } = require('./persoonsroutes');
+const { kantoorRolVoor, VOORVOEGSELS: KANTOOR_V, PADEN: KANTOOR_P } = require('./kantoorroutes');
+const { signatureRolVoor, VOORVOEGSELS: SIGN_V, PADEN: SIGN_P } = require('./signatureroutes');
+const { pasRolVoor, VOORVOEGSELS: PAS_V } = require('./pasroutes');
 
-/* Op volgorde. Ze sluiten elkaar uit -- elk register verfijnt een andere
-   uitgangsrol -- dus de volgorde is een vorm en geen voorrang. */
+/* Op volgorde, en die volgorde is een VORM en geen voorrang -- maar niet meer
+   om de reden die hier eerst stond.
+
+   Er stond: "ze sluiten elkaar uit, want elk register verfijnt een andere
+   uitgangsrol". Dat klopte tot er een vijfde bij kwam: `pas` verfijnt net als
+   `account` vanaf `member`. Een toets ving dat meteen, en terecht -- alleen
+   was het bewaakte kenmerk een PROXY. Wat er werkelijk toe doet is dat geen
+   PAD door twee registers wordt geclaimd; dan kan de volgorde nooit beslissen
+   wat er gebeurt. Dat is nu wat de toets meet, en elk register draagt daarvoor
+   zijn `paden` mee.
+
+   Een uitzondering die daar bewust op staat: /api/member/rendezvous zou zowel
+   `signature` als een pas-eis passen. De zwaarste eis wint, dus `signature`
+   staat eerder -- en /api/member/rendezvous staat daarom NIET in pasroutes.js. */
 const REGISTERS = [
-  { naam: 'account',  van: 'member',   naar: 'member-account',   beslis: accountRolVoor },
-  { naam: 'persoon',  van: 'supplier', naar: 'zaak-persoonlijk', beslis: persoonsRolVoor },
-  { naam: 'kantoor',  van: 'office',   naar: 'kantoor-op-naam',  beslis: kantoorRolVoor },
+  { naam: 'account',  van: 'member',   naar: 'member-account',   beslis: accountRolVoor,
+    paden: [...ACCOUNT_V.map(v => v.pad), ...ACCOUNT_P] },
+  { naam: 'persoon',  van: 'supplier', naar: 'zaak-persoonlijk', beslis: persoonsRolVoor,
+    paden: [...PERSOON_V.map(v => v.pad), ...PERSOON_P] },
+  { naam: 'kantoor',  van: 'office',   naar: 'kantoor-op-naam',  beslis: kantoorRolVoor,
+    paden: [...KANTOOR_V.map(v => v.pad), ...KANTOOR_P] },
   /* Deze laatste staat apart: hij verfijnt niet EEN uitgangsrol maar drie
      (member, member-account, member-lifestyle), omdat de ontmoetpoort drie
      dingen tegelijk vraagt en geen van die drie sessies ze alle drie heeft.
      Daarom staat hij ACHTERAAN: de registers hierboven verfijnen elk vanaf
      precies een rol, en dat blijft de regel waarop de volgorde geen voorrang
      is. Deze mag als enige overlappen, en dan wint de specifiekere eis. */
-  { naam: 'signature', van: 'een lid', naar: 'member-signature', beslis: signatureRolVoor }
+  { naam: 'signature', van: 'een lid', naar: 'member-signature', beslis: signatureRolVoor,
+    paden: [...SIGN_V.map(v => v.pad), ...SIGN_P] },
+  /* En de eenvoudigste: geen account, geen persoon, geen geverifieerde
+     identiteit -- gewoon een andere PAS. Hij staat na `signature` omdat
+     /api/member/rendezvous allebei zou passen en de zwaarste eis moet winnen:
+     daar is een pas nodig EN een geverifieerd account. */
+  { naam: 'pas', van: 'member', naar: 'een zwaardere pas', beslis: pasRolVoor,
+    paden: PAS_V.map(v => v.pad) }
 ];
 
 /* Geeft { rol, register } als er verfijnd wordt, anders { rol: null }.

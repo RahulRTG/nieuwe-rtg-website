@@ -39,6 +39,14 @@
       een machtiging die blijft staan bij een gestopt plan is een openstaande
       volmacht zonder grond.
 
+   EN EEN WOORD OVER HET WOORD "BANK". Hier stond "via je eigen bank", en
+   test/eu-naleving.test.js zakte daarop: het woord "eigen bank" vraagt onder
+   Wft 3:7 een bankvergunning zodra een platform het over ZICHZELF gebruikt.
+   Hier ging het over de bank van het LID, wat die regel uitdrukkelijk toestaat
+   -- maar een regex kan dat verschil niet zien, en een juridische grendel hoort
+   niet losser gezet te worden omdat mijn zin toevallig onschuldig was. Het is
+   nu "via je bank": even waar, en niet te verwarren.
+
    WAT HIER NIET IN ZIT: geen afschrijving, geen bestandsformaat (pain.008),
    geen incassant-ID. Dat komt pas als er een bankcontract is, en dan hoort het
    volledige rekeningnummer daar te liggen en niet hier. */
@@ -120,7 +128,7 @@ module.exports = (ctx, { planVan, standVan }) => {
       { zegt: [
         'Getekend onder kenmerk ' + kenmerk + '. Bewaar dat kenmerk: daarmee herken je de afschrijving op je rekening.',
         'Je krijgt elke termijn ' + regels.AANKONDIGING_DAGEN + ' dagen van tevoren bericht met het bedrag en de datum.',
-        'Een afschrijving kun je tot ' + regels.STORNO_WEKEN + ' weken terug laten boeken via je eigen bank, zonder opgaaf van reden.',
+        'Een afschrijving kun je tot ' + regels.STORNO_WEKEN + ' weken terug laten boeken via je bank, zonder opgaaf van reden.',
         'Er wordt nu niets afgeschreven: ' + NIET.uitleg
       ] });
   }
@@ -141,7 +149,7 @@ module.exports = (ctx, { planVan, standVan }) => {
     return Object.assign({ ok: true, machtiging: beeld(m) }, NIET, { zegt: [
       'De machtiging is ingetrokken. Vanaf nu wordt er niets meer van je rekening gehaald.',
       'Je periodieke gift loopt hiermee NIET af. Wat je hebt toegezegd blijft staan; je kunt elke termijn zelf overmaken. Wil je de afspraak zelf beëindigen, stop dan het plan.',
-      'Een afschrijving van de afgelopen ' + regels.STORNO_WEKEN + ' weken kun je bij je eigen bank laten terugboeken.'
+      'Een afschrijving van de afgelopen ' + regels.STORNO_WEKEN + ' weken kun je bij je bank laten terugboeken.'
     ] });
   }
 

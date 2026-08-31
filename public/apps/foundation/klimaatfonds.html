@@ -305,6 +305,19 @@ $('#aliasOk').addEventListener('click', () => {
 });
 
 start();
+
+/* AANROEPEN AAN HET EINDE VAN DIT BLOK, en niet bij de definitie hierboven:
+   `esc` is een const die verderop staat, en een aanroep ervoor loopt op de
+   temporal dead zone stuk.
+
+   EN BINNEN DIT BLOK, niet erna. Ik zette hem eerst voor de laatste
+   sluit-tag van het bestand -- en die hoort bij premium.js. Een script met een
+   src negeert zijn inhoud, dus de aanroep verdween zonder spoor: geen fout in
+   de console, alleen een kaart die leeg bleef. En de reparatie ging meteen op
+   dezelfde plek weer mis, want ik zette het woord sluit-tag er letterlijk in --
+   waarmee de browser het blok daar afkapte. Beide keren gevonden door
+   test/blindevlek.test.js. */
+werkTeken();
 </script>
 <script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
@@ -317,11 +330,6 @@ start();
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/ios.js" defer></script>
 <script src="schil-os.js" defer></script>
-<script src="premium.js" defer>
-/* PAS HIER AANGEROEPEN en niet bij de definitie: `esc` is een const die verderop
-   in dit bestand staat, en een aanroep ervoor loopt op de temporal dead zone
-   stuk -- met een lege kaart en een consolefout als enig spoor. */
-werkTeken();
-</script>
+<script src="premium.js" defer></script>
 </body>
 </html>

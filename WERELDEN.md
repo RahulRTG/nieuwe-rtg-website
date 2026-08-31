@@ -111,7 +111,7 @@ prijs of doelgroep; ze moeten elk een stabiele menselijke context zijn.
 | **LivingOS** | `/apps/rtg.html` | mijn dagelijks leven | 59 |
 | **WorkOS** | `/apps/kantoor.html` | mijn werk en organisaties | 13 |
 | **TravelOS** | `/apps/reizen.html` | mijn reizen en onderweg zijn | 14 |
-| **FoundationOS** | `/apps/foundation/os-publiek.html` | RTFoundation en haar maatschappelijke werk | 4 |
+| **FoundationOS** | `/apps/foundation/os-publiek.html` | RTFoundation en haar maatschappelijke werk | 7 |
 
 Die laatste kolom telt items in `MAPPEN` en geen schermen. De tabel wordt
 machinaal vergeleken met de code, dus als hij niet meer klopt zakt de bouw.
@@ -221,6 +221,21 @@ een plek, alles wat eraan komt, uit alle reisapps tegelijk"*
 De operationele en digitale wereld van de stichting: bestuur, donateurs,
 vrijwilligers, deelnemers, veldwerk, het onderzoekslab, het labfonds, de
 onderwijsprogramma's, de stadsraad, het RTF-kantoor, maatschappelijke projecten.
+
+Het **Klimaatfonds** hangt er sinds 31 augustus 2026 als vijfde onderdeel in, en
+het is met opzet een VENSTER en geen nieuw lab: klimaat is de soort `duurzaam`
+in `server/kern/livinglab/kader.js`, en dat lab telt al 23 modules met studies,
+ethiek, bewijsgraden en een thema-trechter voor bewoners. Een eigen klimaatlab
+zou die hele laag dupliceren -- de toetsvraag van `PLATFORM.md` par. 0b
+beantwoordt zichzelf hier: tweede ingang, geen zelfstandige capability.
+
+De **Buurtruil** kwam er als zesde bij, en hij is de enige rtfos-ingang die op
+een gewone LEDENsessie opengaat -- alle andere staan achter de kantoordeur of op
+een uitgegeven code. Dat is meteen de leeftijdsgrens: een eigen RTG-account is
+precies wat een beschermd kind niet heeft. Er komt geen geld aan te pas en er
+staat nergens een prijs; wat een winkel wel zou vragen (een doneerknop, een
+RTF-entiteit om aan te betalen, btw en retour) staat in de kop van
+`server/kern/rtfos/ruil.js` met de reden waarom het er niet is.
 
 Gemeten: van de 71 schermen onder `public/apps/foundation/` gaan er acht over de
 stichting als organisatie (`os-bestuur`, `os-donateur`, `os-vrijwilliger`,

@@ -4145,7 +4145,11 @@ var RTG_BOUW = 'c5d43cd0';
        bestaan niet meer. */
     horeca:      { naam: 'Horeca',         url: '/apps/horeca.html' },
     partnernetwerk:{ naam: 'Partner Network', url: '/apps/partner-network.html' },
-    rtfbuurt:    { naam: 'RTFoundation in uw buurt', url: '/apps/foundation/os-publiek.html' },
+    rtfbuurt:    { naam: 'RTFoundation in jouw buurt', url: '/apps/foundation/os-publiek.html' },
+    klimaat:     { naam: 'Klimaatfonds', url: '/apps/foundation/klimaatfonds.html' },
+    buurtruil:   { naam: 'Buurtruil', url: '/apps/foundation/buurtruil.html' },
+    geven:       { naam: 'Geven', url: '/apps/foundation/geven.html' },
+    rtfwinkel:   { naam: 'Winkel van de RTFoundation', url: '/apps/foundation/winkel.html' },
     spelen:      { naam: 'Spelen',       url: '/apps/spelen.html?pas=' + encodeURIComponent(pas) },
     vrienden:    { naam: 'Vrienden',     url: '/apps/foundation/vrienden.html' },
     juridisch:   { naam: 'Juridisch',    url: '/apps/juridisch.html' },
@@ -4532,7 +4536,9 @@ var RTG_BOUW = 'c5d43cd0';
       'link:rtfbuurt', 'link:rtfportaal',
     /* Twee uit de tikkenmeting (scripts/tikken.js): het bord en het schrift
        bestonden en hingen nergens aan. */
-      'link:rtfbord', 'link:rtfschrift'] }
+    /* Het Klimaatfonds is een VENSTER op het Living Lab en geen tweede lab:
+       klimaat is daar de soort 'duurzaam' (kern/livinglab/kader.js). */
+      'link:rtfbord', 'link:rtfschrift', 'link:klimaat', 'link:buurtruil', 'link:geven'] }
   ];
   /* Afgesplitst van app-main-24a2.js toen dat over de 10 KB ging. De snede loopt
      langs een echte grens, en het is dezelfde grens waar WERELDEN.md over gaat:

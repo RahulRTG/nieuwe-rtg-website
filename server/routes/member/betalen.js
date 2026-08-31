@@ -5,7 +5,7 @@
 module.exports = (kern) => {
   const { app, auth, db, save, accounts, memberTemplate, betaal, fonds, factuur, broadcastSync, stateFor,
           liveCodename } = kern;
-  const { principalVoorSession } = require('../../kern/economie/identiteit');
+  const { principalVoorSession } = require('../../kern/economie/principal');
 
   /* Het dossier van dit lid: een echt account heeft een eigen ledenstaat, een
      demo-sessie deelt de gedeelde demo. Deze twee regels stonden op DRIE

@@ -3,7 +3,7 @@
 'use strict';
 
 module.exports = (app, auth, experience) => {
-  const { principalVoorSession } = require('../kern/economie/identiteit');
+  const { principalVoorSession } = require('../kern/economie/principal');
   const lid = (req, res, next) => req.session.tier === 'guest'
     ? res.status(403).json({ error: 'Het persoonlijke Experience Platform is voor ingelogde leden.' })
     : next();

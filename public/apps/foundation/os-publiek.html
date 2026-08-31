@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="nl" data-rtg-thema="champagne">
+<html lang="nl">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#F4F0E9">
-<title>FoundationOS · RTFoundation in uw buurt</title>
+<meta name="theme-color" content="#0C0C0B">
+<title>FoundationOS · RTFoundation in jouw buurt</title>
 <link rel="icon" href="/icons/foundation.svg">
 <link rel="manifest" href="/manifests/rtf-buurt.webmanifest">
 <link href="/fonts/fonts.css" rel="stylesheet">
@@ -15,23 +15,27 @@
   *{margin:0;padding:0;box-sizing:border-box;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
   h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;}
-  header{padding:1.2rem 1rem;border-bottom:1px solid var(--line);}
-  header .ey{font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--burgundy);}
-  header h1{font-size:1.45rem;margin-top:.15rem;}
-  header p{font-size:.9rem;color:var(--muted);margin-top:.4rem;line-height:1.6;max-width:44rem;}
-  main{padding:1rem;max-width:780px;margin:0 auto;display:flex;flex-direction:column;gap:.9rem;}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.95rem 1rem;}
-  .sec{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin-bottom:.5rem;}
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(12rem,1fr));gap:.7rem;}
-  .stadkaart{cursor:pointer;}
-  .stadkaart h2{font-size:1.05rem;}
+  main{padding:1rem;max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:1.1rem;}
+
+  /* De inkt van dit scherm komt uit shared/rtg-worlds-2026.css. Daar stond de
+     inkt van deze wereld vast op de Pearl-waarden terwijl premium.css de grond
+     hier zwart schildert; die regel is nu voorwaardelijk op de schil. Hier
+     stond een omweg om dat te ontwijken -- die is weg, want twee plekken die
+     hetzelfde bedoelen lopen uiteen. */
+  .buurtkaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.95rem 1rem;}
+  /* GOUD EN GEEN BORDEAUX. Deze labels zijn 10,5px; bordeaux haalt op de grond
+     van dit scherm 1,87:1 en --burgundy-on-dark 3,78 -- allebei onder de 4,5
+     die kleine tekst vraagt. Goud haalt ruim 7:1 (CLAUDE.md, Kleuren:
+     bordeaux is een accent, nooit een tekstkleur op zwarte achtergrond). */
+  .buurtsec{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--rtg-goud,#C9A24B);margin-bottom:.6rem;}
   .rij{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;}
-  .knop{background:var(--txt);color:#000;border:none;border-radius:0;padding:.6rem 1rem;font:inherit;font-weight:600;font-size:.88rem;cursor:pointer;}
-  .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
+  .buurtknop{background:var(--txt);color:var(--bg);border:none;border-radius:0;padding:.6rem 1rem;font:inherit;font-weight:600;font-size:.88rem;cursor:pointer;min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:.4rem;text-decoration:none;}
+  .buurtknop.rand{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
+  .buurtknop.vol{background:var(--burgundy);color:#fff;}
   .lijnrij{display:flex;gap:.5rem;align-items:baseline;padding:.5rem 0;border-bottom:1px solid var(--line);font-size:.92rem;flex-wrap:wrap;}
   .lijnrij:last-child{border-bottom:none;}
   .lijnrij .naam{flex:1;min-width:9rem;}
-  .lijnrij .sub{font-size:.78rem;color:var(--muted);width:100%;}
+  .lijnrij .buurtsub{font-size:.78rem;color:var(--muted);width:100%;}
   .pil{font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);border-radius:0;padding:.15rem .55rem;color:var(--muted);}
   .pil.goed{color:#7FC79B;border-color:#2F5E42;}
   .pil.let{color:var(--rtg-leesgoud,var(--gold));border-color:#5C4E10;}
@@ -40,6 +44,129 @@
   .melder{font-size:.88rem;border-radius:0;padding:.6rem .8rem;border:1px solid #5C1B2C;color:#F0A9BB;}
   .ruimte{margin-top:.6rem;}
   .verborgen{display:none;}
+
+  /* ---------------------------------------------------------------- de hero
+     GEEN FOTO, EN OOK GEEN BIJSCHRIFT DAT ER EEN SUGGEREERT. Site- en
+     campagnebeeld hoort uit De Salon te komen, mét naamsvermelding
+     (CLAUDE.md), maar /api/salon/promo vraagt een inlog en deze pagina heeft
+     die met opzet niet. Een leenbeeld met een verzonnen credit is erger dan
+     geen beeld, dus dit vlak is bordeaux met CSS -- de merkregel zegt het
+     letterlijk: overige visuals met CSS/SVG bouwen. */
+  .onthaal{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,26rem);border:1px solid var(--line);}
+  .onthaal-beeld{position:relative;overflow:hidden;padding:2.1rem 2.2rem 1.9rem;display:flex;flex-direction:column;justify-content:flex-end;min-height:19rem;
+    background:linear-gradient(155deg,#8E1839 0%,#7F1634 52%,#4A0C1E 100%);color:#F4F0E9;}
+  /* De was is zachter dan hij was. De eigen a11y-scan meet de kleur die er
+     ECHT ligt: deze was tilde het bordeaux naar rgb(182,87,112), en daarop
+     haalde de tekst 4,03:1 waar 4,5 moet. Mijn eigen meting keek naar de
+     achtergrondkleur van het element en zag deze was niet -- de scan wel.
+
+     EN DE OPACITY WAS NIET DE KNOP. scripts/a11ykeuring.js rekent met de
+     UITERSTE kleurstops van elke laag en niet met de opacity van het pseudo,
+     dus die van .32 naar .2 zetten veranderde niets aan wat zij meet (en
+     terecht: de was ligt er nog steeds). Wat wel telt zijn de alfa's in de
+     stops zelf en de lichtste stop van het verloop eronder. */
+  .onthaal-beeld::before{content:"";position:absolute;inset:0;opacity:.2;pointer-events:none;
+    background:repeating-linear-gradient(118deg,rgba(244,240,233,.06) 0 2px,transparent 2px 26px),
+               radial-gradient(120% 90% at 78% 15%,rgba(244,240,233,.10),transparent 62%);}
+  .onthaal-beeld > *{position:relative;}
+  .onthaal-beeld .buurtey{font-size:.66rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#F4F0E9;margin-bottom:.6rem;}
+  /* !important OMDAT premium.js `body.rtf-premium` op de body zet, en die laag
+     élke kop in `main` naar sans 900 in kapitalen duwt. Dat is de vormtaal van
+     de donkere RTF-werkschermen; de merkregel voor koppen is Bodoni Moda
+     (CLAUDE.md, Typografie), en dit is het onthaal van de wereld en geen
+     werkscherm. Alleen deze kop wijkt af; de rest van de pagina houdt zich aan
+     wat premium.js doet. */
+  /* OP HET ID EN NIET OP DE KLASSE. `body.rtf-premium main h1` weegt zwaarder
+     dan `.onthaal-beeld h1`, dus met gelijke !important won hun regel alsnog
+     en bleef de kop in Inter 900 staan. Een id weegt zwaarder dan welke
+     stapel klassen ook, en het hangt niet aan de naam die premium.js kiest --
+     hernoemen zij hun klasse, dan blijft deze kop staan. */
+  #onthaalkop{font-size:clamp(1.9rem,4.4vw,2.9rem);line-height:1.1;letter-spacing:-.01em;
+    font-family:'Bodoni Moda',Georgia,serif!important;font-weight:400!important;text-transform:none!important;}
+  .onthaal-beeld p{font-size:.98rem;line-height:1.6;max-width:34ch;margin-top:.9rem;color:#F4F0E9;}
+  .onthaal-kies{border-left:1px solid var(--line);padding:1.1rem 1.2rem;display:flex;flex-direction:column;gap:.8rem;}
+
+  /* auto-FILL en niet auto-fit: met één open stad rekt auto-fit die ene kaart
+     over de volle breedte uit, en dan ziet één afdeling eruit als een banner. */
+  .steden{display:grid;grid-template-columns:repeat(auto-fill,minmax(8.5rem,1fr));gap:.7rem;flex:1;align-content:start;}
+  /* HEET buurtstad EN NIET stadkaart. Die naam is al bezet: shared/rtg-worlds-2026.css
+     geeft `.stadkaart` op deze wereld een eigen kaart mét een gouden vlak op
+     hover en focus-within. Een knop houdt na een klik de focus, dus de gekozen
+     stad kleurde goud over de eigen opmaak heen -- dezelfde botsing als
+     `.kaart` uit premium.css, alleen een blad verderop. */
+  .buurtstad{display:flex;flex-direction:column;gap:.5rem;text-align:left;background:transparent;border:none;padding:0;font:inherit;color:inherit;cursor:pointer;}
+  /* HET PLAATJE IS EEN PLAAT EN GEEN FOTO. Er is geen stadsbeeld in de data,
+     dus staat hier een vlak met de beginletter -- niet een gehaald plaatje dat
+     doet alsof het die stad is. */
+  .stadplaat{height:6rem;border:1px solid var(--line);display:grid;place-items:center;
+    font-family:'Bodoni Moda',serif;font-size:1.8rem;color:rgba(26,23,19,.34);
+    background:linear-gradient(160deg,#EDE7DC 0%,#CFC6B4 100%);}
+  .buurtstad b{font-size:.9rem;font-weight:600;}
+  .buurtstad .soorten{font-size:.74rem;line-height:1.5;color:var(--muted);}
+  .buurtstad:hover .stadplaat,.buurtstad:focus-visible .stadplaat{border-color:var(--rtg-goud,#857007);}
+  /* De gekozen stad draagt een rand en een streep, niet alleen een kleur: wie
+     kleur niet ziet, ziet zo nog steeds welke afdeling openstaat. */
+  .buurtstad[aria-pressed="true"] .stadplaat{border-color:var(--burgundy);box-shadow:inset 0 -4px 0 var(--burgundy);}
+  .buurtstad[aria-pressed="true"] b{color:var(--rtg-goud,#C9A24B);}
+  .stippen{display:flex;justify-content:center;gap:.4rem;}
+  .stip{width:7px;height:7px;border-radius:50%;background:var(--line);}
+  .stip.aan{background:var(--rtg-goud,#857007);}
+
+  /* -------------------------------------------------- doen + landelijk ---- */
+  .tweeluik{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,21rem);gap:1.1rem;align-items:start;}
+  .doen{display:grid;grid-template-columns:repeat(auto-fit,minmax(10rem,1fr));gap:.8rem;}
+  .doenkaart{background:var(--card);border:1px solid var(--line);padding:1.2rem 1rem;display:flex;flex-direction:column;align-items:center;text-align:center;gap:.55rem;
+    font:inherit;color:inherit;cursor:pointer;}
+  .doenkaart svg{width:2rem;height:2rem;stroke:var(--burgundy);fill:none;stroke-width:1.2;}
+  .doenkaart b{font-size:.88rem;font-weight:600;}
+  .doenkaart .uitleg{font-size:.78rem;}
+  /* De pil brak over twee regels en liep daarmee door de rand van de kaart. */
+  .doenkaart .pil{white-space:nowrap;align-self:center;}
+  .doenkaart .heen{margin-top:auto;padding-top:.5rem;min-height:44px;display:flex;align-items:center;gap:.4rem;font-size:.78rem;font-weight:600;color:var(--rtg-goud,#C9A24B);}
+  .doenkaart .knoppen{margin-top:auto;padding-top:.5rem;display:flex;flex-direction:column;gap:.45rem;width:100%;}
+  .landelijk .lijnrij{align-items:flex-start;}
+  .landelijk svg{width:1.5rem;height:1.5rem;flex-shrink:0;stroke:var(--rtg-goud,#857007);fill:none;stroke-width:1.2;}
+
+  /* ------------------------------------------------------------ de band --- */
+  .band{position:relative;overflow:hidden;display:flex;align-items:center;gap:1.6rem;padding:1.6rem 1.8rem;color:#F4F0E9;
+    background:linear-gradient(120deg,#4A0C1E 0%,#7F1634 62%);}
+  .band::before{content:"";position:absolute;inset:0;opacity:.24;background:repeating-linear-gradient(64deg,rgba(244,240,233,.12) 0 2px,transparent 2px 30px);}
+  .band > *{position:relative;}
+  .band-merk{width:4.6rem;height:4.6rem;flex-shrink:0;border:1px solid rgba(192,165,68,.6);display:grid;place-items:center;}
+  .band-merk svg{width:2.1rem;height:2.1rem;stroke:#C0A544;fill:none;stroke-width:1;}
+  .band p{font-size:1.05rem;line-height:1.5;max-width:42ch;}
+  .band .buurtknop{margin-top:.8rem;border-color:rgba(244,240,233,.52);color:#F4F0E9;}
+
+  /* ------------------------------------------------- het wereldrooster ----
+     HET STOND HIER ONLEESBAAR, EN AL VOOR DIT SCHERM. premium.css is voor de
+     DONKERE RTF-apps geschreven en zet `.hero` met !important op een bijna
+     zwart vlak; `.wrooster-kaart` erft de inkt van de pagina, en die is op
+     champagne #1A1713. Donkere inkt op een zwart vlak: de tegels waren wel te
+     zien maar niet te lezen.
+
+     Het rooster hoort te lezen zoals de rest van deze pagina, dus daar zetten
+     we hem terug -- met !important omdat de regel van premium.css er een
+     draagt, en alleen op DEZE pagina. Aan de tegels zelf verandert niets: dat
+     blok wordt door scripts/wereldrooster.js geschreven. */
+  .hero{background:var(--card)!important;border:1px solid var(--line)!important;padding:1.2rem 1.1rem!important;}
+  .hero h1,.hero h2{font-family:'Bodoni Moda',serif!important;font-weight:500!important;letter-spacing:-.01em!important;text-transform:none!important;}
+  /* GOUD. Hier stond var(--burgundy): #7F1634 op rgb(11,24,37) haalt 1,9:1, en
+     de merkregel is expliciet dat bordeaux een accent is en nooit een
+     tekstkleur op zwart. De eigen a11y-scan ving dit; mijn eigen meting keek
+     niet naar dit label. */
+  .hero .ey{color:var(--rtg-goud,#C9A24B)!important;}
+
+  @media (max-width:860px){
+    .onthaal{grid-template-columns:minmax(0,1fr);}
+    .onthaal-kies{border-left:none;border-top:1px solid var(--line);}
+    .onthaal-beeld{min-height:13rem;padding:1.4rem 1.1rem 1.2rem;}
+    .tweeluik{grid-template-columns:minmax(0,1fr);}
+    .doen{grid-template-columns:minmax(0,1fr);}
+    .doenkaart{flex-direction:row;text-align:left;align-items:flex-start;gap:.8rem;}
+    .doenkaart .tekst{flex:1;min-width:0;display:flex;flex-direction:column;gap:.3rem;}
+    .doenkaart .heen,.doenkaart .knoppen{margin-top:0;}
+    .band{flex-direction:column;align-items:flex-start;gap:1rem;padding:1.3rem 1.1rem;}
+  }
 </style>
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
 <link href="/shared/wereldrooster.css" rel="stylesheet">
@@ -55,12 +182,82 @@
   <p id="wat">De RTFoundation werkt per stad samen met lokale stichtingen, buurthuizen, scholen en ondernemers.</p>
 </header>
 <main id="main">
-  <div class="kaart">
-    <div class="sec">Kies uw stad</div>
-    <div class="grid" id="steden"><div class="leeg">Laden...</div></div>
+
+  <section class="onthaal" aria-labelledby="onthaalkop">
+    <div class="onthaal-beeld">
+      <div class="buurtey" id="groet">FoundationOS · RTFoundation</div>
+      <h1 id="onthaalkop">Iedere buurt<br>heeft een toekomst.</h1>
+      <p id="wat">De RTFoundation werkt per stad samen met lokale stichtingen, buurthuizen, scholen en ondernemers.</p>
+    </div>
+    <div class="onthaal-kies">
+      <div class="buurtsec">Kies je stad</div>
+      <div class="steden" id="steden"><div class="leeg">Laden...</div></div>
+      <div class="stippen" id="stippen" aria-hidden="true"></div>
+    </div>
+  </section>
+
+  <div class="tweeluik">
+    <section aria-labelledby="doenkop">
+      <div class="buurtsec" id="doenkop">Wat kun je doen in jouw stad</div>
+      <div class="doen">
+
+        <button type="button" class="doenkaart" data-heen="hulp">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19s-6-3.8-6-8a3.3 3.3 0 0 1 6-1.9A3.3 3.3 0 0 1 18 11c0 4.2-6 8-6 8z"/><path d="M3 20c1.6-1.4 3.4-2 5-2"/></svg>
+          <div class="tekst"><b>Hulp &amp; ondersteuning</b>
+          <div class="uitleg">Vind hulp, stel een vraag of vraag iets aan.</div></div>
+          <span class="heen">Lees meer <svg viewBox="0 0 24 24" style="width:.9rem;height:.9rem;stroke-width:1.6;" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></span>
+        </button>
+
+        <button type="button" class="doenkaart" data-heen="projecten">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="16.5" cy="9" r="2.4"/><path d="M3 19c0-3 2.7-5 6-5s6 2 6 5M15 19c0-2 1.6-3.4 3.6-3.4S22 17 22 19"/></svg>
+          <div class="tekst"><b>Wat er loopt</b>
+          <div class="uitleg">Bekijk projecten en initiatieven in jouw buurt.</div></div>
+          <span class="heen">Bekijk projecten <svg viewBox="0 0 24 24" style="width:.9rem;height:.9rem;stroke-width:1.6;" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></span>
+        </button>
+
+        <button type="button" class="doenkaart" data-heen="activiteiten">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6.1 7-11a7 7 0 1 0-14 0c0 4.9 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+          <div class="tekst"><b>Waar je binnen kunt lopen</b>
+          <div class="uitleg">Vind activiteiten bij jou in de buurt.</div>
+          <!-- HET GETAL VERSCHIJNT ALLEEN ALS HET GETELD IS. In het ontwerp
+               stond hier vast "2 plekken vrij"; dat is precies het soort cijfer
+               dat een scherm niet mag verzinnen. Deze pil wordt door
+               tekenVrijePlekken() gevuld zodra er een stad gekozen is, en
+               blijft anders weg. -->
+          <span class="pil let verborgen" id="vrij"></span></div>
+          <span class="heen">Bekijk activiteiten <svg viewBox="0 0 24 24" style="width:.9rem;height:.9rem;stroke-width:1.6;" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></span>
+        </button>
+
+        <div class="doenkaart" style="cursor:auto;">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="8" r="2.8"/><circle cx="16" cy="8" r="2.8"/><path d="M2 19c0-3 2.6-5 6-5s6 2 6 5M14 19c0-2.4 2-4.2 4.4-4.2S22 16.6 22 19"/></svg>
+          <div class="tekst"><b>Doe mee</b>
+          <div class="uitleg">Word vrijwilliger of neem deel aan projecten.</div></div>
+          <span class="knoppen">
+            <a class="buurtknop vol" href="os-vrijwilliger.html">Vrijwilliger worden</a>
+            <a class="buurtknop rand" href="os-deelnemer.html">Deelnemer worden</a>
+          </span>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="buurtkaart landelijk" id="campagnes" aria-labelledby="landelijkkop">
+      <div class="buurtsec" id="landelijkkop">Wat er landelijk loopt</div>
+      <div class="leeg">Laden...</div>
+    </section>
   </div>
+
   <div id="uit"></div>
-  <div class="kaart" id="campagnes"></div>
+
+  <section class="band" aria-labelledby="bandkop">
+    <div class="band-merk"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21V9"/><path d="M12 9c0-3 2-5 5-5 0 3-2 5-5 5zM12 12c0-2.6-1.8-4.4-4.4-4.4 0 2.6 1.8 4.4 4.4 4.4z"/></svg></div>
+    <div>
+      <p id="bandkop">Samen bouwen we aan buurten waar iedereen mee kan doen.</p>
+      <a class="buurtknop rand" href="os-vrijwilliger.html">Bekijk hoe je kunt meedoen
+        <svg viewBox="0 0 24 24" style="width:.9rem;height:.9rem;stroke:currentColor;fill:none;stroke-width:1.6;" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></a>
+    </div>
+  </section>
+
   <!-- ALLES IN DEZE WERELD, uit de bron. Dit blok is niet met de hand
        geschreven: scripts/wereldrooster.js schrijft het uit shared/sprongindex.json,
        dat uit MAPPEN komt, en npm run wereldrooster -- --controle zakt als het
@@ -73,9 +270,12 @@
        bedieningselement te staan (test/kantoor.e2e.js). -->
   <section class="hero rtgdeel-vast" aria-labelledby="allesFoundationOS"><div class="ey">ALLES IN DEZE WERELD</div><h2 id="allesFoundationOS">Alles wat in FoundationOS hangt.</h2><div class="wrooster">
   <!-- WERELDROOSTER:FoundationOS -->
+    <a class="wrooster-kaart" href="/apps/foundation/buurtruil.html"><span>Buurtruil</span></a>
+    <a class="wrooster-kaart" href="/apps/foundation/geven.html"><span>Geven</span></a>
     <a class="wrooster-kaart" href="/apps/foundation/bord.html"><span>Het bord</span></a>
     <a class="wrooster-kaart" href="/apps/foundation/schrift.html"><span>Het schrift</span></a>
-    <a class="wrooster-kaart" href="/apps/foundation/os-publiek.html"><span>RTFoundation in uw buurt</span></a>
+    <a class="wrooster-kaart" href="/apps/foundation/klimaatfonds.html"><span>Klimaatfonds</span></a>
+    <a class="wrooster-kaart" href="/apps/foundation/os-publiek.html"><span>RTFoundation in jouw buurt</span></a>
     <a class="wrooster-kaart" href="/apps/foundation/os-portaal.html"><span>RTFoundation portaal</span></a>
   <!-- /WERELDROOSTER --></div></section>
 </main>
@@ -92,7 +292,12 @@
    niet, want daar is geen drempel hoog genoeg.
 
    De server houdt zich aan diezelfde grens (kern/rtfos/publiek.js); dit scherm
-   toont wat het krijgt. Filteren in de browser is geen grens. */
+   toont wat het krijgt. Filteren in de browser is geen grens.
+
+   DE VIER KAARTEN ONDER "WAT KUNT U DOEN" ZIJN GEEN VIERDE INGANG. Ze brengen
+   je naar een blok dat er al is; is er nog geen stad gekozen, dan brengen ze
+   je naar de stadkiezer en onthouden ze waar je heen wilde. Dat scheelt een lijst
+   bestemmingen die naast de echte gaat lopen. */
 const $ = s => document.querySelector(s);
 const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
@@ -104,56 +309,107 @@ const api = (pad, body) => fetch('/api/rtfos/publiek/' + pad, {
   return d;
 });
 
+/* De begroeting komt uit de klok van de bezoeker en niet uit een account: deze
+   pagina heeft er geen. Meer dan het dagdeel weet zij dus niet, en dat is
+   precies genoeg. */
+function groet() {
+  const u = new Date().getHours();
+  return u < 6 ? 'Goedenacht' : u < 12 ? 'Goedemorgen' : u < 18 ? 'Goedemiddag' : 'Goedenavond';
+}
+
+let GEKOZEN = null;   // de stad die open staat
+let WACHT = null;     // waar de bezoeker heen wilde voor hij een stad koos
+
 async function start() {
+  $('#groet').textContent = groet();
+
   try {
     const r = await api('steden');
     $('#wat').textContent = r.wat;
     $('#steden').innerHTML = r.steden.length
-      ? r.steden.map(s => '<div class="kaart stadkaart" data-stad="' + esc(s.id) + '">' +
-          '<h2>RTF ' + esc(s.naam) + '</h2>' +
-          '<div class="uitleg">' + (s.soorten.length ? esc(s.soorten.join(', ')) : 'net begonnen') + '</div></div>').join('')
+      ? r.steden.map(s => '<button type="button" class="buurtstad" data-stad="' + esc(s.id) + '" aria-pressed="false">' +
+          '<span class="stadplaat" aria-hidden="true">' + esc((s.naam || '?').slice(0, 1)) + '</span>' +
+          '<b>RTF ' + esc(s.naam) + '</b>' +
+          '<span class="soorten">' + (s.soorten.length ? esc(s.soorten.join(' · ')) : 'net begonnen') + '</span></button>').join('')
       : '<div class="leeg">Er is nog geen afdeling open. Zodra er een start, staat hij hier.</div>';
+    $('#stippen').innerHTML = r.steden.length > 1
+      ? r.steden.map((_, i) => '<span class="stip' + (i === 0 ? ' aan' : '') + '"></span>').join('') : '';
     $('#steden').querySelectorAll('[data-stad]').forEach(k =>
       k.addEventListener('click', () => toonStad(k.dataset.stad)));
   } catch (e) { $('#steden').innerHTML = '<div class="melder">' + esc(e.message) + '</div>'; }
 
   try {
     const c = await api('campagnes');
-    $('#campagnes').innerHTML = c.campagnes.length
-      ? '<div class="sec">Wat er landelijk loopt</div>' + c.campagnes.map(x =>
-          '<div class="lijnrij"><span class="naam"><b>' + esc(x.naam) + '</b></span>' +
+    $('#campagnes').innerHTML = '<div class="buurtsec">Wat er landelijk loopt</div>' + (c.campagnes.length
+      ? c.campagnes.map(x =>
+          '<div class="lijnrij">' +
+          '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-6-3.6-6-7.6A3.2 3.2 0 0 1 12 10a3.2 3.2 0 0 1 6 2.4c0 4-6 7.6-6 7.6z"/><path d="M12 10V4"/></svg>' +
+          '<span class="naam"><b>' + esc(x.naam) + '</b></span>' +
           (x.tot ? '<span class="pil">tot ' + esc(x.tot) + '</span>' : '') +
           '<div class="sub">' + esc(x.doel || '') + (x.steden.length ? ' &middot; in ' + esc(x.steden.join(', ')) : '') + '</div></div>').join('') +
         '<div class="uitleg ruimte">Er staat met opzet geen teller bij hoeveel er is opgehaald. Een thermometer werkt als aansporing, en dat is precies het soort druk dat wij niet op mensen zetten.</div>'
-      : '';
-  } catch (e) { $('#campagnes').innerHTML = ''; }
+      : '<div class="leeg">Er loopt op dit moment geen landelijke campagne.</div>');
+  } catch (e) { $('#campagnes').innerHTML = '<div class="buurtsec">Wat er landelijk loopt</div><div class="melder">' + esc(e.message) + '</div>'; }
+}
+
+/* De vrije plekken: opgeteld uit de activiteiten die de server teruggaf, en
+   alleen getoond als er iets te tellen viel. Geen stad gekozen = geen pil, niet
+   een nul. */
+function tekenVrijePlekken(activiteiten) {
+  const pil = $('#vrij');
+  const vrij = (activiteiten || []).filter(a => !a.vol).reduce((n, a) => n + (Number(a.plekVrij) || 0), 0);
+  if (!vrij) { pil.classList.add('verborgen'); pil.textContent = ''; return; }
+  pil.textContent = vrij === 1 ? '1 plek vrij' : vrij + ' plekken vrij';
+  pil.classList.remove('verborgen');
 }
 
 async function toonStad(id) {
   try {
     const r = await api('stad', { id });
+    GEKOZEN = id;
+    $('#steden').querySelectorAll('[data-stad]').forEach(k =>
+      k.setAttribute('aria-pressed', k.dataset.stad === id ? 'true' : 'false'));
+    tekenVrijePlekken(r.activiteiten);
     $('#uit').innerHTML =
-      '<div class="kaart"><h2>RTF ' + esc(r.stad.naam) + '</h2>' +
+      '<div class="buurtkaart" id="blok-hulp"><h2>RTF ' + esc(r.stad.naam) + '</h2>' +
         '<div class="uitleg ruimte">' + esc(r.meedoen.hulp) + '</div></div>' +
-      '<div class="kaart"><div class="sec">Wat er loopt</div>' +
+      '<div class="buurtkaart ruimte" id="blok-projecten"><div class="buurtsec">Wat er loopt</div>' +
         (r.projecten.length ? r.projecten.map(p => '<div class="lijnrij"><span class="naam">' + esc(p.naam) + '</span>' +
           '<span class="pil">' + esc(p.soort) + '</span>' +
           '<div class="sub">' + esc(p.doelgroep || '') + '</div></div>').join('')
           : '<div class="leeg">Hier start binnenkort het eerste project.</div>') + '</div>' +
-      '<div class="kaart"><div class="sec">Waar u binnen kunt lopen</div>' +
+      '<div class="buurtkaart ruimte" id="blok-activiteiten"><div class="buurtsec">Waar je binnen kunt lopen</div>' +
         (r.activiteiten.length ? r.activiteiten.map(a => '<div class="lijnrij"><span class="naam">' + esc(a.naam) + '</span>' +
           '<span class="pil">' + esc(a.wanneer || 'datum volgt') + ' ' + esc(a.tijd || '') + '</span>' +
           (a.vol ? '<span class="pil let">vol</span>' : '<span class="pil goed">' + a.plekVrij + ' plekken vrij</span>') +
           '<div class="sub">' + esc(a.locatie || '') + '</div></div>').join('')
           : '<div class="leeg">Er staat op dit moment niets open. Kijk over een paar dagen weer.</div>') + '</div>' +
-      '<div class="kaart"><div class="sec">Meedoen</div>' +
+      '<div class="buurtkaart ruimte"><div class="buurtsec">Meedoen</div>' +
         '<div class="uitleg">' + esc(r.meedoen.vrijwilliger) + '</div>' +
         '<div class="uitleg ruimte">' + esc(r.meedoen.ondernemer) + '</div>' +
-        '<div class="rij ruimte"><a class="knop stil" href="os-vrijwilliger.html">Ik ben al vrijwilliger</a>' +
-        '<a class="knop stil" href="os-deelnemer.html">Ik heb een code voor mijn hulpvraag</a></div></div>';
-    window.scrollTo({ top: $('#uit').offsetTop - 20, behavior: 'smooth' });
-  } catch (e) { $('#uit').innerHTML = '<div class="kaart"><div class="melder">' + esc(e.message) + '</div></div>'; }
+        '<div class="rij ruimte"><a class="buurtknop rand" href="os-vrijwilliger.html">Ik ben al vrijwilliger</a>' +
+        '<a class="buurtknop rand" href="os-deelnemer.html">Ik heb een code voor mijn hulpvraag</a></div></div>';
+    ga(WACHT || 'hulp');
+    WACHT = null;
+  } catch (e) { $('#uit').innerHTML = '<div class="buurtkaart"><div class="melder">' + esc(e.message) + '</div></div>'; }
 }
+
+function ga(naar) {
+  const doel = $('#blok-' + naar) || $('#uit');
+  if (!doel) return;
+  window.scrollTo({ top: doel.getBoundingClientRect().top + window.scrollY - 20, behavior: 'smooth' });
+}
+
+document.querySelectorAll('[data-heen]').forEach(k => k.addEventListener('click', () => {
+  if (GEKOZEN) return ga(k.dataset.heen);
+  /* Nog geen stad: onthouden waar hij heen wilde en hem eerst laten kiezen.
+     Zonder stad bestaat het blok niet, en een knop die naar niets springt is
+     erger dan een knop die zegt wat er eerst moet. */
+  WACHT = k.dataset.heen;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  const eerste = $('#steden .buurtstad');
+  if (eerste) eerste.focus({ preventScroll: true });
+}));
 
 start();
 

@@ -61,5 +61,10 @@ module.exports = {
   // Sport
   sportclub: { label: 'Sportclub', icon: 'sport', industry: 'sports', caps: ['sportclub'], status: 'open' },
   golfclub: { label: 'Golf & countryclub', icon: '\u{26F3}', industry: 'sports', caps: ['golf', 'location', 'pricing'], status: 'open' },
-  fitnessclub: { label: 'Sport & fitnessclub', icon: '\u{1F3CB}', industry: 'sports', caps: ['fitclub', 'location', 'pricing'], status: 'open' }
+  fitnessclub: { label: 'Sport & fitnessclub', icon: '\u{1F3CB}', industry: 'sports', caps: ['fitclub', 'location', 'pricing'], status: 'open' },
+  /* De RTFoundation zelf, als houder van haar wallet. Status 'huis': er is er
+     precies een en hij wordt aangemaakt (kern/rtfwallet.js), niet aangevraagd
+     en niet aangesloten. Geen caps -- dit is geen zaak met een werkvloer maar
+     een positie waar geld kan landen. */
+  rtfoundation: { label: 'RTFoundation', icon: 'hart', industry: 'nonprofit', caps: [], status: 'huis' }
 };

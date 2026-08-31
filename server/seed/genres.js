@@ -54,7 +54,13 @@ const SECTOREN = {
   technology: 'Technologie',
   media: 'Media',
   events: 'Events & cultuur',
-  sports: 'Sport'
+  sports: 'Sport',
+  /* De stichting zelf. Een goed doel is geen overheid en geen zorginstelling,
+     en het in een bestaande sector duwen zou een onwaarheid zijn die op een
+     scherm terechtkomt. Deze sector draagt bewust een genre: 'rtfoundation',
+     status 'huis'. Hij is dus nergens aan te vragen -- de regel hieronder
+     ("een sector zonder genres bestaat niet") blijft gelden. */
+  nonprofit: 'Goede doelen'
 };
 
 /* De genres zelf staan in ./genres-lijst.js -- pure data, afgesplitst omdat een
@@ -93,6 +99,16 @@ const TOEGANG = {
     uitleg: 'Dit genre gaat alleen op uitnodiging van RTG open.' },
   intern: { mag: false,
     uitleg: 'Dit genre hoort bij de wereld zelf en wordt niet door een partner aangevraagd.' },
+  /* HUIS is strenger dan INTERN, en het verschil is er een van AANTAL. Een
+     gemeente is intern (RTG sluit er zoveel aan als er gemeenten zijn, via
+     kern/instelling.js). Een genre op 'huis' is een rechtspersoon van RTG zelf
+     waarvan er precies EEN bestaat -- de RTFoundation -- en die wordt niet
+     aangesloten maar aangemaakt, op zijn eigen weg met zijn eigen grendel.
+     Stond hij op 'intern', dan zou de instellingsweg hem in zijn lijst zetten
+     en kon iemand er een tweede stichting naast maken. Twee posities waar
+     giften kunnen landen is precies wat niet mag. */
+  huis: { mag: false,
+    uitleg: 'Dit genre is een rechtspersoon van RTG zelf. Er bestaat er precies een, en die wordt niet aangevraagd of aangesloten.' },
   binnenkort: { mag: false,
     uitleg: 'Dit genre staat in het register, maar de aanvraagweg is nog niet open.' }
 };

@@ -104,5 +104,38 @@ module.exports = (kern) => {
   require('./doelgroepen')({ app, officeAuth, rtfos, veilig, H });
   require('./governance')({ app, officeAuth, rtfos, veilig, H });
   require('./afmaak')({ app, officeAuth, rtfos, veilig, H });
+  /* De buurtruil hangt aan de LEDENdeur en niet aan de kantoordeur; hij krijgt
+     daarom andere onderdelen mee dan de rest van dit domein. */
+  require('./ruil')({ app, auth: kern.auth, geenGast: kern.geenGast,
+    liveCodename: kern.liveCodename, rtfos, veilig });
+  /* De schakelaar zelf: alleen de boardroom. Hij staat hier en niet bij de
+     ledendeur hierboven, want dat is de hele grens (GIFT.md par. 4). */
+  /* En de LEESkant voor het kantoor. De ledendeur heeft er al een
+     (routes/rtfos/ruil.js), maar die draait op een ledensessie; het RTF-kantoor
+     draait op een kantoortoken en kwam daar dus niet door. Twee soorten lezers,
+     twee deuren, een antwoord -- en niet een deur die allebei de sessies
+     accepteert, want dan bepaalt de sessie niet meer wat je mag. */
+  app.post('/api/rtfos/gift/stand/kantoor', kern.boardroomAuth || officeAuth,
+    (req, res) => veilig(res, () => rtfos.gift.stand()));
+  /* De overeenkomst vastleggen: kantoorwerk, want er hoort een vindbaar stuk
+     bij. Een voorstel van een gever wordt hier pas een periodieke gift. */
+  app.post('/api/rtfos/gift/plan/lijst', officeAuth,
+    (req, res) => veilig(res, () => rtfos.gift.plan.lijst()));
+  app.post('/api/rtfos/gift/plan/vastleggen', officeAuth,
+    (req, res) => veilig(res, () => rtfos.gift.plan.vastleggen(req.body, kern.boardroomWie && kern.boardroomWie(req))));
+  app.post('/api/rtfos/gift/stand/zet', kern.boardroomAuth || officeAuth,
+    (req, res) => veilig(res, () => rtfos.gift.standZet(req.body, kern.boardroomWie && kern.boardroomWie(req))));
+  /* De winkelkant van het kantoor: artikelen zetten en bestellingen afhandelen.
+     De STAND van een bestelling zet een MENS -- software die zelf "verstuurd"
+     aanvinkt, liegt over de enige stap die telt. */
+  app.post('/api/rtfos/winkel/artikelen', officeAuth,
+    (req, res) => veilig(res, () => rtfos.winkel.etalage()));
+  app.post('/api/rtfos/winkel/artikel/zet', officeAuth,
+    (req, res) => veilig(res, () => rtfos.winkel.artikelZet(req.body, kern.boardroomWie && kern.boardroomWie(req))));
+  app.post('/api/rtfos/winkel/bestellingen', officeAuth,
+    (req, res) => veilig(res, () => rtfos.winkel.bestellingen()));
+  app.post('/api/rtfos/winkel/stand', officeAuth,
+    (req, res) => veilig(res, () => rtfos.winkel.standZet(req.body, kern.boardroomWie && kern.boardroomWie(req))));
+
   require('./portalen')({ app, rtfos, veilig });
 };

@@ -53,13 +53,26 @@
        standaard op een pagina zonder thema -- wat die pagina's ook zijn.
        Gemeten: 6,51:1 licht en 8,97:1 donker. */
     '#rtg-cookie span{color:var(--rtg-cookie-zacht);}' +
-    /* de twee klikbare woorden dragen alleen een onderlijn, geen vlak */
-    '#rtg-cookie a,#rtg-cookie button{background:none;border:0;padding:0;margin:0;cursor:pointer;' +
-      'font:inherit;color:var(--rtg-cookie-inkt);text-decoration:none;' +
-      'border-bottom:1px solid rgba(244,240,233,0.28);}' +
+    /* De twee klikbare woorden dragen alleen een onderlijn, geen vlak -- maar ze
+       waren daardoor 17px hoog en 22px breed, en TOEGANKELIJK.md eist 24x24 op
+       telefoonformaat (WCAG 2.5.8). Dat werd door niets gemeten: deze balk
+       verdwijnt zodra iemand een keer heeft bevestigd (regel 11 hierboven), en
+       de raakvlakronde draait INGELOGD -- dus zag hij een banner die er niet
+       meer was. De nulstand in A11Y-INGELOGD.json klopte, en klopte alleen voor
+       de tweede bezoeker.
+
+       De onderlijn zit daarom niet meer op de rand van het vakje (die zou met
+       een hoger vakje mee omlaag zakken en van het woord loskomen) maar op de
+       TEKST zelf, zodat het raakvlak kan groeien zonder dat het beeld verandert. */
+    '#rtg-cookie a,#rtg-cookie button{background:none;border:0;margin:0;cursor:pointer;' +
+      'font:inherit;color:var(--rtg-cookie-inkt);' +
+      'display:inline-flex;align-items:center;justify-content:center;' +
+      'min-height:24px;min-width:24px;padding:0 0.15rem;' +
+      'text-decoration:underline;text-decoration-color:rgba(244,240,233,0.28);' +
+      'text-underline-offset:3px;}' +
     '#rtg-cookie a:hover,#rtg-cookie button:hover,' +
     '#rtg-cookie a:focus-visible,#rtg-cookie button:focus-visible{color:var(--gold-tekst,#C0A544);' +
-      'border-bottom-color:var(--gold-tekst,#C0A544);}' +
+      'text-decoration-color:var(--gold-tekst,#C0A544);}' +
     /* Work OS heeft een vaste onderbalk; de melding staat erboven en laat alle
        softwarebediening bereikbaar. */
     'body[data-rtg-schil="standaard"] #rtg-cookie{bottom:calc(66px + env(safe-area-inset-bottom,0px));}' +

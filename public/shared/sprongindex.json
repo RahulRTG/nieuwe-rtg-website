@@ -863,12 +863,32 @@
       "url": "/apps/vluchten.html"
     },
     {
+      "naam": "Buurtruil",
+      "wereld": "FoundationOS",
+      "soort": "link",
+      "sleutel": "buurtruil",
+      "url": "/apps/foundation/buurtruil.html",
+      "woorden": [
+        "niet",
+        "gebruikt",
+        "zoekt",
+        "iemand"
+      ]
+    },
+    {
       "naam": "FoundationOS",
       "wereld": "FoundationOS",
       "soort": "link",
       "sleutel": "map-rtf",
       "url": "/apps/foundation/os-publiek.html",
       "huis": true
+    },
+    {
+      "naam": "Geven",
+      "wereld": "FoundationOS",
+      "soort": "link",
+      "sleutel": "geven",
+      "url": "/apps/foundation/geven.html"
     },
     {
       "naam": "Het bord",
@@ -885,7 +905,20 @@
       "url": "/apps/foundation/schrift.html"
     },
     {
-      "naam": "RTFoundation in uw buurt",
+      "naam": "Klimaatfonds",
+      "wereld": "FoundationOS",
+      "soort": "link",
+      "sleutel": "klimaat",
+      "url": "/apps/foundation/klimaatfonds.html",
+      "woorden": [
+        "straat",
+        "koelt",
+        "bedenkt",
+        "zelf"
+      ]
+    },
+    {
+      "naam": "RTFoundation in jouw buurt",
       "wereld": "FoundationOS",
       "soort": "link",
       "sleutel": "rtfbuurt",

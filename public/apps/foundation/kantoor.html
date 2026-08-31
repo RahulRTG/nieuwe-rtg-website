@@ -64,6 +64,15 @@
     <div class="sec">De Stadsraad -- samen met de stadspartners beslissen over lab-uitslagen</div>
     <div id="raadIn"><div class="leeg">Laden...</div></div>
   </div>
+  <div class="deel">Giften</div>
+  <!-- DE STAND VAN DE DONEERKNOP. Lezen mag ieder kantoor; ZETTEN doet alleen de
+       boardroom, en dat oordeel valt op de server (routes/rtfos/index.js). Dit
+       scherm verzint geen rechten: het toont de knoppen en laat de weigering
+       zien als hij komt. Zie GIFT.md. -->
+  <div class="kaart" id="giftKaart">
+    <div class="sec">Neemt RTG giften aan voor de stichting?</div>
+    <div id="giftIn"><div class="leeg">Laden...</div></div>
+  </div>
   <!-- rtgdeel-vast: het kamerdetail hoort bij geen enkel deel. De pagina zet
        het zelf open en dicht bij het rooster hierboven; zo blijft dat werken
        met het menu erbij. -->
@@ -227,6 +236,111 @@ if (TOKEN) {
   laad().catch(e => { const el = $('#top'); if (el) el.innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; });
   raadLaad();
 }
+
+/* ---------------------------------------------------------------- de giftstand
+   De schakelaar uit GIFT.md, hier bedienbaar. Vier ANBI-standen als WISSEL: de
+   zin die de gever leest hangt eraan, en die zin staat niet hier maar in
+   kern/rtfos/gift-voornemen.js -- dit scherm zet alleen de stand. */
+const giftApi = (pad, body) => fetch('/api/rtfos/gift/' + pad, {
+  method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
+  body: JSON.stringify(body || {})
+}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok || d.error) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+
+/* Dezelfde kop als giftApi, want dit is dezelfde kantoorsessie. Een tweede
+   manier om een token mee te sturen is een tweede plek die kan verlopen. */
+const kop = () => ({ 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN });
+
+const ANBI_TEKST = { onbekend: 'Niet vastgelegd', nee: 'Geen ANBI', aangevraagd: 'Aanvraag loopt', ja: 'ANBI' };
+
+async function giftTeken() {
+  try {
+    const g = await giftApi('stand/kantoor', {});
+    const open = g.stand === 'open';
+    $('#giftIn').innerHTML =
+      '<div class="rij" style="justify-content:space-between;align-items:baseline;">' +
+        '<b style="font-size:1rem;">' + (open ? 'Ja, giften staan open' : 'Nee, giften staan dicht') + '</b>' +
+        '<button class="knop' + (open ? ' stil' : '') + '" id="giftWissel">' + (open ? 'Dicht zetten' : 'Open zetten') + '</button>' +
+      '</div>' +
+      '<div class="kpi" style="margin-top:.4rem;">' + esc(g.uitleg) + '</div>' +
+      (g.ontbreekt.length
+        ? '<div style="margin-top:.6rem;">' + g.ontbreekt.map(x =>
+            '<div class="kpi">Besluit ' + x.besluit + ': ' + esc(x.vraag) +
+            (x.blokkeert === false ? ' <i>(houdt de knop niet tegen)</i>' : '') + '</div>').join('') + '</div>'
+        : '') +
+      '<div id="walletBlok" style="margin-top:.7rem;"></div>' +
+      '<div style="margin-top:.7rem;"><div class="sec">ANBI-status</div><div class="rij" id="giftAnbi">' +
+        ['nee', 'aangevraagd', 'ja', 'onbekend'].map(x =>
+          '<button class="knop' + (g.anbi === x ? '' : ' stil') + '" data-anbi="' + x + '">' + ANBI_TEKST[x] + '</button>').join('') +
+      '</div>' +
+      (g.anbi === 'ja' ? '<div class="kpi" style="margin-top:.3rem;">RSIN ' + esc(g.rsin) + '</div>' : '') +
+      '<div class="rij" style="margin-top:.4rem;"><input class="veld" id="giftRsin" style="max-width:12rem;" placeholder="RSIN (9 cijfers)" value="' + esc(g.rsin || '') + '"></div>' +
+      '</div>' +
+      '<div id="giftMeld"></div>';
+
+    $('#giftWissel').addEventListener('click', () => giftZet({ stand: open ? 'dicht' : 'open' }));
+    walletTeken(g);
+    $('#giftAnbi').querySelectorAll('[data-anbi]').forEach(b => b.addEventListener('click', () =>
+      giftZet(b.dataset.anbi === 'ja'
+        ? { anbi: 'ja', rsin: $('#giftRsin').value.trim() }
+        : { anbi: b.dataset.anbi })));
+  } catch (e) { $('#giftIn').innerHTML = '<div class="melder fout">' + esc(e.message) + '</div>'; }
+}
+
+/* DE POSITIE ZELF -- en die kon je hier alleen INTIKKEN.
+
+   Het veld hierboven vroeg om een walletcode, maar er was geen weg om die
+   positie te MAKEN: een leverancier ontstaat uit een partneraanvraag met
+   ledenbewijs en toelatingsdossier, en de stichting is geen partner die
+   solliciteert. Wie een code verzon, kreeg een giftstand die openging naar een
+   wallet die niet bestond. Nu maakt de boardroom hem hier, en vult het
+   aanmaken de ontvanger zelf in -- zie kern/rtfwallet.js. */
+async function walletTeken(g) {
+  const doel = $('#walletBlok');
+  if (!doel) return;
+  try {
+    const w = await (await fetch('/api/office/rtfwallet', { method: 'POST',
+      headers: kop(), body: '{}' })).json();
+    if (w.bestaat) {
+      doel.innerHTML = '<div class="sec">Positie in RTG Pay</div>' +
+        '<div class="kpi"><b>' + esc(w.wallet.code) + '</b> \u2014 ' + esc(w.wallet.naam) + '</div>' +
+        '<div class="kpi">' + esc(w.uitleg) + '</div>' +
+        '<div class="kpi">Bankrekening: ' + (w.wallet.rekening
+          ? 'ingesteld door de stichting zelf'
+          : 'nog niet ingesteld. Zonder rekening weigert een uitbetaling \u2014 dat is met opzet, want anders gaat het saldo van de wallet af zonder ergens aan te komen.') + '</div>';
+      return;
+    }
+    doel.innerHTML = '<div class="sec">Positie in RTG Pay</div>' +
+      '<div class="kpi">' + esc(w.uitleg) + '</div>' +
+      '<div class="rij" style="margin-top:.5rem;gap:.4rem;flex-wrap:wrap;">' +
+        '<input class="veld" id="walletNaam" style="max-width:12rem;" placeholder="Naam" value="RTFoundation">' +
+        '<input class="veld" id="walletBeheer" style="max-width:12rem;" placeholder="Naam van de beheerder">' +
+        '<button class="knop" id="walletMaak">Positie aanmaken</button>' +
+      '</div>' +
+      '<div class="kpi" style="margin-top:.3rem;">Er komt een bedrijfscode en een eenmalige beheer-PIN uit. Daarmee stelt de stichting zelf haar bankrekening in en betaalt ze zichzelf uit, langs dezelfde weg als elke zaak. Dit zet de giftknop niet open.</div>';
+    $('#walletMaak').addEventListener('click', async () => {
+      const b = { naam: $('#walletNaam').value.trim(), beheerder: $('#walletBeheer').value.trim() };
+      const r = await fetch('/api/office/rtfwallet/maak', { method: 'POST', headers: kop(), body: JSON.stringify(b) });
+      const uit = await r.json();
+      if (!r.ok) { doel.innerHTML += '<div class="melder fout">' + esc(uit.error || 'Er ging iets mis.') + '</div>'; return; }
+      /* DE PIN STAAT HIER EEN KEER EN NERGENS ANDERS. Hij is niet opnieuw op te
+         vragen; wie hem wegklikt zonder hem door te geven, moet een nieuwe
+         beheerder laten aanmaken. */
+      doel.innerHTML = '<div class="sec">Positie in RTG Pay</div>' +
+        '<div class="melder">Aangemaakt. Code <b>' + esc(uit.code) + '</b>, beheer-PIN <b>' + esc(uit.pin) + '</b>. ' +
+        'Geef deze twee nu door aan de beheerder \u2014 de PIN is hierna niet meer op te vragen.</div>' +
+        '<div class="kpi">' + esc(uit.vervolg) + '</div>' +
+        (uit.wereldFout ? '<div class="melder fout">Let op: de economische wereld van de stichting is niet gezet (' + esc(uit.wereldFout) + '). Meld dit voordat er giften binnenkomen.</div>' : '') +
+        (uit.giftFout ? '<div class="melder fout">De ontvanger van de giftstand is niet ingevuld: ' + esc(uit.giftFout) + '</div>' : '');
+      giftTeken();
+    });
+  } catch (e) { doel.innerHTML = '<div class="melder fout">' + esc(e.message) + '</div>'; }
+}
+
+async function giftZet(lijf) {
+  try { await giftApi('stand/zet', lijf); giftTeken(); }
+  catch (e) { const m = $('#giftMeld'); if (m) m.innerHTML = '<div class="melder fout">' + esc(e.message) + '</div>'; }
+}
+giftTeken();
 </script>
 <script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>

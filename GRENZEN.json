@@ -1322,6 +1322,7 @@
       "pendingVerifications",
       "rechtsvormwacht",
       "rememberSession",
+      "rtfWallet",
       "rvTafelKantoor",
       "rvTafelMaak",
       "rvTafelNodig",
@@ -1497,6 +1498,7 @@
       "vervolg"
     ],
     "rtfos": [
+      "boardroomAuth",
       "rtfos"
     ],
     "rtfschool": [

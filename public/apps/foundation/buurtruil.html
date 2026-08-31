@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0C0C0B">
+<title>Buurtruil · RTFoundation</title>
+<link rel="icon" href="/icons/foundation.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<link href="premium.css" rel="stylesheet">
+<style>
+  :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--line:var(--rtg-line);--txt:var(--rtg-txt);--muted:var(--rtg-muted);--soft:var(--rtg-soft);--burgundy:#A6002F;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
+  h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;}
+  main{padding:1rem;max-width:1000px;margin:0 auto;display:flex;flex-direction:column;gap:1.1rem;}
+  .brkaart{background:var(--card);border:1px solid var(--line);padding:.95rem 1rem;}
+  .brsec{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--rtg-goud,#C9A24B);margin-bottom:.6rem;}
+  .brknop{background:transparent;color:var(--txt);border:1px solid var(--line);padding:.6rem 1rem;font:inherit;font-weight:500;font-size:.86rem;cursor:pointer;min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:.4rem;text-decoration:none;}
+  .brknop.vol{background:var(--burgundy);color:#fff;border-color:var(--burgundy);font-weight:600;}
+  .brveld{flex:1;min-width:11rem;background:var(--bg);border:1px solid var(--line);color:var(--txt);font:inherit;font-size:.9rem;padding:.6rem .7rem;min-height:44px;}
+  select.brveld{min-width:9rem;}
+  .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
+  .uitleg{font-size:.86rem;color:var(--muted);line-height:1.65;}
+  .leeg{color:var(--muted);font-size:.9rem;padding:.5rem 0;}
+  .melder{font-size:.88rem;padding:.6rem .8rem;border:1px solid #5C1B2C;color:#F0A9BB;}
+  .melder.goed{border-color:#2F5E42;color:#9FD6B4;}
+  .ruimte{margin-top:.7rem;}
+  /* !important, en dat is hier geen luiheid. shared/rtg-ui.css zet
+     `body.rtg-stijl .rij{display:flex}` -- twee klassen en een element, dus
+     zwaarder dan deze ene klasse. Zonder dit bleef elk verborgen blok dat OOK
+     een .rij is gewoon staan: op dit scherm het projectveld, op
+     klimaatfonds.html het aliasveld. Een verbergklasse die soms niet verbergt,
+     is erger dan geen verbergklasse. */
+  .verborgen{display:none!important;}
+
+  .onthaal{position:relative;overflow:hidden;padding:2rem 2rem 1.8rem;
+    background:linear-gradient(155deg,#1B1817 0%,#151312 54%,#0C0C0B 100%);color:#F4F0E9;border:1px solid var(--line);}
+  .onthaal::before{content:"";position:absolute;inset:0;opacity:.22;pointer-events:none;
+    background:repeating-linear-gradient(112deg,rgba(201,162,75,.07) 0 2px,transparent 2px 28px);}
+  .onthaal > *{position:relative;}
+  .onthaal .ey{font-size:.66rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--rtg-goud,#C9A24B);margin-bottom:.6rem;}
+  #brkop{font-size:clamp(1.7rem,4vw,2.5rem);line-height:1.14;font-family:'Bodoni Moda',Georgia,serif!important;font-weight:400!important;text-transform:none!important;}
+  .onthaal p{font-size:.98rem;line-height:1.6;max-width:46ch;margin-top:.9rem;color:#F4F0E9;}
+
+  .steden{display:grid;grid-template-columns:repeat(auto-fill,minmax(9rem,1fr));gap:.6rem;}
+  .stadknop{background:transparent;border:1px solid var(--line);color:inherit;font:inherit;padding:.7rem .8rem;text-align:left;cursor:pointer;min-height:44px;}
+  .stadknop[aria-pressed="true"]{border-color:var(--rtg-goud,#C9A24B);box-shadow:inset 0 -3px 0 var(--rtg-goud,#C9A24B);}
+  .stadknop b{display:block;font-size:.9rem;font-weight:600;}
+
+  .tabs{display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:.6rem;}
+  .tabs button{background:transparent;border:1px solid var(--line);color:var(--muted);font:inherit;font-size:.8rem;padding:.45rem .9rem;cursor:pointer;min-height:44px;}
+  .tabs button[aria-pressed="true"]{color:var(--txt);border-color:var(--rtg-goud,#C9A24B);}
+
+  .aanbod{border-bottom:1px solid var(--line);padding:.85rem 0;display:flex;gap:.9rem;align-items:flex-start;flex-wrap:wrap;}
+  .aanbod:last-child{border-bottom:none;}
+  .aanbod .kern{flex:1;min-width:12rem;}
+  .aanbod b{font-size:.95rem;}
+  .aanbod .wat{font-size:.85rem;color:var(--muted);line-height:1.55;margin-top:.25rem;}
+  .aanbod .meta{font-size:.72rem;color:var(--soft);margin-top:.35rem;}
+  .aanbod .acties{display:flex;gap:.4rem;flex-wrap:wrap;}
+  .merk{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);padding:.15rem .5rem;color:var(--muted);}
+  .merk.geef{color:var(--rtg-goud,#C9A24B);border-color:#5C4E10;}
+
+  @media (max-width:760px){ .onthaal{padding:1.4rem 1.1rem 1.2rem;} .aanbod .acties{width:100%;} }
+</style>
+<link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
+</head>
+<body class="rtg-stijl" data-rtg-world="foundation">
+<main id="main">
+
+  <section class="onthaal" aria-labelledby="brkop">
+    <div class="ey">FoundationOS · Buurtruil</div>
+    <h1 id="brkop">Wat jij niet meer<br>gebruikt, zoekt iemand.</h1>
+    <p>Spullen die je weggeeft of zoekt, binnen je eigen RTF-stad. Er komt geen geld aan te pas
+      en er staat nergens een prijs: dit is de buurt, geen marktplaats.</p>
+  </section>
+
+  <div id="poort" class="brkaart verborgen">
+    <div class="brsec">Even inloggen</div>
+    <div class="uitleg">De buurtruil werkt op je eigen RTG-account, zodat een aanbod aan iemand hangt
+      en er verhaal te halen is als het misgaat.</div>
+    <div class="rij ruimte"><a class="brknop vol" href="/apps/app.html">Naar het inlogscherm</a></div>
+  </div>
+
+  <div id="app" class="verborgen">
+    <div class="brkaart">
+      <div class="brsec">Kies je stad</div>
+      <div class="steden" id="steden"><div class="leeg">Laden...</div></div>
+    </div>
+
+    <div id="inhoud" class="verborgen">
+      <div class="brkaart ruimte">
+        <div class="brsec">Zet iets erbij</div>
+        <div class="rij">
+          <select class="brveld" id="nSoort" aria-label="Geef je iets weg of zoek je iets?">
+            <option value="geef">Ik geef weg</option>
+            <option value="zoek">Ik zoek</option>
+          </select>
+          <input class="brveld" id="nTitel" maxlength="80" placeholder="Wat is het?" aria-label="Wat is het">
+        </div>
+        <div class="rij ruimte">
+          <input class="brveld" id="nWat" maxlength="600" placeholder="Kort iets erover: staat, maat, waar het staat" aria-label="Toelichting">
+          <input class="brveld" id="nStaat" maxlength="40" placeholder="Staat (nieuw, gebruikt...)" aria-label="Staat">
+          <button class="brknop vol" id="plaats">Plaatsen</button>
+        </div>
+        <div id="melding"></div>
+        <div class="uitleg ruimte">Je naam staat er niet bij: een aanbod hangt aan je codenaam.
+          Wie belangstelling toont, zie jij &mdash; en jij bepaalt wat je ermee doet. Er wordt niets
+          verstuurd en niemand krijgt jouw gegevens.</div>
+      </div>
+
+      <div class="brkaart ruimte">
+        <div class="tabs" id="tabs">
+          <button type="button" data-tab="" aria-pressed="true">Alles</button>
+          <button type="button" data-tab="geef" aria-pressed="false">Weggegeven</button>
+          <button type="button" data-tab="zoek" aria-pressed="false">Gezocht</button>
+          <button type="button" data-tab="mijn" aria-pressed="false">Van mij</button>
+        </div>
+        <div id="lijst"><div class="leeg">Laden...</div></div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+/* De buurtruil: de enige rtfos-deur die op een gewone ledensessie opengaat.
+
+   WAT DIT SCHERM NIET DOET, en dat is de helft van het ontwerp. Het stuurt
+   niets naar een tweede persoon. Belangstelling tonen zet een vinkje dat de
+   EIGENAAR ophaalt; er gaat geen bericht, geen mail en geen melding de deur
+   uit. Wie iets wil afspreken, doet dat zelf -- dat is de regel uit LIFE.md
+   par. 4 en geen ontbrekende functie.
+
+   EN ER STAAT NERGENS EEN BEDRAG. Zodra dat er komt, is dit een marktplaats en
+   gelden er btw-, retour- en consumentenregels die deze laag niet draagt.
+   test/rtfos-ruil.test.js zakt als het woord in de module verschijnt. */
+const $ = s => document.querySelector(s);
+const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+function token() { try { return localStorage.getItem('rtg_member_token') || ''; } catch (e) { return ''; } }
+
+const api = (pad, body) => fetch('/api/rtfos/' + pad, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token() },
+  body: JSON.stringify(body || {})
+}).then(async r => {
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok || d.error) { const e = new Error(d.error || 'Er ging iets mis.'); e.status = r.status; throw e; }
+  return d;
+});
+
+let STAD = null;
+let TAB = '';
+
+function zeg(tekst, goed) {
+  $('#melding').innerHTML = '<div class="melder' + (goed ? ' goed' : '') + ' ruimte">' + esc(tekst) + '</div>';
+}
+
+async function start() {
+  if (!token()) { $('#poort').classList.remove('verborgen'); return; }
+  $('#app').classList.remove('verborgen');
+  try {
+    const r = await fetch('/api/rtfos/publiek/steden', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}'
+    }).then(x => x.json());
+    $('#steden').innerHTML = (r.steden || []).length
+      ? r.steden.map(s => '<button type="button" class="stadknop" data-stad="' + esc(s.id) + '" aria-pressed="false">' +
+          '<b>' + esc(s.naam) + '</b></button>').join('')
+      : '<div class="leeg">Er is nog geen afdeling open. Zodra er een start, kan er geruild worden.</div>';
+    $('#steden').querySelectorAll('[data-stad]').forEach(k =>
+      k.addEventListener('click', () => kies(k.dataset.stad)));
+  } catch (e) { $('#steden').innerHTML = '<div class="melder">' + esc(e.message) + '</div>'; }
+}
+
+function kies(id) {
+  STAD = id;
+  $('#steden').querySelectorAll('[data-stad]').forEach(k =>
+    k.setAttribute('aria-pressed', k.dataset.stad === id ? 'true' : 'false'));
+  $('#inhoud').classList.remove('verborgen');
+  teken();
+}
+
+function rij(r) {
+  const eigen = r.ikBenEigenaar;
+  return '<div class="aanbod"><div class="kern">' +
+    '<span class="merk ' + (r.soort === 'geef' ? 'geef' : '') + '">' + (r.soort === 'geef' ? 'weg te geven' : 'gezocht') + '</span> ' +
+    '<b>' + esc(r.titel) + '</b>' +
+    (r.wat ? '<div class="wat">' + esc(r.wat) + '</div>' : '') +
+    '<div class="meta">' + esc(r.van) + (r.staat ? ' &middot; ' + esc(r.staat) : '') +
+      ' &middot; ' + r.interesse + ' met belangstelling' +
+      (eigen && r.belangstellenden && r.belangstellenden.length
+        ? ' (' + r.belangstellenden.map(esc).join(', ') + ')' : '') + '</div>' +
+    '</div><div class="acties">' +
+    (eigen
+      ? '<button type="button" class="brknop" data-sluit="' + esc(r.id) + '">Het is weg</button>' +
+        '<button type="button" class="brknop" data-intrek="' + esc(r.id) + '">Intrekken</button>'
+      : '<button type="button" class="brknop vol" data-int="' + esc(r.id) + '">Ik heb belangstelling</button>' +
+        '<button type="button" class="brknop" data-meld="' + esc(r.id) + '">Melden</button>') +
+    '</div></div>';
+}
+
+async function teken() {
+  try {
+    const r = TAB === 'mijn' ? await api('ruil/mijn', {})
+      : await api('ruil/lijst', { stad: STAD, soort: TAB || undefined });
+    const rijen = r.ruil || [];
+    $('#lijst').innerHTML = rijen.length ? rijen.map(rij).join('')
+      : '<div class="leeg">' + (TAB === 'mijn'
+        ? 'Je hebt hier nog niets staan.'
+        : 'Nog niets in deze stad. Het eerste mag van jou zijn.') + '</div>';
+
+    $('#lijst').querySelectorAll('[data-int]').forEach(b => b.addEventListener('click', () => doe(
+      'ruil/interesse', { id: b.dataset.int },
+      'Genoteerd. De eigenaar ziet dat je belangstelling hebt en kan contact zoeken; wij sturen niets.')));
+    $('#lijst').querySelectorAll('[data-sluit]').forEach(b => b.addEventListener('click', () => doe(
+      'ruil/sluit', { id: b.dataset.sluit, status: 'weg' }, 'Afgerond.')));
+    $('#lijst').querySelectorAll('[data-intrek]').forEach(b => b.addEventListener('click', () => doe(
+      'ruil/sluit', { id: b.dataset.intrek, status: 'ingetrokken' }, 'Ingetrokken.')));
+    $('#lijst').querySelectorAll('[data-meld]').forEach(b => b.addEventListener('click', async () => {
+      const reden = prompt('Wat klopt er niet aan dit aanbod?');
+      if (reden === null) return;
+      try { const r2 = await api('ruil/meld', { id: b.dataset.meld, reden }); zeg(r2.bericht, true); teken(); }
+      catch (e) { zeg(e.message); }
+    }));
+  } catch (e) { $('#lijst').innerHTML = '<div class="melder">' + esc(e.message) + '</div>'; }
+}
+
+async function doe(pad, lijf, gelukt) {
+  try { await api(pad, lijf); zeg(gelukt, true); teken(); }
+  catch (e) { zeg(e.message); }
+}
+
+$('#tabs').querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => {
+  TAB = b.dataset.tab;
+  $('#tabs').querySelectorAll('[data-tab]').forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
+  teken();
+}));
+
+$('#plaats').addEventListener('click', async () => {
+  const titel = $('#nTitel').value.trim();
+  if (!STAD || titel.length < 3) { zeg('Wat is het? Een paar woorden is genoeg.'); return; }
+  try {
+    await api('ruil/plaats', { stad: STAD, soort: $('#nSoort').value, titel,
+      wat: $('#nWat').value.trim(), staat: $('#nStaat').value.trim() });
+    $('#nTitel').value = ''; $('#nWat').value = ''; $('#nStaat').value = '';
+    zeg('Staat erbij.', true);
+    teken();
+  } catch (e) { zeg(e.message); }
+});
+
+start();
+</script>
+<script src="/shared/deelmenu.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/levendekleur.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+<script src="/shared/ios.js" defer></script>
+<script src="schil-os.js" defer></script>
+<script src="premium.js" defer></script>
+</body>
+</html>

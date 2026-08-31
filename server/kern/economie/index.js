@@ -3,7 +3,9 @@
    ECONOMIE.md beschrijft de richting; dit is wat er van gebouwd is. Twee dingen,
    en ze horen bij elkaar:
 
-     werelden   vier economieën die niet in elkaar overlopen (./werelden.js)
+     werelden   vier economieën die niet in elkaar overlopen (./werelden.js),
+                met ./identiteit.js voor de identiteit die zelf een entiteit is
+                en dus niet de wereld van haar dragersoort draagt
      firewall   wie mag wie iets in rekening brengen (./firewall.js), met het
                 relatieregister eronder (./relaties.js) dat standaard leeg is
 
@@ -43,12 +45,18 @@ function maakEconomie({ db, save, klok }) {
   const ctx = { db, save, nu, d };
   const rel = require('./relaties')(ctx);
   ctx.relatieVoor = rel.relatieVoor;
+  /* VOOR de firewall: die vraagt in welke wereld een drager woont, en dat is
+     een eigenschap van de identiteit en niet van haar dragersoort. */
+  const ident = require('./identiteit')(ctx);
+  ctx.wereldVanDrager = ident.wereldVanDrager;
   const fw = require('./firewall')(ctx);
 
   return { economie: {
     WERELDEN: werelden.WERELDEN, INFRA_WERELD: werelden.INFRA_WERELD,
     werelden: werelden.alle, wereldVan: werelden.wereldVan, wereld: werelden.wereld,
     factureerbaar: werelden.factureerbaar,
+    wereldVanDrager: ident.wereldVanDrager, identiteiten: ident.alle,
+    identiteitZet: ident.zet, identiteitWeg: ident.weg,
     relaties: rel.relaties, relatieZet: rel.relatieZet, relatieWeg: rel.relatieWeg,
     relatieVoor: rel.relatieVoor, relatiejournaal: rel.journaal,
     magBelasten: fw.magBelasten, magDragerBelasten: fw.magDragerBelasten

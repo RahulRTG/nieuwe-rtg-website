@@ -143,3 +143,34 @@ test('de ronde vertelt ook hoeveel er gekeken is', () => {
   assert.equal(uit.gekeken, 2);
   assert.equal(uit.klein.length, 1);
 });
+
+/* ---------------------------------------------------------------------------
+   DE COOKIEBALK WERD DOOR DEZE RONDE NOOIT GEZIEN, EN DROEG TWEE TE KLEINE
+   RAAKVLAKKEN.
+
+   Dit is een gat in de MEETOPZET en niet in de meetregel. public/shared/cookie.js
+   begint met `if (localStorage.getItem(SLEUTEL)) return;` -- de balk verdwijnt
+   zodra iemand een keer heeft bevestigd. De raakvlakronde draait INGELOGD, dus
+   zag hij een banner die er niet meer was, en de nulstand in A11Y-INGELOGD.json
+   klopte alleen voor de tweede bezoeker. In een verse browser stonden er twee
+   raakvlakken van 17px hoog (`Privacy` en `Prima`) op ELK scherm van dit huis.
+
+   Gemeten in een echte browser op 390x844: 17 hoog, 22 breed. Nu 24 bij 24, met
+   de onderlijn op de tekst in plaats van op de rand van het vakje -- anders
+   zakt de streep mee omlaag als het raakvlak groeit.
+
+   Deze toets kijkt naar de STIJLREGEL en niet naar een browser, want dat is de
+   plek waar het fout ging en de plek waar het terug kan sluipen. */
+test('de cookiebalk haalt de 24 pixels, ook bij het eerste bezoek', () => {
+  const bron = require('fs').readFileSync(require('path').join(__dirname, '../public/shared/cookie.js'), 'utf8');
+  const regel = (bron.match(/#rtg-cookie a,#rtg-cookie button\{[^}]*\}/) || [''])[0];
+  assert.ok(regel, 'de stijlregel voor de klikbare woorden is er niet meer');
+  assert.match(regel, new RegExp('min-height:' + GRENS + 'px'),
+    'de klikbare woorden in de cookiebalk zijn lager dan WCAG 2.5.8 vraagt');
+  assert.match(regel, new RegExp('min-width:' + GRENS + 'px'),
+    'de klikbare woorden in de cookiebalk zijn smaller dan WCAG 2.5.8 vraagt');
+  /* EN NIET TERUG NAAR border-bottom: die zit op de rand van het vakje, dus met
+     een raakvlak van 24px komt de streep los van de tekst te hangen. */
+  assert.ok(!/border-bottom:\s*1px/.test(regel),
+    'de onderlijn zit weer op de rand van het vakje; dan hangt hij los van het woord');
+});

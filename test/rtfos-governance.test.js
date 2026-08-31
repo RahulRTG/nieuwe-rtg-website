@@ -245,6 +245,19 @@ test('het jaarverslag heeft een besluit nodig, en de cijfers bevriezen', async (
   assert.equal(open.body.jaarverslagen.length, 1);
   assert.equal(open.body.jaarverslagen[0].cijfers.totaal.batenEuro, batenBevroren);
 
+  /* EN OP WELKE GROND DIT OPENBAAR STAAT. Dit deel noemde zijn publieke kant
+     "de ANBI-publicatie" terwijl de eigenaar in de giftstand had vastgelegd dat
+     de aanvraag nog loopt -- een status die op twee plekken werd aangenomen.
+     Zolang die stand niet 'ja' is, publiceert de stichting uit eigen keus, en
+     dat hoort er te STAAN in plaats van dat een lezer het invult. */
+  assert.ok(open.body.grondslag, 'de publieke kant zegt niet op welke grond hij openbaar staat');
+  assert.equal(open.body.grondslag.grond, 'eigen keus');
+  assert.notEqual(open.body.grondslag.anbi, 'ja');
+  assert.match(open.body.grondslag.zegt, /niet omdat het al moet|zelf wil|niet als een ANBI-publicatie/);
+  /* GEEN RSIN NAAST EEN STATUS DIE ER NOG NIET IS: dat leest als een
+     beschikking. */
+  assert.equal(open.body.grondslag.rsin, null);
+
   // een tweede verslag over hetzelfde jaar kan alleen met een reden
   const stil = await os_('jaarverslag/opstellen', { jaar: 2026 });
   assert.equal(stil.status, 400);
@@ -471,4 +484,29 @@ test('de lijsten tellen wat er open staat, en een herbeoordeling vraagt een oord
     verhaal: 'tweede opzet, met de cijfers erin', bijlage: { naam: 'balans 2025', url: '/stukken/balans-2025' } });
   assert.equal(welBij.status, 200);
   assert.equal(welBij.body.jaarverslag.bijlagen.length, 1);
+});
+
+/* ---------------------------------------------------------------------------
+   HET AUDITSPOOR IS VAN HET LANDELIJKE BESTUUR, EN DAT WAS NERGENS GETOETST.
+
+   Deze grendel stond in kern/rtfos/index.js tussen de bedrading. Bij het
+   uitsplitsen naar index-spiegel.js bleek met een mutatie dat de hele suite
+   groen bleef als je hem eruit haalde: een stadscoordinator kon dan het
+   landelijke auditspoor lezen -- wie welke casus opende, wie welke uitgave
+   deed. Een grendel zonder toets is een gewoonte.
+
+   En de AFKAPTELLER hoort erbij te staan (LAT.md regel 3): "er staat niets
+   meer" en "er is nooit iets geweest" mogen niet hetzelfde lezen. */
+test('het auditspoor is landelijk, en zegt of het is afgekapt', async () => {
+  const mag = await post('/api/rtfos/audit', {}, LAND);
+  assert.equal(mag.status, 200);
+  assert.ok(Array.isArray(mag.body.regels), 'het landelijke bestuur ziet het spoor niet');
+  assert.equal(typeof mag.body.afgekapt, 'number',
+    'zonder afkapteller leest een afgekapt spoor als een schoon spoor');
+
+  /* TWEE is een zetel in een stad en geen landelijk bestuurder. */
+  const magNiet = await post('/api/rtfos/audit', {}, TWEE);
+  assert.equal(magNiet.status, 403, 'een stadszetel kon het landelijke auditspoor lezen');
+  assert.match(magNiet.body.error, /landelijke/);
+  assert.equal(magNiet.body.regels, undefined, 'de weigering lekte alsnog regels');
 });

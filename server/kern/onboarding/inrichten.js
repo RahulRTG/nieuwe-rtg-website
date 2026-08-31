@@ -108,6 +108,7 @@ module.exports = (ctx) => {
     const kenbaar = new Map(ONDERDELEN.map(o => [o.id, o]));
     const md = dossier(acc);
     let raakteDossier = false;
+    const geweigerd = [];
     for (const [k, ruw] of Object.entries(velden || {})) {
       if (!kenbaar.has(k)) continue;
       const waarde = schoonVeld(ruw, k === 'adres' ? 200 : 120).trim();
@@ -115,7 +116,16 @@ module.exports = (ctx) => {
       if (k === 'telefoon') {
         // te kort om een nummer te zijn: overslaan in plaats van de hele stap
         // te laten mislukken (dezelfde soepelheid als bij de aanmelding)
-        if (waarde.replace(/\D/g, '').length >= 8) accounts.setPhone(acc.id, waarde);
+        /* setPhone weigert een vervanging zonder her-authenticatie (het nummer
+           is het herstelkanaal). Bij het INRICHTEN is er normaal nog geen
+           nummer, dus dit raakt alleen het geval dat iemand er via deze weg een
+           bestaand nummer probeert te overschrijven -- en dat hoort hier juist
+           niet te kunnen. De uitkomst wordt bewaard zodat de aanroeper het kan
+           melden in plaats van te denken dat het gelukt is. */
+        if (waarde.replace(/\D/g, '').length >= 8) {
+          const uit = accounts.setPhone(acc.id, waarde);
+          if (uit && uit.error === 'herstelkanaal') geweigerd.push('telefoon');
+        }
         continue;
       }
       if (k === 'land') {
@@ -131,7 +141,13 @@ module.exports = (ctx) => {
       md[k] = waarde; raakteDossier = true;
     }
     if (raakteDossier) accounts.saveMemberState(acc.id, md);
-    return inrichtStatus(sess);
+    /* Wat NIET is opgeslagen, staat erbij. Een scherm dat "gelukt" toont terwijl
+       het telefoonnummer stil is geweigerd, laat een mens denken dat zijn
+       herstelkanaal is bijgewerkt terwijl het oude nog geldt -- en dat is
+       precies het verkeerde om te denken. */
+    const uit = inrichtStatus(sess);
+    return geweigerd.length ? Object.assign({}, uit, { geweigerd,
+      reden: 'Het telefoonnummer is niet gewijzigd: er staat al een ander nummer, en dat vervangen vraagt eerst uw wachtwoord.' }) : uit;
   }
 
   return { inrichtStatus, inrichtOp, ONDERDELEN };

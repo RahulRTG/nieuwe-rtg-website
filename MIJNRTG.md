@@ -226,28 +226,45 @@ naam hoort in de identiteitskluis, met een inzageregel. Draai
 
 ---
 
-## 5a. Een open bevinding: het telefoonnummer is een herstelkanaal
-
-Bij het uitbreiden van de zware paden (blok 4) kwam iets aan het licht dat geen
-onderdeel van dat blok is en dus blijft staan tot iemand het repareert.
+## 5a. Het telefoonnummer is een herstelkanaal (gerepareerd 31 augustus 2026)
 
 `/api/auth/reset` stuurt een sms naar `phoneOf(u)`. Dat nummer is dus een
-herstelkanaal. Maar het KAN worden vervangen door een ingelogde sessie **zonder
-dat er opnieuw om een wachtwoord wordt gevraagd** -- via `/api/gegevens/zeg`
-(`routes/member/gegevens.js`) of `/api/onboarding/inricht`. Het wachtwoord
-wijzigen eist wél het huidige wachtwoord (`routes/auth/herstel.js`), en dat is
-de scheve kant op: het nummer omzetten is de eerste stap van een overname en het
-wachtwoord de tweede.
+herstelkanaal -- en het KON worden vervangen door een ingelogde sessie zonder
+dat er opnieuw om een wachtwoord werd gevraagd, via `/api/gegevens/zeg` of
+`/api/onboarding/inricht`. Het wachtwoord wijzigen eiste dat wél. Dat was de
+scheve kant op: het nummer omzetten is de eerste stap van een accountovername en
+het wachtwoord de tweede.
 
-`herstel.js` redeneert in zijn eigen commentaar dat een aanvaller "eerst het
-telefoonnummer zou moeten weghalen, en daarvoor moet hij al binnen zijn".
-`setPhone` kan een nummer inderdaad niet leegmaken -- maar wel VERVANGEN, en dat
-komt op hetzelfde neer.
+`routes/auth/herstel.js` redeneert in zijn eigen commentaar dat een aanvaller
+"eerst het telefoonnummer zou moeten weghalen, en daarvoor moet hij al binnen
+zijn". Die redenering klopte; de aanname eronder niet. `setPhone` kon een nummer
+niet leegmaken -- maar wel VERVANGEN, en dat komt op hetzelfde neer.
 
-Beide routes staan sinds blok 4 op de zware lijst, maar **dat dicht het niet**:
-een bezitsbewijs vraagt om het toestel, niet om de mens. De echte reparatie is
-her-authenticatie op die twee routes. Dat is een besluit over UX-wrijving en
-hoort daarom bij de eigenaar, niet bij wie dit toevallig vond.
+**De grendel staat in de kern en niet op een route** (`accounts/users.js`,
+`setPhone`). Op een route dek je de aanroepers die je kent; in de kern ook die
+van volgend jaar. Het onderscheid is niet *zetten* maar *vervangen*:
+
+| Situatie | Wat er gebeurt |
+|---|---|
+| nog geen nummer | toegestaan -- er is geen kanaal om te kapen, en een eerste invoer een wachtwoord vragen is wrijving zonder winst |
+| zelfde nummer | toegestaan, want er verandert niets |
+| ander nummer | alleen met `vervangenMag`, en die zet een aanroeper pas ná her-authenticatie |
+
+De twee bestaande aanroepers geven die vlag niet mee en kunnen dus alleen nog een
+eerste nummer zetten; ze *melden* de weigering in plaats van hem te slikken. Een
+scherm dat "gelukt" toont terwijl het nummer stil is geweigerd, laat een mens
+denken dat zijn herstelkanaal is bijgewerkt terwijl het oude nog geldt.
+
+Vervangen gebeurt op `/api/mijn/herstelkanaal/telefoon`, met dezelfde
+her-authenticatie als `/api/auth/password`. Dat is geen nieuwe drempel maar het
+rechttrekken van een scheve. Het antwoord noemt het **gevolg** en niet alleen het
+succes: *"een herstelcode gaat vanaf nu naar dit nummer"* -- wie dat leest en de
+wijziging niet herkent, hoort meteen te weten dat er iets mis is.
+
+Wat dit **niet** repareert: het e-mailadres. Er is vandaag geen ledenroute die
+het verandert (alleen de eigenaars-bootstrap in `server.js` raakt `renameUser`),
+dus er is niets te grendelen -- maar wie er ooit een bouwt, hoort langs dezelfde
+grendel te gaan.
 
 ## 6. De volgorde
 

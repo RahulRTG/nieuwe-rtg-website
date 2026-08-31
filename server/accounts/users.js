@@ -68,9 +68,43 @@ function count() { return S.zin('SELECT COUNT(*) AS c FROM users').get().c; }
    wanneer er iets geregeld moet worden waar een derde partij bij komt (zie
    kern/gegevenspoort.js). Het nummer gaat gebonden de kluis in en de zoek-hash
    gaat mee, zodat herstel op telefoonnummer blijft werken. */
-function setPhone(id, phone) {
+/* HET TELEFOONNUMMER IS EEN HERSTELKANAAL, en daarom is deze functie
+   fail-closed op VERVANGEN.
+
+   /api/auth/reset stuurt een sms naar phoneOf(u). Wie dat nummer omzet, verlegt
+   de herstelweg naar zichzelf -- dat is de eerste stap van een accountovername,
+   en het wachtwoord is pas de tweede. Toch eiste alleen die tweede stap een
+   bevestiging (/api/auth/password vraagt het huidige wachtwoord); deze eerste
+   deed dat niet.
+
+   Het commentaar in routes/auth/herstel.js redeneert dat een aanvaller "eerst
+   het telefoonnummer zou moeten weghalen, en daarvoor moet hij al binnen zijn".
+   Die redenering klopt, maar de aanname eronder niet: deze functie kon een
+   nummer niet LEEGMAKEN, maar wel VERVANGEN -- en dat komt op hetzelfde neer.
+
+   HET ONDERSCHEID DAT ERTOE DOET is niet "zetten" maar "vervangen":
+
+     nog geen nummer   dan is er ook geen herstelkanaal om te kapen. Gewoon
+                       toestaan; iemand die zijn gegevens voor het eerst invult
+                       een wachtwoord vragen is wrijving zonder winst.
+     zelfde nummer     verandert niets. Toestaan.
+     ander nummer      dit VERLEGT het herstelkanaal. Alleen met `vervangenMag`,
+                       en die zet een aanroeper pas nadat hij de mens opnieuw
+                       heeft gecontroleerd.
+
+   Fail-closed betekent hier: de twee bestaande aanroepers (het gegevensgesprek
+   en de onboarding) geven die vlag NIET mee en kunnen dus alleen nog een eerste
+   nummer zetten. Dat is de veilige kant, en het is precies de reden dat de
+   grendel hier staat en niet op de routes -- op een route dek je de aanroepers
+   die je kent, hier ook die van volgend jaar. */
+function setPhone(id, phone, opties) {
   const nummer = String(phone || '').trim().slice(0, 30);
   if (!nummer) return null;
+  const bestaand = String(gebonden.phoneOf(getUserById(id)) || '').trim();
+  if (bestaand && bestaand !== nummer && !(opties && opties.vervangenMag === true)) {
+    return { error: 'herstelkanaal',
+      reden: 'Dit account heeft al een telefoonnummer. Het vervangen ervan verlegt de weg waarlangs een wachtwoord hersteld wordt, en vraagt daarom eerst uw wachtwoord.' };
+  }
   S.zin('UPDATE users SET enc_phone = ?, phone_hash = ? WHERE id = ?')
     .run(gebonden.zegel('enc_phone', id, nummer), kluis.phoneHash(nummer), id);
   mirror.markUser(id);

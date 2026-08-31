@@ -130,4 +130,49 @@ module.exports = (kern) => {
       nietGeraakt: hier ? 'Deze sessie blijft open. Sessies van voor de invoering van sessie-identiteit staan niet in de lijst en zijn hiermee niet gesloten; wijzig uw wachtwoord als u die ook wilt beeindigen.'
         : 'Deze sessie draagt geen identiteit en kon zichzelf niet uitzonderen; er is niets gesloten.' });
   });
+
+  /* ------------------------------------------------------------------------
+     HET HERSTELKANAAL WIJZIGEN.
+
+     Deze route bestaat omdat accounts.setPhone een VERVANGING weigert zonder
+     her-authenticatie: het nummer is de weg waarlangs /api/auth/reset een sms
+     stuurt, en dat verleggen is de eerste stap van een accountovername.
+
+     Hij vraagt hetzelfde als /api/auth/password: het huidige wachtwoord. Dat is
+     geen nieuwe drempel maar het rechttrekken van een scheve: het wachtwoord
+     WIJZIGEN eiste al een bevestiging, terwijl het herstelkanaal -- dat je nodig
+     hebt om het wachtwoord te resetten -- zonder bevestiging te vervangen was.
+
+     Hij staat hier en niet bij /api/gegevens: dat gesprek gaat over een
+     bestelling en hoort geen wachtwoord te vragen. Twee verschillende
+     handelingen op twee verschillende plekken, elk met de zwaarte die erbij
+     hoort.
+
+     WAT DIT NIET IS: een tweede plek waar een nummer kan worden gezet. Het
+     EERSTE nummer zetten kan gewoon in het gesprek en bij de onboarding -- daar
+     is nog geen kanaal om te kapen. Deze route is er alleen voor vervangen.
+     ---------------------------------------------------------------------- */
+  app.post('/api/mijn/herstelkanaal/telefoon', auth, async (req, res) => {
+    if (!eisLid(req, res)) return;
+    const u = req.session.account;
+    if (!u || !u.password_hash) {
+      return res.status(403).json({ error: 'Dit account heeft geen wachtwoord om mee te bevestigen. Neem contact op met RTG.' });
+    }
+    if (!await accounts.verifyPassword(String(req.body.huidig || ''), u.password_hash)) {
+      spoor(req, 'herstelkanaal-geweigerd', { reden: 'wachtwoord' });
+      return res.status(403).json({ error: 'Het wachtwoord klopt niet.' });
+    }
+    const nummer = String(req.body.telefoon || '').replace(/[^\d+ ]/g, '').trim().slice(0, 30);
+    if (nummer.replace(/\D/g, '').length < 8) {
+      return res.status(400).json({ error: 'Dat lijkt geen volledig telefoonnummer.' });
+    }
+    const uit = accounts.setPhone(u.id, nummer, { vervangenMag: true });
+    if (!uit || uit.error) return res.status(400).json({ error: (uit && uit.reden) || 'Kon het nummer niet bewaren.' });
+    spoor(req, 'herstelkanaal-gewijzigd', {});
+    res.json({ ok: true,
+      /* Eerlijk over het gevolg: dit verandert waar een herstelcode HEEN gaat.
+         Wie dat leest en het niet zelf deed, hoort meteen te weten dat er iets
+         mis is -- daarom staat het er als gevolg en niet als bevestiging. */
+      gevolg: 'Een herstelcode gaat vanaf nu naar dit nummer. Herkent u deze wijziging niet, sluit dan meteen uw andere sessies en wijzig uw wachtwoord.' });
+  });
 };

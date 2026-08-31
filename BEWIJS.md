@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1419 bestanden en 9972 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1420 bestanden en 9981 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1419 |
-| losse beweringen (`test(...)`) | 9972 |
+| toetsbestanden | 1420 |
+| losse beweringen (`test(...)`) | 9981 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 50 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 971 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 39 |
 | alleen in de kop *genoemd*, nog niet gemeten | 117 |
-| niets van beide | 282 |
+| niets van beide | 283 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1242 bestanden, 9669 beweringen.
+1243 bestanden, 9678 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -295,6 +295,7 @@ toets omvalt.
 | `eventkeuken.test.js` | 7 | gezakt op `liegpoort /api/` | DE EVENTKEUKEN -- 8 endpoints achter de leverancier-inlog. Deze acht wees de waargenomen dekkingsmeting aan als nooit aangeroepen: catering, allergy, allergy/alt, mep, checkin, runsheet, runsheet/done en runsheet/ai. |
 | `eventloop.test.js` | 4 | overleefd | DE EVENT-LOOP-VERTRAGING, EN OF DE METER HEM ECHT ZIET. Node draait alles op een lus. |
 | `excursie.test.js` | 2 | gezakt op `liegpoort /api/` | DE EXCURSIE -- waar kinderen zijn, en wie dat mag weten. WAAROM DIT DE ZWAARSTE VAN DE SCHOOL IS Van alle 199 school- en RTF-routes zonder toets is dit de enige waar het over de LOCATIE VAN EEN KIND gaat. |
+| `executionmap.test.js` | 9 | -- | DE CAPABILITY-COMPILER (scripts/executionmap.js, EXECUTIE.md blok 1). EXECUTION_MAP.json is een PROJECTIE en geen bron. |
 | `facturatie.test.js` | 6 | gezakt op `liegpoort /api/` | De centrale facturatielaag (kern/facturatie.js): bij elke verkoop krijgt zowel de verkoper als de koper automatisch dezelfde factuur in de app; de PDF is te downloaden; en de AI-factuurtool maakt in gewone taal een... |
 | `factuur.test.js` | 5 | gezakt op `liegpoort /api/` | Facturen downloaden. Zelfgebouwde PDF-schrijver (geen pakketten) + de leden-endpoints om een factuur en een jaaroverzicht op te halen. |
 | `factuursaldo.test.js` | 6 | gezakt op `liegpoort /api/` | De maandfactuur betalen uit het eigen RTG Pay-saldo (/api/pay/saldo, kern/factuursaldo.js): de derde betaalweg naast kaart en munten. De afschrijving loopt via pay.huisIn (autolaad inbegrepen, idempotent) en de... |

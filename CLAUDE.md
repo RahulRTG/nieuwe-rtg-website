@@ -777,7 +777,17 @@ willekeur, en willekeur verbergt een vermogen zonder dat iemand het merkt.
 schrijft ze tussen merktekens uit de registers (`<!--getal:idem.ongemeten-->`), en
 `test/getallen.test.js` zakt zodra een document iets anders beweert dan zijn
 register -- inclusief een zelfijking die een met opzet verkeerd getal moet vinden.
-Nul merktekens is daar geen "in orde" maar een gezakte meter. Hij verandert geen bevoegdheid en kan dat ook niet
+Nul merktekens is daar geen "in orde" maar een gezakte meter. **Blok 1 staat**: `EXECUTION_MAP.json`
+(`npm run executionmap`) is een PROJECTIE van 3282 routes -- bereikbaarheid uit
+`beleid.js`, gezagstrede uit de noemer, bewijs uit `VERTROUWEN.json`,
+herhaalbaarheid uit `IDEMPROEF.json` -- met risico, herstel en kosten als
+`ONBEPAALD` MET REDEN, want die zijn statisch niet af te leiden. Drie
+handhavingen, alle drie zakken ze: met de hand gewijzigd is rood (byte voor byte
+hercompileren), een generator die iets anders doet zonder bronwijziging is
+hetzelfde rood, en waar twee bronnen elkaar tegenspreken staat `ONBEPAALD` en
+nooit stil een winnaar. Die derde was meteen nodig: `IDEMPROEF.json` spreekt
+zichzelf 28 keer tegen over dezelfde route (`beschermd` naast `ongemeten`) -- een
+vondst in de bron, op te lossen in blok 5 en hier niet weg te poetsen. Hij verandert geen bevoegdheid en kan dat ook niet
 (hij filtert de lijst die `beleid.js` al goedkeurde, en toets 1 houdt vast dat de
 uitkomst altijd een deelverzameling is), en zijn woordenschat komt uit de
 padsegmenten zelf zodat er geen tweede routelijst ontstaat. Twee dingen daar niet

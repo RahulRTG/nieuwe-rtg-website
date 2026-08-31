@@ -124,6 +124,8 @@
     "semantiek": "node scripts/semantiek.js",
     "semantiek:vast": "node scripts/semantiek.js --vastleggen",
     "lagen": "node scripts/lagen.js",
+    "executionmap": "node scripts/executionmap.js",
+    "executionmap:controle": "node scripts/executionmap.js --controle",
     "resolverbereik": "node scripts/resolverbereik.js",
     "getallen": "node scripts/getallen.js",
     "getallen:controle": "node scripts/getallen.js --controle",

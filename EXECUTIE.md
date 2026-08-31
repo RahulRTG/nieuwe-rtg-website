@@ -376,7 +376,7 @@ raakt. De uitkomst is dan de volledige lijst met de reden erbij — nooit een le
 werkveld, want dat zou het model laten zeggen "dat kan ik niet", en dat is een
 leugen over wat de gebruiker mag.
 
-### Blok 1 — Capability-compiler · **een besluit nodig**
+### Blok 1 — Capability-compiler · **GEBOUWD**
 
 Eén generator die uit bestaande bronnen `EXECUTION_MAP.json` samenstelt: code,
 `stuur/beleid.js`, `VERTROUWEN.json`, `IDEMPROEF.json`, de risicoregels, de
@@ -400,6 +400,43 @@ De eigenschappen die de kaart per capability zou moeten dragen: identiteit,
 bereikbaarheid, bewijs, risico, omkeerbaarheid, impact, waarde, frictie,
 herhaling, kosten, mandateerbaarheid, simuleerbaarheid, herstel, verval. Zoveel
 mogelijk afgeleid, en wat niet afgeleid kan worden staat als `ONBEPAALD`.
+
+**Wat er staat** (`scripts/executionmap.js`, `EXECUTION_MAP.json`, 933 KB):
+**3282 routes**, waarvan **176 (rol, route)-paren** die de AI mag bedienen. Vier
+veldsoorten worden afgeleid — bereikbaarheid uit `beleid.js`, de gezagstrede uit
+de noemer, het bewijs uit `VERTROUWEN.json`, de herhaalbaarheid uit
+`IDEMPROEF.json`. Drie staan er als **`ONBEPAALD` met de reden**: risico (dat
+rekent `command/risico.js` per gevál uit bedrag en aantal — statisch bestaat het
+niet), herstel (geen register kent de tegenhanger van een route) en kosten
+(`KOSTEN.md` meet verbruik per aanroep, niet per route). Een kaart die die drie
+invult omdat de kolom bestaat, verzint ze.
+
+**De herkomst staat per veldsoort en niet per rij**, en dat is geen bezuiniging
+op de waarheid: dát elke `bewijs`-waarde uit `VERTROUWEN.json` komt is een
+eigenschap van het veld, niet van de route. Per rij herhalen kostte 6,7 MB en
+voegde geen enkel feit toe. Wat wél per rij hoort — een afwijkende reden, elke
+`ONBEPAALD` — staat per rij.
+
+**De drie handhavingen die de eigenaar eiste, staan en zakken alle drie:**
+
+| eis | hoe |
+|---|---|
+| met de hand gewijzigd → rood | de kaart moet byte voor byte gelijk zijn aan de hercompilatie |
+| generator gewijzigd zonder bronwijziging → rood | dezelfde toets vangt dat: een projectie die verandert zonder dat de bron veranderde, is er geen |
+| twee bronnen oneens → `ONBEPAALD` | nooit stil een winnaar, en de toets rekent het na uit de bron zelf |
+
+Elke bron draagt bovendien zijn **vingerafdruk** in de kaart, en de toets
+controleert dat die klopt met het bestand — anders is "ongewijzigd" een bewering
+in plaats van een meting.
+
+**En de derde eis bleek meteen nodig.** `IDEMPROEF.json` bevat 86 keer dezelfde
+route+rol twee keer, en in **28 gevallen met een tegengesteld oordeel**:
+`beschermd` naast `ongemeten` voor precies hetzelfde pad. Een compiler die de
+laatste regel laat winnen, zet daar een hard antwoord neer dat niemand heeft
+vastgesteld — en dat antwoord zou vervolgens door PLAN gebruikt worden om te
+beslissen of een stap veilig te herhalen is. Ze staan nu als `ONBEPAALD` met
+beide waarden erbij. **Dat is geen gebrek van de kaart maar een vondst in de
+bron**, en hij hoort in blok 5 te worden opgelost, niet hier weggepoetst.
 
 ### Blok 2 — Eén risicosemantiek · **de noemer STAAT, het besluit erover niet**
 

@@ -3667,8 +3667,18 @@ console.log('\n51) elke afdruk is gelijk aan de meting eronder');
          draagt er een (scripts/versheid.js leest hem), en zonder deze
          uitzondering meldt deze regel bij elke ronde "stempel wijkt af" --
          een regel die altijd rood staat, wordt genegeerd. */
+      /* `groei` hoort er om DEZELFDE reden niet bij, en om een tweede die er
+         nog scherper is. BEWIJSSCHULD.json draagt een groeigeschiedenis: per
+         keer dat de achterstand omhoog ging, met de reden erbij. Die ontstaat
+         alleen bij het vastleggen (--groei="...") en komt in de meting dus
+         nooit voor -- zonder deze uitzondering meldt de regel bij elke ronde
+         "groei wijkt af", en een regel die altijd rood staat wordt genegeerd.
+
+         En hij MOET blijven staan: hij is de enige plek waar leest waarom een
+         schuld ooit gegroeid is. Hem meevergelijken zou hem stilzwijgend
+         wegpoetsen bij het eerstvolgende vastleggen. */
       const blokken = [...new Set([...Object.keys(opSchijf), ...Object.keys(vers)])]
-        .filter(k => k !== 'uitleg' && k !== 'vastgelegd' && k !== 'stempel');
+        .filter(k => k !== 'uitleg' && k !== 'vastgelegd' && k !== 'stempel' && k !== 'groei');
       const anders = (a, b) => JSON.stringify(a) !== JSON.stringify(b);
       const verschil = [];
       for (const k of blokken) {
@@ -3696,6 +3706,24 @@ console.log('\n51) elke afdruk is gelijk aan de meting eronder');
     vast: 'npm run objectmodel:vast',
     zeg: (v) => v.gemeten.vormen + ' bewaarde vormen in ' + v.gemeten.bestanden +
       ' bestanden, en OBJECTMODEL.json is daar in elk blok gelijk aan'
+  });
+  /* DE SCHULDENLIJST ZELF, en dat gat was er een van de pijnlijke soort.
+     BEWIJSSCHULD.json houdt bij wat er nog NIET gemeten is; hij stond tien
+     dagen en 126 commits stil, op een vuile boom gemeten, en niets klaagde --
+     terwijl de idempotentiemeting er wel al een verspoort had. Een lijst van
+     wat er nog open staat, die zelf kan verouderen, is de gevaarlijkste soort
+     register: hij ziet er even gezaghebbend uit als een verse.
+
+     Hij is goedkoop om na te rekenen (0,2 seconde: hij LEEST de registers en
+     meet niet zelf), dus hij kan gewoon bij elke keuring mee. Dat zijn getallen
+     zo vers zijn als de registers eronder, bewaakt scripts/versheid.js -- daar
+     staat hij sinds dezelfde ronde ook in. */
+  afdrukGelijk({
+    bestand: 'BEWIJSSCHULD.json', meter: () => require('./bewijsschuld').meet(),
+    vast: 'node scripts/bewijsschuld.js --vastleggen',
+    zeg: (v) => v.gemeten.achterstand + ' achterstand en ' + v.gemeten.randVanDeMethode +
+      ' rand van de methode over ' + v.gemeten.postenTotaal +
+      ' posten, en BEWIJSSCHULD.json is daar in elk blok gelijk aan'
   });
   afdrukGelijk({
     bestand: 'HANDLERWACHT.json', meter: () => require('./handlerwacht').meet(),

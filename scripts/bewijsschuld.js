@@ -353,6 +353,20 @@ function meet() {
       'zo vers als de laatste ronde; zie scripts/versheid.js.',
     telling: { posten: posten.length, meetwerk: som('meetwerk'),
       instrument: som('instrument'), grens: som('grens') },
+    /* HET `gemeten`-BLOK IS ER VOOR DE KEURING, en zijn vorm is geen toeval.
+       scripts/check.js vergelijkt een afdruk blok voor blok en noemt bij
+       `gemeten` het VERSCHIL PER GETAL -- "objectpoort: 52 -> 61" in plaats
+       van "posten wijkt af". Dat scheelt het half uur waarvoor die regel
+       bestaat, en het kan alleen als de getallen plat naast elkaar staan.
+
+       `null` blijft hier `null` en wordt NOOIT nul. Een post die niemand heeft
+       gemeten (audit-wisselend) is iets anders dan een post die op nul staat,
+       en dat verschil wegschrijven als een getal is precies de schijnzekerheid
+       die deze hele lijst moet voorkomen. */
+    gemeten: Object.assign(
+      { postenTotaal: posten.length, achterstand: som('meetwerk') + som('instrument'),
+        randVanDeMethode: som('grens') },
+      Object.fromEntries(posten.map(p => [p.id, p.aantal]))),
     posten };
 }
 

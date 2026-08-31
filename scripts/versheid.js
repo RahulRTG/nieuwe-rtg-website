@@ -62,6 +62,12 @@ const REGISTERS = [
   ['SCHERMLEUGEN.json', 'node --test test/liegend-scherm.e2e.js', 'of een scherm iets toont dat er niet is'],
   ['SABOTAGE.json', 'node scripts/sabotage.js', 'of elke handhaver echt aan staat'],
   ['WAAROM.json', 'node scripts/waarom.js --vastleggen', 'waarom een route niet te bewijzen valt, in zijn eigen woorden'],
+  /* EN DE SCHULDENLIJST. Hij leest de registers hierboven en is dus per
+     definitie zo oud als de oudste daarvan -- maar hij droeg zijn eigen
+     ouderdom niet uit. Gevonden op 31 augustus 2026: tien dagen stil, 126
+     commits achter, en gemeten op een vuile boom. Precies het gat waar dit
+     instrument voor bestaat, en het stond er zelf niet in. */
+  ['BEWIJSSCHULD.json', 'node scripts/bewijsschuld.js --vastleggen', 'wat er nog niet gemeten is, en waarom niet'],
   /* TIEN REGISTERS DIE HIER NIET IN STONDEN, en dat was het gat waar dit
      instrument juist voor is. Zeven ervan droegen zelfs helemaal geen stempel:
      hun ouderdom was niet vast te stellen, en ze zeiden dat ook niet -- ze

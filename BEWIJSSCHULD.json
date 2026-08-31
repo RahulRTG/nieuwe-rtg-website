@@ -1,8 +1,8 @@
 {
  "stempel": {
-  "op": "2026-08-31T15:06:26.891Z",
-  "commit": "fb2245a5",
-  "boomVuil": false,
+  "op": "2026-08-31T15:35:44.034Z",
+  "commit": "5d548b5e",
+  "boomVuil": true,
   "node": "v22.22.2"
  },
  "uitleg": "Wat er nog niet gemeten is, en waarom niet. MAG ALLEEN KRIMPEN -- zie test/bewijsschuld.test.js. Een post van soort \"grens\" sluit nooit; die telt niet als achterstand maar als de rand van de methode.",
@@ -12,6 +12,25 @@
   "meetwerk": 58,
   "instrument": 323,
   "grens": 708
+ },
+ "gemeten": {
+  "postenTotaal": 14,
+  "achterstand": 381,
+  "randVanDeMethode": 708,
+  "auth-onbeslist": 0,
+  "capability-in-handler": 612,
+  "objectpoort": 52,
+  "output-deuren": 18,
+  "lichaamssleutel": 74,
+  "output-niet-toerekenbaar": 0,
+  "output-blind": 0,
+  "output-onwaarneembaar": 4,
+  "audit-wisselend": null,
+  "audit-verklaard": null,
+  "rollback-gezakt": 3,
+  "object-vooraf": 323,
+  "proefruis": 1,
+  "wegwerpserver-kopieen": 2
  },
  "posten": [
   {

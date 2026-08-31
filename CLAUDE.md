@@ -799,7 +799,18 @@ is: van 3282 routes hebben er 74 een kandidaat-tegenhanger op grond van hun naam
 een VERKLARINGSREGISTER nodig zoals IDEMBESLUIT.json; zolang `bevestigd` leeg is
 mag geen scherm en geen bon een terugweg beloven. Let ook op de tegenspraakregel
 die er bijna verkeerd in kwam: `code-maker` naast een gemeten `beschermd` is GEEN
-bug, want de proef kent `beschermd` pas toe als de VERSE sleutel iets anders gaf. Hij verandert geen bevoegdheid en kan dat ook niet
+bug, want de proef kent `beschermd` pas toe als de VERSE sleutel iets anders gaf. **Blok 3 staat** (`server/kern/stuur/plan.js`, gereedschap `plan`):
+het model levert doel + stappen, de compiler weegt ze en geeft een uitvoerbaar
+plan of een afwijzing MET bezwaren -- inclusief hoeveel bevestigingen het plan
+vooraf gaat vragen en welke. Vier regels houden hem klein en alle vier zakken ze
+op een mutatie: **PLAN voert niets uit** (getoetst op de BRON: geen fetch, geen
+stuurRoep), **PLAN bezit niets** (het oordeel is exact `beleidVoor()`), **de
+autoriteit komt LIVE en nooit uit EXECUTION_MAP.json** (een bouwartefact kan een
+commit achterlopen; de toets verandert de kaart en eist dat het oordeel niet
+meebeweegt), en **een verboden stap laat het hele plan zakken** in plaats van
+stil te worden overgeslagen. Wat PLAN met opzet NIET doet is de uitkomst van een
+stap doorgeven aan de volgende: zodra hij over gegevens gaat in plaats van over
+bevoegdheid, is hij niet meer klein. Hij verandert geen bevoegdheid en kan dat ook niet
 (hij filtert de lijst die `beleid.js` al goedkeurde, en toets 1 houdt vast dat de
 uitkomst altijd een deelverzameling is), en zijn woordenschat komt uit de
 padsegmenten zelf zodat er geen tweede routelijst ontstaat. Twee dingen daar niet

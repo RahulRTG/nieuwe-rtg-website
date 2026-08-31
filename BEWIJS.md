@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1421 bestanden en 9989 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1422 bestanden en 10000 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1421 |
-| losse beweringen (`test(...)`) | 9989 |
+| toetsbestanden | 1422 |
+| losse beweringen (`test(...)`) | 10000 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 50 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 971 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 39 |
-| alleen in de kop *genoemd*, nog niet gemeten | 117 |
+| alleen in de kop *genoemd*, nog niet gemeten | 118 |
 | niets van beide | 284 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1244 bestanden, 9686 beweringen.
+1245 bestanden, 9697 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1083,6 +1083,7 @@ toets omvalt.
 | `stun.test.js` | 4 | gezakt op `===->!==#0` | Test voor de eigen STUN-server (server/stun.js): een Binding Request krijgt een Binding Success Response met een correct ge-XOR'd MAPPED-ADDRESS terug, en rommel wordt genegeerd (geen crash). Zo bellen leden zonder... |
 | `stuur-aanval.test.js` | 6 | gezakt op `!==->===#0` | Aanvalstoetsen voor het AI-stuur. Deze gebruiken bewust een vijandig nagemaakt model dat bevestigingsvelden fabriceert en verborgen routes kiest. |
 | `stuur-niveaus.test.js` | 9 | -- | DE SPLITSING VAN `direct` IN `lezen` EN `klein` (server/kern/stuur/beleid.js). AANLEIDING. |
+| `stuur-plan.test.js` | 11 | genoemd | DE PLANCOMPILER (server/kern/stuur/plan.js, EXECUTIE.md blok 3). De sprong van dit blok is dat een keten van handelingen een OBJECT wordt dat je kunt wegen voordat er iets gebeurt. |
 | `stuur-resolver-taal.test.js` | 7 | -- | DE TAALSUITE VAN DE CAPABILITY-RESOLVER -- de veiligheidskant. test/stuur-resolver.test.js bewijst de GRENS: er komt nooit een pad bij. |
 | `stuur-resolver.test.js` | 14 | genoemd | DE CAPABILITY-RESOLVER (server/kern/stuur/resolver.js, EXECUTIE.md blok 0). Wat hier bewezen moet worden is niet "hij kiest goed" maar iets hardere: hij kan de bevoegdheid niet veranderen. |
 | `stuur.test.js` | 9 | gezakt op `liegpoort /api/` | Het AI-stuur: Rahul voert acties uit op elk toegestaan API-pad via een interne aanroep met de eigen inlog van de gebruiker. Dezelfde rechten en dezelfde schakelkast als de app-knoppen; infrastructuur is verboden... |

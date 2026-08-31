@@ -521,7 +521,7 @@ menselijke bevestiging stilletjes verdwijnt.
 **Wat er hierna nog moet:** één motor. De verhuizing van `risico.js` blijft de
 juiste eindtoestand; hij was alleen niet de eerste stap.
 
-### Blok 3 — PLAN als protocol · **een besluit nodig**
+### Blok 3 — PLAN als protocol · **GEBOUWD**
 
 De architectuursprong. En het ontwerp ervan is streng:
 
@@ -549,6 +549,41 @@ weging → bewijscontrole → simulatie → goedkeuringsgrenzen → uitvoering �
 verificatie. Het model mag een pad verzinnen dat niet bestaat; de compiler wijst
 het plan dan af. Dat de resolver het pad ook niet had aangeboden is de eerste
 verdediging; de compiler is de tweede.
+
+**Wat er staat** (`server/kern/stuur/plan.js`, aangehaakt als derde gereedschap
+`plan` in `stuur/gereedschap.js`): het model levert doel + stappen, de compiler
+weegt ze en geeft een uitvoerbaar plan of een afwijzing mét de bezwaren.
+Uitvoeren blijft `doe` — dus het gewone voorstel dat een mens buiten het gesprek
+bevestigt.
+
+**De vier regels die hem klein houden, en alle vier zakken ze op een mutatie:**
+
+| regel | wat het tegenhoudt |
+|---|---|
+| **PLAN voert niets uit** | geen `fetch`, geen `stuurRoep`, geen weg naar een effect — getoetst op de **bron**, want een weg die er niet is kan ook niet per ongeluk gebruikt worden |
+| **PLAN bezit niets** | het oordeel per stap is exact `beleidVoor()`; er wordt niets bijberekend |
+| **de autoriteit komt live** | nooit uit `EXECUTION_MAP.json`: dat is een bouwartefact en kan een commit achterlopen. De toets verandert de kaart met opzet en eist dat het oordeel niet meebeweegt |
+| **een verboden stap laat het plan zakken** | nooit stil overslaan: een keten waarvan stap 5 wegvalt is een andere keten dan de gebruiker las |
+
+**Wat het oplevert dat er gisteren niet was:** het plan zegt **vooraf** hoeveel
+bevestigingen het gaat vragen, en wélke. Plus de golven — wat niet van elkaar
+afhangt staat in dezelfde golf — als volgorde-informatie, uitdrukkelijk niet als
+uitvoering. Een kringloop, een stap die naar een onbekende stap wijst, een plan
+van meer dan 24 stappen en twee stappen met hetzelfde kenmerk worden alle vier
+afgewezen met de reden erbij.
+
+**Twee dingen die deze bouw blootlegde.** `lus.js` liep tegen de 10 KB van
+keuringsregel 13, dus de gereedschapsbeschrijvingen zijn eruit gehaald naar
+`stuur/gereedschap.js` — een naad die er toch al hoorde: dat bestand beschrijft
+wat het model mág vragen, de lus handelt het af. En mijn eerste versie van toets
+1 sloeg aan op de **kop van `plan.js` zelf**, die uitlegt dat er geen `fetch` en
+geen `stuurRoep` in zit. Commentaar gaat er nu eerst af — dezelfde les als bij de
+noemer, waar een verwijzing in commentaar werd aangezien voor een import.
+
+**Wat PLAN nog niet doet:** simuleren (blok 4), en de uitkomst van een stap
+doorgeven aan de volgende. Dat tweede is met opzet: zodra een stap de invoer van
+de volgende bepaalt, gaat de compiler over gegevens in plaats van over
+bevoegdheid, en dan is hij niet meer klein.
 
 ### Blok 4 — Simulatie en droogloop · **een stap weg**
 

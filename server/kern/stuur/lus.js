@@ -7,32 +7,8 @@
    van de assistenten staan. Draait op de context die kern/stuur.js opbouwt. */
 const { TWIJFELREGELS, magDoen } = require('../rahul/twijfel');
 const { resolveer } = require('./resolver');
-
-/* De twee gereedschappen. Staan buiten de fabriek omdat ze vast zijn, en
-   omdat de twijfelpoort alleen dichtzit als `zeker` en `begrepen` ECHT
-   verplichte velden zijn; dat is nu van buitenaf te controleren
-   (test/rahul-mens.test.js). */
-const TOOLS = [
-  /* `kaart` geeft de paden die DEZE opdracht raken (./resolver.js: versmalt de
-     keuze, nooit de bevoegdheid). `alles: true` is de ontsnapping. */
-  { name: 'kaart', description: 'De API-paden (POST) die je met "doe" kunt aanroepen. Standaard alleen de paden die deze ' +
-      'opdracht raken. Staat er niet bij wat je zoekt, roep hem dan opnieuw aan met alles=true voor de volledige lijst.',
-    input_schema: { type: 'object', properties: {
-      alles: { type: 'boolean', description: 'true = de volledige lijst voor deze rol, zonder versmalling' } } } },
-  /* `zeker` en `begrepen` zijn geen formaliteit maar de poort tegen twijfel
-     (kern/rahul/twijfel.js). Het model moet expliciet verklaren dat het het
-     zeker weet en in een zin opschrijven wat het gaat doen; lukt dat niet,
-     dan hoort het te vragen in plaats van te doen. Dit is een gedragsrem, geen
-     autorisatiegrens: die staat server-side in stuur/beleid + goedkeuring. */
-  { name: 'doe', description: 'Voer een actie uit op een RTG API-pad (POST), met de inlog van de gebruiker. ' +
-      'Alleen gebruiken als je het ZEKER weet: zet zeker=true en beschrijf in "begrepen" in een zin wat je gaat doen en voor wie. ' +
-      'Twijfel je over wat, wanneer, hoeveel, waar of voor wie, gebruik deze tool dan NIET maar stel eerst een vraag.',
-    input_schema: { type: 'object', properties: {
-      pad: { type: 'string' }, body: { type: 'object' },
-      zeker: { type: 'boolean', description: 'true als je zonder enige twijfel weet wat er moet gebeuren' },
-      begrepen: { type: 'string', description: 'in een korte zin: wat ga je precies doen en voor wie' } },
-      required: ['pad', 'zeker', 'begrepen'] } }
-];
+const { compileer } = require('./plan');
+const { TOOLS } = require('./gereedschap');
 
 module.exports = ({ anthropic, app, log, stuurRoep, stuurPaden, classificeer, parseSubs }) => {
   const LUS_REGELS = TWIJFELREGELS.join(' ') + ' ' +
@@ -76,7 +52,14 @@ module.exports = ({ anthropic, app, log, stuurRoep, stuurPaden, classificeer, pa
         const uitkomsten = [];
         for (const t of wilTools) {
           let uit;
-          if (t.name === 'kaart') {
+          if (t.name === 'plan') {
+            /* Wegen, niet doen. De compiler krijgt de rol mee en raakt niets
+               aan; wat hij teruggeeft is een oordeel dat het model aan de
+               gebruiker kan voorlezen voordat er een voorstel ontstaat. */
+            uit = compileer(t.input || {}, opties.wereld);
+            acties.push({ pad: 'plan', status: uit.uitvoerbaar ? 200 : 409, gevraagd: true });
+          }
+          else if (t.name === 'kaart') {
             const toegestaan = paden();
             uit = (t.input && t.input.alles)
               ? { paden: toegestaan, versmald: false, reden: 'De volledige lijst voor deze rol, op verzoek.' }

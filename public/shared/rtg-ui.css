@@ -314,11 +314,24 @@ body.rtg-stijl progress{accent-color:var(--rtg-goud);}
   flex-direction:column;
   align-items:flex-start;
   gap:.35rem;
+  /* 34rem is een LEESMAAT en geen breedte: in een smalle kolom (de la van
+     Berichten is 330px) moet het blok gewoon meekrimpen. Zonder min-width:0
+     weigert een flex-item smaller te worden dan zijn inhoud en loopt het aan
+     de linkerkant het beeld uit -- daar stond de kop half buiten het scherm. */
+  box-sizing:border-box;
+  width:100%;
+  min-width:0;
   max-width:34rem;
+  overflow-wrap:break-word;
   margin:clamp(1.6rem,5vh,3rem) 0 0;
-  padding:clamp(1.5rem,4vh,2.1rem) 0 0;
+  /* Zijruimte hoort erbij: dit blok landt net zo vaak in een kolom die zelf
+     geen padding heeft (de la van Berichten) als in een main die dat wel
+     doet. Zonder deze regel plakt de kop tegen de schermrand terwijl alles
+     eromheen inspringt. In procenten, zodat een smalle kolom niet de helft
+     van zijn breedte aan marge kwijt is. */
+  padding:clamp(1.5rem,4vh,2.1rem) clamp(0rem,4%,1.25rem) 0;
   border:0;
-  border-top:1px solid var(--rtg-line);
+  border-top:1px solid color-mix(in srgb,currentColor 20%,transparent);
   background:none;
   text-align:left;
 }
@@ -334,14 +347,21 @@ body.rtg-stijl progress{accent-color:var(--rtg-goud);}
   font-size:clamp(1.35rem,2.6vw,1.8rem);
   line-height:1.12;
   letter-spacing:-.005em;
-  color:var(--rtg-txt);
+  /* ERFT DE KLEUR VAN ZIJN OMGEVING en pakt hem niet van de pagina. Dit blok
+     landt net zo goed in een lokaal donker paneel op een licht scherm (de la
+     van Berichten) als andersom. Met `var(--rtg-txt)` kreeg het daar de inkt
+     van de PAGINA -- donkergrijs op donkergrijs, en de kop was zo goed als
+     onzichtbaar. Dat is dezelfde fout die MATERIAAL.md beschrijft voor
+     champagne: een laag die de inkt verzet maar niet de vlakken die een
+     scherm zelf schildert. */
+  color:inherit;
   margin-top:.15rem;
   text-wrap:balance;
 }
 .rtg-leeg-vlak p{
   margin:.3rem 0 0;
   max-width:42ch;
-  color:var(--rtg-muted);
+  color:color-mix(in srgb,currentColor 74%,transparent);
   font-size:.86rem;
   line-height:1.65;
 }
@@ -352,10 +372,10 @@ body.rtg-stijl progress{accent-color:var(--rtg-goud);}
   display:inline-flex;
   align-items:center;
   gap:.5rem;
-  border:1px solid var(--rtg-line);
+  border:1px solid color-mix(in srgb,currentColor 26%,transparent);
   border-radius:0;
   padding:.65rem 1.15rem;
-  color:var(--rtg-txt);
+  color:inherit;
   text-decoration:none;
   font-weight:600;
   font-size:.78rem;

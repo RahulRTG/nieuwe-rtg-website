@@ -279,9 +279,11 @@
     liveEl.innerHTML = ''; alleEl.innerHTML = '';
     const rijen = zaal.kanalen || [];
     const lives = rijen.filter(k => k.live);
-    if (!lives.length) liveEl.innerHTML = '<p class="stil">Er is nu niemand live. Kom straks terug, of start zelf een kanaal.</p>';
+    if (!lives.length) liveEl.innerHTML = RTGLeeg.html({ ey: 'Live', titel: 'Er is nu niemand live.',
+    wat: 'Zodra iemand een kanaal opent, staat het hier. U kunt er zelf ook een beginnen.' });
     for (const k of lives) liveEl.appendChild(kanKnop(k, !(zaal.mijn && zaal.mijn.id === k.id)));
-    if (!rijen.length) alleEl.innerHTML = '<p class="stil">Nog geen kanalen in de zaal.</p>';
+    if (!rijen.length) alleEl.innerHTML = RTGLeeg.html({ ey: 'De zaal', titel: 'Nog geen kanalen in de zaal.',
+    wat: 'Kanalen die zijn aangemaakt blijven hier staan, ook als er niemand uitzendt.' });
     for (const k of rijen) alleEl.appendChild(kanKnop(k, !!k.live && !(zaal.mijn && zaal.mijn.id === k.id)));
     tekenMijn();
     toon('vZaal');

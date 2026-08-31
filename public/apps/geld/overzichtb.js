@@ -106,7 +106,8 @@
     var rs = (c && c.tijdlijn) || [];
     laatste = rs;
     if (!rs.length) {
-      vak.innerHTML = '<p class="stil">Nog geen gebeurtenissen. Zodra er iets beweegt, staat het hier.</p>';
+      vak.innerHTML = RTGLeeg.html({ ey: 'Logboek', titel: 'Nog geen gebeurtenissen.',
+        wat: 'Zodra er geld beweegt of een besluit valt, staat het hier met datum en bron.' });
       return;
     }
     var vandaag = dagVan(new Date());

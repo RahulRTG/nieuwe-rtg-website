@@ -68,7 +68,8 @@
       try { history.replaceState(null, '', '#' + s.id); } catch (e) { /* file:// */ }
     }
     try { if (typeof s.start === 'function') s.start(); }
-    catch (e) { $('#paneel').innerHTML = '<p class="stil">Deze stand kon niet openen.</p>'; }
+    catch (e) { $('#paneel').innerHTML = RTGLeeg.html(RTGLeeg.vanFout(e, {
+      ey: 'RTG Veilig', titel: 'Deze stand kon niet openen.' })); }
   }
   V.toon = toon;
 

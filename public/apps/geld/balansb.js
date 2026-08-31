@@ -33,8 +33,8 @@
         '</div>';
     } catch (e) {
       $('#blWeek').innerHTML = RTGLeeg.html(RTGLeeg.vanFout({ status: 401, message: esc(e.message) }));
-      $('#blAdvies').innerHTML = '<p class="stil">Niet geladen.</p>';
-      $('#blKook').innerHTML = '<p class="stil">Niet geladen.</p>';
+      $('#blAdvies').innerHTML = '<p class="stil">Dit deel laadde niet. Ververs de pagina; blijft het staan, dan is de bron even niet bereikbaar.</p>';
+      $('#blKook').innerHTML = '<p class="stil">Dit deel laadde niet. Ververs de pagina; blijft het staan, dan is de bron even niet bereikbaar.</p>';
     }
   }
 

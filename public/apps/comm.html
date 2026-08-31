@@ -187,6 +187,7 @@
 </style>
 <link href="/shared/social-suite.css" rel="stylesheet">
 <link href="/shared/social-intelligence.css" rel="stylesheet">
+<script src="/shared/leeg.js"></script>
 <script src="/shared/social-suite.js" defer></script>
 <script src="/shared/social-intelligence.js" defer></script>
 <script src="/shared/social-intelligence-deck.js" defer></script>
@@ -312,7 +313,8 @@
     var n = $('#gesprekken');
     n.textContent = '';
     if (!staat.gesprekken.length) {
-      n.innerHTML = '<p class="leeg">Nog geen gesprekken in deze la.<br>Tik op + om er een te beginnen.</p>';
+      n.innerHTML = RTGLeeg.html({ ey: 'Berichten', titel: 'Nog geen gesprekken in deze la.',
+        wat: 'Wat u hier begint blijft in deze la staan, gescheiden van uw andere gesprekken.' });
       return;
     }
     staat.gesprekken.forEach(function (g) {
@@ -764,7 +766,8 @@
   }
 
   if (!token) {
-    $('#gesprekken').innerHTML = '<p class="leeg">Log eerst in op de app.</p>';
+    $('#gesprekken').innerHTML = RTGLeeg.html(RTGLeeg.inlogStand({
+      ey: 'Berichten', wat: 'Uw gesprekken staan achter uw account.' }));
   } else {
     /* Het app-menu wordt door shared/ios.js bijgeladen en is dus niet meteen
        aanwezig; we zetten onze lijst zodra hij er is. Zonder deze wacht zou de

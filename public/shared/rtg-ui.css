@@ -335,11 +335,36 @@ body.rtg-stijl progress{accent-color:var(--rtg-goud);}
   background:none;
   text-align:left;
 }
+/* HET OPSCHRIFT ERFT ZIJN KLEUR EN PAKT GEEN GOUD VAN DE PAGINA.
+
+   Dit is de derde keer in een week dat dezelfde fout hier terugkwam, en de
+   derde keer met een ander gezicht:
+
+     op pearl stond het donkere goud niet -> 2,2:1
+     na die reparatie stond het lichte goud niet meer op een donker paneel
+     binnen een licht scherm (de la van Berichten) -> 1,93:1
+
+   Beide keren omdat een component die op WILLEKEURIGE vlakken landt zijn
+   kleur van de PAGINA haalde. Er bestaat geen enkel goud dat op alle vier de
+   materialen en op elk zelfgeschilderd paneel daarbinnen leest; een vierde
+   token toevoegen verplaatst de fout alleen.
+
+   Het opschrift leest nu als opschrift door zijn VORM -- klein, in kapitalen,
+   ruim gespatieerd -- in de inkt van het vlak waarop het staat. Dat kan niet
+   zakken, want die inkt is per materiaal al uitgerekend. Het goud blijft waar
+   het wel gemeten kan worden: op de rand en de hover van de handeling. */
 .rtg-leeg-vlak .rtg-leeg-ey{
   font-size:.56rem;
   letter-spacing:.26em;
   text-transform:uppercase;
-  color:var(--rtg-leesgoud,var(--rtg-goud));
+  /* GEEN MENGING. Eerst stond hier currentColor op 76%, en dat leek veilig
+     omdat het de inkt van het vlak volgt. Nagerekend op pearl kwam het uit op
+     ongeveer 3,9:1 -- onder de 4,5 die kleine tekst nodig heeft. Een opschrift
+     van 0,56rem heeft geen enkele marge om lichter te worden.
+     Het leest als opschrift door zijn VORM: klein, kapitalen, ruim
+     gespatieerd. Dat is genoeg, en het kan niet zakken zolang de tekst
+     eromheen niet zakt. */
+  color:inherit;
 }
 .rtg-leeg-vlak b{
   font-family:var(--rtg-display,"Bodoni Moda",Georgia,serif);

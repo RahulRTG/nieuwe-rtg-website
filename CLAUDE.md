@@ -733,7 +733,18 @@ minimum -- die hoort dus eerst in de schaduw te lopen. De stuurmaat is niet
 "wanneer hebben we Mijn AI" maar **wanneer kan RTG een volledige keten
 bewijzen**; par. 7 zet er een van vier routes klaar, met per route gemeten wat
 er nog aan ontbreekt en waarom (twee zijn ongemeten omdat de proef geen
-gekoppelde groothandel had, niet omdat ze riskant zijn).
+gekoppelde groothandel had, niet omdat ze riskant zijn). **Blok 0 staat**
+(`server/kern/stuur/resolver.js`): de tool `kaart` geeft niet langer alles wat
+een rol mag maar de paden die DEZE opdracht raken -- gemeten 5,6 paden gemiddeld en
+91% kleiner over zestien opdrachten in drie rollen (`npm run resolver` rekent het
+na op de echte routes; het kleinste werkveld is een pad). Hij verandert geen bevoegdheid en kan dat ook niet
+(hij filtert de lijst die `beleid.js` al goedkeurde, en toets 1 houdt vast dat de
+uitkomst altijd een deelverzameling is), en zijn woordenschat komt uit de
+padsegmenten zelf zodat er geen tweede routelijst ontstaat. Twee dingen daar niet
+wegpoetsen: een versmalling die het GEVRAAGDE vermogen verbergt is de gevaarlijkste
+faalvorm van deze laag (vandaar dat `kaart` met `alles: true` de versmalling altijd
+overslaat), en een brug als `taxi -> ride` wordt getoetst tegen de echte routes --
+`taxi -> rit` wees nergens heen en werd door die toets gevonden.
 
 **`LAT.md` is de technische lat** — elf regels die allemaal uit een fout komen die hier écht is gemaakt, met per regel wat hem handhaaft en waar er alleen op mensen wordt vertrouwd. Lees die vóór je code schrijft of repareert. De belangrijkste twee: repareer de oorzaak en niet het symptoom, en trek elke bewering na met een mutatie (een toets die je niet hebt zien zakken is geen toets). LAT.md gaat over de code, CLAUDE.md over het merk.
 

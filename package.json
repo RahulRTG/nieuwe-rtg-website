@@ -114,6 +114,7 @@
     "objectmodel": "node scripts/objectmodel.js",
     "objectmodel:vast": "node scripts/objectmodel.js --vastleggen",
     "capabilities": "node scripts/capabilities.js",
+    "resolver": "node scripts/resolver.js",
     "capabilityroepers": "node scripts/capabilityroepers.js",
     "capabilities:vast": "node scripts/capabilities.js --vastleggen",
     "magnaatlab": "node scripts/magnaatlab.js",

@@ -228,16 +228,72 @@ definitie niet in.
 
 ## 6. De negen blokken, met hun stand
 
-### Blok 0 — Capability resolver · **een stap weg**
+### Blok 0 — Capability resolver · **GEBOUWD**
 
-Een deterministische voorselectie vóór het model: per opdracht acht tot vijftien
-relevante paden in plaats van de hele allowlist. `toegestanePaden()` bestaat al;
-wat erbij komt is de domein- en contextherkenning ervoor.
+`server/kern/stuur/resolver.js` (de weging) met `stuur/resolver-woorden.js`
+(de taalkant), aangehaakt op de tool `kaart` in `stuur/lus.js`. Een deterministische voorselectie vóór het model: per opdracht
+de paden die de vraag raken, in plaats van alles wat de rol mag.
 
-Dit verandert geen autoriteit — het maakt de reeds toegestane wereld kleiner
-voor déze opdracht. Winst: minder tokens, minder ambiguïteit, betere
-toolselectie, kleiner aanvalsvlak. Het is de enige stap die vandaag waarde
-levert zonder iets te verplaatsen, en daarom staat hij vooraan.
+**Gemeten, niet geschat** — `npm run resolver` rekent het na op de echte
+routes uit `IDEMPROEF.json`, door dezelfde `toegestanePaden()` als het stuur:
+
+| rol | toegestaan | werkveld na versmalling |
+|---|---|---|
+| member | 120 | 1–15 |
+| supplier | 40 | 1–14 |
+| staff | 16 | 2–5 |
+
+Zestien gewone opdrachten, alle zestien versmald, **gemiddeld 5,6 paden — 91%
+kleiner**. Het kleinste werkveld is één pad, en juist daarom kan het model
+altijd om de volledige lijst vragen.
+
+De meter zegt er zelf bij wat hij niet meet: of het model met dat werkveld de
+júiste keuze maakt, en of echte gebruikers zulke zinnen typen — de vragen staan
+in het script, want een register van echte gebruikersvragen bestaat niet. Wie de
+vragen kiest, kiest het resultaat.
+
+**Dit verandert geen autoriteit.** De resolver krijgt de lijst die `beleid.js`
+al heeft goedgekeurd en filtert die array; hij kan structureel niets toevoegen.
+Dat is de eerste toets in `test/stuur-resolver.test.js` en niet een belofte in
+tekst: wat eruit komt is altijd een deelverzameling van wat erin ging, ook bij
+een vraag die zelf een pad noemt.
+
+**De woordenschat komt uit de paden zelf.** Een tabel "bestellen →
+`/api/supplier/agent/voorstel`" zou een tweede routelijst zijn en binnen een
+maand achterlopen (`LAT.md` regel 4; `check.js` regel 56 telt eigen routelijsten
+om precies die reden). De segmenten van een pad zijn de woorden. Een nieuwe
+route doet het dus meteen mee — toets 10 bewijst dat met een pad dat niemand
+ooit heeft voorzien.
+
+**Drie dingen gingen echt mis tijdens het bouwen, en ze staan nu vast:**
+
+- *"Maak 200 euro over"* koos `/api/meet/maak` en miste `/api/bank/overboek` —
+  een scheidbaar werkwoord, waarvan de delen los in de zin staan en waarvan
+  `over` bovendien een stopwoord is.
+- *"Boek een tafel"* leverde alleen `/api/reservering/annuleer` op. Dat is de
+  gevaarlijkste faalvorm van deze hele laag: **een versmalling die precies het
+  gevraagde vermogen verbergt.** Daarom mag een menselijk woord meer dan één
+  brug hebben, en daarom kan het model de versmalling altijd overslaan
+  (`kaart` met `alles: true`). Een fout in deze weging mag nooit een vermogen
+  verbergen dat de gebruiker gewoon heeft.
+- *"Hoe gaat het met mijn zaak"* versmalde naar vijftien paden op alfabet. De
+  brug `zaak → supplier` raakte élk pad van die rol even hard, en dan is de
+  uitslag geen selectie maar een greep. De oorzaak zat in een opsomming
+  (`api`, `member`, `staff` gelden niet mee) waar `supplier` toevallig niet in
+  stond. Dat is nu **geteld in plaats van opgesomd**: een segment dat in álle
+  paden van de lijst staat, draagt geen informatie en telt niet mee. Een lijst
+  die morgen een vierde rolvoorvoegsel krijgt, doet het meteen goed.
+
+**De bruggen hebben tanden.** Toets 9 controleert dat elk doelwoord ook echt als
+segment in de routes voorkomt. Hij sloeg meteen aan: `taxi → rit` wees nergens
+heen, want die routes heten `ride`. Dat is dezelfde fout als de cap `rooms` die
+een document noemde en die niet bestond.
+
+**Wat hij niet kan, en dat staat er eerlijk bij:** samenstellingen. "Zoek een
+hotelkamer" wordt niet versmald, omdat `hotelkamer` als één woord geen segment
+raakt. De uitkomst is dan de volledige lijst met de reden erbij — nooit een leeg
+werkveld, want dat zou het model laten zeggen "dat kan ik niet", en dat is een
+leugen over wat de gebruiker mag.
 
 ### Blok 1 — Capability-compiler · **een besluit nodig**
 
@@ -406,6 +462,15 @@ de proefopstelling geen gekoppelde groothandel en geen openstaand voorstel had.
 Een zaaisituatie erbij en de keten is meetbaar — de goedkoopste denkbare eerste
 taak. Tegelijk laat de rechterkolom zien dat de bewijsketen sluiten voor deze
 ene keten echt werk is, en dat is precies wat je wilt weten vóór je uitschaalt.
+
+**En er is een vierde ding, gevonden bij het bouwen van blok 0: geen van deze
+vier routes staat op de AI-allowlist.** `beleidVoor()` geeft voor alle vier
+`verboden` met dezelfde reden — *"deze actie staat niet op de expliciete
+AI-allowlist voor supplier"*. Dat is geen gat maar de opzet: een nieuwe route
+is nooit automatisch AI-bedienbaar, en iemand moet er per pad naar hebben
+gekeken. Het betekent wel dat de eerste stap van deze keten een **menselijk
+besluit** is en geen commit — precies zoals het hoort, en precies het soort stap
+dat je niet ontdekt zolang je alleen over de architectuur praat.
 
 De keten is af als elk van deze tien punten voor dit ene scenario groen is:
 intentie → resolver → formeel plan → capabilities bewezen → risico uit één

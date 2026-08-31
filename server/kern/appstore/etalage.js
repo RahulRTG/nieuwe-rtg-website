@@ -22,6 +22,7 @@
 'use strict';
 
 const { toonbaar } = require('./machtigingen');
+const { bereik } = require('./bereik');
 
 module.exports = function maakEtalage(kern) {
   const { S, app, versie, uitgever, eigen, geld } = kern;
@@ -84,6 +85,13 @@ module.exports = function maakEtalage(kern) {
       gekocht: prijsVan(v) > 0 ? heeftGekocht(key, a.sleutel) : true,
       geinstalleerd: !!verleend,
       verleend: verleend ? toonbaar(verleend.machtigingen, verleend.doelen) : [],
+      /* HOE VER DEZE APP KOMT, in een woord. Twee keer dezelfde rekensom over
+         twee verschillende vragen: wat het manifest VRAAGT, en wat dit lid
+         werkelijk heeft VERLEEND. Die twee door elkaar halen is grens 4, dus ze
+         staan hier onder twee namen en nooit onder een. Afgeleid in
+         ./bereik.js; er is geen veld waarmee een uitgever dit zet. */
+      vraagtBereik: bereik(v.manifest.machtigingen),
+      verleendBereik: verleend ? bereik(verleend.machtigingen) : null,
       /* WAT DEZE UPDATE MEER VRAAGT DAN JE HEBT GEGEVEN. Zonder dit kan een app
          stilletjes groeien in bevoegdheden: een nieuwe versie zet een machtiging
          in zijn manifest en niemand die het ziet. Hij wordt hier UITGEREKEND en

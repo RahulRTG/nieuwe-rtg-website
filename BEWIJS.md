@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1442 bestanden en 10145 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1443 bestanden en 10152 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1442 |
-| losse beweringen (`test(...)`) | 10145 |
+| toetsbestanden | 1443 |
+| losse beweringen (`test(...)`) | 10152 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 50 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 969 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 38 |
 | alleen in de kop *genoemd*, nog niet gemeten | 133 |
-| niets van beide | 292 |
+| niets van beide | 293 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1267 bestanden, 9844 beweringen.
+1268 bestanden, 9851 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -289,7 +289,7 @@ toets omvalt.
 | `eigenaarwerkplek.test.js` | 1 | gezakt op `liegpoort /api/` | De eigenaar ziet zijn werkplek, OOK in productie. server/eigenaar.js legt vast dat de eigenaar bij de beheeromgevingen kan, met zoveel woorden: "de RTG-Backoffice (met zijn eigen accountlogin, zonder aparte code)". |
 | `eigenip.test.js` | 2 | gezakt op `liegpoort /api/` | EEN ADRES DAT DE BEZOEKER ZELF MAG KIEZEN, IS GEEN ADRES. Elke snelheidslimiet, elk verbod en elke teller in dit huis rekent op het adres van de aanroeper. |
 | `eigenpoort.test.js` | 5 | genoemd | DE POORT IN DE HANDLER IS IETS ANDERS DAN OPENBAAR. WAT ER MIS GING, en het was mijn eigen keuze. |
-| `eindpoort.test.js` | 4 | -- | WAT AF IS, BLIJFT AF -- de eindpoort op de bakken die op nul staan. De eigenaar wil uiteindelijk een build die alleen groen wordt als ELKE bak van scripts/onbewezen.js op nul staat. |
+| `eindpoort.test.js` | 5 | -- | WAT AF IS, BLIJFT AF -- de eindpoort op de bakken die op nul staan. De eigenaar wil uiteindelijk een build die alleen groen wordt als ELKE bak van scripts/onbewezen.js op nul staat. |
 | `envelop.test.js` | 12 | gezakt op `!==->===#0` | DE EVENTENVELOP: de taal op de bus. OS.md par. |
 | `envelopvorm.test.js` | 14 | -- | DE CANONIEKE ENVELOP (server/opzet/envelop.js). WAT HIER OP HET SPEL STAAT. |
 | `ervaring.test.js` | 9 | gezakt op `liegpoort /api/` | End-to-end tests voor de ervaring-laag (kern/ervaring.js): tafelreserveringen, annuleren, reviews, favorieten, fooi, de reisagenda, rekening splitsen, wachtlijsten, RTG-punten en meldingsvoorkeuren. Tegen een echte... |
@@ -1289,6 +1289,7 @@ toets omvalt.
 | `zaakcommand-routes.test.js` | 8 | gezakt op `liegpoort /api/` | DE ROUTES VAN ZAAK COMMAND -- de commandolaag van EEN zaak, over HTTP. test/zaakcommand.test.js toetst de motor met nagemaakte gegevens: daar staat dat de zaak niets van de buurman ziet en niets van RTG. |
 | `zaakcommand.test.js` | 8 | gezakt op `===->!==#0` | Zaak Command (kern/zaakcommand/): dezelfde commandologica als RTG Command, maar van EEN zaak en uitsluitend over die zaak. Deze toets bewijst vier dingen: de zaak ziet niets van een andere zaak en niets van RTG; een... |
 | `zaakdoos.test.js` | 10 | gezakt op `liegpoort /api/` | De Zaakdoos end-to-end: een cloudserver en een doos-kastje ernaast. 1. |
+| `zaakinlog.test.js` | 6 | -- | Inloggen bij een zaak: op een plek, met een teller die klopt. Deze module bestaat omdat er TWEE implementaties van dezelfde handeling stonden -- de genrewereld en de proefsleutels deden allebei rooster+login -- en de... |
 | `zaaktools.test.js` | 2 | gezakt op `liegpoort /api/` | De gereedschappen die elke zaak krijgt: reageren op reviews (met melding aan de gast) en de lichte voorraad met drempelmeldingen. |
 | `zaaktransactie.test.js` | 5 | gezakt op `===->!==#0` | DE HERSTELTRANSACTIE AAN DE ZAAK-KANT. Tot vandaag draaide kern/zaakcommand zijn recepten rechtstreeks door runbooks.voer(). |
 | `zakelijk.test.js` | 6 | gezakt op `liegpoort /api/` | Integratietests voor RTG Zakelijk (de LinkedIn-laag van de Business Pass): profiel (opt-in), gids, professioneel verbinden via de bestaande vriendengraaf, de zakelijke feed en aanbevelingen. Draait tegen een echte... |

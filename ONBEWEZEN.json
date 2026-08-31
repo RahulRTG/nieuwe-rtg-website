@@ -1,19 +1,19 @@
 {
   "metingGebruikt": true,
-  "metingReden": "gemeten op commit b3a2d336, schone boom",
+  "metingReden": "gemeten op commit 7b9d1e31, schone boom",
   "stempel": {
-    "op": "2026-08-31T12:32:59.924Z",
-    "commit": "b3a2d336",
+    "op": "2026-08-31T13:13:49.139Z",
+    "commit": "7b9d1e31",
     "boomVuil": true,
     "node": "v22.22.2",
     "metingGebruikt": true,
-    "metingReden": "gemeten op commit b3a2d336, schone boom"
+    "metingReden": "gemeten op commit 7b9d1e31, schone boom"
   },
   "uitleg": "Waarom heeft deze mutatie geen geldig bewijs? De bakken staan van GOEDKOOP naar DUUR en een route valt in de EERSTE die past. De invariant: ONBEWEZEN mag alleen kleiner worden doordat een route geldig bewijs krijgt, nooit doordat een foutreden wordt hernoemd -- daarom ratelt het TOTAAL en niet de bakken. Zie de kop van scripts/onbewezen.js.",
   "gemeten": {
     "mutaties": 4661,
-    "metBewijs": 2095,
-    "onbewezen": 2566,
+    "metBewijs": 2097,
+    "onbewezen": 2564,
     "sluit": true
   },
   "bakken": [
@@ -76,7 +76,7 @@
     {
       "id": "FIXTURE_404",
       "uitleg": "de eerste oproep gaf 404 -- het object of de relatie bestaat niet",
-      "aantal": 1468,
+      "aantal": 1461,
       "voorbeelden": [
         "POST /api/aandacht",
         "POST /api/aanmelding/opzeggen",
@@ -87,7 +87,7 @@
     {
       "id": "FIXTURE_409",
       "uitleg": "de eerste oproep gaf 409 -- de toestand is niet voorbereid",
-      "aantal": 111,
+      "aantal": 113,
       "voorbeelden": [
         "POST /api/aanmelding/bewijs",
         "POST /api/aanmelding/bewijs/teken",
@@ -98,7 +98,7 @@
     {
       "id": "FIXTURE_422",
       "uitleg": "de eerste oproep gaf 400 of 422 -- lijf, velden of query kloppen niet",
-      "aantal": 758,
+      "aantal": 761,
       "voorbeelden": [
         "POST /api/aanmelding/beslis",
         "POST /api/agenda/antwoord",
@@ -1492,11 +1492,6 @@
       "POST /api/supplier/horeca/club/gastenlijst/beslis",
       "POST /api/supplier/horeca/dish-twin/concept",
       "POST /api/supplier/horeca/dish-twin/publiceer",
-      "POST /api/supplier/horeca/event/aanbetaling",
-      "POST /api/supplier/horeca/event/akkoord",
-      "POST /api/supplier/horeca/event/kosten",
-      "POST /api/supplier/horeca/event/nacalculatie",
-      "POST /api/supplier/horeca/event/posten",
       "POST /api/supplier/horeca/folio/afrekenen",
       "POST /api/supplier/horeca/folio/boek",
       "POST /api/supplier/horeca/folio/borg",
@@ -1523,14 +1518,12 @@
       "POST /api/supplier/horeca/rekening/voeg-samen",
       "POST /api/supplier/horeca/verzoeken/zet",
       "POST /api/supplier/horeca/wijk/aanvaard",
-      "POST /api/supplier/horeca/wijk/bied",
       "POST /api/supplier/horeca/wijk/gezien",
       "POST /api/supplier/horeca/wijk/laat",
-      "POST /api/supplier/horeca/wijk/neem",
       "POST /api/supplier/horeca/wijk/tafel-terug",
       "POST /api/supplier/horeca/wijk/trek-in",
-      "POST /api/supplier/horeca/wijk/weg",
       "POST /api/supplier/horeca/wijk/weiger",
+      "POST /api/supplier/horeca/wijk/zet",
       "POST /api/supplier/hr/certificaat",
       "POST /api/supplier/hr/certificaat/weg",
       "POST /api/supplier/hr/gesprek",
@@ -1924,8 +1917,10 @@
       "POST /api/supplier/horeca/betaal",
       "POST /api/supplier/horeca/bezorg/check",
       "POST /api/supplier/horeca/club/band/terug",
+      "POST /api/supplier/horeca/event/aanbetaling",
       "POST /api/supplier/horeca/missions/activeer",
       "POST /api/supplier/horeca/wave/activeer",
+      "POST /api/supplier/horeca/wijk/bied",
       "POST /api/supplier/huur/foto",
       "POST /api/supplier/huur/fotos",
       "POST /api/supplier/huur/overzicht",
@@ -2561,7 +2556,10 @@
       "POST /api/supplier/horeca/bezorg/afgeleverd",
       "POST /api/supplier/horeca/bezorg/route",
       "POST /api/supplier/horeca/club/tafel",
+      "POST /api/supplier/horeca/event/akkoord",
+      "POST /api/supplier/horeca/event/kosten",
       "POST /api/supplier/horeca/event/offerte",
+      "POST /api/supplier/horeca/event/posten",
       "POST /api/supplier/horeca/folio/open",
       "POST /api/supplier/horeca/fooienpot",
       "POST /api/supplier/horeca/gast/qr",

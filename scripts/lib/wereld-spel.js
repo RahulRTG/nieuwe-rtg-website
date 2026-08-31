@@ -35,7 +35,7 @@ async function zetSpelKlaar({ post, tokens, gezinLijf }) {
   const een = (tokens || {}).member;
   const twee = (tokens || {})['member-account'];
   if (!een || !twee) {
-    return { klaar: false, extra: {}, stappen,
+    return { klaar: false, extra: {}, stappen, idVoor: () => ({}),
       reden: 'er zijn twee verschillende ledensessies nodig; een potje ontstaat pas met een tegenstander' };
   }
 
@@ -45,7 +45,8 @@ async function zetSpelKlaar({ post, tokens, gezinLijf }) {
   stappen.push({ naam: 'de spelsoorten opvragen', pad: '/api/member/spel/varianten',
     status: v ? v.status : 0, ok: !!soorten.length,
     waarom: soorten.length ? null : 'geen enkele spelsoort teruggekregen' });
-  if (!soorten.length) return { klaar: false, extra: {}, stappen, reden: 'zonder spelsoort valt er niets te starten' };
+  if (!soorten.length) return { klaar: false, extra: {}, stappen, idVoor: () => ({}),
+    reden: 'zonder spelsoort valt er niets te starten' };
 
   for (const soort of soorten) {
     let a = null, b = null;
@@ -79,12 +80,28 @@ async function zetSpelKlaar({ post, tokens, gezinLijf }) {
        Lukt deze helft niet, dan blijft de RTG-helft gewoon staan. Twee
        halve werelden zijn beter dan een die valt op de tweede. */
     const rtf = await rtfPotje(post, gezinLijf, soort, stappen);
+
+    /* EN EEN TWEEDE POTJE, om dezelfde reden waarom de school een tweede
+       medewerker heeft. /api/member/spel/opgeven beeindigt het potje, en de
+       proef roept elke route aan -- dus gaf zij haar eigen potje op, en elke
+       spelroute die alfabetisch NA `opgeven` komt (staat, zet, ...) viel
+       daarna om. De wereldcontrole na afloop vond dat; eerder werd zoiets bij
+       toeval ontdekt.
+
+       Het verschil met de school is dat daar twee VELDEN bestonden
+       (personeelId naast klasCode) en hier maar een: alles heet `id`. De
+       scheiding moet dus per ROUTE, net als bij het livinglab. `opgeven` krijgt
+       het reservepotje; al het andere het echte. */
+    const reserve = await tweedePotje(post, tokens, soort, stappen);
+
     const extra = { id, potje: id, soort };
+    if (reserve) extra.reserve = reserve;
     if (rtf) extra.rtf = rtf;
-    return { klaar: true, extra, stappen, reden: null };
+    return { klaar: true, extra, stappen, reden: null,
+      idVoor: (pad) => idVoor(extra, pad) };
   }
 
-  return { klaar: false, extra: {}, stappen,
+  return { klaar: false, extra: {}, stappen, idVoor: () => ({}),
     reden: 'geen van de ' + soorten.length + ' spelsoorten leverde een potje op; zie stappen' };
 }
 
@@ -126,4 +143,33 @@ async function rtfPotje(post, gezinLijf, soort, stappen) {
   return id ? { id, potje: id, code: G.code, token: G.token, profielId } : null;
 }
 
-module.exports = { zetSpelKlaar };
+/* Nog een potje uit dezelfde wachtrij, met dezelfde twee spelers. */
+async function tweedePotje(post, tokens, soort, stappen) {
+  const een = tokens.member, twee = tokens['member-account'];
+  let a = null, b = null;
+  try { a = await post('/api/member/spel/random', { soort, grootte: 2 }, een); } catch (e) { a = null; }
+  if (!a || a.status !== 200) {
+    stappen.push({ naam: 'reservepotje', pad: '/api/member/spel/random', status: a ? a.status : 0,
+      ok: false, waarom: (a && a.data && a.data.error) || 'geen antwoord' });
+    return null;
+  }
+  try { b = await post('/api/member/spel/random', { soort, grootte: 2 }, twee); } catch (e) { b = null; }
+  const id = b && b.status === 200 && b.data && b.data.id;
+  stappen.push({ naam: 'reservepotje voor de routes die een potje beeindigen',
+    pad: '/api/member/spel/random', status: b ? b.status : 0, ok: !!id,
+    waarom: id ? null : ((b && b.data && b.data.error) || 'er ontstond geen tweede potje') });
+  return id || null;
+}
+
+/* Welke routes krijgen het RESERVEpotje. Klein en met de reden erbij: elke
+   route hier beeindigt een potje, en met het echte potje sloopt de proef haar
+   eigen wereld. Wie er een bij zet, doet dat omdat de wereldcontrole na afloop
+   klaagt -- niet op gevoel. */
+const BEEINDIGT = new Set(['/api/member/spel/opgeven', '/api/rtf/spel/opgeven']);
+
+function idVoor(extra, pad) {
+  if (!BEEINDIGT.has(String(pad || ''))) return {};
+  return extra.reserve ? { id: extra.reserve, potje: extra.reserve } : {};
+}
+
+module.exports = { zetSpelKlaar, BEEINDIGT, idVoor };

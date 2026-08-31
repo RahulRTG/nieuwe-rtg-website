@@ -356,8 +356,8 @@ wachtOpSchoneBoom();
       ...(r.pad.startsWith('/api/rtfos/') ? rtfosWereld.extra : {}),
       ...(r.pad.startsWith('/api/festival/') ? festivalWereld.extra : {}),
       ...(r.pad.startsWith('/api/lab2/') ? { ...lab2Wereld.extra, ...lab2Wereld.idVoor(r.pad) } : {}),
-      ...(r.pad.startsWith('/api/member/spel/') ? spelWereld.extra : {}),
-      ...(r.pad.startsWith('/api/rtf/spel/') ? (spelWereld.extra.rtf || {}) : {}),
+      ...(r.pad.startsWith('/api/member/spel/') ? { ...spelWereld.extra, ...spelWereld.idVoor(r.pad) } : {}),
+      ...(r.pad.startsWith('/api/rtf/spel/') ? { ...(spelWereld.extra.rtf || {}), ...spelWereld.idVoor(r.pad) } : {}),
       ...(lijfsleutels.lijfVoor(r.pad) || {}) }),
     koppenVoor: (r) => lijfsleutels.koppenVoor(r.pad)
   });
@@ -443,8 +443,8 @@ wachtOpSchoneBoom();
       ...(r.pad.startsWith('/api/rtfos/') ? rtfosWereld.extra : {}),
       ...(r.pad.startsWith('/api/festival/') ? festivalWereld.extra : {}),
       ...(r.pad.startsWith('/api/lab2/') ? { ...lab2Wereld.extra, ...lab2Wereld.idVoor(r.pad) } : {}),
-      ...(r.pad.startsWith('/api/member/spel/') ? spelWereld.extra : {}),
-      ...(r.pad.startsWith('/api/rtf/spel/') ? (spelWereld.extra.rtf || {}) : {}),
+      ...(r.pad.startsWith('/api/member/spel/') ? { ...spelWereld.extra, ...spelWereld.idVoor(r.pad) } : {}),
+      ...(r.pad.startsWith('/api/rtf/spel/') ? { ...(spelWereld.extra.rtf || {}), ...spelWereld.idVoor(r.pad) } : {}),
       ...(lijfsleutels.lijfVoor(r.pad) || {}), ...(geldLijven[r.pad] || {}) }),
     koppenVoor: (r) => lijfsleutels.koppenVoor(r.pad), maxRoutes: MAX, staatVan,
     /* De stand van het opslag-meetpunt reist mee: in stand 2 mag de uitslag
@@ -513,6 +513,22 @@ wachtOpSchoneBoom();
   console.log('  onbeschermd MET een besluit          : ' + (onbeschermd.length - zonderBesluit.length) + ' / ' + onbeschermd.length);
   if (zonderBesluit.length) console.log('      zonder besluit in IDEMBESLUIT.json: ' + zonderBesluit.length);
 
+  /* STAAT DE WERELD ER NA AFLOOP NOG. Zie ./lib/wereldcontrole.js: de proef
+     roept elke route aan, en er staan 26 sloopachtige routes BINNEN de
+     werelden die zij zelf opzet. Een wereld die halverwege sneuvelt meldde
+     zich nog steeds klaar -- want klaar was hij, aan het begin. */
+  const { controleerWerelden } = require('./lib/wereldcontrole');
+  const wereldStand = await controleerWerelden({
+    post, tokenVoor,
+    extras: { school: schoolWereld.extra, rtfos: rtfosWereld.extra,
+      festival: festivalWereld.extra, lab2: lab2Wereld.extra, spel: spelWereld.extra }
+  });
+  const gesneuveld = wereldStand.filter(w => w.gecontroleerd && !w.ok);
+  console.log('\n  de werelden NA afloop                : ' +
+    wereldStand.filter(w => w.ok).length + ' overeind, ' + gesneuveld.length + ' gesneuveld, ' +
+    wereldStand.filter(w => !w.gecontroleerd).length + ' niet gecontroleerd');
+  for (const w of wereldStand) if (!w.ok) console.log('      ' + w.wereld + ': ' + w.waarom);
+
   fs.writeFileSync(UITSLAG, JSON.stringify({
     stempel: stempel(),
     uitleg: 'Per route drie oproepen: twee met dezelfde sleutel en een met een verse. De derde is de ' +
@@ -539,6 +555,7 @@ wachtOpSchoneBoom();
          veld, en een familie die niet is gebouwd dekt niets. */
       objectenGemaakt: objecten.gelukt, objectTakken: objecten.takken,
       schoolwereld: schoolWereld.klaar, horecawereld: horecaWereld.klaar,
+      werelden: wereldStand,
       rolOpgewaardeerd: opgewaardeerd.length, rolOpwaarderingGeweigerd: geweigerd.length,
       schoolwereldStappen: schoolWereld.stappen.map(x => ({ naam: x.naam, ok: x.ok, waarom: x.waarom })),
       lijfsleutelsGebouwd: lijfsleutels.gebouwd.map(g => g.naam),

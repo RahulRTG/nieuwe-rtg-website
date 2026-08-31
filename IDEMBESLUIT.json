@@ -18,7 +18,7 @@
  },
  "telling": {
   "creatie": 45,
-  "berekening": 42,
+  "berekening": 43,
   "instelling": 19,
   "beschermd": 15,
   "code-maker": 4,
@@ -28,8 +28,48 @@
   "/api/agenda/toevoegen": {
    "klasse": "creatie"
   },
+  "/api/bank/bulk": {
+   "klasse": "beschermd",
+   "reden": "Gerepareerd op 24 augustus (TAKEN.md 4.57): loopt nu door metIdem uit server/lib/idem.js, met de afdruk op de geld-bepalende velden en de vrije omschrijving er nadrukkelijk NIET in. Afdruk: bron, soort run, aantal posten en het TOTAAL -- niet de losse IBAN's en niet de volgorde. Vijfduizend begunstigden in een afdruk is een sleutel die niemand meer kan vergelijken, en dezelfde run anders gesorteerd is dezelfde opdracht."
+  },
+  "/api/bank/naar-wallet": {
+   "klasse": "beschermd",
+   "reden": "Gerepareerd op 24 augustus (TAKEN.md 4.57): loopt nu door metIdem uit server/lib/idem.js, met de afdruk op de geld-bepalende velden en de vrije omschrijving er nadrukkelijk NIET in. Afdruk: rekening en bedrag. Hier weegt de sleutel zwaarder dan elders in de bank: de brug raakt TWEE grootboeken, en tussen die twee boekingen zit een handmatige terugdraai die twee gelijktijdige retries konden kruisen."
+  },
+  "/api/bank/overboek": {
+   "klasse": "beschermd",
+   "reden": "Gerepareerd op 24 augustus (TAKEN.md 4.57): loopt nu door metIdem uit server/lib/idem.js, met de afdruk op de geld-bepalende velden en de vrije omschrijving er nadrukkelijk NIET in. Afdruk: bron, doel en bedrag. De sleutelruimte bankIdem is bij deze ronde uit kern/bank/overboeken.js naar de gedeelde ctx van kern/bank/index.js verhuisd -- hij bestond al, maar alleen storten en sepa kwamen erbij."
+  },
+  "/api/bank/pas/betaal": {
+   "klasse": "beschermd",
+   "reden": "Gerepareerd op 24 augustus (TAKEN.md 4.57): loopt nu door metIdem uit server/lib/idem.js, met de afdruk op de geld-bepalende velden en de vrije omschrijving er nadrukkelijk NIET in. Afdruk: de pas en het bedrag. De sleutel valt NA de daglimietcontrole, zodat een geweigerde betaling er geen verbruikt -- anders zou de correctie erna een 409 krijgen op de afdruk van de mislukking."
+  },
+  "/api/bank/pas/uitgeven": {
+   "klasse": "beschermd",
+   "reden": "Gerepareerd op 24 augustus (TAKEN.md 4.57): loopt nu door metIdem uit server/lib/idem.js, met de afdruk op de geld-bepalende velden en de vrije omschrijving er nadrukkelijk NIET in. Afdruk: rekening en paskaartsoort; de naam niet (vrije tekst). Wie er bewust twee wil, doet een nieuwe poging met een verse sleutel -- dat blijft mogen, en dat is precies het verschil tussen een dubbeltik en een tweede besluit."
+  },
+  "/api/bank/rekening/open": {
+   "klasse": "creatie",
+   "reden": "Nog een rekening openen. Een dubbeltik geeft een tweede, lege rekening op naam van hetzelfde lid: hinderlijk in de lijst, en er gaat geen geld mee weg. Gevonden in dezelfde ronde als de negen hierboven, en met opzet NIET bij ze in gezet -- dat verschil is de hele reden dat dit register bestaat."
+  },
+  "/api/bank/salaris": {
+   "klasse": "beschermd",
+   "reden": "Gerepareerd op 24 augustus (TAKEN.md 4.57): loopt nu door metIdem uit server/lib/idem.js, met de afdruk op de geld-bepalende velden en de vrije omschrijving er nadrukkelijk NIET in. Zelfde batch-afdruk als bulk. De KANTOORkant (/api/office/bank/salaris/run) krijgt zijn sleutel niet van een knop maar uit het betaalbestand zelf (loonrun-id + bestand-id): die blijft gelden over sessies, schermen en medewerkers heen, dus twee kantoormedewerkers die tegelijk op Uitbetalen drukken betalen samen EEN keer uit."
+  },
+  "/api/bank/terugkerend/zet": {
+   "klasse": "beschermd",
+   "reden": "Gerepareerd op 24 augustus (TAKEN.md 4.57): loopt nu door metIdem uit server/lib/idem.js, met de afdruk op de geld-bepalende velden en de vrije omschrijving er nadrukkelijk NIET in. Afdruk: bron, doel, bedrag en interval. Dit was de duurste van de negen -- een dubbele vaste betaling betaalt niet een keer te veel maar elke maand -- en tegelijk de goedkoopste reparatie."
+  },
+  "/api/bank/van-wallet": {
+   "klasse": "beschermd",
+   "reden": "Gerepareerd op 24 augustus (TAKEN.md 4.57): loopt nu door metIdem uit server/lib/idem.js, met de afdruk op de geld-bepalende velden en de vrije omschrijving er nadrukkelijk NIET in. Zelfde als naar-wallet, andere richting."
+  },
   "/api/bestanden/upstart": {
    "klasse": "creatie"
+  },
+  "/api/bijles/vraag": {
+   "klasse": "creatie",
+   "reden": "Gevonden op 24 augustus door stand 2 van het tweede meetpunt (server/staatlog.js): een WIJZIGING OP ZIJN PLAATS verandert geen enkele lengte, dus met alleen lengtes stond deze route op ongemeten. Een vraag aan de bijlesbegeleider. Elke oproep is een nieuwe beurt in hetzelfde gesprek; twee keer vragen is twee keer vragen."
   },
   "/api/command/alarm": {
    "klasse": "berekening"
@@ -60,6 +100,10 @@
   },
   "/api/concern/opname/maak": {
    "klasse": "creatie"
+  },
+  "/api/drm/report": {
+   "klasse": "creatie",
+   "reden": "Lichte telemetrie: welke sleutelsystemen de speler van dit lid meldt, met een tijdstempel. Elke oproep is een WAARNEMING van een moment, dus twee oproepen horen twee regels te geven -- dat is wat een meetlog is. De lijst is afgekapt op 5.000 en raakt geen geld, geen toegang en geen persoonsgegevens buiten de codenaam. Gevonden door het tweede meetpunt (het antwoord is altijd {ok:true}); zie server/kern/drm.js."
   },
   "/api/gedachten/zet": {
    "klasse": "instelling"
@@ -95,6 +139,10 @@
   "/api/member/leren/project-maak": {
    "klasse": "creatie"
   },
+  "/api/member/leren/schrijf-bewaar": {
+   "klasse": "creatie",
+   "reden": "Gevonden op 24 augustus door stand 2 van het tweede meetpunt (server/staatlog.js): een WIJZIGING OP ZIJN PLAATS verandert geen enkele lengte, dus met alleen lengtes stond deze route op ongemeten. Bewaart een schrijfsel: kern/leren/schrijven.js zet er een voor in de lijst en kapt af op twintig. Een tweede keer bewaren geeft een tweede versie, en dat is bij schrijfwerk gewenst."
+  },
   "/api/member/magnaat/economie/beslis": {
    "klasse": "berekening"
   },
@@ -113,6 +161,10 @@
   },
   "/api/muziek/rahul": {
    "klasse": "berekening"
+  },
+  "/api/office/aidata/export": {
+   "klasse": "berekening",
+   "reden": "Bouwt de AI-dataset uit de stand van dat moment en stuurt hem als JSONL terug; er wordt niets blijvends aangemaakt (de opslagdelta van alle drie de oproepen is leeg). Een tweede export hoort dus een VERSE uitkomst te geven -- dat de proef verschil ziet, is precies goed. Het enige wat hij achterlaat is een regel in kantoorAudit, en dat is een aantekening van de handeling en niet de handeling zelf (zie vastleggingUitleg). Gevonden op 29 augustus 2026, in de eerste ronde waarin dit instrument een boardroom-sleutel had; daarvoor was deze route ONGEMETEN en niet groen."
   },
   "/api/office/architect/maak": {
    "klasse": "creatie"
@@ -137,6 +189,14 @@
    "klasse": "instelling",
    "reden": "Zet de noodstop AAN. Twee keer zetten geeft dezelfde eindstand (nood actief); alleen het auditspoor krijgt twee regels, en dat is bij een noodschakelaar eerder gewenst dan hinderlijk."
   },
+  "/api/office/bank/opdrachten/ronde": {
+   "klasse": "berekening",
+   "reden": "Gevonden op 24 augustus door stand 2 van het tweede meetpunt (server/staatlog.js): een WIJZIGING OP ZIJN PLAATS verandert geen enkele lengte, dus met alleen lengtes stond deze route op ongemeten. De herkansingsronde van de betaalopdrachten: alles wat AAN DE BEURT is opnieuw indienen. Een tweede ronde doet weer wat aan de beurt is -- dat is de hele functie. Dubbel indienen wordt niet door deze knop tegengehouden maar door `volgendeAt` (een net ingediende opdracht is voorlopig niet aan de beurt) en door een `bezig`-vlag die twee rondes over elkaar heen verhindert; zie de kop van kern/betaalopdracht/rij.js."
+  },
+  "/api/office/bank/regels/check": {
+   "klasse": "berekening",
+   "reden": "Gevonden op 24 augustus door stand 2 van het tweede meetpunt (server/staatlog.js): een WIJZIGING OP ZIJN PLAATS verandert geen enkele lengte, dus met alleen lengtes stond deze route op ongemeten. De regelwacht loopt de fiscale regels na en schrijft de bevindingen weg. Een tweede check is een verse beoordeling van dezelfde stand -- een controle die de tweede keer niets meer zou zien, is geen controle."
+  },
   "/api/office/betalingen/status": {
    "klasse": "berekening"
   },
@@ -148,6 +208,10 @@
   },
   "/api/office/ideeen/maak": {
    "klasse": "creatie"
+  },
+  "/api/office/kamer/taak": {
+   "klasse": "creatie",
+   "reden": "Gevonden op 24 augustus door stand 2 van het tweede meetpunt (server/staatlog.js): een WIJZIGING OP ZIJN PLAATS verandert geen enkele lengte, dus met alleen lengtes stond deze route op ongemeten. Zet een taak op het bord van een afdeling (kern/afdelingen/boardroom). Twee keer op Toevoegen drukken geeft twee taken: hinderlijk, en het raakt geen geld."
   },
   "/api/office/kantoorpakket/maak": {
    "klasse": "creatie"
@@ -181,6 +245,10 @@
   },
   "/api/office/rtgai": {
    "klasse": "berekening"
+  },
+  "/api/office/stats": {
+   "klasse": "berekening",
+   "reden": "Platformcijfers opvragen: een POST die telt en niets aanmaakt. Dat de tweede oproep andere getallen geeft, is precies goed. Kwam als enige van deze groep uit het ANTWOORD en niet uit de opslag."
   },
   "/api/office/studio/collectie": {
    "klasse": "creatie"
@@ -219,6 +287,10 @@
    "klasse": "berekening",
    "reden": "Draait de wachtende schemamigraties, met een back-up ervoor. Een tweede oproep meldt \"al op schema v.., niets te doen\" -- dezelfde eindstand."
   },
+  "/api/onboarding/paspoort": {
+   "klasse": "instelling",
+   "reden": "Gevonden op 24 augustus door stand 2 van het tweede meetpunt (server/staatlog.js): een WIJZIGING OP ZIJN PLAATS verandert geen enkele lengte, dus met alleen lengtes stond deze route op ongemeten. Bewaart de paspoortvelden op het onboarding-profiel en in het ledendossier. Dezelfde gegevens twee keer opsturen geeft dezelfde eindstand; wat er bij een herhaling nog beweegt is het tijdstempel `at` waarop we ze het laatst zagen."
+  },
   "/api/onboarding/teken": {
    "klasse": "instelling"
   },
@@ -227,6 +299,10 @@
   },
   "/api/ov/code": {
    "klasse": "code-maker"
+  },
+  "/api/overheid/rijbewijs/verleng": {
+   "klasse": "instelling",
+   "reden": "Verlengen zet geldigTot op VANDAAG + 10 jaar, absoluut en niet opgeteld bij de vorige datum -- twee keer verlengen geeft dus dezelfde einddatum en niet twintig jaar rijbewijs. Vastgehouden in test/overheid.test.js 3, en met een mutatie (optellen in plaats van absoluut) gezien zakken. Wat er bij een herhaling WEL twee keer gebeurt, en dat hoort hier te staan in plaats van weggestreept: de inwoner krijgt een tweede bericht dat zijn rijbewijs is verlengd. Een dubbele brief is hinderlijk; het rijbewijs zelf schuift niet twee keer op. Berichten aan een mens gaan daarom NIET in de vastleggingslijst -- een tweede brief is iets dat iemand ziet."
   },
   "/api/overheid/water/meld": {
    "klasse": "beschermd",
@@ -238,8 +314,28 @@
   "/api/pay/tikcode": {
    "klasse": "code-maker"
   },
+  "/api/pay/verzoek": {
+   "klasse": "beschermd",
+   "reden": "Gerepareerd op 24 augustus (TAKEN.md 4.57): loopt nu door metIdem uit server/lib/idem.js, met de afdruk op de geld-bepalende velden en de vrije omschrijving er nadrukkelijk NIET in. Afdruk: de ontvangers (gesorteerd, dus dezelfde groep in een andere volgorde is hetzelfde verzoek) en het bedrag per persoon. Dit is de ledenkant van wat in 4.55 voor supplier/betaalverzoek is gedaan."
+  },
   "/api/privacy/export": {
    "klasse": "berekening"
+  },
+  "/api/residentie/betreed": {
+   "klasse": "instelling",
+   "reden": "Gevonden op 24 augustus door stand 2 van het tweede meetpunt (server/staatlog.js): een WIJZIGING OP ZIJN PLAATS verandert geen enkele lengte, dus met alleen lengtes stond deze route op ongemeten. Een kamer binnenlopen. De eerste keer krijg je een zitplek, daarna wordt alleen ververst wanneer je voor het laatst gezien bent (`leden[key].at`). Twee keer binnenlopen maakt je niet twee keer aanwezig."
+  },
+  "/api/residentie/emote": {
+   "klasse": "instelling",
+   "reden": "Gevonden op 24 augustus door stand 2 van het tweede meetpunt (server/staatlog.js): een WIJZIGING OP ZIJN PLAATS verandert geen enkele lengte, dus met alleen lengtes stond deze route op ongemeten. Een gebaar maken in de kamer. Het gebaar zelf gaat als sein naar de anderen en wordt nergens bewaard; het enige dat in de opslag beweegt is het aanwezigheidsstempel. Twee keer zwaaien mag, en hoort ook twee keer gezien te worden."
+  },
+  "/api/residentie/pols": {
+   "klasse": "instelling",
+   "reden": "Gevonden op 24 augustus door stand 2 van het tweede meetpunt (server/staatlog.js): een WIJZIGING OP ZIJN PLAATS verandert geen enkele lengte, dus met alleen lengtes stond deze route op ongemeten. De hartslag van de kamer: het scherm vraagt hoe de zaal ervoor staat en meldt daarmee dat je er nog bent. Herhaald aanroepen is hier niet een neveneffect maar de FUNCTIE; het enige dat verandert is het aanwezigheidsstempel."
+  },
+  "/api/rtgid/intrek": {
+   "klasse": "instelling",
+   "reden": "Gevonden op 24 augustus door stand 2 van het tweede meetpunt (server/staatlog.js): een WIJZIGING OP ZIJN PLAATS verandert geen enkele lengte, dus met alleen lengtes stond deze route op ongemeten. Toegang van een dienst intrekken. De intrekking zelf is idempotent -- de tweede oproep vindt geen niet-ingetrokken sessies meer en meldt `ingetrokken: 0`. Wat er dan nog beweegt is het INZAGEJOURNAAL, dat elke poging vastlegt. Dat hoort er te zijn: een tweede intrekpoging is iets wat het lid later terug moet kunnen zien."
   },
   "/api/rtgone/frictie": {
    "klasse": "berekening"
@@ -343,101 +439,13 @@
   "/api/wallet/voeg": {
    "klasse": "creatie"
   },
-  "/api/drm/report": {
-   "klasse": "creatie",
-   "reden": "Lichte telemetrie: welke sleutelsystemen de speler van dit lid meldt, met een tijdstempel. Elke oproep is een WAARNEMING van een moment, dus twee oproepen horen twee regels te geven -- dat is wat een meetlog is. De lijst is afgekapt op 5.000 en raakt geen geld, geen toegang en geen persoonsgegevens buiten de codenaam. Gevonden door het tweede meetpunt (het antwoord is altijd {ok:true}); zie server/kern/drm.js."
-  },
-  "/api/overheid/rijbewijs/verleng": {
-   "klasse": "instelling",
-   "reden": "Verlengen zet geldigTot op VANDAAG + 10 jaar, absoluut en niet opgeteld bij de vorige datum -- twee keer verlengen geeft dus dezelfde einddatum en niet twintig jaar rijbewijs. Vastgehouden in test/overheid.test.js 3, en met een mutatie (optellen in plaats van absoluut) gezien zakken. Wat er bij een herhaling WEL twee keer gebeurt, en dat hoort hier te staan in plaats van weggestreept: de inwoner krijgt een tweede bericht dat zijn rijbewijs is verlengd. Een dubbele brief is hinderlijk; het rijbewijs zelf schuift niet twee keer op. Berichten aan een mens gaan daarom NIET in de vastleggingslijst -- een tweede brief is iets dat iemand ziet."
-  },
-  "/api/bank/overboek": {
-   "klasse": "beschermd",
-   "reden": "Gerepareerd op 24 augustus (TAKEN.md 4.57): loopt nu door metIdem uit server/lib/idem.js, met de afdruk op de geld-bepalende velden en de vrije omschrijving er nadrukkelijk NIET in. Afdruk: bron, doel en bedrag. De sleutelruimte bankIdem is bij deze ronde uit kern/bank/overboeken.js naar de gedeelde ctx van kern/bank/index.js verhuisd -- hij bestond al, maar alleen storten en sepa kwamen erbij."
-  },
-  "/api/bank/bulk": {
-   "klasse": "beschermd",
-   "reden": "Gerepareerd op 24 augustus (TAKEN.md 4.57): loopt nu door metIdem uit server/lib/idem.js, met de afdruk op de geld-bepalende velden en de vrije omschrijving er nadrukkelijk NIET in. Afdruk: bron, soort run, aantal posten en het TOTAAL -- niet de losse IBAN's en niet de volgorde. Vijfduizend begunstigden in een afdruk is een sleutel die niemand meer kan vergelijken, en dezelfde run anders gesorteerd is dezelfde opdracht."
-  },
-  "/api/bank/salaris": {
-   "klasse": "beschermd",
-   "reden": "Gerepareerd op 24 augustus (TAKEN.md 4.57): loopt nu door metIdem uit server/lib/idem.js, met de afdruk op de geld-bepalende velden en de vrije omschrijving er nadrukkelijk NIET in. Zelfde batch-afdruk als bulk. De KANTOORkant (/api/office/bank/salaris/run) krijgt zijn sleutel niet van een knop maar uit het betaalbestand zelf (loonrun-id + bestand-id): die blijft gelden over sessies, schermen en medewerkers heen, dus twee kantoormedewerkers die tegelijk op Uitbetalen drukken betalen samen EEN keer uit."
-  },
-  "/api/bank/pas/betaal": {
-   "klasse": "beschermd",
-   "reden": "Gerepareerd op 24 augustus (TAKEN.md 4.57): loopt nu door metIdem uit server/lib/idem.js, met de afdruk op de geld-bepalende velden en de vrije omschrijving er nadrukkelijk NIET in. Afdruk: de pas en het bedrag. De sleutel valt NA de daglimietcontrole, zodat een geweigerde betaling er geen verbruikt -- anders zou de correctie erna een 409 krijgen op de afdruk van de mislukking."
-  },
-  "/api/bank/naar-wallet": {
-   "klasse": "beschermd",
-   "reden": "Gerepareerd op 24 augustus (TAKEN.md 4.57): loopt nu door metIdem uit server/lib/idem.js, met de afdruk op de geld-bepalende velden en de vrije omschrijving er nadrukkelijk NIET in. Afdruk: rekening en bedrag. Hier weegt de sleutel zwaarder dan elders in de bank: de brug raakt TWEE grootboeken, en tussen die twee boekingen zit een handmatige terugdraai die twee gelijktijdige retries konden kruisen."
-  },
-  "/api/bank/van-wallet": {
-   "klasse": "beschermd",
-   "reden": "Gerepareerd op 24 augustus (TAKEN.md 4.57): loopt nu door metIdem uit server/lib/idem.js, met de afdruk op de geld-bepalende velden en de vrije omschrijving er nadrukkelijk NIET in. Zelfde als naar-wallet, andere richting."
-  },
-  "/api/bank/terugkerend/zet": {
-   "klasse": "beschermd",
-   "reden": "Gerepareerd op 24 augustus (TAKEN.md 4.57): loopt nu door metIdem uit server/lib/idem.js, met de afdruk op de geld-bepalende velden en de vrije omschrijving er nadrukkelijk NIET in. Afdruk: bron, doel, bedrag en interval. Dit was de duurste van de negen -- een dubbele vaste betaling betaalt niet een keer te veel maar elke maand -- en tegelijk de goedkoopste reparatie."
-  },
-  "/api/bank/pas/uitgeven": {
-   "klasse": "beschermd",
-   "reden": "Gerepareerd op 24 augustus (TAKEN.md 4.57): loopt nu door metIdem uit server/lib/idem.js, met de afdruk op de geld-bepalende velden en de vrije omschrijving er nadrukkelijk NIET in. Afdruk: rekening en paskaartsoort; de naam niet (vrije tekst). Wie er bewust twee wil, doet een nieuwe poging met een verse sleutel -- dat blijft mogen, en dat is precies het verschil tussen een dubbeltik en een tweede besluit."
-  },
-  "/api/pay/verzoek": {
-   "klasse": "beschermd",
-   "reden": "Gerepareerd op 24 augustus (TAKEN.md 4.57): loopt nu door metIdem uit server/lib/idem.js, met de afdruk op de geld-bepalende velden en de vrije omschrijving er nadrukkelijk NIET in. Afdruk: de ontvangers (gesorteerd, dus dezelfde groep in een andere volgorde is hetzelfde verzoek) en het bedrag per persoon. Dit is de ledenkant van wat in 4.55 voor supplier/betaalverzoek is gedaan."
-  },
-  "/api/bank/rekening/open": {
-   "klasse": "creatie",
-   "reden": "Nog een rekening openen. Een dubbeltik geeft een tweede, lege rekening op naam van hetzelfde lid: hinderlijk in de lijst, en er gaat geen geld mee weg. Gevonden in dezelfde ronde als de negen hierboven, en met opzet NIET bij ze in gezet -- dat verschil is de hele reden dat dit register bestaat."
-  },
-  "/api/bijles/vraag": {
-   "klasse": "creatie",
-   "reden": "Gevonden op 24 augustus door stand 2 van het tweede meetpunt (server/staatlog.js): een WIJZIGING OP ZIJN PLAATS verandert geen enkele lengte, dus met alleen lengtes stond deze route op ongemeten. Een vraag aan de bijlesbegeleider. Elke oproep is een nieuwe beurt in hetzelfde gesprek; twee keer vragen is twee keer vragen."
-  },
-  "/api/member/leren/schrijf-bewaar": {
-   "klasse": "creatie",
-   "reden": "Gevonden op 24 augustus door stand 2 van het tweede meetpunt (server/staatlog.js): een WIJZIGING OP ZIJN PLAATS verandert geen enkele lengte, dus met alleen lengtes stond deze route op ongemeten. Bewaart een schrijfsel: kern/leren/schrijven.js zet er een voor in de lijst en kapt af op twintig. Een tweede keer bewaren geeft een tweede versie, en dat is bij schrijfwerk gewenst."
-  },
-  "/api/office/bank/opdrachten/ronde": {
-   "klasse": "berekening",
-   "reden": "Gevonden op 24 augustus door stand 2 van het tweede meetpunt (server/staatlog.js): een WIJZIGING OP ZIJN PLAATS verandert geen enkele lengte, dus met alleen lengtes stond deze route op ongemeten. De herkansingsronde van de betaalopdrachten: alles wat AAN DE BEURT is opnieuw indienen. Een tweede ronde doet weer wat aan de beurt is -- dat is de hele functie. Dubbel indienen wordt niet door deze knop tegengehouden maar door `volgendeAt` (een net ingediende opdracht is voorlopig niet aan de beurt) en door een `bezig`-vlag die twee rondes over elkaar heen verhindert; zie de kop van kern/betaalopdracht/rij.js."
-  },
-  "/api/office/bank/regels/check": {
-   "klasse": "berekening",
-   "reden": "Gevonden op 24 augustus door stand 2 van het tweede meetpunt (server/staatlog.js): een WIJZIGING OP ZIJN PLAATS verandert geen enkele lengte, dus met alleen lengtes stond deze route op ongemeten. De regelwacht loopt de fiscale regels na en schrijft de bevindingen weg. Een tweede check is een verse beoordeling van dezelfde stand -- een controle die de tweede keer niets meer zou zien, is geen controle."
-  },
-  "/api/office/kamer/taak": {
-   "klasse": "creatie",
-   "reden": "Gevonden op 24 augustus door stand 2 van het tweede meetpunt (server/staatlog.js): een WIJZIGING OP ZIJN PLAATS verandert geen enkele lengte, dus met alleen lengtes stond deze route op ongemeten. Zet een taak op het bord van een afdeling (kern/afdelingen/boardroom). Twee keer op Toevoegen drukken geeft twee taken: hinderlijk, en het raakt geen geld."
-  },
-  "/api/office/stats": {
-   "klasse": "berekening",
-   "reden": "Platformcijfers opvragen: een POST die telt en niets aanmaakt. Dat de tweede oproep andere getallen geeft, is precies goed. Kwam als enige van deze groep uit het ANTWOORD en niet uit de opslag."
-  },
-  "/api/onboarding/paspoort": {
-   "klasse": "instelling",
-   "reden": "Gevonden op 24 augustus door stand 2 van het tweede meetpunt (server/staatlog.js): een WIJZIGING OP ZIJN PLAATS verandert geen enkele lengte, dus met alleen lengtes stond deze route op ongemeten. Bewaart de paspoortvelden op het onboarding-profiel en in het ledendossier. Dezelfde gegevens twee keer opsturen geeft dezelfde eindstand; wat er bij een herhaling nog beweegt is het tijdstempel `at` waarop we ze het laatst zagen."
-  },
-  "/api/residentie/betreed": {
-   "klasse": "instelling",
-   "reden": "Gevonden op 24 augustus door stand 2 van het tweede meetpunt (server/staatlog.js): een WIJZIGING OP ZIJN PLAATS verandert geen enkele lengte, dus met alleen lengtes stond deze route op ongemeten. Een kamer binnenlopen. De eerste keer krijg je een zitplek, daarna wordt alleen ververst wanneer je voor het laatst gezien bent (`leden[key].at`). Twee keer binnenlopen maakt je niet twee keer aanwezig."
-  },
-  "/api/residentie/emote": {
-   "klasse": "instelling",
-   "reden": "Gevonden op 24 augustus door stand 2 van het tweede meetpunt (server/staatlog.js): een WIJZIGING OP ZIJN PLAATS verandert geen enkele lengte, dus met alleen lengtes stond deze route op ongemeten. Een gebaar maken in de kamer. Het gebaar zelf gaat als sein naar de anderen en wordt nergens bewaard; het enige dat in de opslag beweegt is het aanwezigheidsstempel. Twee keer zwaaien mag, en hoort ook twee keer gezien te worden."
-  },
-  "/api/residentie/pols": {
-   "klasse": "instelling",
-   "reden": "Gevonden op 24 augustus door stand 2 van het tweede meetpunt (server/staatlog.js): een WIJZIGING OP ZIJN PLAATS verandert geen enkele lengte, dus met alleen lengtes stond deze route op ongemeten. De hartslag van de kamer: het scherm vraagt hoe de zaal ervoor staat en meldt daarmee dat je er nog bent. Herhaald aanroepen is hier niet een neveneffect maar de FUNCTIE; het enige dat verandert is het aanwezigheidsstempel."
-  },
-  "/api/rtgid/intrek": {
-   "klasse": "instelling",
-   "reden": "Gevonden op 24 augustus door stand 2 van het tweede meetpunt (server/staatlog.js): een WIJZIGING OP ZIJN PLAATS verandert geen enkele lengte, dus met alleen lengtes stond deze route op ongemeten. Toegang van een dienst intrekken. De intrekking zelf is idempotent -- de tweede oproep vindt geen niet-ingetrokken sessies meer en meldt `ingetrokken: 0`. Wat er dan nog beweegt is het INZAGEJOURNAAL, dat elke poging vastlegt. Dat hoort er te zijn: een tweede intrekpoging is iets wat het lid later terug moet kunnen zien."
-  },
   "/api/wereld/profiel/van": {
    "klasse": "teller",
    "reden": "Gevonden op 24 augustus door stand 2 van het tweede meetpunt (server/staatlog.js): een WIJZIGING OP ZIJN PLAATS verandert geen enkele lengte, dus met alleen lengtes stond deze route op ongemeten. Een profiel bekijken. De eerste keer komt er een bezoekregel bij, daarna gaat `keer` omhoog en schuift `at` mee (kern/wereld/bezoek.js). Dat is geen neveneffect maar de belofte: er is geen sluipstand, en dat staat ook in het antwoord zodat het scherm het niet kan verzwijgen. Zou een tweede blik NIET meetellen, dan klopte de telling niet meer."
+  },
+  "/api/bank/spaardoel": {
+   "klasse": "instelling",
+   "reden": "Het spaardoel van een spaarrekening zetten. spaardoelZet() in kern/bank/sparen.js doet `m.doelCenten = centen` en verder niets: twee keer hetzelfde doel zetten laat exact dezelfde stand achter. Gevonden op 30 augustus 2026, en de MANIER waarop is de moeite waard. De opslagmeter noemde hem onbeschermd met als grond \"de eerste oproep gaf een wijziging in bankRekeningen en de herhaling opnieuw +1 in techniek, +6 in wacht\". Lees dat nog eens: de herhaling raakte bankRekeningen NIET. Wat er bewoog waren het techniekjournaal en de wachtrij -- collecties die van het KIJKEN groeien, niet van het werk. Zelfde valstrik als bij de drie routes in lib/mutatiecontracten-wachtrij.js, nu aan de meetkant. De ruisijking van scripts/idemproef-route.js kan ze niet vinden, want die zoekt wat bij ELKE oproep groeit en deze twee tikken alleen op bepaalde poorten -- precies de reden die daar bij `kosten` staat. Ze hier tot ruis verklaren zou echt werk kunnen verbergen: een wachtrij waar een baan in wordt gezet IS werk. Dus blijft de meter tellen en staat het oordeel hier, gelezen uit de handler."
   }
  }
 }

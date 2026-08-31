@@ -87,7 +87,20 @@ test('na de wachttijd wordt er precies EEN keer gespoeld', async () => {
   const j = maakDoorgeefjournaal({ db: { data: {} }, bestand: null,
     save: () => { schrijfacties++; gespoeld(); } });
   for (let i = 0; i < 50; i++) j.journaalBinnen({ wat: '/api/weg', methode: 'GET', status: 500, mislukt: true });
-  try { await eersteSpoeling; } finally { clearTimeout(anker); }
+  /* EERST WACHTEN OP DE SPOELING, DAN OP DE STILTE ERNA -- en dat tweede stond
+     er niet. Zonder die tweede wacht meet deze toets alleen dat er EEN keer is
+     gespoeld op het MOMENT dat de eerste spoeling binnenkomt, en dat is per
+     definitie waar. Nagemeten met een mutatie: haal de rem (`if (spoelt)
+     return`) uit kern/doorgeefjournaal.js en er komen vijftig spoelingen -- en
+     deze toets bleef gewoon groen. Een toets die je niet hebt zien zakken, is
+     geen toets.
+
+     Het anker hierboven blijft nodig voor de EERSTE wacht (die hangt aan een
+     unref'd timer); de tweede houdt de lus zelf wakker. */
+  try {
+    await eersteSpoeling;
+    await new Promise(r => setTimeout(r, 1300));
+  } finally { clearTimeout(anker); }
   assert.equal(schrijfacties, 1,
     'vijftig mislukkingen binnen een seconde horen samen EEN schrijfactie te kosten, niet vijftig');
 });

@@ -22,7 +22,7 @@ module.exports = (ctx) => {
       if (b.error) return b;
       seintje(aan);
       return { ok: true, saldo: saldoVan(rekLid(van)), bijgeladen: z.bijgeladen, boeking: b.boeking.id };
-    });
+    }, { geld: 'betaalt een bedrag aan een ander lid' });
   }
   /* ---------- de huisrekening van RTG ----------
      RTG Assets rekent af met "RTG Treasury": servicefees en overnames komen
@@ -121,7 +121,7 @@ module.exports = (ctx) => {
       save();
       seintje(v.van);
       return { ok: true, saldo: saldoVan(rekLid(codenaam)), bijgeladen: z.bijgeladen };
-    });
+    }, { geld: 'voldoet een betaalverzoek van iemand anders' });
   }
   function verzoekIntrek({ codenaam, verzoekId }) {
     const v = klompjes().find(x => x.id === verzoekId && x.van === codenaam);

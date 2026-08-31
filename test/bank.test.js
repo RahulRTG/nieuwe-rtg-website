@@ -207,20 +207,20 @@ test('sparen met rente: 1,5% per jaar wordt als echte boeking bijgeschreven', as
    niet meer". Teruggedraaid, daarna groen. */
 test('de brug met RTG Pay is eenrichtingsverkeer: bank -> wallet mag, andersom niet', async () => {
   await api('pay/oplaad', { centen: 3000, idem: 'w1' }, lid.token);
-  const dicht = await api('bank/van-wallet', { iban: lid.iban, centen: 2000 }, lid.token);
+  const dicht = await api('bank/van-wallet', { idem: 'proef-' + Math.random(), iban: lid.iban, centen: 2000 }, lid.token);
   assert.equal(dicht.status, 409, 'van de wallet naar de bank kan niet meer');
   assert.match(dicht.body.error, /binnen RTG/i, 'en het lid leest waarom: ' + JSON.stringify(dicht.body).slice(0, 160));
 
   /* De andere kant hoort juist WEL te werken -- anders bewijst de toets alleen
      dat de brug stuk is (LAT.md regel 9). */
-  const open = await api('bank/naar-wallet', { iban: lid.iban, centen: 2000 }, lid.token);
+  const open = await api('bank/naar-wallet', { idem: 'proef-' + Math.random(), iban: lid.iban, centen: 2000 }, lid.token);
   assert.equal(open.status, 200, 'van de bank naar de wallet mag gewoon: ' + JSON.stringify(open.body).slice(0, 160));
   assert.equal((await oapi('bank/gezond', {}, 'RTG')).body.sluit.klopt, true, 'de som van alle bank-saldi is nul');
 });
 
 test('interne overboeking + het kantoor ziet de bank met de nieuwe regie-velden', async () => {
   const naar = await nieuweRekening('zakelijk', 0);
-  assert.equal((await api('bank/overboek', { vanIban: lid.iban, naarIban: naar, centen: 3000 }, lid.token)).status, 200);
+  assert.equal((await api('bank/overboek', { idem: 'proef-' + Math.random(), vanIban: lid.iban, naarIban: naar, centen: 3000 }, lid.token)).status, 200);
   const o = await oapi('bank', {}, 'RTG');
   assert.equal(o.body.regie.modi.length, 3);
   assert.equal(o.body.regie.ledenAan, true, 'de leden-bank staat live in het bord');
@@ -232,11 +232,11 @@ test('passen: uitgeven, betalen binnen de daglimiet, en bevriezen blokkeert', as
   const iban = await nieuweRekening('betaal', 50000);
   const pas = (await api('bank/pas/uitgeven', { iban, soort: 'debit' }, lid.token)).body.pas;
   assert.ok(/•••• •••• •••• \d{4}/.test(pas.nummer), 'de pas toont alleen gemaskeerd');
-  assert.equal((await api('bank/pas/betaal', { id: pas.id, centen: 3000 }, lid.token)).body.saldoCenten, 47000);
+  assert.equal((await api('bank/pas/betaal', { idem: 'proef-' + Math.random(), id: pas.id, centen: 3000 }, lid.token)).body.saldoCenten, 47000);
   await api('bank/pas/limiet', { id: pas.id, euro: 10 }, lid.token);
-  assert.equal((await api('bank/pas/betaal', { id: pas.id, centen: 2000 }, lid.token)).status, 429, 'boven de daglimiet weigert de pas');
+  assert.equal((await api('bank/pas/betaal', { idem: 'proef-' + Math.random(), id: pas.id, centen: 2000 }, lid.token)).status, 429, 'boven de daglimiet weigert de pas');
   await api('bank/pas/bevries', { id: pas.id, aan: true }, lid.token);
-  assert.equal((await api('bank/pas/betaal', { id: pas.id, centen: 100 }, lid.token)).status, 423, 'een bevroren pas betaalt niet');
+  assert.equal((await api('bank/pas/betaal', { idem: 'proef-' + Math.random(), id: pas.id, centen: 100 }, lid.token)).status, 423, 'een bevroren pas betaalt niet');
 });
 
 test('krediet: het lid vraagt aan, het kantoor keurt goed en stort, het lid lost af', async () => {
@@ -251,10 +251,10 @@ test('krediet: het lid vraagt aan, het kantoor keurt goed en stort, het lid lost
 test('terugkerende betaling + incassoronde, en een zakelijke bulkbetaling', async () => {
   const van = await nieuweRekening('betaal', 60000);
   const naar = await nieuweRekening('spaar', 0);
-  await api('bank/terugkerend/zet', { vanIban: van, naarIban: naar, centen: 10000, interval: 'maand', oms: 'Sparen' }, lid.token);
+  await api('bank/terugkerend/zet', { idem: 'proef-' + Math.random(), vanIban: van, naarIban: naar, centen: 10000, interval: 'maand', oms: 'Sparen' }, lid.token);
   assert.ok((await oapi('bank/incasso', { tot: Date.now() + 35 * 86400000 }, 'RTG')).body.uitgevoerd >= 1, 'de incassoronde voert de vaste betaling uit');
   const a = await nieuweRekening('betaal', 0), b = await nieuweRekening('betaal', 0);
-  const bulk = await api('bank/bulk', { vanIban: van, posten: [{ naarIban: a, centen: 5000 }, { naarIban: b, centen: 8000 }] }, lid.token);
+  const bulk = await api('bank/bulk', { idem: 'proef-' + Math.random(), vanIban: van, posten: [{ naarIban: a, centen: 5000 }, { naarIban: b, centen: 8000 }] }, lid.token);
   assert.equal(bulk.body.geboekt, 2, 'beide posten in één opdracht geboekt');
 });
 
@@ -811,7 +811,7 @@ test('een dubbeltik op de bank boekt niet twee keer -- gemeten aan het saldo', a
      (zie de kop van server/lib/idem.js). */
   assert.equal((await api('bank/overboek', { vanIban: van, naarIban: naar, centen: 9999, idem: 'dt-bank/overboek' }, k.token)).status, 409,
     'zelfde sleutel, ander bedrag: dat is een conflict en geen herhaling');
-  assert.equal((await api('bank/bulk', { vanIban: van, posten: [{ naarIban: naar, centen: 12345 }], idem: 'dt-bank/bulk' }, k.token)).status, 409,
+  assert.equal((await api('bank/bulk', { idem: 'proef-' + Math.random(), vanIban: van, posten: [{ naarIban: naar, centen: 12345 }], idem: 'dt-bank/bulk' }, k.token)).status, 409,
     'ook als het bedrag in de posten zit');
 
   /* En een andere OMSCHRIJVING is juist GEEN ander verzoek: vrije tekst hoort

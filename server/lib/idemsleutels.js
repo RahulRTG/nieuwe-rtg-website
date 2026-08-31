@@ -153,17 +153,20 @@ Object.assign(SLEUTELS,
   require('./idemsleutels-werelden').SLEUTELS,
   require('./idemsleutels-geld').SLEUTELS,
   require('./idemsleutels-kosten').SLEUTELS,
-  require('./idemsleutels-commerce').SLEUTELS);
+  require('./idemsleutels-commerce').SLEUTELS,
+  /* De kale ronde van 30 augustus 2026, met per regel het identiteitsveld. */
+  require('./idemsleutels-kaleronde').SLEUTELS,
+  /* En de andere kant van diezelfde ronde: wat je met opzet NIET dedupliceert,
+     elk met een reden. Zie de kop van dat bestand. */
+  require('./idemsleutels-kaleronde-b').SLEUTELS,
+  /* De zesentwintig die de uitgebreide proefopstelling zichtbaar maakte. */
+  require('./idemsleutels-proefronde').SLEUTELS,
+  /* De tien uit de objectronde: het werkdossier van een onderzoek en drie erbuiten. */
+  require('./idemsleutels-objectronde').SLEUTELS);
 
-/* De verklaring nakijken bij het laden: een `nietIdempotent` zonder reden is
-   geen verklaring maar een ontsnapping, en een lege veldenlijst zegt niets. */
-for (const [sleutel, v] of Object.entries(SLEUTELS)) {
-  if (v.nietIdempotent && !v.waarom)
-    throw new Error('idemsleutels: "' + sleutel + '" is nietIdempotent zonder waarom');
-  if (v.velden && (!Array.isArray(v.velden) || !v.velden.length))
-    throw new Error('idemsleutels: "' + sleutel + '" heeft een lege veldenlijst');
-  if (!v.nietIdempotent && !v.zelfdeVerzoek && !v.velden && !v.leest)
-    throw new Error('idemsleutels: "' + sleutel + '" verklaart niets');
-}
+/* Drie keuringen bij het laden, en ze staan bij elkaar in ./idemsleutels-nooit.js:
+   geen route in twee zijbestanden, elke verklaring compleet, en vier routes die
+   hier NOOIT een regel mogen hebben. Alle drie gooien ze. */
+require('./idemsleutels-nooit')(SLEUTELS);
 
 module.exports = { SLEUTELS, sleutelVoor, VENSTER_MS };

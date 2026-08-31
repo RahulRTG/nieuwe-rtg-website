@@ -3,6 +3,7 @@
    (../lib/rtgjson): strikte spec-parser met diepte-grens en __proto__-schild. */
 'use strict';
 const rtgjson = require('../lib/rtgjson');
+const { AsyncResource } = require('async_hooks');
 
 function limietBytes(v) {
   if (v == null) return Infinity;
@@ -30,7 +31,23 @@ function typeMatcht(req, type) {
   if (type === 'application/json' || type === 'json') return /[/+]json(\s*;|\s*$)/i.test(ct) || ct === '' && false;
   return ct.toLowerCase().startsWith(String(type).toLowerCase());
 }
-function leesBody(req, limiet, cb) {
+/* DE TERUGROEP HOUDT ZIJN CONTEXT VAST, en dat is geen detail.
+
+   Een luisteraar op een EventEmitter draait in de context van wie EMIT, niet van
+   wie hem heeft aangehangen -- `emit` roept hem gewoon synchroon aan. De 'end'
+   van een verzoeklichaam komt uit de HTTP-parser, en die staat buiten alles wat
+   een middleware ervoor heeft opgezet. Alles NA de body-lezer draaide daardoor
+   buiten elke async-context die de keten had geopend.
+
+   Dat is gemeten en niet bedacht: server/effectmeter.js meldde `geen` op een
+   verzoek dat een compleet account aanmaakte, omdat de route in een andere
+   context liep dan de meter. Hetzelfde gold voor elke andere context die vóór
+   express.json() wordt geopend.
+
+   AsyncResource.bind knoopt de terugroep vast aan de context van HIER, waar hij
+   wordt gemaakt. Kosten: één binding per verzoek met een lichaam. */
+function leesBody(req, limiet, cb0) {
+  const cb = AsyncResource.bind(cb0);
   const brokken = []; let n = 0, klaar = false;
   req.on('data', (c) => {
     if (klaar) return;

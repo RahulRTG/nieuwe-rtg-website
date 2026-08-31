@@ -51,7 +51,7 @@ module.exports = (ctx) => {
       if (via === 'eigen') bankregie.bankClearingGelukt(); // een geslaagde eigen-clearing wist de mislukt-teller
       seintje(rekMeta(iban).codenaam);
       return { ok: true, iban, via, saldoCenten: saldoVan(iban), gestort: c };
-    });
+    }, { geld: 'stort geld op een rekening' });
   }
 
   /* Interne overboeking tussen twee rekeningen (direct, geen kosten).
@@ -75,7 +75,7 @@ module.exports = (ctx) => {
       seintje(rekMeta(vanIban).codenaam);
       seintje(rekMeta(naarIban).codenaam);
       return { ok: true, saldoCenten: saldoVan(vanIban), boeking: b.boeking };
-    });
+    }, { geld: 'boekt van de ene rekening naar de andere' });
   }
 
   /* Uitgaande SEPA naar een externe bank, achter de betaal-naad (payout). Een
@@ -115,7 +115,7 @@ module.exports = (ctx) => {
          weten we hier nog niet. Vandaar de status erbij. */
       return { ok: true, saldoCenten: saldoVan(iban), overgemaakt: c, tarief: fooi, naar: dest,
         opdrachtId: op.id, opdrachtStatus: na.status };
-    });
+    }, { geld: 'stuurt geld het huis uit, naar een IBAN buiten RTG' });
   }
 
   return { bankStorten: storten, bankOverboek: overboek, bankSepaUit: sepaUit };

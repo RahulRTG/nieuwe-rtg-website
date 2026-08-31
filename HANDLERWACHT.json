@@ -1,8 +1,9 @@
 {
  "stempel": {
-  "op": "2026-08-30T12:29:34.001Z",
-  "commit": "29eda3e9",
+  "op": "2026-08-31T17:50:43.431Z",
+  "commit": "df671f92",
   "boomVuil": true,
+  "boomAnders": 2,
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
@@ -17,7 +18,7 @@
   "onbewaakt": 0,
   "nietGelezen": 0,
   "gezagsfuncties": 26,
-  "publiekeLijstenVerschillen": 18
+  "publiekeLijstenVerschillen": 19
  },
  "tweePubliekeLijsten": {
   "alleenInPoortwacht": [
@@ -38,6 +39,7 @@
    "/api/auth/resend",
    "/api/account/start",
    "/api/foundation/school/school/maak",
+   "/api/foundation/school/personeel/inloglink",
    "/api/foundation/les/maak"
   ],
   "alleenInDeKeuring": []

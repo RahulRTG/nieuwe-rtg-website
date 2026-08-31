@@ -1,24 +1,25 @@
 {
  "stempel": {
-  "op": "2026-08-31T15:56:36.368Z",
-  "commit": "89b7797e",
+  "op": "2026-08-31T17:43:21.111Z",
+  "commit": "df671f92",
   "boomVuil": false,
+  "boomAnders": 1,
   "node": "v22.22.2"
  },
  "uitleg": "Wat er nog niet gemeten is, en waarom niet. MAG ALLEEN KRIMPEN -- zie test/bewijsschuld.test.js. Een post van soort \"grens\" sluit nooit; die telt niet als achterstand maar als de rand van de methode.",
  "grens": "Dit is een lijst van wat we WETEN dat we niet hebben gemeten. Wat niemand heeft bedacht staat er per definitie niet in, en dat is de gevaarlijkste categorie -- een schuldenlijst is geen dekkingsbewijs. De aantallen komen uit de registers en zijn dus zo vers als de laatste ronde; zie scripts/versheid.js.",
  "telling": {
   "posten": 14,
-  "meetwerk": 58,
+  "meetwerk": 57,
   "instrument": 323,
-  "grens": 708
+  "grens": 642
  },
  "gemeten": {
   "postenTotaal": 14,
-  "achterstand": 381,
-  "randVanDeMethode": 708,
-  "auth-onbeslist": 0,
-  "capability-in-handler": 612,
+  "achterstand": 380,
+  "randVanDeMethode": 642,
+  "auth-onbeslist": 1,
+  "capability-in-handler": 546,
   "objectpoort": 52,
   "output-deuren": 18,
   "lichaamssleutel": 74,
@@ -27,7 +28,7 @@
   "output-onwaarneembaar": 4,
   "audit-wisselend": null,
   "audit-verklaard": null,
-  "rollback-gezakt": 3,
+  "rollback-gezakt": 1,
   "object-vooraf": 323,
   "proefruis": 1,
   "wegwerpserver-kopieen": 2
@@ -37,7 +38,7 @@
    "id": "auth-onbeslist",
    "soort": "meetwerk",
    "wat": "stille routes die onder geen enkele andere post op deze lijst vallen",
-   "aantal": 0,
+   "aantal": 1,
    "waarom": "de klop gaat zonder token. Een 400 of 404 betekent dat de validatie of een opzoeking eerder aan de beurt was dan de autorisatie, en zegt niets over een slot. Na een tweede klop met een plausibel lijf bleven deze routes hetzelfde antwoord geven.",
    "sluit": "per route nakijken wat er precies wordt gevraagd. Dit is geen instrumentvraag meer maar handwerk op een handvol routes, en dat is precies wat een schuldpost hoort te zijn als het gereedschap er is."
   },
@@ -45,7 +46,7 @@
    "id": "capability-in-handler",
    "soort": "grens",
    "wat": "routes zonder bewakerslaag: de controle zit IN de handler (een capability-token)",
-   "aantal": 612,
+   "aantal": 546,
    "waarom": "de rolproef kruist ROLLEN. Deze routes kennen geen rol -- ze eisen een token dat je alleen hebt als je het hebt gekregen (de schoolborden van foundation, rtf/social). Rollen kruisen is hier niet moeilijk maar zinloos.",
    "sluit": "niets in deze proef. Een eigen proef op capability-tokens zou de goede vraag stellen; die bestaat niet en is een project, geen achterstand."
   },
@@ -117,7 +118,7 @@
    "id": "rollback-gezakt",
    "soort": "meetwerk",
    "wat": "routes die weigeren en toch de toestand veranderen",
-   "aantal": 3,
+   "aantal": 1,
    "waarom": "de meeste zijn /api/rtfos/* met securityLog en sessions -- vermoedelijk de auth-laag die een geweigerde poging vastlegt, en dus mogelijk ruis in de meting en geen lek. Maar EEN ervan verspringt per ronde van plek, en een bevinding die verhuist is zelf een bevinding over de meting.",
    "sluit": "per route nalopen wat er beweegt en waarom. Dit is de oudste post op deze lijst en de enige die naar een mogelijk defect wijst."
   },

@@ -53,14 +53,6 @@ const PUBLIEK = new Map([
      bewijs zit in het verzoek: een handtekening over de uitdaging die de
      server zelf net heeft uitgegeven, en die maar een keer geldig is. */
   ['/api/webauthn/login', 'de tegenhanger van /api/webauthn/opties: de ondertekende uitdaging IS het bewijs, en die geldt eenmalig'],
-  /* Nog dezelfde deur, derde sleutel. Wachtwoordloos herinloggen van
-     schoolpersoneel: wie de link aanvraagt HEEFT per definitie geen sessie.
-     Wat hem eerlijk houdt staat in server/school/personeel-inlog.js en is
-     precies wat /api/auth/reset ook doet -- een rem per ip, een antwoord dat
-     bekend en onbekend niet uit elkaar houdt, EN een minimale antwoordtijd,
-     zodat het bestaan van een schoolaccount ook niet uit de duur volgt. Het
-     bewijs zit in de mailbox en niet in het verzoek. */
-  ['/api/foundation/school/personeel/inloglink', 'de wachtwoordloze herinlog van schoolpersoneel: wie hem aanvraagt heeft nog geen sessie; rem per ip, gelijk antwoord en gelijke antwoordtijd voor bekend en onbekend'],
   ['/api/pin/herstel', 'pin vergeten: de eenmalige sleutel uit de mail IS het bewijs, net als bij /api/auth/reset'],
   ['/api/aanmelding/aanvraag', 'een aanstaande aanvrager is nog geen lid (met rem per ip)'],
   ['/api/foundation/registratie/aanvragen', 'een school, vrijwilliger of stichting heeft vóór toelating nog geen account of code (met rem per ip)'],
@@ -353,6 +345,19 @@ const ALLEEN_ANONIEM = new Map([
      -- en dat is een ANDERE route (/api/les/maak). Deze route maakte onbeperkt
      lessen aan. De rem staat nu op de route zelf; zie
      test/foundation-lesrem.test.js. */
+  /* Wachtwoordloos herinloggen van schoolpersoneel: wie de link aanvraagt HEEFT
+     per definitie geen sessie. Wat hem eerlijk houdt staat in
+     server/school/personeel-inlog.js en is precies wat /api/auth/reset ook
+     doet -- een rem per ip, een antwoord dat bekend en onbekend niet uit elkaar
+     houdt, EN een minimale antwoordtijd, zodat het bestaan van een
+     schoolaccount ook niet uit de duur volgt. Het bewijs zit in de mailbox.
+
+     WAAROM HIER EN NIET BIJ PUBLIEK, waar de andere deuren staan. Keuringsregel
+     28 leest alleen `app.post('/api/...')` met een letterlijk pad; deze route
+     hangt aan een router die onder /api/foundation is gemonteerd. Op de
+     PUBLIEK-lijst kon regel 28 hem dus nooit terugvinden en meldde hij hem als
+     een pad dat niet bestaat -- terwijl hij bestaat en gewoon opengaat. */
+  ['/api/foundation/school/personeel/inloglink', 'de wachtwoordloze herinlog van schoolpersoneel: wie hem aanvraagt heeft nog geen sessie; rem per ip, gelijk antwoord en gelijke antwoordtijd voor bekend en onbekend'],
   ['/api/foundation/les/maak', 'bewust zonder inlog: een quizbord in de klas. Met een eigen uurgrens per IP op de route zelf -- zie server/foundation/onderwijs/les.js']
 ]);
 

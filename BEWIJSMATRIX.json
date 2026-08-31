@@ -1,43 +1,44 @@
 {
   "stempel": {
-    "op": "2026-08-29T23:50:35.253Z",
-    "commit": "b81f58a5",
-    "boomVuil": true,
+    "op": "2026-08-31T17:43:15.903Z",
+    "commit": "df671f92",
+    "boomVuil": false,
+    "boomAnders": 0,
     "node": "v22.22.2"
   },
   "herkomst": "routekaart (draaiende server)",
   "gedegradeerd": false,
-  "journaalGelezen": null,
+  "journaalGelezen": ".routejournaal",
   "routes": 4738,
   "schakels": 11,
   "cellen": 52118,
   "telling": {
-    "bewezen": 24700,
+    "bewezen": 25885,
     "verklaard": 0,
     "nvt": 308,
-    "ongemeten": 27094,
-    "gezakt": 16
+    "ongemeten": 25884,
+    "gezakt": 41
   },
   "perSchakel": {
     "AUTH": {
-      "bewezen": 4410,
+      "bewezen": 4417,
       "verklaard": 0,
       "nvt": 0,
       "ongemeten": 321,
-      "gezakt": 7
-    },
-    "ACL": {
-      "bewezen": 3820,
-      "verklaard": 0,
-      "nvt": 0,
-      "ongemeten": 918,
       "gezakt": 0
     },
-    "INPUT": {
-      "bewezen": 3265,
+    "ACL": {
+      "bewezen": 3826,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 1473,
+      "ongemeten": 880,
+      "gezakt": 32
+    },
+    "INPUT": {
+      "bewezen": 3364,
+      "verklaard": 0,
+      "nvt": 0,
+      "ongemeten": 1374,
       "gezakt": 0
     },
     "OUTPUT": {
@@ -48,17 +49,17 @@
       "gezakt": 0
     },
     "STATE": {
-      "bewezen": 385,
+      "bewezen": 419,
       "verklaard": 0,
       "nvt": 77,
-      "ongemeten": 4276,
+      "ongemeten": 4242,
       "gezakt": 0
     },
     "SIDE_EFFECT": {
-      "bewezen": 385,
+      "bewezen": 419,
       "verklaard": 0,
       "nvt": 77,
-      "ongemeten": 4276,
+      "ongemeten": 4242,
       "gezakt": 0
     },
     "AUDIT": {
@@ -69,11 +70,11 @@
       "gezakt": 0
     },
     "IDEMPOTENCY": {
-      "bewezen": 1153,
+      "bewezen": 2076,
       "verklaard": 0,
       "nvt": 77,
-      "ongemeten": 3502,
-      "gezakt": 6
+      "ongemeten": 2577,
+      "gezakt": 8
     },
     "FAILURE": {
       "bewezen": 2,
@@ -83,24 +84,19 @@
       "gezakt": 0
     },
     "ROLLBACK": {
-      "bewezen": 2594,
+      "bewezen": 2638,
       "verklaard": 0,
       "nvt": 77,
-      "ongemeten": 2064,
-      "gezakt": 3
+      "ongemeten": 2022,
+      "gezakt": 1
     },
     "PRIVACY": {
-      "bewezen": 3820,
+      "bewezen": 3858,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 918,
+      "ongemeten": 880,
       "gezakt": 0
     }
-  },
-  "verslechteringToegestaan": {
-    "reden": "De matrix ging van 4153 naar 4708 routes (+555): de vier bewijsproeven konden negen dagen lang niet starten (RTG_DEMO=1 werd een no-op, zie scripts/lib/proefsleutels.js) en bereiken sinds de reparatie 3777 in plaats van 3092 routes met een rol, plus de routes die er sindsdien bij kwamen. Elke nieuwe route begint in de meeste kolommen op ongemeten, dus stijgt dat getal absoluut terwijl de dekking verbetert: bewezen 16475 -> 24700 (+50%), ongemeten 29205 -> 27094. Geen enkele kolom leverde bewezen cellen in. De AUDIT-kolom stond bovendien op 0 door een defect in deze matrix zelf (de eerste AUDIT-tak claimde de cel ook als zijn bron leeg was, waardoor de handelingproef nooit aan de beurt kwam); die is in deze ronde gerepareerd en staat weer op 709.",
-    "cellenVoor": 46068,
-    "cellenNa": 52118
   },
   "uitleg": "Gegenereerd door scripts/bewijsmatrix.js. ongemeten MAG ALLEEN KRIMPEN."
 }

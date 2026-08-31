@@ -1,4 +1,5 @@
 :root{
+  --werkbreedte:min(100%,1680px);
   --onyx:#170409;--graphite:#24060f;--graphite-2:#2c0812;--ivory:#f1ede5;
   --muted:#969995;--line:#430f1f;--line-soft:#360916;--wine:#7F1634;
   --wine-bright:#9E1C40;--wine-licht:#C23A5E;--green:#35bd72;--danger:#C23A5E;
@@ -34,7 +35,7 @@ svg{display:block;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:
 
 main{min-height:calc(100dvh - var(--header));padding-bottom:calc(var(--nav) + env(safe-area-inset-bottom))}
 .appblad{min-height:calc(100dvh - var(--header) - var(--nav));animation:blad-in .28s ease both}
-.bladbinnen{width:min(100%,1180px);margin:0 auto;padding:clamp(2rem,5vw,4.5rem) clamp(1.2rem,4vw,3.2rem) 4rem}
+.bladbinnen{width:var(--werkbreedte);margin:0 auto;padding:clamp(1.2rem,2.5vw,2.2rem) clamp(1.2rem,2.5vw,2.4rem) 3.5rem}
 .micro{margin:0;color:#b5b7b3;font-size:.65rem;font-weight:650;letter-spacing:.22em;text-transform:uppercase}
 .sub,.sectiekop>p:last-child{color:var(--muted)}
 .tekstknop{border:0;border-bottom:1px solid var(--wine);background:none;color:var(--ivory);padding:.4rem 0;font-size:.62rem;font-weight:700;letter-spacing:.16em}
@@ -46,7 +47,7 @@ main{min-height:calc(100dvh - var(--header));padding-bottom:calc(var(--nav) + en
 .bestemmingkop h1{margin:0;font:800 clamp(3rem,13cqi,7.4rem)/.88 var(--sans);letter-spacing:-.07em;text-transform:uppercase}
 .gereed{display:inline-flex;align-items:center;border:1px solid var(--line);padding:.3rem .6rem;color:var(--ivory);font-size:.78rem;font-weight:650;letter-spacing:.22em;white-space:nowrap}.gereed::first-letter{color:var(--wine-licht)}
 .dagkop .sub{margin:.85rem 0 0;font-size:1rem}
-.vandaagraster{display:grid;gap:2rem}
+.vandaagraster{display:grid;gap:2rem;align-items:start}
 .volgendblok{position:relative;overflow:hidden;border:1px solid #511425;background:linear-gradient(115deg,#280710 0,#1e050c 70%);padding:1.6rem 1.55rem 1.45rem}
 .volgendblok::after{content:"";position:absolute;right:-4rem;top:-2rem;width:9rem;height:130%;border-left:1px solid #400e1e;transform:skew(-17deg);background:repeating-linear-gradient(90deg,transparent 0,transparent 7px,#2e0813 8px,#2e0813 9px);pointer-events:none}
 .tijdregel{position:relative;z-index:1;display:flex;align-items:baseline;gap:1.1rem;margin:1.3rem 0 .75rem;flex-wrap:wrap}
@@ -94,7 +95,7 @@ main{min-height:calc(100dvh - var(--header));padding-bottom:calc(var(--nav) + en
 
 /* De twee werkblokken onder de tabbladen staan naast elkaar, zoals de
    reiswacht en de invoerbalie dat in het ontwerp doen. Ze blijven in main. */
-.dagkaarten{width:min(calc(100% - clamp(2rem,8vw,6.4rem)),1180px);margin:clamp(2.5rem,5vw,4rem) auto 0;display:grid;gap:clamp(1rem,2vw,1.6rem)}
+.dagkaarten{width:calc(var(--werkbreedte) - clamp(2.4rem,5vw,4.8rem));margin:clamp(1.2rem,2.5vw,2rem) auto 0;display:grid;gap:clamp(1rem,2vw,1.6rem)}
 .dagkaart{min-width:0}
 .dagkaart .regkop{margin-top:0}
 @media(min-width:940px){
@@ -117,11 +118,11 @@ main{min-height:calc(100dvh - var(--header));padding-bottom:calc(var(--nav) + en
 .reisdiensten{display:grid;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:2.6rem}.reisdiensten a{display:grid;grid-template-columns:40px 1fr;align-items:center;gap:1rem;background:#20060d;color:inherit;text-decoration:none;padding:1.15rem}.reisdiensten a:hover{background:#2a0711}.reisdiensten svg{width:26px;height:26px;color:var(--wine-licht)}.reisdiensten span{display:flex;flex-direction:column;gap:.2rem}.reisdiensten b{font-size:.86rem}.reisdiensten small{color:var(--muted);font-size:.68rem}
 #vandaagVak{border-top:1px solid var(--line);margin-top:2rem;padding-top:1.2rem}#vandaagVak .cv-lijn{max-width:none;padding:1.25rem 0}#vandaagVak .cv-uur{color:var(--muted)}#vandaagVak .cv-wat{border-color:var(--line)}#vandaagVak .cv-toe{color:var(--muted)}
 
-main>.regkop,main>#poorten,main>.wrooster{width:min(calc(100% - clamp(2rem,8vw,6.4rem)),1180px);margin-inline:auto}
+main>.regkop,main>#poorten,main>.wrooster{width:calc(var(--werkbreedte) - clamp(2.4rem,5vw,4.8rem));margin-inline:auto}
 main>.regkop.rtgdeel-vast{margin-top:clamp(2.5rem,5vw,4rem);padding-bottom:1rem;border-bottom:1px solid var(--line)}
 main>.wrooster{margin-bottom:4rem}
 main>.regkop:has(+ #poorten){margin-top:clamp(3.5rem,7vw,6rem);padding-bottom:1rem;border-bottom:1px solid var(--line)}
-#poorten{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;border:1px solid var(--line);background:var(--line)}
+#poorten{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1px;border:1px solid var(--line);background:var(--line)}
 #poorten .poort{position:relative;isolation:isolate;min-height:215px;display:flex;flex-direction:column;justify-content:flex-end;gap:.38rem;padding:1.25rem;overflow:hidden;border:0;background-color:#1e050c;background-image:linear-gradient(0deg,rgba(24,4,10,.96),rgba(24,4,10,.38) 76%),linear-gradient(90deg,rgba(24,4,10,.74),transparent),var(--poort-beeld);background-size:cover;background-position:center;color:var(--ivory);text-decoration:none;transition:filter .18s}
 #poorten .poort::before{content:"";position:absolute;z-index:-1;inset:0;border-top:2px solid transparent;background:linear-gradient(125deg,transparent 58%,rgba(194,58,94,.07));pointer-events:none}
 #poorten .poort:hover{filter:brightness(1.15)}#poorten .poort:hover::before{border-top-color:var(--wine-licht)}

@@ -9,6 +9,11 @@
 const G = (wat, doe, tip) => ({ wat, doe, tip });
 
 module.exports = {
+  '/apps/mijn-gegevens.html': G('Wat weet RTG van mij: per soort gegeven waar het staat, hoe het bij ons kwam, waarvoor het mag worden gebruikt en of het weg kan.',
+    ['Zie per gegeven of RTG het heeft -- en waar dat niet vast te stellen is, staat dat er als eigen uitslag',
+     'Lees waarvoor elk gegeven gebruikt mag worden, en waar het fysiek staat',
+     'Zie wat er blijft staan als je je account opheft, en waarom'],
+    'Dit zijn SOORTEN en geen inhoud: hier staat dat RTG je adres heeft, niet welk. De inhoud haal je op met een uitvoer van je dossier onder Juridisch.'),
   '/apps/mijn-relaties.html': G('Wie heeft toegang tot mij: alle partijen die op dit moment iets van je mogen, per partij bij elkaar.',
     ['Zie per zaak of dienst wat zij precies mag en tot wanneer',
      'Vraag de gevolgen op voordat je een relatie sluit',

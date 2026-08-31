@@ -136,7 +136,7 @@ standaard of de wereld is er nog niet klaar voor.
 | 8 | Purpose-bound data | **besluit — het duurste gat** | De boardroom schakelt per *capability*, niet per *doel*. Zie par. 5. |
 | 9 | Credential wallet (VC 2.0) | **jaren, vooruitcompatibel ontwerpen** | W3C VC 2.0 is Recommendation; de Digital Credentials API is Working Draft. Ontwerp de kluis zo dat een credential ernaast kan, maak hem geen afhankelijkheid. |
 | 10 | Zero-copy identity (ask → prove → forget) | **stap weg voor nieuwe modules, jaren voor bestaande** | `kern/gegevenspoort.js` is het aanknopingspunt. De 100 bestaande domeinen bewaren al kopieën; dat is een migratie en geen schakelaar. |
-| 11 | Gegevenskaart | **stap weg** | `/api/privacy/export` en `/api/privacy/inzage` hebben de gegevens al; er is geen scherm dat ze als kaart toont. |
+| 11 | Gegevenskaart | **staat** | `kern/identiteit/gegevenssoorten.js` + `gegevenskaart.js`, scherm `/apps/mijn-gegevens.html`. Zie par. 5e. |
 | 12 | Data lineage voor personen | **jaren** | Vergelijk `kern/kosten/herkomst.js`: die keten eindigt eerlijk bij "zo is hij overgenomen door een mens". Een persoonsketen over 100 domeinen is groter dan dat. |
 | 13 | Policy compiler | **besluit** | Volgt op 1 en 8. |
 | 14 | Simulatie vóór uitvoering | **stap weg** | De vorm bestaat: de gevolgsimulatie in `TENANT.md` met `nietGerekend` voor wat níét is meegerekend. Hergebruik die taal. |
@@ -366,6 +366,69 @@ Het staat op het Consent Center en niet op een eigen eilandje: een lid hoort nie
 te moeten weten dat "wie mag mij benaderen" ergens anders woont dan "wie mag iets
 van mij zien". In de firewall groepeert het onder *Rahul Travel Group*, want hier
 verstuurt dit huis zelf en is de partij geen derde.
+
+## 5e. De gegevenskaart: wat weet RTG van mij
+
+Dit huis had drie van de vier vragen al beantwoord, en dat is precies waarom deze
+ontbrak zonder dat iemand hem miste:
+
+| vraag | laag |
+|---|---|
+| wie **mag** er iets van mij | `kern/consent-register.js` |
+| wie **heeft** er gekeken | `kern/inzagekaart.js` |
+| wat **mist** er voor een handeling | `kern/gegevenspoort.js` |
+| wat **is** er van mij | `kern/identiteit/gegevenskaart.js` |
+
+`/api/privacy/export` gaf die vierde wel, maar als een dump: een JSON met veertien
+takken waarin een mens moet zoeken. Een uitvoer is een RECHT, en een antwoord is
+iets anders dan een bestand.
+
+**Drie woorden die hier niet hetzelfde betekenen**, en dat is met opzet: *waar*
+iets staat (kluis, dossier, operationeel, afgeleid), *hoe* het bij ons kwam
+(opgegeven, gemeten, overgenomen, afgeleid) en *waarvoor* het gebruikt mag worden.
+Ze lopen uit elkaar -- uw geboortedatum staat in de kluis, is door u opgegeven,
+en kan later zijn overgenomen van een document dat een mens aftekende. Dat
+verschil is de reden dat RTG iD twee bronnen toont, en een kaart die alleen
+"geboortedatum: bekend" zegt, wist het weg.
+
+**Dit is een register en geen afleiding, en dat is een keuze.**
+`BEWIJSMACHINE.md` waarschuwt terecht dat een register naast de code binnen een
+jaar zelf een botsing wordt. Het antwoord daarop is hier niet "dan leiden we het
+af" -- want doelbinding en het gevolg van weghalen staan nergens in de code te
+lezen; die zijn besloten, niet gemeten. Het antwoord is dat elke regel een
+`bron` draagt: het bestand waar dat gegeven werkelijk woont. Verhuist dat
+bestand, dan zakt `test/gegevenskaart.test.js` -- en dan is de regel aantoonbaar
+achterhaald in plaats van stil verkeerd. Bij de eerste keer draaien vond die
+handhaver meteen een fout: `server/accounts.js` bestaat niet, dat is een map.
+
+**Drie redenen waarom iets niet weg kan, en ze zijn niet inwisselbaar.** Ze
+stonden eerst alle drie als een kale `kan: false`, en dan komt uw naam op
+dezelfde lijst als uw facturen -- terwijl het ene meegaat als u opheft en het
+andere zeven jaar blijft staan. Dus: `account-nodig` (gaat mee bij opheffen),
+`wettelijk` (blijft ook daarna), `beschermt-u` (wissen zou het onbruikbaar maken
+als bescherming -- kon u het inzagejournaal wissen, dan kon iemand die bij u keek
+dat ook).
+
+**Een storing is geen afwezigheid.** Elke peiling geeft ja, nee of *niet vast te
+stellen*, en die derde draagt altijd een reden bij de rij zelf. `BESTUUR.md` zegt
+dat "niet vast te stellen" een eersteklas uitslag is naast de andere twee, en
+hier is dat geen netheid: zou een storing als "nee" op het scherm komen, dan leest
+een lid "RTG heeft mijn adres niet" op het moment dat de kluis niet opengaat. Die
+regel sneuvelde onderweg een keer in mijn eigen code -- de kluisfout werd
+opgevangen en daarna zeiden de dossier-peilingen keurig `false`. De toets ving
+het; het scherm geeft "onbekend" een eigen kleur, zodat het onderscheid ook voor
+een mens bestaat.
+
+**Wat deze kaart niet zegt** staat op de kaart zelf, in vier regels: het zijn
+soorten en geen inhoud (dat blijft de AVG-uitvoer), wat een zaak zelf bijhoudt
+valt erbuiten, een controle met het Zegel kan er niet op (het pseudoniem verschilt
+per zaak, dus RTG kan hem niet aan uw account terugkoppelen), en de kaart schrijft
+niets -- hem openen laat geen spoor achter, anders wordt uw eigen kaart voller
+door ernaar te kijken.
+
+Er komt met opzet **geen wisknop** op dit scherm. Weghalen doe je waar het gegeven
+woont; zou het hier ook kunnen, dan bestond er van elk gegeven twee plekken om het
+weg te halen, en dan is er binnen een jaar een die het net iets anders doet.
 
 ## 6. De volgorde
 

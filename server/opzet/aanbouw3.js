@@ -101,6 +101,16 @@ module.exports = function bouwKernAanDrie(kern, grens) {
      dezelfde verspreid gemonteerde lagen nodig heeft. */
   Object.assign(kern, require('../kern/inzagekaart')({ kern }));
   require('../routes/inzagekaart')(grens('inzagekaart'));
+  /* De gegevenskaart (kern/identiteit/gegevenskaart.js): de VIERDE vraag naast
+     de drie hierboven. Consent zegt wie er iets MAG, de inzagekaart wie er
+     HEEFT gekeken, de gegevenspoort wat er nog MOET -- en deze zegt wat er IS.
+     Hij hoort hier omdat hij de inzagekaart peilt, en die bestaat pas een regel
+     eerder; hij krijgt met opzet losse functies mee en niet de kern, zodat hij
+     niets anders KAN lezen dan de vier lagen die zijn register noemt. */
+  Object.assign(kern, { gegevenskaart: require('../kern/identiteit/gegevenskaart').maakGegevenskaart({
+    accounts: kern.accounts, sessieregister: kern.sessieregister, toestellen: kern.toestellen,
+    commercieel: { standVan: kern.commercieelStand }, inzagekaart: kern.inzagekaartVan }) });
+  require('../routes/member/gegevenskaart')(grens('gegevenskaart'));
   /* De tijdlijn (kern/tijdlijn.js): wat er in de tijd met u gebeurd is. Bezit
      niets en leidt niets af -- geen verbanden en geen score. Krijgt de KERN mee,
      net als Life en de dagcoach, en hangt daarom onderaan. */

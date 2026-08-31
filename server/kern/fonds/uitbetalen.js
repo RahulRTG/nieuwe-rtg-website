@@ -42,7 +42,15 @@ function maakUitbetaling({ opdrachten, runtime, save, log, lijst, bankGeef, herb
   }
 
   async function verstuurLeg(afdracht, leg, { invoiceId, wie }) {
-    if (!leg || !leg.settlementId || !leg.iban) return leg;
+    /* DE IBAN-EIS HOORT BIJ DE EXTERNE RAIL, EN BIJ DIE ALLEEN.
+
+       Hij stond hier bovenaan en gold dus ook voor de eigen-bankboeking
+       hieronder -- terwijl die geen rekeningnummer nodig heeft: een boeking van
+       rtg:reserve naar extern:foundation loopt door ons EIGEN grootboek en
+       verlaat het huis niet. Zie de kop van ./economie.js voor de andere helft
+       van dezelfde reparatie; samen zorgden ze ervoor dat de afdracht in de
+       eigen-stand zonder IBAN stil niets deed. */
+    if (!leg || !leg.settlementId) return leg;
     const bankAfdracht = bankGeef();
     if (bankAfdracht) {
       try {
@@ -62,6 +70,11 @@ function maakUitbetaling({ opdrachten, runtime, save, log, lijst, bankGeef, herb
           { invoiceId, component: leg.component, fout: e.message });
       }
     }
+
+    /* Vanaf hier gaat het geld naar BUITEN, en dan is een rekeningnummer geen
+       detail maar de bestemming zelf. Zonder IBAN blijft de leg staan zoals hij
+       stond -- wachtend op de rekening, precies zoals bedoeld. */
+    if (!leg.iban) return leg;
 
     if (opdrachten) {
       const op = opdrachten.maak({

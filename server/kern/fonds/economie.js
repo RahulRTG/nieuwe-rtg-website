@@ -91,13 +91,45 @@ module.exports = function fondsEconomie({ runtime, crypto, env }) {
       const leg = { component, claimId: claim.id, centen: claim.amountMinor, currency: claim.currency,
         destinationRef: bestemming.destinationRef, iban: bestemming.iban, begunstigde: bestemming.begunstigde,
         settlementId: null, opdrachtId: null, providerRef: null, status: 'te_storten', fout: null };
-      if (bestemming.iban) {
-        const p = await runtime.planSettlement({ intentId: intent.id, claimId: claim.id,
-          destinationRef: bestemming.destinationRef, rail: 'SEPA',
-          idempotencyKey: 'social:' + component + ':' + hash(sourceRef).slice(0, 24) });
-        if (!p || p.error) return p || { error: 'Settlement kon niet worden gepland.' };
-        leg.settlementId = p.settlement.id; leg.status = 'gepland';
-      }
+      /* EEN CLAIM WORDT GEPLAND, OOK ZONDER IBAN -- en dat is de reparatie.
+
+         Hier stond dit blok achter `if (bestemming.iban)`. Zonder rekeningnummer
+         kreeg de leg dus geen settlementId, en ../fonds/uitbetalen.js stopt op
+         precies dat veld. Gevolg: stond de boardroom-knop op "eigen" terwijl er
+         nog geen RTF_IBAN was vastgelegd, dan gebeurde er NIETS -- geen boeking,
+         geen opdracht, en `foundationCenten` bleef op nul staan terwijl het lid
+         wel had betaald. Niets brak; er stond alleen niets, en dat is de
+         vervelendste soort.
+
+         DE RAIL IS NIET DE BESTEMMING. Een IBAN zegt hoe het geld naar BUITEN
+         gaat; de eigen-grootboekrail brengt het niet naar buiten maar boekt het
+         van rtg:reserve naar extern:foundation, binnen ons eigen boek. De claim
+         blijft EXTERNAL -- het geld is een andere rechtspersoon verschuldigd --
+         maar hij wordt over een interne rail voldaan. Vandaar `INTERN` in plaats
+         van `SEPA`: de runtime houdt claim, ledger en bewijs, en de rail zegt
+         alleen waarlangs het is gegaan.
+
+         Zonder IBAN EN zonder eigen rail verandert er niets: uitbetalen.js valt
+         dan terug op de opdrachtenrij, die wel een rekeningnummer eist, en de
+         leg blijft op te_storten wachten op de rekening. Dat is de bestaande
+         belofte en die blijft staan. */
+      const opEigenBoek = !bestemming.iban;
+      const p = await runtime.planSettlement({ intentId: intent.id, claimId: claim.id,
+        destinationRef: bestemming.destinationRef, rail: opEigenBoek ? 'INTERN' : 'SEPA',
+        idempotencyKey: 'social:' + component + ':' + hash(sourceRef).slice(0, 24) });
+      if (!p || p.error) return p || { error: 'Settlement kon niet worden gepland.' };
+      leg.settlementId = p.settlement.id;
+      /* DE STAND VAN DE LEG VOLGT DE RAIL, NIET DE PLANNING. `gepland` staat
+         voor "er ligt een weg naar buiten"; zonder IBAN ligt die er niet, en
+         dan blijft de leg op te_storten wachten op de rekening. Hem hier toch
+         op gepland zetten maakt van een openstaande verplichting een belofte
+         die het huis niet kan waarmaken -- precies de fout die de kop van
+         ./uitbetalen.js beschrijft ("van een mislukking weer een belofte").
+
+         De settlement in de runtime is iets anders en wordt wel aangemaakt: dat
+         is de administratie van de claim, en die hoort er te zijn ook als er
+         nog geen rail is. */
+      if (!opEigenBoek) leg.status = 'gepland';
       legs.push(leg);
     }
     return { ok: true, replay: intentUit.replay, intent, legs, berekening: c };

@@ -37,10 +37,38 @@ module.exports = ({ db, save }) => {
 
   const eigen = require('./eigencollectie')({ db, domein: 'kern/pestgrens', bezit: { rahulRespect: 'kaart' } });
 
+  /* LEZEN MAAKT HIER GEEN RECORD MEER AAN.
+
+     Hier stond `if (!b[key]) b[key] = {...}; return b[key];` -- elke oproep van
+     /api/fluister legde dus een regel aan in `rahulRespect`, ook als er
+     helemaal niets gebeurde. Twee dingen mis:
+
+     1. EEN GEWEIGERD VERZOEK VERANDERDE DE TOESTAND. Vraag je Rahul iets en de
+        route geeft 400 (geen vraag, geen AI-sleutel), dan was er tóch iets
+        opgeslagen. Gevonden door de staatproef, die de OPSLAG meet in plaats
+        van het antwoord: "geweigerd (status 400) en de toestand veranderde toch".
+        Het antwoord kon dat niet laten zien; de opslag wel.
+
+     2. HET BEWAARDE IETS OVER IEDEREEN DIE OOIT IETS VROEG. De collectie heet
+        "de teller van de pestgrens" en hoort dus alleen mensen te bevatten bij
+        wie er iets te tellen valt. In plaats daarvan groeide hij mee met het
+        aantal sessies -- lege records, over leden die niets verkeerd deden.
+        Minder bewaren is hier gratis: wie er niet in staat, heeft n = 0.
+
+     Lezen geeft nu een LOSSE momentopname (niet in de bak), en pas wie iets
+     wijzigt zet hem er met `bewaar()` in. Zo staat er alleen iets over iemand
+     zodra er werkelijk iets is voorgevallen. */
+  const LEEG = () => ({ n: 0, wegTot: 0, wachtExcuus: false });
   function S(key) {
     const b = eigen.bak('rahulRespect');
-    if (!b[key]) b[key] = { n: 0, wegTot: 0, wachtExcuus: false };
-    return b[key];
+    return b[key] || LEEG();
+  }
+  /* De tegenhanger: dit is het enige wat schrijft. Elke tak in poort() die de
+     stand verandert, roept hem aan -- ook de tak die hem op nul zet, want een
+     verzoening hoort zichtbaar te blijven tot de bewaarveger hem opruimt. */
+  function bewaar(key, st) {
+    eigen.bak('rahulRespect')[key] = st;
+    save();
   }
 
   const isPest = t => heeft(t, PEST);
@@ -60,12 +88,12 @@ module.exports = ({ db, save }) => {
       // eerst de weigering wegen: "waarom zou ik sorry zeggen" draagt wel het
       // woord sorry, maar is het tegendeel van een excuus
       if (isPest(tekst) || isWeiger(tekst)) {
-        st.wegTot = nu() + WEG_MS; save();
+        st.wegTot = nu() + WEG_MS; bewaar(key, st);
         return { blok: true, weg: true, tot: st.wegTot,
           antwoord: 'Dan is het nog geen tijd. Zonder excuses gaan we niet verder; ik ben er weer over 24 uur.' };
       }
       if (isExcuus(tekst)) {
-        st.n = 0; st.wegTot = 0; st.wachtExcuus = false; save();
+        st.n = 0; st.wegTot = 0; st.wachtExcuus = false; bewaar(key, st);
         return { blok: true, verzoend: true,
           antwoord: 'Dank je. Excuses aanvaard, oprecht; we beginnen met een schone lei en ik ben er weer helemaal voor je. Waar zullen we mee verdergaan?' };
       }
@@ -76,10 +104,10 @@ module.exports = ({ db, save }) => {
     if (isPest(tekst)) {
       st.n += 1;
       if (st.n > 3) {
-        st.wegTot = nu() + WEG_MS; st.wachtExcuus = true; save();
+        st.wegTot = nu() + WEG_MS; st.wachtExcuus = true; bewaar(key, st);
         return { blok: true, vurig: true, weg: true, tot: st.wegTot, antwoord: VURIG };
       }
-      save();
+      bewaar(key, st);
       return { blok: true, waarschuwing: st.n, antwoord: WAARSCHUWING[st.n - 1] };
     }
     return null;

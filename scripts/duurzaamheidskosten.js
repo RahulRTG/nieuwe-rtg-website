@@ -32,6 +32,11 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { start: wegwerp } = require('./lib/wegwerpserver');
+/* Wanneer is dit gemeten, en waartegen. Zonder stempel is een register niet na
+   te lopen: verouderd ziet er identiek uit aan vers, en scripts/versheid.js kan
+   er niets over zeggen. Zeven registers misten hem; zie de kop van
+   scripts/lib/stempel.js. */
+const { stempel } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'DUURZAAMHEIDSKOSTEN.json');
@@ -179,6 +184,7 @@ if (require.main !== module) return;
   if (blind) console.log('\n  DE METER IS BLIND: ' + o.reden);
 
   fs.writeFileSync(UITSLAG, JSON.stringify({
+    stempel: stempel(),
     uitleg: 'Gepaarde meting van de duurzame commit: dezelfde machine, dezelfde opslag, dezelfde ' +
       'belasting, alleen RTG_DUURZAAM ertussen. De controlegroep is een schrijfroute die NIET ' +
       'duurzaam vastlegt; beweegt die mee, dan meet deze ronde de machine en niet de commit. ' +

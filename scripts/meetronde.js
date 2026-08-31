@@ -69,6 +69,27 @@ const STAPPEN = [
   { id: 'staatproef', register: 'STAATPROEF.json', duur: '~8 min',
     wat: 'of de toestand na afloop klopt',
     cmd: ['scripts/staatproef-route.js', '--max=8000'] },
+  /* DE TWEE BEWIJSPROEVEN STONDEN HIER NIET IN, en dat had twee gevolgen die
+     allebei zijn opgetreden.
+
+     Het eerste: de bewijsmatrix stelt de AUDIT-kolom samen uit deze twee. Draai
+     je een meetronde zonder ze, dan zakt die kolom naar nul en vraagt de ratel
+     "is de meetronde meegeleverd?" -- terecht, want dat was hij niet.
+
+     Het tweede is duurder. Wie ze met de hand draait, vergeet de begrenzing:
+     de handelingproef valt zonder --max terug op 400 routes, en schreef zo een
+     register van 3081 routes terug naar 400. Dat is precies het ongeluk dat de
+     kop van dit bestand beschrijft voor de rolproef -- en het gebeurde opnieuw,
+     bij het bijwerken van de registers na de reparatie van de proefsleutels.
+
+     Ze staan nu in de rij, met de vlag erbij, op de plek waar hun uitslag nog
+     vóór de bewijsmatrix komt. */
+  { id: 'auditproef', register: 'AUDITPROEF.json', duur: '~5 min',
+    wat: 'of een geslaagde schrijfactie een regel in het API-spoor nalaat',
+    cmd: ['scripts/auditproef-route.js', '--max=8000'] },
+  { id: 'handelingproef', register: 'HANDELINGPROEF.json', duur: '~5 min',
+    wat: 'of een geslaagde schrijfactie een geketende regel nalaat',
+    cmd: ['scripts/handelingproef-route.js', '--max=8000'] },
   { id: 'ketenronde', register: 'KETENS.json', duur: '~4 min',
     wat: 'of een keten netjes faalt onder sabotage',
     cmd: ['scripts/ketenronde.js'] },

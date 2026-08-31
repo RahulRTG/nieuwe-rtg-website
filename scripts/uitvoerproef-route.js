@@ -35,6 +35,24 @@ const { spawn } = require('child_process');
 const { draaiUitvoerproef, maakKanaries, kanarieLijst } = require('./lib/uitvoerproef');
 const { plausibelLijf } = require('./lib/rolproef');
 const { alleRoutes, isSchakel } = require('./lib/routes');
+/* Wanneer is dit gemeten, en waartegen. Zonder stempel is een register niet na
+   te lopen: verouderd ziet er identiek uit aan vers, en scripts/versheid.js kan
+   er niets over zeggen. Zeven registers misten hem; zie de kop van
+   scripts/lib/stempel.js. */
+const { stempel, eisSchoneBoom } = require('./lib/stempel');
+
+/* WEIGEREN VOOR HET BEGINT. Deze ronde duurt minuten en levert een register op
+   dat NERGENS meetelt zodra er ongecommit werk in de boom staat -- boomVuil
+   wordt pas aan het eind vastgesteld. Zie de kop van ./lib/stempel.js voor de
+   drie rondes die daar in een zitting aan zijn opgegaan. */
+function wachtOpSchoneBoom() {
+  const b = eisSchoneBoom('de uitvoerproef');
+  if (b.ok) return;
+  console.error('\n  DEZE RONDE ZOU NIET MEETELLEN\n');
+  console.error('  ' + b.reden);
+  for (const r of (b.bestanden || [])) console.error('    ' + r);
+  process.exit(3);
+}
 
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'UITVOERPROEF.json');
@@ -67,6 +85,8 @@ async function wacht(basis, ms) {
   }
   return false;
 }
+
+wachtOpSchoneBoom();
 
 (async () => {
   const poort = await vrijePoort();
@@ -180,6 +200,11 @@ async function wacht(basis, ms) {
   const schoon = rijen.filter(r => r.uitvoer === 'schoon');
   const gezakt = rijen.filter(r => r.uitvoer === 'GEZAKT');
   const poortRijen = rijen.filter(r => r.uitvoer === 'poort');
+  /* Verklaard staat APART van schoon: hier zag de proef werkelijk een geheim en
+     heeft een mens opgeschreven waarom dat daar hoort (VERKLAARD in
+     lib/uitvoerproef.js). Onder schoon wegstrepen zou de lijst een plek maken
+     waar bevindingen verdwijnen. */
+  const verklaardRijen = rijen.filter(r => r.uitvoer === 'verklaard');
 
   console.log('  verzoeken                            : ' + uit.pogingen);
   console.log('  gaf een 2xx (echt gemeten)           : ' + uit.gemeten + ' / ' + routes.length);
@@ -187,16 +212,21 @@ async function wacht(basis, ms) {
   console.log('  tokens onderweg opnieuw gehaald      : ' + uit.hernieuwd);
   console.log('  antwoord met gegevens van een ander  : ' + gezakt.length);
   for (const b of uit.bevindingen.lekken.slice(0, 20)) console.log('      ' + b);
+  console.log('  geheim dat er hoort (verklaard)      : ' + verklaardRijen.length);
+  for (const b of (uit.bevindingen.verklaard || []).slice(0, 10)) console.log('      ' + b);
 
   fs.writeFileSync(UITSLAG, JSON.stringify({
+    stempel: stempel(),
     uitleg: 'Per route: met de JUISTE rol en plausibele invoer, en of het 2xx-antwoord gegevens ' +
       'van een ANDER account bevatte (kanaries) of een geheim veld. Een route die hier NIET in staat ' +
       'is niet beproefd. Een route met uitvoer:"poort" gaf nooit een 2xx en is ONGEMETEN, geen groen. ' +
       'Zie scripts/lib/uitvoerproef.js voor de grens en waarom de lekmerkers niet blind over een 2xx mogen.',
     kanariekenmerk: kenmerk,
     gemeten: { routesMetRol: routes.length, gemeten: uit.gemeten, pogingen: uit.pogingen,
-      schoon: schoon.length, gezakt: gezakt.length, achterEenPoort: poortRijen.length,
+      schoon: schoon.length, gezakt: gezakt.length, verklaard: verklaardRijen.length,
+      achterEenPoort: poortRijen.length,
       tokensHernieuwd: uit.hernieuwd, begrenzing: MAX },
+    verklaringen: uit.bevindingen.verklaard || [],
     perRoute: rijen
   }, null, 1) + '\n');
   console.log('\n  weggeschreven in UITVOERPROEF.json');

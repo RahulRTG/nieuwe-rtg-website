@@ -8,7 +8,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon } = require('./helper');
 const { maakAuthenticator } = require('./webauthn-authenticator');
 
 let srv, base, lidA, lidB, codeA, codeB, pkA, pkB, rpID, origin;
@@ -35,7 +35,7 @@ const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCA
    alleen langs de echte weg -- bewijs insturen, kantoor keurt goed -- want het
    niveau wordt nergens gezet maar overal afgeleid. */
 async function keurGoed(token, codenaam, documentDatum) {
-  const office = (await api('/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+  const office = await kantoorAlsPersoon(base, 'RTG-OFFICE');
   await api('/api/verify/upload', { image: PNG }, token);
   await api('/api/verify/selfie', { image: PNG }, token);
   const pend = await api('/api/office/verifications', {}, office);
@@ -447,7 +447,7 @@ test('22. een onleesbare datum wordt geweigerd, niet half opgeslagen', async () 
   /* Een datum die er niet uitziet als een datum is erger dan geen datum: die
      krijgt straks het stempel 'paspoort' en ziet er dus uit als bewijs. */
   const g = await lid('1992-02-02');
-  const office = (await api('/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+  const office = await kantoorAlsPersoon(base, 'RTG-OFFICE');
   await api('/api/verify/upload', { image: PNG }, g.token);
   await api('/api/verify/selfie', { image: PNG }, g.token);
   const pend = await api('/api/office/verifications', {}, office);

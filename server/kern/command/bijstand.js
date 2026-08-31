@@ -33,7 +33,7 @@
 const klok = require('../../lib/klok');
 
 const niveaus = require('./bijstand-niveaus');
-const { NIVEAUS } = require('./risico');
+const { NIVEAUS } = require('../frictie');
 const melden = require('./bijstand-melden');
 
 function maakBijstand({ opslag, save, crypto, journaal, tenant, diagnose }) {

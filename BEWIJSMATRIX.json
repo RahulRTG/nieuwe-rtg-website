@@ -1,106 +1,108 @@
 {
   "stempel": {
-    "op": "2026-08-20T15:47:51.090Z",
-    "commit": "fcba02e",
-    "boomVuil": true,
+    "op": "2026-08-31T19:10:33.533Z",
+    "commit": "9ecef79b",
+    "boomVuil": false,
+    "boomAnders": 6,
+    "instrument": "scripts/bewijsmatrix.js",
     "node": "v22.22.2"
   },
   "herkomst": "routekaart (draaiende server)",
   "gedegradeerd": false,
   "journaalGelezen": ".routejournaal",
-  "routes": 4188,
+  "routes": 4738,
   "schakels": 11,
-  "cellen": 46068,
+  "cellen": 52118,
   "telling": {
-    "bewezen": 16475,
+    "bewezen": 25887,
     "verklaard": 0,
-    "nvt": 272,
-    "ongemeten": 29205,
-    "gezakt": 116
+    "nvt": 308,
+    "ongemeten": 25879,
+    "gezakt": 44
   },
   "perSchakel": {
     "AUTH": {
-      "bewezen": 4187,
+      "bewezen": 4417,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 297,
+      "ongemeten": 321,
       "gezakt": 0
     },
     "ACL": {
-      "bewezen": 3079,
+      "bewezen": 3827,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 1117,
-      "gezakt": 0
+      "ongemeten": 880,
+      "gezakt": 31
     },
     "INPUT": {
-      "bewezen": 2632,
+      "bewezen": 3368,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 1556,
+      "ongemeten": 1370,
       "gezakt": 0
     },
     "OUTPUT": {
-      "bewezen": 4157,
+      "bewezen": 4151,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 4188,
+      "ongemeten": 587,
       "gezakt": 0
     },
     "STATE": {
-      "bewezen": 266,
+      "bewezen": 424,
       "verklaard": 0,
-      "nvt": 68,
-      "ongemeten": 3854,
+      "nvt": 77,
+      "ongemeten": 4237,
       "gezakt": 0
     },
     "SIDE_EFFECT": {
-      "bewezen": 266,
+      "bewezen": 424,
       "verklaard": 0,
-      "nvt": 68,
-      "ongemeten": 3854,
+      "nvt": 77,
+      "ongemeten": 4237,
       "gezakt": 0
     },
     "AUDIT": {
-      "bewezen": 575,
+      "bewezen": 709,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 3613,
+      "ongemeten": 4029,
       "gezakt": 0
     },
     "IDEMPOTENCY": {
-      "bewezen": 175,
+      "bewezen": 2072,
       "verklaard": 0,
-      "nvt": 68,
-      "ongemeten": 3840,
-      "gezakt": 105
+      "nvt": 77,
+      "ongemeten": 2578,
+      "gezakt": 11
     },
     "FAILURE": {
       "bewezen": 2,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 4186,
+      "ongemeten": 4736,
       "gezakt": 0
     },
     "ROLLBACK": {
-      "bewezen": 2214,
+      "bewezen": 2635,
       "verklaard": 0,
-      "nvt": 68,
-      "ongemeten": 1896,
-      "gezakt": 10
+      "nvt": 77,
+      "ongemeten": 2024,
+      "gezakt": 2
     },
     "PRIVACY": {
-      "bewezen": 3079,
+      "bewezen": 3858,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 1117,
+      "ongemeten": 880,
       "gezakt": 0
     }
   },
   "verslechteringToegestaan": {
-    "reden": "De routeset groeide van 3987 naar 4188 (+201, waaronder de uitrol-routes en wat er met main meekwam), dus het aantal cellen van 43857 naar 46068. Absoluut staat er daardoor meer ongemeten, maar PROPORTIONEEL is elke kolom gelijk gebleven of vooruitgegaan, en AUDIT ging van 0 naar 13,7 procent (575 routes) doordat scripts/handelingproef-route.js nu bestaat. Alle vijf de meetrondes zijn ruimer gedraaid dan de vorige vastlegging: rolproef 2937->3081, invoerproef 2510->2634, staatproef 2338->2491.",
-    "cellenVoor": 43857,
-    "cellenNa": 46068
+    "reden": "Meetruis tussen twee rondes, niet meer dan zes routes per schakel (OUTPUT -6, IDEMPOTENCY -4, ROLLBACK -3), tegenover 25884 -> 25879 ongemeten en 25885 -> 25887 bewezen in de som. Tussen de gemeten rondes (30cd8c2e -> 5dc3b081) is er geen enkele regel in server/ of public/ gewijzigd -- alleen scripts/lib/publiek.js en scripts/lib/stempel.js. Een verschil in wat een proef bereikt is daarmee per definitie ruis en geen achteruitgang; het staat als post proefruis in BEWIJSSCHULD.json.",
+    "cellenVoor": 52118,
+    "cellenNa": 52118
   },
   "uitleg": "Gegenereerd door scripts/bewijsmatrix.js. ongemeten MAG ALLEEN KRIMPEN."
 }

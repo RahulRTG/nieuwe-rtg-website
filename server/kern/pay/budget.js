@@ -7,14 +7,31 @@
    boekhoudkundige formaliteit maar de kernregel uit ./index.js -- geld ontstaat
    nooit uit het niets.
 
-   DE VOLGORDE. Eerst de positie klaarzetten, dan boeken. Faalt de boeking (de
-   werkgever heeft het niet, of het plafond van de klasse zit in de weg), dan
-   blijft er een lege positie achter. Dat is bewust de goede kant om op te
-   falen: een lege positie is zichtbaar, verwarrend hooguit, en kost niemand
-   geld. Andersom -- eerst boeken, dan de positie maken -- zou geld op een
-   rekening zetten die nog geen klasse heeft, en dan staat er tussen die twee
-   stappen saldo zonder regels. Dat is precies wat deze hele laag moet
-   voorkomen.
+   DE VOLGORDE. Eerst de positie klaarzetten, dan boeken. Andersom -- eerst
+   boeken, dan de positie maken -- zou geld op een rekening zetten die nog geen
+   klasse heeft, en dan staat er tussen die twee stappen saldo zonder regels.
+   Dat is precies wat deze hele laag moet voorkomen. Die volgorde blijft dus.
+
+   MAAR DE LEGE POSITIE MAG NIET BLIJVEN STAAN, en hier stond tot 31 augustus
+   2026 het tegenovergestelde: "een lege positie is zichtbaar, verwarrend
+   hooguit, en kost niemand geld". Dat eerste klopt en het tweede ook -- alleen
+   ontbrak er een regel in de redenering. kern/waarde/uitgifte.js laat
+   MAX_PER_LID = 25 open posities per lid toe, met als reden "meer open
+   budgetten per lid is een lek, geen gebruik".
+
+   Gemeten: 24 mislukte pogingen van EEN werkgever met te weinig saldo (402,
+   "Onvoldoende saldo") laten 24 lege posities achter, en bij de 25e krijgt het
+   LID 429 "Dit lid heeft te veel open posities" -- van iedereen, niet alleen
+   van die werkgever. Twee besluiten die elk apart kloppen en samen een lid
+   buitensluiten, zonder dat er iets kwaadwilligs gebeurt: een werkgever die
+   het even niet heeft en het opnieuw probeert, doet dit.
+
+   Faalt de boeking, dan neemt deze module de registratie dus terug. Dat is
+   geen vergeten grootboek: er is nooit geld op geweest, en de waardelaag
+   weigert de terugname als dat niet is aangetoond (registratieTerug in
+   kern/waarde/index.js). Lukt de terugname niet, dan blijft de oude toestand
+   staan en zegt het antwoord dat erbij -- stil opruimen is erger dan niet
+   opruimen.
 
    WIE MAG DIT. Niet deze module: hij kent geen sessies en geen rollen. De
    aanroeper (server/routes/pay.js) bepaalt wie de uitgever is en boekt van
@@ -36,7 +53,17 @@ module.exports = (ctx) => {
       if (v.error) return v;
       const b = await boekAsync({ van: uitgeverRek, naar: v.rek, centen: c,
         soort: 'budget', oms: schoon(oms, 120) || v.oms, ref: v.id });
-      if (b.error) return b;
+      if (b.error) {
+        /* De positie terugnemen -- zie de kop. Het saldo komt van HIER, want
+           de waardelaag houdt er zelf geen bij en neemt niets terug op gezag. */
+        const terug = waarde.uitgifteTerug
+          ? waarde.uitgifteTerug(v.rek, { saldoCenten: saldoVan(v.rek) })
+          : { status: 501, error: 'terugnemen bestaat niet in deze opstelling' };
+        if (terug && terug.error) {
+          return { ...b, legePositie: v.rek, legePositieReden: terug.error };
+        }
+        return b;
+      }
       seintje(aanCodenaam);
       return { ok: true, positie: v.rek, id: v.id, klasse: v.klasse, aan: aanCodenaam,
         centen: c, vervaltOp: v.vervaltOp, restantUitgever: saldoVan(uitgeverRek) };

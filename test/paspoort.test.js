@@ -9,7 +9,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon } = require('./helper');
 
 const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M8AAAMCAoHf3ZQAAAAASUVORK5CYII=';
 
@@ -46,7 +46,7 @@ test.before(async () => {
   base = srv.base;
   const login = await api(base, '/api/supplier/login', { username: 'rahul', password: 'Imran' });
   brand = { token: login.body.token, code: login.body.state.supplier.code };
-  office = (await api(base, '/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+  office = await kantoorAlsPersoon(base, 'RTG-OFFICE');
   lid = await nieuwGeverifieerdLid();
 });
 test.after(() => stop(srv && srv.child));

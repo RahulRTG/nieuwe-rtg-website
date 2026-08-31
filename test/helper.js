@@ -387,12 +387,36 @@ function postJson(base) {
    proefpubliek in gezelschap.js). Twee kopieen van dezelfde weg lopen uiteen
    zodra de inlog verandert -- LAT.md regel 4. Geeft null als het niet lukt, zodat
    de aanroeper zelf kan besluiten wat dat betekent. */
-async function kantoorAlsPersoon(base) {
+async function kantoorAlsPersoon(base, code) {
   const post = postJson(base);
   const eig = await post('/api/auth/login', { login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' });
-  if (!eig || !eig.token) return null;
-  const kantoor = await post('/api/account/start', { rol: 'kantoor' }, eig.token);
-  return (kantoor && kantoor.token) || null;
+  if (eig && eig.token) {
+    const kantoor = await post('/api/account/start', { rol: 'kantoor' }, eig.token);
+    if (kantoor && kantoor.token) return kantoor.token;
+  }
+  /* GEEN DEMO-EIGENAAR? DAN DE WEG DIE EEN MEDEWERKER OOK LOOPT.
+
+     De eigenaar hierboven bestaat alleen in de demo-seed. Toetsen die met een
+     eigen OFFICE_CODE en een lege database starten, kregen daarom `null` terug
+     en vielen terug op de gedeelde code -- en sinds kern/kantoor/kluispoort.js
+     komt die niet meer langs de kluisdeuren (KYC-besluit, documentnummer,
+     aftekenen).
+
+     De tweede weg is geen omweg maar het echte scenario: een eigen RTG-account,
+     daarin de kantoorrol koppelen met dezelfde code, en die rol starten. Wat je
+     terugkrijgt is een office-sessie MET een sleutel, en dat is precies wat het
+     inzagejournaal nodig heeft om een regel naar een mens terug te voeren.
+
+     Elke aanroeper krijgt een vers account, zodat twee toetsen nooit dezelfde
+     kantoormedewerker delen. */
+  const email = 'kantoor' + Date.now() + Math.random().toString(36).slice(2, 8) + '@voorbeeld.test';
+  const reg = await post('/api/auth/register', { name: 'Kantoor Toets', email,
+    password: 'geheim123', geboortedatum: '1985-05-05', pasApp: 'rtg' });
+  if (!reg || !reg.token) return null;
+  const k = await post('/api/account/koppel', { soort: 'kantoor', code: code || 'RTG-OFFICE' }, reg.token);
+  if (!k || k.error) return null;
+  const s2 = await post('/api/account/start', { rol: 'kantoor' }, reg.token);
+  return (s2 && s2.token) || null;
 }
 
 /* Een lid naar Lifestyle of Business tillen, zoals het in het echt gaat: een
@@ -989,11 +1013,13 @@ async function installeerNepMicrofoon(context) {
 
 
 const KEUR_PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M8AAAMCAoHf3ZQAAAAASUVORK5CYII=';
+
 async function keurLidGoed(base, token, codenaam, geboortedatum) {
   const post = (pad, body, tok) => fetch(base + pad, { method: 'POST',
     headers: Object.assign({ 'Content-Type': 'application/json' }, tok ? { Authorization: 'Bearer ' + tok } : {}),
     body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
-  const office = (await post('/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+  /* Op naam, want dit is een KYC-besluit: zie kantoorOpNaam hierboven. */
+  const office = await kantoorAlsPersoon(base, 'RTG-OFFICE');
   if (!office) throw new Error('kantoor-inlog mislukt; is RTG_DEMO aan?');
   await post('/api/verify/upload', { image: KEUR_PNG }, token);
   await post('/api/verify/selfie', { image: KEUR_PNG }, token);

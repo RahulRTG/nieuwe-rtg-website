@@ -182,3 +182,125 @@ test('de reclassificatie levert echte meting op, en dat is te tellen', () => {
     'de eigenrol-routes zijn kruisbaar geworden; dat aantal mag groeien maar niet ' +
     'krimpen zonder reden. Nu: ' + kruisbaar.length + ', ondergrens 138.');
 });
+
+/* ============================================================================
+   EEN OPENBARE ROUTE IS TE BEPROEVEN, EN TELDE ALS INSTRUMENTTEKORT.
+
+   WAT ER MIS WAS. `beoordeel()` gaf voor een route zonder middleware altijd
+   "geen bewakerslaag (bewaking zit in de handler)". Voor de meeste klopt dat,
+   maar niet voor de routes die met een REDEN op de openbaar-lijst staan
+   (scripts/lib/publiek.js): die horen zonder sleutel open te gaan. Ze vielen
+   daarmee in de bak GEEN_PROEFSLEUTEL van scripts/onbewezen.js -- een tekort
+   van de opstelling -- terwijl er niets ontbrak. Er valt juist WEL te meten, en
+   op de enige juiste manier: zonder token, want dat is wat een bezoeker
+   meestuurt.
+
+   Gemeten: 55 routes verhuisden van "geen sleutel" naar beproefbaar.
+
+   EN DE TWEEDE HELFT VAN DEZELFDE FOUT: `rolVan()` gaf alleen de BEWAKERS door
+   en niet het pad, dus de nieuwe tak werd nooit bereikt. De eerste meting na
+   het toevoegen gaf 0 openbaar. Een tak die stil nooit afgaat is geen tak
+   (LAT.md regel 9) -- vandaar dat de tweede toets hieronder door verdeelOpRol
+   heen meet en niet alleen beoordeel() aanroept.
+
+   DE MUTATIE: haal de PUBLIEK-tak uit beoordeel() -> beide toetsen zakken.
+   Geef in verdeelOpRol het pad niet meer mee -> de tweede zakt.
+   ========================================================================== */
+test('een route zonder bewaker die met reden openbaar is, krijgt de rol openbaar', () => {
+  const { PUBLIEK } = require('../scripts/lib/publiek');
+  const pad = [...PUBLIEK.keys()][0];
+  const u = bk.beoordeel({ bewakersBekend: true, bewakers: [], pad, methode: 'POST' });
+  assert.equal(u.rol, 'openbaar', pad + ' staat met een reden op de openbaar-lijst');
+  assert.equal(u.reden, null, 'een besluit is geen reden-om-niet');
+});
+
+test('een route zonder bewaker die NIET openbaar is, blijft een gat', () => {
+  const u = bk.beoordeel({ bewakersBekend: true, bewakers: [], pad: '/api/bestaat-niet-xyz', methode: 'POST' });
+  assert.equal(u.rol, null);
+  assert.match(u.reden, /geen bewakerslaag/);
+});
+
+test('en de verdeling bereikt die tak ook werkelijk', () => {
+  /* De tak zat er een meting lang in zonder ooit af te gaan, omdat het pad niet
+     werd doorgegeven. Deze toets meet daarom door verdeelOpRol heen. */
+  const { alleRoutes, isSchakel, verdeelOpRol } = require('../scripts/lib/routes');
+  const { ROLLEN } = require('../scripts/lib/proefsleutels');
+  const m = alleRoutes().filter(r => r.pad.startsWith('/api/') && r.methode !== 'GET' &&
+    !isSchakel(r.pad) && !r.pad.includes(':'));
+  const v = verdeelOpRol(m, ROLLEN);
+  const openbaar = v.metRol.filter(x => x.rol === 'openbaar').length;
+  assert.ok(openbaar > 20,
+    'er horen tientallen openbare schrijfroutes beproefbaar te zijn, gevonden: ' + openbaar);
+});
+
+/* ============================================================================
+   OPENBAAR MET EEN REM ERVOOR IS NOG STEEDS OPENBAAR.
+
+   De openbaar-tak zat eerst alleen op de tak ZONDER enige middleware. Maar een
+   openbare route heeft juist vaak wel iets voor zich staan -- een rem, want
+   open en scheppend hoort begrensd te zijn. /api/arrival/interpret, de twee
+   betaal-webhooks, de hele lab2-bewonerkant en het rtfos-portaal vielen
+   daardoor onder "alleen verfijners, geen laag die een identiteit vaststelt".
+   Dat is waar, en het is niet de conclusie: er valt WEL te meten, zonder token,
+   precies zoals een bezoeker het doet.
+
+   Gemeten: 41 routes stonden zo als instrumenttekort geboekt terwijl er niets
+   ontbrak.
+
+   HET IS DEZELFDE FOUT ALS EEN TAK HOGER, en die herhaling is het punt: de
+   vraag "is dit met reden openbaar" hoort niet aan de VORM van de bewakerslijst
+   te hangen. Wie hier een derde tak toevoegt, hoort deze vraag weer te stellen.
+
+   DE MUTATIE: haal de PUBLIEK-tak uit de verfijner-tak -> deze toets zakt.
+   ========================================================================== */
+test('een openbare route met alleen een rem ervoor is beproefbaar', () => {
+  const { PUBLIEK } = require('../scripts/lib/publiek');
+  const pad = '/api/arrival/interpret';
+  assert.ok(PUBLIEK.has(pad), 'deze route hoort met een reden op de openbaar-lijst te staan');
+  const u = bk.beoordeel({ bewakersBekend: true, bewakers: ['mw'], pad, methode: 'POST' });
+  assert.equal(u.rol, 'openbaar', 'een rem is geen identiteitslaag, maar ook geen reden om niet te meten');
+});
+
+test('een NIET-openbare route met alleen een rem blijft wel een gat', () => {
+  const u = bk.beoordeel({ bewakersBekend: true, bewakers: ['mw'], pad: '/api/bestaat-niet-xyz', methode: 'POST' });
+  assert.equal(u.rol, null);
+  assert.match(u.reden, /geen autorisatielaag/,
+    'zonder reden op de openbaar-lijst blijft een rem gewoon een rem');
+});
+
+test('de openbaar-lijst overschrijft nooit een ECHTE deur', () => {
+  /* De zwakste bewering mag de sterkste niet overschrijven. Staat er een
+     lichaamssleutel of een objectpoort voor, dan is er wel degelijk een deur --
+     en dan mag "hij staat op de openbaar-lijst" die niet wegschrijven. */
+  const { PUBLIEK } = require('../scripts/lib/publiek');
+  const pad = [...PUBLIEK.keys()][0];
+  for (const bewaker of ['gastAuth', 'huisAuth', 'meetpoort']) {
+    const u = bk.beoordeel({ bewakersBekend: true, bewakers: [bewaker], pad, methode: 'POST' });
+    assert.notEqual(u.rol, 'openbaar',
+      bewaker + ' is een deur; de openbaar-lijst hoort die niet weg te schrijven');
+  }
+});
+
+/* ============================================================================
+   DE OPSTELLING BESLIST -- EN DAT IS EEN ROL, GEEN GAT.
+
+   `meetpoort` (server/meetpoort.js) laat binnen op ADRES: met
+   RTG_METRICS_TOKEN gezet moet dat token mee, zonder token gaat de deur alleen
+   open vanaf een intern adres. De proeven kloppen aan vanaf 127.0.0.1, en dat
+   IS zo'n adres -- de weg die de opstelling bedoelt.
+
+   Zolang dit `rol: null` gaf, stond /api/sonde/melding als instrumenttekort
+   geboekt terwijl de proef er gewoon bij kan. Het was de laatste van de 873.
+
+   EN HIJ HEET `omgeving` EN NIET `openbaar`, met opzet: van buiten geeft deze
+   deur 404. Dat verschil hoort in het register te staan in plaats van
+   gladgestreken te worden -- anders leest een route die alleen intern open is
+   straks als een route die voor iedereen open staat.
+   ========================================================================== */
+test('een route achter de meetpoort krijgt de rol omgeving, niet openbaar', () => {
+  const u = bk.beoordeel({ bewakersBekend: true, bewakers: ['meetpoort'],
+    pad: '/api/sonde/melding', methode: 'POST' });
+  assert.equal(u.rol, 'omgeving');
+  assert.notEqual(u.rol, 'openbaar', 'van buiten geeft deze deur 404; dat is niet openbaar');
+  assert.equal(u.reden, null);
+});

@@ -49,7 +49,26 @@ const os = require('os');
 const path = require('path');
 const { spawn } = require('child_process');
 const { alleRoutes } = require('./lib/routes');
+const { gereedschapsomgeving } = require('./lib/wegwerpserver');
 const { plausibelLijf } = require('./lib/rolproef');
+/* Wanneer is dit gemeten, en waartegen. Zonder stempel is een register niet na
+   te lopen: verouderd ziet er identiek uit aan vers, en scripts/versheid.js kan
+   er niets over zeggen. Zeven registers misten hem; zie de kop van
+   scripts/lib/stempel.js. */
+const { stempel, eisSchoneBoom } = require('./lib/stempel');
+
+/* WEIGEREN VOOR HET BEGINT. Deze ronde duurt minuten en levert een register op
+   dat NERGENS meetelt zodra er ongecommit werk in de boom staat -- boomVuil
+   wordt pas aan het eind vastgesteld. Zie de kop van ./lib/stempel.js voor de
+   drie rondes die daar in een zitting aan zijn opgegaan. */
+function wachtOpSchoneBoom() {
+  const b = eisSchoneBoom('de handelingproef');
+  if (b.ok) return;
+  console.error('\n  DEZE RONDE ZOU NIET MEETELLEN\n');
+  console.error('  ' + b.reden);
+  for (const r of (b.bestanden || [])) console.error('    ' + r);
+  process.exit(3);
+}
 
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'HANDELINGPROEF.json');
@@ -86,6 +105,8 @@ async function wacht(basis, ms) {
   return false;
 }
 
+wachtOpSchoneBoom();
+
 (async () => {
   const poort = await vrijePoort();
   const datamap = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-handelingproef-'));
@@ -96,8 +117,12 @@ async function wacht(basis, ms) {
     /* RTG_DEMO=1 mint alleen de TOKENS; de routes die daarna worden beproefd
        zijn de echte, met hun echte bewakers ervoor. Zelfde afweging als in
        rolproef-route.js, en om dezelfde reden daar uitgelegd. */
-    env: { ...process.env, PORT: String(poort), RTG_DATA_DIR: datamap, SMTP_URL: '', STUN_UIT: '1',
-      RTG_DEMO: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' }
+    /* De omgeving komt uit lib/wegwerpserver: RTG_DEMO=1 is op zichzelf een
+       no-op geworden (server/testomgeving.js), en deze twee instrumenten hebben
+       nog hun eigen spawn en zouden die reparatie dus mislopen. Dat is precies
+       hoe de andere elf hem wel kregen en deze twee niet. */
+    env: gereedschapsomgeving({ poort, datamap },
+      { RTG_DEMO: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' })
   });
 
   const klaar = () => { try { kind.kill('SIGKILL'); } catch (e) {} try { fs.rmSync(datamap, { recursive: true, force: true }); } catch (e) {} };
@@ -171,6 +196,7 @@ async function wacht(basis, ms) {
   console.log('  keten van het spoor       : ' + (ketenOk ? 'klopt' : 'GEBROKEN'));
 
   fs.writeFileSync(UITSLAG, JSON.stringify({
+    stempel: stempel(),
     uitleg: 'Per schrijfroute: liet een geslaagde oproep een geketende regel na in het handelingsspoor? ' +
       'Een route die hier NIET in staat is niet beproefd, en dat is ongemeten en geen groen. ' +
       '"ongemeten" betekent hier: de oproep gaf geen 2xx, dus er is niets gebeurd en er hoort geen regel te zijn.',

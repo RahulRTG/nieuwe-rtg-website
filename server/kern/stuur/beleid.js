@@ -31,6 +31,7 @@
    onderliggende route zelf wel mag. */
 
 const { staatVan } = require('../../lib/vervalstaat');
+const { bodemVoorPad } = require('../frictie/bodem');
 
 /* LEZEN: haalt op en verandert niets. Wie hier iets bij zet dat schrijft,
    verplaatst een bevoegdheid zonder het te merken -- daarom staat de scheiding
@@ -144,6 +145,37 @@ function beleidVoor(pad, wereld) {
   if (!Object.prototype.hasOwnProperty.call(LEZEN, w)) {
     return { niveau: 'verboden', reden: 'Het AI-stuur mist een geldige, servergekozen rol.' };
   }
+  /* DE BODEM VAN HET HUIS -- kern/frictie/bodem.js, en dit is de tweede lezer.
+
+     De allowlist hierboven is een besluit dat ooit per pad genomen is. Dat is
+     kwetsbaar op precies een manier: wie er een pad bij zet, neemt dat besluit
+     opnieuw, alleen en zonder dat iets meekijkt. De bodem is de lijst grenzen
+     die NIET per pad heronderhandeld mag worden -- een KYC-besluit, een
+     pasbesluit, geld dat het huis verlaat -- en hij komt uit dezelfde bron als
+     de frictiemotor die RTG Command gebruikt.
+
+     DE TWEE SCHALEN ZIJN NIET DEZELFDE LENGTE, en scripts/gezag.js zegt met
+     zoveel woorden dat ze daarom niet op elkaar af te beelden zijn zonder een
+     besluit. Hier staat dat besluit:
+
+         direct   de machine doet het alleen            -> auto
+         voorstel de machine bereidt voor, mens tekent  -> assist
+         verboden de machine zit er niet aan            -> hand
+
+     HIJ KAN ALLEEN VERZWAREN. Er is geen tak die een pad soepeler maakt dan de
+     allowlist hem al had, en dat is de dragende eigenschap van deze koppeling:
+     een contextmodel dat frictie kan WEGHALEN is een manier om om een
+     vergunningplicht of een merkregel heen te komen. Toevoegen mag, weghalen
+     niet. Zie de kop van kern/frictie/bodem.js voor waarom dat geen theorie is:
+     FOUNDATION.md heeft dezelfde afweging al een keer gemaakt en er bewust geen
+     EXECUTE_LOW_RISK van gemaakt. */
+  const bodem = bodemVoorPad(pad);
+  if (bodem && bodem.minimum === 'hand') {
+    return { niveau: 'verboden', wereld: w, bodem: bodem.id,
+      reden: bodem.reden + ' Deze handeling doet een mens zelf; het stuur biedt hem niet aan.',
+      bron: bodem.bron };
+  }
+
   const opDeLijst = raakt(LEZEN[w], pad) ? 'lezen'
     : raakt(KLEIN[w], pad) ? 'klein'
     : (raakt(VOORSTEL[w], pad) ? 'voorstel' : null);
@@ -157,7 +189,16 @@ function beleidVoor(pad, wereld) {
       reden: 'Het bewijs achter deze actie is gezakt; hij is geschorst tot een hermeting slaagt. ' +
         'Het AI-stuur kiest niet uit onbewezen handelingen.' };
   }
-  return { niveau: opDeLijst, wereld: w, ...(staat ? { vervalstaat: staat.staat } : {}) };
+  /* Een bodem op `assist` betekent: nooit zonder menselijke bevestiging. In de
+     taal van het stuur is dat `voorstel`. Vandaag verschuift dit niets -- geen
+     van de bodempaden staat op een LEZEN- of KLEIN-lijst -- en dat is het punt: het was
+     tot nu toe waar bij toeval, en het is nu waar bij constructie. Wie morgen
+     /api/bank/sepa op zo'n lijst zet, krijgt hier een voorstel terug in
+     plaats van een stille uitvoering. */
+  const niveau = bodem && bodem.minimum === 'assist' && opDeLijst !== 'voorstel' ? 'voorstel' : opDeLijst;
+  return { niveau, wereld: w,
+    ...(niveau !== opDeLijst ? { bodem: bodem.id, reden: bodem.reden, bron: bodem.bron } : {}),
+    ...(staat ? { vervalstaat: staat.staat } : {}) };
 }
 
 function toegestanePaden(paden, wereld) {

@@ -1300,6 +1300,7 @@
       "handelsregelwacht",
       "instelling",
       "keyVanCodenaam",
+      "kluisAuth",
       "logInlog",
       "loginFails",
       "mail",
@@ -2198,6 +2199,7 @@
       "auth",
       "db",
       "findSupplier",
+      "kluisAuth",
       "logActivity",
       "notify",
       "officeAuth",
@@ -2213,6 +2215,7 @@
       "vakbewijzenVerlopend"
     ],
     "vakbewijs-kantoor": [
+      "kluisAuth",
       "persoonseis",
       "sendPushToUser",
       "stuur",

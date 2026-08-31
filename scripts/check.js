@@ -1827,7 +1827,13 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
      namen hier doen -- alleen is het bewijs een sleutel van de tafel in plaats
      van een sessie van een account, omdat een gast aan tafel 12 geen lid hoeft
      te zijn. */
-  const POORT_MW = new Set(['auth', 'supplierAuth', 'officeAuth', 'techAuth', 'boardroomAuth',
+  const POORT_MW = new Set(['auth', 'supplierAuth', 'officeAuth',
+    /* de kluispoort (kern/kantoor/kluispoort.js): officeAuth PLUS identiteit.
+       Een gedeelde backoffice-code komt er niet door, want wat erachter gebeurt
+       komt in het inzagejournaal en daar hoort een mens bij. Hij staat hier als
+       eigen naam en niet als variant van officeAuth: dat is precies het
+       onderscheid dat deze regel zichtbaar hoort te maken. */
+    'kluisAuth', 'techAuth', 'boardroomAuth',
     'huisAuth', 'baasAuth', 'lid', 'geenGast', 'eigenaarAlleen', 'meetpoort', 'gastAuth',
     /* de gezinsdeur van het RTFoundation-huis (gezinscode + profieltoken, gasten
        erbuiten). Stond eerst als aanroep BINNEN de handler; is middleware geworden
@@ -1847,13 +1853,12 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
      tekstafstand te plezieren. */
   const POORT_BINNEN = /\b(profiel|schoolProfiel|rtfSociaal|eisAccount|resolveSession|verifyToken|sessionFor|magInzien|isEigenaar|boardroomWie|magBoardroom|doosSleutelOk|magMeten|metPartner|samenSess|kantoorSess|werkPoort|beheerVan|lidVan|viaBeheerOfDirectie)\s*\(/;
 
-  /* PUBLIEK MET REDEN staat in ./lib/publiekeroutes.js, en daar alleen. Hij
-     stond hier, en het mutatiecontractregister heeft hem ook nodig: een contract
-     eist een toegangsklasse, en voor een publieke route is dat PUBLIC MET EEN
-     REDEN -- precies wat hier per route al geschreven staat. Twee kopieen zouden
-     uiteenlopen, en dan noemt de ene lijst een route publiek die op de andere
-     een poort heeft. */
-  const { PUBLIEK } = require('./lib/publiekeroutes');
+  /* PUBLIEK MET REDEN woont in ./lib/publiek.js, en daar alleen: keuringsregel
+     28, scripts/handlerwacht.js en het mutatiecontractregister stellen dezelfde
+     vraag, en twee lijsten van wat openbaar mag zijn lopen uiteen (LAT.md regel
+     4). ./lib/publiekeroutes.js is de doorgang voor het contractregister en
+     houdt zelf niets vast. */
+  const { PUBLIEK } = require('./lib/publiek');
 
   let gaten = 0, viaMw = 0, viaBinnen = 0, totaal = 0;
   /* DE STAART NIET MEE-MATCHEN. Hier stond ([\s\S]{0,800}) in het patroon zelf,
@@ -3676,8 +3681,23 @@ console.log('\n51) elke afdruk is gelijk aan de meting eronder');
          ook een blok dat er morgen bij komt. Vandaar de vereniging van beide
          sleutelverzamelingen: een blok dat wel op schijf staat en niet meer in de
          meting is net zo goed achterstand. */
+      /* `stempel` hoort er ook niet bij, en om precies dezelfde reden als de
+         datum: hij zegt WANNEER er gemeten is en niet WAT. HANDLERWACHT.json
+         draagt er een (scripts/versheid.js leest hem), en zonder deze
+         uitzondering meldt deze regel bij elke ronde "stempel wijkt af" --
+         een regel die altijd rood staat, wordt genegeerd. */
+      /* `groei` hoort er om DEZELFDE reden niet bij, en om een tweede die er
+         nog scherper is. BEWIJSSCHULD.json draagt een groeigeschiedenis: per
+         keer dat de achterstand omhoog ging, met de reden erbij. Die ontstaat
+         alleen bij het vastleggen (--groei="...") en komt in de meting dus
+         nooit voor -- zonder deze uitzondering meldt de regel bij elke ronde
+         "groei wijkt af", en een regel die altijd rood staat wordt genegeerd.
+
+         En hij MOET blijven staan: hij is de enige plek waar leest waarom een
+         schuld ooit gegroeid is. Hem meevergelijken zou hem stilzwijgend
+         wegpoetsen bij het eerstvolgende vastleggen. */
       const blokken = [...new Set([...Object.keys(opSchijf), ...Object.keys(vers)])]
-        .filter(k => k !== 'uitleg' && k !== 'vastgelegd');
+        .filter(k => k !== 'uitleg' && k !== 'vastgelegd' && k !== 'stempel' && k !== 'groei');
       const anders = (a, b) => JSON.stringify(a) !== JSON.stringify(b);
       const verschil = [];
       for (const k of blokken) {
@@ -3706,6 +3726,37 @@ console.log('\n51) elke afdruk is gelijk aan de meting eronder');
     zeg: (v) => v.gemeten.vormen + ' bewaarde vormen in ' + v.gemeten.bestanden +
       ' bestanden, en OBJECTMODEL.json is daar in elk blok gelijk aan'
   });
+  /* DE SCHULDENLIJST ZELF, en dat gat was er een van de pijnlijke soort.
+     BEWIJSSCHULD.json houdt bij wat er nog NIET gemeten is; hij stond tien
+     dagen en 126 commits stil, op een vuile boom gemeten, en niets klaagde --
+     terwijl de idempotentiemeting er wel al een verspoort had. Een lijst van
+     wat er nog open staat, die zelf kan verouderen, is de gevaarlijkste soort
+     register: hij ziet er even gezaghebbend uit als een verse.
+
+     Hij is goedkoop om na te rekenen (0,2 seconde: hij LEEST de registers en
+     meet niet zelf), dus hij kan gewoon bij elke keuring mee. Dat zijn getallen
+     zo vers zijn als de registers eronder, bewaakt scripts/versheid.js -- daar
+     staat hij sinds dezelfde ronde ook in. */
+  afdrukGelijk({
+    bestand: 'BEWIJSSCHULD.json', meter: () => require('./bewijsschuld').meet(),
+    vast: 'node scripts/bewijsschuld.js --vastleggen',
+    zeg: (v) => v.gemeten.achterstand + ' achterstand en ' + v.gemeten.randVanDeMethode +
+      ' rand van de methode over ' + v.gemeten.postenTotaal +
+      ' posten, en BEWIJSSCHULD.json is daar in elk blok gelijk aan'
+  });
+  afdrukGelijk({
+    bestand: 'HANDLERWACHT.json', meter: () => require('./handlerwacht').meet(),
+    vast: 'npm run handlerwacht:vast',
+    zeg: (v) => v.gemeten.zonderBewakerslaag + ' routes zonder bewakerslaag, waarvan ' +
+      v.gemeten.bewaakt + ' met een gezagsfunctie en ' + v.gemeten.onbewaakt +
+      ' zonder enige controle, en HANDLERWACHT.json is daar in elk blok gelijk aan'
+  });
+  afdrukGelijk({
+    bestand: 'GRAAFAS.json', meter: () => require('./graafas').meet(),
+    vast: 'npm run graafas:vast',
+    zeg: (v) => v.gemeten.grafen + ' grafen, ' + v.gemeten.metEenEigenEenheid + ' met een eigen eenheid, ' +
+      v.gemeten.verschillendeAssen + ' verschillende dringendheidsassen, en GRAAFAS.json is daar in elk blok gelijk aan'
+  });
   afdrukGelijk({
     bestand: 'COMMERCE.json', meter: () => require('./commerce').meet(),
     vast: 'npm run commerce:vast',
@@ -3726,6 +3777,32 @@ console.log('\n51) elke afdruk is gelijk aan de meting eronder');
    Waarom dit ernaast moet en test/wereldregister.test.js niet volstaat: die
    toets meet dat elk item ergens OP UITKOMT. Hij zegt niets over de vraag of het
    document dat mensen lezen nog dezelfde inhoud beschrijft. */
+/* 53b) FUNCTIES.md LOOPT NIET ACHTER OP DE REGISTERS.
+
+   Zelfde vorm als de wereldlijst hiernaast, en om dezelfde reden nodig: dit
+   document OPENDE met de belofte dat het "niet met de hand opgeschreven maar
+   afgelezen uit de bron" is, en was met de hand bijgehouden. Het stond op 145
+   schakelaars waar er 204 zijn, en op 83 apps waar er 84 zijn. Een document dat
+   zijn eigen betrouwbaarheid belooft en het niet waarmaakt, wordt geloofd.
+
+   Alleen de drie LIJSTEN worden afgeleid; de inleiding en alles vanaf hoofdstuk
+   4 zijn met de hand geschreven en blijven staan (zie scripts/functielijst.js). */
+console.log('\n53b) FUNCTIES.md loopt niet achter op de registers');
+{
+  try {
+    const fl = require('./functielijst');
+    const opSchijf = fs.existsSync(fl.DOEL) ? fs.readFileSync(fl.DOEL, 'utf8') : null;
+    if (opSchijf === null) fout('FUNCTIES.md bestaat niet -- draai: npm run functielijst');
+    else if (opSchijf !== fl.bouw()) fout('FUNCTIES.md loopt achter op de registers -- draai: npm run functielijst');
+    else {
+      const n = require('../server/functies/register').FUNCTIES.length;
+      ok(n + ' functieschakelaars, en FUNCTIES.md is daar gelijk aan');
+    }
+  } catch (e) {
+    fout('FUNCTIES.md kon niet worden opgebouwd (' + e.message + '); dan stelt deze regel niets vast');
+  }
+}
+
 console.log('\n53) WERELDLIJST.md loopt niet achter op het wereldregister');
 {
   try {

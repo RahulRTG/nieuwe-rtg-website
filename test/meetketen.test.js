@@ -51,8 +51,14 @@ test('1. een stempel draagt wanneer, waartegen en of de boom schoon was', () => 
      zich daarmee als reproduceerbaar zou voordoen. De verwachting wordt hier
      los berekend: dat is geen tweede implementatie maar de hele bedoeling van
      een toets. */
+  /* De verwachting los berekend, met dezelfde GRENS als stempel(): alleen
+     ongecommitte CODE maakt een meting onreproduceerbaar. Een register of een
+     document in de boom doet dat niet -- zie CODEPADEN in stempel.js. */
   const echtVuil = spawnSync('git', ['status', '--porcelain'],
-    { cwd: WORTEL, encoding: 'utf8' }).stdout.trim().length > 0;
+    { cwd: WORTEL, encoding: 'utf8' }).stdout.split('\n')
+    .filter(r => r.trim()).map(r => r.slice(3))
+    .some(pad => pad.split(' -> ').some(d =>
+      ['server', 'scripts', 'public'].some(c => d === c || d.startsWith(c + '/'))));
   assert.equal(s.boomVuil, echtVuil,
     'boomVuil zegt ' + s.boomVuil + ' terwijl de boom ' + (echtVuil ? 'vuil' : 'schoon') + ' is');
   assert.equal(s.node, process.version);

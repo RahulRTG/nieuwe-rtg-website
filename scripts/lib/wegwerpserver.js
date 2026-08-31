@@ -21,6 +21,42 @@
    er geen TIENDE kopie bij komt.
    ========================================================================== */
 'use strict';
+
+/* RTG_DEMO=1 IS OP ZICHZELF EEN NO-OP GEWORDEN, EN DAT LEGDE DERTIEN
+   INSTRUMENTEN STIL ZONDER EEN ENKELE FOUTMELDING.
+
+   server/testomgeving.js kent sinds kort een expliciete testomgeving:
+
+     actief = NODE_ENV === 'test' && RTG_DEMO === '1'   (oude weg)
+            of RTG_MAGNAAT_TEST === '1'                 (de nieuwe vlag)
+
+   Dertien instrumenten geven `RTG_DEMO: '1'` mee en verder niets. Die vlag doet
+   sindsdien niets: de demo-inlog blijft dicht, /api/login geeft 403 "Log in met
+   je account", en de proef stopt met "geen token voor member, supplier".
+
+   WAT DAT KOSTTE. IDEMPROEF.json staat sinds 20 augustus stil, en dat leek
+   achterstallig onderhoud. Het was een KAPOT INSTRUMENT: hij kan niet meer
+   starten. Het register bleef ondertussen 845 beproefde routes tonen, en
+   scripts/versheid.js meldde alleen "verouderd" -- want die kent het verschil
+   niet tussen een meting die niet is herhaald en een meting die niet MEER KAN.
+   Een register dat getallen toont van een instrument dat niet meer draait, is
+   de gevaarlijkste vorm van schijnzekerheid die dit huis kent.
+
+   DE VERTALING STAAT HIER EN NIET IN DERTIEN BESTANDEN. Wie om de demo-stand
+   vraagt, krijgt de omgeving waarin die stand bestaat. Wie hem niet vraagt,
+   merkt niets: er wordt nooit een testomgeving aangezet die de aanroeper niet
+   heeft gevraagd. */
+function gereedschapsomgeving({ poort, datamap }, eigen) {
+  const env = Object.assign({}, process.env, {
+    PORT: String(poort), RTG_DATA_DIR: datamap, SMTP_URL: '', STUN_UIT: '1'
+  }, eigen || {});
+  if (env.RTG_DEMO === '1' && env.RTG_MAGNAAT_TEST !== '1' && env.NODE_ENV !== 'test') {
+    env.RTG_MAGNAAT_TEST = '1';
+  }
+  return env;
+}
+
+
 const fs = require('fs');
 const os = require('os');
 const net = require('net');
@@ -79,9 +115,7 @@ async function start(opties) {
   const kind = spawn(process.execPath, nodeArgs, {
     cwd: WORTEL,
     stdio: uit === 'ignore' ? 'ignore' : ['ignore', uit, uit],
-    env: Object.assign({}, process.env, {
-      PORT: String(poort), RTG_DATA_DIR: datamap, SMTP_URL: '', STUN_UIT: '1'
-    }, o.env || {})
+    env: gereedschapsomgeving({ poort, datamap }, o.env)
   });
 
   const klaar = () => {
@@ -114,4 +148,4 @@ async function start(opties) {
   return { basis, poort, datamap, kind, klaar, dood: false };
 }
 
-module.exports = { start, vrijePoort, wachtTotOp, WORTEL };
+module.exports = { gereedschapsomgeving, start, vrijePoort, wachtTotOp, WORTEL };

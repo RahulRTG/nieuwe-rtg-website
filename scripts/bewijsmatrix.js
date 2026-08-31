@@ -451,10 +451,29 @@ function bouw(invoer) {
            evenmin: dat is dezelfde wisselende waarneming met een uitgezochte
            reden eronder, en een reden is geen meting. Alleen 'bewezen' passeert
            hier, zodat een verklaring nooit een cel kan vullen. */
-        cellen[s.id] = !a ? { staat: 'ongemeten' }
-          : a.staat === 'bewezen' ? { staat: 'bewezen', bron: 'auditproef', reden: a.reden }
+        /* HIJ CLAIMDE DE CEL OOK ALS ZIJN BRON LEEG WAS, en daarmee waren de
+           twee AUDIT-takken verderop in deze lus onbereikbaar.
+
+           `auditp` komt uit objectRegister(), en die geeft null zodra
+           AUDITPROEF.json zijn perRoute als LIJST schrijft in plaats van als
+           object -- wat scripts/auditproef-route.js doet. Elke route kreeg dus
+           `{ staat: 'ongemeten' }` en een `continue`, waarna de tak die de
+           handelingproef leest (en de tak die AUDITPROEF wél als lijst leest)
+           nooit aan de beurt kwam. De hele AUDIT-kolom stond stil op nul,
+           terwijl beide proeven honderden bewezen routes rapporteerden.
+
+           Zichtbaar geworden toen de proefinstrumenten weer konden draaien: de
+           ratel meldde "AUDIT bewezen 575 -> 0 (is de meetronde meegeleverd?)"
+           terwijl hij dat wél was. Die vraag was de juiste vraag op de
+           verkeerde plek -- het lag niet aan de ronde maar aan deze regel.
+
+           Nu claimt hij alleen wat hij werkelijk weet en laat de rest door. */
+        if (a) {
+          cellen[s.id] = a.staat === 'bewezen'
+            ? { staat: 'bewezen', bron: 'auditproef', reden: a.reden }
             : { staat: 'ongemeten', bron: 'auditproef', reden: a.reden };
-        continue;
+          continue;
+        }
       }
 
       if (s.id === 'FAILURE' || s.id === 'ROLLBACK') {

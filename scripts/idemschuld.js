@@ -29,6 +29,16 @@
 const fs = require('fs');
 const path = require('path');
 const { alleRoutes } = require('./lib/routes');
+/* WANNEER IS DIT GETELD, EN WAARTEGEN.
+
+   Dit register droeg geen stempel, en daardoor was het onzichtbaar voor
+   scripts/versheid.js -- dat instrument bestaat juist omdat "een verouderd
+   register gevaarlijker is dan een ontbrekend register: een ontbrekend register
+   geeft niet-gemeten, een verouderd register geeft getallen, en getallen worden
+   geloofd". Een schuldteller waarvan niemand de ouderdom kan vaststellen, is
+   precies de vorm waar die zin over gaat. Gevonden door scripts/mutatieboek.js,
+   die zijn eigen afwijking met de vastlegging niet kon duiden. */
+const { stempel } = require('./lib/stempel');
 const { SLEUTELS } = require('../server/lib/idemsleutels');
 
 const WORTEL = path.join(__dirname, '..');
@@ -54,6 +64,7 @@ const bekend = new Set(routes.map(r => r.methode.toUpperCase() + ' ' + r.pad));
 const wees = Object.keys(SLEUTELS).filter(s => !bekend.has(s));
 
 const uit = {
+  stempel: stempel(),
   uitleg: 'Schrijfroutes zonder verklaring in server/lib/idemsleutels.js. MAG ALLEEN KRIMPEN -- ' +
     'zie test/idemschuld.test.js. Een route met nietIdempotent staat NIET in de schuld: daar is over ' +
     'nagedacht. Dit telt of er een besluit is, niet of de idempotentie werkt (dat doet de idemproef).',

@@ -362,6 +362,13 @@ wachtOpSchoneBoom();
 
   /* DE POSTBUSWERELD -- ./lib/wereld-rtmail.js. Vier dingen (bericht, team,
      concept, regel) over TWEE domeinen die dezelfde postbus zijn. */
+  /* HET STADSWEEFSEL -- ./lib/wereld-weefsel.js. Een gebied, een object, een
+     doel en een werkorder; de plek wordt uit de kaart GELEZEN. */
+  const { zetWeefselKlaar } = require('./lib/wereld-weefsel');
+  const weefselWereld = await zetWeefselKlaar({ post, tokens });
+  console.log('  stadsweefsel                         : ' + (weefselWereld.klaar ? 'klaar' : 'NIET klaar -- ' + weefselWereld.reden));
+  for (const st of weefselWereld.stappen) if (!st.ok) console.log('      ' + st.naam + ': ' + st.waarom);
+
   const { zetRtmailKlaar, lijfVoor: rtmailLijf } = require('./lib/wereld-rtmail');
   const rtmailWereld = await zetRtmailKlaar({ post, tokens });
   console.log('  postbuswereld                        : ' + (rtmailWereld.klaar ? 'klaar' : 'NIET klaar -- ' + rtmailWereld.reden));
@@ -383,7 +390,8 @@ wachtOpSchoneBoom();
       /* NA de familie: die levert het token van de BEHEERDER, en een deel van
          /api/rtf/ hoort bij het kind. Zie ./lib/wereld-rtf.js. */
       ...(r.pad.startsWith('/api/rtf/') ? rtfWereld.lijfVoor(schoolWereld.extra, r.pad) : {}),
-      ...rtmailLijf(rtmailWereld.extra, r.pad) }),
+      ...rtmailLijf(rtmailWereld.extra, r.pad),
+      ...(r.pad.startsWith('/api/office/weefsel/') ? weefselWereld.extra : {}) }),
     koppenVoor: (r) => lijfsleutels.koppenVoor(r.pad)
   });
   console.log('  objecten gemaakt voor de proef       : ' + objecten.gelukt + ' van ' +
@@ -482,6 +490,7 @@ wachtOpSchoneBoom();
       ...(lijfsleutels.lijfVoor(r.pad) || {}),
       ...(r.pad.startsWith('/api/rtf/') ? rtfWereld.lijfVoor(schoolWereld.extra, r.pad) : {}),
       ...rtmailLijf(rtmailWereld.extra, r.pad),
+      ...(r.pad.startsWith('/api/office/weefsel/') ? weefselWereld.extra : {}),
       ...(geldLijven[r.pad] || {}) }),
     koppenVoor: (r) => lijfsleutels.koppenVoor(r.pad), maxRoutes: MAX, staatVan,
     /* De stand van het opslag-meetpunt reist mee: in stand 2 mag de uitslag

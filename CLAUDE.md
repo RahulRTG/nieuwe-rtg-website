@@ -706,13 +706,15 @@ voor je iets bouwt dat bepaalt of een handeling mag, hoeveel bevestiging hij
 vraagt, of hij te herhalen is of hoe hij terugdraait. De kern in een zin: **een
 scherm, een automatisering, de commandbalk, een AI-agent, een externe aanroep en
 een geplande taak leveren allemaal intentie -- alleen de execution plane
-veroorzaakt effecten.** Het opent met de dubbele waarheid die dit huis vandaag
-heeft: `kern/command/risico.js` rekent per geval uit of iets `hand`, `assist` of
-`auto` mag (met de score-opbouw erbij, want een cijfer zonder opbouw is een
-orakel), terwijl `kern/stuur/beleid.js` er naast staat met 21 patronen `direct`
-en 27 `voorstel`, vast per route en ongeacht bedrag. Twee correcte systemen die
-dezelfde werkelijkheid verschillend modelleren -- de klasse die `SEMANTIEK.json`
-94 keer mat. De eerste opdracht is daarom semantische consolidatie en geen
+veroorzaakt effecten.** Het opent met de gezagsvraag: `kern/command/risico.js`
+rekent per geval uit of iets `hand`, `assist` of `auto` mag (met de score-opbouw
+erbij, want een cijfer zonder opbouw is een orakel), terwijl `kern/stuur/beleid.js`
+er naast staat met 21 patronen `direct` en 27 `voorstel`, vast per route en
+ongeacht bedrag. **Het zijn er trouwens vijf en geen twee** -- `scripts/gezag.js`
+registreert vijf gezagsvocabulaires plus 22 losse niveaunamen -- en ze botsen
+vandaag NERGENS: van de 120/40/16 AI-bedienbare paden is er geen enkele een
+Command-route. Dat is geen geruststelling maar een tijdvenster, want PLAN heeft
+die kruising nodig. De eerste opdracht is daarom semantische consolidatie en geen
 featurewerk. Vijf van de zeven "grote sprongen" blijken al gebouwd, alleen voor
 de ops-cockpit: voor- en nacontrole (`command/transactie-poorten.js`, waar *een
 controle die niet kon draaien niet geslaagd is* en de verificatie POSITIEF
@@ -744,7 +746,16 @@ zodra die dekking zakt. De dekkingsmeter verdiende zich meteen terug met drie
 gemiste vermogens, waaronder een zin met twee typefouten die naar EEN pad
 versmalde dat er niets mee te maken had -- daaruit volgt de regel *dun bewijs is
 geen bewijs*: raakt maar een woord iets terwijl de vraag er drie draagt, dan gaat
-de volledige lijst terug. Hij verandert geen bevoegdheid en kan dat ook niet
+de volledige lijst terug. **Blok 2 staat als MEETLAAG en niet als beslisser**
+(`scripts/gezagsnoemer.js`, `npm run gezagsnoemer`): een vier-tredige noemer
+(`geen` / `tonen` / `klaarzetten` / `uitvoeren`) waarin alle vijf schalen worden
+verklaard -- 16 treden evident met een citaat dat letterlijk in de bron moet
+staan, 3 aangenomen en 1 ONBEPAALD. Die laatste is de scherpste: `direct` in de
+AI-allowlist betekent "lezen OF een kleine omkeerbare handeling", en dat zijn twee
+noemertreden in een woord. De noemer beslist met opzet niets en woont daarom in
+`scripts/`; `test/gezagsnoemer.test.js` zakt zodra iets uit `server/` hem
+importeert, want dan is hij de zesde gezagsschaal in plaats van de laag
+eroverheen. Neem de vier open besluiten vóór je twee schalen in een keten mengt. Hij verandert geen bevoegdheid en kan dat ook niet
 (hij filtert de lijst die `beleid.js` al goedkeurde, en toets 1 houdt vast dat de
 uitkomst altijd een deelverzameling is), en zijn woordenschat komt uit de
 padsegmenten zelf zodat er geen tweede routelijst ontstaat. Twee dingen daar niet

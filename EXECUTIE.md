@@ -67,8 +67,27 @@ tegenspreken.*
 (wijzigt, deelt, boekt, beweegt geld), vast per route, ongeacht bedrag,
 omkeerbaarheid of wie het raakt.
 
-Beide zijn goed voor hun eigen laag. Samen zijn ze een tweede waarheid, en de
-richting is daarom niet "verhuis het ene naar het andere" maar:
+**En het zijn er niet twee maar vijf.** Dat bleek bij het bouwen van blok 2, en
+het corrigeert de eerste versie van dit document. `scripts/gezag.js` houdt al een
+register bij van **vijf gezagsvocabulaires** die elk de vraag "mag de machine dit
+zelf?" met eigen woorden beantwoorden — de twee hierboven plus
+`geldbeleid/regels.js` (kijken/voorstellen/klaarzetten/automatisch),
+`stadsweefsel/ainiveau.js` (waarnemen/adviseren/voorbereiden/begrensd/verboden)
+en `bureau/delegatie.js` (informeren/aanbevelen/voorbereiden/uitvoeren/autonoom),
+plus 22 losse niveaunamen die als kale tekenreeks in andere modules staan. Het
+register zegt er zelf bij wat het niet kan: *geen mens en geen machine kan ze
+naast elkaar leggen*, en een afbeelding maken is een **besluit** en geen
+afleiding.
+
+**En ze botsen vandaag nergens.** Ook dat is gemeten: van de 120 (member), 40
+(supplier) en 16 (staff) AI-bedienbare paden is er **geen enkele** een
+Command-route, en er is geen geldbeleid-route bij. De vijf schalen delen op dit
+moment dus geen enkele concrete handeling. Dat is geen geruststelling maar een
+tijdvenster: het moment dat één Command-route AI-bedienbaar wordt — en PLAN
+(blok 3) heeft dat nodig — verschijnen er twee antwoorden op dezelfde vraag en is
+er geen manier om ze naast elkaar te leggen.
+
+Daarom is de richting niet "verhuis het ene naar het andere" maar:
 
 > **Er bestaat in RTG precies één antwoord op de vraag welke frictie déze
 > concrete handeling nú vereist.** Cockpit, AI, commandbalk, klassieke UI en
@@ -353,13 +372,63 @@ bereikbaarheid, bewijs, risico, omkeerbaarheid, impact, waarde, frictie,
 herhaling, kosten, mandateerbaarheid, simuleerbaarheid, herstel, verval. Zoveel
 mogelijk afgeleid, en wat niet afgeleid kan worden staat als `ONBEPAALD`.
 
-### Blok 2 — Eén risicosemantiek · **een stap weg, en het raakt een draaiende laag**
+### Blok 2 — Eén risicosemantiek · **de noemer STAAT, het besluit erover niet**
 
-`kern/command/risico.js` naar de kern, cockpit en stuur lezen eruit (par. 1).
-Technisch klein, operationeel niet: het raakt een werkende ops-laag, en dat is
-precies waar een migratie veiligheidsmechanismen kapot kan maken. Schaduw eerst:
-laat de kernmotor meelopen naast het bestaande binaire beleid en meet waar ze
-verschillen, vóórdat de uitslag ergens iets beslist.
+De eerste opzet van dit blok was "`kern/command/risico.js` naar de kern, cockpit
+en stuur lezen eruit". Die opzet is bij het bouwen gesneuveld, en om een goede
+reden: er zijn vijf schalen en geen twee, ze raken vandaag geen gemeenschappelijke
+handeling, en een 3-tredige schaal op een andere 3-tredige schaal afbeelden is
+precies het "afbeelden zonder besluit" waar `scripts/gezag.js` voor waarschuwt.
+Een migratie van een draaiende ops-laag zou dus risico hebben genomen om een
+probleem op te lossen dat vandaag niet bestaat, op een manier die de echte vraag
+overslaat.
+
+**Wat er wél gebouwd is: de gedeelde noemer** (`scripts/gezagsnoemer.js`,
+`GEZAGSNOEMER.json`, `npm run gezagsnoemer`). Vier treden waarin alle vijf schalen
+worden verklaard:
+
+| trede | wat |
+|---|---|
+| `geen` | de handeling bestaat niet voor de machine |
+| `tonen` | de machine leest, rekent of adviseert en verandert niets |
+| `klaarzetten` | de machine stelt samen; een mens bevestigt |
+| `uitvoeren` | de machine voert uit, binnen beleid |
+
+Twintig treden verklaard: **16 evident** (met een citaat uit de bron, en de toets
+controleert dat die zin er letterlijk staat), **3 aangenomen** en **1 onbepaald**.
+Die vier zijn de opbrengst, niet de bijvangst — het zijn de besluiten die de
+eigenaar moet nemen vóór PLAN twee schalen in één keten mengt:
+
+1. `geldbeleid/regels.js :: voorstellen` — is een voorstel aan een lid al
+   klaarzetten, of pas tonen? Die schaal kent beide woorden náást elkaar, dus daar
+   is het verschil bedoeld; de noemer heeft er een trede minder.
+2. `stadsweefsel/ainiveau.js :: begrensd` — begrensd en onbegrensd uitvoeren
+   vallen in de noemer samen. Is de grens zelf een trede, of een eigenschap van de
+   uitvoering?
+3. `bureau/delegatie.js :: autonoom` — die schaal onderscheidt *uitvoeren* van
+   *autonoom* (zonder opdracht per geval). Dat onderscheid valt weg.
+4. `stuur/beleid.js :: direct` — **onbepaald**, en dit is de scherpste. De bron
+   zegt "uitsluitend lezen **óf** een kleine, omkeerbare handeling zonder externe
+   gevolgen". Dat zijn twee noemertreden in één trede: `direct` dekt zowel `tonen`
+   als `uitvoeren`. Eén woord in de AI-allowlist betekent dus vandaag twee
+   verschillende dingen over wat de machine zelfstandig doet.
+
+**Het is een meetlaag en geen beslisser**, en dat is afgedwongen: hij woont in
+`scripts/`, en toets 7 zakt zodra iets uit `server/` hem importeert — want dan is
+hij de zesde gezagsschaal in plaats van de laag eroverheen, en dat is precies wat
+de ratel in `scripts/gezag.js` tegenhoudt. Hij gebruikt ook het woord `niveau`
+niet, zodat de teller van dat huis niet vervuilt door dit huis.
+
+De toets is fail-closed tegenover het bestaande register: elke schaal en elke
+trede uit `scripts/gezag.js` móét een verklaring hebben (een zesde schaal kan er
+niet stil bij komen), de projectie mag nooit verruimen (wat "een mens doet het
+zelf" zegt kan niet op `uitvoeren` uitkomen), en een `evident` citaat dat niet
+letterlijk in de bron staat laat de bouw zakken — wat meteen gebeurde bij het
+eerste citaat dat over een regeleinde liep.
+
+**Wat er hierna nog moet:** de vier besluiten nemen, en pas dáárna één motor. De
+verhuizing van `risico.js` blijft de juiste eindtoestand; hij is alleen niet de
+eerste stap.
 
 ### Blok 3 — PLAN als protocol · **een besluit nodig**
 

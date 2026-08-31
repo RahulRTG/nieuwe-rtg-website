@@ -1,0 +1,257 @@
+{
+ "uitleg": "De vier-tredige noemer waarin de vijf gezagsschalen van GEZAG.json worden verklaard, met per trede of de verklaring EVIDENT is (citaat uit de bron), AANGENOMEN (een mens moet beslissen) of ONBEPAALD (de trede dekt twee noemertreden en is niet af te beelden). Dit is een meetlaag: er hangt geen gedrag aan, en test/gezagsnoemer.test.js zakt zodra server/ hem importeert.",
+ "noemer": [
+  {
+   "trede": "geen",
+   "wat": "de handeling bestaat niet voor de machine"
+  },
+  {
+   "trede": "tonen",
+   "wat": "de machine leest, rekent of adviseert en verandert niets"
+  },
+  {
+   "trede": "klaarzetten",
+   "wat": "de machine stelt samen; een mens bevestigt"
+  },
+  {
+   "trede": "uitvoeren",
+   "wat": "de machine voert uit, binnen beleid"
+  }
+ ],
+ "schalen": 5,
+ "treden": 20,
+ "evident": 16,
+ "aangenomen": [
+  {
+   "bestand": "server/kern/geldbeleid/regels.js",
+   "trede": "voorstellen",
+   "noemer": "tonen",
+   "grond": "aangenomen",
+   "vraag": "Is een VOORSTEL aan een lid al \"klaarzetten\", of pas iets tonen? Deze schaal kent beide woorden naast elkaar, dus het verschil is daar bedoeld; de noemer heeft er een trede minder.",
+   "bronGevonden": true
+  },
+  {
+   "bestand": "server/kern/stadsweefsel/ainiveau.js",
+   "trede": "begrensd",
+   "noemer": "uitvoeren",
+   "grond": "aangenomen",
+   "vraag": "Begrensd uitvoeren en onbegrensd uitvoeren vallen in de noemer samen. Hoort de grens zelf een noemertrede te zijn, of is hij een eigenschap van de uitvoering?",
+   "bronGevonden": true
+  },
+  {
+   "bestand": "server/kern/bureau/delegatie.js",
+   "trede": "autonoom",
+   "noemer": "uitvoeren",
+   "grond": "aangenomen",
+   "vraag": "Deze schaal onderscheidt UITVOEREN van AUTONOOM (zonder opdracht per geval). De noemer doet dat niet: dat onderscheid valt weg. Hoort er een vijfde trede te zijn?",
+   "bronGevonden": true
+  }
+ ],
+ "onbepaald": [
+  {
+   "bestand": "server/kern/stuur/beleid.js",
+   "trede": "direct",
+   "noemer": [
+    "tonen",
+    "uitvoeren"
+   ],
+   "grond": "onbepaald",
+   "vraag": "De bron zegt: \"uitsluitend lezen OF een kleine, omkeerbare handeling zonder externe gevolgen\". Dat zijn twee noemertreden in een trede. Splitsen (lezen tegenover kleine handeling) of samenvoegen?",
+   "bronGevonden": true
+  }
+ ],
+ "meterstuk": [],
+ "tredenZonderSchaal": [],
+ "dekking": {
+  "geen": [
+   "server/kern/stuur/beleid.js",
+   "server/kern/command/risico.js",
+   "server/kern/stadsweefsel/ainiveau.js"
+  ],
+  "tonen": [
+   "server/kern/stuur/beleid.js",
+   "server/kern/geldbeleid/regels.js",
+   "server/kern/stadsweefsel/ainiveau.js",
+   "server/kern/bureau/delegatie.js"
+  ],
+  "klaarzetten": [
+   "server/kern/stuur/beleid.js",
+   "server/kern/command/risico.js",
+   "server/kern/geldbeleid/regels.js",
+   "server/kern/stadsweefsel/ainiveau.js",
+   "server/kern/bureau/delegatie.js"
+  ],
+  "uitvoeren": [
+   "server/kern/stuur/beleid.js",
+   "server/kern/command/risico.js",
+   "server/kern/geldbeleid/regels.js",
+   "server/kern/stadsweefsel/ainiveau.js",
+   "server/kern/bureau/delegatie.js"
+  ]
+ },
+ "rijen": [
+  {
+   "bestand": "server/kern/stuur/beleid.js",
+   "trede": "verboden",
+   "noemer": "geen",
+   "grond": "evident",
+   "citaat": "Alles wat niet genoemd is blijft dicht",
+   "bronGevonden": true
+  },
+  {
+   "bestand": "server/kern/stuur/beleid.js",
+   "trede": "voorstel",
+   "noemer": "klaarzetten",
+   "grond": "evident",
+   "citaat": "vereist daarom een eenmalig servervoorstel dat de gebruiker buiten het model bevestigt",
+   "bronGevonden": true
+  },
+  {
+   "bestand": "server/kern/stuur/beleid.js",
+   "trede": "direct",
+   "noemer": [
+    "tonen",
+    "uitvoeren"
+   ],
+   "grond": "onbepaald",
+   "vraag": "De bron zegt: \"uitsluitend lezen OF een kleine, omkeerbare handeling zonder externe gevolgen\". Dat zijn twee noemertreden in een trede. Splitsen (lezen tegenover kleine handeling) of samenvoegen?",
+   "bronGevonden": true
+  },
+  {
+   "bestand": "server/kern/command/risico.js",
+   "trede": "hand",
+   "noemer": "geen",
+   "grond": "evident",
+   "citaat": "een mens doet het zelf",
+   "bronGevonden": true
+  },
+  {
+   "bestand": "server/kern/command/risico.js",
+   "trede": "assist",
+   "noemer": "klaarzetten",
+   "grond": "evident",
+   "citaat": "de machine bereidt het voor, een mens drukt af",
+   "bronGevonden": true
+  },
+  {
+   "bestand": "server/kern/command/risico.js",
+   "trede": "auto",
+   "noemer": "uitvoeren",
+   "grond": "evident",
+   "citaat": "de machine doet het volledig, binnen beleid",
+   "bronGevonden": true
+  },
+  {
+   "bestand": "server/kern/geldbeleid/regels.js",
+   "trede": "kijken",
+   "noemer": "tonen",
+   "grond": "evident",
+   "citaat": "kijken",
+   "bronGevonden": true
+  },
+  {
+   "bestand": "server/kern/geldbeleid/regels.js",
+   "trede": "voorstellen",
+   "noemer": "tonen",
+   "grond": "aangenomen",
+   "vraag": "Is een VOORSTEL aan een lid al \"klaarzetten\", of pas iets tonen? Deze schaal kent beide woorden naast elkaar, dus het verschil is daar bedoeld; de noemer heeft er een trede minder.",
+   "bronGevonden": true
+  },
+  {
+   "bestand": "server/kern/geldbeleid/regels.js",
+   "trede": "klaarzetten",
+   "noemer": "klaarzetten",
+   "grond": "evident",
+   "citaat": "klaarzetten",
+   "bronGevonden": true
+  },
+  {
+   "bestand": "server/kern/geldbeleid/regels.js",
+   "trede": "automatisch",
+   "noemer": "uitvoeren",
+   "grond": "evident",
+   "citaat": "automatisch",
+   "bronGevonden": true
+  },
+  {
+   "bestand": "server/kern/stadsweefsel/ainiveau.js",
+   "trede": "waarnemen",
+   "noemer": "tonen",
+   "grond": "evident",
+   "citaat": "waarnemen",
+   "bronGevonden": true
+  },
+  {
+   "bestand": "server/kern/stadsweefsel/ainiveau.js",
+   "trede": "adviseren",
+   "noemer": "tonen",
+   "grond": "evident",
+   "citaat": "adviseren",
+   "bronGevonden": true
+  },
+  {
+   "bestand": "server/kern/stadsweefsel/ainiveau.js",
+   "trede": "voorbereiden",
+   "noemer": "klaarzetten",
+   "grond": "evident",
+   "citaat": "voorbereiden",
+   "bronGevonden": true
+  },
+  {
+   "bestand": "server/kern/stadsweefsel/ainiveau.js",
+   "trede": "begrensd",
+   "noemer": "uitvoeren",
+   "grond": "aangenomen",
+   "vraag": "Begrensd uitvoeren en onbegrensd uitvoeren vallen in de noemer samen. Hoort de grens zelf een noemertrede te zijn, of is hij een eigenschap van de uitvoering?",
+   "bronGevonden": true
+  },
+  {
+   "bestand": "server/kern/stadsweefsel/ainiveau.js",
+   "trede": "verboden",
+   "noemer": "geen",
+   "grond": "evident",
+   "citaat": "verboden",
+   "bronGevonden": true
+  },
+  {
+   "bestand": "server/kern/bureau/delegatie.js",
+   "trede": "informeren",
+   "noemer": "tonen",
+   "grond": "evident",
+   "citaat": "informeren",
+   "bronGevonden": true
+  },
+  {
+   "bestand": "server/kern/bureau/delegatie.js",
+   "trede": "aanbevelen",
+   "noemer": "tonen",
+   "grond": "evident",
+   "citaat": "aanbevelen",
+   "bronGevonden": true
+  },
+  {
+   "bestand": "server/kern/bureau/delegatie.js",
+   "trede": "voorbereiden",
+   "noemer": "klaarzetten",
+   "grond": "evident",
+   "citaat": "voorbereiden",
+   "bronGevonden": true
+  },
+  {
+   "bestand": "server/kern/bureau/delegatie.js",
+   "trede": "uitvoeren",
+   "noemer": "uitvoeren",
+   "grond": "evident",
+   "citaat": "uitvoeren",
+   "bronGevonden": true
+  },
+  {
+   "bestand": "server/kern/bureau/delegatie.js",
+   "trede": "autonoom",
+   "noemer": "uitvoeren",
+   "grond": "aangenomen",
+   "vraag": "Deze schaal onderscheidt UITVOEREN van AUTONOOM (zonder opdracht per geval). De noemer doet dat niet: dat onderscheid valt weg. Hoort er een vijfde trede te zijn?",
+   "bronGevonden": true
+  }
+ ]
+}

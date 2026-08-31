@@ -63,10 +63,39 @@ body[data-rtg-world]::before{
   mask-image:linear-gradient(to bottom,rgba(0,0,0,.72),transparent 72%);
 }
 
+/* DE SCHIL MOET WETEN DAT DEZE BALK ER IS.
+
+   `.rtg-edge-chrome` is een vaste overlay op `inset:0` -- de zijrail, de
+   onderbalk en de kruimel zitten daarin. Toen de switcher op elk scherm kwam,
+   legde die zich er dus overheen: de bovenste knop van de rail werd afgesneden
+   en niemand kon er nog bij.
+
+   Twee regels lossen het op, en ze horen bij elkaar: de balk wordt PLAKKEND
+   (anders ontstaat er een gat zodra je scrolt, want de schil staat vast en de
+   balk niet), en de schil begint onder de balk in plaats van bovenaan het
+   venster. De hoogte staat als variabele zodat er maar een getal is. */
+:root{ --os-switcher-h:64px; }
+body:has(> .os-switcher) .rtg-edge-chrome{ top:var(--os-switcher-h); }
+/* Niet elk scherm gebruikt die schil: de meeste dragen hun EIGEN vaste
+   zijbalk of kopbalk, elk met een eigen klassenaam (.media-bank, .bank, ...).
+   Een regel per naam wordt een lijst die veroudert, dus wordt hier op VORM
+   geselecteerd: een landmark dat rechtstreeks in de body staat. `top` doet
+   niets bij een statisch element, dus dit raakt alleen wat werkelijk vast of
+   plakkend staat -- precies de elementen die anders onder de balk verdwijnen.
+   De hoogte krimpt mee, anders schuift de onderkant het beeld uit. */
+body:has(> .os-switcher) > aside,
+body:has(> .os-switcher) > nav,
+body:has(> .os-switcher) > header{
+  top:var(--os-switcher-h);
+}
+body:has(> .os-switcher) > aside{
+  max-height:calc(100vh - var(--os-switcher-h));
+}
 .os-switcher{
-  position:relative;
+  position:sticky;
+  top:0;
   z-index:60;
-  min-height:64px;
+  min-height:var(--os-switcher-h);
   display:grid;
   grid-template-columns:auto minmax(0,1fr) auto;
   align-items:center;

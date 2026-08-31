@@ -115,6 +115,37 @@ function maakWaarde({ db, save, crypto, nu = klokNu }) {
     return { ok: true, positie: positie(rek) };
   }
 
+  /* EEN REGISTRATIE TERUGNEMEN, en dit is met opzet het smalste wat er bestaat.
+
+     Waarom hij er is: kern/pay/budget.js zet eerst de positie klaar en boekt
+     daarna. Faalt de boeking, dan blijft er een lege positie achter -- en dat
+     stond daar als een bewuste keuze, met de redenering "kost niemand geld,
+     verwarrend hooguit". Die redenering miste een tweede regel: uitgifte.js
+     laat maar 25 open posities per lid toe. Gemeten op 31 augustus 2026: 24
+     mislukte pogingen van EEN werkgever met te weinig saldo, en daarna krijgt
+     dat lid van NIEMAND meer een budget -- "Dit lid heeft te veel open
+     posities". Twee besluiten die elk apart kloppen en samen een lid buiten
+     sluiten.
+
+     Waarom hij zo smal is: een grootboek hoort niet te kunnen vergeten. Deze
+     functie neemt daarom alleen een registratie terug, nooit een boeking, en
+     de aanroeper moet AANTONEN dat er nooit geld op stond -- deze laag houdt
+     zelf geen saldo bij (zie de kop) en kan dat dus niet zelf zien. Wie hem
+     aanroept zonder dat bewijs, krijgt een weigering en geen stilte. */
+  function registratieTerug(rek, { saldoCenten } = {}) {
+    if (!rek) return { status: 400, error: 'Welke rekening?' };
+    if (!posities()[rek]) return { status: 404, error: 'Deze positie is niet geregistreerd.' };
+    if (saldoCenten === undefined || saldoCenten === null) {
+      return { status: 400, error: 'Toon aan dat deze positie leeg is; deze laag houdt geen saldo bij.' };
+    }
+    if (Math.round(Number(saldoCenten)) !== 0) {
+      return { status: 409, error: 'Op deze positie staat geld; een registratie met saldo wordt niet teruggenomen.' };
+    }
+    delete posities()[rek];
+    save();
+    return { ok: true, teruggenomen: rek };
+  }
+
   /* Beschikbaar is saldo min wat vastgezet staat. Dit is het getal waar een
      bestedingsvraag tegenaan hoort, en niet het saldo -- zie ./reserve.js. */
   function beschikbaar(rek, saldo) {
@@ -141,7 +172,7 @@ function maakWaarde({ db, save, crypto, nu = klokNu }) {
      als kern/pay/kijken.js. */
   const kijk = require('./kijken')({ posities, positie, beschikbaar, ruimte, reserve, oormerk, KLASSEN });
 
-  const api = { KLASSEN, SOORTEN, STANDAARD, positie, registreer, beschikbaar, ruimte, poort, toets,
+  const api = { KLASSEN, SOORTEN, STANDAARD, positie, registreer, registratieTerug, beschikbaar, ruimte, poort, toets,
     koppelWalletPlafond,
     positiesVan: kijk.positiesVan, overzicht: kijk.overzicht, portefeuille: kijk.portefeuille,
     reserveer: reserve.reserveer, vastleggen: reserve.vastleggen, vrijgeven: reserve.vrijgeven,

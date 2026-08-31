@@ -5,21 +5,43 @@
    iemand het doel en de impact heeft beoordeeld en het hieronder bewust als
    `direct` of `voorstel` heeft opgenomen.
 
-   `direct` is uitsluitend lezen of een kleine, omkeerbare handeling zonder
-   externe gevolgen. `voorstel` wijzigt gegevens, deelt informatie, boekt,
-   publiceert of beweegt geld en vereist daarom een eenmalig servervoorstel dat
-   de gebruiker buiten het model bevestigt. Alles wat niet genoemd is blijft
-   dicht, ook als de ingelogde gebruiker de onderliggende route zelf wel mag. */
+   DRIE NIVEAUS, EN WAAROM HET ER GEEN TWEE MEER ZIJN. Er stond hier eerst
+   `direct` tegenover `voorstel`, en `direct` betekende "uitsluitend lezen OF een
+   kleine, omkeerbare handeling zonder externe gevolgen". Dat is niet een niveau
+   maar twee: scripts/gezagsnoemer.js kon die trede daarom niet afbeelden op de
+   gedeelde noemer en meldde hem als ONBEPAALD -- een woord in de laag waaruit de
+   AI kiest dat twee verschillende dingen zegt over wat de machine zelfstandig
+   doet. De eigenaar heeft besloten te splitsen (EXECUTIE.md blok 2).
+
+     lezen      de machine leest en verandert niets
+     klein      een kleine, omkeerbare handeling zonder externe gevolgen
+     voorstel   wijzigt gegevens, deelt informatie, boekt, publiceert of beweegt
+                geld, en vereist een eenmalig servervoorstel dat de gebruiker
+                buiten het model bevestigt
+
+   DE SPLITSING VERANDERT GEEN BEVOEGDHEID, en dat is met opzet: `lezen` en
+   `klein` samen zijn exact de oude `direct`-lijst, en alleen `voorstel` vraagt
+   nog steeds een menselijke bevestiging. Wat hij WEL deed is vijf routes
+   blootleggen die in de lezen-lijst stonden en helemaal niet lezen:
+   /api/mediaos/stuur en /volg (zetten de smaak en het volgen van een lid),
+   /api/leerstof/oefen en /antwoord (schrijven de oefenstand) en /api/bijles/vraag
+   (roept een model aan en kost geld). Die staan nu onder `klein`, waar ze horen.
+
+   Alles wat niet genoemd is blijft dicht, ook als de ingelogde gebruiker de
+   onderliggende route zelf wel mag. */
 
 const { staatVan } = require('../../lib/vervalstaat');
 
-const DIRECT = Object.freeze({
+/* LEZEN: haalt op en verandert niets. Wie hier iets bij zet dat schrijft,
+   verplaatst een bevoegdheid zonder het te merken -- daarom staat de scheiding
+   met KLEIN hieronder, en niet in een commentaarregel. */
+const LEZEN = Object.freeze({
   member: [
     /^\/api\/kantoorpakket\/(mijn|open|versies|uitslag)$/,
     /^\/api\/onderwijs\/(advies|ladder|mijn)$/,
-    /^\/api\/leerstof\/(vakken|les|oefen|antwoord)$/,
-    /^\/api\/bijles\/(vraag|gesprek)$/,
-    /^\/api\/mediaos\/(wereld|stuur|volg|stuk)$/,
+    /^\/api\/leerstof\/(vakken|les)$/,
+    /^\/api\/bijles\/gesprek$/,
+    /^\/api\/mediaos\/(wereld|stuk)$/,
     /^\/api\/agenda\/(mijn|mijn-lijst|bereik|ics)$/,
     /^\/api\/locatie\/mijn$/,
     /^\/api\/asset\/(document|mijn)$/,
@@ -41,6 +63,19 @@ const DIRECT = Object.freeze({
     /^\/api\/staff\/ov\/(dienst|lijnen)$/,
     /^\/api\/staff\/mob\/kaart\/storingen$/
   ]
+});
+
+/* KLEIN: verandert iets, maar alleen bij de gebruiker zelf, omkeerbaar en
+   zonder dat er iemand anders of geld aan te pas komt. Deze vijf stonden
+   hierboven bij het lezen en doen dat aantoonbaar niet. */
+const KLEIN = Object.freeze({
+  member: [
+    /^\/api\/mediaos\/(stuur|volg)$/,   // zet de smaak / het volgen van dit lid
+    /^\/api\/leerstof\/(oefen|antwoord)$/, // schrijft de oefenstand van dit lid
+    /^\/api\/bijles\/vraag$/           // roept een model aan: omkeerbaar, maar niet gratis
+  ],
+  supplier: [],
+  staff: []
 });
 
 const VOORSTEL = Object.freeze({
@@ -106,10 +141,12 @@ function raakt(lijst, pad) {
    dat is de methode waarop we de staat opzoeken. */
 function beleidVoor(pad, wereld) {
   const w = String(wereld || '');
-  if (!Object.prototype.hasOwnProperty.call(DIRECT, w)) {
+  if (!Object.prototype.hasOwnProperty.call(LEZEN, w)) {
     return { niveau: 'verboden', reden: 'Het AI-stuur mist een geldige, servergekozen rol.' };
   }
-  const opDeLijst = raakt(DIRECT[w], pad) ? 'direct' : (raakt(VOORSTEL[w], pad) ? 'voorstel' : null);
+  const opDeLijst = raakt(LEZEN[w], pad) ? 'lezen'
+    : raakt(KLEIN[w], pad) ? 'klein'
+    : (raakt(VOORSTEL[w], pad) ? 'voorstel' : null);
   if (!opDeLijst) {
     return { niveau: 'verboden', wereld: w,
       reden: 'Deze actie staat niet op de expliciete AI-allowlist voor ' + w + '.' };
@@ -127,4 +164,11 @@ function toegestanePaden(paden, wereld) {
   return (paden || []).filter(p => beleidVoor(p, wereld).niveau !== 'verboden');
 }
 
-module.exports = { DIRECT, VOORSTEL, beleidVoor, toegestanePaden };
+/* DIRECT blijft bestaan als de VERENIGING van lezen en klein: bestaande
+   aanroepers die "mag de AI dit zonder bevestiging" vragen, hoeven niet te
+   veranderen en krijgen exact het oude antwoord. test/stuur-niveaus.test.js
+   houdt vast dat die vereniging gelijk is aan de lijst van voor de splitsing. */
+const DIRECT = Object.freeze(Object.fromEntries(
+  Object.keys(LEZEN).map(w => [w, LEZEN[w].concat(KLEIN[w] || [])])));
+
+module.exports = { LEZEN, KLEIN, DIRECT, VOORSTEL, beleidVoor, toegestanePaden };

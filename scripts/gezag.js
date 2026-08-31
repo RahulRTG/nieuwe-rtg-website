@@ -5,7 +5,7 @@
    WAAROM DIT ER IS. RTG stelt op vijf plekken dezelfde vraag, met vijf
    verschillende antwoorden-schalen:
 
-     server/kern/stuur/beleid.js          direct / voorstel / verboden
+     server/kern/stuur/beleid.js          lezen / klein / voorstel / verboden
      server/kern/command/risico.js        hand / assist / auto
      server/kern/geldbeleid/regels.js     kijken / voorstellen / klaarzetten / automatisch
      server/kern/stadsweefsel/ainiveau.js waarnemen / adviseren / voorbereiden / begrensd / verboden
@@ -79,7 +79,7 @@ const LIJST = argv.includes('--lijst');
    even lang zijn, en dus niet op elkaar af te beelden zonder een besluit. */
 const REGISTER = [
   { bestand: 'server/kern/stuur/beleid.js',
-    schaal: ['verboden', 'voorstel', 'direct'],
+    schaal: ['verboden', 'lezen', 'voorstel', 'klein'],
     beslisser: 'beleidVoor',
     bestuurt: 'de AI over HTTP-routes, per rol (member/supplier/staff)' },
   { bestand: 'server/kern/command/risico.js',

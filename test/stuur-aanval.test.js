@@ -15,10 +15,16 @@ const req = (token) => ({
 });
 
 test('de expliciete allowlist is per rol en standaard dicht', () => {
-  assert.equal(beleidVoor('/api/kantoorpakket/open', 'member').niveau, 'direct');
+  /* `direct` heette tot 31 augustus 2026 een niveau en was er twee: lezen, en
+     een kleine omkeerbare handeling. Sinds de splitsing zijn dat `lezen` en
+     `klein` (EXECUTIE.md blok 2, test/stuur-niveaus.test.js). Voor deze toets
+     verandert er niets aan de STREKKING -- beide gaan zonder bevestiging, en
+     alleen `voorstel` vraagt een mens. */
+  assert.equal(beleidVoor('/api/kantoorpakket/open', 'member').niveau, 'lezen');
+  assert.equal(beleidVoor('/api/bijles/vraag', 'member').niveau, 'klein');
   assert.equal(beleidVoor('/api/kantoorpakket/maak', 'member').niveau, 'voorstel');
   assert.equal(beleidVoor('/api/supplier/state', 'member').niveau, 'verboden');
-  assert.equal(beleidVoor('/api/supplier/state', 'supplier').niveau, 'direct');
+  assert.equal(beleidVoor('/api/supplier/state', 'supplier').niveau, 'lezen');
   assert.equal(beleidVoor('/api/nieuw/onbekend', 'member').niveau, 'verboden');
   assert.deepEqual(toegestanePaden(['/api/kantoorpakket/open', '/api/nieuw/onbekend'], 'member'),
     ['/api/kantoorpakket/open']);

@@ -42,7 +42,7 @@
     "delenZonderOnderwerp": 0,
     "beweringenZonderVulcontrole": 111,
     "bewijsCellenBewezen": 16475,
-    "bewijsAchterstand": 989,
+    "bewijsAchterstand": 2605,
     "schermenZonderVormtaal": 181,
     "dbDeuren": 507,
     "dbDeurenSchrijvend": 269
@@ -1261,6 +1261,14 @@
     },
     {
       "datum": "2026-08-31",
+      "meter": "bewijsAchterstand 989 -> 1997",
+      "soort": "structureel",
+      "sleutel": "bewijsAchterstand",
+      "waarheen": "BEWIJSSCHULD.json, veld `aflossing`: doel 0, met de aflosregels erbij",
+      "reden": "Nieuwe grondwaarde, en met opzet GEEN schuld-notitie met een vervaldatum. Dit is ONTDEKTE schuld en geen nieuwe: de uitvoeringslaag (EXECUTIE.md) kreeg vier eigen posten, alle vier afgeleid uit een register -- 849 muterende routes zonder uitspraak over wat een tweede keer betekent, 94 bereikbare capabilities waarvan nooit is gemeten wat zij veranderen, 63 tegenhangers die uit namen zijn afgeleid en nog niet zijn uitgevoerd, en 2 onbeoordeelde droogloopstappen. Die gaten bestonden al en stonden nergens; een nieuwe laag zonder schuldpost ziet er per ongeluk schuldenvrij uit. Terugkeren naar 989 zou betekenen dat we 1008 werkelijk bestaande gaten weer onzichtbaar maken, en dan bewaakt de ratel een leugen. Vanaf hier geldt de aflosregel in BEWIJSSCHULD.json: doel 0, de achterstand mag alleen omlaag, en een post die drie meetdagen stilstaat wordt gemeld."
+    },
+    {
+      "datum": "2026-08-31",
       "soort": "schuld",
       "sleutel": "keuringOmvang",
       "van": 233,
@@ -1276,6 +1284,14 @@
       "vervalt": "2026-11-30",
       "meter": "metingenZonderRatel 31 -> 33",
       "reden": "Deze ronde zette zes meetbestanden in de wortel. Vier hebben een echte ratel gekregen (MUTATIECONTRACT.json, -AFGELEID, MUTATIEINVENTARIS en HANDLERBEWAKERS staan in scripts/lib/metingen.js en worden bij naam gelezen door de toets die ze vasthoudt). Twee niet: MUTATIECONTRACT-VOORSTEL.json is een WACHTRIJ voor een mens en hoort te fluctueren, en SCHRIJFANALYSE.json heeft nog geen getal waarvan vaststaat welke kant het op moet. Ze met een gok in het register zetten is precies wat de kop van metingen.js verbiedt -- dan daalt dit getal door een regel in plaats van door een ratel. Vervalt eind november: SCHRIJFANALYSE hoort tegen die tijd een ratel te hebben op \"routes waarvan de handler niet te volgen was\", en dat getal mag alleen dalen."
+    },
+    {
+      "datum": "2026-08-31",
+      "meter": "bewijsAchterstand 1966 -> 2605",
+      "soort": "structureel",
+      "sleutel": "bewijsAchterstand",
+      "waarheen": "BEWIJSSCHULD.json, veld `aflossing`: doel 0",
+      "reden": "Main binnengehaald: de boom telt 4643 routes in plaats van 3282, en de idempotentieproef van main is over die nieuwe routes gedraaid. idem-ongeclassificeerd gaat daardoor van 849 naar 1477 en gevolg-onbekend van 94 naar 90 over een grotere noemer -- dezelfde schuld over een grotere boom, geen nieuwe schuld. herstel-onbevestigd ging juist omlaag (63 -> 47) doordat de herstelproef ook over de nieuwe paren is gedraaid. Geen vervaldatum, om dezelfde reden als bij 989 -> 1997: teruggaan zou betekenen dat we bestaande gaten weer onzichtbaar maken. De aflosregel blijft: doel 0, alleen omlaag, stilstand wordt gemeld."
     }
   ],
   "prestatie": {

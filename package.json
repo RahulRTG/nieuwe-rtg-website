@@ -115,6 +115,7 @@
     "objectmodel": "node scripts/objectmodel.js",
     "objectmodel:vast": "node scripts/objectmodel.js --vastleggen",
     "capabilities": "node scripts/capabilities.js",
+    "resolver": "node scripts/resolver.js",
     "capabilityroepers": "node scripts/capabilityroepers.js",
     "capabilities:vast": "node scripts/capabilities.js --vastleggen",
     "magnaatlab": "node scripts/magnaatlab.js",
@@ -124,6 +125,14 @@
     "semantiek": "node scripts/semantiek.js",
     "semantiek:vast": "node scripts/semantiek.js --vastleggen",
     "lagen": "node scripts/lagen.js",
+    "droogloop": "node scripts/droogloop.js",
+    "herstel": "node scripts/herstel.js",
+    "executionmap": "node scripts/executionmap.js",
+    "executionmap:controle": "node scripts/executionmap.js --controle",
+    "resolverbereik": "node scripts/resolverbereik.js",
+    "getallen": "node scripts/getallen.js",
+    "getallen:controle": "node scripts/getallen.js --controle",
+    "gezagsnoemer": "node scripts/gezagsnoemer.js",
     "gezag": "node scripts/gezag.js",
     "gezag:lijst": "node scripts/gezag.js --lijst",
     "gezag:vast": "node scripts/gezag.js --vastleggen",
@@ -203,7 +212,8 @@
     "versheid": "node scripts/versheid.js",
     "waarom": "node scripts/waarom.js",
     "swcache": "node scripts/swcache.js",
-    "swcache:vast": "node scripts/swcache.js --schrijf"
+    "swcache:vast": "node scripts/swcache.js --schrijf",
+    "herstelproef": "node scripts/herstelproef.js"
   },
   "devDependencies": {
     "playwright": "^1.62.1"

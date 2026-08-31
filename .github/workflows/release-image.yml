@@ -15,9 +15,11 @@ jobs:
     timeout-minutes: 90
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: "26"
+          node-version-file: '.nvmrc'
           cache: npm
       - run: npm ci
       # xmllint is de scheidsrechter van test/samlc14n.test.js en die toets slaat

@@ -67,7 +67,12 @@ const r = spawnSync(process.execPath, [
   ...mijn.map(n => path.join('test', n))
 ], {
   cwd: WORTEL,
-  env: { ...process.env, RTG_ROUTELOG: journaal },
+  /* Zelfde voorlading als in scripts/test-runner.js, en om dezelfde reden: de
+     naam van het toetsbestand moet in elk kindproces staan, niet alleen in de
+     servers die test/helper.js start. Zie test/toetsnaam.js. */
+  env: { ...process.env, RTG_ROUTELOG: journaal,
+    NODE_OPTIONS: (process.env.NODE_OPTIONS ? process.env.NODE_OPTIONS + ' ' : '') +
+      '--require ' + JSON.stringify(path.join(WORTEL, 'test', 'toetsnaam.js')) },
   stdio: 'inherit'
 });
 

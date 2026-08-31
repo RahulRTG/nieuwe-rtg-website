@@ -33,6 +33,30 @@ on:
 permissions:
   contents: read
 
+# VIER DINGEN DIE IN ELKE JOB HETZELFDE ZIJN, EN WAAROM.
+#
+# 1. persist-credentials: false op ELKE checkout. Zonder die regel laat de
+#    checkout een GITHUB_TOKEN achter in .git/config, en daarna draaien er in
+#    diezelfde job 1058 toetsbestanden en de scripts van elke dependency. Geen
+#    enkele job hier pusht, dus het kost niets. Het is geen optimalisatie maar
+#    een invariant: `npm run ci-keten` zakt op een checkout zonder die regel,
+#    en die keuring draait in de job `keuringen`.
+#
+# 2. node-version-file: '.nvmrc' in plaats van een getal per job. Hier stond
+#    negen keer '26' en vijf keer '22' -- geen matrix, geen besluit, gewoon uit
+#    elkaar gegroeid. De schermtoetsen en de dekkingsjob draaiden dus op een
+#    andere runtime dan productie (Dockerfile: node:26-slim). Wil je ooit ECHT
+#    op twee versies toetsen, dan hoort dat een matrix te zijn die je kunt zien.
+#
+# 3. Niets wordt geinstalleerd buiten package-lock.json om. Wat een job nodig
+#    heeft komt uit `npm ci`; de browserbinary komt uit de lockfileversie via
+#    scripts/browserinstall.js.
+#
+# 4. Alle third-party actions staan op een commit-sha, niet op een tag.
+#
+# Alle vier worden ze afgedwongen door scripts/ci-keten.js -- het CI-contract.
+# De toetsen bewaken het product; dit bewaakt het systeem dat ze draait.
+
 # Een nieuwe push vervangt de vorige run van dezelfde PR of hoofdlijn. Zonder
 # deze grens bleven oude revisies urenlang drie runners bezetten, terwijl hun
 # uitslag door de nieuwere commit al niet meer merge-bepalend kon zijn.
@@ -138,10 +162,11 @@ jobs:
       # maken heeft. Zelfde reden als bij de deltapoort in de job hieronder.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
+          persist-credentials: false
           fetch-depth: 0
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: '26'
+          node-version-file: '.nvmrc'
           cache: 'npm'
       - run: npm ci
       # DE RUST-MOTOR, want zonder hem is de pariteitstoets een belofte zonder
@@ -169,6 +194,19 @@ jobs:
       # zin gold hier net zo goed.
       - name: libxml2 (de scheidsrechter van de c14n-toets)
         run: sudo apt-get update -qq && sudo apt-get install -y -qq libxml2-utils
+      # EEN GEZAKTE TOETS MOET TE LEZEN ZIJN, ANDERS IS HET GEEN SIGNAAL.
+      # Deze stap zakte een keer met drie rode toetsen, en die namen waren niet
+      # meer te achterhalen: node zet "not ok" op de plek waar de toets draaide,
+      # daarna komt de dekkingstabel van ruim tweeduizend regels overheen, en de
+      # log-API levert alleen de STAART. Het downloadadres van het volledige log
+      # ligt achter een andere host, die niet altijd bereikbaar is. Wie dan een
+      # rode stap ziet, weet alleen DAT er iets zakte. Vandaar de herhaling
+      # onderaan, na de tabel, waar ze wel te vinden is.
+      # Die herhaling gaf eerst alleen de NAAM terug ("not ok 5861 - ..."), en
+      # niet de reden. Daarmee begon iedereen alsnog bij het lokaal naspelen van
+      # de hele suite; op 18 augustus 2026 kostte dat een ochtend. Sindsdien komt
+      # het hele TAP-blok mee: de bewering, de verwachte en de gevonden waarde en
+      # de stapel. Zie scripts/gezakte-toetsen.js.
       - name: Deze scherf, met dekking als lcov
         run: |
           set -o pipefail
@@ -212,10 +250,11 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
+          persist-credentials: false
           fetch-depth: 0
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: '26'
+          node-version-file: '.nvmrc'
           cache: 'npm'
       - run: npm ci
       - name: De ijking draaien (een bestand, alleen op deze machine)
@@ -250,33 +289,27 @@ jobs:
           retention-days: 1
           if-no-files-found: error
 
-  test:
-    name: Tests, checks en build
-    # DEZE NAAM STAAT IN DE TAKBESCHERMING VAN main en verandert dus niet.
-    # Wat eronder gebeurt is wel veranderd: de zware toetsstap is naar
-    # `toetsscherf` hierboven verhuisd en deze job telt hun dekking op en
-    # handhaaft de vloer. De snelle keuringen (check.js, de deltapoort, de
-    # AST-scan, de norm, de bouw) blijven hier, want die zijn samen twee
-    # minuten en horen bij het oordeel over de tak als geheel.
-    needs: [toetsscherf, ijkingen]
+  # DE KEURINGEN WACHTEN OP NIETS, en dat is een reparatie.
+  #
+  # Deze stappen stonden in de job `test` hieronder, achter
+  # `needs: [toetsscherf, ijkingen]`. Ze hebben van die scherven niets nodig --
+  # check.js leest de bron, de deltapoort leest de diff, de PostgreSQL-toetsen
+  # draaien hun eigen elf bestanden -- maar ze begonnen pas als de traagste
+  # scherf klaar was. Gemeten in run 33404735353 (main, 31 augustus 2026): de
+  # traagste scherf deed 1336s, en daarna deed deze job er nog 379s overheen,
+  # waarvan 161s check.js, 39s de AST-scan en 124s PostgreSQL. Ruim vijf
+  # minuten die naast het zware werk hadden kunnen lopen, en ze stonden erachter.
+  #
+  # `test` WACHT WEL OP DEZE JOB. Zijn naam staat in de takbescherming; zakt
+  # deze job, dan wordt `test` overgeslagen en meldt hij dus nooit groen. Dat
+  # is de fail-closed kant: een keuring die zakt kan niet langs de poort komen
+  # doordat hij naar een andere job is verhuisd.
+  keuringen:
+    name: De keuringen (statisch) en PostgreSQL
     runs-on: ubuntu-latest
-    # 1h08 op 18 aug, gecanceld op 90 min op 20 aug, en op 21 aug liep hij op
-    # 150 min NOG. Gemeten in die afgebroken ronde: de unit-stap draaide toen al
-    # 117 minuten en was nog bezig -- geen vastloper, gewoon een suite die met
-    # deze samenvoeging van ~897 naar 1058 toetsbestanden ging. De concurrency
-    # staat al op 4 (het maximum voor een standaard runner; hoger laat servers
-    # elkaars healthcheck verdringen, zie scripts/test-runner.js), dus er valt
-    # geen tijd te winnen zonder de suite te splitsen. Ruimte voor de groei en
-    # voor een trage runner, en niet zo hoog dat een echte vastloper er een uur
-    # onder wegzakt.
-    # VEERTIG MINUTEN, want het zware werk staat niet meer in deze job. Op
-    # 22 augustus 2026 werd hij nog na 240 minuten afgekapt met de toetsstap op
-    # 3 uur 57; die stap is nu verdeeld over vier scherven die parallel lopen.
-    # Wat hier overblijft zijn de snelle keuringen, het optellen van de dekking
-    # en de bouw -- samen een paar minuten. Blijft hij hier hangen, dan is er
-    # iets anders aan de hand dan een groeiende suite, en dan hoort hij snel
-    # rood te staan in plaats van een uur te wachten.
-    timeout-minutes: 40
+    # Vijf tot tien minuten in de praktijk; twintig geeft ruimte voor een trage
+    # runner zonder dat een echte vastloper er een half uur onder wegzakt.
+    timeout-minutes: 20
     services:
       postgres:
         image: postgres:16-alpine
@@ -306,24 +339,20 @@ jobs:
       # zakt hij met exitcode 2 in plaats van stil groen te melden.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
+          persist-credentials: false
           fetch-depth: 0
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: '26'
+          node-version-file: '.nvmrc'
           cache: 'npm'
       - run: npm ci
-      # LIBXML2 IS DE SCHEIDSRECHTER van test/samlc14n.test.js. Onze eigen
-      # canonicalisatie wordt daar naast die van een vreemde implementatie
-      # gelegd, en die toets slaat zichzelf bewust NIET over als xmllint
-      # ontbreekt: een veiligheidsmeting die niet heeft gedraaid mag er niet
-      # uitzien als een groen vinkje.
-      #
-      # In die toets stond dat xmllint "op elke ubuntu-runner" staat. Dat was
-      # niet waar -- de image van ubuntu-latest draagt hem niet, en de eerste
-      # volledige suite die hem bereikte zakte met drie keer ENOENT. Een
-      # aanname over de omgeving is geen omgeving; daarom staat hij hier.
-      - name: libxml2 (de scheidsrechter van de c14n-toets)
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq libxml2-utils
+      # GEEN LIBXML2 MEER IN DEZE JOB, en dat is geen bezuiniging maar een
+      # opruiming. Die stap stond hier als scheidsrechter van
+      # test/samlc14n.test.js -- maar die toets draait in een SCHERF, en daar
+      # staat de installatie ook (zie `toetsscherf` hierboven). Hier stond de
+      # scheidsrechter dus in een machine waar de toets niet komt. Zakt
+      # samlc14n ooit op ENOENT, dan hoort dat in de scherf gerepareerd te
+      # worden en niet hier.
       - name: Codeafspraken (check.js)
         run: npm run check
       # DE DELTAPOORT. De norm hieronder is een som over de hele codebase, en een
@@ -352,7 +381,12 @@ jobs:
           RTG_BASIS: ${{ github.event.pull_request.base.sha }}
       - name: Eigen AST-scan (statische analyse, geen dependency)
         run: npm run ast-scan
-      - name: CI-keten gebruikt alleen exact vastgezette Actions
+      # HET CI-CONTRACT: de keten toetst zichzelf. Vier regels, alle vier uit
+      # een vondst van 31 augustus 2026 -- elke Action op een SHA, elke checkout
+      # zonder achtergelaten credential, elke runtime gedeclareerd in plaats van
+      # overgetypt, en niets geinstalleerd buiten package-lock.json om. De
+      # toetsen bewaken het product; deze stap bewaakt het systeem dat ze draait.
+      - name: Het CI-contract (de keten toetst zichzelf)
         run: npm run ci-keten
       # Het wettenregister mag niet stil uit elkaar lopen met de code: elke wet
       # wijst naar een letterlijke zin in zijn doctrine-document en naar de
@@ -381,6 +415,56 @@ jobs:
       # meet de meter niets meer en hoort hij te vallen, niet stil te dalen.
       - name: De envelop (wat ligt er op tafel als het gezag wordt verleend)
         run: npm run envelop
+      # De PostgreSQL-opslag, -accounts en chaos-test apart, met DATABASE_URL alleen
+      # voor deze stap. Serieel (--test-concurrency=1): pg.test.js en chaos delen de
+      # kv-tabel en zouden elkaar bij parallel draaien resetten.
+      # Elk bestand in een EIGEN database (scripts/pgtoetsen.js). Serieel draaien
+      # was niet genoeg: deze toetsen maken en droppen dezelfde tabellen, dus
+      # begon nummer vijf op wat nummer vier had achtergelaten. Daardoor stonden
+      # hier drie van de acht bestanden -- de andere vijf draaiden nooit.
+      - name: PostgreSQL-integratietests (elk in een eigen database)
+        run: node scripts/pgtoetsen.js
+        env:
+          REDIS_URL: redis://localhost:6379
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/rtgtest
+          RTG_VAULT_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+          RTG_SECRET_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
+
+  test:
+    name: Tests, checks en build
+    # DEZE NAAM STAAT IN DE TAKBESCHERMING VAN main en verandert dus niet.
+    # Wat eronder gebeurt is wel veranderd. Eerst verhuisde de zware toetsstap
+    # naar `toetsscherf`; nu zijn ook de keuringen eruit die van die scherven
+    # niets nodig hadden (zie de job `keuringen` hierboven). Wat hier overblijft
+    # is precies het werk dat de scherven WEL nodig heeft: hun dekking optellen,
+    # de vloer handhaven en hun routejournalen samenvoegen. Een paar seconden.
+    #
+    # De bouw staat in `norm`, de keuringen in `keuringen`, en deze job is het
+    # oordeel over de tak als geheel -- hij zakt zodra een van de drie zakt,
+    # want dan draait hij niet.
+    needs: [toetsscherf, ijkingen, keuringen]
+    runs-on: ubuntu-latest
+    # GEEN POSTGRES EN GEEN REDIS MEER. Die stonden hier voor de
+    # PostgreSQL-integratietests, en die zijn mee verhuisd. Het opstarten van
+    # de twee containers kostte 22 seconden per run aan een job die alleen nog
+    # artefacten optelt.
+    #
+    # TIEN MINUTEN. Er draait geen suite meer in deze job; blijft hij hangen,
+    # dan is er iets mis met het ophalen van artefacten en niet met de code, en
+    # dan hoort hij snel rood te staan in plaats van veertig minuten te wachten.
+    timeout-minutes: 10
+    steps:
+      # Een ondiepe kloon is hier genoeg: de deltapoort en semdiff -- de twee
+      # dingen die het aftakpunt nodig hadden -- staan in `keuringen` en in
+      # `toetsscherf`. Deze job leest geen geschiedenis.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+      - run: npm ci
       # De hoofdsuite draait op de standaard (json) opslag; DATABASE_URL is hier
       # bewust NIET gezet, anders zouden alle testbestanden dezelfde Postgres delen.
       # test:gate draait dezelfde suite MET een dekkingsvloer (regels/branches/
@@ -424,19 +508,6 @@ jobs:
       # afgehandeld. Dat kost niets extra's in deze stap en levert de volgende
       # stap een waargenomen dekkingscijfer in plaats van een tekstzoektocht
       # door de tests. Zie server/routelog.js en scripts/dekking.js.
-      # EEN GEZAKTE TOETS MOET TE LEZEN ZIJN, ANDERS IS HET GEEN SIGNAAL.
-      # Deze stap zakte een keer met drie rode toetsen, en die namen waren niet
-      # meer te achterhalen: node zet "not ok" op de plek waar de toets draaide,
-      # daarna komt de dekkingstabel van ruim tweeduizend regels overheen, en de
-      # log-API levert alleen de STAART. Het downloadadres van het volledige log
-      # ligt achter een andere host, die niet altijd bereikbaar is. Wie dan een
-      # rode stap ziet, weet alleen DAT er iets zakte. Vandaar de herhaling
-      # onderaan, na de tabel, waar ze wel te vinden is.
-      # Die herhaling gaf eerst alleen de NAAM terug ("not ok 5861 - ..."), en
-      # niet de reden. Daarmee begon iedereen alsnog bij het lokaal naspelen van
-      # de hele suite; op 18 augustus 2026 kostte dat een ochtend. Sindsdien komt
-      # het hele TAP-blok mee: de bewering, de verwachte en de gevonden waarde en
-      # de stapel. Zie scripts/gezakte-toetsen.js.
       - name: De dekking van alle vier de scherven ophalen
         uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
         with:
@@ -468,30 +539,24 @@ jobs:
           retention-days: 1
           if-no-files-found: error
 
-      # De PostgreSQL-opslag, -accounts en chaos-test apart, met DATABASE_URL alleen
-      # voor deze stap. Serieel (--test-concurrency=1): pg.test.js en chaos delen de
-      # kv-tabel en zouden elkaar bij parallel draaien resetten.
-      # Elk bestand in een EIGEN database (scripts/pgtoetsen.js). Serieel draaien
-      # was niet genoeg: deze toetsen maken en droppen dezelfde tabellen, dus
-      # begon nummer vijf op wat nummer vier had achtergelaten. Daardoor stonden
-      # hier drie van de acht bestanden -- de andere vijf draaiden nooit.
-      - name: PostgreSQL-integratietests (elk in een eigen database)
-        run: node scripts/pgtoetsen.js
-        env:
-          REDIS_URL: redis://localhost:6379
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/rtgtest
-          RTG_VAULT_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
-          RTG_SECRET_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
-
   norm:
     name: De norm, de instroom en de build
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
+      # fetch-depth: 0 EN GEEN LATERE `git fetch`. Hier stond een ondiepe
+      # checkout met verderop `git fetch --depth=1 origin main`. Die tweede
+      # fetch heeft een credential nodig, en sinds persist-credentials: false
+      # staat die niet meer in .git/config -- dan zou de stap zakken op de
+      # omgeving in plaats van op de norm. De basislijn komt nu uit de checkout
+      # zelf, die zijn token alleen tijdens het ophalen gebruikt.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+          fetch-depth: 0
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: '22'
+          node-version-file: '.nvmrc'
           cache: 'npm'
       - run: npm ci
       # DE NORM: een ratel, geen rapportcijfer. NORM.json legt vast waar de code
@@ -505,13 +570,10 @@ jobs:
       # en dan meet de stap hierboven de code tegen een lat die in dezelfde
       # commit is verlaagd. Deze stap legt hem naast die van main: strakker mag
       # altijd, losser alleen met een reden in `notities` die de meter bij naam
-      # noemt. De fetch is er omdat de checkout ondiep is en origin/main hier
-      # anders niet bestaat -- en dan zakt normbasis.js liever dan dat hij
-      # stilzwijgend slaagt.
+      # noemt. origin/main komt uit de volle checkout hierboven -- en bestaat
+      # hij niet, dan zakt normbasis.js liever dan dat hij stilzwijgend slaagt.
       - name: De basislijn van de norm (verlagen mag, stilletjes niet)
-        run: |
-          git fetch --depth=1 origin main
-          node scripts/normbasis.js --tegen FETCH_HEAD
+        run: node scripts/normbasis.js --tegen origin/main
 
       # DE INSTROOM, NAAST DE VOORRAAD. endpointsZonderTest is een TOTAAL: een
       # tak die drie routes toevoegt en er vier laat toetsen komt er groen
@@ -519,7 +581,7 @@ jobs:
       # er 1192, en de ratel heeft in die hele periode niet een keer geklaagd --
       # hij bewaakte de voorraad en niemand bewaakte wat erbij kwam. Deze stap
       # draait de routekaart hier en in een worktree van main, en eist een toets
-      # voor het verschil. De fetch van de stap hierboven maakt FETCH_HEAD.
+      # voor het verschil.
       # TIJDELIJK UIT, EN MET EEN DATUM WAAROP HIJ TERUGKOMT (27 augustus 2026).
       #
       # Deze stap meet de basis MET DE BASIS: hij start de server van main op in
@@ -538,11 +600,11 @@ jobs:
       # vergelijking over de HELE kaart, niet de regel zelf.
       #
       # AANZETTEN ZODRA MAIN DEZE SAMENVOEGING DRAAGT. Haal dan het commentaar
-      # weg en draai de stap een keer met de hand: `git fetch --depth=1 origin
-      # main && node scripts/nieuweroutes.js --tegen FETCH_HEAD`. Komt hij door,
-      # dan hoort hij hier gewoon weer te staan.
+      # weg en draai de stap een keer met de hand:
+      # `node scripts/nieuweroutes.js --tegen origin/main`. Komt hij door, dan
+      # hoort hij hier gewoon weer te staan.
       # - name: Nieuwe routes komen met een toets
-      #   run: node scripts/nieuweroutes.js --tegen FETCH_HEAD
+      #   run: node scripts/nieuweroutes.js --tegen origin/main
       - name: Frontend-build (minify + service-worker-cache)
         run: npm run build
       - name: Build is idempotent (geen ongecommitte wijziging aan de bron)
@@ -554,9 +616,11 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: '26'
+          node-version-file: '.nvmrc'
           cache: 'npm'
       # Eerst het volledige rapport tonen (faalt niet), zodat ook moderate/low
       # zichtbaar zijn in de log; daarna de harde poort op high + critical.
@@ -600,9 +664,11 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: '26'
+          node-version-file: '.nvmrc'
           cache: 'npm'
       - run: npm ci
       - name: Van kleuter tot aanvaller
@@ -631,9 +697,11 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: '26'
+          node-version-file: '.nvmrc'
           cache: 'npm'
       - run: npm ci
       - name: Elke rol op elke route
@@ -667,9 +735,11 @@ jobs:
     timeout-minutes: 40
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: '26'
+          node-version-file: '.nvmrc'
           cache: 'npm'
       - run: npm ci
       - name: Slaat de vernielingscontrole echt uit? (zelfproef)
@@ -698,6 +768,8 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
       - name: De Node uit de Dockerfile draait de CMD uit de Dockerfile
         run: node scripts/containerproef.js
 
@@ -723,15 +795,23 @@ jobs:
         deel: [1, 2, 3, 4]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: '26'
+          node-version-file: '.nvmrc'
           cache: 'npm'
       - run: npm ci
-      - name: Playwright + Chromium
-        run: |
-          npm i --no-save playwright@^1.49.0
-          npx playwright install --with-deps chromium
+      # DE BROWSER KOMT UIT DE LOCKFILE. Hier stond `npm i --no-save
+      # playwright@^1.49.0` NA `npm ci` -- een tweede installatie buiten de
+      # lockfile om, zonder integriteitscontrole, op een bereik dat niet meer
+      # klopte met wat de repo pint. scripts/browserinstall.js zakt nu zodra
+      # node_modules en de lockfile het oneens zijn, en klokt de apt-fase en de
+      # browserdownload APART -- want de uitschieters van 313s en 434s op
+      # 31 augustus 2026 zaten in een van die twee en `--with-deps` liet niet
+      # zien in welke. Nog geen cache: eerst het getal, dan het besluit.
+      - name: Playwright + Chromium (uit de lockfile, per fase geklokt)
+        run: node scripts/browserinstall.js --meting=browsermeting/${{ github.job }}-${{ matrix.deel }}.json
       # De scan gaat over ALLE schermen, uitgelogd en ingelogd, en sinds de
       # raakvlakronde nog een derde keer op telefoonformaat. Dit deel meet zijn
       # kwart daarvan en oordeelt niet.
@@ -746,6 +826,14 @@ jobs:
           path: a11ymeting/
           if-no-files-found: error
           retention-days: 5
+      - name: De installatietijden van deze browserjob bewaren
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: browsermeting-${{ github.job }}-${{ matrix.deel }}
+          path: browsermeting/
+          if-no-files-found: error
+          retention-days: 5
 
   a11y-oordeel:
     name: Toegankelijkheid - het oordeel over alle delen
@@ -754,9 +842,11 @@ jobs:
     needs: a11y
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: '22'
+          node-version-file: '.nvmrc'
           cache: 'npm'
       - run: npm ci
       - name: De metingen van de vier delen ophalen
@@ -781,15 +871,23 @@ jobs:
         deel: [1, 2, 3, 4]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: '22'
+          node-version-file: '.nvmrc'
           cache: 'npm'
       - run: npm ci
-      - name: Playwright + Chromium
-        run: |
-          npm i --no-save playwright@^1.49.0
-          npx playwright install --with-deps chromium
+      # DE BROWSER KOMT UIT DE LOCKFILE. Hier stond `npm i --no-save
+      # playwright@^1.49.0` NA `npm ci` -- een tweede installatie buiten de
+      # lockfile om, zonder integriteitscontrole, op een bereik dat niet meer
+      # klopte met wat de repo pint. scripts/browserinstall.js zakt nu zodra
+      # node_modules en de lockfile het oneens zijn, en klokt de apt-fase en de
+      # browserdownload APART -- want de uitschieters van 313s en 434s op
+      # 31 augustus 2026 zaten in een van die twee en `--with-deps` liet niet
+      # zien in welke. Nog geen cache: eerst het getal, dan het besluit.
+      - name: Playwright + Chromium (uit de lockfile, per fase geklokt)
+        run: node scripts/browserinstall.js --meting=browsermeting/${{ github.job }}-${{ matrix.deel }}.json
       # RTG_E2E_STRICT=1 zegt: deze omgeving BELOOFT schermtoetsen te draaien.
       # test/browserpoort.e2e.js zakt dan als er geen browser is. Zonder die
       # vlag slaan drieenveertig e2e-bestanden zichzelf stil over als Chromium
@@ -827,6 +925,14 @@ jobs:
           retention-days: 1
           if-no-files-found: error
           include-hidden-files: true
+      - name: De installatietijden van deze browserjob bewaren
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: browsermeting-${{ github.job }}-${{ matrix.deel }}
+          path: browsermeting/
+          if-no-files-found: error
+          retention-days: 5
 
   schermen-oordeel:
     name: Schermdekking - het oordeel over alle delen
@@ -835,9 +941,11 @@ jobs:
     needs: schermen
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: '22'
+          node-version-file: '.nvmrc'
           cache: 'npm'
       - run: npm ci
       - name: De journalen van de vier delen ophalen
@@ -892,9 +1000,11 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: '22'
+          node-version-file: '.nvmrc'
           cache: 'npm'
       - run: npm ci
       - name: Het journaal van npm test ophalen
@@ -915,3 +1025,25 @@ jobs:
           node scripts/dekking.js \
             --lees journalen/test/routejournaal.log \
             --lees journalen/scherm/.schermjournaal
+      # DE ATTRIBUTIE ERNAAST, EN HIJ BLOKKEERT NIETS. `dekking` vraagt WELKE
+      # endpoints geraakt zijn; deze stap vraagt DOOR WIE, en vooral van hoeveel
+      # toetsen we dat niet weten. Dat tweede getal is de bodem onder elke
+      # latere versmalling: een toets zonder attributie draagt `volleRing` en
+      # mag niet worden overgeslagen. Meten eerst, handhaven pas als het getal
+      # er staat -- een poort die vandaag scherp zou staan, zou 1432 van de
+      # 1433 toetsen als ongemeten weigeren.
+      - name: De attributie (van welke toets weten we wat hij aanraakt)
+        run: |
+          node scripts/attributie.js \
+            --lees journalen/test/routejournaal.log \
+            --lees journalen/scherm/.schermjournaal \
+            --schrijf
+      - name: De attributiemeting bewaren
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: attributie
+          path: ATTRIBUTIE.json
+          if-no-files-found: error
+          retention-days: 5
+

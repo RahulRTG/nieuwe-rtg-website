@@ -99,11 +99,12 @@ function main() {
   const basis = lees(ref);
   if (!basis) {
     /* Geen tweede kant is geen vergelijking. Dit hoort te zakken en niet
-       stilzwijgend te slagen: precies LAT.md regel 10. In CI staat er een
-       `git fetch --depth=1 origin main` voor. */
+       stilzwijgend te slagen: precies LAT.md regel 10. In CI komt origin/main
+       uit de volle checkout (fetch-depth: 0); een latere `git fetch` kan daar
+       niet meer, want de checkout laat geen credential achter. */
     console.error('\n  ' + K.rood + 'De basislijn van ' + ref + ' is niet te lezen.' + K.reset +
       '\n  Een vergelijking met een kant is geen vergelijking. Haal de tak op\n' +
-      '  (git fetch --depth=1 origin main) en draai opnieuw.\n');
+      '  (git fetch origin main) en draai opnieuw.\n');
     return 1;
   }
   const nu = JSON.parse(fs.readFileSync(path.join(WORTEL, 'NORM.json'), 'utf8'));

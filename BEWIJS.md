@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1433 bestanden en 10139 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1434 bestanden en 10150 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1433 |
-| losse beweringen (`test(...)`) | 10139 |
-| bestanden zonder kop (dus zonder opgeschreven bewering) | 50 |
+| toetsbestanden | 1434 |
+| losse beweringen (`test(...)`) | 10150 |
+| bestanden zonder kop (dus zonder opgeschreven bewering) | 51 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 991 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 40 |
 | alleen in de kop *genoemd*, nog niet gemeten | 115 |
-| niets van beide | 277 |
+| niets van beide | 278 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1256 bestanden, 9835 beweringen.
+1257 bestanden, 9846 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -97,6 +97,7 @@ toets omvalt.
 | `ast-grens.test.js` | 2 | gezakt op `===->!==` | DE SNELLE EN DE UITPUTTENDE VARIANT MOETEN HETZELFDE ZEGGEN. WAAROM DEZE TOETS ER IS scripts/ast-scan.js kwam lokaal in negen minuten niet rond, terwijl hij in CI een blokkerende stap is (TAKEN 4.6). |
 | `ast-scan.test.js` | 13 | gezakt op `===->!==` | Test voor de zelfgebouwde AST-scanner (scripts/ast/* + scripts/ast-scan.js). Drie soorten borging: 1. |
 | `atelier.test.js` | 5 | gezakt op `liegpoort /api/` | RTG Atelier: het besloten ontwerpbureau van de kantoren. Ontwerpen voor mode en alles wat je aan het lijf draagt, met een AI die het concept uittekent (silhouet, materialen, gedempt palet, verhaal), een tech pack... |
+| `attributie.test.js` | 7 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `auditspoor.test.js` | 13 | genoemd | HET API-SPOOR (server/opzet/auditspoor.js): laat elke geslaagde schrijfhandeling een regel na die niemand ongemerkt kan wijzigen? WAT HIER OP HET SPEL STAAT. |
 | `auth-rol.test.js` | 2 | gezakt op `liegpoort /api/` | Auth-scoping over elke leden-route die AAN ZIJN VORM te herkennen is: deze test leest de bron en eist dat een leverancier- EN een kantoor-token 401 krijgen -- nooit 2xx (ongewenste toegang) en nooit 5xx (crash). HIER... |
 | `automatisering.test.js` | 11 | gezakt op `return-weg` | De automatiseringen (draaiboeken) op de RTMAIL-rail. Unit-test op het welkom- draaiboek met een nep-db, zodat we los kunnen bewijzen dat een nieuw lid een welkom in zijn eigen RTMAIL-postvak krijgt -- zonder echte... |
@@ -206,7 +207,7 @@ toets omvalt.
 | `chaos.pg.test.js` | 3 | slaat zichzelf over | Chaos-/concurrency-test: meerdere gelijktijdige schrijvers naar DEZELFDE Postgres-collectie, om te bewijzen dat er onder contentie niets verloren gaat. Elke "schrijver" is een eigen pg-adapterinstance (eigen... |
 | `chaos.test.js` | 7 | gezakt op `>=->>#0` | De meetkant van de chaosproef (scripts/lib/chaosmeet.js). HET OMLEGGEN ZELF IS EEN SCRIPT (scripts/chaos.js): dat start een eigen trio, schiet de ACTIEVE server met SIGKILL om en meet door. |
 | `charter.test.js` | 8 | gezakt op `liegpoort /api/` | Charter (boten en jachten), eerlijk verhuren: vaste dagprijs vooraf betaald, met of zonder schipper, bareboat alleen met vaarbewijs, dubbele boekingen onmogelijk, staat met foto's VOOR het uitvaren en NA de... |
-| `ci-keten.test.js` | 1 | gezakt op `+->-#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `ci-keten.test.js` | 5 | gezakt op `+->-#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `claims-btw.test.js` | 11 | -- | BTW EN CLAIMS: het tarief op EEN plek, en geen bewering zonder dekking. TWEE GATEN uit de doorlichting van 20 augustus 2026: 4.10 `* 1.21` stond hard in kern/fonds.js en kern/lid/facturen.js, terwijl het platform... |
 | `clipdeler.test.js` | 4 | geen module gevonden | DE CLIPDELER STAAT ÉÉN KEER. Korte video's staan alleen op het toestel van de maker en reizen rechtstreeks (WebRTC-datakanaal). |
 | `clips.test.js` | 9 | gezakt op `liegpoort /api/` | RTG Clips: korte verticale video's die alleen op het toestel van de maker staan (OPFS). De server bewaart enkel de kaart (titel, duur, affiche) en relayeert signalen; de feed is een eindige dagselectie zonder... |

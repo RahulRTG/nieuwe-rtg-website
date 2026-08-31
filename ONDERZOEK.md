@@ -172,13 +172,74 @@ schreef, de graden, en de reden dat de rest ontbreekt.
 stilletjes weg kunnen: de kaart blijft staan en toont dat zij is ingetrokken, met
 de reden erbij.
 
+## Ook "nee" is een antwoord
+
+Bewoners kunnen een vraag aandragen; wat er daarna gebeurde was zichtbaar in
+precies één geval -- als er een onderzoek van kwam. `kern/livinglab/vraagbesluit.js`
+geeft elke vraag een levensloop: ingediend, verkend, beoordeeld, gestart of
+**niet-gestart met een reden**.
+
+De reden komt uit een **gesloten lijst** van zes, want vrije tekst levert "hier
+doen we op dit moment niets mee" op: niet te vergelijken, niet te doorzoeken, en
+niet te herkennen als dezelfde vraag over een jaar terugkomt. De toelichting
+erbij is verplicht en juist wél vrij -- de reden maakt het vergelijkbaar, de
+toelichting maakt het begrijpelijk voor deze ene bewoner.
+
+Een van de zes is de belangrijkste en staat er met opzet in: **de benodigde
+gegevens zijn niet in verhouding tot de vraag.** Een instituut dat kan zeggen
+"dit onderzoeken wij niet, want de prijs is te hoog voor de mensen die het zou
+raken", gebruikt zijn ethieklaag in plaats van hem af te vinken.
+
+Drie dingen gebeuren hier niet: een vraag wordt **nooit verwijderd** (een
+afgewezen vraag die verdwijnt, is niet te onderscheiden van een vraag die nooit
+is gesteld), er komt **geen ranglijst** van vragen (stemmen tellen mee in de
+afweging, ze beslissen niet -- anders verdwijnt precies de vraag van de kleine
+groep), en de AI beslist er niets.
+
+## Apparatuur buiten het lab
+
+Een school of buurtinitiatief kan apparatuur lenen (`kern/livinglab/uitleen.js`
+en `uitleenketen.js`). De catalogus is openbaar en zegt óók wat níét beschikbaar
+is, met de reden -- weglaten zou lijken alsof het apparaat niet bestaat.
+
+**De keten is het product.** Aanvraag, besluit, meegegeven, terug, herijkt: elke
+stap wordt achteraan toegevoegd en niets wordt ooit aangepast. Twee poorten gaan
+fail-closed dicht: een **open storing** (een apparaat waarvan bekend is dat het
+iets mankeert, geeft metingen mee waarvan niemand weet wat ze waard zijn) en een
+**verlopen ijking** -- die ziet er precies zo uit als een geldige. Bij het
+meegeven wordt de ijkstand bevroren in de keten, dezelfde stand die
+`instrument.js` in elke meting vastlegt.
+
+Terugkomen sluit de uitleen niet: eerst **herijken**, want het apparaat is
+vervoerd en door anderen bediend. En "in orde" is ook een waarneming: de staat
+waarin het terugkwam moet worden opgeschreven.
+
+## De reproductiecapsule en de geschiedenis van een conclusie
+
+"We hebben ergens een Excelbestand" is hoe onderzoek onherhaalbaar wordt. De
+capsule (`kern/livinglab/capsule.js`) bevat de **opzet**: hypothese mét tegendeel,
+plan, meetprotocol met zijn versie en het aantal metingen per versie, de
+apparaten met hun bevroren ijkstanden, de bewijsregels voluit (wie dit over vijf
+jaar leest, heeft de code niet bij de hand), en de softwareversie.
+
+Hij wordt **afgeleid en niet bewaard**: een capsule die bij het afsluiten wordt
+dichtgeklapt, vertelt over een half jaar iets anders dan het dossier. En hij
+bevat géén ruwe waarnemingen, géén ingevulde meetwaarden en géén aliassen -- een
+capsule die codenamen draagt, maakt de scheiding ongedaan zodra iemand hem
+doorstuurt.
+
+**Een conclusie is geen zin in een PDF.** `conclusielijn.js` geeft elke conclusie
+een geschiedenis waarin elke regel een OORZAAK draagt: een drager kwam erbij, een
+graad werd gezet, het plafond zakte doordat een deelnemer zich terugtrok. Elke
+graadverandering is een **versie**; wat ertoe leidde staat erbij. Dat legde meteen
+een gat bloot: terugtrekken herijkte zelf en liet een conclusie stil zakken --
+de graad veranderde en niets zei waardoor.
+
 ## Wat er nog niet is, met de reden
 
 - **Labfonds ↔ studie.** Het fonds financiert onderzoek en weet niet welk. Dit is
-  de duurste ontbrekende schakel: zonder haar kan een lid niet zien wat er met
+  nu de duurste ontbrekende schakel: zonder haar kan een lid niet zien wat er met
   zijn bijdrage is onderzocht.
-- **Reproductiecapsule en conclusieversies.** De bewijsmotor weegt al per studie;
-  een conclusie is nog geen object met een geschiedenis.
 
 Die vier staan hier zonder datum en zonder belofte. Wat er wel is, is gemeten:
 draai `npm run onderzoeksketen` en de tabel hierboven rekent zichzelf na.

@@ -3,7 +3,7 @@
     "op": "2026-08-31",
     "stations": 10,
     "paren": 90,
-    "schakels": 6,
+    "schakels": 8,
     "ontbrekendeBestanden": []
   },
   "stations": [
@@ -167,6 +167,22 @@
       ]
     },
     {
+      "van": "onderzoekslab",
+      "naar": "studie",
+      "velden": [
+        "studieId"
+      ],
+      "modules": []
+    },
+    {
+      "van": "onderzoekslab",
+      "naar": "doorbraak",
+      "velden": [
+        "uitgangId"
+      ],
+      "modules": []
+    },
+    {
       "van": "kosten",
       "naar": "studie",
       "velden": [
@@ -180,7 +196,6 @@
     "ethiek",
     "waarneming",
     "bewijs",
-    "onderzoekslab",
     "labfonds"
   ],
   "zonderInkomend": [
@@ -188,7 +203,6 @@
     "ethiek",
     "waarneming",
     "apparatuur",
-    "doorbraak",
     "labfonds",
     "kosten"
   ],
@@ -230,7 +244,7 @@
     },
     {
       "station": "onderzoekslab",
-      "aanDeStudie": false,
+      "aanDeStudie": true,
       "aanHetLab": false
     },
     {
@@ -288,7 +302,7 @@
       "van": "doorbraak",
       "naar": "onderzoekslab",
       "verbonden": true,
-      "richting": "heen",
+      "richting": "beide",
       "via": []
     },
     {

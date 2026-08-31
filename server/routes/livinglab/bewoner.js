@@ -124,9 +124,6 @@ module.exports = (kern, hulp) => {
      Zonder inlog en zonder labpas: dit is de kant die een gemeente, een
      subsidiegever of een buurtbewoner leest. Er staat alleen wat het lab zelf
      heeft geschreven en wat te tellen is -- geen aliassen, geen waarnemingen. */
-  app.post('/api/lab2/publiek/onderzoeken', remLezen, (req, res) => veilig(res, () => livinglab.publicatie.lijst(lijf(req).labId, lijf(req).n)));
-  app.post('/api/lab2/publiek/onderzoek', remLezen, (req, res) => veilig(res, () => livinglab.publicatie.kaart(lijf(req).id)));
-
   app.post('/api/lab2/bewoner/themas', remLezen, (req, res) => veilig(res, () => livinglab.themas.themas(lijf(req).labId)));
   app.post('/api/lab2/bewoner/thema', remSchrijf, (req, res) => veilig(res, () => livinglab.themas.themaBij(lijf(req))));
   app.post('/api/lab2/bewoner/stem', remSchrijf, (req, res) => veilig(res, () => livinglab.themas.themaStem(lijf(req))));
@@ -160,4 +157,10 @@ module.exports = (kern, hulp) => {
      de cyclus en de methoden zijn (regel 4). Er staat niets vertrouwelijks in --
      het zijn de spelregels, en die horen juist openbaar te zijn. */
   app.post('/api/lab2/bewoner/kader', remLezen, (req, res) => veilig(res, () => livinglab.kaderVoorScherm()));
+
+  /* De deuren voor wie alleen KIJKT -- de onderzoekskaarten, de buurtvragen met
+     hun stand, de leenbare apparatuur -- staan in ./openbaar.js. Ze krijgen
+     dezelfde rem mee, want dat is dezelfde vraag: afgrazen tegenhouden zonder
+     iemand buiten te sluiten die er wel bij hoort. */
+  require('./openbaar')(kern, { veilig, lijf, remLezen, remSchrijf });
 };

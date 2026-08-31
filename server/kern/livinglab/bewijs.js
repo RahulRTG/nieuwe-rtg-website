@@ -29,6 +29,11 @@
 'use strict';
 
 const kader = require('./kader');
+/* De geschiedenis van een conclusie (./conclusielijn.js): elke verandering krijgt
+   een regel met haar OORZAAK. Een conclusie is geen zin in een PDF maar iets dat
+   stijgt, zakt en soms wordt herzien; wie alleen de laatste stand ziet, ziet niet
+   dat een lab van gedachten is veranderd. */
+const lijn = require('./conclusielijn');
 const graden = require('./graden');
 
 const SOORTEN_BEWIJS = ['bron', 'dataset', 'observatie', 'interview', 'experiment', 'statistiek'];
@@ -46,7 +51,9 @@ module.exports = (ctx) => {
     if (tekst.length < 10) return { status: 400, error: 'Wat concludeert u? Schrijf het als een bewering.' };
     if (s.dossier.conclusies.length >= 200) return { status: 400, error: 'Tweehonderd conclusies is genoeg; voeg ze liever samen.' };
     const c = { id: rid(), tekst, graad: 'aanname', bewijs: [], tekenaar: null,
-      door: schoon(wie, 80) || 'lab', voorstel: !!b.voorstel, at: nu() };
+      door: schoon(wie, 80) || 'lab', voorstel: !!b.voorstel, at: nu(), geschiedenis: [] };
+    lijn.noteer(c, { soort: 'gemaakt', naar: 'aanname', oorzaak: 'opgeschreven als bewering',
+      door: c.door, at: c.at });
     s.dossier.conclusies.unshift(c);
     audit(s.labId, 'bewijs.conclusie', wie, s.id, tekst.slice(0, 60));
     save();
@@ -66,6 +73,8 @@ module.exports = (ctx) => {
     if (!soort) return { status: 400, error: 'Kies een bewijssoort: ' + SOORTEN_BEWIJS.join(', ') + '.' };
     if (b.weg) {
       c.bewijs = c.bewijs.filter(w => !(w.soort === soort && w.ref === String(b.ref || '')));
+      lijn.noteer(c, { soort: 'drager-eraf', oorzaak: 'een ' + soort + ' viel weg onder deze conclusie',
+        door: schoon(wie, 80) || 'lab', at: nu() });
       herijk(s, c);
       save();
       return { ok: true, conclusie: c, plafond: plafond(s, c).graad.graad };
@@ -91,6 +100,8 @@ module.exports = (ctx) => {
     if (c.bewijs.some(w => w.soort === soort && w.ref === ref)) return { status: 409, error: 'Dit bewijs hangt er al onder.' };
     if (c.bewijs.length >= 50) return { status: 400, error: 'Vijftig dragers onder één conclusie is genoeg.' };
     c.bewijs.push({ soort, ref, notitie: schoon(b.notitie, 200), door: schoon(wie, 80) || 'lab', at: nu() });
+    lijn.noteer(c, { soort: 'drager-erbij', oorzaak: 'een ' + soort + ' kwam eronder te staan',
+      door: schoon(wie, 80) || 'lab', at: nu() });
     herijk(s, c);
     audit(s.labId, 'bewijs.koppel', wie, s.id, c.id + ' <- ' + soort);
     save();
@@ -103,6 +114,8 @@ module.exports = (ctx) => {
   function herijk(s, c) {
     const p = plafond(s, c).graad;
     if ((kader.graad(c.graad) || kader.graad('aanname')).rang > p.rang) {
+      lijn.noteer(c, { soort: 'herijkt', van: c.graad, naar: p.graad,
+        oorzaak: 'het plafond zakte: ' + plafond(s, c).reden, at: nu() });
       c.graad = p.graad;
       c.herijkt = nu();
       /* De handtekening gold voor de graad die er stond, en die is nu lager.
@@ -143,6 +156,9 @@ module.exports = (ctx) => {
        weggooien bij een graad die hem niet strikt nodig heeft, was de eerste
        versie -- en dan verlaagde de eerstvolgende herijking het plafond, zodat
        een conclusie zakte juist doordat er bewijs bij kwam. */
+    lijn.noteer(c, { soort: 'graad-gezet', van: c.graad, naar: doel.graad,
+      oorzaak: tekenaar ? 'gezet en getekend' : 'gezet op wat het bewijs kan dragen',
+      door: door || schoon(wie, 80) || 'lab', at: nu() });
     c.graad = doel.graad; c.tekenaar = nodig ? tekenaar : null; c.voorstel = false;
     audit(s.labId, 'bewijs.graad', door || wie, s.id, c.id + ' -> ' + doel.graad);
     s.dossier.logboek.unshift({ id: rid(), tekst: 'Conclusie op "' + doel.naam + '"' + (tekenaar ? ', getekend door ' + tekenaar.naam : '') + '.', wie: door || schoon(wie, 80) || 'lab', at: nu() });

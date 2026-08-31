@@ -36,6 +36,10 @@
 
 const graden = require('./graden');
 const kader = require('./kader');
+/* De geschiedenis van een conclusie (./conclusielijn.js). Terugtrekken herijkt
+   hier zelf -- het loopt niet langs ./bewijs.js -- en zonder deze regels zou een
+   conclusie stil zakken: de graad verandert, en niets zegt waardoor. */
+const lijn = require('./conclusielijn');
 const rangVan = (g) => (kader.graad(g) || kader.graad('aanname')).rang;
 
 module.exports = (ctx) => {
@@ -118,9 +122,18 @@ module.exports = (ctx) => {
     const gezakt = [];
     for (const c of s.dossier.conclusies) {
       const voor = (c.graad || 'aanname');
+      const dragersVoor = (c.bewijs || []).length;
       c.bewijs = (c.bewijs || []).filter(w => !(w.soort === 'observatie' && ids.has(w.ref)));
+      if ((c.bewijs || []).length < dragersVoor) {
+        lijn.noteer(c, { soort: 'drager-eraf',
+          oorzaak: (dragersVoor - c.bewijs.length) + ' observatie(s) vielen weg doordat een deelnemer zich terugtrok',
+          door: schoon(wie, 80) || 'deelnemer zelf', at: nu() });
+      }
       const p = graden.plafond(s, c).graad;
       if (rangVan(voor) > p.rang) {
+        lijn.noteer(c, { soort: 'herijkt', van: voor, naar: p.graad,
+          oorzaak: 'het plafond zakte: ' + graden.plafond(s, c).reden,
+          door: schoon(wie, 80) || 'deelnemer zelf', at: nu() });
         c.graad = p.graad; c.herijkt = nu();
         if (c.tekenaar && !graden.handtekeningNodig(s, p)) c.tekenaar = null;
         gezakt.push({ id: c.id, van: voor, naar: p.graad });

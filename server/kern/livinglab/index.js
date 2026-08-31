@@ -70,6 +70,11 @@ module.exports = ({ db, save, crypto, anthropic, lab, kosten, economie }) => {
   ctx.plan = require('./plan')(ctx);
   ctx.mensen = require('./mensen')(ctx);        // leest ctx.studie bij de bouw
   ctx.themas = require('./themas')(ctx);
+  /* Het besluit over een buurtvraag (./vraagbesluit.js): ook "nee" is een
+     antwoord. Staat naast ./themas.js en niet erin: dat gaat over het OPHALEN
+     van vragen, dit over wat het lab ermee doet -- twee handelingen met twee
+     verschillende lezers (een bewoner tegenover het kantoor). */
+  ctx.vraagbesluit = require('./vraagbesluit')(ctx);
   ctx.waarnemen = require('./waarnemen')(ctx);
   ctx.bewijs = require('./bewijs')(ctx);        // leest ctx.bestuur bij de bouw
   /* Verzamelen en wegen staan in twee bestanden maar zijn één begrip voor de
@@ -89,12 +94,20 @@ module.exports = ({ db, save, crypto, anthropic, lab, kosten, economie }) => {
      dus na allebei. ./mensen.js roept hem aan via `ctx` en niet via een kopie:
      die is eerder gebouwd, en een kopie zou hier `undefined` bevriezen. */
   ctx.terugtrekken = require('./terugtrekken')(ctx);
+  /* Apparatuur buiten het lab (./uitleen.js): uitlenen aan een school of een
+     buurtinitiatief, met een keten die niemand kan herschrijven. Staat na de
+     apparatuur, want hij leest de kalibratiestand en de storingen. */
+  ctx.uitleen = require('./uitleen')(ctx);
   ctx.doorbraak = require('./doorbraak')(ctx);
   ctx.impact = require('./impact')(ctx);
   /* De openbare onderzoekskaart (./publicatie.js). Hij staat achteraan omdat hij
      alles hierboven LEEST en zelf niets aan het onderzoek verandert -- op het
      besluit om te publiceren na, en dat is een handeling van een mens. */
   ctx.publicatie = require('./publicatie')(ctx);
+  /* De reproductiecapsule (./capsule.js): hoe een conclusie tot stand kwam,
+     afgeleid en niet bewaard. Staat achteraan om dezelfde reden als de
+     publicatie: hij leest alles en verandert niets. */
+  ctx.capsule = require('./capsule')(ctx);
   ctx.ai = require('./ai')(ctx);
 
   /* HET ONDERZOEKSGROOTBOEK (./ledger.js): wat een studie kostte en waarom de

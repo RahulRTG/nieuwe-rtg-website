@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1424 bestanden en 9997 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1427 bestanden en 10018 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1424 |
-| losse beweringen (`test(...)`) | 9997 |
+| toetsbestanden | 1427 |
+| losse beweringen (`test(...)`) | 10018 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 50 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 971 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 39 |
 | alleen in de kop *genoemd*, nog niet gemeten | 116 |
-| niets van beide | 288 |
+| niets van beide | 291 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1247 bestanden, 9693 beweringen.
+1250 bestanden, 9714 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -582,12 +582,15 @@ toets omvalt.
 | `linkkoppelingenui.test.js` | 8 | -- | HET SCHERM "MIJN KOPPELINGEN" (public/shared/linkkoppelingen.js) -- LINK.md par. 4, stap 6. |
 | `livegang-pakket.test.js` | 5 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `livegang.test.js` | 3 | gezakt op `liegpoort /api/` | De livegang: in productie start het platform schoon en op slot. - geen demozaken in de catalogus, geen demopersoneel, geen voorbeeldposts - de demo-inlog is dicht (leden en zaken) - de rate-limiter staat aan |
+| `livinglab-capsule.test.js` | 6 | -- | DE REPRODUCTIECAPSULE EN DE GESCHIEDENIS VAN EEN CONCLUSIE. Wat deze toets vastlegt: 1. |
 | `livinglab-instrument.test.js` | 10 | -- | MEETINSTRUMENTEN -- wat een deelnemer met zijn labpas invult. Wat deze toets vastlegt: 1. |
 | `livinglab-ledger.test.js` | 8 | -- | HET ONDERZOEKSGROOTBOEK -- wat een studie kostte, en waarom de stichting die rekening mocht betalen. Wat deze toets vastlegt: 1. |
 | `livinglab-nummer.test.js` | 7 | -- | HET ONDERZOEKSNUMMER -- één naam voor één onderzoek, door het hele systeem. De meting eronder (scripts/onderzoeksketen.js) wees uit dat zeven van de tien stations al aan DEZELFDE studie hangen: het is een ster en... |
 | `livinglab-publicatie.test.js` | 6 | -- | DE OPENBARE ONDERZOEKSKAART -- wat een lab naar buiten zegt, inclusief wat er niet werkte. Wat deze toets vastlegt: 1. |
 | `livinglab-routes.test.js` | 11 | gezakt op `liegpoort /api/` | DE OVERIGE ROUTES VAN HET LIVING LAB -- werkplaats, apparatuur, deelnemers, themas, de pijplijn, de coach en de bewonerskant. test/livinglab.test.js loopt de ONDERZOEKSCYCLUS af: de poorten, de ethiek, de bewijsmotor. |
 | `livinglab-terugtrekken.test.js` | 5 | -- | TERUGTREKKEN -- wat er verdwijnt, wat er blijft, en wat dat met de conclusies doet. Wat deze toets vastlegt: 1. |
+| `livinglab-uitleen.test.js` | 8 | -- | APPARATUUR BUITEN HET LAB -- uitlenen met een keten die niemand herschrijft. Wat deze toets vastlegt: 1. |
+| `livinglab-vraagbesluit.test.js` | 7 | -- | HET BESLUIT OVER EEN BUURTVRAAG -- ook "nee" is een antwoord. Wat deze toets vastlegt: 1. |
 | `livinglab.test.js` | 20 | gezakt op `liegpoort /api/` | Het RTF Living Lab: de onderzoekscyclus met haar poorten, de ethieklaag, de bewijsmotor, de scheiding van onderzoeksdata, de apparatuurpoort en de pijplijn naar echte verandering. Draai los: node --test... |
 | `loghygiene.test.js` | 5 | gezakt op `&&->||#0` | LOGHYGIENE -- lekt er een naam, e-mailadres of token via de logs? Een systeem kan zijn database keurig versleutelen en toch alle identiteiten weggeven, omdat ze in platte tekst in de logs staan. |
 | `logstroom.test.js` | 4 | gezakt op `<=-><#0` | DE LOGSTROOM (techniekcontrole LOG-01, server/techniek.js). Node kiest zijn stdout-stroom op wat eraan hangt, en dat bepaalt of de log de server ophoudt: een PIJP (systemd, docker, `\| logger`) -> Socket, schrijft... |

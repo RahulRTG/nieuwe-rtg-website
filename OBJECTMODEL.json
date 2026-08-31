@@ -2,15 +2,15 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-08-31",
   "gemeten": {
-    "bestanden": 1897,
-    "vormen": 1297,
-    "velden": 1848,
-    "modules": 696,
+    "bestanden": 1902,
+    "vormen": 1299,
+    "velden": 1853,
+    "modules": 698,
     "domeinen": 245,
     "envelopDrempel": 15,
-    "envelop": 33,
-    "veldenDomeineigen": 1299,
-    "veldenGedeeldVanafVier": 183,
+    "envelop": 34,
+    "veldenDomeineigen": 1304,
+    "veldenGedeeldVanafVier": 182,
     "gelijkendeVormparen": 19
   },
   "envelop": [
@@ -37,6 +37,7 @@
     "ref",
     "sinds",
     "soort",
+    "stand",
     "status",
     "supplierCode",
     "tekst",
@@ -59,18 +60,6 @@
         "kern/commerce",
         "kern/instant-reality",
         "kern/magnaat-werkroutefabriek"
-      ]
-    },
-    {
-      "veld": "stand",
-      "domeinen": 14,
-      "waar": [
-        "bedrijf",
-        "kern/bureau",
-        "kern/command",
-        "kern/commercie",
-        "kern/concern",
-        "kern/eten"
       ]
     },
     {
@@ -528,6 +517,18 @@
         "kern/mobiliteit",
         "kern/onderneming"
       ]
+    },
+    {
+      "veld": "duurMin",
+      "domeinen": 8,
+      "waar": [
+        "kern/avond",
+        "kern/care",
+        "kern/gemeente",
+        "kern/leverancier",
+        "kern/mall",
+        "kern/trainingsschema"
+      ]
     }
   ],
   "paren": [
@@ -793,6 +794,20 @@
     },
     {
       "gelijkenis": 0.63,
+      "a": "server/kern/geloofbieb.js",
+      "b": "server/kern/reisbieb/index.js",
+      "domeinA": "kern/geloofbieb",
+      "domeinB": "kern/reisbieb",
+      "gedeeld": [
+        "categorie",
+        "categorieLabel",
+        "gratis",
+        "nr",
+        "prijsCenten"
+      ]
+    },
+    {
+      "gelijkenis": 0.6,
       "a": "server/kern/gast/order-beeld.js",
       "b": "server/kern/horeca/regel.js",
       "domeinA": "kern/gast",
@@ -806,22 +821,7 @@
         "ingredienten",
         "itemId",
         "lijstprijs",
-        "opties",
-        "stand"
-      ]
-    },
-    {
-      "gelijkenis": 0.63,
-      "a": "server/kern/geloofbieb.js",
-      "b": "server/kern/reisbieb/index.js",
-      "domeinA": "kern/geloofbieb",
-      "domeinB": "kern/reisbieb",
-      "gedeeld": [
-        "categorie",
-        "categorieLabel",
-        "gratis",
-        "nr",
-        "prijsCenten"
+        "opties"
       ]
     }
   ]

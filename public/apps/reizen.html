@@ -17,16 +17,8 @@
 </head>
 <body class="rtg-stijl" data-rtg-world="travel">
 <a class="skip" href="#inhoud">Naar de inhoud</a>
-<div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">
-  <a class="os-switcher__brand" href="/apps/app.html"><b>RTG</b><span>Vier werelden · één kern</span></a>
-  <div class="os-switcher__links">
-    <a href="/apps/rtg.html"><span>01</span>LivingOS</a>
-    <a href="/apps/kantoor.html"><span>02</span>WorkOS</a>
-    <a href="/apps/reizen.html" aria-current="page"><span>03</span>TravelOS</a>
-    <a href="/apps/foundation/os-publiek.html"><span>04</span>FoundationOS</a>
-  </div>
-  <span class="os-switcher__state">Kern verbonden</span>
-</div>
+<!-- De wereldstrook stond hier; de vier werelden staan nu in de topbalk van de
+     Edge-schil. Zie de opmerking in apps/kantoor.html. -->
 
 <div class="reisapp">
   <header class="prestatiekop">
@@ -336,10 +328,6 @@
      tijdlijn. De performance-interface verandert de bediening, niet de waarheid. -->
 <script src="/shared/canvas.js"></script>
 <script src="/shared/canvas-taal.js"></script>
-<script src="/shared/rtg-edge-worlds.js"></script>
-<script src="/shared/rtg-edge-icons.js"></script>
-<script src="/shared/rtg-edge-library.js"></script>
-<script src="/shared/rtg-edge-system.js"></script>
 <script>
 (() => {
   const $ = s => document.querySelector(s);
@@ -938,5 +926,8 @@ function tekenCanvasVandaag(lijst) {
 <script src="/shared/poortgesprek.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
+<!-- randen.js beslist welk scherm welke wereldschil krijgt; hier stonden de
+     vier Edge-bestanden los, zonder dat iets ze startte. -->
+<script src="/shared/randen.js" defer></script>
 </body>
 </html>

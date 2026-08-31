@@ -1,6 +1,19 @@
 /* Alle echte functies van de vier RTG-werelden, op één vindbare plek. */
 (function (w) {
   'use strict';
+  /* HUIS EN HOME ZIJN TWEE DINGEN, en dat was hier één woord te weinig.
+
+     `home` is waar de RTG-markering van de schil naartoe gaat: de werkplek van
+     die wereld. `huis` is het wereldSCHERM uit MAPPEN (app-main.js) -- de
+     bestemming die WERELDEN.md aanwijst en die test/wereldregister.test.js
+     tegen de code houdt. Ze zijn niet hetzelfde: LivingOS werkt op
+     /apps/living-os.html en woont op /apps/rtg.html.
+
+     Zolang dat één veld was, stonden er twee antwoorden op dezelfde vraag in
+     het huis: de wereldstrook op de wereldschermen wees naar rtg.html en
+     os-publiek.html, de wereldlijst in het menu naar living-os.html en
+     foundation/index.html. Dat is precies de dubbeling uit LAT.md regel 4, dus
+     staat het adres nu één keer hier en leest elke wereldnavigatie het hier. */
   function wereld(meta, groepen, rail) {
     var alles = [];
     groepen.forEach(function (groep) { groep[1].forEach(function (functie) { alles.push(functie); }); });
@@ -9,7 +22,7 @@
     return meta;
   }
   w.RTGEdgeWorlds = {
-    work: wereld({ naam: 'WORK OS', kort: 'WORK', home: '/apps/werkruimte.html?gebied=kantoor', workspace: '/apps/werkruimte.html?gebied=kantoor', actie: 'Open werkbank' }, [
+    work: wereld({ naam: 'WORK OS', kort: 'WORK', kaart: 'WorkOS', huis: '/apps/kantoor.html', home: '/apps/werkruimte.html?gebied=kantoor', workspace: '/apps/werkruimte.html?gebied=kantoor', actie: 'Open werkbank' }, [
       ['Dag & team', [
         ['vandaag', 'Vandaag', 'home', '/apps/kantoor.html'], ['afdelingen', 'Afdelingen', 'grid', '/apps/kantoren.html'],
         ['personeel', 'Personeel', 'people', '/apps/personeel.html?kantoor=1'], ['agenda', 'Agenda', 'calendar', '/apps/agenda.html'],
@@ -30,7 +43,7 @@
       ]]
     ], ['vandaag', 'afdelingen', 'personeel', 'office', 'agenda', 'mail', 'bestanden', 'backoffice', 'command']),
 
-    travel: wereld({ naam: 'TRAVEL OS', kort: 'TRAVEL', home: '/apps/reizen.html', workspace: '/apps/werkruimte.html?gebied=reizen', actie: 'Open reisdetail' }, [
+    travel: wereld({ naam: 'TRAVEL OS', kort: 'TRAVEL', kaart: 'TravelOS', huis: '/apps/reizen.html', home: '/apps/reizen.html', workspace: '/apps/werkruimte.html?gebied=reizen', actie: 'Open reisdetail' }, [
       ['Plannen', [
         ['vandaag', 'Vandaag', 'home', '/apps/reizen.html#vandaag'], ['reisveilig', 'Reizen & Veilig', 'shield', '/apps/reizen-veilig.html'],
         ['vluchten', 'Vluchten', 'plane', '/apps/vluchten.html'], ['hotels', 'Verblijven', 'bed', '/apps/hotels.html'],
@@ -46,7 +59,7 @@
       ]]
     ], ['vandaag', 'vluchten', 'hotels', 'reisbureau', 'mobiliteit', 'navigatie', 'rit', 'reisboek', 'hangar']),
 
-    living: wereld({ naam: 'LIVING OS', kort: 'LIVING', home: '/apps/living-os.html', workspace: '/apps/werkruimte.html?gebied=living', actie: 'Vergelijk werelden' }, [
+    living: wereld({ naam: 'LIVING OS', kort: 'LIVING', kaart: 'LivingOS', huis: '/apps/rtg.html', home: '/apps/living-os.html', workspace: '/apps/werkruimte.html?gebied=living', actie: 'Vergelijk werelden' }, [
       ['Leefmodel', [
         ['universe', 'Universe', 'spark', '/apps/living-os.html?view=universe'], ['intent', 'Intent', 'target', '/apps/living-os.html?view=intent'],
         ['worlds', 'Worlds', 'grid', '/apps/living-os.html?view=worlds'], ['decisions', 'Decisions', 'branch', '/apps/living-os.html?view=decisions'],
@@ -60,7 +73,7 @@
       ]]
     ], ['universe', 'intent', 'worlds', 'decisions', 'evidence', 'leven', 'geld', 'veilig']),
 
-    foundation: wereld({ naam: 'RTFOUNDATION', kort: 'RTF', home: '/apps/foundation/index.html', workspace: '/apps/werkruimte.html?gebied=foundation', actie: 'Ga verder' }, [
+    foundation: wereld({ naam: 'RTFOUNDATION', kort: 'RTF', kaart: 'FoundationOS', huis: '/apps/foundation/os-publiek.html', home: '/apps/foundation/index.html', workspace: '/apps/werkruimte.html?gebied=foundation', actie: 'Ga verder' }, [
       ['Start & leren', [
         ['foundation-home', 'Foundation Home', 'home', '/apps/foundation/index.html'], ['campus', 'Campus', 'school', '/apps/foundation/campus.html'],
         ['leren', 'Leren', 'book', '/apps/foundation/leren.html'], ['office', 'Presenteren & Office', 'doc', '/apps/office.html?werk=rtf'],

@@ -39,7 +39,14 @@ test('iedere doelgroep opent de bestaande specialist die erbij hoort', () => {
 });
 
 test('de drie primaire ingangen staan ook in het volledige WORK-register', () => {
-  const register = html.slice(html.indexOf('<nav class="wereldapps"'), html.indexOf('</nav>'));
+  /* Vanaf de OPENING van het register tot ZIJN sluiting, en niet tot de eerste
+     </nav> van de pagina: dat laatste ging goed zolang de wereldapps het eerste
+     <nav> waren en zakte zodra er een balk boven kwam (de bladenbalk). De slice
+     werd dan leeg en de toets meldde "0 keer aanwezig" over een register waar
+     alle drie de ingangen gewoon in staan. Een toets die het verkeerde stuk
+     meet, meldt een fout die er niet is -- even schadelijk als er een missen. */
+  const begin = html.indexOf('<nav class="wereldapps"');
+  const register = html.slice(begin, html.indexOf('</nav>', begin));
   for (const route of ['/apps/personeel.html', '/apps/leverancier.html', '/apps/partner-worden.html'])
     assert.equal((register.match(new RegExp('href="' + route.replace(/[.]/g, '\\.') + '"', 'g')) || []).length, 1,
       route + ' hoort precies eenmaal in het WORK-register');

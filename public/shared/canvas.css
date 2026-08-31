@@ -47,6 +47,62 @@
 .cv-stand .cv-cijfers > span { font-size: .82rem; color: var(--rtg-muted, #4D4A45); }
 .cv-stand .cv-cijfers b { font-variant-numeric: tabular-nums; font-weight: 500; }
 
+/* ---------- de drie lagen naast elkaar ----------
+   EEN OPSTELLING, GEEN VIJFDE LAAG. Stand, rust en tijdlijn blijven precies wat
+   ze zijn en worden door canvas.js in hun eigen doel getekend; dit zegt alleen
+   dat ze op een breed scherm naast elkaar mogen staan in plaats van onder
+   elkaar. Een scherm kiest dat zelf door de drie in `.cv-rij` te zetten -- doet
+   het dat niet, dan verandert er niets, en dat is waarom dit geen tak in
+   canvas.js is geworden.
+
+   Waarom het de moeite is: onder elkaar kostten de drie op een bureauscherm
+   bijna de hele hoogte, terwijl ze samen EEN antwoord geven op EEN vraag (hoe
+   staat deze wereld ervoor). Wat daaronder komt -- het register -- begon
+   daardoor onder de vouw.
+
+   De volgorde in de bron blijft stand, rust, tijdlijn: dat is ook de volgorde
+   waarin een schermlezer en een telefoon ze krijgen, en de belangrijkste staat
+   dus eerst. Op de telefoon valt hij vanzelf terug op onder elkaar. */
+.cv-rij {
+  display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1fr) minmax(0, 1.1fr);
+  margin: 1.6rem 0 0;
+  border-top: 1px solid var(--rtg-line, #DEDBD5);
+  border-bottom: 1px solid var(--rtg-line, #DEDBD5);
+}
+.cv-rij > * { min-width: 0; border-left: 1px solid var(--rtg-line, #DEDBD5); }
+.cv-rij > *:first-child { border-left: 0; }
+/* De maten van de losse lagen passen bij een blok over de volle breedte; in een
+   kolom van een derde is dat te veel lucht aan de zijkanten en te weinig
+   tussen de drie. */
+.cv-rij .cv-stand { padding: 1.5rem 1.25rem; }
+.cv-rij .cv-stand.rtg-rail::before { top: 1.5rem; bottom: 1.5rem; }
+.cv-rij .cv-stand .cv-woord { font-size: clamp(1.6rem, 3.4vw, 2.1rem); }
+/* De cijfers krijgen elk hun eigen cel. Dat is niet alleen vorm: drie getallen
+   op een rij met alleen witruimte ertussen lezen als een zin, en dit zijn drie
+   losse metingen. */
+.cv-rij .cv-cijfers {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0; margin-top: 1.2rem; padding-top: 1.2rem;
+}
+.cv-rij .cv-cijfers > span {
+  display: block; padding: 0 .6rem; text-align: center;
+  border-left: 1px solid var(--rtg-line, #DEDBD5);
+  font-size: .62rem; letter-spacing: .06em;
+}
+.cv-rij .cv-cijfers > span:first-child { border-left: 0; padding-left: 0; }
+.cv-rij .cv-cijfers b {
+  display: block; margin-bottom: .35rem;
+  font-family: 'Bodoni Moda', Georgia, serif; font-size: 1.5rem; font-weight: 400;
+  color: var(--rtg-txt, #0C0C0B);
+}
+.cv-rij .cv-rust { padding: 1.5rem 1.25rem; max-width: none; }
+.cv-rij .cv-lijn { padding: 1.5rem 1.25rem; max-width: none; }
+@media (max-width: 860px) {
+  .cv-rij { grid-template-columns: 1fr; }
+  .cv-rij > * { border-left: 0; border-top: 1px solid var(--rtg-line, #DEDBD5); }
+  .cv-rij > *:first-child { border-top: 0; }
+}
+
 /* ---------- laag 1: de rust ----------
    Negentig procent lucht. Wie hier iets bij wil zetten, haalt eerst iets weg. */
 .cv-rust { padding: 0 1.25rem 2.25rem; max-width: 46rem; }

@@ -131,7 +131,10 @@ body.travel-os[data-travelos-scene="residence"]{--tos-scene:url('/images/travelo
 }
 .tos-service-step{min-height:84px;display:grid;grid-template-columns:auto 1fr;align-items:center;gap:.85rem;padding:1rem 1.15rem;border-left:1px solid var(--tos-line)}
 .tos-service-step:first-child{border-left:0}
-.tos-service-step>span{color:var(--tos-wine-licht);font:500 1.3rem/1 "Bodoni Moda",Didot,serif}
+/* GEEN BORDEAUX OP DE CIJFERS. 1,3rem is 20,8px en niet vet: dat telt niet
+   als grote tekst, en het hoogsel haalt op deze grond 3,74:1 -- de a11y-poort
+   ving het op vier schermen. Een rozetint uit dezelfde familie haalt ruim 7. */
+.tos-service-step>span{color:#E7A8B8;font:500 1.3rem/1 "Bodoni Moda",Didot,serif}
 .tos-service-step div{display:flex;min-width:0;flex-direction:column;gap:.2rem}
 .tos-service-step b{color:var(--tos-ivory);font-size:.61rem;letter-spacing:.15em}
 .tos-service-step small{overflow:hidden;color:var(--tos-muted);font-size:.66rem;line-height:1.35;text-overflow:ellipsis;white-space:nowrap}

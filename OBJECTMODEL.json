@@ -1,15 +1,15 @@
 {
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
-  "vastgelegd": "2026-08-28",
+  "vastgelegd": "2026-08-31",
   "gemeten": {
-    "bestanden": 1880,
-    "vormen": 1291,
-    "velden": 1841,
-    "modules": 691,
-    "domeinen": 245,
+    "bestanden": 1883,
+    "vormen": 1299,
+    "velden": 1846,
+    "modules": 693,
+    "domeinen": 247,
     "envelopDrempel": 15,
-    "envelop": 32,
-    "veldenDomeineigen": 1292,
+    "envelop": 33,
+    "veldenDomeineigen": 1296,
     "veldenGedeeldVanafVier": 184,
     "gelijkendeVormparen": 19
   },
@@ -36,6 +36,7 @@
     "ref",
     "sinds",
     "soort",
+    "stand",
     "status",
     "supplierCode",
     "tekst",
@@ -58,18 +59,6 @@
         "kern/commerce",
         "kern/instant-reality",
         "kern/magnaat-werkroutefabriek"
-      ]
-    },
-    {
-      "veld": "stand",
-      "domeinen": 14,
-      "waar": [
-        "bedrijf",
-        "kern/bureau",
-        "kern/command",
-        "kern/commercie",
-        "kern/concern",
-        "kern/eten"
       ]
     },
     {
@@ -385,6 +374,18 @@
       ]
     },
     {
+      "veld": "eigenaar",
+      "domeinen": 10,
+      "waar": [
+        "bedrijf",
+        "kern/command",
+        "kern/levensgraaf",
+        "kern/onderneming",
+        "kern/reisgezelschap",
+        "kern/reisgezelschap-delen"
+      ]
+    },
+    {
       "veld": "niveau",
       "domeinen": 10,
       "waar": [
@@ -406,6 +407,18 @@
         "kern/livinglab",
         "kern/office",
         "kern/overheid"
+      ]
+    },
+    {
+      "veld": "rol",
+      "domeinen": 10,
+      "waar": [
+        "kern/concern",
+        "kern/livinglab",
+        "kern/magnaatwereld",
+        "kern/onderneming",
+        "kern/rechterhand",
+        "kern/reisgezelschap"
       ]
     },
     {
@@ -514,18 +527,6 @@
         "kern/kosten",
         "kern/overheid",
         "kern/payroll"
-      ]
-    },
-    {
-      "veld": "regels",
-      "domeinen": 8,
-      "waar": [
-        "kern/agent",
-        "kern/commerce",
-        "kern/facturatie",
-        "kern/gast",
-        "kern/magnaat-economie",
-        "kern/mall"
       ]
     }
   ],
@@ -792,6 +793,20 @@
     },
     {
       "gelijkenis": 0.63,
+      "a": "server/kern/geloofbieb.js",
+      "b": "server/kern/reisbieb/index.js",
+      "domeinA": "kern/geloofbieb",
+      "domeinB": "kern/reisbieb",
+      "gedeeld": [
+        "categorie",
+        "categorieLabel",
+        "gratis",
+        "nr",
+        "prijsCenten"
+      ]
+    },
+    {
+      "gelijkenis": 0.6,
       "a": "server/kern/gast/order-beeld.js",
       "b": "server/kern/horeca/regel.js",
       "domeinA": "kern/gast",
@@ -805,22 +820,7 @@
         "ingredienten",
         "itemId",
         "lijstprijs",
-        "opties",
-        "stand"
-      ]
-    },
-    {
-      "gelijkenis": 0.63,
-      "a": "server/kern/geloofbieb.js",
-      "b": "server/kern/reisbieb/index.js",
-      "domeinA": "kern/geloofbieb",
-      "domeinB": "kern/reisbieb",
-      "gedeeld": [
-        "categorie",
-        "categorieLabel",
-        "gratis",
-        "nr",
-        "prijsCenten"
+        "opties"
       ]
     }
   ]

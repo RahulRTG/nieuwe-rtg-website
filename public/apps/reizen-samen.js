@@ -15,6 +15,19 @@
   var R = w.RTGReizen; if (!R) return;
   var $ = R.$, maak = R.maak;
   var huidig = null;                       // de reis waar dit blad nu over gaat
+  /* De tekenlogica van de gedeelde helft staat in ./reizen-samen-delen.js. Bij
+     naam opgehaald en niet bij het laden vastgepakt: de volgorde van twee
+     defer-scripts is geen afspraak om op te bouwen. */
+  function deel(naam) {
+    return function () {
+      var mod = (w.RTGSamenDelen && w.RTGSamenDelen[naam]) ? w.RTGSamenDelen
+        : (w.RTGSamenMensen && w.RTGSamenMensen[naam]) ? w.RTGSamenMensen : null;
+      if (mod) return mod[naam].apply(null, arguments);
+      /* Zwijgen zou dezelfde fout herhalen die het opknippen al een keer maakte:
+         een ontbrekende functie liet zwijgend de halve kolom weg. */
+      if (w.console && w.console.error) w.console.error('[samen] onderdeel ontbreekt:', naam);
+    };
+  }
 
   function tijd(iso) {
     var t = new Date(String(iso || ''));
@@ -43,190 +56,10 @@
     });
   }
 
-  function tekenLeden(uit) {
-    var vak = $('#samenLeden'); if (!vak) return;
-    /* UITNODIGEN DOET DE EIGENAAR. De server weigert het al voor een ander
-       (404), maar een formulier dat zichtbaar is en dan afketst, is een
-       verhindering zonder reden -- GRAMMATICA.md par. 4. Wie niet mag, ziet
-       hier waarom in plaats van een knop. */
-    var vorm = $('#samenNodig');
-    if (vorm) {
-      var eigenaar = uit.rol === 'eigenaar';
-      vorm.hidden = !eigenaar;
-      var noot = $('#samenNodigNoot');
-      if (noot) noot.hidden = eigenaar;
-    }
-    vak.textContent = '';
-    var rij = uit.leden || [];
-    if (!rij.length) { leeg(vak, 'Nog niemand. Nodig uw reisgenoot of familie uit.'); return; }
-    rij.forEach(function (l) {
-      var regel = maak('div', 'gezellid');
-      regel.appendChild(maak('span', 'pionrond klein', (l.codenaam || '?').slice(0, 2).toUpperCase()));
-      var midden = maak('span', 'gezelnaam');
-      midden.appendChild(maak('b', '', l.codenaam));
-      midden.appendChild(maak('small', '', l.stand === 'gevraagd' ? 'uitnodiging staat open' : 'in het gezelschap'));
-      regel.appendChild(midden);
-      regel.appendChild(maak('em', 'rolpil', l.rol.toUpperCase()));
-      if (uit.rol === 'eigenaar') {
-        var weg = maak('button', 'tekstknop', 'HAAL WEG');
-        weg.type = 'button';
-        weg.addEventListener('click', function () {
-          R.api('/api/reis/gezelschap/weg', { id: l.id })
-            .then(function () { R.toast('Weggehaald. Deze persoon ziet niets meer van deze reis.'); laad(); })
-            .catch(function (e) { R.toast(e.message); });
-        });
-        regel.appendChild(weg);
-      }
-      vak.appendChild(regel);
-    });
-  }
-
-  function tekenTijdlijn(uit) {
-    var vak = $('#samenTijdlijn'); if (!vak) return;
-    vak.textContent = '';
-    var rij = uit.posts || [];
-    if (!rij.length) { leeg(vak, 'Nog niets gedeeld. Wat u hier schrijft, leest het hele gezelschap.'); return; }
-    rij.forEach(function (p) {
-      var post = maak('article', 'gezelpost');
-      post.appendChild(maak('span', 'pionrond klein', (p.van || '?').slice(0, 2).toUpperCase()));
-      var body = maak('div');
-      var kop = maak('div', 'gezelkop');
-      kop.appendChild(maak('b', '', p.van));
-      kop.appendChild(maak('small', '', tijd(p.at) + ' · ' + p.rol));
-      body.appendChild(kop);
-      if (p.tekst) body.appendChild(maak('p', '', p.tekst));
-      if (p.soort === 'beeld') {
-        /* De bytes staan in de kluis van de reiziger en komen daar vandaan --
-           met de sessie van de LEZER, zodat de kluis zelf beslist of hij ze
-           krijgt. Dit scherm bewaart geen kopie en kent geen adres. */
-        var beeld = maak('div', 'postbeeld');
-        beeld.appendChild(maak('small', '', 'Beeld uit de kluis van ' + p.van));
-        body.appendChild(beeld);
-        R.api('/api/bestanden/haal', { id: p.bestand }).then(function (uit) {
-          if (!uit || !uit.dataUrl) return;
-          var img = d.createElement('img');
-          img.src = uit.dataUrl; img.alt = p.tekst || 'Gedeeld beeld';
-          img.loading = 'lazy';
-          beeld.textContent = ''; beeld.appendChild(img);
-        }).catch(function () {
-          /* Niet zwijgen als het niet lukt: een leeg vlak leest als "er is
-             niets", en er is wel iets -- u mag er alleen niet bij. */
-          beeld.textContent = 'Dit beeld is niet (meer) met u gedeeld.';
-        });
-      }
-      post.appendChild(body);
-      vak.appendChild(post);
-    });
-  }
-
-  /* WAT DEZE LEZER VAN DE REIS ZIET -- rechtstreeks uit de poort, inclusief
-     wat er NIET in zit. Dit scherm rekent daar niets bij en niets af. */
-  function tekenZicht(uit) {
-    var vak = $('#samenZicht'); if (!vak || !uit || !uit.reis) return;
-    var reis = uit.reis;
-    vak.textContent = '';
-    vak.appendChild(maak('b', '', reis.bestemming + ' · ' + reis.venster.van + ' t/m ' + reis.venster.tot));
-    vak.appendChild(maak('small', '', 'U kijkt hier als ' + reis.rol + (uit.van ? ', op de reis van ' + uit.van : '') + '.'));
-    if ((reis.nietZichtbaar || []).length) {
-      vak.appendChild(maak('small', 'nietzicht', 'Niet zichtbaar voor deze rol: ' + reis.nietZichtbaar.join(', ') + '.'));
-    }
-  }
-
-  /* WAT U DEELT -- alleen voor de reiziger zelf, want alleen hij kan het zetten.
-     Wat er NIET bestaat komt van de server mee en staat er even groot bij: een
-     ontbrekende schakelaar leest anders als een functie die nog moet komen. */
-  function tekenDelen(uit) {
-    var kaart = $('#samenDelenKaart'), vak = $('#samenDelen');
-    if (!kaart || !vak) return;
-    if (!uit || uit.error) { kaart.hidden = true; return; }
-    kaart.hidden = false;
-    vak.textContent = '';
-    var b = uit.beleid || {};
-    Object.keys(b).forEach(function (veld) {
-      var regel = maak('div', 'deelregel');
-      var label = maak('span', 'gezelnaam');
-      label.appendChild(maak('b', '', veld === 'aankomst' ? 'Aankomst melden' : veld));
-      label.appendChild(maak('small', '', veld === 'aankomst'
-        ? 'Meekijkers zien dat u er bent. Wie meereist ziet het altijd.' : ''));
-      regel.appendChild(label);
-      var knop = maak('button', 'schakel' + (b[veld] ? ' aan' : ''), b[veld] ? 'AAN' : 'UIT');
-      knop.type = 'button';
-      knop.setAttribute('aria-pressed', b[veld] ? 'true' : 'false');
-      knop.addEventListener('click', function () {
-        R.api('/api/reis/gezelschap/beleid/zet', { reis: huidig, veld: veld, aan: !b[veld] })
-          .then(function () { laad(); })
-          .catch(function (e) { R.toast(e.message); });
-      });
-      regel.appendChild(knop);
-      vak.appendChild(regel);
-    });
-    (uit.bestaatNiet || []).forEach(function (x) {
-      var regel = maak('div', 'deelregel');
-      var label = maak('span', 'gezelnaam');
-      label.appendChild(maak('b', '', x.naam.charAt(0).toUpperCase() + x.naam.slice(1)));
-      label.appendChild(maak('small', '', x.reden));
-      regel.appendChild(label);
-      regel.appendChild(maak('em', 'rolpil', 'BESTAAT NIET'));
-      vak.appendChild(regel);
-    });
-  }
-
-  /* DE BEELDKIEZER. Alleen voor de reiziger, en alleen met wat er al IN zijn
-     kluis staat: hier komt geen tweede uploadweg bij, want dat zou een tweede
-     quotum, een tweede virusscan en een tweede plek zijn waar bytes landen. */
-  function vulBeelden(vanMij) {
-    var balk = $('#samenBeeldBalk'), keuze = $('#samenBeeld');
-    if (!balk || !keuze) return;
-    if (!vanMij) { balk.hidden = true; return; }
-    R.api('/api/bestanden/mijn', {}).then(function (uit) {
-      var beelden = (uit.items || []).filter(function (x) {
-        return !x.weg && /^image\//.test(String(x.mime || ''));
-      });
-      keuze.textContent = '';
-      if (!beelden.length) {
-        balk.hidden = false;
-        keuze.appendChild(maak('option', '', 'Nog geen beeld in uw kluis'));
-        keuze.disabled = true; $('#samenDeelBeeld').disabled = true;
-        return;
-      }
-      keuze.disabled = false; $('#samenDeelBeeld').disabled = false;
-      beelden.forEach(function (b) {
-        var optie = maak('option', '', b.naam);
-        optie.value = b.id; keuze.appendChild(optie);
-      });
-      balk.hidden = false;
-    }).catch(function () { balk.hidden = true; });
-  }
-
-  function tekenKring(uit) {
-    var vak = $('#samenKring'); if (!vak) return;
-    vak.textContent = '';
-    var rij = (uit.gevraagd || []);
-    if (!rij.length) { leeg(vak, 'Geen openstaande uitnodigingen.'); return; }
-    rij.forEach(function (v) {
-      var regel = maak('div', 'gezellid');
-      var midden = maak('span', 'gezelnaam');
-      midden.appendChild(maak('b', '', v.van || 'Een lid'));
-      midden.appendChild(maak('small', '', 'vraagt u mee als ' + v.rol));
-      regel.appendChild(midden);
-      ['Aanvaarden', 'Nee'].forEach(function (woord, i) {
-        var knop = maak('button', i ? 'tekstknop' : 'rtg-knop vol', woord);
-        knop.type = 'button';
-        knop.addEventListener('click', function () {
-          R.api('/api/reis/gezelschap/antwoord', { id: v.id, ja: i === 0 })
-            .then(function () { R.toast(i === 0 ? 'U hoort nu bij deze reis.' : 'Afgewezen.'); laad(); })
-            .catch(function (e) { R.toast(e.message); });
-        });
-        regel.appendChild(knop);
-      });
-      vak.appendChild(regel);
-    });
-  }
-
   function laad() {
     if (!R.token) return;
     var kring = R.api('/api/reis/gezelschap/kring', {})
-      .then(function (uit) { tekenKring(uit); return uit; })
+      .then(function (uit) { deel('tekenKring')(uit); return uit; })
       .catch(function () { return { meereizen: [] }; });
     var eigen = R.api('/api/reis/reizen', {})
       .then(function (d) { return d.reizen || []; }).catch(function () { return []; });
@@ -253,16 +86,24 @@
       var vanMij = lijst.some(function (r) { return r.id === huidig && !r.van; });
       kiesReis(lijst);
       if (!huidig) return;
-      R.api('/api/reis/gezelschap', { reis: huidig }).then(tekenLeden).catch(function () {});
-      R.api('/api/reis/gezelschap/tijdlijn', { reis: huidig }).then(tekenTijdlijn).catch(function () {});
-      R.api('/api/reis/gezelschap/reis', { reis: huidig }).then(tekenZicht).catch(function () {});
-      vulBeelden(vanMij);
+      R.api('/api/reis/gezelschap', { reis: huidig }).then(deel('tekenLeden')).catch(function () {});
+      R.api('/api/reis/gezelschap/tijdlijn', { reis: huidig }).then(deel('tekenTijdlijn')).catch(function () {});
+      R.api('/api/reis/gezelschap/reis', { reis: huidig }).then(deel('tekenZicht')).catch(function () {});
+      deel('vulBeelden')(vanMij);
       if (vanMij) {
         R.api('/api/reis/gezelschap/beleid', { reis: huidig })
-          .then(tekenDelen)
-          .catch(function () { tekenDelen(null); });
-      } else tekenDelen(null);
-    }).catch(function () {});
+          .then(deel('tekenDelen'))
+          .catch(function () { deel('tekenDelen')(null); });
+      } else deel('tekenDelen')(null);
+    }).catch(function (fout) {
+      /* GEEN LEGE CATCH MEER. Hier stond `catch(function(){})`, en die heeft een
+         echte fout verborgen: na het opknippen riep dit bestand een functie aan
+         die naar het andere bestand was verhuisd. De ReferenceError verdween in
+         deze catch, en op het scherm ontbrak zwijgend de halve rechterkolom.
+         Een scherm dat stil half werkt is erger dan een scherm dat klaagt. */
+      if (w.console && w.console.error) w.console.error('[samen] het blad kon niet volledig laden:', fout);
+      R.toast('Niet alles van het gezelschap kon worden geladen.');
+    });
   }
 
   d.addEventListener('DOMContentLoaded', function () {

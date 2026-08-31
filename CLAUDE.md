@@ -810,7 +810,15 @@ commit achterlopen; de toets verandert de kaart en eist dat het oordeel niet
 meebeweegt), en **een verboden stap laat het hele plan zakken** in plaats van
 stil te worden overgeslagen. Wat PLAN met opzet NIET doet is de uitkomst van een
 stap doorgeven aan de volgende: zodra hij over gegevens gaat in plaats van over
-bevoegdheid, is hij niet meer klein. Hij verandert geen bevoegdheid en kan dat ook niet
+bevoegdheid, is hij niet meer klein. **Blok 4 staat half**: `kern/stuur/gevolg.js` hangt
+NAAST het plan en zegt uit een echte meting welke collecties de stappen
+aanraakten (`opslag` in IDEMPROEF.json -- 331 routes, 196 collecties). Drie
+graden, en over de 176 bereikbare paden zijn dat er 36 `gemeten`, 44
+`geen-effect-gemeten` en **96 `onbekend`**. Die laatste twee mogen NOOIT door
+elkaar lopen: "de proef kwam er niet bij" is iets anders dan "er gebeurt niets",
+en een plan dat "raakt niets aan" zegt terwijl niemand keek is een geruststelling
+zonder grond. Wat er NIET staat is een echte droogloop: het plan wordt niet in de
+zandbak uitgevoerd, er wordt een eerdere meting op geprojecteerd. Hij verandert geen bevoegdheid en kan dat ook niet
 (hij filtert de lijst die `beleid.js` al goedkeurde, en toets 1 houdt vast dat de
 uitkomst altijd een deelverzameling is), en zijn woordenschat komt uit de
 padsegmenten zelf zodat er geen tweede routelijst ontstaat. Twee dingen daar niet

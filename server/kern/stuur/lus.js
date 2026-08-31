@@ -8,6 +8,7 @@
 const { TWIJFELREGELS, magDoen } = require('../rahul/twijfel');
 const { resolveer } = require('./resolver');
 const { compileer } = require('./plan');
+const { voorspel } = require('./gevolg');
 const { TOOLS } = require('./gereedschap');
 
 module.exports = ({ anthropic, app, log, stuurRoep, stuurPaden, classificeer, parseSubs }) => {
@@ -56,7 +57,13 @@ module.exports = ({ anthropic, app, log, stuurRoep, stuurPaden, classificeer, pa
             /* Wegen, niet doen. De compiler krijgt de rol mee en raakt niets
                aan; wat hij teruggeeft is een oordeel dat het model aan de
                gebruiker kan voorlezen voordat er een voorstel ontstaat. */
-            uit = compileer(t.input || {}, opties.wereld);
+            /* Het plan en de gevolgvoorspelling reizen SAMEN terug maar zijn
+               twee dingen: ./plan.js weegt de bevoegdheid, ./gevolg.js zegt uit
+               een eerdere meting wat de stappen aanraakten. Ze worden hier
+               samengevoegd tot een antwoord; het plan zelf bezit de voorspelling
+               niet (EXECUTIE.md blok 3: PLAN bezit niets). */
+            const gewogen = compileer(t.input || {}, opties.wereld);
+            uit = Object.assign({}, gewogen, { gevolg: voorspel(gewogen) });
             acties.push({ pad: 'plan', status: uit.uitvoerbaar ? 200 : 409, gevraagd: true });
           }
           else if (t.name === 'kaart') {

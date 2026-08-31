@@ -585,7 +585,7 @@ doorgeven aan de volgende. Dat tweede is met opzet: zodra een stap de invoer van
 de volgende bepaalt, gaat de compiler over gegevens in plaats van over
 bevoegdheid, en dan is hij niet meer klein.
 
-### Blok 4 — Simulatie en droogloop · **een stap weg**
+### Blok 4 — Simulatie en droogloop · **de gevolgvoorspelling STAAT, de echte droogloop niet**
 
 `zandbak.js` en `simulatie.js` bestaan. Wat ontbreekt is de koppeling aan PLAN
 en één eerlijke eigenschap per capability: is simulatie hier `exact`,
@@ -593,6 +593,45 @@ en één eerlijke eigenschap per capability: is simulatie hier `exact`,
 gasten voorspellen is probabilistisch, "de klant reageert positief" is niet
 voorspelbaar. Zonder dat onderscheid presenteert één mooie simulator alles als
 zekerheid — precies wat de bewijsgraden van `BESTUUR.md` verbieden.
+
+**Wat er staat: de gevolgvoorspelling** (`server/kern/stuur/gevolg.js`, naast het
+`plan`-gereedschap). Zij beantwoordt de vraag die een gebruiker vóór het
+bevestigen stelt — *wat verandert er dan* — voor het deel dat we werkelijk weten,
+en zegt van de rest dat zij het niet weet.
+
+**En het komt uit een meting, niet uit een model.** De idempotentieproef draaide
+elke bereikbare route tegen een wegwerpserver en noteerde per oproep wélke
+collecties veranderden: dat is het veld `opslag` in `IDEMPROEF.json`. Voor
+`/api/bank/overboek` staan daar `bankSaldi`, `bankBoekingen`, `bankIdem` en
+`bankIdemAfdruk`. Die vier zijn geen aanname — ze zijn één keer echt gebeurd.
+Over alle routes: **331 met een gemeten effect over 196 collecties**.
+
+**Drie graden, en de derde is de grootste.** Over de 176 paden die de AI mag
+bedienen:
+
+| graad | aantal | wat het zegt |
+|---|---|---|
+| `gemeten` | 36 | de proef raakte deze collecties aan |
+| `geen-effect-gemeten` | 44 | de proef draaide en raakte niets aan |
+| **`onbekend`** | **96** | de proef kwam er niet bij (404, 403, geen geldige invoer) |
+
+**Die laatste twee mogen nooit door elkaar lopen**, en dat is de scherpste toets
+van dit blok. "De proef kwam er niet bij" is iets anders dan "er gebeurt niets",
+en het verschil is precies de gevaarlijke kant: een plan dat zegt "raakt niets
+aan" terwijl niemand heeft gekeken, is een geruststelling zonder grond. De
+mutatie die die twee laat samenvallen, laat de suite zakken.
+
+**Vier grenzen staan in de uitslag zelf** en niet alleen in een commentaarregel:
+zij zegt wélke collecties en nooit wat erin verandert; zij is gemeten met de
+invoer van de proef, dus een ander lichaam kan andere collecties raken; alles
+buiten de opslag valt erbuiten (mail, een betaalprovider, een derde partij); en
+zij is een momentopname van de laatste proefronde, niet van deze commit.
+
+**Wat dit dus níét is: een echte droogloop.** Het plan wordt niet in de zandbak
+uitgevoerd; er wordt een eerdere meting op geprojecteerd. Die stap — het plan
+werkelijk laten lopen tegen `zandbak.js`, dat al uit de zaaiset draait en
+structureel niet terugschrijft — is wat er van blok 4 openblijft, en zij vraagt
+een besluit: een zandbak per gebruiker kost geheugen en tijd per opdracht.
 
 ### Blok 5 — Transactie- en compensatiesemantiek · **de herhaling staat, het herstel is GEMETEN en blijkt niet af te leiden**
 

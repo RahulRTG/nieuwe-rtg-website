@@ -30,9 +30,9 @@ module.exports = (kern) => {
   const gez = (res, r) => r && r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   app.post('/api/reis/gezelschap', auth, (req, res) =>
     gez(res, kern.reisgezelschap.gezelschap(req.session.key, String((req.body || {}).reis || ''))));
-  app.post('/api/reis/gezelschap/nodig-uit', auth, (req, res) => {
+  app.post('/api/reis/gezelschap/nodig-uit', auth, async (req, res) => {
     const b = req.body || {};
-    gez(res, kern.reisgezelschap.nodigUit(req.session.key, String(b.reis || ''), b.codenaam, b.rol));
+    gez(res, await kern.reisgezelschap.nodigUit(req.session.key, String(b.reis || ''), b.codenaam, b.rol));
   });
   app.post('/api/reis/gezelschap/antwoord', auth, (req, res) => {
     const b = req.body || {};

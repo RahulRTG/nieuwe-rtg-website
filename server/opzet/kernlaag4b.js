@@ -82,7 +82,8 @@ Object.assign(kern, require('../kern/reisuitnodiging').maakReisuitnodiging({
    codenaam-laag -- er komt geen tweede plek waar een reis wordt samengesteld,
    en geen tweede plek waar een naam vandaan komt. */
 Object.assign(kern, require('../kern/reisgezelschap').maakReisgezelschap({
-  db, save, crypto, mijnReizen: kern.mijnReizen, codenaamVan: kern.codenaamVan }));
+  db, save, crypto, mijnReizen: kern.mijnReizen, codenaamVan: kern.codenaamVan,
+  keyVanCodenaam }));
 /* De tijdzone-hulp van het huis leent diezelfde plaatsbepaling: van een zaak in
    "Ibiza" weten we zo dat zij in Europe/Madrid staat. Een keer registreren, en
    daarna geven de Mall, de vakwerk-agenda en de Food Court gegarandeerd

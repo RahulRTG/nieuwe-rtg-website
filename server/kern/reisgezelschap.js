@@ -63,7 +63,7 @@ const ONDERDEELVELDEN = {
   meekijker: []                                     // geen draaiboek: de lijst blijft leeg
 };
 
-module.exports.maakReisgezelschap = ({ db, save, crypto, mijnReizen, codenaamVan }) => {
+module.exports.maakReisgezelschap = ({ db, save, crypto, mijnReizen, codenaamVan, keyVanCodenaam }) => {
   const nu = () => klok.datum().toISOString();
   const schoon = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, n || 120);
   const naam = (key) => (typeof codenaamVan === 'function' ? codenaamVan(key) : null) || key;
@@ -114,12 +114,21 @@ module.exports.maakReisgezelschap = ({ db, save, crypto, mijnReizen, codenaamVan
   }
 
   /* UITNODIGEN. Zet een verzoek klaar; de ander aanvaardt het zelf. */
-  function nodigUit(key, reisId, codenaam, rol) {
+  /* EEN CODENAAM IS GEEN SLEUTEL. Dit stond hier eerst wel zo: de opgegeven
+     codenaam werd bewaard en later vergeleken met de SESSIESLEUTEL van de
+     kijker. Dat kan alleen kloppen als een lid de sleutel van een ander kent --
+     en die kent hij niet, dus de uitnodiging kwam nooit aan. De vertaling
+     hoort hier, één keer, langs `keyVanCodenaam` uit de ledengids (kern/gids.js) --
+     er komt geen tweede manier bij om iemand op te zoeken. */
+  async function nodigUit(key, reisId, codenaam, rol) {
     const reis = reisVan(key, reisId);
     if (!reis) return { status: 404, error: 'Deze reis staat niet bij u.' };
     if (!ROLLEN.includes(rol)) return { status: 400, error: 'Kies reisgenoot of meekijker.' };
-    const lid = schoon(codenaam, 60);
-    if (!lid) return { status: 400, error: 'Geef de codenaam van de persoon die u uitnodigt.' };
+    const gevraagd = schoon(codenaam, 60);
+    if (!gevraagd) return { status: 400, error: 'Geef de codenaam van de persoon die u uitnodigt.' };
+    const treffer = typeof keyVanCodenaam === 'function' ? await keyVanCodenaam(gevraagd) : null;
+    const lid = treffer && treffer.key;
+    if (!lid) return { status: 404, error: 'Er is geen lid met de codenaam ' + gevraagd + '.' };
     if (lid === key) return { status: 400, error: 'U staat zelf al bij deze reis.' };
     const rij = leden().filter(x => x.reis === reisId && x.eigenaar === key);
     if (rij.length >= MAX_LEDEN) return { status: 400, error: 'Een gezelschap telt maximaal ' + MAX_LEDEN + ' mensen.' };
@@ -128,7 +137,8 @@ module.exports.maakReisgezelschap = ({ db, save, crypto, mijnReizen, codenaamVan
     const rec = {
       id: 'G-' + crypto.randomBytes(4).toString('hex'),
       reis: reisId, eigenaar: key, eigenaarCodenaam: naam(key),
-      lid, rol, stand: 'gevraagd', gevraagdOp: nu(), aanvaardOp: null
+      lid, lidCodenaam: treffer.codename || gevraagd,
+      rol, stand: 'gevraagd', gevraagdOp: nu(), aanvaardOp: null
     };
     leden().push(rec); save();
     return { status: 200, ok: true, lid: toon(rec) };
@@ -158,7 +168,7 @@ module.exports.maakReisgezelschap = ({ db, save, crypto, mijnReizen, codenaamVan
   }
 
   const toon = (x) => ({
-    id: x.id, reis: x.reis, codenaam: x.lid, rol: x.rol, stand: x.stand,
+    id: x.id, reis: x.reis, codenaam: x.lidCodenaam || naam(x.lid), rol: x.rol, stand: x.stand,
     gevraagdOp: x.gevraagdOp, aanvaardOp: x.aanvaardOp
   });
 

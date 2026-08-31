@@ -46,7 +46,9 @@
     return new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format((Number(centen) || 0) / 100);
   };
   R.wisselBlad = function (naam, schrijfHash) {
-    if (!['vandaag', 'reizen', 'taxi', 'rahul'].includes(naam)) naam = 'vandaag';
+    /* De lijst bladen staat hier EEN keer; wie er een toevoegt aan het scherm
+       moet hem hier ook noemen, anders valt de tab stil terug op Vandaag. */
+    if (!['vandaag', 'reizen', 'taxi', 'samen', 'rahul'].includes(naam)) naam = 'vandaag';
     R.staat.blad = naam;
     R.$$('[data-blad]').forEach(function (blad) { var aan = blad.dataset.blad === naam; blad.hidden = !aan; blad.classList.toggle('actief', aan); });
     R.$$('[data-tab]').forEach(function (knop) { var aan = knop.dataset.tab === naam; knop.classList.toggle('actief', aan);

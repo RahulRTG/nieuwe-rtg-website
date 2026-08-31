@@ -48,6 +48,9 @@
     <button type="button" data-tab="taxi">
       <svg viewBox="0 0 24 24"><path d="m5 16-1-2 2-6h12l2 6-1 2M6 16h12v3H6zM8 19v2m8-2v2M7 12h.01M17 12h.01"/></svg><span>Taxi</span>
     </button>
+    <button type="button" data-tab="samen">
+      <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 5.5a3.2 3.2 0 0 1 0 5M18 20a6 6 0 0 0-3-5.2"/></svg><span>Samen</span>
+    </button>
     <button type="button" data-tab="rahul">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>Rahul</span>
     </button>
@@ -267,6 +270,64 @@
           <input id="rahulVraag" autocomplete="off" placeholder="Vraag Rahul…" required>
           <button type="submit">VERSTUUR <span aria-hidden="true">↗</span></button>
         </form>
+      </div>
+    </section>
+
+    <!-- HET GEZELSCHAP (kern/reisgezelschap.js). Wie wat van een reis ziet,
+         bepaalt de poort op de server en niet dit scherm; dit blad toont wat
+         zij teruggeeft, inclusief wat een rol NIET ziet. -->
+    <section class="appblad" data-blad="samen" aria-labelledby="titelSamen" hidden>
+      <div class="bladbinnen samenblad">
+        <header class="dagtitel">
+          <p class="micro">HET GEZELSCHAP</p>
+          <h1 id="titelSamen">Samen</h1>
+          <p class="sub">De mensen die bij deze reis horen: wie meereist, en wie meeleeft.</p>
+        </header>
+
+        <div class="reiskeuzes" id="samenReizen"></div>
+
+        <div class="dagdek">
+          <div class="daghoofd">
+            <section class="kompaskaart" aria-labelledby="samenLijnTitel">
+              <div class="kompaskop"><h2 id="samenLijnTitel" class="micro">DE TIJDLIJN VAN DEZE REIS</h2></div>
+              <div id="samenTijdlijn"><p class="leegtekst">Kies een reis.</p></div>
+              <form class="rahulsnel" id="samenSchrijf">
+                <label for="samenTekst">Schrijf iets aan het gezelschap</label>
+                <input id="samenTekst" autocomplete="off" placeholder="Schrijf iets aan het gezelschap…" maxlength="1200">
+                <button type="submit" aria-label="Deel met het gezelschap">↗</button>
+              </form>
+            </section>
+          </div>
+
+          <aside class="kompas" aria-label="Het gezelschap">
+            <section class="kompaskaart" aria-labelledby="samenLedenTitel">
+              <div class="kompaskop"><h2 id="samenLedenTitel" class="micro">HET GEZELSCHAP</h2></div>
+              <div id="samenLeden"><p class="leegtekst">Kies een reis.</p></div>
+              <form id="samenNodig" class="nodigvorm">
+                <label class="rtg-label" for="samenCodenaam">Codenaam van wie u uitnodigt</label>
+                <input class="rtg-veld" id="samenCodenaam" autocomplete="off" placeholder="Bijvoorbeeld Nachtvlinder" maxlength="60" required>
+                <label class="rtg-label" for="samenRol">Als</label>
+                <select class="rtg-veld" id="samenRol">
+                  <option value="reisgenoot">Reisgenoot — reist mee, ziet het draaiboek</option>
+                  <option value="meekijker">Meekijker — ziet bestemming, periode en wat u deelt</option>
+                </select>
+                <button class="rtg-knop vol" type="submit">NODIG UIT</button>
+                <p class="rtg-sub">Zij zien pas iets nadat zij de uitnodiging zelf aanvaarden.</p>
+              </form>
+              <p class="rtg-sub" id="samenNodigNoot" hidden>Uitnodigen doet de reiziger zelf; u kijkt mee op zijn reis.</p>
+            </section>
+
+            <section class="kompaskaart" aria-labelledby="samenKringTitel">
+              <div class="kompaskop"><h2 id="samenKringTitel" class="micro">VOOR U</h2></div>
+              <div id="samenKring"><p class="leegtekst">Geen openstaande uitnodigingen.</p></div>
+            </section>
+
+            <section class="kompaskaart" aria-labelledby="samenZichtTitel">
+              <div class="kompaskop"><h2 id="samenZichtTitel" class="micro">WAT U ZIET</h2></div>
+              <div class="zichtblok" id="samenZicht"><p class="leegtekst">Kies een reis.</p></div>
+            </section>
+          </aside>
+        </div>
       </div>
     </section>
 
@@ -975,6 +1036,7 @@ function tekenCanvasVandaag(lijst) {
 <script src="/apps/reizen-performance-taxi.js"></script>
 <script src="/apps/reizen-performance-boeken.js"></script>
 <script src="/apps/reizen-performance-rahul.js"></script>
+<script src="/apps/reizen-samen.js"></script>
 <!-- De vier bestaande TravelOS-tabs reizen als capabilities naar de ene
      mobiele Command-balk; de uitvoering blijft in reizen-performance.js. -->
 <script src="/shared/adaptief.js" defer></script>

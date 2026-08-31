@@ -132,3 +132,4 @@
     wbw:         { naam: 'Samen betalen', url: '/apps/geld.html#wbw' },
     passkeys:    { naam: 'Passkeys',     url: '/apps/passkeys.html' },
     sessies:     { naam: 'Waar ben ik aanwezig', url: '/apps/mijn-sessies.html' },
+    relaties:    { naam: 'Wie heeft toegang tot mij', url: '/apps/mijn-relaties.html' },

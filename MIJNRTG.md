@@ -131,7 +131,7 @@ standaard of de wereld is er nog niet klaar voor.
 | 3 | Trust graph | **stap weg** | `command.toegang.graaf()` bestaat, office-only. Zie 1.2. |
 | 4 | Continu vertrouwen / step-up per actie | **besluit** na sessieverrijking | De risicoassen zijn een beleidskeuze, geen afleiding. |
 | 5 | Action-bound authentication | **stap weg** | `kern/webauthn.js` heeft de ceremonieopslag al (`zetChallenge`/`pakChallenge` met `extra`). De actie in de challenge binden is een kleine, echte stap. |
-| 6 | Permission firewall ("wie heeft nu toegang tot mij?") | **stap weg** | Projectie over lidboard + consentregister + machtigingen + tenant. Bouwbaar zonder nieuw model. |
+| 6 | Permission firewall ("wie heeft nu toegang tot mij?") | **staat** | 31 augustus 2026: `kern/consent-relaties.js`, scherm `/apps/mijn-relaties.html`. Geen nieuwe laag -- het Consent Center dééd dit al per soort; dit legt dezelfde negen lagen per PARTIJ. Meten wees ook uit dat de boardroom geen toegangsregister is en dat de bureau-delegatie RTG machtigt en geen buitenstaander; die staan met die reden bij "wat dit scherm niet dekt". |
 | 7 | Tijdelijke rechten als standaard (wie+wat+waarom+hoelang) | **staat, verkeerde doelgroep** | `recht/geef` kent `minuten`, `mandaat` kent `tot`. Voor leden bestaat het niet. |
 | 8 | Purpose-bound data | **besluit — het duurste gat** | De boardroom schakelt per *capability*, niet per *doel*. Zie par. 5. |
 | 9 | Credential wallet (VC 2.0) | **jaren, vooruitcompatibel ontwerpen** | W3C VC 2.0 is Recommendation; de Digital Credentials API is Working Draft. Ontwerp de kluis zo dat een credential ernaast kan, maak hem geen afhankelijkheid. |
@@ -286,6 +286,31 @@ De bevestigingsroute is publiek en staat met die reden in de `PUBLIEK`-lijst van
 `scripts/check.js`: hij komt uit de mailbox van het nieuwe adres en heeft dus
 geen sessie. Dat is geen omissie maar het bewijs zelf.
 
+## 5b. Een gat dat het overzicht zelf niet zag
+
+Bij het bouwen van de firewall is eerst GEMETEN of de vier bronnen een vorm
+delen, in plaats van dat aan te nemen. Dat leverde twee dingen op.
+
+Ten eerste: er hoefde geen vijfde laag bij. Het Consent Center bewaart niets,
+leest negen lagen en laat het intrekken over aan de laag die de toestemming
+beheert -- dat ís de firewall-architectuur. De boardroom bleek geen
+toegangsregister maar een schakelbord van het lid zelf, en de bureau-delegatie
+machtigt RTG en geen buitenstaander. Die twee staan nu met die reden bij "wat dit
+scherm niet dekt", in plaats van dat ze er verkeerd in zaten.
+
+Ten tweede, en dat is de dure: **een zaak die uw echte naam mag opvragen**
+(`kern/metier/bewijs.js`) stond in geen van beide lijsten van het register --
+niet als gedekte laag en ook niet bij het niet-gedekte. Hij had zijn eigen
+schermpje binnen `/api/metier/ik` en viel daardoor buiten het overzicht dat "wie
+ziet wat" heet, terwijl het een lopende toestemming is met een doel en een
+intrekknop.
+
+Hij ontsnapte aan `test/consent-dekking.test.js` omdat die scan zoekt naar een
+rij met `status: 'actief'`, en deze laag `ingetrokken: null` gebruikt. Dat is
+precies het gat dat `consent-register.js` in zijn eigen kop benoemt ("wat die
+scan NIET vindt is een andere vorm") -- het is dus niet onverwacht, maar het was
+wel onopgemerkt.
+
 ## 6. De volgorde
 
 Niet naar aantrekkelijkheid maar naar afhankelijkheid. Elk blok is los
@@ -309,6 +334,9 @@ opleverbaar en los terug te draaien.
    toets 6 zakt zodra die module een account aanraakt.)*
 4. **De permission firewall** — projectie over vier bestaande bronnen. Het eerste
    blok dat er als MIJN RTG uitziet.
+   *(Staat. En de meting die eraan voorafging vond een gat: een zaak die uw
+   echte naam mag opvragen stond in géén van beide lijsten van het Consent
+   Center -- niet gedekt en ook niet als uitzondering benoemd. Zie par. 5b.)*
 5. **Trust receipts** — de bon onder wat blok 2 en 4 uitvoeren. Bewijs dat al
    bestaat, eindelijk zichtbaar.
 6. **Mijn Stand** — pas als er iets te tonen valt dat gemeten is. *(par. 4)*

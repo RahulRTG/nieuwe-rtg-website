@@ -95,7 +95,18 @@ const ZAKEN = [
   { code: 'GARNIZOEN', genre: 'defensie',      prefixen: ['/api/supplier/def/'],
     waarom: 'de defensie-organisatie; kern/defensie/index.js leest s.type === "defensie"' },
   { code: 'GUARDIA',   genre: 'politie',       prefixen: ['/api/supplier/hulp/'],
-    waarom: 'de hulpdienst; kern/hulpdienst/index.js leest s.type uit HULP_TYPES' }
+    waarom: 'de hulpdienst; kern/hulpdienst/index.js leest s.type uit HULP_TYPES' },
+  /* Deze vier kwamen boven bij het tellen per deelgebied, en ze antwoorden
+     alle vier 409 in plaats van 403 -- dezelfde reden waarom defensie en de
+     hulpdienst pas laat werden gevonden. Samen 61 routes. */
+  { code: 'AEGIS',     genre: 'beveiliging',   prefixen: ['/api/supplier/beveiliging'],
+    waarom: 'het beveiligingsteam; kern/beveiliging.js leest s.type === "beveiliging"' },
+  { code: 'CANFERRER', genre: 'boerderij',     prefixen: ['/api/supplier/boerderij'],
+    waarom: 'de boerderij; kern/boerderij.js vraagt de cap "boerderij"' },
+  { code: 'BODE',      genre: 'journalistiek', prefixen: ['/api/supplier/redactie'],
+    waarom: 'de redactie; routes/journalistiek.js vraagt de cap "redactie"' },
+  { code: 'MAISON',    genre: 'retail',        prefixen: ['/api/supplier/retail'],
+    waarom: 'de mode- en retailpartner; routes/supplier/retail.js vraagt de cap "retail"' }
 ];
 
 /* De rem op /api/supplier/roster staat op dertig per kwartier per IP. Deze

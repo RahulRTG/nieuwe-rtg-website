@@ -1,8 +1,8 @@
 {
  "stempel": {
-  "op": "2026-08-30T23:51:34.909Z",
-  "commit": "926ea893",
-  "boomVuil": false,
+  "op": "2026-08-31T06:18:12.543Z",
+  "commit": "6167337d",
+  "boomVuil": true,
   "node": "v22.22.2"
  },
  "uitleg": "Per route drie oproepen: twee met dezelfde sleutel en een met een verse. De derde is de IJKING -- verschilt hij van de eerste, dan is het antwoord gevoelig voor een nieuwe oproep en pas dan betekent een gelijke herhaling iets. Een route die hier NIET in staat is niet beproefd. \"onbeschermd\" is een telling en geen defect-oordeel; zie de grens in scripts/lib/idemproef.js.",
@@ -44,11 +44,11 @@
  "routesGevonden": 4622,
  "gemeten": {
   "routesMetRol": 4621,
-  "beoordeeld": 1859,
-  "beschermd": 1858,
+  "beoordeeld": 1890,
+  "beschermd": 1889,
   "onbeschermd": 1,
-  "ongemeten": 2762,
-  "oproepen": 13880,
+  "ongemeten": 2731,
+  "oproepen": 13881,
   "tokensHernieuwd": 4,
   "uitOpslag": 4,
   "ruisGeijkt": [
@@ -71,7 +71,7 @@
    },
    {
     "collectie": "supplierActivity",
-    "families": 23
+    "families": 24
    }
   ],
   "blindeRondes": 0,
@@ -143,7 +143,7 @@
  "zonderBesluit": [],
  "tegenspraken": [],
  "vastleggingVerdacht": [],
- "vermoedensVerworpen": 13,
+ "vermoedensVerworpen": 14,
  "perRoute": [
   {
    "methode": "POST",
@@ -300,9 +300,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -1875,9 +1873,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -2836,9 +2837,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -2877,7 +2876,9 @@
     403
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -3382,9 +3383,7 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
    }
   },
@@ -5275,7 +5274,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Die regel bestaat niet: a8296c54-bc53-42fc-a7e1-e2c6e00c53a1"
+   "blokkade": "Die regel bestaat niet: 445fb626-aae6-424e-bca8-c3df04e074bc"
   },
   {
    "methode": "POST",
@@ -5293,7 +5292,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Die regel bestaat niet: a8296c54-bc53-42fc-a7e1-e2c6e00c53a1"
+   "blokkade": "Die regel bestaat niet: 445fb626-aae6-424e-bca8-c3df04e074bc"
   },
   {
    "methode": "POST",
@@ -5507,7 +5506,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Onbekende functie: a8296c54-bc53-42fc-a7e1-e2c6e00c53a1"
+   "blokkade": "Onbekende functie: 445fb626-aae6-424e-bca8-c3df04e074bc"
   },
   {
    "methode": "POST",
@@ -6298,7 +6297,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dat runbook bestaat niet: a8296c54-bc53-42fc-a7e1-e2c6e00c53a1"
+   "blokkade": "Dat runbook bestaat niet: 445fb626-aae6-424e-bca8-c3df04e074bc"
   },
   {
    "methode": "POST",
@@ -6415,6 +6414,7 @@
    ],
    "opslag": {
     "a": {
+     "kosten": "gewijzigd",
      "sondeMonsters": 5
     },
     "b": {},
@@ -6729,14 +6729,11 @@
     "a": {
      "commandZaken": 1
     },
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {
      "commandZaken": 1
     }
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -7943,7 +7940,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    }
   },
   {
@@ -9255,9 +9254,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Deze band bestaat niet."
   },
@@ -9867,7 +9864,9 @@
     403
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -9938,9 +9937,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -12519,6 +12516,7 @@
    ],
    "opslag": {
     "a": {
+     "kosten": "gewijzigd",
      "officeDocs": "gewijzigd"
     },
     "b": {},
@@ -12863,14 +12861,11 @@
     "a": {
      "kmar": "gewijzigd"
     },
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {
      "kmar": "gewijzigd"
     }
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -13300,7 +13295,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "blokkade": "Kies een soort: ruimte, werkbank, sensor, camera, printer3d, laptop, gereedschap, voertuig, overig."
   },
@@ -15180,7 +15177,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -15252,9 +15251,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -15771,9 +15768,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Gast niet gevonden."
   },
@@ -17081,7 +17076,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -17873,9 +17870,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -17913,7 +17908,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    }
   },
   {
@@ -19604,7 +19601,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Schrijf eerst een stukje; dan lees ik mee."
   },
@@ -19638,12 +19637,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -19999,9 +19995,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -21543,7 +21537,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -21920,12 +21916,9 @@
     "a": {
      "lifestyle": "gewijzigd"
     },
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -22081,9 +22074,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -22674,7 +22670,10 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "betaalOpdrachten": "gewijzigd",
+     "capGezondheid": "gewijzigd"
+    }
    },
    "blokkade": "Dit bericht bestaat niet."
   },
@@ -23582,7 +23581,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "commandAlarmen": "gewijzigd"
+    }
    },
    "blokkade": "Dit team bestaat niet."
   },
@@ -23635,9 +23636,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -23707,9 +23706,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -23877,18 +23879,18 @@
    "pad": "/api/member/spel/kijk",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
-    404,
-    404,
-    404
+    403,
+    403,
+    403
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit potje bestaat niet (meer)."
+   "blokkade": "Je speelt zelf mee in dit potje."
   },
   {
    "methode": "POST",
@@ -23929,18 +23931,18 @@
    "pad": "/api/member/spel/nabespreking",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 409)",
    "statussen": [
-    404,
-    404,
-    404
+    409,
+    409,
+    409
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Van deze partij is geen verloop (meer)."
+   "blokkade": "Een partij bespreek je na afloop. Tijdens het spelen kun je Rahul om een hint vragen."
   },
   {
    "methode": "POST",
@@ -23976,7 +23978,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Onbekend spel."
+   "blokkade": "Nodig minstens een speler uit (vriend of codenaam), of speel random."
   },
   {
    "methode": "POST",
@@ -23999,55 +24001,57 @@
    "methode": "POST",
    "pad": "/api/member/spel/opgeven",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    409
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "spellen": "gewijzigd",
+     "spelTelling": 1
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Dit potje bestaat niet (meer)."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/spel/praat",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
-    404,
-    404,
-    404
+    403,
+    403,
+    403
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit potje bestaat niet (meer)."
+   "blokkade": "In dit potje zit iemand die je buiten het spel niet kunt bereiken. Praten kan met vrienden, klasgenoten en je eigen gezin."
   },
   {
    "methode": "POST",
    "pad": "/api/member/spel/praat-stuur",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
-    404,
-    404,
-    404
+    403,
+    403,
+    403
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit potje bestaat niet (meer)."
+   "blokkade": "In dit potje zit iemand die je buiten het spel niet kunt bereiken. Praten kan met vrienden, klasgenoten en je eigen gezin."
   },
   {
    "methode": "POST",
@@ -24071,11 +24075,11 @@
    "pad": "/api/member/spel/projectie-open",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 409)",
    "statussen": [
-    404,
-    404,
-    404
+    409,
+    409,
+    409
    ],
    "opslag": {
     "a": {
@@ -24084,64 +24088,60 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit potje bestaat niet (meer)."
+   "blokkade": "Dit potje is klaar."
   },
   {
    "methode": "POST",
    "pad": "/api/member/spel/projectie-sluit",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Dit potje bestaat niet (meer)."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/spel/rahul",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Dit potje bestaat niet (meer)."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/spel/random",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 400)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    400,
-    400,
-    400
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {
-     "betaalOpdrachten": "gewijzigd",
-     "capGezondheid": "gewijzigd"
+     "spellen": "gewijzigd"
     },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Onbekend spel."
+   }
   },
   {
    "methode": "POST",
@@ -24190,9 +24190,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -24201,19 +24199,18 @@
    "methode": "POST",
    "pad": "/api/member/spel/staat",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Dit potje bestaat niet (meer)."
+   }
   },
   {
    "methode": "POST",
@@ -24416,7 +24413,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Onbekend spel."
+   "blokkade": "Een toernooi van 4 vraagt precies 3 medespelers."
   },
   {
    "methode": "POST",
@@ -24441,18 +24438,18 @@
    "pad": "/api/member/spel/toewijzen",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 409)",
    "statussen": [
-    404,
-    404,
-    404
+    409,
+    409,
+    409
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit potje bestaat niet (meer)."
+   "blokkade": "Dit potje loopt niet (meer)."
   },
   {
    "methode": "POST",
@@ -24493,18 +24490,18 @@
    "pad": "/api/member/spel/zet",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 409)",
    "statussen": [
-    404,
-    404,
-    404
+    409,
+    409,
+    409
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit potje bestaat niet (meer)."
+   "blokkade": "Dit potje loopt niet (meer)."
   },
   {
    "methode": "POST",
@@ -24849,9 +24846,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "commandAlarmen": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -25509,9 +25504,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -26120,7 +26118,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "blokkade": "Deze uitgave bestaat niet."
   },
@@ -26138,9 +26138,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Deze uitgave bestaat niet."
   },
@@ -27248,9 +27246,12 @@
     "a": {
      "atelierSites": "gewijzigd"
     },
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -27583,12 +27584,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -27973,9 +27971,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -29280,7 +29276,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "blokkade": "Kies een instelling uit de lijst: ov, luchthaven, gemeente, rijk, politie, brandweer, ambulance, marechaussee."
   },
@@ -30985,9 +30983,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -32135,7 +32131,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -34299,12 +34297,9 @@
     "a": {
      "weefselOrganen": 7
     },
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -35444,7 +35439,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    }
   },
   {
@@ -37404,7 +37401,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -37510,9 +37509,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Aanslag niet gevonden."
   },
@@ -37763,9 +37760,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -38541,7 +38536,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "blokkade": "Kies een geldige subsidieregeling."
   },
@@ -39038,7 +39035,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -39212,9 +39211,7 @@
     403
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -40391,6 +40388,7 @@
    ],
    "opslag": {
     "a": {
+     "kosten": "gewijzigd",
      "reisInvoer": 2
     },
     "b": {},
@@ -40571,9 +40569,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -40713,9 +40709,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -41697,7 +41691,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "blokkade": "Vul eerst de geboortedatum in; zonder leeftijdspas blijft het leerpaspoort dicht."
   },
@@ -41820,7 +41816,10 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "betaalOpdrachten": "gewijzigd",
+     "capGezondheid": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -42358,7 +42357,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -42414,9 +42415,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Deze activiteit bestaat niet."
   },
@@ -42575,7 +42574,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "commandAlarmen": "gewijzigd"
+    }
    }
   },
   {
@@ -44284,7 +44285,6 @@
    ],
    "opslag": {
     "a": {
-     "wacht": "gewijzigd",
      "rtfos": "gewijzigd"
     },
     "b": {},
@@ -44611,10 +44611,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "betaalOpdrachten": "gewijzigd",
-     "capGezondheid": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Afronden doet uw coordinator. Dat zet de bewaartermijn in gang en sluit de zaak; zo'n besluit hoort niet op de stoep te vallen. Noteer wat u heeft gedaan, dan z"
   },
@@ -45321,7 +45318,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "blokkade": "Welke belofte is gedaan?"
   },
@@ -45358,9 +45357,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "commandAlarmen": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -46601,6 +46598,7 @@
    ],
    "opslag": {
     "a": {
+     "kosten": "gewijzigd",
      "genootschap": "gewijzigd"
     },
     "b": {},
@@ -46655,9 +46653,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Dit vinden we niet."
   },
@@ -47281,12 +47277,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -47821,9 +47814,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -47927,9 +47923,7 @@
     503
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -47985,7 +47979,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "blokkade": "Deze functie is voor dit genre zaken uitgeschakeld door RTG."
   },
@@ -49193,9 +49189,12 @@
     "a": {
      "beauty": "gewijzigd"
     },
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -49293,380 +49292,389 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/beveiliging/aanvraag",
-   "rol": "supplier",
+   "rol": "zaak:AEGIS",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    409,
-    409,
-    409
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze functie is er voor beveiligingsteams."
+   "blokkade": "Geef het object/de locatie."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/beveiliging/aanvraag/beslis",
-   "rol": "supplier",
+   "rol": "zaak:AEGIS",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    409,
-    409,
-    409
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze functie is er voor beveiligingsteams."
+   "blokkade": "Aanvraag niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/beveiliging/aanvragen",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "rol": "zaak:AEGIS",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    409,
-    409,
-    409
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze functie is er voor beveiligingsteams."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/beveiliging/budget",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "rol": "zaak:AEGIS",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    409,
-    409,
-    409
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze functie is er voor beveiligingsteams."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/beveiliging/command",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "rol": "zaak:AEGIS",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    409,
-    409,
-    409
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze functie is er voor beveiligingsteams."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/beveiliging/dienst",
-   "rol": "supplier",
+   "rol": "zaak:AEGIS",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    409,
-    409,
-    409
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze functie is er voor beveiligingsteams."
+   "blokkade": "Post niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/beveiliging/dienst/weg",
-   "rol": "supplier",
+   "rol": "zaak:AEGIS",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    409,
-    409,
-    409
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze functie is er voor beveiligingsteams."
+   "blokkade": "Dienst niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/beveiliging/functie",
-   "rol": "supplier",
+   "rol": "zaak:AEGIS",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    409,
-    409,
-    409
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze functie is er voor beveiligingsteams."
+   "blokkade": "Onbekende functie."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/beveiliging/incident/beslis",
-   "rol": "supplier",
+   "rol": "zaak:AEGIS",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    409,
-    409,
-    409
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze functie is er voor beveiligingsteams."
+   "blokkade": "Incident niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/beveiliging/pda/diensten",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "rol": "zaak:AEGIS",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    409,
-    409,
-    409
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze functie is er voor beveiligingsteams."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/beveiliging/pda/incident",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "rol": "zaak:AEGIS",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    409,
-    409,
-    409
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "supplierNotifications": 1,
+     "bevIncidenten": 1
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Deze functie is er voor beveiligingsteams."
+    "c": {
+     "supplierNotifications": "gewijzigd",
+     "bevIncidenten": 1
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/beveiliging/pda/inklok",
-   "rol": "supplier",
+   "rol": "zaak:AEGIS",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    409,
-    409,
-    409
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze functie is er voor beveiligingsteams."
+   "blokkade": "Dienst niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/beveiliging/pda/ronde/checkpoint",
-   "rol": "supplier",
+   "rol": "zaak:AEGIS",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    409,
-    409,
-    409
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze functie is er voor beveiligingsteams."
+   "blokkade": "Lopende ronde niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/beveiliging/pda/ronde/klaar",
-   "rol": "supplier",
+   "rol": "zaak:AEGIS",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    409,
-    409,
-    409
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze functie is er voor beveiligingsteams."
+   "blokkade": "Lopende ronde niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/beveiliging/pda/ronde/start",
-   "rol": "supplier",
+   "rol": "zaak:AEGIS",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    409,
-    409,
-    409
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze functie is er voor beveiligingsteams."
+   "blokkade": "Post niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/beveiliging/pda/sos",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "rol": "zaak:AEGIS",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    409,
-    409,
-    409
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "supplierNotifications": "gewijzigd",
+     "bevIncidenten": 1
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Deze functie is er voor beveiligingsteams."
+    "c": {
+     "supplierNotifications": "gewijzigd",
+     "bevIncidenten": 1
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/beveiliging/pda/uitklok",
-   "rol": "supplier",
+   "rol": "zaak:AEGIS",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    409,
-    409,
-    409
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze functie is er voor beveiligingsteams."
+   "blokkade": "Dienst niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/beveiliging/planauto",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "rol": "zaak:AEGIS",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    409,
-    409,
-    409
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Deze functie is er voor beveiligingsteams."
+    "c": {
+     "bevDiensten": 5
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/beveiliging/post",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "rol": "zaak:AEGIS",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    409,
-    409,
-    409
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Deze functie is er voor beveiligingsteams."
+    "c": {
+     "suppliers": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/beveiliging/post/weg",
-   "rol": "supplier",
+   "rol": "zaak:AEGIS",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    409,
-    409,
-    409
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze functie is er voor beveiligingsteams."
+   "blokkade": "Post niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/beveiliging/rooster",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "rol": "zaak:AEGIS",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    409,
-    409,
-    409
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze functie is er voor beveiligingsteams."
+   }
   },
   {
    "methode": "POST",
@@ -49861,9 +49869,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -49887,254 +49893,254 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/boerderij/ai",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "rol": "zaak:CANFERRER",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    409,
-    409,
-    409
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Dit is geen boerderij."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/boerderij/dier",
-   "rol": "supplier",
+   "rol": "zaak:CANFERRER",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    409,
-    409,
-    409
+    400,
+    400,
+    400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit is geen boerderij."
+   "blokkade": "Diergroep niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/boerderij/naar-salon",
-   "rol": "supplier",
+   "rol": "zaak:CANFERRER",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    409,
-    409,
-    409
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit is geen boerderij."
+   "blokkade": "Product niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/boerderij/oogst",
-   "rol": "supplier",
+   "rol": "zaak:CANFERRER",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    409,
-    409,
-    409
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit is geen boerderij."
+   "blokkade": "Perceel niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/boerderij/opbrengst",
-   "rol": "supplier",
+   "rol": "zaak:CANFERRER",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    409,
-    409,
-    409
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit is geen boerderij."
+   "blokkade": "Diergroep niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/boerderij/overzicht",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "rol": "zaak:CANFERRER",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    409,
-    409,
-    409
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Dit is geen boerderij."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/boerderij/perceel",
-   "rol": "supplier",
+   "rol": "zaak:CANFERRER",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    409,
-    409,
-    409
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit is geen boerderij."
+   "blokkade": "Perceel niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/boerderij/product",
-   "rol": "supplier",
+   "rol": "zaak:CANFERRER",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    409,
-    409,
-    409
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit is geen boerderij."
+   "blokkade": "Product niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/boerderij/taak",
-   "rol": "supplier",
+   "rol": "zaak:CANFERRER",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    409,
-    409,
-    409
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit is geen boerderij."
+   "blokkade": "Beschrijf de taak."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/boerderij/taak/klaar",
-   "rol": "supplier",
+   "rol": "zaak:CANFERRER",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    409,
-    409,
-    409
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit is geen boerderij."
+   "blokkade": "Taak niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/boerderij/type",
-   "rol": "supplier",
+   "rol": "zaak:CANFERRER",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    409,
-    409,
-    409
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit is geen boerderij."
+   "blokkade": "Onbekend boerderijtype."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/boerderij/voer",
-   "rol": "supplier",
+   "rol": "zaak:CANFERRER",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    409,
-    409,
-    409
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit is geen boerderij."
+   "blokkade": "Diergroep niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/boerderij/water",
-   "rol": "supplier",
+   "rol": "zaak:CANFERRER",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    409,
-    409,
-    409
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit is geen boerderij."
+   "blokkade": "Perceel niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/boerderij/zaai",
-   "rol": "supplier",
+   "rol": "zaak:CANFERRER",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    409,
-    409,
-    409
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit is geen boerderij."
+   "blokkade": "Perceel niet gevonden."
   },
   {
    "methode": "POST",
@@ -50615,9 +50621,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -50816,7 +50820,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Die regel bestaat niet: doc9096f75bde1f"
+   "blokkade": "Die regel bestaat niet: doc01ce2b44f9e7"
   },
   {
    "methode": "POST",
@@ -50834,7 +50838,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Die regel bestaat niet: doc9096f75bde1f"
+   "blokkade": "Die regel bestaat niet: doc01ce2b44f9e7"
   },
   {
    "methode": "POST",
@@ -50882,7 +50886,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -50974,7 +50980,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "blokkade": "Dat plan bestaat niet (meer)."
   },
@@ -51029,7 +51037,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dat runbook bestaat niet: doc9096f75bde1f"
+   "blokkade": "Dat runbook bestaat niet: doc01ce2b44f9e7"
   },
   {
    "methode": "POST",
@@ -51722,9 +51730,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -52282,9 +52288,12 @@
      "facturen": 2,
      "fitclub": 1
     },
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -53477,9 +53486,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Deze aanvraag kennen we niet."
   },
@@ -53749,7 +53756,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -53864,7 +53873,8 @@
    ],
    "opslag": {
     "a": {
-     "horeca": "gewijzigd"
+     "horeca": "gewijzigd",
+     "wacht": "gewijzigd"
     },
     "b": {},
     "c": {}
@@ -53952,9 +53962,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -54711,9 +54719,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Geen overdraagbare missie gevonden."
   },
@@ -54872,7 +54878,9 @@
      "horeca": "gewijzigd"
     },
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -54909,7 +54917,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Voor 2026-08-30 staan er geen diensten. Zet ze eerst neer (diensten: [{naam, uren, uurloon}])."
+   "blokkade": "Voor 2026-08-31 staan er geen diensten. Zet ze eerst neer (diensten: [{naam, uren, uurloon}])."
   },
   {
    "methode": "POST",
@@ -55871,9 +55879,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -56256,7 +56262,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Alleen de ambulance of de huisarts draagt over aan het ziekenhuis."
   },
@@ -56432,11 +56440,11 @@
     404
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "blokkade": "Groothandel niet gevonden."
   },
@@ -57357,12 +57365,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -57755,7 +57760,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -58838,9 +58845,7 @@
     503
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -59307,7 +59312,7 @@
    "opslag": {
     "a": {
      "onboarding": "gewijzigd",
-     "wacht": "gewijzigd",
+     "kosten": "gewijzigd",
      "directOntvangsten": 1
     },
     "b": {},
@@ -59453,7 +59458,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "blokkade": "Bestelling niet gevonden."
   },
@@ -59559,7 +59566,10 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "betaalOpdrachten": "gewijzigd",
+     "capGezondheid": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -59993,9 +60003,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "commandAlarmen": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in commandAlarmen, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -60153,9 +60166,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Deze medewerker werkt niet bij uw zaak."
   },
@@ -60567,7 +60578,8 @@
    ],
    "opslag": {
     "a": {
-     "suppliers": "gewijzigd"
+     "suppliers": "gewijzigd",
+     "kosten": "gewijzigd"
     },
     "b": {},
     "c": {}
@@ -60881,236 +60893,240 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/redactie/artikel/bewaar",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "rol": "zaak:BODE",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    409,
-    409,
-    409
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "redacties": 1
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Deze zaak heeft geen redactie. Een krant hoort bij de werkvorm journalistiek."
+    "c": {
+     "redacties": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/redactie/artikel/concept",
-   "rol": "supplier",
+   "rol": "zaak:BODE",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    409,
-    409,
-    409
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak heeft geen redactie. Een krant hoort bij de werkvorm journalistiek."
+   "blokkade": "Artikel niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/redactie/artikel/haal",
-   "rol": "supplier",
+   "rol": "zaak:BODE",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    409,
-    409,
-    409
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak heeft geen redactie. Een krant hoort bij de werkvorm journalistiek."
+   "blokkade": "Artikel niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/redactie/artikel/publiceer",
-   "rol": "supplier",
+   "rol": "zaak:BODE",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    409,
-    409,
-    409
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak heeft geen redactie. Een krant hoort bij de werkvorm journalistiek."
+   "blokkade": "Artikel niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/redactie/artikel/verwijder",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "rol": "zaak:BODE",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    409,
-    409,
-    409
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze zaak heeft geen redactie. Een krant hoort bij de werkvorm journalistiek."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/redactie/artikelen",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "rol": "zaak:BODE",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    409,
-    409,
-    409
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze zaak heeft geen redactie. Een krant hoort bij de werkvorm journalistiek."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/redactie/assist",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "rol": "zaak:BODE",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    409,
-    409,
-    409
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze zaak heeft geen redactie. Een krant hoort bij de werkvorm journalistiek."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/redactie/huisstijl",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "rol": "zaak:BODE",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    409,
-    409,
-    409
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "redacties": "gewijzigd"
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze zaak heeft geen redactie. Een krant hoort bij de werkvorm journalistiek."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/redactie/rubriek/bewaar",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "rol": "zaak:BODE",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    409,
-    409,
-    409
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "redacties": "gewijzigd"
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze zaak heeft geen redactie. Een krant hoort bij de werkvorm journalistiek."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/redactie/rubriek/verwijder",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "rol": "zaak:BODE",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    409,
-    409,
-    409
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "redacties": "gewijzigd"
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze zaak heeft geen redactie. Een krant hoort bij de werkvorm journalistiek."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/redactie/site/bewaar",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "rol": "zaak:BODE",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    409,
-    409,
-    409
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze zaak heeft geen redactie. Een krant hoort bij de werkvorm journalistiek."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/redactie/snel",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "rol": "zaak:BODE",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    409,
-    409,
-    409
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "redacties": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Deze zaak heeft geen redactie. Een krant hoort bij de werkvorm journalistiek."
+    "c": {
+     "redacties": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/redactie/staat",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "rol": "zaak:BODE",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    409,
-    409,
-    409
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze zaak heeft geen redactie. Een krant hoort bij de werkvorm journalistiek."
+   }
   },
   {
    "methode": "POST",
@@ -61187,79 +61203,7 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/retail",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
-   "statussen": [
-    409,
-    409,
-    409
-   ],
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "blokkade": "Dit is geen mode-/retailpartner."
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/supplier/retail/annuleer",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 400)",
-   "statussen": [
-    400,
-    400,
-    400
-   ],
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "blokkade": "Deze zaak is geen retail."
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/supplier/retail/apart",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
-   "statussen": [
-    409,
-    409,
-    409
-   ],
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "blokkade": "Dit is geen mode-/retailpartner."
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/supplier/retail/artikel",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
-   "statussen": [
-    409,
-    409,
-    409
-   ],
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "blokkade": "Dit is geen mode-/retailpartner."
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/supplier/retail/bon",
-   "rol": "supplier",
+   "rol": "zaak:MAISON",
    "idempotentie": "beschermd",
    "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
@@ -61275,183 +61219,262 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/supplier/retail/collectie",
-   "rol": "supplier",
+   "pad": "/api/supplier/retail/annuleer",
+   "rol": "zaak:MAISON",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    409,
-    409,
-    409
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit is geen mode-/retailpartner."
+   "blokkade": "Kies een grond: betaling-mislukt, vergissing, klant-zag-af, retour."
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/retail/apart",
+   "rol": "zaak:MAISON",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   },
+   "blokkade": "Variant niet gevonden."
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/retail/artikel",
+   "rol": "zaak:MAISON",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   },
+   "blokkade": "Geef het artikel een naam."
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/retail/bon",
+   "rol": "zaak:MAISON",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {
+     "posSales": 1
+    },
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/retail/collectie",
+   "rol": "zaak:MAISON",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {
+     "suppliers": "gewijzigd"
+    },
+    "b": {},
+    "c": {
+     "suppliers": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/retail/drop/release",
-   "rol": "supplier",
+   "rol": "zaak:MAISON",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    409,
-    409,
-    409
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit is geen mode-/retailpartner."
+   "blokkade": "Geen drop op dit artikel."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/retail/klant",
-   "rol": "supplier",
+   "rol": "zaak:MAISON",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    409,
-    409,
-    409
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit is geen mode-/retailpartner."
+   "blokkade": "Geef een klant (codenaam-sleutel)."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/retail/klant/maten",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "rol": "zaak:MAISON",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    409,
-    409,
-    409
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd"
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Dit is geen mode-/retailpartner."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/retail/klant/notitie",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "rol": "zaak:MAISON",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    409,
-    409,
-    409
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Dit is geen mode-/retailpartner."
+    "c": {
+     "suppliers": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/retail/paskamer/breng",
-   "rol": "supplier",
+   "rol": "zaak:MAISON",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    409,
-    409,
-    409
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit is geen mode-/retailpartner."
+   "blokkade": "Verzoek niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/retail/styling",
-   "rol": "supplier",
+   "rol": "zaak:MAISON",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    409,
-    409,
-    409
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit is geen mode-/retailpartner."
+   "blokkade": "Kies minstens een artikel."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/retail/verkoop",
-   "rol": "supplier",
+   "rol": "zaak:MAISON",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    409,
-    409,
-    409
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit is geen mode-/retailpartner."
+   "blokkade": "Geen geldige artikelen."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/retail/voorraad",
-   "rol": "supplier",
+   "rol": "zaak:MAISON",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    409,
-    409,
-    409
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit is geen mode-/retailpartner."
+   "blokkade": "Variant niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/retail/zoek",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "rol": "zaak:MAISON",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    409,
-    409,
-    409
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Dit is geen mode-/retailpartner."
+   }
   },
   {
    "methode": "POST",
@@ -61642,9 +61665,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -61769,7 +61790,8 @@
    ],
    "opslag": {
     "a": {
-     "suppliers": "gewijzigd"
+     "suppliers": "gewijzigd",
+     "kosten": "gewijzigd"
     },
     "b": {},
     "c": {}
@@ -61864,7 +61886,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    }
   },
   {
@@ -61937,9 +61961,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -62156,13 +62178,9 @@
     "a": {
      "rtmailSchrijf": "gewijzigd"
     },
-    "b": {
-     "betaalOpdrachten": "gewijzigd",
-     "capGezondheid": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in betaalOpdrachten, een wijziging in capGezondheid, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -62618,9 +62636,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "commandAlarmen": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -62814,9 +62830,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -62928,7 +62942,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Dit land kennen we niet: "
   },
@@ -64059,12 +64075,9 @@
     "a": {
      "training": "gewijzigd"
     },
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -64113,7 +64126,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -64224,7 +64239,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    }
   },
   {
@@ -64315,9 +64332,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Offerte niet gevonden."
   },
@@ -65321,12 +65336,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -65395,7 +65407,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -66593,9 +66607,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Video niet gevonden."
   },
@@ -66648,9 +66660,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -66719,7 +66734,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "blokkade": "Uw kanaal wacht nog op goedkeuring door RTG-kantoor."
   },
@@ -66877,9 +66894,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -67729,7 +67744,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -67749,9 +67766,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Makelaar niet gevonden."
   },
@@ -68922,9 +68937,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -68940,6 +68953,7 @@
    ],
    "opslag": {
     "a": {
+     "kosten": "gewijzigd",
      "wallet": 1
     },
     "b": {},
@@ -68997,11 +69011,14 @@
     "a": {
      "wallet": "gewijzigd"
     },
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {
      "wallet": "gewijzigd"
     }
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -69142,9 +69159,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -70187,7 +70202,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -70255,9 +70272,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -71261,7 +71276,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -71317,7 +71334,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    }
   },
   {
@@ -71714,8 +71733,7 @@
    ],
    "opslag": {
     "a": {
-     "werkruimtes": "gewijzigd",
-     "wacht": "gewijzigd"
+     "werkruimtes": "gewijzigd"
     },
     "b": {},
     "c": {
@@ -73156,9 +73174,14 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
-    "c": {}
-   }
+    "b": {
+     "wacht": "gewijzigd"
+    },
+    "c": {
+     "kosten": "gewijzigd"
+    }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -73172,7 +73195,10 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "betaalOpdrachten": "gewijzigd",
+     "capGezondheid": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -73301,9 +73327,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -73592,9 +73616,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "commandAlarmen": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in commandAlarmen, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -73715,9 +73742,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -74240,7 +74265,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Deze leerling heeft geen eigen leerlingprofiel."
   },
@@ -74353,8 +74380,7 @@
     },
     "b": {},
     "c": {
-     "foundation": "gewijzigd",
-     "kosten": "gewijzigd"
+     "foundation": "gewijzigd"
     }
    }
   },
@@ -75153,7 +75179,9 @@
     403
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -75172,7 +75200,8 @@
    ],
    "opslag": {
     "a": {
-     "foundation": "gewijzigd"
+     "foundation": "gewijzigd",
+     "kosten": "gewijzigd"
     },
     "b": {},
     "c": {
@@ -75319,12 +75348,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -75782,9 +75808,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -75913,10 +75937,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "betaalOpdrachten": "gewijzigd",
-     "capGezondheid": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -76040,7 +76061,8 @@
    ],
    "opslag": {
     "a": {
-     "foundation": "gewijzigd"
+     "foundation": "gewijzigd",
+     "kosten": "gewijzigd"
     },
     "b": {},
     "c": {
@@ -76296,9 +76318,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -76336,9 +76356,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "commandAlarmen": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Die peiling kennen we niet."
   },
@@ -76917,10 +76935,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -77279,9 +77302,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -77783,9 +77804,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Dit kind zit niet in deze klas."
   },
@@ -78038,7 +78057,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -78306,14 +78327,11 @@
     "a": {
      "foundation": "gewijzigd"
     },
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {
      "foundation": "gewijzigd"
     }
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -78965,7 +78983,9 @@
      "officeDocs": "gewijzigd"
     },
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    }
   },
   {
@@ -79629,9 +79649,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -81161,7 +81179,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "blokkade": "Dit potje bestaat niet (meer)."
   },
@@ -81540,8 +81560,7 @@
     },
     "b": {},
     "c": {
-     "foundation": "gewijzigd",
-     "wacht": "gewijzigd"
+     "foundation": "gewijzigd"
     }
    }
   },
@@ -82920,7 +82939,9 @@
      "studio": "gewijzigd"
     },
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    }
   },
   {
@@ -83339,8 +83360,7 @@
    ],
    "opslag": {
     "a": {
-     "werkplekMensen": "gewijzigd",
-     "wacht": "gewijzigd"
+     "werkplekMensen": "gewijzigd"
     },
     "b": {},
     "c": {}

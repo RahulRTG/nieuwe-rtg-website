@@ -340,6 +340,13 @@ wachtOpSchoneBoom();
   console.log('  livinglab-wereld                     : ' + (lab2Wereld.klaar ? 'klaar' : 'NIET klaar -- ' + lab2Wereld.reden));
   for (const st of lab2Wereld.stappen) if (!st.ok) console.log('      ' + st.naam + ': ' + st.waarom);
 
+  /* DE SPELWERELD -- ./lib/wereld-spel.js. Een potje ontstaat pas met een
+     tegenstander; de proef heeft er twee. */
+  const { zetSpelKlaar } = require('./lib/wereld-spel');
+  const spelWereld = await zetSpelKlaar({ post, tokens });
+  console.log('  spelwereld                           : ' + (spelWereld.klaar ? 'klaar   (' + spelWereld.extra.soort + ')' : 'NIET klaar -- ' + spelWereld.reden));
+  for (const st of spelWereld.stappen) if (!st.ok) console.log('      ' + st.naam + ': ' + st.waarom);
+
   const { oogstObjecten } = require('./lib/objectoogst');
   const objecten = await oogstObjecten({
     post, routes, tokenVoor,
@@ -349,6 +356,7 @@ wachtOpSchoneBoom();
       ...(r.pad.startsWith('/api/rtfos/') ? rtfosWereld.extra : {}),
       ...(r.pad.startsWith('/api/festival/') ? festivalWereld.extra : {}),
       ...(r.pad.startsWith('/api/lab2/') ? { ...lab2Wereld.extra, ...lab2Wereld.idVoor(r.pad) } : {}),
+      ...(r.pad.startsWith('/api/member/spel/') ? spelWereld.extra : {}),
       ...(lijfsleutels.lijfVoor(r.pad) || {}) }),
     koppenVoor: (r) => lijfsleutels.koppenVoor(r.pad)
   });
@@ -434,6 +442,7 @@ wachtOpSchoneBoom();
       ...(r.pad.startsWith('/api/rtfos/') ? rtfosWereld.extra : {}),
       ...(r.pad.startsWith('/api/festival/') ? festivalWereld.extra : {}),
       ...(r.pad.startsWith('/api/lab2/') ? { ...lab2Wereld.extra, ...lab2Wereld.idVoor(r.pad) } : {}),
+      ...(r.pad.startsWith('/api/member/spel/') ? spelWereld.extra : {}),
       ...(lijfsleutels.lijfVoor(r.pad) || {}), ...(geldLijven[r.pad] || {}) }),
     koppenVoor: (r) => lijfsleutels.koppenVoor(r.pad), maxRoutes: MAX, staatVan,
     /* De stand van het opslag-meetpunt reist mee: in stand 2 mag de uitslag

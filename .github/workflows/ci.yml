@@ -438,7 +438,7 @@ jobs:
       # het hele TAP-blok mee: de bewering, de verwachte en de gevonden waarde en
       # de stapel. Zie scripts/gezakte-toetsen.js.
       - name: De dekking van alle vier de scherven ophalen
-        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           pattern: dekking-*
           path: dekking-scherven
@@ -452,7 +452,7 @@ jobs:
       # Elke toetsscherf en ijking schrijft zijn eigen routejournaal. Voeg ze
       # samen voordat de aparte dekkingsjob ze naast het schermjournaal legt.
       - name: De routejournalen van de scherven en ijkingen ophalen
-        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           pattern: routejournaal-*
           path: routejournalen
@@ -760,7 +760,7 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - name: De metingen van de vier delen ophalen
-        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           pattern: a11ymeting-deel-*
           path: a11ymeting
@@ -841,7 +841,7 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - name: De journalen van de vier delen ophalen
-        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           pattern: schermjournaal-deel-*
           path: journalen/scherm
@@ -898,12 +898,12 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - name: Het journaal van npm test ophalen
-        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: routejournaal
           path: journalen/test
       - name: Het journaal van de schermsuite ophalen
-        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: schermjournaal
           path: journalen/scherm

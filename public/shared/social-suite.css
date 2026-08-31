@@ -11,8 +11,19 @@ body.rtg-suite-page{
   --suite-stack:116px;
   --suite-ink:#181917;
   --suite-ink-2:#20211e;
-  --suite-paper:#ebe9e3;
-  --suite-paper-2:#f6f4ef;
+  /* DE SUITE STAAT OP PEARL (31 augustus 2026).
+     Hier stonden zes eigen lichte kleuren die niemand had uitgerekend --
+     #ebe9e3 en verderop #ddd6c9, tot 32 stappen naast --pearl-basis. Dezelfde
+     bedoeling als het materiaal van het huis, een eigen getal. Het licht van
+     deze schermen is een BESLUIT (MATERIAAL.md, "De sociale kant staat op
+     Pearl"); alleen de kleuren waren niet die van het huis.
+
+     Het is een LADDER en geen kleur, en dat is waarom er drie tokens staan en
+     niet een: de grond is `basis`, wat erbovenop ligt is `hoog`, wat erin ligt
+     is `diep`. Wie hier alleen de grond vervangt, maakt de grond lichter dan
+     de kaarten die erop liggen -- dan keert de verhouding om en zweeft alles. */
+  --suite-paper:var(--pearl-basis);
+  --suite-paper-2:var(--pearl-hoog);
   --suite-text:#1b1c19;
   --suite-muted:#68675f;
   --suite-line:rgba(27,28,25,.14);
@@ -20,7 +31,7 @@ body.rtg-suite-page{
   --suite-wine:#713044;
   --rtg-bg:var(--suite-paper);
   --rtg-card:var(--suite-paper-2);
-  --rtg-card2:#e4e1d9;
+  --rtg-card2:var(--pearl-diep);
   --rtg-txt:var(--suite-text);
   --rtg-muted:var(--suite-muted);
   --rtg-soft:#625f57;
@@ -28,7 +39,7 @@ body.rtg-suite-page{
   --rtg-goud:var(--suite-gold);
   --bg:var(--suite-paper);
   --card:var(--suite-paper-2);
-  --card2:#e4e1d9;
+  --card2:var(--pearl-diep);
   --txt:var(--suite-text);
   --muted:var(--suite-muted);
   --soft:#625f57;
@@ -333,9 +344,9 @@ body.rtg-social-private-hub{background:var(--suite-ink)!important;}
    zwevende witte bediening, geen lege demo-vlakken, geen generieke SaaS-card.
    ========================================================================== */
 body.rtg-suite-page{
-  --suite-paper:#ddd6c9;
-  --suite-paper-2:#f1ecdf;
-  --suite-card:#f4efe4;
+  --suite-paper:var(--pearl-basis);
+  --suite-paper-2:var(--pearl-hoog);
+  --suite-card:var(--pearl-hoog);
   --suite-ink:#171815;
   --suite-ink-2:#20211d;
   --suite-gold:#ae9250;

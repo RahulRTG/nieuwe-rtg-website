@@ -74,7 +74,7 @@ const path = require('path');
    de schoolregistratie in scripts/lib/lijfsleutels.js, en om dezelfde reden:
    de link gaat naar het schoolmailadres en niet naar de aanroeper. Peilt tot de
    mail er echt is in plaats van een aantal milliseconden te gokken. */
-async function leesUitnodiging(datamap, msMax) {
+async function leesUitnodiging(datamap, msMax, gezien) {
   if (!datamap) return null;
   const outbox = path.join(datamap, 'outbox');
   const tot = Date.now() + (msMax || 8000);
@@ -85,7 +85,10 @@ async function leesUitnodiging(datamap, msMax) {
       let tekst = '';
       try { tekst = fs.readFileSync(path.join(outbox, n), 'utf8'); } catch (e) { continue; }
       const m = /#uitnodiging=([A-Z0-9]+\.[a-f0-9]{20,})/i.exec(tekst);
-      if (m) return m[1];
+      /* `gezien` is er omdat de wereld TWEE leraren uitnodigt en de outbox
+         niet leeg loopt: zonder deze filter geeft de tweede lezing gewoon de
+         eerste link terug, en dan accepteert dezelfde persoon twee keer. */
+      if (m && !(gezien && gezien.has(m[1]))) return m[1];
     }
     await new Promise(r => setTimeout(r, 40));
   }
@@ -125,19 +128,64 @@ async function zetSchoolKlaar({ post, sleutels, datamap }) {
      de schoolregistratie zelf is dat het ontwerp -- wie uitnodigt hoort de
      sleutel niet in handen te krijgen -- en dus leest de bouwer hem uit de
      outbox van de proefopstelling. */
+  const gezieneLinks = new Set();
   const email = 'proefleraar@voorbeeld.test';
   await doe('leraar uitnodigen', '/api/foundation/school/personeel/uitnodig',
     { schoolCode: school.schoolCode, beheerToken: school.beheerToken,
       naam: 'Proef Leraar', email, rollen: ['leraar'] }, null);
-  const uitnodiging = await leesUitnodiging(datamap);
+  const uitnodiging = await leesUitnodiging(datamap, null, gezieneLinks);
   let personeelToken = null;
+  let personeelId = null;
   if (uitnodiging) {
     const acc = await doe('leraar accepteert', '/api/foundation/school/personeel/uitnodiging/accepteer',
       { uitnodiging }, null);
     personeelToken = acc && (acc.personeelToken || (acc.personeel && acc.personeel.token));
+    /* EN ZIJN ID. Zeven HR-routes lezen `personeelId` (server/school/hr-verlof.js
+       en zusters) en stonden allemaal op "Dit personeelslid is niet gevonden",
+       terwijl de wereld de leraar al had aangemaakt. Het antwoord droeg hem de
+       hele tijd onder `medewerker.id`; er keek alleen niemand. */
+    personeelId = acc && acc.medewerker && acc.medewerker.id;
+    if (uitnodiging) gezieneLinks.add(uitnodiging);
   } else {
     stappen.push({ naam: 'leraar accepteert', pad: '-', status: 0, ok: false,
       waarom: 'geen uitnodigingslink in de outbox gevonden' });
+  }
+
+  /* EN EEN TWEEDE MEDEWERKER, en die staat hier om een reden die ik zelf heb
+     veroorzaakt.
+
+     Zeven HR-routes lezen `personeelId`; die stonden op "Dit personeelslid is
+     niet gevonden" tot de wereld dat id ging meegeven. Meteen daarna vielen er
+     ZEVENTIEN andere om, alfabetisch aaneengesloten van `rooster` tot
+     `vervanging`, allemaal op "Onbekende klas of verkeerd token". De oorzaak
+     stond precies tussen die twee blokken in het alfabet:
+     /api/foundation/school/personeel/toegang/intrek zet `p.status =
+     'ingetrokken'` en draait `p.token`. De proef roept ELKE route aan, dus met
+     een werkend id trok zij de toegang in van haar eigen leraar.
+
+     Dat is geen fout in de route en geen fout in het id -- het is wat er
+     gebeurt als een wereld maar EEN mens heeft. Een school heeft er meer. De
+     tweede medewerker is dus geen kunstgreep om een toets groen te krijgen
+     maar de vorm die het domein zelf al aannam: `personeelId` wijst naar hem,
+     en de leraar die de klas geeft blijft buiten schot.
+
+     Wie hier iets aan verandert, kijkt eerst welke van de twee hij te pakken
+     heeft. */
+  let reserveId = null;
+  const tweedeMail = 'proefconcierge@voorbeeld.test';
+  await doe('tweede medewerker uitnodigen', '/api/foundation/school/personeel/uitnodig',
+    { schoolCode: school.schoolCode, beheerToken: school.beheerToken,
+      naam: 'Proef Conciërge', email: tweedeMail, rollen: ['leraar'] }, null);
+  const tweedeLink = await leesUitnodiging(datamap, null, gezieneLinks);
+  if (tweedeLink) {
+    const acc2 = await doe('tweede medewerker accepteert',
+      '/api/foundation/school/personeel/uitnodiging/accepteer', { uitnodiging: tweedeLink }, null);
+    reserveId = acc2 && acc2.medewerker && acc2.medewerker.id;
+    gezieneLinks.add(tweedeLink);
+  } else {
+    stappen.push({ naam: 'tweede medewerker accepteert', pad: '-', status: 0, ok: false,
+      waarom: 'geen tweede uitnodigingslink in de outbox; dan wijst personeelId naar de leraar zelf ' +
+        'en trekt de proef zijn eigen toegang in' });
   }
 
   /* EN DE KLAS MAAKT DE LERAAR, niet de beheerder. De eerste versie stuurde de
@@ -148,10 +196,35 @@ async function zetSchoolKlaar({ post, sleutels, datamap }) {
     { schoolCode: school.schoolCode, personeelToken, naam: 'Proefklas', niveau: 'po', jaar: 1 }, null) : null;
   const klasCode = klas && (klas.klas ? (klas.klas.code || klas.klas.klasCode) : (klas.code || klas.klasCode));
 
-  /* Pas hier kent de school het gezin: de ouder sluit zijn kind aan. */
+  /* Pas hier kent de school het gezin: de ouder sluit zijn kind aan.
+
+     EN DAAR STOPTE DEZE WERELD EEN STAP TE VROEG. De ouder KOPPELT niet, hij
+     NODIGT UIT: server/school/klas.js zet in de beheerderstak een regel in
+     `k.uitnodigingen` en niet in `k.leerlingen`. Het kind accepteert zelf --
+     dezelfde regel als overal in dit huis (LIFE.md: klaarzetten doet de
+     software, bevestigen doet de mens).
+
+     Zolang die tweede helft ontbrak, stond er een uitnodiging klaar en geen
+     leerling, en bleven zestien routes op "Dit kind zit niet in deze klas",
+     "Je zit niet in deze klas" en "Geen kind van jullie in deze klas" staan --
+     terwijl de wereld zich klaar meldde. Precies het soort halve wereld dat
+     eruitziet als een gebrek in de route.
+
+     Het kind kiest zichzelf met zijn eigen pincode (dat is de enige route die
+     een profieltoken teruggeeft) en koppelt dan met ZIJN token; dan loopt het
+     door de tak `!s.beheerder`, die de leerling meteen toevoegt. */
+  let kindToken = null;
   if (klasCode && profielId) {
-    await doe('kind aansluiten bij de klas', '/api/foundation/school/koppel',
+    await doe('ouder nodigt het kind uit voor de klas', '/api/foundation/school/koppel',
       { code: gezin.code, token: gezin.token, klasCode, profielId }, null);
+    const gekozen = await doe('het kind kiest zichzelf met zijn pincode',
+      '/api/foundation/gezin/profiel/kies',
+      { code: gezin.code, token: gezin.token, profielId, pin: '4321' }, null);
+    kindToken = gekozen && gekozen.token;
+    if (kindToken) {
+      await doe('het kind accepteert en zit in de klas', '/api/foundation/school/koppel',
+        { code: gezin.code, token: kindToken, klasCode, profielId }, null);
+    }
   }
 
   /* DRIE SLEUTELS NAAST ELKAAR, EN DAT KAN OMDAT ZE ANDERS HETEN.
@@ -187,6 +260,15 @@ async function zetSchoolKlaar({ post, sleutels, datamap }) {
   if (gezin.code) { extra.code = gezin.code; extra.token = gezin.token; }
   if (klasCode) { extra.klasCode = klasCode; }
   if (personeelToken) { extra.personeelToken = personeelToken; }
+  /* `personeelId` wijst naar de RESERVE en niet naar de leraar van de klas --
+     zie de uitleg hierboven. Is er geen reserve, dan gaat er geen id mee: dan
+     staan er zeven HR-routes op 404, en dat is beter dan zeventien klasroutes
+     die omvallen doordat de proef haar eigen leraar de deur uit zet. */
+  if (reserveId) { extra.personeelId = reserveId; }
+  /* Het token van het KIND, want een deel van de schoolroutes wil de leerling
+     zelf horen en niet zijn ouder. Het staat naast `token` en niet eroverheen:
+     de ouderroutes hebben de beheerderssleutel nog steeds nodig. */
+  if (kindToken) { extra.kindToken = kindToken; }
   if (profielId) { extra.profielId = profielId; }
   /* `leerlingId` is het administratie-id en NIET het gezinsprofiel. Dat heb ik
      eerst wel gelijkgesteld, en toen bleven veertien routes 404 geven met

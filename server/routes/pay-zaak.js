@@ -140,4 +140,25 @@ module.exports = (kern, { stuur }) => {
     stuur(res, await pay.partnerUitbetaal({ supplierCode: req.supplier.code, idem: req.body.idem }));
   });
 
+  /* WAAR DAT GELD HEEN GAAT. Deze vraag werd nooit gesteld: de uitbetaling ging
+     de rail op met een lege iban, en die reserveert dan in plaats van te
+     versturen -- terwijl het saldo er al af was (kern/pay/zaakrekening.js).
+
+     Van de manager, om dezelfde reden als uitbetalen zelf: wie de bestemming
+     mag zetten, mag het saldo verleggen. Dat is dezelfde handeling, een stap
+     eerder. */
+  app.post('/api/supplier/pay/rekening', supplierAuth, (req, res) => {
+    if (!managerOnly(req, res)) return;
+    stuur(res, pay.zaakRekeningZet(req.supplier.code, req.body || {}));
+  });
+  app.post('/api/supplier/pay/rekening/stand', supplierAuth, (req, res) => {
+    if (!managerOnly(req, res)) return;
+    const r = pay.zaakRekening(req.supplier.code);
+    /* Alleen de laatste vier cijfers terug. Wie het scherm openzet hoeft het
+       hele nummer niet te zien om te weten dat het goed staat. */
+    stuur(res, { ok: true, ingesteld: !!r.iban, reden: r.reden || null,
+      bruikbaarVanaf: r.bruikbaarVanaf || null,
+      eind: r.iban ? String(r.iban).slice(-4) : null, naam: r.naam || null });
+  });
+
 };

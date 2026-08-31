@@ -106,7 +106,7 @@ module.exports = (ctx) => {
            eigenaar, 31 augustus 2026). Dat is met opzet geen nieuwe betaalvorm:
            kern/pay/partner.js boekt al van een lid naar `partner:<code>`, en de
            stichting betaalt zichzelf uit naar haar bankrekening langs precies
-           dezelfde weg als elke zaak (/api/pay/zaak/uitbetalen). Er komt dus
+           dezelfde weg als elke zaak (/api/supplier/pay/uitbetaal). Er komt dus
            geen tweede betaalweg bij, alleen een tweede houder van een wallet. */
         const soort = schoon(o && o.soort, 20);
         if (soort !== 'wallet') {

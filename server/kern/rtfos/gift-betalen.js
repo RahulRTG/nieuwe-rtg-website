@@ -6,7 +6,7 @@
    wat een betaling aan een zaak ook is: `pay.partnerIn` boekt van de wallet van
    het lid naar `partner:<code>`. Uitbetalen naar de eigen bankrekening doet de
    stichting daarna zelf, langs dezelfde weg als elke andere zaak
-   (/api/pay/zaak/uitbetalen). Dit bestand bouwt daar niets voor: het zou een
+   (/api/supplier/pay/uitbetaal). Dit bestand bouwt daar niets voor: het zou een
    tweede uitbetaalpad zijn voor dezelfde handeling.
 
    VIER DINGEN DIE HIER GEBEUREN, in deze volgorde, en de volgorde is de veiligheid:

@@ -91,6 +91,12 @@ test('uitbetalen neemt het apart gezette geld NIET mee -- dit is de hele toets',
   const voor = await stand();
   assert.ok(voor.apartGezet > 0, 'er staat iets apart');
 
+  /* Sinds kern/pay/zaakrekening.js weigert uitbetalen zonder bekende
+     bestemming: de opdracht ging voorheen de rail op met een lege iban, die dan
+     reserveert in plaats van verstuurt, terwijl het saldo er al af was. */
+  const rek = await api('supplier/pay/rekening', { iban: 'NL91 ABNA 0417 1643 00', naam: 'Toetszaak' }, sup.token);
+  assert.equal(rek.status, 200, JSON.stringify(rek.body));
+
   const uit = await api('supplier/pay/uitbetaal', { idem: 'u1' }, sup.token);
   assert.equal(uit.status, 200);
   assert.equal(uit.body.uitbetaald, voor.beschikbaar, 'precies het beschikbare deel ging eruit');

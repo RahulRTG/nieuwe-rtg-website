@@ -336,7 +336,7 @@ test('de betaallaag wordt op precies een manier aangeroepen', () => {
   assert.deepEqual(aanroepen.sort(), ['pay.partnerIn'],
     'de giftlaag roept meer van de betaallaag aan dan partnerIn -- een tweede weg naar hetzelfde geld');
   assert.ok(!/uitbetaal|sepa|iban/i.test(bron),
-    'uitbetalen naar de bank doet de stichting zelf langs /api/pay/zaak/uitbetalen; hier hoort geen tweede pad');
+    'uitbetalen naar de bank doet de stichting zelf langs /api/supplier/pay/uitbetaal; hier hoort geen tweede pad');
 });
 
 /* ---------------------------------------------------------------------------

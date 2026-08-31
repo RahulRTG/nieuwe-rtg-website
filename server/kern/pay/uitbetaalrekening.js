@@ -126,3 +126,7 @@ module.exports = (ctx) => {
   return { rekeningZet, ibanBevestigd, ibanVan, bruikbaar, publiek, kort, ibanGeldig, WACHT_UUR };
 };
 module.exports.ibanGeldig = ibanGeldig;
+/* De wachttijd hoort bij de REDENERING (een overname hangt op snelheid) en niet
+   bij het lid: ./zaakrekening.js leest hem hier, zodat er geen tweede wachttijd
+   ontstaat die er stilletjes naast gaat lopen. */
+module.exports.WACHT_UUR = WACHT_UUR;

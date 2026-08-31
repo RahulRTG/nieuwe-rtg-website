@@ -69,7 +69,7 @@ Dat is geen vierde optie naast de drie hieronder maar de scherpste vorm van de
 eerste, en hij heeft een eigenschap die de andere twee misten: **er komt geen
 betaalweg bij.** `kern/pay/partner.js` boekt al van een lid naar
 `partner:<code>`, en uitbetalen naar de bank bestaat al als
-`/api/pay/zaak/uitbetalen` — met de reserveringen die niet meeverhuizen, een
+`/api/supplier/pay/uitbetaal` — met de reserveringen die niet meeverhuizen, een
 idempotentiesleutel, een betaalopdracht die opnieuw wordt ingediend met dezelfde
 sleutel, en een eerlijke stand "in behandeling" in plaats van "gelukt". De
 stichting is daarmee een houder van een wallet, niet een nieuwe geldstroom.
@@ -251,9 +251,31 @@ zetten alleen de boardroom — en dat oordeel valt op de server.
 
 ## 7. Wat er nog niet is
 
-- **Het uitbetalen is niet gebouwd en hoeft dat ook niet**: de stichting logt in
-  als houder van haar wallet en gebruikt `/api/pay/zaak/uitbetalen`. Daar een
-  eigen knop naast zetten zou een tweede pad zijn voor dezelfde handeling.
+- **Het uitbetalen leunt op `/api/supplier/pay/uitbetaal`, en dat pad was stuk
+  (gerepareerd 31 augustus 2026).** Ik schreef hier eerder dat het "niet gebouwd
+  is en dat ook niet hoeft". Het eerste klopte niet zoals ik het bedoelde en het
+  tweede rustte op een pad dat ik nooit had nagelopen. Gemeten met de echte
+  modules: `kern/pay/partner.js` maakte de betaalopdracht **zonder
+  `bestemming`**, en dat is precies het veld dat naar de rail gaat (`server.js`:
+  `iban: o.bestemming`). Bij een lege iban reserveert `server/betaal.js` en
+  verstuurt hij niet — terwijl het saldo er al af was. Wallet leeg, opdracht op
+  `INGEDIEND`, geen IBAN ooit genoemd. `kern/fonds.js` was de enige plek in het
+  hele huis die een bestemming zette.
+
+  Er is nu `kern/pay/zaakrekening.js`: de zaak zet haar eigen rekening (mod-97
+  uit `server/iban.js`, niet nagetikt), en uitbetalen **weigert vóórdat er iets
+  wordt afgeboekt** als er geen bestemming is. De wachttijd van 24 uur staat op
+  het WIJZIGEN en niet op het instellen — dezelfde redenering als bij het lid, en
+  het getal komt uit `uitbetaalrekening.js` zodat er geen tweede ontstaat. De
+  stichting doet daarmee wat de eigenaar vroeg: zelf naar haar eigen rekening
+  storten, langs dezelfde weg als elke zaak. Er komt nog steeds geen tweede
+  uitbetaalpad bij.
+
+  Twee toetsen van dit huis heetten "uitbetalen leegt de partnerpot" en stonden
+  al die tijd groen over dat kapotte pad — de pot wás leeg, er was alleen nooit
+  een rekening genoemd. En let op de route: hij heet `/api/supplier/pay/uitbetaal`
+  en niet `/api/pay/zaak/uitbetalen`, zoals ik hem eerder in dit document en in
+  drie codecommentaren had staan.
 - **De incasso.** Er is er geen, en hij komt er niet uit zichzelf: elke termijn
   wordt door de gever zelf bevestigd. Geld dat vanzelf van iemands rekening gaat,
   vraagt een machtiging en een eigen besluit.

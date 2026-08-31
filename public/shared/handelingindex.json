@@ -1334,7 +1334,19 @@
       "url": "/apps/rtg.html"
     },
     {
+      "label": "Camera",
+      "app": "Ontdekken",
+      "wereld": "LivingOS",
+      "url": "/apps/rtg.html"
+    },
+    {
       "label": "Commerce",
+      "app": "Ontdekken",
+      "wereld": "LivingOS",
+      "url": "/apps/rtg.html"
+    },
+    {
+      "label": "Daten",
       "app": "Ontdekken",
       "wereld": "LivingOS",
       "url": "/apps/rtg.html"
@@ -1352,19 +1364,13 @@
       "url": "/apps/rtg.html"
     },
     {
-      "label": "Geld",
-      "app": "Ontdekken",
-      "wereld": "LivingOS",
-      "url": "/apps/rtg.html"
-    },
-    {
       "label": "Hangar Lifestyle",
       "app": "Ontdekken",
       "wereld": "LivingOS",
       "url": "/apps/rtg.html"
     },
     {
-      "label": "Leven",
+      "label": "Het Vooruitzicht",
       "app": "Ontdekken",
       "wereld": "LivingOS",
       "url": "/apps/rtg.html"
@@ -1388,7 +1394,7 @@
       "url": "/apps/rtg.html"
     },
     {
-      "label": "Media",
+      "label": "Mensen",
       "app": "Ontdekken",
       "wereld": "LivingOS",
       "url": "/apps/rtg.html"
@@ -1424,12 +1430,6 @@
       "url": "/apps/rtg.html"
     },
     {
-      "label": "Sociaal",
-      "app": "Ontdekken",
-      "wereld": "LivingOS",
-      "url": "/apps/rtg.html"
-    },
-    {
       "label": "Stad",
       "app": "Ontdekken",
       "wereld": "LivingOS",
@@ -1442,13 +1442,13 @@
       "url": "/apps/rtg.html"
     },
     {
-      "label": "Veilig",
+      "label": "Vluchten",
       "app": "Ontdekken",
       "wereld": "LivingOS",
       "url": "/apps/rtg.html"
     },
     {
-      "label": "Vluchten",
+      "label": "Volledige agenda",
       "app": "Ontdekken",
       "wereld": "LivingOS",
       "url": "/apps/rtg.html"

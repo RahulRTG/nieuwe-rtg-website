@@ -127,28 +127,10 @@
       ' · Minder: ' + (minder.join(', ') || '--') +
       ' · Nooit: ' + ((d.smaak.nooitMakers || []).concat(d.smaak.nooitOnderwerpen || []).join(', ') || '--');
   }
-  /* De lege stand van dit scherm, in de vorm die shared/rtg-ui.css voor het
-     hele huis vastlegt (.rtg-leeg-vlak). Hij stond hier als los kader met vier
-     inline stijlen; die kwamen op elk scherm net anders terug. Een uitweg komt
-     er alleen als hij bestaat -- een knop die nergens heen gaat is erger dan
-     geen knop. */
-  function aangemeld() {
-    try { return !!localStorage.getItem('rtg_member_token'); } catch (e) { return false; }
-  }
-  function leegVlak(o) {
-    var vlak = el('div', 'rtg-leeg-vlak');
-    vlak.style.gridColumn = '1 / -1';   // over de hele breedte: het is geen kaart tussen kaarten
-    if (o.ey) vlak.appendChild(el('span', 'rtg-leeg-ey', o.ey));
-    if (o.titel) vlak.appendChild(el('b', null, o.titel));
-    if (o.wat) vlak.appendChild(el('p', null, o.wat));
-    if (o.waarom) vlak.appendChild(el('p', null, o.waarom));
-    (o.stappen || []).forEach(function (st) {
-      var a = document.createElement('a');
-      a.className = 'rtg-leeg-actie'; a.href = st.pad; a.textContent = st.tekst;
-      vlak.appendChild(a);
-    });
-    return vlak;
-  }
+  /* De lege stand komt uit shared/leeg.js. Hier stond een eigen kopie,
+     geschreven voor de gedeelde bestond; twee kopieen van een vorm lopen
+     gegarandeerd uit elkaar. */
+
 
   function teken(d) {
     stand = d;
@@ -168,11 +150,11 @@
     if (d.error) {
       $('#uitleg').textContent = '';
       var doosF = $('#stukken'); doosF.textContent = '';
-      doosF.appendChild(leegVlak({
+      doosF.appendChild(RTGLeeg.vlak({
         ey: 'RTG Media',
-        titel: aangemeld() ? 'Dit lukte niet.' : 'Meld u aan om verder te gaan.',
+        titel: RTGLeeg.aangemeld() ? 'Dit lukte niet.' : 'Meld u aan om verder te gaan.',
         wat: d.error,
-        stappen: aangemeld() ? [] : [{ tekst: 'Naar de leden-app', pad: '/apps/app.html' }]
+        stappen: RTGLeeg.aangemeld() ? [] : [{ tekst: 'Naar de leden-app', pad: '/apps/app.html' }]
       }));
       return;
     }
@@ -182,7 +164,7 @@
     /* Een lege stand is geen leeg raster: de server zegt wat hier komt, waarom
        het er nu niet is, en welke stap dat opheft. Die tekst staat daar en niet
        hier, want de reden hangt van de gegevens af (zie kern/mediaos/leeg.js). */
-    if (d.leeg) doos.appendChild(leegVlak({
+    if (d.leeg) doos.appendChild(RTGLeeg.vlak({
       ey: 'RTG Media', titel: d.leeg.titel, wat: d.leeg.wat,
       waarom: d.leeg.waarom, stappen: d.leeg.stappen
     }));

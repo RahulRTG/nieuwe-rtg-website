@@ -1,6 +1,14 @@
 {
+ "stempel": {
+  "op": "2026-08-31T18:51:33.244Z",
+  "commit": "47c119c3",
+  "boomVuil": false,
+  "boomAnders": 8,
+  "instrument": "scripts/duurzaamheidskosten.js",
+  "node": "v22.22.2"
+ },
  "uitleg": "Gepaarde meting van de duurzame commit: dezelfde machine, dezelfde opslag, dezelfde belasting, alleen RTG_DUURZAAM ertussen. De controlegroep is een schrijfroute die NIET duurzaam vastlegt; beweegt die mee, dan meet deze ronde de machine en niet de commit. Getallen van verschillende machines of opslagstanden horen NIET vergeleken te worden.",
- "gedraaid": "2026-08-12T11:17:33.619Z",
+ "gedraaid": "2026-08-31T18:51:33.244Z",
  "machine": {
   "kernen": 4,
   "geheugenGB": 17,
@@ -9,11 +17,11 @@
  },
  "opslag": "sqlite",
  "gemeten": {
-  "verzoekenPerRoute": 400,
-  "factorP50": 2.01,
-  "factorP95": 1.49,
-  "factorP99": 0.84,
-  "controleFactorP50": 1.03,
+  "verzoekenPerRoute": 200,
+  "factorP50": 1.76,
+  "factorP95": 1.21,
+  "factorP99": 1.5,
+  "controleFactorP50": 1,
   "blindeRondes": 0
  },
  "routes": [
@@ -21,118 +29,118 @@
    "route": "notities/bewaar",
    "duurzaam": true,
    "aan": {
-    "p50": 5.35,
-    "p95": 7.08,
-    "p99": 8.21,
-    "max": 11.24,
-    "gelukt": 400,
+    "p50": 9.02,
+    "p95": 12.23,
+    "p99": 14.12,
+    "max": 15.09,
+    "gelukt": 200,
     "statussen": {
-     "200": 400
+     "200": 200
     }
    },
    "uit": {
-    "p50": 2.58,
-    "p95": 4.16,
-    "p99": 11.62,
-    "max": 12.79,
-    "gelukt": 400,
+    "p50": 5.1,
+    "p95": 7.81,
+    "p99": 14.17,
+    "max": 14.57,
+    "gelukt": 200,
     "statussen": {
-     "200": 400
+     "200": 200
     }
    },
    "factor": {
-    "p50": 2.07,
-    "p95": 1.7,
-    "p99": 0.71
+    "p50": 1.77,
+    "p95": 1.57,
+    "p99": 1
    }
   },
   {
    "route": "agenda/toevoegen",
    "duurzaam": true,
    "aan": {
-    "p50": 7.14,
-    "p95": 8.97,
-    "p99": 13.39,
-    "max": 42.87,
-    "gelukt": 400,
+    "p50": 12.25,
+    "p95": 16.86,
+    "p99": 23.42,
+    "max": 45.82,
+    "gelukt": 200,
     "statussen": {
-     "200": 400
+     "200": 200
     }
    },
    "uit": {
-    "p50": 3.67,
-    "p95": 6.53,
-    "p99": 13.68,
-    "max": 14.73,
-    "gelukt": 400,
+    "p50": 7.16,
+    "p95": 16.6,
+    "p99": 30.4,
+    "max": 43.87,
+    "gelukt": 200,
     "statussen": {
-     "200": 400
+     "200": 200
     }
    },
    "factor": {
-    "p50": 1.95,
-    "p95": 1.37,
-    "p99": 0.98
+    "p50": 1.71,
+    "p95": 1.02,
+    "p99": 0.77
    }
   },
   {
    "route": "bestanden/map",
    "duurzaam": true,
    "aan": {
-    "p50": 6.91,
-    "p95": 9.1,
-    "p99": 11.05,
-    "max": 11.05,
+    "p50": 13.43,
+    "p95": 17.84,
+    "p99": 54.94,
+    "max": 54.94,
     "gelukt": 95,
     "statussen": {
      "200": 95,
-     "409": 305
+     "409": 105
     }
    },
    "uit": {
-    "p50": 3.43,
-    "p95": 6.56,
-    "p99": 13.41,
-    "max": 13.41,
+    "p50": 7.51,
+    "p95": 17.12,
+    "p99": 20.15,
+    "max": 20.15,
     "gelukt": 95,
     "statussen": {
      "200": 95,
-     "409": 305
+     "409": 105
     }
    },
    "factor": {
-    "p50": 2.01,
-    "p95": 1.39,
-    "p99": 0.82
+    "p50": 1.79,
+    "p95": 1.04,
+    "p99": 2.73
    }
   },
   {
    "route": "zorgprofiel/zet (controle)",
    "duurzaam": false,
    "aan": {
-    "p50": 3.55,
-    "p95": 12.17,
-    "p99": 13.71,
-    "max": 40.11,
-    "gelukt": 400,
+    "p50": 9.3,
+    "p95": 20.73,
+    "p99": 24.37,
+    "max": 34.02,
+    "gelukt": 200,
     "statussen": {
-     "200": 400
+     "200": 200
     }
    },
    "uit": {
-    "p50": 3.43,
-    "p95": 12.32,
-    "p99": 13.62,
-    "max": 16.07,
-    "gelukt": 400,
+    "p50": 9.26,
+    "p95": 20.18,
+    "p99": 22.95,
+    "max": 47.9,
+    "gelukt": 200,
     "statussen": {
-     "200": 400
+     "200": 200
     }
    },
    "factor": {
-    "p50": 1.03,
-    "p95": 0.99,
-    "p99": 1.01
+    "p50": 1,
+    "p95": 1.03,
+    "p99": 1.06
    }
   }
  ]

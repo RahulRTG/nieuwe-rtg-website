@@ -470,3 +470,26 @@ body.rtg-social-circles .aibalk input{border-color:rgba(255,255,255,.12)!importa
   body.rtg-social-circles main#main>.kaart>h2{margin:0 -1.15rem 1rem;padding:1.15rem;}
   body.rtg-social-circles .aibalk{bottom:calc(var(--suite-nav) + .65rem)!important;}
 }
+
+/* ---- de DONKERE vlakken binnen dit lichte scherm --------------------------
+   Deze suite verft de pagina pearl, en daarom staat --rtg-leesgoud hierboven
+   op --gold-diep: dat is het goud dat op parelmoer leest. Maar de suite
+   schildert daarbinnen ook vlakken met --suite-ink (#171815): de bovenbalk,
+   de private wereld, en de hele lijstkolom van Berichten. Op die vlakken is
+   het donkere goud onleesbaar -- scripts/a11y.js mat 1,93:1 op het merkje
+   "Rahul" in de balk.
+
+   Dus geldt hier dezelfde regel als een blok hoger, alleen andersom: wie een
+   vlak DONKER schildert binnen een licht scherm, zet daar het goud terug dat
+   op donker leest. Een token per scherm is niet genoeg zodra een scherm twee
+   gronden heeft. */
+.rtg-suitebar,
+body.rtg-social-messages .comm,
+body.rtg-social-private-hub,
+.private-world,
+body.rtg-suite-page button.knop.vol,
+body.rtg-social-messages .nieuwknop,
+body.rtg-social-messages .stuurknop{
+  --rtg-leesgoud:var(--gold-tekst);
+  --rtg-goud:var(--gold-tekst);
+}

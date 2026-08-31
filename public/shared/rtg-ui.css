@@ -386,7 +386,15 @@ body.rtg-stijl progress{accent-color:var(--rtg-goud);}
 .rtg-leeg-vlak p{
   margin:.3rem 0 0;
   max-width:42ch;
-  color:color-mix(in srgb,currentColor 74%,transparent);
+  /* OOK HIER GEEN MENGING. Het opschrift is hierboven al van 76% naar
+     `inherit` gegaan omdat het onder de norm zakte; deze zin stond nog op 74%
+     en zakte precies zo -- 3,73:1 op pearl, gemeten door scripts/a11y.js in
+     drie rondes tegelijk. Vierde keer dezelfde fout, en de reden is elke keer
+     dat de mengverhouding wordt gekozen op hoe het OOGT en niet op wat het
+     haalt. De rangorde in dit blok loopt via grootte en letter (kapitalen,
+     Bodoni, lopende tekst) en niet via kleur; dat is de enige vorm die op elk
+     vlak overeind blijft. */
+  color:inherit;
   font-size:.86rem;
   line-height:1.65;
 }

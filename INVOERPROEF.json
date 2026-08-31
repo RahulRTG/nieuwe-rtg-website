@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-08-31T16:26:30.960Z",
-  "commit": "a2ce21ba",
+  "op": "2026-08-31T17:07:17.806Z",
+  "commit": "30cd8c2e",
   "boomVuil": false,
-  "boomAnders": 1,
+  "boomAnders": 2,
   "node": "v22.22.2"
  },
  "uitleg": "Per route: rommel met de JUISTE rol, en of er een 5xx of een intern spoor uit kwam. Een route die hier NIET in staat is niet beproefd. Een route met invoer:\"poort\" stond achter een tweede grendel en is ONGEMETEN, geen groen. Zie scripts/lib/invoerproef.js voor de grens.",

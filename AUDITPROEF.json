@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-08-31T16:34:08.610Z",
-  "commit": "a2ce21ba",
+  "op": "2026-08-31T17:39:50.697Z",
+  "commit": "30cd8c2e",
   "boomVuil": false,
-  "boomAnders": 3,
+  "boomAnders": 5,
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute: is er na een geslaagde oproep een regel bijgekomen in het API-spoor (server/opzet/auditspoor.js), gelezen via dezelfde kantoorroute die een auditor gebruikt. \"gezakt\" is hier WEL een defect-oordeel: een handeling die lukt zonder spoor is achteraf niet terug te vinden. De ronde ijkt twee keer: de stand mag niet uit zichzelf oplopen, en de keten moet na afloop heel zijn.",

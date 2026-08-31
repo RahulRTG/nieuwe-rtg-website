@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-08-31T16:25:43.037Z",
-  "commit": "a2ce21ba",
+  "op": "2026-08-31T17:06:24.822Z",
+  "commit": "30cd8c2e",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 1,
   "node": "v22.22.2"
  },
  "uitleg": "Per SCHRIJFroute welke verkeerde rollen zijn geprobeerd, met plausibele invoer. Een route die hier NIET in staat is niet beproefd -- dat is ongemeten en geen groen. Zie scripts/lib/rolproef.js voor wat de proef wel en niet uitsluit.",

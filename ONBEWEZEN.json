@@ -1,19 +1,19 @@
 {
   "metingGebruikt": true,
-  "metingReden": "gemeten op commit cf24d691, schone boom",
+  "metingReden": "gemeten op commit b3a2d336, schone boom",
   "stempel": {
-    "op": "2026-08-31T12:05:48.764Z",
-    "commit": "cf24d691",
+    "op": "2026-08-31T12:32:59.924Z",
+    "commit": "b3a2d336",
     "boomVuil": true,
     "node": "v22.22.2",
     "metingGebruikt": true,
-    "metingReden": "gemeten op commit cf24d691, schone boom"
+    "metingReden": "gemeten op commit b3a2d336, schone boom"
   },
   "uitleg": "Waarom heeft deze mutatie geen geldig bewijs? De bakken staan van GOEDKOOP naar DUUR en een route valt in de EERSTE die past. De invariant: ONBEWEZEN mag alleen kleiner worden doordat een route geldig bewijs krijgt, nooit doordat een foutreden wordt hernoemd -- daarom ratelt het TOTAAL en niet de bakken. Zie de kop van scripts/onbewezen.js.",
   "gemeten": {
     "mutaties": 4661,
-    "metBewijs": 2087,
-    "onbewezen": 2574,
+    "metBewijs": 2095,
+    "onbewezen": 2566,
     "sluit": true
   },
   "bakken": [
@@ -65,7 +65,7 @@
     {
       "id": "FIXTURE_403",
       "uitleg": "de eerste oproep gaf 403 -- verkeerde rol of ontbrekend recht",
-      "aantal": 157,
+      "aantal": 158,
       "voorbeelden": [
         "POST /api/account/koppel",
         "POST /api/account/ontkoppel",
@@ -76,7 +76,7 @@
     {
       "id": "FIXTURE_404",
       "uitleg": "de eerste oproep gaf 404 -- het object of de relatie bestaat niet",
-      "aantal": 1469,
+      "aantal": 1468,
       "voorbeelden": [
         "POST /api/aandacht",
         "POST /api/aanmelding/opzeggen",
@@ -98,7 +98,7 @@
     {
       "id": "FIXTURE_422",
       "uitleg": "de eerste oproep gaf 400 of 422 -- lijf, velden of query kloppen niet",
-      "aantal": 766,
+      "aantal": 758,
       "voorbeelden": [
         "POST /api/aanmelding/beslis",
         "POST /api/agenda/antwoord",
@@ -258,6 +258,7 @@
       "POST /api/member/dm",
       "POST /api/member/dm/send",
       "POST /api/member/naam/zet",
+      "POST /api/member/rtmail/bijlagen",
       "POST /api/member/rtmail/delegatie/weg",
       "POST /api/member/rtmail/delegeer",
       "POST /api/member/snap/send",
@@ -915,7 +916,6 @@
       "POST /api/member/rendezvous/introductie/antwoord",
       "POST /api/member/rendezvous/tafel/antwoord",
       "POST /api/member/rtmail/bijlage",
-      "POST /api/member/rtmail/bijlagen",
       "POST /api/member/rtmail/classificeer",
       "POST /api/member/rtmail/draad",
       "POST /api/member/rtmail/hulp",
@@ -2248,15 +2248,7 @@
       "POST /api/member/rtmail/regel/zet",
       "POST /api/member/rtmail/sluimer",
       "POST /api/member/rtmail/ster",
-      "POST /api/member/rtmail/team/af",
-      "POST /api/member/rtmail/team/dossier",
-      "POST /api/member/rtmail/team/koppel",
-      "POST /api/member/rtmail/team/lid",
       "POST /api/member/rtmail/team/maak",
-      "POST /api/member/rtmail/team/notitie",
-      "POST /api/member/rtmail/team/overzicht",
-      "POST /api/member/rtmail/team/pak",
-      "POST /api/member/rtmail/team/postvak",
       "POST /api/member/rtmail/team/prioriteit",
       "POST /api/member/rtmail/team/status",
       "POST /api/member/rtmail/team/stuur",

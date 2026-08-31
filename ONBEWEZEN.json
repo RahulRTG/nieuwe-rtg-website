@@ -1,13 +1,13 @@
 {
   "metingGebruikt": true,
-  "metingReden": "gemeten op commit 4fe3a32e, schone boom",
+  "metingReden": "gemeten op commit 8174edcb, schone boom",
   "stempel": {
-    "op": "2026-08-31T08:40:26.038Z",
-    "commit": "4fe3a32e",
+    "op": "2026-08-31T09:09:23.098Z",
+    "commit": "8174edcb",
     "boomVuil": true,
     "node": "v22.22.2",
     "metingGebruikt": true,
-    "metingReden": "gemeten op commit 4fe3a32e, schone boom"
+    "metingReden": "gemeten op commit 8174edcb, schone boom"
   },
   "uitleg": "Waarom heeft deze mutatie geen geldig bewijs? De bakken staan van GOEDKOOP naar DUUR en een route valt in de EERSTE die past. De invariant: ONBEWEZEN mag alleen kleiner worden doordat een route geldig bewijs krijgt, nooit doordat een foutreden wordt hernoemd -- daarom ratelt het TOTAAL en niet de bakken. Zie de kop van scripts/onbewezen.js.",
   "gemeten": {
@@ -26,7 +26,7 @@
     {
       "id": "NIET_AANRAAKBAAR",
       "uitleg": "de proef MAG hier niet aankloppen -- een schakelkast of een onomkeerbare handeling, met de reden per route",
-      "aantal": 28,
+      "aantal": 29,
       "voorbeelden": [
         "POST /api/boardroom/reset",
         "POST /api/office/boardroom/alles",
@@ -76,7 +76,7 @@
     {
       "id": "FIXTURE_404",
       "uitleg": "de eerste oproep gaf 404 -- het object of de relatie bestaat niet",
-      "aantal": 1470,
+      "aantal": 1469,
       "voorbeelden": [
         "POST /api/aandacht",
         "POST /api/aanmelding/opzeggen",
@@ -171,6 +171,7 @@
       "POST /api/office/geld/korting",
       "POST /api/office/geld/pasprijs",
       "POST /api/office/techniek/lastafworp",
+      "POST /api/privacy/delete",
       "POST /api/techniek/bewaren/veeg",
       "POST /api/techniek/eigenaar",
       "POST /api/techniek/fouten/wis",
@@ -1830,7 +1831,6 @@
       "POST /api/vracht/volg",
       "POST /api/wachtlijst",
       "POST /api/wallet/munt/wissel",
-      "POST /api/wallet/weg",
       "POST /api/wbw/groep",
       "POST /api/wbw/uitgave",
       "POST /api/wbw/verreken",

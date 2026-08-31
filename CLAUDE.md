@@ -699,6 +699,42 @@ paragraaf 5, de grenzen: de AI kan nooit meer dan de persoon die hem iets vraagt
 geld verlaat het huis nooit vanzelf, wat een tweede persoon bereikt bevestigt een
 mens, en autonomie wordt gepromoveerd en nooit geslopen.
 
+**`EXECUTIE.md` is de laag eronder** -- de RTG Execution Plane: niet "we moeten
+een veilige AI-executielaag ontwerpen" maar "we hebben meerdere volwassen
+executiemechanismen die nog niet als een platformwaarheid functioneren". Lees die
+voor je iets bouwt dat bepaalt of een handeling mag, hoeveel bevestiging hij
+vraagt, of hij te herhalen is of hoe hij terugdraait. De kern in een zin: **een
+scherm, een automatisering, de commandbalk, een AI-agent, een externe aanroep en
+een geplande taak leveren allemaal intentie -- alleen de execution plane
+veroorzaakt effecten.** Het opent met de dubbele waarheid die dit huis vandaag
+heeft: `kern/command/risico.js` rekent per geval uit of iets `hand`, `assist` of
+`auto` mag (met de score-opbouw erbij, want een cijfer zonder opbouw is een
+orakel), terwijl `kern/stuur/beleid.js` er naast staat met 21 patronen `direct`
+en 27 `voorstel`, vast per route en ongeacht bedrag. Twee correcte systemen die
+dezelfde werkelijkheid verschillend modelleren -- de klasse die `SEMANTIEK.json`
+94 keer mat. De eerste opdracht is daarom semantische consolidatie en geen
+featurewerk. Vijf van de zeven "grote sprongen" blijken al gebouwd, alleen voor
+de ops-cockpit: voor- en nacontrole (`command/transactie-poorten.js`, waar *een
+controle die niet kon draaien niet geslaagd is* en de verificatie POSITIEF
+nakijkt), de transactie met terugweg, de zandbak die uit de zaaiset draait en
+niet uit productie, de simulatie met haar aannames in de uitslag, en het
+ketenspoor van `kern/envelop.js`. Echt ontbrekend zijn er vier: **PLAN als
+object**, de capability-compiler, het mandaat, en de optimizer zelf. Zes grenzen
+bovenop die van FABRIC.md, waarvan de drie scherpste: een **mandaat verleent
+nooit vermogen** maar versmalt alleen bestaand bewezen vermogen (de speelruimte
+is een doorsnede en geen optelsom), **voorbereiden, verplichten en betalen zijn
+drie gebeurtenissen** die er als een knop uitzien terwijl GELD.md erboven staat,
+en de **executiekaart is een projectie en nooit een bron** -- wie hem met de hand
+kan bijwerken heeft de 22e capabilitylijst gemaakt. Let op par. 5 voor je een
+volgorde kiest: `VERTROUWEN.json` staat op **0 bewezen, 0 geschorst en 4180
+verzwakt**, dus de bewijspoort houdt vandaag niets tegen en de regel "onbekende
+uitvoeringssemantiek krijgt nooit maximale autonomie" zet nu ALLES op het
+minimum -- die hoort dus eerst in de schaduw te lopen. De stuurmaat is niet
+"wanneer hebben we Mijn AI" maar **wanneer kan RTG een volledige keten
+bewijzen**; par. 7 zet er een van vier routes klaar, met per route gemeten wat
+er nog aan ontbreekt en waarom (twee zijn ongemeten omdat de proef geen
+gekoppelde groothandel had, niet omdat ze riskant zijn).
+
 **`LAT.md` is de technische lat** — elf regels die allemaal uit een fout komen die hier écht is gemaakt, met per regel wat hem handhaaft en waar er alleen op mensen wordt vertrouwd. Lees die vóór je code schrijft of repareert. De belangrijkste twee: repareer de oorzaak en niet het symptoom, en trek elke bewering na met een mutatie (een toets die je niet hebt zien zakken is geen toets). LAT.md gaat over de code, CLAUDE.md over het merk.
 
 ## Structuur en starten (kort)

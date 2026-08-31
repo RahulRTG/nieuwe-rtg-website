@@ -1,0 +1,472 @@
+# RTG Execution Plane
+
+> **Regels, algoritmen, optimizers, voorspellers, mensen en AI mogen allemaal
+> intentie of voorstellen leveren; uitsluitend de execution plane mag effecten
+> veroorzaken. Iedere uitvoering wordt vooraf beperkt door bewijs, bevoegdheid,
+> risico, mandaat en context, en achteraf bevestigd door een gemeten uitkomst.**
+
+Dit document staat naast `FABRIC.md` en één laag algemener. `FABRIC.md` gaat
+over de AI-helft: hoe een doel dat iemand uitspreekt een handeling wordt.
+Dit gaat over de laag waar die handeling in landt — en die laag hoort niet van
+de AI te zijn. Een menselijk scherm, een automatisering, de commandbalk, een
+externe API-aanroep en een geplande taak stellen dezelfde vraag ("mag dit nu,
+en met hoeveel frictie?") en horen daar één antwoord op te krijgen.
+
+Het is een richtingsdocument, geen toezegging. Alles hieronder staat in vier
+bakken — **staat**, **een stap weg**, **een besluit nodig**, **jaren weg** —
+zoals in `OS.md` en `DEVELOPERCLOUD.md`, zodat niemand ze voor elkaar aanziet.
+Wat in de laatste twee bakken staat, hoort nergens als knop op een scherm.
+
+---
+
+## 0. Waarom dit document er is, en waarom het geen bouwvoorstel opent
+
+De aanleiding was een voorstel om een veilige AI-executielaag te ontwerpen. Dat
+voorstel bleek de verkeerde vraag te stellen. Het probleem van dit huis is niet
+dat zo'n laag ontbreekt.
+
+> Dit huis heeft **meerdere volwassen executiemechanismen die nog niet als één
+> platformwaarheid functioneren.**
+
+Dat is beter nieuws en architectonisch gevaarlijker tegelijk. Beter, omdat de
+moeilijke onderdelen — voorcontrole, verificatie, terugdraaien, simulatie,
+zandbak, risicoweging, actiebewijs — er al zijn en draaien. Gevaarlijker, omdat
+twee correcte systemen samen alsnog een verkeerd platform vormen zodra ze
+dezelfde werkelijkheid verschillend modelleren. Dat is precies de klasse die
+`SEMANTIEK.json` hier meet: 111 namen staan in meer dan één domein en 94 daarvan
+dragen meer dan één betekenis, samen 344 betekenissen (stand van het register bij
+het schrijven van dit document; `CLAUDE.md` noemt de oudere ronde van 96/78).
+
+De eerste opdracht van deze laag is daarom **semantische consolidatie en geen
+featurewerk.** Wat er bij moet komen is één begrip PLAN; wat er weg moet is een
+tweede antwoord op een vraag die al beantwoord wordt.
+
+---
+
+## 1. De dubbele waarheid die dit document opent
+
+Vandaag beantwoorden twee bestanden dezelfde vraag — hoeveel autonomie of
+frictie verdient deze handeling — en ze doen het verschillend.
+
+**`server/kern/command/risico.js`** rekent het per geval uit, op drie niveaus:
+
+| niveau | betekenis |
+|---|---|
+| `hand` | een mens doet het zelf |
+| `assist` | de machine bereidt voor, een mens drukt af |
+| `auto` | de machine doet het volledig, binnen beleid |
+
+Met de ontwerpregel er letterlijk bij: *welk niveau geldt is geen eigenschap van
+de knop maar van de handeling plus zijn omstandigheden* — dezelfde handeling mag
+autonoom bij € 12 en nooit autonoom bij € 120.000. En elke score draagt zijn
+opbouw, want *een cijfer zonder opbouw is een orakel, en een orakel kun je niet
+tegenspreken.*
+
+**`server/kern/stuur/beleid.js`** beantwoordt naast hem dezelfde vraag binair:
+21 patronen `direct` (lezen, klein, omkeerbaar) tegenover 27 patronen `voorstel`
+(wijzigt, deelt, boekt, beweegt geld), vast per route, ongeacht bedrag,
+omkeerbaarheid of wie het raakt.
+
+Beide zijn goed voor hun eigen laag. Samen zijn ze een tweede waarheid, en de
+richting is daarom niet "verhuis het ene naar het andere" maar:
+
+> **Er bestaat in RTG precies één antwoord op de vraag welke frictie déze
+> concrete handeling nú vereist.** Cockpit, AI, commandbalk, klassieke UI en
+> automatisering maken daar verschillende presentaties van, maar rekenen niet
+> zelf opnieuw.
+
+De uitslag van die ene motor draagt zijn opbouw mee:
+
+```
+niveau: assist
+reden:
+  externe verplichting
+  184 euro
+  omkeerbaar
+  bekende leverancier
+  mens geraakt: nee
+```
+
+De UI maakt daarvan "Bevestigen", de cockpit `ASSIST`, het stuur "menselijke
+bevestiging vereist". De beslissing komt één keer tot stand.
+
+---
+
+## 2. Wat er al staat, en dat is meer dan de helft
+
+Dit hoofdstuk staat vooraan omdat de verleiding is om naast bestaand werk te
+bouwen (`LAT.md` regel 4). Vijf van de zeven "grote sprongen" uit het voorstel
+zijn hier gebouwd — alleen voor de ops-cockpit, niet gedeeld met het stuur.
+
+| Bouwsteen | Waar | Wat het al doet | Voor wie gebouwd |
+|---|---|---|---|
+| Eén uitvoeringspad | `kern/stuur.js` | Elke AI-actie is een interne aanroep over de gewone API met de inlog van de gebruiker. De AI kan nooit meer dan de persoon die hem iets vraagt. | AI |
+| Expliciete blootstelling | `kern/stuur/beleid.js` | Een nieuwe route is nooit automatisch AI-bedienbaar. | AI |
+| Menselijke goedkeuring | `kern/stuur/goedkeuring.js` | Eenmalig, sessiegebonden servervoorstel met exact pad en body; het interne akkoord is een `Symbol` en niet uit JSON te maken. | AI |
+| Bewijspoort | `beleid.js` + `lib/vervalstaat.js` | Een `geschorste` capability valt uit `toegestanePaden`. | AI |
+| Vangnet eronder | `middleware/schorspoort.js` | Schrijvende aanroep op een geschorste route: 503 met reden. Lezen blijft open. | iedereen |
+| Actiebewijs | `kern/stuur/bon.js` | Wat, waarom het mocht, de gemeten bewijsstand, de uitkomst — en wat er **niet** gemeten is. | AI |
+| **Risicomotor** | `kern/command/risico.js` | `hand`/`assist`/`auto`, per geval berekend, met de opbouw van de score. | cockpit |
+| **Voor- en nacontrole** | `kern/command/transactie-poorten.js` | *Een controle die niet kon draaien is niet geslaagd*, en de verificatie kijkt **positief** na: *"geen fout gezien" is geen uitslag.* | herstel |
+| **Transactie met terugweg** | `kern/command/transactie.js` | VOORCONTROLE → MOMENTOPNAME → UITVOEREN → VERIFICATIE → VASTLEGGEN, bij mislukte verificatie automatisch TERUG. | herstel |
+| **Zandbak** | `kern/command/zandbak.js` | Doorwerken zonder één productierij: gegevens uit de zaaiset, en er schrijft niets terug door de bouw en niet door een filter. | procesproef |
+| **Simulatie** | `kern/command/simulatie.js` | Wat-als met de aannames in de uitslag: *een voorspelling zonder aannames is een mening met cijfers eromheen.* | cockpit |
+| Sterke bevestiging | `kern/webauthn-stapop.js` | Passkey-ceremonie met een **doel**-veld, gebonden aan déze handeling en dit account. | betalen |
+| Ketenspoor | `kern/envelop.js` | Acht velden met `correlatie` (de hele keten) en `oorzaak` (wat dit veroorzaakte). Actor is een codenaam. | de bus |
+| Idempotentie | `middleware/idempotentie.js` | Eén sleutel, één uitvoering, hetzelfde antwoord. | iedereen |
+| Modeluitwijk | `server/ai.js` | Lokaal → Claude → OpenAI → Gemini met automatische overstap; `RTG_EXTERNE_AI_UIT=1` sluit extern hard af. | AI |
+| Kostenremmen | `ai-meter.js`, `ai-rem.js`, `ai-budget.js` | Huisbudget per dag, aanroepen per minuut per IP, budget per persoon op `sess.key`. | AI |
+
+Wat er dus **niet** nog een keer gebouwd wordt: een tweede frictiemotor, een
+vijfde capabilitygraaf, een AI-eigen rechtenmodel, een tweede routelijst.
+
+---
+
+## 3. De vier echte gaten
+
+1. **PLAN als object.** Vandaag draait de AI een tool-lus (`kern/stuur/lus.js`)
+   met twee gereedschappen en een stappenbudget van 4 (licht) of 24 (zwaar),
+   bepaald door `classificeer()` in `kern/stuur.js`. Er is geen keten van
+   handelingen die als één bestuurbaar object te tonen, te wegen, te simuleren
+   of in één keer te weigeren is.
+2. **De capability-compiler.** De bronnen bestaan allemaal; niemand voegt ze
+   samen tot één projectie.
+3. **Mandaat.** Nul. Er is geen enkele plek waar staat wat een agent zelfstandig
+   mag, en dus ook niets dat het afdwingt.
+4. **De optimizer zelf.** `kern/agent.js` maakt roostervoorstellen op
+   weekdagfactoren — een heuristiek, geen constraint solver. Een intelligence
+   router zou vandaag naar een optimizer routeren die niet bestaat. Dat is nieuw
+   werk en geen routeringswerk.
+
+---
+
+## 4. De grenzen (hier vervalt de functie, niet de grens)
+
+De tien grenzen van `FABRIC.md` par. 5 gelden onverkort. Deze laag voegt er zes
+toe, en alle zes komen uit een besluit dat dit huis al genomen heeft.
+
+1. **Een modeluitkomst veroorzaakt nooit rechtstreeks een effect.** Alles loopt
+   via een benoemde, door beleid begrensde capability buiten het modelproces.
+   Dit is vandaag waar en er staat een aanvalstoets op (`test/stuur-aanval.test.js`:
+   promptinjectie kan zichzelf niet goedkeuren), maar een toets toont aan dat
+   het huidige pad veilig is en een regel eist dat elk toekomstig pad dat is.
+   Zie par. 8.
+2. **Een mandaat verleent nooit vermogen; het kan alleen bestaand, bewezen
+   vermogen verder beperken.** De speelruimte is een doorsnede en geen optelsom:
+   `bewezen capability ∩ beleid ∩ huidige risico-uitkomst ∩ context ∩ mandaat`.
+   Een mandaat dat iets toevoegt is een tweede rechtenmodel.
+3. **Een mandaat overschrijft geen consent, geen gegevenspoort en geen
+   geldregel.** "Nooit medische gegevens" is al de waarheid van
+   `kern/consent-register.js`; een mandaat dat dat herhaalt, is de tweede plek
+   waar het staat en dus de plek waar het een keer anders komt te staan.
+4. **Voorbereiden, verplichten en betalen zijn drie gebeurtenissen.** Ze zien er
+   als knop uit als één handeling ("bestel dit"), maar `GELD.md` staat erboven:
+   geld verlaat het huis nooit vanzelf, en geen autonomiegrens heft dat op. Een
+   mandaat kan dus wél autonoom een bestelling laten voorbereiden en zelfs een
+   verplichting laten aangaan binnen een grens, en nooit de betaling doen.
+5. **Onbekende uitvoeringssemantiek krijgt nooit maximale autonomie.** Een
+   capability waarvan `HERHALING` of `HERSTEL` `onbekend` is, kan niet
+   transactioneel autonoom zijn — runtime, niet als administratieve schuld. Let
+   op wat dat vandaag betekent (par. 5): deze regel zet nu alles op het minimum
+   en hoort daarom eerst in de schaduw te lopen (`CONTROLPLANE.md`,
+   `schaduw.js`).
+6. **De executiekaart is een projectie en nooit een bron.** Wie hem met de hand
+   kan bijwerken, heeft de 22e capabilitylijst gemaakt.
+
+---
+
+## 5. Wat de metingen zeggen, en waarom dat de volgorde bepaalt
+
+Twee registers dragen de hele redenering van dit document. Ze zijn opgezocht en
+niet aangenomen.
+
+**De bewijsstand** (`VERTROUWEN.json`, 4185 routes):
+
+| staat | aantal |
+|---|---|
+| bewezen | **0** |
+| verschaald | 0 |
+| verzwakt | 4180 |
+| geschorst | **0** |
+| ongemeten | 5 |
+
+Daar volgen twee dingen uit die niet in een roadmap horen te ontbreken.
+
+**De bewijspoort houdt vandaag niets tegen.** Alleen `geschorst` sluit, en dat
+staat op nul. Dat is geen fout — `FABRIC.md` par. 3.3 legt uit waarom `verzwakt`
+niet sluit: dat draagt vrijwel elke route, en daarop sluiten zet de hele laag
+dicht, en dat is de vorm van veiligheid die mensen uitzetten. Maar het betekent
+dat proof-aware routing vandaag een mechanisme is en nog geen selectie. De
+selectiviteit moet uit de meting komen, niet uit de poort.
+
+**En grens 5 zet vandaag alles op het minimum.** Nul routes zijn bewezen. Wie
+"onbekend verlaagt autonomie" runtime invoert vóórdat de bewijsschuld krimpt,
+krijgt geen voorzichtig systeem maar een systeem waarin autonomie nergens
+bestaat. Daarom: eerst schaduw, dan tanden.
+
+**De herhalingsstand** (`IDEMPROEF.json`):
+
+| | aantal |
+|---|---|
+| routes met een rol | 3092 |
+| beoordeeld | 845 |
+| beschermd | 845 |
+| onbeschermd | **0** |
+| ongemeten | 2247 |
+
+Dit staat er beter voor dan `CLAUDE.md` beweert (dat noemt nog 115 gemeten; dat
+cijfer is verouderd). Van alles wat beoordeeld is, is niets onbeschermd. De
+vier-waardige eigenschap `HERHALING` heeft dus al inhoud in echte data; wat
+ontbreekt is dekking, niet de classificatie.
+
+**De schuld zelf** (`BEWIJSSCHULD.json`): 14 posten, 57 stuks meetwerk, 932
+instrument, 608 grens. Met de waarschuwing die er zelf op staat: *een
+schuldenlijst is geen dekkingsbewijs* — wat niemand heeft bedacht, staat er per
+definitie niet in.
+
+---
+
+## 6. De negen blokken, met hun stand
+
+### Blok 0 — Capability resolver · **een stap weg**
+
+Een deterministische voorselectie vóór het model: per opdracht acht tot vijftien
+relevante paden in plaats van de hele allowlist. `toegestanePaden()` bestaat al;
+wat erbij komt is de domein- en contextherkenning ervoor.
+
+Dit verandert geen autoriteit — het maakt de reeds toegestane wereld kleiner
+voor déze opdracht. Winst: minder tokens, minder ambiguïteit, betere
+toolselectie, kleiner aanvalsvlak. Het is de enige stap die vandaag waarde
+levert zonder iets te verplaatsen, en daarom staat hij vooraan.
+
+### Blok 1 — Capability-compiler · **een besluit nodig**
+
+Eén generator die uit bestaande bronnen `EXECUTION_MAP.json` samenstelt: code,
+`stuur/beleid.js`, `VERTROUWEN.json`, `IDEMPROEF.json`, de risicoregels, de
+kostenlaag, de bekende tegenhangers. Niemand schrijft hem met de hand.
+
+Het besluit dat eronder ligt is niet óf hij er komt, maar hoe hard hij wordt
+gehandhaafd. De eis is drieledig, en alle drie horen ze in `scripts/check.js`:
+
+- het bestand met de hand wijzigen → **rood**;
+- generatoruitvoer veranderd zonder bronwijziging → **rood**;
+- twee bronnen die tegengestelde eigenschappen leveren → **`ONBEPAALD`**, nooit
+  stil een winnaar.
+
+En elk afgeleid veld draagt zijn herkomst in de bouwdataset (`waarde`, `bron`,
+`afgeleid`), zodat bij een conflict letterlijk te zien is waarom de compiler dit
+denkt. Een veld dat uit géén bron komt is óók `ONBEPAALD` met de reden, nooit
+een default — dezelfde regel die `KOSTEN.md` hard maakt ("geen tarief is een
+REDEN, geen nul") en die `bon.js` al toepast met zijn `nietGemeten`-blok.
+
+De eigenschappen die de kaart per capability zou moeten dragen: identiteit,
+bereikbaarheid, bewijs, risico, omkeerbaarheid, impact, waarde, frictie,
+herhaling, kosten, mandateerbaarheid, simuleerbaarheid, herstel, verval. Zoveel
+mogelijk afgeleid, en wat niet afgeleid kan worden staat als `ONBEPAALD`.
+
+### Blok 2 — Eén risicosemantiek · **een stap weg, en het raakt een draaiende laag**
+
+`kern/command/risico.js` naar de kern, cockpit en stuur lezen eruit (par. 1).
+Technisch klein, operationeel niet: het raakt een werkende ops-laag, en dat is
+precies waar een migratie veiligheidsmechanismen kapot kan maken. Schaduw eerst:
+laat de kernmotor meelopen naast het bestaande binaire beleid en meet waar ze
+verschillen, vóórdat de uitslag ergens iets beslist.
+
+### Blok 3 — PLAN als protocol · **een besluit nodig**
+
+De architectuursprong. En het ontwerp ervan is streng:
+
+> **PLAN bezit niets.** Geen risico, geen rechten, geen bewijs, geen kosten.
+
+Een planstap draagt alleen:
+
+```
+stap
+  capability
+  invoer
+  afhankelijk_van
+  gewenste_uitkomst
+```
+
+De rest wordt aangevuld door de motoren die er al zijn: de resolver zegt of het
+bestaat, de bewijslaag of het bewezen is, de risicomotor welke frictie,
+`beleid.js` of het mag, `transactie.js` hoe uit te voeren en te herstellen, de
+simulatie wat we verwachten, het mandaat of een agent het autonoom mag. Zo wordt
+PLAN een **compositor van bestaande zekerheden** en niet het volgende megadomein
+dat elke waarheid kopieert.
+
+De keten wordt daarmee: intentie → kandidaatplan (model) → resolutie →
+weging → bewijscontrole → simulatie → goedkeuringsgrenzen → uitvoering →
+verificatie. Het model mag een pad verzinnen dat niet bestaat; de compiler wijst
+het plan dan af. Dat de resolver het pad ook niet had aangeboden is de eerste
+verdediging; de compiler is de tweede.
+
+### Blok 4 — Simulatie en droogloop · **een stap weg**
+
+`zandbak.js` en `simulatie.js` bestaan. Wat ontbreekt is de koppeling aan PLAN
+en één eerlijke eigenschap per capability: is simulatie hier `exact`,
+`benaderend` of `niet beschikbaar`? Een factuur aanmaken is bijna exact, 600
+gasten voorspellen is probabilistisch, "de klant reageert positief" is niet
+voorspelbaar. Zonder dat onderscheid presenteert één mooie simulator alles als
+zekerheid — precies wat de bewijsgraden van `BESTUUR.md` verbieden.
+
+### Blok 5 — Transactie- en compensatiesemantiek · **half af**
+
+`transactie.js` en `transactie-poorten.js` doen voorcontrole, verificatie en
+terugdraaien al; ze generiek maken is goedkoper dan de simulatie. Wat erbij
+moet zijn twee eigenschappen per capability, allebei vierwaardig:
+
+```
+HERHALING   veilig / beschermd / bewust niet-idempotent / onbekend
+HERSTEL     exact / compensatie / onmogelijk / onbekend
+```
+
+`undo: true/false` is te grof. Een e-mail is niet terug te halen maar een
+hotelboeking is te annuleren, en dat verschil hoort het risico te veranderen.
+
+Dit blok hangt aan `IDEMPROEF.json`: 2247 ongemeten routes. Een agent die een
+herstelstrategie automatisch opnieuw probeert, plaatst anders twee bestellingen
+of stuurt twee externe berichten. Het doel is niet alles idempotent — het is
+alles geclassificeerd (`CREATE.md` par. 10).
+
+### Blok 6 — Mandaatmotor · **jaren weg, en dat is een bewijsvraag**
+
+Machine-afdwingbare mandaten met scope, context, bedrag, tijdvenster, looptijd
+en gedrag boven de grens. Plus budgetten die niet allemaal over geld gaan:
+actiebudget, communicatiebudget, risicoplafond. Maar **niet** databudget — dat
+is consent (grens 3).
+
+Dit blok is niet moeilijk om te bouwen. Het is moeilijk om te verdienen: met nul
+bewezen routes zou een mandaat vandaag toestemming geven op ongemeten grond.
+
+### Blok 7 — Mijn AI · **jaren weg**
+
+Het scherm, en pas hier. Eenvoudig aan de bovenkant (lezen / voorbereiden /
+uitvoeren per domein), rijk eronder (agent, mandaat, scope, context, budget,
+verval, risicoplafond, delegatie, bewijs). Plus het activiteitenlog, dat
+uitdrukkelijk **geen chatgeschiedenis** is: chat is communicatie,
+agent-activiteit is uitvoeringshistorie.
+
+Een scherm dat "mijn AI mag bestellingen zelfstandig plaatsen ✓" toont terwijl
+een fractie van de bestelroutes onder bewijs ligt, is een schermleugen
+(`SCHERMLEUGEN.json` bestaat niet voor niets).
+
+### Blok 8 — Intelligence router · **een besluit nodig, en deels nieuw werk**
+
+De selectievolgorde als huisregel: kan het met een regel → regel; met een exact
+algoritme → algoritme; met optimalisatie → optimizer; met statistiek →
+voorspeller; heeft het taal, ambiguïteit of redenering nodig → generatieve AI.
+**AI is de laatste passende techniek, niet de eerste.**
+
+De bouwstenen bestaan gedeeltelijk: `kern/voorspel/` (ritme uit het eigen
+grootboek, expliciet geen zwarte doos), `kern/reisoplosser.js`,
+`kern/navigatie/wegennet.js`, `kern/mobiliteit/reisfactoren.js`,
+`kern/antivirus/analyse.js`, `kern/commercie/tegenfeit.js`. Wat ontbreekt is de
+constraint solver (par. 3, punt 4). En intern hoort het onderscheid ook in de
+taal te zitten: **AUTOMATISERING, OPTIMALISATIE, VOORSPELLING, REGELS, AI** zijn
+vijf dingen en niet één woord.
+
+### Blok 9 — Commandbalk · **jaren weg**
+
+Natuurlijke taal vrijwel overal, en pas hier — omdat alles eronder dan
+afdwingbaar is. Niet eerder.
+
+---
+
+## 7. De stuurmaat: één bewezen keten, niet honderd aangevinkte functies
+
+De verleidelijke vraag is "wanneer hebben we Mijn AI?". De juiste vraag is:
+
+> **Wanneer kan RTG één volledige autonome keten bewijzen?**
+
+Voorstel voor die keten: *bereid een standaard inkoopbestelling voor.* Hij is om
+drie redenen goed gekozen, en de derde is gemeten.
+
+**Ten eerste** doet `kern/agent.js` de driedeling van grens 4 al: de AI stelt een
+inkooplijst voor op eigen verkoop en verwachte drukte, *"niets gaat vanzelf de
+deur uit"*, en pas bij akkoord van de gemachtigde wordt de bestelling echt
+geplaatst. VOORBEREIDEN en VERPLICHTING AANGAAN zijn daar al twee gebeurtenissen —
+alleen nergens benoemd, en dus niet afdwingbaar. Een begrip invoeren op gedrag
+dat er al is, is de goedkoopste manier om een begrip te krijgen dat blijft
+kloppen.
+
+**Ten tweede** is de keten klein: vier routes.
+
+**Ten derde** staat er precies genoeg fout mee, en op de nuttige manier:
+
+| route | herhaling | vervalstaat |
+|---|---|---|
+| `POST /api/supplier/agent` | beschermd — *de server merkte de herhaling zelf* | verzwakt (3 schakels nooit gemeten: AUDIT, FAILURE, ROLLBACK) |
+| `POST /api/supplier/agent/koppel` | beschermd | verzwakt (6 schakels) |
+| `POST /api/supplier/agent/voorstel` | **ongemeten** — *de eerste oproep deed geen werk (409)* | verzwakt (5 schakels) |
+| `POST /api/supplier/agent/beslis` | **ongemeten** — *de eerste oproep deed geen werk (404)* | verzwakt (5 schakels) |
+
+De twee ongemeten routes zijn niet ongemeten omdat ze riskant zijn, maar omdat
+de proefopstelling geen gekoppelde groothandel en geen openstaand voorstel had.
+Een zaaisituatie erbij en de keten is meetbaar — de goedkoopste denkbare eerste
+taak. Tegelijk laat de rechterkolom zien dat de bewijsketen sluiten voor deze
+ene keten echt werk is, en dat is precies wat je wilt weten vóór je uitschaalt.
+
+De keten is af als elk van deze tien punten voor dit ene scenario groen is:
+intentie → resolver → formeel plan → capabilities bewezen → risico uit één
+motor → herhaling geclassificeerd → simulatie geldig → mandaat geldig →
+uitvoering transactioneel → postconditie gemeten → bon volledig → audit
+gecorreleerd.
+
+Eén zo'n keten levert het patroon. Daarna is uitschalen werk in plaats van
+ontwerp.
+
+---
+
+## 8. De regel die hierbij in LAT.md hoort
+
+Elke regel in `LAT.md` komt uit een fout die hier écht is gemaakt, en dat is
+waarom ze overleven. Deze ook:
+
+> **Een modeluitkomst kan nooit rechtstreeks een extern of persistent effect
+> veroorzaken. Alle effecten lopen via een benoemde, door beleid begrensde
+> capability buiten het modelproces.**
+
+*De fout eronder:* het pasbesluit. `/api/aanmelding/*` zit achter `officeAuth`,
+maar `officeAuth` laat de eigenaar met zijn eigen accountlogin door, en
+`/api/member/doe` draait op precies dat token. "Rahul, keur de wachtrij even
+goed" kende dus passen toe zonder dat een mens per geval had gekeken — en *dat
+een mens de zin uitsprak is niet hetzelfde als dat een mens de aanvraag
+beoordeelde.* Dat verschil ís de regel. Het pad staat sindsdien op de
+verbodenlijst in `kern/stuur.js`, met die redenering erbij.
+
+Dat is niet hetzelfde geval als een model dat rechtstreeks schrijft, maar het is
+dezelfde klasse: een effect dat ontstond doordat het uitvoeringspad en het
+beoordelingspad niet gescheiden waren. Deze regel is precies het soort regel dat
+over twee jaar sneuvelt met "voor deze ene feature is rechtstreeks schrijven
+makkelijker", en hij hoort daarom een handhaver te krijgen en niet alleen een
+alinea.
+
+*Wat hem vandaag handhaaft:* `test/stuur-aanval.test.js` (promptinjectie kan
+zichzelf niet goedkeuren) en de bouw van `kern/stuur/goedkeuring.js` (het interne
+akkoord is een `Symbol`). *Wat er nog niet is:* een statische controle die een
+schrijvende aanroep in een modelantwoordpad überhaupt vindt.
+
+---
+
+## 9. Wat er bewust NIET komt
+
+- **Geen tweede frictiemotor.** Er is er één te veel, niet één te weinig.
+- **Geen vijfde capabilitygraaf.** Er zijn er al vier die zo heten en iets
+  anders doen: `command/graaf.js` (gegevens, gemeten), `command/vermogens.js`
+  (per categorie, bewust niet per functie-id), `magnaat-capabilities.js`
+  (codescan met risicoklasse) en het routedossier in Kantoor.
+- **Geen handgeschreven capability-register.** `CAPABILITEIT.json`: 21
+  woordenlijsten, 249 leden, 92% in precies één lijst. De 22e komt er niet bij.
+- **Geen AI-eigen rechtenmodel.** De AI kan nooit meer dan de persoon die hem
+  iets vraagt, en dat blijft één codepad.
+- **Geen Mijn AI vóór bewijs.**
+- **Geen mandaat dat consent-, gegevens- of geldregels overschrijft.**
+- **Geen losse tool-exposure van honderden endpoints aan een model.** Een model
+  met honderden gereedschappen is iets anders dan een model dat een plan
+  oplevert dat daarna deterministisch gewogen wordt (`FABRIC.md` par. 2).
+- **Geen Engelse naam voor de speelruimte.** `envelop` is bezet
+  (`kern/envelop.js`, gesloten op acht velden) en dit huis heeft één keer
+  eerder een naambotsing betaald (`capability` tegenover `VERMOGENS`, opgelost
+  door laag 4 om te dopen tot *genre-cap*). De doorsnede uit grens 2 heet hier
+  **de speelruimte**.

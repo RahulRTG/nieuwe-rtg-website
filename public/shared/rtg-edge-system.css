@@ -134,6 +134,51 @@ body.rtg-edge-embed .lo-rail,body.rtg-edge-embed .lo-top,body.rtg-edge-embed .lo
   .rtg-edge-state span{display:none}.rtg-edge-state{padding:0 12px}.rtg-edge-worldbar a{padding:0 8px;font-size:0}.rtg-edge-worldbar a span{font-size:8px;letter-spacing:.04em}.rtg-edge-bottom{grid-template-columns:var(--edge-side) 40px 59px minmax(0,1fr) 58px}.rtg-edge-layout{display:none!important}.rtg-edge-action{padding:0 9px}.rtg-edge-ai small{display:none}.rtg-edge-crumbs{padding:0 9px;gap:5px}.rtg-edge-crumbs button{max-width:34%}.rtg-edge-crumbs button:nth-of-type(2){display:none}.rtg-edge-crumbs i:nth-of-type(2){display:none}
   body.rtg-edge-host .lo-stage{display:block}.rtg-edge-host .lo-panel{display:none!important}.rtg-edge-host .lo-panel[data-edge-active]{display:block!important;height:100%}
   body.rtg-edge-host>#balk{box-sizing:border-box;width:calc(100vw - var(--edge-side));max-width:calc(100vw - var(--edge-side))}
+
+  /* ---- DE BLADEN GAAN NAAR DE DUIM ----
+     Op een bureauscherm staan de bladen van een wereld bovenaan; op een telefoon
+     hoort wat je DOET onderaan (GRAMMATICA.md: "ik wil iets doen -> mijn duim
+     vindt het onderaan"). Bladwisselen is het meest gedane dat er op deze
+     schermen is, en bovenaan is dat op een groot toestel niet te halen zonder
+     het apparaat om te pakken.
+
+     Ze liggen DIRECT op de bank, zonder tussenruimte en zonder eigen bovenrand
+     boven die van de bank: samen een blok van twee lagen, en niet twee balken
+     die om aandacht vechten. De bank blijft de onderste -- daar staan menu,
+     terug, de handeling en Rahul, en die zijn wereldbreed. Wat erboven ligt gaat
+     alleen over DIT scherm.
+
+     Alleen op de telefoon: op bureau blijven ze bovenaan, waar meer breedte is
+     dan aandacht. Zie test/appmenu.e2e.js voor de regel die zegt dat er onderaan
+     maar EEN vaste NAVIGATIEbalk hoort te staan -- de bank is dat; deze strook
+     schakelt tussen de bladen van het scherm dat je al open hebt. */
+  body.rtg-edge-host .wereldtabs,
+  body.rtg-edge-host .hoofdtabs{position:fixed!important;z-index:8790;
+    left:var(--edge-side);right:0;top:auto!important;
+    bottom:calc(var(--edge-bottom) + env(safe-area-inset-bottom,0px))!important;
+    order:0!important;margin:0!important;
+    border-top:1px solid var(--edge-line)!important;border-bottom:0!important;
+    background:color-mix(in srgb,var(--edge-bg) 96%,transparent)!important;
+    backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px)}
+  /* Een blad is een raakvlak van minstens 44 hoog (TOEGANKELIJK.md vraagt 24;
+     dit is een rij waar een duim doorheen gaat, dus ruimer). */
+  body.rtg-edge-host .wereldtabs .wereldtab,
+  body.rtg-edge-host .wereldtabs .rtg-rahul-tab,
+  body.rtg-edge-host .hoofdtabs button{min-height:46px;border-bottom:0!important;border-top:0!important}
+  /* De inhoud moet erlangs kunnen: de strook ligt OVER de pagina, dus de voet
+     van het document krijgt zijn hoogte erbij. Zonder deze regel valt de laatste
+     regel van een scherm eronder -- en juist de laatste regel is waar iemand
+     naartoe scrolt. */
+  body.rtg-edge-host:has(.wereldtabs),
+  body.rtg-edge-host:has(.hoofdtabs){
+    padding-bottom:calc(var(--edge-bottom) + 47px + env(safe-area-inset-bottom,0px))!important}
+  /* De korte weg (shared/sprong.js) hangt op 76px van de onderrand: net boven de
+     bank. Met de bladenbalk erbij lag hij OVER de plus -- een zwevende knop die
+     een echte knop afdekt. Hij schuift mee omhoog, en alleen waar die strook er
+     werkelijk is. */
+  body.rtg-edge-host:has(.wereldtabs) .rtgsprong-greep,
+  body.rtg-edge-host:has(.hoofdtabs) .rtgsprong-greep{
+    bottom:calc(123px + env(safe-area-inset-bottom,0px))!important}
 }
 @media(min-width:768px) and (max-width:1024px){.rtg-edge-host[data-rtg-layout="4"] .lo-stage{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr))}.rtg-edge-host[data-rtg-layout="4"] .lo-panel{padding:18px 16px}}
 @media(prefers-reduced-motion:reduce){.rtg-edge-chrome *{transition:none!important}}

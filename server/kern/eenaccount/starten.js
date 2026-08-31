@@ -20,7 +20,7 @@
 module.exports = (ctx) => {
   const { db, save, crypto, accounts, findSupplier, rememberSession, logInlog,
     logActivity, supplierState, officeState, magWerken, pinInfo, pinCheck,
-    lijst, zelfde, eigenaarKantoor, afgeleid, nu, persoonsPoort } = ctx;
+    lijst, zelfde, eigenaarKantoor, afgeleid, nu, persoonsPoort, sessieregister } = ctx;
 
   /* Het lidnummer uit de lidsleutel. De sleutel is 'user-<id>' -- dezelfde vorm
      die kernlaag1, kernlaag7 en kern/wauw.js al lezen. Geen tweede opzoeking in
@@ -52,6 +52,25 @@ module.exports = (ctx) => {
       const p = await pinCheck(key, body.pin);
       if (p.error) return { status: p.status || 401, error: p.error, pinNodig: true };
     }
+    /* NAMENS WIE (MIJN RTG blok 3). Hier ontstaat een tweede context voor
+       dezelfde mens: hij was al ingelogd als zichzelf en handelt nu namens een
+       zaak of namens het kantoor. Dat is precies het moment waarop het
+       vastgelegd hoort te worden -- achteraf uit de rol afleiden zou een
+       afleiding zijn en dus hoogstens `vermoed` opleveren, terwijl wij het nu
+       met zekerheid weten.
+
+       De contextId is een CODE en geen naam: de naam van de zaak wordt door het
+       scherm opgezocht, om dezelfde reden als bij de toestelnaam -- een sessie
+       repliceert over een bus en draagt daarom geen namen. */
+    function legContext(sess, lidKey, soort, contextId) {
+      if (!sessieregister || !sess || !sess.sid) return;
+      sessieregister.open(sess.sid, lidKey, {
+        context: { contextId: String(contextId), contextSoort: soort, contextVersie: 1,
+          herkomst: { bron: 'eenaccount/starten', methode: 'gemeten',
+            vastgesteldOp: new Date().toISOString(), regelversie: 'blok3' } }
+      });
+    }
+
     /* De werkruimte munt geen nieuwe sessie: hij HEEFT er al een, en dat is de
        code plus het lid-token dat deze persoon zelf in handen had toen hij
        koppelde. We geven dus terug wat hij al bezit -- geen escalatie, wel het
@@ -68,7 +87,9 @@ module.exports = (ctx) => {
       const token = crypto.randomBytes(24).toString('hex');
       // lidKey reist mee: zo weet de boardroom-poort WIE er door de
       // kantoordeur kwam (de eigenaar of iemand met gegeven toegang)
-      rememberSession(token, { role: 'office', lidKey: key });
+      const oSess = { role: 'office', lidKey: key };
+      rememberSession(token, oSess);
+      legContext(oSess, key, 'kantoor', 'rtg-kantoor');
       logInlog('office', true, 'backoffice via RTG-account', req);
       return { status: 200, ok: true, rol: 'kantoor', token, state: officeState() };
     }
@@ -106,7 +127,9 @@ module.exports = (ctx) => {
        agenda van dit lid kan kijken; nooit naar die van iemand anders. `lid`
        reist mee omdat de persoonseis en de loonlaag het lidnummer zelf nodig
        hebben -- dat ontbrak hier, net als in kern/werkbijlogin.js. */
-    rememberSession(token, { role: 'supplier', code: s.code, actor: actor.name, staffId: actor.staffId, staffRole: actor.role, manager: actor.manager, lidKey: key, lid: lidId });
+    const zSess = { role: 'supplier', code: s.code, actor: actor.name, staffId: actor.staffId, staffRole: actor.role, manager: actor.manager, lidKey: key, lid: lidId };
+    rememberSession(token, zSess);
+    legContext(zSess, key, 'zaak', s.code);
     logInlog('zaak', true, s.code + ' · ' + actor.name + ' via RTG-account', req);
     logActivity(s.code, actor, actor.name + ' logde in met het RTG-account');
     /* Rahuls welzijnszin: een stille, eenmalige opmerking bij de start --

@@ -45,6 +45,8 @@
      alleen wil weten of hij deze sessie herkent. */
   .samen{margin-top:0.55rem;font-size:0.92rem;line-height:1.6;}
   .samen .los{color:var(--soft);font-size:0.82rem;}
+  /* Een sessie die namens iemand anders loopt, hoort op te vallen. */
+  .samen .namens{color:var(--gold);font-size:0.85rem;}
   .techkop{margin-top:1rem;border-top:1px solid var(--line);}
 
   /* DE BEWIJSRAIL. Drie segmenten: vermoed vult er een, gemeten twee, bewezen
@@ -186,6 +188,14 @@
   }
 
   function titelVoor(s, huidige) {
+    /* EEN WERKSESSIE HEET NAAR ZIJN CONTEXT. Wie op een gedeelde kassa staat
+       ingelogd, zoekt die regel op de naam van de zaak en niet op het toestel --
+       en het toestel is daar juist van iemand anders. De persoonlijke context
+       voegt niets toe aan de titel (dat is de normale stand), dus die valt
+       terug op het toestel en daarna op het kenmerk. */
+    if (s.contextSoort && s.contextSoort !== 'persoonlijk') {
+      return s.contextNaam || (s.contextSoort === 'kantoor' ? 'RTG Kantoor' : 'Zaak ' + (s.contextId || ''));
+    }
     return naamVoorToestel(s)
       || (s.sid === huidige ? 'Deze sessie' : 'Sessie ' + kenmerkVan(s.sid));
   }
@@ -210,7 +220,13 @@
     const tb = s.stand.toestel;
     const toestel = !tb || !tb.aanwezig ? 'Toestel nog niet bevestigd'
       : (tb.graad === 'bewezen' ? 'Toestel cryptografisch bevestigd' : 'Toestel bekend (' + tb.graad + ')');
-    return { eerste: hoe + ' \u00b7 ' + wanneer(s.gezienOp) + ' actief', tweede: toestel };
+    /* "Namens uzelf" op elke kaart zetten is ruis: dat is de normale stand.
+       Een AFWIJKENDE context is juist het eerste wat iemand moet zien, want
+       daar hangen andere rechten aan. Uitzonderingen tonen, niet de regel --
+       ONTWERP.md noemt dat uitzonderingsgestuurd ontwerpen. */
+    const namens = s.contextSoort && s.contextSoort !== 'persoonlijk'
+      ? 'Namens ' + (s.contextNaam || s.contextId || 'een andere partij') : null;
+    return { eerste: hoe + ' \u00b7 ' + wanneer(s.gezienOp) + ' actief', tweede: toestel, namens };
   }
 
   function kaart(s, huidige) {
@@ -223,6 +239,7 @@
     const sam = samenvatting(s);
     const blok = maak('div', 'samen');
     blok.appendChild(tekst(maak('div'), sam.eerste));
+    if (sam.namens) blok.appendChild(tekst(maak('div', 'namens'), sam.namens));
     blok.appendChild(tekst(maak('div', 'los'), sam.tweede));
     el.appendChild(blok);
 

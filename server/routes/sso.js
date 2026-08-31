@@ -33,6 +33,8 @@ const { log } = require('../log');
    met een blinde vlek voed je niet met ruis. */
 const OVERDRACHT = binnenkomst.OVERDRACHT;
 
+const { legInlogVast } = require('../kern/identiteit/inlogherkomst');
+
 module.exports = (kern) => {
   const { app, accounts, appUrl, stateFor, logInlog } = kern;
 
@@ -134,14 +136,8 @@ module.exports = (kern) => {
        overdracht zwak is, maar omdat wij niet weten of daar een passkey of een
        wachtwoord aan vooraf ging. Dat als `gemeten` opschrijven zou bewijs
        claimen dat aan de andere kant van de naad ligt. */
-    if (kern.sessieregister && typeof accounts.sessieVan === 'function') {
-      const sid = accounts.sessieVan(token);
-      if (sid) kern.sessieregister.open(sid, sess.key, {
-        authenticator: { type: 'overdracht', assurance: 'overgedragen',
-          herkomst: { bron: 'sso/overdracht', methode: 'afgeleid',
-            vastgesteldOp: new Date().toISOString(), regelversie: 'blok1' } }
-      });
-    }
+    legInlogVast({ sessieregister: kern.sessieregister, accounts, token, lidKey: sess.key,
+      type: 'overdracht', assurance: 'overgedragen', methode: 'afgeleid', bron: 'sso/overdracht' });
     res.json({ token, state: stateFor(sess, req.body.lang) });
   });
 };

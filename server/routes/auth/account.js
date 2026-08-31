@@ -2,6 +2,8 @@
    e-mailbevestiging en het opnieuw sturen van de bevestigingslink. Krijgt
    de gedeelde context een keer bij het opstarten vanuit routes/auth.js. */
 const eigenaar = require('../../eigenaar'); // een bron van waarheid over wie de eigenaar is
+const { legInlogVast } = require('../../kern/identiteit/inlogherkomst');
+
 module.exports = (actx) => {
   const { PERSONAS, PRODUCTION, UPLOAD_DIR, accounts, app, appUrl, auth, checkCred, crypto, db, express, forgetSession, fs, hasCred, leeftijdVan, loginFails, mail, memberTemplate, noteFailedTry, path, rememberSession, save, schoon, sessions, stateFor, tooManyTries, logInlog,
     DEMO, pasAppOk, PAS_FOUT, pasAppVan, DEV_VELDEN, automatisering, kern, sessieregister } = actx;
@@ -62,14 +64,8 @@ app.post('/api/auth/register', async (req, res) => {
        Zonder deze regel begint elk nieuw lid met "Herkomst niet vastgelegd" op
        zijn eigen sessiescherm -- op precies het moment dat hij het huis leert
        kennen. Het wachtwoord is hier zojuist door hemzelf gezet, dus `gemeten`. */
-    if (sessieregister && typeof accounts.sessieVan === 'function') {
-      const sid = accounts.sessieVan(token);
-      if (sid) sessieregister.open(sid, sess.key, {
-        authenticator: { type: 'wachtwoord', assurance: 'kennis',
-          herkomst: { bron: 'auth/registratie', methode: 'gemeten',
-            vastgesteldOp: new Date().toISOString(), regelversie: 'blok1' } }
-      });
-    }
+    legInlogVast({ sessieregister, accounts, token, lidKey: sess.key,
+      type: 'wachtwoord', assurance: 'kennis', methode: 'gemeten', bron: 'auth/registratie' });
     if (email === eigenaar.eigenaarEmail()) delete process.env.RTG_OWNER_BOOTSTRAP;
     res.json({ token, state: stateFor(sess, req.body.lang), needsEmailVerify: true,
       ...(werk ? { werk } : {}), ...(DEV_VELDEN(req) ? { devVerifyUrl: verifyUrl } : {}) });

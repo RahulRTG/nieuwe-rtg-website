@@ -554,7 +554,9 @@ function alcoholGrensVan(s) {
 const { maakSessies } = require('./kern/sessies');
 const { sessions, tokenHash, rememberSession, forgetSession, sessionFor,
   koppelBus: koppelSessiesBus, herbouwSessions, TOKEN_TTL_MS } =
-  maakSessies({ db, save, crypto });
+  maakSessies({ db, save, crypto,
+    // lui: accounts is hier al geladen, maar de pijl houdt de volgorde vrij
+    sessieIngetrokken: (sid) => (accounts && typeof accounts.sessieIngetrokken === 'function' ? accounts.sessieIngetrokken(sid) : false) });
 
 /* Inlogpogingen afremmen: per emmer hooguit tien mislukkingen (of de grens die
    de aanroeper meegeeft), daarna vijf minuten wachten. Geldt voor wachtwoorden
@@ -2233,7 +2235,7 @@ const hulp = {
      409 hoorde, en het tegoed bleef verrekend. Nooit de ene helft van dit
      paar doorgeven zonder de andere. */
   ordersVanKlant, ordersVanZaak, pasTegoedToe, herstelTegoed, path, pickupCode, pinSlot, pushLive, rememberSession,
-  reserveerTafel, rtf, rtmail, save, schoon, sendPush, sendPushToUser, sociaal, sseToCustomer,
+  reserveerTafel, rtf, rtmail, save, schoon, sessieregister, sendPush, sendPushToUser, sociaal, sseToCustomer,
   sseToOffice, sseToSupplier, supplierState, ticketsVoorSlot, verdienPunten, zetRtgai, zorgContact,
   /* Voor "wie van je vrienden is er nu" (kern/spellen/presence.js): de levende
      lijst van open live-verbindingen, en dezelfde functiepoort die

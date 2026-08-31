@@ -142,7 +142,7 @@ function maakTokens(getUserById) {
      aanroepers niets merken van de knip. */
   const herstel = require('./herstel').maakHerstel(getUserById);
 
-  return { issueToken, verifyToken, sessieVan, trekIn, trekInActie, isIngetrokken, trekInSessie, issueActionToken, verifyActionToken,
+  return { issueToken, verifyToken, sessieVan, trekIn, trekInActie, isIngetrokken, trekInSessie, sessieIngetrokken, issueActionToken, verifyActionToken,
     setEmailVerified: herstel.setEmailVerified, createReset: herstel.createReset,
     findByReset: herstel.findByReset, setPassword: herstel.setPassword };
 }

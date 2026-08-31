@@ -25,14 +25,14 @@ const register = () => maakSessieregister({ db: { data: {} }, save() {} });
 /* De route bouwen op een nagemaakte app: we willen de HANDLERS toetsen, niet
    HTTP. Elke app.post legt zijn handler in een kaart; de toets roept hem aan
    met een verzoek en een antwoord die alleen kunnen wat hier nodig is. */
-function bouwRoutes({ reg, ingetrokken }) {
+function bouwRoutes({ reg, ingetrokken, findSupplier }) {
   const routes = {};
   const app = { post: (pad, auth, fn) => { routes[pad] = fn; } };
   const accounts = {
     trekInSessie: (sid) => { ingetrokken.add(sid); return true; },
     sessieIngetrokken: (sid) => ingetrokken.has(sid)
   };
-  require('../server/routes/member/sessies')({ app, auth: null, accounts, sessieregister: reg });
+  require('../server/routes/member/sessies')({ app, auth: null, accounts, sessieregister: reg, findSupplier });
   return routes;
 }
 const antwoord = () => {
@@ -147,6 +147,89 @@ test('5e. de lijst geeft de soort mee, los van de graad', () => {
   assert.equal(per.overdracht, 'vermoed', 'een overgedragen sessie is nooit zelf gezien; afgeleid geeft vermoed');
   assert.ok('sleutelwoorden' in per && 'overdracht' in per,
     'zonder soort moet een scherm hem uit de graad raden, en dat gaat stuk zodra er een derde manier bij komt');
+});
+
+/* ---------------------------------------------------------------------------
+   NAMENS WIE. Twee dingen die niet mogen schuiven: de sessie draagt een CODE en
+   nooit een naam (zelfde reden als bij het toestel -- zij repliceert over een
+   bus), en een naam die niet meer op te zoeken is wordt null en geen gok.
+   ------------------------------------------------------------------------- */
+test('5f. de sessie draagt de contextcode, de naam komt van de bron', () => {
+  const reg = register();
+  reg.open('aaaaaaaaaaaa', 'user-1', { context: { contextId: 'ZAAK7', contextSoort: 'zaak', contextVersie: 1,
+    herkomst: hk('gemeten') } });
+  const rauw = JSON.stringify(reg.lees('aaaaaaaaaaaa'));
+  assert.equal(rauw.includes('Bloomingdale'), false, 'een bedrijfsnaam hoort niet in de sessie');
+
+  const routes = bouwRoutes({ reg, ingetrokken: new Set(),
+    findSupplier: (code) => (code === 'ZAAK7' ? { code, naam: 'Bloomingdale' } : null) });
+  const res = antwoord();
+  routes['/api/mijn/sessies'](verzoek({ tier: 'rtg', key: 'user-1', account: {} }), res);
+  assert.equal(res.data.sessies[0].contextNaam, 'Bloomingdale');
+  assert.equal(res.data.sessies[0].contextId, 'ZAAK7');
+});
+
+/* DEZE TOETS KWAM UIT DE MUTATIEPROEF. 5f keek alleen naar wat er OPGESLAGEN
+   ligt, dus een naam die het register in zijn projectie verzon bleef groen. De
+   scherpere regel is structureel: het register levert geen contextNaam, punt.
+   Dat opzoeken is het werk van de route, bij de partij die de naam bezit. */
+test('5f2. het register levert GEEN naam -- dat is werk van de route', () => {
+  const reg = register();
+  reg.open('aaaaaaaaaaaa', 'user-1', { context: { contextId: 'ZAAK7', contextSoort: 'zaak', contextVersie: 1,
+    herkomst: hk('gemeten') } });
+  const rij = reg.vanLid('user-1')[0];
+  assert.equal('contextNaam' in rij, false,
+    'zou het register een naam leveren, dan heeft hij een tweede bron voor iets dat elders al bestaat');
+  assert.equal('toestelNaam' in rij, false);
+  assert.equal(rij.contextId, 'ZAAK7');
+});
+
+test('5g. een zaak die niet meer bestaat geeft null, nooit een gok', () => {
+  const reg = register();
+  reg.open('aaaaaaaaaaaa', 'user-1', { context: { contextId: 'WEG', contextSoort: 'zaak', contextVersie: 1,
+    herkomst: hk('gemeten') } });
+  const routes = bouwRoutes({ reg, ingetrokken: new Set(), findSupplier: () => null });
+  const res = antwoord();
+  routes['/api/mijn/sessies'](verzoek({ tier: 'rtg', key: 'user-1', account: {} }), res);
+  assert.equal(res.data.sessies[0].contextNaam, null,
+    'een verkeerde bedrijfsnaam naast "sluit deze sessie" is een dure vergissing');
+});
+
+test('5h. persoonlijk heet Uzelf en heeft geen bron nodig', () => {
+  const reg = register();
+  reg.open('aaaaaaaaaaaa', 'user-1', { context: { contextId: 'persoonlijk', contextSoort: 'persoonlijk',
+    contextVersie: 1, herkomst: hk('gemeten') } });
+  const routes = bouwRoutes({ reg, ingetrokken: new Set(), findSupplier: () => { throw new Error('niet opzoeken'); } });
+  const res = antwoord();
+  routes['/api/mijn/sessies'](verzoek({ tier: 'rtg', key: 'user-1', account: {} }), res);
+  assert.equal(res.data.sessies[0].contextNaam, 'Uzelf');
+});
+
+/* OOK UIT DE MUTATIEPROEF: dat een werksessie een sid krijgt, stond nergens
+   vast. Zonder sid staat een werkplek-inlog niet in "waar ben ik aanwezig" en
+   is hij dus ook niet te sluiten -- terwijl een kassa op een gedeelde computer
+   juist de sessie is die je wilt kunnen afsluiten. */
+test('5i. ook een werksessie krijgt een sessie-identiteit', () => {
+  const { maakSessies } = require('../server/kern/sessies');
+  const crypto = require('crypto');
+  const S = maakSessies({ db: { data: {} }, save() {}, crypto });
+  const sess = { role: 'supplier', code: 'ZAAK7', lidKey: 'user-1' };
+  S.rememberSession('tok-abc', sess);
+  assert.match(String(sess.sid), /^[A-Za-z0-9_-]{12}$/, 'zonder sid is deze sessie niet aanwijsbaar en dus niet te sluiten');
+  assert.equal(S.sessionFor('tok-abc').sid, sess.sid);
+});
+
+test('5j. en een intrekking op de sid werkt ook op een werksessie', () => {
+  const { maakSessies } = require('../server/kern/sessies');
+  const crypto = require('crypto');
+  const buiten = new Set();
+  const S = maakSessies({ db: { data: {} }, save() {}, crypto, sessieIngetrokken: (sid) => buiten.has(sid) });
+  const sess = { role: 'supplier', code: 'ZAAK7', lidKey: 'user-1' };
+  S.rememberSession('tok-abc', sess);
+  assert.ok(S.sessionFor('tok-abc'), 'eerst gewoon geldig');
+  buiten.add(sess.sid);
+  assert.equal(S.sessionFor('tok-abc'), null,
+    'een knop die op de ene soort sessie werkt en op de andere niet, is erger dan geen knop');
 });
 
 test('6. een gast heeft hier niets te zoeken', () => {

@@ -33,7 +33,21 @@
 const TOKEN_MAX_MS = 30 * 24 * 3600 * 1000;
 
 module.exports = (kern) => {
-  const { app, auth, accounts, sessieregister, toestellen, handelingsspoor } = kern;
+  const { app, auth, accounts, sessieregister, toestellen, findSupplier, handelingsspoor } = kern;
+
+  /* NAMENS WIE, in mensentaal. Weer geldt de knip van het toestel: de sessie
+     draagt een CODE, de naam komt van de partij die hem bezit. Een zaak die
+     niet meer bestaat geeft null en dus de code -- nooit een gok, want een
+     verkeerde bedrijfsnaam naast "sluit deze sessie" is een dure vergissing. */
+  function contextNaam(r) {
+    if (r.contextSoort === 'persoonlijk') return 'Uzelf';
+    if (r.contextSoort === 'kantoor') return 'RTG Kantoor';
+    if (r.contextSoort === 'zaak' && r.contextId && findSupplier) {
+      const s = findSupplier(r.contextId);
+      return (s && s.naam) || null;
+    }
+    return null;
+  }
 
   const eisLid = (req, res) => {
     if (req.session.tier === 'guest') { res.status(403).json({ error: 'Alleen voor leden.' }); return false; }
@@ -58,7 +72,9 @@ module.exports = (kern) => {
          naam die het lid zelf gaf. Onbekend of ingetrokken toestel geeft null,
          nooit een gok -- anders staat er "MacBook" bij iets anders. */
       const tid = r.toestelId;
-      return Object.assign({}, r, { toestelNaam: tid && toestellen ? toestellen.naamVan(req.session.key, tid) : null });
+      return Object.assign({}, r, {
+        toestelNaam: tid && toestellen ? toestellen.naamVan(req.session.key, tid) : null,
+        contextNaam: contextNaam(r) });
     });
     /* WAAROM HIER EEN UITLEG BIJ ZIT EN GEEN AANTAL. Een lijst met "3 actieve
        apparaten" nodigt uit tot geruststelling; deze lijst hoort te zeggen wat

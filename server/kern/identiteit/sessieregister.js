@@ -143,6 +143,11 @@ function maakSessieregister({ db, save }) {
            staan, dan had de sessie hem moeten dragen -- en dat is precies wat
            de verbodenlijst tegenhoudt. */
         toestelId: (rij.context.toestel && rij.context.toestel.toestelId) || null,
+        /* Dezelfde knip als bij het toestel: de CODE reist mee, de naam niet.
+           De naam van een zaak wordt door de route opgezocht bij de bron die
+           hem bezit; een sessie draagt geen namen. */
+        contextSoort: (rij.context.context && rij.context.context.contextSoort) || null,
+        contextId: (rij.context.context && rij.context.context.contextId) || null,
         stand: ctx.stand(rij.context, nu) });
     }
     return uit.sort((a, b) => new Date(b.gezienOp) - new Date(a.gezienOp));

@@ -3,6 +3,8 @@
    dezelfde sessie als het wachtwoord, met dezelfde rem op de deur en
    dezelfde pas-app-controle. Krijgt de gedeelde context een keer bij het
    opstarten vanuit routes/auth.js. */
+const { legInlogVast } = require('../../kern/identiteit/inlogherkomst');
+
 module.exports = (actx) => {
   const { app, appUrl, auth, accounts, crypto, stateFor, pasAppOk, PAS_FOUT, isBaas, tooManyTries, noteFailedTry, loginFails,
     webauthn, sessieregister } = actx;
@@ -73,14 +75,9 @@ module.exports = (actx) => {
        passkey het was. Zonder dat kun je later niet zeggen "trek alles in dat
        met deze sleutel is gemaakt", en dat is precies wat een gestolen toestel
        nodig heeft. */
-    if (sessieregister && typeof accounts.sessieVan === 'function') {
-      const sid = accounts.sessieVan(token);
-      if (sid) sessieregister.open(sid, sess.key, {
-        authenticator: { type: 'passkey', authenticatorId: vingerafdruk(credential), assurance: 'bezit',
-          herkomst: { bron: 'webauthn', methode: 'cryptografisch',
-            vastgesteldOp: new Date().toISOString(), regelversie: 'blok1' } }
-      });
-    }
+    legInlogVast({ sessieregister, accounts, token, lidKey: sess.key,
+      type: 'passkey', assurance: 'bezit', methode: 'cryptografisch', bron: 'webauthn',
+      authenticatorId: vingerafdruk(credential) });
     res.json({ token, state: stateFor(sess, req.body.lang) });
   });
 };

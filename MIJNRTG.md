@@ -145,7 +145,7 @@ standaard of de wereld is er nog niet klaar voor.
 | 17 | Security autopilot / rechtenschuld | **stap weg** | `BEWIJSSCHULD.json` is het model: een schuld met een naam, een reden en een sluitweg. Identity debt is dezelfde vorm. |
 | 18 | Privacy budget (cumulatieve blootstelling) | **jaren** | Interessant en ongemeten. Niet beginnen vóór 8 en 11 staan. |
 | 19 | AI-mandaat i.p.v. almacht | **staat, verkeerde doelgroep** | `command.toezicht.zetGrenzen()` doet dit voor RTG-agenten. `FABRIC.md` par. 5 heeft de grenzen al. |
-| 20 | Contextwisseling zonder opnieuw inloggen | **staat** | `kern/eenaccount.js` + `/api/account/rollen|start`, `/api/sso/wissel`. |
+| 20 | Contextwisseling zonder opnieuw inloggen | **staat** | `kern/eenaccount.js` + `/api/account/rollen|start`, `/api/sso/wissel`. Sinds 31 augustus 2026 ook ZICHTBAAR: elke context legt zich vast bij het wisselen en verschijnt als eigen regel in "waar ben ik aanwezig". |
 | 21 | Aanwezigheid per context i.p.v. sessies | **na sessieverrijking** | Zie par. 2. |
 | 22 | Sender-constrained sessies (DPoP) | **besluit** | Gelaagd naar risico, niet overal. Een sleutelgebonden token voor betaalroutes is iets anders dan voor het lezen van een menukaart. |
 | 23 | Evidence-native UI | **staat als taal, niet als UI** | `BESTUUR.md`: onbekend → vermoed → gemeten → bewezen, met datum, en *vervallen bewijs is geen bewijs*. Niet opnieuw uitvinden. |

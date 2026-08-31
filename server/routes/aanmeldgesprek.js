@@ -12,6 +12,8 @@
 const vertaler = require('../translate');
 const { NL2EN } = require('../translate/woordenboek');
 
+const { legInlogVast } = require('../kern/identiteit/inlogherkomst');
+
 module.exports = (kern) => {
   const { app, intakeStart, intakeZeg, accounts, stateFor } = kern;
 
@@ -79,14 +81,8 @@ module.exports = (kern) => {
          hetzelfde opschrijven zou het sessiescherm laten zeggen dat iemand een
          wachtwoord gebruikte terwijl dat niet zo is -- en juist bij een melding
          "dit was ik niet" is dat het eerste wat een mens narekent. */
-      if (kern.sessieregister && typeof accounts.sessieVan === 'function') {
-        const sid = accounts.sessieVan(token);
-        if (sid) kern.sessieregister.open(sid, sess.key, {
-          authenticator: { type: 'sleutelwoorden', assurance: 'kennis',
-            herkomst: { bron: 'aanmeldgesprek', methode: 'gemeten',
-              vastgesteldOp: new Date().toISOString(), regelversie: 'blok1' } }
-        });
-      }
+      legInlogVast({ sessieregister: kern.sessieregister, accounts, token, lidKey: sess.key,
+        type: 'sleutelwoorden', assurance: 'kennis', methode: 'gemeten', bron: 'aanmeldgesprek' });
       return res.json({ tekst: await naarTaal(r.tekst, lang), ingelogd: true, token, state: stateFor(sess, lang) });
     }
     r.tekst = await naarTaal(r.tekst, lang);

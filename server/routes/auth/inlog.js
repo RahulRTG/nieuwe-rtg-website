@@ -9,6 +9,8 @@
 
    De gedeelde stukken (DEMO, pasAppOk, PAS_FOUT, isBaas) komen mee uit
    routes/auth.js en staan daar met de uitleg waarom ze zijn zoals ze zijn. */
+const { legInlogVast } = require('../../kern/identiteit/inlogherkomst');
+
 module.exports = (ctx) => {
   const { accounts, app, auth, crypto, loginFails, noteFailedTry, stateFor, tooManyTries, logInlog,
     pasAppOk, isBaas, kern , PAS_FOUT, sessieregister } = ctx;
@@ -132,19 +134,12 @@ app.post('/api/auth/login', async (req, res) => {
      zodat een geslaagde inlog ook een spoor nalaat als daar iets misgaat. */
   logInlog('account', true, user.id, req);
   const sess = { tier: user.tier, key: 'user-' + user.id, account: user };
-  /* MIJN RTG blok 1. Een wachtwoord is `gemeten` en niet `cryptografisch`: wij
-     controleerden een gedeeld geheim, niemand bewees sleutelbezit. Een
-     passkey-sessie hoort niet even zeker te lijken -- zie ./webauthn.js. Geen
-     authenticatorId, want er is er geen; een verzonnen id zou een sleutel
-     suggereren die niet bestaat. */
-  if (sessieregister && typeof accounts.sessieVan === 'function') {
-    const sid = accounts.sessieVan(token);
-    if (sid) sessieregister.open(sid, sess.key, {
-      authenticator: { type: 'wachtwoord', assurance: 'kennis',
-        herkomst: { bron: 'auth/inlog', methode: 'gemeten',
-          vastgesteldOp: new Date().toISOString(), regelversie: 'blok1' } }
-    });
-  }
+  /* MIJN RTG. Een wachtwoord is `gemeten` en niet `cryptografisch`: wij
+     controleerden een gedeeld geheim, niemand bewees sleutelbezit -- zie
+     ./webauthn.js, waar dezelfde claim wel `bewezen` haalt. Geen
+     authenticatorId, want er is er geen. */
+  legInlogVast({ sessieregister, accounts, token, lidKey: sess.key,
+    type: 'wachtwoord', assurance: 'kennis', methode: 'gemeten', bron: 'auth/inlog' });
   // Bestaande leden krijgen hun publieke adres bij de eerstvolgende veilige
   // inlog; een paswijziging verhuist hier ook naar het juiste pasdomein.
   try { require('../../kern/mail-publiek')({ accounts }).geefLid({

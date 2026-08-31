@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1413 bestanden en 9949 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1413 bestanden en 9955 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,13 +13,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 1413 |
-| losse beweringen (`test(...)`) | 9949 |
+| losse beweringen (`test(...)`) | 9955 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 50 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 969 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 38 |
-| alleen in de kop *genoemd*, nog niet gemeten | 117 |
-| niets van beide | 279 |
+| alleen in de kop *genoemd*, nog niet gemeten | 118 |
+| niets van beide | 278 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1238 bestanden, 9648 beweringen.
+1238 bestanden, 9654 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -661,7 +661,7 @@ toets omvalt.
 | `middleware.test.js` | 13 | gezakt op `!==->===#0` | De poortwachters die voor alle routers hangen (server/middleware/). Waarom deze test bestaat: bij het uit elkaar halen van server.js bleek de voordeur zijn scriptbeveiliging te missen. |
 | `migratierace.test.js` | 5 | gezakt op `getal+1#0` | TWEE PROCESSEN DIE TEGELIJK MIGREREN, EN ALLEBEI KOMEN ZE OP. WAAROM DIT BESTAAT. |
 | `migraties.test.js` | 8 | gezakt op `&&->||#0` | Schemamigraties: genummerd, precies een keer, en met een weigering om te starten op een database die nieuwer is dan de code. |
-| `mijnsessies.test.js` | 9 | -- | MIJN RTG blok 2 -- de sessielijst en het sluiten. DE BEWERING DIE ERTOE DOET staat in toets 2: sluiten werkt ECHT. |
+| `mijnsessies.test.js` | 15 | genoemd | MIJN RTG blok 2 -- de sessielijst en het sluiten. DE BEWERING DIE ERTOE DOET staat in toets 2: sluiten werkt ECHT. |
 | `minify.test.js` | 3 | gezakt op `===->!==#0` | Test voor de eigen minifier (scripts/ast/minify.js + print.js), die terser verving. Kern: de minifier levert NOOIT iets uit dat een andere boom oplevert dan de bron -- klopt de geprinte code niet exact, dan valt hij... |
 | `mobiel.test.js` | 5 | genoemd | DE TELEFOONPOORT MOET DICHT KUNNEN, EN OP DE JUISTE MOMENTEN OPEN BLIJVEN. GRAMMATICA.md belooft dat een mens zijn duim vindt wat hij zoekt, en ADAPTIEF.md dat een scherm op een telefoon past. |
 | `mobiliteit-werkkant-routes.test.js` | 6 | gezakt op `liegpoort /api/` | DE WERKKANT VAN DE MOBILITEIT -- dispatch, pendel, en de PDA van de chauffeur. test/mobiliteit.test.js loopt de reizigerskant en de toewijzing af. |

@@ -88,6 +88,11 @@ module.exports = function bouwKernAanDrie(kern, grens) {
      zet ik dat stop. Bewaart niets en trekt in bij de bron; krijgt daarom de
      KERN mee, net als Life, want hij leest lagen die verspreid gemonteerd zijn. */
   Object.assign(kern, require('../kern/consent')({ kern }));
+  /* De firewall herschikt wat consentVan oplevert en bewaart niets; hij krijgt
+     die twee functies mee in plaats van de kern, zodat hij niets anders KAN
+     lezen dan wat het Consent Center al toont. */
+  Object.assign(kern, require('../kern/consent-relaties').maakRelaties({
+    consentVan: kern.consentVan, consentIntrek: kern.consentIntrek }));
   require('../routes/consent')(grens('consent'));
   /* De inzagekaart (kern/inzagekaart.js): de andere helft van diezelfde vraag.
      Het Consent Center gaat over wat er OPENSTAAT, deze kaart over wat er IS

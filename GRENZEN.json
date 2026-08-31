@@ -265,6 +265,9 @@
     "consent": [
       "consentIntrek",
       "consentVan",
+      "gevolgenVan",
+      "relatieSluit",
+      "relatiesVan",
       "status"
     ],
     "dagcoach": [

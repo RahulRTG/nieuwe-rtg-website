@@ -31,7 +31,7 @@
    ========================================================================== */
 'use strict';
 
-const { machtiging } = require('./machtigingen');
+const { machtiging, MACHTIGINGEN } = require('./machtigingen');
 
 /* De klassen. `sleutel` is wat de code gebruikt, `label` wat een lid leest, en
    `betekent` de zin die eronder hoort te staan -- niet in een scherm getypt,
@@ -59,12 +59,8 @@ const OP_SLEUTEL = new Map(KLASSEN.map(k => [k.sleutel, k]));
    naar de zwaarste klasse in plaats van stilzwijgend als 'geen bereik' te
    tellen. Een onbekende bevoegdheid die als de veiligste wordt geteld, is
    precies het gat waar zo'n classificatie doorheen lekt. */
-const KLASSE_VAN_MACHTIGING = {
-  'opslag.eigen': 'eigen-potje',
-  'profiel.basis': 'met-identiteit',
-  'bericht.klaarzetten': 'met-bakje',
-  'arena.meedoen': 'op-een-bord'
-};
+const KLASSE_VAN_MACHTIGING = Object.fromEntries(
+  MACHTIGINGEN.filter(m => m.bereik).map(m => [m.id, m.bereik]));
 const ZWAARSTE = KLASSEN[KLASSEN.length - 1].sleutel;
 
 /* WAT VOOR ELKE APP GELDT, met de plek waar het wordt afgedwongen. Dit hoort

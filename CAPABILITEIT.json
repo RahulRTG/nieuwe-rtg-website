@@ -1,18 +1,12 @@
 {
-  "woordenlijsten": 22,
+  "woordenlijsten": 21,
   "leden": 250,
-  "ledenInEen": 225,
-  "ledenInMeer": 25,
-  "ledenInEenPct": 90,
-  "maxGelijkenis": 1,
-  "gelijkendeParen": 1,
-  "paren": [
-    {
-      "gelijkenis": 1,
-      "a": "server/kern/appstore/bereik.js :: KLASSE_VAN_MACHTIGING",
-      "b": "server/kern/appstore/machtigingen.js :: MACHTIGINGEN"
-    }
-  ],
+  "ledenInEen": 229,
+  "ledenInMeer": 21,
+  "ledenInEenPct": 92,
+  "maxGelijkenis": 0.22,
+  "gelijkendeParen": 0,
+  "paren": [],
   "gedeeldeLeden": [
     {
       "id": "tickets",
@@ -49,22 +43,6 @@
         "server/kern/pda/modules.js :: PER_CAP",
         "server/seed/genres-lijst-a.js :: caps (genre-register)",
         "server/seed/genres-lijst-b.js :: caps (genre-register)"
-      ]
-    },
-    {
-      "id": "arena.meedoen",
-      "lijsten": 2,
-      "waar": [
-        "server/kern/appstore/bereik.js :: KLASSE_VAN_MACHTIGING",
-        "server/kern/appstore/machtigingen.js :: MACHTIGINGEN"
-      ]
-    },
-    {
-      "id": "bericht.klaarzetten",
-      "lijsten": 2,
-      "waar": [
-        "server/kern/appstore/bereik.js :: KLASSE_VAN_MACHTIGING",
-        "server/kern/appstore/machtigingen.js :: MACHTIGINGEN"
       ]
     },
     {
@@ -148,14 +126,6 @@
       ]
     },
     {
-      "id": "opslag.eigen",
-      "lijsten": 2,
-      "waar": [
-        "server/kern/appstore/bereik.js :: KLASSE_VAN_MACHTIGING",
-        "server/kern/appstore/machtigingen.js :: MACHTIGINGEN"
-      ]
-    },
-    {
       "id": "orders",
       "lijsten": 2,
       "waar": [
@@ -177,14 +147,6 @@
       "waar": [
         "server/seed/genres-lijst-a.js :: caps (genre-register)",
         "server/seed/genres-lijst-b.js :: caps (genre-register)"
-      ]
-    },
-    {
-      "id": "profiel.basis",
-      "lijsten": 2,
-      "waar": [
-        "server/kern/appstore/bereik.js :: KLASSE_VAN_MACHTIGING",
-        "server/kern/appstore/machtigingen.js :: MACHTIGINGEN"
       ]
     },
     {
@@ -343,13 +305,13 @@
       "draagt": []
     },
     {
-      "lijst": "server/kern/appstore/bereik.js :: KLASSE_VAN_MACHTIGING",
+      "lijst": "server/kern/magnaat-partnerstudio-bedrijf.js :: RECHTEN",
       "leden": 4,
       "draagt": []
     },
     {
-      "lijst": "server/kern/magnaat-partnerstudio-bedrijf.js :: RECHTEN",
-      "leden": 4,
+      "lijst": "server/kern/overheid/index.js :: RECHTSVORMEN",
+      "leden": 3,
       "draagt": []
     }
   ],
@@ -365,5 +327,5 @@
   },
   "bestanden": 3001,
   "bekeken": 3001,
-  "kandidaten": 1029
+  "kandidaten": 1028
 }

@@ -52,10 +52,21 @@ const NIVEAU_TEKST = {
 };
 
 module.exports = ({ kern, LAGEN, NIET_GEDEKT }) => {
+  /* EEN LAAG DIE NIET IS AANGESLOTEN, MELDT ZICH -- hij wordt niet stil.
+
+     Hier stond `return { waarde: null }` voor een ontbrekende functie, en dat
+     is op dit scherm de gevaarlijkste stilte die er is: een laag die niet
+     bedraad is levert geen regel, en een lijst zonder regel leest als "niemand
+     kijkt mee". Precies andersom dus dan wat het lid zou moeten concluderen.
+
+     Zie test/consent.test.js, "een laag die het niet doet, wordt gemeld en niet
+     als leegte getoond". Het is dezelfde huisregel als in BESTUUR.md: `niet
+     vast te stellen` is een eersteklas uitslag naast in orde en storing, en
+     nooit een lege plek. */
   function lees(naam, fn) {
-    if (typeof fn !== 'function') return { waarde: null };
+    if (typeof fn !== 'function') return { fout: 'De laag ' + naam + ' is niet aangesloten.' };
     try { return { waarde: fn() }; }
-    catch (e) { return { fout: naam + ': ' + (e && e.message ? e.message : 'onbekende storing') }; }
+    catch (e) { return { fout: 'De laag ' + naam + ': ' + (e && e.message ? e.message : 'onbekende storing') }; }
   }
 
   function consentVan(key) {

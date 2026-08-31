@@ -23,7 +23,15 @@
    ========================================================================== */
 'use strict';
 
-const M = (id, label, geeft, nooit, risico, doelen) => ({ id, label, geeft, nooit, risico, doelen: doelen || [] });
+/* `bereik` is de klasse die ../appstore/bereik.js aan deze machtiging hangt: hoe
+   ver een app met haar kan komen. Hij staat HIER en niet daar, omdat daar een
+   tweede lijst van dezelfde vier id's ontstond -- en scripts/capabilities.js
+   telde die twee terecht als gelijkende lijsten (OS.md par. 2). Een machtiging
+   zonder `bereik` valt in bereik.js door de bodem naar de zwaarste klasse; dat
+   blijft zo, en juist daarom is dit veld geen verplichting maar een verzwaring
+   die je wegneemt als je weet wat je doet. */
+const M = (id, label, geeft, nooit, risico, doelen, bereik) =>
+  ({ id, label, geeft, nooit, risico, doelen: doelen || [], bereik: bereik || null });
 
 /* ----------------------------------------------------------------------------
    DE DOELEN, EN WAAROM HET EEN GESLOTEN LIJST IS.
@@ -62,13 +70,13 @@ const MACHTIGINGEN = [
     'je codenaam, je taal en welke pas je hebt',
     'je echte naam, je e-mailadres, je telefoonnummer, je adres of je geboortedatum',
     'laag',
-    ['aanspreken', 'taal-kiezen', 'pas-tonen']),
+    ['aanspreken', 'taal-kiezen', 'pas-tonen'], 'met-identiteit'),
   M('opslag.eigen',
     'Onthouden wat jij in deze app doet',
     'een eigen kladblok van deze app, alleen voor jou en alleen voor deze app',
     'inzage in wat je in een andere app hebt staan, of in de rest van je RTG-gegevens',
     'laag',
-    ['voortgang-onthouden', 'voorkeuren-onthouden', 'werk-bewaren']),
+    ['voortgang-onthouden', 'voorkeuren-onthouden', 'werk-bewaren'], 'eigen-potje'),
   /* DE VIERDE, EN DE ENIGE WAARBIJ EEN ANDER LID IETS VAN JOU ZIET. Daarom
      staat het risico op hoog en staat er in `nooit` met zoveel woorden wat er
      NIET op het bord komt. De 18+-poort erachter is dezelfde als die van de
@@ -79,13 +87,13 @@ const MACHTIGINGEN = [
     'je score in de arena van DEZE app, met je codenaam ernaast',
     'een plek in de ranglijsten van RTG zelf, en niets over leden die deze app niet spelen',
     'hoog',
-    ['meedoen-arena']),
+    ['meedoen-arena'], 'op-een-bord'),
   M('bericht.klaarzetten',
     'Een bericht voor je klaarzetten in de App Store',
     'hooguit een handvol berichten per dag, die je zelf ophaalt in de App Store',
     'een pushbericht, een e-mail, een sms, of iets dat je onderbreekt',
     'midden',
-    ['herinneren', 'klaar-melden'])
+    ['herinneren', 'klaar-melden'], 'met-bakje')
 ];
 
 const OP_ID = new Map(MACHTIGINGEN.map(m => [m.id, m]));

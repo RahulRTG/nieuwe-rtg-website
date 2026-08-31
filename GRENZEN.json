@@ -4,6 +4,7 @@
     "aanmeldgesprek": [
       "intakeStart",
       "intakeZeg",
+      "sessieregister",
       "stateFor"
     ],
     "aanmeldingen": [
@@ -1697,6 +1698,7 @@
       "accounts",
       "appUrl",
       "logInlog",
+      "sessieregister",
       "stateFor",
       "tenant"
     ],

@@ -74,6 +74,19 @@ module.exports = (kern) => {
       if (!user) return res.status(401).json({ error: await naarTaal('Inloggen lukte net niet; probeer het opnieuw.', lang) });
       const token = accounts.issueToken(user.id);
       const sess = { tier: user.tier, key: 'user-' + user.id, account: user };
+      /* MIJN RTG blok 1. Dit pad logt in met SLEUTELWOORDEN (zie de sw-stappen in
+         kern/aanmeldgesprek-inlog.js) en niet met een wachtwoord. Die twee als
+         hetzelfde opschrijven zou het sessiescherm laten zeggen dat iemand een
+         wachtwoord gebruikte terwijl dat niet zo is -- en juist bij een melding
+         "dit was ik niet" is dat het eerste wat een mens narekent. */
+      if (kern.sessieregister && typeof accounts.sessieVan === 'function') {
+        const sid = accounts.sessieVan(token);
+        if (sid) kern.sessieregister.open(sid, sess.key, {
+          authenticator: { type: 'sleutelwoorden', assurance: 'kennis',
+            herkomst: { bron: 'aanmeldgesprek', methode: 'gemeten',
+              vastgesteldOp: new Date().toISOString(), regelversie: 'blok1' } }
+        });
+      }
       return res.json({ tekst: await naarTaal(r.tekst, lang), ingelogd: true, token, state: stateFor(sess, lang) });
     }
     r.tekst = await naarTaal(r.tekst, lang);

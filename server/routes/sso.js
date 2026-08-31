@@ -127,6 +127,21 @@ module.exports = (kern) => {
     accounts.trekInActie(bewijs, OVERDRACHT);
     const token = accounts.issueToken(user.id);
     const sess = { tier: user.tier, key: 'user-' + user.id, account: user };
+    /* MIJN RTG blok 1, en hier ligt de eerlijkheid het gevoeligst: wij hebben
+       de OORSPRONKELIJKE inlog niet gezien. Wat wij controleerden is een
+       eenmalig overdrachtsbewijs met onze eigen handtekening. De methode is dus
+       `afgeleid` en de graad die daaruit volgt is `vermoed` -- niet omdat de
+       overdracht zwak is, maar omdat wij niet weten of daar een passkey of een
+       wachtwoord aan vooraf ging. Dat als `gemeten` opschrijven zou bewijs
+       claimen dat aan de andere kant van de naad ligt. */
+    if (kern.sessieregister && typeof accounts.sessieVan === 'function') {
+      const sid = accounts.sessieVan(token);
+      if (sid) kern.sessieregister.open(sid, sess.key, {
+        authenticator: { type: 'overdracht', assurance: 'overgedragen',
+          herkomst: { bron: 'sso/overdracht', methode: 'afgeleid',
+            vastgesteldOp: new Date().toISOString(), regelversie: 'blok1' } }
+      });
+    }
     res.json({ token, state: stateFor(sess, req.body.lang) });
   });
 };

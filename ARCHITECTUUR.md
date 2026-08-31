@@ -161,7 +161,7 @@ loginFails(5) logInlog(5) overheid(5) sseToCustomer(5)
 | Namen uit kern | Bestand |
 |---|---|
 | 71 | `server/routes/member/rechterhand.js` |
-| 42 | `server/routes/auth/account.js` |
+| 43 | `server/routes/auth/account.js` |
 | 41 | `server/routes/member/voertuigen/huur.js` |
 | 40 | `server/routes/member/voertuigen/charter.js` |
 | 40 | `server/routes/member/voertuigen/verkoop.js` |

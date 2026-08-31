@@ -132,7 +132,13 @@ function maakSessieregister({ db, save }) {
     for (const [sid, rij] of Object.entries(bak())) {
       if (!lidKey || rij.lidKey !== lidKey) continue;
       if (nu - new Date(rij.gezienOp || 0).getTime() > REGISTER_TTL_MS) continue;
-      uit.push({ sid, geopendOp: rij.geopendOp, gezienOp: rij.gezienOp, stand: ctx.stand(rij.context, nu) });
+      /* De SOORT naast de STAND. Zonder dit moet een scherm de soort raden uit de
+         graad ("bewezen dus een passkey"), en dat is precies zo lang waar tot er
+         een derde manier van inloggen bij komt. De soort is geen persoonsgegeven
+         en geen bewijs -- hij zegt WAT het was, de graad zegt hoe zeker. */
+      uit.push({ sid, geopendOp: rij.geopendOp, gezienOp: rij.gezienOp,
+        soort: (rij.context.authenticator && rij.context.authenticator.type) || null,
+        stand: ctx.stand(rij.context, nu) });
     }
     return uit.sort((a, b) => new Date(b.gezienOp) - new Date(a.gezienOp));
   }

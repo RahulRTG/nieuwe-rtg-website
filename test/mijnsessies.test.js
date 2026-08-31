@@ -129,6 +129,26 @@ test('5. een sessie zonder identiteit wordt gemeld en niet verzwegen', () => {
   assert.match(res.data.nietGetoond, /niet in de lijst/);
 });
 
+/* ---------------------------------------------------------------------------
+   DE SOORT EN DE GRAAD ZIJN TWEE DINGEN. De soort zegt WAT het was, de graad
+   hoe zeker wij dat weten. Het scherm raadde de soort eerst uit de graad
+   ("bewezen dus een passkey"), en dat klopt precies zolang er twee manieren van
+   inloggen zijn. Er zijn er inmiddels vier.
+   ------------------------------------------------------------------------- */
+test('5e. de lijst geeft de soort mee, los van de graad', () => {
+  const reg = register();
+  reg.open('aaaaaaaaaaaa', 'user-1', { authenticator: { type: 'sleutelwoorden', herkomst: hk('gemeten') } });
+  reg.open('bbbbbbbbbbbb', 'user-1', { authenticator: { type: 'overdracht', herkomst: hk('afgeleid') } });
+  const routes = bouwRoutes({ reg, ingetrokken: new Set() });
+  const res = antwoord();
+  routes['/api/mijn/sessies'](verzoek({ tier: 'rtg', key: 'user-1', account: {} }), res);
+  const per = Object.fromEntries(res.data.sessies.map(s => [s.soort, s.stand.authenticator.graad]));
+  assert.equal(per.sleutelwoorden, 'gemeten');
+  assert.equal(per.overdracht, 'vermoed', 'een overgedragen sessie is nooit zelf gezien; afgeleid geeft vermoed');
+  assert.ok('sleutelwoorden' in per && 'overdracht' in per,
+    'zonder soort moet een scherm hem uit de graad raden, en dat gaat stuk zodra er een derde manier bij komt');
+});
+
 test('6. een gast heeft hier niets te zoeken', () => {
   const routes = bouwRoutes({ reg: register(), ingetrokken: new Set() });
   const res = antwoord();

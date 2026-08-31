@@ -16,7 +16,7 @@
 const { legInlogVast } = require('../../kern/identiteit/inlogherkomst');
 
 module.exports = (kern) => {
-  const { app, auth, accounts, handelingsspoor, tweefactor, stateFor, sessieregister } = kern;
+  const { app, auth, accounts, handelingsspoor, tweefactor, stateFor, sessieregister, commercieel } = kern;
 
   const eisLid = (req, res) => {
     if (req.session.tier === 'guest') { res.status(403).json({ error: 'Alleen voor leden.' }); return false; }
@@ -124,5 +124,42 @@ module.exports = (kern) => {
       assurance: 'kennis+bezit', methode: 'gemeten', bron: 'auth/tweede' });
     res.json({ token, state: stateFor(sess, req.body.lang),
       ...(r.let ? { let: r.let } : {}), ...(r.soort ? { soort: r.soort } : {}) });
+  });
+
+  /* ------------------------------------------------------------------------
+     COMMERCIELE POST. Hier omdat het bij dezelfde vraag hoort als hierboven:
+     wat mag er met mij gebeuren en wie mag mij bereiken.
+
+     Alles staat standaard UIT. Aanzetten legt tijdstip EN herkomst vast, want
+     bij een klacht is de vraag niet of het aanstond maar wanneer u ja zei en
+     waar. De bron komt van de client maar wordt begrensd en nooit vertrouwd als
+     bewijs op zichzelf -- hij zegt waar de knop stond, niet dat er geklikt is.
+     ---------------------------------------------------------------------- */
+  app.post('/api/mijn/post', auth, (req, res) => {
+    if (!eisLid(req, res)) return;
+    res.json(commercieel.standVan(req.session.key));
+  });
+
+  app.post('/api/mijn/post/zet', auth, (req, res) => {
+    if (!eisLid(req, res)) return;
+    const r = commercieel.zet(req.session.key, req.body.soort, req.body.kanalen,
+      'scherm:' + String(req.body.bron || 'onbekend').slice(0, 40));
+    if (r.ok) spoor(req, 'post-toestemming', { soort: String(req.body.soort || '') });
+    res.status(r.status || 200).json(r);
+  });
+
+  /* AFMELDEN MOET NET ZO MAKKELIJK ZIJN ALS AANMELDEN, en dat is geen
+     vriendelijkheid maar een eis. Wie vier vinkjes moet omzetten om van post af
+     te komen, is niet afgemeld maar afgeschrikt. */
+  app.post('/api/mijn/post/alles-uit', auth, (req, res) => {
+    if (!eisLid(req, res)) return;
+    const r = commercieel.allesUit(req.session.key, 'afmeldknop');
+    spoor(req, 'post-alles-uit', { aantal: r.uitgezet });
+    res.json(r);
+  });
+
+  app.post('/api/mijn/post/geschiedenis', auth, (req, res) => {
+    if (!eisLid(req, res)) return;
+    res.json(commercieel.geschiedenisVan(req.session.key));
   });
 };

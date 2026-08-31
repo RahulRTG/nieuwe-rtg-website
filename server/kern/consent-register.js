@@ -52,6 +52,11 @@ const LAGEN = [
      buiten de dekkingstoets omdat zijn rij `ingetrokken: null` gebruikt in
      plaats van `status: 'actief'`. */
   { id: 'metier-naam', naam: 'Zaken die uw echte naam mogen opvragen', richting: 'ziet', gedekt: true },
+  /* Commerciele post is ook een toestemming, en hij hoort hier omdat een lid
+     niet hoort te moeten weten dat "wie mag mij benaderen" ergens anders woont
+     dan "wie mag iets van mij zien". Hij verschilt wel van alle andere: hier
+     verstuurt RTG ZELF, dus de partij is dit huis en niet een derde. */
+  { id: 'commercieel', naam: 'Post van RTG waarvoor u toestemming gaf', richting: 'seint', gedekt: true },
   { id: 'locatie', naam: 'Zaken die live met u meekijken', richting: 'ziet', gedekt: true },
   { id: 'zorgprofiel', naam: 'Uw zorgprofiel dat meereist met bestellingen', richting: 'ziet', gedekt: true },
   { id: 'toestel', naam: 'Toestellen die metingen wegschrijven', richting: 'schrijft', gedekt: true },

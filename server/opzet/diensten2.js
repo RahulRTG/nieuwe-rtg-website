@@ -130,6 +130,11 @@ const bezitsbewijs = require('../kern/identiteit/bezitsbewijs').maakBezitsbewijs
 /* De tweede factor woont bij accounts en niet bij db.data: het geheim gaat het
    versleutelde ledendossier in (zie de kop van kern/identiteit/tweefactor.js). */
 const tweefactor = require('../kern/identiteit/tweefactor').maakTweefactor({ accounts });
+/* Commerciele toestemming: standaard uit, met tijdstip en herkomst. Hij levert
+   ook `commercieelStand` en `commercieelZet` aan het Consent Center, zodat
+   "wie mag mij benaderen" op hetzelfde scherm staat als "wie mag iets van mij
+   zien" -- een lid hoort niet te moeten weten dat dat twee lagen zijn. */
+const commercieel = require('../kern/identiteit/commercieel').maakCommercieel({ db, save });
 
 /* Een token kan een demo-sessie zijn (in-memory) of een echt account-token
    (ondertekend, staatloos). Beide leveren een sessie met tier + unieke key.
@@ -240,6 +245,8 @@ function auth(req, res, next) {
 
   return {
     aiPoort, antivirus, archief, atelierweb, auth, automatisering, beveilig, naamlaag, 
-    resolveSession, sessieregister, toestellen, bezitsbewijs, tweefactor, mailQ, mailIn, mailAuth, mailBijlage, mailSleutel, rtmailAi, rtmail, rtmailTeam, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar, mailAanname, scanNet, wacht, werkmail
+    resolveSession, sessieregister, toestellen, bezitsbewijs, tweefactor, commercieel,
+    commercieelStand: (k) => commercieel.standVan(k),
+    commercieelZet: (k, s2, kan, bron) => commercieel.zet(k, s2, kan, bron), mailQ, mailIn, mailAuth, mailBijlage, mailSleutel, rtmailAi, rtmail, rtmailTeam, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar, mailAanname, scanNet, wacht, werkmail
   };
 };

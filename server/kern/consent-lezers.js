@@ -140,6 +140,18 @@ module.exports = ({ kern, LAGEN, NIET_GEDEKT }) => {
         tot: null, richting: 'ziet', intrekbaar: true });
     }
 
+    /* De commerciele toestemmingen. Eentje per SOORT en niet per kanaal: op dit
+       scherm is de vraag "mag RTG mij hierover benaderen", en de kanalen staan
+       erbij als wat het lid koos. Vier regels waar er een hoort, maakt een
+       overzicht onleesbaar. */
+    const com = pak('Commercieel', kern.commercieelStand && (() => kern.commercieelStand(key)));
+    for (const c of (com && com.soorten) || []) {
+      if (!c.aan) continue;
+      uit.push({ laag: 'commercieel', id: c.id, wie: 'Rahul Travel Group', partij: 'rtg',
+        wat: c.naam + ' (' + c.kanalen.join(', ') + ')',
+        tot: null, richting: 'seint', intrekbaar: true });
+    }
+
     const wacht = pak('Wachtlijst', kern.wachtlijstVan && (() => kern.wachtlijstVan(key)));
     for (const w of (wacht && wacht.lijsten) || []) {
       uit.push({ laag: 'wachtlijst', id: w.id, wie: w.aanbiederNaam, partij: sleutel(w.aanbiederCode || w.aanbiederNaam),

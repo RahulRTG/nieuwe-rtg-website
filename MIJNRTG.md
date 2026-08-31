@@ -339,6 +339,34 @@ zekerheden samen als een hele -- precies het samengestelde cijfer dat LAT-regel
 11 verbiedt. En elke stand draagt zijn `nietMeegewogen`: een stand die zwijgt
 over wat hij niet bekeek, laat een mens denken dat hij alles bekeek.
 
+## 5d. Commerciele post: toestemming, en niet een voorkeur
+
+Dit huis had al meldingsvoorkeuren (`kern/ervaring.js`, `MELDING_SCOPES`) en die
+staan **standaard aan**: dat zijn serviceberichten -- uw bestelling is onderweg,
+uw reservering is bevestigd. Ze uitzetten is een gemak dat RTG aanbiedt.
+
+Commerciele post is het omgekeerde, en dat is geen stijlkeuze maar de wet: zonder
+toestemming geen aanbieding. `kern/identiteit/commercieel.js` staat daarom
+standaard UIT, per soort en per kanaal apart -- ja tegen mail is geen ja tegen
+sms, en ja tegen aanbiedingen is geen ja tegen enquetes.
+
+**De geschiedenis is het bewijs.** Bij een klacht is de vraag niet of het
+aanstond maar wanneer iemand ja zei en waar. Elke beweging -- geven, wijzigen,
+intrekken -- komt in een lijst die aangroeit en nooit wordt herschreven, met
+tijdstip en herkomst. Een stand zonder herkomst is geen bewijs van toestemming;
+hij is een bewering dat er ooit toestemming was.
+
+**Wat er nooit onder valt** staat in `ALTIJD`, met de reden per regel:
+beveiligingswaarschuwingen, facturen en incasso, wettelijke mededelingen, en
+antwoord op iets dat u zelf vroeg. Die lijst gaat mee naar het scherm -- een
+toestemmingsscherm dat alleen toont wat je KUNT uitzetten, laat denken dat de
+rest ook uit kan.
+
+Het staat op het Consent Center en niet op een eigen eilandje: een lid hoort niet
+te moeten weten dat "wie mag mij benaderen" ergens anders woont dan "wie mag iets
+van mij zien". In de firewall groepeert het onder *Rahul Travel Group*, want hier
+verstuurt dit huis zelf en is de partij geen derde.
+
 ## 6. De volgorde
 
 Niet naar aantrekkelijkheid maar naar afhankelijkheid. Elk blok is los

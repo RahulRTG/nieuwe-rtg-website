@@ -43,6 +43,9 @@ module.exports = ({ kern }) => {
     if (laag === 'toestel') return kern.toestelIntrek(key, { id });
     if (laag === 'wachtlijst') return kern.wachtlijstAf(key, { id });
     if (laag === 'metier-naam') return kern.metierBewijs.trekIn(key, id);
+    /* Intrekken is hier: geen kanaal meer. Dat is dezelfde weg als het scherm
+       gebruikt, dus er ontstaat geen tweede manier om hetzelfde uit te zetten. */
+    if (laag === 'commercieel') return kern.commercieelZet(key, id, [], 'consentcentrum');
     if (laag === 'zorgprofiel') {
       /* Het profiel zelf blijft staan; alleen het MEEREIZEN gaat uit. Het
          weggooien zou meer doen dan er gevraagd is, en het lid raakt dan zijn

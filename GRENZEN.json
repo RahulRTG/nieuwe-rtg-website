@@ -264,6 +264,8 @@
       "werkOverzicht"
     ],
     "consent": [
+      "commercieelStand",
+      "commercieelZet",
       "consentIntrek",
       "consentVan",
       "gevolgenVan",
@@ -803,6 +805,7 @@
       "commDm",
       "commGast",
       "commWerk",
+      "commercieel",
       "conciergeIntrek",
       "conciergeVerzoeken",
       "conciergeVraag",

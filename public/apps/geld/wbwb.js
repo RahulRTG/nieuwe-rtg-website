@@ -22,7 +22,7 @@
     } catch (e) {
       /* de poort van de oude pagina: niet ingelogd of geen lid, dan geen
          half scherm maar alleen de uitleg */
-      $('#wbFout').innerHTML = '<p class="stil">' + Geld.esc(e.message) + ' Log eerst in via de leden-app.</p>';
+      $('#wbFout').innerHTML = RTGLeeg.html(RTGLeeg.vanFout({ status: 401, message: Geld.esc(e.message) }));
       $('#wbLijst').hidden = true;
       $('#wbGroep').hidden = true;
     }

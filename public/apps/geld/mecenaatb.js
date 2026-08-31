@@ -28,8 +28,7 @@
       /* Bij een 403 is de serverzin (onderdeel van de Lifestyle Pass) het
          hele verhaal; daar hoort geen inloghint achteraan. Al het andere is
          vrijwel altijd niet ingelogd, zoals in de andere standen. */
-      $('#mcVak').innerHTML = '<p class="stil">' + Geld.esc(e.message) +
-        (e.status === 403 ? '' : ' Log eerst in via de leden-app.') + '</p>';
+      $('#mcVak').innerHTML = RTGLeeg.html(RTGLeeg.vanFout(e));
     }
   }
 

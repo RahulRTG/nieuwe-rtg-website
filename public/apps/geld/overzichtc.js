@@ -35,8 +35,7 @@
     } catch (e) {
       C = null;
       /* hint alleen bij 401: een 500 zo noemen is een leugen */
-      $('#ovVak').innerHTML = '<p class="stil">' + esc(e.message) +
-        (e.status === 401 ? ' Log eerst in via de leden-app.' : '') + '</p>';
+      $('#ovVak').innerHTML = RTGLeeg.html(RTGLeeg.vanFout(e));
     }
   }
 

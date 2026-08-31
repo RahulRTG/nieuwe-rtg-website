@@ -32,7 +32,7 @@
           '<button class="knop" id="blBeweeg" type="button">Vraag Rahul naar sport en wellness</button>' +
         '</div>';
     } catch (e) {
-      $('#blWeek').innerHTML = '<p class="stil">' + esc(e.message) + ' Log eerst in via de leden-app.</p>';
+      $('#blWeek').innerHTML = RTGLeeg.html(RTGLeeg.vanFout({ status: 401, message: esc(e.message) }));
       $('#blAdvies').innerHTML = '<p class="stil">Niet geladen.</p>';
       $('#blKook').innerHTML = '<p class="stil">Niet geladen.</p>';
     }

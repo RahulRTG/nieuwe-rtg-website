@@ -75,7 +75,21 @@ body[data-rtg-world]::before{
    balk niet), en de schil begint onder de balk in plaats van bovenaan het
    venster. De hoogte staat als variabele zodat er maar een getal is. */
 :root{ --os-switcher-h:64px; }
-body:has(> .os-switcher) .rtg-edge-chrome{ top:var(--os-switcher-h); }
+/* TWEE SOORTEN SCHERMEN, TWEE KANTEN OP SCHUIVEN.
+
+   Eerst schoof hier de gedeelde schil (`.rtg-edge-chrome`) omlaag. Dat klopte
+   niet: die schil zet zelf al `padding-top` op de body, dus de switcher stond
+   al ONDER zijn balk -- en door hem ook nog eens 64px te verplaatsen kwam hij
+   precies over de switcher heen te liggen. Twee dingen die allebei ruimte
+   maakten voor elkaar.
+
+   De schil is de baas waar hij bestaat: zijn balk blijft op nul en de switcher
+   plakt eronder. Waar hij NIET bestaat draagt het scherm zijn eigen zijbalk,
+   en dan is het andersom -- daar staat de switcher bovenaan en schuift de
+   zijbalk. Die tweede regel staat hieronder. */
+body.rtg-edge-host > .os-switcher{
+  top:calc(var(--edge-top,40px) + env(safe-area-inset-top,0px));
+}
 /* Niet elk scherm gebruikt die schil: de meeste dragen hun EIGEN vaste
    zijbalk of kopbalk, elk met een eigen klassenaam (.media-bank, .bank, ...).
    Een regel per naam wordt een lijst die veroudert, dus wordt hier op VORM
@@ -83,12 +97,12 @@ body:has(> .os-switcher) .rtg-edge-chrome{ top:var(--os-switcher-h); }
    niets bij een statisch element, dus dit raakt alleen wat werkelijk vast of
    plakkend staat -- precies de elementen die anders onder de balk verdwijnen.
    De hoogte krimpt mee, anders schuift de onderkant het beeld uit. */
-body:has(> .os-switcher) > aside,
-body:has(> .os-switcher) > nav,
-body:has(> .os-switcher) > header{
+body:has(> .os-switcher):not(.rtg-edge-host) > aside,
+body:has(> .os-switcher):not(.rtg-edge-host) > nav,
+body:has(> .os-switcher):not(.rtg-edge-host) > header{
   top:var(--os-switcher-h);
 }
-body:has(> .os-switcher) > aside{
+body:has(> .os-switcher):not(.rtg-edge-host) > aside{
   max-height:calc(100vh - var(--os-switcher-h));
 }
 .os-switcher{

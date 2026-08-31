@@ -19,7 +19,7 @@
     catch (e) {
       /* de poort van de oude pagina: niet ingelogd (of gast), dan geen half
          scherm maar alleen de uitleg waarom */
-      $('#lfFout').innerHTML = '<p class="stil">' + Geld.esc(e.message) + ' Log eerst in via de leden-app.</p>';
+      $('#lfFout').innerHTML = RTGLeeg.html(RTGLeeg.vanFout({ status: 401, message: Geld.esc(e.message) }));
       $('#lfBody').hidden = true;
       return;
     }

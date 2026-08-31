@@ -33,7 +33,7 @@
   async function laad() {
     try { B.ov = await w.Geld.api('/api/bank/overzicht'); render(); }
     catch (e) {
-      $('#bkApp').innerHTML = '<p class="stil">' + w.Geld.esc(e.message) + ' Log eerst in via de leden-app.</p>';
+      $('#bkApp').innerHTML = RTGLeeg.html(RTGLeeg.vanFout({ status: 401, message: w.Geld.esc(e.message) }));
     }
   }
 

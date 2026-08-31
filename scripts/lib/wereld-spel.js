@@ -30,7 +30,7 @@
    grens, geen gebrek, en de wereld loopt gewoon door naar de volgende. */
 'use strict';
 
-async function zetSpelKlaar({ post, tokens }) {
+async function zetSpelKlaar({ post, tokens, gezinLijf }) {
   const stappen = [];
   const een = (tokens || {}).member;
   const twee = (tokens || {})['member-account'];
@@ -61,11 +61,69 @@ async function zetSpelKlaar({ post, tokens }) {
     stappen.push({ naam: 'tweede speler voor ' + soort, pad: '/api/member/spel/random',
       status: b ? b.status : 0, ok: !!id,
       waarom: id ? null : ((b && b.data && b.data.error) || 'er ontstond geen potje') });
-    if (id) return { klaar: true, extra: { id, potje: id, soort }, stappen, reden: null };
+    if (!id) continue;
+
+    /* EN DE RTF-HELFT, met precies dezelfde mechaniek maar andere mensen.
+       /api/rtf/spel/* draait niet op een sessie maar op een gezinscode plus
+       een profieltoken uit het LIJF (routes/spellen.js, rtfSpeler). Ook daar
+       zijn twee spelers nodig, en een gezin heeft er standaard maar een: de
+       beheerder.
+
+       De weg is de echte weg van het product: de beheerder maakt een profiel
+       voor een kind, en dat kind kiest zichzelf met zijn eigen pincode
+       (/api/foundation/gezin/profiel/kies). Dat is de enige route die een
+       profieltoken teruggeeft -- `profiel/maak` doet dat met opzet niet, en
+       dat is geen gebrek maar een grens: een token is een sleutel, en die
+       hoort achter de pincode van de eigenaar vandaan te komen.
+
+       Lukt deze helft niet, dan blijft de RTG-helft gewoon staan. Twee
+       halve werelden zijn beter dan een die valt op de tweede. */
+    const rtf = await rtfPotje(post, gezinLijf, soort, stappen);
+    const extra = { id, potje: id, soort };
+    if (rtf) extra.rtf = rtf;
+    return { klaar: true, extra, stappen, reden: null };
   }
 
   return { klaar: false, extra: {}, stappen,
     reden: 'geen van de ' + soorten.length + ' spelsoorten leverde een potje op; zie stappen' };
+}
+
+async function rtfPotje(post, gezinLijf, soort, stappen) {
+  if (!gezinLijf || !gezinLijf.code || !gezinLijf.token) {
+    stappen.push({ naam: 'een potje in het gezin', pad: '/api/rtf/spel/random', status: 0, ok: false,
+      waarom: 'er is geen gezinssleutel; zonder gezinscode en profieltoken speelt daar niemand' });
+    return null;
+  }
+  const G = { code: gezinLijf.code, token: gezinLijf.token };
+  const doe = async (naam, pad, lijf) => {
+    let a = null;
+    try { a = await post(pad, lijf, null); } catch (e) { a = null; }
+    const ok = a && a.status >= 200 && a.status < 300;
+    stappen.push({ naam, pad, status: a ? a.status : 0, ok,
+      waarom: ok ? null : ((a && a.data && a.data.error) || 'geen antwoord') });
+    return ok ? a.data : null;
+  };
+
+  const gemaakt = await doe('een tweede profiel in het gezin', '/api/foundation/gezin/profiel/maak',
+    /* De pincode is '5678' en niet '1234' of '4321', en dat is geen smaak: de
+       gezinsfamilie maakt de beheerder met 1234 en de schoolwereld een kind
+       met 4321, allebei in DIT gezin. Een gezin weigert twee gelijke pincodes
+       ("Kies voor ieder gezinslid een andere pincode"), en dat is precies de
+       weigering die deze stap een ronde lang tegenhield. */
+    { ...G, naam: 'Proefspeler', rol: 'kind', geboortedatum: '2014-05-05', pin: '5678' });
+  const profielId = gemaakt && gemaakt.profiel && gemaakt.profiel.id;
+  if (!profielId) return null;
+
+  const gekozen = await doe('dat profiel kiest zichzelf met zijn pincode',
+    '/api/foundation/gezin/profiel/kies', { ...G, profielId, pin: '5678' });
+  const tweede = gekozen && gekozen.token;
+  if (!tweede) return null;
+
+  await doe('de beheerder in de wachtrij', '/api/rtf/spel/random', { ...G, soort, grootte: 2 });
+  const b = await doe('het kind erbij, en het potje start', '/api/rtf/spel/random',
+    { code: G.code, token: tweede, soort, grootte: 2 });
+  const id = b && b.id;
+  return id ? { id, potje: id, code: G.code, token: G.token, profielId } : null;
 }
 
 module.exports = { zetSpelKlaar };

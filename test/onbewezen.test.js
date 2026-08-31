@@ -30,7 +30,7 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { meet, BAKKEN, KLAAR } = require('../scripts/onbewezen');
+const { meet, bakVan, BAKKEN, KLAAR } = require('../scripts/onbewezen');
 
 const u = meet();
 
@@ -64,11 +64,38 @@ test('een route zonder proefsleutel is geen verouderde meting', () => {
   const geen = u.bakken.find(b => b.id === 'GEEN_PROEFSLEUTEL');
   const stale = u.bakken.find(b => b.id === 'STALE_BEWIJS');
   assert.ok(geen, 'de bak GEEN_PROEFSLEUTEL hoort te bestaan');
-  assert.ok(geen.aantal > 0,
-    'er zijn routes zonder sleutel (het mutatieboek telt er honderden); ' +
-    'staan die op 0, dan vallen ze ergens anders in en waarschijnlijk in STALE_BEWIJS');
-  assert.ok(stale.aantal < geen.aantal + stale.aantal,
-    'niet alles hoort stale te heten');
+  /* HIER STOND `geen.aantal > 0`, en dat was een GETAL en geen regel. Toen deze
+     toets werd geschreven telde het mutatieboek er honderden, en de zorg was
+     terecht: een bak die op nul springt terwijl de sleutels ontbreken, betekent
+     dat die routes ergens anders zijn beland.
+
+     Inmiddels is die bak echt leeg -- elke rol heeft een sleutel, en dat was
+     het werk van zestien stappen. De toets zakte daarop, en dat is precies
+     verkeerd om: een toets hoort te zakken als het SLECHTER wordt.
+
+     Wat hij nu bewaakt is de zorg zelf en niet het getal: nul mag, maar dan
+     moet STALE_BEWIJS ook nul zijn. Waren er sleutels weggevallen, dan zouden
+     die routes zonder meting in STALE belanden en zou deze toets alsnog zakken. */
+  if (geen.aantal === 0) {
+    assert.equal(stale.aantal, 0,
+      'GEEN_PROEFSLEUTEL staat op nul terwijl er ' + stale.aantal + ' routes in STALE_BEWIJS staan; ' +
+      'dat is precies hoe een ontbrekende sleutel zich vermomt als een verouderde meting');
+  }
+
+  /* EN DE REGEL ZELF, want de twee tellingen hierboven staan allebei op nul en
+     kunnen elkaar dus niet meer tegenspreken. Een toets die vandaag niet kan
+     zakken is geen toets (LAT.md regel 9), dus wordt de indeler hier
+     RECHTSTREEKS gevraagd wat hij van een sleutelloze route vindt. Die vraag
+     blijft falsifieerbaar ook als de bak voorgoed leeg blijft. */
+  const zonderSleutel = bakVan({ pad: '/api/verzonnen/proef', bestand: null }, null, null, true, false);
+  assert.equal(zonderSleutel, 'GEEN_PROEFSLEUTEL',
+    'een route zonder sleutel hoort GEEN_PROEFSLEUTEL te heten en niet "' + zonderSleutel + '"');
+  const metSleutel = bakVan({ pad: '/api/verzonnen/proef', bestand: null }, null, null, false, false);
+  assert.equal(metSleutel, 'STALE_BEWIJS',
+    'een route MET sleutel maar zonder meting hoort wel STALE te heten');
+  /* De oude staartcontrole (`stale < geen + stale`) stond hier om te zeggen
+     dat niet ALLES stale mocht heten. Met allebei op nul rekende die zichzelf
+     kapot (0 < 0), en hij zei niets meer dat de regel hierboven niet al zegt. */
 });
 
 test('elke onbewezen route valt in precies een bak, en de optelling sluit', () => {

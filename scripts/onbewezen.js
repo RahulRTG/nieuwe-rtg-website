@@ -342,4 +342,4 @@ if (require.main === module) {
     console.log('\n  weggeschreven in ONBEWEZEN.json');
   }
 }
-module.exports = { meet, BAKKEN, KLAAR };
+module.exports = { meet, bakVan, BAKKEN, KLAAR };

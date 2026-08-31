@@ -43,6 +43,20 @@ test('1c. een passkey is BEZIT', () => {
   assert.equal(standVan({ authenticator: g('bewezen') }, 'passkey').stand, 'bezit');
 });
 
+/* DE TREDE DIE HET DUURST WAS OM EERLIJK TE HOUDEN. Twee factoren zijn beter
+   dan een, en het is NIET hetzelfde als een passkey: een TOTP-code komt uit een
+   geheim dat RTG ook heeft, en een mens kan hem voorlezen aan wie erom vraagt.
+   Hem onder `bezit` scharen zou een groen vinkje zijn dat phishing niet
+   tegenhoudt. */
+test('1c2. wachtwoord + TOTP is twee factoren, en blijft onder een passkey', () => {
+  const t = standVan({ authenticator: g('gemeten') }, 'wachtwoord+totp');
+  assert.equal(t.stand, 'tweefactor');
+  assert.ok(STANDEN.tweefactor.rang > STANDEN.kennis.rang, 'het is beter dan een wachtwoord alleen');
+  assert.ok(STANDEN.tweefactor.rang < STANDEN.bezit.rang, 'en het is minder dan aangetoond bezit');
+  assert.match(t.uitleg, /doorvertellen|phishing/i,
+    'de uitleg hoort te zeggen waarom dit geen phishingbestendigheid is');
+});
+
 test('1d. een bewezen toestelbinding tilt een wachtwoordsessie naar bezit', () => {
   const s = standVan({ authenticator: g('gemeten'), toestel: g('bewezen') }, 'wachtwoord');
   assert.equal(s.stand, 'bezit', 'het toestel heeft een sleutel aangetoond die het niet kan verlaten');
@@ -141,7 +155,7 @@ test('5c. het register levert hem mee zonder hem op te slaan', () => {
 
 test('6. de standen zijn geordend en compleet', () => {
   const rangen = Object.values(STANDEN).map(s => s.rang).sort();
-  assert.deepEqual(rangen, [0, 1, 2, 3]);
+  assert.deepEqual(rangen, [0, 1, 2, 3, 4]);
   for (const [id, s] of Object.entries(STANDEN)) {
     assert.ok(s.naam && s.uitleg && s.uitleg.length > 25, id + ' mist een uitleg die een mens iets zegt');
   }

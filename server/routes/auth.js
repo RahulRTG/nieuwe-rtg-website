@@ -69,7 +69,7 @@ module.exports = (kern) => {
      van registreren is in dit huis de volgorde van afhandelen. */
   require('./auth/inlog')({ PERSONAS, accounts, app, auth, checkCred, crypto, forgetSession, hasCred,
     loginFails, noteFailedTry, rememberSession, sessions, stateFor, tooManyTries, logInlog,
-    DEMO, pasAppOk, PAS_FOUT, isBaas, kern, sessieregister: kern.sessieregister });
+    DEMO, pasAppOk, PAS_FOUT, isBaas, kern, sessieregister: kern.sessieregister, tweefactor: kern.tweefactor });
 
   /* De registratie-, herstel- en verificatieroutes draaien als submodules
      op een gedeelde context, een keer opgebouwd bij het opstarten. */

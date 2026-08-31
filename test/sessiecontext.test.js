@@ -47,24 +47,52 @@ test('1b. alleen een handtekening haalt "bewezen"', () => {
 /* ---------------------------------------------------------------------------
    2. VERVALLEN BEWIJS IS GEEN BEWIJS (BESTUUR.md).
    ------------------------------------------------------------------------- */
-/* Het voorbeeld is `risico` en niet `vertrouwen`: dat laatste veld is er op
-   31 augustus 2026 uit gehaald omdat niemand het ooit schreef. Een
-   vertrouwensstand is een gevolgtrekking en geen waarneming, en die hoort niet
-   te worden bewaard -- zie kern/identiteit/vertrouwen.js. Het GEDRAG dat deze
-   toets bewaakt is ongewijzigd. */
+/* DE VERVALREGEL, en waarom hij hier met een STAND-IN wordt getoetst.
+
+   Sinds `vertrouwen` en `risico` uit de veldenlijst zijn gehaald (allebei omdat
+   niemand ze ooit schreef), draagt geen enkel veld nog een `verval`. De regel
+   "vervallen bewijs is geen bewijs" (BESTUUR.md) raakt dus vandaag niets meer.
+
+   Hem daarom maar weghalen zou fout zijn: hij geldt op het moment dat er ooit
+   een claim bijkomt die over de HUIDIGE toestand van de wereld gaat, en een
+   regel die je dan opnieuw moet bedenken, wordt dan vergeten. Vandaar `graadMet`
+   -- dezelfde rekenweg, met de velddefinitie als argument, zodat de regel
+   toetsbaar blijft zonder dat er een veld voor in de lijst hoeft te staan dat
+   niemand vult.
+
+   DIT IS DUS EEN ZWAKKERE TOETS DAN HIJ WAS, en dat hoort er hard bij te staan:
+   hij bewaakt de rekenregel, niet dat er ergens een veld is dat hem gebruikt. */
+const UUR = 3600 * 1000;
+const STANDIN = { soort: 'claim', persoonsgegeven: false, verval: 1 * UUR };
+
 test('2. een verlopen meting zakt naar vermoed en zegt dat erbij', () => {
-  const oud = nu - 2 * 3600 * 1000;                  // risico vervalt na een uur
-  const { context } = ctx.bouw({ risico: { risicoRef: 'r1', herkomst: hk('gemeten', oud) } });
-  const s = ctx.stand(context, nu).risico;
+  const claim = { herkomst: hk('gemeten', nu - 2 * UUR) };
+  const s = ctx.graadMet(claim, STANDIN, nu);
   assert.equal(s.graad, 'vermoed');
   assert.equal(s.vervallen, true);
   assert.match(s.reden, /vervallen bewijs is geen bewijs/);
 });
 
 test('2b. maar zakt niet naar onbekend -- wij hebben het wel degelijk gemeten', () => {
-  const { context } = ctx.bouw({ risico: { risicoRef: 'r1', herkomst: hk('gemeten', nu - 40 * 24 * 3600 * 1000) } });
-  assert.equal(ctx.stand(context, nu).risico.graad, 'vermoed',
+  const s = ctx.graadMet({ herkomst: hk('gemeten', nu - 40 * 24 * UUR) }, STANDIN, nu);
+  assert.equal(s.graad, 'vermoed',
     '"nooit vastgesteld" en "ooit vastgesteld, nu verlopen" zijn twee verschillende dingen');
+});
+
+test('2c. binnen de termijn blijft de graad staan', () => {
+  assert.equal(ctx.graadMet({ herkomst: hk('gemeten', nu - 10 * 60 * 1000) }, STANDIN, nu).graad, 'gemeten');
+});
+
+test('2d. een veld ZONDER verval vervalt nooit', () => {
+  const oud = { herkomst: hk('cryptografisch', nu - 400 * 24 * UUR) };
+  assert.equal(ctx.graadMet(oud, { verval: null }, nu).graad, 'bewezen',
+    'een sleutel die ooit heeft ondertekend, heeft dat gedaan; dat verjaart niet vanzelf');
+});
+
+test('2e. vandaag draagt geen enkel veld een verval, en dat is bekend', () => {
+  const metVerval = Object.entries(ctx.VELDEN).filter(function (p) { return p[1].verval; });
+  assert.equal(metVerval.length, 0,
+    'komt hier ooit een veld bij met een verval, dan hoort de toets hierboven OOK op dat echte veld te draaien');
 });
 
 /* ---------------------------------------------------------------------------

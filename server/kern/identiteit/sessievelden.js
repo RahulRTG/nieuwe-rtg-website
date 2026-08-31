@@ -84,11 +84,18 @@ const VELDEN = {
      Hij wordt nu berekend op het moment dat iemand hem vraagt, in
      ./vertrouwen.js, en nergens bewaard. Een veld dat niemand vult is een
      belofte die niemand nakomt; die hoort weg en niet stil te blijven staan. */
-  risico: {
-    soort: 'verwijzing', persoonsgegeven: false, verval: 1 * UUR,
-    uitleg: 'Sleutel naar het risicodossier van deze sessie.',
-    vorm: { risicoRef: 'sleutel' }
-  },
+  /* HIER STOND `risico`, en hij is er om dezelfde reden uit als `vertrouwen`
+     hierboven: niemand schreef hem ooit. Er is geen risicoweging in dit huis en
+     die komt er voorlopig niet -- dat vraagt beleidskeuzes die de eigenaar
+     bewust niet heeft gemaakt (MIJNRTG.md par. 5c).
+
+     GEVOLG DAT ER EERLIJK BIJ HOORT: hiermee draagt GEEN ENKEL veld in deze
+     lijst nog een `verval`. De regel eronder -- vervallen bewijs is geen bewijs
+     (BESTUUR.md) -- blijft dus wel bestaan maar wordt door niets meer geraakt.
+     Hij is met opzet NIET weggehaald: hij geldt op het moment dat er ooit een
+     claim bijkomt die over de huidige toestand van de wereld gaat, en een regel
+     die je bij het toevoegen van zo'n claim opnieuw moet bedenken, wordt dan
+     vergeten. `graadMet` in ./sessiecontext.js houdt hem toetsbaar. */
   sleutelbinding: {
     soort: 'binding', persoonsgegeven: false, verval: null,
     uitleg: 'Of het token aan een sleutel gebonden is (sender-constrained).',

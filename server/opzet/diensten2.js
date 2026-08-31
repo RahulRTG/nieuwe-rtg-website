@@ -127,6 +127,9 @@ const toestellen = require('../kern/identiteit/toestellen').maakToestellen({ db,
 /* Het bezitsbewijs leunt op het toestelregister (daar ligt de publieke sleutel)
    en wordt door auth gebruikt; daarom hier, naast de andere twee. */
 const bezitsbewijs = require('../kern/identiteit/bezitsbewijs').maakBezitsbewijs({ db, save, toestellen });
+/* De tweede factor woont bij accounts en niet bij db.data: het geheim gaat het
+   versleutelde ledendossier in (zie de kop van kern/identiteit/tweefactor.js). */
+const tweefactor = require('../kern/identiteit/tweefactor').maakTweefactor({ accounts });
 
 /* Een token kan een demo-sessie zijn (in-memory) of een echt account-token
    (ondertekend, staatloos). Beide leveren een sessie met tier + unieke key.
@@ -237,6 +240,6 @@ function auth(req, res, next) {
 
   return {
     aiPoort, antivirus, archief, atelierweb, auth, automatisering, beveilig, naamlaag, 
-    resolveSession, sessieregister, toestellen, bezitsbewijs, mailQ, mailIn, mailAuth, mailBijlage, mailSleutel, rtmailAi, rtmail, rtmailTeam, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar, mailAanname, scanNet, wacht, werkmail
+    resolveSession, sessieregister, toestellen, bezitsbewijs, tweefactor, mailQ, mailIn, mailAuth, mailBijlage, mailSleutel, rtmailAi, rtmail, rtmailTeam, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar, mailAanname, scanNet, wacht, werkmail
   };
 };

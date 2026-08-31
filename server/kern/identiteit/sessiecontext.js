@@ -63,10 +63,20 @@ function herkomstOk(h) {
    `onbekend`: wij hebben het wel degelijk ooit gemeten, we weten alleen niet of
    het nu nog zo is. Dat verschil is precies wat een scherm hoort te tonen. */
 function graadVan(claim, nu = Date.now()) {
+  return graadMet(claim, VELDEN[claim && claim.veld], nu);
+}
+
+/* DEZELFDE REGEL, met de velddefinitie als argument.
+
+   Hij bestaat apart omdat er sinds het weghalen van `risico` geen enkel veld
+   meer een `verval` draagt (zie ./sessievelden.js). Zonder deze ingang zou de
+   regel "vervallen bewijs is geen bewijs" alleen nog bestaan als code die niets
+   raakt -- en dan is er niets dat hem overeind houdt tot de dag dat er weer een
+   claim bijkomt die over de huidige toestand van de wereld gaat. */
+function graadMet(claim, veld, nu = Date.now()) {
   if (!claim || !claim.herkomst || !herkomstOk(claim.herkomst)) {
     return { graad: 'onbekend', reden: 'geen herkomst vastgelegd' };
   }
-  const veld = VELDEN[claim.veld];
   const basis = METHODEN[claim.herkomst.methode].graad;
   const verval = veld && veld.verval;
   if (!verval) return { graad: basis, reden: METHODEN[claim.herkomst.methode].uitleg };
@@ -135,4 +145,4 @@ function stand(context, nu = Date.now()) {
   return uit;
 }
 
-module.exports = { VELDEN, VERBODEN, METHODEN, GRADEN, bouw, stand, graadVan, herkomstOk };
+module.exports = { VELDEN, VERBODEN, METHODEN, GRADEN, bouw, stand, graadVan, graadMet, herkomstOk };

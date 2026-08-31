@@ -43,9 +43,17 @@ const STANDEN = {
     uitleg: 'Van deze sessie is niet vastgelegd waarmee zij tot stand kwam.' },
   kennis: { rang: 1, naam: 'Alleen kennis',
     uitleg: 'Deze sessie steunt op iets dat u weet. Dat is over te dragen: af te kijken, te phishen of te vertellen.' },
-  bezit: { rang: 2, naam: 'Bezit aangetoond',
+  /* TWEE FACTOREN, MAAR ALLEBEI OVER TE DRAGEN. Een TOTP-code komt uit een
+     geheim dat RTG ook heeft, en een mens kan hem voorlezen aan wie erom vraagt.
+     Dat is aantoonbaar beter dan een wachtwoord alleen -- en het is niet
+     hetzelfde als een passkey, waar dit huis de private helft nooit heeft
+     gezien. Deze trede bestaat om dat verschil niet weg te poetsen: hem onder
+     `bezit` scharen zou een groen vinkje zijn dat phishing niet tegenhoudt. */
+  tweefactor: { rang: 2, naam: 'Twee factoren',
+    uitleg: 'Naast uw wachtwoord is een code uit uw authenticator gecontroleerd. Twee drempels in plaats van een -- maar allebei van de soort die u kunt doorvertellen, dus phishing werkt hier nog.' },
+  bezit: { rang: 3, naam: 'Bezit aangetoond',
     uitleg: 'Er is bezit van een sleutel of een toestel aangetoond, en dat is niet over te dragen.' },
-  gebonden: { rang: 3, naam: 'Bezit en binding',
+  gebonden: { rang: 4, naam: 'Bezit en binding',
     uitleg: 'Er is sleutelbezit aangetoond en het token van deze sessie zit aan die sleutel vast. Een gestolen token alleen levert niets op.' }
 };
 
@@ -83,12 +91,15 @@ function standVan(perVeld, soort) {
       betekenis: 'Zonder dit is er niets om op te bouwen.' });
   } else {
     const bezitAuth = auth.graad === 'bewezen';
-    stand = bezitAuth ? 'bezit' : 'kennis';
+    const tweeFactoren = /\+totp/.test(String(soort || ''));
+    stand = bezitAuth ? 'bezit' : (tweeFactoren ? 'tweefactor' : 'kennis');
     dragend.push(auth);
     gronden.push({ feit: 'Waarmee ingelogd', staat: soortNaam(soort, bezitAuth),
       betekenis: bezitAuth
         ? 'Een sleutel heeft ondertekend; dat is bezit en niet over te dragen.'
-        : 'Een gedeeld geheim is gecontroleerd. Dat is kennis, en kennis is over te dragen.' });
+        : (tweeFactoren
+          ? 'Een wachtwoord EN een code uit uw authenticator zijn gecontroleerd. Beide zijn door te vertellen, dus dit is twee drempels en geen phishingbestendigheid.'
+          : 'Een gedeeld geheim is gecontroleerd. Dat is kennis, en kennis is over te dragen.') });
   }
 
   /* Een bewezen toestelbinding tilt een kennis-sessie naar `bezit`: het toestel
@@ -139,6 +150,7 @@ function standVan(perVeld, soort) {
 }
 
 function soortNaam(soort, bezit) {
+  if (soort === 'wachtwoord+totp') return 'wachtwoord en authenticator';
   if (soort === 'passkey') return 'passkey';
   if (soort === 'wachtwoord') return 'wachtwoord';
   if (soort === 'sleutelwoorden') return 'sleutelwoorden';

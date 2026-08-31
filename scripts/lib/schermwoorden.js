@@ -11,6 +11,12 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
+/* GEEN REGEX MEER OP HTML. CodeQL noemde de vorige lezer twee keer HIGH
+   (js/bad-tag-filter) en had gelijk: `<script[\s\S]*?<\/script>` is te
+   misleiden, en dan lekt er code in de woordenlijst -- wat hier al een keer
+   gebeurd is (`fromCharCode` stond als woord op een scherm). scripts/lib/ontleed.js
+   loopt de tekst een keer door en weet in welke stand hij staat. */
+const ontleed = require('./ontleed');
 
 const STOP = new Set(['rtg', 'de', 'het', 'een', 'en', 'van', 'in', 'op', 'uw', 'je', 'mijn',
   'voor', 'met', 'bij', 'aan', 'die', 'dat', 'is', 'als', 'naar', 'over', 'onder', 'per',
@@ -30,9 +36,9 @@ function vanScherm(wortel, url) {
   const pad = path.join(wortel, 'public', String(url || '').split('?')[0].split('#')[0]);
   if (!url || !fs.existsSync(pad)) return [];
   const html = fs.readFileSync(pad, 'utf8');
-  const titel = (/<title[^>]*>([\s\S]*?)<\/title>/i.exec(html) || [])[1] || '';
-  const h1 = (/<h1[^>]*>([\s\S]*?)<\/h1>/i.exec(html) || [])[1] || '';
-  return [...new Set(woordenUit(titel + ' ' + h1.replace(/<[^>]+>/g, ' ')))];
+  const titel = ontleed.eersteElement(html, 'title');
+  const h1 = ontleed.eersteElement(html, 'h1');
+  return [...new Set(woordenUit(titel + ' ' + h1))];
 }
 
 /* BREDER, EN MET OPZET UIT EEN ANDERE HOEK. vanScherm() levert wat er IN de
@@ -43,17 +49,13 @@ function vanScherm(wortel, url) {
 function vanSchermBreed(wortel, url) {
   const pad = path.join(wortel, 'public', String(url || '').split('?')[0].split('#')[0]);
   if (!url || !fs.existsSync(pad)) return [];
-  let html = fs.readFileSync(pad, 'utf8');
-  /* Script en stijl eruit VOORDAT er iets geteld wordt. Zonder dit sluipen
-     `fromCharCode`, `svgHtml` en `disabled` binnen als 'woorden op het scherm',
-     en dan meet je hoe een pagina geschreven is in plaats van wat er staat. */
-  html = html.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ')
-             .replace(/<!-- WERELDROOSTER:[\s\S]*?<!-- \/WERELDROOSTER -->/g, ' ');
+  const html = fs.readFileSync(pad, 'utf8');
   /* De woordenschat van een scherm zit in zijn BEDIENING en zijn tussenkoppen:
      etiketten die een mens leest en onthoudt. Niet in de lopende tekst -- die is
-     proza, en wie daarop meet, meet of iemand de marketing kan navertellen. */
-  const koppen = (html.match(/<h[23][^>]*>[\s\S]*?<\/h[23]>/gi) || [])
-    .slice(0, 40).join(' ').replace(/<[^>]+>/g, ' ');
+     proza, en wie daarop meet, meet of iemand de marketing kan navertellen.
+     Script en stijl slaat de lezer zelf over, dus die kunnen hier niet meer
+     binnensluipen als 'woord op het scherm'. */
+  const koppen = ontleed.elementen(html, ['h2', 'h3'], 40).join(' ');
   return [...new Set(woordenUit(koppen).concat(woordenUit(etikettenVan(wortel, url).join(' '))))]
     .filter((w) => /^[a-zà-ÿ]+$/.test(w));
 }
@@ -68,32 +70,43 @@ function vanSchermBreed(wortel, url) {
 function etikettenVan(wortel, url) {
   const pad = path.join(wortel, 'public', String(url || '').split('?')[0].split('#')[0]);
   if (!url || !fs.existsSync(pad)) return [];
-  let html = fs.readFileSync(pad, 'utf8');
-  html = html.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ');
+  const html = fs.readFileSync(pad, 'utf8');
+  const uit = [];
+  const zie = new Set();
+  const neem = (t) => {
+    t = String(t || '').replace(/\s+/g, ' ').trim();
+    if (!t || t.length < 3 || t.length > 28) return;
+    if (t.split(' ').length > 3) return;
+    if (!/^[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ' -]*$/.test(t)) return;   // geen code, geen cijfers
+    const sleutel = t.toLowerCase();
+    if (zie.has(sleutel) || STOP.has(sleutel)) return;
+    zie.add(sleutel);
+    uit.push(t);
+  };
   /* HET GEGENEREERDE WERELDROOSTER TELT NIET MEE. Dat blok bevat de NAMEN van
      andere apps (scripts/wereldrooster.js schrijft ze in het huis van hun
      wereld); ze als HANDELING van dit huis opvoeren zou "Mall" een verrichting
      van Ontdekken maken, en zou de index bovendien van zichzelf laten groeien.
-     Ze zijn al bestemming in shared/sprongindex.json, en daar horen ze. */
-  html = html.replace(/<!-- WERELDROOSTER:[\s\S]*?<!-- \/WERELDROOSTER -->/g, ' ');
-  const uit = [];
-  const zie = new Set();
-  const pak = (re) => {
-    let m;
-    while ((m = re.exec(html)) && uit.length < 40) {
-      let t = m[1].replace(/<[^>]+>/g, ' ').replace(/&[a-z]+;/g, ' ').replace(/\s+/g, ' ').trim();
-      if (!t || t.length < 3 || t.length > 28) continue;
-      if (t.split(' ').length > 3) continue;
-      if (!/^[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ' -]*$/.test(t)) continue;   // geen code, geen cijfers
-      const sleutel = t.toLowerCase();
-      if (zie.has(sleutel) || STOP.has(sleutel)) continue;
-      zie.add(sleutel);
-      uit.push(t);
-    }
-  };
-  pak(/<button[^>]*>([\s\S]*?)<\/button>/gi);
-  pak(/<a[^>]*class="[^"]*(?:tab|nav|kaart|knop)[^"]*"[^>]*>([\s\S]*?)<\/a>/gi);
-  return uit;
+     Ze zijn al bestemming in shared/sprongindex.json, en daar horen ze.
+
+     Met een indexOf-lus en niet met een patroon: de merktekens zijn vaste tekst,
+     en dan is zoeken eerlijker dan matchen. */
+  let schoon = html;
+  for (;;) {
+    const a = schoon.indexOf('<!-- WERELDROOSTER:');
+    if (a < 0) break;
+    const b = schoon.indexOf('<!-- /WERELDROOSTER -->', a);
+    if (b < 0) break;
+    schoon = schoon.slice(0, a) + ' ' + schoon.slice(b + '<!-- /WERELDROOSTER -->'.length);
+  }
+  ontleed.elementen(schoon, ['button'], 200).forEach(neem);
+  /* De links die als tab, navigatie, kaart of knop bedoeld zijn -- dezelfde
+     keuze als hiervoor, alleen leest de lezer nu de tag in plaats van een
+     patroon over de hele pagina. Alle andere links zijn navigatie naar een
+     ander scherm en geen handeling van dit scherm. */
+  const bedienend = (tag) => /class\s*=\s*"[^"]*(?:tab|nav|kaart|knop)[^"]*"/i.test(tag);
+  ontleed.elementen(schoon, ['a'], 200, bedienend).forEach(neem);
+  return uit.slice(0, 40);
 }
 
 module.exports = { STOP, woordenUit, vanScherm, vanSchermBreed, etikettenVan };

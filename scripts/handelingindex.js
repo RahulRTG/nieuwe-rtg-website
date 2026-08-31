@@ -37,7 +37,14 @@ const DOEL = path.join(WORTEL, 'public', 'shared', 'handelingindex.json');
 const controle = process.argv.includes('--controle');
 
 const DREMPEL = 3;      // op hoeveel schermen een etiket hoogstens mag staan
-const PER_SCHERM = 18;  // hoeveel handelingen we per app tonen
+/* ACHTTIEN WERD ZESENTWINTIG op 31 augustus 2026, en niet om een cijfer te
+   redden. De lezer werd vervangen (scripts/lib/ontleed.js) en haalt sindsdien
+   schonere en meer etiketten uit een scherm -- een knop met een icoon erin
+   leverde eerst rommel en nu zijn tekst. Daarmee groeide ook de woordenschat
+   waar scripts/vindbaar.js tegen meet, en dan hoort er meer geindexeerd te
+   worden, niet minder. Gemeten: 18 gaf 59,9%, 26 geeft 62,8%, 34 geeft 63,9% --
+   de winst vlakt af, dus 26. */
+const PER_SCHERM = 26;  // hoeveel handelingen we per app tonen
 
 function bouw() {
   const index = JSON.parse(fs.readFileSync(INDEX, 'utf8'));

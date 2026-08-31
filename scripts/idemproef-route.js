@@ -375,6 +375,16 @@ wachtOpSchoneBoom();
   console.log('  postbuswereld                        : ' + (rtmailWereld.klaar ? 'klaar' : 'NIET klaar -- ' + rtmailWereld.reden));
   for (const st of rtmailWereld.stappen) if (!st.ok) console.log('      ' + st.naam + ': ' + st.waarom);
 
+  /* DE KLEINE WORTELS -- ./lib/wereld-wortels.js. Negen dingen die elk hun
+     eigen domein openen; geen ketens maar een oproep per stuk. */
+  const { zetWortelsKlaar, lijfVoor: wortelLijf } = require('./lib/wereld-wortels');
+  const wortelWereld = await zetWortelsKlaar({ post, tokenVoor });
+  /* Het aantal WORTELS, niet het aantal stappen: het gesprek kost er vier en
+     zou de teller anders laten lijken alsof er iets mislukt is. */
+  console.log('  kleine wortels                       : ' +
+    Object.keys(wortelWereld.per).length + ' van ' + wortelWereld.telt);
+  for (const st of wortelWereld.stappen) if (!st.ok) console.log('      ' + st.naam + ': ' + st.waarom);
+
   const { oogstObjecten, metAchtervoegsels } = require('./lib/objectoogst');
   const rtfWereld = require('./lib/wereld-rtf');
   const objecten = await oogstObjecten({
@@ -392,7 +402,8 @@ wachtOpSchoneBoom();
          /api/rtf/ hoort bij het kind. Zie ./lib/wereld-rtf.js. */
       ...(r.pad.startsWith('/api/rtf/') ? rtfWereld.lijfVoor(schoolWereld.extra, r.pad) : {}),
       ...rtmailLijf(rtmailWereld.extra, r.pad),
-      ...(r.pad.startsWith('/api/office/weefsel/') ? weefselWereld.extra : {}) }),
+      ...(r.pad.startsWith('/api/office/weefsel/') ? weefselWereld.extra : {}),
+      ...wortelLijf(wortelWereld.per, r.pad) }),
     koppenVoor: (r) => lijfsleutels.koppenVoor(r.pad)
   });
   console.log('  objecten gemaakt voor de proef       : ' + objecten.gelukt + ' van ' +
@@ -493,6 +504,7 @@ wachtOpSchoneBoom();
       ...(r.pad.startsWith('/api/rtf/') ? rtfWereld.lijfVoor(schoolWereld.extra, r.pad) : {}),
       ...rtmailLijf(rtmailWereld.extra, r.pad),
       ...(r.pad.startsWith('/api/office/weefsel/') ? weefselWereld.extra : {}),
+      ...wortelLijf(wortelWereld.per, r.pad),
       ...(geldLijven[r.pad] || {}) }),
     koppenVoor: (r) => lijfsleutels.koppenVoor(r.pad), maxRoutes: MAX, staatVan,
     /* De stand van het opslag-meetpunt reist mee: in stand 2 mag de uitslag

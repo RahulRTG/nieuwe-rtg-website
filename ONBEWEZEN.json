@@ -1,19 +1,19 @@
 {
   "metingGebruikt": true,
-  "metingReden": "gemeten op commit 7b9d1e31, schone boom",
+  "metingReden": "gemeten op commit 7b1690ac, schone boom",
   "stempel": {
-    "op": "2026-08-31T13:13:49.139Z",
-    "commit": "7b9d1e31",
+    "op": "2026-08-31T13:42:13.387Z",
+    "commit": "7b1690ac",
     "boomVuil": true,
     "node": "v22.22.2",
     "metingGebruikt": true,
-    "metingReden": "gemeten op commit 7b9d1e31, schone boom"
+    "metingReden": "gemeten op commit 7b1690ac, schone boom"
   },
   "uitleg": "Waarom heeft deze mutatie geen geldig bewijs? De bakken staan van GOEDKOOP naar DUUR en een route valt in de EERSTE die past. De invariant: ONBEWEZEN mag alleen kleiner worden doordat een route geldig bewijs krijgt, nooit doordat een foutreden wordt hernoemd -- daarom ratelt het TOTAAL en niet de bakken. Zie de kop van scripts/onbewezen.js.",
   "gemeten": {
     "mutaties": 4661,
-    "metBewijs": 2097,
-    "onbewezen": 2564,
+    "metBewijs": 2109,
+    "onbewezen": 2552,
     "sluit": true
   },
   "bakken": [
@@ -65,7 +65,7 @@
     {
       "id": "FIXTURE_403",
       "uitleg": "de eerste oproep gaf 403 -- verkeerde rol of ontbrekend recht",
-      "aantal": 158,
+      "aantal": 131,
       "voorbeelden": [
         "POST /api/account/koppel",
         "POST /api/account/ontkoppel",
@@ -76,7 +76,7 @@
     {
       "id": "FIXTURE_404",
       "uitleg": "de eerste oproep gaf 404 -- het object of de relatie bestaat niet",
-      "aantal": 1461,
+      "aantal": 1469,
       "voorbeelden": [
         "POST /api/aandacht",
         "POST /api/aanmelding/opzeggen",
@@ -87,7 +87,7 @@
     {
       "id": "FIXTURE_409",
       "uitleg": "de eerste oproep gaf 409 -- de toestand is niet voorbereid",
-      "aantal": 113,
+      "aantal": 117,
       "voorbeelden": [
         "POST /api/aanmelding/bewijs",
         "POST /api/aanmelding/bewijs/teken",
@@ -98,7 +98,7 @@
     {
       "id": "FIXTURE_422",
       "uitleg": "de eerste oproep gaf 400 of 422 -- lijf, velden of query kloppen niet",
-      "aantal": 761,
+      "aantal": 764,
       "voorbeelden": [
         "POST /api/aanmelding/beslis",
         "POST /api/agenda/antwoord",
@@ -248,12 +248,9 @@
       "POST /api/mall/zakelijk",
       "POST /api/mediaos/lijst/deel",
       "POST /api/mediaos/samen/nodig",
-      "POST /api/member/accountant",
       "POST /api/member/berichten/afspraken",
       "POST /api/member/berichten/concept",
       "POST /api/member/berichten/samenvatting",
-      "POST /api/member/bord",
-      "POST /api/member/borden",
       "POST /api/member/call",
       "POST /api/member/dm",
       "POST /api/member/dm/send",
@@ -265,7 +262,6 @@
       "POST /api/member/spel/kijk",
       "POST /api/member/spel/praat",
       "POST /api/member/spel/praat-stuur",
-      "POST /api/member/zzp",
       "POST /api/office/balie/abo",
       "POST /api/office/balie/dossier",
       "POST /api/office/balie/herstel",
@@ -343,32 +339,9 @@
       "POST /api/thuis/cohost",
       "POST /api/verify/selfie",
       "POST /api/verify/upload",
-      "POST /api/vonk/halfweg",
-      "POST /api/vonk/kies",
-      "POST /api/vonk/like",
-      "POST /api/vonk/mijn",
-      "POST /api/vonk/profiel",
-      "POST /api/vonk/selectie",
       "POST /api/wereld/bedrijf",
-      "POST /api/wereld/bereik",
-      "POST /api/wereld/bezoekers",
       "POST /api/wereld/gesprek",
-      "POST /api/wereld/introductie",
-      "POST /api/wereld/modus",
-      "POST /api/wereld/zoek",
-      "POST /api/zakelijk/aanbevelen",
-      "POST /api/zakelijk/connect",
-      "POST /api/zakelijk/feed",
-      "POST /api/zakelijk/gids",
-      "POST /api/zakelijk/kans",
-      "POST /api/zakelijk/kans/reageer",
-      "POST /api/zakelijk/kans/sluit",
-      "POST /api/zakelijk/kansen",
-      "POST /api/zakelijk/like",
-      "POST /api/zakelijk/post",
-      "POST /api/zakelijk/profiel",
-      "POST /api/zakelijk/profiel/zet",
-      "POST /api/zakelijk/reactie"
+      "POST /api/wereld/modus"
     ],
     "FIXTURE_404": [
       "POST /api/aandacht",
@@ -801,6 +774,7 @@
       "POST /api/member/apply",
       "POST /api/member/apply/chat",
       "POST /api/member/apply/chat/send",
+      "POST /api/member/bord",
       "POST /api/member/bureau/collectie/bruikleen",
       "POST /api/member/bureau/collectie/conditie",
       "POST /api/member/bureau/collectie/herkomst",
@@ -1783,6 +1757,9 @@
       "POST /api/voeding/weg",
       "POST /api/vonk/bericht",
       "POST /api/vonk/betaal",
+      "POST /api/vonk/halfweg",
+      "POST /api/vonk/kies",
+      "POST /api/vonk/like",
       "POST /api/vracht/volg",
       "POST /api/wachtlijst",
       "POST /api/wallet/munt/wissel",
@@ -1831,7 +1808,11 @@
       "POST /api/werkvloer/tafel",
       "POST /api/werkvloer/tafel/weg",
       "POST /api/werving/kijk",
-      "POST /api/werving/verbind"
+      "POST /api/werving/verbind",
+      "POST /api/zakelijk/aanbevelen",
+      "POST /api/zakelijk/connect",
+      "POST /api/zakelijk/kans/sluit",
+      "POST /api/zakelijk/like"
     ],
     "FIXTURE_409": [
       "POST /api/aanmelding/bewijs",
@@ -1946,7 +1927,11 @@
       "POST /api/supplier/verkoop/auto/weg",
       "POST /api/supplier/zorgpolis/declaratie",
       "POST /api/tenant/groep",
-      "POST /api/theater/kanaal/aanmeld"
+      "POST /api/theater/kanaal/aanmeld",
+      "POST /api/zakelijk/kans",
+      "POST /api/zakelijk/kans/reageer",
+      "POST /api/zakelijk/post",
+      "POST /api/zakelijk/reactie"
     ],
     "FIXTURE_422": [
       "POST /api/aanmelding/beslis",
@@ -2198,6 +2183,7 @@
       "POST /api/mediaos/stuk",
       "POST /api/mediaos/stuur",
       "POST /api/meet/sein",
+      "POST /api/member/accountant",
       "POST /api/member/ai/beleid",
       "POST /api/member/berichten/vlag",
       "POST /api/member/block",
@@ -2262,6 +2248,7 @@
       "POST /api/member/taal/zet",
       "POST /api/member/vluchten/charter",
       "POST /api/member/vooruit/post/neem",
+      "POST /api/member/zzp",
       "POST /api/memo/samenvat",
       "POST /api/metier/aanbeveling-intrekken",
       "POST /api/metier/aanbeveling-verberg",
@@ -2709,7 +2696,8 @@
       "POST /api/werkplek/kantoorpakket/vul",
       "POST /api/werkplek/toegang-geef",
       "POST /api/werkvloer/checklijst",
-      "POST /api/werkvloer/koppel/maak"
+      "POST /api/werkvloer/koppel/maak",
+      "POST /api/zakelijk/profiel/zet"
     ],
     "FIXTURE_OVERIG": [
       "POST /api/bank/krediet",

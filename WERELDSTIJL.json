@@ -7,8 +7,7 @@
       "wereld": "LivingOS",
       "schermen": 41,
       "telling": {
-        "aankleden": 33,
-        "ombouwen": 7,
+        "aankleden": 40,
         "schil": 1
       },
       "lijst": [
@@ -32,10 +31,46 @@
             },
             "licht": 0.03529411764705883,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 209,
           "bytes": 12008,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Attenties"
+          ],
+          "bestand": "/apps/attenties.html",
+          "klasse": "aankleden",
+          "reden": "grond #f4f0e9 = pearl precies, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #171815",
+            "waarde": "#f4f0e9",
+            "pixel": {
+              "r": 244,
+              "g": 240,
+              "b": 233,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.9425294117647058,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(244, 240, 233)"
+          },
+          "regels": 141,
+          "bytes": 13626,
           "dragers": {
             "wereldschil": false,
             "wereldcss": false,
@@ -66,6 +101,7 @@
             },
             "licht": 0.0467756862745098,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 607,
@@ -100,10 +136,46 @@
             },
             "licht": 0.03529411764705883,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 113,
           "bytes": 9827,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Cercle"
+          ],
+          "bestand": "/apps/cercle.html",
+          "klasse": "aankleden",
+          "reden": "grond #f4f0e9 = pearl precies, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #171815",
+            "waarde": "#f4f0e9",
+            "pixel": {
+              "r": 244,
+              "g": 240,
+              "b": 233,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.9425294117647058,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(244, 240, 233)"
+          },
+          "regels": 142,
+          "bytes": 13110,
           "dragers": {
             "wereldschil": false,
             "wereldcss": false,
@@ -134,6 +206,7 @@
             },
             "licht": 0.03529411764705883,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 466,
@@ -168,7 +241,8 @@
             },
             "licht": 0.10222823529411765,
             "letter": "Inter, system-ui, sans-serif",
-            "eigenschap": "rgb(221, 214, 201)"
+            "letterEr": true,
+            "eigenschap": "rgb(244, 240, 233)"
           },
           "regels": 782,
           "bytes": 41601,
@@ -202,10 +276,46 @@
             },
             "licht": 0.03529411764705883,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 510,
           "bytes": 30174,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Entourage"
+          ],
+          "bestand": "/apps/entourage.html",
+          "klasse": "aankleden",
+          "reden": "grond #f4f0e9 = pearl precies, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #171815",
+            "waarde": "#f4f0e9",
+            "pixel": {
+              "r": 244,
+              "g": 240,
+              "b": 233,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.9425294117647058,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(244, 240, 233)"
+          },
+          "regels": 144,
+          "bytes": 13305,
           "dragers": {
             "wereldschil": false,
             "wereldcss": false,
@@ -236,6 +346,7 @@
             },
             "licht": 0.03529411764705883,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 204,
@@ -247,6 +358,41 @@
             "huisletters": true,
             "bodoni": true,
             "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Vrienden"
+          ],
+          "bestand": "/apps/foundation/vrienden.html",
+          "klasse": "aankleden",
+          "reden": "grond #08090c = onyx (4 naast de basis), huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx",
+            "waarde": "#08090c",
+            "pixel": {
+              "r": 8,
+              "g": 9,
+              "b": 12,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.03530980392156863,
+            "letter": "Inter, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(7, 17, 27)"
+          },
+          "regels": 1054,
+          "bytes": 67130,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": false,
+            "bodoni": true,
+            "inter": false,
             "uniform": true
           }
         },
@@ -270,6 +416,7 @@
             },
             "licht": 0.032489411764705885,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 116,
@@ -304,6 +451,7 @@
             },
             "licht": 0.032489411764705885,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 25,
@@ -346,6 +494,7 @@
             },
             "licht": 0.032489411764705885,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 165,
@@ -380,6 +529,7 @@
             },
             "licht": 0.03529411764705883,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 183,
@@ -414,6 +564,7 @@
             },
             "licht": 0.032489411764705885,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": "rgb(12, 12, 11)"
           },
           "regels": 12,
@@ -448,6 +599,7 @@
             },
             "licht": 0.03529411764705883,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 759,
@@ -482,6 +634,7 @@
             },
             "licht": 0.0361278431372549,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": "rgb(12, 12, 11)"
           },
           "regels": 8,
@@ -516,6 +669,7 @@
             },
             "licht": 0.032489411764705885,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 110,
@@ -550,6 +704,7 @@
             },
             "licht": 0.03529411764705883,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 1450,
@@ -584,6 +739,7 @@
             },
             "licht": 0.03137254901960784,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 265,
@@ -618,6 +774,7 @@
             },
             "licht": 0.03529411764705883,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 137,
@@ -652,6 +809,7 @@
             },
             "licht": 0.0602078431372549,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 373,
@@ -686,6 +844,7 @@
             },
             "licht": 0.03529411764705883,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 121,
@@ -720,6 +879,7 @@
             },
             "licht": 0.03529411764705883,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 578,
@@ -742,7 +902,7 @@
           "klasse": "aankleden",
           "reden": "grond #090909 = onyx (3 naast de basis), huisletter staat er",
           "grond": {
-            "herkomst": "materiaal onyx, boven #120e0e",
+            "herkomst": "materiaal onyx, boven #120d0d",
             "waarde": "#090909",
             "pixel": {
               "r": 9,
@@ -754,10 +914,46 @@
             },
             "licht": 0.03529411764705883,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 654,
           "bytes": 38989,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Vandaag"
+          ],
+          "bestand": "/apps/pulse.html",
+          "klasse": "aankleden",
+          "reden": "grond #f4f0e9 = pearl precies, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #171815",
+            "waarde": "#f4f0e9",
+            "pixel": {
+              "r": 244,
+              "g": 240,
+              "b": 233,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.9425294117647058,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(244, 240, 233)"
+          },
+          "regels": 237,
+          "bytes": 20866,
           "dragers": {
             "wereldschil": false,
             "wereldcss": false,
@@ -788,6 +984,7 @@
             },
             "licht": 0.9425294117647058,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": "rgb(244, 240, 233)"
           },
           "regels": 378,
@@ -810,7 +1007,7 @@
           "klasse": "aankleden",
           "reden": "grond #090909 = onyx (3 naast de basis), huisletter staat er",
           "grond": {
-            "herkomst": "materiaal onyx, boven #120e0d",
+            "herkomst": "materiaal onyx, boven #120d0d",
             "waarde": "#090909",
             "pixel": {
               "r": 9,
@@ -822,6 +1019,7 @@
             },
             "licht": 0.03529411764705883,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 231,
@@ -856,6 +1054,7 @@
             },
             "licht": 0.9338525490196078,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 779,
@@ -868,6 +1067,76 @@
             "bodoni": false,
             "inter": false,
             "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Spelen"
+          ],
+          "bestand": "/apps/spelen.html",
+          "klasse": "aankleden",
+          "reden": "grond #060f1a = onyx (15 naast de basis), huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #08090c",
+            "waarde": "#060f1a",
+            "pixel": {
+              "r": 6,
+              "g": 15,
+              "b": 26,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.054434509803921574,
+            "letter": "Inter, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(7, 15, 23)"
+          },
+          "regels": 1926,
+          "bytes": 120378,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": false,
+            "bodoni": false,
+            "inter": false,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Game Night"
+          ],
+          "bestand": "/apps/spelscherm.html",
+          "klasse": "aankleden",
+          "reden": "grond #090909 = onyx (3 naast de basis), huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #1b2326",
+            "waarde": "#090909",
+            "pixel": {
+              "r": 9,
+              "g": 9,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.03529411764705883,
+            "letter": "Inter, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgba(12, 12, 11, 0.953)"
+          },
+          "regels": 143,
+          "bytes": 7251,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": false,
+            "bodoni": true,
+            "inter": true,
+            "uniform": false
           }
         },
         {
@@ -890,6 +1159,7 @@
             },
             "licht": 0.03529411764705883,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 223,
@@ -924,6 +1194,7 @@
             },
             "licht": 0.032489411764705885,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 124,
@@ -958,6 +1229,7 @@
             },
             "licht": 0.03529411764705883,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 769,
@@ -980,7 +1252,7 @@
           "klasse": "aankleden",
           "reden": "grond #090909 = onyx (3 naast de basis), huisletter staat er",
           "grond": {
-            "herkomst": "materiaal onyx, boven #101212",
+            "herkomst": "materiaal onyx, boven #1b2326",
             "waarde": "#090909",
             "pixel": {
               "r": 9,
@@ -992,6 +1264,7 @@
             },
             "licht": 0.03529411764705883,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 398,
@@ -1026,6 +1299,7 @@
             },
             "licht": 0.03529411764705883,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 252,
@@ -1060,6 +1334,7 @@
             },
             "licht": 0.03529411764705883,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 49,
@@ -1094,6 +1369,7 @@
             },
             "licht": 0.9425294117647058,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": "rgb(244, 240, 233)"
           },
           "regels": 354,
@@ -1128,6 +1404,7 @@
             },
             "licht": 0.04285411764705882,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 610,
@@ -1140,244 +1417,6 @@
             "bodoni": true,
             "inter": true,
             "uniform": true
-          }
-        },
-        {
-          "namen": [
-            "Attenties"
-          ],
-          "bestand": "/apps/attenties.html",
-          "klasse": "ombouwen",
-          "reden": "grond #ddd6c9 staat niet in het palet (dichtstbij: pearl op 32)",
-          "grond": {
-            "herkomst": "materiaal onyx, boven #171815",
-            "waarde": "#ddd6c9",
-            "pixel": {
-              "r": 221,
-              "g": 214,
-              "b": 201,
-              "kanalen": 3,
-              "w": 4,
-              "h": 4
-            },
-            "licht": 0.8413709803921569,
-            "letter": "Inter, system-ui, sans-serif",
-            "eigenschap": "rgb(221, 214, 201)"
-          },
-          "regels": 141,
-          "bytes": 13626,
-          "dragers": {
-            "wereldschil": false,
-            "wereldcss": false,
-            "switcher": false,
-            "huisletters": true,
-            "bodoni": true,
-            "inter": true,
-            "uniform": true
-          }
-        },
-        {
-          "namen": [
-            "Cercle"
-          ],
-          "bestand": "/apps/cercle.html",
-          "klasse": "ombouwen",
-          "reden": "grond #ddd6c9 staat niet in het palet (dichtstbij: pearl op 32)",
-          "grond": {
-            "herkomst": "materiaal onyx, boven #171815",
-            "waarde": "#ddd6c9",
-            "pixel": {
-              "r": 221,
-              "g": 214,
-              "b": 201,
-              "kanalen": 3,
-              "w": 4,
-              "h": 4
-            },
-            "licht": 0.8413709803921569,
-            "letter": "Inter, system-ui, sans-serif",
-            "eigenschap": "rgb(221, 214, 201)"
-          },
-          "regels": 142,
-          "bytes": 13110,
-          "dragers": {
-            "wereldschil": false,
-            "wereldcss": false,
-            "switcher": false,
-            "huisletters": true,
-            "bodoni": true,
-            "inter": true,
-            "uniform": true
-          }
-        },
-        {
-          "namen": [
-            "Entourage"
-          ],
-          "bestand": "/apps/entourage.html",
-          "klasse": "ombouwen",
-          "reden": "grond #ddd6c9 staat niet in het palet (dichtstbij: pearl op 32)",
-          "grond": {
-            "herkomst": "materiaal onyx, boven #171815",
-            "waarde": "#ddd6c9",
-            "pixel": {
-              "r": 221,
-              "g": 214,
-              "b": 201,
-              "kanalen": 3,
-              "w": 4,
-              "h": 4
-            },
-            "licht": 0.8413709803921569,
-            "letter": "Inter, system-ui, sans-serif",
-            "eigenschap": "rgb(221, 214, 201)"
-          },
-          "regels": 144,
-          "bytes": 13305,
-          "dragers": {
-            "wereldschil": false,
-            "wereldcss": false,
-            "switcher": false,
-            "huisletters": true,
-            "bodoni": true,
-            "inter": true,
-            "uniform": true
-          }
-        },
-        {
-          "namen": [
-            "Vrienden"
-          ],
-          "bestand": "/apps/foundation/vrienden.html",
-          "klasse": "ombouwen",
-          "reden": "laadt fonts.css niet",
-          "grond": {
-            "herkomst": "materiaal onyx",
-            "waarde": "#08090c",
-            "pixel": {
-              "r": 8,
-              "g": 9,
-              "b": 12,
-              "kanalen": 3,
-              "w": 4,
-              "h": 4
-            },
-            "licht": 0.03530980392156863,
-            "letter": "Inter, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
-            "eigenschap": "rgb(7, 16, 26)"
-          },
-          "regels": 1054,
-          "bytes": 67130,
-          "dragers": {
-            "wereldschil": false,
-            "wereldcss": false,
-            "switcher": false,
-            "huisletters": false,
-            "bodoni": true,
-            "inter": false,
-            "uniform": true
-          }
-        },
-        {
-          "namen": [
-            "Vandaag"
-          ],
-          "bestand": "/apps/pulse.html",
-          "klasse": "ombouwen",
-          "reden": "grond #ddd6c9 staat niet in het palet (dichtstbij: pearl op 32)",
-          "grond": {
-            "herkomst": "materiaal onyx, boven #171815",
-            "waarde": "#ddd6c9",
-            "pixel": {
-              "r": 221,
-              "g": 214,
-              "b": 201,
-              "kanalen": 3,
-              "w": 4,
-              "h": 4
-            },
-            "licht": 0.8413709803921569,
-            "letter": "Inter, system-ui, sans-serif",
-            "eigenschap": "rgb(221, 214, 201)"
-          },
-          "regels": 237,
-          "bytes": 20866,
-          "dragers": {
-            "wereldschil": false,
-            "wereldcss": false,
-            "switcher": false,
-            "huisletters": true,
-            "bodoni": true,
-            "inter": true,
-            "uniform": true
-          }
-        },
-        {
-          "namen": [
-            "Spelen"
-          ],
-          "bestand": "/apps/spelen.html",
-          "klasse": "ombouwen",
-          "reden": "laadt fonts.css niet",
-          "grond": {
-            "herkomst": "materiaal onyx, boven #07111b",
-            "waarde": "#07101c",
-            "pixel": {
-              "r": 7,
-              "g": 16,
-              "b": 28,
-              "kanalen": 3,
-              "w": 4,
-              "h": 4
-            },
-            "licht": 0.05863921568627451,
-            "letter": "Inter, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
-            "eigenschap": "rgb(7, 17, 27)"
-          },
-          "regels": 1926,
-          "bytes": 120378,
-          "dragers": {
-            "wereldschil": false,
-            "wereldcss": false,
-            "switcher": false,
-            "huisletters": false,
-            "bodoni": false,
-            "inter": false,
-            "uniform": true
-          }
-        },
-        {
-          "namen": [
-            "Game Night"
-          ],
-          "bestand": "/apps/spelscherm.html",
-          "klasse": "ombouwen",
-          "reden": "laadt fonts.css niet",
-          "grond": {
-            "herkomst": "materiaal onyx, boven #1b2326",
-            "waarde": "#090909",
-            "pixel": {
-              "r": 9,
-              "g": 9,
-              "b": 9,
-              "kanalen": 3,
-              "w": 4,
-              "h": 4
-            },
-            "licht": 0.03529411764705883,
-            "letter": "Inter, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
-            "eigenschap": "rgba(12, 12, 11, 0.325)"
-          },
-          "regels": 143,
-          "bytes": 7251,
-          "dragers": {
-            "wereldschil": false,
-            "wereldcss": false,
-            "switcher": false,
-            "huisletters": false,
-            "bodoni": true,
-            "inter": true,
-            "uniform": false
           }
         },
         {
@@ -1401,6 +1440,7 @@
             },
             "licht": 0.02684392156862745,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": "rgb(74, 12, 30)"
           },
           "regels": 306,
@@ -1445,6 +1485,7 @@
             },
             "licht": 0.03108941176470588,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 433,
@@ -1479,6 +1520,7 @@
             },
             "licht": 0.02745098039215686,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": "rgb(11, 11, 10)"
           },
           "regels": 201,
@@ -1513,6 +1555,7 @@
             },
             "licht": 0.03529411764705883,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 251,
@@ -1547,6 +1590,7 @@
             },
             "licht": 0.02745098039215686,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 591,
@@ -1581,6 +1625,7 @@
             },
             "licht": 0.03108941176470588,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 629,
@@ -1615,6 +1660,7 @@
             },
             "licht": 0.03108941176470588,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 898,
@@ -1649,6 +1695,7 @@
             },
             "licht": 0.02745098039215686,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": "rgb(12, 12, 11)"
           },
           "regels": 9,
@@ -1669,21 +1716,22 @@
           ],
           "bestand": "/apps/rtgone.html",
           "klasse": "aankleden",
-          "reden": "grond #120d0c = onyx (6 naast de basis), huisletter staat er",
+          "reden": "grond #180d0d = onyx (12 naast de basis), huisletter staat er",
           "grond": {
-            "herkomst": "materiaal onyx, boven #0c0c0a",
-            "waarde": "#120d0c",
+            "herkomst": "materiaal onyx, boven #0e0c0b",
+            "waarde": "#180d0d",
             "pixel": {
-              "r": 18,
+              "r": 24,
               "g": 13,
-              "b": 12,
+              "b": 13,
               "kanalen": 3,
               "w": 4,
               "h": 4
             },
-            "licht": 0.054865882352941174,
+            "licht": 0.0601513725490196,
             "letter": "Inter, system-ui, sans-serif",
-            "eigenschap": "rgb(14, 12, 11)"
+            "letterEr": true,
+            "eigenschap": "rgb(18, 12, 11)"
           },
           "regels": 29,
           "bytes": 31678,
@@ -1717,7 +1765,8 @@
             },
             "licht": 0.03108941176470588,
             "letter": "Inter, system-ui, sans-serif",
-            "eigenschap": "rgb(14, 12, 11)"
+            "letterEr": true,
+            "eigenschap": "rgb(16, 12, 11)"
           },
           "regels": 183,
           "bytes": 11287,
@@ -1751,6 +1800,7 @@
             },
             "licht": 0.03108941176470588,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 474,
@@ -1785,6 +1835,7 @@
             },
             "licht": 0.03108941176470588,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 654,
@@ -1819,6 +1870,7 @@
             },
             "licht": 0.023529411764705882,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": "rgb(12, 12, 11)"
           },
           "regels": 157,
@@ -1853,6 +1905,7 @@
             },
             "licht": 0.03866509803921569,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 482,
@@ -1897,6 +1950,7 @@
             },
             "licht": 0.03137254901960784,
             "letter": "Inter, sans-serif",
+            "letterEr": true,
             "eigenschap": "rgb(8, 8, 8)"
           },
           "regels": 9,
@@ -1919,7 +1973,7 @@
           "klasse": "aankleden",
           "reden": "grond #090a0a = onyx (3 naast de basis), huisletter staat er",
           "grond": {
-            "herkomst": "materiaal onyx, boven #080808",
+            "herkomst": "materiaal onyx, boven #080909",
             "waarde": "#090a0a",
             "pixel": {
               "r": 9,
@@ -1931,6 +1985,7 @@
             },
             "licht": 0.038381960784313725,
             "letter": "Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 296,
@@ -1965,6 +2020,7 @@
             },
             "licht": 0.038381960784313725,
             "letter": "Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 139,
@@ -1999,6 +2055,7 @@
             },
             "licht": 0.038381960784313725,
             "letter": "Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 719,
@@ -2033,6 +2090,7 @@
             },
             "licht": 0.038381960784313725,
             "letter": "Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 1021,
@@ -2067,6 +2125,7 @@
             },
             "licht": 0.03390980392156863,
             "letter": "Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+            "letterEr": true,
             "eigenschap": "rgb(8, 10, 11)"
           },
           "regels": 306,
@@ -2101,6 +2160,7 @@
             },
             "licht": 0.038381960784313725,
             "letter": "Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 137,
@@ -2135,6 +2195,7 @@
             },
             "licht": 0.02745098039215686,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": "rgb(12, 12, 11)"
           },
           "regels": 97,
@@ -2157,7 +2218,7 @@
           "klasse": "aankleden",
           "reden": "grond #0d0b08 = onyx (3 naast de basis), huisletter staat er",
           "grond": {
-            "herkomst": "materiaal onyx, boven #090501",
+            "herkomst": "materiaal onyx, boven #040505",
             "waarde": "#0d0b08",
             "pixel": {
               "r": 13,
@@ -2169,6 +2230,7 @@
             },
             "licht": 0.04395529411764706,
             "letter": "Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 182,
@@ -2203,7 +2265,8 @@
             },
             "licht": 0.03108941176470588,
             "letter": "Inter, system-ui, sans-serif",
-            "eigenschap": "rgba(17, 12, 11, 0.965)"
+            "letterEr": true,
+            "eigenschap": "rgba(17, 12, 11, 0.97)"
           },
           "regels": 320,
           "bytes": 16943,
@@ -2237,6 +2300,7 @@
             },
             "licht": 0.038381960784313725,
             "letter": "Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 164,
@@ -2271,6 +2335,7 @@
             },
             "licht": 0.038381960784313725,
             "letter": "Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 183,
@@ -2305,6 +2370,7 @@
             },
             "licht": 0.019607843137254898,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": "rgb(8, 9, 9)"
           },
           "regels": 943,
@@ -2325,8 +2391,7 @@
       "wereld": "Instellingen",
       "schermen": 4,
       "telling": {
-        "aankleden": 3,
-        "ombouwen": 1
+        "aankleden": 4
       },
       "lijst": [
         {
@@ -2349,6 +2414,7 @@
             },
             "licht": 0.03529411764705883,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 343,
@@ -2360,6 +2426,41 @@
             "huisletters": true,
             "bodoni": true,
             "inter": false,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Juridisch"
+          ],
+          "bestand": "/apps/juridisch.html",
+          "klasse": "aankleden",
+          "reden": "grond #090909 = onyx (3 naast de basis), huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #1b2326",
+            "waarde": "#090909",
+            "pixel": {
+              "r": 9,
+              "g": 9,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.03529411764705883,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": null
+          },
+          "regels": 72,
+          "bytes": 3802,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
             "uniform": true
           }
         },
@@ -2383,6 +2484,7 @@
             },
             "licht": 0.03529411764705883,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 225,
@@ -2417,6 +2519,7 @@
             },
             "licht": 0.032489411764705885,
             "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
             "eigenschap": null
           },
           "regels": 116,
@@ -2430,40 +2533,6 @@
             "inter": false,
             "uniform": true
           }
-        },
-        {
-          "namen": [
-            "Juridisch"
-          ],
-          "bestand": "/apps/juridisch.html",
-          "klasse": "ombouwen",
-          "reden": "laadt fonts.css niet",
-          "grond": {
-            "herkomst": "materiaal onyx, boven #1b2326",
-            "waarde": "#090909",
-            "pixel": {
-              "r": 9,
-              "g": 9,
-              "b": 9,
-              "kanalen": 3,
-              "w": 4,
-              "h": 4
-            },
-            "licht": 0.03529411764705883,
-            "letter": "Inter, system-ui, sans-serif",
-            "eigenschap": null
-          },
-          "regels": 71,
-          "bytes": 3754,
-          "dragers": {
-            "wereldschil": false,
-            "wereldcss": false,
-            "switcher": false,
-            "huisletters": false,
-            "bodoni": true,
-            "inter": true,
-            "uniform": true
-          }
         }
       ]
     },
@@ -2471,52 +2540,17 @@
       "wereld": "FoundationOS",
       "schermen": 4,
       "telling": {
-        "aankleden": 1,
-        "ombouwen": 2,
+        "aankleden": 3,
         "schil": 1
       },
       "lijst": [
         {
           "namen": [
-            "RTFoundation portaal"
-          ],
-          "bestand": "/apps/foundation/os-portaal.html",
-          "klasse": "aankleden",
-          "reden": "grond #07101b = onyx (16 naast de basis), huisletter staat er",
-          "grond": {
-            "herkomst": "materiaal onyx",
-            "waarde": "#07101b",
-            "pixel": {
-              "r": 7,
-              "g": 16,
-              "b": 27,
-              "kanalen": 3,
-              "w": 4,
-              "h": 4
-            },
-            "licht": 0.058356078431372554,
-            "letter": "Inter, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
-            "eigenschap": "rgb(8, 16, 25)"
-          },
-          "regels": 242,
-          "bytes": 15911,
-          "dragers": {
-            "wereldschil": false,
-            "wereldcss": false,
-            "switcher": false,
-            "huisletters": true,
-            "bodoni": true,
-            "inter": true,
-            "uniform": false
-          }
-        },
-        {
-          "namen": [
             "Het bord"
           ],
           "bestand": "/apps/foundation/bord.html",
-          "klasse": "ombouwen",
-          "reden": "laadt fonts.css niet",
+          "klasse": "aankleden",
+          "reden": "grond #08090c = onyx (4 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx",
             "waarde": "#08090c",
@@ -2530,7 +2564,8 @@
             },
             "licht": 0.03530980392156863,
             "letter": "Inter, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
-            "eigenschap": "rgb(7, 17, 28)"
+            "letterEr": true,
+            "eigenschap": "rgb(7, 16, 25)"
           },
           "regels": 261,
           "bytes": 17200,
@@ -2546,11 +2581,46 @@
         },
         {
           "namen": [
+            "RTFoundation portaal"
+          ],
+          "bestand": "/apps/foundation/os-portaal.html",
+          "klasse": "aankleden",
+          "reden": "grond #07101b = onyx (16 naast de basis), huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #07101a",
+            "waarde": "#07101b",
+            "pixel": {
+              "r": 7,
+              "g": 16,
+              "b": 27,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.058356078431372554,
+            "letter": "Inter, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(9, 15, 22)"
+          },
+          "regels": 242,
+          "bytes": 15911,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": false
+          }
+        },
+        {
+          "namen": [
             "Het schrift"
           ],
           "bestand": "/apps/foundation/schrift.html",
-          "klasse": "ombouwen",
-          "reden": "laadt fonts.css niet",
+          "klasse": "aankleden",
+          "reden": "grond #08090c = onyx (4 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx",
             "waarde": "#08090c",
@@ -2564,7 +2634,8 @@
             },
             "licht": 0.03530980392156863,
             "letter": "Inter, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
-            "eigenschap": "rgb(7, 17, 27)"
+            "letterEr": true,
+            "eigenschap": "rgb(7, 16, 25)"
           },
           "regels": 271,
           "bytes": 19935,
@@ -2587,7 +2658,7 @@
           "klasse": "schil",
           "reden": "de wereldschil staat er",
           "grond": {
-            "herkomst": "materiaal champagne, boven #07111b",
+            "herkomst": "materiaal champagne, boven #07101b",
             "waarde": "#07101c",
             "pixel": {
               "r": 7,
@@ -2599,7 +2670,8 @@
             },
             "licht": 0.05863921568627451,
             "letter": "Inter, system-ui, sans-serif",
-            "eigenschap": "rgb(7, 17, 28)"
+            "letterEr": true,
+            "eigenschap": "rgba(7, 17, 28, 0.875)"
           },
           "regels": 186,
           "bytes": 11112,

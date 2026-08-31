@@ -185,6 +185,12 @@ function helderheid(kleur) {
 }
 const hex = (k) => k ? '#' + [k.r, k.g, k.b].map((n) => n.toString(16).padStart(2, '0')).join('') : null;
 
+/* `fonts.css` staat hier nog als NOTITIE en niet meer als oordeel. De meter
+   zocht die link in de HTML en zette drie schermen op "ombouwen" omdat hij hem
+   niet vond -- terwijl public/apps/foundation/stijl.css hem op regel 2 gewoon
+   @import't. Vierde keer dezelfde fout in dit bestand: de bron gelezen waar de
+   uitkomst geteld moest worden. Wat telt is of er een huisletter RENDERT, en
+   dat wordt gemeten. */
 const BINNEN = [
   ['huisletters', (s) => s.includes('fonts/fonts.css')],
   ['bodoni', (s) => s.includes('Bodoni Moda')],
@@ -220,7 +226,10 @@ function meet(url, gemeten) {
      woord "Inter" kan hem via een gedeelde stylesheet toch dragen. */
   const gemetenLetter = String((grond && grond.letter) || '');
   const draagtHuisletter = /Inter|Bodoni/i.test(gemetenLetter);
-  const lettersOk = binnen.huisletters && draagtHuisletter;
+  /* twee vragen, want ze gaan mis op twee manieren: vraagt het scherm om een
+     huisletter, en is die letter er ook echt (een @font-face die niet laadt,
+     valt stil terug op Georgia en niemand ziet het). */
+  const lettersOk = draagtHuisletter && grond && grond.letterEr !== false;
 
   let klasse, reden;
   if (grond.herkomst === 'niet gemeten') { klasse = 'niet gemeten'; reden = 'de pagina is niet geopend'; }
@@ -239,8 +248,8 @@ function meet(url, gemeten) {
       mist.push('grond ' + grond.waarde + ' staat niet in het palet'
         + (dichtst ? '' : ' (dichtstbij: ' + naastLangs(grond.pixel, gronden) + ')'));
     }
-    if (!binnen.huisletters) mist.push('laadt fonts.css niet');
-    else if (!lettersOk) mist.push('leest niet in een huisletter (' + (gemetenLetter.split(',')[0] || '?') + ')');
+    if (!draagtHuisletter) mist.push('vraagt geen huisletter (' + (gemetenLetter.split(',')[0] || '?') + ')');
+    else if (grond && grond.letterEr === false) mist.push('vraagt ' + gemetenLetter.split(',')[0] + ' maar die letter laadt niet');
     reden = mist.join(', ');
   }
   return {
@@ -277,7 +286,9 @@ async function open(urls) {
       const onder = pngPixel(await page.screenshot({ clip: { x: 4, y: maat.height - 8, width: 4, height: 4 } }));
       const kleur = onder || boven;
       const eens = boven && onder && hex(boven) === hex(onder);
-      const g = await page.evaluate(() => {
+      const g = await page.evaluate(async () => {
+        /* wachten tot de letters klaar zijn, anders meet je de terugval */
+        try { await document.fonts.ready; } catch (e) { /* oude browser */ }
         /* EEN DOORZICHTIGE BODY IS GEEN ZWARTE BODY. getComputedStyle geeft
            rgba(0,0,0,0) voor "niet geschilderd", en die vier nullen zien er
            precies uit als zwart -- de meter noemde 25 schermen daardoor
@@ -289,13 +300,31 @@ async function open(urls) {
         const h = getComputedStyle(document.documentElement);
         const grond = !leeg(b.backgroundColor) ? b.backgroundColor
           : (!leeg(h.backgroundColor) ? h.backgroundColor : null);
+        /* IS DE GEVRAAGDE LETTER ER OOK ECHT? Een scherm dat Bodoni vraagt
+           terwijl het @font-face nooit laadt, rendert Georgia -- en dat ziet er
+           van een afstandje uit als een keuze.
+
+           NIET met document.fonts.check(): die gaf `true` voor "Kaas Van Niks",
+           dus die toets kon niet zakken en was er dus geen. Wel door dezelfde
+           tekst twee keer te meten -- een keer met de gevraagde letter voor
+           monospace, een keer met monospace alleen. Zijn de breedtes gelijk,
+           dan is er teruggevallen en is de letter er niet. Nagerekend: onzin
+           en Georgia geven false, Inter en Bodoni true. */
+        const eerste = (b.fontFamily.split(',')[0] || '').replace(/^["']|["']$/g, '').trim();
+        let letterEr = null;
+        try {
+          const c = document.createElement('canvas').getContext('2d');
+          const breed = (f) => { c.font = '40px ' + f; return c.measureText('Handgloves 123 WMil').width; };
+          letterEr = eerste ? Math.abs(breed('"' + eerste + '", monospace') - breed('monospace')) > 0.5 : null;
+        } catch (e) { letterEr = null; }
         return { grond, waar: !leeg(b.backgroundColor) ? 'body' : (grond ? 'html' : null),
-          letter: b.fontFamily,
+          letter: b.fontFamily, letterEr,
           thema: document.documentElement.getAttribute('data-rtg-thema') || null };
       });
       uit[u] = {
         herkomst: (g.thema ? 'materiaal ' + g.thema : 'zonder materiaal') + (eens ? '' : ', boven ' + (hex(boven) || '?')),
-        waarde: hex(kleur), pixel: kleur, licht: helderheid(kleur), letter: g.letter,
+        waarde: hex(kleur), pixel: kleur, licht: helderheid(kleur),
+        letter: g.letter, letterEr: g.letterEr,
         eigenschap: g.grond   /* wat backgroundColor zei -- bewaard, want het VERSCHIL is de les */
       };
     } catch (e) { /* een scherm dat niet opengaat blijft NIET GEMETEN */ }

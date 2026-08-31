@@ -170,7 +170,7 @@ const { realNameOf, emailOf, phoneOf } = gebonden; // lezen zit bij de binding
 /* De staatloze tokens, de e-mailbevestiging en het wachtwoord-herstel staan
    in ./tokens.js; ze krijgen getUserById mee en verhuizen mee in de export,
    zodat aanroepers niets merken. */
-const { issueToken, verifyToken, trekIn, trekInActie, isIngetrokken, issueActionToken, verifyActionToken,
+const { issueToken, verifyToken, sessieVan, trekIn, trekInActie, isIngetrokken, issueActionToken, verifyActionToken,
   setEmailVerified, createReset, findByReset, setPassword } = require('./tokens').maakTokens(getUserById);
 
 /* Openbaar profiel voor de client (nooit de wachtwoord-hash of ruwe kluis). */
@@ -204,7 +204,7 @@ module.exports = {
      en alle bestaande aanroepers niets merken van de opsplitsing. */
   findByPublicMail, reservePublicMail,
   renameUser, setTier, zetActief, isActief, realNameOf, emailOf, phoneOf, setPhone,
-  issueToken, verifyToken, trekIn, trekInActie, isIngetrokken, issueActionToken, verifyActionToken,
+  issueToken, verifyToken, sessieVan, trekIn, trekInActie, isIngetrokken, issueActionToken, verifyActionToken,
   setEmailVerified, createReset, findByReset, setPassword, setPasswordSync, setPasswordZaai, vernieuwWachtwoordHash,
   getMemberState, saveMemberState, setVerification, listByVerification, conversations, ledenRegisterRijen, deleteUser
 };

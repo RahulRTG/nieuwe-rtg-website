@@ -69,13 +69,13 @@ module.exports = (kern) => {
      van registreren is in dit huis de volgorde van afhandelen. */
   require('./auth/inlog')({ PERSONAS, accounts, app, auth, checkCred, crypto, forgetSession, hasCred,
     loginFails, noteFailedTry, rememberSession, sessions, stateFor, tooManyTries, logInlog,
-    DEMO, pasAppOk, PAS_FOUT, isBaas, kern });
+    DEMO, pasAppOk, PAS_FOUT, isBaas, kern, sessieregister: kern.sessieregister });
 
   /* De registratie-, herstel- en verificatieroutes draaien als submodules
      op een gedeelde context, een keer opgebouwd bij het opstarten. */
   const actx = { PERSONAS, PRODUCTION, UPLOAD_DIR, accounts, app, appUrl, auth, checkCred, crypto, db, express, forgetSession, fs, hasCred, leeftijdVan, loginFails, mail, memberTemplate, noteFailedTry, path, rememberSession, save, schoon, sessions, stateFor, tooManyTries, logInlog,
     DEMO, pasAppOk, PAS_FOUT, pasAppVan, DEV_VELDEN, isBaas, antivirus: kern.antivirus,
-    webauthn: kern.webauthn, automatisering,
+    webauthn: kern.webauthn, automatisering, sessieregister: kern.sessieregister,
     /* De kern zelf reist mee voor de wervingslink. Die helpers (zoekInvite,
        verbindLid) worden PAS aan de kern gehangen als routes/werving.js is
        gemount, en dat gebeurt na deze module -- dus uitpakken bij het opstarten

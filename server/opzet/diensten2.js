@@ -115,15 +115,48 @@ const { mailAanname } = require('../kern/mailaanname')({ rtmail, mailIn, mailBij
    verzoeken van die router nooit. */
 const scanNet = require('../middleware/malwarescan')({ antivirus, uploadquarantaine, log: deps.log });
 
+/* Het sessieregister van MIJN RTG (blok 1). Het houdt de CONTEXT van een sessie
+   bij -- waarmee zij ontstond, aan welk toestel zij gebonden is, namens wie er
+   gehandeld wordt -- en verleent zelf geen enkele toegang. Zie de kop van
+   kern/identiteit/sessieregister.js voor waarom dat een apart ding moet zijn. */
+const sessieregister = require('../kern/identiteit/sessieregister').maakSessieregister({ db, save });
+
 /* Een token kan een demo-sessie zijn (in-memory) of een echt account-token
-   (ondertekend, staatloos). Beide leveren een sessie met tier + unieke key. */
+   (ondertekend, staatloos). Beide leveren een sessie met tier + unieke key.
+
+   SINDS BLOK 1 hangt er een sid en een context aan, en dat gebeurt HIER omdat
+   dit de enige plek is waar beide soorten sessies samenkomen. Twee dingen die
+   niet mogen verschuiven:
+
+     1. de context beslist NIETS. Hij komt er additief bij, na de geldigheids-
+        toets, en een ontbrekend of vervallen register verandert nooit of iemand
+        binnenkomt. Een storing in de bewijslaag hoort niet te klinken als een
+        overtreding (CONTROLPLANE.md: ONBEKEND is geen WEIGEREN).
+     2. de context wordt GELEZEN, niet aangevuld. Een claim vastleggen gebeurt
+        op het moment van authenticatie; wie dat hier zou doen, legt bij elk
+        verzoek opnieuw een 'afgeleide' vast en verliest daarmee het bewijs dat
+        op het inlogmoment wel te halen was. */
 function resolveSession(token) {
   if (!token) return null;
   const demo = sessionFor(token);
-  if (demo) return demo;
+  if (demo) return demo.sid ? metContext(demo, demo.sid) : demo;
   const user = accounts.verifyToken(token);
-  if (user) return { tier: user.tier, key: 'user-' + user.id, account: user };
+  if (user) {
+    const sid = typeof accounts.sessieVan === 'function' ? accounts.sessieVan(token) : null;
+    const sess = { tier: user.tier, key: 'user-' + user.id, account: user };
+    return sid ? metContext(sess, sid) : sess;
+  }
   return null;
+}
+
+/* Additief: req.session blijft precies wat hij was, hier komt alleen `sid` en
+   een gelezen `sessieContext` bij. Een oud token (drie delen, geen sid) krijgt
+   `sid: null` -- "deze sessie heeft geen identiteit", en dat is waar. */
+function metContext(sess, sid) {
+  sess.sid = sid;
+  const rij = sessieregister.lees(sid);
+  if (rij) { sess.sessieContext = rij.context; sessieregister.raak(sid); }
+  return sess;
 }
 
 /* De AI-poort deelt resolveSession met auth hieronder: een vertaalverzoek en een
@@ -175,6 +208,6 @@ function auth(req, res, next) {
 
   return {
     aiPoort, antivirus, archief, atelierweb, auth, automatisering, beveilig, naamlaag, 
-    resolveSession, mailQ, mailIn, mailAuth, mailBijlage, mailSleutel, rtmailAi, rtmail, rtmailTeam, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar, mailAanname, scanNet, wacht, werkmail
+    resolveSession, sessieregister, mailQ, mailIn, mailAuth, mailBijlage, mailSleutel, rtmailAi, rtmail, rtmailTeam, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar, mailAanname, scanNet, wacht, werkmail
   };
 };

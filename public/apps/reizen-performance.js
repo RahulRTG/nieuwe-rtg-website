@@ -54,7 +54,13 @@
     R.$$('[data-tab]').forEach(function (knop) { var aan = knop.dataset.tab === naam; knop.classList.toggle('actief', aan);
       if (aan) knop.setAttribute('aria-current', 'page'); else knop.removeAttribute('aria-current'); });
     if (schrijfHash !== false) history.replaceState(null, '', '#' + naam);
-    d.title = 'RTG Reizen · ' + naam.charAt(0).toUpperCase() + naam.slice(1);
+    var bladNaam = naam.charAt(0).toUpperCase() + naam.slice(1);
+    d.title = 'RTG Reizen · ' + bladNaam;
+    /* HET KRUIMELPAD VOLGT HET BLAD. De schil van het huis zet zijn pad bij het
+       openen van de pagina; deze vier bladen zijn geen aparte pagina's, dus
+       bleef er "VANDAAG" staan terwijl je op Samen keek. Een pad dat iets
+       anders zegt dan het scherm is erger dan geen pad. */
+    if (w.RTGEdge && w.RTGEdge.setContext) w.RTGEdge.setContext({ title: bladNaam });
     w.scrollTo({ top: 0, behavior: 'smooth' });
     if (naam === 'taxi' && R.laadMobiliteit) R.laadMobiliteit();
     R.meldAdaptief();

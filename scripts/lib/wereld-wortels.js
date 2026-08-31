@@ -95,6 +95,53 @@ const WORTELS = [
     veldnaam: 'uploadId',
     waarom: 'de kluis kent een upload in stukken; het bestand zelf ontstaat pas na het laatste stuk' },
 
+  /* ---- de tweede ronde: elf wortels met dezelfde vorm ---- */
+
+  { naam: 'mallaanvraag', pad: '/api/mall/aanvraag', rol: 'member',
+    prefix: '/api/mall/aanvraag', gemeten: 17,
+    /* `verdieping` komt uit een gesloten lijst (kern/mall/aanbodvorm.js) en de
+       route legt uit waarom hij verplicht is: zonder verdieping krijgt elke
+       zaak alles te zien. */
+    lijf: { titel: 'Proefaanvraag', wat: 'een vraag om te kunnen meten',
+            verdieping: 'diensten', plek: 'Ibiza', budget: 100 },
+    haal: (d) => (d.aanvraag && d.aanvraag.id) || d.id,
+    waarom: 'de vindlaag van de Mall hangt aan een aanvraag van een lid' },
+
+  { naam: 'lerenproject', pad: '/api/member/leren/project-maak', rol: 'member',
+    prefix: '/api/member/leren', gemeten: 12,
+    lijf: { titel: 'Proefproject', wat: 'een project om te kunnen meten' },
+    haal: (d) => d.id || (d.project && d.project.id),
+    waarom: 'de leerkant hangt aan een project; zonder project geen notitie en geen taak' },
+
+  { naam: 'kantoorpakket', pad: '/api/kantoorpakket/maak', rol: 'member',
+    prefix: '/api/kantoorpakket', gemeten: 10,
+    /* `soort: formulier` is geen smaak: tien routes weigeren met "Dit document
+       is geen formulier", dus een gewoon document opent ze niet. */
+    lijf: { naam: 'Proefformulier', soort: 'formulier' },
+    haal: (d) => d.id || (d.document && d.document.id),
+    waarom: 'RTG Office hangt aan een document, en tien routes willen er een van het soort formulier' },
+
+  { naam: 'loonrun', pad: '/api/office/payroll/loonrun', rol: 'kantoor-op-naam',
+    prefix: '/api/office/payroll', gemeten: 10,
+    /* `periode` als jjjj-mm; de route zegt het formaat er zelf bij. */
+    /* En een `zaak`: een loonrun loopt per bedrijf, niet per kantoor. */
+    lijf: { periode: '2026-07', maand: '2026-07', zaak: 'KIKUNOI', code: 'KIKUNOI' },
+    haal: (d) => (d.run && d.run.id) || (d.loonrun && d.loonrun.id) || d.id,
+    waarom: 'de loonrun is de wortel van de payroll-uitgang: aangifte, betaalbestand, correctie' },
+
+  /* DE NAHEFFING STAAT HIER NIET, en dat is een besluit en geen vergetelheid.
+
+     Het rijk weigert met "Deze zaak heeft over 2026K2 niets gefactureerd en
+     niets aangegeven" (kern/overheid/naheffing.js, teHeffen). Dat is geen
+     ontbrekend veld maar een echte voorwaarde: je kunt niet naheffen op niets.
+     Om die tien routes te openen zou er eerst een btw-geschiedenis moeten
+     staan -- facturen, een aangifte, een aansluiting -- en dat is een keten
+     van een heel ander formaat dan de wortels hier.
+
+     Zolang die er niet is, blijven die tien eerlijk onbewezen. Dat is beter
+     dan een verzonnen naheffing, want dan zou de proef meten op een aanslag
+     die in het echt niet had mogen bestaan. */
+
   { naam: 'clips', pad: '/api/clips/maak', rol: 'member',
     prefix: '/api/clips', gemeten: 9,
     /* `duurS` in seconden. Met `duur` weigert hij met "Een clip duurt 1 tot 60

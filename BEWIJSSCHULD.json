@@ -1,8 +1,8 @@
 {
  "stempel": {
-  "op": "2026-08-31T15:35:44.034Z",
-  "commit": "5d548b5e",
-  "boomVuil": true,
+  "op": "2026-08-31T15:56:36.368Z",
+  "commit": "89b7797e",
+  "boomVuil": false,
   "node": "v22.22.2"
  },
  "uitleg": "Wat er nog niet gemeten is, en waarom niet. MAG ALLEEN KRIMPEN -- zie test/bewijsschuld.test.js. Een post van soort \"grens\" sluit nooit; die telt niet als achterstand maar als de rand van de methode.",

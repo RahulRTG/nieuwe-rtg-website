@@ -5,8 +5,8 @@
   "drempel": 3,
   "bestemmingen": 84,
   "woorden": 1070,
-  "gevonden": 668,
-  "dekking": 0.6243,
+  "gevonden": 684,
+  "dekking": 0.6393,
   "perBestemming": [
     {
       "naam": "Magnaat",
@@ -453,21 +453,6 @@
       ]
     },
     {
-      "naam": "Geven",
-      "url": "/apps/foundation/geven.html",
-      "woorden": 8,
-      "gevonden": 1,
-      "mist": [
-        "voorstellen",
-        "gift",
-        "machtiging",
-        "tekenen",
-        "stoppen",
-        "inlogscherm",
-        "winkel"
-      ]
-    },
-    {
       "naam": "App-dossier",
       "url": "/apps/appstore-dossier.html",
       "woorden": 10,
@@ -641,30 +626,6 @@
       ]
     },
     {
-      "naam": "Buurtruil",
-      "url": "/apps/foundation/buurtruil.html",
-      "woorden": 7,
-      "gevonden": 3,
-      "mist": [
-        "weggegeven",
-        "gezocht",
-        "belangstelling",
-        "inlogscherm"
-      ]
-    },
-    {
-      "naam": "RTFoundation in jouw buurt",
-      "url": "/apps/foundation/os-publiek.html",
-      "woorden": 11,
-      "gevonden": 7,
-      "mist": [
-        "hangt",
-        "vrijwilliger",
-        "worden",
-        "deelnemer"
-      ]
-    },
-    {
       "naam": "Berichten",
       "url": "/apps/comm.html",
       "woorden": 4,
@@ -792,16 +753,6 @@
       ]
     },
     {
-      "naam": "Klimaatfonds",
-      "url": "/apps/foundation/klimaatfonds.html",
-      "woorden": 9,
-      "gevonden": 7,
-      "mist": [
-        "onthoud",
-        "hieraan"
-      ]
-    },
-    {
       "naam": "Alles bij elkaar",
       "url": "/apps/wereld.html",
       "woorden": 6,
@@ -880,6 +831,15 @@
       "gevonden": 3,
       "mist": [
         "vooruitblik"
+      ]
+    },
+    {
+      "naam": "RTFoundation in jouw buurt",
+      "url": "/apps/foundation/os-publiek.html",
+      "woorden": 11,
+      "gevonden": 10,
+      "mist": [
+        "hangt"
       ]
     },
     {
@@ -1044,10 +1004,31 @@
       "mist": []
     },
     {
+      "naam": "Buurtruil",
+      "url": "/apps/foundation/buurtruil.html",
+      "woorden": 7,
+      "gevonden": 7,
+      "mist": []
+    },
+    {
+      "naam": "Geven",
+      "url": "/apps/foundation/geven.html",
+      "woorden": 8,
+      "gevonden": 8,
+      "mist": []
+    },
+    {
       "naam": "Het schrift",
       "url": "/apps/foundation/schrift.html",
       "woorden": 2,
       "gevonden": 2,
+      "mist": []
+    },
+    {
+      "naam": "Klimaatfonds",
+      "url": "/apps/foundation/klimaatfonds.html",
+      "woorden": 9,
+      "gevonden": 9,
       "mist": []
     },
     {

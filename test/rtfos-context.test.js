@@ -48,11 +48,31 @@ function bouwContext() {
     db, save: () => {}, crypto,
     boardroomWie: () => null, magBoardroom: () => false
   });
-  Object.assign(ctx, { db, save: () => {}, crypto, kluis: require('../server/kluis') });
-  /* Wat index.js na het opbouwen van de delen op de context zet. Beide zijn
-     late binding: een module die er later komt, gebruikt ze wel. */
-  ctx.herkomstBepaal = () => {};
-  ctx.magInStad = () => false;
+  Object.assign(ctx, { db, save: () => {}, crypto, kluis: require('../server/kluis'),
+    /* `pay` komt uit de state die index.js meekrijgt (regel 58) en staat er dus
+       vanaf het begin op; gift-betalen.js en winkel.js lezen hem. */
+    pay: { partnerIn: async () => ({ ok: true }) } });
+
+  /* WAT ER NA HET OPBOUWEN VAN DE DELEN OP DE CONTEXT WORDT GEZET -- late
+     binding, want de module die het levert bestaat op dat moment nog niet.
+
+     DEZE LIJST GROEIDE VAN TWEE NAAR ZEVEN, en dat is zelf een bevinding. Late
+     binding is handig en verbergt een afhankelijkheid: je ziet aan de kop van
+     een module niet meer wat hij nodig heeft. Waar het kon is er dan ook
+     EXPLICIET doorgegeven in plaats van via de context (gift.js geeft
+     `planVan`, `standVan` en `bronUitGift` als argument mee aan zijn delen);
+     wat hier staat is wat over meer dan een stap heen moet reizen, of wat een
+     kring zou maken. Komt er een achtste bij, dan is dat een moment om te
+     vragen of de opbouwvolgorde nog klopt.
+
+     Elke regel met de plek waar hij wordt gezet, zodat je hem kunt narekenen. */
+  ctx.herkomstBepaal = () => {};                 // index.js, na herkomst.js
+  ctx.magInStad = () => false;                   // index.js
+  ctx.bronUitGift = () => ({});                  // index.js: geld.bronUitGift
+  ctx.winkelOntvanger = () => null;              // index.js: de walletcode uit de giftstand
+  ctx.giftAnbi = () => 'onbekend';               // gift.js, voor donateur-kantoor.js
+  ctx.giftRsin = () => '';                       // gift.js, idem
+  ctx.giftMachtigingWeg = () => [];              // gift.js: gift-periodiek.js trekt hiermee de machtiging in
   return ctx;
 }
 

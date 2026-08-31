@@ -77,6 +77,43 @@ lezen en niet te volgen -- wie in het Onderzoekslab een project in handen had,
 kon niet terug naar het onderzoek waar het uit kwam. Nu draagt het project een
 `herkomst` als veld, met het onderzoeksnummer erbij.
 
+## Meetinstrumenten: wat een deelnemer invult
+
+Sinds 31 augustus 2026 kan een onderzoeksleider een **meetprotocol** samenstellen
+(`kern/livinglab/instrument.js`) dat een deelnemer met zijn labpas invult. Dat is
+iets anders dan de vrije observatie die er al was: de observatie levert
+materiaal, het instrument levert vergelijkbare metingen. Ze horen niet in elkaar
+te schuiven -- een vrije observatie met een schaal ernaast is geen meting.
+
+**Dit is met opzet géén app uit de App Store.** Een app van derden draait in een
+cel zonder netwerk (APPSTORE.md grens 1) en kan een meting dus niet terugsturen
+-- en zou dat ook niet mogen: een meting draagt een toestemmingsgrond en hoort
+bij een studie van de stichting. Het instrument woont daarom achter de labpas, in
+de software van RTG zelf.
+
+Elke meting draagt haar context, en elk stuk daarvan heeft een reden:
+
+| wat | waarom |
+|---|---|
+| protocolversie | zonder dit is een reeks over een half jaar niet te vergelijken: de vraag kan onderweg zijn veranderd |
+| toestemmingsgrond | bevriest bij het insturen; wat later verandert, verandert niet met terugwerkende kracht wat er toen gold |
+| apparaat + ijkstand | de gerekende kalibratiestand op het MOMENT van meten -- blijkt een apparaat later ontregeld, dan is te zien welke metingen eronder vallen |
+| meetmoment | het hoeveelste meetmoment uit het onderzoeksplan |
+| ruwe waarde | wat de deelnemer invulde, ongewijzigd |
+
+Drie grenzen: **geen toestemmingsgrond, geen meting** (fail-closed, en op de
+module getoetst omdat die weg over HTTP niet te bereiken is); **een waarde buiten
+bereik wordt geweigerd en niet stil bijgesteld** -- wie meetwaarden bijschaaft,
+meet zijn eigen verwachting; en **de deelnemer is een alias**, die uit de pas
+komt en nooit uit het lijf van het verzoek.
+
+Vier soorten instrument bestaan met opzet níét, met het antwoord erbij dat een
+onderzoeksleider krijgt als hij het toch probeert: **foto** (er staat altijd meer
+op dan de meting), **locatie** (de gevoeligste waarde in dit huis), **audio** (dat
+vangt de stem van mensen die niets hebben verleend) en **doorlopend meten** (dat
+is een sensor in iemands huis, en die loopt langs de apparatuurlaag met haar
+bevoegdheden).
+
 ## Wat er nog niet is, met de reden
 
 - **Labfonds ↔ studie.** Het fonds financiert onderzoek en weet niet welk. Dit is

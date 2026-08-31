@@ -81,6 +81,10 @@ module.exports = ({ db, save, crypto, anthropic, lab, kosten, economie }) => {
   ctx.apparatuur = require('./apparatuur')(ctx);
   // het register en het gebruik ervan: twee bestanden, één begrip voor de routes
   Object.assign(ctx.apparatuur, require('./apparatuurgebruik')(ctx));
+  /* De meetinstrumenten (./instrument.js): wat een deelnemer met zijn labpas
+     invult. Hij staat NA de apparatuur omdat hij de kalibratiestand van een
+     apparaat bevriest op het moment van meten, en die rekensom staat daar. */
+  ctx.instrument = require('./instrument')(ctx);
   ctx.doorbraak = require('./doorbraak')(ctx);
   ctx.impact = require('./impact')(ctx);
   ctx.ai = require('./ai')(ctx);

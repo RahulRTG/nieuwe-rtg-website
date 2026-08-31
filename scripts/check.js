@@ -1956,6 +1956,8 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
     ['/api/lab2/mijn', 'de labpas is de geloofsbrief (opPas); alleen het eigen onderzoek van die ene deelnemer'],
     ['/api/lab2/mijn/observatie', 'idem; de alias komt uit de pas en niet uit het lijf'],
     ['/api/lab2/mijn/reflectie', 'idem; juist het gedrag dat dit lab wil hebben, dus het mag geen drempel krijgen'],
+    ['/api/lab2/mijn/venster', 'idem; de deelnemer haalt de vragen op die HIJ moet invullen -- welke studie dat is, volgt uit zijn pas'],
+    ['/api/lab2/mijn/meting', 'idem; de meting gaat de studie in op de alias uit de pas, met de toestemmingsgrond van die studie'],
     ['/api/lab2/mijn/terugtrekken', 'toestemming intrekken moet werken met wat de deelnemer zelf heeft: zijn pas'],
     ['/api/lab2/bewoner/themas', 'de vragen uit de buurt zijn openbaar; dat is de trechter vóór het onderzoek'],
     ['/api/lab2/bewoner/thema', 'een bewoner draagt een onderzoeksvraag aan zonder account (rem 10/min per bron)'],

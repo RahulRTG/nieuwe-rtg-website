@@ -67,6 +67,27 @@ module.exports = (kern, hulp) => {
     return livinglab.bewijs.observatieBij(wie.studieId, b, wie.alias);
   }));
 
+  /* ---------- het meetvenster: de vragen die deze studie stelt ----------
+
+     Twee deuren, allebei op de labpas: de vragen ophalen en ze invullen. De
+     alias komt ook hier uit de pas en nooit uit het lijf.
+
+     DIT IS MET OPZET GEEN APP UIT DE APP STORE. Een app van derden draait in een
+     cel zonder netwerk en kan een meting dus niet terugsturen -- en zou dat ook
+     niet mogen: een meting draagt een toestemmingsgrond en hoort bij een studie
+     van de stichting (kern/livinglab/instrument.js). */
+  app.post('/api/lab2/mijn/venster', remBron, remCode, (req, res) => veilig(res, () => {
+    const wie = livinglab.mensen.opPas(codeUit(req));
+    if (!wie) return { status: 404, error: 'Deze labpas kennen we niet.' };
+    return livinglab.instrument.venster(wie.studieId, wie.alias);
+  }));
+
+  app.post('/api/lab2/mijn/meting', remBron, remCode, (req, res) => veilig(res, () => {
+    const wie = livinglab.mensen.opPas(codeUit(req));
+    if (!wie) return { status: 404, error: 'Deze labpas kennen we niet.' };
+    return livinglab.instrument.metingBij(wie.studieId, wie.alias, lijf(req));
+  }));
+
   /* Een reflectie insturen met de labpas: wat er misging, wat onverwacht was, of
      welke eerdere conclusie herzien moet worden. Dit staat open voor bewoners
      omdat het juist het gedrag is dat dit lab wil hebben -- en het is bovendien

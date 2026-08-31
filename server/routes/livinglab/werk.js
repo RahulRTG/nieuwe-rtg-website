@@ -52,6 +52,13 @@ module.exports = (kern, hulp) => {
   app.post('/api/lab2/app/uitgifte', officeAuth, (req, res) => veilig(res, () => livinglab.apparatuur.uitgifte(req.body, wie(req))));
 
   /* ---------- van onderzoek naar verandering ---------- */
+  /* ---------- meetinstrumenten ----------
+     Het protocol samenstellen doet de onderzoeksleider; invullen doet de
+     deelnemer met zijn labpas (./bewoner.js). Die twee staan met opzet aan
+     verschillende kanten van de deur. */
+  app.post('/api/lab2/protocol/zet', officeAuth, (req, res) => veilig(res, () => livinglab.instrument.protocolZet(id(req), req.body, wie(req))));
+  app.post('/api/lab2/metingen', officeAuth, (req, res) => veilig(res, () => livinglab.instrument.metingen(id(req), req.body || {})));
+
   app.post('/api/lab2/uit/maak', officeAuth, (req, res) => veilig(res, () => livinglab.doorbraak.uitgangBij(id(req), req.body, wie(req))));
   app.post('/api/lab2/uit/status', officeAuth, (req, res) => veilig(res, () => livinglab.doorbraak.uitgangZet(id(req), req.body, wie(req))));
   app.post('/api/lab2/uit/naar-lab', officeAuth, (req, res) => veilig(res, () => livinglab.doorbraak.naarLab(id(req), req.body, wie(req))));

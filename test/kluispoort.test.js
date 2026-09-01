@@ -102,7 +102,16 @@ test('op naam komt hij er wel door, en het journaal noemt de sleutel van wie kee
   const voor = inzage().length;
   const r = await post('/api/office/verify', { userId: id, decision: 'approve' }, opNaam);
   assert.equal(r.status, 200, JSON.stringify(r.data).slice(0, 200));
-  await new Promise(z => setTimeout(z, 400));
+  /* WACHTEN OP DE TOESTAND, NIET OP DE KLOK. Hier stond een vaste 400 ms voor
+     het journaal dat na het besluit wordt weggeschreven. Een vaste tijd meet
+     twee dingen tegelijk -- of de regel er komt, en of de machine vrij was --
+     en op een volle runner zakt hij zonder dat er iets mis is. Vandaar: kijken
+     tot de regel er is, met een plafond zodat een uitblijvende regel de toets
+     nog steeds laat zakken (en niet laat hangen). */
+  const tot = Date.now() + 10000;
+  while (inzage().length <= voor && Date.now() < tot) {
+    await new Promise(z => setImmediate(z));
+  }
 
   const na = inzage();
   assert.ok(na.length > voor, 'het besluit hoort een regel op te leveren');

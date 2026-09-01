@@ -144,6 +144,23 @@ const MUNTERS = [
       const s = await post('/api/techniek/sso/scimsleutel', { org }, bos.techniek);
       return (s && s.data && s.data.sleutel) || null;
     }],
+
+  /* DE DRIE LEGE SLEUTELS, en ze staan hier omdat ze GEMUNT moeten worden.
+
+     Ze stonden al in ROLLEN met de reden erbij, maar zonder munter bleef
+     `tokens.openbaar` leeg -- en dan meldt een proef "rol openbaar, maar dit
+     instrument heeft daar geen token voor" en telt de route als ONGEMETEN.
+     Gemeten op 1 september 2026: 107 routes, en er was niets mis mee.
+
+     Hun sleutel is de LEGE STRING: geen Authorization-kop meesturen is voor een
+     openbare route niet een tekort maar de JUISTE invoer. Zie de kop van
+     LEGE_SLEUTELS hieronder voor waarom het er drie zijn en geen een. */
+  ['openbaar', 'geen inlog maar het ONTBREKEN ervan: zonder kop aankloppen is precies wat een openbare route hoort te krijgen',
+    async () => ''],
+  ['omgeving', 'hangt aan een omgevingsvariabele en niet aan een sessie; ook hier is geen kop de juiste invoer',
+    async () => ''],
+  ['eigen-poort', 'een inlogdeur die zelf oordeelt (scripts/lib/bewakers.js); hij MAAKT de sessie en kan er dus geen eisen',
+    async () => ''],
 ];
 
 /* Rollen die geen DEUR zijn en dus niet in de rollenlijst horen. `eigenaar` is
@@ -173,7 +190,10 @@ async function haalSleutels({ post }) {
     waaroms[rol] = waarom;
     let t = null;
     try { t = await munt(post, tokens); } catch (e) { t = null; }
-    if (t) tokens[rol] = t; else ontbreekt.push({ rol, waarom });
+    /* `t != null` en niet `if (t)`: de lege string IS een geldige sleutel voor de
+       drie lege-sleutelrollen hierboven, en een waarheidstoets gooit hem weg.
+       Dat is precies hoe 107 openbare routes als ongemeten konden tellen. */
+    if (t != null && t !== false) tokens[rol] = t; else ontbreekt.push({ rol, waarom });
   }
   const hernieuw = async (rol) => {
     const rij = MUNTERS.find(m => m[0] === rol);
@@ -248,7 +268,7 @@ const LEGE_SLEUTELS = ['openbaar', 'omgeving', 'eigen-poort'];
    van dezelfde rollen lopen uiteen zodra er een munter bij komt, en dan noemt de
    ene lijst een rol die de andere niet kent. Dat is exact de fout die deze
    sleutelbos zelf moest oplossen (zie de kop). */
-const ROLLEN = [...MUNTERS.map(m => m[0]), ...LEGE_SLEUTELS];
+const ROLLEN = [...new Set([...MUNTERS.map(m => m[0]), ...LEGE_SLEUTELS])];
 
 module.exports = { haalSleutels, meldSleutels, BASISROLLEN, ROLLEN, LEGE_SLEUTELS,
   PASLADDER, OFFICE_CODE, DEMO_PASS, MUNTERS };

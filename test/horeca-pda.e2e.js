@@ -274,10 +274,16 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
     const knoppen = await page.$$('[data-belofte]');
     assert.ok(knoppen.length >= 2, 'elke wachtende belofte heeft een eigen knop: ' + knoppen.length);
     for (let i = 0; i < knoppen.length + 2; i++) {
-      const knop = await page.$('[data-belofte]');
-      if (!knop) break;
       const hoeveel = (await page.$$('[data-belofte]')).length;
-      await knop.click();
+      if (!hoeveel) break;
+      /* KLIKKEN OP DE SELECTOR EN NIET OP EEN VASTGEHOUDEN HANDVAT. Tussen het
+         opvragen van het element en de klik tekent de lijst zichzelf opnieuw --
+         elke aftekening haalt er een belofte uit -- en dan klikt playwright op
+         een knoop die niet meer in de DOM hangt: "Element is not attached to
+         the DOM". Gemeten in een volle schermronde op 1 september 2026, op
+         regel 280. page.click() zoekt de knop opnieuw op en wacht tot hij
+         stabiel is; een elementHandle doet dat allebei niet. */
+      await page.click('[data-belofte]');
       /* Elke aftekening haalt EEN belofte weg (hij wacht niet meer op een mens),
          en met de laatste verdwijnt de hele aankomsttaak. Het aantal knoppen is
          dus de teller die verandert; wachten op een tekst kan hier niet, want wat

@@ -98,10 +98,17 @@ function wachtOpSchoneBoom() {
       RTG_STAATLOG: '2' } });
   const { basis, klaar } = server;
 
-  const post = async (pad, lijf, tok) => {
+  /* `extraKoppen` is er voor deuren die hun sleutel in een KOP verwachten en niet
+     in het lijf -- de zaakdoos is de enige. Zonder dit vierde argument stuurde
+     deze proef de doossleutel nooit mee: de bouwer in ./lib/lijfsleutels.js gaf
+     hem netjes door, hij viel hier op de grond, de route weigerde, en de familie
+     meldde zich als 'geen sleutel gekregen'. Vier routes stonden zo als
+     ongemeten terwijl de sleutel klopte. */
+  const post = async (pad, lijf, tok, extraKoppen) => {
     try {
       const r = await fetch(basis + pad, { method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...(tok ? { Authorization: 'Bearer ' + tok } : {}) },
+        headers: { 'Content-Type': 'application/json',
+          ...(tok ? { Authorization: 'Bearer ' + tok } : {}), ...(extraKoppen || {}) },
         body: JSON.stringify(lijf || {}) });
       const tekst = await r.text();
       let data; try { data = JSON.parse(tekst); } catch (e) { data = tekst; }

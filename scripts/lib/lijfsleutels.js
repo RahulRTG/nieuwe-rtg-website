@@ -132,10 +132,10 @@ const FAMILIES = [
         bevoegd: true, waarheidsgetrouw: true, privacyAkkoord: true
       }, null);
       const id = aanvraag && aanvraag.data && aanvraag.data.id;
-      if (!id) return null;
-      if (!tokens || !tokens.boardroom) return null;   // zonder boardroom geen controle
+      if (!id) throw new Error('de registratie-aanvraag gaf geen id terug: ' + JSON.stringify(aanvraag && aanvraag.data).slice(0, 160));
+      if (!tokens || !tokens.boardroom) throw new Error('geen boardroom-sleutel; zonder die rol is er niemand die de controle aftekent');
       const eisen = ((aanvraag.data.aanvraag || {}).controles || []).map(c => c.id);
-      if (!eisen.length) return null;
+      if (!eisen.length) throw new Error('de aanvraag noemde geen enkele controle; dan valt er niets af te tekenen');
       for (const onderdeel of eisen) {
         await post('/api/office/foundation/registratie/controle', {
           id, onderdeel, uitkomst: 'geverifieerd',
@@ -144,13 +144,13 @@ const FAMILIES = [
       }
       const besluit = await post('/api/office/foundation/registratie/besluit',
         { id, action: 'goedkeuren' }, tokens.boardroom);
-      if (!besluit || !besluit.data || !besluit.data.ok) return null;
-      if (!datamap) return null;
+      if (!besluit || !besluit.data || !besluit.data.ok) throw new Error('goedkeuren mislukte: ' + JSON.stringify(besluit && besluit.data).slice(0, 160));
+      if (!datamap) throw new Error('geen datamap meegegeven; de activatiesleutel staat op schijf');
       const geheim = await leesActivatie(datamap);
-      if (!geheim) return null;
+      if (!geheim) throw new Error('de activatiesleutel was niet uit de datamap te lezen');
       const act = await post('/api/foundation/school/school/activeren', { activatie: geheim }, null);
       const d = act && act.data;
-      if (!d || !d.beheerToken) return null;
+      if (!d || !d.beheerToken) throw new Error('activeren gaf geen beheerToken: ' + JSON.stringify(d).slice(0, 160));
       return { schoolCode: d.schoolCode, beheerToken: d.beheerToken };
     }
   },

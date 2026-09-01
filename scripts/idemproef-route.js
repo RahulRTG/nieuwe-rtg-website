@@ -28,7 +28,7 @@ const { alleRoutes, isSchakel, verdeelOpRol, meldZonderRol } = require('./lib/ro
 const { haalSleutels, meldSleutels, BASISROLLEN, PASLADDER } = require('./lib/proefsleutels');
 /* Wanneer is dit gemeten, en waartegen. Zonder stempel is een register niet na
    te lopen: verouderd ziet er identiek uit aan vers. Zie scripts/lib/stempel.js. */
-const { stempel } = require('./lib/stempel');
+const { stempel, eisSchoneBoom } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'IDEMPROEF.json');
@@ -52,7 +52,23 @@ const MAX = Number((argv.find(a => a.startsWith('--max=')) || '').slice(6)) || 0
    OVERSCHRIJFT. */
 if (require.main !== module) { module.exports = {}; return; }
 
+
+/* WEIGEREN VOOR HET BEGINT. Deze ronde duurt minuten en levert een register op
+   dat NERGENS meetelt zodra er ongecommit werk in de boom staat -- boomVuil
+   wordt pas aan het eind vastgesteld. Zelfde poort als de drie andere proeven
+   uit deze familie (rolproef, handelingproef, uitvoerproef); hij ontbrak hier,
+   en test/schoneboom.test.js vraagt met zoveel woorden om alle zes. */
+function wachtOpSchoneBoom() {
+  const b = eisSchoneBoom('de idempotentieproef');
+  if (b.ok) return;
+  console.error('\n  DEZE RONDE ZOU NIET MEETELLEN\n');
+  console.error('  ' + b.reden);
+  for (const r of (b.bestanden || [])) console.error('    ' + r);
+  process.exit(3);
+}
+
 (async () => {
+  wachtOpSchoneBoom();
   /* DE GEDEELDE WEGWERPSERVER. Hier stond de eigen kopie die de kop al een
      maand ontkende ('ze delen de wegwerpserver') -- de tekst beloofde wat de
      code niet deed, en zo lopen kopieen uiteen zonder dat iemand het ziet

@@ -43,16 +43,29 @@
    ---- WAT ER GEBEURT MET EEN BESTAND ZONDER METING ----
 
    Dit is de plek waar deze wijziging fout kon gaan, dus staat hij hier hardop.
-   Een nieuw toetsbestand staat nog in geen enkel register. Hij mag daarom NOOIT
-   uit de verdeling vallen -- dat is precies de faalvorm waar dit bestand voor
-   is gebouwd. Ongemeten bestanden worden na de gewogen ronde om en om over de
-   delen gelegd, in dezelfde volgorde als vroeger. Ze krijgen dus geen verzonnen
-   gewicht (dat zou de weging vervuilen met een gok) maar ze worden wel
-   evenwichtig verdeeld, en ze zitten gegarandeerd in precies een deel.
+   Een nieuw toetsbestand staat nog in geen enkel register, en hij mag NOOIT uit
+   de verdeling vallen -- dat is precies de faalvorm waar dit bestand voor is
+   gebouwd.
 
-   Staat het register er helemaal niet, dan is ALLES ongemeten en gedraagt deze
-   functie zich exact zoals hij zich altijd heeft gedragen. Een ontbrekende
-   meting maakt de keten trager, nooit stiller. */
+   Hij krijgt daarom het ZWAARSTE bekende gewicht. Niet nul en niet het
+   gemiddelde: dat zijn allebei gokken die de keten SNELLER laten lijken dan hij
+   is, en die gok kost een scherf die als laatste nog een half uur bezig is.
+   Onbekend telt hier als duur, en dat is de hoofdregel van KEURING.md in een
+   regel code -- onzekerheid mag nooit snelheid afdwingen. De prijs is wat
+   evenwicht als de gok te hoog was, en dat is de goedkope kant.
+
+   Deze regel komt uit scripts/scherf.js, dat tot 28 augustus 2026 in ci.yml
+   stond en toen door `npm run test:deel` is vervangen. Bij die verhuizing is de
+   WEGING blijven liggen -- de verdeling ging terug naar om en om -- en dit
+   bestand maakt dat af. Het oude script en zijn eigen register zijn opgeruimd:
+   twee plekken die hetzelfde verdelen is LAT.md regel 4, en dat is de fout die
+   deze hele laag juist moet voorkomen.
+
+   Staat het register er helemaal niet, dan is ALLES ongemeten en dus even
+   zwaar. Dan valt de greedy hieronder samen met om en om (i % totaal): gelijke
+   gewichten, oplopend op naam, elk naar het laagst geladen deel. De verdeling
+   gedraagt zich dan exact zoals vroeger -- een ontbrekende meting maakt de
+   keten trager, nooit stiller. */
 
 const fs = require('fs');
 const path = require('path');
@@ -96,26 +109,22 @@ function indeling(lijst, totaal) {
   const last = new Array(totaal).fill(0);
   const gewicht = duren();
 
-  const gemeten = [];
-  const ongemeten = [];
-  for (const naam of lijst) {
-    if (gewicht.has(naam)) gemeten.push(naam); else ongemeten.push(naam);
-  }
+  /* Het zwaarste bekende gewicht is wat een ONGEMETEN bestand krijgt. Is er
+     niets bekend, dan is elk bestand even zwaar en valt de greedy samen met de
+     oude om-en-om-verdeling; de waarde zelf doet er dan niet toe. */
+  const bekend = [...gewicht.values()].filter((v) => v > 0);
+  const zwaarste = bekend.length ? Math.max(...bekend) : 1;
+  const kost = (naam) => gewicht.get(naam) || zwaarste;
 
   /* Zwaarste eerst; bij een gelijk gewicht op naam, zodat de uitkomst niet van
-     de volgorde van de invoer afhangt. */
-  gemeten.sort((a, b) => (gewicht.get(b) - gewicht.get(a)) || (a < b ? -1 : a > b ? 1 : 0));
-  for (const naam of gemeten) {
+     de volgorde van de invoer afhangt maar alleen van de lijst zelf. */
+  for (const naam of [...lijst].sort((a, b) =>
+    (kost(b) - kost(a)) || (a < b ? -1 : a > b ? 1 : 0))) {
     let k = 0;
     for (let i = 1; i < totaal; i++) if (last[i] < last[k]) k = i;
     bakken[k].push(naam);
-    last[k] += gewicht.get(naam);
+    last[k] += kost(naam);
   }
-
-  /* En de ongemeten bestanden om en om, precies zoals de oude verdeling het
-     deed: i % totaal. Zo blijft het aantal per deel in evenwicht en valt er
-     nooit een buiten de boot. */
-  ongemeten.forEach((naam, i) => bakken[i % totaal].push(naam));
 
   return bakken;
 }

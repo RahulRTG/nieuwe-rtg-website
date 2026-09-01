@@ -359,7 +359,7 @@ bij de bouw heeft blootgelegd -- want dat laatste is de eigenlijke opbrengst.
 | 6 | Semantische diff | `scripts/lib/semdiff.js` | 10 klassen, soort vóór woorden |
 | 7 | Bewijsboek | `scripts/lib/bewijsboek.js` | 11 omgevingsdelen gemeten, 4 niet, 9 mutaties |
 | 8 | Planner | `scripts/plan.js` | de vier lagen achter elkaar, met redenen |
-| 9 | Werkrij | `scripts/draai.js` | twee banen, langste eerst, duur teruggeschreven |
+| 9 | Werkrij | *(opgeruimd 1 sep 2026)* | ging met `scripts/scherf.js` mee toen `test:deel` de scherven overnam; de weging staat nu in `scripts/lib/delen.js` |
 | 10 | Persistente runners | -- | **op slot**, zie hieronder |
 
 **Stap tien blijft dicht, en dat is een besluit en geen achterstand.** Par. 8.1

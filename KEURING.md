@@ -47,9 +47,22 @@ nieuwe toets een deel op. Toen er op deze tak één toetsbestand bijkwam
 gaf 419 / **1122** / 626 / 549: dezelfde scheefheid, andere scherf, niemand die
 het zag aankomen. Sinds 1 september 2026 weegt de verdeling daarom op de gemeten
 duur uit `TOETSDUUR.json` (zwaarste eerst, naar het lichtste deel), met één
-harde eis: een bestand dat niet in het register staat wordt om en om verdeeld en
-**nooit overgeslagen** — ontbrekende meting maakt de keten trager, nooit
-stiller. Waar die meting vandaan komt staat in par. 3.
+harde eis: een bestand dat niet in het register staat krijgt het **zwaarste
+bekende gewicht** en wordt nooit overgeslagen. Nul of het gemiddelde gokken zou
+de keten sneller laten lijken dan hij is; onbekend telt hier als duur, en dat is
+de hoofdregel hierboven in één regel code. Waar de meting vandaan komt staat in
+par. 3.
+
+**Dit was er al een keer, en het is bij een verhuizing blijven liggen.**
+`scripts/scherf.js` verdeelde op precies deze manier en stond tot 28 augustus
+2026 in `ci.yml`; commit `618cfea8` verving hem door `npm run test:deel`, dat de
+CI-weg gelijktrok met wat een ontwikkelaar lokaal draait. Bij die verhuizing
+ging de weging verloren — de verdeling viel terug op alfabetische volgorde — en
+het script bleef met zijn eigen register (`SUITEDUUR.json`) als dode tak achter.
+Beide zijn op 1 september 2026 opgeruimd; de weging staat nu in
+`scripts/lib/delen.js`, de plek die `test-runner.js`, `e2e.js` én `a11y.js` al
+deelden. Twee verdelers met elk een eigen duurregister is `LAT.md` regel 4 op de
+plek waar hij het duurst is.
 
 ### De impactgraaf versmalt te goed om waar te zijn
 
@@ -136,6 +149,15 @@ noemt het bestand niet. Hier is het gratis — dit proces ís het toetsbestand.
 Het register wordt in CI samengesteld en als artefact klaargezet; **een mens
 commit hem**, want hij stuurt de bouw en hoort dus in de historie te veranderen
 en niet onderweg.
+
+*Waarom niet gewoon uit de Actions-cache?* Dat zou de menselijke stap besparen,
+en voor een planningsgetal klinkt dat redelijk. Het antwoord staat in de kop van
+het opgeruimde `scherf.js`, en het is de reden dat het register in git hoort:
+**de verdeling is deterministisch — zelfde invoer, zelfde uitkomst.** Zou de
+weging uit een cache komen, dan kan een herhaalde ronde op dezelfde commit een
+ander bestand op een andere scherf zetten, "en dan is *die scherf zakte* geen
+bruikbare aanwijzing meer". Een cache maakt de verdeling sneller actueel en de
+diagnose onbruikbaar; dat is de verkeerde ruil.
 
 Eén ding is daarbij stil fout gegaan en staat daarom uitgeschreven in
 `test/toetsnaam.js`: `node --test a.js b.js` maakt drie soorten processen die er

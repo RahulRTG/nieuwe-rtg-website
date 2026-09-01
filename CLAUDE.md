@@ -917,9 +917,12 @@ permanente PASS. De **scherfverdeling weegt sinds 1 september 2026 op gemeten
 duur** (`TOETSDUUR.json`, zwaarste eerst naar het lichtste deel) en niet meer op
 alfabetische volgorde — die verschoof namelijk: één toetsbestand erbij
 verhuisde 299 van de 314 bestanden van een scherf, en daarmee de zware staart
-van scherf 1 naar scherf 2. De harde eis eromheen: een bestand zonder gewicht
-wordt om en om verdeeld en **nooit overgeslagen**, want een ontbrekende meting
-hoort de keten trager te maken en nooit stiller.
+van scherf 1 naar scherf 2. De harde eis eromheen: een bestand zonder gewicht krijgt
+het **zwaarste bekende gewicht** en wordt nooit overgeslagen -- onbekend telt als
+duur, want een ontbrekende meting hoort de keten trager te maken en nooit
+stiller. Diezelfde weging stond tot 28 augustus 2026 al in `scripts/scherf.js`
+en ging bij een verhuizing naar `test:deel` verloren; dat script en zijn eigen
+register zijn opgeruimd.
 
 **`LAT.md` is de technische lat** — elf regels die allemaal uit een fout komen die hier écht is gemaakt, met per regel wat hem handhaaft en waar er alleen op mensen wordt vertrouwd. Lees die vóór je code schrijft of repareert. De belangrijkste twee: repareer de oorzaak en niet het symptoom, en trek elke bewering na met een mutatie (een toets die je niet hebt zien zakken is geen toets). LAT.md gaat over de code, CLAUDE.md over het merk.
 

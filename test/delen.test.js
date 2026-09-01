@@ -230,3 +230,30 @@ test('een lijst die geen toetsbestanden bevat (a11y-schermen) blijft om en om', 
   assert.deepEqual(bakken[0], ['/apps/app.html', '/apps/cel.html', '/apps/eten.html']);
   assert.deepEqual(bakken[1], ['/apps/bank.html', '/apps/dok.html']);
 });
+
+/* DE ZWAARSTE SCHATTING VOOR EEN ONGEMETEN BESTAND (1 september 2026).
+
+   Deze regel komt uit scripts/scherf.js, dat tot 28 augustus 2026 in ci.yml
+   stond. Een nieuw toetsbestand heeft nog geen gewicht, en de gok die je dan
+   maakt bepaalt de wandklok: nul of het gemiddelde laten de keten SNELLER
+   lijken dan hij is, en dan staat er een scherf een half uur alleen na te
+   hijgen. Het zwaarste bekende gewicht gokt de andere kant op -- onbekend telt
+   als duur. Dat is de hoofdregel van KEURING.md in een regel code.
+
+   MUTATIE (LAT.md regel 2): `gewicht.get(naam) || zwaarste` vervangen door
+   `gewicht.get(naam) || 0`
+   -> "een ongemeten bestand telt als het zwaarste" ZAKT (RAAK). */
+test('een ongemeten bestand telt als het zwaarste, niet als nul', () => {
+  zetDuren({ 'zwaar.test.js': 100000, 'licht.test.js': 1000 });
+  try {
+    /* Zou een ongemeten bestand als nul tellen, dan belandt hij bij het
+       zwaarste bestand op dezelfde scherf en is die scherf twee keer zo lang
+       bezig. Telt hij als het zwaarste, dan gaat hij juist apart. */
+    const bakken = indeling(['zwaar.test.js', 'licht.test.js', 'nieuw.test.js'], 2);
+    const metZwaar = bakken.find(b => b.includes('zwaar.test.js'));
+    assert.ok(!metZwaar.includes('nieuw.test.js'),
+      'een ongemeten bestand kruipt bij de zwaarste; dan is de gok naar beneden gedaan');
+    assert.deepEqual(bakken.find(b => b.includes('nieuw.test.js')).sort(),
+      ['licht.test.js', 'nieuw.test.js']);
+  } finally { zetDuren(null); }
+});

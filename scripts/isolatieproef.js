@@ -43,6 +43,9 @@ const { maakBeschermstand, BEVRIEST, LOOPT_DOOR, UITZONDERINGEN } =
 const beleid = require(path.join(root, 'server/kern/stuur/beleid'));
 const maakIsolatie = require(path.join(root, 'server/kern/isolatie'));
 const effectmodel = require(path.join(root, 'server/kern/isolatie/effecten'));
+const effectcollecties = require(path.join(root, 'server/kern/isolatie/effectcollecties'));
+const effectregister = require(path.join(root, 'server/kern/isolatie/effectregister'));
+const proefmeting = require(path.join(root, 'server/kern/isolatie/proefmeting'));
 const dragerlijst = require(path.join(root, 'server/kern/isolatie/dragers'));
 const leesset = require(path.join(root, 'server/kern/isolatie/leesset'));
 const { maakIsolatiefilter } = require(path.join(root, 'server/kern/stuur/isolatiefilter'));
@@ -237,6 +240,85 @@ const noemers = {};
     })(),
     voorbeeldStrenger: soorten.strenger.slice(0, 10),
     voorbeeldLosser: soorten.losser.slice(0, 10)
+  };
+}
+
+/* ---------- 3b1. Kan het effectmodel ooit uit de schaduw? ----------
+
+   Dit is de noemer waar het besluit aan hangt, en hij is met opzet apart geteld
+   van de onenigheden hierboven: die zeggen WAAR de twee lagen verschillen, dit
+   zegt of het effectmodel genoeg WEET om ooit zelf te mogen beslissen. */
+{
+  const paden = [...new Set(kaart.capabilities.map(r => r.pad))].sort();
+  const graden = {};
+  const bronnen = {};
+  for (const pad of paden) {
+    const r = effectmodel.effectenVan(pad, 'POST', functies.functieVoorPad(pad));
+    graden[r.graad] = (graden[r.graad] || 0) + 1;
+    const b = (r.bronnen || []).join('+') || 'geen';
+    bronnen[b] = (bronnen[b] || 0) + 1;
+  }
+
+  /* HET PLAFOND. Wat zou de dekking worden als IEDERE gemeten collectie was
+     ingedeeld? Dat getal beantwoordt de vraag of dit register nog werk waard is,
+     en het antwoord is: niet zoveel. De grens ligt bij de PROEF en niet bij de
+     lijst -- een pad waar IDEMPROEF.json nooit met succes langskwam, raakt geen
+     enkele collectie, en dus valt er niets uit af te leiden hoeveel namen er ook
+     staan. Wie meer dekking wil, verbetert de proef. */
+  let metGemetenCollectie = 0, blijftOnbekend = 0;
+  for (const pad of paden) {
+    const c = proefmeting.collectiesVan(pad);
+    if (c && c.size) { metGemetenCollectie++; continue; }
+    const r = effectmodel.effectenVan(pad, 'POST', functies.functieVoorPad(pad));
+    if (r.graad === 'onbekend') blijftOnbekend++;
+  }
+
+  /* DE IJKING. Waar allebei de bronnen iets zeggen: zijn ze het eens? Dit is de
+     vraag die vooraf moet gaan aan elk gebruik van de afleiding als gezag. */
+  const ijking = { paren: 0, overlappend: 0, aanvullend: [] };
+  for (const pad of paden) {
+    const c = proefmeting.collectiesVan(pad);
+    if (!c || !c.size) continue;
+    const uitCol = new Set();
+    for (const col of c) { const rij = effectcollecties.effectVan(col); if (rij) uitCol.add(rij.effect); }
+    if (!uitCol.size) continue;
+    const uitVerklaring = new Set();
+    for (const r of effectregister.VERKLAARD) if (r.patroon.test(pad)) r.effecten.forEach(x => uitVerklaring.add(x));
+    if (!uitVerklaring.size) continue;
+    ijking.paren++;
+    if ([...uitCol].some(x => uitVerklaring.has(x))) ijking.overlappend++;
+    else if (ijking.aanvullend.length < 10) ijking.aanvullend.push({ pad, verklaard: [...uitVerklaring], afgeleid: [...uitCol] });
+  }
+  ijking.zonderOverlap = ijking.paren - ijking.overlappend;
+  ijking.uitslag = 'de twee bronnen spreken elkaar niet tegen maar vullen elkaar aan: waar ze niet ' +
+    'overlappen, ziet de een iets wat de ander principieel niet kan zien (de proef kijkt in de ' +
+    'opslag en niet naar uitgaande aanroepen; de verklaring leest de naam en kent geen collecties). ' +
+    'Daarom worden ze OPGETELD en niet gerangschikt.';
+
+  noemers.effectdekking = {
+    wat: 'weet het effectmodel genoeg om ooit zelf te mogen beslissen?',
+    bron: ['server/kern/isolatie/effecten.js', 'server/kern/isolatie/effectcollecties.js',
+      'IDEMPROEF.json'],
+    gevonden: paden.length,
+    graden, bronnen,
+    collectiesIngedeeld: Object.keys(effectcollecties.PER_COLLECTIE).length,
+    collectiesGemeten: 236,
+    plafond: {
+      alsElkeCollectieIsIngedeeld: metGemetenCollectie,
+      danNogOnbekend: blijftOnbekend,
+      waarom: 'de grens ligt bij de PROEF en niet bij de lijst: een pad waar IDEMPROEF.json nooit ' +
+        'met succes langskwam, raakt geen enkele collectie. Meer dekking komt van een betere proef, ' +
+        'niet van meer namen in het register.'
+    },
+    ijking,
+    /* HET ANTWOORD OP DE VRAAG WAAROM DEZE NOEMER BESTAAT. Hij staat er als
+       oordeel en niet als getallen waar de lezer zelf iets van moet vinden. */
+    magHandhaven: false,
+    waarom: 'met ' + (graden.onbekend || 0) + ' van de ' + paden.length + ' paden zonder profiel kan ' +
+      'dit model niet de laag zijn die beslist: het zou over meer dan de helft van het huis moeten ' +
+      'raden, en raden in de gesloten richting legt het platform plat terwijl raden in de open ' +
+      'richting niets beschermt. De blokkade is GEMETEN en heeft een naam -- de proef, niet het ' +
+      'register -- en dat is iets anders dan "er is nog werk".'
   };
 }
 
@@ -453,8 +535,12 @@ const schuld = [
       'op zijn eigen dragers (een getypte zin) en loopt nu langs dezelfde ceremonie.',
     open: 'passkey en apparaatbinding worden AFGETEKEND en niet uitgevoerd; het bewijs komt van elders.' },
   { punt: 'effectmodel handhaaft',
-    stand: 'SCHADUW',
-    waarom: 'hij rekent mee en meldt onenigheden; hij blokkeert niets. Zie noemers.schaduw.' },
+    stand: 'SCHADUW, MET EEN GEMETEN BLOKKADE',
+    waarom: 'hij rekent mee en meldt onenigheden; hij blokkeert niets. Dat blijft zo, en de reden is ' +
+      'nu een getal: zie noemers.effectdekking. De blokkade is de PROEF en niet het register -- ook ' +
+      'met alle 236 collecties ingedeeld blijft de dekking staan waar IDEMPROEF.json ophoudt.',
+    open: 'de proef verder laten reiken (werelden opzetten waar hij nu niet bij kan), niet meer ' +
+      'namen in effectcollecties.js zetten.' },
   { punt: 'blinde vlek in de beschermstand',
     stand: 'GEMETEN',
     waarom: noemers.httpPaden.blindeVlek.aantal + ' paden hebben geen functie in de catalogus en ' +
@@ -505,6 +591,12 @@ function vat(naam, n) {
       String(n.losser).padStart(4) + ' losser, ' + String(n.onbekend).padStart(4) + ' zonder profiel' +
       '  (blind EN verzwakkend: ' + n.blindEnVerzwakkend.werklijst.aantal + ' werklijst, ' +
       n.blindEnVerzwakkend.bijOntwerp.aantal + ' bij ontwerp)';
+  }
+  if (naam === 'effectdekking') {
+    return String(n.gevonden).padStart(6) + ' paden, ' + String(n.graden.verklaard || 0).padStart(4) +
+      ' verklaard, ' + String(n.graden.afgeleid || 0).padStart(4) + ' afgeleid, ' +
+      String(n.graden.vermoed || 0).padStart(5) + ' vermoed, ' + String(n.graden.onbekend || 0).padStart(5) +
+      ' onbekend  (plafond: ' + n.plafond.danNogOnbekend + ' blijft onbekend)';
   }
   if (naam === 'dragers') {
     return String(n.gevonden).padStart(6) + ' dragers, ' + String(n.metBron).padStart(5) + ' met een bron, ' +

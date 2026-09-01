@@ -42,8 +42,9 @@
     },
     {
       "punt": "effectmodel handhaaft",
-      "stand": "SCHADUW",
-      "waarom": "hij rekent mee en meldt onenigheden; hij blokkeert niets. Zie noemers.schaduw."
+      "stand": "SCHADUW, MET EEN GEMETEN BLOKKADE",
+      "waarom": "hij rekent mee en meldt onenigheden; hij blokkeert niets. Dat blijft zo, en de reden is nu een getal: zie noemers.effectdekking. De blokkade is de PROEF en niet het register -- ook met alle 236 collecties ingedeeld blijft de dekking staan waar IDEMPROEF.json ophoudt.",
+      "open": "de proef verder laten reiken (werelden opzetten waar hij nu niet bij kan), niet meer namen in effectcollecties.js zetten."
     },
     {
       "punt": "blinde vlek in de beschermstand",
@@ -401,16 +402,17 @@
       "gevonden": 4643,
       "effectgraad": {
         "verklaard": 369,
-        "vermoed": 1761,
-        "onbekend": 2513
+        "vermoed": 1671,
+        "onbekend": 2453,
+        "afgeleid": 150
       },
-      "eens": 1238,
-      "onbekend": 2513,
-      "strenger": 854,
-      "losser": 38,
+      "eens": 1250,
+      "onbekend": 2453,
+      "strenger": 900,
+      "losser": 40,
       "geenSom": "strenger, losser en onbekend vragen om drie verschillende dingen en worden nooit opgeteld",
       "blindEnVerzwakkend": {
-        "aantal": 46,
+        "aantal": 50,
         "waarom": "deze paden kent de beschermstand niet (geen functie in de catalogus) terwijl het effectmodel er een gesloten effect in ziet",
         "bijOntwerp": {
           "aantal": 46,
@@ -419,12 +421,102 @@
           "maar": "de beschermstand heeft daarmee geen grip op die console. Wie hem overneemt, loopt langs deze hele laag heen; daar hangt de ontsluitceremonie van het HUIS aan, en die is er nog niet."
         },
         "werklijst": {
-          "aantal": 0,
-          "paden": [],
+          "aantal": 4,
+          "paden": [
+            {
+              "pad": "/api/boardroom/betalingen/proef",
+              "regel": null,
+              "effecten": [
+                "GELD_BEWEGEN"
+              ],
+              "graad": "afgeleid",
+              "geraakt": [
+                "GELD_BEWEGEN"
+              ]
+            },
+            {
+              "pad": "/api/inzagekaart",
+              "regel": null,
+              "effecten": [
+                "IDENTITEIT_WIJZIGEN"
+              ],
+              "graad": "afgeleid",
+              "geraakt": [
+                "IDENTITEIT_WIJZIGEN"
+              ]
+            },
+            {
+              "pad": "/api/privacy/delete",
+              "regel": null,
+              "effecten": [
+                "EXTERN_BEREIKEN",
+                "RECHT_VERLENEN",
+                "IDENTITEIT_WIJZIGEN",
+                "SCHRIJVEN_ANDERMANS",
+                "VERTROUWENSRELATIE_AANGAAN",
+                "BEVEILIGING_VERZWAKKEN"
+              ],
+              "graad": "afgeleid",
+              "geraakt": [
+                "RECHT_VERLENEN",
+                "IDENTITEIT_WIJZIGEN",
+                "SCHRIJVEN_ANDERMANS",
+                "VERTROUWENSRELATIE_AANGAAN",
+                "BEVEILIGING_VERZWAKKEN"
+              ]
+            },
+            {
+              "pad": "/api/privacy/inzage",
+              "regel": null,
+              "effecten": [
+                "IDENTITEIT_WIJZIGEN"
+              ],
+              "graad": "afgeleid",
+              "geraakt": [
+                "IDENTITEIT_WIJZIGEN"
+              ]
+            }
+          ],
           "wat": "blinde vlekken zonder die verklaring; dit is het werk"
         }
       },
       "voorbeeldStrenger": [
+        {
+          "pad": "/api/appstore/bonnen",
+          "regel": null,
+          "effecten": [
+            "IDENTITEIT_WIJZIGEN",
+            "DERDENCODE_UITVOEREN"
+          ],
+          "graad": "afgeleid",
+          "geraakt": [
+            "IDENTITEIT_WIJZIGEN"
+          ]
+        },
+        {
+          "pad": "/api/appstore/mijn",
+          "regel": null,
+          "effecten": [
+            "IDENTITEIT_WIJZIGEN",
+            "DERDENCODE_UITVOEREN"
+          ],
+          "graad": "afgeleid",
+          "geraakt": [
+            "IDENTITEIT_WIJZIGEN"
+          ]
+        },
+        {
+          "pad": "/api/appstore/tijdlijn",
+          "regel": null,
+          "effecten": [
+            "BEVEILIGING_VERZWAKKEN",
+            "DERDENCODE_UITVOEREN"
+          ],
+          "graad": "afgeleid",
+          "geraakt": [
+            "BEVEILIGING_VERZWAKKEN"
+          ]
+        },
         {
           "pad": "/api/auth/forgot",
           "regel": null,
@@ -442,13 +534,11 @@
           "pad": "/api/auth/login",
           "regel": null,
           "effecten": [
-            "RECHT_VERLENEN",
-            "IDENTITEIT_WIJZIGEN"
+            "BEVEILIGING_VERZWAKKEN"
           ],
-          "graad": "vermoed",
+          "graad": "afgeleid",
           "geraakt": [
-            "RECHT_VERLENEN",
-            "IDENTITEIT_WIJZIGEN"
+            "BEVEILIGING_VERZWAKKEN"
           ]
         },
         {
@@ -515,43 +605,6 @@
             "RECHT_VERLENEN",
             "IDENTITEIT_WIJZIGEN"
           ]
-        },
-        {
-          "pad": "/api/auth/verify-email",
-          "regel": null,
-          "effecten": [
-            "RECHT_VERLENEN",
-            "IDENTITEIT_WIJZIGEN"
-          ],
-          "graad": "vermoed",
-          "geraakt": [
-            "RECHT_VERLENEN",
-            "IDENTITEIT_WIJZIGEN"
-          ]
-        },
-        {
-          "pad": "/api/avond/koppel",
-          "regel": null,
-          "effecten": [
-            "VERTROUWENSRELATIE_AANGAAN"
-          ],
-          "graad": "verklaard",
-          "geraakt": [
-            "VERTROUWENSRELATIE_AANGAAN"
-          ]
-        },
-        {
-          "pad": "/api/bedrijf/apparaat/innemen",
-          "regel": null,
-          "effecten": [
-            "SCHRIJVEN_ANDERMANS",
-            "BEVEILIGING_VERZWAKKEN"
-          ],
-          "graad": "vermoed",
-          "geraakt": [
-            "SCHRIJVEN_ANDERMANS",
-            "BEVEILIGING_VERZWAKKEN"
-          ]
         }
       ],
       "voorbeeldLosser": [
@@ -583,8 +636,8 @@
           "geraakt": []
         },
         {
-          "pad": "/api/member/ai/tegoed",
-          "regel": "Geld",
+          "pad": "/api/onboarding/config/ai",
+          "regel": "Identiteit en veiligheid",
           "effecten": [
             "UITGAANDE_AANROEP"
           ],
@@ -592,12 +645,12 @@
           "geraakt": []
         },
         {
-          "pad": "/api/onboarding/config/ai",
+          "pad": "/api/onboarding/salonpost",
           "regel": "Identiteit en veiligheid",
           "effecten": [
-            "UITGAANDE_AANROEP"
+            "EXTERN_BEREIKEN"
           ],
-          "graad": "verklaard",
+          "graad": "afgeleid",
           "geraakt": []
         },
         {
@@ -647,6 +700,91 @@
         }
       ]
     },
+    "effectdekking": {
+      "wat": "weet het effectmodel genoeg om ooit zelf te mogen beslissen?",
+      "bron": [
+        "server/kern/isolatie/effecten.js",
+        "server/kern/isolatie/effectcollecties.js",
+        "IDEMPROEF.json"
+      ],
+      "gevonden": 4643,
+      "graden": {
+        "onbekend": 2453,
+        "vermoed": 1671,
+        "afgeleid": 150,
+        "verklaard": 369
+      },
+      "bronnen": {
+        "geen": 2453,
+        "vermoed": 1671,
+        "afgeleid": 150,
+        "verklaard": 338,
+        "verklaard+afgeleid": 31
+      },
+      "collectiesIngedeeld": 85,
+      "collectiesGemeten": 236,
+      "plafond": {
+        "alsElkeCollectieIsIngedeeld": 599,
+        "danNogOnbekend": 2217,
+        "waarom": "de grens ligt bij de PROEF en niet bij de lijst: een pad waar IDEMPROEF.json nooit met succes langskwam, raakt geen enkele collectie. Meer dekking komt van een betere proef, niet van meer namen in het register."
+      },
+      "ijking": {
+        "paren": 31,
+        "overlappend": 26,
+        "aanvullend": [
+          {
+            "pad": "/api/member/ai/tegoed",
+            "verklaard": [
+              "UITGAANDE_AANROEP"
+            ],
+            "afgeleid": [
+              "GELD_BEWEGEN"
+            ]
+          },
+          {
+            "pad": "/api/member/rtmail/export",
+            "verklaard": [
+              "BULK_UITVOER"
+            ],
+            "afgeleid": [
+              "RECHT_VERLENEN"
+            ]
+          },
+          {
+            "pad": "/api/office/boardroom/ai",
+            "verklaard": [
+              "UITGAANDE_AANROEP"
+            ],
+            "afgeleid": [
+              "RECHT_VERLENEN"
+            ]
+          },
+          {
+            "pad": "/api/office/techniek/integraties/schakel",
+            "verklaard": [
+              "BEVEILIGING_VERZWAKKEN"
+            ],
+            "afgeleid": [
+              "VERTROUWENSRELATIE_AANGAAN"
+            ]
+          },
+          {
+            "pad": "/api/supplier/facturen/pdf",
+            "verklaard": [
+              "ONVERTROUWDE_BYTES"
+            ],
+            "afgeleid": [
+              "EXTERN_BEREIKEN",
+              "GELD_BEWEGEN"
+            ]
+          }
+        ],
+        "zonderOverlap": 5,
+        "uitslag": "de twee bronnen spreken elkaar niet tegen maar vullen elkaar aan: waar ze niet overlappen, ziet de een iets wat de ander principieel niet kan zien (de proef kijkt in de opslag en niet naar uitgaande aanroepen; de verklaring leest de naam en kent geen collecties). Daarom worden ze OPGETELD en niet gerangschikt."
+      },
+      "magHandhaven": false,
+      "waarom": "met 2453 van de 4643 paden zonder profiel kan dit model niet de laag zijn die beslist: het zou over meer dan de helft van het huis moeten raden, en raden in de gesloten richting legt het platform plat terwijl raden in de open richting niets beschermt. De blokkade is GEMETEN en heeft een naam -- de proef, niet het register -- en dat is iets anders dan \"er is nog werk\"."
+    },
     "leesset": {
       "wat": "wat er onder `isolatie` overblijft, en op welke grond",
       "bron": [
@@ -655,14 +793,14 @@
         "server/kern/isolatie/effecten.js"
       ],
       "gevonden": 4643,
-      "BEWEZEN_GEBLOKKEERD": 3702,
-      "BEWEZEN_TOEGESTAAN": 941,
+      "BEWEZEN_GEBLOKKEERD": 3740,
+      "BEWEZEN_TOEGESTAAN": 903,
       "ONBESLIST": 0,
       "ONBEPAALD_INFRA": 0,
       "gronden": {
         "NIET_BEWEZEN_LEZER": 2491,
         "Toegang en identiteit": 50,
-        "EFFECT_GESLOTEN": 63,
+        "EFFECT_GESLOTEN": 101,
         "Geld": 92,
         "Betalen & verificatie": 30,
         "Personeel & integraties": 31,
@@ -680,7 +818,7 @@
       },
       "tegenoverBeschermd": {
         "beschermdLaatDoor": 3495,
-        "isolatieLaatDoor": 941,
+        "isolatieLaatDoor": 903,
         "waarom": "isolatie draagt de eigenschap `beschermd` ook, en sluit daarbovenop alles waarvan het lezerschap niet is bewezen"
       },
       "prijs": "de meting kwam bij 3074 van de 4643 rol-paden nooit met succes langs. Die gaan onder isolatie dicht, en een deel ervan zijn onschuldige lezers. Isolatie is dus botter dan hij hoeft te zijn; dat wordt minder naarmate IDEMPROEF.json verder komt."

@@ -20,105 +20,106 @@
    voor zaak is dit". `GELD_BEWEGEN` staat er dus wel in en `bookings` niet --
    dat laatste is exact de `Asset`-fout, en die is hier al een keer gemaakt.
 
-   DRIE GRADEN, EN DE DERDE IS DE BELANGRIJKSTE. Een pad draagt zijn effecten
-   `verklaard` (iemand heeft ze opgeschreven, met een grond), `vermoed`
-   (afgeleid uit de categorie van zijn functie) of `onbekend` (niets van beide).
+   VIER GRADEN, EN DE LAATSTE IS DE BELANGRIJKSTE. Een pad draagt zijn effecten
+   `verklaard` (iemand heeft ze opgeschreven, met een grond), `afgeleid` (uit de
+   COLLECTIES die de proef zag bewegen, via ./effectcollecties.js), `vermoed`
+   (uit de categorie van zijn functie) of `onbekend` (niets van die drie).
+
+   DE VOLGORDE IS EEN RANGORDE VAN BEWIJS EN GEEN VOLGORDE VAN GEMAK. `afgeleid`
+   staat boven `vermoed` omdat een gemeten schrijfactie iets zegt over wat een
+   route DOET, en een categorie alleen over waar hij WOONT. Dat verschil is een
+   keer duur geweest: /api/adres/zoek viel dicht met de reden IDENTITEIT_WIJZIGEN
+   omdat zijn functie in "Toegang en identiteit" zit, terwijl een adres opzoeken
+   geen identiteit wijzigt.
    Een onbekend effect wordt NOOIT stil als "geen effect" gelezen: in de schaduw
    telt hij als een onenigheid, en zodra deze laag ooit handhaaft, hoort hij
    fail closed te gaan. Wie hier `[]` teruggeeft bij twijfel, heeft een meter
    gebouwd die alles goedkeurt wat hij niet begrijpt. */
 'use strict';
 
-/* ---------------------------------------------------------------------------
-   DE WOORDENLIJST. Dertien effecten, en elk van hen beantwoordt de vraag "wat
-   kan een aanvaller hiermee bereiken" en niet "in welk scherm zit dit".
-   ------------------------------------------------------------------------ */
-const EFFECTEN = Object.freeze({
-  LEZEN_EIGEN:               'gegevens van de aanroeper zelf ophalen',
-  SCHRIJVEN_EIGEN:           'gegevens van de aanroeper zelf wijzigen',
-  SCHRIJVEN_ANDERMANS:       'gegevens wijzigen die van iemand anders zijn',
-  EXTERN_BEREIKEN:           'een tweede persoon buiten RTG bereiken: mail, sms, publiceren, delen',
-  VERTROUWENSRELATIE_AANGAAN:'een nieuwe blijvende koppeling: integratie, sleutel, webhook, apparaat, uitnodiging',
-  RECHT_VERLENEN:            'iemand meer laten mogen dan daarvoor',
-  IDENTITEIT_WIJZIGEN:       'wie iemand is of hoe hij binnenkomt',
-  GELD_BEWEGEN:              'een bedrag verplaatsen, vastleggen of uitbetalen',
-  BULK_UITVOER:              'veel gegevens tegelijk naar buiten',
-  DERDENCODE_UITVOEREN:      'code draaien die niet van RTG is',
-  ONVERTROUWDE_BYTES:        'bytes ontleden die van buiten komen: bestand, document, beeld',
-  BEVEILIGING_VERZWAKKEN:    'een grens, stand, uitzondering of sleutel losser maken',
-  UITGAANDE_AANROEP:         'zelf een verbinding naar buiten opzetten'
-});
-const NAMEN = Object.freeze(Object.keys(EFFECTEN));
-
-/* ---------------------------------------------------------------------------
-   WAT ELKE STAND SLUIT. Uitgedrukt in het paar uit ./ordening.js, want
-   `beschermd` is een eigenschap en geen trede.
-   ------------------------------------------------------------------------ */
-
-/* De eigenschap `beschermd` sluit precies wat kern/beschermstand-lijst.js met
-   zijn zes bevroren categorieën bedoelt: nieuwe bevoorrechte handelingen en
-   mutaties van derden. Deze zes zijn de vertaling daarvan naar effecten, en het
-   is die vertaling die de schaduwmeting toetst. */
-const BESCHERMD_SLUIT = Object.freeze([
-  'VERTROUWENSRELATIE_AANGAAN', 'RECHT_VERLENEN', 'IDENTITEIT_WIJZIGEN',
-  'GELD_BEWEGEN', 'BEVEILIGING_VERZWAKKEN', 'SCHRIJVEN_ANDERMANS'
-]);
-
-/* De tredes. `waakzaam` sluit met opzet niets -- hij markeert, en een stand die
-   stiekem toch iets sluit is de reden dat niemand hem meer vertrouwt.
-   `beperkt` sluit gerícht per functie en niet structureel per effect; daarom
-   staat hij hier leeg met de reden en niet met een lege lijst zonder uitleg. */
-const TREDE_SLUIT = Object.freeze({
-  normaal:  [],
-  waakzaam: [],
-  beperkt:  [],
-  isolatie: NAMEN.filter(n => n !== 'LEZEN_EIGEN')
-});
-const TREDE_WAAROM = Object.freeze({
-  waakzaam: 'waakzaam markeert en sluit niets; een stand die stilletjes toch iets sluit, wordt niet meer vertrouwd',
-  beperkt:  'beperkt sluit gericht per functie en niet per effect; wat er dichtgaat staat in het incident zelf'
-});
-
+const { EFFECTEN, NAMEN } = require('./effectwoorden');
 const { VERKLAARD, PER_CATEGORIE } = require('./effectregister');
+const { BESCHERMD_SLUIT, TREDE_SLUIT, TREDE_WAAROM, sluit } = require('./standsluiting');
+const proefmeting = require('./proefmeting');
+const effectcollecties = require('./effectcollecties');
 
 /* ---------------------------------------------------------------------------
    DE AFLEIDING.
    ------------------------------------------------------------------------ */
 function effectenVan(pad, methode, functie) {
   const p = String(pad || '');
-  const uit = new Set();
+  const leest = /^(GET|HEAD|OPTIONS)$/i.test(String(methode || 'POST'));
+
+  /* 1. WAT IEMAND HEEFT VERKLAARD -- een patroon met een grond. */
+  const uitVerklaring = new Set();
   const gronden = [];
   for (const r of VERKLAARD) {
     if (!r.patroon.test(p)) continue;
-    for (const e of r.effecten) uit.add(e);
+    for (const e of r.effecten) uitVerklaring.add(e);
     gronden.push(r.grond);
   }
-  if (uit.size) {
-    /* Lezen wordt er niet bij verzonnen: een GET die geld leest, beweegt geen
-       geld. De methode snijdt de schrijfeffecten eruit. */
-    const leest = /^(GET|HEAD|OPTIONS)$/i.test(String(methode || 'POST'));
-    const effecten = leest ? ['LEZEN_EIGEN'] : [...uit];
-    return { effecten, graad: 'verklaard', gronden, bron: 'kern/isolatie/effecten.js: VERKLAARD' };
+
+  /* 2. WAT DE PROEF ZAG BEWEGEN -- gemeten collecties, ingedeeld in
+        ./effectcollecties.js. Alleen die laatste stap is mensenwerk. */
+  const collecties = proefmeting.collectiesVan(p);
+  const uitMeting = new Set();
+  const grondenMeting = [];
+  if (collecties) {
+    for (const col of collecties) {
+      const rij = effectcollecties.effectVan(col);
+      if (!rij) continue;
+      uitMeting.add(rij.effect);
+      grondenMeting.push(col + ': ' + rij.grond);
+    }
   }
+
+  /* DE TWEE WORDEN OPGETELD EN NIET GERANGSCHIKT, en dat is een besluit uit een
+     meting. Over de 31 paden waar allebei de bronnen iets zeggen, overlapten er
+     26 en waren er 5 zonder overlap -- maar die vijf spreken elkaar NIET tegen,
+     ze vullen elkaar aan: /api/member/ai/tegoed roept een model aan (dat ziet de
+     verklaring aan zijn naam) EN beweegt tegoed (dat ziet de proef in de
+     collectie). Wie hier de een de ander laat overschrijven, gooit telkens een
+     van beide effecten weg -- en bij een beveiligingslaag is dat de helft die je
+     net nodig had.
+
+     Ze zien met opzet verschillende dingen: de proef kijkt in de OPSLAG en zegt
+     zelf dat zij bestanden en uitgaande aanroepen niet ziet; de verklaring leest
+     de NAAM en weet niets van collecties. Elkaars blinde vlek, en daarom samen. */
+  const alles = new Set([...uitVerklaring, ...uitMeting]);
+  if (alles.size) {
+    const bronnen = [];
+    if (uitVerklaring.size) bronnen.push('verklaard');
+    if (uitMeting.size) bronnen.push('afgeleid');
+    return {
+      effecten: leest ? ['LEZEN_EIGEN'] : [...alles],
+      /* De graad is de STERKSTE bijdragende bron: een verklaring met een grond
+         staat boven een afleiding uit een meting, en die weer boven een
+         vermoeden uit een categorie. `bronnen` zegt wie er werkelijk meededen. */
+      graad: uitVerklaring.size ? 'verklaard' : 'afgeleid',
+      bronnen,
+      gronden: gronden.concat(grondenMeting),
+      bron: bronnen.join(' + ')
+    };
+  }
+
+  /* 3. HET VERMOEDEN. Uit de categorie van de functie, en dus over waar iets
+        WOONT in plaats van wat het DOET. Hij komt als laatste omdat hij als
+        enige geen meting en geen grond per pad achter zich heeft. */
   const cat = functie && functie.categorie;
   if (cat && PER_CATEGORIE[cat]) {
-    return { effecten: [...PER_CATEGORIE[cat]], graad: 'vermoed', gronden:
+    return { effecten: [...PER_CATEGORIE[cat]], graad: 'vermoed', bronnen: ['vermoed'], gronden:
       ['afgeleid uit de categorie "' + cat + '" van zijn functie, en een categorie zegt waar iets woont'],
-      bron: 'kern/isolatie/effecten.js: PER_CATEGORIE' };
+      bron: 'kern/isolatie/effectregister.js: PER_CATEGORIE' };
   }
+
   /* GEEN LEGE LIJST. Een leeg antwoord leest als "dit doet niets", en dat is
      de gevaarlijkste zin in een beveiligingslaag. */
-  return { effecten: null, graad: 'onbekend', gronden:
-    ['geen verklaring en geen categorie met een vermoeden; dit pad heeft geen effectprofiel'],
+  return { effecten: null, graad: 'onbekend', bronnen: [], gronden:
+    [collecties && collecties.size
+      ? 'de proef zag ' + collecties.size + ' collectie(s) bewegen, maar geen ervan is ingedeeld ' +
+        'in kern/isolatie/effectcollecties.js'
+      : 'geen verklaring, geen gemeten collectie en geen categorie met een vermoeden'],
     bron: null };
-}
-
-/* Wat een stand sluit, uitgedrukt in effecten. */
-function sluit(stand) {
-  const trede = stand && stand.trede;
-  const uit = new Set(TREDE_SLUIT[trede] || []);
-  if (stand && stand.beschermd) for (const e of BESCHERMD_SLUIT) uit.add(e);
-  return [...uit];
 }
 
 /* Het schaduwoordeel. `onbekend` is met opzet een eigen uitkomst naast ja en
@@ -141,5 +142,11 @@ function schaduwOordeel({ pad, methode, functie, stand }) {
   };
 }
 
-module.exports = { EFFECTEN, NAMEN, BESCHERMD_SLUIT, TREDE_SLUIT, TREDE_WAAROM,
+/* De collectielijst wordt bij het LADEN tegen de effectnamen gehouden. Een
+   tikfout daar zou een collectie stil ongeclassificeerd laten -- precies de
+   faalvorm die deze laag moet uitsluiten, en die je bij het eerste incident
+   ontdekt in plaats van bij het starten. */
+const COLLECTIES_INGEDEELD = effectcollecties.keurIn(NAMEN);
+
+module.exports = { EFFECTEN, NAMEN, BESCHERMD_SLUIT, TREDE_SLUIT, TREDE_WAAROM, COLLECTIES_INGEDEELD,
   VERKLAARD, PER_CATEGORIE, effectenVan, sluit, schaduwOordeel };

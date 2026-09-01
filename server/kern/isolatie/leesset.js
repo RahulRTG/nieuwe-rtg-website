@@ -51,54 +51,14 @@
    wordt. Het getal staat in ISOLATIEPROEF.json. */
 'use strict';
 
-const path = require('path');
-const fs = require('fs');
 const effecten = require('./effecten');
-
-const BRON = path.join(__dirname, '..', '..', '..', 'IDEMPROEF.json');
+const proefmeting = require('./proefmeting');
 
 /* De vier die binnen een gesloten stand blijven lopen. Ze worden GELEZEN uit
    kern/beschermstand-lijst.js en niet overgetypt: twee lijsten die hetzelfde
    moeten zeggen, zeggen na een jaar iets anders (LAT.md regel 4). */
 function uitzonderingIds() {
   try { return require('../beschermstand-lijst').UITZONDERINGEN || {}; } catch (e) { return {}; }
-}
-
-/* De gemeten lezers, één keer ingelezen. Geen cache-verval: het bestand
-   verandert alleen bij een build, en dan draait het proces opnieuw. */
-let gemeten = null;
-function lees() {
-  if (gemeten) return gemeten;
-  let ruw = null;
-  try { ruw = JSON.parse(fs.readFileSync(BRON, 'utf8')); } catch (e) { ruw = null; }
-  if (!ruw || !ruw.perRoute) {
-    /* GEEN BESTAND IS GEEN LEGE LIJST MET EEN SCHOUDEROPHALEN. Zonder meting is
-       er geen enkel bewezen lezerschap, en dan sluit isolatie alles behalve de
-       vier uitzonderingen. Dat is hard, en het is de goede kant om fout te gaan
-       -- maar het moet wel ZICHTBAAR zijn, anders denkt iemand dat de laag
-       gewoon streng is. */
-    gemeten = { lezers: new Set(), gevonden: 0, gemetenGeslaagd: 0,
-      ontbreekt: 'IDEMPROEF.json is niet gelezen; er is dus geen enkel bewezen lezerschap' };
-    return gemeten;
-  }
-  const lezers = new Set();
-  let geslaagd = 0, totaal = 0;
-  for (const rij of Object.values(ruw.perRoute)) {
-    totaal++;
-    const z = rij.zonderSleutel || {};
-    const eerste = (z.statussen || [])[0];
-    /* De oproep moet WERK hebben gedaan. Een 404 die niets bewoog, bewijst
-       niets over de route -- alleen dat de proef er niet bij kwam. Dat
-       onderscheid niet maken zou 3074 ongemeten paden tot lezer promoveren, en
-       dat is exact de fout die deze hele module moet voorkomen. */
-    if (!(eerste >= 200 && eerste < 300)) continue;
-    geslaagd++;
-    const e = z.effect || {};
-    const bewoog = Object.keys(e).filter(k => k !== 'nietGemeten').some(k => e[k] !== 'geen');
-    if (!bewoog) lezers.add(rij.pad);
-  }
-  gemeten = { lezers, gevonden: totaal, gemetenGeslaagd: geslaagd, ontbreekt: null };
-  return gemeten;
 }
 
 /* Het oordeel per pad. Geeft altijd een REDEN terug, ook bij ja: een scherm dat
@@ -110,8 +70,8 @@ function magOnderIsolatie(pad, functie) {
       waarom: 'deze functie loopt ook binnen een gesloten stand door: ' + uitz[functie.id] };
   }
 
-  const m = lees();
-  if (!m.lezers.has(String(pad))) {
+  const m = proefmeting.stand();
+  if (!proefmeting.isBewezenLezer(pad)) {
     return { mag: false, grond: m.ontbreekt ? 'GEEN_METING' : 'NIET_BEWEZEN_LEZER',
       waarom: m.ontbreekt
         ? m.ontbreekt + ', dus onder isolatie blijft alleen over wat met naam is uitgezonderd'
@@ -130,9 +90,17 @@ function magOnderIsolatie(pad, functie) {
      categorie zegt waar iets WOONT; een gemeten kale oproep zegt wat het DOET.
      Waar die twee botsen, wint de meting, en dat is precies waarvoor de graad
      bestaat. Een `verklaard` effect is geen vermoeden maar een regel die iemand
-     met een grond heeft opgeschreven, en die telt wel. */
+     met een grond heeft opgeschreven, en een `afgeleid` effect komt uit een
+     GEMETEN schrijfactie in een ingedeelde collectie. Die twee tellen wel.
+
+     In de praktijk kan `afgeleid` hier trouwens niet aanslaan, en dat is geen
+     dode tak maar een sluitende redenering: een bewezen lezer bewoog per
+     definitie geen collectie, dus er valt niets uit collecties af te leiden. Hij
+     staat er omdat de voorwaarde over de GRAAD hoort te gaan en niet over het
+     toeval dat de twee elkaar hier niet raken -- verandert de leesset ooit van
+     definitie, dan blijft deze regel kloppen. */
   const prof = effecten.effectenVan(pad, 'POST', functie);
-  if (prof.graad === 'verklaard') {
+  if (prof.graad === 'verklaard' || prof.graad === 'afgeleid') {
     const stout = (prof.effecten || []).filter(x => x !== 'LEZEN_EIGEN');
     if (stout.length) {
       return { mag: false, grond: 'EFFECT_GESLOTEN',
@@ -149,12 +117,12 @@ function magOnderIsolatie(pad, functie) {
 /* De cijfers voor het register. Geen percentage: de noemer hangt ervan af of je
    over paden, rollen of gemeten paden praat, en die drie zijn niet hetzelfde. */
 function stand() {
-  const m = lees();
+  const m = proefmeting.stand();
   return {
-    routesInDeProef: m.gevonden,
-    metSuccesGemeten: m.gemetenGeslaagd,
-    bewezenLezers: m.lezers.size,
-    nooitMetSuccesGemeten: m.gevonden - m.gemetenGeslaagd,
+    routesInDeProef: m.routesInDeProef,
+    metSuccesGemeten: m.metSuccesGemeten,
+    bewezenLezers: m.bewezenLezers,
+    nooitMetSuccesGemeten: m.nooitMetSuccesGemeten,
     ontbreekt: m.ontbreekt,
     kost: 'wat nooit met succes is gemeten, gaat onder isolatie dicht. Een deel daarvan zijn ' +
       'onschuldige lezers, dus isolatie is botter dan hij hoeft te zijn. Dat wordt minder naarmate ' +
@@ -164,6 +132,6 @@ function stand() {
 }
 
 /* Alleen voor de toetsen: de ingelezen meting weggooien. */
-function vergeet() { gemeten = null; }
+function vergeet() { proefmeting.vergeet(); }
 
-module.exports = { magOnderIsolatie, stand, vergeet, BRON };
+module.exports = { magOnderIsolatie, stand, vergeet, BRON: proefmeting.BRON };

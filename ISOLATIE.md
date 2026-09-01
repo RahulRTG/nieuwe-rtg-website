@@ -137,7 +137,8 @@ De eerste ronde (1 september 2026):
 | Bestandsverwerkers | 45 | 0 | 0 | 45 |
 | AI-bereik (lid, onder `beschermd`) | 120 | 28 | 0 | 0 |
 | Onder `isolatie` (leesset) | 4643 | 3702 | 0 | 0 |
-| Schaduw: onenigheden | 4643 | 865 strenger | 16 losser | 2567 zonder profiel |
+| Schaduw: onenigheden | 4643 | 900 strenger | 40 losser | 2453 zonder profiel |
+| Effectdekking | 4643 | 369 verklaard · 150 afgeleid | 1671 vermoed | 2453 onbekend |
 | Dragers | 6 | 5 met bron | 1 zonder | 0 |
 
 Drie dingen die deze ronde meteen opleverde:
@@ -168,7 +169,11 @@ De acht open punten staan vooraan in het register, niet in een voetnoot.
 |---|---|
 | `ordening.js` | wat is strenger dan wat, en wanneer is dat niet te zeggen |
 | `dragers.js` | de zes dragers, wie welke stand mag zetten |
-| `effecten.js` | wat een handeling **doet**, en wat een stand sluit — in de schaduw |
+| `effectwoorden.js` | de dertien effecten, en verder niets |
+| `effecten.js` | wat een handeling **doet** — in de schaduw |
+| `effectregister.js` · `effectcollecties.js` | de uitspraken: per pad en per collectie |
+| `standsluiting.js` | wat een stand dichtzet |
+| `proefmeting.js` | de enige lezer van `IDEMPROEF.json` in deze laag |
 | `leesset.js` | wat er onder `isolatie` overblijft, en waarom dat gemeten is |
 | `besluit.js` | het verklaarde besluit: waarom niet, en van wie |
 | `ontsluiting.js` | verlagen als protocol |
@@ -244,12 +249,71 @@ die is hier al een keer gemaakt (`OS.md` par. 4).
 
 **Hij handhaaft niets, en dat is het ontwerp.** `CONTROLPLANE.md`: een nieuwe
 handhavingsregel loopt eerst mee zonder te blokkeren. Hij rekent mee naast de
-beschermstand en meldt waar de twee het **oneens** zijn — 865 keer strenger, 16
-keer losser, 2567 paden zonder profiel. Die drie worden nooit opgeteld: ze vragen
+beschermstand en meldt waar de twee het **oneens** zijn — 900 keer strenger, 40
+keer losser, 2453 paden zonder profiel. Die drie worden nooit opgeteld: ze vragen
 om drie verschillende dingen.
 
 Een pad zonder profiel geeft **nooit** een lege lijst terug. Leeg leest als "dit
 doet niets", en dat is de gevaarlijkste zin in een beveiligingslaag.
+
+#### De derde bron: gemeten collecties
+
+Het model had 2513 paden zonder profiel, en de voor de hand liggende reactie —
+meer verklaringen schrijven — betekent 4643 paden één voor één nakijken. Zo'n
+register loopt vol met gissingen.
+
+De uitweg is een **kleinere noemer**. `IDEMPROEF.json` heeft per route gemeten
+welke **collecties** bewogen, en dat zijn er 236 — een lijst die een mens wél kan
+nalopen. De afleiding wordt: *route → (gemeten schrijfactie) → collectie →
+(register) → effect*, en alleen de laatste pijl is mensenwerk. 85 van de 236 zijn
+ingedeeld: geld, identiteit, rechten, blijvende koppelingen en de beveiliging
+zelf — wat een hoog belang draagt en waarover geen redelijke discussie bestaat.
+
+**Vier graden**, en de volgorde is een rangorde van bewijs: `verklaard` (een
+patroon met een grond) → `afgeleid` (een gemeten schrijfactie in een ingedeelde
+collectie) → `vermoed` (de categorie van de functie) → `onbekend`. Dat `afgeleid`
+boven `vermoed` staat is één keer duur geweest: `/api/adres/zoek` viel dicht met
+de reden `IDENTITEIT_WIJZIGEN` omdat zijn functie in "Toegang en identiteit"
+zit. Een categorie zegt waar iets *woont*, een meting wat het *doet*.
+
+**De twee bronnen worden opgeteld, niet gerangschikt — en dat is een besluit uit
+een meting.** Over de 31 paden waar allebei iets zeggen, overlappen er 26 en
+staan er 5 zonder overlap. Die vijf spreken elkaar níét tegen: `/api/member/ai/tegoed`
+roept een model aan (dat ziet de verklaring aan de naam) én beweegt tegoed (dat
+ziet de proef in de collectie). Ze zien met opzet verschillende dingen — de proef
+kijkt in de opslag en zegt zelf dat zij bestanden en uitgaande aanroepen niet
+ziet; de verklaring leest de naam en kent geen collecties. Elkaars blinde vlek.
+Wie er één de ander laat overschrijven, gooit telkens een van beide effecten weg.
+
+#### Waarom het model tóch niet uit de schaduw komt
+
+| | was | nu |
+|---|---:|---:|
+| verklaard | 282 | **369** |
+| afgeleid | — | **150** |
+| vermoed | 1794 | 1671 |
+| **onbekend** | **2513** | **2453** |
+
+De dekking bewoog nauwelijks, en dat is de bevinding. **Zelfs als alle 236
+collecties waren ingedeeld, blijven 2217 paden onbekend** — want een pad waar de
+proef nooit met succes langskwam, raakt géén collectie, hoeveel namen er ook in
+het register staan.
+
+> **De blokkade is de proef, niet het register.** Dat is nu een getal in plaats
+> van een gevoel, en het verandert wat er hierna moet gebeuren: niet vijftig
+> regels erbij, maar `IDEMPROEF.json` verder laten reiken. Met 2453 van 4643
+> paden zonder profiel zou het model over meer dan de helft van het huis moeten
+> raden — en raden in de gesloten richting legt het platform plat, raden in de
+> open richting beschermt niets. `magHandhaven: false` staat daarom in het
+> register mét die reden.
+
+**Wat het wél opleverde:** de werklijst van blinde vlekken ging van 0 naar 4.
+`/api/privacy/delete` heeft geen functie in de catalogus — dus de beschermstand
+bevriest hem niet tijdens een incident — terwijl de gemeten collecties laten zien
+dat hij rechten, identiteit, andermans gegevens, koppelingen én de beveiliging
+raakt. Of dat een gat is of een bewuste keuze (een AVG-verzoek mag je niet zomaar
+blokkeren) is een besluit van de eigenaar; het staat in het register en is niet
+stil rechtgetrokken.
 
 ### Wat `isolatie` overlaat — en waarom dat gemeten is
 
@@ -344,11 +408,14 @@ de verkeerde drukken.
    3. ~~Drager-model~~ · 4. ~~Ontsluitceremonie~~ · 5. ~~`isolatie` echt strenger
    dan `beschermd`~~ · 6. ~~Een ceremonie voor het huis~~ · 7. ~~Het scherm van
    het lid~~ — **staan**
-8. **Het effectmodel uit de schaduw halen.** 2513 paden zonder profiel is de
-   prijs; die moet omlaag voordat afdwingen iets anders is dan gokken.
-9. **De leesset verbreden door de PROEF te verbeteren, niet de regel.** 3074
-   paden zijn nooit met succes gemeten en gaan daarom dicht; elk pad dat
-   `IDEMPROEF.json` erbij meet, maakt isolatie minder bot.
+8. ~~De derde bron onder het effectmodel~~ — **staat**, met een gemeten
+   blokkade: het model komt niet uit de schaduw tot de proef verder reikt.
+9. **De proef verder laten reiken.** Dit is nu het enige punt dat er echt toe
+   doet, en het draagt twee dingen tegelijk: elk pad dat `IDEMPROEF.json` erbij
+   meet, maakt isolatie minder bot (3074 paden gaan dicht zonder dat iemand weet
+   of ze gevaarlijk zijn) én brengt het effectmodel dichter bij handhaven. Het
+   werk zit in de werelden die de proef niet kan opzetten — een zaak met een
+   genre, een ingericht landpakket, een salon.
 10. **Invariant op onvertrouwde invoer** — *onvertrouwde inhoud kan de beschikbare
    capabilities nooit vergroten.* Voor een platform waarvan de AI kan handelen is
    dit de verdediging tegen indirecte prompt-injectie.

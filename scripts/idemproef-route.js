@@ -316,7 +316,44 @@ function wachtOpSchoneBoom() {
   try { register = JSON.parse(fs.readFileSync(path.join(WORTEL, 'IDEMBESLUIT.json'), 'utf8')); } catch (e) {}
   const besluiten = register.routes || {};
 
-  const uit = await draaiIdemproef({ post, routes, tokenVoor, hernieuw,
+  /* DE WERELDEN, EN WAAROM ZE HIER STAAN.
+
+     Deze proef roept elke schrijfroute aan, en een deel daarvan leeft BINNEN
+     een wereld die zij zelf opzet: een stadsafdeling, een festival-editie, een
+     onderzoek. Zonder die wereld antwoordt de route met "bestaat niet" en telt
+     hij als ongemeten -- niet omdat er iets mis is, maar omdat er niets stond.
+
+     Ze staan er ook om een tweede reden, en die is scherper: er zitten
+     sloopachtige routes BINNEN die werelden. Een wereld die halverwege
+     sneuvelt, meldde zich aan het begin gewoon klaar. Vandaar de wacht
+     hieronder, die onderweg peilt, en de eindcontrole erna. */
+  const werelden = {};
+  const wereldExtras = {};
+  const zetKlaar = async (naam, mod, fn, args) => {
+    try {
+      const w = await require(mod)[fn](args);
+      werelden[naam] = w;
+      if (w && w.extra) wereldExtras[naam] = w.extra;
+      console.log('  wereld ' + naam.padEnd(30) + ': ' +
+        (w && w.klaar ? 'klaar' : 'NIET klaar -- ' + ((w && w.reden) || 'onbekend')));
+    } catch (e) {
+      console.log('  wereld ' + naam.padEnd(30) + ': NIET klaar -- ' + e.message);
+    }
+  };
+  /* De genrewereld deelt het zaakbureau van de sleutelbos: EEN teller en EEN
+     cache, zodat de roosterrem eerlijk te meten is (test/eindpoort.test.js). */
+  await zetKlaar('genre', './lib/wereld-genre', 'zetGenreKlaar', { post, zaakinlog: bos.zaakbureau });
+  await zetKlaar('rtfos', './lib/wereld-rtfos', 'zetRtfosKlaar', { post, tokens });
+  await zetKlaar('festival', './lib/wereld-festival', 'zetFestivalKlaar', { post, tokens });
+  await zetKlaar('lab2', './lib/wereld-lab2', 'zetLab2Klaar', { post, tokens });
+  await zetKlaar('weefsel', './lib/wereld-weefsel', 'zetWeefselKlaar', { post, tokens });
+  await zetKlaar('rtmail', './lib/wereld-rtmail', 'zetRtmailKlaar', { post, tokens });
+
+  const { maakWereldwacht, controleerWerelden } = require('./lib/wereldcontrole');
+  const wacht = maakWereldwacht({ post, tokenVoor, extras: wereldExtras,
+    elke: Number(process.env.RTG_WERELDWACHT || 250) });
+
+  const uit = await draaiIdemproef({ post, routes, tokenVoor, hernieuw, wacht,
     lijfVoor: (r) => {
       const vv = voorvoegselVan(r.pad);
       return { ...plausibelLijf(r.pad), ...extra, ...(vv ? schoonLijf(vv.lijf) : {}), ...(geldLijven[r.pad] || {}) };
@@ -401,6 +438,20 @@ function wachtOpSchoneBoom() {
   console.log('');
   console.log('  onbeschermd MET een besluit          : ' + (onbeschermd.length - zonderBesluit.length) + ' / ' + onbeschermd.length);
   if (zonderBesluit.length) console.log('      zonder besluit in IDEMBESLUIT.json: ' + zonderBesluit.length);
+  /* De eindcontrole en het verslag van de wacht, VOOR de uitslag wordt
+     samengesteld: allebei horen ze in het register en niet alleen op het
+     scherm. */
+  const wereldStand = await controleerWerelden({ post, tokenVoor, hernieuw, extras: wereldExtras });
+  const wachtVerslag = wacht.verslag();
+  const gesneuveld = wereldStand.filter(w => w.gecontroleerd && !w.ok);
+  console.log('\n  de werelden NA afloop                : ' +
+    wereldStand.filter(w => w.ok).length + ' overeind, ' + gesneuveld.length + ' gesneuveld, ' +
+    wereldStand.filter(w => !w.gecontroleerd).length + ' niet gecontroleerd');
+  for (const w of wereldStand) if (!w.ok) console.log('      ' + w.wereld + ': ' + w.waarom);
+  console.log('  de wereldwacht onderweg              : ' + wachtVerslag.peilingen +
+    ' peilingen (elke ' + wachtVerslag.stap + ' routes), ' + wachtVerslag.gebeurtenissen.length + ' omslag(en)');
+  console.log('  roosteropvragingen                   : ' + bos.zaakbureau.verbruikt() + ' / 30');
+
 
   fs.writeFileSync(UITSLAG, JSON.stringify({
     stempel: stempel(),
@@ -429,6 +480,24 @@ function wachtOpSchoneBoom() {
       blindeRondes: uit.meterStuk ? 1 : 0, begrenzing: MAX,
       wereldKlaargezet: Object.keys(extra), geldroutesMetEigenLijf: Object.keys(geldLijven).length,
       onbeschermdMetBesluit: onbeschermd.length - zonderBesluit.length,
+      /* STAAT DE WERELD ER NA AFLOOP NOG, en sloeg er onderweg een om.
+
+         Twee getallen die niet hetzelfde zeggen. `werelden` is de eindstand:
+         staat hij er nog. `wereldwacht` is het VENSTER: als een wereld tussen
+         route 900 en 1150 omsloeg, weet je waar je moet kijken -- een
+         eindoordeel zou alleen zeggen DAT hij weg is.
+
+         `gecontroleerd: false` telt met opzet niet als fout. Niet gekeken is
+         geen uitslag (LAT.md regel 3), maar het mag ook niet alles zijn: dan
+         gaat de poort dicht door weg te kijken, en dat bewaakt
+         test/eindpoort.test.js apart. */
+      werelden: wereldStand, wereldwacht: wachtVerslag,
+      /* EN DE REM DIE NIET MAG SPRINGEN. /api/supplier/roster laat dertig
+         opvragingen per kwartier per IP toe -- een echte poort, want zonder hem
+         is het personeelsbestand van elke partner in minuten uit te lezen. Wat
+         hier staat is wat er GEMETEN is opgevraagd, niet hoe lang een lijst is:
+         een tweede plek die alsnog zelf gaat aankloppen, valt daarmee op. */
+      roosteropvragingen: bos.zaakbureau.verbruikt(), roosterRem: 30,
       /* WAT DE PLATFORMLAAG VING, EN WAT DE ROUTE ZELF DOET -- twee getallen,
          want ze gaan niet over hetzelfde. Alle oproepen hierboven dragen `idem`
          in het lijf, en server/middleware/idempotentie.js is precies daarop

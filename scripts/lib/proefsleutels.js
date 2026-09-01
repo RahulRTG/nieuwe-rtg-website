@@ -29,6 +29,8 @@
 
 /* De kantoorcode van de wegwerpserver. Staat hier omdat de proeven hem in hun
    env meegeven en het anders op twee plekken een string is. */
+const { maakZaakinlog } = require('./zaakinlog');
+
 const OFFICE_CODE = 'RTG-OFFICE-PROEF';
 
 /* Het demo-wachtwoord van de gezaaide accounts (server/server.js:
@@ -190,7 +192,23 @@ async function haalSleutels({ post }) {
     return false;
   };
   const rollen = Object.keys(tokens).filter(r => !GEEN_BEWAKER.has(r));
-  return { tokens, rollen, ontbreekt, waaroms, hernieuw, tokenVoor: (rol) => tokens[rol] };
+  /* HET ZAAKBUREAU -- een plek voor elke zaakinlog, met EEN teller.
+
+     ./zaakinlog.js houdt een rem op het aantal roosteropvragingen en een cache
+     over de zaken die het al kent. De wereldopstellingen van de
+     idempotentieproef (de genrewereld voorop) hebben er een nodig, en ze horen
+     DEZELFDE te krijgen: twee bureaus zijn twee tellers, en dan meet de proef
+     zijn eigen verbruik verkeerd -- precies wat test/eindpoort.test.js
+     ("de proef blijft onder de roster-rem, gemeten") bewaakt.
+
+     Hij staat hier en niet in de proef, omdat de sleutelbos de enige plek is
+     waar dit huis inlogt. `inlog` geeft de losse munters terug voor wie een
+     rol opnieuw wil zetten zonder de hele bos te hermunten. */
+  const zaakbureau = maakZaakinlog({ post });
+  const inlog = Object.fromEntries(MUNTERS.map(([rol, , munt]) => [rol, () => munt(post, tokens)]));
+
+  return { tokens, rollen, ontbreekt, waaroms, hernieuw, zaakbureau, inlog,
+    tokenVoor: (rol) => tokens[rol] };
 }
 
 /* Wat een proef op het scherm zet over zijn sleutelbos. Een plek, zodat zes

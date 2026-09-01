@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-01T08:57:19.774Z",
-  "commit": "a7f678119",
+  "op": "2026-09-01T12:02:52.327Z",
+  "commit": "bd32f797e",
   "boomVuil": false,
-  "boomAnders": 9,
+  "boomAnders": 0,
   "instrument": "scripts/bewijsschuld.js",
   "node": "v22.22.2"
  },
@@ -11,14 +11,14 @@
  "grens": "Dit is een lijst van wat we WETEN dat we niet hebben gemeten. Wat niemand heeft bedacht staat er per definitie niet in, en dat is de gevaarlijkste categorie -- een schuldenlijst is geen dekkingsbewijs. De aantallen komen uit de registers en zijn dus zo vers als de laatste ronde; zie scripts/versheid.js.",
  "telling": {
   "posten": 18,
-  "meetwerk": 1952,
+  "meetwerk": 1961,
   "instrument": 323,
   "grens": 643
  },
  "aflossing": {
   "doel": 0,
   "wat": "de achterstand (meetwerk + instrument) gaat naar nul. `grens` telt niet mee en sluit nooit -- dat is de rand van de methode en geen werk.",
-  "staat": 2275,
+  "staat": 2284,
   "regels": [
    "de achterstand mag nooit groeien zonder een reden IN dit register (--groei=...)",
    "een post mag niet van soort veranderen om onder de poort uit te komen: naar `grens` verplaatsen laat de achterstand dalen zonder dat er iets gemeten is",
@@ -28,7 +28,7 @@
  },
  "gemeten": {
   "postenTotaal": 18,
-  "achterstand": 2275,
+  "achterstand": 2284,
   "randVanDeMethode": 643,
   "auth-onbeslist": 1,
   "capability-in-handler": 547,
@@ -43,10 +43,10 @@
   "rollback-gezakt": 2,
   "object-vooraf": 323,
   "proefruis": 1,
-  "gevolg-onbekend": 90,
+  "gevolg-onbekend": 89,
   "droogloop-onbeoordeeld": 2,
   "herstel-onbevestigd": 47,
-  "idem-ongeclassificeerd": 1477,
+  "idem-ongeclassificeerd": 1487,
   "wegwerpserver-kopieen": 3
  },
  "posten": [
@@ -158,7 +158,7 @@
    "id": "gevolg-onbekend",
    "soort": "meetwerk",
    "wat": "bereikbare capabilities waarvan niemand heeft gemeten WAT ze veranderen",
-   "aantal": 90,
+   "aantal": 89,
    "waarom": "server/kern/stuur/gevolg.js projecteert een EERDERE proefronde op de stappen van een plan. Staat een pad niet in die ronde, dan is de eerlijke uitslag `onbekend` -- en een plan dat voor het merendeel uit onbekende gevolgen bestaat, is geen voorspelling.",
    "sluit": "de idempotentieproef over deze paden halen, of ze in de droogloop opnemen. Het gereedschap staat er (scripts/droogloop.js meet per stap welke collectie werkelijk bewoog); wat rest is meten."
   },
@@ -182,7 +182,7 @@
    "id": "idem-ongeclassificeerd",
    "soort": "meetwerk",
    "wat": "muterende routes zonder uitspraak over herhalen: wat gebeurt er bij een tweede keer",
-   "aantal": 1477,
+   "aantal": 1487,
    "waarom": "autonomie zonder herhaalsemantiek is niet te doen: een keten die halverwege afbreekt moet weten of opnieuw beginnen veilig is. Het doel is niet dat alles idempotent IS -- het is dat van elke route vastligt wat een tweede keer betekent.",
    "sluit": "per route beslissen en vastleggen. Het instrument staat (scripts/idemproef-route.js plus IDEMBESLUIT.json met zijn klassen); dit is meetwerk en handwerk."
   },
@@ -333,7 +333,7 @@
    },
    {
     "op": "2026-09-01",
-    "aantal": 90
+    "aantal": 89
    }
   ],
   "droogloop-onbeoordeeld": [
@@ -363,7 +363,7 @@
    },
    {
     "op": "2026-09-01",
-    "aantal": 1477
+    "aantal": 1487
    }
   ],
   "wegwerpserver-kopieen": [
@@ -408,6 +408,12 @@
    "van": 1966,
    "naar": 2605,
    "reden": "Main binnengehaald: 4643 routes in plaats van 3282, en de idempotentieproef is over die nieuwe routes gedraaid. Daardoor groeit idem-ongeclassificeerd van 849 naar 1477 en gevolg-onbekend van 94 naar 90+ -- geen nieuwe schuld maar dezelfde schuld over een grotere boom. herstel-onbevestigd ging juist omlaag (63 -> 47) doordat de herstelproef ook over de nieuwe paren is gedraaid."
+  },
+  {
+   "op": "2026-09-01",
+   "van": 2275,
+   "naar": 2284,
+   "reden": "De idempotentieproef is voor het eerst na de samenvoeging van twaalf PR's gedraaid en zag daardoor routes die er al stonden maar nog nooit gemeten waren: idem-ongeclassificeerd 1477 -> 1487. Er is niets slechter geworden; er is meer in beeld gekomen. Tegelijk daalde gevolg-onbekend van 90 naar 89 uit dezelfde meting. Netto +9 op een achterstand van 2284, en de post die groeit is precies de post die de nieuwe routes telt."
   }
  ]
 }

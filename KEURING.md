@@ -31,8 +31,19 @@ Het kritieke pad liep over drie jobs:
 De vier scherven deden samen 2962 seconden, dus een gelijke verdeling is
 ~740 s per scherf. De traagste stond op 1,8× dat getal, en hij bepaalde de
 klok. Dezelfde scheefheid in de schermtoetsen (1037 tegenover 552) en in de
-a11y-ronde (958 tegenover 518). De verdeling in `scripts/lib/delen.js` is om en
+a11y-ronde (958 tegenover 518). De verdeling in `scripts/lib/delen.js` was om en
 om over de ALFABETISCHE lijst — die spreidt naamburen, maar weet niets van duur.
+
+**En hij verschuift.** Bij een verdeling op volgorde schuift elk bestand na een
+nieuwe toets een deel op. Toen er op deze tak één toetsbestand bijkwam
+(`attributie.test.js`, positie 60), verhuisden 299 van de 314 bestanden van deel
+2 — en daarmee de zware staart van scherf 1 naar scherf 2. Run `33454187817`
+gaf 419 / **1122** / 626 / 549: dezelfde scheefheid, andere scherf, niemand die
+het zag aankomen. Sinds 1 september 2026 weegt de verdeling daarom op de gemeten
+duur uit `TOETSDUUR.json` (zwaarste eerst, naar het lichtste deel), met één
+harde eis: een bestand dat niet in het register staat wordt om en om verdeeld en
+**nooit overgeslagen** — ontbrekende meting maakt de keten trager, nooit
+stiller. Waar die meting vandaan komt staat in par. 3.
 
 ### De impactgraaf versmalt te goed om waar te zijn
 
@@ -111,17 +122,41 @@ Wat hij níét meet staat er even groot bij: welke BRONBESTANDEN een toets raakt
 Node schrijft lcov per groep en niet per toetsbestand, dus die as staat in het
 register als `nietGemeten` met de reden — niet als nul.
 
+Diezelfde voorlading levert de tweede meting: **hoe lang elk toetsbestand
+erover deed** (`TOETSDUUR.json`, geschreven door `scripts/toetsduur.js`). Dat is
+het gewicht onder de scherfverdeling hierboven, en het is nergens anders te
+halen: `node --test` draait een hele groep in één aanroep en zijn TAP-uitvoer
+noemt het bestand niet. Hier is het gratis — dit proces ís het toetsbestand.
+Het register wordt in CI samengesteld en als artefact klaargezet; **een mens
+commit hem**, want hij stuurt de bouw en hoort dus in de historie te veranderen
+en niet onderweg.
+
+Eén ding is daarbij stil fout gegaan en staat daarom uitgeschreven in
+`test/toetsnaam.js`: `node --test a.js b.js` maakt drie soorten processen die er
+van binnen bijna hetzelfde uitzien, en de eerste versie liet de **regelaar**
+zichzelf de naam van het eerste bestand geven. Omdat de kinderen zijn omgeving
+erven, meldde het kind dat `b.js` draaide zich als `a.js` — een hele scherf
+sporen op naam van het verkeerde bestand, en het attributieregister zou dat als
+*gemeten* hebben opgeschreven. `NODE_TEST_CONTEXT` scheidt de drie.
+
 ## 4. Wat er nu staat, en wat nadrukkelijk niet
 
 **Staat.** Het CI-contract met zijn vier regels; de browserinstallatie uit de
 lockfile met een tijd per fase (`scripts/browserinstall.js`); de keuringen
 losgeknipt van de scherven (job `keuringen`, `test` wacht er nog wel op en
 wordt overgeslagen als hij zakt — fail-closed); één runtime uit `.nvmrc`; de
-testidentiteit als runtime-context; het attributieregister met drie standen.
+testidentiteit als runtime-context; het attributieregister met drie standen; en
+de scherfverdeling die op gemeten duur weegt in plaats van op alfabet.
+
+Dat laatste is de machinerie, niet meteen de winst: zolang `TOETSDUUR.json` leeg
+is, gedraagt de verdeling zich precies zoals vroeger. Hij wordt gevuld door de
+eerste volle ronde die de meting meeschrijft, en pas de ronde daarná verdeelt
+op echte gewichten. Dat is met opzet — een weging die zichzelf onderweg zou
+bijwerken, verschuift het kritieke pad zonder dat iemand een besluit neemt.
 
 **Staat niet, en dat is een besluit en geen gat.** Er is geen impactgraaf, geen
-risicoclassificatie, geen planner, geen resultaatcache en geen dynamische
-verdeling. De volgorde waarin ze mogen komen:
+risicoclassificatie, geen planner en geen resultaatcache. De volgorde waarin ze
+mogen komen:
 
 1. attributie over een volle ronde (de bodem — nu meetbaar, nog niet gemeten)
 2. de graaf als `bekend = statische kanten ∪ waargenomen kanten`, met de
@@ -138,7 +173,7 @@ verdeling. De volgorde waarin ze mogen komen:
    waargenomen kanten, plannerselectie en uitslagen, zodat een nieuwe
    plannerversie op honderden oude commits kan worden losgelaten in plaats van
    op de volgende tweehonderd te wachten
-5. pas daarna lanes, dynamische verdeling en handhaving voor lage risico's
+5. pas daarna lanes en handhaving voor lage risico's
 6. en als sluitstuk de resultaatcache — nooit eerder. Een cache op "de hash van
    de bronnen waarvan deze toets afhangt" is alleen geldig als die verzameling
    compleet is; op een graaf met een blinde vlek verandert hij die vlek in een

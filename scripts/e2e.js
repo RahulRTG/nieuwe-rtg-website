@@ -71,6 +71,9 @@ const r = spawnSync(process.execPath, [
      naam van het toetsbestand moet in elk kindproces staan, niet alleen in de
      servers die test/helper.js start. Zie test/toetsnaam.js. */
   env: { ...process.env, RTG_ROUTELOG: journaal,
+    /* Ook de schermtoetsen worden in vier delen verdeeld, dus ook zij hebben
+       een gewicht nodig. Zelfde meting, zelfde bestand. */
+    RTG_TOETSDUUR: process.env.RTG_TOETSDUUR || path.join(WORTEL, '.toetsduur'),
     NODE_OPTIONS: (process.env.NODE_OPTIONS ? process.env.NODE_OPTIONS + ' ' : '') +
       '--require ' + JSON.stringify(path.join(WORTEL, 'test', 'toetsnaam.js')) },
   stdio: 'inherit'

@@ -80,3 +80,40 @@ test('de blinde vlek van de statische graaf wordt geteld en niet weggelaten', ()
   assert.equal(uit.proeven.length, 1);
   assert.equal(typeof uit.proeven[0].toetsen, 'number');
 });
+
+/* ---- WELK PROCES MAG ZICHZELF EEN NAAM GEVEN? ----
+
+   Deze toets bestaat omdat de eerste versie van test/toetsnaam.js hier stil
+   fout was: `node --test a.js b.js` maakt een REGELAAR met argv[1] = a.js, en
+   die zette RTG_TOETS voor zichzelf. De kinderen erven zijn omgeving, zagen de
+   naam al staan en lieten hem staan -- dus meldde het kind dat b.js draaide
+   zich als a.js. Een hele scherf sporen op naam van het verkeerde bestand, en
+   het register hierboven zou dat als GEMETEN hebben opgeschreven.
+
+   MUTATIE (LAT.md regel 2): de `--test`-controle uit ikDraaiDeToets gehaald
+   -> "de regelaar geeft zichzelf geen naam" ZAKT (RAAK). */
+const { ikDraaiDeToets } = require('./toetsnaam');
+
+test('een kind van de runner draagt zijn EIGEN naam, ook als hij een andere erfde', () => {
+  assert.equal(ikDraaiDeToets('/repo/test/delen.test.js',
+    { NODE_TEST_CONTEXT: 'child-v8', RTG_TOETS: 'pasladder.test.js' },
+    ['--test-concurrency=2']), 'delen.test.js');
+});
+
+test('de regelaar geeft zichzelf geen naam -- hij draait geen toets maar verdeelt ze', () => {
+  assert.equal(ikDraaiDeToets('test/pasladder.test.js', {}, ['--test', '--test-concurrency=2']), null);
+});
+
+test('een los gedraaid toetsbestand mag wel', () => {
+  assert.equal(ikDraaiDeToets('/repo/test/foo.e2e.js', {}, []), 'foo.e2e.js');
+});
+
+test('een server die een toets start houdt de naam van die toets', () => {
+  /* Het kleinkind erft NODE_TEST_CONTEXT, maar zijn argv[1] is geen toets:
+     hij hoort te zwijgen en te houden wat hij erfde -- hij werkt namens die
+     toets, en zijn sporen horen dus op diens naam. */
+  assert.equal(ikDraaiDeToets('/repo/server/server.js',
+    { NODE_TEST_CONTEXT: 'child-v8', RTG_TOETS: 'delen.test.js' }, []), null);
+  assert.equal(ikDraaiDeToets('/repo/scripts/dekkingsvloer.js',
+    { NODE_TEST_CONTEXT: 'child-v8' }, []), null);
+});

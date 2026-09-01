@@ -118,8 +118,14 @@ const journaal = process.env.RTG_ROUTELOG || path.join(WORTEL, '.routejournaal')
    kindproces tegelijk regelt; een meegegeven NODE_OPTIONS blijft staan. */
 const VOORLADEN = '--require ' + JSON.stringify(path.join(WORTEL, 'test', 'toetsnaam.js'));
 const nodeOpties = (process.env.NODE_OPTIONS ? process.env.NODE_OPTIONS + ' ' : '') + VOORLADEN;
+/* DE DUURMETING, en die schrijft ALTIJD mee. Hij kost per toetsbestand een
+   append van een regel en hij is de invoer van de gewogen scherfverdeling
+   (scripts/lib/delen.js). Wie hem alleen in CI zou aanzetten, meet alleen wat
+   CI toevallig draaide; wie hem met een vlag zou aanzetten, meet nooit.
+   Het meegegeven pad wint, zoals bij het routejournaal hierboven. */
+const duurpad = process.env.RTG_TOETSDUUR || path.join(WORTEL, '.toetsduur');
 const env = { ...process.env, RTG_ROUTELOG: journaal, RTG_AFBOUW_SLOT_ACTIEF: '1',
-  NODE_OPTIONS: nodeOpties };
+  NODE_OPTIONS: nodeOpties, RTG_TOETSDUUR: duurpad };
 
 /* HET JOURNAAL LEEGGOOIEN DOET ALLEEN WIE OOK ECHT GAAT DRAAIEN, en die regel
    is duur geleerd. De unlink stond hier onvoorwaardelijk, boven de --toon-poort

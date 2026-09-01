@@ -66,6 +66,7 @@
     "ast-scan": "node scripts/ast-scan.js",
     "ci-keten": "node scripts/ci-keten.js",
     "attributie": "node scripts/attributie.js",
+    "toetsduur": "node scripts/toetsduur.js",
     "impactbereik": "node scripts/impactbereik.js",
     "a11y": "node scripts/a11y.js",
     "build": "node scripts/build.js",

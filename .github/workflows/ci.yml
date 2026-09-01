@@ -234,6 +234,19 @@ jobs:
           path: routejournaal.log
           retention-days: 1
           if-no-files-found: error
+      # DE DUURMETING VAN DEZE SCHERF. Elk toetsproces schrijft zelf op hoe lang
+      # het erover deed (test/toetsnaam.js); scripts/toetsduur.js maakt daar het
+      # gewicht van waarop scripts/lib/delen.js de volgende ronde verdeelt. Zonder
+      # deze artefacten meet het register alleen wat er lokaal toevallig draaide.
+      - name: De duurmeting van deze scherf bewaren
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: toetsduur-scherf-${{ matrix.scherf }}
+          path: .toetsduur
+          retention-days: 5
+          if-no-files-found: error
+          include-hidden-files: true
 
   # Deze zes toetsen veranderen bronbestanden met opzet om een meter te ijken.
   # Ze mogen daarom niet tegelijk met scanners of met elkaar draaien. Elk krijgt
@@ -280,6 +293,15 @@ jobs:
           name: dekking-ijking-${{ matrix.ijking }}
           path: dekking/*.info
           if-no-files-found: error
+      - name: De duurmeting van deze ijking bewaren
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: toetsduur-ijking-${{ matrix.ijking }}
+          path: .toetsduur
+          retention-days: 5
+          if-no-files-found: error
+          include-hidden-files: true
       - name: Het routejournaal van deze ijking bewaren
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
@@ -917,6 +939,15 @@ jobs:
       # ten onrechte als ontbrekend aanmerken. Bewaar de vier delen daarom met
       # een unieke naam; de job hieronder voegt ze eerst samen en oordeelt pas
       # daarna over de volledige ronde.
+      - name: De duurmeting van dit schermdeel bewaren
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: toetsduur-schermen-${{ matrix.deel }}
+          path: .toetsduur
+          retention-days: 5
+          if-no-files-found: error
+          include-hidden-files: true
       - name: Schermjournaal van dit deel bewaren
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
@@ -1046,4 +1077,40 @@ jobs:
           path: ATTRIBUTIE.json
           if-no-files-found: error
           retention-days: 5
+
+      # DE DUURMETING VAN DE HELE RONDE, en waarom hij hier NIET blokkeert.
+      #
+      # De vier scherven verdelen zich sinds 1 september 2026 op GEMETEN duur
+      # (scripts/lib/delen.js) in plaats van op alfabetische volgorde. Die
+      # weging komt uit TOETSDUUR.json, en dat register staat IN de repo -- het
+      # stuurt de bouw, dus het hoort in een commit te veranderen en niet
+      # onderweg. Deze stap voegt de metingen van alle scherven, ijkingen en
+      # schermdelen samen, laat zien wat de verdeling ermee zou doen, en zet het
+      # resultaat als artefact klaar. Een mens commit hem.
+      #
+      # WAAROM GEEN POORT. Een toets die trager wordt is hier geen fout maar een
+      # ander gewicht; daar is NORM.json voor. En een register dat zichzelf in
+      # CI zou bijwerken, verandert de verdeling zonder dat iemand het in de
+      # historie ziet -- dan verschuift het kritieke pad weer zonder besluit.
+      - name: De duurmetingen van alle delen ophalen
+        if: always()
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          pattern: toetsduur-*
+          path: duurmetingen
+      - name: Het duurregister samenstellen (meten, niet handhaven)
+        if: always()
+        run: |
+          set -o pipefail
+          gevonden=$(find duurmetingen -name .toetsduur -type f | sed 's/^/--lees /' | tr '\n' ' ')
+          test -n "$gevonden"
+          node scripts/toetsduur.js $gevonden --schrijf
+      - name: Het duurregister bewaren (een mens commit hem)
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: toetsduur
+          path: TOETSDUUR.json
+          if-no-files-found: error
+          retention-days: 30
 

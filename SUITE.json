@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-31T20:24:27.091Z",
-  "commit": "71ff3358",
+  "op": "2026-09-01T07:48:45.515Z",
+  "commit": "74b876ca",
   "boomVuil": false,
   "node": "v22.22.2"
  },
@@ -9,7 +9,7 @@
  "grens": "zegt niets over WELKE toets zakte -- dat staat in de uitvoer van de ronde zelf. Hij zegt alleen dat er een volle ronde is geweest, wanneer, en met welke uitkomst.",
  "hoe": "npm test",
  "gemeten": {
-  "bestanden": 1256,
+  "bestanden": 1257,
   "afsluitcode": 0,
   "groen": true
  }

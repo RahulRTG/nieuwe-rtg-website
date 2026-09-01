@@ -35,9 +35,13 @@ test('Module Registry kent LivingOS, WorkOS en iedere canonieke functie zonder t
   const w = platform('workspace-world-catalog.js', 'workspace-registries.js'), r = w.RTGWorkspaceRegistries();
   r.registerWorldCatalog(w.RTGWorkspaceWorldCatalog);
   const worlds = r.worldCatalog(), functies = worlds.flatMap(x => x.items);
-  assert.equal(worlds.filter(x => x.kind === 'world').length, 4); assert.equal(functies.length, 82);
-  assert.equal(worlds.find(x => x.name === 'LivingOS').items.length, 50);
-  assert.equal(worlds.find(x => x.name === 'WorkOS').items.length, 13);
+  // Vergeleken met MAPPEN (via de generator) en niet met een getal hier -- anders
+  // is deze toets de tweede handlijst die hij zegt te weren.
+  const bron = require('../scripts/workspace-worlds').gegevens(), tel = n => bron.find(x => x.name === n).items.length;
+  assert.equal(worlds.filter(x => x.kind === 'world').length, 4); assert.equal(functies.length, bron.reduce((n, x) => n + x.items.length, 0));
+  assert.ok(functies.length >= 82);
+  assert.equal(worlds.find(x => x.name === 'LivingOS').items.length, tel('LivingOS'));
+  assert.equal(worlds.find(x => x.name === 'WorkOS').items.length, tel('WorkOS'));
   assert.equal(functies.find(x => x.id === 'link:berichten').module, 'messages');
   assert.equal(functies.find(x => x.id === 'link:veilig').module, 'safety');
 });

@@ -201,7 +201,7 @@ test('de buurt-app toont activiteiten en geen enkel gegeven over een mens',
     s = await schermMet(srv.base, pw, '/apps/foundation/os-publiek.html');
     await s.page.waitForSelector('[data-stad]', { timeout: 15000 });
     await s.page.click('[data-stad]');
-    await s.page.waitForSelector('#uit .kaart', { timeout: 15000 });
+    await s.page.waitForSelector('#uit .buurtkaart', { timeout: 15000 });
     const tekst = await s.page.evaluate(() => document.body.innerText.replace(/\s+/g, ' '));
 
     assert.match(tekst, /RTF Almere/i, 'de stad staat niet in beeld');

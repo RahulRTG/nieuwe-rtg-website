@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-01T11:44:58.971Z",
-    "commit": "1d21f7ca",
+    "op": "2026-09-01T12:54:03.757Z",
+    "commit": "07ee0355",
     "boomVuil": true,
     "node": "v22.22.2"
   },
@@ -3573,6 +3573,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 3,
       "scherp": "gezakt"
+    },
+    "meetbron.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/meetbron.js",
+      "operator": "return-weg#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "memo.test.js": {
       "soort": "server",

@@ -176,11 +176,23 @@ wordt overgeslagen als hij zakt — fail-closed); één runtime uit `.nvmrc`; de
 testidentiteit als runtime-context; het attributieregister met drie standen; en
 de scherfverdeling die op gemeten duur weegt in plaats van op alfabet.
 
-Dat laatste is de machinerie, niet meteen de winst: zolang `TOETSDUUR.json` leeg
-is, gedraagt de verdeling zich precies zoals vroeger. Hij wordt gevuld door de
-eerste volle ronde die de meting meeschrijft, en pas de ronde daarná verdeelt
-op echte gewichten. Dat is met opzet — een weging die zichzelf onderweg zou
-bijwerken, verschuift het kritieke pad zonder dat iemand een besluit neemt.
+Dat laatste is inmiddels gevuld en doorgerekend. Over de 1247 bestanden die de
+scherven werkelijk draaien (niet-geïsoleerd, zonder de ijkingen):
+
+| | scherf 1 / 2 / 3 / 4 | traagste |
+|---|---|---|
+| om en om (op volgorde) | 1578 / **2586** / 1735 / 1755 s | 2586 s |
+| gewogen (op duur) | 1913 / 1913 / 1913 / 1913 s | **1913 s** |
+
+**673 seconden van het kritieke pad, 26%** — en vier keer exact het ideaal in
+plaats van één scherf op 1,35×. Het register is lokaal gemeten (zie zijn
+`stempel`); de absolute getallen van een runner liggen anders, de verhoudingen
+niet, en alleen die tellen voor de verdeling.
+
+De 177 schermtoetsen (`*.e2e.js`) staan er nog niet in: `npm test` draait ze
+niet. Ze zijn dus ongemeten, krijgen het zwaarste gewicht en worden om en om
+verdeeld — precies zoals vroeger. De schermscherven winnen hier dus nog niets;
+dat komt met de eerstvolgende ronde die hun meting meeschrijft.
 
 **Staat niet, en dat is een besluit en geen gat.** Er is geen impactgraaf, geen
 risicoclassificatie, geen planner en geen resultaatcache. De volgorde waarin ze

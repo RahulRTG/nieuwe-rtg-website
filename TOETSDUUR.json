@@ -1,0 +1,7566 @@
+{
+ "stempel": {
+  "op": "2026-09-01T06:52:54.189Z",
+  "waar": "lokaal",
+  "node": "v22.22.2",
+  "kernen": 4,
+  "commit": "43dc0f9b"
+ },
+ "uitleg": "Hoe lang elk toetsbestand erover deed, als gewicht voor de scherfverdeling in scripts/lib/delen.js. Mediaan over alle waarnemingen. Een bestand dat hier NIET in staat is ongemeten en wordt om en om verdeeld -- nooit overgeslagen.",
+ "hoe": "npm test (schrijft .toetsduur), daarna: node scripts/toetsduur.js --schrijf",
+ "gemeten": {
+  "bestanden": 1257,
+  "opSchijf": 1434,
+  "ongemeten": 177,
+  "verseWaarnemingen": 1257,
+  "regels": 1258,
+  "verminkt": 0,
+  "totaalMs": 8834057
+ },
+ "duur": {
+  "a11ykeuring.test.js": 76,
+  "a11yoordeel.test.js": 376,
+  "aanmeldbesluit.test.js": 7163,
+  "aanmeldgesprek.test.js": 8518,
+  "aanmeldingen.test.js": 127,
+  "aanwezig.test.js": 13938,
+  "accounts-os.test.js": 77,
+  "accounts.test.js": 999,
+  "activiteiten.test.js": 7156,
+  "adaptief.test.js": 149,
+  "administratie.test.js": 12656,
+  "adresopzoek.test.js": 15044,
+  "adyen-config.test.js": 59,
+  "adyen-eigen.test.js": 76,
+  "afleidbaar.test.js": 4573,
+  "agenda-pro.test.js": 7814,
+  "agenda.test.js": 7812,
+  "agent.test.js": 7728,
+  "ai-budget.test.js": 137,
+  "ai-cache.test.js": 99,
+  "ai-meter.test.js": 86,
+  "ai-oproepen.test.js": 344,
+  "ai-optioneel.test.js": 138,
+  "ai-regie.test.js": 7239,
+  "ai-rem.test.js": 77,
+  "ai-router.test.js": 92,
+  "ai-uitwijk.test.js": 174,
+  "aidata.test.js": 7146,
+  "aikosten-route.test.js": 7155,
+  "aipoort.test.js": 79,
+  "alarm.test.js": 72,
+  "alarmweg.test.js": 464,
+  "algpin.test.js": 7873,
+  "allergie.test.js": 13642,
+  "allocatie.test.js": 84,
+  "alpine.test.js": 7137,
+  "ankerdienst-echt.test.js": 6741,
+  "ankerdienst.test.js": 71,
+  "anthropic.test.js": 1635,
+  "antivirus.test.js": 434,
+  "api-contract.test.js": 7072,
+  "apipoort.test.js": 72,
+  "appbieb.test.js": 6957,
+  "appstore-cel.test.js": 105,
+  "appstore-doel.test.js": 7657,
+  "appstore-dossier.test.js": 8122,
+  "appstore-geld.test.js": 7923,
+  "appstore-meting.test.js": 81,
+  "appstore-persoon.test.js": 6771,
+  "appstore-toegankelijk.test.js": 152,
+  "appstore.test.js": 8192,
+  "appwereldcatalogus.test.js": 156,
+  "archief.test.js": 22606,
+  "architect.test.js": 6994,
+  "arena.test.js": 8981,
+  "arrival-security.test.js": 75,
+  "assets.test.js": 7511,
+  "ast-grens.test.js": 486401,
+  "ast-scan.test.js": 69962,
+  "atelier.test.js": 6625,
+  "attributie.test.js": 2326,
+  "auditspoor.test.js": 356,
+  "auth-rol.test.js": 12621,
+  "automatisering.test.js": 83,
+  "autoverkoop.test.js": 6877,
+  "avond.test.js": 7500,
+  "baby.test.js": 6497,
+  "backupstand.test.js": 71,
+  "backupvolledig.test.js": 53,
+  "balans.test.js": 6773,
+  "balkkleur.test.js": 54,
+  "bank-beheer.test.js": 7244,
+  "bank-eigendom.test.js": 53,
+  "bank.test.js": 10568,
+  "bankbeveiliging.test.js": 6579,
+  "bankdeuren.test.js": 7021,
+  "bankhart.test.js": 6908,
+  "banknood-idem.test.js": 59,
+  "bedrading.test.js": 1036,
+  "bedrijfbeeld.test.js": 6917,
+  "bedrijfbouw.test.js": 7098,
+  "bedrijfeigenaar.test.js": 7580,
+  "bedrijfkern.test.js": 7761,
+  "bedrijfklant.test.js": 7664,
+  "bedrijfrecht.test.js": 7525,
+  "bedrijfscontrole.test.js": 92,
+  "bedrijfsintake.test.js": 7585,
+  "bedrijfwerk.test.js": 7254,
+  "beginscherm.test.js": 119,
+  "begroting.test.js": 87,
+  "begrotingroute.test.js": 19816,
+  "begrotingsgrenzen.test.js": 67,
+  "belasting-groothandels.test.js": 6864,
+  "belasting.test.js": 6919,
+  "belastingkantoor.test.js": 7637,
+  "belofte.test.js": 2017,
+  "bereikbaar.test.js": 5409,
+  "berichten.test.js": 8968,
+  "beroepenbieb.test.js": 6374,
+  "beschermd.test.js": 7216,
+  "beschermstand.test.js": 80,
+  "besluit.test.js": 83,
+  "bestand-binding.test.js": 74,
+  "bestanden.test.js": 7121,
+  "betaaldienst.test.js": 7363,
+  "betaaldienstfee.test.js": 69,
+  "betaalopdracht.test.js": 85,
+  "betaalproviders.test.js": 82,
+  "betaalregie.test.js": 69,
+  "betaalstore.test.js": 59,
+  "betaalwaarheid.test.js": 65,
+  "betrouwbaarheid.test.js": 67,
+  "beveiliging.test.js": 87,
+  "beveiligingsteam.test.js": 7011,
+  "bewaartermijnen.test.js": 76,
+  "bewaarveger.test.js": 65,
+  "bewaarwacht.test.js": 63,
+  "bewakers.test.js": 6267,
+  "bewakersketen.test.js": 6018,
+  "bewijs.test.js": 7574,
+  "bewijsboek.test.js": 177,
+  "bewijsmatrix.test.js": 1594,
+  "bewijsschuld.test.js": 1396,
+  "bewijstoken.test.js": 127,
+  "bezorg.test.js": 7585,
+  "bezorging.test.js": 7374,
+  "bezorgketen.test.js": 7383,
+  "bezorgvolgen.test.js": 14257,
+  "bibliotheek.test.js": 6729,
+  "bijles.test.js": 6915,
+  "bijstand.test.js": 82,
+  "bijstandbericht.test.js": 75,
+  "bijstandketen.test.js": 7230,
+  "blindevlek.test.js": 7356,
+  "blokafsplitsing.test.js": 107,
+  "boardlog-keten.test.js": 75,
+  "boardroom-poort.test.js": 7357,
+  "boardroom.test.js": 7645,
+  "boeken.test.js": 6962,
+  "boekhoud.test.js": 6665,
+  "boerderij.test.js": 6808,
+  "bon.test.js": 76,
+  "boot-smoke.test.js": 5631,
+  "borden.test.js": 7019,
+  "bouw.test.js": 6997,
+  "bron.test.js": 1027,
+  "bronblind.test.js": 64,
+  "bronmutanten.test.js": 212,
+  "brugklant.test.js": 87,
+  "btw-aangifte.test.js": 7171,
+  "btw-naheffing-keten.test.js": 24538,
+  "btw-naheffing.test.js": 176,
+  "btw-toezicht.test.js": 85,
+  "bugjacht.test.js": 15724,
+  "bundeldelen.test.js": 226,
+  "bundelprijs.test.js": 68,
+  "bureau.test.js": 22614,
+  "ca.test.js": 178,
+  "cache.test.js": 81,
+  "canary.test.js": 85,
+  "canvas.test.js": 71,
+  "capabilities.test.js": 1390,
+  "capabilitycallers.test.js": 11639,
+  "capgezondheid.test.js": 72,
+  "care.test.js": 6968,
+  "catalogus-wensen.test.js": 27561,
+  "cdt.test.js": 7416,
+  "chaos.pg.test.js": 47,
+  "chaos.test.js": 73,
+  "charter.test.js": 7590,
+  "ci-keten.test.js": 62,
+  "claims-btw.test.js": 137,
+  "clipdeler.test.js": 180,
+  "clips.test.js": 7554,
+  "clubdorp.test.js": 7914,
+  "clubs.test.js": 7751,
+  "collectie-transactie-sqlite.test.js": 431,
+  "collega-namen.test.js": 7601,
+  "collegachat.test.js": 7126,
+  "comm-actor.test.js": 84,
+  "comm-collega.test.js": 102,
+  "comm-deelnemer.test.js": 101,
+  "comm-dm.test.js": 88,
+  "comm-gast.test.js": 144,
+  "comm-vergeten.test.js": 85,
+  "comm-werk.test.js": 96,
+  "command-router.test.js": 73,
+  "command-routes-bestuur.test.js": 7125,
+  "command-routes-herstel.test.js": 7140,
+  "command.test.js": 159,
+  "commandlagen.test.js": 7508,
+  "commerce-kern.test.js": 112,
+  "commerce-overdracht.test.js": 74,
+  "commerce-prijsvraag.test.js": 68,
+  "commerce-publiek.test.js": 63,
+  "commerce-retour.test.js": 85,
+  "commerce-verkoopweg.test.js": 67,
+  "commerce.test.js": 85,
+  "commercie.test.js": 121,
+  "concern-voorstel.test.js": 121,
+  "concern.test.js": 128,
+  "consent-dekking.test.js": 157,
+  "consent.test.js": 7101,
+  "contact.test.js": 7038,
+  "contactpin.test.js": 9365,
+  "context-lijn.test.js": 7352,
+  "contract.test.js": 76,
+  "controlekamer.test.js": 7976,
+  "controls.test.js": 202,
+  "creator-portfolio.test.js": 6978,
+  "creator.test.js": 13509,
+  "dagcoach.test.js": 6810,
+  "dagplan.test.js": 7387,
+  "dealkans.test.js": 7211,
+  "deavond.test.js": 27951,
+  "deelindex.test.js": 107,
+  "defensie.test.js": 7286,
+  "dekking.test.js": 17769,
+  "delen.test.js": 158,
+  "deltapoort.test.js": 1781,
+  "demokosten.test.js": 13244,
+  "demostand.test.js": 30573,
+  "demozaken.test.js": 40009,
+  "denkfout.test.js": 7407,
+  "directpay.test.js": 7867,
+  "doelen.test.js": 6884,
+  "domeinalleen.test.js": 13360,
+  "domeingrens.test.js": 94,
+  "doorgeefjournaal.test.js": 7398,
+  "doos-journaal.test.js": 88,
+  "doos-regie.test.js": 7126,
+  "drie.test.js": 64,
+  "drm.test.js": 7538,
+  "droogloop.test.js": 84,
+  "dubbelemelding.test.js": 67,
+  "dubbeltik.test.js": 661,
+  "dubbeltikgzip.test.js": 271,
+  "duels2.test.js": 7795,
+  "duurzaamheid-kill.test.js": 35996,
+  "duurzaamheid-pg.test.js": 84,
+  "duurzaamheidskosten.test.js": 79,
+  "dyncode-e2e.test.js": 7245,
+  "dyncode.test.js": 69,
+  "economie.test.js": 7779,
+  "edge-system.test.js": 72,
+  "eenaccount-werkruimte.test.js": 20688,
+  "eenaccount.test.js": 16312,
+  "effectmeter.test.js": 116,
+  "eigen-website.test.js": 8372,
+  "eigenaar-wedloop.test.js": 9564,
+  "eigenaar.test.js": 10058,
+  "eigenaarschap.test.js": 9518,
+  "eigenaarwerkplek.test.js": 6835,
+  "eigenip.test.js": 6800,
+  "envelop.test.js": 396,
+  "envelopvorm.test.js": 69,
+  "ervaring.test.js": 7621,
+  "eten.test.js": 71,
+  "eu-naleving.test.js": 155,
+  "eventkeuken.test.js": 7342,
+  "eventloop.test.js": 1727,
+  "excursie.test.js": 6902,
+  "executionmap.test.js": 399,
+  "facturatie.test.js": 6986,
+  "factuur.test.js": 6675,
+  "factuursaldo.test.js": 6779,
+  "fases.test.js": 7052,
+  "festival-dienst.test.js": 147,
+  "festival-gast.test.js": 106,
+  "festival-geheugen.test.js": 120,
+  "festival-gereed.test.js": 98,
+  "festival-groep.test.js": 109,
+  "festival-partner.test.js": 105,
+  "festival-podium.test.js": 102,
+  "festival-routes.test.js": 8710,
+  "festival-tijdlijn.test.js": 427,
+  "festival-verkoop.test.js": 111,
+  "festival-vooruit.test.js": 889,
+  "festival.test.js": 134,
+  "fiscaal-aansluiting.test.js": 75,
+  "fiscaal-bronnen.test.js": 181,
+  "fiscaal-gateway.test.js": 6778,
+  "fiscaal-herkomst.test.js": 6879,
+  "fiscaal-jaargangen.test.js": 77,
+  "fiscaal-preflight.test.js": 68,
+  "fiscaal-scenario.test.js": 6595,
+  "fiscaal-terugrekenen.test.js": 95,
+  "fiscaal-verbintenis.test.js": 83,
+  "fiscaal-zekerheid.test.js": 92,
+  "fiscaal-zzpwacht.test.js": 73,
+  "flits.test.js": 8692,
+  "fluister.test.js": 8500,
+  "fonds.test.js": 6368,
+  "foodcourt.test.js": 6951,
+  "foundation-markt.test.js": 7099,
+  "foundation-premium-ui.test.js": 68,
+  "foundation-rest.test.js": 7101,
+  "foundation.test.js": 13470,
+  "foundationregistratie.test.js": 6824,
+  "foundationschil.test.js": 60,
+  "fout-aggregatie.test.js": 70,
+  "fout-client-route.test.js": 6699,
+  "fout-client.test.js": 6491,
+  "foutisolatie.test.js": 69,
+  "foutmelder.test.js": 301,
+  "functieplaats.test.js": 6938,
+  "functies.test.js": 103,
+  "galerij.test.js": 6984,
+  "gastbezorging.test.js": 8964,
+  "gastfoodcourt.test.js": 7354,
+  "gastorder.test.js": 7452,
+  "gastregels.test.js": 7305,
+  "gastroomservice.test.js": 7015,
+  "gastverzoek.test.js": 7060,
+  "gastzorg.test.js": 7027,
+  "gebaar.test.js": 72,
+  "gebouw.test.js": 6868,
+  "gebouwplus.test.js": 7167,
+  "gedachten.test.js": 7835,
+  "geen-demo.test.js": 12910,
+  "geenlek.test.js": 70,
+  "gegevenspoort.test.js": 20567,
+  "geheugen.test.js": 6723,
+  "geld-conservatie-last.test.js": 8603,
+  "geld-rollen-buiten-bank.test.js": 7345,
+  "geld-rollen-gezin.test.js": 6968,
+  "geld-rollen-school.test.js": 6928,
+  "geld-rollen-werkruimte.test.js": 7083,
+  "geld-rollen-zaken.test.js": 7164,
+  "geld-rollen.test.js": 7277,
+  "geldbeleid.test.js": 7491,
+  "geldeenheid.test.js": 1092,
+  "geldgraaf.test.js": 7185,
+  "geldgrens.test.js": 7132,
+  "geldregie.test.js": 7488,
+  "geldroutes.test.js": 81,
+  "geldveilig.test.js": 287,
+  "geldwereld.test.js": 79,
+  "geloofbieb.test.js": 7393,
+  "gemeente.test.js": 7803,
+  "genootschap-beheer.test.js": 6745,
+  "genootschap.test.js": 12694,
+  "genrecap.test.js": 78,
+  "genredekking.test.js": 95,
+  "genreplan.test.js": 7599,
+  "genrepuls.test.js": 7150,
+  "genreregister.test.js": 18121,
+  "genretoegang.test.js": 11454,
+  "gerechtkennis.test.js": 7506,
+  "gereedschap.test.js": 61,
+  "gesprekdraad.test.js": 8113,
+  "getallen.test.js": 1256,
+  "gewoonten.test.js": 7369,
+  "gezag.test.js": 43358,
+  "gezagsnoemer.test.js": 214,
+  "gezakte-toetsen.test.js": 65,
+  "gezelschap.test.js": 220931,
+  "gezin-weghalen.test.js": 8261,
+  "gezinenleren.test.js": 7411,
+  "gezinhuishouden.test.js": 7464,
+  "gezinleven.test.js": 7565,
+  "gezinskeuken.test.js": 7325,
+  "gezinsregistratie.test.js": 7523,
+  "gezinzorg.test.js": 7728,
+  "gezondheid.test.js": 7344,
+  "gezondheidskaart.test.js": 107,
+  "ghost.test.js": 6731,
+  "gidswacht.test.js": 66,
+  "golive.test.js": 7295,
+  "grafsteen.pg.test.js": 61,
+  "grammatica.test.js": 190,
+  "grand-integratie.pg.test.js": 52,
+  "grens-sweep.test.js": 57257,
+  "grondwacht.test.js": 310,
+  "groothandel.test.js": 7142,
+  "hack.test.js": 7369,
+  "hand.test.js": 67,
+  "handeling.test.js": 6808,
+  "handelingsspoor-echt.test.js": 7070,
+  "handelingsspoor.test.js": 80,
+  "handelsketen.test.js": 60597,
+  "handelsregelwacht.test.js": 76,
+  "handenvrij.test.js": 86,
+  "handlerpoorten.test.js": 90,
+  "hardware.test.js": 7475,
+  "helikopter.test.js": 7375,
+  "herkomst.test.js": 84,
+  "herstel-sandbox.test.js": 13983,
+  "herstel.test.js": 252,
+  "herstel2fa.test.js": 10210,
+  "herstelgat.test.js": 13274,
+  "herstelproef.test.js": 55839,
+  "hersteltransactie.test.js": 77,
+  "herstelzondertelefoon.test.js": 13938,
+  "homekit.test.js": 6489,
+  "horeca-bar.test.js": 6541,
+  "horeca-bezorg-club.test.js": 6528,
+  "horeca-cadans.test.js": 6296,
+  "horeca-dienstmeting.test.js": 6273,
+  "horeca-edge.test.js": 6306,
+  "horeca-gezelschap.test.js": 6771,
+  "horeca-host.test.js": 6316,
+  "horeca-hotel-event.test.js": 7917,
+  "horeca-journey.test.js": 7667,
+  "horeca-kaart.test.js": 7601,
+  "horeca-keuken.test.js": 7910,
+  "horeca-pas.test.js": 8609,
+  "horeca-rahul.test.js": 7851,
+  "horeca-rekening.test.js": 7715,
+  "horeca-samenvoegen.test.js": 7606,
+  "horeca-stappen.test.js": 7508,
+  "horeca-verdeling.test.js": 8293,
+  "horeca-vloer.test.js": 7812,
+  "horeca-werklijst.test.js": 96,
+  "horeca-wijk.test.js": 9945,
+  "horlogewerk.test.js": 93,
+  "hospitality-universe.test.js": 80,
+  "housekeeping.test.js": 7898,
+  "hrplus.test.js": 14840,
+  "http1.test.js": 100,
+  "http2.test.js": 163,
+  "huis.test.js": 6977,
+  "huisstijl.test.js": 8735,
+  "hulpdienst.test.js": 7891,
+  "hulpdiensten-bord.test.js": 8064,
+  "hulpklassen.test.js": 78,
+  "human-reality.test.js": 96,
+  "i18n-auto.test.js": 1166,
+  "ideeen.test.js": 6694,
+  "idem-poort-echt.test.js": 27100,
+  "idem-poort.test.js": 111,
+  "idempotentie.test.js": 330,
+  "idemproef.test.js": 86,
+  "idemschuld.test.js": 12966,
+  "idemwereld-voorvoegsel.test.js": 6176,
+  "idemwereld.test.js": 65,
+  "identiteit-opvraag.test.js": 78,
+  "idor.test.js": 82,
+  "imageherkomst.test.js": 114,
+  "imap.test.js": 97,
+  "incident.test.js": 99,
+  "incidentcontrole-route.test.js": 7141,
+  "incidentcontrole.test.js": 125,
+  "inhoudswacht.test.js": 8217,
+  "inkoopketen.test.js": 7404,
+  "inlogrem.test.js": 31324,
+  "inlogspoor.test.js": 7812,
+  "instant-reality.test.js": 64,
+  "instap.test.js": 6852,
+  "instellingsweg.test.js": 12971,
+  "invoer.test.js": 6999,
+  "invoerproef.test.js": 63,
+  "inzagekaart.test.js": 5853,
+  "inzagelog.test.js": 160,
+  "journaalbestand.test.js": 134,
+  "journaalschrijf.test.js": 3969,
+  "journalistiek-redactie.test.js": 7077,
+  "kaart.test.js": 66,
+  "kantoordienst.test.js": 7698,
+  "kantoorgesprek.test.js": 14593,
+  "kantoorpakket-alle.test.js": 8994,
+  "kantoorwereld.test.js": 94,
+  "kantoren-uitbreiding.test.js": 7492,
+  "kantoren.test.js": 8526,
+  "kappen.test.js": 81,
+  "kassa-herhaling.test.js": 7561,
+  "kassa-modus.test.js": 7904,
+  "kassa-premium.test.js": 7810,
+  "kern-afgeleid.test.js": 84,
+  "kern-events.test.js": 84,
+  "kern-fiscaal.test.js": 116,
+  "kern-live.test.js": 93,
+  "kern-util.test.js": 72,
+  "keten.test.js": 103,
+  "ketenchat.test.js": 8891,
+  "ketenproef.test.js": 170,
+  "keuken.test.js": 8306,
+  "keuring.test.js": 86516,
+  "keuringsindex.test.js": 75304,
+  "kijken.test.js": 66,
+  "kijkplicht.test.js": 8853,
+  "klantnaad.test.js": 64,
+  "kleef-readyourwrites.test.js": 12194,
+  "kleine-grendels.test.js": 14971,
+  "klets.test.js": 108,
+  "klok.test.js": 2420,
+  "klokwacht.test.js": 6735,
+  "kluis-binding.test.js": 1385,
+  "kluis-rotatie.test.js": 1246,
+  "koppels.test.js": 7606,
+  "kosten.test.js": 10169,
+  "kostengrens.test.js": 7899,
+  "kostenherkomst.test.js": 7788,
+  "kostenketen.test.js": 7445,
+  "kostenmeters.test.js": 7299,
+  "kostenperiode.test.js": 7144,
+  "kostenvooruitblik.test.js": 7851,
+  "kostenzaak.test.js": 6883,
+  "krimpronde.test.js": 2190,
+  "kruisscan.test.js": 2355,
+  "kwaliteit.test.js": 67,
+  "kycspoor.test.js": 7716,
+  "laatste-negen.test.js": 7643,
+  "laatste-twee-endpoints.test.js": 20591,
+  "lab-geheim.test.js": 62,
+  "lab2-bewoner.test.js": 7660,
+  "lab2-werk.test.js": 8194,
+  "labfonds.test.js": 68,
+  "landpakket.test.js": 70,
+  "lcov.test.js": 205,
+  "leden-gids-pg.test.js": 54,
+  "leden-teller.test.js": 7126,
+  "ledenaflopen.test.js": 13400,
+  "ledenbalie.test.js": 49567,
+  "ledengids-race.test.js": 265,
+  "ledenladder.test.js": 7922,
+  "ledenregister.test.js": 77,
+  "leerfabric.test.js": 270,
+  "leerstof.test.js": 6949,
+  "leerstofbreed.test.js": 92,
+  "leerstofvo.test.js": 7194,
+  "leren-leden.test.js": 8291,
+  "leren.test.js": 7495,
+  "letters.test.js": 56,
+  "levenbandroutes.test.js": 7449,
+  "levensband.test.js": 73,
+  "levensbeleid.test.js": 77,
+  "levensgraafleven.test.js": 73,
+  "levenslijn.test.js": 79,
+  "levensloop.test.js": 8533,
+  "leverancierpoort.test.js": 93,
+  "lib.test.js": 173,
+  "lidboard.test.js": 10560,
+  "lidfactuur.test.js": 66936,
+  "lidmaatschap.test.js": 54,
+  "lidsleutel.test.js": 53,
+  "liegpoort.test.js": 55,
+  "life-lagen.test.js": 72,
+  "life-schakelbaar.test.js": 7704,
+  "life.test.js": 6801,
+  "lifestyle.test.js": 9258,
+  "link.test.js": 8764,
+  "linkcap.test.js": 8185,
+  "linkgezin.test.js": 8813,
+  "linkkaart.test.js": 79,
+  "linkkassa.test.js": 8128,
+  "linkkoppelingen.test.js": 10883,
+  "linkkoppelingenui.test.js": 102,
+  "livegang-pakket.test.js": 1054,
+  "livegang.test.js": 6828,
+  "livinglab-routes.test.js": 7537,
+  "livinglab.test.js": 8155,
+  "loghygiene.test.js": 6900,
+  "logstroom.test.js": 332,
+  "lokaal-eerst.test.js": 116,
+  "lokaal-tls.test.js": 248,
+  "lokaaladres.test.js": 56,
+  "lokale-ai-poort.test.js": 1489,
+  "lokale-taal.test.js": 81,
+  "loonstrook-portaal.test.js": 12394,
+  "luchthaven-vip.test.js": 7737,
+  "luchthaven.test.js": 7752,
+  "luchtzijde-taal.test.js": 7492,
+  "magnaat-capabilities.test.js": 12751,
+  "magnaat-controle.test.js": 10390,
+  "magnaat-economenlab.test.js": 80,
+  "magnaat-economie.test.js": 112,
+  "magnaat-hospitality.test.js": 110,
+  "magnaat-leerkring.test.js": 84,
+  "magnaat-motorklant.test.js": 116,
+  "magnaat-partnerstudio-routes.test.js": 7241,
+  "magnaat-partnerstudio.test.js": 90,
+  "magnaat-rtgketen.test.js": 250,
+  "magnaat-rust-integratie.test.js": 75,
+  "magnaat-teamkamer-productie.test.js": 133,
+  "magnaat-trainingslobby.test.js": 72,
+  "magnaat-werkroutefabriek.test.js": 2661,
+  "magnaatlab.test.js": 3896,
+  "magnaatwereld.test.js": 39597,
+  "mail-eigen.test.js": 2217,
+  "mail-publiek.test.js": 58,
+  "mailauth.test.js": 68,
+  "mailbijlage.test.js": 6957,
+  "maildns.test.js": 65,
+  "mailpost-kantoor.test.js": 7462,
+  "mailpost.test.js": 7290,
+  "makers.test.js": 1139,
+  "mall-bestellingen.test.js": 7419,
+  "mall-bewaard.test.js": 8174,
+  "mall-collecties.test.js": 8350,
+  "mall-concierge.test.js": 7645,
+  "mall-context.test.js": 8725,
+  "mall-extern.test.js": 9037,
+  "mall-kaart.test.js": 7319,
+  "mall-lijsten.test.js": 8259,
+  "mall-supplieros.test.js": 8523,
+  "mall-vestigingen.test.js": 7657,
+  "mall-vindlaag.test.js": 8532,
+  "mall-vraagbeeld.test.js": 8072,
+  "mall.test.js": 7554,
+  "malwarescan-dicht.test.js": 94,
+  "marechaussee.test.js": 7688,
+  "margeschaal.test.js": 78,
+  "marina.test.js": 7555,
+  "markt-zaak.test.js": 7604,
+  "markt.test.js": 7935,
+  "materiaal.test.js": 67,
+  "mdm.test.js": 83,
+  "media.test.js": 7422,
+  "mediadelen.test.js": 8124,
+  "medialijstdelen.test.js": 8334,
+  "medialijsten.test.js": 8112,
+  "mediaos.test.js": 8914,
+  "mediasamen.test.js": 7509,
+  "mediazaak.test.js": 9255,
+  "medicatie.test.js": 7154,
+  "meelezen.test.js": 83,
+  "meet.test.js": 7638,
+  "meetketen.test.js": 7302,
+  "meetkeuring.test.js": 1074,
+  "memo.test.js": 7214,
+  "menselijkebanen.test.js": 82583,
+  "menselijkverkeer.test.js": 39171,
+  "merge3.property.test.js": 585,
+  "merkkern.test.js": 80,
+  "meterijk.test.js": 863972,
+  "metier.test.js": 9986,
+  "meting.test.js": 118,
+  "metingcapaciteit.test.js": 59,
+  "metingen.test.js": 7339,
+  "metingpoort.test.js": 10724,
+  "metingtenant.test.js": 83,
+  "middleware.test.js": 213,
+  "migratierace.test.js": 1192,
+  "migraties.test.js": 503,
+  "minify.test.js": 12706,
+  "mobiel.test.js": 74,
+  "mobiliteit-werkkant-routes.test.js": 7319,
+  "mobiliteit.test.js": 8093,
+  "modebezorg.test.js": 7233,
+  "modelkeuze.test.js": 93,
+  "moedertaal.test.js": 7340,
+  "mollie-config.test.js": 60,
+  "mollie-eigen.test.js": 76,
+  "mond.test.js": 132,
+  "motor-vingerafdruk.test.js": 52,
+  "motorverbinding.test.js": 69,
+  "motorzekering.test.js": 67,
+  "mrz.test.js": 61,
+  "multi-instance-sqlite.test.js": 12104,
+  "munten.test.js": 6918,
+  "mutatie.test.js": 89,
+  "mutatiecontract.test.js": 223,
+  "mutatiesemantiek.test.js": 524,
+  "mutatiewacht.test.js": 334,
+  "muziek-lied.test.js": 7015,
+  "muziek-uitgave.test.js": 7489,
+  "muziek.test.js": 7126,
+  "naamlaag.test.js": 7503,
+  "naarkassa.test.js": 14152,
+  "naslag.test.js": 110,
+  "navigatie.test.js": 303,
+  "negenplus.test.js": 9622,
+  "nieuwe-endpoints.test.js": 7503,
+  "nieuweroutes.test.js": 71,
+  "nieuwlid-leeg.test.js": 20573,
+  "noodkaart.test.js": 7203,
+  "noodrem-bron.test.js": 21119,
+  "normbasis.test.js": 61,
+  "normprestatie.test.js": 74,
+  "normverval.test.js": 4021,
+  "notities.test.js": 7730,
+  "notitiesduurzaam.test.js": 15857,
+  "objectlaag.test.js": 111,
+  "objectlaagroutes.test.js": 7702,
+  "objectmodel.test.js": 2262,
+  "objectpool.test.js": 57,
+  "ochtend.test.js": 7761,
+  "office-bank.test.js": 8310,
+  "office-blad.test.js": 95,
+  "office-enterprise.test.js": 7985,
+  "office-payroll-dekking.test.js": 8213,
+  "office-tweede-helft.test.js": 9759,
+  "office.test.js": 8299,
+  "officebord.test.js": 7676,
+  "ogen.test.js": 89,
+  "onboarding-inrichten.test.js": 21305,
+  "onboarding-meebouwen.test.js": 20953,
+  "onboarding.test.js": 8691,
+  "onderhoud.test.js": 70,
+  "ondernemerpoort-e2e.test.js": 7301,
+  "ondernemerpoort.test.js": 69,
+  "onderneming-belasting.test.js": 157,
+  "onderneming-bestuur.test.js": 7049,
+  "onderneming-capaciteit.test.js": 169,
+  "onderneming-contracten.test.js": 128,
+  "onderneming-crediteuren.test.js": 134,
+  "onderneming-dagbeeld.test.js": 138,
+  "onderneming-debiteuren.test.js": 136,
+  "onderneming-eersteklant.test.js": 179,
+  "onderneming-kas.test.js": 128,
+  "onderneming-klussen.test.js": 137,
+  "onderneming-mallprofiel.test.js": 132,
+  "onderneming-offertebouw.test.js": 72,
+  "onderneming-ontwerper.test.js": 138,
+  "onderneming-oprichting.test.js": 7694,
+  "onderneming-pijplijn.test.js": 143,
+  "onderneming-rechtsvormen.test.js": 162,
+  "onderneming-regie.test.js": 159,
+  "onderneming-relaties.test.js": 168,
+  "onderneming-routes.test.js": 22674,
+  "onderneming-toegang.test.js": 147,
+  "onderneming-verkenning.test.js": 153,
+  "onderneming-voorraad.test.js": 159,
+  "onderneming-werving.test.js": 149,
+  "onderneming.test.js": 7800,
+  "ondertitels.test.js": 94,
+  "onderwijs.test.js": 7553,
+  "onderwijsstuur.test.js": 7528,
+  "onderzoeker.test.js": 7297,
+  "onderzoekslab.test.js": 7190,
+  "onnozel.test.js": 7776,
+  "ontmoeting-leeg.test.js": 7053,
+  "ontmoeting.test.js": 11041,
+  "ontwerp.test.js": 63,
+  "ontwerpbank.test.js": 69,
+  "oog.test.js": 7458,
+  "oplaadgat.test.js": 61,
+  "opslag-voorcheck.test.js": 1482,
+  "opslagblokkade.test.js": 59,
+  "opslagpoort.test.js": 80,
+  "opvolging.test.js": 7332,
+  "outputaudit.test.js": 627,
+  "ov-operatie.test.js": 81,
+  "ov-regie.test.js": 52,
+  "ov.test.js": 8321,
+  "overdracht.test.js": 7088,
+  "overheid.test.js": 9034,
+  "overname.test.js": 84,
+  "ovkaart.test.js": 9003,
+  "paginaroutes.test.js": 6973,
+  "paginascripts.test.js": 235,
+  "pakket.test.js": 70,
+  "papieren-boardroom.test.js": 7871,
+  "papieren.test.js": 7049,
+  "partner.test.js": 9711,
+  "partnerpas.test.js": 14431,
+  "partnertypes.test.js": 8073,
+  "pas-apps.test.js": 8530,
+  "pas-escalatie.test.js": 7510,
+  "pasladder.test.js": 108,
+  "paspoort.test.js": 7424,
+  "pasprijs.test.js": 63,
+  "pay-grootboek.test.js": 7208,
+  "pay.test.js": 7880,
+  "paybudget.test.js": 7442,
+  "payroll-aangifte.test.js": 93,
+  "payroll-dekking.test.js": 80,
+  "payroll-dossier.test.js": 107,
+  "payroll-herkomst.test.js": 6827,
+  "payroll-journaal.test.js": 97,
+  "payroll-loonheffing.test.js": 75,
+  "payroll-motor.test.js": 93,
+  "payroll-register-verzuim.test.js": 84,
+  "payroll-routes.test.js": 7579,
+  "payroll-run.test.js": 102,
+  "payroll-samenstellen.test.js": 95,
+  "payroll-uren-controles.test.js": 68,
+  "payroll-valuta.test.js": 112,
+  "payroll.test.js": 7460,
+  "paytegoed.test.js": 9159,
+  "payterug.test.js": 7241,
+  "payvooraf.test.js": 7440,
+  "pda-aanmelden.test.js": 7615,
+  "pda-netwerk.test.js": 7948,
+  "pdamodules.test.js": 6967,
+  "pdf.test.js": 7073,
+  "perimeter-risico.test.js": 7118,
+  "persistentiestand.test.js": 477,
+  "persoonseis.test.js": 122,
+  "pestgrens.test.js": 62,
+  "pg-snapshot.test.js": 49,
+  "pg-wachten.test.js": 62,
+  "pg.test.js": 48,
+  "pgaccounts.test.js": 48,
+  "pgsync-voorrang.test.js": 111,
+  "pgwire.test.js": 79,
+  "pinvergeten.test.js": 13704,
+  "plaats.test.js": 110,
+  "plaatsdienstbrug.test.js": 7662,
+  "plaatspost.test.js": 7822,
+  "plaatsprikklok.test.js": 7840,
+  "plafonds.test.js": 7386,
+  "planners.test.js": 7921,
+  "platformregister.test.js": 15840,
+  "podium.test.js": 9980,
+  "podiumhandel.test.js": 8092,
+  "podiumzaak.test.js": 8908,
+  "podiumzones.test.js": 8470,
+  "pols.test.js": 8221,
+  "poortrace.test.js": 5802,
+  "poortwacht-oordeel.test.js": 59,
+  "poortwacht.test.js": 84,
+  "portemonnee.test.js": 28956,
+  "postdatum.test.js": 7685,
+  "pragmavolgorde.test.js": 632,
+  "presentiemeting.test.js": 7415,
+  "prijsmelding.test.js": 79,
+  "productie-communicatie.test.js": 65,
+  "productie-installatie.test.js": 60,
+  "productie-motor.test.js": 112,
+  "productie.test.js": 214,
+  "proefsleutels.test.js": 66,
+  "provider-sandbox.test.js": 801,
+  "proxykop.test.js": 66,
+  "prplus.test.js": 15117,
+  "publieke-adressen.test.js": 11271,
+  "publieke-rand.test.js": 8022,
+  "pulse.test.js": 9308,
+  "punten.test.js": 7443,
+  "qr.test.js": 173,
+  "qrscan.test.js": 159,
+  "raakvlak.test.js": 75,
+  "rahul-eerlijk.test.js": 93,
+  "rahul-hart.test.js": 62,
+  "rahul-mens.test.js": 7465,
+  "rahul-omgang.test.js": 84,
+  "rahul-regie.test.js": 8205,
+  "rahul-reis.test.js": 7405,
+  "rampbeeld.test.js": 9410,
+  "randen.test.js": 148,
+  "rechtbank.test.js": 8130,
+  "rechten.test.js": 98,
+  "rechterhand-huis.test.js": 8271,
+  "rechterhand-reis.test.js": 8488,
+  "rechterhand-wissen.test.js": 10142,
+  "rechterhand.test.js": 15961,
+  "redactie.test.js": 7365,
+  "redis.test.js": 236,
+  "regexmutatie.test.js": 72,
+  "regie.test.js": 8100,
+  "reisaanbod.test.js": 19099,
+  "reisactiviteiten.test.js": 7777,
+  "reisagenda.test.js": 7462,
+  "reisbieb.test.js": 7432,
+  "reisbureau.test.js": 8206,
+  "reisoplosser.test.js": 7490,
+  "reisplan.test.js": 8184,
+  "reisuitnodiging.test.js": 7956,
+  "reiswacht.test.js": 7244,
+  "reiswereld.test.js": 84,
+  "reiswijzer.test.js": 6945,
+  "reizen.test.js": 7250,
+  "rekening.test.js": 14390,
+  "rekenmotor.test.js": 77,
+  "rekenschuif.test.js": 54,
+  "release-bewijs.test.js": 76,
+  "rem.test.js": 61,
+  "rendezvous.test.js": 40712,
+  "reservering-beleid.test.js": 65,
+  "residentie.test.js": 7519,
+  "residentie2.test.js": 7531,
+  "residentie3.test.js": 7466,
+  "residentie4.test.js": 53,
+  "resolverbereik.test.js": 566,
+  "retail-annulering.test.js": 106,
+  "retail-prijs.test.js": 78,
+  "retail.test.js": 8194,
+  "rijksles.test.js": 6998,
+  "risico.test.js": 1087,
+  "rollenmatrix.test.js": 9254,
+  "rolproef.test.js": 91,
+  "ronde.test.js": 85,
+  "routedekking.test.js": 13627,
+  "routedossier.test.js": 8404,
+  "routelog.test.js": 20054,
+  "routerindex.test.js": 10149,
+  "rtf-veilig.test.js": 7126,
+  "rtfagenda.test.js": 6997,
+  "rtfalbum.test.js": 6818,
+  "rtfbieb.test.js": 7249,
+  "rtfcampus.test.js": 79,
+  "rtfcoderem.test.js": 7351,
+  "rtfcurve.test.js": 7019,
+  "rtfgeld.test.js": 6806,
+  "rtfkantoor.test.js": 7110,
+  "rtfleerlingtoegang.test.js": 6927,
+  "rtfos-afmaak.test.js": 7787,
+  "rtfos-bestuur.test.js": 8187,
+  "rtfos-context.test.js": 87,
+  "rtfos-doelgroepen.test.js": 7943,
+  "rtfos-governance.test.js": 8159,
+  "rtfos-netwerk.test.js": 8293,
+  "rtfos-portalen.test.js": 8174,
+  "rtfos-uitvoering.test.js": 8227,
+  "rtfos.test.js": 8671,
+  "rtfschool.test.js": 7273,
+  "rtfschool2.test.js": 7383,
+  "rtfwelzijn.test.js": 7109,
+  "rtfwelzijn2.test.js": 7037,
+  "rtg-a11y.test.js": 75,
+  "rtg.test.js": 141,
+  "rtgai.test.js": 7553,
+  "rtgcode.test.js": 56,
+  "rtghorloge.test.js": 63,
+  "rtgid.test.js": 11442,
+  "rtgjson.test.js": 8316,
+  "rtgone.test.js": 7252,
+  "rtmail-ai.test.js": 7574,
+  "rtmail-bestuur.test.js": 8616,
+  "rtmail-lid.test.js": 8407,
+  "rtmail-schrijf.test.js": 9282,
+  "rtmail-team.test.js": 7840,
+  "rtmail-vak.test.js": 7665,
+  "rtmail-werk.test.js": 8181,
+  "rtmail-zaak.test.js": 8304,
+  "rtmail.test.js": 108,
+  "rust-migraties.test.js": 56,
+  "rust-noodstop.test.js": 58,
+  "rust.test.js": 17534,
+  "salon-app.test.js": 13195,
+  "salon-curatie.test.js": 7219,
+  "salon-verplicht.test.js": 7358,
+  "salonbeeld.test.js": 53,
+  "salonbron-fotobank.test.js": 7229,
+  "salonviraal.test.js": 58,
+  "samen.test.js": 7953,
+  "samendelen.test.js": 18338,
+  "samenwerking.test.js": 7742,
+  "samlacs.test.js": 14983,
+  "samlc14n.test.js": 224,
+  "samlpoort.test.js": 493,
+  "samlxsw.test.js": 596,
+  "satelliet.test.js": 7322,
+  "saveduurzaam.test.js": 1991,
+  "scanner.test.js": 168,
+  "scannerpdf.test.js": 56,
+  "schaduw.test.js": 77,
+  "schakelaar-zwijgt.test.js": 7041,
+  "schakelaarsdekking.test.js": 6270,
+  "schakelkast-dekking.test.js": 8658,
+  "scheiding.test.js": 7739,
+  "schermleugen.test.js": 82,
+  "schermronde.test.js": 111,
+  "schild.test.js": 7631,
+  "school.test.js": 11755,
+  "schoolaanwezig.test.js": 8468,
+  "schooladvies.test.js": 117,
+  "schoolbeeld.test.js": 8258,
+  "schoolbel.test.js": 8824,
+  "schooldirectie.test.js": 7781,
+  "schoolenterprise.test.js": 8094,
+  "schoolexcursie.test.js": 9209,
+  "schoolgeld.test.js": 8583,
+  "schoolhulplijn.test.js": 8060,
+  "schoolkoppel.test.js": 12597,
+  "schoolniveau.test.js": 7739,
+  "schoolpersoneelregistratie.test.js": 8177,
+  "schoolrest.test.js": 7483,
+  "schoolschermen.test.js": 168,
+  "schooltaal.test.js": 8012,
+  "schooltoets.test.js": 7923,
+  "schoolverbonden.test.js": 8130,
+  "schorspoort.test.js": 341,
+  "schrijfanalyse.test.js": 72,
+  "scim.test.js": 997,
+  "scimgroepen.test.js": 7003,
+  "scriptafsplitsing.test.js": 77,
+  "scriptbundel.test.js": 85,
+  "securitylog-keten.test.js": 20669,
+  "selfhost.test.js": 221,
+  "semantiek.test.js": 2940,
+  "semdiff.test.js": 167,
+  "sentinel.test.js": 86,
+  "server.test.js": 7988,
+  "ses-ontvangst.test.js": 6850,
+  "sessie-herstart.test.js": 11947,
+  "sessiegrens.test.js": 15001,
+  "sessies.test.js": 185,
+  "sessiewacht.test.js": 70,
+  "simulatiebank.test.js": 7331,
+  "skipwacht.test.js": 1008,
+  "sleutelwoorden.test.js": 6846,
+  "slo-routes.test.js": 14159,
+  "slo.test.js": 241,
+  "sloophamer.pg.test.js": 63,
+  "smtp-in.test.js": 14524,
+  "smtp.test.js": 562,
+  "sni.test.js": 66,
+  "sociaal-index.test.js": 93,
+  "social-elite.test.js": 117,
+  "socialebeleid.test.js": 83,
+  "socialecommand.test.js": 87,
+  "socialegraaf.test.js": 93,
+  "socialelijn.test.js": 93,
+  "socialewereld.test.js": 121,
+  "societeit.test.js": 8389,
+  "sparren.test.js": 15158,
+  "spelaandeel.test.js": 186,
+  "spelbank.test.js": 326,
+  "spelbeleid.test.js": 295,
+  "speldag.test.js": 10310,
+  "spelhandel.test.js": 210,
+  "spelkijken.test.js": 209,
+  "spelklok.test.js": 314,
+  "spellen.test.js": 29698,
+  "spelmaatje.test.js": 7554,
+  "spelmagnaat.test.js": 10568,
+  "spelnabespreking.test.js": 219,
+  "spelnaspelen.test.js": 298,
+  "spelpoort.test.js": 7336,
+  "spelpraat.test.js": 8344,
+  "spelpresence.test.js": 68,
+  "spelprestaties.test.js": 69,
+  "spelprojectie.test.js": 272,
+  "spelquiz.test.js": 178,
+  "spelregels-drift.test.js": 177,
+  "spelregister.test.js": 189,
+  "spelreplay.test.js": 205,
+  "spelsudoku.test.js": 10866,
+  "spelteams.test.js": 8678,
+  "speltelling.test.js": 7500,
+  "speltoernooi.test.js": 180,
+  "speluitslagen.test.js": 194,
+  "spelvariant.test.js": 187,
+  "spelveiling.test.js": 127,
+  "spelverzekering.test.js": 286,
+  "sportclub.test.js": 7698,
+  "spreidingsoordeel.test.js": 74,
+  "sprongindex.test.js": 1099,
+  "sso.test.js": 606,
+  "ssrf.test.js": 61,
+  "staatlog.test.js": 75,
+  "staatproef.test.js": 310,
+  "stad.test.js": 7900,
+  "stadsbesluit.test.js": 8032,
+  "stadsbestuur.test.js": 8748,
+  "stadshardware.test.js": 8501,
+  "stadskansen.test.js": 7865,
+  "stadsraad.test.js": 6820,
+  "stadstart.test.js": 74,
+  "stadsweefsel-steden.test.js": 116,
+  "stadsweefsel.test.js": 9558,
+  "staff-inzet-mob.test.js": 8546,
+  "staffinvite.test.js": 10028,
+  "stijlafsplitsing.test.js": 74,
+  "stijlbundel.test.js": 93,
+  "stilalarm.test.js": 20887,
+  "stillepost.test.js": 82,
+  "streng-poorten.test.js": 7635,
+  "strenge-poort.test.js": 262,
+  "stripe-eigen.test.js": 126,
+  "studio.test.js": 6948,
+  "stun.test.js": 89,
+  "stuur-aanval.test.js": 137,
+  "stuur-gevolg.test.js": 159,
+  "stuur-mandaat.test.js": 213,
+  "stuur-niveaus.test.js": 316,
+  "stuur-plan.test.js": 151,
+  "stuur-resolver-taal.test.js": 455,
+  "stuur-resolver.test.js": 231,
+  "stuur.test.js": 7804,
+  "supplier-comm-mob-payroll.test.js": 9958,
+  "supplier-comm-routes.test.js": 7578,
+  "supplier-contract-teken.test.js": 7466,
+  "supplier-contract.test.js": 7775,
+  "supplier-post-drive.test.js": 7783,
+  "svgpaden.test.js": 377,
+  "synergie.test.js": 7848,
+  "taalcheck.test.js": 7265,
+  "taaldekking.test.js": 104,
+  "taallaag.test.js": 7226,
+  "tafeldek.test.js": 7778,
+  "tafelticket.test.js": 23723,
+  "takenlijst.test.js": 351,
+  "talen.test.js": 7873,
+  "talen114.test.js": 7219,
+  "teacherflow.test.js": 7362,
+  "techniek-functies.test.js": 8989,
+  "techniek-sso-scim.test.js": 8103,
+  "techniek.test.js": 88,
+  "tegenfeit.test.js": 180,
+  "tegoed.test.js": 73,
+  "tenant.test.js": 7440,
+  "tenantbewijs.test.js": 7213,
+  "tenantcontract.test.js": 7390,
+  "tenantherstelproef.test.js": 7321,
+  "tenantspine.test.js": 128,
+  "tenantuitgang.test.js": 7517,
+  "terrein-en-panden.test.js": 8869,
+  "terugstortstand.test.js": 7513,
+  "theater-thuis.test.js": 7462,
+  "theater.test.js": 7644,
+  "thema.test.js": 170,
+  "thuis-zaak.test.js": 8056,
+  "thuis.test.js": 7605,
+  "thuiszakelijk.test.js": 7253,
+  "tiener.test.js": 7094,
+  "tijdlijn.test.js": 63,
+  "tls-acme-boot.test.js": 149,
+  "tls-acme.test.js": 89,
+  "tls-boot.test.js": 24020,
+  "tls-native.test.js": 159,
+  "tls-x509.test.js": 142,
+  "toegangprefix.test.js": 1910,
+  "toegankelijk.test.js": 6910,
+  "toestellen.test.js": 6995,
+  "toetskeuring.test.js": 7161,
+  "training.test.js": 7873,
+  "trainingsschema.test.js": 7996,
+  "transfer.test.js": 9945,
+  "treasury.test.js": 9209,
+  "trio-kleef.test.js": 386,
+  "trio-wees.test.js": 44957,
+  "trio-werkers.test.js": 362,
+  "txgeld.test.js": 116,
+  "txindex.test.js": 119,
+  "txkap.test.js": 186,
+  "txledger-sqlite.test.js": 1008,
+  "txledger.pg.test.js": 111,
+  "uitgeven-inwisselen.test.js": 9236,
+  "uitgifte.test.js": 9490,
+  "uitloggen.test.js": 8954,
+  "uitrol.test.js": 68,
+  "uitrolregie-echt.test.js": 8786,
+  "uitrolregie.test.js": 86,
+  "uitvoerproef.test.js": 69,
+  "upload-poort.test.js": 7610,
+  "uploadquarantaine.test.js": 100,
+  "vakbewijs-kluis.test.js": 56,
+  "vakbewijs-routes.test.js": 9357,
+  "vakken.test.js": 8833,
+  "vakpro.test.js": 8885,
+  "vakpro2.test.js": 8977,
+  "vakwerk-pro.test.js": 7837,
+  "vakwerk.test.js": 8404,
+  "vastgoed.test.js": 8081,
+  "vastleggen.test.js": 7443,
+  "veer.test.js": 82,
+  "veiligadres.test.js": 67,
+  "veiligheid-kring-rust.test.js": 7078,
+  "veiligheid-moment.test.js": 53,
+  "veiligheid.test.js": 92871,
+  "veiligheidskern.test.js": 64,
+  "verblijf.test.js": 8957,
+  "vergeten-gezelschap.test.js": 8912,
+  "vergeten.test.js": 7122,
+  "verhuur.test.js": 7547,
+  "verjaardagen.test.js": 7214,
+  "verkoop-etalage.test.js": 7427,
+  "verraad.test.js": 1018,
+  "verraadtelling.test.js": 88,
+  "versieadres.test.js": 67,
+  "vertaal.test.js": 6320,
+  "vertrouwen.test.js": 147,
+  "verzadiging.test.js": 69,
+  "verzoek-intrekken.test.js": 7048,
+  "verzorging-leden.test.js": 6665,
+  "verzorging.test.js": 7547,
+  "villa.test.js": 6487,
+  "vingerafdruk.test.js": 228,
+  "vloerwerk.test.js": 7519,
+  "vloot.test.js": 11311,
+  "vlootbeeld.test.js": 84,
+  "voeding.test.js": 6611,
+  "vonk.test.js": 16465,
+  "voornemen.test.js": 126,
+  "voorspel.test.js": 6759,
+  "voorspelplaats.test.js": 78,
+  "voorstel.test.js": 64,
+  "vracht.test.js": 6565,
+  "vrijenamen.test.js": 6741,
+  "vuurplan.test.js": 94,
+  "waarde.test.js": 6207,
+  "waardegraaf.test.js": 6447,
+  "waarom.test.js": 63,
+  "wacht.test.js": 79,
+  "wachtdeur.test.js": 6221,
+  "wachter.test.js": 94,
+  "wachtlijst.test.js": 6354,
+  "wachtwoordkosten.test.js": 1159,
+  "wauw.test.js": 7407,
+  "wbw.test.js": 6792,
+  "web.test.js": 143,
+  "webauthn-ceremonie.test.js": 6514,
+  "webauthn-eigen.test.js": 90,
+  "webauthn.test.js": 12866,
+  "webplatform.test.js": 12617,
+  "webpush.test.js": 81,
+  "website-aanvraag-handoff.test.js": 52,
+  "weigering-laat-niets-achter.test.js": 6742,
+  "wereld.test.js": 6686,
+  "wereldkern.test.js": 60,
+  "wereldlaag.test.js": 12381,
+  "wereldprofiel.test.js": 10780,
+  "wereldregels.test.js": 6084,
+  "wereldregister.test.js": 106,
+  "wereldroutes.test.js": 6885,
+  "wereldtaal.test.js": 70,
+  "wereldvermogens.test.js": 16608,
+  "werk-bij-inloggen.test.js": 8403,
+  "werkbeleid-dienst.test.js": 8551,
+  "werkgebeurtenis.test.js": 84,
+  "werkgeheugen.test.js": 7952,
+  "werkgevolg.test.js": 7299,
+  "werkgezondheid.test.js": 6866,
+  "werkgrens.test.js": 7699,
+  "werkhandeling.test.js": 7289,
+  "werkindienst.test.js": 7227,
+  "werkmail.test.js": 8195,
+  "werkplaats-uitgifte.test.js": 7311,
+  "werkplek-wijzigen.test.js": 8868,
+  "werkplek.test.js": 7837,
+  "werkregels.test.js": 8119,
+  "werkregister.test.js": 7714,
+  "werkruimte-kantoor.test.js": 68,
+  "werktafelgeheugen.test.js": 67,
+  "werktoen.test.js": 7261,
+  "werkvenster.test.js": 8811,
+  "werkvloer.test.js": 7591,
+  "werkvormen.test.js": 7637,
+  "werkwaarom.test.js": 7467,
+  "werving-link.test.js": 28960,
+  "wetten.test.js": 302,
+  "wiring-contract.test.js": 234,
+  "wisselen-en-historie.test.js": 9335,
+  "woonplaats-poort.test.js": 144,
+  "work-doelgroepen.test.js": 68,
+  "zaaihash.test.js": 8059,
+  "zaak-balie.test.js": 8150,
+  "zaak-en-mensen.test.js": 7938,
+  "zaak-export.test.js": 7899,
+  "zaak-inrichting.test.js": 8232,
+  "zaak-kantoor.test.js": 7964,
+  "zaak-loket-en-dossier.test.js": 7829,
+  "zaak-vloot-en-facturen.test.js": 8122,
+  "zaak.test.js": 7333,
+  "zaakabonnement.test.js": 65,
+  "zaakbetaling.test.js": 9728,
+  "zaakcommand-routes.test.js": 7736,
+  "zaakcommand.test.js": 101,
+  "zaakdoos.test.js": 42399,
+  "zaaktools.test.js": 7582,
+  "zaaktransactie.test.js": 97,
+  "zakelijk.test.js": 12781,
+  "zakelijkvervoer.test.js": 8798,
+  "zandbak.test.js": 83,
+  "zegel.test.js": 82,
+  "zegelcheck.test.js": 89,
+  "zegelroute.test.js": 27168,
+  "zelfzorg.test.js": 7177,
+  "ziekmelding-privacy.test.js": 22976,
+  "zinnencache.test.js": 560,
+  "zorgketen.test.js": 7970,
+  "zorgniveau.test.js": 6935,
+  "zorgwallet.test.js": 7086,
+  "zware-bundels.test.js": 58
+ },
+ "spreiding": {
+  "a11ykeuring.test.js": {
+   "n": 1,
+   "min": 76,
+   "max": 76
+  },
+  "a11yoordeel.test.js": {
+   "n": 1,
+   "min": 376,
+   "max": 376
+  },
+  "aanmeldbesluit.test.js": {
+   "n": 1,
+   "min": 7163,
+   "max": 7163
+  },
+  "aanmeldgesprek.test.js": {
+   "n": 1,
+   "min": 8518,
+   "max": 8518
+  },
+  "aanmeldingen.test.js": {
+   "n": 1,
+   "min": 127,
+   "max": 127
+  },
+  "aanwezig.test.js": {
+   "n": 1,
+   "min": 13938,
+   "max": 13938
+  },
+  "accounts-os.test.js": {
+   "n": 1,
+   "min": 77,
+   "max": 77
+  },
+  "accounts.test.js": {
+   "n": 1,
+   "min": 999,
+   "max": 999
+  },
+  "activiteiten.test.js": {
+   "n": 1,
+   "min": 7156,
+   "max": 7156
+  },
+  "adaptief.test.js": {
+   "n": 1,
+   "min": 149,
+   "max": 149
+  },
+  "administratie.test.js": {
+   "n": 1,
+   "min": 12656,
+   "max": 12656
+  },
+  "adresopzoek.test.js": {
+   "n": 1,
+   "min": 15044,
+   "max": 15044
+  },
+  "adyen-config.test.js": {
+   "n": 1,
+   "min": 59,
+   "max": 59
+  },
+  "adyen-eigen.test.js": {
+   "n": 1,
+   "min": 76,
+   "max": 76
+  },
+  "afleidbaar.test.js": {
+   "n": 1,
+   "min": 4573,
+   "max": 4573
+  },
+  "agenda-pro.test.js": {
+   "n": 1,
+   "min": 7814,
+   "max": 7814
+  },
+  "agenda.test.js": {
+   "n": 1,
+   "min": 7812,
+   "max": 7812
+  },
+  "agent.test.js": {
+   "n": 1,
+   "min": 7728,
+   "max": 7728
+  },
+  "ai-budget.test.js": {
+   "n": 1,
+   "min": 137,
+   "max": 137
+  },
+  "ai-cache.test.js": {
+   "n": 1,
+   "min": 99,
+   "max": 99
+  },
+  "ai-meter.test.js": {
+   "n": 1,
+   "min": 86,
+   "max": 86
+  },
+  "ai-oproepen.test.js": {
+   "n": 1,
+   "min": 344,
+   "max": 344
+  },
+  "ai-optioneel.test.js": {
+   "n": 1,
+   "min": 138,
+   "max": 138
+  },
+  "ai-regie.test.js": {
+   "n": 1,
+   "min": 7239,
+   "max": 7239
+  },
+  "ai-rem.test.js": {
+   "n": 1,
+   "min": 77,
+   "max": 77
+  },
+  "ai-router.test.js": {
+   "n": 1,
+   "min": 92,
+   "max": 92
+  },
+  "ai-uitwijk.test.js": {
+   "n": 1,
+   "min": 174,
+   "max": 174
+  },
+  "aidata.test.js": {
+   "n": 1,
+   "min": 7146,
+   "max": 7146
+  },
+  "aikosten-route.test.js": {
+   "n": 1,
+   "min": 7155,
+   "max": 7155
+  },
+  "aipoort.test.js": {
+   "n": 1,
+   "min": 79,
+   "max": 79
+  },
+  "alarm.test.js": {
+   "n": 1,
+   "min": 72,
+   "max": 72
+  },
+  "alarmweg.test.js": {
+   "n": 1,
+   "min": 464,
+   "max": 464
+  },
+  "algpin.test.js": {
+   "n": 1,
+   "min": 7873,
+   "max": 7873
+  },
+  "allergie.test.js": {
+   "n": 1,
+   "min": 13642,
+   "max": 13642
+  },
+  "allocatie.test.js": {
+   "n": 1,
+   "min": 84,
+   "max": 84
+  },
+  "alpine.test.js": {
+   "n": 1,
+   "min": 7137,
+   "max": 7137
+  },
+  "ankerdienst-echt.test.js": {
+   "n": 1,
+   "min": 6741,
+   "max": 6741
+  },
+  "ankerdienst.test.js": {
+   "n": 1,
+   "min": 71,
+   "max": 71
+  },
+  "anthropic.test.js": {
+   "n": 1,
+   "min": 1635,
+   "max": 1635
+  },
+  "antivirus.test.js": {
+   "n": 1,
+   "min": 434,
+   "max": 434
+  },
+  "api-contract.test.js": {
+   "n": 1,
+   "min": 7072,
+   "max": 7072
+  },
+  "apipoort.test.js": {
+   "n": 1,
+   "min": 72,
+   "max": 72
+  },
+  "appbieb.test.js": {
+   "n": 1,
+   "min": 6957,
+   "max": 6957
+  },
+  "appstore-cel.test.js": {
+   "n": 1,
+   "min": 105,
+   "max": 105
+  },
+  "appstore-doel.test.js": {
+   "n": 1,
+   "min": 7657,
+   "max": 7657
+  },
+  "appstore-dossier.test.js": {
+   "n": 1,
+   "min": 8122,
+   "max": 8122
+  },
+  "appstore-geld.test.js": {
+   "n": 1,
+   "min": 7923,
+   "max": 7923
+  },
+  "appstore-meting.test.js": {
+   "n": 1,
+   "min": 81,
+   "max": 81
+  },
+  "appstore-persoon.test.js": {
+   "n": 1,
+   "min": 6771,
+   "max": 6771
+  },
+  "appstore-toegankelijk.test.js": {
+   "n": 1,
+   "min": 152,
+   "max": 152
+  },
+  "appstore.test.js": {
+   "n": 1,
+   "min": 8192,
+   "max": 8192
+  },
+  "appwereldcatalogus.test.js": {
+   "n": 1,
+   "min": 156,
+   "max": 156
+  },
+  "archief.test.js": {
+   "n": 1,
+   "min": 22606,
+   "max": 22606
+  },
+  "architect.test.js": {
+   "n": 1,
+   "min": 6994,
+   "max": 6994
+  },
+  "arena.test.js": {
+   "n": 1,
+   "min": 8981,
+   "max": 8981
+  },
+  "arrival-security.test.js": {
+   "n": 1,
+   "min": 75,
+   "max": 75
+  },
+  "assets.test.js": {
+   "n": 1,
+   "min": 7511,
+   "max": 7511
+  },
+  "ast-grens.test.js": {
+   "n": 1,
+   "min": 486401,
+   "max": 486401
+  },
+  "ast-scan.test.js": {
+   "n": 1,
+   "min": 69962,
+   "max": 69962
+  },
+  "atelier.test.js": {
+   "n": 1,
+   "min": 6625,
+   "max": 6625
+  },
+  "attributie.test.js": {
+   "n": 1,
+   "min": 2326,
+   "max": 2326
+  },
+  "auditspoor.test.js": {
+   "n": 1,
+   "min": 356,
+   "max": 356
+  },
+  "auth-rol.test.js": {
+   "n": 1,
+   "min": 12621,
+   "max": 12621
+  },
+  "automatisering.test.js": {
+   "n": 1,
+   "min": 83,
+   "max": 83
+  },
+  "autoverkoop.test.js": {
+   "n": 1,
+   "min": 6877,
+   "max": 6877
+  },
+  "avond.test.js": {
+   "n": 1,
+   "min": 7500,
+   "max": 7500
+  },
+  "baby.test.js": {
+   "n": 1,
+   "min": 6497,
+   "max": 6497
+  },
+  "backupstand.test.js": {
+   "n": 1,
+   "min": 71,
+   "max": 71
+  },
+  "backupvolledig.test.js": {
+   "n": 1,
+   "min": 53,
+   "max": 53
+  },
+  "balans.test.js": {
+   "n": 1,
+   "min": 6773,
+   "max": 6773
+  },
+  "balkkleur.test.js": {
+   "n": 1,
+   "min": 54,
+   "max": 54
+  },
+  "bank-beheer.test.js": {
+   "n": 1,
+   "min": 7244,
+   "max": 7244
+  },
+  "bank-eigendom.test.js": {
+   "n": 1,
+   "min": 53,
+   "max": 53
+  },
+  "bank.test.js": {
+   "n": 1,
+   "min": 10568,
+   "max": 10568
+  },
+  "bankbeveiliging.test.js": {
+   "n": 1,
+   "min": 6579,
+   "max": 6579
+  },
+  "bankdeuren.test.js": {
+   "n": 1,
+   "min": 7021,
+   "max": 7021
+  },
+  "bankhart.test.js": {
+   "n": 1,
+   "min": 6908,
+   "max": 6908
+  },
+  "banknood-idem.test.js": {
+   "n": 1,
+   "min": 59,
+   "max": 59
+  },
+  "bedrading.test.js": {
+   "n": 1,
+   "min": 1036,
+   "max": 1036
+  },
+  "bedrijfbeeld.test.js": {
+   "n": 1,
+   "min": 6917,
+   "max": 6917
+  },
+  "bedrijfbouw.test.js": {
+   "n": 1,
+   "min": 7098,
+   "max": 7098
+  },
+  "bedrijfeigenaar.test.js": {
+   "n": 1,
+   "min": 7580,
+   "max": 7580
+  },
+  "bedrijfkern.test.js": {
+   "n": 1,
+   "min": 7761,
+   "max": 7761
+  },
+  "bedrijfklant.test.js": {
+   "n": 1,
+   "min": 7664,
+   "max": 7664
+  },
+  "bedrijfrecht.test.js": {
+   "n": 1,
+   "min": 7525,
+   "max": 7525
+  },
+  "bedrijfscontrole.test.js": {
+   "n": 1,
+   "min": 92,
+   "max": 92
+  },
+  "bedrijfsintake.test.js": {
+   "n": 1,
+   "min": 7585,
+   "max": 7585
+  },
+  "bedrijfwerk.test.js": {
+   "n": 1,
+   "min": 7254,
+   "max": 7254
+  },
+  "beginscherm.test.js": {
+   "n": 1,
+   "min": 119,
+   "max": 119
+  },
+  "begroting.test.js": {
+   "n": 1,
+   "min": 87,
+   "max": 87
+  },
+  "begrotingroute.test.js": {
+   "n": 1,
+   "min": 19816,
+   "max": 19816
+  },
+  "begrotingsgrenzen.test.js": {
+   "n": 1,
+   "min": 67,
+   "max": 67
+  },
+  "belasting-groothandels.test.js": {
+   "n": 1,
+   "min": 6864,
+   "max": 6864
+  },
+  "belasting.test.js": {
+   "n": 1,
+   "min": 6919,
+   "max": 6919
+  },
+  "belastingkantoor.test.js": {
+   "n": 1,
+   "min": 7637,
+   "max": 7637
+  },
+  "belofte.test.js": {
+   "n": 1,
+   "min": 2017,
+   "max": 2017
+  },
+  "bereikbaar.test.js": {
+   "n": 1,
+   "min": 5409,
+   "max": 5409
+  },
+  "berichten.test.js": {
+   "n": 1,
+   "min": 8968,
+   "max": 8968
+  },
+  "beroepenbieb.test.js": {
+   "n": 1,
+   "min": 6374,
+   "max": 6374
+  },
+  "beschermd.test.js": {
+   "n": 1,
+   "min": 7216,
+   "max": 7216
+  },
+  "beschermstand.test.js": {
+   "n": 1,
+   "min": 80,
+   "max": 80
+  },
+  "besluit.test.js": {
+   "n": 1,
+   "min": 83,
+   "max": 83
+  },
+  "bestand-binding.test.js": {
+   "n": 1,
+   "min": 74,
+   "max": 74
+  },
+  "bestanden.test.js": {
+   "n": 1,
+   "min": 7121,
+   "max": 7121
+  },
+  "betaaldienst.test.js": {
+   "n": 1,
+   "min": 7363,
+   "max": 7363
+  },
+  "betaaldienstfee.test.js": {
+   "n": 1,
+   "min": 69,
+   "max": 69
+  },
+  "betaalopdracht.test.js": {
+   "n": 1,
+   "min": 85,
+   "max": 85
+  },
+  "betaalproviders.test.js": {
+   "n": 1,
+   "min": 82,
+   "max": 82
+  },
+  "betaalregie.test.js": {
+   "n": 1,
+   "min": 69,
+   "max": 69
+  },
+  "betaalstore.test.js": {
+   "n": 1,
+   "min": 59,
+   "max": 59
+  },
+  "betaalwaarheid.test.js": {
+   "n": 1,
+   "min": 65,
+   "max": 65
+  },
+  "betrouwbaarheid.test.js": {
+   "n": 1,
+   "min": 67,
+   "max": 67
+  },
+  "beveiliging.test.js": {
+   "n": 1,
+   "min": 87,
+   "max": 87
+  },
+  "beveiligingsteam.test.js": {
+   "n": 1,
+   "min": 7011,
+   "max": 7011
+  },
+  "bewaartermijnen.test.js": {
+   "n": 1,
+   "min": 76,
+   "max": 76
+  },
+  "bewaarveger.test.js": {
+   "n": 1,
+   "min": 65,
+   "max": 65
+  },
+  "bewaarwacht.test.js": {
+   "n": 1,
+   "min": 63,
+   "max": 63
+  },
+  "bewakers.test.js": {
+   "n": 1,
+   "min": 6267,
+   "max": 6267
+  },
+  "bewakersketen.test.js": {
+   "n": 1,
+   "min": 6018,
+   "max": 6018
+  },
+  "bewijs.test.js": {
+   "n": 1,
+   "min": 7574,
+   "max": 7574
+  },
+  "bewijsboek.test.js": {
+   "n": 1,
+   "min": 177,
+   "max": 177
+  },
+  "bewijsmatrix.test.js": {
+   "n": 1,
+   "min": 1594,
+   "max": 1594
+  },
+  "bewijsschuld.test.js": {
+   "n": 1,
+   "min": 1396,
+   "max": 1396
+  },
+  "bewijstoken.test.js": {
+   "n": 1,
+   "min": 127,
+   "max": 127
+  },
+  "bezorg.test.js": {
+   "n": 1,
+   "min": 7585,
+   "max": 7585
+  },
+  "bezorging.test.js": {
+   "n": 1,
+   "min": 7374,
+   "max": 7374
+  },
+  "bezorgketen.test.js": {
+   "n": 1,
+   "min": 7383,
+   "max": 7383
+  },
+  "bezorgvolgen.test.js": {
+   "n": 1,
+   "min": 14257,
+   "max": 14257
+  },
+  "bibliotheek.test.js": {
+   "n": 1,
+   "min": 6729,
+   "max": 6729
+  },
+  "bijles.test.js": {
+   "n": 1,
+   "min": 6915,
+   "max": 6915
+  },
+  "bijstand.test.js": {
+   "n": 1,
+   "min": 82,
+   "max": 82
+  },
+  "bijstandbericht.test.js": {
+   "n": 1,
+   "min": 75,
+   "max": 75
+  },
+  "bijstandketen.test.js": {
+   "n": 1,
+   "min": 7230,
+   "max": 7230
+  },
+  "blindevlek.test.js": {
+   "n": 1,
+   "min": 7356,
+   "max": 7356
+  },
+  "blokafsplitsing.test.js": {
+   "n": 1,
+   "min": 107,
+   "max": 107
+  },
+  "boardlog-keten.test.js": {
+   "n": 1,
+   "min": 75,
+   "max": 75
+  },
+  "boardroom-poort.test.js": {
+   "n": 1,
+   "min": 7357,
+   "max": 7357
+  },
+  "boardroom.test.js": {
+   "n": 1,
+   "min": 7645,
+   "max": 7645
+  },
+  "boeken.test.js": {
+   "n": 1,
+   "min": 6962,
+   "max": 6962
+  },
+  "boekhoud.test.js": {
+   "n": 1,
+   "min": 6665,
+   "max": 6665
+  },
+  "boerderij.test.js": {
+   "n": 1,
+   "min": 6808,
+   "max": 6808
+  },
+  "bon.test.js": {
+   "n": 1,
+   "min": 76,
+   "max": 76
+  },
+  "boot-smoke.test.js": {
+   "n": 1,
+   "min": 5631,
+   "max": 5631
+  },
+  "borden.test.js": {
+   "n": 1,
+   "min": 7019,
+   "max": 7019
+  },
+  "bouw.test.js": {
+   "n": 1,
+   "min": 6997,
+   "max": 6997
+  },
+  "bron.test.js": {
+   "n": 1,
+   "min": 1027,
+   "max": 1027
+  },
+  "bronblind.test.js": {
+   "n": 1,
+   "min": 64,
+   "max": 64
+  },
+  "bronmutanten.test.js": {
+   "n": 1,
+   "min": 212,
+   "max": 212
+  },
+  "brugklant.test.js": {
+   "n": 1,
+   "min": 87,
+   "max": 87
+  },
+  "btw-aangifte.test.js": {
+   "n": 1,
+   "min": 7171,
+   "max": 7171
+  },
+  "btw-naheffing-keten.test.js": {
+   "n": 1,
+   "min": 24538,
+   "max": 24538
+  },
+  "btw-naheffing.test.js": {
+   "n": 1,
+   "min": 176,
+   "max": 176
+  },
+  "btw-toezicht.test.js": {
+   "n": 1,
+   "min": 85,
+   "max": 85
+  },
+  "bugjacht.test.js": {
+   "n": 1,
+   "min": 15724,
+   "max": 15724
+  },
+  "bundeldelen.test.js": {
+   "n": 1,
+   "min": 226,
+   "max": 226
+  },
+  "bundelprijs.test.js": {
+   "n": 1,
+   "min": 68,
+   "max": 68
+  },
+  "bureau.test.js": {
+   "n": 1,
+   "min": 22614,
+   "max": 22614
+  },
+  "ca.test.js": {
+   "n": 1,
+   "min": 178,
+   "max": 178
+  },
+  "cache.test.js": {
+   "n": 1,
+   "min": 81,
+   "max": 81
+  },
+  "canary.test.js": {
+   "n": 1,
+   "min": 85,
+   "max": 85
+  },
+  "canvas.test.js": {
+   "n": 1,
+   "min": 71,
+   "max": 71
+  },
+  "capabilities.test.js": {
+   "n": 1,
+   "min": 1390,
+   "max": 1390
+  },
+  "capabilitycallers.test.js": {
+   "n": 1,
+   "min": 11639,
+   "max": 11639
+  },
+  "capgezondheid.test.js": {
+   "n": 1,
+   "min": 72,
+   "max": 72
+  },
+  "care.test.js": {
+   "n": 1,
+   "min": 6968,
+   "max": 6968
+  },
+  "catalogus-wensen.test.js": {
+   "n": 1,
+   "min": 27561,
+   "max": 27561
+  },
+  "cdt.test.js": {
+   "n": 1,
+   "min": 7416,
+   "max": 7416
+  },
+  "chaos.pg.test.js": {
+   "n": 1,
+   "min": 47,
+   "max": 47
+  },
+  "chaos.test.js": {
+   "n": 1,
+   "min": 73,
+   "max": 73
+  },
+  "charter.test.js": {
+   "n": 1,
+   "min": 7590,
+   "max": 7590
+  },
+  "ci-keten.test.js": {
+   "n": 1,
+   "min": 62,
+   "max": 62
+  },
+  "claims-btw.test.js": {
+   "n": 1,
+   "min": 137,
+   "max": 137
+  },
+  "clipdeler.test.js": {
+   "n": 1,
+   "min": 180,
+   "max": 180
+  },
+  "clips.test.js": {
+   "n": 1,
+   "min": 7554,
+   "max": 7554
+  },
+  "clubdorp.test.js": {
+   "n": 1,
+   "min": 7914,
+   "max": 7914
+  },
+  "clubs.test.js": {
+   "n": 1,
+   "min": 7751,
+   "max": 7751
+  },
+  "collectie-transactie-sqlite.test.js": {
+   "n": 1,
+   "min": 431,
+   "max": 431
+  },
+  "collega-namen.test.js": {
+   "n": 1,
+   "min": 7601,
+   "max": 7601
+  },
+  "collegachat.test.js": {
+   "n": 1,
+   "min": 7126,
+   "max": 7126
+  },
+  "comm-actor.test.js": {
+   "n": 1,
+   "min": 84,
+   "max": 84
+  },
+  "comm-collega.test.js": {
+   "n": 1,
+   "min": 102,
+   "max": 102
+  },
+  "comm-deelnemer.test.js": {
+   "n": 1,
+   "min": 101,
+   "max": 101
+  },
+  "comm-dm.test.js": {
+   "n": 1,
+   "min": 88,
+   "max": 88
+  },
+  "comm-gast.test.js": {
+   "n": 1,
+   "min": 144,
+   "max": 144
+  },
+  "comm-vergeten.test.js": {
+   "n": 1,
+   "min": 85,
+   "max": 85
+  },
+  "comm-werk.test.js": {
+   "n": 1,
+   "min": 96,
+   "max": 96
+  },
+  "command-router.test.js": {
+   "n": 1,
+   "min": 73,
+   "max": 73
+  },
+  "command-routes-bestuur.test.js": {
+   "n": 1,
+   "min": 7125,
+   "max": 7125
+  },
+  "command-routes-herstel.test.js": {
+   "n": 1,
+   "min": 7140,
+   "max": 7140
+  },
+  "command.test.js": {
+   "n": 1,
+   "min": 159,
+   "max": 159
+  },
+  "commandlagen.test.js": {
+   "n": 1,
+   "min": 7508,
+   "max": 7508
+  },
+  "commerce-kern.test.js": {
+   "n": 1,
+   "min": 112,
+   "max": 112
+  },
+  "commerce-overdracht.test.js": {
+   "n": 1,
+   "min": 74,
+   "max": 74
+  },
+  "commerce-prijsvraag.test.js": {
+   "n": 1,
+   "min": 68,
+   "max": 68
+  },
+  "commerce-publiek.test.js": {
+   "n": 1,
+   "min": 63,
+   "max": 63
+  },
+  "commerce-retour.test.js": {
+   "n": 1,
+   "min": 85,
+   "max": 85
+  },
+  "commerce-verkoopweg.test.js": {
+   "n": 1,
+   "min": 67,
+   "max": 67
+  },
+  "commerce.test.js": {
+   "n": 1,
+   "min": 85,
+   "max": 85
+  },
+  "commercie.test.js": {
+   "n": 1,
+   "min": 121,
+   "max": 121
+  },
+  "concern-voorstel.test.js": {
+   "n": 1,
+   "min": 121,
+   "max": 121
+  },
+  "concern.test.js": {
+   "n": 1,
+   "min": 128,
+   "max": 128
+  },
+  "consent-dekking.test.js": {
+   "n": 1,
+   "min": 157,
+   "max": 157
+  },
+  "consent.test.js": {
+   "n": 1,
+   "min": 7101,
+   "max": 7101
+  },
+  "contact.test.js": {
+   "n": 1,
+   "min": 7038,
+   "max": 7038
+  },
+  "contactpin.test.js": {
+   "n": 1,
+   "min": 9365,
+   "max": 9365
+  },
+  "context-lijn.test.js": {
+   "n": 1,
+   "min": 7352,
+   "max": 7352
+  },
+  "contract.test.js": {
+   "n": 1,
+   "min": 76,
+   "max": 76
+  },
+  "controlekamer.test.js": {
+   "n": 1,
+   "min": 7976,
+   "max": 7976
+  },
+  "controls.test.js": {
+   "n": 1,
+   "min": 202,
+   "max": 202
+  },
+  "creator-portfolio.test.js": {
+   "n": 1,
+   "min": 6978,
+   "max": 6978
+  },
+  "creator.test.js": {
+   "n": 1,
+   "min": 13509,
+   "max": 13509
+  },
+  "dagcoach.test.js": {
+   "n": 1,
+   "min": 6810,
+   "max": 6810
+  },
+  "dagplan.test.js": {
+   "n": 1,
+   "min": 7387,
+   "max": 7387
+  },
+  "dealkans.test.js": {
+   "n": 1,
+   "min": 7211,
+   "max": 7211
+  },
+  "deavond.test.js": {
+   "n": 1,
+   "min": 27951,
+   "max": 27951
+  },
+  "deelindex.test.js": {
+   "n": 1,
+   "min": 107,
+   "max": 107
+  },
+  "defensie.test.js": {
+   "n": 1,
+   "min": 7286,
+   "max": 7286
+  },
+  "dekking.test.js": {
+   "n": 1,
+   "min": 17769,
+   "max": 17769
+  },
+  "delen.test.js": {
+   "n": 1,
+   "min": 158,
+   "max": 158
+  },
+  "deltapoort.test.js": {
+   "n": 1,
+   "min": 1781,
+   "max": 1781
+  },
+  "demokosten.test.js": {
+   "n": 1,
+   "min": 13244,
+   "max": 13244
+  },
+  "demostand.test.js": {
+   "n": 1,
+   "min": 30573,
+   "max": 30573
+  },
+  "demozaken.test.js": {
+   "n": 1,
+   "min": 40009,
+   "max": 40009
+  },
+  "denkfout.test.js": {
+   "n": 1,
+   "min": 7407,
+   "max": 7407
+  },
+  "directpay.test.js": {
+   "n": 1,
+   "min": 7867,
+   "max": 7867
+  },
+  "doelen.test.js": {
+   "n": 1,
+   "min": 6884,
+   "max": 6884
+  },
+  "domeinalleen.test.js": {
+   "n": 1,
+   "min": 13360,
+   "max": 13360
+  },
+  "domeingrens.test.js": {
+   "n": 1,
+   "min": 94,
+   "max": 94
+  },
+  "doorgeefjournaal.test.js": {
+   "n": 1,
+   "min": 7398,
+   "max": 7398
+  },
+  "doos-journaal.test.js": {
+   "n": 1,
+   "min": 88,
+   "max": 88
+  },
+  "doos-regie.test.js": {
+   "n": 1,
+   "min": 7126,
+   "max": 7126
+  },
+  "drie.test.js": {
+   "n": 1,
+   "min": 64,
+   "max": 64
+  },
+  "drm.test.js": {
+   "n": 1,
+   "min": 7538,
+   "max": 7538
+  },
+  "droogloop.test.js": {
+   "n": 1,
+   "min": 84,
+   "max": 84
+  },
+  "dubbelemelding.test.js": {
+   "n": 1,
+   "min": 67,
+   "max": 67
+  },
+  "dubbeltik.test.js": {
+   "n": 1,
+   "min": 661,
+   "max": 661
+  },
+  "dubbeltikgzip.test.js": {
+   "n": 1,
+   "min": 271,
+   "max": 271
+  },
+  "duels2.test.js": {
+   "n": 1,
+   "min": 7795,
+   "max": 7795
+  },
+  "duurzaamheid-kill.test.js": {
+   "n": 1,
+   "min": 35996,
+   "max": 35996
+  },
+  "duurzaamheid-pg.test.js": {
+   "n": 1,
+   "min": 84,
+   "max": 84
+  },
+  "duurzaamheidskosten.test.js": {
+   "n": 1,
+   "min": 79,
+   "max": 79
+  },
+  "dyncode-e2e.test.js": {
+   "n": 1,
+   "min": 7245,
+   "max": 7245
+  },
+  "dyncode.test.js": {
+   "n": 1,
+   "min": 69,
+   "max": 69
+  },
+  "economie.test.js": {
+   "n": 1,
+   "min": 7779,
+   "max": 7779
+  },
+  "edge-system.test.js": {
+   "n": 1,
+   "min": 72,
+   "max": 72
+  },
+  "eenaccount-werkruimte.test.js": {
+   "n": 1,
+   "min": 20688,
+   "max": 20688
+  },
+  "eenaccount.test.js": {
+   "n": 1,
+   "min": 16312,
+   "max": 16312
+  },
+  "effectmeter.test.js": {
+   "n": 1,
+   "min": 116,
+   "max": 116
+  },
+  "eigen-website.test.js": {
+   "n": 1,
+   "min": 8372,
+   "max": 8372
+  },
+  "eigenaar-wedloop.test.js": {
+   "n": 1,
+   "min": 9564,
+   "max": 9564
+  },
+  "eigenaar.test.js": {
+   "n": 1,
+   "min": 10058,
+   "max": 10058
+  },
+  "eigenaarschap.test.js": {
+   "n": 1,
+   "min": 9518,
+   "max": 9518
+  },
+  "eigenaarwerkplek.test.js": {
+   "n": 1,
+   "min": 6835,
+   "max": 6835
+  },
+  "eigenip.test.js": {
+   "n": 1,
+   "min": 6800,
+   "max": 6800
+  },
+  "envelop.test.js": {
+   "n": 1,
+   "min": 396,
+   "max": 396
+  },
+  "envelopvorm.test.js": {
+   "n": 1,
+   "min": 69,
+   "max": 69
+  },
+  "ervaring.test.js": {
+   "n": 1,
+   "min": 7621,
+   "max": 7621
+  },
+  "eten.test.js": {
+   "n": 1,
+   "min": 71,
+   "max": 71
+  },
+  "eu-naleving.test.js": {
+   "n": 1,
+   "min": 155,
+   "max": 155
+  },
+  "eventkeuken.test.js": {
+   "n": 1,
+   "min": 7342,
+   "max": 7342
+  },
+  "eventloop.test.js": {
+   "n": 1,
+   "min": 1727,
+   "max": 1727
+  },
+  "excursie.test.js": {
+   "n": 1,
+   "min": 6902,
+   "max": 6902
+  },
+  "executionmap.test.js": {
+   "n": 1,
+   "min": 399,
+   "max": 399
+  },
+  "facturatie.test.js": {
+   "n": 1,
+   "min": 6986,
+   "max": 6986
+  },
+  "factuur.test.js": {
+   "n": 1,
+   "min": 6675,
+   "max": 6675
+  },
+  "factuursaldo.test.js": {
+   "n": 1,
+   "min": 6779,
+   "max": 6779
+  },
+  "fases.test.js": {
+   "n": 1,
+   "min": 7052,
+   "max": 7052
+  },
+  "festival-dienst.test.js": {
+   "n": 1,
+   "min": 147,
+   "max": 147
+  },
+  "festival-gast.test.js": {
+   "n": 1,
+   "min": 106,
+   "max": 106
+  },
+  "festival-geheugen.test.js": {
+   "n": 1,
+   "min": 120,
+   "max": 120
+  },
+  "festival-gereed.test.js": {
+   "n": 1,
+   "min": 98,
+   "max": 98
+  },
+  "festival-groep.test.js": {
+   "n": 1,
+   "min": 109,
+   "max": 109
+  },
+  "festival-partner.test.js": {
+   "n": 1,
+   "min": 105,
+   "max": 105
+  },
+  "festival-podium.test.js": {
+   "n": 1,
+   "min": 102,
+   "max": 102
+  },
+  "festival-routes.test.js": {
+   "n": 1,
+   "min": 8710,
+   "max": 8710
+  },
+  "festival-tijdlijn.test.js": {
+   "n": 1,
+   "min": 427,
+   "max": 427
+  },
+  "festival-verkoop.test.js": {
+   "n": 1,
+   "min": 111,
+   "max": 111
+  },
+  "festival-vooruit.test.js": {
+   "n": 1,
+   "min": 889,
+   "max": 889
+  },
+  "festival.test.js": {
+   "n": 1,
+   "min": 134,
+   "max": 134
+  },
+  "fiscaal-aansluiting.test.js": {
+   "n": 1,
+   "min": 75,
+   "max": 75
+  },
+  "fiscaal-bronnen.test.js": {
+   "n": 1,
+   "min": 181,
+   "max": 181
+  },
+  "fiscaal-gateway.test.js": {
+   "n": 1,
+   "min": 6778,
+   "max": 6778
+  },
+  "fiscaal-herkomst.test.js": {
+   "n": 1,
+   "min": 6879,
+   "max": 6879
+  },
+  "fiscaal-jaargangen.test.js": {
+   "n": 1,
+   "min": 77,
+   "max": 77
+  },
+  "fiscaal-preflight.test.js": {
+   "n": 1,
+   "min": 68,
+   "max": 68
+  },
+  "fiscaal-scenario.test.js": {
+   "n": 1,
+   "min": 6595,
+   "max": 6595
+  },
+  "fiscaal-terugrekenen.test.js": {
+   "n": 1,
+   "min": 95,
+   "max": 95
+  },
+  "fiscaal-verbintenis.test.js": {
+   "n": 1,
+   "min": 83,
+   "max": 83
+  },
+  "fiscaal-zekerheid.test.js": {
+   "n": 1,
+   "min": 92,
+   "max": 92
+  },
+  "fiscaal-zzpwacht.test.js": {
+   "n": 1,
+   "min": 73,
+   "max": 73
+  },
+  "flits.test.js": {
+   "n": 1,
+   "min": 8692,
+   "max": 8692
+  },
+  "fluister.test.js": {
+   "n": 1,
+   "min": 8500,
+   "max": 8500
+  },
+  "fonds.test.js": {
+   "n": 1,
+   "min": 6368,
+   "max": 6368
+  },
+  "foodcourt.test.js": {
+   "n": 1,
+   "min": 6951,
+   "max": 6951
+  },
+  "foundation-markt.test.js": {
+   "n": 1,
+   "min": 7099,
+   "max": 7099
+  },
+  "foundation-premium-ui.test.js": {
+   "n": 1,
+   "min": 68,
+   "max": 68
+  },
+  "foundation-rest.test.js": {
+   "n": 1,
+   "min": 7101,
+   "max": 7101
+  },
+  "foundation.test.js": {
+   "n": 1,
+   "min": 13470,
+   "max": 13470
+  },
+  "foundationregistratie.test.js": {
+   "n": 1,
+   "min": 6824,
+   "max": 6824
+  },
+  "foundationschil.test.js": {
+   "n": 1,
+   "min": 60,
+   "max": 60
+  },
+  "fout-aggregatie.test.js": {
+   "n": 1,
+   "min": 70,
+   "max": 70
+  },
+  "fout-client-route.test.js": {
+   "n": 1,
+   "min": 6699,
+   "max": 6699
+  },
+  "fout-client.test.js": {
+   "n": 1,
+   "min": 6491,
+   "max": 6491
+  },
+  "foutisolatie.test.js": {
+   "n": 1,
+   "min": 69,
+   "max": 69
+  },
+  "foutmelder.test.js": {
+   "n": 1,
+   "min": 301,
+   "max": 301
+  },
+  "functieplaats.test.js": {
+   "n": 1,
+   "min": 6938,
+   "max": 6938
+  },
+  "functies.test.js": {
+   "n": 1,
+   "min": 103,
+   "max": 103
+  },
+  "galerij.test.js": {
+   "n": 1,
+   "min": 6984,
+   "max": 6984
+  },
+  "gastbezorging.test.js": {
+   "n": 1,
+   "min": 8964,
+   "max": 8964
+  },
+  "gastfoodcourt.test.js": {
+   "n": 1,
+   "min": 7354,
+   "max": 7354
+  },
+  "gastorder.test.js": {
+   "n": 1,
+   "min": 7452,
+   "max": 7452
+  },
+  "gastregels.test.js": {
+   "n": 1,
+   "min": 7305,
+   "max": 7305
+  },
+  "gastroomservice.test.js": {
+   "n": 1,
+   "min": 7015,
+   "max": 7015
+  },
+  "gastverzoek.test.js": {
+   "n": 1,
+   "min": 7060,
+   "max": 7060
+  },
+  "gastzorg.test.js": {
+   "n": 1,
+   "min": 7027,
+   "max": 7027
+  },
+  "gebaar.test.js": {
+   "n": 1,
+   "min": 72,
+   "max": 72
+  },
+  "gebouw.test.js": {
+   "n": 1,
+   "min": 6868,
+   "max": 6868
+  },
+  "gebouwplus.test.js": {
+   "n": 1,
+   "min": 7167,
+   "max": 7167
+  },
+  "gedachten.test.js": {
+   "n": 1,
+   "min": 7835,
+   "max": 7835
+  },
+  "geen-demo.test.js": {
+   "n": 1,
+   "min": 12910,
+   "max": 12910
+  },
+  "geenlek.test.js": {
+   "n": 1,
+   "min": 70,
+   "max": 70
+  },
+  "gegevenspoort.test.js": {
+   "n": 1,
+   "min": 20567,
+   "max": 20567
+  },
+  "geheugen.test.js": {
+   "n": 1,
+   "min": 6723,
+   "max": 6723
+  },
+  "geld-conservatie-last.test.js": {
+   "n": 1,
+   "min": 8603,
+   "max": 8603
+  },
+  "geld-rollen-buiten-bank.test.js": {
+   "n": 1,
+   "min": 7345,
+   "max": 7345
+  },
+  "geld-rollen-gezin.test.js": {
+   "n": 1,
+   "min": 6968,
+   "max": 6968
+  },
+  "geld-rollen-school.test.js": {
+   "n": 1,
+   "min": 6928,
+   "max": 6928
+  },
+  "geld-rollen-werkruimte.test.js": {
+   "n": 1,
+   "min": 7083,
+   "max": 7083
+  },
+  "geld-rollen-zaken.test.js": {
+   "n": 1,
+   "min": 7164,
+   "max": 7164
+  },
+  "geld-rollen.test.js": {
+   "n": 1,
+   "min": 7277,
+   "max": 7277
+  },
+  "geldbeleid.test.js": {
+   "n": 1,
+   "min": 7491,
+   "max": 7491
+  },
+  "geldeenheid.test.js": {
+   "n": 1,
+   "min": 1092,
+   "max": 1092
+  },
+  "geldgraaf.test.js": {
+   "n": 1,
+   "min": 7185,
+   "max": 7185
+  },
+  "geldgrens.test.js": {
+   "n": 1,
+   "min": 7132,
+   "max": 7132
+  },
+  "geldregie.test.js": {
+   "n": 1,
+   "min": 7488,
+   "max": 7488
+  },
+  "geldroutes.test.js": {
+   "n": 1,
+   "min": 81,
+   "max": 81
+  },
+  "geldveilig.test.js": {
+   "n": 1,
+   "min": 287,
+   "max": 287
+  },
+  "geldwereld.test.js": {
+   "n": 1,
+   "min": 79,
+   "max": 79
+  },
+  "geloofbieb.test.js": {
+   "n": 1,
+   "min": 7393,
+   "max": 7393
+  },
+  "gemeente.test.js": {
+   "n": 1,
+   "min": 7803,
+   "max": 7803
+  },
+  "genootschap-beheer.test.js": {
+   "n": 1,
+   "min": 6745,
+   "max": 6745
+  },
+  "genootschap.test.js": {
+   "n": 1,
+   "min": 12694,
+   "max": 12694
+  },
+  "genrecap.test.js": {
+   "n": 1,
+   "min": 78,
+   "max": 78
+  },
+  "genredekking.test.js": {
+   "n": 1,
+   "min": 95,
+   "max": 95
+  },
+  "genreplan.test.js": {
+   "n": 1,
+   "min": 7599,
+   "max": 7599
+  },
+  "genrepuls.test.js": {
+   "n": 1,
+   "min": 7150,
+   "max": 7150
+  },
+  "genreregister.test.js": {
+   "n": 1,
+   "min": 18121,
+   "max": 18121
+  },
+  "genretoegang.test.js": {
+   "n": 1,
+   "min": 11454,
+   "max": 11454
+  },
+  "gerechtkennis.test.js": {
+   "n": 1,
+   "min": 7506,
+   "max": 7506
+  },
+  "gereedschap.test.js": {
+   "n": 1,
+   "min": 61,
+   "max": 61
+  },
+  "gesprekdraad.test.js": {
+   "n": 1,
+   "min": 8113,
+   "max": 8113
+  },
+  "getallen.test.js": {
+   "n": 1,
+   "min": 1256,
+   "max": 1256
+  },
+  "gewoonten.test.js": {
+   "n": 1,
+   "min": 7369,
+   "max": 7369
+  },
+  "gezag.test.js": {
+   "n": 1,
+   "min": 43358,
+   "max": 43358
+  },
+  "gezagsnoemer.test.js": {
+   "n": 1,
+   "min": 214,
+   "max": 214
+  },
+  "gezakte-toetsen.test.js": {
+   "n": 1,
+   "min": 65,
+   "max": 65
+  },
+  "gezelschap.test.js": {
+   "n": 1,
+   "min": 220931,
+   "max": 220931
+  },
+  "gezin-weghalen.test.js": {
+   "n": 1,
+   "min": 8261,
+   "max": 8261
+  },
+  "gezinenleren.test.js": {
+   "n": 1,
+   "min": 7411,
+   "max": 7411
+  },
+  "gezinhuishouden.test.js": {
+   "n": 1,
+   "min": 7464,
+   "max": 7464
+  },
+  "gezinleven.test.js": {
+   "n": 1,
+   "min": 7565,
+   "max": 7565
+  },
+  "gezinskeuken.test.js": {
+   "n": 1,
+   "min": 7325,
+   "max": 7325
+  },
+  "gezinsregistratie.test.js": {
+   "n": 1,
+   "min": 7523,
+   "max": 7523
+  },
+  "gezinzorg.test.js": {
+   "n": 1,
+   "min": 7728,
+   "max": 7728
+  },
+  "gezondheid.test.js": {
+   "n": 1,
+   "min": 7344,
+   "max": 7344
+  },
+  "gezondheidskaart.test.js": {
+   "n": 1,
+   "min": 107,
+   "max": 107
+  },
+  "ghost.test.js": {
+   "n": 1,
+   "min": 6731,
+   "max": 6731
+  },
+  "gidswacht.test.js": {
+   "n": 1,
+   "min": 66,
+   "max": 66
+  },
+  "golive.test.js": {
+   "n": 1,
+   "min": 7295,
+   "max": 7295
+  },
+  "grafsteen.pg.test.js": {
+   "n": 1,
+   "min": 61,
+   "max": 61
+  },
+  "grammatica.test.js": {
+   "n": 1,
+   "min": 190,
+   "max": 190
+  },
+  "grand-integratie.pg.test.js": {
+   "n": 1,
+   "min": 52,
+   "max": 52
+  },
+  "grens-sweep.test.js": {
+   "n": 1,
+   "min": 57257,
+   "max": 57257
+  },
+  "grondwacht.test.js": {
+   "n": 1,
+   "min": 310,
+   "max": 310
+  },
+  "groothandel.test.js": {
+   "n": 1,
+   "min": 7142,
+   "max": 7142
+  },
+  "hack.test.js": {
+   "n": 1,
+   "min": 7369,
+   "max": 7369
+  },
+  "hand.test.js": {
+   "n": 1,
+   "min": 67,
+   "max": 67
+  },
+  "handeling.test.js": {
+   "n": 1,
+   "min": 6808,
+   "max": 6808
+  },
+  "handelingsspoor-echt.test.js": {
+   "n": 1,
+   "min": 7070,
+   "max": 7070
+  },
+  "handelingsspoor.test.js": {
+   "n": 1,
+   "min": 80,
+   "max": 80
+  },
+  "handelsketen.test.js": {
+   "n": 1,
+   "min": 60597,
+   "max": 60597
+  },
+  "handelsregelwacht.test.js": {
+   "n": 1,
+   "min": 76,
+   "max": 76
+  },
+  "handenvrij.test.js": {
+   "n": 1,
+   "min": 86,
+   "max": 86
+  },
+  "handlerpoorten.test.js": {
+   "n": 1,
+   "min": 90,
+   "max": 90
+  },
+  "hardware.test.js": {
+   "n": 1,
+   "min": 7475,
+   "max": 7475
+  },
+  "helikopter.test.js": {
+   "n": 1,
+   "min": 7375,
+   "max": 7375
+  },
+  "herkomst.test.js": {
+   "n": 1,
+   "min": 84,
+   "max": 84
+  },
+  "herstel-sandbox.test.js": {
+   "n": 1,
+   "min": 13983,
+   "max": 13983
+  },
+  "herstel.test.js": {
+   "n": 1,
+   "min": 252,
+   "max": 252
+  },
+  "herstel2fa.test.js": {
+   "n": 1,
+   "min": 10210,
+   "max": 10210
+  },
+  "herstelgat.test.js": {
+   "n": 1,
+   "min": 13274,
+   "max": 13274
+  },
+  "herstelproef.test.js": {
+   "n": 1,
+   "min": 55839,
+   "max": 55839
+  },
+  "hersteltransactie.test.js": {
+   "n": 1,
+   "min": 77,
+   "max": 77
+  },
+  "herstelzondertelefoon.test.js": {
+   "n": 1,
+   "min": 13938,
+   "max": 13938
+  },
+  "homekit.test.js": {
+   "n": 1,
+   "min": 6489,
+   "max": 6489
+  },
+  "horeca-bar.test.js": {
+   "n": 1,
+   "min": 6541,
+   "max": 6541
+  },
+  "horeca-bezorg-club.test.js": {
+   "n": 1,
+   "min": 6528,
+   "max": 6528
+  },
+  "horeca-cadans.test.js": {
+   "n": 1,
+   "min": 6296,
+   "max": 6296
+  },
+  "horeca-dienstmeting.test.js": {
+   "n": 1,
+   "min": 6273,
+   "max": 6273
+  },
+  "horeca-edge.test.js": {
+   "n": 1,
+   "min": 6306,
+   "max": 6306
+  },
+  "horeca-gezelschap.test.js": {
+   "n": 1,
+   "min": 6771,
+   "max": 6771
+  },
+  "horeca-host.test.js": {
+   "n": 1,
+   "min": 6316,
+   "max": 6316
+  },
+  "horeca-hotel-event.test.js": {
+   "n": 1,
+   "min": 7917,
+   "max": 7917
+  },
+  "horeca-journey.test.js": {
+   "n": 1,
+   "min": 7667,
+   "max": 7667
+  },
+  "horeca-kaart.test.js": {
+   "n": 1,
+   "min": 7601,
+   "max": 7601
+  },
+  "horeca-keuken.test.js": {
+   "n": 1,
+   "min": 7910,
+   "max": 7910
+  },
+  "horeca-pas.test.js": {
+   "n": 1,
+   "min": 8609,
+   "max": 8609
+  },
+  "horeca-rahul.test.js": {
+   "n": 1,
+   "min": 7851,
+   "max": 7851
+  },
+  "horeca-rekening.test.js": {
+   "n": 1,
+   "min": 7715,
+   "max": 7715
+  },
+  "horeca-samenvoegen.test.js": {
+   "n": 1,
+   "min": 7606,
+   "max": 7606
+  },
+  "horeca-stappen.test.js": {
+   "n": 1,
+   "min": 7508,
+   "max": 7508
+  },
+  "horeca-verdeling.test.js": {
+   "n": 1,
+   "min": 8293,
+   "max": 8293
+  },
+  "horeca-vloer.test.js": {
+   "n": 1,
+   "min": 7812,
+   "max": 7812
+  },
+  "horeca-werklijst.test.js": {
+   "n": 1,
+   "min": 96,
+   "max": 96
+  },
+  "horeca-wijk.test.js": {
+   "n": 1,
+   "min": 9945,
+   "max": 9945
+  },
+  "horlogewerk.test.js": {
+   "n": 1,
+   "min": 93,
+   "max": 93
+  },
+  "hospitality-universe.test.js": {
+   "n": 1,
+   "min": 80,
+   "max": 80
+  },
+  "housekeeping.test.js": {
+   "n": 1,
+   "min": 7898,
+   "max": 7898
+  },
+  "hrplus.test.js": {
+   "n": 1,
+   "min": 14840,
+   "max": 14840
+  },
+  "http1.test.js": {
+   "n": 1,
+   "min": 100,
+   "max": 100
+  },
+  "http2.test.js": {
+   "n": 1,
+   "min": 163,
+   "max": 163
+  },
+  "huis.test.js": {
+   "n": 1,
+   "min": 6977,
+   "max": 6977
+  },
+  "huisstijl.test.js": {
+   "n": 1,
+   "min": 8735,
+   "max": 8735
+  },
+  "hulpdienst.test.js": {
+   "n": 1,
+   "min": 7891,
+   "max": 7891
+  },
+  "hulpdiensten-bord.test.js": {
+   "n": 1,
+   "min": 8064,
+   "max": 8064
+  },
+  "hulpklassen.test.js": {
+   "n": 1,
+   "min": 78,
+   "max": 78
+  },
+  "human-reality.test.js": {
+   "n": 1,
+   "min": 96,
+   "max": 96
+  },
+  "i18n-auto.test.js": {
+   "n": 1,
+   "min": 1166,
+   "max": 1166
+  },
+  "ideeen.test.js": {
+   "n": 1,
+   "min": 6694,
+   "max": 6694
+  },
+  "idem-poort-echt.test.js": {
+   "n": 1,
+   "min": 27100,
+   "max": 27100
+  },
+  "idem-poort.test.js": {
+   "n": 1,
+   "min": 111,
+   "max": 111
+  },
+  "idempotentie.test.js": {
+   "n": 1,
+   "min": 330,
+   "max": 330
+  },
+  "idemproef.test.js": {
+   "n": 1,
+   "min": 86,
+   "max": 86
+  },
+  "idemschuld.test.js": {
+   "n": 1,
+   "min": 12966,
+   "max": 12966
+  },
+  "idemwereld-voorvoegsel.test.js": {
+   "n": 1,
+   "min": 6176,
+   "max": 6176
+  },
+  "idemwereld.test.js": {
+   "n": 1,
+   "min": 65,
+   "max": 65
+  },
+  "identiteit-opvraag.test.js": {
+   "n": 1,
+   "min": 78,
+   "max": 78
+  },
+  "idor.test.js": {
+   "n": 1,
+   "min": 82,
+   "max": 82
+  },
+  "imageherkomst.test.js": {
+   "n": 1,
+   "min": 114,
+   "max": 114
+  },
+  "imap.test.js": {
+   "n": 1,
+   "min": 97,
+   "max": 97
+  },
+  "incident.test.js": {
+   "n": 1,
+   "min": 99,
+   "max": 99
+  },
+  "incidentcontrole-route.test.js": {
+   "n": 1,
+   "min": 7141,
+   "max": 7141
+  },
+  "incidentcontrole.test.js": {
+   "n": 1,
+   "min": 125,
+   "max": 125
+  },
+  "inhoudswacht.test.js": {
+   "n": 1,
+   "min": 8217,
+   "max": 8217
+  },
+  "inkoopketen.test.js": {
+   "n": 1,
+   "min": 7404,
+   "max": 7404
+  },
+  "inlogrem.test.js": {
+   "n": 1,
+   "min": 31324,
+   "max": 31324
+  },
+  "inlogspoor.test.js": {
+   "n": 1,
+   "min": 7812,
+   "max": 7812
+  },
+  "instant-reality.test.js": {
+   "n": 1,
+   "min": 64,
+   "max": 64
+  },
+  "instap.test.js": {
+   "n": 1,
+   "min": 6852,
+   "max": 6852
+  },
+  "instellingsweg.test.js": {
+   "n": 1,
+   "min": 12971,
+   "max": 12971
+  },
+  "invoer.test.js": {
+   "n": 1,
+   "min": 6999,
+   "max": 6999
+  },
+  "invoerproef.test.js": {
+   "n": 1,
+   "min": 63,
+   "max": 63
+  },
+  "inzagekaart.test.js": {
+   "n": 1,
+   "min": 5853,
+   "max": 5853
+  },
+  "inzagelog.test.js": {
+   "n": 1,
+   "min": 160,
+   "max": 160
+  },
+  "journaalbestand.test.js": {
+   "n": 1,
+   "min": 134,
+   "max": 134
+  },
+  "journaalschrijf.test.js": {
+   "n": 1,
+   "min": 3969,
+   "max": 3969
+  },
+  "journalistiek-redactie.test.js": {
+   "n": 1,
+   "min": 7077,
+   "max": 7077
+  },
+  "kaart.test.js": {
+   "n": 1,
+   "min": 66,
+   "max": 66
+  },
+  "kantoordienst.test.js": {
+   "n": 1,
+   "min": 7698,
+   "max": 7698
+  },
+  "kantoorgesprek.test.js": {
+   "n": 1,
+   "min": 14593,
+   "max": 14593
+  },
+  "kantoorpakket-alle.test.js": {
+   "n": 1,
+   "min": 8994,
+   "max": 8994
+  },
+  "kantoorwereld.test.js": {
+   "n": 1,
+   "min": 94,
+   "max": 94
+  },
+  "kantoren-uitbreiding.test.js": {
+   "n": 1,
+   "min": 7492,
+   "max": 7492
+  },
+  "kantoren.test.js": {
+   "n": 1,
+   "min": 8526,
+   "max": 8526
+  },
+  "kappen.test.js": {
+   "n": 1,
+   "min": 81,
+   "max": 81
+  },
+  "kassa-herhaling.test.js": {
+   "n": 1,
+   "min": 7561,
+   "max": 7561
+  },
+  "kassa-modus.test.js": {
+   "n": 1,
+   "min": 7904,
+   "max": 7904
+  },
+  "kassa-premium.test.js": {
+   "n": 1,
+   "min": 7810,
+   "max": 7810
+  },
+  "kern-afgeleid.test.js": {
+   "n": 1,
+   "min": 84,
+   "max": 84
+  },
+  "kern-events.test.js": {
+   "n": 1,
+   "min": 84,
+   "max": 84
+  },
+  "kern-fiscaal.test.js": {
+   "n": 1,
+   "min": 116,
+   "max": 116
+  },
+  "kern-live.test.js": {
+   "n": 1,
+   "min": 93,
+   "max": 93
+  },
+  "kern-util.test.js": {
+   "n": 1,
+   "min": 72,
+   "max": 72
+  },
+  "keten.test.js": {
+   "n": 1,
+   "min": 103,
+   "max": 103
+  },
+  "ketenchat.test.js": {
+   "n": 1,
+   "min": 8891,
+   "max": 8891
+  },
+  "ketenproef.test.js": {
+   "n": 1,
+   "min": 170,
+   "max": 170
+  },
+  "keuken.test.js": {
+   "n": 1,
+   "min": 8306,
+   "max": 8306
+  },
+  "keuring.test.js": {
+   "n": 1,
+   "min": 86516,
+   "max": 86516
+  },
+  "keuringsindex.test.js": {
+   "n": 1,
+   "min": 75304,
+   "max": 75304
+  },
+  "kijken.test.js": {
+   "n": 1,
+   "min": 66,
+   "max": 66
+  },
+  "kijkplicht.test.js": {
+   "n": 1,
+   "min": 8853,
+   "max": 8853
+  },
+  "klantnaad.test.js": {
+   "n": 1,
+   "min": 64,
+   "max": 64
+  },
+  "kleef-readyourwrites.test.js": {
+   "n": 1,
+   "min": 12194,
+   "max": 12194
+  },
+  "kleine-grendels.test.js": {
+   "n": 1,
+   "min": 14971,
+   "max": 14971
+  },
+  "klets.test.js": {
+   "n": 1,
+   "min": 108,
+   "max": 108
+  },
+  "klok.test.js": {
+   "n": 1,
+   "min": 2420,
+   "max": 2420
+  },
+  "klokwacht.test.js": {
+   "n": 1,
+   "min": 6735,
+   "max": 6735
+  },
+  "kluis-binding.test.js": {
+   "n": 1,
+   "min": 1385,
+   "max": 1385
+  },
+  "kluis-rotatie.test.js": {
+   "n": 1,
+   "min": 1246,
+   "max": 1246
+  },
+  "koppels.test.js": {
+   "n": 1,
+   "min": 7606,
+   "max": 7606
+  },
+  "kosten.test.js": {
+   "n": 1,
+   "min": 10169,
+   "max": 10169
+  },
+  "kostengrens.test.js": {
+   "n": 1,
+   "min": 7899,
+   "max": 7899
+  },
+  "kostenherkomst.test.js": {
+   "n": 1,
+   "min": 7788,
+   "max": 7788
+  },
+  "kostenketen.test.js": {
+   "n": 1,
+   "min": 7445,
+   "max": 7445
+  },
+  "kostenmeters.test.js": {
+   "n": 1,
+   "min": 7299,
+   "max": 7299
+  },
+  "kostenperiode.test.js": {
+   "n": 1,
+   "min": 7144,
+   "max": 7144
+  },
+  "kostenvooruitblik.test.js": {
+   "n": 1,
+   "min": 7851,
+   "max": 7851
+  },
+  "kostenzaak.test.js": {
+   "n": 1,
+   "min": 6883,
+   "max": 6883
+  },
+  "krimpronde.test.js": {
+   "n": 1,
+   "min": 2190,
+   "max": 2190
+  },
+  "kruisscan.test.js": {
+   "n": 1,
+   "min": 2355,
+   "max": 2355
+  },
+  "kwaliteit.test.js": {
+   "n": 1,
+   "min": 67,
+   "max": 67
+  },
+  "kycspoor.test.js": {
+   "n": 1,
+   "min": 7716,
+   "max": 7716
+  },
+  "laatste-negen.test.js": {
+   "n": 1,
+   "min": 7643,
+   "max": 7643
+  },
+  "laatste-twee-endpoints.test.js": {
+   "n": 1,
+   "min": 20591,
+   "max": 20591
+  },
+  "lab-geheim.test.js": {
+   "n": 1,
+   "min": 62,
+   "max": 62
+  },
+  "lab2-bewoner.test.js": {
+   "n": 1,
+   "min": 7660,
+   "max": 7660
+  },
+  "lab2-werk.test.js": {
+   "n": 1,
+   "min": 8194,
+   "max": 8194
+  },
+  "labfonds.test.js": {
+   "n": 1,
+   "min": 68,
+   "max": 68
+  },
+  "landpakket.test.js": {
+   "n": 1,
+   "min": 70,
+   "max": 70
+  },
+  "lcov.test.js": {
+   "n": 1,
+   "min": 205,
+   "max": 205
+  },
+  "leden-gids-pg.test.js": {
+   "n": 1,
+   "min": 54,
+   "max": 54
+  },
+  "leden-teller.test.js": {
+   "n": 1,
+   "min": 7126,
+   "max": 7126
+  },
+  "ledenaflopen.test.js": {
+   "n": 1,
+   "min": 13400,
+   "max": 13400
+  },
+  "ledenbalie.test.js": {
+   "n": 1,
+   "min": 49567,
+   "max": 49567
+  },
+  "ledengids-race.test.js": {
+   "n": 1,
+   "min": 265,
+   "max": 265
+  },
+  "ledenladder.test.js": {
+   "n": 1,
+   "min": 7922,
+   "max": 7922
+  },
+  "ledenregister.test.js": {
+   "n": 1,
+   "min": 77,
+   "max": 77
+  },
+  "leerfabric.test.js": {
+   "n": 1,
+   "min": 270,
+   "max": 270
+  },
+  "leerstof.test.js": {
+   "n": 1,
+   "min": 6949,
+   "max": 6949
+  },
+  "leerstofbreed.test.js": {
+   "n": 1,
+   "min": 92,
+   "max": 92
+  },
+  "leerstofvo.test.js": {
+   "n": 1,
+   "min": 7194,
+   "max": 7194
+  },
+  "leren-leden.test.js": {
+   "n": 1,
+   "min": 8291,
+   "max": 8291
+  },
+  "leren.test.js": {
+   "n": 1,
+   "min": 7495,
+   "max": 7495
+  },
+  "letters.test.js": {
+   "n": 1,
+   "min": 56,
+   "max": 56
+  },
+  "levenbandroutes.test.js": {
+   "n": 1,
+   "min": 7449,
+   "max": 7449
+  },
+  "levensband.test.js": {
+   "n": 1,
+   "min": 73,
+   "max": 73
+  },
+  "levensbeleid.test.js": {
+   "n": 1,
+   "min": 77,
+   "max": 77
+  },
+  "levensgraafleven.test.js": {
+   "n": 1,
+   "min": 73,
+   "max": 73
+  },
+  "levenslijn.test.js": {
+   "n": 1,
+   "min": 79,
+   "max": 79
+  },
+  "levensloop.test.js": {
+   "n": 1,
+   "min": 8533,
+   "max": 8533
+  },
+  "leverancierpoort.test.js": {
+   "n": 1,
+   "min": 93,
+   "max": 93
+  },
+  "lib.test.js": {
+   "n": 1,
+   "min": 173,
+   "max": 173
+  },
+  "lidboard.test.js": {
+   "n": 1,
+   "min": 10560,
+   "max": 10560
+  },
+  "lidfactuur.test.js": {
+   "n": 1,
+   "min": 66936,
+   "max": 66936
+  },
+  "lidmaatschap.test.js": {
+   "n": 1,
+   "min": 54,
+   "max": 54
+  },
+  "lidsleutel.test.js": {
+   "n": 1,
+   "min": 53,
+   "max": 53
+  },
+  "liegpoort.test.js": {
+   "n": 1,
+   "min": 55,
+   "max": 55
+  },
+  "life-lagen.test.js": {
+   "n": 1,
+   "min": 72,
+   "max": 72
+  },
+  "life-schakelbaar.test.js": {
+   "n": 1,
+   "min": 7704,
+   "max": 7704
+  },
+  "life.test.js": {
+   "n": 1,
+   "min": 6801,
+   "max": 6801
+  },
+  "lifestyle.test.js": {
+   "n": 1,
+   "min": 9258,
+   "max": 9258
+  },
+  "link.test.js": {
+   "n": 1,
+   "min": 8764,
+   "max": 8764
+  },
+  "linkcap.test.js": {
+   "n": 1,
+   "min": 8185,
+   "max": 8185
+  },
+  "linkgezin.test.js": {
+   "n": 1,
+   "min": 8813,
+   "max": 8813
+  },
+  "linkkaart.test.js": {
+   "n": 1,
+   "min": 79,
+   "max": 79
+  },
+  "linkkassa.test.js": {
+   "n": 1,
+   "min": 8128,
+   "max": 8128
+  },
+  "linkkoppelingen.test.js": {
+   "n": 1,
+   "min": 10883,
+   "max": 10883
+  },
+  "linkkoppelingenui.test.js": {
+   "n": 1,
+   "min": 102,
+   "max": 102
+  },
+  "livegang-pakket.test.js": {
+   "n": 1,
+   "min": 1054,
+   "max": 1054
+  },
+  "livegang.test.js": {
+   "n": 1,
+   "min": 6828,
+   "max": 6828
+  },
+  "livinglab-routes.test.js": {
+   "n": 1,
+   "min": 7537,
+   "max": 7537
+  },
+  "livinglab.test.js": {
+   "n": 1,
+   "min": 8155,
+   "max": 8155
+  },
+  "loghygiene.test.js": {
+   "n": 1,
+   "min": 6900,
+   "max": 6900
+  },
+  "logstroom.test.js": {
+   "n": 1,
+   "min": 332,
+   "max": 332
+  },
+  "lokaal-eerst.test.js": {
+   "n": 1,
+   "min": 116,
+   "max": 116
+  },
+  "lokaal-tls.test.js": {
+   "n": 1,
+   "min": 248,
+   "max": 248
+  },
+  "lokaaladres.test.js": {
+   "n": 1,
+   "min": 56,
+   "max": 56
+  },
+  "lokale-ai-poort.test.js": {
+   "n": 1,
+   "min": 1489,
+   "max": 1489
+  },
+  "lokale-taal.test.js": {
+   "n": 1,
+   "min": 81,
+   "max": 81
+  },
+  "loonstrook-portaal.test.js": {
+   "n": 1,
+   "min": 12394,
+   "max": 12394
+  },
+  "luchthaven-vip.test.js": {
+   "n": 1,
+   "min": 7737,
+   "max": 7737
+  },
+  "luchthaven.test.js": {
+   "n": 1,
+   "min": 7752,
+   "max": 7752
+  },
+  "luchtzijde-taal.test.js": {
+   "n": 1,
+   "min": 7492,
+   "max": 7492
+  },
+  "magnaat-capabilities.test.js": {
+   "n": 1,
+   "min": 12751,
+   "max": 12751
+  },
+  "magnaat-controle.test.js": {
+   "n": 1,
+   "min": 10390,
+   "max": 10390
+  },
+  "magnaat-economenlab.test.js": {
+   "n": 1,
+   "min": 80,
+   "max": 80
+  },
+  "magnaat-economie.test.js": {
+   "n": 1,
+   "min": 112,
+   "max": 112
+  },
+  "magnaat-hospitality.test.js": {
+   "n": 1,
+   "min": 110,
+   "max": 110
+  },
+  "magnaat-leerkring.test.js": {
+   "n": 1,
+   "min": 84,
+   "max": 84
+  },
+  "magnaat-motorklant.test.js": {
+   "n": 1,
+   "min": 116,
+   "max": 116
+  },
+  "magnaat-partnerstudio-routes.test.js": {
+   "n": 1,
+   "min": 7241,
+   "max": 7241
+  },
+  "magnaat-partnerstudio.test.js": {
+   "n": 1,
+   "min": 90,
+   "max": 90
+  },
+  "magnaat-rtgketen.test.js": {
+   "n": 1,
+   "min": 250,
+   "max": 250
+  },
+  "magnaat-rust-integratie.test.js": {
+   "n": 1,
+   "min": 75,
+   "max": 75
+  },
+  "magnaat-teamkamer-productie.test.js": {
+   "n": 1,
+   "min": 133,
+   "max": 133
+  },
+  "magnaat-trainingslobby.test.js": {
+   "n": 1,
+   "min": 72,
+   "max": 72
+  },
+  "magnaat-werkroutefabriek.test.js": {
+   "n": 1,
+   "min": 2661,
+   "max": 2661
+  },
+  "magnaatlab.test.js": {
+   "n": 1,
+   "min": 3896,
+   "max": 3896
+  },
+  "magnaatwereld.test.js": {
+   "n": 1,
+   "min": 39597,
+   "max": 39597
+  },
+  "mail-eigen.test.js": {
+   "n": 1,
+   "min": 2217,
+   "max": 2217
+  },
+  "mail-publiek.test.js": {
+   "n": 1,
+   "min": 58,
+   "max": 58
+  },
+  "mailauth.test.js": {
+   "n": 1,
+   "min": 68,
+   "max": 68
+  },
+  "mailbijlage.test.js": {
+   "n": 1,
+   "min": 6957,
+   "max": 6957
+  },
+  "maildns.test.js": {
+   "n": 1,
+   "min": 65,
+   "max": 65
+  },
+  "mailpost-kantoor.test.js": {
+   "n": 1,
+   "min": 7462,
+   "max": 7462
+  },
+  "mailpost.test.js": {
+   "n": 1,
+   "min": 7290,
+   "max": 7290
+  },
+  "makers.test.js": {
+   "n": 1,
+   "min": 1139,
+   "max": 1139
+  },
+  "mall-bestellingen.test.js": {
+   "n": 1,
+   "min": 7419,
+   "max": 7419
+  },
+  "mall-bewaard.test.js": {
+   "n": 1,
+   "min": 8174,
+   "max": 8174
+  },
+  "mall-collecties.test.js": {
+   "n": 1,
+   "min": 8350,
+   "max": 8350
+  },
+  "mall-concierge.test.js": {
+   "n": 1,
+   "min": 7645,
+   "max": 7645
+  },
+  "mall-context.test.js": {
+   "n": 1,
+   "min": 8725,
+   "max": 8725
+  },
+  "mall-extern.test.js": {
+   "n": 1,
+   "min": 9037,
+   "max": 9037
+  },
+  "mall-kaart.test.js": {
+   "n": 1,
+   "min": 7319,
+   "max": 7319
+  },
+  "mall-lijsten.test.js": {
+   "n": 1,
+   "min": 8259,
+   "max": 8259
+  },
+  "mall-supplieros.test.js": {
+   "n": 1,
+   "min": 8523,
+   "max": 8523
+  },
+  "mall-vestigingen.test.js": {
+   "n": 1,
+   "min": 7657,
+   "max": 7657
+  },
+  "mall-vindlaag.test.js": {
+   "n": 1,
+   "min": 8532,
+   "max": 8532
+  },
+  "mall-vraagbeeld.test.js": {
+   "n": 1,
+   "min": 8072,
+   "max": 8072
+  },
+  "mall.test.js": {
+   "n": 1,
+   "min": 7554,
+   "max": 7554
+  },
+  "malwarescan-dicht.test.js": {
+   "n": 1,
+   "min": 94,
+   "max": 94
+  },
+  "marechaussee.test.js": {
+   "n": 1,
+   "min": 7688,
+   "max": 7688
+  },
+  "margeschaal.test.js": {
+   "n": 1,
+   "min": 78,
+   "max": 78
+  },
+  "marina.test.js": {
+   "n": 1,
+   "min": 7555,
+   "max": 7555
+  },
+  "markt-zaak.test.js": {
+   "n": 1,
+   "min": 7604,
+   "max": 7604
+  },
+  "markt.test.js": {
+   "n": 1,
+   "min": 7935,
+   "max": 7935
+  },
+  "materiaal.test.js": {
+   "n": 1,
+   "min": 67,
+   "max": 67
+  },
+  "mdm.test.js": {
+   "n": 1,
+   "min": 83,
+   "max": 83
+  },
+  "media.test.js": {
+   "n": 1,
+   "min": 7422,
+   "max": 7422
+  },
+  "mediadelen.test.js": {
+   "n": 1,
+   "min": 8124,
+   "max": 8124
+  },
+  "medialijstdelen.test.js": {
+   "n": 1,
+   "min": 8334,
+   "max": 8334
+  },
+  "medialijsten.test.js": {
+   "n": 1,
+   "min": 8112,
+   "max": 8112
+  },
+  "mediaos.test.js": {
+   "n": 1,
+   "min": 8914,
+   "max": 8914
+  },
+  "mediasamen.test.js": {
+   "n": 1,
+   "min": 7509,
+   "max": 7509
+  },
+  "mediazaak.test.js": {
+   "n": 1,
+   "min": 9255,
+   "max": 9255
+  },
+  "medicatie.test.js": {
+   "n": 1,
+   "min": 7154,
+   "max": 7154
+  },
+  "meelezen.test.js": {
+   "n": 1,
+   "min": 83,
+   "max": 83
+  },
+  "meet.test.js": {
+   "n": 1,
+   "min": 7638,
+   "max": 7638
+  },
+  "meetketen.test.js": {
+   "n": 1,
+   "min": 7302,
+   "max": 7302
+  },
+  "meetkeuring.test.js": {
+   "n": 1,
+   "min": 1074,
+   "max": 1074
+  },
+  "memo.test.js": {
+   "n": 1,
+   "min": 7214,
+   "max": 7214
+  },
+  "menselijkebanen.test.js": {
+   "n": 1,
+   "min": 82583,
+   "max": 82583
+  },
+  "menselijkverkeer.test.js": {
+   "n": 1,
+   "min": 39171,
+   "max": 39171
+  },
+  "merge3.property.test.js": {
+   "n": 1,
+   "min": 585,
+   "max": 585
+  },
+  "merkkern.test.js": {
+   "n": 1,
+   "min": 80,
+   "max": 80
+  },
+  "meterijk.test.js": {
+   "n": 1,
+   "min": 863972,
+   "max": 863972
+  },
+  "metier.test.js": {
+   "n": 1,
+   "min": 9986,
+   "max": 9986
+  },
+  "meting.test.js": {
+   "n": 1,
+   "min": 118,
+   "max": 118
+  },
+  "metingcapaciteit.test.js": {
+   "n": 1,
+   "min": 59,
+   "max": 59
+  },
+  "metingen.test.js": {
+   "n": 1,
+   "min": 7339,
+   "max": 7339
+  },
+  "metingpoort.test.js": {
+   "n": 1,
+   "min": 10724,
+   "max": 10724
+  },
+  "metingtenant.test.js": {
+   "n": 1,
+   "min": 83,
+   "max": 83
+  },
+  "middleware.test.js": {
+   "n": 1,
+   "min": 213,
+   "max": 213
+  },
+  "migratierace.test.js": {
+   "n": 1,
+   "min": 1192,
+   "max": 1192
+  },
+  "migraties.test.js": {
+   "n": 1,
+   "min": 503,
+   "max": 503
+  },
+  "minify.test.js": {
+   "n": 1,
+   "min": 12706,
+   "max": 12706
+  },
+  "mobiel.test.js": {
+   "n": 1,
+   "min": 74,
+   "max": 74
+  },
+  "mobiliteit-werkkant-routes.test.js": {
+   "n": 1,
+   "min": 7319,
+   "max": 7319
+  },
+  "mobiliteit.test.js": {
+   "n": 1,
+   "min": 8093,
+   "max": 8093
+  },
+  "modebezorg.test.js": {
+   "n": 1,
+   "min": 7233,
+   "max": 7233
+  },
+  "modelkeuze.test.js": {
+   "n": 1,
+   "min": 93,
+   "max": 93
+  },
+  "moedertaal.test.js": {
+   "n": 1,
+   "min": 7340,
+   "max": 7340
+  },
+  "mollie-config.test.js": {
+   "n": 1,
+   "min": 60,
+   "max": 60
+  },
+  "mollie-eigen.test.js": {
+   "n": 1,
+   "min": 76,
+   "max": 76
+  },
+  "mond.test.js": {
+   "n": 1,
+   "min": 132,
+   "max": 132
+  },
+  "motor-vingerafdruk.test.js": {
+   "n": 1,
+   "min": 52,
+   "max": 52
+  },
+  "motorverbinding.test.js": {
+   "n": 1,
+   "min": 69,
+   "max": 69
+  },
+  "motorzekering.test.js": {
+   "n": 1,
+   "min": 67,
+   "max": 67
+  },
+  "mrz.test.js": {
+   "n": 1,
+   "min": 61,
+   "max": 61
+  },
+  "multi-instance-sqlite.test.js": {
+   "n": 1,
+   "min": 12104,
+   "max": 12104
+  },
+  "munten.test.js": {
+   "n": 1,
+   "min": 6918,
+   "max": 6918
+  },
+  "mutatie.test.js": {
+   "n": 1,
+   "min": 89,
+   "max": 89
+  },
+  "mutatiecontract.test.js": {
+   "n": 1,
+   "min": 223,
+   "max": 223
+  },
+  "mutatiesemantiek.test.js": {
+   "n": 1,
+   "min": 524,
+   "max": 524
+  },
+  "mutatiewacht.test.js": {
+   "n": 1,
+   "min": 334,
+   "max": 334
+  },
+  "muziek-lied.test.js": {
+   "n": 1,
+   "min": 7015,
+   "max": 7015
+  },
+  "muziek-uitgave.test.js": {
+   "n": 1,
+   "min": 7489,
+   "max": 7489
+  },
+  "muziek.test.js": {
+   "n": 1,
+   "min": 7126,
+   "max": 7126
+  },
+  "naamlaag.test.js": {
+   "n": 1,
+   "min": 7503,
+   "max": 7503
+  },
+  "naarkassa.test.js": {
+   "n": 1,
+   "min": 14152,
+   "max": 14152
+  },
+  "naslag.test.js": {
+   "n": 1,
+   "min": 110,
+   "max": 110
+  },
+  "navigatie.test.js": {
+   "n": 1,
+   "min": 303,
+   "max": 303
+  },
+  "negenplus.test.js": {
+   "n": 1,
+   "min": 9622,
+   "max": 9622
+  },
+  "nieuwe-endpoints.test.js": {
+   "n": 1,
+   "min": 7503,
+   "max": 7503
+  },
+  "nieuweroutes.test.js": {
+   "n": 1,
+   "min": 71,
+   "max": 71
+  },
+  "nieuwlid-leeg.test.js": {
+   "n": 1,
+   "min": 20573,
+   "max": 20573
+  },
+  "noodkaart.test.js": {
+   "n": 1,
+   "min": 7203,
+   "max": 7203
+  },
+  "noodrem-bron.test.js": {
+   "n": 1,
+   "min": 21119,
+   "max": 21119
+  },
+  "normbasis.test.js": {
+   "n": 1,
+   "min": 61,
+   "max": 61
+  },
+  "normprestatie.test.js": {
+   "n": 1,
+   "min": 74,
+   "max": 74
+  },
+  "normverval.test.js": {
+   "n": 1,
+   "min": 4021,
+   "max": 4021
+  },
+  "notities.test.js": {
+   "n": 1,
+   "min": 7730,
+   "max": 7730
+  },
+  "notitiesduurzaam.test.js": {
+   "n": 1,
+   "min": 15857,
+   "max": 15857
+  },
+  "objectlaag.test.js": {
+   "n": 1,
+   "min": 111,
+   "max": 111
+  },
+  "objectlaagroutes.test.js": {
+   "n": 1,
+   "min": 7702,
+   "max": 7702
+  },
+  "objectmodel.test.js": {
+   "n": 1,
+   "min": 2262,
+   "max": 2262
+  },
+  "objectpool.test.js": {
+   "n": 1,
+   "min": 57,
+   "max": 57
+  },
+  "ochtend.test.js": {
+   "n": 1,
+   "min": 7761,
+   "max": 7761
+  },
+  "office-bank.test.js": {
+   "n": 1,
+   "min": 8310,
+   "max": 8310
+  },
+  "office-blad.test.js": {
+   "n": 1,
+   "min": 95,
+   "max": 95
+  },
+  "office-enterprise.test.js": {
+   "n": 1,
+   "min": 7985,
+   "max": 7985
+  },
+  "office-payroll-dekking.test.js": {
+   "n": 1,
+   "min": 8213,
+   "max": 8213
+  },
+  "office-tweede-helft.test.js": {
+   "n": 1,
+   "min": 9759,
+   "max": 9759
+  },
+  "office.test.js": {
+   "n": 1,
+   "min": 8299,
+   "max": 8299
+  },
+  "officebord.test.js": {
+   "n": 1,
+   "min": 7676,
+   "max": 7676
+  },
+  "ogen.test.js": {
+   "n": 1,
+   "min": 89,
+   "max": 89
+  },
+  "onboarding-inrichten.test.js": {
+   "n": 1,
+   "min": 21305,
+   "max": 21305
+  },
+  "onboarding-meebouwen.test.js": {
+   "n": 1,
+   "min": 20953,
+   "max": 20953
+  },
+  "onboarding.test.js": {
+   "n": 1,
+   "min": 8691,
+   "max": 8691
+  },
+  "onderhoud.test.js": {
+   "n": 1,
+   "min": 70,
+   "max": 70
+  },
+  "ondernemerpoort-e2e.test.js": {
+   "n": 1,
+   "min": 7301,
+   "max": 7301
+  },
+  "ondernemerpoort.test.js": {
+   "n": 1,
+   "min": 69,
+   "max": 69
+  },
+  "onderneming-belasting.test.js": {
+   "n": 1,
+   "min": 157,
+   "max": 157
+  },
+  "onderneming-bestuur.test.js": {
+   "n": 1,
+   "min": 7049,
+   "max": 7049
+  },
+  "onderneming-capaciteit.test.js": {
+   "n": 1,
+   "min": 169,
+   "max": 169
+  },
+  "onderneming-contracten.test.js": {
+   "n": 1,
+   "min": 128,
+   "max": 128
+  },
+  "onderneming-crediteuren.test.js": {
+   "n": 1,
+   "min": 134,
+   "max": 134
+  },
+  "onderneming-dagbeeld.test.js": {
+   "n": 1,
+   "min": 138,
+   "max": 138
+  },
+  "onderneming-debiteuren.test.js": {
+   "n": 1,
+   "min": 136,
+   "max": 136
+  },
+  "onderneming-eersteklant.test.js": {
+   "n": 1,
+   "min": 179,
+   "max": 179
+  },
+  "onderneming-kas.test.js": {
+   "n": 1,
+   "min": 128,
+   "max": 128
+  },
+  "onderneming-klussen.test.js": {
+   "n": 1,
+   "min": 137,
+   "max": 137
+  },
+  "onderneming-mallprofiel.test.js": {
+   "n": 1,
+   "min": 132,
+   "max": 132
+  },
+  "onderneming-offertebouw.test.js": {
+   "n": 1,
+   "min": 72,
+   "max": 72
+  },
+  "onderneming-ontwerper.test.js": {
+   "n": 1,
+   "min": 138,
+   "max": 138
+  },
+  "onderneming-oprichting.test.js": {
+   "n": 1,
+   "min": 7694,
+   "max": 7694
+  },
+  "onderneming-pijplijn.test.js": {
+   "n": 1,
+   "min": 143,
+   "max": 143
+  },
+  "onderneming-rechtsvormen.test.js": {
+   "n": 1,
+   "min": 162,
+   "max": 162
+  },
+  "onderneming-regie.test.js": {
+   "n": 1,
+   "min": 159,
+   "max": 159
+  },
+  "onderneming-relaties.test.js": {
+   "n": 1,
+   "min": 168,
+   "max": 168
+  },
+  "onderneming-routes.test.js": {
+   "n": 1,
+   "min": 22674,
+   "max": 22674
+  },
+  "onderneming-toegang.test.js": {
+   "n": 1,
+   "min": 147,
+   "max": 147
+  },
+  "onderneming-verkenning.test.js": {
+   "n": 1,
+   "min": 153,
+   "max": 153
+  },
+  "onderneming-voorraad.test.js": {
+   "n": 1,
+   "min": 159,
+   "max": 159
+  },
+  "onderneming-werving.test.js": {
+   "n": 1,
+   "min": 149,
+   "max": 149
+  },
+  "onderneming.test.js": {
+   "n": 1,
+   "min": 7800,
+   "max": 7800
+  },
+  "ondertitels.test.js": {
+   "n": 1,
+   "min": 94,
+   "max": 94
+  },
+  "onderwijs.test.js": {
+   "n": 1,
+   "min": 7553,
+   "max": 7553
+  },
+  "onderwijsstuur.test.js": {
+   "n": 1,
+   "min": 7528,
+   "max": 7528
+  },
+  "onderzoeker.test.js": {
+   "n": 1,
+   "min": 7297,
+   "max": 7297
+  },
+  "onderzoekslab.test.js": {
+   "n": 1,
+   "min": 7190,
+   "max": 7190
+  },
+  "onnozel.test.js": {
+   "n": 1,
+   "min": 7776,
+   "max": 7776
+  },
+  "ontmoeting-leeg.test.js": {
+   "n": 1,
+   "min": 7053,
+   "max": 7053
+  },
+  "ontmoeting.test.js": {
+   "n": 1,
+   "min": 11041,
+   "max": 11041
+  },
+  "ontwerp.test.js": {
+   "n": 1,
+   "min": 63,
+   "max": 63
+  },
+  "ontwerpbank.test.js": {
+   "n": 1,
+   "min": 69,
+   "max": 69
+  },
+  "oog.test.js": {
+   "n": 1,
+   "min": 7458,
+   "max": 7458
+  },
+  "oplaadgat.test.js": {
+   "n": 1,
+   "min": 61,
+   "max": 61
+  },
+  "opslag-voorcheck.test.js": {
+   "n": 1,
+   "min": 1482,
+   "max": 1482
+  },
+  "opslagblokkade.test.js": {
+   "n": 1,
+   "min": 59,
+   "max": 59
+  },
+  "opslagpoort.test.js": {
+   "n": 1,
+   "min": 80,
+   "max": 80
+  },
+  "opvolging.test.js": {
+   "n": 1,
+   "min": 7332,
+   "max": 7332
+  },
+  "outputaudit.test.js": {
+   "n": 1,
+   "min": 627,
+   "max": 627
+  },
+  "ov-operatie.test.js": {
+   "n": 1,
+   "min": 81,
+   "max": 81
+  },
+  "ov-regie.test.js": {
+   "n": 1,
+   "min": 52,
+   "max": 52
+  },
+  "ov.test.js": {
+   "n": 1,
+   "min": 8321,
+   "max": 8321
+  },
+  "overdracht.test.js": {
+   "n": 1,
+   "min": 7088,
+   "max": 7088
+  },
+  "overheid.test.js": {
+   "n": 1,
+   "min": 9034,
+   "max": 9034
+  },
+  "overname.test.js": {
+   "n": 1,
+   "min": 84,
+   "max": 84
+  },
+  "ovkaart.test.js": {
+   "n": 1,
+   "min": 9003,
+   "max": 9003
+  },
+  "paginaroutes.test.js": {
+   "n": 1,
+   "min": 6973,
+   "max": 6973
+  },
+  "paginascripts.test.js": {
+   "n": 1,
+   "min": 235,
+   "max": 235
+  },
+  "pakket.test.js": {
+   "n": 1,
+   "min": 70,
+   "max": 70
+  },
+  "papieren-boardroom.test.js": {
+   "n": 1,
+   "min": 7871,
+   "max": 7871
+  },
+  "papieren.test.js": {
+   "n": 1,
+   "min": 7049,
+   "max": 7049
+  },
+  "partner.test.js": {
+   "n": 1,
+   "min": 9711,
+   "max": 9711
+  },
+  "partnerpas.test.js": {
+   "n": 1,
+   "min": 14431,
+   "max": 14431
+  },
+  "partnertypes.test.js": {
+   "n": 1,
+   "min": 8073,
+   "max": 8073
+  },
+  "pas-apps.test.js": {
+   "n": 1,
+   "min": 8530,
+   "max": 8530
+  },
+  "pas-escalatie.test.js": {
+   "n": 1,
+   "min": 7510,
+   "max": 7510
+  },
+  "pasladder.test.js": {
+   "n": 1,
+   "min": 108,
+   "max": 108
+  },
+  "paspoort.test.js": {
+   "n": 1,
+   "min": 7424,
+   "max": 7424
+  },
+  "pasprijs.test.js": {
+   "n": 1,
+   "min": 63,
+   "max": 63
+  },
+  "pay-grootboek.test.js": {
+   "n": 1,
+   "min": 7208,
+   "max": 7208
+  },
+  "pay.test.js": {
+   "n": 1,
+   "min": 7880,
+   "max": 7880
+  },
+  "paybudget.test.js": {
+   "n": 1,
+   "min": 7442,
+   "max": 7442
+  },
+  "payroll-aangifte.test.js": {
+   "n": 1,
+   "min": 93,
+   "max": 93
+  },
+  "payroll-dekking.test.js": {
+   "n": 1,
+   "min": 80,
+   "max": 80
+  },
+  "payroll-dossier.test.js": {
+   "n": 1,
+   "min": 107,
+   "max": 107
+  },
+  "payroll-herkomst.test.js": {
+   "n": 1,
+   "min": 6827,
+   "max": 6827
+  },
+  "payroll-journaal.test.js": {
+   "n": 1,
+   "min": 97,
+   "max": 97
+  },
+  "payroll-loonheffing.test.js": {
+   "n": 1,
+   "min": 75,
+   "max": 75
+  },
+  "payroll-motor.test.js": {
+   "n": 1,
+   "min": 93,
+   "max": 93
+  },
+  "payroll-register-verzuim.test.js": {
+   "n": 1,
+   "min": 84,
+   "max": 84
+  },
+  "payroll-routes.test.js": {
+   "n": 1,
+   "min": 7579,
+   "max": 7579
+  },
+  "payroll-run.test.js": {
+   "n": 1,
+   "min": 102,
+   "max": 102
+  },
+  "payroll-samenstellen.test.js": {
+   "n": 1,
+   "min": 95,
+   "max": 95
+  },
+  "payroll-uren-controles.test.js": {
+   "n": 1,
+   "min": 68,
+   "max": 68
+  },
+  "payroll-valuta.test.js": {
+   "n": 1,
+   "min": 112,
+   "max": 112
+  },
+  "payroll.test.js": {
+   "n": 1,
+   "min": 7460,
+   "max": 7460
+  },
+  "paytegoed.test.js": {
+   "n": 1,
+   "min": 9159,
+   "max": 9159
+  },
+  "payterug.test.js": {
+   "n": 1,
+   "min": 7241,
+   "max": 7241
+  },
+  "payvooraf.test.js": {
+   "n": 1,
+   "min": 7440,
+   "max": 7440
+  },
+  "pda-aanmelden.test.js": {
+   "n": 1,
+   "min": 7615,
+   "max": 7615
+  },
+  "pda-netwerk.test.js": {
+   "n": 1,
+   "min": 7948,
+   "max": 7948
+  },
+  "pdamodules.test.js": {
+   "n": 1,
+   "min": 6967,
+   "max": 6967
+  },
+  "pdf.test.js": {
+   "n": 1,
+   "min": 7073,
+   "max": 7073
+  },
+  "perimeter-risico.test.js": {
+   "n": 1,
+   "min": 7118,
+   "max": 7118
+  },
+  "persistentiestand.test.js": {
+   "n": 1,
+   "min": 477,
+   "max": 477
+  },
+  "persoonseis.test.js": {
+   "n": 1,
+   "min": 122,
+   "max": 122
+  },
+  "pestgrens.test.js": {
+   "n": 1,
+   "min": 62,
+   "max": 62
+  },
+  "pg-snapshot.test.js": {
+   "n": 1,
+   "min": 49,
+   "max": 49
+  },
+  "pg-wachten.test.js": {
+   "n": 1,
+   "min": 62,
+   "max": 62
+  },
+  "pg.test.js": {
+   "n": 1,
+   "min": 48,
+   "max": 48
+  },
+  "pgaccounts.test.js": {
+   "n": 1,
+   "min": 48,
+   "max": 48
+  },
+  "pgsync-voorrang.test.js": {
+   "n": 1,
+   "min": 111,
+   "max": 111
+  },
+  "pgwire.test.js": {
+   "n": 1,
+   "min": 79,
+   "max": 79
+  },
+  "pinvergeten.test.js": {
+   "n": 1,
+   "min": 13704,
+   "max": 13704
+  },
+  "plaats.test.js": {
+   "n": 1,
+   "min": 110,
+   "max": 110
+  },
+  "plaatsdienstbrug.test.js": {
+   "n": 1,
+   "min": 7662,
+   "max": 7662
+  },
+  "plaatspost.test.js": {
+   "n": 1,
+   "min": 7822,
+   "max": 7822
+  },
+  "plaatsprikklok.test.js": {
+   "n": 1,
+   "min": 7840,
+   "max": 7840
+  },
+  "plafonds.test.js": {
+   "n": 1,
+   "min": 7386,
+   "max": 7386
+  },
+  "planners.test.js": {
+   "n": 1,
+   "min": 7921,
+   "max": 7921
+  },
+  "platformregister.test.js": {
+   "n": 1,
+   "min": 15840,
+   "max": 15840
+  },
+  "podium.test.js": {
+   "n": 1,
+   "min": 9980,
+   "max": 9980
+  },
+  "podiumhandel.test.js": {
+   "n": 1,
+   "min": 8092,
+   "max": 8092
+  },
+  "podiumzaak.test.js": {
+   "n": 1,
+   "min": 8908,
+   "max": 8908
+  },
+  "podiumzones.test.js": {
+   "n": 1,
+   "min": 8470,
+   "max": 8470
+  },
+  "pols.test.js": {
+   "n": 1,
+   "min": 8221,
+   "max": 8221
+  },
+  "poortrace.test.js": {
+   "n": 1,
+   "min": 5802,
+   "max": 5802
+  },
+  "poortwacht-oordeel.test.js": {
+   "n": 1,
+   "min": 59,
+   "max": 59
+  },
+  "poortwacht.test.js": {
+   "n": 1,
+   "min": 84,
+   "max": 84
+  },
+  "portemonnee.test.js": {
+   "n": 1,
+   "min": 28956,
+   "max": 28956
+  },
+  "postdatum.test.js": {
+   "n": 1,
+   "min": 7685,
+   "max": 7685
+  },
+  "pragmavolgorde.test.js": {
+   "n": 1,
+   "min": 632,
+   "max": 632
+  },
+  "presentiemeting.test.js": {
+   "n": 1,
+   "min": 7415,
+   "max": 7415
+  },
+  "prijsmelding.test.js": {
+   "n": 1,
+   "min": 79,
+   "max": 79
+  },
+  "productie-communicatie.test.js": {
+   "n": 1,
+   "min": 65,
+   "max": 65
+  },
+  "productie-installatie.test.js": {
+   "n": 1,
+   "min": 60,
+   "max": 60
+  },
+  "productie-motor.test.js": {
+   "n": 1,
+   "min": 112,
+   "max": 112
+  },
+  "productie.test.js": {
+   "n": 1,
+   "min": 214,
+   "max": 214
+  },
+  "proefsleutels.test.js": {
+   "n": 1,
+   "min": 66,
+   "max": 66
+  },
+  "provider-sandbox.test.js": {
+   "n": 1,
+   "min": 801,
+   "max": 801
+  },
+  "proxykop.test.js": {
+   "n": 1,
+   "min": 66,
+   "max": 66
+  },
+  "prplus.test.js": {
+   "n": 1,
+   "min": 15117,
+   "max": 15117
+  },
+  "publieke-adressen.test.js": {
+   "n": 1,
+   "min": 11271,
+   "max": 11271
+  },
+  "publieke-rand.test.js": {
+   "n": 1,
+   "min": 8022,
+   "max": 8022
+  },
+  "pulse.test.js": {
+   "n": 1,
+   "min": 9308,
+   "max": 9308
+  },
+  "punten.test.js": {
+   "n": 1,
+   "min": 7443,
+   "max": 7443
+  },
+  "qr.test.js": {
+   "n": 1,
+   "min": 173,
+   "max": 173
+  },
+  "qrscan.test.js": {
+   "n": 1,
+   "min": 159,
+   "max": 159
+  },
+  "raakvlak.test.js": {
+   "n": 1,
+   "min": 75,
+   "max": 75
+  },
+  "rahul-eerlijk.test.js": {
+   "n": 1,
+   "min": 93,
+   "max": 93
+  },
+  "rahul-hart.test.js": {
+   "n": 1,
+   "min": 62,
+   "max": 62
+  },
+  "rahul-mens.test.js": {
+   "n": 1,
+   "min": 7465,
+   "max": 7465
+  },
+  "rahul-omgang.test.js": {
+   "n": 1,
+   "min": 84,
+   "max": 84
+  },
+  "rahul-regie.test.js": {
+   "n": 1,
+   "min": 8205,
+   "max": 8205
+  },
+  "rahul-reis.test.js": {
+   "n": 1,
+   "min": 7405,
+   "max": 7405
+  },
+  "rampbeeld.test.js": {
+   "n": 1,
+   "min": 9410,
+   "max": 9410
+  },
+  "randen.test.js": {
+   "n": 1,
+   "min": 148,
+   "max": 148
+  },
+  "rechtbank.test.js": {
+   "n": 1,
+   "min": 8130,
+   "max": 8130
+  },
+  "rechten.test.js": {
+   "n": 1,
+   "min": 98,
+   "max": 98
+  },
+  "rechterhand-huis.test.js": {
+   "n": 1,
+   "min": 8271,
+   "max": 8271
+  },
+  "rechterhand-reis.test.js": {
+   "n": 1,
+   "min": 8488,
+   "max": 8488
+  },
+  "rechterhand-wissen.test.js": {
+   "n": 1,
+   "min": 10142,
+   "max": 10142
+  },
+  "rechterhand.test.js": {
+   "n": 1,
+   "min": 15961,
+   "max": 15961
+  },
+  "redactie.test.js": {
+   "n": 1,
+   "min": 7365,
+   "max": 7365
+  },
+  "redis.test.js": {
+   "n": 1,
+   "min": 236,
+   "max": 236
+  },
+  "regexmutatie.test.js": {
+   "n": 1,
+   "min": 72,
+   "max": 72
+  },
+  "regie.test.js": {
+   "n": 1,
+   "min": 8100,
+   "max": 8100
+  },
+  "reisaanbod.test.js": {
+   "n": 1,
+   "min": 19099,
+   "max": 19099
+  },
+  "reisactiviteiten.test.js": {
+   "n": 1,
+   "min": 7777,
+   "max": 7777
+  },
+  "reisagenda.test.js": {
+   "n": 1,
+   "min": 7462,
+   "max": 7462
+  },
+  "reisbieb.test.js": {
+   "n": 1,
+   "min": 7432,
+   "max": 7432
+  },
+  "reisbureau.test.js": {
+   "n": 1,
+   "min": 8206,
+   "max": 8206
+  },
+  "reisoplosser.test.js": {
+   "n": 1,
+   "min": 7490,
+   "max": 7490
+  },
+  "reisplan.test.js": {
+   "n": 1,
+   "min": 8184,
+   "max": 8184
+  },
+  "reisuitnodiging.test.js": {
+   "n": 1,
+   "min": 7956,
+   "max": 7956
+  },
+  "reiswacht.test.js": {
+   "n": 1,
+   "min": 7244,
+   "max": 7244
+  },
+  "reiswereld.test.js": {
+   "n": 1,
+   "min": 84,
+   "max": 84
+  },
+  "reiswijzer.test.js": {
+   "n": 1,
+   "min": 6945,
+   "max": 6945
+  },
+  "reizen.test.js": {
+   "n": 1,
+   "min": 7250,
+   "max": 7250
+  },
+  "rekening.test.js": {
+   "n": 1,
+   "min": 14390,
+   "max": 14390
+  },
+  "rekenmotor.test.js": {
+   "n": 1,
+   "min": 77,
+   "max": 77
+  },
+  "rekenschuif.test.js": {
+   "n": 1,
+   "min": 54,
+   "max": 54
+  },
+  "release-bewijs.test.js": {
+   "n": 1,
+   "min": 76,
+   "max": 76
+  },
+  "rem.test.js": {
+   "n": 1,
+   "min": 61,
+   "max": 61
+  },
+  "rendezvous.test.js": {
+   "n": 1,
+   "min": 40712,
+   "max": 40712
+  },
+  "reservering-beleid.test.js": {
+   "n": 1,
+   "min": 65,
+   "max": 65
+  },
+  "residentie.test.js": {
+   "n": 1,
+   "min": 7519,
+   "max": 7519
+  },
+  "residentie2.test.js": {
+   "n": 1,
+   "min": 7531,
+   "max": 7531
+  },
+  "residentie3.test.js": {
+   "n": 1,
+   "min": 7466,
+   "max": 7466
+  },
+  "residentie4.test.js": {
+   "n": 1,
+   "min": 53,
+   "max": 53
+  },
+  "resolverbereik.test.js": {
+   "n": 1,
+   "min": 566,
+   "max": 566
+  },
+  "retail-annulering.test.js": {
+   "n": 1,
+   "min": 106,
+   "max": 106
+  },
+  "retail-prijs.test.js": {
+   "n": 1,
+   "min": 78,
+   "max": 78
+  },
+  "retail.test.js": {
+   "n": 1,
+   "min": 8194,
+   "max": 8194
+  },
+  "rijksles.test.js": {
+   "n": 1,
+   "min": 6998,
+   "max": 6998
+  },
+  "risico.test.js": {
+   "n": 1,
+   "min": 1087,
+   "max": 1087
+  },
+  "rollenmatrix.test.js": {
+   "n": 1,
+   "min": 9254,
+   "max": 9254
+  },
+  "rolproef.test.js": {
+   "n": 1,
+   "min": 91,
+   "max": 91
+  },
+  "ronde.test.js": {
+   "n": 1,
+   "min": 85,
+   "max": 85
+  },
+  "routedekking.test.js": {
+   "n": 1,
+   "min": 13627,
+   "max": 13627
+  },
+  "routedossier.test.js": {
+   "n": 1,
+   "min": 8404,
+   "max": 8404
+  },
+  "routelog.test.js": {
+   "n": 1,
+   "min": 20054,
+   "max": 20054
+  },
+  "routerindex.test.js": {
+   "n": 1,
+   "min": 10149,
+   "max": 10149
+  },
+  "rtf-veilig.test.js": {
+   "n": 1,
+   "min": 7126,
+   "max": 7126
+  },
+  "rtfagenda.test.js": {
+   "n": 1,
+   "min": 6997,
+   "max": 6997
+  },
+  "rtfalbum.test.js": {
+   "n": 1,
+   "min": 6818,
+   "max": 6818
+  },
+  "rtfbieb.test.js": {
+   "n": 1,
+   "min": 7249,
+   "max": 7249
+  },
+  "rtfcampus.test.js": {
+   "n": 1,
+   "min": 79,
+   "max": 79
+  },
+  "rtfcoderem.test.js": {
+   "n": 1,
+   "min": 7351,
+   "max": 7351
+  },
+  "rtfcurve.test.js": {
+   "n": 1,
+   "min": 7019,
+   "max": 7019
+  },
+  "rtfgeld.test.js": {
+   "n": 1,
+   "min": 6806,
+   "max": 6806
+  },
+  "rtfkantoor.test.js": {
+   "n": 1,
+   "min": 7110,
+   "max": 7110
+  },
+  "rtfleerlingtoegang.test.js": {
+   "n": 1,
+   "min": 6927,
+   "max": 6927
+  },
+  "rtfos-afmaak.test.js": {
+   "n": 1,
+   "min": 7787,
+   "max": 7787
+  },
+  "rtfos-bestuur.test.js": {
+   "n": 1,
+   "min": 8187,
+   "max": 8187
+  },
+  "rtfos-context.test.js": {
+   "n": 1,
+   "min": 87,
+   "max": 87
+  },
+  "rtfos-doelgroepen.test.js": {
+   "n": 1,
+   "min": 7943,
+   "max": 7943
+  },
+  "rtfos-governance.test.js": {
+   "n": 1,
+   "min": 8159,
+   "max": 8159
+  },
+  "rtfos-netwerk.test.js": {
+   "n": 1,
+   "min": 8293,
+   "max": 8293
+  },
+  "rtfos-portalen.test.js": {
+   "n": 1,
+   "min": 8174,
+   "max": 8174
+  },
+  "rtfos-uitvoering.test.js": {
+   "n": 1,
+   "min": 8227,
+   "max": 8227
+  },
+  "rtfos.test.js": {
+   "n": 1,
+   "min": 8671,
+   "max": 8671
+  },
+  "rtfschool.test.js": {
+   "n": 1,
+   "min": 7273,
+   "max": 7273
+  },
+  "rtfschool2.test.js": {
+   "n": 1,
+   "min": 7383,
+   "max": 7383
+  },
+  "rtfwelzijn.test.js": {
+   "n": 1,
+   "min": 7109,
+   "max": 7109
+  },
+  "rtfwelzijn2.test.js": {
+   "n": 1,
+   "min": 7037,
+   "max": 7037
+  },
+  "rtg-a11y.test.js": {
+   "n": 1,
+   "min": 75,
+   "max": 75
+  },
+  "rtg.test.js": {
+   "n": 1,
+   "min": 141,
+   "max": 141
+  },
+  "rtgai.test.js": {
+   "n": 1,
+   "min": 7553,
+   "max": 7553
+  },
+  "rtgcode.test.js": {
+   "n": 1,
+   "min": 56,
+   "max": 56
+  },
+  "rtghorloge.test.js": {
+   "n": 1,
+   "min": 63,
+   "max": 63
+  },
+  "rtgid.test.js": {
+   "n": 1,
+   "min": 11442,
+   "max": 11442
+  },
+  "rtgjson.test.js": {
+   "n": 1,
+   "min": 8316,
+   "max": 8316
+  },
+  "rtgone.test.js": {
+   "n": 1,
+   "min": 7252,
+   "max": 7252
+  },
+  "rtmail-ai.test.js": {
+   "n": 1,
+   "min": 7574,
+   "max": 7574
+  },
+  "rtmail-bestuur.test.js": {
+   "n": 1,
+   "min": 8616,
+   "max": 8616
+  },
+  "rtmail-lid.test.js": {
+   "n": 1,
+   "min": 8407,
+   "max": 8407
+  },
+  "rtmail-schrijf.test.js": {
+   "n": 1,
+   "min": 9282,
+   "max": 9282
+  },
+  "rtmail-team.test.js": {
+   "n": 1,
+   "min": 7840,
+   "max": 7840
+  },
+  "rtmail-vak.test.js": {
+   "n": 1,
+   "min": 7665,
+   "max": 7665
+  },
+  "rtmail-werk.test.js": {
+   "n": 1,
+   "min": 8181,
+   "max": 8181
+  },
+  "rtmail-zaak.test.js": {
+   "n": 1,
+   "min": 8304,
+   "max": 8304
+  },
+  "rtmail.test.js": {
+   "n": 1,
+   "min": 108,
+   "max": 108
+  },
+  "rust-migraties.test.js": {
+   "n": 1,
+   "min": 56,
+   "max": 56
+  },
+  "rust-noodstop.test.js": {
+   "n": 1,
+   "min": 58,
+   "max": 58
+  },
+  "rust.test.js": {
+   "n": 1,
+   "min": 17534,
+   "max": 17534
+  },
+  "salon-app.test.js": {
+   "n": 1,
+   "min": 13195,
+   "max": 13195
+  },
+  "salon-curatie.test.js": {
+   "n": 1,
+   "min": 7219,
+   "max": 7219
+  },
+  "salon-verplicht.test.js": {
+   "n": 1,
+   "min": 7358,
+   "max": 7358
+  },
+  "salonbeeld.test.js": {
+   "n": 1,
+   "min": 53,
+   "max": 53
+  },
+  "salonbron-fotobank.test.js": {
+   "n": 1,
+   "min": 7229,
+   "max": 7229
+  },
+  "salonviraal.test.js": {
+   "n": 1,
+   "min": 58,
+   "max": 58
+  },
+  "samen.test.js": {
+   "n": 1,
+   "min": 7953,
+   "max": 7953
+  },
+  "samendelen.test.js": {
+   "n": 1,
+   "min": 18338,
+   "max": 18338
+  },
+  "samenwerking.test.js": {
+   "n": 1,
+   "min": 7742,
+   "max": 7742
+  },
+  "samlacs.test.js": {
+   "n": 1,
+   "min": 14983,
+   "max": 14983
+  },
+  "samlc14n.test.js": {
+   "n": 1,
+   "min": 224,
+   "max": 224
+  },
+  "samlpoort.test.js": {
+   "n": 1,
+   "min": 493,
+   "max": 493
+  },
+  "samlxsw.test.js": {
+   "n": 1,
+   "min": 596,
+   "max": 596
+  },
+  "satelliet.test.js": {
+   "n": 1,
+   "min": 7322,
+   "max": 7322
+  },
+  "saveduurzaam.test.js": {
+   "n": 1,
+   "min": 1991,
+   "max": 1991
+  },
+  "scanner.test.js": {
+   "n": 1,
+   "min": 168,
+   "max": 168
+  },
+  "scannerpdf.test.js": {
+   "n": 1,
+   "min": 56,
+   "max": 56
+  },
+  "schaduw.test.js": {
+   "n": 1,
+   "min": 77,
+   "max": 77
+  },
+  "schakelaar-zwijgt.test.js": {
+   "n": 1,
+   "min": 7041,
+   "max": 7041
+  },
+  "schakelaarsdekking.test.js": {
+   "n": 1,
+   "min": 6270,
+   "max": 6270
+  },
+  "schakelkast-dekking.test.js": {
+   "n": 1,
+   "min": 8658,
+   "max": 8658
+  },
+  "scheiding.test.js": {
+   "n": 1,
+   "min": 7739,
+   "max": 7739
+  },
+  "schermleugen.test.js": {
+   "n": 1,
+   "min": 82,
+   "max": 82
+  },
+  "schermronde.test.js": {
+   "n": 1,
+   "min": 111,
+   "max": 111
+  },
+  "schild.test.js": {
+   "n": 1,
+   "min": 7631,
+   "max": 7631
+  },
+  "school.test.js": {
+   "n": 1,
+   "min": 11755,
+   "max": 11755
+  },
+  "schoolaanwezig.test.js": {
+   "n": 1,
+   "min": 8468,
+   "max": 8468
+  },
+  "schooladvies.test.js": {
+   "n": 1,
+   "min": 117,
+   "max": 117
+  },
+  "schoolbeeld.test.js": {
+   "n": 1,
+   "min": 8258,
+   "max": 8258
+  },
+  "schoolbel.test.js": {
+   "n": 1,
+   "min": 8824,
+   "max": 8824
+  },
+  "schooldirectie.test.js": {
+   "n": 1,
+   "min": 7781,
+   "max": 7781
+  },
+  "schoolenterprise.test.js": {
+   "n": 1,
+   "min": 8094,
+   "max": 8094
+  },
+  "schoolexcursie.test.js": {
+   "n": 1,
+   "min": 9209,
+   "max": 9209
+  },
+  "schoolgeld.test.js": {
+   "n": 1,
+   "min": 8583,
+   "max": 8583
+  },
+  "schoolhulplijn.test.js": {
+   "n": 1,
+   "min": 8060,
+   "max": 8060
+  },
+  "schoolkoppel.test.js": {
+   "n": 1,
+   "min": 12597,
+   "max": 12597
+  },
+  "schoolniveau.test.js": {
+   "n": 1,
+   "min": 7739,
+   "max": 7739
+  },
+  "schoolpersoneelregistratie.test.js": {
+   "n": 1,
+   "min": 8177,
+   "max": 8177
+  },
+  "schoolrest.test.js": {
+   "n": 1,
+   "min": 7483,
+   "max": 7483
+  },
+  "schoolschermen.test.js": {
+   "n": 1,
+   "min": 168,
+   "max": 168
+  },
+  "schooltaal.test.js": {
+   "n": 1,
+   "min": 8012,
+   "max": 8012
+  },
+  "schooltoets.test.js": {
+   "n": 1,
+   "min": 7923,
+   "max": 7923
+  },
+  "schoolverbonden.test.js": {
+   "n": 1,
+   "min": 8130,
+   "max": 8130
+  },
+  "schorspoort.test.js": {
+   "n": 1,
+   "min": 341,
+   "max": 341
+  },
+  "schrijfanalyse.test.js": {
+   "n": 1,
+   "min": 72,
+   "max": 72
+  },
+  "scim.test.js": {
+   "n": 1,
+   "min": 997,
+   "max": 997
+  },
+  "scimgroepen.test.js": {
+   "n": 1,
+   "min": 7003,
+   "max": 7003
+  },
+  "scriptafsplitsing.test.js": {
+   "n": 1,
+   "min": 77,
+   "max": 77
+  },
+  "scriptbundel.test.js": {
+   "n": 1,
+   "min": 85,
+   "max": 85
+  },
+  "securitylog-keten.test.js": {
+   "n": 1,
+   "min": 20669,
+   "max": 20669
+  },
+  "selfhost.test.js": {
+   "n": 1,
+   "min": 221,
+   "max": 221
+  },
+  "semantiek.test.js": {
+   "n": 1,
+   "min": 2940,
+   "max": 2940
+  },
+  "semdiff.test.js": {
+   "n": 1,
+   "min": 167,
+   "max": 167
+  },
+  "sentinel.test.js": {
+   "n": 1,
+   "min": 86,
+   "max": 86
+  },
+  "server.test.js": {
+   "n": 1,
+   "min": 7988,
+   "max": 7988
+  },
+  "ses-ontvangst.test.js": {
+   "n": 1,
+   "min": 6850,
+   "max": 6850
+  },
+  "sessie-herstart.test.js": {
+   "n": 1,
+   "min": 11947,
+   "max": 11947
+  },
+  "sessiegrens.test.js": {
+   "n": 1,
+   "min": 15001,
+   "max": 15001
+  },
+  "sessies.test.js": {
+   "n": 1,
+   "min": 185,
+   "max": 185
+  },
+  "sessiewacht.test.js": {
+   "n": 1,
+   "min": 70,
+   "max": 70
+  },
+  "simulatiebank.test.js": {
+   "n": 1,
+   "min": 7331,
+   "max": 7331
+  },
+  "skipwacht.test.js": {
+   "n": 1,
+   "min": 1008,
+   "max": 1008
+  },
+  "sleutelwoorden.test.js": {
+   "n": 1,
+   "min": 6846,
+   "max": 6846
+  },
+  "slo-routes.test.js": {
+   "n": 1,
+   "min": 14159,
+   "max": 14159
+  },
+  "slo.test.js": {
+   "n": 1,
+   "min": 241,
+   "max": 241
+  },
+  "sloophamer.pg.test.js": {
+   "n": 1,
+   "min": 63,
+   "max": 63
+  },
+  "smtp-in.test.js": {
+   "n": 1,
+   "min": 14524,
+   "max": 14524
+  },
+  "smtp.test.js": {
+   "n": 1,
+   "min": 562,
+   "max": 562
+  },
+  "sni.test.js": {
+   "n": 1,
+   "min": 66,
+   "max": 66
+  },
+  "sociaal-index.test.js": {
+   "n": 1,
+   "min": 93,
+   "max": 93
+  },
+  "social-elite.test.js": {
+   "n": 1,
+   "min": 117,
+   "max": 117
+  },
+  "socialebeleid.test.js": {
+   "n": 1,
+   "min": 83,
+   "max": 83
+  },
+  "socialecommand.test.js": {
+   "n": 1,
+   "min": 87,
+   "max": 87
+  },
+  "socialegraaf.test.js": {
+   "n": 1,
+   "min": 93,
+   "max": 93
+  },
+  "socialelijn.test.js": {
+   "n": 1,
+   "min": 93,
+   "max": 93
+  },
+  "socialewereld.test.js": {
+   "n": 1,
+   "min": 121,
+   "max": 121
+  },
+  "societeit.test.js": {
+   "n": 1,
+   "min": 8389,
+   "max": 8389
+  },
+  "sparren.test.js": {
+   "n": 1,
+   "min": 15158,
+   "max": 15158
+  },
+  "spelaandeel.test.js": {
+   "n": 1,
+   "min": 186,
+   "max": 186
+  },
+  "spelbank.test.js": {
+   "n": 1,
+   "min": 326,
+   "max": 326
+  },
+  "spelbeleid.test.js": {
+   "n": 1,
+   "min": 295,
+   "max": 295
+  },
+  "speldag.test.js": {
+   "n": 1,
+   "min": 10310,
+   "max": 10310
+  },
+  "spelhandel.test.js": {
+   "n": 1,
+   "min": 210,
+   "max": 210
+  },
+  "spelkijken.test.js": {
+   "n": 1,
+   "min": 209,
+   "max": 209
+  },
+  "spelklok.test.js": {
+   "n": 1,
+   "min": 314,
+   "max": 314
+  },
+  "spellen.test.js": {
+   "n": 1,
+   "min": 29698,
+   "max": 29698
+  },
+  "spelmaatje.test.js": {
+   "n": 1,
+   "min": 7554,
+   "max": 7554
+  },
+  "spelmagnaat.test.js": {
+   "n": 1,
+   "min": 10568,
+   "max": 10568
+  },
+  "spelnabespreking.test.js": {
+   "n": 1,
+   "min": 219,
+   "max": 219
+  },
+  "spelnaspelen.test.js": {
+   "n": 1,
+   "min": 298,
+   "max": 298
+  },
+  "spelpoort.test.js": {
+   "n": 1,
+   "min": 7336,
+   "max": 7336
+  },
+  "spelpraat.test.js": {
+   "n": 1,
+   "min": 8344,
+   "max": 8344
+  },
+  "spelpresence.test.js": {
+   "n": 1,
+   "min": 68,
+   "max": 68
+  },
+  "spelprestaties.test.js": {
+   "n": 1,
+   "min": 69,
+   "max": 69
+  },
+  "spelprojectie.test.js": {
+   "n": 1,
+   "min": 272,
+   "max": 272
+  },
+  "spelquiz.test.js": {
+   "n": 1,
+   "min": 178,
+   "max": 178
+  },
+  "spelregels-drift.test.js": {
+   "n": 1,
+   "min": 177,
+   "max": 177
+  },
+  "spelregister.test.js": {
+   "n": 1,
+   "min": 189,
+   "max": 189
+  },
+  "spelreplay.test.js": {
+   "n": 1,
+   "min": 205,
+   "max": 205
+  },
+  "spelsudoku.test.js": {
+   "n": 1,
+   "min": 10866,
+   "max": 10866
+  },
+  "spelteams.test.js": {
+   "n": 1,
+   "min": 8678,
+   "max": 8678
+  },
+  "speltelling.test.js": {
+   "n": 1,
+   "min": 7500,
+   "max": 7500
+  },
+  "speltoernooi.test.js": {
+   "n": 1,
+   "min": 180,
+   "max": 180
+  },
+  "speluitslagen.test.js": {
+   "n": 1,
+   "min": 194,
+   "max": 194
+  },
+  "spelvariant.test.js": {
+   "n": 1,
+   "min": 187,
+   "max": 187
+  },
+  "spelveiling.test.js": {
+   "n": 1,
+   "min": 127,
+   "max": 127
+  },
+  "spelverzekering.test.js": {
+   "n": 1,
+   "min": 286,
+   "max": 286
+  },
+  "sportclub.test.js": {
+   "n": 1,
+   "min": 7698,
+   "max": 7698
+  },
+  "spreidingsoordeel.test.js": {
+   "n": 1,
+   "min": 74,
+   "max": 74
+  },
+  "sprongindex.test.js": {
+   "n": 1,
+   "min": 1099,
+   "max": 1099
+  },
+  "sso.test.js": {
+   "n": 1,
+   "min": 606,
+   "max": 606
+  },
+  "ssrf.test.js": {
+   "n": 1,
+   "min": 61,
+   "max": 61
+  },
+  "staatlog.test.js": {
+   "n": 1,
+   "min": 75,
+   "max": 75
+  },
+  "staatproef.test.js": {
+   "n": 1,
+   "min": 310,
+   "max": 310
+  },
+  "stad.test.js": {
+   "n": 1,
+   "min": 7900,
+   "max": 7900
+  },
+  "stadsbesluit.test.js": {
+   "n": 1,
+   "min": 8032,
+   "max": 8032
+  },
+  "stadsbestuur.test.js": {
+   "n": 1,
+   "min": 8748,
+   "max": 8748
+  },
+  "stadshardware.test.js": {
+   "n": 1,
+   "min": 8501,
+   "max": 8501
+  },
+  "stadskansen.test.js": {
+   "n": 1,
+   "min": 7865,
+   "max": 7865
+  },
+  "stadsraad.test.js": {
+   "n": 1,
+   "min": 6820,
+   "max": 6820
+  },
+  "stadstart.test.js": {
+   "n": 1,
+   "min": 74,
+   "max": 74
+  },
+  "stadsweefsel-steden.test.js": {
+   "n": 1,
+   "min": 116,
+   "max": 116
+  },
+  "stadsweefsel.test.js": {
+   "n": 1,
+   "min": 9558,
+   "max": 9558
+  },
+  "staff-inzet-mob.test.js": {
+   "n": 1,
+   "min": 8546,
+   "max": 8546
+  },
+  "staffinvite.test.js": {
+   "n": 1,
+   "min": 10028,
+   "max": 10028
+  },
+  "stijlafsplitsing.test.js": {
+   "n": 1,
+   "min": 74,
+   "max": 74
+  },
+  "stijlbundel.test.js": {
+   "n": 1,
+   "min": 93,
+   "max": 93
+  },
+  "stilalarm.test.js": {
+   "n": 1,
+   "min": 20887,
+   "max": 20887
+  },
+  "stillepost.test.js": {
+   "n": 1,
+   "min": 82,
+   "max": 82
+  },
+  "streng-poorten.test.js": {
+   "n": 1,
+   "min": 7635,
+   "max": 7635
+  },
+  "strenge-poort.test.js": {
+   "n": 1,
+   "min": 262,
+   "max": 262
+  },
+  "stripe-eigen.test.js": {
+   "n": 1,
+   "min": 126,
+   "max": 126
+  },
+  "studio.test.js": {
+   "n": 1,
+   "min": 6948,
+   "max": 6948
+  },
+  "stun.test.js": {
+   "n": 1,
+   "min": 89,
+   "max": 89
+  },
+  "stuur-aanval.test.js": {
+   "n": 1,
+   "min": 137,
+   "max": 137
+  },
+  "stuur-gevolg.test.js": {
+   "n": 1,
+   "min": 159,
+   "max": 159
+  },
+  "stuur-mandaat.test.js": {
+   "n": 1,
+   "min": 213,
+   "max": 213
+  },
+  "stuur-niveaus.test.js": {
+   "n": 1,
+   "min": 316,
+   "max": 316
+  },
+  "stuur-plan.test.js": {
+   "n": 1,
+   "min": 151,
+   "max": 151
+  },
+  "stuur-resolver-taal.test.js": {
+   "n": 1,
+   "min": 455,
+   "max": 455
+  },
+  "stuur-resolver.test.js": {
+   "n": 1,
+   "min": 231,
+   "max": 231
+  },
+  "stuur.test.js": {
+   "n": 1,
+   "min": 7804,
+   "max": 7804
+  },
+  "supplier-comm-mob-payroll.test.js": {
+   "n": 1,
+   "min": 9958,
+   "max": 9958
+  },
+  "supplier-comm-routes.test.js": {
+   "n": 1,
+   "min": 7578,
+   "max": 7578
+  },
+  "supplier-contract-teken.test.js": {
+   "n": 1,
+   "min": 7466,
+   "max": 7466
+  },
+  "supplier-contract.test.js": {
+   "n": 1,
+   "min": 7775,
+   "max": 7775
+  },
+  "supplier-post-drive.test.js": {
+   "n": 1,
+   "min": 7783,
+   "max": 7783
+  },
+  "svgpaden.test.js": {
+   "n": 1,
+   "min": 377,
+   "max": 377
+  },
+  "synergie.test.js": {
+   "n": 1,
+   "min": 7848,
+   "max": 7848
+  },
+  "taalcheck.test.js": {
+   "n": 1,
+   "min": 7265,
+   "max": 7265
+  },
+  "taaldekking.test.js": {
+   "n": 1,
+   "min": 104,
+   "max": 104
+  },
+  "taallaag.test.js": {
+   "n": 1,
+   "min": 7226,
+   "max": 7226
+  },
+  "tafeldek.test.js": {
+   "n": 1,
+   "min": 7778,
+   "max": 7778
+  },
+  "tafelticket.test.js": {
+   "n": 1,
+   "min": 23723,
+   "max": 23723
+  },
+  "takenlijst.test.js": {
+   "n": 1,
+   "min": 351,
+   "max": 351
+  },
+  "talen.test.js": {
+   "n": 1,
+   "min": 7873,
+   "max": 7873
+  },
+  "talen114.test.js": {
+   "n": 1,
+   "min": 7219,
+   "max": 7219
+  },
+  "teacherflow.test.js": {
+   "n": 1,
+   "min": 7362,
+   "max": 7362
+  },
+  "techniek-functies.test.js": {
+   "n": 1,
+   "min": 8989,
+   "max": 8989
+  },
+  "techniek-sso-scim.test.js": {
+   "n": 1,
+   "min": 8103,
+   "max": 8103
+  },
+  "techniek.test.js": {
+   "n": 1,
+   "min": 88,
+   "max": 88
+  },
+  "tegenfeit.test.js": {
+   "n": 1,
+   "min": 180,
+   "max": 180
+  },
+  "tegoed.test.js": {
+   "n": 1,
+   "min": 73,
+   "max": 73
+  },
+  "tenant.test.js": {
+   "n": 1,
+   "min": 7440,
+   "max": 7440
+  },
+  "tenantbewijs.test.js": {
+   "n": 1,
+   "min": 7213,
+   "max": 7213
+  },
+  "tenantcontract.test.js": {
+   "n": 1,
+   "min": 7390,
+   "max": 7390
+  },
+  "tenantherstelproef.test.js": {
+   "n": 1,
+   "min": 7321,
+   "max": 7321
+  },
+  "tenantspine.test.js": {
+   "n": 1,
+   "min": 128,
+   "max": 128
+  },
+  "tenantuitgang.test.js": {
+   "n": 1,
+   "min": 7517,
+   "max": 7517
+  },
+  "terrein-en-panden.test.js": {
+   "n": 1,
+   "min": 8869,
+   "max": 8869
+  },
+  "terugstortstand.test.js": {
+   "n": 1,
+   "min": 7513,
+   "max": 7513
+  },
+  "theater-thuis.test.js": {
+   "n": 1,
+   "min": 7462,
+   "max": 7462
+  },
+  "theater.test.js": {
+   "n": 1,
+   "min": 7644,
+   "max": 7644
+  },
+  "thema.test.js": {
+   "n": 1,
+   "min": 170,
+   "max": 170
+  },
+  "thuis-zaak.test.js": {
+   "n": 1,
+   "min": 8056,
+   "max": 8056
+  },
+  "thuis.test.js": {
+   "n": 1,
+   "min": 7605,
+   "max": 7605
+  },
+  "thuiszakelijk.test.js": {
+   "n": 1,
+   "min": 7253,
+   "max": 7253
+  },
+  "tiener.test.js": {
+   "n": 1,
+   "min": 7094,
+   "max": 7094
+  },
+  "tijdlijn.test.js": {
+   "n": 1,
+   "min": 63,
+   "max": 63
+  },
+  "tls-acme-boot.test.js": {
+   "n": 1,
+   "min": 149,
+   "max": 149
+  },
+  "tls-acme.test.js": {
+   "n": 1,
+   "min": 89,
+   "max": 89
+  },
+  "tls-boot.test.js": {
+   "n": 1,
+   "min": 24020,
+   "max": 24020
+  },
+  "tls-native.test.js": {
+   "n": 1,
+   "min": 159,
+   "max": 159
+  },
+  "tls-x509.test.js": {
+   "n": 1,
+   "min": 142,
+   "max": 142
+  },
+  "toegangprefix.test.js": {
+   "n": 1,
+   "min": 1910,
+   "max": 1910
+  },
+  "toegankelijk.test.js": {
+   "n": 1,
+   "min": 6910,
+   "max": 6910
+  },
+  "toestellen.test.js": {
+   "n": 1,
+   "min": 6995,
+   "max": 6995
+  },
+  "toetskeuring.test.js": {
+   "n": 1,
+   "min": 7161,
+   "max": 7161
+  },
+  "training.test.js": {
+   "n": 1,
+   "min": 7873,
+   "max": 7873
+  },
+  "trainingsschema.test.js": {
+   "n": 1,
+   "min": 7996,
+   "max": 7996
+  },
+  "transfer.test.js": {
+   "n": 1,
+   "min": 9945,
+   "max": 9945
+  },
+  "treasury.test.js": {
+   "n": 1,
+   "min": 9209,
+   "max": 9209
+  },
+  "trio-kleef.test.js": {
+   "n": 1,
+   "min": 386,
+   "max": 386
+  },
+  "trio-wees.test.js": {
+   "n": 1,
+   "min": 44957,
+   "max": 44957
+  },
+  "trio-werkers.test.js": {
+   "n": 1,
+   "min": 362,
+   "max": 362
+  },
+  "txgeld.test.js": {
+   "n": 1,
+   "min": 116,
+   "max": 116
+  },
+  "txindex.test.js": {
+   "n": 1,
+   "min": 119,
+   "max": 119
+  },
+  "txkap.test.js": {
+   "n": 1,
+   "min": 186,
+   "max": 186
+  },
+  "txledger-sqlite.test.js": {
+   "n": 1,
+   "min": 1008,
+   "max": 1008
+  },
+  "txledger.pg.test.js": {
+   "n": 1,
+   "min": 111,
+   "max": 111
+  },
+  "uitgeven-inwisselen.test.js": {
+   "n": 1,
+   "min": 9236,
+   "max": 9236
+  },
+  "uitgifte.test.js": {
+   "n": 1,
+   "min": 9490,
+   "max": 9490
+  },
+  "uitloggen.test.js": {
+   "n": 1,
+   "min": 8954,
+   "max": 8954
+  },
+  "uitrol.test.js": {
+   "n": 1,
+   "min": 68,
+   "max": 68
+  },
+  "uitrolregie-echt.test.js": {
+   "n": 1,
+   "min": 8786,
+   "max": 8786
+  },
+  "uitrolregie.test.js": {
+   "n": 1,
+   "min": 86,
+   "max": 86
+  },
+  "uitvoerproef.test.js": {
+   "n": 1,
+   "min": 69,
+   "max": 69
+  },
+  "upload-poort.test.js": {
+   "n": 1,
+   "min": 7610,
+   "max": 7610
+  },
+  "uploadquarantaine.test.js": {
+   "n": 1,
+   "min": 100,
+   "max": 100
+  },
+  "vakbewijs-kluis.test.js": {
+   "n": 1,
+   "min": 56,
+   "max": 56
+  },
+  "vakbewijs-routes.test.js": {
+   "n": 1,
+   "min": 9357,
+   "max": 9357
+  },
+  "vakken.test.js": {
+   "n": 1,
+   "min": 8833,
+   "max": 8833
+  },
+  "vakpro.test.js": {
+   "n": 1,
+   "min": 8885,
+   "max": 8885
+  },
+  "vakpro2.test.js": {
+   "n": 1,
+   "min": 8977,
+   "max": 8977
+  },
+  "vakwerk-pro.test.js": {
+   "n": 1,
+   "min": 7837,
+   "max": 7837
+  },
+  "vakwerk.test.js": {
+   "n": 1,
+   "min": 8404,
+   "max": 8404
+  },
+  "vastgoed.test.js": {
+   "n": 1,
+   "min": 8081,
+   "max": 8081
+  },
+  "vastleggen.test.js": {
+   "n": 1,
+   "min": 7443,
+   "max": 7443
+  },
+  "veer.test.js": {
+   "n": 1,
+   "min": 82,
+   "max": 82
+  },
+  "veiligadres.test.js": {
+   "n": 1,
+   "min": 67,
+   "max": 67
+  },
+  "veiligheid-kring-rust.test.js": {
+   "n": 1,
+   "min": 7078,
+   "max": 7078
+  },
+  "veiligheid-moment.test.js": {
+   "n": 1,
+   "min": 53,
+   "max": 53
+  },
+  "veiligheid.test.js": {
+   "n": 1,
+   "min": 92871,
+   "max": 92871
+  },
+  "veiligheidskern.test.js": {
+   "n": 1,
+   "min": 64,
+   "max": 64
+  },
+  "verblijf.test.js": {
+   "n": 1,
+   "min": 8957,
+   "max": 8957
+  },
+  "vergeten-gezelschap.test.js": {
+   "n": 1,
+   "min": 8912,
+   "max": 8912
+  },
+  "vergeten.test.js": {
+   "n": 1,
+   "min": 7122,
+   "max": 7122
+  },
+  "verhuur.test.js": {
+   "n": 1,
+   "min": 7547,
+   "max": 7547
+  },
+  "verjaardagen.test.js": {
+   "n": 1,
+   "min": 7214,
+   "max": 7214
+  },
+  "verkoop-etalage.test.js": {
+   "n": 1,
+   "min": 7427,
+   "max": 7427
+  },
+  "verraad.test.js": {
+   "n": 1,
+   "min": 1018,
+   "max": 1018
+  },
+  "verraadtelling.test.js": {
+   "n": 1,
+   "min": 88,
+   "max": 88
+  },
+  "versieadres.test.js": {
+   "n": 1,
+   "min": 67,
+   "max": 67
+  },
+  "vertaal.test.js": {
+   "n": 1,
+   "min": 6320,
+   "max": 6320
+  },
+  "vertrouwen.test.js": {
+   "n": 1,
+   "min": 147,
+   "max": 147
+  },
+  "verzadiging.test.js": {
+   "n": 1,
+   "min": 69,
+   "max": 69
+  },
+  "verzoek-intrekken.test.js": {
+   "n": 1,
+   "min": 7048,
+   "max": 7048
+  },
+  "verzorging-leden.test.js": {
+   "n": 1,
+   "min": 6665,
+   "max": 6665
+  },
+  "verzorging.test.js": {
+   "n": 1,
+   "min": 7547,
+   "max": 7547
+  },
+  "villa.test.js": {
+   "n": 1,
+   "min": 6487,
+   "max": 6487
+  },
+  "vingerafdruk.test.js": {
+   "n": 1,
+   "min": 228,
+   "max": 228
+  },
+  "vloerwerk.test.js": {
+   "n": 1,
+   "min": 7519,
+   "max": 7519
+  },
+  "vloot.test.js": {
+   "n": 1,
+   "min": 11311,
+   "max": 11311
+  },
+  "vlootbeeld.test.js": {
+   "n": 1,
+   "min": 84,
+   "max": 84
+  },
+  "voeding.test.js": {
+   "n": 1,
+   "min": 6611,
+   "max": 6611
+  },
+  "vonk.test.js": {
+   "n": 1,
+   "min": 16465,
+   "max": 16465
+  },
+  "voornemen.test.js": {
+   "n": 1,
+   "min": 126,
+   "max": 126
+  },
+  "voorspel.test.js": {
+   "n": 1,
+   "min": 6759,
+   "max": 6759
+  },
+  "voorspelplaats.test.js": {
+   "n": 1,
+   "min": 78,
+   "max": 78
+  },
+  "voorstel.test.js": {
+   "n": 1,
+   "min": 64,
+   "max": 64
+  },
+  "vracht.test.js": {
+   "n": 1,
+   "min": 6565,
+   "max": 6565
+  },
+  "vrijenamen.test.js": {
+   "n": 1,
+   "min": 6741,
+   "max": 6741
+  },
+  "vuurplan.test.js": {
+   "n": 1,
+   "min": 94,
+   "max": 94
+  },
+  "waarde.test.js": {
+   "n": 1,
+   "min": 6207,
+   "max": 6207
+  },
+  "waardegraaf.test.js": {
+   "n": 1,
+   "min": 6447,
+   "max": 6447
+  },
+  "waarom.test.js": {
+   "n": 1,
+   "min": 63,
+   "max": 63
+  },
+  "wacht.test.js": {
+   "n": 1,
+   "min": 79,
+   "max": 79
+  },
+  "wachtdeur.test.js": {
+   "n": 1,
+   "min": 6221,
+   "max": 6221
+  },
+  "wachter.test.js": {
+   "n": 1,
+   "min": 94,
+   "max": 94
+  },
+  "wachtlijst.test.js": {
+   "n": 1,
+   "min": 6354,
+   "max": 6354
+  },
+  "wachtwoordkosten.test.js": {
+   "n": 1,
+   "min": 1159,
+   "max": 1159
+  },
+  "wauw.test.js": {
+   "n": 1,
+   "min": 7407,
+   "max": 7407
+  },
+  "wbw.test.js": {
+   "n": 1,
+   "min": 6792,
+   "max": 6792
+  },
+  "web.test.js": {
+   "n": 1,
+   "min": 143,
+   "max": 143
+  },
+  "webauthn-ceremonie.test.js": {
+   "n": 1,
+   "min": 6514,
+   "max": 6514
+  },
+  "webauthn-eigen.test.js": {
+   "n": 1,
+   "min": 90,
+   "max": 90
+  },
+  "webauthn.test.js": {
+   "n": 1,
+   "min": 12866,
+   "max": 12866
+  },
+  "webplatform.test.js": {
+   "n": 1,
+   "min": 12617,
+   "max": 12617
+  },
+  "webpush.test.js": {
+   "n": 1,
+   "min": 81,
+   "max": 81
+  },
+  "website-aanvraag-handoff.test.js": {
+   "n": 1,
+   "min": 52,
+   "max": 52
+  },
+  "weigering-laat-niets-achter.test.js": {
+   "n": 1,
+   "min": 6742,
+   "max": 6742
+  },
+  "wereld.test.js": {
+   "n": 1,
+   "min": 6686,
+   "max": 6686
+  },
+  "wereldkern.test.js": {
+   "n": 1,
+   "min": 60,
+   "max": 60
+  },
+  "wereldlaag.test.js": {
+   "n": 1,
+   "min": 12381,
+   "max": 12381
+  },
+  "wereldprofiel.test.js": {
+   "n": 1,
+   "min": 10780,
+   "max": 10780
+  },
+  "wereldregels.test.js": {
+   "n": 1,
+   "min": 6084,
+   "max": 6084
+  },
+  "wereldregister.test.js": {
+   "n": 1,
+   "min": 106,
+   "max": 106
+  },
+  "wereldroutes.test.js": {
+   "n": 1,
+   "min": 6885,
+   "max": 6885
+  },
+  "wereldtaal.test.js": {
+   "n": 1,
+   "min": 70,
+   "max": 70
+  },
+  "wereldvermogens.test.js": {
+   "n": 1,
+   "min": 16608,
+   "max": 16608
+  },
+  "werk-bij-inloggen.test.js": {
+   "n": 1,
+   "min": 8403,
+   "max": 8403
+  },
+  "werkbeleid-dienst.test.js": {
+   "n": 1,
+   "min": 8551,
+   "max": 8551
+  },
+  "werkgebeurtenis.test.js": {
+   "n": 1,
+   "min": 84,
+   "max": 84
+  },
+  "werkgeheugen.test.js": {
+   "n": 1,
+   "min": 7952,
+   "max": 7952
+  },
+  "werkgevolg.test.js": {
+   "n": 1,
+   "min": 7299,
+   "max": 7299
+  },
+  "werkgezondheid.test.js": {
+   "n": 1,
+   "min": 6866,
+   "max": 6866
+  },
+  "werkgrens.test.js": {
+   "n": 1,
+   "min": 7699,
+   "max": 7699
+  },
+  "werkhandeling.test.js": {
+   "n": 1,
+   "min": 7289,
+   "max": 7289
+  },
+  "werkindienst.test.js": {
+   "n": 1,
+   "min": 7227,
+   "max": 7227
+  },
+  "werkmail.test.js": {
+   "n": 1,
+   "min": 8195,
+   "max": 8195
+  },
+  "werkplaats-uitgifte.test.js": {
+   "n": 1,
+   "min": 7311,
+   "max": 7311
+  },
+  "werkplek-wijzigen.test.js": {
+   "n": 1,
+   "min": 8868,
+   "max": 8868
+  },
+  "werkplek.test.js": {
+   "n": 1,
+   "min": 7837,
+   "max": 7837
+  },
+  "werkregels.test.js": {
+   "n": 1,
+   "min": 8119,
+   "max": 8119
+  },
+  "werkregister.test.js": {
+   "n": 1,
+   "min": 7714,
+   "max": 7714
+  },
+  "werkruimte-kantoor.test.js": {
+   "n": 1,
+   "min": 68,
+   "max": 68
+  },
+  "werktafelgeheugen.test.js": {
+   "n": 1,
+   "min": 67,
+   "max": 67
+  },
+  "werktoen.test.js": {
+   "n": 1,
+   "min": 7261,
+   "max": 7261
+  },
+  "werkvenster.test.js": {
+   "n": 1,
+   "min": 8811,
+   "max": 8811
+  },
+  "werkvloer.test.js": {
+   "n": 1,
+   "min": 7591,
+   "max": 7591
+  },
+  "werkvormen.test.js": {
+   "n": 1,
+   "min": 7637,
+   "max": 7637
+  },
+  "werkwaarom.test.js": {
+   "n": 1,
+   "min": 7467,
+   "max": 7467
+  },
+  "werving-link.test.js": {
+   "n": 1,
+   "min": 28960,
+   "max": 28960
+  },
+  "wetten.test.js": {
+   "n": 1,
+   "min": 302,
+   "max": 302
+  },
+  "wiring-contract.test.js": {
+   "n": 1,
+   "min": 234,
+   "max": 234
+  },
+  "wisselen-en-historie.test.js": {
+   "n": 1,
+   "min": 9335,
+   "max": 9335
+  },
+  "woonplaats-poort.test.js": {
+   "n": 1,
+   "min": 144,
+   "max": 144
+  },
+  "work-doelgroepen.test.js": {
+   "n": 1,
+   "min": 68,
+   "max": 68
+  },
+  "zaaihash.test.js": {
+   "n": 1,
+   "min": 8059,
+   "max": 8059
+  },
+  "zaak-balie.test.js": {
+   "n": 1,
+   "min": 8150,
+   "max": 8150
+  },
+  "zaak-en-mensen.test.js": {
+   "n": 1,
+   "min": 7938,
+   "max": 7938
+  },
+  "zaak-export.test.js": {
+   "n": 1,
+   "min": 7899,
+   "max": 7899
+  },
+  "zaak-inrichting.test.js": {
+   "n": 1,
+   "min": 8232,
+   "max": 8232
+  },
+  "zaak-kantoor.test.js": {
+   "n": 1,
+   "min": 7964,
+   "max": 7964
+  },
+  "zaak-loket-en-dossier.test.js": {
+   "n": 1,
+   "min": 7829,
+   "max": 7829
+  },
+  "zaak-vloot-en-facturen.test.js": {
+   "n": 1,
+   "min": 8122,
+   "max": 8122
+  },
+  "zaak.test.js": {
+   "n": 1,
+   "min": 7333,
+   "max": 7333
+  },
+  "zaakabonnement.test.js": {
+   "n": 1,
+   "min": 65,
+   "max": 65
+  },
+  "zaakbetaling.test.js": {
+   "n": 1,
+   "min": 9728,
+   "max": 9728
+  },
+  "zaakcommand-routes.test.js": {
+   "n": 1,
+   "min": 7736,
+   "max": 7736
+  },
+  "zaakcommand.test.js": {
+   "n": 1,
+   "min": 101,
+   "max": 101
+  },
+  "zaakdoos.test.js": {
+   "n": 1,
+   "min": 42399,
+   "max": 42399
+  },
+  "zaaktools.test.js": {
+   "n": 1,
+   "min": 7582,
+   "max": 7582
+  },
+  "zaaktransactie.test.js": {
+   "n": 1,
+   "min": 97,
+   "max": 97
+  },
+  "zakelijk.test.js": {
+   "n": 1,
+   "min": 12781,
+   "max": 12781
+  },
+  "zakelijkvervoer.test.js": {
+   "n": 1,
+   "min": 8798,
+   "max": 8798
+  },
+  "zandbak.test.js": {
+   "n": 1,
+   "min": 83,
+   "max": 83
+  },
+  "zegel.test.js": {
+   "n": 1,
+   "min": 82,
+   "max": 82
+  },
+  "zegelcheck.test.js": {
+   "n": 1,
+   "min": 89,
+   "max": 89
+  },
+  "zegelroute.test.js": {
+   "n": 1,
+   "min": 27168,
+   "max": 27168
+  },
+  "zelfzorg.test.js": {
+   "n": 1,
+   "min": 7177,
+   "max": 7177
+  },
+  "ziekmelding-privacy.test.js": {
+   "n": 1,
+   "min": 22976,
+   "max": 22976
+  },
+  "zinnencache.test.js": {
+   "n": 1,
+   "min": 560,
+   "max": 560
+  },
+  "zorgketen.test.js": {
+   "n": 1,
+   "min": 7970,
+   "max": 7970
+  },
+  "zorgniveau.test.js": {
+   "n": 1,
+   "min": 6935,
+   "max": 6935
+  },
+  "zorgwallet.test.js": {
+   "n": 1,
+   "min": 7086,
+   "max": 7086
+  },
+  "zware-bundels.test.js": {
+   "n": 1,
+   "min": 58,
+   "max": 58
+  }
+ }
+}

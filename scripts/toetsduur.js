@@ -110,7 +110,25 @@ function bouw(paden, bestaand) {
   const gesorteerdeSpreiding = {};
   for (const n of namen) if (spreiding[n]) gesorteerdeSpreiding[n] = spreiding[n];
 
+  /* DE HERKOMST HOORT ERBIJ, en niet als sfeer. Een meting van een CI-runner en
+     een van een ontwikkelmachine geven andere absolute getallen; voor de
+     verdeling maakt dat niets uit (die weegt verhoudingen) maar voor wie het
+     bestand leest wel. Zonder stempel zou iemand deze seconden voor
+     runnertijden aanzien en zich afvragen waarom zijn scherf anders loopt.
+     Zelfde vorm als KETENS.json en de andere registers hier. */
+  const stempel = {
+    op: new Date().toISOString(),
+    waar: process.env.GITHUB_ACTIONS ? 'ci' : 'lokaal',
+    node: process.version,
+    kernen: require('os').cpus().length
+  };
+  try {
+    stempel.commit = require('child_process')
+      .execFileSync('git', ['rev-parse', '--short', 'HEAD'], { cwd: WORTEL, encoding: 'utf8' }).trim();
+  } catch (e) { /* zonder git ook goed */ }
+
   return {
+    stempel,
     uitleg: 'Hoe lang elk toetsbestand erover deed, als gewicht voor de ' +
       'scherfverdeling in scripts/lib/delen.js. Mediaan over alle waarnemingen. ' +
       'Een bestand dat hier NIET in staat is ongemeten en wordt om en om verdeeld ' +
@@ -130,17 +148,27 @@ function bouw(paden, bestaand) {
 }
 
 /* Wat zou de verdeling worden? Dit is de hele reden dat het register bestaat,
-   dus hoort hij ook hier af te lezen te zijn -- niet alleen in CI. */
+   dus hoort hij ook hier af te lezen te zijn -- niet alleen in CI.
+
+   EN HIJ REKENT OVER DEZELFDE VERZAMELING ALS DE KETEN, want anders is de
+   afdruk een ander getal met dezelfde naam. De scherven draaien de NIET
+   -geisoleerde bestanden (scripts/lib/geisoleerd.js) en laten de ijkingen weg
+   (--zonder-ijkingen); die krijgen elk een eigen job. Zonder die twee filters
+   telde meterijk.test.js hier mee met 864 seconden -- veertien minuten die in
+   geen enkele scherf zitten, en dus een verdeling die nergens over gaat. */
 function toonVerdeling(uit, totaal) {
   const { indeling, zetDuren } = require('./lib/delen');
+  const { isGeisoleerd } = require('./lib/geisoleerd');
   zetDuren(uit.duur);
   try {
-    const alle = [...opSchijf()].filter((n) => n.endsWith('.test.js')).sort();
+    const alle = [...opSchijf()].filter((n) => n.endsWith('.test.js'))
+      .filter((n) => !isGeisoleerd(n)).sort();
     const bakken = indeling(alle, totaal);
     const som = (b) => b.reduce((s, n) => s + (uit.duur[n] || 0), 0);
     const lasten = bakken.map(som);
     const ideaal = lasten.reduce((a, b) => a + b, 0) / totaal;
-    console.log('\n  de verdeling over ' + totaal + ' scherven (alleen *.test.js):');
+    console.log('\n  de verdeling over ' + totaal + ' scherven ' +
+      '(zoals de keten hem draait: zonder de geisoleerde bestanden en de ijkingen):');
     bakken.forEach((b, i) => console.log('    scherf ' + (i + 1) + '  ' +
       String(b.length).padStart(4) + ' bestanden  ' +
       (lasten[i] / 1000).toFixed(0).padStart(6) + 's' +

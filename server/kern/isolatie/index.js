@@ -133,10 +133,10 @@ module.exports = function maakIsolatie({ db, save, functies, klok, huisStand, be
   /* VERLAGEN. Alleen langs een ceremonie, en die begint met de HUIDIGE stand --
      niet met een stand die de aanroeper aanlevert. Zou de aanvrager `van` mogen
      kiezen, dan koos hij een overgang die geen ceremonie vraagt. */
-  function vraagOntsluiting({ drager, sleutel, naar, door, reden }) {
+  function vraagOntsluiting({ drager, sleutel, naar, door, reden, tweedeMens }) {
     if (!EIGEN_DRAGERS.includes(drager)) fout(400, 'Deze laag ontsluit alleen ' + EIGEN_DRAGERS.join(', ') + '.');
     const van = standVan(drager, sleutel) || 'normaal';
-    return ontsluiting.start({ drager, sleutel, van, naar, door, reden });
+    return ontsluiting.start({ drager, sleutel, van, naar, door, reden, tweedeMens });
   }
 
   function voltooiOntsluiting(id, { door }) {
@@ -154,6 +154,10 @@ module.exports = function maakIsolatie({ db, save, functies, klok, huisStand, be
       { bron: 'isolatie:ontsluiting' });
     return uit;
   }
+
+  /* De ceremonie van het HUIS staat in ./huisceremonie.js: het is het enige
+     stuk van deze laag dat over een stand gaat die zij niet bezit. */
+  const huisdeel = require('./huisceremonie')({ ontsluiting, spoor, save, beveilig, fout });
 
   /* ---------- het overzicht ---------- */
   function overzicht() {
@@ -182,6 +186,8 @@ module.exports = function maakIsolatie({ db, save, functies, klok, huisStand, be
   }
 
   return { context, besluit, standVan, zet, vraagOntsluiting, voltooiOntsluiting,
+    vraagHuisOntsluiting: huisdeel.vraagHuisOntsluiting,
+    huisCeremoniePoort: huisdeel.huisCeremoniePoort,
     ontsluiting, overzicht, ordening, dragers, effecten, beschermstand,
     effectieveStand: laag.effectieveStand };
 };

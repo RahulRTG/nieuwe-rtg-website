@@ -26,6 +26,7 @@
 
 const ordening = require('./ordening');
 const effecten = require('./effecten');
+const leesset = require('./leesset');
 const { NAMEN: DRAGERNAMEN } = require('./dragers');
 
 /* WELKE DRAGER HET BESLUIT DROEG. Niet "de fijnste" en ook niet "iedereen met
@@ -78,24 +79,29 @@ function maakBesluitlaag({ functies, beschermstand }) {
     /* 1. HET HANDHAVENDE OORDEEL. De beschermstand kent maar een vraag: geldt de
           beschermde stand, en houdt hij dit pad tegen. Hij wordt alleen gesteld
           als die stand ook werkelijk geldt. */
-    /* WAAROM `isolatie` HIER DEZELFDE DEUR NEEMT ALS `beschermd`, EN WAT DAT
-       NOG NIET IS. Het huis isoleert door ELKE functieschakelaar om te zetten
-       (kern/incidentcontrole.js: isoleer). Dat kan niet voor één lid: een
-       schakelaar is huis-breed. Voor een drager onder het huis is de
-       beschermstand daarom vandaag het enige dat werkelijk iets tegenhoudt, en
-       een isolatie die minder zou tegenhouden dan een beschermstand is een
-       woord zonder inhoud. Dus consulteert `isolatie` hem ook.
+    /* HET HANDHAVENDE OORDEEL, IN TWEE TRAPPEN.
 
-       WAT DAARMEE NOG NIET WAAR IS: een drager op `isolatie` houdt vandaag
-       precies evenveel tegen als een drager op `beschermd`. Het verschil dat de
-       naam belooft -- alles dicht behalve lezen -- bestaat op deze laag nog
-       niet, want de methode is hier het verkeerde signaal (3728 POST-routes
-       tegenover 35 GET-routes; zie de kop van kern/beschermstand.js) en het
-       effectmodel loopt nog in de schaduw. Dat staat als `nietGebouwd` in het
-       antwoord en niet als een stilte. */
+       Trap 1 is de beschermstand: zes bevroren categorieën, gebouwd en in
+       gebruik. Hij geldt zodra de eigenschap `beschermd` aanstaat, en isolatie
+       draagt die eigenschap ook (./ordening.js) -- dus alles wat beschermd
+       sluit, blijft onder isolatie dicht.
+
+       Trap 2 geldt ALLEEN onder isolatie en is het verschil dat de naam belooft:
+       niets mag, behalve wat zijn lezerschap heeft BEWEZEN. Waarom dat een
+       gemeten verzameling is en geen methodecontrole staat in ./leesset.js -- in
+       het kort: het lezen loopt hier grotendeels over POST, dus "alleen GET" zou
+       een lid uitloggen in plaats van beschermen. */
     let tegen = null;
-    const consulteert = samen.beschermd === true || samen.trede === 'isolatie';
-    if (consulteert) tegen = beschermstand.houdtTegen(pad, methode);
+    if (samen.beschermd === true) tegen = beschermstand.houdtTegen(pad, methode);
+
+    let leesbesluit = null;
+    if (!tegen && samen.trede === 'isolatie' && !/^(GET|HEAD|OPTIONS)$/i.test(String(methode || ''))) {
+      leesbesluit = leesset.magOnderIsolatie(pad, functie);
+      if (!leesbesluit.mag) {
+        tegen = { functie: functie ? functie.id : null, naam: functie ? functie.naam : null,
+          categorie: leesbesluit.grond, waarom: leesbesluit.waarom, uitLeesset: true };
+      }
+    }
 
     /* 2. HET SCHADUWOORDEEL, dat vandaag niets doet behalve zichtbaar zijn. */
     const schaduw = effecten.schaduwOordeel({ pad, methode, functie, stand: samen });
@@ -131,18 +137,16 @@ function maakBesluitlaag({ functies, beschermstand }) {
       onenigheid
     };
 
-    if (samen.trede === 'isolatie' && samen.beschermd !== true) {
-      uit.nietGebouwd = 'op deze drager houdt `isolatie` vandaag precies evenveel tegen als ' +
-        '`beschermd`: de zes bevroren categorieën. Het verschil dat de naam belooft, bestaat hier ' +
-        'nog niet -- zie de opmerking in kern/isolatie/besluit.js.';
-    }
-
     if (tegen) {
-      uit.reden = 'BESCHERMSTAND_CATEGORIE';
+      uit.reden = tegen.uitLeesset ? 'ISOLATIE_LEESSET' : 'BESCHERMSTAND_CATEGORIE';
       uit.regel = tegen.categorie;
       uit.uitleg = tegen.waarom;
-      uit.bewijs = ['kern/beschermstand-lijst.js: de categorie "' + tegen.categorie + '" is bevroren',
-        'kern/isolatie/ordening.js: de effectieve stand over ' + samen.dragers.length + ' drager(s)'];
+      uit.bewijs = tegen.uitLeesset
+        ? ['kern/isolatie/leesset.js: ' + tegen.categorie,
+           'IDEMPROEF.json: de gemeten kale oproep achter dit pad',
+           'kern/isolatie/ordening.js: de effectieve stand over ' + samen.dragers.length + ' drager(s)']
+        : ['kern/beschermstand-lijst.js: de categorie "' + tegen.categorie + '" is bevroren',
+           'kern/isolatie/ordening.js: de effectieve stand over ' + samen.dragers.length + ' drager(s)'];
       return uit;
     }
 
@@ -158,10 +162,14 @@ function maakBesluitlaag({ functies, beschermstand }) {
     }
 
     uit.reden = samen.beschermd || samen.trede === 'isolatie' ? 'CATEGORIE_LOOPT_DOOR' : 'GEEN_STAND_ACTIEF';
-    uit.uitleg = samen.beschermd || samen.trede === 'isolatie'
-      ? 'de categorie "' + functie.categorie + '" loopt door in deze stand'
-      : 'er staat geen drager in een stand die iets sluit';
-    uit.bewijs = ['kern/beschermstand-lijst.js: LOOPT_DOOR'];
+    uit.uitleg = samen.trede === 'isolatie' && leesbesluit
+      ? leesbesluit.waarom
+      : (samen.beschermd
+        ? 'de categorie "' + functie.categorie + '" loopt door in deze stand'
+        : 'er staat geen drager in een stand die iets sluit');
+    uit.bewijs = samen.trede === 'isolatie' && leesbesluit
+      ? ['kern/isolatie/leesset.js: ' + leesbesluit.grond]
+      : ['kern/beschermstand-lijst.js: LOOPT_DOOR'];
     return uit;
   }
 

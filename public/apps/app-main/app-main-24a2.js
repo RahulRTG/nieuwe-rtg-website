@@ -96,7 +96,7 @@
        in de voet. Vandaar `paneel`: geen vijfde wereldtegel, geen tweede
        instellingenscherm. wereldBij() in 29c filtert deze map er vanzelf uit. */
     { sleutel: 'map-instellingen', naam: 'Instellingen', paneel: '#osCcBtn', items: [
-      'link:ik', 'link:veilig', 'link:passkeys', 'link:juridisch'] },
+      'link:ik', 'link:veilig', 'link:passkeys', 'link:bescherming', 'link:juridisch'] },
     /* WORKOS IS EEN CONTEXT EN GEEN PRODUCT MET EEN PRIJS. De naam ging van
        "RTG Kantoor" naar WorkOS omdat er twee verschillende toegangsmodellen in
        dezelfde wereld wonen, en die verschillen mogen de wereld niet splitsen:

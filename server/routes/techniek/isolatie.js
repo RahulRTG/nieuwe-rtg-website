@@ -34,7 +34,7 @@ module.exports = (tctx) => {
   /* De huisstand wordt GELEZEN uit de incidentcontrole en niet gekopieerd. Lui,
      want db.data.techniek kan bij het monteren nog leeg zijn -- en een stand die
      bij het opstarten wordt vastgelegd, loopt de rest van de dag achter. */
-  const isolatie = maakIsolatie({
+  const isolatie = (tctx.kern && tctx.kern.isolatie) || maakIsolatie({
     db, save, functies, klok, beveilig,
     huisStand: () => {
       const t = db.data && db.data.techniek;
@@ -42,12 +42,30 @@ module.exports = (tctx) => {
       return (s && s.modus) || 'normaal';
     }
   });
+  /* EEN LAAG EN NIET TWEE. routes/isolatie.js (de kant van het lid) hangt hem
+     op kern.isolatie; die wordt hier hergebruikt zodat een ceremonie die het lid
+     begint, dezelfde is als die het kantoor ziet. Twee exemplaren lezen allebei
+     uit db.data en lopen tóch uiteen zodra er een teller of een cache bij komt. */
+  if (tctx.kern && !tctx.kern.isolatie) tctx.kern.isolatie = isolatie;
   const filter = maakIsolatiefilter({ isolatie, beleid });
 
   function actor(req) {
     const id = req.techUser && req.techUser.id;
     return id === undefined || id === null ? 'eigenaar' : 'user-' + String(id).slice(0, 40);
   }
+  /* IS ER EEN TWEEDE MENS DIE MAG GOEDKEUREN? Geteld en niet aangenomen: de
+     eigenaar plus iedereen op de handmatige toegangslijst van de techniekpagina,
+     min de aanvrager zelf. Dit gegeven komt NOOIT uit het verzoek -- zou de
+     aanvrager het mogen meesturen, dan kiest hij zelf of hij vier ogen nodig
+     heeft, en dan is de eis een instelling. */
+  function tweedeMensBestaat(req) {
+    const t = (db.data && db.data.techniek) || {};
+    const lijst = Array.isArray(t.toegang) ? t.toegang : [];
+    const ik = String((req.techUser && req.techUser.id) || '');
+    const anderen = lijst.map(x => String((x && (x.id || x.user || x)) || '')).filter(x => x && x !== ik);
+    return new Set(anderen).size > 0;
+  }
+
   function faal(res, e) {
     return res.status(e.status || 500).json({ error: e.status ? e.message : 'De handeling mislukte.' });
   }
@@ -75,8 +93,15 @@ module.exports = (tctx) => {
   app.post('/api/techniek/isolatie/ontsluiting', techAuth, eigenaarAlleen, (req, res) => {
     const b = req.body || {};
     try {
-      res.json({ ok: true, verzoek: isolatie.vraagOntsluiting({ drager: b.drager, sleutel: b.sleutel,
-        naar: b.naar, door: actor(req), reden: b.reden }) });
+      const gedeeld = { naar: b.naar, door: actor(req), reden: b.reden,
+        tweedeMens: tweedeMensBestaat(req) };
+      /* Het HUIS heeft een eigen ingang omdat zijn stand niet in deze laag
+         woont maar in de incidentcontrole. De ceremonie is wel dezelfde, en dat
+         is het punt: een tweede ceremonie naast de eerste zou binnen een jaar
+         iets anders eisen. */
+      res.json({ ok: true, verzoek: b.drager === 'huis'
+        ? isolatie.vraagHuisOntsluiting(Object.assign({ van: b.van }, gedeeld))
+        : isolatie.vraagOntsluiting(Object.assign({ drager: b.drager, sleutel: b.sleutel }, gedeeld)) });
     } catch (e) { faal(res, e); }
   });
 

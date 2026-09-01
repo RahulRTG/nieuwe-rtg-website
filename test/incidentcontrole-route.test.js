@@ -18,6 +18,41 @@ test.before(async () => {
 });
 test.after(() => stop(srv && srv.child));
 
+
+/* DE CEREMONIE VOOR HET HUIS, in de vorm waarin een mens hem ook loopt.
+
+   `herstel` verlaagt de stand van het hele platform en staat sinds de
+   isolatielaag achter dezelfde ceremonie als de dragers eronder. Deze helper is
+   dus geen omweg om de toets weer groen te krijgen -- hij IS de nieuwe weg, en
+   dat hij hier zoveel regels kost, is precies wat de grens waard is.
+
+   In deze opstelling is er EEN eigenaar en niemand op de handmatige
+   toegangslijst. De ceremonie merkt dat en gaat door als NOODONTSLUITING: het
+   tweede paar ogen wordt niet gevraagd, maar de ontsluiting draagt een merk dat
+   blijft staan. Dat is met opzet zo -- een eis die in een opstelling met een
+   eigenaar nooit te halen is, maakt het platform onherstelbaar. De toets kijkt
+   dus ook na DAT het merk er staat. */
+async function ceremonie(van, reden) {
+  const v = await post('/api/techniek/isolatie/ontsluiting', {
+    drager: 'huis', van: van, naar: 'normaal', reden: reden
+  }, token);
+  assert.equal(v.status, 200, JSON.stringify(v.body));
+  const verzoek = v.body.verzoek;
+  assert.equal(verzoek.noodontsluiting, true, 'een opstelling met een eigenaar hoort dit te merken');
+  assert.ok(!verzoek.vereisten.includes('tweedePaarOgen'));
+  /* De stappen komen UIT het verzoek en staan hier niet overgetypt. De eisen
+     hangen af van hoe zwaar de overgang is -- van `beperkt` naar `normaal` vraagt
+     minder dan vanuit `isolatie` -- en een toets die zijn eigen lijst meebrengt,
+     zou een verzwaring van die eisen niet merken. */
+  for (const soort of verzoek.vereisten) {
+    if (soort === 'reden' || soort === 'wachttijd') continue;
+    const r = await post('/api/techniek/isolatie/ontsluiting/stap',
+      { id: verzoek.id, soort: soort, bewijs: 'proef' }, token);
+    assert.equal(r.status, 200, soort + ': ' + JSON.stringify(r.body));
+  }
+  return verzoek.id;
+}
+
 test('de controlelaag is alleen voor de eigenaar en toont code plus routes', async () => {
   assert.equal((await fetch(srv.base + '/api/techniek/controle/status')).status, 401);
   const r = await fetch(srv.base + '/api/techniek/controle/status', { headers: { Authorization: 'Bearer ' + token } });
@@ -41,8 +76,17 @@ test('gericht dichtzetten blokkeert direct en herstel zet de oude stand terug', 
   assert.equal((await post('/api/techniek/controle/incident', {
     actie: 'herstel', reden: 'Onderzoek afgerond en schone code bevestigd', bevestiging: 'verkeerd'
   }, token)).status, 400);
-  const herstel = await post('/api/techniek/controle/incident', {
+  /* Zonder ceremonie komt herstel er niet meer langs, en de getypte zin is
+     daarvoor niet genoeg -- die is nog maar de rem tegen een misklik. */
+  const zonder = await post('/api/techniek/controle/incident', {
     actie: 'herstel', reden: 'Onderzoek afgerond en schone code bevestigd', bevestiging: 'HERSTEL RTG'
+  }, token);
+  assert.equal(zonder.status, 400, JSON.stringify(zonder.body));
+  assert.match(zonder.body.error, /ontsluitceremonie/);
+
+  const herstel = await post('/api/techniek/controle/incident', {
+    actie: 'herstel', reden: 'Onderzoek afgerond en schone code bevestigd', bevestiging: 'HERSTEL RTG',
+    ceremonie: await ceremonie('beperkt', 'Onderzoek afgerond en schone code bevestigd')
   }, token);
   assert.equal(herstel.status, 200);
   assert.equal(herstel.body.incident.modus, 'normaal');
@@ -61,7 +105,8 @@ test('volledige isolatie laat health en de herstelkamer bereikbaar', async () =>
     headers: { Authorization: 'Bearer ' + token } })).status, 200);
   assert.equal((await post('/api/foundation/gezin/maak', { gezinsnaam: 'X' })).status, 503);
   const terug = await post('/api/techniek/controle/incident', {
-    actie: 'herstel', reden: 'Schone release hersteld en volledig gecontroleerd', bevestiging: 'HERSTEL RTG'
+    actie: 'herstel', reden: 'Schone release hersteld en volledig gecontroleerd', bevestiging: 'HERSTEL RTG',
+    ceremonie: await ceremonie('isolatie', 'Schone release hersteld en volledig gecontroleerd')
   }, token);
   assert.equal(terug.status, 200);
   assert.equal(terug.body.incident.modus, 'normaal');

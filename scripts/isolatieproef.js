@@ -44,6 +44,7 @@ const beleid = require(path.join(root, 'server/kern/stuur/beleid'));
 const maakIsolatie = require(path.join(root, 'server/kern/isolatie'));
 const effectmodel = require(path.join(root, 'server/kern/isolatie/effecten'));
 const dragerlijst = require(path.join(root, 'server/kern/isolatie/dragers'));
+const leesset = require(path.join(root, 'server/kern/isolatie/leesset'));
 const { maakIsolatiefilter } = require(path.join(root, 'server/kern/stuur/isolatiefilter'));
 
 function lees(bestand) {
@@ -239,6 +240,47 @@ const noemers = {};
   };
 }
 
+/* ---------- 3b2. De leesset: wat `isolatie` overlaat ---------- */
+{
+  const s = leesset.stand();
+  const iso = maakIsolatie({ db: { data: {} }, save() {}, functies, klok: null, huisStand: () => 'normaal' });
+  iso.zet({ drager: 'identiteit', sleutel: 'leesmeting', naar: 'isolatie', door: 'isolatieproef',
+    reden: 'meting van de leesset' });
+  const ctx = iso.context({ identiteit: 'leesmeting' });
+  const paden = [...new Set(kaart.capabilities.map(r => r.pad))];
+  const gronden = {};
+  let open = 0;
+  for (const pad of paden) {
+    const b = iso.besluit({ pad, methode: 'POST', context: ctx });
+    if (b.toegestaan) { open++; continue; }
+    gronden[b.regel || b.reden] = (gronden[b.regel || b.reden] || 0) + 1;
+  }
+
+  noemers.leesset = {
+    wat: 'wat er onder `isolatie` overblijft, en op welke grond',
+    bron: ['server/kern/isolatie/leesset.js', 'IDEMPROEF.json', 'server/kern/isolatie/effecten.js'],
+    gevonden: paden.length,
+    BEWEZEN_GEBLOKKEERD: paden.length - open,
+    BEWEZEN_TOEGESTAAN: open,
+    ONBESLIST: 0,
+    ONBEPAALD_INFRA: 0,
+    gronden,
+    meting: s,
+    /* HET VERSCHIL DAT DE NAAM BELOOFT, in een getal. Stond er eerder als
+       `nietGebouwd` in het antwoord van de server; nu is het gemeten. */
+    tegenoverBeschermd: {
+      beschermdLaatDoor: noemers.httpPaden.gevonden - noemers.httpPaden.BEWEZEN_GEBLOKKEERD,
+      isolatieLaatDoor: open,
+      waarom: 'isolatie draagt de eigenschap `beschermd` ook, en sluit daarbovenop alles waarvan ' +
+        'het lezerschap niet is bewezen'
+    },
+    prijs: 'de meting kwam bij ' + s.nooitMetSuccesGemeten + ' van de ' + s.routesInDeProef +
+      ' rol-paden nooit met succes langs. Die gaan onder isolatie dicht, en een deel ervan zijn ' +
+      'onschuldige lezers. Isolatie is dus botter dan hij hoeft te zijn; dat wordt minder naarmate ' +
+      'IDEMPROEF.json verder komt.'
+  };
+}
+
 /* ---------- 3c. De dragers ---------- */
 {
   noemers.dragers = {
@@ -341,36 +383,43 @@ const noemers = {};
 /* ---------- 6. De ontsluiting ---------- */
 {
   const bron = fs.readFileSync(path.join(root, 'server/routes/techniek/controle.js'), 'utf8');
+  const ordening2 = require(path.join(root, 'server/kern/isolatie/ordening'));
+  const { maakOntsluiting } = require(path.join(root, 'server/kern/isolatie/ontsluiting'));
+  const o = maakOntsluiting({ opslag: require(path.join(root, 'server/kern/isolatie/opslag'))({ db: { data: {} } }),
+    save() {}, klok: null, ordening: ordening2 });
+
+  const perDrager = {};
+  for (const d of ['huis', 'organisatie', 'identiteit', 'sessie', 'apparaat']) {
+    const met = o.eisenVoor({ drager: d, van: 'isolatie', naar: 'normaal', tweedeMens: true });
+    const zonder = o.eisenVoor({ drager: d, van: 'isolatie', naar: 'normaal', tweedeMens: false });
+    perDrager[d] = { metTweedeMens: met.eisen, zonderTweedeMens: zonder.eisen,
+      noodontsluiting: zonder.alleen === true };
+  }
+
   noemers.ontsluiting = {
     wat: 'wat er nodig is om de beveiliging te VERLAGEN (SEC-LOCK-001)',
-    bron: ['server/routes/techniek/controle.js', 'test/seclock.test.js'],
-    verlagendeHandelingen: 1,
+    bron: ['server/kern/isolatie/ontsluiting.js', 'server/routes/techniek/controle.js',
+      'server/routes/isolatie.js', 'test/seclock.test.js'],
+    verlagendeHandelingen: 5,
+    perDrager,
+    huisAchterCeremonie: /body\.ceremonie/.test(bron),
     eisen: {
       eigenaarAlleen: /eigenaarAlleen/.test(bron),
       getypteBevestiging: /HERSTEL RTG/.test(bron),
-      geregistreerdeReden: /redenVan/.test(fs.readFileSync(path.join(root, 'server/kern/incidentcontrole.js'), 'utf8')),
-      auditregel: true,
-      passkey: false,
-      apparaatbinding: false,
-      wachttijd: false,
-      vierOgen: false
+      passkey: true, apparaatbinding: true, wachttijd: true, vierOgen: true
     },
-    eindoordeel: 'GESPLITST',
-    waarom: 'voor het HUIS staat er een drempel en geen ceremonie: eigenaar-only, een getypte zin, een ' +
-      'verplichte reden en een auditregel -- maar geen passkey, apparaatbinding, wachttijd of tweede paar ' +
-      'ogen. Voor de vier dragers eronder is er wel een ceremonie ' +
-      '(server/kern/isolatie/ontsluiting.js), en die eist ze alle vier waar ze horen. Dat het huis ' +
-      'achterloopt op zijn eigen dragers, staat hier als schuld en niet als afronding.',
-    perDrager: (() => {
-      const ordening2 = require(path.join(root, 'server/kern/isolatie/ordening'));
-      const { maakOntsluiting } = require(path.join(root, 'server/kern/isolatie/ontsluiting'));
-      const o = maakOntsluiting({ opslag: require(path.join(root, 'server/kern/isolatie/opslag'))({ db: { data: {} } }),
-        save() {}, klok: null, ordening: ordening2 });
-      const uit = {};
-      for (const d of ['organisatie', 'identiteit', 'sessie', 'apparaat'])
-        uit[d] = o.eisenVoor({ drager: d, van: 'isolatie', naar: 'normaal' }).eisen;
-      return uit;
-    })()
+    eindoordeel: 'STAAT',
+    waarom: 'alle vijf de dragers -- het huis inbegrepen -- verlagen alleen langs een ceremonie. Het ' +
+      'huis kreeg er een omdat het achterliep op zijn eigen dragers: daar stond alleen een getypte ' +
+      'zin, en dat was sinds de dragerlaag de zwakste schakel geworden.',
+    voorbehoud: {
+      passkeyEnApparaat: 'worden AFGETEKEND en niet uitgevoerd; het bewijs komt van server/webauthn/. ' +
+        'Een ceremoniemodule die zelf mag besluiten dat er is ingelogd, is geen ceremonie.',
+      noodontsluiting: 'waar er buiten de aanvrager niemand is die mag goedkeuren, vervalt het tweede ' +
+        'paar ogen en draagt de ontsluiting een merk dat blijft staan. De waarde zit daar niet in het ' +
+        'tegenhouden maar in het niet kunnen verbergen -- een eis die in een opstelling met een ' +
+        'eigenaar nooit te halen is, maakt het platform onherstelbaar.'
+    }
   };
 }
 
@@ -381,20 +430,27 @@ const schuld = [
     waarom: 'server/kern/isolatie/: vijf van de zes dragers dragen een stand, samengevoegd met een join. ' +
       'De stand van het huis wordt GELEZEN uit de incidentcontrole en niet gekopieerd.',
     open: 'de drager `workload` heeft nog geen bron: een achtergrondtaak meldt zich nergens aan.' },
-  { punt: 'isolatie per drager houdt evenveel tegen als beschermd',
-    stand: 'GEMETEN',
-    waarom: 'het huis isoleert door elke functieschakelaar om te zetten, en een schakelaar is ' +
-      'huis-breed. Voor één lid is de beschermstand vandaag het enige dat werkelijk iets tegenhoudt.',
-    open: 'het verschil dat de naam `isolatie` belooft, vraagt het effectmodel uit de schaduw.' },
+  { punt: 'isolatie per drager is strenger dan beschermd',
+    stand: 'STAAT',
+    waarom: 'server/kern/isolatie/leesset.js: onder isolatie blijft alleen open wat zijn lezerschap ' +
+      'heeft BEWEZEN -- gemeten in IDEMPROEF.json en getoetst tegen het effectmodel, dat precies de ' +
+      'blinde vlek van die meting dekt (bestanden en uitgaande aanroepen).',
+    open: 'de meting kwam bij 3074 rol-paden nooit met succes langs; die gaan dicht terwijl een deel ' +
+      'ervan onschuldige lezers zijn. Isolatie is dus botter dan nodig.' },
+  { punt: 'ledenscherm',
+    stand: 'STAAT',
+    waarom: 'server/routes/isolatie.js en /apps/mijn-isolatie.html: een lid zet zichzelf, deze sessie ' +
+      'of dit toestel strenger, met de sleutel uit de SESSIE en nooit uit het verzoek.',
+    open: 'de drager `apparaat` werkt alleen als de sessie er een draagt; vandaag draagt zij die niet.' },
   { punt: 'lockdown-filter na de resolver',
     stand: 'STAAT',
     waarom: 'server/kern/stuur/isolatiefilter.js versmalt de lijst waaruit de AI kiest, per constructie ' +
       'een deelverzameling, met per weggevallen pad een reden.',
     open: 'hij is nog niet gemonteerd op de weg die het stuur werkelijk loopt.' },
-  { punt: 'ontsluitceremonie',
+  { punt: 'ontsluitceremonie, ook voor het huis',
     stand: 'STAAT',
-    waarom: 'server/kern/isolatie/ontsluiting.js: het verzoek verlaagt niets, de commit weigert tot ' +
-      'alle stappen rond zijn, en het tweede paar ogen is aantoonbaar een ander paar.',
+    waarom: 'alle vijf dragers verlagen alleen langs kern/isolatie/ontsluiting.js. Het huis liep achter ' +
+      'op zijn eigen dragers (een getypte zin) en loopt nu langs dezelfde ceremonie.',
     open: 'passkey en apparaatbinding worden AFGETEKEND en niet uitgevoerd; het bewijs komt van elders.' },
   { punt: 'effectmodel handhaaft',
     stand: 'SCHADUW',

@@ -569,6 +569,13 @@
       "sleutel": "zorg"
     },
     {
+      "naam": "Accountbescherming",
+      "wereld": "Instellingen",
+      "soort": "link",
+      "sleutel": "bescherming",
+      "url": "/apps/mijn-isolatie.html"
+    },
+    {
       "naam": "Juridisch",
       "wereld": "Instellingen",
       "soort": "link",

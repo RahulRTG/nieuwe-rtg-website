@@ -17,10 +17,16 @@
       "open": "de drager `workload` heeft nog geen bron: een achtergrondtaak meldt zich nergens aan."
     },
     {
-      "punt": "isolatie per drager houdt evenveel tegen als beschermd",
-      "stand": "GEMETEN",
-      "waarom": "het huis isoleert door elke functieschakelaar om te zetten, en een schakelaar is huis-breed. Voor één lid is de beschermstand vandaag het enige dat werkelijk iets tegenhoudt.",
-      "open": "het verschil dat de naam `isolatie` belooft, vraagt het effectmodel uit de schaduw."
+      "punt": "isolatie per drager is strenger dan beschermd",
+      "stand": "STAAT",
+      "waarom": "server/kern/isolatie/leesset.js: onder isolatie blijft alleen open wat zijn lezerschap heeft BEWEZEN -- gemeten in IDEMPROEF.json en getoetst tegen het effectmodel, dat precies de blinde vlek van die meting dekt (bestanden en uitgaande aanroepen).",
+      "open": "de meting kwam bij 3074 rol-paden nooit met succes langs; die gaan dicht terwijl een deel ervan onschuldige lezers zijn. Isolatie is dus botter dan nodig."
+    },
+    {
+      "punt": "ledenscherm",
+      "stand": "STAAT",
+      "waarom": "server/routes/isolatie.js en /apps/mijn-isolatie.html: een lid zet zichzelf, deze sessie of dit toestel strenger, met de sleutel uit de SESSIE en nooit uit het verzoek.",
+      "open": "de drager `apparaat` werkt alleen als de sessie er een draagt; vandaag draagt zij die niet."
     },
     {
       "punt": "lockdown-filter na de resolver",
@@ -29,9 +35,9 @@
       "open": "hij is nog niet gemonteerd op de weg die het stuur werkelijk loopt."
     },
     {
-      "punt": "ontsluitceremonie",
+      "punt": "ontsluitceremonie, ook voor het huis",
       "stand": "STAAT",
-      "waarom": "server/kern/isolatie/ontsluiting.js: het verzoek verlaagt niets, de commit weigert tot alle stappen rond zijn, en het tweede paar ogen is aantoonbaar een ander paar.",
+      "waarom": "alle vijf dragers verlagen alleen langs kern/isolatie/ontsluiting.js. Het huis liep achter op zijn eigen dragers (een getypte zin) en loopt nu langs dezelfde ceremonie.",
       "open": "passkey en apparaatbinding worden AFGETEKEND en niet uitgevoerd; het bewijs komt van elders."
     },
     {
@@ -326,10 +332,11 @@
         "isolatie": {
           "member": {
             "bereikbaar": 120,
-            "naFilter": 92,
-            "weggevallen": 28,
+            "naFilter": 47,
+            "weggevallen": 73,
             "regels": [
-              "Geld"
+              "Geld",
+              "NIET_BEWEZEN_LEZER"
             ]
           },
           "zonder-rol": {
@@ -346,10 +353,11 @@
           },
           "supplier": {
             "bereikbaar": 53,
-            "naFilter": 32,
-            "weggevallen": 21,
+            "naFilter": 13,
+            "weggevallen": 40,
             "regels": [
               "Geld",
+              "NIET_BEWEZEN_LEZER",
               "Partners (leveranciers)",
               "Personeel & integraties"
             ]
@@ -392,14 +400,14 @@
       "waarom": "CONTROLPLANE.md: een nieuwe handhavingsregel loopt eerst mee zonder te blokkeren. Deze getallen zijn de voorwaarde om hem ooit aan te zetten, niet het bewijs dat het al werkt.",
       "gevonden": 4643,
       "effectgraad": {
-        "verklaard": 282,
-        "vermoed": 1794,
-        "onbekend": 2567
+        "verklaard": 369,
+        "vermoed": 1761,
+        "onbekend": 2513
       },
-      "eens": 1195,
-      "onbekend": 2567,
-      "strenger": 865,
-      "losser": 16,
+      "eens": 1238,
+      "onbekend": 2513,
+      "strenger": 854,
+      "losser": 38,
       "geenSom": "strenger, losser en onbekend vragen om drie verschillende dingen en worden nooit opgeteld",
       "blindEnVerzwakkend": {
         "aantal": 46,
@@ -548,96 +556,134 @@
       ],
       "voorbeeldLosser": [
         {
-          "pad": "/api/supplier/charter/foto",
-          "regel": "Partners (leveranciers)",
+          "pad": "/api/member/ai/beleid",
+          "regel": "Geld",
           "effecten": [
-            "ONVERTROUWDE_BYTES"
+            "UITGAANDE_AANROEP"
           ],
           "graad": "verklaard",
           "geraakt": []
         },
         {
-          "pad": "/api/supplier/charter/fotos",
-          "regel": "Partners (leveranciers)",
+          "pad": "/api/member/ai/bundel",
+          "regel": "Geld",
           "effecten": [
-            "ONVERTROUWDE_BYTES"
+            "UITGAANDE_AANROEP"
           ],
           "graad": "verklaard",
           "geraakt": []
         },
         {
-          "pad": "/api/supplier/facturen/pdf",
-          "regel": "Partners (leveranciers)",
+          "pad": "/api/member/ai/bundels",
+          "regel": "Geld",
           "effecten": [
-            "ONVERTROUWDE_BYTES"
+            "UITGAANDE_AANROEP"
           ],
           "graad": "verklaard",
           "geraakt": []
         },
         {
-          "pad": "/api/supplier/finance/export",
-          "regel": "Partners (leveranciers)",
+          "pad": "/api/member/ai/tegoed",
+          "regel": "Geld",
           "effecten": [
-            "BULK_UITVOER"
+            "UITGAANDE_AANROEP"
           ],
           "graad": "verklaard",
           "geraakt": []
         },
         {
-          "pad": "/api/supplier/horeca/dagbeeld",
-          "regel": "Partners (leveranciers)",
+          "pad": "/api/onboarding/config/ai",
+          "regel": "Identiteit en veiligheid",
           "effecten": [
-            "ONVERTROUWDE_BYTES"
+            "UITGAANDE_AANROEP"
           ],
           "graad": "verklaard",
           "geraakt": []
         },
         {
-          "pad": "/api/supplier/huur/foto",
+          "pad": "/api/supplier/advies",
           "regel": "Partners (leveranciers)",
           "effecten": [
-            "ONVERTROUWDE_BYTES"
+            "UITGAANDE_AANROEP"
           ],
           "graad": "verklaard",
           "geraakt": []
         },
         {
-          "pad": "/api/supplier/huur/fotos",
+          "pad": "/api/supplier/advies/afspraak",
           "regel": "Partners (leveranciers)",
           "effecten": [
-            "ONVERTROUWDE_BYTES"
+            "UITGAANDE_AANROEP"
           ],
           "graad": "verklaard",
           "geraakt": []
         },
         {
-          "pad": "/api/supplier/keten/rampbeeld",
+          "pad": "/api/supplier/advies/dossier",
           "regel": "Partners (leveranciers)",
           "effecten": [
-            "ONVERTROUWDE_BYTES"
+            "UITGAANDE_AANROEP"
           ],
           "graad": "verklaard",
           "geraakt": []
         },
         {
-          "pad": "/api/supplier/keten/rampbeeld/ai",
+          "pad": "/api/supplier/advies/dossier/status",
           "regel": "Partners (leveranciers)",
           "effecten": [
-            "ONVERTROUWDE_BYTES"
+            "UITGAANDE_AANROEP"
           ],
           "graad": "verklaard",
           "geraakt": []
         },
         {
-          "pad": "/api/supplier/keten/rampbeeld/evaluatie",
+          "pad": "/api/supplier/agenda/ai",
           "regel": "Partners (leveranciers)",
           "effecten": [
-            "ONVERTROUWDE_BYTES"
+            "UITGAANDE_AANROEP"
           ],
           "graad": "verklaard",
           "geraakt": []
         }
       ]
+    },
+    "leesset": {
+      "wat": "wat er onder `isolatie` overblijft, en op welke grond",
+      "bron": [
+        "server/kern/isolatie/leesset.js",
+        "IDEMPROEF.json",
+        "server/kern/isolatie/effecten.js"
+      ],
+      "gevonden": 4643,
+      "BEWEZEN_GEBLOKKEERD": 3702,
+      "BEWEZEN_TOEGESTAAN": 941,
+      "ONBESLIST": 0,
+      "ONBEPAALD_INFRA": 0,
+      "gronden": {
+        "NIET_BEWEZEN_LEZER": 2491,
+        "Toegang en identiteit": 50,
+        "EFFECT_GESLOTEN": 63,
+        "Geld": 92,
+        "Betalen & verificatie": 30,
+        "Personeel & integraties": 31,
+        "Identiteit en veiligheid": 23,
+        "Partners (leveranciers)": 922
+      },
+      "meting": {
+        "routesInDeProef": 4643,
+        "metSuccesGemeten": 1569,
+        "bewezenLezers": 1236,
+        "nooitMetSuccesGemeten": 3074,
+        "ontbreekt": null,
+        "kost": "wat nooit met succes is gemeten, gaat onder isolatie dicht. Een deel daarvan zijn onschuldige lezers, dus isolatie is botter dan hij hoeft te zijn. Dat wordt minder naarmate IDEMPROEF.json verder komt, niet naarmate deze module slimmer wordt.",
+        "verouderingsrichting": "strenger: een pad dat nog niet in de meting staat, is niet bewezen en gaat dicht"
+      },
+      "tegenoverBeschermd": {
+        "beschermdLaatDoor": 3495,
+        "isolatieLaatDoor": 941,
+        "waarom": "isolatie draagt de eigenschap `beschermd` ook, en sluit daarbovenop alles waarvan het lezerschap niet is bewezen"
+      },
+      "prijs": "de meting kwam bij 3074 van de 4643 rol-paden nooit met succes langs. Die gaan onder isolatie dicht, en een deel ervan zijn onschuldige lezers. Isolatie is dus botter dan hij hoeft te zijn; dat wordt minder naarmate IDEMPROEF.json verder komt."
     },
     "dragers": {
       "wat": "de zes dragers waarop een stand kan staan",
@@ -961,46 +1007,97 @@
     "ontsluiting": {
       "wat": "wat er nodig is om de beveiliging te VERLAGEN (SEC-LOCK-001)",
       "bron": [
+        "server/kern/isolatie/ontsluiting.js",
         "server/routes/techniek/controle.js",
+        "server/routes/isolatie.js",
         "test/seclock.test.js"
       ],
-      "verlagendeHandelingen": 1,
+      "verlagendeHandelingen": 5,
+      "perDrager": {
+        "huis": {
+          "metTweedeMens": [
+            "reden",
+            "passkey",
+            "apparaat",
+            "tweedePaarOgen"
+          ],
+          "zonderTweedeMens": [
+            "reden",
+            "passkey",
+            "apparaat"
+          ],
+          "noodontsluiting": true
+        },
+        "organisatie": {
+          "metTweedeMens": [
+            "reden",
+            "passkey",
+            "apparaat",
+            "tweedePaarOgen"
+          ],
+          "zonderTweedeMens": [
+            "reden",
+            "passkey",
+            "apparaat"
+          ],
+          "noodontsluiting": true
+        },
+        "identiteit": {
+          "metTweedeMens": [
+            "reden",
+            "passkey",
+            "apparaat",
+            "wachttijd"
+          ],
+          "zonderTweedeMens": [
+            "reden",
+            "passkey",
+            "apparaat",
+            "wachttijd"
+          ],
+          "noodontsluiting": false
+        },
+        "sessie": {
+          "metTweedeMens": [
+            "reden",
+            "passkey",
+            "apparaat"
+          ],
+          "zonderTweedeMens": [
+            "reden",
+            "passkey",
+            "apparaat"
+          ],
+          "noodontsluiting": false
+        },
+        "apparaat": {
+          "metTweedeMens": [
+            "reden",
+            "passkey",
+            "apparaat"
+          ],
+          "zonderTweedeMens": [
+            "reden",
+            "passkey",
+            "apparaat"
+          ],
+          "noodontsluiting": false
+        }
+      },
+      "huisAchterCeremonie": true,
       "eisen": {
         "eigenaarAlleen": true,
         "getypteBevestiging": true,
-        "geregistreerdeReden": true,
-        "auditregel": true,
-        "passkey": false,
-        "apparaatbinding": false,
-        "wachttijd": false,
-        "vierOgen": false
+        "passkey": true,
+        "apparaatbinding": true,
+        "wachttijd": true,
+        "vierOgen": true
       },
-      "eindoordeel": "GESPLITST",
-      "waarom": "voor het HUIS staat er een drempel en geen ceremonie: eigenaar-only, een getypte zin, een verplichte reden en een auditregel -- maar geen passkey, apparaatbinding, wachttijd of tweede paar ogen. Voor de vier dragers eronder is er wel een ceremonie (server/kern/isolatie/ontsluiting.js), en die eist ze alle vier waar ze horen. Dat het huis achterloopt op zijn eigen dragers, staat hier als schuld en niet als afronding.",
-      "perDrager": {
-        "organisatie": [
-          "reden",
-          "passkey",
-          "apparaat",
-          "wachttijd",
-          "tweedePaarOgen"
-        ],
-        "identiteit": [
-          "reden",
-          "passkey",
-          "apparaat",
-          "wachttijd"
-        ],
-        "sessie": [
-          "reden",
-          "passkey",
-          "apparaat"
-        ],
-        "apparaat": [
-          "reden",
-          "passkey",
-          "apparaat"
-        ]
+      "eindoordeel": "STAAT",
+      "waarom": "alle vijf de dragers -- het huis inbegrepen -- verlagen alleen langs een ceremonie. Het huis kreeg er een omdat het achterliep op zijn eigen dragers: daar stond alleen een getypte zin, en dat was sinds de dragerlaag de zwakste schakel geworden.",
+      "voorbehoud": {
+        "passkeyEnApparaat": "worden AFGETEKEND en niet uitgevoerd; het bewijs komt van server/webauthn/. Een ceremoniemodule die zelf mag besluiten dat er is ingelogd, is geen ceremonie.",
+        "noodontsluiting": "waar er buiten de aanvrager niemand is die mag goedkeuren, vervalt het tweede paar ogen en draagt de ontsluiting een merk dat blijft staan. De waarde zit daar niet in het tegenhouden maar in het niet kunnen verbergen -- een eis die in een opstelling met een eigenaar nooit te halen is, maakt het platform onherstelbaar."
       }
     }
   }

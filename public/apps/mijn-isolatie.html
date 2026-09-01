@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG · Mijn bescherming</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+  :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--card2:var(--rtg-card2);--line:var(--rtg-line);
+    --txt:var(--rtg-txt);--muted:var(--rtg-muted);--soft:var(--rtg-soft);--gold:#C9A24B;
+    --groen:#3BA55D;--oranje:#D6A32E;--rood:#D6455F;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.6;}
+  a{color:var(--rtg-leesgoud,var(--gold));}
+  .skip{position:absolute;left:.6rem;top:-3rem;z-index:60;background:var(--gold);color:#0C0C0B;padding:.5rem .9rem;border-radius:0;font-weight:700;text-decoration:none;transition:top .15s;}
+  .skip:focus{top:0;}
+  :focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  .wrap{max-width:44rem;margin:0 auto;padding:2.6rem 1.2rem 5rem;}
+  h1{font-family:'Bodoni Moda',Georgia,serif;font-size:2.1rem;font-weight:400;letter-spacing:-.01em;}
+  .lead{color:var(--soft);margin-top:.5rem;font-size:.95rem;}
+  .sec{font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--soft);font-weight:700;margin:2.6rem 0 .8rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1.4rem;}
+  .nu{display:flex;align-items:center;gap:.8rem;}
+  .stip{width:.75rem;height:.75rem;border-radius:50%;flex-shrink:0;background:var(--soft);}
+  .stip.normaal{background:var(--groen);}
+  .stip.waakzaam{background:var(--oranje);}
+  .stip.beschermd{background:var(--gold);}
+  .stip.isolatie{background:var(--rood);}
+  .nu .naam{font-size:1.25rem;font-weight:600;}
+  .nu .bij{font-size:.85rem;color:var(--soft);}
+  .keuze{display:block;width:100%;text-align:left;background:var(--card2);border:1px solid var(--line);border-radius:0;padding:1rem 1.1rem;margin-top:.7rem;cursor:pointer;font-family:inherit;color:var(--txt);min-height:2.75rem;}
+  .keuze:hover{border-color:var(--gold);}
+  .keuze[disabled]{opacity:.45;cursor:not-allowed;}
+  .keuze .t{font-weight:600;font-size:.95rem;}
+  .keuze .u{font-size:.85rem;color:var(--soft);margin-top:.2rem;}
+  .veld{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:0;padding:.75rem .85rem;color:var(--txt);font-family:inherit;font-size:.92rem;min-height:2.75rem;}
+  label{display:block;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);font-weight:700;margin:1.1rem 0 .35rem;}
+  .melding{border:1px solid var(--line);border-left:3px solid var(--gold);background:var(--card2);padding:.9rem 1rem;font-size:.9rem;margin-top:1.2rem;}
+  .melding.fout{border-left-color:var(--rood);}
+  .melding.goed{border-left-color:var(--groen);}
+  .voet{font-size:.85rem;color:var(--soft);margin-top:.7rem;}
+  .stap{display:flex;align-items:center;gap:.7rem;padding:.6rem 0;border-top:1px solid var(--line);font-size:.9rem;}
+  .stap:first-child{border-top:none;}
+  .vink{width:1.15rem;height:1.15rem;border-radius:50%;border:1px solid var(--line);flex-shrink:0;}
+  .vink.klaar{background:var(--groen);border-color:var(--groen);}
+  .knop{background:var(--gold);color:#0C0C0B;border:none;border-radius:0;padding:.75rem 1.1rem;font-weight:600;font-size:.88rem;cursor:pointer;font-family:inherit;min-height:2.75rem;}
+  .knop.grijs{background:var(--card2);color:var(--txt);border:1px solid var(--line);}
+  .knop[disabled]{opacity:.45;cursor:not-allowed;}
+</style>
+</head>
+<body>
+<a class="skip" href="#hoofd">Naar de inhoud</a>
+<main id="hoofd" class="wrap">
+  <h1>Mijn bescherming</h1>
+  <p class="lead">Denk je dat er iets mis is met je account? Zet jezelf hier strenger.
+    Dat werkt meteen, en je hoeft niemand te bellen.</p>
+
+  <div id="melding" hidden></div>
+
+  <h2 class="sec">Hoe je nu staat</h2>
+  <div class="kaart">
+    <div class="nu" id="nu"></div>
+    <p class="voet" id="nuvoet"></p>
+  </div>
+
+  <h2 class="sec">Strenger zetten</h2>
+  <div class="kaart" id="keuzes"></div>
+
+  <h2 class="sec">Weer terug</h2>
+  <div class="kaart" id="terug"></div>
+</main>
+<script src="/shared/basis.js"></script>
+<script src="/shared/metgezel.js"></script>
+<script src="/apps/mijn-isolatie.js"></script>
+</body>
+</html>

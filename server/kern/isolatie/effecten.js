@@ -79,42 +79,7 @@ const TREDE_WAAROM = Object.freeze({
   beperkt:  'beperkt sluit gericht per functie en niet per effect; wat er dichtgaat staat in het incident zelf'
 });
 
-/* ---------------------------------------------------------------------------
-   WAT PADEN VERKLAREN. Klein begonnen en met een grond per regel: een register
-   dat in één ronde volloopt met vermoedens, is een register dat niemand meer
-   durft af te dwingen.
-   ------------------------------------------------------------------------ */
-const VERKLAARD = Object.freeze([
-  { patroon: /^\/api\/(pay|bank)\//,            effecten: ['GELD_BEWEGEN'],
-    grond: 'alles achter kern/pay/poort.js beweegt of legt een bedrag vast' },
-  { patroon: /^\/api\/appstore\/.*\/(start|draai|uitvoer)/, effecten: ['DERDENCODE_UITVOEREN'],
-    grond: 'APPSTORE.md: derdencode draait in de cel, en dat is het effect' },
-  { patroon: /^\/api\/techniek\//,              effecten: ['BEVEILIGING_VERZWAKKEN', 'RECHT_VERLENEN'],
-    grond: 'de techniekhoek zet standen, schakelaars en zekeringen' },
-  { patroon: /(zekering|incident|schakel|bevoegdheid|machtiging)/i, effecten: ['BEVEILIGING_VERZWAKKEN'],
-    grond: 'zelfde strekking, ongeacht waar het pad woont -- dit is precies wat een effectmodel moet doen' },
-  { patroon: /^\/api\/rtgid\//,                 effecten: ['IDENTITEIT_WIJZIGEN'],
-    grond: 'RTG iD is de identiteit zelf' },
-  { patroon: /(webhook|apikey|sleutel|oauth|sso|scim|koppel)/i, effecten: ['VERTROUWENSRELATIE_AANGAAN'],
-    grond: 'elk van deze maakt een blijvende relatie met iets buiten de sessie' },
-  { patroon: /(upload|bestand|document|foto|beeld|pdf|import)/i, effecten: ['ONVERTROUWDE_BYTES'],
-    grond: 'hier komen bytes binnen die niemand van ons heeft geschreven' },
-  { patroon: /(export|uitdraai|dump|archief)/i, effecten: ['BULK_UITVOER'],
-    grond: 'veel gegevens tegelijk naar buiten is een eigen effect, ook als elk stuk apart mocht' }
-]);
-
-/* Wat een categorie uit de functiecatalogus VERMOEDELIJK doet. Uitdrukkelijk
-   `vermoed`: de categorie zegt waar iets woont, en daaruit volgt hooguit een
-   verwachting. Wie dit als verklaring leest, heeft de graad weggegooid. */
-const PER_CATEGORIE = Object.freeze({
-  'Toegang en identiteit':     ['RECHT_VERLENEN', 'IDENTITEIT_WIJZIGEN'],
-  'Identiteit en veiligheid':  ['IDENTITEIT_WIJZIGEN'],
-  'Betalen & verificatie':     ['GELD_BEWEGEN'],
-  'Geld':                      ['GELD_BEWEGEN'],
-  'Partners (leveranciers)':   ['SCHRIJVEN_ANDERMANS'],
-  'Personeel & integraties':   ['SCHRIJVEN_ANDERMANS', 'VERTROUWENSRELATIE_AANGAAN'],
-  'RTG-Backoffice':            ['SCHRIJVEN_ANDERMANS', 'BEVEILIGING_VERZWAKKEN']
-});
+const { VERKLAARD, PER_CATEGORIE } = require('./effectregister');
 
 /* ---------------------------------------------------------------------------
    DE AFLEIDING.

@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '1b36fbf8';
+var RTG_BOUW = '8329d479';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -4098,6 +4098,11 @@ var RTG_BOUW = '1b36fbf8';
        geinstalleerde PWA komt nog steeds uit waar hij hoort. */
     ik:          { naam: 'Wie ben ik',   url: '/apps/ik.html' },
     veilig:      { naam: 'RTG Veilig',   url: '/apps/veilig.html' },
+    /* ACCOUNTbescherming en niet "Bescherming": `veilig` hierboven is de
+       veiligheid van een MENS (stil alarm, codewoord), dit die van een ACCOUNT.
+       Twee tegels die allebei "bescherming" heten, laten een lid op het
+       verkeerde moment op de verkeerde drukken. */
+    bescherming: { naam: 'Accountbescherming', url: '/apps/mijn-isolatie.html' },
     ov:          { naam: 'Openbaar vervoer',           url: '/apps/ov.html' },
     stad:        { naam: 'Stad',    url: '/apps/stad.html' },
     clips:       { naam: 'Video',        url: '/apps/clips.html' },
@@ -4237,6 +4242,12 @@ var RTG_BOUW = '1b36fbf8';
      tekenlaag aan te raken -- en zodat hier staat waarom hij leeg is. */
   const FUNCTIES = [];
 
+  /* Afgesplitst van app-main-24.js, dat over de 10 KB ging toen er een tegel
+     bijkwam. De snede loopt langs een echte grens: hierboven staat WAT er is
+     (de registry van alle apps), hieronder WAAR het hangt (de mappen), en hier
+     ertussen staat waarom die mappen zo werken. Dat het maar een blok
+     commentaar is, maakt het niet minder de juiste plek -- de uitleg hoort bij
+     de MAPPEN in app-main-24a2.js en niet bij de registry ervoor. */
   /* ---------- de mappen, boven de klok ----------
      Vier mappen, en daar zit alles in waar je pas je recht op geeft. Niets
      installeren: het staat er al. Wil je iets niet zien, dan zet je het uit
@@ -4343,7 +4354,7 @@ var RTG_BOUW = '1b36fbf8';
        in de voet. Vandaar `paneel`: geen vijfde wereldtegel, geen tweede
        instellingenscherm. wereldBij() in 29c filtert deze map er vanzelf uit. */
     { sleutel: 'map-instellingen', naam: 'Instellingen', paneel: '#osCcBtn', items: [
-      'link:ik', 'link:veilig', 'link:passkeys', 'link:juridisch'] },
+      'link:ik', 'link:veilig', 'link:passkeys', 'link:bescherming', 'link:juridisch'] },
     /* WORKOS IS EEN CONTEXT EN GEEN PRODUCT MET EEN PRIJS. De naam ging van
        "RTG Kantoor" naar WorkOS omdat er twee verschillende toegangsmodellen in
        dezelfde wereld wonen, en die verschillen mogen de wereld niet splitsen:

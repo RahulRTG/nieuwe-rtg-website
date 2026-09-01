@@ -136,6 +136,7 @@ De eerste ronde (1 september 2026):
 | Uitgaande bestemmingen | 43 | 0 | 0 | 43 |
 | Bestandsverwerkers | 45 | 0 | 0 | 45 |
 | AI-bereik (lid, onder `beschermd`) | 120 | 28 | 0 | 0 |
+| Onder `isolatie` (leesset) | 4643 | 3702 | 0 | 0 |
 | Schaduw: onenigheden | 4643 | 865 strenger | 16 losser | 2567 zonder profiel |
 | Dragers | 6 | 5 met bron | 1 zonder | 0 |
 
@@ -168,6 +169,7 @@ De acht open punten staan vooraan in het register, niet in een voetnoot.
 | `ordening.js` | wat is strenger dan wat, en wanneer is dat niet te zeggen |
 | `dragers.js` | de zes dragers, wie welke stand mag zetten |
 | `effecten.js` | wat een handeling **doet**, en wat een stand sluit — in de schaduw |
+| `leesset.js` | wat er onder `isolatie` overblijft, en waarom dat gemeten is |
 | `besluit.js` | het verklaarde besluit: waarom niet, en van wie |
 | `ontsluiting.js` | verlagen als protocol |
 | `opslag.js` | de enige deur naar `db.data` |
@@ -195,9 +197,35 @@ voordeel van de twijfel:
 
 | Drager | Eisen voor `isolatie → normaal` |
 |---|---|
-| organisatie | reden, passkey, apparaat, wachttijd (30 min), tweede paar ogen |
+| huis · organisatie | reden, passkey, apparaat, tweede paar ogen |
 | identiteit | reden, passkey, apparaat, wachttijd (10 min) |
 | sessie · apparaat | reden, passkey, apparaat |
+
+**Het huis heeft er nu ook een.** Het liep achter op zijn eigen dragers: `herstel`
+verlaagt de stand van het hele platform en vroeg alleen om eigenaar-only, een
+getypte zin en een reden. Die zin is nu de rem tegen een misklik; de grens is de
+ceremonie.
+
+**Waarom het huis géén wachttijd heeft, tegen de verwachting in.** De eerste
+opzet gaf het de langste — een uur — want het raakt iedereen. Dat is de verkeerde
+redenering en ze is duur: een wachttijd op het *herstel* van het platform is een
+zelf toegebrachte storing, en wie na een vals alarm een uur moet wachten, zet de
+isolatiestand de volgende keer niet aan. Waar een wachttijd vóór is — een echte
+eigenaar tijd geven om te merken dat iemand anders zijn beveiliging openzet —
+doet een **tweede mens** beter en meteen. Het huis en de organisatie ruilen de
+klok dus in voor vier ogen; de dragers eronder hebben geen tweede mens en houden
+de klok.
+
+**En waar die tweede mens niet bestaat.** In een opstelling met één eigenaar is
+vier ogen nooit te halen, en dan is het platform na een incident *onherstelbaar*
+— geen strenge beveiliging maar een storing die je zelf inbouwt. Zo'n eis wordt
+bovendien altijd omzeild: iemand maakt een tweede account om zichzelf goed te
+keuren, en dan is het principe een formaliteit mét een extra sleutel die
+rondslingert. Dus: bestaat er een tweede bevoegde mens, dan is hij verplicht;
+bestaat hij aantoonbaar niet, dan gaat het door als **noodontsluiting** — gemerkt,
+gemeld, en blijvend in het spoor. De waarde zit daar niet in het tegenhouden maar
+in het niet kunnen verbergen. Het is geen keuze van de aanvrager: hij levert het
+gegeven niet, de laag erboven telt het.
 
 Het tweede paar ogen is aantoonbaar een **ander** paar; zonder die regel voert
 dezelfde mens de vier-ogencontrole twee keer uit. **Verstrengen kent geen
@@ -223,6 +251,50 @@ om drie verschillende dingen.
 Een pad zonder profiel geeft **nooit** een lege lijst terug. Leeg leest als "dit
 doet niets", en dat is de gevaarlijkste zin in een beveiligingslaag.
 
+### Wat `isolatie` overlaat — en waarom dat gemeten is
+
+`beschermd` bevriest zes categorieën. `isolatie` moet strenger zijn, maar de voor
+de hand liggende regel — *alleen GET* — zet in dit huis alles dicht: er zijn 3728
+schrijfroutes tegenover 35 GET-routes, dus het **lezen loopt hier ook over POST**.
+Die regel zou een lid uitloggen in plaats van beschermen.
+
+De regel is daarom omgekeerd: **een pad moet zijn lezerschap verdienen.** Drie
+voorwaarden, alle drie:
+
+1. **Gemeten geen effect.** `IDEMPROEF.json` draaide een kale oproep tegen de
+   draaiende server en keek daarna in de opslag. Een pad dat werkelijk werk deed
+   (2xx) en geen enkele collectie bewoog, is een lezer — gemeten, niet gevonden.
+   Dat zijn er **1236**.
+2. **Het effectmodel ziet er niets geslotens in.** Die meting noemt haar eigen
+   blinde vlek: `nietGemeten: bestand,externe-aanroep`. `/api/agenda/ai` bewoog
+   geen collectie en roept wél een model aan — dat kost geld en verlaat het huis.
+   De twee bronnen moeten het eens zijn; één ervan zou onvoldoende zijn.
+3. **De beschermstand laat het door**, want isolatie draagt die eigenschap ook.
+
+**Veroudering maakt dit register strenger en nooit losser**, en dat is waarom een
+bouwartefact hier wél de autoriteit mag zijn terwijl `kern/stuur/plan.js` dat
+uitdrukkelijk verbiedt. Daar is de kaart een lijst van wat *mag*: loopt zij
+achter, dan staat er iets open dat dicht hoorde. Hier is de meting een lijst van
+wat *bewezen onschadelijk* is: loopt zij achter, dan is een nieuw pad simpelweg
+niet bewezen en gaat het dicht.
+
+Het resultaat, over 4643 rol-paden: `beschermd` laat er **3495** door, `isolatie`
+nog **941**.
+
+**Wat dat kost, en dat hoort er even groot bij te staan.** 3074 paden zijn nooit
+met succes gemeten — de proef kwam er niet bij: geen wereld, geen object, geen
+rol. Die gaan onder isolatie dicht, en een deel ervan zijn onschuldige lezers.
+Isolatie is dus botter dan hij hoeft te zijn, en dat wordt minder naarmate
+`IDEMPROEF.json` verder komt — niet naarmate deze module slimmer wordt.
+
+> **Twee fouten die de eerste versie hier maakte.** Hij liet ook `vermoed`
+> blokkeren, en toen viel `/api/adres/zoek` dicht met de reden
+> `IDENTITEIT_WIJZIGEN` — want zijn functie zit in de categorie "Toegang en
+> identiteit". Een adres opzoeken wijzigt geen identiteit: een categorie zegt
+> waar iets *woont*, een gemeten kale oproep zegt wat het *doet*, en waar die
+> botsen wint de meting. En de AI-blinde vlek die hij claimde te dekken, dekte
+> hij niet: het effectmodel had geen regel voor een pad dat een model aanroept.
+
 ### Het isolatiefilter
 
 `kern/stuur/isolatiefilter.js`. Wat de beschermstand zou tegenhouden, staat niet
@@ -242,30 +314,47 @@ eigen afschrift ontneemt breekt de belofte dat het lezen doorloopt.
 niets uitvoert: wie besluit een klant dicht te zetten, hoort eerst te zien wat
 die klant dat kost. Dat is de reden dat het besluit verklaard is en geen boolean.
 
-Het is de eigenaar-console en niet het scherm van een lid. Een lid dat zijn eigen
-isolatie aanzet is een echte en goede functie, maar hij vraagt zijn eigen weg —
-ledenpoort, eigen scherm, eigen toon — en is dus geen parameter aan deze route.
-Hij staat als schuld en niet als een half werkende knop.
+### Het scherm van het lid
+
+`/apps/mijn-isolatie.html` (Instellingen → Accountbescherming), achter de gewone
+ledenpoort. Een aparte pagina en niet dezelfde met een vlag erbij: het kantoor
+doet *containment* — bij een verdenking iemand dichtzetten — en dit is het
+omgekeerde, een mens die zelf denkt dat er iets mis is. Andere handeling, andere
+toon ("je/jij"), andere bevoegdheid.
+
+**De enige regel die daar echt telt: de sleutel komt uit de sessie en nooit uit
+het verzoek.** Zou een lid zijn eigen sleutel mogen meesturen, dan kan hij de
+sessie van iemand anders in isolatie zetten — een aardig klinkende functie die in
+werkelijkheid een uitlogknop voor willekeurige leden is. Een lid zet alleen zijn
+eigen `identiteit`, `sessie` en `apparaat`; `organisatie` en `huis` niet.
+
+Verlagen loopt ook voor een lid langs de ceremonie, en dat is met opzet niet
+lichter gemaakt: juist bij een lid is het scenario dat zij moet vangen — iemand
+heeft de sessie overgenomen en zet de bescherming weer uit — het meest
+waarschijnlijk.
+
+De tegel heet **Accountbescherming** en niet "Bescherming": `RTG Veilig` staat
+ernaast en gaat over de veiligheid van een *mens* (stil alarm, codewoord). Twee
+tegels die allebei "bescherming" heten, laten een lid op het verkeerde moment op
+de verkeerde drukken.
 
 ## 5b. Wat hierna komt
 
 1. ~~SEC-LOCK-invarianten~~ · 2. ~~Eerlijke `ISOLATIEPROEF.json`~~ ·
-   3. ~~Drager-model~~ · 4. ~~Ontsluitceremonie~~ — **staan**
-5. **Het effectmodel uit de schaduw halen.** 2567 paden zonder profiel is de
+   3. ~~Drager-model~~ · 4. ~~Ontsluitceremonie~~ · 5. ~~`isolatie` echt strenger
+   dan `beschermd`~~ · 6. ~~Een ceremonie voor het huis~~ · 7. ~~Het scherm van
+   het lid~~ — **staan**
+8. **Het effectmodel uit de schaduw halen.** 2513 paden zonder profiel is de
    prijs; die moet omlaag voordat afdwingen iets anders is dan gokken.
-6. **`isolatie` per drager echt strenger maken dan `beschermd`.** Vandaag houden
-   ze even veel tegen — het huis isoleert door elke functieschakelaar om te
-   zetten, en een schakelaar is huis-breed. Dat staat als `nietGebouwd` in het
-   antwoord en niet als een stilte.
-7. **Een ceremonie voor het huis.** De vier dragers eronder hebben er een; het
-   huis heeft een getypte zin. Dat het huis achterloopt op zijn eigen dragers is
-   de scherpste openstaande schuld.
-8. **Invariant op onvertrouwde invoer** — *onvertrouwde inhoud kan de beschikbare
+9. **De leesset verbreden door de PROEF te verbeteren, niet de regel.** 3074
+   paden zijn nooit met succes gemeten en gaan daarom dicht; elk pad dat
+   `IDEMPROEF.json` erbij meet, maakt isolatie minder bot.
+10. **Invariant op onvertrouwde invoer** — *onvertrouwde inhoud kan de beschikbare
    capabilities nooit vergroten.* Voor een platform waarvan de AI kan handelen is
    dit de verdediging tegen indirecte prompt-injectie.
-9. **Uitrolbewijs** voor egress, parsers en netwerksegmentatie — de 88 regels die
+11. **Uitrolbewijs** voor egress, parsers en netwerksegmentatie — de 88 regels die
    `ONBEPAALD_INFRA` dragen.
-10. **Adaptieve escalatie** — pas hierna. `VERTROUWEN.json` staat op 0 bewezen en
+12. **Adaptieve escalatie** — pas hierna. `VERTROUWEN.json` staat op 0 bewezen en
    4180 verzwakt: een risicomotor die daarop stuurt, stuurt op niets.
 
 ## 6. Twee grenzen die niet mogen sneuvelen

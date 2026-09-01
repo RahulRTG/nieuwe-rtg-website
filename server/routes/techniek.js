@@ -91,9 +91,25 @@ module.exports = (kern) => {
      aan de historie verandert; een tweede keten voor de techniekkant zou de
      teller sparen en de regel dupliceren, en dat is precies de ruil die LAT.md
      regel 4 verbiedt. Hij staat als kernGedeeld in NORM.json, met deze reden. */
+  /* De isolatielaag wordt verderop gemount, maar de incidentcontrole heeft haar
+     ceremonie NU al nodig: `herstel` verlaagt de stand van het hele platform en
+     die weg hoort niet zwakker te zijn dan de weg waarlangs een lid zijn eigen
+     sessie ontsluit. Lui doorgegeven, want de laag bestaat op dit punt nog niet
+     -- hem hier bouwen zou een tweede exemplaar maken met een eigen lijst
+     ceremonies, en dan dekt een ceremonie die de een kent de ander niet. */
+  let isolatieDeel = null;
   const controle = require('./techniek/controle')({ app, db, save, beveilig,
     av: kern.antivirus, techAuth, eigenaarAlleen,
-    journaal: () => (kern.command ? kern.command.journaal : null) });
+    journaal: () => (kern.command ? kern.command.journaal : null),
+    ontsluitpoort: (vraag) => {
+      if (!isolatieDeel) {
+        const e = new Error('De isolatielaag is niet gemonteerd; de ceremonie voor het platform kan ' +
+          'niet worden nagekeken. Herstel loopt hier niet omheen.');
+        e.status = 503;
+        throw e;
+      }
+      return isolatieDeel.isolatie.huisCeremoniePoort(vraag);
+    } });
 
   /* Het statusbord staat in ./techniek/bord.js: het is een groot antwoord dat
      uit tien bronnen wordt samengesteld, en dat leest beter als een geheel dan
@@ -135,7 +151,7 @@ module.exports = (kern) => {
   /* De isolatiecockpit: dezelfde standen als de incidentcontrole, maar per
      DRAGER (organisatie, identiteit, sessie, apparaat) in plaats van huis-breed.
      Hij leest de huisstand uit de incidentcontrole en bezit hem niet. */
-  require('./techniek/isolatie')(tctx);
+  isolatieDeel = require('./techniek/isolatie')(tctx);
 
   // Hulp voor de kern: mag een door een zekering bewaakt subsysteem draaien?
   kern.zekeringMag = (id) => { const z = db.data.techniek && db.data.techniek.zekeringen && db.data.techniek.zekeringen[id]; return !z || z.aan !== false; };

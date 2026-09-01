@@ -1,25 +1,25 @@
 {
  "stempel": {
-  "op": "2026-09-01T18:28:58.912Z",
-  "commit": "6275c417",
+  "op": "2026-09-01T19:26:43.425Z",
+  "commit": "e9fb2ad5",
   "boomVuil": true,
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 4659,
-  "geclassificeerd": 4659,
+  "totaal": 4665,
+  "geclassificeerd": 4665,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3201,
-   "NOT_APPLICABLE": 1077,
-   "PROTECTED": 301,
-   "INTENTIONALLY_NON_IDEMPOTENT": 80
+   "NOT_APPLICABLE": 1078,
+   "PROTECTED": 305,
+   "INTENTIONALLY_NON_IDEMPOTENT": 81
   },
-  "vastgesteldDoorMens": 1485,
+  "vastgesteldDoorMens": 1491,
   "afgeleidDoorScript": 3174,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 3824,
+   "AUTHENTICATED": 3830,
    "PUBLIC": 104,
    "OBJECT_SCOPED": 716,
    "SERVICE_TO_SERVICE": 14,
@@ -29,7 +29,7 @@
    "kale ronde: beschermd": 120,
    "kale ronde: onbeschermd": 86,
    "kale ronde: geen uitspraak": 4437,
-   "niet gemeten": 16
+   "niet gemeten": 22
   },
   "voorstellen": {},
   "metingVan": "2026-08-31T09:44:33.117Z"
@@ -43,6 +43,42 @@
   },
   {
    "route": "POST /api/festival/scan",
+   "bedoeld": "OBJECT_SCOPED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/isolatie/mijn",
+   "bedoeld": "OBJECT_SCOPED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/isolatie/mijn/ontsluiting",
+   "bedoeld": "OBJECT_SCOPED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/isolatie/mijn/ontsluiting/afbreken",
+   "bedoeld": "OBJECT_SCOPED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/isolatie/mijn/ontsluiting/commit",
+   "bedoeld": "OBJECT_SCOPED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/isolatie/mijn/ontsluiting/stap",
+   "bedoeld": "OBJECT_SCOPED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/isolatie/mijn/zet",
    "bedoeld": "OBJECT_SCOPED",
    "waargenomen": "AUTHENTICATED",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
@@ -29238,6 +29274,132 @@
     "hindernis": null
    },
    "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "isolatie.mijn.lezen",
+   "route": "POST /api/isolatie/mijn",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "isolatie.mijn.ontsluiting.start",
+   "route": "POST /api/isolatie/mijn/ontsluiting",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "isolatie.mijn.ontsluiting.afbreken",
+   "route": "POST /api/isolatie/mijn/ontsluiting/afbreken",
+   "semantiek": {
+    "klasse": "hooguitEens"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "isolatie.mijn.ontsluiting.commit",
+   "route": "POST /api/isolatie/mijn/ontsluiting/commit",
+   "semantiek": {
+    "klasse": "hooguitEens"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "isolatie.mijn.ontsluiting.stap",
+   "route": "POST /api/isolatie/mijn/ontsluiting/stap",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "isolatie.mijn.zet",
+   "route": "POST /api/isolatie/mijn/zet",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null

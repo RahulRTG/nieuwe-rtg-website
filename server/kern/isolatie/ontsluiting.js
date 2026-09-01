@@ -34,20 +34,7 @@
 
 const crypto = require('crypto');
 
-/* De stappen die een ceremonie kan eisen. Elk met wie hem levert, want een
-   stap die het systeem zelf kan afvinken is geen stap. */
-const STAPPEN = Object.freeze({
-  reden:        { wie: 'de aanvrager', wat: 'een concrete reden van minimaal 8 tekens' },
-  passkey:      { wie: 'server/webauthn', wat: 'een geslaagde WebAuthn-bevestiging, buiten deze module' },
-  apparaat:     { wie: 'de sessie', wat: 'de handeling komt van een apparaat dat al vertrouwd was' },
-  wachttijd:    { wie: 'de klok', wat: 'een afkoelperiode waarin het verzoek zichtbaar openstaat' },
-  tweedePaarOgen: { wie: 'een tweede mens', wat: 'een andere actor dan de aanvrager keurt goed' }
-});
-
-/* Hoe lang de afkoelperiode duurt, per drager. Het huis raakt iedereen en
-   krijgt de langste; een lid dat zijn eigen isolatie opheft, wordt niet een uur
-   uit zijn eigen account gehouden. */
-const WACHTTIJD_MINUTEN = Object.freeze({ huis: 60, organisatie: 30, identiteit: 10, sessie: 0, apparaat: 0 });
+const { STAPPEN, WACHTTIJD_MINUTEN, eisenVoor } = require('./ceremonie-eisen');
 
 function maakOntsluiting({ opslag, save, klok, ordening }) {
   const nu = () => (klok && klok.datum ? klok.datum() : new Date());
@@ -57,31 +44,12 @@ function maakOntsluiting({ opslag, save, klok, ordening }) {
   /* WELKE EISEN GELDEN. Puur: dezelfde overgang geeft altijd hetzelfde antwoord,
      zodat een scherm hem vooraf kan tonen. Een mens die pas halverwege hoort dat
      er een tweede paar ogen bij moet, wacht een uur voor niets. */
-  function eisenVoor({ drager, van, naar }) {
-    const stap = ordening.verlaagt(van, naar);
-    if (!stap.verlaagt) {
-      return { verlaagt: false, eisen: [], waarom: 'dit verstrengt of laat gelijk; verhogen kent geen ceremonie' };
-    }
-    const eisen = ['reden', 'passkey'];
-    const zwaar = !stap.zeker || String(van) === 'isolatie' || String(van) === 'beschermd';
-    if (zwaar) eisen.push('apparaat');
-    if ((WACHTTIJD_MINUTEN[drager] || 0) > 0 && zwaar) eisen.push('wachttijd');
-    if (drager === 'huis' || drager === 'organisatie') eisen.push('tweedePaarOgen');
-    return {
-      verlaagt: true, zeker: stap.zeker, eisen,
-      wachttijdMinuten: eisen.includes('wachttijd') ? WACHTTIJD_MINUTEN[drager] : 0,
-      waarom: stap.zeker
-        ? 'dit verlaagt de stand van ' + van + ' naar ' + naar
-        : 'deze overgang is niet te ordenen en telt daarom als de zwaarste verlaging'
-    };
-  }
-
   function lijst() { return opslag.tak('ontsluitingen'); }
   function vind(id) { return lijst().find(v => v.id === String(id)) || null; }
 
   /* START. Bewaart een verzoek en verandert GEEN stand. */
-  function start({ drager, sleutel, van, naar, door, reden }) {
-    const eis = eisenVoor({ drager, van, naar });
+  function start({ drager, sleutel, van, naar, door, reden, tweedeMens }) {
+    const eis = eisenVoor({ drager, van, naar, tweedeMens });
     if (!eis.verlaagt) fout(400, 'Deze overgang verlaagt niets; verstrengen gaat zonder ceremonie.');
     const schoon = String(reden || '').trim().replace(/\s+/g, ' ').slice(0, 240);
     if (schoon.length < 8) fout(400, 'Geef een concrete reden van minimaal 8 tekens.');
@@ -93,6 +61,11 @@ function maakOntsluiting({ opslag, save, klok, ordening }) {
       aangevraagdDoor: String(door || 'onbekend').slice(0, 64),
       gestart: nu().toISOString(),
       vereisten: eis.eisen,
+      /* Het merk reist mee met het verzoek en wordt niet bij het aftekenen
+         opnieuw bepaald: anders kan iemand tussen aanvraag en commit de
+         toegangslijst leegmaken en zo van vier ogen twee maken. */
+      noodontsluiting: eis.alleen === true,
+      noodWaarom: eis.alleenWaarom,
       wachttijdMinuten: eis.wachttijdMinuten,
       voltooid: { reden: { at: nu().toISOString(), door: String(door || 'onbekend').slice(0, 64) } },
       reden: schoon,

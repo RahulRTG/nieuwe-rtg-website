@@ -90,6 +90,11 @@ async function leesActivatie(datamap, msMax, kenmerk) {
   return null;
 }
 
+/* Uit dezelfde bron als scripts/lib/proefsleutels.js: een tweede plek met een
+   eigen wachtwoord zou de eerste keer al uiteenlopen. */
+const OWNER_LOGIN = process.env.RTG_OWNER_LOGIN || 'Rahul';
+const OWNER_PASS = process.env.DEMO_PASS || 'Imran';
+
 const FAMILIES = [
   {
     naam: 'werkruimte',
@@ -172,7 +177,12 @@ const FAMILIES = [
       const besluit = await post('/api/office/foundation/registratie/besluit',
         { id, action: 'goedkeuren' }, tokens.boardroom);
       if (!besluit || !besluit.data || !besluit.data.ok) throw new Error('goedkeuren mislukte: ' + JSON.stringify(besluit && besluit.data).slice(0, 160));
-      if (!datamap) throw new Error('geen datamap meegegeven; de activatiesleutel staat op schijf');
+      /* GEEN DATAMAP IS GEEN FOUT. De activatiesleutel komt van schijf; draait
+         deze proef zonder datamap, dan KAN deze familie niet gebouwd worden en
+         dat is een eerlijke null. De stops hierboven en hieronder zijn wel
+         fouten: daar ging iets stuk dat had moeten werken. Zie
+         test/lijfsleutels.test.js, die precies dit onderscheid vastzet. */
+      if (!datamap) return null;
       const geheim = await leesActivatie(datamap, 8000, brin);
       if (!geheim) throw new Error('de activatiesleutel was niet uit de datamap te lezen');
       const act = await post('/api/foundation/school/school/activeren', { activatie: geheim }, null);
@@ -436,6 +446,59 @@ const FAMILIES = [
       const sleutel = r && r.data && r.data.sleutel;
       if (!sleutel) return null;
       return { __koppen: { 'x-rtg-toestel': sleutel } };
+    }
+  },
+  {
+    naam: 'tweefactor',
+    /* DE TWEEDE INLOGSTAP, en waarom die een eigen familie is.
+
+       /api/auth/tweede vraagt twee dingen die geen enkele rol meebrengt: een
+       `bewijs` (een kort actietoken dat zegt "het wachtwoord klopte", vijf
+       minuten geldig) en een `code`. Er is geen sessie waarmee je die deur
+       opent -- hij MAAKT de sessie. Zonder deze opstelling stond hij als enige
+       route in GEEN_PROEFSLEUTEL, en zoeken naar een sleutel had daar niets
+       opgelost: er is er geen, er is een keten.
+
+       De keten: tweede factor aanzetten op het eigenaarsaccount (begin ->
+       bevestig met een echte TOTP uit kern/totp.js), de herstelcodes opvangen
+       die `bevestig` eenmalig teruggeeft, en daarna opnieuw inloggen met het
+       wachtwoord -- dan antwoordt de inlog met `tweedeFactorNodig` en het
+       bewijs.
+
+       EEN HERSTELCODE EN NIET DE TOTP, met opzet: de proef roept deze route
+       meer dan eens aan, en een TOTP is binnen zijn venster van dertig seconden
+       gewoon nog geldig. Dan zou een tweede oproep 'het werk opnieuw doen'
+       heten terwijl het huis precies doet wat het hoort te doen. Een
+       herstelcode is eenmalig; de tweede oproep krijgt een eerlijke weigering,
+       en dat is een toestandscontrole en geen dubbeltik. */
+    prefixen: ['/api/auth/tweede'],
+    velden: ['bewijs', 'code'],
+    waarom: 'de tweede inlogstap kent geen rol: hij maakt de sessie. Bewijs en code komen uit ' +
+      'een keten die deze opstelling zelf opzet (aanzetten, herstelcodes, opnieuw inloggen)',
+    async bouw({ post, tokens }) {
+      if (!tokens || !tokens.eigenaar) return null;
+      const eig = tokens.eigenaar;
+      const begin = await post('/api/mijn/tweefactor/begin', {}, eig);
+      const geheim = begin && begin.data && begin.data.geheim;
+      if (!geheim) {
+        /* Staat hij al aan van een eerdere ronde? Dan is er geen nieuw geheim en
+           ook geen nieuwe herstelcode: deze opstelling kan hem niet bouwen, en
+           dat is een eerlijke null en geen fout. */
+        return null;
+      }
+      const { totpCode } = require('../../server/kern/totp');
+      const bev = await post('/api/mijn/tweefactor/bevestig', { code: totpCode(geheim) }, eig);
+      const codes = bev && bev.data && bev.data.herstelcodes;
+      if (!Array.isArray(codes) || !codes.length) {
+        throw new Error('bevestigen gaf geen herstelcodes: ' + JSON.stringify(bev && bev.data).slice(0, 160));
+      }
+      const opnieuw = await post('/api/auth/login', { login: OWNER_LOGIN, password: OWNER_PASS });
+      const bewijs = opnieuw && opnieuw.data && opnieuw.data.bewijs;
+      if (!bewijs) {
+        throw new Error('de inlog gaf geen bewijs terug; staat de tweede factor wel aan? ' +
+          JSON.stringify(opnieuw && opnieuw.data).slice(0, 160));
+      }
+      return { bewijs, code: codes[0] };
     }
   },
   {

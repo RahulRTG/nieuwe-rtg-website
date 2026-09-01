@@ -1,25 +1,25 @@
 {
  "stempel": {
-  "op": "2026-08-31T12:34:51.902Z",
-  "commit": "3924eac6",
+  "op": "2026-09-01T18:28:58.912Z",
+  "commit": "6275c417",
   "boomVuil": true,
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 4653,
-  "geclassificeerd": 4653,
+  "totaal": 4659,
+  "geclassificeerd": 4659,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3201,
-   "NOT_APPLICABLE": 1076,
-   "PROTECTED": 297,
-   "INTENTIONALLY_NON_IDEMPOTENT": 79
+   "NOT_APPLICABLE": 1077,
+   "PROTECTED": 301,
+   "INTENTIONALLY_NON_IDEMPOTENT": 80
   },
-  "vastgesteldDoorMens": 1479,
+  "vastgesteldDoorMens": 1485,
   "afgeleidDoorScript": 3174,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 3818,
+   "AUTHENTICATED": 3824,
    "PUBLIC": 104,
    "OBJECT_SCOPED": 716,
    "SERVICE_TO_SERVICE": 14,
@@ -29,7 +29,7 @@
    "kale ronde: beschermd": 120,
    "kale ronde: onbeschermd": 86,
    "kale ronde: geen uitspraak": 4437,
-   "niet gemeten": 10
+   "niet gemeten": 16
   },
   "voorstellen": {},
   "metingVan": "2026-08-31T09:44:33.117Z"
@@ -115583,6 +115583,138 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "isolatie.ontsluiting.start",
+   "route": "POST /api/techniek/isolatie/ontsluiting",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "techAuth",
+     "eigenaarAlleen"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "isolatie.ontsluiting.afbreken",
+   "route": "POST /api/techniek/isolatie/ontsluiting/afbreken",
+   "semantiek": {
+    "klasse": "hooguitEens"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "techAuth",
+     "eigenaarAlleen"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "isolatie.ontsluiting.commit",
+   "route": "POST /api/techniek/isolatie/ontsluiting/commit",
+   "semantiek": {
+    "klasse": "hooguitEens"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "techAuth",
+     "eigenaarAlleen"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "isolatie.ontsluiting.stap",
+   "route": "POST /api/techniek/isolatie/ontsluiting/stap",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "techAuth",
+     "eigenaarAlleen"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "isolatie.proef",
+   "route": "POST /api/techniek/isolatie/proef",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "techAuth",
+     "eigenaarAlleen"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "isolatie.zet",
+   "route": "POST /api/techniek/isolatie/zet",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "techAuth",
+     "eigenaarAlleen"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },

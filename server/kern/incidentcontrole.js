@@ -45,7 +45,7 @@ module.exports = function maakIncidentcontrole({ db, save, functies, beveilig, j
        knop die volgens BESTUUR.md grens 6.10 niet gebruikt wordt. Dus valt hij
        terug op `beschermd`: de enige stand die GEEN schakelaar omzet, het lezen
        laat doorlopen en toch de zes bevoorrechte categorieën bevriest.
-       kern/veiligheid/ordening.js leest dezelfde onbekende waarde op dezelfde
+       kern/isolatie/ordening.js leest dezelfde onbekende waarde op dezelfde
        manier; deze regel is de uitvoering ervan en niet een tweede oordeel. */
     if (!MODI.includes(s.modus)) {
       const was = String(s.modus);

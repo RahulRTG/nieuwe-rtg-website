@@ -38,7 +38,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const path = require('path');
 
-const ordening = require('../server/kern/veiligheid/ordening');
+const ordening = require('../server/kern/isolatie/ordening');
 const beleid = require('../server/kern/stuur/beleid');
 const maakIncident = require('../server/kern/incidentcontrole');
 const functies = require('../server/functies');

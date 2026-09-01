@@ -132,6 +132,10 @@ module.exports = (kern) => {
   /* De toestandsvingerafdruk: per collectie een aantal en een gezouten hash,
      nooit inhoud. Draagt de vier matrixkolommen die over de TOESTAND gaan. */
   require('./techniek/vingerafdruk')(tctx);
+  /* De isolatiecockpit: dezelfde standen als de incidentcontrole, maar per
+     DRAGER (organisatie, identiteit, sessie, apparaat) in plaats van huis-breed.
+     Hij leest de huisstand uit de incidentcontrole en bezit hem niet. */
+  require('./techniek/isolatie')(tctx);
 
   // Hulp voor de kern: mag een door een zekering bewaakt subsysteem draaien?
   kern.zekeringMag = (id) => { const z = db.data.techniek && db.data.techniek.zekeringen && db.data.techniek.zekeringen[id]; return !z || z.aan !== false; };

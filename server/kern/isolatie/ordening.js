@@ -37,14 +37,38 @@
 const LADDER = Object.freeze(['normaal', 'waakzaam', 'beperkt', 'isolatie']);
 
 /* De vijf standen zoals kern/incidentcontrole.js ze op schijf zet, uit elkaar
-   getrokken in het paar. `beschermd` heeft met opzet geen trede: hij zegt niets
-   over de ladder, en een trede verzinnen zou de enige leugen in dit bestand zijn. */
+   getrokken in het paar.
+
+   TWEE INVULLINGEN DIE UIT DE CODE KOMEN EN NIET UIT DE NAAM, en ze zijn allebei
+   een keer fout gegaan voor ze klopten:
+
+   `beschermd` KRIJGT TREDE `normaal`. De eerste versie gaf hem er geen, "want
+   hij zegt niets over de ladder". Dat leek eerlijk en was fout: het maakte de
+   overgang normaal -> beschermd onvergelijkbaar, en dus telde AANZETTEN van de
+   veilige noodstand als een verlaging die een ceremonie vroeg. Precies de
+   drempel voor de veilige keuze die BESTUUR.md grens 6.10 verbiedt. De code
+   zegt wat zijn trede is: incidentcontrole-bescherm.js zet GEEN ENKELE
+   schakelaar om, dus op de ladder staat hij op normaal. Zijn hele strengheid
+   zit in de eigenschap ernaast, en daar hoort hij ook.
+
+   `isolatie` DRAAGT DE EIGENSCHAP OOK. Wat isolatie sluit is een bovenverzameling
+   van wat de beschermstand sluit -- hij zet elke functieschakelaar om. Hem
+   `beschermd: false` geven zou betekenen dat isolatie en beschermd
+   onvergelijkbaar zijn, en dan zou de weg van isolatie naar beschermd geen
+   verlaging heten. Zo staat het niet in de code: incidentcontrole-bescherm.js
+   weigert te beschermen tijdens isolatie met zoveel woorden ("beschermen is dan
+   een stap terug"). Die zin is nu AFGELEID uit de vorm in plaats van los
+   opgeschreven, en daarmee is de tegenspraak tussen die twee bestanden weg.
+
+   Wat hierdoor NIET verandert is dat de vijf geen ladder zijn: `beschermd` en
+   `beperkt` blijven onvergelijkbaar, want de een bevriest zes categorieën en de
+   ander zet genoemde functies uit. Dat is de botsing waar het altijd om ging. */
 const MODUS_ALS_PAAR = Object.freeze({
   normaal:   { trede: 'normaal',   beschermd: false },
   waakzaam:  { trede: 'waakzaam',  beschermd: false },
   beperkt:   { trede: 'beperkt',   beschermd: false },
-  isolatie:  { trede: 'isolatie',  beschermd: false },
-  beschermd: { trede: null,        beschermd: true  }
+  beschermd: { trede: 'normaal',   beschermd: true  },
+  isolatie:  { trede: 'isolatie',  beschermd: true  }
 });
 
 function tredeIndex(t) { return t === null || t === undefined ? -1 : LADDER.indexOf(t); }

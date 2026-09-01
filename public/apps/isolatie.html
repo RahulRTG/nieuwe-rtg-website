@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG · Isolatiemodus</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+  :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--card2:var(--rtg-card2);--line:var(--rtg-line);
+    --txt:var(--rtg-txt);--muted:var(--rtg-muted);--soft:var(--rtg-soft);--gold:#C9A24B;
+    --groen:#3BA55D;--oranje:#D6A32E;--rood:#D6455F;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.55;}
+  a{color:var(--rtg-leesgoud,var(--gold));}
+  .skip{position:absolute;left:.6rem;top:-3rem;z-index:60;background:var(--gold);color:#0C0C0B;padding:.5rem .9rem;border-radius:0;font-weight:700;text-decoration:none;transition:top .15s;}
+  .skip:focus{top:0;}
+  :focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  .wrap{max-width:1040px;margin:0 auto;padding:2.2rem 1.2rem 5rem;}
+  header.kop{margin-bottom:1.8rem;}
+  .kop h1{font-family:'Bodoni Moda',Georgia,serif;font-size:2rem;font-weight:400;letter-spacing:-.01em;}
+  .kop .sub{font-size:.85rem;color:var(--soft);margin-top:.35rem;max-width:52ch;}
+  .sec{font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--soft);font-weight:700;margin:2.4rem 0 .8rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1.3rem;}
+  .rail{display:grid;grid-template-columns:repeat(auto-fit,minmax(11rem,1fr));gap:1px;background:var(--line);border:1px solid var(--line);}
+  .rail .cel{background:var(--card);padding:1.1rem 1.2rem;}
+  .rail .cel .l{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);font-weight:700;}
+  .rail .cel .n{font-size:1.45rem;font-weight:600;margin-top:.3rem;}
+  .rail .cel .n.klein{font-size:1rem;}
+  .rail .cel .w{font-size:.75rem;color:var(--muted);margin-top:.2rem;}
+  .stip{display:inline-block;width:.6rem;height:.6rem;border-radius:50%;margin-right:.45rem;vertical-align:baseline;background:var(--soft);}
+  .stip.normaal{background:var(--groen);}
+  .stip.waakzaam,.stip.beperkt{background:var(--oranje);}
+  .stip.beschermd{background:var(--gold);}
+  .stip.isolatie{background:var(--rood);}
+  table{width:100%;border-collapse:collapse;font-size:.85rem;}
+  th{text-align:left;font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--soft);font-weight:700;padding:.5rem .7rem;border-bottom:1px solid var(--line);}
+  td{padding:.65rem .7rem;border-bottom:1px solid var(--line);vertical-align:top;}
+  tr:last-child td{border-bottom:none;}
+  .mono{font-family:ui-monospace,SFMono-Regular,monospace;font-size:.78rem;}
+  .knop{background:var(--gold);color:#0C0C0B;border:none;border-radius:0;padding:.7rem 1rem;font-weight:600;font-size:.85rem;cursor:pointer;font-family:inherit;min-height:2.75rem;}
+  .knop.grijs{background:var(--card2);color:var(--txt);border:1px solid var(--line);}
+  .knop.klein{padding:.45rem .7rem;font-size:.78rem;min-height:2.75rem;min-width:2.75rem;}
+  .knop[disabled]{opacity:.45;cursor:not-allowed;}
+  .veld,select.veld{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:0;padding:.7rem .8rem;color:var(--txt);font-family:inherit;font-size:.88rem;min-height:2.75rem;}
+  label{display:block;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);font-weight:700;margin:.9rem 0 .35rem;}
+  .vorm{display:grid;grid-template-columns:repeat(auto-fit,minmax(12rem,1fr));gap:0 1rem;}
+  .melding{border:1px solid var(--line);border-left:3px solid var(--gold);background:var(--card2);padding:.8rem .95rem;font-size:.85rem;margin-top:1rem;}
+  .melding.fout{border-left-color:var(--rood);}
+  .melding.goed{border-left-color:var(--groen);}
+  .voetnoot{font-size:.78rem;color:var(--soft);margin-top:.6rem;max-width:64ch;}
+  .schuif{overflow-x:auto;}
+  .stap{display:flex;align-items:center;gap:.6rem;padding:.5rem 0;border-top:1px solid var(--line);font-size:.84rem;}
+  .stap:first-child{border-top:none;}
+  .stap .vink{width:1.1rem;height:1.1rem;border-radius:50%;border:1px solid var(--line);flex-shrink:0;}
+  .stap .vink.klaar{background:var(--groen);border-color:var(--groen);}
+  @media (max-width:640px){.kop h1{font-size:1.6rem;}}
+</style>
+</head>
+<body>
+<a class="skip" href="#hoofd">Naar de inhoud</a>
+<main id="hoofd" class="wrap">
+  <header class="kop">
+    <h1>Isolatiemodus</h1>
+    <p class="sub">Dezelfde standen als de incidentcontrole, maar per drager. Isolatie is geen functie
+      die functies uitschakelt: het is een contract dat beschikbare effecten verkleint, nooit stilzwijgend
+      zwakker wordt, en waarvan elke grens een bewijsgraad draagt.</p>
+  </header>
+
+  <div id="melding" hidden></div>
+
+  <h2 class="sec">De effectieve stand</h2>
+  <div class="rail" id="rail"></div>
+  <p class="voetnoot" id="railvoet"></p>
+
+  <h2 class="sec">Een drager verstrengen</h2>
+  <div class="kaart">
+    <p class="voetnoot" style="margin-top:0">Verstrengen gaat meteen en zonder ceremonie: een drempel voor
+      de veilige keuze duwt mensen onder druk naar de onveilige. Verlagen kan hier niet: dat loopt over een
+      ontsluiting, en die weg is de enige.</p>
+    <div class="vorm">
+      <div><label for="d-drager">Drager</label>
+        <select class="veld" id="d-drager">
+          <option value="identiteit">identiteit (een mens of zaak)</option>
+          <option value="sessie">sessie (één inlog)</option>
+          <option value="apparaat">apparaat (één toestel)</option>
+          <option value="organisatie">organisatie (een hele klant)</option>
+        </select></div>
+      <div><label for="d-sleutel">Sleutel (codenaam of code)</label>
+        <input class="veld" id="d-sleutel" autocomplete="off" placeholder="cn-…"></div>
+      <div><label for="d-naar">Naar stand</label>
+        <select class="veld" id="d-naar">
+          <option value="waakzaam">waakzaam: markeren, niets sluiten</option>
+          <option value="beschermd" selected>beschermd: zes categorieën bevriezen, lezen loopt door</option>
+          <option value="isolatie">isolatie: het strengst wat deze laag kan</option>
+        </select></div>
+      <div><label for="d-reden">Reden (blijft in het spoor staan)</label>
+        <input class="veld" id="d-reden" autocomplete="off" placeholder="Verdenking op een gerichte aanval"></div>
+    </div>
+    <div style="margin-top:1.1rem;display:flex;gap:.6rem;flex-wrap:wrap">
+      <button class="knop" id="btn-zet">Verstrengen</button>
+      <button class="knop grijs" id="btn-proef">Eerst proefdraaien</button>
+    </div>
+  </div>
+
+  <h2 class="sec">Wat dit een mens kost</h2>
+  <div class="kaart" id="proefkaart">
+    <p class="voetnoot" style="margin-top:0">Wie besluit een klant dicht te zetten, hoort eerst te zien wat
+      die klant dat kost. Deze proef voert niets uit.</p>
+    <div id="proefuit"></div>
+  </div>
+
+  <h2 class="sec">Lopende ontsluitingen</h2>
+  <div class="kaart" id="ontsluitkaart"><p class="voetnoot" style="margin-top:0">Nog niets geladen.</p></div>
+
+  <h2 class="sec">Standen per drager</h2>
+  <div class="kaart schuif" id="dragerkaart"></div>
+
+  <h2 class="sec">Het spoor</h2>
+  <div class="kaart schuif" id="spoorkaart"></div>
+
+  <h2 class="sec">Wat deze laag nog niet is</h2>
+  <div class="kaart" id="gatenkaart"></div>
+</main>
+<script src="/shared/basis.js"></script>
+<script src="/shared/metgezel.js"></script>
+<script src="/apps/isolatie.js"></script>
+</body>
+</html>

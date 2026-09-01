@@ -12,14 +12,32 @@
   "schuld": [
     {
       "punt": "drager-model",
-      "stand": "ONTBREEKT",
-      "waarom": "alle standen zijn huis-breed (db.data.techniek.incidentcontrole.modus). Er valt niets per identiteit, sessie, apparaat of organisatie te meten, omdat er niets per drager te zetten is.",
-      "gevolg": "RTG kan vandaag niet zeggen \"dit ene lid staat in isolatie\"."
+      "stand": "STAAT",
+      "waarom": "server/kern/isolatie/: vijf van de zes dragers dragen een stand, samengevoegd met een join. De stand van het huis wordt GELEZEN uit de incidentcontrole en niet gekopieerd.",
+      "open": "de drager `workload` heeft nog geen bron: een achtergrondtaak meldt zich nergens aan."
+    },
+    {
+      "punt": "isolatie per drager houdt evenveel tegen als beschermd",
+      "stand": "GEMETEN",
+      "waarom": "het huis isoleert door elke functieschakelaar om te zetten, en een schakelaar is huis-breed. Voor één lid is de beschermstand vandaag het enige dat werkelijk iets tegenhoudt.",
+      "open": "het verschil dat de naam `isolatie` belooft, vraagt het effectmodel uit de schaduw."
     },
     {
       "punt": "lockdown-filter na de resolver",
-      "stand": "ONTBREEKT",
-      "waarom": "kern/stuur/beleid.js kent de incidentstand niet; bevoegd zijn en beschikbaar zijn vallen tijdens een incident nog samen."
+      "stand": "STAAT",
+      "waarom": "server/kern/stuur/isolatiefilter.js versmalt de lijst waaruit de AI kiest, per constructie een deelverzameling, met per weggevallen pad een reden.",
+      "open": "hij is nog niet gemonteerd op de weg die het stuur werkelijk loopt."
+    },
+    {
+      "punt": "ontsluitceremonie",
+      "stand": "STAAT",
+      "waarom": "server/kern/isolatie/ontsluiting.js: het verzoek verlaagt niets, de commit weigert tot alle stappen rond zijn, en het tweede paar ogen is aantoonbaar een ander paar.",
+      "open": "passkey en apparaatbinding worden AFGETEKEND en niet uitgevoerd; het bewijs komt van elders."
+    },
+    {
+      "punt": "effectmodel handhaaft",
+      "stand": "SCHADUW",
+      "waarom": "hij rekent mee en meldt onenigheden; hij blokkeert niets. Zie noemers.schaduw."
     },
     {
       "punt": "blinde vlek in de beschermstand",
@@ -35,11 +53,6 @@
       "punt": "procesisolatie van parsers",
       "stand": "ONBEPAALD_INFRA",
       "waarom": "45 verwerkers draaien in het hoofdproces."
-    },
-    {
-      "punt": "ontsluitceremonie",
-      "stand": "ONBESLIST",
-      "waarom": "een getypte zin is geen passkey, apparaatbinding, wachttijd of vier-ogenbesluit."
     },
     {
       "punt": "herkomst en vertrouwensklasse van invoer (taint)",
@@ -179,10 +192,11 @@
       ]
     },
     "aiBereik": {
-      "wat": "wat het AI-stuur mag kiezen, per rol; kern/stuur/beleid.js is closed by default",
+      "wat": "wat het AI-stuur mag kiezen, per rol, en wat daarvan overblijft onder een stand",
       "bron": [
         "EXECUTION_MAP.json",
-        "server/kern/stuur/beleid.js"
+        "server/kern/stuur/beleid.js",
+        "server/kern/stuur/isolatiefilter.js"
       ],
       "perRol": {
         "member": {
@@ -194,7 +208,7 @@
             "[object Object]": 120
           }
         },
-        "": {
+        "zonder-rol": {
           "gevonden": 840,
           "verboden": 840,
           "bereikbaar": 0,
@@ -252,8 +266,393 @@
           }
         }
       },
-      "onderIsolatie": "ONBEPAALD",
-      "waarom": "kern/stuur/beleid.js kent de incidentstand niet; er bestaat geen smallere AI-lijst die tijdens een incident geldt. Zolang die er niet is, zou elk getal hier verzonnen zijn."
+      "onderStand": {
+        "beschermd": {
+          "member": {
+            "bereikbaar": 120,
+            "naFilter": 92,
+            "weggevallen": 28,
+            "regels": [
+              "Geld"
+            ]
+          },
+          "zonder-rol": {
+            "bereikbaar": 0,
+            "naFilter": 0,
+            "weggevallen": 0,
+            "regels": []
+          },
+          "office": {
+            "bereikbaar": 0,
+            "naFilter": 0,
+            "weggevallen": 0,
+            "regels": []
+          },
+          "supplier": {
+            "bereikbaar": 53,
+            "naFilter": 32,
+            "weggevallen": 21,
+            "regels": [
+              "Geld",
+              "Partners (leveranciers)",
+              "Personeel & integraties"
+            ]
+          },
+          "techniek": {
+            "bereikbaar": 0,
+            "naFilter": 0,
+            "weggevallen": 0,
+            "regels": []
+          },
+          "boardroom": {
+            "bereikbaar": 0,
+            "naFilter": 0,
+            "weggevallen": 0,
+            "regels": []
+          },
+          "scim": {
+            "bereikbaar": 0,
+            "naFilter": 0,
+            "weggevallen": 0,
+            "regels": []
+          },
+          "werkplekbaas": {
+            "bereikbaar": 0,
+            "naFilter": 0,
+            "weggevallen": 0,
+            "regels": []
+          }
+        },
+        "isolatie": {
+          "member": {
+            "bereikbaar": 120,
+            "naFilter": 92,
+            "weggevallen": 28,
+            "regels": [
+              "Geld"
+            ]
+          },
+          "zonder-rol": {
+            "bereikbaar": 0,
+            "naFilter": 0,
+            "weggevallen": 0,
+            "regels": []
+          },
+          "office": {
+            "bereikbaar": 0,
+            "naFilter": 0,
+            "weggevallen": 0,
+            "regels": []
+          },
+          "supplier": {
+            "bereikbaar": 53,
+            "naFilter": 32,
+            "weggevallen": 21,
+            "regels": [
+              "Geld",
+              "Partners (leveranciers)",
+              "Personeel & integraties"
+            ]
+          },
+          "techniek": {
+            "bereikbaar": 0,
+            "naFilter": 0,
+            "weggevallen": 0,
+            "regels": []
+          },
+          "boardroom": {
+            "bereikbaar": 0,
+            "naFilter": 0,
+            "weggevallen": 0,
+            "regels": []
+          },
+          "scim": {
+            "bereikbaar": 0,
+            "naFilter": 0,
+            "weggevallen": 0,
+            "regels": []
+          },
+          "werkplekbaas": {
+            "bereikbaar": 0,
+            "naFilter": 0,
+            "weggevallen": 0,
+            "regels": []
+          }
+        }
+      },
+      "handhaaft": true
+    },
+    "schaduw": {
+      "wat": "het effectmodel naast de beschermstand, in de schaduw: waar zijn ze het oneens",
+      "bron": [
+        "server/kern/isolatie/effecten.js",
+        "server/kern/beschermstand.js"
+      ],
+      "handhaaft": false,
+      "waarom": "CONTROLPLANE.md: een nieuwe handhavingsregel loopt eerst mee zonder te blokkeren. Deze getallen zijn de voorwaarde om hem ooit aan te zetten, niet het bewijs dat het al werkt.",
+      "gevonden": 4643,
+      "effectgraad": {
+        "verklaard": 282,
+        "vermoed": 1794,
+        "onbekend": 2567
+      },
+      "eens": 1195,
+      "onbekend": 2567,
+      "strenger": 865,
+      "losser": 16,
+      "geenSom": "strenger, losser en onbekend vragen om drie verschillende dingen en worden nooit opgeteld",
+      "blindEnVerzwakkend": {
+        "aantal": 46,
+        "waarom": "deze paden kent de beschermstand niet (geen functie in de catalogus) terwijl het effectmodel er een gesloten effect in ziet",
+        "bijOntwerp": {
+          "aantal": 46,
+          "wat": "de eigen console van de eigenaar: eigenaar-only en bewust buiten de functieschakelaars",
+          "bron": "server/routes/techniek/controle.js",
+          "maar": "de beschermstand heeft daarmee geen grip op die console. Wie hem overneemt, loopt langs deze hele laag heen; daar hangt de ontsluitceremonie van het HUIS aan, en die is er nog niet."
+        },
+        "werklijst": {
+          "aantal": 0,
+          "paden": [],
+          "wat": "blinde vlekken zonder die verklaring; dit is het werk"
+        }
+      },
+      "voorbeeldStrenger": [
+        {
+          "pad": "/api/auth/forgot",
+          "regel": null,
+          "effecten": [
+            "RECHT_VERLENEN",
+            "IDENTITEIT_WIJZIGEN"
+          ],
+          "graad": "vermoed",
+          "geraakt": [
+            "RECHT_VERLENEN",
+            "IDENTITEIT_WIJZIGEN"
+          ]
+        },
+        {
+          "pad": "/api/auth/login",
+          "regel": null,
+          "effecten": [
+            "RECHT_VERLENEN",
+            "IDENTITEIT_WIJZIGEN"
+          ],
+          "graad": "vermoed",
+          "geraakt": [
+            "RECHT_VERLENEN",
+            "IDENTITEIT_WIJZIGEN"
+          ]
+        },
+        {
+          "pad": "/api/auth/me",
+          "regel": null,
+          "effecten": [
+            "RECHT_VERLENEN",
+            "IDENTITEIT_WIJZIGEN"
+          ],
+          "graad": "vermoed",
+          "geraakt": [
+            "RECHT_VERLENEN",
+            "IDENTITEIT_WIJZIGEN"
+          ]
+        },
+        {
+          "pad": "/api/auth/password",
+          "regel": null,
+          "effecten": [
+            "RECHT_VERLENEN",
+            "IDENTITEIT_WIJZIGEN"
+          ],
+          "graad": "vermoed",
+          "geraakt": [
+            "RECHT_VERLENEN",
+            "IDENTITEIT_WIJZIGEN"
+          ]
+        },
+        {
+          "pad": "/api/auth/register",
+          "regel": null,
+          "effecten": [
+            "RECHT_VERLENEN",
+            "IDENTITEIT_WIJZIGEN"
+          ],
+          "graad": "vermoed",
+          "geraakt": [
+            "RECHT_VERLENEN",
+            "IDENTITEIT_WIJZIGEN"
+          ]
+        },
+        {
+          "pad": "/api/auth/resend",
+          "regel": null,
+          "effecten": [
+            "RECHT_VERLENEN",
+            "IDENTITEIT_WIJZIGEN"
+          ],
+          "graad": "vermoed",
+          "geraakt": [
+            "RECHT_VERLENEN",
+            "IDENTITEIT_WIJZIGEN"
+          ]
+        },
+        {
+          "pad": "/api/auth/reset",
+          "regel": null,
+          "effecten": [
+            "RECHT_VERLENEN",
+            "IDENTITEIT_WIJZIGEN"
+          ],
+          "graad": "vermoed",
+          "geraakt": [
+            "RECHT_VERLENEN",
+            "IDENTITEIT_WIJZIGEN"
+          ]
+        },
+        {
+          "pad": "/api/auth/verify-email",
+          "regel": null,
+          "effecten": [
+            "RECHT_VERLENEN",
+            "IDENTITEIT_WIJZIGEN"
+          ],
+          "graad": "vermoed",
+          "geraakt": [
+            "RECHT_VERLENEN",
+            "IDENTITEIT_WIJZIGEN"
+          ]
+        },
+        {
+          "pad": "/api/avond/koppel",
+          "regel": null,
+          "effecten": [
+            "VERTROUWENSRELATIE_AANGAAN"
+          ],
+          "graad": "verklaard",
+          "geraakt": [
+            "VERTROUWENSRELATIE_AANGAAN"
+          ]
+        },
+        {
+          "pad": "/api/bedrijf/apparaat/innemen",
+          "regel": null,
+          "effecten": [
+            "SCHRIJVEN_ANDERMANS",
+            "BEVEILIGING_VERZWAKKEN"
+          ],
+          "graad": "vermoed",
+          "geraakt": [
+            "SCHRIJVEN_ANDERMANS",
+            "BEVEILIGING_VERZWAKKEN"
+          ]
+        }
+      ],
+      "voorbeeldLosser": [
+        {
+          "pad": "/api/supplier/charter/foto",
+          "regel": "Partners (leveranciers)",
+          "effecten": [
+            "ONVERTROUWDE_BYTES"
+          ],
+          "graad": "verklaard",
+          "geraakt": []
+        },
+        {
+          "pad": "/api/supplier/charter/fotos",
+          "regel": "Partners (leveranciers)",
+          "effecten": [
+            "ONVERTROUWDE_BYTES"
+          ],
+          "graad": "verklaard",
+          "geraakt": []
+        },
+        {
+          "pad": "/api/supplier/facturen/pdf",
+          "regel": "Partners (leveranciers)",
+          "effecten": [
+            "ONVERTROUWDE_BYTES"
+          ],
+          "graad": "verklaard",
+          "geraakt": []
+        },
+        {
+          "pad": "/api/supplier/finance/export",
+          "regel": "Partners (leveranciers)",
+          "effecten": [
+            "BULK_UITVOER"
+          ],
+          "graad": "verklaard",
+          "geraakt": []
+        },
+        {
+          "pad": "/api/supplier/horeca/dagbeeld",
+          "regel": "Partners (leveranciers)",
+          "effecten": [
+            "ONVERTROUWDE_BYTES"
+          ],
+          "graad": "verklaard",
+          "geraakt": []
+        },
+        {
+          "pad": "/api/supplier/huur/foto",
+          "regel": "Partners (leveranciers)",
+          "effecten": [
+            "ONVERTROUWDE_BYTES"
+          ],
+          "graad": "verklaard",
+          "geraakt": []
+        },
+        {
+          "pad": "/api/supplier/huur/fotos",
+          "regel": "Partners (leveranciers)",
+          "effecten": [
+            "ONVERTROUWDE_BYTES"
+          ],
+          "graad": "verklaard",
+          "geraakt": []
+        },
+        {
+          "pad": "/api/supplier/keten/rampbeeld",
+          "regel": "Partners (leveranciers)",
+          "effecten": [
+            "ONVERTROUWDE_BYTES"
+          ],
+          "graad": "verklaard",
+          "geraakt": []
+        },
+        {
+          "pad": "/api/supplier/keten/rampbeeld/ai",
+          "regel": "Partners (leveranciers)",
+          "effecten": [
+            "ONVERTROUWDE_BYTES"
+          ],
+          "graad": "verklaard",
+          "geraakt": []
+        },
+        {
+          "pad": "/api/supplier/keten/rampbeeld/evaluatie",
+          "regel": "Partners (leveranciers)",
+          "effecten": [
+            "ONVERTROUWDE_BYTES"
+          ],
+          "graad": "verklaard",
+          "geraakt": []
+        }
+      ]
+    },
+    "dragers": {
+      "wat": "de zes dragers waarop een stand kan staan",
+      "bron": [
+        "server/kern/isolatie/dragers.js"
+      ],
+      "gevonden": 6,
+      "metBron": 5,
+      "zonderBron": [
+        {
+          "naam": "workload",
+          "waarom": "er is nog geen plek waar een achtergrondtaak zichzelf als drager aanmeldt. Hij staat hier omdat hij bestaat, niet omdat hij werkt -- een lege stand die als `normaal` meetelt zou de join stil verzwakken, dus telt hij als een drager ZONDER stand en niet als een drager MET de stand normaal."
+        }
+      ],
+      "teltAlsNormaal": false
     },
     "uitgaandeBestemmingen": {
       "wat": "hostnamen die letterlijk in server/ voorkomen; een ondergrens, geen inventaris",
@@ -576,8 +975,33 @@
         "wachttijd": false,
         "vierOgen": false
       },
-      "eindoordeel": "ONBESLIST",
-      "waarom": "er staat een drempel (eigenaar-only, een getypte zin, een verplichte reden, een auditregel) maar geen ceremonie: geen passkey, geen apparaatbinding, geen wachttijd en geen tweede paar ogen. De invariant legt vast wat er IS; hij zegt niet dat het genoeg is."
+      "eindoordeel": "GESPLITST",
+      "waarom": "voor het HUIS staat er een drempel en geen ceremonie: eigenaar-only, een getypte zin, een verplichte reden en een auditregel -- maar geen passkey, apparaatbinding, wachttijd of tweede paar ogen. Voor de vier dragers eronder is er wel een ceremonie (server/kern/isolatie/ontsluiting.js), en die eist ze alle vier waar ze horen. Dat het huis achterloopt op zijn eigen dragers, staat hier als schuld en niet als afronding.",
+      "perDrager": {
+        "organisatie": [
+          "reden",
+          "passkey",
+          "apparaat",
+          "wachttijd",
+          "tweedePaarOgen"
+        ],
+        "identiteit": [
+          "reden",
+          "passkey",
+          "apparaat",
+          "wachttijd"
+        ],
+        "sessie": [
+          "reden",
+          "passkey",
+          "apparaat"
+        ],
+        "apparaat": [
+          "reden",
+          "passkey",
+          "apparaat"
+        ]
+      }
     }
   }
 }

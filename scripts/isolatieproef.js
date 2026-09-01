@@ -40,6 +40,11 @@ const root = path.join(__dirname, '..');
 const functies = require(path.join(root, 'server/functies'));
 const { maakBeschermstand, BEVRIEST, LOOPT_DOOR, UITZONDERINGEN } =
   require(path.join(root, 'server/kern/beschermstand'));
+const beleid = require(path.join(root, 'server/kern/stuur/beleid'));
+const maakIsolatie = require(path.join(root, 'server/kern/isolatie'));
+const effectmodel = require(path.join(root, 'server/kern/isolatie/effecten'));
+const dragerlijst = require(path.join(root, 'server/kern/isolatie/dragers'));
+const { maakIsolatiefilter } = require(path.join(root, 'server/kern/stuur/isolatiefilter'));
 
 function lees(bestand) {
   try { return JSON.parse(fs.readFileSync(path.join(root, bestand), 'utf8')); }
@@ -108,26 +113,144 @@ const noemers = {};
   };
 }
 
-/* ---------- 3. Wat de AI mag, per rol ---------- */
+/* ---------- 3. Wat de AI mag, per rol -- en wat er onder een stand overblijft ---------- */
 {
   const perRol = {};
+  /* 840 rijen dragen een LEGE rol. Dat is geen ontbrekend gegeven maar een
+     toegangsklasse (MUTATIECONTRACT.md: "geen rol" hoort op te houden een
+     restpost te zijn), en hem als '' in een tabel zetten maakt hem onleesbaar. */
   for (const r of kaart.capabilities) {
-    const p = perRol[r.rol] || (perRol[r.rol] = { gevonden: 0, verboden: 0, bereikbaar: 0, perNiveau: {} });
+    const rol = r.rol || 'zonder-rol';
+    const p = perRol[rol] || (perRol[rol] = { gevonden: 0, verboden: 0, bereikbaar: 0, perNiveau: {} });
     p.gevonden++;
-    if (r.bereik === 'verboden') p.verboden++; else { p.bereikbaar++; }
+    if (r.bereik === 'verboden') p.verboden++; else p.bereikbaar++;
     p.perNiveau[r.bereik] = (p.perNiveau[r.bereik] || 0) + 1;
   }
+
+  /* DIT GETAL STOND HIER EERST ALS `ONBEPAALD`, en met reden: kern/stuur/beleid.js
+     kende de incidentstand niet, dus er bestond geen smallere AI-lijst die tijdens
+     een incident geldt. Nu bestaat hij (kern/stuur/isolatiefilter.js) en wordt hij
+     GEMETEN in plaats van beloofd -- door de echte lijst door het echte filter te
+     halen, met een echte drager in een echte stand. */
+  const iso = maakIsolatie({ db: { data: {} }, save() {}, functies, klok: null, huisStand: () => 'normaal' });
+  const filter = maakIsolatiefilter({ isolatie: iso, beleid });
+  const onderStand = {};
+  for (const stand of ['beschermd', 'isolatie']) {
+    onderStand[stand] = {};
+    for (const wereld of Object.keys(perRol)) {
+      const paden = [...new Set(kaart.capabilities
+        .filter(r => (r.rol || 'zonder-rol') === wereld && r.bereik !== 'verboden').map(r => r.pad))];
+      const sleutel = 'meting-' + stand + '-' + wereld;
+      iso.zet({ drager: 'identiteit', sleutel, naar: stand, door: 'isolatieproef',
+        reden: 'meting van het isolatiefilter' });
+      const uit = filter.versmal(paden, iso.context({ identiteit: sleutel }), wereld);
+      onderStand[stand][wereld] = { bereikbaar: paden.length, naFilter: uit.paden.length,
+        weggevallen: uit.weggevallen.length,
+        regels: [...new Set(uit.weggevallen.map(w => w.regel).filter(Boolean))].sort() };
+    }
+  }
+
   noemers.aiBereik = {
-    wat: 'wat het AI-stuur mag kiezen, per rol; kern/stuur/beleid.js is closed by default',
-    bron: ['EXECUTION_MAP.json', 'server/kern/stuur/beleid.js'],
+    wat: 'wat het AI-stuur mag kiezen, per rol, en wat daarvan overblijft onder een stand',
+    bron: ['EXECUTION_MAP.json', 'server/kern/stuur/beleid.js', 'server/kern/stuur/isolatiefilter.js'],
     perRol,
-    /* GEEN ISOLATIEKOLOM, en dat is het eerlijke antwoord. De beschermstand
-       filtert vandaag de HTTP-laag en niet de AI-allowlist: er is geen tweede,
-       smallere lijst die tijdens een incident geldt. Wie hier een getal wil,
-       moet eerst dat filter bouwen (het lockdown-filter na de resolver). */
-    onderIsolatie: 'ONBEPAALD',
-    waarom: 'kern/stuur/beleid.js kent de incidentstand niet; er bestaat geen smallere AI-lijst ' +
-      'die tijdens een incident geldt. Zolang die er niet is, zou elk getal hier verzonnen zijn.'
+    onderStand,
+    /* Het filter versmalt en verbreedt nooit; dat is per constructie zo en
+       test/isolatie.test.js houdt het vast. Dit getal zegt dus hoeveel er
+       dichtgaat, niet of er iets bijkwam. */
+    handhaaft: true
+  };
+}
+
+/* ---------- 3b. De schaduw: waar het effectmodel en de beschermstand het oneens zijn ---------- */
+{
+  const iso = maakIsolatie({ db: { data: {} }, save() {}, functies, klok: null, huisStand: () => 'normaal' });
+  iso.zet({ drager: 'identiteit', sleutel: 'schaduwmeting', naar: 'beschermd', door: 'isolatieproef',
+    reden: 'meting van het effectmodel' });
+  const ctx = iso.context({ identiteit: 'schaduwmeting' });
+  const paden = [...new Set(kaart.capabilities.map(r => r.pad))].sort();
+
+  const soorten = { eens: 0, strenger: [], losser: [], onbekend: 0 };
+  const graden = { verklaard: 0, vermoed: 0, onbekend: 0 };
+  for (const pad of paden) {
+    const b = iso.besluit({ pad, methode: 'POST', context: ctx });
+    graden[b.schaduw.graad] = (graden[b.schaduw.graad] || 0) + 1;
+    if (!b.onenigheid) { soorten.eens++; continue; }
+    if (b.onenigheid.soort === 'onbekend') { soorten.onbekend++; continue; }
+    soorten[b.onenigheid.soort].push({ pad, regel: b.regel || null,
+      effecten: b.schaduw.effecten, graad: b.schaduw.graad, geraakt: b.schaduw.geraakt });
+  }
+
+  /* DE DUURSTE RIJ VAN DE HELE PROEF. Een pad dat de beschermstand niet kent
+     (geen functie in de catalogus) EN waarvan het effectmodel zegt dat het de
+     beveiliging kan verzwakken, is een blinde vlek met een scherpe rand. Deze
+     lijst is de werklijst en geen statistiek. */
+  const blindEnGevaarlijk = soorten.strenger.filter(r => !functies.functieVoorPad(r.pad));
+
+  noemers.schaduw = {
+    wat: 'het effectmodel naast de beschermstand, in de schaduw: waar zijn ze het oneens',
+    bron: ['server/kern/isolatie/effecten.js', 'server/kern/beschermstand.js'],
+    handhaaft: false,
+    waarom: 'CONTROLPLANE.md: een nieuwe handhavingsregel loopt eerst mee zonder te blokkeren. ' +
+      'Deze getallen zijn de voorwaarde om hem ooit aan te zetten, niet het bewijs dat het al werkt.',
+    gevonden: paden.length,
+    effectgraad: graden,
+    eens: soorten.eens,
+    onbekend: soorten.onbekend,
+    strenger: soorten.strenger.length,
+    losser: soorten.losser.length,
+    /* Ze worden NIET opgeteld: `strenger` wil dat de beschermstand iets erbij
+       neemt, `losser` dat het effectmodel wordt bijgesteld, en `onbekend` dat
+       iemand het pad een profiel geeft. Drie verschillende opdrachten. */
+    geenSom: 'strenger, losser en onbekend vragen om drie verschillende dingen en worden nooit opgeteld',
+    blindEnVerzwakkend: (() => {
+      /* DEZE RIJ MOEST WORDEN OPGESPLITST, want zonder die splitsing meldt hij
+         een alarm dat een verklaring heeft -- en een meter die je niet kunt
+         geloven, wordt uitgezet. server/routes/techniek/controle.js zegt met
+         zoveel woorden dat de techniekroutes eigenaar-only zijn en BEWUST buiten
+         de functieschakelaars vallen: dat is de hand die repareert, en die mag
+         tijdens een incident niet vastzitten (kern/beschermstand-lijst.js zet
+         'RTG-Backoffice' om dezelfde reden op LOOPT_DOOR).
+
+         WAT DE OBSERVATIE DAN NOG WEL WAARD IS, en dat hoort er even groot bij:
+         de beschermstand heeft dus GEEN grip op de eigen console van de
+         eigenaar. Dat is een aanvaard ontwerp en geen bug -- maar het betekent
+         dat wie die console overneemt, langs deze hele laag heen loopt. Daar
+         hangt de ontsluitceremonie van het huis aan, en die is er nog niet. */
+      const eigenConsole = blindEnGevaarlijk.filter(r => /^\/api\/techniek\//.test(r.pad));
+      const rest = blindEnGevaarlijk.filter(r => !/^\/api\/techniek\//.test(r.pad));
+      return {
+        aantal: blindEnGevaarlijk.length,
+        waarom: 'deze paden kent de beschermstand niet (geen functie in de catalogus) terwijl het ' +
+          'effectmodel er een gesloten effect in ziet',
+        bijOntwerp: {
+          aantal: eigenConsole.length,
+          wat: 'de eigen console van de eigenaar: eigenaar-only en bewust buiten de functieschakelaars',
+          bron: 'server/routes/techniek/controle.js',
+          maar: 'de beschermstand heeft daarmee geen grip op die console. Wie hem overneemt, loopt ' +
+            'langs deze hele laag heen; daar hangt de ontsluitceremonie van het HUIS aan, en die is er nog niet.'
+        },
+        werklijst: { aantal: rest.length, paden: rest.slice(0, 60),
+          wat: 'blinde vlekken zonder die verklaring; dit is het werk' }
+      };
+    })(),
+    voorbeeldStrenger: soorten.strenger.slice(0, 10),
+    voorbeeldLosser: soorten.losser.slice(0, 10)
+  };
+}
+
+/* ---------- 3c. De dragers ---------- */
+{
+  noemers.dragers = {
+    wat: 'de zes dragers waarop een stand kan staan',
+    bron: ['server/kern/isolatie/dragers.js'],
+    gevonden: dragerlijst.DRAGERS.length,
+    metBron: dragerlijst.werkend().length,
+    zonderBron: dragerlijst.DRAGERS.filter(d => d.bron === null)
+      .map(d => ({ naam: d.naam, waarom: d.nietGebouwd })),
+    /* Een drager zonder bron telt NIET stil als `normaal` mee in de join: hij
+       levert geen stand, en dat is iets anders dan de stand normaal. */
+    teltAlsNormaal: false
   };
 }
 
@@ -232,24 +355,50 @@ const noemers = {};
       wachttijd: false,
       vierOgen: false
     },
-    eindoordeel: 'ONBESLIST',
-    waarom: 'er staat een drempel (eigenaar-only, een getypte zin, een verplichte reden, een auditregel) ' +
-      'maar geen ceremonie: geen passkey, geen apparaatbinding, geen wachttijd en geen tweede paar ogen. ' +
-      'De invariant legt vast wat er IS; hij zegt niet dat het genoeg is.'
+    eindoordeel: 'GESPLITST',
+    waarom: 'voor het HUIS staat er een drempel en geen ceremonie: eigenaar-only, een getypte zin, een ' +
+      'verplichte reden en een auditregel -- maar geen passkey, apparaatbinding, wachttijd of tweede paar ' +
+      'ogen. Voor de vier dragers eronder is er wel een ceremonie ' +
+      '(server/kern/isolatie/ontsluiting.js), en die eist ze alle vier waar ze horen. Dat het huis ' +
+      'achterloopt op zijn eigen dragers, staat hier als schuld en niet als afronding.',
+    perDrager: (() => {
+      const ordening2 = require(path.join(root, 'server/kern/isolatie/ordening'));
+      const { maakOntsluiting } = require(path.join(root, 'server/kern/isolatie/ontsluiting'));
+      const o = maakOntsluiting({ opslag: require(path.join(root, 'server/kern/isolatie/opslag'))({ db: { data: {} } }),
+        save() {}, klok: null, ordening: ordening2 });
+      const uit = {};
+      for (const d of ['organisatie', 'identiteit', 'sessie', 'apparaat'])
+        uit[d] = o.eisenVoor({ drager: d, van: 'isolatie', naar: 'normaal' }).eisen;
+      return uit;
+    })()
   };
 }
 
 /* ---------- De schuld, met opzet vooraan in het bestand ---------- */
 const schuld = [
   { punt: 'drager-model',
-    stand: 'ONTBREEKT',
-    waarom: 'alle standen zijn huis-breed (db.data.techniek.incidentcontrole.modus). Er valt niets per ' +
-      'identiteit, sessie, apparaat of organisatie te meten, omdat er niets per drager te zetten is.',
-    gevolg: 'RTG kan vandaag niet zeggen "dit ene lid staat in isolatie".' },
+    stand: 'STAAT',
+    waarom: 'server/kern/isolatie/: vijf van de zes dragers dragen een stand, samengevoegd met een join. ' +
+      'De stand van het huis wordt GELEZEN uit de incidentcontrole en niet gekopieerd.',
+    open: 'de drager `workload` heeft nog geen bron: een achtergrondtaak meldt zich nergens aan.' },
+  { punt: 'isolatie per drager houdt evenveel tegen als beschermd',
+    stand: 'GEMETEN',
+    waarom: 'het huis isoleert door elke functieschakelaar om te zetten, en een schakelaar is ' +
+      'huis-breed. Voor één lid is de beschermstand vandaag het enige dat werkelijk iets tegenhoudt.',
+    open: 'het verschil dat de naam `isolatie` belooft, vraagt het effectmodel uit de schaduw.' },
   { punt: 'lockdown-filter na de resolver',
-    stand: 'ONTBREEKT',
-    waarom: 'kern/stuur/beleid.js kent de incidentstand niet; bevoegd zijn en beschikbaar zijn ' +
-      'vallen tijdens een incident nog samen.' },
+    stand: 'STAAT',
+    waarom: 'server/kern/stuur/isolatiefilter.js versmalt de lijst waaruit de AI kiest, per constructie ' +
+      'een deelverzameling, met per weggevallen pad een reden.',
+    open: 'hij is nog niet gemonteerd op de weg die het stuur werkelijk loopt.' },
+  { punt: 'ontsluitceremonie',
+    stand: 'STAAT',
+    waarom: 'server/kern/isolatie/ontsluiting.js: het verzoek verlaagt niets, de commit weigert tot ' +
+      'alle stappen rond zijn, en het tweede paar ogen is aantoonbaar een ander paar.',
+    open: 'passkey en apparaatbinding worden AFGETEKEND en niet uitgevoerd; het bewijs komt van elders.' },
+  { punt: 'effectmodel handhaaft',
+    stand: 'SCHADUW',
+    waarom: 'hij rekent mee en meldt onenigheden; hij blokkeert niets. Zie noemers.schaduw.' },
   { punt: 'blinde vlek in de beschermstand',
     stand: 'GEMETEN',
     waarom: noemers.httpPaden.blindeVlek.aantal + ' paden hebben geen functie in de catalogus en ' +
@@ -260,9 +409,6 @@ const schuld = [
   { punt: 'procesisolatie van parsers',
     stand: 'ONBEPAALD_INFRA',
     waarom: noemers.bestandsverwerkers.gevonden + ' verwerkers draaien in het hoofdproces.' },
-  { punt: 'ontsluitceremonie',
-    stand: 'ONBESLIST',
-    waarom: 'een getypte zin is geen passkey, apparaatbinding, wachttijd of vier-ogenbesluit.' },
   { punt: 'herkomst en vertrouwensklasse van invoer (taint)',
     stand: 'ONTBREEKT',
     waarom: 'onvertrouwde inhoud (mail, document, webpagina, toolresultaat) draagt geen klasse, dus ' +
@@ -285,13 +431,37 @@ const uit = {
 
 fs.writeFileSync(path.join(root, 'ISOLATIEPROEF.json'), JSON.stringify(uit, null, 2) + '\n');
 
-/* Het scherm vat samen; het bestand is de waarheid. */
-console.log('ISOLATIEPROEF.json geschreven.');
-for (const [naam, n] of Object.entries(noemers)) {
-  if (n.gevonden === undefined) { console.log('  ' + naam.padEnd(24) + ' (geen telling: ' + (n.eindoordeel || 'zie bestand') + ')'); continue; }
-  console.log('  ' + naam.padEnd(24) + String(n.gevonden).padStart(6) + ' gevonden, ' +
-    String(n.BEWEZEN_GEBLOKKEERD).padStart(5) + ' geblokkeerd, ' +
-    String(n.ONBESLIST).padStart(4) + ' onbeslist, ' +
-    String(n.ONBEPAALD_INFRA).padStart(4) + ' onbepaald-infra');
+/* Het scherm vat samen; het bestand is de waarheid.
+
+   GEEN `undefined` OP EEN BEVEILIGINGSREGEL. Niet elke noemer telt in de vijf
+   uitslagen -- de schaduw telt onenigheden, de dragers tellen bronnen -- en die
+   door dezelfde kolommen persen levert een regel op die er ingevuld uitziet en
+   niets zegt. Elke noemer vat zichzelf samen. */
+function vat(naam, n) {
+  if (n.BEWEZEN_GEBLOKKEERD !== undefined) {
+    return String(n.gevonden).padStart(6) + ' gevonden, ' +
+      String(n.BEWEZEN_GEBLOKKEERD).padStart(5) + ' geblokkeerd, ' +
+      String(n.ONBESLIST).padStart(4) + ' onbeslist, ' +
+      String(n.ONBEPAALD_INFRA).padStart(4) + ' onbepaald-infra';
+  }
+  if (naam === 'schaduw') {
+    return String(n.gevonden).padStart(6) + ' gewogen, ' + String(n.strenger).padStart(5) + ' strenger, ' +
+      String(n.losser).padStart(4) + ' losser, ' + String(n.onbekend).padStart(4) + ' zonder profiel' +
+      '  (blind EN verzwakkend: ' + n.blindEnVerzwakkend.werklijst.aantal + ' werklijst, ' +
+      n.blindEnVerzwakkend.bijOntwerp.aantal + ' bij ontwerp)';
+  }
+  if (naam === 'dragers') {
+    return String(n.gevonden).padStart(6) + ' dragers, ' + String(n.metBron).padStart(5) + ' met een bron, ' +
+      String(n.zonderBron.length).padStart(4) + ' zonder';
+  }
+  if (naam === 'aiBereik') {
+    const b = n.onderStand.beschermd || {};
+    return Object.keys(b).map(w => w + ': ' + b[w].bereikbaar + '->' + b[w].naFilter).join(', ') +
+      '  (onder beschermd)';
+  }
+  return '(zie bestand: ' + (n.eindoordeel || 'geen telling') + ')';
 }
-console.log('  schuld: ' + schuld.length + ' open punten (zie ISOLATIEPROEF.json).');
+
+console.log('ISOLATIEPROEF.json geschreven.');
+for (const [naam, n] of Object.entries(noemers)) console.log('  ' + naam.padEnd(24) + vat(naam, n));
+console.log('  schuld: ' + schuld.length + ' punten (zie ISOLATIEPROEF.json).');

@@ -257,3 +257,141 @@ test('een ongemeten bestand telt als het zwaarste, niet als nul', () => {
       ['licht.test.js', 'nieuw.test.js']);
   } finally { zetDuren(null); }
 });
+
+/* ===========================================================================
+   HET KOSTENMODEL, EN HOEVEEL HET WAARD IS.
+
+   Dit blok komt uit een fout die hier echt is gemaakt en die van binnen
+   PERFECT oogde. TOETSDUUR.json was lokaal gemeten, zonder dekking, op vier
+   kernen; de keten draait op een runner MET dekking. De verdeler deed precies
+   wat hem gevraagd was en meldde 1,00x op zijn eigen projectie -- en de
+   werkelijke ronde liep 1348s tegen 526s uit elkaar. Een verdeling op het
+   verkeerde kostenmodel ziet er niet verkeerd uit; hij is alleen verkeerd.
+
+   Vandaar drie beweringen: de modus wordt gelezen, een andere modus is
+   BRUIKBAAR MAAR NIET VERTROUWD, en dat wantrouwen heeft een gevolg dat je kunt
+   zien -- anders is het een woord in een JSON-veld.
+   =========================================================================== */
+const fs2 = require('node:fs');
+const os2 = require('node:os');
+const path2 = require('node:path');
+
+/* Een register op schijf neerzetten waar delen.js hem zoekt, en netjes
+   terugzetten. Zonder dit toetst dit blok de opgelegde weging in plaats van
+   het lezen ervan, en juist het LEZEN ging fout. */
+function metRegister(inhoud, fn) {
+  const REG = require('../scripts/lib/delen').REGISTER;
+  let oud = null, bestond = false;
+  try { oud = fs2.readFileSync(REG); bestond = true; } catch (e) { /* geen register */ }
+  const oudeModus = process.env.RTG_TOETSMODUS;
+  try {
+    fs2.writeFileSync(REG, JSON.stringify(inhoud));
+    zetDuren(null);
+    return fn();
+  } finally {
+    if (bestond) fs2.writeFileSync(REG, oud); else { try { fs2.unlinkSync(REG); } catch (e) {} }
+    if (oudeModus === undefined) delete process.env.RTG_TOETSMODUS;
+    else process.env.RTG_TOETSMODUS = oudeModus;
+    zetDuren(null);
+  }
+}
+
+const { weging } = require('../scripts/lib/delen');
+
+test('de gevraagde modus wordt gelezen, en niet die van de buurman', () => {
+  const reg = { versie: 2, modi: {
+    normaal: { duur: { 'a.test.js': 1000, 'b.test.js': 2000 } },
+    dekking: { duur: { 'a.test.js': 9000, 'b.test.js': 1000 } }
+  } };
+  metRegister(reg, () => {
+    process.env.RTG_TOETSMODUS = 'dekking';
+    zetDuren(null);
+    const w = weging();
+    assert.equal(w.modus, 'dekking', 'de dekkingsmodus hoort gelezen te worden');
+    assert.equal(w.vertrouwen, 'geldig');
+    /* Onder dekking is a het zwaarst, onder normaal is b dat. Leest hij de
+       verkeerde modus, dan komt de verkeerde eerst en zakt deze bewering. */
+    const bakken = indeling(['a.test.js', 'b.test.js'], 2);
+    assert.ok(bakken[0].includes('a.test.js'),
+      'het zwaarste bestand VAN DEZE MODUS hoort als eerste geplaatst te worden');
+  });
+});
+
+test('een andere modus is bruikbaar maar niet vertrouwd', () => {
+  const reg = { versie: 2, modi: { normaal: { duur: { 'a.test.js': 1000 } } } };
+  metRegister(reg, () => {
+    process.env.RTG_TOETSMODUS = 'dekking';
+    zetDuren(null);
+    const w = weging();
+    assert.equal(w.vertrouwen, 'twijfelachtig',
+      'gewichten uit een andere modus mogen nooit als geldig doorgaan');
+    assert.equal(w.modus, 'normaal', 'en er hoort bij te staan WELKE modus het dan was');
+  });
+});
+
+test('een register van voor de modi telt als een andere modus, niet als geldig', () => {
+  metRegister({ duur: { 'a.test.js': 1000 } }, () => {
+    process.env.RTG_TOETSMODUS = 'normaal';
+    zetDuren(null);
+    /* Versie 1 droeg geen modus. Hem stilzwijgend als `normaal` aannemen is
+       precies de gok die de hele fout veroorzaakte. */
+    assert.equal(weging().vertrouwen, 'twijfelachtig');
+  });
+});
+
+test('zonder register is er geen weging om te vertrouwen', () => {
+  const REG = require('../scripts/lib/delen').REGISTER;
+  let oud = null, bestond = false;
+  try { oud = fs2.readFileSync(REG); bestond = true; } catch (e) {}
+  try {
+    try { fs2.unlinkSync(REG); } catch (e) {}
+    zetDuren(null);
+    assert.equal(weging().vertrouwen, 'ongeldig');
+  } finally {
+    if (bestond) fs2.writeFileSync(REG, oud);
+    zetDuren(null);
+  }
+});
+
+test('bij twijfel begrenst de marge hoeveel bestanden een scherf krijgt', () => {
+  /* Een gewicht dat er faliekant naast zit: een bestand dat honderd keer zo
+     zwaar LIJKT trekt bij pure weging alle andere naar de overkant. Klopt dat
+     gewicht niet, dan staat er een scherf met een handvol bestanden naast een
+     scherf met de rest. De marge bindt dat: bij twijfel nooit meer dan zijn
+     deel. */
+  const reg = { versie: 2, modi: { normaal: { duur: {
+    'zwaar.test.js': 100000, 'a.test.js': 10, 'b.test.js': 10, 'c.test.js': 10
+  } } } };
+  const lijst = ['zwaar.test.js', 'a.test.js', 'b.test.js', 'c.test.js'];
+
+  const zonderMarge = metRegister(reg, () => {
+    process.env.RTG_TOETSMODUS = 'normaal';       // geldig -> geen marge
+    zetDuren(null);
+    assert.equal(weging().vertrouwen, 'geldig');
+    return indeling(lijst, 2).map((b) => b.length).sort();
+  });
+  const metMarge = metRegister(reg, () => {
+    process.env.RTG_TOETSMODUS = 'dekking';       // twijfelachtig -> marge
+    zetDuren(null);
+    assert.equal(weging().vertrouwen, 'twijfelachtig');
+    return indeling(lijst, 2).map((b) => b.length).sort();
+  });
+
+  assert.deepEqual(zonderMarge, [1, 3], 'bij een vertrouwd gewicht mag een scherf gerust klein zijn');
+  assert.deepEqual(metMarge, [2, 2], 'bij twijfel hoort geen scherf meer dan zijn deel te krijgen');
+});
+
+test('de marge laat nooit een bestand vallen', () => {
+  /* De gevaarlijkste manier waarop een plafond fout gaat: alles zit vol en het
+     laatste bestand komt nergens meer terecht. Volledigheid gaat voor de
+     marge, altijd. */
+  const reg = { versie: 2, modi: { normaal: { duur: { 'a.test.js': 5 } } } };
+  metRegister(reg, () => {
+    process.env.RTG_TOETSMODUS = 'dekking';
+    zetDuren(null);
+    const lijst = ['a.test.js', 'b.test.js', 'c.test.js', 'd.test.js', 'e.test.js'];
+    const bakken = indeling(lijst, 2);
+    assert.deepEqual([].concat(...bakken).sort(), [...lijst].sort(),
+      'elk bestand hoort in precies een scherf te zitten');
+  });
+});

@@ -66,6 +66,20 @@ const SLEUTELS = {
      verplicht veld in de body dat bepaalt wat er ontstaat. Wie zonder inhoud
      een tweede maakt, krijgt met recht een tweede -- en een laag die dat
      opslikt, laat werk verdwijnen. */
+  /* DE AI-DATASET EXPORTEREN, en dit is met opzet GEEN dubbeltik.
+
+     De idempotentieproef ziet dat een tweede oproep "het werk opnieuw doet", en
+     dat klopt: er komt een tweede regel in het auditlog. Dat is precies wat er
+     hoort te gebeuren. De dataset heeft twee keer het gebouw verlaten, en een
+     spoor dat de tweede keer verzwijgt is een slechter spoor.
+
+     Het bestand zelf is een download en geen bewaarde bron: er ontstaat geen
+     tweede record, alleen een tweede levering. Afvangen zou hier dus niet een
+     dubbeling voorkomen maar een uitgifte verbergen (routes/kantoren/geld.js). */
+  'POST /api/office/aidata/export': { nietIdempotent: true,
+    waarom: 'elke export is een echte uitgifte: de dataset verlaat het gebouw en dat hoort ' +
+      'per keer in het auditlog te staan. Er ontstaat geen tweede record, alleen een tweede ' +
+      'levering -- afvangen zou een uitgifte verbergen in plaats van een dubbeling voorkomen' },
   'POST /api/office/kantoorpakket/maak': { nietIdempotent: true,
     waarom: 'de titel is optioneel en valt terug op "Nieuw document"; twee lege oproepen zijn ' +
       'twee verse documenten, niet dezelfde nog eens (kern/office/docs.js)' },

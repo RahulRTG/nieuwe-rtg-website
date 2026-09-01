@@ -6,7 +6,7 @@ const { magBij } = require('./eigendom');/* RTG Bank, deel "rekeningen": het ope
    een lid kan meerdere rekeningen hebben (betaal, spaar, zakelijk). Krijgt de
    gedeelde ctx van kern/bank/index.js. */
 module.exports = (ctx) => {
-  const { db, save, crypto, nu, SOORTEN, rekeningen, rekMeta, saldoVan, boek, bankregie, keyVanCodenaam, seintje } = ctx;
+  const { db, save, crypto, nu, SOORTEN, rekeningen, rekMeta, saldoVan, boek, bankregie, keyVanCodenaam, seintje, metIdem } = ctx;
 
   // IBAN mod-97: letters -> getallen (A=10..Z=35), controlegetal = 98 - (rest mod 97).
   function mod97(str) {
@@ -37,7 +37,19 @@ module.exports = (ctx) => {
      identiteitsgids hem kent), zodat de eigenaarschapscheck later altijd klopt,
      ongeacht hoofdletters. Een betaalrekening krijgt meteen de standaard
      rood-staan-ruimte uit de boardroom (bankregie). */
-  async function open({ codenaam, soort = 'betaal', naam, wie }) {
+  /* EEN TWEEDE TIK OPENT GEEN TWEEDE REKENING.
+
+     Dit ontbrak, en de idempotentieproef bewees het: twee keer aankloppen gaf
+     twee IBAN's. `/api/bank/` staat als geheel op de EIGEN-lijst van
+     server/middleware/idempotentie.js -- "de bank doet het zelf" -- en dat was
+     waar voor storten en SEPA maar niet hier. Precies het gat waar de kop van
+     dat bestand voor waarschuwt bij een blanket-prefix.
+
+     Zelfde vorm als ./overboeken.js en ./incasso.js: metIdem uit de gedeelde
+     sleutelruimte `bankIdem`, met een AFDRUK erbij zodat dezelfde sleutel met
+     een andere aanvraag niet stilletjes het oude antwoord krijgt. Zonder
+     sleutel verandert er niets -- wie er geen stuurt, krijgt het oude gedrag. */
+  async function open({ codenaam, soort = 'betaal', naam, wie, idem }) {
     const ruw = String(codenaam || '').trim();
     if (!ruw) return { status: 400, error: 'Voor wie is de rekening?' };
     if (!SOORTEN[soort]) return { status: 400, error: 'Onbekende rekeningsoort.' };
@@ -50,16 +62,19 @@ module.exports = (ctx) => {
       if (!rec) return { status: 404, error: 'Die codenaam kennen we niet.' };
       c = rec.codename || ruw;
     }
-    const eigen = Object.values(rekeningen()).filter(m => m.codenaam === c);
-    if (eigen.length >= 12) return { status: 429, error: 'Het maximaal aantal rekeningen is bereikt.' };
-    const iban = genIban();
-    if (!iban) return { status: 500, error: 'Kon geen IBAN uitgeven; probeer het opnieuw.' };
-    const meta = { iban, codenaam: c, soort, naam: String(naam || SOORTEN[soort]).replace(/[<>]/g, '').slice(0, 40),
-      geopend: nu(), roodLimiet: soort === 'betaal' ? bankregie.bankRoodStandaard() : 0, bevroren: false, doelCenten: 0, door: wie || 'lid' };
-    rekeningen()[iban] = meta;
-    save();
-    seintje(c);
-    return { ok: true, rekening: publiek(meta) };
+    return metIdem(idem ? 'rekopen:' + c + ':' + idem : null,
+      'rekopen|' + c + '|' + soort + '|' + String(naam || ''), () => {
+        const eigen = Object.values(rekeningen()).filter(m => m.codenaam === c);
+        if (eigen.length >= 12) return { status: 429, error: 'Het maximaal aantal rekeningen is bereikt.' };
+        const iban = genIban();
+        if (!iban) return { status: 500, error: 'Kon geen IBAN uitgeven; probeer het opnieuw.' };
+        const meta = { iban, codenaam: c, soort, naam: String(naam || SOORTEN[soort]).replace(/[<>]/g, '').slice(0, 40),
+          geopend: nu(), roodLimiet: soort === 'betaal' ? bankregie.bankRoodStandaard() : 0, bevroren: false, doelCenten: 0, door: wie || 'lid' };
+        rekeningen()[iban] = meta;
+        save();
+        seintje(c);
+        return { ok: true, rekening: publiek(meta) };
+      });
   }
 
   const publiek = m => ({ iban: m.iban, soort: m.soort, soortLabel: SOORTEN[m.soort], naam: m.naam,

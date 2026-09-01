@@ -17,7 +17,7 @@ module.exports = (kern) => {
   // akkoord geven: opent meteen de eerste betaalrekening (de module bewaakt online)
   app.post('/api/bank/akkoord', auth, async (req, res) => { if (gast(req, res)) return; stuur(res, await bank.bankLedenAkkoord(cn(req), req.session.tier)); });
 
-  app.post('/api/bank/rekening/open', auth, async (req, res) => { if (gate(req, res)) return; stuur(res, await bank.rekeningOpen({ codenaam: cn(req), soort: req.body.soort, naam: req.body.naam, wie: 'lid' })); });
+  app.post('/api/bank/rekening/open', auth, async (req, res) => { if (gate(req, res)) return; stuur(res, await bank.rekeningOpen({ codenaam: cn(req), soort: req.body.soort, naam: req.body.naam, wie: 'lid', idem: req.body.idem || req.body.idempotentieSleutel })); });
   app.post('/api/bank/rekening', auth, (req, res) => { if (gate(req, res)) return; stuur(res, bank.rekeningDetail(String(req.body.iban || ''), cn(req))); });
   app.post('/api/bank/afschrift', auth, (req, res) => {
     if (gate(req, res)) return;

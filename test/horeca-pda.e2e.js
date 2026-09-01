@@ -92,8 +92,33 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
     /* En een halve gang met een afgesproken serveertijd die AL VOORBIJ is: die
        is over zijn grens (het serveermoment zelf) en hoort dus in "nu". Twintig
        minuten terug, in de tijd van deze machine -- dezelfde tijd waarmee
-       kern/horeca/cadans.js rekent. */
-    const toen = new Date(Date.now() - 20 * 60000);
+       kern/horeca/cadans.js rekent.
+
+       MAAR NOOIT OVER MIDDERNACHT HEEN, en dat is dezelfde valkuil als bij de
+       aankomststroom verderop -- alleen andersom. Een serveertijd is een
+       KLOKTIJD (HH:MM) zonder datum, en kern/horeca/cadans-doel.js hangt hem
+       aan de dag van het anker en rolt hem vooruit als hij meer dan zes uur in
+       het verleden zou liggen. Dat is bewust: een zaak die na middernacht
+       doorloopt spreekt om 23:00 "00:30" af en bedoelt straks.
+
+       Om 00:09 rekent deze toets 20 minuten terug, komt op "23:49", en de
+       server leest dat als VANAVOND -- bijna 24 uur vooruit in plaats van
+       twintig minuten terug. Dan staat er niets over zijn grens en zakt de
+       bewering hieronder op de klok in plaats van op de code. Gemeten in CI-run
+       33452968389, die om 00:09 UTC startte.
+
+       Dus: nooit voorbij middernacht terug. En de gang moet minstens een hele
+       minuut over zijn, want `doelOver` wordt op hele minuten AFGEROND en de
+       werklijst neemt hem pas op bij `< 0` -- dertig seconden te laat is voor
+       die lijst nul. Valt de start in de eerste twee minuten van een dag, dan
+       bestaat de voorwaarde van deze toets domweg niet en wachten we hem uit;
+       overslaan zou een bewering wegpoetsen die het hele scherm draagt. */
+    const middernacht = new Date(); middernacht.setHours(0, 0, 0, 0);
+    const RUIMTE = 2 * 60000;
+    if (Date.now() - middernacht.getTime() < RUIMTE) {
+      await new Promise((r) => setTimeout(r, RUIMTE - (Date.now() - middernacht.getTime()) + 1000));
+    }
+    const toen = new Date(Math.max(Date.now() - 20 * 60000, middernacht.getTime() + 60000));
     const serveerOm = String(toen.getHours()).padStart(2, '0') + ':' + String(toen.getMinutes()).padStart(2, '0');
     const laat = (await H('/api/supplier/horeca/rekening/open', { kanaal: 'tafel', tafel: 'PDA-LAAT', gasten: 2 })).body.rekening;
     const l1 = (await H('/api/supplier/horeca/rekening/regel', { rekeningId: laat.id, naam: 'Tartaar', prijs: 22, aantal: 1, gang: 1, station: 'koud' })).body.regel;

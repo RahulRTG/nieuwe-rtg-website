@@ -153,9 +153,16 @@ test('14. een wijziging buiten het instrument veroudert het register niet', () =
   const commits = spawnSync('git', ['log', '--format=%h', '-40', 'HEAD'],
     { cwd: WORTEL2, encoding: 'utf8' }).stdout.split('\n').filter(Boolean);
 
+  /* Per commit zijn EIGEN wijziging (ouder..commit), en niet de opgetelde
+     afstand tot HEAD. De eerste versie nam commit..HEAD, en dan is het geval er
+     alleen zolang de nieuwste commits allemaal scripts-only zijn: een commit
+     in public/ erbovenop maakte het geval onvindbaar en de toets rood, terwijl
+     er aan versheid() niets veranderd was. Het register wordt daarom
+     vergeleken alsof die commit HEAD is -- versheid() neemt de huidige commit
+     als argument, dus dat vraagt geen verzonnen historie. */
   let bewijs = null;
   for (const c of commits) {
-    const gewijzigd = spawnSync('git', ['diff', '--name-only', c + '..' + head, '--',
+    const gewijzigd = spawnSync('git', ['diff', '--name-only', c + '^..' + c, '--',
       'server', 'scripts', 'public'], { cwd: WORTEL2, encoding: 'utf8' })
       .stdout.split('\n').filter(Boolean);
     if (!gewijzigd.length || gewijzigd.some(f => !f.startsWith('scripts/'))) continue;
@@ -170,12 +177,12 @@ test('14. een wijziging buiten het instrument veroudert het register niet', () =
   assert.ok(bewijs, 'geen commit gevonden die alleen scripts buiten een instrument raakt; ' +
     'deze toets meet dan niets -- verruim het venster of voeg een geval toe');
 
-  const met = versheid({ op: 'x', commit: bewijs.c, boomVuil: false, instrument: bewijs.i }, head);
+  const met = versheid({ op: 'x', commit: bewijs.c + '^', boomVuil: false, instrument: bewijs.i }, bewijs.c);
   assert.equal(met.vers, true, bewijs.i + ' leest geen van ' + bewijs.gewijzigd.join(', ') +
     ' in, en hoort dus vers te blijven -- gezien: ' + met.reden);
 
   /* En zonder `instrument` blijft de oude, strengste regel gelden: een bestaand
      register mag niet ineens vers heten omdat de regel is bijgesteld. */
-  const zonder = versheid({ op: 'x', commit: bewijs.c, boomVuil: false }, head);
+  const zonder = versheid({ op: 'x', commit: bewijs.c + '^', boomVuil: false }, bewijs.c);
   assert.equal(zonder.vers, false, 'een stempel zonder instrument valt terug op de strengste regel');
 });

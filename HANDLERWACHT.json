@@ -1,23 +1,23 @@
 {
  "stempel": {
-  "op": "2026-09-01T00:20:47.132Z",
-  "commit": "5f7e43d5f",
-  "boomVuil": true,
-  "boomAnders": 11,
+  "op": "2026-09-01T06:00:39.849Z",
+  "commit": "b790bca11",
+  "boomVuil": false,
+  "boomAnders": 3,
   "instrument": "scripts/handlerwacht.js",
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
   "zonderBewakerslaag": 614,
-  "bewaakt": 487,
+  "bewaakt": 531,
   "openbaarMetReden": 47,
   "eigenControle": 16,
   "sleutelDoorgegeven": 12,
   "zonderWachtMetReden": 8,
   "laat": 0,
-  "onbewaakt": 1,
-  "nietGelezen": 43,
+  "onbewaakt": 0,
+  "nietGelezen": 0,
   "gezagsfuncties": 26,
   "publiekeLijstenVerschillen": 19
  },
@@ -64,6 +64,10 @@
    "aantal": 55
   },
   {
+   "naam": "rtfSpeler -> rtf.verifieerProfiel",
+   "aantal": 43
+  },
+  {
    "naam": "gezinSessie",
    "aantal": 37
   },
@@ -104,6 +108,10 @@
    "aantal": 7
   },
   {
+   "naam": "samenSess",
+   "aantal": 6
+  },
+  {
    "naam": "sessie",
    "aantal": 5
   },
@@ -113,10 +121,6 @@
   },
   {
    "naam": "rtf.verifieerProfiel",
-   "aantal": 5
-  },
-  {
-   "naam": "samenSess",
    "aantal": 5
   },
   {
@@ -3046,7 +3050,7 @@
   },
   {
    "sleutel": "POST /api/mijn/herstelkanaal/email/bevestig",
-   "bestand": "server/routes/member/herstelkanaal.js:150",
+   "bestand": "server/routes/member/herstelkanaal.js:151",
    "staat": "openbaar",
    "reden": "de bevestigingslink IS de geloofsbrief (verifyActionToken, doel mailwissel); komt uit de mailbox van het nieuwe adres en heeft dus geen sessie"
   },
@@ -3257,9 +3261,9 @@
   },
   {
    "sleutel": "POST /api/rtf/samen/maak",
-   "staat": "nietGelezen",
-   "bestand": "server/kern/handlerpoorten/index.js:7",
-   "reden": "op deze regel staat geen leesbare handler (lus of hulpje)"
+   "bestand": "server/routes/rtfschool.js:74",
+   "staat": "bewaakt",
+   "wacht": "samenSess"
   },
   {
    "sleutel": "POST /api/rtf/samen/mee",
@@ -3473,218 +3477,261 @@
   },
   {
    "sleutel": "POST /api/rtf/spel/antwoord",
-   "bestand": "server/routes/rtmail-vak.js:127",
-   "staat": "onbewaakt"
+   "bestand": "server/routes/spellen.js:139",
+   "staat": "bewaakt",
+   "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/arcade-bord",
-   "staat": "nietGelezen",
-   "reden": "de bron van deze route is niet gevonden"
+   "bestand": "server/routes/spellen.js:139",
+   "staat": "bewaakt",
+   "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/arcade-score",
-   "staat": "nietGelezen",
-   "reden": "de bron van deze route is niet gevonden"
+   "bestand": "server/routes/spellen.js:139",
+   "staat": "bewaakt",
+   "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/dag",
-   "staat": "nietGelezen",
-   "reden": "de bron van deze route is niet gevonden"
+   "bestand": "server/routes/spellen.js:139",
+   "staat": "bewaakt",
+   "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/dag-klaar",
-   "staat": "nietGelezen",
-   "reden": "de bron van deze route is niet gevonden"
+   "bestand": "server/routes/spellen.js:139",
+   "staat": "bewaakt",
+   "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/dag-start",
-   "staat": "nietGelezen",
-   "reden": "de bron van deze route is niet gevonden"
+   "bestand": "server/routes/spellen.js:139",
+   "staat": "bewaakt",
+   "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/kijk",
-   "staat": "nietGelezen",
-   "reden": "de bron van deze route is niet gevonden"
+   "bestand": "server/routes/spellen.js:139",
+   "staat": "bewaakt",
+   "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/klasgenoten",
-   "staat": "nietGelezen",
-   "reden": "de bron van deze route is niet gevonden"
+   "bestand": "server/routes/spellen.js:139",
+   "staat": "bewaakt",
+   "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/mijn",
-   "staat": "nietGelezen",
-   "reden": "de bron van deze route is niet gevonden"
+   "bestand": "server/routes/spellen.js:139",
+   "staat": "bewaakt",
+   "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/nabespreking",
-   "staat": "nietGelezen",
-   "reden": "de bron van deze route is niet gevonden"
+   "bestand": "server/routes/spellen.js:139",
+   "staat": "bewaakt",
+   "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/naspelen",
-   "staat": "nietGelezen",
-   "reden": "de bron van deze route is niet gevonden"
+   "bestand": "server/routes/spellen.js:139",
+   "staat": "bewaakt",
+   "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/nieuw",
-   "staat": "nietGelezen",
-   "reden": "de bron van deze route is niet gevonden"
+   "bestand": "server/routes/spellen.js:139",
+   "staat": "bewaakt",
+   "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/online",
-   "staat": "nietGelezen",
-   "reden": "de bron van deze route is niet gevonden"
+   "bestand": "server/routes/spellen.js:139",
+   "staat": "bewaakt",
+   "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/opgeven",
-   "staat": "nietGelezen",
-   "reden": "de bron van deze route is niet gevonden"
+   "bestand": "server/routes/spellen.js:139",
+   "staat": "bewaakt",
+   "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/praat",
-   "staat": "nietGelezen",
-   "reden": "de bron van deze route is niet gevonden"
+   "bestand": "server/routes/spellen.js:139",
+   "staat": "bewaakt",
+   "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/praat-stuur",
-   "staat": "nietGelezen",
-   "reden": "de bron van deze route is niet gevonden"
+   "bestand": "server/routes/spellen.js:139",
+   "staat": "bewaakt",
+   "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/prestaties",
-   "staat": "nietGelezen",
-   "reden": "de bron van deze route is niet gevonden"
+   "bestand": "server/routes/spellen.js:139",
+   "staat": "bewaakt",
+   "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/projectie-open",
-   "staat": "nietGelezen",
-   "reden": "de bron van deze route is niet gevonden"
+   "bestand": "server/routes/spellen.js:139",
+   "staat": "bewaakt",
+   "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/projectie-sluit",
-   "staat": "nietGelezen",
-   "reden": "de bron van deze route is niet gevonden"
+   "bestand": "server/routes/spellen.js:139",
+   "staat": "bewaakt",
+   "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/rahul",
-   "staat": "nietGelezen",
-   "reden": "de bron van deze route is niet gevonden"
+   "bestand": "server/routes/spellen.js:139",
+   "staat": "bewaakt",
+   "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/random",
-   "staat": "nietGelezen",
-   "reden": "de bron van deze route is niet gevonden"
+   "bestand": "server/routes/spellen.js:139",
+   "staat": "bewaakt",
+   "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/replay",
-   "staat": "nietGelezen",
-   "reden": "de bron van deze route is niet gevonden"
+   "bestand": "server/routes/spellen.js:139",
+   "staat": "bewaakt",
+   "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/sneek-bord",
-   "staat": "nietGelezen",
-   "reden": "de bron van deze route is niet gevonden"
+   "bestand": "server/routes/spellen.js:139",
+   "staat": "bewaakt",
+   "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/sneek-score",
-   "staat": "nietGelezen",
-   "reden": "de bron van deze route is niet gevonden"
+   "bestand": "server/routes/spellen.js:139",
+   "staat": "bewaakt",
+   "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/staat",
-   "staat": "nietGelezen",
-   "reden": "de bron van deze route is niet gevonden"
+   "bestand": "server/routes/spellen.js:139",
+   "staat": "bewaakt",
+   "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/stand",
-   "staat": "nietGelezen",
-   "reden": "de bron van deze route is niet gevonden"
+   "bestand": "server/routes/spellen.js:139",
+   "staat": "bewaakt",
+   "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/sudoku-klaar",
-   "staat": "nietGelezen",
-   "reden": "de bron van deze route is niet gevonden"
+   "bestand": "server/routes/spellen.js:139",
+   "staat": "bewaakt",
+   "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/sudoku-nieuw",
-   "staat": "nietGelezen",
-   "reden": "de bron van deze route is niet gevonden"
+   "bestand": "server/routes/spellen.js:139",
+   "staat": "bewaakt",
+   "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/team-antwoord",
-   "staat": "nietGelezen",
-   "reden": "de bron van deze route is niet gevonden"
+   "bestand": "server/routes/spellen.js:139",
+   "staat": "bewaakt",
+   "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/team-mijn",
-   "staat": "nietGelezen",
-   "reden": "de bron van deze route is niet gevonden"
+   "bestand": "server/routes/spellen.js:139",
+   "staat": "bewaakt",
+   "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/team-nieuw",
-   "staat": "nietGelezen",
-   "reden": "de bron van deze route is niet gevonden"
+   "bestand": "server/routes/spellen.js:139",
+   "staat": "bewaakt",
+   "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/team-nodig",
-   "staat": "nietGelezen",
-   "reden": "de bron van deze route is niet gevonden"
+   "bestand": "server/routes/spellen.js:139",
+   "staat": "bewaakt",
+   "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/team-verlaat",
-   "staat": "nietGelezen",
-   "reden": "de bron van deze route is niet gevonden"
+   "bestand": "server/routes/spellen.js:139",
+   "staat": "bewaakt",
+   "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/toernooi-antwoord",
-   "staat": "nietGelezen",
-   "reden": "de bron van deze route is niet gevonden"
+   "bestand": "server/routes/spellen.js:139",
+   "staat": "bewaakt",
+   "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/toernooi-mijn",
-   "staat": "nietGelezen",
-   "reden": "de bron van deze route is niet gevonden"
+   "bestand": "server/routes/spellen.js:139",
+   "staat": "bewaakt",
+   "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/toernooi-nieuw",
-   "staat": "nietGelezen",
-   "reden": "de bron van deze route is niet gevonden"
+   "bestand": "server/routes/spellen.js:139",
+   "staat": "bewaakt",
+   "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/toernooi-staat",
-   "staat": "nietGelezen",
-   "reden": "de bron van deze route is niet gevonden"
+   "bestand": "server/routes/spellen.js:139",
+   "staat": "bewaakt",
+   "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/toewijzen",
-   "staat": "nietGelezen",
-   "reden": "de bron van deze route is niet gevonden"
+   "bestand": "server/routes/spellen.js:139",
+   "staat": "bewaakt",
+   "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/uitslagen",
-   "staat": "nietGelezen",
-   "reden": "de bron van deze route is niet gevonden"
+   "bestand": "server/routes/spellen.js:139",
+   "staat": "bewaakt",
+   "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/varianten",
-   "staat": "nietGelezen",
-   "reden": "de bron van deze route is niet gevonden"
+   "bestand": "server/routes/spellen.js:139",
+   "staat": "bewaakt",
+   "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/zet",
-   "staat": "nietGelezen",
-   "reden": "de bron van deze route is niet gevonden"
+   "bestand": "server/routes/spellen.js:139",
+   "staat": "bewaakt",
+   "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/zichtbaar",
-   "staat": "nietGelezen",
-   "reden": "de bron van deze route is niet gevonden"
+   "bestand": "server/routes/spellen.js:139",
+   "staat": "bewaakt",
+   "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/zichtbaar-zet",
-   "staat": "nietGelezen",
-   "reden": "de bron van deze route is niet gevonden"
+   "bestand": "server/routes/spellen.js:139",
+   "staat": "bewaakt",
+   "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/talent/interesse",

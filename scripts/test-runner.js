@@ -62,6 +62,17 @@ if (dekkingVloer.length && (dekkingVloer.length !== 3 || dekkingVloer.some(n => 
   console.error('[tests] --dekking wil een map of drie getallen: regels,takken,functies');
   process.exit(2);
 }
+/* DE MODUS STAAT VOOR DE VERDELING, EN NIET ALLEEN VOOR DE METING. Hieronder
+   verdeelt `verdeel()` de scherven op de gewichten uit TOETSDUUR.json, en welke
+   gewichten dat zijn hangt af van de modus waarin DEZE ronde draait. Stond hij
+   alleen in de omgeving van het kindproces, dan meet de loper `dekking` en
+   verdeelt hij op `normaal` -- exact de fout waar deze hele laag voor is
+   gebouwd, een niveau lager en net zo onzichtbaar.
+
+   Draait er ook maar iets met dekking, dan is dat het model waarop de scherven
+   gepland worden: die batches bepalen de looptijd. */
+require('./lib/meetbron').zetModus(!!(dekkingMap || dekkingVloer.length === 3));
+
 const deelVlag = (argv.find(a => a.startsWith('--deel=')) || '').slice(7);
 const deel = (() => {
   if (!deelVlag) return null;
@@ -124,18 +135,8 @@ const nodeOpties = (process.env.NODE_OPTIONS ? process.env.NODE_OPTIONS + ' ' : 
    CI toevallig draaide; wie hem met een vlag zou aanzetten, meet nooit.
    Het meegegeven pad wint, zoals bij het routejournaal hierboven. */
 const duurpad = process.env.RTG_TOETSDUUR || path.join(WORTEL, '.toetsduur');
-/* DE HERKOMST VAN DE METING, EEN KEER BEPAALD. Elk toetsproces schrijft hem
-   mee (test/toetsnaam.js), zodat een gewicht later zelf kan zeggen waar het
-   vandaan komt in plaats van dat iemand het moet aannemen. Hier en niet daar,
-   want `git rev-parse` per toetsproces is duizend spawns voor een waarde die
-   voor de hele ronde hetzelfde is. */
-let commitKort = 'onbekend';
-try {
-  commitKort = require('child_process')
-    .execFileSync('git', ['rev-parse', '--short', 'HEAD'], { cwd: WORTEL, encoding: 'utf8' }).trim();
-} catch (e) { /* zonder git ook goed */ }
-const BRON = [process.env.GITHUB_ACTIONS ? 'ci' : 'lokaal', process.version,
-  require('os').cpus().length, commitKort].join('|');
+/* De herkomst van de meting; een plek, en die is scripts/lib/meetbron.js. */
+const BRON = require('./lib/meetbron').bron();
 
 const env = { ...process.env, RTG_ROUTELOG: journaal, RTG_AFBOUW_SLOT_ACTIEF: '1',
   NODE_OPTIONS: nodeOpties, RTG_TOETSDUUR: duurpad, RTG_TOETSBRON: BRON };

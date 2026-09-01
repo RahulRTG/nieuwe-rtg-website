@@ -118,41 +118,65 @@ function gevraagdeModus() {
 
 function duren() {
   if (onthouden) return onthouden;
-  const gevraagd = gevraagdeModus();
   let reg = null;
   try { reg = JSON.parse(fs.readFileSync(REGISTER, 'utf8')); } catch (e) { reg = null; }
-
-  const uit = (kaart, vertrouwen, modus) =>
-    ({ gewicht: new Map(Object.entries(kaart || {})), vertrouwen, modus, gevraagd });
-
-  if (!reg) return (onthouden = uit(null, 'ongeldig', null));
 
   /* Een register van voor de modi (versie 1) draagt zijn duur in de top. Die
      metingen zijn ECHT, maar van welke modus weet niemand meer -- dus tellen ze
      als een andere modus: bruikbaar, niet vertrouwd. */
-  const modi = reg.modi || (reg.duur ? { onbekend: { duur: reg.duur } } : {});
-  const eigen = modi[gevraagd] && modi[gevraagd].duur;
-  if (eigen && Object.keys(eigen).length) return (onthouden = uit(eigen, 'geldig', gevraagd));
+  const modi = !reg ? {}
+    : (reg.modi || (reg.duur ? { onbekend: { duur: reg.duur } } : {}));
 
-  for (const naam of [...MODI, 'onbekend']) {
-    const ander = modi[naam] && modi[naam].duur;
-    if (ander && Object.keys(ander).length) return (onthouden = uit(ander, 'twijfelachtig', naam));
+  const kaarten = {};
+  for (const [naam, m] of Object.entries(modi)) {
+    if (m && m.duur && Object.keys(m.duur).length) kaarten[naam] = new Map(Object.entries(m.duur));
   }
-  return (onthouden = uit(null, 'ongeldig', null));
+  onthouden = { kaarten };
+  return onthouden;
+}
+
+/* WELKE WEGING GELDT VOOR DEZE LIJST?
+
+   De gevraagde modus wint altijd. Ontbreekt hij, dan kiest de terugval de modus
+   die DEZE BESTANDEN het best kent -- en niet de eerste op naam.
+
+   Dat verschil is geen detail. Toen e2e.js zijn eigen modus (`normaal`) ging
+   declareren, bestond die nog niet in het register en pakte de terugval op
+   naamvolgorde `dekking`: een modus met 1259 unit-bestanden en GEEN ENKEL
+   e2e-bestand. De schermtoetsen waren daarmee in een klap ongewogen, terwijl er
+   een modus naast lag die ze allemaal kende. Een terugval die niet kijkt of hij
+   het onderwerp kent, is geen terugval maar een gok. */
+function wegingVoor(lijst) {
+  if (opgelegd) return opgelegd;
+  const gevraagd = gevraagdeModus();
+  const { kaarten } = duren();
+
+  const eigen = kaarten[gevraagd];
+  if (eigen) return { gewicht: eigen, vertrouwen: 'geldig', modus: gevraagd, gevraagd };
+
+  let beste = null;
+  for (const [naam, kaart] of Object.entries(kaarten)) {
+    const dekt = lijst.reduce((n, b) => n + (kaart.has(b) ? 1 : 0), 0);
+    if (dekt && (!beste || dekt > beste.dekt)) beste = { naam, kaart, dekt };
+  }
+  if (beste) return { gewicht: beste.kaart, vertrouwen: 'twijfelachtig', modus: beste.naam, gevraagd };
+  return { gewicht: new Map(), vertrouwen: 'ongeldig', modus: null, gevraagd };
 }
 
 /* Alleen voor de toetsen: een eigen weging opleggen zonder een bestand op
    schijf te zetten. Met null valt hij terug op het register. */
+let opgelegd = null;
 function zetDuren(kaart, vertrouwen) {
-  onthouden = kaart === null ? null
+  opgelegd = kaart === null ? null
     : { gewicht: new Map(Object.entries(kaart)), vertrouwen: vertrouwen || 'geldig',
         modus: 'opgelegd', gevraagd: 'opgelegd' };
+  if (kaart === null) onthouden = null;
 }
 
 /* Wat de verdeler op dit moment onder zich heeft. De wachter leest dit, en een
    scherm dat over de verdeling iets beweert hoort het erbij te zetten. */
-function weging() {
-  const d = duren();
+function weging(lijst) {
+  const d = wegingVoor(lijst || []);
   return { vertrouwen: d.vertrouwen, modus: d.modus, gevraagd: d.gevraagd, bestanden: d.gewicht.size };
 }
 
@@ -162,7 +186,7 @@ function weging() {
 function indeling(lijst, totaal) {
   const bakken = Array.from({ length: totaal }, () => []);
   const last = new Array(totaal).fill(0);
-  const { gewicht, vertrouwen } = duren();
+  const { gewicht, vertrouwen } = wegingVoor(lijst);
 
   /* De marge uit de kop: bij twijfel mag geen scherf meer dan zijn deel aan
      BESTANDEN krijgen. Bij `geldig` staat hij uit, want dan zou hij een goede
@@ -206,4 +230,4 @@ function verdeel(lijst, deel) {
   return indeling(lijst, deel.totaal)[deel.nr - 1];
 }
 
-module.exports = { ontleedDeel, verdeel, indeling, zetDuren, weging, MODI, REGISTER };
+module.exports = { ontleedDeel, verdeel, indeling, zetDuren, weging, wegingVoor, MODI, REGISTER };

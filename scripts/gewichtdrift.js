@@ -109,6 +109,45 @@ function vergelijk(oudModus, verseDuur) {
   return { gedeeld: gedeeld.length, totaleKosten, maxBestand, maxNaam };
 }
 
+/* HOEVEEL VAN DIT REGISTER KOMT ECHT UIT DEZE OMGEVING?
+
+   Een modus bewaart het gewicht van een bestand dat DEZE ronde niet draaide --
+   met opzet, want een scherf mag de andere drie kwarten niet uit het register
+   vegen. De prijs is dat zo'n gewicht zijn oude bron houdt: een meting van een
+   andere runner, een andere node, soms een andere machine.
+
+   Dat is precies de vorm van appels met peren die dit hele register moest
+   wegnemen, alleen dan BINNEN een modus in plaats van ertussen. Het staat per
+   bestand vastgelegd (`spreiding.bronnen`) en is dus na te rekenen -- maar zolang
+   niemand het optelt, ziet niemand het. Deze som telt hoeveel gewichten NIET van
+   de nieuwste bron komen.
+
+   Hij verandert met opzet de STATUS niet. Een oude bron is geen bewijs dat het
+   gewicht fout is; hij is een reden om het te weten. Wie hier een grens op zet,
+   laat een register zakken omdat een toets een ronde niet draaide. */
+function vreemdeBronnen(oudModus) {
+  const spreiding = (oudModus && oudModus.spreiding) || {};
+  const namen = Object.keys(spreiding);
+  if (!namen.length) return null;
+
+  /* De nieuwste bron is die van de laatste meting; het stempel van de modus
+     noemt hem niet, dus wordt hij afgeleid uit de bron die het vaakst bij de
+     jongste meetdatum hoort. */
+  let jongste = '';
+  for (const n of namen) if ((spreiding[n].gemetenOp || '') > jongste) jongste = spreiding[n].gemetenOp || '';
+  const telling = new Map();
+  for (const n of namen) {
+    if ((spreiding[n].gemetenOp || '') !== jongste) continue;
+    for (const b of (spreiding[n].bronnen || [])) telling.set(b, (telling.get(b) || 0) + 1);
+  }
+  let huidig = null, beste = 0;
+  for (const [b, aantal] of telling) if (aantal > beste) { huidig = b; beste = aantal; }
+  if (!huidig) return null;
+
+  const vreemd = namen.filter((n) => !((spreiding[n].bronnen || []).includes(huidig)));
+  return { huidig, vreemd: vreemd.length, totaal: namen.length };
+}
+
 function beoordeel({ zelfdeModus, gedeeld, fout }) {
   if (!zelfdeModus) return { status: 'ONGELDIG', waarom: 'het register gaat over een andere modus dan deze meting' };
   if (!gedeeld) return { status: 'ONGELDIG', waarom: 'geen enkel bestand komt in allebei voor' };
@@ -145,6 +184,7 @@ function meet(paden) {
     }
     const oordeel = beoordeel({ zelfdeModus: !!oudModus, gedeeld: v.gedeeld, fout });
     uit.push(Object.assign({ modus, fout, lasten, verse: Object.keys(verseDuur).length,
+      herkomst: vreemdeBronnen(oudModus),
       stempel: (oudModus || {}).stempel || null }, v, oordeel));
   }
   return uit;
@@ -164,6 +204,8 @@ function toon(rijen) {
     console.log('    totale kosten       ' + pct(r.totaleKosten));
     console.log('    max bestand         ' + pct(r.maxBestand) + (r.maxNaam ? '   (' + r.maxNaam + ')' : ''));
     console.log('    shard projectiefout ' + (r.fout === null ? '-' : (r.fout * 100).toFixed(0) + '%'));
+    if (r.herkomst) console.log('    van een andere bron  ' + r.herkomst.vreemd + ' van ' +
+      r.herkomst.totaal + '   (nieuwste: ' + r.herkomst.huidig + ')');
     if (r.lasten) console.log('    scherven zouden     ' +
       r.lasten.map((l) => (l / 1000).toFixed(0) + 's').join(' / '));
     console.log('  status                ' + r.status + '   -- ' + r.waarom);
@@ -214,4 +256,4 @@ function main() {
 }
 
 if (require.main === module) process.exit(main());
-module.exports = { vergelijk, beoordeel, projectiefout, GRENS };
+module.exports = { vergelijk, beoordeel, projectiefout, vreemdeBronnen, GRENS };

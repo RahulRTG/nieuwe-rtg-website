@@ -217,6 +217,54 @@ deel. Die marge is met opzet een **telling en geen tijd**: als de gewichten
 verdacht zijn, is het enige dat je nog zeker weet hoeveel bestanden er zijn. De
 schade van een fout gewicht is daarmee begrensd in plaats van onbeperkt.
 
+### Wanneer een gewicht zonder modus mag verdwijnen
+
+`onbekend` is de bak voor metingen van vóór de modi: echt gemeten, maar niemand
+weet meer onder welke omstandigheden. Hij is nuttig zolang hij de enige is die
+een bestand kent — de terugval leunt erop — en hij hoort niet eeuwig te groeien
+naast modi die datzelfde bestand wél gelabeld kennen.
+
+De regel is bewust streng: **een gewicht gaat pas weg als élke gedeclareerde
+modus dat bestand kent.** Dan bestaat er voor elke vraag een gelabeld antwoord
+en kan `onbekend` per definitie niet meer nodig zijn.
+
+Waarom niet soepeler — "weg zodra `dekking` het kent"? Omdat niemand weet wát
+`onbekend` heeft gemeten. Voor een ronde zonder dekking is een onbekende meting
+waarschijnlijk een betere schatting dan een dekkingsmeting, die er drie keer
+naast kan zitten. Een gewicht weggooien op grond van een aanname over zijn
+herkomst is precies de fout die dit register wegneemt.
+
+Hij ruimt dus vanzelf op zodra beide modi vol zijn, en tot die tijd doet hij
+niets. **Een opruiming die iemand op het juiste moment moet aanzetten is geen
+opruiming** — dat is hoe het register maandenlang lokaal bleef.
+
+### Appels met peren, ook binnen een modus
+
+De modi voorkomen dat een dekkingsmeting en een gewone meting op een hoop
+komen. Er blijft een tweede vorm over, en die zit *binnen* een modus: een
+register bewaart het gewicht van een bestand dat deze ronde niet draaide — met
+opzet, want een scherf mag de andere drie kwarten niet wissen — en zo'n gewicht
+houdt zijn oude bron. Een meting van een andere runner, een andere node, soms
+een andere machine.
+
+Dat staat per bestand vast (`spreiding.bronnen`), maar zolang niemand het optelt
+ziet niemand het. `gewichtdrift.js` telt daarom hoeveel gewichten **niet** van
+de nieuwste bron komen. Op het eerste CI-gemeten register:
+
+| modus | van een andere bron |
+|---|---|
+| `dekking` | 0 van 1259 |
+| `onbekend` | 1257 van 1434 |
+
+Die meter verandert met opzet de **status niet**. Een oude bron is geen bewijs
+dat het gewicht fout is; hij is een reden om het te weten. Wie hier een grens op
+zet, laat een register zakken omdat een toets een ronde niet meedraaide.
+
+En hij neemt de nieuwste bron uit de **jongste meting**, niet uit de grootste
+hoop. Dat is de faalvorm die hem anders nutteloos maakt: bij een register vol
+oude gewichten wint de oude bron op aantal, heet die "de nieuwste", en meldt de
+meter bijna niets vreemds — precies wanneer er het meeste vreemd is.
+
 ### CI meet, CI stelt voor, een mens merget
 
 Het register staat in git omdat de verdeling deterministisch hoort te zijn; een

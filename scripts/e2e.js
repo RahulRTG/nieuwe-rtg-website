@@ -52,6 +52,19 @@ const deel = (() => {
 const journaal = process.env.RTG_SCHERMJOURNAAL || path.join(WORTEL, '.schermjournaal');
 try { fs.unlinkSync(journaal); } catch (e) { if (e.code !== 'ENOENT') throw e; }
 
+/* DEZE LOPER DRAAIT ZONDER DEKKING, en dat is een eigenschap van de meting en
+   niet een detail. Hij stond hier eerst helemaal niet, en daardoor schreven de
+   schermtoetsen hun duur weg als modus `onbekend`: een bak die nooit leegloopt,
+   waardoor deze suite voor altijd op `twijfelachtig` bleef staan en met een
+   marge verdeeld werd. Gemeten in run 33504563133 -- 1434 bestanden onder
+   `onbekend`, terwijl de unit-scherven netjes onder `dekking` landden.
+
+   Hij staat BOVEN de verdeling hieronder, want `verdeel()` kiest zijn gewichten
+   op de modus van dit proces. Meten en plannen horen hetzelfde model te
+   gebruiken; dat ze uit elkaar konden lopen is de fout waar deze laag voor is
+   gebouwd. */
+require('./lib/meetbron').zetModus(false);
+
 const alle = fs.readdirSync(TESTMAP).filter(n => n.endsWith('.e2e.js')).sort();
 const mijn = verdeel(alle, deel);   // dezelfde verdeelregel als de unit-toetsen
 
@@ -74,6 +87,7 @@ const r = spawnSync(process.execPath, [
     /* Ook de schermtoetsen worden in vier delen verdeeld, dus ook zij hebben
        een gewicht nodig. Zelfde meting, zelfde bestand. */
     RTG_TOETSDUUR: process.env.RTG_TOETSDUUR || path.join(WORTEL, '.toetsduur'),
+    RTG_TOETSBRON: require('./lib/meetbron').bron(),
     NODE_OPTIONS: (process.env.NODE_OPTIONS ? process.env.NODE_OPTIONS + ' ' : '') +
       '--require ' + JSON.stringify(path.join(WORTEL, 'test', 'toetsnaam.js')) },
   stdio: 'inherit'

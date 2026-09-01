@@ -167,6 +167,48 @@ function bouwModus(per, bestaand, bestaat) {
   };
 }
 
+/* WANNEER MAG EEN GEWICHT ZONDER MODUS WEG?
+
+   `onbekend` is de bak voor metingen van voor de modi: echt gemeten, maar
+   niemand weet meer onder welke omstandigheden. Zolang hij de enige is die een
+   bestand kent, is hij nuttig -- de terugval leunt erop. Hij hoort alleen niet
+   eeuwig te blijven groeien naast modi die hetzelfde bestand wel gelabeld
+   kennen.
+
+   DE REGEL IS BEWUST STRENG: een gewicht gaat pas weg als ELKE gedeclareerde
+   modus dat bestand kent. Dan bestaat er voor elke vraag een gelabeld antwoord
+   en kan `onbekend` per definitie niet meer nodig zijn.
+
+   Waarom niet soepeler -- bijvoorbeeld "weg zodra `dekking` het kent"? Omdat we
+   niet weten WAT `onbekend` heeft gemeten. Voor een ronde zonder dekking is een
+   onbekende meting waarschijnlijk een betere schatting dan een dekkingsmeting,
+   die er drie keer naast kan zitten. Een gewicht weggooien op grond van een
+   aanname over zijn herkomst is precies de fout die dit register wegneemt.
+
+   Hij ruimt dus vanzelf op zodra beide modi vol zijn, en tot die tijd doet hij
+   niets. Een opruiming die iemand op het juiste moment moet aanzetten, is geen
+   opruiming -- dat is hoe het register maandenlang lokaal bleef. */
+function ruimOnbekendOp(modi) {
+  const O = modi.onbekend;
+  if (!O) return null;
+  const gedeclareerd = ['normaal', 'dekking'].filter((m) => modi[m]);
+  if (!gedeclareerd.length) return { weg: 0, over: Object.keys(O.duur).length };
+
+  const overbodig = Object.keys(O.duur)
+    .filter((n) => gedeclareerd.every((m) => modi[m].duur[n] !== undefined));
+  if (gedeclareerd.length < 2) return { weg: 0, over: Object.keys(O.duur).length,
+    wacht: 'nog niet elke modus is gemeten' };
+
+  for (const n of overbodig) { delete O.duur[n]; delete O.spreiding[n]; }
+  const over = Object.keys(O.duur).length;
+  if (!over) delete modi.onbekend;
+  else {
+    O.gemeten.bestanden = over;
+    O.gemeten.totaalMs = Object.values(O.duur).reduce((a, b) => a + b, 0);
+  }
+  return { weg: overbodig.length, over };
+}
+
 function bouw(paden, bestaand) {
   const { perModus, regels, verminkt } = lees(paden);
   const bestaat = opSchijf();
@@ -185,6 +227,7 @@ function bouw(paden, bestaand) {
     const uit = bouwModus(perModus.get(m), oudeModi[m], bestaat);
     if (uit.gemeten.bestanden) modi[m] = uit;
   }
+  const opgeruimd = ruimOnbekendOp(modi);
 
   return {
     versie: 2,
@@ -195,7 +238,7 @@ function bouw(paden, bestaand) {
       'dat hier NIET in staat is ongemeten en wordt om en om verdeeld -- nooit ' +
       'overgeslagen.',
     hoe: 'npm test (schrijft .toetsduur), daarna: node scripts/toetsduur.js --schrijf',
-    gelezen: { regels, verminkt, opSchijf: bestaat.size, modi: namen },
+    gelezen: { regels, verminkt, opSchijf: bestaat.size, modi: namen, opgeruimd },
     modi
   };
 }

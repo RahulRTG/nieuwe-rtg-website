@@ -306,7 +306,7 @@ test('de gevraagde modus wordt gelezen, en niet die van de buurman', () => {
   metRegister(reg, () => {
     process.env.RTG_TOETSMODUS = 'dekking';
     zetDuren(null);
-    const w = weging();
+    const w = weging(['a.test.js', 'b.test.js']);
     assert.equal(w.modus, 'dekking', 'de dekkingsmodus hoort gelezen te worden');
     assert.equal(w.vertrouwen, 'geldig');
     /* Onder dekking is a het zwaarst, onder normaal is b dat. Leest hij de
@@ -322,7 +322,7 @@ test('een andere modus is bruikbaar maar niet vertrouwd', () => {
   metRegister(reg, () => {
     process.env.RTG_TOETSMODUS = 'dekking';
     zetDuren(null);
-    const w = weging();
+    const w = weging(['a.test.js']);
     assert.equal(w.vertrouwen, 'twijfelachtig',
       'gewichten uit een andere modus mogen nooit als geldig doorgaan');
     assert.equal(w.modus, 'normaal', 'en er hoort bij te staan WELKE modus het dan was');
@@ -335,7 +335,7 @@ test('een register van voor de modi telt als een andere modus, niet als geldig',
     zetDuren(null);
     /* Versie 1 droeg geen modus. Hem stilzwijgend als `normaal` aannemen is
        precies de gok die de hele fout veroorzaakte. */
-    assert.equal(weging().vertrouwen, 'twijfelachtig');
+    assert.equal(weging(['a.test.js']).vertrouwen, 'twijfelachtig');
   });
 });
 
@@ -346,7 +346,7 @@ test('zonder register is er geen weging om te vertrouwen', () => {
   try {
     try { fs2.unlinkSync(REG); } catch (e) {}
     zetDuren(null);
-    assert.equal(weging().vertrouwen, 'ongeldig');
+    assert.equal(weging(['a.test.js']).vertrouwen, 'ongeldig');
   } finally {
     if (bestond) fs2.writeFileSync(REG, oud);
     zetDuren(null);
@@ -367,13 +367,13 @@ test('bij twijfel begrenst de marge hoeveel bestanden een scherf krijgt', () => 
   const zonderMarge = metRegister(reg, () => {
     process.env.RTG_TOETSMODUS = 'normaal';       // geldig -> geen marge
     zetDuren(null);
-    assert.equal(weging().vertrouwen, 'geldig');
+    assert.equal(weging(lijst).vertrouwen, 'geldig');
     return indeling(lijst, 2).map((b) => b.length).sort();
   });
   const metMarge = metRegister(reg, () => {
     process.env.RTG_TOETSMODUS = 'dekking';       // twijfelachtig -> marge
     zetDuren(null);
-    assert.equal(weging().vertrouwen, 'twijfelachtig');
+    assert.equal(weging(lijst).vertrouwen, 'twijfelachtig');
     return indeling(lijst, 2).map((b) => b.length).sort();
   });
 
@@ -393,5 +393,40 @@ test('de marge laat nooit een bestand vallen', () => {
     const bakken = indeling(lijst, 2);
     assert.deepEqual([].concat(...bakken).sort(), [...lijst].sort(),
       'elk bestand hoort in precies een scherf te zitten');
+  });
+});
+
+test('de terugval kiest de modus die DEZE bestanden kent, niet de eerste op naam', () => {
+  /* Dit is een echte regressie die bijna is doorgeglipt. Toen e2e.js zijn eigen
+     modus (`normaal`) ging declareren, bestond die nog niet in het register.
+     De terugval pakte toen op naamvolgorde `dekking` -- 1259 unit-bestanden en
+     GEEN ENKEL e2e-bestand -- terwijl er een modus naast lag die ze allemaal
+     kende. De schermtoetsen waren daarmee in een klap ongewogen. */
+  const reg = { versie: 2, modi: {
+    dekking: { duur: { 'unit-a.test.js': 5000, 'unit-b.test.js': 5000 } },
+    onbekend: { duur: { 'scherm-a.e2e.js': 900, 'scherm-b.e2e.js': 100 } }
+  } };
+  metRegister(reg, () => {
+    process.env.RTG_TOETSMODUS = 'normaal';   // bestaat niet -> terugval
+    zetDuren(null);
+    const lijst = ['scherm-a.e2e.js', 'scherm-b.e2e.js'];
+    const w = weging(lijst);
+    assert.equal(w.modus, 'onbekend',
+      'de terugval hoort de modus te kiezen die deze bestanden kent');
+    assert.equal(w.vertrouwen, 'twijfelachtig', 'en hem nog steeds niet te vertrouwen');
+    /* En hij weegt ook echt: scherm-a is negen keer zo zwaar, dus die twee
+       horen uit elkaar te gaan. */
+    const bakken = indeling(lijst, 2);
+    assert.equal(bakken[0].length, 1, 'met een echte weging gaan ze uit elkaar');
+  });
+});
+
+test('kent geen enkele modus deze bestanden, dan is er niets te wegen', () => {
+  const reg = { versie: 2, modi: { dekking: { duur: { 'unit-a.test.js': 5000 } } } };
+  metRegister(reg, () => {
+    process.env.RTG_TOETSMODUS = 'normaal';
+    zetDuren(null);
+    assert.equal(weging(['heel-iets-anders.e2e.js']).vertrouwen, 'ongeldig',
+      'een modus die deze lijst niet kent is geen weging, ook al staat hij vol');
   });
 });

@@ -160,8 +160,20 @@ async function main() {
     title: 'Het gewichtregister van de toetsketen opnieuw gemeten',
     head: TAK, base: basis, body: lijf(raak)
   });
-  if (pr.ok && pr.json) zeg('voorstel geopend: #' + pr.json.number);
-  else zeg('de PR kon niet worden geopend (' + pr.status + '):', pr.tekst.slice(0, 300));
+  if (pr.ok && pr.json) { zeg('voorstel geopend: #' + pr.json.number); return 0; }
+
+  zeg('de PR kon niet worden geopend (' + pr.status + '):', pr.tekst.slice(0, 300));
+  /* DE TAK STAAT ER WEL, EN DAT IS DE HELFT DIE TELT. Gebeurd op 1 september
+     2026: 403 "GitHub Actions is not permitted to create or approve pull
+     requests" -- een instelling van de organisatie, niet iets wat dit script
+     kan oplossen. Zonder deze regel leest een mens alleen een foutmelding en
+     denkt hij dat de meting weg is; hij staat gewoon klaar op een tak. */
+  zeg('de tak ' + TAK + ' staat WEL klaar met het nieuwe register.');
+  if (pr.status === 403) {
+    zeg('403 betekent hier meestal: Settings -> Actions -> General ->',
+      '"Allow GitHub Actions to create and approve pull requests" staat uit.',
+      'Zet die aan, of open de PR met de hand vanaf die tak.');
+  }
   return 0;
 }
 

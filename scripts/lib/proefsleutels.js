@@ -192,4 +192,26 @@ function meldSleutels(bos, log) {
    een uitgeklede omgeving ontbreken, en dan is 'ongemeten' het eerlijke woord. */
 const BASISROLLEN = ['member', 'office', 'supplier'];
 
-module.exports = { haalSleutels, meldSleutels, BASISROLLEN, PASLADDER, OFFICE_CODE, DEMO_PASS, MUNTERS };
+/* DE DRIE LEGE SLEUTELS -- rollen waarvan de sleutel de LEGE STRING is.
+
+   Ze horen in deze lijst juist omdat er niets te munten valt. `openbaar` is geen
+   inlog maar het ontbreken ervan; `omgeving` hangt aan een omgevingsvariabele en
+   niet aan een sessie; `eigen-poort` is een inlogdeur die zelf oordeelt
+   (scripts/lib/bewakers.js). Voor alle drie is "geen Authorization-kop" niet een
+   tekort maar de JUISTE invoer.
+
+   Waarom ze dan toch meetellen: een rol die niet in ROLLEN staat, valt bij het
+   verdelen uit de beproefbare verzameling, en dan tellen routes die met een
+   reden openbaar zijn als instrumenttekort terwijl er niets ontbreekt. Drie
+   verschillende woorden dus, en ze mogen niet tot een samenvallen -- daar zakt
+   test/eigenpoort.test.js op. */
+const LEGE_SLEUTELS = ['openbaar', 'omgeving', 'eigen-poort'];
+
+/* ROLLEN wordt AFGELEID en niet nog eens naast de munters getypt: twee lijsten
+   van dezelfde rollen lopen uiteen zodra er een munter bij komt, en dan noemt de
+   ene lijst een rol die de andere niet kent. Dat is exact de fout die deze
+   sleutelbos zelf moest oplossen (zie de kop). */
+const ROLLEN = [...MUNTERS.map(m => m[0]), ...LEGE_SLEUTELS];
+
+module.exports = { haalSleutels, meldSleutels, BASISROLLEN, ROLLEN, LEGE_SLEUTELS,
+  PASLADDER, OFFICE_CODE, DEMO_PASS, MUNTERS };

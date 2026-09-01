@@ -129,9 +129,21 @@ test('een pad met bodem assist komt nooit als direct terug', () => {
 });
 
 test('de bodem raakt alleen wat hij moet raken: gewone leesroutes blijven direct', () => {
-  assert.equal(beleidVoor('/api/pay/saldo', 'member').niveau, 'direct');
-  assert.equal(beleidVoor('/api/agenda/mijn', 'member').niveau, 'direct');
-  assert.equal(beleidVoor('/api/supplier/state', 'supplier').niveau, 'direct');
+  /* `direct` is inmiddels GESPLITST in `lezen` en `klein` (EXECUTIE.md blok 2);
+     DIRECT bestaat nog als de vereniging van die twee. Deze toets vraagt of de
+     bodem een gewone leesroute NIET aanraakt, en dat antwoord is sindsdien
+     preciezer: `lezen` in plaats van `direct`. De vraag verandert niet -- wat
+     hier nooit mag staan is `voorstel` of `verboden`, want dan heeft de bodem
+     een route geraakt die hij met rust hoort te laten. */
+  const DIRECT_FAMILIE = ['lezen', 'klein'];
+  for (const [pad, wereld] of [['/api/pay/saldo', 'member'], ['/api/agenda/mijn', 'member'],
+    ['/api/supplier/state', 'supplier']]) {
+    const uit = beleidVoor(pad, wereld);
+    assert.ok(DIRECT_FAMILIE.includes(uit.niveau),
+      pad + ' (' + wereld + ') kwam terug als ' + uit.niveau + ' -- de bodem hoort een gewone ' +
+      'leesroute niet te raken');
+    assert.equal(uit.bodem, undefined, pad + ' draagt een bodem en dat hoort niet');
+  }
 });
 
 test('geen pad op een DIRECT-lijst draagt een bodem die hem tegenspreekt', () => {

@@ -583,11 +583,32 @@
       "url": "/apps/passkeys.html"
     },
     {
+      "naam": "Post van RTG",
+      "wereld": "Instellingen",
+      "soort": "link",
+      "sleutel": "post",
+      "url": "/apps/mijn-post.html"
+    },
+    {
       "naam": "RTG Veilig",
       "wereld": "Instellingen",
       "soort": "link",
       "sleutel": "veilig",
       "url": "/apps/veilig.html"
+    },
+    {
+      "naam": "Waar ben ik aanwezig",
+      "wereld": "Instellingen",
+      "soort": "link",
+      "sleutel": "sessies",
+      "url": "/apps/mijn-sessies.html"
+    },
+    {
+      "naam": "Wat weet RTG van mij",
+      "wereld": "Instellingen",
+      "soort": "link",
+      "sleutel": "gegevens",
+      "url": "/apps/mijn-gegevens.html"
     },
     {
       "naam": "Wie ben ik",
@@ -598,6 +619,13 @@
       "woorden": [
         "instellingen"
       ]
+    },
+    {
+      "naam": "Wie heeft toegang tot mij",
+      "wereld": "Instellingen",
+      "soort": "link",
+      "sleutel": "relaties",
+      "url": "/apps/mijn-relaties.html"
     },
     {
       "naam": "Documenten",

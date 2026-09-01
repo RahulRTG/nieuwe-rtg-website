@@ -128,6 +128,60 @@
       "url": "/apps/pay.html"
     },
     {
+      "label": "Gezocht",
+      "app": "Buurtruil",
+      "wereld": "FoundationOS",
+      "url": "/apps/foundation/buurtruil.html"
+    },
+    {
+      "label": "Het is weg",
+      "app": "Buurtruil",
+      "wereld": "FoundationOS",
+      "url": "/apps/foundation/buurtruil.html"
+    },
+    {
+      "label": "Ik heb belangstelling",
+      "app": "Buurtruil",
+      "wereld": "FoundationOS",
+      "url": "/apps/foundation/buurtruil.html"
+    },
+    {
+      "label": "Intrekken",
+      "app": "Buurtruil",
+      "wereld": "FoundationOS",
+      "url": "/apps/foundation/buurtruil.html"
+    },
+    {
+      "label": "Melden",
+      "app": "Buurtruil",
+      "wereld": "FoundationOS",
+      "url": "/apps/foundation/buurtruil.html"
+    },
+    {
+      "label": "Naar het inlogscherm",
+      "app": "Buurtruil",
+      "wereld": "FoundationOS",
+      "url": "/apps/foundation/buurtruil.html"
+    },
+    {
+      "label": "Plaatsen",
+      "app": "Buurtruil",
+      "wereld": "FoundationOS",
+      "url": "/apps/foundation/buurtruil.html"
+    },
+    {
+      "label": "Van mij",
+      "app": "Buurtruil",
+      "wereld": "FoundationOS",
+      "url": "/apps/foundation/buurtruil.html"
+    },
+    {
+      "label": "Weggegeven",
+      "app": "Buurtruil",
+      "wereld": "FoundationOS",
+      "url": "/apps/foundation/buurtruil.html"
+    },
+    {
       "label": "Auto",
       "app": "Camera",
       "wereld": "LivingOS",
@@ -584,6 +638,60 @@
       "url": "/apps/geld-command.html"
     },
     {
+      "label": "Machtiging intrekken",
+      "app": "Geven",
+      "wereld": "FoundationOS",
+      "url": "/apps/foundation/geven.html"
+    },
+    {
+      "label": "Machtiging tekenen",
+      "app": "Geven",
+      "wereld": "FoundationOS",
+      "url": "/apps/foundation/geven.html"
+    },
+    {
+      "label": "Naar de winkel",
+      "app": "Geven",
+      "wereld": "FoundationOS",
+      "url": "/apps/foundation/geven.html"
+    },
+    {
+      "label": "Naar het inlogscherm",
+      "app": "Geven",
+      "wereld": "FoundationOS",
+      "url": "/apps/foundation/geven.html"
+    },
+    {
+      "label": "Naar mijn overzicht",
+      "app": "Geven",
+      "wereld": "FoundationOS",
+      "url": "/apps/foundation/geven.html"
+    },
+    {
+      "label": "Nog een gift",
+      "app": "Geven",
+      "wereld": "FoundationOS",
+      "url": "/apps/foundation/geven.html"
+    },
+    {
+      "label": "Stoppen",
+      "app": "Geven",
+      "wereld": "FoundationOS",
+      "url": "/apps/foundation/geven.html"
+    },
+    {
+      "label": "Terug",
+      "app": "Geven",
+      "wereld": "FoundationOS",
+      "url": "/apps/foundation/geven.html"
+    },
+    {
+      "label": "Voorstellen",
+      "app": "Geven",
+      "wereld": "FoundationOS",
+      "url": "/apps/foundation/geven.html"
+    },
+    {
       "label": "Kopieer",
       "app": "Het bord",
       "wereld": "FoundationOS",
@@ -804,6 +912,30 @@
       "app": "Horeca",
       "wereld": "WorkOS",
       "url": "/apps/horeca.html"
+    },
+    {
+      "label": "Bekijk het labfonds",
+      "app": "Klimaatfonds",
+      "wereld": "FoundationOS",
+      "url": "/apps/foundation/klimaatfonds.html"
+    },
+    {
+      "label": "Hieraan geven",
+      "app": "Klimaatfonds",
+      "wereld": "FoundationOS",
+      "url": "/apps/foundation/klimaatfonds.html"
+    },
+    {
+      "label": "Onthoud dit",
+      "app": "Klimaatfonds",
+      "wereld": "FoundationOS",
+      "url": "/apps/foundation/klimaatfonds.html"
+    },
+    {
+      "label": "Zet erbij",
+      "app": "Klimaatfonds",
+      "wereld": "FoundationOS",
+      "url": "/apps/foundation/klimaatfonds.html"
     },
     {
       "label": "Alleen abonnees",
@@ -1028,12 +1160,6 @@
       "url": "/apps/mall.html"
     },
     {
-      "label": "Bestellen",
-      "app": "Mall",
-      "wereld": "LivingOS",
-      "url": "/apps/mall.html"
-    },
-    {
       "label": "Betalen",
       "app": "Mall",
       "wereld": "LivingOS",
@@ -1047,6 +1173,12 @@
     },
     {
       "label": "Boeken",
+      "app": "Mall",
+      "wereld": "LivingOS",
+      "url": "/apps/mall.html"
+    },
+    {
+      "label": "Cel vernietigen",
       "app": "Mall",
       "wereld": "LivingOS",
       "url": "/apps/mall.html"
@@ -1136,6 +1268,12 @@
       "url": "/apps/mall.html"
     },
     {
+      "label": "Softwarepaspoort",
+      "app": "Mall",
+      "wereld": "LivingOS",
+      "url": "/apps/mall.html"
+    },
+    {
       "label": "Stop vaste afspraak",
       "app": "Mall",
       "wereld": "LivingOS",
@@ -1155,12 +1293,6 @@
     },
     {
       "label": "Vraag advies",
-      "app": "Mall",
-      "wereld": "LivingOS",
-      "url": "/apps/mall.html"
-    },
-    {
-      "label": "Vraag offerte aan",
       "app": "Mall",
       "wereld": "LivingOS",
       "url": "/apps/mall.html"
@@ -1890,6 +2022,18 @@
       "app": "Routedossier",
       "wereld": "TravelOS",
       "url": "/apps/routedossier.html"
+    },
+    {
+      "label": "Deelnemer worden",
+      "app": "RTFoundation in jouw buurt",
+      "wereld": "FoundationOS",
+      "url": "/apps/foundation/os-publiek.html"
+    },
+    {
+      "label": "Vrijwilliger worden",
+      "app": "RTFoundation in jouw buurt",
+      "wereld": "FoundationOS",
+      "url": "/apps/foundation/os-publiek.html"
     },
     {
       "label": "Openen",

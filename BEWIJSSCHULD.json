@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-08-31T21:22:13.366Z",
-  "commit": "3b4a1be43",
+  "op": "2026-09-01T00:21:01.279Z",
+  "commit": "5f7e43d5f",
   "boomVuil": true,
-  "boomAnders": 8,
+  "boomAnders": 14,
   "instrument": "scripts/bewijsschuld.js",
   "node": "v22.22.2"
  },
@@ -200,11 +200,19 @@
    {
     "op": "2026-08-31",
     "aantal": 1
+   },
+   {
+    "op": "2026-09-01",
+    "aantal": 1
    }
   ],
   "capability-in-handler": [
    {
     "op": "2026-08-31",
+    "aantal": 547
+   },
+   {
+    "op": "2026-09-01",
     "aantal": 547
    }
   ],
@@ -212,11 +220,19 @@
    {
     "op": "2026-08-31",
     "aantal": 52
+   },
+   {
+    "op": "2026-09-01",
+    "aantal": 52
    }
   ],
   "output-deuren": [
    {
     "op": "2026-08-31",
+    "aantal": 18
+   },
+   {
+    "op": "2026-09-01",
     "aantal": 18
    }
   ],
@@ -224,11 +240,19 @@
    {
     "op": "2026-08-31",
     "aantal": 74
+   },
+   {
+    "op": "2026-09-01",
+    "aantal": 74
    }
   ],
   "output-niet-toerekenbaar": [
    {
     "op": "2026-08-31",
+    "aantal": 277
+   },
+   {
+    "op": "2026-09-01",
     "aantal": 277
    }
   ],
@@ -236,11 +260,19 @@
    {
     "op": "2026-08-31",
     "aantal": 0
+   },
+   {
+    "op": "2026-09-01",
+    "aantal": 0
    }
   ],
   "output-onwaarneembaar": [
    {
     "op": "2026-08-31",
+    "aantal": 4
+   },
+   {
+    "op": "2026-09-01",
     "aantal": 4
    }
   ],
@@ -248,11 +280,19 @@
    {
     "op": "2026-08-31",
     "aantal": null
+   },
+   {
+    "op": "2026-09-01",
+    "aantal": null
    }
   ],
   "audit-verklaard": [
    {
     "op": "2026-08-31",
+    "aantal": null
+   },
+   {
+    "op": "2026-09-01",
     "aantal": null
    }
   ],
@@ -260,11 +300,19 @@
    {
     "op": "2026-08-31",
     "aantal": 2
+   },
+   {
+    "op": "2026-09-01",
+    "aantal": 2
    }
   ],
   "object-vooraf": [
    {
     "op": "2026-08-31",
+    "aantal": 323
+   },
+   {
+    "op": "2026-09-01",
     "aantal": 323
    }
   ],
@@ -272,11 +320,19 @@
    {
     "op": "2026-08-31",
     "aantal": 1
+   },
+   {
+    "op": "2026-09-01",
+    "aantal": 1
    }
   ],
   "gevolg-onbekend": [
    {
     "op": "2026-08-31",
+    "aantal": 90
+   },
+   {
+    "op": "2026-09-01",
     "aantal": 90
    }
   ],
@@ -284,11 +340,19 @@
    {
     "op": "2026-08-31",
     "aantal": 2
+   },
+   {
+    "op": "2026-09-01",
+    "aantal": 2
    }
   ],
   "herstel-onbevestigd": [
    {
     "op": "2026-08-31",
+    "aantal": 47
+   },
+   {
+    "op": "2026-09-01",
     "aantal": 47
    }
   ],
@@ -296,11 +360,19 @@
    {
     "op": "2026-08-31",
     "aantal": 1477
+   },
+   {
+    "op": "2026-09-01",
+    "aantal": 1477
    }
   ],
   "wegwerpserver-kopieen": [
    {
     "op": "2026-08-31",
+    "aantal": 3
+   },
+   {
+    "op": "2026-09-01",
     "aantal": 3
    }
   ]

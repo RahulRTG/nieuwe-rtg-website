@@ -31,6 +31,10 @@ module.exports = [
     paden: ['/api/command/start', '/api/command/puls', '/api/command/zoek', '/api/command/object', '/api/command/journaal', '/api/command/apispoor',
       '/api/command/kwaliteit', '/api/command/graaf', '/api/command/herkomst', '/api/command/alarm',
       '/api/command/slo', '/api/command/sonde',
+      /* De twee schaduwmeters (routes/command/schaduwmeters.js): allebei lezen ze
+         alleen een stand terug -- wat er GEBEURD ZOU ZIJN als een regel al werd
+         afgedwongen. Ze horen dus bij het zien, net als /kwaliteit en /slo. */
+      '/api/command/bezitsbewijs', '/api/command/doelbinding',
       /* De gezondheidskaart hoort bij het ZIEN, ook al DOET /gezondheid/controleer
          iets: die ronde MEET (een sonderonde, een hashketen narekenen, een
          back-up openmaken) en verandert niets aan de bedrijfsvoering. Dezelfde

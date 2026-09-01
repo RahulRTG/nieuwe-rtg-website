@@ -171,7 +171,35 @@ function maakSessieregister({ db, save }) {
     for (let i = 0; i < teveel; i++) delete bak()[mijne[i][0]];
   }
 
-  return { open, vul, lees, raak, sluit, vanLid, REGISTER_TTL_MS, MAX_PER_LID };
+  /* HET RECHT OP VERGETELHEID, en waarom die functie HIER staat.
+
+     Bij het wissen van een lid bleef zijn sleutel in deze bak achter. De
+     bezem van test/vergeten-gezelschap.test.js gaat door de hele database en
+     vond hem: tak `sessiecontext (sleutel)`. De sessies zelf werden wel
+     uitgelogd (forgetSession), maar dat raakt de Map met tokens en niet dit
+     register -- twee dingen met dezelfde naam en een verschillende levensduur,
+     precies zoals de kop van dit bestand zegt.
+
+     Waarom niet vanLid() + sluit() vanuit kern/vergeten.js: vanLid FILTERT op
+     de TTL van dertig dagen. Een rij die net over die grens is, komt daar niet
+     uit en zou dus blijven staan -- en juist de oudste rij is de rij die het
+     langst blijft liggen. Wissen kijkt naar wat er STAAT en niet naar wat een
+     scherm nog zou tonen.
+
+     Deze module bezit de collectie (zie de declaratie bij eigencollectie
+     hierboven), dus hoort hij hem ook zelf leeg te maken. Wie dit van buitenaf
+     doet, is de tweede schrijver waar die declaratie voor bestaat. */
+  function wisLid(lidKey) {
+    if (!lidKey) return 0;
+    let weg = 0;
+    for (const [sid, rij] of Object.entries(bak())) {
+      if (rij && rij.lidKey === lidKey) { delete bak()[sid]; weg += 1; }
+    }
+    if (weg) save();
+    return weg;
+  }
+
+  return { open, vul, lees, raak, sluit, vanLid, wisLid, REGISTER_TTL_MS, MAX_PER_LID };
 }
 
 module.exports = { maakSessieregister, REGISTER_TTL_MS };

@@ -195,12 +195,37 @@ function indeling(lijst, totaal) {
   const plafond = vertrouwen === 'twijfelachtig'
     ? Math.ceil(lijst.length / totaal) : Infinity;
 
-  /* Het zwaarste bekende gewicht is wat een ONGEMETEN bestand krijgt. Is er
-     niets bekend, dan is elk bestand even zwaar en valt de greedy samen met de
-     oude om-en-om-verdeling; de waarde zelf doet er dan niet toe. */
-  const bekend = [...gewicht.values()].filter((v) => v > 0);
-  const zwaarste = bekend.length ? Math.max(...bekend) : 1;
-  const kost = (naam) => gewicht.get(naam) || zwaarste;
+  /* WAT KOST EEN BESTAND DAT NIEMAND HEEFT GEMETEN?
+
+     Duur, en dat blijft zo: onzekerheid mag nooit snelheid afdwingen. Een nieuw
+     toetsbestand mag nooit uit de verdeling vallen en ook nooit als goedkoop
+     worden ingeboekt -- nul of het gemiddelde gokken laat de keten sneller
+     lijken dan hij is, en die gok kost een scherf die als laatste nog een half
+     uur bezig is.
+
+     MAAR NIET HET ZWAARSTE. Hier stond `Math.max`, en dat is geen maat maar een
+     uitschieter. Gemeten op het eerste CI-register (1259 bestanden, modus
+     dekking): p50 5,3s, p90 9,8s, p99 46s -- en de zwaarste 1272s, want
+     ast-grens.test.js is in zijn eentje 14% van al het werk. Elk ongemeten
+     bestand kreeg daarmee 27 keer de p99 toebedeeld.
+
+     Wat dat werkelijk deed, in ronde 33518796922: de twee nieuwe toetsbestanden
+     van die tak waren ongemeten en reserveerden elk 1272s. Scherf 2 en 3 kregen
+     er een, planden 2732s, en deden er in werkelijkheid 512s en 516s over. Twee
+     scherven voor een kwart gevuld, en het echte werk geperst in de andere twee.
+
+     DUS DE p99, en dat is nog steeds streng: hoger dan 99 van de 100 bestanden,
+     negen keer de mediaan. Een nieuw bestand telt als een van de duurste die er
+     zijn -- alleen niet als de duurste die ooit heeft bestaan. De regel blijft
+     "onbekend telt als duur"; wat vervalt is dat een enkele uitschieter bepaalt
+     hoe duur.
+
+     Is er niets bekend, dan is elk bestand even zwaar en valt de greedy samen
+     met de oude om-en-om-verdeling; de waarde zelf doet er dan niet toe. */
+  const bekend = [...gewicht.values()].filter((v) => v > 0).sort((a, b) => a - b);
+  const duur = bekend.length ? bekend[Math.min(bekend.length - 1,
+    Math.ceil(bekend.length * 0.99) - 1)] : 1;
+  const kost = (naam) => gewicht.get(naam) || duur;
 
   /* Zwaarste eerst; bij een gelijk gewicht op naam, zodat de uitkomst niet van
      de volgorde van de invoer afhangt maar alleen van de lijst zelf. */

@@ -217,6 +217,48 @@ deel. Die marge is met opzet een **telling en geen tijd**: als de gewichten
 verdacht zijn, is het enige dat je nog zeker weet hoeveel bestanden er zijn. De
 schade van een fout gewicht is daarmee begrensd in plaats van onbeperkt.
 
+### Wat een ongemeten bestand kost, en waar de bodem ligt
+
+De eerste ronde op het CI-gemeten kostenmodel (33518796922) leverde
+**1335 / 512 / 516 / 809** seconden. Dat is 13 seconden beter dan de ronde
+ervoor — één procent — en het antwoord is niet dat de verdeler tekortschiet.
+
+**`ast-grens.test.js` is de bodem.** Onder dekking duurt hij 1272s: in zijn
+eentje **14% van al het werk** (9214s), tegen een p99 van 46s. Zolang dat
+bestand in één scherf draait kan geen verdeling onder ~1272s komen. Het
+kritieke pad stond op 1335s — vijf procent boven een harde bodem. De
+scherfverdeling is daarmee vrijwel optimaal.
+
+**En de lege scherven kwamen door de regel voor onbekend.** Twee nieuwe
+toetsbestanden waren ongemeten en kregen elk het *zwaarste bekende* gewicht:
+1272s. Scherf 2 en 3 planden daarmee 2732s en deden er 512s en 516s over — voor
+een kwart gevuld, terwijl het echte werk in de andere twee werd geperst.
+
+Vandaar de maat: **de p99 in plaats van het maximum**. De regel blijft
+"onbekend telt als duur" — de p99 is hoger dan 99 van de 100 bestanden en negen
+keer de mediaan. Wat vervalt is dat een enkele uitschieter bepaalt hóé duur.
+Let op de rekenkunde: bij een kleine verzameling valt de p99 samen met het
+zwaarste bestand, en dat is geen fout maar de definitie.
+
+### De enige lever die overblijft, en wat hij kost
+
+Het kritieke pad zakt alleen als `ast-grens` niet meer onder dekking draait —
+gemeten: 430s zonder tegen 1272s met. Dat kost dekking, en hoeveel is gemeten in
+plaats van geschat. Zonder ast-grens staat `scripts/ast/regels.js` op **85,8%
+(279/325)**; de rest van `scripts/ast/*` blijft op 99-100%, want drie andere
+toetsen laden diezelfde modules.
+
+Die 46 regels zijn `heeftGrens_`, en de bron zegt zelf wat hij is:
+
+> `heeftGrens_` en `analyse` gaan mee naar buiten zodat `test/ast-grens.test.js`
+> de [twee implementaties kan vergelijken]
+
+Dat is **toetssteiger die in productiecode woont**. Wie hem naar de toets
+verplaatst, haalt hem uit de noemer van de vloer en maakt de weg vrij om
+ast-grens zonder dekking te draaien — zonder één regel echte dekking te
+verliezen. Dat is geen opruiming maar een verplaatsing, en hij raakt een
+security-scanner; hij hoort dus een eigen besluit te zijn en geen bijvangst.
+
 ### Wanneer een gewicht zonder modus mag verdwijnen
 
 `onbekend` is de bak voor metingen van vóór de modi: echt gemeten, maar niemand

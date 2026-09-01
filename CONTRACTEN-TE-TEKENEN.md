@@ -1,4 +1,23 @@
-# Achttien contracten die een besluit vragen
+# Achttien contracten die een besluit vroegen — en getekend zijn
+
+**Stand 1 september 2026: getekend.** De achttien staan in
+`server/lib/mutatiecontracten-samenvoeging.js`, `LEGACY_PENDING_CLASSIFICATION`
+staat weer op 0 en `test/mutatiecontract.test.js` bewaakt dat. Drie besluiten
+wijken af van het voorstel hieronder, met de reden in het contract zelf:
+
+| route | voorstel | getekend | waarom |
+|---|---|---|---|
+| `POST /api/foundation/school/opleiding/zet` | `PROTECTED`, mits | `INTENTIONALLY_NON_IDEMPOTENT` | het id in het lijf is de sleutel: met id zet een tweede oproep dezelfde opleiding opnieuw, zonder id is elke oproep met opzet een nieuwe (`server/school/organisatie.js`, `|| rid(4)`); het verschil in `wacht` was de wachtlijstteller, geen rem |
+| `POST /api/rtfos/gift/stand/zet` | open | `INTENTIONALLY_NON_IDEMPOTENT` | de stand zelf is idempotent, maar elke druk op deze boardroomschakelaar hoort een eigen auditregel te krijgen — een dubbeltik samenvouwen zou een druk uit het journaal wissen |
+| `POST /api/supplier/pay/rekening` | open | `INTENTIONALLY_NON_IDEMPOTENT` | een herhaalde rekeningwijziging start de wachttijd opnieuw en dat is de bedoeling; vastgelegd in `server/lib/idemsleutels-geld.js` zodat de idempotentielaag en het contract dezelfde bron lezen |
+
+De dertien lezers zijn `NOT_APPLICABLE` (geen van hen schrijft naar een bestand
+of roept een externe partij aan) en `POST /api/auth/tweede` is
+`BLOCKED_BY_TEST_FIXTURE`. De tekst hieronder is het voorstel zoals het er lag,
+bewaard omdat de afweging zelf het besluit draagt.
+
+---
+
 
 De samenvoeging van twaalf PR's bracht 106 schrijfroutes zonder contract binnen
 (`LEGACY_PENDING_CLASSIFICATION`). `scripts/mutatiecontract.js --afleiden` heeft

@@ -1029,6 +1029,12 @@ jobs:
     runs-on: ubuntu-latest
     needs: [test, schermen-oordeel]
     timeout-minutes: 20
+    # De enige job in deze keten die iets mag wegschrijven, en alleen om een
+    # VOORSTEL te doen: een tak plus een pull request met het opnieuw gemeten
+    # gewichtregister. Naar main schrijft hij nooit.
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -1098,6 +1104,27 @@ jobs:
         with:
           pattern: toetsduur-*
           path: duurmetingen
+      # EERST METEN, DAN OVERSCHRIJVEN. De drift vergelijkt het GECOMMITTE
+      # register met deze verse meting; de stap hieronder schrijft dat register
+      # weg. In de omgekeerde volgorde vergelijkt hij het nieuwe bestand met
+      # zichzelf en meldt eeuwig ACTUEEL -- een wachter die per constructie
+      # nooit iets ziet.
+      - name: De drift van het gewichtregister (meten, geen poort)
+        if: always()
+        run: |
+          set -o pipefail
+          gevonden=$(find duurmetingen -name .toetsduur -type f | sed 's/^/--meting /' | tr '\n' ' ')
+          test -n "$gevonden"
+          node scripts/gewichtdrift.js $gevonden
+          node scripts/gewichtdrift.js $gevonden --json > gewichtdrift.json
+      - name: Het driftoordeel bewaren
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: gewichtdrift
+          path: gewichtdrift.json
+          if-no-files-found: error
+          retention-days: 30
       - name: Het duurregister samenstellen (meten, niet handhaven)
         if: always()
         run: |
@@ -1113,4 +1140,19 @@ jobs:
           path: TOETSDUUR.json
           if-no-files-found: error
           retention-days: 30
+
+      # CI MEET, CI STELT VOOR, EEN MENS MERGET. De regel hierboven -- het
+      # register verandert alleen in een commit -- blijft staan; wat erbij komt
+      # is dat het voorstel er ook echt KOMT. Tot nu toe stond het artefact
+      # klaar en heeft niemand het ooit opgehaald, en daardoor stuurde een
+      # lokale meting maandenlang de verdeling op de runners.
+      #
+      # Alleen op main: op een PR zou dit voorstellen over een meting die over
+      # die PR gaat en niet over de hoofdlijn, en dat zijn twee verschillende
+      # vragen.
+      - name: Een nieuw gewichtregister voorstellen bij materiele drift
+        if: always() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/gewichtvoorstel.js --oordeel gewichtdrift.json
 

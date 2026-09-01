@@ -167,6 +167,81 @@ erven, meldde het kind dat `b.js` draaide zich als `a.js` — een hele scherf
 sporen op naam van het verkeerde bestand, en het attributieregister zou dat als
 *gemeten* hebben opgeschreven. `NODE_TEST_CONTEXT` scheidt de drie.
 
+## 3b. Het gewichtregister, en waarom het een driftcontract heeft
+
+Op 1 september 2026 draaide deze keten een verdeling die op haar eigen projectie
+**1,00x** scoorde en in werkelijkheid **1348s tegen 526s** uitliep. Er was niets
+rood, en er was ook niets te zien.
+
+De oorzaak was niet de verdeler. `TOETSDUUR.json` was lokaal gemeten — zonder
+dekking, op vier kernen, node v22 — en de keten draait op runners **mét**
+dekking. De verdeler optimaliseerde correct op een fout kostenmodel, en dat ziet
+er van binnen perfect uit. Het register droeg dat feit gewoon in zijn stempel
+(`waar: lokaal`); niemand las het. **Een signaal dat niemand leest is geen
+signaal.**
+
+Hoe groot dat verschil is, gemeten op het zwaarste bestand: `ast-grens.test.js`
+doet **430s zonder dekking** en was **met dekking na vijfentwintig minuten nog
+niet klaar**. Dat is geen uitschieter maar een ander kostenmodel — en daarmee is
+één universeel gewicht principieel verkeerd. Het register houdt de modi daarom
+apart (`normaal`, `dekking`), en gewichten waarvan de modus niet meer te
+achterhalen is heten `onbekend` en worden nooit bij een van de twee opgeteld.
+
+### De drie maten, en waarom ze niet hetzelfde zeggen
+
+| maat | wat hij zegt |
+|---|---|
+| totale kosten | de suite als geheel duurder — een andere machine schaalt alles mee |
+| max bestand | het ergste losse verschil; dít had `ast-grens` gevangen |
+| **projectiefout** | verdeel met de oude gewichten, weeg met de nieuwe |
+
+Alleen de derde vertaalt drift naar wachttijd. Een register kan er per bestand
+flink naast zitten en toch prima verdelen (als alles meeschaalt), en het kan er
+gemiddeld dichtbij zitten en toch een scherf laten uitlopen (als juist het
+zwaarste bestand verschoof). En hij kijkt naar de **traagste** scherf en niet
+naar het gemiddelde: het gemiddelde van de lasten ís het ideaal, dus die maat
+zou per definitie nul zijn en eeuwig ACTUEEL melden.
+
+### Drie banden, met een gevolg
+
+| status | projectiefout | wat er gebeurt |
+|---|---|---|
+| ACTUEEL | < 10% | melden, verder niets |
+| VEROUDERD | < 25% | CI stelt een nieuw register voor, als PR |
+| ONGELDIG | ≥ 25%, andere modus, of geen meting | de gewogen verdeling is geen bewijs meer |
+
+Dat laatste heeft een gevolg in de code en niet alleen op een scherm.
+`scripts/lib/delen.js` draagt een **vertrouwen**: bij `twijfelachtig` weegt hij
+nog steeds, maar met een marge — geen scherf krijgt meer bestanden dan zijn
+deel. Die marge is met opzet een **telling en geen tijd**: als de gewichten
+verdacht zijn, is het enige dat je nog zeker weet hoeveel bestanden er zijn. De
+schade van een fout gewicht is daarmee begrensd in plaats van onbeperkt.
+
+### CI meet, CI stelt voor, een mens merget
+
+Het register staat in git omdat de verdeling deterministisch hoort te zijn; een
+register dat zichzelf in CI bijwerkt verschuift het kritieke pad zonder dat
+iemand het in de historie ziet. Dat blijft staan. Wat erbij komt is dat het
+voorstel er ook echt kómt: `scripts/gewichtvoorstel.js` opent bij materiële
+drift een PR met de nieuwe meting. Boven de oude stap stond al *"een mens commit
+hem"* — en sinds die stap bestaat heeft niemand dat gedaan. **Een mens doet het
+is geen mechanisme als niemand het onder ogen krijgt.**
+
+Het voorstel schrijft nooit naar main, opent nooit een tweede PR, en laat de
+bouw nooit zakken: een mislukt voorstel is geen kapotte keten.
+
+### Wat hier bewust niet staat
+
+Geen poort op traagheid. Een toets die trager wordt is hier geen fout maar een
+ander gewicht; daarvoor is `NORM.json`. `gewichtdrift.js` zakt alleen als je hem
+dat expliciet vraagt (`--poort`), en dan uitsluitend op ONGELDIG — want dat is
+geen trage toets maar een register dat niet over deze keten gaat.
+
+En de **26% winst** die eerder in deze tak is opgeschreven, is geschrapt. Niet
+omdat de verdeler slecht was, maar omdat de meting geen geldige weergave van de
+uitvoeromgeving was. Wat er over de scherfwinst komt te staan, wordt gemeten op
+echte CI-wall-clock of het staat er niet.
+
 ## 4. Wat er nu staat, en wat nadrukkelijk niet
 
 **Staat.** Het CI-contract met zijn vier regels; de browserinstallatie uit de

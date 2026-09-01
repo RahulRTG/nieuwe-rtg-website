@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-01T08:55:34.274Z",
-  "commit": "a7f678119",
+  "op": "2026-09-01T11:09:20.073Z",
+  "commit": "453c5642c",
   "boomVuil": false,
-  "boomAnders": 2,
+  "boomAnders": 3,
   "instrument": "scripts/mutatieboek.js",
   "node": "v22.22.2"
  },
@@ -28,8 +28,8 @@
  },
  "bewijsgraad": {
   "metingGebruikt": false,
-  "metingReden": "de meting is gemaakt met ongecommit werk in de boom (commit 2c0b0910); zij hoort bij een stand die nergens is vastgelegd",
-  "metingGemetenOp": "2026-08-31T09:44:33.117Z",
+  "metingReden": "de meting is van commit 16c886771 en HEAD staat op 453c5642c; een meting van een andere stand is geen grond voor een status",
+  "metingGemetenOp": "2026-09-01T10:37:43.809Z",
   "perGraad": [
    {
     "id": "afgeleid",
@@ -302,24 +302,24 @@
   {
    "bron": "IDEMPROEF.json",
    "veld": "routesGevonden",
-   "vastgelegd": 4643,
-   "vastgelegdOp": "2026-08-31",
+   "vastgelegd": 4729,
+   "vastgelegdOp": "2026-09-01",
    "nu": 4729,
    "zelfdeVraag": "mutaties zonder schakelpad en zonder :parameter",
-   "verschil": 86,
-   "gelijk": false,
-   "duiding": "de vastlegging is van 2026-08-31; sindsdien zijn er routes bijgekomen"
+   "verschil": 0,
+   "gelijk": true,
+   "duiding": "gelijk"
   },
   {
    "bron": "IDEMPROEF.json",
    "veld": "routesMetRol",
-   "vastgelegd": 3803,
+   "vastgelegd": 3879,
    "nu": 3998,
-   "vastgelegdOp": "2026-08-31",
+   "vastgelegdOp": "2026-09-01",
    "zelfdeVraag": "daarvan: de routes waarvoor een proefsleutel bestaat",
-   "verschil": 195,
+   "verschil": 119,
    "gelijk": false,
-   "duiding": "de vastlegging is van 2026-08-31; sindsdien zijn er routes bijgekomen"
+   "duiding": "de vastlegging is van 2026-09-01; sindsdien zijn er routes bijgekomen"
   }
  ]
 }

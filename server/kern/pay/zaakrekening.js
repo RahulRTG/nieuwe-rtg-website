@@ -40,6 +40,7 @@
       zet die reden in zijn weigering, zodat op het scherm staat wat eraan
       scheelt in plaats van "er ging iets mis". */
 'use strict';
+const klok = require('../../lib/klok');
 
 const iban = require('../../iban');
 const { WACHT_UUR } = require('./uitbetaalrekening');
@@ -56,7 +57,7 @@ module.exports = (ctx) => {
     const u = s.uitbetaal;
     if (!u || !u.iban) return { iban: null, reden: 'geen-rekening' };
     const klaar = Number(u.bruikbaarVanaf) || 0;
-    if (klaar > Date.now()) {
+    if (klaar > klok.nu()) {
       return { iban: null, reden: 'nog-in-wachttijd', bruikbaarVanaf: klaar };
     }
     return { iban: u.iban, naam: u.naam || s.name || '', sinds: u.sinds || null };
@@ -75,8 +76,8 @@ module.exports = (ctx) => {
     if (!naam) return { status: 400, error: 'Op welke naam staat de rekening?' };
     const oud = s.uitbetaal || null;
     const wijziging = !!(oud && oud.iban && oud.iban !== nieuw);
-    s.uitbetaal = { iban: nieuw, naam, sinds: nu ? nu() : new Date().toISOString(),
-      bruikbaarVanaf: wijziging ? Date.now() + WACHT_UUR * 3600000 : Date.now(),
+    s.uitbetaal = { iban: nieuw, naam, sinds: nu ? nu() : klok.datum().toISOString(),
+      bruikbaarVanaf: wijziging ? klok.nu() + WACHT_UUR * 3600000 : klok.nu(),
       vorige: wijziging ? oud.iban : (oud && oud.vorige) || null };
     save();
     return { ok: true, rekening: { iban: nieuw, naam, bruikbaarVanaf: s.uitbetaal.bruikbaarVanaf },

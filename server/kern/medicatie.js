@@ -23,6 +23,7 @@
    schrijft, schrijft hij ergens. */
 
 const { niveauVan } = require('./zorgniveau');
+const klok = require('../lib/klok');
 const { GRENS, dag, momentenVan, voorraadVan, waarschuwing } = require('./medicatie-regels');
 
 module.exports = ({ db, save, schoon, crypto }) => {
@@ -37,7 +38,7 @@ module.exports = ({ db, save, schoon, crypto }) => {
     return b[key];
   };
 
-  function beeld(key, nu = new Date()) {
+  function beeld(key, nu = klok.datum()) {
     const m = mijn(key);
     const vandaag = dag(nu);
     const af = m.afgetekend[vandaag] || {};
@@ -97,7 +98,7 @@ module.exports = ({ db, save, schoon, crypto }) => {
 
     const mid = bestaand || {
       id: crypto.randomBytes(4).toString('hex'),
-      begonnenOp: new Date().toISOString(), voorraad: null, voorraadOp: null
+      begonnenOp: klok.datum().toISOString(), voorraad: null, voorraadOp: null
     };
     mid.naam = naam;
     mid.sterkte = schoon(body.sterkte, 40);
@@ -132,13 +133,13 @@ module.exports = ({ db, save, schoon, crypto }) => {
     if (!mid.momenten.includes(String(moment))) {
       return { status: 400, error: 'Dat moment staat niet bij dit middel.' };
     }
-    const d = dag(new Date());
+    const d = dag(klok.datum());
     if (!m.afgetekend[d]) m.afgetekend[d] = {};
     const sleutel = mid.id + '@' + moment;
-    if (aan) m.afgetekend[d][sleutel] = new Date().toISOString();
+    if (aan) m.afgetekend[d][sleutel] = klok.datum().toISOString();
     else delete m.afgetekend[d][sleutel];
     /* Oude dagen opruimen: dit is een agenda en geen dossier. */
-    const grens = dag(new Date(Date.now() - 120 * 86400000));
+    const grens = dag(new Date(klok.nu() - 120 * 86400000));
     for (const oud of Object.keys(m.afgetekend)) if (oud < grens) delete m.afgetekend[oud];
     save();
     return beeld(key);
@@ -156,7 +157,7 @@ module.exports = ({ db, save, schoon, crypto }) => {
         return { status: 400, error: 'Vul in hoeveel er in huis zijn, als getal.' };
       }
       mid.voorraad = Math.round(n);
-      mid.voorraadOp = new Date().toISOString();
+      mid.voorraadOp = klok.datum().toISOString();
     }
     save();
     return beeld(key);

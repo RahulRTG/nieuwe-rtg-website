@@ -26,6 +26,7 @@
       een indringer buiten te zetten.
    ========================================================================== */
 'use strict';
+const klok = require('../../lib/klok');
 
 /* De maximale levensduur van een token; de intreklijst wil weten tot wanneer
    hij een sid moet onthouden en een sid draagt zelf geen tijd. Te ruim schatten
@@ -103,7 +104,7 @@ module.exports = (kern) => {
     if (!rij || rij.lidKey !== req.session.key) {
       return res.status(404).json({ error: 'Die sessie kennen wij niet.' });
     }
-    accounts.trekInSessie(sid, Date.now() + TOKEN_MAX_MS);
+    accounts.trekInSessie(sid, klok.nu() + TOKEN_MAX_MS);
     sessieregister.sluit(sid);
     spoor(req, 'sessie-gesloten', { sid, eigen: sid === req.session.sid });
     res.json({ ok: true, gesloten: sid, ditWasUzelf: sid === req.session.sid,
@@ -118,7 +119,7 @@ module.exports = (kern) => {
     const gesloten = [];
     for (const r of rijen) {
       if (r.sid === hier) continue;              // nooit de sessie waarin u dit doet
-      accounts.trekInSessie(r.sid, Date.now() + TOKEN_MAX_MS);
+      accounts.trekInSessie(r.sid, klok.nu() + TOKEN_MAX_MS);
       sessieregister.sluit(r.sid);
       gesloten.push(r.sid);
     }

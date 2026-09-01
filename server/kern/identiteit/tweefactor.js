@@ -26,6 +26,7 @@
    en het is wat er waar is.
    ========================================================================== */
 'use strict';
+const klok = require('../../lib/klok');
 
 const crypto = require('crypto');
 const { totpOk } = require('../totp');
@@ -96,7 +97,7 @@ function maakTweefactor({ accounts }) {
       return { status: 409, error: 'Er staat al een tweede factor aan. Zet die eerst uit als u opnieuw wilt beginnen.' };
     }
     const geheim = nieuwGeheim();
-    md.tweefactor = { geheim, aan: false, begonnen: new Date().toISOString(), codes: [] };
+    md.tweefactor = { geheim, aan: false, begonnen: klok.datum().toISOString(), codes: [] };
     bewaar(user.id, md);
     const label = encodeURIComponent(String(uitgever || 'RTG') + ':' + String(naam || 'lid'));
     return { ok: true, geheim,
@@ -115,7 +116,7 @@ function maakTweefactor({ accounts }) {
     const codes = [];
     const gehasht = [];
     for (let i = 0; i < CODES; i++) { const c = nieuweCode(); codes.push(c); gehasht.push(hashVan(c)); }
-    t.aan = true; t.aanSinds = new Date().toISOString(); t.codes = gehasht;
+    t.aan = true; t.aanSinds = klok.datum().toISOString(); t.codes = gehasht;
     bewaar(user.id, md);
     return { ok: true, herstelcodes: codes,
       /* De enige keer dat deze codes bestaan buiten een hash. Dat hoort er te

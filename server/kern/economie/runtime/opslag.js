@@ -5,6 +5,7 @@
    Deterministische ids maken een retry en twee processen die dezelfde
    economische handeling zien convergent: ze maken niet twee objecten. */
 'use strict';
+const klok = require('../../../lib/klok');
 
 const { SCHEMA_VERSIE, postings: toetsPostings } = require('./regels');
 const { veiligGelijk } = require('../../util');
@@ -31,7 +32,7 @@ function hashInvoer(value) {
 function maakOpslag({ db, save, crypto, nu }) {
   const eigen = require('../../eigencollectie')({ db, domein: 'kern/economie/runtime',
     bezit: { economischeRuntime: 'kaart' } });
-  const tijd = typeof nu === 'function' ? nu : () => Date.now();
+  const tijd = typeof nu === 'function' ? nu : () => klok.nu();
   const sha = value => crypto.createHash('sha256').update(hashInvoer(value)).digest('hex');
   const id = (prefix, sleutel) => prefix + sha(String(sleutel)).slice(0, 24).toUpperCase();
 

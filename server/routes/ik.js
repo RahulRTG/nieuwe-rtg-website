@@ -9,6 +9,7 @@
    je paspoort staat en hoe je genoemd wilt worden zijn twee verschillende
    dingen, en het tweede telt hier. */
 const { coord } = require('../kern/util');
+const klok = require('../lib/klok');
 const workspace = require('../kern/workspace-voorkeur');
 const workspaceAudit = require('../kern/workspace-audit');
 module.exports = (kern) => {
@@ -21,7 +22,7 @@ module.exports = (kern) => {
   // de leeftijd uit het profiel; bepaalt welke fases gekozen mogen worden
   function leeftijdVan(md) {
     if (!md || !md.geboren) return null;
-    const g = new Date(md.geboren), nu = new Date();
+    const g = new Date(md.geboren), nu = klok.datum();
     let l = nu.getFullYear() - g.getFullYear();
     if (nu < new Date(nu.getFullYear(), g.getMonth(), g.getDate())) l -= 1;
     return l;
@@ -143,7 +144,7 @@ module.exports = (kern) => {
     const id = uid(req);
     if (id == null) return res.status(403).json({ error: 'Alleen voor leden met een eigen account.' });
     const md = accounts.getMemberState(id) || {};
-    const r = workspace.zet(md, req.body && req.body.workspace, new Date().toISOString());
+    const r = workspace.zet(md, req.body && req.body.workspace, klok.datum().toISOString());
     if (r.error) return uit(res, r);
     accounts.saveMemberState(id, md);
     res.json({ ok: true, workspace: r });
@@ -159,7 +160,7 @@ module.exports = (kern) => {
     const id = uid(req);
     if (id == null) return res.status(403).json({ error: 'Alleen voor leden met een eigen account.' });
     const md = accounts.getMemberState(id) || {};
-    const r = workspaceAudit.noteer(md, req.body, 'member-' + id, new Date().toISOString());
+    const r = workspaceAudit.noteer(md, req.body, 'member-' + id, klok.datum().toISOString());
     if (r.error) return uit(res, r);
     accounts.saveMemberState(id, md); res.json({ ok: true });
   });

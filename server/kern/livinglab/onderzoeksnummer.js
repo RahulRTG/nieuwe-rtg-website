@@ -44,6 +44,7 @@
       niet meer klopt.
    ========================================================================== */
 'use strict';
+const klok = require('../../lib/klok');
 
 const VOORVOEGSEL = 'RTF';
 
@@ -84,7 +85,7 @@ function ontleed(nummer) {
    onderzoek begint; het jaar komt daaruit en niet uit de systeemklok, zodat een
    toets een jaarwissel kan naspelen. */
 function nieuw({ lab, studies, at }) {
-  const jaar = Number(String(at || '').slice(0, 4)) || new Date().getUTCFullYear();
+  const jaar = Number(String(at || '').slice(0, 4)) || klok.datum().getUTCFullYear();
   const volg = volgnummer(studies, lab && lab.id, jaar);
   return [VOORVOEGSEL, stadsdeel(lab && lab.stad), String(jaar),
     String(Math.min(9999, volg)).padStart(4, '0')].join('-');

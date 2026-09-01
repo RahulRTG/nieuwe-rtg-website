@@ -1,11 +1,12 @@
 /* Alleen experience-state: resume, acknowledgement, korte previews en het
    append-only action evidence-log. Nooit domeinobjecten of projections. */
 'use strict';
+const klok = require('../../lib/klok');
 
 const { hash, kopie } = require('./canon');
 
 module.exports = function maakOpslag({ db, save, crypto, nu }) {
-  const tijd = () => (nu ? nu() : new Date().toISOString());
+  const tijd = () => (nu ? nu() : klok.datum().toISOString());
   const eigen = require('../eigencollectie')({ db, domein: 'kern/experience',
     bezit: { experiencePlatform: 'kaart' } });
   function experienceWortel() {
@@ -61,7 +62,7 @@ module.exports = function maakOpslag({ db, save, crypto, nu }) {
   }
   function ruimPreviews(r) {
     const nuMs = Date.parse(tijd());
-    const grens = (Number.isFinite(nuMs) ? nuMs : Date.now()) - 86400000;
+    const grens = (Number.isFinite(nuMs) ? nuMs : klok.nu()) - 86400000;
     Object.keys(r.previews).forEach(k => {
       const p = r.previews[k], t = Date.parse(p.expiresAt || p.createdAt || 0);
       if (!Number.isFinite(t) || t < grens) delete r.previews[k];

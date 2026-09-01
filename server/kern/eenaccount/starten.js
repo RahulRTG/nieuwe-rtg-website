@@ -16,6 +16,7 @@
    account een tweede toegangspad met soepeler regels -- en dan is het geen
    sleutelbos meer maar een omweg. */
 'use strict';
+const klok = require('../../lib/klok');
 
 module.exports = (ctx) => {
   const { db, save, crypto, accounts, findSupplier, rememberSession, logInlog,
@@ -67,7 +68,7 @@ module.exports = (ctx) => {
       sessieregister.open(sess.sid, lidKey, {
         context: { contextId: String(contextId), contextSoort: soort, contextVersie: 1,
           herkomst: { bron: 'eenaccount/starten', methode: 'gemeten',
-            vastgesteldOp: new Date().toISOString(), regelversie: 'blok3' } }
+            vastgesteldOp: klok.datum().toISOString(), regelversie: 'blok3' } }
       });
     }
 
@@ -136,9 +137,9 @@ module.exports = (ctx) => {
        nooit een blokkade, nooit een score, alleen zorg. Diep in de nacht
        of bij een zoveelste werkstart vandaag mag dat gezegd worden. */
     let welzijn = null;
-    const uur = new Date().getHours();
+    const uur = klok.datum().getHours();
     const wm = db.data.accountWelzijn = db.data.accountWelzijn || {};
-    const vandaag = new Date().toISOString().slice(0, 10);
+    const vandaag = klok.datum().toISOString().slice(0, 10);
     const wr = wm[key] = (wm[key] && wm[key].dag === vandaag) ? wm[key] : { dag: vandaag, starts: 0 };
     wr.starts++;
     save();

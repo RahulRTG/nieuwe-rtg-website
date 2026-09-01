@@ -2,6 +2,7 @@
    domeinopslag: hij resolveert intent, context, authority, policy, bevestiging
    en idempotentie en roept daarna precies één runtime-adapter aan. */
 'use strict';
+const klok = require('../../lib/klok');
 
 const { hash, kopie } = require('./canon');
 const registry = require('./intent-registry');
@@ -95,7 +96,7 @@ module.exports = function maakBroker({ crypto, opslag, projecteer, contexten, ke
     if (p.executedAt)
       return fout('Deze preview is al uitgevoerd. Gebruik dezelfde idempotencyKey.', 409, 'PREVIEW_USED');
     const nuMs = Date.parse(opslag.tijd());
-    if (Date.parse(p.expiresAt) <= (Number.isFinite(nuMs) ? nuMs : Date.now()))
+    if (Date.parse(p.expiresAt) <= (Number.isFinite(nuMs) ? nuMs : klok.nu()))
       return fout('Deze preview is verlopen; bekijk de actie opnieuw.', 409, 'PREVIEW_EXPIRED');
     if (p.confirmation && p.confirmation.required && b.confirmed !== true)
       return fout('Menselijke bevestiging ontbreekt.', 409, 'CONFIRMATION_REQUIRED');

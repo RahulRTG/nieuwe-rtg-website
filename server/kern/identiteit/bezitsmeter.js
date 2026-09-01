@@ -24,9 +24,10 @@
    database zetten -- en dan hoort er een bewaartermijn bij.
    ========================================================================== */
 'use strict';
+const klok = require('../../lib/klok');
 
 function maakMeter(standNu) {
-  const meter = { sinds: new Date().toISOString(), totaal: 0, perUitkomst: {}, perPad: {} };
+  const meter = { sinds: klok.datum().toISOString(), totaal: 0, perUitkomst: {}, perPad: {} };
 
   function tel(pad, uitkomst) {
     meter.totaal++;

@@ -11,6 +11,7 @@
    server/kern/identiteit/toestellen.js. Lees die eerst.
    ========================================================================== */
 'use strict';
+const klok = require('../../lib/klok');
 
 const TOKEN_MAX_MS = 30 * 24 * 3600 * 1000;
 
@@ -59,7 +60,7 @@ module.exports = (kern) => {
        tweede binding kan deze nooit stilletjes omlaag halen. */
     let inSessie = false;
     if (sessieregister && req.session.sid) {
-      const nu = new Date().toISOString();
+      const nu = klok.datum().toISOString();
       const hk = { bron: 'toestelsleutel', methode: 'cryptografisch', vastgesteldOp: nu, regelversie: 'blok3' };
       const uit = sessieregister.vul(req.session.sid, {
         toestel: { toestelId: r.toestelId, bindingId: r.bindingId, bindingStand: 'bevestigd', herkomst: hk },
@@ -104,7 +105,7 @@ module.exports = (kern) => {
     const gesloten = [];
     for (const s of (sessieregister ? sessieregister.vanLid(req.session.key) : [])) {
       if (s.toestelId !== tid || s.sid === req.session.sid) continue;
-      accounts.trekInSessie(s.sid, Date.now() + TOKEN_MAX_MS);
+      accounts.trekInSessie(s.sid, klok.nu() + TOKEN_MAX_MS);
       sessieregister.sluit(s.sid);
       gesloten.push(s.sid);
     }

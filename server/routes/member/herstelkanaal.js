@@ -23,6 +23,7 @@
    typefout in een inlognaam anders een account is waar niemand meer in kan.
    ========================================================================== */
 'use strict';
+const klok = require('../../lib/klok');
 
 module.exports = (kern) => {
   const { app, auth, accounts, handelingsspoor, mail, appUrl } = kern;
@@ -124,7 +125,7 @@ module.exports = (kern) => {
        RTG-account hebben, en dat is precies de vraag die de kluis niet hoort te
        beantwoorden. */
     const md = accounts.getMemberState(u.id) || {};
-    md.mailwissel = { naar: nieuw, tot: Date.now() + WISSEL_MS };
+    md.mailwissel = { naar: nieuw, tot: klok.nu() + WISSEL_MS };
     accounts.saveMemberState(u.id, md);
     const tok = accounts.issueActionToken(u.id, 'mailwissel', WISSEL_MS);
     const url = appUrl(req) + '/apps/app.html?mailwissel=' + tok;
@@ -152,7 +153,7 @@ module.exports = (kern) => {
     if (!u) return res.status(400).json({ error: 'Ongeldige of verlopen bevestigingslink.' });
     const md = accounts.getMemberState(u.id) || {};
     const w = md.mailwissel;
-    if (!w || !w.naar || Number(w.tot || 0) < Date.now()) {
+    if (!w || !w.naar || Number(w.tot || 0) < klok.nu()) {
       return res.status(400).json({ error: 'Er staat geen wijziging meer open.' });
     }
     const uit = accounts.setEmail(u.id, w.naar, { vervangenMag: true });

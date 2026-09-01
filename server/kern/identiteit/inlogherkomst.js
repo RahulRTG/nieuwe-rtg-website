@@ -15,6 +15,7 @@
    de graad niets meer.
    ========================================================================== */
 'use strict';
+const klok = require('../../lib/klok');
 
 /* Vastleggen op het moment van authenticatie. Faalt stil naar "niets
    vastgelegd" als er geen register of geen sid is: een sessie die geen
@@ -26,7 +27,7 @@ function legInlogVast({ sessieregister, accounts, token, lidKey, type, assurance
   if (!sessieregister || !accounts || typeof accounts.sessieVan !== 'function') return null;
   const sid = accounts.sessieVan(token);
   if (!sid) return null;
-  const nu = new Date().toISOString();
+  const nu = klok.datum().toISOString();
   const herkomst = (m) => ({ bron, methode: m, vastgesteldOp: nu, regelversie: 'mijnrtg' });
   const auth = { type, herkomst: herkomst(methode) };
   if (assurance) auth.assurance = assurance;

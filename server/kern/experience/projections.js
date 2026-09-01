@@ -2,6 +2,7 @@
    blijft herkenbaar voor huidige surfaces; objects en attention zijn de nieuwe
    platformlaag eromheen. */
 'use strict';
+const klok = require('../../lib/klok');
 
 const { hash, kopie } = require('./canon');
 const { maakRef } = require('./objectrefs');
@@ -124,7 +125,7 @@ module.exports = function maakProjecties({ kern, crypto, contexten, attention, m
     const items = (b.items || []).map(item => ({ ...kopie(item), ref: maakRef(item, crypto, w) }));
     const objects = items.map(item => ({ ref: item.ref, title: item.titel || '', status: item.status || '',
       source: item.app || item.bron || '', deepLink: item.link || null }));
-    const generatedAt = new Date().toISOString();
+    const generatedAt = klok.datum().toISOString();
     const inhoud = { world: w, context: context.id, view: b.view, objects };
     const attentions = attention.uit(key, w, context, items);
     return {

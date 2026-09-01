@@ -40,6 +40,7 @@
       precies hoe een verantwoording onbetrouwbaar wordt.
    ========================================================================== */
 'use strict';
+const klok = require('../../lib/klok');
 
 const { dragerVanLab, dragerVanStudie, hoortBij, studieVanDrager } = require('./ledgeradres');
 
@@ -49,7 +50,7 @@ function maakLedger(ctx) {
   const labfonds = () => (typeof ctx.labfonds === 'function' ? ctx.labfonds() : ctx.labfonds);
   const vindLab = (id) => ctx.vindLab(id);
   const vindStudie = (id) => ctx.vindStudie(id);
-  const periodeNu = () => String(ctx.nu ? ctx.nu() : new Date().toISOString()).slice(0, 7);
+  const periodeNu = () => String(ctx.nu ? ctx.nu() : klok.datum().toISOString()).slice(0, 7);
 
   /* Het verbruik van één drager, uit de kostenmeter. Er wordt hier niets
      opgeteld dat daar niet al staat: `voorDrager` levert de regels, hun

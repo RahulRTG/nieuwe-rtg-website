@@ -31,6 +31,7 @@
       heeft een bord gebouwd waarop mensen worden bekeken.
    ========================================================================== */
 'use strict';
+const klok = require('../../lib/klok');
 
 /* De drie standen, van licht naar zwaar. De volgorde IS de rangorde: het bord
    neemt de zwaarste van zijn seinen over, en `niet vast te stellen` is bewust
@@ -40,7 +41,7 @@ const zwaarste = (a, b) => (STANDEN.indexOf(a) >= STANDEN.indexOf(b) ? a : b);
 
 module.exports = (ctx) => {
   const { S, vindLab } = ctx;
-  const nu = () => (ctx.nu ? ctx.nu() : new Date().toISOString());
+  const nu = () => (ctx.nu ? ctx.nu() : klok.datum().toISOString());
   const labfonds = () => (typeof ctx.labfonds === 'function' ? ctx.labfonds() : ctx.labfonds);
   const kort = (s) => ({ id: s.id, nummer: s.nummer || null, titel: s.titel, lab: s.labId });
 

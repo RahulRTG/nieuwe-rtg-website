@@ -3,6 +3,7 @@
    door deze grens. De scherpe vorm voorkomt dat een vrije JSON-instelling een
    tweede persoonlijk dossier wordt. */
 'use strict';
+const klok = require('../lib/klok');
 
 const ID = /^[a-z][a-z0-9]*(?:[.-][a-z0-9]+)*$/;
 const MAX = 40;
@@ -39,7 +40,7 @@ function lees(md) {
 }
 
 function zet(md, invoer, op) {
-  const w = normaliseerWorkspace(invoer, op || new Date().toISOString());
+  const w = normaliseerWorkspace(invoer, op || klok.datum().toISOString());
   if (w.error) return w;
   if (!md.interface || typeof md.interface !== 'object' || Array.isArray(md.interface)) md.interface = {};
   md.interface.workspace = w;

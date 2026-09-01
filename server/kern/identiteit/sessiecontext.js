@@ -38,6 +38,7 @@
    allowlist die je kunt omzeilen door een veld te verzinnen is een suggestie.
    ========================================================================== */
 'use strict';
+const klok = require('../../lib/klok');
 
 const { GRADEN, METHODEN, VELDEN, VERBODEN } = require('./sessievelden');
 const isSleutel = (v) => typeof v === 'string' && /^[A-Za-z0-9_:-]{1,64}$/.test(v);
@@ -62,7 +63,7 @@ function herkomstOk(h) {
    ouderdom (geldt dat nog). Vervallen bewijs zakt naar `vermoed` en niet naar
    `onbekend`: wij hebben het wel degelijk ooit gemeten, we weten alleen niet of
    het nu nog zo is. Dat verschil is precies wat een scherm hoort te tonen. */
-function graadVan(claim, nu = Date.now()) {
+function graadVan(claim, nu = klok.nu()) {
   return graadMet(claim, VELDEN[claim && claim.veld], nu);
 }
 
@@ -73,7 +74,7 @@ function graadVan(claim, nu = Date.now()) {
    regel "vervallen bewijs is geen bewijs" alleen nog bestaan als code die niets
    raakt -- en dan is er niets dat hem overeind houdt tot de dag dat er weer een
    claim bijkomt die over de huidige toestand van de wereld gaat. */
-function graadMet(claim, veld, nu = Date.now()) {
+function graadMet(claim, veld, nu = klok.nu()) {
   if (!claim || !claim.herkomst || !herkomstOk(claim.herkomst)) {
     return { graad: 'onbekend', reden: 'geen herkomst vastgelegd' };
   }
@@ -134,7 +135,7 @@ function bouw(ruw) {
    Dit is wat MIJN STAND later leest -- en het is met opzet GEEN samengesteld
    cijfer. Zie MIJNRTG.md par. 4: LAT-regel 11 en check.js regel 48 verbieden
    het ene groene getal, omdat 82% verbergt of het ontbrekende de herstelroute is. */
-function stand(context, nu = Date.now()) {
+function stand(context, nu = klok.nu()) {
   const uit = {};
   for (const naam of Object.keys(VELDEN)) {
     const claim = context && context[naam];

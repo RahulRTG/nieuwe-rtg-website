@@ -28,6 +28,7 @@
    praat alleen met db.data en save(), net als bij json/sqlite/postgres.
    ============================================================================ */
 const fs = require('fs');
+const klok = require('../lib/klok');
 const rtgjson = require('../lib/rtgjson');
 const path = require('path');
 const crypto = require('crypto');
@@ -128,9 +129,9 @@ function schrijfGeheugenNu() {
   // het manifest als LAATSTE (commit-punt); de vorige blijft als .bak voor rollback
   try { if (fs.existsSync(MANIFEST)) fs.renameSync(MANIFEST, MANIFEST + '.bak'); } catch (e) {}
   generatie++;
-  schrijfDuurzaam(MANIFEST, versleutel(rtgjson.stringify({ v: 1, generatie, at: Date.now(), keys: manKeys })), 0o600);
-  saveDuur = Date.now() - (saveT0 || Date.now());
-  saveKlaar = Date.now();
+  schrijfDuurzaam(MANIFEST, versleutel(rtgjson.stringify({ v: 1, generatie, at: klok.nu(), keys: manKeys })), 0o600);
+  saveDuur = klok.nu() - (saveT0 || klok.nu());
+  saveKlaar = klok.nu();
   return geschreven;
 }
 
@@ -147,10 +148,10 @@ function saveGeheugen() {
   saveVuil = true;
   if (saveTimer) return;
   const venster = Math.max(SAVE_MS, saveDuur * 4);
-  const sinds = Date.now() - saveKlaar;
-  saveT0 = Date.now();
+  const sinds = klok.nu() - saveKlaar;
+  saveT0 = klok.nu();
   if (sinds >= venster) { try { schrijfGeheugenNu(); } catch (e) { console.warn('[geheugen] save mislukt:', e.message); } return; }
-  saveTimer = setTimeout(() => { saveTimer = null; if (saveVuil) { saveT0 = Date.now(); try { schrijfGeheugenNu(); } catch (e) { console.warn('[geheugen] save mislukt:', e.message); } } }, venster - sinds);
+  saveTimer = setTimeout(() => { saveTimer = null; if (saveVuil) { saveT0 = klok.nu(); try { schrijfGeheugenNu(); } catch (e) { console.warn('[geheugen] save mislukt:', e.message); } } }, venster - sinds);
   if (saveTimer.unref) saveTimer.unref();
 }
 function flushGeheugen() { if (db.writable && saveVuil) { try { schrijfGeheugenNu(); } catch (e) {} } }

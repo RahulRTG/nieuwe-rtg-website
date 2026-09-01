@@ -9,6 +9,12 @@ De hoofdregel staat vooraan, want alles hieronder volgt eruit:
 > **Volledige dekking is de uitgangstoestand. Versmalling is geen optimalisatie
 > die achteraf bewezen wordt — het is een recht dat per effect verdiend moet
 > worden.**
+>
+> Of scherper, als mechanische regel: **zekerheid mag snelheid toestaan;
+> onzekerheid mag nooit snelheid afdwingen.** Alles hieronder is daar een
+> toepassing van — `ongemeten` draagt een volle ring, een ontbrekend
+> duurregister valt terug op de oude verdeling, een onzekere
+> afhankelijkheidsverzameling maakt een resultaatcache ongeldig.
 
 Dat is dezelfde zin als in `EXECUTIE.md` ("een scherm, een automatisering, de
 commandbalk en een AI-agent leveren allemaal intentie — alleen de execution
@@ -190,3 +196,50 @@ of handhaving aan of uit staat — en nooit één woord eronder.
 
 Van die getallen is er één dat werkelijk telt: het aantal beslissingen dat
 `onbekend` is. Zolang dat niet nul kan worden, is de rest decoratie.
+
+## 6. Wat hierna mag komen — en wat de meting daarover zegt
+
+Er ligt een uitgewerkt eindmodel: een delta-motor die afgeleide toestand
+bijwerkt in plaats van herberekent, content-addressable uitvoering, selectie op
+bewijsverplichting in plaats van op testbestand, een snelle voorcontrole vóór
+GitHub Actions, en warme werkers. Vier van die voorstellen zijn hier gemeten
+voordat er iets aan gebouwd wordt, met deze uitkomst:
+
+**De incrementele motor levert vandaag niets.** De volledige graaf over 5899
+bestanden staat in **1,8 seconden** (`scripts/lib/werkelijkheid.js`, koud, op
+één kern). Een job kost alleen al 13 seconden aan checkout en `setup-node`
+voordat er één regel code draait. Incrementeel herberekenen bespaart dus
+hooguit 1,8 s tegen een grote hoeveelheid nieuwe toestand die zelf fout kan
+staan — precies de vorm van complexiteit die dit document elders afwijst. Hij
+wordt pas interessant als de graaf ordes van grootte trager wordt.
+
+**Selectie op bewijsverplichting is het juiste eindmodel en de verkeerde
+volgende stap.** Het register bestaat al: `WETTEN.json` draagt 46 wetten, elk
+met een bron, met handhavers (29 wijzen naar `test/`) en 43 met een
+sabotage-recept — de enige manier waarop een verplichting zich laat natrekken.
+Maar omgekeerd gelezen dekt dat register **76 van de 5899 bestanden**:
+`kern/pay/poort.js` raakt één wet, `kern/stuur/resolver.js` en `kern/passen.js`
+raken er nul. Een selector op verplichtingen zou vandaag over vrijwel elke
+wijziging zeggen dat er niets te bewijzen valt, en dat is de gevaarlijkste
+uitkomst die deze laag kent.
+
+**Een voorcontrole onder de 20 seconden kan niet op GitHub-hosted runners.** De
+vaste kost is 7 s checkout + 6 s `setup-node` (+ 21 s als de job containers
+draait), plus wachttijd in de rij — gemeten in run `33454187817`, waar jobs
+tussen +2 s en +52 s begonnen. Een snelle baan is haalbaar op ongeveer een
+minuut; alles daaronder vraagt eerst warme werkers, en dat is een
+infrastructuurbesluit (eigen runners) en geen codebesluit.
+
+**Agressief annuleren staat er al.** De concurrency-groep met
+`cancel-in-progress: true` doet precies wat het voorstel vraagt: run
+`33452968389` werd afgebroken toen `33454187817` op dezelfde tak startte. Wat
+er niet is, is het annuleren van zware banen zodra een goedkope poort al rood
+staat — dat is wel een echte toevoeging.
+
+Wat daarmee overblijft als eerstvolgende bouwstap is de **dubbele planner**:
+statische graaf ∪ waargenomen attributie, met een derde bron (historische
+mede-falers) als hij er is, en de regel dat oneensheid tussen de bronnen de
+onzekerheid verhoogt en dus de suite verbreedt. Dat is geen extra laag maar de
+directe voortzetting van par. 1 en 3, en het is de enige constructie die de
+blinde vlek van 57% structureel onschadelijk maakt in plaats van hem te
+omzeilen.

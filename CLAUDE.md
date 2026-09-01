@@ -898,9 +898,10 @@ overslaat), en een brug als `taxi -> ride` wordt getoetst tegen de echte routes 
 `taxi -> rit` wees nergens heen en werd door die toets gevonden.
 
 **`KEURING.md` gaat over de machine die de toetsen draait** — de keuringsketen
-zelf, en de bodem onder elke latere versmalling. De hoofdregel: **volledige
-dekking is de uitgangstoestand, versmalling is een recht dat per effect verdiend
-moet worden.** Lees die vóór je aan CI, aan testselectie of aan een impactgraaf
+zelf, en de bodem onder elke latere versmalling. De hoofdregel, mechanisch gesteld: **zekerheid mag
+snelheid toestaan; onzekerheid mag nooit snelheid afdwingen** — oftewel
+volledige dekking is de uitgangstoestand en versmalling is een recht dat per
+effect verdiend moet worden. Lees die vóór je aan CI, aan testselectie of aan een impactgraaf
 werkt. De scherpste meting staat in paragraaf 1: de omgekeerde require-graaf
 versmalt `kern/pay/poort.js` naar zes toetsen, en dat is geen versmalling maar
 een blinde vlek — **819 van de 1434 toetsbestanden (57,1%) hebben geen enkele

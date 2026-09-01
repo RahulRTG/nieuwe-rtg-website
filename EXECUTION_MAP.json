@@ -1,7 +1,7 @@
 {
  "uitleg": "Afgeleide executiekaart: per route wat de AI ermee mag, wat het bewijs eronder zegt en of een herhaling schade doet. De herkomst staat per veldsoort in `velden`, de vertaling naar de gedeelde gezagsnoemer in `noemer`. NOOIT met de hand wijzigen: npm run executionmap:controle zakt erop.",
  "bronnen": {
-  "IDEMPROEF.json": "83ca9f48e9a3f951",
+  "IDEMPROEF.json": "8c95eef3481e015b",
   "IDEMBESLUIT.json": "d28c4cb491fda818",
   "HERSTEL.json": "18f81fa488b39474",
   "VERTROUWEN.json": "4acd0745523e3c37",
@@ -72,7 +72,7 @@
   }
  },
  "telling": {
-  "capabilities": 4643,
+  "capabilities": 4655,
   "bereikbaarPerRol": 176,
   "conflicten": 0,
   "metBesluit": 128,
@@ -6363,7 +6363,7 @@
   {
    "pad": "/api/foundation/school/aanwezigheid/leerling",
    "rol": "",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 9 schakel(s) nooit gemeten (ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
    "bereik": "verboden"
@@ -6427,7 +6427,7 @@
   {
    "pad": "/api/foundation/school/belasting/mij",
    "rol": "",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "ONBEPAALD",
    "bewijsReden": "deze route staat niet in het vervalregister",
    "bereik": "verboden"
@@ -6651,7 +6651,7 @@
   {
    "pad": "/api/foundation/school/dossier",
    "rol": "",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 9 schakel(s) nooit gemeten (ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
    "bereik": "verboden"
@@ -6659,7 +6659,7 @@
   {
    "pad": "/api/foundation/school/dossier/contact",
    "rol": "",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 9 schakel(s) nooit gemeten (ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
    "bereik": "verboden"
@@ -6823,7 +6823,7 @@
   {
    "pad": "/api/foundation/school/hr/mijn",
    "rol": "",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 9 schakel(s) nooit gemeten (ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
    "bereik": "verboden"
@@ -6839,7 +6839,7 @@
   {
    "pad": "/api/foundation/school/hr/uren",
    "rol": "",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 9 schakel(s) nooit gemeten (ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
    "bereik": "verboden"
@@ -7007,7 +7007,7 @@
   {
    "pad": "/api/foundation/school/kantine/saldo",
    "rol": "",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 9 schakel(s) nooit gemeten (ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
    "bereik": "verboden"
@@ -7119,7 +7119,7 @@
   {
    "pad": "/api/foundation/school/leerling/overstap",
    "rol": "",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 9 schakel(s) nooit gemeten (ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
    "bereik": "verboden"
@@ -7135,7 +7135,7 @@
   {
    "pad": "/api/foundation/school/leraar/klas/maak",
    "rol": "",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 9 schakel(s) nooit gemeten (ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
    "bereik": "verboden"
@@ -7143,7 +7143,7 @@
   {
    "pad": "/api/foundation/school/leraar/overzicht",
    "rol": "",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 9 schakel(s) nooit gemeten (ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
    "bereik": "verboden"
@@ -7255,7 +7255,7 @@
   {
    "pad": "/api/foundation/school/mijn-rechten",
    "rol": "",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 9 schakel(s) nooit gemeten (ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
    "bereik": "verboden"
@@ -7343,7 +7343,7 @@
   {
    "pad": "/api/foundation/school/overdracht/pakket",
    "rol": "",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "ONBEPAALD",
    "bewijsReden": "deze route staat niet in het vervalregister",
    "bereik": "verboden"
@@ -7415,7 +7415,7 @@
   {
    "pad": "/api/foundation/school/peiling/mijn-personeel",
    "rol": "",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "ONBEPAALD",
    "bewijsReden": "deze route staat niet in het vervalregister",
    "bereik": "verboden"
@@ -7471,7 +7471,7 @@
   {
    "pad": "/api/foundation/school/personeel/mail/inbox",
    "rol": "",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "ONBEPAALD",
    "bewijsReden": "deze route staat niet in het vervalregister",
    "bereik": "verboden"
@@ -7487,7 +7487,7 @@
   {
    "pad": "/api/foundation/school/personeel/mail/overzicht",
    "rol": "",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "ONBEPAALD",
    "bewijsReden": "deze route staat niet in het vervalregister",
    "bereik": "verboden"
@@ -7503,7 +7503,7 @@
   {
    "pad": "/api/foundation/school/personeel/mail/verzonden",
    "rol": "",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "ONBEPAALD",
    "bewijsReden": "deze route staat niet in het vervalregister",
    "bereik": "verboden"
@@ -7519,7 +7519,7 @@
   {
    "pad": "/api/foundation/school/personeel/start",
    "rol": "",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "ONBEPAALD",
    "bewijsReden": "deze route staat niet in het vervalregister",
    "bereik": "verboden"
@@ -7527,7 +7527,7 @@
   {
    "pad": "/api/foundation/school/personeel/status",
    "rol": "",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 9 schakel(s) nooit gemeten (ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
    "bereik": "verboden"
@@ -8063,7 +8063,7 @@
   {
    "pad": "/api/foundation/school/zorg/zet",
    "rol": "",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 9 schakel(s) nooit gemeten (ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
    "bereik": "verboden"
@@ -8560,7 +8560,7 @@
   {
    "pad": "/api/gemeente/afspraken",
    "rol": "supplier",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
    "bereik": "verboden"
@@ -8584,7 +8584,7 @@
   {
    "pad": "/api/gemeente/bekendmaking",
    "rol": "supplier",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
    "bereik": "verboden"
@@ -8661,7 +8661,7 @@
   {
    "pad": "/api/gemeente/meldingen",
    "rol": "supplier",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
    "bereik": "verboden"
@@ -8677,7 +8677,7 @@
   {
    "pad": "/api/gemeente/regie",
    "rol": "supplier",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
    "bereik": "verboden"
@@ -8685,7 +8685,7 @@
   {
    "pad": "/api/gemeente/triage",
    "rol": "supplier",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
    "bereik": "verboden"
@@ -8713,7 +8713,7 @@
   {
    "pad": "/api/gemeente/vergunningen",
    "rol": "supplier",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
    "bereik": "verboden"
@@ -9285,6 +9285,54 @@
    "pad": "/api/inzagekaart",
    "rol": "member",
    "herhaling": "beschermd",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/isolatie/mijn",
+   "rol": "member",
+   "herhaling": "beschermd",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/isolatie/mijn/ontsluiting",
+   "rol": "member",
+   "herhaling": "ongemeten",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/isolatie/mijn/ontsluiting/afbreken",
+   "rol": "member",
+   "herhaling": "ongemeten",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/isolatie/mijn/ontsluiting/commit",
+   "rol": "member",
+   "herhaling": "ongemeten",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/isolatie/mijn/ontsluiting/stap",
+   "rol": "member",
+   "herhaling": "ongemeten",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/isolatie/mijn/zet",
+   "rol": "member",
+   "herhaling": "ongemeten",
    "bewijs": "ONBEPAALD",
    "bewijsReden": "deze route staat niet in het vervalregister",
    "bereik": "verboden"
@@ -10857,7 +10905,7 @@
   {
    "pad": "/api/lucht/ai",
    "rol": "supplier",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
    "bereik": "verboden"
@@ -10865,7 +10913,7 @@
   {
    "pad": "/api/lucht/bagage",
    "rol": "supplier",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
    "bereik": "verboden"
@@ -10881,7 +10929,7 @@
   {
    "pad": "/api/lucht/bord",
    "rol": "supplier",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
    "bereik": "verboden"
@@ -10897,7 +10945,7 @@
   {
    "pad": "/api/lucht/charters",
    "rol": "supplier",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
    "bereik": "verboden"
@@ -10905,7 +10953,7 @@
   {
    "pad": "/api/lucht/cockpit",
    "rol": "supplier",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
    "bereik": "verboden"
@@ -10921,7 +10969,7 @@
   {
    "pad": "/api/lucht/lounge",
    "rol": "supplier",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
    "bereik": "verboden"
@@ -10961,7 +11009,7 @@
   {
    "pad": "/api/lucht/vip/lijst",
    "rol": "supplier",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
    "bereik": "verboden"
@@ -10993,7 +11041,7 @@
   {
    "pad": "/api/lucht/vlucht/maak",
    "rol": "supplier",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
    "bereik": "verboden"
@@ -20771,7 +20819,7 @@
   {
    "pad": "/api/overheid/aangifte/advies",
    "rol": "member",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK)",
    "bereik": "verboden"
@@ -20787,7 +20835,7 @@
   {
    "pad": "/api/overheid/aanslagen/mijn",
    "rol": "member",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK)",
    "bereik": "verboden"
@@ -20955,7 +21003,7 @@
   {
    "pad": "/api/overheid/bekendmakingen",
    "rol": "member",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK)",
    "bereik": "verboden"
@@ -20963,7 +21011,7 @@
   {
    "pad": "/api/overheid/belasting/bereken",
    "rol": "member",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK)",
    "bereik": "verboden"
@@ -20979,7 +21027,7 @@
   {
    "pad": "/api/overheid/berichten",
    "rol": "member",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK)",
    "bereik": "verboden"
@@ -21023,7 +21071,7 @@
   {
    "pad": "/api/overheid/bezwaren/mijn",
    "rol": "member",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK)",
    "bereik": "verboden"
@@ -21087,7 +21135,7 @@
   {
    "pad": "/api/overheid/kvk/mijn",
    "rol": "member",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK)",
    "bereik": "verboden"
@@ -21287,7 +21335,7 @@
   {
    "pad": "/api/overheid/rijbewijs",
    "rol": "member",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
    "bereik": "verboden"
@@ -21295,7 +21343,7 @@
   {
    "pad": "/api/overheid/rijbewijs/verleng",
    "rol": "member",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
    "herhalingBesluit": "instelling",
@@ -21332,7 +21380,7 @@
   {
    "pad": "/api/overheid/subsidies",
    "rol": "member",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK)",
    "bereik": "verboden"
@@ -21348,7 +21396,7 @@
   {
    "pad": "/api/overheid/subsidies/mijn",
    "rol": "member",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK)",
    "bereik": "verboden"
@@ -21384,7 +21432,7 @@
   {
    "pad": "/api/overheid/toeslagen/mijn",
    "rol": "member",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK)",
    "bereik": "verboden"
@@ -21452,7 +21500,7 @@
   {
    "pad": "/api/overheid/uitkeringen/mijn",
    "rol": "member",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK)",
    "bereik": "verboden"
@@ -21460,7 +21508,7 @@
   {
    "pad": "/api/overheid/verkiezing",
    "rol": "member",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK)",
    "bereik": "verboden"
@@ -21496,7 +21544,7 @@
   {
    "pad": "/api/overheid/voertuigen",
    "rol": "member",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK)",
    "bereik": "verboden"
@@ -21504,7 +21552,7 @@
   {
    "pad": "/api/overheid/water/meld",
    "rol": "member",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
    "herhalingBesluit": "beschermd",
@@ -21533,7 +21581,7 @@
   {
    "pad": "/api/overheid/water/meldingen/mijn",
    "rol": "member",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK)",
    "bereik": "verboden"
@@ -21549,7 +21597,7 @@
   {
    "pad": "/api/overheid/waterschap/mijn",
    "rol": "member",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
    "bereik": "verboden"
@@ -21557,7 +21605,7 @@
   {
    "pad": "/api/overheid/zaken/mijn",
    "rol": "member",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK)",
    "bereik": "verboden"
@@ -35547,6 +35595,54 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 9 schakel(s) nooit gemeten (ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/techniek/isolatie/ontsluiting",
+   "rol": "techniek",
+   "herhaling": "ongemeten",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/techniek/isolatie/ontsluiting/afbreken",
+   "rol": "techniek",
+   "herhaling": "ongemeten",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/techniek/isolatie/ontsluiting/commit",
+   "rol": "techniek",
+   "herhaling": "ongemeten",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/techniek/isolatie/ontsluiting/stap",
+   "rol": "techniek",
+   "herhaling": "ongemeten",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/techniek/isolatie/proef",
+   "rol": "techniek",
+   "herhaling": "beschermd",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/techniek/isolatie/zet",
+   "rol": "techniek",
+   "herhaling": "ongemeten",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
    "bereik": "verboden"
   },
   {

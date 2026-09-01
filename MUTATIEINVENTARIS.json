@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-09-01T21:04:39.297Z",
-  "commit": "59f03174",
+  "op": "2026-09-01T22:23:39.280Z",
+  "commit": "ea6ba2f0",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -12,9 +12,9 @@
   "mutatie": 4673,
   "mutatieBuitenSchakel": 4665,
   "idempotentieAanroepbaar": 4655,
-  "werkelijkAangeroepen": 4643,
-  "bewijsMetSleutel": 1563,
-  "bewijsZonderSleutel": 206,
+  "werkelijkAangeroepen": 4655,
+  "bewijsMetSleutel": 1617,
+  "bewijsZonderSleutel": 220,
   "verklaard": 319
  },
  "autorisatie": {

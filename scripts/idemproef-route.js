@@ -305,7 +305,26 @@ if (require.main !== module) { module.exports = {}; return; }
       const vv = voorvoegselVan(r.pad);
       return { ...plausibelLijf(r.pad), ...extra, ...(vv ? schoonLijf(vv.lijf) : {}), ...(geldLijven[r.pad] || {}) };
     },
-    rolVoor: (r) => { const vv = voorvoegselVan(r.pad); return (vv && vv.rol) || r.rol; },
+    /* EEN VOORVOEGSEL MAG DE ROL OPLEGGEN -- MAAR NIET ALTIJD AAN IEDEREEN.
+
+       `/api/overheid/` is helemaal van het rijk, dus daar mag de rol onvoorwaardelijk
+       over alles heen. `/api/gemeente/` is dat NIET: daar wonen vijftien routes
+       voor een BURGER (afval melden, belasting betalen, een afspraak maken) naast
+       acht voor de gemeente zelf. Een onvoorwaardelijke rol gaf die vijftien het
+       leveranciers-token en dus een 401 "Niet ingelogd als lid" -- en vijf routes
+       die eerst gemeten waren, werden ongemeten. Een toevoeging aan de wereld die
+       de meting VERSLECHTERT is het ergste wat hier kan gebeuren, want hij ziet er
+       van buiten uit als vooruitgang.
+
+       `alleenRol` maakt de overname voorwaardelijk: hij geldt alleen waar de route
+       zelf al die soort actor verwachtte. Zonder `alleenRol` blijft het gedrag
+       precies zoals het was. */
+    rolVoor: (r) => {
+      const vv = voorvoegselVan(r.pad);
+      if (!vv || !vv.rol) return r.rol;
+      if (vv.alleenRol && r.rol !== vv.alleenRol) return r.rol;
+      return vv.rol;
+    },
     maxRoutes: MAX, staatVan,
     vastlegging: register.vastlegging, metenZonderSleutel: true, pasladder: PASLADDER });
 

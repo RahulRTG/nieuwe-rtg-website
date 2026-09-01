@@ -44,12 +44,12 @@
       "punt": "effectmodel handhaaft",
       "stand": "SCHADUW, MET EEN GEMETEN BLOKKADE",
       "waarom": "hij rekent mee en meldt onenigheden; hij blokkeert niets. Dat blijft zo, en de reden is nu een getal: zie noemers.effectdekking. De blokkade is de PROEF en niet het register -- ook met alle 236 collecties ingedeeld blijft de dekking staan waar IDEMPROEF.json ophoudt.",
-      "open": "de proef verder laten reiken (werelden opzetten waar hij nu niet bij kan), niet meer namen in effectcollecties.js zetten."
+      "open": "de proef verder laten reiken (werelden opzetten waar hij nu niet bij kan), niet meer namen in effectcollecties.js zetten. Eerste ronde gedaan: +53 gemeten, +44 bewezen lezers, 0 regressies. Wat er nu nog dicht zit, zit dicht om een REDEN -- een vergunning of een vastgestelde identiteit die een mens heeft moeten zien -- en niet omdat de proef er niet bij kon."
     },
     {
       "punt": "blinde vlek in de beschermstand",
       "stand": "GEMETEN",
-      "waarom": "69 paden hebben geen functie in de catalogus en passeren de beschermstand ongemerkt."
+      "waarom": "81 paden hebben geen functie in de catalogus en passeren de beschermstand ongemerkt."
     },
     {
       "punt": "egress deny-by-default",
@@ -80,13 +80,13 @@
         "server/kern/beschermstand.js",
         "server/functies"
       ],
-      "gevonden": 4643,
+      "gevonden": 4655,
       "BEWEZEN_GEBLOKKEERD": 1148,
       "BEWEZEN_TOEGESTAAN": 3426,
-      "ONBESLIST": 69,
+      "ONBESLIST": 81,
       "ONBEPAALD_INFRA": 0,
       "blindeVlek": {
-        "aantal": 69,
+        "aantal": 81,
         "waarom": "geen functie in de functiecatalogus achter dit pad; de beschermstand deelt hem daarom niet in en laat hem door",
         "paden": [
           "/api/boardroom/ai",
@@ -106,6 +106,12 @@
           "/api/boardroom/wachter",
           "/api/boardroom/zet",
           "/api/inzagekaart",
+          "/api/isolatie/mijn",
+          "/api/isolatie/mijn/ontsluiting",
+          "/api/isolatie/mijn/ontsluiting/afbreken",
+          "/api/isolatie/mijn/ontsluiting/commit",
+          "/api/isolatie/mijn/ontsluiting/stap",
+          "/api/isolatie/mijn/zet",
           "/api/privacy/delete",
           "/api/privacy/export",
           "/api/privacy/inzage",
@@ -126,6 +132,12 @@
           "/api/techniek/functie/ai",
           "/api/techniek/functie/besluit",
           "/api/techniek/inloggen",
+          "/api/techniek/isolatie/ontsluiting",
+          "/api/techniek/isolatie/ontsluiting/afbreken",
+          "/api/techniek/isolatie/ontsluiting/commit",
+          "/api/techniek/isolatie/ontsluiting/stap",
+          "/api/techniek/isolatie/proef",
+          "/api/techniek/isolatie/zet",
           "/api/techniek/moderniseer",
           "/api/techniek/papieren",
           "/api/techniek/papieren/antwoord",
@@ -207,11 +219,11 @@
       ],
       "perRol": {
         "member": {
-          "gevonden": 1623,
-          "verboden": 1503,
+          "gevonden": 1629,
+          "verboden": 1509,
           "bereikbaar": 120,
           "perNiveau": {
-            "verboden": 1503,
+            "verboden": 1509,
             "[object Object]": 120
           }
         },
@@ -241,11 +253,11 @@
           }
         },
         "techniek": {
-          "gevonden": 61,
-          "verboden": 61,
+          "gevonden": 67,
+          "verboden": 67,
           "bereikbaar": 0,
           "perNiveau": {
-            "verboden": 61
+            "verboden": 67
           }
         },
         "boardroom": {
@@ -399,23 +411,23 @@
       ],
       "handhaaft": false,
       "waarom": "CONTROLPLANE.md: een nieuwe handhavingsregel loopt eerst mee zonder te blokkeren. Deze getallen zijn de voorwaarde om hem ooit aan te zetten, niet het bewijs dat het al werkt.",
-      "gevonden": 4643,
+      "gevonden": 4655,
       "effectgraad": {
-        "verklaard": 369,
-        "vermoed": 1671,
-        "onbekend": 2453,
-        "afgeleid": 150
+        "verklaard": 375,
+        "vermoed": 1670,
+        "onbekend": 2459,
+        "afgeleid": 151
       },
-      "eens": 1250,
-      "onbekend": 2453,
-      "strenger": 900,
+      "eens": 1251,
+      "onbekend": 2459,
+      "strenger": 905,
       "losser": 40,
       "geenSom": "strenger, losser en onbekend vragen om drie verschillende dingen en worden nooit opgeteld",
       "blindEnVerzwakkend": {
-        "aantal": 50,
+        "aantal": 56,
         "waarom": "deze paden kent de beschermstand niet (geen functie in de catalogus) terwijl het effectmodel er een gesloten effect in ziet",
         "bijOntwerp": {
-          "aantal": 46,
+          "aantal": 52,
           "wat": "de eigen console van de eigenaar: eigenaar-only en bewust buiten de functieschakelaars",
           "bron": "server/routes/techniek/controle.js",
           "maar": "de beschermstand heeft daarmee geen grip op die console. Wie hem overneemt, loopt langs deze hele laag heen; daar hangt de ontsluitceremonie van het HUIS aan, en die is er nog niet."
@@ -506,18 +518,6 @@
           ]
         },
         {
-          "pad": "/api/appstore/tijdlijn",
-          "regel": null,
-          "effecten": [
-            "BEVEILIGING_VERZWAKKEN",
-            "DERDENCODE_UITVOEREN"
-          ],
-          "graad": "afgeleid",
-          "geraakt": [
-            "BEVEILIGING_VERZWAKKEN"
-          ]
-        },
-        {
           "pad": "/api/auth/forgot",
           "regel": null,
           "effecten": [
@@ -595,6 +595,19 @@
         },
         {
           "pad": "/api/auth/reset",
+          "regel": null,
+          "effecten": [
+            "RECHT_VERLENEN",
+            "IDENTITEIT_WIJZIGEN"
+          ],
+          "graad": "vermoed",
+          "geraakt": [
+            "RECHT_VERLENEN",
+            "IDENTITEIT_WIJZIGEN"
+          ]
+        },
+        {
+          "pad": "/api/auth/verify-email",
           "regel": null,
           "effecten": [
             "RECHT_VERLENEN",
@@ -707,25 +720,25 @@
         "server/kern/isolatie/effectcollecties.js",
         "IDEMPROEF.json"
       ],
-      "gevonden": 4643,
+      "gevonden": 4655,
       "graden": {
-        "onbekend": 2453,
-        "vermoed": 1671,
-        "afgeleid": 150,
-        "verklaard": 369
+        "onbekend": 2459,
+        "vermoed": 1670,
+        "afgeleid": 151,
+        "verklaard": 375
       },
       "bronnen": {
-        "geen": 2453,
-        "vermoed": 1671,
-        "afgeleid": 150,
-        "verklaard": 338,
+        "geen": 2459,
+        "vermoed": 1670,
+        "afgeleid": 151,
+        "verklaard": 344,
         "verklaard+afgeleid": 31
       },
       "collectiesIngedeeld": 85,
       "collectiesGemeten": 236,
       "plafond": {
-        "alsElkeCollectieIsIngedeeld": 599,
-        "danNogOnbekend": 2217,
+        "alsElkeCollectieIsIngedeeld": 639,
+        "danNogOnbekend": 2203,
         "waarom": "de grens ligt bij de PROEF en niet bij de lijst: een pad waar IDEMPROEF.json nooit met succes langskwam, raakt geen enkele collectie. Meer dekking komt van een betere proef, niet van meer namen in het register."
       },
       "ijking": {
@@ -783,7 +796,7 @@
         "uitslag": "de twee bronnen spreken elkaar niet tegen maar vullen elkaar aan: waar ze niet overlappen, ziet de een iets wat de ander principieel niet kan zien (de proef kijkt in de opslag en niet naar uitgaande aanroepen; de verklaring leest de naam en kent geen collecties). Daarom worden ze OPGETELD en niet gerangschikt."
       },
       "magHandhaven": false,
-      "waarom": "met 2453 van de 4643 paden zonder profiel kan dit model niet de laag zijn die beslist: het zou over meer dan de helft van het huis moeten raden, en raden in de gesloten richting legt het platform plat terwijl raden in de open richting niets beschermt. De blokkade is GEMETEN en heeft een naam -- de proef, niet het register -- en dat is iets anders dan \"er is nog werk\"."
+      "waarom": "met 2459 van de 4655 paden zonder profiel kan dit model niet de laag zijn die beslist: het zou over meer dan de helft van het huis moeten raden, en raden in de gesloten richting legt het platform plat terwijl raden in de open richting niets beschermt. De blokkade is GEMETEN en heeft een naam -- de proef, niet het register -- en dat is iets anders dan \"er is nog werk\"."
     },
     "leesset": {
       "wat": "wat er onder `isolatie` overblijft, en op welke grond",
@@ -792,15 +805,15 @@
         "IDEMPROEF.json",
         "server/kern/isolatie/effecten.js"
       ],
-      "gevonden": 4643,
-      "BEWEZEN_GEBLOKKEERD": 3740,
-      "BEWEZEN_TOEGESTAAN": 903,
+      "gevonden": 4655,
+      "BEWEZEN_GEBLOKKEERD": 3711,
+      "BEWEZEN_TOEGESTAAN": 944,
       "ONBESLIST": 0,
       "ONBEPAALD_INFRA": 0,
       "gronden": {
-        "NIET_BEWEZEN_LEZER": 2491,
+        "NIET_BEWEZEN_LEZER": 2459,
         "Toegang en identiteit": 50,
-        "EFFECT_GESLOTEN": 101,
+        "EFFECT_GESLOTEN": 104,
         "Geld": 92,
         "Betalen & verificatie": 30,
         "Personeel & integraties": 31,
@@ -808,20 +821,20 @@
         "Partners (leveranciers)": 922
       },
       "meting": {
-        "routesInDeProef": 4643,
-        "metSuccesGemeten": 1569,
-        "bewezenLezers": 1236,
-        "nooitMetSuccesGemeten": 3074,
+        "routesInDeProef": 4655,
+        "metSuccesGemeten": 1622,
+        "bewezenLezers": 1280,
+        "nooitMetSuccesGemeten": 3033,
         "ontbreekt": null,
         "kost": "wat nooit met succes is gemeten, gaat onder isolatie dicht. Een deel daarvan zijn onschuldige lezers, dus isolatie is botter dan hij hoeft te zijn. Dat wordt minder naarmate IDEMPROEF.json verder komt, niet naarmate deze module slimmer wordt.",
         "verouderingsrichting": "strenger: een pad dat nog niet in de meting staat, is niet bewezen en gaat dicht"
       },
       "tegenoverBeschermd": {
-        "beschermdLaatDoor": 3495,
-        "isolatieLaatDoor": 903,
+        "beschermdLaatDoor": 3507,
+        "isolatieLaatDoor": 944,
         "waarom": "isolatie draagt de eigenschap `beschermd` ook, en sluit daarbovenop alles waarvan het lezerschap niet is bewezen"
       },
-      "prijs": "de meting kwam bij 3074 van de 4643 rol-paden nooit met succes langs. Die gaan onder isolatie dicht, en een deel ervan zijn onschuldige lezers. Isolatie is dus botter dan hij hoeft te zijn; dat wordt minder naarmate IDEMPROEF.json verder komt."
+      "prijs": "de meting kwam bij 3033 van de 4655 rol-paden nooit met succes langs. Die gaan onder isolatie dicht, en een deel ervan zijn onschuldige lezers. Isolatie is dus botter dan hij hoeft te zijn; dat wordt minder naarmate IDEMPROEF.json verder komt."
     },
     "dragers": {
       "wat": "de zes dragers waarop een stand kan staan",

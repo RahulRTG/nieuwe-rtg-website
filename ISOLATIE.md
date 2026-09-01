@@ -410,12 +410,9 @@ de verkeerde drukken.
    het lid~~ — **staan**
 8. ~~De derde bron onder het effectmodel~~ — **staat**, met een gemeten
    blokkade: het model komt niet uit de schaduw tot de proef verder reikt.
-9. **De proef verder laten reiken.** Dit is nu het enige punt dat er echt toe
-   doet, en het draagt twee dingen tegelijk: elk pad dat `IDEMPROEF.json` erbij
-   meet, maakt isolatie minder bot (3074 paden gaan dicht zonder dat iemand weet
-   of ze gevaarlijk zijn) én brengt het effectmodel dichter bij handhaven. Het
-   werk zit in de werelden die de proef niet kan opzetten — een zaak met een
-   genre, een ingericht landpakket, een salon.
+9. **De proef verder laten reiken** — eerste ronde gedaan, zie hieronder. Elk
+   pad dat `IDEMPROEF.json` erbij meet, maakt isolatie minder bot én brengt het
+   effectmodel dichter bij handhaven.
 10. **Invariant op onvertrouwde invoer** — *onvertrouwde inhoud kan de beschikbare
    capabilities nooit vergroten.* Voor een platform waarvan de AI kan handelen is
    dit de verdediging tegen indirecte prompt-injectie.
@@ -423,6 +420,60 @@ de verkeerde drukken.
    `ONBEPAALD_INFRA` dragen.
 12. **Adaptieve escalatie** — pas hierna. `VERTROUWEN.json` staat op 0 bewezen en
    4180 verzwakt: een risicomotor die daarop stuurt, stuurt op niets.
+
+## 5c. De proef verder laten reiken — eerste ronde
+
+`IDEMPROEF.json` bepaalt allebei de dingen die deze laag beperken: wat er onder
+`isolatie` open blijft (de leesset) en hoeveel het effectmodel weet. 3074 paden
+waren nooit met succes gemeten. Twee ronden later: **+53 gemeten, +44 bewezen
+lezers, +40 met een gemeten collectie, en 0 regressies.**
+
+Wat er is toegevoegd, en waarom die drie:
+
+- **Een leerling in de klas.** De proef bouwde een school, een leraar en een klas,
+  maar geen kind. Voor de halve schooladministratie — absentie, rapporten,
+  documenten, bijdragen, berichten aan het gezin — is een klas zonder leerling
+  een lege huls. Aanmelden én plaatsen, twee routes, want dat zijn het in het
+  echt ook.
+- **`personeelToken` doorgeven.** Het werd gebouwd en nergens gebruikt. Achttien
+  schoolroutes gaven "Onbekende school of verkeerd personeel-token" terwijl de
+  leraar gewoon bestond: `server/school/poorten.js` kent drie deuren en het lijf
+  droeg er twee.
+- **Twee interne genres erbij** (`gemeente`, `luchthaven`), op precies het besluit
+  dat voor `rijk` en `ov` al genomen was: een intern genre wordt niet aangevraagd
+  maar door RTG zelf aangesloten.
+
+### Drie dingen die deze ronde blootlegde
+
+**Een toevoeging kan de meting verslechteren, en dat ziet er van buiten uit als
+vooruitgang.** Het `/api/gemeente/`-voorvoegsel legde de rol onvoorwaardelijk op,
+en onder dat pad wonen vijftien routes voor een **burger** naast acht voor de
+gemeente. Vijf routes gingen van gemeten naar ongemeten. Het voorvoegsel-mechanisme
+kent nu `alleenRol`: de overname geldt alleen waar de route zelf al die soort
+actor verwachtte.
+
+**Dezelfde fout stond er al.** `/api/overheid/` is óók gemengd — 33 member-routes
+naast 64 van het rijk — en die 33 gaven allemaal 401 "Niet ingelogd als lid". Ze
+stonden in de kolom `ongemeten` om een reden die niets met de route te maken had,
+en dat was niet te zien: een 401 ziet eruit als een route die nu eenmaal een
+andere sleutel wil. `test/idemwereld.test.js` toets 4 houdt dat nu vast.
+
+**Een diagnose die de verkeerde regel aanwijst, is duurder dan geen diagnose.**
+De marechaussee kwam niet klaar, en de melding zei "aansluiten gaf 200" — want
+`gemist` zoekt de laatste aanroep van een pad, en drie genres deelden die route.
+Met een merk per voorwerp gaf hij meteen het echte antwoord: **403, "Voor werk in
+dit genre is een eigen RTG-account met een vastgestelde identiteit nodig"** —
+`kern/persoonseis.js` met reikwijdte `werk`. Acht routes onder `/api/kmar/`
+blijven daarom ongemeten, en dat is de eerlijke uitslag: een proefronde die een
+identiteit vaststelt die niemand heeft gezien, verzint precies het bewijs waar
+die eis voor is. Dezelfde grens houdt `beveiliging` (status `bewijs`) en de
+Kiwa-vergunning van `mob` dicht.
+
+> **De invariant die deze ronde opleverde:** wordt een voorwerp gebouwd, dan moet
+> het ook ergens worden **doorgegeven** — `gemist` controleerde alleen het eerste.
+> Dat is de stilste manier waarop deze proef onderrapporteert: geen fout, geen
+> lege sleutel, geen melding, alleen een kolom `ongemeten` die groter is dan hij
+> hoeft te zijn. En die kolom bepaalt wat er onder isolatie dichtgaat.
 
 ## 6. Twee grenzen die niet mogen sneuvelen
 

@@ -540,7 +540,9 @@ const schuld = [
       'nu een getal: zie noemers.effectdekking. De blokkade is de PROEF en niet het register -- ook ' +
       'met alle 236 collecties ingedeeld blijft de dekking staan waar IDEMPROEF.json ophoudt.',
     open: 'de proef verder laten reiken (werelden opzetten waar hij nu niet bij kan), niet meer ' +
-      'namen in effectcollecties.js zetten.' },
+      'namen in effectcollecties.js zetten. Eerste ronde gedaan: +53 gemeten, +44 bewezen lezers, ' +
+      '0 regressies. Wat er nu nog dicht zit, zit dicht om een REDEN -- een vergunning of een ' +
+      'vastgestelde identiteit die een mens heeft moeten zien -- en niet omdat de proef er niet bij kon.' },
   { punt: 'blinde vlek in de beschermstand',
     stand: 'GEMETEN',
     waarom: noemers.httpPaden.blindeVlek.aantal + ' paden hebben geen functie in de catalogus en ' +

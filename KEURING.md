@@ -240,24 +240,47 @@ keer de mediaan. Wat vervalt is dat een enkele uitschieter bepaalt hóé duur.
 Let op de rekenkunde: bij een kleine verzameling valt de p99 samen met het
 zwaarste bestand, en dat is geen fout maar de definitie.
 
-### De enige lever die overblijft, en wat hij kost
+### De bodem weggehaald: een orakel dat in productiecode woonde
 
-Het kritieke pad zakt alleen als `ast-grens` niet meer onder dekking draait —
-gemeten: 430s zonder tegen 1272s met. Dat kost dekking, en hoeveel is gemeten in
-plaats van geschat. Zonder ast-grens staat `scripts/ast/regels.js` op **85,8%
-(279/325)**; de rest van `scripts/ast/*` blijft op 99-100%, want drie andere
-toetsen laden diezelfde modules.
+Het kritieke pad stond op 1335s tegen een bodem van 1272s, en die bodem was één
+bestand: `ast-grens.test.js` — onder dekking 14% van al het toetswerk, tegen een
+p99 van 46s. Zonder dekking doet hij **272s**.
 
-Die 46 regels zijn `heeftGrens_`, en de bron zegt zelf wat hij is:
+Waarom hij toch onder dekking moest, bleek in de bron te staan. `heeftGrens_`,
+de uitputtende variant, stond in `scripts/ast/regels.js` met eigen commentaar:
 
-> `heeftGrens_` en `analyse` gaan mee naar buiten zodat `test/ast-grens.test.js`
-> de [twee implementaties kan vergelijken]
+> hij wordt niet meer aangeroepen — `analyse()` doet hetzelfde in een doorloop —
+> maar hij blijft staan … en de toets vergelijkt de twee
 
-Dat is **toetssteiger die in productiecode woont**. Wie hem naar de toets
-verplaatst, haalt hem uit de noemer van de vloer en maakt de weg vrij om
-ast-grens zonder dekking te draaien — zonder één regel echte dekking te
-verliezen. Dat is geen opruiming maar een verplaatsing, en hij raakt een
-security-scanner; hij hoort dus een eigen besluit te zijn en geen bijvangst.
+Dat is geen productiecode maar het **orakel** van die toets. En het stond daar
+niet gratis: `regels.js` wordt onder dekking gemeten, dus telden die regels mee
+in de noemer van de vloer, en alleen `ast-grens.test.js` kon ze dekken. Het
+orakel hield zijn eigen toets onder dekking.
+
+Het orakel is verhuisd naar de toets, woord voor woord — een orakel dat je bij
+het verhuizen "even opschoont" is geen orakel meer. Wat dat kostte aan echte
+dekking is gemeten en niet geschat:
+
+| `scripts/ast/regels.js`, zonder ast-grens | regels |
+|---|---|
+| vóór de verhuizing | 279/325 — **85,8%** |
+| ná de verhuizing | 292/302 — **96,7%** |
+
+De noemer is kleiner en de dekking hóger. `parser`, `walk` en `lexer` bleven op
+99–100%, want drie andere toetsen laden diezelfde modules.
+
+Daarna kon de toets uit de scherven: `scripts/lib/zwaar.js` met een eigen job in
+de keten, zonder dekking. Dat is **niet** de isolatielijst — die gaat over
+gedeelde staat, deze over kosten, en twee redenen verdienen twee lijsten. Wat
+een toets daar niet zomaar in mag maken: traag alleen is geen reden. Hij hoort
+er pas als hij aantoonbaar het kritieke pad zet **én** zijn dekking elders al
+gedekt is. Anders verplaats je geen kosten maar dekking.
+
+Vier wachters, want een verplaatste toets verdwijnt stil — hij is niet rood, hij
+is er gewoon niet: de matrix in `ci.yml` moet gelijk zijn aan de lijst, de
+scherven moeten de vlag écht meegeven (anders draait hij dubbel), het beschermde
+eindoordeel moet op de nieuwe job wachten (anders laat een gezakte toets de
+merge door), en de lijst mag geen bestand noemen dat niet bestaat.
 
 ### Wanneer een gewicht zonder modus mag verdwijnen
 

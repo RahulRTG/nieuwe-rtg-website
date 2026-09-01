@@ -189,46 +189,22 @@ function heeftGrens(fn, naam) {
   return a.metGrens.has(naam) || a.elementCheck.has(naam);
 }
 
-/* De oude, uitputtende variant. Hij wordt niet meer aangeroepen -- analyse()
-   hierboven doet hetzelfde in een doorloop -- maar hij blijft staan als de
-   nauwkeurige beschrijving van wat "een grens" betekent, en test/ast-scan.test.js
-   vergelijkt de twee zodat ze niet uiteen kunnen lopen. */
-function heeftGrens_(fn, naam) {
-  for (const n of onder(fn.body)) {
-    if (n.type === 'CallExpression' && n.callee && n.callee.type === 'MemberExpression'
-        && n.callee.property && /^(isInteger|isSafeInteger|isFinite)$/.test(n.callee.property.name)
-        && n.arguments.some(a => a && a.type === 'Identifier' && a.name === naam)) return true;
-    /* EEN GAT DAT HIER JAREN HEEFT GEZETEN. De eerste tak was
-         if (raakt(n.left) && raakt(n.right)) return true;
-       met een `raakt` die OOK waar is voor elke `x.length`. Bij een vergelijking
-       als `kand.regels.length > basis.regels.length` -- en die staat er echt,
-       in server/kern/agent.js -- zijn beide zijden dus "raak" zonder dat de
-       gevraagde naam er ook maar in voorkomt. Gevolg: EEN zo'n vergelijking
-       ergens in een functie zette de hele index-controle voor die functie uit.
+/* DE UITPUTTENDE VARIANT IS VERHUISD NAAR DE TOETS.
 
-       Gevonden door de snelle variant hiernaast ertegenaan te houden
-       (test/ast-grens.test.js): die was op 23 van de 1980 gevallen STRENGER, en
-       dat bleek geen fout in de nieuwe maar een gat in de oude. De naam moet er
-       gewoon in staan. */
-    if (n.type === 'BinaryExpression' && ['<', '>', '<=', '>='].includes(n.operator)) {
-      const isNaam = z => z && z.type === 'Identifier' && z.name === naam;
-      if (isNaam(n.left) || isNaam(n.right)) return true;
-    }
-  }
-  /* En de derde vorm van een grens: kijken of het ELEMENT bestaat.
-       if (!p.poll.opties[i]) return 400;
-     Dat is een volwaardige controle -- lijst[NaN] en lijst[-1] zijn undefined,
-     dus die aanroep valt er netjes op stuk. Zonder deze herkenning zou de
-     regel een correcte route aanwijzen, en een regel die goed werk afkeurt
-     wordt uitgezet. */
-  for (const n of onder(fn.body)) {
-    if (n.type === 'UnaryExpression' && n.operator === '!' && n.argument
-        && n.argument.type === 'MemberExpression' && n.argument.computed
-        && n.argument.property && n.argument.property.type === 'Identifier'
-        && n.argument.property.name === naam) return true;
-  }
-  return false;
-}
+   `heeftGrens_` stond hier, en zijn eigen commentaar zei waarom: "hij wordt niet
+   meer aangeroepen -- analyse() hierboven doet hetzelfde in een doorloop -- maar
+   hij blijft staan ... en de toets vergelijkt de twee". Dat is geen productiecode
+   maar het ORAKEL van test/ast-grens.test.js, en een orakel hoort bij zijn toets.
+
+   Hij stond hier ook niet gratis. Deze module wordt onder dekking gemeten, dus
+   telden zijn 46 regels mee in de noemer van de dekkingsvloer -- en omdat alleen
+   ast-grens.test.js hem aanriep, was die ene toets de enige die ze kon dekken.
+   Zolang hij hier stond, moest die toets dus onder dekking draaien, en dat kost
+   1272 seconden tegen 430 zonder. Dat was het kritieke pad van de hele keten.
+
+   Wat NIET verandert is de bewering zelf: de snelle en de uitputtende variant
+   worden nog steeds op de echte boom tegen elkaar gehouden. Alleen woont de
+   uitputtende nu naast de toets die hem als enige gebruikt. */
 
 
 const REGELS = [
@@ -319,7 +295,8 @@ const REGELS = [
   }
 ];
 
-/* heeftGrens_ en analyse gaan mee naar buiten zodat test/ast-grens.test.js de
-   snelle en de uitputtende variant op de ECHTE boom tegen elkaar kan houden.
-   Een optimalisatie is pas te vertrouwen als vastligt dat hij hetzelfde zegt. */
-module.exports = { REGELS, VERBODEN, GEHEIM, heeftGrens, heeftGrens_, naamUitBuiten, analyse, onder };
+/* `analyse` en `onder` gaan mee naar buiten zodat test/ast-grens.test.js de
+   snelle variant op de ECHTE boom tegen zijn uitputtende tegenhanger kan houden.
+   Die tegenhanger woont in de toets zelf (zie hierboven). Een optimalisatie is
+   pas te vertrouwen als vastligt dat hij hetzelfde zegt. */
+module.exports = { REGELS, VERBODEN, GEHEIM, heeftGrens, naamUitBuiten, analyse, onder };

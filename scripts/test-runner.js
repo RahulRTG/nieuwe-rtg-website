@@ -38,6 +38,7 @@ const { spawnSync } = require('child_process');
 const { pak } = require('./afbouw-slot');
 const { ontleedDeel, verdeel } = require('./lib/delen');
 const { IJKINGEN } = require('./lib/ijkingen');
+const { ZWAAR } = require('./lib/zwaar');
 
 const WORTEL = path.join(__dirname, '..');
 /* HET SLOT NIET TWEE KEER PAKKEN. pak() werpt als het bezet is, en dat is
@@ -84,6 +85,10 @@ const deel = (() => {
   return d;
 })();
 const zonderIjkingen = argv.includes('--zonder-ijkingen');
+/* De zware toetsen krijgen in de keten een eigen job ZONDER dekking; met deze
+   vlag laat een scherf ze weg. Lokaal draaien ze gewoon mee -- ze hoeven niet
+   geisoleerd, ze zijn alleen duur. Zie scripts/lib/zwaar.js. */
+const zonderZware = argv.includes('--zonder-zware');
 /* DE SOLO-LIJST WOONT IN scripts/lib/geisoleerd.js. Hij stond hier, en dat was
    bijna goed: hij hoort bij deze loper. Maar dit bestand IS een script -- wie het
    met require() opent om alleen die lijst te lezen, start de hele suite. Dat is
@@ -225,7 +230,8 @@ function draai(namen, parallel, metVloer, tijdgrens) {
   return r.status == null ? 2 : r.status;
 }
 
-const gewoon = verdeel(bestanden.filter(n => !isGeisoleerd(n)), deel);
+const gewoon = verdeel(bestanden.filter(n => !isGeisoleerd(n) &&
+  (!zonderZware || selectie.length || !ZWAAR.includes(n))), deel);
 const geïsoleerd = verdeel(bestanden.filter(n => isGeisoleerd(n) &&
   (!zonderIjkingen || selectie.length || !IJKINGEN.includes(n))), deel);
 
@@ -253,6 +259,7 @@ console.log('[tests] ' + gewoon.length + ' bestanden, maximaal ' + concurrency +
     : (dekkingVloer.length ? ' (met dekkingsvloer ' + dekkingVloer.join('/') + ')' : '')));
 if (deel) console.log('[tests] deel ' + deel.nr + ' van ' + deel.totaal);
 if (zonderIjkingen && !selectie.length) console.log('[tests] zonder de losse ijkingen; die draaien in de CI elk in een eigen job');
+if (zonderZware && !selectie.length) console.log('[tests] zonder de zware toetsen; die draaien in de CI elk in een eigen job, zonder dekking');
 let code = draai(gewoon, concurrency, true);
 for (const naam of geïsoleerd) {
   console.log('[tests] geïsoleerd: ' + naam);

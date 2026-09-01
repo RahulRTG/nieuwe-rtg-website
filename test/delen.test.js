@@ -491,3 +491,64 @@ test('de maat van een ongemeten bestand ligt tussen de bulk en de uitschieter', 
       'een ongemeten bestand hoort onder de uitschieter en boven de bulk te vallen');
   } finally { zetDuren(null); }
 });
+
+/* ===========================================================================
+   DE ZWARE TOETSEN: uit de scherven, maar niet uit de keten.
+
+   ast-grens.test.js is uit de vier scherven gehaald omdat hij onder dekking
+   1272s deed -- in zijn eentje de bodem van het kritieke pad. Hij draait nu in
+   een eigen job zonder dekking (272s).
+
+   Dat is precies het soort verplaatsing dat stil fout gaat, en op drie
+   manieren. Alle drie staan ze hieronder, want een toets die nergens meer
+   draait ziet niemand: hij is niet rood, hij is er gewoon niet.
+   =========================================================================== */
+const { ZWAAR, KORT: ZWAAR_KORT } = require('../scripts/lib/zwaar');
+
+test('elke zware toets heeft een eigen job in de keten', () => {
+  const yml = fs.readFileSync(path.join(__dirname, '..', '.github', 'workflows', 'ci.yml'), 'utf8');
+  const regel = /^\s*zwaar:\s*\[([^\]]+)\]\s*$/m.exec(yml);
+  assert.ok(regel, 'ci.yml heeft geen matrix `zwaar: [...]`; dan draait geen enkele zware toets meer');
+  const inKeten = regel[1].split(',').map((x) => x.trim()).filter(Boolean).sort();
+  assert.deepEqual(inKeten, [...ZWAAR_KORT].sort(),
+    'de matrix in ci.yml en scripts/lib/zwaar.js zeggen niet hetzelfde: ' +
+    inKeten.join(', ') + '  vs  ' + ZWAAR_KORT.join(', '));
+  for (const naam of ZWAAR) {
+    assert.ok(fs.existsSync(path.join(__dirname, naam)), 'zware toets ontbreekt op schijf: ' + naam);
+  }
+});
+
+test('de scherven laten de zware toetsen ook echt weg', () => {
+  /* De vlag bestaat, maar geeft de keten hem ook mee? Zonder deze bewering
+     draait ast-grens gewoon door in een scherf MET dekking, naast zijn eigen
+     job -- twee keer het werk, en de hele winst weg zonder dat iets rood wordt. */
+  const yml = fs.readFileSync(path.join(__dirname, '..', '.github', 'workflows', 'ci.yml'), 'utf8');
+  const scherf = /npm run test:deel --[^\n]*--deel=\$\{\{ matrix\.scherf \}\}[^\n]*/.exec(yml);
+  assert.ok(scherf, 'de scherfstap is niet te vinden in ci.yml');
+  assert.match(scherf[0], /--zonder-zware/,
+    'de scherven halen de zware toetsen niet weg; dan draaien ze dubbel');
+});
+
+test('het eindoordeel wacht op de zware toetsen', () => {
+  /* De gevaarlijkste van de drie: de beschermde check heet "Tests, checks en
+     build" en is wat een merge tegenhoudt. Staat `zware` niet in zijn needs,
+     dan laat een GEZAKTE zware toets die check gewoon groen. Een toets
+     verplaatsen mag nooit betekenen dat hij ophoudt te tellen. */
+  const yml = fs.readFileSync(path.join(__dirname, '..', '.github', 'workflows', 'ci.yml'), 'utf8');
+  const needs = /^\s*needs: \[([^\]]*toetsscherf[^\]]*)\]\s*$/m.exec(yml);
+  assert.ok(needs, 'het eindoordeel heeft geen needs met de scherven erin');
+  assert.match(needs[1], /\bzware\b/,
+    'het eindoordeel wacht niet op de zware toetsen; dan telt een gezakte niet mee');
+});
+
+test('een zware toets draait nog steeds mee als je hem niet wegvraagt', () => {
+  /* Lokaal hoort `npm test` gewoon alles te draaien. De vlag is er voor de
+     keten, niet om een toets uit te zetten. */
+  const { ontleedDeel } = require('../scripts/lib/delen');
+  assert.ok(ontleedDeel, 'delen.js hoort bereikbaar te zijn');
+  for (const naam of ZWAAR) {
+    assert.ok(!require('../scripts/lib/geisoleerd').isGeisoleerd(naam),
+      naam + ' hoort NIET in de isolatielijst te staan: die gaat over gedeelde ' +
+      'staat, deze lijst over kosten. Twee redenen, twee lijsten.');
+  }
+});

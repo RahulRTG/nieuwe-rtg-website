@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-01T00:20:10.763Z",
-  "commit": "5f7e43d5f",
-  "boomVuil": true,
-  "boomAnders": 3,
+  "op": "2026-09-01T08:55:34.274Z",
+  "commit": "a7f678119",
+  "boomVuil": false,
+  "boomAnders": 2,
   "instrument": "scripts/mutatieboek.js",
   "node": "v22.22.2"
  },
@@ -14,12 +14,12 @@
   "mutaties": 4769,
   "mutatiesVerklaard": 323,
   "mutatiesOnverklaard": 4446,
-  "beproefbaar": 3993,
-  "beproefbaarVerklaard": 263,
+  "beproefbaar": 3998,
+  "beproefbaarVerklaard": 266,
   "bakken": 7,
   "statusSom": 4769,
   "statusSluit": true,
-  "nogNietGeclassificeerd": 3730,
+  "nogNietGeclassificeerd": 3732,
   "metBesluitOverDuplicaat": 323,
   "zonderBesluitOverDuplicaat": 4446,
   "metGemetenDuplicaatgedrag": 0,
@@ -33,7 +33,7 @@
   "perGraad": [
    {
     "id": "afgeleid",
-    "aantal": 716,
+    "aantal": 714,
     "voorbeelden": [
      "POST /api/boardroom/reset",
      "POST /api/office/boardroom/alles",
@@ -42,7 +42,7 @@
    },
    {
     "id": "onbekend",
-    "aantal": 3730,
+    "aantal": 3732,
     "voorbeelden": [
      "POST /api/aandacht",
      "POST /api/aanmeld/start",
@@ -109,7 +109,7 @@
   {
    "id": "geen-rol-met-token",
    "uitleg": "Er is geen proefsleutel voor de rol achter deze deur. Aanroepen zonder sleutel geeft 401, en dat bewijst niets. De onderverdeling staat in zonderRolPerReden -- daar zitten drie verschillende reparaties in.",
-   "aantal": 736,
+   "aantal": 731,
    "eind": true,
    "voorbeelden": [
     "POST /api/arrival/pass",
@@ -120,7 +120,7 @@
   {
    "id": "beproefbaar-verklaard",
    "uitleg": "Beproefbaar EN er staat een besluit over duplicaatgedrag in server/lib/idemsleutels.js.",
-   "aantal": 263,
+   "aantal": 266,
    "eind": true,
    "voorbeelden": [
     "POST /api/aanmelding/bewijs/herkeuring",
@@ -131,7 +131,7 @@
   {
    "id": "beproefbaar-onverklaard",
    "uitleg": "Beproefbaar, maar er is nog geen besluit over wat \"hetzelfde verzoek\" hier betekent. Dit is de enige bak die naar nul hoort.",
-   "aantal": 3730,
+   "aantal": 3732,
    "eind": true,
    "voorbeelden": [
     "POST /api/aandacht",
@@ -180,7 +180,7 @@
   {
    "id": "NIET_BEPROEFBAAR",
    "uitleg": "Dit instrument heeft geen sleutel voor deze deur. De reden staat erbij; zonder sleutel aankloppen bewijst niets.",
-   "aantal": 551,
+   "aantal": 549,
    "moetNaarNul": false,
    "semantiek": false,
    "voorbeelden": [
@@ -204,7 +204,7 @@
   {
    "id": "NOG_NIET_GECLASSIFICEERD",
    "uitleg": "Er is geen besluit over duplicaatgedrag. De enige bak die naar nul hoort.",
-   "aantal": 3730,
+   "aantal": 3732,
    "moetNaarNul": true,
    "semantiek": false,
    "voorbeelden": [
@@ -270,15 +270,6 @@
    ]
   },
   {
-   "reden": "rol \"kantoor-op-naam\", maar dit instrument heeft daar geen token voor; zonder sleutel aankloppen meet niets over deze route",
-   "aantal": 5,
-   "voorbeelden": [
-    "POST /api/office/vakbewijs/intrek",
-    "POST /api/office/vakbewijs/nummer",
-    "POST /api/office/vakbewijs/teken"
-   ]
-  },
-  {
    "reden": "geenBewaker: mw+mw -- geen autorisatielaag -- alleen een rem of cache",
    "aantal": 3,
    "voorbeelden": [
@@ -302,7 +293,7 @@
    "veld": "schrijfroutes",
    "vastgelegd": 4769,
    "nu": 4769,
-   "vastgelegdOp": "2026-08-31",
+   "vastgelegdOp": "2026-09-01",
    "zelfdeVraag": "API-paden die niet GET zijn",
    "verschil": 0,
    "gelijk": true,
@@ -323,10 +314,10 @@
    "bron": "IDEMPROEF.json",
    "veld": "routesMetRol",
    "vastgelegd": 3803,
-   "nu": 3993,
+   "nu": 3998,
    "vastgelegdOp": "2026-08-31",
    "zelfdeVraag": "daarvan: de routes waarvoor een proefsleutel bestaat",
-   "verschil": 190,
+   "verschil": 195,
    "gelijk": false,
    "duiding": "de vastlegging is van 2026-08-31; sindsdien zijn er routes bijgekomen"
   }

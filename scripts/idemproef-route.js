@@ -377,6 +377,7 @@ function wachtOpSchoneBoom() {
   console.log('  lijfsleutels gebouwd                 : ' +
     (lijfsleutels.gebouwd.length ? lijfsleutels.gebouwd.map(g => g.naam).join(', ') : 'GEEN') +
     (lijfsleutels.mislukt.length ? '   (mislukt: ' + lijfsleutels.mislukt.map(m => m.naam).join(', ') + ')' : ''));
+  for (const m of lijfsleutels.mislukt) console.log('      ' + m.naam + ': ' + m.reden);
 
   const { maakWereldwacht, controleerWerelden } = require('./lib/wereldcontrole');
   const wacht = maakWereldwacht({ post, tokenVoor, extras: wereldExtras,

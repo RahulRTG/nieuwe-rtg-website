@@ -456,8 +456,21 @@ async function bouwLijfsleutels(ctx) {
   const velden = new Map();   // prefix -> velden
   for (const f of FAMILIES) {
     let uit = null;
-    try { uit = await f.bouw(ctx); } catch (e) { uit = null; }
-    if (!uit) { mislukt.push({ naam: f.naam, reden: 'de bouwer kreeg geen sleutel terug' }); continue; }
+    let stuk = null;
+    /* EEN BOUWER DIE STRUIKELT IS IETS ANDERS DAN EEN BOUWER DIE NEE ZEGT.
+
+       Hier stond `catch (e) { uit = null; }`, en daarmee zag een uitzondering
+       er precies zo uit als een eerlijke null ("deze opstelling kan deze
+       familie niet bouwen"). Vier families mislukten zo zonder dat iemand kon
+       zien waarom, en de 135 routes erachter telden als 'geen proefsleutel' --
+       een bak waar je met zoeken naar een sleutel niets oplost als het
+       probleem een fout in de bouwer is. */
+    try { uit = await f.bouw(ctx); } catch (e) { uit = null; stuk = (e && e.message) || String(e); }
+    if (!uit) {
+      mislukt.push({ naam: f.naam,
+        reden: stuk ? 'de bouwer liep vast: ' + stuk : 'de bouwer kreeg geen sleutel terug' });
+      continue;
+    }
     /* `koppen` is met opzet een APARTE uitkomst en geen veld in het lijf: een
        apparaatsleutel die in een kop hoort te reizen, in de body meesturen zou
        een andere weg beproeven dan de route werkelijk kent. */

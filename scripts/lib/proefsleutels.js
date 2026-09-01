@@ -224,6 +224,22 @@ async function haalSleutels({ post }) {
      Hij staat hier en niet in de proef, omdat de sleutelbos de enige plek is
      waar dit huis inlogt. `inlog` geeft de losse munters terug voor wie een
      rol opnieuw wil zetten zonder de hele bos te hermunten. */
+  /* TWEE NAMEN VOOR DEZELFDE SESSIE, en dat is geen slordigheid maar een brug.
+
+     De lijfsleutelfamilies in ./lijfsleutels.js zijn geschreven tegen de
+     namen `member-lifestyle` en `member-zakelijk`; deze sleutelbos mint ze als
+     `lid-lifestyle` en `lid-business`. Dezelfde inlog, dezelfde pas, ander
+     woord -- en het gevolg was stil: `partner` en `lifestyle` konden niet
+     gebouwd worden, en alle routes erachter telden als 'geen proefsleutel'
+     terwijl de sleutel er gewoon was.
+
+     Hernoemen kan niet zonder de vijf andere proefrunners te raken, dus staat
+     de brug hier, op EEN plek, met de reden. Een alias en geen tweede inlog:
+     het is letterlijk hetzelfde token. */
+  for (const [alias, bron] of [['member-lifestyle', 'lid-lifestyle'], ['member-zakelijk', 'lid-business']]) {
+    if (tokens[bron] != null && tokens[alias] == null) tokens[alias] = tokens[bron];
+  }
+
   const zaakbureau = maakZaakinlog({ post });
   const inlog = Object.fromEntries(MUNTERS.map(([rol, , munt]) => [rol, () => munt(post, tokens)]));
 

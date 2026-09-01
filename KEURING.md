@@ -217,6 +217,33 @@ deel. Die marge is met opzet een **telling en geen tijd**: als de gewichten
 verdacht zijn, is het enige dat je nog zeker weet hoeveel bestanden er zijn. De
 schade van een fout gewicht is daarmee begrensd in plaats van onbeperkt.
 
+### Appels met peren, ook binnen een modus
+
+De modi voorkomen dat een dekkingsmeting en een gewone meting op een hoop
+komen. Er blijft een tweede vorm over, en die zit *binnen* een modus: een
+register bewaart het gewicht van een bestand dat deze ronde niet draaide — met
+opzet, want een scherf mag de andere drie kwarten niet wissen — en zo'n gewicht
+houdt zijn oude bron. Een meting van een andere runner, een andere node, soms
+een andere machine.
+
+Dat staat per bestand vast (`spreiding.bronnen`), maar zolang niemand het optelt
+ziet niemand het. `gewichtdrift.js` telt daarom hoeveel gewichten **niet** van
+de nieuwste bron komen. Op het eerste CI-gemeten register:
+
+| modus | van een andere bron |
+|---|---|
+| `dekking` | 0 van 1259 |
+| `onbekend` | 1257 van 1434 |
+
+Die meter verandert met opzet de **status niet**. Een oude bron is geen bewijs
+dat het gewicht fout is; hij is een reden om het te weten. Wie hier een grens op
+zet, laat een register zakken omdat een toets een ronde niet meedraaide.
+
+En hij neemt de nieuwste bron uit de **jongste meting**, niet uit de grootste
+hoop. Dat is de faalvorm die hem anders nutteloos maakt: bij een register vol
+oude gewichten wint de oude bron op aantal, heet die "de nieuwste", en meldt de
+meter bijna niets vreemds — precies wanneer er het meeste vreemd is.
+
 ### CI meet, CI stelt voor, een mens merget
 
 Het register staat in git omdat de verdeling deterministisch hoort te zijn; een

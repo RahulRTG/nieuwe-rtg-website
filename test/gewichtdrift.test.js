@@ -98,3 +98,61 @@ test('zonder meting komt er nooit een groen antwoord uit', () => {
   assert.notEqual(draai([]), 0, 'zonder meting is er niets vastgesteld');
   assert.notEqual(draai(['--poort']), 0, 'en de poort hoort dat zeker niet door te laten');
 });
+
+/* ===========================================================================
+   HOEVEEL VAN EEN MODUS KOMT ECHT UIT DEZE OMGEVING?
+
+   Een modus bewaart het gewicht van een bestand dat deze ronde niet draaide.
+   Dat is met opzet -- een scherf mag de andere drie kwarten niet wissen -- maar
+   zo'n gewicht houdt wel zijn oude bron. Appels met peren, nu BINNEN een modus.
+   =========================================================================== */
+const { vreemdeBronnen } = require('../scripts/gewichtdrift');
+
+test('een gewicht van een andere bron wordt geteld, niet weggepoetst', () => {
+  const modus = { spreiding: {
+    'vers-a.test.js': { bronnen: ['ci|v26|4|abc'], gemetenOp: '2026-09-01' },
+    'vers-b.test.js': { bronnen: ['ci|v26|4|abc'], gemetenOp: '2026-09-01' },
+    'oud.test.js':    { bronnen: ['lokaal|v22|4|xyz'], gemetenOp: '2026-08-01' }
+  } };
+  const h = vreemdeBronnen(modus);
+  assert.equal(h.huidig, 'ci|v26|4|abc', 'de nieuwste bron komt van de jongste meting');
+  assert.equal(h.vreemd, 1, 'het oude gewicht hoort geteld te worden');
+  assert.equal(h.totaal, 3);
+});
+
+test('een modus die in een keer gemeten is, draagt geen vreemde bronnen', () => {
+  const modus = { spreiding: {
+    'a.test.js': { bronnen: ['ci|v26|4|abc'], gemetenOp: '2026-09-01' },
+    'b.test.js': { bronnen: ['ci|v26|4|abc'], gemetenOp: '2026-09-01' }
+  } };
+  assert.equal(vreemdeBronnen(modus).vreemd, 0);
+});
+
+test('de herkomst verandert de status niet', () => {
+  /* Een oude bron is geen bewijs dat het gewicht fout is; hij is een reden om
+     het te WETEN. Wie hier een grens op zet, laat een register zakken omdat een
+     toets een ronde niet meedraaide. */
+  assert.equal(beoordeel({ zelfdeModus: true, gedeeld: 10, fout: 0 }).status, 'ACTUEEL');
+});
+
+test('zonder spreiding valt er niets over de herkomst te zeggen', () => {
+  assert.equal(vreemdeBronnen({ duur: { 'a.test.js': 1 } }), null,
+    'geen spreiding is geen nul vreemde bronnen maar geen antwoord');
+});
+
+test('de nieuwste bron komt uit de JONGSTE meting, niet uit de grootste hoop', () => {
+  /* De gevaarlijkste faalvorm van deze meter: een register dat vooral uit oude
+     gewichten bestaat. Telt hij over alle metingen, dan wint de oude bron op
+     aantal, heet die "de nieuwste", en meldt hij bijna geen vreemde bronnen --
+     precies wanneer er de meeste zijn. */
+  const spreiding = {};
+  for (let i = 0; i < 20; i++) {
+    spreiding['oud-' + i + '.test.js'] = { bronnen: ['lokaal|v22|4|xyz'], gemetenOp: '2026-08-01' };
+  }
+  spreiding['vers.test.js'] = { bronnen: ['ci|v26|4|abc'], gemetenOp: '2026-09-01' };
+
+  const h = vreemdeBronnen({ spreiding });
+  assert.equal(h.huidig, 'ci|v26|4|abc',
+    'de jongste meting bepaalt de huidige bron, ook al is zij in de minderheid');
+  assert.equal(h.vreemd, 20, 'en dan zijn die twintig oude gewichten allemaal vreemd');
+});

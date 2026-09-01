@@ -40,6 +40,10 @@ public/dist/
 .routejournaal
 # idem voor de schermen: invoer voor scripts/schermen.js, geen bronbestand
 .schermjournaal
+# de ruwe duurmeting van de laatste ronde: invoer voor scripts/toetsduur.js.
+# Het REGISTER (TOETSDUUR.json) staat wel in de repo -- dat is de weging waar
+# de scherfverdeling op draait; dit is de meting waaruit hij wordt geschreven.
+.toetsduur
 
 # de ijkbestanden van test/meterijk.test.js. Die toets controleert of de
 # normmeters echt uitslaan door er even een bestand bij te zetten (een extra

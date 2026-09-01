@@ -159,8 +159,27 @@ function bronIndex() {
   const perStaart = new Map();
   const voorvoegsels = new Map();
   const achtervoegsels = new Map();
+  /* COMMENTAAR TELT NIET ALS REGISTRATIE, en dat was een echte vondst.
+
+     server/kern/handlerpoorten/buiten.js legt in zijn kop uit welke routes in
+     een lus ontstaan, en schrijft daarbij het voorbeeld letterlijk op:
+     `app.post('/api/rtf/spel/' + naam, ...)`. Deze index las dat als een TWEEDE
+     registratie op dat voorvoegsel -- en omdat hieronder alleen bij precies EEN
+     kandidaat wordt toegewezen, verloren alle drieenveertig spelroutes hun bron.
+     Erger nog: ze vielen daarna door naar de achtervoegselregel, en die wees
+     /api/rtf/spel/antwoord toe aan routes/rtmail-vak.js. Een verkeerd
+     toegewezen bronbestand is erger dan geen (zie de kop hierboven).
+
+     Commentaar wordt daarom weggehaald voor het zoeken, met behoud van de
+     REGELNUMMERS: elk teken wordt door een spatie vervangen en de regelovergangen
+     blijven staan, zodat `regel` blijft kloppen. Zelfde aanpak als
+     scripts/schakelbaar.js, waar dezelfde les al was geleerd. */
+  const zonderCommentaar = (b) => String(b)
+    .replace(/\/\*[\s\S]*?\*\//g, m => m.replace(/[^\n]/g, ' '))
+    .replace(/(^|[^:'"\\])\/\/[^\n]*/g, (m, p1) => p1 + ' '.repeat(m.length - p1.length));
+
   loopMap(path.join(WORTEL, 'server'), /\.js$/, f => {
-    const tekst = fs.readFileSync(f, 'utf8');
+    const tekst = zonderCommentaar(fs.readFileSync(f, 'utf8'));
     let m;
     ROUTE_RE.lastIndex = 0;
     while ((m = ROUTE_RE.exec(tekst))) {

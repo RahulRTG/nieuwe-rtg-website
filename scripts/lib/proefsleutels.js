@@ -103,6 +103,25 @@ const MUNTERS = [
   ['boardroom', 'eigenaar -> /api/account/start {rol:kantoor}: een office-sessie MET lidKey, het enige wat boardroomAuth() doorlaat',
     async (post, bos) => (bos.eigenaar ? tok(await post('/api/account/start', { rol: 'kantoor' }, bos.eigenaar)) : null)],
 
+  /* KANTOOR OP NAAM, en dat is iets anders dan `office` hierboven.
+
+     `office` is de GEDEELDE backofficecode: een sessie zonder lidKey, dus zonder
+     mens erachter. Een groeiend aantal routes weigert juist die -- een Lifestyle
+     Pass toekennen, een identiteit goedkeuren, alles wat in het inzagejournaal
+     belandt -- omdat daar een herleidbaar persoon bij hoort en geen code die
+     iedereen kent (kern/kantoor/kluispoort.js zegt dat met zoveel woorden).
+
+     Zonder sleutel voor deze rol werden die routes stil als ONGEMETEN
+     overgeslagen, en ongemeten leest in een uitslag als geslaagd. Dat is precies
+     het gat dat test/proefsleutels.test.js bewaakt.
+
+     De sessie is dezelfde als die van de boardroom: de eigenaar logt in als lid
+     en opent daarmee de kantoordeur (kern/eenaccount/starten.js), en DIE sessie
+     draagt een lidKey. Hij staat hier als eigen rol en niet als alias, omdat de
+     bewakerskaart hem als eigen rol kent en de verdeling op die naam gebeurt. */
+  ['kantoor-op-naam', 'dezelfde office-sessie MET lidKey als de boardroom: een kantoorsessie met een mens erachter, wat de gedeelde code niet is',
+    async (post, bos) => bos.boardroom || null],
+
   /* baasAuth() in server/routes/werkplek.js is `wie(req).baas`, en `wie` is
      boardroomWie/boardroomBaas. Dezelfde sessie dus, met dezelfde reden. */
   ['werkplekbaas', 'dezelfde boardroom-sessie: baasAuth() vraagt boardroomBaas() en dat is de eigenaar',

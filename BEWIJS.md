@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1434 bestanden en 10158 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1434 bestanden en 10159 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 1434 |
-| losse beweringen (`test(...)`) | 10158 |
+| losse beweringen (`test(...)`) | 10159 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 51 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 992 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1257 bestanden, 9854 beweringen.
+1257 bestanden, 9855 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -255,7 +255,7 @@ toets omvalt.
 | `deelindex.test.js` | 5 | gezakt op `+->-#0` | DE INDEX VAN DE BUNDELDELEN LOOPT NIET ACHTER. BUNDELS.md wordt voortgebracht door scripts/deelindex.js. |
 | `defensie.test.js` | 7 | gezakt op `liegpoort /api/` | De defensie-toren: paraatheid, materieel en onderhoud, bevoorrading, de oefenagenda en de staf-AI. Uitdrukkelijk logistiek en organisatie: de AI weigert alles wat richting wapeninzet of doelbestrijding gaat. |
 | `dekking.test.js` | 2 | -- | DE DEKKINGSMETER LEEST ALLE JOURNALEN, NIET EEN (scripts/dekking.js). WAAROM DEZE TOETS ER IS. |
-| `delen.test.js` | 12 | gezakt op `===->!==#0` | DE SUITE IN DELEN, EN DE VLOER DAAROVERHEEN. Sinds de CI de unit-suite en de schermtoetsen over vier runners verdeelt, hangen er twee nieuwe manieren aan waarop deze keten stil minder kan gaan toetsen dan hij belooft: 1. |
+| `delen.test.js` | 13 | gezakt op `===->!==#0` | DE SUITE IN DELEN, EN DE VLOER DAAROVERHEEN. Sinds de CI de unit-suite en de schermtoetsen over vier runners verdeelt, hangen er twee nieuwe manieren aan waarop deze keten stil minder kan gaan toetsen dan hij belooft: 1. |
 | `deltapoort.test.js` | 17 | genoemd | DE IJKING VAN DE DELTAPOORT -- regel 2 van de lat, op de poort zelf. scripts/deltapoort.js houdt nieuw werk aan de norm. |
 | `demokosten.test.js` | 5 | -- | WAT DE DEMOSEED KOST, EN WAAROM DAT EEN METER VERDIENT. De demostand zet bij een verse database 183 personeelsrijen neer (71 zaken, server/kern/staffseed.js en staffseed2.js). |
 | `demostand.test.js` | 7 | gezakt op `liegpoort /api/` | De demo-stand hoort UIT te staan als niemand erom vraagt. WAT ER OPENSTOND, op de echte server, op het open internet: 1. |

@@ -82,8 +82,14 @@ function wachtOpSchoneBoom() {
      exit(2) op "geen token voor member, office, supplier". RTG_MAGNAAT_TEST is
      de expliciete, gedocumenteerde vlag voor synthetische data en staat niet in
      productie -- de opstelling zegt nu zelf wat ze nodig heeft. */
+  /* RTG_DOOS_SLEUTEL hoort bij de OPSTELLING, net als OFFICE_CODE: zonder die
+     variabele bestaat de doosdeur helemaal niet, ook niet in productie
+     (server/routes/doos.js). Hem hier zetten opent geen deur die anders dicht
+     zou zijn -- het maakt de opstelling compleet. */
+  const DOOS_SLEUTEL = 'proef-doos-sleutel-0123456789abcdef';
   const server = await start({ naam: 'idemproef',
     env: { RTG_DEMO: '1', RTG_MAGNAAT_TEST: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF',
+      RTG_DOOS_SLEUTEL: DOOS_SLEUTEL,
       /* Het TWEEDE meetpunt (de opslag) hing aan dezelfde toevalligheid: zonder
          RTG_STAATLOG draagt geen antwoord een X-RTG-Staat-kop en meet de proef
          alleen wat de route terugzegt -- stiller, en een stuk zwakker. Stand 2,
@@ -349,6 +355,29 @@ function wachtOpSchoneBoom() {
   await zetKlaar('weefsel', './lib/wereld-weefsel', 'zetWeefselKlaar', { post, tokens });
   await zetKlaar('rtmail', './lib/wereld-rtmail', 'zetRtmailKlaar', { post, tokens });
 
+  /* DE LIJFSLEUTELS -- een sleutel die in het LICHAAM staat en niet in de kop.
+
+     Een deel van dit huis bewaakt niet met een rol maar met een sleutel in het
+     verzoek zelf: gezinsPoort, werkPoort, rtfPoort, gastAuth. Rollen kruisen
+     meet daar niets, en zonder gebouwde familie belandt zo'n route in
+     GEEN_PROEFSLEUTEL -- terwijl er niets ontbreekt behalve deze opstelling.
+
+     Gemeten op 1 september 2026: 471 routes stonden daar, en scripts/onbewezen.js
+     leest de gebouwde families uit `gemeten.lijfsleutelsGebouwd` van DEZE proef.
+     Zolang die lijst leeg is, telt elke lichaamssleutel-route als ontbrekende
+     sleutel. Zie ./lib/lijfsleutels.js voor waarom dit een tweede begrip is en
+     geen rol. */
+  const { bouwLijfsleutels } = require('./lib/lijfsleutels');
+  let lijfsleutels = { gebouwd: [], mislukt: [], lijfVoor: () => ({}) };
+  try {
+    lijfsleutels = await bouwLijfsleutels({ post, tokens, datamap: server.datamap, doosSleutel: DOOS_SLEUTEL });
+  } catch (e) {
+    console.log('  lijfsleutels                         : NIET gebouwd -- ' + e.message);
+  }
+  console.log('  lijfsleutels gebouwd                 : ' +
+    (lijfsleutels.gebouwd.length ? lijfsleutels.gebouwd.map(g => g.naam).join(', ') : 'GEEN') +
+    (lijfsleutels.mislukt.length ? '   (mislukt: ' + lijfsleutels.mislukt.map(m => m.naam).join(', ') + ')' : ''));
+
   const { maakWereldwacht, controleerWerelden } = require('./lib/wereldcontrole');
   const wacht = maakWereldwacht({ post, tokenVoor, extras: wereldExtras,
     elke: Number(process.env.RTG_WERELDWACHT || 250) });
@@ -498,6 +527,10 @@ function wachtOpSchoneBoom() {
          hier staat is wat er GEMETEN is opgevraagd, niet hoe lang een lijst is:
          een tweede plek die alsnog zelf gaat aankloppen, valt daarmee op. */
       roosteropvragingen: bos.zaakbureau.verbruikt(), roosterRem: 30,
+      /* WELKE LICHAAMSSLEUTEL-FAMILIES ER STONDEN. scripts/onbewezen.js leest
+         deze lijst om te bepalen of een route werkelijk zonder sleutel zat of
+         alleen zonder OPSTELLING -- twee heel verschillende reparaties. */
+      lijfsleutelsGebouwd: lijfsleutels.gebouwd.map(g => g.naam),
       /* WAT DE PLATFORMLAAG VING, EN WAT DE ROUTE ZELF DOET -- twee getallen,
          want ze gaan niet over hetzelfde. Alle oproepen hierboven dragen `idem`
          in het lijf, en server/middleware/idempotentie.js is precies daarop

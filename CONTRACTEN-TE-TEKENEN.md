@@ -115,3 +115,45 @@ stand van 1 september 2026, met een verse `IDEMPROEF.json` eronder. De 88
 afgeleide regels staan in `MUTATIECONTRACT-AFGELEID.json` met per regel de
 grond; ze worden bij elke volgende gang overschreven en drukken een menselijk
 besluit nooit weg.
+
+
+---
+
+# En twee bevindingen die geen contract zijn maar een bug
+
+De idempotentieproef heeft na de port van de wereldopstelling twee routes
+gevonden waarvan **bewezen** is dat een herhaling het werk overdoet. Dat is de
+bak `ECHT_DEFECT`, en die hoort op nul te staan:
+
+| route | wat de proef zag |
+|---|---|
+| `POST /api/bank/rekening/open` | twee keer aankloppen opent twee rekeningen |
+| `POST /api/office/aidata/export` | de tweede oproep doet de export opnieuw |
+
+De eerste is de zwaarste: een bankrekening openen is geen leeshandeling, en een
+dubbeltik hoort daar niet twee rekeningen op te leveren. Dit is geen
+classificatievraag zoals de achttien hierboven — er is niets te tekenen, er is
+iets te repareren.
+
+De tweede is milder maar niet niets: een export die twee keer draait kost twee
+keer werk en levert twee keer een bestand.
+
+## Wat ik NIET heb gedaan
+
+Ze repareren. Een idempotentiesleutel op een bankroute is een ingreep in de
+geldketen, en `kern/pay/poort.js` is de plek waar dit huis zulke besluiten
+neemt. Dat hoort een eigen wijziging te zijn met eigen toetsen, niet een
+bijvangst van een samenvoeging.
+
+## En een derde die geen bug is
+
+`GEEN_PROEFSLEUTEL` staat op 471. Nagerekend: `scripts/onbewezen.js` en
+`verdeelOpRol` zijn identiek aan die van PR #144, en met de rollenlijst van #144
+komt er exact hetzelfde uit (731 zonder rol, 4038 met rol). Het verschil zit
+niet in het instrument maar in de data: **548 van die routes hebben hun poort in
+de HANDLER** in plaats van op de route, en daar kan een rolverdeler per
+definitie geen rol aan toekennen.
+
+Die bak op nul krijgen vraagt dus dat het instrument handlerpoorten leert lezen.
+Dat is een uitbreiding en geen reparatie, en het is de eerlijke reden dat
+`test/eindpoort.test.js` rood blijft staan.

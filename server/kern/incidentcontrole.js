@@ -37,7 +37,25 @@ module.exports = function maakIncidentcontrole({ db, save, functies, beveilig, j
     const s = t.incidentcontrole;
     if (!Array.isArray(s.audit)) s.audit = [];
     if (!Number.isSafeInteger(s.revisie)) s.revisie = 0;
-    if (!MODI.includes(s.modus)) s.modus = 'normaal';
+    /* SEC-LOCK-004: EEN ONBEKENDE STAND IS GEEN NORMALE STAND. Hier stond
+       `s.modus = 'normaal'`, en dat is een fail-OPEN: een beschadigd of
+       gemanipuleerd veld zette het platform stilzwijgend in de zwakste stand,
+       precies op het moment dat er iets aan de hand was. Terugvallen op
+       `isolatie` zou het huis platleggen op grond van een tikfout, en dat is de
+       knop die volgens BESTUUR.md grens 6.10 niet gebruikt wordt. Dus valt hij
+       terug op `beschermd`: de enige stand die GEEN schakelaar omzet, het lezen
+       laat doorlopen en toch de zes bevoorrechte categorieën bevriest.
+       kern/veiligheid/ordening.js leest dezelfde onbekende waarde op dezelfde
+       manier; deze regel is de uitvoering ervan en niet een tweede oordeel. */
+    if (!MODI.includes(s.modus)) {
+      const was = String(s.modus);
+      s.modus = 'beschermd';
+      s.standOnbepaald = { was: was.slice(0, 40), at: klok.datum().toISOString() };
+      if (beveilig) beveilig.meld('incidentcontrole', 'kritiek',
+        'De opgeslagen incidentstand was onleesbaar ("' + was.slice(0, 40) + '"). ' +
+        'Teruggevallen op de beschermstand in plaats van op normaal; stel handmatig vast wat er hoort te gelden.',
+        { bron: 'incidentcontrole:standOnbepaald' });
+    } else if (s.standOnbepaald) delete s.standOnbepaald;
     return { t, s };
   }
 
@@ -192,6 +210,10 @@ module.exports = function maakIncidentcontrole({ db, save, functies, beveilig, j
         bevriest: Object.keys(beschermstand.BEVRIEST),
         looptDoor: Object.keys(beschermstand.LOOPT_DOOR),
         uitzonderingen: beschermstand.UITZONDERINGEN },
+      /* Een teruggevallen stand staat in het antwoord en niet alleen in de
+         melding: wie het scherm leest hoort te zien dat hier geen mens heeft
+         gekozen. */
+      standOnbepaald: s.standOnbepaald || null,
       auditAantal: s.audit.length,
       audit: s.audit.slice(-50).reverse(),
       laatstGesloten: s.laatstGesloten || null

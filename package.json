@@ -130,6 +130,7 @@
     "droogloop": "node scripts/droogloop.js",
     "herstel": "node scripts/herstel.js",
     "executionmap": "node scripts/executionmap.js",
+    "isolatieproef": "node scripts/isolatieproef.js",
     "executionmap:controle": "node scripts/executionmap.js --controle",
     "resolverbereik": "node scripts/resolverbereik.js",
     "getallen": "node scripts/getallen.js",

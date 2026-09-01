@@ -1,0 +1,583 @@
+{
+  "uitleg": "De veiligheidsboekhouding van de beschermstand. Per noemer geteld, nooit samengesteld: een percentage tussen twee verschillende noemers is fictie.",
+  "gemetenOp": "2026-09-01",
+  "uitslagen": [
+    "BEWEZEN_GEBLOKKEERD",
+    "BEWEZEN_TOEGESTAAN",
+    "ONBESLIST",
+    "NIET_TOEPASSELIJK",
+    "ONBEPAALD_INFRA"
+  ],
+  "geenSamengesteldCijfer": "met opzet. Zie de kop van scripts/isolatieproef.js.",
+  "schuld": [
+    {
+      "punt": "drager-model",
+      "stand": "ONTBREEKT",
+      "waarom": "alle standen zijn huis-breed (db.data.techniek.incidentcontrole.modus). Er valt niets per identiteit, sessie, apparaat of organisatie te meten, omdat er niets per drager te zetten is.",
+      "gevolg": "RTG kan vandaag niet zeggen \"dit ene lid staat in isolatie\"."
+    },
+    {
+      "punt": "lockdown-filter na de resolver",
+      "stand": "ONTBREEKT",
+      "waarom": "kern/stuur/beleid.js kent de incidentstand niet; bevoegd zijn en beschikbaar zijn vallen tijdens een incident nog samen."
+    },
+    {
+      "punt": "blinde vlek in de beschermstand",
+      "stand": "GEMETEN",
+      "waarom": "69 paden hebben geen functie in de catalogus en passeren de beschermstand ongemerkt."
+    },
+    {
+      "punt": "egress deny-by-default",
+      "stand": "ONBEPAALD_INFRA",
+      "waarom": "niet uit deze repo te bewijzen; hoort bij de uitrol."
+    },
+    {
+      "punt": "procesisolatie van parsers",
+      "stand": "ONBEPAALD_INFRA",
+      "waarom": "45 verwerkers draaien in het hoofdproces."
+    },
+    {
+      "punt": "ontsluitceremonie",
+      "stand": "ONBESLIST",
+      "waarom": "een getypte zin is geen passkey, apparaatbinding, wachttijd of vier-ogenbesluit."
+    },
+    {
+      "punt": "herkomst en vertrouwensklasse van invoer (taint)",
+      "stand": "ONTBREEKT",
+      "waarom": "onvertrouwde inhoud (mail, document, webpagina, toolresultaat) draagt geen klasse, dus de regel \"onvertrouwde inhoud vergroot nooit de beschikbare capabilities\" is niet af te dwingen."
+    },
+    {
+      "punt": "bruikbaarheid onder isolatie",
+      "stand": "ONGEMETEN",
+      "waarom": "er is geen lijst kritieke gebruikersverhalen, dus er is niet te zeggen wat er tijdens een incident nog WERKT. Een isolatiestand die niemand durft aan te zetten, beschermt niets."
+    }
+  ],
+  "noemers": {
+    "httpPaden": {
+      "wat": "unieke API-paden uit de executiekaart, gehouden tegen kern/beschermstand.js met methode POST",
+      "bron": [
+        "EXECUTION_MAP.json",
+        "server/kern/beschermstand.js",
+        "server/functies"
+      ],
+      "gevonden": 4643,
+      "BEWEZEN_GEBLOKKEERD": 1148,
+      "BEWEZEN_TOEGESTAAN": 3426,
+      "ONBESLIST": 69,
+      "ONBEPAALD_INFRA": 0,
+      "blindeVlek": {
+        "aantal": 69,
+        "waarom": "geen functie in de functiecatalogus achter dit pad; de beschermstand deelt hem daarom niet in en laat hem door",
+        "paden": [
+          "/api/boardroom/ai",
+          "/api/boardroom/betalingen/keuze",
+          "/api/boardroom/betalingen/proef",
+          "/api/boardroom/betalingen/stap",
+          "/api/boardroom/betalingen/status",
+          "/api/boardroom/onboarding",
+          "/api/boardroom/onboarding/ai",
+          "/api/boardroom/persoon",
+          "/api/boardroom/reset",
+          "/api/boardroom/status",
+          "/api/boardroom/storing",
+          "/api/boardroom/taal",
+          "/api/boardroom/talen",
+          "/api/boardroom/toepassen",
+          "/api/boardroom/wachter",
+          "/api/boardroom/zet",
+          "/api/inzagekaart",
+          "/api/privacy/delete",
+          "/api/privacy/export",
+          "/api/privacy/inzage",
+          "/api/techniek/ai",
+          "/api/techniek/alarm/proef",
+          "/api/techniek/archief",
+          "/api/techniek/betalingen/keuze",
+          "/api/techniek/betalingen/proef",
+          "/api/techniek/betalingen/stap",
+          "/api/techniek/beveiliging/afhandelen",
+          "/api/techniek/beveiliging/auto",
+          "/api/techniek/bewaren/veeg",
+          "/api/techniek/controle/incident",
+          "/api/techniek/controle/integriteit",
+          "/api/techniek/eigenaar",
+          "/api/techniek/fouten/wis",
+          "/api/techniek/functie",
+          "/api/techniek/functie/ai",
+          "/api/techniek/functie/besluit",
+          "/api/techniek/inloggen",
+          "/api/techniek/moderniseer",
+          "/api/techniek/papieren",
+          "/api/techniek/papieren/antwoord",
+          "/api/techniek/papieren/document",
+          "/api/techniek/papieren/documenten",
+          "/api/techniek/spelcijfers",
+          "/api/techniek/sso",
+          "/api/techniek/sso/proef",
+          "/api/techniek/sso/saml",
+          "/api/techniek/sso/schakel",
+          "/api/techniek/sso/scimsleutel",
+          "/api/techniek/tenant",
+          "/api/techniek/tenant/bewaringsplicht",
+          "/api/techniek/tenant/bind",
+          "/api/techniek/tenant/contract",
+          "/api/techniek/tenant/invoer",
+          "/api/techniek/tenant/levensloop",
+          "/api/techniek/tenant/merk",
+          "/api/techniek/tenant/vernietig",
+          "/api/techniek/toegang",
+          "/api/techniek/vingerafdruk",
+          "/api/techniek/vingerafdruk/verschil",
+          "/api/techniek/wacht/analyseer",
+          "/api/techniek/wacht/av-test",
+          "/api/techniek/wacht/beslis",
+          "/api/techniek/wacht/lastafworp",
+          "/api/techniek/wacht/opruimen",
+          "/api/techniek/wacht/quarantaine",
+          "/api/techniek/zekering",
+          "/api/toestel/meting",
+          "/api/toestemming",
+          "/api/toestemming/intrek"
+        ]
+      }
+    },
+    "functies": {
+      "wat": "functies in de catalogus, ingedeeld door kern/beschermstand-lijst.js",
+      "bron": [
+        "server/functies",
+        "server/kern/beschermstand-lijst.js"
+      ],
+      "gevonden": 204,
+      "categorieën": 17,
+      "BEWEZEN_GEBLOKKEERD": 56,
+      "BEWEZEN_TOEGESTAAN": 148,
+      "ONBESLIST": 0,
+      "ONBEPAALD_INFRA": 0,
+      "bevrorenCategorieën": 6,
+      "doorlopendeCategorieën": 11,
+      "uitzonderingen": [
+        {
+          "id": "dom-foutmelder",
+          "categorie": "Identiteit en veiligheid",
+          "waarom": "dit is het kanaal waarlangs wij hóren dat er iets mis is. Hem dichtzetten tijdens een incident is de meter uitzetten omdat hij slecht nieuws geeft."
+        },
+        {
+          "id": "dom-veiligheid",
+          "categorie": "Identiteit en veiligheid",
+          "waarom": "veiligheidsdiensten. Een hulpdienst stilzetten om een incident in te dammen, is de ruil die 6.10 verbiedt."
+        },
+        {
+          "id": "dom-kmar",
+          "categorie": "Identiteit en veiligheid",
+          "waarom": "grensdiensten, om dezelfde reden."
+        },
+        {
+          "id": "tg-inlog",
+          "categorie": "Toegang en identiteit",
+          "waarom": "inloggen is geen nieuw voorrecht maar de deur naar het lezen. Wie dit bevriest, zet ook het lezen stil en heeft dan isolatie gebouwd met een andere naam."
+        }
+      ]
+    },
+    "aiBereik": {
+      "wat": "wat het AI-stuur mag kiezen, per rol; kern/stuur/beleid.js is closed by default",
+      "bron": [
+        "EXECUTION_MAP.json",
+        "server/kern/stuur/beleid.js"
+      ],
+      "perRol": {
+        "member": {
+          "gevonden": 1623,
+          "verboden": 1503,
+          "bereikbaar": 120,
+          "perNiveau": {
+            "verboden": 1503,
+            "[object Object]": 120
+          }
+        },
+        "": {
+          "gevonden": 840,
+          "verboden": 840,
+          "bereikbaar": 0,
+          "perNiveau": {
+            "verboden": 840
+          }
+        },
+        "office": {
+          "gevonden": 806,
+          "verboden": 806,
+          "bereikbaar": 0,
+          "perNiveau": {
+            "verboden": 806
+          }
+        },
+        "supplier": {
+          "gevonden": 1213,
+          "verboden": 1160,
+          "bereikbaar": 53,
+          "perNiveau": {
+            "verboden": 1160,
+            "[object Object]": 53
+          }
+        },
+        "techniek": {
+          "gevonden": 61,
+          "verboden": 61,
+          "bereikbaar": 0,
+          "perNiveau": {
+            "verboden": 61
+          }
+        },
+        "boardroom": {
+          "gevonden": 95,
+          "verboden": 95,
+          "bereikbaar": 0,
+          "perNiveau": {
+            "verboden": 95
+          }
+        },
+        "scim": {
+          "gevonden": 2,
+          "verboden": 2,
+          "bereikbaar": 0,
+          "perNiveau": {
+            "verboden": 2
+          }
+        },
+        "werkplekbaas": {
+          "gevonden": 3,
+          "verboden": 3,
+          "bereikbaar": 0,
+          "perNiveau": {
+            "verboden": 3
+          }
+        }
+      },
+      "onderIsolatie": "ONBEPAALD",
+      "waarom": "kern/stuur/beleid.js kent de incidentstand niet; er bestaat geen smallere AI-lijst die tijdens een incident geldt. Zolang die er niet is, zou elk getal hier verzonnen zijn."
+    },
+    "uitgaandeBestemmingen": {
+      "wat": "hostnamen die letterlijk in server/ voorkomen; een ondergrens, geen inventaris",
+      "bron": [
+        "server/**/*.js",
+        "server/kern/ssrf.js"
+      ],
+      "gevonden": 43,
+      "BEWEZEN_GEBLOKKEERD": 0,
+      "BEWEZEN_TOEGESTAAN": 0,
+      "ONBESLIST": 0,
+      "ONBEPAALD_INFRA": 43,
+      "appBewijs": "kern/ssrf.js weigert privé- en metadata-adressen voor doelen die een CLIENT aanlevert, en houdt voor web-push een allowlist van pushdiensten aan",
+      "infraBewijs": "ONTBREEKT: er is in deze repo geen egress-policy, geen deny-by-default en geen netwerknamespace-bewijs. PRODUCTION.md belooft een egress-proxy; een belofte is geen meting",
+      "eindoordeel": "ONBEPAALD_INFRA",
+      "waarschuwing": "dit telt genoemde hosts, niet bereikbare hosts. Zonder egress-policy is het werkelijke aantal bestemmingen het hele internet.",
+      "hosts": [
+        "169.254.169.254",
+        "192.168.x.x",
+        "acme-staging-v02.api.letsencrypt.org",
+        "acme-v02.api.letsencrypt.org",
+        "api.anthropic.com",
+        "api.kvk.nl",
+        "api.mollie.com",
+        "api.openai.com",
+        "api.pdok.nl",
+        "api.stripe.com",
+        "app.rahultravelgroup.com",
+        "business.gov.nl",
+        "checkout-test.adyen.com",
+        "dashboard.stripe.com",
+        "developers.kvk.nl",
+        "duo.nl",
+        "e-justice.europa.eu",
+        "ec.europa.eu",
+        "finance.ec.europa.eu",
+        "find-and-update.company-information.service.gov.uk",
+        "generativelanguage.googleapis.com",
+        "kwaadaardig.example",
+        "main.un.org",
+        "my.mollie.com",
+        "ofac.treasury.gov",
+        "policy.trade.ec.europa.eu",
+        "purl.imsglobal.org",
+        "rahulrtg.github.io",
+        "rahultravelgroup.com",
+        "rahultravelgroup.example",
+        "taxation-customs.ec.europa.eu",
+        "trade.ec.europa.eu",
+        "www.adyen.com",
+        "www.afm.nl",
+        "www.autoriteitpersoonsgegevens.nl",
+        "www.belastingdienst.nl",
+        "www.houjin-bangou.nta.go.jp",
+        "www.justis.nl",
+        "www.kvk.nl",
+        "www.nvwa.nl",
+        "www.openstreetmap.org",
+        "www.rahultravelgroup.com",
+        "www.sba.gov"
+      ]
+    },
+    "bestandsverwerkers": {
+      "wat": "modules in server/kern die onvertrouwde bytes ontleden, herkend aan hun naam",
+      "bron": [
+        "server/kern/**/*.js"
+      ],
+      "gevonden": 45,
+      "BEWEZEN_GEBLOKKEERD": 0,
+      "BEWEZEN_TOEGESTAAN": 0,
+      "ONBESLIST": 0,
+      "ONBEPAALD_INFRA": 45,
+      "procesGeisoleerd": 0,
+      "appBewijs": "45 van de 45 importeren geen HTTP-client",
+      "infraBewijs": "ONTBREEKT: geen van deze modules draait in een eigen proces met eigen geheugen-, CPU- en tijdgrens. Ze draaien in het hoofdproces van de server",
+      "eindoordeel": "ONBEPAALD_INFRA",
+      "waarschuwing": "\"importeert geen HTTP-client\" is GEEN bewijs dat een parser geen internet heeft -- alleen dat de code er niet om vraagt. Een geheugenfout in een parser vraagt niets.",
+      "modules": [
+        {
+          "module": "server/kern/bestanden-delen.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/bestanden-opslag.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/bestanden-poort.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/bestanden-stukken.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/bestanden-vergeten.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/bestanden.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/betaalwaarheid/beeld.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/command/vlootbeeld-incidenten.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/command/vlootbeeld.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/concern/entiteit-beeld.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/eten/orderbeeld-basis.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/eten/orderbeeld-legacy.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/eten/orderbeeld-rekening.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/eten/orderbeeld.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/gast/order-beeld.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/journaalbestand.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/kletspraat/dagbeeld.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/mall/vraagbeeld.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/mobiliteit/kaartje-beeld.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/muziek-uitgave-beeld.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/office.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/office/basis.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/office/delen.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/office/docs.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/office/formulier.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/office/samen.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/office/sjablonen.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/office/sjablonen2.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/office/workflow.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/onderneming/beeld.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/onderneming/dagbeeld-acties.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/onderneming/dagbeeld.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/pdf-bouw.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/pdf-notitie.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/pdf-redactie.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/pdf-xref.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/pdf.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/rampbeeld/advies.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/rampbeeld/evaluatie.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/rampbeeld/index.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/stadsweefsel/zaakbeeld.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/theater/video.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/uploadquarantaine.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/webmaker-fotos.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/zaakcommand/beeld.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        }
+      ]
+    },
+    "ontsluiting": {
+      "wat": "wat er nodig is om de beveiliging te VERLAGEN (SEC-LOCK-001)",
+      "bron": [
+        "server/routes/techniek/controle.js",
+        "test/seclock.test.js"
+      ],
+      "verlagendeHandelingen": 1,
+      "eisen": {
+        "eigenaarAlleen": true,
+        "getypteBevestiging": true,
+        "geregistreerdeReden": true,
+        "auditregel": true,
+        "passkey": false,
+        "apparaatbinding": false,
+        "wachttijd": false,
+        "vierOgen": false
+      },
+      "eindoordeel": "ONBESLIST",
+      "waarom": "er staat een drempel (eigenaar-only, een getypte zin, een verplichte reden, een auditregel) maar geen ceremonie: geen passkey, geen apparaatbinding, geen wachttijd en geen tweede paar ogen. De invariant legt vast wat er IS; hij zegt niet dat het genoeg is."
+    }
+  }
+}

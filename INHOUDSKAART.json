@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-08-31T19:08:59.411Z",
-  "commit": "9ecef79b",
+  "op": "2026-09-01T10:19:59.363Z",
+  "commit": "3d2f51b54",
   "boomVuil": false,
-  "boomAnders": 1,
+  "boomAnders": 2,
   "instrument": "scripts/inhoudskaart.js",
   "node": "v22.22.2"
  },
@@ -11,11 +11,11 @@
  "grens": "Een profiel borgt de VORM van het antwoord, niet de waarheid van de waarden -- dit is de vloer, geen plafond. Routes met onwaarneembaar:true zijn eerlijk niet te bewaken op vorm en blijven blind. En de kaart kent alleen rollen waarvoor dit instrument een token heeft.",
  "gemeten": {
   "doelRoutes": 277,
-  "inKaart": 405,
-  "waarneembaar": 401,
+  "inKaart": 407,
+  "waarneembaar": 403,
   "onwaarneembaar": 4,
-  "versDezeRun": 266,
-  "zonderRol": 11,
+  "versDezeRun": 269,
+  "zonderRol": 8,
   "dood": 0,
   "weerlegd": 0
  },
@@ -678,17 +678,6 @@
     "collectie",
     "ok"
    ],
-   "op": "2026-08-20T08:10:40.999Z"
-  },
-  "POST /api/office/verifications": {
-   "methode": "POST",
-   "pad": "/api/office/verifications",
-   "rol": "office",
-   "status": 200,
-   "sleutels": [
-    "pending"
-   ],
-   "dragend": [],
    "op": "2026-08-20T08:10:40.999Z"
   },
   "POST /api/ov/kaart": {
@@ -1985,7 +1974,7 @@
     "betaaldienst",
     "status"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "GET /api/claims": {
    "methode": "GET",
@@ -2000,7 +1989,7 @@
     "claims",
     "status"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "GET /api/sociaalbeleid": {
    "methode": "GET",
@@ -2017,7 +2006,7 @@
     "regels",
     "status"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "GET /api/sso/saml/metadata": {
    "methode": "GET",
@@ -2030,7 +2019,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "GET /api/sso/saml/start": {
    "methode": "GET",
@@ -2043,7 +2032,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/aanmelding/bewijs/herkeuring": {
    "methode": "POST",
@@ -2057,7 +2046,7 @@
    "dragend": [
     "ok"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/appstore/berichten": {
    "methode": "POST",
@@ -2068,7 +2057,7 @@
     "berichten"
    ],
    "dragend": [],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/appstore/berichten/gelezen": {
    "methode": "POST",
@@ -2083,7 +2072,7 @@
     "gelezen",
     "ok"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/appstore/bon": {
    "methode": "POST",
@@ -2100,7 +2089,7 @@
     "landen",
     "waarom"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/appstore/bonnen": {
    "methode": "POST",
@@ -2111,7 +2100,7 @@
     "bonnen"
    ],
    "dragend": [],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/appstore/brug": {
    "methode": "POST",
@@ -2124,7 +2113,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/appstore/catalogus": {
    "methode": "POST",
@@ -2135,14 +2124,15 @@
     "items",
     "pagina",
     "paginas",
-    "totaal"
+    "totaal",
+    "universa"
    ],
    "dragend": [
     "pagina",
     "paginas",
     "totaal"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/appstore/dossier": {
    "methode": "POST",
@@ -2157,7 +2147,7 @@
     "error",
     "status"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/appstore/installeer": {
    "methode": "POST",
@@ -2172,7 +2162,7 @@
     "error",
     "status"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/appstore/kanaal": {
    "methode": "POST",
@@ -2189,7 +2179,7 @@
     "machtigingen",
     "nietGebouwd"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/appstore/koop": {
    "methode": "POST",
@@ -2206,7 +2196,7 @@
     "landNodig",
     "landen"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/appstore/landen": {
    "methode": "POST",
@@ -2220,7 +2210,7 @@
    "dragend": [
     "landen"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/appstore/mijn": {
    "methode": "POST",
@@ -2232,7 +2222,7 @@
     "berichten"
    ],
    "dragend": [],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/appstore/open": {
    "methode": "POST",
@@ -2247,7 +2237,7 @@
     "error",
     "status"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/appstore/persoon": {
    "methode": "POST",
@@ -2266,7 +2256,7 @@
     "soort",
     "status"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/appstore/persoon/aanvraag": {
    "methode": "POST",
@@ -2281,7 +2271,7 @@
     "error",
     "status"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/appstore/persoon/cijfers": {
    "methode": "POST",
@@ -2294,7 +2284,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/appstore/persoon/dossier": {
    "methode": "POST",
@@ -2307,7 +2297,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/appstore/persoon/intrekken": {
    "methode": "POST",
@@ -2320,7 +2310,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/appstore/persoon/inzenden": {
    "methode": "POST",
@@ -2333,7 +2323,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/appstore/persoon/journaal": {
    "methode": "POST",
@@ -2346,7 +2336,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/appstore/persoon/naslag": {
    "methode": "POST",
@@ -2375,7 +2365,7 @@
     "nogGeenCode",
     "status"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/appstore/persoon/omzet": {
    "methode": "POST",
@@ -2388,7 +2378,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/appstore/persoon/proef": {
    "methode": "POST",
@@ -2408,7 +2398,7 @@
     "fouten",
     "status"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/appstore/tijdlijn": {
    "methode": "POST",
@@ -2424,7 +2414,7 @@
     "let",
     "soorten"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/appstore/verleen": {
    "methode": "POST",
@@ -2439,7 +2429,7 @@
     "error",
     "status"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/appstore/weg": {
    "methode": "POST",
@@ -2454,7 +2444,7 @@
     "error",
     "status"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/appstore/wis-opslag": {
    "methode": "POST",
@@ -2471,7 +2461,7 @@
     "ok",
     "status"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/claims": {
    "methode": "POST",
@@ -2486,7 +2476,7 @@
     "claims",
     "status"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/command/apispoor": {
    "methode": "POST",
@@ -2505,7 +2495,7 @@
     "regels",
     "venster"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/command/bijstand": {
    "methode": "POST",
@@ -2521,7 +2511,7 @@
     "niveaus",
     "tel"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/command/bijstand/betreed": {
    "methode": "POST",
@@ -2534,7 +2524,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/command/bijstand/inhoud": {
    "methode": "POST",
@@ -2547,7 +2537,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/command/bijstand/kijk": {
    "methode": "POST",
@@ -2560,7 +2550,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/command/bijstand/sessie": {
    "methode": "POST",
@@ -2573,7 +2563,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/command/bijstand/sluit": {
    "methode": "POST",
@@ -2586,7 +2576,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/command/bijstand/uitvoeren": {
    "methode": "POST",
@@ -2599,7 +2589,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/command/bijstand/voorstel": {
    "methode": "POST",
@@ -2612,7 +2602,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/command/gezondheid": {
    "methode": "POST",
@@ -2638,7 +2628,7 @@
     "tel",
     "vermogens"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/command/gezondheid/controleer": {
    "methode": "POST",
@@ -2651,7 +2641,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/command/gezondheid/vermogen": {
    "methode": "POST",
@@ -2664,7 +2654,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/command/incident": {
    "methode": "POST",
@@ -2677,7 +2667,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/command/incident/maatregel": {
    "methode": "POST",
@@ -2690,7 +2680,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/command/incident/neem": {
    "methode": "POST",
@@ -2703,7 +2693,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/command/incident/open": {
    "methode": "POST",
@@ -2716,7 +2706,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/command/incident/sluit": {
    "methode": "POST",
@@ -2729,7 +2719,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/command/incident/weeg": {
    "methode": "POST",
@@ -2744,7 +2734,7 @@
    "dragend": [
     "let"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/command/incidenten": {
    "methode": "POST",
@@ -2758,7 +2748,7 @@
    "dragend": [
     "tel"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/command/tijdlijn": {
    "methode": "POST",
@@ -2778,7 +2768,7 @@
     "let",
     "totaalInVenster"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/command/tijdlijn/rondom": {
    "methode": "POST",
@@ -2805,7 +2795,7 @@
     "venster",
     "veranderdeIets"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/command/vloot": {
    "methode": "POST",
@@ -2830,7 +2820,7 @@
     "platform",
     "tel"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/command/vloot/organisatie": {
    "methode": "POST",
@@ -2843,7 +2833,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/commerce/aanbod": {
    "methode": "POST",
@@ -2861,7 +2851,7 @@
     "ok",
     "volledig"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/commerce/etalage": {
    "methode": "POST",
@@ -2874,7 +2864,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/commerce/mand": {
    "methode": "POST",
@@ -2899,7 +2889,7 @@
     "valuta",
     "volledig"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/commerce/mand/leeg": {
    "methode": "POST",
@@ -2924,7 +2914,7 @@
     "valuta",
     "volledig"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/commerce/mand/zet": {
    "methode": "POST",
@@ -2937,7 +2927,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/commerce/overdracht/lees": {
    "methode": "POST",
@@ -2950,7 +2940,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/commerce/overdracht/maak": {
    "methode": "POST",
@@ -2963,7 +2953,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/commerce/overdracht/mijn": {
    "methode": "POST",
@@ -2977,7 +2967,7 @@
    "dragend": [
     "ok"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/commerce/reken": {
    "methode": "POST",
@@ -3000,7 +2990,7 @@
     "toonTotaalCenten",
     "valuta"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/commerce/retour/mijn": {
    "methode": "POST",
@@ -3016,7 +3006,7 @@
     "nietGebouwd",
     "ok"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/commerce/retour/verstuurd": {
    "methode": "POST",
@@ -3029,7 +3019,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/commerce/retour/vraag": {
    "methode": "POST",
@@ -3042,7 +3032,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/festival/gast/edities": {
    "methode": "POST",
@@ -3056,7 +3046,7 @@
    "dragend": [
     "ok"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/festival/gast/passen": {
    "methode": "POST",
@@ -3071,7 +3061,7 @@
     "error",
     "status"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/festival/gast/programma": {
    "methode": "POST",
@@ -3086,7 +3076,7 @@
     "error",
     "status"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/festival/groep": {
    "methode": "POST",
@@ -3101,7 +3091,7 @@
     "error",
     "status"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/festival/groep/code": {
    "methode": "POST",
@@ -3116,7 +3106,7 @@
     "error",
     "status"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/festival/groep/mee": {
    "methode": "POST",
@@ -3131,7 +3121,7 @@
     "error",
     "status"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/festival/groep/mijn": {
    "methode": "POST",
@@ -3146,7 +3136,7 @@
     "error",
     "status"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/festival/groep/stand": {
    "methode": "POST",
@@ -3161,7 +3151,7 @@
     "error",
     "status"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/festival/groep/weg": {
    "methode": "POST",
@@ -3176,7 +3166,7 @@
     "error",
     "status"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/foundation/school/bezoeker/lijst": {
    "methode": "POST",
@@ -3189,7 +3179,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/foundation/school/pas/lijst": {
    "methode": "POST",
@@ -3202,7 +3192,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/foundation/school/peiling/mijn-personeel": {
    "methode": "POST",
@@ -3215,7 +3205,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/gast/eten/beoordeel": {
    "methode": "POST",
@@ -3228,7 +3218,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/gast/eten/concierge": {
    "methode": "POST",
@@ -3255,7 +3245,7 @@
     "ok",
     "restaurants"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/gast/eten/ontdekken": {
    "methode": "POST",
@@ -3280,7 +3270,7 @@
     "ok",
     "restaurants"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/gast/eten/probleem": {
    "methode": "POST",
@@ -3293,7 +3283,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/gast/eten/zoeken": {
    "methode": "POST",
@@ -3318,7 +3308,7 @@
     "ok",
     "restaurants"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/geld/grens": {
    "methode": "POST",
@@ -3332,7 +3322,7 @@
    "dragend": [
     "ok"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/geld/grens/weg": {
    "methode": "POST",
@@ -3345,7 +3335,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/geld/grens/zet": {
    "methode": "POST",
@@ -3358,7 +3348,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/inzagekaart": {
    "methode": "POST",
@@ -3381,7 +3371,7 @@
     "ok",
     "voorbehoud"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/kosten/grens": {
    "methode": "POST",
@@ -3398,7 +3388,7 @@
     "ok",
     "stand"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/kosten/grens/zet": {
    "methode": "POST",
@@ -3417,7 +3407,7 @@
     "status",
     "weg"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/kosten/herkomst": {
    "methode": "POST",
@@ -3432,7 +3422,7 @@
     "error",
     "status"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/kosten/mij": {
    "methode": "POST",
@@ -3457,7 +3447,7 @@
     "wieBetaalt",
     "zegtNiet"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/kosten/vooruitblik": {
    "methode": "POST",
@@ -3491,7 +3481,7 @@
     "verwachtCenten",
     "zegtNiet"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/leerstof/dag": {
    "methode": "POST",
@@ -3510,7 +3500,7 @@
     "ok",
     "uitleg"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/leerstof/herhaal": {
    "methode": "POST",
@@ -3523,7 +3513,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/leerstof/herhalen": {
    "methode": "POST",
@@ -3544,7 +3534,7 @@
     "uitleg",
     "vragen"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/leerstof/pad": {
    "methode": "POST",
@@ -3557,7 +3547,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/link/cap/aanvaard": {
    "methode": "POST",
@@ -3570,7 +3560,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/link/cap/maak": {
    "methode": "POST",
@@ -3583,7 +3573,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/link/cap/trek": {
    "methode": "POST",
@@ -3596,7 +3586,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/member/ai/beleid": {
    "methode": "POST",
@@ -3611,7 +3601,7 @@
     "error",
     "status"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/member/ai/bundel": {
    "methode": "POST",
@@ -3626,7 +3616,7 @@
     "error",
     "status"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/member/ai/bundels": {
    "methode": "POST",
@@ -3643,7 +3633,7 @@
     "ok",
     "status"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/member/ai/tegoed": {
    "methode": "POST",
@@ -3682,7 +3672,7 @@
     "verbruikt",
     "waarschuwing"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/member/connect/intrek": {
    "methode": "POST",
@@ -3695,7 +3685,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/member/pin": {
    "methode": "POST",
@@ -3723,7 +3713,7 @@
     "uit",
     "versie"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/member/pin/actie/opties": {
    "methode": "POST",
@@ -3736,7 +3726,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/member/pin/connect": {
    "methode": "POST",
@@ -3749,7 +3739,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/member/pin/live": {
    "methode": "POST",
@@ -3768,7 +3758,7 @@
     "token",
     "ttlMs"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/member/pin/live/kijk": {
    "methode": "POST",
@@ -3781,7 +3771,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/member/pin/live/verbind": {
    "methode": "POST",
@@ -3794,7 +3784,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/member/pin/nieuw": {
    "methode": "POST",
@@ -3822,7 +3812,7 @@
     "uit",
     "versie"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/member/pin/uit": {
    "methode": "POST",
@@ -3850,7 +3840,7 @@
     "uit",
     "versie"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/member/pin/zoek": {
    "methode": "POST",
@@ -3863,7 +3853,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/member/prijsgarantie": {
    "methode": "POST",
@@ -3879,7 +3869,7 @@
     "ok",
     "status"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/member/prijsgarantie/meld": {
    "methode": "POST",
@@ -3894,7 +3884,7 @@
     "error",
     "status"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/member/rendezvous/aanwezig/wis": {
    "methode": "POST",
@@ -3909,7 +3899,7 @@
     "code",
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/member/rendezvous/akkoord": {
    "methode": "POST",
@@ -3924,7 +3914,7 @@
     "code",
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/member/rendezvous/arrange": {
    "methode": "POST",
@@ -3939,7 +3929,7 @@
     "code",
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/member/rendezvous/blokkeer": {
    "methode": "POST",
@@ -3954,7 +3944,7 @@
     "code",
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/member/rendezvous/encounter": {
    "methode": "POST",
@@ -3969,7 +3959,7 @@
     "code",
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/member/rendezvous/introductie/antwoord": {
    "methode": "POST",
@@ -3984,7 +3974,7 @@
     "code",
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/member/rendezvous/introducties": {
    "methode": "POST",
@@ -3999,7 +3989,7 @@
     "code",
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/member/rendezvous/samen": {
    "methode": "POST",
@@ -4014,7 +4004,7 @@
     "code",
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/member/rendezvous/samen/zet": {
    "methode": "POST",
@@ -4029,7 +4019,7 @@
     "code",
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/member/rendezvous/tafel/antwoord": {
    "methode": "POST",
@@ -4044,7 +4034,7 @@
     "code",
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/member/rendezvous/tafels": {
    "methode": "POST",
@@ -4059,7 +4049,7 @@
     "code",
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/nav/status": {
    "methode": "POST",
@@ -4086,7 +4076,7 @@
     "status",
     "versie"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/office/claims/poort": {
    "methode": "POST",
@@ -4104,7 +4094,7 @@
     "ok",
     "status"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/office/partner/regels": {
    "methode": "POST",
@@ -4126,7 +4116,7 @@
     "intervalMs",
     "openWijzigingen"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/office/pay/bewijs": {
    "methode": "POST",
@@ -4147,7 +4137,7 @@
     "telling",
     "uitleg"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/office/reisbureau/besluit": {
    "methode": "POST",
@@ -4160,7 +4150,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/office/rendezvous/meldingen": {
    "methode": "POST",
@@ -4174,7 +4164,7 @@
    "dragend": [
     "status"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/office/rendezvous/tafel/maak": {
    "methode": "POST",
@@ -4191,7 +4181,7 @@
     "status",
     "tafel"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/office/rendezvous/tafel/nodig": {
    "methode": "POST",
@@ -4204,7 +4194,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/office/rendezvous/tafels": {
    "methode": "POST",
@@ -4219,7 +4209,7 @@
     "status",
     "tafels"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/office/sociaal": {
    "methode": "POST",
@@ -4232,7 +4222,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/office/vakbewijzen": {
    "methode": "POST",
@@ -4249,7 +4239,7 @@
     "ok",
     "soorten"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/onboarding/bedrijf": {
    "methode": "POST",
@@ -4268,7 +4258,7 @@
     "onderneming",
     "vervolg"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/onboarding/inricht": {
    "methode": "POST",
@@ -4281,7 +4271,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/onboarding/inrichten": {
    "methode": "POST",
@@ -4298,7 +4288,7 @@
     "klaar",
     "ok"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/onboarding/meebouwen": {
    "methode": "POST",
@@ -4314,7 +4304,7 @@
     "klaar",
     "ok"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/onboarding/salonpost": {
    "methode": "POST",
@@ -4329,7 +4319,7 @@
     "ok",
     "post"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/onderwijs/bewijs": {
    "methode": "POST",
@@ -4347,7 +4337,7 @@
     "ok",
     "uitleg"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/pay/graaf": {
    "methode": "POST",
@@ -4374,7 +4364,7 @@
     "staatNu",
     "uitgegeven"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/pay/portefeuille": {
    "methode": "POST",
@@ -4395,7 +4385,7 @@
     "posities",
     "vrijBesteedbaar"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/pay/rekening": {
    "methode": "POST",
@@ -4408,7 +4398,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/pay/tegoed": {
    "methode": "POST",
@@ -4427,7 +4417,7 @@
     "openCenten",
     "vervalDagen"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/pay/tegoed/koop": {
    "methode": "POST",
@@ -4440,7 +4430,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/pay/tegoed/terug": {
    "methode": "POST",
@@ -4453,7 +4443,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/pay/tegoed/verzilver": {
    "methode": "POST",
@@ -4466,7 +4456,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/pay/terug": {
    "methode": "POST",
@@ -4481,7 +4471,7 @@
     "error",
     "reden"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/pay/terugstand": {
    "methode": "POST",
@@ -4509,7 +4499,7 @@
     "ok",
     "saldo"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/plaats/dienst": {
    "methode": "POST",
@@ -4524,7 +4514,7 @@
    "dragend": [
     "status"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/plaats/hekken": {
    "methode": "POST",
@@ -4537,7 +4527,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/plaats/stand": {
    "methode": "POST",
@@ -4553,7 +4543,7 @@
    "dragend": [
     "status"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/plaats/venster": {
    "methode": "POST",
@@ -4566,7 +4556,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/plaats/venster/sluit": {
    "methode": "POST",
@@ -4579,7 +4569,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/plaats/waarneem": {
    "methode": "POST",
@@ -4592,7 +4582,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/reis/invoer/bevestig": {
    "methode": "POST",
@@ -4605,7 +4595,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/reis/invoer/lees": {
    "methode": "POST",
@@ -4624,7 +4614,7 @@
     "opmerking",
     "voorstel"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/reis/invoer/mijn": {
    "methode": "POST",
@@ -4640,7 +4630,7 @@
     "ok",
     "soorten"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/reis/invoer/weg": {
    "methode": "POST",
@@ -4653,7 +4643,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/reis/los": {
    "methode": "POST",
@@ -4668,7 +4658,7 @@
     "error",
     "status"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/reis/los/doe": {
    "methode": "POST",
@@ -4683,7 +4673,7 @@
     "error",
     "status"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/reis/reizen": {
    "methode": "POST",
@@ -4705,7 +4695,7 @@
     "stand",
     "telling"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/reis/uitnodiging/eisop": {
    "methode": "POST",
@@ -4718,7 +4708,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/reis/uitnodiging/mijn": {
    "methode": "POST",
@@ -4732,7 +4722,7 @@
    "dragend": [
     "ok"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/reis/uitnodiging/nodig-uit": {
    "methode": "POST",
@@ -4745,7 +4735,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/reis/uitnodiging/weg": {
    "methode": "POST",
@@ -4758,7 +4748,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/reis/wacht": {
    "methode": "POST",
@@ -4781,7 +4771,7 @@
     "ok",
     "uitleg"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/rtf/leerling/bewijs": {
    "methode": "POST",
@@ -4794,7 +4784,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/rtf/leerling/dag": {
    "methode": "POST",
@@ -4807,7 +4797,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/rtf/leerling/herhaal": {
    "methode": "POST",
@@ -4820,7 +4810,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/rtf/leerling/herhalen": {
    "methode": "POST",
@@ -4833,7 +4823,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/rtf/leerling/pad": {
    "methode": "POST",
@@ -4846,7 +4836,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/rtf/social/pin": {
    "methode": "POST",
@@ -4859,7 +4849,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/rtf/social/pin/connect": {
    "methode": "POST",
@@ -4872,7 +4862,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/rtf/social/pin/live": {
    "methode": "POST",
@@ -4885,7 +4875,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/rtf/social/pin/live/kijk": {
    "methode": "POST",
@@ -4898,7 +4888,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/rtf/social/pin/live/verbind": {
    "methode": "POST",
@@ -4911,7 +4901,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/rtf/social/pin/nieuw": {
    "methode": "POST",
@@ -4924,7 +4914,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/rtf/social/pin/uit": {
    "methode": "POST",
@@ -4937,7 +4927,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/rtf/social/pin/zoek": {
    "methode": "POST",
@@ -4950,7 +4940,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/rtf/talent/interesse": {
    "methode": "POST",
@@ -4963,7 +4953,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/rtf/talent/mijn": {
    "methode": "POST",
@@ -4976,7 +4966,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/rtf/uitnodiging/accepteer": {
    "methode": "POST",
@@ -4989,7 +4979,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/rtgid/stapop/opties": {
    "methode": "POST",
@@ -5002,7 +4992,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/sociaalbeleid": {
    "methode": "POST",
@@ -5019,7 +5009,7 @@
     "regels",
     "status"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/sso/saml/acs": {
    "methode": "POST",
@@ -5032,7 +5022,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/eten/capaciteit": {
    "methode": "POST",
@@ -5047,7 +5037,7 @@
     "capaciteit",
     "ok"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/eten/instellingen": {
    "methode": "POST",
@@ -5060,7 +5050,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/eten/status": {
    "methode": "POST",
@@ -5073,7 +5063,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/eten/werkblad": {
    "methode": "POST",
@@ -5096,7 +5086,7 @@
     "rollen",
     "samenvatting"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/horeca/bar": {
    "methode": "POST",
@@ -5117,7 +5107,7 @@
     "open",
     "staat"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/horeca/dienstmeting": {
    "methode": "POST",
@@ -5146,7 +5136,7 @@
     "regels",
     "rekeningen"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/horeca/gezelschap": {
    "methode": "POST",
@@ -5159,7 +5149,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/horeca/gezelschap/stoel": {
    "methode": "POST",
@@ -5172,7 +5162,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/horeca/gezelschap/stoel/weg": {
    "methode": "POST",
@@ -5185,7 +5175,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/horeca/kaart": {
    "methode": "POST",
@@ -5204,7 +5194,7 @@
     "let",
     "ok"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/horeca/keuken/stappen": {
    "methode": "POST",
@@ -5220,7 +5210,7 @@
     "naam",
     "ok"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/horeca/offline/handelingen": {
    "methode": "POST",
@@ -5233,7 +5223,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/horeca/pas/gereed": {
    "methode": "POST",
@@ -5253,7 +5243,7 @@
     "ok",
     "vrij"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/horeca/pas/los": {
    "methode": "POST",
@@ -5266,7 +5256,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/horeca/pas/overneem": {
    "methode": "POST",
@@ -5279,7 +5269,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/horeca/pas/pak": {
    "methode": "POST",
@@ -5292,7 +5282,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/horeca/pas/uit": {
    "methode": "POST",
@@ -5305,7 +5295,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/horeca/rahul/bevestig": {
    "methode": "POST",
@@ -5318,7 +5308,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/horeca/rahul/bonnen": {
    "methode": "POST",
@@ -5340,7 +5330,7 @@
     "ok",
     "wacht"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/horeca/rahul/doe": {
    "methode": "POST",
@@ -5357,7 +5347,7 @@
     "ok",
     "oordeel"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/horeca/rahul/grens": {
    "methode": "POST",
@@ -5372,7 +5362,7 @@
     "kortingGrensCenten",
     "ok"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/horeca/rahul/register": {
    "methode": "POST",
@@ -5395,7 +5385,7 @@
     "ok",
     "uitvoerbaar"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/horeca/rekening/regel/stoel": {
    "methode": "POST",
@@ -5408,7 +5398,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/horeca/rekening/verdeel": {
    "methode": "POST",
@@ -5421,7 +5411,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/horeca/werklijst": {
    "methode": "POST",
@@ -5452,7 +5442,7 @@
     "voorMij",
     "wijk"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/horeca/wijk/aanvaard": {
    "methode": "POST",
@@ -5465,7 +5455,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/horeca/wijk/bied": {
    "methode": "POST",
@@ -5478,7 +5468,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/horeca/wijk/gezien": {
    "methode": "POST",
@@ -5491,7 +5481,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/horeca/wijk/laat": {
    "methode": "POST",
@@ -5504,7 +5494,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/horeca/wijk/neem": {
    "methode": "POST",
@@ -5517,7 +5507,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/horeca/wijk/tafel-terug": {
    "methode": "POST",
@@ -5530,7 +5520,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/horeca/wijk/trek-in": {
    "methode": "POST",
@@ -5543,7 +5533,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/horeca/wijk/weg": {
    "methode": "POST",
@@ -5556,7 +5546,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/horeca/wijk/weiger": {
    "methode": "POST",
@@ -5569,7 +5559,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/horeca/wijk/zet": {
    "methode": "POST",
@@ -5587,7 +5577,7 @@
     "ok",
     "wijk"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/horeca/wijken": {
    "methode": "POST",
@@ -5618,7 +5608,7 @@
     "wijken",
     "zonderWijk"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/nav/event": {
    "methode": "POST",
@@ -5631,7 +5621,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/nav/events": {
    "methode": "POST",
@@ -5645,7 +5635,7 @@
    "dragend": [
     "status"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/pay/budget": {
    "methode": "POST",
@@ -5658,7 +5648,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/pay/budget/lijst": {
    "methode": "POST",
@@ -5674,7 +5664,7 @@
     "ok",
     "uitstaandCenten"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/pay/graaf": {
    "methode": "POST",
@@ -5703,7 +5693,7 @@
     "supplierCode",
     "uitbetaald"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/pay/treasury": {
    "methode": "POST",
@@ -5735,7 +5725,7 @@
     "uitleg",
     "vrijeLiquiditeit"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/pay/treasury/apart": {
    "methode": "POST",
@@ -5748,7 +5738,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/pay/treasury/vrij": {
    "methode": "POST",
@@ -5761,7 +5751,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/pay/treasury/zet": {
    "methode": "POST",
@@ -5780,7 +5770,7 @@
     "ok",
     "payrollPct"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/pay/vastleg": {
    "methode": "POST",
@@ -5793,7 +5783,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/pay/vooraf": {
    "methode": "POST",
@@ -5806,7 +5796,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/pay/vooraf/lijst": {
    "methode": "POST",
@@ -5824,7 +5814,7 @@
     "ok",
     "vastgezetCenten"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/pay/vrijgeef": {
    "methode": "POST",
@@ -5837,7 +5827,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/persoonseis": {
    "methode": "POST",
@@ -5854,7 +5844,7 @@
     "ok",
     "ploeg"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/retail/annuleer": {
    "methode": "POST",
@@ -5869,7 +5859,7 @@
     "error",
     "status"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/retail/bon": {
    "methode": "POST",
@@ -5885,7 +5875,7 @@
     "gronden",
     "ok"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/retour/lijst": {
    "methode": "POST",
@@ -5901,7 +5891,7 @@
     "nietGebouwd",
     "ok"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/retour/uitvoeren": {
    "methode": "POST",
@@ -5916,7 +5906,7 @@
     "error",
     "status"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/retour/zet": {
    "methode": "POST",
@@ -5931,7 +5921,7 @@
     "error",
     "status"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/talent/match": {
    "methode": "POST",
@@ -5944,7 +5934,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/verkoopweg/lijst": {
    "methode": "POST",
@@ -5966,7 +5956,7 @@
     "soorten",
     "toegang"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/verkoopweg/publiceer": {
    "methode": "POST",
@@ -5981,7 +5971,7 @@
     "error",
     "status"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/verkoopweg/wis": {
    "methode": "POST",
@@ -5996,7 +5986,7 @@
     "error",
     "status"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/verkoopweg/zet": {
    "methode": "POST",
@@ -6011,7 +6001,7 @@
     "error",
     "status"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/supplier/werkmail/adressen": {
    "methode": "POST",
@@ -6039,7 +6029,7 @@
     "publiekActief",
     "uitleg"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/tenant/bijstand": {
    "methode": "POST",
@@ -6052,7 +6042,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/tenant/bijstand/besluit": {
    "methode": "POST",
@@ -6065,7 +6055,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/tenant/bijstand/dossier": {
    "methode": "POST",
@@ -6078,7 +6068,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/tenant/bijstand/inhoud": {
    "methode": "POST",
@@ -6091,7 +6081,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/tenant/bijstand/intrekken": {
    "methode": "POST",
@@ -6104,7 +6094,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/tenant/bijstand/niveaus": {
    "methode": "POST",
@@ -6117,7 +6107,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/tenant/bijstand/vraag": {
    "methode": "POST",
@@ -6130,7 +6120,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/tenant/bootstrap/mijn": {
    "methode": "POST",
@@ -6148,7 +6138,7 @@
     "let",
     "ok"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/theater/ondertitels": {
    "methode": "POST",
@@ -6161,7 +6151,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/vakbewijs": {
    "methode": "POST",
@@ -6174,7 +6164,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/vakbewijs/zet": {
    "methode": "POST",
@@ -6187,7 +6177,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/vonk/halfweg": {
    "methode": "POST",
@@ -6200,7 +6190,7 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
   },
   "POST /api/vonk/kies": {
    "methode": "POST",
@@ -6213,7 +6203,46 @@
    "dragend": [
     "error"
    ],
-   "op": "2026-08-31T19:08:58.184Z"
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/office/vakbewijs/intrek": {
+   "methode": "POST",
+   "pad": "/api/office/vakbewijs/intrek",
+   "rol": "kantoor-op-naam",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/office/vakbewijs/nummer": {
+   "methode": "POST",
+   "pad": "/api/office/vakbewijs/nummer",
+   "rol": "kantoor-op-naam",
+   "status": 400,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/office/vakbewijs/teken": {
+   "methode": "POST",
+   "pad": "/api/office/vakbewijs/teken",
+   "rol": "kantoor-op-naam",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
   }
  }
 }

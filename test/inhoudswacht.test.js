@@ -19,7 +19,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer } = require('./helper');
+const { startServer, kantoorAlsPersoon } = require('./helper');
 const { profielVan } = require('../scripts/inhoudskaart');
 
 const KAART = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'INHOUDSKAART.json'), 'utf8'));
@@ -42,6 +42,12 @@ test.before(async () => {
   tokens.member = (await doe('POST', '/api/login', { tier: 'rtg' })).data.token;
   tokens.office = (await doe('POST', '/api/office/login', { code: 'RTG-OFFICE-PROEF' })).data.token;
   tokens.supplier = (await doe('POST', '/api/supplier/login', { username: 'rahul', password: 'Imran' })).data.token;
+  /* DE KLUISROL. De kaart neemt de kluisdeuren (een KYC-besluit, een
+     documentnummer, aftekenen) sinds kern/kantoor/kluispoort.js op met een
+     kantoorsessie OP NAAM -- de gedeelde code komt daar niet door. Wie hier die
+     sleutel niet zet, meet de dichte deur in plaats van het antwoordcontract,
+     en dan zakt de toets op een 403 die niets over de vorm zegt. */
+  tokens['kantoor-op-naam'] = await kantoorAlsPersoon(BASE, 'RTG-OFFICE-PROEF');
 });
 test.after(() => {
   if (child) try { child.kill('SIGKILL'); } catch (e) {}

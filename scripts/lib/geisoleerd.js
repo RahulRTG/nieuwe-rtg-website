@@ -10,7 +10,8 @@
    HIJ STAAT HIER EN NIET IN DE LOPER, en dat is met reden. scripts/test-runner.js
    is een script: wie het met require() opent om alleen deze lijst te lezen, start
    de hele suite. Dat is geen bedacht risico -- het is bij het bouwen van
-   scripts/draai.js precies zo misgegaan. Een lijst met twee lezers hoort in een
+   scripts/draai.js precies zo misgegaan (dat script is op 1 september 2026
+   opgeruimd; de fout blijft de reden). Een lijst met twee lezers hoort in een
    bestand dat niets doet als je het opent.
    ========================================================================== */
 const GEISOLEERD = [

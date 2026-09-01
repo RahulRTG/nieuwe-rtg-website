@@ -109,7 +109,23 @@ if (!bestanden.length) {
    van een goede vraag een verwarrende. Dus: het meegegeven pad wint, en de
    eigen keuze is alleen de terugval. */
 const journaal = process.env.RTG_ROUTELOG || path.join(WORTEL, '.routejournaal');
-const env = { ...process.env, RTG_ROUTELOG: journaal, RTG_AFBOUW_SLOT_ACTIEF: '1' };
+/* DE TOETSIDENTITEIT REIST MEE. Elk toetsproces laadt test/toetsnaam.js voor,
+   en die zet RTG_TOETS op de naam van het bestand dat draait. Vanaf daar erft
+   ELK kindproces hem via de omgeving -- ook een server die niet via
+   test/helper.js start. Zonder dit schreven de sporen van 565 toetsbestanden
+   zich weg als `onbekend`, en dat is niet te onderscheiden van "deze toets
+   raakt niets aan". NODE_OPTIONS is de enige plek waar node dat voor ELK
+   kindproces tegelijk regelt; een meegegeven NODE_OPTIONS blijft staan. */
+const VOORLADEN = '--require ' + JSON.stringify(path.join(WORTEL, 'test', 'toetsnaam.js'));
+const nodeOpties = (process.env.NODE_OPTIONS ? process.env.NODE_OPTIONS + ' ' : '') + VOORLADEN;
+/* DE DUURMETING, en die schrijft ALTIJD mee. Hij kost per toetsbestand een
+   append van een regel en hij is de invoer van de gewogen scherfverdeling
+   (scripts/lib/delen.js). Wie hem alleen in CI zou aanzetten, meet alleen wat
+   CI toevallig draaide; wie hem met een vlag zou aanzetten, meet nooit.
+   Het meegegeven pad wint, zoals bij het routejournaal hierboven. */
+const duurpad = process.env.RTG_TOETSDUUR || path.join(WORTEL, '.toetsduur');
+const env = { ...process.env, RTG_ROUTELOG: journaal, RTG_AFBOUW_SLOT_ACTIEF: '1',
+  NODE_OPTIONS: nodeOpties, RTG_TOETSDUUR: duurpad };
 
 /* HET JOURNAAL LEEGGOOIEN DOET ALLEEN WIE OOK ECHT GAAT DRAAIEN, en die regel
    is duur geleerd. De unlink stond hier onvoorwaardelijk, boven de --toon-poort

@@ -37,12 +37,19 @@ const GEEN_METING = new Set([
   'package.json', 'package-lock.json',
   'NORM.json',              // de ratel zelf; die wordt door normverval.js bewaakt
   'LANDEN.json',            // landpakketten: welke munt, welke voertaal -- gegevens
-  /* SUITEDUUR.json draagt hoe lang elk toetsbestand duurde. Dat is een
+  /* TOETSDUUR.json draagt hoe lang elk toetsbestand duurde. Dat is een
      PLANNINGSgetal en geen kwaliteitsgetal: een toets die langzamer wordt is
      niet slechter, en een die sneller wordt niet beter. Het bestand voedt de
-     verdeling over de scherven (scripts/scherf.js); wordt het gewist, dan is de
-     verdeling een ronde lang onhandig en verder niets. */
-  'SUITEDUUR.json'
+     verdeling over de scherven (scripts/lib/delen.js); wordt het gewist, dan is
+     de verdeling een ronde lang onhandig en verder niets.
+
+     HIER STOND SUITEDUUR.json, met scripts/scherf.js als lezer. Dat script
+     stond tot 28 augustus 2026 in ci.yml en is toen vervangen door
+     `npm run test:deel`; de weging bleef daarbij liggen en het script en zijn
+     register bleven als dode tak achter. Ze zijn op 1 september 2026 opgeruimd
+     en de weging is in delen.js hersteld -- twee verdelers met elk een eigen
+     duurregister is LAT.md regel 4 op de plek waar hij het duurst is. */
+  'TOETSDUUR.json'
 ]);
 
 const REGISTER = {

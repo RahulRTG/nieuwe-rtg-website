@@ -340,7 +340,9 @@ async function giftZet(lijf) {
   try { await giftApi('stand/zet', lijf); giftTeken(); }
   catch (e) { const m = $('#giftMeld'); if (m) m.innerHTML = '<div class="melder fout">' + esc(e.message) + '</div>'; }
 }
-giftTeken();
+/* Dezelfde reden als bij laad() en raadLaad() hierboven: zonder kantoorsessie
+   staat de deur er al en bestaat #giftIn niet meer. */
+if (TOKEN) giftTeken();
 </script>
 <script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>

@@ -308,7 +308,16 @@ body[data-rtg-world="living"] .werk{
   max-width:1440px;
   padding-top:clamp(2.6rem,6vw,6rem);
 }
-body[data-rtg-world="living"] .kop{
+/* DE HERO VAN HET HUIS, en alleen die. `.kop` is in dit huis de gewone naam
+   voor de kopbalk van een scherm (clips, media, muziek, podium, theater,
+   scherm ...), en twaalf LivingOS-schermen dragen er een. Zonder de `.werk >`
+   ervoor kregen al die balken de herostijl: position:relative (waardoor de
+   os-switcher-verschuiving `top:var(--os-switcher-h)` de balk 64px uit zijn
+   stroom tilde en over de knop eronder legde -- op Clips lag "Maak een clip"
+   onder "Alleen met ondertitel"), een marge van 4,5rem en een 20rem grote "L"
+   als watermerk. Het huis zelf (rtg.html) heeft die hero inmiddels als
+   .dagkop, dus de regels troffen alleen nog wat ze niet bedoelden. */
+body[data-rtg-world="living"] .werk > .kop{
   position:relative;
   max-width:1050px;
   margin:0 0 clamp(2rem,5vw,4.5rem);
@@ -316,7 +325,7 @@ body[data-rtg-world="living"] .kop{
   text-align:left;
   border-bottom:1px solid var(--bordeaux-rand);
 }
-body[data-rtg-world="living"] .kop::after{
+body[data-rtg-world="living"] .werk > .kop::after{
   content:"L";
   position:absolute;
   right:0;
@@ -325,10 +334,10 @@ body[data-rtg-world="living"] .kop::after{
   font:500 clamp(9rem,22vw,20rem)/.7 var(--rtg-display);
   pointer-events:none;
 }
-body[data-rtg-world="living"] .kop .ey{color:#F4F0E9;}
-body[data-rtg-world="living"] .kop .os-kicker,
-body[data-rtg-world="living"] .kop .os-kicker span{color:#F4F0E9;}
-body[data-rtg-world="living"] .kop h1{
+body[data-rtg-world="living"] .werk > .kop .ey{color:#F4F0E9;}
+body[data-rtg-world="living"] .werk > .kop .os-kicker,
+body[data-rtg-world="living"] .werk > .kop .os-kicker span{color:#F4F0E9;}
+body[data-rtg-world="living"] .werk > .kop h1{
   max-width:840px;
   margin:.5rem 0 1rem;
   color:var(--op-bordeaux);
@@ -336,13 +345,13 @@ body[data-rtg-world="living"] .kop h1{
   line-height:.82;
   letter-spacing:-.055em;
 }
-body[data-rtg-world="living"] .kop p{
+body[data-rtg-world="living"] .werk > .kop p{
   margin:0;
   max-width:680px;
   color:#F4F0E9;
   font-size:clamp(.9rem,1.3vw,1.08rem);
 }
-body[data-rtg-world="living"] .kop .status{
+body[data-rtg-world="living"] .werk > .kop .status{
   border-color:var(--bordeaux-rand);
   background:rgba(0,0,0,.18);
 }
@@ -854,7 +863,7 @@ body[data-rtg-world="foundation"]:not(.rtf-premium) .lijnrij .sub{color:#41403E;
   .os-switcher__links a span{display:none;}
   body[data-rtg-world="living"] .laagkeuze{grid-template-columns:1fr;}
   body[data-rtg-world="living"] .lifelagen{grid-template-columns:repeat(3,1fr);}
-  body[data-rtg-world="living"] .kop h1{font-size:clamp(3.2rem,17vw,6rem);}
+  body[data-rtg-world="living"] .werk > .kop h1{font-size:clamp(3.2rem,17vw,6rem);}
   body[data-rtg-world="work"] .merkkop{min-height:290px;}
   body[data-rtg-world="work"] .doelgroep{margin:-1.2rem .45rem 2.5rem;}
   body[data-rtg-world="foundation"] .grid{grid-template-columns:1fr;}

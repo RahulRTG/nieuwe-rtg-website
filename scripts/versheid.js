@@ -93,7 +93,29 @@ const REGISTERS = [
   ['IDEMSCHULD.json', 'npm run idemschuld:vast', 'welke schrijfroutes nog geen besluit over duplicaatgedrag dragen'],
   ['MUTATIEBOEK.json', 'npm run mutatieboek:vast', 'in welke bak elke route valt, en of de optelling sluit'],
   ['ONBEWEZEN.json', 'npm run onbewezen:vast', 'waarom een mutatie geen geldig bewijs heeft, van goedkoop naar duur'],
-  ['HANDLERWACHT.json', 'npm run handlerwacht:vast', 'wie de routes bewaakt waar de router geen bewakerslaag ziet']
+  ['HANDLERWACHT.json', 'npm run handlerwacht:vast', 'wie de routes bewaakt waar de router geen bewakerslaag ziet'],
+
+  /* ACHT METERS DIE MET DE SAMENVOEGING BINNENKWAMEN.
+
+     Ze stonden nergens onder toezicht, en dat is precies het gat dat
+     test/versheidsdekking.test.js dicht hoort te houden: een verouderd register
+     geeft getallen, en getallen worden geloofd. Bij deze acht is dat geen
+     theorie -- vier ervan meten in een ECHTE browser of tegen een DRAAIENDE
+     server, en zo'n meting hoort bij de code van die dag en bij geen andere.
+
+     Vijf van de acht dragen (nog) geen stempel. Dat wordt hier niet weggepoetst:
+     versheid meldt ze dan als "ouderdom niet vast te stellen", en dat is de
+     eerlijke uitslag en tevens de aansporing om er een te zetten. Ze hier
+     WEGLATEN omdat ze geen stempel hebben, zou de meter stil maken over precies
+     de registers waarover het minst bekend is. */
+  ['TIKKEN.json', 'npm run tikken', 'hoeveel tikken elke functie van het beginscherm af ligt, in een echte browser'],
+  ['VINDBAAR.json', 'npm run vindbaar', 'of je een functie terugvindt met het woord dat erop staat'],
+  ['WERELDSTIJL.json', 'npm run wereldstijl', 'of elk scherm de vormtaal van zijn wereld draagt'],
+  ['SCHERMMUTATIES.json', 'npm run schermmutatie', 'of een schermtoets het merkt als er iets van het scherm verdwijnt'],
+  ['RESOLVERBEREIK.json', 'npm run resolverbereik', 'de dekking van de resolver over elke toegestane route'],
+  ['HERSTELPROEF.json', 'npm run herstelproef', 'of de tegenhanger werkelijk ongedaan maakt wat de heenweg deed'],
+  ['DROOGLOOP.json', 'npm run droogloop', 'een plan werkelijk laten lopen, maar nergens waar het telt'],
+  ['ONDERZOEKSKETEN.json', 'npm run onderzoeksketen', 'welke stations van het onderzoek van elkaar weten']
 ];
 
 /* Het stempel van een register. Twee vormen, en dat is historie en geen smaak:

@@ -78,7 +78,41 @@ const BUITEN = {
   'GRONDWACHT.json': 'wordt op aanvraag geschreven en staat niet in de boom',
   'LEUGENS.json': 'wordt op aanvraag geschreven en staat niet in de boom; scripts/norm.js ratelt de cijfers',
   'BEWIJSBOEK.json': 'het bewijsboek van de testrunner; staat niet in de boom',
-  'WETWACHT.json': 'wordt op aanvraag geschreven en staat niet in de boom'
+  'WETWACHT.json': 'wordt op aanvraag geschreven en staat niet in de boom',
+  'ATTRIBUTIE.json': 'wordt op aanvraag geschreven en staat niet in de boom',
+  'IDEMVOORSTEL.json': 'wordt op aanvraag geschreven en staat niet in de boom; een VOORSTEL, geen meting',
+
+  /* WAT ER MET DE SAMENVOEGING BINNENKWAM EN BEWUST BUITEN BLIJFT.
+
+     Acht andere meters uit diezelfde takken zijn wel in REGISTERS gezet -- die
+     meten in een browser of tegen een draaiende server, en daar doet veroudering
+     pijn. De negen hieronder niet, en de reden verschilt per soort:
+
+       een VOORSTEL is geen meting. MUTATIECONTRACT-VOORSTEL en
+       MUTATIECONTRACT-AFGELEID dragen wat een machine voorstelt; het BESLUIT
+       staat in server/lib/mutatiecontracten.js, door een mens. Ze worden bij
+       elke gang overschreven en drukken dat besluit nooit weg
+       (MUTATIECONTRACT.md: het bewijs draagt een voorstel, een mens draagt het
+       besluit). Zou versheid ze bewaken, dan meldde hij "verouderd voorstel" --
+       en dat is precies het soort werk dat er niet is.
+
+       een AFDRUK UIT DE CODE veroudert niet los van de code. Zes stuks, zelfde
+       grond als BEREIK/SEMANTIEK/CAPABILITEIT hierboven: ze worden door de
+       keuring ververst, en loopt zo'n afdruk achter op zijn bron, dan zakt de
+       keuring en niet de versheid.
+
+       TOETSDUUR is de tweelingbroer van SUITEDUUR een paar regels hierboven:
+       hij schrijft bij elke testronde mee en heeft geen eigen ronde die kan
+       verouderen. */
+  'MUTATIECONTRACT-VOORSTEL.json': 'een VOORSTEL van de machine; het besluit staat in server/lib/mutatiecontracten.js en wordt hier nooit weggedrukt',
+  'MUTATIECONTRACT-AFGELEID.json': 'idem: afgeleide voorstellen, bij elke gang overschreven',
+  'MUTATIECONTRACT.json': 'een afdruk van de contracten in de code, ververst door de keuring',
+  'MUTATIEINVENTARIS.json': 'een afdruk uit de code: hij TELT de routes en meet geen gedrag',
+  'SCHRIJFANALYSE.json': 'een statische afdruk uit de code; hij certificeert niet maar vetoot',
+  'HANDLERBEWAKERS.json': 'een afdruk uit de code, ververst door de keuring',
+  'GEZAGSNOEMER.json': 'een afdruk uit de code, met een eigen toets (test/gezagsnoemer.test.js)',
+  'HERSTEL.json': 'een afdruk uit de code op grond van NAMEN; de echte meting staat in HERSTELPROEF.json, en die valt wel onder versheid',
+  'TOETSDUUR.json': 'schrijft bij elke testronde mee, net als SUITEDUUR hierboven; geen eigen ronde die kan verouderen'
 };
 
 function schrijvers() {

@@ -331,6 +331,13 @@
   --rtg-card:#151312;
   --rtg-card2:#1B1817;
   --rtg-goud:var(--gold-tekst);
+  /* --rtg-opgoud stond hier NIET, en dat is exact de fout waar dit blok voor
+     bestaat -- een regel lager dan waar hij hem tegenhield. Het vlak zette wel
+     zijn eigen goud maar liet de INKT daarop uit het omliggende thema komen. In
+     de bordeauxwereld is die inkt wit (regel 283), dus een volle knop in een
+     onyx-vlak op een bordeauxscherm werd wit op goud. Dezelfde donkere inkt als
+     het scherm-blok hierboven, en om dezelfde reden: hier IS het accent goud. */
+  --rtg-opgoud:#1C1608;
   --rtg-leesgoud:var(--gold-tekst);
   --rtg-leeszacht:var(--rtg-soft);
   --rtg-leesgroen:#4C9A75;

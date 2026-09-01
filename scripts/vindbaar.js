@@ -29,9 +29,15 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
+const { stempel } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(WORTEL, 'VINDBAAR.json');
+/* De wacht: dit script schrijft een register, dus het start niet bij het
+   requiren (een laadcontrole schreef zo ooit ROLPROEF.json terug naar 292
+   routes; scripts/meetkeuring.js houdt dit vast). */
+if (require.main !== module) return;
+
 const controle = process.argv.includes('--controle');
 
 /* WELKE WOORDEN MOETEN WERKEN, en welke met opzet niet.
@@ -117,7 +123,7 @@ function meet() {
   }
   const woorden = rijen.reduce((n, r) => n + r.woorden, 0);
   const gevonden = rijen.reduce((n, r) => n + r.gevonden, 0);
-  return { stempel: new Date().toISOString().slice(0, 10),
+  return { stempel: stempel(),
     uitleg: 'Per bestemming in de sprong: welk aandeel van de ONDERSCHEIDENDE woorden van dat scherm (woorden uit zijn koppen die op hooguit ' + DREMPEL + ' bestemmingen voorkomen) er ook naartoe leidt in de zoekfilter van shared/sprong.js. Meet woorden, geen mensen: of iemand op het idee komt dat woord te typen, weet deze meter niet.',
     vloer: VLOER, drempel: DREMPEL, bestemmingen: rijen.length, woorden, gevonden,
     dekking: woorden ? Number((gevonden / woorden).toFixed(4)) : 1,

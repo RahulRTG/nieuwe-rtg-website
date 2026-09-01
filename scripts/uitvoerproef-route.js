@@ -88,6 +88,11 @@ async function wacht(basis, ms) {
 
 wachtOpSchoneBoom();
 
+/* De wacht: dit script schrijft een register, dus het start niet bij het
+   requiren (een laadcontrole schreef zo ooit ROLPROEF.json terug naar 292
+   routes; scripts/meetkeuring.js houdt dit vast). */
+if (require.main !== module) return;
+
 (async () => {
   const poort = await vrijePoort();
   const datamap = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-uitvoerproef-'));

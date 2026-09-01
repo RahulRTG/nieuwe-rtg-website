@@ -44,6 +44,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { stempel } = require('./lib/stempel');
 /* HET SPOOR WORDT GELEZEN VOOR ./mutatie WORDT GELADEN, en dat is geen
    volgordekwestie maar de hele werking: die module RUIMT het spoor op bij het
    laden (zijn opruimwacht). Zou deze grendel het daarna lezen, dan zag hij
@@ -204,7 +205,10 @@ async function hoofd() {
       (r.overleefd ? ', ' + r.overleefd + ' stuk(ken) scherm ongedekt' : ''));
     uit.push(r);
   }
-  fs.writeFileSync(UITSLAG, JSON.stringify({ gemeten: new Date().toISOString(), toetsen: uit }, null, 2) + '\n');
+  fs.writeFileSync(UITSLAG, JSON.stringify({ stempel: stempel(), gemeten: new Date().toISOString(),
+    uitleg: 'Per schermtoets: hoeveel van de stukken scherm die hij beweert te dekken hij werkelijk mist als ze verdwijnen.',
+    grens: 'Meet alleen wat er uit een scherm VERDWIJNT, niet wat er fout in staat; een toets die niet in de lijst staat wordt niet gemeten.',
+    toetsen: uit }, null, 2) + '\n');
   console.log('\nUitslag in SCHERMMUTATIES.json');
 }
 

@@ -111,7 +111,7 @@ const REGISTERS = [
   ['TIKKEN.json', 'npm run tikken', 'hoeveel tikken elke functie van het beginscherm af ligt, in een echte browser'],
   ['VINDBAAR.json', 'npm run vindbaar', 'of je een functie terugvindt met het woord dat erop staat'],
   ['WERELDSTIJL.json', 'npm run wereldstijl', 'of elk scherm de vormtaal van zijn wereld draagt'],
-  ['SCHERMMUTATIES.json', 'npm run schermmutatie', 'of een schermtoets het merkt als er iets van het scherm verdwijnt'],
+  ['SCHERMMUTATIES.json', 'npm run mutatie:scherm', 'of een schermtoets het merkt als er iets van het scherm verdwijnt'],
   ['RESOLVERBEREIK.json', 'npm run resolverbereik', 'de dekking van de resolver over elke toegestane route'],
   ['HERSTELPROEF.json', 'npm run herstelproef', 'of de tegenhanger werkelijk ongedaan maakt wat de heenweg deed'],
   ['DROOGLOOP.json', 'npm run droogloop', 'een plan werkelijk laten lopen, maar nergens waar het telt'],

@@ -80,6 +80,11 @@ function wachtOpSchoneBoom() {
   process.exit(3);
 }
 
+/* De wacht: dit script schrijft een register, dus het start niet bij het
+   requiren (een laadcontrole schreef zo ooit ROLPROEF.json terug naar 292
+   routes; scripts/meetkeuring.js houdt dit vast). */
+if (require.main !== module) return;
+
 (async () => {
   wachtOpSchoneBoom();
   const poort = await vrijePoort();

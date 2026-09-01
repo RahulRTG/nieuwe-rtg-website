@@ -43,6 +43,11 @@ const { SLEUTELS } = require('../server/lib/idemsleutels');
 
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'IDEMSCHULD.json');
+/* De wacht: dit script schrijft een register, dus het start niet bij het
+   requiren (een laadcontrole schreef zo ooit ROLPROEF.json terug naar 292
+   routes; scripts/meetkeuring.js houdt dit vast). */
+if (require.main !== module) return;
+
 const vastleggen = process.argv.includes('--vastleggen');
 
 /* Wat telt als schrijfroute. GET valt af (lezen is al idempotent), en zo ook de

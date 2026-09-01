@@ -25,6 +25,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { stempel } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 
@@ -128,7 +129,15 @@ const hub = STATIONS.map(s => {
     aanHetLab: /\bvindLab\b/.test(src) || /\blabId\b/.test(src) };
 });
 
+/* De wacht: dit script schrijft een register, dus het start niet bij het
+   requiren (een laadcontrole schreef zo ooit ROLPROEF.json terug naar 292
+   routes; scripts/meetkeuring.js houdt dit vast). */
+if (require.main !== module) return;
+
 const uit = {
+  stempel: stempel(),
+  uitleg: 'Welke stations van het onderzoek in de code naar elkaar verwijzen, en of de keten daarmee rond is.',
+  grens: 'Zegt niet of een verwijzing altijd gevuld is, en niet of het om hetzelfde onderzoek gaat -- zie `let`.',
   gemeten: { op: new Date().toISOString().slice(0, 10), stations: STATIONS.length, paren, schakels: gevonden,
     ontbrekendeBestanden: ontbreekt },
   stations: STATIONS.map(s => ({ id: s.id, naam: s.naam, bestanden: s.bestanden, verwijst: s.verwijst })),

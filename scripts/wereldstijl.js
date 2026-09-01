@@ -36,6 +36,7 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
+const { stempel } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const INDEX = path.join(WORTEL, 'public', 'shared', 'sprongindex.json');
@@ -333,6 +334,11 @@ async function open(urls) {
   return uit;
 }
 
+/* De wacht: dit script schrijft een register, dus het start niet bij het
+   requiren (een laadcontrole schreef zo ooit ROLPROEF.json terug naar 292
+   routes; scripts/meetkeuring.js houdt dit vast). */
+if (require.main !== module) return;
+
 (async () => {
   const index = JSON.parse(fs.readFileSync(INDEX, 'utf8'));
   const urls = [];
@@ -372,7 +378,7 @@ async function open(urls) {
   werelden.sort((a, b) => b.schermen - a.schermen);
 
   const uit = {
-    stempel: new Date().toISOString().slice(0, 10),
+    stempel: stempel(),
     uitleg: 'Per scherm van een wereld: draagt het de vormtaal van die wereld? '
       + 'De grond en de letter zijn GEMETEN in een echte browser (getComputedStyle), '
       + 'niet uit de CSS gelezen -- twee eerdere versies van deze meter lazen de '

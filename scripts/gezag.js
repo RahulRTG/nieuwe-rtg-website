@@ -123,7 +123,12 @@ const TEGENSPRAKEN = [
            'bevestigt een al ingevulde beslissing met een tik.',
     kanten: [
       { bestand: 'server/kern/stadsweefsel/ainiveau.js', zin: "'vergunning-weigeren': { niveau: 4" },
-      { bestand: 'server/kern/stuur/beleid.js', zin: 'vergunning\\/beslis' },
+      /* VERHUISD, NIET OPGELOST. De drie allowlists van het AI-stuur staan sinds
+         1 september in ./beleid-lijsten.js -- beleid.js liep over de
+         tienkilobytegrens van keuringsregel 13 en is langs de naad geknipt die
+         er al lag: dat bestand draagt het BESLUIT, dit de PADEN. De tegenspraak
+         zelf is geen letter veranderd; alleen het adres. */
+      { bestand: 'server/kern/stuur/beleid-lijsten.js', zin: 'vergunning\\/beslis' },
       { bestand: 'server/routes/supplier/ai/ambtenaar.js', zin: "besluit: goed ? 'verleend' : af ? 'geweigerd'" }
     ]
   }

@@ -1,12 +1,12 @@
 {
-  "stempel": "2026-08-31",
+  "stempel": "2026-09-01",
   "uitleg": "Per bestemming in de sprong: welk aandeel van de ONDERSCHEIDENDE woorden van dat scherm (woorden uit zijn koppen die op hooguit 3 bestemmingen voorkomen) er ook naartoe leidt in de zoekfilter van shared/sprong.js. Meet woorden, geen mensen: of iemand op het idee komt dat woord te typen, weet deze meter niet.",
   "vloer": 0.6,
   "drempel": 3,
-  "bestemmingen": 84,
-  "woorden": 1073,
-  "gevonden": 674,
-  "dekking": 0.6281,
+  "bestemmingen": 88,
+  "woorden": 1077,
+  "gevonden": 697,
+  "dekking": 0.6472,
   "perBestemming": [
     {
       "naam": "Magnaat",
@@ -59,7 +59,7 @@
       "naam": "Onderneming",
       "url": "/apps/onderneming.html",
       "woorden": 35,
-      "gevonden": 7,
+      "gevonden": 8,
       "mist": [
         "beginnen",
         "gezondheid",
@@ -83,7 +83,6 @@
         "contracten",
         "opzij",
         "voorraad",
-        "toegang",
         "klussen",
         "pijplijn",
         "bestuur",
@@ -95,7 +94,7 @@
       "naam": "Mall",
       "url": "/apps/mall.html",
       "woorden": 41,
-      "gevonden": 25,
+      "gevonden": 26,
       "mist": [
         "gevonden",
         "complete",
@@ -111,8 +110,7 @@
         "dienstenplein",
         "tussen",
         "leveranciers",
-        "vernietigen",
-        "softwarepaspoort"
+        "bestellen"
       ]
     },
     {
@@ -164,8 +162,8 @@
     {
       "naam": "Openbaar vervoer",
       "url": "/apps/ov.html",
-      "woorden": 29,
-      "gevonden": 14,
+      "woorden": 28,
+      "gevonden": 13,
       "mist": [
         "volgende",
         "gaat",
@@ -405,21 +403,6 @@
       ]
     },
     {
-      "naam": "Attenties",
-      "url": "/apps/attenties.html",
-      "woorden": 9,
-      "gevonden": 2,
-      "mist": [
-        "relatiesecretaris",
-        "binnenkort",
-        "relatie",
-        "wijzigen",
-        "gift",
-        "noteren",
-        "giftgeschiedenis"
-      ]
-    },
-    {
       "naam": "Commerce",
       "url": "/apps/commerce.html",
       "woorden": 13,
@@ -450,21 +433,6 @@
       ]
     },
     {
-      "naam": "Geven",
-      "url": "/apps/foundation/geven.html",
-      "woorden": 8,
-      "gevonden": 1,
-      "mist": [
-        "voorstellen",
-        "gift",
-        "machtiging",
-        "tekenen",
-        "stoppen",
-        "inlogscherm",
-        "winkel"
-      ]
-    },
-    {
       "naam": "App-dossier",
       "url": "/apps/appstore-dossier.html",
       "woorden": 10,
@@ -476,6 +444,20 @@
         "elke",
         "hier",
         "geldt"
+      ]
+    },
+    {
+      "naam": "Attenties",
+      "url": "/apps/attenties.html",
+      "woorden": 9,
+      "gevonden": 3,
+      "mist": [
+        "relatiesecretaris",
+        "binnenkort",
+        "wijzigen",
+        "gift",
+        "noteren",
+        "giftgeschiedenis"
       ]
     },
     {
@@ -638,30 +620,6 @@
       ]
     },
     {
-      "naam": "Buurtruil",
-      "url": "/apps/foundation/buurtruil.html",
-      "woorden": 7,
-      "gevonden": 3,
-      "mist": [
-        "weggegeven",
-        "gezocht",
-        "belangstelling",
-        "inlogscherm"
-      ]
-    },
-    {
-      "naam": "RTFoundation in jouw buurt",
-      "url": "/apps/foundation/os-publiek.html",
-      "woorden": 11,
-      "gevonden": 7,
-      "mist": [
-        "hangt",
-        "vrijwilliger",
-        "worden",
-        "deelnemer"
-      ]
-    },
-    {
       "naam": "Berichten",
       "url": "/apps/comm.html",
       "woorden": 4,
@@ -728,17 +686,6 @@
       ]
     },
     {
-      "naam": "Web",
-      "url": "/apps/browser.html",
-      "woorden": 5,
-      "gevonden": 2,
-      "mist": [
-        "deze",
-        "bestaat",
-        "leden"
-      ]
-    },
-    {
       "naam": "Cellier",
       "url": "/apps/cellier.html",
       "woorden": 5,
@@ -759,6 +706,16 @@
       ]
     },
     {
+      "naam": "Web",
+      "url": "/apps/browser.html",
+      "woorden": 4,
+      "gevonden": 2,
+      "mist": [
+        "bestaat",
+        "leden"
+      ]
+    },
+    {
       "naam": "Stad",
       "url": "/apps/stad.html",
       "woorden": 4,
@@ -776,16 +733,6 @@
       "mist": [
         "atelier",
         "huistelefoon"
-      ]
-    },
-    {
-      "naam": "Klimaatfonds",
-      "url": "/apps/foundation/klimaatfonds.html",
-      "woorden": 9,
-      "gevonden": 7,
-      "mist": [
-        "onthoud",
-        "hieraan"
       ]
     },
     {
@@ -852,6 +799,15 @@
       ]
     },
     {
+      "naam": "Waar ben ik aanwezig",
+      "url": "/apps/mijn-sessies.html",
+      "woorden": 3,
+      "gevonden": 2,
+      "mist": [
+        "behalve"
+      ]
+    },
+    {
       "naam": "Navigatie",
       "url": "/apps/navigatie.html",
       "woorden": 12,
@@ -885,6 +841,15 @@
       "gevonden": 3,
       "mist": [
         "vooruitblik"
+      ]
+    },
+    {
+      "naam": "RTFoundation in jouw buurt",
+      "url": "/apps/foundation/os-publiek.html",
+      "woorden": 11,
+      "gevonden": 10,
+      "mist": [
+        "hangt"
       ]
     },
     {
@@ -1014,6 +979,27 @@
       "mist": []
     },
     {
+      "naam": "Post van RTG",
+      "url": "/apps/mijn-post.html",
+      "woorden": 1,
+      "gevonden": 1,
+      "mist": []
+    },
+    {
+      "naam": "Wat weet RTG van mij",
+      "url": "/apps/mijn-gegevens.html",
+      "woorden": 1,
+      "gevonden": 1,
+      "mist": []
+    },
+    {
+      "naam": "Wie heeft toegang tot mij",
+      "url": "/apps/mijn-relaties.html",
+      "woorden": 2,
+      "gevonden": 2,
+      "mist": []
+    },
+    {
       "naam": "School",
       "url": "/apps/rtgschool.html",
       "woorden": 6,
@@ -1037,8 +1023,22 @@
     {
       "naam": "Vluchten",
       "url": "/apps/vluchten.html",
-      "woorden": 6,
-      "gevonden": 6,
+      "woorden": 5,
+      "gevonden": 5,
+      "mist": []
+    },
+    {
+      "naam": "Buurtruil",
+      "url": "/apps/foundation/buurtruil.html",
+      "woorden": 7,
+      "gevonden": 7,
+      "mist": []
+    },
+    {
+      "naam": "Geven",
+      "url": "/apps/foundation/geven.html",
+      "woorden": 8,
+      "gevonden": 8,
       "mist": []
     },
     {
@@ -1046,6 +1046,13 @@
       "url": "/apps/foundation/schrift.html",
       "woorden": 2,
       "gevonden": 2,
+      "mist": []
+    },
+    {
+      "naam": "Klimaatfonds",
+      "url": "/apps/foundation/klimaatfonds.html",
+      "woorden": 9,
+      "gevonden": 9,
       "mist": []
     },
     {

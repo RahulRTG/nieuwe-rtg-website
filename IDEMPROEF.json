@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-09-01T15:28:40.659Z",
-  "commit": "41d9a7d75",
+  "op": "2026-09-01T15:41:49.786Z",
+  "commit": "c86c393e4",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/idemproef-route.js",
@@ -53,7 +53,7 @@
   "beschermd": 1571,
   "onbeschermd": 2,
   "ongemeten": 3156,
-  "oproepen": 25852,
+  "oproepen": 25850,
   "tokensHernieuwd": 60,
   "uitOpslag": 3,
   "ruisGeijkt": [
@@ -156,6 +156,7 @@
    "werkplek",
    "les",
    "gast",
+   "doos",
    "partner",
    "codelink",
    "arrival",
@@ -172,7 +173,7 @@
  "zonderBesluit": [],
  "tegenspraken": [],
  "vastleggingVerdacht": [],
- "vermoedensVerworpen": 9,
+ "vermoedensVerworpen": 7,
  "perRoute": [
   {
    "methode": "POST",
@@ -210,7 +211,7 @@
      "werkplekMensen": 2,
      "werkplekTaken": 2,
      "horeca": 1,
-     "doosAfketsers": 1,
+     "doosUpdateStatus": 1,
      "toestellen": 1,
      "lifestyle": 1
     },
@@ -4246,9 +4247,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -6199,7 +6198,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -10513,7 +10514,7 @@
     404,
     404
    ],
-   "hindernis": "Die regel bestaat niet: proef-ohn4rx",
+   "hindernis": "Die regel bestaat niet: proef-46j2ia",
    "opslag": {
     "a": {},
     "b": {},
@@ -10549,7 +10550,7 @@
     404,
     404
    ],
-   "hindernis": "Die regel bestaat niet: proef-j6f2bx",
+   "hindernis": "Die regel bestaat niet: proef-rzawyy",
    "opslag": {
     "a": {},
     "b": {},
@@ -11014,7 +11015,7 @@
     404,
     404
    ],
-   "hindernis": "Onbekende functie: proef-w70chh",
+   "hindernis": "Onbekende functie: proef-i71zzk",
    "opslag": {
     "a": {},
     "b": {},
@@ -11562,7 +11563,6 @@
    ],
    "opslag": {
     "a": {
-     "wacht": "gewijzigd",
      "commandAlarmen": "gewijzigd"
     },
     "b": {},
@@ -12085,8 +12085,7 @@
     ],
     "opslag": {
      "d": {
-      "commandPlannen": 1,
-      "veilig": 1
+      "commandPlannen": 1
      },
      "e": {
       "commandPlannen": 1
@@ -12646,7 +12645,7 @@
     404,
     404
    ],
-   "hindernis": "Dat runbook bestaat niet: proef-86hoob",
+   "hindernis": "Dat runbook bestaat niet: proef-q89iaz",
    "opslag": {
     "a": {},
     "b": {},
@@ -13670,7 +13669,9 @@
     "a": {
      "zandbakken": 1
     },
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
    },
    "zonderSleutel": {
@@ -13690,7 +13691,8 @@
      "e": "geen",
      "nietGemeten": "bestand,externe-aanroep"
     }
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -13934,7 +13936,9 @@
     ],
     "opslag": {
      "d": {},
-     "e": {}
+     "e": {
+      "veilig": 1
+     }
     },
     "effect": {
      "d": "geen",
@@ -16671,9 +16675,7 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
    },
    "zonderSleutel": {
@@ -16693,8 +16695,7 @@
      "e": "geen",
      "nietGemeten": "bestand,externe-aanroep"
     }
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -19828,7 +19829,9 @@
     ],
     "opslag": {
      "d": {},
-     "e": {}
+     "e": {
+      "wacht": "gewijzigd"
+     }
     },
     "effect": {
      "d": "geen",
@@ -21760,9 +21763,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -25113,15 +25114,17 @@
     "c": {}
    },
    "zonderSleutel": {
-    "stand": "ongemeten",
-    "grond": null,
-    "reden": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien",
+    "stand": "beschermd",
+    "grond": "opslag",
+    "reden": "de eerste kale oproep veranderde de opslag en de woordelijk gelijke herhaling niet",
     "statussen": [
      200,
      200
     ],
     "opslag": {
-     "d": {},
+     "d": {
+      "wacht": "gewijzigd"
+     },
      "e": {}
     },
     "effect": {
@@ -25962,9 +25965,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -27809,9 +27810,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "commandAlarmen": "gewijzigd"
-    }
+    "c": {}
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -30880,7 +30879,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -31922,7 +31923,6 @@
    "hindernis": "Deze deling bestaat niet.",
    "opslag": {
     "a": {
-     "wacht": "gewijzigd",
      "lifestyle": 1,
      "metier": 5
     },
@@ -32410,7 +32410,9 @@
     ],
     "opslag": {
      "d": {},
-     "e": {}
+     "e": {
+      "commandAlarmen": "gewijzigd"
+     }
     },
     "effect": {
      "d": "opslag=1",
@@ -35092,6 +35094,7 @@
    "hindernis": "Deze lijst bestaat niet.",
    "opslag": {
     "a": {
+     "wacht": "gewijzigd",
      "mediaLijsten": 1
     },
     "b": {},
@@ -35533,9 +35536,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -38884,7 +38885,9 @@
    "viaPas": "lid-lifestyle",
    "hindernis": "Waar gaat het optreden over?",
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -39032,9 +39035,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -42452,9 +42453,7 @@
    ],
    "hindernis": "Kies een gepubliceerd officieel partnerbedrijf.",
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -42539,7 +42538,9 @@
      404
     ],
     "opslag": {
-     "d": {},
+     "d": {
+      "wacht": "gewijzigd"
+     },
      "e": {}
     },
     "effect": {
@@ -45477,9 +45478,7 @@
     ],
     "opslag": {
      "d": {},
-     "e": {
-      "wacht": "gewijzigd"
-     }
+     "e": {}
     },
     "effect": {
      "d": "opslag=1",
@@ -45613,7 +45612,9 @@
    "viaPas": "lid-lifestyle",
    "hindernis": "Dit document staat niet in uw dossier.",
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -48174,9 +48175,7 @@
      400
     ],
     "opslag": {
-     "d": {
-      "wacht": "gewijzigd"
-     },
+     "d": {},
      "e": {}
     },
     "effect": {
@@ -48991,7 +48990,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -49240,7 +49241,6 @@
    "hindernis": "Deze uitnodiging is er niet meer.",
    "opslag": {
     "a": {
-     "commandAlarmen": "gewijzigd",
      "spellen": 2
     },
     "b": {},
@@ -51043,9 +51043,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -52082,6 +52080,7 @@
     },
     "b": {},
     "c": {
+     "wacht": "gewijzigd",
      "metier": "gewijzigd"
     }
    },
@@ -53121,7 +53120,9 @@
    ],
    "hindernis": "Dit hoort bij een eigen RTG-account.",
    "opslag": {
-    "a": {},
+    "a": {
+     "commandAlarmen": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -54489,9 +54490,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -55311,7 +55310,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -57950,9 +57951,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -58115,7 +58114,8 @@
       "fiscaalRegels": "gewijzigd"
      },
      "e": {
-      "fiscaalRegels": "gewijzigd"
+      "fiscaalRegels": "gewijzigd",
+      "wacht": "gewijzigd"
      }
     },
     "effect": {
@@ -60782,7 +60782,9 @@
      "d": {
       "ideeen": "gewijzigd"
      },
-     "e": {}
+     "e": {
+      "wacht": "gewijzigd"
+     }
     },
     "effect": {
      "d": "opslag=1",
@@ -61575,9 +61577,7 @@
      400
     ],
     "opslag": {
-     "d": {
-      "wacht": "gewijzigd"
-     },
+     "d": {},
      "e": {}
     },
     "effect": {
@@ -63487,6 +63487,7 @@
    "opslag": {
     "a": {
      "magnaatWereld": "gewijzigd",
+     "wacht": "gewijzigd",
      "mailQ": 2
     },
     "b": {},
@@ -63703,9 +63704,7 @@
    ],
    "hindernis": "Deze collectie beheert u niet.",
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -65495,6 +65494,7 @@
       "handelsRegelwacht": "gewijzigd"
      },
      "e": {
+      "wacht": "gewijzigd",
       "handelsRegelwacht": "gewijzigd"
      }
     },
@@ -66812,9 +66812,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -67582,9 +67580,7 @@
    ],
    "hindernis": "Kies minstens een GEPUBLICEERD artikel voor de editie.",
    "opslag": {
-    "a": {
-     "commandAlarmen": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -68239,7 +68235,9 @@
     ],
     "opslag": {
      "d": {},
-     "e": {}
+     "e": {
+      "wacht": "gewijzigd"
+     }
     },
     "effect": {
      "d": "geen",
@@ -68692,7 +68690,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "commandAlarmen": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -69407,9 +69407,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -70887,7 +70885,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -72182,9 +72182,7 @@
      404
     ],
     "opslag": {
-     "d": {
-      "wacht": "gewijzigd"
-     },
+     "d": {},
      "e": {}
     },
     "effect": {
@@ -73565,7 +73563,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
    },
    "zonderSleutel": {
@@ -73585,7 +73585,8 @@
      "e": "geen",
      "nietGemeten": "bestand,externe-aanroep"
     }
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -74989,9 +74990,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -75520,7 +75519,8 @@
    ],
    "opslag": {
     "a": {
-     "ondernemingen": "gewijzigd"
+     "ondernemingen": "gewijzigd",
+     "wacht": "gewijzigd"
     },
     "b": {},
     "c": {
@@ -77148,9 +77148,7 @@
      400
     ],
     "opslag": {
-     "d": {
-      "wacht": "gewijzigd"
-     },
+     "d": {},
      "e": {}
     },
     "effect": {
@@ -77406,7 +77404,9 @@
     ],
     "opslag": {
      "d": {},
-     "e": {}
+     "e": {
+      "wacht": "gewijzigd"
+     }
     },
     "effect": {
      "d": "geen",
@@ -80421,7 +80421,9 @@
    ],
    "viaPas": "rijk",
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -80536,8 +80538,7 @@
     },
     "b": {},
     "c": {
-     "rijkVerkiezing": "gewijzigd",
-     "wacht": "gewijzigd"
+     "rijkVerkiezing": "gewijzigd"
     }
    },
    "zonderSleutel": {
@@ -82456,7 +82457,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -82706,9 +82709,7 @@
    ],
    "hindernis": "Dit kanaal is nu niet live.",
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -83067,7 +83068,9 @@
    ],
    "hindernis": "Alleen de maker beheert het kanaal.",
    "opslag": {
-    "a": {},
+    "a": {
+     "commandAlarmen": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -83426,9 +83429,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "commandAlarmen": "gewijzigd"
-    }
+    "c": {}
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -84696,7 +84697,9 @@
      404
     ],
     "opslag": {
-     "d": {},
+     "d": {
+      "wacht": "gewijzigd"
+     },
      "e": {}
     },
     "effect": {
@@ -84947,7 +84950,6 @@
     },
     "b": {},
     "c": {
-     "wacht": "gewijzigd",
      "residentie": "gewijzigd"
     }
    },
@@ -86959,7 +86961,9 @@
     ],
     "opslag": {
      "d": {},
-     "e": {}
+     "e": {
+      "wacht": "gewijzigd"
+     }
     },
     "effect": {
      "d": "geen",
@@ -87592,9 +87596,7 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
    },
    "zonderSleutel": {
@@ -87614,8 +87616,7 @@
      "e": "geen",
      "nietGemeten": "bestand,externe-aanroep"
     }
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -89609,7 +89610,8 @@
    "opslag": {
     "a": {
      "sessions": 1,
-     "sessiecontext": 2
+     "sessiecontext": 2,
+     "wacht": "gewijzigd"
     },
     "b": {
      "sessions": 1,
@@ -89826,8 +89828,7 @@
     },
     "b": {
      "sessions": 1,
-     "sessiecontext": 2,
-     "wacht": "gewijzigd"
+     "sessiecontext": 2
     },
     "c": {
      "sessions": 1,
@@ -91152,7 +91153,9 @@
    "viaPas": "boardroom",
    "hindernis": "Deze partner staat niet in het register.",
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -92444,8 +92447,7 @@
    "opslag": {
     "a": {
      "sessions": 1,
-     "sessiecontext": 2,
-     "wacht": "gewijzigd"
+     "sessiecontext": 2
     },
     "b": {
      "sessions": 1,
@@ -92683,7 +92685,8 @@
     },
     "c": {
      "sessions": 1,
-     "sessiecontext": 2
+     "sessiecontext": 2,
+     "wacht": "gewijzigd"
     }
    },
    "zonderSleutel": {
@@ -94401,9 +94404,7 @@
      "rtfos": 1
     },
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -94748,7 +94749,9 @@
    ],
    "hindernis": "RTG iD hoort bij een eigen RTG-account. Een gratis account is genoeg; een demo-gast heeft er geen.",
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -95296,7 +95299,9 @@
    ],
    "hindernis": "Titel en bedoeling zijn verplicht.",
    "opslag": {
-    "a": {},
+    "a": {
+     "commandAlarmen": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -96783,17 +96788,15 @@
     "c": {}
    },
    "zonderSleutel": {
-    "stand": "beschermd",
-    "grond": "opslag",
-    "reden": "de eerste kale oproep veranderde de opslag en de woordelijk gelijke herhaling niet",
+    "stand": "ongemeten",
+    "grond": null,
+    "reden": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien",
     "statussen": [
      200,
      200
     ],
     "opslag": {
-     "d": {
-      "wacht": "gewijzigd"
-     },
+     "d": {},
      "e": {}
     },
     "effect": {
@@ -96892,7 +96895,9 @@
    ],
    "hindernis": "Deze functie is tijdelijk uitgeschakeld door de beheerder.",
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -97500,9 +97505,7 @@
    ],
    "hindernis": "Sleutelwoorden horen bij een echt RTG-account.",
    "opslag": {
-    "a": {
-     "commandAlarmen": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -99013,7 +99016,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -99259,9 +99264,7 @@
    ],
    "hindernis": "Onbekende doos of verkeerde sleutel.",
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -101254,7 +101257,9 @@
     ],
     "opslag": {
      "d": {},
-     "e": {}
+     "e": {
+      "wacht": "gewijzigd"
+     }
     },
     "effect": {
      "d": "geen",
@@ -101910,9 +101915,7 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
    },
    "zonderSleutel": {
@@ -101932,8 +101935,7 @@
      "e": "opslag=1",
      "nietGemeten": "bestand,externe-aanroep"
     }
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -103625,7 +103627,9 @@
      409
     ],
     "opslag": {
-     "d": {},
+     "d": {
+      "wacht": "gewijzigd"
+     },
      "e": {}
     },
     "effect": {
@@ -105161,9 +105165,7 @@
    ],
    "hindernis": "Deze naheffing kennen we niet.",
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -106165,7 +106167,7 @@
     404,
     404
    ],
-   "hindernis": "Die regel bestaat niet: proef-8ltnlp",
+   "hindernis": "Die regel bestaat niet: proef-g3cp2m",
    "opslag": {
     "a": {},
     "b": {},
@@ -106201,7 +106203,7 @@
     404,
     404
    ],
-   "hindernis": "Die regel bestaat niet: proef-9bgc4v",
+   "hindernis": "Die regel bestaat niet: proef-mptffu",
    "opslag": {
     "a": {},
     "b": {},
@@ -106454,7 +106456,9 @@
     "a": {
      "zaakCommand": "gewijzigd"
     },
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {
      "zaakCommand": "gewijzigd"
     }
@@ -106480,7 +106484,8 @@
      "e": "opslag=1",
      "nietGemeten": "bestand,externe-aanroep"
     }
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -106602,7 +106607,7 @@
     404,
     404
    ],
-   "hindernis": "Dat runbook bestaat niet: proef-rqq5ac",
+   "hindernis": "Dat runbook bestaat niet: proef-6muq31",
    "opslag": {
     "a": {},
     "b": {},
@@ -107923,9 +107928,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -109153,7 +109156,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -109654,7 +109659,9 @@
    ],
    "hindernis": "Dit is geen kantoorgebouw-partner.",
    "opslag": {
-    "a": {},
+    "a": {
+     "commandAlarmen": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -110671,9 +110678,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -111837,7 +111842,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -113300,9 +113307,7 @@
     ],
     "opslag": {
      "d": {},
-     "e": {
-      "wacht": "gewijzigd"
-     }
+     "e": {}
     },
     "effect": {
      "d": "geen",
@@ -114043,7 +114048,7 @@
    "opslag": {
     "a": {},
     "b": {
-     "commandAlarmen": "gewijzigd"
+     "wacht": "gewijzigd"
     },
     "c": {}
    },
@@ -114065,7 +114070,7 @@
      "nietGemeten": "bestand,externe-aanroep"
     }
    },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in commandAlarmen, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -115616,9 +115621,7 @@
    ],
    "hindernis": "Simulatiebrug niet gevonden.",
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -116179,7 +116182,9 @@
     ],
     "opslag": {
      "d": {},
-     "e": {}
+     "e": {
+      "wacht": "gewijzigd"
+     }
     },
     "effect": {
      "d": "geen",
@@ -118179,9 +118184,7 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
    },
    "zonderSleutel": {
@@ -118201,8 +118204,7 @@
      "e": "geen",
      "nietGemeten": "bestand,externe-aanroep"
     }
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -118363,7 +118365,9 @@
    ],
    "hindernis": "Kies verspil, breuk, eigen of repro.",
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -120451,7 +120455,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -120788,9 +120794,7 @@
     ],
     "opslag": {
      "d": {},
-     "e": {
-      "wacht": "gewijzigd"
-     }
+     "e": {}
     },
     "effect": {
      "d": "geen",
@@ -122832,7 +122836,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -123229,7 +123235,9 @@
      "onboarding": "gewijzigd",
      "directOntvangsten": 1
     },
-    "b": {},
+    "b": {
+     "commandAlarmen": "gewijzigd"
+    },
     "c": {}
    },
    "zonderSleutel": {
@@ -123662,9 +123670,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -124746,7 +124752,9 @@
    "hindernis": "Deze betaalcode is niet (meer) geldig.",
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
    },
    "zonderSleutel": {
@@ -125834,9 +125842,7 @@
     ],
     "opslag": {
      "d": {},
-     "e": {
-      "wacht": "gewijzigd"
-     }
+     "e": {}
     },
     "effect": {
      "d": "geen",
@@ -127187,7 +127193,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -128530,9 +128538,7 @@
      404
     ],
     "opslag": {
-     "d": {
-      "wacht": "gewijzigd"
-     },
+     "d": {},
      "e": {}
     },
     "effect": {
@@ -129205,9 +129211,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "commandAlarmen": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -129362,7 +129366,9 @@
      400
     ],
     "opslag": {
-     "d": {},
+     "d": {
+      "wacht": "gewijzigd"
+     },
      "e": {}
     },
     "effect": {
@@ -130688,9 +130694,7 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
    },
    "zonderSleutel": {
@@ -130710,8 +130714,7 @@
      "e": "geen",
      "nietGemeten": "bestand,externe-aanroep"
     }
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -131424,7 +131427,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -132761,9 +132766,7 @@
     ],
     "opslag": {
      "d": {},
-     "e": {
-      "wacht": "gewijzigd"
-     }
+     "e": {}
     },
     "effect": {
      "d": "geen",
@@ -133798,7 +133801,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -135309,17 +135314,15 @@
     "c": {}
    },
    "zonderSleutel": {
-    "stand": "beschermd",
-    "grond": "opslag",
-    "reden": "de eerste kale oproep veranderde de opslag en de woordelijk gelijke herhaling niet",
+    "stand": "ongemeten",
+    "grond": null,
+    "reden": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien",
     "statussen": [
      200,
      200
     ],
     "opslag": {
-     "d": {
-      "wacht": "gewijzigd"
-     },
+     "d": {},
      "e": {}
     },
     "effect": {
@@ -135995,7 +135998,9 @@
    ],
    "hindernis": "Alleen het ziekenhuis heeft een eerste hulp.",
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -136389,7 +136394,11 @@
    ],
    "hindernis": "Onbekende check.",
    "opslag": {
-    "a": {},
+    "a": {
+     "weefsel": "gewijzigd",
+     "stadNodes": "gewijzigd",
+     "stadMetingen": 35
+    },
     "b": {},
     "c": {}
    },
@@ -136438,7 +136447,9 @@
     ],
     "opslag": {
      "d": {},
-     "e": {}
+     "e": {
+      "commandAlarmen": "gewijzigd"
+     }
     },
     "effect": {
      "d": "geen",
@@ -137583,9 +137594,7 @@
     "a": {
      "wacht": "gewijzigd"
     },
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
    },
    "zonderSleutel": {
@@ -137605,8 +137614,7 @@
      "e": "geen",
      "nietGemeten": "bestand,externe-aanroep"
     }
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -138053,7 +138061,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
    },
    "zonderSleutel": {
@@ -138073,7 +138083,8 @@
      "e": "geen",
      "nietGemeten": "bestand,externe-aanroep"
     }
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -139266,9 +139277,7 @@
     "a": {
      "toestellen": 2
     },
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {
      "toestellen": 1
     }
@@ -139291,8 +139300,7 @@
      "nietGemeten": "bestand,externe-aanroep"
     },
     "laag": "idem-poort (verklaring in idemsleutels.js)"
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -139706,15 +139714,17 @@
     "c": {}
    },
    "zonderSleutel": {
-    "stand": "ongemeten",
-    "grond": null,
-    "reden": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien",
+    "stand": "beschermd",
+    "grond": "opslag",
+    "reden": "de eerste kale oproep veranderde de opslag en de woordelijk gelijke herhaling niet",
     "statussen": [
      200,
      200
     ],
     "opslag": {
-     "d": {},
+     "d": {
+      "wacht": "gewijzigd"
+     },
      "e": {}
     },
     "effect": {
@@ -140952,9 +140962,7 @@
    ],
    "hindernis": "Dit Moment bestaat niet.",
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -141360,7 +141368,9 @@
      404
     ],
     "opslag": {
-     "d": {},
+     "d": {
+      "wacht": "gewijzigd"
+     },
      "e": {}
     },
     "effect": {
@@ -141490,9 +141500,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "commandAlarmen": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -142687,9 +142695,7 @@
     ],
     "opslag": {
      "d": {},
-     "e": {
-      "wacht": "gewijzigd"
-     }
+     "e": {}
     },
     "effect": {
      "d": "geen",
@@ -142970,7 +142976,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -144473,7 +144481,9 @@
     ],
     "opslag": {
      "d": {},
-     "e": {}
+     "e": {
+      "wacht": "gewijzigd"
+     }
     },
     "effect": {
      "d": "geen",
@@ -144545,9 +144555,7 @@
     ],
     "opslag": {
      "d": {},
-     "e": {
-      "wacht": "gewijzigd"
-     }
+     "e": {}
     },
     "effect": {
      "d": "geen",
@@ -146001,7 +146009,9 @@
    "zonderRol": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)",
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
    },
    "zonderSleutel": {
@@ -146021,7 +146031,8 @@
      "e": "geen",
      "nietGemeten": "bestand,externe-aanroep"
     }
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -146295,7 +146306,9 @@
    "zonderRol": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)",
    "hindernis": "Kies een wijziging: lid.uit-dienst, project.stop of werkruimte.sluiten.",
    "opslag": {
-    "a": {},
+    "a": {
+     "commandAlarmen": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -146383,9 +146396,7 @@
     ],
     "opslag": {
      "d": {},
-     "e": {
-      "wacht": "gewijzigd"
-     }
+     "e": {}
     },
     "effect": {
      "d": "geen",
@@ -147721,7 +147732,9 @@
    "zonderRol": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)",
    "hindernis": "Dat project kennen we niet.",
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -148622,9 +148635,7 @@
    "zonderRol": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)",
    "hindernis": "Dat ticket kennen we niet.",
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -149308,18 +149319,20 @@
     "reden": "de eerste kale oproep deed geen werk (status 403)",
     "statussen": [
      403,
-     429
+     403
     ],
     "opslag": {
      "d": {
-      "techniek": "gewijzigd",
       "doosAfketsers": 1
      },
-     "e": {}
+     "e": {
+      "techniek": "gewijzigd",
+      "doosAfketsers": 1
+     }
     },
     "effect": {
-     "d": "opslag=2",
-     "e": "geen",
+     "d": "opslag=1",
+     "e": "opslag=2",
      "nietGemeten": "bestand,externe-aanroep"
     }
    }
@@ -149712,7 +149725,9 @@
    ],
    "zonderRol": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)",
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -150652,9 +150667,7 @@
    ],
    "zonderRol": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)",
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -151263,7 +151276,9 @@
    "zonderRol": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)",
    "hindernis": "Dit profiel bestaat niet meer.",
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -152449,9 +152464,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -153016,7 +153029,7 @@
     ],
     "opslag": {
      "d": {
-      "commandAlarmen": "gewijzigd"
+      "wacht": "gewijzigd"
      },
      "e": {}
     },
@@ -154329,9 +154342,7 @@
    "zonderRol": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)",
    "hindernis": "Dit patroon staat niet (meer) open in deze klas.",
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -154710,15 +154721,17 @@
     "c": {}
    },
    "zonderSleutel": {
-    "stand": "ongemeten",
-    "grond": null,
-    "reden": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien",
+    "stand": "beschermd",
+    "grond": "opslag",
+    "reden": "de eerste kale oproep veranderde de opslag en de woordelijk gelijke herhaling niet",
     "statussen": [
      200,
      200
     ],
     "opslag": {
-     "d": {},
+     "d": {
+      "wacht": "gewijzigd"
+     },
      "e": {}
     },
     "effect": {
@@ -156033,9 +156046,7 @@
     ],
     "opslag": {
      "d": {},
-     "e": {
-      "wacht": "gewijzigd"
-     }
+     "e": {}
     },
     "effect": {
      "d": "geen",
@@ -156340,7 +156351,9 @@
     ],
     "opslag": {
      "d": {},
-     "e": {}
+     "e": {
+      "wacht": "gewijzigd"
+     }
     },
     "effect": {
      "d": "geen",
@@ -156624,7 +156637,8 @@
    "zonderRol": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)",
    "opslag": {
     "a": {
-     "foundation": "gewijzigd"
+     "foundation": "gewijzigd",
+     "commandAlarmen": "gewijzigd"
     },
     "b": {},
     "c": {
@@ -157737,7 +157751,9 @@
      404
     ],
     "opslag": {
-     "d": {},
+     "d": {
+      "wacht": "gewijzigd"
+     },
      "e": {}
     },
     "effect": {
@@ -157811,9 +157827,7 @@
      404
     ],
     "opslag": {
-     "d": {
-      "wacht": "gewijzigd"
-     },
+     "d": {},
      "e": {}
     },
     "effect": {
@@ -159383,7 +159397,9 @@
    "zonderRol": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)",
    "hindernis": "Geef minstens een pad op: van welke klas naar welke klas.",
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -159761,9 +159777,7 @@
     "a": {
      "foundation": "gewijzigd"
     },
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {
      "foundation": "gewijzigd"
     }
@@ -159788,8 +159802,7 @@
      "nietGemeten": "bestand,externe-aanroep"
     },
     "laag": "idem-poort (verklaring in idemsleutels.js)"
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -161179,7 +161192,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -162109,9 +162124,7 @@
    "zonderRol": "lichaamssleutel: gezinsPoort -- de sleutel staat in het lichaam en niet in de kop, dus rollen kruisen meet niets",
    "hindernis": "Dit momentje staat er niet meer.",
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -162867,7 +162880,9 @@
     ],
     "opslag": {
      "d": {},
-     "e": {}
+     "e": {
+      "wacht": "gewijzigd"
+     }
     },
     "effect": {
      "d": "geen",
@@ -164235,17 +164250,15 @@
     "c": {}
    },
    "zonderSleutel": {
-    "stand": "beschermd",
-    "grond": "opslag",
-    "reden": "de eerste kale oproep veranderde de opslag en de woordelijk gelijke herhaling niet",
+    "stand": "ongemeten",
+    "grond": null,
+    "reden": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien",
     "statussen": [
      200,
      200
     ],
     "opslag": {
-     "d": {
-      "wacht": "gewijzigd"
-     },
+     "d": {},
      "e": {}
     },
     "effect": {
@@ -164729,7 +164742,9 @@
      404
     ],
     "opslag": {
-     "d": {},
+     "d": {
+      "wacht": "gewijzigd"
+     },
      "e": {}
     },
     "effect": {
@@ -164753,9 +164768,7 @@
    "zonderRol": "lichaamssleutel: gezinsPoort -- de sleutel staat in het lichaam en niet in de kop, dus rollen kruisen meet niets",
    "hindernis": "Wat bent u voor elkaar? Kies uit: ouder, kind, partner, familie, mentor, leerkracht, vertrouwenspersoon.",
    "opslag": {
-    "a": {
-     "commandAlarmen": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -166247,9 +166260,7 @@
      403
     ],
     "opslag": {
-     "d": {
-      "wacht": "gewijzigd"
-     },
+     "d": {},
      "e": {}
     },
     "effect": {
@@ -166436,7 +166447,9 @@
     ],
     "opslag": {
      "d": {},
-     "e": {}
+     "e": {
+      "wacht": "gewijzigd"
+     }
     },
     "effect": {
      "d": "geen",
@@ -166707,7 +166720,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "commandAlarmen": "gewijzigd"
+    }
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -168146,9 +168161,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -168160,7 +168173,9 @@
     ],
     "opslag": {
      "d": {},
-     "e": {}
+     "e": {
+      "wacht": "gewijzigd"
+     }
     },
     "effect": {
      "d": "geen",
@@ -169783,7 +169798,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -169995,9 +170012,7 @@
     ],
     "opslag": {
      "d": {},
-     "e": {
-      "wacht": "gewijzigd"
-     }
+     "e": {}
     },
     "effect": {
      "d": "opslag=1",
@@ -171265,7 +171280,9 @@
    "viaPas": "boardroom",
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
    },
    "zonderSleutel": {
@@ -171285,7 +171302,8 @@
      "e": "opslag=1",
      "nietGemeten": "bestand,externe-aanroep"
     }
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -171843,9 +171861,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
    "zonderSleutel": {
     "stand": "ongemeten",

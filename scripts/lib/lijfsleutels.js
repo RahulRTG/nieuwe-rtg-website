@@ -46,18 +46,45 @@ const path = require('path');
    ECHT is in plaats van een aantal milliseconden te gokken -- dezelfde les als
    wachtOpBestand() in test/helper.js, en om dezelfde reden: een slaapje is te
    kort op een trage machine en gooit tijd weg op een snelle. */
-async function leesActivatie(datamap, msMax) {
+/* WELKE activatie, en niet de eerste de beste.
+
+   Hier stond `readdirSync` met de eerste treffer die langskwam. Dat is een
+   willekeurige vololgorde, en de outbox bevat meer dan een mail: elke eerdere
+   schoolaanvraag in dezelfde datamap laat er een achter. De bouwer kreeg zo een
+   activatie van een school die al geactiveerd WAS, en de server antwoordde
+   volkomen terecht met "Deze schoolactivatie is ongeldig, gebruikt of
+   verlopen." De familie meldde zich als mislukt, en de 135 routes erachter
+   telden als 'geen proefsleutel' -- terwijl er niets ontbrak behalve de juiste
+   mail.
+
+   De aanroeper weet welke school hij net heeft aangevraagd, dus zoekt hij nu op
+   diens KENMERK (het brin-nummer). Is dat er niet, dan de NIEUWSTE mail: nog
+   steeds een gok, maar een gok die met de tijd meebeweegt in plaats van met de
+   leesvolgorde van een map. */
+async function leesActivatie(datamap, msMax, kenmerk) {
   const outbox = path.join(datamap, 'outbox');
   const tot = Date.now() + (msMax || 8000);
+  const patroon = /#activeren=([A-Z0-9]+\.[a-f0-9]{48})/i;
   while (Date.now() < tot) {
     let namen = [];
     try { namen = fs.readdirSync(outbox); } catch (e) { namen = []; }
-    for (const n of namen) {
+    const bestanden = namen.map((n) => {
+      const vol = path.join(outbox, n);
+      let tijd = 0;
+      try { tijd = fs.statSync(vol).mtimeMs; } catch (e) { tijd = 0; }
+      return { vol, tijd };
+    }).sort((a, b) => b.tijd - a.tijd);          // nieuwste eerst
+    let terugval = null;
+    for (const b of bestanden) {
       let tekst = '';
-      try { tekst = fs.readFileSync(path.join(outbox, n), 'utf8'); } catch (e) { continue; }
-      const m = /#activeren=([A-Z0-9]+\.[a-f0-9]{48})/i.exec(tekst);
-      if (m) return m[1];
+      try { tekst = fs.readFileSync(b.vol, 'utf8'); } catch (e) { continue; }
+      const m = patroon.exec(tekst);
+      if (!m) continue;
+      if (kenmerk && tekst.includes(kenmerk)) return m[1];   // deze school, zeker weten
+      if (!terugval) terugval = m[1];                        // anders de nieuwste
     }
+    if (terugval && !kenmerk) return terugval;
+    if (terugval) return terugval;
     await new Promise(r => setTimeout(r, 40));
   }
   return null;
@@ -146,7 +173,7 @@ const FAMILIES = [
         { id, action: 'goedkeuren' }, tokens.boardroom);
       if (!besluit || !besluit.data || !besluit.data.ok) throw new Error('goedkeuren mislukte: ' + JSON.stringify(besluit && besluit.data).slice(0, 160));
       if (!datamap) throw new Error('geen datamap meegegeven; de activatiesleutel staat op schijf');
-      const geheim = await leesActivatie(datamap);
+      const geheim = await leesActivatie(datamap, 8000, brin);
       if (!geheim) throw new Error('de activatiesleutel was niet uit de datamap te lezen');
       const act = await post('/api/foundation/school/school/activeren', { activatie: geheim }, null);
       const d = act && act.data;

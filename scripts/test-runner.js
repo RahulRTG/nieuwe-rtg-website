@@ -124,8 +124,21 @@ const nodeOpties = (process.env.NODE_OPTIONS ? process.env.NODE_OPTIONS + ' ' : 
    CI toevallig draaide; wie hem met een vlag zou aanzetten, meet nooit.
    Het meegegeven pad wint, zoals bij het routejournaal hierboven. */
 const duurpad = process.env.RTG_TOETSDUUR || path.join(WORTEL, '.toetsduur');
+/* DE HERKOMST VAN DE METING, EEN KEER BEPAALD. Elk toetsproces schrijft hem
+   mee (test/toetsnaam.js), zodat een gewicht later zelf kan zeggen waar het
+   vandaan komt in plaats van dat iemand het moet aannemen. Hier en niet daar,
+   want `git rev-parse` per toetsproces is duizend spawns voor een waarde die
+   voor de hele ronde hetzelfde is. */
+let commitKort = 'onbekend';
+try {
+  commitKort = require('child_process')
+    .execFileSync('git', ['rev-parse', '--short', 'HEAD'], { cwd: WORTEL, encoding: 'utf8' }).trim();
+} catch (e) { /* zonder git ook goed */ }
+const BRON = [process.env.GITHUB_ACTIONS ? 'ci' : 'lokaal', process.version,
+  require('os').cpus().length, commitKort].join('|');
+
 const env = { ...process.env, RTG_ROUTELOG: journaal, RTG_AFBOUW_SLOT_ACTIEF: '1',
-  NODE_OPTIONS: nodeOpties, RTG_TOETSDUUR: duurpad };
+  NODE_OPTIONS: nodeOpties, RTG_TOETSDUUR: duurpad, RTG_TOETSBRON: BRON };
 
 /* HET JOURNAAL LEEGGOOIEN DOET ALLEEN WIE OOK ECHT GAAT DRAAIEN, en die regel
    is duur geleerd. De unlink stond hier onvoorwaardelijk, boven de --toon-poort
@@ -195,8 +208,14 @@ function draai(namen, parallel, metVloer, tijdgrens) {
       '--test-reporter=lcov', '--test-reporter-destination=' + path.join(dekkingMap, naam));
   } else if (reporter) args.push('--test-reporter=' + reporter);
   args.push(...namen.map(n => path.join('test', n)));
+  /* DE MODUS HOORT BIJ DEZE BATCH EN NIET BIJ DE RONDE. Dekking staat per
+     aanroep aan (een vloer, of een lcov-map), dus een ronde kan batches met en
+     zonder dekking bevatten. Wie de modus een ronde-eigenschap maakt, plakt het
+     verkeerde etiket op de helft van de metingen. */
+  const metDekking = !!(dekkingMap || (metVloer && dekkingVloer.length === 3));
   const r = spawnSync(process.execPath, args, {
-    cwd: WORTEL, env, stdio: 'inherit', timeout: 90 * 60 * 1000
+    cwd: WORTEL, stdio: 'inherit', timeout: 90 * 60 * 1000,
+    env: { ...env, RTG_TOETSMODUS: metDekking ? 'dekking' : 'normaal' }
   });
   if (r.error) {
     console.error('[tests] runnerfout:', r.error.message);

@@ -79,12 +79,29 @@ if (mij) process.env.RTG_TOETS = mij;
    veilige kant: ongemeten valt in delen.js terug op de tellingverdeling in
    plaats van op een verzonnen gewicht. En nooit een ronde laten zakken: een
    kapotte schrijfactie is een tekort van de meting, geen fout in de code. */
+/* ---- EN ONDER WELKE OMSTANDIGHEDEN ----
+
+   EEN GETAL ZONDER MODUS IS GEEN GEWICHT. ast-grens.test.js doet 430 seconden
+   zonder dekking en was met dekking na vijfentwintig minuten nog niet klaar --
+   hetzelfde bestand, hetzelfde werk, een ander kostenmodel. Wie die twee onder
+   een noemer schuift, middelt twee werelden tot een getal dat in geen van beide
+   klopt. Dat is exact hoe het een keer is misgegaan: het register was lokaal
+   zonder dekking gemeten, de keten draait op een runner MET dekking, en de
+   verdeler verdeelde daardoor keurig optimaal over de verkeerde kosten (scherf
+   1 deed 1348s tegen 526s voor scherf 4, terwijl de projectie 1,00x zei).
+
+   De modus en de herkomst worden dus MEEGESCHREVEN, en ze komen van de loper --
+   die weet als enige of deze batch met dekking draait. Hier wordt niets
+   afgeleid en niets geraden: staat er geen modus, dan heet hij `onbekend`, en
+   onbekend wordt nooit bij een van de twee opgeteld. */
 if (mij && process.env.RTG_TOETSDUUR) {
   const begonnen = Date.now();
+  const modus = process.env.RTG_TOETSMODUS || 'onbekend';
+  const bron = process.env.RTG_TOETSBRON || 'onbekend';
   process.on('exit', () => {
     try {
       require('fs').appendFileSync(process.env.RTG_TOETSDUUR,
-        mij + '\t' + (Date.now() - begonnen) + '\n');
+        mij + '\t' + (Date.now() - begonnen) + '\t' + modus + '\t' + bron + '\n');
     } catch (e) { /* een meting mag nooit een toets omgooien */ }
   });
 }

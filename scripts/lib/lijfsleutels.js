@@ -478,13 +478,22 @@ const FAMILIES = [
     async bouw({ post, tokens }) {
       if (!tokens || !tokens.eigenaar) return null;
       const eig = tokens.eigenaar;
-      const begin = await post('/api/mijn/tweefactor/begin', {}, eig);
+      /* HET WACHTWOORD MOET MEE, en dat is geen formaliteit: dit antwoord draagt
+         het GEHEIM zelf. Wie een open sessie kaapt zou anders een eigen tweede
+         factor kunnen aanzetten en de rechtmatige houder buitensluiten -- de
+         route zegt dat met zoveel woorden (routes/member/tweefactor.js). */
+      const begin = await post('/api/mijn/tweefactor/begin', { huidig: OWNER_PASS }, eig);
       const geheim = begin && begin.data && begin.data.geheim;
       if (!geheim) {
-        /* Staat hij al aan van een eerdere ronde? Dan is er geen nieuw geheim en
-           ook geen nieuwe herstelcode: deze opstelling kan hem niet bouwen, en
-           dat is een eerlijke null en geen fout. */
-        return null;
+        /* 409 = hij staat al aan van een eerdere ronde in dezelfde datamap. Dan
+           is er geen nieuw geheim en ook geen nieuwe herstelcode: deze opstelling
+           kan hem niet bouwen, en dat is een eerlijke null. Alles anders ging
+           wel degelijk stuk en hoort als fout zichtbaar te zijn -- zonder dat
+           onderscheid zoekt de volgende lezer naar een sleutel terwijl er een
+           wachtwoord ontbrak. */
+        if (begin && begin.status === 409) return null;
+        throw new Error('tweefactor/begin gaf geen geheim (status ' + (begin && begin.status) + '): ' +
+          JSON.stringify(begin && begin.data).slice(0, 160));
       }
       const { totpCode } = require('../../server/kern/totp');
       const bev = await post('/api/mijn/tweefactor/bevestig', { code: totpCode(geheim) }, eig);

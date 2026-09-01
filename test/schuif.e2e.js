@@ -80,7 +80,15 @@ test('geen enkel Foundation-scherm schuift zijwaarts op een telefoon', { skip: !
     for (const naam of foundationSchermen()) {
       const page = await ctx.newPage();
       try {
-        await page.goto(base + '/apps/foundation/' + naam + '.html', { waitUntil: 'networkidle', timeout: 25000 });
+        /* NIET `networkidle`. Een scherm met een levende verbinding haalt die
+           stand nooit: contact.html opent een EventSource (`GezinRT.init`), en
+           die hoort open te blijven staan. Deze toets liep daar 25 seconden op
+           stuk en meldde een time-out over een pagina die allang klaar was --
+           een verzonnen storing over een scherm dat het goed doet. De rust
+           waar het hier om gaat is die van de DOM en niet die van het netwerk,
+           en die meet `wachtOpRust` hieronder al. Elk scherm dat er morgen een
+           kanaal bij krijgt, valt met `load` vanzelf goed. */
+        await page.goto(base + '/apps/foundation/' + naam + '.html', { waitUntil: 'load', timeout: 25000 });
         await wachtOpRust(page);
         const uitslag = await page.evaluate(() => {
           const cw = document.documentElement.clientWidth;

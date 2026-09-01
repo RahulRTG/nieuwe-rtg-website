@@ -217,6 +217,27 @@ deel. Die marge is met opzet een **telling en geen tijd**: als de gewichten
 verdacht zijn, is het enige dat je nog zeker weet hoeveel bestanden er zijn. De
 schade van een fout gewicht is daarmee begrensd in plaats van onbeperkt.
 
+### Wanneer een gewicht zonder modus mag verdwijnen
+
+`onbekend` is de bak voor metingen van vóór de modi: echt gemeten, maar niemand
+weet meer onder welke omstandigheden. Hij is nuttig zolang hij de enige is die
+een bestand kent — de terugval leunt erop — en hij hoort niet eeuwig te groeien
+naast modi die datzelfde bestand wél gelabeld kennen.
+
+De regel is bewust streng: **een gewicht gaat pas weg als élke gedeclareerde
+modus dat bestand kent.** Dan bestaat er voor elke vraag een gelabeld antwoord
+en kan `onbekend` per definitie niet meer nodig zijn.
+
+Waarom niet soepeler — "weg zodra `dekking` het kent"? Omdat niemand weet wát
+`onbekend` heeft gemeten. Voor een ronde zonder dekking is een onbekende meting
+waarschijnlijk een betere schatting dan een dekkingsmeting, die er drie keer
+naast kan zitten. Een gewicht weggooien op grond van een aanname over zijn
+herkomst is precies de fout die dit register wegneemt.
+
+Hij ruimt dus vanzelf op zodra beide modi vol zijn, en tot die tijd doet hij
+niets. **Een opruiming die iemand op het juiste moment moet aanzetten is geen
+opruiming** — dat is hoe het register maandenlang lokaal bleef.
+
 ### Appels met peren, ook binnen een modus
 
 De modi voorkomen dat een dekkingsmeting en een gewone meting op een hoop

@@ -1,8 +1,8 @@
 {
  "stempel": {
-  "op": "2026-09-01T13:05:53.257Z",
-  "commit": "b2212be57",
-  "boomVuil": false,
+  "op": "2026-09-01T17:47:06.002Z",
+  "commit": "ead5e2039",
+  "boomVuil": true,
   "boomAnders": 0,
   "instrument": "scripts/test-runner.js",
   "node": "v22.22.2"

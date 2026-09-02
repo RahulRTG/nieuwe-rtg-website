@@ -46,7 +46,10 @@
   .rijkop{display:flex;align-items:baseline;gap:0.6rem;flex-wrap:wrap;}
   .rijkop .naam{font-family:'Bodoni Moda',serif;font-size:1.05rem;flex:1;}
   .vlag{font-size:0.62rem;letter-spacing:0.13em;text-transform:uppercase;white-space:nowrap;}
-  .vlag.ja{color:var(--gold);}
+  /* De leestoon en niet het accent: --gold is een vulkleur en las als label
+     2,8:1 op parelmoer (champagne) en 3,4:1 op fluweel (bordeaux); de a11y-
+     themaronde vond het. --rtg-leesgoud is per thema de goudtoon die LEEST. */
+  .vlag.ja{color:var(--rtg-leesgoud,var(--gold));}
   .vlag.nee{color:var(--soft);}
   /* Onbekend krijgt zijn eigen gezicht en niet dat van "nee". Dat verschil IS
      het punt van deze kaart. */

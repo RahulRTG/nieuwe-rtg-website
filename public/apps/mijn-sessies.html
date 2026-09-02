@@ -37,7 +37,9 @@
   .sessie.hier{border-left:3px solid var(--gold);}
   .sessiekop{display:flex;align-items:baseline;gap:0.6rem;flex-wrap:wrap;}
   .sessiekop .titel{font-family:'Bodoni Moda',serif;font-size:1.05rem;}
-  .hierlabel{font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);}
+  /* Leestoon, geen accent: --gold las als label 2,8:1 op parelmoer en 3,4:1 op
+     fluweel (a11y-themaronde). --rtg-leesgoud is per thema de goudtoon die leest. */
+  .hierlabel{font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   .kenmerk{font-size:0.62rem;letter-spacing:0.18em;color:var(--soft);
     font-variant-numeric:tabular-nums;}
   /* DE SAMENVATTING draagt het gewicht van de kaart. De zes bewijsregels

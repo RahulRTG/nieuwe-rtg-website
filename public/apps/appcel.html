@@ -23,7 +23,10 @@
     padding:calc(env(safe-area-inset-top) + .8rem) 1.1rem .7rem;display:flex;align-items:center;gap:.6rem;}
   header > .knop{flex:0 0 auto;}
   header .wie{min-width:0;flex:1 1 auto;}
-  header .ey{font-size:.6rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  /* Leestoon, geen accent: het eigen --gold (#A98F1C) las 2,8:1 op parelmoer
+     zodra een lid champagne koos (a11y-themaronde). --rtg-leesgoud is per thema
+     de goudtoon die leest; buiten een thema valt hij terug op het eigen goud. */
+  header .ey{font-size:.6rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   header h1{font-size:1.1rem;margin-top:.1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   header .van{font-size:.72rem;color:var(--soft);margin-top:.1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   /* Op telefoonformaat is "Wat mag deze app?" te lang naast een naam die zelf
@@ -71,7 +74,7 @@
     flex-direction:column;align-items:center;justify-content:center;gap:.5rem;
     transition:opacity .45s ease;}
   .opening[data-weg="1"]{opacity:0;pointer-events:none;}
-  .opening .ey{font-size:.6rem;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);}
+  .opening .ey{font-size:.6rem;letter-spacing:.28em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   .opening h2{font-size:1.35rem;}
   .opening .id{font-size:.7rem;letter-spacing:.22em;text-transform:uppercase;color:var(--soft);}
   .opening .streep{width:0;height:1px;background:var(--gold);margin-top:.6rem;
@@ -89,7 +92,7 @@
     overflow:auto;padding:1.2rem;display:none;}
   .over[data-open="1"]{display:block;}
   .over .binnen{max-width:520px;margin:0 auto;}
-  .over .ey{font-size:.6rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  .over .ey{font-size:.6rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   .over h2{font-size:1.25rem;margin:.15rem 0 .5rem;}
   .over .sub{font-size:.82rem;color:var(--soft);line-height:1.6;margin-bottom:.9rem;}
   .over .veldrij{display:flex;justify-content:space-between;gap:.8rem;border-top:1px solid var(--line);

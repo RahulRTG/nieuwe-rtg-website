@@ -133,11 +133,27 @@ test('Bestellen: zoeken vindt het gerecht, alcohol krijgt geen plusknop, en een 
       const ontdekt = page.waitForResponse((r) => r.url().endsWith('/api/gast/eten/ontdekken'), { timeout: 20000 });
       await page.locator('[data-ingang="ontdekken"]').click();
       assert.equal((await ontdekt).status(), 200);
-      await page.waitForSelector('#zaken .zaakknop[data-zaak="PONTO"]', { state: 'visible', timeout: 15000 });
+      /* WACHTEN TOT DE LIJST KLAAR IS, NIET TOT DE KNOP ER EVEN STAAT.
+         laadResultaten() zet #zaken eerst op skeletten en vult hem pas in de
+         .then(), dus het antwoord van /ontdekken is er voor de lijst getekend
+         is. De skelet-eis maakt van "de knop staat er" een "de lijst is af".
+
+         Dit dekt het GEVOLG af; de oorzaak lag in het scherm en is daar
+         gerepareerd. Het zoekveld zette een debounce van 280 ms klaar die na
+         de klik op Ontdekken alsnog afliep, INGANG terugzette op 'zoeken' en
+         het ontdek-antwoord met het oude zoekwoord filterde -- gemeten in een
+         gezakte ronde: knoppen ["KIKUNOI"], groepsknoppen verborgen, #zoek nog
+         "Gazpacho de sandia". bestellen.html wist die timer nu en negeert een
+         antwoord dat niet meer bij de laatste lading hoort. */
+      await page.waitForFunction(() => !document.querySelector('#zaken .skelet') &&
+        !!document.querySelector('#zaken .zaakknop[data-zaak="PONTO"]'), null, { timeout: 15000 });
       const kaart2 = page.waitForResponse((r) => r.url().endsWith('/api/gast/bezorg/kaart'), { timeout: 20000 });
       await page.locator('#zaken .zaakknop[data-zaak="PONTO"]').click();
       assert.equal((await kaart2).status(), 200);
-      await page.waitForSelector('#kaartLijst [data-plus="' + gewoonB.id + '"]', { state: 'visible', timeout: 15000 });
+      /* Zelfde reden als hierboven: laadKaart() zet ook #kaartLijst eerst op
+         skeletten, dus de kaart is er voordat de rijen er zijn. */
+      await page.waitForFunction((id) => !document.querySelector('#kaartLijst .skelet') &&
+        !!document.querySelector('#kaartLijst [data-plus="' + id + '"]'), gewoonB.id, { timeout: 15000 });
       await page.locator('#kaartLijst [data-plus="' + gewoonB.id + '"]').click();
       await page.waitForFunction(() => /bij 2 loketten/.test(document.querySelector('#mandTekst').textContent),
         null, { timeout: 10000 });

@@ -43,8 +43,11 @@ const path = require('path');
 const WORTEL = path.join(__dirname, '..');
 const REGISTER = path.join(WORTEL, 'TOETSDUUR.json');
 
+/* Per MODUS een eigen verzameling. Een waarneming zonder modus heet `onbekend`
+   en komt nooit bij een van de twee terecht -- zie de kop van test/toetsnaam.js:
+   dat samenvoegen is precies de fout die dit register moest oplossen. */
 function lees(paden) {
-  const per = new Map();
+  const perModus = new Map();
   let regels = 0, verminkt = 0;
   for (const p of paden) {
     let tekst = '';
@@ -52,22 +55,34 @@ function lees(paden) {
     for (const regel of tekst.split('\n')) {
       if (!regel.trim()) continue;
       regels++;
-      const [naam, ms] = regel.split('\t');
+      const [naam, ms, modus, bron] = regel.split('\t');
       const n = Number(ms);
       /* Een half geschreven regel (twee processen tegelijk) telt niet mee en
          laat het bestand dus ongemeten -- de veilige kant. */
       if (!naam || !/\.(test|e2e)\.js$/.test(naam) || !Number.isFinite(n) || n < 0) { verminkt++; continue; }
+      const m = modus || 'onbekend';
+      if (!perModus.has(m)) perModus.set(m, new Map());
+      const per = perModus.get(m);
       if (!per.has(naam)) per.set(naam, []);
-      per.get(naam).push(Math.round(n));
+      per.get(naam).push({ ms: Math.round(n), bron: bron || 'onbekend' });
     }
   }
-  return { per, regels, verminkt };
+  return { perModus, regels, verminkt };
 }
 
 const mediaan = (xs) => {
   const s = [...xs].sort((a, b) => a - b);
   const m = s.length >> 1;
   return s.length % 2 ? s[m] : Math.round((s[m - 1] + s[m]) / 2);
+};
+
+/* De p90 staat erbij en wordt NIET als gewicht gebruikt. Hij zegt iets anders
+   dan de mediaan: hoe erg het kan uitpakken. Een bestand met mediaan 20s en
+   p90 200s is geen bestand van 20s -- wie dat verschil niet ziet, plant een
+   scherf die een op de tien rondes uitloopt zonder dat iemand weet waarom. */
+const p90 = (xs) => {
+  const s = [...xs].sort((a, b) => a - b);
+  return s[Math.min(s.length - 1, Math.ceil(s.length * 0.9) - 1)];
 };
 
 /* De bestanden die er NU zijn. Een register dat namen bewaart van toetsen die
@@ -79,43 +94,7 @@ function opSchijf() {
     .filter((n) => /\.(test|e2e)\.js$/.test(n)));
 }
 
-function bouw(paden, bestaand) {
-  const { per, regels, verminkt } = lees(paden);
-  const bestaat = opSchijf();
-
-  /* Wat er al in het register stond blijft staan zolang het bestand bestaat:
-     een ronde die maar een KWART van de suite draaide (een scherf) mag de
-     andere drie kwarten niet uit het register vegen. */
-  const duur = {};
-  const spreiding = {};
-  for (const [naam, waarde] of Object.entries((bestaand || {}).duur || {})) {
-    if (bestaat.has(naam)) duur[naam] = waarde;
-  }
-  for (const [naam, waarde] of Object.entries((bestaand || {}).spreiding || {})) {
-    if (bestaat.has(naam)) spreiding[naam] = waarde;
-  }
-
-  let vers = 0;
-  for (const [naam, waarnemingen] of per) {
-    if (!bestaat.has(naam)) continue;
-    duur[naam] = mediaan(waarnemingen);
-    spreiding[naam] = { n: waarnemingen.length,
-      min: Math.min(...waarnemingen), max: Math.max(...waarnemingen) };
-    vers++;
-  }
-
-  const namen = Object.keys(duur).sort();
-  const gesorteerd = {};
-  for (const n of namen) gesorteerd[n] = duur[n];
-  const gesorteerdeSpreiding = {};
-  for (const n of namen) if (spreiding[n]) gesorteerdeSpreiding[n] = spreiding[n];
-
-  /* DE HERKOMST HOORT ERBIJ, en niet als sfeer. Een meting van een CI-runner en
-     een van een ontwikkelmachine geven andere absolute getallen; voor de
-     verdeling maakt dat niets uit (die weegt verhoudingen) maar voor wie het
-     bestand leest wel. Zonder stempel zou iemand deze seconden voor
-     runnertijden aanzien en zich afvragen waarom zijn scherf anders loopt.
-     Zelfde vorm als KETENS.json en de andere registers hier. */
+function stempelNu() {
   const stempel = {
     op: new Date().toISOString(),
     waar: process.env.GITHUB_ACTIONS ? 'ci' : 'lokaal',
@@ -126,24 +105,141 @@ function bouw(paden, bestaand) {
     stempel.commit = require('child_process')
       .execFileSync('git', ['rev-parse', '--short', 'HEAD'], { cwd: WORTEL, encoding: 'utf8' }).trim();
   } catch (e) { /* zonder git ook goed */ }
+  return stempel;
+}
+
+/* Een bron is de omgeving waarin EEN waarneming is gedaan, zoals de loper hem
+   meeschreef: `waar|node|kernen|commit`. Hij staat een keer in een tabel en de
+   bestanden verwijzen ernaar -- veertienhonderd keer dezelfde runnerregel
+   uitschrijven maakt het register vier keer zo groot zonder er iets aan toe te
+   voegen. */
+function ontleedBron(tekst) {
+  const [waar, node, kernen, commit] = String(tekst || '').split('|');
+  if (!waar || waar === 'onbekend') return { waar: 'onbekend' };
+  return { waar, node: node || null, kernen: Number(kernen) || null, commit: commit || null };
+}
+
+function bouwModus(per, bestaand, bestaat) {
+  const duur = {}, spreiding = {};
+  /* Wat er al stond blijft staan zolang het bestand bestaat: een ronde die maar
+     een KWART van de suite draaide (een scherf) mag de andere drie kwarten niet
+     uit het register vegen. */
+  for (const [naam, waarde] of Object.entries((bestaand || {}).duur || {})) {
+    if (bestaat.has(naam)) duur[naam] = waarde;
+  }
+  for (const [naam, waarde] of Object.entries((bestaand || {}).spreiding || {})) {
+    if (bestaat.has(naam)) spreiding[naam] = waarde;
+  }
+  const bronnen = Object.assign({}, (bestaand || {}).bronnen || {});
+
+  let vers = 0;
+  for (const [naam, waarnemingen] of (per || new Map())) {
+    if (!bestaat.has(naam)) continue;
+    const ms = waarnemingen.map((w) => w.ms);
+    duur[naam] = mediaan(ms);
+    const gezien = [...new Set(waarnemingen.map((w) => w.bron))].sort();
+    for (const b of gezien) if (!bronnen[b]) bronnen[b] = ontleedBron(b);
+    spreiding[naam] = { n: ms.length, min: Math.min(...ms), max: Math.max(...ms),
+      p90: p90(ms), bronnen: gezien, gemetenOp: new Date().toISOString().slice(0, 10) };
+    vers++;
+  }
+
+  const namen = Object.keys(duur).sort();
+  const g = {}, gs = {};
+  for (const n of namen) { g[n] = duur[n]; if (spreiding[n]) gs[n] = spreiding[n]; }
+  /* Alleen bronnen die nog ergens naar verwezen worden. */
+  const inGebruik = new Set();
+  for (const n of namen) for (const b of ((gs[n] || {}).bronnen || [])) inGebruik.add(b);
+  const bg = {};
+  for (const b of [...inGebruik].sort()) bg[b] = bronnen[b] || ontleedBron(b);
 
   return {
-    stempel,
-    uitleg: 'Hoe lang elk toetsbestand erover deed, als gewicht voor de ' +
-      'scherfverdeling in scripts/lib/delen.js. Mediaan over alle waarnemingen. ' +
-      'Een bestand dat hier NIET in staat is ongemeten en wordt om en om verdeeld ' +
-      '-- nooit overgeslagen.',
-    hoe: 'npm test (schrijft .toetsduur), daarna: node scripts/toetsduur.js --schrijf',
+    stempel: vers ? stempelNu() : ((bestaand || {}).stempel || null),
     gemeten: {
       bestanden: namen.length,
-      opSchijf: bestaat.size,
       ongemeten: bestaat.size - namen.length,
       verseWaarnemingen: vers,
-      regels, verminkt,
-      totaalMs: namen.reduce((s, n) => s + duur[n], 0)
+      totaalMs: namen.reduce((s2, n) => s2 + g[n], 0)
     },
-    duur: gesorteerd,
-    spreiding: gesorteerdeSpreiding
+    bronnen: bg,
+    duur: g,
+    spreiding: gs
+  };
+}
+
+/* WANNEER MAG EEN GEWICHT ZONDER MODUS WEG?
+
+   `onbekend` is de bak voor metingen van voor de modi: echt gemeten, maar
+   niemand weet meer onder welke omstandigheden. Zolang hij de enige is die een
+   bestand kent, is hij nuttig -- de terugval leunt erop. Hij hoort alleen niet
+   eeuwig te blijven groeien naast modi die hetzelfde bestand wel gelabeld
+   kennen.
+
+   DE REGEL IS BEWUST STRENG: een gewicht gaat pas weg als ELKE gedeclareerde
+   modus dat bestand kent. Dan bestaat er voor elke vraag een gelabeld antwoord
+   en kan `onbekend` per definitie niet meer nodig zijn.
+
+   Waarom niet soepeler -- bijvoorbeeld "weg zodra `dekking` het kent"? Omdat we
+   niet weten WAT `onbekend` heeft gemeten. Voor een ronde zonder dekking is een
+   onbekende meting waarschijnlijk een betere schatting dan een dekkingsmeting,
+   die er drie keer naast kan zitten. Een gewicht weggooien op grond van een
+   aanname over zijn herkomst is precies de fout die dit register wegneemt.
+
+   Hij ruimt dus vanzelf op zodra beide modi vol zijn, en tot die tijd doet hij
+   niets. Een opruiming die iemand op het juiste moment moet aanzetten, is geen
+   opruiming -- dat is hoe het register maandenlang lokaal bleef. */
+function ruimOnbekendOp(modi) {
+  const O = modi.onbekend;
+  if (!O) return null;
+  const gedeclareerd = ['normaal', 'dekking'].filter((m) => modi[m]);
+  if (!gedeclareerd.length) return { weg: 0, over: Object.keys(O.duur).length };
+
+  const overbodig = Object.keys(O.duur)
+    .filter((n) => gedeclareerd.every((m) => modi[m].duur[n] !== undefined));
+  if (gedeclareerd.length < 2) return { weg: 0, over: Object.keys(O.duur).length,
+    wacht: 'nog niet elke modus is gemeten' };
+
+  for (const n of overbodig) { delete O.duur[n]; delete O.spreiding[n]; }
+  const over = Object.keys(O.duur).length;
+  if (!over) delete modi.onbekend;
+  else {
+    O.gemeten.bestanden = over;
+    O.gemeten.totaalMs = Object.values(O.duur).reduce((a, b) => a + b, 0);
+  }
+  return { weg: overbodig.length, over };
+}
+
+function bouw(paden, bestaand) {
+  const { perModus, regels, verminkt } = lees(paden);
+  const bestaat = opSchijf();
+
+  /* Versie 1 kende geen modi en droeg zijn duur in de top. Die metingen zijn
+     echt, maar van WELKE modus weet niemand meer -- ze verhuizen dus naar
+     `onbekend` en niet naar een van de twee. Een gok hier is precies de fout
+     die dit formaat moest wegnemen. */
+  const oudeModi = (bestaand && bestaand.modi) ? bestaand.modi
+    : (bestaand && bestaand.duur ? { onbekend: { duur: bestaand.duur, spreiding: bestaand.spreiding,
+        stempel: bestaand.stempel } } : {});
+
+  const namen = [...new Set([...Object.keys(oudeModi), ...perModus.keys()])].sort();
+  const modi = {};
+  for (const m of namen) {
+    const uit = bouwModus(perModus.get(m), oudeModi[m], bestaat);
+    if (uit.gemeten.bestanden) modi[m] = uit;
+  }
+  const opgeruimd = ruimOnbekendOp(modi);
+
+  return {
+    versie: 2,
+    uitleg: 'Hoe lang elk toetsbestand erover deed, als gewicht voor de ' +
+      'scherfverdeling in scripts/lib/delen.js. PER MODUS, want met dekking aan ' +
+      'is dezelfde toets een ander kostenmodel -- niet een uitschieter. Mediaan ' +
+      'over alle waarnemingen; de p90 staat erbij en weegt niet mee. Een bestand ' +
+      'dat hier NIET in staat is ongemeten en wordt om en om verdeeld -- nooit ' +
+      'overgeslagen.',
+    hoe: 'npm test (schrijft .toetsduur), daarna: node scripts/toetsduur.js --schrijf',
+    gelezen: { regels, verminkt, opSchijf: bestaat.size, modi: namen, opgeruimd },
+    modi
   };
 }
 
@@ -156,10 +252,15 @@ function bouw(paden, bestaand) {
    (--zonder-ijkingen); die krijgen elk een eigen job. Zonder die twee filters
    telde meterijk.test.js hier mee met 864 seconden -- veertien minuten die in
    geen enkele scherf zitten, en dus een verdeling die nergens over gaat. */
-function toonVerdeling(uit, totaal) {
+function toonVerdeling(modus, totaal) {
   const { indeling, zetDuren } = require('./lib/delen');
   const { isGeisoleerd } = require('./lib/geisoleerd');
-  zetDuren(uit.duur);
+  const uit = modus;
+  /* MET HETZELFDE VERTROUWEN ALS DE KETEN, anders toont deze afdruk een
+     verdeling die niemand draait. `onbekend` is voor de planner een ANDERE
+     modus en krijgt dus de marge; wie dat hier weglaat, laat een register er
+     beter uitzien dan het is. */
+  zetDuren(uit.duur, uit.naam === 'onbekend' ? 'twijfelachtig' : 'geldig');
   try {
     const alle = [...opSchijf()].filter((n) => n.endsWith('.test.js'))
       .filter((n) => !isGeisoleerd(n)).sort();
@@ -196,17 +297,27 @@ function main() {
   }
 
   const uit = bouw(aanwezig, bestaand);
-  const g = uit.gemeten;
-  console.log('\nTOETSDUUR  (' + g.regels + ' waarnemingen uit ' + aanwezig.length + ' meting(en))\n');
-  console.log('  toetsbestanden op schijf ' + String(g.opSchijf).padStart(5));
-  console.log('  met een gewicht          ' + String(g.bestanden).padStart(5));
-  console.log('  ongemeten                ' + String(g.ongemeten).padStart(5) +
-    (g.ongemeten ? '   -> om en om verdeeld, nooit overgeslagen' : ''));
-  if (g.verminkt) console.log('  verminkte regels         ' + String(g.verminkt).padStart(5) +
+  const gl = uit.gelezen;
+  console.log('\nTOETSDUUR  (' + gl.regels + ' waarnemingen uit ' + aanwezig.length + ' meting(en))\n');
+  console.log('  toetsbestanden op schijf ' + String(gl.opSchijf).padStart(5));
+  if (gl.verminkt) console.log('  verminkte regels         ' + String(gl.verminkt).padStart(5) +
     '   -> die bestanden blijven ongemeten');
-  console.log('  samen                    ' + (g.totaalMs / 1000).toFixed(0).padStart(5) + 's');
 
-  toonVerdeling(uit, 4);
+  const namen = Object.keys(uit.modi);
+  if (!namen.length) console.log('\n  Geen enkele modus heeft een gewicht.');
+  for (const m of namen) {
+    const M = uit.modi[m];
+    const st = M.stempel || {};
+    console.log('\n  ---- modus ' + m + (m === 'onbekend'
+      ? '   (uit een register van voor de modi -- telt als een ANDERE modus)' : ''));
+    console.log('    met een gewicht        ' + String(M.gemeten.bestanden).padStart(5));
+    console.log('    ongemeten              ' + String(M.gemeten.ongemeten).padStart(5) +
+      (M.gemeten.ongemeten ? '   -> om en om verdeeld, nooit overgeslagen' : ''));
+    console.log('    samen                  ' + (M.gemeten.totaalMs / 1000).toFixed(0).padStart(5) + 's');
+    console.log('    gemeten                ' + (st.waar || '?') + ' / ' + (st.node || '?') +
+      ' / ' + (st.kernen || '?') + ' kernen' + (st.commit ? ' / ' + st.commit : ''));
+    toonVerdeling(Object.assign({ naam: m }, M), 4);
+  }
 
   if (process.argv.includes('--schrijf')) {
     fs.writeFileSync(REGISTER, JSON.stringify(uit, null, 1) + '\n');
@@ -218,4 +329,4 @@ function main() {
 }
 
 if (require.main === module) process.exit(main());
-module.exports = { lees, bouw, mediaan, REGISTER };
+module.exports = { lees, bouw, mediaan, p90, ontleedBron, REGISTER };

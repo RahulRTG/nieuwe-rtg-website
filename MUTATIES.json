@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-01T00:01:36.050Z",
-    "commit": "2eca8042",
+    "op": "2026-09-01T14:08:31.277Z",
+    "commit": "51e4aa0a",
     "boomVuil": true,
     "node": "v22.22.2"
   },
@@ -1954,6 +1954,22 @@
       "gezakt": 2,
       "geprobeerd": 3
     },
+    "gewichtdrift.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/gewichtdrift.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "gewichtvoorstel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/gewichtvoorstel.js",
+      "operator": "+->-#1",
+      "gezakt": 2,
+      "geprobeerd": 8
+    },
     "gewoonten.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -3557,6 +3573,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 3,
       "scherp": "gezakt"
+    },
+    "meetbron.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/meetbron.js",
+      "operator": "return-weg#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "memo.test.js": {
       "soort": "server",
@@ -6618,6 +6642,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 6,
       "scherp": "gezakt"
+    },
+    "toetsduur-opruim.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/toetsduur.js",
+      "operator": "!==->===#0",
+      "gezakt": 2,
+      "geprobeerd": 2
     },
     "training.test.js": {
       "soort": "server",

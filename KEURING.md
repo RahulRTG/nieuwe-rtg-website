@@ -167,6 +167,194 @@ erven, meldde het kind dat `b.js` draaide zich als `a.js` — een hele scherf
 sporen op naam van het verkeerde bestand, en het attributieregister zou dat als
 *gemeten* hebben opgeschreven. `NODE_TEST_CONTEXT` scheidt de drie.
 
+## 3b. Het gewichtregister, en waarom het een driftcontract heeft
+
+Op 1 september 2026 draaide deze keten een verdeling die op haar eigen projectie
+**1,00x** scoorde en in werkelijkheid **1348s tegen 526s** uitliep. Er was niets
+rood, en er was ook niets te zien.
+
+De oorzaak was niet de verdeler. `TOETSDUUR.json` was lokaal gemeten — zonder
+dekking, op vier kernen, node v22 — en de keten draait op runners **mét**
+dekking. De verdeler optimaliseerde correct op een fout kostenmodel, en dat ziet
+er van binnen perfect uit. Het register droeg dat feit gewoon in zijn stempel
+(`waar: lokaal`); niemand las het. **Een signaal dat niemand leest is geen
+signaal.**
+
+Hoe groot dat verschil is, gemeten op het zwaarste bestand: `ast-grens.test.js`
+doet **430s zonder dekking** en was **met dekking na vijfentwintig minuten nog
+niet klaar**. Dat is geen uitschieter maar een ander kostenmodel — en daarmee is
+één universeel gewicht principieel verkeerd. Het register houdt de modi daarom
+apart (`normaal`, `dekking`), en gewichten waarvan de modus niet meer te
+achterhalen is heten `onbekend` en worden nooit bij een van de twee opgeteld.
+
+### De drie maten, en waarom ze niet hetzelfde zeggen
+
+| maat | wat hij zegt |
+|---|---|
+| totale kosten | de suite als geheel duurder — een andere machine schaalt alles mee |
+| max bestand | het ergste losse verschil; dít had `ast-grens` gevangen |
+| **projectiefout** | verdeel met de oude gewichten, weeg met de nieuwe |
+
+Alleen de derde vertaalt drift naar wachttijd. Een register kan er per bestand
+flink naast zitten en toch prima verdelen (als alles meeschaalt), en het kan er
+gemiddeld dichtbij zitten en toch een scherf laten uitlopen (als juist het
+zwaarste bestand verschoof). En hij kijkt naar de **traagste** scherf en niet
+naar het gemiddelde: het gemiddelde van de lasten ís het ideaal, dus die maat
+zou per definitie nul zijn en eeuwig ACTUEEL melden.
+
+### Drie banden, met een gevolg
+
+| status | projectiefout | wat er gebeurt |
+|---|---|---|
+| ACTUEEL | < 10% | melden, verder niets |
+| VEROUDERD | < 25% | CI stelt een nieuw register voor, als PR |
+| ONGELDIG | ≥ 25%, andere modus, of geen meting | de gewogen verdeling is geen bewijs meer |
+
+Dat laatste heeft een gevolg in de code en niet alleen op een scherm.
+`scripts/lib/delen.js` draagt een **vertrouwen**: bij `twijfelachtig` weegt hij
+nog steeds, maar met een marge — geen scherf krijgt meer bestanden dan zijn
+deel. Die marge is met opzet een **telling en geen tijd**: als de gewichten
+verdacht zijn, is het enige dat je nog zeker weet hoeveel bestanden er zijn. De
+schade van een fout gewicht is daarmee begrensd in plaats van onbeperkt.
+
+### Wat een ongemeten bestand kost, en waar de bodem ligt
+
+De eerste ronde op het CI-gemeten kostenmodel (33518796922) leverde
+**1335 / 512 / 516 / 809** seconden. Dat is 13 seconden beter dan de ronde
+ervoor — één procent — en het antwoord is niet dat de verdeler tekortschiet.
+
+**`ast-grens.test.js` is de bodem.** Onder dekking duurt hij 1272s: in zijn
+eentje **14% van al het werk** (9214s), tegen een p99 van 46s. Zolang dat
+bestand in één scherf draait kan geen verdeling onder ~1272s komen. Het
+kritieke pad stond op 1335s — vijf procent boven een harde bodem. De
+scherfverdeling is daarmee vrijwel optimaal.
+
+**En de lege scherven kwamen door de regel voor onbekend.** Twee nieuwe
+toetsbestanden waren ongemeten en kregen elk het *zwaarste bekende* gewicht:
+1272s. Scherf 2 en 3 planden daarmee 2732s en deden er 512s en 516s over — voor
+een kwart gevuld, terwijl het echte werk in de andere twee werd geperst.
+
+Vandaar de maat: **de p99 in plaats van het maximum**. De regel blijft
+"onbekend telt als duur" — de p99 is hoger dan 99 van de 100 bestanden en negen
+keer de mediaan. Wat vervalt is dat een enkele uitschieter bepaalt hóé duur.
+Let op de rekenkunde: bij een kleine verzameling valt de p99 samen met het
+zwaarste bestand, en dat is geen fout maar de definitie.
+
+### De bodem weggehaald: een orakel dat in productiecode woonde
+
+Het kritieke pad stond op 1335s tegen een bodem van 1272s, en die bodem was één
+bestand: `ast-grens.test.js` — onder dekking 14% van al het toetswerk, tegen een
+p99 van 46s. Zonder dekking doet hij **272s**.
+
+Waarom hij toch onder dekking moest, bleek in de bron te staan. `heeftGrens_`,
+de uitputtende variant, stond in `scripts/ast/regels.js` met eigen commentaar:
+
+> hij wordt niet meer aangeroepen — `analyse()` doet hetzelfde in een doorloop —
+> maar hij blijft staan … en de toets vergelijkt de twee
+
+Dat is geen productiecode maar het **orakel** van die toets. En het stond daar
+niet gratis: `regels.js` wordt onder dekking gemeten, dus telden die regels mee
+in de noemer van de vloer, en alleen `ast-grens.test.js` kon ze dekken. Het
+orakel hield zijn eigen toets onder dekking.
+
+Het orakel is verhuisd naar de toets, woord voor woord — een orakel dat je bij
+het verhuizen "even opschoont" is geen orakel meer. Wat dat kostte aan echte
+dekking is gemeten en niet geschat:
+
+| `scripts/ast/regels.js`, zonder ast-grens | regels |
+|---|---|
+| vóór de verhuizing | 279/325 — **85,8%** |
+| ná de verhuizing | 292/302 — **96,7%** |
+
+De noemer is kleiner en de dekking hóger. `parser`, `walk` en `lexer` bleven op
+99–100%, want drie andere toetsen laden diezelfde modules.
+
+Daarna kon de toets uit de scherven: `scripts/lib/zwaar.js` met een eigen job in
+de keten, zonder dekking. Dat is **niet** de isolatielijst — die gaat over
+gedeelde staat, deze over kosten, en twee redenen verdienen twee lijsten. Wat
+een toets daar niet zomaar in mag maken: traag alleen is geen reden. Hij hoort
+er pas als hij aantoonbaar het kritieke pad zet **én** zijn dekking elders al
+gedekt is. Anders verplaats je geen kosten maar dekking.
+
+Vier wachters, want een verplaatste toets verdwijnt stil — hij is niet rood, hij
+is er gewoon niet: de matrix in `ci.yml` moet gelijk zijn aan de lijst, de
+scherven moeten de vlag écht meegeven (anders draait hij dubbel), het beschermde
+eindoordeel moet op de nieuwe job wachten (anders laat een gezakte toets de
+merge door), en de lijst mag geen bestand noemen dat niet bestaat.
+
+### Wanneer een gewicht zonder modus mag verdwijnen
+
+`onbekend` is de bak voor metingen van vóór de modi: echt gemeten, maar niemand
+weet meer onder welke omstandigheden. Hij is nuttig zolang hij de enige is die
+een bestand kent — de terugval leunt erop — en hij hoort niet eeuwig te groeien
+naast modi die datzelfde bestand wél gelabeld kennen.
+
+De regel is bewust streng: **een gewicht gaat pas weg als élke gedeclareerde
+modus dat bestand kent.** Dan bestaat er voor elke vraag een gelabeld antwoord
+en kan `onbekend` per definitie niet meer nodig zijn.
+
+Waarom niet soepeler — "weg zodra `dekking` het kent"? Omdat niemand weet wát
+`onbekend` heeft gemeten. Voor een ronde zonder dekking is een onbekende meting
+waarschijnlijk een betere schatting dan een dekkingsmeting, die er drie keer
+naast kan zitten. Een gewicht weggooien op grond van een aanname over zijn
+herkomst is precies de fout die dit register wegneemt.
+
+Hij ruimt dus vanzelf op zodra beide modi vol zijn, en tot die tijd doet hij
+niets. **Een opruiming die iemand op het juiste moment moet aanzetten is geen
+opruiming** — dat is hoe het register maandenlang lokaal bleef.
+
+### Appels met peren, ook binnen een modus
+
+De modi voorkomen dat een dekkingsmeting en een gewone meting op een hoop
+komen. Er blijft een tweede vorm over, en die zit *binnen* een modus: een
+register bewaart het gewicht van een bestand dat deze ronde niet draaide — met
+opzet, want een scherf mag de andere drie kwarten niet wissen — en zo'n gewicht
+houdt zijn oude bron. Een meting van een andere runner, een andere node, soms
+een andere machine.
+
+Dat staat per bestand vast (`spreiding.bronnen`), maar zolang niemand het optelt
+ziet niemand het. `gewichtdrift.js` telt daarom hoeveel gewichten **niet** van
+de nieuwste bron komen. Op het eerste CI-gemeten register:
+
+| modus | van een andere bron |
+|---|---|
+| `dekking` | 0 van 1259 |
+| `onbekend` | 1257 van 1434 |
+
+Die meter verandert met opzet de **status niet**. Een oude bron is geen bewijs
+dat het gewicht fout is; hij is een reden om het te weten. Wie hier een grens op
+zet, laat een register zakken omdat een toets een ronde niet meedraaide.
+
+En hij neemt de nieuwste bron uit de **jongste meting**, niet uit de grootste
+hoop. Dat is de faalvorm die hem anders nutteloos maakt: bij een register vol
+oude gewichten wint de oude bron op aantal, heet die "de nieuwste", en meldt de
+meter bijna niets vreemds — precies wanneer er het meeste vreemd is.
+
+### CI meet, CI stelt voor, een mens merget
+
+Het register staat in git omdat de verdeling deterministisch hoort te zijn; een
+register dat zichzelf in CI bijwerkt verschuift het kritieke pad zonder dat
+iemand het in de historie ziet. Dat blijft staan. Wat erbij komt is dat het
+voorstel er ook echt kómt: `scripts/gewichtvoorstel.js` opent bij materiële
+drift een PR met de nieuwe meting. Boven de oude stap stond al *"een mens commit
+hem"* — en sinds die stap bestaat heeft niemand dat gedaan. **Een mens doet het
+is geen mechanisme als niemand het onder ogen krijgt.**
+
+Het voorstel schrijft nooit naar main, opent nooit een tweede PR, en laat de
+bouw nooit zakken: een mislukt voorstel is geen kapotte keten.
+
+### Wat hier bewust niet staat
+
+Geen poort op traagheid. Een toets die trager wordt is hier geen fout maar een
+ander gewicht; daarvoor is `NORM.json`. `gewichtdrift.js` zakt alleen als je hem
+dat expliciet vraagt (`--poort`), en dan uitsluitend op ONGELDIG — want dat is
+geen trage toets maar een register dat niet over deze keten gaat.
+
+En de **26% winst** die eerder in deze tak is opgeschreven, is geschrapt. Niet
+omdat de verdeler slecht was, maar omdat de meting geen geldige weergave van de
+uitvoeromgeving was. Wat er over de scherfwinst komt te staan, wordt gemeten op
+echte CI-wall-clock of het staat er niet.
+
 ## 4. Wat er nu staat, en wat nadrukkelijk niet
 
 **Staat.** Het CI-contract met zijn vier regels; de browserinstallatie uit de

@@ -38,6 +38,7 @@ const { spawnSync } = require('child_process');
 const { pak } = require('./afbouw-slot');
 const { ontleedDeel, verdeel } = require('./lib/delen');
 const { IJKINGEN } = require('./lib/ijkingen');
+const { ZWAAR } = require('./lib/zwaar');
 
 const WORTEL = path.join(__dirname, '..');
 /* HET SLOT NIET TWEE KEER PAKKEN. pak() werpt als het bezet is, en dat is
@@ -62,6 +63,17 @@ if (dekkingVloer.length && (dekkingVloer.length !== 3 || dekkingVloer.some(n => 
   console.error('[tests] --dekking wil een map of drie getallen: regels,takken,functies');
   process.exit(2);
 }
+/* DE MODUS STAAT VOOR DE VERDELING, EN NIET ALLEEN VOOR DE METING. Hieronder
+   verdeelt `verdeel()` de scherven op de gewichten uit TOETSDUUR.json, en welke
+   gewichten dat zijn hangt af van de modus waarin DEZE ronde draait. Stond hij
+   alleen in de omgeving van het kindproces, dan meet de loper `dekking` en
+   verdeelt hij op `normaal` -- exact de fout waar deze hele laag voor is
+   gebouwd, een niveau lager en net zo onzichtbaar.
+
+   Draait er ook maar iets met dekking, dan is dat het model waarop de scherven
+   gepland worden: die batches bepalen de looptijd. */
+require('./lib/meetbron').zetModus(!!(dekkingMap || dekkingVloer.length === 3));
+
 const deelVlag = (argv.find(a => a.startsWith('--deel=')) || '').slice(7);
 const deel = (() => {
   if (!deelVlag) return null;
@@ -73,6 +85,10 @@ const deel = (() => {
   return d;
 })();
 const zonderIjkingen = argv.includes('--zonder-ijkingen');
+/* De zware toetsen krijgen in de keten een eigen job ZONDER dekking; met deze
+   vlag laat een scherf ze weg. Lokaal draaien ze gewoon mee -- ze hoeven niet
+   geisoleerd, ze zijn alleen duur. Zie scripts/lib/zwaar.js. */
+const zonderZware = argv.includes('--zonder-zware');
 /* DE SOLO-LIJST WOONT IN scripts/lib/geisoleerd.js. Hij stond hier, en dat was
    bijna goed: hij hoort bij deze loper. Maar dit bestand IS een script -- wie het
    met require() opent om alleen die lijst te lezen, start de hele suite. Dat is
@@ -124,8 +140,11 @@ const nodeOpties = (process.env.NODE_OPTIONS ? process.env.NODE_OPTIONS + ' ' : 
    CI toevallig draaide; wie hem met een vlag zou aanzetten, meet nooit.
    Het meegegeven pad wint, zoals bij het routejournaal hierboven. */
 const duurpad = process.env.RTG_TOETSDUUR || path.join(WORTEL, '.toetsduur');
+/* De herkomst van de meting; een plek, en die is scripts/lib/meetbron.js. */
+const BRON = require('./lib/meetbron').bron();
+
 const env = { ...process.env, RTG_ROUTELOG: journaal, RTG_AFBOUW_SLOT_ACTIEF: '1',
-  NODE_OPTIONS: nodeOpties, RTG_TOETSDUUR: duurpad };
+  NODE_OPTIONS: nodeOpties, RTG_TOETSDUUR: duurpad, RTG_TOETSBRON: BRON };
 
 /* HET JOURNAAL LEEGGOOIEN DOET ALLEEN WIE OOK ECHT GAAT DRAAIEN, en die regel
    is duur geleerd. De unlink stond hier onvoorwaardelijk, boven de --toon-poort
@@ -195,8 +214,14 @@ function draai(namen, parallel, metVloer, tijdgrens) {
       '--test-reporter=lcov', '--test-reporter-destination=' + path.join(dekkingMap, naam));
   } else if (reporter) args.push('--test-reporter=' + reporter);
   args.push(...namen.map(n => path.join('test', n)));
+  /* DE MODUS HOORT BIJ DEZE BATCH EN NIET BIJ DE RONDE. Dekking staat per
+     aanroep aan (een vloer, of een lcov-map), dus een ronde kan batches met en
+     zonder dekking bevatten. Wie de modus een ronde-eigenschap maakt, plakt het
+     verkeerde etiket op de helft van de metingen. */
+  const metDekking = !!(dekkingMap || (metVloer && dekkingVloer.length === 3));
   const r = spawnSync(process.execPath, args, {
-    cwd: WORTEL, env, stdio: 'inherit', timeout: 90 * 60 * 1000
+    cwd: WORTEL, stdio: 'inherit', timeout: 90 * 60 * 1000,
+    env: { ...env, RTG_TOETSMODUS: metDekking ? 'dekking' : 'normaal' }
   });
   if (r.error) {
     console.error('[tests] runnerfout:', r.error.message);
@@ -205,7 +230,8 @@ function draai(namen, parallel, metVloer, tijdgrens) {
   return r.status == null ? 2 : r.status;
 }
 
-const gewoon = verdeel(bestanden.filter(n => !isGeisoleerd(n)), deel);
+const gewoon = verdeel(bestanden.filter(n => !isGeisoleerd(n) &&
+  (!zonderZware || selectie.length || !ZWAAR.includes(n))), deel);
 const geïsoleerd = verdeel(bestanden.filter(n => isGeisoleerd(n) &&
   (!zonderIjkingen || selectie.length || !IJKINGEN.includes(n))), deel);
 
@@ -233,6 +259,7 @@ console.log('[tests] ' + gewoon.length + ' bestanden, maximaal ' + concurrency +
     : (dekkingVloer.length ? ' (met dekkingsvloer ' + dekkingVloer.join('/') + ')' : '')));
 if (deel) console.log('[tests] deel ' + deel.nr + ' van ' + deel.totaal);
 if (zonderIjkingen && !selectie.length) console.log('[tests] zonder de losse ijkingen; die draaien in de CI elk in een eigen job');
+if (zonderZware && !selectie.length) console.log('[tests] zonder de zware toetsen; die draaien in de CI elk in een eigen job, zonder dekking');
 let code = draai(gewoon, concurrency, true);
 for (const naam of geïsoleerd) {
   console.log('[tests] geïsoleerd: ' + naam);

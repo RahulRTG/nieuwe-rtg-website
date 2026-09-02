@@ -84,21 +84,100 @@ function ontleedDeel(waarde) {
    proces een paar keer aangeroepen (gewone bestanden, geisoleerde bestanden) en
    moet dan hetzelfde antwoord geven. */
 let onthouden = null;
+
+/* ---- WELK KOSTENMODEL, EN HOEVEEL IS DAT WAARD? ----
+
+   EEN TOETS HEEFT NIET EEN DUUR MAAR EEN DUUR PER MODUS. Met dekking aan is
+   ast-grens.test.js meer dan drie keer zo duur als zonder; dat is geen ruis
+   maar een ander kostenmodel. Het register houdt ze daarom apart, en hier
+   wordt gevraagd naar de modus waarin DEZE ronde draait -- de loper zet hem,
+   want die weet als enige of er dekking aan staat.
+
+   EN DE UITKOMST DRAAGT EEN VERTROUWEN, want dat is de fout die dit huis een
+   keer heeft gemaakt: een register dat lokaal ZONDER dekking was gemeten voedde
+   een keten die op een runner MET dekking draait. De verdeler deed het goed --
+   1,00x op zijn eigen projectie -- en de werkelijkheid was 1348s tegen 526s.
+   Een verdeling die zich op het verkeerde model baseert ziet er van binnen
+   perfect uit. Daarom kan hij dat hier niet meer stil doen:
+
+     geldig         de gevraagde modus staat in het register -> gewoon wegen
+     twijfelachtig  alleen een ANDERE modus is bekend -> wegen, maar met een
+                    marge: geen scherf krijgt meer bestanden dan zijn deel.
+                    Zit het gewicht ernaast, dan is de schade begrensd.
+     ongeldig       niets bekend -> alles even zwaar, oftewel om en om
+
+   De marge bij `twijfelachtig` is met opzet een TELLING en geen tijd: als de
+   gewichten verdacht zijn, is het enige wat je nog zeker weet hoeveel
+   bestanden er zijn. */
+const MODI = ['normaal', 'dekking'];
+
+function gevraagdeModus() {
+  const m = process.env.RTG_TOETSMODUS;
+  return MODI.includes(m) ? m : 'normaal';
+}
+
 function duren() {
   if (onthouden) return onthouden;
-  try {
-    const reg = JSON.parse(fs.readFileSync(REGISTER, 'utf8'));
-    onthouden = new Map(Object.entries(reg.duur || {}));
-  } catch (e) {
-    onthouden = new Map();   // geen register: alles ongemeten, zie de kop
+  let reg = null;
+  try { reg = JSON.parse(fs.readFileSync(REGISTER, 'utf8')); } catch (e) { reg = null; }
+
+  /* Een register van voor de modi (versie 1) draagt zijn duur in de top. Die
+     metingen zijn ECHT, maar van welke modus weet niemand meer -- dus tellen ze
+     als een andere modus: bruikbaar, niet vertrouwd. */
+  const modi = !reg ? {}
+    : (reg.modi || (reg.duur ? { onbekend: { duur: reg.duur } } : {}));
+
+  const kaarten = {};
+  for (const [naam, m] of Object.entries(modi)) {
+    if (m && m.duur && Object.keys(m.duur).length) kaarten[naam] = new Map(Object.entries(m.duur));
   }
+  onthouden = { kaarten };
   return onthouden;
+}
+
+/* WELKE WEGING GELDT VOOR DEZE LIJST?
+
+   De gevraagde modus wint altijd. Ontbreekt hij, dan kiest de terugval de modus
+   die DEZE BESTANDEN het best kent -- en niet de eerste op naam.
+
+   Dat verschil is geen detail. Toen e2e.js zijn eigen modus (`normaal`) ging
+   declareren, bestond die nog niet in het register en pakte de terugval op
+   naamvolgorde `dekking`: een modus met 1259 unit-bestanden en GEEN ENKEL
+   e2e-bestand. De schermtoetsen waren daarmee in een klap ongewogen, terwijl er
+   een modus naast lag die ze allemaal kende. Een terugval die niet kijkt of hij
+   het onderwerp kent, is geen terugval maar een gok. */
+function wegingVoor(lijst) {
+  if (opgelegd) return opgelegd;
+  const gevraagd = gevraagdeModus();
+  const { kaarten } = duren();
+
+  const eigen = kaarten[gevraagd];
+  if (eigen) return { gewicht: eigen, vertrouwen: 'geldig', modus: gevraagd, gevraagd };
+
+  let beste = null;
+  for (const [naam, kaart] of Object.entries(kaarten)) {
+    const dekt = lijst.reduce((n, b) => n + (kaart.has(b) ? 1 : 0), 0);
+    if (dekt && (!beste || dekt > beste.dekt)) beste = { naam, kaart, dekt };
+  }
+  if (beste) return { gewicht: beste.kaart, vertrouwen: 'twijfelachtig', modus: beste.naam, gevraagd };
+  return { gewicht: new Map(), vertrouwen: 'ongeldig', modus: null, gevraagd };
 }
 
 /* Alleen voor de toetsen: een eigen weging opleggen zonder een bestand op
    schijf te zetten. Met null valt hij terug op het register. */
-function zetDuren(kaart) {
-  onthouden = kaart === null ? null : new Map(Object.entries(kaart));
+let opgelegd = null;
+function zetDuren(kaart, vertrouwen) {
+  opgelegd = kaart === null ? null
+    : { gewicht: new Map(Object.entries(kaart)), vertrouwen: vertrouwen || 'geldig',
+        modus: 'opgelegd', gevraagd: 'opgelegd' };
+  if (kaart === null) onthouden = null;
+}
+
+/* Wat de verdeler op dit moment onder zich heeft. De wachter leest dit, en een
+   scherm dat over de verdeling iets beweert hoort het erbij te zetten. */
+function weging(lijst) {
+  const d = wegingVoor(lijst || []);
+  return { vertrouwen: d.vertrouwen, modus: d.modus, gevraagd: d.gevraagd, bestanden: d.gewicht.size };
 }
 
 /* De volledige indeling: een array van `totaal` lijsten. Deterministisch --
@@ -107,21 +186,63 @@ function zetDuren(kaart) {
 function indeling(lijst, totaal) {
   const bakken = Array.from({ length: totaal }, () => []);
   const last = new Array(totaal).fill(0);
-  const gewicht = duren();
+  const { gewicht, vertrouwen } = wegingVoor(lijst);
 
-  /* Het zwaarste bekende gewicht is wat een ONGEMETEN bestand krijgt. Is er
-     niets bekend, dan is elk bestand even zwaar en valt de greedy samen met de
-     oude om-en-om-verdeling; de waarde zelf doet er dan niet toe. */
-  const bekend = [...gewicht.values()].filter((v) => v > 0);
-  const zwaarste = bekend.length ? Math.max(...bekend) : 1;
-  const kost = (naam) => gewicht.get(naam) || zwaarste;
+  /* De marge uit de kop: bij twijfel mag geen scherf meer dan zijn deel aan
+     BESTANDEN krijgen. Bij `geldig` staat hij uit, want dan zou hij een goede
+     weging tegenwerken -- een terecht zware scherf hoort minder bestanden te
+     hebben, en dat is precies wat de CI-meting liet zien (258 tegen 331). */
+  const plafond = vertrouwen === 'twijfelachtig'
+    ? Math.ceil(lijst.length / totaal) : Infinity;
+
+  /* WAT KOST EEN BESTAND DAT NIEMAND HEEFT GEMETEN?
+
+     Duur, en dat blijft zo: onzekerheid mag nooit snelheid afdwingen. Een nieuw
+     toetsbestand mag nooit uit de verdeling vallen en ook nooit als goedkoop
+     worden ingeboekt -- nul of het gemiddelde gokken laat de keten sneller
+     lijken dan hij is, en die gok kost een scherf die als laatste nog een half
+     uur bezig is.
+
+     MAAR NIET HET ZWAARSTE. Hier stond `Math.max`, en dat is geen maat maar een
+     uitschieter. Gemeten op het eerste CI-register (1259 bestanden, modus
+     dekking): p50 5,3s, p90 9,8s, p99 46s -- en de zwaarste 1272s, want
+     ast-grens.test.js is in zijn eentje 14% van al het werk. Elk ongemeten
+     bestand kreeg daarmee 27 keer de p99 toebedeeld.
+
+     Wat dat werkelijk deed, in ronde 33518796922: de twee nieuwe toetsbestanden
+     van die tak waren ongemeten en reserveerden elk 1272s. Scherf 2 en 3 kregen
+     er een, planden 2732s, en deden er in werkelijkheid 512s en 516s over. Twee
+     scherven voor een kwart gevuld, en het echte werk geperst in de andere twee.
+
+     DUS DE p99, en dat is nog steeds streng: hoger dan 99 van de 100 bestanden,
+     negen keer de mediaan. Een nieuw bestand telt als een van de duurste die er
+     zijn -- alleen niet als de duurste die ooit heeft bestaan. De regel blijft
+     "onbekend telt als duur"; wat vervalt is dat een enkele uitschieter bepaalt
+     hoe duur.
+
+     Is er niets bekend, dan is elk bestand even zwaar en valt de greedy samen
+     met de oude om-en-om-verdeling; de waarde zelf doet er dan niet toe. */
+  const bekend = [...gewicht.values()].filter((v) => v > 0).sort((a, b) => a - b);
+  const duur = bekend.length ? bekend[Math.min(bekend.length - 1,
+    Math.ceil(bekend.length * 0.99) - 1)] : 1;
+  const kost = (naam) => gewicht.get(naam) || duur;
 
   /* Zwaarste eerst; bij een gelijk gewicht op naam, zodat de uitkomst niet van
      de volgorde van de invoer afhangt maar alleen van de lijst zelf. */
   for (const naam of [...lijst].sort((a, b) =>
     (kost(b) - kost(a)) || (a < b ? -1 : a > b ? 1 : 0))) {
-    let k = 0;
-    for (let i = 1; i < totaal; i++) if (last[i] < last[k]) k = i;
+    let k = -1;
+    for (let i = 0; i < totaal; i++) {
+      if (bakken[i].length >= plafond) continue;
+      if (k < 0 || last[i] < last[k]) k = i;
+    }
+    /* Zit alles aan het plafond, dan wint het plafond het niet van de
+       volledigheid: geen enkel bestand valt uit de verdeling. Met het plafond
+       hierboven is deze tak ONBEREIKBAAR -- ceil(N/k) x k is altijd minstens N
+       -- en hij staat er voor wie die formule ooit aanpast. Nagemeten dat hij
+       dan echt werkt: met floor(N/k) blijft de verdeling volledig, en zonder
+       deze regel vallen er bestanden weg (drie beweringen zakken). */
+    if (k < 0) { k = 0; for (let i = 1; i < totaal; i++) if (last[i] < last[k]) k = i; }
     bakken[k].push(naam);
     last[k] += kost(naam);
   }
@@ -134,4 +255,4 @@ function verdeel(lijst, deel) {
   return indeling(lijst, deel.totaal)[deel.nr - 1];
 }
 
-module.exports = { ontleedDeel, verdeel, indeling, zetDuren, REGISTER };
+module.exports = { ontleedDeel, verdeel, indeling, zetDuren, weging, wegingVoor, MODI, REGISTER };

@@ -206,7 +206,41 @@ Wie vanaf een kapot scherm om hulp vraagt, laat de medewerker meteen zien dat di
 geen individueel probleem is: `/api/office/service/zaak` geeft de signalen van
 dat scherm mee.
 
-## 10. Wat er staat, en wat er niet staat
+## 10. De cockpit, en waarom er geen zoekbalk op staat
+
+`/apps/service.html` is het bureau van de medewerker. Je komt er via de wachtrij
+en opent SUP-xxxxxx; er is **geen veld waarmee je een lid opzoekt**. Dat is het
+onderscheid met de ledenbalie: die is vrije inzage, met een reden en een regel in
+het inzagejournaal, en die blijft bestaan. Deze is zaakgericht, en die twee horen
+zichtbaar naast elkaar en niet door elkaar.
+
+Wat het bord toont: het gesprek als tijdlijn links, de zaak rechts (melder als
+codenaam, de verwijzing, de vier klokken, de machtigingen, de foutsignalen van
+dat scherm), en de handelingen eronder. Toegang vragen gaat via een keuzelijst
+met wat het **team** nodig heeft — geen vrij tekstveld, want dan vraagt iemand
+iets dat zijn team niet mag en krijgt hij een weigering waar hij niets aan heeft.
+
+**Alles wat het bord beweert, draagt een waarom.** Achter "Waarom?" staat waarop
+de prioriteit is uitgerekend, waarom de zaak bij dit team ligt, en — het
+belangrijkste veld — wat er **niet** is gewogen. Een zaak op P4 omdat niemand de
+omvang inschatte, is iets anders dan een zaak die aantoonbaar klein is.
+
+En het bord **stelt geen oorzaak vast**. Er is geen onderzoekende AI, en dat
+staat er met zoveel woorden bij in plaats van dat er een waarschijnlijke oorzaak
+wordt getoond. Een gok in de vorm van een diagnose is precies de bewering die dit
+huis nergens anders accepteert.
+
+Twee dingen die de browsertoets blootlegde en die je nergens anders moet
+herhalen. Een functie `open()` op het hoogste niveau van een klassiek script
+**overschaduwt `window.open`**, die de gedeelde schil gebruikt. En de schil laadt
+met `defer` en verbouwt de header, dus `#titel` kan weg zijn op het moment dat je
+erin schrijft — stond dat als eerste regel in de renderfunctie, dan sloeg de
+TypeError toe vóórdat het werkblad werd gevuld: een dode klik, zonder
+foutmelding, die zich als een willekeurige flake voordeed. Sindsdien loopt elke
+handeling door een vangnet dat de reden meldt, en raakt het bord de kop alleen
+defensief aan.
+
+## 11. Wat er staat, en wat er niet staat
 
 **Staat** (gemeten, met toetsen die zijn zien zakken):
 
@@ -222,7 +256,8 @@ dat scherm mee.
 - de klacht van de ledenbalie krijgt een envelop en blijft een klacht;
 - patroonherkenning met bundelen en herstellen in één handeling;
 - de persoonlijke stand, zonder belofte over beschikbaarheid;
-- foutsignalen op vingerafdruk, gevoed door `routes/fout.js`.
+- foutsignalen op vingerafdruk, gevoed door `routes/fout.js`;
+- de cockpit op `/apps/service.html`, met de waarom-laag en zonder ledenzoeker.
 
 **Staat niet**, met de reden en niet als lege functie:
 
@@ -235,11 +270,10 @@ dat scherm mee.
 - **support voor partners en leveranciers richting RTG**: een zaak kan de
   doelgroep `zaak` dragen en er is een team `zakelijk`, maar er is geen ingang
   waarlangs een leverancier hem opent.
-- **een medewerkerscockpit**: de kantoorroutes bestaan, een scherm eromheen niet.
 - **AI-onderzoeker en copilot**: de router kiest een team, geen techniek. De
   intelligentierouter (`kern/ai/router.js`) loopt in de schaduw en beslist niets.
 
-## 11. De grenzen
+## 12. De grenzen
 
 1. **Een zaak opent niets.** `betrokken` is een verwijzing; gegevens vragen een
    machtiging, en die vraagt een bevestiging van het lid.
@@ -259,7 +293,7 @@ dat scherm mee.
 8. **Er komt geen groen vinkje.** De persoonlijke stand zegt nooit dat alles
    werkt, want beschikbaarheid wordt niet per lid gemeten.
 
-## 12. Wat de meting vond, en wat lezen niet vond
+## 13. Wat de meting vond, en wat lezen niet vond
 
 De zevenentwintig routes zijn door een **kale ronde** gehaald: twee keer dezelfde
 aanroep, met een opname van de servicecollecties (inclusief de tijdlijn) voor en

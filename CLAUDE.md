@@ -623,10 +623,20 @@ dit lid weg is. Par. 8: de persoonlijke stand zegt NOOIT "alles werkt"
 (beschikbaarheid wordt niet per lid gemeten) en houdt uit elkaar wat een storing
 IS en wat Service erover heeft GEMELD. Par. 9: foutsignalen op vingerafdruk,
 waarbij `gebruikers` op `null` staat MET de reden -- de foutingang is zonder
-inlog en kent geen mensen om te tellen. En par. 12 staat er even groot bij: de
-kale meetronde over de zevenentwintig routes vond VIER fouten die geen enkele
-toets zag en die er bij het LEZEN alle vier prima uitzagen -- waaronder twee
-dubbelklikken die twintig melders twee keer hetzelfde stuurden.
+inlog en kent geen mensen om te tellen. Par. 10 is de cockpit
+(`/apps/service.html`): zaakgericht en met opzet ZONDER ledenzoeker -- vrije
+inzage blijft bij de ledenbalie, met een reden en een journaalregel -- en alles
+wat het bord beweert draagt een "waarom?", inclusief wat er NIET is gewogen. Het
+bord stelt geen oorzaak vast en zegt dat er ook bij. En par. 13 staat er even
+groot bij: de kale meetronde over de zevenentwintig routes vond VIER fouten die
+geen enkele toets zag en die er bij het LEZEN alle vier prima uitzagen --
+waaronder twee dubbelklikken die twintig melders twee keer hetzelfde stuurden.
+Twee vondsten uit de browsertoets horen daar los bij, want ze gelden voor ELK
+scherm: een functie `open()` op het hoogste niveau van een klassiek script
+overschaduwt `window.open` die de gedeelde schil gebruikt, en die schil laadt met
+`defer` en verbouwt de header -- schrijf je als eerste in `#titel`, dan sloopt de
+TypeError je hele werkblad voordat het gevuld is, en dat ziet eruit als een
+willekeurige flake.
 
 **`ONTWERP.md` is het RTG Design System 2.0** — de vormtaal: merk-elementen
 tegenover werk-elementen (Bodoni is ceremonieel en staat op een gesloten lijst

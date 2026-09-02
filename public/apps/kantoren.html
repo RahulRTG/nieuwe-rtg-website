@@ -971,6 +971,13 @@
     </div>
     <p class="deck">Hier helpt u een lid met zijn abonnement, zijn wachtwoord of een klacht. De balie werkt op codenaam: een naam, een e-mailadres, een telefoonnummer of een document komt hier niet in beeld. Elke raadpleging gaat met uw reden het inzagelog in.</p>
 
+    <!-- DE WACHTRIJ STAAT ERNAAST EN NIET HIERIN. De balie is VRIJE INZAGE: u
+         zoekt een lid op en opent zijn dossier, met een reden. RTG Service is
+         zaakgericht: u opent SUP-xxxxxx en krijgt wat bij die zaak hoort. Dat
+         onderscheid is de hele reden dat die laag bestaat (SERVICE.md par. 2),
+         dus die twee horen zichtbaar naast elkaar en niet door elkaar. -->
+    <p class="deck" style="margin-top:.4rem;">Werkt u een hulpvraag af in plaats van een lid op te zoeken? Dat gaat zaakgericht, met de tijdlijn, de klokken en de bevoegdheden erbij: <a href="/apps/service.html" style="color:var(--rtg-leesgoud,var(--gold));">open RTG Service &rarr;</a></p>
+
     <div class="kaart" id="balDicht" hidden style="padding:1.1rem 1.2rem;margin-top:1.25rem;">
       <p class="stil" style="font-size:.85rem;color:var(--muted);line-height:1.6;margin:0;" id="balDichtTekst"></p>
     </div>
@@ -978,7 +985,18 @@
     <div id="balWerk">
       <h3 class="sec">Zoeken op codenaam of steuncode</h3>
       <div class="kaart" style="padding:1.1rem 1.2rem;">
-        <p class="stil" style="font-size:.78rem;color:var(--soft);line-height:1.6;margin:0 0 0.25rem;">Het lid noemt zijn codenaam of leest de steuncode voor uit de app. Zonder een van beide zoekt de balie niet: door het ledenbestand bladeren is geen hulpvraag.</p>
+        <p class="stil" style="font-size:.78rem;color:var(--soft);line-height:1.6;margin:0 0 0.25rem;">Het lid noemt zijn codenaam. Zonder codenaam zoekt de balie niet: door het ledenbestand bladeren is geen hulpvraag.</p>
+        <!-- HIER STOND "of leest de steuncode voor uit de app", en dat was niet
+             uitvoerbaar: steuncodeVan() werd buiten kern/ledenbalie.js nergens
+             aangeroepen, dus geen enkel lid kon zijn code zien. Een beveiligde
+             werkstroom die niet uit te voeren is, is erger dan geen -- hij ziet
+             er af uit en in de praktijk vraagt de balie dan maar iets anders.
+             Het veld blijft staan voor wie een code AL heeft; wat het lid
+             tegenwoordig voorleest is zijn zaaknummer (SUP-...), en bevestigen
+             dat u de juiste persoon spreekt gaat via RTG Service: het lid drukt
+             zelf op Bevestigen in zijn app, of leest zes cijfers voor die vijf
+             minuten en een keer gelden. -->
+        <p class="stil" style="font-size:.78rem;color:var(--soft);line-height:1.6;margin:0 0 0.25rem;">Belt het lid over een lopende hulpvraag, dan noemt hij zijn zaaknummer (SUP-&hellip;) en werkt u verder in <a href="/apps/service.html" style="color:var(--rtg-leesgoud,var(--gold));">RTG Service</a>. Toegang tot iets van dit lid bevestigt hij daar zelf in zijn app.</p>
         <div class="taakrij">
           <input class="veld h-flex1" id="balCode" placeholder="Codenaam" maxlength="60" autocomplete="off">
           <input class="veld" id="balSteun" style="max-width:11rem;" placeholder="Steuncode" maxlength="24" autocomplete="off">

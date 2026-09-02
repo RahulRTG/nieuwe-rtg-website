@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Service · de wachtrij</title>
+<link rel="icon" href="/icon.svg">
+<meta name="robots" content="noindex">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<link href="/shared/rtg-materiaal.css" rel="stylesheet">
+<link href="/shared/rtg-ontwerp.css" rel="stylesheet">
+<style>
+  /* Geen eigen hexcodes. Het merk komt uit de materialenleer en de toestanden
+     uit de signaaltokens van ONTWERP.md par. 4 -- want dat is wat ze hier zijn:
+     "let op", "in orde", "hier moet een mens naar kijken". Een overgetikte
+     bordeaux loopt uit de pas zodra het beeldmerk verandert, en juist op het
+     bord waar over iemands account wordt besloten hoort dat niet te kunnen. */
+  :root{ --bg:var(--rtg-bg); --card:var(--rtg-card); --card2:var(--rtg-card2); --line:var(--rtg-line);
+    --txt:var(--rtg-txt); --muted:var(--rtg-muted); --soft:var(--rtg-soft);
+    --merkgoud:var(--gold-tekst);
+    --sig-hoog:var(--rtg-sig-incident); --sig-let:var(--rtg-sig-aandacht); --sig-ok:var(--rtg-sig-gezond); }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:3rem;}
+  /* Serif staat op een gesloten lijst rollen (ONTWERP.md par. 1). De paginatitel
+     is ceremonieel; een kaarttitel op een werkbord is werk. */
+  h1{font-family:var(--rtg-display);font-weight:500;letter-spacing:-.01em;}
+  h2,h3{font-family:var(--rtg-interface);font-weight:600;}
+  a{color:inherit;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 88%,transparent));
+    backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + .9rem) 1.1rem .7rem;border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--merkgoud);}
+  header h1{font-size:1.3rem;margin-top:.05rem;}
+  .groei{flex:1 1 auto;min-width:8rem;}
+  main{padding:1.1rem;max-width:1180px;margin:0 auto;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;
+    padding:calc(var(--rtg-ruim) * 1.1) calc(var(--rtg-ruim) * 1.3);margin-bottom:var(--rtg-ruim);}
+  .kaart h2{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--merkgoud);margin-bottom:.45rem;}
+  .sub{font-size:.8rem;color:var(--soft);line-height:1.6;}
+  .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-top:.7rem;}
+  .knop{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:0;font:inherit;
+    font-size:.82rem;padding:.5rem .8rem;min-height:2.6rem;min-width:2.6rem;cursor:pointer;}
+  .knop:hover{border-color:var(--merkgoud);}
+  .knop.doe{background:var(--txt);color:var(--bg);border-color:var(--txt);font-weight:600;}
+  .veld{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:0;
+    padding:.5rem .7rem;font:inherit;font-size:.85rem;min-height:2.6rem;}
+  .veld.breed{flex:1 1 12rem;}
+  textarea.veld{width:100%;min-height:4.4rem;resize:vertical;}
+  select.veld{min-width:9rem;}
+  /* de wachtrij */
+  table{width:100%;border-collapse:collapse;font-size:.85rem;}
+  th,td{text-align:left;padding:.5rem .6rem;border-bottom:1px solid var(--line);vertical-align:top;}
+  th{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);font-weight:600;}
+  tbody tr{cursor:pointer;}
+  tbody tr:hover{background:var(--card2);}
+  .pil{display:inline-block;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;
+    border:1px solid var(--line);padding:.12rem .45rem;color:var(--muted);white-space:nowrap;}
+  .pil.P0,.pil.P1{border-color:var(--sig-hoog);color:var(--sig-hoog);}
+  .pil.P2{border-color:var(--sig-let);color:var(--sig-let);}
+  .pil.mens{border-color:var(--merkgoud);color:var(--merkgoud);}
+  /* de cockpit: gesprek links, zaak rechts */
+  .cockpit{display:grid;grid-template-columns:1fr;gap:var(--rtg-ruim);}
+  @media(min-width:900px){ .cockpit{grid-template-columns:1.35fr 1fr;} }
+  .draad{display:flex;flex-direction:column;gap:.55rem;max-height:26rem;overflow-y:auto;}
+  .beurt{border-left:2px solid var(--line);padding:.15rem 0 .15rem .6rem;font-size:.84rem;line-height:1.55;}
+  .beurt.melder{border-left-color:var(--merkgoud);}
+  .beurt.mens{border-left-color:var(--sig-ok);}
+  .beurt .wie{font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--soft);}
+  .beurt.stap{color:var(--soft);font-size:.78rem;}
+  dl.feiten{display:grid;grid-template-columns:auto 1fr;gap:.3rem .7rem;font-size:.83rem;margin-top:.3rem;}
+  dl.feiten dt{color:var(--soft);}
+  dl.feiten dd{font-variant-numeric:tabular-nums;}
+  .waarom{margin-top:.6rem;border-top:1px solid var(--line);padding-top:.5rem;}
+  .waarom ul{margin:.35rem 0 0 1rem;font-size:.8rem;color:var(--muted);line-height:1.6;}
+  .stil{color:var(--soft);font-size:.8rem;line-height:1.6;}
+  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:var(--card2);
+    border:1px solid var(--line);border-radius:0;padding:.6rem 1rem;font-size:.85rem;opacity:0;
+    transition:opacity .3s;z-index:30;pointer-events:none;}
+  .tabs{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:var(--rtg-ruim);}
+  .tabs .knop[aria-current="true"]{border-color:var(--merkgoud);color:var(--merkgoud);}
+</style>
+</head>
+<body class="rtg-stijl" data-rtg-modus="command">
+
+<header>
+  <div class="groei"><div class="ey">RTG-kantoor</div><h1 id="titel">RTG Service</h1></div>
+  <button class="knop" id="terug" hidden>&larr; wachtrij</button>
+  <button class="knop" id="ververs">Verversen</button>
+</header>
+
+<main id="main"><div class="kaart"><p class="sub">Bezig met laden&hellip;</p></div></main>
+<div class="melding" id="melding" role="status"></div>
+
+<script>
+/* ============================================================================
+   DE SERVICE-COCKPIT.
+
+   EEN ZAAK IS HET WERKSTUK, NIET EEN GEBRUIKER. Dit bord heeft met opzet GEEN
+   zoekbalk waarmee je elk lid kunt opzoeken en alles kunt opendoen. Je komt hier
+   via de wachtrij, je opent SUP-xxxxxx, en je krijgt wat bij SUP-xxxxxx hoort.
+   Vrije inzage bestaat nog steeds en loopt langs de ledenbalie, met een reden en
+   een regel in het inzagejournaal -- dat onderscheid is de reden dat deze laag
+   bestaat (SERVICE.md par. 2).
+
+   HET SCHERM REKENT NIETS EN OORDEELT NIETS. Elke prioriteit, elke klok en elke
+   routering komt van de server. Een scherm dat zelf weegt, zegt op een dag iets
+   anders dan de wachtrij waaruit het komt.
+
+   EN ALLES WAT HET BORD BEWEERT, DRAAGT EEN WAAROM. De prioriteit toont zijn
+   opbouw, de routering zijn reden, en de klokken zeggen het als ze NIET gemeten
+   zijn. Een cijfer zonder opbouw is een orakel (kern/service/prioriteit.js).
+   Wat hier NIET staat is een diagnose: er is geen AI-onderzoeker, en een
+   waarschijnlijke oorzaak verzinnen zou precies de bewering zijn die dit huis
+   nergens anders accepteert.
+   ========================================================================== */
+const $ = s => document.querySelector(s);
+/* SCHRIJVEN IN DE KOP MAG MISLUKKEN. De gedeelde schil (shared/basis.js,
+   shared/bediening.js) laadt met defer en kan de header verbouwen, dus #titel en
+   #terug zijn er niet gegarandeerd meer op het moment dat u ze aanraakt. Dat
+   stond hier onbeschermd EN als eerste in openZaak(), en dus wisselde het
+   resultaat: soms een dode klik waarbij het hele werkblad niet verscheen, want
+   de TypeError sloeg toe voordat #main was gevuld. Een scherm hoort zijn eigen
+   inhoud niet te verliezen aan een sierlijkheid in de kop. */
+function kop(id, doe) { const el = document.querySelector(id); if (el) { try { doe(el); } catch (e) {} } }
+const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_office_token'); } catch (e) {}
+function meld(t) { const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 3000); }
+const api = (pad, body) => fetch('/api/office/service/' + pad, {
+  method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
+  body: JSON.stringify(body || {})
+}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) { const e = new Error(d.error || 'Er ging iets mis.'); e.status = r.status; throw e; } return d; });
+
+const MND = ['', 'jan', 'feb', 'mrt', 'apr', 'mei', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
+function tijd(s) { if (!s) return ''; const d = new Date(s); return d.getDate() + ' ' + MND[d.getMonth() + 1] + ' ' + d.getHours() + ':' + String(d.getMinutes()).padStart(2, '0'); }
+/* Een klok die niet gemeten is, toont zijn REDEN en geen streepje. Dat is de
+   huisregel uit KOSTEN.md en BESTUUR.md, en hij geldt hier net zo hard: een
+   streepje leest als nul, en nul leest als "meteen gereageerd". */
+function klok(k) { return !k ? '' : (k.nietGemeten ? '<span class="stil">niet gemeten &middot; ' + esc(k.waarom) + '</span>' : esc(k.minuten) + ' min'); }
+
+let STAND = { blad: 'wachtrij', zaak: null, keuzes: null };
+
+/* ELKE HANDELING KRIJGT EEN VANGNET, EN DAT IS GEEN NETHEID.
+
+   Hier stond het niet, en het gevolg was het ergste soort fout op een werkbord:
+   een klik die mislukt deed NIETS. Geen melding, geen spoor, geen verandering --
+   het scherm bleef staan alsof er niet was geklikt, en een medewerker die het
+   nog eens probeert krijgt precies hetzelfde. In de browsertoets zag dat eruit
+   als een willekeurige flake; op een echt bord is het een medewerker die denkt
+   dat het bord kapot is terwijl de server een reden teruggaf.
+
+   Elke aanroep hieronder loopt daarom via `poging()`: hij meldt wat er misging
+   en laat het scherm staan waar het stond. */
+async function poging(fn) {
+  try { await fn(); }
+  catch (e) { meld(e && e.message ? e.message : 'Er ging iets mis.'); }
+}
+
+/* ------------------------------------------------------------- wachtrij -- */
+async function wachtrij() {
+  STAND.blad = 'wachtrij'; STAND.zaak = null;
+  kop('#terug', el => { el.hidden = true; }); kop('#titel', el => { el.textContent = 'RTG Service'; });
+  const d = await api('wachtrij', {});
+  STAND.keuzes = d.keuzes;
+  const t = d.tel || {};
+  const teams = Object.entries(t.perTeam || {}).map(([k, n]) => esc(k) + ' ' + n).join(' &middot; ') || 'niets open';
+  $('#main').innerHTML =
+    '<div class="tabs">'
+    + '<button class="knop" id="tWachtrij" aria-current="true">Wachtrij</button>'
+    + '<button class="knop" id="tPatronen">Patronen</button>'
+    + '<button class="knop" id="tFouten">Foutsignalen</button></div>'
+    + '<div class="kaart"><h2>De rij</h2>'
+    + '<p class="sub">' + esc(t.open || 0) + ' open &middot; ' + esc(t.zonderEigenaar || 0) + ' zonder eigenaar &middot; '
+    + esc(t.wachtOpMens || 0) + ' wacht op een mens &middot; ' + esc(t.wachtOpMelder || 0) + ' wacht op de melder</p>'
+    + '<p class="sub">' + teams + '</p></div>'
+    + '<div class="kaart">' + tabel(d.zaken || []) + '</div>';
+  $('#tPatronen').onclick = () => poging(patronen); $('#tFouten').onclick = () => poging(fouten);
+  bindRijen();
+}
+
+function tabel(zaken) {
+  if (!zaken.length) return '<p class="sub">Niets open. Er ligt niemand te wachten.</p>';
+  return '<table><thead><tr><th>Zaak</th><th>Onderwerp</th><th>Stand</th><th>Team</th><th>Eigenaar</th><th>Sinds</th></tr></thead><tbody>'
+    + zaken.map(z => '<tr data-id="' + esc(z.id) + '">'
+      + '<td><span class="pil ' + esc(z.prioriteit) + '">' + esc(z.prioriteit) + '</span> ' + esc(z.id)
+      + (z.mensGevraagd ? ' <span class="pil mens">mens gevraagd</span>' : '') + '<br><span class="stil">' + esc(z.titel) + '</span></td>'
+      + '<td>' + esc(z.onderwerp) + '</td><td>' + esc(z.standNaam) + '</td><td>' + esc(z.team) + '</td>'
+      + '<td>' + esc(z.eigenaar || '&mdash;') + '</td><td>' + esc(tijd(z.at)) + '</td></tr>').join('')
+    + '</tbody></table>';
+}
+function bindRijen() {
+  document.querySelectorAll('tbody tr[data-id]').forEach(tr => { tr.onclick = () => poging(() => openZaak(tr.dataset.id)); });
+}
+
+/* --------------------------------------------------------------- de zaak -- */
+/* HIJ HEET openZaak EN NIET open. `function open()` op het hoogste niveau van
+   een klassiek script overschaduwt window.open, en de gedeelde schil
+   (shared/basis.js, shared/bediening.js) gebruikt die. Het gevolg was geen
+   foutmelding maar iets veel stillers: het bord verloor bij een klik zijn eigen
+   kop. Gevonden doordat een browsertoets wisselend zakte en pas bij het uitlezen
+   van de DOM bleek dat #titel weg was. */
+async function openZaak(id) {
+  const d = await api('zaak', { id });
+  STAND.blad = 'zaak'; STAND.zaak = d;
+  const z = d.zaak;
+  kop('#terug', el => { el.hidden = false; }); kop('#titel', el => { el.textContent = z.id; });
+  $('#main').innerHTML =
+    '<div class="kaart"><h2>' + esc(z.id) + ' &middot; ' + esc(z.prioriteitNaam) + ' &middot; ' + esc(z.standNaam) + '</h2>'
+    + '<p class="sub">' + esc(z.titel) + '</p>' + waaromBlok(d) + '</div>'
+    + '<div class="cockpit"><div>' + draadBlok(z) + antwoordBlok() + '</div>'
+    + '<div>' + zaakBlok(d) + actieBlok(z) + '</div></div>';
+  bindZaak(z);
+}
+
+/* DE WAAROM-LAAG. Alles wat dit bord beweert, kun je hier natrekken: waarop de
+   prioriteit is uitgerekend, waarom de zaak bij dit team ligt, en welke termen
+   NIET zijn gewogen. Dat laatste is het belangrijkste veld: een zaak op P4 omdat
+   niemand de omvang inschatte, is iets anders dan een zaak die aantoonbaar klein
+   is. */
+function waaromBlok(d) {
+  /* LET OP HET NIVEAU. dossier() zet melder, routeWaarom, routeVia en
+     prioriteitOpbouw op `zaak` en de route hangt machtigingen, bevestigingen en
+     foutsignalen ERNAAST. Hier stond `d.prioriteitOpbouw`, en dat is undefined:
+     de waarom-laag was leeg en zag er precies zo uit als een zaak zonder opbouw.
+     Gevonden door test/servicecockpit.e2e.js -- een leeg blok valt bij het
+     lezen niet op, want er staat geen fout, er staat niets. */
+  const z = d.zaak || {};
+  const p = z.prioriteitOpbouw || {};
+  const opbouw = (p.opbouw || []).map(o => '<li>' + esc(o.term) + ' (' + esc(o.trede) + ') &rarr; ' + esc(o.punten) + ' punt &mdash; ' + esc(o.waarom) + '</li>').join('');
+  const stil = (p.nietGewogen || []).length ? '<li>niet gewogen: ' + (p.nietGewogen || []).map(esc).join(', ') + ' &mdash; hierover is niets gezegd, dus dit is geen "klein"</li>' : '';
+  const mens = p.door === 'mens' ? '<li>overschreven door ' + esc(p.wie) + ': ' + esc(p.reden) + ' (berekend was ' + esc(p.berekendWas) + ')</li>' : '';
+  return '<details class="waarom"><summary class="sub">Waarom?</summary><ul>'
+    + '<li>routering: ' + esc(z.routeWaarom || '') + ' (' + esc(z.routeVia || '') + ')</li>'
+    + opbouw + stil + mens
+    + '<li class="stil">RTG stelt hier geen oorzaak vast. Er is geen onderzoekende AI; wat u ziet is hoe de zaak is gewogen en gerouteerd, niet wat er mis is.</li>'
+    + '</ul></details>';
+}
+
+function draadBlok(z) {
+  const rijen = (z.tijdlijn || []).map(r => {
+    if (r.wat === 'bericht') return '<div class="beurt ' + esc(r.van) + '"><span class="wie">' + esc(r.van) + (r.wie ? ' &middot; ' + esc(r.wie) : '') + ' &middot; ' + esc(tijd(r.at)) + '</span><br>' + esc(r.tekst) + '</div>';
+    if (r.wat === 'stand') return '<div class="beurt stap">' + esc(tijd(r.at)) + ' &middot; stand &rarr; ' + esc(r.naar) + (r.notitie ? ' &mdash; ' + esc(r.notitie) : '') + '</div>';
+    if (r.wat === 'mensGevraagd') return '<div class="beurt stap">' + esc(tijd(r.at)) + ' &middot; de melder vroeg om een mens (keer ' + esc(r.keer) + ')</div>';
+    if (r.wat === 'koppeling') return '<div class="beurt stap">' + esc(tijd(r.at)) + ' &middot; gekoppeld aan ' + esc(r.soort) + ' ' + esc(r.code) + '</div>';
+    if (r.wat === 'prioriteit') return '<div class="beurt stap">' + esc(tijd(r.at)) + ' &middot; prioriteit ' + esc(r.van) + ' &rarr; ' + esc(r.naar) + ' door ' + esc(r.door) + ' &mdash; ' + esc(r.reden) + '</div>';
+    if (r.wat === 'eigenaar') return '<div class="beurt stap">' + esc(tijd(r.at)) + ' &middot; eigenaar &rarr; ' + esc(r.naar) + '</div>';
+    if (r.wat === 'team') return '<div class="beurt stap">' + esc(tijd(r.at)) + ' &middot; team ' + esc(r.van) + ' &rarr; ' + esc(r.naar) + ' &mdash; ' + esc(r.waarom) + '</div>';
+    return '<div class="beurt stap">' + esc(tijd(r.at)) + ' &middot; ' + esc(r.wat) + '</div>';
+  }).join('');
+  return '<div class="kaart"><h2>Gesprek</h2><div class="draad">' + rijen + '</div></div>';
+}
+
+function antwoordBlok() {
+  return '<div class="kaart"><h2>Antwoorden</h2>'
+    + '<textarea class="veld" id="aTekst" placeholder="Uw antwoord aan de melder" maxlength="4000"></textarea>'
+    + '<div class="rij"><button class="knop doe" id="aStuur">Versturen</button></div></div>';
+}
+
+/* WAT DIT BORD OVER DE MELDER TOONT: een codenaam en een VERWIJZING. Geen naam,
+   geen adres, geen bedrag -- de zaak draagt die niet eens (kern/service/zaak.js).
+   Wat erachter zit gaat open met een machtiging, en die vraagt een bevestiging
+   van het lid. */
+function zaakBlok(d) {
+  const z = d.zaak, b = z.betrokken;
+  const mach = (d.machtigingen || []).map(m => '<li>' + esc(m.id) + ' &middot; ' + esc(m.mens) + ' &middot; ' + esc(m.stand)
+    + ' &middot; ' + (m.capabilities || []).map(esc).join(', ') + (m.zwaar && m.zwaar.length ? ' <span class="pil">zwaar</span>' : '') + '</li>').join('');
+  const sig = (d.foutsignalen || []).map(s => '<li>' + esc(s.id) + ' &middot; ' + esc(s.melding) + ' &middot; ' + esc(s.aantal) + ' keer</li>').join('');
+  return '<div class="kaart"><h2>Zaak</h2>'
+    + '<dl class="feiten">'
+    + '<dt>melder</dt><dd>' + esc(z.melder || '') + '</dd>'
+    + '<dt>soort</dt><dd>' + esc(z.soort) + '</dd>'
+    + '<dt>kanaal</dt><dd>' + esc(z.kanaal) + '</dd>'
+    + '<dt>betrokken</dt><dd>' + (b ? esc(b.soort) + ' ' + esc(b.code) : '<span class="stil">niets opgegeven</span>') + '</dd>'
+    + '<dt>team</dt><dd>' + esc(z.team) + '</dd>'
+    + '<dt>eigenaar</dt><dd>' + esc(z.eigenaar || '&mdash;') + '</dd>'
+    + '<dt>eerste reactie</dt><dd>' + klok(z.klokken.eersteReactie) + '</dd>'
+    + '<dt>mens gereageerd</dt><dd>' + klok(z.klokken.menselijkeReactie) + '</dd>'
+    + '<dt>hersteltijd</dt><dd>' + klok(z.klokken.hersteltijd) + '</dd>'
+    + '<dt>wacht op melder</dt><dd>' + esc(z.klokken.wachtOpMelder.minuten) + ' min</dd>'
+    + '<dt>doorlooptijd</dt><dd>' + esc(z.klokken.doorlooptijd.minuten) + ' min</dd>'
+    + '</dl>'
+    + ((z.koppelingenLijst || []).length ? '<p class="sub">Gekoppeld: ' + z.koppelingenLijst.map(k => esc(k.soort) + ' ' + esc(k.code)).join(', ') + '</p>' : '')
+    + (sig ? '<h3 class="sub" style="margin-top:.7rem;">Op dit scherm is iets kapot</h3><ul class="waarom">' + sig + '</ul>' : '')
+    + (mach ? '<h3 class="sub" style="margin-top:.7rem;">Machtigingen bij deze zaak</h3><ul class="waarom">' + mach + '</ul>' : '')
+    + '</div>';
+}
+
+function actieBlok(z) {
+  const standen = ['nieuw', 'onderzoek', 'wachtOpMens', 'inBehandeling', 'wachtOpMelder', 'opgelost', 'gesloten'];
+  const teams = ((STAND.keuzes && STAND.keuzes.teams) || []).map(t => t.id);
+  return '<div class="kaart"><h2>Handelingen</h2>'
+    + '<div class="rij"><select class="veld" id="hStand">' + standen.map(s => '<option' + (s === z.stand ? ' selected' : '') + '>' + esc(s) + '</option>').join('') + '</select>'
+    + '<input class="veld breed" id="hNotitie" placeholder="Notitie bij de stand" maxlength="300">'
+    + '<button class="knop" id="hStandZet">Stand zetten</button></div>'
+    + '<div class="rij"><button class="knop" id="hMij">Op mijn naam</button></div>'
+    + '<div class="rij"><select class="veld" id="hPrio"><option>P0</option><option>P1</option><option>P2</option><option>P3</option><option>P4</option></select>'
+    + '<input class="veld breed" id="hReden" placeholder="Waarom wijkt dit af van de berekening?" maxlength="300">'
+    + '<button class="knop" id="hWeeg">Prioriteit</button></div>'
+    /* Toegang vragen. De capabilities komen uit wat het TEAM nodig heeft; er
+       staat geen vrij tekstveld, want dan vraagt iemand iets dat het team niet
+       mag en krijgt hij een weigering waar hij niets aan heeft. */
+    + '<div class="rij"><select class="veld" id="hCap">'
+    + capsVoor(z.team).map(c => '<option>' + esc(c) + '</option>').join('') + '</select>'
+    + '<input class="veld breed" id="hDoel" placeholder="Waarvoor heeft u dit nodig? (het lid leest dit)" maxlength="300">'
+    + '<button class="knop doe" id="hVraag">Bevestiging vragen</button></div>'
+    + '<p class="stil">Het lid ziet wie het vraagt, waarvoor, en wat er opengaat, en drukt zelf. '
+    + 'Kan hij niet bij zijn app, dan leest hij zes cijfers voor.</p>'
+    + '<div class="rij"><input class="veld breed" id="hCode" placeholder="Bevestigingscode van het lid" maxlength="20" inputmode="numeric">'
+    + '<button class="knop" id="hCodeOk">Code invoeren</button></div>'
+    + '</div>';
+}
+function capsVoor(team) {
+  const t = ((STAND.keuzes && STAND.keuzes.teams) || []).find(x => x.id === team);
+  return (t && t.capabilities) || ['zaak.lezen'];
+}
+
+function bindZaak(z) {
+  const doe = (fn, klaar) => poging(async () => { await fn(); meld(klaar); await openZaak(z.id); });
+  $('#aStuur').onclick = () => doe(() => api('bericht', { id: z.id, tekst: $('#aTekst').value }), 'Verstuurd.');
+  $('#hStandZet').onclick = () => doe(() => api('stand', { id: z.id, naar: $('#hStand').value, notitie: $('#hNotitie').value }), 'Stand gezet.');
+  $('#hMij').onclick = () => doe(() => api('eigenaar', { id: z.id }), 'Op uw naam.');
+  $('#hWeeg').onclick = () => doe(() => api('weeg', { id: z.id, naar: $('#hPrio').value, reden: $('#hReden').value }), 'Prioriteit gezet.');
+  $('#hVraag').onclick = () => doe(() => api('bevestiging/vraag', { id: z.id, capabilities: [$('#hCap').value], doel: $('#hDoel').value, reden: $('#hDoel').value }), 'Gevraagd. Het lid ziet het in zijn app.');
+  $('#hCodeOk').onclick = () => doe(() => api('bevestiging/code', { code: $('#hCode').value }), 'Bevestigd.');
+}
+
+/* -------------------------------------------------------------- patronen -- */
+async function patronen() {
+  const d = await api('patronen', {});
+  $('#main').innerHTML = '<div class="tabs"><button class="knop" id="tWachtrij">Wachtrij</button>'
+    + '<button class="knop" aria-current="true">Patronen</button>'
+    + '<button class="knop" id="tFouten">Foutsignalen</button></div>'
+    + '<div class="kaart"><h2>Vermoedens</h2><p class="sub">' + esc(d.let) + '</p>'
+    + ((d.vermoedens || []).length ? (d.vermoedens || []).map(v =>
+      '<div class="waarom"><b>' + esc(v.aantal) + ' zaken</b> delen ' + esc(v.gedeeld) + '<br>'
+      + '<span class="stil">' + esc(tijd(v.vanaf)) + ' tot ' + esc(tijd(v.tot)) + '</span>'
+      + '<div class="rij"><input class="veld" placeholder="Incidentnummer uit RTG Command" data-inc="' + esc(v.sleutel) + '" maxlength="60">'
+      + '<button class="knop doe" data-bundel="' + esc(v.sleutel) + '">Bundelen</button></div>'
+      + '<ul>' + v.zaken.map(z => '<li>' + esc(z.id) + ' &middot; ' + esc(z.titel) + '</li>').join('') + '</ul></div>').join('')
+      : '<p class="sub">Geen groepen boven de drempel. Dat is geen uitspraak over of er een storing is.</p>')
+    + '</div>'
+    + '<div class="kaart"><h2>Lopende incidenten</h2>'
+    + ((d.incidenten || []).length ? '<table><thead><tr><th>Incident</th><th>Zaken</th><th>Open</th><th></th></tr></thead><tbody>'
+      + d.incidenten.map(i => '<tr><td>' + esc(i.incident) + '</td><td>' + esc(i.zaken) + '</td><td>' + esc(i.open) + '</td>'
+        + '<td><button class="knop" data-herstel="' + esc(i.incident) + '">Hersteld melden</button></td></tr>').join('')
+      + '</tbody></table>' : '<p class="sub">Geen zaken aan een incident gekoppeld.</p>')
+    + '</div>';
+  $('#tWachtrij').onclick = () => poging(wachtrij); $('#tFouten').onclick = () => poging(fouten);
+  document.querySelectorAll('[data-bundel]').forEach(b => b.onclick = async () => {
+    const v = (d.vermoedens || []).find(x => x.sleutel === b.dataset.bundel);
+    const inc = document.querySelector('[data-inc="' + CSS.escape(b.dataset.bundel) + '"]').value;
+    try { const r = await api('bundel', { zaken: v.zaken.map(z => z.id), incident: inc }); meld(r.gekoppeld + ' zaken gekoppeld.'); patronen(); }
+    catch (e) { meld(e.message); }
+  });
+  document.querySelectorAll('[data-herstel]').forEach(b => b.onclick = async () => {
+    try { const r = await api('incident/hersteld', { incident: b.dataset.herstel }); meld(r.let || (r.bijgewerkt + ' melders ingelicht.')); patronen(); }
+    catch (e) { meld(e.message); }
+  });
+}
+
+/* ---------------------------------------------------------- foutsignalen -- */
+async function fouten() {
+  const d = await api('foutsignalen', {});
+  const t = d.tel || {};
+  $('#main').innerHTML = '<div class="tabs"><button class="knop" id="tWachtrij">Wachtrij</button>'
+    + '<button class="knop" id="tPatronen">Patronen</button>'
+    + '<button class="knop" aria-current="true">Foutsignalen</button></div>'
+    + '<div class="kaart"><h2>Wat er in browsers stukgaat</h2>'
+    + '<p class="sub">' + esc(t.signalen || 0) + ' vormen &middot; ' + esc(t.gebeurtenissen || 0) + ' gebeurtenissen</p>'
+    + '<p class="stil">Geraakte gebruikers: niet te tellen. ' + esc(t.gebruikersWaarom || '') + '</p>'
+    + ((d.signalen || []).length ? '<table><thead><tr><th>Signaal</th><th>Melding</th><th>Keer</th><th>Schermen</th><th>Laatst</th></tr></thead><tbody>'
+      + d.signalen.map(s => '<tr><td>' + esc(s.id) + '</td><td>' + esc(s.melding) + '<br><span class="stil">' + esc(s.bestand) + ':' + esc(s.regel) + '</span></td>'
+        + '<td>' + esc(s.aantal) + '</td><td>' + (s.schermen || []).map(esc).join('<br>') + '</td><td>' + esc(tijd(s.laatst)) + '</td></tr>').join('')
+      + '</tbody></table>' : '<p class="sub">Nog niets binnengekomen.</p>')
+    + '</div>';
+  $('#tWachtrij').onclick = () => poging(wachtrij); $('#tPatronen').onclick = () => poging(patronen);
+}
+
+/* ------------------------------------------------------------------ start -- */
+kop('#terug', el => { el.onclick = () => poging(wachtrij); });
+kop('#ververs', el => { el.onclick = () => poging(() => (STAND.blad === 'zaak' && STAND.zaak ? openZaak(STAND.zaak.zaak.id) : wachtrij())); });
+async function start() {
+  if (!TOKEN) { $('#main').innerHTML = '<div class="kaart"><p class="sub">Meld u eerst aan bij het kantoor met uw eigen RTG-account. RTG Service vraagt een zetel op naam; de gedeelde kantoorcode opent wel de ruimte maar wijst niemand aan.</p></div>'; return; }
+  try { await wachtrij(); }
+  catch (e) { $('#main').innerHTML = '<div class="kaart"><p class="sub">' + esc(e.message) + '</p></div>'; }
+}
+start();
+</script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+</body>
+</html>

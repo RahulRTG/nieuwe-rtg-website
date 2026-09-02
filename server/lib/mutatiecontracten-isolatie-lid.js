@@ -73,6 +73,25 @@ const CONTRACTEN = {
     bewijs: BEWIJS_LID,
     afgetekend: AFGETEKEND
   },
+  /* DE BEVESTIGING AANVRAGEN. Nieuw naast /stap, en met opzet een eigen route:
+     de challenge munten en de assertie inleveren zijn twee gebeurtenissen, en
+     een route die allebei doet kan de eerste niet aan de tweede binden. */
+  'POST /api/isolatie/mijn/ontsluiting/stap/opties': {
+    mutatieId: 'isolatie.mijn.ontsluiting.stap.opties',
+    herkomst: 'mens',
+    semantiek: { klasse: 'nietHerhaalbaar' },
+    toegang: { klasse: 'OBJECT_SCOPED', objectVeld: 'req.body.id + req.session.key',
+      wat: 'het verzoek moet aan een drager van DEZE sessie hangen; eerst het eigendom, dan pas ' +
+        'een ceremonie -- anders levert een geraden nummer een geldige challenge op' },
+    stand: 'INTENTIONALLY_NON_IDEMPOTENT',
+    waarom: 'elke aanroep munt een nieuwe WebAuthn-uitdaging en die hoort nieuw te zijn: een ' +
+      'herhaling die de oude teruggaf, zou een uitdaging herbruikbaar maken en daarmee precies ' +
+      'de binding opheffen waarvoor deze route bestaat. De vorige uitdaging blijft geldig tot ' +
+      'zij verloopt of eenmalig wordt gebruikt (kern/webauthn-ceremonie.js).',
+    bewijs: { gemeten: 'niet gemeten: de uitkomst is per ontwerp verschillend, dus een ' +
+      'byte-voor-byte-vergelijking meet hier de bedoeling en geen afwijking', op: '2026-09-02' },
+    afgetekend: AFGETEKEND
+  },
   'POST /api/isolatie/mijn/ontsluiting/stap': {
     mutatieId: 'isolatie.mijn.ontsluiting.stap',
     herkomst: 'mens',

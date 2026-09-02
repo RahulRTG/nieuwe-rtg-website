@@ -128,7 +128,11 @@ module.exports = (kern) => {
 
   /* De overige domeinen draaien als submodules op dezelfde gedeelde context
      (een keer bij het opstarten gemount, geen kosten per verzoek). */
-  const tctx = { app, accounts, anthropic, archief, beveilig, wacht: kern.wacht, av: kern.antivirus, crypto, db, mail, save, sendPushToUser,
+  /* `appUrl` reist mee omdat de isolatiecockpit een WebAuthn-grens nodig heeft
+     en die NOOIT uit een kop mag komen: zou de origin uit Origin of Host komen,
+     dan kiest de aanvrager zijn eigen grens en is de binding een formaliteit.
+     Zelfde afspraak als routes/rtgid.js en routes/auth/webauthn.js. */
+  const tctx = { app, accounts, anthropic, appUrl: kern.appUrl, archief, beveilig, wacht: kern.wacht, av: kern.antivirus, crypto, db, mail, save, sendPushToUser,
     LANDEN, keyVanCodenaam, talen, onboarding, staat, eigenaarUser, isEigenaar, magInzien, techAuth, eigenaarAlleen, ctx,
     betaalRegie: kern.betaalRegie, geldPasprijsZet, geldKortingZet, geldCommissieZet, tooManyTries, noteFailedTry, loginFails, kern };
   require('./techniek/inlog')(tctx);   // de inlog op deze pagina, met rem en gelijk antwoord

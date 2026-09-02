@@ -89,3 +89,66 @@ test('4. elk verhaal wijst naar paden die bestaan', () => {
     'deze verhalen wijzen naar een route die niet bestaat: ' + wezen.join(', ') +
     ' -- zo\'n verhaal staat altijd op "werkt niet" en zegt niets');
 });
+
+/* ---------------------------------------------------------------------------
+   5. WAT ER OPEN BLIJFT, WAT ER OOK GEBEURT.
+
+   81 paden hebben geen functie in de catalogus en passeren de beschermstand
+   ongemerkt. Dat getal las als 81 problemen en dat was het niet: 68 zijn de
+   eigenaar-console (bewust buiten de functieschakelaars), 6 zijn de uitgang van
+   deze laag zelf, 5 zijn rechten die een mens over zichzelf heeft, en 2 zijn
+   overwogen en met opzet niet opengezet.
+
+   De vijf rechten -- inzage, uitdraai, het inzagejournaal en het intrekken van
+   toestemming -- horen niet dicht te vallen omdat er een incident loopt, en om
+   twee redenen die allebei op zichzelf genoeg zijn. Juridisch schort je een
+   AVG-recht niet op omdat het even slecht uitkomt. En inhoudelijk, wat hier
+   zwaarder weegt: ze LEZEN of ze VERSMALLEN. Een beveiligingslaag die een
+   versmalling tegenhoudt, werkt tegen zichzelf in.
+
+   MUTATIES (LAT.md regel 2):
+   - /api/privacy/delete aan RECHT_VAN_DE_MENS toevoegen -> 5 ZAKT bij het LADEN
+     (de fail-fast in openpaden.js: bewust dicht en toch open is precies het gat
+     dat je pas bij een incident vindt).
+   - /api/toestemming/intrek uit RECHT_VAN_DE_MENS halen -> 5 ZAKT (RAAK).
+   - EIGEN_UITGANG en RECHT_VAN_DE_MENS hetzelfde pad geven -> 5 ZAKT bij het laden.
+   ------------------------------------------------------------------------ */
+test('5. wat open blijft heeft een grond, en wat dicht blijft ook', () => {
+  const openpaden = require('../server/kern/isolatie/openpaden');
+  const leesset = require('../server/kern/isolatie/leesset');
+
+  /* Elke open regel draagt een grond die iets ZEGT. Een lege grond, of een woord
+     als "ok" of "nodig", is een vrijstelling die niemand kan betwisten.
+
+     De drempel stond eerst op twintig tekens en dat was te streng: "de uitgang
+     aanvragen" is een echte grond, alleen kort -- de vier ceremoniestappen leggen
+     zichzelf uit in hun context. Een lengte-eis die legitiem korte gronden
+     afkeurt, leert de volgende schrijver om er woorden bij te verzinnen, en dan
+     meet hij precies niets meer. */
+  const LEEG = /^(ok|nodig|ja|nee|tbd|todo|-+)$/i;
+  for (const lijst of [openpaden.EIGEN_UITGANG, openpaden.RECHT_VAN_DE_MENS, openpaden.BEWUST_DICHT]) {
+    for (const [pad, grond] of Object.entries(lijst)) {
+      const g = String(grond).trim();
+      assert.ok(g.length >= 10 && !LEEG.test(g) && g.includes(' '),
+        pad + ' heeft geen echte grond: "' + grond + '"');
+    }
+  }
+
+  /* De rechten staan werkelijk open onder isolatie, en de bewust-dichte niet. */
+  for (const pad of Object.keys(openpaden.RECHT_VAN_DE_MENS)) {
+    const u = leesset.magOnderIsolatie(pad, functies.functieVoorPad(pad));
+    assert.equal(u.mag, true, pad + ' hoort open te blijven: ' + u.waarom);
+    assert.equal(u.grond, 'RECHT_VAN_DE_MENS');
+  }
+  for (const pad of Object.keys(openpaden.BEWUST_DICHT)) {
+    assert.equal(leesset.magOnderIsolatie(pad, functies.functieVoorPad(pad)).mag, false,
+      pad + ' is bewust dicht en hoort dat te blijven');
+  }
+
+  /* HET INTREKKEN VAN TOESTEMMING IS DE SCHERPSTE VAN DE VIJF, en hij staat hier
+     apart genoemd: hij VERSMALT wat er mag. Een stand die een versmalling
+     tegenhoudt, werkt tegen zichzelf in -- en dat is precies het soort regel dat
+     bij een refactor sneuvelt omdat hij contra-intuïtief oogt. */
+  assert.ok(openpaden.RECHT_VAN_DE_MENS['/api/toestemming/intrek'],
+    'toestemming intrekken maakt de verzameling wat mag KLEINER en hoort altijd te kunnen');
+});

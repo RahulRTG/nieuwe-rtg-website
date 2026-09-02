@@ -29,7 +29,8 @@ const beleid = require('../../kern/stuur/beleid');
 const { maakIsolatiefilter } = require('../../kern/stuur/isolatiefilter');
 
 module.exports = (tctx) => {
-  const { app, db, save, beveilig, techAuth, eigenaarAlleen } = tctx;
+  const { app, db, save, beveilig, techAuth, eigenaarAlleen, appUrl } = tctx;
+  const kern = tctx.kern || {};
 
   /* De huisstand wordt GELEZEN uit de incidentcontrole en niet gekopieerd. Lui,
      want db.data.techniek kan bij het monteren nog leeg zijn -- en een stand die
@@ -86,46 +87,13 @@ module.exports = (tctx) => {
     } catch (e) { faal(res, e); }
   });
 
-  /* DE CEREMONIE. Vier routes en niet een: het verzoek, de stappen, de commit en
-     het afbreken zijn vier gebeurtenissen. Ze samenvouwen tot een enkele
-     "ontsluit"-aanroep met een lijst bewijzen erin zou precies het ding maken
-     dat deze laag wil voorkomen -- een verlaging die in een keer gebeurt. */
-  app.post('/api/techniek/isolatie/ontsluiting', techAuth, eigenaarAlleen, (req, res) => {
-    const b = req.body || {};
-    try {
-      const gedeeld = { naar: b.naar, door: actor(req), reden: b.reden,
-        tweedeMens: tweedeMensBestaat(req) };
-      /* Het HUIS heeft een eigen ingang omdat zijn stand niet in deze laag
-         woont maar in de incidentcontrole. De ceremonie is wel dezelfde, en dat
-         is het punt: een tweede ceremonie naast de eerste zou binnen een jaar
-         iets anders eisen. */
-      res.json({ ok: true, verzoek: b.drager === 'huis'
-        ? isolatie.vraagHuisOntsluiting(Object.assign({ van: b.van }, gedeeld))
-        : isolatie.vraagOntsluiting(Object.assign({ drager: b.drager, sleutel: b.sleutel }, gedeeld)) });
-    } catch (e) { faal(res, e); }
-  });
-
-  app.post('/api/techniek/isolatie/ontsluiting/stap', techAuth, eigenaarAlleen, (req, res) => {
-    const b = req.body || {};
-    try {
-      res.json({ ok: true, verzoek: isolatie.ontsluiting.stap(b.id,
-        { soort: b.soort, door: actor(req), bewijs: b.bewijs }) });
-    } catch (e) { faal(res, e); }
-  });
-
-  app.post('/api/techniek/isolatie/ontsluiting/commit', techAuth, eigenaarAlleen, (req, res) => {
-    try {
-      res.json({ ok: true, uit: isolatie.voltooiOntsluiting((req.body || {}).id, { door: actor(req) }) });
-    } catch (e) { faal(res, e); }
-  });
-
-  app.post('/api/techniek/isolatie/ontsluiting/afbreken', techAuth, eigenaarAlleen, (req, res) => {
-    const b = req.body || {};
-    try {
-      res.json({ ok: true, verzoek: isolatie.ontsluiting.afbreken(b.id,
-        { door: actor(req), reden: b.reden }) });
-    } catch (e) { faal(res, e); }
-  });
+  /* DE CEREMONIE STAAT ERNAAST, in ./isolatie-ceremonie.js. Zelfde naad als aan
+     de ledenkant en om dezelfde reden: verstrengen is een handeling, verlagen is
+     een protocol. De gedeelde gegevens gaan mee in plaats van te worden
+     nagebouwd -- wie hier een tweede `tweedeMensBestaat` schrijft, heeft binnen
+     een jaar twee antwoorden op dezelfde vraag. */
+  require('./isolatie-ceremonie')({ app, kern, isolatie, appUrl, techAuth, eigenaarAlleen,
+    actor, tweedeMensBestaat, faal });
 
   /* DE PROEF. "Wat zou er gebeuren als ik dit pad aanroep met deze dragers in
      deze stand" -- zonder het aan te roepen. Dit is de reden dat het besluit
@@ -143,10 +111,19 @@ module.exports = (tctx) => {
          een ander getal dan "welke routes werken nog": bevoegd zijn en
          beschikbaar zijn vallen hier juist uit elkaar, en dat verschil is het
          hele punt van deze laag. */
-      const versmald = filter.versmal(paden, ctx, wereld);
+      /* HIER MAG DE AANROEPER DE KANALEN WEL KIEZEN, en dat verschil is het
+         hele punt van deze route: dit is een WAT-ALS en geen handhaving. Overal
+         elders komt de herkomst uit de boekhouding van de lus
+         (kern/stuur/besmetting.js) en nooit uit een verzoek -- zou een client
+         zijn eigen kanaal mogen opgeven, dan kiest hij zelf hoe streng hij wordt
+         behandeld. Op deze proefroute is het omgekeerde nodig: wie besluit of de
+         herkomstpoort mag bijten, moet kunnen zien wat onvertrouwde invoer kost. */
+      const bronnen = Array.isArray(b.bronnen) ? b.bronnen.slice(0, 13).map(String) : undefined;
+      const versmald = filter.versmal(paden, ctx, wereld, bronnen);
       res.set('Cache-Control', 'no-store');
       res.json({ ok: true, stand: isolatie.effectieveStand(ctx.standen), besluiten,
         stuur: { over: versmald.paden.length, weggevallen: versmald.weggevallen,
+          herkomstSluit: versmald.herkomstSluit || [],
           uitleg: filter.uitleg(versmald.weggevallen) } });
     } catch (e) { faal(res, e); }
   });

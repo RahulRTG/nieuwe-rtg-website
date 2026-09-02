@@ -19,9 +19,9 @@
 
 module.exports = function maakHuisceremonie({ ontsluiting, spoor, save, beveilig, fout }) {
 
-  function vraagHuisOntsluiting({ van, naar, door, reden, tweedeMens }) {
+  function vraagHuisOntsluiting({ van, naar, door, reden, tweedeMens, passkeyMogelijk }) {
     return ontsluiting.start({ drager: 'huis', sleutel: null, van: van || 'isolatie',
-      naar: naar || 'normaal', door, reden, tweedeMens });
+      naar: naar || 'normaal', door, reden, tweedeMens, passkeyMogelijk });
   }
 
   /* DE POORT die kern/incidentcontrole.js meekrijgt. Hij gooit bij elk gebrek,

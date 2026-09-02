@@ -5,11 +5,12 @@
    stappen; een zware taak wordt in maximaal 3 deeltaken gesplitst binnen een
    budget van 24. Zonder sleutel geeft dit null terug en blijven de vaste antwoorden
    van de assistenten staan. Draait op de context die kern/stuur.js opbouwt. */
-const { TWIJFELREGELS, magDoen } = require('../rahul/twijfel');
-const { resolveer } = require('./resolver');
-const { compileer } = require('./plan');
-const { voorspel } = require('./gevolg');
+const { TWIJFELREGELS } = require('../rahul/twijfel');
 const { TOOLS } = require('./gereedschap');
+const besmetting = require('./besmetting');
+const maakLusstap = require('./lusstap');
+const beleid = require('./beleid');
+const { maakIsolatiefilter } = require('./isolatiefilter');
 
 module.exports = ({ anthropic, app, log, stuurRoep, stuurPaden, classificeer, parseSubs, isolatie }) => {
   /* De isolatiecontext staat in ./luscontext.js: klein stuk, groot gevolg. */
@@ -29,8 +30,19 @@ module.exports = ({ anthropic, app, log, stuurRoep, stuurPaden, classificeer, pa
     const vraag = String((opties && opties.vraag) || '').trim().slice(0, 1200);
     if (!vraag) return null;
     const isoContext = () => isoContextVan(req);
-    const paden = () => stuurPaden(app, opties.wereld, isoContext())
+
+    /* WAT ER AAN DIT GESPREK HEEFT BIJGEDRAGEN, per gesprek en niet per proces.
+       Twee lussen tegelijk zouden elkaars boekhouding overschrijven, en dan
+       versmalt het gesprek van de een op de invoer van de ander. */
+    const vuil = besmetting.nieuw();
+    const paden = () => stuurPaden(app, opties.wereld, isoContext(), vuil.bronnen())
       .filter(opties.filter || (() => true));
+    /* De poort bij `doe` velt HETZELFDE oordeel als de kaart, en dat kan alleen
+       door dezelfde functie te gebruiken. Nabouwen zou twee waarheden geven die
+       allebei 'werken' en na een jaar iets anders zeggen. */
+    const laag = typeof isolatie === 'function' ? isolatie() : isolatie;
+    const stap = maakLusstap({ stuurRoep, vuil,
+      filter: laag ? maakIsolatiefilter({ isolatie: laag, beleid }) : null });
     // een streamende voortgangsmelding (optioneel): de route koppelt dit aan de
     // SSE-bus, zodat de UI live "Stap 4/24: taxi zoeken..." kan tonen
     const opStap = typeof (opties && opties.opStap) === 'function' ? opties.opStap : () => {};
@@ -56,56 +68,7 @@ module.exports = ({ anthropic, app, log, stuurRoep, stuurPaden, classificeer, pa
         messages.push({ role: 'assistant', content: resp.content });
         const uitkomsten = [];
         for (const t of wilTools) {
-          let uit;
-          if (t.name === 'plan') {
-            /* Wegen, niet doen. De compiler krijgt de rol mee en raakt niets
-               aan; wat hij teruggeeft is een oordeel dat het model aan de
-               gebruiker kan voorlezen voordat er een voorstel ontstaat. */
-            /* Het plan en de gevolgvoorspelling reizen SAMEN terug maar zijn
-               twee dingen: ./plan.js weegt de bevoegdheid, ./gevolg.js zegt uit
-               een eerdere meting wat de stappen aanraakten. Ze worden hier
-               samengevoegd tot een antwoord; het plan zelf bezit de voorspelling
-               niet (EXECUTIE.md blok 3: PLAN bezit niets). */
-            const gewogen = compileer(t.input || {}, opties.wereld);
-            uit = Object.assign({}, gewogen, { gevolg: voorspel(gewogen) });
-            acties.push({ pad: 'plan', status: uit.uitvoerbaar ? 200 : 409, gevraagd: true });
-          }
-          else if (t.name === 'kaart') {
-            const toegestaan = paden();
-            uit = (t.input && t.input.alles)
-              ? { paden: toegestaan, versmald: false, reden: 'De volledige lijst voor deze rol, op verzoek.' }
-              : resolveer(kaartVraag, toegestaan);
-            /* WAT ER DOOR EEN BEVEILIGINGSSTAND WEGVIEL, ZEGT DE KAART ERBIJ.
-               Zonder deze regel denkt het model dat die vermogens niet BESTAAN,
-               en zegt het "dat kan ik niet" in plaats van "dat kan nu niet,
-               omdat". EXECUTIE.md blok 0. */
-            const iso = toegestaan.isolatie;
-            if (iso && iso.actief && iso.weggevallen.length) {
-              uit.beveiligingsstand = {
-                weggevallen: iso.weggevallen.length,
-                uitleg: iso.uitleg,
-                zegTegenDeGebruiker: 'Er staat een beveiligingsstand aan. Zeg WAT er nu niet kan en ' +
-                  'WAARDOOR; doe niet alsof die mogelijkheid niet bestaat.'
-              };
-            }
-          }
-          else {
-            /* De twijfelpoort staat VOOR de aanroep. Zonder expliciete
-               zekerheid gebeurt er niets en krijgt het model te horen dat het
-               eerst moet vragen. Dit is bewust een harde poort en geen regel
-               die het model mag afwegen: bij twijfel is de neiging om toch
-               maar iets te doen nu juist het probleem. */
-            const poort = magDoen(t.input || {});
-            if (!poort.ok) {
-              uit = poort;
-              acties.push({ pad: (t.input || {}).pad, status: 0, gevraagd: true });
-            } else {
-              uit = await stuurRoep(req, String((t.input || {}).pad || ''), (t.input || {}).body,
-                { wereld: opties.wereld });
-              acties.push({ pad: (t.input || {}).pad, status: uit.status,
-                goedkeuring: uit && uit.goedkeuring ? uit.goedkeuring : undefined });
-            }
-          }
+          const uit = await stap.voerUit(req, t, { wereld: opties.wereld, kaartVraag, paden, acties });
           uitkomsten.push({ type: 'tool_result', tool_use_id: t.id, content: JSON.stringify(uit).slice(0, 6000) });
         }
         tel++;

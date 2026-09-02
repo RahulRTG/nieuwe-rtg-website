@@ -86,57 +86,13 @@
       : 'Alle dragers dragen een stand.');
   }
 
-  /* ---------- ontsluitingen ---------- */
+  /* De lopende ontsluitingen staan ernaast, in ./isolatie-ontsluiting.js. De
+     helpers gaan mee in plaats van te worden nagebouwd. */
   function tekenOntsluitingen(o) {
-    var kaart = $('ontsluitkaart');
-    leeg(kaart);
-    var open = o.openOntsluitingen || [];
-    if (!open.length) {
-      kaart.appendChild(maak('p', 'voetnoot', 'Er loopt geen ontsluiting. Een verzoek verlaagt overigens ' +
-        'niets: pas de laatste, geautoriseerde stap levert een nieuwe stand op.'));
-      return;
-    }
-    open.forEach(function (v) {
-      var blok = maak('div');
-      blok.style.paddingBottom = '1rem';
-      var kop = maak('div');
-      kop.appendChild(maak('strong', null, v.drager + ' · ' + (v.sleutel || '-')));
-      kop.appendChild(document.createTextNode('  ' + v.van + ' → ' + v.naar));
-      blok.appendChild(kop);
-      blok.appendChild(maak('div', 'voetnoot', v.reden));
-      (v.vereisten || []).forEach(function (eis) {
-        var klaar = eis === 'wachttijd' ? v.wachttijdVerstreken : !!(v.voltooid && v.voltooid[eis]);
-        var r = maak('div', 'stap');
-        r.appendChild(maak('span', 'vink' + (klaar ? ' klaar' : '')));
-        r.appendChild(maak('span', null, eis + (klaar ? '' : ': nog open')));
-        blok.appendChild(r);
-      });
-      var rij = maak('div');
-      rij.style.marginTop = '.7rem';
-      rij.style.display = 'flex';
-      rij.style.gap = '.5rem';
-      rij.style.flexWrap = 'wrap';
-      var af = maak('button', 'knop grijs klein', 'Afbreken');
-      af.addEventListener('click', function () {
-        haal('/api/techniek/isolatie/ontsluiting/afbreken', { id: v.id, reden: 'afgebroken vanaf de cockpit' })
-          .then(function () { meld('goed', 'Ontsluiting afgebroken.'); laad(); })
-          .catch(function (e) { meld('fout', e.message); });
-      });
-      rij.appendChild(af);
-      var klaarKnop = maak('button', 'knop klein', 'Voltooien');
-      klaarKnop.disabled = (v.ontbreekt || []).length > 0;
-      klaarKnop.addEventListener('click', function () {
-        haal('/api/techniek/isolatie/ontsluiting/commit', { id: v.id })
-          .then(function (j) { meld('goed', 'Stand verlaagd naar ' + j.uit.nieuweStand + '.'); laad(); })
-          .catch(function (e) { meld('fout', e.message); });
-      });
-      rij.appendChild(klaarKnop);
-      blok.appendChild(rij);
-      kaart.appendChild(blok);
-    });
+    window.RTGIsolatieOntsluiting({ maak: maak, meld: meld, haal: haal, laad: laad, leeg: leeg })
+      .tekenOntsluitingen(o);
   }
 
-  /* De tabellen staan in ./isolatie-tabellen.js; zie daar waarom. */
   /* ---------- proef ---------- */
   var PROEFPADEN = ['/api/pay/stuur', '/api/bank/sepa', '/api/bank/afschrift', '/api/pay/overzicht',
     '/api/agenda/mijn', '/api/salon/post'];

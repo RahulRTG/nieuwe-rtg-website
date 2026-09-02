@@ -44,6 +44,20 @@ module.exports = (ctx) => {
      aanroeper moet het verschil kunnen zien tussen "dit ging mis" en "u heeft
      er nog geen, maak er een". */
   async function stapOpOpties(user, hostnaam, doel) {
+    /* EEN LEEG DOEL IS GEEN DOEL, en dat was hier een echte rand. `doel` gaat
+       hieronder door `String(doel || '')` en wordt bij het verifieren met
+       diezelfde uitdrukking vergeleken -- dus twee aanroepers die allebei
+       vergeten een doel mee te geven, krijgen ELKAARS ceremonie. De hele waarde
+       van deze weg zit in die binding: zonder doel bewijst een vinger op een
+       toestel alleen dat er ooit een vinger op een toestel lag.
+
+       Er is geen aanroeper die een leeg doel nodig heeft, dus dit breekt niets
+       -- maar er WAS er een die er per ongeluk een kon produceren
+       (routes/rtgid.js met een verzoek zonder koppelId). Die krijgt nu een
+       weigering in plaats van een ceremonie die overal op past. */
+    const merk = String(doel == null ? '' : doel);
+    if (!merk) return { status: 400,
+      error: 'Deze bevestiging heeft geen doel; een passkey bevestigt altijd een concrete handeling.' };
     const creds = credsVan(user.id);
     if (!creds.length) return { status: 409, geenPasskey: true,
       error: 'Voor deze bevestiging is een passkey nodig en aan dit account hangt er nog geen.' };
@@ -52,7 +66,7 @@ module.exports = (ctx) => {
       allowCredentials: creds.map(c => ({ id: c.id, transports: c.transports }))
     });
     const ceremonie = crypto.randomBytes(24).toString('base64url');
-    zetChallenge('stapop:' + ceremonie, opties.challenge, { userId: String(user.id), doel: String(doel || '') });
+    zetChallenge('stapop:' + ceremonie, opties.challenge, { userId: String(user.id), doel: merk });
     return { status: 200, opties, ceremonie };
   }
   async function stapOpMaak(user, ceremonie, antwoord, origin, hostnaam, doel) {
@@ -77,7 +91,13 @@ module.exports = (ctx) => {
     cred.counter = uit.authenticationInfo.newCounter;
     cred.laatstGebruikt = klok.datum().toISOString();
     save();
-    return { status: 200, ok: true };
+    /* WELKE sleutel tekende, gaat mee terug. Niet omdat deze module er iets mee
+       doet, maar omdat een spoor dat alleen "er is bevestigd" zegt, na een
+       incident niet te lezen is: met twee passkeys op een account is de vraag
+       altijd welke. De bestaande aanroeper (kern/rtgid-bevestigen.js) leest
+       alleen `.error` en spreidt dit antwoord niet uit, dus het veld erbij
+       verandert daar niets. */
+    return { status: 200, ok: true, credentialId: cred.id };
   }
 
   return { stapOpOpties, stapOpMaak };

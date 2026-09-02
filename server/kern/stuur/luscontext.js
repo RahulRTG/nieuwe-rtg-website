@@ -9,8 +9,17 @@
    ONTBREEKT DE SESSIE (een dienstlus, een zaak-token), dan blijft de context leeg
    en versmalt er niets. Dat is bewust: een lege context betekent "geen drager
    bekend" en niet "alles dicht". Wie het HUIS in isolatie zet, doet dat via de
-   incidentcontrole, en die geldt sowieso -- ook zonder deze context. */
+   incidentcontrole, en die geldt sowieso -- ook zonder deze context.
+
+   DE VERTALING ZELF STAAT IN ../isolatie/sessiedragers.js en niet hier. Hier
+   stond `s.id || s.sid || s.key`, en `s.id` en `s.sid` bestaan nergens: de
+   sessie wordt per verzoek opgebouwd als `{ tier, key, account }`. `sessie` viel
+   dus stil terug op de identiteitsleutel, en `apparaat` en `organisatie` werden
+   op deze -- de enige handhavingsweg -- helemaal niet meegegeven. De join was
+   daarmee precies op de plek waar hij telt het minst volledig. */
 'use strict';
+
+const { dragersVanVerzoek } = require('../isolatie/sessiedragers');
 
 module.exports = function maakLusContext({ isolatie }) {
   return function isoContextVan(req) {
@@ -18,8 +27,7 @@ module.exports = function maakLusContext({ isolatie }) {
     if (!s) return null;
     const laag = typeof isolatie === 'function' ? isolatie() : isolatie;
     if (!laag) return null;
-    try {
-      return laag.context({ identiteit: s.key || null, sessie: s.id || s.sid || s.key || null });
-    } catch (e) { return null; }
+    try { return laag.context(dragersVanVerzoek(req).sleutels); }
+    catch (e) { return null; }
   };
 };

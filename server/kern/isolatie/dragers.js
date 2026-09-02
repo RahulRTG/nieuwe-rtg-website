@@ -40,21 +40,56 @@
    Hij staat er dus als drager met `bron: null` en dat is zichtbaar in de meting. */
 'use strict';
 
-/* Van grof naar fijn. De volgorde is de ZETRICHTING en niet de winrichting:
-   wie hoger staat, kan lager iets opleggen. */
+/* TWEE VRAGEN DIE ONDER EEN VELDNAAM ZATEN, en dat was een stille meetfout.
+
+   `bron` beantwoordt: WAAR STAAT DE STAND. `sleutelbron` beantwoordt: WAAR KOMT
+   DE SLEUTEL VANDAAN BIJ EEN LOPEND VERZOEK. Dat zijn niet dezelfde vraag, en de
+   meter las de eerste als de tweede: `werkend()` filterde op `bron !== null` en
+   scripts/isolatieproef.js meldde daarom "5 van 6 met een bron", terwijl er bij
+   een echt verzoek maar EEN drager een sleutel had. `apparaat` had een keurige
+   opslagplek en geen enkele plek in de code die hem ooit zette; `sessie` viel
+   stil terug op de identiteitsleutel, dus twee lagen zetten in werkelijkheid
+   dezelfde stand.
+
+   Waar een sleutelbron ontbreekt staat de REDEN, en die reden wordt door
+   ./sessiedragers.js letterlijk doorgegeven aan het scherm. Een lid dat een laag
+   niet kan zetten, hoort te horen waarom -- niet een knop die niets doet. */
 const DRAGERS = Object.freeze([
-  { naam: 'huis',        wat: 'het hele platform',                       gezetDoor: 'eigenaar',        bron: 'db.data.techniek.incidentcontrole.modus' },
-  { naam: 'organisatie', wat: 'één klantorganisatie (TENANT.md: org IS de klant)', gezetDoor: 'orgbeheer of RTG', bron: 'db.data.isolatie.organisatie' },
-  { naam: 'identiteit',  wat: 'één mens of zaak, over al zijn sessies',   gezetDoor: 'het lid zelf of RTG', bron: 'db.data.isolatie.identiteit' },
-  { naam: 'sessie',      wat: 'één ingelogde sessie',                     gezetDoor: 'het lid zelf of RTG', bron: 'db.data.isolatie.sessie' },
-  { naam: 'apparaat',    wat: 'één toestel',                              gezetDoor: 'het lid zelf of RTG', bron: 'db.data.isolatie.apparaat' },
+  { naam: 'huis',        wat: 'het hele platform',                       gezetDoor: 'eigenaar',        bron: 'db.data.techniek.incidentcontrole.modus',
+    sleutelbron: 'geen sleutel nodig: er is er maar een' },
+  { naam: 'organisatie', wat: 'één klantorganisatie (TENANT.md: org IS de klant)', gezetDoor: 'orgbeheer of RTG', bron: 'db.data.isolatie.organisatie',
+    sleutelbron: null,
+    geenSleutel: 'een sessie draagt geen organisatiecode. Een zaaksessie kent `code`, maar geen ' +
+      'enkele aanroeper geeft die door aan deze laag; RTG kan de stand dus wel ZETTEN vanaf de ' +
+      'cockpit, maar hij werkt bij een lopend verzoek van dat lid nog niet mee in de join.' },
+  { naam: 'identiteit',  wat: 'één mens of zaak, over al zijn sessies',   gezetDoor: 'het lid zelf of RTG', bron: 'db.data.isolatie.identiteit',
+    sleutelbron: 'req.session.key' },
+  { naam: 'sessie',      wat: 'één ingelogde sessie',                     gezetDoor: 'het lid zelf of RTG', bron: 'db.data.isolatie.sessie',
+    sleutelbron: 'de sha256 van het bearer-token (kern/sessies.js tokenHash) -- een login, een sleutel' },
+  { naam: 'apparaat',    wat: 'één toestel',                              gezetDoor: 'het lid zelf of RTG', bron: 'db.data.isolatie.apparaat',
+    sleutelbron: 'een afgeleide van de passkey waarmee is ingelogd, in het ondertekende token ' +
+      '(kern/isolatie/apparaatsleutel.js)',
+    geenSleutel: 'RTG kent een apparaat alleen van een PASSKEY: daar bewijst een authenticator met ' +
+      'echte cryptografie dat hij dezelfde is als de vorige keer. Wie met een wachtwoord inlogt, ' +
+      'draagt geen toestel -- en een verzonnen sleutel zou een stand opleveren die aan niets hangt. ' +
+      'Let op het woord: `apparaat` betekent op een webauthn-credential iets anders (single- of ' +
+      'multiDevice) en op kern/toestellen.js weer iets anders (een horloge of weegschaal met een ' +
+      'eigen smalle sleutel); die drie mogen niet worden samengevoegd.' },
   { naam: 'workload',    wat: 'een achtergrondtaak, geplande opdracht of webhook-verwerker',
     gezetDoor: 'niemand',
     bron: null,
+    sleutelbron: null,
+    geenSleutel: 'geen achtergrondtaak meldt zich aan; er is ook geen gedeeld beginpunt waar dat ' +
+      'zou kunnen (de async-context van kern/kosten/haak.js draagt een kostendrager, geen actor).',
     nietGebouwd: 'er is nog geen plek waar een achtergrondtaak zichzelf als drager aanmeldt. ' +
       'Hij staat hier omdat hij bestaat, niet omdat hij werkt -- een lege stand die als `normaal` ' +
       'meetelt zou de join stil verzwakken, dus telt hij als een drager ZONDER stand en niet als ' +
-      'een drager MET de stand normaal.' }
+      'een drager MET de stand normaal. HET GAT HEEFT EEN MAAT: zie ISOLATIEPROEF.json, ' +
+      'noemers.workload (gemeten door scripts/lib/achtergrond.js). Twee andere plekken stellen ' +
+      'dezelfde afwezigheid al vast met zoveel woorden: opzet/handeling.js ("een cronjob draait ' +
+      'buiten deze context") en kosten/haak.js ("een achtergrondtaak krijgt `huis`"). Dat JSON-bestand ' +
+      'wordt hier NIET gelezen: een bouwartefact kan een commit achterlopen, en gezag komt niet uit ' +
+      'een artefact (EXECUTIE.md blok 3).' }
 ]);
 
 const OP_NAAM = Object.freeze(Object.fromEntries(DRAGERS.map(d => [d.naam, d])));
@@ -71,8 +106,16 @@ function magZetten(zetter, doelDrager) {
   return a <= b;
 }
 
-/* De dragers die vandaag werkelijk een stand kunnen dragen. Het verschil met
-   DRAGERS is het meetpunt: een drager zonder bron is een gat met een naam. */
+/* De dragers die een stand kunnen OPSLAAN. Het verschil met DRAGERS is het
+   meetpunt: een drager zonder bron is een gat met een naam. */
 function werkend() { return DRAGERS.filter(d => d.bron !== null); }
 
-module.exports = { DRAGERS, OP_NAAM, NAMEN, magZetten, werkend };
+/* De dragers die bij een LOPEND VERZOEK werkelijk meedoen. Dit is het strengere
+   en eerlijkere getal van de twee, en het hoort naast `werkend()` te staan en
+   niet in plaats daarvan: RTG kan een organisatie wel dichtzetten vanaf de
+   cockpit (dus de opslag werkt), terwijl die stand bij een verzoek van dat lid
+   nog niet meeweegt (dus de sleutel ontbreekt). Die twee samentellen zou van
+   allebei een halve waarheid maken. */
+function metSleutelbron() { return DRAGERS.filter(d => d.sleutelbron !== null && d.sleutelbron !== undefined); }
+
+module.exports = { DRAGERS, OP_NAAM, NAMEN, magZetten, werkend, metSleutelbron };

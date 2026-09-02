@@ -25,16 +25,24 @@
    hier een drempel voor de veilige richting inbouwt, duwt mensen onder druk naar
    de onveilige (BESTUUR.md grens 6.10).
 
-   WAT ER NIET IS, MET DE REDEN. De stappen `passkey` en `apparaat` worden hier
-   AFGETEKEND en niet UITGEVOERD: het bewijs komt van server/webauthn/ en
-   kern/webauthn-stapop.js, en die twee horen niet vanuit een ceremoniemodule te
-   worden aangeroepen -- dan zou deze module zelf kunnen besluiten dat er is
-   ingelogd. Hij eist een verwijzing naar een bewijs dat elders is geleverd. */
+   WAT ER NIET IS, MET DE REDEN. Deze module CONTROLEERT geen bewijs; hij noteert
+   het. Het bewijs komt van server/webauthn/ en kern/webauthn-stapop.js, en die
+   horen niet vanuit een ceremoniemodule te worden aangeroepen -- dan zou deze
+   module zelf kunnen besluiten dat er is ingelogd.
+
+   Dat betekent NIET dat de stappen ongecontroleerd zijn, en dat verschil stond
+   hier eerst verkeerd. `passkey` wordt sinds ./stapbewijs.js buiten deze module
+   ECHT uitgevoerd: de route vraagt een WebAuthn-ceremonie aan die aan DIT
+   verzoek en aan DEZE stap gebonden is, laat hem verifieren, en overhandigt het
+   resultaat pas daarna hier. `apparaat` wordt nog wel afgetekend, met de reden
+   in ./ceremonie-eisen.js (`STAPPEN.apparaat.nietUitgevoerd`): RTG heeft geen
+   register van vertrouwde toestellen. Welke stap wat is, staat per stap in
+   `uitgevoerd` -- en niet in dit commentaar, want dat loopt achter. */
 'use strict';
 
 const crypto = require('crypto');
 
-const { STAPPEN, WACHTTIJD_MINUTEN, eisenVoor } = require('./ceremonie-eisen');
+const { STAPPEN, WACHTTIJD_MINUTEN, doelVoor, eisenVoor } = require('./ceremonie-eisen');
 
 function maakOntsluiting({ opslag, save, klok, ordening }) {
   const nu = () => (klok && klok.datum ? klok.datum() : new Date());
@@ -48,8 +56,8 @@ function maakOntsluiting({ opslag, save, klok, ordening }) {
   function vind(id) { return lijst().find(v => v.id === String(id)) || null; }
 
   /* START. Bewaart een verzoek en verandert GEEN stand. */
-  function start({ drager, sleutel, van, naar, door, reden, tweedeMens }) {
-    const eis = eisenVoor({ drager, van, naar, tweedeMens });
+  function start({ drager, sleutel, van, naar, door, reden, tweedeMens, passkeyMogelijk }) {
+    const eis = eisenVoor({ drager, van, naar, tweedeMens, passkeyMogelijk });
     if (!eis.verlaagt) fout(400, 'Deze overgang verlaagt niets; verstrengen gaat zonder ceremonie.');
     const schoon = String(reden || '').trim().replace(/\s+/g, ' ').slice(0, 240);
     if (schoon.length < 8) fout(400, 'Geef een concrete reden van minimaal 8 tekens.');
@@ -66,6 +74,10 @@ function maakOntsluiting({ opslag, save, klok, ordening }) {
          toegangslijst leegmaken en zo van vier ogen twee maken. */
       noodontsluiting: eis.alleen === true,
       noodWaarom: eis.alleenWaarom,
+      /* De GRONDEN los naast het merk, want "noodontsluiting" alleen zegt niet
+         of er geen tweede mens was of geen passkey -- en dat is bij een
+         onderzoek achteraf precies de vraag. */
+      noodGronden: eis.gronden || [],
       wachttijdMinuten: eis.wachttijdMinuten,
       voltooid: { reden: { at: nu().toISOString(), door: String(door || 'onbekend').slice(0, 64) } },
       reden: schoon,
@@ -150,8 +162,8 @@ function maakOntsluiting({ opslag, save, klok, ordening }) {
 
   function open() { return lijst().filter(v => v.status === 'open').map(openbaar); }
 
-  return { STAPPEN, WACHTTIJD_MINUTEN, eisenVoor, start, stap, commit, afbreken, open, vind: id => {
+  return { STAPPEN, WACHTTIJD_MINUTEN, doelVoor, eisenVoor, start, stap, commit, afbreken, open, vind: id => {
     const v = vind(id); return v ? openbaar(v) : null; } };
 }
 
-module.exports = { maakOntsluiting, STAPPEN, WACHTTIJD_MINUTEN };
+module.exports = { maakOntsluiting, STAPPEN, WACHTTIJD_MINUTEN, doelVoor };

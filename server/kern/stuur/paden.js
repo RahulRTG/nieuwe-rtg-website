@@ -13,12 +13,26 @@
 const beleid = require('./beleid');
 const { toegestanePaden } = beleid;
 const { maakIsolatiefilter } = require('./isolatiefilter');
+const besmetting = require('./besmetting');
 
 module.exports = function maakStuurPaden({ VERBODEN, stuurUit, isolatie }) {
   /* ---- de kaart van het stuur: alle POST-paden die dit proces kent ----
      Rechtstreeks uit de router gelezen (dus nooit een verouderde lijst),
      gefilterd op de verbodslijst en desgewenst op een prefix per rol. */
-  function stuurPaden(app, wereld, context) {
+  /* `bronnen` zijn de KANALEN die aan deze opdracht hebben bijgedragen
+     (../isolatie/herkomst.js, geboekt door ./besmetting.js). Zat daar
+     onvertrouwde inhoud bij, dan versmalt de lijst OOK zonder dat er een
+     beveiligingsstand geldt: de invariant "onvertrouwde inhoud vergroot nooit de
+     beschikbare capabilities" staat los van isolatie. Een mail die geld wil laten
+     bewegen, hoort ook op een doodgewone dinsdag te worden tegengehouden.
+
+     GEEN BRONNEN MEEGEVEN IS NIET GEEN BRONNEN HEBBEN, en dat verschil kostte
+     deze laag zijn hele dekking: de enige productie-aanroeper riep hem met drie
+     argumenten aan, dus `bronnen` was altijd `undefined` en de herkomstbranche
+     draaide nooit. De regel stond en werkte nergens. Een aanroeper die het
+     argument weglaat, krijgt daarom nu het VERTROUWDE begin en niet een lege
+     lijst -- hetzelfde gedrag, maar uitgesproken in plaats van per ongeluk. */
+  function stuurPaden(app, wereld, context, bronnen) {
     if (stuurUit()) return [];
     const uit = [];
     const stack = (app && app._router && app._router.stack) || [];
@@ -45,7 +59,7 @@ module.exports = function maakStuurPaden({ VERBODEN, stuurUit, isolatie }) {
     const laag = typeof isolatie === 'function' ? isolatie() : isolatie;
     if (!laag || !context) return toegestaan;
     const filter = maakIsolatiefilter({ isolatie: laag, beleid });
-    const uitslag = filter.versmal(toegestaan, context, wereld);
+    const uitslag = filter.versmal(toegestaan, context, wereld, bronnen || besmetting.START);
     /* De weggevallen paden reizen mee als eigenschap van de lijst en niet als
        tweede teruggave: elke bestaande aanroeper krijgt zo nog steeds gewoon een
        array, en wie de reden wil tonen kan erbij. EXECUTIE.md blok 0: een

@@ -1975,6 +1975,16 @@ console.log('\n29) de Authorization-kop wordt gelezen om een token te halen, nie
       'de kop is hier alleen ONDOORZICHTIG sleutelmateriaal: hij gaat een sha256 in zodat twee afzenders ' +
       'met dezelfde idempotentiesleutel nooit elkaars antwoord krijgen. Er wordt niets uit gelezen en niets ' +
       'besloten -- een fout token betekent hoogstens een eigen kasvakje, en de poort van de route oordeelt zelf.'],
+    ["server/kern/isolatie/sessiedragers.js|const kop = (req && typeof req.get === 'function' ? req.get('authorization') : '') || '';",
+      'de kop levert hier SLEUTELMATERIAAL en geen toegang. Twee dingen gebeuren ermee, en allebei ' +
+      'beslissen ze niets: de sha256 wordt de sleutel waaronder de isolatiestand van DEZE inlog ' +
+      'staat (kern/sessies.js tokenHash -- dezelfde bytes als de sessie-opslag, geen tweede ' +
+      'definitie), en het apparaatveld wordt gelezen door accounts.apparaatVanToken, die de ' +
+      'HANDTEKENING eerst verifieert en null geeft als die niet klopt. Wie hier binnenkomt, is al ' +
+      'door `auth` gegaan; een verzonnen kop levert hooguit een sleutel op waaronder niets staat, ' +
+      'en dat is de VEILIGE kant -- geen stand gevonden betekent geen versoepeling, want de ' +
+      'strengste drager wint (SEC-LOCK-003). Zou hier ooit iets worden VERLEEND op grond van deze ' +
+      'kop, dan vervalt deze reden.'],
     ["server/trio-kleef.js|const kop = (req && req.headers && req.headers.authorization) || '';",
       'de poortwachter gebruikt het token als ROUTELABEL en niets anders: het gaat rechtstreeks een hash in en de uitkomst is een servernummer. ' +
       'Er wordt niets verleend -- de gekozen server draait de volledige stapel en verifieert zelf, dus een verzonnen Bearer levert daar gewoon een 401 op. ' +

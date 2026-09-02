@@ -46,6 +46,7 @@
 const METHODE = 'POST';
 
 const herkomst = require('../isolatie/herkomst');
+const maakHerkomstpoort = require('./herkomstpoort');
 
 function maakIsolatiefilter({ isolatie, beleid }) {
 
@@ -70,6 +71,9 @@ function maakIsolatiefilter({ isolatie, beleid }) {
      invariant "onvertrouwde inhoud vergroot nooit de beschikbare capabilities",
      en die staat los van isolatie. Een mail die geld wil laten bewegen, hoort
      ook op een doodgewone dinsdag te worden tegengehouden. */
+  /* Het herkomstoordeel woont in ./herkomstpoort.js -- zie de kop daar waarom. */
+  const { magMetHerkomst } = maakHerkomstpoort({ isolatie, beleid, functieVoor, methodeVoor });
+
   function versmal(paden, context, wereld, bronnen) {
     const binnen = Array.isArray(paden) ? paden : [];
     const dichtDoorHerkomst = herkomst.sluitDoorHerkomst(bronnen || []);
@@ -99,36 +103,15 @@ function maakIsolatiefilter({ isolatie, beleid }) {
           continue;
         }
       }
-      /* 2. DE HERKOMST. Wat dit pad DOET komt uit hetzelfde effectmodel; een
-            pad zonder profiel valt onder `onbekend` en gaat dan DICHT, want bij
-            onvertrouwde invoer is "we weten het niet" geen grond om door te
-            laten. Dat is strenger dan de isolatiekant, en met reden: daar
-            beschermt de stand een account, hier verdedigt hij tegen een tekst
-            die actief probeert iets te laten gebeuren. */
+      /* 2. DE HERKOMST, en dat oordeel woont in `magMetHerkomst` hieronder.
+            EEN WAARHEID, TWEE LEZERS: de kaart versmalt de LIJST, maar de
+            uitvoerpoort moet bij `doe` hetzelfde zeggen -- en het model heeft
+            de bredere lijst dan al gezien. Zou de poort dit oordeel nabouwen,
+            dan lopen de twee binnen een jaar uiteen zonder dat iemand het merkt,
+            want ze 'werken' allebei. */
       if (dichtDoorHerkomst.length) {
-        const functie = functieVoor(pad);
-        /* LEZEN VERGROOT GEEN VERMOGEN, en dat is geen uitzondering op de regel
-           maar de regel zelf gelezen. De invariant zegt dat onvertrouwde inhoud
-           de beschikbare capabilities nooit VERGROOT; een pad waarvan gemeten is
-           dat het werk doet zonder iets te veranderen, vergroot niets. Zonder
-           deze regel viel /api/agenda/mijn dicht zodra Rahul een mail had
-           gelezen -- en dan is de verdediging in de praktijk een uitknop voor de
-           assistent, wat betekent dat iemand hem uitzet.
-
-           `magOnderIsolatie` is dezelfde toets als onder isolatie, en met opzet:
-           twee lijsten "wat is een lezer" zouden na een jaar uiteenlopen. */
-        const leest = isolatie ? isolatie.leesset.magOnderIsolatie(pad, functie) : { mag: false };
-        if (!leest.mag) {
-          const prof = isolatie
-            ? isolatie.effecten.effectenVan(pad, methodeVoor(pad, wereld), functie)
-            : { effecten: null, graad: 'onbekend' };
-          const oordeel = herkomst.oordeel({ effecten: prof.effecten, bronnen });
-          if (oordeel.toegestaan !== true) {
-            weg.push({ pad, reden: 'HERKOMST', regel: oordeel.geraakt.join(', ') || 'geen effectprofiel',
-              uitleg: oordeel.waarom, dragers: [] });
-            continue;
-          }
-        }
+        const oordeel = magMetHerkomst(pad, wereld, bronnen);
+        if (!oordeel.mag) { weg.push(oordeel.weg); continue; }
       }
       blijft.push(pad);
     }
@@ -150,7 +133,7 @@ function maakIsolatiefilter({ isolatie, beleid }) {
       '. Wat er dichtstaat: ' + [...new Set(weggevallen.map(w => w.regel).filter(Boolean))].join(', ') + '.';
   }
 
-  return { versmal, uitleg, methodeVoor, METHODE };
+  return { versmal, magMetHerkomst, uitleg, methodeVoor, METHODE };
 }
 
 module.exports = { maakIsolatiefilter };

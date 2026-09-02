@@ -31,7 +31,15 @@ test.after(() => stop(srv && srv.child));
    tweede paar ogen wordt niet gevraagd, maar de ontsluiting draagt een merk dat
    blijft staan. Dat is met opzet zo -- een eis die in een opstelling met een
    eigenaar nooit te halen is, maakt het platform onherstelbaar. De toets kijkt
-   dus ook na DAT het merk er staat. */
+   dus ook na DAT het merk er staat.
+
+   ER ZIJN SINDS 2 SEPTEMBER 2026 TWEE GRONDEN, en die worden allebei met naam
+   nagekeken. Dat is geen overdaad maar noodzaak: de stappenlijst komt UIT het
+   verzoek, dus zodra een eis wegvalt, meet deze helper er stilletjes een minder
+   en blijft hij groen. Door de gronden te noemen kan zo'n wegval niet meer
+   ongemerkt gebeuren -- de tweede eigenaar-account van de toetsopstelling heeft
+   geen passkey, en dat hoort een uitgesproken vaststelling te zijn en geen
+   toevallige uitkomst. */
 async function ceremonie(van, reden) {
   const v = await post('/api/techniek/isolatie/ontsluiting', {
     drager: 'huis', van: van, naar: 'normaal', reden: reden
@@ -40,6 +48,12 @@ async function ceremonie(van, reden) {
   const verzoek = v.body.verzoek;
   assert.equal(verzoek.noodontsluiting, true, 'een opstelling met een eigenaar hoort dit te merken');
   assert.ok(!verzoek.vereisten.includes('tweedePaarOgen'));
+  const gronden = (verzoek.noodGronden || []).map(g => g.grond).sort();
+  assert.deepEqual(gronden, ['geenPasskey', 'geenTweedeMens'],
+    'beide gronden staan met naam in het verzoek; een eis die wegvalt zonder grond zou deze ' +
+    'helper stilletjes minder laten meten: ' + JSON.stringify(verzoek.noodGronden));
+  assert.ok(!verzoek.vereisten.includes('passkey'),
+    'en de passkey-eis is dus met reden weggevallen, niet vergeten');
   /* De stappen komen UIT het verzoek en staan hier niet overgetypt. De eisen
      hangen af van hoe zwaar de overgang is -- van `beperkt` naar `normaal` vraagt
      minder dan vanuit `isolatie` -- en een toets die zijn eigen lijst meebrengt,

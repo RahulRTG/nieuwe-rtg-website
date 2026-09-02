@@ -73,14 +73,50 @@ const noemers = {};
   const zonderFunctie = paden.filter(p => !functies.functieVoorPad(p));
   const tegengehouden = paden.filter(p => beschermstand.houdtTegen(p, 'POST'));
 
+  /* GEEN FUNCTIE IS NIET HETZELFDE ALS NIEMAND HEEFT DIT INGEDEELD.
+
+     Hier stond `ONBESLIST: zonderFunctie.length`, en dat las 81 paden als 81
+     onbesliste gevallen. Voor 75 ervan bestaat de indeling al -- in
+     server/kern/bestuursroutes.js, het register van paden die BEWUST nooit
+     achter een functieschakelaar staan, met per prefix de reden. Die paden
+     lopen aantoonbaar door EN dat is een keuze, en dat is per de definitie
+     bovenaan dit bestand `BEWEZEN_TOEGESTAAN` en niet `ONBESLIST`.
+
+     Het verschil is niet cosmetisch: zolang beide in een getal zaten, meldde
+     dit register 81 ONBESLIST terwijl zijn eigen werklijst 0 zei, en zei
+     scripts/schakelbaar.js over dezelfde vraag 7. Twee meters, twee antwoorden.
+     ONBESLIST is nu wat het woord zegt: geen functie EN geen grond. */
+  const { redenVoor: bestuursgrond } = require(path.join(root, 'server/kern/bestuursroutes'));
+  const openpadenLijst = require(path.join(root, 'server/kern/isolatie/openpaden'));
+  const heeftGrond = p => !!(bestuursgrond(p) || openpadenLijst.EIGEN_UITGANG[p] ||
+    openpadenLijst.RECHT_VAN_DE_MENS[p] || openpadenLijst.BEWUST_DICHT[p]);
+  const onbeslist = zonderFunctie.filter(p => !heeftGrond(p));
+
   noemers.httpPaden = {
     wat: 'unieke API-paden uit de executiekaart, gehouden tegen kern/beschermstand.js met methode POST',
-    bron: ['EXECUTION_MAP.json', 'server/kern/beschermstand.js', 'server/functies'],
+    bron: ['EXECUTION_MAP.json', 'server/kern/beschermstand.js', 'server/functies',
+      'server/kern/bestuursroutes.js'],
     gevonden: paden.length,
     BEWEZEN_GEBLOKKEERD: tegengehouden.length,
-    BEWEZEN_TOEGESTAAN: paden.length - tegengehouden.length - zonderFunctie.length,
-    ONBESLIST: zonderFunctie.length,
+    BEWEZEN_TOEGESTAAN: paden.length - tegengehouden.length - onbeslist.length,
+    ONBESLIST: onbeslist.length,
     ONBEPAALD_INFRA: 0,
+    /* DE NOEMER IS AANTOONBAAR ONVOLLEDIG, EN DAT STAAT ERBIJ IN PLAATS VAN DAT
+       4655 als "alle paden" leest. Twee gaten, allebei nagemeten:
+       - EXECUTION_MAP.json is een bouwartefact en kan een commit achterlopen op
+         nieuwe routes (npm run executionmap haalt hem bij);
+       - de scanner van scripts/schakelbaar.js mist routes die met een BEREKENDE
+         prefix worden gemonteerd (server/routes/papieren-deur.js), want hij
+         zoekt letterlijke strings.
+       Een derde scanner erbij bouwen mag niet: keuringsregel 56 verbiedt een
+       nieuwe eigen routelijst, en schakelbaar.js staat daar al als uitzondering. */
+    noemerachterstand: {
+      wat: 'twee bekende gaten in de inventaris; 4655 is niet "alle paden"',
+      kaartLooptAchter: 'EXECUTION_MAP.json wordt gegenereerd en draagt alleen wat er bij de laatste ' +
+        'draai stond',
+      berekendePrefix: 'routes die met een berekende prefix worden gemonteerd (routes/papieren-deur.js) ' +
+        'ziet de statische scanner niet'
+    },
     /* DE BLINDE VLEK, en die hoort bovenaan en niet in een voetnoot.
        houdtTegen() geeft `null` zodra er geen functie achter een pad hangt: er
        valt dan niets in te delen, en tegenhouden op grond van niets is raden.
@@ -95,22 +131,48 @@ const noemers = {};
        en wie ze weglaat, verzwijgt dat de beschermstand geen grip heeft op de
        console van de eigenaar. Dus staan ze er alle drie, apart. */
     blindeVlek: (() => {
-      const uitgang = Object.keys(
-        require(path.join(root, 'server/kern/isolatie/leesset')).EIGEN_UITGANG || {});
-      const console_ = zonderFunctie.filter(p => /^\/api\/(techniek|boardroom)\//.test(p));
+      const openpaden = openpadenLijst;
+      const uitgang = Object.keys(openpaden.EIGEN_UITGANG || {});
+      const recht = Object.keys(openpaden.RECHT_VAN_DE_MENS || {});
+      const dicht = openpaden.BEWUST_DICHT || {};
+      /* DE GROND KOMT UIT HET BESTAANDE REGISTER EN NIET UIT EEN REGEX HIER.
+
+         Hier stond `/^\/api\/(techniek|boardroom)\//`, en dat was een tweede
+         waarheid naast server/kern/bestuursroutes.js -- de enige lijst van paden
+         die BEWUST buiten de functieschakelaars staan, met per prefix de reden.
+         Die regex kende /api/health, /api/metrics, /api/cluster, /api/sat en
+         /api/test niet, en `blindEnVerzwakkend` verderop vergat /api/boardroom/
+         helemaal. Vandaag onzichtbaar omdat de kaart die paden niet draagt,
+         morgen een stille verkeerde indeling. */
+      const redenVoor = bestuursgrond;
+      const console_ = zonderFunctie.filter(p => redenVoor(p) &&
+        !uitgang.includes(p) && !recht.includes(p) && !dicht[p]);
       const eigen = zonderFunctie.filter(p => uitgang.includes(p));
-      const rest = zonderFunctie.filter(p => !console_.includes(p) && !eigen.includes(p));
+      const rechten = zonderFunctie.filter(p => recht.includes(p));
+      const besloten = zonderFunctie.filter(p => dicht[p]);
+      const rest = zonderFunctie.filter(p => !console_.includes(p) && !eigen.includes(p) &&
+        !rechten.includes(p) && !besloten.includes(p));
       return {
         aantal: zonderFunctie.length,
         waarom: 'geen functie in de functiecatalogus achter dit pad; de beschermstand deelt hem daarom ' +
           'niet in en laat hem door',
         eigenaarConsole: { aantal: console_.length,
-          wat: 'eigenaar-only en bewust buiten de functieschakelaars: de hand die repareert',
-          bron: 'server/routes/techniek/controle.js',
+          wat: 'bewust buiten de functieschakelaars, met een grond die al bestond: de hand die ' +
+            'repareert, de meetlijn die eerlijk moet blijven, en de AVG-knoppen die RTG niet mag uitzetten',
+          bron: 'server/kern/bestuursroutes.js: REDENEN (het bestaande register, niet hier overgetypt)',
+          gronden: Object.fromEntries([...new Set(console_.map(p => redenVoor(p)))].map(r =>
+            [r, console_.filter(p => redenVoor(p) === r).length])),
           maar: 'de beschermstand heeft daarmee geen grip op die console' },
         eigenUitgang: { aantal: eigen.length, paden: eigen,
           wat: 'de uitgang van de stand zelf; die valt met opzet niet dicht',
-          bron: 'server/kern/isolatie/leesset.js: EIGEN_UITGANG' },
+          bron: 'server/kern/isolatie/openpaden.js: EIGEN_UITGANG' },
+        rechtVanDeMens: { aantal: rechten.length, paden: rechten,
+          wat: 'inzage, uitdraai, het inzagejournaal en het intrekken van toestemming: die LEZEN of ' +
+            'VERSMALLEN, dus ze vergroten geen vermogen en blijven open',
+          bron: 'server/kern/isolatie/openpaden.js: RECHT_VAN_DE_MENS' },
+        bewustDicht: { aantal: besloten.length,
+          paden: Object.fromEntries(besloten.map(p => [p, dicht[p]])),
+          wat: 'overwogen en met opzet niet opengezet' },
         werklijst: { aantal: rest.length, paden: rest,
           wat: 'blinde vlekken zonder verklaring; dit is het werk' }
       };
@@ -245,16 +307,23 @@ const noemers = {};
          eigenaar. Dat is een aanvaard ontwerp en geen bug -- maar het betekent
          dat wie die console overneemt, langs deze hele laag heen loopt. Daar
          hangt de ontsluitceremonie van het huis aan, en die is er nog niet. */
-      const eigenConsole = blindEnGevaarlijk.filter(r => /^\/api\/techniek\//.test(r.pad));
-      const rest = blindEnGevaarlijk.filter(r => !/^\/api\/techniek\//.test(r.pad));
+      /* OOK HIER DE GROND UIT HET REGISTER. Deze filter keek alleen naar
+         /api/techniek/ en vergat /api/boardroom/, dus /api/boardroom/betalingen/proef
+         stond als werk op de lijst terwijl bestuursroutes.js hem al verklaart.
+         Een werklijst met een verklaard pad erop, kost iemand een middag. */
+      const bestuur = require(path.join(root, 'server/kern/bestuursroutes'));
+      const eigenConsole = blindEnGevaarlijk.filter(r => bestuur.redenVoor(r.pad));
+      const rest = blindEnGevaarlijk.filter(r => !bestuur.redenVoor(r.pad));
       return {
         aantal: blindEnGevaarlijk.length,
         waarom: 'deze paden kent de beschermstand niet (geen functie in de catalogus) terwijl het ' +
           'effectmodel er een gesloten effect in ziet',
         bijOntwerp: {
           aantal: eigenConsole.length,
-          wat: 'de eigen console van de eigenaar: eigenaar-only en bewust buiten de functieschakelaars',
-          bron: 'server/routes/techniek/controle.js',
+          wat: 'bewust buiten de functieschakelaars, met een grond die al bestond',
+          bron: 'server/kern/bestuursroutes.js: REDENEN',
+          gronden: Object.fromEntries([...new Set(eigenConsole.map(r => bestuur.redenVoor(r.pad)))]
+            .map(g => [g, eigenConsole.filter(r => bestuur.redenVoor(r.pad) === g).length])),
           maar: 'de beschermstand heeft daarmee geen grip op die console. Wie hem overneemt, loopt ' +
             'langs deze hele laag heen; daar hangt de ontsluitceremonie van het HUIS aan, en die is er nog niet.'
         },
@@ -419,16 +488,62 @@ const noemers = {};
 
 /* ---------- 3c. De dragers ---------- */
 {
+  /* DRIE KOLOMMEN EN GEEN EEN, want er zaten twee vragen onder een veldnaam.
+
+     `metBron` telde de dragers met een OPSLAGPLEK en werd hier gelezen als "kan
+     dit werken". Dat is niet hetzelfde: `apparaat` had een keurige plek in
+     db.data.isolatie.apparaat en geen enkele plek in de code die er ooit een
+     sleutel in stopte, en `sessie` viel stil terug op de identiteitsleutel. De
+     meter meldde 5 van 6 terwijl er bij een echt verzoek EEN drager een sleutel
+     had.
+
+     De twee worden niet opgeteld en niet vervangen. RTG kan een organisatie wel
+     dichtzetten vanaf de cockpit (dus de opslag werkt) terwijl die stand bij een
+     verzoek van dat lid nog niet meeweegt (dus de sleutel ontbreekt) -- allebei
+     waar, en samentellen zou van allebei een halve waarheid maken. */
   noemers.dragers = {
     wat: 'de zes dragers waarop een stand kan staan',
-    bron: ['server/kern/isolatie/dragers.js'],
+    bron: ['server/kern/isolatie/dragers.js', 'server/kern/isolatie/sessiedragers.js'],
     gevonden: dragerlijst.DRAGERS.length,
     metBron: dragerlijst.werkend().length,
+    metSleutelbron: dragerlijst.metSleutelbron().length,
+    verschil: 'metBron = er is een plek waar de stand STAAT. metSleutelbron = bij een lopend ' +
+      'verzoek is er ook een SLEUTEL om hem aan te hangen. Alleen de tweede telt mee in de join ' +
+      'van een echt verzoek.',
     zonderBron: dragerlijst.DRAGERS.filter(d => d.bron === null)
       .map(d => ({ naam: d.naam, waarom: d.nietGebouwd })),
+    zonderSleutelbron: dragerlijst.DRAGERS.filter(d => !d.sleutelbron)
+      .map(d => ({ naam: d.naam, waarom: d.geenSleutel })),
     /* Een drager zonder bron telt NIET stil als `normaal` mee in de join: hij
        levert geen stand, en dat is iets anders dan de stand normaal. */
     teltAlsNormaal: false
+  };
+}
+
+/* ---------- 3c2. Achtergrondwerk: de maat van het gat `workload` ---------- */
+{
+  const achtergrond = require(path.join(root, 'scripts/lib/achtergrond')).meet();
+  noemers.workload = {
+    wat: 'hoeveel achtergrondwerk er draait, en of het ergens aan hangt',
+    bron: ['server/kern/isolatie/dragers.js', 'server/kern/kosten/haak.js',
+      'server/opzet/handeling.js', 'scripts/lib/achtergrond.js'],
+    gevonden: achtergrond.sites,
+    bestanden: achtergrond.bestanden,
+    binnenEenContext: achtergrond.metContext,
+    contextpunten: achtergrond.contextpunten,
+    ondergrens: achtergrond.ondergrens,
+    /* WAAROM DIT GEEN NOEMER MET EEN PERCENTAGE IS. "45 taken, 1 met context"
+       leest als 2% dekking, en dat suggereert dat de andere 44 een context
+       zouden moeten krijgen. Dat is niet de vraag: die ene treffer is een
+       HTTP-poort in hetzelfde bestand, geen taak die zich aanmeldt. Het getal
+       zegt hoe GROOT de afwezigheid is, niet hoe ver we zijn. */
+    waarom: 'er is geen gedeeld punt waar een achtergrondtaak begint. De async-context die er wel ' +
+      'is (kern/kosten/haak.js) wordt op drie plekken betreden en alle drie zijn HTTP-poorten; een ' +
+      'achtergrondtaak krijgt daar `huis`, en dat woord betekent op die plek tegelijk ' +
+      '"achtergrondtaak", "onbekende aanroeper" en "de kern was nog niet wakker". Die waarde als ' +
+      'workload-signaal lezen zou een tweede betekenis op een bestaand woord zijn.',
+    gevolg: 'een `bron` invullen voor de drager `workload` levert een stand op die niemand zet en ' +
+      'niemand leest. Hij blijft dus leeg, maar het gat heeft nu een maat.'
   };
 }
 
@@ -471,15 +586,50 @@ const noemers = {};
     klassen: herkomstlaag.KLASSENAMEN,
     sluitBijOnvertrouwd: herkomstlaag.NOOIT_UIT_ONVERTROUWD.length,
     sluitBijActiefOnvertrouwd: herkomstlaag.NOOIT_UIT_ACTIEF.length,
-    handhaaft: true,
-    waar: 'kern/stuur/isolatiefilter.js, op dezelfde plek waar de isolatiestand versmalt',
+    /* `handhaaft` IS GEMETEN EN NIET BEWEERD, en dat is een reparatie waar dit
+       register zich voor moet schamen. Hier stond vast `true` terwijl de regel
+       NERGENS draaide: de enige productie-aanroeper riep stuurPaden met drie
+       argumenten aan, dus `bronnen` was altijd `undefined` en `sluitDoorHerkomst([])`
+       gaf altijd `[]`. De regel stond, de dekking was nul, en het register meldde
+       bescherming. Dat is erger dan geen regel -- niemand bouwt wat er al lijkt
+       te zijn.
+
+       De meting leest de BRON van de lus: geeft hij zijn kanalen door, en hangt
+       de poort ook bij `doe`? Beide zijn nodig; de kaart komt bij stap n en `doe`
+       bij stap n+3, dus alleen de lijst versmallen sluit niets. */
+    handhaaft: (() => {
+      const lus = fs.readFileSync(path.join(root, 'server/kern/stuur/lus.js'), 'utf8');
+      const stap = fs.readFileSync(path.join(root, 'server/kern/stuur/lusstap.js'), 'utf8');
+      const geeftDoor = /stuurPaden\(app, opties\.wereld, isoContext\(\), vuil\.bronnen\(\)\)/.test(lus);
+      const poortBijDoe = /herkomstpoort\(pad, wereld\)/.test(stap);
+      const meldt = /vuil\.meldToolantwoord\(pad\)/.test(stap);
+      return {
+        kaartVersmalt: geeftDoor,
+        poortBijUitvoeren: poortBijDoe,
+        besmettingGeboekt: meldt,
+        bijt: process.env.RTG_HERKOMST_AFDWINGEN === '1',
+        wat: geeftDoor && poortBijDoe && meldt
+          ? 'de leiding ligt er: de lus boekt zijn kanalen, de kaart versmalt erop en de poort ' +
+            'hangt VOOR de uitvoering. Hij BIJT alleen met RTG_HERKOMST_AFDWINGEN=1; daarzonder telt ' +
+            'hij en houdt hij niets tegen (CONTROLPLANE.md: eerst in de schaduw).'
+          : 'de leiding is INCOMPLEET; wat hier ontbreekt maakt de regel dood'
+      };
+    })(),
+    waar: 'kern/stuur/herkomstpoort.js (het oordeel), kern/stuur/isolatiefilter.js (de lijst) en ' +
+      'kern/stuur/lusstap.js (de poort voor de uitvoering) -- een oordeel, drie lezers',
     /* WAT DIT NIET IS, en dat hoort er even groot bij: er wordt geen tekst
        gescand op verdachte zinnen. Dat werkt niet, en het wekt de indruk dat het
        wel werkt -- wat erger is dan niets. */
     nietGebouwd: {
       detectie: 'er wordt geen tekst gescand; de klasse komt uit het KANAAL en nooit uit de inhoud',
-      labelaars: 'welke kanalen zich vandaag werkelijk aanmelden, is niet gemeten -- een kanaal dat ' +
-        'zwijgt telt als onvertrouwd, dus de verkeerde kant is de veilige, maar dekking is dat niet'
+      labelaars: 'van de 13 kanalen meldt er vandaag precies EEN zich aan: `toolantwoord`, geboekt ' +
+        'door kern/stuur/besmetting.js. De andere twaalf hebben geen enkele aanmelder. Een route die ' +
+        'weet dat zij post of een document teruggeeft, kan zich VERFIJNEN -- dat is niet gebouwd, en ' +
+        'zolang dat zo is telt alles wat een gereedschap teruggeeft als `toolantwoord`. Dat is de ' +
+        'veilige kant, maar dekking is het niet.',
+      prijs: 'de standaard kost bereik: na de eerste geslaagde `doe` versmalt de lijst van een lid ' +
+        'aanzienlijk. Dat is de reden dat hij in de schaduw loopt en niet bijt -- eerst het getal, ' +
+        'dan het besluit.'
     }
   };
 }
@@ -705,7 +855,8 @@ function vat(naam, n) {
       String(n.ONBESLIST).padStart(4) + ' onbeslist, ' +
       String(n.ONBEPAALD_INFRA).padStart(4) + ' onbepaald-infra' +
       (naam === 'httpPaden' ? '  (blind: ' + n.blindeVlek.werklijst.aantal + ' werklijst, ' +
-        n.blindeVlek.eigenaarConsole.aantal + ' console, ' + n.blindeVlek.eigenUitgang.aantal + ' uitgang)' : '');
+        n.blindeVlek.eigenaarConsole.aantal + ' console, ' + n.blindeVlek.eigenUitgang.aantal + ' uitgang, ' +
+        n.blindeVlek.rechtVanDeMens.aantal + ' recht, ' + n.blindeVlek.bewustDicht.aantal + ' besloten)' : '');
   }
   if (naam === 'schaduw') {
     return String(n.gevonden).padStart(6) + ' gewogen, ' + String(n.strenger).padStart(5) + ' strenger, ' +
@@ -729,8 +880,12 @@ function vat(naam, n) {
       ' effecten dicht bij onvertrouwd, ' + n.sluitBijActiefOnvertrouwd + ' bij actief-onvertrouwd';
   }
   if (naam === 'dragers') {
-    return String(n.gevonden).padStart(6) + ' dragers, ' + String(n.metBron).padStart(5) + ' met een bron, ' +
-      String(n.zonderBron.length).padStart(4) + ' zonder';
+    return String(n.gevonden).padStart(6) + ' dragers, ' + String(n.metSleutelbron).padStart(5) + ' met een sleutel bij een verzoek, ' +
+      String(n.zonderSleutelbron.length).padStart(4) + ' zonder sleutel';
+  }
+  if (naam === 'workload') {
+    return String(n.gevonden).padStart(6) + ' achtergrondsites, ' + String(n.bestanden).padStart(5) +
+      ' bestanden, ' + String(n.binnenEenContext).padStart(4) + ' binnen een context';
   }
   if (naam === 'aiBereik') {
     const b = n.onderStand.beschermd || {};

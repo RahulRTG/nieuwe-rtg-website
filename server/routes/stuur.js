@@ -7,6 +7,8 @@
    De /kaart-varianten geven uitsluitend de expliciet beoordeelde paden terug.
    Een wijziging levert een eenmalig servervoorstel; alleen /doe/bevestig kan
    dat exacte voorstel uitvoeren. De tool-lus zelf mag die route nooit zien. */
+const { dragersVanVerzoek } = require('../kern/isolatie/sessiedragers');
+
 module.exports = (kern) => {
   const { app, auth, supplierAuth, stuurRoep, stuurBevestig, stuurPaden } = kern;
 
@@ -23,9 +25,12 @@ module.exports = (kern) => {
   const isoContext = (req) => {
     const s = (req && req.session) || null;
     if (!s || !kern.isolatie) return null;
-    try {
-      return kern.isolatie.context({ identiteit: s.key || null, sessie: s.id || s.sid || s.key || null });
-    } catch (e) { return null; }
+    /* De vertaling verzoek -> dragers staat op EEN plek
+       (kern/isolatie/sessiedragers.js). Hier stond hem met de hand, met een
+       geraden `s.id || s.sid` erin die nergens bestaat -- de derde kopie van
+       dezelfde regel, en de derde die anders was. */
+    try { return kern.isolatie.context(dragersVanVerzoek(req).sleutels); }
+    catch (e) { return null; }
   };
 
   /* Wat er door een stand wegviel, gaat MEE in het antwoord. Een kaart die
@@ -73,6 +78,13 @@ module.exports = (kern) => {
   // de kaart per wereld: leden zien geen werk-paden en andersom
   const WERK = ['/api/supplier', '/api/staff', '/api/office', '/api/foundation', '/api/partner'];
   app.post('/api/member/doe/kaart', auth, (req, res) => {
+    /* GEEN VIERDE ARGUMENT, EN DAT IS EEN BESLUIT. De drie /kaart-routes hier
+       zijn een tweede weg naar dezelfde lijst; ze kregen ooit al de
+       isolatiecontext vergeten. De KANALEN krijgen ze bewust NIET mee: hier
+       vraagt een client om de lijst, en een client mag zijn eigen herkomst niet
+       opgeven -- precies dezelfde reden waarom de isolatiecontext uit de sessie
+       komt en niet uit het lijf. Zij vallen terug op het vertrouwde begin
+       (kern/stuur/besmetting.js START). */
     const alle = stuurPaden(app, 'member', isoContext(req));
     const paden = alle.filter(p => !WERK.some(w => p.startsWith(w)));
     /* De vlag reist mee over het filteren heen: `filter` levert een gewone array

@@ -48,7 +48,7 @@
     {
       "punt": "blinde vlek in de beschermstand",
       "stand": "GEMETEN",
-      "waarom": "7 paden hebben geen functie in de catalogus en geen verklaring waarom niet. De andere 74 zijn de eigenaar-console (bij ontwerp) en de uitgang van deze laag zelf."
+      "waarom": "0 paden hebben geen functie in de catalogus en geen verklaring waarom niet. De andere 81 zijn de eigenaar-console (bij ontwerp) en de uitgang van deze laag zelf."
     },
     {
       "punt": "egress deny-by-default",
@@ -84,20 +84,30 @@
       "bron": [
         "EXECUTION_MAP.json",
         "server/kern/beschermstand.js",
-        "server/functies"
+        "server/functies",
+        "server/kern/bestuursroutes.js"
       ],
       "gevonden": 4655,
       "BEWEZEN_GEBLOKKEERD": 1148,
-      "BEWEZEN_TOEGESTAAN": 3426,
-      "ONBESLIST": 81,
+      "BEWEZEN_TOEGESTAAN": 3507,
+      "ONBESLIST": 0,
       "ONBEPAALD_INFRA": 0,
+      "noemerachterstand": {
+        "wat": "twee bekende gaten in de inventaris; 4655 is niet \"alle paden\"",
+        "kaartLooptAchter": "EXECUTION_MAP.json wordt gegenereerd en draagt alleen wat er bij de laatste draai stond",
+        "berekendePrefix": "routes die met een berekende prefix worden gemonteerd (routes/papieren-deur.js) ziet de statische scanner niet"
+      },
       "blindeVlek": {
         "aantal": 81,
         "waarom": "geen functie in de functiecatalogus achter dit pad; de beschermstand deelt hem daarom niet in en laat hem door",
         "eigenaarConsole": {
           "aantal": 68,
-          "wat": "eigenaar-only en bewust buiten de functieschakelaars: de hand die repareert",
-          "bron": "server/routes/techniek/controle.js",
+          "wat": "bewust buiten de functieschakelaars, met een grond die al bestond: de hand die repareert, de meetlijn die eerlijk moet blijven, en de AVG-knoppen die RTG niet mag uitzetten",
+          "bron": "server/kern/bestuursroutes.js: REDENEN (het bestaande register, niet hier overgetypt)",
+          "gronden": {
+            "de schakelkast zelf: anders sluit de eigenaar zichzelf buiten": 16,
+            "het techniekbord zelf: de herstelknoppen mogen niet achter een knop": 52
+          },
           "maar": "de beschermstand heeft daarmee geen grip op die console"
         },
         "eigenUitgang": {
@@ -111,19 +121,31 @@
             "/api/isolatie/mijn/zet"
           ],
           "wat": "de uitgang van de stand zelf; die valt met opzet niet dicht",
-          "bron": "server/kern/isolatie/leesset.js: EIGEN_UITGANG"
+          "bron": "server/kern/isolatie/openpaden.js: EIGEN_UITGANG"
         },
-        "werklijst": {
-          "aantal": 7,
+        "rechtVanDeMens": {
+          "aantal": 5,
           "paden": [
             "/api/inzagekaart",
-            "/api/privacy/delete",
             "/api/privacy/export",
             "/api/privacy/inzage",
-            "/api/toestel/meting",
             "/api/toestemming",
             "/api/toestemming/intrek"
           ],
+          "wat": "inzage, uitdraai, het inzagejournaal en het intrekken van toestemming: die LEZEN of VERSMALLEN, dus ze vergroten geen vermogen en blijven open",
+          "bron": "server/kern/isolatie/openpaden.js: RECHT_VAN_DE_MENS"
+        },
+        "bewustDicht": {
+          "aantal": 2,
+          "paden": {
+            "/api/privacy/delete": "onomkeerbaar en breed: de gemeten collecties laten rechten, identiteit, andermans gegevens, koppelingen en de beveiliging zien. Het RECHT blijft bestaan; de UITVOERING wacht tot het account niet meer onder verdenking staat.",
+            "/api/toestel/meting": "geen ledenroute maar een toestelsleutel (kern/toestellen.js): een andere deur, geen blinde vlek in deze."
+          },
+          "wat": "overwogen en met opzet niet opengezet"
+        },
+        "werklijst": {
+          "aantal": 0,
+          "paden": [],
           "wat": "blinde vlekken zonder verklaring; dit is het werk"
         }
       }
@@ -382,68 +404,20 @@
         "aantal": 56,
         "waarom": "deze paden kent de beschermstand niet (geen functie in de catalogus) terwijl het effectmodel er een gesloten effect in ziet",
         "bijOntwerp": {
-          "aantal": 52,
-          "wat": "de eigen console van de eigenaar: eigenaar-only en bewust buiten de functieschakelaars",
-          "bron": "server/routes/techniek/controle.js",
+          "aantal": 56,
+          "wat": "bewust buiten de functieschakelaars, met een grond die al bestond",
+          "bron": "server/kern/bestuursroutes.js: REDENEN",
+          "gronden": {
+            "de schakelkast zelf: anders sluit de eigenaar zichzelf buiten": 1,
+            "zien wie in uw gegevens keek is hetzelfde AVG-recht; een knop die dat dichtzet hoort niet te bestaan": 1,
+            "inzage, export en verwijdering zijn AVG-rechten en niet uitschakelbaar": 2,
+            "het techniekbord zelf: de herstelknoppen mogen niet achter een knop": 52
+          },
           "maar": "de beschermstand heeft daarmee geen grip op die console. Wie hem overneemt, loopt langs deze hele laag heen; daar hangt de ontsluitceremonie van het HUIS aan, en die is er nog niet."
         },
         "werklijst": {
-          "aantal": 4,
-          "paden": [
-            {
-              "pad": "/api/boardroom/betalingen/proef",
-              "regel": null,
-              "effecten": [
-                "GELD_BEWEGEN"
-              ],
-              "graad": "afgeleid",
-              "geraakt": [
-                "GELD_BEWEGEN"
-              ]
-            },
-            {
-              "pad": "/api/inzagekaart",
-              "regel": null,
-              "effecten": [
-                "IDENTITEIT_WIJZIGEN"
-              ],
-              "graad": "afgeleid",
-              "geraakt": [
-                "IDENTITEIT_WIJZIGEN"
-              ]
-            },
-            {
-              "pad": "/api/privacy/delete",
-              "regel": null,
-              "effecten": [
-                "EXTERN_BEREIKEN",
-                "RECHT_VERLENEN",
-                "IDENTITEIT_WIJZIGEN",
-                "SCHRIJVEN_ANDERMANS",
-                "VERTROUWENSRELATIE_AANGAAN",
-                "BEVEILIGING_VERZWAKKEN"
-              ],
-              "graad": "afgeleid",
-              "geraakt": [
-                "RECHT_VERLENEN",
-                "IDENTITEIT_WIJZIGEN",
-                "SCHRIJVEN_ANDERMANS",
-                "VERTROUWENSRELATIE_AANGAAN",
-                "BEVEILIGING_VERZWAKKEN"
-              ]
-            },
-            {
-              "pad": "/api/privacy/inzage",
-              "regel": null,
-              "effecten": [
-                "IDENTITEIT_WIJZIGEN"
-              ],
-              "graad": "afgeleid",
-              "geraakt": [
-                "IDENTITEIT_WIJZIGEN"
-              ]
-            }
-          ],
+          "aantal": 0,
+          "paden": [],
           "wat": "blinde vlekken zonder die verklaring; dit is het werk"
         }
       },
@@ -804,14 +778,14 @@
         "server/kern/isolatie/effecten.js"
       ],
       "gevonden": 4655,
-      "BEWEZEN_GEBLOKKEERD": 3398,
-      "BEWEZEN_TOEGESTAAN": 1257,
+      "BEWEZEN_GEBLOKKEERD": 3396,
+      "BEWEZEN_TOEGESTAAN": 1259,
       "ONBESLIST": 0,
       "ONBEPAALD_INFRA": 0,
       "gronden": {
-        "NIET_BEWEZEN_LEZER": 2454,
+        "NIET_BEWEZEN_LEZER": 2453,
         "Toegang en identiteit": 37,
-        "EFFECT_GESLOTEN": 51,
+        "EFFECT_GESLOTEN": 50,
         "Geld": 62,
         "Betalen & verificatie": 20,
         "Personeel & integraties": 26,
@@ -829,7 +803,7 @@
       },
       "tegenoverBeschermd": {
         "beschermdLaatDoor": 3507,
-        "isolatieLaatDoor": 1257,
+        "isolatieLaatDoor": 1259,
         "waarom": "isolatie draagt de eigenschap `beschermd` ook, en sluit daarbovenop alles waarvan het lezerschap niet is bewezen"
       },
       "prijs": "de meting kwam bij 3033 van de 4655 rol-paden nooit met succes langs. Die gaan onder isolatie dicht, en een deel ervan zijn onschuldige lezers. Isolatie is dus botter dan hij hoeft te zijn; dat wordt minder naarmate IDEMPROEF.json verder komt."
@@ -837,17 +811,48 @@
     "dragers": {
       "wat": "de zes dragers waarop een stand kan staan",
       "bron": [
-        "server/kern/isolatie/dragers.js"
+        "server/kern/isolatie/dragers.js",
+        "server/kern/isolatie/sessiedragers.js"
       ],
       "gevonden": 6,
       "metBron": 5,
+      "metSleutelbron": 4,
+      "verschil": "metBron = er is een plek waar de stand STAAT. metSleutelbron = bij een lopend verzoek is er ook een SLEUTEL om hem aan te hangen. Alleen de tweede telt mee in de join van een echt verzoek.",
       "zonderBron": [
         {
           "naam": "workload",
           "waarom": "er is nog geen plek waar een achtergrondtaak zichzelf als drager aanmeldt. Hij staat hier omdat hij bestaat, niet omdat hij werkt -- een lege stand die als `normaal` meetelt zou de join stil verzwakken, dus telt hij als een drager ZONDER stand en niet als een drager MET de stand normaal."
         }
       ],
+      "zonderSleutelbron": [
+        {
+          "naam": "organisatie",
+          "waarom": "een sessie draagt geen organisatiecode. Een zaaksessie kent `code`, maar geen enkele aanroeper geeft die door aan deze laag; RTG kan de stand dus wel ZETTEN vanaf de cockpit, maar hij werkt bij een lopend verzoek van dat lid nog niet mee in de join."
+        },
+        {
+          "naam": "workload",
+          "waarom": "geen achtergrondtaak meldt zich aan; er is ook geen gedeeld beginpunt waar dat zou kunnen (de async-context van kern/kosten/haak.js draagt een kostendrager, geen actor)."
+        }
+      ],
       "teltAlsNormaal": false
+    },
+    "workload": {
+      "wat": "hoeveel achtergrondwerk er draait, en of het ergens aan hangt",
+      "bron": [
+        "server/kern/isolatie/dragers.js",
+        "server/kern/kosten/haak.js",
+        "server/opzet/handeling.js",
+        "scripts/lib/achtergrond.js"
+      ],
+      "gevonden": 45,
+      "bestanden": 41,
+      "binnenEenContext": 1,
+      "contextpunten": [
+        "server/opzet/diensten2.js (kosten/haak)"
+      ],
+      "ondergrens": "alleen setInterval wordt herkend; een taak die anders wordt gestart telt hier niet mee",
+      "waarom": "er is geen gedeeld punt waar een achtergrondtaak begint. De async-context die er wel is (kern/kosten/haak.js) wordt op drie plekken betreden en alle drie zijn HTTP-poorten; een achtergrondtaak krijgt daar `huis`, en dat woord betekent op die plek tegelijk \"achtergrondtaak\", \"onbekende aanroeper\" en \"de kern was nog niet wakker\". Die waarde als workload-signaal lezen zou een tweede betekenis op een bestaand woord zijn.",
+      "gevolg": "een `bron` invullen voor de drager `workload` levert een stand op die niemand zet en niemand leest. Hij blijft dus leeg, maar het gat heeft nu een maat."
     },
     "bruikbaarheid": {
       "wat": "wat er onder elke stand nog werkt, per kritiek gebruikersverhaal",
@@ -905,11 +910,18 @@
       ],
       "sluitBijOnvertrouwd": 8,
       "sluitBijActiefOnvertrouwd": 11,
-      "handhaaft": true,
-      "waar": "kern/stuur/isolatiefilter.js, op dezelfde plek waar de isolatiestand versmalt",
+      "handhaaft": {
+        "kaartVersmalt": true,
+        "poortBijUitvoeren": true,
+        "besmettingGeboekt": true,
+        "bijt": false,
+        "wat": "de leiding ligt er: de lus boekt zijn kanalen, de kaart versmalt erop en de poort hangt VOOR de uitvoering. Hij BIJT alleen met RTG_HERKOMST_AFDWINGEN=1; daarzonder telt hij en houdt hij niets tegen (CONTROLPLANE.md: eerst in de schaduw)."
+      },
+      "waar": "kern/stuur/herkomstpoort.js (het oordeel), kern/stuur/isolatiefilter.js (de lijst) en kern/stuur/lusstap.js (de poort voor de uitvoering) -- een oordeel, drie lezers",
       "nietGebouwd": {
         "detectie": "er wordt geen tekst gescand; de klasse komt uit het KANAAL en nooit uit de inhoud",
-        "labelaars": "welke kanalen zich vandaag werkelijk aanmelden, is niet gemeten -- een kanaal dat zwijgt telt als onvertrouwd, dus de verkeerde kant is de veilige, maar dekking is dat niet"
+        "labelaars": "van de 13 kanalen meldt er vandaag precies EEN zich aan: `toolantwoord`, geboekt door kern/stuur/besmetting.js. De andere twaalf hebben geen enkele aanmelder. Een route die weet dat zij post of een document teruggeeft, kan zich VERFIJNEN -- dat is niet gebouwd, en zolang dat zo is telt alles wat een gereedschap teruggeeft als `toolantwoord`. Dat is de veilige kant, maar dekking is het niet.",
+        "prijs": "de standaard kost bereik: na de eerste geslaagde `doe` versmalt de lijst van een lid aanzienlijk. Dat is de reden dat hij in de schaduw loopt en niet bijt -- eerst het getal, dan het besluit."
       }
     },
     "uitgaandeBestemmingen": {

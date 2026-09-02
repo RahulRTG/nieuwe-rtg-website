@@ -23,15 +23,16 @@
    VERLAGEN LOOPT LANGS DEZELFDE CEREMONIE als bij het kantoor. Dat is met opzet
    niet lichter gemaakt voor een lid: juist bij een lid is het scenario dat de
    ceremonie moet vangen -- iemand die de sessie heeft overgenomen en de
-   bescherming weer uit wil zetten -- het meest waarschijnlijk. */
+   bescherming weer uit wil zetten -- het meest waarschijnlijk. Die ceremonie
+   staat in ./isolatie-ceremonie.js: verstrengen is een handeling, verlagen is
+   een protocol, en dat zijn twee onderwerpen. */
 'use strict';
 
 const functies = require('../functies');
 const klok = require('../lib/klok');
 const maakIsolatie = require('../kern/isolatie');
 const { maakBruikbaarheid } = require('../kern/isolatie/bruikbaarheid');
-
-const EIGEN_LAGEN = ['identiteit', 'sessie', 'apparaat'];
+const { dragersVanVerzoek, EIGEN_LAGEN } = require('../kern/isolatie/sessiedragers');
 
 module.exports = (kern) => {
   const { app, db, save, auth, beveilig } = kern;
@@ -56,25 +57,26 @@ module.exports = (kern) => {
      drukken, wordt er niet door beschermd. */
   const bruikbaar = maakBruikbaarheid({ isolatie, functies });
 
-  /* De drie sleutels van dit lid, alle drie uit de sessie. `apparaat` bestaat
-     alleen als de sessie er een draagt; hem verzinnen zou een stand opleveren
-     die aan niets hangt. */
-  function mijnSleutels(req) {
-    const s = req.session || {};
-    return {
-      identiteit: s.key || null,
-      sessie: s.id || s.sid || s.key || null,
-      apparaat: s.apparaat || s.device || null
-    };
-  }
+  /* De sleutels van dit lid, alle uit de sessie en de Authorization-kop. De
+     vertaling staat in kern/isolatie/sessiedragers.js -- hier stond hem met de
+     hand, met een `s.id || s.sid` erin die nergens bestaat, waardoor `sessie`
+     stil terugviel op de identiteitsleutel. Twee lagen zetten dan dezelfde
+     stand, en het scherm zei dat niet. */
+  function mijnSleutels(req) { return dragersVanVerzoek(req).sleutels; }
+
   function laagOf(req, drager) {
     if (!EIGEN_LAGEN.includes(String(drager))) {
       const e = new Error('U kunt alleen uw eigen lagen zetten: ' + EIGEN_LAGEN.join(', ') + '.');
       e.status = 403; throw e;
     }
-    const sleutel = mijnSleutels(req)[drager];
+    const uit = dragersVanVerzoek(req);
+    const sleutel = uit.sleutels[drager];
     if (!sleutel) {
-      const e = new Error('Deze sessie draagt geen ' + drager + '; er is niets om een stand aan te hangen.');
+      /* GEEN LEGE WEIGERING. De reden komt uit het dragerregister en zegt wat er
+         ontbreekt en waarom -- een lid dat een knop niet kan gebruiken, hoort te
+         horen waardoor (GRAMMATICA.md: een verhindering draagt altijd een reden). */
+      const e = new Error('Deze sessie draagt geen ' + drager + ': ' +
+        (uit.ontbreekt[drager] || 'er is niets om een stand aan te hangen.'));
       e.status = 409; throw e;
     }
     return sleutel;
@@ -123,51 +125,10 @@ module.exports = (kern) => {
     } catch (e) { faal(res, e); }
   });
 
-  app.post('/api/isolatie/mijn/ontsluiting', auth, (req, res) => {
-    const b = req.body || {};
-    try {
-      const drager = String(b.drager || 'identiteit');
-      res.json({ ok: true, verzoek: isolatie.vraagOntsluiting({ drager, sleutel: laagOf(req, drager),
-        naar: b.naar, door: actor(req), reden: b.reden }) });
-    } catch (e) { faal(res, e); }
-  });
-
-  /* DE STAP EN DE COMMIT MOETEN OVER EEN VERZOEK VAN DIT LID GAAN. Zonder deze
-     controle kan een lid met een geraden nummer de ceremonie van iemand anders
-     aftekenen -- en dat is precies de aanval waar deze hele laag tegen is. */
-  function mijnVerzoek(req, id) {
-    const v = isolatie.ontsluiting.vind(id);
-    const sleutels = Object.values(mijnSleutels(req)).filter(Boolean);
-    if (!v || !EIGEN_LAGEN.includes(v.drager) || !sleutels.includes(v.sleutel)) {
-      const e = new Error('Onbekende ontsluiting.');   // met opzet hetzelfde antwoord als "bestaat niet"
-      e.status = 404; throw e;
-    }
-    return v;
-  }
-
-  app.post('/api/isolatie/mijn/ontsluiting/stap', auth, (req, res) => {
-    const b = req.body || {};
-    try {
-      mijnVerzoek(req, b.id);
-      res.json({ ok: true, verzoek: isolatie.ontsluiting.stap(b.id,
-        { soort: b.soort, door: actor(req), bewijs: b.bewijs }) });
-    } catch (e) { faal(res, e); }
-  });
-
-  app.post('/api/isolatie/mijn/ontsluiting/commit', auth, (req, res) => {
-    const b = req.body || {};
-    try {
-      mijnVerzoek(req, b.id);
-      res.json({ ok: true, uit: isolatie.voltooiOntsluiting(b.id, { door: actor(req) }) });
-    } catch (e) { faal(res, e); }
-  });
-
-  app.post('/api/isolatie/mijn/ontsluiting/afbreken', auth, (req, res) => {
-    const b = req.body || {};
-    try {
-      mijnVerzoek(req, b.id);
-      res.json({ ok: true, verzoek: isolatie.ontsluiting.afbreken(b.id,
-        { door: actor(req), reden: b.reden }) });
-    } catch (e) { faal(res, e); }
-  });
+  /* DE CEREMONIE STAAT ERNAAST. Vijf routes, een eigen bestand, en dezelfde
+     helpers doorgegeven in plaats van nagebouwd: `mijnSleutels` en `laagOf`
+     dragen de regel dat een sleutel uit de sessie komt, en die regel mag maar
+     op een plek staan. */
+  require('./isolatie-ceremonie')({ app, kern, auth, isolatie,
+    eigenLagen: EIGEN_LAGEN, laagOf, mijnSleutels, actor, faal });
 };

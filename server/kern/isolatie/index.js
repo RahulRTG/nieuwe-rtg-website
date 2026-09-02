@@ -35,7 +35,13 @@ const { maakOntsluiting } = require('./ontsluiting');
 const maakOpslag = require('./opslag');
 const { maakBeschermstand } = require('../beschermstand');
 
-const EIGEN_DRAGERS = ['organisatie', 'identiteit', 'sessie', 'apparaat'];
+/* AFGELEID EN NIET OVERGETYPT. Hier stond de lijst met de hand, als VIERDE
+   kopie van "welke dragers zijn van deze laag" -- naast dragers.js,
+   routes/isolatie.js en sessiedragers.js. Uit de afleiding volgt bovendien
+   vanzelf dat het huis er niet in zit: die stand woont in de incidentcontrole en
+   heeft daarom geen opslagplek hier. */
+const EIGEN_DRAGERS = dragers.NAMEN.filter(n =>
+  n !== 'huis' && dragers.OP_NAAM[n].bron !== null);
 
 function fout(status, tekst) { const e = new Error(tekst); e.status = status; throw e; }
 

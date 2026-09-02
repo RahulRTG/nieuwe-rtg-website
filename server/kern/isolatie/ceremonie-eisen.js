@@ -14,14 +14,39 @@
 const ordening = require('./ordening');
 
 /* De stappen die een ceremonie kan eisen. Elk met wie hem levert, want een
-   stap die het systeem zelf kan afvinken is geen stap. */
+   stap die het systeem zelf kan afvinken is geen stap.
+
+   `uitgevoerd` zegt of de stap ECHT WORDT GECONTROLEERD of alleen afgetekend.
+   Dat onderscheid stond er niet, en dat was de duurste stille aanname van deze
+   laag: de zwaarste eis werd afgetekend met een vrije tekst uit het verzoek, dus
+   wie een sessie had overgenomen tekende hem af met het woord "proef". Waar
+   `uitgevoerd` false is, staat de REDEN erbij -- een aftekening zonder reden ziet
+   er van buiten precies zo uit als een controle. */
 const STAPPEN = Object.freeze({
-  reden:        { wie: 'de aanvrager', wat: 'een concrete reden van minimaal 8 tekens' },
-  passkey:      { wie: 'server/webauthn', wat: 'een geslaagde WebAuthn-bevestiging, buiten deze module' },
-  apparaat:     { wie: 'de sessie', wat: 'de handeling komt van een apparaat dat al vertrouwd was' },
-  wachttijd:    { wie: 'de klok', wat: 'een afkoelperiode waarin het verzoek zichtbaar openstaat' },
-  tweedePaarOgen: { wie: 'een tweede mens', wat: 'een andere actor dan de aanvrager keurt goed' }
+  reden:        { wie: 'de aanvrager', wat: 'een concrete reden van minimaal 8 tekens', uitgevoerd: true },
+  passkey:      { wie: 'server/webauthn', wat: 'een geslaagde WebAuthn-bevestiging, buiten deze module',
+                  uitgevoerd: true },
+  apparaat:     { wie: 'de sessie', wat: 'de handeling komt van een apparaat dat al vertrouwd was',
+                  uitgevoerd: false,
+                  nietUitgevoerd: 'RTG heeft geen register van vertrouwde toestellen en de sessie draagt ' +
+                    'geen toestelsleutel. Deze stap wordt daarom afgetekend en niet gecontroleerd.' },
+  wachttijd:    { wie: 'de klok', wat: 'een afkoelperiode waarin het verzoek zichtbaar openstaat',
+                  uitgevoerd: true },
+  tweedePaarOgen: { wie: 'een tweede mens', wat: 'een andere actor dan de aanvrager keurt goed',
+                  uitgevoerd: true }
 });
+
+/* HET DOEL WAARAAN EEN PASSKEY-CEREMONIE WORDT GEBONDEN, op een plek.
+
+   kern/webauthn-stapop.js bewaart ELKE stap-op-ceremonie onder hetzelfde
+   voorvoegsel `stapop:`, en het `doel` is een vrije string. Het doel IS dus de
+   enige scheiding tussen features -- niet het toeval dat een rtgid-koppel er
+   anders uitziet dan een ontsluitverzoek. Vandaar het naamsvoorvoegsel, en
+   vandaar dat de SOORT erin staat: een assertie voor `passkey` mag nooit in een
+   toekomstige `apparaat`-stap glijden. */
+function doelVoor(verzoekId, soort) {
+  return 'isolatie:ontsluiting:' + String(verzoekId || '') + ':' + String(soort || '');
+}
 
 /* Hoe lang de afkoelperiode duurt, per drager.
 
@@ -44,12 +69,27 @@ const WACHTTIJD_MINUTEN = Object.freeze({ huis: 0, organisatie: 0, identiteit: 1
 /* `tweedeMens` zegt of er BUITEN de aanvrager iemand is die mag goedkeuren.
    De aanroeper weet dat (hij kent de toegangslijst); deze module niet, en hem
    laten raden zou de zwaarste eis van de hele laag op een gok zetten. */
-function eisenVoor({ drager, van, naar, tweedeMens }) {
+function eisenVoor({ drager, van, naar, tweedeMens, passkeyMogelijk }) {
   const stap = ordening.verlaagt(van, naar);
   if (!stap.verlaagt) {
     return { verlaagt: false, eisen: [], waarom: 'dit verstrengt of laat gelijk; verhogen kent geen ceremonie' };
 }
-  const eisen = ['reden', 'passkey'];
+  const eisen = ['reden'];
+  /* DE PASSKEY-EIS HANGT AAN EEN GETELD GEGEVEN, nooit aan het verzoek.
+
+     Dezelfde afweging als bij het tweede paar ogen hieronder, en om dezelfde
+     reden: een eiser die de aanvrager niet kan halen maakt het platform na een
+     incident onherstelbaar. Een eigenaar zonder passkey zou de huis-ceremonie
+     dan nooit meer rondkrijgen. `passkeyMogelijk` wordt daarom GETELD door de
+     laag erboven (kern/webauthn.js telt de credentials van dit account) en komt
+     nooit uit het lijf van het verzoek -- zou de aanvrager het mogen meesturen,
+     dan kiest hij zelf of hij een passkey nodig heeft.
+
+     `undefined` telt hier als "wel mogelijk": een aanroeper die het gegeven niet
+     levert, mag de eis niet per ongeluk wegnemen. Alleen een uitgesproken
+     `false` opent de nooduitgang. */
+  const geenPasskey = passkeyMogelijk === false;
+  if (!geenPasskey) eisen.push('passkey');
   const zwaar = !stap.zeker || String(van) === 'isolatie' || String(van) === 'beschermd';
   if (zwaar) eisen.push('apparaat');
   if ((WACHTTIJD_MINUTEN[drager] || 0) > 0 && zwaar) eisen.push('wachttijd');
@@ -72,13 +112,29 @@ function eisenVoor({ drager, van, naar, tweedeMens }) {
      verbergen. En het is geen keuze van de aanvrager: hij levert het gegeven
      niet, de laag erboven telt het. */
   const vierOgenLaag = drager === 'huis' || drager === 'organisatie';
-  const alleen = vierOgenLaag && tweedeMens === false;
-  if (vierOgenLaag && !alleen) eisen.push('tweedePaarOgen');
+  const geenTweedeMens = vierOgenLaag && tweedeMens === false;
+  if (vierOgenLaag && !geenTweedeMens) eisen.push('tweedePaarOgen');
+
+  /* TWEE REDENEN VOOR EEN NOODONTSLUITING, EN ZE BLIJVEN UIT ELKAAR.
+
+     Er is nu meer dan een grond waarop een eis kan wegvallen, en die in een
+     boolean persen zou precies de stille samenvoeging zijn die dit huis elders
+     verbiedt: "noodontsluiting: true" zegt dan niet meer WAAROM, terwijl een
+     ontsluiting zonder tweede mens iets heel anders is dan een zonder passkey.
+     `alleen` blijft bestaan en wordt AFGELEID uit de lijst -- de lijst is de
+     waarheid, de boolean is het gemak. */
+  const gronden = [];
+  if (geenTweedeMens) gronden.push({ grond: 'geenTweedeMens',
+    waarom: 'er is buiten de aanvrager niemand met de bevoegdheid om dit goed te keuren' });
+  if (geenPasskey) gronden.push({ grond: 'geenPasskey',
+    waarom: 'aan dit account hangt geen passkey; een eis die niemand kan halen maakt het platform ' +
+      'onherstelbaar en wordt in de praktijk omzeild' });
+  const alleen = gronden.length > 0;
   return {
-    verlaagt: true, zeker: stap.zeker, eisen, alleen,
+    verlaagt: true, zeker: stap.zeker, eisen, alleen, gronden,
     alleenWaarom: alleen
-      ? 'er is buiten de aanvrager niemand met de bevoegdheid om dit goed te keuren. De ontsluiting ' +
-        'gaat door als NOODONTSLUITING: hij wordt gemerkt, gemeld en blijft in het spoor staan.'
+      ? gronden.map(g => g.waarom).join('; ') + '. De ontsluiting gaat door als NOODONTSLUITING: ' +
+        'hij wordt gemerkt, gemeld en blijft in het spoor staan.'
       : null,
     wachttijdMinuten: eisen.includes('wachttijd') ? WACHTTIJD_MINUTEN[drager] : 0,
     waarom: stap.zeker
@@ -87,4 +143,4 @@ function eisenVoor({ drager, van, naar, tweedeMens }) {
 };
 }
 
-module.exports = { STAPPEN, WACHTTIJD_MINUTEN, eisenVoor };
+module.exports = { STAPPEN, WACHTTIJD_MINUTEN, doelVoor, eisenVoor };

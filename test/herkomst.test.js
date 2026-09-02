@@ -139,6 +139,19 @@ test('6. de kanalen en de effecten zijn bij het laden gekeurd', () => {
 
    De toets leest de BRON en niet het gedrag: elke aanroep van stuurPaden() moet
    een derde argument meegeven, of met zoveel woorden zeggen waarom niet.
+
+   EN SINDS 2 SEPTEMBER 2026 EEN VIERDE, voor de AI-lus: de KANALEN die aan het
+   gesprek hebben bijgedragen. Dat argument ontbrak, en daarmee was de hele
+   herkomstbranche dood -- `bronnen` was altijd `undefined`, `sluitDoorHerkomst([])`
+   gaf altijd `[]`, en de regel stond in het register als bescherming terwijl hij
+   nergens draaide. Dat is erger dan geen regel.
+
+   DE DRIE /kaart-ROUTES IN routes/stuur.js KRIJGEN BEWUST GEEN VIERDE. Daar
+   vraagt een CLIENT om de lijst, en een client mag zijn eigen kanaal niet
+   opgeven -- om precies dezelfde reden dat de isolatiecontext uit de sessie komt
+   en niet uit het lijf. Zij vallen terug op het vertrouwde begin. Vandaar dat de
+   vier-eis alleen geldt in de lus, en dat die uitzondering hier met naam staat
+   in plaats van stil te ontbreken.
    ------------------------------------------------------------------------ */
 test('7. elke aanroep van stuurPaden geeft een isolatiecontext mee', () => {
   const fs2 = require('fs');
@@ -156,10 +169,26 @@ test('7. elke aanroep van stuurPaden geeft een isolatiecontext mee', () => {
       /* De definitie zelf telt niet mee, en ook niet het bestand dat hem maakt. */
       if (rel === 'server/kern/stuur/paden.js') continue;
       for (const [lijn, code] of codeRegelsUit(fs2.readFileSync(p, 'utf8'))) {
-        const m = /stuurPaden\s*\(([^)]*)\)/.exec(code);
+        const m = /stuurPaden\s*\(/.exec(code);
         if (!m) continue;
-        const argumenten = m[1].split(',').length;
-        if (argumenten < 3) zonder.push(rel + ':' + lijn + '  ' + code.trim().slice(0, 80));
+        /* DE HAAKJES WORDEN GETELD EN NIET GERADEN. Hier stond `[^)]*`, en die
+           stopt bij het EERSTE haakje-dicht: `stuurPaden(app, w, isoContext(), x)`
+           las als drie argumenten in plaats van vier. Zo'n toets meldt een gat
+           dat er niet is -- en, erger, hij zou een echt gat niet zien zodra er
+           ergens een aanroep met een functie-argument bij komt. */
+        let diepte = 0, komma = 1, eind = -1;
+        for (let k = m.index + m[0].length - 1; k < code.length; k++) {
+          const c = code[k];
+          if (c === '(') diepte++;
+          else if (c === ')') { diepte--; if (!diepte) { eind = k; break; } }
+          else if (c === ',' && diepte === 1) komma++;
+        }
+        if (eind < 0) continue;   // een aanroep over meerdere regels; die telt deze lezer niet
+        const argumenten = komma;
+        /* De lus draagt een gesprek en moet dus ook zijn KANALEN meegeven; een
+           client-route vraagt alleen een lijst op en mag dat juist niet. */
+        const nodig = rel === 'server/kern/stuur/lus.js' ? 4 : 3;
+        if (argumenten < nodig) zonder.push(rel + ':' + lijn + ' (< ' + nodig + ')  ' + code.trim().slice(0, 80));
       }
     }
   })(wortel);

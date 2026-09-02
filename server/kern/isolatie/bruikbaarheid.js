@@ -55,7 +55,8 @@ const VERHALEN = Object.freeze([
     paden: ['/api/isolatie/mijn', '/api/isolatie/mijn/zet'],
     waarom: 'de knop waarmee een mens zich beschermt, mag nooit dichtvallen door de bescherming zelf' },
   { id: 'ontsluiten-aanvragen', wie: 'lid', wat: 'vragen om er weer uit te mogen', moetHeel: true,
-    paden: ['/api/isolatie/mijn/ontsluiting', '/api/isolatie/mijn/ontsluiting/stap'],
+    paden: ['/api/isolatie/mijn/ontsluiting', '/api/isolatie/mijn/ontsluiting/stap/opties',
+      '/api/isolatie/mijn/ontsluiting/stap'],
     waarom: 'een stand zonder uitgang is een val, en een val zet niemand aan' }
 ]);
 

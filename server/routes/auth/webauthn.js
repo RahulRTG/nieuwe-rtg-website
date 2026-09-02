@@ -3,6 +3,8 @@
    dezelfde sessie als het wachtwoord, met dezelfde rem op de deur en
    dezelfde pas-app-controle. Krijgt de gedeelde context een keer bij het
    opstarten vanuit routes/auth.js. */
+const { sleutelUitCredential } = require('../../kern/isolatie/apparaatsleutel');
+
 module.exports = (actx) => {
   const { app, appUrl, auth, accounts, crypto, stateFor, pasAppOk, PAS_FOUT, isBaas, tooManyTries, noteFailedTry, loginFails,
     webauthn } = actx;
@@ -59,7 +61,18 @@ module.exports = (actx) => {
     const user = r.user;
     if (!accounts.isActief(user)) return res.status(403).json({ error: 'Dit account is door uw organisatie op non-actief gezet. Neem contact op met uw beheerder.' });
     if (!isBaas(user) && !pasAppOk(String(req.body.pasApp || ''), user.tier)) return res.status(403).json({ error: PAS_FOUT });
-    const token = accounts.issueToken(user.id);
+    /* DE APPARAATSLEUTEL, en dit is de enige plek in het huis waar hij bestaat.
+       Een passkey-inlog bewijst met echte cryptografie dat dit dezelfde
+       authenticator is als de vorige keer; een wachtwoordinlog bewijst dat niet,
+       en dan blijft de drager `apparaat` leeg MET de reden
+       (kern/isolatie/dragers.js). Wat er in het token komt is een afgeleide en
+       niet het credential-id: dat id is over accounts heen te herkennen. */
+    /* `sleutelVoor` komt van de GEVEL van de identiteitskluis (accounts) en niet
+       uit server/accounts/kluis.js: een route gaat nooit langs de gevel heen naar
+       het binnenwerk. Dat is niet alleen huisstijl -- de codenaam-scheiding uit
+       CLAUDE.md hangt eraan. */
+    const apparaat = sleutelUitCredential(r.credentialId, accounts.sleutelVoor);
+    const token = accounts.issueToken(user.id, 30, apparaat);
     const sess = { tier: user.tier, key: 'user-' + user.id, account: user };
     res.json({ token, state: stateFor(sess, req.body.lang) });
   });

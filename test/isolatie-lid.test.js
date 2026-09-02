@@ -153,9 +153,24 @@ test('3. verlagen loopt ook voor een lid langs de ceremonie', async () => {
   const teVroeg = await api('/api/isolatie/mijn/ontsluiting/commit', { id }, lid);
   assert.equal(teVroeg.status, 409, JSON.stringify(teVroeg.body));
 
+  /* DIT LID HEEFT GEEN PASSKEY, EN DAT WORDT HIER UITGESPROKEN.
+
+     De lus hieronder loopt over `vereisten` en niet over een eigen lijst -- een
+     toets die zijn stappen overtypt, merkt een verzwaring niet. Maar diezelfde
+     vorm laat een WEGVAL ook niet merken: valt `passkey` weg, dan tekent de lus
+     stilletjes een stap minder af en blijft groen. Vandaar deze vaststelling
+     ervoor. Dat de eis wegvalt is met opzet (een eis die niemand kan halen sluit
+     een mens buiten zijn eigen bescherming); dat het GEMERKT wordt, is de prijs.
+     De passkey-weg zelf staat end-to-end in test/isolatie-passkey.test.js. */
+  const gronden = (v.body.verzoek.noodGronden || []).map(g => g.grond);
+  assert.deepEqual(gronden, ['geenPasskey'],
+    'dit lid heeft geen passkey, dus de eis valt weg -- gemerkt en met grond: ' +
+    JSON.stringify(v.body.verzoek.noodGronden));
+  assert.ok(!v.body.verzoek.vereisten.includes('passkey'));
+
   for (const soort of v.body.verzoek.vereisten) {
     if (soort === 'reden' || soort === 'wachttijd') continue;
-    const r = await api('/api/isolatie/mijn/ontsluiting/stap', { id, soort, bewijs: 'proef' }, lid);
+    const r = await api('/api/isolatie/mijn/ontsluiting/stap', { id, soort }, lid);
     assert.equal(r.status, 200, soort + ': ' + JSON.stringify(r.body));
   }
 
@@ -225,13 +240,22 @@ test('6. een tweede aanroep op de ledenroutes', async () => {
     { drager: 'identiteit', naar: 'normaal', reden: 'Toestel opnieuw geverifieerd' }, lid);
   assert.notEqual(v1.body.verzoek.id, v2.body.verzoek.id);
 
-  /* Dezelfde stap twee keer aftekenen laat de EERSTE aftekening staan. */
+  /* Dezelfde stap twee keer aftekenen laat de EERSTE aftekening staan.
+
+     GEMETEN OP `apparaat` EN NIET OP `passkey`, en dat is geen uitwijkmanoeuvre.
+     Deze toets vraagt of een HERHALING iets verandert. Bij een passkey-stap is
+     een woordelijke herhaling per ontwerp onmogelijk: de uitdaging is eenmalig,
+     dus de tweede aanroep is een ANDERE aanroep en meet iets anders. `apparaat`
+     is de stap waar de vraag wel gesteld kan worden. Dat de tweede passkey-poging
+     met dezelfde assertie wordt geweigerd, staat als eigen bewering in
+     test/isolatie-passkey.test.js toets 6. */
   const s1 = await api('/api/isolatie/mijn/ontsluiting/stap',
-    { id: v1.body.verzoek.id, soort: 'passkey', bewijs: 'een' }, lid);
+    { id: v1.body.verzoek.id, soort: 'apparaat' }, lid);
   const s2 = await api('/api/isolatie/mijn/ontsluiting/stap',
-    { id: v1.body.verzoek.id, soort: 'passkey', bewijs: 'twee' }, lid);
+    { id: v1.body.verzoek.id, soort: 'apparaat' }, lid);
+  assert.equal(s1.status, 200, JSON.stringify(s1.body).slice(0, 160));
   assert.equal(s2.status, 200);
-  assert.deepEqual(s2.body.verzoek.voltooid.passkey, s1.body.verzoek.voltooid.passkey);
+  assert.deepEqual(s2.body.verzoek.voltooid.apparaat, s1.body.verzoek.voltooid.apparaat);
 
   /* Afbreken is hooguit eens: de tweede aanroep wordt geweigerd. */
   const a1 = await api('/api/isolatie/mijn/ontsluiting/afbreken', { id: v2.body.verzoek.id, reden: 'toch niet' }, lid);

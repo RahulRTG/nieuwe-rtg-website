@@ -76,6 +76,19 @@ const CONTRACTEN = {
     bewijs: BEWIJS,
     afgetekend: AFGETEKEND
   },
+  /* DE BEVESTIGING AANVRAGEN. Zie de ledenkant: de challenge munten en de
+     assertie inleveren zijn twee gebeurtenissen. */
+  'POST /api/techniek/isolatie/ontsluiting/stap/opties': {
+    mutatieId: 'isolatie.ontsluiting.stap.opties',
+    herkomst: 'mens',
+    semantiek: { klasse: 'nietHerhaalbaar' },
+    toegang: { klasse: 'AUTHENTICATED', deur: 'techAuth + eigenaarAlleen' },
+    stand: 'INTENTIONALLY_NON_IDEMPOTENT',
+    waarom: 'elke aanroep munt een nieuwe WebAuthn-uitdaging; een herhaling die de oude teruggaf ' +
+      'zou de uitdaging herbruikbaar maken en daarmee de binding opheffen waarvoor de route bestaat.',
+    bewijs: { gemeten: 'niet gemeten: de uitkomst is per ontwerp verschillend', op: '2026-09-02' },
+    afgetekend: AFGETEKEND
+  },
   'POST /api/techniek/isolatie/ontsluiting/stap': {
     mutatieId: 'isolatie.ontsluiting.stap',
     herkomst: 'mens',

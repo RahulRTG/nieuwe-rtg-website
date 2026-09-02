@@ -45,8 +45,13 @@ module.exports = function maakZetter({ opslag, save, beveilig, nu, standVan, spo
 
     const stap = ordening.verlaagt(huidig, naar);
     if (stap.verlaagt) {
+      /* De reden van de ordening staat er ALLEEN als hij er is. Zonder deze
+         controle eindigde de melding op een losse spatie zodra de overgang
+         gewoon ordelijk was -- en een foutmelding die er slordig uitziet, wordt
+         ook slordig gelezen. */
       fout(409, 'Dit verlaagt de beveiliging (' + huidig + ' -> ' + naar + '). ' +
-        'Verlagen loopt via een ontsluitceremonie en niet via deze weg. ' + (stap.waarom || ''));
+        'Verlagen loopt via een ontsluitceremonie en niet via deze weg.' +
+        (stap.waarom ? ' ' + stap.waarom : ''));
     }
     const kaart = opslag.tak(drager);
     kaart[String(sleutel)] = { stand: String(naar), sinds: nu().toISOString(),
@@ -63,10 +68,10 @@ module.exports = function maakZetter({ opslag, save, beveilig, nu, standVan, spo
   /* VERLAGEN. Alleen langs een ceremonie, en die begint met de HUIDIGE stand --
      niet met een stand die de aanroeper aanlevert. Zou de aanvrager `van` mogen
      kiezen, dan koos hij een overgang die geen ceremonie vraagt. */
-  function vraagOntsluiting({ drager, sleutel, naar, door, reden, tweedeMens }) {
+  function vraagOntsluiting({ drager, sleutel, naar, door, reden, tweedeMens, passkeyMogelijk }) {
     if (!EIGEN_DRAGERS.includes(drager)) fout(400, 'Deze laag ontsluit alleen ' + EIGEN_DRAGERS.join(', ') + '.');
     const van = standVan(drager, sleutel) || 'normaal';
-    return ontsluiting.start({ drager, sleutel, van, naar, door, reden, tweedeMens });
+    return ontsluiting.start({ drager, sleutel, van, naar, door, reden, tweedeMens, passkeyMogelijk });
   }
 
   function voltooiOntsluiting(id, { door }) {

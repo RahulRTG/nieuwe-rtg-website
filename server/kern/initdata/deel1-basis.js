@@ -12,6 +12,11 @@ module.exports = (ctx) => {
   }
   if (migrated) save();
   for (const [t, s] of Object.entries(db.data.sessions)) if (!sessions.has(t)) sessions.set(t, s);
+
+  /* De isolatiemigratie staat in ./isolatiesleutels.js: eenmalig werk met een
+     lange onderbouwing, en dit bestand is de basis-seed. */
+  require('./isolatiesleutels')({ db, save });
+
   if (!db.data.notifications) db.data.notifications = { rtg: [], lifestyle: [], business: [] };
   if (!db.data.pushSubs) db.data.pushSubs = { rtg: [], lifestyle: [], business: [] };
   if (!db.data.pushSubsUser) db.data.pushSubsUser = {}; // per account: userId -> [subscriptions]

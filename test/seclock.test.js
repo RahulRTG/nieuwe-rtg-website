@@ -26,6 +26,12 @@
      -> 001-b ZAKT (RAAK).
    - /api/techniek/controle/incident aan de LEZEN-lijst van beleid.js toegevoegd
      -> 002-a EN 002-b ZAKKEN (RAAK; de een leest de kaart, de ander de regexen).
+   - /api/isolatie/mijn/zet aan de KLEIN-lijst van beleid.js toegevoegd
+     -> 002-b ZAKT (RAAK). Deze mutatie zakte de EERSTE keer NIET: 002-b liep
+     toen over een handgetypt rijtje van zeven paden waar de isolatielaag niet
+     in stond. De proeflijst wordt sindsdien afgeleid uit alleRoutes(); pas
+     daarna zag de toets zijn eigen onderwerp. Zonder die tweede ronde had hier
+     een groene toets gestaan boven een gat.
    - `strengste()` de fijnste drager laten winnen in plaats van de join
      -> 003 ZAKT (RAAK), 001-a zakt niet mee.
    - de fail-closed in incidentcontrole.js terug op 'normaal'
@@ -42,6 +48,7 @@ const ordening = require('../server/kern/isolatie/ordening');
 const beleid = require('../server/kern/stuur/beleid');
 const maakIncident = require('../server/kern/incidentcontrole');
 const functies = require('../server/functies');
+const { alleRoutes } = require('../scripts/lib/routes');
 
 const root = path.join(__dirname, '..');
 
@@ -54,7 +61,17 @@ const BEVEILIGINGSPAD = [
   /incident/i, /zekering/i, /schakel/i,
   /\/functie(\/|$)/i,                      // functieschakelaars
   /\/sso(\/|$)/i, /\/eigenaar(\/|$)/i,
-  /bevoegdheid/i, /codewoord/i, /machtiging/i
+  /bevoegdheid/i, /codewoord/i, /machtiging/i,
+  /* DE ISOLATIELAAG ZELF, en die ontbrak hier -- een gat in de invariant die de
+     laag moest bewaken. /api/techniek/isolatie/ viel toevallig onder de eerste
+     regel, maar /api/isolatie/mijn/ontsluiting/commit onder geen enkele: de AI
+     zou de bescherming van een lid dus mogen opheffen als iemand dat pad ooit op
+     de allowlist zette. Precies wat SEC-LOCK-002 verbiedt, en precies wat een
+     regel op "de techniekhoek" niet ziet omdat de ledenkant daar niet woont.
+
+     Hij staat hier onderaan zodat zichtbaar blijft dat hij later is toegevoegd:
+     de laag die de invariant bewaakt, was zelf niet bewaakt. */
+  /^\/api\/isolatie\//
 ];
 function isBeveiligingspad(pad) { return BEVEILIGINGSPAD.some(r => r.test(pad)); }
 
@@ -113,14 +130,21 @@ test('SEC-LOCK-002-a: geen beveiligingspad is AI-bereikbaar volgens de executiek
 test('SEC-LOCK-002-b: geen enkele regex in de AI-allowlist raakt een beveiligingspad', () => {
   /* De kaart hierboven is een BOUWARTEFACT en kan een commit achterlopen. Deze
      tweede toets leest de bron zelf, zodat een nieuwe regel in beleid.js meteen
-     zakt en niet pas na `npm run executionmap`. */
-  const proef = [
-    '/api/techniek/controle/incident', '/api/techniek/functie', '/api/techniek/zekering',
-    '/api/techniek/eigenaar', '/api/techniek/sso/schakel', '/api/veiligheid/codewoord/schakel',
-    '/api/office/boardroom/schakel'
-  ];
+     zakt en niet pas na `npm run executionmap`.
+
+     DE PROEFLIJST WORDT AFGELEID EN NIET GETYPT, en dat is een reparatie. Er
+     stond hier een handgeschreven rijtje van zeven paden, en toen /api/isolatie/
+     aan BEVEILIGINGSPAD werd toegevoegd, merkte deze toets dat niet: het pad
+     stond niet in het rijtje. Een toets die zijn eigen onderwerp uit een tweede
+     lijst haalt, groeit niet mee met de eerste -- LAT.md regel 4 in het klein. */
+  const beveiligingspaden = alleRoutes()
+    .map(r => r.pad)
+    .filter(p => typeof p === 'string' && p.startsWith('/api/') && isBeveiligingspad(p));
+  assert.ok(beveiligingspaden.length > 50,
+    'er horen ruim beveiligingspaden te zijn; gevonden: ' + beveiligingspaden.length);
+
   for (const w of ['member', 'supplier', 'staff']) {
-    for (const pad of proef) {
+    for (const pad of beveiligingspaden) {
       const uit = beleid.beleidVoor(pad, w);
       assert.equal(uit.niveau, 'verboden', w + ' mag ' + pad + ' niet via de AI bereiken');
     }
@@ -133,11 +157,13 @@ test('SEC-LOCK-002-b: geen enkele regex in de AI-allowlist raakt een beveiliging
   for (const [naam, lijst] of Object.entries(lijsten)) {
     for (const [wereld, regexen] of Object.entries(lijst || {})) {
       for (const r of regexen || []) {
-        for (const pad of proef) if (r.test(pad)) raak.push(naam + '/' + wereld + ': ' + r + ' matcht ' + pad);
+        for (const pad of beveiligingspaden) {
+          if (r.test(pad)) raak.push(naam + '/' + wereld + ': ' + r + ' matcht ' + pad);
+        }
       }
     }
   }
-  assert.deepEqual(raak, [], raak.join('; '));
+  assert.deepEqual(raak, [], raak.slice(0, 5).join('; '));
 });
 
 /* ---------------- SEC-LOCK-003: een kind neutraliseert zijn ouder niet ---------------- */

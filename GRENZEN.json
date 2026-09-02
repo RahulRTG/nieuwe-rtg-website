@@ -434,8 +434,12 @@
       "status"
     ],
     "isolatie": [
+      "appUrl",
       "beveilig",
-      "isolatie"
+      "isolatie",
+      "webauthnAantal",
+      "webauthnStapOpMaak",
+      "webauthnStapOpOpties"
     ],
     "journaal": [
       "boardroomAuth",
@@ -2072,6 +2076,7 @@
     "techniek": [
       "LANDEN",
       "antivirus",
+      "appUrl",
       "archief",
       "av",
       "bank",
@@ -2110,6 +2115,9 @@
       "techniek",
       "tenant",
       "wacht",
+      "webauthnAantal",
+      "webauthnStapOpMaak",
+      "webauthnStapOpOpties",
       "zekeringMag"
     ],
     "tenant": [

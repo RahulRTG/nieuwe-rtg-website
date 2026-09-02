@@ -132,80 +132,12 @@
     });
   }
 
-  function tekenTerug(d) {
-    var doos = $('terug');
-    leeg(doos);
-    var nu = d.mijn.identiteit || 'normaal';
-    if (nu === 'normaal') {
-      doos.appendChild(maak('p', 'voet', 'Je staat op normaal; er valt niets terug te zetten.'));
-      return;
-    }
-    var lopend = (d.open || [])[0];
-    if (!lopend) {
-      doos.appendChild(maak('p', 'voet', 'Terugzetten doen we in stappen: je bevestigt met een passkey, ' +
-        'en soms wachten we even. Zolang dat loopt, blijft je bescherming gewoon aan.'));
-      var start = maak('button', 'knop', 'Terug naar normaal aanvragen');
-      start.type = 'button';
-      start.addEventListener('click', function () {
-        var r = ($('reden') && $('reden').value || '').trim();
-        if (r.length < 8) { meld('fout', 'Schrijf even in een zin waarom je terug wilt.'); return; }
-        haal('/api/isolatie/mijn/ontsluiting', { drager: 'identiteit', naar: 'normaal', reden: r })
-          .then(function () { meld('goed', 'Aangevraagd. Je bescherming blijft aan tot alle stappen rond zijn.'); laad(); })
-          .catch(function (e) { meld('fout', e.message); });
-      });
-      doos.appendChild(start);
-      return;
-    }
-
-    doos.appendChild(maak('p', 'voet', 'Je vroeg aan om terug te gaan naar ' + lopend.naar +
-      '. Je bescherming blijft aan tot dit rond is.'));
-    (lopend.vereisten || []).forEach(function (eis) {
-      var klaar = eis === 'wachttijd' ? lopend.wachttijdVerstreken : !!(lopend.voltooid && lopend.voltooid[eis]);
-      var rij = maak('div', 'stap');
-      rij.appendChild(maak('span', 'vink' + (klaar ? ' klaar' : '')));
-      var mid = maak('div');
-      mid.appendChild(maak('div', null, eis === 'wachttijd'
-        ? 'Even wachten (' + lopend.wachttijdMinuten + ' minuten)' : eis));
-      mid.appendChild(maak('div', 'u', klaar ? 'klaar' : 'nog te doen'));
-      rij.appendChild(mid);
-      if (!klaar && eis !== 'wachttijd') {
-        var b = maak('button', 'knop grijs', 'Bevestigen');
-        b.type = 'button';
-        b.style.marginLeft = 'auto';
-        b.addEventListener('click', function () {
-          haal('/api/isolatie/mijn/ontsluiting/stap', { id: lopend.id, soort: eis })
-            .then(function () { laad(); })
-            .catch(function (e) { meld('fout', e.message); });
-        });
-        rij.appendChild(b);
-      }
-      doos.appendChild(rij);
-    });
-
-    var rij2 = maak('div');
-    rij2.style.marginTop = '1rem';
-    rij2.style.display = 'flex';
-    rij2.style.gap = '.6rem';
-    rij2.style.flexWrap = 'wrap';
-    var af = maak('button', 'knop', 'Terugzetten afronden');
-    af.type = 'button';
-    af.disabled = (lopend.ontbreekt || []).length > 0;
-    af.addEventListener('click', function () {
-      haal('/api/isolatie/mijn/ontsluiting/commit', { id: lopend.id })
-        .then(function () { meld('goed', 'Je staat weer op normaal.'); laad(); })
-        .catch(function (e) { meld('fout', e.message); });
-    });
-    rij2.appendChild(af);
-    var stop = maak('button', 'knop grijs', 'Toch niet');
-    stop.type = 'button';
-    stop.addEventListener('click', function () {
-      haal('/api/isolatie/mijn/ontsluiting/afbreken', { id: lopend.id, reden: 'toch niet' })
-        .then(function () { meld('goed', 'Afgebroken. Je bescherming staat gewoon nog aan.'); laad(); })
-        .catch(function (e) { meld('fout', e.message); });
-    });
-    rij2.appendChild(stop);
-    doos.appendChild(rij2);
-  }
+  /* De weg terug staat ernaast, in ./mijn-isolatie-terug.js. De helpers gaan
+     mee in plaats van te worden nagebouwd -- twee `haal`-functies zouden binnen
+     een jaar twee verschillende foutmeldingen geven. */
+  var tekenTerug = function (d) {
+    window.RTGIsolatieTerug({ $: $, maak: maak, leeg: leeg, meld: meld, haal: haal, laad: laad })(d);
+  };
 
   function laad() {
     haal('/api/isolatie/mijn', {}).then(function (d) {

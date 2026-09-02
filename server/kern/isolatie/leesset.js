@@ -61,34 +61,16 @@ function uitzonderingIds() {
   try { return require('../beschermstand-lijst').UITZONDERINGEN || {}; } catch (e) { return {}; }
 }
 
-/* DE UITGANG MAG NOOIT DICHTVALLEN DOOR DE STAND ZELF.
-
-   Gemeten en niet bedacht: bruikbaarheid.js liet zien dat onder `isolatie` de
-   verhalen `zelf-beschermen` en `ontsluiten-aanvragen` op "werkt niet" stonden.
-   De routes van deze laag zijn nieuw, dus de proef heeft ze nooit gemeten, dus
-   de leesset sluit ze -- en dan kan een mens die in isolatie staat zichzelf niet
-   meer beschermen en er ook niet meer uit. Een stand zonder uitgang is een val,
-   en een val zet niemand aan.
-
-   Ze staan hier met naam en niet als patroon: een patroon als /api/isolatie/
-   zou elke toekomstige route van deze laag automatisch vrijstellen, en juist
-   hier hoort elke vrijstelling een besluit te zijn. */
-const EIGEN_UITGANG = Object.freeze({
-  '/api/isolatie/mijn': 'de eigen stand kunnen LEZEN; wie niet ziet dat hij dichtstaat, snapt niets',
-  '/api/isolatie/mijn/zet': 'zichzelf strenger zetten mag nooit door de bescherming zelf dichtvallen',
-  '/api/isolatie/mijn/ontsluiting': 'de uitgang aanvragen',
-  '/api/isolatie/mijn/ontsluiting/stap': 'de uitgang aflopen',
-  '/api/isolatie/mijn/ontsluiting/commit': 'de uitgang afmaken',
-  '/api/isolatie/mijn/ontsluiting/afbreken': 'de uitgang laten vallen'
-});
+/* Wat er open blijft wat er ook gebeurt -- de uitgang van de stand zelf en de
+   rechten die een mens over zichzelf heeft. Met de gronden per pad in
+   ./openpaden.js; hier alleen de vraag. */
+const { blijftOpen } = require('./openpaden');
 
 /* Het oordeel per pad. Geeft altijd een REDEN terug, ook bij ja: een scherm dat
    moet uitleggen waarom iets dicht is, heeft de grond nodig en niet de uitkomst. */
 function magOnderIsolatie(pad, functie) {
-  if (EIGEN_UITGANG[String(pad)]) {
-    return { mag: true, grond: 'EIGEN_UITGANG',
-      waarom: 'dit is de uitgang van de stand zelf: ' + EIGEN_UITGANG[String(pad)] };
-  }
+  const open = blijftOpen(pad);
+  if (open) return { mag: true, grond: open.grond, waarom: open.waarom };
 
   const uitz = uitzonderingIds();
   if (functie && uitz[functie.id]) {
@@ -161,4 +143,4 @@ function stand() {
 /* Alleen voor de toetsen: de ingelezen meting weggooien. */
 function vergeet() { proefmeting.vergeet(); }
 
-module.exports = { magOnderIsolatie, stand, vergeet, EIGEN_UITGANG, BRON: proefmeting.BRON };
+module.exports = { magOnderIsolatie, stand, vergeet, BRON: proefmeting.BRON };

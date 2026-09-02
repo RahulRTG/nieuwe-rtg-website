@@ -1,25 +1,25 @@
 {
  "stempel": {
-  "op": "2026-09-02T05:16:32.801Z",
-  "commit": "a9b355d3",
+  "op": "2026-09-02T06:12:45.572Z",
+  "commit": "da940138",
   "boomVuil": true,
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 4665,
-  "geclassificeerd": 4665,
+  "totaal": 4667,
+  "geclassificeerd": 4667,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3201,
    "NOT_APPLICABLE": 1078,
    "PROTECTED": 305,
-   "INTENTIONALLY_NON_IDEMPOTENT": 81
+   "INTENTIONALLY_NON_IDEMPOTENT": 83
   },
-  "vastgesteldDoorMens": 1491,
+  "vastgesteldDoorMens": 1493,
   "afgeleidDoorScript": 3174,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 3830,
+   "AUTHENTICATED": 3832,
    "PUBLIC": 104,
    "OBJECT_SCOPED": 716,
    "SERVICE_TO_SERVICE": 14,
@@ -29,7 +29,7 @@
    "kale ronde: beschermd": 128,
    "kale ronde: onbeschermd": 92,
    "kale ronde: geen uitspraak": 4435,
-   "niet gemeten": 10
+   "niet gemeten": 12
   },
   "voorstellen": {},
   "metingVan": "2026-09-01T22:21:24.236Z"
@@ -73,6 +73,12 @@
   },
   {
    "route": "POST /api/isolatie/mijn/ontsluiting/stap",
+   "bedoeld": "OBJECT_SCOPED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/isolatie/mijn/ontsluiting/stap/opties",
    "bedoeld": "OBJECT_SCOPED",
    "waargenomen": "AUTHENTICATED",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
@@ -29409,6 +29415,27 @@
     "hindernis": "Onbekende ontsluiting."
    },
    "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "isolatie.mijn.ontsluiting.stap.opties",
+   "route": "POST /api/isolatie/mijn/ontsluiting/stap/opties",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
@@ -115892,6 +115919,28 @@
     "hindernis": "Onbekend ontsluitverzoek."
    },
    "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "isolatie.ontsluiting.stap.opties",
+   "route": "POST /api/techniek/isolatie/ontsluiting/stap/opties",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "techAuth",
+     "eigenaarAlleen"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null

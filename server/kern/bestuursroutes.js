@@ -15,6 +15,13 @@ const REDENEN = [
   ['/api/toestemming', 'toestemming intrekken is een recht en niet uitschakelbaar'],
   ['/api/inzagekaart', 'zien wie in uw gegevens keek is hetzelfde AVG-recht; een knop die dat dichtzet hoort niet te bestaan'],
   ['/api/toestel/meting', 'de toestelsleutel wordt door het lid zelf ingetrokken'],
+  /* De ledenkant van de isolatiemodus. NIET het bredere `/api/isolatie`: het
+     kantoorpad valt al onder /api/techniek hierboven, en een toekomstige
+     /api/isolatie/<iets anders> hoort een eigen besluit te vragen in plaats van
+     er gratis onder te vallen -- een te brede prefix is precies de sluipweg die
+     dit gat maakte. */
+  ['/api/isolatie/mijn', 'de uitgang van de stand zelf: een lid dat zichzelf heeft dichtgezet moet er ' +
+    'langs de ceremonie weer uit kunnen, en een schakelaar daarop is een val'],
   ['/api/metrics', 'de meetlijn mag bij een incident niet blind worden gemaakt'],
   ['/api/cluster', 'de clusterlaag bestuurt instances en blijft buiten een instance-schakelaar'],
   ['/api/sat', 'de satellietping voorkomt dat een zaakdoos gezond verkeer als offline leest'],

@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-02T14:52:41.359Z",
-  "commit": "189341180",
+  "op": "2026-09-02T15:25:42.854Z",
+  "commit": "79bb9ad1c",
   "boomVuil": true,
-  "boomAnders": 3,
+  "boomAnders": 9,
   "instrument": "scripts/mutatieboek.js",
   "node": "v22.22.2"
  },
@@ -28,7 +28,7 @@
  },
  "bewijsgraad": {
   "metingGebruikt": false,
-  "metingReden": "de meting is van commit 8f4b3a080 en HEAD staat op 189341180; een meting van een andere stand is geen grond voor een status",
+  "metingReden": "de meting is van commit 8f4b3a080 en HEAD staat op 79bb9ad1c; een meting van een andere stand is geen grond voor een status",
   "metingGemetenOp": "2026-09-01T16:38:26.262Z",
   "perGraad": [
    {
@@ -144,7 +144,7 @@
   {
    "id": "BESCHERMD",
    "uitleg": "Er staat verklaard hoe een herhaling wordt herkend. De idemproef kan hierop meten.",
-   "aantal": 183,
+   "aantal": 181,
    "moetNaarNul": false,
    "semantiek": true,
    "voorbeelden": [
@@ -156,7 +156,7 @@
   {
    "id": "BEWUST_NIET_IDEMPOTENT",
    "uitleg": "Een herhaling is een echte tweede handeling, met een verplichte reden erbij. Dit is klaar en geen tekort.",
-   "aantal": 64,
+   "aantal": 66,
    "moetNaarNul": false,
    "semantiek": true,
    "voorbeelden": [
@@ -293,7 +293,7 @@
    "veld": "schrijfroutes",
    "vastgelegd": 4769,
    "nu": 4769,
-   "vastgelegdOp": "2026-09-01",
+   "vastgelegdOp": "2026-09-02",
    "zelfdeVraag": "API-paden die niet GET zijn",
    "verschil": 0,
    "gelijk": true,

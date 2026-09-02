@@ -164,6 +164,8 @@ const BEOORDEELD = new Map([
     'de knop staat dicht en er hoort GEEN bestelling klaar te staan; dat de lijst kan vullen bewijst de winkelronde in hetzelfde bestand (bestellingen.length 2 na twee aankopen)'],
   ['appstore-arena.test.js::b.body.uit.bord',
     'een gewoon lid bewaart niets: de leegte is hier de grens uit CLAUDE.md (progressie stopt onder 18+); dat het bord kan vullen staat in hetzelfde bestand met een gekeurd lid (bord[0].score)'],
+  ['geven-scherm.e2e.js::overzicht.body.plannen',
+    'de hele tocht over het scherm vertrekt met opzet GEEN bevestiging (GIFT.md: er is geen doneerknop), dus de lege plannenlijst IS de bewering; dat die lijst kan vullen staat op de route in test/rtfos-gift-ruil-routes.test.js (plannen.length >= 1 na plan/maak)'],
   ['webauthn.test.js::lijst.body.sleutels',
     'hier IS de leegte de bewering: er staat geen sleutel tot de browser-ceremonie er een zet, en die kan een toets niet doen'],
   ['boardroom-poort.test.js::weg.body.lijst',

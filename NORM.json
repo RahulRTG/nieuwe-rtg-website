@@ -1,7 +1,7 @@
 {
   "vastgelegd": "2026-09-02",
   "meters": {
-    "endpointsZonderTest": 979,
+    "endpointsZonderTest": 968,
     "dekkingPct": 80,
     "keuringStuk": 0,
     "keuringScheef": 18,
@@ -9,7 +9,7 @@
     "testbestanden": 1341,
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 18,
-    "e2eBestanden": 180,
+    "e2eBestanden": 193,
     "keuringOmvang": 261,
     "keuringDubbeling": 154,
     "keuringDekkingAdvies": 52,
@@ -20,7 +20,7 @@
     "schermenZonderToets": 0,
     "keuringTeGroot": 16,
     "inlineStijlAttributen": 4973,
-    "browserpoortToetsen": 275,
+    "browserpoortToetsen": 295,
     "kernBreedte": 1517,
     "kernGedeeld": 216,
     "kernBreedsteBestand": 71,
@@ -1427,8 +1427,8 @@
     "keuringDekkingAdvies": "2026-09-02",
     "dbDeuren": "2026-08-28",
     "dbDeurenSchrijvend": "2026-08-28",
-    "browserpoortToetsen": "2026-09-01",
-    "e2eBestanden": "2026-09-01",
+    "browserpoortToetsen": "2026-09-02",
+    "e2eBestanden": "2026-09-02",
     "schermenZonderVormtaal": "2026-08-28",
     "bewijsCellenBewezen": "2026-09-01",
     "beweringenZonderVulcontrole": "2026-09-02"

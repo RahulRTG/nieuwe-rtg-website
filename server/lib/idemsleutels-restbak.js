@@ -71,20 +71,29 @@ module.exports = {
 
   /* ---- en de vier die WEL iets doen ---- */
 
-  'POST /api/bank/akkoord': { zelfdeVerzoek: true },
-  // ^ het lijf is leeg, dus elke tweede oproep is woordelijk hetzelfde verzoek.
-  //   kern/bank/rekeningen.js is er zelf al tegen bestand (`alHad`, en
-  //   store[c] = store[c] || nu()); deze verklaring zegt dat een dubbeltik
-  //   inderdaad een dubbeltik is en geen tweede akkoord.
+  'POST /api/bank/akkoord': { nietIdempotent: true,
+    waarom: 'de kern ontdubbelt zelf op STAND (kern/bank/rekeningen.js: alHad, en de zakelijke rekening komt er ' +
+      'maar een keer bij); het tweede antwoord zegt dan met recht zakelijk: null. Een afgespeeld eerste antwoord ' +
+      'zou beweren dat er opnieuw een rekening is geopend -- test/bankhart.test.js houdt dat vast' },
+  // ^ Stond hier eerst als zelfdeVerzoek, en dat las mooi: een leeg lijf, dus
+  //   elke tweede oproep is woordelijk hetzelfde verzoek. Maar de poort speelt
+  //   dan het EERSTE antwoord af, met de rekening erin, en het lid ziet een
+  //   tweede opening die nooit is gebeurd. De kern is er al tegen bestand; de
+  //   poort hoort hier zijn mond te houden (zie ./idemsleutels-nooit.js over
+  //   het antwoord dat loog over wat er gebeurd was).
 
   'POST /api/bank/bevries': { velden: ['iban', 'aan'] },
   // ^ een stand zetten op EEN rekening: iban en aan bepalen samen de handeling.
   //   Twee keer "bevries deze rekening" is een keer bevriezen.
 
-  'POST /api/bank/veeg': { zelfdeVerzoek: true },
-  // ^ leeg lijf, en de kern houdt per maand bij wat er al geveegd is
-  //   (bankWisselgeld). Een herhaling binnen het venster is een dubbeltik op
-  //   een GELDVERPLAATSING, en dat is precies waar deze laag voor is.
+  'POST /api/bank/veeg': { nietIdempotent: true,
+    waarom: 'een RONDE (zie ./idemsleutels-kaleronde-b.js): de kern houdt per maand bij wat er al geveegd is ' +
+      '(bankWisselgeld) en de tweede veeg vindt met recht 0 -- dat is het bewijs dat de eerste werkte. Een ' +
+      'afgespeeld eerste antwoord zou 50 cent melden die niet opnieuw zijn verplaatst; test/bankhart.test.js ' +
+      'houdt de 0 vast' },
+  // ^ Stond hier eerst als zelfdeVerzoek: een dubbeltik op een geldverplaatsing,
+  //   precies waar deze laag voor is. Alleen verplaatst de tweede veeg niets --
+  //   de kern rekent per maand -- en het afgespeelde antwoord loog daarover.
 
   'POST /api/podium/weg': { velden: ['id'] },
   // ^ weggaan bij een kanaal. De kern geeft ok terug als je er al niet meer in

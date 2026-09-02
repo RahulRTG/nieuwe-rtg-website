@@ -810,7 +810,7 @@ afkapgrens van vijftien sneed midden in een GELIJKE score, dus /api/bank/pas/bet
 viel op alfabet af terwijl /api/bank/advies bleef. Een gelijke score afkappen is
 willekeur, en willekeur verbergt een vermogen zonder dat iemand het merkt.
 **En meetgetallen in de documenten verouderen niet meer**: `npm run getallen`
-schrijft ze tussen merktekens uit de registers (`<!--getal:idem.ongemeten-->3080<!--/getal--> randen,
+schrijft ze tussen merktekens uit de registers (`<!--getal:idem.ongemeten-->3156<!--/getal--> randen,
 <!--getal:verstrengeling.onverklaard-->0<!--/getal--> onverklaard — en dát getal moet naar nul, niet het
 aantal randen), de activering per functie, de deltapoort die er niets bij laat
 komen, de tredeproef over alle zeven treden van LAUNCH.md (0 lekken), en de

@@ -3,8 +3,8 @@
   "grondslag": "require-sluiting vanaf het bestand dat de route ophangt",
   "teHoog": "een require is geen aanroep: dit is wat er wakker KAN worden, niet wat er draait",
   "teLaag": "de bus (kern/envelop.js), cron, AI-gereedschap en webhooks lopen niet via require en staan hier niet in",
-  "kernSleutels": 1672,
-  "kernSleutelsViaTekst": 81,
+  "kernSleutels": 1690,
+  "kernSleutelsViaTekst": 77,
   "kernSleutelsViaMethoden": 1,
   "kernOnbekend": {
     "AI_TONE": {
@@ -188,10 +188,6 @@
       "soort": "ONVINDBAAR",
       "reden": "een functie met te weinig brontekst om terug te zoeken (64 tekens)"
     },
-    "magBoardroom": {
-      "soort": "ONVINDBAAR",
-      "reden": "een functie met te weinig brontekst om terug te zoeken (119 tekens)"
-    },
     "path": {
       "soort": "ONVINDBAAR",
       "reden": "een object zonder functiewaarden die naar een bestand wijzen"
@@ -358,11 +354,11 @@
   },
   "kernSleutelsHoe": "via het merken bij require, via de waarde bij een letterlijk object, achteraf over de tas zelf, en als laatste door de brontekst van de functie letterlijk terug te zoeken (alleen bij precies EEN treffer)",
   "kernTasGevonden": true,
-  "routes": 4748,
-  "routeLagen": 9177,
+  "routes": 4856,
+  "routeLagen": 9419,
   "routesZonderEigenaar": 0,
   "randenOnvindbaar": 0,
-  "knopenTotaal": 849,
+  "knopenTotaal": 865,
   "perDomein": [
     {
       "domein": "domein:util",
@@ -1558,7 +1554,7 @@
     },
     {
       "domein": "domein:eigencollectie",
-      "functies": 154,
+      "functies": 155,
       "welke": [
         "arrival",
         "avondos",
@@ -1700,6 +1696,7 @@
         "tg-inlog",
         "tg-link",
         "tg-pin",
+        "tg-sso",
         "tg-zegel",
         "theater",
         "tickets",
@@ -3443,6 +3440,31 @@
       ]
     },
     {
+      "domein": "domein:kosten",
+      "functies": 19,
+      "welke": [
+        "dom-kosten",
+        "dom-livinglab",
+        "dom-livinglab-bewoner",
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "kantoorpakket",
+        "kern-live",
+        "kern-meldingen",
+        "levenos",
+        "member",
+        "office",
+        "rtf-contacten",
+        "spellen",
+        "supplier",
+        "tg-inlog",
+        "tg-pin",
+        "verificatie",
+        "werk-rtf"
+      ]
+    },
+    {
       "domein": "domein:lidmaatschap",
       "functies": 19,
       "welke": [
@@ -3492,6 +3514,29 @@
       ]
     },
     {
+      "domein": "domein:agenda-opslag",
+      "functies": 17,
+      "welke": [
+        "bedrijf",
+        "bk-reiswijzer",
+        "dom-agenda",
+        "dom-werkplek",
+        "foundation",
+        "kantoorpakket",
+        "kern-live",
+        "kern-meldingen",
+        "kern-state",
+        "levenos",
+        "member",
+        "office",
+        "ov-kantoorgesprek",
+        "rtf-contacten",
+        "spellen",
+        "supplier",
+        "werk-rtf"
+      ]
+    },
+    {
       "domein": "domein:gastzorg",
       "functies": 17,
       "welke": [
@@ -3512,29 +3557,6 @@
         "supplier",
         "tickets",
         "verhuur"
-      ]
-    },
-    {
-      "domein": "domein:kosten",
-      "functies": 17,
-      "welke": [
-        "dom-kosten",
-        "dom-werkplek",
-        "foundation",
-        "foundation-school",
-        "kantoorpakket",
-        "kern-live",
-        "kern-meldingen",
-        "levenos",
-        "member",
-        "office",
-        "rtf-contacten",
-        "spellen",
-        "supplier",
-        "tg-inlog",
-        "tg-pin",
-        "verificatie",
-        "werk-rtf"
       ]
     },
     {
@@ -4109,6 +4131,26 @@
       ]
     },
     {
+      "domein": "domein:machtiging",
+      "functies": 14,
+      "welke": [
+        "dom-rtfos",
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "kantoorpakket",
+        "kern-live",
+        "kern-meldingen",
+        "levenos",
+        "member",
+        "office",
+        "rtf-contacten",
+        "spellen",
+        "supplier",
+        "werk-rtf"
+      ]
+    },
+    {
       "domein": "domein:veilig",
       "functies": 14,
       "welke": [
@@ -4183,6 +4225,25 @@
         "spellen",
         "supplier",
         "werk-rtf"
+      ]
+    },
+    {
+      "domein": "domein:frictie",
+      "functies": 13,
+      "welke": [
+        "command-besturen",
+        "command-doen",
+        "command-zien",
+        "dom-fluister",
+        "kern-locatie",
+        "ov-spar",
+        "ov-zorgprofiel",
+        "staff",
+        "stuur",
+        "supplier",
+        "tenant",
+        "zaakregie",
+        "zaakregie-beheer"
       ]
     },
     {
@@ -4603,6 +4664,22 @@
       ]
     },
     {
+      "domein": "domein:economie",
+      "functies": 10,
+      "welke": [
+        "betalen",
+        "dom-facturen",
+        "experience-platform",
+        "gld-claims",
+        "gld-munt",
+        "gld-prijzen",
+        "gld-rekening",
+        "kern-state",
+        "member",
+        "office"
+      ]
+    },
+    {
       "domein": "domein:demostand",
       "functies": 9,
       "welke": [
@@ -4733,7 +4810,34 @@
       ]
     },
     {
+      "domein": "domein:identiteit",
+      "functies": 8,
+      "welke": [
+        "command-doen",
+        "command-zien",
+        "kern-state",
+        "member",
+        "tg-aanmeld",
+        "tg-inlog",
+        "tg-sso",
+        "webauthn"
+      ]
+    },
+    {
       "domein": "domein:agenda",
+      "functies": 7,
+      "welke": [
+        "bedrijf",
+        "bk-reiswijzer",
+        "dom-agenda",
+        "kern-state",
+        "member",
+        "ov-kantoorgesprek",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:agenda-idempotentie",
       "functies": 7,
       "welke": [
         "bedrijf",
@@ -6050,6 +6154,15 @@
       ]
     },
     {
+      "domein": "domein:livinglab",
+      "functies": 3,
+      "welke": [
+        "dom-labfonds",
+        "dom-livinglab",
+        "dom-livinglab-bewoner"
+      ]
+    },
+    {
       "domein": "domein:appbieb",
       "functies": 3,
       "welke": [
@@ -6754,6 +6867,22 @@
       ]
     },
     {
+      "domein": "domein:workspace-audit",
+      "functies": 2,
+      "welke": [
+        "kern-rahul",
+        "kern-state"
+      ]
+    },
+    {
+      "domein": "domein:workspace-voorkeur",
+      "functies": 2,
+      "welke": [
+        "kern-rahul",
+        "kern-state"
+      ]
+    },
+    {
       "domein": "domein:appstore",
       "functies": 2,
       "welke": [
@@ -6858,11 +6987,11 @@
       ]
     },
     {
-      "domein": "domein:livinglab",
+      "domein": "domein:labfonds",
       "functies": 2,
       "welke": [
-        "dom-livinglab",
-        "dom-livinglab-bewoner"
+        "dom-labfonds",
+        "dom-livinglab"
       ]
     },
     {
@@ -7043,13 +7172,6 @@
     },
     {
       "domein": "domein:architect",
-      "functies": 1,
-      "welke": [
-        "office"
-      ]
-    },
-    {
-      "domein": "domein:economie",
       "functies": 1,
       "welke": [
         "office"
@@ -7301,6 +7423,13 @@
       ]
     },
     {
+      "domein": "domein:totp",
+      "functies": 1,
+      "welke": [
+        "tg-inlog"
+      ]
+    },
+    {
       "domein": "domein:munten",
       "functies": 1,
       "welke": [
@@ -7455,13 +7584,6 @@
       ]
     },
     {
-      "domein": "domein:labfonds",
-      "functies": 1,
-      "welke": [
-        "dom-labfonds"
-      ]
-    },
-    {
       "domein": "domein:ghost",
       "functies": 1,
       "welke": [
@@ -7484,6 +7606,27 @@
     },
     {
       "domein": "domein:invoer-onderdelen",
+      "functies": 1,
+      "welke": [
+        "bk-reiswijzer"
+      ]
+    },
+    {
+      "domein": "domein:reisgezelschap",
+      "functies": 1,
+      "welke": [
+        "bk-reiswijzer"
+      ]
+    },
+    {
+      "domein": "domein:reisgezelschap-delen",
+      "functies": 1,
+      "welke": [
+        "bk-reiswijzer"
+      ]
+    },
+    {
+      "domein": "domein:reisgezelschap-poort",
       "functies": 1,
       "welke": [
         "bk-reiswijzer"
@@ -7679,6 +7822,20 @@
       ]
     },
     {
+      "domein": "domein:kantoorgesprek",
+      "functies": 1,
+      "welke": [
+        "ov-kantoorgesprek"
+      ]
+    },
+    {
+      "domein": "domein:kantoorwereld",
+      "functies": 1,
+      "welke": [
+        "ov-kantoorgesprek"
+      ]
+    },
+    {
       "domein": "domein:rtgid",
       "functies": 1,
       "welke": [
@@ -7718,20 +7875,6 @@
       "functies": 1,
       "welke": [
         "life"
-      ]
-    },
-    {
-      "domein": "domein:kantoorgesprek",
-      "functies": 1,
-      "welke": [
-        "ov-kantoorgesprek"
-      ]
-    },
-    {
-      "domein": "domein:kantoorwereld",
-      "functies": 1,
-      "welke": [
-        "ov-kantoorgesprek"
       ]
     },
     {
@@ -7910,14 +8053,14 @@
       ]
     }
   ],
-  "functiesMetEnvelop": 204,
+  "functiesMetEnvelop": 205,
   "perGraad": {
     "deels-niet-toe-te-rekenen": 7,
-    "ondergrens": 47,
+    "ondergrens": 48,
     "onbepaald": 3,
     "gemeten": 147
   },
-  "ondergrens": 47,
+  "ondergrens": 48,
   "onbepaald": 3,
   "zonderReden": 0,
   "functiesNietToeTeRekenen": 7,
@@ -7976,6 +8119,7 @@
     "bevIsBeveiliging",
     "coachCache",
     "convOf",
+    "doelpoort",
     "dossierVan",
     "dpMijnBetalingen",
     "findSupplierByName",
@@ -8013,7 +8157,6 @@
     "maakKassacode",
     "machtigingActief",
     "mag",
-    "magBoardroom",
     "meld",
     "memberTemplate",
     "mijnSleutels",
@@ -8034,6 +8177,7 @@
     "personeelToegang",
     "personeelVan",
     "poort",
+    "post",
     "presentieLijst",
     "pushHook",
     "rechtenVan",
@@ -8062,13 +8206,13 @@
   ],
   "grootste": {
     "id": "supplier",
-    "knopen": 367,
+    "knopen": 371,
     "pct": 43
   },
   "mediaanKnopen": 27,
   "mediaanPct": 3,
-  "routesZonderFunctie": 97,
-  "bediening": 97,
+  "routesZonderFunctie": 120,
+  "bediening": 120,
   "onbenoemd": 0,
   "onbenoemdeRoutes": [],
   "envelopen": [
@@ -8077,7 +8221,7 @@
       "naam": "Partner-app (algemeen)",
       "categorie": "Partners (leveranciers)",
       "standaard": true,
-      "routes": 853,
+      "routes": 855,
       "graad": "deels-niet-toe-te-rekenen",
       "sleutelsWaarde": [
         "ANNULEERGRONDEN",
@@ -8408,6 +8552,7 @@
         "server/kern/hoteldorp/tools/index.js",
         "server/kern/hulpdienst/index.js",
         "server/kern/journalistiek.js",
+        "server/kern/kantoor/boardroom.js",
         "server/kern/kantoor/index.js",
         "server/kern/ketenchat.js",
         "server/kern/keuken.js",
@@ -8594,10 +8739,10 @@
         "wervingsLink",
         "zaakBoard"
       ],
-      "bestandenBereikt": 1256,
-      "knopen": 367,
+      "bestandenBereikt": 1264,
+      "knopen": 371,
       "perLaag": {
-        "domein": 257,
+        "domein": 261,
         "motor": 53,
         "opzet": 1,
         "ingang": 56
@@ -8609,6 +8754,8 @@
         "domein:afgeleid",
         "domein:agenda",
         "domein:agenda-ics",
+        "domein:agenda-idempotentie",
+        "domein:agenda-opslag",
         "domein:agenda-pro",
         "domein:agendatijd",
         "domein:agent",
@@ -8654,6 +8801,7 @@
         "domein:fluister",
         "domein:foodcourt",
         "domein:foundation",
+        "domein:frictie",
         "domein:gast",
         "domein:gastzorg",
         "domein:gebouw",
@@ -8712,6 +8860,7 @@
         "domein:link",
         "domein:logies",
         "domein:luchthaven",
+        "domein:machtiging",
         "domein:magnaat-capabilities",
         "domein:magnaat-capabilities-bronnen",
         "domein:magnaat-controle",
@@ -8861,14 +9010,16 @@
         "domein:zorgketen",
         "domein:zorgpolis"
       ],
-      "onverklaardeRanden": []
+      "onverklaardeRanden": [
+        "domein:school -> domein:machtiging"
+      ]
     },
     {
       "id": "office",
       "naam": "Backoffice (algemeen)",
       "categorie": "RTG-Backoffice",
       "standaard": true,
-      "routes": 529,
+      "routes": 531,
       "graad": "ondergrens",
       "sleutelsWaarde": [],
       "sleutelsOnvindbaar": [
@@ -9005,7 +9156,9 @@
         "server/kern/geldregie.js",
         "server/kern/gids.js",
         "server/kern/hardwarelab/index.js",
+        "server/kern/kantoor/boardroom.js",
         "server/kern/kantoor/index.js",
+        "server/kern/kantoor/kluispoort.js",
         "server/kern/koppel.js",
         "server/kern/kosten/index.js",
         "server/kern/ledenbalie-zaken.js",
@@ -9097,10 +9250,10 @@
         "geparkeerd",
         "kern"
       ],
-      "bestandenBereikt": 976,
-      "knopen": 316,
+      "bestandenBereikt": 993,
+      "knopen": 318,
       "perLaag": {
-        "domein": 215,
+        "domein": 217,
         "motor": 54,
         "opzet": 1,
         "ingang": 46
@@ -9109,6 +9262,7 @@
         "domein:afdelingen",
         "domein:afdelingshotel",
         "domein:agenda-ics",
+        "domein:agenda-opslag",
         "domein:agenda-pro",
         "domein:aidata",
         "domein:antivirus",
@@ -9190,6 +9344,7 @@
         "domein:lid",
         "domein:link",
         "domein:logies",
+        "domein:machtiging",
         "domein:magnaat-capabilities",
         "domein:magnaat-capabilities-bronnen",
         "domein:magnaat-controle",
@@ -9322,7 +9477,9 @@
         "domein:werkvormen",
         "domein:winkelcatalogus"
       ],
-      "onverklaardeRanden": []
+      "onverklaardeRanden": [
+        "domein:school -> domein:machtiging"
+      ]
     },
     {
       "id": "member",
@@ -9403,6 +9560,7 @@
         "server/kern/gegevenspoort.js",
         "server/kern/gids.js",
         "server/kern/huis.js",
+        "server/kern/kantoor/boardroom.js",
         "server/kern/kantoor/index.js",
         "server/kern/leren.js",
         "server/kern/levensgraaf/index.js",
@@ -9466,10 +9624,10 @@
         "kern",
         "lidboard"
       ],
-      "bestandenBereikt": 747,
-      "knopen": 221,
+      "bestandenBereikt": 758,
+      "knopen": 226,
       "perLaag": {
-        "domein": 154,
+        "domein": 159,
         "motor": 49,
         "opzet": 1,
         "ingang": 17
@@ -9478,6 +9636,8 @@
         "domein:afgeleid",
         "domein:agenda",
         "domein:agenda-ics",
+        "domein:agenda-idempotentie",
+        "domein:agenda-opslag",
         "domein:agenda-pro",
         "domein:automatisering",
         "domein:bedrijf",
@@ -9497,6 +9657,7 @@
         "domein:demostand",
         "domein:doorgeefjournaal",
         "domein:dubbelemelding",
+        "domein:economie",
         "domein:eigencollectie",
         "domein:facturatie",
         "domein:fiscaal",
@@ -9505,6 +9666,7 @@
         "domein:geld",
         "domein:gids",
         "domein:huis",
+        "domein:identiteit",
         "domein:internationalehandel",
         "domein:journaalverhuizing",
         "domein:journaalvorm",
@@ -9541,6 +9703,7 @@
         "domein:lifestyle",
         "domein:link",
         "domein:luchthaven",
+        "domein:machtiging",
         "domein:magnaat-capabilities",
         "domein:magnaat-capabilities-bronnen",
         "domein:magnaat-controle",
@@ -9630,7 +9793,9 @@
         "domein:werkcommand",
         "domein:werkvormen"
       ],
-      "onverklaardeRanden": []
+      "onverklaardeRanden": [
+        "domein:school -> domein:machtiging"
+      ]
     },
     {
       "id": "rtf-contacten",
@@ -9676,6 +9841,7 @@
         "server/kern/bijles.js",
         "server/kern/concern/index.js",
         "server/kern/geloofbieb.js",
+        "server/kern/kantoor/boardroom.js",
         "server/kern/kantoor/index.js",
         "server/kern/leerstof-vervolg.js",
         "server/kern/leerstof.js",
@@ -9707,16 +9873,17 @@
       "sleutelsOnbekend": [
         "kern"
       ],
-      "bestandenBereikt": 480,
-      "knopen": 148,
+      "bestandenBereikt": 484,
+      "knopen": 150,
       "perLaag": {
-        "domein": 87,
+        "domein": 89,
         "motor": 47,
         "opzet": 1,
         "ingang": 13
       },
       "domeinen": [
         "domein:agenda-ics",
+        "domein:agenda-opslag",
         "domein:agenda-pro",
         "domein:baby",
         "domein:bedrijf",
@@ -9759,6 +9926,7 @@
         "domein:leerstof-taalvorm",
         "domein:leerstof-vervolg",
         "domein:leren",
+        "domein:machtiging",
         "domein:mail-publiek",
         "domein:muziek-instrumenten",
         "domein:muziek-stijlen",
@@ -9804,7 +9972,9 @@
         "domein:werkplek-kantoren-vorm",
         "domein:werkvormen"
       ],
-      "onverklaardeRanden": []
+      "onverklaardeRanden": [
+        "domein:school -> domein:machtiging"
+      ]
     },
     {
       "id": "kern-meldingen",
@@ -9857,16 +10027,17 @@
         "PASPOORT_NIVEAUS",
         "retailIsRetail"
       ],
-      "bestandenBereikt": 457,
-      "knopen": 131,
+      "bestandenBereikt": 459,
+      "knopen": 133,
       "perLaag": {
-        "domein": 81,
+        "domein": 83,
         "motor": 47,
         "opzet": 1,
         "ingang": 2
       },
       "domeinen": [
         "domein:agenda-ics",
+        "domein:agenda-opslag",
         "domein:agenda-pro",
         "domein:bedrijf",
         "domein:belasting",
@@ -9906,6 +10077,7 @@
         "domein:lid",
         "domein:link",
         "domein:logies",
+        "domein:machtiging",
         "domein:mail-publiek",
         "domein:muziek-instrumenten",
         "domein:muziek-stijlen",
@@ -9948,7 +10120,9 @@
         "domein:werkcommand",
         "domein:werkvormen"
       ],
-      "onverklaardeRanden": []
+      "onverklaardeRanden": [
+        "domein:school -> domein:machtiging"
+      ]
     },
     {
       "id": "dom-werkplek",
@@ -9975,6 +10149,7 @@
         "server/kern/atelier/index.js",
         "server/kern/concern/index.js",
         "server/kern/huisdb.js",
+        "server/kern/kantoor/boardroom.js",
         "server/kern/kantoor/index.js",
         "server/kern/office/delen.js",
         "server/kern/office/docs.js",
@@ -9988,16 +10163,17 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 445,
-      "knopen": 123,
+      "bestandenBereikt": 449,
+      "knopen": 125,
       "perLaag": {
-        "domein": 72,
+        "domein": 74,
         "motor": 45,
         "opzet": 1,
         "ingang": 5
       },
       "domeinen": [
         "domein:agenda-ics",
+        "domein:agenda-opslag",
         "domein:agenda-pro",
         "domein:atelier",
         "domein:bedrijf",
@@ -10035,6 +10211,7 @@
         "domein:leerstof-herhalen",
         "domein:leerstof-lijn",
         "domein:leerstof-taalvorm",
+        "domein:machtiging",
         "domein:mail-publiek",
         "domein:muziek-instrumenten",
         "domein:muziek-stijlen",
@@ -10070,7 +10247,9 @@
         "domein:werkplek-kantoren-vorm",
         "domein:werkvormen"
       ],
-      "onverklaardeRanden": []
+      "onverklaardeRanden": [
+        "domein:school -> domein:machtiging"
+      ]
     },
     {
       "id": "kern-live",
@@ -10098,16 +10277,17 @@
       ],
       "sleutelsUitBedrading": [],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 439,
-      "knopen": 119,
+      "bestandenBereikt": 441,
+      "knopen": 121,
       "perLaag": {
-        "domein": 70,
+        "domein": 72,
         "motor": 47,
         "opzet": 1,
         "ingang": 1
       },
       "domeinen": [
         "domein:agenda-ics",
+        "domein:agenda-opslag",
         "domein:agenda-pro",
         "domein:bedrijf",
         "domein:belasting",
@@ -10143,6 +10323,7 @@
         "domein:leerstof-lijn",
         "domein:leerstof-taalvorm",
         "domein:link",
+        "domein:machtiging",
         "domein:mail-publiek",
         "domein:muziek-instrumenten",
         "domein:muziek-stijlen",
@@ -10178,7 +10359,9 @@
         "domein:werkcommand",
         "domein:werkvormen"
       ],
-      "onverklaardeRanden": []
+      "onverklaardeRanden": [
+        "domein:school -> domein:machtiging"
+      ]
     },
     {
       "id": "foundation",
@@ -10238,6 +10421,7 @@
         "server/foundation/zorg.js",
         "server/kern/concern/index.js",
         "server/kern/foundationregistratie-register.js",
+        "server/kern/kantoor/boardroom.js",
         "server/kern/kantoor/index.js",
         "server/kern/mobiliteit/index.js",
         "server/kern/util.js",
@@ -10253,16 +10437,17 @@
         "oppasinfoPubliek",
         "pushHook"
       ],
-      "bestandenBereikt": 458,
-      "knopen": 115,
+      "bestandenBereikt": 462,
+      "knopen": 117,
       "perLaag": {
-        "motor": 46,
-        "domein": 67,
+        "domein": 69,
         "opzet": 1,
+        "motor": 46,
         "ingang": 1
       },
       "domeinen": [
         "domein:agenda-ics",
+        "domein:agenda-opslag",
         "domein:agenda-pro",
         "domein:bedrijf",
         "domein:belasting",
@@ -10301,6 +10486,7 @@
         "domein:leerstof-herhalen",
         "domein:leerstof-lijn",
         "domein:leerstof-taalvorm",
+        "domein:machtiging",
         "domein:mail-publiek",
         "domein:mobiliteit",
         "domein:muziek-instrumenten",
@@ -10330,7 +10516,9 @@
         "domein:werkcommand",
         "domein:werkvormen"
       ],
-      "onverklaardeRanden": []
+      "onverklaardeRanden": [
+        "domein:school -> domein:machtiging"
+      ]
     },
     {
       "id": "levenos",
@@ -10363,16 +10551,17 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 416,
-      "knopen": 112,
+      "bestandenBereikt": 418,
+      "knopen": 114,
       "perLaag": {
-        "domein": 63,
+        "domein": 65,
         "motor": 45,
         "opzet": 1,
         "ingang": 3
       },
       "domeinen": [
         "domein:agenda-ics",
+        "domein:agenda-opslag",
         "domein:agenda-pro",
         "domein:bedrijf",
         "domein:belasting",
@@ -10412,6 +10601,7 @@
         "domein:levensgraaf",
         "domein:levenslijn",
         "domein:link",
+        "domein:machtiging",
         "domein:mail-publiek",
         "domein:muziek-instrumenten",
         "domein:muziek-stijlen",
@@ -10436,7 +10626,9 @@
         "domein:werkcommand",
         "domein:werkvormen"
       ],
-      "onverklaardeRanden": []
+      "onverklaardeRanden": [
+        "domein:school -> domein:machtiging"
+      ]
     },
     {
       "id": "kantoorpakket",
@@ -10457,6 +10649,7 @@
       "leveranciers": [
         "server/bedrijf/index.js",
         "server/foundation.js",
+        "server/kern/kantoor/boardroom.js",
         "server/kern/kantoor/index.js",
         "server/kern/office/delen.js",
         "server/kern/office/docs.js",
@@ -10471,16 +10664,17 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 408,
-      "knopen": 112,
+      "bestandenBereikt": 412,
+      "knopen": 114,
       "perLaag": {
-        "domein": 63,
+        "domein": 65,
         "motor": 45,
         "opzet": 1,
         "ingang": 3
       },
       "domeinen": [
         "domein:agenda-ics",
+        "domein:agenda-opslag",
         "domein:agenda-pro",
         "domein:bedrijf",
         "domein:belasting",
@@ -10515,6 +10709,7 @@
         "domein:leerstof-herhalen",
         "domein:leerstof-lijn",
         "domein:leerstof-taalvorm",
+        "domein:machtiging",
         "domein:mail-publiek",
         "domein:muziek-instrumenten",
         "domein:muziek-stijlen",
@@ -10544,7 +10739,9 @@
         "domein:werkplek-kantoren-vorm",
         "domein:werkvormen"
       ],
-      "onverklaardeRanden": []
+      "onverklaardeRanden": [
+        "domein:school -> domein:machtiging"
+      ]
     },
     {
       "id": "werk-rtf",
@@ -10589,17 +10786,18 @@
       "sleutelsOnbekend": [
         "PERSONAS"
       ],
-      "bestandenBereikt": 421,
-      "knopen": 111,
+      "bestandenBereikt": 423,
+      "knopen": 113,
       "perLaag": {
         "motor": 44,
-        "domein": 65,
+        "domein": 67,
         "opzet": 1,
         "ingang": 1
       },
       "domeinen": [
         "domein:afgeleid",
         "domein:agenda-ics",
+        "domein:agenda-opslag",
         "domein:agenda-pro",
         "domein:bedrijf",
         "domein:belasting",
@@ -10635,6 +10833,7 @@
         "domein:leerstof-herhalen",
         "domein:leerstof-lijn",
         "domein:leerstof-taalvorm",
+        "domein:machtiging",
         "domein:mail-publiek",
         "domein:muziek-instrumenten",
         "domein:muziek-stijlen",
@@ -10664,7 +10863,9 @@
         "domein:werkcommand",
         "domein:werkvormen"
       ],
-      "onverklaardeRanden": []
+      "onverklaardeRanden": [
+        "domein:school -> domein:machtiging"
+      ]
     },
     {
       "id": "spellen",
@@ -10703,16 +10904,17 @@
         "geenGast"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 408,
-      "knopen": 108,
+      "bestandenBereikt": 410,
+      "knopen": 110,
       "perLaag": {
-        "domein": 58,
+        "domein": 60,
         "motor": 47,
         "opzet": 1,
         "ingang": 2
       },
       "domeinen": [
         "domein:agenda-ics",
+        "domein:agenda-opslag",
         "domein:agenda-pro",
         "domein:bedrijf",
         "domein:belasting",
@@ -10746,6 +10948,7 @@
         "domein:leerstof-herhalen",
         "domein:leerstof-lijn",
         "domein:leerstof-taalvorm",
+        "domein:machtiging",
         "domein:mail-publiek",
         "domein:muziek-instrumenten",
         "domein:muziek-stijlen",
@@ -10771,7 +10974,9 @@
         "domein:werkcommand",
         "domein:werkvormen"
       ],
-      "onverklaardeRanden": []
+      "onverklaardeRanden": [
+        "domein:school -> domein:machtiging"
+      ]
     },
     {
       "id": "foundation-school",
@@ -10965,10 +11170,10 @@
         "verlofLijst",
         "zorgPersoneelsMail"
       ],
-      "bestandenBereikt": 310,
-      "knopen": 93,
+      "bestandenBereikt": 311,
+      "knopen": 94,
       "perLaag": {
-        "domein": 56,
+        "domein": 57,
         "motor": 36,
         "opzet": 1
       },
@@ -11005,6 +11210,7 @@
         "domein:leerstof-herhalen",
         "domein:leerstof-lijn",
         "domein:leerstof-taalvorm",
+        "domein:machtiging",
         "domein:mail-publiek",
         "domein:mobiliteit",
         "domein:muziek-instrumenten",
@@ -11030,7 +11236,9 @@
         "domein:vakbewijs-verhuis",
         "domein:werkvormen"
       ],
-      "onverklaardeRanden": []
+      "onverklaardeRanden": [
+        "domein:school -> domein:machtiging"
+      ]
     },
     {
       "id": "betalen",
@@ -11083,10 +11291,10 @@
         "dpMijnBetalingen",
         "memberTemplate"
       ],
-      "bestandenBereikt": 281,
-      "knopen": 75,
+      "bestandenBereikt": 295,
+      "knopen": 76,
       "perLaag": {
-        "domein": 38,
+        "domein": 39,
         "motor": 29,
         "opzet": 1,
         "ingang": 7
@@ -11100,6 +11308,7 @@
         "domein:concern",
         "domein:directpay",
         "domein:doorgeefjournaal",
+        "domein:economie",
         "domein:eigencollectie",
         "domein:factuur",
         "domein:factuursaldo",
@@ -11193,10 +11402,10 @@
         "PERSONAS",
         "memberTemplate"
       ],
-      "bestandenBereikt": 280,
-      "knopen": 75,
+      "bestandenBereikt": 292,
+      "knopen": 76,
       "perLaag": {
-        "domein": 44,
+        "domein": 45,
         "motor": 29,
         "opzet": 1,
         "ingang": 1
@@ -11209,6 +11418,7 @@
         "domein:commercie",
         "domein:concern",
         "domein:doorgeefjournaal",
+        "domein:economie",
         "domein:eigencollectie",
         "domein:ervaring",
         "domein:factuur",
@@ -11248,6 +11458,136 @@
         "domein:werkvormen"
       ],
       "onverklaardeRanden": []
+    },
+    {
+      "id": "tg-inlog",
+      "naam": "Inloggen en registreren",
+      "categorie": "Toegang en identiteit",
+      "standaard": true,
+      "routes": 11,
+      "graad": "ondergrens",
+      "sleutelsWaarde": [
+        "PRODUCTION",
+        "UPLOAD_DIR",
+        "loginFails",
+        "sessions"
+      ],
+      "sleutelsOnvindbaar": [
+        "PERSONAS",
+        "forgetSession",
+        "fs",
+        "hasCred",
+        "kern",
+        "memberTemplate",
+        "path"
+      ],
+      "sleutelsSamengesteld": [],
+      "redenen": {
+        "PERSONAS": "een object zonder functiewaarden die naar een bestand wijzen",
+        "PRODUCTION": "een boolean: gegevens, geen module",
+        "UPLOAD_DIR": "een string: gegevens, geen module",
+        "forgetSession": "een functie met te weinig brontekst om terug te zoeken (109 tekens)",
+        "fs": "een object zonder functiewaarden die naar een bestand wijzen",
+        "hasCred": "een functie met te weinig brontekst om terug te zoeken (93 tekens)",
+        "kern": "staat niet in de kern-tas en is langs geen van de zeven constructies te herleiden",
+        "loginFails": "een Map: gedeelde staat, geen module",
+        "memberTemplate": "een functie met te weinig brontekst om terug te zoeken (64 tekens)",
+        "path": "een object zonder functiewaarden die naar een bestand wijzen",
+        "sessions": "een Map: gedeelde staat, geen module"
+      },
+      "inBedrading": 0,
+      "ophangbestanden": [
+        "server/routes/auth/account.js",
+        "server/routes/auth/herstel.js",
+        "server/routes/auth/inlog-pas.js",
+        "server/routes/auth/inlog.js",
+        "server/routes/member/tweefactor.js"
+      ],
+      "leveranciers": [
+        "server/accounts/index.js",
+        "server/bedrijf/index.js",
+        "server/db/index.js",
+        "server/kern/automatisering.js",
+        "server/kern/concern/index.js",
+        "server/kern/identiteit/commercieel.js",
+        "server/kern/identiteit/sessieregister.js",
+        "server/kern/identiteit/tweefactor.js",
+        "server/kern/lid.js",
+        "server/kern/sessies.js",
+        "server/kern/util.js",
+        "server/lib/handelingsspoor.js",
+        "server/lib/leeftijd.js",
+        "server/mail.js",
+        "server/testomgeving.js",
+        "server/web/index.js"
+      ],
+      "sleutelsUitBedrading": [
+        "appUrl",
+        "auth",
+        "checkCred",
+        "logInlog",
+        "noteFailedTry",
+        "tooManyTries"
+      ],
+      "sleutelsOnbekend": [
+        "PERSONAS",
+        "PRODUCTION",
+        "UPLOAD_DIR",
+        "forgetSession",
+        "fs",
+        "hasCred",
+        "kern",
+        "loginFails",
+        "memberTemplate",
+        "path",
+        "sessions"
+      ],
+      "bestandenBereikt": 271,
+      "knopen": 73,
+      "perLaag": {
+        "domein": 33,
+        "motor": 37,
+        "opzet": 1,
+        "ingang": 2
+      },
+      "domeinen": [
+        "domein:automatisering",
+        "domein:bedrijf",
+        "domein:command",
+        "domein:commercie",
+        "domein:concern",
+        "domein:doorgeefjournaal",
+        "domein:eigencollectie",
+        "domein:fiscaal",
+        "domein:geld",
+        "domein:identiteit",
+        "domein:journaalverhuizing",
+        "domein:journaalvorm",
+        "domein:kosten",
+        "domein:lid",
+        "domein:lidmaatschap",
+        "domein:mail-publiek",
+        "domein:muziek-instrumenten",
+        "domein:muziek-stijlen",
+        "domein:onderneming",
+        "domein:pasladder",
+        "domein:pasprijs",
+        "domein:salonviraal",
+        "domein:sessies",
+        "domein:ssrf",
+        "domein:totp",
+        "domein:util",
+        "domein:vakbewijs",
+        "domein:vakbewijs-aftekenen",
+        "domein:vakbewijs-nummer",
+        "domein:vakbewijs-verhuis",
+        "domein:wereld",
+        "domein:werkcommand",
+        "domein:werkvormen"
+      ],
+      "onverklaardeRanden": [
+        "domein:identiteit -> domein:totp"
+      ]
     },
     {
       "id": "bk-reizen",
@@ -11390,127 +11730,6 @@
       "onverklaardeRanden": []
     },
     {
-      "id": "tg-inlog",
-      "naam": "Inloggen en registreren",
-      "categorie": "Toegang en identiteit",
-      "standaard": true,
-      "routes": 10,
-      "graad": "ondergrens",
-      "sleutelsWaarde": [
-        "PRODUCTION",
-        "UPLOAD_DIR",
-        "loginFails",
-        "sessions"
-      ],
-      "sleutelsOnvindbaar": [
-        "PERSONAS",
-        "forgetSession",
-        "fs",
-        "hasCred",
-        "kern",
-        "memberTemplate",
-        "path"
-      ],
-      "sleutelsSamengesteld": [],
-      "redenen": {
-        "PERSONAS": "een object zonder functiewaarden die naar een bestand wijzen",
-        "PRODUCTION": "een boolean: gegevens, geen module",
-        "UPLOAD_DIR": "een string: gegevens, geen module",
-        "forgetSession": "een functie met te weinig brontekst om terug te zoeken (109 tekens)",
-        "fs": "een object zonder functiewaarden die naar een bestand wijzen",
-        "hasCred": "een functie met te weinig brontekst om terug te zoeken (93 tekens)",
-        "kern": "staat niet in de kern-tas en is langs geen van de zeven constructies te herleiden",
-        "loginFails": "een Map: gedeelde staat, geen module",
-        "memberTemplate": "een functie met te weinig brontekst om terug te zoeken (64 tekens)",
-        "path": "een object zonder functiewaarden die naar een bestand wijzen",
-        "sessions": "een Map: gedeelde staat, geen module"
-      },
-      "inBedrading": 0,
-      "ophangbestanden": [
-        "server/routes/auth/account.js",
-        "server/routes/auth/herstel.js",
-        "server/routes/auth/inlog-pas.js",
-        "server/routes/auth/inlog.js"
-      ],
-      "leveranciers": [
-        "server/accounts/index.js",
-        "server/bedrijf/index.js",
-        "server/db/index.js",
-        "server/kern/automatisering.js",
-        "server/kern/concern/index.js",
-        "server/kern/lid.js",
-        "server/kern/sessies.js",
-        "server/kern/util.js",
-        "server/lib/leeftijd.js",
-        "server/mail.js",
-        "server/testomgeving.js",
-        "server/web/index.js"
-      ],
-      "sleutelsUitBedrading": [
-        "appUrl",
-        "auth",
-        "checkCred",
-        "logInlog",
-        "noteFailedTry",
-        "tooManyTries"
-      ],
-      "sleutelsOnbekend": [
-        "PERSONAS",
-        "PRODUCTION",
-        "UPLOAD_DIR",
-        "forgetSession",
-        "fs",
-        "hasCred",
-        "kern",
-        "loginFails",
-        "memberTemplate",
-        "path",
-        "sessions"
-      ],
-      "bestandenBereikt": 258,
-      "knopen": 70,
-      "perLaag": {
-        "domein": 31,
-        "motor": 37,
-        "opzet": 1,
-        "ingang": 1
-      },
-      "domeinen": [
-        "domein:automatisering",
-        "domein:bedrijf",
-        "domein:command",
-        "domein:commercie",
-        "domein:concern",
-        "domein:doorgeefjournaal",
-        "domein:eigencollectie",
-        "domein:fiscaal",
-        "domein:geld",
-        "domein:journaalverhuizing",
-        "domein:journaalvorm",
-        "domein:kosten",
-        "domein:lid",
-        "domein:lidmaatschap",
-        "domein:mail-publiek",
-        "domein:muziek-instrumenten",
-        "domein:muziek-stijlen",
-        "domein:onderneming",
-        "domein:pasladder",
-        "domein:pasprijs",
-        "domein:salonviraal",
-        "domein:sessies",
-        "domein:ssrf",
-        "domein:util",
-        "domein:vakbewijs",
-        "domein:vakbewijs-aftekenen",
-        "domein:vakbewijs-nummer",
-        "domein:vakbewijs-verhuis",
-        "domein:wereld",
-        "domein:werkcommand",
-        "domein:werkvormen"
-      ],
-      "onverklaardeRanden": []
-    },
-    {
       "id": "dom-facturen",
       "naam": "Facturen",
       "categorie": "Werk (zaken en personeel)",
@@ -11552,10 +11771,10 @@
       "sleutelsOnbekend": [
         "memberTemplate"
       ],
-      "bestandenBereikt": 251,
-      "knopen": 66,
+      "bestandenBereikt": 263,
+      "knopen": 67,
       "perLaag": {
-        "domein": 35,
+        "domein": 36,
         "motor": 28,
         "opzet": 1,
         "ingang": 2
@@ -11566,6 +11785,7 @@
         "domein:commercie",
         "domein:concern",
         "domein:doorgeefjournaal",
+        "domein:economie",
         "domein:eigencollectie",
         "domein:facturatie",
         "domein:factuur",
@@ -11803,10 +12023,10 @@
         "hasCred",
         "sseClients"
       ],
-      "bestandenBereikt": 318,
-      "knopen": 64,
+      "bestandenBereikt": 320,
+      "knopen": 65,
       "perLaag": {
-        "domein": 38,
+        "domein": 39,
         "motor": 22,
         "opzet": 1,
         "ingang": 3
@@ -11822,6 +12042,7 @@
         "domein:eigencollectie",
         "domein:fiscaal",
         "domein:fluister",
+        "domein:frictie",
         "domein:geld",
         "domein:journaalverhuizing",
         "domein:journaalvorm",
@@ -11964,6 +12185,91 @@
         "domein:wereld",
         "domein:werkcommand",
         "domein:werkvormen"
+      ],
+      "onverklaardeRanden": []
+    },
+    {
+      "id": "kern-state",
+      "naam": "De app-staat",
+      "categorie": "Leden (RTG-app)",
+      "standaard": true,
+      "routes": 11,
+      "graad": "gemeten",
+      "sleutelsWaarde": [],
+      "sleutelsOnvindbaar": [],
+      "sleutelsSamengesteld": [],
+      "redenen": {},
+      "inBedrading": 0,
+      "ophangbestanden": [
+        "server/routes/ik.js",
+        "server/routes/member.js"
+      ],
+      "leveranciers": [
+        "server/accounts/index.js",
+        "server/bedrijf/index.js",
+        "server/kern/concern/index.js",
+        "server/kern/geloof/index.js",
+        "server/kern/lid.js",
+        "server/kern/rahul/stemming.js",
+        "server/kern/toegankelijk.js",
+        "server/kern/util.js"
+      ],
+      "sleutelsUitBedrading": [
+        "auth"
+      ],
+      "sleutelsOnbekend": [],
+      "bestandenBereikt": 289,
+      "knopen": 63,
+      "perLaag": {
+        "domein": 44,
+        "motor": 17,
+        "ingang": 2
+      },
+      "domeinen": [
+        "domein:agenda",
+        "domein:agenda-idempotentie",
+        "domein:agenda-opslag",
+        "domein:bedrijf",
+        "domein:bedrijfscontrole",
+        "domein:bezorgvolg",
+        "domein:command",
+        "domein:commercie",
+        "domein:concern",
+        "domein:economie",
+        "domein:eigencollectie",
+        "domein:fiscaal",
+        "domein:geld",
+        "domein:geloof",
+        "domein:identiteit",
+        "domein:internationalehandel",
+        "domein:kvkvoorcontrole",
+        "domein:lid",
+        "domein:lidmaatschap",
+        "domein:onderneming",
+        "domein:pakketten",
+        "domein:pasladder",
+        "domein:pasprijs",
+        "domein:rahul",
+        "domein:rahul-fases",
+        "domein:rahul-hart",
+        "domein:rahul-omgang",
+        "domein:rtmail-wie",
+        "domein:salonpromo",
+        "domein:salonviraal",
+        "domein:servicekosten",
+        "domein:sociaal",
+        "domein:toegankelijk",
+        "domein:util",
+        "domein:vakbewijs",
+        "domein:vakbewijs-aftekenen",
+        "domein:vakbewijs-nummer",
+        "domein:vakbewijs-verhuis",
+        "domein:veilig",
+        "domein:vergeten",
+        "domein:wereld",
+        "domein:werkcommand",
+        "domein:workspace-audit",
+        "domein:workspace-voorkeur"
       ],
       "onverklaardeRanden": []
     },
@@ -12327,10 +12633,10 @@
       "sleutelsOnbekend": [
         "memberTemplate"
       ],
-      "bestandenBereikt": 237,
-      "knopen": 58,
+      "bestandenBereikt": 248,
+      "knopen": 59,
       "perLaag": {
-        "domein": 28,
+        "domein": 29,
         "motor": 28,
         "opzet": 1,
         "ingang": 1
@@ -12341,6 +12647,7 @@
         "domein:commercie",
         "domein:concern",
         "domein:doorgeefjournaal",
+        "domein:economie",
         "domein:eigencollectie",
         "domein:factuur",
         "domein:fonds",
@@ -12452,85 +12759,6 @@
         "domein:wereld",
         "domein:werkcommand",
         "domein:werkvormen"
-      ],
-      "onverklaardeRanden": []
-    },
-    {
-      "id": "kern-state",
-      "naam": "De app-staat",
-      "categorie": "Leden (RTG-app)",
-      "standaard": true,
-      "routes": 7,
-      "graad": "gemeten",
-      "sleutelsWaarde": [],
-      "sleutelsOnvindbaar": [],
-      "sleutelsSamengesteld": [],
-      "redenen": {},
-      "inBedrading": 0,
-      "ophangbestanden": [
-        "server/routes/ik.js",
-        "server/routes/member.js"
-      ],
-      "leveranciers": [
-        "server/accounts/index.js",
-        "server/bedrijf/index.js",
-        "server/kern/concern/index.js",
-        "server/kern/geloof/index.js",
-        "server/kern/lid.js",
-        "server/kern/rahul/stemming.js",
-        "server/kern/toegankelijk.js",
-        "server/kern/util.js"
-      ],
-      "sleutelsUitBedrading": [
-        "auth"
-      ],
-      "sleutelsOnbekend": [],
-      "bestandenBereikt": 279,
-      "knopen": 57,
-      "perLaag": {
-        "domein": 38,
-        "motor": 17,
-        "ingang": 2
-      },
-      "domeinen": [
-        "domein:agenda",
-        "domein:bedrijf",
-        "domein:bedrijfscontrole",
-        "domein:bezorgvolg",
-        "domein:command",
-        "domein:commercie",
-        "domein:concern",
-        "domein:eigencollectie",
-        "domein:fiscaal",
-        "domein:geld",
-        "domein:geloof",
-        "domein:internationalehandel",
-        "domein:kvkvoorcontrole",
-        "domein:lid",
-        "domein:lidmaatschap",
-        "domein:onderneming",
-        "domein:pakketten",
-        "domein:pasladder",
-        "domein:pasprijs",
-        "domein:rahul",
-        "domein:rahul-fases",
-        "domein:rahul-hart",
-        "domein:rahul-omgang",
-        "domein:rtmail-wie",
-        "domein:salonpromo",
-        "domein:salonviraal",
-        "domein:servicekosten",
-        "domein:sociaal",
-        "domein:toegankelijk",
-        "domein:util",
-        "domein:vakbewijs",
-        "domein:vakbewijs-aftekenen",
-        "domein:vakbewijs-nummer",
-        "domein:vakbewijs-verhuis",
-        "domein:veilig",
-        "domein:vergeten",
-        "domein:wereld",
-        "domein:werkcommand"
       ],
       "onverklaardeRanden": []
     },
@@ -12704,7 +12932,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 216,
+      "bestandenBereikt": 218,
       "knopen": 53,
       "perLaag": {
         "domein": 31,
@@ -12873,7 +13101,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 228,
+      "bestandenBereikt": 230,
       "knopen": 53,
       "perLaag": {
         "domein": 33,
@@ -12951,7 +13179,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 183,
+      "bestandenBereikt": 185,
       "knopen": 53,
       "perLaag": {
         "domein": 34,
@@ -13018,6 +13246,8 @@
         "server/bedrijf/index.js",
         "server/kern/aanmeldgesprek.js",
         "server/kern/aanmeldingen.js",
+        "server/kern/identiteit/sessieregister.js",
+        "server/kern/kantoor/boardroom.js",
         "server/kern/kantoor/index.js",
         "server/kern/lid.js"
       ],
@@ -13025,10 +13255,10 @@
         "tooManyTries"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 230,
-      "knopen": 51,
+      "bestandenBereikt": 238,
+      "knopen": 52,
       "perLaag": {
-        "domein": 26,
+        "domein": 27,
         "motor": 22,
         "opzet": 1,
         "ingang": 2
@@ -13046,6 +13276,7 @@
         "domein:doorgeefjournaal",
         "domein:eigencollectie",
         "domein:geld",
+        "domein:identiteit",
         "domein:journaalverhuizing",
         "domein:journaalvorm",
         "domein:kantoor",
@@ -13097,7 +13328,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 238,
+      "bestandenBereikt": 240,
       "knopen": 51,
       "perLaag": {
         "domein": 33,
@@ -13147,7 +13378,7 @@
       "naam": "App Store (apps van derden)",
       "categorie": "Winkel en media",
       "standaard": true,
-      "routes": 39,
+      "routes": 43,
       "graad": "gemeten",
       "sleutelsWaarde": [],
       "sleutelsOnvindbaar": [],
@@ -13180,7 +13411,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 266,
+      "bestandenBereikt": 277,
       "knopen": 51,
       "perLaag": {
         "domein": 23,
@@ -13209,6 +13440,318 @@
         "domein:sociaal",
         "domein:tenant",
         "domein:util",
+        "domein:wereld",
+        "domein:werkcommand",
+        "domein:werkvormen"
+      ],
+      "onverklaardeRanden": []
+    },
+    {
+      "id": "ov-zorgprofiel",
+      "naam": "Zorgprofiel",
+      "categorie": "Diensten (leden)",
+      "standaard": true,
+      "routes": 2,
+      "graad": "gemeten",
+      "sleutelsWaarde": [
+        "anthropic"
+      ],
+      "sleutelsOnvindbaar": [],
+      "sleutelsSamengesteld": [],
+      "redenen": {
+        "anthropic": "een null: gegevens, geen module"
+      },
+      "inBedrading": 0,
+      "ophangbestanden": [
+        "server/routes/member/persoonlijk.js"
+      ],
+      "leveranciers": [
+        "server/bedrijf/index.js",
+        "server/bus.js",
+        "server/kern/ai.js",
+        "server/kern/balans.js",
+        "server/kern/fluister.js",
+        "server/kern/gastzorg.js",
+        "server/kern/pestgrens.js",
+        "server/kern/stuur.js",
+        "server/kern/veiligheid/codewoord.js",
+        "server/kern/voorspel/index.js"
+      ],
+      "sleutelsUitBedrading": [
+        "auth",
+        "liveCodename"
+      ],
+      "sleutelsOnbekend": [
+        "anthropic"
+      ],
+      "bestandenBereikt": 210,
+      "knopen": 50,
+      "perLaag": {
+        "domein": 28,
+        "motor": 20,
+        "opzet": 1,
+        "ingang": 1
+      },
+      "domeinen": [
+        "domein:ai",
+        "domein:balans",
+        "domein:bedrijf",
+        "domein:command",
+        "domein:context",
+        "domein:doorgeefjournaal",
+        "domein:eigencollectie",
+        "domein:envelop",
+        "domein:fluister",
+        "domein:frictie",
+        "domein:gastzorg",
+        "domein:geld",
+        "domein:journaalverhuizing",
+        "domein:journaalvorm",
+        "domein:muziek-instrumenten",
+        "domein:muziek-stijlen",
+        "domein:pestgrens",
+        "domein:rahul",
+        "domein:rahul-fases",
+        "domein:rahul-hart",
+        "domein:rahul-omgang",
+        "domein:stuur",
+        "domein:util",
+        "domein:veiligheid",
+        "domein:voorspel",
+        "domein:wereld",
+        "domein:werkcommand",
+        "domein:werkvormen"
+      ],
+      "onverklaardeRanden": []
+    },
+    {
+      "id": "kern-locatie",
+      "naam": "Locatie delen",
+      "categorie": "Leden (RTG-app)",
+      "standaard": true,
+      "routes": 3,
+      "graad": "gemeten",
+      "sleutelsWaarde": [
+        "anthropic"
+      ],
+      "sleutelsOnvindbaar": [],
+      "sleutelsSamengesteld": [],
+      "redenen": {
+        "anthropic": "een null: gegevens, geen module"
+      },
+      "inBedrading": 0,
+      "ophangbestanden": [
+        "server/routes/member/persoonlijk.js"
+      ],
+      "leveranciers": [
+        "server/bedrijf/index.js",
+        "server/bus.js",
+        "server/kern/ai.js",
+        "server/kern/balans.js",
+        "server/kern/fluister.js",
+        "server/kern/gastzorg.js",
+        "server/kern/pestgrens.js",
+        "server/kern/stuur.js",
+        "server/kern/veiligheid/codewoord.js",
+        "server/kern/voorspel/index.js"
+      ],
+      "sleutelsUitBedrading": [
+        "auth",
+        "liveCodename"
+      ],
+      "sleutelsOnbekend": [
+        "anthropic"
+      ],
+      "bestandenBereikt": 210,
+      "knopen": 50,
+      "perLaag": {
+        "domein": 28,
+        "motor": 20,
+        "opzet": 1,
+        "ingang": 1
+      },
+      "domeinen": [
+        "domein:ai",
+        "domein:balans",
+        "domein:bedrijf",
+        "domein:command",
+        "domein:context",
+        "domein:doorgeefjournaal",
+        "domein:eigencollectie",
+        "domein:envelop",
+        "domein:fluister",
+        "domein:frictie",
+        "domein:gastzorg",
+        "domein:geld",
+        "domein:journaalverhuizing",
+        "domein:journaalvorm",
+        "domein:muziek-instrumenten",
+        "domein:muziek-stijlen",
+        "domein:pestgrens",
+        "domein:rahul",
+        "domein:rahul-fases",
+        "domein:rahul-hart",
+        "domein:rahul-omgang",
+        "domein:stuur",
+        "domein:util",
+        "domein:veiligheid",
+        "domein:voorspel",
+        "domein:wereld",
+        "domein:werkcommand",
+        "domein:werkvormen"
+      ],
+      "onverklaardeRanden": []
+    },
+    {
+      "id": "dom-fluister",
+      "naam": "Fluister",
+      "categorie": "Cultuur en gezelschap",
+      "standaard": true,
+      "routes": 5,
+      "graad": "gemeten",
+      "sleutelsWaarde": [
+        "anthropic"
+      ],
+      "sleutelsOnvindbaar": [],
+      "sleutelsSamengesteld": [],
+      "redenen": {
+        "anthropic": "een null: gegevens, geen module"
+      },
+      "inBedrading": 0,
+      "ophangbestanden": [
+        "server/routes/member/persoonlijk.js"
+      ],
+      "leveranciers": [
+        "server/bedrijf/index.js",
+        "server/bus.js",
+        "server/kern/ai.js",
+        "server/kern/balans.js",
+        "server/kern/fluister.js",
+        "server/kern/gastzorg.js",
+        "server/kern/pestgrens.js",
+        "server/kern/stuur.js",
+        "server/kern/veiligheid/codewoord.js",
+        "server/kern/voorspel/index.js"
+      ],
+      "sleutelsUitBedrading": [
+        "auth",
+        "liveCodename"
+      ],
+      "sleutelsOnbekend": [
+        "anthropic"
+      ],
+      "bestandenBereikt": 210,
+      "knopen": 50,
+      "perLaag": {
+        "domein": 28,
+        "motor": 20,
+        "opzet": 1,
+        "ingang": 1
+      },
+      "domeinen": [
+        "domein:ai",
+        "domein:balans",
+        "domein:bedrijf",
+        "domein:command",
+        "domein:context",
+        "domein:doorgeefjournaal",
+        "domein:eigencollectie",
+        "domein:envelop",
+        "domein:fluister",
+        "domein:frictie",
+        "domein:gastzorg",
+        "domein:geld",
+        "domein:journaalverhuizing",
+        "domein:journaalvorm",
+        "domein:muziek-instrumenten",
+        "domein:muziek-stijlen",
+        "domein:pestgrens",
+        "domein:rahul",
+        "domein:rahul-fases",
+        "domein:rahul-hart",
+        "domein:rahul-omgang",
+        "domein:stuur",
+        "domein:util",
+        "domein:veiligheid",
+        "domein:voorspel",
+        "domein:wereld",
+        "domein:werkcommand",
+        "domein:werkvormen"
+      ],
+      "onverklaardeRanden": []
+    },
+    {
+      "id": "ov-spar",
+      "naam": "Sparren en parkeren",
+      "categorie": "Diensten (leden)",
+      "standaard": true,
+      "routes": 3,
+      "graad": "gemeten",
+      "sleutelsWaarde": [
+        "anthropic"
+      ],
+      "sleutelsOnvindbaar": [],
+      "sleutelsSamengesteld": [],
+      "redenen": {
+        "anthropic": "een null: gegevens, geen module"
+      },
+      "inBedrading": 0,
+      "ophangbestanden": [
+        "server/routes/member/persoonlijk.js"
+      ],
+      "leveranciers": [
+        "server/bedrijf/index.js",
+        "server/bus.js",
+        "server/kern/ai.js",
+        "server/kern/balans.js",
+        "server/kern/fluister.js",
+        "server/kern/gastzorg.js",
+        "server/kern/pestgrens.js",
+        "server/kern/stuur.js",
+        "server/kern/veiligheid/codewoord.js",
+        "server/kern/voorspel/index.js"
+      ],
+      "sleutelsUitBedrading": [
+        "auth",
+        "liveCodename"
+      ],
+      "sleutelsOnbekend": [
+        "anthropic"
+      ],
+      "bestandenBereikt": 210,
+      "knopen": 50,
+      "perLaag": {
+        "domein": 28,
+        "motor": 20,
+        "opzet": 1,
+        "ingang": 1
+      },
+      "domeinen": [
+        "domein:ai",
+        "domein:balans",
+        "domein:bedrijf",
+        "domein:command",
+        "domein:context",
+        "domein:doorgeefjournaal",
+        "domein:eigencollectie",
+        "domein:envelop",
+        "domein:fluister",
+        "domein:frictie",
+        "domein:gastzorg",
+        "domein:geld",
+        "domein:journaalverhuizing",
+        "domein:journaalvorm",
+        "domein:muziek-instrumenten",
+        "domein:muziek-stijlen",
+        "domein:pestgrens",
+        "domein:rahul",
+        "domein:rahul-fases",
+        "domein:rahul-hart",
+        "domein:rahul-omgang",
+        "domein:stuur",
+        "domein:util",
+        "domein:veiligheid",
+        "domein:voorspel",
         "domein:wereld",
         "domein:werkcommand",
         "domein:werkvormen"
@@ -13278,314 +13821,6 @@
       "onverklaardeRanden": []
     },
     {
-      "id": "ov-zorgprofiel",
-      "naam": "Zorgprofiel",
-      "categorie": "Diensten (leden)",
-      "standaard": true,
-      "routes": 2,
-      "graad": "gemeten",
-      "sleutelsWaarde": [
-        "anthropic"
-      ],
-      "sleutelsOnvindbaar": [],
-      "sleutelsSamengesteld": [],
-      "redenen": {
-        "anthropic": "een null: gegevens, geen module"
-      },
-      "inBedrading": 0,
-      "ophangbestanden": [
-        "server/routes/member/persoonlijk.js"
-      ],
-      "leveranciers": [
-        "server/bedrijf/index.js",
-        "server/bus.js",
-        "server/kern/ai.js",
-        "server/kern/balans.js",
-        "server/kern/fluister.js",
-        "server/kern/gastzorg.js",
-        "server/kern/pestgrens.js",
-        "server/kern/stuur.js",
-        "server/kern/veiligheid/codewoord.js",
-        "server/kern/voorspel/index.js"
-      ],
-      "sleutelsUitBedrading": [
-        "auth",
-        "liveCodename"
-      ],
-      "sleutelsOnbekend": [
-        "anthropic"
-      ],
-      "bestandenBereikt": 208,
-      "knopen": 49,
-      "perLaag": {
-        "domein": 27,
-        "motor": 20,
-        "opzet": 1,
-        "ingang": 1
-      },
-      "domeinen": [
-        "domein:ai",
-        "domein:balans",
-        "domein:bedrijf",
-        "domein:command",
-        "domein:context",
-        "domein:doorgeefjournaal",
-        "domein:eigencollectie",
-        "domein:envelop",
-        "domein:fluister",
-        "domein:gastzorg",
-        "domein:geld",
-        "domein:journaalverhuizing",
-        "domein:journaalvorm",
-        "domein:muziek-instrumenten",
-        "domein:muziek-stijlen",
-        "domein:pestgrens",
-        "domein:rahul",
-        "domein:rahul-fases",
-        "domein:rahul-hart",
-        "domein:rahul-omgang",
-        "domein:stuur",
-        "domein:util",
-        "domein:veiligheid",
-        "domein:voorspel",
-        "domein:wereld",
-        "domein:werkcommand",
-        "domein:werkvormen"
-      ],
-      "onverklaardeRanden": []
-    },
-    {
-      "id": "kern-locatie",
-      "naam": "Locatie delen",
-      "categorie": "Leden (RTG-app)",
-      "standaard": true,
-      "routes": 3,
-      "graad": "gemeten",
-      "sleutelsWaarde": [
-        "anthropic"
-      ],
-      "sleutelsOnvindbaar": [],
-      "sleutelsSamengesteld": [],
-      "redenen": {
-        "anthropic": "een null: gegevens, geen module"
-      },
-      "inBedrading": 0,
-      "ophangbestanden": [
-        "server/routes/member/persoonlijk.js"
-      ],
-      "leveranciers": [
-        "server/bedrijf/index.js",
-        "server/bus.js",
-        "server/kern/ai.js",
-        "server/kern/balans.js",
-        "server/kern/fluister.js",
-        "server/kern/gastzorg.js",
-        "server/kern/pestgrens.js",
-        "server/kern/stuur.js",
-        "server/kern/veiligheid/codewoord.js",
-        "server/kern/voorspel/index.js"
-      ],
-      "sleutelsUitBedrading": [
-        "auth",
-        "liveCodename"
-      ],
-      "sleutelsOnbekend": [
-        "anthropic"
-      ],
-      "bestandenBereikt": 208,
-      "knopen": 49,
-      "perLaag": {
-        "domein": 27,
-        "motor": 20,
-        "opzet": 1,
-        "ingang": 1
-      },
-      "domeinen": [
-        "domein:ai",
-        "domein:balans",
-        "domein:bedrijf",
-        "domein:command",
-        "domein:context",
-        "domein:doorgeefjournaal",
-        "domein:eigencollectie",
-        "domein:envelop",
-        "domein:fluister",
-        "domein:gastzorg",
-        "domein:geld",
-        "domein:journaalverhuizing",
-        "domein:journaalvorm",
-        "domein:muziek-instrumenten",
-        "domein:muziek-stijlen",
-        "domein:pestgrens",
-        "domein:rahul",
-        "domein:rahul-fases",
-        "domein:rahul-hart",
-        "domein:rahul-omgang",
-        "domein:stuur",
-        "domein:util",
-        "domein:veiligheid",
-        "domein:voorspel",
-        "domein:wereld",
-        "domein:werkcommand",
-        "domein:werkvormen"
-      ],
-      "onverklaardeRanden": []
-    },
-    {
-      "id": "dom-fluister",
-      "naam": "Fluister",
-      "categorie": "Cultuur en gezelschap",
-      "standaard": true,
-      "routes": 5,
-      "graad": "gemeten",
-      "sleutelsWaarde": [
-        "anthropic"
-      ],
-      "sleutelsOnvindbaar": [],
-      "sleutelsSamengesteld": [],
-      "redenen": {
-        "anthropic": "een null: gegevens, geen module"
-      },
-      "inBedrading": 0,
-      "ophangbestanden": [
-        "server/routes/member/persoonlijk.js"
-      ],
-      "leveranciers": [
-        "server/bedrijf/index.js",
-        "server/bus.js",
-        "server/kern/ai.js",
-        "server/kern/balans.js",
-        "server/kern/fluister.js",
-        "server/kern/gastzorg.js",
-        "server/kern/pestgrens.js",
-        "server/kern/stuur.js",
-        "server/kern/veiligheid/codewoord.js",
-        "server/kern/voorspel/index.js"
-      ],
-      "sleutelsUitBedrading": [
-        "auth",
-        "liveCodename"
-      ],
-      "sleutelsOnbekend": [
-        "anthropic"
-      ],
-      "bestandenBereikt": 208,
-      "knopen": 49,
-      "perLaag": {
-        "domein": 27,
-        "motor": 20,
-        "opzet": 1,
-        "ingang": 1
-      },
-      "domeinen": [
-        "domein:ai",
-        "domein:balans",
-        "domein:bedrijf",
-        "domein:command",
-        "domein:context",
-        "domein:doorgeefjournaal",
-        "domein:eigencollectie",
-        "domein:envelop",
-        "domein:fluister",
-        "domein:gastzorg",
-        "domein:geld",
-        "domein:journaalverhuizing",
-        "domein:journaalvorm",
-        "domein:muziek-instrumenten",
-        "domein:muziek-stijlen",
-        "domein:pestgrens",
-        "domein:rahul",
-        "domein:rahul-fases",
-        "domein:rahul-hart",
-        "domein:rahul-omgang",
-        "domein:stuur",
-        "domein:util",
-        "domein:veiligheid",
-        "domein:voorspel",
-        "domein:wereld",
-        "domein:werkcommand",
-        "domein:werkvormen"
-      ],
-      "onverklaardeRanden": []
-    },
-    {
-      "id": "ov-spar",
-      "naam": "Sparren en parkeren",
-      "categorie": "Diensten (leden)",
-      "standaard": true,
-      "routes": 3,
-      "graad": "gemeten",
-      "sleutelsWaarde": [
-        "anthropic"
-      ],
-      "sleutelsOnvindbaar": [],
-      "sleutelsSamengesteld": [],
-      "redenen": {
-        "anthropic": "een null: gegevens, geen module"
-      },
-      "inBedrading": 0,
-      "ophangbestanden": [
-        "server/routes/member/persoonlijk.js"
-      ],
-      "leveranciers": [
-        "server/bedrijf/index.js",
-        "server/bus.js",
-        "server/kern/ai.js",
-        "server/kern/balans.js",
-        "server/kern/fluister.js",
-        "server/kern/gastzorg.js",
-        "server/kern/pestgrens.js",
-        "server/kern/stuur.js",
-        "server/kern/veiligheid/codewoord.js",
-        "server/kern/voorspel/index.js"
-      ],
-      "sleutelsUitBedrading": [
-        "auth",
-        "liveCodename"
-      ],
-      "sleutelsOnbekend": [
-        "anthropic"
-      ],
-      "bestandenBereikt": 208,
-      "knopen": 49,
-      "perLaag": {
-        "domein": 27,
-        "motor": 20,
-        "opzet": 1,
-        "ingang": 1
-      },
-      "domeinen": [
-        "domein:ai",
-        "domein:balans",
-        "domein:bedrijf",
-        "domein:command",
-        "domein:context",
-        "domein:doorgeefjournaal",
-        "domein:eigencollectie",
-        "domein:envelop",
-        "domein:fluister",
-        "domein:gastzorg",
-        "domein:geld",
-        "domein:journaalverhuizing",
-        "domein:journaalvorm",
-        "domein:muziek-instrumenten",
-        "domein:muziek-stijlen",
-        "domein:pestgrens",
-        "domein:rahul",
-        "domein:rahul-fases",
-        "domein:rahul-hart",
-        "domein:rahul-omgang",
-        "domein:stuur",
-        "domein:util",
-        "domein:veiligheid",
-        "domein:voorspel",
-        "domein:wereld",
-        "domein:werkcommand",
-        "domein:werkvormen"
-      ],
-      "onverklaardeRanden": []
-    },
-    {
       "id": "dom-bank-inzicht",
       "naam": "Uitgaven-inzichten",
       "categorie": "Geld",
@@ -13618,7 +13853,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 236,
+      "bestandenBereikt": 238,
       "knopen": 49,
       "perLaag": {
         "domein": 32,
@@ -13695,7 +13930,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 236,
+      "bestandenBereikt": 238,
       "knopen": 49,
       "perLaag": {
         "domein": 32,
@@ -13855,7 +14090,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 198,
+      "bestandenBereikt": 200,
       "knopen": 48,
       "perLaag": {
         "domein": 27,
@@ -13977,318 +14212,6 @@
         "domein:vakbewijs-aftekenen",
         "domein:vakbewijs-nummer",
         "domein:vakbewijs-verhuis",
-        "domein:wereld",
-        "domein:werkcommand",
-        "domein:werkvormen"
-      ],
-      "onverklaardeRanden": []
-    },
-    {
-      "id": "onderweg",
-      "naam": "Onderweg (live locatie)",
-      "categorie": "Genres & diensten",
-      "standaard": true,
-      "routes": 5,
-      "graad": "ondergrens",
-      "sleutelsWaarde": [
-        "DOOR_RELOCK_MS"
-      ],
-      "sleutelsOnvindbaar": [
-        "PERSONAS"
-      ],
-      "sleutelsSamengesteld": [],
-      "redenen": {
-        "DOOR_RELOCK_MS": "een number: gegevens, geen module",
-        "PERSONAS": "een object zonder functiewaarden die naar een bestand wijzen"
-      },
-      "inBedrading": 0,
-      "ophangbestanden": [
-        "server/routes/member/onderweg.js",
-        "server/routes/member/terplaatse.js"
-      ],
-      "leveranciers": [
-        "server/bedrijf/index.js",
-        "server/db/index.js",
-        "server/kern/comm/gast.js",
-        "server/kern/concern/index.js",
-        "server/kern/leverancier/gastcontact.js",
-        "server/kern/leverancier/zaak.js",
-        "server/kern/lid.js",
-        "server/kern/lidacties/ritten.js",
-        "server/kern/util.js",
-        "server/kern/werk.js",
-        "server/lib/geo.js",
-        "server/talen.js"
-      ],
-      "sleutelsUitBedrading": [
-        "auth",
-        "findSupplier",
-        "liveCodename",
-        "liveStateFor",
-        "logActivity",
-        "notify",
-        "notifySupplier",
-        "pushLive",
-        "sseToCustomer",
-        "sseToOffice",
-        "sseToSupplier"
-      ],
-      "sleutelsOnbekend": [
-        "DOOR_RELOCK_MS",
-        "PERSONAS"
-      ],
-      "bestandenBereikt": 203,
-      "knopen": 46,
-      "perLaag": {
-        "domein": 29,
-        "motor": 15,
-        "opzet": 1,
-        "ingang": 1
-      },
-      "domeinen": [
-        "domein:bedrijf",
-        "domein:comm",
-        "domein:command",
-        "domein:commercie",
-        "domein:concern",
-        "domein:doorgeefjournaal",
-        "domein:eigencollectie",
-        "domein:geld",
-        "domein:journaalverhuizing",
-        "domein:journaalvorm",
-        "domein:leverancier",
-        "domein:lid",
-        "domein:lidacties",
-        "domein:lidmaatschap",
-        "domein:muziek-instrumenten",
-        "domein:muziek-stijlen",
-        "domein:onderneming",
-        "domein:pasladder",
-        "domein:pasprijs",
-        "domein:salonviraal",
-        "domein:util",
-        "domein:vakbewijs",
-        "domein:vakbewijs-aftekenen",
-        "domein:vakbewijs-nummer",
-        "domein:vakbewijs-verhuis",
-        "domein:wereld",
-        "domein:werk",
-        "domein:werkcommand",
-        "domein:werkvormen"
-      ],
-      "onverklaardeRanden": []
-    },
-    {
-      "id": "tenant",
-      "naam": "Tenant Control Plane (white-label)",
-      "categorie": "RTG-Backoffice",
-      "standaard": true,
-      "routes": 14,
-      "graad": "gemeten",
-      "sleutelsWaarde": [],
-      "sleutelsOnvindbaar": [],
-      "sleutelsSamengesteld": [],
-      "redenen": {},
-      "inBedrading": 0,
-      "ophangbestanden": [
-        "server/routes/tenant.js",
-        "server/routes/tenant/bijstand.js"
-      ],
-      "leveranciers": [
-        "server/bedrijf/index.js",
-        "server/db/index.js",
-        "server/kern/command/bijstand.js",
-        "server/kern/concern/index.js",
-        "server/kern/tenant/index.js",
-        "server/kern/util.js"
-      ],
-      "sleutelsUitBedrading": [
-        "auth",
-        "findSupplier"
-      ],
-      "sleutelsOnbekend": [],
-      "bestandenBereikt": 235,
-      "knopen": 46,
-      "perLaag": {
-        "domein": 20,
-        "motor": 24,
-        "opzet": 1,
-        "ingang": 1
-      },
-      "domeinen": [
-        "domein:bedrijf",
-        "domein:command",
-        "domein:concern",
-        "domein:doorgeefjournaal",
-        "domein:eigencollectie",
-        "domein:geld",
-        "domein:journaalverhuizing",
-        "domein:journaalvorm",
-        "domein:muziek-instrumenten",
-        "domein:muziek-stijlen",
-        "domein:onderneming",
-        "domein:tenant",
-        "domein:util",
-        "domein:vakbewijs",
-        "domein:vakbewijs-aftekenen",
-        "domein:vakbewijs-nummer",
-        "domein:vakbewijs-verhuis",
-        "domein:wereld",
-        "domein:werkcommand",
-        "domein:werkvormen"
-      ],
-      "onverklaardeRanden": []
-    },
-    {
-      "id": "salon",
-      "naam": "De Salon (feed, volgen, deals)",
-      "categorie": "Sociaal (De Salon)",
-      "standaard": true,
-      "routes": 25,
-      "graad": "ondergrens",
-      "sleutelsWaarde": [],
-      "sleutelsOnvindbaar": [
-        "AUTHOR_TIER",
-        "PERSONAS"
-      ],
-      "sleutelsSamengesteld": [],
-      "redenen": {
-        "AUTHOR_TIER": "een object zonder functiewaarden die naar een bestand wijzen",
-        "PERSONAS": "een object zonder functiewaarden die naar een bestand wijzen"
-      },
-      "inBedrading": 0,
-      "ophangbestanden": [
-        "server/routes/member/salon.js",
-        "server/routes/member/salonapp.js"
-      ],
-      "leveranciers": [
-        "server/bedrijf/index.js",
-        "server/db/index.js",
-        "server/kern/concern/index.js",
-        "server/kern/leverancier/gastcontact.js",
-        "server/kern/lid/contact.js",
-        "server/kern/salon/ai.js",
-        "server/kern/salon/index.js",
-        "server/kern/salon/inzicht.js",
-        "server/kern/salon/profiel.js",
-        "server/kern/salon/reacties.js",
-        "server/kern/sociaal/vrienden/contact.js",
-        "server/talen.js",
-        "server/web/index.js"
-      ],
-      "sleutelsUitBedrading": [
-        "auth",
-        "broadcastSync",
-        "findSupplier",
-        "geenGast",
-        "liveCodename",
-        "notify",
-        "notifySupplier",
-        "salonZichtbaar"
-      ],
-      "sleutelsOnbekend": [
-        "AUTHOR_TIER",
-        "PERSONAS"
-      ],
-      "bestandenBereikt": 208,
-      "knopen": 45,
-      "perLaag": {
-        "domein": 27,
-        "motor": 16,
-        "opzet": 1,
-        "ingang": 1
-      },
-      "domeinen": [
-        "domein:bedrijf",
-        "domein:command",
-        "domein:concern",
-        "domein:doorgeefjournaal",
-        "domein:eigencollectie",
-        "domein:geld",
-        "domein:journaalverhuizing",
-        "domein:journaalvorm",
-        "domein:leverancier",
-        "domein:lid",
-        "domein:mediaopruim",
-        "domein:muziek-instrumenten",
-        "domein:muziek-stijlen",
-        "domein:onderneming",
-        "domein:salon",
-        "domein:salonpromo",
-        "domein:salonviraal",
-        "domein:sociaal",
-        "domein:util",
-        "domein:vakbewijs",
-        "domein:vakbewijs-aftekenen",
-        "domein:vakbewijs-nummer",
-        "domein:vakbewijs-verhuis",
-        "domein:veilig",
-        "domein:wereld",
-        "domein:werkcommand",
-        "domein:werkvormen"
-      ],
-      "onverklaardeRanden": []
-    },
-    {
-      "id": "dom-eigendomein",
-      "naam": "Eigen domein (buiten het RTG-web)",
-      "categorie": "Winkel en media",
-      "standaard": false,
-      "routes": 2,
-      "graad": "gemeten",
-      "sleutelsWaarde": [],
-      "sleutelsOnvindbaar": [],
-      "sleutelsSamengesteld": [],
-      "redenen": {},
-      "inBedrading": 0,
-      "ophangbestanden": [
-        "server/routes/webmeting.js"
-      ],
-      "leveranciers": [
-        "server/bedrijf/index.js",
-        "server/kern/kantoor/index.js",
-        "server/kern/leverancier/zaak.js",
-        "server/kern/webmaker.js"
-      ],
-      "sleutelsUitBedrading": [
-        "auth",
-        "supplierAuth"
-      ],
-      "sleutelsOnbekend": [],
-      "bestandenBereikt": 171,
-      "knopen": 45,
-      "perLaag": {
-        "domein": 28,
-        "opzet": 1,
-        "motor": 15,
-        "ingang": 1
-      },
-      "domeinen": [
-        "domein:bedrijf",
-        "domein:command",
-        "domein:doorgeefjournaal",
-        "domein:eigencollectie",
-        "domein:geld",
-        "domein:journaalverhuizing",
-        "domein:journaalvorm",
-        "domein:kantoor",
-        "domein:leverancier",
-        "domein:mediaopruim",
-        "domein:muziek-instrumenten",
-        "domein:muziek-stijlen",
-        "domein:util",
-        "domein:webdomein",
-        "domein:webmaker",
-        "domein:webmaker-blader",
-        "domein:webmaker-fotos",
-        "domein:webmaker-meting",
-        "domein:webmaker-ontwerp",
-        "domein:webmaker-paginas",
-        "domein:webmaker-plan",
-        "domein:webmaker-publiceren",
-        "domein:webmaker-schoon",
-        "domein:webmaker-spoor",
-        "domein:webmaker-versies",
         "domein:wereld",
         "domein:werkcommand",
         "domein:werkvormen"
@@ -14483,15 +14406,17 @@
         "werkPoort",
         "zetWie"
       ],
-      "bestandenBereikt": 222,
-      "knopen": 45,
+      "bestandenBereikt": 224,
+      "knopen": 47,
       "perLaag": {
-        "domein": 30,
+        "domein": 32,
         "motor": 14,
         "opzet": 1
       },
       "domeinen": [
         "domein:agenda",
+        "domein:agenda-idempotentie",
+        "domein:agenda-opslag",
         "domein:bedrijf",
         "domein:bestanden",
         "domein:bestanden-delen",
@@ -14519,6 +14444,163 @@
         "domein:vakbewijs-nummer",
         "domein:vakbewijs-verhuis",
         "domein:wereld",
+        "domein:werkcommand",
+        "domein:werkvormen"
+      ],
+      "onverklaardeRanden": []
+    },
+    {
+      "id": "tenant",
+      "naam": "Tenant Control Plane (white-label)",
+      "categorie": "RTG-Backoffice",
+      "standaard": true,
+      "routes": 14,
+      "graad": "gemeten",
+      "sleutelsWaarde": [],
+      "sleutelsOnvindbaar": [],
+      "sleutelsSamengesteld": [],
+      "redenen": {},
+      "inBedrading": 0,
+      "ophangbestanden": [
+        "server/routes/tenant.js",
+        "server/routes/tenant/bijstand.js"
+      ],
+      "leveranciers": [
+        "server/bedrijf/index.js",
+        "server/db/index.js",
+        "server/kern/command/bijstand.js",
+        "server/kern/concern/index.js",
+        "server/kern/tenant/index.js",
+        "server/kern/util.js"
+      ],
+      "sleutelsUitBedrading": [
+        "auth",
+        "findSupplier"
+      ],
+      "sleutelsOnbekend": [],
+      "bestandenBereikt": 237,
+      "knopen": 47,
+      "perLaag": {
+        "domein": 21,
+        "motor": 24,
+        "opzet": 1,
+        "ingang": 1
+      },
+      "domeinen": [
+        "domein:bedrijf",
+        "domein:command",
+        "domein:concern",
+        "domein:doorgeefjournaal",
+        "domein:eigencollectie",
+        "domein:frictie",
+        "domein:geld",
+        "domein:journaalverhuizing",
+        "domein:journaalvorm",
+        "domein:muziek-instrumenten",
+        "domein:muziek-stijlen",
+        "domein:onderneming",
+        "domein:tenant",
+        "domein:util",
+        "domein:vakbewijs",
+        "domein:vakbewijs-aftekenen",
+        "domein:vakbewijs-nummer",
+        "domein:vakbewijs-verhuis",
+        "domein:wereld",
+        "domein:werkcommand",
+        "domein:werkvormen"
+      ],
+      "onverklaardeRanden": []
+    },
+    {
+      "id": "onderweg",
+      "naam": "Onderweg (live locatie)",
+      "categorie": "Genres & diensten",
+      "standaard": true,
+      "routes": 5,
+      "graad": "ondergrens",
+      "sleutelsWaarde": [
+        "DOOR_RELOCK_MS"
+      ],
+      "sleutelsOnvindbaar": [
+        "PERSONAS"
+      ],
+      "sleutelsSamengesteld": [],
+      "redenen": {
+        "DOOR_RELOCK_MS": "een number: gegevens, geen module",
+        "PERSONAS": "een object zonder functiewaarden die naar een bestand wijzen"
+      },
+      "inBedrading": 0,
+      "ophangbestanden": [
+        "server/routes/member/onderweg.js",
+        "server/routes/member/terplaatse.js"
+      ],
+      "leveranciers": [
+        "server/bedrijf/index.js",
+        "server/db/index.js",
+        "server/kern/comm/gast.js",
+        "server/kern/concern/index.js",
+        "server/kern/leverancier/gastcontact.js",
+        "server/kern/leverancier/zaak.js",
+        "server/kern/lid.js",
+        "server/kern/lidacties/ritten.js",
+        "server/kern/util.js",
+        "server/kern/werk.js",
+        "server/lib/geo.js",
+        "server/talen.js"
+      ],
+      "sleutelsUitBedrading": [
+        "auth",
+        "findSupplier",
+        "liveCodename",
+        "liveStateFor",
+        "logActivity",
+        "notify",
+        "notifySupplier",
+        "pushLive",
+        "sseToCustomer",
+        "sseToOffice",
+        "sseToSupplier"
+      ],
+      "sleutelsOnbekend": [
+        "DOOR_RELOCK_MS",
+        "PERSONAS"
+      ],
+      "bestandenBereikt": 203,
+      "knopen": 46,
+      "perLaag": {
+        "domein": 29,
+        "motor": 15,
+        "opzet": 1,
+        "ingang": 1
+      },
+      "domeinen": [
+        "domein:bedrijf",
+        "domein:comm",
+        "domein:command",
+        "domein:commercie",
+        "domein:concern",
+        "domein:doorgeefjournaal",
+        "domein:eigencollectie",
+        "domein:geld",
+        "domein:journaalverhuizing",
+        "domein:journaalvorm",
+        "domein:leverancier",
+        "domein:lid",
+        "domein:lidacties",
+        "domein:lidmaatschap",
+        "domein:muziek-instrumenten",
+        "domein:muziek-stijlen",
+        "domein:onderneming",
+        "domein:pasladder",
+        "domein:pasprijs",
+        "domein:salonviraal",
+        "domein:util",
+        "domein:vakbewijs",
+        "domein:vakbewijs-aftekenen",
+        "domein:vakbewijs-nummer",
+        "domein:vakbewijs-verhuis",
+        "domein:wereld",
+        "domein:werk",
         "domein:werkcommand",
         "domein:werkvormen"
       ],
@@ -14575,10 +14657,10 @@
         "anthropic",
         "convOf"
       ],
-      "bestandenBereikt": 170,
-      "knopen": 44,
+      "bestandenBereikt": 172,
+      "knopen": 46,
       "perLaag": {
-        "domein": 25,
+        "domein": 27,
         "motor": 16,
         "ingang": 3
       },
@@ -14607,7 +14689,424 @@
         "domein:util",
         "domein:wereld",
         "domein:werk",
+        "domein:werkcommand",
+        "domein:workspace-audit",
+        "domein:workspace-voorkeur"
+      ],
+      "onverklaardeRanden": []
+    },
+    {
+      "id": "salon",
+      "naam": "De Salon (feed, volgen, deals)",
+      "categorie": "Sociaal (De Salon)",
+      "standaard": true,
+      "routes": 25,
+      "graad": "ondergrens",
+      "sleutelsWaarde": [],
+      "sleutelsOnvindbaar": [
+        "AUTHOR_TIER",
+        "PERSONAS"
+      ],
+      "sleutelsSamengesteld": [],
+      "redenen": {
+        "AUTHOR_TIER": "een object zonder functiewaarden die naar een bestand wijzen",
+        "PERSONAS": "een object zonder functiewaarden die naar een bestand wijzen"
+      },
+      "inBedrading": 0,
+      "ophangbestanden": [
+        "server/routes/member/salon.js",
+        "server/routes/member/salonapp.js"
+      ],
+      "leveranciers": [
+        "server/bedrijf/index.js",
+        "server/db/index.js",
+        "server/kern/concern/index.js",
+        "server/kern/leverancier/gastcontact.js",
+        "server/kern/lid/contact.js",
+        "server/kern/salon/ai.js",
+        "server/kern/salon/index.js",
+        "server/kern/salon/inzicht.js",
+        "server/kern/salon/profiel.js",
+        "server/kern/salon/reacties.js",
+        "server/kern/sociaal/vrienden/contact.js",
+        "server/talen.js",
+        "server/web/index.js"
+      ],
+      "sleutelsUitBedrading": [
+        "auth",
+        "broadcastSync",
+        "findSupplier",
+        "geenGast",
+        "liveCodename",
+        "notify",
+        "notifySupplier",
+        "salonZichtbaar"
+      ],
+      "sleutelsOnbekend": [
+        "AUTHOR_TIER",
+        "PERSONAS"
+      ],
+      "bestandenBereikt": 208,
+      "knopen": 45,
+      "perLaag": {
+        "domein": 27,
+        "motor": 16,
+        "opzet": 1,
+        "ingang": 1
+      },
+      "domeinen": [
+        "domein:bedrijf",
+        "domein:command",
+        "domein:concern",
+        "domein:doorgeefjournaal",
+        "domein:eigencollectie",
+        "domein:geld",
+        "domein:journaalverhuizing",
+        "domein:journaalvorm",
+        "domein:leverancier",
+        "domein:lid",
+        "domein:mediaopruim",
+        "domein:muziek-instrumenten",
+        "domein:muziek-stijlen",
+        "domein:onderneming",
+        "domein:salon",
+        "domein:salonpromo",
+        "domein:salonviraal",
+        "domein:sociaal",
+        "domein:util",
+        "domein:vakbewijs",
+        "domein:vakbewijs-aftekenen",
+        "domein:vakbewijs-nummer",
+        "domein:vakbewijs-verhuis",
+        "domein:veilig",
+        "domein:wereld",
+        "domein:werkcommand",
+        "domein:werkvormen"
+      ],
+      "onverklaardeRanden": []
+    },
+    {
+      "id": "dom-eigendomein",
+      "naam": "Eigen domein (buiten het RTG-web)",
+      "categorie": "Winkel en media",
+      "standaard": false,
+      "routes": 2,
+      "graad": "gemeten",
+      "sleutelsWaarde": [],
+      "sleutelsOnvindbaar": [],
+      "sleutelsSamengesteld": [],
+      "redenen": {},
+      "inBedrading": 0,
+      "ophangbestanden": [
+        "server/routes/webmeting.js"
+      ],
+      "leveranciers": [
+        "server/bedrijf/index.js",
+        "server/kern/kantoor/index.js",
+        "server/kern/leverancier/zaak.js",
+        "server/kern/webmaker.js"
+      ],
+      "sleutelsUitBedrading": [
+        "auth",
+        "supplierAuth"
+      ],
+      "sleutelsOnbekend": [],
+      "bestandenBereikt": 173,
+      "knopen": 45,
+      "perLaag": {
+        "domein": 28,
+        "opzet": 1,
+        "motor": 15,
+        "ingang": 1
+      },
+      "domeinen": [
+        "domein:bedrijf",
+        "domein:command",
+        "domein:doorgeefjournaal",
+        "domein:eigencollectie",
+        "domein:geld",
+        "domein:journaalverhuizing",
+        "domein:journaalvorm",
+        "domein:kantoor",
+        "domein:leverancier",
+        "domein:mediaopruim",
+        "domein:muziek-instrumenten",
+        "domein:muziek-stijlen",
+        "domein:util",
+        "domein:webdomein",
+        "domein:webmaker",
+        "domein:webmaker-blader",
+        "domein:webmaker-fotos",
+        "domein:webmaker-meting",
+        "domein:webmaker-ontwerp",
+        "domein:webmaker-paginas",
+        "domein:webmaker-plan",
+        "domein:webmaker-publiceren",
+        "domein:webmaker-schoon",
+        "domein:webmaker-spoor",
+        "domein:webmaker-versies",
+        "domein:wereld",
+        "domein:werkcommand",
+        "domein:werkvormen"
+      ],
+      "onverklaardeRanden": []
+    },
+    {
+      "id": "command-zien",
+      "naam": "RTG Command: zien",
+      "categorie": "RTG-Backoffice",
+      "standaard": true,
+      "routes": 25,
+      "graad": "ondergrens",
+      "sleutelsWaarde": [],
+      "sleutelsOnvindbaar": [
+        "doelpoort"
+      ],
+      "sleutelsSamengesteld": [],
+      "redenen": {
+        "doelpoort": "staat niet in de kern-tas en is langs geen van de zeven constructies te herleiden"
+      },
+      "inBedrading": 0,
+      "ophangbestanden": [
+        "server/routes/command/bestuur.js",
+        "server/routes/command/index.js",
+        "server/routes/command/meten.js",
+        "server/routes/command/schaduwmeters.js"
+      ],
+      "leveranciers": [
+        "server/bedrijf/index.js",
+        "server/kern/command/index.js",
+        "server/kern/command/journaal.js",
+        "server/kern/identiteit/bezitsbewijs.js",
+        "server/kern/kantoor/boardroom.js",
+        "server/kern/kantoor/index.js"
+      ],
+      "sleutelsUitBedrading": [],
+      "sleutelsOnbekend": [
+        "doelpoort"
+      ],
+      "bestandenBereikt": 238,
+      "knopen": 45,
+      "perLaag": {
+        "domein": 19,
+        "motor": 24,
+        "opzet": 1,
+        "ingang": 1
+      },
+      "domeinen": [
+        "domein:bedrijf",
+        "domein:command",
+        "domein:doorgeefjournaal",
+        "domein:eigencollectie",
+        "domein:fiscaal",
+        "domein:frictie",
+        "domein:geld",
+        "domein:identiteit",
+        "domein:journaalverhuizing",
+        "domein:journaalvorm",
+        "domein:kantoor",
+        "domein:muziek-instrumenten",
+        "domein:muziek-stijlen",
+        "domein:payroll",
+        "domein:tenant",
+        "domein:util",
+        "domein:wereld",
+        "domein:werkcommand",
+        "domein:werkvormen"
+      ],
+      "onverklaardeRanden": []
+    },
+    {
+      "id": "command-doen",
+      "naam": "RTG Command: doen",
+      "categorie": "RTG-Backoffice",
+      "standaard": true,
+      "routes": 29,
+      "graad": "ondergrens",
+      "sleutelsWaarde": [],
+      "sleutelsOnvindbaar": [
+        "doelpoort"
+      ],
+      "sleutelsSamengesteld": [],
+      "redenen": {
+        "doelpoort": "staat niet in de kern-tas en is langs geen van de zeven constructies te herleiden"
+      },
+      "inBedrading": 0,
+      "ophangbestanden": [
+        "server/routes/command/herstel.js",
+        "server/routes/command/index.js",
+        "server/routes/command/toezicht.js"
+      ],
+      "leveranciers": [
+        "server/bedrijf/index.js",
+        "server/kern/command/index.js",
+        "server/kern/command/journaal.js",
+        "server/kern/identiteit/bezitsbewijs.js",
+        "server/kern/kantoor/boardroom.js",
+        "server/kern/kantoor/index.js"
+      ],
+      "sleutelsUitBedrading": [],
+      "sleutelsOnbekend": [
+        "doelpoort"
+      ],
+      "bestandenBereikt": 238,
+      "knopen": 45,
+      "perLaag": {
+        "domein": 19,
+        "motor": 24,
+        "opzet": 1,
+        "ingang": 1
+      },
+      "domeinen": [
+        "domein:bedrijf",
+        "domein:command",
+        "domein:doorgeefjournaal",
+        "domein:eigencollectie",
+        "domein:fiscaal",
+        "domein:frictie",
+        "domein:geld",
+        "domein:identiteit",
+        "domein:journaalverhuizing",
+        "domein:journaalvorm",
+        "domein:kantoor",
+        "domein:muziek-instrumenten",
+        "domein:muziek-stijlen",
+        "domein:payroll",
+        "domein:tenant",
+        "domein:util",
+        "domein:wereld",
+        "domein:werkcommand",
+        "domein:werkvormen"
+      ],
+      "onverklaardeRanden": []
+    },
+    {
+      "id": "tg-sso",
+      "naam": "Inloggen via een andere partij (SSO en SCIM)",
+      "categorie": "Toegang en identiteit",
+      "standaard": true,
+      "routes": 22,
+      "graad": "gemeten",
+      "sleutelsWaarde": [],
+      "sleutelsOnvindbaar": [],
+      "sleutelsSamengesteld": [],
+      "redenen": {},
+      "inBedrading": 0,
+      "ophangbestanden": [
+        "server/routes/scim-groepen.js",
+        "server/routes/scim.js",
+        "server/routes/sso-saml.js",
+        "server/routes/sso.js"
+      ],
+      "leveranciers": [
+        "server/accounts/index.js",
+        "server/bedrijf/index.js",
+        "server/kern/identiteit/sessieregister.js",
+        "server/kern/lid.js",
+        "server/kern/tenant/index.js"
+      ],
+      "sleutelsUitBedrading": [
+        "appUrl",
+        "logInlog"
+      ],
+      "sleutelsOnbekend": [],
+      "bestandenBereikt": 174,
+      "knopen": 44,
+      "perLaag": {
+        "domein": 18,
+        "motor": 21,
+        "opzet": 1,
+        "ingang": 4
+      },
+      "domeinen": [
+        "domein:bedrijf",
+        "domein:command",
+        "domein:commercie",
+        "domein:doorgeefjournaal",
+        "domein:eigencollectie",
+        "domein:geld",
+        "domein:identiteit",
+        "domein:journaalverhuizing",
+        "domein:journaalvorm",
+        "domein:lid",
+        "domein:lidmaatschap",
+        "domein:pasladder",
+        "domein:pasprijs",
+        "domein:salonviraal",
+        "domein:tenant",
+        "domein:util",
+        "domein:wereld",
         "domein:werkcommand"
+      ],
+      "onverklaardeRanden": []
+    },
+    {
+      "id": "gld-prijzen",
+      "naam": "Pasprijzen en balans",
+      "categorie": "Geld",
+      "standaard": true,
+      "routes": 3,
+      "graad": "gemeten",
+      "sleutelsWaarde": [],
+      "sleutelsOnvindbaar": [],
+      "sleutelsSamengesteld": [],
+      "redenen": {},
+      "inBedrading": 0,
+      "ophangbestanden": [
+        "server/routes/balans.js",
+        "server/routes/kantoren/geld.js"
+      ],
+      "leveranciers": [
+        "server/bedrijf/index.js",
+        "server/kern/afdelingen.js",
+        "server/kern/aidata.js",
+        "server/kern/balans.js",
+        "server/kern/fonds.js",
+        "server/kern/geldregie.js",
+        "server/kern/kantoor/boardroom.js",
+        "server/kern/kantoor/index.js"
+      ],
+      "sleutelsUitBedrading": [
+        "auth",
+        "liveCodename",
+        "supplierAuth"
+      ],
+      "sleutelsOnbekend": [],
+      "bestandenBereikt": 216,
+      "knopen": 44,
+      "perLaag": {
+        "domein": 26,
+        "motor": 15,
+        "opzet": 1,
+        "ingang": 2
+      },
+      "domeinen": [
+        "domein:afdelingen",
+        "domein:aidata",
+        "domein:balans",
+        "domein:bedrijf",
+        "domein:command",
+        "domein:commercie",
+        "domein:doorgeefjournaal",
+        "domein:economie",
+        "domein:eigencollectie",
+        "domein:fonds",
+        "domein:geld",
+        "domein:geldregie",
+        "domein:journaalverhuizing",
+        "domein:journaalvorm",
+        "domein:kantoor",
+        "domein:muziek-instrumenten",
+        "domein:muziek-stijlen",
+        "domein:pasladder",
+        "domein:rahul",
+        "domein:rahul-fases",
+        "domein:rahul-hart",
+        "domein:rahul-omgang",
+        "domein:util",
+        "domein:wereld",
+        "domein:werkcommand",
+        "domein:werkvormen"
       ],
       "onverklaardeRanden": []
     },
@@ -14999,21 +15498,18 @@
       "categorie": "RTFoundation",
       "standaard": true,
       "routes": 22,
-      "graad": "ondergrens",
+      "graad": "gemeten",
       "sleutelsWaarde": [],
-      "sleutelsOnvindbaar": [
-        "magBoardroom"
-      ],
+      "sleutelsOnvindbaar": [],
       "sleutelsSamengesteld": [],
-      "redenen": {
-        "magBoardroom": "een functie met te weinig brontekst om terug te zoeken (119 tekens)"
-      },
+      "redenen": {},
       "inBedrading": 0,
       "ophangbestanden": [
         "server/routes/rtfkantoor/index.js"
       ],
       "leveranciers": [
         "server/bedrijf/index.js",
+        "server/kern/kantoor/boardroom.js",
         "server/kern/kantoor/index.js",
         "server/kern/onderzoekslab.js",
         "server/kern/rtfclubs.js",
@@ -15021,10 +15517,8 @@
         "server/kern/stadsraad.js"
       ],
       "sleutelsUitBedrading": [],
-      "sleutelsOnbekend": [
-        "magBoardroom"
-      ],
-      "bestandenBereikt": 169,
+      "sleutelsOnbekend": [],
+      "bestandenBereikt": 171,
       "knopen": 43,
       "perLaag": {
         "domein": 25,
@@ -15067,21 +15561,18 @@
       "categorie": "RTFoundation",
       "standaard": true,
       "routes": 9,
-      "graad": "ondergrens",
+      "graad": "gemeten",
       "sleutelsWaarde": [],
-      "sleutelsOnvindbaar": [
-        "magBoardroom"
-      ],
+      "sleutelsOnvindbaar": [],
       "sleutelsSamengesteld": [],
-      "redenen": {
-        "magBoardroom": "een functie met te weinig brontekst om terug te zoeken (119 tekens)"
-      },
+      "redenen": {},
       "inBedrading": 0,
       "ophangbestanden": [
         "server/routes/rtfkantoor/index.js"
       ],
       "leveranciers": [
         "server/bedrijf/index.js",
+        "server/kern/kantoor/boardroom.js",
         "server/kern/kantoor/index.js",
         "server/kern/onderzoekslab.js",
         "server/kern/rtfclubs.js",
@@ -15089,10 +15580,8 @@
         "server/kern/stadsraad.js"
       ],
       "sleutelsUitBedrading": [],
-      "sleutelsOnbekend": [
-        "magBoardroom"
-      ],
-      "bestandenBereikt": 169,
+      "sleutelsOnbekend": [],
+      "bestandenBereikt": 171,
       "knopen": 43,
       "perLaag": {
         "domein": 25,
@@ -15130,79 +15619,11 @@
       "onverklaardeRanden": []
     },
     {
-      "id": "gld-prijzen",
-      "naam": "Pasprijzen en balans",
-      "categorie": "Geld",
-      "standaard": true,
-      "routes": 3,
-      "graad": "gemeten",
-      "sleutelsWaarde": [],
-      "sleutelsOnvindbaar": [],
-      "sleutelsSamengesteld": [],
-      "redenen": {},
-      "inBedrading": 0,
-      "ophangbestanden": [
-        "server/routes/balans.js",
-        "server/routes/kantoren/geld.js"
-      ],
-      "leveranciers": [
-        "server/bedrijf/index.js",
-        "server/kern/afdelingen.js",
-        "server/kern/aidata.js",
-        "server/kern/balans.js",
-        "server/kern/fonds.js",
-        "server/kern/geldregie.js",
-        "server/kern/kantoor/index.js"
-      ],
-      "sleutelsUitBedrading": [
-        "auth",
-        "liveCodename",
-        "supplierAuth"
-      ],
-      "sleutelsOnbekend": [],
-      "bestandenBereikt": 203,
-      "knopen": 43,
-      "perLaag": {
-        "domein": 25,
-        "motor": 15,
-        "opzet": 1,
-        "ingang": 2
-      },
-      "domeinen": [
-        "domein:afdelingen",
-        "domein:aidata",
-        "domein:balans",
-        "domein:bedrijf",
-        "domein:command",
-        "domein:commercie",
-        "domein:doorgeefjournaal",
-        "domein:eigencollectie",
-        "domein:fonds",
-        "domein:geld",
-        "domein:geldregie",
-        "domein:journaalverhuizing",
-        "domein:journaalvorm",
-        "domein:kantoor",
-        "domein:muziek-instrumenten",
-        "domein:muziek-stijlen",
-        "domein:pasladder",
-        "domein:rahul",
-        "domein:rahul-fases",
-        "domein:rahul-hart",
-        "domein:rahul-omgang",
-        "domein:util",
-        "domein:wereld",
-        "domein:werkcommand",
-        "domein:werkvormen"
-      ],
-      "onverklaardeRanden": []
-    },
-    {
-      "id": "command-zien",
-      "naam": "RTG Command: zien",
+      "id": "command-besturen",
+      "naam": "RTG Command: besturen",
       "categorie": "RTG-Backoffice",
       "standaard": true,
-      "routes": 23,
+      "routes": 54,
       "graad": "gemeten",
       "sleutelsWaarde": [],
       "sleutelsOnvindbaar": [],
@@ -15211,76 +15632,22 @@
       "inBedrading": 0,
       "ophangbestanden": [
         "server/routes/command/bestuur.js",
-        "server/routes/command/index.js",
-        "server/routes/command/meten.js"
-      ],
-      "leveranciers": [
-        "server/bedrijf/index.js",
-        "server/kern/command/index.js",
-        "server/kern/command/journaal.js",
-        "server/kern/kantoor/index.js"
-      ],
-      "sleutelsUitBedrading": [],
-      "sleutelsOnbekend": [],
-      "bestandenBereikt": 229,
-      "knopen": 43,
-      "perLaag": {
-        "domein": 17,
-        "motor": 24,
-        "opzet": 1,
-        "ingang": 1
-      },
-      "domeinen": [
-        "domein:bedrijf",
-        "domein:command",
-        "domein:doorgeefjournaal",
-        "domein:eigencollectie",
-        "domein:fiscaal",
-        "domein:geld",
-        "domein:journaalverhuizing",
-        "domein:journaalvorm",
-        "domein:kantoor",
-        "domein:muziek-instrumenten",
-        "domein:muziek-stijlen",
-        "domein:payroll",
-        "domein:tenant",
-        "domein:util",
-        "domein:wereld",
-        "domein:werkcommand",
-        "domein:werkvormen"
-      ],
-      "onverklaardeRanden": []
-    },
-    {
-      "id": "command-doen",
-      "naam": "RTG Command: doen",
-      "categorie": "RTG-Backoffice",
-      "standaard": true,
-      "routes": 29,
-      "graad": "gemeten",
-      "sleutelsWaarde": [],
-      "sleutelsOnvindbaar": [],
-      "sleutelsSamengesteld": [],
-      "redenen": {},
-      "inBedrading": 0,
-      "ophangbestanden": [
-        "server/routes/command/herstel.js",
-        "server/routes/command/index.js",
+        "server/routes/command/inrichten.js",
+        "server/routes/command/meten.js",
         "server/routes/command/toezicht.js"
       ],
       "leveranciers": [
         "server/bedrijf/index.js",
         "server/kern/command/index.js",
-        "server/kern/command/journaal.js",
         "server/kern/kantoor/index.js"
       ],
       "sleutelsUitBedrading": [],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 229,
+      "bestandenBereikt": 231,
       "knopen": 43,
       "perLaag": {
-        "domein": 17,
-        "motor": 24,
+        "domein": 18,
+        "motor": 23,
         "opzet": 1,
         "ingang": 1
       },
@@ -15290,6 +15657,7 @@
         "domein:doorgeefjournaal",
         "domein:eigencollectie",
         "domein:fiscaal",
+        "domein:frictie",
         "domein:geld",
         "domein:journaalverhuizing",
         "domein:journaalvorm",
@@ -15608,11 +15976,11 @@
       "onverklaardeRanden": []
     },
     {
-      "id": "tg-sso",
-      "naam": "Inloggen via een andere partij (SSO en SCIM)",
-      "categorie": "Toegang en identiteit",
+      "id": "gld-claims",
+      "naam": "Commerciele claims en tarieven",
+      "categorie": "Geld",
       "standaard": true,
-      "routes": 22,
+      "routes": 6,
       "graad": "gemeten",
       "sleutelsWaarde": [],
       "sleutelsOnvindbaar": [],
@@ -15620,97 +15988,49 @@
       "redenen": {},
       "inBedrading": 0,
       "ophangbestanden": [
-        "server/routes/scim-groepen.js",
-        "server/routes/scim.js",
-        "server/routes/sso-saml.js",
-        "server/routes/sso.js"
-      ],
-      "leveranciers": [
-        "server/accounts/index.js",
-        "server/bedrijf/index.js",
-        "server/kern/lid.js",
-        "server/kern/tenant/index.js"
-      ],
-      "sleutelsUitBedrading": [
-        "appUrl",
-        "logInlog"
-      ],
-      "sleutelsOnbekend": [],
-      "bestandenBereikt": 167,
-      "knopen": 42,
-      "perLaag": {
-        "domein": 16,
-        "motor": 21,
-        "opzet": 1,
-        "ingang": 4
-      },
-      "domeinen": [
-        "domein:bedrijf",
-        "domein:command",
-        "domein:commercie",
-        "domein:doorgeefjournaal",
-        "domein:geld",
-        "domein:journaalverhuizing",
-        "domein:journaalvorm",
-        "domein:lid",
-        "domein:lidmaatschap",
-        "domein:pasladder",
-        "domein:pasprijs",
-        "domein:salonviraal",
-        "domein:tenant",
-        "domein:util",
-        "domein:wereld",
-        "domein:werkcommand"
-      ],
-      "onverklaardeRanden": []
-    },
-    {
-      "id": "command-besturen",
-      "naam": "RTG Command: besturen",
-      "categorie": "RTG-Backoffice",
-      "standaard": true,
-      "routes": 54,
-      "graad": "gemeten",
-      "sleutelsWaarde": [],
-      "sleutelsOnvindbaar": [],
-      "sleutelsSamengesteld": [],
-      "redenen": {},
-      "inBedrading": 0,
-      "ophangbestanden": [
-        "server/routes/command/bestuur.js",
-        "server/routes/command/inrichten.js",
-        "server/routes/command/meten.js",
-        "server/routes/command/toezicht.js"
+        "server/routes/kantoren/geld.js"
       ],
       "leveranciers": [
         "server/bedrijf/index.js",
-        "server/kern/command/index.js",
+        "server/kern/afdelingen.js",
+        "server/kern/aidata.js",
+        "server/kern/fonds.js",
+        "server/kern/geldregie.js",
+        "server/kern/kantoor/boardroom.js",
         "server/kern/kantoor/index.js"
       ],
       "sleutelsUitBedrading": [],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 226,
+      "bestandenBereikt": 214,
       "knopen": 42,
       "perLaag": {
-        "domein": 17,
-        "motor": 23,
+        "domein": 25,
+        "motor": 15,
         "opzet": 1,
         "ingang": 1
       },
       "domeinen": [
+        "domein:afdelingen",
+        "domein:aidata",
         "domein:bedrijf",
         "domein:command",
+        "domein:commercie",
         "domein:doorgeefjournaal",
+        "domein:economie",
         "domein:eigencollectie",
-        "domein:fiscaal",
+        "domein:fonds",
         "domein:geld",
+        "domein:geldregie",
         "domein:journaalverhuizing",
         "domein:journaalvorm",
         "domein:kantoor",
         "domein:muziek-instrumenten",
         "domein:muziek-stijlen",
-        "domein:payroll",
-        "domein:tenant",
+        "domein:pasladder",
+        "domein:rahul",
+        "domein:rahul-fases",
+        "domein:rahul-hart",
+        "domein:rahul-omgang",
         "domein:util",
         "domein:wereld",
         "domein:werkcommand",
@@ -15746,7 +16066,7 @@
         "liveCodename"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 184,
+      "bestandenBereikt": 186,
       "knopen": 42,
       "perLaag": {
         "domein": 20,
@@ -15810,7 +16130,7 @@
         "resolveSession"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 208,
+      "bestandenBereikt": 210,
       "knopen": 42,
       "perLaag": {
         "domein": 18,
@@ -16082,67 +16402,6 @@
       "onverklaardeRanden": []
     },
     {
-      "id": "gld-claims",
-      "naam": "Commerciele claims en tarieven",
-      "categorie": "Geld",
-      "standaard": true,
-      "routes": 6,
-      "graad": "gemeten",
-      "sleutelsWaarde": [],
-      "sleutelsOnvindbaar": [],
-      "sleutelsSamengesteld": [],
-      "redenen": {},
-      "inBedrading": 0,
-      "ophangbestanden": [
-        "server/routes/kantoren/geld.js"
-      ],
-      "leveranciers": [
-        "server/bedrijf/index.js",
-        "server/kern/afdelingen.js",
-        "server/kern/aidata.js",
-        "server/kern/fonds.js",
-        "server/kern/geldregie.js",
-        "server/kern/kantoor/index.js"
-      ],
-      "sleutelsUitBedrading": [],
-      "sleutelsOnbekend": [],
-      "bestandenBereikt": 201,
-      "knopen": 41,
-      "perLaag": {
-        "domein": 24,
-        "motor": 15,
-        "opzet": 1,
-        "ingang": 1
-      },
-      "domeinen": [
-        "domein:afdelingen",
-        "domein:aidata",
-        "domein:bedrijf",
-        "domein:command",
-        "domein:commercie",
-        "domein:doorgeefjournaal",
-        "domein:eigencollectie",
-        "domein:fonds",
-        "domein:geld",
-        "domein:geldregie",
-        "domein:journaalverhuizing",
-        "domein:journaalvorm",
-        "domein:kantoor",
-        "domein:muziek-instrumenten",
-        "domein:muziek-stijlen",
-        "domein:pasladder",
-        "domein:rahul",
-        "domein:rahul-fases",
-        "domein:rahul-hart",
-        "domein:rahul-omgang",
-        "domein:util",
-        "domein:wereld",
-        "domein:werkcommand",
-        "domein:werkvormen"
-      ],
-      "onverklaardeRanden": []
-    },
-    {
       "id": "gld-aitegoed",
       "naam": "AI-tegoed en bundels",
       "categorie": "Geld",
@@ -16169,7 +16428,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 194,
+      "bestandenBereikt": 196,
       "knopen": 40,
       "perLaag": {
         "domein": 23,
@@ -16476,7 +16735,7 @@
         "liveCodename"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 232,
+      "bestandenBereikt": 234,
       "knopen": 40,
       "perLaag": {
         "domein": 22,
@@ -16620,7 +16879,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 164,
+      "bestandenBereikt": 166,
       "knopen": 39,
       "perLaag": {
         "domein": 21,
@@ -16646,6 +16905,65 @@
         "domein:muziek-stijlen",
         "domein:muziek-uitgave",
         "domein:muziek-uitgave-beeld",
+        "domein:util",
+        "domein:wereld",
+        "domein:werkcommand",
+        "domein:werkvormen"
+      ],
+      "onverklaardeRanden": []
+    },
+    {
+      "id": "dom-livinglab",
+      "naam": "Het RTF Living Lab",
+      "categorie": "RTFoundation",
+      "standaard": true,
+      "routes": 84,
+      "graad": "gemeten",
+      "sleutelsWaarde": [],
+      "sleutelsOnvindbaar": [],
+      "sleutelsSamengesteld": [],
+      "redenen": {},
+      "inBedrading": 0,
+      "ophangbestanden": [
+        "server/routes/livinglab/index.js",
+        "server/routes/livinglab/openbaar.js",
+        "server/routes/livinglab/werk.js"
+      ],
+      "leveranciers": [
+        "server/bedrijf/index.js",
+        "server/kern/kantoor/boardroom.js",
+        "server/kern/kantoor/index.js",
+        "server/kern/labfonds.js",
+        "server/kern/livinglab/index.js"
+      ],
+      "sleutelsUitBedrading": [],
+      "sleutelsOnbekend": [],
+      "bestandenBereikt": 209,
+      "knopen": 39,
+      "perLaag": {
+        "domein": 21,
+        "motor": 16,
+        "opzet": 1,
+        "ingang": 1
+      },
+      "domeinen": [
+        "domein:bedrijf",
+        "domein:command",
+        "domein:doorgeefjournaal",
+        "domein:eigencollectie",
+        "domein:geld",
+        "domein:journaalverhuizing",
+        "domein:journaalvorm",
+        "domein:kantoor",
+        "domein:kosten",
+        "domein:labfonds",
+        "domein:livinglab",
+        "domein:muziek-instrumenten",
+        "domein:muziek-stijlen",
+        "domein:rahul",
+        "domein:rahul-fases",
+        "domein:rahul-hart",
+        "domein:rahul-omgang",
         "domein:util",
         "domein:wereld",
         "domein:werkcommand",
@@ -16707,7 +17025,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 220,
+      "bestandenBereikt": 222,
       "knopen": 39,
       "perLaag": {
         "domein": 17,
@@ -16733,6 +17051,78 @@
         "domein:wereld",
         "domein:werkcommand",
         "domein:werkvormen"
+      ],
+      "onverklaardeRanden": []
+    },
+    {
+      "id": "webauthn",
+      "naam": "Passkeys (WebAuthn)",
+      "categorie": "Betalen & verificatie",
+      "standaard": true,
+      "routes": 6,
+      "graad": "gemeten",
+      "sleutelsWaarde": [
+        "loginFails"
+      ],
+      "sleutelsOnvindbaar": [],
+      "sleutelsSamengesteld": [],
+      "redenen": {
+        "loginFails": "een Map: gedeelde staat, geen module"
+      },
+      "inBedrading": 0,
+      "ophangbestanden": [
+        "server/routes/auth/webauthn.js"
+      ],
+      "leveranciers": [
+        "server/accounts/index.js",
+        "server/bedrijf/index.js",
+        "server/kern/concern/index.js",
+        "server/kern/identiteit/sessieregister.js",
+        "server/kern/lid.js",
+        "server/kern/webauthn.js"
+      ],
+      "sleutelsUitBedrading": [
+        "appUrl",
+        "auth",
+        "noteFailedTry",
+        "tooManyTries"
+      ],
+      "sleutelsOnbekend": [
+        "loginFails"
+      ],
+      "bestandenBereikt": 170,
+      "knopen": 38,
+      "perLaag": {
+        "domein": 25,
+        "motor": 12,
+        "ingang": 1
+      },
+      "domeinen": [
+        "domein:bedrijf",
+        "domein:command",
+        "domein:commercie",
+        "domein:concern",
+        "domein:eigencollectie",
+        "domein:geld",
+        "domein:identiteit",
+        "domein:lid",
+        "domein:lidmaatschap",
+        "domein:onderneming",
+        "domein:pasladder",
+        "domein:pasprijs",
+        "domein:salonviraal",
+        "domein:util",
+        "domein:vakbewijs",
+        "domein:vakbewijs-aftekenen",
+        "domein:vakbewijs-nummer",
+        "domein:vakbewijs-verhuis",
+        "domein:webauthn",
+        "domein:webauthn-actie",
+        "domein:webauthn-ceremonie",
+        "domein:webauthn-poorten",
+        "domein:webauthn-stapop",
+        "domein:wereld",
+        "domein:werkcommand"
       ],
       "onverklaardeRanden": []
     },
@@ -16763,7 +17153,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 187,
+      "bestandenBereikt": 189,
       "knopen": 38,
       "perLaag": {
         "domein": 21,
@@ -16966,7 +17356,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 171,
+      "bestandenBereikt": 173,
       "knopen": 38,
       "perLaag": {
         "domein": 21,
@@ -16996,76 +17386,6 @@
         "domein:wereld",
         "domein:werkcommand",
         "domein:werkvormen"
-      ],
-      "onverklaardeRanden": []
-    },
-    {
-      "id": "webauthn",
-      "naam": "Passkeys (WebAuthn)",
-      "categorie": "Betalen & verificatie",
-      "standaard": true,
-      "routes": 6,
-      "graad": "gemeten",
-      "sleutelsWaarde": [
-        "loginFails"
-      ],
-      "sleutelsOnvindbaar": [],
-      "sleutelsSamengesteld": [],
-      "redenen": {
-        "loginFails": "een Map: gedeelde staat, geen module"
-      },
-      "inBedrading": 0,
-      "ophangbestanden": [
-        "server/routes/auth/webauthn.js"
-      ],
-      "leveranciers": [
-        "server/accounts/index.js",
-        "server/bedrijf/index.js",
-        "server/kern/concern/index.js",
-        "server/kern/lid.js",
-        "server/kern/webauthn.js"
-      ],
-      "sleutelsUitBedrading": [
-        "appUrl",
-        "auth",
-        "noteFailedTry",
-        "tooManyTries"
-      ],
-      "sleutelsOnbekend": [
-        "loginFails"
-      ],
-      "bestandenBereikt": 164,
-      "knopen": 37,
-      "perLaag": {
-        "domein": 24,
-        "motor": 12,
-        "ingang": 1
-      },
-      "domeinen": [
-        "domein:bedrijf",
-        "domein:command",
-        "domein:commercie",
-        "domein:concern",
-        "domein:eigencollectie",
-        "domein:geld",
-        "domein:lid",
-        "domein:lidmaatschap",
-        "domein:onderneming",
-        "domein:pasladder",
-        "domein:pasprijs",
-        "domein:salonviraal",
-        "domein:util",
-        "domein:vakbewijs",
-        "domein:vakbewijs-aftekenen",
-        "domein:vakbewijs-nummer",
-        "domein:vakbewijs-verhuis",
-        "domein:webauthn",
-        "domein:webauthn-actie",
-        "domein:webauthn-ceremonie",
-        "domein:webauthn-poorten",
-        "domein:webauthn-stapop",
-        "domein:wereld",
-        "domein:werkcommand"
       ],
       "onverklaardeRanden": []
     },
@@ -17139,12 +17459,13 @@
       "leveranciers": [
         "server/accounts/index.js",
         "server/bedrijf/index.js",
+        "server/kern/kantoor/boardroom.js",
         "server/kern/kantoor/index.js",
         "server/kern/rtgone.js"
       ],
       "sleutelsUitBedrading": [],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 184,
+      "bestandenBereikt": 186,
       "knopen": 37,
       "perLaag": {
         "domein": 15,
@@ -17164,60 +17485,6 @@
         "domein:muziek-instrumenten",
         "domein:muziek-stijlen",
         "domein:rtgone",
-        "domein:util",
-        "domein:wereld",
-        "domein:werkcommand",
-        "domein:werkvormen"
-      ],
-      "onverklaardeRanden": []
-    },
-    {
-      "id": "dom-livinglab",
-      "naam": "Het RTF Living Lab",
-      "categorie": "RTFoundation",
-      "standaard": true,
-      "routes": 63,
-      "graad": "gemeten",
-      "sleutelsWaarde": [],
-      "sleutelsOnvindbaar": [],
-      "sleutelsSamengesteld": [],
-      "redenen": {},
-      "inBedrading": 0,
-      "ophangbestanden": [
-        "server/routes/livinglab/index.js",
-        "server/routes/livinglab/werk.js"
-      ],
-      "leveranciers": [
-        "server/bedrijf/index.js",
-        "server/kern/kantoor/index.js",
-        "server/kern/livinglab/index.js"
-      ],
-      "sleutelsUitBedrading": [],
-      "sleutelsOnbekend": [],
-      "bestandenBereikt": 185,
-      "knopen": 37,
-      "perLaag": {
-        "domein": 19,
-        "motor": 16,
-        "opzet": 1,
-        "ingang": 1
-      },
-      "domeinen": [
-        "domein:bedrijf",
-        "domein:command",
-        "domein:doorgeefjournaal",
-        "domein:eigencollectie",
-        "domein:geld",
-        "domein:journaalverhuizing",
-        "domein:journaalvorm",
-        "domein:kantoor",
-        "domein:livinglab",
-        "domein:muziek-instrumenten",
-        "domein:muziek-stijlen",
-        "domein:rahul",
-        "domein:rahul-fases",
-        "domein:rahul-hart",
-        "domein:rahul-omgang",
         "domein:util",
         "domein:wereld",
         "domein:werkcommand",
@@ -17252,7 +17519,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 169,
+      "bestandenBereikt": 171,
       "knopen": 36,
       "perLaag": {
         "domein": 19,
@@ -17311,7 +17578,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 161,
+      "bestandenBereikt": 163,
       "knopen": 35,
       "perLaag": {
         "domein": 18,
@@ -17478,6 +17745,70 @@
       "onverklaardeRanden": []
     },
     {
+      "id": "dom-rtfos",
+      "naam": "Foundation OS",
+      "categorie": "RTFoundation",
+      "standaard": true,
+      "routes": 180,
+      "graad": "gemeten",
+      "sleutelsWaarde": [],
+      "sleutelsOnvindbaar": [],
+      "sleutelsSamengesteld": [],
+      "redenen": {},
+      "inBedrading": 0,
+      "ophangbestanden": [
+        "server/routes/rtfos/afmaak.js",
+        "server/routes/rtfos/doelgroepen.js",
+        "server/routes/rtfos/governance.js",
+        "server/routes/rtfos/index.js",
+        "server/routes/rtfos/netwerk.js",
+        "server/routes/rtfos/portalen.js",
+        "server/routes/rtfos/ruil.js",
+        "server/routes/rtfos/uitvoering.js"
+      ],
+      "leveranciers": [
+        "server/bedrijf/index.js",
+        "server/kern/kantoor/boardroom.js",
+        "server/kern/kantoor/index.js",
+        "server/kern/rtfos/index.js"
+      ],
+      "sleutelsUitBedrading": [
+        "auth",
+        "geenGast",
+        "liveCodename"
+      ],
+      "sleutelsOnbekend": [],
+      "bestandenBereikt": 228,
+      "knopen": 34,
+      "perLaag": {
+        "domein": 16,
+        "motor": 16,
+        "opzet": 1,
+        "ingang": 1
+      },
+      "domeinen": [
+        "domein:bedrijf",
+        "domein:command",
+        "domein:doorgeefjournaal",
+        "domein:eigencollectie",
+        "domein:geld",
+        "domein:journaalverhuizing",
+        "domein:journaalvorm",
+        "domein:kantoor",
+        "domein:machtiging",
+        "domein:muziek-instrumenten",
+        "domein:muziek-stijlen",
+        "domein:rtfos",
+        "domein:util",
+        "domein:wereld",
+        "domein:werkcommand",
+        "domein:werkvormen"
+      ],
+      "onverklaardeRanden": [
+        "domein:rtfos -> domein:machtiging"
+      ]
+    },
+    {
       "id": "dom-onderwijs",
       "naam": "Onderwijs (paspoort en ladder)",
       "categorie": "RTFoundation",
@@ -17542,6 +17873,58 @@
       "onverklaardeRanden": []
     },
     {
+      "id": "dom-labfonds",
+      "naam": "Het labfonds",
+      "categorie": "RTFoundation",
+      "standaard": true,
+      "routes": 9,
+      "graad": "gemeten",
+      "sleutelsWaarde": [],
+      "sleutelsOnvindbaar": [],
+      "sleutelsSamengesteld": [],
+      "redenen": {},
+      "inBedrading": 0,
+      "ophangbestanden": [
+        "server/routes/labfonds.js"
+      ],
+      "leveranciers": [
+        "server/bedrijf/index.js",
+        "server/kern/kantoor/index.js",
+        "server/kern/labfonds.js"
+      ],
+      "sleutelsUitBedrading": [
+        "auth"
+      ],
+      "sleutelsOnbekend": [],
+      "bestandenBereikt": 162,
+      "knopen": 33,
+      "perLaag": {
+        "domein": 16,
+        "motor": 15,
+        "opzet": 1,
+        "ingang": 1
+      },
+      "domeinen": [
+        "domein:bedrijf",
+        "domein:command",
+        "domein:doorgeefjournaal",
+        "domein:eigencollectie",
+        "domein:geld",
+        "domein:journaalverhuizing",
+        "domein:journaalvorm",
+        "domein:kantoor",
+        "domein:labfonds",
+        "domein:livinglab",
+        "domein:muziek-instrumenten",
+        "domein:muziek-stijlen",
+        "domein:util",
+        "domein:wereld",
+        "domein:werkcommand",
+        "domein:werkvormen"
+      ],
+      "onverklaardeRanden": []
+    },
+    {
       "id": "clips",
       "naam": "RTG Clips (korte video’s)",
       "categorie": "Eigen apps",
@@ -17565,7 +17948,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 158,
+      "bestandenBereikt": 160,
       "knopen": 33,
       "perLaag": {
         "domein": 16,
@@ -17586,112 +17969,6 @@
         "domein:muziek-instrumenten",
         "domein:muziek-stijlen",
         "domein:ondertitels",
-        "domein:util",
-        "domein:wereld",
-        "domein:werkcommand",
-        "domein:werkvormen"
-      ],
-      "onverklaardeRanden": []
-    },
-    {
-      "id": "dom-rtfos",
-      "naam": "Foundation OS",
-      "categorie": "RTFoundation",
-      "standaard": true,
-      "routes": 153,
-      "graad": "gemeten",
-      "sleutelsWaarde": [],
-      "sleutelsOnvindbaar": [],
-      "sleutelsSamengesteld": [],
-      "redenen": {},
-      "inBedrading": 0,
-      "ophangbestanden": [
-        "server/routes/rtfos/afmaak.js",
-        "server/routes/rtfos/doelgroepen.js",
-        "server/routes/rtfos/governance.js",
-        "server/routes/rtfos/index.js",
-        "server/routes/rtfos/netwerk.js",
-        "server/routes/rtfos/portalen.js",
-        "server/routes/rtfos/uitvoering.js"
-      ],
-      "leveranciers": [
-        "server/bedrijf/index.js",
-        "server/kern/kantoor/index.js",
-        "server/kern/rtfos/index.js"
-      ],
-      "sleutelsUitBedrading": [],
-      "sleutelsOnbekend": [],
-      "bestandenBereikt": 212,
-      "knopen": 33,
-      "perLaag": {
-        "domein": 15,
-        "motor": 16,
-        "opzet": 1,
-        "ingang": 1
-      },
-      "domeinen": [
-        "domein:bedrijf",
-        "domein:command",
-        "domein:doorgeefjournaal",
-        "domein:eigencollectie",
-        "domein:geld",
-        "domein:journaalverhuizing",
-        "domein:journaalvorm",
-        "domein:kantoor",
-        "domein:muziek-instrumenten",
-        "domein:muziek-stijlen",
-        "domein:rtfos",
-        "domein:util",
-        "domein:wereld",
-        "domein:werkcommand",
-        "domein:werkvormen"
-      ],
-      "onverklaardeRanden": []
-    },
-    {
-      "id": "dom-labfonds",
-      "naam": "Het labfonds",
-      "categorie": "RTFoundation",
-      "standaard": true,
-      "routes": 8,
-      "graad": "gemeten",
-      "sleutelsWaarde": [],
-      "sleutelsOnvindbaar": [],
-      "sleutelsSamengesteld": [],
-      "redenen": {},
-      "inBedrading": 0,
-      "ophangbestanden": [
-        "server/routes/labfonds.js"
-      ],
-      "leveranciers": [
-        "server/bedrijf/index.js",
-        "server/kern/kantoor/index.js",
-        "server/kern/labfonds.js"
-      ],
-      "sleutelsUitBedrading": [
-        "auth"
-      ],
-      "sleutelsOnbekend": [],
-      "bestandenBereikt": 158,
-      "knopen": 32,
-      "perLaag": {
-        "domein": 15,
-        "opzet": 1,
-        "motor": 15,
-        "ingang": 1
-      },
-      "domeinen": [
-        "domein:bedrijf",
-        "domein:command",
-        "domein:doorgeefjournaal",
-        "domein:eigencollectie",
-        "domein:geld",
-        "domein:journaalverhuizing",
-        "domein:journaalvorm",
-        "domein:kantoor",
-        "domein:labfonds",
-        "domein:muziek-instrumenten",
-        "domein:muziek-stijlen",
         "domein:util",
         "domein:wereld",
         "domein:werkcommand",
@@ -17727,7 +18004,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 161,
+      "bestandenBereikt": 163,
       "knopen": 32,
       "perLaag": {
         "domein": 15,
@@ -17778,7 +18055,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 157,
+      "bestandenBereikt": 159,
       "knopen": 32,
       "perLaag": {
         "domein": 15,
@@ -17868,6 +18145,75 @@
       "onverklaardeRanden": []
     },
     {
+      "id": "bk-reiswijzer",
+      "naam": "Reiswijzer en landeninfo",
+      "categorie": "Diensten (leden)",
+      "standaard": true,
+      "routes": 28,
+      "graad": "gemeten",
+      "sleutelsWaarde": [],
+      "sleutelsOnvindbaar": [],
+      "sleutelsSamengesteld": [],
+      "redenen": {},
+      "inBedrading": 0,
+      "ophangbestanden": [
+        "server/routes/reis.js"
+      ],
+      "leveranciers": [
+        "server/bedrijf/index.js",
+        "server/kern/invoer.js",
+        "server/kern/reis.js",
+        "server/kern/reisgezelschap.js",
+        "server/kern/reisoplosser.js",
+        "server/kern/reisuitnodiging.js",
+        "server/kern/reiswacht.js",
+        "server/kern/reiswereld.js",
+        "server/kern/reizen.js"
+      ],
+      "sleutelsUitBedrading": [
+        "auth",
+        "liveCodename",
+        "tooManyTries"
+      ],
+      "sleutelsOnbekend": [],
+      "bestandenBereikt": 104,
+      "knopen": 30,
+      "perLaag": {
+        "domein": 26,
+        "motor": 3,
+        "ingang": 1
+      },
+      "domeinen": [
+        "domein:agenda",
+        "domein:agenda-idempotentie",
+        "domein:agenda-opslag",
+        "domein:bedrijf",
+        "domein:command",
+        "domein:eigencollectie",
+        "domein:geld",
+        "domein:invoer",
+        "domein:invoer-lezer",
+        "domein:invoer-onderdelen",
+        "domein:reis",
+        "domein:reisgezelschap",
+        "domein:reisgezelschap-delen",
+        "domein:reisgezelschap-poort",
+        "domein:reisoplosser",
+        "domein:reisuitnodiging",
+        "domein:reisuitnodiging-gebruik",
+        "domein:reiswacht",
+        "domein:reiswereld",
+        "domein:reiswereld-bronnen",
+        "domein:reizen",
+        "domein:reizen-vorm",
+        "domein:util",
+        "domein:wereld",
+        "domein:wereldkern",
+        "domein:werkcommand"
+      ],
+      "onverklaardeRanden": []
+    },
+    {
       "id": "dom-appstore-uitgever",
       "naam": "App Store: inzenden door uitgevers",
       "categorie": "Winkel en media",
@@ -17893,7 +18239,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 171,
+      "bestandenBereikt": 180,
       "knopen": 29,
       "perLaag": {
         "domein": 11,
@@ -18014,69 +18360,6 @@
         "domein:vakbewijs-nummer",
         "domein:vakbewijs-verhuis",
         "domein:wereld",
-        "domein:werkcommand"
-      ],
-      "onverklaardeRanden": []
-    },
-    {
-      "id": "bk-reiswijzer",
-      "naam": "Reiswijzer en landeninfo",
-      "categorie": "Diensten (leden)",
-      "standaard": true,
-      "routes": 16,
-      "graad": "gemeten",
-      "sleutelsWaarde": [],
-      "sleutelsOnvindbaar": [],
-      "sleutelsSamengesteld": [],
-      "redenen": {},
-      "inBedrading": 0,
-      "ophangbestanden": [
-        "server/routes/reis.js"
-      ],
-      "leveranciers": [
-        "server/bedrijf/index.js",
-        "server/kern/invoer.js",
-        "server/kern/reis.js",
-        "server/kern/reisoplosser.js",
-        "server/kern/reisuitnodiging.js",
-        "server/kern/reiswacht.js",
-        "server/kern/reiswereld.js",
-        "server/kern/reizen.js"
-      ],
-      "sleutelsUitBedrading": [
-        "auth",
-        "liveCodename",
-        "tooManyTries"
-      ],
-      "sleutelsOnbekend": [],
-      "bestandenBereikt": 99,
-      "knopen": 25,
-      "perLaag": {
-        "domein": 21,
-        "motor": 3,
-        "ingang": 1
-      },
-      "domeinen": [
-        "domein:agenda",
-        "domein:bedrijf",
-        "domein:command",
-        "domein:eigencollectie",
-        "domein:geld",
-        "domein:invoer",
-        "domein:invoer-lezer",
-        "domein:invoer-onderdelen",
-        "domein:reis",
-        "domein:reisoplosser",
-        "domein:reisuitnodiging",
-        "domein:reisuitnodiging-gebruik",
-        "domein:reiswacht",
-        "domein:reiswereld",
-        "domein:reiswereld-bronnen",
-        "domein:reizen",
-        "domein:reizen-vorm",
-        "domein:util",
-        "domein:wereld",
-        "domein:wereldkern",
         "domein:werkcommand"
       ],
       "onverklaardeRanden": []
@@ -19590,6 +19873,51 @@
       "onverklaardeRanden": []
     },
     {
+      "id": "dom-livinglab-bewoner",
+      "naam": "Living Lab: de bewonerskant",
+      "categorie": "RTFoundation",
+      "standaard": true,
+      "routes": 17,
+      "graad": "gemeten",
+      "sleutelsWaarde": [],
+      "sleutelsOnvindbaar": [],
+      "sleutelsSamengesteld": [],
+      "redenen": {},
+      "inBedrading": 0,
+      "ophangbestanden": [
+        "server/routes/livinglab/bewoner.js"
+      ],
+      "leveranciers": [
+        "server/bedrijf/index.js",
+        "server/kern/livinglab/index.js"
+      ],
+      "sleutelsUitBedrading": [],
+      "sleutelsOnbekend": [],
+      "bestandenBereikt": 131,
+      "knopen": 18,
+      "perLaag": {
+        "domein": 13,
+        "motor": 4,
+        "ingang": 1
+      },
+      "domeinen": [
+        "domein:bedrijf",
+        "domein:command",
+        "domein:eigencollectie",
+        "domein:geld",
+        "domein:kosten",
+        "domein:livinglab",
+        "domein:rahul",
+        "domein:rahul-fases",
+        "domein:rahul-hart",
+        "domein:rahul-omgang",
+        "domein:util",
+        "domein:wereld",
+        "domein:werkcommand"
+      ],
+      "onverklaardeRanden": []
+    },
+    {
       "id": "werving",
       "naam": "Wervingslink (in dienst via een link)",
       "categorie": "Personeel & integraties",
@@ -19882,11 +20210,11 @@
       "onverklaardeRanden": []
     },
     {
-      "id": "dom-livinglab-bewoner",
-      "naam": "Living Lab: de bewonerskant",
-      "categorie": "RTFoundation",
+      "id": "ov-kantoorgesprek",
+      "naam": "Kantoorgesprek",
+      "categorie": "Werk (zaken en personeel)",
       "standaard": true,
-      "routes": 14,
+      "routes": 3,
       "graad": "gemeten",
       "sleutelsWaarde": [],
       "sleutelsOnvindbaar": [],
@@ -19894,33 +20222,37 @@
       "redenen": {},
       "inBedrading": 0,
       "ophangbestanden": [
-        "server/routes/livinglab/bewoner.js"
+        "server/routes/kantoor.js",
+        "server/routes/kantoorgesprek.js"
       ],
       "leveranciers": [
         "server/bedrijf/index.js",
-        "server/kern/livinglab/index.js"
+        "server/kern/kantoorgesprek.js",
+        "server/kern/kantoorwereld.js"
       ],
-      "sleutelsUitBedrading": [],
+      "sleutelsUitBedrading": [
+        "auth"
+      ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 112,
+      "bestandenBereikt": 91,
       "knopen": 17,
       "perLaag": {
         "domein": 12,
-        "motor": 4,
-        "ingang": 1
+        "motor": 3,
+        "ingang": 2
       },
       "domeinen": [
+        "domein:agenda",
+        "domein:agenda-idempotentie",
+        "domein:agenda-opslag",
         "domein:bedrijf",
         "domein:command",
-        "domein:eigencollectie",
         "domein:geld",
-        "domein:livinglab",
-        "domein:rahul",
-        "domein:rahul-fases",
-        "domein:rahul-hart",
-        "domein:rahul-omgang",
+        "domein:kantoorgesprek",
+        "domein:kantoorwereld",
         "domein:util",
         "domein:wereld",
+        "domein:wereldkern",
         "domein:werkcommand"
       ],
       "onverklaardeRanden": []
@@ -20170,6 +20502,60 @@
       "onverklaardeRanden": []
     },
     {
+      "id": "dom-agenda",
+      "naam": "Agenda",
+      "categorie": "Diensten (leden)",
+      "standaard": true,
+      "routes": 11,
+      "graad": "ondergrens",
+      "sleutelsWaarde": [],
+      "sleutelsOnvindbaar": [
+        "kern"
+      ],
+      "sleutelsSamengesteld": [],
+      "redenen": {
+        "kern": "staat niet in de kern-tas en is langs geen van de zeven constructies te herleiden"
+      },
+      "inBedrading": 0,
+      "ophangbestanden": [
+        "server/routes/agenda.js",
+        "server/routes/member/handel/uitjes.js"
+      ],
+      "leveranciers": [
+        "server/bedrijf/index.js",
+        "server/kern/agenda.js",
+        "server/kern/leverancier/zaak.js"
+      ],
+      "sleutelsUitBedrading": [
+        "auth",
+        "geenGast",
+        "supplierAuth"
+      ],
+      "sleutelsOnbekend": [
+        "kern"
+      ],
+      "bestandenBereikt": 90,
+      "knopen": 15,
+      "perLaag": {
+        "domein": 10,
+        "motor": 3,
+        "ingang": 2
+      },
+      "domeinen": [
+        "domein:agenda",
+        "domein:agenda-idempotentie",
+        "domein:agenda-opslag",
+        "domein:bedrijf",
+        "domein:command",
+        "domein:geld",
+        "domein:leverancier",
+        "domein:util",
+        "domein:wereld",
+        "domein:werkcommand"
+      ],
+      "onverklaardeRanden": []
+    },
+    {
       "id": "dom-foutmelder",
       "naam": "Storingsmelding uit de browser",
       "categorie": "Identiteit en veiligheid",
@@ -20207,52 +20593,6 @@
         "domein:journaalvorm",
         "domein:util",
         "domein:wereld",
-        "domein:werkcommand"
-      ],
-      "onverklaardeRanden": []
-    },
-    {
-      "id": "ov-kantoorgesprek",
-      "naam": "Kantoorgesprek",
-      "categorie": "Werk (zaken en personeel)",
-      "standaard": true,
-      "routes": 3,
-      "graad": "gemeten",
-      "sleutelsWaarde": [],
-      "sleutelsOnvindbaar": [],
-      "sleutelsSamengesteld": [],
-      "redenen": {},
-      "inBedrading": 0,
-      "ophangbestanden": [
-        "server/routes/kantoor.js",
-        "server/routes/kantoorgesprek.js"
-      ],
-      "leveranciers": [
-        "server/bedrijf/index.js",
-        "server/kern/kantoorgesprek.js",
-        "server/kern/kantoorwereld.js"
-      ],
-      "sleutelsUitBedrading": [
-        "auth"
-      ],
-      "sleutelsOnbekend": [],
-      "bestandenBereikt": 89,
-      "knopen": 15,
-      "perLaag": {
-        "domein": 10,
-        "motor": 3,
-        "ingang": 2
-      },
-      "domeinen": [
-        "domein:agenda",
-        "domein:bedrijf",
-        "domein:command",
-        "domein:geld",
-        "domein:kantoorgesprek",
-        "domein:kantoorwereld",
-        "domein:util",
-        "domein:wereld",
-        "domein:wereldkern",
         "domein:werkcommand"
       ],
       "onverklaardeRanden": []
@@ -20580,6 +20920,99 @@
       "onverklaardeRanden": []
     },
     {
+      "id": "zaakregie",
+      "naam": "Regie: zien & op de lijst zetten",
+      "categorie": "Partners (leveranciers)",
+      "standaard": true,
+      "routes": 11,
+      "graad": "gemeten",
+      "sleutelsWaarde": [],
+      "sleutelsOnvindbaar": [],
+      "sleutelsSamengesteld": [],
+      "redenen": {},
+      "inBedrading": 0,
+      "ophangbestanden": [
+        "server/routes/zaakcommand/herstel.js",
+        "server/routes/zaakcommand/index.js"
+      ],
+      "leveranciers": [
+        "server/bedrijf/index.js",
+        "server/kern/leverancier/zaak.js",
+        "server/kern/zaakcommand/index.js"
+      ],
+      "sleutelsUitBedrading": [
+        "supplierAuth"
+      ],
+      "sleutelsOnbekend": [],
+      "bestandenBereikt": 107,
+      "knopen": 14,
+      "perLaag": {
+        "domein": 10,
+        "motor": 3,
+        "ingang": 1
+      },
+      "domeinen": [
+        "domein:bedrijf",
+        "domein:command",
+        "domein:eigencollectie",
+        "domein:frictie",
+        "domein:geld",
+        "domein:leverancier",
+        "domein:util",
+        "domein:wereld",
+        "domein:werkcommand",
+        "domein:zaakcommand"
+      ],
+      "onverklaardeRanden": []
+    },
+    {
+      "id": "zaakregie-beheer",
+      "naam": "Regie: rechtzetten & regels",
+      "categorie": "Partners (leveranciers)",
+      "standaard": true,
+      "routes": 14,
+      "graad": "gemeten",
+      "sleutelsWaarde": [],
+      "sleutelsOnvindbaar": [],
+      "sleutelsSamengesteld": [],
+      "redenen": {},
+      "inBedrading": 0,
+      "ophangbestanden": [
+        "server/routes/zaakcommand/bestuur.js",
+        "server/routes/zaakcommand/herstel.js",
+        "server/routes/zaakcommand/index.js"
+      ],
+      "leveranciers": [
+        "server/bedrijf/index.js",
+        "server/kern/leverancier/zaak.js",
+        "server/kern/zaakcommand/index.js"
+      ],
+      "sleutelsUitBedrading": [
+        "supplierAuth"
+      ],
+      "sleutelsOnbekend": [],
+      "bestandenBereikt": 107,
+      "knopen": 14,
+      "perLaag": {
+        "domein": 10,
+        "motor": 3,
+        "ingang": 1
+      },
+      "domeinen": [
+        "domein:bedrijf",
+        "domein:command",
+        "domein:eigencollectie",
+        "domein:frictie",
+        "domein:geld",
+        "domein:leverancier",
+        "domein:util",
+        "domein:wereld",
+        "domein:werkcommand",
+        "domein:zaakcommand"
+      ],
+      "onverklaardeRanden": []
+    },
+    {
       "id": "dom-pay-vooraf",
       "naam": "Vooraf vastzetten aan de kassa",
       "categorie": "Geld",
@@ -20871,58 +21304,6 @@
       "onverklaardeRanden": []
     },
     {
-      "id": "dom-agenda",
-      "naam": "Agenda",
-      "categorie": "Diensten (leden)",
-      "standaard": true,
-      "routes": 11,
-      "graad": "ondergrens",
-      "sleutelsWaarde": [],
-      "sleutelsOnvindbaar": [
-        "kern"
-      ],
-      "sleutelsSamengesteld": [],
-      "redenen": {
-        "kern": "staat niet in de kern-tas en is langs geen van de zeven constructies te herleiden"
-      },
-      "inBedrading": 0,
-      "ophangbestanden": [
-        "server/routes/agenda.js",
-        "server/routes/member/handel/uitjes.js"
-      ],
-      "leveranciers": [
-        "server/bedrijf/index.js",
-        "server/kern/agenda.js",
-        "server/kern/leverancier/zaak.js"
-      ],
-      "sleutelsUitBedrading": [
-        "auth",
-        "geenGast",
-        "supplierAuth"
-      ],
-      "sleutelsOnbekend": [
-        "kern"
-      ],
-      "bestandenBereikt": 88,
-      "knopen": 13,
-      "perLaag": {
-        "domein": 8,
-        "motor": 3,
-        "ingang": 2
-      },
-      "domeinen": [
-        "domein:agenda",
-        "domein:bedrijf",
-        "domein:command",
-        "domein:geld",
-        "domein:leverancier",
-        "domein:util",
-        "domein:wereld",
-        "domein:werkcommand"
-      ],
-      "onverklaardeRanden": []
-    },
-    {
       "id": "dom-boeken",
       "naam": "Boeken",
       "categorie": "Cultuur en gezelschap",
@@ -20962,97 +21343,6 @@
         "domein:util",
         "domein:wereld",
         "domein:werkcommand"
-      ],
-      "onverklaardeRanden": []
-    },
-    {
-      "id": "zaakregie",
-      "naam": "Regie: zien & op de lijst zetten",
-      "categorie": "Partners (leveranciers)",
-      "standaard": true,
-      "routes": 11,
-      "graad": "gemeten",
-      "sleutelsWaarde": [],
-      "sleutelsOnvindbaar": [],
-      "sleutelsSamengesteld": [],
-      "redenen": {},
-      "inBedrading": 0,
-      "ophangbestanden": [
-        "server/routes/zaakcommand/herstel.js",
-        "server/routes/zaakcommand/index.js"
-      ],
-      "leveranciers": [
-        "server/bedrijf/index.js",
-        "server/kern/leverancier/zaak.js",
-        "server/kern/zaakcommand/index.js"
-      ],
-      "sleutelsUitBedrading": [
-        "supplierAuth"
-      ],
-      "sleutelsOnbekend": [],
-      "bestandenBereikt": 105,
-      "knopen": 13,
-      "perLaag": {
-        "domein": 9,
-        "motor": 3,
-        "ingang": 1
-      },
-      "domeinen": [
-        "domein:bedrijf",
-        "domein:command",
-        "domein:eigencollectie",
-        "domein:geld",
-        "domein:leverancier",
-        "domein:util",
-        "domein:wereld",
-        "domein:werkcommand",
-        "domein:zaakcommand"
-      ],
-      "onverklaardeRanden": []
-    },
-    {
-      "id": "zaakregie-beheer",
-      "naam": "Regie: rechtzetten & regels",
-      "categorie": "Partners (leveranciers)",
-      "standaard": true,
-      "routes": 14,
-      "graad": "gemeten",
-      "sleutelsWaarde": [],
-      "sleutelsOnvindbaar": [],
-      "sleutelsSamengesteld": [],
-      "redenen": {},
-      "inBedrading": 0,
-      "ophangbestanden": [
-        "server/routes/zaakcommand/bestuur.js",
-        "server/routes/zaakcommand/herstel.js",
-        "server/routes/zaakcommand/index.js"
-      ],
-      "leveranciers": [
-        "server/bedrijf/index.js",
-        "server/kern/leverancier/zaak.js",
-        "server/kern/zaakcommand/index.js"
-      ],
-      "sleutelsUitBedrading": [
-        "supplierAuth"
-      ],
-      "sleutelsOnbekend": [],
-      "bestandenBereikt": 105,
-      "knopen": 13,
-      "perLaag": {
-        "domein": 9,
-        "motor": 3,
-        "ingang": 1
-      },
-      "domeinen": [
-        "domein:bedrijf",
-        "domein:command",
-        "domein:eigencollectie",
-        "domein:geld",
-        "domein:leverancier",
-        "domein:util",
-        "domein:wereld",
-        "domein:werkcommand",
-        "domein:zaakcommand"
       ],
       "onverklaardeRanden": []
     },
@@ -21283,6 +21573,50 @@
       "onverklaardeRanden": []
     },
     {
+      "id": "stuur",
+      "naam": "Rahul doet het (AI-stuur)",
+      "categorie": "Personeel & integraties",
+      "standaard": true,
+      "routes": 9,
+      "graad": "gemeten",
+      "sleutelsWaarde": [],
+      "sleutelsOnvindbaar": [],
+      "sleutelsSamengesteld": [],
+      "redenen": {},
+      "inBedrading": 0,
+      "ophangbestanden": [
+        "server/routes/stuur.js"
+      ],
+      "leveranciers": [
+        "server/bedrijf/index.js",
+        "server/kern/stuur.js"
+      ],
+      "sleutelsUitBedrading": [
+        "auth",
+        "supplierAuth"
+      ],
+      "sleutelsOnbekend": [],
+      "bestandenBereikt": 100,
+      "knopen": 13,
+      "perLaag": {
+        "domein": 9,
+        "motor": 3,
+        "ingang": 1
+      },
+      "domeinen": [
+        "domein:bedrijf",
+        "domein:command",
+        "domein:frictie",
+        "domein:geld",
+        "domein:rahul",
+        "domein:stuur",
+        "domein:util",
+        "domein:wereld",
+        "domein:werkcommand"
+      ],
+      "onverklaardeRanden": []
+    },
+    {
       "id": "kern-gids",
       "naam": "App-gids en uitleg",
       "categorie": "Leden (RTG-app)",
@@ -21303,7 +21637,7 @@
       ],
       "sleutelsUitBedrading": [],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 107,
+      "bestandenBereikt": 108,
       "knopen": 13,
       "perLaag": {
         "domein": 9,
@@ -21888,49 +22222,6 @@
         "domein:eigencollectie",
         "domein:geld",
         "domein:mediaos",
-        "domein:util",
-        "domein:wereld",
-        "domein:werkcommand"
-      ],
-      "onverklaardeRanden": []
-    },
-    {
-      "id": "stuur",
-      "naam": "Rahul doet het (AI-stuur)",
-      "categorie": "Personeel & integraties",
-      "standaard": true,
-      "routes": 9,
-      "graad": "gemeten",
-      "sleutelsWaarde": [],
-      "sleutelsOnvindbaar": [],
-      "sleutelsSamengesteld": [],
-      "redenen": {},
-      "inBedrading": 0,
-      "ophangbestanden": [
-        "server/routes/stuur.js"
-      ],
-      "leveranciers": [
-        "server/bedrijf/index.js",
-        "server/kern/stuur.js"
-      ],
-      "sleutelsUitBedrading": [
-        "auth",
-        "supplierAuth"
-      ],
-      "sleutelsOnbekend": [],
-      "bestandenBereikt": 98,
-      "knopen": 12,
-      "perLaag": {
-        "domein": 8,
-        "motor": 3,
-        "ingang": 1
-      },
-      "domeinen": [
-        "domein:bedrijf",
-        "domein:command",
-        "domein:geld",
-        "domein:rahul",
-        "domein:stuur",
         "domein:util",
         "domein:wereld",
         "domein:werkcommand"
@@ -22655,6 +22946,41 @@
         "motor": 1
       },
       "domeinen": [],
+      "onverklaardeRanden": []
+    },
+    {
+      "id": "experience-platform",
+      "naam": "RTG Experience Platform",
+      "categorie": "Eigen apps",
+      "standaard": true,
+      "routes": 6,
+      "graad": "ondergrens",
+      "sleutelsWaarde": [],
+      "sleutelsOnvindbaar": [
+        "post"
+      ],
+      "sleutelsSamengesteld": [],
+      "redenen": {
+        "post": "staat niet in de kern-tas en is langs geen van de zeven constructies te herleiden"
+      },
+      "inBedrading": 0,
+      "ophangbestanden": [
+        "server/routes/experience.js"
+      ],
+      "leveranciers": [],
+      "sleutelsUitBedrading": [],
+      "sleutelsOnbekend": [
+        "post"
+      ],
+      "bestandenBereikt": 2,
+      "knopen": 2,
+      "perLaag": {
+        "ingang": 1,
+        "domein": 1
+      },
+      "domeinen": [
+        "domein:economie"
+      ],
       "onverklaardeRanden": []
     },
     {

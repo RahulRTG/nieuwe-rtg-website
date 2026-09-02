@@ -22,7 +22,7 @@ Dezelfde volgorde als bij `OBJECTMODEL.json` (waar `Asset` sneuvelde) en
 
 `npm run verstrengeling` → `VERSTRENGELING.json`
 
-<!--getal:verstrengeling.randen-->1644<!--/getal--> randen tussen de knopen van dit huis, waarvan er
+<!--getal:verstrengeling.randen-->1696<!--/getal--> randen tussen de knopen van dit huis, waarvan er
 <!--getal:verstrengeling.onverklaard-->0<!--/getal--> **onverklaard** zijn. Dat getal moet naar nul, en het
 aantal randen niet: een huis waarin domeinen elkaar nooit nodig hebben, is geen
 huis maar een map met losse programma's.
@@ -47,7 +47,7 @@ kern** — `SEMANTIEK.json` laat zien dat hetzelfde woord op drie plekken nog ge
 gedeelde betekenis is.
 
 Omgekeerd staat er wat er breekt als iets er niet is:
-<!--getal:verstrengeling.uitneembaar-->64<!--/getal--> van de <!--getal:verstrengeling.domeinen-->544<!--/getal--> domeinen sleept géén ander
+<!--getal:verstrengeling.uitneembaar-->60<!--/getal--> van de <!--getal:verstrengeling.domeinen-->559<!--/getal--> domeinen sleept géén ander
 domein mee. Bovenaan de andere kant staat `eigencollectie` met 246: dat is geen
 domein meer maar een verborgen kern, en dat is een besluit (noem het kern) of
 werk (breng de koppelingen terug).
@@ -57,11 +57,11 @@ werk (breng de koppelingen terug).
 `npm run activering` → `ACTIVERING.json`
 
 Per functie uit de catalogus: welke routes, welke bestanden, welke domeinen.
-<!--getal:activering.functies-->204<!--/getal--> functies dragen routes; een doorsnee functie raakt
+<!--getal:activering.functies-->205<!--/getal--> functies dragen routes; een doorsnee functie raakt
 <!--getal:activering.mediaan-->27<!--/getal--> knopen.
 
 **Vier graden, en ze zijn niet uitwisselbaar.** <!--getal:activering.gemeten-->147<!--/getal--> functies
-zijn `gemeten`; <!--getal:activering.ondergrens-->47<!--/getal--> zijn `ondergrens` (er hangt méér aan dan
+zijn `gemeten`; <!--getal:activering.ondergrens-->48<!--/getal--> zijn `ondergrens` (er hangt méér aan dan
 hier staat, en nieuwe broninformatie zou helpen); <!--getal:activering.onbepaald-->3<!--/getal--> zijn
 `onbepaald` (de bronnen spreken elkaar tegen — dat vraagt een besluit en geen
 betere meter); en zeven zijn `deels-niet-toe-te-rekenen` (hun route hangt in de
@@ -115,8 +115,8 @@ verrekent: een rand weg in het ene domein betaalt een nieuwe in het andere.
 
 De zeven treden van `LAUNCH.md` staan machineleesbaar in
 `server/functies/register` (`FASES`). De proef zet er één aan, de rest uit, en
-kijkt of er dan werkelijk niets anders openstaat. Op trede 0: <!--getal:trede.inTrede-->333<!--/getal-->
-van de <!--getal:trede.routes-->4740<!--/getal--> API-routes open, en <!--getal:trede.lekken-->0<!--/getal--> lekken.
+kijkt of er dan werkelijk niets anders openstaat. Op trede 0: <!--getal:trede.inTrede-->344<!--/getal-->
+van de <!--getal:trede.routes-->4848<!--/getal--> API-routes open, en <!--getal:trede.lekken-->0<!--/getal--> lekken.
 
 | trede | functies | routes open | zuiver | beproefd | rondgang | onvoltooid |
 |---|---|---|---|---|---|---|

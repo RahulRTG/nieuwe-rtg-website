@@ -302,5 +302,17 @@ module.exports = [
   { van: 'motor:seed', naar: 'domein:muziek-stijlen', soort: 'DOMEINRELATIE',
     reden: 'seed/media.js r.32: de zaaiset maakt voorbeelden met de echte stijlenlijst in plaats van met verzonnen waarden' },
   { van: 'motor:techniek-basis', naar: 'motor:trio-stand', soort: 'DOMEINRELATIE',
-    reden: 'techniek-basis.js r.105: de technische pagina toont de stand van het failover-trio' }
+    reden: 'techniek-basis.js r.105: de technische pagina toont de stand van het failover-trio' },
+
+  /* ---- DRIE RANDEN DIE MET DE MERGE VAN 2 SEPTEMBER 2026 MEEKWAMEN ----
+     Ze staan hier niet om het getal weg te krijgen maar omdat het alle drie
+     dezelfde vorm is: EEN plek waar een regel woont, en meerdere domeinen die
+     hem lezen. Dat is precies wat regel 4 van de lat vraagt; een tweede kopie
+     zou de bevinding zijn, niet deze rand. */
+  { van: 'domein:identiteit', naar: 'domein:totp', soort: 'GEDEELDE_PRIMITIEF',
+    reden: 'kern/totp.js is RFC 6238 in pure Node-crypto zonder enige afhankelijkheid; kern/identiteit/tweefactor.js r.31 leest er alleen totpOk uit. Een tweede TOTP-implementatie naast deze zou betekenen dat twee deuren van dit huis een code anders valideren' },
+  { van: 'domein:rtfos', naar: 'domein:machtiging', soort: 'BELEID',
+    reden: 'kern/machtiging.js draagt met opzet DE REGELS en niet de opslag: wat een geldige SEPA-machtiging is (een maximum, geen volledig rekeningnummer, altijd per direct in te trekken) is een ding, ook al hangt hij bij een school aan een leerling en bij een gift aan de gever. kern/rtfos/gift-machtiging.js r.55 leest die regels' },
+  { van: 'domein:school', naar: 'domein:machtiging', soort: 'BELEID',
+    reden: 'zelfde regels, andere houder: server/school/machtiging.js r.34 leest kern/machtiging.js. Dit IS het register waar die regels vandaan komen -- het schoolregister was er eerst, en de gift kreeg geen kopie maar dezelfde bron (SEMANTIEK.json noemt twee registers onder een naam duur)' }
 ];

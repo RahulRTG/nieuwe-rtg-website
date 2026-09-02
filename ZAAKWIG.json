@@ -6,8 +6,8 @@
       "tredeNaam": "Trede 3 · De vloer draait",
       "geldAan": false,
       "zaak": "KIKUNOI",
-      "ref": "RTG-O-0D1656",
-      "pickup": "64PP",
+      "ref": "RTG-O-C61937",
+      "pickup": "L7KN",
       "stappen": [
         {
           "wat": "lid logt in",
@@ -87,8 +87,8 @@
       "tredeNaam": "Trede 4 · Het fundament (de wig)",
       "geldAan": true,
       "zaak": "KIKUNOI",
-      "ref": "RTG-O-5AC66B",
-      "pickup": "HFLX",
+      "ref": "RTG-O-8FDCBA",
+      "pickup": "AMSV",
       "stappen": [
         {
           "wat": "lid logt in",
@@ -151,13 +151,13 @@
         },
         {
           "wat": "de betaling hoort bij DEZELFDE bon",
-          "uitleg": "betaald: RTG-O-5AC66B",
+          "uitleg": "betaald: RTG-O-8FDCBA",
           "uitkomst": "ok",
           "goed": true
         },
         {
           "wat": "de zaak ziet DEZELFDE bon",
-          "uitleg": "op ref RTG-O-5AC66B",
+          "uitleg": "op ref RTG-O-8FDCBA",
           "uitkomst": "ok",
           "goed": true
         },
@@ -188,8 +188,8 @@
       "tredeNaam": "Trede 6 · Alles open",
       "geldAan": true,
       "zaak": "KIKUNOI",
-      "ref": "RTG-O-11FD26",
-      "pickup": "LQ5E",
+      "ref": "RTG-O-ADB0ED",
+      "pickup": "3PQY",
       "stappen": [
         {
           "wat": "lid logt in",
@@ -252,13 +252,13 @@
         },
         {
           "wat": "de betaling hoort bij DEZELFDE bon",
-          "uitleg": "betaald: RTG-O-11FD26",
+          "uitleg": "betaald: RTG-O-ADB0ED",
           "uitkomst": "ok",
           "goed": true
         },
         {
           "wat": "de zaak ziet DEZELFDE bon",
-          "uitleg": "op ref RTG-O-11FD26",
+          "uitleg": "op ref RTG-O-ADB0ED",
           "uitkomst": "ok",
           "goed": true
         },

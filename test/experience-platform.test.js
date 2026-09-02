@@ -328,3 +328,22 @@ test('een crash tussen domeinschrijving en finalization herstelt zonder dubbele 
   assert.equal(h.experience.evidence('crash-key').evidence.length, 1);
   assert.equal(h.experience.evidence('crash-key').integrity.valid, true);
 });
+
+test('de wereldwachter kent alleen echte werelden, en geen sleutels van Object', () => {
+  /* `haal` las met MANIFESTS[w], en dat leest ook wat op Object.prototype staat:
+     'constructor' gaf een functie terug en '__proto__' een object. Allebei kwamen
+     ze door de wachter `if (!manifest)` in kern/experience/projections.js, en die
+     wachter is het bewijs waarop `BOUWERS[w](...)` daarna wordt aangeroepen. De
+     wereld komt uit het lijf van een verzoek, dus dit is invoer.
+
+     DE MUTATIE: zet in kern/experience/manifesten.js `haal` terug op
+     MANIFESTS[w] || null -- dan is 'constructor' weer een wereld. */
+  for (const sleutel of ['constructor', '__proto__', 'toString', 'valueOf', 'hasOwnProperty']) {
+    assert.equal(manifesten.haal(sleutel), null,
+      'de wachter zag "' + sleutel + '" aan voor een wereld');
+  }
+  /* En de vier echte werelden blijven werken, ook met een hoofdletter -- anders
+     is de reparatie een storing in plaats van een grens. */
+  for (const w of ['living', 'travel', 'work', 'foundation'])
+    assert.equal(manifesten.haal(w.toUpperCase()).id, w);
+});

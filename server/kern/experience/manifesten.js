@@ -63,7 +63,22 @@ const LIJST = [
 LIJST.forEach(valideerManifest);
 const MANIFESTS = diepBevries(Object.fromEntries(LIJST.map(m => [m.id, m])));
 const ids = () => Object.keys(MANIFESTS);
-const haal = id => MANIFESTS[String(id || '').toLowerCase()] || null;
+/* ALLEEN EIGEN SLEUTELS, en dat is geen zuinigheid maar de wachter zelf.
+
+   `MANIFESTS[w]` leest ook wat op Object.prototype staat: `haal('constructor')`
+   gaf een FUNCTIE terug en `haal('__proto__')` een object, allebei waarheidsgetrouw
+   genoeg om door `if (!manifest)` te komen. De aanroeper (kern/experience/projections.js)
+   gebruikt die uitkomst als bewijs dat de wereld bestaat en doet daarna
+   `BOUWERS[w](...)` -- met een prototypesleutel is dat een aanroep van iets heel
+   anders dan een wereldbouwer. De wereld komt uit het lijf van een verzoek
+   (routes/experience.js), dus dit is invoer en geen interne waarde.
+
+   De reparatie hoort HIER en niet bij de aanroeper: wie de wachter vraagt of een
+   wereld bestaat, hoort geen halve waarheid terug te krijgen. */
+const haal = (id) => {
+  const w = String(id || '').toLowerCase();
+  return Object.prototype.hasOwnProperty.call(MANIFESTS, w) ? MANIFESTS[w] : null;
+};
 const publiek = () => JSON.parse(JSON.stringify(MANIFESTS));
 
 module.exports = { MANIFESTS, ids, haal, publiek };

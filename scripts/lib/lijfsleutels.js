@@ -41,6 +41,8 @@
 
 const fs = require('fs');
 const path = require('path');
+/* Zie de tokenbouwer verderop: een sleutel komt uit crypto en nooit uit Math.random. */
+const crypto = require('crypto');
 
 /* De activatielink uit de outbox van de proefopstelling. Peilt tot de mail er
    ECHT is in plaats van een aantal milliseconden te gokken -- dezelfde les als
@@ -415,12 +417,25 @@ const FAMILIES = [
          niet (/api/supplier/mijn geeft 404). Hier opnieuw inloggen is geen
          omweg maar de enige plek waar de code te halen valt -- `state` komt
          alleen bij het aanmelden mee. */
-      const inlog = await post('/api/supplier/login', { username: 'rahul', password: 'Imran' }, null);
+      const inlog = await post('/api/supplier/login', { username: 'rahul', password: OWNER_PASS }, null);
       const st = inlog && inlog.data && inlog.data.state;
       const code = st && (st.code || (st.supplier && st.supplier.code) || (st.zaak && st.zaak.code));
       if (!code) return null;
-      const deel = () => Array.from({ length: 24 }, () =>
-        'abcdefghijklmnopqrstuvwxyz0123456789'[Math.floor(Math.random() * 36)]).join('');
+      /* DE SLEUTEL KOMT UIT CRYPTO EN NIET UIT Math.random. Dit is een
+         aanvraagsleutel die als bewijs de deur van /api/arrival/request in gaat,
+         en Math.random is voorspelbaar: wie een reeks ziet, kan de volgende
+         raden. Dat het hier om een proefopstelling gaat maakt het niet minder
+         erg -- dit bestand is de plek waar iemand een tokenbouwer kopieert.
+
+         Twee huisregels wezen er allebei net langs: regel A van
+         scripts/check.js kijkt alleen in server/, en de AST-regel
+         math-random-geheim leest de naam van de dichtstbijzijnde functie (hier
+         `deel`) en niet die van de variabele die het resultaat draagt
+         (`requestToken`). Een naamcontrole mist dit; een taint-analyse niet.
+
+         Zelfde lengte en hetzelfde alfabet, dus /api/arrival/request ziet
+         precies dezelfde vorm als eerst. */
+      const deel = () => crypto.randomBytes(12).toString('hex');
       const requestToken = deel() + '.' + deel();
       const morgen = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
       const r = await post('/api/arrival/request', { requestToken, supplierCode: code,

@@ -1,15 +1,20 @@
 {
-  "gemeten": "2026-08-31T16:20:30.914Z",
+  "stempel": {
+    "op": "2026-09-02T16:28:17.399Z",
+    "commit": "b73f64f3b",
+    "boomVuil": true,
+    "boomAnders": 15,
+    "instrument": "scripts/schermmutatie.js",
+    "node": "v22.22.2"
+  },
+  "gemeten": "2026-09-02T16:28:17.399Z",
+  "uitleg": "Per schermtoets: hoeveel van de stukken scherm die hij beweert te dekken hij werkelijk mist als ze verdwijnen.",
+  "grens": "Meet alleen wat er uit een scherm VERDWIJNT, niet wat er fout in staat; een toets die niet in de lijst staat wordt niet gemeten.",
   "toetsen": [
     {
-      "toets": "test/gegevenskaart-scherm.e2e.js",
-      "schermen": [
-        "public/apps/mijn-gegevens.html"
-      ],
-      "schoten": 6,
-      "gezakt": 6,
-      "overleefd": 0,
-      "ongedekt": []
+      "toets": "test/winkel-scherm.e2e.js",
+      "stand": "geen scherm gevonden",
+      "schoten": 0
     }
   ]
 }

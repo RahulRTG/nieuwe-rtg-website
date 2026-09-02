@@ -159,7 +159,8 @@ module.exports = (ctx) => {
     return { ok: true, bestelling: { id: o.id, artikel: a.naam, aantal, euro: euro(centen), stand: o.stand },
       kosten: betaald.kosten || 0, meegestuurd,
       zegt: [
-        'Gekocht: ' + a.naam + (aantal > 1 ? ' (' + aantal + 'x)' : '') + ' voor ' + euro(centen) + '.',
+        /* het bedrag zoals de kaart het zegt ("€ 12,50"), niet als kaal getal (12.5) */
+        'Gekocht: ' + a.naam + (aantal > 1 ? ' (' + aantal + 'x)' : '') + ' voor € ' + euro(centen).toFixed(2).replace('.', ',') + '.',
         /* DE GRENS, EN NIET IN DE KLEINE LETTERTJES. */
         'Dit is een aankoop en geen gift: er staat iets tegenover, dus je krijgt hiervoor geen giftbewijs en het is niet aftrekbaar.',
         'De stichting zet klaar wat je hebt gekocht. Wanneer het verstuurd of klaargelegd is, zet een mens van de stichting dat hier.'

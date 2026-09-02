@@ -1,0 +1,289 @@
+{
+  "gemetenOp": "2026-09-02",
+  "treden": [
+    {
+      "trede": "bestellen",
+      "tredeNaam": "Trede 3 · De vloer draait",
+      "geldAan": false,
+      "zaak": "KIKUNOI",
+      "ref": "RTG-O-0D1656",
+      "pickup": "64PP",
+      "stappen": [
+        {
+          "wat": "lid logt in",
+          "status": 200,
+          "geslaagd": true
+        },
+        {
+          "wat": "de zaak logt in",
+          "status": 200,
+          "geslaagd": true
+        },
+        {
+          "wat": "het lid vindt de zaak",
+          "status": 200,
+          "geslaagd": true
+        },
+        {
+          "wat": "het lid leest de kaart",
+          "status": 200,
+          "geslaagd": true
+        },
+        {
+          "wat": "het lid bestelt",
+          "status": 200,
+          "geslaagd": true
+        }
+      ],
+      "invarianten": [
+        {
+          "wat": "exact een bestelling met deze ref",
+          "uitleg": "gevonden: 1 -- twee zou betekenen dat een tik twee bonnen maakt",
+          "uitkomst": "ok",
+          "goed": true
+        },
+        {
+          "wat": "een onbetaalde bon is bij de zaak NIET zichtbaar",
+          "uitleg": "de zaak zag hem al voor de betaling -- dan krijgt een zaak werk van wie niet betaald heeft",
+          "uitkomst": "ok",
+          "goed": true
+        },
+        {
+          "wat": "onder trede 4 weigert betalen fail-closed",
+          "uitleg": "antwoord: 503 betalingen-uit",
+          "uitkomst": "ok",
+          "goed": true
+        },
+        {
+          "wat": "na een geweigerde betaling blijft de bon geldig en onbetaald",
+          "uitleg": "stand: wacht-op-betaling",
+          "uitkomst": "ok",
+          "goed": true
+        },
+        {
+          "wat": "op deze trede bereikt een vooruitbetaalde bon de zaak NIET",
+          "uitleg": "dat is geen defect maar het gevolg van \"de vloer zonder betaalrail\": deze weg loopt hier dood, de horeca-rekening is de weg die het wel doet",
+          "uitkomst": "ok",
+          "goed": true
+        },
+        {
+          "wat": "een onbekende status wordt geweigerd",
+          "uitleg": "antwoord: 400",
+          "uitkomst": "ok",
+          "goed": true
+        },
+        {
+          "wat": "zonder betaalrail weigert ook de KASSA",
+          "uitleg": "antwoord: 503 -- administratief \"voldaan\" zetten is ook betalen",
+          "uitkomst": "ok",
+          "goed": true
+        }
+      ],
+      "stappenGezakt": 0,
+      "invariantenGezakt": 0
+    },
+    {
+      "trede": "fundament",
+      "tredeNaam": "Trede 4 · Het fundament (de wig)",
+      "geldAan": true,
+      "zaak": "KIKUNOI",
+      "ref": "RTG-O-5AC66B",
+      "pickup": "HFLX",
+      "stappen": [
+        {
+          "wat": "lid logt in",
+          "status": 200,
+          "geslaagd": true
+        },
+        {
+          "wat": "de zaak logt in",
+          "status": 200,
+          "geslaagd": true
+        },
+        {
+          "wat": "het lid vindt de zaak",
+          "status": 200,
+          "geslaagd": true
+        },
+        {
+          "wat": "het lid leest de kaart",
+          "status": 200,
+          "geslaagd": true
+        },
+        {
+          "wat": "het lid bestelt",
+          "status": 200,
+          "geslaagd": true
+        },
+        {
+          "wat": "het lid betaalt",
+          "status": 200,
+          "geslaagd": true
+        },
+        {
+          "wat": "de zaak ziet hem NA de betaling",
+          "status": 200,
+          "geslaagd": true
+        },
+        {
+          "wat": "de zaak zet de status op \"in bereiding\"",
+          "status": 200,
+          "geslaagd": true
+        },
+        {
+          "wat": "de kassa vindt hem op de afhaalcode",
+          "status": 200,
+          "geslaagd": true
+        }
+      ],
+      "invarianten": [
+        {
+          "wat": "exact een bestelling met deze ref",
+          "uitleg": "gevonden: 1 -- twee zou betekenen dat een tik twee bonnen maakt",
+          "uitkomst": "ok",
+          "goed": true
+        },
+        {
+          "wat": "een onbetaalde bon is bij de zaak NIET zichtbaar",
+          "uitleg": "de zaak zag hem al voor de betaling -- dan krijgt een zaak werk van wie niet betaald heeft",
+          "uitkomst": "ok",
+          "goed": true
+        },
+        {
+          "wat": "de betaling hoort bij DEZELFDE bon",
+          "uitleg": "betaald: RTG-O-5AC66B",
+          "uitkomst": "ok",
+          "goed": true
+        },
+        {
+          "wat": "de zaak ziet DEZELFDE bon",
+          "uitleg": "op ref RTG-O-5AC66B",
+          "uitkomst": "ok",
+          "goed": true
+        },
+        {
+          "wat": "een onbekende status wordt geweigerd",
+          "uitleg": "antwoord: 400",
+          "uitkomst": "ok",
+          "goed": true
+        },
+        {
+          "wat": "het lid ziet dezelfde status als de zaak zette",
+          "uitleg": "bij het lid: in bereiding",
+          "uitkomst": "ok",
+          "goed": true
+        },
+        {
+          "wat": "geen dubbele bon: de tweede keer weigert",
+          "uitleg": "antwoord: 409 -- 200 zou betekenen dat dezelfde bon twee keer uitgaat",
+          "uitkomst": "ok",
+          "goed": true
+        }
+      ],
+      "stappenGezakt": 0,
+      "invariantenGezakt": 0
+    },
+    {
+      "trede": "alles",
+      "tredeNaam": "Trede 6 · Alles open",
+      "geldAan": true,
+      "zaak": "KIKUNOI",
+      "ref": "RTG-O-11FD26",
+      "pickup": "LQ5E",
+      "stappen": [
+        {
+          "wat": "lid logt in",
+          "status": 200,
+          "geslaagd": true
+        },
+        {
+          "wat": "de zaak logt in",
+          "status": 200,
+          "geslaagd": true
+        },
+        {
+          "wat": "het lid vindt de zaak",
+          "status": 200,
+          "geslaagd": true
+        },
+        {
+          "wat": "het lid leest de kaart",
+          "status": 200,
+          "geslaagd": true
+        },
+        {
+          "wat": "het lid bestelt",
+          "status": 200,
+          "geslaagd": true
+        },
+        {
+          "wat": "het lid betaalt",
+          "status": 200,
+          "geslaagd": true
+        },
+        {
+          "wat": "de zaak ziet hem NA de betaling",
+          "status": 200,
+          "geslaagd": true
+        },
+        {
+          "wat": "de zaak zet de status op \"in bereiding\"",
+          "status": 200,
+          "geslaagd": true
+        },
+        {
+          "wat": "de kassa vindt hem op de afhaalcode",
+          "status": 200,
+          "geslaagd": true
+        }
+      ],
+      "invarianten": [
+        {
+          "wat": "exact een bestelling met deze ref",
+          "uitleg": "gevonden: 1 -- twee zou betekenen dat een tik twee bonnen maakt",
+          "uitkomst": "ok",
+          "goed": true
+        },
+        {
+          "wat": "een onbetaalde bon is bij de zaak NIET zichtbaar",
+          "uitleg": "de zaak zag hem al voor de betaling -- dan krijgt een zaak werk van wie niet betaald heeft",
+          "uitkomst": "ok",
+          "goed": true
+        },
+        {
+          "wat": "de betaling hoort bij DEZELFDE bon",
+          "uitleg": "betaald: RTG-O-11FD26",
+          "uitkomst": "ok",
+          "goed": true
+        },
+        {
+          "wat": "de zaak ziet DEZELFDE bon",
+          "uitleg": "op ref RTG-O-11FD26",
+          "uitkomst": "ok",
+          "goed": true
+        },
+        {
+          "wat": "een onbekende status wordt geweigerd",
+          "uitleg": "antwoord: 400",
+          "uitkomst": "ok",
+          "goed": true
+        },
+        {
+          "wat": "het lid ziet dezelfde status als de zaak zette",
+          "uitleg": "bij het lid: in bereiding",
+          "uitkomst": "ok",
+          "goed": true
+        },
+        {
+          "wat": "geen dubbele bon: de tweede keer weigert",
+          "uitleg": "antwoord: 409 -- 200 zou betekenen dat dezelfde bon twee keer uitgaat",
+          "uitkomst": "ok",
+          "goed": true
+        }
+      ],
+      "stappenGezakt": 0,
+      "invariantenGezakt": 0
+    }
+  ],
+  "gezakt": 0
+}

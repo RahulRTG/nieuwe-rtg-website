@@ -212,6 +212,19 @@ const METERS = [
      Luisteren is de opstelling, ANTWOORDEN is het werk; alleen het tweede telt
      hier. Op trede 6 staan die functies aan en is het getal nul, en dat is de
      tegenproef dat deze meter over de poort gaat en niet over ruis. */
+  /* DE VERTICALE KETEN (ZAAKWIG.json).
+
+     Geen brede meter maar EEN scenario: een lid vindt een zaak, leest de kaart,
+     bestelt, betaalt, de zaak ziet hem, zet een status, het lid ziet die status,
+     de kassa haalt hem op. Op trede 3, 4 en 6, omdat de semantiek daar
+     verandert. Wat er geteld wordt zijn niet de statuscodes maar de
+     BEDRIJFSREGELS: precies een bon, geen dubbele uitgifte, een onbekende status
+     geweigerd, en zonder betaalrail weigert ook de kassa.
+
+     Die laatste stond op de dag dat dit werd geschreven op GEZAKT, en dat was
+     een echt gat: /api/supplier/pos/redeem zette een bon administratief op
+     betaald terwijl de betaalrail uit stond. Dat hoort dus op nul te blijven. */
+  { sleutel: 'zaakwigGezakt', richting: 'omlaag', wat: 'stappen en invarianten van de verticale zaakketen die zakken (uit ZAAKWIG.json)' },
   { sleutel: 'tredeIngangLekken', richting: 'omlaag', wat: 'ingangen buiten HTTP die op trede 0 antwoorden terwijl hun functie uit staat (uit TREDEPROEF.json)' },
   { sleutel: 'wekkersFunctieUitToch', richting: 'omlaag', wat: 'ingangen buiten HTTP die het werk van een functie doen zonder langs haar schakelaar te komen (uit WEKKERS.json)' },
   { sleutel: 'wekkersZonderTrede', richting: 'omlaag', wat: 'ingangen buiten HTTP waarvan geen trede te bepalen is (uit WEKKERS.json)' },
@@ -695,6 +708,19 @@ function leesRondgang(pad, veld) {
   return a[naam];
 }
 
+/* De lezer van ZAAKWIG.json -- pad als parameter, werpend bij een ontbrekend
+   getal. Nul zou hier "de hele keten klopt" betekenen, en dat is precies wat je
+   niet mag aannemen als er niets gemeten is. */
+function leesZaakwig(pad) {
+  let a;
+  try { a = JSON.parse(fs.readFileSync(pad, 'utf8')); }
+  catch (e) { throw new Error('ZAAKWIG.json ontbreekt of is stuk (' + e.message + '); draai npm run zaakwig:vast'); }
+  if (!a || typeof a.gezakt !== 'number') {
+    throw new Error('ZAAKWIG.json draagt geen gezakt; een meter zonder invoer is geen meter');
+  }
+  return a.gezakt;
+}
+
 function meet(bronnen) {
   /* DE KEURING GEEFT EXITCODE 1 ZODRA HIJ IETS VINDT, en dat is precies zijn
      werk. execFileSync gooit daar standaard op, dus meet() klapte om op het
@@ -913,6 +939,7 @@ function meet(bronnen) {
   const wekkersZonderTrede = leesWekkers(path.join(WORTEL, 'WEKKERS.json'), 'zonderTrede');
   const tredeRondgangGezakt = leesRondgang(path.join(WORTEL, 'TREDEPROEF.json'));
   const tredeIngangLekken = leesRondgang(path.join(WORTEL, 'TREDEPROEF.json'), 'ingangLekken');
+  const zaakwigGezakt = leesZaakwig(path.join(WORTEL, 'ZAAKWIG.json'));
 
   /* De deuren naar db.data uit dezelfde bron als het losse script, om dezelfde
      reden als hierboven: een tweede implementatie loopt binnen een week uiteen. */
@@ -1003,6 +1030,7 @@ function meet(bronnen) {
     tredeLekken,
     tredeRondgangGezakt,
     tredeIngangLekken,
+    zaakwigGezakt,
     wekkersOnverklaard,
     wekkersFunctieUitToch,
     wekkersZonderTrede,
@@ -1341,6 +1369,6 @@ function main() {
 }
 
 if (require.main === module) process.exit(main());
-module.exports = { meet, leesNorm, METERS, schoon, traagsteTanden, heeftEinde, dagenTussen, oordeel, leesActivering, leesTredeproef, leesWekkers, leesRondgang,
+module.exports = { meet, leesNorm, METERS, schoon, traagsteTanden, heeftEinde, dagenTussen, oordeel, leesActivering, leesTredeproef, leesWekkers, leesRondgang, leesZaakwig,
   PRESTATIEMETERS, leesPrestatie, bron, PRESTATIEBESTAND, telOngeijkt, telInlineStijl, telSkips,
   telBewijslaag };

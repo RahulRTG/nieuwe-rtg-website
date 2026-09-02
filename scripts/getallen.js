@@ -95,7 +95,9 @@ const GETALLEN = {
   'wekkers.onverklaard': { bron: 'WEKKERS.json', veld: 'ongeschakeld',
     wat: 'wekkers die geen functie raken en niet verklaard zijn' },
   'wekkers.functieUitToch': { bron: 'WEKKERS.json', veld: 'functieUitMaarUitvoerbaar',
-    wat: 'ingangen buiten HTTP die het werk van een functie doen zonder haar schakelaar' }
+    wat: 'ingangen buiten HTTP die het werk van een functie doen zonder haar schakelaar' },
+  'zaakwig.gezakt': { bron: 'ZAAKWIG.json', veld: 'gezakt',
+    wat: 'stappen en invarianten van de verticale zaakketen die zakken' }
 };
 
 /* De documenten die merktekens mogen dragen. Bewust een lijst en geen glob over

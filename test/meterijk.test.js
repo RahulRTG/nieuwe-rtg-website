@@ -853,6 +853,27 @@ const IJKINGEN = {
      geijkt worden: de honderd ijkroutes hieronder vormen een nieuw domein zonder
      toets, en dan hoort dit getal precies een omhoog te gaan. */
   keuringDekkingAdvies: { proef: (voor) => metIjkRoutes(voor).dekkingAdvies },
+  zaakwigGezakt: {
+    /* De verticale keten: geen brede teller maar een scenario. Nul betekent
+       "elke stap en elke bedrijfsregel klopt op trede 3, 4 en 6" -- en dat mag
+       alleen staan als het gemeten is, dus weigert de lezer een bestand zonder
+       dat getal in plaats van nul terug te geven. */
+    proef: () => {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-zaakwig-ijk-'));
+      const pad = path.join(dir, 'ZAAKWIG.json');
+      try {
+        fs.writeFileSync(pad, JSON.stringify({ treden: [], gezakt: 0 }));
+        assert.equal(norm.leesZaakwig(pad), 0);
+        fs.writeFileSync(pad, JSON.stringify({ treden: [], gezakt: 1 }));
+        const na = norm.leesZaakwig(pad);
+        assert.equal(na, 1, 'een gezakte invariant slaat door');
+        assert.throws(() => norm.leesZaakwig(path.join(dir, 'weg.json')), /ontbreekt/);
+        fs.writeFileSync(pad, JSON.stringify({ treden: [] }));
+        assert.throws(() => norm.leesZaakwig(pad), /gezakt/);
+        return na;
+      } finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} }
+    }
+  },
   tredeIngangLekken: {
     /* De gemeten kant: een ingang buiten HTTP die ANTWOORDT terwijl zijn functie
        uit staat. Derde getal uit hetzelfde bestand, en de ijking toont dat de

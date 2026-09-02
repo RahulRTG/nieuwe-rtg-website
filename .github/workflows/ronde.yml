@@ -93,6 +93,9 @@ jobs:
       - name: De tredeproef (alle zeven treden van LAUNCH.md)
         if: always()
         run: npm run tredeproef:alle
+      - name: De zaakwig (een bestelling van het lid tot in de kassa)
+        if: always()
+        run: npm run zaakwig:vast
       - name: De norm (structureel hard, prestatie alleen gemeten)
         if: always()
         run: npm run norm

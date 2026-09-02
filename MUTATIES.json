@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-02T18:34:35.924Z",
-    "commit": "7f2c1364",
+    "op": "2026-09-02T18:58:25.149Z",
+    "commit": "c13886d1",
     "boomVuil": true,
     "node": "v22.22.2"
   },
@@ -7597,6 +7597,14 @@
       "module": "server/kern/zaakcommand/runbooks.js",
       "operator": "===->!==#0",
       "gezakt": 2,
+      "geprobeerd": 7
+    },
+    "zaakwig.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/functies/register/index.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
       "geprobeerd": 7
     },
     "zakelijk.test.js": {

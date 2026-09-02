@@ -219,6 +219,38 @@ dus langs dezelfde schakelaars als een mens.
 Deze meter **blokkeert niets**. Dat is de volgorde van `CONTROLPLANE.md` en niet
 van gemak: je kunt niet afdwingen wat nooit in de schaduw heeft gelopen.
 
+## 6. De zaakwig — één bestelling, van het lid tot in de kassa
+
+`npm run zaakwig` → `ZAAKWIG.json`
+
+De vijf registers hierboven meten **breed**. Dit is er met opzet géén: één lid,
+één zaak, één bon, en bij elke schakel de vraag of de **bedrijfsregel** klopt.
+Niet "antwoordt hij 200" maar *is het er precies één, ziet de kassa dezelfde bon,
+en weigert hij de tweede keer*. Op trede 3, 4 en 6, want daar verandert de
+semantiek. Gezakte stappen en invarianten:
+<!--getal:zaakwig.gezakt-->0<!--/getal-->.
+
+**De volgorde die deze proef heeft rechtgezet.** Eerst stond de keten als
+*bestellen → de zaak ziet hem*. Dat is fout: een bon met status
+`wacht-op-betaling` wordt op drie plekken uit het zicht van de zaak gefilterd, en
+dat is geen bug maar de regel — een zaak krijgt geen werk van wie niet betaald
+heeft.
+
+**Met een gevolg voor trede 3.** "De vloer draait" belooft bestellen zonder
+betaalrail. Langs deze weg kan dat niet: een vooruitbetaalde bestelling blijft op
+`wacht-op-betaling` staan en bereikt de zaak nooit. De vloer draait daar dus via
+de **horeca-rekening** (betalen na het eten) en niet via `/api/order`. Vastgesteld
+in plaats van vermoed.
+
+**En één echt defect.** Op trede 3 gaf `/api/supplier/pos/redeem` een 200: de
+kassa zette de bon administratief op betaald terwijl de betaalrail uit stond.
+`betaalstop.js` verbiedt dat in zijn eigen kop — *nergens een betaling simuleren
+of alleen administratief als voldaan markeren* — maar de route glipte langs beide
+stoppen: de catch-all kijkt naar het láátste padstuk (`redeem` stond er niet in)
+en er ging geen geld door de poort van RTG Pay, dus de interne stop kwam er niet
+aan te pas. Het precedent stond een regel hoger: `giftcard/redeem` staat er al in,
+om precies dezelfde reden. Eén regel erbij, en de wig is groen.
+
 ## Wat er bewust NIET staat
 
 - **Geen mapverhuizing.** Een indeling in `kern/ domeinen/ producten/` verplaatst
@@ -226,9 +258,10 @@ van gemak: je kunt niet afdwingen wat nooit in de schaduw heeft gelopen.
 - **Geen capability-register eroverheen verklaard.** `CAPABILITEIT.json` heeft die
   vraag al gemeten: er is geen capabilitylaag, er zijn er 21. Een nieuw register
   ernaast wordt de 22ste.
-- **Geen kassa en geen bevestiging aan de zaakkant.** De rondgang bestelt en
-  betaalt als LID; wat de zaak daarna op de PDA of de kassa ziet, is niet
-  beproefd.
+- **Geen gelijktijdigheid.** De zaakwig is één bon van één lid bij één zaak. Wat
+  er gebeurt als twee mensen tegelijk dezelfde afhaalcode innen, of als een
+  betaling halverwege afbreekt, staat er niet in — dat laatste vraagt een
+  provider die kan haperen (`server/betaal/synthetisch.js`).
 - **Geen afdwinging op de wekkers.** Zie hierboven: eerst de schaduw.
 - **Geen `default = dicht` in `functieAan()`.** De regel `if (!f) return true`
   staat er nog. Het gat in de vorm is echt, maar het staat vandaag niet open:

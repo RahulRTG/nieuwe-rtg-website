@@ -94,19 +94,31 @@ voornemen, en die staan hieronder ook als zodanig.
 | een scherm draagt de foutmelder (par. 4.1) | -- | **geen handhaver.** Vraagt `TAKEN.md` 7.9 |
 | een route draagt een invoercontract (par. 2) | -- | **geen handhaver.** Vraagt `TAKEN.md` 7.6 |
 | een ontleder van buitenbytes hangt niet (par. 6) | een nieuwe ontleder wordt op misvormde bytes beproefd | **half.** `test/vijandigerand.test.js` bewaakt de twee gerepareerde ontleders met een tijdsbudget in een kindproces; er is nog geen fuzzer die zelf zoekt -- `TAKEN.md` 7.2 |
-| autorisatie is toewijsbaar (par. 8) | -- | **schaduw.** Regel 28 MEET sinds 2 september wat hij niet ziet (565 paden, 385 zonder bewakerslaag) en blokkeert daar nog niet op -- `TAKEN.md` 7.14 |
+| elk /api-pad draagt een poort (par. 8) | een nieuwe route zonder poort komt er niet door | **machine** -- keuringsregel 28, sinds 2 september HARD over de volle routetabel: 565 paden buiten zijn eigen uitdrukking, alle 565 geclassificeerd, nul zonder poort |
+| autorisatie is toewijsbaar (par. 8) | -- | **geen handhaver.** Een poort HEBBEN is niet hetzelfde als een toewijsbare uitslag geven; van de 716 `OBJECT_SCOPED`-routes dragen er 638 er geen -- `TAKEN.md` 7.14 sloot de eerste helft, de tweede staat open |
 
-Zes machines, vier voornemens en een schaduw, en bij elk voornemen staat wat hem
-in de weg staat. Die verhouding hoort te verschuiven; zij is zelf de
+Zeven machines en vijf voornemens, en bij elk voornemen staat wat hem in de weg
+staat. De schaduwstand is er niet meer: hij is op 2 september 2026 hard geworden,
+en dat is precies wat een schaduw hoort te doen. Die verhouding hoort te verschuiven; zij is zelf de
 voortgangsmaat van dit document. Wat er NIET hoort te gebeuren is dat een
 voornemen stilzwijgend als eis wordt gelezen omdat hij in dezelfde tabel staat.
 
-**Waarom er een schaduwstand tussen zit.** Een eis die 565 routes in een keer
-rood zet, is binnen een week uitgezet. `CONTROLPLANE.md` schrijft daarom voor dat
-een nieuwe handhavingsregel eerst meeloopt zonder te blokkeren: je kunt niet
-afdwingen wat nooit in de schaduw heeft gelopen. Een schaduwmeting is dus geen
-halve eis maar een tussenstand met een richting -- en het getal erbij, zodat
-niemand hem voor nul aanziet.
+**Waarom er een schaduwstand tussen zat, en hoe die eruit ging.** Een eis die 565
+routes in een keer rood zet, is binnen een week uitgezet. `CONTROLPLANE.md`
+schrijft daarom voor dat een nieuwe handhavingsregel eerst meeloopt zonder te
+blokkeren: je kunt niet afdwingen wat nooit in de schaduw heeft gelopen. Een
+schaduwmeting is geen halve eis maar een tussenstand met een richting -- en het
+getal erbij, zodat niemand hem voor nul aanziet.
+
+Die van regel 28 heeft de hele weg afgelegd, in vier stappen en binnen een dag:
+meten (565 buiten bereik), classificeren met dezelfde poortlijsten waarmee de
+regel zelf oordeelt (565 -> 11 gaten), de elf een voor een oplossen, en dan pas
+afdwingen. Wat het meest heeft opgeleverd is de derde stap, want daar bleken de
+elf geen elf gaten: acht waren bewuste open deuren die alleen hun reden misten
+(en een rem), drie waren leesroutes die hun eigen poort omzeilden, en zeven
+"onvindbare bronnen" hadden gewoon een bewaker die niet in het vocabulaire stond.
+Een schaduw die je serieus uitzoekt, wordt kleiner dan hij eruitzag -- en de rest
+is echt.
 
 ---
 
@@ -371,12 +383,14 @@ speelruimte is een doorsnede, en leeg is dicht.
 **De eis.** Er is een plek waar wordt beslist of iets mag, en het oordeel draagt
 een reden.
 
-**Wat ontbreekt.** Zestig bewakersvormen over 4441 handlers. Keuringsregel 28
-leest `app.<verb>()` en niet `router.<verb>()`, waardoor 341 routes van de
-RTFoundation- en School-tak buiten de per-commit poortcontrole vallen; de
-runtime-poortwacht dekt er 324 wel, dus het gat zit in de controle en niet in de
-deur. Van de 716 routes die het huis zelf `OBJECT_SCOPED` noemt, dragen er 638
-geen toewijsbare uitslag over horizontale scheiding. `TAKEN.md` 7.14.
+**Wat ontbreekt.** Zestig bewakersvormen over 4441 handlers. De eerste helft is
+af: keuringsregel 28 las `app.<verb>()` en niet `router.<verb>()`, waardoor 341
+routes van de RTFoundation- en School-tak buiten de per-commit poortcontrole
+vielen -- die zijn nu geclassificeerd en de regel zakt hard op elk /api-pad dat de
+router kent en hij niet kan verantwoorden (`TAKEN.md` 7.14, gesloten). Wat
+overblijft is de zwaardere helft: een poort HEBBEN is niet hetzelfde als een
+toewijsbare uitslag GEVEN. Van de 716 routes die het huis zelf `OBJECT_SCOPED`
+noemt, dragen er 638 geen toewijsbare uitslag over horizontale scheiding.
 
 **De vorm.** Niet herschrijven. Elke bewakersvorm roept een gedeelde
 `beslis(req, eis)` aan die de uitkomst met reden teruggeeft; de bewakers blijven

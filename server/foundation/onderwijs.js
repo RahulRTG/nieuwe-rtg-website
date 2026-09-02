@@ -127,6 +127,7 @@ module.exports = (ctx) => {
      een keer opgebouwd bij het opstarten; de SSE-administratie (sse/stuur)
      blijft hier en gaat als referentie mee. */
   const octx = { router, F, save, nu, rid, schoon, crypto, anthropic, LETTERS, SYSTEM, DEMO, TIPS,
+    teVaak, misluktePoging, ipVan,
     nieuweCode, sse, stuur, online, presentie, lesVan, docentCheck, leerlingVan, lesPubliek };
   require('./onderwijs/les')(octx);
   require('./onderwijs/schrift')(octx);

@@ -1837,6 +1837,17 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
        de kantoorpakket-paden voluit kwamen te staan (regel 45) */
     'ledenAuth', 'rtfPoort']);
   POORT_MW.add('arrivalPassAuth'); // bezit van de tijdelijke, gehashte Arrival Pass
+  /* `scimAuth` (routes/scim.js) -- de deur waar de IdP van een klant zelf
+     doorheen loopt: Bearer-sleutel, opgezocht met scim.sleutels.vanSleutel(),
+     401 met www-authenticate als hij niet klopt. Hij stond hier niet, en de
+     zeven /api/scim/v2-paden vielen daardoor in de schaduwmeting onder "bron
+     onvindbaar" -- niet omdat er geen poort is, maar omdat hun pad een
+     EXPRESSIE is (`BASIS + '/Users'`) en geen lezer van de brontekst hem vindt.
+     De levende routetabel kent zijn bewakers wel; die stonden alleen niet in
+     dit vocabulaire. scripts/lib/bewakers.js kende hem al als eigenrol en
+     scripts/mutatiecontract.js leest hem als SERVICE_TO_SERVICE, dus dit is de
+     derde plek die dezelfde deur nu bij dezelfde naam noemt. */
+  POORT_MW.add('scimAuth');
   /* `viaBeheerOfDirectie` (routes/tenant.js) is geen derde poort maar een keuze
      tussen de twee die er al zijn: het beheer-token, of een lid met het recht
      `werkruimte`. Hij belandde hier omdat deze regel 800 tekens vooruitkijkt en
@@ -1992,37 +2003,58 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
      hier op de handhaver zelf toegepast).
 
      De vergelijking staat in ./lib/poortbereik.js en gaat tegen de LEVENDE
-     routetabel, niet tegen een tweede regex. Hij MELDT en blokkeert niet: 565
-     routes in een keer rood zetten maakt van deze regel een muur die binnen een
-     week wordt uitgezet, en "geen bewakerslaag" is niet hetzelfde als
-     "onbeveiligd" -- honderden routes in die takken controleren een
-     capability-token in de handler. Wat ze nodig hebben is een oordeel per
+     routetabel, niet tegen een tweede regex. Hij begon als MELDING en niet als
+     blokkade: 565 routes in een keer rood zetten maakt van deze regel een muur
+     die binnen een week wordt uitgezet, en "geen bewakerslaag" is niet hetzelfde
+     als "onbeveiligd" -- honderden routes in die takken controleren een
+     capability-token in de handler. Wat ze nodig hadden was een oordeel per
      route. CONTROLPLANE.md schrijft die volgorde voor: eerst meelopen, dan
-     afdwingen. TAKEN.md 7.14 draagt de weg naar hard. */
+     afdwingen.
+
+     HIJ IS HARD SINDS 2 SEPTEMBER 2026, en dat mocht omdat de schaduw op nul
+     staat: alle 565 zijn geclassificeerd (181 poortwachter, 43 gegenereerde
+     familie, 329 poort in de handler, 12 publiek met reden), nul zonder poort,
+     nul met een onvindbare bron, nul met onbekende bewakers. De weg ernaartoe
+     stond in TAKEN.md 7.14 en liep over vier stappen: de poortnamen van de
+     RTFoundation- en schooltak in POORT_MW, `scimAuth` erbij, een rem plus een
+     reden op de acht open deuren van de foundation, en de lescode-leesroutes
+     door `lesVan()`.
+
+     WAT ER NU ROOD WORDT ZIJN VIER DINGEN, en drie ervan zeggen "ik heb niet
+     gekeken" in plaats van "er is iets fout". Dat is met opzet even hard: een
+     handhaver die zijn eigen blinde vlek groen meldt, is precies waar deze
+     schaduwmeting tegen bestaat (LAT.md regel 10). Dus zakt de keuring ook als
+     de routetabel niet op te halen is, als de classificatie niet kon draaien, en
+     als een pad wel bestaat maar zijn bron of zijn bewakers onvindbaar zijn.
+     Wie een nieuwe route zonder poort toevoegt, ziet hem hier meteen. */
   {
     const b = schaduw;
     if (b.nietVastTeStellen) {
-      console.log('  \x1b[2m? bereik van deze regel niet vast te stellen: ' + b.nietVastTeStellen + '\x1b[0m');
+      fout('check.js regel 28: het bereik van deze regel is niet vast te stellen (' + b.nietVastTeStellen +
+        ') -- niet gemeten is geen "in orde"');
     } else if (!b.paden.length) {
       ok('en deze regel ziet elk /api-pad dat de router kent');
     } else if (b.nietGeclassificeerd) {
-      console.log('  \x1b[2m? ' + b.paden.length + ' paden vallen buiten deze regel, ongeclassificeerd: ' +
-        b.nietGeclassificeerd + '\x1b[0m');
+      fout('check.js regel 28: ' + b.paden.length + ' paden vallen buiten deze regel en konden niet worden ' +
+        'geclassificeerd (' + b.nietGeclassificeerd + ') -- niet gemeten is geen "in orde"');
     } else {
       const k = b.klasse;
-      console.log('  \x1b[2m! SCHADUW: ' + b.paden.length + ' van de ' + b.bekend +
+      console.log('  \x1b[2m  ' + b.paden.length + ' van de ' + b.bekend +
         ' /api-paden die de router kent, vallen buiten de uitdrukking van deze regel. Geclassificeerd: ' +
         k.poortwachter.length + ' via een poortwachter, ' + k.familie.length + ' via een gegenereerde familie, ' +
         k.inHandler.length + ' met een poort in de handler, ' +
         k.publiek.length + ' publiek met reden, ' + k.bronOnvindbaar.length + ' bron onvindbaar, ' +
         k.onbekend.length + ' bewakers onbekend.\x1b[0m');
-      if (k.gat.length) {
-        console.log('  \x1b[2m! en ' + k.gat.length + ' ZONDER enige poort -- die blokkeren nog niet, ' +
-          'maar dit is de lijst die naar nul moet (TAKEN.md 7.14):\x1b[0m');
-        for (const g of k.gat.slice(0, 12)) console.log('  \x1b[2m    ' + g + '\x1b[0m');
-        if (k.gat.length > 12) console.log('  \x1b[2m    ... en nog ' + (k.gat.length - 12) + '\x1b[0m');
-      } else {
-        console.log('  \x1b[2m! en GEEN ENKELE zonder poort -- de schaduw mag hard worden gemaakt\x1b[0m');
+      for (const g of k.gat) fout('check.js regel 28: ' + g + ' heeft geen enkele poort -- ' +
+        'geef hem er een, of zet hem met een reden op de publieke lijst (scripts/lib/publiekeroutes.js)');
+      for (const p2 of k.bronOnvindbaar) fout('check.js regel 28: ' + p2 + ' bestaat als route maar zijn bron ' +
+        'is niet te vinden, dus over zijn poort valt niets te zeggen -- zet de bewaker bij naam in POORT_MW, ' +
+        'of het voorvoegsel in server/kern/handlerpoorten/buiten.js (FAMILIES)');
+      for (const p2 of k.onbekend) fout('check.js regel 28: van ' + p2 + ' kent de routetabel de bewakers niet, ' +
+        'dus over zijn poort valt niets te zeggen');
+      if (!k.gat.length && !k.bronOnvindbaar.length && !k.onbekend.length) {
+        ok('en de ' + b.paden.length + ' paden buiten die uitdrukking zijn alle ' + b.paden.length +
+          ' geclassificeerd: geen enkele zonder poort');
       }
     }
   }

@@ -4,6 +4,7 @@
    keer bij het opstarten vanuit foundation/onderwijs.js. */
 module.exports = (octx) => {
   const { router, F, save, nu, rid, schoon, crypto, anthropic, LETTERS, SYSTEM, DEMO, TIPS,
+    teVaak, misluktePoging, ipVan,
     nieuweCode, sse, stuur, online, presentie, lesVan, docentCheck, leerlingVan, lesPubliek } = octx;
   /* ---------- het schrift ---------- */
   router.post('/schrift/opslaan', (req, res) => {
@@ -19,15 +20,15 @@ module.exports = (octx) => {
     l.schrift.updatedAt = nu(); save();
     res.json({ ok: true }); presentie(les.code);
   });
+  /* Via lesVan(): zie de uitleg boven /les/:code in ./les.js. Het schrift van
+     een leerling is de gevoeligste van de drie leesroutes. */
   router.get('/schrift/:code', (req, res) => {
-    const les = F().lessen[String(req.params.code).toUpperCase()];
-    if (!les) return res.status(404).json({ error: 'Onbekende les.' });
+    const les = lesVan(req, res); if (!les) return;
     const l = leerlingVan(les, req, res); if (!l) return;
     res.json({ schrift: l.schrift });
   });
   router.get('/schrift/:code/:studentId', (req, res) => {
-    const les = F().lessen[String(req.params.code).toUpperCase()];
-    if (!les) return res.status(404).json({ error: 'Onbekende les.' });
+    const les = lesVan(req, res); if (!les) return;
     if (!docentCheck(les, req, res)) return;
     const l = les.leerlingen[req.params.studentId];
     if (!l) return res.status(404).json({ error: 'Leerling niet gevonden.' });
@@ -54,8 +55,7 @@ module.exports = (octx) => {
     presentie(les.code); res.json({ ok: true });
   });
   router.get('/opgaven/:code', (req, res) => {
-    const les = F().lessen[String(req.params.code).toUpperCase()];
-    if (!les) return res.status(404).json({ error: 'Onbekende les.' });
+    const les = lesVan(req, res); if (!les) return;
     if (!docentCheck(les, req, res)) return;
     res.json({ opgaven: les.opgaven });
   });
@@ -102,7 +102,20 @@ module.exports = (octx) => {
   });
 
   /* ---------- op reis met de foundation: aanvraag of voordracht ---------- */
+  /* EEN REM, EN HIER IS DE SCHADE ANDERS DAN ELDERS. Deze lijst is AFGEKAPT op
+     duizend (`slice(0, 1000)` hieronder) en nieuwe aanvragen komen er vooraan in.
+     Wie hem duizend keer volschrijft, duwt de echte aanvragen er dus achteraan
+     uit -- en dat zijn precies de gezinnen waarvoor de RTFoundation bestaat. Een
+     open schrijfroute zonder rem is hier geen ongemak maar het wissen van
+     hulpvragen.
+
+     TIEN PER UUR PER ADRES. Een gezin dient er een in, hooguit twee. Een
+     schoolmaatschappelijk werker die er een paar op een middag voordraagt, past
+     daar ruim in; duizend volschrijven kost bij deze grens honderd uur. */
   router.post('/reis/aanvraag', (req, res) => {
+    const bak = 'reisaanvraag:' + ipVan(req);
+    if (teVaak(res, bak)) return;
+    misluktePoging(bak, 10, 60);
     const a = {
       id: rid(4),
       soort: req.body.soort === 'voordracht' ? 'voordracht' : 'aanvraag',

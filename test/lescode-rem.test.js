@@ -19,6 +19,12 @@
    zijn bestaan, en het is ook de reden dat het klein blijft: alles wat hier bij
    komt, komt onder een aangezette rem te staan.
 
+   EN DAAROM STAAN DE TWEE OPEN SCHRIJFROUTES ER OOK IN (toets 4 en 5). Het
+   onderwijs van de RTFoundation heeft drie deuren zonder inlog -- de lescode
+   raden, een les MAKEN en een reisaanvraag indienen -- en alle drie zijn ze
+   alleen te toetsen op een server waar de rem aanstaat. Ze bij elkaar zetten is
+   geen thema-drift maar de enige plek waar ze te meten zijn.
+
    Draai los: node --test test/lescode-rem.test.js */
 'use strict';
 const test = require('node:test');
@@ -91,4 +97,62 @@ test('een lescode raden loopt tegen de rem', async () => {
   const metGoedeCode = await api('/les/join', { code: d.code, naam: 'Kim' });
   assert.equal(metGoedeCode.status, 429,
     'zolang de rem staat, komt ook een JUISTE code er niet langs -- anders remt hij niets');
+});
+
+/* DERDE, EN HIJ HOORT NA DE TWEEDE. De rem zat eerst alleen op de POST-routes,
+   want die riepen `lesVan()` aan en de LEESroutes (`/les/:code`, `/bord/:code`,
+   `/schrift/:code`, `/opgaven/:code`, de stream) zochten de les rechtstreeks op
+   in `F().lessen[...]`. Dat is de verkeerde helft om open te laten: raden loont
+   juist aan de leeskant, want daar staat wat je wilt hebben.
+
+   Deze toets maakt hard dat de leeskant DEZELFDE bak deelt: de vorige toets heeft
+   hem met POST-pogingen volgemaakt, en dan hoort ook een GET tegen 429 te lopen.
+   Mutatie nagetrokken: zet in les.js `const les = lesVan(req, res)` terug naar
+   `F().lessen[...]` en deze toets zakt op 404 in plaats van 429 -- precies het
+   gat dat op 2 september 2026 dichtging. */
+test('de leesroutes delen dezelfde bak als de POST-routes', async () => {
+  const r = await fetch(BASE + '/api/foundation/bord/ZZZZZZZZ');
+  assert.equal(r.status, 429,
+    'GET /bord/:code hoort door lesVan() te gaan; anders is de rem alleen op de schrijfkant');
+});
+
+/* ---------- de twee open SCHRIJFroutes ----------
+   Deze twee staan achteraan omdat ze elk hun eigen bak vullen en die daarna
+   dicht blijft; wie ze naar voren haalt, sluit zichzelf uit de rest. */
+
+test('een les maken loopt tegen zijn eigen rem', async () => {
+  /* Zonder rem groeit `F().lessen` onbegrensd: elke les blijft staan en wordt
+     bij elke opslag meegeschreven. Geen exact getal in de assertie -- wel de
+     bewering dat er ergens een bodem is. Mutatie nagetrokken: de twee remregels
+     uit /les/maak weghalen laat deze toets vallen.
+
+     ELKE POGING KRIJGT EEN EIGEN VAKNAAM, en dat is geen opsmuk. Deze route staat
+     in lib/idemsleutels-kaleronde.js als `zelfdeVerzoek: true`: een IDENTIEK lijf
+     wordt herkend als herhaling en krijgt het bewaarde antwoord terug zonder dat
+     de handler draait. Veertig keer exact hetzelfde sturen maakt dus een les en
+     negenendertig echo's -- geen rem in zicht, en ook geen probleem. De aanval
+     die de rem moet stoppen varieert het lijf, want alleen dan komt er telkens
+     een les bij. Deze toets doet dat dus ook; met een vast lijf toetste hij de
+     idempotentielaag en niet de rem. */
+  let zagRem = false, gemaakt = 0;
+  for (let i = 0; i < 40 && !zagRem; i++) {
+    const r = await api('/les/maak', { vak: 'Vul ' + i, naam: 'Vuller' });
+    if (r.status === 429) zagRem = true; else { assert.equal(r.status, 200); gemaakt++; }
+  }
+  assert.ok(zagRem, 'na ' + gemaakt + ' nieuwe lessen vanaf een adres hoort de rem te staan');
+});
+
+test('een reisaanvraag indienen loopt tegen zijn eigen rem', async () => {
+  /* De lijst is afgekapt op duizend en nieuwe aanvragen komen er VOORAAN in.
+     Onbegrensd volschrijven wist dus de hulpvragen van echte gezinnen achteraan
+     uit de lijst -- daarom is dit geen ongemak maar de zwaarste van de drie. */
+  const lijf = i => ({ soort: 'aanvraag', naam: 'Test ' + i, contact: 'test@voorbeeld.test',
+    gezin: '2 volwassenen', waarom: 'Een reden die lang genoeg is om erdoor te komen.' });
+  let zagRem = false, ingediend = 0;
+  for (let i = 0; i < 25 && !zagRem; i++) {
+    const r = await api('/reis/aanvraag', lijf(i));
+    if (r.status === 429) zagRem = true; else { assert.equal(r.status, 200); ingediend++; }
+  }
+  assert.ok(zagRem, 'na ' + ingediend + ' aanvragen vanaf een adres hoort de rem te staan; ' +
+    'zonder rem duwt duizend nepaanvragen elke echte hulpvraag uit de lijst');
 });

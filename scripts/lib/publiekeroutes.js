@@ -89,6 +89,29 @@ const PUBLIEK = new Map([
     ['/api/foundation/bespaartip', 'een spaartip uit een vaste lijst, gekozen op de dag; leest niets en kent niemand'],
     ['/api/foundation/gesprekskaart', 'een gespreksvraag uit een vaste lijst; leest niets en kent niemand'],
     ['/api/foundation/tip', 'een dagtip voor in het schrift, uit een vaste lijst; leest niets en kent niemand'],
+    /* ---- DE ACHT OPEN DEUREN VAN DE RTFOUNDATION ----
+
+       Alle acht scheppen ze iets of wisselen ze een geloofsbrief in, en alle acht
+       staan ze open omdat er op dat moment per definitie nog geen sessie IS: een
+       gezin dat zichzelf aanmaakt, een begeleider die een les opent, een gezin
+       dat om een reis vraagt, een medewerker die zijn uitnodiging verzilvert.
+       Dat is het model van de RTFoundation -- gratis, zonder RTG-account -- en
+       geen omissie in de afscherming.
+
+       WAT ZE DAN WEL DRAGEN IS EEN REM, en die staat er bij alle acht in de
+       handler zelf, met het aantal per adres erbij. Dat is hier de hele
+       beveiliging: open + scheppend zonder rem is een emmer die vanzelf
+       volloopt, en bij /reis/aanvraag zelfs een emmer die overloopt over de
+       hulpvragen van echte gezinnen heen. De rem is dus de reden dat ze publiek
+       MOGEN zijn, niet een verzachting achteraf. */
+    ['/api/foundation/gezin/maak', 'een gezin dat zichzelf aanmaakt heeft nog geen gezinscode en geen profiel; rem 8 per adres per half uur (server/foundation/gezin.js)'],
+    ['/api/foundation/les/maak', 'een begeleider opent een les zonder RTG-account -- dat is het hele idee van het open onderwijs; rem 30 per adres per uur (server/foundation/onderwijs/les.js)'],
+    ['/api/foundation/reis/aanvraag', 'een gezin dat om een reis vraagt of wordt voorgedragen heeft geen account; rem 10 per adres per uur, want de lijst is afgekapt op duizend en volschrijven zou echte hulpvragen eruit duwen (server/foundation/onderwijs/schrift.js)'],
+    ['/api/foundation/school/school/maak', 'oude snelle deur, buiten de toetsenreeks 410: in productie loopt elke nieuwe school via /registratie/aanvragen; rem 5 per adres per tien minuten (server/school/beheer.js)'],
+    ['/api/foundation/school/personeel/aanmeld', 'oude testfixture, buiten de toetsenreeks 410: in productie geeft de directie een persoonlijke uitnodiging; rem 6 per adres per kwartier (server/school/beheer.js)'],
+    ['/api/foundation/school/personeel/inloglink', 'wie is uitgelogd kan zich niet legitimeren; de link gaat naar de schoolmail en het antwoord is voor bekend en onbekend gelijk in tekst EN in tijd, rem 5 per adres per kwartier (server/school/personeel-inlog.js)'],
+    ['/api/foundation/school/personeel/uitnodiging/bekijk', 'de uitnodigingssleutel IS de geloofsbrief en toont uitsluitend die ene uitnodiging; rem 8 per adres per kwartier (server/school/personeelstoegang.js)'],
+    ['/api/foundation/school/personeel/uitnodiging/accepteer', 'de uitnodigingssleutel IS de geloofsbrief; hij verloopt, gaat na gebruik dicht en de hash wordt gewist, rem 6 per adres per kwartier (server/school/personeelstoegang.js)'],
     ['/api/foundation/registratie/aanvragen', 'een school, vrijwilliger of stichting heeft vóór toelating nog geen account of code (met rem per ip)'],
     ['/api/foundation/registratie/status', 'de willekeurige, gehashte statussleutel is de geloofsbrief en toont uitsluitend die ene aanvraag (met rem per ip)'],
     /* Het bewijsstuk voor de gereguleerde genres hoort bij dezelfde aanvraag en

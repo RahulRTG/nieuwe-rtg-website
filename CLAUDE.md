@@ -273,6 +273,28 @@ afdwingen wat nooit in de schaduw heeft gelopen (`schaduw.js`).
 per capability of er ergens een caller is, en hij vond er vijf die er geen
 hadden. Draai hem vóór je een capability toevoegt. Paragraaf 6.1 is de eerlijke
 lijst van wat er nog openstaat.
+**`KANTOORMACHT.md` is de kantoorkant daarvan** — niet wat een LID mag (dat is
+CONTROLPLANE.md) maar wat een MEDEWERKER van RTG mag, en tot waar zijn macht
+reikt. Lees die vóór je een kantoorscherm, een backofficeroute of een
+"adminfunctie" bouwt. De kern is een omkering: het voorstel zegt *bouw geen
+almachtige SUPER_ADMIN*, en die is er al — één gedeelde `OFFICE_CODE`, één rol
+`office`, **26 kamers achter één sleutel** en **548 muterende kantoorroutes**
+waarvan er 37 een reden vragen, 99 een spoor nalaten, 10 allebei en **0** een
+tweede paar ogen kennen (lexicaal gemeten, graad `vermoed`). De blokken uit het
+idee — People, Companies, Money, Risk — zijn daarom niet de eerste opdracht: wie
+ze vandaag bouwt, zet zevenentwintig kamers achter diezelfde ene sleutel. Eerst
+de mens achter de deur (blok 1: lezen mag anoniem, schrijven niet, en in de
+schaduw vóór het weigert). Drie dingen daar niet wegpoetsen: **break glass is
+geen trede maar een eigenschap** van `uitvoeren` — de gezagsnoemer heeft er vier
+en er komt geen vijfde vocabulaire bij, precies zoals `autonoom` en `begrensd`
+eigenschappen bleven; **een score op een mens draagt altijd zijn opbouw** en
+wordt nooit een sorteersleutel, ook niet intern; en het universele klantbeeld is
+het gevaarlijkste scherm van het platform en komt dáárom pas als blok 7, mét
+`scripts/afleidbaar.js` eroverheen. Wat er werkelijk vanaf nul begint is maar
+één ding: er is **geen enkele risicomodule** in deze code. De AI-operator is
+blok 9 en niet uit voorzichtigheid maar uit rekenkunde — `kern/stuur/beleid.js`
+kent 0 `/api/office`-paden en `VERTROUWEN.json` staat op 0 bewezen, dus de
+bewijspoort waar dat idee op leunt houdt vandaag niets tegen.
 **`MUTATIECONTRACT.md` is de laag ernaast** — niet wie iets mag (dat is
 CONTROLPLANE.md) maar wat een TWEEDE aanroep doet, en hoe hard dit huis dat weet.
 Lees die vóór je een schrijfroute toevoegt of aan idempotentie werkt. De kern in

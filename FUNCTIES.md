@@ -21,9 +21,9 @@ het?**
 | Bedrijfsgenres | **74** in 27 sectoren |
 | Genre-caps (waar de apps op sturen) | **40** |
 | API-routes (uit de router) | **4738** |
-| Kernmodules (`server/kern/**`) | **1935** |
+| Kernmodules (`server/kern/**`) | **1936** |
 | App-pagina's (`public/apps/**.html`) | **287** |
-| Testbestanden | **1543** |
+| Testbestanden | **1545** |
 
 ## De vier werelden
 

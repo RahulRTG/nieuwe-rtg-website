@@ -117,9 +117,10 @@ const REGELS = [
      regels lopen na een hernoeming uit elkaar, en dan hangt het scherm ergens
      anders dan de deur die het bedient. */
   [/(?:^|\/)mijn[-/](?:tweefactor|sessies|herstelkanaal)/, 'intern', 'Intern & IT'],
-  [/(?:^|\/)mijn[-/](?:gegevens|post|relaties)/, 'juridisch', 'Juridisch'],
+  [/(?:^|\/)mijn[-/](?:gegevens|post|relaties)/, 'juridisch', 'Juridisch']
 ];
 
-/* En de brede domeinen erachteraan: zie ./tabel-breed.js. De volgorde is
-   gedrag, dus deze twee lijsten worden geplakt en niet apart doorzocht. */
-module.exports = REGELS.concat(require('./tabel-breed'));
+/* Daarachter de HDI-laag (./tabel-hdi.js) en dan de brede domeinen
+   (./tabel-breed.js). De volgorde is gedrag, dus deze drie lijsten worden
+   geplakt en niet apart doorzocht: smal voor breed, en de brede het laatst. */
+module.exports = REGELS.concat(require('./tabel-hdi'), require('./tabel-breed'));

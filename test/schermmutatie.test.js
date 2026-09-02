@@ -33,8 +33,24 @@ test('1. het scherm komt uit de toets zelf en niet uit een register', () => {
     'de motor leest het adres dat de toets bezoekt; een register ernaast zou wegdrijven');
 });
 
+/* WAAROM DEZE MAP EERST WORDT AANGEMAAKT. server/data/ staat in .gitignore --
+   daar wonen de database en de sleutels -- dus op een VERSE checkout bestaat hij
+   niet. Deze twee toetsen schreven er zonder meer in en zakten dan op ENOENT.
+
+   Dat ging jarenlang goed omdat er in dezelfde scherf altijd wel een toets was
+   die eerder een server startte en de map liet ontstaan. Die volgorde is geen
+   afspraak maar toeval: de scherven worden op GEMETEN DUUR verdeeld
+   (TOETSDUUR.json), dus een toetsbestand erbij kan dit bestand naar een scherf
+   verplaatsen waar niemand hem voor is geweest. Dat gebeurde ook: deze twee
+   zakten in CI op een tak die alleen toetsen toevoegde.
+
+   recursive: true is hier geen voorzichtigheid maar het herstel: een toets hoort
+   niet af te hangen van wat een andere toets toevallig eerder deed. */
+const PROEFMAP = path.join(WORTEL, 'server', 'data');
+
 test('1b. een toets die geen pagina bezoekt levert geen gok op', () => {
-  const tmp = path.join(WORTEL, 'server', 'data', 'schermmutatie-proef.js');
+  fs.mkdirSync(PROEFMAP, { recursive: true });
+  const tmp = path.join(PROEFMAP, 'schermmutatie-proef.js');
   fs.writeFileSync(tmp, "// geen page.goto hier\n");
   try {
     assert.deepEqual(schermenVan(tmp), [], 'liever niets dan een verzonnen scherm');
@@ -42,7 +58,8 @@ test('1b. een toets die geen pagina bezoekt levert geen gok op', () => {
 });
 
 test('1c. en een pagina die niet bestaat wordt niet meegenomen', () => {
-  const tmp = path.join(WORTEL, 'server', 'data', 'schermmutatie-proef2.js');
+  fs.mkdirSync(PROEFMAP, { recursive: true });
+  const tmp = path.join(PROEFMAP, 'schermmutatie-proef2.js');
   fs.writeFileSync(tmp, "await page.goto(base + '/apps/bestaat-niet-xyz.html');\n");
   try {
     assert.deepEqual(schermenVan(tmp), []);

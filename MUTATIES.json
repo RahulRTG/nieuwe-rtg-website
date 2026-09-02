@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-02T16:23:59.389Z",
-    "commit": "b73f64f3b",
+    "op": "2026-09-02T20:41:54.847Z",
+    "commit": "a25ae0a3",
     "boomVuil": true,
-    "boomAnders": 14,
+    "boomAnders": 15,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -679,6 +679,13 @@
       "module": "server/bewaarwacht.js",
       "operator": "===->!==",
       "gezakt": 2
+    },
+    "bewijsmapscherm.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "bewijsmatrix.test.js": {
       "soort": "puur",
@@ -7290,6 +7297,13 @@
       "operator": "&&->||#0",
       "gezakt": 1,
       "geprobeerd": 3
+    },
+    "wegwijzerscherm.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "wereld.test.js": {
       "soort": "server",

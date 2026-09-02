@@ -38,7 +38,7 @@ van 2 september 2026:
 |---|---|---|
 | 1. Foundation Operations | `server/kern/rtfos/` — 49 modules: casus, meldcode, veld, integriteit, vrijwilligers-VOG, voorraad, geld, subsidies, projecten, gemeenteportaal, rapport, blauwdrukken, risico, beleid, bestuur, jaarverslag | **staat** |
 | 2. Human Control | `kern/consent.js` (+ dekkingsregister met eigen toets), `kern/rtgid-regie.js` (inzagelog, `namens`, herroepbare machtiging), `kern/rtgid.js` (claim zonder gegeven) | **staat, één attribuut breed** |
-| 3. Safety | `kern/rtfos/meldcode.js` (alleen huiselijk geweld/kindermishandeling, alleen kantoorkant), `kern/zorgniveau.js` (crisis als codegrens), `kern/rtfos/casus.js` urgentie `acuut` | **een stap weg voor de meldcode, een besluit voor de rest** |
+| 3. Safety | `server/kern/beschermzaak/` (de eigen dataklasse, sinds 2 sep 2026), `server/kern/veiligheid/` (de persoonlijke laag: dodemansknop, stil codewoord, kring — zie par. 7.2), `kern/rtfos/meldcode.js`, `kern/zorgniveau.js` | **staat; de meldcode is nog smal en de persoonlijke laag hangt los** |
 | 4. Recovery | `casus.SOORTEN` dekt huisvesting, schulden, werk, zorgdoorverwijzing, noodhulp; `kern/opvang.js` doet de asielketen; `kern/rtfos/voorraad*.js` de goederen | **staat als registratie, niet als traject** |
 | 5. Development | `kern/levensgraaf/` (18+ bronnen, vijf etiketten per knoop), `kern/levenslijn/fasen.js` (fasen zonder voortgangsbalk), `kern/doelen.js` | **staat als graaf, mist de motor** |
 | 6. Opportunity | vacatures, opleidingen, kinderopvang en woningen bestaan als losse domeinen; er is geen keten die ze aan elkaar rijgt | **een besluit** |
@@ -137,14 +137,18 @@ venster** als eersteklas velden, en het scherm "wie weet wat over mij".
 Once-only (punt 20) is hier hetzelfde besluit: feiten één keer verifiëren, per
 gebruik toestemming, minimaal delen. **Een stap weg.**
 
-### Laag 3 — Safety · **het echte gat, en het eerste werk**
-Zie paragraaf 6 voor de volgorde. Kort: `meldcode.js` dekt huiselijk geweld en
-kindermishandeling, professioneel en kantoorzijdig. De woorden *uitbuiting,
-mensenhandel, seksueel geweld, stalking* en *dakloos* komen in de hele codebase
-niet voor. `casus.SOORTEN` heeft geen categorie veiligheid — en dat is geen
-ontbrekend label maar een ontbrekende KETEN: de bestaande keten wil koppelen aan
-een lokale partner en zet bij afronding een bewaartermijn van 730 dagen. Bij een
-geweldszaak zijn dat allebei risico's in plaats van functies.
+### Laag 3 — Safety · **staat, met twee open randen**
+Dit was bij het schrijven van dit document het grootste gat: de woorden
+*uitbuiting, mensenhandel, seksueel geweld, stalking* en *dakloos* kwamen in de
+hele codebase niet voor, en `casus.SOORTEN` had geen categorie veiligheid. Dat
+was geen ontbrekend label maar een ontbrekende KETEN: de casusketen wil koppelen
+aan een lokale partner en zet bij afronding een bewaartermijn van 730 dagen, en
+bij een geweldszaak zijn dat allebei risico's in plaats van functies.
+
+`server/kern/beschermzaak/` is die keten, als eigen dataklasse (par. 7.2). Wat
+er nog open staat: de meldcode dekt alleen huiselijk geweld en kindermishandeling
+en alleen de kantoorkant (regel 5), en de persoonlijke veiligheidslaag hangt los
+van de Foundation (regel 4b).
 
 ### Laag 4 — Recovery · **staat als registratie, mist het traject**
 Wonen, recht, gezondheid en inkomen zijn er als casussoorten. Wat er niet is, is
@@ -350,8 +354,9 @@ veilige slaapplek heeft.
 |---|---|---|---|
 | 1 | **Uitstapknop, neutrale titel, geen voorvertoning** over de Foundation-schermen, plus het eerlijke scherm over wat we niet kunnen verbergen | maakt al het volgende pas veilig; belooft niets wat niet waar is (5.7) | **staat** (2 sep 2026) |
 | 2 | **Hulpwijzer verbreden**: categorie "onveilig, misbruikt of uitgebuit", met de gespecialiseerde instanties erbij | pure tekst, geen gegevens, geen keten — en vandaag het enige wat een slachtoffer aan deze app heeft | **staat** (2 sep 2026) |
-| 3 | **`kern/foundation/safety/`: de eigen keten** — veiligheid → minimale gegevens → toestemming → stabilisatie → gecontroleerde overdracht, als eigen dataklasse (5.2) | het gat dat par. 4 laag 3 beschrijft | weken |
+| 3 | **De eigen keten** — veiligheid → minimale gegevens → toestemming → stabilisatie → gecontroleerde overdracht, als eigen dataklasse (5.2) | het gat dat par. 4 laag 3 beschrijft | **staat** als `server/kern/beschermzaak/` (2 sep 2026) |
 | 4 | **De voordeur**: zelfingang zonder account, zonder BSN, zonder adres; eerst "ben je nu veilig" en "kan iemand meekijken" | keert de huidige richting om (office maakt casus → burger krijgt code) | weken |
+| 4b | **De persoonlijke veiligheidslaag verbinden** — `kern/veiligheid/` (dodemansknop, stil codewoord, kring, laatste plek) bestaat en is vanaf de Foundation-kant onzichtbaar | zie par. 7.2: gebouwd, eerlijk, en op de verkeerde plek voor de mens uit par. 0 | dagen |
 | 5 | **Meldcode verbreden** naar volwassen slachtoffers buiten het gezin, of een tweede route ernaast | de vijf wettelijke stappen blijven; de reikwijdte niet | weken |
 | 6 | **Consent: doel en termijn per venster** + het scherm "wie weet wat over mij" | laag 2 afmaken vóór er meer instanties bijkomen | weken |
 | 7 | **De Advocate als lezer** op `levensgraaf/termijnen.js` | alle waarde van punt 10 zonder de onbewezen helft (5.6) | weken |
@@ -390,6 +395,44 @@ achter een knop komen. De laag wordt hier dus niet geladen, en de eerder
 bedachte `rtgdeel-vast`-markering is weggehaald in plaats van decoratief blijven
 staan: een klas die niets afdwingt omdat zijn laag niet draait, leest als een
 garantie die er niet is.
+
+### 7.2 Wat regel 3 opleverde, en de zesde laag die al bestond
+
+**`server/kern/beschermzaak/` staat**: vier bestanden, negen routes, zeven
+toetsen. De vier grendels van par. 5.2 zijn code en geen instelling — en het
+verschil met een strenger afgestelde casus zit hierin dat de klasse **weigert in
+plaats van filtert**: een aanroeper die `adres` meestuurt krijgt geen zaak zonder
+adres maar geen zaak, met de reden erbij. Filteren is stil, en stil betekent dat
+de volgende versie het veld gewoon bewaart.
+
+Alle zeven beweringen zijn met een mutatie zien zakken (LAT.md regel 2), elk op
+precies één toets. De duurste vondst zat in de derde: de overdrachtstoets sloeg
+eerst AF omdat de route al op de KETEN weigerde, dus de toets keurde een
+ketenfout goed terwijl hij dacht de ontvanger te toetsen. Dezelfde val als in
+`test/rtfos.test.js`, en de reden dat de toets de zaak nu eerst netjes op
+`overdracht` zet.
+
+**En er bleek een zesde laag al te bestaan.** Par. 1 telde er vijf; het zijn er
+zes. `server/kern/veiligheid/` is een werkende **persoonlijke** veiligheidslaag:
+een dodemansknop waarvan de klok op de SERVER loopt (`wacht.js` — geen
+levensteken is zelf het signaal), een **stil codewoord** dat je in een gewoon
+gesprek laat vallen en waarna er op je scherm met opzet níéts gebeurt
+(`codewoord.js`, bewaard als HMAC zodat wij de zin niet kunnen teruglezen), een
+kring van codenamen (`kring.js`) en een laatst bekende plek zonder spoor
+(`plek.js`). Met vier schermen in `public/apps/`.
+
+Dat verandert twee dingen aan dit document:
+
+- **Par. 5.7 was te streng gesteld.** "Duress mode wordt heel of niet gebouwd"
+  blijft gelden voor een verborgen modus met een tweede pincode. Maar het stille
+  codewoord ís al een dwangfunctie, en een eerlijke: hij belooft niets over de
+  app-wisselaar of de geschiedenis, hij doet één ding en dat doet hij goed. Dat
+  is precies de vorm die par. 5.7 zoekt.
+- **Het staat op de verkeerde plek voor de missie.** Die laag zit in de
+  RTG-ledenapp, achter een inlog, en is vanuit de Foundation-kant en vanaf
+  `onveilig.html` onzichtbaar. Voor de mens uit par. 0 — die vaak géén RTG-account
+  heeft — bestaat hij dus niet. Dat is geen bouwwerk maar een verbinding, en het
+  hoort in de volgorde hierboven vóór regel 5.
 
 ---
 

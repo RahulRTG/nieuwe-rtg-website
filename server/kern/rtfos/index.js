@@ -44,6 +44,7 @@
      risico           het risicoregister: beheerst is een bewering, niet een vinkje
      herkomst         grote en contante giften: het geld staat stil tot er gekeken is
      meldcode         de vijf wettelijke stappen bij zorg om een kind
+     beschermzaak     geweld en uitbuiting: een EIGEN klasse, in ../beschermzaak/
 
    WAT DIT NIET IS. Geen tweede ledenadministratie en geen tweede boekhouding.
    De 30%-afdracht van RTG naar de stichting blijft in kern/fonds.js; dit OS
@@ -115,6 +116,8 @@ module.exports = (state) => {
     besluitVindbaar: notulen.besluitVindbaar });
   const risico = require('./risico')(ctx);
   const meldcode = require('./meldcode')(ctx);
+  // Buiten deze map, en dat is het punt (../beschermzaak/index.js).
+  const beschermzaak = require('../beschermzaak')(ctx);
 
   const vrijwilligerportaal = require('./vrijwilligerportaal')(ctx);
   const deelnemerportaal = require('./deelnemerportaal')(ctx, { toestemmingWegDirect: casus.toestemmingWegDirect });
@@ -159,7 +162,7 @@ module.exports = (state) => {
     partners, projecten, vrijwilligers, geld, casus, integriteit, rapport, gemeente, ondernemers,
     subsidies, voorraad, activiteiten, berichten,
     netwerk, inkoop, uitwisseling, campagnes, koppeling,
-    bestuur, beleid, jaarverslag, risico, herkomst, meldcode,
+    bestuur, beleid, jaarverslag, risico, herkomst, meldcode, beschermzaak,
     vrijwilligerportaal, deelnemerportaal, publiek,
     veld, donateur,
     VLAGGEN: ctx.VLAGGEN, ROLLEN: ctx.ROLLEN

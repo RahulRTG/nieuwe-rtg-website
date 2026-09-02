@@ -80,6 +80,12 @@ module.exports = ({ db, save, crypto, boardroomWie, magBoardroom }) => {
     // fase drie, de governance-laag: het bestuur zelf, de regels die het stelt,
     // de verantwoording achteraf en de dingen die mis kunnen gaan
     vergaderingen: [], beleid: [], jaarverslagen: [], risicos: [], meldcodes: [],
+    /* De beschermzaken (kern/beschermzaak/) wonen hier omdat ze dezelfde POORT
+       gebruiken -- wie mag wat, waar, hoort op EEN plek te staan. De KLASSE is
+       wel een andere dan de casus, en die scheiding staat in de mappenstructuur
+       en niet hier; zie kern/beschermzaak/klasse.js. Geen enkele andere rtfos-
+       module schrijft in deze lijst, en rapport/gemeente lezen hem niet. */
+    beschermzaken: [],
     audit: [] };
   function S() {
     if (!db.data.rtfos || typeof db.data.rtfos !== 'object') db.data.rtfos = {};

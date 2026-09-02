@@ -1,0 +1,129 @@
+/* ============================================================================
+   MUTATIECONTRACTEN -- DE NEGEN ROUTES VAN DE BESCHERMZAAK.
+
+   Deel van server/lib/mutatiecontracten.js; zie de kop daar voor de vorm en de
+   regels. De routes zelf staan in server/routes/rtfos/uitvoering.js, de klasse
+   in server/kern/beschermzaak/.
+
+   WAAROM DIT REGISTER HIER EERST KWAM EN DE ROUTES DAARNA. MUTATIECONTRACT.md:
+   "de volgorde is een grens en geen gewoonte". Deze negen zijn nieuw, en een
+   nieuwe schrijfroute zonder contract laat de bouw zakken.
+
+   ALLE NEGEN ZIJN GEMETEN, NIET GERADEN. Er is een ronde gedraaid tegen een
+   draaiende server waarin elke route TWEE keer werd aangeroepen met hetzelfde
+   lijf, en waarin het gevolg is nagekeken in de opslag (aantal zaken, lengte
+   van de overdrachtenlijst, aantal auditregels). Wat daaruit kwam staat per
+   route in `bewijs.gemeten`, en het is drie keer iets anders:
+
+     - drie routes doen bij een tweede aanroep AANTOONBAAR een tweede handeling
+       (open, lees, overdracht). Dat hoort zo, en waarom staat erbij.
+     - vijf routes laten na twee aanroepen dezelfde stand achter (veiligheid,
+       stand, toestemming, toestemming-weg, sluit).
+     - een route verandert niets (zaken).
+
+   EN DE PRECISIE DIE MUTATIECONTRACT.md PAR. 5o EIST. Bij drie van die vijf
+   (stand, toestemming-weg, sluit) komt de tweede aanroep terug met een 400 uit
+   een TOESTANDSCONTROLE: "van minimaal naar minimaal kan niet", "er staat geen
+   toestemming om in te trekken", "deze zaak is al gesloten". Dat is met opzet
+   niet hetzelfde als een duplicaatlaag, en het staat daarom in het bewijs met
+   zoveel woorden. Wie hier later een sleutellaag overheen legt, mag deze regels
+   NIET lezen als "dat is al geregeld": wat vaststaat is dat de keten geen tweede
+   effect toelaat, niet dat een dubbeltik ergens wordt herkend.
+   ========================================================================== */
+'use strict';
+
+const AFGETEKEND = {
+  door: 'Claude (Opus 5), op grond van een eigen gemeten dubbeltik-ronde tegen een draaiende ' +
+    'server; niet door een mens nagelezen',
+  op: '2026-09-02'
+};
+const OP = '2026-09-02';
+const TOEGANG = { klasse: 'AUTHENTICATED' };
+
+/* Een route die bij herhaling een tweede handeling doet, en waarom dat hoort. */
+const tweedeHandeling = (route, mutatieId, waarom, gemeten) => [route, {
+  mutatieId, herkomst: 'mens',
+  semantiek: { klasse: 'nietHerhaalbaar' },
+  toegang: TOEGANG,
+  stand: 'INTENTIONALLY_NON_IDEMPOTENT',
+  waarom,
+  bewijs: { gemeten, op: OP },
+  afgetekend: AFGETEKEND
+}];
+
+/* Een route die na twee aanroepen dezelfde stand achterlaat. `hoe` zegt WAARDOOR
+   -- een toewijzing of de keten -- want dat verschil is precies wat par. 5o
+   verbiedt weg te poetsen. */
+const zelfdeStand = (route, mutatieId, hoe) => [route, {
+  mutatieId, herkomst: 'mens',
+  semantiek: { klasse: 'idempotent' },
+  toegang: TOEGANG,
+  stand: 'PROTECTED',
+  bewijs: {
+    gemeten: 'dubbeltik-ronde: dezelfde aanroep twee keer liet dezelfde stand achter. ' + hoe,
+    op: OP
+  },
+  afgetekend: AFGETEKEND
+}];
+
+const CONTRACTEN = Object.fromEntries([
+  tweedeHandeling('POST /api/rtfos/bescherming/open', 'rtfos.bescherming.open',
+    'Twee meldingen over dezelfde mens zijn twee zorgen, en samenvoegen is hier gevaarlijker dan ' +
+    'een dubbele zaak: wie ze samenvoegt, laat de tweede melding verdwijnen in het dossier van de ' +
+    'eerste en leest hem misschien nooit. Dezelfde regel als bij de meldcode ("een nieuwe zorg is ' +
+    'een nieuw dossier", kern/rtfos/meldcode.js). Een dubbele zaak valt op en is te sluiten; een ' +
+    'verdwenen melding niet.',
+    'twee keer hetzelfde lijf gaf TWEE zaken met verschillende codenamen (aantal +2)'),
+
+  tweedeHandeling('POST /api/rtfos/bescherming/lees', 'rtfos.bescherming.lees',
+    'Elke blik is een aparte blik. Deze route bestaat alleen om vast te leggen DAT iemand in een ' +
+    'beschermzaak heeft gekeken; een tweede keer kijken dat geen tweede regel achterlaat, maakt ' +
+    'het hele spoor waardeloos. Precies dezelfde reden als bij het openen van contactgegevens in ' +
+    'kern/rtfos/casus-dossier.js.',
+    'twee keer lezen gaf TWEE auditregels beschermzaak.gelezen'),
+
+  tweedeHandeling('POST /api/rtfos/bescherming/overdracht', 'rtfos.bescherming.overdracht',
+    'Een tweede overdracht aan dezelfde ontvanger is een tweede gebeurtenis: er is opnieuw iets ' +
+    'over deze mens verteld, en hij heeft er recht op dat dat er staat. Samenvouwen zou de ' +
+    'overdrachtenlijst laten liegen over hoe vaak zijn situatie is gedeeld.',
+    'twee keer overdragen gaf twee regels in overdrachten (1 -> 2)'),
+
+  zelfdeStand('POST /api/rtfos/bescherming/veiligheid', 'rtfos.bescherming.veiligheid',
+    'De route ZET het antwoord (een toewijzing, geen toevoeging), dus de tweede oproep overschrijft ' +
+    'hetzelfde antwoord en de stand van de zaak bleef gelijk.'),
+
+  zelfdeStand('POST /api/rtfos/bescherming/toestemming', 'rtfos.bescherming.toestemming',
+    'De route ZET de toestemming (een toewijzing), en de gemeten ontvanger was na twee oproepen ' +
+    'dezelfde.'),
+
+  zelfdeStand('POST /api/rtfos/bescherming/stand', 'rtfos.bescherming.stand',
+    'De tweede oproep kwam terug met 400 uit de KETEN ("van minimaal kan niet naar minimaal"). ' +
+    'Dat is een toestandscontrole en geen duplicaatlaag -- zie MUTATIECONTRACT.md par. 5o. Wat ' +
+    'vaststaat is dat er geen tweede effect kan ontstaan, niet dat een dubbeltik wordt herkend.'),
+
+  zelfdeStand('POST /api/rtfos/bescherming/toestemming-weg', 'rtfos.bescherming.toestemmingWeg',
+    'De tweede oproep kwam terug met 400 ("er staat geen toestemming om in te trekken"). Ook hier: ' +
+    'een toestandscontrole, geen duplicaatlaag (MUTATIECONTRACT.md par. 5o).'),
+
+  zelfdeStand('POST /api/rtfos/bescherming/sluit', 'rtfos.bescherming.sluit',
+    'De tweede oproep kwam terug met 400 ("deze zaak is al gesloten"), en de bewaartermijn van de ' +
+    'eerste sluiting bleef staan. Een toestandscontrole, geen duplicaatlaag (par. 5o).'),
+
+  ['POST /api/rtfos/bescherming/zaken', {
+    mutatieId: 'rtfos.bescherming.zaken', herkomst: 'mens',
+    semantiek: { klasse: 'idempotent' },
+    toegang: TOEGANG,
+    stand: 'NOT_APPLICABLE',
+    nagekeken: 'Claude (Opus 5), 2026-09-02: de handler (lijst() in kern/beschermzaak/index.js) ' +
+      'roept geen save() en geen audit() aan -- hij leest S().beschermzaken, filtert en geeft ' +
+      'lijstbeeld() terug. De gemeten ronde bevestigde dat: twee oproepen, hetzelfde aantal, geen ' +
+      'nieuwe regel in de opslag.',
+    bewijs: {
+      gemeten: 'dubbeltik-ronde: twee keer opvragen gaf hetzelfde aantal en liet geen spoor na',
+      op: OP
+    },
+    afgetekend: AFGETEKEND
+  }]
+]);
+
+module.exports = { CONTRACTEN };

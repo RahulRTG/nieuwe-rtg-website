@@ -1,16 +1,16 @@
 {
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
-  "vastgelegd": "2026-08-31",
+  "vastgelegd": "2026-09-02",
   "gemeten": {
-    "bestanden": 1896,
-    "vormen": 1292,
-    "velden": 1843,
-    "modules": 692,
-    "domeinen": 246,
+    "bestanden": 1900,
+    "vormen": 1294,
+    "velden": 1845,
+    "modules": 694,
+    "domeinen": 247,
     "envelopDrempel": 15,
-    "envelop": 32,
-    "veldenDomeineigen": 1294,
-    "veldenGedeeldVanafVier": 184,
+    "envelop": 33,
+    "veldenDomeineigen": 1293,
+    "veldenGedeeldVanafVier": 183,
     "gelijkendeVormparen": 19
   },
   "envelop": [
@@ -36,6 +36,7 @@
     "ref",
     "sinds",
     "soort",
+    "stand",
     "status",
     "supplierCode",
     "tekst",
@@ -70,18 +71,6 @@
         "kern/commercie",
         "kern/concern",
         "kern/gewoonten"
-      ]
-    },
-    {
-      "veld": "stand",
-      "domeinen": 14,
-      "waar": [
-        "bedrijf",
-        "kern/bureau",
-        "kern/command",
-        "kern/commercie",
-        "kern/concern",
-        "kern/eten"
       ]
     },
     {
@@ -457,6 +446,42 @@
       ]
     },
     {
+      "veld": "stad",
+      "domeinen": 9,
+      "waar": [
+        "kern/beschermzaak",
+        "kern/foundationregistratie-uitgifte",
+        "kern/ledenbalie",
+        "kern/livinglab",
+        "kern/mobiliteit",
+        "kern/rechterhand"
+      ]
+    },
+    {
+      "veld": "ingetrokken",
+      "domeinen": 9,
+      "waar": [
+        "bedrijf",
+        "kern/beschermzaak",
+        "kern/command",
+        "kern/festival",
+        "kern/mobiliteit",
+        "kern/reisuitnodiging-gebruik"
+      ]
+    },
+    {
+      "veld": "stappen",
+      "domeinen": 9,
+      "waar": [
+        "kern/beschermzaak",
+        "kern/commercie",
+        "kern/magnaat-trainingslobby",
+        "kern/magnaatwereld",
+        "kern/muziek",
+        "kern/ondernemerpoort"
+      ]
+    },
+    {
       "veld": "bestemming",
       "domeinen": 9,
       "waar": [
@@ -502,30 +527,6 @@
         "kern/festival",
         "kern/ledenbalie",
         "kern/livinglab"
-      ]
-    },
-    {
-      "veld": "periode",
-      "domeinen": 8,
-      "waar": [
-        "kern/aanmeldingen",
-        "kern/commercie",
-        "kern/fiscaal",
-        "kern/kosten",
-        "kern/overheid",
-        "kern/payroll"
-      ]
-    },
-    {
-      "veld": "regels",
-      "domeinen": 8,
-      "waar": [
-        "kern/agent",
-        "kern/commerce",
-        "kern/facturatie",
-        "kern/gast",
-        "kern/magnaat-economie",
-        "kern/mall"
       ]
     }
   ],
@@ -792,6 +793,20 @@
     },
     {
       "gelijkenis": 0.63,
+      "a": "server/kern/geloofbieb.js",
+      "b": "server/kern/reisbieb/index.js",
+      "domeinA": "kern/geloofbieb",
+      "domeinB": "kern/reisbieb",
+      "gedeeld": [
+        "categorie",
+        "categorieLabel",
+        "gratis",
+        "nr",
+        "prijsCenten"
+      ]
+    },
+    {
+      "gelijkenis": 0.6,
       "a": "server/kern/gast/order-beeld.js",
       "b": "server/kern/horeca/regel.js",
       "domeinA": "kern/gast",
@@ -805,22 +820,7 @@
         "ingredienten",
         "itemId",
         "lijstprijs",
-        "opties",
-        "stand"
-      ]
-    },
-    {
-      "gelijkenis": 0.63,
-      "a": "server/kern/geloofbieb.js",
-      "b": "server/kern/reisbieb/index.js",
-      "domeinA": "kern/geloofbieb",
-      "domeinB": "kern/reisbieb",
-      "gedeeld": [
-        "categorie",
-        "categorieLabel",
-        "gratis",
-        "nr",
-        "prijsCenten"
+        "opties"
       ]
     }
   ]

@@ -12,7 +12,11 @@
  "correcties": [
   {
    "op": "2026-09-02",
-   "waar": ["commit 306fb14e", "commit 0a816ed0", "PR RahulRTG/nieuwe-rtg-website#173"],
+   "waar": [
+    "commit 306fb14e",
+    "commit 0a816ed0",
+    "PR RahulRTG/nieuwe-rtg-website#173"
+   ],
    "onderwerp": "de prijs van een ongemeten toetsbestand in scripts/lib/delen.js",
    "bewering": "dat een ongemeten toetsbestand het ZWAARSTE bekende gewicht kreeg -- 870 seconden per schermtoets, en negen unit-toetsen van eenentwintig minuten elk (een factor tachtig)",
    "klopt": "de terugval stond sinds 1 september 2026 al op de p99 en niet op het maximum. De werkelijke prijs was 60552 ms voor een schermtoets (modus onbekend) en 45632 ms voor een unit-toets (modus dekking), tegen 11000 ms en 47-11346 ms werkelijk gemeten. Een factor 5, geen factor 80.",
@@ -20,6 +24,19 @@
    "bron": "scripts/lib/duurprijs.js (de percentielen per klasse per modus) en TOETSDUUR.json",
    "raaktDeCode": false,
    "toelichting": "De gemaakte reparaties blijven kloppen: de negen unit-toetsen en zestien schermtoetsen waren echt ongemeten en zijn echt te duur ingeboekt. Alleen de FACTOR was verkeerd opgeschreven."
+  },
+  {
+   "op": "2026-09-02",
+   "waar": [
+    "PR RahulRTG/nieuwe-rtg-website#173, comment 5517441656"
+   ],
+   "onderwerp": "of test/grammatica.e2e.js door deze tak zakte",
+   "bewering": "dat kycspoor.test.js en grammatica.e2e.js 'wel door deze tak zakten' en dat 'beide toetsen terug zijn op hun oude scherf'",
+   "klopt": "dat geldt voor kycspoor.test.js en niet voor grammatica.e2e.js. Grammatica zakt op head 54e6c321 opnieuw, en met exact dezelfde uitslag (854 !== 796) op PR #174, een tak die deze code nergens raakt. Zijn SCHERF hing wel aan de geschatte gewichten van deze tak -- dat is nagemeten en blijft staan -- maar zijn FALEN niet: het is een bestaande, omgevingsafhankelijke toets, net als bestellen-scherm.e2e.js.",
+   "waarom": "ik concludeerde 'weg' uit EEN groene ronde (head b6a14a60). Dat is precies het zwakke bewijs waar ik bestellen-scherm.e2e.js op had afgerekend: een toets die soms slaagt, is niet gerepareerd. Twee rondes later zakte hij weer.",
+   "bron": "run 33693416160 (deze tak, schermscherf 4) en run 33688026500 (PR #174, schermscherf 1) -- zelfde bestand, zelfde bewering, zelfde getallen",
+   "raaktDeCode": false,
+   "toelichting": "De gemeten scherfgewichten blijven een echte reparatie: kycspoor.test.js is groen en de e2e- en unit-registers zijn compleet. Wat er niet uit volgt is dat grammatica daarmee gerepareerd zou zijn."
   }
  ]
 }

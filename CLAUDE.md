@@ -792,137 +792,19 @@ afkapgrens van vijftien sneed midden in een GELIJKE score, dus /api/bank/pas/bet
 viel op alfabet af terwijl /api/bank/advies bleef. Een gelijke score afkappen is
 willekeur, en willekeur verbergt een vermogen zonder dat iemand het merkt.
 **En meetgetallen in de documenten verouderen niet meer**: `npm run getallen`
-schrijft ze tussen merktekens uit de registers (`<!--getal:idem.ongemeten-->`), en
-`test/getallen.test.js` zakt zodra een document iets anders beweert dan zijn
-register -- inclusief een zelfijking die een met opzet verkeerd getal moet vinden.
-Nul merktekens is daar geen "in orde" maar een gezakte meter. **Blok 1 staat**: `EXECUTION_MAP.json`
-(`npm run executionmap`) is een PROJECTIE van 3282 routes -- bereikbaarheid uit
-`beleid.js`, gezagstrede uit de noemer, bewijs uit `VERTROUWEN.json`,
-herhaalbaarheid uit `IDEMPROEF.json` -- met risico, herstel en kosten als
-`ONBEPAALD` MET REDEN, want die zijn statisch niet af te leiden. Drie
-handhavingen, alle drie zakken ze: met de hand gewijzigd is rood (byte voor byte
-hercompileren), een generator die iets anders doet zonder bronwijziging is
-hetzelfde rood, en waar twee bronnen elkaar tegenspreken staat `ONBEPAALD` en
-nooit stil een winnaar. Die derde was meteen nodig: `IDEMPROEF.json` spreekt
-zichzelf 28 keer tegen over dezelfde route (`beschermd` naast `ongemeten`) -- een
-vondst in de bron, op te lossen in blok 5 en hier niet weg te poetsen. **Blok 5 is half een vondst en half een negatief.** De
-HERHALING-kant bestond al: `IDEMBESLUIT.json` verklaart 126 routes in zeven
-klassen (met het eerlijke `tebeslissen`), dus die is GEKOPPELD aan de kaart in
-plaats van nagebouwd -- meting en besluit staan er naast elkaar en de toets
-bewaakt dat het besluit de meting niet wegdrukt. De HERSTEL-kant is gemeten
-(`npm run herstel`, `HERSTEL.json`) en de uitkomst is dat hij NIET af te leiden
-is: van 3282 routes hebben er 74 een kandidaat-tegenhanger op grond van hun naam
-(2,4%), 4 zijn dubbelzinnig en 0 waren er bevestigd. Niets komt boven de graad
-`vermoed` uit een naam, want /agenda/bewaar is geen omkering van /verwijder. Wat
-herstel nodig had bleek geen verklaringsregister maar een PROEF, en die staat er:
-`scripts/herstelproef.js` VOERT het paar uit (heen, kijken, terug, kijken) en
-vergelijkt de INHOUD van de opslag -- over 90 paren: 13 `exact`, 30
-`compensatie`, 1 `geen-herstel`, **0 niet beproefd** en 46 die een WERELD vragen
-die de proef niet opzet (een zaak met de werkvorm journalistiek, een ingericht landpakket, een
-salon), elk met wat er zou moeten bestaan erbij. Elk paar draagt dus een uitslag.
-`scripts/lib/herstelwereld.js` is daarvoor wat `idemwereld.js` voor de
-idempotentieproef is: de tegenhanger is de voorbereiding, het lijf staat per
-route, een voorziening laat het onderwerp langs de gewone route ontstaan, en de
-wereld gaat eenmalig aan. Hij draait drie sessies en haalt de rol uit
-IDEMPROEF.json, want wie /api/supplier/ ziet en daaruit leverancier afleidt zit
-er bij elke uitzondering naast. Alleen over die 42 mag een
-scherm of een bon iets over een terugweg zeggen, en dan met de SOORT erbij: een
-creditnota wist geen factuur, dus `exact` en `compensatie` worden nooit
-samengeteld. Twee dingen daar niet wegpoetsen: `nietBeproefd` is met opzet geen
-`geen-herstel` (een tekort van de proef is geen oordeel over het paar), en zonder
-de OPWARMRONDE bestaat de collectie nog niet en heet elk paar `compensatie` --
-een hoogste graad die niemand kan halen is geen graad. Drie dingen die daar stil verkeerd gingen en die je nergens anders
-moet herhalen: een verdict is een BESCHULDIGING (`geen-herstel` zegt dat een
-route liegt, dus dat oordeel wordt niet geveld als de sleutel uit het laatste
-element van een lijst is GERADEN), wachten op stilte is niet wachten op de
-schrijver (twee gelijke metingen vlak na een oproep zijn allebei van VOOR de
-schrijfronde, dus wordt er gewacht tot het beeld VERANDERT), en de proef
-beinvloedt zichzelf -- wat in de volle ronde niet lukt draait nog een keer alleen
-op een eigen server, en lukt het dan wel dan draagt de uitslag `ordeAfhankelijk`.
-Die opwarmronde heeft ook
-een prijs, en die staat in de uitslag: een EENMALIG gevolg (een kostenregel bij de
-eerste aanmaak) valt erin en wordt niet gemeten, dus `exact` betekent hier exact
-bij een TWEEDE en volgende uitvoering. De proef beproeft daarom ook de al
-bevestigde paren -- doet hij dat niet, dan verdwijnt een bevestiging bij de
-volgende ronde uit het register, en een bevestiging die zichzelf opheft is erger
-dan geen. Let ook op de tegenspraakregel
-die er bijna verkeerd in kwam: `code-maker` naast een gemeten `beschermd` is GEEN
-bug, want de proef kent `beschermd` pas toe als de VERSE sleutel iets anders gaf. **Blok 3 staat** (`server/kern/stuur/plan.js`, gereedschap `plan`):
-het model levert doel + stappen, de compiler weegt ze en geeft een uitvoerbaar
-plan of een afwijzing MET bezwaren -- inclusief hoeveel bevestigingen het plan
-vooraf gaat vragen en welke. Vier regels houden hem klein en alle vier zakken ze
-op een mutatie: **PLAN voert niets uit** (getoetst op de BRON: geen fetch, geen
-stuurRoep), **PLAN bezit niets** (het oordeel is exact `beleidVoor()`), **de
-autoriteit komt LIVE en nooit uit EXECUTION_MAP.json** (een bouwartefact kan een
-commit achterlopen; de toets verandert de kaart en eist dat het oordeel niet
-meebeweegt), en **een verboden stap laat het hele plan zakken** in plaats van
-stil te worden overgeslagen. Wat PLAN met opzet NIET doet is de uitkomst van een
-stap doorgeven aan de volgende: zodra hij over gegevens gaat in plaats van over
-bevoegdheid, is hij niet meer klein. **Blok 4 staat half**: `kern/stuur/gevolg.js` hangt
-NAAST het plan en zegt uit een echte meting welke collecties de stappen
-aanraakten (`opslag` in IDEMPROEF.json -- 331 routes, 196 collecties). Drie
-graden, en over de 176 bereikbare paden zijn dat er 36 `gemeten`, 44
-`geen-effect-gemeten` en **96 `onbekend`**. Die laatste twee mogen NOOIT door
-elkaar lopen: "de proef kwam er niet bij" is iets anders dan "er gebeurt niets",
-en een plan dat "raakt niets aan" zegt terwijl niemand keek is een geruststelling
-zonder grond. Wat er NIET staat is een echte droogloop: het plan wordt niet in de
-zandbak uitgevoerd, er wordt een eerdere meting op geprojecteerd. **Blok 8 staat in de
-SCHADUW** (`kern/ai/router.js`): vijf technieken in volgorde -- regels,
-algoritme, optimalisatie, voorspelling, ai -- met een register van motoren die
-aantoonbaar bestaan en een uitslag die altijd een techniek EN een reden draagt.
-De vondst die het opende: de volgorde staat vandaag OMGEKEERD, want
-`demoantwoorden.js` levert al regelantwoorden maar staat in `kern/ai.js` NA het
-model. De router beslist daarom niets: hij meet hoe vaak een goedkopere techniek
-het gedekt zou hebben, en pas met dat getal is omdraaien een besluit in plaats
-van een gok (een matig regelantwoord dat een goed modelantwoord verdringt, merkt
-niemand). Hij wijst alleen naar motoren die laden, en de ontbrekende techniek
-staat er hardop bij: er is GEEN constraint solver -- kern/agent.js roostert op
-weekdagfactoren, en dat is een heuristiek. **Blok 6 staat als GRAMMATICA**
-(`kern/stuur/mandaat.js`): een mandaat verleent nooit vermogen maar VERSMALT
-bestaand vermogen, dus de speelruimte is een doorsnede die structureel niets kan
-toevoegen. Drie dingen daar niet wegpoetsen: **leeg is dicht** (geen mandaat
-betekent niets zelfstandig, niet alles), **een mandaat hoogt geen niveau op**
-(wat `voorstel` is blijft een mens vragen), en **geld en het pasbesluit blijven
-mensenwerk** hoeveel er ook in staat. Blok 7 is met opzet HALF: de speelruimte is
-de waarheid die een Mijn AI-scherm zou tonen, maar het scherm zelf komt er pas
-als de bewijsschuld gesloten is -- anders toont het een macht die het systeem niet
-kan definiëren. Blok 9 (commandbalk) is om dezelfde reden bewust niet gebouwd:
-0 bewezen routes en 96 van 176 onbekende gevolgen dragen geen balk die het hele
-huis in gewone taal bedient. Hij verandert geen bevoegdheid en kan dat ook niet
-(hij filtert de lijst die `beleid.js` al goedkeurde, en toets 1 houdt vast dat de
-uitkomst altijd een deelverzameling is), en zijn woordenschat komt uit de
-padsegmenten zelf zodat er geen tweede routelijst ontstaat. Twee dingen daar niet
-wegpoetsen: een versmalling die het GEVRAAGDE vermogen verbergt is de gevaarlijkste
-faalvorm van deze laag (vandaar dat `kaart` met `alles: true` de versmalling altijd
-overslaat), en een brug als `taxi -> ride` wordt getoetst tegen de echte routes --
-`taxi -> rit` wees nergens heen en werd door die toets gevonden.
-
-**`KEURING.md` gaat over de machine die de toetsen draait** — de keuringsketen
-zelf, en de bodem onder elke latere versmalling. De hoofdregel, mechanisch gesteld: **zekerheid mag
-snelheid toestaan; onzekerheid mag nooit snelheid afdwingen** — oftewel
-volledige dekking is de uitgangstoestand en versmalling is een recht dat per
-effect verdiend moet worden. Lees die vóór je aan CI, aan testselectie of aan een impactgraaf
-werkt. De scherpste meting staat in paragraaf 1: de omgekeerde require-graaf
-versmalt `kern/pay/poort.js` naar zes toetsen, en dat is geen versmalling maar
-een blinde vlek — **819 van de 1434 toetsbestanden (57,1%) hebben geen enkele
-require-kant naar `server/`** (`npm run impactbereik`) en raken de oppervlakte via een `spawn`. Een
-planner daarop slaat ze over en meldt groen. Verder: het CI-contract met vier
-regels die de keten op zichzelf toepast (`scripts/ci-keten.js`, elke regel zien
-zakken in `test/ci-keten.test.js`), en de attributie met drie standen waarvan
-`ongemeten` de belangrijkste is — dat is nooit "raakt niets aan" maar "hierover
-is niets bewezen", en zo'n toets draagt `volleRing: true`. Paragraaf 4 zet de
-volgorde vast waarin de rest mag komen, met de resultaatcache als sluitstuk en
-nooit eerder: een cache op een graaf met een blinde vlek maakt van die vlek een
-permanente PASS. De **scherfverdeling weegt sinds 1 september 2026 op gemeten
-duur** (`TOETSDUUR.json`, zwaarste eerst naar het lichtste deel) en niet meer op
-alfabetische volgorde — die verschoof namelijk: één toetsbestand erbij
-verhuisde 299 van de 314 bestanden van een scherf, en daarmee de zware staart
-van scherf 1 naar scherf 2. De harde eis eromheen: een bestand zonder gewicht krijgt
-het **zwaarste bekende gewicht** en wordt nooit overgeslagen -- onbekend telt als
-duur, want een ontbrekende meting hoort de keten trager te maken en nooit
-stiller. Diezelfde weging stond tot 28 augustus 2026 al in `scripts/scherf.js`
-en ging bij een verhuizing naar `test:deel` verloren; dat script en zijn eigen
-register zijn opgeruimd.
+schrijft ze tussen merktekens uit de registers (`<!--getal:idem.ongemeten-->3080<!--/getal--> randen,
+<!--getal:verstrengeling.onverklaard-->111<!--/getal--> onverklaard — en dát getal moet naar nul, niet het
+aantal randen), de activering per functie, de deltapoort die er niets bij laat
+komen, de tredeproef over alle zeven treden van LAUNCH.md (0 lekken), en de
+wekkers (<!--getal:wekkers.onverklaard-->8<!--/getal--> die geen enkele functie raken). Drie dingen daar
+niet wegpoetsen: **een knoop is laag + domein en nooit domein alleen** (zonder de
+laag lijkt een ingang die zijn eigen domein aanroept de zwaarste verstrengeling
+van het huis), **de require-graaf ziet de kern-tas niet** (de meeste
+route-bestanden hebben nul requires en krijgen hun domein via `(kern) => ...`),
+en de tredeproef geeft **twee uitslagen die nooit worden opgeteld** — zuiver
+(compleet, bewijst de bedrading niet) en beproefd (bewijst de bedrading, kan niet
+compleet zijn). Dat verschil vond meteen een webhook die 200 gaf terwijl zijn
+functie uit stond.
 
 **`LAT.md` is de technische lat** — elf regels die allemaal uit een fout komen die hier écht is gemaakt, met per regel wat hem handhaaft en waar er alleen op mensen wordt vertrouwd. Lees die vóór je code schrijft of repareert. De belangrijkste twee: repareer de oorzaak en niet het symptoom, en trek elke bewering na met een mutatie (een toets die je niet hebt zien zakken is geen toets). LAT.md gaat over de code, CLAUDE.md over het merk.
 

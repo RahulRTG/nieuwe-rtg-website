@@ -62,13 +62,40 @@ const GETALLEN = {
   'semantiek.namen': { bron: 'SEMANTIEK.json', veld: 'namenInMeerDomeinen',
     wat: 'namen die in meer dan een domein voorkomen' },
   'semantiek.betekenissen': { bron: 'SEMANTIEK.json', veld: 'woordenMetMeerBetekenissen',
-    wat: 'namen die meer dan een betekenis dragen' }
+    wat: 'namen die meer dan een betekenis dragen' },
+  /* De vijf registers van de binnenpoort (MODULAIR.md). */
+  'verstrengeling.randen': { bron: 'VERSTRENGELING.json', veld: 'randen',
+    wat: 'randen tussen twee knopen van RTG' },
+  'verstrengeling.onverklaard': { bron: 'VERSTRENGELING.json', veld: 'onbekend',
+    wat: 'randen die niemand heeft verklaard' },
+  'verstrengeling.domeinen': { bron: 'VERSTRENGELING.json', veld: 'domeinknopen',
+    wat: 'domeinen in de graaf' },
+  'verstrengeling.uitneembaar': { bron: 'VERSTRENGELING.json', veld: 'volledigUitneembaar',
+    wat: 'domeinen die geen ander domein meeslepen' },
+  'activering.functies': { bron: 'ACTIVERING.json', veld: 'functiesMetEnvelop',
+    wat: 'functies met een activeringsenvelop' },
+  'activering.gemeten': { bron: 'ACTIVERING.json', veld: 'perGraad.gemeten',
+    wat: 'functies waarvan de envelop volledig gemeten is' },
+  'activering.ondergrens': { bron: 'ACTIVERING.json', veld: 'perGraad.ondergrens',
+    wat: 'functies waarvan de envelop een ondergrens is' },
+  'activering.mediaan': { bron: 'ACTIVERING.json', veld: 'mediaanKnopen',
+    wat: 'knopen die een doorsnee functie raakt' },
+  'trede.routes': { bron: 'TREDEPROEF.json', veld: 'routes',
+    wat: 'API-routes die de tredeproef telde' },
+  'trede.inTrede': { bron: 'TREDEPROEF.json', veld: 'routesInTrede',
+    wat: 'routes die op trede 0 openstaan' },
+  'trede.lekken': { bron: 'TREDEPROEF.json', veld: 'zuiverLekken',
+    wat: 'routes buiten trede 0 die de schakelkast niet dichtzet' },
+  'wekkers.totaal': { bron: 'WEKKERS.json', veld: 'wekkers',
+    wat: 'plekken die werk kunnen beginnen zonder dat iemand een pad opvraagt' },
+  'wekkers.onverklaard': { bron: 'WEKKERS.json', veld: 'ongeschakeld',
+    wat: 'wekkers die geen functie raken en niet verklaard zijn' }
 };
 
 /* De documenten die merktekens mogen dragen. Bewust een lijst en geen glob over
    alles: een generator die elk .md-bestand mag herschrijven, herschrijft op een
    dag ook iets dat niemand had bedoeld. */
-const DOCUMENTEN = ['CLAUDE.md', 'CREATE.md', 'EXECUTIE.md', 'OS.md', 'BEWIJSMACHINE.md'];
+const DOCUMENTEN = ['CLAUDE.md', 'CREATE.md', 'EXECUTIE.md', 'OS.md', 'BEWIJSMACHINE.md', 'MODULAIR.md'];
 
 const MERK = /<!--getal:([a-zA-Z0-9._-]+)-->([\s\S]*?)<!--\/getal-->/g;
 

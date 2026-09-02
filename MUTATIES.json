@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-02T18:10:30.598Z",
-    "commit": "4423719c",
+    "op": "2026-09-02T18:18:36.577Z",
+    "commit": "ea725c8a",
     "boomVuil": true,
     "node": "v22.22.2"
   },
@@ -1310,6 +1310,14 @@
       "module": "scripts/lib/delen.js",
       "operator": "===->!==#0",
       "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "deltapoort.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/deltapoort.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
       "geprobeerd": 1
     },
     "demostand.test.js": {

@@ -106,6 +106,8 @@ const { routesInBron } = require('./lib/routes');
 const { maakZoeker } = require('./lib/routedekking');
 const { zonderCommentaar } = require('./lib/bron');
 const V = require('./verstrengeling');
+const { PATRONEN: INGANGPATRONEN } = require('./wekkers');
+const VERKLAARDE_INGANGEN = new Set(require('./lib/wekker-verklaringen').map(v => v.bestand));
 
 const arg = (naam, std) => { const i = process.argv.indexOf(naam); return i > 0 ? process.argv[i + 1] : std; };
 const TOON = process.argv.includes('--toon');
@@ -302,6 +304,38 @@ const REGELS = [
       const toen = telSkips(voor);
       if (nu > toen) return [{ bericht: 'zelfpoortende toetsen gaan van ' + toen + ' naar ' + nu }];
       return [];
+    }
+  },
+  {
+    naam: 'nieuwe-ingang-buiten-http',
+    meter: 'wekkersOnverklaard',
+    wat: 'klokken, busabonnees, eigen servers en werkers: werk dat begint zonder dat iemand een pad opvraagt',
+    geldt: isServer,
+    keur(pad, voor, na) {
+      /* DE INGANGENKAART BEWAAKT HET GEHEEL, DEZE REGEL HET NIEUWE WERK.
+
+         Een setInterval, een busabonnee, een eigen server op een eigen poort of
+         een tweede proces: alle vier kunnen ze werk beginnen buiten de
+         functieschakelaars om. Bestaande gevallen staan geteld en verklaard
+         (scripts/lib/wekker-verklaringen.js); wat er BIJ komt, hoort meteen
+         gezegd te worden -- want achteraf uitzoeken waar een timer vandaan komt
+         is precies het werk dat deze hele ronde heeft gekost.
+
+         Een bestand dat al verklaard is, mag zijn ingangen houden: die vraag is
+         beantwoord. */
+      if (VERKLAARDE_INGANGEN.has(pad)) return [];
+      const tel = (bron) => INGANGPATRONEN.map(p => ({ soort: p.soort,
+        n: (String(bron || '').match(new RegExp(p.rx.source, 'g')) || []).length }));
+      const nu = tel(na), toen = tel(voor === null ? '' : voor);
+      const uit = [];
+      for (let i = 0; i < nu.length; i++) {
+        if (nu[i].n <= toen[i].n) continue;
+        uit.push({ bericht: (voor === null ? 'nieuw bestand met ' : 'erbij: ') + (nu[i].n - toen[i].n) +
+            ' ingang(en) van de soort ' + nu[i].soort + ' (' + INGANGPATRONEN[i].wat + ')',
+          hulp: 'hang hem aan een functie zodat de boardroom hem kan uitzetten, of zet hem met een reden in ' +
+            'scripts/lib/wekker-verklaringen.js -- npm run wekkers laat zien hoe hij nu telt' });
+      }
+      return uit;
     }
   },
   {

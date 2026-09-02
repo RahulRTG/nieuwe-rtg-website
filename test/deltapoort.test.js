@@ -155,6 +155,32 @@ function metWegwerpRepo(doe) {
   } finally { fs.rmSync(map, { recursive: true, force: true }); }
 }
 
+test('nieuwe-ingang-buiten-http: een nieuwe klok of server moet worden gezegd', () => {
+  const r = regel('nieuwe-ingang-buiten-http');
+  assert.equal(r.keur('server/kern/nieuw.js', null, 'setInterval(veeg, 1000);').length, 1,
+    'een nieuw bestand met een timer hoort uit te slaan');
+  assert.equal(r.keur('server/kern/nieuw.js', null, "require('net').createServer(f);").length, 1,
+    'en een eigen server op een eigen poort ook');
+  assert.equal(r.keur('server/kern/nieuw.js', null, 'module.exports = () => 1;').length, 0,
+    'een gewoon bestand niet -- anders slaat de regel op alles uit en gaat hij uit');
+});
+
+test('nieuwe-ingang-buiten-http: de erfenis mag blijven, maar niet groeien', () => {
+  const r = regel('nieuwe-ingang-buiten-http');
+  const oud = 'setInterval(a, 1);';
+  assert.equal(r.keur('server/kern/x.js', oud, oud + '\nconst y = 1;').length, 0,
+    'een bestaande timer houden mag; anders is elke wijziging aan zo\'n bestand geblokkeerd');
+  assert.equal(r.keur('server/kern/x.js', oud, oud + 'setInterval(b, 2);').length, 1, 'een tweede erbij niet');
+  assert.equal(r.keur('server/kern/x.js', oud, '').length, 0, 'hem weghalen mag altijd');
+});
+
+test('nieuwe-ingang-buiten-http: een al verklaarde ingang wordt met rust gelaten', () => {
+  /* server/bus.js IS de bus; die vraag is beantwoord en staat met een reden in
+     de verklaringen. Een poort die daar opnieuw over begint, wordt uitgezet. */
+  const r = regel('nieuwe-ingang-buiten-http');
+  assert.equal(r.keur('server/bus.js', null, 'x.subscribe(f); x.subscribe(g);').length, 0);
+});
+
 test('nieuwe-onverklaarde-rand: een NIEUW bestand mag er geen enkele hebben', () => {
   const r = regel('nieuwe-onverklaarde-rand');
   /* De indeling van het hele huis komt normaal uit VERSTRENGELING.json; hier

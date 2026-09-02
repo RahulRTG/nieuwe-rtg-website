@@ -17,7 +17,7 @@
 
 module.exports = (kern) => {
   const { app, save, supplierAuth, managerOnly, logActivity, sseToSupplier, horeca } = kern;
-  const { H } = horeca;
+  const { H, Hlees } = horeca;
   const registerlaag = require('../../../kern/horeca/rahul-register');
   const recht = require('../../../kern/horeca/rahul-recht')({ horeca, save });
   const UITVOERDERS = require('./rahul-doen')(kern);
@@ -75,6 +75,15 @@ module.exports = (kern) => {
      voorraadverschil, korting) allemaal geld of veiligheid raken. */
   app.post('/api/supplier/horeca/rahul/bevestig', supplierAuth, (req, res) => {
     if (!managerOnly(req, res)) return;
+    /* H() MAAKT de doos van een zaak aan zodra iemand ernaar vraagt, ook als er
+       daarna een 404 volgt omdat de bon niet bestaat. Eerst kijken met Hlees()
+       -- is er niets, dan is er ook geen bon en gaat het verzoek terug zonder
+       spoor. Zie ook kern/horeca.js bij Hlees(); daar staat waarom dat onderscheid
+       bestaat. */
+    const bonId = String((req.body || {}).bonId || '');
+    if (!recht.bonnen(Hlees(req.supplier.code), recht.MAX).some((b) => b.id === bonId)) {
+      return res.status(404).json({ error: 'Deze actiebon kennen we niet.' });
+    }
     const h = H(req.supplier.code);
     const uit = recht.bevestig(h, (req.body || {}).bonId, wieVan(req), (bon) => {
       const f = UITVOERDERS[bon.handeling];

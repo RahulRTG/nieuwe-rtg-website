@@ -107,7 +107,13 @@ async function start(opties) {
        gaat hierna en wint dus van deze regel. */
     env: Object.assign({}, process.env, {
       PORT: String(poort), RTG_DATA_DIR: datamap, SMTP_URL: '', STUN_UIT: '1',
-      RTG_SCHORSPOORT_UIT: '1'
+      RTG_SCHORSPOORT_UIT: '1',
+      /* De achtergrondtikkers van RTG Command uit: een klok die binnen het
+         meetvenster afgaat, krijgt zijn schrijfactie toegerekend aan de route
+         die op dat moment onder de meetklok ligt. Zie
+         server/kern/command/tikkerstand.js -- twee routes stonden daardoor
+         geschorst en gaven 503 op echt verkeer. */
+      RTG_TIKKERS_UIT: '1'
     }, o.env || {})
   });
 

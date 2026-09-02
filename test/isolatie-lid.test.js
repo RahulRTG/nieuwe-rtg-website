@@ -374,3 +374,60 @@ test('8. het scherm belooft niet meer dan de code doet', async () => {
   assert.ok(!/Dat werkt meteen/.test(html),
     'de pagina belooft nog steeds handhaving in vaste tekst; die hoort uit het antwoord te komen');
 });
+
+test('9. de AI-kaart versmalt echt, en zegt erbij wat er wegviel', async () => {
+  /* DIT IS DE ENIGE BELOFTE DIE DEZE LAAG VANDAAG WERKELIJK WAARMAAKT, en tot nu
+     toe was hij alleen per module getoetst. Een lid dat zichzelf dichtzet, ziet
+     de assistent minder kunnen -- en dat hoort end-to-end te kloppen, over de
+     route, de sessie, de dragervertaling en het filter heen.
+
+     DE TWEEDE HELFT IS DE BELANGRIJKSTE. Een kaart die stilletjes korter is,
+     laat het model denken dat die vermogens niet BESTAAN, en dan zegt het tegen
+     een mens "dat kan ik niet" in plaats van "dat kan nu niet, omdat".
+     EXECUTIE.md blok 0 noemt dat de gevaarlijkste faalvorm van deze laag.
+
+     GEMETEN bij het schrijven: 120 paden voor, 50 erna, 70 weggevallen met de
+     zin "er staat een beveiligingsstand aan op identiteit". De getallen staan
+     hier NIET hard in -- ze schuiven met elke route die het huis erbij krijgt --
+     maar de VERHOUDING wel: er moet fors zijn versmald, er moet iets overblijven,
+     en het verschil moet worden uitgelegd.
+
+     MUTATIES die zijn gedraaid (LAT.md regel 2):
+     - `isoContext(req)` weghalen uit de /kaart-route -> ZAKT (geen versmalling).
+     - `metUitleg` de beveiligingsstand laten weglaten -> ZAKT op de uitleg.
+     - de vlag `isolatie` niet meegeven over het WERK-filter heen -> ZAKT op de
+       uitleg (dat is een echte val: `filter()` levert een nieuwe array en die
+       draagt een niet-opsombare eigenschap niet vanzelf mee). */
+  const lid = await nieuwLid();
+
+  const voor = await api('/api/member/doe/kaart', {}, lid);
+  assert.equal(voor.status, 200);
+  const nVoor = (voor.body.paden || []).length;
+  assert.ok(nVoor > 50, 'een lid zonder stand hoort een ruime kaart te krijgen: ' + nVoor);
+  assert.equal(voor.body.beveiligingsstand, undefined,
+    'zonder stand hoort er geen beveiligingszin te staan; anders went hij en leest niemand hem nog');
+
+  await api('/api/isolatie/mijn/zet',
+    { drager: 'identiteit', naar: 'isolatie', reden: 'Ik kreeg een vreemde inlogmelding' }, lid);
+
+  const na = await api('/api/member/doe/kaart', {}, lid);
+  const nNa = (na.body.paden || []).length;
+  assert.ok(nNa < nVoor, 'onder isolatie hoort de kaart korter te zijn: ' + nVoor + ' -> ' + nNa);
+  assert.ok(nNa > 0,
+    'maar niet leeg -- een assistent die niets meer kan, is een assistent die iemand uitzet');
+
+  const b = na.body.beveiligingsstand;
+  assert.ok(b, 'de kaart hoort te ZEGGEN dat er iets wegviel; stilletjes korter is de gevaarlijkste vorm');
+  assert.equal(b.weggevallen, nVoor - nNa, 'en het getal hoort te kloppen met het verschil');
+  assert.match(String(b.uitleg), /beveiligingsstand/,
+    'met een zin die een mens kan lezen: ' + b.uitleg);
+  assert.match(String(b.uitleg), /identiteit/, 'en die zegt op WELKE drager hij staat');
+
+  /* En wat er wegviel is niet willekeurig: geld sturen hoort erbij te zitten,
+     lezen niet. Zonder deze twee zou de toets ook slagen op een filter dat de
+     helft van de lijst weggooit. */
+  const weg = (voor.body.paden || []).filter(p => !(na.body.paden || []).includes(p));
+  assert.ok(weg.includes('/api/pay/stuur'), 'geld sturen hoort dicht te gaan');
+  assert.ok((na.body.paden || []).includes('/api/agenda/mijn'),
+    'en de eigen agenda lezen hoort te blijven -- lezen loopt door');
+});

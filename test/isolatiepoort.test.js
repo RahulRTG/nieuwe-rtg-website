@@ -106,35 +106,56 @@ test('4. de uitgang blijft open, OOK met de vlag om', () => {
   }
 });
 
-test('4b. de uitgang overleeft ook een HUIS dat alles zou sluiten', () => {
-  /* DIT IS WAT TOETS 4 NIET MAT, en dat kwam uit een mutatie: de
-     openpaden-controle uit weeg() halen liet toets 4 groen, want vandaag laat
-     `besluit()` diezelfde paden toch al door -- ze staan in EIGEN_UITGANG, dus de
-     leesset redt ze een laag lager. De controle in de poort beschermt dus niet
-     tegen VANDAAG maar tegen MORGEN: het HUIS-been draait ervoor, kent openpaden
-     niet, en sluit die paden zodra een van hen een functie in de catalogus
-     krijgt. Dan is de val er, en dan is hij niet te ontsluiten.
+test('4b. de uitgang overleeft de DRAGER, en het HUIS overrulet de uitgang', () => {
+  /* TWEE BEWERINGEN DIE MAKKELIJK EEN WORDEN, en het verschil is een echte fout
+     die ik in de eerste versie heb gemaakt.
 
-     Een toets die dat niet kan meten met de echte beschermstand, meet het met een
-     die alles sluit. Dat is geen gekunsteld geval: het IS de toekomstige stand
-     waar de regel voor bestaat.
+     WAT TOETS 4 NIET MAT: de openpaden-controle uit weeg() halen liet hem groen,
+     want vandaag laat `besluit()` diezelfde paden toch al door -- ze staan in
+     EIGEN_UITGANG, dus de leesset redt ze een laag lager. De controle in de poort
+     beschermt tegen MORGEN: zodra een van die paden een functie krijgt, sluit het
+     drager-been ze. Dat wordt hieronder gemeten met een besluitlaag die alles
+     sluit.
 
-     MUTATIE: de openpaden-controle uit weeg() halen -> ZAKT. */
-  opstelling({ afdwingen: true });
+     WAT DE EERSTE VERSIE FOUT DEED: hij zette de uitgangen voor BEIDE benen, dus
+     ook voor het huis. Dat is SEC-LOCK-003 overtreden -- een vrijstellingslijst
+     uit de ledenlaag die het oordeel van de eigenaar overrulet is een lagere
+     drager die een hogere neutraliseert. Vandaag maakte het geen verschil (geen
+     van de twintig paden wordt onder `beschermd` door houdtTegen gesloten), en
+     juist daarom was het het moment om de volgorde goed te zetten.
+
+     MUTATIES: de openpaden-controle uit weeg() halen -> deel 1 ZAKT. De controle
+     terugzetten VOOR het huis-been -> deel 2 ZAKT. */
+  const db = { data: { techniek: { incidentcontrole: { modus: 'beschermd' } } } };
   const allesDicht = { houdtTegen: () => ({ functie: 'verzonnen', naam: 'Alles',
     categorie: 'Geld', waarom: 'een beschermstand die alles sluit' }) };
-  const db = { data: { techniek: { incidentcontrole: { modus: 'beschermd' } } } };
 
-  for (const pad of UITGANGEN) {
-    assert.equal(poort.weeg(verzoek(pad), { db, beschermstand: allesDicht }), null,
-      pad + ' viel dicht op het huis-been; dan is de uitgang weg zodra iemand dat pad een functie ' +
-      'geeft, en een stand zonder uitgang is een val');
-  }
+  /* 1. TEGEN DE DRAGER blijft de uitgang open -- ook als het drager-oordeel alles
+        zou sluiten. Dit is de val die deze laag al twee keer heeft gerepareerd:
+        een lid dat zichzelf dichtzette en er niet meer uit kon. */
+  const iso = opstelling({ afdwingen: true });
+  const echteBesluit = iso.besluit;
+  iso.besluit = () => ({ toegestaan: false, reden: 'PROEF', uitleg: 'alles dicht', dragers: [] });
+  try {
+    for (const pad of UITGANGEN) {
+      assert.equal(poort.weeg(verzoek(pad), {}), null,
+        pad + ' viel dicht op het drager-been; een stand zonder uitgang is een val');
+    }
+    assert.ok(poort.weeg(verzoek('/api/pay/stuur'), {}),
+      'een gewoon pad valt daar WEL dicht -- anders meet deze toets niets');
+  } finally { iso.besluit = echteBesluit; }
 
-  /* En de tegenproef: een gewoon pad valt daar WEL dicht -- anders zou deze toets
-     ook slagen op een poort die het huis-been helemaal niet raadpleegt. */
+  /* 2. TEGEN HET HUIS wint het HUIS. De eigenaar zet de noodstop om; een lijst
+        uit de laag daaronder houdt die niet open. */
+  opstelling({ afdwingen: true });
+  const opHuis = poort.weeg(verzoek(UITGANGEN[0]), { db, beschermstand: allesDicht });
+  assert.ok(opHuis && opHuis.been === 'huis',
+    'het huis-oordeel hoort te winnen van de uitgangslijst (SEC-LOCK-003): een lagere drager ' +
+    'neutraliseert een hogere niet');
+
+  /* En het huis sluit een gewoon pad ook -- de tegenproef op de tegenproef. */
   const gewoon = poort.weeg(verzoek('/api/pay/stuur'), { db, beschermstand: allesDicht });
-  assert.ok(gewoon && gewoon.been === 'huis', 'het huis-been hoort een gewoon pad wel te sluiten');
+  assert.ok(gewoon && gewoon.been === 'huis');
 });
 
 test('5. lezen loopt door, en een verzoek zonder sessie wordt niet gewogen', () => {
@@ -162,4 +183,69 @@ test('6. het huis-been blijft werken, en gaat VOOR het drager-been', () => {
   assert.equal(uit.been, 'huis');
   assert.equal(uit.antwoord.reden, 'bescherming');
   assert.ok(uit.antwoord.categorie, 'en zegt welke categorie bevroren is');
+});
+
+test('7. de poort is VLAK: 50.000 standen kosten niet meer dan nul', () => {
+  /* DE EIGENSCHAP DIE DE KOP VAN isolatiepoort.js CLAAMT, hier vastgepind. Een
+     bewering over complexiteit in commentaar is een bewering die niemand
+     nakijkt, en juist deze glijdt makkelijk weg: elke `Object.keys()`,
+     `for..in` of `.filter()` op een dragerkaart maakt de poort O(n), en dan
+     wordt het platform trager naarmate MEER mensen zich beschermen -- precies
+     op het moment dat de laag wordt gebruikt.
+
+     GEMETEN, en de getallen zijn hard: `Object.keys(kaart).length === 0` kost
+     bij 50.000 sleutels 8,5 MILLISECONDE, en `for (const k in kaart) return
+     false;` -- de voor de hand liggende uitweg -- 8,4 ms, want V8 materialiseert
+     de sleutelverzameling voordat de lus begint. Een gewone opzoeking blijft op
+     0,013 us. Er is dus geen goedkope leegtetest; er is alleen de juiste vraag.
+
+     DEZE TOETS MEET TIJD, EN DAT IS NORMAAL EEN SLECHT IDEE -- een trage
+     bouwmachine laat hem dan zakken om de verkeerde reden. Vandaar een RUIME
+     drempel (factor 4) en een VERHOUDING in plaats van een absoluut getal: hij
+     vergelijkt de poort met zichzelf op een lege kaart, op dezelfde machine, in
+     hetzelfde proces. Een O(n)-regressie is hier geen factor 4 maar een factor
+     duizend, dus de ruimte kost geen scherpte.
+
+     MUTATIE die hem laat zakken: in weeg() een aanroep zetten die de hele kaart
+     afloopt (`laag.overzicht()`) -> ZAKT, gedraaid. Die eerste ronde liep met
+     20.000 herhalingen 170 seconden door in plaats van te zakken; het aantal
+     ronden staat daarom laag. Een toets die de bouw laat HANGEN is erger dan
+     geen toets.
+
+     Draait NIET mee in de gewone ronde als RTG_SNELLE_TOETS=1 staat: op een
+     gedeelde bouwmachine is een tijdmeting het eerste dat ruist. */
+  if (process.env.RTG_SNELLE_TOETS === '1') return;
+
+  const maakIso = require('../server/kern/isolatie');
+  function poortMet(n) {
+    const iso = maakIso({ db: { data: {} }, save() {}, functies, klok: null, huisStand: () => 'normaal' });
+    for (let i = 0; i < n; i++) {
+      iso.zet({ drager: 'identiteit', sleutel: 'lid-' + i, naar: 'isolatie',
+        door: 'toets', reden: 'meting van de vlakheid van de poort' });
+    }
+    poort._wisTelling();
+    poort.zetLaag(iso, { afdwingen: false });
+    /* Een lid dat er met opzet BUITEN valt: de dure weg is die van een schoon
+       lid, want die moet alle dragers opzoeken voordat hij niets vindt. */
+    const r = verzoek('/api/agenda/mijn');
+    r.session = { key: 'buitenstaander' };
+    /* WEINIG RONDEN, EN DAT IS EEN LES UIT DE MUTATIE. Met 20.000 ronden liep de
+       toets bij een O(n)-regressie 170 seconden door in plaats van te zakken --
+       een toets die de bouw laat HANGEN is erger dan geen toets, want niemand
+       weet dan wat er aan de hand is. Een O(n)-regressie is hier een factor
+       duizend, geen factor vier: 200 ronden zijn ruim genoeg om dat te zien, en
+       ze begrenzen de schade bij een regressie tot een paar seconden. */
+    for (let i = 0; i < 500; i++) poort.weeg(r, {});      // opwarmen
+    const t = process.hrtime.bigint();
+    for (let i = 0; i < 200; i++) poort.weeg(r, {});
+    return Number(process.hrtime.bigint() - t) / 200;
+  }
+
+  const leeg = poortMet(0);
+  const vol = poortMet(50000);
+  assert.ok(vol < leeg * 4,
+    'de poort wordt trager naarmate er MEER mensen in isolatie staan: ' +
+    (leeg / 1000).toFixed(2) + ' us bij 0 standen tegenover ' + (vol / 1000).toFixed(2) +
+    ' us bij 50.000. Ergens loopt hij nu een kaart af in plaats van er een sleutel in op te ' +
+    'zoeken -- en dan wordt het platform traag op het moment dat deze laag wordt gebruikt.');
 });

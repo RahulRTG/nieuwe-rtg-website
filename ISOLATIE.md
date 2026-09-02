@@ -939,12 +939,39 @@ samenvat liegt opnieuw, nu met een teller als dekmantel.
 
 ### Drie dingen die in de poort zitten omdat ze gemeten zijn
 
-**De voorpoort vraagt nooit "staat er érgens een stand".** Dat kost bij nul leden
-0,02 µs en bij tienduizend dichtgezette leden **~1 ms per verzoek** — het
-materialiseren van de sleutels van een dictionary-object. Honderd keer duurder dan
-het besluit dat hij moest vermijden, en precies op het moment dat de laag wordt
-gebruikt. De vraag is *"staat er een stand vóór dít verzoek"*: een hash-opzoeking,
-O(1) hoe groot de kaart ook wordt.
+**De voorpoort vraagt nooit "staat er érgens een stand".** Nagemeten bij 50.000
+dichtgezette leden:
+
+| Vraag | 0 sleutels | 50.000 sleutels |
+|---|---|---|
+| `Object.keys(kaart).length === 0` | 0,067 µs | **8.545 µs** |
+| `for (const k in kaart) return false;` | 0,040 µs | **8.450 µs** |
+| een gewone opzoeking `kaart[x]` | 0,022 µs | **0,013 µs** |
+
+Die middelste regel is de belangrijkste: stoppen na de eerste sleutel is de voor
+de hand liggende slimme uitweg, en hij is **even duur** — V8 materialiseert de
+sleutelverzameling van een dictionary-object voordat de lus begint. Er bestaat dus
+geen goedkope leegtetest, en daarom vraagt de poort er geen. Hij vraagt *"staat er
+een stand vóór dít verzoek"*, en dat is een gewone opzoeking.
+
+**De hele poort is daarmee vlak**: 3,0 – 3,7 µs bij 0, 1.000, 10.000 en 50.000
+standen. Dat is de eigenschap die telt, want een O(n)-poort wordt trager naarmate
+*méér* mensen zich beschermen — precies op het moment dat de laag gebruikt wordt.
+
+> **Die 3 µs wordt wél door elk schrijvend verzoek betaald**, ook in een
+> installatie waar niemand een stand heeft, en het meeste ervan is crypto (de
+> sha256 voor de sessiesleutel plus de HMAC voor de apparaatsleutel). Dat is
+> bewust niet weggehaald met een teller *"hoeveel standen zijn er"*: die moet bij
+> elke schrijfweg worden bijgewerkt, en de faalvorm als iemand er één vergeet is
+> **fail-open** — de poort slaat dan een echte stand over. Drie microseconde is
+> een lage prijs voor het niet hebben van die faalvorm.
+
+`test/isolatiepoort.test.js` toets 7 houdt de vlakheid vast. Hij meet tijd, wat
+normaal een slecht idee is, en daarom vergelijkt hij de poort met **zichzelf** op
+een lege kaart in hetzelfde proces, met een ruime drempel — een O(n)-regressie is
+hier geen factor 4 maar een factor duizend. Het aantal ronden staat laag omdat de
+eerste versie bij een regressie 170 seconden **doorliep in plaats van te zakken**,
+en een toets die de bouw laat hangen is erger dan geen toets.
 
 **De verklaarde uitgangen worden vóór béide benen geraadpleegd.** Niet omdat het
 vandaag nodig is — `besluit()` laat ze toch al door — maar omdat het huis-been

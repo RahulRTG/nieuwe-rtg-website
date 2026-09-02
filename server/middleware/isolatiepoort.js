@@ -23,6 +23,12 @@
       productieverkeer; "rijp" moet hier uit een gerichte proef komen. Dat staat
       hier omdat een teller die nooit vult, anders als bewijs gaat gelden.
 
+   DE VOLGORDE IS HUIS, DAN UITGANG, DAN DRAGER -- en die middelste plek is een
+   correctie op de eerste versie, die de uitgangen VOOR beide benen zette.
+   SEC-LOCK-003: een lagere drager neutraliseert een hogere niet, en een
+   vrijstellingslijst uit de ledenlaag die het huis-oordeel overrulet is precies
+   dat. Zie de uitleg bij stap 3 in weeg().
+
    TWEE HOOGTES OP EEN AS, EN DAAROM STAAN ZE HIER SAMEN. Het HUIS-been (de
    veilige noodstand uit kern/beschermstand.js) stond in ./functieschakelaars.js
    en is meeverhuisd: dat bestand schuift als iemand in de boardroom een knop
@@ -36,12 +42,26 @@
    ontleedt en (iv) de 503 van deze as al bezit. `auth` heeft de sessie wél maar
    dekt alleen ledenroutes; leverancier, kantoor en techniek hebben eigen deuren.
 
-   DE VOORPOORT MAG NOOIT VRAGEN "STAAT ER ERGENS EEN STAND". Gemeten: die vraag
-   kost bij nul leden 0,02 us en bij tienduizend dichtgezette leden ~1 ms per
-   verzoek, want hij materialiseert de sleutels van een dictionary-object.
-   Honderd keer duurder dan het besluit dat hij moest vermijden, en precies op het
-   moment dat de laag wordt gebruikt. De vraag is altijd "staat er een stand vóór
-   DIT verzoek" -- een hash-opzoeking, O(1) hoe groot de kaart ook wordt. */
+   DE VOORPOORT MAG NOOIT VRAGEN "STAAT ER ERGENS EEN STAND". Bij 50.000
+   dichtgezette leden kost `Object.keys(kaart).length === 0` **8,5 milliseconde**
+   per verzoek -- en `for (const k in kaart) return false;`, de voor de hand
+   liggende slimme uitweg, kost 8,4 ms, want V8 materialiseert de sleutels van
+   een dictionary-object voordat de lus begint. Die tweede staat er met naam bij
+   omdat hij eruitziet als de oplossing en het niet is.
+
+   Er is dus geen goedkope leegtetest, en daarom vraagt deze poort er geen. Hij
+   vraagt "staat er een stand vóór DIT verzoek": een gewone opzoeking, 0,013 us
+   bij 50.000 sleutels. De hele weeg() is daarmee VLAK -- 3,0 tot 3,7 us bij 0 tot
+   50.000 standen -- en toets 7 in test/isolatiepoort.test.js houdt die vlakheid
+   vast, zodat een latere wijziging die er O(n) van maakt de bouw laat zakken in
+   plaats van stil traag te worden.
+
+   Die vlakke 3 us wordt wel door ELK schrijvend verzoek betaald, ook waar niemand
+   een stand heeft, en het meeste ervan is crypto. Dat is bewust niet weggehaald
+   met een teller "hoeveel standen zijn er": zo'n teller moet bij elke schrijfweg
+   worden bijgewerkt, en de faalvorm als iemand er een vergeet is FAIL-OPEN. De
+   meetgetallen staan in ISOLATIE.md par. 10. */
+
 'use strict';
 
 const { dragersVanSessie } = require('../kern/isolatie/sessiedragers');
@@ -93,15 +113,7 @@ function weeg(req, ctx) {
         opzoeking hieronder op elk leesverzoek. */
   if (/^(GET|HEAD|OPTIONS)$/i.test(String(req.method || ''))) return null;
 
-  /* 2. DE VERKLAARDE UITGANGEN, VOOR ELK OORDEEL. Zonder deze regel sluit het
-        huis-been op een dag de uitgang van de stand zelf -- namelijk zodra een
-        van die paden een functie in de catalogus krijgt. Dat is de val die deze
-        laag al twee keer heeft gerepareerd, en hij hoort hier niet opnieuw te
-        ontstaan. */
-  const uitgang = openpaden.blijftOpen(pad);
-  if (uitgang) return null;
-
-  /* 3. HET HUIS. Ongewijzigd overgenomen uit ./functieschakelaars.js, inclusief
+  /* 2. HET HUIS. Ongewijzigd overgenomen uit ./functieschakelaars.js, inclusief
         de reden: deze stand zet met opzet geen enkele functie om, zodat opheffen
         geen herstelactie is maar het wegnemen van een vlag
         (kern/incidentcontrole-bescherm.js). Hij staat VOOR het drager-been,
@@ -117,6 +129,30 @@ function weeg(req, ctx) {
   }
 
   if (!laag) return null;
+
+  /* 3. DE VERKLAARDE UITGANGEN -- NA HET HUIS EN VOOR DE DRAGER, en die volgorde
+        is een correctie op mijn eigen eerste versie.
+
+        Die zette ze VOOR beide benen, met als argument dat het huis-been anders
+        ooit de uitgang van de stand zelf sluit. Dat argument klopt voor de
+        DRAGER: een lid dat zichzelf heeft dichtgezet en er niet meer uit kan, zit
+        in een val die niemand heeft gekozen. Het klopt NIET voor het huis.
+
+        SEC-LOCK-003: een lagere drager neutraliseert de beperking van een hogere
+        niet. Een vrijstellingslijst die in de LEDENlaag woont en het HUIS-oordeel
+        overrulet, is precies dat -- de eigenaar zet de noodstop om en een lijst
+        van een laag eronder houdt zeven paden open. Vandaag maakt het geen
+        verschil (nagemeten: geen van de twintig paden wordt onder `beschermd`
+        door houdtTegen gesloten), en juist daarom is dit het moment om de
+        volgorde goed te zetten: over een jaar, als iemand `bk-verblijf` in een
+        bevroren categorie zet, zou de hotelkamerdeur stil open blijven tegen het
+        besluit van de eigenaar in.
+
+        Wat de uitgang tegen het HUIS beschermt is niet deze lijst maar de
+        ceremonie van het huis zelf (kern/incidentcontrole.js), en die heeft zijn
+        eigen weg terug. */
+  const uitgang = openpaden.blijftOpen(pad);
+  if (uitgang) return null;
 
   /* 4. STAAT ER EEN STAND VOOR DIT VERZOEK? Per drager EEN hash-opzoeking, en
         nooit "loop de kaart af" -- zie de kop. Zonder sessie is er geen drager

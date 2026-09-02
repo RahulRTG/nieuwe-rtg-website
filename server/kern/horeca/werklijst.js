@@ -125,7 +125,11 @@ module.exports = ({ horeca, schoon, verzoeklaag }) => {
     /* Dezelfde klok als de cadans (lib/klok), en niet de OS-tijd: anders rekent
        de PDA met een andere "nu" dan het scherm waar hij naast staat. */
     const nuMs = klok.nu();
-    const modus = MODI[String((opties && opties.modus) || 'alles')] ? String(opties.modus) : 'alles';
+    /* Een keer uitrekenen, dan pas keuren. De controle en de toewijzing keken
+       naar iets anders, en zonder `modus` in het lijf gaf dat een 500 -- zie
+       test/horeca-werklijst-modus.test.js. */
+    const gevraagd = String((opties && opties.modus) || 'alles');
+    const modus = MODI[gevraagd] ? gevraagd : 'alles';
     const soorten = MODI[modus].soorten;
 
     let alles = [];

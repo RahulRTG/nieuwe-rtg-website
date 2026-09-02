@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1440 bestanden en 10217 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1441 bestanden en 10221 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1440 |
-| losse beweringen (`test(...)`) | 10217 |
+| toetsbestanden | 1441 |
+| losse beweringen (`test(...)`) | 10221 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 51 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 996 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 40 |
-| alleen in de kop *genoemd*, nog niet gemeten | 115 |
+| alleen in de kop *genoemd*, nog niet gemeten | 116 |
 | niets van beide | 279 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1263 bestanden, 9913 beweringen.
+1264 bestanden, 9917 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1085,6 +1085,7 @@ toets omvalt.
 | `stadsweefsel.test.js` | 12 | gezakt op `liegpoort /api/` | HET STADSWEEFSEL: de laag die van losse stadssystemen een stad maakt. Getest, en per toets is de bewering met een MUTATIE nagetrokken (de lat, regel 2). |
 | `staff-inzet-mob.test.js` | 6 | gezakt op `liegpoort /api/` | DRIE PERSONEELSINGANGEN VAN HET MOBILITY OS DIE DOOR NIETS WERDEN AANGEROEPEN. /api/staff/mob/kaart/storingen de storingslijst van de OV-vervoerder /api/staff/mob/mijn het dispatchbeeld op de PDA... |
 | `staffinvite.test.js` | 11 | gezakt op `liegpoort /api/` | Personeel = RTG-account, met uitnodiging. Een manager nodigt uit en krijgt een eenmalige kassacode; pas daarna kan de medewerker zich aanmelden met de bedrijfsnaam + kassacode + eigen RTG-inlog. |
+| `stempel.test.js` | 4 | genoemd | HET STEMPEL: WANNEER IS EEN METING ONREPRODUCEERBAAR? `boomVuil` beantwoordt een vraag met gevolgen: hoort deze uitslag bij de commit die eronder staat, of bij iets wat nergens is vastgelegd? |
 | `stijlafsplitsing.test.js` | 8 | -- | HET AFGESPLITSTE STIJLBLOK: WAT ER WEG MAG, EN VOORAL WAT NIET. Over alle 258 schermen is 74% van de HTML inline CSS en JS. |
 | `stijlbundel.test.js` | 11 | gezakt op `===->!==#0` | DE STIJLBUNDEL: WAT ER SAMEN MAG, EN VOORAL WAT NIET. /apps/app.html doet 72 verzoeken. |
 | `stilalarm.test.js` | 3 | gezakt op `liegpoort /api/` | EEN NOODSIGNAAL DAT NIEMAND BEREIKT, MAG NOOIT ALS GELUKT GELDEN. WAT ER MISGING. |

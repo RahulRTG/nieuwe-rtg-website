@@ -18,10 +18,28 @@
      commit      waartegen. Twee registers van verschillende commits zijn niet
                  met elkaar te vergelijken, en een register van een oudere commit
                  dan HEAD is per definitie achterhaald.
-     boomVuil    stond er ongecommit werk in de boom tijdens het meten? Zo ja,
+     boomVuil    stond er ongecommit CODE in de boom tijdens het meten? Zo ja,
                  dan hoort die meting NIET bij die commit -- hij hoort bij iets
                  wat nergens is vastgelegd. Dat is geen detail: precies zo
                  ontstaat een register dat niemand kan reproduceren.
+
+                 CODE, EN NIET DE HELE BOOM. Hier stond `git status --porcelain`
+                 over alles, en daarmee was een schone stand onbereikbaar --
+                 exact de fout die tien regels lager bij `versheid()` al een keer
+                 is gemaakt en gerepareerd. De reden is dezelfde en de vorm ook:
+                 zodra de eerste meetronde zijn register WEGSCHRIJFT, is de boom
+                 vuil, en stempelt elke volgende meting van diezelfde ronde
+                 zichzelf als onreproduceerbaar. Gemeten op 2 september 2026:
+                 van drie generatoren achter elkaar kwam alleen de EERSTE schoon
+                 binnen, en de andere twee niet -- niet omdat er iets mis was,
+                 maar omdat hun voorganger net een bestand had geschreven.
+
+                 Een register dat naast je ligt is een UITKOMST en geen invoer
+                 van de code. Wat een meting onreproduceerbaar maakt, is
+                 ongecommitte CODE: server, scripts, public, test, de motor en
+                 de pakketlijst. Vandaar dat de status daar nu op wordt gevraagd
+                 en niet op de hele boom. Wie deze lijst uitbreidt: neem er
+                 alleen iets in op dat een MEETUITKOMST kan veranderen.
      node        welke node. Een meting op een andere runtime is een andere
                  meting; scripts/norm.js maakt dat onderscheid al voor prestatie.
 
@@ -44,12 +62,22 @@ function git(args) {
 /* `extra` komt er ONGEWIJZIGD bij, voor wat alleen dit instrument weet -- het
    aantal routes van dat moment, de gebruikte seed, de opstelling. Zie
    scripts/poortwacht.js, die zijn omgevingsvlaggen meegeeft. */
+/* WAT ALS CODE TELT. Alles waarvan een wijziging een MEETUITKOMST kan
+   veranderen -- en verder niets. Registers (*.json in de wortel) en documenten
+   zijn uitkomsten; die maken een meting niet onreproduceerbaar.
+
+   `test` staat er wel bij en dat is geen slordigheid: de mutatiemotor MEET de
+   toetsen, dus een ongecommitte toets verandert daar de uitslag. Hetzelfde
+   geldt voor de pakketlijst -- de meter `dependencies` leest hem rechtstreeks,
+   en juist daar is deze sessie een keuring op omgevallen. */
+const CODE = ['server', 'scripts', 'public', 'test', 'motor', 'package.json', 'package-lock.json'];
+
 function stempel(extra) {
   const commit = git(['rev-parse', '--short', 'HEAD']) || null;
-  /* --porcelain geeft een regel per gewijzigd bestand; leeg = schone boom.
+  /* --porcelain geeft een regel per gewijzigd bestand; leeg = schone code.
      Faalt git (geen repo, geen git), dan is het ONBEKEND en niet 'schoon':
      onbekend als schoon lezen is precies de fout die dit veld moet voorkomen. */
-  const status = commit === null ? null : git(['status', '--porcelain']);
+  const status = commit === null ? null : git(['status', '--porcelain', '--'].concat(CODE));
   return Object.assign({
     op: new Date().toISOString(),
     commit,
@@ -99,4 +127,4 @@ function versheid(gemeten, huidigeCommit) {
 
 const nuCommit = () => git(['rev-parse', '--short', 'HEAD']) || null;
 
-module.exports = { stempel, versheid, nuCommit, WORTEL };
+module.exports = { stempel, versheid, nuCommit, WORTEL, CODE };

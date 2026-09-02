@@ -58,10 +58,10 @@ werk (breng de koppelingen terug).
 
 Per functie uit de catalogus: welke routes, welke bestanden, welke domeinen.
 <!--getal:activering.functies-->204<!--/getal--> functies dragen routes; een doorsnee functie raakt
-<!--getal:activering.mediaan-->22<!--/getal--> knopen.
+<!--getal:activering.mediaan-->27<!--/getal--> knopen.
 
-**Drie graden, en ze zijn niet uitwisselbaar.** <!--getal:activering.gemeten-->67<!--/getal--> functies
-zijn `gemeten`; <!--getal:activering.ondergrens-->130<!--/getal--> zijn `ondergrens` (er hangt méér aan dan
+**Drie graden, en ze zijn niet uitwisselbaar.** <!--getal:activering.gemeten-->118<!--/getal--> functies
+zijn `gemeten`; <!--getal:activering.ondergrens-->79<!--/getal--> zijn `ondergrens` (er hangt méér aan dan
 hier staat) en zeven zijn `deels-niet-toe-te-rekenen` (hun route hangt in de
 bedrading, en de sluiting vanaf `server.js` is het hele huis).
 
@@ -70,7 +70,16 @@ fout — de fouten staan uitgeschreven in de kop van `scripts/activering.js`. De
 belangrijkste: **de require-graaf ziet de hoofdbedrading van dit huis niet.** De
 meeste route-bestanden hebben nul requires en krijgen hun domein via de kern-tas
 (`module.exports = (kern) => { const { gewoontenVan } = kern; }`). Daarom wordt
-bij het opstarten vastgelegd welk bestand welke sleutel levert.
+bij het opstarten vastgelegd welk bestand welke sleutel levert, in vier slagen:
+bij het `require`, via de waarde bij een letterlijk object, achteraf over de tas
+zelf (voor `kern.x = ...`), en als laatste door de brontekst van de functie
+letterlijk terug te zoeken in `server/`.
+
+Die laatste is met opzet een ZOEKTOCHT en geen aanname. Wat overbleef had je ook
+"komt uit de bedrading" kunnen noemen -- dat klopt waarschijnlijk, en het zou 130
+functies van `ondergrens` naar `gemeten` tillen zonder dat er iets gemeten is.
+Nu telt alleen een UNIEKE treffer; twee treffers of geen is onbekend en blijft
+onbekend.
 
 ## 3. De deltapoort — er komt niets bij
 

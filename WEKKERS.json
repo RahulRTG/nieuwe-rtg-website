@@ -26,7 +26,7 @@
     }
   ],
   "ongeschakeld": 0,
-  "ongeschakeldVerklaard": 26,
+  "ongeschakeldVerklaard": 25,
   "verklaringenOngebruikt": [],
   "ongeschakeldLijst": [],
   "lijst": [
@@ -101,14 +101,6 @@
       "functies": 0,
       "welke": [],
       "verklaard": "het schild; een beveiliging met een schakelaar is een deur met het slot aan de binnenkant"
-    },
-    {
-      "soort": "BUS",
-      "bestand": "server/kern/sessies.js",
-      "aantal": 1,
-      "functies": 0,
-      "welke": [],
-      "verklaard": "houdt sessies gelijk over meerdere servers; zet je dat uit, dan logt iemand uit doordat zijn verzoek bij de andere server landt"
     },
     {
       "soort": "BUS",
@@ -312,6 +304,19 @@
       ]
     },
     {
+      "soort": "BUS",
+      "bestand": "server/kern/sessies.js",
+      "aantal": 1,
+      "functies": 5,
+      "welke": [
+        "supplier",
+        "tg-inlog",
+        "verificatie",
+        "tg-zegel",
+        "tg-link"
+      ]
+    },
+    {
       "soort": "KLOK",
       "bestand": "server/kern/webmaker-plan.js",
       "aantal": 1,
@@ -457,11 +462,11 @@
         "supplier",
         "office",
         "betalen",
-        "supplier-pos",
-        "gld-cadeau",
         "dom-bank-spaardoel",
         "dom-bank-inzicht",
-        "dom-bank-vastelasten"
+        "dom-bank-vastelasten",
+        "supplier-pos",
+        "dom-pay-wallet"
       ]
     },
     {

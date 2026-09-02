@@ -259,6 +259,8 @@ function meet() {
     teHoog: 'een require is geen aanroep: dit is wat er wakker KAN worden, niet wat er draait',
     teLaag: 'de bus (kern/envelop.js), cron, AI-gereedschap en webhooks lopen niet via require en staan hier niet in',
     kernSleutels: herkomst.kernSleutels,
+    kernSleutelsViaTekst: herkomst.kernSleutelsViaTekst,
+    kernSleutelsHoe: 'via het merken bij require, via de waarde bij een letterlijk object, achteraf over de tas zelf, en als laatste door de brontekst van de functie letterlijk terug te zoeken (alleen bij precies EEN treffer)',
     kernTasGevonden: herkomst.kernTasGevonden,
     routes: herkomst.routes.length,
     routeLagen: herkomst.lagen,
@@ -307,7 +309,8 @@ function rapport(r) {
   L.push('');
   L.push(`  ${r.routes} routes uit ${r.routeLagen} lagen, ${r.routesZonderEigenaar} zonder eigenaar.`);
   L.push(`  ${r.functiesMetEnvelop} functies dragen routes. Het huis telt ${r.knopenTotaal} knopen.`);
-  L.push(`  De kern-tas leverde ${r.kernSleutels} herleidbare sleutels.`);
+  L.push(`  De kern-tas leverde ${r.kernSleutels} herleidbare sleutels, waarvan ${r.kernSleutelsViaTekst}`);
+  L.push('  door de brontekst van de functie letterlijk terug te zoeken (uniek, anders onbekend).');
   L.push('  PER GRAAD: ' + Object.entries(r.perGraad).map(([g, n]) => `${n} ${g}`).join(', ') + '.');
   L.push(`  'ondergrens' betekent: er hangt meer aan dan hier staat. ${r.sleutelsOnopgelost.length} sleutels`);
   L.push('  komen nergens op uit -- de meeste uit server.js zelf (officeAuth, PERSONAS, anthropic).');

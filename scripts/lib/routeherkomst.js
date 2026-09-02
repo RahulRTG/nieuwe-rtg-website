@@ -77,6 +77,17 @@ const WIKKELS = [
 ];
 const isWikkel = rel => WIKKELS.some(w => w[0] === rel);
 
+/* Alle .js van een map, voor het terugzoeken van brontekst. */
+function bestandenVan(map, uit = []) {
+  for (const e of fs.readdirSync(map, { withFileTypes: true })) {
+    if (e.name === 'node_modules' || e.name === 'data') continue;
+    const p = path.join(map, e.name);
+    if (e.isDirectory()) bestandenVan(p, uit);
+    else if (e.name.endsWith('.js')) uit.push(p);
+  }
+  return uit;
+}
+
 function vrijePoort() {
   const uit = require('child_process').execFileSync(process.execPath, ['-e',
     "const s=require('net').createServer();s.listen(0,'127.0.0.1',()=>{" +
@@ -246,6 +257,7 @@ function lees() {
   let tas = null, grootste = 0;
   for (const d of DOELEN) { const m = bijdragen.get(d); if (m && m.size > grootste) { grootste = m.size; tas = d; } }
   const kernBron = {};
+  const kernBronViaTekst = [];
   if (tas) for (const [k, v] of bijdragen.get(tas)) kernBron[k] = v;
   /* EN DE SLEUTELS DIE ER RECHTSTREEKS IN GEZET ZIJN. Niet alles komt via
      Object.assign binnen: `kern.vakwerk = require(...)(...)` zet een sleutel
@@ -291,8 +303,42 @@ function lees() {
     methode: l.methode, pad: l.pad, bestand: eigenaarVan(l.stapel), stapel: l.stapel
   }));
 
+  /* DE LAATSTE SLEUTELS: DE BRONTEKST TERUGZOEKEN.
+
+     Wat na alle merken nog onbekend is, is een waarde die nergens door een
+     require is aangeraakt: een functie die rechtstreeks in server.js of in een
+     opzet-bestand is geschreven en zo in de tas is gezet. Die zou je 'wiring'
+     kunnen NOEMEN -- en dat zou een gok zijn die 130 functies van 'ondergrens'
+     naar 'gemeten' tilt zonder dat er iets gemeten is.
+
+     Dit doet het omgekeerde: het ZOEKT hem. De broncode van de functie
+     (fn.toString()) wordt letterlijk teruggezocht in de bestanden van server/.
+     Precies een bestand dat hem bevat = gevonden. Meer dan een, of geen enkel =
+     onbekend, en dat blijft dan ook onbekend.
+
+     Twee grendels tegen een valse treffer: de tekst moet lang genoeg zijn (een
+     pijlfunctie van tien tekens staat overal), en de treffer moet UNIEK zijn. */
+  if (tas) {
+    const index = [];
+    for (const f of bestandenVan(path.join(WORTEL, 'server'))) {
+      try { index.push([path.relative(WORTEL, f).replace(/\\/g, '/'), fs.readFileSync(f, 'utf8')]); }
+      catch (e) { /* onleesbaar bestand telt niet mee */ }
+    }
+    for (const k of Object.keys(tas)) {
+      if (kernBron[k]) continue;
+      let v; try { v = tas[k]; } catch (e) { continue; }
+      if (typeof v !== 'function') continue;
+      let tekst; try { tekst = Function.prototype.toString.call(v); } catch (e) { continue; }
+      if (!tekst || tekst.length < 120 || tekst.includes('[native code]')) continue;
+      const treffers = [];
+      for (const [rel, bron] of index) { if (bron.includes(tekst)) { treffers.push(rel); if (treffers.length > 1) break; } }
+      if (treffers.length === 1) { kernBron[k] = treffers[0]; kernBronViaTekst.push(k); }
+    }
+  }
+
   return { routes, lagen: lagen.length, zonderEigenaar: routes.filter(r => !r.bestand).length,
     wikkels: WIKKELS, kernBron, kernSleutels: Object.keys(kernBron).length,
+    kernSleutelsViaTekst: kernBronViaTekst.length,
     kernTasGevonden: !!tas };
 }
 

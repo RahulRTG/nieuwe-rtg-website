@@ -678,24 +678,34 @@ Elk pad draagt nu zijn eigen methode.
 
 | Baan | onder `beschermd` | onder `isolatie` |
 |---|---|---|
-| iedereen (5) | 4 werkt · 1 beperkt | 4 werkt · 1 beperkt |
-| lid (21) | 18 werkt · 3 niet | 13 werkt · 1 beperkt · 7 niet |
-| gezin (5) | 5 werkt | 2 beperkt · 3 niet |
-| zaak + gast (5) | 1 werkt · 1 beperkt · 3 niet | 0 werkt · 1 beperkt · 4 niet |
-| kantoor (3) | 3 werkt | 3 werkt |
+| iedereen (5) | 5 werkt · 0 beperkt · 0 niet | 5 werkt · 0 beperkt · 0 niet |
+| lid (21) | 18 werkt · 0 beperkt · 3 niet | 13 werkt · 1 beperkt · 7 niet |
+| gezin (5) | 5 werkt · 0 beperkt · 0 niet | 2 werkt · 0 beperkt · 3 niet |
+| zaak + gast (5) | 2 werkt · 0 beperkt · 3 niet | 1 werkt · 0 beperkt · 4 niet |
+| kantoor (3) | 3 werkt · 0 beperkt · 0 niet | 3 werkt · 0 beperkt · 0 niet |
 
 In totaal blijven er onder `isolatie`
-<!--getal:isolatie.werktOnderIsolatie-->20<!--/getal--> van de
+<!--getal:isolatie.werktOnderIsolatie-->24<!--/getal--> van de
 <!--getal:isolatie.verhalen-->39<!--/getal--> verhalen HEEL.
-De mens-baan komt er goed doorheen; de **zaak-baan komt er onder `beschermd` niet
-één keer heel doorheen**. Dat is geen bug om weg te poetsen maar een tegenspraak
-in de indeling: elke `/api/supplier/`-route valt onder de bevroren categorie
-"Partners (leveranciers)" met als reden *"een leverancier schrijft hier in onze
-gegevens"* — terwijl een zaak die haar eigen tafelrekening bijwerkt precies is wat
-`LOOPT_DOOR` onder "Werk" als eigenaar beschrijft. Ook het HACCP-temperatuurlogboek
-gaat dicht, en dat is een wettelijke registratieplicht die stilvalt door een
-beveiligingsstand van RTG. Vier van zulke vondsten staan als **besluit van de
-eigenaar** in `ISOLATIEPROEF.json`, met de meting erbij en niet stil rechtgetrokken.
+
+De mens-baan komt er goed doorheen. De **zaak-baan kwam er onder `beschermd`
+geen enkele keer heel doorheen** — elke `/api/supplier/`-route valt onder de
+bevroren categorie "Partners (leveranciers)" met als reden *"een leverancier
+schrijft hier in onze gegevens"*, terwijl een zaak die haar eigen tafelrekening
+bijwerkt precies is wat `LOOPT_DOOR` onder "Werk" als eigenaar beschrijft.
+
+Vier van zulke vondsten zijn als **besluit van de eigenaar** voorgelegd en
+genomen (2 september 2026):
+
+| Vondst | Besluit | Waarom die kant op |
+|---|---|---|
+| Passkey-inloggen viel dicht onder `beschermd` | de twee inlogpaden horen nu bij `tg-inlog` | een halfopen voordeur is erger dan een dichte; registreren blijft bevroren, want een nieuwe sleutel maken tijdens een incident is wél een voorrecht |
+| Een horecazaak kon niets | **alleen** HACCP open (`supplier-haccp` + een uitzondering) | het temperatuurlogboek is een wettelijke plicht: onze storing verplaatsen naar de administratie van een ander. Afrekenen blijft dicht — dat beweegt geld |
+| De deur van het gezinsportaal | open | hij sloot alleen de *inlog* terwijl de gegevens erachter openbleven: een half gesloten deur beschermt niemand |
+| De hotelkamerdeur | open | iemand die op reis is buitensluiten is schade in de fysieke wereld, en een deur openen vergroot geen digitaal vermogen |
+
+De laatste twee staan in een eigen lijst, `FYSIEKE_DEUR` — een derde grond naast
+de uitgang en de rechten, want dit gaat over de wereld *buiten* het scherm.
 
 > **En de uitgang van het kantoor stond dicht.** De vijf ceremonieroutes van
 > `/apps/isolatie.html` hingen aan geen enkele functie, waren dus geen bewezen
@@ -901,3 +911,63 @@ wijst. Dat is DNS-rebinding en het hoort achter een egress-poort in de uitrol.
 > verwijzing naar een paragraaf die nooit heeft bestaan: dezelfde fout als de cap
 > `rooms` in CLAUDE.md en `kern/stuur/schaduw.js` in paragraaf 1 hierboven. Een
 > huis dat drie keer dezelfde fout maakt, heeft er een patroon van.
+
+## 10. De poort staat — in de schaduw
+
+De vijfde leugen van paragraaf 8 is gerepareerd voor zover dat verantwoord kan:
+`server/middleware/isolatiepoort.js` draagt nu de **hele beveiligings-as**, op de
+plek waar het huis-blok stond.
+
+Die plek is het antwoord op *"wie ziet elk verzoek"*: de enige plek die elk
+`/api/`-verzoek ziet, vóór élke router staat, de bearer-kop al ontleedt en de 503
+van deze as al bezit. `auth` heeft de sessie wel maar dekt alleen ledenroutes —
+leverancier, kantoor en techniek hebben eigen deuren.
+
+**Twee hoogtes op één as, en daarom staan ze samen.** Het huis-been (de veilige
+noodstand) is meeverhuisd uit `functieschakelaars.js`: dat bestand schuift als
+iemand in de boardroom een knop omzet, deze as als er een incident is of een mens
+zichzelf beschermt. De volgorde is `dicht = huis || drager` en **nooit** het
+drager-been in plaats van het huis: `besluit()` is op **255 paden losser** dan de
+beschermstand, dus vervangen zou bestaande handhaving verzwakken.
+
+**Hij bijt niet.** Het drager-been telt wat het zou sluiten en laat door, tot
+iemand `zetLaag(isolatie, { afdwingen: true })` schrijft. Dat is geen halve maat
+maar de regel: je kunt niet afdwingen wat nooit heeft meegelopen. Het scherm van
+een lid zegt dat ook — *"de poort loopt mee maar houdt nog niets tegen"* — want
+`schaduw` en `afdwingen` zijn in `handhaving.js` met opzet twee standen, en wie ze
+samenvat liegt opnieuw, nu met een teller als dekmantel.
+
+### Drie dingen die in de poort zitten omdat ze gemeten zijn
+
+**De voorpoort vraagt nooit "staat er érgens een stand".** Dat kost bij nul leden
+0,02 µs en bij tienduizend dichtgezette leden **~1 ms per verzoek** — het
+materialiseren van de sleutels van een dictionary-object. Honderd keer duurder dan
+het besluit dat hij moest vermijden, en precies op het moment dat de laag wordt
+gebruikt. De vraag is *"staat er een stand vóór dít verzoek"*: een hash-opzoeking,
+O(1) hoe groot de kaart ook wordt.
+
+**De verklaarde uitgangen worden vóór béide benen geraadpleegd.** Niet omdat het
+vandaag nodig is — `besluit()` laat ze toch al door — maar omdat het huis-been
+`openpaden.js` niet kent en ze zou sluiten zodra een van die paden een functie in
+de catalogus krijgt. Dan is de val er, en dan is hij niet te ontsluiten. Een
+mutatie liet zien dat de eerste toets dát niet mat: hij werd groen zonder de
+regel. `test/isolatiepoort.test.js` toets 4b meet hem nu tegen een beschermstand
+die álles sluit — de toekomstige stand waar de regel voor bestaat.
+
+**Een sessiesplitsing, geen tweede kopie.** `dragersVanSessie(sess, token)` naast
+`dragersVanVerzoek(req)`: een route draait ná `auth` en heeft de sessie, een
+middleware die vóór elke router staat moet hem zelf oplossen. Eén lichaam, twee
+ingangen — twee kopieën zouden na een jaar twee verschillende sleutels opleveren
+voor dezelfde mens.
+
+### Wat er nog steeds openstaat, met de reden
+
+De vlag omzetten. `CONTROLPLANE.md` eist 200 waarnemingen en zeven dagen, en de
+noemer is *"verzoeken van accounts die een stand dragen"* — dat zijn er vandaag
+**nul**. Deze regel rijpt dus waarschijnlijk **niet** uit productieverkeer;
+"rijp" moet hier uit een gerichte proef komen. Dat staat er omdat een teller die
+nooit vult, anders op een dag als bewijs gaat gelden.
+
+En het blijft handhaving voor **vier** dragers, niet zes: `organisatie` en
+`workload` hebben bij een lopend verzoek geen sleutel. Een cockpit die beweert
+dat een dichtgezette organisatie iets tegenhoudt, zou liegen.

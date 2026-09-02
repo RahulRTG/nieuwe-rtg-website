@@ -1975,6 +1975,15 @@ console.log('\n29) de Authorization-kop wordt gelezen om een token te halen, nie
       'de kop is hier alleen ONDOORZICHTIG sleutelmateriaal: hij gaat een sha256 in zodat twee afzenders ' +
       'met dezelfde idempotentiesleutel nooit elkaars antwoord krijgen. Er wordt niets uit gelezen en niets ' +
       'besloten -- een fout token betekent hoogstens een eigen kasvakje, en de poort van de route oordeelt zelf.'],
+    ["server/middleware/isolatiepoort.js|const kop = (typeof req.get === 'function' ? req.get('authorization') : '') || '';",
+      'de poort BESLIST niets op deze kop: hij gebruikt hem als SLEUTELMATERIAAL om op te zoeken of ' +
+      'er voor dit verzoek een beveiligingsstand STAAT. De vertaling loopt via ' +
+      'kern/isolatie/sessiedragers.js, waar de sha256 de sessiesleutel wordt en het apparaatveld ' +
+      'door accounts.apparaatVanToken gaat -- die verifieert de HANDTEKENING eerst. Een verzonnen ' +
+      'kop levert dus hooguit een sleutel op waaronder niets staat, en dat is de VEILIGE kant: geen ' +
+      'stand gevonden betekent geen versoepeling, want deze poort kan alleen SLUITEN en nooit iets ' +
+      'openzetten dat een andere laag dichthield. Zou hier ooit iets worden VERLEEND op grond van ' +
+      'deze kop, dan vervalt deze reden.'],
     ["server/kern/isolatie/sessiedragers.js|const kop = (req && typeof req.get === 'function' ? req.get('authorization') : '') || '';",
       'de kop levert hier SLEUTELMATERIAAL en geen toegang. Twee dingen gebeuren ermee, en allebei ' +
       'beslissen ze niets: de sha256 wordt de sleutel waaronder de isolatiestand van DEZE inlog ' +

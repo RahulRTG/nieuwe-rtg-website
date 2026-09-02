@@ -836,24 +836,27 @@ const schuld = [
       'te hangen. Dat vraagt een besluit over WELKE organisatie de drager is (TENANT.md houdt org, ' +
       'werkruimte en leverancier met opzet uit elkaar) en niet een regel code.' },
   { punt: 'handhaving in de HTTP-keten',
-    stand: 'ONTBREEKT',
+    stand: 'SCHADUW',
     waarom: 'GEMETEN: middleware/functieschakelaars.js leest alleen het HUIS-veld ' +
       '(ic.modus === "beschermd") en roept beschermstand.houdtTegen() aan. Grep naar "isolatie" in ' +
       'server/middleware/ geeft NUL treffers. isolatie.besluit() wordt in heel server/ door drie ' +
       'plekken aangeroepen: kern/stuur/isolatiefilter.js (de AI-padlijst), routes/techniek/isolatie.js ' +
       '(een proef die niets uitvoert) en kern/isolatie/bruikbaarheid.js (een meter).',
-    open: 'een lid dat zichzelf op `isolatie` zet, versmalt alleen de lijst waaruit het model kiest; ' +
-      'zijn gewone HTTP-paden blijven open. Het ledenscherm zegt dat inmiddels met zoveel woorden ' +
-      '(het veld `afgedwongen` op /api/isolatie/mijn, afgeleid uit de code en niet uit een tekst), ' +
-      'maar de poort zelf is er nog niet. Wie hem bouwt: hij hoort op de plek van het huis-blok in ' +
-      'functieschakelaars.js -- de enige plek die elk /api/-verzoek ziet, vóór elke router staat, de ' +
-      'bearer-kop al ontleedt en de 503 van deze as al bezit -- en hij hoort eerst in de SCHADUW te ' +
-      'lopen (CONTROLPLANE.md). Let op twee gemeten valkuilen: een voorpoort die vraagt "staat er ' +
-      'ergens een stand" kost bij 10.000 dichtgezette leden ~1 ms per verzoek (het materialiseren van ' +
-      'de sleutels), dus de vraag hoort te zijn "staat er een stand VOOR DIT VERZOEK" -- een ' +
-      'hash-opzoeking, O(1). En besluit() laat onder huis=beschermd 255 paden door die houdtTegen() ' +
-      'vandaag dichthoudt: dat is een VERZWAKKING van bestaande handhaving en een eigen besluit met ' +
-      'een eigen schaduwronde, niet iets dat meelift.' },
+    open: 'DE POORT STAAT, IN DE SCHADUW (server/middleware/isolatiepoort.js, aangemeld vanuit ' +
+      'routes/isolatie.js). De hele beveiligings-as woont er nu: het HUIS-been (de veilige noodstand, ' +
+      'meeverhuisd uit functieschakelaars.js) en het DRAGER-been ernaast, als `dicht = huis || drager` ' +
+      '-- nooit in plaats van, want besluit() is op 255 paden LOSSER dan de beschermstand en hem het ' +
+      'huis-oordeel laten vervangen zou bestaande handhaving VERZWAKKEN. Het drager-been telt en ' +
+      'houdt niets tegen tot iemand `zetLaag(isolatie, { afdwingen: true })` schrijft. ' +
+      'WAT OPEN BLIJFT: die vlag omzetten. CONTROLPLANE.md eist 200 waarnemingen en 7 dagen, en de ' +
+      'noemer is "verzoeken van accounts die een stand dragen" -- dat zijn er vandaag nul, dus deze ' +
+      'regel rijpt waarschijnlijk NIET uit productieverkeer en "rijp" moet uit een gerichte proef ' +
+      'komen. Een teller die nooit vult, mag nooit als bewijs gaan gelden. Twee valkuilen zijn al ' +
+      'gemeten en in de poort verwerkt: de voorpoort vraagt "staat er een stand VOOR DIT VERZOEK" ' +
+      '(een hash-opzoeking, O(1)) en nooit "staat er ergens een stand" -- die tweede kost bij 10.000 ' +
+      'dichtgezette leden ~1 ms per verzoek. En de verklaarde uitgangen worden VOOR beide benen ' +
+      'geraadpleegd, want het huis-been kent openpaden.js niet en zou de uitgang sluiten zodra een ' +
+      'van die paden een functie krijgt.' },
   { punt: 'drager-model',
     stand: 'STAAT ALS BESLUITLAAG',
     waarom: 'server/kern/isolatie/: vijf van de zes dragers dragen een stand, samengevoegd met een join. ' +

@@ -38,10 +38,13 @@ const ZAAK = [
   { id: 'zaak-bestelling-opnemen', wie: 'zaak', wat: 'een bestelling opnemen', moetHeel: false,
     paden: ['/api/supplier/horeca/rekening/open', '/api/supplier/horeca/rekening/regel',
       '/api/supplier/horeca/bon/maak'] },
-  { id: 'zaak-voedselveiligheid', wie: 'zaak', wat: 'de koeltemperatuur vastleggen', moetHeel: false,
+  { id: 'zaak-voedselveiligheid', wie: 'zaak', wat: 'de koeltemperatuur vastleggen', moetHeel: true,
     paden: ['/api/supplier/horeca/haccp/meting', '/api/supplier/horeca/haccp/logboek'],
-    waarom: 'een wettelijke registratieplicht die stilvalt door een beveiligingsstand van RTG, is ' +
-      'een probleem van de zaak dat wij hebben veroorzaakt' },
+    waarom: 'BESLUIT VAN DE EIGENAAR, 2 september 2026. Een wettelijke registratieplicht die stilvalt ' +
+      'door een beveiligingsstand van RTG verplaatst onze storing naar de administratie van een ' +
+      'ander, en die schade is niet terug te draaien als het incident voorbij is. HACCP heeft nu een ' +
+      'eigen schakelaar (`supplier-haccp`) en loopt door via de uitzonderingenlijst. Afrekenen blijft ' +
+      'met opzet dicht -- dat beweegt geld.' },
   { id: 'zaak-deur-openen', wie: 'zaak', wat: 'de deur van de club openen', moetHeel: false,
     paden: ['/api/supplier/horeca/club/deur'] },
   { id: 'gast-afrekenen', wie: 'gast', wat: 'zelf afrekenen aan tafel', moetHeel: false,

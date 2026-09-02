@@ -40,13 +40,14 @@ const IEDEREEN = [
   { id: 'inloggen', wie: 'iedereen', wat: 'binnenkomen', moetHeel: true,
     paden: ['/api/login', '/api/auth/login', '/api/logout'],
     waarom: 'wie niet kan inloggen, kan ook niets lezen; dan is "lezen loopt door" een zin zonder inhoud' },
-  { id: 'inloggen-passkey', wie: 'iedereen', wat: 'binnenkomen met een passkey', moetHeel: false,
+  { id: 'inloggen-passkey', wie: 'iedereen', wat: 'binnenkomen met een passkey', moetHeel: true,
     paden: ['/api/webauthn/opties', '/api/webauthn/login'],
-    waarom: 'GEMETEN: /api/webauthn/opties komt er als bewezen lezer doorheen en /api/webauthn/login ' +
-      'niet -- die hangt aan de functie `webauthn` in de bevroren categorie "Betalen & verificatie". ' +
-      'Een halfopen voordeur is erger dan een dichte, en welke van de drie uitwegen de goede is, is ' +
-      'een besluit van de eigenaar (zie ISOLATIEPROEF.json). Tot dat besluit valt is inloggen met een ' +
-      'wachtwoord de gegarandeerde weg, en dat staat al in de uitleg van de functie.' },
+    waarom: 'BESLUIT VAN DE EIGENAAR, 2 september 2026. Dit stond op "werkt beperkt": /opties kwam ' +
+      'er als bewezen lezer doorheen en /login niet, want die hing aan de functie `webauthn` in de ' +
+      'bevroren categorie "Betalen & verificatie". Een halfopen voordeur is erger dan een dichte. ' +
+      'De twee inlogpaden horen nu bij `tg-inlog` -- de voordeur -- en registreren en verwijderen ' +
+      'blijven bij `webauthn` en dus bevroren: binnenkomen met een sleutel die je al had is geen ' +
+      'voorrecht, een nieuwe sleutel aanmaken tijdens een incident wel.' },
   { id: 'wachtwoord-kwijt', wie: 'iedereen', wat: 'weer binnenkomen na een vergeten wachtwoord', moetHeel: true,
     paden: ['/api/auth/forgot', '/api/auth/reset'],
     waarom: 'een mens die zijn wachtwoord kwijt is tijdens een incident, is precies de mens die er ' +
@@ -120,9 +121,12 @@ const LID = [
   { id: 'reis-onderweg', wie: 'lid', wat: 'onderweg bij mijn vlucht en mijn kamer kunnen', moetHeel: false,
     paden: ['/api/member/vluchten/mijn', '/api/member/vluchten/incheck', '/api/verblijf/mijn',
       '/api/verblijf/deur'],
-    waarom: 'GEMETEN: /api/verblijf/deur -- de sleutel van je hotelkamer -- gaat onder isolatie dicht. ' +
-      'Of iemand die op reis is zijn kamer uit moet kunnen, is een besluit van de eigenaar en geen ' +
-      'meetfout; het staat als schuldpunt in ISOLATIEPROEF.json' },
+    waarom: 'BESLUIT VAN DE EIGENAAR, 2 september 2026: /api/verblijf/deur -- de sleutel van je ' +
+      'hotelkamer -- blijft open onder isolatie (kern/isolatie/openpaden-lijst.js: FYSIEKE_DEUR). ' +
+      'Iemand die op reis is en zijn kamer niet meer in kan omdat zijn account onder verdenking ' +
+      'staat, is echte schade in de fysieke wereld, en een deur openen vergroot geen digitaal ' +
+      'vermogen. GEEN moetHeel: incheck en de vluchtlijst blijven onder isolatie dicht, en die ' +
+      'belofte is niet gedaan.' },
   { id: 'reisregels-lezen', wie: 'lid', wat: 'de reisregels van mijn bestemming lezen', moetHeel: false,
     paden: ['/api/reis/wijzer'] }
 ];

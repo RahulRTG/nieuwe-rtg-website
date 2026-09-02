@@ -40,10 +40,17 @@ function bearerVan(req) {
 }
 
 /* Geeft { sleutels, ontbreekt } terug. `sleutels` is wat er WEL is;
-   `ontbreekt` zegt per ontbrekende drager waarom, met de tekst uit dragers.js. */
-function dragersVanVerzoek(req) {
-  const s = (req && req.session) || {};
-  const token = bearerVan(req);
+   `ontbreekt` zegt per ontbrekende drager waarom, met de tekst uit dragers.js.
+
+   TWEE INGANGEN EN EEN LICHAAM. `dragersVanVerzoek` is de weg voor een ROUTE:
+   die draait na `auth`, dus req.session bestaat. Een MIDDLEWARE die vóór elke
+   router staat heeft die sessie nog niet -- hij moet hem zelf oplossen uit het
+   token -- en krijgt daarom `dragersVanSessie`. De regel "de sleutel komt uit de
+   sessie en nooit uit het verzoek" staat daarmee nog steeds op een plek; alleen
+   de manier waarop de sessie binnenkomt verschilt. Twee kopieën van dit lichaam
+   zouden na een jaar twee verschillende sleutels opleveren voor dezelfde mens. */
+function dragersVanSessie(sess, token) {
+  const s = sess || {};
 
   const sleutels = {
     /* De identiteit: dit lid, over al zijn inlogs heen. */
@@ -74,4 +81,9 @@ function dragersVanVerzoek(req) {
   return { sleutels, ontbreekt };
 }
 
-module.exports = { dragersVanVerzoek, EIGEN_LAGEN, bearerVan };
+/* De routekant: de sessie staat er al, het token staat in de kop. */
+function dragersVanVerzoek(req) {
+  return dragersVanSessie((req && req.session) || null, bearerVan(req));
+}
+
+module.exports = { dragersVanVerzoek, dragersVanSessie, EIGEN_LAGEN, bearerVan };

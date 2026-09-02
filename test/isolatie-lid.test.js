@@ -328,20 +328,39 @@ test('8. het scherm belooft niet meer dan de code doet', async () => {
      kern/isolatie/handhaving.js, dan MAG het antwoord niet zeggen dat http wordt
      afgedwongen. Dit is de kern van deze toets: niet "de tekst is goed" maar "de
      tekst is afgeleid". */
-  const handhaving = require('../server/kern/isolatie/handhaving');
-  const h = handhaving.stand();
-  assert.equal(a.http, h.afdwingen,
-    'het scherm zegt iets anders dan de aanmeldplek: ' + JSON.stringify(h));
-  if (!h.gemonteerd) {
-    assert.equal(a.http, false,
-      'zonder handhaver hoort dit veld false te zijn -- een lid dat denkt dat hij beschermd is, ' +
-      'gedraagt zich daarnaar');
-    assert.match(String(a.waarom), /staat er nog niet/);
+  /* DE BEWERING WORDT TEGEN DE BRON GEHOUDEN EN NIET TEGEN EEN REGISTER IN DIT
+     PROCES. Die eerste versie deed dat wel, en dat was fout: kern/isolatie/handhaving.js
+     draagt MODULESTAND, en de server draait in een KIND-proces. De toets vroeg
+     dus zijn eigen (lege) register en vergeleek dat met het antwoord van een
+     andere node -- hij zou nooit iets anders dan "niet gemonteerd" hebben gezien,
+     en dus ook nooit een verkeerde belofte hebben gevangen zodra de poort er wel
+     stond. Een toets die het verkeerde proces vraagt, geeft dekking zonder te
+     dekken.
+
+     De bron zegt het wel: `zetLaag(isolatie)` ZONDER `{ afdwingen: true }` is de
+     schaduwstand. Zodra iemand die vlag ergens omzet, hoort deze toets te zakken
+     tot ook de verwachting is bijgewerkt -- dat is precies de bedoeling, want de
+     vlag omzetten is een besluit en geen configuratiedetail. */
+  const bronnen = ['server/routes/isolatie.js', 'server/routes/techniek/isolatie.js']
+    .map(f => fs2.readFileSync(path2.join(__dirname, '..', f), 'utf8')).join('\n');
+  const meldt = /zetLaag\(isolatie\)/.test(bronnen);
+  const dwingtAf = /zetLaag\(isolatie,\s*\{[^}]*afdwingen:\s*true/.test(bronnen);
+  assert.ok(meldt, 'de isolatielaag hoort zich bij de HTTP-poort aan te melden');
+
+  /* DRIE STANDEN, EN ELK HEEFT ZIJN EIGEN ZIN. De middelste glijdt het makkelijkst
+     weg: een poort die MEELOOPT is gemonteerd en dwingt niets af, en wie die twee
+     samenvat liegt opnieuw -- nu met een teller als dekmantel. */
+  assert.equal(a.http, dwingtAf,
+    'het scherm zegt iets anders dan de bron: gemeld=' + meldt + ' afdwingen=' + dwingtAf);
+  if (!dwingtAf) {
+    assert.match(String(a.waarom), meldt ? /houdt nog niets tegen/ : /staat er nog niet/,
+      'SCHADUW IS GEEN HANDHAVING, en de zin hoort dat te zeggen: ' + a.waarom);
   }
 
-  /* EN SCHADUW IS GEEN HANDHAVING. Een poort die meeloopt zonder te blokkeren
-     telt, maar houdt niets tegen; die twee door elkaar halen is dezelfde leugen
-     in een nieuwe vorm. */
+  /* EN SCHADUW IS GEEN HANDHAVING -- de aanmeldplek zelf, in dit proces. Hij mag
+     hier wel worden aangeroepen: dit is een eigenschap van de MODULE en geen
+     vraag over de draaiende server, dus het kind-proces doet er niet toe. */
+  const handhaving = require('../server/kern/isolatie/handhaving');
   handhaving.meldHandhaver({ waar: 'toets', modus: 'schaduw' });
   assert.equal(handhaving.stand().afdwingen, false, 'schaduw is geen handhaving');
   assert.equal(handhaving.stand().gemonteerd, true, 'maar hij is wel gemonteerd');

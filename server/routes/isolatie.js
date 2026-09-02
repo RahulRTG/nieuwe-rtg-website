@@ -53,6 +53,17 @@ module.exports = (kern) => {
     }
   });
   const isolatie = kern.isolatie;
+
+  /* DE LAAG MELDT ZICH BIJ DE HTTP-POORT. Hij hangt in de middleware-keten, die
+     bij het opstarten VOOR de routers wordt gebouwd -- dus hij kan de laag niet
+     zelf requiren zonder een kringverwijzing. Late binding, zelfde patroon als
+     zetWacht/zetScanNet in opzet/verzoekketen.js.
+
+     ZONDER `{ afdwingen: true }` LOOPT HIJ IN DE SCHADUW: hij telt wat hij zou
+     sluiten en houdt niets tegen. CONTROLPLANE.md -- je kunt niet afdwingen wat
+     nooit heeft meegelopen, en de prijs van aanzetten is hier gemeten en groot. */
+  require('../middleware/isolatiepoort').zetLaag(isolatie);
+
   /* WAT ER NOG WERKT, voor het lid zelf. Dezelfde meter als op de cockpit en met
      opzet niet een tweede lijst: een lid dat overweegt zichzelf dicht te zetten,
      hoort precies te zien wat het kantoor ook ziet. Wie de knop niet durft in te

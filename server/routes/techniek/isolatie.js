@@ -48,6 +48,17 @@ module.exports = (tctx) => {
      begint, dezelfde is als die het kantoor ziet. Twee exemplaren lezen allebei
      uit db.data en lopen tóch uiteen zodra er een teller of een cache bij komt. */
   if (tctx.kern && !tctx.kern.isolatie) tctx.kern.isolatie = isolatie;
+
+  /* DE LAAG MELDT ZICH BIJ DE HTTP-POORT. Hij hangt in de middleware-keten, die
+     bij het opstarten VOOR de routers wordt gebouwd -- dus hij kan de laag niet
+     zelf requiren zonder een kringverwijzing. Late binding, zelfde patroon als
+     zetWacht/zetScanNet in opzet/verzoekketen.js.
+
+     ZONDER `{ afdwingen: true }` LOOPT HIJ IN DE SCHADUW: hij telt wat hij zou
+     sluiten en houdt niets tegen. CONTROLPLANE.md -- je kunt niet afdwingen wat
+     nooit heeft meegelopen, en de prijs van aanzetten is hier gemeten en groot. */
+  require('../../middleware/isolatiepoort').zetLaag(isolatie);
+
   const filter = maakIsolatiefilter({ isolatie, beleid });
 
   function actor(req) {

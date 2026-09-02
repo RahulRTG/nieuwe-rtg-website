@@ -23,6 +23,7 @@ const { natieNaarLand } = require('./functieschakelaars-tekst');
    gegaan hoort ook bij elkaar -- het is de vraag WAT een beller te horen krijgt,
    los van de vraag OF hij erdoor mag. */
 const antwoord = require('./schakelaar-antwoord');
+const isolatiepoort = require('./isolatiepoort');
 const { ZIN, bekendeBeller } = antwoord;
 
 function schakelaars({ db, accounts, functies, sessionFor, findSupplier, wachter, bevoegdVan, beschermstand }) {
@@ -97,20 +98,16 @@ function schakelaars({ db, accounts, functies, sessionFor, findSupplier, wachter
       }
     }
 
-    /* DE VEILIGE NOODSTAND (kern/beschermstand.js). Hij staat BOVEN de snelle
-       uitgang hieronder, want die slaat alles over zolang er nog nooit iets
-       geschakeld is -- en juist dan hoort een noodstand te werken. Hij hangt
-       ook niet aan een schakelaarstand: deze stand zet met opzet geen enkele
-       functie om, zodat opheffen geen herstelactie is maar het wegnemen van een
-       vlag. Zie kern/incidentcontrole-bescherm.js. */
-    const ic = db.data && db.data.techniek && db.data.techniek.incidentcontrole;
-    if (beschermstand && ic && ic.modus === 'beschermd') {
-      const houd = beschermstand.houdtTegen(p, req.method);
-      if (houd) {
-        return res.status(503).json({ error: ZIN.bescherming, functie: houd.functie, naam: houd.naam,
-          reden: 'bescherming', categorie: houd.categorie, waarom: houd.waarom });
-      }
-    }
+    /* DE BEVEILIGINGS-AS staat nu in zijn geheel in ./isolatiepoort.js: het huis
+       (de veilige noodstand) en de drager eronder zijn twee hoogtes van EEN as,
+       en die schuift om een andere reden dan dit bestand -- hier een knop in de
+       boardroom, daar een incident of een mens die zichzelf beschermt.
+
+       DE PLEK IN DE KETEN IS ONVERANDERD: boven de snelle uitgang hieronder,
+       want die slaat alles over zolang er nog nooit iets geschakeld is -- en
+       juist dan hoort een noodstand te werken. */
+    const beveiliging = isolatiepoort.weeg(req, { db, beschermstand });
+    if (beveiliging) return res.status(503).json(beveiliging.antwoord);
 
     const staat = (db.data && db.data.techniek && db.data.techniek.functies) || null;
     /* DE SNELLE UITGANG: is er nog nooit iets geschakeld, dan staat alles aan.

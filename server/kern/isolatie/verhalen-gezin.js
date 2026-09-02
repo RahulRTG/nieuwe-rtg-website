@@ -20,8 +20,10 @@ const GEZIN = [
   { id: 'kind-bereiken', wie: 'gezin', wat: 'zien waar mijn kind is', moetHeel: false,
     paden: ['/api/foundation/gezin/inloggen', 'GET /api/foundation/gezin/:code/locaties',
       'GET /api/foundation/gezin/:code/berichten'],
-    waarom: 'GEMETEN: de DEUR (/inloggen) gaat onder isolatie dicht terwijl de reads erachter open ' +
-      'blijven -- wie al binnen is leest door, wie erbuiten staat komt er niet in' },
+    waarom: 'BESLUIT VAN DE EIGENAAR, 2 september 2026. De DEUR (/inloggen) ging onder isolatie ' +
+      'dicht terwijl de reads erachter openbleven -- wie al binnen was las door, wie erbuiten stond ' +
+      'kwam er niet in. Een half gesloten deur beschermt niemand en houdt alleen de ouder tegen die ' +
+      'er nog niet was. Hij staat nu in FYSIEKE_DEUR.' },
   { id: 'kind-bericht-sturen', wie: 'gezin', wat: 'mijn kind een bericht sturen', moetHeel: false,
     paden: ['/api/foundation/gezin/bericht'] },
   { id: 'kind-gezondheid-lezen', wie: 'gezin', wat: 'de gezondheidsgegevens van mijn kind lezen', moetHeel: false,

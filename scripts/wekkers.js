@@ -248,7 +248,8 @@ if (require.main === module) {
          nog bij de code van vandaag hoort. Zonder stempel zou hij eerlijk
          "ouderdom niet vast te stellen" melden, en dat is een uitslag die je
          niet vrijwillig aan een meter geeft. */
-      JSON.stringify({ stempel: stempel(), hoe: 'npm run wekkers:vast', ...r }, null, 2) + '\n');
+      JSON.stringify({ stempel: stempel(), hoe: 'npm run wekkers:vast',
+        grens: 'Dit vindt ingangen aan hun PATROON in de code (setInterval, subscribe, createServer, spawn) plus de verklaarde webhooks. Wat hij NIET aantoont: dat een gevonden wekker ook echt loopt, en dat de lijst compleet is -- een ingang in een vorm die hier niet staat, bestaat voor deze meter niet. Een wekker BINNEN de envelop van een functie gaat bovendien niet vanzelf uit als die functie uit gaat.', ...r }, null, 2) + '\n');
     process.stdout.write(rapport(r) + '\n\nVastgelegd in WEKKERS.json\n');
   } else process.stdout.write(rapport(r) + '\n');
 }

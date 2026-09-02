@@ -539,7 +539,8 @@ if (require.main === module) {
          nog bij de code van vandaag hoort. Zonder stempel zou hij eerlijk
          "ouderdom niet vast te stellen" melden, en dat is een uitslag die je
          niet vrijwillig aan een meter geeft. */
-      JSON.stringify({ stempel: stempel(), hoe: 'npm run activering:vast', ...r }, null, 2) + '\n');
+      JSON.stringify({ stempel: stempel(), hoe: 'npm run activering:vast',
+        grens: 'Dit is een ONDERGRENS, geen inventaris: 48 functies dragen die graad met zoveel woorden, en daar is het echte bereik groter dan het getal. Wat hij NIET aantoont: dat een bereikt bestand ook werkelijk draait als die functie aanstaat (de schakelaar zit op de route, niet op wat erachter ligt), en niets over gedrag -- alleen over bereik.', ...r }, null, 2) + '\n');
     process.stdout.write(rapport(r) + '\n\nVastgelegd in ACTIVERING.json\n');
   } else process.stdout.write(rapport(r) + '\n');
   process.exit(0);

@@ -298,6 +298,7 @@ if (require.main === module) {
         /* Met stempel en `hoe`: deze wig loopt een echte bestelling langs een
            draaiende server, dus hij veroudert met de code eronder. */
         stempel: stempel(), hoe: 'npm run zaakwig:vast',
+        grens: 'Dit is EEN scenario in EEN zaak op drie treden, geen dekking. Het bewijst dat deze keten rondkomt en dat deze invarianten houden -- niet dat elke bestelweg, elk genre of elke betaalvorm klopt. `niet-gedraaid` is hier met opzet geen geslaagde uitslag.',
         gemetenOp: new Date().toISOString().slice(0, 10), treden: uit, gezakt }, null, 2) + '\n');
       process.stdout.write(rapport(uit) + '\n\nVastgelegd in ZAAKWIG.json\n');
     } else process.stdout.write(rapport(uit) + '\n');

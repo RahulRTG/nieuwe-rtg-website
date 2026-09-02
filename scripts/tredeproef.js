@@ -662,7 +662,8 @@ if (require.main === module && process.argv.includes('--alle')) {
     /* Met stempel en `hoe`. Deze meting klopt bij ELKE trede aan een echt
        draaiende server, dus hij hoort bij de code van die dag en bij geen
        andere: een verouderde "0 lekken" is erger dan geen meting. */
-    JSON.stringify({ stempel: stempel(), hoe: 'node scripts/tredeproef.js --alle --vastleggen', ...uit }, null, 2) + '\n');
+    JSON.stringify({ stempel: stempel(), hoe: 'node scripts/tredeproef.js --alle --vastleggen',
+        grens: 'Vier uitslagen die nooit worden opgeteld. `zuiver` is een besluit over alle routes en bewijst de bedrading niet; `beproefd` is een STEEKPROEF van zestig routes en kan dus niet compleet zijn. De rondgang dekt niet wat een eigen account eist of wat een tweede mens eist. En alles hier is HTTP behalve de twee aangeklopte poorten: cron, bus en AI-gereedschap komen er niet langs.', ...uit }, null, 2) + '\n');
   process.stdout.write(rapport(hoofd) + '\n\n' + tabel(treden) + '\n\nVastgelegd in TREDEPROEF.json\n');
   process.exit(treden.some(t => t.zuiverLekken || t.beproefdNiet503 || t.rondgangGezakt) ? 1 : 0);
 } else if (require.main === module) {

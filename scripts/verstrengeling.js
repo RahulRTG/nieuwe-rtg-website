@@ -449,7 +449,8 @@ if (require.main === module) {
          nog bij de code van vandaag hoort. Zonder stempel zou hij eerlijk
          "ouderdom niet vast te stellen" melden, en dat is een uitslag die je
          niet vrijwillig aan een meter geeft. */
-      JSON.stringify({ stempel: stempel(), hoe: 'npm run verstrengeling:vast', ...r }, null, 2) + '\n');
+      JSON.stringify({ stempel: stempel(), hoe: 'npm run verstrengeling:vast',
+        grens: 'Dit meet de STATISCHE require-graaf en niets anders. Wat hij NIET ziet: de kern-tas (de meeste route-bestanden hebben nul requires en krijgen hun domein via een factory-parameter -- daarvoor is ACTIVERING.json), aanroepen over HTTP, over de bus of via de AI, en of een rand ook werkelijk wordt gebruikt op het moment dat het ertoe doet. Nul onverklaarde randen betekent dat elke rand een reden DRAAGT, niet dat elke reden goed is.', ...r }, null, 2) + '\n');
     process.stdout.write(rapport(r) + '\n\nVastgelegd in VERSTRENGELING.json\n');
   } else process.stdout.write(rapport(r) + '\n');
 }

@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-31T19:13:16.701Z",
-  "commit": "fffbb0fc",
+  "op": "2026-09-02T10:03:19.692Z",
+  "commit": "eb2f5d68",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -9,14 +9,14 @@
  "grens": "Dit is een lijst van wat we WETEN dat we niet hebben gemeten. Wat niemand heeft bedacht staat er per definitie niet in, en dat is de gevaarlijkste categorie -- een schuldenlijst is geen dekkingsbewijs. De aantallen komen uit de registers en zijn dus zo vers als de laatste ronde; zie scripts/versheid.js.",
  "telling": {
   "posten": 18,
-  "meetwerk": 1673,
+  "meetwerk": 1725,
   "instrument": 932,
   "grens": 608
  },
  "aflossing": {
   "doel": 0,
   "wat": "de achterstand (meetwerk + instrument) gaat naar nul. `grens` telt niet mee en sluit nooit -- dat is de rand van de methode en geen werk.",
-  "staat": 2605,
+  "staat": 2657,
   "regels": [
    "de achterstand mag nooit groeien zonder een reden IN dit register (--groei=...)",
    "een post mag niet van soort veranderen om onder de poort uit te komen: naar `grens` verplaatsen laat de achterstand dalen zonder dat er iets gemeten is",
@@ -157,7 +157,7 @@
    "id": "idem-ongeclassificeerd",
    "soort": "meetwerk",
    "wat": "muterende routes zonder uitspraak over herhalen: wat gebeurt er bij een tweede keer",
-   "aantal": 1477,
+   "aantal": 1529,
    "waarom": "autonomie zonder herhaalsemantiek is niet te doen: een keten die halverwege afbreekt moet weten of opnieuw beginnen veilig is. Het doel is niet dat alles idempotent IS -- het is dat van elke route vastligt wat een tweede keer betekent.",
    "sluit": "per route beslissen en vastleggen. Het instrument staat (scripts/idemproef-route.js plus IDEMBESLUIT.json met zijn klassen); dit is meetwerk en handwerk."
   },
@@ -175,11 +175,19 @@
    {
     "op": "2026-08-31",
     "aantal": 0
+   },
+   {
+    "op": "2026-09-02",
+    "aantal": 0
    }
   ],
   "capability-in-handler": [
    {
     "op": "2026-08-31",
+    "aantal": 523
+   },
+   {
+    "op": "2026-09-02",
     "aantal": 523
    }
   ],
@@ -187,11 +195,19 @@
    {
     "op": "2026-08-31",
     "aantal": 52
+   },
+   {
+    "op": "2026-09-02",
+    "aantal": 52
    }
   ],
   "output-deuren": [
    {
     "op": "2026-08-31",
+    "aantal": 18
+   },
+   {
+    "op": "2026-09-02",
     "aantal": 18
    }
   ],
@@ -199,11 +215,19 @@
    {
     "op": "2026-08-31",
     "aantal": 63
+   },
+   {
+    "op": "2026-09-02",
+    "aantal": 63
    }
   ],
   "output-niet-toerekenbaar": [
    {
     "op": "2026-08-31",
+    "aantal": 0
+   },
+   {
+    "op": "2026-09-02",
     "aantal": 0
    }
   ],
@@ -211,11 +235,19 @@
    {
     "op": "2026-08-31",
     "aantal": 0
+   },
+   {
+    "op": "2026-09-02",
+    "aantal": 0
    }
   ],
   "output-onwaarneembaar": [
    {
     "op": "2026-08-31",
+    "aantal": 4
+   },
+   {
+    "op": "2026-09-02",
     "aantal": 4
    }
   ],
@@ -223,11 +255,19 @@
    {
     "op": "2026-08-31",
     "aantal": null
+   },
+   {
+    "op": "2026-09-02",
+    "aantal": null
    }
   ],
   "audit-verklaard": [
    {
     "op": "2026-08-31",
+    "aantal": null
+   },
+   {
+    "op": "2026-09-02",
     "aantal": null
    }
   ],
@@ -235,11 +275,19 @@
    {
     "op": "2026-08-31",
     "aantal": 0
+   },
+   {
+    "op": "2026-09-02",
+    "aantal": 0
    }
   ],
   "object-vooraf": [
    {
     "op": "2026-08-31",
+    "aantal": 932
+   },
+   {
+    "op": "2026-09-02",
     "aantal": 932
    }
   ],
@@ -247,11 +295,19 @@
    {
     "op": "2026-08-31",
     "aantal": 1
+   },
+   {
+    "op": "2026-09-02",
+    "aantal": 1
    }
   ],
   "gevolg-onbekend": [
    {
     "op": "2026-08-31",
+    "aantal": 90
+   },
+   {
+    "op": "2026-09-02",
     "aantal": 90
    }
   ],
@@ -259,11 +315,19 @@
    {
     "op": "2026-08-31",
     "aantal": 2
+   },
+   {
+    "op": "2026-09-02",
+    "aantal": 2
    }
   ],
   "herstel-onbevestigd": [
    {
     "op": "2026-08-31",
+    "aantal": 47
+   },
+   {
+    "op": "2026-09-02",
     "aantal": 47
    }
   ],
@@ -271,11 +335,19 @@
    {
     "op": "2026-08-31",
     "aantal": 1477
+   },
+   {
+    "op": "2026-09-02",
+    "aantal": 1529
    }
   ],
   "wegwerpserver-kopieen": [
    {
     "op": "2026-08-31",
+    "aantal": 4
+   },
+   {
+    "op": "2026-09-02",
     "aantal": 4
    }
   ]
@@ -311,6 +383,12 @@
    "van": 1966,
    "naar": 2605,
    "reden": "Main binnengehaald: 4643 routes in plaats van 3282, en de idempotentieproef is over die nieuwe routes gedraaid. Daardoor groeit idem-ongeclassificeerd van 849 naar 1477 en gevolg-onbekend van 94 naar 90+ -- geen nieuwe schuld maar dezelfde schuld over een grotere boom. herstel-onbevestigd ging juist omlaag (63 -> 47) doordat de herstelproef ook over de nieuwe paren is gedraaid."
+  },
+  {
+   "op": "2026-09-02",
+   "van": 2605,
+   "naar": 2657,
+   "reden": "De idempotentieproef reikt verder, niet het werk. Commit 1916055c (De proef verder laten reiken: +53 gemeten, +44 bewezen lezers, 0 regressies) bracht 53 routes binnen bereik van scripts/idemproef.js die er daarvoor als onbereikbaar buiten stonden. Die routes DEDEN dat werk al; wat veranderde is dat IDEMPROEF.json ze nu meet en dus kan zien dat er geen besluit over ze staat in IDEMBESLUIT.json. idem-ongeclassificeerd gaat daardoor van 1477 naar 1529 en de achterstand van 2605 naar 2657. De andere zeventien posten bewogen niet. Dit is de goede kant op fout gaan: een route die stil onbereikbaar was telde als niets, en telt nu als onbeslist -- de schuld is niet gegroeid maar zichtbaar geworden. Sluiten doet niet dit script maar een mens die per route beslist wat een tweede aanroep hoort te doen."
   }
  ]
 }

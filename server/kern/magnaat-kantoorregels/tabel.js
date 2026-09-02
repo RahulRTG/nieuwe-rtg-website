@@ -73,7 +73,15 @@ const REGELS = [
   [/office\/(?:aidata)|\/belastingkantoor|\/loonstrook/, 'financien', 'Financiën'],
   [/office\/wereld|\/wereld\b/, 'controleregister', 'RTG Controleregister'],
   [/\/api\/office\b|\/kantoor\/gesprek|\/living-os|\/scherm\.html|\/app\.html/, 'intern', 'Intern & IT'],
-  [/\/techniek|\/wacht|\/incident|\/storing/, 'techniek', 'Techniek & De Wacht'],
+  /* ISOLATIE HOORT BIJ DEZELFDE HAND ALS DE INCIDENTCONTROLE, en dat is geen
+     naamsgelijkenis maar de opzet: kern/isolatie/ leest zijn huisstand uit de
+     incidentcontrole en de cockpit staat achter dezelfde deur (techAuth,
+     eigenaarAlleen). De ledenkant valt er ook onder -- wie een gestolen sessie
+     dichtzet doet incidentwerk, ook als hij het over zijn eigen account doet.
+     Zonder deze regel viel de hele laag in de terugval "Onderzoek & data", en
+     die terugval is met opzet rood: onbekend werk hoort niet stilletjes een
+     eigenaar te krijgen. */
+  [/\/techniek|\/wacht|\/incident|\/storing|[/-]isolatie/, 'techniek', 'Techniek & De Wacht'],
   /* RTG Link (LINK.md): de adres- en capabilitylaag. Hij hoort bij Intern & IT,
      bij de familie waar hij thuishoort -- codes, scanners, sleutels, identiteit
      (zie de platformregel verderop met /code, /scanner en /rtgid).

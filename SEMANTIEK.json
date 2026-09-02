@@ -1,9 +1,9 @@
 {
-  "catalogi": 989,
-  "verschillendeNamen": 590,
+  "catalogi": 997,
+  "verschillendeNamen": 596,
   "namenInMeerDomeinen": 111,
   "woordenMetMeerBetekenissen": 94,
-  "betekenissenTotaal": 348,
+  "betekenissenTotaal": 349,
   "ergsteWoord": "SOORTEN",
   "ergsteAantal": 45,
   "dubbelingen": 30,
@@ -225,6 +225,7 @@
       "waar": [
         "server/kern/command/opslag-register.js",
         "server/kern/concern/opslag.js",
+        "server/kern/isolatie/opslag.js",
         "server/kern/levensdossier/velden.js",
         "server/kern/mobiliteit/opslag.js",
         "server/kern/payroll/opslag.js",
@@ -2682,6 +2683,75 @@
       ]
     },
     {
+      "naam": "REGISTER",
+      "domeinen": 5,
+      "betekenissen": 5,
+      "hoogsteOverlap": 0,
+      "soort": "botsing",
+      "waar": [
+        {
+          "bestanden": [
+            "server/kern/command/opslag-register.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "steden",
+            "landen",
+            "zandbakken",
+            "overnames"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/concern/opslag.js"
+          ],
+          "leden": 8,
+          "voorbeeld": [
+            "concerns",
+            "entiteiten",
+            "vestigingen",
+            "employments"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/fiscaal/zekerheid.js"
+          ],
+          "leden": 19,
+          "voorbeeld": [
+            "btw.aangifte",
+            "btw.regel",
+            "btw.herbouw",
+            "btw.categorie"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/isolatie/opslag.js"
+          ],
+          "leden": 6,
+          "voorbeeld": [
+            "organisatie",
+            "identiteit",
+            "sessie",
+            "apparaat"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/veiligheid/opslag.js"
+          ],
+          "leden": 8,
+          "voorbeeld": [
+            "alarmen",
+            "wachten",
+            "momenten",
+            "kring"
+          ]
+        }
+      ]
+    },
+    {
       "naam": "STANDAARD",
       "domeinen": 5,
       "betekenissen": 5,
@@ -3203,63 +3273,6 @@
       ]
     },
     {
-      "naam": "REGISTER",
-      "domeinen": 4,
-      "betekenissen": 4,
-      "hoogsteOverlap": 0,
-      "soort": "botsing",
-      "waar": [
-        {
-          "bestanden": [
-            "server/kern/command/opslag-register.js"
-          ],
-          "leden": 5,
-          "voorbeeld": [
-            "steden",
-            "landen",
-            "zandbakken",
-            "overnames"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/concern/opslag.js"
-          ],
-          "leden": 8,
-          "voorbeeld": [
-            "concerns",
-            "entiteiten",
-            "vestigingen",
-            "employments"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/fiscaal/zekerheid.js"
-          ],
-          "leden": 19,
-          "voorbeeld": [
-            "btw.aangifte",
-            "btw.regel",
-            "btw.herbouw",
-            "btw.categorie"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/veiligheid/opslag.js"
-          ],
-          "leden": 8,
-          "voorbeeld": [
-            "alarmen",
-            "wachten",
-            "momenten",
-            "kring"
-          ]
-        }
-      ]
-    },
-    {
       "naam": "SCENARIOS",
       "domeinen": 4,
       "betekenissen": 4,
@@ -3371,5 +3384,5 @@
       ]
     }
   ],
-  "bestanden": 2883
+  "bestanden": 2927
 }

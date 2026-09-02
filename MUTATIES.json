@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-02T10:15:11.868Z",
-    "commit": "9cf891015",
+    "op": "2026-09-02T10:17:54.162Z",
+    "commit": "ed8d1e5b7",
     "boomVuil": true,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -262,6 +262,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "appstore-lab-toestemming-routes.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 15,
       "scherp": "gezakt"
     },
     "archief.test.js": {
@@ -3695,6 +3702,13 @@
       "gezakt": 7,
       "geprobeerd": 1
     },
+    "mijnrtg-routes.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 12,
+      "scherp": "gezakt"
+    },
     "minify.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -4956,6 +4970,13 @@
       "gezakt": 6,
       "scherp": "gezakt"
     },
+    "reisgezelschap-routes.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 12,
+      "scherp": "gezakt"
+    },
     "reisplan.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -5211,6 +5232,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "scherp": "gezakt"
+    },
+    "rtfos-gift-ruil-routes.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 18,
       "scherp": "gezakt"
     },
     "rtfos-governance.test.js": {

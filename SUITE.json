@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-09-02T07:26:31.438Z",
-  "commit": "cb694f3b9",
+  "op": "2026-09-02T08:31:31.735Z",
+  "commit": "59ed433aa",
   "boomVuil": false,
   "boomAnders": 1,
   "instrument": "scripts/test-runner.js",
@@ -12,7 +12,7 @@
  "hoe": "npm test",
  "gemeten": {
   "bestanden": 1337,
-  "afsluitcode": 0,
-  "groen": true
+  "afsluitcode": 1,
+  "groen": false
  }
 }

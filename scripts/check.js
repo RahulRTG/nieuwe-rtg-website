@@ -1844,7 +1844,60 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
      route, dan valt zijn 403 buiten het venster en heet de eerste route
      ongepoort. Bij naam noemen is eerlijker dan de code herschikken om een
      tekstafstand te plezieren. */
-  const POORT_BINNEN = /\b(profiel|schoolProfiel|rtfSociaal|eisAccount|resolveSession|verifyToken|sessionFor|magInzien|isEigenaar|boardroomWie|magBoardroom|doosSleutelOk|magMeten|metPartner|samenSess|kantoorSess|werkPoort|beheerVan|lidVan|viaBeheerOfDirectie)\s*\(/;
+  /* DE POORTEN VAN DE RTFOUNDATION- EN SCHOOLTAK, toegevoegd 2 september 2026.
+
+     Die takken hangen via `app.use('/api/foundation', router)` en waren daardoor
+     onzichtbaar voor de uitdrukking hierboven -- 342 van de 565 paden die deze
+     regel niet zag (zie de schaduwmeting onderaan). Ze dragen geen bewakerslaag
+     en poorten in de HANDLER, met een eigen vocabulaire dat hier niet stond.
+
+     ELKE NAAM IS IN ZIJN DEFINITIE NAGEKEKEN, en dat is geen formaliteit: de
+     eerste meting gaf ook `schoon`, `getal`, `String` en `isDatum` als kandidaat,
+     want die bewaken ook een vroege return. Wie die lijst op frequentie vult,
+     keurt honderden routes goed op een opschoonfunctie.
+
+       gezinVan        gezinshulp.js:147   return null
+       sessieVan       foundation.js:44    403 + return null
+       familieVan      foundation.js:51    403 (weigert gasten) + return null
+       gezinSessie     poorten.js:69       403 + return null
+       schoolVan       poorten.js:13       403 + return null
+       personeelVan    poorten.js:32       403 + return null
+       klasVan         poorten.js:44       403 + return null
+       docentCheck     onderwijs.js:44     403
+       lesVan          onderwijs.js:38     return null
+       beheerderVan    gezinshulp.js:158   403
+       magKlus         gezinsleven.js:105  403
+       marktVolwassen  markt.js:14         403
+       sessie          leden-mail.js:19    403 (weigert gasten) + return null
+
+     BEWUST NIET OPGENOMEN, en met de reden:
+       geldigePin   `p => /^\d{4,6}$/.test(p)` -- een controle op VORM is geen
+                    controle (LAT.md regel 8). Vier cijfers is geen bewijs.
+       magGeld,     rolpredicaten op een AL geauthenticeerde sessie
+       isGast       (`s.p.rol`). Ze verfijnen een poort; ze zijn er geen.
+       schoon,      opschonen en omzetten. Ze bewaken wel een vroege return,
+       getal        en juist daarom staan ze hier met naam als tegenvoorbeeld.
+       mijn, ipVan  een gefilterde berichtenlijst en het IP-adres. Ze staan naast
+                    een poort, ze zijn er geen.
+
+     EN `poort` STAAT ER WEL IN, MAAR ALLEEN IN DE VORM `poort(req, ...)`. Deze
+     naam draagt in dit huis twee betekenissen, en ik heb ze bij het schrijven
+     van deze lijst eerst verwisseld -- met de gevaarlijke uitkomst, want ik
+     sloot de echte poort uit:
+
+       `server/school/rollen.js:84`  function poort(req, res, recht)
+                                     schoolcode, token, actieve status EN een
+                                     rechtencontrole, alle vier met 403. Dit is
+                                     de poort van de hele schooltak.
+       `server/school/taalcheck.js:34`  const poort = mag(doel, taal, beleid)
+                                     een TAALBELEID-uitkomst met 400. Geen
+                                     autorisatie, en toevallig dezelfde naam.
+
+     De vorm scheidt ze: de poort wordt met `(req` aangeroepen, de variabele
+     wordt toegekend. Vandaar de tweede tak in de uitdrukking hieronder en niet
+     de kale naam. Dit is SEMANTIEK.json in het klein -- een naam met twee
+     betekenissen, in de veiligheidslaag. */
+  const POORT_BINNEN = /\b(profiel|schoolProfiel|rtfSociaal|eisAccount|resolveSession|verifyToken|sessionFor|magInzien|isEigenaar|boardroomWie|magBoardroom|doosSleutelOk|magMeten|metPartner|samenSess|kantoorSess|werkPoort|beheerVan|lidVan|viaBeheerOfDirectie|gezinVan|sessieVan|familieVan|gezinSessie|schoolVan|personeelVan|klasVan|docentCheck|lesVan|beheerderVan|magKlus|marktVolwassen|sessie)\s*\(|\bpoort\s*\(\s*req/;
 
   /* PUBLIEK MET REDEN staat in ./lib/publiekeroutes.js, en daar alleen. Hij
      stond hier, en het mutatiecontractregister heeft hem ook nodig: een contract
@@ -1934,18 +1987,29 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
      afdwingen. TAKEN.md 7.14 draagt de weg naar hard. */
   {
     const { buitenBereik } = require('./lib/poortbereik');
-    const b = buitenBereik(bestaat);
+    const b = buitenBereik(bestaat, { poortMw: POORT_MW, poortBinnen: POORT_BINNEN, publiek: PUBLIEK });
     if (b.nietVastTeStellen) {
       console.log('  \x1b[2m? bereik van deze regel niet vast te stellen: ' + b.nietVastTeStellen + '\x1b[0m');
     } else if (!b.paden.length) {
       ok('en deze regel ziet elk /api-pad dat de router kent');
+    } else if (b.nietGeclassificeerd) {
+      console.log('  \x1b[2m? ' + b.paden.length + ' paden vallen buiten deze regel, ongeclassificeerd: ' +
+        b.nietGeclassificeerd + '\x1b[0m');
     } else {
-      const takken = Object.entries(b.perTak).sort((a, b2) => b2[1] - a[1]).slice(0, 6)
-        .map(([t, n]) => t + ' ' + n).join(', ');
+      const k = b.klasse;
       console.log('  \x1b[2m! SCHADUW: ' + b.paden.length + ' van de ' + b.bekend +
-        ' /api-paden die de router kent, vallen buiten deze regel (' + b.zonderBewaker.length +
-        ' daarvan zonder bewakerslaag). Per tak: ' + takken +
-        '. Meldt, blokkeert nog niet -- zie TAKEN.md 7.14\x1b[0m');
+        ' /api-paden die de router kent, vallen buiten de uitdrukking van deze regel. Geclassificeerd: ' +
+        k.poortwachter.length + ' via een poortwachter, ' + k.inHandler.length + ' met een poort in de handler, ' +
+        k.publiek.length + ' publiek met reden, ' + k.bronOnvindbaar.length + ' bron onvindbaar, ' +
+        k.onbekend.length + ' bewakers onbekend.\x1b[0m');
+      if (k.gat.length) {
+        console.log('  \x1b[2m! en ' + k.gat.length + ' ZONDER enige poort -- die blokkeren nog niet, ' +
+          'maar dit is de lijst die naar nul moet (TAKEN.md 7.14):\x1b[0m');
+        for (const g of k.gat.slice(0, 12)) console.log('  \x1b[2m    ' + g + '\x1b[0m');
+        if (k.gat.length > 12) console.log('  \x1b[2m    ... en nog ' + (k.gat.length - 12) + '\x1b[0m');
+      } else {
+        console.log('  \x1b[2m! en GEEN ENKELE zonder poort -- de schaduw mag hard worden gemaakt\x1b[0m');
+      }
     }
   }
 }

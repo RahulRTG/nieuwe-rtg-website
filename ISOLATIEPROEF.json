@@ -11,6 +11,18 @@
   "geenSamengesteldCijfer": "met opzet. Zie de kop van scripts/isolatieproef.js.",
   "schuld": [
     {
+      "punt": "de uitgaande mailweg koos zijn doel niet zelf",
+      "stand": "GEREPAREERD, EN NIET DICHT",
+      "waarom": "server/smtp-direct.js bezorg() zoekt de MX van het domein achter de @ op en opent daar een TCP-verbinding. Dat is de enige uitgaande verbinding van dit huis waarvan de BESTEMMING door een buitenstaander wordt gekozen: wie een domein beheert zet zijn MX waar hij wil, en dus ook op 10.0.0.5 of 127.0.0.1. kern/ssrf.js noemde zichzelf al een vangnet voor uitgaande fetches en de smarthost-kant (server/smtp.js) gebruikte hem; deze helft liep er nooit langs.",
+      "open": "de poort geldt alleen op de DNS-tak -- een MX die onze eigen code meegeeft is niet door een aanvaller gekozen, en hem daar weigeren maakt een uitrol met een interne mailserver onmogelijk (de eerste versie deed dat wel en liet zes bestaande toetsen zakken). Wat NIET dicht is: een hostnaam die pas NA de DNS-opzoeking naar binnen wijst. Dat is DNS-rebinding en blijft ONBEPAALD_INFRA -- het hoort achter een egress-poort in de uitrol, en die is er niet."
+    },
+    {
+      "punt": "een zaaksessie bereikt de dragerlaag niet",
+      "stand": "GEMETEN GAT",
+      "waarom": "supplierAuth (opzet/leverancierpoort.js) zet req.supplier en req.actor, maar NOOIT req.session. kern/isolatie/sessiedragers.js leest req.session en de Authorization-kop, dus voor een zaakverzoek is er geen enkele drager -- niet alleen `organisatie` ontbreekt, de hele context is null. Beide contextbouwers (kern/stuur/luscontext.js en routes/stuur.js) geven daarop null terug.",
+      "open": "de HERKOMSTkant is hierdoor niet meer stil: kern/stuur/paden.js keerde bij een lege context vroeg terug en versmalde dus ook niet op onvertrouwde invoer -- gemeten kostte dat een zaak 53 paden waar er 9 hadden moeten overblijven. Die terugkeer hangt nu alleen nog aan de LAAG en niet aan de context. Wat OPEN blijft: een zaak kan zichzelf niet in isolatie zetten en RTG kan een zaaksessie niet gericht dichtzetten, want er is geen sleutel om de stand aan te hangen. Dat vraagt een besluit over WELKE organisatie de drager is (TENANT.md houdt org, werkruimte en leverancier met opzet uit elkaar) en niet een regel code."
+    },
+    {
       "punt": "handhaving in de HTTP-keten",
       "stand": "ONTBREEKT",
       "waarom": "GEMETEN: middleware/functieschakelaars.js leest alleen het HUIS-veld (ic.modus === \"beschermd\") en roept beschermstand.houdtTegen() aan. Grep naar \"isolatie\" in server/middleware/ geeft NUL treffers. isolatie.besluit() wordt in heel server/ door drie plekken aangeroepen: kern/stuur/isolatiefilter.js (de AI-padlijst), routes/techniek/isolatie.js (een proef die niets uitvoert) en kern/isolatie/bruikbaarheid.js (een meter).",
@@ -868,7 +880,7 @@
       "zonderSleutelbron": [
         {
           "naam": "organisatie",
-          "waarom": "een sessie draagt geen organisatiecode. Een zaaksessie kent `code`, maar geen enkele aanroeper geeft die door aan deze laag; RTG kan de stand dus wel ZETTEN vanaf de cockpit, maar hij werkt bij een lopend verzoek van dat lid nog niet mee in de join."
+          "waarom": "DRIE REDENEN, en ze zijn alle drie gemeten. (1) Een ledensessie draagt geen organisatiecode: req.session wordt op precies EEN plek gezet (opzet/diensten2.js) in de vorm { tier, key, account }, en daar zit geen org bij. (2) De zaaksessie die WEL een code draagt, bereikt deze laag helemaal niet: supplierAuth zet req.supplier en req.actor en nooit req.session, dus voor een zaakverzoek weegt GEEN ENKELE drager mee -- niet alleen deze niet. (3) En er is geen eenduidig antwoord op de vraag welke organisatie het IS: TENANT.md houdt org, werkruimte en leverancier met opzet uit elkaar, en iemand die bij twee organisaties werkt zou de strengste van de twee over zijn hele sessie krijgen -- de join kent geen wereld. Een sleutel invullen is hier dus geen ontbrekend stukje werk maar een BESLUIT dat eerst moet worden genomen; hem raden sluit de verkeerde mensen af."
         },
         {
           "naam": "workload",
@@ -1168,11 +1180,21 @@
         "bijt": false,
         "wat": "de leiding ligt er: de lus boekt zijn kanalen, de kaart versmalt erop en de poort hangt VOOR de uitvoering. Hij BIJT alleen met RTG_HERKOMST_AFDWINGEN=1; daarzonder telt hij en houdt hij niets tegen (CONTROLPLANE.md: eerst in de schaduw)."
       },
+      "prijsPerRol": {
+        "member": {
+          "voor": 120,
+          "na": 36
+        },
+        "supplier": {
+          "voor": 53,
+          "na": 9
+        }
+      },
       "waar": "kern/stuur/herkomstpoort.js (het oordeel), kern/stuur/isolatiefilter.js (de lijst) en kern/stuur/lusstap.js (de poort voor de uitvoering) -- een oordeel, drie lezers",
       "nietGebouwd": {
         "detectie": "er wordt geen tekst gescand; de klasse komt uit het KANAAL en nooit uit de inhoud",
         "labelaars": "van de 13 kanalen meldt er vandaag precies EEN zich aan: `toolantwoord`, geboekt door kern/stuur/besmetting.js. De andere twaalf hebben geen enkele aanmelder. Een route die weet dat zij post of een document teruggeeft, kan zich VERFIJNEN -- dat is niet gebouwd, en zolang dat zo is telt alles wat een gereedschap teruggeeft als `toolantwoord`. Dat is de veilige kant, maar dekking is het niet.",
-        "prijs": "de standaard kost bereik: na de eerste geslaagde `doe` versmalt de lijst van een lid aanzienlijk. Dat is de reden dat hij in de schaduw loopt en niet bijt -- eerst het getal, dan het besluit."
+        "prijs": "de standaard kost bereik: na de eerste geslaagde `doe` versmalt de lijst. Dat is de reden dat hij in de schaduw loopt en niet bijt -- eerst het getal, dan het besluit. Het getal staat hieronder in `prijsPerRol` en niet in deze zin, want een zin veroudert stil."
       }
     },
     "uitgaandeBestemmingen": {
@@ -1187,7 +1209,7 @@
       "ONBESLIST": 0,
       "ONBEPAALD_INFRA": 43,
       "appBewijs": "kern/ssrf.js weigert privé- en metadata-adressen voor doelen die een CLIENT aanlevert, en houdt voor web-push een allowlist van pushdiensten aan",
-      "infraBewijs": "ONTBREEKT: er is in deze repo geen egress-policy, geen deny-by-default en geen netwerknamespace-bewijs. PRODUCTION.md belooft een egress-proxy; een belofte is geen meting",
+      "infraBewijs": "ONTBREEKT: er is in deze repo geen egress-policy, geen deny-by-default en geen netwerknamespace-bewijs. En let op: hier stond \"PRODUCTION.md belooft een egress-proxy; een belofte is geen meting\" -- dat document noemt egress NERGENS. Er was dus niet eens een belofte, alleen een verwijzing naar een paragraaf die nooit heeft bestaan (dezelfde fout als de cap `rooms` in CLAUDE.md). Er is geen egress-poort, en er is er ook nooit een toegezegd",
       "eindoordeel": "ONBEPAALD_INFRA",
       "waarschuwing": "dit telt genoemde hosts, niet bereikbare hosts. Zonder egress-policy is het werkelijke aantal bestemmingen het hele internet.",
       "hosts": [

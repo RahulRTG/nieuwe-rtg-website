@@ -59,9 +59,16 @@ const DRAGERS = Object.freeze([
     sleutelbron: 'geen sleutel nodig: er is er maar een' },
   { naam: 'organisatie', wat: 'één klantorganisatie (TENANT.md: org IS de klant)', gezetDoor: 'orgbeheer of RTG', bron: 'db.data.isolatie.organisatie',
     sleutelbron: null,
-    geenSleutel: 'een sessie draagt geen organisatiecode. Een zaaksessie kent `code`, maar geen ' +
-      'enkele aanroeper geeft die door aan deze laag; RTG kan de stand dus wel ZETTEN vanaf de ' +
-      'cockpit, maar hij werkt bij een lopend verzoek van dat lid nog niet mee in de join.' },
+    geenSleutel: 'DRIE REDENEN, en ze zijn alle drie gemeten. (1) Een ledensessie draagt geen ' +
+      'organisatiecode: req.session wordt op precies EEN plek gezet (opzet/diensten2.js) in de vorm ' +
+      '{ tier, key, account }, en daar zit geen org bij. (2) De zaaksessie die WEL een code draagt, ' +
+      'bereikt deze laag helemaal niet: supplierAuth zet req.supplier en req.actor en nooit ' +
+      'req.session, dus voor een zaakverzoek weegt GEEN ENKELE drager mee -- niet alleen deze niet. ' +
+      '(3) En er is geen eenduidig antwoord op de vraag welke organisatie het IS: TENANT.md houdt ' +
+      'org, werkruimte en leverancier met opzet uit elkaar, en iemand die bij twee organisaties ' +
+      'werkt zou de strengste van de twee over zijn hele sessie krijgen -- de join kent geen wereld. ' +
+      'Een sleutel invullen is hier dus geen ontbrekend stukje werk maar een BESLUIT dat eerst moet ' +
+      'worden genomen; hem raden sluit de verkeerde mensen af.' },
   { naam: 'identiteit',  wat: 'één mens of zaak, over al zijn sessies',   gezetDoor: 'het lid zelf of RTG', bron: 'db.data.isolatie.identiteit',
     sleutelbron: 'req.session.key' },
   { naam: 'sessie',      wat: 'één ingelogde sessie',                     gezetDoor: 'het lid zelf of RTG', bron: 'db.data.isolatie.sessie',

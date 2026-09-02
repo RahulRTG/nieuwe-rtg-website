@@ -56,10 +56,29 @@ module.exports = function maakStuurPaden({ VERBODEN, stuurUit, isolatie }) {
 
        Zonder isolatielaag (een opstelling zonder kern.isolatie) verandert er
        niets: `versmal` geeft de lijst onaangeraakt terug en zegt dat. */
+    /* GEEN ISOLATIECONTEXT IS NIET GEEN VERSMALLING, en dat was hier een gat met
+       een meetbare prijs.
+
+       Hier stond `if (!laag || !context) return toegestaan;`. Een zaaksessie
+       bereikt deze laag nooit met een context: `supplierAuth` zet `req.supplier`
+       en `req.actor`, maar NOOIT `req.session`, dus ../isolatie/sessiedragers.js
+       heeft niets om uit te lezen en de contextbouwers geven null. Dat is
+       verdedigbaar voor de isolatieSTAND -- er is geen drager om hem aan te
+       hangen -- maar de vroege terugkeer nam de HERKOMSTversmalling mee, en die
+       staat daar juist los van: "onvertrouwde inhoud vergroot nooit de
+       beschikbare capabilities" geldt ook als er geen stand is. Een mail die geld
+       wil laten bewegen hoort ook op een doodgewone dinsdag te worden gestopt,
+       en ook bij een zaak.
+
+       Gemeten wat dat kostte: voor een zaak met een besmet gesprek versmalt de
+       filter van 53 naar 9 paden -- en dat gebeurde niet, want de lijst kwam
+       hier al onaangeraakt terug. De filter zelf kan prima met een lege context
+       overweg (dan geldt alleen de herkomstkant), dus de terugkeer hangt nu
+       alleen nog aan de LAAG. */
     const laag = typeof isolatie === 'function' ? isolatie() : isolatie;
-    if (!laag || !context) return toegestaan;
+    if (!laag) return toegestaan;
     const filter = maakIsolatiefilter({ isolatie: laag, beleid });
-    const uitslag = filter.versmal(toegestaan, context, wereld, bronnen || besmetting.START);
+    const uitslag = filter.versmal(toegestaan, context || null, wereld, bronnen || besmetting.START);
     /* De weggevallen paden reizen mee als eigenschap van de lijst en niet als
        tweede teruggave: elke bestaande aanroeper krijgt zo nog steeds gewoon een
        array, en wie de reden wil tonen kan erbij. EXECUTIE.md blok 0: een

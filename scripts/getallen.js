@@ -73,7 +73,11 @@ const GETALLEN = {
   'isolatie.dragersMetSleutel': { bron: 'ISOLATIEPROEF.json', veld: 'noemers.dragers.metSleutelbron',
     wat: 'dragers die bij een lopend verzoek een sleutel hebben' },
   'isolatie.achtergrondsites': { bron: 'ISOLATIEPROEF.json', veld: 'noemers.workload.gevonden',
-    wat: 'plekken waar achtergrondwerk start zonder drager' }
+    wat: 'plekken waar achtergrondwerk start zonder drager' },
+  'isolatie.kanalen': { bron: 'ISOLATIEPROEF.json', veld: 'noemers.herkomst.gevonden',
+    wat: 'kanalen waarlangs invoer een gesprek in kan komen, elk met een vertrouwensklasse' },
+  'isolatie.herkomstprijsLid': { bron: 'ISOLATIEPROEF.json', veld: 'noemers.herkomst.prijsPerRol.member.na',
+    wat: 'AI-paden die een lid overhoudt nadat onvertrouwde invoer het gesprek raakte' }
 };
 
 /* De documenten die merktekens mogen dragen. Bewust een lijst en geen glob over

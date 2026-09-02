@@ -594,6 +594,28 @@ const noemers = {};
 
 /* ---------- 3e. De herkomst van invoer ---------- */
 {
+  /* DE PRIJS VAN DE HERKOMSTPOORT, GEMETEN EN NIET GESCHAT. Dit is het getal
+     waarop de eigenaar besluit of RTG_HERKOMST_AFDWINGEN omgaat, dus het hoort
+     in het register en niet in een commentaarregel die stil veroudert. Gemeten
+     met de ECHTE filter over de bereikbare paden per rol, met een gesprek dat
+     een toolantwoord heeft gezien. */
+  const herkomstPrijs = (() => {
+    const beleidmod = require(path.join(root, 'server/kern/stuur/beleid'));
+    const { maakIsolatiefilter } = require(path.join(root, 'server/kern/stuur/isolatiefilter'));
+    const iso2 = maakIsolatie({ db: { data: {} }, save() {}, functies, klok: null, huisStand: () => 'normaal' });
+    const filter2 = maakIsolatiefilter({ isolatie: iso2, beleid: beleidmod });
+    const ctx2 = iso2.context({ identiteit: 'herkomstmeting' });
+    const uit = {};
+    for (const wereld of ['member', 'supplier', 'staff']) {
+      const paden2 = [...new Set(kaart.capabilities.filter(r => r.rol === wereld && r.bereik !== 'verboden')
+        .map(r => r.pad))];
+      if (!paden2.length) continue;
+      uit[wereld] = { voor: paden2.length,
+        na: filter2.versmal(paden2, ctx2, wereld, ['gebruikersvraag', 'toolantwoord']).paden.length };
+    }
+    return uit;
+  })();
+
   noemers.herkomst = {
     wat: 'onvertrouwde inhoud vergroot nooit de beschikbare capabilities',
     bron: ['server/kern/isolatie/herkomst.js', 'server/kern/stuur/isolatiefilter.js'],
@@ -630,6 +652,7 @@ const noemers = {};
           : 'de leiding is INCOMPLEET; wat hier ontbreekt maakt de regel dood'
       };
     })(),
+    prijsPerRol: herkomstPrijs,
     waar: 'kern/stuur/herkomstpoort.js (het oordeel), kern/stuur/isolatiefilter.js (de lijst) en ' +
       'kern/stuur/lusstap.js (de poort voor de uitvoering) -- een oordeel, drie lezers',
     /* WAT DIT NIET IS, en dat hoort er even groot bij: er wordt geen tekst
@@ -642,9 +665,9 @@ const noemers = {};
         'weet dat zij post of een document teruggeeft, kan zich VERFIJNEN -- dat is niet gebouwd, en ' +
         'zolang dat zo is telt alles wat een gereedschap teruggeeft als `toolantwoord`. Dat is de ' +
         'veilige kant, maar dekking is het niet.',
-      prijs: 'de standaard kost bereik: na de eerste geslaagde `doe` versmalt de lijst van een lid ' +
-        'aanzienlijk. Dat is de reden dat hij in de schaduw loopt en niet bijt -- eerst het getal, ' +
-        'dan het besluit.'
+      prijs: 'de standaard kost bereik: na de eerste geslaagde `doe` versmalt de lijst. Dat is de ' +
+        'reden dat hij in de schaduw loopt en niet bijt -- eerst het getal, dan het besluit. Het ' +
+        'getal staat hieronder in `prijsPerRol` en niet in deze zin, want een zin veroudert stil.'
     }
   };
 }
@@ -677,7 +700,10 @@ const noemers = {};
     appBewijs: 'kern/ssrf.js weigert privé- en metadata-adressen voor doelen die een CLIENT aanlevert, ' +
       'en houdt voor web-push een allowlist van pushdiensten aan',
     infraBewijs: 'ONTBREEKT: er is in deze repo geen egress-policy, geen deny-by-default en geen ' +
-      'netwerknamespace-bewijs. PRODUCTION.md belooft een egress-proxy; een belofte is geen meting',
+      'netwerknamespace-bewijs. En let op: hier stond "PRODUCTION.md belooft een egress-proxy; een ' +
+      'belofte is geen meting" -- dat document noemt egress NERGENS. Er was dus niet eens een ' +
+      'belofte, alleen een verwijzing naar een paragraaf die nooit heeft bestaan (dezelfde fout als ' +
+      'de cap `rooms` in CLAUDE.md). Er is geen egress-poort, en er is er ook nooit een toegezegd',
     eindoordeel: 'ONBEPAALD_INFRA',
     /* Een hostnaam die in de code staat is niet hetzelfde als een bestemming
        waar het proces heen KAN. Een gecompromitteerde parser praat met elk
@@ -783,6 +809,32 @@ const schuld = [
      BESLUITLAAG en niet over de handhaving: geen van de drie houdt vandaag een
      gewoon HTTP-verzoek tegen. Deze post staat daarom bovenaan en niet in een
      voetnoot. */
+  { punt: 'de uitgaande mailweg koos zijn doel niet zelf',
+    stand: 'GEREPAREERD, EN NIET DICHT',
+    waarom: 'server/smtp-direct.js bezorg() zoekt de MX van het domein achter de @ op en opent daar ' +
+      'een TCP-verbinding. Dat is de enige uitgaande verbinding van dit huis waarvan de BESTEMMING ' +
+      'door een buitenstaander wordt gekozen: wie een domein beheert zet zijn MX waar hij wil, en ' +
+      'dus ook op 10.0.0.5 of 127.0.0.1. kern/ssrf.js noemde zichzelf al een vangnet voor uitgaande ' +
+      'fetches en de smarthost-kant (server/smtp.js) gebruikte hem; deze helft liep er nooit langs.',
+    open: 'de poort geldt alleen op de DNS-tak -- een MX die onze eigen code meegeeft is niet door ' +
+      'een aanvaller gekozen, en hem daar weigeren maakt een uitrol met een interne mailserver ' +
+      'onmogelijk (de eerste versie deed dat wel en liet zes bestaande toetsen zakken). Wat NIET ' +
+      'dicht is: een hostnaam die pas NA de DNS-opzoeking naar binnen wijst. Dat is DNS-rebinding en ' +
+      'blijft ONBEPAALD_INFRA -- het hoort achter een egress-poort in de uitrol, en die is er niet.' },
+  { punt: 'een zaaksessie bereikt de dragerlaag niet',
+    stand: 'GEMETEN GAT',
+    waarom: 'supplierAuth (opzet/leverancierpoort.js) zet req.supplier en req.actor, maar NOOIT ' +
+      'req.session. kern/isolatie/sessiedragers.js leest req.session en de Authorization-kop, dus ' +
+      'voor een zaakverzoek is er geen enkele drager -- niet alleen `organisatie` ontbreekt, de hele ' +
+      'context is null. Beide contextbouwers (kern/stuur/luscontext.js en routes/stuur.js) geven ' +
+      'daarop null terug.',
+    open: 'de HERKOMSTkant is hierdoor niet meer stil: kern/stuur/paden.js keerde bij een lege ' +
+      'context vroeg terug en versmalde dus ook niet op onvertrouwde invoer -- gemeten kostte dat een ' +
+      'zaak 53 paden waar er 9 hadden moeten overblijven. Die terugkeer hangt nu alleen nog aan de ' +
+      'LAAG en niet aan de context. Wat OPEN blijft: een zaak kan zichzelf niet in isolatie zetten ' +
+      'en RTG kan een zaaksessie niet gericht dichtzetten, want er is geen sleutel om de stand aan ' +
+      'te hangen. Dat vraagt een besluit over WELKE organisatie de drager is (TENANT.md houdt org, ' +
+      'werkruimte en leverancier met opzet uit elkaar) en niet een regel code.' },
   { punt: 'handhaving in de HTTP-keten',
     stand: 'ONTBREEKT',
     waarom: 'GEMETEN: middleware/functieschakelaars.js leest alleen het HUIS-veld ' +

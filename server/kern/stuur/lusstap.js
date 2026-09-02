@@ -29,9 +29,16 @@ const { voorspel } = require('./gevolg');
 
    CONTROLPLANE.md: een nieuwe handhavingsregel loopt eerst mee zonder te
    blokkeren -- je kunt niet afdwingen wat nooit in de schaduw heeft gelopen. De
-   prijs is gemeten en niet geschat: na de eerste geslaagde `doe` gaat een lid
-   van 120 naar 43 AI-paden, een zaak van 40 naar 9 en personeel van 16 naar 2.
-   Dat getal hoort een mens te zien voordat de vlag omgaat.
+   prijs is gemeten en niet geschat: na de eerste geslaagde `doe` gaat een lid van
+   120 naar 36 AI-paden en een zaak van 53 naar 9. Dat getal hoort een mens te
+   zien voordat de vlag omgaat.
+
+   HIER STONDEN EERST 43 EN 9, EN DIE WAREN VEROUDERD. Ze zijn gemeten VOORDAT de
+   leesset-vrijstelling werd aangescherpt (../isolatie/herkomstpoort.js:
+   SCHRIJFNIVEAUS -- een bewezen lezer die het beleid een SCHRIJVER noemt, is
+   onder onvertrouwde invoer geen lezer meer). Een gemeten getal in commentaar dat
+   niet meer klopt, is precies het soort stille onwaarheid waar deze laag voor is
+   gebouwd; wie hem verandert, meet opnieuw.
 
    In de schaduw TELT hij en houdt hij niets tegen; de telling reist mee in het
    antwoord van de kaart, zodat de eigenaar de prijs op zijn scherm heeft in

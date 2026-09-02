@@ -585,7 +585,7 @@ tegen een mens "dat kan ik niet" in plaats van "dat kan nu niet, omdat".
 
 ### Onvertrouwde inhoud vergroot nooit de capabilities
 
-`kern/isolatie/herkomst.js`. Vier klassen, dertien kanalen. Het verschil tussen
+`kern/isolatie/herkomst.js`. Vier klassen, <!--getal:isolatie.kanalen-->13<!--/getal--> kanalen. Het verschil tussen
 gezaghebbend en niet-gezaghebbend is **niet uit de tekst af te leiden** — daar is
 de aanval op gebouwd — maar alleen uit het **kanaal** waarlangs iets binnenkwam.
 Deze module herkent dus niets; hij labelt.
@@ -617,14 +617,18 @@ allebei "werken" en na een jaar iets anders zeggen.
 **Hij bijt nog niet.** `RTG_HERKOMST_AFDWINGEN=1` zet hem aan; daarzonder telt hij
 en houdt hij niets tegen, en de prijs staat op de kaart die de eigenaar leest
 (`herkomstSchaduw`). `CONTROLPLANE.md`: je kunt niet afdwingen wat nooit in de
-schaduw heeft gelopen — en de prijs is echt, want na de eerste geslaagde `doe`
-versmalt de lijst van een lid aanzienlijk.
+schaduw heeft gelopen — en de prijs is echt en gemeten: na de eerste geslaagde
+`doe` houdt een lid **<!--getal:isolatie.herkomstprijsLid-->36<!--/getal--> van
+de 120** AI-paden over, en een zaak 9 van de 53. Dat getal staat in
+`ISOLATIEPROEF.json` (`noemers.herkomst.prijsPerRol`) en niet in een zin, want
+een zin veroudert stil — wat hier al een keer is gebeurd: er stond 43, gemeten
+vóór de leesset-vrijstelling werd aangescherpt.
 
 Twee dingen die het níét is: er wordt geen tekst gescand op verdachte zinnen (dat
 werkt niet, en het wekt de indruk dat het wel werkt — erger dan niets), en een
-kanaal dat zich niet aanmeldt telt als onvertrouwd. **Van de dertien kanalen meldt
-er vandaag precies één zich aan** (`toolantwoord`); de andere twaalf hebben geen
-enkele aanmelder. Een route die weet dat zij post of een document teruggeeft kan
+kanaal dat zich niet aanmeldt telt als onvertrouwd. **Van de <!--getal:isolatie.kanalen-->13<!--/getal--> kanalen meldt er vandaag
+precies één zich aan** (`toolantwoord`); de andere twaalf hebben geen enkele
+aanmelder. Een route die weet dat zij post of een document teruggeeft kan
 zich verfijnen — dat is niet gebouwd, en zolang dat zo is telt alles wat een
 gereedschap teruggeeft als onvertrouwd. Dat is de veilige kant, maar dekking is
 het niet.
@@ -841,3 +845,59 @@ er nul van de 4655. Voor `waakzaam` is dat ontwerp; `beperkt` sluit gericht per
 functie via de huis-brede schakelaars, en die hebben geen drager-as. Het
 ledenscherm biedt `beperkt` niet aan, dus dat is geen leugen — het is wel een gat
 met een naam.
+
+## 9. Twee gaten die pas zichtbaar werden door de reparatie
+
+### Een zaaksessie bereikte deze laag helemaal niet
+
+`supplierAuth` zet `req.supplier` en `req.actor` — en **nooit** `req.session`.
+`kern/isolatie/sessiedragers.js` leest de sessie en de Authorization-kop, dus
+voor een zaakverzoek is er geen enkele drager: niet alleen `organisatie`
+ontbreekt, de hele context is `null`. Beide contextbouwers geven daarop null
+terug.
+
+Voor de isolatie**stand** is dat verdedigbaar — er is geen drager om hem aan te
+hangen. Maar `kern/stuur/paden.js` keerde bij een lege context **vroeg terug**,
+en nam daarmee de **herkomst**versmalling mee. Die staat er juist los van: *"een
+mail die geld wil laten bewegen hoort ook op een doodgewone dinsdag te worden
+gestopt"* — en dus ook bij een zaak. Gemeten kostte dat een zaak met een besmet
+gesprek **53 paden waar er 9 hadden moeten overblijven**. De terugkeer hangt nu
+alleen nog aan de laag.
+
+Wat **open** blijft: een zaak kan zichzelf niet in isolatie zetten, en RTG kan
+een zaaksessie niet gericht dichtzetten. Dat vraagt een besluit over wélke
+organisatie de drager is — `TENANT.md` houdt org, werkruimte en leverancier met
+opzet uit elkaar, en iemand die bij twee organisaties werkt zou de strengste van
+de twee over zijn hele sessie krijgen. **Een sleutel raden sluit de verkeerde
+mensen af.**
+
+### De uitgaande mailweg koos zijn doel niet zelf
+
+`server/smtp-direct.js` `bezorg()` zoekt de MX van het domein achter de @ op en
+opent daar een TCP-verbinding. Dat is **de enige uitgaande verbinding van dit
+huis waarvan de bestemming door een buitenstaander wordt gekozen**: wie een
+domein beheert zet zijn MX waar hij wil, en dus ook op `10.0.0.5` of
+`127.0.0.1`. Dan spreekt RTG SMTP tegen iets binnen zijn eigen netwerk.
+
+`kern/ssrf.js` noemde zichzelf al *"een vangnet voor toekomstige uitgaande
+fetches"*, en de smarthost-kant (`server/smtp.js`) gebruikte hem. Deze helft liep
+er nooit langs — twee helften van dezelfde functie, één ervan gepoort.
+
+De poort geldt **alleen op de DNS-tak**, en dat is de vraag zelf: *wie koos dit
+doel?* Een MX die onze eigen code meegeeft (een vaste route, een toets tegen een
+lokale mailserver) is niet door een aanvaller gekozen. De eerste versie poortte
+allebei en liet **zes bestaande toetsen zakken** — de meting wees de te brede
+regel meteen aan, en een uitrol met een interne mailserver was er ook op
+gesneuveld.
+
+Wat het **niet** dicht doet: een hostnaam die pas ná de DNS-opzoeking naar binnen
+wijst. Dat is DNS-rebinding en het hoort achter een egress-poort in de uitrol.
+
+> **En daar stond een dode verwijzing.** `kern/ssrf.js` schreef *"zie
+> PRODUCTION.md"* voor die egress-proxy, en `ISOLATIEPROEF.json` schreef
+> *"PRODUCTION.md belooft een egress-proxy; een belofte is geen meting"*. Dat
+> document noemt egress **nergens** — alle tien proxy-vermeldingen gaan over een
+> *inkomende* reverse proxy of CDN. Er was dus niet eens een belofte, alleen een
+> verwijzing naar een paragraaf die nooit heeft bestaan: dezelfde fout als de cap
+> `rooms` in CLAUDE.md en `kern/stuur/schaduw.js` in paragraaf 1 hierboven. Een
+> huis dat drie keer dezelfde fout maakt, heeft er een patroon van.

@@ -165,3 +165,53 @@ test('4. zonder de vlag telt de poort en houdt hij niets tegen', async () => {
     assert.equal(kaart.herkomstSchaduw.afdwingen, false);
   } finally { o.herstel(); }
 });
+
+test('5. de herkomstregel geldt ook zonder isolatiecontext -- dus ook voor een zaak', () => {
+  /* HET GAT DAT DIT SLUIT. server/kern/stuur/paden.js keerde vroeg terug zodra
+     er geen isolatiecontext was: `if (!laag || !context) return toegestaan;`.
+     Een zaaksessie bereikt deze laag NOOIT met een context -- `supplierAuth`
+     zet req.supplier en req.actor, maar nooit req.session -- dus voor elke zaak
+     en elk personeelslid werd de lijst onaangeraakt teruggegeven.
+
+     Dat is verdedigbaar voor de isolatieSTAND (er is geen drager om hem aan te
+     hangen) maar niet voor de HERKOMST: die staat er juist los van. Het
+     commentaar in isolatiefilter.js zei dat zelf al -- "een mail die geld wil
+     laten bewegen, hoort ook op een doodgewone dinsdag te worden tegengehouden"
+     -- en de vroege terugkeer sloopte precies die regel voor twee van de drie
+     rollen.
+
+     MUTATIE: `if (!laag || !context) return toegestaan;` terugzetten in
+     paden.js -> ZAKT. */
+  const { maakIsolatiefilter } = require('../server/kern/stuur/isolatiefilter');
+  const filter = maakIsolatiefilter({ isolatie: laag(), beleid });
+  const paden = ['/api/supplier/rtmail/inbox', '/api/supplier/pay/stuur', '/api/pay/stuur'];
+
+  /* Zonder context EN met een besmet gesprek: de herkomstkant hoort te werken. */
+  const uit = filter.versmal(paden, null, 'supplier', ['gebruikersvraag', 'toolantwoord']);
+  assert.ok(uit.paden.length < paden.length,
+    'zonder isolatiecontext hoort de herkomstregel nog steeds te versmallen: ' +
+    JSON.stringify(uit.paden));
+  assert.ok(uit.weggevallen.some(w => w.reden === 'HERKOMST'),
+    'en met de grond HERKOMST, niet met een stand: ' + JSON.stringify(uit.weggevallen));
+
+  /* En met alleen gezaghebbende bronnen versmalt hij niets -- anders zou deze
+     toets ook slagen op een filter dat altijd dichtgooit. */
+  const schoon = filter.versmal(paden, null, 'supplier', ['systeemprompt', 'gebruikersvraag']);
+  assert.deepEqual(schoon.paden, paden, 'een schoon gesprek versmalt niets');
+
+  /* DE BRON, want het gat zat in de AANROEPER en niet in de filter: de filter
+     kon dit altijd al. */
+  const fs2 = require('fs');
+  const path2 = require('path');
+  const { codeRegelsUit } = require('../scripts/lib/werkelijkheid');
+  /* COMMENTAAR TELT NIET MEE, en dat is hier geen detail: de reparatie in
+     paden.js CITEERT de oude regel in zijn uitleg, want zonder dat citaat weet de
+     volgende lezer niet wat er stond. Een brontoets die commentaar meeleest,
+     dwingt je om de uitleg weg te laten -- en dan is de reparatie over een jaar
+     niet meer te begrijpen. */
+  const bron = fs2.readFileSync(path2.join(__dirname, '..', 'server/kern/stuur/paden.js'), 'utf8');
+  const raak = [...codeRegelsUit(bron)]
+    .filter(([, code]) => /if \(!laag \|\| !context\) return toegestaan;/.test(code));
+  assert.deepEqual(raak.map(r => r[0]), [],
+    'paden.js keert weer vroeg terug zonder context; dan draait de herkomstregel voor een zaak niet');
+});

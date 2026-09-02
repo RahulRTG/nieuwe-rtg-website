@@ -1,0 +1,61 @@
+{
+  "stempel": {
+    "op": "2026-09-02T14:46:52.553Z",
+    "node": "v22.22.2"
+  },
+  "uitleg": "Wat middleware/isolatiepoort.js zou sluiten als hij beet. Gemeten met echt HTTP-verkeer van een echt lid met een echte stand, niet geschat.",
+  "grens": "Dit gaat over de paden uit de member-allowlist van kern/stuur/beleid.js en over GEEN ander verkeer. Een lid dat een pad gebruikt dat daar niet in staat, is hier niet gemeten -- en dat is iets anders dan \"die loopt door\".",
+  "paden": 120,
+  "rondes": [
+    {
+      "stand": "waakzaam",
+      "drager": "identiteit",
+      "paden": 120,
+      "gewogen": 117,
+      "zouSluiten": 0,
+      "voorbeelden": []
+    },
+    {
+      "stand": "beperkt",
+      "drager": "identiteit",
+      "paden": 120,
+      "gewogen": 117,
+      "zouSluiten": 0,
+      "voorbeelden": []
+    },
+    {
+      "stand": "beschermd",
+      "drager": "identiteit",
+      "paden": 120,
+      "gewogen": 117,
+      "zouSluiten": 26,
+      "voorbeelden": [
+        "POST /api/bank/salaris",
+        "POST /api/bank/sepa",
+        "POST /api/bank/spaardoel",
+        "POST /api/bank/storten",
+        "POST /api/bank/terugkerend/stop",
+        "POST /api/bank/terugkerend/zet",
+        "POST /api/bank/van-wallet",
+        "POST /api/pay/kascode"
+      ]
+    },
+    {
+      "stand": "isolatie",
+      "drager": "identiteit",
+      "paden": 120,
+      "gewogen": 117,
+      "zouSluiten": 85,
+      "voorbeelden": [
+        "POST /api/bank/salaris",
+        "POST /api/bank/sepa",
+        "POST /api/bank/spaardoel",
+        "POST /api/bank/storten",
+        "POST /api/bank/terugkerend/stop",
+        "POST /api/bank/terugkerend/zet",
+        "POST /api/bank/van-wallet",
+        "POST /api/pay/kascode"
+      ]
+    }
+  ]
+}

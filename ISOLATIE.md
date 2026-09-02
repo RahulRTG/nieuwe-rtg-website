@@ -997,13 +997,61 @@ middleware die vóór elke router staat moet hem zelf oplossen. Eén lichaam, tw
 ingangen — twee kopieën zouden na een jaar twee verschillende sleutels opleveren
 voor dezelfde mens.
 
+## 11. De gerichte schaduwproef, en wat zij vond
+
+De schaduwronde rijpt niet uit productieverkeer: de noemer is *"verzoeken van
+accounts die een stand dragen"*, en dat zijn er nul. Wachten is dus wachten op
+iets dat niet komt. `scripts/isolatieschaduw.js` (`npm run isolatieschaduw`)
+doet het daarom gericht: een echte server, een echt lid, een echte stand, en echt
+HTTP-verkeer over 120 paden — de routes die de server werkelijk registreert,
+gefilterd door de member-allowlist van `kern/stuur/beleid.js`.
+
+| stand | gewogen | zou sluiten |
+|---|---|---|
+| `waakzaam` | 117 | 0 |
+| `beperkt` | 117 | 0 |
+| `beschermd` | 117 | **26** |
+| `isolatie` | 117 | **85** |
+
+**De eerste ronde mat nul, en dat was géén nulmeting.** De padenlijst kwam eerst
+uit `beleid.LEZEN.member` — de lijst waarvan een mens heeft gezegd wat een lid
+mag. Daar staan **regexen** in, geen paden, en een regex als tekenreeks levert
+een URL als `/^//api//site//(mijn|haal)$/`. Die begint niet met `/api/`, dus de
+poort woog hem terecht niet. Vier keer nul, zonder dat er iets gemeten was. Een
+nulmeting die geen nulmeting is, is het gevaarlijkste wat een proef kan opleveren.
+
+**En toen kwam de echte vondst.** Met een stand op `sessie` woog de poort 117
+verzoeken; met dezelfde stand op `identiteit` woog hij er **nul** — en
+`identiteit` is precies wat een lid zet als hij zijn account beschermt
+(`routes/isolatie.js`: `String(b.drager || 'identiteit')`). De oorzaak: de poort
+staat als middleware vóór `auth`, dus `req.session` bestaat daar niet en
+`identiteit: s.key` viel terug op `null`. De laag stond aan, telde netjes, en
+keek langs de gewoonste beschermstand heen.
+
+De reparatie is een **late binding** en geen tweede kopie: `opzet/diensten2.js`
+hangt zijn eigen `resolveSession` in `kern/isolatie/sessiedragers.js`. Dat is
+dezelfde functie die `auth` gebruikt, met haar twee takken (een demo-sessie in
+het geheugen en een ondertekend accounttoken). Overtypen zou een tweede antwoord
+geven op *"wie is dit"* zodra er een derde tak bij komt — en dan zet een lid zich
+dicht op een sleutel die de poort niet kent. Zonder oplosser blijft `identiteit`
+gewoon `null` mét zijn reden: minder dan het kan zijn, maar nooit een verkéérde
+sleutel. `test/isolatie-lid.test.js` toets 10 houdt het vast; de mutatie (de
+inhangregel eruit) laat hem zakken.
+
+> **Wat deze getallen niet zeggen.** Zij gaan over deze 120 paden en niet over
+> het verkeer van morgen, en zij tellen wat de poort zou sluiten — niet wat een
+> lid daarvan zou missen. `waakzaam` en `beperkt` sluiten nul: dat is geen
+> vergissing maar de leesset, en het is precies waarom `besluit()` op 255 paden
+> losser is dan de beschermstand.
+
 ### Wat er nog steeds openstaat, met de reden
 
-De vlag omzetten. `CONTROLPLANE.md` eist 200 waarnemingen en zeven dagen, en de
-noemer is *"verzoeken van accounts die een stand dragen"* — dat zijn er vandaag
-**nul**. Deze regel rijpt dus waarschijnlijk **niet** uit productieverkeer;
-"rijp" moet hier uit een gerichte proef komen. Dat staat er omdat een teller die
-nooit vult, anders op een dag als bewijs gaat gelden.
+De vlag omzetten. `CONTROLPLANE.md` eist 200 waarnemingen en zeven dagen. De
+gerichte proef hierboven levert er 117 per stand, en dat is een ander soort
+waarneming dan productieverkeer: zij zegt wat de poort DOET, niet dat hij het
+zonder schade doet. Wat er nog niet is, is een ronde waarin een mens de 85
+gesloten paden onder `isolatie` heeft nagelopen op de vraag of dat de bedoeling
+is. Dat is een oordeel en geen meting.
 
 En het blijft handhaving voor **vier** dragers, niet zes: `organisatie` en
 `workload` hebben bij een lopend verzoek geen sleutel. Een cockpit die beweert

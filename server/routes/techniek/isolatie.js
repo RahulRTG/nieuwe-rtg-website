@@ -82,9 +82,21 @@ module.exports = (tctx) => {
     return res.status(e.status || 500).json({ error: e.status ? e.message : 'De handeling mislukte.' });
   }
 
+  /* DE STAND VAN DE POORT GAAT MEE, en dat is geen extraatje. De laag loopt in
+     de SCHADUW: hij telt wat hij zou sluiten en houdt niets tegen. Precies dat
+     getal is wat een mens nodig heeft om te besluiten of hij hem laat bijten --
+     en het stond nergens, ook niet op het scherm dat over deze laag gaat. Een
+     schaduwronde die niemand kan aflezen, is geen schaduwronde maar een
+     stille aanname (CONTROLPLANE.md).
+
+     stand() zegt zelf dat hij niets bewijst zolang `gewogen` nul is. Die zin
+     reist mee naar het scherm in plaats van hier te worden herschreven: twee
+     formuleringen van dezelfde onzekerheid worden binnen een jaar twee
+     verschillende beweringen. */
   app.get('/api/techniek/isolatie', techAuth, eigenaarAlleen, (req, res) => {
     res.set('Cache-Control', 'no-store');
-    res.json(isolatie.overzicht());
+    res.json(Object.assign({}, isolatie.overzicht(),
+      { poort: require('../../middleware/isolatiepoort-stand').stand() }));
   });
 
   /* VERSTRENGEN. Geen bevestigingszin: een drempel voor de veilige keuze duwt

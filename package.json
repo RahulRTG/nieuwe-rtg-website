@@ -131,6 +131,8 @@
     "herstel": "node scripts/herstel.js",
     "executionmap": "node scripts/executionmap.js",
     "isolatieproef": "node scripts/isolatieproef.js",
+    "isolatieschaduw": "node scripts/isolatieschaduw.js",
+    "isolatieschaduw:vast": "node scripts/isolatieschaduw.js --vastleggen",
     "executionmap:controle": "node scripts/executionmap.js --controle",
     "resolverbereik": "node scripts/resolverbereik.js",
     "getallen": "node scripts/getallen.js",

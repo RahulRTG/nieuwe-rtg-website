@@ -126,6 +126,15 @@ function resolveSession(token) {
   return null;
 }
 
+/* DE ISOLATIEPOORT DEELT HEM OOK, en dat moest wel. Die middleware staat VOOR
+   `auth`, dus req.session bestaat daar nog niet; zonder deze regel viel de
+   drager `identiteit` terug op null en keek de poort langs de gewoonste
+   beschermstand heen (gemeten: nul gewogen verzoeken tegenover 117 met een
+   stand op `sessie`). Inhangen en niet nabouwen: resolveSession heeft twee
+   takken, en een tweede kopie geeft een ander antwoord zodra er een derde
+   bijkomt. */
+require('../kern/isolatie/sessiedragers').zetSessieOplosser(resolveSession);
+
 /* De AI-poort deelt resolveSession met auth hieronder: een vertaalverzoek en een
    gewone API-aanroep horen dezelfde sessies te herkennen. */
 const aiPoort = require('../kern/aipoort').maakAiPoort({ resolveSession });

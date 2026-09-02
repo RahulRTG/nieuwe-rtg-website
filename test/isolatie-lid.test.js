@@ -60,7 +60,7 @@ async function nieuwLid() {
   return r.body.token;
 }
 
-test.before(async () => { srv = await startServer({ env: { SMTP_URL: '' } }); });
+test.before(async () => { srv = await startServer({ env: { SMTP_URL: '', RTG_OWNER_EMAIL: 'lid-poort-eigenaar@x.nl' } }); });
 test.after(() => stop(srv && srv.child));
 
 test('1. een lid zet zijn eigen stand, en dat werkt meteen door', async () => {
@@ -431,3 +431,53 @@ test('9. de AI-kaart versmalt echt, en zegt erbij wat er wegviel', async () => {
   assert.ok((na.body.paden || []).includes('/api/agenda/mijn'),
     'en de eigen agenda lezen hoort te blijven -- lezen loopt door');
 });
+
+test('10. de poort ZIET een stand op identiteit, en niet alleen op sessie', async () => {
+  /* DE DUURSTE BEVINDING VAN DEZE LAAG, hier vastgepind.
+
+     De isolatiepoort staat als middleware VOOR `auth`, dus req.session bestaat
+     daar niet. `identiteit` viel daardoor terug op null -- en dat is precies de
+     drager die een lid zet als hij zijn account beschermt
+     (routes/isolatie.js: `String(b.drager || 'identiteit')`). De laag stond aan,
+     telde netjes, en keek langs de gewoonste beschermstand heen.
+
+     Gemeten met scripts/isolatieschaduw.js: een stand op `sessie` gaf 117
+     gewogen verzoeken, dezelfde stand op `identiteit` gaf er NUL. De reparatie
+     is kern/isolatie/sessiedragers.js + opzet/diensten2.js: dezelfde
+     resolveSession wordt ingehangen in plaats van nagebouwd.
+
+     MUTATIE: de zetSessieOplosser-regel uit opzet/diensten2.js halen -> ZAKT op
+     `gewogen === 0`, gedraaid. Dat is de faalvorm die terug zou komen.
+
+     Waarom deze toets de TELLER leest en niet een geweigerd verzoek: de poort
+     loopt in de schaduw en houdt niets tegen, dus "het verzoek kwam door" bewijst
+     hier niets. De teller is het enige dat zegt of hij heeft gekeken. */
+  const token = await nieuwLid();
+  const zet = await api('/api/isolatie/mijn/zet', { naar: 'isolatie' }, token);
+  assert.equal(zet.status, 200, JSON.stringify(zet.body));
+  assert.equal(zet.body.uit.drager, 'identiteit',
+    'de standaarddrager van een lid is identiteit; verandert dat, dan meet deze toets iets anders');
+
+  const voor = await poortstand();
+  await api('/api/agenda/mijn', {}, token);
+  const na = await poortstand();
+  assert.ok(na.gewogen > voor.gewogen,
+    'de poort heeft dit verzoek niet gewogen; een stand op identiteit is dan onzichtbaar ' +
+    'voor de handhaving (gewogen bleef ' + voor.gewogen + ')');
+});
+
+/* De teller staat achter de kantoordeur; kan de toets er niet bij, dan zakt hij
+   in plaats van nul te melden -- niet gemeten is geen bewijs van niets. */
+let _techtoken = null;
+async function poortstand() {
+  if (!_techtoken) {
+    const r = await api('/api/techniek/inloggen',
+      { login: 'lid-poort-eigenaar@x.nl', wachtwoord: 'Imran' });
+    _techtoken = r.body && r.body.token;
+    assert.ok(_techtoken, 'zonder techniek-inlog is de teller niet te lezen, en dan meet deze toets niets');
+  }
+  const r = await fetch(srv.base + '/api/techniek/isolatie',
+    { headers: { Authorization: 'Bearer ' + _techtoken } }).then(x => x.json());
+  assert.ok(r.poort, 'het overzicht draagt geen poort-stand');
+  return r.poort;
+}

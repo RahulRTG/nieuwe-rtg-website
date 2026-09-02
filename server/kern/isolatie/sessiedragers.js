@@ -49,8 +49,34 @@ function bearerVan(req) {
    sessie en nooit uit het verzoek" staat daarmee nog steeds op een plek; alleen
    de manier waarop de sessie binnenkomt verschilt. Twee kopieën van dit lichaam
    zouden na een jaar twee verschillende sleutels opleveren voor dezelfde mens. */
+/* DE SESSIE UIT EEN TOKEN, met late binding -- zelfde patroon als zetLaag in
+   middleware/isolatiepoort.js, en om dezelfde reden.
+
+   WAAROM DIT ERBIJ MOEST, en het is de duurste bevinding van deze laag. Een
+   middleware staat VOOR `auth`, dus req.session bestaat daar niet. `identiteit`
+   viel daardoor terug op null, en de isolatiepoort kon een stand op `identiteit`
+   niet zien -- terwijl dat precies is wat een lid zet als hij zijn account
+   beschermt (routes/isolatie.js: `String(b.drager || 'identiteit')`).
+
+   GEMETEN en niet vermoed (scripts/isolatieschaduw.js): met een stand op
+   `sessie` woog de poort 117 verzoeken en zou hij er onder `isolatie` 85
+   sluiten; met dezelfde stand op `identiteit` woog hij er NUL. De laag stond
+   dus aan, telde netjes, en keek langs de gewoonste beschermstand heen.
+
+   HIJ WORDT INGEHANGEN EN NIET NAGEBOUWD. opzet/diensten2.js heeft precies een
+   resolveSession, met twee takken (een demo-sessie in het geheugen en een
+   ondertekend accounttoken). Die hier overtypen zou een tweede antwoord geven op
+   "wie is dit" zodra er een derde tak bij komt -- en dan zet een lid zich dicht
+   op een sleutel die de poort niet kent. Zonder oplosser blijft `identiteit`
+   gewoon null, met zijn reden: dat is minder dan het kan zijn, maar het is nooit
+   een VERKEERDE sleutel. */
+let oplosSessie = null;
+function zetSessieOplosser(fn) { oplosSessie = typeof fn === 'function' ? fn : null; }
+
 function dragersVanSessie(sess, token) {
-  const s = sess || {};
+  /* De sessie wordt alleen opgelost als hij er niet al is: een aanroeper die hem
+     meegeeft, heeft hem via `auth` gekregen en dat is dezelfde bron. */
+  const s = sess || (token && oplosSessie ? (oplosSessie(token) || {}) : {});
 
   const sleutels = {
     /* De identiteit: dit lid, over al zijn inlogs heen. */
@@ -86,4 +112,4 @@ function dragersVanVerzoek(req) {
   return dragersVanSessie((req && req.session) || null, bearerVan(req));
 }
 
-module.exports = { dragersVanVerzoek, dragersVanSessie, EIGEN_LAGEN, bearerVan };
+module.exports = { zetSessieOplosser, dragersVanVerzoek, dragersVanSessie, EIGEN_LAGEN, bearerVan };

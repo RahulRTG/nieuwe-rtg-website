@@ -45,6 +45,9 @@
    en niet hier. */
 const METHODE = 'POST';
 
+/* De trede komt UIT de schaal en staat hier niet als tekenreeks: zie de
+   NIVEAUS-uitleg in ./beleid.js. */
+const { NIVEAUS } = require('./beleid');
 const herkomst = require('../isolatie/herkomst');
 const maakHerkomstpoort = require('./herkomstpoort');
 
@@ -59,7 +62,7 @@ function maakIsolatiefilter({ isolatie, beleid }) {
 
   function methodeVoor(pad, wereld) {
     if (!beleid || !wereld) return METHODE;
-    try { return beleid.beleidVoor(pad, wereld).niveau === 'lezen' ? 'GET' : METHODE; }
+    try { return beleid.beleidVoor(pad, wereld).niveau === NIVEAUS.LEZEN ? 'GET' : METHODE; }
     catch (e) { return METHODE; }   /* bij twijfel het strengste; dat is de goede kant om fout te gaan */
   }
 

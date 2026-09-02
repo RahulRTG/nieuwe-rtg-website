@@ -169,7 +169,12 @@ Object.assign(kern, require('../kern/rtfos')({ db, save, crypto,
   // en de agenda: dat is de ENIGE koppeling die vandaag echt iets doet
   // (een RTF-activiteit als afspraak in je eigen RTG-agenda). Zonder hem
   // meldt het koppelbord hem eerlijk als kapot, en dat is hij dan ook.
-  agenda: kern.agenda }));
+  agenda: kern.agenda,
+  /* En de betaallaag, voor de online gift (kern/rtfos/gift-betalen.js). Die
+     boekt langs pay.partnerIn -- de stichting heeft een wallet zoals een
+     leverancier -- en bouwt zelf geen betaalweg. Ontbreekt pay, dan weigert die
+     module met een reden in plaats van stil te doen alsof er is betaald. */
+  pay: kern.pay }));
 
 kern.foundationregistratie = require('../kern/foundationregistratie-register')({ db, save, crypto, schoon });
 

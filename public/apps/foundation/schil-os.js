@@ -11,7 +11,7 @@
        -- dit is de STICHTING die werkt. Medewerkers, bestuur, veldwerk.
 
      Portaal voor partners, gemeenten en ondernemers · Mijn hulpvraag ·
-     Mijn giften · Mijn vrijwilligerswerk · RTFoundation in uw buurt
+     Mijn giften · Mijn vrijwilligerswerk · RTFoundation in jouw buurt
        -- dit zijn MENSEN EN ORGANISATIES DIE MET de stichting te maken hebben.
           Iemand die hulp vraagt, iemand die geeft, iemand die meehelpt.
 

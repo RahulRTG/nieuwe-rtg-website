@@ -6,7 +6,7 @@
      en bouwt het beginscherm zichzelf niet meer op: een zwart scherm zonder
      foutmelding. app-main-01.js vergelijkt de twee en haalt zichzelf dan een
      keer vers op. -->
-<meta name="rtg-bouw" content="8329d479">
+<meta name="rtg-bouw" content="b3bf2c3b">
 <!-- De foutmelder staat bewust VOORAAN: hij moet de fouten van het opstarten
      kunnen zien, en die gebeuren voordat de rest geladen is. -->
 <script src="/shared/meelezen.js"></script>
@@ -43,6 +43,7 @@ try {
 <link href="/shared/command.css" rel="stylesheet">
 <link href="/shared/adaptief.css" rel="stylesheet">
 <link href="/shared/interface/second-screen.css" rel="stylesheet">
+<link href="/shared/interface/workspace-components.css" rel="stylesheet">
 <link href="/shared/grammatica.css" rel="stylesheet">
 <!-- de melding van de mediapoort; tussen de andere bladen zodat hij in DEZELFDE
      stijlbundel meegaat en er geen tweede bundel bijkomt (test/stijlbundel.test.js) -->
@@ -1690,19 +1691,40 @@ try {
   .privrij{display:flex;gap:0.5rem;}
   .privknop.wis{border-color:rgba(194,58,94,0.4);}
 </style>
-<script src="/shared/command/catalog.js?v=8329d479" defer></script>
-<script src="/shared/command/console.js?v=8329d479" defer></script>
-<script src="/shared/command/verdeler.js?v=8329d479" defer></script>
-<script src="/shared/interface/second-screen-modules.js?v=8329d479" defer></script>
-<script src="/shared/interface/second-screen.js?v=8329d479" defer></script>
-<script src="/shared/command/bank.js?v=8329d479" defer></script>
-<script src="/shared/command/praat.js?v=8329d479" defer></script>
-<script src="/shared/command/inlogpoort.js?v=8329d479" defer></script>
-<script src="/shared/command/bladhaak.js?v=8329d479" defer></script>
-<script src="/shared/command/romp.js?v=8329d479" defer></script>
-<script src="/shared/command/geheugen.js?v=8329d479" defer></script>
-<script src="/shared/command/werktafel.js?v=8329d479" defer></script>
-<script src="/shared/command.js?v=8329d479" defer></script>
+<script src="/shared/command/catalog.js?v=b3bf2c3b" defer></script>
+<script src="/shared/command/console.js?v=b3bf2c3b" defer></script>
+<script src="/shared/command/verdeler.js?v=b3bf2c3b" defer></script>
+<script src="/shared/interface/module-sdk.js?v=b3bf2c3b" defer></script>
+<script src="/shared/interface/workspace-world-catalog.js?v=b3bf2c3b" defer></script>
+<script src="/shared/interface/workspace-continuity.js?v=b3bf2c3b" defer></script>
+<script src="/shared/interface/workspace-composer.js?v=b3bf2c3b" defer></script>
+<script src="/shared/interface/workspace-registries.js?v=b3bf2c3b" defer></script>
+<script src="/shared/interface/workspace-session.js?v=b3bf2c3b" defer></script>
+<script src="/shared/interface/workspace-policy.js?v=b3bf2c3b" defer></script>
+<script src="/shared/interface/workspace-context.js?v=b3bf2c3b" defer></script>
+<script src="/shared/interface/workspace-navigation.js?v=b3bf2c3b" defer></script>
+<script src="/shared/interface/workspace-state.js?v=b3bf2c3b" defer></script>
+<script src="/shared/interface/workspace-orchestrator.js?v=b3bf2c3b" defer></script>
+<script src="/shared/interface/workspace-blueprints.js?v=b3bf2c3b" defer></script>
+<script src="/shared/interface/workspace-broker.js?v=b3bf2c3b" defer></script>
+<script src="/shared/interface/workspace-module-host.js?v=b3bf2c3b" defer></script>
+<script src="/shared/interface/workspace-runtime.js?v=b3bf2c3b" defer></script>
+<script src="/shared/interface/workspace-legacy.js?v=b3bf2c3b" defer></script>
+<!-- RTG_WORKSPACE_MODULES_START: nieuwe modules komen via scripts/workspace-module.js binnen -->
+<script src="/shared/interface/second-screen-modules.js?v=b3bf2c3b" defer></script>
+<script src="/shared/interface/modules/travel.js?v=b3bf2c3b" defer></script>
+<script src="/shared/interface/modules/safety.js?v=b3bf2c3b" defer></script>
+<!-- RTG_WORKSPACE_MODULES_END -->
+<script src="/shared/interface/workspace-experience.js?v=b3bf2c3b" defer></script>
+<script src="/shared/interface/second-screen.js?v=b3bf2c3b" defer></script>
+<script src="/shared/command/bank.js?v=b3bf2c3b" defer></script>
+<script src="/shared/command/praat.js?v=b3bf2c3b" defer></script>
+<script src="/shared/command/inlogpoort.js?v=b3bf2c3b" defer></script>
+<script src="/shared/command/bladhaak.js?v=b3bf2c3b" defer></script>
+<script src="/shared/command/romp.js?v=b3bf2c3b" defer></script>
+<script src="/shared/command/geheugen.js?v=b3bf2c3b" defer></script>
+<script src="/shared/command/werktafel.js?v=b3bf2c3b" defer></script>
+<script src="/shared/command.js?v=b3bf2c3b" defer></script>
 <!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
 <script src="/shared/media.js"></script>
 <link href="/shared/ios.css" rel="stylesheet">
@@ -2387,8 +2409,8 @@ try {
 <script src="/shared/glyf.js"></script>
 <script src="/shared/emoji.js"></script>
 <script src="/shared/uitvoer.js"></script>
-<script src="/apps/magnaat-sandbox.js?v=8329d479"></script>
-<script src="/apps/magnaat-data.js?v=8329d479"></script>
+<script src="/apps/magnaat-sandbox.js?v=b3bf2c3b"></script>
+<script src="/apps/magnaat-data.js?v=b3bf2c3b"></script>
 <script src="/apps/app-main.js" defer></script>
 <script>
 window.I18N = { en: {
@@ -2474,8 +2496,10 @@ window.I18N = { en: {
   'ag.stuur':'Send', 'ag.log':'Rahul',
   'ag.ballotage':'The ballotage', 'ag.kluis':'Encrypted · straight into the vault',
   'ag.entree':'The entrance', 'ag.kluisdirect':'Straight to the vault, not through this conversation',
-  'ag.welkom':'There you are: welcome back to the house.',
-  'ag.pk.open':'Open with Face ID or passkey', 'ag.anders':'Use another way',
+  'ag.welkom':'There you are: welcome back to the house.', 'ag.welkom.kop':'Welcome back',
+  'ag.pk.open':'Open with Face ID or passkey', 'ag.pk.uitleg':'Continue with your passkey',
+  'ag.pk.veilig':'Open securely', 'ag.anders':'Use another way',
+  'ag.werelden':'Available RTG worlds',
   'ag.pk.geen':'This device has no passkey. Choose Use another way.',
   'ag.pk.vraag':'Your device is now asking for your Face ID, fingerprint or key.',
   'ag.pk.afgebroken':'Not opened. Try again or choose Use another way.',
@@ -2809,5 +2833,6 @@ window.I18N = { en: {
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/ios.js" defer></script>
 <script src="/shared/pinherstel.js" defer></script>
+<script src="/shared/leeg.js"></script>
 </body>
 </html>

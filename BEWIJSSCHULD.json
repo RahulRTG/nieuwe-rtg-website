@@ -1,22 +1,24 @@
 {
  "stempel": {
-  "op": "2026-09-02T10:03:19.692Z",
-  "commit": "eb2f5d68",
-  "boomVuil": true,
+  "op": "2026-09-01T16:42:52.563Z",
+  "commit": "1f26479d7",
+  "boomVuil": false,
+  "boomAnders": 0,
+  "instrument": "scripts/bewijsschuld.js",
   "node": "v22.22.2"
  },
  "uitleg": "Wat er nog niet gemeten is, en waarom niet. MAG ALLEEN KRIMPEN -- zie test/bewijsschuld.test.js. Een post van soort \"grens\" sluit nooit; die telt niet als achterstand maar als de rand van de methode.",
  "grens": "Dit is een lijst van wat we WETEN dat we niet hebben gemeten. Wat niemand heeft bedacht staat er per definitie niet in, en dat is de gevaarlijkste categorie -- een schuldenlijst is geen dekkingsbewijs. De aantallen komen uit de registers en zijn dus zo vers als de laatste ronde; zie scripts/versheid.js.",
  "telling": {
   "posten": 18,
-  "meetwerk": 1725,
-  "instrument": 932,
-  "grens": 608
+  "meetwerk": 1962,
+  "instrument": 323,
+  "grens": 643
  },
  "aflossing": {
   "doel": 0,
   "wat": "de achterstand (meetwerk + instrument) gaat naar nul. `grens` telt niet mee en sluit nooit -- dat is de rand van de methode en geen werk.",
-  "staat": 2657,
+  "staat": 2285,
   "regels": [
    "de achterstand mag nooit groeien zonder een reden IN dit register (--groei=...)",
    "een post mag niet van soort veranderen om onder de poort uit te komen: naar `grens` verplaatsen laat de achterstand dalen zonder dat er iets gemeten is",
@@ -24,12 +26,35 @@
    "nul is bereikt als meetwerk en instrument allebei leeg zijn, en niet als de posten zijn herbenoemd"
   ]
  },
+ "gemeten": {
+  "postenTotaal": 18,
+  "achterstand": 2285,
+  "randVanDeMethode": 643,
+  "auth-onbeslist": 1,
+  "capability-in-handler": 547,
+  "objectpoort": 52,
+  "output-deuren": 18,
+  "lichaamssleutel": 74,
+  "output-niet-toerekenbaar": 277,
+  "output-blind": 0,
+  "output-onwaarneembaar": 4,
+  "audit-wisselend": null,
+  "audit-verklaard": null,
+  "rollback-gezakt": 2,
+  "object-vooraf": 323,
+  "proefruis": 1,
+  "gevolg-onbekend": 90,
+  "droogloop-onbeoordeeld": 2,
+  "herstel-onbevestigd": 47,
+  "idem-ongeclassificeerd": 1487,
+  "wegwerpserver-kopieen": 3
+ },
  "posten": [
   {
    "id": "auth-onbeslist",
    "soort": "meetwerk",
    "wat": "stille routes die onder geen enkele andere post op deze lijst vallen",
-   "aantal": 0,
+   "aantal": 1,
    "waarom": "de klop gaat zonder token. Een 400 of 404 betekent dat de validatie of een opzoeking eerder aan de beurt was dan de autorisatie, en zegt niets over een slot. Na een tweede klop met een plausibel lijf bleven deze routes hetzelfde antwoord geven.",
    "sluit": "per route nakijken wat er precies wordt gevraagd. Dit is geen instrumentvraag meer maar handwerk op een handvol routes, en dat is precies wat een schuldpost hoort te zijn als het gereedschap er is."
   },
@@ -37,7 +62,7 @@
    "id": "capability-in-handler",
    "soort": "grens",
    "wat": "routes zonder bewakerslaag: de controle zit IN de handler (een capability-token)",
-   "aantal": 523,
+   "aantal": 547,
    "waarom": "de rolproef kruist ROLLEN. Deze routes kennen geen rol -- ze eisen een token dat je alleen hebt als je het hebt gekregen (de schoolborden van foundation, rtf/social). Rollen kruisen is hier niet moeilijk maar zinloos.",
    "sluit": "niets in deze proef. Een eigen proef op capability-tokens zou de goede vraag stellen; die bestaat niet en is een project, geen achterstand."
   },
@@ -61,7 +86,7 @@
    "id": "lichaamssleutel",
    "soort": "grens",
    "wat": "routes waarvan de sleutel een VELD IN HET VERZOEK is, geen token in de kop",
-   "aantal": 63,
+   "aantal": 74,
    "waarom": "gastAuth leest req.body.sleutel, gezinsPoort en rtfPoort lezen code+token uit het lichaam. Een member-, supplier- of officetoken is voor zo n deur niet fout maar IRRELEVANT: hij kijkt er niet naar. Alle drie krijgen dezelfde 401.",
    "sluit": "niets in deze proef; die 401 als bewijs tellen zou dezelfde fout zijn die de AUTH-as al 294 cellen kostte. Een proef op sessiesleutels is een andere vraag."
   },
@@ -69,7 +94,7 @@
    "id": "output-niet-toerekenbaar",
    "soort": "meetwerk",
    "wat": "routes waar inhoudgevoelige toetsen op zitten, maar die toetsen raken er meer",
-   "aantal": 0,
+   "aantal": 277,
    "waarom": "een toets die op de lege inhoud zakt en tien routes raakt, kan op de inhoud van een van die tien zijn gezakt. Aan DEZE route valt dan niets toe te rekenen.",
    "sluit": "node scripts/outputproef.js --meet=<n>. Die liegt over EEN route en draait alleen de toetsen die hem raken; de uitslagen stapelen in OUTPUTPROEF.json. Een paar honderd per ronde, dus dit sluit met werk en niet met een doorbraak."
   },
@@ -109,7 +134,7 @@
    "id": "rollback-gezakt",
    "soort": "meetwerk",
    "wat": "routes die weigeren en toch de toestand veranderen",
-   "aantal": 0,
+   "aantal": 2,
    "waarom": "de meeste zijn /api/rtfos/* met securityLog en sessions -- vermoedelijk de auth-laag die een geweigerde poging vastlegt, en dus mogelijk ruis in de meting en geen lek. Maar EEN ervan verspringt per ronde van plek, en een bevinding die verhuist is zelf een bevinding over de meting.",
    "sluit": "per route nalopen wat er beweegt en waarom. Dit is de oudste post op deze lijst en de enige die naar een mogelijk defect wijst."
   },
@@ -117,7 +142,7 @@
    "id": "object-vooraf",
    "soort": "instrument",
    "wat": "routes die een bestaand object willen bedienen dat de proef niet heeft aangemaakt",
-   "aantal": 932,
+   "aantal": 323,
    "waarom": "de proef stuurt een plausibel lijf met een verzonnen identiteit. De route zoekt het object op, vindt het niet, en antwoordt 404 -- juist gedrag, en de handler heeft nooit gedraaid. Gemeten op 507 member-routes: 166 verschillende boodschappen die alle 166 hetzelfde zeggen.",
    "sluit": "de objectpool (scripts/lib/objectpool.js) oogst echte id's uit antwoorden die de ronde zelf zag en verrijkt er de lijven mee; de eerste ronde herwon zo 393 van de 1014. Wat rest zijn objecten die alleen via een eigen keten ontstaan (vier ogen, goedkeuring); daarvoor blijft de tweestapsketen per domein het antwoord."
   },
@@ -157,7 +182,7 @@
    "id": "idem-ongeclassificeerd",
    "soort": "meetwerk",
    "wat": "muterende routes zonder uitspraak over herhalen: wat gebeurt er bij een tweede keer",
-   "aantal": 1529,
+   "aantal": 1487,
    "waarom": "autonomie zonder herhaalsemantiek is niet te doen: een keten die halverwege afbreekt moet weten of opnieuw beginnen veilig is. Het doel is niet dat alles idempotent IS -- het is dat van elke route vastligt wat een tweede keer betekent.",
    "sluit": "per route beslissen en vastleggen. Het instrument staat (scripts/idemproef-route.js plus IDEMBESLUIT.json met zijn klassen); dit is meetwerk en handwerk."
   },
@@ -165,7 +190,7 @@
    "id": "wegwerpserver-kopieen",
    "soort": "meetwerk",
    "wat": "scripts met een eigen kopie van \"start een wegwerpserver\"",
-   "aantal": 4,
+   "aantal": 3,
    "waarom": "scripts/lib/wegwerpserver.js bestaat sinds de meetronde, maar de bestaande instrumenten zijn er nog niet op omgezet. Verandert er iets aan hoe je hier een server start, dan verandert dat op tien plekken of -- waarschijnlijker -- op een.",
    "sluit": "GEDAAN: alle instrumenten delen nu scripts/lib/wegwerpserver.js. De lib kreeg de opties die de laatste vier nodig hadden -- magSterven (keten/verraad saboteren de start), een eigen/hergebruikte datamap (hersteltijd herstart erop), nodeArgs (--expose-gc + gc-hook voor de geheugen-beproevingen), een vaste poort en readiness (ladder, beproeving, tot-crash). Een tiende kopie kan er niet meer bij zonder dat de teller het ziet."
   }
@@ -174,21 +199,21 @@
   "auth-onbeslist": [
    {
     "op": "2026-08-31",
-    "aantal": 0
+    "aantal": 1
    },
    {
-    "op": "2026-09-02",
-    "aantal": 0
+    "op": "2026-09-01",
+    "aantal": 1
    }
   ],
   "capability-in-handler": [
    {
     "op": "2026-08-31",
-    "aantal": 523
+    "aantal": 547
    },
    {
-    "op": "2026-09-02",
-    "aantal": 523
+    "op": "2026-09-01",
+    "aantal": 547
    }
   ],
   "objectpoort": [
@@ -197,7 +222,7 @@
     "aantal": 52
    },
    {
-    "op": "2026-09-02",
+    "op": "2026-09-01",
     "aantal": 52
    }
   ],
@@ -207,28 +232,28 @@
     "aantal": 18
    },
    {
-    "op": "2026-09-02",
+    "op": "2026-09-01",
     "aantal": 18
    }
   ],
   "lichaamssleutel": [
    {
     "op": "2026-08-31",
-    "aantal": 63
+    "aantal": 74
    },
    {
-    "op": "2026-09-02",
-    "aantal": 63
+    "op": "2026-09-01",
+    "aantal": 74
    }
   ],
   "output-niet-toerekenbaar": [
    {
     "op": "2026-08-31",
-    "aantal": 0
+    "aantal": 277
    },
    {
-    "op": "2026-09-02",
-    "aantal": 0
+    "op": "2026-09-01",
+    "aantal": 277
    }
   ],
   "output-blind": [
@@ -237,7 +262,7 @@
     "aantal": 0
    },
    {
-    "op": "2026-09-02",
+    "op": "2026-09-01",
     "aantal": 0
    }
   ],
@@ -247,7 +272,7 @@
     "aantal": 4
    },
    {
-    "op": "2026-09-02",
+    "op": "2026-09-01",
     "aantal": 4
    }
   ],
@@ -257,7 +282,7 @@
     "aantal": null
    },
    {
-    "op": "2026-09-02",
+    "op": "2026-09-01",
     "aantal": null
    }
   ],
@@ -267,28 +292,28 @@
     "aantal": null
    },
    {
-    "op": "2026-09-02",
+    "op": "2026-09-01",
     "aantal": null
    }
   ],
   "rollback-gezakt": [
    {
     "op": "2026-08-31",
-    "aantal": 0
+    "aantal": 2
    },
    {
-    "op": "2026-09-02",
-    "aantal": 0
+    "op": "2026-09-01",
+    "aantal": 2
    }
   ],
   "object-vooraf": [
    {
     "op": "2026-08-31",
-    "aantal": 932
+    "aantal": 323
    },
    {
-    "op": "2026-09-02",
-    "aantal": 932
+    "op": "2026-09-01",
+    "aantal": 323
    }
   ],
   "proefruis": [
@@ -297,7 +322,7 @@
     "aantal": 1
    },
    {
-    "op": "2026-09-02",
+    "op": "2026-09-01",
     "aantal": 1
    }
   ],
@@ -307,7 +332,7 @@
     "aantal": 90
    },
    {
-    "op": "2026-09-02",
+    "op": "2026-09-01",
     "aantal": 90
    }
   ],
@@ -317,7 +342,7 @@
     "aantal": 2
    },
    {
-    "op": "2026-09-02",
+    "op": "2026-09-01",
     "aantal": 2
    }
   ],
@@ -327,7 +352,7 @@
     "aantal": 47
    },
    {
-    "op": "2026-09-02",
+    "op": "2026-09-01",
     "aantal": 47
    }
   ],
@@ -337,18 +362,18 @@
     "aantal": 1477
    },
    {
-    "op": "2026-09-02",
-    "aantal": 1529
+    "op": "2026-09-01",
+    "aantal": 1487
    }
   ],
   "wegwerpserver-kopieen": [
    {
     "op": "2026-08-31",
-    "aantal": 4
+    "aantal": 3
    },
    {
-    "op": "2026-09-02",
-    "aantal": 4
+    "op": "2026-09-01",
+    "aantal": 3
    }
   ]
  },
@@ -385,10 +410,16 @@
    "reden": "Main binnengehaald: 4643 routes in plaats van 3282, en de idempotentieproef is over die nieuwe routes gedraaid. Daardoor groeit idem-ongeclassificeerd van 849 naar 1477 en gevolg-onbekend van 94 naar 90+ -- geen nieuwe schuld maar dezelfde schuld over een grotere boom. herstel-onbevestigd ging juist omlaag (63 -> 47) doordat de herstelproef ook over de nieuwe paren is gedraaid."
   },
   {
-   "op": "2026-09-02",
-   "van": 2605,
-   "naar": 2657,
-   "reden": "De idempotentieproef reikt verder, niet het werk. Commit 1916055c (De proef verder laten reiken: +53 gemeten, +44 bewezen lezers, 0 regressies) bracht 53 routes binnen bereik van scripts/idemproef.js die er daarvoor als onbereikbaar buiten stonden. Die routes DEDEN dat werk al; wat veranderde is dat IDEMPROEF.json ze nu meet en dus kan zien dat er geen besluit over ze staat in IDEMBESLUIT.json. idem-ongeclassificeerd gaat daardoor van 1477 naar 1529 en de achterstand van 2605 naar 2657. De andere zeventien posten bewogen niet. Dit is de goede kant op fout gaan: een route die stil onbereikbaar was telde als niets, en telt nu als onbeslist -- de schuld is niet gegroeid maar zichtbaar geworden. Sluiten doet niet dit script maar een mens die per route beslist wat een tweede aanroep hoort te doen."
+   "op": "2026-09-01",
+   "van": 2275,
+   "naar": 2284,
+   "reden": "De idempotentieproef is voor het eerst na de samenvoeging van twaalf PR's gedraaid en zag daardoor routes die er al stonden maar nog nooit gemeten waren: idem-ongeclassificeerd 1477 -> 1487. Er is niets slechter geworden; er is meer in beeld gekomen. Tegelijk daalde gevolg-onbekend van 90 naar 89 uit dezelfde meting. Netto +9 op een achterstand van 2284, en de post die groeit is precies de post die de nieuwe routes telt."
+  },
+  {
+   "op": "2026-09-01",
+   "van": 2284,
+   "naar": 2285,
+   "reden": "De idempotentieproef meet na de wereldopstelling en dertien lijfsleutelfamilies veel meer routes dan eerst; gevolg-onbekend gaat daardoor van 89 naar 90. Netto +1 op 2285, en de post die groeit is precies de post die zegt dat er nog geen droogloop over die route is geweest."
   }
  ]
 }

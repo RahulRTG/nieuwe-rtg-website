@@ -127,6 +127,11 @@
       ' · Minder: ' + (minder.join(', ') || '--') +
       ' · Nooit: ' + ((d.smaak.nooitMakers || []).concat(d.smaak.nooitOnderwerpen || []).join(', ') || '--');
   }
+  /* De lege stand komt uit shared/leeg.js. Hier stond een eigen kopie,
+     geschreven voor de gedeelde bestond; twee kopieen van een vorm lopen
+     gegarandeerd uit elkaar. */
+
+
   function teken(d) {
     stand = d;
     /* Welke clips op DIT toestel staan, zodat de deler ze kan uitdienen en de
@@ -136,30 +141,33 @@
       S.deler.zetEigen((d.stukken || []).filter(function (x) { return x.vorm === 'clip' && x.mijn; })
         .map(function (x) { return x.id.slice(x.id.indexOf(':') + 1); }));
     }
-    if (d.error) { $('#uitleg').textContent = d.error; return; }
+    /* EEN UITGELOGD SCHERM IS GEEN FOUTMELDING. Hier stond alleen
+       `$('#uitleg').textContent = d.error` en dan `return`: de zin "Niet
+       ingelogd." kwam als kale regel bovenaan een leeg vlak van driehonderd
+       pixels te staan, terwijl de LEGE stand er twee regels verderop al een
+       vorm voor had (d.leeg). Twee wegen naar hetzelfde moment, en maar een
+       ervan was ontworpen. Nu gebruiken ze allebei hetzelfde vlak. */
+    if (d.error) {
+      $('#uitleg').textContent = '';
+      var doosF = $('#stukken'); doosF.textContent = '';
+      doosF.appendChild(RTGLeeg.vlak({
+        ey: 'RTG Media',
+        titel: RTGLeeg.aangemeld() ? 'Dit lukte niet.' : 'Meld u aan om verder te gaan.',
+        wat: d.error,
+        stappen: RTGLeeg.aangemeld() ? [] : [{ tekst: 'Naar de leden-app', pad: '/apps/app.html' }]
+      }));
+      return;
+    }
     tekenStanden(d);
     $('#uitleg').textContent = d.uitleg;
     var doos = $('#stukken'); doos.textContent = '';
     /* Een lege stand is geen leeg raster: de server zegt wat hier komt, waarom
        het er nu niet is, en welke stap dat opheft. Die tekst staat daar en niet
        hier, want de reden hangt van de gegevens af (zie kern/mediaos/leeg.js). */
-    if (d.leeg) {
-      var kader = el('div', 'kader');
-      kader.style.gridColumn = '1 / -1';   // over de hele breedte, het is geen kaart tussen kaarten
-      kader.appendChild(el('b', null, d.leeg.titel));
-      kader.appendChild(el('p', 'stil', d.leeg.wat));
-      kader.appendChild(el('p', 'stil', d.leeg.waarom));
-      var rij = el('div', 'rij');
-      rij.style.display = 'flex'; rij.style.gap = '0.35rem'; rij.style.flexWrap = 'wrap'; rij.style.marginTop = '0.7rem';
-      (d.leeg.stappen || []).forEach(function (st) {
-        var a = document.createElement('a');
-        a.className = 'knop'; a.href = st.pad; a.textContent = st.tekst;
-        a.style.textDecoration = 'none'; a.style.display = 'inline-block';
-        rij.appendChild(a);
-      });
-      kader.appendChild(rij);
-      doos.appendChild(kader);
-    }
+    if (d.leeg) doos.appendChild(RTGLeeg.vlak({
+      ey: 'RTG Media', titel: d.leeg.titel, wat: d.leeg.wat,
+      waarom: d.leeg.waarom, stappen: d.leeg.stappen
+    }));
     d.stukken.forEach(function (s) { doos.appendChild(kaart(s)); });
     $('#einde').textContent = d.einde;
 

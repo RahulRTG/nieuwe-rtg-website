@@ -37,7 +37,10 @@ const BREED = [
   [/supplier|partner|\/gast/, 'support', 'Support team'],
 
   /* Platform, onderzoek en creatie. */
-  [/asset|site|auth|webauthn|rtgid|verify|sleutel|passkeys|\/sso|\/account|\/bestanden|\/agenda|\/kantoorpakket|\/werkplek|\/browser|\/code\b|\/scanner|\/veilig\.html|\/rtgcode|\/table\.html|\/state\b|\/klok/, 'intern', 'Intern & IT'],
+  /* De Experience Plane is gedeelde platformorkestratie: werelden lezen er
+     projecties en bieden intents aan, maar geen domein bezit deze voordeur.
+     Daarom heeft hij één expliciete eigenaar bij Intern & IT. */
+  [/asset|site|auth|webauthn|rtgid|verify|sleutel|passkeys|\/experience|\/sso|\/account|\/bestanden|\/agenda|\/kantoorpakket|\/werkplek|\/browser|\/code\b|\/scanner|\/veilig\.html|\/rtgcode|\/table\.html|\/state\b|\/klok/, 'intern', 'Intern & IT'],
   /* `/plaats` staat bij zijn naaste buur `/nav`: de plaatslaag (PLAATS.md) is
      net als navigatie, comm en push een gedeelde platformvoorziening waar
      andere domeinen op leunen -- de prikklok, de arrival-pass en de voorspeller

@@ -1,7 +1,7 @@
 {
   "woordenlijsten": 21,
-  "leden": 249,
-  "ledenInEen": 228,
+  "leden": 250,
+  "ledenInEen": 229,
   "ledenInMeer": 21,
   "ledenInEenPct": 92,
   "maxGelijkenis": 0.22,
@@ -185,7 +185,7 @@
   "contract": [
     {
       "lijst": "server/kern/appstore/machtigingen.js :: MACHTIGINGEN",
-      "leden": 3,
+      "leden": 4,
       "draagt": [
         "label",
         "risico",
@@ -317,7 +317,7 @@
   ],
   "volledigsteContract": {
     "lijst": "server/kern/appstore/machtigingen.js :: MACHTIGINGEN",
-    "leden": 3,
+    "leden": 4,
     "draagt": [
       "label",
       "risico",
@@ -325,7 +325,7 @@
       "grens"
     ]
   },
-  "bestanden": 2927,
-  "bekeken": 2927,
-  "kandidaten": 999
+  "bestanden": 3005,
+  "bekeken": 3005,
+  "kandidaten": 1028
 }

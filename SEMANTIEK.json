@@ -1,12 +1,12 @@
 {
-  "catalogi": 997,
-  "verschillendeNamen": 596,
-  "namenInMeerDomeinen": 111,
-  "woordenMetMeerBetekenissen": 94,
-  "betekenissenTotaal": 349,
+  "catalogi": 1026,
+  "verschillendeNamen": 605,
+  "namenInMeerDomeinen": 116,
+  "woordenMetMeerBetekenissen": 99,
+  "betekenissenTotaal": 367,
   "ergsteWoord": "SOORTEN",
-  "ergsteAantal": 45,
-  "dubbelingen": 30,
+  "ergsteAantal": 46,
+  "dubbelingen": 31,
   "dubbelingLijst": [
     {
       "naam": "PALET",
@@ -221,11 +221,10 @@
     },
     {
       "naam": "NIET_GEBOUWD",
-      "betekenissenVanDitWoord": 3,
+      "betekenissenVanDitWoord": 4,
       "waar": [
         "server/kern/command/opslag-register.js",
         "server/kern/concern/opslag.js",
-        "server/kern/isolatie/opslag.js",
         "server/kern/levensdossier/velden.js",
         "server/kern/mobiliteit/opslag.js",
         "server/kern/payroll/opslag.js",
@@ -256,7 +255,7 @@
     },
     {
       "naam": "SOORTEN",
-      "betekenissenVanDitWoord": 45,
+      "betekenissenVanDitWoord": 46,
       "waar": [
         "server/kern/avond/plan.js",
         "server/kern/invoer.js"
@@ -393,6 +392,21 @@
       ]
     },
     {
+      "naam": "STANDEN",
+      "betekenissenVanDitWoord": 16,
+      "waar": [
+        "server/kern/gast/verzoek.js",
+        "server/kern/rtfos/ruil.js"
+      ],
+      "leden": 4,
+      "voorbeeld": [
+        "open",
+        "opgepakt",
+        "klaar",
+        "ingetrokken"
+      ]
+    },
+    {
       "naam": "ERNST",
       "betekenissenVanDitWoord": 1,
       "waar": [
@@ -439,7 +453,7 @@
     },
     {
       "naam": "SOORTEN",
-      "betekenissenVanDitWoord": 45,
+      "betekenissenVanDitWoord": 46,
       "waar": [
         "server/kern/bank/index.js",
         "server/kern/koppel.js"
@@ -453,7 +467,7 @@
     },
     {
       "naam": "STANDEN",
-      "betekenissenVanDitWoord": 14,
+      "betekenissenVanDitWoord": 16,
       "waar": [
         "server/kern/avond/voorkeuren.js",
         "server/kern/werkvenster.js"
@@ -480,7 +494,7 @@
       ]
     }
   ],
-  "dubbelingenZonderNaam": 190,
+  "dubbelingenZonderNaam": 192,
   "dubbelingZonderNaamLijst": [
     {
       "overlap": 1,
@@ -786,8 +800,8 @@
   "top": [
     {
       "naam": "SOORTEN",
-      "domeinen": 47,
-      "betekenissen": 45,
+      "domeinen": 48,
+      "betekenissen": 46,
       "hoogsteOverlap": 0.2,
       "soort": "gemengd",
       "waar": [
@@ -1019,6 +1033,18 @@
         },
         {
           "bestanden": [
+            "server/kern/identiteit/gegevenssoorten.js"
+          ],
+          "leden": 13,
+          "voorbeeld": [
+            "naam",
+            "codenaam",
+            "email",
+            "telefoon"
+          ]
+        },
+        {
+          "bestanden": [
             "server/kern/kletspraat/namen.js"
           ],
           "leden": 6,
@@ -1213,7 +1239,7 @@
           "bestanden": [
             "server/kern/rtfos/projecten.js"
           ],
-          "leden": 18,
+          "leden": 19,
           "voorbeeld": [
             "jongeren",
             "huiswerk",
@@ -1331,8 +1357,8 @@
     },
     {
       "naam": "STANDEN",
-      "domeinen": 15,
-      "betekenissen": 14,
+      "domeinen": 18,
+      "betekenissen": 16,
       "hoogsteOverlap": 0.4,
       "soort": "gemengd",
       "waar": [
@@ -1372,7 +1398,8 @@
         },
         {
           "bestanden": [
-            "server/kern/gast/verzoek.js"
+            "server/kern/gast/verzoek.js",
+            "server/kern/rtfos/ruil.js"
           ],
           "leden": 4,
           "voorbeeld": [
@@ -1380,6 +1407,18 @@
             "opgepakt",
             "klaar",
             "ingetrokken"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/identiteit/vertrouwen.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "onbekend",
+            "kennis",
+            "tweefactor",
+            "bezit"
           ]
         },
         {
@@ -1392,6 +1431,18 @@
             "doorbelasten",
             "rtfoundation",
             "huis"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/livinglab/uitleen.js"
+          ],
+          "leden": 6,
+          "voorbeeld": [
+            "aangevraagd",
+            "toegekend",
+            "afgewezen",
+            "meegegeven"
           ]
         },
         {
@@ -1526,7 +1577,7 @@
         },
         {
           "bestanden": [
-            "server/kern/betaalopdracht/index.js"
+            "server/kern/betaalopdracht/status.js"
           ],
           "leden": 5,
           "voorbeeld": [
@@ -1904,6 +1955,123 @@
       ]
     },
     {
+      "naam": "VELDEN",
+      "domeinen": 9,
+      "betekenissen": 9,
+      "hoogsteOverlap": 0.09,
+      "soort": "botsing",
+      "waar": [
+        {
+          "bestanden": [
+            "server/db/tx/pgachter.js"
+          ],
+          "leden": 8,
+          "voorbeeld": [
+            "soort",
+            "ref",
+            "klant",
+            "zaak"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/appstore/context.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "bedrag",
+            "bestemming",
+            "datum",
+            "tot"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/gegevenspoort.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "telefoon",
+            "adres",
+            "identiteit",
+            "reisdocument"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/identiteit/sessievelden.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "authenticator",
+            "toestel",
+            "context",
+            "sleutelbinding"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/levensdossier/velden.js"
+          ],
+          "leden": 24,
+          "voorbeeld": [
+            "verzoeken",
+            "bezittingen",
+            "afspraken",
+            "dossier"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/onderzoekslab.js"
+          ],
+          "leden": 9,
+          "voorbeeld": [
+            "hardware",
+            "software",
+            "dorp",
+            "meta"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/rtmail-regels.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "van",
+            "onderwerp",
+            "tekst",
+            "soort"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/webplatform-taal.js"
+          ],
+          "leden": 11,
+          "voorbeeld": [
+            "hero",
+            "kop",
+            "tekst",
+            "knop"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/school/koppelingen.js"
+          ],
+          "leden": 12,
+          "voorbeeld": [
+            "naam",
+            "klas",
+            "opleiding",
+            "vestiging"
+          ]
+        }
+      ]
+    },
+    {
       "naam": "BRONNEN",
       "domeinen": 8,
       "betekenissen": 8,
@@ -2015,7 +2183,7 @@
       "waar": [
         {
           "bestanden": [
-            "server/kern/appstore/manifest.js"
+            "server/kern/appstore/manifestvorm.js"
           ],
           "leden": 8,
           "voorbeeld": [
@@ -2509,102 +2677,9 @@
       ]
     },
     {
-      "naam": "VELDEN",
+      "naam": "VORMEN",
       "domeinen": 7,
       "betekenissen": 7,
-      "hoogsteOverlap": 0.09,
-      "soort": "botsing",
-      "waar": [
-        {
-          "bestanden": [
-            "server/db/tx/pgachter.js"
-          ],
-          "leden": 8,
-          "voorbeeld": [
-            "soort",
-            "ref",
-            "klant",
-            "zaak"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/gegevenspoort.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "telefoon",
-            "adres",
-            "identiteit",
-            "reisdocument"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/levensdossier/velden.js"
-          ],
-          "leden": 24,
-          "voorbeeld": [
-            "verzoeken",
-            "bezittingen",
-            "afspraken",
-            "dossier"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/onderzoekslab.js"
-          ],
-          "leden": 9,
-          "voorbeeld": [
-            "hardware",
-            "software",
-            "dorp",
-            "meta"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/rtmail-regels.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "van",
-            "onderwerp",
-            "tekst",
-            "soort"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/webplatform-taal.js"
-          ],
-          "leden": 11,
-          "voorbeeld": [
-            "hero",
-            "kop",
-            "tekst",
-            "knop"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/school/koppelingen.js"
-          ],
-          "leden": 12,
-          "voorbeeld": [
-            "naam",
-            "klas",
-            "opleiding",
-            "vestiging"
-          ]
-        }
-      ]
-    },
-    {
-      "naam": "VORMEN",
-      "domeinen": 6,
-      "betekenissen": 6,
       "hoogsteOverlap": 0,
       "soort": "botsing",
       "waar": [
@@ -2612,7 +2687,7 @@
           "bestanden": [
             "server/kern/appstore/naslag.js"
           ],
-          "leden": 5,
+          "leden": 8,
           "voorbeeld": [
             "opslag.lees",
             "opslag.lijst",
@@ -2658,6 +2733,17 @@
         },
         {
           "bestanden": [
+            "server/kern/rtfos/gift-vormen.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "eenmalig",
+            "geoormerkt",
+            "periodiek"
+          ]
+        },
+        {
+          "bestanden": [
             "server/kern/spellen/magnaat/bankvormen.js"
           ],
           "leden": 5,
@@ -2678,75 +2764,6 @@
             "zelfstandig",
             "horeca",
             "verblijf"
-          ]
-        }
-      ]
-    },
-    {
-      "naam": "REGISTER",
-      "domeinen": 5,
-      "betekenissen": 5,
-      "hoogsteOverlap": 0,
-      "soort": "botsing",
-      "waar": [
-        {
-          "bestanden": [
-            "server/kern/command/opslag-register.js"
-          ],
-          "leden": 5,
-          "voorbeeld": [
-            "steden",
-            "landen",
-            "zandbakken",
-            "overnames"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/concern/opslag.js"
-          ],
-          "leden": 8,
-          "voorbeeld": [
-            "concerns",
-            "entiteiten",
-            "vestigingen",
-            "employments"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/fiscaal/zekerheid.js"
-          ],
-          "leden": 19,
-          "voorbeeld": [
-            "btw.aangifte",
-            "btw.regel",
-            "btw.herbouw",
-            "btw.categorie"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/isolatie/opslag.js"
-          ],
-          "leden": 6,
-          "voorbeeld": [
-            "organisatie",
-            "identiteit",
-            "sessie",
-            "apparaat"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/veiligheid/opslag.js"
-          ],
-          "leden": 8,
-          "voorbeeld": [
-            "alarmen",
-            "wachten",
-            "momenten",
-            "kring"
           ]
         }
       ]
@@ -2815,6 +2832,68 @@
             "contrast",
             "beweging",
             "links"
+          ]
+        }
+      ]
+    },
+    {
+      "naam": "NIET_GEBOUWD",
+      "domeinen": 9,
+      "betekenissen": 4,
+      "hoogsteOverlap": 1,
+      "soort": "gemengd",
+      "waar": [
+        {
+          "bestanden": [
+            "server/kern/appstore/machtigingen.js"
+          ],
+          "leden": 6,
+          "voorbeeld": [
+            "betalen",
+            "agenda",
+            "bestanden",
+            "locatie"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/command/opslag-register.js",
+            "server/kern/concern/opslag.js",
+            "server/kern/levensdossier/velden.js",
+            "server/kern/mobiliteit/opslag.js",
+            "server/kern/payroll/opslag.js",
+            "server/kern/veiligheid/opslag.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "schema",
+            "validatie",
+            "bevoegdheid",
+            "gebeurtenissen"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/commerce/retourlijst.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "ruilen-tegen-ander-artikel",
+            "retourlabel",
+            "automatisch-terugboeken",
+            "retourpercentage"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/livinglab/instrumentsoorten.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "foto",
+            "locatie",
+            "audio",
+            "doorlopend"
           ]
         }
       ]
@@ -3273,6 +3352,63 @@
       ]
     },
     {
+      "naam": "REGISTER",
+      "domeinen": 4,
+      "betekenissen": 4,
+      "hoogsteOverlap": 0,
+      "soort": "botsing",
+      "waar": [
+        {
+          "bestanden": [
+            "server/kern/command/opslag-register.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "steden",
+            "landen",
+            "zandbakken",
+            "overnames"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/concern/opslag.js"
+          ],
+          "leden": 8,
+          "voorbeeld": [
+            "concerns",
+            "entiteiten",
+            "vestigingen",
+            "employments"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/fiscaal/zekerheid.js"
+          ],
+          "leden": 19,
+          "voorbeeld": [
+            "btw.aangifte",
+            "btw.regel",
+            "btw.herbouw",
+            "btw.categorie"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/veiligheid/opslag.js"
+          ],
+          "leden": 8,
+          "voorbeeld": [
+            "alarmen",
+            "wachten",
+            "momenten",
+            "kring"
+          ]
+        }
+      ]
+    },
+    {
       "naam": "SCENARIOS",
       "domeinen": 4,
       "betekenissen": 4,
@@ -3327,62 +3463,7 @@
           ]
         }
       ]
-    },
-    {
-      "naam": "UITLEG",
-      "domeinen": 4,
-      "betekenissen": 4,
-      "hoogsteOverlap": 0,
-      "soort": "botsing",
-      "waar": [
-        {
-          "bestanden": [
-            "server/kern/appstore/toegankelijk.js"
-          ],
-          "leden": 3,
-          "voorbeeld": [
-            "in-orde",
-            "blokkeert",
-            "niet-vast-te-stellen"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/platformregister.js"
-          ],
-          "leden": 3,
-          "voorbeeld": [
-            "gezakt",
-            "ongemeten",
-            "beproefd"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/rtfos/deelnemerportaal.js"
-          ],
-          "leden": 8,
-          "voorbeeld": [
-            "ontvangen",
-            "intake",
-            "toestemming",
-            "gekoppeld"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/routes/pay.js"
-          ],
-          "leden": 12,
-          "voorbeeld": [
-            "reden",
-            "opheffbaar",
-            "klasse",
-            "ruimte"
-          ]
-        }
-      ]
     }
   ],
-  "bestanden": 2927
+  "bestanden": 3001
 }

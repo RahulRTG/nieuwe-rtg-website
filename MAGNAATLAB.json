@@ -1,7 +1,7 @@
 {
   "simulatiemodules": 66,
-  "kernmodules": 1785,
-  "kernDomeinen": 522,
+  "kernmodules": 1853,
+  "kernDomeinen": 535,
   "perWereld": {
     "magnaat": {
       "modules": 63,
@@ -77,7 +77,7 @@
     }
   ],
   "gedeeldeOnderwerpen": 13,
-  "kandidaatparen": 35,
+  "kandidaatparen": 36,
   "parenMetGedeeldeVorm": 0,
   "paren": [
     {
@@ -208,15 +208,15 @@
     },
     {
       "onderwerp": "economie",
-      "simulatie": "server/kern/spellen/magnaat/economie.js",
-      "rtg": "server/kern/economie/index.js",
+      "simulatie": "server/kern/magnaat-economie.js",
+      "rtg": "server/kern/fonds/economie.js",
       "vormgelijkenis": 0,
       "meetbaar": false
     },
     {
-      "onderwerp": "foundation",
-      "simulatie": "server/kern/spellen/magnaat/foundation.js",
-      "rtg": "server/kern/wereldroutes/foundation.js",
+      "onderwerp": "economie",
+      "simulatie": "server/kern/spellen/magnaat/economie.js",
+      "rtg": "server/kern/economie/index.js",
       "vormgelijkenis": 0,
       "meetbaar": false
     }

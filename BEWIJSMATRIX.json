@@ -1,106 +1,108 @@
 {
   "stempel": {
-    "op": "2026-08-20T15:47:51.090Z",
-    "commit": "fcba02e",
-    "boomVuil": true,
+    "op": "2026-09-01T05:51:56.653Z",
+    "commit": "9ce86fe98",
+    "boomVuil": false,
+    "boomAnders": 1,
+    "instrument": "scripts/bewijsmatrix.js",
     "node": "v22.22.2"
   },
   "herkomst": "routekaart (draaiende server)",
   "gedegradeerd": false,
   "journaalGelezen": ".routejournaal",
-  "routes": 4188,
+  "routes": 4846,
   "schakels": 11,
-  "cellen": 46068,
+  "cellen": 53306,
   "telling": {
-    "bewezen": 16475,
+    "bewezen": 25500,
     "verklaard": 0,
-    "nvt": 272,
-    "ongemeten": 29205,
-    "gezakt": 116
+    "nvt": 308,
+    "ongemeten": 27453,
+    "gezakt": 45
   },
   "perSchakel": {
     "AUTH": {
-      "bewezen": 4187,
+      "bewezen": 4475,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 297,
+      "ongemeten": 371,
       "gezakt": 0
     },
     "ACL": {
-      "bewezen": 3079,
+      "bewezen": 3827,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 1117,
-      "gezakt": 0
+      "ongemeten": 988,
+      "gezakt": 31
     },
     "INPUT": {
-      "bewezen": 2632,
+      "bewezen": 3368,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 1556,
+      "ongemeten": 1478,
       "gezakt": 0
     },
     "OUTPUT": {
-      "bewezen": 4157,
+      "bewezen": 4151,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 4188,
+      "ongemeten": 695,
       "gezakt": 0
     },
     "STATE": {
-      "bewezen": 266,
+      "bewezen": 424,
       "verklaard": 0,
-      "nvt": 68,
-      "ongemeten": 3854,
+      "nvt": 77,
+      "ongemeten": 4345,
       "gezakt": 0
     },
     "SIDE_EFFECT": {
-      "bewezen": 266,
+      "bewezen": 424,
       "verklaard": 0,
-      "nvt": 68,
-      "ongemeten": 3854,
+      "nvt": 77,
+      "ongemeten": 4345,
       "gezakt": 0
     },
     "AUDIT": {
-      "bewezen": 575,
+      "bewezen": 709,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 3613,
+      "ongemeten": 4137,
       "gezakt": 0
     },
     "IDEMPOTENCY": {
-      "bewezen": 175,
+      "bewezen": 1627,
       "verklaard": 0,
-      "nvt": 68,
-      "ongemeten": 3840,
-      "gezakt": 105
+      "nvt": 77,
+      "ongemeten": 3130,
+      "gezakt": 12
     },
     "FAILURE": {
       "bewezen": 2,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 4186,
+      "ongemeten": 4844,
       "gezakt": 0
     },
     "ROLLBACK": {
-      "bewezen": 2214,
+      "bewezen": 2635,
       "verklaard": 0,
-      "nvt": 68,
-      "ongemeten": 1896,
-      "gezakt": 10
+      "nvt": 77,
+      "ongemeten": 2132,
+      "gezakt": 2
     },
     "PRIVACY": {
-      "bewezen": 3079,
+      "bewezen": 3858,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 1117,
+      "ongemeten": 988,
       "gezakt": 0
     }
   },
   "verslechteringToegestaan": {
-    "reden": "De routeset groeide van 3987 naar 4188 (+201, waaronder de uitrol-routes en wat er met main meekwam), dus het aantal cellen van 43857 naar 46068. Absoluut staat er daardoor meer ongemeten, maar PROPORTIONEEL is elke kolom gelijk gebleven of vooruitgegaan, en AUDIT ging van 0 naar 13,7 procent (575 routes) doordat scripts/handelingproef-route.js nu bestaat. Alle vijf de meetrondes zijn ruimer gedraaid dan de vorige vastlegging: rolproef 2937->3081, invoerproef 2510->2634, staatproef 2338->2491.",
-    "cellenVoor": 43857,
-    "cellenNa": 46068
+    "reden": "Twaalf samengevoegde PR's brachten 108 nieuwe routes; elke kolom kreeg daardoor exact dezelfde +108 ongemeten. Dat is geen gezakt bewijs maar afwezig bewijs: er is nog geen meetronde langs die routes geweest, en 'ongemeten' is hier de eerlijke uitslag (BESTUUR.md: niet vast te stellen is een eersteklas uitkomst). IDEMPOTENCY verliest daarbovenop 445 bewezen omdat IDEMPROEF.json van voor de samenvoeging dateert; die ronde duurt uren en eist een schone boom, en draait apart. Vanaf deze stand geldt de ratel onverkort weer.",
+    "cellenVoor": 52118,
+    "cellenNa": 53306
   },
   "uitleg": "Gegenereerd door scripts/bewijsmatrix.js. ongemeten MAG ALLEEN KRIMPEN."
 }

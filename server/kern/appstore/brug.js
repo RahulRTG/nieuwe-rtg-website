@@ -39,7 +39,7 @@ const GRENS = {
 };
 
 function maakBrug(kern) {
-  const { S, eigen, nu, boek } = kern;
+  const { S, eigen, nu, boek, arena } = kern;
   const save = kern.save;
   /* De meter. Hij telt aanroepen en weigeringen per app per dag en weet met
      opzet NIET welk lid er aanroept -- deze functie geeft hem alleen de
@@ -73,7 +73,7 @@ function maakBrug(kern) {
      de POORT is: de rem, de machtigingscontrole, het weigeren en het tellen. Wie
      wil weten wat een app mag, leest een tabel; wie wil weten of hij erdoor
      komt, leest dit. */
-  const METHODES = require('./brugmethodes').maakMethodes({ GRENS, bak, nu, save });
+  const METHODES = require('./brugmethodes').maakMethodes({ GRENS, bak, nu, save, arena });
 
   /* DE MUTATIEPOORT, en hij staat hier omdat dit de RAND van het platform is:
      alles in METHODES is publiek aanroepbaar door code van een derde. Een
@@ -160,7 +160,7 @@ function maakBrug(kern) {
   const machtigingen = {};
   for (const n of namen) machtigingen[n] = METHODES[n].machtiging;
 
-  return { roep, bakje, bakjeGelezen, bakjes, METHODES: namen, machtigingen, mutaties, GRENS, boek, meting };
+  return { roep, bakje, bakjeGelezen, bakjes, METHODES: namen, machtigingen, mutaties, GRENS, boek, meting, arena };
 }
 
 module.exports = { maakBrug, GRENS };

@@ -25,14 +25,17 @@ module.exports = (sctx) => {
   const { router, save, rid, nu, schoon, eigenVeld, poort, log, gezinSessie, leerlingLijst } = sctx;
 
   const M = (sch) => { if (!sch.machtigingen) sch.machtigingen = []; return sch.machtigingen; };
+  /* De REGELS staan in kern/machtiging.js en niet meer hier. Ze stonden hier
+     eerst, en ze stonden hier goed -- maar toen de periodieke gift om een
+     SEPA-machtiging vroeg, zouden dezelfde vier regels een tweede keer zijn
+     opgeschreven. Twee registers met dezelfde betekenis onder dezelfde naam is
+     wat SEMANTIEK.json duur noemt. De OPSLAG blijft van school (een machtiging
+     hangt hier aan een leerling); wat een geldige machtiging is, is een ding. */
+  const regels = require('../kern/machtiging');
   const FREQ = ['eenmalig', 'maandelijks', 'per periode', 'per schooljaar'];
-  const NOOIT = { geindNu: false,
-    uitleg: 'RTG School int niets. Dit register legt vast wat er is getekend; het afschrijven gebeurt bij de bank of betaaldienst van de school.' };
+  const NOOIT = regels.nietGeind('RTG School');
 
-  const publiek = (m) => ({ id: m.id, kenmerk: m.kenmerk, leerlingId: m.leerlingId, houder: m.houder,
-    ibanEinde: m.ibanEinde, bank: m.bank, maxCenten: m.maxCenten, frequentie: m.frequentie,
-    getekendOp: m.getekendOp, kanaal: m.kanaal, actief: m.actief, ingetrokkenAt: m.ingetrokkenAt || null,
-    ingetrokkenDoor: m.ingetrokkenDoor || null });
+  const publiek = (m) => Object.assign(regels.publiek(m), { leerlingId: m.leerlingId });
 
   // de geldige machtiging van een leerling (of null). Ook door financien.js
   // gebruikt, zodat "mag dit geïncasseerd worden" op één plek wordt beantwoord.
@@ -45,23 +48,15 @@ module.exports = (sctx) => {
     const g = poort(req, res, 'financieel'); if (!g) return;
     const l = eigenVeld(leerlingLijst(g.sch), req.body.leerlingId);
     if (!l) return res.status(404).json({ error: 'Deze leerling staat niet in de administratie.' });
-    const houder = schoon(req.body.houder, 80);
-    if (!houder) return res.status(400).json({ error: 'Op wiens naam staat de rekening?' });
-    const einde = String(req.body.ibanEinde || '').replace(/\s/g, '').slice(-4);
-    if (!/^[0-9A-Za-z]{4}$/.test(einde)) return res.status(400).json({ error: 'Geef de laatste vier tekens van het rekeningnummer. Het volledige nummer bewaren we niet: er wordt hier niets geïnd.' });
-    const maxCenten = Math.round(Math.max(0, Math.min(1000000, Number(req.body.max) || 0)) * 100);
-    if (!maxCenten) return res.status(400).json({ error: 'Noteer het maximumbedrag per incasso. Een machtiging zonder maximum is een blanco cheque.' });
-    const frequentie = String(req.body.frequentie || 'maandelijks');
-    if (!FREQ.includes(frequentie)) return res.status(400).json({ error: 'Kies een frequentie: ' + FREQ.join(', ') + '.' });
-    const m = { id: rid(6), kenmerk: 'M' + String(M(g.sch).length + 1).padStart(5, '0'),
-      leerlingId: l.id, houder, ibanEinde: einde, bank: schoon(req.body.bank, 60) || null,
-      maxCenten, frequentie, getekendOp: schoon(req.body.getekendOp, 10) || nu().slice(0, 10),
-      kanaal: schoon(req.body.kanaal, 30) || 'papier', actief: true, at: nu(), door: g.p.naam };
+    const k = regels.keur(req.body, { frequenties: FREQ });
+    if (!k.ok) return res.status(k.status).json({ error: k.error });
+    const m = Object.assign({ id: rid(6), kenmerk: 'M' + String(M(g.sch).length + 1).padStart(5, '0'),
+      leerlingId: l.id, actief: true, at: nu(), door: g.p.naam }, k.velden);
+    if (!m.getekendOp) m.getekendOp = nu().slice(0, 10);
+    const maxCenten = m.maxCenten;
     // een tweede machtiging vervangt de eerste: twee geldige naast elkaar is
     // precies hoe iemand twee keer wordt afgeschreven
-    for (const oud of M(g.sch)) if (oud.leerlingId === l.id && oud.actief) {
-      oud.actief = false; oud.ingetrokkenAt = nu(); oud.ingetrokkenDoor = 'vervangen door ' + m.kenmerk;
-    }
+    regels.vervang(M(g.sch), oud => oud.leerlingId === l.id, m.kenmerk, nu());
     M(g.sch).unshift(m); g.sch.machtigingen = M(g.sch).slice(0, 20000);
     log(g.sch, g.p, 'machtiging-gezet', l.id, m.kenmerk + ', max ' + (maxCenten / 100).toFixed(2));
     save();

@@ -65,7 +65,16 @@ test('een geslaagde ronde munt alle zeven rollen en meldt niets ontbrekends', as
   const { post } = nepPost();
   const b = await bos.haalSleutels({ post });
   assert.deepStrictEqual(b.ontbreekt, []);
-  for (const rol of munterNamen) assert.ok(b.tokens[rol], 'geen token voor ' + rol);
+  /* `!= null` en niet `assert.ok`: drie rollen (openbaar, omgeving, eigen-poort)
+     hebben met opzet de LEGE STRING als sleutel -- geen Authorization-kop is voor
+     een openbare route de juiste invoer en geen tekort. Een waarheidstoets leest
+     die drie als 'geen token', en dat is precies hoe 107 openbare routes als
+     ongemeten konden tellen. Wat deze regel moet vastzetten is dat er een sleutel
+     IS, niet dat hij niet leeg is. */
+  for (const rol of munterNamen) {
+    assert.ok(b.tokens[rol] != null, 'geen token voor ' + rol);
+    assert.equal(typeof b.tokens[rol], 'string', 'een sleutel is een tekenreeks: ' + rol);
+  }
   // eigenaar is een opstapje en geen deur: hij hoort niet in de rollenlijst
   assert.ok(!b.rollen.includes('eigenaar'),
     'eigenaar is geen bewakersrol; zou hij in de lijst staan, dan gingen proeven routes verdelen op een rol die geen enkele route draagt');

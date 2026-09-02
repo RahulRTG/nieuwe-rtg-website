@@ -22,7 +22,7 @@
     } catch (e) {
       /* de poort van de oude pagina: niet ingelogd of geen lid, dan geen
          half scherm maar alleen de uitleg */
-      $('#wbFout').innerHTML = '<p class="stil">' + Geld.esc(e.message) + ' Log eerst in via de leden-app.</p>';
+      $('#wbFout').innerHTML = RTGLeeg.html(RTGLeeg.vanFout({ status: 401, message: Geld.esc(e.message) }));
       $('#wbLijst').hidden = true;
       $('#wbGroep').hidden = true;
     }
@@ -187,7 +187,7 @@
             '<div class="wb-rij"><button class="knop hoofd" id="wbVoeg" type="button">Ik heb dit betaald</button></div>' +
           '</div>' +
           '<h2>Het lijstje</h2>' +
-          '<div class="kaart wb-log" id="wbLog"><p class="stil">Nog geen uitgaven.</p></div>' +
+          '<div class="kaart wb-log" id="wbLog"><p class="leeg">Nog geen uitgaven.</p></div>' +
         '</section>' +
       '</div>',
     start: start,

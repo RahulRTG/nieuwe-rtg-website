@@ -28,7 +28,7 @@ const { alleRoutes, isSchakel, verdeelOpRol, meldZonderRol } = require('./lib/ro
 const { haalSleutels, meldSleutels, BASISROLLEN, PASLADDER } = require('./lib/proefsleutels');
 /* Wanneer is dit gemeten, en waartegen. Zonder stempel is een register niet na
    te lopen: verouderd ziet er identiek uit aan vers. Zie scripts/lib/stempel.js. */
-const { stempel } = require('./lib/stempel');
+const { stempel, eisSchoneBoom } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'IDEMPROEF.json');
@@ -52,7 +52,23 @@ const MAX = Number((argv.find(a => a.startsWith('--max=')) || '').slice(6)) || 0
    OVERSCHRIJFT. */
 if (require.main !== module) { module.exports = {}; return; }
 
+
+/* WEIGEREN VOOR HET BEGINT. Deze ronde duurt minuten en levert een register op
+   dat NERGENS meetelt zodra er ongecommit werk in de boom staat -- boomVuil
+   wordt pas aan het eind vastgesteld. Zelfde poort als de drie andere proeven
+   uit deze familie (rolproef, handelingproef, uitvoerproef); hij ontbrak hier,
+   en test/schoneboom.test.js vraagt met zoveel woorden om alle zes. */
+function wachtOpSchoneBoom() {
+  const b = eisSchoneBoom('de idempotentieproef');
+  if (b.ok) return;
+  console.error('\n  DEZE RONDE ZOU NIET MEETELLEN\n');
+  console.error('  ' + b.reden);
+  for (const r of (b.bestanden || [])) console.error('    ' + r);
+  process.exit(3);
+}
+
 (async () => {
+  wachtOpSchoneBoom();
   /* DE GEDEELDE WEGWERPSERVER. Hier stond de eigen kopie die de kop al een
      maand ontkende ('ze delen de wegwerpserver') -- de tekst beloofde wat de
      code niet deed, en zo lopen kopieen uiteen zonder dat iemand het ziet
@@ -66,8 +82,14 @@ if (require.main !== module) { module.exports = {}; return; }
      exit(2) op "geen token voor member, office, supplier". RTG_MAGNAAT_TEST is
      de expliciete, gedocumenteerde vlag voor synthetische data en staat niet in
      productie -- de opstelling zegt nu zelf wat ze nodig heeft. */
+  /* RTG_DOOS_SLEUTEL hoort bij de OPSTELLING, net als OFFICE_CODE: zonder die
+     variabele bestaat de doosdeur helemaal niet, ook niet in productie
+     (server/routes/doos.js). Hem hier zetten opent geen deur die anders dicht
+     zou zijn -- het maakt de opstelling compleet. */
+  const DOOS_SLEUTEL = 'proef-doos-sleutel-0123456789abcdef';
   const server = await start({ naam: 'idemproef',
     env: { RTG_DEMO: '1', RTG_MAGNAAT_TEST: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF',
+      RTG_DOOS_SLEUTEL: DOOS_SLEUTEL,
       /* Het TWEEDE meetpunt (de opslag) hing aan dezelfde toevalligheid: zonder
          RTG_STAATLOG draagt geen antwoord een X-RTG-Staat-kop en meet de proef
          alleen wat de route terugzegt -- stiller, en een stuk zwakker. Stand 2,
@@ -76,10 +98,17 @@ if (require.main !== module) { module.exports = {}; return; }
       RTG_STAATLOG: '2' } });
   const { basis, klaar } = server;
 
-  const post = async (pad, lijf, tok) => {
+  /* `extraKoppen` is er voor deuren die hun sleutel in een KOP verwachten en niet
+     in het lijf -- de zaakdoos is de enige. Zonder dit vierde argument stuurde
+     deze proef de doossleutel nooit mee: de bouwer in ./lib/lijfsleutels.js gaf
+     hem netjes door, hij viel hier op de grond, de route weigerde, en de familie
+     meldde zich als 'geen sleutel gekregen'. Vier routes stonden zo als
+     ongemeten terwijl de sleutel klopte. */
+  const post = async (pad, lijf, tok, extraKoppen) => {
     try {
       const r = await fetch(basis + pad, { method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...(tok ? { Authorization: 'Bearer ' + tok } : {}) },
+        headers: { 'Content-Type': 'application/json',
+          ...(tok ? { Authorization: 'Bearer ' + tok } : {}), ...(extraKoppen || {}) },
         body: JSON.stringify(lijf || {}) });
       const tekst = await r.text();
       let data; try { data = JSON.parse(tekst); } catch (e) { data = tekst; }
@@ -300,7 +329,68 @@ if (require.main !== module) { module.exports = {}; return; }
   try { register = JSON.parse(fs.readFileSync(path.join(WORTEL, 'IDEMBESLUIT.json'), 'utf8')); } catch (e) {}
   const besluiten = register.routes || {};
 
-  const uit = await draaiIdemproef({ post, routes, tokenVoor, hernieuw,
+  /* DE WERELDEN, EN WAAROM ZE HIER STAAN.
+
+     Deze proef roept elke schrijfroute aan, en een deel daarvan leeft BINNEN
+     een wereld die zij zelf opzet: een stadsafdeling, een festival-editie, een
+     onderzoek. Zonder die wereld antwoordt de route met "bestaat niet" en telt
+     hij als ongemeten -- niet omdat er iets mis is, maar omdat er niets stond.
+
+     Ze staan er ook om een tweede reden, en die is scherper: er zitten
+     sloopachtige routes BINNEN die werelden. Een wereld die halverwege
+     sneuvelt, meldde zich aan het begin gewoon klaar. Vandaar de wacht
+     hieronder, die onderweg peilt, en de eindcontrole erna. */
+  const werelden = {};
+  const wereldExtras = {};
+  const zetKlaar = async (naam, mod, fn, args) => {
+    try {
+      const w = await require(mod)[fn](args);
+      werelden[naam] = w;
+      if (w && w.extra) wereldExtras[naam] = w.extra;
+      console.log('  wereld ' + naam.padEnd(30) + ': ' +
+        (w && w.klaar ? 'klaar' : 'NIET klaar -- ' + ((w && w.reden) || 'onbekend')));
+    } catch (e) {
+      console.log('  wereld ' + naam.padEnd(30) + ': NIET klaar -- ' + e.message);
+    }
+  };
+  /* De genrewereld deelt het zaakbureau van de sleutelbos: EEN teller en EEN
+     cache, zodat de roosterrem eerlijk te meten is (test/eindpoort.test.js). */
+  await zetKlaar('genre', './lib/wereld-genre', 'zetGenreKlaar', { post, zaakinlog: bos.zaakbureau });
+  await zetKlaar('rtfos', './lib/wereld-rtfos', 'zetRtfosKlaar', { post, tokens });
+  await zetKlaar('festival', './lib/wereld-festival', 'zetFestivalKlaar', { post, tokens });
+  await zetKlaar('lab2', './lib/wereld-lab2', 'zetLab2Klaar', { post, tokens });
+  await zetKlaar('weefsel', './lib/wereld-weefsel', 'zetWeefselKlaar', { post, tokens });
+  await zetKlaar('rtmail', './lib/wereld-rtmail', 'zetRtmailKlaar', { post, tokens });
+
+  /* DE LIJFSLEUTELS -- een sleutel die in het LICHAAM staat en niet in de kop.
+
+     Een deel van dit huis bewaakt niet met een rol maar met een sleutel in het
+     verzoek zelf: gezinsPoort, werkPoort, rtfPoort, gastAuth. Rollen kruisen
+     meet daar niets, en zonder gebouwde familie belandt zo'n route in
+     GEEN_PROEFSLEUTEL -- terwijl er niets ontbreekt behalve deze opstelling.
+
+     Gemeten op 1 september 2026: 471 routes stonden daar, en scripts/onbewezen.js
+     leest de gebouwde families uit `gemeten.lijfsleutelsGebouwd` van DEZE proef.
+     Zolang die lijst leeg is, telt elke lichaamssleutel-route als ontbrekende
+     sleutel. Zie ./lib/lijfsleutels.js voor waarom dit een tweede begrip is en
+     geen rol. */
+  const { bouwLijfsleutels } = require('./lib/lijfsleutels');
+  let lijfsleutels = { gebouwd: [], mislukt: [], lijfVoor: () => ({}) };
+  try {
+    lijfsleutels = await bouwLijfsleutels({ post, tokens, datamap: server.datamap, doosSleutel: DOOS_SLEUTEL });
+  } catch (e) {
+    console.log('  lijfsleutels                         : NIET gebouwd -- ' + e.message);
+  }
+  console.log('  lijfsleutels gebouwd                 : ' +
+    (lijfsleutels.gebouwd.length ? lijfsleutels.gebouwd.map(g => g.naam).join(', ') : 'GEEN') +
+    (lijfsleutels.mislukt.length ? '   (mislukt: ' + lijfsleutels.mislukt.map(m => m.naam).join(', ') + ')' : ''));
+  for (const m of lijfsleutels.mislukt) console.log('      ' + m.naam + ': ' + m.reden);
+
+  const { maakWereldwacht, controleerWerelden } = require('./lib/wereldcontrole');
+  const wacht = maakWereldwacht({ post, tokenVoor, extras: wereldExtras,
+    elke: Number(process.env.RTG_WERELDWACHT || 250) });
+
+  const uit = await draaiIdemproef({ post, routes, tokenVoor, hernieuw, wacht,
     lijfVoor: (r) => {
       const vv = voorvoegselVan(r.pad);
       return { ...plausibelLijf(r.pad), ...extra, ...(vv ? schoonLijf(vv.lijf) : {}), ...(geldLijven[r.pad] || {}) };
@@ -404,6 +494,20 @@ if (require.main !== module) { module.exports = {}; return; }
   console.log('');
   console.log('  onbeschermd MET een besluit          : ' + (onbeschermd.length - zonderBesluit.length) + ' / ' + onbeschermd.length);
   if (zonderBesluit.length) console.log('      zonder besluit in IDEMBESLUIT.json: ' + zonderBesluit.length);
+  /* De eindcontrole en het verslag van de wacht, VOOR de uitslag wordt
+     samengesteld: allebei horen ze in het register en niet alleen op het
+     scherm. */
+  const wereldStand = await controleerWerelden({ post, tokenVoor, hernieuw, extras: wereldExtras });
+  const wachtVerslag = wacht.verslag();
+  const gesneuveld = wereldStand.filter(w => w.gecontroleerd && !w.ok);
+  console.log('\n  de werelden NA afloop                : ' +
+    wereldStand.filter(w => w.ok).length + ' overeind, ' + gesneuveld.length + ' gesneuveld, ' +
+    wereldStand.filter(w => !w.gecontroleerd).length + ' niet gecontroleerd');
+  for (const w of wereldStand) if (!w.ok) console.log('      ' + w.wereld + ': ' + w.waarom);
+  console.log('  de wereldwacht onderweg              : ' + wachtVerslag.peilingen +
+    ' peilingen (elke ' + wachtVerslag.stap + ' routes), ' + wachtVerslag.gebeurtenissen.length + ' omslag(en)');
+  console.log('  roosteropvragingen                   : ' + bos.zaakbureau.verbruikt() + ' / 30');
+
 
   fs.writeFileSync(UITSLAG, JSON.stringify({
     stempel: stempel(),
@@ -432,6 +536,28 @@ if (require.main !== module) { module.exports = {}; return; }
       blindeRondes: uit.meterStuk ? 1 : 0, begrenzing: MAX,
       wereldKlaargezet: Object.keys(extra), geldroutesMetEigenLijf: Object.keys(geldLijven).length,
       onbeschermdMetBesluit: onbeschermd.length - zonderBesluit.length,
+      /* STAAT DE WERELD ER NA AFLOOP NOG, en sloeg er onderweg een om.
+
+         Twee getallen die niet hetzelfde zeggen. `werelden` is de eindstand:
+         staat hij er nog. `wereldwacht` is het VENSTER: als een wereld tussen
+         route 900 en 1150 omsloeg, weet je waar je moet kijken -- een
+         eindoordeel zou alleen zeggen DAT hij weg is.
+
+         `gecontroleerd: false` telt met opzet niet als fout. Niet gekeken is
+         geen uitslag (LAT.md regel 3), maar het mag ook niet alles zijn: dan
+         gaat de poort dicht door weg te kijken, en dat bewaakt
+         test/eindpoort.test.js apart. */
+      werelden: wereldStand, wereldwacht: wachtVerslag,
+      /* EN DE REM DIE NIET MAG SPRINGEN. /api/supplier/roster laat dertig
+         opvragingen per kwartier per IP toe -- een echte poort, want zonder hem
+         is het personeelsbestand van elke partner in minuten uit te lezen. Wat
+         hier staat is wat er GEMETEN is opgevraagd, niet hoe lang een lijst is:
+         een tweede plek die alsnog zelf gaat aankloppen, valt daarmee op. */
+      roosteropvragingen: bos.zaakbureau.verbruikt(), roosterRem: 30,
+      /* WELKE LICHAAMSSLEUTEL-FAMILIES ER STONDEN. scripts/onbewezen.js leest
+         deze lijst om te bepalen of een route werkelijk zonder sleutel zat of
+         alleen zonder OPSTELLING -- twee heel verschillende reparaties. */
+      lijfsleutelsGebouwd: lijfsleutels.gebouwd.map(g => g.naam),
       /* WAT DE PLATFORMLAAG VING, EN WAT DE ROUTE ZELF DOET -- twee getallen,
          want ze gaan niet over hetzelfde. Alle oproepen hierboven dragen `idem`
          in het lijf, en server/middleware/idempotentie.js is precies daarop

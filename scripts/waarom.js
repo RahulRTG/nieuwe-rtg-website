@@ -32,6 +32,7 @@ const fs = require('fs');
 const path = require('path');
 const { start, WORTEL } = require('./lib/wegwerpserver');
 const { alleRoutes, verdeelOpRol } = require('./lib/routes');
+const { maakSleutels, haalSleutels, ONMISBAAR } = require('./lib/proefsleutels');
 const { plausibelLijf } = require('./lib/rolproef');
 const wm = require('./lib/waarom');
 const { maakPool } = require('./lib/objectpool');
@@ -70,13 +71,12 @@ if (require.main !== module) { module.exports = {}; return; }
   /* Dezelfde demo-inlog als de staatproef: in RTG_DEMO-modus is dat een gewone
      inlog en geen achterdeur. Lukt een rol niet, dan komen zijn routes met die
      reden terug in plaats van zonder sleutel te worden aangeklopt. */
-  const inlog = {
-    member: async () => (await post('/api/login', { tier: 'rtg' })).data.token,
-    office: async () => (await post('/api/office/login', { code: 'RTG-OFFICE-PROEF' })).data.token,
-    supplier: async () => (await post('/api/supplier/login', { username: 'rahul', password: 'Imran' })).data.token
-  };
-  const tokens = {};
-  for (const rol of Object.keys(inlog)) { try { tokens[rol] = await inlog[rol](); } catch (e) {} }
+  /* De sleutelbos staat in ./lib/proefsleutels.js: zes instrumenten hadden hier
+     dezelfde drie rollen staan, en dus alle zes dezelfde blinde vlek voor alles
+     achter boardroomAuth en techAuth. */
+  const bos = maakSleutels({ post, officeCode: 'RTG-OFFICE-PROEF' });
+  const inlog = bos.inlog;
+  const { tokens, mislukt } = await haalSleutels(bos);
   /* DE SESSIEWACHT. Deze ronde loopt langs ALLE schrijfroutes, en /api/logout
      hoort daarbij: vanaf dat punt deelde hij routes in op een antwoord dat
      alleen maar "u bent niet ingelogd" was. Zie scripts/lib/sessiewacht.js voor
@@ -89,7 +89,13 @@ if (require.main !== module) { module.exports = {}; return; }
   const mist = Object.keys(inlog).filter(r => !tokens[r]);
   if (mist.length) { console.error('geen token voor: ' + mist.join(', ')); server.klaar(); process.exitCode = 2; return; }
 
-  const verdeling = verdeelOpRol(kandidaten, Object.keys(inlog));
+  const verdeling = verdeelOpRol(kandidaten, Object.keys(tokens));
+  /* DE ROLLEN WAARVOOR ER WERKELIJK EEN SLEUTEL IS, en niet de rollen die dit
+     instrument kon PROBEREN. Hier stond Object.keys(inlog), en dat is subtiel
+     iets anders: mislukt een inlog (geen demo-eigenaar in deze database), dan
+     zou die rol toch als "beproefbaar" tellen, zonder token worden aangeroepen,
+     401 krijgen en dat als uitslag opleveren. Een meting zonder invoer die toch
+     een cijfer geeft -- LAT.md regel 3. */
   let routes = verdeling.metRol;
   if (MAX) routes = routes.slice(0, MAX);
 

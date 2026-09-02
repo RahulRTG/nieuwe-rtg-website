@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="nl">
+<html lang="nl" data-levend="bordeaux">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -12,6 +12,9 @@
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
 <link href="/shared/rtg-ontwerp.css" rel="stylesheet">
+<!-- Het materiaal van TravelOS (fluweel + accent). Dit scherm deelt de
+     schil van travel-os.css NIET: het houdt zijn eigen vorm. -->
+<link href="/shared/travelos-materiaal.css" rel="stylesheet">
 <style>
   /* Alleen wat van DIT scherm is; de vormtaal komt uit rtg-ontwerp.css. */
   body{margin:0;padding-bottom:3rem;}
@@ -82,7 +85,7 @@
   .cel .bron{color:var(--rtg-soft);font-size:.72rem;margin-top:.2rem;}
 </style>
 </head>
-<body class="rtg-stijl" data-rtg-modus="pro">
+<body class="rtg-stijl" data-rtg-modus="pro" data-rtg-world="travel" data-rtg-eigenvlak="bordeaux">
 <a class="skip" href="#inhoud">Naar de inhoud</a>
 <header>
   <div><div class="ey">RTG Kantoor</div><h1 class="rtg-ceremonie">Routedossier</h1></div>

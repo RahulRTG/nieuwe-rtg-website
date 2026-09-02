@@ -13,7 +13,7 @@
    Alle bakken zijn objecten op id, geen arrays; de lezer maakt er rijen van.
 
    BEDRAGEN ZIJN CENTEN. Overal in deze laag, want alles in het Werk OS is
-   centen. Dat is dezelfde eenheid die kern/command/risico.js verwacht als het
+   centen. Dat is dezelfde eenheid die kern/frictie/motor.js verwacht als het
    een bedrag tegen `risico.geldGrensCenten` houdt; een register dat hier euro's
    in stopte zou een grens van 500 euro pas bij 50.000 laten aanslaan. */
 'use strict';

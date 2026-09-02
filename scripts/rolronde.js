@@ -62,6 +62,11 @@ const K = { rood: '\x1b[31m', groen: '\x1b[32m', geel: '\x1b[33m', grijs: '\x1b[
 
 const { alleRoutes } = require('./lib/routes');
 const proefserver = require('./lib/proefserver');
+/* Wanneer is dit gemeten, en waartegen. Zonder stempel is een register niet na
+   te lopen: verouderd ziet er identiek uit aan vers, en scripts/versheid.js kan
+   er niets over zeggen. Zeven registers misten hem; zie de kop van
+   scripts/lib/stempel.js. */
+const { stempel } = require('./lib/stempel');
 
 const arg = (naam, std) => { const i = process.argv.indexOf(naam); return i > 0 ? process.argv[i + 1] : std; };
 const BASIS_EXTERN = arg('--basis', null);
@@ -254,6 +259,7 @@ async function main() {
 
   try {
     fs.writeFileSync(UITSLAGBESTAND, JSON.stringify({
+      stempel: stempel(),
       uitleg: 'De rolronde: welke rol komt waar binnen, gevraagd aan een echte server in plaats van aan de brontekst. ' +
         'gaten MAG ALLEEN DALEN en gemeten mag ALLEEN STIJGEN -- zie scripts/rolronde.js. ' +
         'Dit is de VERTICALE scheiding; de horizontale (lid A tegen lid B) is de gluurder-trede van de ladder.',

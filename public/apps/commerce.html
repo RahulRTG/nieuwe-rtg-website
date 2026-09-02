@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="nl">
+<html lang="nl" data-rtg-thema="bordeaux">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -8,6 +8,7 @@
 <link href="/fonts/fonts.css" rel="stylesheet">
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
+<script src="/shared/leeg.js"></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 <!-- RTG Commerce: de verkooplaag boven de domeinen (COMMERCE.md).
@@ -101,8 +102,19 @@
   .stuk{border:1px solid var(--burgundy);border-radius:0;padding:.7rem .9rem;color:var(--burgundy);font-size:.84rem;margin-bottom:1rem;}
   #melding{position:fixed;left:50%;transform:translateX(-50%);bottom:1.2rem;background:var(--card2);border:1px solid var(--line);border-radius:0;padding:.6rem 1rem;font-size:.85rem;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9;}
 </style>
+<link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
 </head>
-<body>
+<body data-rtg-world="living" data-rtg-eigenvlak="bordeaux">
+<div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">
+  <a class="os-switcher__brand" href="/apps/app.html"><b>RTG</b><span>Vier werelden &middot; één kern</span></a>
+  <div class="os-switcher__links">
+    <a href="/apps/rtg.html" aria-current="page"><span>01</span>LivingOS</a>
+    <a href="/apps/kantoor.html"><span>02</span>WorkOS</a>
+    <a href="/apps/reizen.html"><span>03</span>TravelOS</a>
+    <a href="/apps/foundation/os-publiek.html"><span>04</span>FoundationOS</a>
+  </div>
+  <span class="os-switcher__state">Kern verbonden</span>
+</div>
 <header>
   <button class="terug" id="terug" type="button">Terug</button>
   <div><div class="ey">RTG Commerce</div><h1>Wat er te koop staat</h1></div>
@@ -155,7 +167,12 @@ const api = (pad, body) => fetch(pad, {
 $('#terug').onclick = () => history.length > 1 ? history.back() : location.assign('/apps/app.html');
 
 if (!TOKEN) {
-  $('#main').innerHTML = '<p class="leeg">Log eerst in om je aanbod en je mand te zien.</p>';
+  /* Niet aangemeld is geen fout: een uitnodiging met een uitweg, in de vorm
+     die het hele huis gebruikt (shared/leeg.js). Hier stond een kale zin. */
+  $('#main').innerHTML = RTGLeeg.html(RTGLeeg.inlogStand({
+    ey: 'RTG Commerce',
+    wat: 'Je aanbod en je mand staan achter je account.'
+  }));
 } else { start(); }
 
 /* De acht werkwoorden in de volgorde van een koop -- dezelfde volgorde als
@@ -324,7 +341,11 @@ async function tekenMand(){
 function toonMand(m){
   const el = $('#mand');
   if (m.leeg || !(m.afrekeningen||[]).length) {
-    el.innerHTML = '<p class="leeg">Je mand is leeg.</p>' +
+    el.innerHTML = RTGLeeg.html({
+      ey: 'Mand', titel: 'Je mand is leeg.',
+      wat: 'Wat je aan je mand toevoegt, staat hier bij elkaar tot je afrekent.',
+      stappen: [{ tekst: 'Naar de etalage', pad: '#etalage' }]
+    }) +
       ((m.geweigerd||[]).length ? geweigerdBlok(m.geweigerd) : '');
     return;
   }

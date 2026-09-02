@@ -1,0 +1,204 @@
+{
+ "uitleg": "Per graaf: de velden van zijn eenheid, en het veld waarop dringendheid wordt afgelezen. Zie de kop van scripts/graafas.js voor wat deze meter wel en niet zegt. Een gedeelde veldnaam is geen gedeelde betekenis.",
+ "vastgelegd": "2026-09-01",
+ "gemeten": {
+  "grafen": 7,
+  "metEenEigenEenheid": 3,
+  "zonderEigenEenheid": 4,
+  "metEenAs": 3,
+  "verschillendeAssen": 3,
+  "assenGedeeld": 0,
+  "veldenTotaal": 19,
+  "veldenGedeeld": 5,
+  "hoogsteOverlap": 0.45,
+  "buitenHetRegister": 0
+ },
+ "klachten": [],
+ "assen": [
+  {
+   "graaf": "levensgraaf",
+   "as": "vervalt",
+   "waarom": "Een ding in het leven van een lid is dringend als er een TERMIJN onder hangt die afloopt: een verzekering, een visum, een keuring."
+  },
+  {
+   "graaf": "geldgraaf",
+   "as": "richting",
+   "waarom": "Geld heeft geen wachtstand maar een richting: er komt iets binnen of er gaat iets uit, en dat verschil bepaalt of een feit aandacht vraagt."
+  },
+  {
+   "graaf": "socialegraaf",
+   "as": "wacht",
+   "waarom": "Het staat in de kop van dat bestand uitgeschreven: een gesprek van drie weken oud is niets, een gesprek waar iemand op antwoord wacht is iets anders."
+  }
+ ],
+ "grafen": [
+  {
+   "id": "levensgraaf",
+   "bestand": "server/kern/levensgraaf/graaf.js",
+   "eenheid": "knoop",
+   "eenheidVastgesteld": true,
+   "hoe": "makerfunctie",
+   "velden": [
+    "bron",
+    "eigenaar",
+    "id",
+    "kamer",
+    "naam",
+    "ouder",
+    "soort",
+    "vervalt",
+    "vervaltWat",
+    "waarde"
+   ],
+   "as": "vervalt",
+   "waarom": "Een ding in het leven van een lid is dringend als er een TERMIJN onder hangt die afloopt: een verzekering, een visum, een keuring."
+  },
+  {
+   "id": "geldgraaf",
+   "bestand": "server/kern/geldgraaf/hulp.js",
+   "eenheid": "feit",
+   "eenheidVastgesteld": true,
+   "hoe": "makerfunctie",
+   "velden": [
+    "bron",
+    "centen",
+    "herhaling",
+    "link",
+    "richting",
+    "soort",
+    "titel",
+    "wanneer"
+   ],
+   "as": "richting",
+   "waarom": "Geld heeft geen wachtstand maar een richting: er komt iets binnen of er gaat iets uit, en dat verschil bepaalt of een feit aandacht vraagt."
+  },
+  {
+   "id": "socialegraaf",
+   "bestand": "server/kern/socialegraaf/hulp.js",
+   "eenheid": "moment",
+   "eenheidVastgesteld": true,
+   "hoe": "makerfunctie",
+   "velden": [
+    "aantal",
+    "bron",
+    "link",
+    "soort",
+    "titel",
+    "wacht",
+    "wanneer",
+    "wie"
+   ],
+   "as": "wacht",
+   "waarom": "Het staat in de kop van dat bestand uitgeschreven: een gesprek van drie weken oud is niets, een gesprek waar iemand op antwoord wacht is iets anders."
+  },
+  {
+   "id": "commandgraaf",
+   "bestand": "server/kern/command/graaf.js",
+   "eenheidVastgesteld": false,
+   "waaromGeenEenheid": "De kennisgraaf bouwt zijn knopen inline uit het soortenregister; er is geen functie die EEN knoop maakt.",
+   "as": null,
+   "waarom": "De kennisgraaf beantwoordt \"wat hangt waaraan vast\" en niet \"wat heeft haast\"; dringendheid komt daar uit kern/command/risico.js."
+  },
+  {
+   "id": "commercegraaf",
+   "bestand": "server/kern/commerce/graaf.js",
+   "eenheidVastgesteld": false,
+   "waaromGeenEenheid": "De commerce-graaf levert een lijst koopbaren uit andermans vormen; hij maakt zelf geen eenheid.",
+   "as": null,
+   "waarom": "Een leeslaag over het assortiment. Hij schrijft niet en hij prioriteert niet."
+  },
+  {
+   "id": "concerngraaf",
+   "bestand": "server/kern/concern/graaf.js",
+   "eenheidVastgesteld": false,
+   "waaromGeenEenheid": "De eigendomsgraaf werkt op concern-rijen uit de opslag; die vorm hoort bij kern/concern en niet bij de graaf.",
+   "as": null,
+   "waarom": "De eigendomsgraaf gaat over zeggenschap. Wat er verloopt, hangt aan de vergunning en niet aan de graaf."
+  },
+  {
+   "id": "waardegraaf",
+   "bestand": "server/kern/pay/graaf.js",
+   "eenheidVastgesteld": false,
+   "waaromGeenEenheid": "De waardegraaf telt stromen op uit grootboekregels; er is geen eenheid die hij zelf vormt.",
+   "as": null,
+   "waarom": "Waar ging deze euro heen -- een herkomstvraag over het verleden, niet over wat er nu moet."
+  }
+ ],
+ "gedeeld": [
+  {
+   "veld": "bron",
+   "grafen": [
+    "geldgraaf",
+    "levensgraaf",
+    "socialegraaf"
+   ],
+   "aantal": 3
+  },
+  {
+   "veld": "soort",
+   "grafen": [
+    "geldgraaf",
+    "levensgraaf",
+    "socialegraaf"
+   ],
+   "aantal": 3
+  },
+  {
+   "veld": "link",
+   "grafen": [
+    "geldgraaf",
+    "socialegraaf"
+   ],
+   "aantal": 2
+  },
+  {
+   "veld": "titel",
+   "grafen": [
+    "geldgraaf",
+    "socialegraaf"
+   ],
+   "aantal": 2
+  },
+  {
+   "veld": "wanneer",
+   "grafen": [
+    "geldgraaf",
+    "socialegraaf"
+   ],
+   "aantal": 2
+  }
+ ],
+ "paren": [
+  {
+   "a": "geldgraaf",
+   "b": "socialegraaf",
+   "gedeeld": [
+    "bron",
+    "link",
+    "soort",
+    "titel",
+    "wanneer"
+   ],
+   "overlap": 0.45
+  },
+  {
+   "a": "levensgraaf",
+   "b": "geldgraaf",
+   "gedeeld": [
+    "bron",
+    "soort"
+   ],
+   "overlap": 0.13
+  },
+  {
+   "a": "levensgraaf",
+   "b": "socialegraaf",
+   "gedeeld": [
+    "bron",
+    "soort"
+   ],
+   "overlap": 0.13
+  }
+ ],
+ "buitenHetRegister": []
+}

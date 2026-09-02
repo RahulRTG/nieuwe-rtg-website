@@ -4,6 +4,7 @@
    keer bij het opstarten vanuit foundation/onderwijs.js. */
 module.exports = (octx) => {
   const { router, F, save, nu, rid, schoon, crypto, anthropic, LETTERS, SYSTEM, DEMO, TIPS,
+    teVaak, misluktePoging, ipVan,
     nieuweCode, sse, stuur, online, presentie, lesVan, docentCheck, leerlingVan, lesPubliek } = octx;
   /* ---------- het schrift ---------- */
   router.post('/schrift/opslaan', (req, res) => {
@@ -101,8 +102,28 @@ module.exports = (octx) => {
     res.json({ tip: TIPS[dag % TIPS.length], nog: TIPS[Math.floor(Math.random() * TIPS.length)] });
   });
 
-  /* ---------- op reis met de foundation: aanvraag of voordracht ---------- */
+  /* ---------- op reis met de foundation: aanvraag of voordracht ----------
+
+     EEN OPEN FORMULIER MOET EEN REM HEBBEN, en die had hij niet.
+
+     Deze route is met opzet zonder sleutel: wie een reis aanvraagt of iemand
+     voordraagt, heeft geen gezin en geen account bij de foundation -- dat is
+     juist het punt. Maar de lijst kapt op duizend (`slice(0, 1000)` op een
+     `unshift`), en zonder rem betekent dat: wie duizend keer post, duwt elke
+     echte aanvraag eruit. Niet stelen, maar wissen -- en niemand merkt het,
+     want er komt gewoon `ok: true` terug.
+
+     Gevonden door scripts/handlerwacht.js: van de 612 routes zonder
+     bewakerslaag was dit er een van acht die geen enkele controle deed, en de
+     enige daarvan die geen deur is.
+
+     Dezelfde rem als /gezin/maak hiernaast (foundation/gezin.js): een teller per
+     IP-adres. Ruim genoeg voor een gezin dat zich vergist, krap genoeg voor
+     duizend berichten. */
   router.post('/reis/aanvraag', (req, res) => {
+    const bucket = 'reisaanvraag:' + ipVan(req);
+    if (teVaak(res, bucket)) return;
+    misluktePoging(bucket, 6, 60);   // hooguit zes aanvragen per adres per uur
     const a = {
       id: rid(4),
       soort: req.body.soort === 'voordracht' ? 'voordracht' : 'aanvraag',

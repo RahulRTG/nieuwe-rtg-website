@@ -1,21 +1,23 @@
 {
  "stempel": {
-  "op": "2026-08-20T12:39:32.705Z",
-  "commit": "3c21bf3",
-  "boomVuil": true,
+  "op": "2026-09-01T10:19:59.363Z",
+  "commit": "3d2f51b54",
+  "boomVuil": false,
+  "boomAnders": 2,
+  "instrument": "scripts/inhoudskaart.js",
   "node": "v22.22.2"
  },
  "uitleg": "Het ware antwoordprofiel per blinde route (status, sleutels, dragende velden), vastgelegd van een eerlijke run op een wegwerpserver. test/inhoudswacht.test.js dwingt deze profielen af; de liegpoort vervangt een antwoord door 200 {ok:true}, dus elk profiel met meer dan dat ziet de leugen. De kaart stapelt: een nieuwe run vervangt alleen wat hij zelf aanriep.",
  "grens": "Een profiel borgt de VORM van het antwoord, niet de waarheid van de waarden -- dit is de vloer, geen plafond. Routes met onwaarneembaar:true zijn eerlijk niet te bewaken op vorm en blijven blind. En de kaart kent alleen rollen waarvoor dit instrument een token heeft.",
  "gemeten": {
-  "doelRoutes": 4,
-  "inKaart": 139,
-  "waarneembaar": 135,
+  "doelRoutes": 277,
+  "inKaart": 407,
+  "waarneembaar": 403,
   "onwaarneembaar": 4,
-  "versDezeRun": 4,
-  "zonderRol": 0,
+  "versDezeRun": 269,
+  "zonderRol": 8,
   "dood": 0,
-  "weerlegd": 1
+  "weerlegd": 0
  },
  "perRoute": {
   "POST /api/bank/pas/uitgeven": {
@@ -676,17 +678,6 @@
     "collectie",
     "ok"
    ],
-   "op": "2026-08-20T08:10:40.999Z"
-  },
-  "POST /api/office/verifications": {
-   "methode": "POST",
-   "pad": "/api/office/verifications",
-   "rol": "office",
-   "status": 200,
-   "sleutels": [
-    "pending"
-   ],
-   "dragend": [],
    "op": "2026-08-20T08:10:40.999Z"
   },
   "POST /api/ov/kaart": {
@@ -1969,6 +1960,4289 @@
     "error"
    ],
    "op": "2026-08-20T09:03:01.642Z"
+  },
+  "GET /api/betaaldiensttarief": {
+   "methode": "GET",
+   "pad": "/api/betaaldiensttarief",
+   "rol": "publiek",
+   "status": 200,
+   "sleutels": [
+    "betaaldienst",
+    "status"
+   ],
+   "dragend": [
+    "betaaldienst",
+    "status"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "GET /api/claims": {
+   "methode": "GET",
+   "pad": "/api/claims",
+   "rol": "publiek",
+   "status": 200,
+   "sleutels": [
+    "claims",
+    "status"
+   ],
+   "dragend": [
+    "claims",
+    "status"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "GET /api/sociaalbeleid": {
+   "methode": "GET",
+   "pad": "/api/sociaalbeleid",
+   "rol": "publiek",
+   "status": 200,
+   "sleutels": [
+    "huidig",
+    "regels",
+    "status"
+   ],
+   "dragend": [
+    "huidig",
+    "regels",
+    "status"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "GET /api/sso/saml/metadata": {
+   "methode": "GET",
+   "pad": "/api/sso/saml/metadata",
+   "rol": "publiek",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "GET /api/sso/saml/start": {
+   "methode": "GET",
+   "pad": "/api/sso/saml/start",
+   "rol": "publiek",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/aanmelding/bewijs/herkeuring": {
+   "methode": "POST",
+   "pad": "/api/aanmelding/bewijs/herkeuring",
+   "rol": "office",
+   "status": 200,
+   "sleutels": [
+    "herkeuring",
+    "ok"
+   ],
+   "dragend": [
+    "ok"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/appstore/berichten": {
+   "methode": "POST",
+   "pad": "/api/appstore/berichten",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "berichten"
+   ],
+   "dragend": [],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/appstore/berichten/gelezen": {
+   "methode": "POST",
+   "pad": "/api/appstore/berichten/gelezen",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "gelezen",
+    "ok"
+   ],
+   "dragend": [
+    "gelezen",
+    "ok"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/appstore/bon": {
+   "methode": "POST",
+   "pad": "/api/appstore/bon",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "landNodig",
+    "landen",
+    "waarom"
+   ],
+   "dragend": [
+    "landNodig",
+    "landen",
+    "waarom"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/appstore/bonnen": {
+   "methode": "POST",
+   "pad": "/api/appstore/bonnen",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "bonnen"
+   ],
+   "dragend": [],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/appstore/brug": {
+   "methode": "POST",
+   "pad": "/api/appstore/brug",
+   "rol": "member",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/appstore/catalogus": {
+   "methode": "POST",
+   "pad": "/api/appstore/catalogus",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "items",
+    "pagina",
+    "paginas",
+    "totaal",
+    "universa"
+   ],
+   "dragend": [
+    "pagina",
+    "paginas",
+    "totaal"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/appstore/dossier": {
+   "methode": "POST",
+   "pad": "/api/appstore/dossier",
+   "rol": "member",
+   "status": 404,
+   "sleutels": [
+    "error",
+    "status"
+   ],
+   "dragend": [
+    "error",
+    "status"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/appstore/installeer": {
+   "methode": "POST",
+   "pad": "/api/appstore/installeer",
+   "rol": "member",
+   "status": 404,
+   "sleutels": [
+    "error",
+    "status"
+   ],
+   "dragend": [
+    "error",
+    "status"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/appstore/kanaal": {
+   "methode": "POST",
+   "pad": "/api/appstore/kanaal",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "let",
+    "machtigingen",
+    "nietGebouwd"
+   ],
+   "dragend": [
+    "let",
+    "machtigingen",
+    "nietGebouwd"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/appstore/koop": {
+   "methode": "POST",
+   "pad": "/api/appstore/koop",
+   "rol": "member",
+   "status": 400,
+   "sleutels": [
+    "error",
+    "landNodig",
+    "landen"
+   ],
+   "dragend": [
+    "error",
+    "landNodig",
+    "landen"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/appstore/landen": {
+   "methode": "POST",
+   "pad": "/api/appstore/landen",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "landen",
+    "voorstel"
+   ],
+   "dragend": [
+    "landen"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/appstore/mijn": {
+   "methode": "POST",
+   "pad": "/api/appstore/mijn",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "apps",
+    "berichten"
+   ],
+   "dragend": [],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/appstore/open": {
+   "methode": "POST",
+   "pad": "/api/appstore/open",
+   "rol": "member",
+   "status": 404,
+   "sleutels": [
+    "error",
+    "status"
+   ],
+   "dragend": [
+    "error",
+    "status"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/appstore/persoon": {
+   "methode": "POST",
+   "pad": "/api/appstore/persoon",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "let",
+    "org",
+    "soort",
+    "status",
+    "uitgever"
+   ],
+   "dragend": [
+    "let",
+    "soort",
+    "status"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/appstore/persoon/aanvraag": {
+   "methode": "POST",
+   "pad": "/api/appstore/persoon/aanvraag",
+   "rol": "member",
+   "status": 400,
+   "sleutels": [
+    "error",
+    "status"
+   ],
+   "dragend": [
+    "error",
+    "status"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/appstore/persoon/cijfers": {
+   "methode": "POST",
+   "pad": "/api/appstore/persoon/cijfers",
+   "rol": "member",
+   "status": 409,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/appstore/persoon/dossier": {
+   "methode": "POST",
+   "pad": "/api/appstore/persoon/dossier",
+   "rol": "member",
+   "status": 409,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/appstore/persoon/intrekken": {
+   "methode": "POST",
+   "pad": "/api/appstore/persoon/intrekken",
+   "rol": "member",
+   "status": 409,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/appstore/persoon/inzenden": {
+   "methode": "POST",
+   "pad": "/api/appstore/persoon/inzenden",
+   "rol": "member",
+   "status": 409,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/appstore/persoon/journaal": {
+   "methode": "POST",
+   "pad": "/api/appstore/persoon/journaal",
+   "rol": "member",
+   "status": 409,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/appstore/persoon/naslag": {
+   "methode": "POST",
+   "pad": "/api/appstore/persoon/naslag",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "budget",
+    "fouten",
+    "grenzen",
+    "let",
+    "machtigingen",
+    "methodes",
+    "nietBeschikbaar",
+    "nogGeenCode",
+    "status"
+   ],
+   "dragend": [
+    "budget",
+    "fouten",
+    "grenzen",
+    "let",
+    "machtigingen",
+    "methodes",
+    "nietBeschikbaar",
+    "nogGeenCode",
+    "status"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/appstore/persoon/omzet": {
+   "methode": "POST",
+   "pad": "/api/appstore/persoon/omzet",
+   "rol": "member",
+   "status": 409,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/appstore/persoon/proef": {
+   "methode": "POST",
+   "pad": "/api/appstore/persoon/proef",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "bevindingen",
+    "budget",
+    "door",
+    "fouten",
+    "status"
+   ],
+   "dragend": [
+    "budget",
+    "door",
+    "fouten",
+    "status"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/appstore/tijdlijn": {
+   "methode": "POST",
+   "pad": "/api/appstore/tijdlijn",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "let",
+    "soorten",
+    "tijdlijn"
+   ],
+   "dragend": [
+    "let",
+    "soorten"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/appstore/verleen": {
+   "methode": "POST",
+   "pad": "/api/appstore/verleen",
+   "rol": "member",
+   "status": 404,
+   "sleutels": [
+    "error",
+    "status"
+   ],
+   "dragend": [
+    "error",
+    "status"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/appstore/weg": {
+   "methode": "POST",
+   "pad": "/api/appstore/weg",
+   "rol": "member",
+   "status": 404,
+   "sleutels": [
+    "error",
+    "status"
+   ],
+   "dragend": [
+    "error",
+    "status"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/appstore/wis-opslag": {
+   "methode": "POST",
+   "pad": "/api/appstore/wis-opslag",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "let",
+    "ok",
+    "status"
+   ],
+   "dragend": [
+    "let",
+    "ok",
+    "status"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/claims": {
+   "methode": "POST",
+   "pad": "/api/claims",
+   "rol": "publiek",
+   "status": 200,
+   "sleutels": [
+    "claims",
+    "status"
+   ],
+   "dragend": [
+    "claims",
+    "status"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/command/apispoor": {
+   "methode": "POST",
+   "pad": "/api/command/apispoor",
+   "rol": "office",
+   "status": 200,
+   "sleutels": [
+    "aantal",
+    "keten",
+    "regels",
+    "venster"
+   ],
+   "dragend": [
+    "aantal",
+    "keten",
+    "regels",
+    "venster"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/command/bijstand": {
+   "methode": "POST",
+   "pad": "/api/command/bijstand",
+   "rol": "office",
+   "status": 200,
+   "sleutels": [
+    "niveaus",
+    "sessies",
+    "tel"
+   ],
+   "dragend": [
+    "niveaus",
+    "tel"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/command/bijstand/betreed": {
+   "methode": "POST",
+   "pad": "/api/command/bijstand/betreed",
+   "rol": "office",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/command/bijstand/inhoud": {
+   "methode": "POST",
+   "pad": "/api/command/bijstand/inhoud",
+   "rol": "office",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/command/bijstand/kijk": {
+   "methode": "POST",
+   "pad": "/api/command/bijstand/kijk",
+   "rol": "office",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/command/bijstand/sessie": {
+   "methode": "POST",
+   "pad": "/api/command/bijstand/sessie",
+   "rol": "office",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/command/bijstand/sluit": {
+   "methode": "POST",
+   "pad": "/api/command/bijstand/sluit",
+   "rol": "office",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/command/bijstand/uitvoeren": {
+   "methode": "POST",
+   "pad": "/api/command/bijstand/uitvoeren",
+   "rol": "office",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/command/bijstand/voorstel": {
+   "methode": "POST",
+   "pad": "/api/command/bijstand/voorstel",
+   "rol": "office",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/command/gezondheid": {
+   "methode": "POST",
+   "pad": "/api/command/gezondheid",
+   "rol": "office",
+   "status": 200,
+   "sleutels": [
+    "alarmenBuitenDeKaart",
+    "at",
+    "dekking",
+    "graden",
+    "let",
+    "oordeel",
+    "tel",
+    "vermogens"
+   ],
+   "dragend": [
+    "at",
+    "dekking",
+    "graden",
+    "let",
+    "oordeel",
+    "tel",
+    "vermogens"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/command/gezondheid/controleer": {
+   "methode": "POST",
+   "pad": "/api/command/gezondheid/controleer",
+   "rol": "office",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/command/gezondheid/vermogen": {
+   "methode": "POST",
+   "pad": "/api/command/gezondheid/vermogen",
+   "rol": "office",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/command/incident": {
+   "methode": "POST",
+   "pad": "/api/command/incident",
+   "rol": "office",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/command/incident/maatregel": {
+   "methode": "POST",
+   "pad": "/api/command/incident/maatregel",
+   "rol": "office",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/command/incident/neem": {
+   "methode": "POST",
+   "pad": "/api/command/incident/neem",
+   "rol": "office",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/command/incident/open": {
+   "methode": "POST",
+   "pad": "/api/command/incident/open",
+   "rol": "office",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/command/incident/sluit": {
+   "methode": "POST",
+   "pad": "/api/command/incident/sluit",
+   "rol": "office",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/command/incident/weeg": {
+   "methode": "POST",
+   "pad": "/api/command/incident/weeg",
+   "rol": "office",
+   "status": 200,
+   "sleutels": [
+    "hersteld",
+    "let",
+    "nieuw"
+   ],
+   "dragend": [
+    "let"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/command/incidenten": {
+   "methode": "POST",
+   "pad": "/api/command/incidenten",
+   "rol": "office",
+   "status": 200,
+   "sleutels": [
+    "incidenten",
+    "tel"
+   ],
+   "dragend": [
+    "tel"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/command/tijdlijn": {
+   "methode": "POST",
+   "pad": "/api/command/tijdlijn",
+   "rol": "office",
+   "status": 200,
+   "sleutels": [
+    "bronnen",
+    "buitenBeeld",
+    "let",
+    "regels",
+    "totaalInVenster"
+   ],
+   "dragend": [
+    "bronnen",
+    "buitenBeeld",
+    "let",
+    "totaalInVenster"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/command/tijdlijn/rondom": {
+   "methode": "POST",
+   "pad": "/api/command/tijdlijn/rondom",
+   "rol": "office",
+   "status": 200,
+   "sleutels": [
+    "aantal",
+    "bronnen",
+    "buitenBeeld",
+    "let",
+    "moment",
+    "regels",
+    "venster",
+    "veranderdeIets"
+   ],
+   "dragend": [
+    "aantal",
+    "bronnen",
+    "buitenBeeld",
+    "let",
+    "moment",
+    "regels",
+    "venster",
+    "veranderdeIets"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/command/vloot": {
+   "methode": "POST",
+   "pad": "/api/command/vloot",
+   "rol": "office",
+   "status": 200,
+   "sleutels": [
+    "at",
+    "hoofdincidenten",
+    "incidentFout",
+    "let",
+    "nietTeZien",
+    "organisatieFout",
+    "organisaties",
+    "platform",
+    "tel"
+   ],
+   "dragend": [
+    "at",
+    "let",
+    "nietTeZien",
+    "platform",
+    "tel"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/command/vloot/organisatie": {
+   "methode": "POST",
+   "pad": "/api/command/vloot/organisatie",
+   "rol": "office",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/commerce/aanbod": {
+   "methode": "POST",
+   "pad": "/api/commerce/aanbod",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "geweigerd",
+    "koopbaren",
+    "ok",
+    "stuk",
+    "volledig"
+   ],
+   "dragend": [
+    "ok",
+    "volledig"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/commerce/etalage": {
+   "methode": "POST",
+   "pad": "/api/commerce/etalage",
+   "rol": "member",
+   "status": 400,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/commerce/mand": {
+   "methode": "POST",
+   "pad": "/api/commerce/mand",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "afrekeningen",
+    "leeg",
+    "ok",
+    "regels",
+    "samenBevestigen",
+    "toonTotaalCenten",
+    "valuta",
+    "volledig"
+   ],
+   "dragend": [
+    "leeg",
+    "ok",
+    "samenBevestigen",
+    "toonTotaalCenten",
+    "valuta",
+    "volledig"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/commerce/mand/leeg": {
+   "methode": "POST",
+   "pad": "/api/commerce/mand/leeg",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "afrekeningen",
+    "leeg",
+    "ok",
+    "regels",
+    "samenBevestigen",
+    "toonTotaalCenten",
+    "valuta",
+    "volledig"
+   ],
+   "dragend": [
+    "leeg",
+    "ok",
+    "samenBevestigen",
+    "toonTotaalCenten",
+    "valuta",
+    "volledig"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/commerce/mand/zet": {
+   "methode": "POST",
+   "pad": "/api/commerce/mand/zet",
+   "rol": "member",
+   "status": 400,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/commerce/overdracht/lees": {
+   "methode": "POST",
+   "pad": "/api/commerce/overdracht/lees",
+   "rol": "member",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/commerce/overdracht/maak": {
+   "methode": "POST",
+   "pad": "/api/commerce/overdracht/maak",
+   "rol": "member",
+   "status": 409,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/commerce/overdracht/mijn": {
+   "methode": "POST",
+   "pad": "/api/commerce/overdracht/mijn",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "ok",
+    "overdrachten"
+   ],
+   "dragend": [
+    "ok"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/commerce/reken": {
+   "methode": "POST",
+   "pad": "/api/commerce/reken",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "afrekeningen",
+    "genegeerd",
+    "geweigerd",
+    "ok",
+    "samenBevestigen",
+    "samenReden",
+    "toonTotaalCenten",
+    "valuta"
+   ],
+   "dragend": [
+    "ok",
+    "samenBevestigen",
+    "toonTotaalCenten",
+    "valuta"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/commerce/retour/mijn": {
+   "methode": "POST",
+   "pad": "/api/commerce/retour/mijn",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "nietGebouwd",
+    "ok",
+    "retouren"
+   ],
+   "dragend": [
+    "nietGebouwd",
+    "ok"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/commerce/retour/verstuurd": {
+   "methode": "POST",
+   "pad": "/api/commerce/retour/verstuurd",
+   "rol": "member",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/commerce/retour/vraag": {
+   "methode": "POST",
+   "pad": "/api/commerce/retour/vraag",
+   "rol": "member",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/festival/gast/edities": {
+   "methode": "POST",
+   "pad": "/api/festival/gast/edities",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "edities",
+    "ok"
+   ],
+   "dragend": [
+    "ok"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/festival/gast/passen": {
+   "methode": "POST",
+   "pad": "/api/festival/gast/passen",
+   "rol": "member",
+   "status": 404,
+   "sleutels": [
+    "error",
+    "status"
+   ],
+   "dragend": [
+    "error",
+    "status"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/festival/gast/programma": {
+   "methode": "POST",
+   "pad": "/api/festival/gast/programma",
+   "rol": "member",
+   "status": 404,
+   "sleutels": [
+    "error",
+    "status"
+   ],
+   "dragend": [
+    "error",
+    "status"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/festival/groep": {
+   "methode": "POST",
+   "pad": "/api/festival/groep",
+   "rol": "member",
+   "status": 404,
+   "sleutels": [
+    "error",
+    "status"
+   ],
+   "dragend": [
+    "error",
+    "status"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/festival/groep/code": {
+   "methode": "POST",
+   "pad": "/api/festival/groep/code",
+   "rol": "member",
+   "status": 404,
+   "sleutels": [
+    "error",
+    "status"
+   ],
+   "dragend": [
+    "error",
+    "status"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/festival/groep/mee": {
+   "methode": "POST",
+   "pad": "/api/festival/groep/mee",
+   "rol": "member",
+   "status": 404,
+   "sleutels": [
+    "error",
+    "status"
+   ],
+   "dragend": [
+    "error",
+    "status"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/festival/groep/mijn": {
+   "methode": "POST",
+   "pad": "/api/festival/groep/mijn",
+   "rol": "member",
+   "status": 404,
+   "sleutels": [
+    "error",
+    "status"
+   ],
+   "dragend": [
+    "error",
+    "status"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/festival/groep/stand": {
+   "methode": "POST",
+   "pad": "/api/festival/groep/stand",
+   "rol": "member",
+   "status": 404,
+   "sleutels": [
+    "error",
+    "status"
+   ],
+   "dragend": [
+    "error",
+    "status"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/festival/groep/weg": {
+   "methode": "POST",
+   "pad": "/api/festival/groep/weg",
+   "rol": "member",
+   "status": 404,
+   "sleutels": [
+    "error",
+    "status"
+   ],
+   "dragend": [
+    "error",
+    "status"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/foundation/school/bezoeker/lijst": {
+   "methode": "POST",
+   "pad": "/api/foundation/school/bezoeker/lijst",
+   "rol": "publiek",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/foundation/school/pas/lijst": {
+   "methode": "POST",
+   "pad": "/api/foundation/school/pas/lijst",
+   "rol": "publiek",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/foundation/school/peiling/mijn-personeel": {
+   "methode": "POST",
+   "pad": "/api/foundation/school/peiling/mijn-personeel",
+   "rol": "publiek",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/gast/eten/beoordeel": {
+   "methode": "POST",
+   "pad": "/api/gast/eten/beoordeel",
+   "rol": "member",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/gast/eten/concierge": {
+   "methode": "POST",
+   "pad": "/api/gast/eten/concierge",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "aantal",
+    "concierge",
+    "filters",
+    "groepen",
+    "keukens",
+    "modus",
+    "ok",
+    "restaurants"
+   ],
+   "dragend": [
+    "aantal",
+    "concierge",
+    "filters",
+    "groepen",
+    "keukens",
+    "modus",
+    "ok",
+    "restaurants"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/gast/eten/ontdekken": {
+   "methode": "POST",
+   "pad": "/api/gast/eten/ontdekken",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "aantal",
+    "filters",
+    "groepen",
+    "keukens",
+    "modus",
+    "ok",
+    "restaurants"
+   ],
+   "dragend": [
+    "aantal",
+    "filters",
+    "groepen",
+    "keukens",
+    "modus",
+    "ok",
+    "restaurants"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/gast/eten/probleem": {
+   "methode": "POST",
+   "pad": "/api/gast/eten/probleem",
+   "rol": "member",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/gast/eten/zoeken": {
+   "methode": "POST",
+   "pad": "/api/gast/eten/zoeken",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "aantal",
+    "filters",
+    "groepen",
+    "keukens",
+    "modus",
+    "ok",
+    "restaurants"
+   ],
+   "dragend": [
+    "aantal",
+    "filters",
+    "groepen",
+    "keukens",
+    "modus",
+    "ok",
+    "restaurants"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/geld/grens": {
+   "methode": "POST",
+   "pad": "/api/geld/grens",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "grenzen",
+    "ok"
+   ],
+   "dragend": [
+    "ok"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/geld/grens/weg": {
+   "methode": "POST",
+   "pad": "/api/geld/grens/weg",
+   "rol": "member",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/geld/grens/zet": {
+   "methode": "POST",
+   "pad": "/api/geld/grens/zet",
+   "rol": "member",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/inzagekaart": {
+   "methode": "POST",
+   "pad": "/api/inzagekaart",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "bronnen",
+    "gekeken",
+    "kaart",
+    "nietZichtbaar",
+    "ok",
+    "storingen",
+    "voorbehoud"
+   ],
+   "dragend": [
+    "bronnen",
+    "gekeken",
+    "nietZichtbaar",
+    "ok",
+    "voorbehoud"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/kosten/grens": {
+   "methode": "POST",
+   "pad": "/api/kosten/grens",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "grens",
+    "ok",
+    "stand"
+   ],
+   "dragend": [
+    "grens",
+    "ok",
+    "stand"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/kosten/grens/zet": {
+   "methode": "POST",
+   "pad": "/api/kosten/grens/zet",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "grens",
+    "ok",
+    "status",
+    "weg"
+   ],
+   "dragend": [
+    "grens",
+    "ok",
+    "status",
+    "weg"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/kosten/herkomst": {
+   "methode": "POST",
+   "pad": "/api/kosten/herkomst",
+   "rol": "member",
+   "status": 400,
+   "sleutels": [
+    "error",
+    "status"
+   ],
+   "dragend": [
+    "error",
+    "status"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/kosten/mij": {
+   "methode": "POST",
+   "pad": "/api/kosten/mij",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "dekking",
+    "grens",
+    "ok",
+    "overzicht",
+    "periode",
+    "wieBetaalt",
+    "zegtNiet"
+   ],
+   "dragend": [
+    "dekking",
+    "grens",
+    "ok",
+    "overzicht",
+    "periode",
+    "wieBetaalt",
+    "zegtNiet"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/kosten/vooruitblik": {
+   "methode": "POST",
+   "pad": "/api/kosten/vooruitblik",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "band",
+    "dagenInMaand",
+    "dagenVoorbij",
+    "drager",
+    "graad",
+    "lopend",
+    "ok",
+    "periode",
+    "totNuCenten",
+    "trefzekerheid",
+    "verwachtCenten",
+    "zegtNiet"
+   ],
+   "dragend": [
+    "dagenInMaand",
+    "dagenVoorbij",
+    "drager",
+    "graad",
+    "lopend",
+    "ok",
+    "periode",
+    "totNuCenten",
+    "trefzekerheid",
+    "verwachtCenten",
+    "zegtNiet"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/leerstof/dag": {
+   "methode": "POST",
+   "pad": "/api/leerstof/dag",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "fase",
+    "let",
+    "ok",
+    "stukken",
+    "uitleg"
+   ],
+   "dragend": [
+    "let",
+    "ok",
+    "uitleg"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/leerstof/herhaal": {
+   "methode": "POST",
+   "pad": "/api/leerstof/herhaal",
+   "rol": "member",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/leerstof/herhalen": {
+   "methode": "POST",
+   "pad": "/api/leerstof/herhalen",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "aantal",
+    "later",
+    "ok",
+    "open",
+    "uitleg",
+    "vragen"
+   ],
+   "dragend": [
+    "aantal",
+    "ok",
+    "uitleg",
+    "vragen"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/leerstof/pad": {
+   "methode": "POST",
+   "pad": "/api/leerstof/pad",
+   "rol": "member",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/link/cap/aanvaard": {
+   "methode": "POST",
+   "pad": "/api/link/cap/aanvaard",
+   "rol": "member",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/link/cap/maak": {
+   "methode": "POST",
+   "pad": "/api/link/cap/maak",
+   "rol": "member",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/link/cap/trek": {
+   "methode": "POST",
+   "pad": "/api/link/cap/trek",
+   "rol": "member",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/member/ai/beleid": {
+   "methode": "POST",
+   "pad": "/api/member/ai/beleid",
+   "rol": "member",
+   "status": 400,
+   "sleutels": [
+    "error",
+    "status"
+   ],
+   "dragend": [
+    "error",
+    "status"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/member/ai/bundel": {
+   "methode": "POST",
+   "pad": "/api/member/ai/bundel",
+   "rol": "member",
+   "status": 404,
+   "sleutels": [
+    "error",
+    "status"
+   ],
+   "dragend": [
+    "error",
+    "status"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/member/ai/bundels": {
+   "methode": "POST",
+   "pad": "/api/member/ai/bundels",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "bundels",
+    "ok",
+    "status"
+   ],
+   "dragend": [
+    "bundels",
+    "ok",
+    "status"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/member/ai/tegoed": {
+   "methode": "POST",
+   "pad": "/api/member/ai/tegoed",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "autoBundel",
+    "beleid",
+    "bijgekocht",
+    "bundels",
+    "contractueel",
+    "gebruiktPct",
+    "inbegrepen",
+    "maand",
+    "maandMaxCenten",
+    "ok",
+    "rest",
+    "status",
+    "tekst",
+    "verbruikt",
+    "waarschuwing"
+   ],
+   "dragend": [
+    "beleid",
+    "bijgekocht",
+    "bundels",
+    "contractueel",
+    "gebruiktPct",
+    "inbegrepen",
+    "maand",
+    "ok",
+    "rest",
+    "status",
+    "tekst",
+    "verbruikt",
+    "waarschuwing"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/member/connect/intrek": {
+   "methode": "POST",
+   "pad": "/api/member/connect/intrek",
+   "rol": "member",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/member/pin": {
+   "methode": "POST",
+   "pad": "/api/member/pin",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "bevroren",
+    "bevrorenSinds",
+    "gebeurtenissen",
+    "gemaaktOp",
+    "laatstGewijzigd",
+    "pin",
+    "toon",
+    "uit",
+    "versie"
+   ],
+   "dragend": [
+    "bevroren",
+    "gebeurtenissen",
+    "gemaaktOp",
+    "laatstGewijzigd",
+    "pin",
+    "toon",
+    "uit",
+    "versie"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/member/pin/actie/opties": {
+   "methode": "POST",
+   "pad": "/api/member/pin/actie/opties",
+   "rol": "member",
+   "status": 400,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/member/pin/connect": {
+   "methode": "POST",
+   "pad": "/api/member/pin/connect",
+   "rol": "member",
+   "status": 400,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/member/pin/live": {
+   "methode": "POST",
+   "pad": "/api/member/pin/live",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "doel",
+    "exp",
+    "token",
+    "ttlMs"
+   ],
+   "dragend": [
+    "doel",
+    "exp",
+    "token",
+    "ttlMs"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/member/pin/live/kijk": {
+   "methode": "POST",
+   "pad": "/api/member/pin/live/kijk",
+   "rol": "member",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/member/pin/live/verbind": {
+   "methode": "POST",
+   "pad": "/api/member/pin/live/verbind",
+   "rol": "member",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/member/pin/nieuw": {
+   "methode": "POST",
+   "pad": "/api/member/pin/nieuw",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "bevroren",
+    "bevrorenSinds",
+    "gebeurtenissen",
+    "gemaaktOp",
+    "laatstGewijzigd",
+    "pin",
+    "toon",
+    "uit",
+    "versie"
+   ],
+   "dragend": [
+    "bevroren",
+    "gebeurtenissen",
+    "gemaaktOp",
+    "laatstGewijzigd",
+    "pin",
+    "toon",
+    "uit",
+    "versie"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/member/pin/uit": {
+   "methode": "POST",
+   "pad": "/api/member/pin/uit",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "bevroren",
+    "bevrorenSinds",
+    "gebeurtenissen",
+    "gemaaktOp",
+    "laatstGewijzigd",
+    "pin",
+    "toon",
+    "uit",
+    "versie"
+   ],
+   "dragend": [
+    "bevroren",
+    "gebeurtenissen",
+    "gemaaktOp",
+    "laatstGewijzigd",
+    "pin",
+    "toon",
+    "uit",
+    "versie"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/member/pin/zoek": {
+   "methode": "POST",
+   "pad": "/api/member/pin/zoek",
+   "rol": "member",
+   "status": 400,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/member/prijsgarantie": {
+   "methode": "POST",
+   "pad": "/api/member/prijsgarantie",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "meldingen",
+    "ok",
+    "status"
+   ],
+   "dragend": [
+    "ok",
+    "status"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/member/prijsgarantie/meld": {
+   "methode": "POST",
+   "pad": "/api/member/prijsgarantie/meld",
+   "rol": "member",
+   "status": 400,
+   "sleutels": [
+    "error",
+    "status"
+   ],
+   "dragend": [
+    "error",
+    "status"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/member/rendezvous/aanwezig/wis": {
+   "methode": "POST",
+   "pad": "/api/member/rendezvous/aanwezig/wis",
+   "rol": "member",
+   "status": 403,
+   "sleutels": [
+    "code",
+    "error"
+   ],
+   "dragend": [
+    "code",
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/member/rendezvous/akkoord": {
+   "methode": "POST",
+   "pad": "/api/member/rendezvous/akkoord",
+   "rol": "member",
+   "status": 403,
+   "sleutels": [
+    "code",
+    "error"
+   ],
+   "dragend": [
+    "code",
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/member/rendezvous/arrange": {
+   "methode": "POST",
+   "pad": "/api/member/rendezvous/arrange",
+   "rol": "member",
+   "status": 403,
+   "sleutels": [
+    "code",
+    "error"
+   ],
+   "dragend": [
+    "code",
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/member/rendezvous/blokkeer": {
+   "methode": "POST",
+   "pad": "/api/member/rendezvous/blokkeer",
+   "rol": "member",
+   "status": 403,
+   "sleutels": [
+    "code",
+    "error"
+   ],
+   "dragend": [
+    "code",
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/member/rendezvous/encounter": {
+   "methode": "POST",
+   "pad": "/api/member/rendezvous/encounter",
+   "rol": "member",
+   "status": 403,
+   "sleutels": [
+    "code",
+    "error"
+   ],
+   "dragend": [
+    "code",
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/member/rendezvous/introductie/antwoord": {
+   "methode": "POST",
+   "pad": "/api/member/rendezvous/introductie/antwoord",
+   "rol": "member",
+   "status": 403,
+   "sleutels": [
+    "code",
+    "error"
+   ],
+   "dragend": [
+    "code",
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/member/rendezvous/introducties": {
+   "methode": "POST",
+   "pad": "/api/member/rendezvous/introducties",
+   "rol": "member",
+   "status": 403,
+   "sleutels": [
+    "code",
+    "error"
+   ],
+   "dragend": [
+    "code",
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/member/rendezvous/samen": {
+   "methode": "POST",
+   "pad": "/api/member/rendezvous/samen",
+   "rol": "member",
+   "status": 403,
+   "sleutels": [
+    "code",
+    "error"
+   ],
+   "dragend": [
+    "code",
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/member/rendezvous/samen/zet": {
+   "methode": "POST",
+   "pad": "/api/member/rendezvous/samen/zet",
+   "rol": "member",
+   "status": 403,
+   "sleutels": [
+    "code",
+    "error"
+   ],
+   "dragend": [
+    "code",
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/member/rendezvous/tafel/antwoord": {
+   "methode": "POST",
+   "pad": "/api/member/rendezvous/tafel/antwoord",
+   "rol": "member",
+   "status": 403,
+   "sleutels": [
+    "code",
+    "error"
+   ],
+   "dragend": [
+    "code",
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/member/rendezvous/tafels": {
+   "methode": "POST",
+   "pad": "/api/member/rendezvous/tafels",
+   "rol": "member",
+   "status": 403,
+   "sleutels": [
+    "code",
+    "error"
+   ],
+   "dragend": [
+    "code",
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/nav/status": {
+   "methode": "POST",
+   "pad": "/api/nav/status",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "dekking",
+    "eigenMotor",
+    "live",
+    "mogelijkheden",
+    "motor",
+    "profielen",
+    "status",
+    "versie"
+   ],
+   "dragend": [
+    "dekking",
+    "eigenMotor",
+    "live",
+    "mogelijkheden",
+    "motor",
+    "profielen",
+    "status",
+    "versie"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/office/claims/poort": {
+   "methode": "POST",
+   "pad": "/api/office/claims/poort",
+   "rol": "office",
+   "status": 200,
+   "sleutels": [
+    "aantal",
+    "ok",
+    "problemen",
+    "status"
+   ],
+   "dragend": [
+    "aantal",
+    "ok",
+    "status"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/office/partner/regels": {
+   "methode": "POST",
+   "pad": "/api/office/partner/regels",
+   "rol": "office",
+   "status": 200,
+   "sleutels": [
+    "automatisch",
+    "bronnen",
+    "gebeurtenissen",
+    "getroffenFoundation",
+    "getroffenLeveranciers",
+    "intervalMs",
+    "openWijzigingen"
+   ],
+   "dragend": [
+    "automatisch",
+    "bronnen",
+    "intervalMs",
+    "openWijzigingen"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/office/pay/bewijs": {
+   "methode": "POST",
+   "pad": "/api/office/pay/bewijs",
+   "rol": "office",
+   "status": 200,
+   "sleutels": [
+    "controles",
+    "ok",
+    "oordeel",
+    "telling",
+    "uitleg"
+   ],
+   "dragend": [
+    "controles",
+    "ok",
+    "oordeel",
+    "telling",
+    "uitleg"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/office/reisbureau/besluit": {
+   "methode": "POST",
+   "pad": "/api/office/reisbureau/besluit",
+   "rol": "office",
+   "status": 400,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/office/rendezvous/meldingen": {
+   "methode": "POST",
+   "pad": "/api/office/rendezvous/meldingen",
+   "rol": "office",
+   "status": 200,
+   "sleutels": [
+    "meldingen",
+    "status"
+   ],
+   "dragend": [
+    "status"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/office/rendezvous/tafel/maak": {
+   "methode": "POST",
+   "pad": "/api/office/rendezvous/tafel/maak",
+   "rol": "office",
+   "status": 200,
+   "sleutels": [
+    "ok",
+    "status",
+    "tafel"
+   ],
+   "dragend": [
+    "ok",
+    "status",
+    "tafel"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/office/rendezvous/tafel/nodig": {
+   "methode": "POST",
+   "pad": "/api/office/rendezvous/tafel/nodig",
+   "rol": "office",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/office/rendezvous/tafels": {
+   "methode": "POST",
+   "pad": "/api/office/rendezvous/tafels",
+   "rol": "office",
+   "status": 200,
+   "sleutels": [
+    "status",
+    "tafels"
+   ],
+   "dragend": [
+    "status",
+    "tafels"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/office/sociaal": {
+   "methode": "POST",
+   "pad": "/api/office/sociaal",
+   "rol": "office",
+   "status": 503,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/office/vakbewijzen": {
+   "methode": "POST",
+   "pad": "/api/office/vakbewijzen",
+   "rol": "office",
+   "status": 200,
+   "sleutels": [
+    "ok",
+    "open",
+    "soorten",
+    "verlopend"
+   ],
+   "dragend": [
+    "ok",
+    "soorten"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/onboarding/bedrijf": {
+   "methode": "POST",
+   "pad": "/api/onboarding/bedrijf",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "catalogusWens",
+    "ok",
+    "onderneming",
+    "vervolg"
+   ],
+   "dragend": [
+    "catalogusWens",
+    "ok",
+    "onderneming",
+    "vervolg"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/onboarding/inricht": {
+   "methode": "POST",
+   "pad": "/api/onboarding/inricht",
+   "rol": "member",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/onboarding/inrichten": {
+   "methode": "POST",
+   "pad": "/api/onboarding/inrichten",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "gedaan",
+    "klaar",
+    "ok",
+    "open"
+   ],
+   "dragend": [
+    "klaar",
+    "ok"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/onboarding/meebouwen": {
+   "methode": "POST",
+   "pad": "/api/onboarding/meebouwen",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "klaar",
+    "ok",
+    "open"
+   ],
+   "dragend": [
+    "klaar",
+    "ok"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/onboarding/salonpost": {
+   "methode": "POST",
+   "pad": "/api/onboarding/salonpost",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "ok",
+    "post"
+   ],
+   "dragend": [
+    "ok",
+    "post"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/onderwijs/bewijs": {
+   "methode": "POST",
+   "pad": "/api/onderwijs/bewijs",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "aantal",
+    "doelen",
+    "ok",
+    "uitleg"
+   ],
+   "dragend": [
+    "aantal",
+    "ok",
+    "uitleg"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/pay/graaf": {
+   "methode": "POST",
+   "pad": "/api/pay/graaf",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "bestemmingen",
+    "binnengekomen",
+    "bronnen",
+    "codenaam",
+    "ok",
+    "posities",
+    "sindsDagen",
+    "staatNu",
+    "uitgegeven"
+   ],
+   "dragend": [
+    "binnengekomen",
+    "codenaam",
+    "ok",
+    "posities",
+    "sindsDagen",
+    "staatNu",
+    "uitgegeven"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/pay/portefeuille": {
+   "methode": "POST",
+   "pad": "/api/pay/portefeuille",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "codenaam",
+    "gebonden",
+    "ok",
+    "posities",
+    "vrijBesteedbaar"
+   ],
+   "dragend": [
+    "codenaam",
+    "gebonden",
+    "ok",
+    "posities",
+    "vrijBesteedbaar"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/pay/rekening": {
+   "methode": "POST",
+   "pad": "/api/pay/rekening",
+   "rol": "member",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/pay/tegoed": {
+   "methode": "POST",
+   "pad": "/api/pay/tegoed",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "gekocht",
+    "ok",
+    "openCenten",
+    "vervalDagen",
+    "voorMij"
+   ],
+   "dragend": [
+    "ok",
+    "openCenten",
+    "vervalDagen"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/pay/tegoed/koop": {
+   "methode": "POST",
+   "pad": "/api/pay/tegoed/koop",
+   "rol": "member",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/pay/tegoed/terug": {
+   "methode": "POST",
+   "pad": "/api/pay/tegoed/terug",
+   "rol": "member",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/pay/tegoed/verzilver": {
+   "methode": "POST",
+   "pad": "/api/pay/tegoed/verzilver",
+   "rol": "member",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/pay/terug": {
+   "methode": "POST",
+   "pad": "/api/pay/terug",
+   "rol": "member",
+   "status": 409,
+   "sleutels": [
+    "error",
+    "reden"
+   ],
+   "dragend": [
+    "error",
+    "reden"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/pay/terugstand": {
+   "methode": "POST",
+   "pad": "/api/pay/terugstand",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "beschikbaar",
+    "blokkades",
+    "gereserveerd",
+    "kan",
+    "maximaal",
+    "minimaal",
+    "ok",
+    "rekening",
+    "saldo"
+   ],
+   "dragend": [
+    "beschikbaar",
+    "blokkades",
+    "gereserveerd",
+    "kan",
+    "maximaal",
+    "minimaal",
+    "ok",
+    "saldo"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/plaats/dienst": {
+   "methode": "POST",
+   "pad": "/api/plaats/dienst",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "diensten",
+    "status",
+    "venster"
+   ],
+   "dragend": [
+    "status"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/plaats/hekken": {
+   "methode": "POST",
+   "pad": "/api/plaats/hekken",
+   "rol": "member",
+   "status": 400,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/plaats/stand": {
+   "methode": "POST",
+   "pad": "/api/plaats/stand",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "log",
+    "status",
+    "vensters",
+    "waarnemingen"
+   ],
+   "dragend": [
+    "status"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/plaats/venster": {
+   "methode": "POST",
+   "pad": "/api/plaats/venster",
+   "rol": "member",
+   "status": 400,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/plaats/venster/sluit": {
+   "methode": "POST",
+   "pad": "/api/plaats/venster/sluit",
+   "rol": "member",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/plaats/waarneem": {
+   "methode": "POST",
+   "pad": "/api/plaats/waarneem",
+   "rol": "member",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/reis/invoer/bevestig": {
+   "methode": "POST",
+   "pad": "/api/reis/invoer/bevestig",
+   "rol": "member",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/reis/invoer/lees": {
+   "methode": "POST",
+   "pad": "/api/reis/invoer/lees",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "drempel",
+    "ok",
+    "opmerking",
+    "voorstel"
+   ],
+   "dragend": [
+    "drempel",
+    "ok",
+    "opmerking",
+    "voorstel"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/reis/invoer/mijn": {
+   "methode": "POST",
+   "pad": "/api/reis/invoer/mijn",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "ok",
+    "onderdelen",
+    "soorten"
+   ],
+   "dragend": [
+    "ok",
+    "soorten"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/reis/invoer/weg": {
+   "methode": "POST",
+   "pad": "/api/reis/invoer/weg",
+   "rol": "member",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/reis/los": {
+   "methode": "POST",
+   "pad": "/api/reis/los",
+   "rol": "member",
+   "status": 404,
+   "sleutels": [
+    "error",
+    "status"
+   ],
+   "dragend": [
+    "error",
+    "status"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/reis/los/doe": {
+   "methode": "POST",
+   "pad": "/api/reis/los/doe",
+   "rol": "member",
+   "status": 404,
+   "sleutels": [
+    "error",
+    "status"
+   ],
+   "dragend": [
+    "error",
+    "status"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/reis/reizen": {
+   "methode": "POST",
+   "pad": "/api/reis/reizen",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "bronnen",
+    "los",
+    "ok",
+    "reizen",
+    "stand",
+    "stil",
+    "telling"
+   ],
+   "dragend": [
+    "bronnen",
+    "ok",
+    "stand",
+    "telling"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/reis/uitnodiging/eisop": {
+   "methode": "POST",
+   "pad": "/api/reis/uitnodiging/eisop",
+   "rol": "member",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/reis/uitnodiging/mijn": {
+   "methode": "POST",
+   "pad": "/api/reis/uitnodiging/mijn",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "ok",
+    "uitnodigingen"
+   ],
+   "dragend": [
+    "ok"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/reis/uitnodiging/nodig-uit": {
+   "methode": "POST",
+   "pad": "/api/reis/uitnodiging/nodig-uit",
+   "rol": "member",
+   "status": 400,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/reis/uitnodiging/weg": {
+   "methode": "POST",
+   "pad": "/api/reis/uitnodiging/weg",
+   "rol": "member",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/reis/wacht": {
+   "methode": "POST",
+   "pad": "/api/reis/wacht",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "at",
+    "bronnen",
+    "momentopname",
+    "ok",
+    "reizen",
+    "stil",
+    "uitleg"
+   ],
+   "dragend": [
+    "at",
+    "bronnen",
+    "momentopname",
+    "ok",
+    "uitleg"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/rtf/leerling/bewijs": {
+   "methode": "POST",
+   "pad": "/api/rtf/leerling/bewijs",
+   "rol": "member",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/rtf/leerling/dag": {
+   "methode": "POST",
+   "pad": "/api/rtf/leerling/dag",
+   "rol": "member",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/rtf/leerling/herhaal": {
+   "methode": "POST",
+   "pad": "/api/rtf/leerling/herhaal",
+   "rol": "member",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/rtf/leerling/herhalen": {
+   "methode": "POST",
+   "pad": "/api/rtf/leerling/herhalen",
+   "rol": "member",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/rtf/leerling/pad": {
+   "methode": "POST",
+   "pad": "/api/rtf/leerling/pad",
+   "rol": "member",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/rtf/social/pin": {
+   "methode": "POST",
+   "pad": "/api/rtf/social/pin",
+   "rol": "publiek",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/rtf/social/pin/connect": {
+   "methode": "POST",
+   "pad": "/api/rtf/social/pin/connect",
+   "rol": "publiek",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/rtf/social/pin/live": {
+   "methode": "POST",
+   "pad": "/api/rtf/social/pin/live",
+   "rol": "publiek",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/rtf/social/pin/live/kijk": {
+   "methode": "POST",
+   "pad": "/api/rtf/social/pin/live/kijk",
+   "rol": "publiek",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/rtf/social/pin/live/verbind": {
+   "methode": "POST",
+   "pad": "/api/rtf/social/pin/live/verbind",
+   "rol": "publiek",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/rtf/social/pin/nieuw": {
+   "methode": "POST",
+   "pad": "/api/rtf/social/pin/nieuw",
+   "rol": "publiek",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/rtf/social/pin/uit": {
+   "methode": "POST",
+   "pad": "/api/rtf/social/pin/uit",
+   "rol": "publiek",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/rtf/social/pin/zoek": {
+   "methode": "POST",
+   "pad": "/api/rtf/social/pin/zoek",
+   "rol": "publiek",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/rtf/talent/interesse": {
+   "methode": "POST",
+   "pad": "/api/rtf/talent/interesse",
+   "rol": "publiek",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/rtf/talent/mijn": {
+   "methode": "POST",
+   "pad": "/api/rtf/talent/mijn",
+   "rol": "publiek",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/rtf/uitnodiging/accepteer": {
+   "methode": "POST",
+   "pad": "/api/rtf/uitnodiging/accepteer",
+   "rol": "member",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/rtgid/stapop/opties": {
+   "methode": "POST",
+   "pad": "/api/rtgid/stapop/opties",
+   "rol": "member",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/sociaalbeleid": {
+   "methode": "POST",
+   "pad": "/api/sociaalbeleid",
+   "rol": "publiek",
+   "status": 200,
+   "sleutels": [
+    "huidig",
+    "regels",
+    "status"
+   ],
+   "dragend": [
+    "huidig",
+    "regels",
+    "status"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/sso/saml/acs": {
+   "methode": "POST",
+   "pad": "/api/sso/saml/acs",
+   "rol": "publiek",
+   "status": 400,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/eten/capaciteit": {
+   "methode": "POST",
+   "pad": "/api/supplier/eten/capaciteit",
+   "rol": "supplier",
+   "status": 200,
+   "sleutels": [
+    "capaciteit",
+    "ok"
+   ],
+   "dragend": [
+    "capaciteit",
+    "ok"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/eten/instellingen": {
+   "methode": "POST",
+   "pad": "/api/supplier/eten/instellingen",
+   "rol": "supplier",
+   "status": 400,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/eten/status": {
+   "methode": "POST",
+   "pad": "/api/supplier/eten/status",
+   "rol": "supplier",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/eten/werkblad": {
+   "methode": "POST",
+   "pad": "/api/supplier/eten/werkblad",
+   "rol": "supplier",
+   "status": 200,
+   "sleutels": [
+    "capaciteit",
+    "kortingscodes",
+    "ok",
+    "orders",
+    "rol",
+    "rollen",
+    "samenvatting"
+   ],
+   "dragend": [
+    "capaciteit",
+    "ok",
+    "rol",
+    "rollen",
+    "samenvatting"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/horeca/bar": {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/bar",
+   "rol": "supplier",
+   "status": 200,
+   "sleutels": [
+    "golven",
+    "let",
+    "ok",
+    "open",
+    "staat",
+    "stapel"
+   ],
+   "dragend": [
+    "let",
+    "ok",
+    "open",
+    "staat"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/horeca/dienstmeting": {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/dienstmeting",
+   "rol": "supplier",
+   "status": 200,
+   "sleutels": [
+    "constructie",
+    "datum",
+    "gemeten",
+    "let",
+    "meetpunten",
+    "nietGemeten",
+    "ok",
+    "regels",
+    "rekeningen"
+   ],
+   "dragend": [
+    "constructie",
+    "datum",
+    "gemeten",
+    "let",
+    "meetpunten",
+    "nietGemeten",
+    "ok",
+    "regels",
+    "rekeningen"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/horeca/gezelschap": {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/gezelschap",
+   "rol": "supplier",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/horeca/gezelschap/stoel": {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/gezelschap/stoel",
+   "rol": "supplier",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/horeca/gezelschap/stoel/weg": {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/gezelschap/stoel/weg",
+   "rol": "supplier",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/horeca/kaart": {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/kaart",
+   "rol": "supplier",
+   "status": 200,
+   "sleutels": [
+    "aantal",
+    "groepen",
+    "let",
+    "ok"
+   ],
+   "dragend": [
+    "aantal",
+    "groepen",
+    "let",
+    "ok"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/horeca/keuken/stappen": {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/keuken/stappen",
+   "rol": "supplier",
+   "status": 200,
+   "sleutels": [
+    "naam",
+    "ok",
+    "stappen"
+   ],
+   "dragend": [
+    "naam",
+    "ok"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/horeca/offline/handelingen": {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/offline/handelingen",
+   "rol": "supplier",
+   "status": 400,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/horeca/pas/gereed": {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/pas/gereed",
+   "rol": "supplier",
+   "status": 200,
+   "sleutels": [
+    "aantal",
+    "gereed",
+    "let",
+    "ok",
+    "vrij"
+   ],
+   "dragend": [
+    "aantal",
+    "let",
+    "ok",
+    "vrij"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/horeca/pas/los": {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/pas/los",
+   "rol": "supplier",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/horeca/pas/overneem": {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/pas/overneem",
+   "rol": "supplier",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/horeca/pas/pak": {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/pas/pak",
+   "rol": "supplier",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/horeca/pas/uit": {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/pas/uit",
+   "rol": "supplier",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/horeca/rahul/bevestig": {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/rahul/bevestig",
+   "rol": "supplier",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/horeca/rahul/bonnen": {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/rahul/bonnen",
+   "rol": "supplier",
+   "status": 200,
+   "sleutels": [
+    "aantal",
+    "bonnen",
+    "geweigerd",
+    "let",
+    "ok",
+    "wacht"
+   ],
+   "dragend": [
+    "aantal",
+    "geweigerd",
+    "let",
+    "ok",
+    "wacht"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/horeca/rahul/doe": {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/rahul/doe",
+   "rol": "supplier",
+   "status": 200,
+   "sleutels": [
+    "bon",
+    "ok",
+    "oordeel"
+   ],
+   "dragend": [
+    "bon",
+    "ok",
+    "oordeel"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/horeca/rahul/grens": {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/rahul/grens",
+   "rol": "supplier",
+   "status": 200,
+   "sleutels": [
+    "kortingGrensCenten",
+    "ok"
+   ],
+   "dragend": [
+    "kortingGrensCenten",
+    "ok"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/horeca/rahul/register": {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/rahul/register",
+   "rol": "supplier",
+   "status": 200,
+   "sleutels": [
+    "handelingen",
+    "kortingGrensCenten",
+    "lagen",
+    "let",
+    "ok",
+    "uitvoerbaar"
+   ],
+   "dragend": [
+    "handelingen",
+    "kortingGrensCenten",
+    "lagen",
+    "let",
+    "ok",
+    "uitvoerbaar"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/horeca/rekening/regel/stoel": {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/rekening/regel/stoel",
+   "rol": "supplier",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/horeca/rekening/verdeel": {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/rekening/verdeel",
+   "rol": "supplier",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/horeca/werklijst": {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/werklijst",
+   "rol": "supplier",
+   "status": 200,
+   "sleutels": [
+    "ik",
+    "let",
+    "mijnWijken",
+    "modi",
+    "modus",
+    "nu",
+    "ok",
+    "open",
+    "verborgen",
+    "voorMij",
+    "wijk",
+    "wijkbeeld"
+   ],
+   "dragend": [
+    "ik",
+    "let",
+    "modi",
+    "modus",
+    "ok",
+    "verborgen",
+    "voorMij",
+    "wijk"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/horeca/wijk/aanvaard": {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/wijk/aanvaard",
+   "rol": "supplier",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/horeca/wijk/bied": {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/wijk/bied",
+   "rol": "supplier",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/horeca/wijk/gezien": {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/wijk/gezien",
+   "rol": "supplier",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/horeca/wijk/laat": {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/wijk/laat",
+   "rol": "supplier",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/horeca/wijk/neem": {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/wijk/neem",
+   "rol": "supplier",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/horeca/wijk/tafel-terug": {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/wijk/tafel-terug",
+   "rol": "supplier",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/horeca/wijk/trek-in": {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/wijk/trek-in",
+   "rol": "supplier",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/horeca/wijk/weg": {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/wijk/weg",
+   "rol": "supplier",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/horeca/wijk/weiger": {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/wijk/weiger",
+   "rol": "supplier",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/horeca/wijk/zet": {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/wijk/zet",
+   "rol": "supplier",
+   "status": 200,
+   "sleutels": [
+    "let",
+    "ok",
+    "verhuisd",
+    "wijk"
+   ],
+   "dragend": [
+    "let",
+    "ok",
+    "wijk"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/horeca/wijken": {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/wijken",
+   "rol": "supplier",
+   "status": 200,
+   "sleutels": [
+    "antwoorden",
+    "leningen",
+    "let",
+    "magIndelen",
+    "mijne",
+    "ok",
+    "overdrachten",
+    "ploeg",
+    "tafels",
+    "voorMij",
+    "wijken",
+    "zonderWijk"
+   ],
+   "dragend": [
+    "let",
+    "magIndelen",
+    "ok",
+    "ploeg",
+    "tafels",
+    "voorMij",
+    "wijken",
+    "zonderWijk"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/nav/event": {
+   "methode": "POST",
+   "pad": "/api/supplier/nav/event",
+   "rol": "supplier",
+   "status": 400,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/nav/events": {
+   "methode": "POST",
+   "pad": "/api/supplier/nav/events",
+   "rol": "supplier",
+   "status": 200,
+   "sleutels": [
+    "gebeurtenissen",
+    "status"
+   ],
+   "dragend": [
+    "status"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/pay/budget": {
+   "methode": "POST",
+   "pad": "/api/supplier/pay/budget",
+   "rol": "supplier",
+   "status": 402,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/pay/budget/lijst": {
+   "methode": "POST",
+   "pad": "/api/supplier/pay/budget/lijst",
+   "rol": "supplier",
+   "status": 200,
+   "sleutels": [
+    "ok",
+    "posities",
+    "uitstaandCenten"
+   ],
+   "dragend": [
+    "ok",
+    "uitstaandCenten"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/pay/graaf": {
+   "methode": "POST",
+   "pad": "/api/supplier/pay/graaf",
+   "rol": "supplier",
+   "status": 200,
+   "sleutels": [
+    "aantal",
+    "beschikbaarNu",
+    "ok",
+    "ontvangen",
+    "opsplitsing",
+    "saldoNu",
+    "sindsDagen",
+    "supplierCode",
+    "uitbetaald"
+   ],
+   "dragend": [
+    "aantal",
+    "beschikbaarNu",
+    "ok",
+    "ontvangen",
+    "opsplitsing",
+    "saldoNu",
+    "sindsDagen",
+    "supplierCode",
+    "uitbetaald"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/pay/treasury": {
+   "methode": "POST",
+   "pad": "/api/supplier/pay/treasury",
+   "rol": "supplier",
+   "status": 200,
+   "sleutels": [
+    "apartGezet",
+    "beleid",
+    "beschikbaar",
+    "gereserveerd",
+    "ok",
+    "onderBuffer",
+    "ontvangenVandaag",
+    "oormerken",
+    "saldo",
+    "uitleg",
+    "vrijeLiquiditeit"
+   ],
+   "dragend": [
+    "apartGezet",
+    "beleid",
+    "beschikbaar",
+    "gereserveerd",
+    "ok",
+    "onderBuffer",
+    "ontvangenVandaag",
+    "saldo",
+    "uitleg",
+    "vrijeLiquiditeit"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/pay/treasury/apart": {
+   "methode": "POST",
+   "pad": "/api/supplier/pay/treasury/apart",
+   "rol": "supplier",
+   "status": 409,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/pay/treasury/vrij": {
+   "methode": "POST",
+   "pad": "/api/supplier/pay/treasury/vrij",
+   "rol": "supplier",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/pay/treasury/zet": {
+   "methode": "POST",
+   "pad": "/api/supplier/pay/treasury/zet",
+   "rol": "supplier",
+   "status": 200,
+   "sleutels": [
+    "btwPct",
+    "bufferCenten",
+    "ok",
+    "payrollPct"
+   ],
+   "dragend": [
+    "btwPct",
+    "bufferCenten",
+    "ok",
+    "payrollPct"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/pay/vastleg": {
+   "methode": "POST",
+   "pad": "/api/supplier/pay/vastleg",
+   "rol": "supplier",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/pay/vooraf": {
+   "methode": "POST",
+   "pad": "/api/supplier/pay/vooraf",
+   "rol": "supplier",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/pay/vooraf/lijst": {
+   "methode": "POST",
+   "pad": "/api/supplier/pay/vooraf/lijst",
+   "rol": "supplier",
+   "status": 200,
+   "sleutels": [
+    "aantal",
+    "ok",
+    "reserveringen",
+    "vastgezetCenten"
+   ],
+   "dragend": [
+    "aantal",
+    "ok",
+    "vastgezetCenten"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/pay/vrijgeef": {
+   "methode": "POST",
+   "pad": "/api/supplier/pay/vrijgeef",
+   "rol": "supplier",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/persoonseis": {
+   "methode": "POST",
+   "pad": "/api/supplier/persoonseis",
+   "rol": "supplier",
+   "status": 200,
+   "sleutels": [
+    "eisen",
+    "ok",
+    "ploeg"
+   ],
+   "dragend": [
+    "eisen",
+    "ok",
+    "ploeg"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/retail/annuleer": {
+   "methode": "POST",
+   "pad": "/api/supplier/retail/annuleer",
+   "rol": "supplier",
+   "status": 400,
+   "sleutels": [
+    "error",
+    "status"
+   ],
+   "dragend": [
+    "error",
+    "status"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/retail/bon": {
+   "methode": "POST",
+   "pad": "/api/supplier/retail/bon",
+   "rol": "supplier",
+   "status": 200,
+   "sleutels": [
+    "bon",
+    "gronden",
+    "ok"
+   ],
+   "dragend": [
+    "gronden",
+    "ok"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/retour/lijst": {
+   "methode": "POST",
+   "pad": "/api/supplier/retour/lijst",
+   "rol": "supplier",
+   "status": 200,
+   "sleutels": [
+    "nietGebouwd",
+    "ok",
+    "retouren"
+   ],
+   "dragend": [
+    "nietGebouwd",
+    "ok"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/retour/uitvoeren": {
+   "methode": "POST",
+   "pad": "/api/supplier/retour/uitvoeren",
+   "rol": "supplier",
+   "status": 404,
+   "sleutels": [
+    "error",
+    "status"
+   ],
+   "dragend": [
+    "error",
+    "status"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/retour/zet": {
+   "methode": "POST",
+   "pad": "/api/supplier/retour/zet",
+   "rol": "supplier",
+   "status": 404,
+   "sleutels": [
+    "error",
+    "status"
+   ],
+   "dragend": [
+    "error",
+    "status"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/talent/match": {
+   "methode": "POST",
+   "pad": "/api/supplier/talent/match",
+   "rol": "supplier",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/verkoopweg/lijst": {
+   "methode": "POST",
+   "pad": "/api/supplier/verkoopweg/lijst",
+   "rol": "supplier",
+   "status": 200,
+   "sleutels": [
+    "nietGebouwd",
+    "ok",
+    "publiek",
+    "soorten",
+    "toegang",
+    "wegen"
+   ],
+   "dragend": [
+    "nietGebouwd",
+    "ok",
+    "publiek",
+    "soorten",
+    "toegang"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/verkoopweg/publiceer": {
+   "methode": "POST",
+   "pad": "/api/supplier/verkoopweg/publiceer",
+   "rol": "supplier",
+   "status": 404,
+   "sleutels": [
+    "error",
+    "status"
+   ],
+   "dragend": [
+    "error",
+    "status"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/verkoopweg/wis": {
+   "methode": "POST",
+   "pad": "/api/supplier/verkoopweg/wis",
+   "rol": "supplier",
+   "status": 404,
+   "sleutels": [
+    "error",
+    "status"
+   ],
+   "dragend": [
+    "error",
+    "status"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/verkoopweg/zet": {
+   "methode": "POST",
+   "pad": "/api/supplier/verkoopweg/zet",
+   "rol": "supplier",
+   "status": 400,
+   "sleutels": [
+    "error",
+    "status"
+   ],
+   "dragend": [
+    "error",
+    "status"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/supplier/werkmail/adressen": {
+   "methode": "POST",
+   "pad": "/api/supplier/werkmail/adressen",
+   "rol": "supplier",
+   "status": 200,
+   "sleutels": [
+    "adressen",
+    "domein",
+    "echteBuitenpost",
+    "internDomein",
+    "magBeheren",
+    "ok",
+    "publiekActief",
+    "publiekBasis",
+    "uitleg"
+   ],
+   "dragend": [
+    "adressen",
+    "domein",
+    "echteBuitenpost",
+    "internDomein",
+    "magBeheren",
+    "ok",
+    "publiekActief",
+    "uitleg"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/tenant/bijstand": {
+   "methode": "POST",
+   "pad": "/api/tenant/bijstand",
+   "rol": "publiek",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/tenant/bijstand/besluit": {
+   "methode": "POST",
+   "pad": "/api/tenant/bijstand/besluit",
+   "rol": "publiek",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/tenant/bijstand/dossier": {
+   "methode": "POST",
+   "pad": "/api/tenant/bijstand/dossier",
+   "rol": "publiek",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/tenant/bijstand/inhoud": {
+   "methode": "POST",
+   "pad": "/api/tenant/bijstand/inhoud",
+   "rol": "publiek",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/tenant/bijstand/intrekken": {
+   "methode": "POST",
+   "pad": "/api/tenant/bijstand/intrekken",
+   "rol": "publiek",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/tenant/bijstand/niveaus": {
+   "methode": "POST",
+   "pad": "/api/tenant/bijstand/niveaus",
+   "rol": "publiek",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/tenant/bijstand/vraag": {
+   "methode": "POST",
+   "pad": "/api/tenant/bijstand/vraag",
+   "rol": "publiek",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/tenant/bootstrap/mijn": {
+   "methode": "POST",
+   "pad": "/api/tenant/bootstrap/mijn",
+   "rol": "member",
+   "status": 200,
+   "sleutels": [
+    "aantal",
+    "let",
+    "ok",
+    "werkruimtes"
+   ],
+   "dragend": [
+    "aantal",
+    "let",
+    "ok"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/theater/ondertitels": {
+   "methode": "POST",
+   "pad": "/api/theater/ondertitels",
+   "rol": "member",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/vakbewijs": {
+   "methode": "POST",
+   "pad": "/api/vakbewijs",
+   "rol": "member",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/vakbewijs/zet": {
+   "methode": "POST",
+   "pad": "/api/vakbewijs/zet",
+   "rol": "member",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/vonk/halfweg": {
+   "methode": "POST",
+   "pad": "/api/vonk/halfweg",
+   "rol": "member",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/vonk/kies": {
+   "methode": "POST",
+   "pad": "/api/vonk/kies",
+   "rol": "member",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/office/vakbewijs/intrek": {
+   "methode": "POST",
+   "pad": "/api/office/vakbewijs/intrek",
+   "rol": "kantoor-op-naam",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/office/vakbewijs/nummer": {
+   "methode": "POST",
+   "pad": "/api/office/vakbewijs/nummer",
+   "rol": "kantoor-op-naam",
+   "status": 400,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
+  },
+  "POST /api/office/vakbewijs/teken": {
+   "methode": "POST",
+   "pad": "/api/office/vakbewijs/teken",
+   "rol": "kantoor-op-naam",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-09-01T10:19:57.839Z"
   }
  }
 }

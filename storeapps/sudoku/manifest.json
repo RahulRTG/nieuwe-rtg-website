@@ -1,0 +1,14 @@
+{
+  "sleutel": "rtg-sudoku",
+  "naam": "Sudoku",
+  "versie": "1.0.0",
+  "uitleg": "Logische puzzels op drie niveaus, volledig op uw toestel. Doe mee aan de arena van dit spel: de snelste tijd wint.",
+  "categorie": "spelen",
+  "taal": "nl",
+  "start": "index.html",
+  "arena": { "richting": "laag", "eenheid": "seconden" },
+  "machtigingen": [
+    { "id": "arena.meedoen", "doel": "meedoen-arena" },
+    { "id": "opslag.eigen", "doel": "voorkeuren-onthouden" }
+  ]
+}

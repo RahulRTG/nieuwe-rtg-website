@@ -94,13 +94,20 @@ function stempelBouw() {
   const js = path.join(PUB, 'apps', 'app-main.js');
   const sandbox = path.join(PUB, 'apps', 'magnaat-sandbox.js');
   const magnaatData = path.join(PUB, 'apps', 'magnaat-data.js');
+  const interfaceDelen = [];
+  (function verzamelInterface(dir) {
+    if (!fs.existsSync(dir)) return;
+    for (const naam of fs.readdirSync(dir)) {
+      const p = path.join(dir, naam), st = fs.statSync(p);
+      if (st.isDirectory()) verzamelInterface(p);
+      else if (/\.(?:js|css)$/.test(naam)) interfaceDelen.push(p);
+    }
+  })(path.join(PUB, 'shared', 'interface'));
   const commandDelen = ['shared/command.js', 'shared/command/catalog.js', 'shared/command/console.js',
     'shared/command/verdeler.js', 'shared/command/bank.js', 'shared/command/praat.js',
     'shared/command/inlogpoort.js', 'shared/command/bladhaak.js', 'shared/command/romp.js',
-    'shared/command/geheugen.js', 'shared/command/werktafel.js', 'shared/command.css', 'shared/rtg-schil.js',
-    'shared/interface/second-screen.js', 'shared/interface/second-screen-modules.js',
-    'shared/interface/second-screen.css']
-    .map(p => path.join(PUB, p));
+    'shared/command/geheugen.js', 'shared/command/werktafel.js', 'shared/command.css', 'shared/rtg-schil.js']
+    .map(p => path.join(PUB, p)).concat(interfaceDelen.sort());
   if (!fs.existsSync(html) || !fs.existsSync(js)) return;
   let s = fs.readFileSync(js, 'utf8');
   const proeflaag = Buffer.concat([sandbox, magnaatData].filter(fs.existsSync).map(p => fs.readFileSync(p)));
@@ -130,7 +137,7 @@ function stempelBouw() {
      stijlbundel, die zelf alle bron-mtimes in zijn ETag draagt. Een ?v= op juist
      dit ene blad breekt de cascade-rij in twee extra blokkerende bundels. */
   const nieuwHMetInterface = nieuwHMetCommand.replace(
-    /(\/shared\/interface\/second-screen(?:-modules)?\.js)(?:\?v=[^"]*)?/g,
+    /(\/shared\/interface\/[^"?]+\.js)(?:\?v=[^"]*)?/g,
     '$1?v=' + hash
   );
   if (nieuwJs !== s) fs.writeFileSync(js, nieuwJs);
@@ -170,6 +177,7 @@ function stempelServiceWorkers() {
 }
 
 (async () => {
+  require('./workspace-worlds').schrijf();
   const gebundeld = schrijfBundels();
   console.log('[build] gebundeld: ' + (gebundeld.length ? gebundeld.join(', ') : 'bundels al actueel'));
   await minifyGedeeld();

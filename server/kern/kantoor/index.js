@@ -16,6 +16,9 @@ const envelop = require('../../opzet/envelop');
 
 function maakKantoor({ db, sessionFor, eigenaar, accounts, findSupplier, connectedSupplierCodes, publicSupplier, conciergeInbox, beveilig, archief, grootAantal, ledenAantal }) {
   const metrics = require('./metrics')({ db, accounts, conciergeInbox, beveilig });
+  /* De kluispoort staat in ./kluispoort.js: hij is geen variant van officeAuth
+     maar een eigen grens, en hij werd hier de druppel over keuringsregel 13. */
+  const kluisAuth = require('./kluispoort')({ officeAuth, sessionFor });
 
   function officeAuth(req, res, next) {
     const header = req.get('authorization') || '';
@@ -25,6 +28,9 @@ function maakKantoor({ db, sessionFor, eigenaar, accounts, findSupplier, connect
       // geen lidKey = geen mens achter dit token; zie ENVELOP.json (bevinding)
       envelop.zet(req, { soort: 'kantoor', id: sess.lidKey || null,
         identiteit: sess.lidKey ? 'bewezen' : 'anoniem' });
+      // het handvat van de mens: waarmee een besluit kan zien dat twee
+      // handelingen niet van dezelfde persoon zijn (kern/appstore/vierogen.js)
+      req.officeKey = sess.lidKey || null;
       return next();
     }
     // de eigenaar komt ook met zijn eigen accountlogin binnen (geen aparte code nodig)
@@ -32,6 +38,7 @@ function maakKantoor({ db, sessionFor, eigenaar, accounts, findSupplier, connect
       const u = token && accounts.verifyToken(token);
       if (u && eigenaar.isEigenaar(accounts, u)) {
         req.eigenaar = true;
+        req.officeKey = 'user-' + u.id;   // zie hierboven
         envelop.zet(req, { soort: 'eigenaar', id: 'user-' + u.id,
           identiteit: 'bewezen', gezagBron: 'eigenaar', gezagBaas: true });
         return next();
@@ -39,49 +46,12 @@ function maakKantoor({ db, sessionFor, eigenaar, accounts, findSupplier, connect
     } catch (e) {}
     return res.status(401).json({ error: 'Geen backoffice-sessie.' });
   }
-
-  /* ---- de boardroom-poort: de kamer van de eigenaar ----
-     De boardroom is van de eigenaar (Rahul Imran Ismail) alleen; hij kan
-     anderen toegang geven en die ook weer intrekken. Toegang vraagt dus een
-     IDENTITEIT: het eigen RTG-account (direct, of als kantoor-rol via het
-     ene account). Een anonieme backoffice-code heeft geen identiteit en
-     komt er daarom nooit in; de rest van het kantoor blijft gewoon open. */
-  function boardroomLijst() {
-    if (!Array.isArray(db.data.boardroomToegang)) db.data.boardroomToegang = [];
-    return db.data.boardroomToegang;
-  }
-  function boardroomWie(req) {
-    const header = req.get('authorization') || '';
-    const token = header.startsWith('Bearer ') ? header.slice(7) : null;
-    if (!token) return null;
-    const sess = sessionFor(token);
-    if (sess && sess.role === 'office') return sess.lidKey || null;
-    try { const u = accounts.verifyToken(token); if (u) return 'user-' + u.id; } catch (e) {}
-    return null;
-  }
-  function boardroomBaas(key) {
-    if (!key || !String(key).startsWith('user-')) return false;
-    const u = accounts.getUserById(Number(String(key).slice(5)));
-    return eigenaar.isEigenaar(accounts, u);
-  }
-  function magBoardroom(key) {
-    return boardroomBaas(key) || (!!key && boardroomLijst().some(t => t.key === key));
-  }
-  function boardroomAuth(req, res, next) {
-    officeAuth(req, res, () => {
-      const key = boardroomWie(req);
-      if (!magBoardroom(key)) {
-        return res.status(403).json({ error: 'De boardroom is gesloten: alleen de eigenaar komt binnen, of wie van hem toegang heeft gekregen. Log in met het eigen RTG-account.' });
-      }
-      req.boardroomKey = key;
-      req.boardroomBaas = boardroomBaas(key);
-      // scherper dan officeAuth: een sleutel EN waar de bevoegdheid vandaan komt
-      envelop.zet(req, { soort: req.boardroomBaas ? 'eigenaar' : 'kantoor', id: key,
-        identiteit: 'bewezen', gezagBron: req.boardroomBaas ? 'eigenaar' : 'toegekend',
-        gezagBaas: !!req.boardroomBaas });
-      next();
-    });
-  }
+  /* De boardroom-poort staat in ./boardroom.js -- de strengste van de drie
+     poorten hier, en om dezelfde reden een eigen bestand als ./kluispoort.js:
+     hij is geen vlag op officeAuth maar een eigen eis (een IDENTITEIT, waar de
+     backofficedeur een anonieme code toelaat). */
+  const { boardroomLijst, boardroomWie, boardroomBaas, magBoardroom, boardroomAuth } =
+    require('./boardroom')({ db, sessionFor, accounts, eigenaar, officeAuth, envelop });
 
   function officeState() {
     // live overzicht: welke leden zijn nu onderweg, waarheen en met welke partners
@@ -177,7 +147,7 @@ function maakKantoor({ db, sessionFor, eigenaar, accounts, findSupplier, connect
     });
   }
 
-  return { officeAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, pendingVerifications };
+  return { officeAuth, kluisAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, pendingVerifications };
 }
 
 module.exports = { maakKantoor };

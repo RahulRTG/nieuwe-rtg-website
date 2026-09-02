@@ -72,73 +72,9 @@ const VENSTER_MS = 5000;
    en de kostprijslaag in ./idemsleutels-kosten.js (zelfde register, eigen
    bestand -- zie de kop daar); hieronder komen ze er via Object.assign bij,
    zodat er maar EEN opzoekweg bestaat. */
-const SLEUTELS = {
-  /* ---- geverifieerd: de body draagt de identiteit van wat er gemaakt wordt ----
-
-     Van elk van deze routes is de handler nagelezen: er staat een veld in de
-     body dat bepaalt WAT er ontstaat (een naam, een titel, een datum). Twee
-     woordelijk gelijke verzoeken binnen vijf seconden zijn dan een dubbeltik en
-     geen tweede bedoeling. */
-  'POST /api/concern/nieuw': { zelfdeVerzoek: true },              // naam
-  'POST /api/concern/entiteit/nieuw': { zelfdeVerzoek: true },     // naam + rechtsvorm
-  'POST /api/gewoonten/maak': { zelfdeVerzoek: true },             // naam
-  'POST /api/genootschap/richt-op': { zelfdeVerzoek: true },       // naam + soort
-  'POST /api/agenda/toevoegen': { zelfdeVerzoek: true },           // titel + datum + tijd
-  'POST /api/gemeente/meld': { zelfdeVerzoek: true },              // de melding zelf
-  'POST /api/member/leren/project-maak': { zelfdeVerzoek: true },  // titel
-  'POST /api/mall/lijst/nieuw': { zelfdeVerzoek: true },           // naam, verplicht (kern/mall/lijsten.js)
-  'POST /api/mediaos/lijst/maak': { zelfdeVerzoek: true },         // naam, verplicht (kern/mediaos/lijsten.js)
-  'POST /api/office/architect/maak': { zelfdeVerzoek: true },      // naam, verplicht (kern/architect/index.js)
-  'POST /api/office/atelier/maak': { zelfdeVerzoek: true },        // naam, verplicht (kern/atelier/index.js)
-  'POST /api/office/hardware/maak': { zelfdeVerzoek: true },       // naam, verplicht (kern/hardwarelab/index.js)
-  'POST /api/office/ideeen/maak': { zelfdeVerzoek: true },         // titel, verplicht (kern/ideeen.js)
-
-  /* ---- bewust NIET idempotent, met de reden erbij ----
-
-     /api/muziek/maak stond hier eerst als "zelfde verzoek is een herhaling", en
-     dat was fout. Hij maakt uit een LEGE body elke keer een nieuw stuk; twee
-     oproepen zijn twee stukken. test/mediaos.test.js ving het meteen.
-
-     Dat is precies de fout waar de kop van dit bestand voor waarschuwt, en ik
-     liep er zelf in: de verklaring was op de NAAM van de route gebaseerd ("maak"
-     klinkt als aanmaken met inhoud) en niet op de handler. Een verklaring die je
-     niet hebt nagelezen, is een gok met een net gezicht. */
-  'POST /api/muziek/maak': { nietIdempotent: true,
-    waarom: 'maakt uit een lege body elke keer een NIEUW stuk; twee oproepen zijn twee stukken, ' +
-      'en een laag die de tweede opslikt laat werk verdwijnen zonder dat iemand het merkt' },
-  'POST /api/command/sonde/draai': { nietIdempotent: true,
-    waarom: 'een sonde draaien is een MEETHANDELING: twee keer draaien hoort twee metingen op te leveren, ' +
-      'anders meet de tweede ronde de eerste' },
-  'POST /api/command/puls': { nietIdempotent: true,
-    waarom: 'de puls is een momentopname; twee keer vragen hoort twee momenten te geven' },
-  'POST /api/live/start': { nietIdempotent: true,
-    waarom: 'een tweede start is een nieuwe uitzending, niet dezelfde nog eens' },
-
-  /* Dezelfde toets als hierboven, andere uitkomst: bij deze vier staat er GEEN
-     verplicht veld in de body dat bepaalt wat er ontstaat. Wie zonder inhoud
-     een tweede maakt, krijgt met recht een tweede -- en een laag die dat
-     opslikt, laat werk verdwijnen. */
-  'POST /api/office/kantoorpakket/maak': { nietIdempotent: true,
-    waarom: 'de titel is optioneel en valt terug op "Nieuw document"; twee lege oproepen zijn ' +
-      'twee verse documenten, niet dezelfde nog eens (kern/office/docs.js)' },
-  'POST /api/meet/maak': { nietIdempotent: true,
-    waarom: 'zonder agendaId ontstaat er elke keer een verse kamer met een eigen toegangscode; ' +
-      'MET agendaId dedupliceert de route zelf al (kern/meet.js geeft dan bestond:true terug), ' +
-      'dus er valt hier niets te winnen en wel iets te verliezen' },
-  'POST /api/concern/opname/maak': { nietIdempotent: true,
-    waarom: 'een opname is een momentopname van het concern; twee keer vragen hoort met recht ' +
-      'twee momenten op te leveren, anders is de tweede opname stil de eerste' },
-
-  /* ---- routes die niets veranderen ----
-
-     Een POST die alleen leest. Herhalen is per definitie veilig, en er valt
-     niets te dedupliceren: de poort doet hier dan ook niets. Ze staan hier
-     omdat "geen verklaring" en "verklaard als leesroute" twee verschillende
-     dingen zijn, en de schuldteller dat verschil hoort te zien. */
-  'POST /api/office/anker': { leest: true },
-  'POST /api/office/anker/reken': { leest: true },
-  'POST /api/office/handelingen': { leest: true }
-};
+/* De eerste ronde staat in ./idemsleutels-basis.js -- zelfde register, eigen
+   bestand, precies zoals de zeven rondes hieronder. */
+const SLEUTELS = {};
 
 function sleutelVoor(methode, pad) {
   return SLEUTELS[String(methode || '').toUpperCase() + ' ' + String(pad || '')] || null;
@@ -150,6 +86,7 @@ function sleutelVoor(methode, pad) {
    zonder reden was daar dus gewoon toegestaan. Een controle die niet over alles
    loopt is geen controle. */
 Object.assign(SLEUTELS,
+  require('./idemsleutels-basis').SLEUTELS,
   require('./idemsleutels-werelden').SLEUTELS,
   require('./idemsleutels-geld').SLEUTELS,
   require('./idemsleutels-kosten').SLEUTELS,
@@ -162,7 +99,12 @@ Object.assign(SLEUTELS,
   /* De zesentwintig die de uitgebreide proefopstelling zichtbaar maakte. */
   require('./idemsleutels-proefronde').SLEUTELS,
   /* De tien uit de objectronde: het werkdossier van een onderzoek en drie erbuiten. */
-  require('./idemsleutels-objectronde').SLEUTELS);
+  require('./idemsleutels-objectronde').SLEUTELS,
+  /* De restbak: de laatste 27 uit de bron verklaard (89a36fcac). Deze regel
+     verdween in de samenvoeging van twaalf PR's (2 september 2026) en dertig
+     verklaringen lagen ongelezen naast het register; het bestand exporteert
+     de lijst zelf, zonder SLEUTELS-omhulsel. */
+  require('./idemsleutels-restbak'));
 
 /* Drie keuringen bij het laden, en ze staan bij elkaar in ./idemsleutels-nooit.js:
    geen route in twee zijbestanden, elke verklaring compleet, en vier routes die

@@ -32,9 +32,9 @@
           '<button class="knop" id="blBeweeg" type="button">Vraag Rahul naar sport en wellness</button>' +
         '</div>';
     } catch (e) {
-      $('#blWeek').innerHTML = '<p class="stil">' + esc(e.message) + ' Log eerst in via de leden-app.</p>';
-      $('#blAdvies').innerHTML = '<p class="stil">Niet geladen.</p>';
-      $('#blKook').innerHTML = '<p class="stil">Niet geladen.</p>';
+      $('#blWeek').innerHTML = RTGLeeg.html(RTGLeeg.vanFout({ status: 401, message: esc(e.message) }));
+      $('#blAdvies').innerHTML = '<p class="stil">Dit deel laadde niet. Ververs de pagina; blijft het staan, dan is de bron even niet bereikbaar.</p>';
+      $('#blKook').innerHTML = '<p class="stil">Dit deel laadde niet. Ververs de pagina; blijft het staan, dan is de bron even niet bereikbaar.</p>';
     }
   }
 

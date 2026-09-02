@@ -115,24 +115,78 @@ const { mailAanname } = require('../kern/mailaanname')({ rtmail, mailIn, mailBij
    verzoeken van die router nooit. */
 const scanNet = require('../middleware/malwarescan')({ antivirus, uploadquarantaine, log: deps.log });
 
+/* Het sessieregister van MIJN RTG (blok 1). Het houdt de CONTEXT van een sessie
+   bij -- waarmee zij ontstond, aan welk toestel zij gebonden is, namens wie er
+   gehandeld wordt -- en verleent zelf geen enkele toegang. Zie de kop van
+   kern/identiteit/sessieregister.js voor waarom dat een apart ding moet zijn. */
+const sessieregister = require('../kern/identiteit/sessieregister').maakSessieregister({ db, save });
+/* Het toestelregister hoort naast het sessieregister en niet erin: een toestel
+   overleeft zijn sessies, en een sessie kan aan een toestel gebonden zijn zonder
+   dat het toestel bij die sessie hoort. Twee levensduren, twee registers. */
+const toestellen = require('../kern/identiteit/toestellen').maakToestellen({ db, save });
+/* Het bezitsbewijs leunt op het toestelregister (daar ligt de publieke sleutel)
+   en wordt door auth gebruikt; daarom hier, naast de andere twee. */
+const bezitsbewijs = require('../kern/identiteit/bezitsbewijs').maakBezitsbewijs({ db, save, toestellen });
+/* De tweede factor woont bij accounts en niet bij db.data: het geheim gaat het
+   versleutelde ledendossier in (zie de kop van kern/identiteit/tweefactor.js). */
+const tweefactor = require('../kern/identiteit/tweefactor').maakTweefactor({ accounts });
+/* Commerciele toestemming: standaard uit, met tijdstip en herkomst. Hij levert
+   ook `commercieelStand` en `commercieelZet` aan het Consent Center, zodat
+   "wie mag mij benaderen" op hetzelfde scherm staat als "wie mag iets van mij
+   zien" -- een lid hoort niet te moeten weten dat dat twee lagen zijn. */
+const commercieel = require('../kern/identiteit/commercieel').maakCommercieel({ db, save });
+/* De doelpoort hoort HIER en niet bij de gegevenskaart: hij leunt op de
+   commerciele laag hierboven (daar woont de toestemming, en er komt geen tweede
+   boekhouding bij) en hij moet meetbaar zijn vanuit het kantoor. Hij weigert in
+   de standaardstand nog niets -- zie de kop van kern/identiteit/doelpoort.js. */
+const doelpoort = require('../kern/identiteit/doelpoort').maakDoelpoort({ commercieel });
+
 /* Een token kan een demo-sessie zijn (in-memory) of een echt account-token
-   (ondertekend, staatloos). Beide leveren een sessie met tier + unieke key. */
+   (ondertekend, staatloos). Beide leveren een sessie met tier + unieke key.
+
+   SINDS BLOK 1 hangt er een sid en een context aan, en dat gebeurt HIER omdat
+   dit de enige plek is waar beide soorten sessies samenkomen. Twee dingen die
+   niet mogen verschuiven:
+
+     1. de context beslist NIETS. Hij komt er additief bij, na de geldigheids-
+        toets, en een ontbrekend of vervallen register verandert nooit of iemand
+        binnenkomt. Een storing in de bewijslaag hoort niet te klinken als een
+        overtreding (CONTROLPLANE.md: ONBEKEND is geen WEIGEREN).
+     2. de context wordt GELEZEN, niet aangevuld. Een claim vastleggen gebeurt
+        op het moment van authenticatie; wie dat hier zou doen, legt bij elk
+        verzoek opnieuw een 'afgeleide' vast en verliest daarmee het bewijs dat
+        op het inlogmoment wel te halen was. */
 function resolveSession(token) {
   if (!token) return null;
   const demo = sessionFor(token);
-  if (demo) return demo;
+  if (demo) return demo.sid ? metContext(demo, demo.sid) : demo;
   const user = accounts.verifyToken(token);
-  if (user) return { tier: user.tier, key: 'user-' + user.id, account: user };
+  if (user) {
+    const sid = typeof accounts.sessieVan === 'function' ? accounts.sessieVan(token) : null;
+    const sess = { tier: user.tier, key: 'user-' + user.id, account: user };
+    return sid ? metContext(sess, sid) : sess;
+  }
   return null;
 }
 
-/* DE ISOLATIEPOORT DEELT HEM OOK, en dat moest wel. Die middleware staat VOOR
-   `auth`, dus req.session bestaat daar nog niet; zonder deze regel viel de
-   drager `identiteit` terug op null en keek de poort langs de gewoonste
+/* Additief: req.session blijft precies wat hij was, hier komt alleen `sid` en
+   een gelezen `sessieContext` bij. Een oud token (drie delen, geen sid) krijgt
+   `sid: null` -- "deze sessie heeft geen identiteit", en dat is waar. */
+function metContext(sess, sid) {
+  sess.sid = sid;
+  const rij = sessieregister.lees(sid);
+  if (rij) { sess.sessieContext = rij.context; sessieregister.raak(sid); }
+  return sess;
+}
+
+/* DE ISOLATIEPOORT DEELT resolveSession OOK, en dat moest wel. Die middleware
+   staat VOOR `auth`, dus req.session bestaat daar nog niet; zonder deze regel
+   viel de drager `identiteit` terug op null en keek de poort langs de gewoonste
    beschermstand heen (gemeten: nul gewogen verzoeken tegenover 117 met een
-   stand op `sessie`). Inhangen en niet nabouwen: resolveSession heeft twee
-   takken, en een tweede kopie geeft een ander antwoord zodra er een derde
-   bijkomt. */
+   stand op `sessie`). Inhangen en niet nabouwen: resolveSession heeft nu drie
+   takken, en een tweede kopie geeft een ander antwoord zodra er een vierde
+   bijkomt -- die derde tak (`sid` uit het sessieregister) kwam van main en had
+   een kopie meteen achterhaald. */
 require('../kern/isolatie/sessiedragers').zetSessieOplosser(resolveSession);
 
 /* De AI-poort deelt resolveSession met auth hieronder: een vertaalverzoek en een
@@ -157,6 +211,27 @@ function auth(req, res, next) {
   if (_fid && sess.key && lidBoardUit(sess.key, _fid)) {
     return res.status(403).json({ error: 'Deze functie staat uit in je boardroom.', functieUit: _fid });
   }
+  /* HET BEZITSBEWIJS (MIJN RTG blok 4), op hetzelfde keelgat als de boardroom
+     hierboven en om dezelfde reden: een regel die op een van de 213
+     routebestanden moet worden herhaald, staat er over een half jaar op 212.
+
+     Hij is asynchroon (een handtekening controleren is dat), dus de rest van de
+     keten schuift naar `verder()`. In de stand `schaduw` -- de standaard --
+     weigert hij nooit; hij rekent alleen uit wat er zou gebeuren. */
+  if (bezitsbewijs.zwaarPad(req.path)) {
+    bezitsbewijs.controleer({ sess, methode: req.method, pad: req.path,
+      kop: req.get('rtg-bezitsbewijs') || null })
+      .then(uit => {
+        if (uit.stand === 'geweigerd') return res.status(uit.code || 401).json({ error: uit.reden, bezitsbewijs: 'vereist' });
+        if (uit.nietAfgedwongen) res.set('RTG-Niet-Afgedwongen', 'bezitsbewijs');
+        verder();
+      })
+      .catch(() => verder());   // een storing in de bewijslaag is geen overtreding
+    return;
+  }
+  return verder();
+
+  function verder() {
   /* DE ENVELOP (server/opzet/envelop.js). Additief: req.session blijft precies
      wat hij was, hier komt alleen de canonieke vorm bij zodat een teller, een
      rem of een bonnetje niet zeven vormen hoeft te kennen. `capability` draagt
@@ -172,6 +247,7 @@ function auth(req, res, next) {
   const drager = kostenhaak.drager('lid', sess.key);
   kostenhaak.meld('verzoek', 1, { drager, pas: sess.tier });
   kostenhaak.binnen(drager, next, sess.tier);
+  }
 }
 
 /* Schoonmaakhulp voor vrije tekstvelden: knipt op lengte en haalt < en >
@@ -184,6 +260,9 @@ function auth(req, res, next) {
 
   return {
     aiPoort, antivirus, archief, atelierweb, auth, automatisering, beveilig, naamlaag, 
-    resolveSession, mailQ, mailIn, mailAuth, mailBijlage, mailSleutel, rtmailAi, rtmail, rtmailTeam, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar, mailAanname, scanNet, wacht, werkmail
+    resolveSession, sessieregister, toestellen, bezitsbewijs, tweefactor, commercieel,
+    commercieelStand: (k) => commercieel.standVan(k),
+    doelpoort,
+    commercieelZet: (k, s2, kan, bron) => commercieel.zet(k, s2, kan, bron), mailQ, mailIn, mailAuth, mailBijlage, mailSleutel, rtmailAi, rtmail, rtmailTeam, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar, mailAanname, scanNet, wacht, werkmail
   };
 };

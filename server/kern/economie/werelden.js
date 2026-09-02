@@ -35,8 +35,14 @@
    (vestiging, voertuig, apparaat, API-client, agent, project, afdeling,
    dochtermaatschappij) staat er niet als achttien soorten. Een soort zonder
    teller is een leeg vakje dat als dekking leest; ze komen erbij op het moment
-   dat er iets is dat ze meet. Wat er nu is, meet op vier: lid, zaak, gezin en
-   het huis. Zie ECONOMIE.md voor wat er nog niet is en waarom. */
+   dat er iets is dat ze meet. Wat er nu is, meet op vijf: lid, zaak, gezin, lab
+   en het huis. Zie ECONOMIE.md voor wat er nog niet is en waarom.
+
+   `lab` is de vijfde en de eerste die geen mens en geen huishouden is: hij staat
+   voor een lab van het RTF Living Lab, dat een eigen begroting heeft
+   (kern/livinglab/bestuur.js, budgetZet) en dus een eigen rekening hoort te
+   kennen. Hij is toegevoegd omdat er iets IS dat hem meet -- niet omdat de lijst
+   volledig moest worden. */
 'use strict';
 
 const { ontleed, SOORTEN_DRAGER } = require('../kosten/haak');
@@ -51,9 +57,9 @@ const WERELDEN = [
   { id: 'rtg-intern', naam: 'RTG Internal Economy', dragers: ['huis'],
     factureerbaar: false,
     grond: 'RTG zelf. Verbruik zonder eigenaar hoort hier, en deze wereld draagt de nota\'s van de infrastructuur.' },
-  { id: 'rtfoundation', naam: 'RTFoundation Economy', dragers: ['gezin'],
+  { id: 'rtfoundation', naam: 'RTFoundation Economy', dragers: ['gezin', 'lab'],
     factureerbaar: false,
-    grond: 'De stichting is een eigen rechtspersoon met een eigen vermogen (kern/rtfos/geld.js). Een gezin krijgt nooit een rekening; de stichting betaalt uit haar eigen begroting.' }
+    grond: 'De stichting is een eigen rechtspersoon met een eigen vermogen (kern/rtfos/geld.js). Een gezin krijgt nooit een rekening; de stichting betaalt uit haar eigen begroting. Een lab van het Living Lab hoort hier om dezelfde reden: het is een entiteit van de stichting en niet een gebruiker van RTG.' }
 ];
 
 const OP_ID = new Map(WERELDEN.map(w => [w.id, w]));

@@ -1,17 +1,19 @@
-/* Auth (deelmodule): INLOGGEN EN UITLOGGEN. De vier routes waarmee een sessie
-   ontstaat en weer verdwijnt -- de demo-inlog, uitloggen, de echte accountinlog
-   en "wie ben ik".
+/* Auth (deelmodule): DE ECHTE ACCOUNTINLOG.
 
-   Geknipt uit routes/auth.js omdat dat bestand over de leesgrens ging. De
-   volgorde blijft: dit wordt aangeroepen op de plek waar de routes stonden,
+   De kop sprak van VIER routes -- demo-inlog, uitloggen, accountinlog en "wie
+   ben ik" -- maar die andere drie staan inmiddels in ./inlog-pas.js. Er staat er
+   dus EEN, en dat hoort er te staan: een kop die meer belooft dan het bestand
+   heeft, laat je op de verkeerde plek zoeken.
+
+   De volgorde blijft: dit wordt aangeroepen op de plek waar de routes stonden,
    VOOR de andere auth-submodules, want in dit huis is de volgorde van
-   registreren ook de volgorde van afhandelen.
+   registreren ook de volgorde van afhandelen. De gedeelde stukken (DEMO,
+   pasAppOk, PAS_FOUT, isBaas) komen uit routes/auth.js, met de uitleg daar. */
+const { legInlogVast } = require('../../kern/identiteit/inlogherkomst');
 
-   De gedeelde stukken (DEMO, pasAppOk, PAS_FOUT, isBaas) komen mee uit
-   routes/auth.js en staan daar met de uitleg waarom ze zijn zoals ze zijn. */
 module.exports = (ctx) => {
-  const { accounts, app, auth, crypto, loginFails, noteFailedTry, stateFor, tooManyTries, logInlog,
-    pasAppOk, isBaas, kern , PAS_FOUT } = ctx;
+  const { accounts, app, crypto, loginFails, noteFailedTry, stateFor, tooManyTries, logInlog,
+    pasAppOk, isBaas, kern , PAS_FOUT, sessieregister, tweefactor } = ctx;
 
   /* Eenmalig, niet per verzoek: de emmernaam van een doel wordt gehasht zodat
      een e-mailadres nooit in het geheugen van de rem of in een
@@ -127,11 +129,22 @@ app.post('/api/auth/login', async (req, res) => {
     logInlog('account', false, user.id, req);
     return res.status(403).json({ error: PAS_FOUT });
   }
+  /* DE TWEEDE FACTOR (kern/identiteit/tweefactor.js). Staat hij aan, dan komt
+     hier een kort BEWIJS uit en geen sessietoken; /api/auth/tweede ruilt dat om.
+     Dat dit VOOR het token staat is het punt -- eronder was het een mededeling
+     in plaats van een drempel. Wie geen tweede factor heeft, merkt niets. */
+  const tweedeStap = tweefactor && tweefactor.inlogPoort(user);
+  if (tweedeStap) { logInlog('account', true, user.id, req); return res.json(tweedeStap); }
+
   const token = accounts.issueToken(user.id);
   /* Hier is de inlog een feit: er is een token. Loggen VOOR de werkplek-lus,
      zodat een geslaagde inlog ook een spoor nalaat als daar iets misgaat. */
   logInlog('account', true, user.id, req);
   const sess = { tier: user.tier, key: 'user-' + user.id, account: user };
+  /* Een wachtwoord is `gemeten` en niet `cryptografisch`: een gedeeld geheim
+     gecontroleerd, geen sleutelbezit bewezen (vgl. ./webauthn.js). */
+  legInlogVast({ sessieregister, accounts, token, lidKey: sess.key,
+    type: 'wachtwoord', assurance: 'kennis', methode: 'gemeten', bron: 'auth/inlog' });
   // Bestaande leden krijgen hun publieke adres bij de eerstvolgende veilige
   // inlog; een paswijziging verhuist hier ook naar het juiste pasdomein.
   try { require('../../kern/mail-publiek')({ accounts }).geefLid({
@@ -143,9 +156,5 @@ app.post('/api/auth/login', async (req, res) => {
   let werk = [];
   try { werk = kern.werkplekkenBijLogin ? kern.werkplekkenBijLogin(user.id, sess.key, req) : []; } catch (e) { werk = []; }
   res.json({ token, state: stateFor(sess, req.body.lang), ...(werk.length ? { werk } : {}) });
-});
-
-app.post('/api/auth/me', auth, (req, res) => {
-  res.json({ user: req.session.account ? accounts.publicUser(req.session.account) : stateFor(req.session, req.body.lang).user });
 });
 };

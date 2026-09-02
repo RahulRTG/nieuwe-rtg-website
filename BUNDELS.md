@@ -9,11 +9,11 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**59 bundels, 458 delen, 0 zonder onderwerp.**
+**59 bundels, 460 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 96 delen, 9719 regels in de delen
+`public/apps/app-main/` -- 97 delen, 9830 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -26,6 +26,7 @@ omlaag.
 | `app-main-04.js` | inloggen en de staat binnenhalen: token, pas en het eerste scherm |
 | `app-main-04a.js` | Vervolg van app-main-04: de compositieregels van de poort (een kolom: klok, lippen, aanspreking, veld) |
 | `app-main-04aa.js` | De koekjesmelding hoort niet midden in de kennismaking |
+| `app-main-04aaa.js` | RTG ACCESS COMPOSITIE |
 | `app-main-04ab.js` | Slotstuk van de poortstijl: de brede-schermregels, en daarna pas het insluiten van het blad |
 | `app-main-04b.js` | Vervolg van app-main-04: de poort-inhoud (mond, zin, invoerveld, passkey) en het gesprek erachter |
 | `app-main-05.js` | een zin, geen logboek: Rahuls woorden vervangen elkaar rustig |
@@ -57,9 +58,9 @@ omlaag.
 | `app-main-21.js` | mijn bestellingen: betalen en volgen |
 | `app-main-22.js` | het boekingsblad: de diensten van een partner kiezen |
 | `app-main-23.js` | de lopende rekening bij een partner opvragen |
+| `app-main-23a.js` | RTG OS-schil |
 | `app-main-23b.js` | Afgesplitst van app-main-23.js, dat met dit blok over de 10 KB ging (keuringsregel 13) |
 | `app-main-24.js` | Veiligheid en verbinding |
-| `app-main-24a1.js` | Afgesplitst van app-main-24.js, dat over de 10 KB ging toen er een tegel bijkwam |
 | `app-main-24a2.js` | Afgesplitst van app-main-24.js, dat over de 10 KB ging |
 | `app-main-24a2b.js` | Afgesplitst van app-main-24a2.js, dat over de 10 KB ging (keuringsregel 13) |
 | `app-main-24a3.js` | Afgesplitst van app-main-24a2.js toen dat over de 10 KB ging |
@@ -116,7 +117,7 @@ omlaag.
 
 ## `apps/backoffice.js`
 
-`public/apps/backoffice/` -- 9 delen, 1074 regels in de delen
+`public/apps/backoffice/` -- 9 delen, 1099 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -141,7 +142,7 @@ omlaag.
 
 ## `apps/command.js`
 
-`public/apps/command/` -- 20 delen, 2798 regels in de delen
+`public/apps/command/` -- 21 delen, 2948 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -165,6 +166,7 @@ omlaag.
 | `command-18.js` | RTG Command, deel 18: de incidenten -- wat er stuk was, wat eraan is gedaan, en wat we nog steeds niet weten |
 | `command-19.js` | RTG Command, deel 19: bijstand |
 | `command-20.js` | RTG Command, deel 20: de vloot |
+| `command-21.js` | RTG Command, deel 21: het bezitsbewijs -- hoeveel zware verzoeken zouden er vandaag worden geweigerd als we het aanze... |
 
 ## `apps/defensie.js`
 
@@ -544,7 +546,7 @@ omlaag.
 
 ## `shared/basis.js`
 
-`public/shared/basis/` -- 4 delen, 583 regels in de delen
+`public/shared/basis/` -- 4 delen, 603 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -591,7 +593,7 @@ omlaag.
 
 ## `shared/cookie.js`
 
-`public/shared/cookie/` -- 2 delen, 179 regels in de delen
+`public/shared/cookie/` -- 2 delen, 192 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -600,7 +602,7 @@ omlaag.
 
 ## `shared/deelmenu.js`
 
-`public/shared/deelmenu/` -- 3 delen, 365 regels in de delen
+`public/shared/deelmenu/` -- 3 delen, 374 regels in de delen
 
 | deel | onderwerp |
 |---|---|

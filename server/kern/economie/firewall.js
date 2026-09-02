@@ -70,7 +70,11 @@ module.exports = (ctx) => {
      Dit is de laatste poort voor een factuurregel, en hij is strenger dan de
      vorige: een gebruiker is geen wereld. */
   function magDragerBelasten({ drager, vanWereld }) {
-    const naar = wereldVan(drager);
+    /* NIET werelden.wereldVan, maar de lezer die het identiteitsregister
+       raadpleegt: een identiteit kan een EIGEN wereld zijn (./identiteit.js).
+       De RTFoundation is dat -- haar wallet is een zaak, en zonder deze regel
+       zou de stichting als commerciele klant een rekening kunnen krijgen. */
+    const naar = ctx.wereldVanDrager ? ctx.wereldVanDrager(drager) : wereldVan(drager);
     if (!factureerbaar(naar)) {
       return nee('wereld-factureert-niet',
         'De wereld ' + naar + ' stuurt haar gebruikers geen rekeningen. Kosten van deze wereld worden door de ' +

@@ -554,7 +554,9 @@ function alcoholGrensVan(s) {
 const { maakSessies } = require('./kern/sessies');
 const { sessions, tokenHash, rememberSession, forgetSession, sessionFor,
   koppelBus: koppelSessiesBus, herbouwSessions, TOKEN_TTL_MS } =
-  maakSessies({ db, save, crypto });
+  maakSessies({ db, save, crypto,
+    // lui: accounts is hier al geladen, maar de pijl houdt de volgorde vrij
+    sessieIngetrokken: (sid) => (accounts && typeof accounts.sessieIngetrokken === 'function' ? accounts.sessieIngetrokken(sid) : false) });
 
 /* Inlogpogingen afremmen: per emmer hooguit tien mislukkingen (of de grens die
    de aanroeper meegeeft), daarna vijf minuten wachten. Geldt voor wachtwoorden
@@ -724,7 +726,7 @@ const {
   beveilig, broadcastSync, bufferEvent, bus, connectedSupplierCodes, dirTouch, 
   ensureSupplierDefaults, etaMinutes, gidsHaal, gidsHaalWacht, gidsWeg, gidsZoekCodenaam, guestsFor,
   haversine, initRealtime, keyVanCodenaam, ledenAantal, leverSse, liveCodename, liveStateFor, 
-  mailQ, mailIn, mailAuth, mailBijlage, mailSleutel, rtmailAi, naamlaag, nextSseId, notify, ondernemerpoort, pushLive, resolveSession, rtmail, rtmailTeam,
+  mailQ, mailIn, mailAuth, mailBijlage, mailSleutel, rtmailAi, naamlaag, nextSseId, notify, ondernemerpoort, pushLive, resolveSession, sessieregister, toestellen, bezitsbewijs, tweefactor, commercieel, commercieelStand, commercieelZet, rtmail, rtmailTeam,
   rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar, mailAanname,
   ruimBuffer, salonItemsVan, salonProfielCompleet, salonZichtbaar, sendPush, sendPushToUser, 
   speelOpnieuw, sseBuffer, sseClients, sseSend, sseToCustomer, toRad, webpush, werkmail
@@ -1738,7 +1740,7 @@ const betaalOpdrachten = require('./kern/betaalopdracht')({
    van een klant gaat automatisch 30% (ex btw) naar de foundation. De afdracht
    wordt op het betaalmoment geboekt en, zodra het IBAN in de omgeving staat,
    via de betaal-naad als uitbetaling ingepland. */
-const fonds = maakFonds({ db, save, betaal, log, env: process.env, betaalOpdrachten });
+const fonds = maakFonds({ db, save, bijeen, inBundel, betaal, log, env: process.env, betaalOpdrachten });
 
 /* Munt-ontvangst (server/muntbetaal.js + kern/munten.js): RTG accepteert
    cryptomunten voor zijn eigen diensten en zet ze via een vergunninghoudende
@@ -2099,7 +2101,7 @@ const { aiSystemPrompt, cannedAnswer, generateAiReply, convOf, memberSays, notee
     } });
 
 // De backoffice-laag draagt de AI-kern (conciergeInbox) mee, dus staat hij na maakAi.
-const { officeAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, pendingVerifications } = maakKantoor({
+const { officeAuth, kluisAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, pendingVerifications } = maakKantoor({
   db, sessionFor, eigenaar, accounts, findSupplier, connectedSupplierCodes,
   publicSupplier, conciergeInbox, beveilig, archief, grootAantal, ledenAantal
 });
@@ -2137,9 +2139,9 @@ const kern = {
   guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, klokVan, ledenPrijs,
   eersteBijdrageFactuur, ledenInhoudVan, leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
   mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, handelsketen, agenda, notities, bestanden, bestandenOpslag, meet, galerij, klok, boeken, onderwijs, leerstof, bijles, vervolg, facturatie, factuurSaldo, markt,
-  noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, openVacatures, optieAan,
+  noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, kluisAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, openVacatures, optieAan,
   entreeCode, keyVanCodenaam, gidsHaal, gidsZoekCodenaam, gidsWeg, magBezorgen, parseRunsheetText, path, pendingVerifications, pickupCode, pinSlot, posDay, publicPartner, publicSupplier, ticketsVoorSlot,
-  publicTrip, pushLive, registerContact, rememberSession, resolveSession, ritBezetting, ritVerder, rtf,
+  publicTrip, pushLive, registerContact, rememberSession, resolveSession, sessieregister, toestellen, bezitsbewijs, tweefactor, commercieel, commercieelStand, commercieelZet, ritBezetting, ritVerder, rtf,
   runItem, runKey, salonNaarVolgers, salonProfielCompleet, salonZichtbaar, salonItemsVan, ...ondernemerpoort, save, scheduleFor, schoon, sectiesForOrder, sendPush,
   sendPushToUser, sessionFor, sessions, setRoomHk, sortRunsheet, speelOpnieuw, sseBuffer, sseClients,
   sseSend, sseToCustomer, sseToOffice, sseToSupplier, stateFor, stationsForOrder, supplierAuth, supplierState, persoonsPoort,
@@ -2233,7 +2235,7 @@ const hulp = {
      409 hoorde, en het tegoed bleef verrekend. Nooit de ene helft van dit
      paar doorgeven zonder de andere. */
   ordersVanKlant, ordersVanZaak, pasTegoedToe, herstelTegoed, path, pickupCode, pinSlot, pushLive, rememberSession,
-  reserveerTafel, rtf, rtmail, save, schoon, sendPush, sendPushToUser, sociaal, sseToCustomer,
+  reserveerTafel, rtf, rtmail, save, schoon, sessieregister, sendPush, sendPushToUser, sociaal, sseToCustomer,
   sseToOffice, sseToSupplier, supplierState, ticketsVoorSlot, verdienPunten, zetRtgai, zorgContact,
   /* Voor "wie van je vrienden is er nu" (kern/spellen/presence.js): de levende
      lijst van open live-verbindingen, en dezelfde functiepoort die
@@ -2250,6 +2252,7 @@ const hulp = {
 /* De samenstelling van de kern staat in ./opzet/kernlaag1..7.js --
    aaneengesloten stukken in precies deze volgorde. Zie de kop van kernlaag1.js. */
 require('./opzet/kernlaag1')(kern, hulp);
+require('./opzet/kernlaag1b')(kern, hulp);
 require('./opzet/kernlaag2')(kern, hulp);
 require('./opzet/kernlaag2b')(kern, hulp);
 require('./opzet/kernlaag3')(kern, hulp);

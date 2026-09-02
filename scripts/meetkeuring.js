@@ -67,10 +67,16 @@ function instrumenten() {
     let m;
     if ((m = /scripts\/([a-z0-9-]+)\.js/.exec(hoe))) script = scriptVoor(m[1]);
     else if ((m = /--alleen=([a-z]+)/.exec(hoe))) script = scriptVoor(m[1]);
-    else if ((m = /npm run ([a-z:]+)/.exec(hoe))) {
-      const kaart = { 'dekking:vast': 'dekking', 'bewijsmatrix:vast': 'bewijsmatrix',
-        mutatie: 'mutatie', beproeving: 'beproeving' };
-      script = kaart[m[1]] ? scriptVoor(kaart[m[1]]) : null;
+    else if ((m = /npm run ([a-z:-]+)/.exec(hoe))) {
+      /* Via package.json en niet via een handkaart. De kaart kende vier namen;
+         acht registers uit de samenvoeging (TIKKEN, VINDBAAR, ...) stonden er
+         niet in, kregen `script: null`, en zakten daardoor op de stempelregel
+         als "de code" terwijl de code ze nooit is voorgelegd. Een instrument
+         dat je niet vindt hoort n.v.t. te zijn, of gevonden -- niet gezakt. */
+      const npm = (() => { try { return require('../package.json').scripts || {}; } catch (e) { return {}; } })();
+      const opdracht = npm[m[1]] || '';
+      const s2 = /node (scripts\/[a-z0-9-]+)\.js/.exec(opdracht);
+      script = s2 ? bestaat(s2[1] + '.js') : null;
     }
     /* Een instrument hoeft geen script te zijn. SCHERMLEUGEN.json wordt door een
        TOETS gemeten, en die toets is even goed de plek waar de regels gelden. */

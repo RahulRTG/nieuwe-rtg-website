@@ -771,6 +771,10 @@ test('Reizen & Veilig opent vervoer als direct RTG-werkblad met één onderbalk'
     }, null, { timeout: 20000 });
 
     const living = page.frameLocator('#rtgCommand .cmd-pane.actief iframe');
+    /* Sinds het huis drie standen heeft, staat de bank op een telefoon niet in
+       beeld en woont Reizen onder de stand "Alles" -- een tik verder, zoals een
+       lid het ook doet. */
+    await living.locator('.standen button[data-paneel="alles"]').click();
     await living.locator('a[href="/apps/reizen-veilig.html"]:visible').first().click();
     await page.waitForFunction(() => {
       const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe');

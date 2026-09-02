@@ -380,8 +380,8 @@
       "woorden": [
         "livingos",
         "life",
+        "momenten",
         "leven",
-        "ritme",
         "huis"
       ]
     },
@@ -590,11 +590,32 @@
       "url": "/apps/passkeys.html"
     },
     {
+      "naam": "Post van RTG",
+      "wereld": "Instellingen",
+      "soort": "link",
+      "sleutel": "post",
+      "url": "/apps/mijn-post.html"
+    },
+    {
       "naam": "RTG Veilig",
       "wereld": "Instellingen",
       "soort": "link",
       "sleutel": "veilig",
       "url": "/apps/veilig.html"
+    },
+    {
+      "naam": "Waar ben ik aanwezig",
+      "wereld": "Instellingen",
+      "soort": "link",
+      "sleutel": "sessies",
+      "url": "/apps/mijn-sessies.html"
+    },
+    {
+      "naam": "Wat weet RTG van mij",
+      "wereld": "Instellingen",
+      "soort": "link",
+      "sleutel": "gegevens",
+      "url": "/apps/mijn-gegevens.html"
     },
     {
       "naam": "Wie ben ik",
@@ -605,6 +626,13 @@
       "woorden": [
         "instellingen"
       ]
+    },
+    {
+      "naam": "Wie heeft toegang tot mij",
+      "wereld": "Instellingen",
+      "soort": "link",
+      "sleutel": "relaties",
+      "url": "/apps/mijn-relaties.html"
     },
     {
       "naam": "Documenten",
@@ -870,12 +898,32 @@
       "url": "/apps/vluchten.html"
     },
     {
+      "naam": "Buurtruil",
+      "wereld": "FoundationOS",
+      "soort": "link",
+      "sleutel": "buurtruil",
+      "url": "/apps/foundation/buurtruil.html",
+      "woorden": [
+        "niet",
+        "gebruikt",
+        "zoekt",
+        "iemand"
+      ]
+    },
+    {
       "naam": "FoundationOS",
       "wereld": "FoundationOS",
       "soort": "link",
       "sleutel": "map-rtf",
       "url": "/apps/foundation/os-publiek.html",
       "huis": true
+    },
+    {
+      "naam": "Geven",
+      "wereld": "FoundationOS",
+      "soort": "link",
+      "sleutel": "geven",
+      "url": "/apps/foundation/geven.html"
     },
     {
       "naam": "Het bord",
@@ -892,7 +940,20 @@
       "url": "/apps/foundation/schrift.html"
     },
     {
-      "naam": "RTFoundation in uw buurt",
+      "naam": "Klimaatfonds",
+      "wereld": "FoundationOS",
+      "soort": "link",
+      "sleutel": "klimaat",
+      "url": "/apps/foundation/klimaatfonds.html",
+      "woorden": [
+        "straat",
+        "koelt",
+        "bedenkt",
+        "zelf"
+      ]
+    },
+    {
+      "naam": "RTFoundation in jouw buurt",
       "wereld": "FoundationOS",
       "soort": "link",
       "sleutel": "rtfbuurt",

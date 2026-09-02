@@ -23,7 +23,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon } = require('./helper');
 
 let srv, base;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-zaakbet-'));
@@ -61,7 +61,7 @@ async function lid() {
      voor ELK pas-lid, met de aanname "met paspoort geballoteerd". Die aanname
      is eruit -- terecht -- en deze toets loopt de keuring nu gewoon af in plaats
      van erop te leunen. */
-  const kantoor = (await api('/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+  const kantoor = await kantoorAlsPersoon(base, 'RTG-OFFICE');
   const wachtend = (await api('/api/office/verifications', {}, kantoor)).body.pending || [];
   const mij = wachtend.find((x) => x.email === 'zb-' + u + '@toets.example') || wachtend[wachtend.length - 1];
   assert.ok(mij, 'de keuring ziet de ingediende aanvraag');

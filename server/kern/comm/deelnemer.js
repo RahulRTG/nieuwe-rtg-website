@@ -18,6 +18,7 @@
    een teken. Ze staan met hun reden erbij, want dat zijn de getallen waar
    iemand later aan gaat draaien. */
 'use strict';
+const klok = require('../../lib/klok');
 
 const VLAGGEN = ['vast', 'stil', 'weg'];
 const WIJZIG_MS = 15 * 60000;   // een correctie mag een kwartier lang
@@ -51,7 +52,7 @@ function maakDeelnemer(binnen) {
     const m = berichtVan(g, berichtId);
     if (m.van !== key) throw new Error('Je kunt alleen je eigen bericht wijzigen.');
     if (m.weg) throw new Error('Dit bericht is ingetrokken.');
-    if (Date.now() - Date.parse(m.at) > WIJZIG_MS) throw new Error('Dit bericht is te oud om nog te wijzigen.');
+    if (klok.nu() - Date.parse(m.at) > WIJZIG_MS) throw new Error('Dit bericht is te oud om nog te wijzigen.');
     const nieuw = String(tekst || '').slice(0, MAX_TEKST).trim();
     if (!nieuw) throw new Error('Een bericht leegmaken is intrekken, niet wijzigen.');
     m.was = m.was || m.tekst;
@@ -118,13 +119,13 @@ function maakDeelnemer(binnen) {
   }
 
   /* -------------------------------------------- aanwezigheid en typen */
-  function levensteken(key) { aanwezig.set(key, Date.now()); }
-  const isAanwezig = (key) => (Date.now() - (aanwezig.get(key) || 0)) < AANWEZIG_MS;
+  function levensteken(key) { aanwezig.set(key, klok.nu()); }
+  const isAanwezig = (key) => (klok.nu() - (aanwezig.get(key) || 0)) < AANWEZIG_MS;
   function typtNu(key, gesprekId) {
     const g = eis(gesprekId, key);
     levensteken(key);
     const m = typt.get(g.id) || new Map();
-    m.set(key, Date.now());
+    m.set(key, klok.nu());
     typt.set(g.id, m);
     seinNaarDeRest(g, key, 'typt', { gesprekId: g.id, wie: noem(key) });
     return true;
@@ -134,7 +135,7 @@ function maakDeelnemer(binnen) {
     if (!m) return [];
     const uit = [];
     for (const [key, t] of m) {
-      if (Date.now() - t > TYPT_MS) { m.delete(key); continue; }
+      if (klok.nu() - t > TYPT_MS) { m.delete(key); continue; }
       if (key === behalve) continue;
       uit.push(noem(key));
     }
@@ -150,10 +151,10 @@ function maakDeelnemer(binnen) {
     const g = eis(gesprekId, key);
     const s = key + '|' + gesprekId;
     const laatst = nudges.get(s) || 0;
-    if (Date.now() - laatst < NUDGE_MS) {
+    if (klok.nu() - laatst < NUDGE_MS) {
       throw new Error('Even wachten -- een por mag een keer per minuut.');
     }
-    nudges.set(s, Date.now());
+    nudges.set(s, klok.nu());
     seinNaarDeRest(g, key, 'nudge', { gesprekId: g.id, wie: noem(key) });
     return true;
   }

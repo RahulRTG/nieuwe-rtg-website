@@ -36,33 +36,63 @@ function maakTokens(getUserById) {
      doen. Een oud token zonder dat derde deel geldt als uitgegeven op moment 0
      en valt dus af zodra er ooit een grens is gezet; dat is de juiste kant om
      naar te falen. */
-  /* HET VIERDE VELD: WELK APPARAAT.
+  /* HET VIERDE EN HET VIJFDE DEEL: EEN SESSIE-ID EN EEN APPARAAT.
 
-     Achterwaarts compatibel, en dat is geen aanname maar de vorm van de lezer
-     hieronder: `body.split('.')` pakt de eerste drie en negeert wat erachter
-     staat, en de handtekening dekt de hele body. Een token dat vandaag in omloop
-     is blijft dus gewoon geldig, en een nieuw token met een vierde veld ook.
+     TWEE TAKKEN CLAIMDEN ALLEBEI PLEK VIER, en dat is hier opgelost in plaats
+     van weggekozen. De sid van main is de fundamentelere: hij maakt een sessie
+     AANWIJSBAAR, en daar hangen "toon mijn actieve sessies", het intrekken van
+     een sessie en de contextbinding aan. De apparaatsleutel van de isolatielaag
+     is een kenmerk VAN die sessie. De sid houdt dus plek vier en het apparaat
+     schuift naar vijf -- wie het andersom doet, breekt elk token dat main al
+     heeft uitgegeven.
 
-     WAT ER IN STAAT IS EEN AFGELEIDE, geen credential-id. De sleutel komt uit
-     kluis.sleutelVoor('isolatie-apparaat') met HKDF-domeinscheiding: hij is
-     stabiel per toestel, en niet terug te rekenen naar de passkey waar hij
-     vandaan komt. Zonder die afleiding zou een token het id van een
-     authenticator dragen -- een kenmerk dat over accounts heen te herkennen is.
+     DE SID (deel 4). Een lid komt niet door kern/sessies.js binnen maar via
+     verifyToken, en resolveSession bouwt bij ELK verzoek een vers sessie-object
+     (opzet/diensten2.js). Er werd dus nergens een sessie bewaard, en daarmee was
+     "toon mijn actieve sessies" niet een ontbrekend scherm maar een
+     onbeantwoordbare vraag. Het token blijft staatloos en draagt geen
+     persoonsgegeven; wat erbij hoort staat in het register.
 
-     ALLEEN EEN PASSKEY-INLOG LEVERT ER EEN. Een wachtwoordinlog niet, en dat is
-     geen tekortkoming maar de waarheid: RTG kent dan geen toestel, en een
-     verzonnen sleutel zou een stand opleveren die aan niets hangt. */
+     HET APPARAAT (deel 5) IS EEN AFGELEIDE, geen credential-id. De sleutel komt
+     uit kluis.sleutelVoor('isolatie-apparaat') met HKDF-domeinscheiding: stabiel
+     per toestel, en niet terug te rekenen naar de passkey waar hij vandaan komt.
+     Zonder die afleiding zou een token het id van een authenticator dragen -- een
+     kenmerk dat over accounts heen te herkennen is. Alleen een PASSKEY-inlog
+     levert er een; een wachtwoordinlog niet, en dat is geen tekortkoming maar de
+     waarheid: RTG kent dan geen toestel, en een verzonnen sleutel zou een stand
+     opleveren die aan niets hangt.
+
+     TERUGWAARTS VEILIG, en dat is de vorm van de lezers en geen aanname: een oud
+     token heeft drie delen, een token van main vier, dit er vijf. `body.split`
+     geeft eenvoudig minder terug, en elke lezer hieronder valt dan terug op null
+     -- "dit token draagt dat gegeven niet", wat waar is. De handtekening dekt de
+     hele body, dus er valt niets bij te schrijven. Geen migratie, geen uitlog. */
   function issueToken(userId, days = 30, apparaat) {
-    const kop = userId + '.' + (Date.now() + days * 86400000) + '.' + Date.now();
+    const sid = crypto.randomBytes(9).toString('base64url');
+    const kop = userId + '.' + (Date.now() + days * 86400000) + '.' + Date.now() + '.' + sid;
     const merk = apparaat ? String(apparaat).replace(/[^a-f0-9]/g, '').slice(0, 32) : '';
     const body = merk ? kop + '.' + merk : kop;
     return Buffer.from(body).toString('base64url') + '.' + kluis.sign(body);
   }
 
+  /* De sid uit een token lezen. Doet NIET aan geldigheid: dat is verifyToken.
+     Wie de context van een sessie ophaalt, hoort eerst te weten dat de sessie
+     geldig is en pas daarna welke het is. Twee vragen, twee functies. */
+  function sessieVan(token) {
+    token = strikt(token);
+    if (!token) return null;
+    try {
+      const b64 = String(token).split('.')[0];
+      const sid = Buffer.from(b64, 'base64url').toString().split('.')[3];
+      return sid && /^[A-Za-z0-9_-]{12}$/.test(sid) ? sid : null;
+    } catch (e) { return null; }
+  }
+
   /* De apparaatsleutel uit een token, NA verificatie van de handtekening. Zonder
      die volgorde zou een aanvaller een toestelkenmerk kunnen kiezen door het
      token te herschrijven -- en dan is de drager `apparaat` een veld uit het
-     verzoek, precies wat deze hele laag verbiedt. */
+     verzoek, precies wat de isolatielaag verbiedt. Vandaar ook het verschil met
+     sessieVan hierboven: die leest een id, deze leest een BEVOEGDHEID. */
   function apparaatVanToken(token) {
     const t = strikt(token);
     if (!t) return null;
@@ -72,14 +102,14 @@ function maakTokens(getUserById) {
       const body = Buffer.from(b64, 'base64url').toString();
       if (!veiligGelijk(kluis.sign(body), sig)) return null;
       const delen = body.split('.');
-      return delen.length >= 4 && /^[a-f0-9]{1,32}$/.test(delen[3]) ? delen[3] : null;
+      return delen.length >= 5 && /^[a-f0-9]{1,32}$/.test(delen[4]) ? delen[4] : null;
     } catch (e) { return null; }
   }
   /* De intreklijst (welke uitgegeven tokens niet meer gelden) staat in
      ./intreklijst.js: dat deel schrijft als enige naar de database, de rest van
      dit bestand is pure cryptografie. Hij krijgt de strikte vorm mee, zodat er
      maar EEN opvatting bestaat van wat een token is. */
-  const { trekIn, trekInActie, isIngetrokken } = require('./intreklijst')(strikt);
+  const { trekIn, trekInActie, isIngetrokken, trekInSessie, sessieIngetrokken } = require('./intreklijst')(strikt);
 
   function verifyToken(token) {
     token = strikt(token);
@@ -94,9 +124,13 @@ function maakTokens(getUserById) {
          uitgerekend deze deur, waar elk verzoek langskomt, stond nog op de
          kale vergelijking. */
       if (!veiligGelijk(kluis.sign(body), sig)) return null;
-      const [id, exp, uitgegeven] = body.split('.');
+      const [id, exp, uitgegeven, sid] = body.split('.');
       if (Number(exp) < Date.now()) return null;
       if (isIngetrokken(token)) return null; // uitgelogd: de handtekening klopt, wij niet meer
+      /* En de sessie zelf. Dit is de tweede deur, en hij bestaat omdat de eerste
+         het token nodig heeft -- dat heeft alleen de houder. Zonder deze regel
+         is "sluit die andere sessie" een knop die niets doet. */
+      if (sid && sessieIngetrokken(sid)) return null;
       const u = getUserById(Number(id));
       /* De grens per account: alles wat voor sessies_vanaf is uitgegeven, geldt
          niet meer. Een wachtwoordwijziging zet die grens (zie setPassword), en
@@ -142,7 +176,7 @@ function maakTokens(getUserById) {
      aanroepers niets merken van de knip. */
   const herstel = require('./herstel').maakHerstel(getUserById);
 
-  return { issueToken, verifyToken, apparaatVanToken, trekIn, trekInActie, isIngetrokken, issueActionToken, verifyActionToken,
+  return { issueToken, verifyToken, apparaatVanToken, sessieVan, trekIn, trekInActie, isIngetrokken, trekInSessie, sessieIngetrokken, issueActionToken, verifyActionToken,
     setEmailVerified: herstel.setEmailVerified, createReset: herstel.createReset,
     findByReset: herstel.findByReset, setPassword: herstel.setPassword };
 }

@@ -92,7 +92,7 @@
       '<h2>Uw giften</h2>' +
       '<div class="kaart" id="mcLijst">' +
         ((dd.giften || []).length ? dd.giften.map(giftRij).join('')
-          : '<p class="stil">Nog geen giften vastgelegd.</p>') +
+          : '<p class="leeg">Nog geen giften vastgelegd.</p>') +
       '</div>' +
       '<h2>Vraag de adviseur</h2>' +
       '<div class="kaart">' +

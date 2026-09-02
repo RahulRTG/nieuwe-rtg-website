@@ -39,7 +39,7 @@ function maakCommand({ db, save, crypto, anthropic, sseToOffice, kern }) {
   const register = require('./register').RTG;
   const journaal = require('./journaal').maakJournaal({ db, save, crypto, opslag });
   const beleid = require('./beleid').maakBeleid({ db, save, crypto, journaal, opslag });
-  const risico = require('./risico').maakRisico({ beleid });
+  const risico = require('../frictie').maakRisico({ beleid });
   const toegang = require('./toegang').maakToegang({ db, save, crypto, journaal, opslag });
   const zaken = require('./zaken').maakZaken({ db, save, crypto, journaal, beleid, opslag });
   const runbooks = require('./runbooks').maakRunbooks({ db, save, crypto, journaal, risico, beleid, register, opslag });

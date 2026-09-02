@@ -31,6 +31,8 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
+/* De poort hieronder: mag dit register uberhaupt geschreven worden? */
+const { eisSchoneBoom } = require('./lib/stempel');
 const { execFileSync } = require('child_process');
 
 const WORTEL = path.join(__dirname, '..');
@@ -201,6 +203,47 @@ function duidUitslag(uitvoer) {
 }
 
 module.exports = { verzamel, duidUitslag, kanNietDraaien, staatVan, leesDekking, uitPad, VELDEN, BRONNEN };
+
+/* ==========================================================================
+   DE POORT VOOR HET SCHRIJVEN -- en waarom juist DIT register er een nodig had.
+
+   Dit bestand schrijft CONTROLS.json, en dat register is geen rapport: de
+   bewijspoort in server/kern/stuur/beleid.js LEEST hem en weigert een route
+   waarvan het bewijs volgens deze afdruk is gezakt. Een verkeerd register zet
+   dus echte handelingen stil.
+
+   Dat is echt gebeurd, twee keer in een zitting. Het register werd afgeleid uit
+   een testronde die halverwege was afgebroken. De routes waarvan de toetsen
+   niet meer aan de beurt waren kwamen als "gezakt bewijs" binnen, VERTROUWEN
+   sprong van 0 naar 45 geschorst, en de volgende ronde antwoordde overal met
+   "Deze handeling is tijdelijk geschorst" -- op plekken waar niets mis was.
+   Aan het bestand is dat verschil niet te zien: een half gemeten register ziet
+   er precies zo uit als een volledig gemeten register.
+
+   TWEE EISEN DUS, ALLEBEI VOOR HET SCHRIJVEN:
+
+     1. een schone boom -- zelfde poort als de zes proefrunners
+        (scripts/rolproef-route.js e.a.). Ongecommit werk betekent dat het
+        register bij iets anders hoort dan bij de commit die het noemt.
+     2. de bronregisters mogen niet ouder zijn dan de laatste ronde, en er moet
+        er minstens EEN zijn. Ontbreken ze allemaal, dan is er niets gemeten en
+        hoort er niets geschreven te worden.
+
+   Weigeren gebeurt MET een reden en met een uitweg, zoals elke verhindering in
+   dit huis (GRAMMATICA.md). Lezen en tonen blijft altijd mogelijk -- de poort
+   staat op het SCHRIJVEN en niet op het meten, want een meter die je niet mag
+   draaien is geen meter.
+   ========================================================================== */
+function poortVoorSchrijven(watIsHet) {
+  const b = eisSchoneBoom(watIsHet);
+  if (!b.ok) {
+    console.error('\n  NIET VASTGELEGD -- dit register stuurt de bewijspoort aan\n');
+    console.error('  ' + b.reden);
+    for (const r of (b.bestanden || [])) console.error('    ' + r);
+    process.exit(3);
+  }
+}
+
 if (require.main !== module) return;
 
 const controls = verzamel();
@@ -261,6 +304,8 @@ const stand = {
 };
 
 if (JSONUIT) { console.log(JSON.stringify(stand, null, 1)); process.exit(0); }
+
+poortVoorSchrijven('het controleregister');
 
 fs.writeFileSync(UITSLAG, JSON.stringify(stand, null, 2) + '\n');
 console.log('\n  gemeten en vastgelegd in CONTROLS.json:');

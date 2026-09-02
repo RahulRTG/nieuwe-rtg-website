@@ -41,9 +41,9 @@
       $('#waMuntPrijs').textContent = 'Munten kosten ' + Geld.euro(Math.round(r.muntPrijs * 100)) +
         ' per stuk (demo). Kopen verhoogt het saldo, inwisselen verlaagt het.';
     } catch (e) {
-      $('#waFout').innerHTML = '<p class="stil">' + Geld.esc(e.message) + ' Log eerst in via de leden-app.</p>';
+      $('#waFout').innerHTML = RTGLeeg.html(RTGLeeg.vanFout({ status: 401, message: Geld.esc(e.message) }));
       var leeg = ['#waLijstPas', '#waLijstTicket', '#waLijstSleutel', '#waLijstMunt', '#waLijstKaart'];
-      for (var i = 0; i < leeg.length; i++) $(leeg[i]).innerHTML = '<p class="stil">Niet geladen.</p>';
+      for (var i = 0; i < leeg.length; i++) $(leeg[i]).innerHTML = '<p class="stil">Dit deel laadde niet. Ververs de pagina; blijft het staan, dan is de bron even niet bereikbaar.</p>';
     }
   }
 

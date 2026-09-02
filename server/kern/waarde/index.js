@@ -149,6 +149,9 @@ function maakWaarde({ db, save, crypto, nu = klokNu }) {
     reserveringenVan: reserve.voorRef, reservering: reserve.vind,
     oormerken: oormerk.oormerken, apart: oormerk.apart,
     oormerkZet: oormerk.oormerkZet, oormerkVrij: oormerk.oormerkVrij };
+  /* De terugname (./terugname.js) staat apart omdat zij als enige in deze
+     laag iets WEGHAALT. Wat zij mag en niet mag, staat daar. */
+  Object.assign(api, require('./terugname')({ posities, positie, save }));
   Object.assign(api, require('./uitgifte')({ api, crypto, nu }));
   /* De samenstelling (./samenstellen.js): uit welke potjes komt deze betaling,
      en in welke volgorde. Rekent alleen uit; boeken doet kern/pay/samen.js,

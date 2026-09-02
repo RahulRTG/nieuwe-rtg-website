@@ -553,3 +553,22 @@ En het grootste gat is per definitie niet te tellen: **er is nog nooit iemand me
 een handicap door dit huis gelopen.** Alles hierboven is gemeten met een browser.
 Een half uur met een echte schermlezergebruiker vindt dingen die geen scanner
 kent, en dat half uur heeft niemand hier gehad.
+
+## Wat de raakvlakronde niet zag (31 augustus 2026)
+
+De nulstand `onder24: 0` in `A11Y-INGELOGD.json` was waar, en hij was alleen
+waar voor de **tweede** bezoeker. `public/shared/cookie/cookie-01.js` begint met
+`if (localStorage.getItem(SLEUTEL)) return;` — de cookiebalk verdwijnt zodra
+iemand een keer heeft bevestigd. De raakvlakronde draait **ingelogd**, dus keek
+hij naar een balk die er niet meer was.
+
+In een verse browser op 390x844 stonden er twee raakvlakken van **17 hoog en 22
+breed** (`Privacy` en `Prima`), op *elk* scherm van dit huis, bij *elk* eerste
+bezoek. Gemeten met Chromium, niet geschat. Ze staan nu op 24x24, met de
+onderlijn op de tekst in plaats van op de rand van het vakje — anders zakt de
+streep mee omlaag als het raakvlak groeit.
+
+**De les is niet de balk maar de meetopzet.** Een ronde die maar één staat van
+de pagina bezoekt, meet de andere staat niet, en zwijgt daar even overtuigd
+over. `test/raakvlak.test.js` bewaakt nu de stijlregel zelf, want de ronde zou
+dit opnieuw missen.

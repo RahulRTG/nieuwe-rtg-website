@@ -76,6 +76,18 @@ Object.assign(kern, require('../kern/invoer').maakInvoer({
    eigen manier bij om vast te stellen wie iemand is. */
 Object.assign(kern, require('../kern/reisuitnodiging').maakReisuitnodiging({
   db, save, crypto, invoer: kern.invoer, idGeverifieerd: kern.idGeverifieerd }));
+/* HET REISGEZELSCHAP (kern/reisgezelschap.js): de mensen rond EEN reis, en de
+   poort die bepaalt wie wat van die reis ziet. Staat hier omdat hij de
+   samengestelde Reis nodig heeft (kern.mijnReizen, hierboven gemonteerd) en de
+   codenaam-laag -- er komt geen tweede plek waar een reis wordt samengesteld,
+   en geen tweede plek waar een naam vandaan komt. */
+Object.assign(kern, require('../kern/reisgezelschap').maakReisgezelschap({
+  db, save, crypto, mijnReizen: kern.mijnReizen, codenaamVan: kern.codenaamVan,
+  keyVanCodenaam,
+  /* Beeld op de tijdlijn is een VERWIJZING naar de kluis van de reiziger; de
+     deellaag van die kluis regelt de toegang. Zo komt er geen tweede opslag
+     en geen tweede bewaartermijn bij. */
+  bestandenDeel: kern.bestanden && kern.bestanden.bestandenDeel }));
 /* De tijdzone-hulp van het huis leent diezelfde plaatsbepaling: van een zaak in
    "Ibiza" weten we zo dat zij in Europe/Madrid staat. Een keer registreren, en
    daarna geven de Mall, de vakwerk-agenda en de Food Court gegarandeerd

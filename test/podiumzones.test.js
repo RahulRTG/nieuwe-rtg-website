@@ -22,7 +22,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon } = require('./helper');
 
 let srv, base, office;
 let volwassen, tweede, jong, kaal;          // vier soorten leden
@@ -60,7 +60,7 @@ async function lid(naam, geboren, geverifieerd) {
 test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   base = srv.base;
-  office = (await api('/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+  office = await kantoorAlsPersoon(base, 'RTG-OFFICE');
   assert.ok(office, 'het kantoor is ingelogd');
 });
 test.after(() => {

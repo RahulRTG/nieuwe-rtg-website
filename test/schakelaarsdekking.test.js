@@ -99,6 +99,24 @@ test('4. elke route hoort bij een functie of bij de bediening', () => {
   const paren = [];
   for (const f of F) for (const p of (f.paden || [])) paren.push(p);
   const zonder = routes.filter(r => !paren.some(p => prefixLengte(r.pad, p) > 0));
+  /* TWEE GRENZEN, EN ZE METEN NIET HETZELFDE. Deze twee kwamen uit twee takken
+     die allebei dezelfde toets versterkten; ze staan hier naast elkaar omdat de
+     ene de andere niet vervangt.
+
+     ONVERKLAARD (<= 10) is de scherpe: een route die aan geen functie hangt EN
+     in geen register staat, is niet schakelbaar terwijl niemand heeft
+     opgeschreven waarom. Dat is het echte gat.
+
+     RUW (<= 120) is de grove, en hij komt van main met zijn eigen onderbouwing:
+     de zelfbedieningslaag van het lid (tweefactor, sessies, herstelkanaal,
+     toestel, twee relatie-routes) hoort met opzet niet aan een schakelaar --
+     een knop waarmee het huis de tweefactor van een lid uitzet, hoort niet te
+     bestaan. Die twintig staan als BEDIENING in kern/platformregister/bediening.js,
+     elk met een reden, en test/platformregister.test.js eist dat elke route daar
+     BENOEMD is. Zonder die volgorde was een hoger getal hier alleen een zachtere
+     meter geweest.
+
+     Wat allebei bewaken is hetzelfde: dat het er niet STILLETJES meer worden. */
   const onverklaard = zonder.filter(r => !redenVoor(r.pad)).map(r => r.pad);
 
   assert.ok(onverklaard.length <= 10,
@@ -107,9 +125,12 @@ test('4. elke route hoort bij een functie of bij de bediening', () => {
     onverklaard.sort().join(', ') + ' -- zet ze in server/kern/bestuursroutes.js met een reden, ' +
     'of geef ze een functie. (Ruw, zonder functie maar wel verklaard: ' + zonder.length + '.)');
 
-  /* EN HET RUWE GETAL BLIJFT ZICHTBAAR, want het is niet niets: elke route die
-     buiten de schakelkast valt, is een route die de boardroom niet kan sluiten.
-     Hij ratelt alleen niet meer, omdat de vraag "mag dit buiten de kast" al
-     ergens anders wordt beantwoord. */
+  assert.ok(zonder.length <= 120,
+    zonder.length + ' routes hangen aan geen enkele functie. Dat is de bediening van ' +
+    'het platform (boardroom, techniek, gezondheid) en die hoort niet schakelbaar te zijn, ' +
+    'maar bij deze aantallen is er iets anders aan de hand.');
+
+  /* EN HET RUWE GETAL MAG NIET NUL ZIJN: nul zou betekenen dat de meting stuk
+     is, niet dat het huis dicht is. */
   assert.ok(zonder.length > 0, 'nul zou betekenen dat de meting stuk is, niet dat het huis dicht is');
 });

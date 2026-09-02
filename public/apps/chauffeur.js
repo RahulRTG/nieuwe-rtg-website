@@ -254,10 +254,22 @@
     return kaart;
   }
   function tekenFout() {
-    var kaart = maak('article', 'ritkaart leeg foutkaart'); kaart.appendChild(maak('p', 'kaartlabel', 'VERBINDING NODIG'));
-    kaart.appendChild(maak('h2', '', 'Ritten konden niet worden geladen'));
+    var aanmelden = staat.foutsoort === 'aanmelden';
+    var kaart = maak('article', 'ritkaart leeg foutkaart');
+    kaart.appendChild(maak('p', 'kaartlabel', aanmelden ? 'AANMELDEN NODIG' : 'VERBINDING NODIG'));
+    kaart.appendChild(maak('h2', '', aanmelden ? 'U bent niet aangemeld als chauffeur' : 'Ritten konden niet worden geladen'));
     kaart.appendChild(maak('p', '', staat.fout || 'Controleer uw verbinding en probeer opnieuw.'));
-    var b = maak('button', 'hoofdactie'); b.type = 'button'; b.appendChild(maak('span', '', 'PROBEER OPNIEUW')); b.appendChild(maak('b', '', '→')); b.addEventListener('click', laad); kaart.appendChild(b);
+    /* Een knop die niets kan doen, hoort er niet te staan: opnieuw proberen
+       lost een ontbrekende aanmelding nooit op. */
+    if (aanmelden) {
+      var a = maak('a', 'hoofdactie'); a.href = '/apps/leverancier.html';
+      a.appendChild(maak('span', '', 'NAAR DE PERSONEELSLOGIN')); a.appendChild(maak('b', '', '\u2192'));
+      kaart.appendChild(a);
+    } else {
+      var b = maak('button', 'hoofdactie'); b.type = 'button';
+      b.appendChild(maak('span', '', 'PROBEER OPNIEUW')); b.appendChild(maak('b', '', '\u2192'));
+      b.addEventListener('click', laad); kaart.appendChild(b);
+    }
     return kaart;
   }
 
@@ -346,8 +358,15 @@
       zetVerbinding(true, 'LIVE');
       if (!staat.poll) staat.poll = setInterval(function () { if (!document.hidden) laad(); }, 12000);
     } catch (e) {
+      /* NIET AANGEMELD IS GEEN STORING. Dat verschil stond in de tekst maar
+         niet in de kop en niet in de verbindingschip: wie deze PDA opende
+         zonder personeelssessie las "VERBINDING NODIG -- ritten konden niet
+         worden geladen" met daaronder een storingslampje, terwijl er niets mis
+         was met de verbinding. Een chauffeur langs de weg gaat dan zijn
+         netwerk zoeken in plaats van zich aan te melden. */
       staat.fout = e.status === 401 ? 'Meld u aan via de persoonlijke RTG-personeelslogin.' : e.message;
-      zetVerbinding(false, navigator.onLine ? 'STORING' : 'OFFLINE');
+      staat.foutsoort = e.status === 401 ? 'aanmelden' : 'verbinding';
+      zetVerbinding(false, e.status === 401 ? 'AANMELDEN' : (navigator.onLine ? 'STORING' : 'OFFLINE'));
     } finally {
       staat.bezig = false; render(); staat.eersteLading = false;
     }

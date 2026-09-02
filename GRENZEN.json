@@ -4,6 +4,7 @@
     "aanmeldgesprek": [
       "intakeStart",
       "intakeZeg",
+      "sessieregister",
       "stateFor"
     ],
     "aanmeldingen": [
@@ -78,11 +79,13 @@
       "pasAppVan",
       "password",
       "rememberSession",
+      "sessieregister",
       "sessions",
       "startHerstel",
       "stateFor",
       "telefoon",
       "tier",
+      "tweefactor",
       "webauthn",
       "webauthnLijst",
       "webauthnLoginMaak",
@@ -180,6 +183,8 @@
     ],
     "command": [
       "apiSpoor",
+      "bezitsbewijs",
+      "doelpoort",
       "command",
       "veilig",
       "wie"
@@ -260,8 +265,13 @@
       "werkOverzicht"
     ],
     "consent": [
+      "commercieelStand",
+      "commercieelZet",
       "consentIntrek",
       "consentVan",
+      "gevolgenVan",
+      "relatieSluit",
+      "relatiesVan",
       "status"
     ],
     "dagcoach": [
@@ -287,6 +297,9 @@
       "boardroomAuth",
       "economie",
       "kosten"
+    ],
+    "experience": [
+      "experience"
     ],
     "facturatie": [
       "facturatie"
@@ -372,6 +385,9 @@
       "gedachteZet",
       "gedachtenVan",
       "status"
+    ],
+    "gegevenskaart": [
+      "gegevenskaart"
     ],
     "geld": [
       "geldbeleid",
@@ -649,6 +665,7 @@
     ],
     "livinglab": [
       "id",
+      "labfonds",
       "livinglab",
       "staf",
       "veilig",
@@ -725,11 +742,13 @@
       "PERSONAS",
       "STEMMINGEN",
       "ZZP",
+      "accounts",
       "agendaVoor",
       "aiSystemPrompt",
       "annuleerItem",
       "annuleerReservering",
       "apiSpoor",
+      "appUrl",
       "appbieb",
       "applyChatVertaald",
       "assetDocument",
@@ -802,6 +821,7 @@
       "commDm",
       "commGast",
       "commWerk",
+      "commercieel",
       "conciergeIntrek",
       "conciergeVerzoeken",
       "conciergeVraag",
@@ -1087,6 +1107,7 @@
       "salonProfiel",
       "salonReacties",
       "salonZichtbaar",
+      "sessieregister",
       "sessions",
       "socialConnecties",
       "sparLijst",
@@ -1104,8 +1125,10 @@
       "tableWeg",
       "tableZet",
       "tables",
+      "toestellen",
       "toggleFavoriet",
       "trChat",
+      "tweefactor",
       "txLedgerActief",
       "txLedgerTel",
       "txLedgerVanKlant",
@@ -1285,6 +1308,7 @@
       "handelsregelwacht",
       "instelling",
       "keyVanCodenaam",
+      "kluisAuth",
       "logInlog",
       "loginFails",
       "mail",
@@ -1306,6 +1330,7 @@
       "pendingVerifications",
       "rechtsvormwacht",
       "rememberSession",
+      "rtfWallet",
       "rvTafelKantoor",
       "rvTafelMaak",
       "rvTafelNodig",
@@ -1453,6 +1478,7 @@
       "liveCodename",
       "mijnReizen",
       "reisLanden",
+      "reisgezelschap",
       "reisoplosser",
       "reisuitnodiging",
       "reiswacht",
@@ -1480,6 +1506,7 @@
       "vervolg"
     ],
     "rtfos": [
+      "boardroomAuth",
       "rtfos"
     ],
     "rtfschool": [
@@ -1702,6 +1729,7 @@
       "accounts",
       "appUrl",
       "logInlog",
+      "sessieregister",
       "stateFor",
       "tenant"
     ],
@@ -2186,6 +2214,7 @@
       "auth",
       "db",
       "findSupplier",
+      "kluisAuth",
       "logActivity",
       "notify",
       "officeAuth",
@@ -2201,6 +2230,7 @@
       "vakbewijzenVerlopend"
     ],
     "vakbewijs-kantoor": [
+      "kluisAuth",
       "persoonseis",
       "sendPushToUser",
       "stuur",

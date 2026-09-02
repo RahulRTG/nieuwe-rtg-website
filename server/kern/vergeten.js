@@ -139,6 +139,19 @@ module.exports = function maakVergeten(kern) {
        oude kop erin. Zo verdwijnt de persoon zonder dat het spoor stilletjes
        een ander verleden gaat vertellen. */
     if (kern.apiSpoor && kern.apiSpoor.wisActor) kern.apiSpoor.wisActor(key, 'recht op vergetelheid (AVG art. 17)');
+    /* EN HET SESSIEREGISTER VAN MIJN RTG. Dat is iets anders dan de sessies die
+       hieronder worden uitgelogd: forgetSession raakt de Map met tokens, dit
+       register houdt de CONTEXT per sessie (waar, met welk toestel, hoe zeker)
+       en overleeft het token met opzet. Zonder deze regel bleef de sleutel van
+       het lid daar staan -- de bezem van test/vergeten-gezelschap.test.js vond
+       hem terug als tak `sessiecontext (sleutel)`.
+
+       De functie woont in het register zelf en niet hier, om twee redenen: die
+       module BEZIT de collectie (kern/eigencollectie), en wissen moet kijken
+       naar wat er staat in plaats van naar wat vanLid() nog toont -- die filtert
+       op een TTL van dertig dagen, en juist de oudste rij is de rij die het
+       langst blijft liggen. */
+    if (kern.sessieregister && kern.sessieregister.wisLid) kern.sessieregister.wisLid(key);
     // alle sessies van dit lid uitloggen
     for (const [h, sess] of sessions) if (sess.key === key) forgetSession(h);
     /* EEN SUCCESANTWOORD BETEKENT HIER OOK: OP SCHIJF.

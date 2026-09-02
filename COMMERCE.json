@@ -2,24 +2,24 @@
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
   "vastgelegd": "2026-09-02",
   "gemeten": {
-    "bestanden": 1933,
-    "domeinenTotaal": 540,
-    "koopbareVormen": 517,
+    "bestanden": 2002,
+    "domeinenTotaal": 553,
+    "koopbareVormen": 524,
     "koopbareDomeinen": 109,
     "envelopDrempel": 7,
-    "envelop": 44,
-    "veldenDomeineigen": 705,
-    "veldenNietEnvelop": 914,
-    "gelijkendeVormparen": 7,
+    "envelop": 45,
+    "veldenDomeineigen": 718,
+    "veldenNietEnvelop": 934,
+    "gelijkendeVormparen": 9,
     "werkwoordenVolledig": 1,
     "werkwoordenOveral": 0,
     "werkwoordCombinaties": 43,
-    "wagenVormen": 31,
-    "wagenVormenUniek": 28,
-    "wagenDomeinen": 20,
-    "optellingen": 103,
-    "optelDomeinen": 52,
-    "optelCenten": 54,
+    "wagenVormen": 33,
+    "wagenVormenUniek": 30,
+    "wagenDomeinen": 22,
+    "optellingen": 108,
+    "optelDomeinen": 53,
+    "optelCenten": 59,
     "optelEuro": 5,
     "optelGemengd": 0,
     "optelOnbekend": 44
@@ -62,6 +62,7 @@
     "supplierCode",
     "titel",
     "totaal",
+    "totaalCenten",
     "type",
     "uitleg",
     "valuta",
@@ -72,8 +73,8 @@
   ],
   "perWerkwoord": {
     "toon": 86,
-    "prijs": 34,
-    "beschikbaarheid": 49,
+    "prijs": 36,
+    "beschikbaarheid": 50,
     "reserveer": 27,
     "bevestig": 50,
     "lever": 18,
@@ -324,7 +325,7 @@
         "prijs": "sleutelSom",
         "beschikbaarheid": "agendaBij",
         "reserveer": "gereserveerd",
-        "bevestig": "bevestig",
+        "bevestig": "bestellingen",
         "lever": "uitgifte"
       },
       "telt": 6
@@ -522,6 +523,27 @@
       "telt": 5
     },
     {
+      "domein": "kern/livinglab",
+      "heeft": {
+        "toon": true,
+        "prijs": true,
+        "beschikbaarheid": true,
+        "reserveer": true,
+        "bevestig": false,
+        "lever": true,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {
+        "toon": "beeld",
+        "prijs": "kosten",
+        "beschikbaarheid": "agenda",
+        "reserveer": "onderhoudBij",
+        "lever": "uitgifte"
+      },
+      "telt": 5
+    },
+    {
       "domein": "kern/markt",
       "heeft": {
         "toon": true,
@@ -618,7 +640,7 @@
       },
       "bewijs": {
         "toon": "lijst",
-        "beschikbaarheid": "openstaand",
+        "beschikbaarheid": "maakOpenstaandOverzicht",
         "bevestig": "bevestig",
         "retour": "terugboeken"
       },
@@ -685,6 +707,26 @@
       "telt": 4
     },
     {
+      "domein": "kern/fonds",
+      "heeft": {
+        "toon": true,
+        "prijs": true,
+        "beschikbaarheid": false,
+        "reserveer": false,
+        "bevestig": true,
+        "lever": true,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {
+        "toon": "fondsOverzicht",
+        "prijs": "bereken",
+        "bevestig": "boekAfdracht",
+        "lever": "verstuurLeg"
+      },
+      "telt": 4
+    },
+    {
       "domein": "kern/handelsketen",
       "heeft": {
         "toon": true,
@@ -741,26 +783,6 @@
         "prijs": "directeKostenPerDrager",
         "beschikbaarheid": "heropen",
         "bevestig": "boek"
-      },
-      "telt": 4
-    },
-    {
-      "domein": "kern/livinglab",
-      "heeft": {
-        "toon": true,
-        "prijs": false,
-        "beschikbaarheid": true,
-        "reserveer": true,
-        "bevestig": false,
-        "lever": true,
-        "annuleer": false,
-        "retour": false
-      },
-      "bewijs": {
-        "toon": "beeld",
-        "beschikbaarheid": "agenda",
-        "reserveer": "onderhoudBij",
-        "lever": "uitgifte"
       },
       "telt": 4
     },
@@ -995,25 +1017,6 @@
         "toon": "zoek",
         "prijs": "bereken",
         "beschikbaarheid": "capaciteitVan"
-      },
-      "telt": 3
-    },
-    {
-      "domein": "kern/fonds",
-      "heeft": {
-        "toon": true,
-        "prijs": false,
-        "beschikbaarheid": false,
-        "reserveer": false,
-        "bevestig": true,
-        "lever": true,
-        "annuleer": false,
-        "retour": false
-      },
-      "bewijs": {
-        "toon": "lijst",
-        "bevestig": "boekAfdracht",
-        "lever": "verstuur"
       },
       "telt": 3
     },
@@ -1292,6 +1295,24 @@
       "bewijs": {
         "toon": "bezoekerMeld",
         "bevestig": "zaalBoek"
+      },
+      "telt": 2
+    },
+    {
+      "domein": "kern/labfonds",
+      "heeft": {
+        "toon": true,
+        "prijs": false,
+        "beschikbaarheid": true,
+        "reserveer": false,
+        "bevestig": false,
+        "lever": false,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {
+        "toon": "beeld",
+        "beschikbaarheid": "openbaar"
       },
       "telt": 2
     },
@@ -1607,23 +1628,6 @@
       },
       "bewijs": {
         "toon": "boardroomLijst"
-      },
-      "telt": 1
-    },
-    {
-      "domein": "kern/labfonds",
-      "heeft": {
-        "toon": true,
-        "prijs": false,
-        "beschikbaarheid": false,
-        "reserveer": false,
-        "bevestig": false,
-        "lever": false,
-        "annuleer": false,
-        "retour": false
-      },
-      "bewijs": {
-        "toon": "locBeeld"
       },
       "telt": 1
     },
@@ -2129,6 +2133,20 @@
     {
       "gelijkenis": 0.83,
       "a": "server/kern/bank/overboeken.js",
+      "b": "server/kern/pay/partner.js",
+      "domeinA": "kern/bank",
+      "domeinB": "kern/pay",
+      "gedeeld": [
+        "begunstigde",
+        "bestemming",
+        "idemSleutel",
+        "ledgerRef",
+        "rail"
+      ]
+    },
+    {
+      "gelijkenis": 0.83,
+      "a": "server/kern/bank/overboeken.js",
       "b": "server/kern/pay/terug.js",
       "domeinA": "kern/bank",
       "domeinB": "kern/pay",
@@ -2176,19 +2194,6 @@
     },
     {
       "gelijkenis": 0.67,
-      "a": "server/kern/bank/overboeken.js",
-      "b": "server/kern/pay/partner.js",
-      "domeinA": "kern/bank",
-      "domeinB": "kern/pay",
-      "gedeeld": [
-        "begunstigde",
-        "idemSleutel",
-        "ledgerRef",
-        "rail"
-      ]
-    },
-    {
-      "gelijkenis": 0.67,
       "a": "server/kern/directpay/betalen.js",
       "b": "server/kern/settlement.js",
       "domeinA": "kern/directpay",
@@ -2213,6 +2218,34 @@
         "sub",
         "zoek"
       ]
+    },
+    {
+      "gelijkenis": 0.63,
+      "a": "server/kern/fonds/uitbetalen.js",
+      "b": "server/kern/pay/partner.js",
+      "domeinA": "kern/fonds",
+      "domeinB": "kern/pay",
+      "gedeeld": [
+        "begunstigde",
+        "bestemming",
+        "idemSleutel",
+        "ledgerRef",
+        "rail"
+      ]
+    },
+    {
+      "gelijkenis": 0.63,
+      "a": "server/kern/fonds/uitbetalen.js",
+      "b": "server/kern/pay/terug.js",
+      "domeinA": "kern/fonds",
+      "domeinB": "kern/pay",
+      "gedeeld": [
+        "begunstigde",
+        "bestemming",
+        "idemSleutel",
+        "ledgerRef",
+        "rail"
+      ]
     }
   ],
   "wagens": [
@@ -2223,11 +2256,13 @@
     "kern/commercie",
     "kern/eten",
     "kern/fiscaal",
+    "kern/fonds",
     "kern/gast",
     "kern/geldgraaf",
     "kern/horeca",
     "kern/kantoor",
     "kern/keuken",
+    "kern/livinglab",
     "kern/mobiliteit",
     "kern/modebezorg",
     "kern/onderneming",
@@ -2309,6 +2344,16 @@
       ]
     },
     {
+      "domein": "kern/rtfos",
+      "plekken": 4,
+      "waar": [
+        "server/kern/rtfos/donateur.js",
+        "server/kern/rtfos/geld.js",
+        "server/kern/rtfos/inkoop-sluiten.js",
+        "server/kern/rtfos/winkel.js"
+      ]
+    },
+    {
       "domein": "kern/command",
       "plekken": 3,
       "waar": [
@@ -2336,15 +2381,6 @@
       ]
     },
     {
-      "domein": "kern/rtfos",
-      "plekken": 3,
-      "waar": [
-        "server/kern/rtfos/donateur.js",
-        "server/kern/rtfos/geld.js",
-        "server/kern/rtfos/inkoop-sluiten.js"
-      ]
-    },
-    {
       "domein": "kern/waarde",
       "plekken": 3,
       "waar": [
@@ -2362,11 +2398,35 @@
       ]
     },
     {
+      "domein": "kern/fonds",
+      "plekken": 2,
+      "waar": [
+        "server/kern/fonds/projecties.js",
+        "server/kern/fonds.js"
+      ]
+    },
+    {
       "domein": "kern/groothandel",
       "plekken": 2,
       "waar": [
         "server/kern/groothandel/bijbestel.js",
         "server/kern/groothandel/orderlaag.js"
+      ]
+    },
+    {
+      "domein": "kern/labfonds",
+      "plekken": 2,
+      "waar": [
+        "server/kern/labfonds/onderzoek.js",
+        "server/kern/labfonds.js"
+      ]
+    },
+    {
+      "domein": "kern/livinglab",
+      "plekken": 2,
+      "waar": [
+        "server/kern/livinglab/impact.js",
+        "server/kern/livinglab/ledger.js"
       ]
     },
     {
@@ -2431,27 +2491,6 @@
       "waar": [
         "server/school/analyse.js",
         "server/school/financien-beheer.js"
-      ]
-    },
-    {
-      "domein": "kern/agent",
-      "plekken": 1,
-      "waar": [
-        "server/kern/agent.js"
-      ]
-    },
-    {
-      "domein": "kern/assets",
-      "plekken": 1,
-      "waar": [
-        "server/kern/assets/winkel.js"
-      ]
-    },
-    {
-      "domein": "kern/avond",
-      "plekken": 1,
-      "waar": [
-        "server/kern/avond/plan.js"
       ]
     }
   ]

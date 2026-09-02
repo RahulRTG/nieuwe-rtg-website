@@ -1,0 +1,103 @@
+/* RTG Experience Layer-componenten. De bestaande Command-tokens blijven de
+   bron; modules krijgen geen eigen globale kleuren, radius of motiontaal. */
+.rtg-interface-second-screen {
+  --rtg-workspace-panel: clamp(320px, 28vw, 390px);
+  --rtg-workspace-wide: clamp(440px, 52vw, 760px);
+  --rtg-workspace-fast: 160ms;
+  --rtg-workspace-motion: 240ms var(--rtg-veer, ease);
+  --rtg-ss-bg: var(--onyx-glans, #0c0c0b);
+  --rtg-ss-card: color-mix(in srgb, var(--onyx-glans, #0c0c0b) 84%, white 16%);
+  --rtg-ss-line: var(--rtg-line, rgba(255, 255, 255, .12));
+  --rtg-ss-text: var(--rtg-txt, #f4f1ec);
+  --rtg-ss-muted: var(--rtg-muted, #aaa69e);
+  --rtg-ss-gold: var(--gold-tekst, #c0a544);
+}
+
+.rtg-interface-second-screen .rtg-ss-module {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, .035), transparent 46%),
+    var(--rtg-ss-card);
+  border-color: color-mix(in srgb, var(--rtg-ss-line) 76%, var(--rtg-ss-gold) 24%);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, .18);
+  transition: border-color var(--rtg-workspace-fast), transform var(--rtg-workspace-motion),
+    background var(--rtg-workspace-fast);
+  contain: layout paint;
+}
+.rtg-interface-second-screen .rtg-ss-module:focus-within {
+  border-color: color-mix(in srgb, var(--rtg-ss-gold) 62%, transparent);
+}
+.rtg-interface-second-screen .rtg-ss-module[hidden] { display: none; }
+.rtg-interface-second-screen .rtg-module-surface { min-width: 0; }
+.rtg-interface-second-screen .rtg-module-head-tools { align-items: center; display: flex; gap: 6px; }
+.rtg-interface-second-screen .rtg-module-state {
+  color: var(--rtg-ss-muted); font-size: 9px; font-weight: 680; letter-spacing: .14em;
+  max-width: 72px; overflow: hidden; text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap;
+}
+.rtg-interface-second-screen .rtg-module-state[data-tone="ok"] { color: #75d39c; }
+.rtg-interface-second-screen .rtg-module-state[data-tone="warning"] { color: #e6bd77; }
+.rtg-interface-second-screen .rtg-module-focus {
+  border-color: transparent; color: var(--rtg-ss-muted); font-size: 0; min-height: 36px; min-width: 36px; padding: 0;
+}
+.rtg-interface-second-screen .rtg-module-focus::after {
+  border-right: 1px solid currentColor; border-top: 1px solid currentColor; content: '';
+  height: 9px; transform: translate(-1px, 1px); width: 9px;
+}
+.rtg-interface-second-screen .rtg-module-focus:hover { color: var(--rtg-ss-gold); }
+
+.rtg-interface-second-screen .rtg-module-legacy { display: grid; gap: 12px; }
+.rtg-interface-second-screen .rtg-module-travel,
+.rtg-interface-second-screen .rtg-module-safety { display: grid; gap: 12px; }
+.rtg-interface-second-screen .rtg-module-summary { display: grid; gap: 3px; }
+.rtg-interface-second-screen .rtg-module-summary strong { color: var(--rtg-ss-text); font-size: .92rem; }
+.rtg-interface-second-screen .rtg-module-summary span,
+.rtg-interface-second-screen .rtg-module-summary small { color: var(--rtg-ss-muted); line-height: 1.45; }
+.rtg-interface-second-screen .rtg-module-suggestion {
+  background: color-mix(in srgb, var(--rtg-ss-gold) 8%, transparent);
+  border-left: 2px solid var(--rtg-ss-gold); display: grid; gap: 8px; padding: 11px 12px;
+}
+.rtg-interface-second-screen .rtg-module-suggestion strong { color: var(--rtg-ss-text); font-size: .82rem; }
+.rtg-interface-second-screen .rtg-module-suggestion p { margin: 0; }
+.rtg-interface-second-screen .rtg-module-error {
+  border-left: 2px solid #b43c5f; color: var(--rtg-ss-muted); font-size: .8rem; margin: 0; padding: 8px 10px;
+}
+.rtg-interface-second-screen .rtg-module-primary,
+.rtg-interface-second-screen .rtg-ss-compose {
+  background: linear-gradient(100deg, #74102f, #9b123c); border-color: #a93658; color: #fff;
+  font-weight: 680; letter-spacing: .02em; padding: 10px 13px; text-align: left;
+}
+.rtg-interface-second-screen .rtg-module-primary:hover,
+.rtg-interface-second-screen .rtg-ss-compose:hover { filter: brightness(1.12); }
+.rtg-interface-second-screen .rtg-ss-editor-list { display: grid; gap: 6px; }
+.rtg-interface-second-screen .rtg-ss-density { display: grid; gap: 6px; grid-template-columns: 1fr 1fr; }
+.rtg-interface-second-screen .rtg-ss-density button[aria-pressed="true"] { border-color: var(--rtg-ss-gold); color: var(--rtg-ss-gold); }
+
+#rtgCommand[data-rtg-density="compact"] .rtg-ss-modules { gap: 6px; }
+#rtgCommand[data-rtg-density="compact"] .rtg-ss-module { padding: 10px; }
+#rtgCommand[data-rtg-density="compact"] .rtg-ss-module-head { margin-bottom: 6px; }
+#rtgCommand[data-rtg-density="compact"] .rtg-ss-profile-copy span,
+#rtgCommand[data-rtg-density="compact"] .rtg-ss-message span { display: none; }
+
+.rtg-interface-second-screen.rtg-ss-focus .rtg-ss-module:not([data-rtg-active="true"]) { display: none; }
+.rtg-interface-second-screen.rtg-ss-focus .rtg-ss-module[data-rtg-active="true"] {
+  border-color: color-mix(in srgb, var(--rtg-ss-gold) 64%, transparent); min-height: calc(100% - 2px);
+}
+.rtg-interface-second-screen.rtg-ss-focus .rtg-ss-actions,
+.rtg-interface-second-screen.rtg-ss-focus .rtg-ss-editor { display: none; }
+
+@media (min-width: 1000px) {
+  #rtgCommand.rtg-interface-second-screen.rtg-ss-workspace {
+    grid-template-columns: var(--rtg-workspace-wide) minmax(0, 1fr);
+  }
+  .rtg-interface-second-screen.rtg-ss-workspace .cmd-bank { width: 100%; }
+  #rtgCommand.rtg-interface-second-screen.rtg-ss-panel {
+    grid-template-columns: var(--rtg-workspace-panel) minmax(0, 1fr);
+  }
+  .rtg-interface-second-screen.rtg-ss-panel .cmd-bank {
+    bottom: 0; grid-column: 1; max-width: none; position: relative; width: 100%;
+  }
+  .rtg-interface-second-screen.rtg-ss-panel .cmd-lade { grid-column: 2; min-width: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rtg-interface-second-screen .rtg-ss-module { transition: none; }
+}

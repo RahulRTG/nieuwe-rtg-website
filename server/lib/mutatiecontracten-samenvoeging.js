@@ -24,59 +24,12 @@ const AFGETEKEND = {
 
 const OP = '2026-09-01';
 
-/* A. DERTIEN DIE ALLEEN LEZEN. Twee onafhankelijke meters: geen spoor in de
-   opslag en de effectmeter op `geen` (geen schrijfpoging, geen mail, geen sms).
-   Wat geen van beide ziet -- een bestand of een externe aanroep -- is per handler
-   nagelezen; de vindplaats staat erbij zodat wie het overdoet weet waar te kijken. */
-const leest = (route, mutatieId, toegang, bestand, wat) => [route, {
-  mutatieId, herkomst: 'mens',
-  semantiek: { klasse: 'idempotent' },
-  toegang,
-  stand: 'NOT_APPLICABLE',
-  bewijs: {
-    gemeten: 'kale ronde zonder sleutel: twee geslaagde oproepen zonder spoor in de gemeten collecties, ' +
-      'en de effectmeter telde op allebei `geen`',
-    op: OP
-  },
-  nagekeken: 'handler gelezen in ' + bestand + ' op ' + OP + ': ' + wat +
-    ' -- geen bestand, geen externe aanroep, geen teller buiten de gemeten collecties',
-  afgetekend: AFGETEKEND
-}];
+/* A. DE DERTIEN DIE ALLEEN LEZEN staan in ./mutatiecontracten-lezers.js. Ze
+   delen alle dertien dezelfde grond en dezelfde vorm en zijn daarmee een lijst;
+   de vijf hieronder dragen elk een eigen uitspraak over gedrag. */
+const LEZERS = require('./mutatiecontracten-lezers').CONTRACTEN;
 
-const office = { klasse: 'AUTHENTICATED' };
-const auth = { klasse: 'AUTHENTICATED' };
-const manager = { klasse: 'AUTHENTICATED' };
-
-const CONTRACTEN = Object.fromEntries([
-  leest('POST /api/command/bezitsbewijs', 'command.bezitsbewijs', office, 'server/routes/command/schaduwmeters.js',
-    'geeft bezitsbewijs.stand() terug of de melding dat de laag niet draait'),
-  leest('POST /api/experience/bootstrap', 'experience.bootstrap', auth, 'server/kern/experience/index.js',
-    'leest resume en contexten en bouwt een projectie; de enige schrijver in die module is resumeZet en die hangt aan /resume'),
-  leest('POST /api/experience/evidence', 'experience.evidence', auth, 'server/kern/experience/index.js',
-    'opslag.bewijsVoor(key, limit) is een lezer'),
-  leest('POST /api/lab2/capsule', 'lab2.capsule', office, 'server/kern/livinglab/capsule.js',
-    'zoekt de studie op en geeft het bevroren dossier terug'),
-  leest('POST /api/lab2/metingen', 'lab2.metingen', office, 'server/kern/livinglab/instrument.js',
-    'filtert en pagineert d.metingen'),
-  leest('POST /api/office/rtfwallet', 'office.rtfwallet', office, 'server/routes/office/instellingen.js',
-    'kern.rtfWallet.stand(); maken zit op een eigen boardroomroute /maak'),
-  leest('POST /api/reis/gezelschap/kring', 'reis.gezelschap.kring', auth, 'server/kern/reisgezelschap.js',
-    'mijnKring filtert leden() op de sleutel van de lezer'),
-  leest('POST /api/rtfos/gift/plan/lijst', 'rtfos.gift.plan.lijst', office, 'server/kern/rtfos/gift-periodiek.js',
-    'lijst() geeft de eerste 500 plannen als beeld terug'),
-  leest('POST /api/rtfos/gift/stand/kantoor', 'rtfos.gift.stand.kantoor', office, 'server/kern/rtfos/gift.js',
-    'stand() leest de giftstand; zetten is /stand/zet hieronder'),
-  leest('POST /api/rtfos/winkel/artikelen', 'rtfos.winkel.artikelen', office, 'server/kern/rtfos/winkel.js',
-    'etalage() filtert en beeldt de artikelen af'),
-  leest('POST /api/rtfos/winkel/bestellingen', 'rtfos.winkel.bestellingen', office, 'server/kern/rtfos/winkel.js',
-    'bestellingen() geeft de laatste 200 terug; de stand zet een mens via /winkel/stand'),
-  leest('POST /api/supplier/horeca/werklijst', 'supplier.horeca.werklijst', auth, 'server/routes/supplier/horeca/werklijst.js',
-    'werk.werklijst en over.lijst lezen de horecastand en merken wat van de lezer is'),
-  leest('POST /api/supplier/pay/rekening/stand', 'supplier.pay.rekening.stand', manager, 'server/routes/pay-zaak.js',
-    'pay.zaakRekening(code) gelezen en tot de laatste vier cijfers teruggebracht'),
-  leest('POST /api/toestemming/relaties', 'toestemming.relaties', auth, 'server/kern/consent-relaties.js',
-    'relatiesVan groepeert de toestemmingen van de lezer per partij'),
-
+const CONTRACTEN = Object.assign({}, LEZERS, Object.fromEntries([
   /* B. EEN DIE DE PROEF NIET IN KWAM. De route ruilt het korte bewijs van
      /api/auth/inloggen om voor een sessie; de proef had zo'n bewijs niet en
      kreeg "Deze inlogpoging is verlopen". Wat een dubbeltik met een GELDIG
@@ -164,6 +117,6 @@ const CONTRACTEN = Object.fromEntries([
     },
     afgetekend: AFGETEKEND
   }]
-]);
+]));
 
 module.exports = { CONTRACTEN };

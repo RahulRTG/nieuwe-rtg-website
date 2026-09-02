@@ -42,12 +42,20 @@
     "delenZonderOnderwerp": 0,
     "beweringenZonderVulcontrole": 112,
     "bewijsCellenBewezen": 25500,
-    "bewijsAchterstand": 2275,
+    "bewijsAchterstand": 2285,
     "schermenZonderVormtaal": 185,
     "dbDeuren": 510,
     "dbDeurenSchrijvend": 270
   },
   "notities": [
+    {
+      "datum": "2026-09-02",
+      "soort": "meting",
+      "sleutel": "bewijsAchterstand",
+      "van": 2275,
+      "meter": "bewijsAchterstand 2275 -> 2285",
+      "reden": "Geen verslechtering maar een meter die bijtrok. De norm van 1 september is geschreven toen BEWIJSSCHULD.json nog 1477 ongeclassificeerde muterende routes droeg; diezelfde dag bleek uit een verse idemproef dat het er 1487 waren, en dat is in twee commits met de reden erbij vastgelegd (b2212be57 en 945cb109e). Wie de post vandaag narekent uit de registers van de normcommit ZELF komt ook op 1487 uit: het getal in de norm liep achter op zijn eigen invoer. Het zijn dus geen tien nieuwe schulden maar tien die er al stonden en nu geteld worden. Aflossen blijft hetzelfde werk: per route vastleggen wat een tweede keer betekent, in IDEMBESLUIT.json."
+    },
     {
       "datum": "2026-08-28",
       "soort": "schuld",

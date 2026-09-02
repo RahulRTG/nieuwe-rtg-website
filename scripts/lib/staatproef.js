@@ -75,16 +75,32 @@
    ========================================================================== */
 'use strict';
 
-/* De boekhoudcollecties, uit de modules die ze bezitten. Zie de paragraaf
-   DE VIERDE KLASSE hierboven voor waarom dit een afleiding is en geen lijst. */
+/* De boekhoudcollecties, uit de twee plekken die ze al bijhielden -- en dus
+   NIET uit een derde lijst hier. Zie DE VIERDE KLASSE hierboven.
+
+   `IDEMBESLUIT.json` heeft een sectie `vastlegging`: door mensen geschreven,
+   met per collectie de reden waarom hij bij een herhaling meegroeit zonder dat
+   er iets tweemaal gebeurt. Die lijst wordt bovendien al BEWAAKT --
+   scripts/lib/idemproef.js meldt hardop wanneer een vastlegging maar onder EEN
+   routefamilie groeit, want dan is het domeinwerk dat in de lijst is gezet en
+   verdwijnt er een bevinding achter een regel in een bestand.
+
+   `server/kern/auditsporen.js` heeft daarnaast NAMEN: de journaal-achtige
+   collecties, gemeten over een volle ronde. De twee overlappen maar zijn niet
+   gelijk (het register kent er vier, de code zeven), en allebei horen ze erbij:
+   het register draagt het BESLUIT, de code de METING.
+
+   Een handgeschreven lijst hier zou de derde plek zijn voor dezelfde waarheid,
+   en dan wint de zwakste zodra iemand hem gebruikt (LAT.md regel 4). */
 function boekhoudcollecties() {
   const uit = new Set();
   try { for (const n of require('../../server/kern/auditsporen').NAMEN) uit.add(n); } catch (e) {}
-  /* db.data.kosten -- de kostenmeter, server/kern/kosten/index.js. Hij heeft
-     geen register waaruit deze naam te lezen valt; de aanhaling staat in de kop
-     van dat bestand ("Opslag: db.data.kosten") en test/staatproef.test.js houdt
-     vast dat hij daar nog zo heet. */
-  uit.add('kosten');
+  try {
+    const path = require('path');
+    const reg = JSON.parse(require('fs').readFileSync(
+      path.join(__dirname, '..', '..', 'IDEMBESLUIT.json'), 'utf8'));
+    for (const n of Object.keys(reg.vastlegging || {})) uit.add(n);
+  } catch (e) {}
   return uit;
 }
 const BOEKHOUDING = boekhoudcollecties();

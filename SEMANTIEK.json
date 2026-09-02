@@ -1,9 +1,9 @@
 {
-  "catalogi": 1026,
-  "verschillendeNamen": 605,
-  "namenInMeerDomeinen": 116,
-  "woordenMetMeerBetekenissen": 99,
-  "betekenissenTotaal": 367,
+  "catalogi": 1035,
+  "verschillendeNamen": 609,
+  "namenInMeerDomeinen": 117,
+  "woordenMetMeerBetekenissen": 100,
+  "betekenissenTotaal": 373,
   "ergsteWoord": "SOORTEN",
   "ergsteAantal": 46,
   "dubbelingen": 31,
@@ -78,7 +78,7 @@
     },
     {
       "naam": "KETEN",
-      "betekenissenVanDitWoord": 3,
+      "betekenissenVanDitWoord": 4,
       "waar": [
         "server/kern/mobiliteit/keten.js",
         "server/kern/modebezorg.js"
@@ -393,7 +393,7 @@
     },
     {
       "naam": "STANDEN",
-      "betekenissenVanDitWoord": 16,
+      "betekenissenVanDitWoord": 18,
       "waar": [
         "server/kern/gast/verzoek.js",
         "server/kern/rtfos/ruil.js"
@@ -467,7 +467,7 @@
     },
     {
       "naam": "STANDEN",
-      "betekenissenVanDitWoord": 16,
+      "betekenissenVanDitWoord": 18,
       "waar": [
         "server/kern/avond/voorkeuren.js",
         "server/kern/werkvenster.js"
@@ -1357,8 +1357,8 @@
     },
     {
       "naam": "STANDEN",
-      "domeinen": 18,
-      "betekenissen": 16,
+      "domeinen": 20,
+      "betekenissen": 18,
       "hoogsteOverlap": 0.4,
       "soort": "gemengd",
       "waar": [
@@ -1383,6 +1383,18 @@
             "nooit",
             "gevraagd",
             "altijd"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/beschermzaak/klasse.js"
+          ],
+          "leden": 6,
+          "voorbeeld": [
+            "veiligheid",
+            "minimaal",
+            "toestemming",
+            "stabilisatie"
           ]
         },
         {
@@ -1419,6 +1431,17 @@
             "kennis",
             "tweefactor",
             "bezit"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/knelpunt/index.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "vervuld",
+            "ontbreekt",
+            "onbekend"
           ]
         },
         {
@@ -2899,6 +2922,64 @@
       ]
     },
     {
+      "naam": "KETEN",
+      "domeinen": 5,
+      "betekenissen": 4,
+      "hoogsteOverlap": 0.18,
+      "soort": "gemengd",
+      "waar": [
+        {
+          "bestanden": [
+            "server/kern/beschermzaak/klasse.js"
+          ],
+          "leden": 6,
+          "voorbeeld": [
+            "veiligheid",
+            "minimaal",
+            "toestemming",
+            "stabilisatie"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/bureau/keten.js"
+          ],
+          "leden": 12,
+          "voorbeeld": [
+            "reizen",
+            "gelegenheden",
+            "huishouden",
+            "vervoer"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/mobiliteit/keten.js",
+            "server/kern/modebezorg.js"
+          ],
+          "leden": 10,
+          "voorbeeld": [
+            "aangevraagd",
+            "geprijsd",
+            "aangeboden",
+            "geaccepteerd"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/rtfos/projecten.js"
+          ],
+          "leden": 9,
+          "voorbeeld": [
+            "idee",
+            "aanvraag",
+            "beoordeling",
+            "goedgekeurd"
+          ]
+        }
+      ]
+    },
+    {
       "naam": "BANK",
       "domeinen": 4,
       "betekenissen": 4,
@@ -3407,63 +3488,7 @@
           ]
         }
       ]
-    },
-    {
-      "naam": "SCENARIOS",
-      "domeinen": 4,
-      "betekenissen": 4,
-      "hoogsteOverlap": 0,
-      "soort": "botsing",
-      "waar": [
-        {
-          "bestanden": [
-            "server/betaal/synthetisch.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "betaald",
-            "geweigerd",
-            "traag",
-            "terugboeking"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/magnaatwereld.js"
-          ],
-          "leden": 6,
-          "voorbeeld": [
-            "planning",
-            "controle",
-            "gesprek",
-            "impact"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/onderneming/simulatie.js"
-          ],
-          "leden": 3,
-          "voorbeeld": [
-            "slecht",
-            "basis",
-            "groei"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/stadsweefsel/klimaat.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "extreme-regen",
-            "hittegolf",
-            "droogte",
-            "hoogwater"
-          ]
-        }
-      ]
     }
   ],
-  "bestanden": 3001
+  "bestanden": 3030
 }

@@ -32,8 +32,20 @@
     m.hidden = false;
   }
 
+  /* DE TECHNIEK-TOKEN GAAT MEE, EN DAT ONTBRAK. Dit scherm stuurde geen
+     Authorization-kop, terwijl techAuth op de server uitsluitend die kop leest.
+     Elke aanroep kwam dus binnen als 401 en het enige wat het kantoor zag was
+     "Geen toegang. Log eerst in op de technische pagina." -- ook als het dat al
+     had gedaan. De sleutel is dezelfde als in apps/techniek.js (`techToken` in
+     sessionStorage); een tweede naam zou betekenen dat inloggen op de ene
+     techniekpagina niet geldt op de andere. */
+  function techToken() {
+    try { return sessionStorage.getItem('techToken') || null; } catch (e) { return null; }
+  }
   function haal(pad, lijf) {
     var opties = { headers: { 'Accept': 'application/json' }, credentials: 'same-origin' };
+    var t = techToken();
+    if (t) opties.headers.Authorization = 'Bearer ' + t;
     if (lijf) {
       opties.method = 'POST';
       opties.headers['Content-Type'] = 'application/json';

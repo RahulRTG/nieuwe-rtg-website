@@ -53,9 +53,24 @@
     m.hidden = false;
     m.scrollIntoView({ block: 'nearest' });
   }
+  /* DE TOKEN GAAT MEE, EN DAT ONTBRAK. Dit scherm stuurde alleen
+     `credentials: 'same-origin'` en geen Authorization-kop -- maar `auth` in
+     server/opzet/diensten2.js leest uitsluitend die kop, en RTG zet geen
+     sessiecookie. Elk verzoek van dit scherm kwam dus binnen als 401, en het
+     enige wat een lid zag was "Je bent uitgelogd". Het scherm dat de eigen
+     beveiliging bedient, werkte niet.
+     De sleutel is dezelfde als in de rest van het huis (`rtg_member_token`,
+     shared/accounts-os.js); een tweede naam zou een lid op het ene scherm
+     ingelogd en op het andere uitgelogd maken. */
+  function lidToken() {
+    try { return localStorage.getItem('rtg_member_token') || null; } catch (e) { return null; }
+  }
   function haal(pad, lijf) {
+    var koppen = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
+    var t = lidToken();
+    if (t) koppen.Authorization = 'Bearer ' + t;
     return fetch(pad, { method: 'POST', credentials: 'same-origin',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      headers: koppen,
       body: JSON.stringify(lijf || {}) }).then(function (r) {
       return r.json().catch(function () { return {}; }).then(function (j) {
         if (!r.ok) {

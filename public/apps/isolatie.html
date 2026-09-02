@@ -9,11 +9,16 @@
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
+<link href="/shared/rtg-ontwerp.css" rel="stylesheet">
 <style>
   :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--card2:var(--rtg-card2);--line:var(--rtg-line);
     --txt:var(--rtg-txt);--muted:var(--rtg-muted);--soft:var(--rtg-soft);--gold:#C9A24B;
     --groen:#3BA55D;--oranje:#D6A32E;--rood:#D6455F;}
   *{margin:0;padding:0;box-sizing:border-box;}
+  /* Twee klassen in plaats van vier losse stijlattributen: die houden
+     style-src-attr in de CSP open, en de norm telt ze daarom. */
+  .strak{margin-top:0;}
+  .knoprij{margin-top:1.1rem;display:flex;gap:.6rem;flex-wrap:wrap;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.55;}
   a{color:var(--rtg-leesgoud,var(--gold));}
   .skip{position:absolute;left:.6rem;top:-3rem;z-index:60;background:var(--gold);color:#0C0C0B;padding:.5rem .9rem;border-radius:0;font-weight:700;text-decoration:none;transition:top .15s;}
@@ -78,7 +83,7 @@
 
   <h2 class="sec">Een drager verstrengen</h2>
   <div class="kaart">
-    <p class="voetnoot" style="margin-top:0">Verstrengen gaat meteen en zonder ceremonie: een drempel voor
+    <p class="voetnoot strak">Verstrengen gaat meteen en zonder ceremonie: een drempel voor
       de veilige keuze duwt mensen onder druk naar de onveilige. Verlagen kan hier niet: dat loopt over een
       ontsluiting, en die weg is de enige.</p>
     <div class="vorm">
@@ -100,7 +105,7 @@
       <div><label for="d-reden">Reden (blijft in het spoor staan)</label>
         <input class="veld" id="d-reden" autocomplete="off" placeholder="Verdenking op een gerichte aanval"></div>
     </div>
-    <div style="margin-top:1.1rem;display:flex;gap:.6rem;flex-wrap:wrap">
+    <div class="knoprij">
       <button class="knop" id="btn-zet">Verstrengen</button>
       <button class="knop grijs" id="btn-proef">Eerst proefdraaien</button>
     </div>
@@ -108,13 +113,13 @@
 
   <h2 class="sec">Wat dit een mens kost</h2>
   <div class="kaart" id="proefkaart">
-    <p class="voetnoot" style="margin-top:0">Wie besluit een klant dicht te zetten, hoort eerst te zien wat
+    <p class="voetnoot strak">Wie besluit een klant dicht te zetten, hoort eerst te zien wat
       die klant dat kost. Deze proef voert niets uit.</p>
     <div id="proefuit"></div>
   </div>
 
   <h2 class="sec">Lopende ontsluitingen</h2>
-  <div class="kaart" id="ontsluitkaart"><p class="voetnoot" style="margin-top:0">Nog niets geladen.</p></div>
+  <div class="kaart" id="ontsluitkaart"><p class="voetnoot strak">Nog niets geladen.</p></div>
 
   <h2 class="sec">Standen per drager</h2>
   <div class="kaart schuif" id="dragerkaart"></div>

@@ -3,13 +3,18 @@
  "uitleg": "Hoe lang elk toetsbestand erover deed, als gewicht voor de scherfverdeling in scripts/lib/delen.js. PER MODUS, want met dekking aan is dezelfde toets een ander kostenmodel -- niet een uitschieter. Mediaan over alle waarnemingen; de p90 staat erbij en weegt niet mee. Een bestand dat hier NIET in staat is ongemeten en wordt om en om verdeeld -- nooit overgeslagen.",
  "hoe": "npm test (schrijft .toetsduur), daarna: node scripts/toetsduur.js --schrijf",
  "gelezen": {
-  "regels": 1437,
+  "regels": 2,
   "verminkt": 0,
-  "opSchijf": 1436,
+  "opSchijf": 1545,
   "modi": [
    "dekking",
    "onbekend"
-  ]
+  ],
+  "opgeruimd": {
+   "weg": 0,
+   "over": 1436,
+   "wacht": "nog niet elke modus is gemeten"
+  }
  },
  "modi": {
   "dekking": {
@@ -13890,19 +13895,25 @@
   },
   "onbekend": {
    "stempel": {
-    "op": "2026-09-01T12:43:18.071Z",
-    "waar": "ci",
-    "node": "v26.8.1",
+    "op": "2026-09-02T21:08:19.166Z",
+    "waar": "lokaal",
+    "node": "v22.22.2",
     "kernen": 4,
-    "commit": "07ee035"
+    "commit": "ad9ac732"
    },
    "gemeten": {
-    "bestanden": 1434,
-    "ongemeten": 2,
-    "verseWaarnemingen": 177,
-    "totaalMs": 10929058
+    "bestanden": 1436,
+    "ongemeten": 109,
+    "verseWaarnemingen": 2,
+    "totaalMs": 10951285
    },
    "bronnen": {
+    "lokaal|v22.22.2|4": {
+     "waar": "lokaal",
+     "node": "v22.22.2",
+     "kernen": 4,
+     "commit": null
+    },
     "onbekend": {
      "waar": "onbekend"
     }
@@ -14039,6 +14050,7 @@
     "bewakersketen.test.js": 5692,
     "bewijs.test.js": 6904,
     "bewijsboek.test.js": 151,
+    "bewijsmapscherm.e2e.js": 10740,
     "bewijsmatrix.test.js": 1366,
     "bewijsschuld.test.js": 1204,
     "bewijstoken.test.js": 122,
@@ -15258,6 +15270,7 @@
     "webplatform.test.js": 12646,
     "webpush.test.js": 80,
     "website-aanvraag-handoff.test.js": 51,
+    "wegwijzerscherm.e2e.js": 11487,
     "weigering-laat-niets-achter.test.js": 6664,
     "wereld.test.js": 6618,
     "wereldbreedte.e2e.js": 7288,
@@ -16048,6 +16061,16 @@
      "n": 1,
      "min": 151,
      "max": 151
+    },
+    "bewijsmapscherm.e2e.js": {
+     "n": 1,
+     "min": 10740,
+     "max": 10740,
+     "p90": 10740,
+     "bronnen": [
+      "lokaal|v22.22.2|4"
+     ],
+     "gemetenOp": "2026-09-02"
     },
     "bewijsmatrix.test.js": {
      "n": 1,
@@ -22893,6 +22916,16 @@
      "n": 1,
      "min": 51,
      "max": 51
+    },
+    "wegwijzerscherm.e2e.js": {
+     "n": 1,
+     "min": 11487,
+     "max": 11487,
+     "p90": 11487,
+     "bronnen": [
+      "lokaal|v22.22.2|4"
+     ],
+     "gemetenOp": "2026-09-02"
     },
     "weigering-laat-niets-achter.test.js": {
      "n": 1,

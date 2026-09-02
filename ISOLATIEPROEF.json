@@ -1,6 +1,6 @@
 {
   "uitleg": "De veiligheidsboekhouding van de beschermstand. Per noemer geteld, nooit samengesteld: een percentage tussen twee verschillende noemers is fictie.",
-  "gemetenOp": "2026-09-01",
+  "gemetenOp": "2026-09-02",
   "uitslagen": [
     "BEWEZEN_GEBLOKKEERD",
     "BEWEZEN_TOEGESTAAN",
@@ -31,8 +31,7 @@
     {
       "punt": "lockdown-filter na de resolver",
       "stand": "STAAT",
-      "waarom": "server/kern/stuur/isolatiefilter.js versmalt de lijst waaruit de AI kiest, per constructie een deelverzameling, met per weggevallen pad een reden.",
-      "open": "hij is nog niet gemonteerd op de weg die het stuur werkelijk loopt."
+      "waarom": "server/kern/stuur/isolatiefilter.js versmalt de lijst waaruit de AI kiest, per constructie een deelverzameling, met per weggevallen pad een reden."
     },
     {
       "punt": "ontsluitceremonie, ook voor het huis",
@@ -62,14 +61,21 @@
       "waarom": "45 verwerkers draaien in het hoofdproces."
     },
     {
-      "punt": "herkomst en vertrouwensklasse van invoer (taint)",
-      "stand": "ONTBREEKT",
-      "waarom": "onvertrouwde inhoud (mail, document, webpagina, toolresultaat) draagt geen klasse, dus de regel \"onvertrouwde inhoud vergroot nooit de beschikbare capabilities\" is niet af te dwingen."
+      "punt": "bruikbaarheid onder isolatie",
+      "stand": "GEMETEN",
+      "waarom": "kern/isolatie/bruikbaarheid.js: negen kritieke verhalen, per stand nagelopen. De meting vond meteen drie echte ontwerpfouten -- geld-lezen, zelf-beschermen en ontsluiten-aanvragen vielen alle drie dicht -- en die zijn gerepareerd.",
+      "open": "negen verhalen is een begin en geen dekking; wie er een toevoegt, meet meteen mee."
     },
     {
-      "punt": "bruikbaarheid onder isolatie",
-      "stand": "ONGEMETEN",
-      "waarom": "er is geen lijst kritieke gebruikersverhalen, dus er is niet te zeggen wat er tijdens een incident nog WERKT. Een isolatiestand die niemand durft aan te zetten, beschermt niets."
+      "punt": "herkomst en vertrouwensklasse van invoer (taint)",
+      "stand": "STAAT",
+      "waarom": "kern/isolatie/herkomst.js: vier klassen, dertien kanalen, en de regel wordt AFGEDWONGEN in kern/stuur/isolatiefilter.js -- op dezelfde plek waar de isolatiestand versmalt. Onvertrouwde invoer sluit acht effecten, actief-onvertrouwde elf.",
+      "open": "welke kanalen zich vandaag werkelijk aanmelden is niet gemeten. Een kanaal dat zwijgt telt als onvertrouwd -- de verkeerde kant is dus de veilige, maar dekking is dat niet."
+    },
+    {
+      "punt": "lockdown-filter gemonteerd",
+      "stand": "STAAT",
+      "waarom": "kern/stuur.js roept het filter aan in stuurPaden(), en kern/stuur/lus.js haalt de context uit de SESSIE van de aanroeper. De kaart zegt er bovendien bij WAT er wegviel, zodat het model niet denkt dat een vermogen niet bestaat."
     }
   ],
   "noemers": {
@@ -289,8 +295,8 @@
         "beschermd": {
           "member": {
             "bereikbaar": 120,
-            "naFilter": 92,
-            "weggevallen": 28,
+            "naFilter": 95,
+            "weggevallen": 25,
             "regels": [
               "Geld"
             ]
@@ -309,8 +315,8 @@
           },
           "supplier": {
             "bereikbaar": 53,
-            "naFilter": 32,
-            "weggevallen": 21,
+            "naFilter": 34,
+            "weggevallen": 19,
             "regels": [
               "Geld",
               "Partners (leveranciers)",
@@ -345,8 +351,8 @@
         "isolatie": {
           "member": {
             "bereikbaar": 120,
-            "naFilter": 47,
-            "weggevallen": 73,
+            "naFilter": 50,
+            "weggevallen": 70,
             "regels": [
               "Geld",
               "NIET_BEWEZEN_LEZER"
@@ -366,8 +372,8 @@
           },
           "supplier": {
             "bereikbaar": 53,
-            "naFilter": 13,
-            "weggevallen": 40,
+            "naFilter": 15,
+            "weggevallen": 38,
             "regels": [
               "Geld",
               "NIET_BEWEZEN_LEZER",
@@ -414,13 +420,13 @@
       "gevonden": 4655,
       "effectgraad": {
         "verklaard": 375,
-        "vermoed": 1670,
-        "onbekend": 2459,
-        "afgeleid": 151
+        "vermoed": 1701,
+        "onbekend": 2461,
+        "afgeleid": 118
       },
-      "eens": 1251,
-      "onbekend": 2459,
-      "strenger": 905,
+      "eens": 996,
+      "onbekend": 2461,
+      "strenger": 1158,
       "losser": 40,
       "geenSom": "strenger, losser en onbekend vragen om drie verschillende dingen en worden nooit opgeteld",
       "blindEnVerzwakkend": {
@@ -494,6 +500,84 @@
       },
       "voorbeeldStrenger": [
         {
+          "pad": "/api/aanmeld/start",
+          "regel": null,
+          "effecten": [
+            "RECHT_VERLENEN",
+            "IDENTITEIT_WIJZIGEN"
+          ],
+          "graad": "vermoed",
+          "geraakt": [
+            "RECHT_VERLENEN",
+            "IDENTITEIT_WIJZIGEN"
+          ]
+        },
+        {
+          "pad": "/api/aanmelding/betalingen",
+          "regel": null,
+          "effecten": [
+            "RECHT_VERLENEN",
+            "IDENTITEIT_WIJZIGEN"
+          ],
+          "graad": "vermoed",
+          "geraakt": [
+            "RECHT_VERLENEN",
+            "IDENTITEIT_WIJZIGEN"
+          ]
+        },
+        {
+          "pad": "/api/aanmelding/bewijs/herkeuring",
+          "regel": null,
+          "effecten": [
+            "RECHT_VERLENEN",
+            "IDENTITEIT_WIJZIGEN"
+          ],
+          "graad": "vermoed",
+          "geraakt": [
+            "RECHT_VERLENEN",
+            "IDENTITEIT_WIJZIGEN"
+          ]
+        },
+        {
+          "pad": "/api/aanmelding/contracten",
+          "regel": null,
+          "effecten": [
+            "RECHT_VERLENEN",
+            "IDENTITEIT_WIJZIGEN"
+          ],
+          "graad": "vermoed",
+          "geraakt": [
+            "RECHT_VERLENEN",
+            "IDENTITEIT_WIJZIGEN"
+          ]
+        },
+        {
+          "pad": "/api/aanmelding/lijst",
+          "regel": null,
+          "effecten": [
+            "RECHT_VERLENEN",
+            "IDENTITEIT_WIJZIGEN"
+          ],
+          "graad": "vermoed",
+          "geraakt": [
+            "RECHT_VERLENEN",
+            "IDENTITEIT_WIJZIGEN"
+          ]
+        },
+        {
+          "pad": "/api/adres/zoek",
+          "regel": null,
+          "effecten": [
+            "RECHT_VERLENEN",
+            "IDENTITEIT_WIJZIGEN"
+          ],
+          "graad": "vermoed",
+          "geraakt": [
+            "RECHT_VERLENEN",
+            "IDENTITEIT_WIJZIGEN"
+          ]
+        },
+        {
           "pad": "/api/appstore/bonnen",
           "regel": null,
           "effecten": [
@@ -532,82 +616,6 @@
         },
         {
           "pad": "/api/auth/login",
-          "regel": null,
-          "effecten": [
-            "BEVEILIGING_VERZWAKKEN"
-          ],
-          "graad": "afgeleid",
-          "geraakt": [
-            "BEVEILIGING_VERZWAKKEN"
-          ]
-        },
-        {
-          "pad": "/api/auth/me",
-          "regel": null,
-          "effecten": [
-            "RECHT_VERLENEN",
-            "IDENTITEIT_WIJZIGEN"
-          ],
-          "graad": "vermoed",
-          "geraakt": [
-            "RECHT_VERLENEN",
-            "IDENTITEIT_WIJZIGEN"
-          ]
-        },
-        {
-          "pad": "/api/auth/password",
-          "regel": null,
-          "effecten": [
-            "RECHT_VERLENEN",
-            "IDENTITEIT_WIJZIGEN"
-          ],
-          "graad": "vermoed",
-          "geraakt": [
-            "RECHT_VERLENEN",
-            "IDENTITEIT_WIJZIGEN"
-          ]
-        },
-        {
-          "pad": "/api/auth/register",
-          "regel": null,
-          "effecten": [
-            "RECHT_VERLENEN",
-            "IDENTITEIT_WIJZIGEN"
-          ],
-          "graad": "vermoed",
-          "geraakt": [
-            "RECHT_VERLENEN",
-            "IDENTITEIT_WIJZIGEN"
-          ]
-        },
-        {
-          "pad": "/api/auth/resend",
-          "regel": null,
-          "effecten": [
-            "RECHT_VERLENEN",
-            "IDENTITEIT_WIJZIGEN"
-          ],
-          "graad": "vermoed",
-          "geraakt": [
-            "RECHT_VERLENEN",
-            "IDENTITEIT_WIJZIGEN"
-          ]
-        },
-        {
-          "pad": "/api/auth/reset",
-          "regel": null,
-          "effecten": [
-            "RECHT_VERLENEN",
-            "IDENTITEIT_WIJZIGEN"
-          ],
-          "graad": "vermoed",
-          "geraakt": [
-            "RECHT_VERLENEN",
-            "IDENTITEIT_WIJZIGEN"
-          ]
-        },
-        {
-          "pad": "/api/auth/verify-email",
           "regel": null,
           "effecten": [
             "RECHT_VERLENEN",
@@ -722,19 +730,19 @@
       ],
       "gevonden": 4655,
       "graden": {
-        "onbekend": 2459,
-        "vermoed": 1670,
-        "afgeleid": 151,
+        "onbekend": 2461,
+        "vermoed": 1701,
+        "afgeleid": 118,
         "verklaard": 375
       },
       "bronnen": {
-        "geen": 2459,
-        "vermoed": 1670,
-        "afgeleid": 151,
-        "verklaard": 344,
-        "verklaard+afgeleid": 31
+        "geen": 2461,
+        "vermoed": 1701,
+        "afgeleid": 118,
+        "verklaard": 348,
+        "verklaard+afgeleid": 27
       },
-      "collectiesIngedeeld": 85,
+      "collectiesIngedeeld": 80,
       "collectiesGemeten": 236,
       "plafond": {
         "alsElkeCollectieIsIngedeeld": 639,
@@ -742,8 +750,8 @@
         "waarom": "de grens ligt bij de PROEF en niet bij de lijst: een pad waar IDEMPROEF.json nooit met succes langskwam, raakt geen enkele collectie. Meer dekking komt van een betere proef, niet van meer namen in het register."
       },
       "ijking": {
-        "paren": 31,
-        "overlappend": 26,
+        "paren": 27,
+        "overlappend": 22,
         "aanvullend": [
           {
             "pad": "/api/member/ai/tegoed",
@@ -795,8 +803,49 @@
         "zonderOverlap": 5,
         "uitslag": "de twee bronnen spreken elkaar niet tegen maar vullen elkaar aan: waar ze niet overlappen, ziet de een iets wat de ander principieel niet kan zien (de proef kijkt in de opslag en niet naar uitgaande aanroepen; de verklaring leest de naam en kent geen collecties). Daarom worden ze OPGETELD en niet gerangschikt."
       },
+      "spreiding": {
+        "wat": "ingedeelde collecties die door VIER of meer onverwante padfamilies worden geraakt",
+        "waarom": "zo'n collectie draagt haar effect niet: iedereen die erin schrijft krijgt het, ook wie er niets mee te maken heeft. Een waarschuwing en geen poort -- twee of drie verwante families zijn normaal.",
+        "breed": [
+          {
+            "collectie": "suppliers",
+            "families": 7,
+            "voorbeelden": [
+              "/api/foodcourt",
+              "/api/groothandel",
+              "/api/mall",
+              "/api/staff",
+              "/api/supplier",
+              "/api/uitgaan"
+            ]
+          },
+          {
+            "collectie": "onboarding",
+            "families": 5,
+            "voorbeelden": [
+              "/api/appstore",
+              "/api/onboarding",
+              "/api/onderneming",
+              "/api/supplier",
+              "/api/rtf"
+            ]
+          }
+        ],
+        "uitgesloten": {
+          "vastlegging": [
+            "securityLog",
+            "commandJournaal",
+            "kantoorAudit",
+            "supplierActivity"
+          ],
+          "grabbelton": [
+            "techniek"
+          ],
+          "waarom": "deze zijn met naam uitgesloten en laten de module bij het laden omvallen als iemand ze alsnog indeelt"
+        }
+      },
       "magHandhaven": false,
-      "waarom": "met 2459 van de 4655 paden zonder profiel kan dit model niet de laag zijn die beslist: het zou over meer dan de helft van het huis moeten raden, en raden in de gesloten richting legt het platform plat terwijl raden in de open richting niets beschermt. De blokkade is GEMETEN en heeft een naam -- de proef, niet het register -- en dat is iets anders dan \"er is nog werk\"."
+      "waarom": "met 2461 van de 4655 paden zonder profiel kan dit model niet de laag zijn die beslist: het zou over meer dan de helft van het huis moeten raden, en raden in de gesloten richting legt het platform plat terwijl raden in de open richting niets beschermt. De blokkade is GEMETEN en heeft een naam -- de proef, niet het register -- en dat is iets anders dan \"er is nog werk\"."
     },
     "leesset": {
       "wat": "wat er onder `isolatie` overblijft, en op welke grond",
@@ -806,19 +855,19 @@
         "server/kern/isolatie/effecten.js"
       ],
       "gevonden": 4655,
-      "BEWEZEN_GEBLOKKEERD": 3711,
-      "BEWEZEN_TOEGESTAAN": 944,
+      "BEWEZEN_GEBLOKKEERD": 3398,
+      "BEWEZEN_TOEGESTAAN": 1257,
       "ONBESLIST": 0,
       "ONBEPAALD_INFRA": 0,
       "gronden": {
-        "NIET_BEWEZEN_LEZER": 2459,
-        "Toegang en identiteit": 50,
-        "EFFECT_GESLOTEN": 104,
-        "Geld": 92,
-        "Betalen & verificatie": 30,
-        "Personeel & integraties": 31,
-        "Identiteit en veiligheid": 23,
-        "Partners (leveranciers)": 922
+        "NIET_BEWEZEN_LEZER": 2454,
+        "Toegang en identiteit": 37,
+        "EFFECT_GESLOTEN": 51,
+        "Geld": 62,
+        "Betalen & verificatie": 20,
+        "Personeel & integraties": 26,
+        "Identiteit en veiligheid": 19,
+        "Partners (leveranciers)": 729
       },
       "meting": {
         "routesInDeProef": 4655,
@@ -831,7 +880,7 @@
       },
       "tegenoverBeschermd": {
         "beschermdLaatDoor": 3507,
-        "isolatieLaatDoor": 944,
+        "isolatieLaatDoor": 1257,
         "waarom": "isolatie draagt de eigenschap `beschermd` ook, en sluit daarbovenop alles waarvan het lezerschap niet is bewezen"
       },
       "prijs": "de meting kwam bij 3033 van de 4655 rol-paden nooit met succes langs. Die gaan onder isolatie dicht, en een deel ervan zijn onschuldige lezers. Isolatie is dus botter dan hij hoeft te zijn; dat wordt minder naarmate IDEMPROEF.json verder komt."
@@ -850,6 +899,69 @@
         }
       ],
       "teltAlsNormaal": false
+    },
+    "bruikbaarheid": {
+      "wat": "wat er onder elke stand nog werkt, per kritiek gebruikersverhaal",
+      "bron": [
+        "server/kern/isolatie/bruikbaarheid.js"
+      ],
+      "gevonden": 9,
+      "perStand": {
+        "normaal": {
+          "werkt": 9,
+          "beperkt": 0,
+          "werktNiet": 0
+        },
+        "waakzaam": {
+          "werkt": 9,
+          "beperkt": 0,
+          "werktNiet": 0
+        },
+        "beperkt": {
+          "werkt": 9,
+          "beperkt": 0,
+          "werktNiet": 0
+        },
+        "beschermd": {
+          "werkt": 8,
+          "beperkt": 0,
+          "werktNiet": 1
+        },
+        "isolatie": {
+          "werkt": 8,
+          "beperkt": 0,
+          "werktNiet": 1
+        }
+      },
+      "beloftesGezakt": [],
+      "waarom": "de tellingen hierboven zeggen wat er DICHTGAAT, en dat is de helft die een verkeerd gevoel geeft: hoe meer er dicht is, hoe beter het lijkt. Een isolatiestand die niemand durft aan te zetten, beschermt niemand.",
+      "gevonden3": [
+        "geld-lezen viel dicht onder beschermd -- de eerste handeling van iemand die zijn account niet vertrouwt",
+        "zelf-beschermen viel dicht door de bescherming zelf",
+        "ontsluiten-aanvragen viel dicht: een stand zonder uitgang is een val"
+      ]
+    },
+    "herkomst": {
+      "wat": "onvertrouwde inhoud vergroot nooit de beschikbare capabilities",
+      "bron": [
+        "server/kern/isolatie/herkomst.js",
+        "server/kern/stuur/isolatiefilter.js"
+      ],
+      "gevonden": 13,
+      "klassen": [
+        "SYSTEEM",
+        "MENS",
+        "ONVERTROUWD",
+        "ACTIEF_ONVERTROUWD"
+      ],
+      "sluitBijOnvertrouwd": 8,
+      "sluitBijActiefOnvertrouwd": 11,
+      "handhaaft": true,
+      "waar": "kern/stuur/isolatiefilter.js, op dezelfde plek waar de isolatiestand versmalt",
+      "nietGebouwd": {
+        "detectie": "er wordt geen tekst gescand; de klasse komt uit het KANAAL en nooit uit de inhoud",
+        "labelaars": "welke kanalen zich vandaag werkelijk aanmelden, is niet gemeten -- een kanaal dat zwijgt telt als onvertrouwd, dus de verkeerde kant is de veilige, maar dekking is dat niet"
+      }
     },
     "uitgaandeBestemmingen": {
       "wat": "hostnamen die letterlijk in server/ voorkomen; een ondergrens, geen inventaris",

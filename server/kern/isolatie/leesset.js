@@ -61,9 +61,35 @@ function uitzonderingIds() {
   try { return require('../beschermstand-lijst').UITZONDERINGEN || {}; } catch (e) { return {}; }
 }
 
+/* DE UITGANG MAG NOOIT DICHTVALLEN DOOR DE STAND ZELF.
+
+   Gemeten en niet bedacht: bruikbaarheid.js liet zien dat onder `isolatie` de
+   verhalen `zelf-beschermen` en `ontsluiten-aanvragen` op "werkt niet" stonden.
+   De routes van deze laag zijn nieuw, dus de proef heeft ze nooit gemeten, dus
+   de leesset sluit ze -- en dan kan een mens die in isolatie staat zichzelf niet
+   meer beschermen en er ook niet meer uit. Een stand zonder uitgang is een val,
+   en een val zet niemand aan.
+
+   Ze staan hier met naam en niet als patroon: een patroon als /api/isolatie/
+   zou elke toekomstige route van deze laag automatisch vrijstellen, en juist
+   hier hoort elke vrijstelling een besluit te zijn. */
+const EIGEN_UITGANG = Object.freeze({
+  '/api/isolatie/mijn': 'de eigen stand kunnen LEZEN; wie niet ziet dat hij dichtstaat, snapt niets',
+  '/api/isolatie/mijn/zet': 'zichzelf strenger zetten mag nooit door de bescherming zelf dichtvallen',
+  '/api/isolatie/mijn/ontsluiting': 'de uitgang aanvragen',
+  '/api/isolatie/mijn/ontsluiting/stap': 'de uitgang aflopen',
+  '/api/isolatie/mijn/ontsluiting/commit': 'de uitgang afmaken',
+  '/api/isolatie/mijn/ontsluiting/afbreken': 'de uitgang laten vallen'
+});
+
 /* Het oordeel per pad. Geeft altijd een REDEN terug, ook bij ja: een scherm dat
    moet uitleggen waarom iets dicht is, heeft de grond nodig en niet de uitkomst. */
 function magOnderIsolatie(pad, functie) {
+  if (EIGEN_UITGANG[String(pad)]) {
+    return { mag: true, grond: 'EIGEN_UITGANG',
+      waarom: 'dit is de uitgang van de stand zelf: ' + EIGEN_UITGANG[String(pad)] };
+  }
+
   const uitz = uitzonderingIds();
   if (functie && uitz[functie.id]) {
     return { mag: true, grond: 'UITZONDERING',
@@ -79,29 +105,30 @@ function magOnderIsolatie(pad, functie) {
           'gaat dicht wat zijn lezerschap niet heeft bewezen' };
   }
 
-  /* De blinde vlek van die meting, gedekt door de tweede bron -- maar ALLEEN
-     door haar harde helft.
+  /* DE BLINDE VLEK VAN DIE METING, EN ALLEEN DIE.
 
-     EEN METING SLAAT EEN VERMOEDEN, en dat is hier geen stijlvoorkeur maar een
-     bug die eruit is gehaald. De eerste versie liet ook `vermoed` blokkeren, en
-     toen viel /api/adres/zoek dicht met de reden IDENTITEIT_WIJZIGEN -- want zijn
-     functie zit in de categorie "Toegang en identiteit", en het vermoeden is
-     afgeleid uit die categorie. Een adres opzoeken wijzigt geen identiteit. Een
-     categorie zegt waar iets WOONT; een gemeten kale oproep zegt wat het DOET.
-     Waar die twee botsen, wint de meting, en dat is precies waarvoor de graad
-     bestaat. Een `verklaard` effect is geen vermoeden maar een regel die iemand
-     met een grond heeft opgeschreven, en een `afgeleid` effect komt uit een
-     GEMETEN schrijfactie in een ingedeelde collectie. Die twee tellen wel.
+     De opslagmeting zegt zelf wat zij niet ziet: `nietGemeten: bestand,
+     externe-aanroep`. Precies die gaten dekt het effectmodel hier af -- en
+     verder niets, want buiten dat gat heeft de meting GEKEKEN en het model
+     alleen geredeneerd.
 
-     In de praktijk kan `afgeleid` hier trouwens niet aanslaan, en dat is geen
-     dode tak maar een sluitende redenering: een bewezen lezer bewoog per
-     definitie geen collectie, dus er valt niets uit collecties af te leiden. Hij
-     staat er omdat de voorwaarde over de GRAAD hoort te gaan en niet over het
-     toeval dat de twee elkaar hier niet raken -- verandert de leesset ooit van
-     definitie, dan blijft deze regel kloppen. */
+     DAT ONDERSCHEID IS EEN KEER DUUR GEWEEST. De eerste versie liet elk
+     `verklaard` effect een gemeten lezer blokkeren. De regel `^/api/(pay|bank)/`
+     zegt GELD_BEWEGEN, dus /api/bank/afschrift -- een afschrift OPVRAGEN -- viel
+     dicht. kern/isolatie/bruikbaarheid.js ving dat: het verhaal `geld-lezen`
+     stond op "werkt niet", en dat is de eerste handeling van iemand die zijn
+     account niet vertrouwt.
+
+     De regel is nu: een effect dat een SCHRIJFACTIE impliceert (geld, rechten,
+     identiteit, andermans gegevens, de beveiliging) is door de meter gemeten --
+     en de meter zag niets bewegen. Daar wint de meting van de verklaring, want
+     zij heeft gekeken. Alleen de effecten die buiten de opslag vallen, mogen een
+     gemeten lezer alsnog sluiten. */
+  const BUITEN_DE_OPSLAG = ['UITGAANDE_AANROEP', 'EXTERN_BEREIKEN', 'ONVERTROUWDE_BYTES',
+    'DERDENCODE_UITVOEREN', 'BULK_UITVOER'];
   const prof = effecten.effectenVan(pad, 'POST', functie);
   if (prof.graad === 'verklaard' || prof.graad === 'afgeleid') {
-    const stout = (prof.effecten || []).filter(x => x !== 'LEZEN_EIGEN');
+    const stout = (prof.effecten || []).filter(x => BUITEN_DE_OPSLAG.includes(x));
     if (stout.length) {
       return { mag: false, grond: 'EFFECT_GESLOTEN',
         waarom: 'de opslagmeting zag geen collectie bewegen, maar zij kijkt niet naar bestanden en ' +
@@ -134,4 +161,4 @@ function stand() {
 /* Alleen voor de toetsen: de ingelezen meting weggooien. */
 function vergeet() { proefmeting.vergeet(); }
 
-module.exports = { magOnderIsolatie, stand, vergeet, BRON: proefmeting.BRON };
+module.exports = { magOnderIsolatie, stand, vergeet, EIGEN_UITGANG, BRON: proefmeting.BRON };

@@ -27,37 +27,9 @@
 const ordening = require('./ordening');
 const effecten = require('./effecten');
 const leesset = require('./leesset');
+
+const { dragersVanStand } = require('./toerekening');
 const { NAMEN: DRAGERNAMEN } = require('./dragers');
-
-/* WELKE DRAGER HET BESLUIT DROEG. Niet "de fijnste" en ook niet "iedereen met
-   dezelfde trede": een drager droeg dit besluit als de stand ZONDER hem zwakker
-   zou zijn geweest. Dat is de definitie, en hij is hier uitgerekend en niet
-   benaderd.
-
-   DE BENADERING DIE HIER EERST STOND, EN WAAROM HIJ SCHADELIJK WAS. Versie een
-   noemde elke drager mee wiens trede gelijk was aan de samengevoegde trede.
-   Voor `normaal` is dat altijd waar, dus een lid in de beschermstand kreeg te
-   lezen: "er staat een beveiligingsstand aan op huis en identiteit" -- terwijl
-   het huis gewoon draaide. Een mens die dat leest, gaat de verkeerde kant op
-   zoeken, en bij een incident is dat het duurste wat een scherm kan doen. */
-function dragersVanStand(standen, samen) {
-  const aanwezig = DRAGERNAMEN.filter(n => standen[n] !== null && standen[n] !== undefined);
-  const raak = [];
-  for (const naam of aanwezig) {
-    const zonder = ordening.strengste(aanwezig.filter(n => n !== naam).map(n => standen[n]));
-    /* Zou het zonder deze drager zwakker zijn geweest, dan droeg hij mee. Twee
-       dragers die allebei isolatie zeggen, dragen dus geen van beiden alleen --
-       daarom is er een tweede ronde die dat opvangt. */
-    if (ordening.vergelijk(zonder, samen) === 'zwakker') raak.push({ drager: naam, stand: standen[naam] });
-  }
-  if (raak.length) return raak;
-  /* Niemand droeg hem ALLEEN: meer dragers zeggen hetzelfde. Dan dragen ze hem
-     samen, en noemen we ze samen -- behalve de dragers die niets sluiten, want
-     die noemen zou weer de fout van versie een zijn. */
-  return aanwezig
-    .filter(n => ordening.vergelijk(standen[n], 'normaal') === 'strenger')
-    .map(n => ({ drager: n, stand: standen[n] }));
-}
 
 function maakBesluitlaag({ functies, beschermstand }) {
 
@@ -92,7 +64,26 @@ function maakBesluitlaag({ functies, beschermstand }) {
        het kort: het lezen loopt hier grotendeels over POST, dus "alleen GET" zou
        een lid uitloggen in plaats van beschermen. */
     let tegen = null;
-    if (samen.beschermd === true) tegen = beschermstand.houdtTegen(pad, methode);
+    if (samen.beschermd === true) {
+      tegen = beschermstand.houdtTegen(pad, methode);
+      /* "HET LEZEN LOOPT DOOR" IS EEN BELOFTE, EN DIE MOET OOK WAAR ZIJN ALS HET
+         LEZEN OVER POST GAAT. kern/beschermstand.js laat een GET altijd door en
+         bevriest de rest per categorie -- verdedigbaar, maar in dit huis lopen
+         3728 schrijfroutes tegenover 35 GET-routes, dus het LEZEN gaat hier
+         grotendeels ook per POST. Gevolg: een lid in de beschermstand kon zijn
+         eigen afschrift niet meer opvragen, en dat is precies de eerste
+         handeling van iemand die zijn account niet vertrouwt.
+
+         Gemeten en niet bedacht: kern/isolatie/bruikbaarheid.js zette het
+         verhaal `geld-lezen` op "werkt niet" onder `beschermd`. De leesset weet
+         welke paden BEWEZEN niets veranderen; dat is de meetbare invulling van
+         dezelfde belofte, en daarom mag hij hem hier waarmaken. Hij kan alleen
+         OPENZETTEN wat de proef heeft bewezen -- nooit iets extra's sluiten. */
+      if (tegen) {
+        const leest = leesset.magOnderIsolatie(pad, functie);
+        if (leest.mag) tegen = null;
+      }
+    }
 
     let leesbesluit = null;
     if (!tegen && samen.trede === 'isolatie' && !/^(GET|HEAD|OPTIONS)$/i.test(String(methode || ''))) {

@@ -104,44 +104,36 @@ const PER_COLLECTIE = Object.freeze({
   homekit:          ['VERTROUWENSRELATIE_AANGAAN', 'een koppeling met apparatuur in huis'],
 
   /* ---- de beveiliging zelf ---- */
-  techniek:         ['BEVEILIGING_VERZWAKKEN', 'de schakelaars, zekeringen en incidentstand'],
-  securityLog:      ['BEVEILIGING_VERZWAKKEN', 'het spoor waarop een incident wordt uitgezocht'],
   contactPinSecurity:['BEVEILIGING_VERZWAKKEN', 'de rem op het scannen van pins'],
   commandBeleid:    ['BEVEILIGING_VERZWAKKEN', 'CONTROLPLANE.md: hier verschuiven de grenzen'],
-  commandJournaal:  ['BEVEILIGING_VERZWAKKEN', 'de hashketen waarop bewijs steunt'],
-  appstore:         ['DERDENCODE_UITVOEREN', 'APPSTORE.md: hier komt code van buiten binnen'],
-
-  /* ---- een tweede persoon bereiken ---- */
-  mailQ:            ['EXTERN_BEREIKEN', 'wat hierin gaat, verlaat het huis'],
-  mailIn:           ['EXTERN_BEREIKEN', 'inkomende post van buiten'],
-  mailBijlagen:     ['ONVERTROUWDE_BYTES', 'bytes die niemand van ons heeft geschreven'],
-  notifications:    ['EXTERN_BEREIKEN', 'een melding die op een toestel landt'],
-  rtmailSchrijf:    ['EXTERN_BEREIKEN', 'een bericht aan iemand anders'],
-  posts:            ['EXTERN_BEREIKEN', 'LIFE.md: publiceren bereikt een tweede persoon'],
-  salon:            ['EXTERN_BEREIKEN', 'zelfde reden, in het besloten netwerk'],
-  campagnes:        ['EXTERN_BEREIKEN', 'een campagne gaat naar buiten'],
-  creatorOproepen:  ['EXTERN_BEREIKEN', 'een oproep aan anderen'],
-  rendezvous:       ['EXTERN_BEREIKEN', 'ONTMOETEN.md: alles wat een tweede mens bereikt'],
-  vonk:             ['EXTERN_BEREIKEN', 'zelfde reden'],
-
-  /* ---- gegevens van iemand anders ---- */
-  suppliers:        ['SCHRIJVEN_ANDERMANS', 'de gegevens van een leverancier'],
-  supplierActivity: ['SCHRIJVEN_ANDERMANS', 'zelfde reden'],
-  supplierNotifications:['SCHRIJVEN_ANDERMANS', 'zelfde reden'],
-  werkplekMensen:   ['SCHRIJVEN_ANDERMANS', 'CONCERN.md: het personeelsdossier van een ander'],
-  payrollRegels:    ['SCHRIJVEN_ANDERMANS', 'wat iemand anders krijgt uitbetaald'],
-  payrollComponenten:['SCHRIJVEN_ANDERMANS', 'zelfde reden'],
-  payrollRegelJournaal:['SCHRIJVEN_ANDERMANS', 'zelfde reden'],
-  zorgProfielen:    ['SCHRIJVEN_ANDERMANS', 'het zorgdossier van een ander mens'],
-  careAanbieders:   ['SCHRIJVEN_ANDERMANS', 'de gegevens van een zorgaanbieder'],
-  kantoorAudit:     ['SCHRIJVEN_ANDERMANS', 'het spoor van wat RTG bij een ander deed']
+  appstore:         ['DERDENCODE_UITVOEREN', 'APPSTORE.md: hier komt code van buiten binnen']
 });
+
+
+
+const { VASTLEGGING, GRABBELTON } = require('./collectieuitsluiting');
+/* Het tweede deel: de effecten die aan ANDERE MENSEN raken. Zie ./effectcollecties-b.js. */
+const { PER_COLLECTIE_B } = require('./effectcollecties-b');
 
 /* De namen worden bij het laden getoetst tegen de effectenlijst: een tikfout in
    een effectnaam zou hier stil een collectie ONgeclassificeerd laten, en dat is
    precies de faalvorm die deze hele laag moet uitsluiten. */
+const ALLES = Object.freeze(Object.assign({}, PER_COLLECTIE, PER_COLLECTIE_B));
+
 function keurIn(geldigeEffecten) {
-  const fout = Object.entries(PER_COLLECTIE)
+  const grof = GRABBELTON.filter(c => ALLES[c]);
+  if (grof.length) {
+    throw new Error('effectcollecties: "' + grof.join(', ') + '" is een GRABBELTON. Onverwante ' +
+      'padfamilies schrijven erin, dus haar naam draagt geen effect -- zie de uitleg bij GRABBELTON. ' +
+      'Hang het effect aan het PAD in ./effectregister.js.');
+  }
+  const vast = VASTLEGGING.filter(c => ALLES[c]);
+  if (vast.length) {
+    throw new Error('effectcollecties: "' + vast.join(', ') + '" is VASTLEGGING en geen effect. ' +
+      'Een append-only spoor verzwakt niets, en omdat vrijwel elke geauditeerde route erin schrijft, ' +
+      'krijgt anders de halve app een effect dat hij niet heeft -- zie de uitleg bij VASTLEGGING.');
+  }
+  const fout = Object.entries(ALLES)
     .filter(([, [effect]]) => !geldigeEffecten.includes(effect))
     .map(([col, [effect]]) => col + ' -> ' + effect);
   if (fout.length) {
@@ -149,12 +141,12 @@ function keurIn(geldigeEffecten) {
       '. De lijst staat in kern/isolatie/effecten.js; een tikfout hier laat een collectie stil ' +
       'ongeclassificeerd, en dat is de faalvorm waar deze laag tegen is gebouwd.');
   }
-  return Object.keys(PER_COLLECTIE).length;
+  return Object.keys(ALLES).length;
 }
 
 function effectVan(collectie) {
-  const rij = PER_COLLECTIE[String(collectie)];
+  const rij = ALLES[String(collectie)];
   return rij ? { effect: rij[0], grond: rij[1] } : null;
 }
 
-module.exports = { PER_COLLECTIE, effectVan, keurIn };
+module.exports = { PER_COLLECTIE: ALLES, VASTLEGGING, GRABBELTON, effectVan, keurIn };

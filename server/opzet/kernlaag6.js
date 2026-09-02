@@ -99,7 +99,12 @@ Object.assign(kern, require('../kern/office').maakOffice({
 /* Het AI-stuur (kern/stuur.js): Rahul voert acties uit op elk toegestaan
    API-pad, als interne aanroep met de eigen inlog van de gebruiker. Een
    codepad, dezelfde rechten en dezelfde schakelkast als de app-knoppen. */
-Object.assign(kern, require('../kern/stuur').maakStuur({ log, anthropic, app, crypto }));
+/* `isolatie` gaat LUI mee: de isolatielaag hangt zichzelf op kern.isolatie op
+   vanuit routes/isolatie.js, en die wordt na deze regel gemount. Hem hier als
+   waarde meegeven zou hem voorgoed op `undefined` vastzetten -- en dan versmalt
+   het stuur nooit, zonder dat iets dat zegt. */
+Object.assign(kern, require('../kern/stuur').maakStuur({ log, anthropic, app, crypto,
+  isolatie: () => kern.isolatie }));
 /* Passkeys (kern/webauthn.js): inloggen met vingerafdruk/gezicht/sleutel.
    De verificatie draait op de eigen WebAuthn-laag (server/webauthn.js) op Node's
    crypto; wij bewaren alleen publieke sleutels per account, challenges leven kort

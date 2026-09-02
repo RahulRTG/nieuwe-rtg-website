@@ -11,7 +11,9 @@ const { compileer } = require('./plan');
 const { voorspel } = require('./gevolg');
 const { TOOLS } = require('./gereedschap');
 
-module.exports = ({ anthropic, app, log, stuurRoep, stuurPaden, classificeer, parseSubs }) => {
+module.exports = ({ anthropic, app, log, stuurRoep, stuurPaden, classificeer, parseSubs, isolatie }) => {
+  /* De isolatiecontext staat in ./luscontext.js: klein stuk, groot gevolg. */
+  const isoContextVan = require('./luscontext')({ isolatie });
   const LUS_REGELS = TWIJFELREGELS.join(' ') + ' ' +
     'Je hebt het stuur van RTG: met de tool "doe" voer je acties uit op de API, ' +
     'altijd met de inlog van de gebruiker zelf (je kunt dus nooit meer dan zij). Gebruik "kaart" om te zien welke paden er zijn. ' +
@@ -26,7 +28,9 @@ module.exports = ({ anthropic, app, log, stuurRoep, stuurPaden, classificeer, pa
     if (!anthropic) return null;
     const vraag = String((opties && opties.vraag) || '').trim().slice(0, 1200);
     if (!vraag) return null;
-    const paden = () => stuurPaden(app, opties.wereld).filter(opties.filter || (() => true));
+    const isoContext = () => isoContextVan(req);
+    const paden = () => stuurPaden(app, opties.wereld, isoContext())
+      .filter(opties.filter || (() => true));
     // een streamende voortgangsmelding (optioneel): de route koppelt dit aan de
     // SSE-bus, zodat de UI live "Stap 4/24: taxi zoeken..." kan tonen
     const opStap = typeof (opties && opties.opStap) === 'function' ? opties.opStap : () => {};
@@ -71,6 +75,19 @@ module.exports = ({ anthropic, app, log, stuurRoep, stuurPaden, classificeer, pa
             uit = (t.input && t.input.alles)
               ? { paden: toegestaan, versmald: false, reden: 'De volledige lijst voor deze rol, op verzoek.' }
               : resolveer(kaartVraag, toegestaan);
+            /* WAT ER DOOR EEN BEVEILIGINGSSTAND WEGVIEL, ZEGT DE KAART ERBIJ.
+               Zonder deze regel denkt het model dat die vermogens niet BESTAAN,
+               en zegt het "dat kan ik niet" in plaats van "dat kan nu niet,
+               omdat". EXECUTIE.md blok 0. */
+            const iso = toegestaan.isolatie;
+            if (iso && iso.actief && iso.weggevallen.length) {
+              uit.beveiligingsstand = {
+                weggevallen: iso.weggevallen.length,
+                uitleg: iso.uitleg,
+                zegTegenDeGebruiker: 'Er staat een beveiligingsstand aan. Zeg WAT er nu niet kan en ' +
+                  'WAARDOOR; doe niet alsof die mogelijkheid niet bestaat.'
+              };
+            }
           }
           else {
             /* De twijfelpoort staat VOOR de aanroep. Zonder expliciete

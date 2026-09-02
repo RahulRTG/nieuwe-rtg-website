@@ -49,6 +49,8 @@ const proefmeting = require(path.join(root, 'server/kern/isolatie/proefmeting'))
 const dragerlijst = require(path.join(root, 'server/kern/isolatie/dragers'));
 const leesset = require(path.join(root, 'server/kern/isolatie/leesset'));
 const { maakIsolatiefilter } = require(path.join(root, 'server/kern/stuur/isolatiefilter'));
+const { maakBruikbaarheid } = require(path.join(root, 'server/kern/isolatie/bruikbaarheid'));
+const herkomstlaag = require(path.join(root, 'server/kern/isolatie/herkomst'));
 
 function lees(bestand) {
   try { return JSON.parse(fs.readFileSync(path.join(root, bestand), 'utf8')); }
@@ -295,6 +297,26 @@ const noemers = {};
     'opslag en niet naar uitgaande aanroepen; de verklaring leest de naam en kent geen collecties). ' +
     'Daarom worden ze OPGETELD en niet gerangschikt.';
 
+  /* DE SPREIDING PER INGEDEELDE COLLECTIE. Een collectie kan alleen een effect
+     dragen als IEDEREEN die erin schrijft dat effect heeft. Wordt zij door
+     onverwante padfamilies geraakt, dan zegt haar naam te weinig -- dat is hoe
+     `techniek` een adres opzoeken het effect BEVEILIGING_VERZWAKKEN gaf. Deze
+     lijst staat er zodat de volgende die een collectie indeelt, ziet waar hij
+     aan begint; hij is een WAARSCHUWING en geen poort, want twee of drie
+     verwante families zijn volstrekt normaal. */
+  const spreiding = {};
+  for (const rij of Object.values(require(path.join(root, 'IDEMPROEF.json')).perRoute || {})) {
+    const c = proefmeting.collectiesVan(rij.pad);
+    if (!c) continue;
+    for (const col of c) {
+      if (!effectcollecties.effectVan(col)) continue;
+      (spreiding[col] = spreiding[col] || new Set()).add(String(rij.pad).split('/').slice(0, 3).join('/'));
+    }
+  }
+  const breed = Object.entries(spreiding).map(([col, s]) => ({ collectie: col, families: s.size,
+    voorbeelden: [...s].slice(0, 6) })).filter(x => x.families >= 4)
+    .sort((a, b) => b.families - a.families);
+
   noemers.effectdekking = {
     wat: 'weet het effectmodel genoeg om ooit zelf te mogen beslissen?',
     bron: ['server/kern/isolatie/effecten.js', 'server/kern/isolatie/effectcollecties.js',
@@ -311,6 +333,16 @@ const noemers = {};
         'niet van meer namen in het register.'
     },
     ijking,
+    spreiding: {
+      wat: 'ingedeelde collecties die door VIER of meer onverwante padfamilies worden geraakt',
+      waarom: 'zo\'n collectie draagt haar effect niet: iedereen die erin schrijft krijgt het, ook wie ' +
+        'er niets mee te maken heeft. Een waarschuwing en geen poort -- twee of drie verwante ' +
+        'families zijn normaal.',
+      breed,
+      uitgesloten: { vastlegging: effectcollecties.VASTLEGGING, grabbelton: effectcollecties.GRABBELTON,
+        waarom: 'deze zijn met naam uitgesloten en laten de module bij het laden omvallen als iemand ' +
+          'ze alsnog indeelt' }
+    },
     /* HET ANTWOORD OP DE VRAAG WAAROM DEZE NOEMER BESTAAT. Hij staat er als
        oordeel en niet als getallen waar de lezer zelf iets van moet vinden. */
     magHandhaven: false,
@@ -375,6 +407,58 @@ const noemers = {};
     /* Een drager zonder bron telt NIET stil als `normaal` mee in de join: hij
        levert geen stand, en dat is iets anders dan de stand normaal. */
     teltAlsNormaal: false
+  };
+}
+
+/* ---------- 3d. Wat er nog WERKT -- de andere helft van de vraag ---------- */
+{
+  const iso = maakIsolatie({ db: { data: {} }, save() {}, functies, klok: null, huisStand: () => 'normaal' });
+  const meter = maakBruikbaarheid({ isolatie: iso, functies });
+  const perStand = meter.overStanden(['normaal', 'waakzaam', 'beperkt', 'beschermd', 'isolatie']);
+  const gezakt = [];
+  for (const [stand, v] of Object.entries(perStand)) {
+    for (const b of v.belofteGezakt) gezakt.push({ stand, verhaal: b.id, dicht: b.dicht });
+  }
+
+  noemers.bruikbaarheid = {
+    wat: 'wat er onder elke stand nog werkt, per kritiek gebruikersverhaal',
+    bron: ['server/kern/isolatie/bruikbaarheid.js'],
+    gevonden: meter.VERHALEN.length,
+    /* GEEN PERCENTAGE. Negen verhalen zijn geen steekproef, en 78% van negen
+       zegt minder dan de rij zelf. */
+    perStand: Object.fromEntries(Object.entries(perStand).map(([k, v]) =>
+      [k, { werkt: v.werkt, beperkt: v.beperkt, werktNiet: v.werktNiet }])),
+    beloftesGezakt: gezakt,
+    waarom: 'de tellingen hierboven zeggen wat er DICHTGAAT, en dat is de helft die een verkeerd ' +
+      'gevoel geeft: hoe meer er dicht is, hoe beter het lijkt. Een isolatiestand die niemand durft ' +
+      'aan te zetten, beschermt niemand.',
+    /* Deze meting vond drie echte ontwerpfouten; ze staan hier zodat zichtbaar
+       blijft waarvoor de noemer bestaat. */
+    gevonden3: ['geld-lezen viel dicht onder beschermd -- de eerste handeling van iemand die zijn ' +
+      'account niet vertrouwt', 'zelf-beschermen viel dicht door de bescherming zelf',
+      'ontsluiten-aanvragen viel dicht: een stand zonder uitgang is een val']
+  };
+}
+
+/* ---------- 3e. De herkomst van invoer ---------- */
+{
+  noemers.herkomst = {
+    wat: 'onvertrouwde inhoud vergroot nooit de beschikbare capabilities',
+    bron: ['server/kern/isolatie/herkomst.js', 'server/kern/stuur/isolatiefilter.js'],
+    gevonden: herkomstlaag.KANALEN_INGEDEELD,
+    klassen: herkomstlaag.KLASSENAMEN,
+    sluitBijOnvertrouwd: herkomstlaag.NOOIT_UIT_ONVERTROUWD.length,
+    sluitBijActiefOnvertrouwd: herkomstlaag.NOOIT_UIT_ACTIEF.length,
+    handhaaft: true,
+    waar: 'kern/stuur/isolatiefilter.js, op dezelfde plek waar de isolatiestand versmalt',
+    /* WAT DIT NIET IS, en dat hoort er even groot bij: er wordt geen tekst
+       gescand op verdachte zinnen. Dat werkt niet, en het wekt de indruk dat het
+       wel werkt -- wat erger is dan niets. */
+    nietGebouwd: {
+      detectie: 'er wordt geen tekst gescand; de klasse komt uit het KANAAL en nooit uit de inhoud',
+      labelaars: 'welke kanalen zich vandaag werkelijk aanmelden, is niet gemeten -- een kanaal dat ' +
+        'zwijgt telt als onvertrouwd, dus de verkeerde kant is de veilige, maar dekking is dat niet'
+    }
   };
 }
 
@@ -527,8 +611,7 @@ const schuld = [
   { punt: 'lockdown-filter na de resolver',
     stand: 'STAAT',
     waarom: 'server/kern/stuur/isolatiefilter.js versmalt de lijst waaruit de AI kiest, per constructie ' +
-      'een deelverzameling, met per weggevallen pad een reden.',
-    open: 'hij is nog niet gemonteerd op de weg die het stuur werkelijk loopt.' },
+      'een deelverzameling, met per weggevallen pad een reden.' },
   { punt: 'ontsluitceremonie, ook voor het huis',
     stand: 'STAAT',
     waarom: 'alle vijf dragers verlagen alleen langs kern/isolatie/ontsluiting.js. Het huis liep achter ' +
@@ -553,14 +636,24 @@ const schuld = [
   { punt: 'procesisolatie van parsers',
     stand: 'ONBEPAALD_INFRA',
     waarom: noemers.bestandsverwerkers.gevonden + ' verwerkers draaien in het hoofdproces.' },
-  { punt: 'herkomst en vertrouwensklasse van invoer (taint)',
-    stand: 'ONTBREEKT',
-    waarom: 'onvertrouwde inhoud (mail, document, webpagina, toolresultaat) draagt geen klasse, dus ' +
-      'de regel "onvertrouwde inhoud vergroot nooit de beschikbare capabilities" is niet af te dwingen.' },
   { punt: 'bruikbaarheid onder isolatie',
-    stand: 'ONGEMETEN',
-    waarom: 'er is geen lijst kritieke gebruikersverhalen, dus er is niet te zeggen wat er tijdens ' +
-      'een incident nog WERKT. Een isolatiestand die niemand durft aan te zetten, beschermt niets.' }
+    stand: 'GEMETEN',
+    waarom: 'kern/isolatie/bruikbaarheid.js: negen kritieke verhalen, per stand nagelopen. De meting ' +
+      'vond meteen drie echte ontwerpfouten -- geld-lezen, zelf-beschermen en ontsluiten-aanvragen ' +
+      'vielen alle drie dicht -- en die zijn gerepareerd.',
+    open: 'negen verhalen is een begin en geen dekking; wie er een toevoegt, meet meteen mee.' },
+  { punt: 'herkomst en vertrouwensklasse van invoer (taint)',
+    stand: 'STAAT',
+    waarom: 'kern/isolatie/herkomst.js: vier klassen, dertien kanalen, en de regel wordt AFGEDWONGEN ' +
+      'in kern/stuur/isolatiefilter.js -- op dezelfde plek waar de isolatiestand versmalt. Onvertrouwde ' +
+      'invoer sluit acht effecten, actief-onvertrouwde elf.',
+    open: 'welke kanalen zich vandaag werkelijk aanmelden is niet gemeten. Een kanaal dat zwijgt telt ' +
+      'als onvertrouwd -- de verkeerde kant is dus de veilige, maar dekking is dat niet.' },
+  { punt: 'lockdown-filter gemonteerd',
+    stand: 'STAAT',
+    waarom: 'kern/stuur.js roept het filter aan in stuurPaden(), en kern/stuur/lus.js haalt de ' +
+      'context uit de SESSIE van de aanroeper. De kaart zegt er bovendien bij WAT er wegviel, zodat ' +
+      'het model niet denkt dat een vermogen niet bestaat.' }
 ];
 
 const uit = {
@@ -599,6 +692,15 @@ function vat(naam, n) {
       ' verklaard, ' + String(n.graden.afgeleid || 0).padStart(4) + ' afgeleid, ' +
       String(n.graden.vermoed || 0).padStart(5) + ' vermoed, ' + String(n.graden.onbekend || 0).padStart(5) +
       ' onbekend  (plafond: ' + n.plafond.danNogOnbekend + ' blijft onbekend)';
+  }
+  if (naam === 'bruikbaarheid') {
+    const i = n.perStand.isolatie;
+    return String(n.gevonden).padStart(6) + ' verhalen, onder isolatie: ' + i.werkt + ' werkt, ' +
+      i.beperkt + ' beperkt, ' + i.werktNiet + ' niet  (beloftes gezakt: ' + n.beloftesGezakt.length + ')';
+  }
+  if (naam === 'herkomst') {
+    return String(n.gevonden).padStart(6) + ' kanalen ingedeeld, ' + n.sluitBijOnvertrouwd +
+      ' effecten dicht bij onvertrouwd, ' + n.sluitBijActiefOnvertrouwd + ' bij actief-onvertrouwd';
   }
   if (naam === 'dragers') {
     return String(n.gevonden).padStart(6) + ' dragers, ' + String(n.metBron).padStart(5) + ' met een bron, ' +

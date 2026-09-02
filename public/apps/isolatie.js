@@ -19,6 +19,11 @@
     return s;
   }
 
+  /* De kleine hulpjes gaan naar het venster omdat ./isolatie-tabellen.js ze
+     nodig heeft; dat zijn twee losse scripts en geen modules. Alleen deze drie,
+     en met een eigen naam: een globale `maak` zou vroeg of laat botsen. */
+  window.RTGIsolatieHulp = { maak: maak, leeg: leeg, stipVoor: stipVoor };
+
   function meld(soort, tekstIn) {
     var m = $('melding');
     leeg(m);
@@ -131,73 +136,7 @@
     });
   }
 
-  /* ---------- tabellen ---------- */
-  function tabel(kolommen, rijen) {
-    var t = maak('table');
-    var thead = maak('thead'), tr = maak('tr');
-    kolommen.forEach(function (k) { tr.appendChild(maak('th', null, k)); });
-    thead.appendChild(tr);
-    t.appendChild(thead);
-    var tb = maak('tbody');
-    rijen.forEach(function (r) {
-      var q = maak('tr');
-      r.forEach(function (c, i) {
-        var td = maak('td', i === 0 ? 'mono' : null);
-        if (c && c.nodeType) td.appendChild(c); else td.appendChild(document.createTextNode(String(c == null ? '-' : c)));
-        q.appendChild(td);
-      });
-      tb.appendChild(q);
-    });
-    t.appendChild(tb);
-    return t;
-  }
-
-  function tekenDragers(o) {
-    var kaart = $('dragerkaart');
-    leeg(kaart);
-    var rijen = [];
-    ['organisatie', 'identiteit', 'sessie', 'apparaat'].forEach(function (d) {
-      var p = o.perDrager[d] || { aantal: 0, perStand: {} };
-      Object.keys(p.perStand).sort().forEach(function (s) {
-        var cel = maak('span');
-        cel.appendChild(stipVoor(s));
-        cel.appendChild(document.createTextNode(s));
-        rijen.push([d, cel, String(p.perStand[s])]);
-      });
-    });
-    if (!rijen.length) {
-      kaart.appendChild(maak('p', 'voetnoot', 'Geen enkele drager staat in een stand.'));
-      return;
-    }
-    kaart.appendChild(tabel(['Drager', 'Stand', 'Aantal'], rijen));
-  }
-
-  function tekenSpoor(o) {
-    var kaart = $('spoorkaart');
-    leeg(kaart);
-    var s = o.spoor || [];
-    if (!s.length) {
-      kaart.appendChild(maak('p', 'voetnoot', 'Nog geen enkele zetting. Het spoor groeit aan en wordt nooit herschreven.'));
-      return;
-    }
-    kaart.appendChild(tabel(['Wanneer', 'Drager', 'Van → naar', 'Richting', 'Door'],
-      s.slice(0, 25).map(function (r) {
-        return [String(r.at).replace('T', ' ').slice(0, 19), r.drager, r.van + ' → ' + r.naar,
-          r.richting, r.door];
-      })));
-  }
-
-  function tekenGaten(o) {
-    var kaart = $('gatenkaart');
-    leeg(kaart);
-    kaart.appendChild(maak('p', null, 'Het effectmodel ' +
-      (o.effectmodel.handhaaft ? 'handhaaft.' : 'handhaaft NIETS.')));
-    kaart.appendChild(maak('p', 'voetnoot', o.effectmodel.waarom));
-    (o.dragersZonderBron || []).forEach(function (z) {
-      kaart.appendChild(maak('p', 'voetnoot', 'Drager "' + z.naam + '": ' + z.waarom));
-    });
-  }
-
+  /* De tabellen staan in ./isolatie-tabellen.js; zie daar waarom. */
   /* ---------- proef ---------- */
   var PROEFPADEN = ['/api/pay/stuur', '/api/bank/sepa', '/api/bank/afschrift', '/api/pay/overzicht',
     '/api/agenda/mijn', '/api/salon/post'];
@@ -213,7 +152,7 @@
       var st = j.stand;
       uit.appendChild(maak('p', 'voetnoot', 'Effectieve stand: trede ' + (st.trede || 'geen') +
         (st.beschermd ? ' + beschermd' : '') + (st.tredeOnbepaald ? ' (trede niet vast te stellen)' : '')));
-      uit.appendChild(tabel(['Pad', 'Uitkomst', 'Waarom', 'Schaduw'],
+      uit.appendChild(window.RTGIsolatieTabellen.tabel(['Pad', 'Uitkomst', 'Waarom', 'Schaduw'],
         (j.besluiten || []).map(function (b) {
           return [b.pad, b.toegestaan ? 'loopt door' : 'tegengehouden', b.uitleg,
             b.schaduw.oordeel + (b.onenigheid ? ': oneens (' + b.onenigheid.soort + ')' : '')];
@@ -235,7 +174,9 @@
 
   function laad() {
     haal('/api/techniek/isolatie').then(function (o) {
-      tekenRail(o); tekenOntsluitingen(o); tekenDragers(o); tekenSpoor(o); tekenGaten(o);
+      var T = window.RTGIsolatieTabellen;
+      tekenRail(o); tekenOntsluitingen(o);
+      T.tekenDragers(o); T.tekenBruikbaar(o); T.tekenSpoor(o); T.tekenGaten(o);
     }).catch(function (e) { meld('fout', e.message); });
   }
 

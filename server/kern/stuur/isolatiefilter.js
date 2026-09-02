@@ -45,7 +45,16 @@
    en niet hier. */
 const METHODE = 'POST';
 
+const herkomst = require('../isolatie/herkomst');
+
 function maakIsolatiefilter({ isolatie, beleid }) {
+
+  /* De functie achter een pad, voor het effectmodel. Hij komt uit dezelfde
+     catalogus als de beschermstand; is die er niet, dan werkt het effectmodel
+     zonder categorievermoeden -- strenger, en dat is hier de goede kant. */
+  function functieVoor(pad) {
+    try { return require('../../functies').functieVoorPad(pad) || null; } catch (e) { return null; }
+  }
 
   function methodeVoor(pad, wereld) {
     if (!beleid || !wereld) return METHODE;
@@ -53,32 +62,81 @@ function maakIsolatiefilter({ isolatie, beleid }) {
     catch (e) { return METHODE; }   /* bij twijfel het strengste; dat is de goede kant om fout te gaan */
   }
 
-  /* Geeft { paden, weggevallen } terug. Nooit meer paden dan er binnenkwamen. */
-  function versmal(paden, context, wereld) {
+  /* Geeft { paden, weggevallen } terug. Nooit meer paden dan er binnenkwamen.
+
+     `bronnen` zijn de KANALEN waarlangs invoer aan deze opdracht heeft
+     bijgedragen (../isolatie/herkomst.js). Zat daar onvertrouwde inhoud bij, dan
+     versmalt hij OOK zonder dat er een beveiligingsstand geldt -- dat is de
+     invariant "onvertrouwde inhoud vergroot nooit de beschikbare capabilities",
+     en die staat los van isolatie. Een mail die geld wil laten bewegen, hoort
+     ook op een doodgewone dinsdag te worden tegengehouden. */
+  function versmal(paden, context, wereld, bronnen) {
     const binnen = Array.isArray(paden) ? paden : [];
-    if (!isolatie || !context) {
-      return { paden: binnen, weggevallen: [], actief: false,
-        waarom: 'geen isolatiecontext meegegeven; er valt niets te versmallen' };
-    }
-    const stand = isolatie.effectieveStand(context.standen || {});
-    const geldt = stand.beschermd === true || stand.trede === 'isolatie' || stand.tredeOnbepaald === true;
-    if (!geldt) {
+    const dichtDoorHerkomst = herkomst.sluitDoorHerkomst(bronnen || []);
+
+    const stand = isolatie && context ? isolatie.effectieveStand(context.standen || {}) : null;
+    const standGeldt = !!(stand && (stand.beschermd === true || stand.trede === 'isolatie' ||
+      stand.tredeOnbepaald === true));
+
+    if (!standGeldt && !dichtDoorHerkomst.length) {
       return { paden: binnen, weggevallen: [], actief: false, stand,
-        waarom: 'geen enkele drager staat in een stand die iets sluit' };
+        waarom: !isolatie || !context
+          ? 'geen isolatiecontext meegegeven en geen onvertrouwde invoer; er valt niets te versmallen'
+          : 'geen enkele drager staat in een stand die iets sluit, en alleen gezaghebbende bronnen droegen bij' };
     }
 
     const blijft = [];
     const weg = [];
     for (const pad of binnen) {
-      const b = isolatie.besluit({ pad, methode: methodeVoor(pad, wereld), context });
-      if (b.toegestaan) { blijft.push(pad); continue; }
-      weg.push({ pad, reden: b.reden, regel: b.regel || null, uitleg: b.uitleg,
-        dragers: (b.dragers || []).map(d => d.drager) });
+      /* 1. DE STAND. Alleen als er ook werkelijk een stand geldt -- anders zou
+            elke aanroep met onvertrouwde invoer ook de isolatievraag stellen en
+            per pad een besluit forceren dat niets toevoegt. */
+      if (standGeldt) {
+        const b = isolatie.besluit({ pad, methode: methodeVoor(pad, wereld), context });
+        if (!b.toegestaan) {
+          weg.push({ pad, reden: b.reden, regel: b.regel || null, uitleg: b.uitleg,
+            dragers: (b.dragers || []).map(d => d.drager) });
+          continue;
+        }
+      }
+      /* 2. DE HERKOMST. Wat dit pad DOET komt uit hetzelfde effectmodel; een
+            pad zonder profiel valt onder `onbekend` en gaat dan DICHT, want bij
+            onvertrouwde invoer is "we weten het niet" geen grond om door te
+            laten. Dat is strenger dan de isolatiekant, en met reden: daar
+            beschermt de stand een account, hier verdedigt hij tegen een tekst
+            die actief probeert iets te laten gebeuren. */
+      if (dichtDoorHerkomst.length) {
+        const functie = functieVoor(pad);
+        /* LEZEN VERGROOT GEEN VERMOGEN, en dat is geen uitzondering op de regel
+           maar de regel zelf gelezen. De invariant zegt dat onvertrouwde inhoud
+           de beschikbare capabilities nooit VERGROOT; een pad waarvan gemeten is
+           dat het werk doet zonder iets te veranderen, vergroot niets. Zonder
+           deze regel viel /api/agenda/mijn dicht zodra Rahul een mail had
+           gelezen -- en dan is de verdediging in de praktijk een uitknop voor de
+           assistent, wat betekent dat iemand hem uitzet.
+
+           `magOnderIsolatie` is dezelfde toets als onder isolatie, en met opzet:
+           twee lijsten "wat is een lezer" zouden na een jaar uiteenlopen. */
+        const leest = isolatie ? isolatie.leesset.magOnderIsolatie(pad, functie) : { mag: false };
+        if (!leest.mag) {
+          const prof = isolatie
+            ? isolatie.effecten.effectenVan(pad, methodeVoor(pad, wereld), functie)
+            : { effecten: null, graad: 'onbekend' };
+          const oordeel = herkomst.oordeel({ effecten: prof.effecten, bronnen });
+          if (oordeel.toegestaan !== true) {
+            weg.push({ pad, reden: 'HERKOMST', regel: oordeel.geraakt.join(', ') || 'geen effectprofiel',
+              uitleg: oordeel.waarom, dragers: [] });
+            continue;
+          }
+        }
+      }
+      blijft.push(pad);
     }
     return { paden: blijft, weggevallen: weg, actief: true, stand,
+      herkomstSluit: dichtDoorHerkomst,
       waarom: weg.length
-        ? weg.length + ' pad(en) vielen weg omdat een drager in een stand staat die ze sluit'
-        : 'de stand geldt, maar raakt geen van deze paden' };
+        ? weg.length + ' pad(en) vielen weg door een beveiligingsstand of door onvertrouwde invoer'
+        : 'de stand en de herkomst gelden, maar raken geen van deze paden' };
   }
 
   /* De zin die het stuur aan een mens laat zien. Nooit "dat kan ik niet" zonder

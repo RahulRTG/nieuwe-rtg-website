@@ -175,6 +175,9 @@ De acht open punten staan vooraan in het register, niet in een voetnoot.
 | `standsluiting.js` | wat een stand dichtzet |
 | `proefmeting.js` | de enige lezer van `IDEMPROEF.json` in deze laag |
 | `leesset.js` | wat er onder `isolatie` overblijft, en waarom dat gemeten is |
+| `herkomst.js` | wie zei dit, en mag dat iets veranderen |
+| `bruikbaarheid.js` | wat er onder een stand nog **werkt** |
+| `zetten.js` · `toerekening.js` | de handhaving, en wie het besluit droeg |
 | `besluit.js` | het verklaarde besluit: waarom niet, en van wie |
 | `ontsluiting.js` | verlagen als protocol |
 | `opslag.js` | de enige deur naar `db.data` |
@@ -474,6 +477,81 @@ Kiwa-vergunning van `mob` dicht.
 > Dat is de stilste manier waarop deze proef onderrapporteert: geen fout, geen
 > lege sleutel, geen melding, alleen een kolom `ongemeten` die groter is dan hij
 > hoeft te zijn. En die kolom bepaalt wat er onder isolatie dichtgaat.
+
+## 5d. Vier gaten gesloten
+
+### Het filter is gemonteerd
+
+`kern/stuur.js` roept het isolatiefilter aan in `stuurPaden()`, en `kern/stuur/lus.js`
+haalt de context uit de **sessie** van de aanroeper — nooit uit `opties`, want dan
+kiest de aanroeper zelf welke stand op hem van toepassing is en is de hele laag
+een instelling.
+
+De kaart zegt er bovendien **bij** wat er wegviel. Zonder die regel ziet het model
+een kortere lijst en denkt het dat die vermogens niet *bestaan* — en dan zegt hij
+tegen een mens "dat kan ik niet" in plaats van "dat kan nu niet, omdat".
+
+### Onvertrouwde inhoud vergroot nooit de capabilities
+
+`kern/isolatie/herkomst.js`. Vier klassen, dertien kanalen. Het verschil tussen
+gezaghebbend en niet-gezaghebbend is **niet uit de tekst af te leiden** — daar is
+de aanval op gebouwd — maar alleen uit het **kanaal** waarlangs iets binnenkwam.
+Deze module herkent dus niets; hij labelt.
+
+Onvertrouwde invoer sluit acht effecten, actief-onvertrouwde inhoud (een script,
+een SVG, een macro) elf. Afgedwongen op dezelfde plek waar de isolatiestand
+versmalt, en **ook zonder isolatiestand**: een mail die geld wil laten bewegen
+hoort ook op een gewone dinsdag te worden gestopt. Voor een lid met onvertrouwde
+invoer in het gesprek: **120 → 40** AI-paden.
+
+Twee dingen die het níét is: er wordt geen tekst gescand op verdachte zinnen (dat
+werkt niet, en het wekt de indruk dat het wel werkt — erger dan niets), en een
+kanaal dat zich niet aanmeldt telt als onvertrouwd.
+
+**Lezen blijft open**, en dat is geen uitzondering maar de regel zelf gelezen: een
+pad waarvan gemeten is dat het niets verandert, vergroot geen vermogen. Zonder die
+regel valt de halve assistent stil zodra hij een mail heeft gelezen — en dan zet
+iemand hem uit.
+
+### Wat er nog wérkt
+
+`kern/isolatie/bruikbaarheid.js`: negen kritieke gebruikersverhalen, per stand
+nagelopen. De tellingen elders zeggen wat er *dichtgaat*, en dat is de helft die
+een verkeerd gevoel geeft: hoe meer er dicht is, hoe beter het lijkt.
+
+**Deze meting vond meteen drie echte ontwerpfouten**, alle drie in mijn eigen werk:
+
+| Verhaal | Wat er misging |
+|---|---|
+| `geld-lezen` | een lid kon zijn eigen afschrift niet meer opvragen — de eerste handeling van iemand die zijn account niet vertrouwt |
+| `zelf-beschermen` | de knop waarmee een mens zich beschermt viel dicht door de bescherming zelf |
+| `ontsluiten-aanvragen` | een stand zonder uitgang is een val, en een val zet niemand aan |
+
+Alle drie gerepareerd. Onder `isolatie` staan nu 8 van de 9 verhalen op *werkt*;
+het negende is `geld-sturen`, en dat hoort dicht te zitten.
+
+> **Twee reparaties met een regel eronder.** De belofte "het lezen loopt door"
+> moest ook waar zijn als het lezen over POST gaat — de leesset is de meetbare
+> invulling daarvan. En waar de verklaring en de meting het oneens zijn over een
+> effect dat een *schrijfactie* impliceert, wint de **meting**: zij heeft gekeken.
+> Alleen wat buiten de opslag valt (uitgaande aanroepen, bestanden, bulk) mag een
+> gemeten lezer alsnog sluiten. Dat haalde 313 paden uit de blokkade.
+
+### Twee classificatiefouten die de meting vond
+
+`securityLog`, `commandJournaal`, `kantoorAudit` en `supplierActivity` stonden als
+`BEVEILIGING_VERZWAKKEN` en `SCHRIJVEN_ANDERMANS` in het collectieregister. Dat
+leest logisch en het is fout: een append-only spoor **verzwakt** niets, het legt
+vast — en omdat vrijwel elke geauditeerde route erin schrijft, kreeg de halve app
+een effect dat hij niet heeft. De proef wist dit al en noemt ze met naam:
+*"vastlegging (geldt niet als werk)"*.
+
+En `techniek` is een **grabbelton**: vier onverwante padfamilies schrijven erin
+(`/api/adres`, `/api/command`, `/api/techniek`, `/api/doos`), en de proef ziet
+alleen de naam op het hoogste niveau. Een adres opzoeken kreeg daardoor
+`BEVEILIGING_VERZWAKKEN`. Allebei de lijsten laten de module bij het **laden**
+omvallen als iemand ze opnieuw indeelt, en `ISOLATIEPROEF.json` meet nu de
+spreiding per collectie zodat de volgende ziet waar hij aan begint.
 
 ## 6. Twee grenzen die niet mogen sneuvelen
 

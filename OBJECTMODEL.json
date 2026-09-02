@@ -1,16 +1,16 @@
 {
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
-  "vastgelegd": "2026-09-01",
+  "vastgelegd": "2026-09-02",
   "gemeten": {
-    "bestanden": 1913,
-    "vormen": 1293,
-    "velden": 1844,
-    "modules": 693,
-    "domeinen": 247,
+    "bestanden": 1921,
+    "vormen": 1296,
+    "velden": 1846,
+    "modules": 694,
+    "domeinen": 248,
     "envelopDrempel": 15,
-    "envelop": 32,
-    "veldenDomeineigen": 1295,
-    "veldenGedeeldVanafVier": 184,
+    "envelop": 33,
+    "veldenDomeineigen": 1296,
+    "veldenGedeeldVanafVier": 183,
     "gelijkendeVormparen": 19
   },
   "envelop": [
@@ -44,6 +44,7 @@
     "tot",
     "uitleg",
     "van",
+    "waarom",
     "wat",
     "wie"
   ],
@@ -58,18 +59,6 @@
         "kern/commerce",
         "kern/instant-reality",
         "kern/magnaat-werkroutefabriek"
-      ]
-    },
-    {
-      "veld": "waarom",
-      "domeinen": 14,
-      "waar": [
-        "kern/bureau",
-        "kern/command",
-        "kern/commerce",
-        "kern/commercie",
-        "kern/concern",
-        "kern/gewoonten"
       ]
     },
     {
@@ -527,6 +516,18 @@
         "kern/magnaat-economie",
         "kern/mall"
       ]
+    },
+    {
+      "veld": "url",
+      "domeinen": 8,
+      "waar": [
+        "kern/appbieb",
+        "kern/bedrijfscontrole",
+        "kern/foundationregistratie-register",
+        "kern/handelsregelbronnen",
+        "kern/handelsregelwacht",
+        "kern/lidmaatschap"
+      ]
     }
   ],
   "paren": [
@@ -545,20 +546,6 @@
         "terugDraaibaar",
         "type",
         "veld"
-      ]
-    },
-    {
-      "gelijkenis": 1,
-      "a": "server/kern/command/index.js",
-      "b": "server/kern/zaakcommand/beeld.js",
-      "domeinA": "kern/command",
-      "domeinB": "kern/zaakcommand",
-      "gedeeld": [
-        "niveau",
-        "score",
-        "vierOgen",
-        "waarom",
-        "waaromNiet"
       ]
     },
     {
@@ -601,6 +588,19 @@
         "rk",
         "rt",
         "type"
+      ]
+    },
+    {
+      "gelijkenis": 1,
+      "a": "server/kern/command/index.js",
+      "b": "server/kern/zaakcommand/beeld.js",
+      "domeinA": "kern/command",
+      "domeinB": "kern/zaakcommand",
+      "gedeeld": [
+        "niveau",
+        "score",
+        "vierOgen",
+        "waaromNiet"
       ]
     },
     {

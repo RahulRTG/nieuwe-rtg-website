@@ -28,6 +28,8 @@
 const ordening = require('./ordening');
 const dragers = require('./dragers');
 const effecten = require('./effecten');
+const leesset = require('./leesset');
+const { maakBruikbaarheid } = require('./bruikbaarheid');
 const { maakBesluitlaag } = require('./besluit');
 const { maakOntsluiting } = require('./ontsluiting');
 const maakOpslag = require('./opslag');
@@ -43,6 +45,13 @@ module.exports = function maakIsolatie({ db, save, functies, klok, huisStand, be
   const laag = maakBesluitlaag({ functies, beschermstand });
   const ontsluiting = maakOntsluiting({ opslag, save, klok, ordening });
   const nu = () => (klok && klok.datum ? klok.datum() : new Date());
+  /* Lui: de meter roept besluit() aan, en die hangt aan de laag die hier nog
+     wordt opgebouwd. Hem hier meteen bouwen zou een halve laag meegeven. */
+  let bruikbaarMem = null;
+  const bruikbaar = { overStanden: (standen) => {
+    if (!bruikbaarMem) bruikbaarMem = maakBruikbaarheid({ isolatie: naarBuiten, functies });
+    return bruikbaarMem.overStanden(standen);
+  } };
 
   /* ---------- lezen ---------- */
 
@@ -86,74 +95,11 @@ module.exports = function maakIsolatie({ db, save, functies, klok, huisStand, be
     if (s.length > 2000) s.length = 2000;
   }
 
-  /* VERSTRENGEN. Geen ceremonie, met opzet: software mag beveiliging automatisch
-     verhogen. Een drempel voor de veilige richting duwt mensen onder druk naar
-     de onveilige (BESTUUR.md grens 6.10). */
-  function zet({ drager, sleutel, naar, door, reden, zetter }) {
-    if (!EIGEN_DRAGERS.includes(drager)) {
-      fout(400, drager === 'huis'
-        ? 'De stand van het huis wordt gezet via de incidentcontrole en niet via deze laag; ' +
-          'twee plekken voor één stand is hoe twee schermen iets anders gaan zeggen.'
-        : 'Onbekende drager: ' + String(drager).slice(0, 30));
-    }
-    if (!sleutel) fout(400, 'Een stand hangt aan een sleutel; zonder sleutel is er geen drager.');
-    if (!ordening.ontleed(naar).bekend) fout(400, 'Onbekende stand: ' + String(naar).slice(0, 30));
-    if (zetter && !dragers.magZetten(zetter, drager)) {
-      fout(403, 'Een ' + zetter + ' zet geen stand op de laag "' + drager + '".');
-    }
-    const huidig = standVan(drager, sleutel) || 'normaal';
-
-    /* NIETS DOEN LAAT GEEN SPOOR NA. Een tweede identieke aanroep zette hier
-       eerst dezelfde stand opnieuw weg en schreef een spoorregel die zei dat er
-       iets was verstrengd. Dat is twee keer fout: het spoor gaat liegen over een
-       handeling die niet plaatsvond, en een register vol handelingen die niets
-       deden is een register dat niemand meer naloopt bij een incident. */
-    if (String(huidig) === String(naar)) {
-      return { drager, sleutel, stand: String(naar), richting: 'ongewijzigd',
-        waarom: 'deze drager stond al op ' + naar + '; er is niets gezet en er is geen spoorregel bij' };
-    }
-
-    const stap = ordening.verlaagt(huidig, naar);
-    if (stap.verlaagt) {
-      fout(409, 'Dit verlaagt de beveiliging (' + huidig + ' -> ' + naar + '). ' +
-        'Verlagen loopt via een ontsluitceremonie en niet via deze weg. ' + (stap.waarom || ''));
-    }
-    const kaart = opslag.tak(drager);
-    kaart[String(sleutel)] = { stand: String(naar), sinds: nu().toISOString(),
-      door: String(door || 'onbekend').slice(0, 64), reden: String(reden || '').slice(0, 240) };
-    spoor({ drager, sleutel: String(sleutel).slice(0, 64), van: huidig, naar: String(naar),
-      richting: 'verstrengd', door: String(door || 'onbekend').slice(0, 64) });
-    if (save) save();
-    if (beveilig) beveilig.meld('isolatie', 'waarschuwing',
-      'Isolatiestand verstrengd op ' + drager + ' naar ' + naar + '. Reden: ' + String(reden || '-'),
-      { bron: 'isolatie:zet' });
-    return { drager, sleutel, stand: String(naar), richting: 'verstrengd' };
-  }
-
-  /* VERLAGEN. Alleen langs een ceremonie, en die begint met de HUIDIGE stand --
-     niet met een stand die de aanroeper aanlevert. Zou de aanvrager `van` mogen
-     kiezen, dan koos hij een overgang die geen ceremonie vraagt. */
-  function vraagOntsluiting({ drager, sleutel, naar, door, reden, tweedeMens }) {
-    if (!EIGEN_DRAGERS.includes(drager)) fout(400, 'Deze laag ontsluit alleen ' + EIGEN_DRAGERS.join(', ') + '.');
-    const van = standVan(drager, sleutel) || 'normaal';
-    return ontsluiting.start({ drager, sleutel, van, naar, door, reden, tweedeMens });
-  }
-
-  function voltooiOntsluiting(id, { door }) {
-    const uit = ontsluiting.commit(id, { door });
-    const kaart = opslag.tak(uit.drager);
-    const van = standVan(uit.drager, uit.sleutel) || 'normaal';
-    if (String(uit.nieuweStand) === 'normaal') delete kaart[String(uit.sleutel)];
-    else kaart[String(uit.sleutel)] = { stand: uit.nieuweStand, sinds: nu().toISOString(),
-      door: String(door || 'onbekend').slice(0, 64), reden: 'ontsluiting ' + uit.verzoek.id };
-    spoor({ drager: uit.drager, sleutel: String(uit.sleutel).slice(0, 64), van, naar: uit.nieuweStand,
-      richting: 'verlaagd', door: String(door || 'onbekend').slice(0, 64), ceremonie: uit.verzoek.id });
-    if (save) save();
-    if (beveilig) beveilig.meld('isolatie', 'kritiek',
-      'Isolatiestand VERLAAGD op ' + uit.drager + ' naar ' + uit.nieuweStand + ' na ceremonie ' + uit.verzoek.id + '.',
-      { bron: 'isolatie:ontsluiting' });
-    return uit;
-  }
+  /* Het zetten en het aanvragen van een ontsluiting staan in ./zetten.js: dat is
+     de handhaving en dit de bedrading. Zie daar waarom er geen andere weg naar
+     beneden is dan een voltooide ceremonie. */
+  const { zet, vraagOntsluiting, voltooiOntsluiting } = require('./zetten')({ opslag, save, beveilig, nu, standVan,
+    spoor, fout, EIGEN_DRAGERS, ontsluiting });
 
   /* De ceremonie van het HUIS staat in ./huisceremonie.js: het is het enige
      stuk van deze laag dat over een stand gaat die zij niet bezit. */
@@ -177,6 +123,10 @@ module.exports = function maakIsolatie({ db, save, functies, klok, huisStand, be
       perDrager,
       openOntsluitingen: ontsluiting.open(),
       spoor: opslag.tak('spoor').slice(0, 50),
+      /* WAT ER NOG WERKT, naast wat er dichtgaat. Wie besluit een klant dicht te
+         zetten, hoort te zien wat die klant dat kost -- en de tellingen hierboven
+         zeggen alleen hoeveel er weg is, wat het gevoel geeft dat meer beter is. */
+      bruikbaarheid: bruikbaar.overStanden(['normaal', 'beschermd', 'isolatie']),
       effectmodel: { handhaaft: false,
         waarom: 'het effectmodel loopt in de schaduw naast de beschermstand. CONTROLPLANE.md: een ' +
           'nieuwe handhavingsregel loopt eerst mee zonder te blokkeren -- je kunt niet afdwingen wat ' +
@@ -185,9 +135,10 @@ module.exports = function maakIsolatie({ db, save, functies, klok, huisStand, be
     };
   }
 
-  return { context, besluit, standVan, zet, vraagOntsluiting, voltooiOntsluiting,
+  const naarBuiten = { context, besluit, standVan, zet, vraagOntsluiting, voltooiOntsluiting,
     vraagHuisOntsluiting: huisdeel.vraagHuisOntsluiting,
     huisCeremoniePoort: huisdeel.huisCeremoniePoort,
-    ontsluiting, overzicht, ordening, dragers, effecten, beschermstand,
+    ontsluiting, overzicht, ordening, dragers, effecten, leesset, beschermstand,
     effectieveStand: laag.effectieveStand };
+  return naarBuiten;
 };

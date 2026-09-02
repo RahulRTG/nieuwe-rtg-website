@@ -623,7 +623,13 @@ dit lid weg is. Par. 8: de persoonlijke stand zegt NOOIT "alles werkt"
 (beschikbaarheid wordt niet per lid gemeten) en houdt uit elkaar wat een storing
 IS en wat Service erover heeft GEMELD. Par. 9: foutsignalen op vingerafdruk,
 waarbij `gebruikers` op `null` staat MET de reden -- de foutingang is zonder
-inlog en kent geen mensen om te tellen. Par. 10 is de cockpit
+inlog en kent geen mensen om te tellen. Par. 11 is de ingang voor een ZAAK, die er
+niet was: een leverancier kon RTG nergens iets melden -- er stond wel een zin over
+een vaste contactpersoon, maar geen kanaal. Het systeem vraagt daar niet wie er
+meldt (de zaakcode komt uit de sessie), de doelgroep wordt door de ROUTE gezet en
+niet uit het lichaam gelezen, en een zaak krijgt een MENS en niet De Rechterhand
+-- welke tabel geldt leest `loop.mensVraag()` uit de DOELGROEP van de zaak.
+Par. 10 is de cockpit
 (`/apps/service.html`): zaakgericht en met opzet ZONDER ledenzoeker -- vrije
 inzage blijft bij de ledenbalie, met een reden en een journaalregel -- en alles
 wat het bord beweert draagt een "waarom?", inclusief wat er NIET is gewogen. Het

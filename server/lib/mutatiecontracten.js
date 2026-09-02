@@ -58,6 +58,7 @@ const CONTRACTEN = Object.assign({},
      publiek aanroepbaar wordt. Eigen bestand om de reden hierboven. */
   require('./mutatiecontracten-service').CONTRACTEN,
   require('./mutatiecontracten-service-kantoor').CONTRACTEN,
+  require('./mutatiecontracten-service-zaak').CONTRACTEN,
   /* ALS LAATSTE, en dat is geen willekeur. Deze 788 vallen onder een BESLUIT
      over de bewijsstandaard en niet onder een mens die ze een voor een las. De
      vier hierboven zijn specifieker; Object.assign laat de laatste winnen, dus

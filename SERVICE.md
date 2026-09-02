@@ -240,7 +240,43 @@ foutmelding, die zich als een willekeurige flake voordeed. Sindsdien loopt elke
 handeling door een vangnet dat de reden meldt, en raakt het bord de kop alleen
 defensief aan.
 
-## 11. Wat er staat, en wat er niet staat
+## 11. De kant van een zaak
+
+Een leverancier, restaurant, vervoerder, gemeente of ontwikkelpartner kon RTG
+**nergens** een hulpvraag stellen. Er was wel een zin — `routes/supplier/
+abonnement.js` vertelt of er een vaste contactpersoon is — maar geen kanaal: geen
+enkele route waarlangs een zaak iets kon melden, en de enige verbinding met het
+kantoor (`sseToOffice`) wordt uitsluitend voor order-sync gebruikt. Wat een gast
+aan tafel wél had (`routes/gast/verzoek.js`), had een zaak richting RTG niet.
+
+`server/routes/service-zaak.js` is die ingang. Drie dingen die hem eerlijk
+houden:
+
+- **Het systeem vraagt niet wie er meldt.** De zaakcode komt uit de sessie
+  (`supplierAuth`); er is geen veld waarin een zaak zijn eigen nummer intikt. Een
+  zaak die zijn klantnummer moet opzoeken om hulp te vragen, is een zaak die het
+  niet doet.
+- **De doelgroep wordt door de route gezet**, niet uit het lichaam gelezen. Een
+  melder die zichzelf een organisatie mag noemen, routeert zichzelf naar een
+  ander team.
+- **Een zaak krijgt een mens, niet De Rechterhand.** Die is een gekochte
+  pas-dienst en een zaak heeft geen pas. `kern/service/mens.js` heeft daarvoor
+  een eigen tabel, en `loop.mensVraag()` leest welke geldt uit de **doelgroep van
+  de zaak** — niet uit een parameter, want dat zou een tweede bron zijn die uit
+  de pas kan lopen.
+
+De meldersleutel is `zaak-<code>` en niet de kale code: leden dragen `user-<id>`,
+en zonder voorvoegsel zou een zaakcode die op een ledensleutel lijkt bij het
+verkeerde dossier uitkomen — precies op de plek waar het telt, het filter dat
+bepaalt wiens zaken je ziet.
+
+Aan de kantoorkant staat er een **zaakprofiel** bij: code, naam, soort, stad en
+de partnerstand. Vijf velden, en met opzet niet `publicSupplier()` — dat is de
+klantweergave met menu's, foto's, kamers en evenementen erin, en een medewerker
+die een storing onderzoekt heeft daar niets aan. Alles wat daar binnenkomt, is
+meteen ook alles wat er in de wachtrij te zien is.
+
+## 12. Wat er staat, en wat er niet staat
 
 **Staat** (gemeten, met toetsen die zijn zien zakken):
 
@@ -257,7 +293,8 @@ defensief aan.
 - patroonherkenning met bundelen en herstellen in één handeling;
 - de persoonlijke stand, zonder belofte over beschikbaarheid;
 - foutsignalen op vingerafdruk, gevoed door `routes/fout.js`;
-- de cockpit op `/apps/service.html`, met de waarom-laag en zonder ledenzoeker.
+- de cockpit op `/apps/service.html`, met de waarom-laag en zonder ledenzoeker;
+- de ingang voor een zaak, met het zaakprofiel aan de kantoorkant.
 
 **Staat niet**, met de reden en niet als lege functie:
 
@@ -267,13 +304,13 @@ defensief aan.
 - **een koppeling met de incidentstand van RTG Command**: Service weet wat zij
   zelf heeft gemeld, niet wat de gezondheidskaart zegt. Die brug is bewust niet
   gelegd zolang de melderskant geen vermogen kan aanwijzen.
-- **support voor partners en leveranciers richting RTG**: een zaak kan de
-  doelgroep `zaak` dragen en er is een team `zakelijk`, maar er is geen ingang
-  waarlangs een leverancier hem opent.
+- **een scherm voor de zaakkant**: de routes bestaan en zijn gemeten, maar er is
+  nog geen werkplekscherm waarin een leverancier ze bedient — hij kan vandaag
+  alleen langs de API binnenkomen.
 - **AI-onderzoeker en copilot**: de router kiest een team, geen techniek. De
   intelligentierouter (`kern/ai/router.js`) loopt in de schaduw en beslist niets.
 
-## 12. De grenzen
+## 13. De grenzen
 
 1. **Een zaak opent niets.** `betrokken` is een verwijzing; gegevens vragen een
    machtiging, en die vraagt een bevestiging van het lid.
@@ -293,7 +330,7 @@ defensief aan.
 8. **Er komt geen groen vinkje.** De persoonlijke stand zegt nooit dat alles
    werkt, want beschikbaarheid wordt niet per lid gemeten.
 
-## 13. Wat de meting vond, en wat lezen niet vond
+## 14. Wat de meting vond, en wat lezen niet vond
 
 De zevenentwintig routes zijn door een **kale ronde** gehaald: twee keer dezelfde
 aanroep, met een opname van de servicecollecties (inclusief de tijdlijn) voor en

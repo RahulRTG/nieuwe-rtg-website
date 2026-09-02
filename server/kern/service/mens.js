@@ -71,6 +71,22 @@ const PER_PAS = {
   }
 };
 
+/* EEN ZAAK IS GEEN PAS, EN DAAROM STAAT HIJ HIER APART.
+
+   Een leverancier, restaurant, vervoerder of gemeente heeft geen pas, dus
+   `PER_PAS` zegt niets over hem. Hem stilzwijgend op de RTG-rij laten vallen zou
+   betekenen dat een zaak met een storing bij de ledenbalie uitkomt, en daar
+   zitten mensen die over abonnementen gaan.
+
+   Waarom hij WEL een mens heeft, en zonder voorwaarde: bij een zaak ligt er een
+   contract onder en meestal ook een werkruimte. "Meldt u zich aan" is daar geen
+   antwoord -- hij IS al aangemeld, dat is nou juist waarom hij belt. */
+const ZAKELIJK = {
+  mens: true, team: 'zakelijk', weg: 'zakelijk',
+  heet: 'iemand van het zakelijke team',
+  waarom: 'Bij een zaak ligt er een contract en meestal een werkruimte onder; dat is een ander gesprek dan een vraag over een pas.'
+};
+
 /* Een melder ZONDER account. Hier is het eerlijke antwoord "nee", en het staat
    uitgeschreven in plaats van dat het per ongeluk uit een lege tabel volgt:
    er is geen kanaal om iemand terug te bereiken, dus een toezegging zou een
@@ -107,6 +123,14 @@ function overname(tier, { ingelogd = true } = {}) {
   };
 }
 
+/* De zakelijke tegenhanger van overname(). Zelfde vorm terug, zodat een
+   aanroeper niet hoeft te weten met welke van de twee hij te maken heeft. */
+function overnameZaak({ ingelogd = true } = {}) {
+  if (!ingelogd) return Object.assign({ pas: null, rechtstreeks: false }, GEEN_ACCOUNT);
+  return { pas: null, mens: ZAKELIJK.mens, rechtstreeks: ZAKELIJK.mens,
+    team: ZAKELIJK.team, weg: ZAKELIJK.weg, heet: ZAKELIJK.heet, waarom: ZAKELIJK.waarom };
+}
+
 /* De intentie. Vier manieren om hetzelfde te vragen leveren hetzelfde op --
    dat was de opdracht, en daarom is dit een lijst en geen model: een melder
    die om een mens vraagt, hoort niet afhankelijk te zijn van of er die dag een
@@ -140,4 +164,4 @@ function belofte(o) {
     'Ondertussen kijkt RTG alvast wat er aan de hand is, zodat u het straks niet opnieuw hoeft uit te leggen.';
 }
 
-module.exports = { PER_PAS, GEEN_ACCOUNT, AFWEER_GRENS, overname, vraagtOmMens, afwerenMag, belofte };
+module.exports = { PER_PAS, ZAKELIJK, GEEN_ACCOUNT, AFWEER_GRENS, overname, overnameZaak, vraagtOmMens, afwerenMag, belofte };

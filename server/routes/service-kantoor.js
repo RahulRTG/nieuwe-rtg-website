@@ -20,7 +20,27 @@
 module.exports = (kern) => {
   const { app, officeAuth, boardroomWie, magBalie,
     serviceZaken, serviceLoop, serviceMachtiging, serviceBevestiging, serviceKeuzes,
-    servicePatronen, serviceFoutsignaal } = kern;
+    serviceFoutsignaal, findSupplier } = kern;
+
+  /* WIE MELDT DIT, ALS HET GEEN LID IS. Een zaak hoeft zijn eigen nummer niet op
+     te zoeken om hulp te vragen: de melder draagt `zaak-<code>`, en dat is genoeg
+     om te weten met wie u praat.
+
+     Veld voor veld en nooit publicSupplier(): dat is de KLANTweergave, met
+     menu's, foto's, kamers en evenementen erin. Een medewerker die een storing
+     onderzoekt heeft daar niets aan, en alles wat hier binnenkomt is meteen ook
+     alles wat er in de wachtrij te zien is. Vijf velden, en de partnerstand
+     erbij omdat een geschorste zaak een ander gesprek is. */
+  function zaakprofiel(melder) {
+    const m = String(melder || '');
+    if (!m.startsWith('zaak-') || typeof findSupplier !== 'function') return null;
+    const code = m.slice(5);
+    let s = null;
+    try { s = findSupplier(code); } catch (e) { s = null; }
+    if (!s) return { code, gevonden: false, let: 'Deze zaakcode kennen wij niet meer; de melding blijft staan.' };
+    return { code: s.code, naam: s.name || null, soort: s.type || null, stad: s.city || null,
+      partnerStand: s.partnerStatus || 'actief', gevonden: true };
+  }
 
   const veilig = (res, werk) => {
     try { const r = werk(); res.status(r && r.status ? r.status : 200).json(r); }
@@ -66,6 +86,7 @@ module.exports = (kern) => {
        niets. */
     const b = r.zaak.betrokken;
     return Object.assign(r, {
+      zaakprofiel: zaakprofiel(r.zaak.melder),
       machtigingen: serviceMachtiging.lijst({ zaak: r.zaak.id, max: 20 }),
       bevestigingen: serviceBevestiging.lijst({ zaak: r.zaak.id, max: 20 }),
       foutsignalen: (b && b.soort === 'scherm') ? serviceFoutsignaal.bijScherm(b.code) : []
@@ -122,37 +143,9 @@ module.exports = (kern) => {
     ({ ok: true, machtigingen: serviceMachtiging.lijst({ mens: req.balieKey, alleenGeldig: true, max: 50 }),
       tel: serviceMachtiging.tel() })));
 
-  /* ------------------------------------------------------------ patronen -- */
-  /* Twintig meldingen die hetzelfde zeggen. Dit LEEST alleen: er wordt niets
-     gebundeld tot een mens het bevestigt, en de uitslag zegt altijd WAAROP de
-     groep is gevormd -- anders is de drempel een orakel dat een maandagochtend
-     voor een storing aanziet. */
-  app.post('/api/office/service/patronen', officeAuth, balieAuth, (req, res) => veilig(res, () =>
-    ({ ok: true, vermoedens: servicePatronen.vermoedens(lijf(req)),
-      incidenten: servicePatronen.perIncident(),
-      let: 'Een vermoeden is een groep die iets DEELT. Wat zij delen is geen oorzaak.' })));
-
-  /* Bundelen: de schaalwinst. Vanaf hier is het een technische oplossing en
-     worden alle gekoppelde melders in een keer bijgewerkt. Het incidentnummer
-     komt uit RTG Command; deze laag geeft er geen tweede reeks bij uit. */
-  app.post('/api/office/service/bundel', officeAuth, balieAuth, (req, res) => veilig(res, () =>
-    servicePatronen.bundel(lijf(req).zaken, { incident: kort(lijf(req).incident, 60),
-      door: req.balieKey, tekst: kort(lijf(req).tekst, 1000) })));
-
-  /* Hersteld: iedereen die erop wachtte hoort het tegelijk. De zaken gaan NIET
-     op opgelost -- dat een platformstoring weg is, bewijst niet dat het probleem
-     van dit ene lid weg is. */
-  app.post('/api/office/service/incident/hersteld', officeAuth, balieAuth, (req, res) => veilig(res, () =>
-    servicePatronen.hersteld(kort(lijf(req).incident, 60), { door: req.balieKey, tekst: kort(lijf(req).tekst, 1000) })));
-
-  /* --------------------------------------------------------- foutsignalen -- */
-  /* Gegroepeerd op vingerafdruk, niet per gebeurtenis: een scherm dat op elke
-     render struikelt levert tienduizend meldingen, en tienduizend zaken is geen
-     wachtrij meer. `gebruikers` staat er als null MET de reden -- de foutingang
-     staat zonder inlog open en kent dus geen mensen om te tellen. */
-  app.post('/api/office/service/foutsignalen', officeAuth, balieAuth, (req, res) => veilig(res, () =>
-    ({ ok: true, signalen: serviceFoutsignaal.lijst({ max: 50 }), tel: serviceFoutsignaal.tel() })));
-
-  app.post('/api/office/service/foutsignaal/koppel', officeAuth, balieAuth, (req, res) => veilig(res, () =>
-    serviceFoutsignaal.koppel(kort(lijf(req).signaal, 40), kort(lijf(req).zaak, 40))));
+  /* De borden die OVER zaken heen kijken -- patronen, bundelen, herstellen en
+     foutsignalen -- staan in ./service-kantoor-borden.js. De naad ligt op een
+     echte grens: hierboven werkt u AAN een zaak, daar kijkt u ERLANGS. Dat
+     scheelt dit bestand bovendien de omvangsgrens van keuringsregel 13. */
+  require('./service-kantoor-borden')(kern, { veilig, lijf, kort, balieAuth });
 };

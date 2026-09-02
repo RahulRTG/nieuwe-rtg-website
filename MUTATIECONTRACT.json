@@ -1,27 +1,27 @@
 {
  "stempel": {
-  "op": "2026-09-02T20:27:48.508Z",
-  "commit": "51c163fc",
+  "op": "2026-09-02T22:04:20.773Z",
+  "commit": "8256a738",
   "boomVuil": true,
-  "boomAnders": 3,
+  "boomAnders": 2,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 4766,
-  "geclassificeerd": 4766,
+  "totaal": 4776,
+  "geclassificeerd": 4776,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3274,
-   "NOT_APPLICABLE": 1098,
+   "NOT_APPLICABLE": 1103,
    "PROTECTED": 303,
-   "INTENTIONALLY_NON_IDEMPOTENT": 91
+   "INTENTIONALLY_NON_IDEMPOTENT": 96
   },
-  "vastgesteldDoorMens": 1520,
+  "vastgesteldDoorMens": 1530,
   "afgeleidDoorScript": 3246,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 3921,
+   "AUTHENTICATED": 3931,
    "PUBLIC": 113,
    "OBJECT_SCOPED": 716,
    "(niet af te leiden -- vraagt een verklaring)": 1,
@@ -32,7 +32,7 @@
    "kale ronde: beschermd": 129,
    "kale ronde: onbeschermd": 88,
    "kale ronde: geen uitspraak": 4512,
-   "niet gemeten": 37
+   "niet gemeten": 47
   },
   "voorstellen": {},
   "metingVan": "2026-09-01T16:38:26.262Z"
@@ -178,6 +178,30 @@
   },
   {
    "route": "POST /api/service/weiger",
+   "bedoeld": "OBJECT_SCOPED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/supplier/service/bericht",
+   "bedoeld": "OBJECT_SCOPED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/supplier/service/bevestig",
+   "bedoeld": "OBJECT_SCOPED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/supplier/service/mens",
+   "bedoeld": "OBJECT_SCOPED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/supplier/service/weiger",
    "bedoeld": "OBJECT_SCOPED",
    "waargenomen": "AUTHENTICATED",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
@@ -114152,6 +114176,216 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "supplier.service.bericht",
+   "route": "POST /api/supplier/service/bericht",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "supplier.service.bevestig",
+   "route": "POST /api/supplier/service/bevestig",
+   "semantiek": {
+    "klasse": "hooguitEens"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "supplier.service.bevestigingen",
+   "route": "POST /api/supplier/service/bevestigingen",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "supplier.service.keuzes",
+   "route": "POST /api/supplier/service/keuzes",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "supplier.service.mens",
+   "route": "POST /api/supplier/service/mens",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "supplier.service.mijn",
+   "route": "POST /api/supplier/service/mijn",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "supplier.service.open",
+   "route": "POST /api/supplier/service/open",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "supplier.service.stand",
+   "route": "POST /api/supplier/service/stand",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "supplier.service.weiger",
+   "route": "POST /api/supplier/service/weiger",
+   "semantiek": {
+    "klasse": "hooguitEens"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "supplier.service.zaak",
+   "route": "POST /api/supplier/service/zaak",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },

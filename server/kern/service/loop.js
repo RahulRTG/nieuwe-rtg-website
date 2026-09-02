@@ -88,7 +88,14 @@ module.exports = function maakLoop({ zaken, save, notify }) {
   function mensVraag(id, { tier, tekst, ingelogd = true } = {}) {
     const z = vind(id);
     if (!z) return { status: 404, error: 'Deze zaak kennen wij niet.' };
-    const o = mensLaag.overname(tier, { ingelogd });
+    /* WELKE TABEL ER GELDT, LEEST HIJ UIT DE ZAAK. Een zaak of een organisatie
+       heeft geen pas, dus `overname(tier)` zegt niets over hem -- hem daar toch
+       doorheen halen zou een leverancier met een storing bij de ledenbalie
+       neerleggen, waar men over abonnementen gaat. De doelgroep staat al op de
+       zaak en is daar door de ROUTE gezet en niet door de client; hem hier als
+       parameter meegeven zou een tweede bron zijn die uit de pas kan lopen. */
+    const zakelijk = z.doelgroep === 'zaak' || z.doelgroep === 'organisatie';
+    const o = zakelijk ? mensLaag.overnameZaak({ ingelogd }) : mensLaag.overname(tier, { ingelogd });
     if (!o.rechtstreeks) {
       noteer(z, { wat: 'mensGeweigerd', waarom: o.waarom });
       save();

@@ -133,4 +133,10 @@ module.exports = function hangDwarseRoutersOp(grens) {
      dezelfde zetel. */
   require('../routes/service')(grens('service'));
   require('../routes/service-kantoor')(grens('service'));
+  /* En de kant van een ZAAK. Een leverancier, restaurant, vervoerder of gemeente
+     kon RTG nergens een hulpvraag stellen -- er was wel een zin over een vaste
+     contactpersoon, maar geen kanaal. Derde bestand om dezelfde reden als de
+     tweede: de naad ligt op de LEZER, en dit is een derde poort (supplierAuth)
+     en geen derde domein. */
+  require('../routes/service-zaak')(grens('service'));
 };

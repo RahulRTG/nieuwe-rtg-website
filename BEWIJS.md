@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1540 bestanden en 10976 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1541 bestanden en 10982 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1540 |
-| losse beweringen (`test(...)`) | 10976 |
+| toetsbestanden | 1541 |
+| losse beweringen (`test(...)`) | 10982 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 57 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1014 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 40 |
 | alleen in de kop *genoemd*, nog niet gemeten | 143 |
-| niets van beide | 333 |
+| niets van beide | 334 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1345 bestanden, 10640 beweringen.
+1346 bestanden, 10646 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1080,6 +1080,7 @@ toets omvalt.
 | `servicemachtiging.test.js` | 9 | -- | DE SERVICEMACHTIGING EN DE SUPPORTBEVESTIGING. TWEE FOUTEN DIE HIER WORDEN VASTGEZET. |
 | `servicemens.test.js` | 9 | -- | "IK WIL EEN MENS" -- HET CONTRACT. DE FOUT DIE HIER WORDT VASTGEZET. |
 | `servicepatroon.test.js` | 6 | -- | HET PATROON, HET INCIDENT EN HET FOUTSIGNAAL. DE SCHAALWINST WAAR DEZE LAAG VOOR BESTAAT: twintig mensen melden dezelfde storing, een mens bevestigt dat het er een is, en vanaf dat moment is het EEN technische... |
+| `servicezaak.test.js` | 6 | -- | RTG SERVICE VOOR EEN ZAAK -- de ingang die er niet was. HET GAT DAT DIT DICHT. |
 | `ses-ontvangst.test.js` | 5 | -- | AWS SES -> RTG Mail: de provider mag alleen met een verse HMAC binnenkomen, de SMTP-envelop wint van de zichtbare To-kop en een Lambda-retry bezorgt hetzelfde bericht niet twee keer. |
 | `sessie-herstart.test.js` | 1 | gezakt op `liegpoort /api/` | Sessie-duurzaamheid: een ingelogd lid blijft na een serverherstart ingelogd, omdat de sessie (alleen de token-hash) in db.data.sessions staat en bij het opstarten terug in de Map wordt geladen. Dit dekt het... |
 | `sessiecontext.test.js` | 18 | -- | MIJN RTG blok 1 -- de toetsen, en vooral DE NEGATIEVE PROEF. De vraag die hier beantwoord moet worden staat in MIJNRTG.md par. |

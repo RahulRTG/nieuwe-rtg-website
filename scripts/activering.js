@@ -206,7 +206,13 @@ function kernSleutelsVan(bron) {
   const m = bron.match(/module\.exports\s*=\s*(?:function\s*[A-Za-z0-9_$]*\s*)?\(?\s*([A-Za-z0-9_$]+)/);
   if (!m) return uit;
   const naam = m[1];
-  const esc = naam.replace(/\$/g, '\\$');
+  /* VOLLEDIG ONTSNAPPEN EN NIET ALLEEN DE DOLLAR. Hier stond
+     `naam.replace(/\$/g, '\\$')` -- juist voor de namen die dit huis heeft
+     (de parameter matcht [A-Za-z0-9_$]+, dus een backslash kan er niet in),
+     maar een ontsnapping die klopt DOORDAT de invoer elders beperkt is, klopt
+     alleen zolang niemand die beperking verruimt. CodeQL zag dat en had gelijk
+     over de vorm, ook al was het gat niet te bereiken. */
+  const esc = naam.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   for (const d of bron.matchAll(new RegExp('(?:const|let|var)\\s*\\{([^}]*)\\}\\s*=\\s*' + esc + '\\s*[;,\n]', 'g'))) {
     for (const stuk of d[1].split(',')) {
       const naamDeel = stuk.split(':')[0].split('=')[0].trim();

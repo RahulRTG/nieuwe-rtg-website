@@ -356,7 +356,7 @@ veilige slaapplek heeft.
 | 2 | **Hulpwijzer verbreden**: categorie "onveilig, misbruikt of uitgebuit", met de gespecialiseerde instanties erbij | pure tekst, geen gegevens, geen keten — en vandaag het enige wat een slachtoffer aan deze app heeft | **staat** (2 sep 2026) |
 | 3 | **De eigen keten** — veiligheid → minimale gegevens → toestemming → stabilisatie → gecontroleerde overdracht, als eigen dataklasse (5.2) | het gat dat par. 4 laag 3 beschrijft | **staat** als `server/kern/beschermzaak/` (2 sep 2026) |
 | 4 | **De voordeur**: zelfingang zonder account, zonder BSN, zonder adres; eerst "ben je nu veilig" en "kan iemand meekijken" | keert de huidige richting om (office maakt casus → burger krijgt code) | **staat** (2 sep 2026) |
-| 4b | **De persoonlijke veiligheidslaag verbinden** — `kern/veiligheid/` (dodemansknop, stil codewoord, kring, laatste plek) bestaat en is vanaf de Foundation-kant onzichtbaar | zie par. 7.2: gebouwd, eerlijk, en op de verkeerde plek voor de mens uit par. 0 | dagen |
+| 4b | **De persoonlijke veiligheidslaag verbinden** — `kern/veiligheid/` (dodemansknop, stil codewoord, kring, laatste plek) bestaat en is vanaf de Foundation-kant onzichtbaar | zie par. 7.2: gebouwd, eerlijk, en op de verkeerde plek voor de mens uit par. 0 | **staat** (2 sep 2026) |
 | 5 | **Meldcode verbreden** naar volwassen slachtoffers buiten het gezin, of een tweede route ernaast | de vijf wettelijke stappen blijven; de reikwijdte niet | weken |
 | 6 | **Consent: doel en termijn per venster** + het scherm "wie weet wat over mij" | laag 2 afmaken vóór er meer instanties bijkomen | weken |
 | 7 | **De Advocate als lezer** op `levensgraaf/termijnen.js` | alle waarde van punt 10 zonder de onbewezen helft (5.6) | weken |
@@ -395,6 +395,48 @@ achter een knop komen. De laag wordt hier dus niet geladen, en de eerder
 bedachte `rtgdeel-vast`-markering is weggehaald in plaats van decoratief blijven
 staan: een klas die niets afdwingt omdat zijn laag niet draait, leest als een
 garantie die er niet is.
+
+### 7.4 Wat regel 4b opleverde, en een correctie op mezelf
+
+**Eerst de correctie.** Par. 7.2 zei dat de vier schermen van RTG Veilig de
+eerlijkheidszin niet toonden. Dat was fout, en de fout is leerzaam: ik had
+gegrepen in `codewoord.html`, `thuiswacht.html`, `vitaal.html` en
+`thuisrust.html`, en die vier zijn geen schermen meer maar **omleidingen** naar
+`/apps/veilig.html` — vier standen van één app. De zin staat er wel degelijk, in
+`public/shared/veiligheid.js`, op elke stand en niet weg te klikken. Een meting
+op de verkeerde bestanden is geen meting.
+
+**Wat er wél mis was, kwam daardoor boven.** De grensregel stond in **twee**
+versies: de server gaf in `veiligBeeld()` een korte mee ("er wordt niemand
+gebeld en er kijkt geen mens mee"), de clientlaag toonde een langere die er twee
+dingen bij zei — geen hulpdienst, en zonder internet gaat er niets af. Allebei
+waar, allebei anders, en niemand die merkte welke een lezer te zien kreeg. Dat is
+LAT.md regel 4 op de gevaarlijkste soort tekst die dit huis heeft: **een belofte
+over wat er niet gebeurt als het misgaat.**
+
+De bron staat nu op één plek (`server/kern/veiligheid/grens.js`, vier zinnen over
+wat er niet gebeurt plus de enige die zegt wat je wél kunt doen), en omdat een
+browser dat bestand niet kan laden houdt `test/veiligheidgrens.test.js` de twee
+kopieën eraan vast. Alle vier de mutaties bijten, en de derde is de leerzaamste:
+een vijfde belofte aan de bron toevoegen laat alle drie de plekken zakken — een
+nieuwe belofte moet overal langs.
+
+**En de verbinding zelf.** `onveilig.html` noemt RTG Veilig nu, met wat het doet,
+wat het kost en wat het niet is. Drie dingen die eerst gemeten zijn en niet
+aangenomen:
+
+- **het werkt echt.** Codewoord zetten, proef raak en mis, de stille `check` die
+  `{ok:true}` teruggeeft zonder iets op het scherm te doen, en het alarm dat
+  aantoonbaar naar één ontvanger ging;
+- **het kost niets.** Een vers account zonder enige pas kan de hele laag
+  gebruiken;
+- **er is geen vriend voor nodig.** De kring accepteert een gewoon e-mailadres
+  (`kring/mail`), dus wie niemand in De Salon heeft, kan hem toch vullen.
+
+Wat de verbinding NIET is: een brug tussen de Foundation-sessie en het
+RTG-account. Die twee blijven gescheiden, en dat is par. 5.1 — de veiligheidskant
+en de rest van een mens reizen niet in één antwoord. Wie hier klikt, komt in de
+ledenapp en logt daar in als hij dat wil.
 
 ### 7.3 Wat regel 4 opleverde: de deur die niets belooft
 
@@ -467,7 +509,8 @@ Dat verandert twee dingen aan dit document:
   blijft gelden voor een verborgen modus met een tweede pincode. Maar het stille
   codewoord ís al een dwangfunctie, en een eerlijke: hij belooft niets over de
   app-wisselaar of de geschiedenis, hij doet één ding en dat doet hij goed. Dat
-  is precies de vorm die par. 5.7 zoekt.
+  is precies de vorm die par. 5.7 zoekt. *(Nagemeten bij regel 4b: hij werkt ook
+  echt, en hij kost niets. Zie par. 7.4.)*
 - **Het staat op de verkeerde plek voor de missie.** Die laag zit in de
   RTG-ledenapp, achter een inlog, en is vanuit de Foundation-kant en vanaf
   `onveilig.html` onzichtbaar. Voor de mens uit par. 0 — die vaak géén RTG-account

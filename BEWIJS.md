@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1439 bestanden en 10216 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1440 bestanden en 10220 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1439 |
-| losse beweringen (`test(...)`) | 10216 |
+| toetsbestanden | 1440 |
+| losse beweringen (`test(...)`) | 10220 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 51 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 996 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 40 |
-| alleen in de kop *genoemd*, nog niet gemeten | 116 |
+| alleen in de kop *genoemd*, nog niet gemeten | 117 |
 | niets van beide | 277 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1262 bestanden, 9912 beweringen.
+1263 bestanden, 9916 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1185,6 +1185,7 @@ toets omvalt.
 | `veiligheid-kring-rust.test.js` | 6 | gezakt op `liegpoort /api/` | DE KRING, HET CODEWOORD EN DE RUST -- 6 endpoints van RTG Veilig. Deze zes wees de waargenomen dekkingsmeting aan als nooit aangeroepen: kring/aanpassen, kring/mail, alarm/afsluiten, codewoord/schakel, codewoord/wis... |
 | `veiligheid-moment.test.js` | 3 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `veiligheid.test.js` | 1 | gezakt op `liegpoort /api/` | RTG Veilig: de vier apps op een ruggengraat. De belangrijkste toets staat in toets 4 en 5, en die is de reden dat dit zo gebouwd is: de dodemansknop moet aflopen ZONDER dat de telefoon nog iets doet. |
+| `veiligheidgrens.test.js` | 4 | genoemd | DE GRENSREGEL VAN RTG VEILIG STAAT OP DRIE PLEKKEN EN BLIJFT DEZELFDE server/kern/veiligheid/grens.js is de bron. Twee andere plekken dragen een KOPIE, en dat is geen slordigheid maar de enige werkbare vorm: een... |
 | `veiligheidskern.test.js` | 8 | genoemd | DE VEILIGHEIDSKERN -- vijf soorten onomkeerbare handelingen, een deur. WAAROM DIT HET LAATSTE STUK IS. |
 | `verblijf.test.js` | 12 | gezakt op `liegpoort /api/` | De verblijf-laag (toren hotel): boeken met datums, het receptiebord en de check-in/check-out-keten. De logies gaan bij check-in automatisch als kamerlast op de rekening; de kassa-check-out int alles in een keer en... |
 | `vergeten-gezelschap.test.js` | 2 | gezakt op `liegpoort /api/` | VERGETEN, maar dan voor iedereen. test/vergeten.test.js veegt door de hele database en is streng, maar hij doet dat voor EEN lid: een RTG-lid van middelbare leeftijd zonder gezin. |

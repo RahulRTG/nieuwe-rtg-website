@@ -61,6 +61,7 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+const { stempel } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const arg = (naam, std) => { const i = process.argv.indexOf(naam); return i > 0 ? process.argv[i + 1] : std; };
@@ -294,6 +295,9 @@ if (require.main === module) {
     const gezakt = uit.reduce((n, r) => n + r.stappenGezakt + r.invariantenGezakt, 0);
     if (process.argv.includes('--vastleggen')) {
       fs.writeFileSync(path.join(WORTEL, 'ZAAKWIG.json'), JSON.stringify({
+        /* Met stempel en `hoe`: deze wig loopt een echte bestelling langs een
+           draaiende server, dus hij veroudert met de code eronder. */
+        stempel: stempel(), hoe: 'npm run zaakwig:vast',
         gemetenOp: new Date().toISOString().slice(0, 10), treden: uit, gezakt }, null, 2) + '\n');
       process.stdout.write(rapport(uit) + '\n\nVastgelegd in ZAAKWIG.json\n');
     } else process.stdout.write(rapport(uit) + '\n');

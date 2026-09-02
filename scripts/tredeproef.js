@@ -69,6 +69,7 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+const { stempel } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const arg = (naam, std) => { const i = process.argv.indexOf(naam); return i > 0 ? process.argv[i + 1] : std; };
@@ -657,7 +658,11 @@ if (require.main === module && process.argv.includes('--alle')) {
     rondgangGezakt: t.rondgangGezakt, rondgangOnvoltooid: t.rondgangOnvoltooid,
     ingangLekken: t.ingangLekken,
     beproefdVoorDeSchakelaar: t.beproefdVoorDeSchakelaar })) };
-  fs.writeFileSync(path.join(WORTEL, 'TREDEPROEF.json'), JSON.stringify(uit, null, 2) + '\n');
+  fs.writeFileSync(path.join(WORTEL, 'TREDEPROEF.json'),
+    /* Met stempel en `hoe`. Deze meting klopt bij ELKE trede aan een echt
+       draaiende server, dus hij hoort bij de code van die dag en bij geen
+       andere: een verouderde "0 lekken" is erger dan geen meting. */
+    JSON.stringify({ stempel: stempel(), hoe: 'node scripts/tredeproef.js --alle --vastleggen', ...uit }, null, 2) + '\n');
   process.stdout.write(rapport(hoofd) + '\n\n' + tabel(treden) + '\n\nVastgelegd in TREDEPROEF.json\n');
   process.exit(treden.some(t => t.zuiverLekken || t.beproefdNiet503 || t.rondgangGezakt) ? 1 : 0);
 } else if (require.main === module) {

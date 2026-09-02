@@ -103,6 +103,7 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
+const { stempel } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const BRON = path.join(WORTEL, 'server');
@@ -443,7 +444,12 @@ if (require.main === module) {
   const r = meet();
   if (args.includes('--json')) process.stdout.write(JSON.stringify(r, null, 2) + '\n');
   else if (args.includes('--vastleggen')) {
-    fs.writeFileSync(path.join(WORTEL, 'VERSTRENGELING.json'), JSON.stringify(r, null, 2) + '\n');
+    fs.writeFileSync(path.join(WORTEL, 'VERSTRENGELING.json'),
+      /* Met stempel en `hoe`: scripts/versheid.js meet hiermee of dit register
+         nog bij de code van vandaag hoort. Zonder stempel zou hij eerlijk
+         "ouderdom niet vast te stellen" melden, en dat is een uitslag die je
+         niet vrijwillig aan een meter geeft. */
+      JSON.stringify({ stempel: stempel(), hoe: 'npm run verstrengeling:vast', ...r }, null, 2) + '\n');
     process.stdout.write(rapport(r) + '\n\nVastgelegd in VERSTRENGELING.json\n');
   } else process.stdout.write(rapport(r) + '\n');
 }

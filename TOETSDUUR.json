@@ -3,7 +3,7 @@
  "uitleg": "Hoe lang elk toetsbestand erover deed, als gewicht voor de scherfverdeling in scripts/lib/delen.js. PER MODUS, want met dekking aan is dezelfde toets een ander kostenmodel -- niet een uitschieter. Mediaan over alle waarnemingen; de p90 staat erbij en weegt niet mee. Een bestand dat hier NIET in staat is ongemeten en wordt om en om verdeeld -- nooit overgeslagen.",
  "hoe": "npm test (schrijft .toetsduur), daarna: node scripts/toetsduur.js --schrijf",
  "gelezen": {
-  "regels": 2,
+  "regels": 9,
   "verminkt": 0,
   "opSchijf": 1545,
   "modi": [
@@ -19,17 +19,17 @@
  "modi": {
   "dekking": {
    "stempel": {
-    "op": "2026-09-01T12:43:18.061Z",
-    "waar": "ci",
-    "node": "v26.8.1",
+    "op": "2026-09-02T21:48:05.526Z",
+    "waar": "lokaal",
+    "node": "v22.22.2",
     "kernen": 4,
-    "commit": "07ee035"
+    "commit": "3fdd0b34"
    },
    "gemeten": {
-    "bestanden": 1259,
-    "ongemeten": 177,
-    "verseWaarnemingen": 1259,
-    "totaalMs": 9214099
+    "bestanden": 1268,
+    "ongemeten": 277,
+    "verseWaarnemingen": 9,
+    "totaalMs": 9229775
    },
    "bronnen": {
     "ci|v26.8.1|4|07ee03554": {
@@ -37,6 +37,12 @@
      "node": "v26.8.1",
      "kernen": 4,
      "commit": "07ee03554"
+    },
+    "lokaal|v22.22.2|4|3fdd0b34": {
+     "waar": "lokaal",
+     "node": "v22.22.2",
+     "kernen": 4,
+     "commit": "3fdd0b34"
     }
    },
    "duur": {
@@ -52,6 +58,7 @@
     "adaptief.test.js": 152,
     "administratie.test.js": 14516,
     "adresopzoek.test.js": 13322,
+    "advocaat-lezer.test.js": 94,
     "adyen-config.test.js": 46,
     "adyen-eigen.test.js": 67,
     "afleidbaar.test.js": 15526,
@@ -141,6 +148,7 @@
     "beroepenbieb.test.js": 7633,
     "beschermd.test.js": 6238,
     "beschermstand.test.js": 78,
+    "beschermzaak.test.js": 7689,
     "besluit.test.js": 89,
     "bestand-binding.test.js": 29,
     "bestanden.test.js": 7632,
@@ -242,6 +250,7 @@
     "concern-voorstel.test.js": 106,
     "concern.test.js": 93,
     "consent-dekking.test.js": 178,
+    "consent-doel-termijn.test.js": 86,
     "consent.test.js": 4797,
     "contact.test.js": 7672,
     "contactpin.test.js": 9985,
@@ -531,6 +540,8 @@
     "klokwacht.test.js": 8994,
     "kluis-binding.test.js": 984,
     "kluis-rotatie.test.js": 1126,
+    "knelpunt-openingen.test.js": 657,
+    "knelpunt.test.js": 68,
     "koppels.test.js": 7593,
     "kosten.test.js": 9828,
     "kostengrens.test.js": 8006,
@@ -773,6 +784,8 @@
     "opslag-voorcheck.test.js": 1102,
     "opslagblokkade.test.js": 44,
     "opslagpoort.test.js": 69,
+    "opvangleden.test.js": 67,
+    "opvangroute.test.js": 6803,
     "opvolging.test.js": 7409,
     "outputaudit.test.js": 212,
     "ov-operatie.test.js": 52,
@@ -947,6 +960,7 @@
     "rtgai.test.js": 4840,
     "rtgcode.test.js": 54,
     "rtghorloge.test.js": 45,
+    "rtgid-bewijs.test.js": 123,
     "rtgid.test.js": 7479,
     "rtgjson.test.js": 9768,
     "rtgone.test.js": 4987,
@@ -1185,6 +1199,7 @@
     "veiligheid-kring-rust.test.js": 7270,
     "veiligheid-moment.test.js": 34,
     "veiligheid.test.js": 92298,
+    "veiligheidgrens.test.js": 89,
     "veiligheidskern.test.js": 38,
     "verblijf.test.js": 8877,
     "vergeten-gezelschap.test.js": 6344,
@@ -1420,6 +1435,16 @@
       "ci|v26.8.1|4|07ee03554"
      ],
      "gemetenOp": "2026-09-01"
+    },
+    "advocaat-lezer.test.js": {
+     "n": 1,
+     "min": 94,
+     "max": 94,
+     "p90": 94,
+     "bronnen": [
+      "lokaal|v22.22.2|4|3fdd0b34"
+     ],
+     "gemetenOp": "2026-09-02"
     },
     "adyen-config.test.js": {
      "n": 1,
@@ -2310,6 +2335,16 @@
       "ci|v26.8.1|4|07ee03554"
      ],
      "gemetenOp": "2026-09-01"
+    },
+    "beschermzaak.test.js": {
+     "n": 1,
+     "min": 7689,
+     "max": 7689,
+     "p90": 7689,
+     "bronnen": [
+      "lokaal|v22.22.2|4|3fdd0b34"
+     ],
+     "gemetenOp": "2026-09-02"
     },
     "besluit.test.js": {
      "n": 1,
@@ -3320,6 +3355,16 @@
       "ci|v26.8.1|4|07ee03554"
      ],
      "gemetenOp": "2026-09-01"
+    },
+    "consent-doel-termijn.test.js": {
+     "n": 1,
+     "min": 86,
+     "max": 86,
+     "p90": 86,
+     "bronnen": [
+      "lokaal|v22.22.2|4|3fdd0b34"
+     ],
+     "gemetenOp": "2026-09-02"
     },
     "consent.test.js": {
      "n": 1,
@@ -6211,6 +6256,26 @@
      ],
      "gemetenOp": "2026-09-01"
     },
+    "knelpunt-openingen.test.js": {
+     "n": 1,
+     "min": 657,
+     "max": 657,
+     "p90": 657,
+     "bronnen": [
+      "lokaal|v22.22.2|4|3fdd0b34"
+     ],
+     "gemetenOp": "2026-09-02"
+    },
+    "knelpunt.test.js": {
+     "n": 1,
+     "min": 68,
+     "max": 68,
+     "p90": 68,
+     "bronnen": [
+      "lokaal|v22.22.2|4|3fdd0b34"
+     ],
+     "gemetenOp": "2026-09-02"
+    },
     "koppels.test.js": {
      "n": 1,
      "min": 7593,
@@ -8631,6 +8696,26 @@
      ],
      "gemetenOp": "2026-09-01"
     },
+    "opvangleden.test.js": {
+     "n": 1,
+     "min": 67,
+     "max": 67,
+     "p90": 67,
+     "bronnen": [
+      "lokaal|v22.22.2|4|3fdd0b34"
+     ],
+     "gemetenOp": "2026-09-02"
+    },
+    "opvangroute.test.js": {
+     "n": 1,
+     "min": 6803,
+     "max": 6803,
+     "p90": 6803,
+     "bronnen": [
+      "lokaal|v22.22.2|4|3fdd0b34"
+     ],
+     "gemetenOp": "2026-09-02"
+    },
     "opvolging.test.js": {
      "n": 1,
      "min": 7409,
@@ -10370,6 +10455,16 @@
       "ci|v26.8.1|4|07ee03554"
      ],
      "gemetenOp": "2026-09-01"
+    },
+    "rtgid-bewijs.test.js": {
+     "n": 1,
+     "min": 123,
+     "max": 123,
+     "p90": 123,
+     "bronnen": [
+      "lokaal|v22.22.2|4|3fdd0b34"
+     ],
+     "gemetenOp": "2026-09-02"
     },
     "rtgid.test.js": {
      "n": 1,
@@ -12750,6 +12845,16 @@
       "ci|v26.8.1|4|07ee03554"
      ],
      "gemetenOp": "2026-09-01"
+    },
+    "veiligheidgrens.test.js": {
+     "n": 1,
+     "min": 89,
+     "max": 89,
+     "p90": 89,
+     "bronnen": [
+      "lokaal|v22.22.2|4|3fdd0b34"
+     ],
+     "gemetenOp": "2026-09-02"
     },
     "veiligheidskern.test.js": {
      "n": 1,

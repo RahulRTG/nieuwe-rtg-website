@@ -79,8 +79,35 @@ async function start(opties) {
   const kind = spawn(process.execPath, nodeArgs, {
     cwd: WORTEL,
     stdio: uit === 'ignore' ? 'ignore' : ['ignore', uit, uit],
+    /* DE SCHORSPOORT STAAT UIT OP EEN MEETSERVER, en dat is geen versoepeling
+       maar de reparatie van een lus die zichzelf dichttrok.
+
+       server/middleware/schorspoort.js weigert met 503 elke schrijvende aanroep
+       op een route die in VERTROUWEN.json `geschorst` heet. Dat is de bedoeling
+       -- in PRODUCTIE. Op een MEETserver is het fataal, en wel zo:
+
+         1. een route krijgt een gezakte bewijscel  -> geschorst
+         2. de schorspoort geeft 503 op die route
+         3. de volgende proefronde kan hem niet meer uitvoeren -> ongemeten
+         4. ongemeten wordt nooit meer bewezen
+         5. de route blijft voor altijd geschorst
+
+       Het register zegt zelf dat de weg omhoog "een geslaagde hermeting" is --
+       en precies die hermeting werd geblokkeerd door de staat die hij moest
+       opheffen. Gemeten op 2 september 2026: alle ACHT geschorste routes gaven
+       in de verse idemproef `de eerste oproep deed geen werk (status 503)`, en
+       het aantal `onbeschermd` in dat register viel van een handvol naar NUL --
+       niet omdat er iets gerepareerd was, maar omdat er niets meer te meten
+       viel. Een register dat leeg raakt doordat de deur dichtzit, leest als
+       vooruitgang.
+
+       Dit raakt alleen wegwerpservers: elk instrument in scripts/ start er een
+       met een eigen datamap, en geen daarvan is het huis van een lid. Een
+       aanroeper die de poort juist WIL zien, zet hem in `o.env` terug -- die
+       gaat hierna en wint dus van deze regel. */
     env: Object.assign({}, process.env, {
-      PORT: String(poort), RTG_DATA_DIR: datamap, SMTP_URL: '', STUN_UIT: '1'
+      PORT: String(poort), RTG_DATA_DIR: datamap, SMTP_URL: '', STUN_UIT: '1',
+      RTG_SCHORSPOORT_UIT: '1'
     }, o.env || {})
   });
 

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="nl">
+<html lang="nl" data-rtg-thema="champagne">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -94,10 +94,22 @@
 <script src="/shared/social-intelligence-deck.js" defer></script>
 <script src="/shared/social-intelligence-runtime.js" defer></script>
 <script src="/shared/social-intelligence-data.js" defer></script>
+<link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
+<script src="/shared/leeg.js"></script>
 </head>
-<body class="rtg-stijl rtg-social-elite" data-rtg-modus="pro" data-rtg-eigenvlak="onyx">
+<body class="rtg-stijl rtg-social-elite" data-rtg-modus="pro" data-rtg-eigenvlak="onyx" data-rtg-world="living">
 <a class="skip" href="#inhoud">Naar de inhoud</a>
 
+<div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">
+  <a class="os-switcher__brand" href="/apps/app.html"><b>RTG</b><span>Vier werelden &middot; één kern</span></a>
+  <div class="os-switcher__links">
+    <a href="/apps/rtg.html" aria-current="page"><span>01</span>LivingOS</a>
+    <a href="/apps/kantoor.html"><span>02</span>WorkOS</a>
+    <a href="/apps/reizen.html"><span>03</span>TravelOS</a>
+    <a href="/apps/foundation/os-publiek.html"><span>04</span>FoundationOS</a>
+  </div>
+  <span class="os-switcher__state">Kern verbonden</span>
+</div>
 <div class="rtg-social-commandbar topbar cmd-tabs" aria-label="Sociale commandobalk">
   <a class="rtg-social-commandbar-brand" href="/apps/app.html"><span>RTG</span><small>LivingOS · Sociaal</small></a>
   <span class="rtg-social-commandbar-state">Besloten ledennetwerk</span>
@@ -424,10 +436,14 @@
     $('#kring').innerHTML = r.length
       ? r.map(werkRegel).join('')
       : (alles.length
-        ? '<p class="stil">Verder wacht er niemand op u; wat er vandaag is, staat hierboven.</p>'
+        ? RTGLeeg.html({ ey: 'Uw kring', titel: 'Verder wacht er niemand op u.',
+            wat: 'Wat er vandaag is, staat hierboven.' })
         : (ACTIEF_FILTER !== 'alles' && bron.length
-          ? '<p class="stil">Binnen ‘' + esc(FILTERS[ACTIEF_FILTER].label) + '’ staat nu niets.</p>'
-          : '<p class="stil">Er wacht niemand op u. Wat er in Berichten, Genootschap of Pulse speelt, komt hier vanzelf te staan.</p>'));
+          ? RTGLeeg.html({ ey: 'Uw kring',
+              titel: 'Binnen ‘' + FILTERS[ACTIEF_FILTER].label + '’ staat nu niets.',
+              wat: 'Een ander filter laat mogelijk wel iets zien.' })
+          : RTGLeeg.html({ ey: 'Uw kring', titel: 'Er wacht niemand op u.',
+              wat: 'Wat er in Berichten, Genootschap of Pulse speelt, komt hier vanzelf te staan.' })));
 
     $('#poorten').innerHTML = WERELD.map(([n, z, h, i]) =>
       '<a class="poort" href="' + h + '"><span class="ic">' + ic(i, 22) + '</span>' +
@@ -757,7 +773,7 @@
     } catch (e) {
       // geen esc(): het Canvas zet tekst met textContent en escapet dus zelf
       RTGCanvas.rust('#rust', { kop: RTGCanvas.groet(), zin: e.message + ' Log eerst in via de leden-app.' });
-      $('#kring').innerHTML = '<p class="stil">' + esc(e.message) + ' Log eerst in via de leden-app.</p>';
+      $('#kring').innerHTML = RTGLeeg.html(RTGLeeg.vanFout(e, { ey: 'RTG Sociaal' }));
       $('#poorten').innerHTML = WERELD.map(([n, z, h, i]) =>
         '<a class="poort" href="' + h + '"><span class="ic">' + ic(i, 22) + '</span>' +
         '<b>' + esc(n) + '</b><span>' + esc(z) + '</span></a>').join('');

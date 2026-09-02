@@ -7,7 +7,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, elevateTier } = require('./helper');
+const { startServer, stop, elevateTier, kantoorAlsPersoon } = require('./helper');
 
 const OWNER = 'boardroom-owner@x.nl';
 const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
@@ -44,7 +44,7 @@ test.before(async () => {
   esToken = regEs.body.token;
   // een Duits lid ZONDER landcode, maar met "Duitse" nationaliteit op het
   // geverifieerde paspoort: de per-land-regel moet dit alsnog herkennen
-  const office = (await api(base, '/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+  const office = await kantoorAlsPersoon(base, 'RTG-OFFICE');
   const regDe = await api(base, '/api/auth/register', { name: 'Lid Duitsland', email: 'de' + u + '@x.nl',
     phone: '069' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' });
   deToken = regDe.body.token;

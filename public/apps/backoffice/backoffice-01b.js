@@ -3,6 +3,25 @@
      achter elkaar geplakt, dus het resultaat is letter voor letter hetzelfde
      bestand. Geknipt omdat deel 01 door de 10 KB van keuringsregel 13 ging
      nadat de bewaarverzoek-knop erbij kwam. */
+  /* EEN DICHTE DEUR MET DE REDEN ERBIJ, en niet een paneel dat leeg blijft.
+
+     De kluisdeuren (identiteitsverificaties, vakbewijzen) staan sinds
+     kern/kantoor/kluispoort.js achter een kantoorsessie OP NAAM: de gedeelde
+     backoffice-code komt er niet meer door, want wat erachter gebeurt komt in
+     het inzagejournaal en daar hoort een mens bij.
+
+     Zonder dit hulpje deed `catch(e){ return; }` precies wat GRAMMATICA.md
+     verbiedt: een verhindering zonder reden. De keurder zag een leeg paneel en
+     kon nergens uit opmaken dat er niets mis was met de gegevens, alleen met
+     zijn inlog. */
+  function kluisDicht(el, e){
+    if (!el || !e || e.status !== 403 || !(e.data && e.data.poort === 'kluis')) return false;
+    el.innerHTML = '<div class="empty kluisdicht">' +
+      '<strong>' + T('bo.kluis.kop','Hiervoor is een kantoorsessie op naam nodig') + '</strong><br>' +
+      escHtml(e.data.error || '') + '</div>';
+    return true;
+  }
+
   // ---- aanmeldingen per pas: de AI deed alles, alleen ja/nee is aan het personeel ----
   async function loadAanmeldingen(){
     const el = document.getElementById('aanmeldingen'); if (!el) return;

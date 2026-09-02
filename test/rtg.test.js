@@ -131,7 +131,22 @@ test('6 - het gereedschap draait de ECHTE poort en bouwt hem niet na', () => {
 
 test('7 - de SDK wordt uit de code gegenereerd, niet uit een lijst', () => {
   const b = sdk.bron();
-  assert.equal(b.methodes.length, 6, 'de zes methodes van de brug');
+  /* GEEN VAST AANTAL MEER -- de kop bij toets 5 van test/mutatie.test.js legt
+     uit waarom (de arenalaag bracht er drie mee, en het getal was het enige dat
+     zakte). Wat deze toets werkelijk bewijst staat in de lus eronder: elke
+     methode die de brug kent, staat MET zijn mutatieklasse in de typings.
+
+     De echte eis hier is dat de SDK dezelfde methodes kent als de brug zelf.
+     Dat is een vergelijking tussen twee lezers en niet met een getal, en die
+     kan niet verouderen: komt er een methode bij die de SDK niet oppikt, dan
+     zakt hij nog steeds. */
+  const { maakBrug } = require('../server/kern/appstore/brug');
+  const staat = { opslag: {}, bakjes: {} };
+  const brug = maakBrug({ S: () => staat, save() {}, boek() {},
+    nu: () => new Date().toISOString(), eigen: (o, k) => o[k] });
+  assert.deepEqual(b.methodes.map(m => m.naam).sort(), [...brug.METHODES].sort(),
+    'de SDK hoort exact de methodes van de brug te kennen, niet een eigen lijst');
+  assert.ok(b.methodes.length >= 6, 'en het horen er meerdere te zijn');
   const dts = sdk.typings(b);
   for (const m of b.methodes) {
     assert.ok(dts.includes("roep(methode: '" + m.naam + "'"), m.naam + ' hoort in de typings te staan');

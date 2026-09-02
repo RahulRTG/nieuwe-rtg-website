@@ -58,7 +58,14 @@ test('vier werelden, en een gebruiker hoort bij precies een', async () => {
   assert.deepEqual(ids.slice().sort(), ['commercieel', 'consument', 'rtfoundation', 'rtg-intern']);
   const rtf = r.body.werelden.find(w => (w.id || w.wereld) === 'rtfoundation');
   assert.equal(rtf.factureerbaar, false, 'de RTFoundation stuurt haar gezinnen geen rekeningen');
-  assert.deepEqual(rtf.dragers, ['gezin']);
+  /* TWEE DRAGERS SINDS 31 AUGUSTUS 2026: een gezin en een LAB. Die tweede is de
+     eerste dragersoort die geen mens en geen huishouden is -- een lab van het
+     RTF Living Lab is een entiteit van de stichting, en zijn verbruik viel
+     daarvoor terug op 'huis', waarmee RTG stilzwijgend het onderzoek van een
+     andere rechtspersoon betaalde. Deze regel is bewust bijgewerkt en niet
+     opgerekt: hij hoort te zakken zodra er een dragersoort bij de stichting
+     wordt gezet die daar niet hoort. */
+  assert.deepEqual(rtf.dragers.slice().sort(), ['gezin', 'lab']);
   const intern = r.body.werelden.find(w => (w.id || w.wereld) === 'rtg-intern');
   assert.equal(intern.factureerbaar, false);
 
@@ -325,4 +332,60 @@ test('de kostprijslaag komt niet tot stand zonder firewall', () => {
   const economie = require('../server/kern/economie')({ db, save: () => {} }).economie;
   const k = maakKosten({ db, save: () => {}, accounts: {}, economie });
   assert.ok(k.kosten && typeof k.kosten.voorstel === 'function');
+});
+
+/* ---------------------------------------------------------------------------
+   EEN IDENTITEIT KAN EEN EIGEN WERELD ZIJN, EN DAT MOEST WEL.
+
+   De RTFoundation krijgt een wallet zoals een leverancier er een heeft. In deze
+   laag is dat een `zaak:<code>`, en werelden.js leidt de wereld af uit de
+   DRAGERSOORT: zaak hoort bij `commercieel`, en commercieel FACTUREERT. De
+   stichting -- volgens ECONOMIE.md een eigen rechtspersoon met een eigen
+   vermogen -- was daarmee een commerciele klant geworden, en de firewall had
+   daar niets van gezegd omdat hij de verkeerde vraag stelde.
+
+   Deze toets is tegen een kapotgemaakte kern gezien zakken:
+   - `wereldVanDrager` terug op werelden.wereldVan (het register wordt genegeerd)
+     -> de stichting is weer factureerbaar;
+   - de grendel `factureerbaar(w.id)` in identiteit.js weggehaald
+     -> een gezin is naar `commercieel` te verplaatsen en krijgt een rekening. */
+test('een identiteit met een eigen wereld ontsnapt niet aan de firewall', () => {
+  const db = { data: {} };
+  const { economie } = require('../server/kern/economie')({ db, save: () => {} });
+  const RTF = 'zaak:RTF-TOETS';
+
+  /* ZONDER REGEL is de stichtingswallet gewoon een commerciele zaak, en dat is
+     precies de stille fout. */
+  assert.equal(economie.wereldVanDrager(RTF), 'commercieel');
+  assert.equal(economie.magDragerBelasten({ drager: RTF, vanWereld: 'commercieel' }).ok, true);
+
+  const gezet = economie.identiteitZet({ drager: RTF, wereld: 'rtfoundation',
+    grond: 'De RTFoundation is een eigen rechtspersoon met een eigen vermogen (ECONOMIE.md).', door: 'toets' });
+  assert.equal(gezet.ok, true, JSON.stringify(gezet));
+  assert.equal(economie.wereldVanDrager(RTF), 'rtfoundation');
+
+  const na = economie.magDragerBelasten({ drager: RTF, vanWereld: 'commercieel' });
+  assert.equal(na.ok, false, 'de stichting kreeg alsnog een commerciele rekening');
+  assert.equal(na.code, 'wereld-factureert-niet');
+
+  /* DE ANDERE RICHTING GAAT DICHT, en dat is de grendel die ertoe doet: dit
+     register kunnen gebruiken om iets WEL factureerbaar te maken, is hoe je een
+     gezin een rekening stuurt. */
+  const fout = economie.identiteitZet({ drager: 'gezin:HUIS-1', wereld: 'commercieel',
+    grond: 'zogenaamd een onderneming', door: 'toets' });
+  assert.equal(fout.ok, undefined);
+  assert.equal(fout.status, 409);
+  assert.match(fout.error, /factureert wel/);
+  assert.equal(economie.wereldVanDrager('gezin:HUIS-1'), 'rtfoundation');
+
+  /* EEN GROND IS VERPLICHT: zonder is dit een lijst uitzonderingen waarvan
+     niemand over een jaar de reden kent. */
+  assert.equal(economie.identiteitZet({ drager: RTF, wereld: 'rtfoundation', grond: '' }).status, 400);
+
+  /* EN WEGHALEN ZEGT WAAR HIJ OP TERUGVALT -- niet "gelukt", want de terugval
+     is een wereld die wel factureert. */
+  const weg = economie.identiteitWeg(RTF, 'toets');
+  assert.equal(weg.ok, true);
+  assert.equal(weg.valtTerugOp, 'commercieel');
+  assert.equal(economie.wereldVanDrager(RTF), 'commercieel');
 });

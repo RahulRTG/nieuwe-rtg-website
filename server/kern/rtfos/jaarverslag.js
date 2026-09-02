@@ -6,6 +6,10 @@
    stichting die dat vergeet, hoort het van de Belastingdienst en niet van
    zichzelf.
 
+   MAAR OF DIT HUIS ER EEN IS, WEET DIT BESTAND NIET, en het nam het wel aan.
+   De grond waarop hier gepubliceerd wordt, staat sinds 31 augustus 2026 in
+   ./anbi-grondslag.js -- met de reden waarom hij daar hoort.
+
    DE GRENDEL DIE DIT DOCUMENT ANDERS MAAKT DAN EEN RAPPORTAGE: DE CIJFERS
    WORDEN BEVROREN. Een rapportagescherm rekent live -- dat hoort ook. Een
    jaarverslag mag dat niet: een verantwoording die meebeweegt met de database
@@ -30,7 +34,8 @@
 
 module.exports = (ctx, eigen) => {
   const { nu, rid, schoon, S, audit, wie, save } = ctx;
-  const { cijfersVan, besluitVindbaar } = eigen;
+  const { cijfersVan, besluitVindbaar, anbiVan } = eigen;
+  const grondslag = require('./anbi-grondslag')(anbiVan);
 
   const vind = id => S().jaarverslagen.find(j => j.id === String(id || '')) || null;
 
@@ -153,7 +158,8 @@ module.exports = (ctx, eigen) => {
     audit(w.key, 'jaarverslag.gepubliceerd', j.id, String(j.jaar));
     save();
     return { ok: true, jaarverslag: beeld(j),
-      melding: 'Openbaar. Het stuk ligt hiermee vast; een correctie is een herziening met een reden, geen wijziging.' };
+      grondslag: grondslag(),
+      melding: 'Openbaar. Het stuk ligt hiermee vast; een correctie is een herziening met een reden, geen wijziging. ' + grondslag().zegt };
   }
 
   function lijst(req) {
@@ -170,7 +176,8 @@ module.exports = (ctx, eigen) => {
   function openbaar() {
     const rijen = S().jaarverslagen.filter(j => j.gepubliceerd && j.vastgesteld)
       .sort((a, b) => b.jaar - a.jaar);
-    return { ok: true, aantal: rijen.length, jaarverslagen: rijen.slice(0, 20).map(j => ({
+    /* OP WELKE GROND DIT OPENBAAR STAAT, en dat wordt gelezen en niet aangenomen. */
+    return { ok: true, aantal: rijen.length, grondslag: grondslag(), jaarverslagen: rijen.slice(0, 20).map(j => ({
       jaar: j.jaar, titel: j.titel, verhaal: j.verhaal, cijfers: j.cijfers,
       vastgesteldOp: j.vastgesteld.vergadering, gepubliceerdOp: String(j.gepubliceerd.at).slice(0, 10),
       bijlagen: (j.bijlagen || []).map(b => ({ naam: b.naam, url: b.url })) })) };

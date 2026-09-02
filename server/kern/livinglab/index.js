@@ -45,7 +45,7 @@
    (regel 4). */
 'use strict';
 
-module.exports = ({ db, save, crypto, anthropic, lab }) => {
+module.exports = ({ db, save, crypto, anthropic, lab, kosten, economie, labfonds }) => {
   /* De context wordt hier één keer opgebouwd en aan elke deelmodule meegegeven.
      De VOLGORDE hieronder is niet vrij: een module die iets uit `ctx`
      DESTRUCTUREERT, leest de waarde op het moment dat hij wordt gebouwd. Wie
@@ -70,6 +70,11 @@ module.exports = ({ db, save, crypto, anthropic, lab }) => {
   ctx.plan = require('./plan')(ctx);
   ctx.mensen = require('./mensen')(ctx);        // leest ctx.studie bij de bouw
   ctx.themas = require('./themas')(ctx);
+  /* Het besluit over een buurtvraag (./vraagbesluit.js): ook "nee" is een
+     antwoord. Staat naast ./themas.js en niet erin: dat gaat over het OPHALEN
+     van vragen, dit over wat het lab ermee doet -- twee handelingen met twee
+     verschillende lezers (een bewoner tegenover het kantoor). */
+  ctx.vraagbesluit = require('./vraagbesluit')(ctx);
   ctx.waarnemen = require('./waarnemen')(ctx);
   ctx.bewijs = require('./bewijs')(ctx);        // leest ctx.bestuur bij de bouw
   /* Verzamelen en wegen staan in twee bestanden maar zijn één begrip voor de
@@ -81,9 +86,51 @@ module.exports = ({ db, save, crypto, anthropic, lab }) => {
   ctx.apparatuur = require('./apparatuur')(ctx);
   // het register en het gebruik ervan: twee bestanden, één begrip voor de routes
   Object.assign(ctx.apparatuur, require('./apparatuurgebruik')(ctx));
+  /* De meetinstrumenten (./instrument.js): wat een deelnemer met zijn labpas
+     invult. Hij staat NA de apparatuur omdat hij de kalibratiestand van een
+     apparaat bevriest op het moment van meten, en die rekensom staat daar. */
+  ctx.instrument = require('./instrument')(ctx);
+  /* Terugtrekken (./terugtrekken.js) leest de conclusies en de metingen en staat
+     dus na allebei. ./mensen.js roept hem aan via `ctx` en niet via een kopie:
+     die is eerder gebouwd, en een kopie zou hier `undefined` bevriezen. */
+  ctx.terugtrekken = require('./terugtrekken')(ctx);
+  /* Apparatuur buiten het lab (./uitleen.js): uitlenen aan een school of een
+     buurtinitiatief, met een keten die niemand kan herschrijven. Staat na de
+     apparatuur, want hij leest de kalibratiestand en de storingen. */
+  ctx.uitleen = require('./uitleen')(ctx);
   ctx.doorbraak = require('./doorbraak')(ctx);
   ctx.impact = require('./impact')(ctx);
+  /* De openbare onderzoekskaart (./publicatie.js). Hij staat achteraan omdat hij
+     alles hierboven LEEST en zelf niets aan het onderzoek verandert -- op het
+     besluit om te publiceren na, en dat is een handeling van een mens. */
+  ctx.publicatie = require('./publicatie')(ctx);
+  /* De reproductiecapsule (./capsule.js): hoe een conclusie tot stand kwam,
+     afgeleid en niet bewaard. Staat achteraan om dezelfde reden als de
+     publicatie: hij leest alles en verandert niets. */
+  ctx.capsule = require('./capsule')(ctx);
   ctx.ai = require('./ai')(ctx);
+
+  /* HET ONDERZOEKSGROOTBOEK (./ledger.js): wat een studie kostte en waarom de
+     stichting die rekening mocht betalen. Hij leest de kostenmeter en de
+     economische firewall, en die worden als functie doorgegeven omdat ze pas in
+     een latere laag bestaan (opzet/kernlaag2.js).
+
+     Hij staat hier achteraan omdat hij alleen LEEST: geen enkele module
+     hierboven hangt ervan af, en een grootboek dat iets zou veranderen aan wat
+     het telt, is geen grootboek. */
+  /* Ook het Lab-fonds komt als functie binnen, en om dezelfde reden: het wordt
+     verderop in kernlaag2 gebouwd. Het grootboek toont ermee welk fondsgeld aan
+     dit onderzoek is TOEGEZEGD -- naast de gemeten kosten, nooit erbij op. */
+  ctx.labfonds = labfonds;
+  ctx.ledger = require('./ledger').maakLedger({
+    kosten, economie, labfonds,
+    vindLab: (id) => ctx.vindLab(id), vindStudie: (id) => ctx.vindStudie(id), nu: ctx.nu });
+
+  /* HET OBSERVATORIUM (./observatorium.js): één bord over alle labs, dat kan
+     ZAKKEN. Hij staat helemaal achteraan omdat hij als enige het grootboek
+     hierboven nodig heeft -- en, via `ctx.labfonds`, het fonds dat pas later in
+     kernlaag2 wordt gebouwd. Hij leest alleen; er komt geen tabel bij. */
+  ctx.observatorium = require('./observatorium')(ctx);
 
   const kader = require('./kader');
 

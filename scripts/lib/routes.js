@@ -119,21 +119,74 @@ function routekaart() {
    en op de STAART (een route op een sub-router staat daar met zijn pad binnen de
    mount: `/les/maak` voor `/api/foundation/les/maak`). Die tweede accepteren we
    alleen bij precies EEN treffer -- een verkeerd toegewezen bronbestand is erger
-   dan geen bronbestand, want dan wijst een melding je naar het verkeerde bestand. */
+   dan geen bronbestand, want dan wijst een melding je naar het verkeerde bestand.
+
+   DERDE INGANG: HET SAMENGESTELDE PAD. Een registratie hoeft geen letterlijk pad
+   te dragen. `app.post('/api/rtf/spel/' + naam, ...)` in een lus over een
+   actietabel registreert drieenveertig echte routes waarvan er geen enkele
+   letterlijk in de bron staat -- en die vielen alle drieenveertig uit de bron,
+   met `bestand: null`. Dat is geen randgeval: het was in een keer de grootste
+   blinde vlek van alle vier de bewijsproeven, want zonder bronbestand kan geen
+   van hen de handler lezen. Erger nog: zonder deze ingang werd
+   `'/api/rtf/spel/'` als EXACT pad opgeslagen, dus de blinde vlek droeg ook nog
+   een verkeerde regel in de index.
+
+   Een aanroep waarvan het eerste argument een string is die verdergaat (`+`),
+   levert daarom geen pad maar een VOORVOEGSEL. Wie geen exacte en geen
+   staarttreffer heeft, krijgt het langste voorvoegsel dat op zijn pad past --
+   en, net als bij de staart, alleen bij precies EEN kandidaat. Wat zo'n plek
+   oplevert is de regel van de REGISTRATIE en niet van de handler-body per
+   actie; dat is precies wat er te weten valt, en het is meer dan niets.
+
+   VIERDE INGANG: DE STAART VAN EEN SAMENGESTELD PAD. Hetzelfde patroon komt ook
+   andersom voor: `app.post(p.pad + '/vak', ...)` in een lus over twee poorten
+   (lid en zaak, server/routes/rtmail-vak.js). Daar is het VOORVOEGSEL de
+   variabele en het achtervoegsel de letterlijke tekst. Vierenzeventig
+   rtmail-routes stonden zo buiten bereik.
+
+   Dezelfde discipline: het langste achtervoegsel dat past, en alleen bij precies
+   EEN kandidaat. Dat laatste doet hier echt werk -- `/Users/:id` staat viermaal
+   in de SCIM-laag en `/papieren` tweemaal, en die blijven dus met opzet zonder
+   bron in plaats van naar een van de vier te wijzen. */
 const ROUTE_RE = /\b(app|router)\.(post|get|put|delete|patch)\(\s*(['"`])([^'"`]+)\3([^\n]*)/g;
+/* De omgekeerde vorm: eerst een variabele, dan een letterlijk achtervoegsel. */
+const STAART_RE = /\b(app|router)\.(post|get|put|delete|patch)\(\s*[A-Za-z_$][\w$.]*\s*\+\s*(['"`])([^'"`]+)\3([^\n]*)/g;
 
 let _bron = null;
 function bronIndex() {
   if (_bron) return _bron;
   const exact = new Map();
   const perStaart = new Map();
+  const voorvoegsels = new Map();
+  const achtervoegsels = new Map();
+  /* COMMENTAAR TELT NIET ALS REGISTRATIE, en dat was een echte vondst.
+
+     server/kern/handlerpoorten/buiten.js legt in zijn kop uit welke routes in
+     een lus ontstaan, en schrijft daarbij het voorbeeld letterlijk op:
+     `app.post('/api/rtf/spel/' + naam, ...)`. Deze index las dat als een TWEEDE
+     registratie op dat voorvoegsel -- en omdat hieronder alleen bij precies EEN
+     kandidaat wordt toegewezen, verloren alle drieenveertig spelroutes hun bron.
+     Erger nog: ze vielen daarna door naar de achtervoegselregel, en die wees
+     /api/rtf/spel/antwoord toe aan routes/rtmail-vak.js. Een verkeerd
+     toegewezen bronbestand is erger dan geen (zie de kop hierboven).
+
+     Commentaar wordt daarom weggehaald voor het zoeken, met behoud van de
+     REGELNUMMERS: elk teken wordt door een spatie vervangen en de regelovergangen
+     blijven staan, zodat `regel` blijft kloppen. Zelfde aanpak als
+     scripts/schakelbaar.js, waar dezelfde les al was geleerd. */
+  const zonderCommentaar = (b) => String(b)
+    .replace(/\/\*[\s\S]*?\*\//g, m => m.replace(/[^\n]/g, ' '))
+    .replace(/(^|[^:'"\\])\/\/[^\n]*/g, (m, p1) => p1 + ' '.repeat(m.length - p1.length));
+
   loopMap(path.join(WORTEL, 'server'), /\.js$/, f => {
-    const tekst = fs.readFileSync(f, 'utf8');
+    const tekst = zonderCommentaar(fs.readFileSync(f, 'utf8'));
     let m;
     ROUTE_RE.lastIndex = 0;
     while ((m = ROUTE_RE.exec(tekst))) {
       const pad = m[4];
       if (!pad.startsWith('/')) continue;
+      /* Gaat de string verder met `+`? Dan is dit een voorvoegsel en geen pad. */
+      const isVoorvoegsel = (m[5] || '').trim().startsWith('+');
       const plek = {
         bestand: path.relative(WORTEL, f).replace(/\\/g, '/'),
         regel: tekst.slice(0, m.index).split('\n').length,
@@ -141,18 +194,38 @@ function bronIndex() {
         rauw: (m[5] || '').trim().slice(0, 160)
       };
       const sleutel = m[2].toUpperCase() + ' ' + pad;
+      if (isVoorvoegsel) {
+        const vv = voorvoegsels.get(sleutel) || [];
+        vv.push(plek);
+        voorvoegsels.set(sleutel, vv);
+        continue;
+      }
       if (!exact.has(sleutel)) exact.set(sleutel, plek);
       const lijst = perStaart.get(sleutel) || [];
       lijst.push(plek);
       perStaart.set(sleutel, lijst);
     }
+    STAART_RE.lastIndex = 0;
+    while ((m = STAART_RE.exec(tekst))) {
+      const staart = m[4];
+      if (!staart.startsWith('/')) continue;
+      const sleutel = m[2].toUpperCase() + ' ' + staart;
+      const av = achtervoegsels.get(sleutel) || [];
+      av.push({
+        bestand: path.relative(WORTEL, f).replace(/\\/g, '/'),
+        regel: tekst.slice(0, m.index).split('\n').length,
+        viaRouter: m[1] === 'router',
+        rauw: (m[5] || '').trim().slice(0, 160)
+      });
+      achtervoegsels.set(sleutel, av);
+    }
   });
-  _bron = { exact, perStaart };
+  _bron = { exact, perStaart, voorvoegsels, achtervoegsels };
   return _bron;
 }
 
 function plekVan(methode, pad) {
-  const { exact, perStaart } = bronIndex();
+  const { exact, perStaart, voorvoegsels, achtervoegsels } = bronIndex();
   const heel = exact.get(methode + ' ' + pad);
   if (heel) return heel;
   /* De staart: loop de padgrenzen af van lang naar kort, en neem de eerste
@@ -163,6 +236,29 @@ function plekVan(methode, pad) {
     const kandidaten = perStaart.get(methode + ' ' + staart);
     if (kandidaten && kandidaten.length === 1) return kandidaten[0];
   }
+  /* Het samengestelde pad: het LANGSTE voorvoegsel dat past, en alleen als er
+     precies een registratie op dat voorvoegsel staat. `samengesteld: true` gaat
+     mee, zodat een lezer weet dat hij de regel van de LUS krijgt en niet die
+     van een handler die per actie ergens anders staat. */
+  let besteLengte = -1, beste = null;
+  for (const [sleutel, kandidaten] of voorvoegsels) {
+    const spatie = sleutel.indexOf(' ');
+    if (sleutel.slice(0, spatie) !== methode) continue;
+    const vv = sleutel.slice(spatie + 1);
+    if (!pad.startsWith(vv)) continue;
+    if (vv.length > besteLengte) { besteLengte = vv.length; beste = kandidaten; }
+  }
+  if (beste && beste.length === 1) return Object.assign({ samengesteld: true }, beste[0]);
+  /* En dezelfde vraag van de andere kant: het langste letterlijke achtervoegsel. */
+  besteLengte = -1; beste = null;
+  for (const [sleutel, kandidaten] of achtervoegsels) {
+    const spatie = sleutel.indexOf(' ');
+    if (sleutel.slice(0, spatie) !== methode) continue;
+    const av = sleutel.slice(spatie + 1);
+    if (!pad.endsWith(av)) continue;
+    if (av.length > besteLengte) { besteLengte = av.length; beste = kandidaten; }
+  }
+  if (beste && beste.length === 1) return Object.assign({ samengesteld: true }, beste[0]);
   return null;
 }
 
@@ -203,6 +299,8 @@ function alleRoutes() {
         viaRouter: plek ? plek.viaRouter : null,
         bestand: plek ? plek.bestand : null,
         regel: plek ? plek.regel : null,
+        // de plek is de REGISTRATIE (een lus over een actietabel), niet de handler
+        samengesteld: plek ? !!plek.samengesteld : false,
         rauw: plek ? plek.rauw : ''
       });
     }
@@ -237,8 +335,21 @@ function alleRoutes() {
    opleveren dat niets bewijst. Welke soort een deur is, staat nu uitputtend in
    scripts/lib/bewakers.js en wordt daar bewaakt door een toets. Hier alleen nog
    de doorgeefluiken, want vier proeven en twee toetsen roepen deze namen aan. */
-function rolVan(bewakers) {
-  return bewakerskaart.beoordeel({ bewakersBekend: true, bewakers: bewakers || [] }).rol;
+function rolVan(bewakers, route) {
+  /* HET PAD GAAT MEE, EN DAT WAS EERST NIET ZO. De bewakerskaart kent sinds de
+     openbaar-tak een oordeel dat van het PAD afhangt: een route zonder bewaker
+     die met een reden op de openbaar-lijst staat, hoort zonder sleutel open te
+     gaan en is dus wel degelijk te beproeven. Zolang hier alleen `bewakers`
+     binnenkwam, werd die tak nooit bereikt en bleven 45 openbare routes als
+     instrumenttekort tellen -- een tak die stil nooit afgaat, is geen tak.
+
+     `route` is optioneel: vier proeven roepen deze functie nog met alleen de
+     bewakerslijst aan, en die krijgen het oude antwoord. Dat is geen gat maar
+     een kleinere vraag; wie het pad niet meegeeft, kan er ook geen oordeel over
+     krijgen. */
+  const r = route || {};
+  return bewakerskaart.beoordeel({ bewakersBekend: true, bewakers: bewakers || [],
+    pad: r.pad, methode: r.methode }).rol;
 }
 
 /* De reden waarom een rol niet te bepalen valt. Zie bewakers.js: de reden bepaalt
@@ -246,7 +357,7 @@ function rolVan(bewakers) {
    onzichtbaar bleven. */
 function redenZonderRol(r) {
   return bewakerskaart.beoordeel(r).reden ||
-    'geen reden -- deze route heeft wel degelijk een rol (' + rolVan(r.bewakers) + ')';
+    'geen reden -- deze route heeft wel degelijk een rol (' + rolVan(r.bewakers, r) + ')';
 }
 
 /* Splitst een routelijst in wat beproefbaar is en wat niet, met de redenen
@@ -273,7 +384,7 @@ function verdeelOpRol(routes, beschikbareRollen) {
      beproeven. */
   const beschikbaar = Array.isArray(beschikbareRollen) ? new Set(beschikbareRollen) : null;
   for (const r of routes) {
-    const rol = rolVan(r.bewakers);
+    const rol = rolVan(r.bewakers, r);
     if (rol && (!beschikbaar || beschikbaar.has(rol))) {
       /* `methode` EN NIET `method`. Hier stond de enige plek in dit huis waar een
          route halverwege de pijplijn van veldnaam wisselde: alleRoutes() geeft
@@ -314,19 +425,113 @@ function meldZonderRol(verdeling, kop) {
   }
 }
 
-/* DE GROTE HENDEL. De platformbrede schakelkast zet functies aan en uit voor de
-   HELE server. Een proef die daar rommel heen stuurt, zet onderweg iets uit en
-   meet daarna een platform dat hij zelf half heeft afgebroken -- elke bevinding
-   erna is dan een gevolg van de proef en niet van de code.
+/* DE GROTE HENDEL -- WAAR EEN PROEF NOOIT AAN MAG KOMEN.
+
+   De platformbrede schakelkast zet functies aan en uit voor de HELE server. Een
+   proef die daar rommel heen stuurt, zet onderweg iets uit en meet daarna een
+   platform dat hij zelf half heeft afgebroken -- elke bevinding erna is dan een
+   gevolg van de proef en niet van de code.
 
    Deze lijst stond in scripts/beproeving.js en had de invoerproef net zo hard
    nodig. Twee kopieen van "wat mag je niet omzetten" lopen uiteen, en de eerste
-   die achterloopt vergiftigt stil een hele ronde (LAT.md, regel 4). */
-const SCHAKELPADEN = [
-  '/api/office/boardroom/alles', '/api/office/boardroom/fase', '/api/office/boardroom/functie',
-  '/api/office/boardroom/functie/zet', '/api/office/leveranciers', '/api/office/geld'
+   die achterloopt vergiftigt stil een hele ronde (LAT.md, regel 4).
+
+   ------------------------------------------------------------------------
+   WAT ER MIS WAS, EN WAAROM HET NIET OPVIEL
+
+   De lijst noemde zes paden, en alle zes gingen over de BOARDROOM-deur naar de
+   schakelkast. De techniek-deur naar diezelfde kast (/api/techniek/functie,
+   /api/techniek/zekering) stond er niet op. Dat viel niet op omdat geen enkele
+   proef een sleutel had voor die deuren: alles achter boardroomAuth en
+   techAuth was onbereikbaar, dus onschadelijk.
+
+   Die sleutel is er nu wel (scripts/lib/proefsleutels.js geeft de proeven de
+   eigenaarssessie, zodat 156 routes eindelijk beproefbaar worden), en daarmee
+   werd de onvolledigheid van deze lijst opeens gevaarlijk. Vandaar de volgorde
+   waarin dat is gebeurd: eerst deze lijst afmaken, dan pas de sleutel uitdelen.
+
+   ELK PAD DRAAGT NU EEN REDEN. Een verbodslijst zonder redenen wordt bij de
+   eerste die hem in de weg vindt zitten ingekort, want dan lijkt elk item
+   willekeurig. De vier soorten:
+
+     schakelkast   zet functies uit voor het hele platform
+     onomkeerbaar  wist, vernietigt of veegt iets weg
+     gezag         verlegt wie er ergens bij mag
+     stand         verandert een juridische of operationele stand van het huis
+
+   DE BANK-STAND IS DE SCHERPSTE. /api/office/bank/terugstorting is volgens
+   CLAUDE.md niet zomaar een schakelaar: die stand IS de juridische positie van
+   RTG (gesloten circuit tegenover uitgever van elektronisch geld). Een proef
+   die hem omzet, verandert waar dit huis vergunningplichtig is. */
+const NIET_AANRAKEN = [
+  // -- de schakelkast, langs alle drie zijn deuren --
+  { pad: '/api/office/boardroom/alles', soort: 'schakelkast', waarom: 'zet in een keer alles om' },
+  { pad: '/api/office/boardroom/fase', soort: 'schakelkast', waarom: 'verschuift de uitrolfase van het hele platform' },
+  { pad: '/api/office/boardroom/functie', soort: 'schakelkast', waarom: 'zet een functie uit voor iedereen' },
+  { pad: '/api/office/boardroom/functie/zet', soort: 'schakelkast', waarom: 'idem, fijnmazig' },
+  { pad: '/api/office/boardroom/schakel', soort: 'schakelkast', waarom: 'dezelfde kast, andere deur -- stond hier niet op' },
+  { pad: '/api/office/boardroom/schakel-fijn', soort: 'schakelkast', waarom: 'idem, per pas of land' },
+  { pad: '/api/techniek/functie', soort: 'schakelkast', waarom: 'de techniek-deur naar dezelfde kast -- stond hier niet op' },
+  { pad: '/api/techniek/zekering', soort: 'schakelkast', waarom: 'de zekeringen van het platform' },
+  { pad: '/api/office/leveranciers', soort: 'schakelkast', waarom: 'zet partners in en uit bedrijf' },
+  { pad: '/api/office/geld', soort: 'schakelkast', waarom: 'de geldkant van het hele huis' },
+
+  // -- onomkeerbaar --
+  { pad: '/api/techniek/bewaren/veeg', soort: 'onomkeerbaar', waarom: 'de bewaarveger; hij wist wat over de termijn is' },
+  { pad: '/api/techniek/tenant/vernietig', soort: 'onomkeerbaar', waarom: 'vernietigt de omgeving van een klant' },
+  { pad: '/api/techniek/fouten/wis', soort: 'onomkeerbaar', waarom: 'wist het foutenlogboek waarop de proef zelf leunt' },
+  { pad: '/api/boardroom/reset', soort: 'onomkeerbaar', waarom: 'zet de boardroom terug naar begin' },
+  /* DE PROEF WIST HAAR EIGEN LID, en dat is bij toeval gevonden.
+
+     /api/privacy/delete is het recht op vergetelheid: `wisLid(req.session)`
+     haalt alles weg -- reizen, facturen, kluis, mediastore -- en zet de sessie
+     op de sleutel `gewist`. Volstrekt juist gedrag, en precies daarom mag de
+     proef er niet aankloppen: hij staat op plek 1600 van de 3091 beproefde
+     routes, dus de ~1491 ledenroutes DAARNA werden gemeten op een leeggehaald
+     lid. Ze gaven netjes antwoord (de proef logt na een 401 opnieuw in), dus
+     er ging geen enkele lamp branten -- ze maten alleen iets anders dan
+     iedereen dacht.
+
+     Gevonden doordat de wereldcontrole meldde dat het spelpotje weg was. Dat
+     was de derde verklaring die ik probeerde: eerst leek /api/member/spel/
+     opgeven het (dat was het ook, voor een deel), toen /api/logout (dat gaf
+     dezelfde foutzin maar herstelt vanzelf), en pas een sweep over alle 3091
+     routes wees deze aan -- als de enige waarna het potje NIET meer terugkwam.
+
+     Dit is de vorm die deze lijst bedoelt: geen deur die te gevaarlijk is voor
+     de wereld, maar een die de PROEF zelf onbruikbaar maakt. */
+  { pad: '/api/privacy/delete', soort: 'onomkeerbaar',
+    waarom: 'wist het lid waarmee de proef zelf meet; alles erna meet een leeg account' },
+
+  // -- gezag --
+  { pad: '/api/office/boardroom/toegang', soort: 'gezag', waarom: 'wie er in de kamer van de eigenaar mag' },
+  { pad: '/api/techniek/toegang', soort: 'gezag', waarom: 'wie de technische pagina mag openen' },
+  { pad: '/api/techniek/eigenaar', soort: 'gezag', waarom: 'wie de eigenaar IS' },
+  { pad: '/api/techniek/sso/schakel', soort: 'gezag', waarom: 'zet de inlogfederatie van een klant om' },
+
+  // -- stand --
+  { pad: '/api/office/bank/terugstorting', soort: 'stand',
+    waarom: 'deze stand IS de juridische positie van RTG (CLAUDE.md, de terugstortstand); omzetten verandert de vergunningplicht' },
+  { pad: '/api/techniek/wacht/lastafworp', soort: 'stand', waarom: 'werpt last af: de server gaat bewust minder doen' },
+  { pad: '/api/office/techniek/lastafworp', soort: 'stand', waarom: 'dezelfde hendel, andere deur' },
+  { pad: '/api/techniek/wacht/quarantaine', soort: 'stand', waarom: 'zet verkeer in quarantaine' },
+  { pad: '/api/techniek/moderniseer', soort: 'stand', waarom: 'draait een migratie over de echte gegevens' }
 ];
+
+/* De platte lijst blijft bestaan: zes instrumenten lezen hem als tekenreeksen.
+   Hij wordt AFGELEID en niet apart bijgehouden -- dat is precies de dubbeling
+   die deze module bestaat om te voorkomen. */
+const SCHAKELPADEN = NIET_AANRAKEN.map(x => x.pad);
+
+/* Waarom mag een proef hier niet aan komen? Voor de uitslagbestanden: een route
+   die wordt overgeslagen zonder reden is niet te onderscheiden van een route die
+   iemand vergeten is. */
+const waaromNietAanraken = (pad) => {
+  const t = NIET_AANRAKEN.find(x => String(pad || '').startsWith(x.pad));
+  return t ? t.soort + ': ' + t.waarom : null;
+};
+
 const isSchakel = (pad) => SCHAKELPADEN.some(p => String(pad || '').startsWith(p));
 
-module.exports = { alleRoutes, routesInBron, WORTEL, loopMap, SCHAKELPADEN, isSchakel,
+module.exports = { alleRoutes, routesInBron, WORTEL, loopMap, SCHAKELPADEN, NIET_AANRAKEN, waaromNietAanraken, isSchakel,
   rolVan, redenZonderRol, verdeelOpRol, meldZonderRol, bewakerskaart };

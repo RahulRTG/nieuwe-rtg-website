@@ -29,10 +29,20 @@ module.exports = (kern) => {
   app.post('/api/labfonds/overzicht', auth, (req, res) => veilig(res, () => labfonds.fonds(lid(req))));
   app.post('/api/labfonds/locatie/maak', auth, (req, res) => { if (!echtLid(req, res)) return; veilig(res, () => labfonds.locatieMaak(req.body && req.body.naam, req.body && req.body.land)); });
   app.post('/api/labfonds/doneer', auth, (req, res) => { if (!echtLid(req, res)) return; veilig(res, () => labfonds.doneer(lid(req), naam(req), String((req.body || {}).locId || ''), (req.body || {}).bedrag)); });
-  app.post('/api/labfonds/voorstel/maak', auth, (req, res) => { if (!echtLid(req, res)) return; veilig(res, () => labfonds.voorstelMaak(lid(req), naam(req), String((req.body || {}).locId || ''), (req.body || {}).titel, (req.body || {}).doel, (req.body || {}).bedrag)); });
+  app.post('/api/labfonds/voorstel/maak', auth, (req, res) => { if (!echtLid(req, res)) return; veilig(res, () => labfonds.voorstelMaak(lid(req), naam(req), String((req.body || {}).locId || ''), (req.body || {}).titel, (req.body || {}).doel, (req.body || {}).bedrag, (req.body || {}).onderzoek)); });
   app.post('/api/labfonds/stem', auth, (req, res) => { if (!echtLid(req, res)) return; veilig(res, () => labfonds.stem(lid(req), String((req.body || {}).id || ''), String((req.body || {}).keuze || ''))); });
   app.post('/api/labfonds/scheidsrechter', auth, (req, res) => veilig(res, () => labfonds.scheidsrechter(String((req.body || {}).id || ''))));
   app.post('/api/labfonds/beslis', auth, (req, res) => { if (!echtLid(req, res)) return; veilig(res, () => labfonds.beslis(String((req.body || {}).id || ''), lid(req))); });
+
+  /* Wat is er met mijn bijdrage onderzocht? De andere kant van de schakel:
+     welk fondsgeld is aan EEN onderzoek toegezegd. Openbaar voor leden, want
+     het fonds is een ledenpagina -- en er komt niets langs dan wat het Living
+     Lab zelf al aan een voorbijganger toont (labfonds/onderzoek.js regel 4). */
+  app.post('/api/labfonds/financiering', auth, (req, res) => veilig(res, () => {
+    const r = labfonds.zoekOnderzoek(String((req.body || {}).onderzoek || ''));
+    if (!r.gevonden) return { status: 404, error: r.reden };
+    return { ok: true, onderzoek: r.studie, financiering: labfonds.financiering(r.studie.id) };
+  }));
 
   // de boardroom ziet het hele fonds
   app.post('/api/labfonds/boardroom', officeAuth, (req, res) => veilig(res, () => labfonds.boardroom()));

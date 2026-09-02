@@ -42,7 +42,7 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
-const { stempel } = require('./lib/stempel');
+const { stempel, eisSchoneBoom, versheid, nuCommit } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'VERTROUWEN.json');
@@ -175,6 +175,88 @@ function meet() {
 
 module.exports = { staatVan, bereken, ouderdom, meet, HALFWAARDETIJD_DAGEN, BRONNEN };
 
+
+/* ==========================================================================
+   DE POORT VOOR HET SCHRIJVEN -- en waarom juist DIT register er een nodig had.
+
+   Dit bestand schrijft VERTROUWEN.json, en dat register is geen rapport: de
+   bewijspoort in server/kern/stuur/beleid.js LEEST hem en weigert een route
+   waarvan het bewijs volgens deze afdruk is gezakt. Een verkeerd register zet
+   dus echte handelingen stil.
+
+   Dat is echt gebeurd, twee keer in een zitting. Het register werd afgeleid uit
+   een testronde die halverwege was afgebroken. De routes waarvan de toetsen
+   niet meer aan de beurt waren kwamen als "gezakt bewijs" binnen, VERTROUWEN
+   sprong van 0 naar 45 geschorst, en de volgende ronde antwoordde overal met
+   "Deze handeling is tijdelijk geschorst" -- op plekken waar niets mis was.
+   Aan het bestand is dat verschil niet te zien: een half gemeten register ziet
+   er precies zo uit als een volledig gemeten register.
+
+   TWEE EISEN DUS, ALLEBEI VOOR HET SCHRIJVEN:
+
+     1. een schone boom -- zelfde poort als de zes proefrunners
+        (scripts/rolproef-route.js e.a.). Ongecommit werk betekent dat het
+        register bij iets anders hoort dan bij de commit die het noemt.
+     2. de bronregisters mogen niet ouder zijn dan de laatste ronde, en er moet
+        er minstens EEN zijn. Ontbreken ze allemaal, dan is er niets gemeten en
+        hoort er niets geschreven te worden.
+
+   Weigeren gebeurt MET een reden en met een uitweg, zoals elke verhindering in
+   dit huis (GRAMMATICA.md). Lezen en tonen blijft altijd mogelijk -- de poort
+   staat op het SCHRIJVEN en niet op het meten, want een meter die je niet mag
+   draaien is geen meter.
+   ========================================================================== */
+function poortVoorSchrijven(watIsHet) {
+  const b = eisSchoneBoom(watIsHet);
+  if (!b.ok) {
+    console.error('\n  NIET VASTGELEGD -- dit register stuurt de bewijspoort aan\n');
+    console.error('  ' + b.reden);
+    for (const r of (b.bestanden || [])) console.error('    ' + r);
+    process.exit(3);
+  }
+
+  /* EEN SCHONE BOOM IS NIET GENOEG -- DE BRONNEN MOETEN OOK BIJ DEZE BOOM HOREN.
+
+     Dit register LEIDT AF uit acht proefregisters. Die dragen elk hun eigen
+     stempel, en die kan van een heel andere versie van de code zijn. Op
+     1 september 2026 gebeurde precies dat: ROLPROEF.json was gemeten op
+     5dc3b081, twee uur voordat de twee lijsten van publieke routes werden
+     samengevoegd. De ACL-cellen kenden die lijst dus niet, en /api/auth/forgot
+     -- een route die met een uitgeschreven reden publiek IS -- kwam terug als
+     'gezakt op ACL'. Vijfenveertig routes gingen daarop naar `geschorst`, de
+     bewijspoort in kern/stuur/beleid.js weigerde ze, en de suite antwoordde
+     honderden keren met "Deze handeling is tijdelijk geschorst" op plekken waar
+     niets mis was.
+
+     De boom was daarbij SCHOON. De poort hierboven zag dus niets, en dat is de
+     hele reden dat deze tweede eis er staat: een afgeleid register kan niet
+     verser zijn dan zijn bronnen, en het verschil is aan de afdruk niet te zien.
+
+     `versheid()` uit ./lib/stempel.js beantwoordt dit al, en met de juiste
+     nuance: niet "andere commit" maar "andere CODE". Een commit die alleen
+     registers of documentatie raakt, maakt een meting niet ongeldig. */
+  const nu = nuCommit();
+  const oud = [];
+  for (const bron of BRONNEN) {
+    let j = null;
+    try { j = JSON.parse(fs.readFileSync(path.join(WORTEL, bron), 'utf8')); } catch (e) { continue; }
+    const v = versheid(j.stempel, nu);
+    if (!v.vers) oud.push(bron + ' -- ' + v.reden);
+  }
+  if (oud.length) {
+    console.error('\n  NIET VASTGELEGD -- de bronnen horen niet bij deze boom\n');
+    console.error('  Dit register leidt af uit de proefregisters, en ' + oud.length +
+      ' van de ' + BRONNEN.length + ' zijn gemeten op andere code. Een route die daardoor');
+    console.error('  ten onrechte `geschorst` heet, wordt door de bewijspoort geweigerd -- en dan');
+    console.error('  staat er software stil om een meting die niet bij deze versie hoort.\n');
+    for (const r of oud) console.error('    ' + r);
+    console.error('\n  Zo kan het wel: draai de proeven die verouderd zijn opnieuw, en leg dit');
+    console.error('  register daarna vast. Een ontbrekend register telt niet mee (de matrix zet');
+    console.error('  die cellen al op ongemeten); een OUD register wel, en dat is het gevaar.');
+    process.exit(3);
+  }
+}
+
 if (require.main !== module) return;
 
 const uit = meet();
@@ -185,6 +267,7 @@ for (const s of ['bewezen', 'verschaald', 'verzwakt', 'geschorst', 'ongemeten'])
   console.log('  ' + s.padEnd(11) + String(uit.telling[s]).padStart(6));
 }
 if (process.argv.includes('--vastleggen')) {
+  poortVoorSchrijven('de vervalstaten');
   fs.writeFileSync(UITSLAG, JSON.stringify(uit, null, 1) + '\n');
   console.log('\n  vastgelegd in VERTROUWEN.json\n');
 } else {

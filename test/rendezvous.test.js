@@ -9,7 +9,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, elevateTier } = require('./helper');
+const { startServer, elevateTier, kantoorAlsPersoon } = require('./helper');
 
 const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
 let BASE;
@@ -25,7 +25,7 @@ const rv = (pad, body, token) => raw('/member/rendezvous/' + pad, body, token);
 
 test.before(async () => {
   ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
-  office = (await json(await raw('/office/login', { code: 'RTG-OFFICE' }))).token;
+  office = await kantoorAlsPersoon(BASE, 'RTG-OFFICE');
 });
 test.after(() => {
   if (child) try { child.kill('SIGKILL'); } catch (e) {}
@@ -33,7 +33,7 @@ test.after(() => {
 });
 
 let teller = 0;
-const officeTok = async () => (await json(await raw('/office/login', { code: 'RTG-OFFICE' }))).token;
+const officeTok = async () => kantoorAlsPersoon(BASE, 'RTG-OFFICE');
 
 /* Het paspoort door de balie halen. Zonder dit komt een lid de ontmoetpoort niet
    door, ook niet met een Lifestyle Pass: de leeftijd wordt uit member_state.geboren

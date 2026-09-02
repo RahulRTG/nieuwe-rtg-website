@@ -215,7 +215,7 @@ function weegZonderSleutel(d, e, staat) {
     reden: 'een woordelijk gelijke herhaling ZONDER sleutel deed het werk opnieuw -- dit is de dubbeltik' };
 }
 
-async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, rolVoor, hernieuw, maxRoutes, staatVan, vastlegging, metenZonderSleutel, pasladder }) {
+async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, rolVoor, hernieuw, maxRoutes, staatVan, vastlegging, metenZonderSleutel, pasladder, wacht }) {
   const perRoute = {};
   let gedaan = 0, hernieuwd = 0, uitOpslag = 0, verworpen = 0, pasGewisseld = 0;
   const tel = { beschermd: 0, onbeschermd: 0, ongemeten: 0 };
@@ -419,6 +419,17 @@ async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, rolVoor, hern
       }
     }
     perRoute[methode + ' ' + r.pad] = rij;
+
+    /* DE WERELDWACHT PEILT ONDERWEG -- zie scripts/lib/wereldcontrole.js.
+
+       Een eindcontrole zegt DAT een wereld weg is; deze zegt WAAR. Er staan
+       sloopachtige routes binnen de werelden die deze proef zelf opzet, en
+       zonder venster is "de stadsafdeling bestaat niet meer" een mededeling
+       zonder aanknopingspunt.
+
+       Een storing in de wacht mag de meting nooit stilzetten: hij is de
+       waarnemer en niet het onderwerp. */
+    if (wacht) { try { await wacht.naRoute(Object.keys(perRoute).length, r.pad); } catch (e) {} }
   }
 
   /* ============================================================================

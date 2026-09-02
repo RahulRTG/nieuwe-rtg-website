@@ -58,4 +58,12 @@ app.post('/api/logout', auth, (req, res) => {
   res.json({ ok: true });
 });
 
+
+/* "WIE BEN IK", hierheen verhuisd uit ./inlog.js toen dat over de leesgrens ging.
+   Hij hoort hier: dit bestand gaat over de levensloop van een sessie -- er een
+   openen, er een sluiten, en vragen welke je hebt. Dat is dezelfde vraag in drie
+   vormen. */
+app.post('/api/auth/me', auth, (req, res) => {
+  res.json({ user: req.session.account ? accounts.publicUser(req.session.account) : stateFor(req.session, req.body.lang).user });
+});
 };

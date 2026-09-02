@@ -20,17 +20,95 @@
     display:flex;flex-direction:column;}
   h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
   header{flex:0 0 auto;background:var(--bg);border-bottom:1px solid var(--line);
-    padding:calc(env(safe-area-inset-top) + .8rem) 1.1rem .7rem;display:flex;align-items:center;gap:.8rem;}
-  header .wie{min-width:0;flex:1;}
-  header .ey{font-size:.6rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+    padding:calc(env(safe-area-inset-top) + .8rem) 1.1rem .7rem;display:flex;align-items:center;gap:.6rem;}
+  header > .knop{flex:0 0 auto;}
+  header .wie{min-width:0;flex:1 1 auto;}
+  /* Leestoon, geen accent: het eigen --gold (#A98F1C) las 2,8:1 op parelmoer
+     zodra een lid champagne koos (a11y-themaronde). --rtg-leesgoud is per thema
+     de goudtoon die leest; buiten een thema valt hij terug op het eigen goud. */
+  header .ey{font-size:.6rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   header h1{font-size:1.1rem;margin-top:.1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  header .van{font-size:.72rem;color:var(--soft);margin-top:.1rem;}
+  header .van{font-size:.72rem;color:var(--soft);margin-top:.1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  /* Op telefoonformaat is "Wat mag deze app?" te lang naast een naam die zelf
+     al mag afbreken; hij wordt dan een kort label zonder iets te verbergen --
+     ADAPTIEF.md: een handeling krijgt een andere VORM, hij verdwijnt niet. */
+  #watMag .lang{display:inline;}
+  #watMag .kort{display:none;}
+  /* OP EEN TELEFOON KRIJGT DE NAAM ZIJN EIGEN REGEL, en dat is geen smaak maar
+     een reparatie. In deze balk hangt ook de schil van het huis (de bank links,
+     Rahul rechts, via /shared/basis.js); die vier dingen naast een naam en een
+     knop passen niet op 430 px, en de naam brak dan onder de knoppen door. Nu
+     staan de handelingen op de eerste regel en de naam op de tweede -- niets
+     verdwijnt, alles verandert van VORM (ADAPTIEF.md). */
+  @media (max-width:560px){
+    #watMag .lang{display:none;}
+    #watMag .kort{display:inline;}
+    header{flex-wrap:wrap;}
+    header .wie{flex:1 0 100%;order:2;}
+    header h1{font-size:1.02rem;}
+  }
   .knop{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:0;
     padding:.42rem .75rem;font:inherit;font-size:.78rem;cursor:pointer;text-decoration:none;white-space:nowrap;min-height:2.5rem;
     display:inline-flex;align-items:center;justify-content:center;}
   .knop.aan{background:var(--txt);color:#000;border-color:var(--txt);font-weight:600;}
+  /* DE SYSTEEMBALK. Dit is geen versiering: de cel is het meest
+     onderscheidende deel van dit kanaal, en hij was nergens te zien. Wat hier
+     staat komt van de server (/api/appstore/open) en wordt hier niet verzonnen.
+     De letters zijn Inter en niet Bodoni -- dit is systeeminformatie, geen
+     merkregel (ONTWERP.md: Bodoni staat op een gesloten lijst rollen). */
+  .systeem{flex:0 0 auto;display:flex;align-items:center;gap:.9rem;flex-wrap:wrap;
+    padding:.45rem 1.1rem;border-bottom:1px solid var(--line);background:var(--card);
+    font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);gap:.7rem;}
+  .systeem .cel-id{color:var(--txt);display:inline-flex;align-items:center;gap:.45rem;}
+  .systeem .stip{width:.4rem;height:.4rem;border-radius:50%;background:var(--gold);display:inline-block;}
+  .systeem .feit{display:inline-flex;align-items:center;gap:.4rem;}
+  .systeem .feit b{color:var(--muted);font-weight:600;letter-spacing:.18em;}
+  .systeem .rek{flex:1 1 auto;}
+  .systeem .klasse{color:var(--gold);}
+  .knop.mini{font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;padding:.3rem .6rem;
+    min-height:1.9rem;color:var(--muted);}
+  /* DE OPENING. Zevenhonderd milliseconden waarin er iets WAARS staat: de cel
+     wordt genoemd voordat de app hem vult. Wie hem niet wil, ziet hem ook niet
+     -- prefers-reduced-motion haalt de beweging eruit en laat de tekst staan. */
+  .opening{position:absolute;inset:0;z-index:4;background:var(--bg);display:flex;
+    flex-direction:column;align-items:center;justify-content:center;gap:.5rem;
+    transition:opacity .45s ease;}
+  .opening[data-weg="1"]{opacity:0;pointer-events:none;}
+  .opening .ey{font-size:.6rem;letter-spacing:.28em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
+  .opening h2{font-size:1.35rem;}
+  .opening .id{font-size:.7rem;letter-spacing:.22em;text-transform:uppercase;color:var(--soft);}
+  .opening .streep{width:0;height:1px;background:var(--gold);margin-top:.6rem;
+    animation:celstreep .7s ease forwards;}
+  @keyframes celstreep{from{width:0;}to{width:8rem;}}
+  @media (prefers-reduced-motion:reduce){
+    .opening .streep{animation:none;width:8rem;}
+    .opening{transition:none;}
+  }
+  /* DE OVERDRACHTSKAART. Hij ligt OVER de cel en niet eronder: wat er
+     doorgegeven wordt, hoort te worden gelezen voordat de app het heeft. Hij
+     verdwijnt door een van de twee knoppen -- er is geen kruisje dat het
+     stilzwijgend doet gebeuren. */
+  .over{position:absolute;inset:0;z-index:5;background:rgba(12,12,11,.96);backdrop-filter:blur(6px);
+    overflow:auto;padding:1.2rem;display:none;}
+  .over[data-open="1"]{display:block;}
+  .over .binnen{max-width:520px;margin:0 auto;}
+  .over .ey{font-size:.6rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
+  .over h2{font-size:1.25rem;margin:.15rem 0 .5rem;}
+  .over .sub{font-size:.82rem;color:var(--soft);line-height:1.6;margin-bottom:.9rem;}
+  .over .veldrij{display:flex;justify-content:space-between;gap:.8rem;border-top:1px solid var(--line);
+    padding:.55rem 0;font-size:.9rem;}
+  .over .veldrij:last-of-type{border-bottom:1px solid var(--line);}
+  .over .veldnaam{color:var(--soft);font-size:.63rem;letter-spacing:.14em;text-transform:uppercase;padding-top:.2rem;}
+  .over .veldnaam small{display:block;letter-spacing:0;text-transform:none;font-size:.72rem;color:var(--soft);}
+  .over .veldwaarde{color:var(--txt);text-align:right;font-variant-numeric:tabular-nums;}
+  .over .let{font-size:.78rem;color:var(--muted);line-height:1.6;margin-top:.8rem;}
   .cel{flex:1 1 auto;min-height:0;position:relative;background:var(--bg);}
-  .cel iframe{width:100%;height:100%;border:0;display:block;background:#fff;}
+  /* HET KADER VULT DE CEL ABSOLUUT. Met height:100% in de stroom begon het
+     iframe 69 px lager dan de cel (de schil van het huis zet er zijn eigen
+     rijen omheen) en liep het er onderaan net zoveel uit -- gemeten, niet
+     vermoed. Een app die zijn onderste regel buiten beeld heeft, is een app die
+     het niet doet. */
+  .cel iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;background:#fff;}
   .paneel{position:absolute;inset:0;background:rgba(12,12,11,.94);backdrop-filter:blur(6px);overflow:auto;
     padding:1.2rem;display:none;}
   .paneel[data-open="1"]{display:block;}
@@ -65,10 +143,28 @@
     <h1 id="naam">Bezig met openen…</h1>
     <div class="van" id="van"></div>
   </div>
-  <button class="knop" id="watMag" type="button" aria-expanded="false">Wat mag deze app?</button>
 </header>
 
+<div class="systeem" id="systeem" hidden>
+  <span class="cel-id"><span class="stip" aria-hidden="true"></span><span id="celId">cel</span></span>
+  <span class="feit"><b id="feitNet">0</b> netwerkverbindingen</span>
+  <span class="feit">geen sensoren</span>
+  <span class="rek"></span>
+  <span class="klasse" id="celKlasse"></span>
+  <!-- DE KNOP STAAT IN DE SYSTEEMBALK EN NIET IN DE KOP. Daar hing hij naast de
+       naam, de bank en Rahul, en op telefoonformaat schoven die vijf over
+       elkaar heen. Hier hoort hij ook inhoudelijk: deze balk gaat over wat de
+       cel is en wat erin mag. -->
+  <button class="knop mini" id="watMag" type="button" aria-expanded="false"><span class="lang">Wat mag deze app?</span><span class="kort">Wat mag hij?</span></button>
+</div>
+
 <main class="cel" id="cel">
+  <div class="opening" id="opening">
+    <div class="ey">RTG</div>
+    <h2>Er wordt een cel geopend</h2>
+    <div class="id" id="openingId"></div>
+    <div class="streep" aria-hidden="true"></div>
+  </div>
   <div id="frameWrap" class="vul">
     <!-- HET KADER STAAT HIER EN NIET IN EEN SCRIPT, EN allow IS LEEG.
 
@@ -85,6 +181,19 @@
          te hebben. test/appstore-cel.test.js zakt daarop. -->
     <iframe id="cel-kader" sandbox="allow-scripts" allow="" referrerpolicy="no-referrer"
             title="Een app van een andere partij, in een afgeschermde cel" hidden></iframe>
+  </div>
+  <div class="over" id="over" role="dialog" aria-label="Doorgeven aan deze app">
+    <div class="binnen">
+      <div class="ey">RTG geeft door</div>
+      <h2 id="overKop">Deze waarden gaan naar de app</h2>
+      <p class="sub" id="overSub"></p>
+      <div id="overVelden"></div>
+      <p class="let" id="overLet"></p>
+      <div class="knoprij">
+        <button class="knop aan" id="overJa" type="button">Geef door</button>
+        <button class="knop" id="overNee" type="button">Niet doorgeven</button>
+      </div>
+    </div>
   </div>
   <div class="paneel" id="paneel" role="dialog" aria-label="Wat mag deze app">
     <div class="binnen">
@@ -145,12 +254,17 @@ const FOUTVELDEN = ['code', 'error', 'herhaalbaar', 'methode', 'methodes',
   'machtiging', 'verleend', 'gevraagd', 'hoe', 'perMinuut'];
 
 const SLEUTEL = (() => { try { return new URLSearchParams(location.search).get('app') || ''; } catch (e) { return ''; } })();
-let frame = null, STAND = null;
+/* DE OVERDRACHT VAN DEZE OPENING. Een id in het adres, meer niet: de waarden
+   zelf staan op de server en worden hier opgehaald om ze te TONEN. Zouden ze in
+   de URL staan, dan is een gedeeld webadres een gedeelde overdracht. */
+const OVERDRACHT = (() => { try { return new URLSearchParams(location.search).get('context') || ''; } catch (e) { return ''; } })();
+let frame = null, STAND = null, KLAAR = null;
 
 /* Een melding in plaats van een app. Het kader zelf blijft staan (verborgen):
    het draagt de sandbox en het lege allow, en die twee horen niet afhankelijk
    te zijn van welke tak van deze functie er is gelopen. */
 function toon(t, sub){
+  const o = $('#opening'); if (o) o.setAttribute('data-weg', '1');
   const f = $('#cel-kader'); if (f) f.hidden = true;
   let m = document.getElementById('celMelding');
   if (!m) { m = document.createElement('div'); m.id = 'celMelding'; m.className = 'leeg'; $('#frameWrap').appendChild(m); }
@@ -165,6 +279,31 @@ async function open(){
   catch (e) { $('#naam').textContent = 'Niet beschikbaar'; return toon(e.message); }
   STAND = d;
   $('#naam').textContent = d.naam;
+  /* EN DE KOPIE IN DE SCHILBALK. De iOS-schil (/shared/ios.js) neemt de TEKST
+     van de h1 over in zijn eigen balk op het moment dat de pagina laadt -- en
+     op dat moment staat er "Bezig met openen...", want de naam komt pas terug
+     van /api/appstore/open. Zonder deze regel blijft die tekst staan terwijl de
+     app er al draait. Een kop die iets anders zegt dan het scherm eronder, is
+     een scherm dat kapot lijkt. */
+  const kopie = document.querySelector('.ios-nav-titel');
+  if (kopie) kopie.textContent = d.naam;
+  /* DE CEL KRIJGT ZIJN NAAM VAN DE SERVER. Hij wordt daar afgeleid uit het lid
+     en de app (kern/appstore/uitgifte.js, celnaam); hier wordt hij alleen
+     getoond. Een naam die het scherm zelf verzint, is een naam die op twee
+     toestellen anders is. */
+  if (d.cel && d.cel.naam) {
+    $('#celId').textContent = 'cel ' + d.cel.naam;
+    $('#openingId').textContent = 'cel ' + d.cel.naam;
+  }
+  if (d.paspoort && d.paspoort.bereik) {
+    $('#celKlasse').textContent = d.paspoort.bereik.label;
+    /* Het aantal netwerkverbindingen komt uit het KANAALFEIT en niet uit een
+       getal in dit scherm: nul is hier geen optimisme maar de CSP van de
+       celroute (kern/appstore/bereik.js, KANAALFEITEN). */
+    const net = (d.paspoort.kanaal || []).find(f => f.feit === 'geen netwerk');
+    if (net) $('#feitNet').textContent = String(net.waarde).split(' ')[0];
+  }
+  $('#systeem').hidden = false;
   $('#van').textContent = 'versie ' + d.versie + (d.uitgever ? ' · van ' + d.uitgever.naam : '');
   document.title = d.naam + ' · App Store';
 
@@ -174,9 +313,63 @@ async function open(){
   const f = $('#cel-kader');
   f.title = d.naam + ' - een app van ' + (d.uitgever ? d.uitgever.naam : 'een derde partij');
   f.hidden = false;
+  /* De opening gaat pas weg als de app er werkelijk staat, met een ondergrens
+     zodat hij niet flikkert bij een bundel die er al is. Blijft de app hangen,
+     dan gaat hij alsnog weg: een schil die blijft staan omdat de derde niets
+     laadt, is een RTG-scherm dat kapot lijkt terwijl de app het is. */
+  const t0 = Date.now();
+  const dicht = () => { const o = $('#opening'); if (o) o.setAttribute('data-weg', '1'); };
+  f.addEventListener('load', () => {
+    setTimeout(dicht, Math.max(0, 700 - (Date.now() - t0)));
+    /* De vraag komt PAS als de app er staat: een bevestiging boven een leeg
+       scherm is een bevestiging waarvan je niet ziet waar hij heen gaat. Staat
+       er niets klaar, dan krijgt de cel meteen `null` en wacht hij nergens op. */
+    toonOverdracht();
+  }, { once: true });
+  setTimeout(dicht, 4000);
   f.src = d.start;
   frame = f;
 }
+
+/* ---------- de contextbrug: samenstellen doet RTG, bevestigen doet de mens ----------
+
+   De waarden gaan pas naar de cel als er op "geef door" is gedrukt. Drukt
+   niemand, dan krijgt de app `null` -- en dat is de gewone toestand, want de
+   meeste keren dat een app opengaat is er niets doorgegeven. Er is met opzet
+   geen "onthoud deze keuze": dan is het weer een machtiging, en precies dat is
+   het niet. */
+async function toonOverdracht(){
+  if (!OVERDRACHT) return stuurContext(null);
+  let d;
+  try { d = await api('/api/appstore/context/lees', { id: OVERDRACHT }); }
+  catch (e) { meld(e.message); return stuurContext(null); }
+  $('#overSub').textContent = 'Deze waarden komen uit RTG. ' + (d.let || '');
+  $('#overVelden').innerHTML = (d.toont || []).map(v =>
+    '<div class="veldrij"><span class="veldnaam">'+esc(v.label)+'<small>'+esc(v.uitleg)+'</small></span>'+
+    '<span class="veldwaarde">'+esc(v.tekst != null ? v.tekst : v.waarde)+'</span></div>').join('');
+  $('#overLet').textContent = 'De app krijgt alleen dit. Niet je naam, niet je codenaam, en niet waar dit vandaan komt. '
+    + 'Geef je het niet door, dan werkt de app gewoon: dan begint hij leeg.';
+  $('#over').setAttribute('data-open', '1');
+}
+function stuurContext(velden){
+  KLAAR = true;
+  if (frame && frame.contentWindow) {
+    try { frame.contentWindow.postMessage({ rtgcel: 1, context: velden || null }, '*'); } catch (e) {}
+  }
+}
+$('#overJa').addEventListener('click', async () => {
+  $('#over').setAttribute('data-open', '0');
+  try {
+    const r = await api('/api/appstore/context/geef', { id: OVERDRACHT, sleutel: SLEUTEL });
+    stuurContext(r.velden || null);
+    meld('Doorgegeven.');
+  } catch (e) { meld(e.message); stuurContext(null); }
+});
+$('#overNee').addEventListener('click', () => {
+  $('#over').setAttribute('data-open', '0');
+  stuurContext(null);
+  meld('Niet doorgegeven. De app begint leeg.');
+});
 
 /* De brug. Alles wat hier binnenkomt komt uit de cel; alles wat eruit gaat is
    het antwoord van de server op precies die aanroep. */

@@ -33,7 +33,12 @@
   async function loadVakbewijzen(){
     const el = document.getElementById('vakbewijzen'); if (!el) return;
     let r = null;
-    try { r = await call('/office/vakbewijzen'); } catch(e){ return; }
+    /* De stapel zelf staat niet achter de kluispoort (hij toont codenamen en
+       geen nummers), maar aftekenen en het nummer openen wel. Gaat er hier toch
+       een kluisdeur dicht, dan zegt het paneel waarom -- zie kluisDicht in deel 01b,
+       want deze delen zitten in een gedeeld bereik. */
+    try { r = await call('/office/vakbewijzen'); }
+    catch(e){ kluisDicht(el, e); return; }
     if (r.soorten) VAK_SOORTEN = r.soorten;
     const open = r.open || [], verlopend = r.verlopend || [];
     const rij = v =>

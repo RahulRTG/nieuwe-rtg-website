@@ -47,6 +47,7 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
+const { stempel } = require('./lib/stempel');
 const { start } = require('./lib/wegwerpserver');
 const { plausibelLijf } = require('./lib/rolproef');
 const wereld = require('./lib/herstelwereld');
@@ -447,6 +448,7 @@ async function main() {
         'eerste ronde op compensatie met `kosten` als reden, en staat er nu op exact'
     ]
   };
+  Object.assign(uit, { stempel: stempel() });
   fs.writeFileSync(path.join(WORTEL, 'HERSTELPROEF.json'), JSON.stringify(uit, null, 1) + '\n');
   console.log('\n  exact ' + tel('exact') + ' | compensatie ' + tel('compensatie') +
     ' | geen-herstel ' + tel('geen-herstel') + ' | niet beproefd ' + tel('nietBeproefd') +

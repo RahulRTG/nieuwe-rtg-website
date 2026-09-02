@@ -67,8 +67,29 @@ test('4 - herhalen wordt op EEN plek beantwoord', () => {
 
 test('5 - de ECHTE brug is volledig geclassificeerd', () => {
   const brug = bouwBrug();
-  assert.equal(brug.METHODES.length, 6, 'de brug kent zes methodes');
-  // als er een zonder klasse bij zou komen, was bouwBrug() hierboven al geknald
+  /* HIER STOND `=== 6`, EN DAT GETAL WAS HET ENIGE DAT ZAKTE toen de arenalaag
+     drie methodes meebracht (arena.bord, arena.mijn, arena.zet). Niets was
+     stuk: alle negen dragen een klasse, en dat is ook precies wat deze toets
+     hoort te bewijzen -- want een methode ZONDER klasse laat bouwBrug()
+     hierboven al knallen, en dat is toets 6 een paar regels verderop.
+
+     Een vast aantal meet de grootte van het huis en niet de eigenschap. Het is
+     bovendien de dure soort: hij zakt bij elke uitbreiding, en wie hem drie
+     keer heeft opgehoogd leest de volgende keer niet meer of er echt iets mis
+     was. Wat er nu staat is de eigenschap zelf plus een ondergrens, en die
+     ondergrens is er om te merken dat de LEZING stukging (een verplaatste
+     module, een gewijzigde vorm) en niet om het aantal vast te zetten. */
+  assert.ok(brug.METHODES.length >= 6,
+    'de brug hoort methodes te kennen; gevonden: ' + brug.METHODES.length);
+  /* brug.mutaties is een LIJST en geen kaart -- elk element draagt zijn eigen
+     naam. Eerst als kaart gelezen, en dan is elke waarde `undefined` en meldt
+     deze lus alle negen methodes als onbekend. Dat is de valse uitslag die de
+     drukste kant op wijst: negen fouten waar er nul zijn. */
+  const perNaam = new Map(brug.mutaties.map(x => [x.naam, x.mutatie]));
+  for (const m of brug.METHODES) {
+    assert.ok(M.isKlasse(perNaam.get(m)),
+      m + ' draagt geen bekende mutatieklasse (gevonden: ' + perNaam.get(m) + ')');
+  }
   assert.ok(brug.METHODES.includes('bericht.zet'));
 });
 

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="nl">
+<html lang="nl" data-rtg-thema="champagne">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -187,13 +187,25 @@
 </style>
 <link href="/shared/social-suite.css" rel="stylesheet">
 <link href="/shared/social-intelligence.css" rel="stylesheet">
+<script src="/shared/leeg.js"></script>
 <script src="/shared/social-suite.js" defer></script>
 <script src="/shared/social-intelligence.js" defer></script>
 <script src="/shared/social-intelligence-deck.js" defer></script>
 <script src="/shared/social-intelligence-runtime.js" defer></script>
 <script src="/shared/social-intelligence-data.js" defer></script>
+<link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-pane="lijst" data-eigen-rahul data-rtg-eigenvlak="onyx">
+<body class="rtg-stijl" data-pane="lijst" data-eigen-rahul data-rtg-eigenvlak="onyx" data-rtg-world="living">
+<div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">
+  <a class="os-switcher__brand" href="/apps/app.html"><b>RTG</b><span>Vier werelden &middot; één kern</span></a>
+  <div class="os-switcher__links">
+    <a href="/apps/rtg.html" aria-current="page"><span>01</span>LivingOS</a>
+    <a href="/apps/kantoor.html"><span>02</span>WorkOS</a>
+    <a href="/apps/reizen.html"><span>03</span>TravelOS</a>
+    <a href="/apps/foundation/os-publiek.html"><span>04</span>FoundationOS</a>
+  </div>
+  <span class="os-switcher__state">Kern verbonden</span>
+</div>
 <!-- data-eigen-rahul: deze app HEEFT Rahul al, in het gesprek zelf (de hulprij
      onder het invoerveld). De metgezel-laag laadt wel -- voor het palet en de
      wauw-laag -- maar zet zijn eigen chatbalk niet neer; twee invoervelden
@@ -301,7 +313,8 @@
     var n = $('#gesprekken');
     n.textContent = '';
     if (!staat.gesprekken.length) {
-      n.innerHTML = '<p class="leeg">Nog geen gesprekken in deze la.<br>Tik op + om er een te beginnen.</p>';
+      n.innerHTML = RTGLeeg.html({ ey: 'Berichten', titel: 'Nog geen gesprekken in deze la.',
+        wat: 'Wat u hier begint blijft in deze la staan, gescheiden van uw andere gesprekken.' });
       return;
     }
     staat.gesprekken.forEach(function (g) {
@@ -753,7 +766,8 @@
   }
 
   if (!token) {
-    $('#gesprekken').innerHTML = '<p class="leeg">Log eerst in op de app.</p>';
+    $('#gesprekken').innerHTML = RTGLeeg.html(RTGLeeg.inlogStand({
+      ey: 'Berichten', wat: 'Uw gesprekken staan achter uw account.' }));
   } else {
     /* Het app-menu wordt door shared/ios.js bijgeladen en is dus niet meteen
        aanwezig; we zetten onze lijst zodra hij er is. Zonder deze wacht zou de

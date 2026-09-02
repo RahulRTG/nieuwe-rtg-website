@@ -90,13 +90,18 @@
       $('#kpi').innerHTML = ''; $('#themas').innerHTML = ''; $('#pijplijn').innerHTML = ''; $('#impact').innerHTML = '';
       $('#beheer').innerHTML = '<div class="leeg">Kies of maak eerst een lab.</div>';
       $('#apparatuur').innerHTML = ''; $('#agenda').innerHTML = ''; $('#opbrengst').innerHTML = '';
+      $('#obs').innerHTML = '';
       return Promise.resolve();
     }
     return Promise.all([
       api('overzicht', { id: LAB }),
       api('themas', { id: LAB }),
       api('uit/pijplijn', { id: LAB }),
-      api('impact', { id: LAB })
+      api('impact', { id: LAB }),
+      /* Het observatorium van DIT lab. Hij faalt apart en niet met de rest mee:
+         een bord dat niet te peilen is, hoort de onderzoekslijst niet mee te
+         nemen -- en het bord zegt dat dan zelf. */
+      api('observatorium', { id: LAB }).catch(function (e) { return { error: e.message }; })
     ]).then(function (r) {
       STUDIES = r[0].studies || [];
       B.tekenFilters(r[0].perSoort);
@@ -108,6 +113,7 @@
       window.LivingLabApparatuur.teken($('#apparatuur'));
       B.tekenOpbrengst($('#opbrengst'), LAB);
       B.agenda($('#agenda'), LAB);
+      window.LivingLabObservatorium.teken($('#obs'), r[4]);
     }).catch(function (e) { $('#lijst').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; });
   }
 

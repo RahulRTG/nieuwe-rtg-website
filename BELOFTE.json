@@ -397,7 +397,7 @@
       "wat": "Risk engine + confidence routing (hand/assist/auto)",
       "groep": "Command: zien, besturen, automatiseren",
       "dekking": [
-        "server/kern/command/risico.js"
+        "server/kern/frictie/motor.js"
       ]
     },
     {

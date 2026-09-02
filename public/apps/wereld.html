@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="nl">
+<html lang="nl" data-rtg-thema="bordeaux">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -166,7 +166,9 @@
   #zoekform input{flex:1;background:var(--rtg-card2);color:var(--rtg-txt);
     font:inherit;font-size:0.85rem;border:1px solid var(--rtg-line);
     border-radius:0;padding:0.5rem 0.95rem;}
-  #zoekform button{background:var(--rtg-acc);color:#0C0C0B;font:inherit;
+  /* dezelfde inkt-op-accent als de gekozen wereld hierboven: bijna-zwart op
+     het accent haalt 3,78:1, --rtg-acc-inkt volgt de dagkleur en leest overal */
+  #zoekform button{background:var(--rtg-acc);color:var(--rtg-acc-inkt);font:inherit;
     font-size:0.8rem;font-weight:600;border:0;border-radius:0;
     padding:0.5rem 1.1rem;cursor:pointer;}
   .via{font-size:0.72rem;color:var(--rtg-acc);margin-top:0.35rem;}
@@ -185,6 +187,14 @@
   .balk a[aria-current="page"]{color:var(--rtg-txt);}
   .balk a[aria-current="page"] span{color:var(--rtg-txt);}
   .balk span{display:block;font-size:1.05rem;line-height:1.35;}
+  /* shared/rtg-worlds-2026.css schuift elke vaste `body > nav` omlaag met
+     `top:var(--os-switcher-h)`, zodat een KOPbalk niet onder de os-switcher
+     verdwijnt. Deze balk staat onderaan (`bottom:0`); met een top erbij rekt
+     een vast element zich uit van de switcher tot de onderrand en ligt dan als
+     onzichtbaar vlak over de hele app -- de wereldknoppen waren niet meer te
+     raken. Een onderbalk heeft geen top; de specificiteit is bewust een tree
+     hoger dan de gedeelde regel, want die staat later in de cascade. */
+  body:has(> .os-switcher):not(.rtg-edge-host) > nav.balk{top:auto;}
 
   @media (max-width:520px){
     .belofte{display:none;}
@@ -196,9 +206,20 @@
     .lenzen span::after{content:'S';display:block;font-size:0.44rem;margin-top:0.12rem;}
   }
 </style>
+<link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
 </head>
-<body>
+<body data-rtg-world="living" data-rtg-eigenvlak="bordeaux">
 
+<div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">
+  <a class="os-switcher__brand" href="/apps/app.html"><b>RTG</b><span>Vier werelden &middot; één kern</span></a>
+  <div class="os-switcher__links">
+    <a href="/apps/rtg.html" aria-current="page"><span>01</span>LivingOS</a>
+    <a href="/apps/kantoor.html"><span>02</span>WorkOS</a>
+    <a href="/apps/reizen.html"><span>03</span>TravelOS</a>
+    <a href="/apps/foundation/os-publiek.html"><span>04</span>FoundationOS</a>
+  </div>
+  <span class="os-switcher__state">Kern verbonden</span>
+</div>
 <header class="kop">
   <div class="kopinhoud" id="eliteKop">
     <div class="elite-merk">

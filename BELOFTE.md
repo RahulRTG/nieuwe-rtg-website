@@ -63,7 +63,7 @@ Dit register beoordeelt geen kwaliteit. Dat een bestand bestaat, zegt niet dat d
 | Autonomous remediation via goedgekeurde runbooks | gedekt | `server/kern/command/runbooks.js`<br>`/api/command/runbook/voer` |
 | One-click rollback op elke herstelronde | gedekt | `/api/command/runbook/terug` |
 | Policy-as-data met versies en vier ogen | gedekt | `server/kern/command/beleid.js`<br>`/api/command/beleid/zet` |
-| Risk engine + confidence routing (hand/assist/auto) | gedekt | `server/kern/command/risico.js` |
+| Risk engine + confidence routing (hand/assist/auto) | gedekt | `server/kern/frictie/motor.js` |
 | Exception queue met eigenaar, termijn en besluit | gedekt | `server/kern/command/zaken.js`<br>`/api/command/zaken` |
 | Immutable audit trail met hashketen | gedekt | `server/kern/command/journaal.js`<br>`/api/command/journaal` |
 | Forensic replay van een tijdvak | gedekt | `/api/command/journaal/herbeleef` |

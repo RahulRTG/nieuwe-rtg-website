@@ -137,11 +137,16 @@ module.exports = (ctxIn) => {
      regel in hetzelfde grootboek. Apart van kassa omdat de teruggang erin zit
      en kassa.js daar met opzet anders mee omgaat. */
   // in de CTX: waar de rest op leunt. Op de API: wat naar buiten gaat.
-  for (const naam of ['samen', 'treasury']) Object.assign(ctx, require('./' + naam)(ctx));
+  /* zaakrekening VOOR kassa: ./partner.js wordt daarbinnen gebouwd en vraagt
+     ctx.zaakRekening vlak voordat hij geld aanraakt. Staat hij er niet, dan
+     weigert die fail-closed -- dat is de bedoeling, maar dan werkt uitbetalen
+     nergens meer. */
+  for (const naam of ['samen', 'treasury', 'zaakrekening']) Object.assign(ctx, require('./' + naam)(ctx));
   /* 'tegoed' en 'zaakbetaling' staan erbij omdat main ze niet bedraadt: die
      bestanden zijn van deze tak. Zonder deze regel bestaan ze wel en geven hun
      routes 404 -- de stilste manier om een functie kwijt te raken. */
   for (const naam of ['verzoeken', 'kassa', 'tegoed', 'zaakbetaling', 'verkoop', 'vooraf', 'budget', 'graaf', 'bewijs', 'terug']) Object.assign(api, require('./' + naam)(ctx));
-  for (const k of ['treasuryBeleid', 'treasuryZet', 'treasuryStand', 'treasuryVrij', 'treasuryApart']) api[k] = ctx[k];
+  for (const k of ['treasuryBeleid', 'treasuryZet', 'treasuryStand', 'treasuryVrij', 'treasuryApart',
+    'zaakRekening', 'zaakRekeningZet']) api[k] = ctx[k];
   return { pay: api };
 };

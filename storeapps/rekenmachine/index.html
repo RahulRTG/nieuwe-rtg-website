@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rekenmachine</title>
+<style>
+  /* De vormtaal van RTG, maar in de bundel en niet uit een RTG-stylesheet: een
+     cel heeft geen netwerk, dus alles wat deze app nodig heeft zit erin. Geen
+     ronde hoeken (CLAUDE.md), en een cirkel alleen waar het een vorm is. */
+  :root{ --bg:#0C0C0B; --card:#151413; --line:#2A2825; --txt:#F4F2EE;
+         --muted:#B4AFA7; --soft:#8A8680; --goud:#A98F1C; --bordeaux:#C23A5E; }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,'Segoe UI',sans-serif;
+    -webkit-font-smoothing:antialiased;padding:1rem;max-width:640px;margin:0 auto;}
+  .veld{background:var(--card);border:1px solid var(--line);color:var(--txt);padding:.6rem .7rem;
+    font:inherit;font-size:.95rem;width:100%;min-height:2.75rem;}
+  #rkScherm{font-size:1.5rem;text-align:right;min-height:3.2rem;}
+  #rkUitkomst{text-align:right;color:var(--goud);font-size:.95rem;min-height:1.4rem;margin:.35rem 0 .6rem;}
+  #rkToetsen{display:grid;grid-template-columns:repeat(4,1fr);gap:.4rem;}
+  #rkToetsen button{background:var(--card);border:1px solid var(--line);color:var(--txt);
+    font:inherit;font-size:1.05rem;min-height:3.2rem;cursor:pointer;}
+  #rkToetsen button:active{background:#201E1C;}
+  #rkToetsen button.op{color:var(--muted);}
+  #rkToetsen button.gelijk{background:var(--txt);color:#000;font-weight:600;}
+  .zaak{margin-top:1.2rem;display:grid;gap:.8rem;}
+  .vak{border-top:1px solid var(--line);padding-top:.7rem;}
+  .vak b{font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);font-weight:600;}
+  .rij{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.45rem;}
+  .rij .groei{flex:1;min-width:0;}
+  .smal{width:6.5rem;}
+  .uitkomst{margin-top:.45rem;font-size:.92rem;color:var(--goud);line-height:1.6;min-height:1.2rem;}
+  .voet{margin-top:1.6rem;border-top:1px solid var(--line);padding-top:.6rem;
+    font-size:.72rem;color:var(--soft);line-height:1.6;}
+  .stip{width:.4rem;height:.4rem;border-radius:50%;background:var(--goud);display:inline-block;margin-right:.4rem;}
+</style>
+</head>
+<body>
+<!-- GEEN EIGEN TITELBALK. De cel eromheen draagt de naam van de app, de
+     uitgever en de versie al; die hier herhalen levert twee koppen boven elkaar
+     op en kost een schermhoogte op een telefoon. Een app in een cel begint bij
+     zijn eerste handeling. -->
+<input id="rkScherm" class="veld" inputmode="none" aria-label="Som" placeholder="0">
+<div id="rkUitkomst" aria-live="polite"></div>
+<div id="rkToetsen"></div>
+
+<div class="zaak">
+  <div class="vak"><b>Btw</b>
+    <div class="rij">
+      <input class="veld groei" id="btwBedrag" inputmode="decimal" placeholder="Bedrag">
+      <select class="veld smal" id="btwPct" aria-label="Btw-tarief"><option value="21">21%</option><option value="9">9%</option><option value="0">0%</option></select>
+      <select class="veld smal" id="btwKant" aria-label="Inclusief of exclusief"><option value="ex">ex &#8594; incl</option><option value="in">incl &#8594; ex</option></select>
+    </div>
+    <div class="uitkomst" id="btwUit" aria-live="polite"></div>
+  </div>
+  <div class="vak"><b>Rekening delen</b>
+    <div class="rij">
+      <input class="veld groei" id="splitBedrag" inputmode="decimal" placeholder="Bedrag">
+      <input class="veld smal" id="splitPersonen" inputmode="numeric" placeholder="Personen">
+      <select class="veld smal" id="splitFooi" aria-label="Fooi"><option value="0">0%</option><option value="5">5%</option><option value="10">10%</option></select>
+    </div>
+    <div class="uitkomst" id="splitUit" aria-live="polite"></div>
+  </div>
+</div>
+
+<div class="voet"><span class="stip" aria-hidden="true"></span>Deze app onthoudt alleen welk btw-tarief en welke fooi u het laatst koos. Verder gaat er niets uit dit scherm.</div>
+
+<script src="rekenkern.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

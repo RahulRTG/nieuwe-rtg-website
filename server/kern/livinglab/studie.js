@@ -20,6 +20,8 @@
    schuldhulpgroep aan de Kerkstraat"). */
 'use strict';
 
+const onderzoeksnummer = require('./onderzoeksnummer');
+
 const kader = require('./kader');
 
 module.exports = (ctx) => {
@@ -38,7 +40,7 @@ module.exports = (ctx) => {
 
   /* ---------- de drie ringen ---------- */
   function beeldPubliek(s) {
-    const basis = { id: s.id, labId: s.labId, titel: s.titel, soort: s.soort,
+    const basis = { id: s.id, nummer: s.nummer || null, labId: s.labId, titel: s.titel, soort: s.soort,
       soortNaam: (kader.soort(s.soort) || {}).naam, stap: s.stap, klasse: s.dossier.ethiek.klasse,
       gescheiden: isGescheiden(s), at: s.at };
     if (isGescheiden(s)) return basis;
@@ -94,7 +96,12 @@ module.exports = (ctx) => {
       return { status: 400, error: 'Dit lab voert geen onderzoek in de soort ' + soort.naam + '.' };
     if (S().studies.length >= 20000) return { status: 400, error: 'Het studieregister zit vol; archiveer eerst afgeronde studies.' };
 
-    const s = { id: rid(), labId: lab.id, titel, soort: soort.soort, vraagstuk, doel,
+    /* HET ONDERZOEKSNUMMER (./onderzoeksnummer.js): één naam voor dit onderzoek,
+       die ook buiten de software bestaat. Hij wordt HIER gezet, bij het ontstaan,
+       en daarna nooit meer -- een nummer dat later wordt toegekend, ontbreekt
+       precies op de stukken die het eerst de deur uit gaan. */
+    const nummer = onderzoeksnummer.nieuw({ lab, studies: S().studies, at: nu() });
+    const s = { id: rid(), nummer, labId: lab.id, titel, soort: soort.soort, vraagstuk, doel,
       stap: 'vraagstuk', dossier: leegDossier(), besluit: null, uit: null, geveegd: null,
       punten: 0, door: schoon(wie, 80) || 'onbekend', at: nu() };
     s.dossier.ethiek.klasse = bodemKlasse(titel + ' ' + vraagstuk + ' ' + doel, soort.soort);

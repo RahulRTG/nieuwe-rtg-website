@@ -2,7 +2,7 @@
    Zie ../appgids.js voor de gedeelde uitleglaag. */
 const G = (wat, doe, tip) => ({ wat, doe, tip });
 
-module.exports = {
+module.exports = Object.assign({
   '/apps/festival.html': G('Het festival draaien: de poort, het beeld en het terrein.',
     ['Poort: kies waar u staat; het veld houdt zelf de focus, zodat een handscanner gewoon werkt',
       'Beeld: alleen wat aandacht vraagt, met de tijd die er nog is -- en welke plekken NIET gemeten worden',
@@ -80,5 +80,5 @@ module.exports = {
     ['Vul eerst de tarieven en de nota\'s in; zonder bron rekent deze laag niets uit en is elk bedrag te laag',
       'Lees het dekkingspercentage nooit los van het blok eronder -- van sommige gebruikers is geen bijdrage bekend',
       'Vrijgeven zet de doorbelasting op de maandfactuur die er al is; dat kan een keer per maand'],
-    'Let op het label naast elk bedrag. "Gemeten" komt van een teller; "vermoed" is een verdeling van een nota, en dat is een schatting hoe precies het getal er ook uitziet. Een gezin van de RTFoundation krijgt hier nooit een rekening.')
-};
+    'Let op het label naast elk bedrag. "Gemeten" komt van een teller; "vermoed" is een verdeling van een nota, en dat is een schatting hoe precies het getal er ook uitziet. Een gezin van de RTFoundation krijgt hier nooit een rekening.'),
+}, require('./deel12b'));

@@ -30,7 +30,7 @@ const path = require('path');
 const { startServer, kantoorAlsPersoon } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-vakb-'));
-let child, BASE, mgr, office, lid, staffId, bedrijf;
+let child, BASE, mgr, office, gedeeldeCode, lid, staffId, bedrijf;
 const PIN = '4321';
 
 /* Een 1x1 PNG: genoeg om de upload-route te laten doen wat zij doet. Wat er op
@@ -54,8 +54,15 @@ test.before(async () => {
   mgr = (await api('/api/supplier/login', { code: 'NIDO', staffId: chef.id, pin: '1234' })).body.token;
   assert.ok(mgr, 'de gezaaide locatiemanager heeft zijn papieren en komt binnen');
 
-  office = (await api('/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+  /* Op naam: aftekenen en het nummer openen staan achter de kluispoort
+     (kern/kantoor/kluispoort.js). */
+  office = await kantoorAlsPersoon(BASE, 'RTG-OFFICE');
   assert.ok(office, 'het kantoor is aangemeld');
+  /* En de GEDEELDE code er los naast, want een paar toetsen hieronder gaat
+     juist over wat die niet mag. Sinds ./helper.js de kantoorsessie op naam
+     levert, is dat niet meer hetzelfde token. */
+  gedeeldeCode = (await api('/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+  assert.ok(gedeeldeCode, 'de gedeelde code komt gewoon binnen; hij mag alleen minder');
 
   // een echt RTG-lid dat hier komt werken
   lid = (await api('/api/auth/register', { name: 'Sanne Bergman', email: 'sanne@x.nl', phone: '0612345699',
@@ -134,8 +141,21 @@ test('4. het kantoor tekent af -- op een naam, en niet de werkgever', async () =
   assert.equal(JSON.stringify(stapel.body).includes('VOG-2026-77'), false,
     'het documentnummer hoort niet zomaar op de stapel te staan');
 
-  const zonderNaam = await api('/api/office/vakbewijs/teken', { sleutel: rij.sleutel, wat: 'vog', door: '  ' }, office);
-  assert.equal(zonderNaam.status, 400, 'een aftekening zonder naam is geen aftekening');
+  /* WIE AFTEKENT KOMT UIT DE INLOG, EN NIET MEER UIT HET FORMULIER.
+
+     Hier stond dat een leeg `door`-veld een 400 hoort te geven. Dat klopte
+     zolang de body de enige bron was -- maar dat was zelf het probleem:
+     routes/office/bewaarverzoek.js schrijft twee bestanden verderop uit waarom,
+     "een naam die je zelf mag typen is geen spoor maar een suggestie".
+
+     Sinds de kluispoort draagt een kantoorsessie een sleutel, en die wint van
+     het veld. Een leeg veld is dus geen ontbrekende handtekening meer; de
+     handtekening is de sessie. Wat de regel bewaakte -- er staat altijd iemand
+     onder -- geldt onverkort, en strenger dan eerst: het is niet meer te typen. */
+  const zonderVeld = await api('/api/office/vakbewijs/teken', { sleutel: rij.sleutel, wat: 'vog', door: '  ' }, office);
+  assert.equal(zonderVeld.status, 200, 'de sessie tekent af, ook zonder ingevuld veld');
+  assert.match(JSON.stringify(zonderVeld.body), /user-\d+/,
+    'en wat er onder staat is de sleutel uit de inlog, niet een getypte naam');
 
   /* En de werkgever kan het niet zelf: de manager heeft een supplier-token, en
      dat komt de kantoordeur niet door. Wie zijn eigen personeel kan aftekenen,
@@ -143,9 +163,10 @@ test('4. het kantoor tekent af -- op een naam, en niet de werkgever', async () =
   const doorBaas = await api('/api/office/vakbewijs/teken', { sleutel: rij.sleutel, wat: 'vog', door: 'De baas' }, mgr);
   assert.equal(doorBaas.status, 401);
 
-  const ok = await api('/api/office/vakbewijs/teken', { sleutel: rij.sleutel, wat: 'vog', door: 'M. de Vries' }, office);
-  assert.equal(ok.status, 200);
-  assert.ok(/geen inspectie/i.test(ok.body.grens), 'de grens gaat mee met het antwoord: ' + ok.body.grens);
+  /* Een tweede aftekening op hetzelfde stuk hoort te botsen: hij is al gezien. */
+  const nogmaals = await api('/api/office/vakbewijs/teken', { sleutel: rij.sleutel, wat: 'vog', door: 'M. de Vries' }, office);
+  assert.equal(nogmaals.status, 409, 'een stuk wordt een keer afgetekend');
+  assert.ok(/geen inspectie/i.test(zonderVeld.body.grens), 'de grens gaat mee met het antwoord: ' + zonderVeld.body.grens);
 });
 
 test('5. de VOG is gezien, en tóch nog geen sessie: de identiteit ontbreekt', async () => {
@@ -259,7 +280,7 @@ test('10. een verlopen bedrijfsbewijs komt over de route op de herkeuringslijst'
   assert.equal(indienen.status, 200, 'het stuk is ontvangen: ' + JSON.stringify(indienen.body).slice(0, 200));
 
   /* De gedeelde kantoorcode is geen mens, dus tekent zij niet af. */
-  const zonderNaam = await api('/api/aanmelding/bewijs/teken', { id }, office);
+  const zonderNaam = await api('/api/aanmelding/bewijs/teken', { id }, gedeeldeCode);
   assert.equal(zonderNaam.status, 400, 'de gedeelde kantoorcode tekent niet af (kreeg ' + zonderNaam.status + ')');
   assert.match(String(zonderNaam.body.error || ''), /naam/i, 'en zegt waarom');
 

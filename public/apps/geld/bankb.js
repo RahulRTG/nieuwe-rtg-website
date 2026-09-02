@@ -25,7 +25,7 @@
         '<ul id="bkAiTips" class="stil" style="margin:0.5rem 0 0 1.25rem;line-height:1.6;font-size:.8rem;"></ul>' +
       '</div>' +
       '<h2>Mijn rekeningen · totaal ' + Geld.euro(ov.totaalCenten) + '</h2>' +
-      '<div class="kaart">' + (reks.length ? reks.map(B.rekHtml).join('') : '<p class="stil">Nog geen rekeningen.</p>') + '</div>' +
+      '<div class="kaart">' + (reks.length ? reks.map(B.rekHtml).join('') : '<p class="leeg">Nog geen rekeningen.</p>') + '</div>' +
       '<h2>Nieuwe rekening</h2>' +
       '<div class="kaart"><div class="bk-rij">' +
         '<span><label class="lbl" for="bkNsoort">Soort</label><select id="bkNsoort">' +

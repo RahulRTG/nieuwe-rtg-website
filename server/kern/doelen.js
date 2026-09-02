@@ -19,6 +19,7 @@
    is het te laat. */
 
 const { magHerkomst, BESCHIKBAAR } = require('./herkomst');
+const klok = require('../lib/klok');
 
 const DAG = 86400000;
 const MAX_DOELEN = 12;                // per lid; een doelenlijst die niet past, wordt genegeerd
@@ -50,7 +51,7 @@ function aandeel(doel, waarde) {
    week. Ze worden afgeleid en niet bewaard, dus ze kloppen altijd met de dag
    waarop je kijkt. Is de streefdatum voorbij, dan komt er geen lege lijst maar
    een eerlijk antwoord (zie planVan). */
-function mijlpalenVoor(doel, nu = new Date()) {
+function mijlpalenVoor(doel, nu = klok.datum()) {
   const vandaag = dagVan(nu);
   const stand = standVan(doel);
   const vanaf = stand.op > vandaag ? stand.op : vandaag;
@@ -72,7 +73,7 @@ function mijlpalenVoor(doel, nu = new Date()) {
 /* Het plan in gewone taal. Geen streak, geen score, geen opgeheven vinger: wat
    er staat is wat er is, en als het niet meer haalbaar is zegt hij dat gewoon
    in plaats van een pad te verzinnen dat niemand loopt. */
-function planVan(doel, nu = new Date()) {
+function planVan(doel, nu = klok.datum()) {
   const vandaag = dagVan(nu);
   const stand = standVan(doel);
   const gehaald = doel.streef.waarde >= doel.nulmeting.waarde
@@ -107,11 +108,11 @@ module.exports = ({ db, save, crypto, schoon }) => {
   const getal = v => { const n = Number(v); return Number.isFinite(n) ? Math.round(n * 100) / 100 : null; };
   const datum = v => /^\d{4}-\d{2}-\d{2}$/.test(String(v || '')) ? String(v) : null;
 
-  function doelenVan(key, nu = new Date()) {
+  function doelenVan(key, nu = klok.datum()) {
     return { ok: true, doelen: mijne(key).map(d => planVan(d, nu)), bronnen: BESCHIKBAAR };
   }
 
-  function doelMaak(key, body, nu = new Date()) {
+  function doelMaak(key, body, nu = klok.datum()) {
     if (mijne(key).length >= MAX_DOELEN) {
       return { status: 409, error: 'U heeft al ' + MAX_DOELEN + ' doelen lopen. Rond er een af of stop er een.' };
     }
@@ -141,7 +142,7 @@ module.exports = ({ db, save, crypto, schoon }) => {
     return { ok: true, doel: planVan(doel, nu) };
   }
 
-  function doelMeet(key, body, nu = new Date()) {
+  function doelMeet(key, body, nu = klok.datum()) {
     const doel = mijne(key).find(d => d.id === String(body.id || ''));
     if (!doel) return { status: 404, error: 'Dit doel staat niet op uw naam.' };
     const waarde = getal(body.waarde);
@@ -165,7 +166,7 @@ module.exports = ({ db, save, crypto, schoon }) => {
   /* De streefdatum verzetten. Dit is de nette uitweg als het leven anders liep,
      en er hoort geen oordeel bij: het pad wordt opnieuw uitgerekend vanaf waar
      u nu staat, niet vanaf het begin. */
-  function doelVerzet(key, body, nu = new Date()) {
+  function doelVerzet(key, body, nu = klok.datum()) {
     const doel = mijne(key).find(d => d.id === String(body.id || ''));
     if (!doel) return { status: 404, error: 'Dit doel staat niet op uw naam.' };
     const op = datum(body.streefOp);

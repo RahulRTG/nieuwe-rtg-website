@@ -89,7 +89,7 @@
         '<span class="wb-sub">' + esc(g.leden) + ' personen</span>' +
         '<span class="wb-rek"></span>' +
         '<span class="wb-bedrag' + kleur(g.mijnSaldo) + '">' + euro(g.mijnSaldo) + '</span></button>';
-    }).join('') : '<p class="stil">Nog geen lijstjes. Begin er een met uw vrienden.</p>';
+    }).join('') : '<p class="leeg">Nog geen lijstjes. Begin er een met uw vrienden.</p>';
   }
 
   function tekenVrienden(rijen) {
@@ -127,7 +127,7 @@
           ? esc(r.oms) + ' · voor ' + esc(r.voor)
           : 'verrekende met ' + esc(r.aan)) + '</span>' +
         '<span class="wb-rek"></span><span class="wb-bedrag">' + euro(r.centen) + '</span></div>';
-    }).join('') : '<p class="stil">Nog geen uitgaven.</p>';
+    }).join('') : '<p class="leeg">Nog geen uitgaven.</p>';
   }
 
   var Deel = w.RTGGeldDeel = w.RTGGeldDeel || {};

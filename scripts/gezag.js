@@ -6,7 +6,7 @@
    verschillende antwoorden-schalen:
 
      server/kern/stuur/beleid.js          lezen / klein / voorstel / verboden
-     server/kern/command/risico.js        hand / assist / auto
+     server/kern/frictie/motor.js         hand / assist / auto
      server/kern/geldbeleid/regels.js     kijken / voorstellen / klaarzetten / automatisch
      server/kern/stadsweefsel/ainiveau.js waarnemen / adviseren / voorbereiden / begrensd / verboden
      server/kern/bureau/delegatie.js      informeren / aanbevelen / voorbereiden / uitvoeren / autonoom
@@ -82,10 +82,14 @@ const REGISTER = [
     schaal: ['verboden', 'lezen', 'voorstel', 'klein'],
     beslisser: 'beleidVoor',
     bestuurt: 'de AI over HTTP-routes, per rol (member/supplier/staff)' },
-  { bestand: 'server/kern/command/risico.js',
+  /* Verhuisd uit server/kern/command/ naar server/kern/frictie/ (met ./bodem.js
+     ernaast), omdat het AI-stuur hem daar niet aanriep en daarom zijn eigen,
+     armere model bouwde. De schaal is niet veranderd, de plek wel -- en dat is
+     precies wat deze meter hoort te merken. */
+  { bestand: 'server/kern/frictie/motor.js',
     schaal: ['hand', 'assist', 'auto'],
     beslisser: 'beoordeel',
-    bestuurt: 'handelingen in RTG Command, met een risicoscore per geval' },
+    bestuurt: 'handelingen die de machine kan raken, met een frictiescore per geval en een bodem eronder' },
   { bestand: 'server/kern/geldbeleid/regels.js',
     schaal: ['kijken', 'voorstellen', 'klaarzetten', 'automatisch'],
     beslisser: 'regelZet',
@@ -119,7 +123,12 @@ const TEGENSPRAKEN = [
            'bevestigt een al ingevulde beslissing met een tik.',
     kanten: [
       { bestand: 'server/kern/stadsweefsel/ainiveau.js', zin: "'vergunning-weigeren': { niveau: 4" },
-      { bestand: 'server/kern/stuur/beleid.js', zin: 'vergunning\\/beslis' },
+      /* VERHUISD, NIET OPGELOST. De drie allowlists van het AI-stuur staan sinds
+         1 september in ./beleid-lijsten.js -- beleid.js liep over de
+         tienkilobytegrens van keuringsregel 13 en is langs de naad geknipt die
+         er al lag: dat bestand draagt het BESLUIT, dit de PADEN. De tegenspraak
+         zelf is geen letter veranderd; alleen het adres. */
+      { bestand: 'server/kern/stuur/beleid-lijsten.js', zin: 'vergunning\\/beslis' },
       { bestand: 'server/routes/supplier/ai/ambtenaar.js', zin: "besluit: goed ? 'verleend' : af ? 'geweigerd'" }
     ]
   }
@@ -211,8 +220,23 @@ function meet() {
     const set = new Set();
     for (const v of REGISTER) {
       if (rel === v.bestand) { set.add(v.bestand); continue; }
+      /* TWEE MANIEREN OM DEZELFDE SCHAAL BINNEN TE HALEN, en de meter kende er
+         eerst maar een. Hij zocht naar de BESTANDSNAAM in een require, wat
+         klopt zolang een schaal in een los bestand woont. Toen de frictieschaal
+         naar een map verhuisde (kern/frictie/motor.js, met een index ernaast
+         die hem doorgeeft), werd elke roeper van `require('../frictie')`
+         opeens als losse niveaunaam geteld -- twaalf bestanden die niets
+         verkeerd deden. Een meter die correcte code beschuldigt, wordt
+         weggeklikt; zie de kop hierboven, dat is hier al eens gebeurd.
+
+         Woont het geregistreerde bestand in een map met een index.js, dan telt
+         een require op die MAP dus ook als importeren. */
       const mod = path.basename(v.bestand, '.js');
-      if (new RegExp("require\\([^)]*\\b" + mod + "\\b[^)]*\\)").test(code)) set.add(v.bestand);
+      const map = path.basename(path.dirname(v.bestand));
+      const viaMap = fs.existsSync(path.join(WORTEL, path.dirname(v.bestand), 'index.js'));
+      const namen = viaMap ? [mod, map] : [mod];
+      if (namen.some(n => new RegExp("require\\([^)]*\\b" + n + "\\b[^)]*\\)").test(code)))
+        set.add(v.bestand);
     }
     importeert.set(rel, set);
   }

@@ -232,6 +232,28 @@ iets dat altijd waar is, een statuscontrole die een hele klasse toelaat, en een
 is de vorm om op te letten -- soms terecht, vaak een toets die zijn eigen vraag
 niet durft te stellen.
 
+*Een vijfde geval, en dat is een eigen vorm: een assertie die de tekst van een
+CONTAINER leest terwijl hij over een element eronder beweert.* Dat ging in één
+ronde drie keer mis, telkens net anders:
+
+| wat er stond | waarom het niets bewees |
+|---|---|
+| `assert.match(await page.textContent('#opheffen'), /eruit gehaald/)` | de zin stond ook in de inleiding erboven; het blok waar het over ging kon verdwijnen zonder dat de toets iets merkte |
+| `assert.match(await page.textContent('main'), ...)` | ergens op de pagina staat het, en dat is niet hetzelfde als op de juiste plek |
+| `assert.match(rijTekst, /Waarvoor:\s*\S/)` | `textContent` plakt de kinderen aan elkaar, dus het VOLGENDE label ("Waar:") vulde de plek van het ontbrekende antwoord |
+
+De les is smaller dan "lees geen containers": een AFWEZIGHEID aantonen wordt juist
+sterker naarmate je breder kijkt (`assert.ok(!alles.includes(email))` hoort op de
+hele pagina). Het is de AANWEZIGHEID die op het element hoort waar hij over gaat.
+
+**Handhaver sinds 31 augustus 2026:** `scripts/schermmutatie.js`
+(`npm run mutatie:scherm`). `scripts/mutatie.js` kende twee fasen en een
+schermtoets valt in geen van beide op de manier die ertoe doet -- hij laadt geen
+module (hij bezoekt een adres) en de liegpoort leegt de API, niet de PAGINA. De
+nieuwe motor haalt stukken van het scherm zelf weg (`blok-weg`,
+`appendChild-weg`) en kijkt of de toets het merkt. Op zijn eerste ronde vond hij
+drie ongedekte stukken in het scherm waarvoor hij geschreven was.
+
 ### 10. Een meter die je niet hebt zien uitslaan, meet niets
 
 Regel 9 gaat over toetsen. Deze gaat over het gereedschap waarmee je meet, en hij

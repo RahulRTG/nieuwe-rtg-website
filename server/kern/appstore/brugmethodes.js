@@ -18,7 +18,7 @@
    ========================================================================== */
 'use strict';
 
-function maakMethodes({ GRENS, bak, nu, save }) {
+function maakMethodes({ GRENS, bak, nu, save, arena }) {
   const METHODES = {
     /* profiel.basis -- de codenaam en verder niets waarmee je iemand vindt. */
     'profiel.wieBenIk': { machtiging: 'profiel.basis', mutatie: 'idempotent', doe: (ctx) => ({
@@ -68,7 +68,16 @@ function maakMethodes({ GRENS, bak, nu, save }) {
       if (b.length > GRENS.bakGrootte) b.length = GRENS.bakGrootte;
       save();
       return { ok: true, klaargezet: t };
-    } }
+    } },
+
+    /* arena.meedoen -- een bord PER APP, met de 18+-poort van het huis erachter
+       (kern/appstore/arena.js). Let op de mutatieklassen: een score insturen is
+       niet herhaalbaar (twee keer sturen is twee pogingen), lezen wel. En op
+       alle drie geldt: onder de leeftijdsgrens is het antwoord GEEN fout maar
+       `ranglijst: false` met de reden -- het spel speelt door. */
+    'arena.zet': { machtiging: 'arena.meedoen', mutatie: 'nietHerhaalbaar', doe: (ctx, args) => arena.zet(ctx, args) },
+    'arena.bord': { machtiging: 'arena.meedoen', mutatie: 'idempotent', doe: (ctx, args) => arena.bord(ctx, args) },
+    'arena.mijn': { machtiging: 'arena.meedoen', mutatie: 'idempotent', doe: (ctx) => arena.mijn(ctx) }
   };
 
   return METHODES;

@@ -22,8 +22,7 @@
          serverzin over de Lifestyle Pass het hele verhaal, en een 500 of
          netwerkfout tegen een ingelogd lid "log eerst in" noemen is een
          leugen. De pagina toonde de inlogkaart ook alleen zonder token. */
-      $('#lbVak').innerHTML = '<p class="stil">' + Geld.esc(e.message) +
-        (e.status === 401 ? ' Log eerst in via de leden-app.' : '') + '</p>';
+      $('#lbVak').innerHTML = RTGLeeg.html(RTGLeeg.vanFout(e));
       return;
     }
     D.S.data = dd;

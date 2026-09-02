@@ -8,6 +8,7 @@
    'lid:<key>' voor een lid. maakAgenda(state) volgt het vaste kern-patroon. */
 
 const DAGEN = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'];
+const { afspraakVoorBron } = require('./agenda-idempotentie');
 
 function maakAgenda({ db, save, bijeen, inBundel, crypto, anthropic, schoon }) {
   /* De agenda van een lid is werk van een lid: bevestigd is vastgelegd. Zie
@@ -18,9 +19,9 @@ function maakAgenda({ db, save, bijeen, inBundel, crypto, anthropic, schoon }) {
   const nu = () => new Date().toISOString();
   const vandaagStr = () => new Date().toISOString().slice(0, 10);
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));
+  const { agendaWortel: store, agendaItems } = require('./agenda-opslag')({ db });
 
-  function store() { if (!db.data.agendas || typeof db.data.agendas !== 'object') db.data.agendas = {}; return db.data.agendas; }
-  function ruw(ownerKey) { const s = store(); if (!Array.isArray(s[ownerKey])) s[ownerKey] = []; return s[ownerKey]; }
+  function ruw(ownerKey) { return agendaItems(ownerKey); }
 
   /* `bron` zegt waar deze afspraak vandaan komt: leeg als iemand hem zelf
      intypte, 'post:<berichtid>' als hij uit een voorstel uit de eigen post is
@@ -49,8 +50,11 @@ function maakAgenda({ db, save, bijeen, inBundel, crypto, anthropic, schoon }) {
     if (!titel) return { error: 'Geef de afspraak een titel.' };
     if (!geldigeDatum(data.datum)) return { error: 'Kies een geldige datum.' };
     const arr = ruw(ownerKey);
+    const bron = scho(data.bron, 60) || null;
+    const bestaand = afspraakVoorBron(arr, bron);
+    if (bestaand) return { ok: true, item: itemPubliek(bestaand), hergebruikt: true };
     if (arr.length >= 2000) return { error: 'Uw agenda zit vol; ruim eerst wat op.' };
-    const item = { id: id(), titel, datum: data.datum, tijd: geldigeTijd(data.tijd) ? data.tijd : null, notitie: scho(data.notitie, 300) || null, gedaan: false, at: nu(), bron: scho(data.bron, 60) || null };
+    const item = { id: id(), titel, datum: data.datum, tijd: geldigeTijd(data.tijd) ? data.tijd : null, notitie: scho(data.notitie, 300) || null, gedaan: false, at: nu(), bron };
     const mis = await vastleggen(() => { arr.push(item); });
     if (mis) return mis;
     return { ok: true, item: itemPubliek(item) };

@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '1b36fbf8';
+var RTG_BOUW = 'b3bf2c3b';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -744,6 +744,86 @@ var RTG_BOUW = '1b36fbf8';
          het enige invoerveld. De kolom houdt daarom alleen ruimte vrij zolang
          de melding er werkelijk staat. */
       'body:has(#rtg-cookie) #gate{padding-bottom:calc(6vh + 3rem);}' +
+      /* RTG ACCESS COMPOSITIE.
+
+         De klok, Rahul en passkey bestonden al. Wat ontbrak was de formele
+         producthierarchie uit het goedgekeurde ontwerp: identificatie boven,
+         een vaste begroeting, een duidelijke beveiligde handeling en op
+         telefoon een rustige vooruitblik op de vier werelden. Deze regels
+         veranderen geen authenticatie; ze ordenen uitsluitend de bestaande
+         toegangspoort. */
+      '#gate{overflow-y:auto;overscroll-behavior:contain;' +
+        'padding:calc(env(safe-area-inset-top,0px) + 4.25rem) 1.1rem calc(env(safe-area-inset-bottom,0px) + 1.5rem);}' +
+      '#gate>.rtg-toegang-signatuur{position:absolute;top:calc(env(safe-area-inset-top,0px) + 1rem);' +
+        'left:50%;right:auto;width:min(calc(100% - 2rem),50rem);transform:translateX(-50%);' +
+        'margin:0;padding-bottom:.7rem;}' +
+      '#gate .os-lock{flex:0 0 auto;}' +
+      '#gate .ag-doos{align-items:center;max-width:36rem;margin:0 auto;}' +
+      '#gate .ag-mond{margin-bottom:.1rem;}' +
+      '#gate .ag-rahul-label{margin:-.15rem 0 .45rem;color:var(--gold-hoog,#E1C77B);' +
+        "font:italic 500 .72rem/1 'Bodoni Moda',serif;letter-spacing:.04em;}" +
+      '#gate .ag-intro{display:flex;flex-direction:column;align-items:center;width:100%;}' +
+      '#gate .ag-welkom{margin:0;color:#F5EFE6;text-align:center;' +
+        "font:400 clamp(2.05rem,4.4vw,3rem)/1.04 'Bodoni Moda',serif;letter-spacing:-.025em;}" +
+      '#gate .ag-zin{min-height:1.8rem;max-width:38ch;margin:.45rem auto .8rem;padding:0;' +
+        "font:400 .72rem/1.45 'Inter',sans-serif;color:var(--rtg-soft);letter-spacing:.02em;}" +
+      '#gate .ag-passkey-kaart{width:min(100%,30rem);padding:1.05rem 1.15rem 1.15rem;' +
+        'border:1px solid color-mix(in srgb,var(--gold-tekst) 48%,transparent);' +
+        'background:linear-gradient(180deg,rgba(255,255,255,.025),rgba(255,255,255,.008));' +
+        'box-shadow:0 24px 70px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.035);}' +
+      '#gate .ag-passkey-kaart[hidden]{display:none;}' +
+      '#gate .ag-passkey-embleem{display:grid;place-items:center;width:2.35rem;height:2.35rem;' +
+        'margin:0 auto .35rem;color:var(--gold-hoog,#E1C77B);}' +
+      '#gate .ag-passkey-embleem svg{display:block;width:100%;height:100%;}' +
+      '#gate .ag-passkey-kaart p{margin:0 0 .75rem;text-align:center;color:#E7E0D7;' +
+        "font:400 .82rem/1.4 'Inter',sans-serif;letter-spacing:.015em;}" +
+      '#gate .ag-passkey{width:100%;min-width:0;min-height:54px;margin:0;padding:.8rem 1rem;' +
+        'border-color:color-mix(in srgb,var(--gold-hoog,#E1C77B) 72%,transparent);' +
+        'background:linear-gradient(180deg,rgba(201,162,75,.14),rgba(201,162,75,.065));' +
+        'color:var(--gold-hoog,#E1C77B);font-size:.86rem;letter-spacing:.045em;}' +
+      '#gate .ag-passkey:hover{background:linear-gradient(180deg,rgba(201,162,75,.21),rgba(201,162,75,.1));}' +
+      '#gate .ag-passkey svg{width:22px;height:22px;}' +
+      '#gate .ag-anders{display:flex;align-items:center;gap:.85rem;width:min(100%,26rem);' +
+        'margin:.75rem auto 0;padding:.45rem 0;text-decoration:none;color:var(--rtg-muted);' +
+        'font-size:.72rem;letter-spacing:.035em;}' +
+      '#gate .ag-anders::before,#gate .ag-anders::after{content:"";height:1px;flex:1;' +
+        'background:color-mix(in srgb,var(--gold-tekst) 42%,transparent);}' +
+      '#gate .ag-anders span{white-space:nowrap;}' +
+      '#gate .ag-anders[hidden]{display:none!important;}' +
+      '#gate .ag-werelden{display:none;width:100%;margin-top:1.1rem;color:var(--rtg-soft);' +
+        "font:500 .56rem/1 'Inter',sans-serif;letter-spacing:.11em;text-transform:uppercase;}" +
+      '#gate .ag-werelden span{min-width:0;padding:.15rem .35rem;text-align:center;}' +
+      '#gate .ag-werelden span+span{border-left:1px solid color-mix(in srgb,var(--gold-tekst) 28%,transparent);}' +
+      /* Zodra iemand de gesprekspoort kiest, wordt de vaste begroeting weer
+         Rahuls levende zin. Een herkende gebruiker houdt de passkey als
+         compacte tweede route naast het wachtwoordveld. */
+      '#gate .ag-doos:has(.ag-rij:not([hidden])) .ag-welkom{display:none;}' +
+      '#gate .ag-doos:has(.ag-rij:not([hidden])) .ag-zin{font-family:\'Bodoni Moda\',serif;' +
+        'font-size:clamp(1.25rem,4.6vw,1.7rem);line-height:1.3;color:#FBFAF8;' +
+        'min-height:3.6rem;max-width:24ch;margin:.4rem auto 1rem;}' +
+      '#gate .ag-doos:has(.ag-rij:not([hidden])) .ag-passkey-kaart{margin-top:.75rem;padding:0;border:0;' +
+        'background:none;box-shadow:none;}' +
+      '#gate .ag-doos:has(.ag-rij:not([hidden])) .ag-passkey-embleem,' +
+      '#gate .ag-doos:has(.ag-rij:not([hidden])) .ag-passkey-kaart p{display:none;}' +
+      '#gate .ag-doos:has(.ag-rij:not([hidden])) .ag-werelden{display:none;}' +
+      '@media (max-width:999px){' +
+        '#gate{--klokschaal:.84;padding-inline:.9rem;}' +
+        '#gate .ag-werelden:not(:empty){display:grid;grid-template-columns:repeat(4,minmax(0,1fr));}' +
+      '}' +
+      '@media (max-height:760px){' +
+        '#gate{--klokschaal:.76;padding-top:3.6rem;padding-bottom:.75rem;}' +
+        '#gate>.rtg-toegang-signatuur{top:.65rem;}' +
+        '#gate .ag-mond{--lipgat:calc(var(--mondbreed) * .18);}' +
+        '#gate .ag-rahul-label{margin-top:-.3rem;}' +
+        '#gate .ag-welkom{font-size:1.8rem;}' +
+        '#gate .ag-zin{margin-bottom:.55rem;}' +
+        '#gate .ag-passkey-kaart{padding:.75rem .9rem .85rem;}' +
+        '#gate .ag-passkey-embleem{display:none;}' +
+        '#gate .ag-passkey-kaart p{margin-bottom:.5rem;font-size:.76rem;}' +
+        '#gate .ag-passkey{min-height:48px;}' +
+        '#gate .ag-anders{margin-top:.45rem;}' +
+        '#gate .ag-werelden{margin-top:.65rem;}' +
+      '}' +
     /* Slotstuk van de poortstijl: de brede-schermregels, en daarna pas het
        insluiten van het blad. Dit deel MOET het laatste van de reeks 04.. zijn
        dat aan de stijlstring bijdraagt, want het sluit hem af met een `;` en
@@ -792,16 +872,46 @@ var RTG_BOUW = '1b36fbf8';
     doos.innerHTML =
       '<div class="ag-kop" id="agKop" aria-hidden="true"></div>' +
       '<canvas class="ag-mond" id="agMond" width="440" height="200" aria-hidden="true"></canvas>' +
-      '<div class="ag-zin" id="agZin" role="status" aria-live="polite" aria-label="' + T('ag.log','Rahul') + '"></div>' +
+      '<div class="ag-rahul-label" aria-hidden="true">' + T('ag.log','Rahul') + '</div>' +
+      '<div class="ag-intro"><h1 class="ag-welkom">' + T('ag.welkom.kop','Welkom terug') + '</h1>' +
+      '<div class="ag-zin" id="agZin" role="status" aria-live="polite" aria-label="' + T('ag.log','Rahul') + '"></div></div>' +
       '<div class="ag-rij" hidden><input id="agIn" autocomplete="off" data-i18n-ph="ag.plho" aria-label="' + T('ag.in','Je antwoord aan Rahul') + '" placeholder="' + T('ag.plho','Ik wil zeggen dat..') + '">' +
       '<button type="button" id="agGo" aria-label="' + T('ag.stuur','Stuur') + '">&#8594;</button></div>' +
       '<div class="ag-stappen" id="agStappen" aria-hidden="true"></div>' +
       '<div class="ag-kluis" id="agKluis"></div>' +
+      '<div class="ag-passkey-kaart"><div class="ag-passkey-embleem" aria-hidden="true">' +
+        '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.35"><circle cx="13" cy="10" r="4"/><path d="M5 23c.8-5 3.4-7 8-7 3.4 0 5.8 1.3 7 4"/><circle cx="23" cy="19" r="3"/><path d="M26 19h5m-2 0v3m-2-3v2"/></svg></div>' +
+        '<p>' + T('ag.pk.uitleg','Ga verder met je passkey') + '</p>' +
       '<button type="button" class="ag-passkey" id="agPasskey">' +
         '<svg viewBox="0 0 24 24" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 11a2 2 0 0 0-2 2c0 2-.4 3.6-1 5"/><path d="M8 9a4 4 0 0 1 7 2c0 3-.5 5.4-1.5 7.5"/><path d="M12 13c0 3-.6 5.6-1.6 7.7"/><path d="M5.5 8a7 7 0 0 1 12 3c0 3.4-.5 6.4-1.5 9"/></svg>' +
-        '<span>' + T('ag.pk.open','Open met Face ID of passkey') + '</span></button>' +
-      '<button type="button" class="ag-anders" id="agAnders">' + T('ag.anders','Andere manier') + '</button>';
+        '<span>' + T('ag.pk.veilig','Veilig openen') + '</span></button></div>' +
+      '<button type="button" class="ag-anders" id="agAnders"><span>' + T('ag.anders','Andere manier') + '</span></button>' +
+      '<div class="ag-werelden" id="agWerelden" aria-label="' + T('ag.werelden','Beschikbare RTG-werelden') + '"></div>';
     gate.appendChild(doos);
+    /* Op telefoon vervangt deze rail de ingeklapte command-bank. De namen
+       komen uit dezelfde navigatiebron; dit is dus geen tweede wereldregister
+       dat later los van LivingOS, WorkOS, TravelOS of FoundationOS kan raken. */
+    let wereldPogingen = 0, wereldWachter = null;
+    function vulWerelden(){
+      const rail = doos.querySelector('#agWerelden');
+      if (!rail || rail.children.length) return;
+      const knoppen = document.querySelectorAll('#rtgCommand .cmd-nav button');
+      const namen = Array.from(knoppen).slice(0, 4).map(function(knop){
+        return knop.textContent.trim();
+      }).filter(Boolean);
+      if (namen.length < 4){
+        if (!wereldWachter && window.MutationObserver){
+          wereldWachter = new MutationObserver(vulWerelden);
+          wereldWachter.observe(document.body, { childList: true, subtree: true });
+        } else if (!window.MutationObserver && wereldPogingen++ < 100) setTimeout(vulWerelden, 100);
+        return;
+      }
+      if (wereldWachter){ wereldWachter.disconnect(); wereldWachter = null; }
+      namen.forEach(function(naam){
+        const item = document.createElement('span'); item.textContent = naam; rail.appendChild(item);
+      });
+    }
+    vulWerelden();
     // een wachtwoord-herstel-link uit de e-mail (?reset=): Rahul regelt het herstel zelf
     const herstel = new URLSearchParams(location.search).get('reset');
 
@@ -889,15 +999,17 @@ var RTG_BOUW = '1b36fbf8';
       }
     }
     const pkKnop = doos.querySelector('#agPasskey');
+    const pkKaart = doos.querySelector('.ag-passkey-kaart');
     const andersKnop = doos.querySelector('#agAnders');
     const antwoordRij = inp.closest('.ag-rij');
     let passkeyBezig = false, passkeyAbort = null;
     function toonPasskey(aan){
       if (!pkKnop) return;
       pkKnop.hidden = !aan;
+      if (pkKaart) pkKaart.hidden = !aan;
       // het label pas hier vertalen: bij het bouwen van de poort is de i18n
       // soms nog niet geladen
-      if (aan){ const s = pkKnop.querySelector('span'); if (s) s.textContent = T('ag.pk.open','Open met Face ID of passkey'); }
+      if (aan){ const s = pkKnop.querySelector('span'); if (s) s.textContent = T('ag.pk.veilig','Veilig openen'); }
     }
     function wachtwoordVeld(placeholder){
       inp.type = 'password';
@@ -1074,12 +1186,12 @@ var RTG_BOUW = '1b36fbf8';
     doos.querySelector('#agGo').addEventListener('click', stuur);
     inp.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); stuur(); } });
     inp.addEventListener('input', () => inp.closest('.ag-rij').classList.toggle('vol', !!inp.value.trim()));
-    // herstel-link uit de e-mail: Rahul begint meteen het herstel-gesprek.
-    // Anders begint het gewone gesprek zodra duidelijk is dat er geen sessie ligt.
+    // Herstel uit de e-mail begint meteen. Een gewone bezoeker krijgt eerst de
+    // zichtbare passkeydeur en opent die zelf: biometrie of een accountsleutel
+    // hoort nooit zonder een bewuste handeling van de mens te verschijnen.
     let onthouden = null;
     try { onthouden = localStorage.getItem('rtg_member_token'); } catch(e){}
     if (herstel){ andereManier(true); setTimeout(resetStart, 400); }
-    else if (!onthouden) setTimeout(() => passkeyInlog(true), 400);
     inp.addEventListener('focus', () => { if (!herstel && !resetStap) start(); }, { once: true });
   })();
   /* ================= SALON-CONNECTIES =================
@@ -4033,7 +4145,11 @@ var RTG_BOUW = '1b36fbf8';
        bestaan niet meer. */
     horeca:      { naam: 'Horeca',         url: '/apps/horeca.html' },
     partnernetwerk:{ naam: 'Partner Network', url: '/apps/partner-network.html' },
-    rtfbuurt:    { naam: 'RTFoundation in uw buurt', url: '/apps/foundation/os-publiek.html' },
+    rtfbuurt:    { naam: 'RTFoundation in jouw buurt', url: '/apps/foundation/os-publiek.html' },
+    klimaat:     { naam: 'Klimaatfonds', url: '/apps/foundation/klimaatfonds.html' },
+    buurtruil:   { naam: 'Buurtruil', url: '/apps/foundation/buurtruil.html' },
+    geven:       { naam: 'Geven', url: '/apps/foundation/geven.html' },
+    rtfwinkel:   { naam: 'Winkel van de RTFoundation', url: '/apps/foundation/winkel.html' },
     spelen:      { naam: 'Spelen',       url: '/apps/spelen.html?pas=' + encodeURIComponent(pas) },
     vrienden:    { naam: 'Vrienden',     url: '/apps/foundation/vrienden.html' },
     juridisch:   { naam: 'Juridisch',    url: '/apps/juridisch.html' },
@@ -4046,6 +4162,10 @@ var RTG_BOUW = '1b36fbf8';
     residentie:  { naam: 'Verblijven', url: '/apps/residentie.html' },
     wbw:         { naam: 'Samen betalen', url: '/apps/geld.html#wbw' },
     passkeys:    { naam: 'Passkeys',     url: '/apps/passkeys.html' },
+    sessies:     { naam: 'Waar ben ik aanwezig', url: '/apps/mijn-sessies.html' },
+    relaties:    { naam: 'Wie heeft toegang tot mij', url: '/apps/mijn-relaties.html' },
+    gegevens:    { naam: 'Wat weet RTG van mij', url: '/apps/mijn-gegevens.html' },
+    post:        { naam: 'Post van RTG', url: '/apps/mijn-post.html' },
   /* Afgesplitst van app-main-23.js, dat met dit blok over de 10 KB ging
      (keuringsregel 13). De snede loopt midden door LINKS -- dat mag hier, want
      de bundel plakt de delen rauw aan elkaar (scripts/bundel.js) en 24a2/24a2b
@@ -4343,7 +4463,7 @@ var RTG_BOUW = '1b36fbf8';
        in de voet. Vandaar `paneel`: geen vijfde wereldtegel, geen tweede
        instellingenscherm. wereldBij() in 29c filtert deze map er vanzelf uit. */
     { sleutel: 'map-instellingen', naam: 'Instellingen', paneel: '#osCcBtn', items: [
-      'link:ik', 'link:veilig', 'link:passkeys', 'link:juridisch'] },
+      'link:ik', 'link:veilig', 'link:passkeys', 'link:sessies', 'link:relaties', 'link:gegevens', 'link:post', 'link:juridisch'] },
     /* WORKOS IS EEN CONTEXT EN GEEN PRODUCT MET EEN PRIJS. De naam ging van
        "RTG Kantoor" naar WorkOS omdat er twee verschillende toegangsmodellen in
        dezelfde wereld wonen, en die verschillen mogen de wereld niet splitsen:
@@ -4416,7 +4536,9 @@ var RTG_BOUW = '1b36fbf8';
       'link:rtfbuurt', 'link:rtfportaal',
     /* Twee uit de tikkenmeting (scripts/tikken.js): het bord en het schrift
        bestonden en hingen nergens aan. */
-      'link:rtfbord', 'link:rtfschrift'] }
+    /* Het Klimaatfonds is een VENSTER op het Living Lab en geen tweede lab:
+       klimaat is daar de soort 'duurzaam' (kern/livinglab/kader.js). */
+      'link:rtfbord', 'link:rtfschrift', 'link:klimaat', 'link:buurtruil', 'link:geven'] }
   ];
   /* Afgesplitst van app-main-24a2.js toen dat over de 10 KB ging. De snede loopt
      langs een echte grens, en het is dezelfde grens waar WERELDEN.md over gaat:

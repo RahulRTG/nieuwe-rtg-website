@@ -44,7 +44,12 @@ function maakWinkel(kern) {
   /* Installeren MET de keuze erbij. `machtigingen` is wat het lid aanvinkt; alles
      wat de app niet vroeg valt weg, en alles wat het lid niet aanvinkte ook. Een
      lege lijst is een geldige keuze: de app werkt dan zonder. */
-  function installeer(key, sleutel, gekozen) {
+  /* TOT WANNEER: zie ./tijdelijk.js. De regel staat daar en niet hier, omdat
+     dezelfde vraag ook bij het openen en op de winkelkaart wordt gesteld. */
+  const { leesTot, isVerlopen } = require('./tijdelijk');
+  const verlopen = (rij) => isVerlopen(rij && rij.tot, nu());
+
+  function installeer(key, sleutel, gekozen, tot) {
     const a = app(sleutel);
     if (!a || !a.live) return { status: 404, error: 'Deze app staat niet in de App Store.' };
     const v = versie(a.live);
@@ -73,16 +78,20 @@ function maakWinkel(kern) {
        vergunningsdiff moet tegenhouden. */
     const gaf = {};
     for (const id of uniek) if ((v.manifest.doelen || {})[id]) gaf[id] = v.manifest.doelen[id];
+    const t = leesTot(tot, nu());
+    if (t && t.fout) return { status: 400, error: t.fout };
     const nieuw = !bestond;
-    rij[sleutel] = { machtigingen: uniek, doelen: gaf, at: nu(), versie: v.id };
+    rij[sleutel] = { machtigingen: uniek, doelen: gaf, at: nu(), versie: v.id, tot: t ? t.tot : null };
     save();
     /* De tijdlijn schrijft mee en beslist niets (./tijdlijn.js). Wat het lid
        GAF gaat mee, want dat is waar de vraag later over gaat. */
     noteer(key, nieuw ? 'geinstalleerd' : 'verleend', sleutel, { gaf: uniek, doelen: gaf, versie: v.manifest.versie });
     return { status: 200, ok: true, sleutel, verleend: toonbaar(uniek, gaf), vraagt: toonbaar(gevraagd, v.manifest.doelen),
-      let: uniek.length < gevraagd.length
+      tot: t ? t.tot : null,
+      let: (t && t.tot ? 'Deze app staat er tot en met ' + t.tot + '. Daarna opent hij niet meer; wat hij voor je bewaarde blijft staan tot je de cel vernietigt. ' : '')
+        + (uniek.length < gevraagd.length
         ? 'Je hebt ' + uniek.length + ' van de ' + gevraagd.length + ' gevraagde machtigingen verleend. De app werkt; wat hij niet mag, krijgt hij niet.'
-        : 'De app heeft wat hij vroeg. Je kunt elke machtiging later los intrekken zonder de app te verwijderen.' };
+        : 'De app heeft wat hij vroeg. Je kunt elke machtiging later los intrekken zonder de app te verwijderen.') };
   }
 
   /* De machtigingen bijstellen zonder de app te verwijderen. Dit is de reden dat
@@ -106,33 +115,10 @@ function maakWinkel(kern) {
     return { status: 200, ok: true, verleend: toonbaar(uniek, gaf), ingetrokken: toonbaar(weg, oudeDoelen) };
   }
 
-  /* Verwijderen haalt de app van je startscherm EN haalt elke machtiging weg. Wat
-     de app voor jou had opgeslagen blijft staan -- dat is jouw inhoud, niet die
-     van de app -- en is er weer als je hem terugzet. Wie het echt weg wil, gooit
-     het weg met wisOpslag; dat staat als eigen handeling in de app-kaart. */
-  function verwijder(key, sleutel) {
-    const rij = rijVan(key);
-    if (!eigen(rij, sleutel)) return { status: 404, error: 'Deze app staat niet op je startscherm.' };
-    delete rij[String(sleutel)];
-    save();
-    noteer(key, 'verwijderd', sleutel, null);
-    return { status: 200, ok: true, aantal: Object.keys(rij).length,
-      let: 'De app staat niet meer op je startscherm en heeft geen enkele machtiging meer. Wat hij voor jou had opgeslagen staat er nog: dat is jouw inhoud. Wis het als je het echt weg wilt.' };
-  }
-
-  function wisOpslag(key, sleutel) {
-    const bak = eigen(S().opslag, sleutel);
-    if (bak && Object.prototype.hasOwnProperty.call(bak, String(key))) { delete bak[String(key)]; save(); }
-    const bakjes = eigen(S().bakjes, String(key));
-    const hadBerichten = !!(bakjes && Object.prototype.hasOwnProperty.call(bakjes, String(sleutel)));
-    if (hadBerichten) { delete bakjes[String(sleutel)]; save(); }
-    /* Dat er is GEWIST komt wel in de tijdlijn; wat er stond niet. De regel dat
-       iets verwijderd is, is zelf geen persoonsgegeven -- en zonder die regel is
-       "ik heb dat laten wissen" achteraf niet te staven. */
-    noteer(key, 'gewist', sleutel, { sleutels: bak ? Object.keys(bak).length : 0, berichten: hadBerichten });
-    return { status: 200, ok: true,
-      let: 'Weg. Er bestaat geen tweede kopie bij de uitgever: een app in de cel heeft geen netwerk, dus er is nooit iets zijn kant op gegaan.' };
-  }
+  /* Weggooien -- verwijderen, wissen en de cel vernietigen -- staat in
+     ./opruim.js. Dat is de naad die hier inhoudelijk al lag: alles hierboven
+     gaat over wat een lid GEEFT, alles daar over wat hij terugneemt. */
+  const { verwijder, wisOpslag, vernietig } = require('./opruim')({ kern, S, eigen, rijVan, noteer, save });
 
   /* Wat er NAAR BUITEN gaat -- open() voor het lid en magCel() voor de
      celroute -- staat in ./uitgifte.js. Die twee veranderen niets; alles
@@ -141,7 +127,7 @@ function maakWinkel(kern) {
      tweede plek met dezelfde waarheid die LAT-regel 4 verbiedt. */
   const { open, magCel } = require('./uitgifte').maakUitgifte(kern, E);
 
-  return { catalogus, installeer, verleen, verwijder, wisOpslag, mijn, open, magCel, verleendeVan, celPad, MAX_PER_LID };
+  return { catalogus, installeer, verleen, verwijder, wisOpslag, vernietig, mijn, open, magCel, verleendeVan, celPad, MAX_PER_LID, verlopen };
 }
 
 module.exports = { maakWinkel, MAX_PER_LID };

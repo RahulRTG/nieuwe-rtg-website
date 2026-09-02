@@ -50,7 +50,7 @@ const TREDEN = NOEMER.map(n => n.trede);
    een mens moet beantwoorden. `onbepaald` is een derde uitkomst en geen fout: een
    trede die twee noemertreden tegelijk dekt, IS niet af te beelden. */
 const PROJECTIES = [
-  { bestand: 'server/kern/stuur/beleid.js', schaal: 'verboden|voorstel|direct',
+  { bestand: 'server/kern/stuur/beleid.js', schaal: 'verboden|lezen|voorstel|klein',
     treden: {
       verboden: { noemer: 'geen', grond: 'evident',
         citaat: 'Alles wat niet genoemd is blijft' },
@@ -60,7 +60,9 @@ const PROJECTIES = [
       klein: { noemer: 'uitvoeren', grond: 'evident',
         citaat: 'een kleine, omkeerbare handeling zonder externe gevolgen' }
     } },
-  { bestand: 'server/kern/command/risico.js', schaal: 'hand|assist|auto',
+  /* Verhuisd naar server/kern/frictie/ (met ./bodem.js ernaast); de schaal en
+     de drie citaten zijn ongewijzigd meegegaan, alleen de plek is nieuw. */
+  { bestand: 'server/kern/frictie/motor.js', schaal: 'hand|assist|auto',
     treden: {
       hand: { noemer: 'geen', grond: 'evident', citaat: 'een mens doet het zelf' },
       assist: { noemer: 'klaarzetten', grond: 'evident', citaat: 'de machine bereidt het voor, een mens drukt af' },

@@ -83,7 +83,7 @@ test('een veeg bergt post op, de weg terug haalt hem terug, en een weigering ook
 
     // 1. doorvegen bergt het bericht ECHT op, en opent het NIET
     const rij = page.locator('#main .rij[data-i]').first();
-    await veegDoor(page, await rij.boundingBox());
+    await veegDoor(page, await rij.boundingBox(), { kiezer: '#main .rij[data-i]' });
     await wachtTot(() => mapVan(onderwerp), (m) => m === 'archief',
       'doorvegen hoort het bericht bij de server in het archief te zetten');
     assert.equal(await page.locator('#terug').count(), 0,
@@ -175,7 +175,7 @@ test('een veeg bergt post op, de weg terug haalt hem terug, en een weigering ook
     }));
     await page.waitForSelector('#main .rij[data-i].gb-rij');
     const derde = page.locator('#main .rij[data-i]').first();
-    await veegDoor(page, await derde.boundingBox());
+    await veegDoor(page, await derde.boundingBox(), { kiezer: '#main .rij[data-i]' });
     await page.waitForFunction(() => {
       const m = document.querySelector('.gb-terug');
       return m && /niet bereikbaar/i.test(m.textContent);

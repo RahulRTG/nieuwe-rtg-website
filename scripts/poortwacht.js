@@ -52,114 +52,20 @@ const jsonUit = args.includes('--json');
 const perRouteUit = args.includes('--per-route');
 const BASIS = args.find(a => a.startsWith('http')) || 'http://127.0.0.1:3000';
 
-/* Routes die BEWUST open staan voor een niet-ingelogde bezoeker. Elke regel
-   heeft een reden; staat er geen reden bij, dan hoort hij hier niet. */
-const PUBLIEK = new Map([
-  ['/api/health', 'liveness voor de load balancer'],
-  ['/api/ready', 'readiness voor de load balancer'],
-  ['/api/ice', 'STUN/TURN-servers voor bellen; bevat geen persoonsgegevens'],
-  ['/api/auth/register', 'aanmelden kan per definitie niet ingelogd'],
-  ['/api/auth/login', 'inloggen kan per definitie niet ingelogd'],
-  ['/api/sso/waarheen', 'het inlogscherm moet weten naar welke provider het je stuurt'],
-  ['/api/sso/start', 'de heenreis naar de provider van een klant: nog niemand is ingelogd'],
-  ['/api/sso/terug', 'de provider stuurt de bezoeker hierheen terug, zonder onze sessie'],
-  ['/api/sso/wissel', 'het overdrachtsbewijs omruilen: dat IS de inlog'],
-  ['/api/sso/saml/start', 'de heenreis naar de SAML-provider van een klant: nog niemand is ingelogd'],
-  ['/api/sso/saml/acs', 'de provider POST de assertie hierheen; een sessie bestaat op dat moment nog niet'],
-  ['/api/sso/saml/metadata', 'wat een klant bij zijn provider invult -- geen gegevens, alleen onze eigen adressen'],
-  ['/api/auth/forgot', 'wachtwoord vergeten: je bent juist buitengesloten'],
-  ['/api/auth/reset', 'herstel met een token uit de e-mail'],
-  ['/api/auth/verify-email', 'e-mailbevestiging met een token uit de e-mail'],
-  ['/api/auth/resend', 'bevestigingsmail opnieuw sturen'],
-  ['/api/aanmeld/start', 'de ballotage-intake begint voor het account bestaat'],
-  ['/api/aanmeld/zeg', 'idem: het gesprek loopt voor de inlog'],
-  ['/api/aanmelding/aanvraag', 'een lidmaatschapsaanvraag komt per definitie van buiten; het besluit erover zit achter officeAuth'],
-  ['/api/bedrijf/werkruimte/maak', 'de eerste deur van het Werk OS: de organisatie bestaat nog niet en het beheer-token ontstaat pas hier; rem per afzender in server/bedrijf/index.js'],
-  ['/api/foundation/school/school/maak', 'een school meldt zich aan voor er een login bestaat; hij start op "wacht" tot RTG goedkeurt, met een rem per afzender'],
-  ['/api/account/start', 'accountherkenning aan de poort'],
-  ['/api/zegel/sleutel', 'de PUBLIEKE sleutel; partners verifieren er offline mee'],
-  ['/api/salon/promo', 'uitgelichte Salon-posts zijn het publieke campagnebeeld'],
-  ['/api/gids/app', 'welke apps bestaan er; geen ledengegevens'],
-  ['/api/config', 'publieke front-end-configuratie'],
-  ['/api/i18n', 'vertalingen'],
-  ['/api/talen', 'talenlijst'],
-  ['/api/webauthn/opties', 'passkey-inlog begint voor je bent ingelogd'],
-  ['/api/zegel/controleer', 'partners verifieren een zegel; de sleutel is toch al publiek'],
-  ['/api/translate', 'de taalkiezer staat op het inlogscherm; met rem, en zonder inlog geen AI'],
-  /* DE TWAALF DIE DE RONDE VAN 12 AUGUSTUS AANWEES. Ze stonden alle twaalf al in
-     de bron beschreven als bewust open, maar niet hier -- en zolang dat zo was,
-     telde de AUTH-kolom ze als GEZAKT. Een deur die met opzet openstaat en
-     nergens als zodanig genoteerd is, is niet te onderscheiden van een deur die
-     iemand vergat te sluiten. Vandaar per regel de reden, uit de code zelf. */
-  ['/api/fout/client', 'een fout die het inloggen sloopt, komt nooit binnen achter een poort die inloggen vereist; met een lijfgrens van 4 kB en een rem per IP'],
-  ['/api/kantoor/gesprek/start', 'vervangt het codeveld van de backoffice-inlog en heeft dezelfde rem; er komt nooit iets terug wat de beller intypte'],
-  ['/api/lab2/bewoner/labs', 'het publieke beeld van een living lab: alleen naam, stad en land van de ACTIEVE labs, zonder budget, tekenaars of partners'],
-  ['/api/lab2/bewoner/kader', 'de spelregels van het onderzoek zelf; die horen juist openbaar te zijn'],
-  ['/api/onderneming/rechtsvormen', 'een vaste lijst rechtsvormen per land; algemene kennis, geen gegevens'],
-  ['/api/rtfos/publiek/campagnes', 'het publieke gezicht van de RTFoundation: welke campagnes lopen er'],
-  ['/api/rtfos/publiek/jaarverslagen', 'verantwoording van een goededoelenstichting hoort openbaar te zijn'],
-  ['/api/rtfos/publiek/steden', 'in welke steden de RTFoundation samenwerkt; geen personen'],
-  ['/api/stad/algoritmes', 'het transparantieregister: welke rekenregels meedraaien, met hun beslisruimte en hun bekende beperkingen'],
-  ['/api/stad/besluiten', 'het besluitenregister; er zitten geen personen in -- fracties stemmen met zetels en een collegestem draagt een functie'],
-  ['/api/vertaal/ui', 'idem: de knopteksten van een uitgelogd scherm'],
-  /* NAGEMETEN OP 19 AUGUSTUS 2026, en dit was de enige open deur van de ronde.
-     Invisible Arrival is de gastenkant: een gast zonder account typt een wens
-     ("morgen om acht uur met z'n vieren") en krijgt terug hoe het systeem die
-     leest. De route doet niets anders: hij leest req.body.tekst, haalt er met
-     vaste patronen datum, tijd, personen en wensen uit, en geeft dat terug. Er
-     komt geen database aan te pas, er wordt niets bewaard, en er gaat niets
-     terug wat de beller niet zelf heeft ingetypt. De vervolgstap
-     (/api/arrival/request) is WEL dicht: die eist een aanvraagcode.
+/* Routes die BEWUST open staan voor een niet-ingelogde bezoeker.
 
-     Achter een inlog zetten zou de functie kapotmaken -- een gast heeft per
-     definitie geen account -- en hem hier ongenoemd laten staan is erger: dan
-     staat deze ronde rood om een deur die met opzet openstaat, en dan leert
-     iedereen die uitslag wegkijken. Hij heeft een eigen rem per IP
-     (interpretRem) en een lijfgrens van 500 tekens. */
-  /* DE TWEE METERS, en waarom ze hier staan zonder dat ze publiek zijn. De
-     ronde klopt aan vanaf 127.0.0.1, en dat is precies het adres dat de
-     meetpoort (server/meetpoort.js) wél binnenlaat als er geen
-     RTG_METRICS_TOKEN is gezet -- de gewone opzet met Prometheus naast de app.
-     Van buiten geeft hij 404, en met een token gezet moet dat token mee. Deze
-     ronde meet dus zijn eigen adres en niet een open deur; zonder deze regel
-     staat er twee keer "open" waar niets opendoet. */
-  ['/api/metrics', 'de Prometheus-scrape: van buiten 404, alleen intern of met RTG_METRICS_TOKEN. De ronde klopt zelf vanaf 127.0.0.1 aan, en dat adres mag'],
-  ['/api/metrics/kort', 'dezelfde poort, in JSON, voor het techniekbord'],
-  ['/api/arrival/interpret', 'de gastenkant van Invisible Arrival: een gast heeft per definitie geen account. Leest alleen de meegestuurde tekst met vaste patronen, raakt de database niet en bewaart niets; met een eigen rem per IP'],
-  ['/api/pasprijzen', 'de prijzen staan op de website'],
-  ['/api/partnertrips', 'het partnerkanaal is er juist voor niet-leden'],
-  ['/api/rtf/vacatures', 'vacatures zijn openbaar; daar solliciteer je op'],
-  ['/api/krant/gids', 'de krantengids is publieke redactionele inhoud'],
-  ['/api/les/apps', 'zoekt in de publieke bibliotheken; leeg zonder zoekterm'],
-  ['/api/munt/opties', 'welke munten geaccepteerd worden; geen gegevens'],
-  ['/api/push/key', 'de PUBLIEKE VAPID-sleutel -- die hoort iedereen te hebben'],
-  ['/api/pay/gezond', 'leven-teken van de betaallaag'],
-  ['/api/sat/ping', 'leven-teken voor de satellietverbinding'],
-  ['/api/foundation/health', 'leven-teken van de RTF (zonder cijfers, zie server/foundation.js)'],
-  ['/api/foundation/impact', 'de RTFoundation legt haar impact juist publiek af'],
-  ['/api/foundation/tip', 'een opvoedtip; vaste tekst, geen gegevens'],
-  ['/api/foundation/bespaartip', 'een bespaartip; vaste tekst, geen gegevens'],
-  ['/api/foundation/gesprekskaart', 'een gesprekskaart; vaste tekst, geen gegevens'],
-  ['/api/foundation/les/maak', 'bewust zonder inlog: een quizbord in de klas. Wel een uurgrens per IP -- zie server/routes/lesmaker.js'],
-  /* De twee webhooks MOETEN publiek bereikbaar zijn: de betaalprovider belt ze.
-     Ze zijn niet onbeschermd -- ze verifieren een handtekening, en in productie
-     zonder secret weigeren ze (zie server/betaal.js en test/poortwacht.test.js). */
-  ['/api/betaal/webhook', 'de betaalprovider belt hier aan; beveiligd met een handtekening'],
-  ['/api/munt/webhook', 'idem voor de munt-aanbieder'],
-  /* De zaakdoos meldt zijn status op het EIGEN net van de zaak. Dat is een
-     bewuste keuze (zie server/routes/doos.js), maar hij hangt hiermee wel aan
-     de publieke kant van de server. Bedrijfstelemetrie, geen ledengegevens. */
-  ['/api/doos/status', 'de zaakdoos meldt zijn status op het eigen net; bedrijfstelemetrie, geen ledengegevens'],
-  ['/api/doos/rapport', 'idem: het dagrapport van de doos zelf'],
-  /* Gevonden door een verse ronde tegen een wegwerpserver: deze route bestond
-     nog niet toen POORTWACHT.json voor het laatst werd geschreven, en stond dus
-     nergens. Hij is bewust open -- hij zet vrije tekst om in een CONCEPT en zegt
-     dat er zelf bij ("Controleer dit plan; er is nog niets aangevraagd"). Er
-     wordt niets opgeslagen en niets aangevraagd; de aanvraag zelf
-     (/api/arrival/request) staat er los van en controleert wel. Wel een eigen
-     snelheidsrem (interpretRem). */
-  ['/api/arrival/interpret', 'zet vrije tekst om in een CONCEPTplan en slaat niets op; de aanvraag is een aparte route met eigen controle']
-]);
+   De lijst stond hier als eigen kopie naast die van keuringsregel 28. Twee
+   lijsten van wat openbaar mag zijn lopen uiteen, en de losse van de twee wordt
+   de ruimere (LAT.md regel 4) -- dat is hier ook gebeurd: twintig paden stonden
+   alleen hier, waarvan er twee niet eens meer bestonden als route en een een
+   rem beloofde die op een gelijknamige route van een ander domein stond.
+
+   Ze wonen nu allebei in ./lib/publiek.js, en met opzet niet als een lijst: dat
+   bestand houdt PUBLIEK (welke SCHRIJFroute mag zonder gezagsfunctie) en
+   ALLEEN_ANONIEM (welke route mag 2xx antwoorden aan een anonieme klop, ook een
+   GET) uit elkaar, zodat geen van beide poorten ruimer wordt. POORTWACHT is de
+   som en is wat deze ronde nodig heeft. Wie een pad toevoegt, doet dat daar. */
+const { POORTWACHT: PUBLIEK } = require('./lib/publiek');
 
 /* ---- DE TWEE METRICS-DEUREN ZIJN CONFIGURATIE, GEEN CODE ----
 

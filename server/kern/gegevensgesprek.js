@@ -113,7 +113,15 @@ function maakGegevensgesprek({ accounts, gegevenspoort, saveMemberState, getMemb
       if (cijfers.length < 8) return { status: 200, tekst: 'Dat lijkt me te kort voor een telefoonnummer. Voluit?', veld: 'telefoon' };
       const nummer = tekst.replace(/[^\d+ ]/g, '').trim().slice(0, 30);
       if (g.userId == null || !accounts.setPhone) return { status: 500, error: 'Kon het nummer niet bewaren.' };
-      accounts.setPhone(g.userId, nummer);
+      /* setPhone weigert VERVANGEN zonder her-authenticatie (het nummer is het
+         herstelkanaal; zie de kop daar). Dit gesprek gaat over een bestelling en
+         hoort geen wachtwoord te vragen, dus het zegt het en stopt. */
+      const uit = accounts.setPhone(g.userId, nummer);
+      if (uit && uit.error === 'herstelkanaal') {
+        gesprekken.delete(id);
+        return { status: 200, gestopt: true, herstelkanaal: true,
+          tekst: 'Er staat al een ander nummer bij je account. Dat is ook de weg waarlangs je je wachtwoord herstelt, dus wijzigen vraagt eerst je wachtwoord. Dat doe je bij je accountgegevens.' };
+      }
     } else if (huidig.veld === 'adres') {
       if (g.wachtPlaats) {
         /* De tweede helft van de adresstap: de plaats, omdat we hem niet met

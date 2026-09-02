@@ -1,0 +1,15 @@
+{
+  "gemeten": "2026-08-31T16:20:30.914Z",
+  "toetsen": [
+    {
+      "toets": "test/gegevenskaart-scherm.e2e.js",
+      "schermen": [
+        "public/apps/mijn-gegevens.html"
+      ],
+      "schoten": 6,
+      "gezakt": 6,
+      "overleefd": 0,
+      "ongedekt": []
+    }
+  ]
+}

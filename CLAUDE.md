@@ -168,6 +168,24 @@ dichtzet terwijl de rest van de app in de regelgestuurde werkmodus doorloopt
 (`kern/kosten/grens.js`; twee sloten, de strengste wint, en `geen-grens` is een
 andere stand dan `ruim`).
 
+**`GIFT.md` is het besluit vóór de doneerknop** -- die knop bestaat met opzet
+niet (`kern/rtfos/donateur.js`: geen doneerknop en geen incasso, geld aannemen
+loopt via RTG Pay en de bank). Lees hem vóór je iets bouwt waarmee de stichting
+geld aanneemt. De verantwoording ERNA is af en streng: het donateursportaal op
+een eigen code, een giftbewijs dat weigert waar het geen gift is (sponsoring,
+tegenprestatie, goederen), en een herkomstcontrole die boven de tienduizend euro
+het geld stil zet in plaats van te waarschuwen. Wat ontbreekt zijn drie
+BESLUITEN, niet drie functies: waar het geld landt (er is geen codenaam of
+positie van de RTFoundation om aan te betalen), welke giftvormen opengaan
+(eenmalig, geoormerkt, periodiek -- en periodiek heet alleen zo met een
+overeenkomst van vijf jaar), en of de stichting zelf een ANBI is. Dat laatste is
+gemodelleerd maar niet aangesloten: `kern/foundationregistratie*.js` en
+`kern/rtfos/partners.js` leggen ANBI en RSIN vast van PARTNERstichtingen, en de
+giftlaag leest die status nul keer -- terwijl er wel een giftbewijs uitgaat. De
+vorm die eruit volgt is die van de terugstortstand hieronder: een schakelaar in
+de boardroom die zelf de juridische positie IS, standaard dicht, en een route
+die dan weigert mét de reden.
+
 **Let op de terugstortstand (24 augustus 2026).** Of leden hun saldo terugkrijgen
 is een schakelaar in de boardroom (`/api/office/bank/terugstorting`), en die
 schakelaar *ís* de juridische positie — geen twee dingen die toevallig
@@ -426,8 +444,8 @@ in de ontwikkelaarsroute** (de beproevingsomgeving voor software is een eigen
 ding, met `scripts/aanval.js` en `scripts/chaos.js` als eerste bouwstenen), de
 App Store-keuring keek niet naar toegankelijkheid (inmiddels wél, en als POORT:
 zie par. 9.2), en er is geen kostenvlak. En
-par. 10 draait één aanname om die vaak fout gaat: van <!--getal:idem.routesMetRol-->3803<!--/getal--> routes met een rol
-zijn er <!--getal:idem.beoordeeld-->1563<!--/getal--> beproefd op herhaalbaarheid en <!--getal:idem.ongemeten-->3080<!--/getal--> ongemeten (`IDEMPROEF.json`,
+par. 10 draait één aanname om die vaak fout gaat: van <!--getal:idem.routesMetRol-->3998<!--/getal--> routes met een rol
+zijn er <!--getal:idem.beoordeeld-->1573<!--/getal--> beproefd op herhaalbaarheid en <!--getal:idem.ongemeten-->3156<!--/getal--> ongemeten (`IDEMPROEF.json`,
 levend getal — `npm run getallen` houdt het bij),
 maar het doel is **niet alles idempotent — het is alles geclassificeerd**, met
 `UNKNOWN` verboden voor nieuwe publiek aanroepbare ontwikkelaarsopdrachten.
@@ -438,7 +456,7 @@ gestandaardiseerde capabilities". Lees die vóór je een capability, een woorden
 met rechten of een nieuwe laag toevoegt. De eerste wet van de opzet — *Everything
 is a Capability* — is er eerst **gemeten** in plaats van aangenomen
 (`scripts/capabilityroepers.js`, `CAPABILITEIT.json`), en de uitkomst is streng: er is
-geen capabilitylaag in deze code, er zijn er **<!--getal:capabiliteit.lijsten-->21<!--/getal-->** met <!--getal:capabiliteit.leden-->249<!--/getal--> leden,
+geen capabilitylaag in deze code, er zijn er **<!--getal:capabiliteit.lijsten-->21<!--/getal-->** met <!--getal:capabiliteit.leden-->250<!--/getal--> leden,
 91% van de leden woont in precies één lijst en geen twee lijsten lijken op elkaar. Twee bestanden dragen
 allebei een `VERMOGENS` met nul gedeelde leden — de les van het gedeelde
 routevoorvoegsel, nu op een woord. Daaruit volgt de grens die het document
@@ -455,8 +473,8 @@ weigert wat op een contactgegeven lijkt, want met `REDIS_URL` gaat hij over een
 netwerk), **`onbekend` is geen `openbaar`** (en een gevolg erft de classificatie
 niet — dat zou raden zijn), en **de levering gaat voor** (een geweigerde actor
 houdt een melding nooit tegen, maar verdwijnt ook nooit stil). Wat er nog niet is,
-staat er met de meting erbij: van de <!--getal:idem.beoordeeld-->1563<!--/getal--> beproefde muterende routes zijn er
-<!--getal:idem.beschermd-->1561<!--/getal--> retry-veilig, en een schemaregister (`payment.authorized.v1` met een vorm
+staat er met de meting erbij: van de <!--getal:idem.beoordeeld-->1573<!--/getal--> beproefde muterende routes zijn er
+<!--getal:idem.beschermd-->1572<!--/getal--> retry-veilig, en een schemaregister (`payment.authorized.v1` met een vorm
 erachter) bestaat niet — de envelop zegt met opzet nooit WAT. Zeven punten die een besluit van de eigenaar vragen staan in par. 4.
 **Het goedkoopste daarvan is genomen (27 augustus 2026):** het woord dat in twee
 lagenmodellen niet hetzelfde betekende, is hernoemd — laag 4 van `PLATFORM.md`
@@ -538,8 +556,8 @@ dat RTG vandaag klopt (`MAGNAATLAB.md`) maar of hij kan voorspellen dat RTG
 mórgen nog klopt. Lees die vóór je een begrip introduceert, een register aanlegt
 of een scorecard bouwt. De opzet vraagt een semantisch register naar aanleiding
 van de twee `VERMOGENS`; de vraag ervóór is gemeten (`scripts/semantiek.js`,
-`SEMANTIEK.json`) en het was **geen incident**: van de <!--getal:semantiek.namen-->111<!--/getal--> namen die in meer dan
-één domein staan, dragen er **<!--getal:semantiek.betekenissen-->94<!--/getal--> meer dan één betekenis** — samen 284
+`SEMANTIEK.json`) en het was **geen incident**: van de <!--getal:semantiek.namen-->116<!--/getal--> namen die in meer dan
+één domein staan, dragen er **<!--getal:semantiek.betekenissen-->99<!--/getal--> meer dan één betekenis** — samen 284
 betekenissen, met `SOORTEN` op **39**. Daarnaast **29** betekenissen die op meer
 dan één plek wonen én **106** paren die dezelfde waarheid onder een ándere naam
 dragen — die tweede ronde bestaat omdat de eerste ze miste, en de duurste

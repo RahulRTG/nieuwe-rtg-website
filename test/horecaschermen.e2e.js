@@ -524,7 +524,7 @@ test('een polsband kan niet onder nul, de deur weigert met het getal erbij, en e
     await page.click('#aMeting');
     await wachtOpTekst(page, /teruggekoeld, monteur gebeld/);
     tekst = await lees(page);
-    assert.match(tekst, /afwijking/, 'met de actie erbij wordt hij wel vastgelegd, als afwijking');
+    assert.match(tekst, /afwijking/i, 'met de actie erbij wordt hij wel vastgelegd, als afwijking');
     assert.match(tekst, /teruggekoeld, monteur gebeld/, 'met de genomen actie in het logboek');
     const gemist = await page.evaluate(() => document.getElementById('aGemist').textContent);
     assert.match(gemist, /Vriezer/,

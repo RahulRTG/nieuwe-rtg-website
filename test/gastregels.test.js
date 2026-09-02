@@ -9,7 +9,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer } = require('./helper');
+const { startServer, kantoorAlsPersoon } = require('./helper');
 
 let BASE;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-gast-'));
@@ -39,7 +39,7 @@ test.before(async () => {
   await api('/api/supplier/bezorg/product', { name: 'Paella thuis', price: 24 }, managerToken);
   await api('/api/supplier/bezorg/instellingen', { aan: true, ophalen: true, bezorgen: true }, managerToken);
   prodId = (await json(await api('/api/bezorg/partners', {}, lidToken))).partners.find(x => x.code === 'KIKUNOI').producten[0].id;
-  officeToken = (await json(await api('/api/office/login', { code: 'RTG-OFFICE' }))).token;
+  officeToken = await kantoorAlsPersoon(BASE, 'RTG-OFFICE');
 });
 test.after(() => {
   if (child) try { child.kill('SIGKILL'); } catch (e) {}

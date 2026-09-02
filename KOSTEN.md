@@ -126,7 +126,7 @@ die hem uitvoert. Wie wil weten wat RTG belooft, moet daar niet doorheen hoeven.
 |---|---|
 | `inbegrepen` | de bijdrage van deze pas dekt het; er gaat niets naar de factuur |
 | `doorbelasten` | het gemeten bedrag gaat als **één regel** naar de maandfactuur die er al is |
-| `rtfoundation` | het gezin ziet wat het kost en krijgt er nooit een rekening voor |
+| `rtfoundation` | het gezin of het lab ziet wat het kost en krijgt er nooit een rekening voor; de stichting draagt het |
 | `huis` | verbruik zonder eigenaar; onze eigen rekening |
 
 De standaardverdeling:
@@ -141,6 +141,7 @@ De standaardverdeling:
 | **Business Lite** | **doorbelasten** | *bestaat nog niet* |
 | zaak | inbegrepen | wat een zaak betaalt staat in zijn leverancierscontract |
 | gezin (RTF) | rtfoundation | de RTFoundation is gratis voor elk gezin; zij betaalt uit haar eigen begroting (`kern/rtfos/geld.js`) |
+| **lab (RTF Living Lab)** | rtfoundation | een lab draait op de begroting van de stichting. Het lab ziet tot op de cent wat het kost -- dat is wat een subsidiegever vraagt -- en de deelnemers krijgen er nooit een rekening voor |
 | huis | huis | onze eigen rekening |
 
 **RTG Lite en Business Lite staan er al en bestaan nog niet.** Dat is met opzet
@@ -149,7 +150,10 @@ doet. De machinerie werkt zodra die passen er zijn, en tot dan zegt het voorstel
 dat er nul gebruikers op zitten -- in plaats van dat er een pas verschijnt die
 niemand kan kopen.
 
-**Twee standen zijn geen instelling.** `gezin` en `huis` zijn beloften. Een
+**Drie standen zijn geen instelling.** `gezin`, `lab` en `huis` zijn beloften.
+Bij een lab is de reden de scherpste van de drie: onderzoek waarin de bewoner
+meebetaalt aan het onderzoek waaraan hij meedoet, is geen onderzoek maar een
+verkoop -- die schakelaar hoort niet te bestaan. Een
 schakelaar waarmee de RTFoundation alsnog gaat factureren, is geen configuratie
 maar het intrekken van "gratis voor elk gezin"; de boardroom krijgt daar een
 weigering mét die reden. De andere passen kan de boardroom wél verzetten -- met

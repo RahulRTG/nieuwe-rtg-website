@@ -110,6 +110,11 @@ const SLEUTELS = {
 
   'POST /api/pay/rekening': { nietIdempotent: true,
     waarom: 'een herhaalde rekeningwijziging start de wachttijd opnieuw; samenvouwen zou terugzetten naar een oud IBAN de wachttijd laten omzeilen' },
+  /* Dezelfde handler (kern/pay/zaakrekening.js) achter de deur van de zaak, dus
+     dezelfde reden -- en niet overgetypt: het contract in
+     ./mutatiecontracten-samenvoeging.js leest hem hier. */
+  'POST /api/supplier/pay/rekening': { nietIdempotent: true,
+    waarom: 'een herhaalde rekeningwijziging start de wachttijd opnieuw; samenvouwen zou terugzetten naar een oud IBAN de wachttijd laten omzeilen' },
 };
 
 module.exports = { SLEUTELS };

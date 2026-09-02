@@ -14,6 +14,7 @@
    Voor echt grote datasets is Postgres of RTG_STORE=sqlite de juiste opslag; dit
    houdt de JSON-modus eerlijk overeind. */
 const rtgjson = require('../lib/rtgjson');
+const klok = require('../lib/klok');
 const kluis = require('../kluis');
 const state = require('./state');
 const opslag = require('./opslag');
@@ -32,8 +33,8 @@ let snapshotVol = false, snapshotWaarschuwing = 0;
 
 function schrijfSnapshotNu() {
   saveVuil = false;
-  if (snapshotVol && Date.now() - snapshotWaarschuwing < 60000) { saveKlaar = Date.now(); return; }
-  const t0 = Date.now();
+  if (snapshotVol && klok.nu() - snapshotWaarschuwing < 60000) { saveKlaar = klok.nu(); return; }
+  const t0 = klok.nu();
   try {
     beslotenMap(DATA_DIR);
     // compact (geen pretty-print): bij grote data scheelt dat ~40% tijd en ruimte
@@ -44,21 +45,21 @@ function schrijfSnapshotNu() {
     snapshotVol = false;
   } catch (e) {
     if (/Invalid string length|string longer than|Cannot create a string/i.test(e.message || '')) {
-      snapshotVol = true; snapshotWaarschuwing = Date.now();
+      snapshotVol = true; snapshotWaarschuwing = klok.nu();
       console.error('[db] datastore te groot voor een JSON-snapshot (' + e.message +
         '). Schakel voor deze omvang over op STORE=postgres; snapshots worden 60 s overgeslagen.');
     } else {
       console.warn('[db] snapshot schrijven mislukt:', e.message);
     }
   }
-  saveDuur = Date.now() - t0;
-  saveKlaar = Date.now();
+  saveDuur = klok.nu() - t0;
+  saveKlaar = klok.nu();
 }
 function planSnapshot() {
   saveVuil = true;
   if (saveTimer) return;
   const venster = Math.max(SAVE_MS, saveDuur * 4);
-  const sinds = Date.now() - saveKlaar;
+  const sinds = klok.nu() - saveKlaar;
   if (sinds >= venster) return schrijfSnapshotNu(); // losse actie: meteen, net als vroeger
   saveTimer = setTimeout(() => { saveTimer = null; if (saveVuil) schrijfSnapshotNu(); }, venster - sinds);
   if (saveTimer.unref) saveTimer.unref();

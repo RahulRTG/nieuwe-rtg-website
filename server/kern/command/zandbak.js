@@ -130,7 +130,7 @@ function maakZandbak({ db, opslag, save, crypto, zaai, register, catalogus }) {
 
     const journaal = require('./journaal').maakJournaal({ db, save, crypto, vak, opslag });
     const beleid = require('./beleid').maakBeleid({ db, save, crypto, journaal, vak, opslag });
-    const risico = require('./risico').maakRisico({ beleid });
+    const risico = require('../frictie').maakRisico({ beleid });
     const runbooks = require('./runbooks').maakRunbooks({
       db: venster, save, crypto, journaal, risico, beleid, register, catalogus, vak, opslag });
     const kwaliteit = require('./kwaliteit').maakKwaliteit({ db: venster, register });

@@ -9,6 +9,9 @@
    je paspoort staat en hoe je genoemd wilt worden zijn twee verschillende
    dingen, en het tweede telt hier. */
 const { coord } = require('../kern/util');
+const klok = require('../lib/klok');
+const workspace = require('../kern/workspace-voorkeur');
+const workspaceAudit = require('../kern/workspace-audit');
 module.exports = (kern) => {
   const { app, auth, schoon, accounts, geloof, toegankelijkVan, toegankelijkZet, TOEGANKELIJK_KEUZES } = kern;
 
@@ -19,7 +22,7 @@ module.exports = (kern) => {
   // de leeftijd uit het profiel; bepaalt welke fases gekozen mogen worden
   function leeftijdVan(md) {
     if (!md || !md.geboren) return null;
-    const g = new Date(md.geboren), nu = new Date();
+    const g = new Date(md.geboren), nu = klok.datum();
     let l = nu.getFullYear() - g.getFullYear();
     if (nu < new Date(nu.getFullYear(), g.getMonth(), g.getDate())) l -= 1;
     return l;
@@ -127,6 +130,39 @@ module.exports = (kern) => {
     const id = uid(req);
     if (id == null) return res.status(403).json({ error: 'Alleen voor leden met een eigen account.' });
     uit(res, toegankelijkZet(id, req.body || {}));
+  });
+
+  /* De Dynamic Workspace volgt een account tussen apparaten. Alleen de
+     compositie gaat mee; iedere module blijft eigenaar van haar inhoud. */
+  app.post('/api/ik/workspace', auth, (req, res) => {
+    const id = uid(req);
+    if (id == null) return res.status(403).json({ error: 'Alleen voor leden met een eigen account.' });
+    res.json({ ok: true, workspace: workspace.lees(accounts.getMemberState(id) || {}) });
+  });
+
+  app.post('/api/ik/workspace/zet', auth, (req, res) => {
+    const id = uid(req);
+    if (id == null) return res.status(403).json({ error: 'Alleen voor leden met een eigen account.' });
+    const md = accounts.getMemberState(id) || {};
+    const r = workspace.zet(md, req.body && req.body.workspace, klok.datum().toISOString());
+    if (r.error) return uit(res, r);
+    accounts.saveMemberState(id, md);
+    res.json({ ok: true, workspace: r });
+  });
+
+  app.post('/api/ik/workspace/audit', auth, (req, res) => {
+    const id = uid(req);
+    if (id == null) return res.status(403).json({ error: 'Alleen voor leden met een eigen account.' });
+    res.json({ ok: true, audit: workspaceAudit.lees(accounts.getMemberState(id) || {}) });
+  });
+
+  app.post('/api/ik/workspace/audit/noteer', auth, (req, res) => {
+    const id = uid(req);
+    if (id == null) return res.status(403).json({ error: 'Alleen voor leden met een eigen account.' });
+    const md = accounts.getMemberState(id) || {};
+    const r = workspaceAudit.noteer(md, req.body, 'member-' + id, klok.datum().toISOString());
+    if (r.error) return uit(res, r);
+    accounts.saveMemberState(id, md); res.json({ ok: true });
   });
 
   /* Wat er vandaag speelt: feestdagen, gebedstijden en de richting van Mekka.

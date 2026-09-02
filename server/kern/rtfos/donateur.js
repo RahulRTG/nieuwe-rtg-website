@@ -139,51 +139,10 @@ module.exports = (ctx, eigen) => {
     } };
   }
 
-  /* ---------- de kantoorkant: de code uitgeven ---------- */
-  function codeVoor(req, bronId) {
-    const b = S().bronnen.find(x => x.id === String(bronId || ''));
-    if (!b) return { status: 404, error: 'Deze bron bestaat niet.' };
-    const w = wie(req);
-    const g = poort(w, b.stad, 'geld.beheren', 'donations');
-    if (!g.ok) return g;
-    /* Alle giften van DEZELFDE gever in deze stad krijgen dezelfde code. Anders
-       heeft een trouwe gever twaalf codes en ziet hij bij elke code een stukje
-       van zichzelf. */
-    const bestaand = S().bronnen.find(x => x.stad === b.stad && x.gever === b.gever && x.donateurcode);
-    const sleutel = bestaand ? bestaand.donateurcode : code('RTFS');
-    let n = 0;
-    for (const x of S().bronnen) {
-      if (x.stad === b.stad && x.gever === b.gever && !x.donateurcode) { x.donateurcode = sleutel; n++; }
-    }
-    audit(w.key, 'donateur.code', b.gever, n + ' gift(en) op deze code');
-    save();
-    return { ok: true, code: sleutel, giften: n,
-      melding: 'Deze code opent alle ' + n + ' gift(en) van ' + b.gever + ' in deze stad, en niets van iemand anders.' };
-  }
+  /* De kantoorkant woont in ./donateur-kantoor.js: dit bestand ging over de
+     10 KB en de naad loopt langs de lezer -- hier de gever, daar de medewerker. */
+  const kantoor = require('./donateur-kantoor')(ctx, { code });
 
-  /* De periodieke schenkingsovereenkomst vastleggen. De grendel zit hier: onder
-     de vijf jaar is het geen periodieke gift, hoe je het ook noemt. */
-  function periodiekVast(req, bronId, b) {
-    b = b || {};
-    const bron = S().bronnen.find(x => x.id === String(bronId || ''));
-    if (!bron) return { status: 404, error: 'Deze bron bestaat niet.' };
-    const w = wie(req);
-    const g = poort(w, bron.stad, 'geld.beheren', 'donations');
-    if (!g.ok) return g;
-    const jaren = Math.round(Number(b.jaren) || 0);
-    if (jaren < 5) {
-      return { status: 400, error: 'Een periodieke gift loopt ten minste vijf jaar. Korter kan, maar dan is het een gewone gift ' +
-        'met een drempel -- en een bewijs dat iets anders suggereert kost de gever geld bij zijn aangifte.' };
-    }
-    const kenmerk = schoon(b.kenmerk, 60);
-    if (!kenmerk) return { status: 400, error: 'Wat is het kenmerk van de overeenkomst? Zonder vindbare overeenkomst is er niets vastgelegd.' };
-    const tot = schoon(b.tot, 10);
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(tot)) return { status: 400, error: 'Tot wanneer loopt de overeenkomst?' };
-    bron.periodiek = { jaren, kenmerk, tot, door: w.key };
-    audit(w.key, 'donateur.periodiek', bron.gever, jaren + ' jaar, kenmerk ' + kenmerk);
-    save();
-    return { ok: true, melding: 'Vastgelegd. Op het giftbewijs staat nu dat het een periodieke gift is: aftrekbaar zonder drempel.' };
-  }
-
-  return { portaal, bewijs, codeVoor, periodiekVast, vindCode, bewijsbaar, giftBeeld };
+  return { portaal, bewijs, codeVoor: kantoor.codeVoor, periodiekVast: kantoor.periodiekVast,
+    vindCode, bewijsbaar, giftBeeld };
 };

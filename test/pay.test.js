@@ -102,8 +102,42 @@ test('de kassacode: het lid toont een code, de zaak int, en uitbetalen leegt de 
   const pot = await api('supplier/pay/overzicht', {}, supToken);
   assert.equal(pot.body.saldo, 2465, 'de partnerpot telt de kassabetaling netto (kosten direct verrekend)');
   assert.equal(pot.body.kostenVandaag, 35, 'en toont de betaaldienstkosten van vandaag transparant');
+  /* EERST DE BESTEMMING, EN DIE ONTBRAK HIER JAREN. Deze toets heette
+     "uitbetalen leegt de partnerpot" en stond op groen terwijl de betaalopdracht
+     de rail op ging met een LEGE iban -- die reserveert dan en verstuurt niet,
+     terwijl het saldo er al af was. De pot was inderdaad leeg; er was alleen
+     nooit een rekening genoemd. Zie kern/pay/zaakrekening.js. */
+  const zonder = await api('supplier/pay/uitbetaal', { idem: 'uit-0' }, supToken);
+  assert.equal(zonder.status, 409, 'uitbetalen kon zonder dat er een rekening bekend was');
+  assert.equal(zonder.body.reden, 'geen-rekening');
+  assert.equal((await api('supplier/pay/overzicht', {}, supToken)).body.saldo, 2465,
+    'de weigering had het saldo al afgeboekt -- dan is de volgorde niet de veiligheid');
+
+  assert.equal((await api('supplier/pay/rekening', { iban: 'NL91ABNA0417164301' }, supToken)).status, 400,
+    'een IBAN met verkeerde controlecijfers werd aangenomen');
+  const rek = await api('supplier/pay/rekening', { iban: 'NL91 ABNA 0417 1643 00', naam: 'Strandtent' }, supToken);
+  assert.equal(rek.status, 200, JSON.stringify(rek.body));
+
   const uit = await api('supplier/pay/uitbetaal', { idem: 'uit-1' }, supToken);
   assert.equal(uit.body.uitbetaald, 2465);
+  /* EN DE REKENING GING MEE NAAR DE RAIL. Dit is de eigenlijke fout: zonder
+     `bestemming` op de betaalopdracht reserveert server/betaal.js en verstuurt
+     hij niet. Deze regel leest hem terug uit de opdracht zelf, want een
+     assertie op wat we net hebben ingevuld bewijst niets. */
+  assert.equal(uit.body.naarRekening, '4300',
+    'de uitbetaling ging de rail op zonder de rekening van de zaak');
+
+  /* EN DE WACHTTIJD OP EEN WIJZIGING. Die staat er niet tegen een tikfout
+     (daar is de mod-97-toets voor) maar tegen een OVERNAME: wie de
+     manager-inlog kaapt, zet zijn eigen rekening erin en trekt de pot leeg.
+     Zijn hele plan hangt op snelheid. Op de eerste registratie staat hij
+     bewust niet -- dat hindert alleen eerlijke zaken. */
+  const anders = await api('supplier/pay/rekening', { iban: 'NL44 RABO 0123 4567 89', naam: 'Strandtent' }, supToken);
+  assert.equal(anders.status, 200);
+  assert.match(anders.body.melding, /gewijzigd/);
+  const meteen = await api('supplier/pay/uitbetaal', { idem: 'uit-2' }, supToken);
+  assert.equal(meteen.status, 409, 'een net gewijzigde rekening kon meteen ontvangen');
+  assert.equal(meteen.body.reden, 'nog-in-wachttijd');
   assert.equal((await api('supplier/pay/overzicht', {}, supToken)).body.saldo, 0, 'uitbetaald naar de bank');
   /* De uitbetaling gaat sinds TAKEN.md 4.22 door de opdrachtenrij. Hier stond
      een compensatie: bij een fout van de betaal-naad werd de afboeking

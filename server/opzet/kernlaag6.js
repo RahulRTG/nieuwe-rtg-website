@@ -22,7 +22,7 @@
 'use strict';
 
 module.exports = (kern, hulp) => {
-  const { accounts, anthropic, app, crypto, db, etaMinutes, findSupplier, haversine, keyVanCodenaam, klokVan, leeftijdVan, log, logActivity, loginFails, noteFailedTry, notify, pinSlot, rememberSession, save, schoon, sseToCustomer, sseToOffice, supplierState } = hulp;
+  const { accounts, anthropic, app, crypto, db, etaMinutes, findSupplier, haversine, keyVanCodenaam, klokVan, leeftijdVan, log, logActivity, loginFails, noteFailedTry, notify, pinSlot, rememberSession, save, sessieregister, schoon, sseToCustomer, sseToOffice, supplierState } = hulp;
 
 /* RTG OV (kern/ov.js): al het vervoer in een app. Lijnen met haltes, live
    voertuigen via de PDA, twee snelle check-ins (oplichtende code of GPS) en
@@ -145,7 +145,9 @@ Object.assign(kern, require('../kern/eenaccount').maakEenAccount({
   // hetzelfde doel-slot als /api/supplier/login: een pin, een teller
   pinSlot,
   // en dezelfde persoonseis als /api/supplier/login: het ene account is geen achterdeur
-  persoonsPoort: kern.persoonsPoort
+  persoonsPoort: kern.persoonsPoort,
+  // MIJN RTG blok 3: hier ontstaat een tweede context voor dezelfde mens
+  sessieregister
 }));
 /* Het kantoorgesprek (kern/kantoorgesprek.js): de backoffice binnenkomen door
    met Rahul te praten in plaats van een codeveld in te vullen. Zelfde slot als

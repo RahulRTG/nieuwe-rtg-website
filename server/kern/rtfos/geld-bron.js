@@ -109,5 +109,33 @@ module.exports = (ctx, eigen) => {
     return bron;
   }
 
-  return { verplaats, bronUitSubsidie, bronUitCampagne };
+  /* De bron die ontstaat uit een ONLINE GIFT (gift-betalen.js). Derde in deze
+     rij naast subsidie en campagne, en met een verschil dat er toe doet: hier
+     gaat het om EEN gever en EEN bedrag, dus de herkomstcontrole hoort erop.
+     bronUitCampagne slaat die over -- daar is de bron een optelsom van een
+     ronde en niet een gift van een mens.
+
+     De gever staat er als CODENAAM in. Dat is geen tekortkoming van deze
+     registratie maar de afspraak van het hele huis: de echte naam woont in de
+     kluis, en het donateursportaal werkt op een code die de stichting uitgeeft. */
+  function bronUitGift(b) {
+    const centen = Math.max(0, Math.round(Number(b.centen) || 0));
+    const soort = ['donatie', 'maandelijkse_donatie', 'sponsoring'].includes(b.soort) ? b.soort : 'donatie';
+    const bron = { id: rid(), stad: b.stad || null, projectId: b.projectId || null, soort,
+      gever: schoon(b.gever, 120) || 'onbekend', anoniem: b.anoniem === true,
+      centen, besteed: 0,
+      /* Een geoormerkte gift is een belofte aan de gever: herbestemmen kan
+         alleen met toestemming. Zonder oormerk is hij stadsbreed en geldt
+         dezelfde regel -- vrij herbestemmen is nooit de stand bij een gift. */
+      herbestemming: 'met_toestemming', kenmerk: schoon(b.kenmerk, 60) || 'online gift',
+      uitGift: true, door: b.door || null, at: nu() };
+    const gemarkeerd = ctx.herkomstBepaal ? ctx.herkomstBepaal(bron) : null;
+    S().bronnen.push(bron);
+    audit(b.door, 'bron.uit-gift', bron.kenmerk,
+      euro(bron.centen) + ' euro' + (gemarkeerd ? ' -- herkomstcontrole open' : ''));
+    save();
+    return bron;
+  }
+
+  return { verplaats, bronUitSubsidie, bronUitCampagne, bronUitGift };
 };

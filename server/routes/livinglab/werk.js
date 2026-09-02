@@ -52,11 +52,53 @@ module.exports = (kern, hulp) => {
   app.post('/api/lab2/app/uitgifte', officeAuth, (req, res) => veilig(res, () => livinglab.apparatuur.uitgifte(req.body, wie(req))));
 
   /* ---------- van onderzoek naar verandering ---------- */
+  /* De reproductiecapsule: alles wat nodig is om te begrijpen HOE een conclusie
+     tot stand kwam, en niets wat van een deelnemer is. */
+  app.post('/api/lab2/capsule', officeAuth, (req, res) => veilig(res, () => livinglab.capsule.capsule(id(req))));
+
+  /* ---------- apparatuur uitlenen buiten het lab ----------
+     De aanvraag komt van buiten (./bewoner.js); hier staat wat het lab ermee
+     doet en de fysieke keten: meegeven, terugnemen, herijken. */
+  app.post('/api/lab2/uitleen/lijst', officeAuth, (req, res) => veilig(res, () => livinglab.uitleen.lijst(id(req) || (req.body || {}).labId, req.body || {})));
+  app.post('/api/lab2/uitleen/besluit', officeAuth, (req, res) => veilig(res, () => livinglab.uitleen.besluit(id(req), req.body, wie(req))));
+  app.post('/api/lab2/uitleen/meegeven', officeAuth, (req, res) => veilig(res, () => livinglab.uitleen.meegeven(id(req), req.body, wie(req))));
+  app.post('/api/lab2/uitleen/terug', officeAuth, (req, res) => veilig(res, () => livinglab.uitleen.terug(id(req), req.body, wie(req))));
+  app.post('/api/lab2/uitleen/herijkt', officeAuth, (req, res) => veilig(res, () => livinglab.uitleen.herijkt(id(req), req.body, wie(req))));
+
+  /* ---------- het besluit over een buurtvraag ----------
+     Ook "nee" is een antwoord: de reden komt uit een gesloten lijst en de
+     toelichting is verplicht en vrij. De vraag wordt nooit verwijderd. */
+  app.post('/api/lab2/vraag/verken', officeAuth, (req, res) => veilig(res, () => livinglab.vraagbesluit.verken(id(req), req.body, wie(req))));
+  app.post('/api/lab2/vraag/niet-starten', officeAuth, (req, res) => veilig(res, () => livinglab.vraagbesluit.nietStarten(id(req), req.body, wie(req))));
+  app.post('/api/lab2/vraag/heroverweeg', officeAuth, (req, res) => veilig(res, () => livinglab.vraagbesluit.heroverweeg(id(req), req.body, wie(req))));
+
+  /* ---------- openbaar maken ----------
+     Publiceren is een besluit van een mens: er hoort een naam onder, en het blok
+     "wat werkte niet" is verplicht. Intrekken wist niets -- de reden blijft
+     openbaar staan. */
+  app.post('/api/lab2/publicatie/zet', officeAuth, (req, res) => veilig(res, () => livinglab.publicatie.publiceer(id(req), req.body, wie(req))));
+  app.post('/api/lab2/publicatie/intrekken', officeAuth, (req, res) => veilig(res, () => livinglab.publicatie.trekIn(id(req), req.body, wie(req))));
+
+  /* ---------- meetinstrumenten ----------
+     Het protocol samenstellen doet de onderzoeksleider; invullen doet de
+     deelnemer met zijn labpas (./bewoner.js). Die twee staan met opzet aan
+     verschillende kanten van de deur. */
+  app.post('/api/lab2/protocol/zet', officeAuth, (req, res) => veilig(res, () => livinglab.instrument.protocolZet(id(req), req.body, wie(req))));
+  app.post('/api/lab2/metingen', officeAuth, (req, res) => veilig(res, () => livinglab.instrument.metingen(id(req), req.body || {})));
+
   app.post('/api/lab2/uit/maak', officeAuth, (req, res) => veilig(res, () => livinglab.doorbraak.uitgangBij(id(req), req.body, wie(req))));
   app.post('/api/lab2/uit/status', officeAuth, (req, res) => veilig(res, () => livinglab.doorbraak.uitgangZet(id(req), req.body, wie(req))));
   app.post('/api/lab2/uit/naar-lab', officeAuth, (req, res) => veilig(res, () => livinglab.doorbraak.naarLab(id(req), req.body, wie(req))));
   app.post('/api/lab2/uit/vervolg', officeAuth, (req, res) => veilig(res, () => livinglab.doorbraak.vervolgStudie(id(req), req.body, wie(req))));
   app.post('/api/lab2/uit/pijplijn', officeAuth, (req, res) => veilig(res, () => livinglab.doorbraak.pijplijn(id(req))));
+
+  /* ---------- het observatorium ----------
+     Eén bord over alle labs (zonder id) of over één lab (met id). Het staat
+     achter de kantoordeur en niet op de openbare kant: er staan gebreken,
+     klachtaantallen en stilgelegde onderzoeken op, en dat is werk in uitvoering
+     en geen verantwoording naar buiten. Wat naar buiten gaat, is de
+     onderzoekskaart. */
+  app.post('/api/lab2/observatorium', officeAuth, (req, res) => veilig(res, () => livinglab.observatorium.bord((req.body || {}).id || null)));
 
   /* ---------- impact ---------- */
   app.post('/api/lab2/impact', officeAuth, (req, res) => veilig(res, () => livinglab.impact.impact(id(req))));

@@ -1,17 +1,17 @@
 {
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
-  "vastgelegd": "2026-08-31",
+  "vastgelegd": "2026-09-02",
   "gemeten": {
-    "bestanden": 1896,
-    "vormen": 1292,
-    "velden": 1843,
-    "modules": 692,
-    "domeinen": 246,
-    "envelopDrempel": 15,
-    "envelop": 32,
-    "veldenDomeineigen": 1294,
-    "veldenGedeeldVanafVier": 184,
-    "gelijkendeVormparen": 19
+    "bestanden": 2002,
+    "vormen": 1340,
+    "velden": 1941,
+    "modules": 720,
+    "domeinen": 253,
+    "envelopDrempel": 16,
+    "envelop": 30,
+    "veldenDomeineigen": 1379,
+    "veldenGedeeldVanafVier": 193,
+    "gelijkendeVormparen": 20
   },
   "envelop": [
     "aantal",
@@ -23,7 +23,6 @@
     "datum",
     "door",
     "gemaakt",
-    "icon",
     "id",
     "key",
     "label",
@@ -36,18 +35,53 @@
     "ref",
     "sinds",
     "soort",
+    "stand",
     "status",
-    "supplierCode",
     "tekst",
     "tijd",
     "titel",
     "tot",
     "uitleg",
     "van",
-    "wat",
-    "wie"
+    "wat"
   ],
   "gedeeld": [
+    {
+      "veld": "icon",
+      "domeinen": 15,
+      "waar": [
+        "kern/appbieb",
+        "kern/architect",
+        "kern/assets",
+        "kern/atelier",
+        "kern/beroepenbieb",
+        "kern/boerderij"
+      ]
+    },
+    {
+      "veld": "ok",
+      "domeinen": 15,
+      "waar": [
+        "kern/appstore",
+        "kern/festival",
+        "kern/fiscaal",
+        "kern/foundationregistratie-register",
+        "kern/koppel",
+        "kern/leren"
+      ]
+    },
+    {
+      "veld": "supplierCode",
+      "domeinen": 15,
+      "waar": [
+        "kern/autoverkoop",
+        "kern/beveiliging",
+        "kern/comm",
+        "kern/commercie",
+        "kern/ervaring",
+        "kern/gastzorg"
+      ]
+    },
     {
       "veld": "type",
       "domeinen": 14,
@@ -73,27 +107,27 @@
       ]
     },
     {
-      "veld": "stand",
+      "veld": "wie",
       "domeinen": 14,
       "waar": [
         "bedrijf",
-        "kern/bureau",
-        "kern/command",
-        "kern/commercie",
-        "kern/concern",
-        "kern/eten"
+        "kern/comm",
+        "kern/commerce",
+        "kern/consent-lezers",
+        "kern/livinglab",
+        "kern/onderzoekslab"
       ]
     },
     {
-      "veld": "ok",
+      "veld": "open",
       "domeinen": 14,
       "waar": [
+        "kern/commerce",
+        "kern/concern",
         "kern/festival",
-        "kern/fiscaal",
-        "kern/foundationregistratie-register",
-        "kern/koppel",
-        "kern/leren",
-        "kern/mailaanname"
+        "kern/labfonds",
+        "kern/lidmaatschap",
+        "kern/livinglab"
       ]
     },
     {
@@ -106,18 +140,6 @@
         "kern/livinglab",
         "kern/magnaat-economenlab-rapport",
         "kern/magnaat-economie"
-      ]
-    },
-    {
-      "veld": "categorie",
-      "domeinen": 13,
-      "waar": [
-        "kern/appbieb",
-        "kern/appstore",
-        "kern/command",
-        "kern/geloofbieb",
-        "kern/groothandel",
-        "kern/magnaat-partnerstudio-bedrijf"
       ]
     },
     {
@@ -157,15 +179,15 @@
       ]
     },
     {
-      "veld": "open",
-      "domeinen": 13,
+      "veld": "categorie",
+      "domeinen": 12,
       "waar": [
-        "kern/commerce",
-        "kern/concern",
-        "kern/festival",
-        "kern/labfonds",
-        "kern/lidmaatschap",
-        "kern/livinglab"
+        "kern/appbieb",
+        "kern/command",
+        "kern/geloofbieb",
+        "kern/groothandel",
+        "kern/magnaat-partnerstudio-bedrijf",
+        "kern/mall"
       ]
     },
     {
@@ -226,6 +248,18 @@
         "kern/commercie",
         "kern/concern",
         "kern/levensgraaf"
+      ]
+    },
+    {
+      "veld": "actief",
+      "domeinen": 11,
+      "waar": [
+        "kern/bank",
+        "kern/beveiliging",
+        "kern/command",
+        "kern/concern",
+        "kern/livinglab",
+        "kern/machtiging"
       ]
     },
     {
@@ -373,18 +407,6 @@
       ]
     },
     {
-      "veld": "actief",
-      "domeinen": 10,
-      "waar": [
-        "kern/bank",
-        "kern/beveiliging",
-        "kern/command",
-        "kern/concern",
-        "kern/livinglab",
-        "kern/mall"
-      ]
-    },
-    {
       "veld": "soortLabel",
       "domeinen": 10,
       "waar": [
@@ -397,6 +419,30 @@
       ]
     },
     {
+      "veld": "eigenaar",
+      "domeinen": 10,
+      "waar": [
+        "bedrijf",
+        "kern/command",
+        "kern/levensgraaf",
+        "kern/onderneming",
+        "kern/reisgezelschap",
+        "kern/reisgezelschap-delen"
+      ]
+    },
+    {
+      "veld": "actor",
+      "domeinen": 10,
+      "waar": [
+        "bedrijf",
+        "kern/command",
+        "kern/commercie",
+        "kern/envelop",
+        "kern/experience",
+        "kern/magnaat-controle"
+      ]
+    },
+    {
       "veld": "voor",
       "domeinen": 10,
       "waar": [
@@ -406,6 +452,18 @@
         "kern/livinglab",
         "kern/office",
         "kern/overheid"
+      ]
+    },
+    {
+      "veld": "rol",
+      "domeinen": 10,
+      "waar": [
+        "kern/concern",
+        "kern/livinglab",
+        "kern/magnaatwereld",
+        "kern/onderneming",
+        "kern/rechterhand",
+        "kern/reisgezelschap"
       ]
     },
     {
@@ -433,18 +491,6 @@
       ]
     },
     {
-      "veld": "prijsCenten",
-      "domeinen": 9,
-      "waar": [
-        "kern/appstore",
-        "kern/beroepenbieb",
-        "kern/eten",
-        "kern/geloofbieb",
-        "kern/reisbieb",
-        "kern/rtfbieb"
-      ]
-    },
-    {
       "veld": "opties",
       "domeinen": 9,
       "waar": [
@@ -457,75 +503,27 @@
       ]
     },
     {
-      "veld": "bestemming",
-      "domeinen": 9,
-      "waar": [
-        "kern/betaalopdracht",
-        "kern/invoer",
-        "kern/luchthaven",
-        "kern/reisaanbod",
-        "kern/reisbieb",
-        "kern/reisbureau"
-      ]
-    },
-    {
-      "veld": "bewijs",
-      "domeinen": 9,
-      "waar": [
-        "kern/betaalwaarheid",
-        "kern/horeca",
-        "kern/invoer",
-        "kern/livinglab",
-        "kern/magnaat-controle",
-        "kern/magnaat-trainingslobby-acties"
-      ]
-    },
-    {
-      "veld": "actor",
+      "veld": "nummer",
       "domeinen": 9,
       "waar": [
         "bedrijf",
-        "kern/command",
-        "kern/commercie",
-        "kern/envelop",
-        "kern/magnaat-controle",
-        "kern/magnaatwereld"
-      ]
-    },
-    {
-      "veld": "pas",
-      "domeinen": 8,
-      "waar": [
-        "kern/aanmeldingen",
-        "kern/clubs",
-        "kern/commercie",
-        "kern/festival",
-        "kern/ledenbalie",
+        "kern/bank",
+        "kern/facturatie",
+        "kern/kosten",
+        "kern/labfonds",
         "kern/livinglab"
       ]
     },
     {
-      "veld": "periode",
-      "domeinen": 8,
+      "veld": "actie",
+      "domeinen": 9,
       "waar": [
-        "kern/aanmeldingen",
-        "kern/commercie",
-        "kern/fiscaal",
-        "kern/kosten",
-        "kern/overheid",
-        "kern/payroll"
-      ]
-    },
-    {
-      "veld": "regels",
-      "domeinen": 8,
-      "waar": [
-        "kern/agent",
-        "kern/commerce",
-        "kern/facturatie",
-        "kern/gast",
-        "kern/magnaat-economie",
-        "kern/mall"
+        "bedrijf",
+        "kern/bankregie",
+        "kern/command",
+        "kern/frictie",
+        "kern/geldbeleid",
+        "kern/magnaat-controle"
       ]
     }
   ],
@@ -792,6 +790,20 @@
     },
     {
       "gelijkenis": 0.63,
+      "a": "server/kern/geloofbieb.js",
+      "b": "server/kern/reisbieb/index.js",
+      "domeinA": "kern/geloofbieb",
+      "domeinB": "kern/reisbieb",
+      "gedeeld": [
+        "categorie",
+        "categorieLabel",
+        "gratis",
+        "nr",
+        "prijsCenten"
+      ]
+    },
+    {
+      "gelijkenis": 0.6,
       "a": "server/kern/gast/order-beeld.js",
       "b": "server/kern/horeca/regel.js",
       "domeinA": "kern/gast",
@@ -805,22 +817,19 @@
         "ingredienten",
         "itemId",
         "lijstprijs",
-        "opties",
-        "stand"
+        "opties"
       ]
     },
     {
-      "gelijkenis": 0.63,
-      "a": "server/kern/geloofbieb.js",
-      "b": "server/kern/reisbieb/index.js",
-      "domeinA": "kern/geloofbieb",
-      "domeinB": "kern/reisbieb",
+      "gelijkenis": 0.6,
+      "a": "server/kern/appstore/context.js",
+      "b": "server/kern/mailsleutel.js",
+      "domeinA": "kern/appstore",
+      "domeinB": "kern/mailsleutel",
       "gedeeld": [
-        "categorie",
-        "categorieLabel",
-        "gratis",
-        "nr",
-        "prijsCenten"
+        "let",
+        "ok",
+        "sleutel"
       ]
     }
   ]

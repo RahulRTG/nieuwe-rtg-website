@@ -128,6 +128,54 @@ function kanarieLijst(kanaries) {
 
    `gemeten: true, lek: null` is dus een echte bewering: deze route heeft met de
    JUISTE rol een antwoord gegeven, en daar zat niets van iemand anders in. */
+
+/* ROUTES DIE EEN GEHEIM MOGEN TONEN, en waarom dat er precies twee soorten zijn.
+
+   De regel hierboven -- "een wachtwoordhash of sessietoken hoort niet in een
+   antwoordlijf, ook niet van jezelf" -- klopt voor bijna elke route en is voor
+   twee soorten met opzet onwaar:
+
+     HET AANMAAKMOMENT. Een route die een sleutel MINT, moet hem een keer laten
+     zien; anders is hij nergens. Dat is precies waarom die antwoorden er zelf
+     bij zeggen "schrijf deze sleutel nu op": hij komt nooit meer terug, ook niet
+     voor de eigenaar. Een proef die dat als lek telt, vraagt om een functie die
+     niet kan bestaan.
+
+     DE KETENVINGERAFDRUK. Een auditketen is te controleren doordat elke regel
+     de hash van de vorige draagt. Die hash is geen geheim maar juist het
+     bewijsmiddel: zonder hem kan niemand narekenen dat er niet aan gesleuteld
+     is. Hem verbergen zou de belofte van de keten opheffen.
+
+   ELKE REGEL DRAAGT EEN REDEN, en de proef telt ze APART -- niet als schoon.
+   Een verklaring is geen meting: wie ze onder 'schoon' zou wegstrepen, maakt van
+   deze lijst een plek om bevindingen te laten verdwijnen. Ze staan in de uitslag
+   als `verklaard`, met hun aantal, zodat een groeiende lijst opvalt.
+
+   De veldnaam staat erbij: `/api/x` mag zijn `sleutel` tonen en daarmee nog geen
+   `wachtwoord`. */
+const VERKLAARD = {
+  'POST /api/member/rtmail/imap/sleutel': { veld: 'sleutel',
+    reden: 'mint een IMAP-wachtwoord voor de eigen mailbox en toont het EEN keer; het antwoord zegt dat er zelf bij' },
+  'POST /api/supplier/rtmail/imap/sleutel': { veld: 'sleutel',
+    reden: 'idem, voor de mailbox van de zaak' },
+  'POST /api/office/anker': { veld: 'hash',
+    reden: 'de ankerpunten van de auditketens: de hash IS het bewijsmiddel, niet het geheim' },
+  'POST /api/office/handelingen': { veld: 'hash',
+    reden: 'het handelingsspoor met zijn ketenhashes; zonder die hash valt de keten niet na te rekenen' },
+  'POST /api/office/securitylog': { veld: 'hash',
+    reden: 'het inlogauditlog met zijn ketenhashes; zelfde reden als het anker' }
+};
+
+/* Is dit een verklaarde combinatie van route en veld? Geeft de reden terug, of
+   null. De veldnaam komt uit de melding ("geheim veld (sleutel)"). */
+function verklaringVoor(sleutel, lek) {
+  const v = VERKLAARD[sleutel];
+  if (!v || !lek) return null;
+  const m = /^geheim veld \(([^)]+)\)$/.exec(String(lek));
+  if (!m || m[1] !== v.veld) return null;
+  return v.reden;
+}
+
 function weegUitvoer(status, lijf, kanaries) {
   if (!(status >= 200 && status < 300)) return { gemeten: false, lek: null };
   const tekst = typeof lijf === 'string' ? lijf : JSON.stringify(lijf == null ? '' : lijf);
@@ -147,7 +195,7 @@ function weegUitvoer(status, lijf, kanaries) {
    waarde is in plaats van stilzwijgend onder 'schoon' te vallen. */
 async function draaiUitvoerproef({ post, routes, tokenVoor, lijfVoor, kanaries, hernieuw, maxPogingen }) {
   const perRoute = {};
-  const bevindingen = { lekken: [], nooit2xx: [] };
+  const bevindingen = { lekken: [], nooit2xx: [], verklaard: [] };
   let pogingen = 0, hernieuwd = 0, gemeten = 0;
 
   for (const r of routes) {
@@ -169,10 +217,20 @@ async function draaiUitvoerproef({ post, routes, tokenVoor, lijfVoor, kanaries, 
     if (!oordeel.gemeten) { bevindingen.nooit2xx.push(sleutel + ' [' + uit.status + ']'); continue; }
     gemeten++;
     if (oordeel.lek) {
-      bij.uitvoer = 'GEZAKT';
-      const lijf = typeof uit.data === 'string' ? uit.data : JSON.stringify(uit.data || {});
-      bevindingen.lekken.push(sleutel + ' [' + uit.status + '] ' + oordeel.lek + ': ' +
-        lijf.slice(0, 160).replace(/\s+/g, ' '));
+      const reden = verklaringVoor(sleutel, oordeel.lek);
+      if (reden) {
+        /* Verklaard is een EIGEN stand en geen synoniem van schoon: de proef zag
+           hier werkelijk een geheim, en een mens heeft opgeschreven waarom dat
+           hier hoort. Wie de twee samenvoegt, maakt van VERKLAARD een plek waar
+           bevindingen verdwijnen. */
+        bij.uitvoer = 'verklaard';
+        bevindingen.verklaard.push(sleutel + ' ' + oordeel.lek + ': ' + reden);
+      } else {
+        bij.uitvoer = 'GEZAKT';
+        const lijf = typeof uit.data === 'string' ? uit.data : JSON.stringify(uit.data || {});
+        bevindingen.lekken.push(sleutel + ' [' + uit.status + '] ' + oordeel.lek + ': ' +
+          lijf.slice(0, 160).replace(/\s+/g, ' '));
+      }
     } else {
       bij.uitvoer = 'schoon';
     }
@@ -182,4 +240,4 @@ async function draaiUitvoerproef({ post, routes, tokenVoor, lijfVoor, kanaries, 
 }
 
 module.exports = { weegUitvoer, draaiUitvoerproef, maakKanaries, kanarieLijst,
-  lijktGeheim, geheimVeld, GEHEIMWOORDEN, GEHEIMMERKER };
+  lijktGeheim, geheimVeld, GEHEIMWOORDEN, GEHEIMMERKER, VERKLAARD, verklaringVoor };

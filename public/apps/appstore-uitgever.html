@@ -33,6 +33,18 @@
   .knop{background:var(--txt);color:#000;border:none;border-radius:0;padding:.5rem .9rem;font:inherit;font-weight:600;font-size:.83rem;cursor:pointer;min-height:2.6rem;}
   .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:400;}
   .knop:disabled{opacity:.5;cursor:default;}
+  /* DE METERS. Ze staan er zodat een bouwer tijdens het bouwen ziet waar hij
+     staat -- niet pas bij een afkeuring. De getallen komen uit dezelfde poort
+     die ook echt keurt (kern/appstore/keuring.js); dit scherm rekent niets zelf
+     uit, want een tweede rekensom is een tweede waarheid. */
+  .meters{display:grid;gap:.55rem;margin:.6rem 0 .2rem;}
+  .meter{display:grid;grid-template-columns:8.5rem 1fr auto;gap:.7rem;align-items:center;font-size:.78rem;}
+  .meter .naam{font-size:.63rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);}
+  .meter .baan{height:.35rem;background:rgba(255,255,255,.07);position:relative;}
+  .meter .vul{position:absolute;left:0;top:0;bottom:0;background:var(--gold);}
+  .meter .vul.vol{background:var(--burgundy);}
+  .meter .getal{font-variant-numeric:tabular-nums;color:var(--txt);}
+  .meter .getal small{color:var(--soft);}
   .bev{border-left:3px solid var(--burgundy);padding:.5rem .7rem;margin-top:.45rem;background:rgba(194,58,94,.07);border-radius:0;}
   .bev.letop{border-left-color:var(--gold);background:rgba(169,143,28,.08);}
   .bev b{font-size:.85rem;display:block;}
@@ -171,9 +183,52 @@ function toonFouten(d){
       '<b>'+esc(b.wat)+'</b>'+
       (b.bestand ? '<span class="waar">'+esc(b.bestand)+(b.regel ? ' · regel ' + b.regel : '')+'</span>' : '')+
       '<span class="hoe">'+esc(b.hoe)+'</span></div>').join('');
-  $('#uitslag').innerHTML = (d.let ? '<p class="sub mb-s">'+esc(d.let)+'</p>' : '')+
+  $('#uitslag').innerHTML = metersHtml(d) + (d.let ? '<p class="sub mb-s">'+esc(d.let)+'</p>' : '')+
     (d.error ? '<p class="sub bordeaux">'+esc(d.error)+'</p>' : '')+ fouten + bev ||
     '<p class="sub">Geen bevindingen.</p>';
+  /* En nu pas de balken vullen; zie de opmerking bij meter(). */
+  $('#uitslag').querySelectorAll('.vul[data-deel]').forEach(v => { v.style.width = v.dataset.deel + '%'; });
+}
+
+/* WAT ER GEMETEN IS, EN WAT NIET. Een meter zonder waarde toont zijn REDEN en
+   geen nul: de toegankelijkheidskeuring draait pas bij het publiceren, en een
+   balk op nul zou zeggen dat hij is gehaald. */
+function meter(naam, waarde, max, eenheid){
+  const deel = max ? Math.min(1, waarde / max) : 0;
+  return '<div class="meter"><span class="naam">'+esc(naam)+'</span>'+
+    /* De breedte wordt NA het tekenen gezet, met een eigenschap en niet met een
+       style-attribuut in de opmaak: dat laatste houdt style-src-attr in de CSP
+       open, en scripts/norm.js telt ze. Op het scherm van een uitgever telt dat
+       dubbel -- hier wordt uitgelegd hoe streng de poort is. */
+    '<span class="baan"><span class="vul'+(deel >= 1 ? ' vol' : '')+'" data-deel="'+Math.round(deel*100)+'"></span></span>'+
+    '<span class="getal">'+waarde+' <small>/ '+max+' '+esc(eenheid||'')+'</small></span></div>';
+}
+function metersHtml(d){
+  if (!d || !d.maten || !d.budget) return '';
+  const m = d.maten, b = d.budget, kB = n => Math.round(n/1024);
+  const blok = (d.bevindingen || []).filter(x => x.ernst === 'blokkeert').length;
+  /* Het aantal bruggen komt uit het formulier, en dat hoeft er niet te staan --
+     de uitslag wordt ook getoond bij een fout die het formulier nooit heeft
+     bereikt. Een meter die de hele uitslag omvertrekt omdat een veld ontbreekt,
+     is erger dan een meter die zegt dat hij het niet weet. */
+  let machtigingen = null;
+  try { machtigingen = (manifestUit().machtigingen || []).length; } catch (e) {}
+  return '<div class="meters">'+
+    meter('bundel', kB(m.totaal), kB(b.totaal), 'kB')+
+    meter('script', kB(m.script), kB(b.script), 'kB')+
+    meter('stijl', kB(m.stijl), kB(b.stijl), 'kB')+
+    meter('bestanden', m.bestanden, b.bestanden, '')+
+    (machtigingen == null
+      ? '<div class="meter"><span class="naam">bruggen</span><span class="baan"></span>'
+        + '<span class="getal"><small>nog niet ingevuld</small></span></div>'
+      : meter('bruggen', machtigingen, 4, ''))+
+    '<div class="meter"><span class="naam">verboden vormen</span>'+
+      '<span class="baan"><span class="vul'+(blok ? ' vol' : '')+'" data-deel="'+(blok?100:0)+'"></span></span>'+
+      '<span class="getal">'+blok+' <small>gevonden</small></span></div>'+
+    '<div class="meter"><span class="naam">toegankelijkheid</span>'+
+      '<span class="baan"></span>'+
+      '<span class="getal"><small>wordt gerenderd gemeten bij het publiceren</small></span></div>'+
+    '</div>';
 }
 
 async function proef(){

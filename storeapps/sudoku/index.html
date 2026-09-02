@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sudoku</title>
+<link href="stijl.css" rel="stylesheet">
+<style>
+  .rooster{display:grid;grid-template-columns:repeat(9,1fr);max-width:420px;margin:0 auto;
+    border:1px solid var(--goud);background:var(--card);}
+  .rooster button{min-width:0;min-height:0;aspect-ratio:1;padding:0;font-size:1.05rem;border:0;
+    border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:transparent;color:var(--txt);}
+  .rooster button.vast{color:var(--soft);font-weight:600;}
+  .rooster button.aan{background:#241F14;color:var(--goud);}
+  .rooster button.fout{color:#E05B5B;}
+  .rooster button:nth-child(9n){border-right:0;}
+  .rooster button.blokr{border-right:1px solid var(--goud);}
+  .rooster button.bloko{border-bottom:1px solid var(--goud);}
+  .cijfers{display:grid;grid-template-columns:repeat(10,1fr);gap:.25rem;max-width:420px;margin:.6rem auto 0;}
+  .cijfers button{min-width:0;padding:.4rem 0;font-size:1rem;}
+</style>
+</head>
+<body>
+<div class="stand"><span>tijd <b id="klok">0:00</b></span><span>niveau <b id="niveauNaam">normaal</b></span><span>beste <b id="beste">–</b></span></div>
+<div class="rij">
+  <button data-n="makkelijk" type="button">Makkelijk</button>
+  <button data-n="normaal" class="aan" type="button">Normaal</button>
+  <button data-n="moeilijk" type="button">Moeilijk</button>
+</div>
+<div class="rooster" id="rooster" role="grid" aria-label="Sudoku"></div>
+<div class="cijfers" id="cijfers"></div>
+<p class="melding" id="uitleg">Kies een vakje en daarna een cijfer. De puzzel wordt op uw toestel gemaakt.</p>
+<div class="bord" id="bord"></div>
+<script src="app.js"></script>
+</body>
+</html>

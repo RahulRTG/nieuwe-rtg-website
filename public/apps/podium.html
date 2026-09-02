@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="nl">
+<html lang="nl" data-rtg-thema="bordeaux">
 <head>
 <meta charset="utf-8">
 <!-- id.js zonder defer en vooraan: RTGId levert id's die al tijdens het parsen nodig zijn -->
@@ -87,9 +87,20 @@
 <!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
 <script src="/shared/media.js"></script>
 <link href="/shared/ios.css" rel="stylesheet">
+<link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl">
+<body class="rtg-stijl" data-rtg-world="living" data-rtg-eigenvlak="bordeaux">
 <a class="skip" href="#inhoud">Naar inhoud</a>
+<div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">
+  <a class="os-switcher__brand" href="/apps/app.html"><b>RTG</b><span>Vier werelden &middot; één kern</span></a>
+  <div class="os-switcher__links">
+    <a href="/apps/rtg.html" aria-current="page"><span>01</span>LivingOS</a>
+    <a href="/apps/kantoor.html"><span>02</span>WorkOS</a>
+    <a href="/apps/reizen.html"><span>03</span>TravelOS</a>
+    <a href="/apps/foundation/os-publiek.html"><span>04</span>FoundationOS</a>
+  </div>
+  <span class="os-switcher__state">Kern verbonden</span>
+</div>
 <header class="kop">
   <a href="/apps/app.html" aria-label="Terug naar de app">←</a>
   <h1>RTG Podium</h1>
@@ -170,7 +181,7 @@
     <section id="kraamBeheer" class="weg" aria-label="Uw kraam"></section>
     <h2>Kijkers</h2>
     <p class="stil" style="margin-top:-0.3rem;">Uw uitzending draagt onbeperkt veel kijkers: elke kijker geeft het beeld door aan een paar volgende, dus u zendt zelf maar naar een handvol.</p>
-    <div id="kijkerLijst"><p class="stil">Nog geen kijkers.</p></div>
+    <div id="kijkerLijst"><p class="leeg">Nog geen kijkers.</p></div>
   </section>
 
 </main>
@@ -268,9 +279,11 @@
     liveEl.innerHTML = ''; alleEl.innerHTML = '';
     const rijen = zaal.kanalen || [];
     const lives = rijen.filter(k => k.live);
-    if (!lives.length) liveEl.innerHTML = '<p class="stil">Er is nu niemand live. Kom straks terug, of start zelf een kanaal.</p>';
+    if (!lives.length) liveEl.innerHTML = RTGLeeg.html({ ey: 'Live', titel: 'Er is nu niemand live.',
+    wat: 'Zodra iemand een kanaal opent, staat het hier. U kunt er zelf ook een beginnen.' });
     for (const k of lives) liveEl.appendChild(kanKnop(k, !(zaal.mijn && zaal.mijn.id === k.id)));
-    if (!rijen.length) alleEl.innerHTML = '<p class="stil">Nog geen kanalen in de zaal.</p>';
+    if (!rijen.length) alleEl.innerHTML = RTGLeeg.html({ ey: 'De zaal', titel: 'Nog geen kanalen in de zaal.',
+    wat: 'Kanalen die zijn aangemaakt blijven hier staan, ook als er niemand uitzendt.' });
     for (const k of rijen) alleEl.appendChild(kanKnop(k, !!k.live && !(zaal.mijn && zaal.mijn.id === k.id)));
     tekenMijn();
     toon('vZaal');
@@ -540,7 +553,7 @@
     lijst.innerHTML = best.length
       ? best.map(b => '<p class="stil">' + esc(b.codenaam) + ' · ' + esc(b.naam) + ' · ' + eur(b.centen) +
           (b.levering ? ' · ' + esc(b.levering) : '') + '</p>').join('')
-      : '<p class="stil">Nog geen bestellingen.</p>';
+      : '<p class="leeg">Nog geen bestellingen.</p>';
     el.appendChild(lijst);
   }
   async function waarZet(data) {
@@ -567,7 +580,7 @@
   function tekenKijkers(lijst) {
     $('#studioTel').textContent = lijst.length + ' kijkers';
     const el = $('#kijkerLijst'); el.innerHTML = '';
-    if (!lijst.length) { el.innerHTML = '<p class="stil">Nog geen kijkers.</p>'; return; }
+    if (!lijst.length) { el.innerHTML = '<p class="leeg">Nog geen kijkers.</p>'; return; }
     for (const x of lijst) {
       const rij = document.createElement('div'); rij.className = 'rij';
       const naam = document.createElement('span'); naam.className = 'stil'; naam.style.flex = '1'; naam.textContent = x.codenaam;
@@ -649,5 +662,6 @@
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/ios.js" defer></script>
+<script src="/shared/leeg.js"></script>
 </body>
 </html>

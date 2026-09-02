@@ -73,7 +73,12 @@ module.exports = (kern) => {
     persoonKey: req.session.key, naam: String(req.body.naam || ''), contact: String(req.body.contact || '') })));
 
   /* mutatie: idempotent -- dezelfde bundel levert dezelfde hash en dus geen tweede versie */
+  /* Ook hier de mens: bij een persoonlijke uitgever is de sessiesleutel het
+     handvat. Er gaat geen naam mee -- die staat in de kluis en hoort niet in de
+     App Store (grens 3). De vier-ogenregel werkt dan op de sleutel, en die is
+     harder dan een naam. */
   app.post('/api/appstore/persoon/inzenden', auth, metPersoon(true, (req, p) => appstore.inzenden({
+    inzender: { soort: 'persoon', id: req.session.key, naam: null },
     org: p.org, manifest: req.body.manifest, bestanden: req.body.bestanden })));
 
   /* mutatie: idempotent -- twee keer intrekken laat dezelfde stand achter */

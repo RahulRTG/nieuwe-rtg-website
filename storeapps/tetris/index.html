@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tetris</title>
+<link href="stijl.css" rel="stylesheet">
+</head>
+<body>
+<div class="stand"><span>score <b id="score">0</b></span><span>lijnen <b id="lijnen">0</b></span><span>beste <b id="beste">–</b></span></div>
+<canvas id="bord2d" width="300" height="600" aria-label="Speelveld"></canvas>
+<div class="rij">
+  <button id="start" class="aan" type="button">Start</button>
+  <button data-z="links" type="button" aria-label="Naar links">&#8592;</button>
+  <button data-z="draai" type="button" aria-label="Draaien">&#8635;</button>
+  <button data-z="rechts" type="button" aria-label="Naar rechts">&#8594;</button>
+  <button data-z="val" type="button" aria-label="Laten vallen">&#8595;&#8595;</button>
+</div>
+<p class="melding" id="uitleg">Pijltjestoetsen of de knoppen. Je score gaat pas naar de arena als het spel voorbij is.</p>
+<div class="bord" id="bord"></div>
+<script src="app.js"></script>
+</body>
+</html>

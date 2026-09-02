@@ -105,4 +105,5 @@ module.exports = (kern) => {
   require('./governance')({ app, officeAuth, rtfos, veilig, H });
   require('./afmaak')({ app, officeAuth, rtfos, veilig, H });
   require('./portalen')({ app, rtfos, veilig });
+  require('./voordeur')({ app, rtfos, veilig });
 };

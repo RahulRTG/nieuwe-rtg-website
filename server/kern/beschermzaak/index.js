@@ -45,6 +45,11 @@ module.exports = (ctx) => {
 
   const keten = require('./keten')(ctx, { vind, zaken });
 
+  /* De enige plek waar een zaak zonder inlog ontstaat (HDI.md par. 7 regel 4).
+     Hij staat hier en niet in routes/, want de weigeringen van ./klasse.js
+     moeten er net zo hard voor gelden als aan de kantoorkant -- juist daar. */
+  const voordeur = require('./voordeur')(ctx, { zaken });
+
   /* ---------- openen ----------
      Er wordt hier NIET gevraagd wie het is. Een beschermzaak begint met een
      aanleiding en een korte, feitelijke omschrijving, en verder niets. De
@@ -106,6 +111,7 @@ module.exports = (ctx) => {
 
   return { open, lijst, lees, veiligheid: keten.veiligheid, stand: keten.stand,
     toestemming: keten.toestemming, trekIn: keten.trekIn, draagOver: keten.draagOver,
-    sluit: keten.sluit, vind, STANDEN: K.STANDEN, KETEN: K.KETEN, AANLEIDINGEN: K.AANLEIDINGEN };
+    sluit: keten.sluit, vind, voordeur,
+    STANDEN: K.STANDEN, KETEN: K.KETEN, AANLEIDINGEN: K.AANLEIDINGEN };
 };
 module.exports.klasse = K;

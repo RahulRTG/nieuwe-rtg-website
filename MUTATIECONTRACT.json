@@ -1,26 +1,26 @@
 {
  "stempel": {
-  "op": "2026-09-02T08:45:16.516Z",
-  "commit": "f6215979",
+  "op": "2026-09-02T09:34:47.141Z",
+  "commit": "90e8d2d2",
   "boomVuil": true,
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 4662,
-  "geclassificeerd": 4662,
+  "totaal": 4666,
+  "geclassificeerd": 4666,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3201,
-   "NOT_APPLICABLE": 1077,
-   "PROTECTED": 302,
-   "INTENTIONALLY_NON_IDEMPOTENT": 82
+   "NOT_APPLICABLE": 1079,
+   "PROTECTED": 303,
+   "INTENTIONALLY_NON_IDEMPOTENT": 83
   },
-  "vastgesteldDoorMens": 1488,
+  "vastgesteldDoorMens": 1492,
   "afgeleidDoorScript": 3174,
   "toegangWaargenomen": {
    "AUTHENTICATED": 3827,
-   "PUBLIC": 104,
+   "PUBLIC": 108,
    "OBJECT_SCOPED": 716,
    "SERVICE_TO_SERVICE": 14,
    "SYSTEM_INTERNAL": 1
@@ -29,7 +29,7 @@
    "kale ronde: beschermd": 120,
    "kale ronde: onbeschermd": 86,
    "kale ronde: geen uitspraak": 4437,
-   "niet gemeten": 19
+   "niet gemeten": 23
   },
   "voorstellen": {},
   "metingVan": "2026-08-31T09:44:33.117Z"
@@ -6716,6 +6716,92 @@
     "grond": null,
     "hindernis": null
    },
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "bescherming.deur.intrekken",
+   "route": "POST /api/bescherming/deur/intrekken",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "PUBLIC",
+    "uitHandler": null,
+    "bedoeld": "PUBLIC",
+    "bewakers": [
+     "mw",
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "bescherming.deur.stand",
+   "route": "POST /api/bescherming/deur/stand",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "PUBLIC",
+    "uitHandler": null,
+    "bedoeld": "PUBLIC",
+    "bewakers": [
+     "mw",
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "bescherming.deur.start",
+   "route": "POST /api/bescherming/deur/start",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "PUBLIC",
+    "uitHandler": null,
+    "bedoeld": "PUBLIC",
+    "bewakers": [
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "bescherming.deur.steden",
+   "route": "POST /api/bescherming/deur/steden",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "PUBLIC",
+    "uitHandler": null,
+    "bedoeld": "PUBLIC",
+    "bewakers": [
+     "mw"
+    ]
+   },
+   "bewijs": null,
    "stand": "NOT_APPLICABLE",
    "herkomst": "mens",
    "voorstel": null,

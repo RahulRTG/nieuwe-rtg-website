@@ -76,6 +76,7 @@ module.exports = [
   '/apps/foundation/verhaaltje.html',
   '/apps/foundation/verjaardagen.html',
   '/apps/foundation/vrienden.html',
+  '/apps/foundation/wegwijzer.html',
   '/apps/foundation/werk.html',
   '/apps/foundation/zakgeld.html',
   '/apps/lab.html',

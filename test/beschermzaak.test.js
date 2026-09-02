@@ -197,3 +197,113 @@ test('7. de beschermzaak staat los van de casus', () => {
     assert.ok(!/beschermzaken/.test(bron), f + ' leest de beschermzaken; die horen nergens geteld te worden');
   }
 });
+
+/* ============================================================================
+   DE VOORDEUR (HDI.md par. 7 regel 4): de omkering.
+
+   Tot hier ontstond elke zaak doordat een MEDEWERKER er een aanmaakte. Deze
+   vier routes hebben geen inlog, en dat vraagt zijn eigen beweringen:
+
+     8.  zonder inlog kan een mens een zaak beginnen, en de weigeringen van de
+         klasse gelden juist HIER;
+     9.  elk antwoord zegt dat er niemand klaarzit -- een knop die eruitziet als
+         hulp die komt, is de gevaarlijkste fout van deze laag;
+    10.  wat er bewaard wordt hangt aan wat de mens zei, niet aan wat handig is;
+    11.  de code is geen wachtwoord: de stand verklapt niets;
+    12.  intrekken kan zonder te bellen, en het wist niets.
+
+   MET EEN MUTATIE NAGETROKKEN:
+     - keurInvoer() uit voordeur.start() halen: RAAK op 8;
+     - nietsKlaar uit het antwoord van start() halen: RAAK op 9;
+     - in start() altijd b.wat overnemen: RAAK op 10;
+     - `wat` toevoegen aan het antwoord van stand(): RAAK op 11;
+     - in trekIn() de zaak uit de lijst splicen: RAAK op 12 (de tweede helft).
+   ========================================================================== */
+const deur = (pad, body) => post('/api/bescherming/deur/' + pad, body);
+
+test('8. zonder inlog begint een mens een zaak, en de klasse weigert ook hier', async () => {
+  const st = await deur('steden', {});
+  assert.equal(st.status, 200, 'de stedenlijst hoort zonder inlog te werken');
+  assert.ok(st.body.steden.some(s => s.id === STAD), 'onze stad hoort erin te staan');
+
+  // de weigering van de klasse geldt juist aan deze kant
+  const metAdres = await deur('start', { stad: STAD, aanleiding: 'huiselijk-geweld',
+    nuVeilig: false, kanMeekijken: true, bewaren: 'ook_wat', wat: 'Het is thuis niet veilig.',
+    telefoon: '0612345678' });
+  assert.equal(metAdres.status, 400, 'een telefoonnummer hoort ook via de voordeur te weigeren');
+  assert.match(metAdres.body.error, /telefoon/i);
+
+  const goed = await deur('start', { stad: STAD, aanleiding: 'huiselijk-geweld',
+    nuVeilig: false, kanMeekijken: true, bewaren: 'ook_wat', wat: 'Het is thuis niet veilig.' });
+  assert.equal(goed.status, 200, JSON.stringify(goed.body).slice(0, 200));
+  assert.ok(/^RTFB/.test(goed.body.code), 'de mens hoort een eigen code te krijgen');
+});
+
+test('9. elk antwoord zegt dat er niemand klaarzit', async () => {
+  const st = await deur('steden', {});
+  const s = await deur('start', { stad: STAD, aanleiding: 'stalking', nuVeilig: true,
+    kanMeekijken: false, bewaren: 'alleen_dat' });
+  const stand = await deur('stand', { code: s.body.code });
+  for (const [naam, a] of [['steden', st], ['start', s], ['stand', stand]]) {
+    assert.match(String(a.body.nietsKlaar || ''), /112/,
+      naam + ' hoort te zeggen dat hier niemand klaarzit, met het nummer dat wel dag en nacht opneemt');
+  }
+});
+
+test('10. wat er bewaard wordt, hangt aan wat de mens zei', async () => {
+  const s = await deur('start', { stad: STAD, aanleiding: 'uitbuiting', nuVeilig: true,
+    kanMeekijken: false, bewaren: 'alleen_dat', wat: 'Mijn baas houdt mijn paspoort.' });
+  assert.equal(s.status, 200);
+  // de kantoorkant mag de zaak lezen -- en de toelichting hoort er NIET in te staan
+  const l = await post('/api/rtfos/bescherming/zaken', { stad: STAD }, LAND);
+  const nieuw = l.body.zaken[0];
+  const gelezen = await post('/api/rtfos/bescherming/lees', { id: nieuw.id }, LAND);
+  assert.ok(!/paspoort/i.test(gelezen.body.zaak.wat),
+    'wie "alleen_dat" koos, hoort zijn toelichting nergens terug te vinden');
+});
+
+test('11. de code is geen wachtwoord: de stand verklapt niets', async () => {
+  const s = await deur('start', { stad: STAD, aanleiding: 'seksueel-geweld', nuVeilig: true,
+    kanMeekijken: false, bewaren: 'ook_wat', wat: 'Iets heel persoonlijks.' });
+  const stand = await deur('stand', { code: s.body.code });
+  assert.equal(stand.status, 200);
+  const tekst = JSON.stringify(stand.body);
+  assert.ok(!/persoonlijks/i.test(tekst), 'de stand hoort de toelichting niet te tonen');
+  assert.ok(!/seksueel/i.test(tekst), 'de stand hoort de aanleiding niet te tonen');
+  assert.equal(stand.body.klaargezet, false, 'er is nog niets klaargezet, en dat hoort er te staan');
+
+  const onzin = await deur('stand', { code: 'RTFB-BESTAATNIET' });
+  assert.equal(onzin.status, 404);
+});
+
+test('12. intrekken kan zonder te bellen, en het wist niets', async () => {
+  const s = await deur('start', { stad: STAD, aanleiding: 'dakloos', nuVeilig: true,
+    kanMeekijken: false, bewaren: 'alleen_dat' });
+  const voor = (await post('/api/rtfos/bescherming/zaken', { stad: STAD }, LAND)).body.aantal;
+
+  const weg = await deur('intrekken', { code: s.body.code, reden: 'Toch niet.' });
+  assert.equal(weg.status, 200);
+  const stand = await deur('stand', { code: s.body.code });
+  assert.equal(stand.body.ingetrokken, true, 'de mens hoort te zien dat het is ingetrokken');
+
+  const na = (await post('/api/rtfos/bescherming/zaken', { stad: STAD }, LAND)).body.aantal;
+  assert.equal(na, voor, 'intrekken WIST niets -- de afdeling hoort te zien dat deze mens het introk');
+});
+
+test('13. zonder plaats staat de deur dicht, en zegt dat met een nummer erbij', async () => {
+  /* De stedenlijst is de enige die de deur kan sluiten, en dat hoort een
+     EIGEN bewering te zijn: als geen enkele afdeling deze module aan heeft,
+     mag er geen zaak ontstaan die nergens landt. Dat de PAGINA het formulier
+     dan wegzet, staat in wegwijzer.html; hier gaat het om de server, want een
+     schermregel die niemand afdwingt is geen grendel. */
+  await post('/api/rtfos/stad/module', { id: STAD, vlag: 'individual_cases', aan: false }, LAND);
+  const st = await deur('steden', {});
+  assert.equal(st.body.steden.length, 0, 'een stad met de module uit hoort niet in de lijst te staan');
+
+  const poging = await deur('start', { stad: STAD, aanleiding: 'dakloos', nuVeilig: true,
+    kanMeekijken: false, bewaren: 'alleen_dat' });
+  assert.equal(poging.status, 400, 'een zaak die nergens kan landen, hoort niet te ontstaan');
+  assert.match(poging.body.error, /lijst/i);
+
+  await post('/api/rtfos/stad/module', { id: STAD, vlag: 'individual_cases', aan: true }, LAND);
+});

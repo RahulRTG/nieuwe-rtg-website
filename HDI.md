@@ -355,7 +355,7 @@ veilige slaapplek heeft.
 | 1 | **Uitstapknop, neutrale titel, geen voorvertoning** over de Foundation-schermen, plus het eerlijke scherm over wat we niet kunnen verbergen | maakt al het volgende pas veilig; belooft niets wat niet waar is (5.7) | **staat** (2 sep 2026) |
 | 2 | **Hulpwijzer verbreden**: categorie "onveilig, misbruikt of uitgebuit", met de gespecialiseerde instanties erbij | pure tekst, geen gegevens, geen keten — en vandaag het enige wat een slachtoffer aan deze app heeft | **staat** (2 sep 2026) |
 | 3 | **De eigen keten** — veiligheid → minimale gegevens → toestemming → stabilisatie → gecontroleerde overdracht, als eigen dataklasse (5.2) | het gat dat par. 4 laag 3 beschrijft | **staat** als `server/kern/beschermzaak/` (2 sep 2026) |
-| 4 | **De voordeur**: zelfingang zonder account, zonder BSN, zonder adres; eerst "ben je nu veilig" en "kan iemand meekijken" | keert de huidige richting om (office maakt casus → burger krijgt code) | weken |
+| 4 | **De voordeur**: zelfingang zonder account, zonder BSN, zonder adres; eerst "ben je nu veilig" en "kan iemand meekijken" | keert de huidige richting om (office maakt casus → burger krijgt code) | **staat** (2 sep 2026) |
 | 4b | **De persoonlijke veiligheidslaag verbinden** — `kern/veiligheid/` (dodemansknop, stil codewoord, kring, laatste plek) bestaat en is vanaf de Foundation-kant onzichtbaar | zie par. 7.2: gebouwd, eerlijk, en op de verkeerde plek voor de mens uit par. 0 | dagen |
 | 5 | **Meldcode verbreden** naar volwassen slachtoffers buiten het gezin, of een tweede route ernaast | de vijf wettelijke stappen blijven; de reikwijdte niet | weken |
 | 6 | **Consent: doel en termijn per venster** + het scherm "wie weet wat over mij" | laag 2 afmaken vóór er meer instanties bijkomen | weken |
@@ -395,6 +395,46 @@ achter een knop komen. De laag wordt hier dus niet geladen, en de eerder
 bedachte `rtgdeel-vast`-markering is weggehaald in plaats van decoratief blijven
 staan: een klas die niets afdwingt omdat zijn laag niet draait, leest als een
 garantie die er niet is.
+
+### 7.3 Wat regel 4 opleverde: de deur die niets belooft
+
+`server/kern/beschermzaak/voordeur.js` plus `wegwijzer.html`: vier routes zonder
+inlog, zes toetsen, en de omkering is er — een zaak ontstaat nu ook zonder dat
+er eerst een medewerker aan te pas komt.
+
+**De gevaarlijkste fout was een knop bouwen die eruitziet alsof er hulp komt.**
+Er zit hier niemand klaar. Elk antwoord van deze laag draagt daarom het veld
+`nietsKlaar` met die mededeling én de nummers die wél dag en nacht opnemen, en
+het scherm zet dat blok bovenaan en niet onderaan. Toets 9 houdt vast dat alle
+drie de antwoorden dat veld dragen; hetzelfde als `kern/veiligheid/alarm.js`
+over zichzelf zegt ("dit is geen alarmcentrale") en om dezelfde reden.
+
+Drie keuzes die er anders uitzagen toen ze eenmaal gebouwd werden:
+
+**RTG belt niet terug, en dat is de moeilijkste van de drie.** De klasse weigert
+`telefoon` en `email`, dus de deur kan ze niet doorlaten — ook niet als iemand
+hem later "even handig" wil maken. Een nummer dat wij bewaren is een telefoon
+waarop wij bellen, en precies op het toestel waarvan de mens net zei dat er
+iemand kan meekijken, is dat de gevaarlijkste handeling die er is. De mens houdt
+zijn eigen code en komt terug. Dat is trager, en het is het enige wat waar te
+maken is.
+
+**De code is geen wachtwoord.** Wie hem heeft, kan de stand zien — dus geeft de
+stand het minimum: of er iets is klaargezet, nooit wat, nooit de aanleiding.
+Iemand die de telefoon van een ander doorzoekt en de code vindt, hoort er niets
+uit te kunnen aflezen (toets 11).
+
+**Geen plaats is geen deur.** Staat in geen enkele afdeling de module aan, dan
+verdwijnt het formulier en staat er een nummer dat het wel oppakt. Iemand zijn
+verhaal laten typen om het daarna te weigeren, is de wreedste vorm van een
+kapotte pagina. Toets 13 bewaakt de serverkant daarvan, want een schermregel die
+niemand afdwingt is geen grendel.
+
+En een verschil dat het contractregister zichtbaar maakte: `deur/intrekken` geeft
+bij een tweede oproep 200 met "dit was al ingetrokken" in plaats van een fout.
+Dat is echte idempotentie en geen toestandscontrole — en het is een keuze over de
+mens: wie twijfelt en nog een keer drukt, hoort geen foutmelding te krijgen op
+het moment dat hij het al zwaar heeft.
 
 ### 7.2 Wat regel 3 opleverde, en de zesde laag die al bestond
 

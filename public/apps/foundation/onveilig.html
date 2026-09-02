@@ -51,6 +51,9 @@
   /* inline-block met lucht eronder: als tekstlink haalde deze 21 px hoog en
      dat is onder de 24 die TOEGANKELIJK.md eist op telefoonformaat. */
   .voet a{color:var(--rtg-leesgoud,var(--goud));display:inline-block;padding:.3rem 0;}
+  .voordeur{display:block;padding:1rem 1.1rem;margin-top:1rem;border-color:var(--goud);text-decoration:none;color:inherit;}
+  .voordeur b{display:block;font-size:1.02rem;color:var(--rtg-leesgoud,var(--goud));}
+  .voordeur span{display:block;margin-top:.25rem;color:var(--zacht);font-size:.88rem;line-height:1.5;}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
@@ -77,6 +80,15 @@
   </div>
 
   <div class="cats" id="cats"></div>
+
+  <!-- De voordeur (HDI.md par. 7 regel 4). Hij staat NA de nummers en niet
+       ervoor: wie nu iemand nodig heeft, moet bellen, en een formulier dat
+       daarboven staat leidt daarvan af. -->
+  <a class="kaart voordeur" href="wegwijzer.html">
+    <b>Liever niet bellen?</b>
+    <span>U kunt hier zelf iets in gang zetten, zonder account en zonder uw naam. U krijgt een code en
+      kunt het altijd weer intrekken. Let op: hier zit niemand klaar, dus voor nu blijft bellen sneller.</span>
+  </a>
 
   <div class="kaart blok">
     <h2>Wat wij niet voor je kunnen verbergen</h2>

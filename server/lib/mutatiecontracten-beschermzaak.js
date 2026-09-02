@@ -1,15 +1,16 @@
 /* ============================================================================
-   MUTATIECONTRACTEN -- DE NEGEN ROUTES VAN DE BESCHERMZAAK.
+   MUTATIECONTRACTEN -- DE DERTIEN ROUTES VAN DE BESCHERMZAAK.
 
    Deel van server/lib/mutatiecontracten.js; zie de kop daar voor de vorm en de
-   regels. De routes zelf staan in server/routes/rtfos/uitvoering.js, de klasse
-   in server/kern/beschermzaak/.
+   regels. Negen routes staan achter de kantoordeur (routes/rtfos/uitvoering.js)
+   en VIER staan zonder poort (routes/rtfos/voordeur.js); de klasse eronder is
+   server/kern/beschermzaak/.
 
    WAAROM DIT REGISTER HIER EERST KWAM EN DE ROUTES DAARNA. MUTATIECONTRACT.md:
-   "de volgorde is een grens en geen gewoonte". Deze negen zijn nieuw, en een
+   "de volgorde is een grens en geen gewoonte". Deze dertien zijn nieuw, en een
    nieuwe schrijfroute zonder contract laat de bouw zakken.
 
-   ALLE NEGEN ZIJN GEMETEN, NIET GERADEN. Er is een ronde gedraaid tegen een
+   ALLE DERTIEN ZIJN GEMETEN, NIET GERADEN. Er is een ronde gedraaid tegen een
    draaiende server waarin elke route TWEE keer werd aangeroepen met hetzelfde
    lijf, en waarin het gevolg is nagekeken in de opslag (aantal zaken, lengte
    van de overdrachtenlijst, aantal auditregels). Wat daaruit kwam staat per
@@ -19,7 +20,13 @@
        (open, lees, overdracht). Dat hoort zo, en waarom staat erbij.
      - vijf routes laten na twee aanroepen dezelfde stand achter (veiligheid,
        stand, toestemming, toestemming-weg, sluit).
-     - een route verandert niets (zaken).
+     - drie routes veranderen niets (zaken, deur/steden, deur/stand).
+
+   EN EEN VIERDE VORM, die alleen aan de voordeur voorkomt: deur/intrekken geeft
+   bij een tweede oproep 200 met "dit was al ingetrokken" in plaats van een fout.
+   Dat is ECHTE idempotentie en geen toestandscontrole, en het is een keuze over
+   de mens: wie twijfelt en nog een keer drukt, hoort geen foutmelding te krijgen
+   op het moment dat hij het al zwaar heeft.
 
    EN DE PRECISIE DIE MUTATIECONTRACT.md PAR. 5o EIST. Bij drie van die vijf
    (stand, toestemming-weg, sluit) komt de tweede aanroep terug met een 400 uit
@@ -32,19 +39,15 @@
    ========================================================================== */
 'use strict';
 
-const AFGETEKEND = {
-  door: 'Claude (Opus 5), op grond van een eigen gemeten dubbeltik-ronde tegen een draaiende ' +
-    'server; niet door een mens nagelezen',
-  op: '2026-09-02'
-};
-const OP = '2026-09-02';
+const { AFGETEKEND, OP } = require('./mutatiecontracten-beschermzaak-op');
 const TOEGANG = { klasse: 'AUTHENTICATED' };
 
+
 /* Een route die bij herhaling een tweede handeling doet, en waarom dat hoort. */
-const tweedeHandeling = (route, mutatieId, waarom, gemeten) => [route, {
+const tweedeHandeling = (route, mutatieId, waarom, gemeten, toegang) => [route, {
   mutatieId, herkomst: 'mens',
   semantiek: { klasse: 'nietHerhaalbaar' },
-  toegang: TOEGANG,
+  toegang: toegang || TOEGANG,
   stand: 'INTENTIONALLY_NON_IDEMPOTENT',
   waarom,
   bewijs: { gemeten, op: OP },
@@ -66,7 +69,12 @@ const zelfdeStand = (route, mutatieId, hoe) => [route, {
   afgetekend: AFGETEKEND
 }];
 
-const CONTRACTEN = Object.fromEntries([
+/* De vier van de voordeur staan in ./mutatiecontracten-beschermzaak-deur.js.
+   Ze zijn afgesplitst op de 10 KB van keuringsregel 13, en niet omdat ze minder
+   wegen: ze zijn de enige van deze klasse zonder poort. */
+const DEUR = require('./mutatiecontracten-beschermzaak-deur').CONTRACTEN;
+
+const CONTRACTEN = Object.assign({}, DEUR, Object.fromEntries([
   tweedeHandeling('POST /api/rtfos/bescherming/open', 'rtfos.bescherming.open',
     'Twee meldingen over dezelfde mens zijn twee zorgen, en samenvoegen is hier gevaarlijker dan ' +
     'een dubbele zaak: wie ze samenvoegt, laat de tweede melding verdwijnen in het dossier van de ' +
@@ -124,6 +132,6 @@ const CONTRACTEN = Object.fromEntries([
     },
     afgetekend: AFGETEKEND
   }]
-]);
+]));
 
-module.exports = { CONTRACTEN };
+module.exports = { CONTRACTEN, AFGETEKEND, OP };

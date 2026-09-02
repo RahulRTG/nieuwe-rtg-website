@@ -71,6 +71,7 @@ const R = [
   ['steun', 'Steun voor jou', 'gevoel', 'tiener', '/apps/foundation/steun.html', 'Een luisterend oor en echte hulplijnen, altijd bereikbaar.'],
   ['hulpwijzer', 'Hulpwijzer', 'gevoel', 'gezin', '/apps/foundation/hulpwijzer.html', 'Welke hulp bestaat er, en waar klop je aan? Alles op een rij.'],
   ['onveilig', 'Als je niet veilig bent', 'gevoel', 'gezin', '/apps/foundation/onveilig.html', 'Waar je gratis terechtkunt bij geweld, misbruik, uitbuiting of geen slaapplek.'],
+  ['wegwijzer', 'Zelf iets in gang zetten', 'gevoel', 'gezin', '/apps/foundation/wegwijzer.html', 'Zonder account en zonder je naam een hulpvraag achterlaten, met een code om hem in te trekken.'],
 
   // ---- geld & later ----
   ['zakgeld', 'Zakgeld', 'geld', 'kind', '/apps/foundation/zakgeld.html', 'Het zakgeldpotje: sparen voor iets, samen bijgehouden.'],

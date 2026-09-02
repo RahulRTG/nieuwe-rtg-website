@@ -190,8 +190,20 @@ deuren.
 **En daar zit de scherpste bevinding van deze ronde.**
 <!--getal:wekkers.functieUitToch-->3<!--/getal--> ingangen doen het werk van een functie zonder langs
 haar schakelaar te komen. De functie `ov-mail-binnen` heet *"post van buiten
-aannemen"* en gaat pas op trede 6 open; de SMTP-ontvanger op de eigen poort neemt
-vanaf trede 0 gewoon post aan. Op het bord staat uit, en de post komt binnen.
+aannemen"* en gaat pas op trede 6 open; de SMTP-ontvanger op de eigen poort komt
+langs geen enkele schakelaar. **Met de voorwaarde erbij**, want die hoort er:
+IMAP en SMTP-in starten alleen als de beheerder hun poort zet — `luister-poorten.js`
+doet dat met opzet niet vanzelf, want een mailpoort die overal openstaat is een
+deur die niemand heeft besloten open te zetten. STUN staat wél altijd aan, maar
+zijn functie `kern-live` gaat al op trede 0 open.
+
+**En dat is niet gebleven bij een bewering.** De tredeproef zet die twee poorten
+zelf open en klopt aan: op trede 0 antwoordt SMTP met `220 rtg-mail RTG Mail
+klaar` en IMAP met `* OK RTG Mail IMAP klaar`, terwijl beide functies uit staan.
+<!--getal:trede.ingangLekken-->2<!--/getal--> gemeten lekken, op trede 0 tot en met 5 — en nul op
+trede 6, waar die functies aan staan. Die tegenproef is wat zegt dat deze meter
+over de poort gaat en niet over ruis. Luisteren is de opstelling; **antwoorden**
+is het werk, en alleen dat telt.
 
 Dat is een **bevinding en geen uitzondering**: hij heeft een eigen teller die
 niet daalt door er een reden bij te schrijven, en `test/wekkers.test.js` draait de

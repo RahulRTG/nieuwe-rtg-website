@@ -29,7 +29,7 @@
     "toetsenOngevoeligPct": 1,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
-    "ratelTanden": 60,
+    "ratelTanden": 61,
     "metingenZonderRatel": 33,
     "ladderRaak": 0,
     "ladderNietGeprobeerd": 1,
@@ -54,7 +54,8 @@
     "activeringOnbepaald": 3,
     "activeringZonderReden": 0,
     "wekkersFunctieUitToch": 3,
-    "wekkersZonderTrede": 0
+    "wekkersZonderTrede": 0,
+    "tredeIngangLekken": 2
   },
   "notities": [
     {
@@ -1346,7 +1347,8 @@
     "activeringOnbepaald": "2026-09-02",
     "activeringZonderReden": "2026-09-02",
     "wekkersFunctieUitToch": "2026-09-02",
-    "wekkersZonderTrede": "2026-09-02"
+    "wekkersZonderTrede": "2026-09-02",
+    "tredeIngangLekken": "2026-09-02"
   },
   "uitzonderingen": [
     {

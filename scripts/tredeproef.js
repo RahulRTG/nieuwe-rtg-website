@@ -212,6 +212,18 @@ function oordeelStap({ aanInTrede, status, voedingMist, klaar, geldUit, code }) 
   return { geslaagd: status !== null && status < 400 && klaar !== false, onvoltooid: false };
 }
 
+/* HET OORDEEL OVER EEN INGANG BUITEN HTTP, apart en puur -- om dezelfde reden
+   als oordeelStap: wat in meet() staat, staat achter een server en is niet te
+   toetsen.
+
+   Het lek is niet "hij luistert" maar "hij ANTWOORDT terwijl zijn functie uit
+   staat". Luisteren is de opstelling; antwoorden is het werk. En een ingang die
+   stil blijft terwijl zijn functie AAN staat is geen lek maar een tekort van de
+   opstelling -- dat wordt apart gemeld en niet als groen weggeschreven. */
+function oordeelIngang({ antwoordde, functieAan }) {
+  return { lek: !!antwoordde && !functieAan, stilTerwijlAan: !antwoordde && !!functieAan };
+}
+
 /* Hoeveel routes er ECHT worden aangeklopt, per soort. Een steekproef en geen
    volledigheid: zie de kop. Het getal staat hier zodat het in de uitslag mee
    kan, want een steekproef zonder omvang is een anekdote. */
@@ -276,6 +288,23 @@ async function meet(tredeId) {
      fail-closed weigeren). Een proef die hem niet zet, laat trede 3 betalingen
      doen die daar niet horen -- en meldt dan groen over een belofte die hij niet
      heeft beproefd. Hij moet vóór het laden staan. */
+  /* DE INGANGEN BUITEN HTTP GAAN HIER MET OPZET OPEN.
+
+     WEKKERS.json zegt STATISCH dat de SMTP-ontvanger en de IMAP-server het werk
+     van een functie doen zonder langs haar schakelaar te komen. Dat is een
+     bewering over code; dit is de waarneming. Ze starten alleen met hun poort
+     gezet (opzet/luister-poorten.js, en dat is een bewuste keuze daar), dus zet
+     de proef ze open -- anders meet hij een deur die dicht zit en meldt hij
+     groen over een vraag die hij niet heeft gesteld.
+
+     Dat maakt deze proef strenger dan de standaardopstelling, en dat hoort:
+     wie die poorten in productie opent, hoort te weten wat er dan gebeurt. */
+  const mailPoort = vrijePoort(), imapPoort = vrijePoort();
+  process.env.MAIL_IN_POORT = String(mailPoort);
+  process.env.MAIL_IN_HOST = '127.0.0.1';
+  process.env.IMAP_POORT = String(imapPoort);
+  process.env.IMAP_HOST = '127.0.0.1';
+
   const tredeNr = functies.FASES.findIndex(f => f.id === tredeId);
   const geldNr = functies.FASES.findIndex(f => f.id === 'fundament');
   const geldAan = tredeNr >= geldNr;
@@ -419,6 +448,31 @@ async function meet(tredeId) {
       status, ...oordeel, pogingen });
   }
 
+  /* ---- DE INGANGEN BUITEN HTTP: antwoorden ze terwijl hun functie uit staat? ---- */
+  const klopAanPoort = (poort) => new Promise((klaar) => {
+    const net = require('net');
+    const sok = net.connect({ port: poort, host: '127.0.0.1' });
+    let af = false;
+    const eind = (antwoord) => { if (af) return; af = true; try { sok.destroy(); } catch (e) {} klaar(antwoord); };
+    const t = setTimeout(() => eind(null), 2500);
+    sok.on('data', (b) => { clearTimeout(t); eind(String(b).slice(0, 60).trim()); });
+    sok.on('error', () => { clearTimeout(t); eind(null); });
+    sok.on('close', () => { clearTimeout(t); eind(null); });
+  });
+
+  const ingangen = [];
+  for (const ing of [
+    { bestand: 'server/smtp-in-server.js', functie: 'ov-mail-binnen', poort: mailPoort, wat: 'post van buiten aannemen (SMTP)' },
+    { bestand: 'server/imap-server.js', functie: 'ov-werkmail', poort: imapPoort, wat: 'een postvak vrijgeven (IMAP)' }
+  ]) {
+    const antwoord = await klopAanPoort(ing.poort);
+    const functieAan = aan.has(ing.functie);
+    /* HET LEK IS: HIJ ANTWOORDT TERWIJL ZIJN FUNCTIE UIT STAAT. Niet "hij
+       luistert" -- luisteren is de opstelling, antwoorden is het werk. */
+    ingangen.push({ ...ing, antwoord, antwoordde: !!antwoord, functieAan,
+      ...oordeelIngang({ antwoordde: !!antwoord, functieAan }) });
+  }
+
   /* Een route buiten de trede hoort 503 te geven. Een ANDER antwoord is de
      bevinding -- ook een 404 of een 401: dan is de poort niet gepasseerd maar
      omzeild, en dat wil je weten. Een null (tijd om, verbinding weg) is geen
@@ -459,6 +513,10 @@ async function meet(tredeId) {
       aanInTrede: r.aanInTrede, verwacht: r.verwacht, status: r.status, geslaagd: r.geslaagd,
       onvoltooid: !!r.onvoltooid, reden: r.reden || null, pogingen: r.pogingen || 0 })),
     rondgangKreegSessie: !!token,
+    ingangen,
+    ingangLekken: ingangen.filter(i => i.lek).length,
+    ingangStilTerwijlAan: ingangen.filter(i => i.stilTerwijlAan).length,
+    ingangenUitleg: 'de SMTP- en IMAP-poort worden door deze proef met opzet opengezet (ze starten anders niet); een LEK is: hij antwoordt terwijl zijn functie op deze trede uit staat. De STUN-server staat hier niet in -- die praat UDP, en zijn functie kern-live gaat al op trede 0 open.',
     routesGeraakt: geraakt.size,
     rondgangDektNiet: 'alles wat een EIGEN ACCOUNT eist (de korte inlog geeft een pas-sessie zonder account, dus /api/ik weigert terecht), en alles wat een TWEEDE MENS eist -- een gesprek, een verbinding, een uitnodiging. member-dm valt daaronder: die route vraagt een withKey en een actieve verbinding, en is met een enkele sessie niet te beproeven.',
     watDitNietDoet: 'de rondgang loopt niet door bestellen, betalen en een bevestiging -- die horen bij hogere treden en vragen een zaak, een kassa en een betaalrail. En alles hier is HTTP: cron, bus en AI-gereedschap komen er niet langs.'
@@ -519,6 +577,12 @@ function rapport(r) {
   L.push(`    ${r.rondgangGezakt} van de ${r.rondgangStappen} stappen zakt` +
     (r.rondgangKreegSessie ? '' : '  <-- en er kwam geen sessie tot stand, dus alles erna zegt niets'));
   L.push('');
+  L.push('  DE INGANGEN BUITEN HTTP (met hun poort met opzet opengezet)');
+  for (const i of r.ingangen)
+    L.push(`    ${i.lek ? 'LEK ' : 'ok  '}  ${i.antwoordde ? 'antwoordt' : 'stil     '}  functie ${i.functieAan ? 'aan' : 'uit'}  ` +
+      `${i.wat.padEnd(30)} [${i.functie}]` + (i.antwoord ? '  "' + i.antwoord + '"' : ''));
+  L.push(`    ${r.ingangLekken} lek(ken): een ingang die antwoordt terwijl zijn functie uit staat.`);
+  L.push('');
   L.push(`  ${r.routesGeraakt} verschillende routes zijn tijdens de proef werkelijk aangeraakt.`);
   L.push('');
   L.push('  WAT DEZE PROEF NIET DOET: ' + r.watDitNietDoet);
@@ -565,7 +629,7 @@ function tabel(treden) {
   const L = [];
   L.push('ALLE TREDEN -- wat staat er open, en lekt er iets');
   L.push('');
-  L.push('  trede                              functies   routes open   dicht   zuiver   beproefd  rondgang  onvoltooid');
+  L.push('  trede                              functies   routes open   dicht   zuiver   beproefd  rondgang  onvoltooid  ingang');
   for (const t of treden) {
     L.push('    ' + t.tredeNaam.padEnd(32) +
       String(t.functiesAan + '/' + t.functiesTotaal).padStart(9) +
@@ -573,7 +637,8 @@ function tabel(treden) {
       String(t.routesBuitenTrede).padStart(8) +
       String(t.zuiverLekken).padStart(9) +
       String(t.beproefdNiet503).padStart(11) +
-      String(t.rondgangGezakt).padStart(10) + String(t.rondgangOnvoltooid).padStart(11));
+      String(t.rondgangGezakt).padStart(10) + String(t.rondgangOnvoltooid).padStart(11) +
+      String(t.ingangLekken).padStart(9));
   }
   L.push('');
   L.push('  zuiver = routes buiten de trede die de schakelkast niet dichtzet (alle routes).');
@@ -590,6 +655,7 @@ if (require.main === module && process.argv.includes('--alle')) {
     routesInTrede: t.routesInTrede, routesBuitenTrede: t.routesBuitenTrede,
     zuiverLekken: t.zuiverLekken, beproefdNiet503: t.beproefdNiet503,
     rondgangGezakt: t.rondgangGezakt, rondgangOnvoltooid: t.rondgangOnvoltooid,
+    ingangLekken: t.ingangLekken,
     beproefdVoorDeSchakelaar: t.beproefdVoorDeSchakelaar })) };
   fs.writeFileSync(path.join(WORTEL, 'TREDEPROEF.json'), JSON.stringify(uit, null, 2) + '\n');
   process.stdout.write(rapport(hoofd) + '\n\n' + tabel(treden) + '\n\nVastgelegd in TREDEPROEF.json\n');
@@ -607,4 +673,4 @@ if (require.main === module && process.argv.includes('--alle')) {
   }).catch(e => { process.stderr.write('de tredeproef kon niet draaien: ' + (e && e.stack || e) + '\n'); process.exit(2); });
 }
 
-module.exports = { meet, rapport, tabel, indeling, steekproef, oordeelStap, VOOR_DE_SCHAKELAAR, isVoorDeSchakelaar, RONDGANG };
+module.exports = { meet, rapport, tabel, indeling, steekproef, oordeelStap, oordeelIngang, VOOR_DE_SCHAKELAAR, isVoorDeSchakelaar, RONDGANG };

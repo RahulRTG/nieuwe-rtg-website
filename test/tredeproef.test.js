@@ -138,6 +138,20 @@ test('3d. de drie uitkomsten van een stap lopen niet door elkaar', () => {
     { geslaagd: false, onvoltooid: false }, 'en een geslaagde betaling onder trede 4 is precies wat niet mag');
 });
 
+test('3e. een ingang buiten HTTP lekt als hij ANTWOORDT met zijn functie uit', () => {
+  /* Luisteren is de opstelling, antwoorden is het werk. De SMTP-ontvanger van
+     dit huis zegt "220 rtg-mail RTG Mail klaar" terwijl ov-mail-binnen op trede
+     0 uit staat -- dat is de waarneming waar deze meter voor bestaat. */
+  const o = T.oordeelIngang;
+  assert.deepEqual(o({ antwoordde: true, functieAan: false }), { lek: true, stilTerwijlAan: false });
+  assert.deepEqual(o({ antwoordde: true, functieAan: true }), { lek: false, stilTerwijlAan: false });
+  assert.deepEqual(o({ antwoordde: false, functieAan: false }), { lek: false, stilTerwijlAan: false });
+  /* En de andere kant: stil terwijl de functie aan staat is geen lek maar een
+     tekort van de opstelling, en dat wordt apart gemeld in plaats van als groen
+     weggeschreven. */
+  assert.deepEqual(o({ antwoordde: false, functieAan: true }), { lek: false, stilTerwijlAan: true });
+});
+
 test('4. elke trede noemt bestaande functies, en trede 0 is de kleinste', () => {
   /* De catalogus toetst dit al bij het laden; hier staat het als de aanname die
      de proef MAAKT. Zakt deze toets, dan meet de proef een trede die niet

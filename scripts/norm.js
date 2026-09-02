@@ -201,6 +201,18 @@ const METERS = [
      `wekkersZonderTrede` telt de ingangen waarvan niet te zeggen is wanneer ze
      horen te werken. Staat op nul; stijgt zodra iemand een ingang toevoegt die
      aan geen enkele trede hangt. */
+  /* DE GEMETEN KANT VAN DIEZELFDE VRAAG (TREDEPROEF.json).
+
+     wekkersFunctieUitToch is een uitspraak over CODE: deze ingang komt niet
+     langs de schakelaar. tredeIngangLekken is de WAARNEMING: de proef zet de
+     SMTP- en IMAP-poort met opzet open, klopt aan, en kijkt of er antwoord komt
+     terwijl die functie op trede 0 uit staat. Er komt antwoord -- "220 rtg-mail
+     RTG Mail klaar" en "* OK RTG Mail IMAP klaar".
+
+     Luisteren is de opstelling, ANTWOORDEN is het werk; alleen het tweede telt
+     hier. Op trede 6 staan die functies aan en is het getal nul, en dat is de
+     tegenproef dat deze meter over de poort gaat en niet over ruis. */
+  { sleutel: 'tredeIngangLekken', richting: 'omlaag', wat: 'ingangen buiten HTTP die op trede 0 antwoorden terwijl hun functie uit staat (uit TREDEPROEF.json)' },
   { sleutel: 'wekkersFunctieUitToch', richting: 'omlaag', wat: 'ingangen buiten HTTP die het werk van een functie doen zonder langs haar schakelaar te komen (uit WEKKERS.json)' },
   { sleutel: 'wekkersZonderTrede', richting: 'omlaag', wat: 'ingangen buiten HTTP waarvan geen trede te bepalen is (uit WEKKERS.json)' },
   { sleutel: 'wekkersOnverklaard', richting: 'omlaag', wat: 'wekkers (klok/bus) die geen enkele functie raakt en niet verklaard zijn (uit WEKKERS.json)' },
@@ -672,14 +684,15 @@ function leesWekkers(pad, veld) {
 /* De rondgang uit dezelfde vastgelegde proef, met zijn pad als parameter en
    werpend bij een ontbrekend getal -- zelfde afspraak als de drie hierboven.
    Nul zou hier "elke stap slaagt" betekenen. */
-function leesRondgang(pad) {
+function leesRondgang(pad, veld) {
   let a;
   try { a = JSON.parse(fs.readFileSync(pad, 'utf8')); }
   catch (e) { throw new Error('TREDEPROEF.json ontbreekt of is stuk (' + e.message + '); draai npm run tredeproef:vast'); }
-  if (!a || typeof a.rondgangGezakt !== 'number') {
-    throw new Error('TREDEPROEF.json draagt geen rondgangGezakt; een meter zonder invoer is geen meter');
+  const naam = veld || 'rondgangGezakt';
+  if (!a || typeof a[naam] !== 'number') {
+    throw new Error('TREDEPROEF.json draagt geen ' + naam + '; een meter zonder invoer is geen meter');
   }
-  return a.rondgangGezakt;
+  return a[naam];
 }
 
 function meet(bronnen) {
@@ -899,6 +912,7 @@ function meet(bronnen) {
   const wekkersFunctieUitToch = leesWekkers(path.join(WORTEL, 'WEKKERS.json'), 'functieUitMaarUitvoerbaar');
   const wekkersZonderTrede = leesWekkers(path.join(WORTEL, 'WEKKERS.json'), 'zonderTrede');
   const tredeRondgangGezakt = leesRondgang(path.join(WORTEL, 'TREDEPROEF.json'));
+  const tredeIngangLekken = leesRondgang(path.join(WORTEL, 'TREDEPROEF.json'), 'ingangLekken');
 
   /* De deuren naar db.data uit dezelfde bron als het losse script, om dezelfde
      reden als hierboven: een tweede implementatie loopt binnen een week uiteen. */
@@ -988,6 +1002,7 @@ function meet(bronnen) {
     activeringZonderReden,
     tredeLekken,
     tredeRondgangGezakt,
+    tredeIngangLekken,
     wekkersOnverklaard,
     wekkersFunctieUitToch,
     wekkersZonderTrede,

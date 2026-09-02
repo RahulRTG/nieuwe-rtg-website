@@ -88,6 +88,8 @@ const GETALLEN = {
     wat: 'routes die op trede 0 openstaan' },
   'trede.lekken': { bron: 'TREDEPROEF.json', veld: 'zuiverLekken',
     wat: 'routes buiten trede 0 die de schakelkast niet dichtzet' },
+  'trede.ingangLekken': { bron: 'TREDEPROEF.json', veld: 'ingangLekken',
+    wat: 'ingangen buiten HTTP die op trede 0 antwoorden terwijl hun functie uit staat' },
   'wekkers.totaal': { bron: 'WEKKERS.json', veld: 'wekkers',
     wat: 'plekken die werk kunnen beginnen zonder dat iemand een pad opvraagt' },
   'wekkers.onverklaard': { bron: 'WEKKERS.json', veld: 'ongeschakeld',

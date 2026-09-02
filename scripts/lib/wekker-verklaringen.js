@@ -102,9 +102,12 @@ module.exports = [
      Deze staan hier NIET om ze weg te verklaren. Ze zijn geteld, met de functie
      erbij die ze in werkelijkheid uitvoeren. */
   { bestand: 'server/smtp-in-server.js', vertegenwoordigt: 'ov-mail-binnen',
-    reden: 'de SMTP-ontvanger op de eigen poort is de tweede weg waarlangs post van buiten binnenkomt; hij raadpleegt geen enkele schakelaar, dus met ov-mail-binnen UIT komt de post alsnog binnen' },
+    voorwaarde: 'alleen met MAIL_IN_POORT gezet',
+    reden: 'de SMTP-ontvanger op de eigen poort is de tweede weg waarlangs post van buiten binnenkomt en hij raadpleegt geen enkele schakelaar: met ov-mail-binnen UIT komt de post alsnog binnen. WEL alleen als de beheerder MAIL_IN_POORT zet -- opzet/luister-poorten.js doet dat met opzet niet vanzelf, want een mailpoort die overal openstaat is een deur die niemand heeft besloten open te zetten' },
   { bestand: 'server/imap-server.js', vertegenwoordigt: 'ov-werkmail',
-    reden: 'de IMAP-server geeft een postvak vrij aan een mailprogramma, buiten elke route om; wat op het bord over mail wordt geschakeld, raakt deze weg niet' },
+    voorwaarde: 'alleen met IMAP_POORT gezet',
+    reden: 'de IMAP-server geeft een postvak vrij aan een mailprogramma, buiten elke route om; wat op het bord over mail wordt geschakeld raakt deze weg niet. Ook hij start alleen als de beheerder zijn poort zet' },
   { bestand: 'server/stun.js', vertegenwoordigt: 'kern-live',
-    reden: 'de eigen STUN-server bedient de ICE-kant van bellen; /api/ice hangt aan kern-live, de UDP-poort aan niets' }
+    voorwaarde: 'altijd, tenzij STUN_UIT=1',
+    reden: 'de eigen STUN-server bedient de ICE-kant van bellen; /api/ice hangt aan kern-live, de UDP-poort aan niets. Hij staat WEL standaard aan -- maar kern-live gaat al op trede 0 open, dus hier loopt de schakelaar niet achter op de deur' }
 ];

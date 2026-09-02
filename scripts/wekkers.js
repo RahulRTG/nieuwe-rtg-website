@@ -140,7 +140,7 @@ function meet() {
     const v = w.functies === 0 && verklaard.get(w.bestand);
     if (!v) continue;
     w.verklaard = v.reden;
-    if (v.vertegenwoordigt) w.vertegenwoordigt = v.vertegenwoordigt;
+    if (v.vertegenwoordigt) { w.vertegenwoordigt = v.vertegenwoordigt; w.voorwaarde = v.voorwaarde || 'altijd'; }
   }
   const ongeschakeld = wekkers.filter(w => w.functies === 0 && !w.verklaard);
   const ongeschakeldVerklaard = wekkers.filter(w => w.functies === 0 && w.verklaard && !w.vertegenwoordigt);
@@ -180,7 +180,16 @@ function meet() {
     ongeschakeldVerklaard: ongeschakeldVerklaard.length,
     functieUitMaarUitvoerbaar: functieUitMaarUitvoerbaar.length,
     functieUitMaarUitvoerbaarLijst: functieUitMaarUitvoerbaar.map(w =>
-      w.bestand + ' doet het werk van ' + w.vertegenwoordigt + (w.trede ? ' (opent op trede ' + w.trede + ')' : '') ),
+      w.bestand + ' doet het werk van ' + w.vertegenwoordigt + (w.trede ? ' (opent op trede ' + w.trede + ')' : '') +
+      ' -- ' + (w.voorwaarde || 'altijd')),
+    /* DE VOORWAARDE HOORT ERBIJ, en dat is geen detail. "De post komt binnen
+       terwijl het bord uit zegt" is iets anders dan "de post komt binnen ALS de
+       beheerder de mailpoort heeft opengezet". Die eerste zin stond hier een
+       ronde lang en hij was te sterk: opzet/luister-poorten.js start IMAP en
+       SMTP-in alleen met hun poort gezet, met zoveel woorden omdat een mailpoort
+       die overal vanzelf openstaat een deur is die niemand heeft besloten open
+       te zetten. */
+    functieUitMaarUitvoerbaarAltijd: functieUitMaarUitvoerbaar.filter(w => (w.voorwaarde || 'altijd').startsWith('altijd')).length,
     zonderTrede: zonderTrede.length,
     zonderTredeLijst: zonderTrede.map(w => w.soort + '  ' + w.bestand).sort(),
     verklaringenOngebruikt: [...verklaard.keys()].filter(b => !wekkers.some(w => w.bestand === b)),

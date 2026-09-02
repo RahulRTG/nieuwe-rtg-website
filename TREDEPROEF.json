@@ -226,6 +226,33 @@
     }
   ],
   "rondgangKreegSessie": true,
+  "ingangen": [
+    {
+      "bestand": "server/smtp-in-server.js",
+      "functie": "ov-mail-binnen",
+      "poort": 43675,
+      "wat": "post van buiten aannemen (SMTP)",
+      "antwoord": "220 rtg-mail RTG Mail klaar",
+      "antwoordde": true,
+      "functieAan": false,
+      "lek": true,
+      "stilTerwijlAan": false
+    },
+    {
+      "bestand": "server/imap-server.js",
+      "functie": "ov-werkmail",
+      "poort": 35707,
+      "wat": "een postvak vrijgeven (IMAP)",
+      "antwoord": "* OK RTG Mail IMAP klaar",
+      "antwoordde": true,
+      "functieAan": false,
+      "lek": true,
+      "stilTerwijlAan": false
+    }
+  ],
+  "ingangLekken": 2,
+  "ingangStilTerwijlAan": 0,
+  "ingangenUitleg": "de SMTP- en IMAP-poort worden door deze proef met opzet opengezet (ze starten anders niet); een LEK is: hij antwoordt terwijl zijn functie op deze trede uit staat. De STUN-server staat hier niet in -- die praat UDP, en zijn functie kern-live gaat al op trede 0 open.",
   "routesGeraakt": 35,
   "rondgangDektNiet": "alles wat een EIGEN ACCOUNT eist (de korte inlog geeft een pas-sessie zonder account, dus /api/ik weigert terecht), en alles wat een TWEEDE MENS eist -- een gesprek, een verbinding, een uitnodiging. member-dm valt daaronder: die route vraagt een withKey en een actieve verbinding, en is met een enkele sessie niet te beproeven.",
   "watDitNietDoet": "de rondgang loopt niet door bestellen, betalen en een bevestiging -- die horen bij hogere treden en vragen een zaak, een kassa en een betaalrail. En alles hier is HTTP: cron, bus en AI-gereedschap komen er niet langs.",
@@ -240,6 +267,7 @@
       "beproefdNiet503": 0,
       "rondgangGezakt": 0,
       "rondgangOnvoltooid": 0,
+      "ingangLekken": 2,
       "beproefdVoorDeSchakelaar": 0
     },
     {
@@ -252,6 +280,7 @@
       "beproefdNiet503": 0,
       "rondgangGezakt": 0,
       "rondgangOnvoltooid": 0,
+      "ingangLekken": 2,
       "beproefdVoorDeSchakelaar": 0
     },
     {
@@ -264,6 +293,7 @@
       "beproefdNiet503": 0,
       "rondgangGezakt": 0,
       "rondgangOnvoltooid": 0,
+      "ingangLekken": 2,
       "beproefdVoorDeSchakelaar": 0
     },
     {
@@ -276,6 +306,7 @@
       "beproefdNiet503": 0,
       "rondgangGezakt": 0,
       "rondgangOnvoltooid": 0,
+      "ingangLekken": 2,
       "beproefdVoorDeSchakelaar": 0
     },
     {
@@ -288,6 +319,7 @@
       "beproefdNiet503": 0,
       "rondgangGezakt": 0,
       "rondgangOnvoltooid": 0,
+      "ingangLekken": 2,
       "beproefdVoorDeSchakelaar": 1
     },
     {
@@ -300,6 +332,7 @@
       "beproefdNiet503": 0,
       "rondgangGezakt": 0,
       "rondgangOnvoltooid": 0,
+      "ingangLekken": 2,
       "beproefdVoorDeSchakelaar": 1
     },
     {
@@ -312,6 +345,7 @@
       "beproefdNiet503": 0,
       "rondgangGezakt": 0,
       "rondgangOnvoltooid": 0,
+      "ingangLekken": 0,
       "beproefdVoorDeSchakelaar": 0
     }
   ]

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-02T10:49:50.129Z",
-    "commit": "7592a0a2",
+    "op": "2026-09-02T14:58:43.432Z",
+    "commit": "b32cb6e1",
     "boomVuil": true,
     "node": "v22.22.2"
   },
@@ -6686,6 +6686,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 8,
       "scherp": "gezakt"
+    },
+    "tredeproef.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/tredeproef.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 3
     },
     "trio-kleef.test.js": {
       "soort": "puur",

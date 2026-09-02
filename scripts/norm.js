@@ -136,6 +136,20 @@ const METERS = [
      ACTIVERING.json niet ververst, bevriest deze meter. `npm run
      activering:vast` is wat hem bijwerkt. */
   { sleutel: 'activeringOndergrens', richting: 'omlaag', wat: 'functies waarvan de activeringsenvelop een ondergrens is (uit ACTIVERING.json)' },
+  /* DE LEKKEN VAN DE ONDERSTE TREDE (TREDEPROEF.json).
+
+     Een route die buiten trede 0 valt en tóch antwoordt. Staat vandaag op nul
+     en hoort daar te blijven: dit is het getal waarop de belofte rust dat een
+     kleine livegang ook werkelijk klein is. Hij telt de twee uitslagen van de
+     proef bij elkaar op -- de zuivere (alle routes, de beslissing) en de
+     beproefde (een steekproef, de bedrading) -- en dat mag hier omdat allebei
+     nul horen te zijn; een som van twee nullen verbergt niets. De uitslagen
+     zelf blijven in TREDEPROEF.json apart staan.
+
+     Leest, net als activeringOndergrens, het vastgelegde bestand: de proef start
+     een server en klopt zestig routes aan, en dat hoort niet in een ratel die
+     bij elke push draait. `npm run tredeproef:vast` ververst hem. */
+  { sleutel: 'tredeLekken', richting: 'omlaag', wat: 'routes buiten trede 0 die tóch antwoorden (uit TREDEPROEF.json)' },
   /* DE DEUREN NAAR db.data (scripts/deuren.js).
 
      De contractlaag is de enige weg naar een andere opslag, en de afbouw die
@@ -564,6 +578,20 @@ function leesActivering(pad) {
   return a.perGraad.ondergrens;
 }
 
+/* De lezer van TREDEPROEF.json, met zijn pad als parameter -- zelfde afspraak
+   en zelfde reden als leesActivering(). Werpt bij een ontbrekend of stuk
+   bestand: nul zou hier "geen enkel lek" betekenen, en dat is de gevaarlijkste
+   uitspraak die deze meter kan doen als er niets gemeten is. */
+function leesTredeproef(pad) {
+  let a;
+  try { a = JSON.parse(fs.readFileSync(pad, 'utf8')); }
+  catch (e) { throw new Error('TREDEPROEF.json ontbreekt of is stuk (' + e.message + '); draai npm run tredeproef:vast'); }
+  if (!a || typeof a.zuiverLekken !== 'number' || typeof a.beproefdNiet503 !== 'number') {
+    throw new Error('TREDEPROEF.json draagt geen zuiverLekken/beproefdNiet503; een meter zonder invoer is geen meter');
+  }
+  return a.zuiverLekken + a.beproefdNiet503;
+}
+
 function meet(bronnen) {
   /* DE KEURING GEEFT EXITCODE 1 ZODRA HIJ IETS VINDT, en dat is precies zijn
      werk. execFileSync gooit daar standaard op, dus meet() klapte om op het
@@ -774,6 +802,7 @@ function meet(bronnen) {
      zakt de meter in plaats van stil nul te melden -- nul zou hier "alles is
      gemeten" betekenen en dat is het tegenovergestelde van onbekend. */
   const activeringOndergrens = leesActivering(path.join(WORTEL, 'ACTIVERING.json'));
+  const tredeLekken = leesTredeproef(path.join(WORTEL, 'TREDEPROEF.json'));
 
   /* De deuren naar db.data uit dezelfde bron als het losse script, om dezelfde
      reden als hierboven: een tweede implementatie loopt binnen een week uiteen. */
@@ -859,6 +888,7 @@ function meet(bronnen) {
     routesNietSchakelbaar,
     verstrengelingOnverklaard,
     activeringOndergrens,
+    tredeLekken,
     bronBlindeBestanden,
     delenZonderOnderwerp,
     dbDeuren: deuren.deuren,
@@ -1194,6 +1224,6 @@ function main() {
 }
 
 if (require.main === module) process.exit(main());
-module.exports = { meet, leesNorm, METERS, schoon, traagsteTanden, heeftEinde, dagenTussen, oordeel, leesActivering,
+module.exports = { meet, leesNorm, METERS, schoon, traagsteTanden, heeftEinde, dagenTussen, oordeel, leesActivering, leesTredeproef,
   PRESTATIEMETERS, leesPrestatie, bron, PRESTATIEBESTAND, telOngeijkt, telInlineStijl, telSkips,
   telBewijslaag };

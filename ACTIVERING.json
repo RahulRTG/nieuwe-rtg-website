@@ -10,6 +10,5881 @@
   "routesZonderEigenaar": 0,
   "randenOnvindbaar": 0,
   "knopenTotaal": 849,
+  "perDomein": [
+    {
+      "domein": "domein:util",
+      "functies": 194,
+      "welke": [
+        "arrival",
+        "avondos",
+        "bedrijf",
+        "bestellen",
+        "betalen",
+        "bk-bezorgen",
+        "bk-eten",
+        "bk-reiswijzer",
+        "bk-reizen",
+        "bk-ritten",
+        "bk-tickets",
+        "charter",
+        "clips",
+        "command-besturen",
+        "command-doen",
+        "command-zien",
+        "commerce",
+        "dagmetingen",
+        "doelen",
+        "dom-agenda",
+        "dom-appstore",
+        "dom-appstore-uitgever",
+        "dom-asset",
+        "dom-bank-advies",
+        "dom-bank-incasso",
+        "dom-bank-inzicht",
+        "dom-bank-krediet",
+        "dom-bank-passen",
+        "dom-bank-rekening-open",
+        "dom-bank-sepa",
+        "dom-bank-spaardoel",
+        "dom-bank-storten",
+        "dom-bank-vastelasten",
+        "dom-bank-zakelijk",
+        "dom-bestanden",
+        "dom-boeken",
+        "dom-care",
+        "dom-doos",
+        "dom-eigendomein",
+        "dom-facturen",
+        "dom-fluister",
+        "dom-foutmelder",
+        "dom-galerij",
+        "dom-gemeente",
+        "dom-genootschap",
+        "dom-home",
+        "dom-kmar",
+        "dom-kosten",
+        "dom-lab",
+        "dom-labfonds",
+        "dom-leerstof",
+        "dom-les",
+        "dom-livinglab",
+        "dom-livinglab-bewoner",
+        "dom-lucht",
+        "dom-mall",
+        "dom-meet",
+        "dom-metier",
+        "dom-muziek",
+        "dom-nav",
+        "dom-notities",
+        "dom-onboarding",
+        "dom-onderwijs",
+        "dom-overheid",
+        "dom-partner-uitbetaling",
+        "dom-pay-tegoed",
+        "dom-pay-tegoed-zaak",
+        "dom-pay-terug",
+        "dom-pay-vooraf",
+        "dom-pay-wallet",
+        "dom-plaats",
+        "dom-reisbureau",
+        "dom-rekening",
+        "dom-residentie",
+        "dom-rtfkantoor",
+        "dom-rtfos",
+        "dom-rtgid",
+        "dom-samen",
+        "dom-site",
+        "dom-sport",
+        "dom-thuis",
+        "dom-vak",
+        "dom-veiligheid",
+        "dom-verkoop",
+        "dom-wallet",
+        "dom-werkplek",
+        "dom-werkvloer",
+        "flits",
+        "foundation",
+        "foundation-school",
+        "fs-gast",
+        "fs-terrein",
+        "fs-werk",
+        "gastos",
+        "gedachten",
+        "geldwereld",
+        "gemoed",
+        "gewoonten",
+        "ghost",
+        "gld-aitegoed",
+        "gld-cadeau",
+        "gld-claims",
+        "gld-munt",
+        "gld-prijsgarantie",
+        "gld-prijzen",
+        "gld-rekening",
+        "groothandel",
+        "instantreality",
+        "kantoorpakket",
+        "kern-berichten",
+        "kern-comm",
+        "kern-gids",
+        "kern-klok",
+        "kern-live",
+        "kern-locatie",
+        "kern-meldingen",
+        "kern-memo",
+        "kern-rahul",
+        "kern-state",
+        "kern-taal",
+        "kern-waardering",
+        "levenos",
+        "life",
+        "mediaos",
+        "medicijnen",
+        "member",
+        "member-werk",
+        "mobiliteit",
+        "noodkaart",
+        "office",
+        "ondernemersos",
+        "onderweg",
+        "ontmoetingen",
+        "oog",
+        "ov",
+        "ov-aandacht",
+        "ov-bijles",
+        "ov-browser",
+        "ov-kantoorgesprek",
+        "ov-krant",
+        "ov-mail-binnen",
+        "ov-media",
+        "ov-spar",
+        "ov-stad",
+        "ov-suppliers",
+        "ov-werkmail",
+        "ov-zorgprofiel",
+        "paspoort",
+        "podium",
+        "privekantoor",
+        "rechterhand",
+        "retail",
+        "rtf-contacten",
+        "rtgone",
+        "salon",
+        "socialewereld",
+        "spellen",
+        "staff",
+        "stuur",
+        "supplier",
+        "supplier-apply",
+        "supplier-events",
+        "supplier-finance",
+        "supplier-pos",
+        "supplier-ride",
+        "supplier-rooms",
+        "supplier-salon",
+        "tenant",
+        "tg-aanmeld",
+        "tg-account",
+        "tg-gegevens",
+        "tg-inlog",
+        "tg-link",
+        "tg-pin",
+        "tg-sso",
+        "tg-zegel",
+        "theater",
+        "tickets",
+        "tijdlijn",
+        "training",
+        "vakbewijs",
+        "verhuur",
+        "verificatie",
+        "verzorging",
+        "voeding",
+        "vonk",
+        "wbw",
+        "webauthn",
+        "wereld",
+        "werk-rtf",
+        "werving",
+        "zaakregie",
+        "zaakregie-beheer",
+        "zakelijk"
+      ]
+    },
+    {
+      "domein": "domein:bedrijf",
+      "functies": 193,
+      "welke": [
+        "arrival",
+        "avondos",
+        "bedrijf",
+        "bestellen",
+        "betalen",
+        "bk-bezorgen",
+        "bk-eten",
+        "bk-reiswijzer",
+        "bk-reizen",
+        "bk-ritten",
+        "bk-tickets",
+        "charter",
+        "clips",
+        "command-besturen",
+        "command-doen",
+        "command-zien",
+        "commerce",
+        "dagmetingen",
+        "doelen",
+        "dom-agenda",
+        "dom-appstore",
+        "dom-appstore-uitgever",
+        "dom-asset",
+        "dom-bank-advies",
+        "dom-bank-incasso",
+        "dom-bank-inzicht",
+        "dom-bank-krediet",
+        "dom-bank-passen",
+        "dom-bank-rekening-open",
+        "dom-bank-sepa",
+        "dom-bank-spaardoel",
+        "dom-bank-storten",
+        "dom-bank-vastelasten",
+        "dom-bank-zakelijk",
+        "dom-bestanden",
+        "dom-boeken",
+        "dom-care",
+        "dom-doos",
+        "dom-eigendomein",
+        "dom-facturen",
+        "dom-fluister",
+        "dom-foutmelder",
+        "dom-galerij",
+        "dom-gemeente",
+        "dom-genootschap",
+        "dom-home",
+        "dom-kmar",
+        "dom-kosten",
+        "dom-lab",
+        "dom-labfonds",
+        "dom-leerstof",
+        "dom-les",
+        "dom-livinglab",
+        "dom-livinglab-bewoner",
+        "dom-lucht",
+        "dom-mall",
+        "dom-meet",
+        "dom-metier",
+        "dom-muziek",
+        "dom-nav",
+        "dom-notities",
+        "dom-onboarding",
+        "dom-onderwijs",
+        "dom-overheid",
+        "dom-partner-uitbetaling",
+        "dom-pay-tegoed",
+        "dom-pay-tegoed-zaak",
+        "dom-pay-terug",
+        "dom-pay-vooraf",
+        "dom-pay-wallet",
+        "dom-plaats",
+        "dom-reisbureau",
+        "dom-rekening",
+        "dom-residentie",
+        "dom-rtfkantoor",
+        "dom-rtfos",
+        "dom-rtgid",
+        "dom-samen",
+        "dom-site",
+        "dom-sport",
+        "dom-thuis",
+        "dom-vak",
+        "dom-veiligheid",
+        "dom-verkoop",
+        "dom-wallet",
+        "dom-werkplek",
+        "dom-werkvloer",
+        "flits",
+        "foundation",
+        "foundation-school",
+        "fs-gast",
+        "fs-terrein",
+        "fs-werk",
+        "gastos",
+        "gedachten",
+        "geldwereld",
+        "gemoed",
+        "gewoonten",
+        "ghost",
+        "gld-aitegoed",
+        "gld-cadeau",
+        "gld-claims",
+        "gld-munt",
+        "gld-prijsgarantie",
+        "gld-prijzen",
+        "gld-rekening",
+        "groothandel",
+        "instantreality",
+        "kantoorpakket",
+        "kern-berichten",
+        "kern-comm",
+        "kern-gids",
+        "kern-klok",
+        "kern-live",
+        "kern-locatie",
+        "kern-meldingen",
+        "kern-memo",
+        "kern-rahul",
+        "kern-state",
+        "kern-taal",
+        "kern-waardering",
+        "levenos",
+        "life",
+        "mediaos",
+        "medicijnen",
+        "member",
+        "member-werk",
+        "mobiliteit",
+        "noodkaart",
+        "office",
+        "ondernemersos",
+        "onderweg",
+        "ontmoetingen",
+        "oog",
+        "ov",
+        "ov-aandacht",
+        "ov-bijles",
+        "ov-browser",
+        "ov-kantoorgesprek",
+        "ov-krant",
+        "ov-mail-binnen",
+        "ov-media",
+        "ov-spar",
+        "ov-stad",
+        "ov-suppliers",
+        "ov-werkmail",
+        "ov-zorgprofiel",
+        "paspoort",
+        "podium",
+        "privekantoor",
+        "rechterhand",
+        "retail",
+        "rtf-contacten",
+        "rtgone",
+        "salon",
+        "socialewereld",
+        "spellen",
+        "staff",
+        "stuur",
+        "supplier",
+        "supplier-events",
+        "supplier-finance",
+        "supplier-pos",
+        "supplier-ride",
+        "supplier-rooms",
+        "supplier-salon",
+        "tenant",
+        "tg-aanmeld",
+        "tg-account",
+        "tg-gegevens",
+        "tg-inlog",
+        "tg-link",
+        "tg-pin",
+        "tg-sso",
+        "tg-zegel",
+        "theater",
+        "tickets",
+        "tijdlijn",
+        "training",
+        "vakbewijs",
+        "verhuur",
+        "verificatie",
+        "verzorging",
+        "voeding",
+        "vonk",
+        "wbw",
+        "webauthn",
+        "wereld",
+        "werk-rtf",
+        "werving",
+        "zaakregie",
+        "zaakregie-beheer",
+        "zakelijk"
+      ]
+    },
+    {
+      "domein": "domein:geld",
+      "functies": 193,
+      "welke": [
+        "arrival",
+        "avondos",
+        "bedrijf",
+        "bestellen",
+        "betalen",
+        "bk-bezorgen",
+        "bk-eten",
+        "bk-reiswijzer",
+        "bk-reizen",
+        "bk-ritten",
+        "bk-tickets",
+        "charter",
+        "clips",
+        "command-besturen",
+        "command-doen",
+        "command-zien",
+        "commerce",
+        "dagmetingen",
+        "doelen",
+        "dom-agenda",
+        "dom-appstore",
+        "dom-appstore-uitgever",
+        "dom-asset",
+        "dom-bank-advies",
+        "dom-bank-incasso",
+        "dom-bank-inzicht",
+        "dom-bank-krediet",
+        "dom-bank-passen",
+        "dom-bank-rekening-open",
+        "dom-bank-sepa",
+        "dom-bank-spaardoel",
+        "dom-bank-storten",
+        "dom-bank-vastelasten",
+        "dom-bank-zakelijk",
+        "dom-bestanden",
+        "dom-boeken",
+        "dom-care",
+        "dom-doos",
+        "dom-eigendomein",
+        "dom-facturen",
+        "dom-fluister",
+        "dom-foutmelder",
+        "dom-galerij",
+        "dom-gemeente",
+        "dom-genootschap",
+        "dom-home",
+        "dom-kmar",
+        "dom-kosten",
+        "dom-lab",
+        "dom-labfonds",
+        "dom-leerstof",
+        "dom-les",
+        "dom-livinglab",
+        "dom-livinglab-bewoner",
+        "dom-lucht",
+        "dom-mall",
+        "dom-meet",
+        "dom-metier",
+        "dom-muziek",
+        "dom-nav",
+        "dom-notities",
+        "dom-onboarding",
+        "dom-onderwijs",
+        "dom-overheid",
+        "dom-partner-uitbetaling",
+        "dom-pay-tegoed",
+        "dom-pay-tegoed-zaak",
+        "dom-pay-terug",
+        "dom-pay-vooraf",
+        "dom-pay-wallet",
+        "dom-plaats",
+        "dom-reisbureau",
+        "dom-rekening",
+        "dom-residentie",
+        "dom-rtfkantoor",
+        "dom-rtfos",
+        "dom-rtgid",
+        "dom-samen",
+        "dom-site",
+        "dom-sport",
+        "dom-thuis",
+        "dom-vak",
+        "dom-veiligheid",
+        "dom-verkoop",
+        "dom-wallet",
+        "dom-werkplek",
+        "dom-werkvloer",
+        "flits",
+        "foundation",
+        "foundation-school",
+        "fs-gast",
+        "fs-terrein",
+        "fs-werk",
+        "gastos",
+        "gedachten",
+        "geldwereld",
+        "gemoed",
+        "gewoonten",
+        "ghost",
+        "gld-aitegoed",
+        "gld-cadeau",
+        "gld-claims",
+        "gld-munt",
+        "gld-prijsgarantie",
+        "gld-prijzen",
+        "gld-rekening",
+        "groothandel",
+        "instantreality",
+        "kantoorpakket",
+        "kern-berichten",
+        "kern-comm",
+        "kern-gids",
+        "kern-klok",
+        "kern-live",
+        "kern-locatie",
+        "kern-meldingen",
+        "kern-memo",
+        "kern-rahul",
+        "kern-state",
+        "kern-taal",
+        "kern-waardering",
+        "levenos",
+        "life",
+        "mediaos",
+        "medicijnen",
+        "member",
+        "member-werk",
+        "mobiliteit",
+        "noodkaart",
+        "office",
+        "ondernemersos",
+        "onderweg",
+        "ontmoetingen",
+        "oog",
+        "ov",
+        "ov-aandacht",
+        "ov-bijles",
+        "ov-browser",
+        "ov-kantoorgesprek",
+        "ov-krant",
+        "ov-mail-binnen",
+        "ov-media",
+        "ov-spar",
+        "ov-stad",
+        "ov-suppliers",
+        "ov-werkmail",
+        "ov-zorgprofiel",
+        "paspoort",
+        "podium",
+        "privekantoor",
+        "rechterhand",
+        "retail",
+        "rtf-contacten",
+        "rtgone",
+        "salon",
+        "socialewereld",
+        "spellen",
+        "staff",
+        "stuur",
+        "supplier",
+        "supplier-events",
+        "supplier-finance",
+        "supplier-pos",
+        "supplier-ride",
+        "supplier-rooms",
+        "supplier-salon",
+        "tenant",
+        "tg-aanmeld",
+        "tg-account",
+        "tg-gegevens",
+        "tg-inlog",
+        "tg-link",
+        "tg-pin",
+        "tg-sso",
+        "tg-zegel",
+        "theater",
+        "tickets",
+        "tijdlijn",
+        "training",
+        "vakbewijs",
+        "verhuur",
+        "verificatie",
+        "verzorging",
+        "voeding",
+        "vonk",
+        "wbw",
+        "webauthn",
+        "wereld",
+        "werk-rtf",
+        "werving",
+        "zaakregie",
+        "zaakregie-beheer",
+        "zakelijk"
+      ]
+    },
+    {
+      "domein": "domein:command",
+      "functies": 192,
+      "welke": [
+        "arrival",
+        "avondos",
+        "bedrijf",
+        "bestellen",
+        "betalen",
+        "bk-bezorgen",
+        "bk-eten",
+        "bk-reiswijzer",
+        "bk-reizen",
+        "bk-ritten",
+        "bk-tickets",
+        "charter",
+        "clips",
+        "command-besturen",
+        "command-doen",
+        "command-zien",
+        "commerce",
+        "dagmetingen",
+        "doelen",
+        "dom-agenda",
+        "dom-appstore",
+        "dom-appstore-uitgever",
+        "dom-asset",
+        "dom-bank-advies",
+        "dom-bank-incasso",
+        "dom-bank-inzicht",
+        "dom-bank-krediet",
+        "dom-bank-passen",
+        "dom-bank-rekening-open",
+        "dom-bank-sepa",
+        "dom-bank-spaardoel",
+        "dom-bank-storten",
+        "dom-bank-vastelasten",
+        "dom-bank-zakelijk",
+        "dom-bestanden",
+        "dom-boeken",
+        "dom-care",
+        "dom-doos",
+        "dom-eigendomein",
+        "dom-facturen",
+        "dom-fluister",
+        "dom-foutmelder",
+        "dom-galerij",
+        "dom-gemeente",
+        "dom-genootschap",
+        "dom-home",
+        "dom-kmar",
+        "dom-kosten",
+        "dom-lab",
+        "dom-labfonds",
+        "dom-leerstof",
+        "dom-les",
+        "dom-livinglab",
+        "dom-livinglab-bewoner",
+        "dom-lucht",
+        "dom-mall",
+        "dom-meet",
+        "dom-metier",
+        "dom-muziek",
+        "dom-nav",
+        "dom-notities",
+        "dom-onboarding",
+        "dom-onderwijs",
+        "dom-overheid",
+        "dom-partner-uitbetaling",
+        "dom-pay-tegoed",
+        "dom-pay-tegoed-zaak",
+        "dom-pay-terug",
+        "dom-pay-vooraf",
+        "dom-pay-wallet",
+        "dom-plaats",
+        "dom-reisbureau",
+        "dom-rekening",
+        "dom-residentie",
+        "dom-rtfkantoor",
+        "dom-rtfos",
+        "dom-rtgid",
+        "dom-samen",
+        "dom-site",
+        "dom-sport",
+        "dom-thuis",
+        "dom-vak",
+        "dom-veiligheid",
+        "dom-verkoop",
+        "dom-wallet",
+        "dom-werkplek",
+        "dom-werkvloer",
+        "flits",
+        "foundation",
+        "fs-gast",
+        "fs-terrein",
+        "fs-werk",
+        "gastos",
+        "gedachten",
+        "geldwereld",
+        "gemoed",
+        "gewoonten",
+        "ghost",
+        "gld-aitegoed",
+        "gld-cadeau",
+        "gld-claims",
+        "gld-munt",
+        "gld-prijsgarantie",
+        "gld-prijzen",
+        "gld-rekening",
+        "groothandel",
+        "instantreality",
+        "kantoorpakket",
+        "kern-berichten",
+        "kern-comm",
+        "kern-gids",
+        "kern-klok",
+        "kern-live",
+        "kern-locatie",
+        "kern-meldingen",
+        "kern-memo",
+        "kern-rahul",
+        "kern-state",
+        "kern-taal",
+        "kern-waardering",
+        "levenos",
+        "life",
+        "mediaos",
+        "medicijnen",
+        "member",
+        "member-werk",
+        "mobiliteit",
+        "noodkaart",
+        "office",
+        "ondernemersos",
+        "onderweg",
+        "ontmoetingen",
+        "oog",
+        "ov",
+        "ov-aandacht",
+        "ov-bijles",
+        "ov-browser",
+        "ov-kantoorgesprek",
+        "ov-krant",
+        "ov-mail-binnen",
+        "ov-media",
+        "ov-spar",
+        "ov-stad",
+        "ov-suppliers",
+        "ov-werkmail",
+        "ov-zorgprofiel",
+        "paspoort",
+        "podium",
+        "privekantoor",
+        "rechterhand",
+        "retail",
+        "rtf-contacten",
+        "rtgone",
+        "salon",
+        "socialewereld",
+        "spellen",
+        "staff",
+        "stuur",
+        "supplier",
+        "supplier-events",
+        "supplier-finance",
+        "supplier-pos",
+        "supplier-ride",
+        "supplier-rooms",
+        "supplier-salon",
+        "tenant",
+        "tg-aanmeld",
+        "tg-account",
+        "tg-gegevens",
+        "tg-inlog",
+        "tg-link",
+        "tg-pin",
+        "tg-sso",
+        "tg-zegel",
+        "theater",
+        "tickets",
+        "tijdlijn",
+        "training",
+        "vakbewijs",
+        "verhuur",
+        "verificatie",
+        "verzorging",
+        "voeding",
+        "vonk",
+        "wbw",
+        "webauthn",
+        "wereld",
+        "werk-rtf",
+        "werving",
+        "zaakregie",
+        "zaakregie-beheer",
+        "zakelijk"
+      ]
+    },
+    {
+      "domein": "domein:wereld",
+      "functies": 192,
+      "welke": [
+        "arrival",
+        "avondos",
+        "bedrijf",
+        "bestellen",
+        "betalen",
+        "bk-bezorgen",
+        "bk-eten",
+        "bk-reiswijzer",
+        "bk-reizen",
+        "bk-ritten",
+        "bk-tickets",
+        "charter",
+        "clips",
+        "command-besturen",
+        "command-doen",
+        "command-zien",
+        "commerce",
+        "dagmetingen",
+        "doelen",
+        "dom-agenda",
+        "dom-appstore",
+        "dom-appstore-uitgever",
+        "dom-asset",
+        "dom-bank-advies",
+        "dom-bank-incasso",
+        "dom-bank-inzicht",
+        "dom-bank-krediet",
+        "dom-bank-passen",
+        "dom-bank-rekening-open",
+        "dom-bank-sepa",
+        "dom-bank-spaardoel",
+        "dom-bank-storten",
+        "dom-bank-vastelasten",
+        "dom-bank-zakelijk",
+        "dom-bestanden",
+        "dom-boeken",
+        "dom-care",
+        "dom-doos",
+        "dom-eigendomein",
+        "dom-facturen",
+        "dom-fluister",
+        "dom-foutmelder",
+        "dom-galerij",
+        "dom-gemeente",
+        "dom-genootschap",
+        "dom-home",
+        "dom-kmar",
+        "dom-kosten",
+        "dom-lab",
+        "dom-labfonds",
+        "dom-leerstof",
+        "dom-les",
+        "dom-livinglab",
+        "dom-livinglab-bewoner",
+        "dom-lucht",
+        "dom-mall",
+        "dom-meet",
+        "dom-metier",
+        "dom-muziek",
+        "dom-nav",
+        "dom-notities",
+        "dom-onboarding",
+        "dom-onderwijs",
+        "dom-overheid",
+        "dom-partner-uitbetaling",
+        "dom-pay-tegoed",
+        "dom-pay-tegoed-zaak",
+        "dom-pay-terug",
+        "dom-pay-vooraf",
+        "dom-pay-wallet",
+        "dom-plaats",
+        "dom-reisbureau",
+        "dom-rekening",
+        "dom-residentie",
+        "dom-rtfkantoor",
+        "dom-rtfos",
+        "dom-rtgid",
+        "dom-samen",
+        "dom-site",
+        "dom-sport",
+        "dom-thuis",
+        "dom-vak",
+        "dom-veiligheid",
+        "dom-verkoop",
+        "dom-wallet",
+        "dom-werkplek",
+        "dom-werkvloer",
+        "flits",
+        "foundation",
+        "fs-gast",
+        "fs-terrein",
+        "fs-werk",
+        "gastos",
+        "gedachten",
+        "geldwereld",
+        "gemoed",
+        "gewoonten",
+        "ghost",
+        "gld-aitegoed",
+        "gld-cadeau",
+        "gld-claims",
+        "gld-munt",
+        "gld-prijsgarantie",
+        "gld-prijzen",
+        "gld-rekening",
+        "groothandel",
+        "instantreality",
+        "kantoorpakket",
+        "kern-berichten",
+        "kern-comm",
+        "kern-gids",
+        "kern-klok",
+        "kern-live",
+        "kern-locatie",
+        "kern-meldingen",
+        "kern-memo",
+        "kern-rahul",
+        "kern-state",
+        "kern-taal",
+        "kern-waardering",
+        "levenos",
+        "life",
+        "mediaos",
+        "medicijnen",
+        "member",
+        "member-werk",
+        "mobiliteit",
+        "noodkaart",
+        "office",
+        "ondernemersos",
+        "onderweg",
+        "ontmoetingen",
+        "oog",
+        "ov",
+        "ov-aandacht",
+        "ov-bijles",
+        "ov-browser",
+        "ov-kantoorgesprek",
+        "ov-krant",
+        "ov-mail-binnen",
+        "ov-media",
+        "ov-spar",
+        "ov-stad",
+        "ov-suppliers",
+        "ov-werkmail",
+        "ov-zorgprofiel",
+        "paspoort",
+        "podium",
+        "privekantoor",
+        "rechterhand",
+        "retail",
+        "rtf-contacten",
+        "rtgone",
+        "salon",
+        "socialewereld",
+        "spellen",
+        "staff",
+        "stuur",
+        "supplier",
+        "supplier-events",
+        "supplier-finance",
+        "supplier-pos",
+        "supplier-ride",
+        "supplier-rooms",
+        "supplier-salon",
+        "tenant",
+        "tg-aanmeld",
+        "tg-account",
+        "tg-gegevens",
+        "tg-inlog",
+        "tg-link",
+        "tg-pin",
+        "tg-sso",
+        "tg-zegel",
+        "theater",
+        "tickets",
+        "tijdlijn",
+        "training",
+        "vakbewijs",
+        "verhuur",
+        "verificatie",
+        "verzorging",
+        "voeding",
+        "vonk",
+        "wbw",
+        "webauthn",
+        "wereld",
+        "werk-rtf",
+        "werving",
+        "zaakregie",
+        "zaakregie-beheer",
+        "zakelijk"
+      ]
+    },
+    {
+      "domein": "domein:werkcommand",
+      "functies": 192,
+      "welke": [
+        "arrival",
+        "avondos",
+        "bedrijf",
+        "bestellen",
+        "betalen",
+        "bk-bezorgen",
+        "bk-eten",
+        "bk-reiswijzer",
+        "bk-reizen",
+        "bk-ritten",
+        "bk-tickets",
+        "charter",
+        "clips",
+        "command-besturen",
+        "command-doen",
+        "command-zien",
+        "commerce",
+        "dagmetingen",
+        "doelen",
+        "dom-agenda",
+        "dom-appstore",
+        "dom-appstore-uitgever",
+        "dom-asset",
+        "dom-bank-advies",
+        "dom-bank-incasso",
+        "dom-bank-inzicht",
+        "dom-bank-krediet",
+        "dom-bank-passen",
+        "dom-bank-rekening-open",
+        "dom-bank-sepa",
+        "dom-bank-spaardoel",
+        "dom-bank-storten",
+        "dom-bank-vastelasten",
+        "dom-bank-zakelijk",
+        "dom-bestanden",
+        "dom-boeken",
+        "dom-care",
+        "dom-doos",
+        "dom-eigendomein",
+        "dom-facturen",
+        "dom-fluister",
+        "dom-foutmelder",
+        "dom-galerij",
+        "dom-gemeente",
+        "dom-genootschap",
+        "dom-home",
+        "dom-kmar",
+        "dom-kosten",
+        "dom-lab",
+        "dom-labfonds",
+        "dom-leerstof",
+        "dom-les",
+        "dom-livinglab",
+        "dom-livinglab-bewoner",
+        "dom-lucht",
+        "dom-mall",
+        "dom-meet",
+        "dom-metier",
+        "dom-muziek",
+        "dom-nav",
+        "dom-notities",
+        "dom-onboarding",
+        "dom-onderwijs",
+        "dom-overheid",
+        "dom-partner-uitbetaling",
+        "dom-pay-tegoed",
+        "dom-pay-tegoed-zaak",
+        "dom-pay-terug",
+        "dom-pay-vooraf",
+        "dom-pay-wallet",
+        "dom-plaats",
+        "dom-reisbureau",
+        "dom-rekening",
+        "dom-residentie",
+        "dom-rtfkantoor",
+        "dom-rtfos",
+        "dom-rtgid",
+        "dom-samen",
+        "dom-site",
+        "dom-sport",
+        "dom-thuis",
+        "dom-vak",
+        "dom-veiligheid",
+        "dom-verkoop",
+        "dom-wallet",
+        "dom-werkplek",
+        "dom-werkvloer",
+        "flits",
+        "foundation",
+        "fs-gast",
+        "fs-terrein",
+        "fs-werk",
+        "gastos",
+        "gedachten",
+        "geldwereld",
+        "gemoed",
+        "gewoonten",
+        "ghost",
+        "gld-aitegoed",
+        "gld-cadeau",
+        "gld-claims",
+        "gld-munt",
+        "gld-prijsgarantie",
+        "gld-prijzen",
+        "gld-rekening",
+        "groothandel",
+        "instantreality",
+        "kantoorpakket",
+        "kern-berichten",
+        "kern-comm",
+        "kern-gids",
+        "kern-klok",
+        "kern-live",
+        "kern-locatie",
+        "kern-meldingen",
+        "kern-memo",
+        "kern-rahul",
+        "kern-state",
+        "kern-taal",
+        "kern-waardering",
+        "levenos",
+        "life",
+        "mediaos",
+        "medicijnen",
+        "member",
+        "member-werk",
+        "mobiliteit",
+        "noodkaart",
+        "office",
+        "ondernemersos",
+        "onderweg",
+        "ontmoetingen",
+        "oog",
+        "ov",
+        "ov-aandacht",
+        "ov-bijles",
+        "ov-browser",
+        "ov-kantoorgesprek",
+        "ov-krant",
+        "ov-mail-binnen",
+        "ov-media",
+        "ov-spar",
+        "ov-stad",
+        "ov-suppliers",
+        "ov-werkmail",
+        "ov-zorgprofiel",
+        "paspoort",
+        "podium",
+        "privekantoor",
+        "rechterhand",
+        "retail",
+        "rtf-contacten",
+        "rtgone",
+        "salon",
+        "socialewereld",
+        "spellen",
+        "staff",
+        "stuur",
+        "supplier",
+        "supplier-events",
+        "supplier-finance",
+        "supplier-pos",
+        "supplier-ride",
+        "supplier-rooms",
+        "supplier-salon",
+        "tenant",
+        "tg-aanmeld",
+        "tg-account",
+        "tg-gegevens",
+        "tg-inlog",
+        "tg-link",
+        "tg-pin",
+        "tg-sso",
+        "tg-zegel",
+        "theater",
+        "tickets",
+        "tijdlijn",
+        "training",
+        "vakbewijs",
+        "verhuur",
+        "verificatie",
+        "verzorging",
+        "voeding",
+        "vonk",
+        "wbw",
+        "webauthn",
+        "wereld",
+        "werk-rtf",
+        "werving",
+        "zaakregie",
+        "zaakregie-beheer",
+        "zakelijk"
+      ]
+    },
+    {
+      "domein": "domein:eigencollectie",
+      "functies": 117,
+      "welke": [
+        "arrival",
+        "avondos",
+        "bedrijf",
+        "bestellen",
+        "betalen",
+        "bk-bezorgen",
+        "bk-reizen",
+        "bk-ritten",
+        "bk-tickets",
+        "charter",
+        "dagmetingen",
+        "doelen",
+        "dom-bank-advies",
+        "dom-bank-incasso",
+        "dom-bank-inzicht",
+        "dom-bank-krediet",
+        "dom-bank-passen",
+        "dom-bank-rekening-open",
+        "dom-bank-sepa",
+        "dom-bank-spaardoel",
+        "dom-bank-storten",
+        "dom-bank-vastelasten",
+        "dom-bank-zakelijk",
+        "dom-doos",
+        "dom-facturen",
+        "dom-fluister",
+        "dom-genootschap",
+        "dom-home",
+        "dom-lab",
+        "dom-labfonds",
+        "dom-les",
+        "dom-livinglab",
+        "dom-livinglab-bewoner",
+        "dom-lucht",
+        "dom-muziek",
+        "dom-nav",
+        "dom-plaats",
+        "dom-rekening",
+        "dom-rtfkantoor",
+        "dom-samen",
+        "dom-verkoop",
+        "dom-werkplek",
+        "dom-werkvloer",
+        "foundation",
+        "foundation-school",
+        "fs-gast",
+        "fs-terrein",
+        "fs-werk",
+        "gastos",
+        "gedachten",
+        "gemoed",
+        "gewoonten",
+        "gld-aitegoed",
+        "gld-cadeau",
+        "gld-claims",
+        "gld-munt",
+        "gld-prijsgarantie",
+        "gld-prijzen",
+        "gld-rekening",
+        "instantreality",
+        "kantoorpakket",
+        "kern-berichten",
+        "kern-live",
+        "kern-locatie",
+        "kern-meldingen",
+        "kern-rahul",
+        "kern-state",
+        "kern-taal",
+        "kern-waardering",
+        "levenos",
+        "life",
+        "mediaos",
+        "medicijnen",
+        "member",
+        "member-connect",
+        "member-dm",
+        "member-werk",
+        "noodkaart",
+        "office",
+        "ondernemersos",
+        "onderweg",
+        "ontmoetingen",
+        "ov",
+        "ov-aandacht",
+        "ov-browser",
+        "ov-krant",
+        "ov-mail-binnen",
+        "ov-spar",
+        "ov-stad",
+        "ov-suppliers",
+        "ov-zorgprofiel",
+        "rechterhand",
+        "rtf-contacten",
+        "salon",
+        "social",
+        "socialewereld",
+        "spellen",
+        "staff",
+        "supplier",
+        "supplier-events",
+        "supplier-pos",
+        "supplier-ride",
+        "supplier-rooms",
+        "supplier-salon",
+        "tenant",
+        "tg-aanmeld",
+        "tg-account",
+        "tg-inlog",
+        "tg-link",
+        "theater",
+        "tickets",
+        "verhuur",
+        "verificatie",
+        "voeding",
+        "wereld",
+        "werk-rtf",
+        "zakelijk"
+      ]
+    },
+    {
+      "domein": "domein:vakbewijs",
+      "functies": 66,
+      "welke": [
+        "arrival",
+        "avondos",
+        "bedrijf",
+        "bestellen",
+        "betalen",
+        "bk-bezorgen",
+        "bk-reizen",
+        "bk-ritten",
+        "bk-tickets",
+        "charter",
+        "dom-bank-inzicht",
+        "dom-bank-spaardoel",
+        "dom-bank-vastelasten",
+        "dom-doos",
+        "dom-facturen",
+        "dom-verkoop",
+        "dom-wallet",
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "fs-gast",
+        "fs-terrein",
+        "fs-werk",
+        "gastos",
+        "gld-aitegoed",
+        "gld-cadeau",
+        "gld-munt",
+        "gld-prijsgarantie",
+        "gld-rekening",
+        "kern-berichten",
+        "kern-live",
+        "kern-meldingen",
+        "kern-state",
+        "kern-waardering",
+        "member",
+        "member-werk",
+        "office",
+        "ondernemersos",
+        "onderweg",
+        "ontmoetingen",
+        "ov-aandacht",
+        "ov-browser",
+        "ov-krant",
+        "ov-mail-binnen",
+        "ov-suppliers",
+        "rtf-contacten",
+        "salon",
+        "staff",
+        "supplier",
+        "supplier-events",
+        "supplier-pos",
+        "supplier-ride",
+        "supplier-rooms",
+        "supplier-salon",
+        "tenant",
+        "tg-account",
+        "tg-inlog",
+        "tickets",
+        "vakbewijs",
+        "verhuur",
+        "verificatie",
+        "verzorging",
+        "webauthn",
+        "wereld",
+        "werk-rtf",
+        "zakelijk"
+      ]
+    },
+    {
+      "domein": "domein:vakbewijs-aftekenen",
+      "functies": 66,
+      "welke": [
+        "arrival",
+        "avondos",
+        "bedrijf",
+        "bestellen",
+        "betalen",
+        "bk-bezorgen",
+        "bk-reizen",
+        "bk-ritten",
+        "bk-tickets",
+        "charter",
+        "dom-bank-inzicht",
+        "dom-bank-spaardoel",
+        "dom-bank-vastelasten",
+        "dom-doos",
+        "dom-facturen",
+        "dom-verkoop",
+        "dom-wallet",
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "fs-gast",
+        "fs-terrein",
+        "fs-werk",
+        "gastos",
+        "gld-aitegoed",
+        "gld-cadeau",
+        "gld-munt",
+        "gld-prijsgarantie",
+        "gld-rekening",
+        "kern-berichten",
+        "kern-live",
+        "kern-meldingen",
+        "kern-state",
+        "kern-waardering",
+        "member",
+        "member-werk",
+        "office",
+        "ondernemersos",
+        "onderweg",
+        "ontmoetingen",
+        "ov-aandacht",
+        "ov-browser",
+        "ov-krant",
+        "ov-mail-binnen",
+        "ov-suppliers",
+        "rtf-contacten",
+        "salon",
+        "staff",
+        "supplier",
+        "supplier-events",
+        "supplier-pos",
+        "supplier-ride",
+        "supplier-rooms",
+        "supplier-salon",
+        "tenant",
+        "tg-account",
+        "tg-inlog",
+        "tickets",
+        "vakbewijs",
+        "verhuur",
+        "verificatie",
+        "verzorging",
+        "webauthn",
+        "wereld",
+        "werk-rtf",
+        "zakelijk"
+      ]
+    },
+    {
+      "domein": "domein:vakbewijs-nummer",
+      "functies": 66,
+      "welke": [
+        "arrival",
+        "avondos",
+        "bedrijf",
+        "bestellen",
+        "betalen",
+        "bk-bezorgen",
+        "bk-reizen",
+        "bk-ritten",
+        "bk-tickets",
+        "charter",
+        "dom-bank-inzicht",
+        "dom-bank-spaardoel",
+        "dom-bank-vastelasten",
+        "dom-doos",
+        "dom-facturen",
+        "dom-verkoop",
+        "dom-wallet",
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "fs-gast",
+        "fs-terrein",
+        "fs-werk",
+        "gastos",
+        "gld-aitegoed",
+        "gld-cadeau",
+        "gld-munt",
+        "gld-prijsgarantie",
+        "gld-rekening",
+        "kern-berichten",
+        "kern-live",
+        "kern-meldingen",
+        "kern-state",
+        "kern-waardering",
+        "member",
+        "member-werk",
+        "office",
+        "ondernemersos",
+        "onderweg",
+        "ontmoetingen",
+        "ov-aandacht",
+        "ov-browser",
+        "ov-krant",
+        "ov-mail-binnen",
+        "ov-suppliers",
+        "rtf-contacten",
+        "salon",
+        "staff",
+        "supplier",
+        "supplier-events",
+        "supplier-pos",
+        "supplier-ride",
+        "supplier-rooms",
+        "supplier-salon",
+        "tenant",
+        "tg-account",
+        "tg-inlog",
+        "tickets",
+        "vakbewijs",
+        "verhuur",
+        "verificatie",
+        "verzorging",
+        "webauthn",
+        "wereld",
+        "werk-rtf",
+        "zakelijk"
+      ]
+    },
+    {
+      "domein": "domein:vakbewijs-verhuis",
+      "functies": 66,
+      "welke": [
+        "arrival",
+        "avondos",
+        "bedrijf",
+        "bestellen",
+        "betalen",
+        "bk-bezorgen",
+        "bk-reizen",
+        "bk-ritten",
+        "bk-tickets",
+        "charter",
+        "dom-bank-inzicht",
+        "dom-bank-spaardoel",
+        "dom-bank-vastelasten",
+        "dom-doos",
+        "dom-facturen",
+        "dom-verkoop",
+        "dom-wallet",
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "fs-gast",
+        "fs-terrein",
+        "fs-werk",
+        "gastos",
+        "gld-aitegoed",
+        "gld-cadeau",
+        "gld-munt",
+        "gld-prijsgarantie",
+        "gld-rekening",
+        "kern-berichten",
+        "kern-live",
+        "kern-meldingen",
+        "kern-state",
+        "kern-waardering",
+        "member",
+        "member-werk",
+        "office",
+        "ondernemersos",
+        "onderweg",
+        "ontmoetingen",
+        "ov-aandacht",
+        "ov-browser",
+        "ov-krant",
+        "ov-mail-binnen",
+        "ov-suppliers",
+        "rtf-contacten",
+        "salon",
+        "staff",
+        "supplier",
+        "supplier-events",
+        "supplier-pos",
+        "supplier-ride",
+        "supplier-rooms",
+        "supplier-salon",
+        "tenant",
+        "tg-account",
+        "tg-inlog",
+        "tickets",
+        "vakbewijs",
+        "verhuur",
+        "verificatie",
+        "verzorging",
+        "webauthn",
+        "wereld",
+        "werk-rtf",
+        "zakelijk"
+      ]
+    },
+    {
+      "domein": "domein:concern",
+      "functies": 65,
+      "welke": [
+        "arrival",
+        "avondos",
+        "bedrijf",
+        "bestellen",
+        "betalen",
+        "bk-bezorgen",
+        "bk-reizen",
+        "bk-ritten",
+        "bk-tickets",
+        "charter",
+        "dom-bank-inzicht",
+        "dom-bank-spaardoel",
+        "dom-bank-vastelasten",
+        "dom-doos",
+        "dom-facturen",
+        "dom-verkoop",
+        "dom-wallet",
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "fs-gast",
+        "fs-terrein",
+        "fs-werk",
+        "gastos",
+        "gld-aitegoed",
+        "gld-cadeau",
+        "gld-munt",
+        "gld-prijsgarantie",
+        "gld-rekening",
+        "kern-berichten",
+        "kern-live",
+        "kern-meldingen",
+        "kern-state",
+        "kern-waardering",
+        "member",
+        "member-werk",
+        "office",
+        "ondernemersos",
+        "onderweg",
+        "ontmoetingen",
+        "ov-aandacht",
+        "ov-browser",
+        "ov-krant",
+        "ov-mail-binnen",
+        "ov-suppliers",
+        "rtf-contacten",
+        "salon",
+        "staff",
+        "supplier",
+        "supplier-events",
+        "supplier-pos",
+        "supplier-ride",
+        "supplier-rooms",
+        "supplier-salon",
+        "tenant",
+        "tg-account",
+        "tg-inlog",
+        "tickets",
+        "verhuur",
+        "verificatie",
+        "verzorging",
+        "webauthn",
+        "wereld",
+        "werk-rtf",
+        "zakelijk"
+      ]
+    },
+    {
+      "domein": "domein:onderneming",
+      "functies": 65,
+      "welke": [
+        "arrival",
+        "avondos",
+        "bedrijf",
+        "bestellen",
+        "betalen",
+        "bk-bezorgen",
+        "bk-reizen",
+        "bk-ritten",
+        "bk-tickets",
+        "charter",
+        "dom-bank-inzicht",
+        "dom-bank-spaardoel",
+        "dom-bank-vastelasten",
+        "dom-doos",
+        "dom-facturen",
+        "dom-verkoop",
+        "dom-wallet",
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "fs-gast",
+        "fs-terrein",
+        "fs-werk",
+        "gastos",
+        "gld-aitegoed",
+        "gld-cadeau",
+        "gld-munt",
+        "gld-prijsgarantie",
+        "gld-rekening",
+        "kern-berichten",
+        "kern-live",
+        "kern-meldingen",
+        "kern-state",
+        "kern-waardering",
+        "member",
+        "member-werk",
+        "office",
+        "ondernemersos",
+        "onderweg",
+        "ontmoetingen",
+        "ov-aandacht",
+        "ov-browser",
+        "ov-krant",
+        "ov-mail-binnen",
+        "ov-suppliers",
+        "rtf-contacten",
+        "salon",
+        "staff",
+        "supplier",
+        "supplier-events",
+        "supplier-pos",
+        "supplier-ride",
+        "supplier-rooms",
+        "supplier-salon",
+        "tenant",
+        "tg-account",
+        "tg-inlog",
+        "tickets",
+        "verhuur",
+        "verificatie",
+        "verzorging",
+        "webauthn",
+        "wereld",
+        "werk-rtf",
+        "zakelijk"
+      ]
+    },
+    {
+      "domein": "domein:doorgeefjournaal",
+      "functies": 64,
+      "welke": [
+        "arrival",
+        "avondos",
+        "bedrijf",
+        "bestellen",
+        "betalen",
+        "bk-reizen",
+        "bk-ritten",
+        "bk-tickets",
+        "charter",
+        "dom-doos",
+        "dom-facturen",
+        "dom-fluister",
+        "dom-foutmelder",
+        "dom-verkoop",
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "gastos",
+        "gld-aitegoed",
+        "gld-cadeau",
+        "gld-munt",
+        "gld-prijsgarantie",
+        "gld-rekening",
+        "kantoorpakket",
+        "kern-berichten",
+        "kern-live",
+        "kern-locatie",
+        "kern-meldingen",
+        "kern-waardering",
+        "levenos",
+        "member",
+        "member-werk",
+        "office",
+        "ondernemersos",
+        "onderweg",
+        "ontmoetingen",
+        "ov-aandacht",
+        "ov-browser",
+        "ov-mail-binnen",
+        "ov-spar",
+        "ov-stad",
+        "ov-suppliers",
+        "ov-zorgprofiel",
+        "rtf-contacten",
+        "salon",
+        "spellen",
+        "staff",
+        "supplier",
+        "supplier-events",
+        "supplier-pos",
+        "supplier-ride",
+        "supplier-rooms",
+        "supplier-salon",
+        "tenant",
+        "tg-account",
+        "tg-gegevens",
+        "tg-inlog",
+        "tg-sso",
+        "tickets",
+        "verhuur",
+        "verificatie",
+        "wereld",
+        "werk-rtf",
+        "zakelijk"
+      ]
+    },
+    {
+      "domein": "domein:journaalverhuizing",
+      "functies": 64,
+      "welke": [
+        "arrival",
+        "avondos",
+        "bedrijf",
+        "bestellen",
+        "betalen",
+        "bk-reizen",
+        "bk-ritten",
+        "bk-tickets",
+        "charter",
+        "dom-doos",
+        "dom-facturen",
+        "dom-fluister",
+        "dom-foutmelder",
+        "dom-verkoop",
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "gastos",
+        "gld-aitegoed",
+        "gld-cadeau",
+        "gld-munt",
+        "gld-prijsgarantie",
+        "gld-rekening",
+        "kantoorpakket",
+        "kern-berichten",
+        "kern-live",
+        "kern-locatie",
+        "kern-meldingen",
+        "kern-waardering",
+        "levenos",
+        "member",
+        "member-werk",
+        "office",
+        "ondernemersos",
+        "onderweg",
+        "ontmoetingen",
+        "ov-aandacht",
+        "ov-browser",
+        "ov-mail-binnen",
+        "ov-spar",
+        "ov-stad",
+        "ov-suppliers",
+        "ov-zorgprofiel",
+        "rtf-contacten",
+        "salon",
+        "spellen",
+        "staff",
+        "supplier",
+        "supplier-events",
+        "supplier-pos",
+        "supplier-ride",
+        "supplier-rooms",
+        "supplier-salon",
+        "tenant",
+        "tg-account",
+        "tg-gegevens",
+        "tg-inlog",
+        "tg-sso",
+        "tickets",
+        "verhuur",
+        "verificatie",
+        "wereld",
+        "werk-rtf",
+        "zakelijk"
+      ]
+    },
+    {
+      "domein": "domein:journaalvorm",
+      "functies": 64,
+      "welke": [
+        "arrival",
+        "avondos",
+        "bedrijf",
+        "bestellen",
+        "betalen",
+        "bk-reizen",
+        "bk-ritten",
+        "bk-tickets",
+        "charter",
+        "dom-doos",
+        "dom-facturen",
+        "dom-fluister",
+        "dom-foutmelder",
+        "dom-verkoop",
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "gastos",
+        "gld-aitegoed",
+        "gld-cadeau",
+        "gld-munt",
+        "gld-prijsgarantie",
+        "gld-rekening",
+        "kantoorpakket",
+        "kern-berichten",
+        "kern-live",
+        "kern-locatie",
+        "kern-meldingen",
+        "kern-waardering",
+        "levenos",
+        "member",
+        "member-werk",
+        "office",
+        "ondernemersos",
+        "onderweg",
+        "ontmoetingen",
+        "ov-aandacht",
+        "ov-browser",
+        "ov-mail-binnen",
+        "ov-spar",
+        "ov-stad",
+        "ov-suppliers",
+        "ov-zorgprofiel",
+        "rtf-contacten",
+        "salon",
+        "spellen",
+        "staff",
+        "supplier",
+        "supplier-events",
+        "supplier-pos",
+        "supplier-ride",
+        "supplier-rooms",
+        "supplier-salon",
+        "tenant",
+        "tg-account",
+        "tg-gegevens",
+        "tg-inlog",
+        "tg-sso",
+        "tickets",
+        "verhuur",
+        "verificatie",
+        "wereld",
+        "werk-rtf",
+        "zakelijk"
+      ]
+    },
+    {
+      "domein": "domein:muziek-instrumenten",
+      "functies": 61,
+      "welke": [
+        "arrival",
+        "avondos",
+        "bedrijf",
+        "bestellen",
+        "betalen",
+        "bk-reizen",
+        "bk-ritten",
+        "bk-tickets",
+        "charter",
+        "dom-doos",
+        "dom-facturen",
+        "dom-fluister",
+        "dom-muziek",
+        "dom-verkoop",
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "gastos",
+        "gld-aitegoed",
+        "gld-cadeau",
+        "gld-munt",
+        "gld-prijsgarantie",
+        "gld-rekening",
+        "kantoorpakket",
+        "kern-berichten",
+        "kern-live",
+        "kern-locatie",
+        "kern-meldingen",
+        "kern-waardering",
+        "levenos",
+        "member",
+        "member-werk",
+        "office",
+        "ondernemersos",
+        "onderweg",
+        "ontmoetingen",
+        "ov-aandacht",
+        "ov-browser",
+        "ov-mail-binnen",
+        "ov-spar",
+        "ov-suppliers",
+        "ov-zorgprofiel",
+        "rtf-contacten",
+        "salon",
+        "spellen",
+        "staff",
+        "supplier",
+        "supplier-events",
+        "supplier-pos",
+        "supplier-ride",
+        "supplier-rooms",
+        "supplier-salon",
+        "tenant",
+        "tg-account",
+        "tg-inlog",
+        "tickets",
+        "verhuur",
+        "verificatie",
+        "wereld",
+        "werk-rtf",
+        "zakelijk"
+      ]
+    },
+    {
+      "domein": "domein:muziek-stijlen",
+      "functies": 61,
+      "welke": [
+        "arrival",
+        "avondos",
+        "bedrijf",
+        "bestellen",
+        "betalen",
+        "bk-reizen",
+        "bk-ritten",
+        "bk-tickets",
+        "charter",
+        "dom-doos",
+        "dom-facturen",
+        "dom-fluister",
+        "dom-muziek",
+        "dom-verkoop",
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "gastos",
+        "gld-aitegoed",
+        "gld-cadeau",
+        "gld-munt",
+        "gld-prijsgarantie",
+        "gld-rekening",
+        "kantoorpakket",
+        "kern-berichten",
+        "kern-live",
+        "kern-locatie",
+        "kern-meldingen",
+        "kern-waardering",
+        "levenos",
+        "member",
+        "member-werk",
+        "office",
+        "ondernemersos",
+        "onderweg",
+        "ontmoetingen",
+        "ov-aandacht",
+        "ov-browser",
+        "ov-mail-binnen",
+        "ov-spar",
+        "ov-suppliers",
+        "ov-zorgprofiel",
+        "rtf-contacten",
+        "salon",
+        "spellen",
+        "staff",
+        "supplier",
+        "supplier-events",
+        "supplier-pos",
+        "supplier-ride",
+        "supplier-rooms",
+        "supplier-salon",
+        "tenant",
+        "tg-account",
+        "tg-inlog",
+        "tickets",
+        "verhuur",
+        "verificatie",
+        "wereld",
+        "werk-rtf",
+        "zakelijk"
+      ]
+    },
+    {
+      "domein": "domein:werkvormen",
+      "functies": 60,
+      "welke": [
+        "arrival",
+        "avondos",
+        "bedrijf",
+        "bestellen",
+        "betalen",
+        "bk-reizen",
+        "bk-ritten",
+        "bk-tickets",
+        "charter",
+        "dom-doos",
+        "dom-facturen",
+        "dom-fluister",
+        "dom-verkoop",
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "gastos",
+        "gld-aitegoed",
+        "gld-cadeau",
+        "gld-munt",
+        "gld-prijsgarantie",
+        "gld-rekening",
+        "kantoorpakket",
+        "kern-berichten",
+        "kern-live",
+        "kern-locatie",
+        "kern-meldingen",
+        "kern-waardering",
+        "levenos",
+        "member",
+        "member-werk",
+        "office",
+        "ondernemersos",
+        "onderweg",
+        "ontmoetingen",
+        "ov-aandacht",
+        "ov-browser",
+        "ov-mail-binnen",
+        "ov-spar",
+        "ov-suppliers",
+        "ov-zorgprofiel",
+        "rtf-contacten",
+        "salon",
+        "spellen",
+        "staff",
+        "supplier",
+        "supplier-events",
+        "supplier-pos",
+        "supplier-ride",
+        "supplier-rooms",
+        "supplier-salon",
+        "tenant",
+        "tg-account",
+        "tg-inlog",
+        "tickets",
+        "verhuur",
+        "verificatie",
+        "wereld",
+        "werk-rtf",
+        "zakelijk"
+      ]
+    },
+    {
+      "domein": "domein:rahul",
+      "functies": 45,
+      "welke": [
+        "dom-bank-advies",
+        "dom-bank-incasso",
+        "dom-bank-inzicht",
+        "dom-bank-krediet",
+        "dom-bank-passen",
+        "dom-bank-rekening-open",
+        "dom-bank-sepa",
+        "dom-bank-spaardoel",
+        "dom-bank-storten",
+        "dom-bank-vastelasten",
+        "dom-bank-zakelijk",
+        "dom-doos",
+        "dom-fluister",
+        "dom-lab",
+        "dom-livinglab",
+        "dom-livinglab-bewoner",
+        "dom-rekening",
+        "dom-rtfkantoor",
+        "dom-werkplek",
+        "foundation",
+        "geldwereld",
+        "gld-claims",
+        "gld-prijzen",
+        "kantoorpakket",
+        "kern-berichten",
+        "kern-live",
+        "kern-locatie",
+        "kern-meldingen",
+        "kern-rahul",
+        "kern-state",
+        "levenos",
+        "member",
+        "office",
+        "ondernemersos",
+        "ov-spar",
+        "ov-stad",
+        "ov-zorgprofiel",
+        "rechterhand",
+        "rtf-contacten",
+        "socialewereld",
+        "spellen",
+        "staff",
+        "supplier",
+        "supplier-finance",
+        "werk-rtf"
+      ]
+    },
+    {
+      "domein": "domein:rahul-fases",
+      "functies": 45,
+      "welke": [
+        "dom-bank-advies",
+        "dom-bank-incasso",
+        "dom-bank-inzicht",
+        "dom-bank-krediet",
+        "dom-bank-passen",
+        "dom-bank-rekening-open",
+        "dom-bank-sepa",
+        "dom-bank-spaardoel",
+        "dom-bank-storten",
+        "dom-bank-vastelasten",
+        "dom-bank-zakelijk",
+        "dom-doos",
+        "dom-fluister",
+        "dom-lab",
+        "dom-livinglab",
+        "dom-livinglab-bewoner",
+        "dom-rekening",
+        "dom-rtfkantoor",
+        "dom-werkplek",
+        "foundation",
+        "geldwereld",
+        "gld-claims",
+        "gld-prijzen",
+        "kantoorpakket",
+        "kern-berichten",
+        "kern-live",
+        "kern-locatie",
+        "kern-meldingen",
+        "kern-rahul",
+        "kern-state",
+        "levenos",
+        "member",
+        "office",
+        "ondernemersos",
+        "ov-spar",
+        "ov-stad",
+        "ov-zorgprofiel",
+        "rechterhand",
+        "rtf-contacten",
+        "socialewereld",
+        "spellen",
+        "staff",
+        "supplier",
+        "supplier-finance",
+        "werk-rtf"
+      ]
+    },
+    {
+      "domein": "domein:rahul-hart",
+      "functies": 45,
+      "welke": [
+        "dom-bank-advies",
+        "dom-bank-incasso",
+        "dom-bank-inzicht",
+        "dom-bank-krediet",
+        "dom-bank-passen",
+        "dom-bank-rekening-open",
+        "dom-bank-sepa",
+        "dom-bank-spaardoel",
+        "dom-bank-storten",
+        "dom-bank-vastelasten",
+        "dom-bank-zakelijk",
+        "dom-doos",
+        "dom-fluister",
+        "dom-lab",
+        "dom-livinglab",
+        "dom-livinglab-bewoner",
+        "dom-rekening",
+        "dom-rtfkantoor",
+        "dom-werkplek",
+        "foundation",
+        "geldwereld",
+        "gld-claims",
+        "gld-prijzen",
+        "kantoorpakket",
+        "kern-berichten",
+        "kern-live",
+        "kern-locatie",
+        "kern-meldingen",
+        "kern-rahul",
+        "kern-state",
+        "levenos",
+        "member",
+        "office",
+        "ondernemersos",
+        "ov-spar",
+        "ov-stad",
+        "ov-zorgprofiel",
+        "rechterhand",
+        "rtf-contacten",
+        "socialewereld",
+        "spellen",
+        "staff",
+        "supplier",
+        "supplier-finance",
+        "werk-rtf"
+      ]
+    },
+    {
+      "domein": "domein:rahul-omgang",
+      "functies": 45,
+      "welke": [
+        "dom-bank-advies",
+        "dom-bank-incasso",
+        "dom-bank-inzicht",
+        "dom-bank-krediet",
+        "dom-bank-passen",
+        "dom-bank-rekening-open",
+        "dom-bank-sepa",
+        "dom-bank-spaardoel",
+        "dom-bank-storten",
+        "dom-bank-vastelasten",
+        "dom-bank-zakelijk",
+        "dom-doos",
+        "dom-fluister",
+        "dom-lab",
+        "dom-livinglab",
+        "dom-livinglab-bewoner",
+        "dom-rekening",
+        "dom-rtfkantoor",
+        "dom-werkplek",
+        "foundation",
+        "geldwereld",
+        "gld-claims",
+        "gld-prijzen",
+        "kantoorpakket",
+        "kern-berichten",
+        "kern-live",
+        "kern-locatie",
+        "kern-meldingen",
+        "kern-rahul",
+        "kern-state",
+        "levenos",
+        "member",
+        "office",
+        "ondernemersos",
+        "ov-spar",
+        "ov-stad",
+        "ov-zorgprofiel",
+        "rechterhand",
+        "rtf-contacten",
+        "socialewereld",
+        "spellen",
+        "staff",
+        "supplier",
+        "supplier-finance",
+        "werk-rtf"
+      ]
+    },
+    {
+      "domein": "domein:leverancier",
+      "functies": 43,
+      "welke": [
+        "bestellen",
+        "bk-reizen",
+        "bk-tickets",
+        "charter",
+        "dom-agenda",
+        "dom-bank-inzicht",
+        "dom-bank-spaardoel",
+        "dom-bank-vastelasten",
+        "dom-eigendomein",
+        "dom-facturen",
+        "dom-onboarding",
+        "dom-partner-uitbetaling",
+        "dom-pay-tegoed-zaak",
+        "dom-pay-vooraf",
+        "dom-site",
+        "dom-verkoop",
+        "dom-werkvloer",
+        "fs-gast",
+        "fs-terrein",
+        "fs-werk",
+        "gld-rekening",
+        "groothandel",
+        "kern-berichten",
+        "kern-waardering",
+        "member",
+        "mobiliteit",
+        "office",
+        "ondernemersos",
+        "onderweg",
+        "ontmoetingen",
+        "ov",
+        "ov-aandacht",
+        "ov-browser",
+        "ov-suppliers",
+        "salon",
+        "staff",
+        "supplier",
+        "supplier-events",
+        "supplier-rooms",
+        "supplier-salon",
+        "verhuur",
+        "zaakregie",
+        "zaakregie-beheer"
+      ]
+    },
+    {
+      "domein": "domein:fiscaal",
+      "functies": 25,
+      "welke": [
+        "bk-reizen",
+        "dom-appstore",
+        "dom-bank-advies",
+        "dom-bank-incasso",
+        "dom-bank-inzicht",
+        "dom-bank-krediet",
+        "dom-bank-passen",
+        "dom-bank-rekening-open",
+        "dom-bank-sepa",
+        "dom-bank-spaardoel",
+        "dom-bank-storten",
+        "dom-bank-vastelasten",
+        "dom-bank-zakelijk",
+        "dom-kosten",
+        "dom-metier",
+        "dom-rekening",
+        "kern-state",
+        "member",
+        "member-werk",
+        "office",
+        "ondernemersos",
+        "supplier",
+        "supplier-finance",
+        "tg-account",
+        "tg-inlog"
+      ]
+    },
+    {
+      "domein": "domein:motorverbinding",
+      "functies": 25,
+      "welke": [
+        "betalen",
+        "dom-bank-advies",
+        "dom-bank-incasso",
+        "dom-bank-inzicht",
+        "dom-bank-krediet",
+        "dom-bank-passen",
+        "dom-bank-rekening-open",
+        "dom-bank-sepa",
+        "dom-bank-spaardoel",
+        "dom-bank-storten",
+        "dom-bank-vastelasten",
+        "dom-bank-zakelijk",
+        "dom-partner-uitbetaling",
+        "dom-pay-tegoed",
+        "dom-pay-tegoed-zaak",
+        "dom-pay-terug",
+        "dom-pay-vooraf",
+        "dom-pay-wallet",
+        "dom-rekening",
+        "fs-terrein",
+        "fs-werk",
+        "gld-cadeau",
+        "office",
+        "supplier",
+        "supplier-pos"
+      ]
+    },
+    {
+      "domein": "domein:motorzekering",
+      "functies": 25,
+      "welke": [
+        "betalen",
+        "dom-bank-advies",
+        "dom-bank-incasso",
+        "dom-bank-inzicht",
+        "dom-bank-krediet",
+        "dom-bank-passen",
+        "dom-bank-rekening-open",
+        "dom-bank-sepa",
+        "dom-bank-spaardoel",
+        "dom-bank-storten",
+        "dom-bank-vastelasten",
+        "dom-bank-zakelijk",
+        "dom-partner-uitbetaling",
+        "dom-pay-tegoed",
+        "dom-pay-tegoed-zaak",
+        "dom-pay-terug",
+        "dom-pay-vooraf",
+        "dom-pay-wallet",
+        "dom-rekening",
+        "fs-terrein",
+        "fs-werk",
+        "gld-cadeau",
+        "office",
+        "supplier",
+        "supplier-pos"
+      ]
+    },
+    {
+      "domein": "domein:pay",
+      "functies": 25,
+      "welke": [
+        "betalen",
+        "dom-bank-advies",
+        "dom-bank-incasso",
+        "dom-bank-inzicht",
+        "dom-bank-krediet",
+        "dom-bank-passen",
+        "dom-bank-rekening-open",
+        "dom-bank-sepa",
+        "dom-bank-spaardoel",
+        "dom-bank-storten",
+        "dom-bank-vastelasten",
+        "dom-bank-zakelijk",
+        "dom-partner-uitbetaling",
+        "dom-pay-tegoed",
+        "dom-pay-tegoed-zaak",
+        "dom-pay-terug",
+        "dom-pay-vooraf",
+        "dom-pay-wallet",
+        "dom-rekening",
+        "fs-terrein",
+        "fs-werk",
+        "gld-cadeau",
+        "office",
+        "supplier",
+        "supplier-pos"
+      ]
+    },
+    {
+      "domein": "domein:commercie",
+      "functies": 18,
+      "welke": [
+        "bestellen",
+        "bk-reizen",
+        "bk-ritten",
+        "bk-tickets",
+        "dom-thuis",
+        "gld-aitegoed",
+        "gld-claims",
+        "gld-prijsgarantie",
+        "gld-prijzen",
+        "gld-rekening",
+        "kern-state",
+        "member",
+        "office",
+        "onderweg",
+        "ov-suppliers",
+        "supplier",
+        "tg-aanmeld",
+        "tickets"
+      ]
+    },
+    {
+      "domein": "domein:factuur",
+      "functies": 18,
+      "welke": [
+        "betalen",
+        "dom-bank-advies",
+        "dom-bank-incasso",
+        "dom-bank-krediet",
+        "dom-bank-passen",
+        "dom-bank-rekening-open",
+        "dom-bank-sepa",
+        "dom-bank-spaardoel",
+        "dom-bank-storten",
+        "dom-bank-zakelijk",
+        "dom-facturen",
+        "dom-rekening",
+        "gld-munt",
+        "gld-rekening",
+        "office",
+        "supplier",
+        "supplier-finance",
+        "supplier-ride"
+      ]
+    },
+    {
+      "domein": "domein:sociaal",
+      "functies": 18,
+      "welke": [
+        "dom-appstore",
+        "geldwereld",
+        "kern-comm",
+        "kern-live",
+        "kern-meldingen",
+        "kern-rahul",
+        "kern-state",
+        "levenos",
+        "member",
+        "office",
+        "ov-browser",
+        "ov-mail-binnen",
+        "salon",
+        "spellen",
+        "staff",
+        "supplier",
+        "wereld",
+        "zakelijk"
+      ]
+    },
+    {
+      "domein": "domein:gastzorg",
+      "functies": 17,
+      "welke": [
+        "avondos",
+        "bestellen",
+        "bk-reizen",
+        "bk-ritten",
+        "bk-tickets",
+        "charter",
+        "dom-fluister",
+        "dom-verkoop",
+        "gld-rekening",
+        "kern-locatie",
+        "ontmoetingen",
+        "ov-spar",
+        "ov-suppliers",
+        "ov-zorgprofiel",
+        "supplier",
+        "tickets",
+        "verhuur"
+      ]
+    },
+    {
+      "domein": "domein:kosten",
+      "functies": 17,
+      "welke": [
+        "dom-kosten",
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "kantoorpakket",
+        "kern-live",
+        "kern-meldingen",
+        "levenos",
+        "member",
+        "office",
+        "rtf-contacten",
+        "spellen",
+        "supplier",
+        "tg-inlog",
+        "tg-pin",
+        "verificatie",
+        "werk-rtf"
+      ]
+    },
+    {
+      "domein": "domein:link",
+      "functies": 17,
+      "welke": [
+        "dom-appstore",
+        "geldwereld",
+        "kern-live",
+        "kern-meldingen",
+        "levenos",
+        "member",
+        "member-connect",
+        "office",
+        "ov-browser",
+        "ov-mail-binnen",
+        "social",
+        "staff",
+        "supplier",
+        "tg-link",
+        "tg-zegel",
+        "wereld",
+        "zakelijk"
+      ]
+    },
+    {
+      "domein": "domein:mail-publiek",
+      "functies": 16,
+      "welke": [
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "kantoorpakket",
+        "kern-live",
+        "kern-meldingen",
+        "levenos",
+        "member",
+        "office",
+        "rtf-contacten",
+        "spellen",
+        "supplier",
+        "tg-inlog",
+        "tg-pin",
+        "verificatie",
+        "werk-rtf"
+      ]
+    },
+    {
+      "domein": "domein:ssrf",
+      "functies": 16,
+      "welke": [
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "kantoorpakket",
+        "kern-live",
+        "kern-meldingen",
+        "levenos",
+        "member",
+        "office",
+        "rtf-contacten",
+        "spellen",
+        "supplier",
+        "tg-inlog",
+        "tg-pin",
+        "verificatie",
+        "werk-rtf"
+      ]
+    },
+    {
+      "domein": "domein:bank",
+      "functies": 14,
+      "welke": [
+        "dom-bank-advies",
+        "dom-bank-incasso",
+        "dom-bank-inzicht",
+        "dom-bank-krediet",
+        "dom-bank-passen",
+        "dom-bank-rekening-open",
+        "dom-bank-sepa",
+        "dom-bank-spaardoel",
+        "dom-bank-storten",
+        "dom-bank-vastelasten",
+        "dom-bank-zakelijk",
+        "dom-rekening",
+        "office",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:veilig",
+      "functies": 14,
+      "welke": [
+        "dom-genootschap",
+        "dom-metier",
+        "kern-berichten",
+        "kern-live",
+        "kern-meldingen",
+        "kern-state",
+        "kern-waardering",
+        "member",
+        "member-connect",
+        "member-dm",
+        "ov-browser",
+        "salon",
+        "supplier",
+        "supplier-salon"
+      ]
+    },
+    {
+      "domein": "domein:belasting",
+      "functies": 13,
+      "welke": [
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "kantoorpakket",
+        "kern-live",
+        "kern-meldingen",
+        "levenos",
+        "member",
+        "office",
+        "rtf-contacten",
+        "spellen",
+        "supplier",
+        "werk-rtf"
+      ]
+    },
+    {
+      "domein": "domein:betekenis",
+      "functies": 13,
+      "welke": [
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "kantoorpakket",
+        "kern-live",
+        "kern-meldingen",
+        "levenos",
+        "member",
+        "office",
+        "rtf-contacten",
+        "spellen",
+        "supplier",
+        "werk-rtf"
+      ]
+    },
+    {
+      "domein": "domein:bijles",
+      "functies": 13,
+      "welke": [
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "kantoorpakket",
+        "kern-live",
+        "kern-meldingen",
+        "levenos",
+        "member",
+        "office",
+        "rtf-contacten",
+        "spellen",
+        "supplier",
+        "werk-rtf"
+      ]
+    },
+    {
+      "domein": "domein:ervaring",
+      "functies": 13,
+      "welke": [
+        "avondos",
+        "bestellen",
+        "bk-reizen",
+        "bk-tickets",
+        "dom-care",
+        "dom-reisbureau",
+        "gld-rekening",
+        "kern-meldingen",
+        "ondernemersos",
+        "ov-suppliers",
+        "paspoort",
+        "retail",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:koppelvlak",
+      "functies": 13,
+      "welke": [
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "kantoorpakket",
+        "kern-live",
+        "kern-meldingen",
+        "levenos",
+        "member",
+        "office",
+        "rtf-contacten",
+        "spellen",
+        "supplier",
+        "werk-rtf"
+      ]
+    },
+    {
+      "domein": "domein:koppelvlak-kaart-eduapi",
+      "functies": 13,
+      "welke": [
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "kantoorpakket",
+        "kern-live",
+        "kern-meldingen",
+        "levenos",
+        "member",
+        "office",
+        "rtf-contacten",
+        "spellen",
+        "supplier",
+        "werk-rtf"
+      ]
+    },
+    {
+      "domein": "domein:koppelvlak-kaarten",
+      "functies": 13,
+      "welke": [
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "kantoorpakket",
+        "kern-live",
+        "kern-meldingen",
+        "levenos",
+        "member",
+        "office",
+        "rtf-contacten",
+        "spellen",
+        "supplier",
+        "werk-rtf"
+      ]
+    },
+    {
+      "domein": "domein:leerstof",
+      "functies": 13,
+      "welke": [
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "kantoorpakket",
+        "kern-live",
+        "kern-meldingen",
+        "levenos",
+        "member",
+        "office",
+        "rtf-contacten",
+        "spellen",
+        "supplier",
+        "werk-rtf"
+      ]
+    },
+    {
+      "domein": "domein:leerstof-bibliotheek",
+      "functies": 13,
+      "welke": [
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "kantoorpakket",
+        "kern-live",
+        "kern-meldingen",
+        "levenos",
+        "member",
+        "office",
+        "rtf-contacten",
+        "spellen",
+        "supplier",
+        "werk-rtf"
+      ]
+    },
+    {
+      "domein": "domein:leerstof-dag",
+      "functies": 13,
+      "welke": [
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "kantoorpakket",
+        "kern-live",
+        "kern-meldingen",
+        "levenos",
+        "member",
+        "office",
+        "rtf-contacten",
+        "spellen",
+        "supplier",
+        "werk-rtf"
+      ]
+    },
+    {
+      "domein": "domein:leerstof-data",
+      "functies": 13,
+      "welke": [
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "kantoorpakket",
+        "kern-live",
+        "kern-meldingen",
+        "levenos",
+        "member",
+        "office",
+        "rtf-contacten",
+        "spellen",
+        "supplier",
+        "werk-rtf"
+      ]
+    },
+    {
+      "domein": "domein:leerstof-denkfout",
+      "functies": 13,
+      "welke": [
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "kantoorpakket",
+        "kern-live",
+        "kern-meldingen",
+        "levenos",
+        "member",
+        "office",
+        "rtf-contacten",
+        "spellen",
+        "supplier",
+        "werk-rtf"
+      ]
+    },
+    {
+      "domein": "domein:leerstof-denkfout-lijst",
+      "functies": 13,
+      "welke": [
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "kantoorpakket",
+        "kern-live",
+        "kern-meldingen",
+        "levenos",
+        "member",
+        "office",
+        "rtf-contacten",
+        "spellen",
+        "supplier",
+        "werk-rtf"
+      ]
+    },
+    {
+      "domein": "domein:leerstof-fabric",
+      "functies": 13,
+      "welke": [
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "kantoorpakket",
+        "kern-live",
+        "kern-meldingen",
+        "levenos",
+        "member",
+        "office",
+        "rtf-contacten",
+        "spellen",
+        "supplier",
+        "werk-rtf"
+      ]
+    },
+    {
+      "domein": "domein:leerstof-gen",
+      "functies": 13,
+      "welke": [
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "kantoorpakket",
+        "kern-live",
+        "kern-meldingen",
+        "levenos",
+        "member",
+        "office",
+        "rtf-contacten",
+        "spellen",
+        "supplier",
+        "werk-rtf"
+      ]
+    },
+    {
+      "domein": "domein:leerstof-gen-basis",
+      "functies": 13,
+      "welke": [
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "kantoorpakket",
+        "kern-live",
+        "kern-meldingen",
+        "levenos",
+        "member",
+        "office",
+        "rtf-contacten",
+        "spellen",
+        "supplier",
+        "werk-rtf"
+      ]
+    },
+    {
+      "domein": "domein:leerstof-gen-meer",
+      "functies": 13,
+      "welke": [
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "kantoorpakket",
+        "kern-live",
+        "kern-meldingen",
+        "levenos",
+        "member",
+        "office",
+        "rtf-contacten",
+        "spellen",
+        "supplier",
+        "werk-rtf"
+      ]
+    },
+    {
+      "domein": "domein:leerstof-gen-meten",
+      "functies": 13,
+      "welke": [
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "kantoorpakket",
+        "kern-live",
+        "kern-meldingen",
+        "levenos",
+        "member",
+        "office",
+        "rtf-contacten",
+        "spellen",
+        "supplier",
+        "werk-rtf"
+      ]
+    },
+    {
+      "domein": "domein:leerstof-gen-taal",
+      "functies": 13,
+      "welke": [
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "kantoorpakket",
+        "kern-live",
+        "kern-meldingen",
+        "levenos",
+        "member",
+        "office",
+        "rtf-contacten",
+        "spellen",
+        "supplier",
+        "werk-rtf"
+      ]
+    },
+    {
+      "domein": "domein:leerstof-gen-vo",
+      "functies": 13,
+      "welke": [
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "kantoorpakket",
+        "kern-live",
+        "kern-meldingen",
+        "levenos",
+        "member",
+        "office",
+        "rtf-contacten",
+        "spellen",
+        "supplier",
+        "werk-rtf"
+      ]
+    },
+    {
+      "domein": "domein:leerstof-gen-wereld",
+      "functies": 13,
+      "welke": [
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "kantoorpakket",
+        "kern-live",
+        "kern-meldingen",
+        "levenos",
+        "member",
+        "office",
+        "rtf-contacten",
+        "spellen",
+        "supplier",
+        "werk-rtf"
+      ]
+    },
+    {
+      "domein": "domein:leerstof-herhalen",
+      "functies": 13,
+      "welke": [
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "kantoorpakket",
+        "kern-live",
+        "kern-meldingen",
+        "levenos",
+        "member",
+        "office",
+        "rtf-contacten",
+        "spellen",
+        "supplier",
+        "werk-rtf"
+      ]
+    },
+    {
+      "domein": "domein:leerstof-lijn",
+      "functies": 13,
+      "welke": [
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "kantoorpakket",
+        "kern-live",
+        "kern-meldingen",
+        "levenos",
+        "member",
+        "office",
+        "rtf-contacten",
+        "spellen",
+        "supplier",
+        "werk-rtf"
+      ]
+    },
+    {
+      "domein": "domein:leerstof-taalvorm",
+      "functies": 13,
+      "welke": [
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "kantoorpakket",
+        "kern-live",
+        "kern-meldingen",
+        "levenos",
+        "member",
+        "office",
+        "rtf-contacten",
+        "spellen",
+        "supplier",
+        "werk-rtf"
+      ]
+    },
+    {
+      "domein": "domein:onderwijs-geheugen",
+      "functies": 13,
+      "welke": [
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "kantoorpakket",
+        "kern-live",
+        "kern-meldingen",
+        "levenos",
+        "member",
+        "office",
+        "rtf-contacten",
+        "spellen",
+        "supplier",
+        "werk-rtf"
+      ]
+    },
+    {
+      "domein": "domein:onderwijs-ladder",
+      "functies": 13,
+      "welke": [
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "kantoorpakket",
+        "kern-live",
+        "kern-meldingen",
+        "levenos",
+        "member",
+        "office",
+        "rtf-contacten",
+        "spellen",
+        "supplier",
+        "werk-rtf"
+      ]
+    },
+    {
+      "domein": "domein:opvolging",
+      "functies": 13,
+      "welke": [
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "kantoorpakket",
+        "kern-live",
+        "kern-meldingen",
+        "levenos",
+        "member",
+        "office",
+        "rtf-contacten",
+        "spellen",
+        "supplier",
+        "werk-rtf"
+      ]
+    },
+    {
+      "domein": "domein:overdracht",
+      "functies": 13,
+      "welke": [
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "kantoorpakket",
+        "kern-live",
+        "kern-meldingen",
+        "levenos",
+        "member",
+        "office",
+        "rtf-contacten",
+        "spellen",
+        "supplier",
+        "werk-rtf"
+      ]
+    },
+    {
+      "domein": "domein:school",
+      "functies": 13,
+      "welke": [
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "kantoorpakket",
+        "kern-live",
+        "kern-meldingen",
+        "levenos",
+        "member",
+        "office",
+        "rtf-contacten",
+        "spellen",
+        "supplier",
+        "werk-rtf"
+      ]
+    },
+    {
+      "domein": "domein:schooladvies",
+      "functies": 13,
+      "welke": [
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "kantoorpakket",
+        "kern-live",
+        "kern-meldingen",
+        "levenos",
+        "member",
+        "office",
+        "rtf-contacten",
+        "spellen",
+        "supplier",
+        "werk-rtf"
+      ]
+    },
+    {
+      "domein": "domein:taalbeleid",
+      "functies": 13,
+      "welke": [
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "kantoorpakket",
+        "kern-live",
+        "kern-meldingen",
+        "levenos",
+        "member",
+        "office",
+        "rtf-contacten",
+        "spellen",
+        "supplier",
+        "werk-rtf"
+      ]
+    },
+    {
+      "domein": "domein:taalcheck",
+      "functies": 13,
+      "welke": [
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "kantoorpakket",
+        "kern-live",
+        "kern-meldingen",
+        "levenos",
+        "member",
+        "office",
+        "rtf-contacten",
+        "spellen",
+        "supplier",
+        "werk-rtf"
+      ]
+    },
+    {
+      "domein": "domein:toetsbouw",
+      "functies": 13,
+      "welke": [
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "kantoorpakket",
+        "kern-live",
+        "kern-meldingen",
+        "levenos",
+        "member",
+        "office",
+        "rtf-contacten",
+        "spellen",
+        "supplier",
+        "werk-rtf"
+      ]
+    },
+    {
+      "domein": "domein:toetsspiegel",
+      "functies": 13,
+      "welke": [
+        "dom-werkplek",
+        "foundation",
+        "foundation-school",
+        "kantoorpakket",
+        "kern-live",
+        "kern-meldingen",
+        "levenos",
+        "member",
+        "office",
+        "rtf-contacten",
+        "spellen",
+        "supplier",
+        "werk-rtf"
+      ]
+    },
+    {
+      "domein": "domein:agenda-ics",
+      "functies": 12,
+      "welke": [
+        "dom-werkplek",
+        "foundation",
+        "kantoorpakket",
+        "kern-live",
+        "kern-meldingen",
+        "levenos",
+        "member",
+        "office",
+        "rtf-contacten",
+        "spellen",
+        "supplier",
+        "werk-rtf"
+      ]
+    },
+    {
+      "domein": "domein:agenda-pro",
+      "functies": 12,
+      "welke": [
+        "dom-werkplek",
+        "foundation",
+        "kantoorpakket",
+        "kern-live",
+        "kern-meldingen",
+        "levenos",
+        "member",
+        "office",
+        "rtf-contacten",
+        "spellen",
+        "supplier",
+        "werk-rtf"
+      ]
+    },
+    {
+      "domein": "domein:foundation",
+      "functies": 12,
+      "welke": [
+        "dom-werkplek",
+        "foundation",
+        "kantoorpakket",
+        "kern-live",
+        "kern-meldingen",
+        "levenos",
+        "member",
+        "office",
+        "rtf-contacten",
+        "spellen",
+        "supplier",
+        "werk-rtf"
+      ]
+    },
+    {
+      "domein": "domein:servicekosten",
+      "functies": 11,
+      "welke": [
+        "bestellen",
+        "betalen",
+        "bk-reizen",
+        "bk-ritten",
+        "bk-tickets",
+        "gld-rekening",
+        "kern-state",
+        "member",
+        "ov-suppliers",
+        "supplier",
+        "tickets"
+      ]
+    },
+    {
+      "domein": "domein:lidacties",
+      "functies": 10,
+      "welke": [
+        "bestellen",
+        "bk-reizen",
+        "bk-ritten",
+        "bk-tickets",
+        "gld-rekening",
+        "onderweg",
+        "ov-suppliers",
+        "supplier",
+        "supplier-pos",
+        "tickets"
+      ]
+    },
+    {
+      "domein": "domein:gids",
+      "functies": 9,
+      "welke": [
+        "dom-metier",
+        "dom-muziek",
+        "levenos",
+        "member",
+        "office",
+        "paspoort",
+        "supplier",
+        "wereld",
+        "zakelijk"
+      ]
+    },
+    {
+      "domein": "domein:pasladder",
+      "functies": 9,
+      "welke": [
+        "bk-reizen",
+        "dom-kosten",
+        "gld-claims",
+        "gld-prijzen",
+        "kern-state",
+        "member",
+        "office",
+        "supplier",
+        "tg-aanmeld"
+      ]
+    },
+    {
+      "domein": "domein:salonpromo",
+      "functies": 9,
+      "welke": [
+        "dom-site",
+        "kern-berichten",
+        "kern-state",
+        "kern-waardering",
+        "member",
+        "office",
+        "ov-browser",
+        "salon",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:activiteitendicht",
+      "functies": 8,
+      "welke": [
+        "bestellen",
+        "bk-reizen",
+        "bk-ritten",
+        "bk-tickets",
+        "gld-rekening",
+        "ov-suppliers",
+        "supplier",
+        "tickets"
+      ]
+    },
+    {
+      "domein": "domein:afgeleid",
+      "functies": 8,
+      "welke": [
+        "bestellen",
+        "member",
+        "member-werk",
+        "staff",
+        "supplier",
+        "supplier-events",
+        "tg-account",
+        "werk-rtf"
+      ]
+    },
+    {
+      "domein": "domein:tenant",
+      "functies": 8,
+      "welke": [
+        "dom-appstore",
+        "dom-appstore-uitgever",
+        "office",
+        "ov-krant",
+        "supplier",
+        "tenant",
+        "tg-sso",
+        "theater"
+      ]
+    },
+    {
+      "domein": "domein:bedrijfscontrole",
+      "functies": 7,
+      "welke": [
+        "bk-reizen",
+        "kern-state",
+        "member",
+        "office",
+        "ondernemersos",
+        "supplier",
+        "tg-aanmeld"
+      ]
+    },
+    {
+      "domein": "domein:mediaopruim",
+      "functies": 7,
+      "welke": [
+        "dom-eigendomein",
+        "dom-site",
+        "office",
+        "ov-browser",
+        "salon",
+        "supplier",
+        "supplier-salon"
+      ]
+    },
+    {
+      "domein": "domein:retail",
+      "functies": 7,
+      "welke": [
+        "bk-reizen",
+        "bk-tickets",
+        "dom-reisbureau",
+        "kern-meldingen",
+        "paspoort",
+        "retail",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:stuur",
+      "functies": 7,
+      "welke": [
+        "dom-fluister",
+        "kern-locatie",
+        "ov-spar",
+        "ov-zorgprofiel",
+        "staff",
+        "stuur",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:reis",
+      "functies": 7,
+      "welke": [
+        "bk-reiswijzer",
+        "bk-reizen",
+        "bk-tickets",
+        "dom-reisbureau",
+        "kern-meldingen",
+        "paspoort",
+        "retail"
+      ]
+    },
+    {
+      "domein": "domein:afdelingen",
+      "functies": 6,
+      "welke": [
+        "dom-doos",
+        "gld-claims",
+        "gld-prijzen",
+        "office",
+        "ov-stad",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:fluister",
+      "functies": 6,
+      "welke": [
+        "dom-fluister",
+        "kern-locatie",
+        "ov-spar",
+        "ov-zorgprofiel",
+        "staff",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:veiligheid",
+      "functies": 6,
+      "welke": [
+        "dom-fluister",
+        "dom-veiligheid",
+        "kern-locatie",
+        "ov-spar",
+        "ov-zorgprofiel",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:paspoort",
+      "functies": 6,
+      "welke": [
+        "bk-reizen",
+        "bk-tickets",
+        "dom-reisbureau",
+        "kern-meldingen",
+        "paspoort",
+        "retail"
+      ]
+    },
+    {
+      "domein": "domein:automatisering",
+      "functies": 5,
+      "welke": [
+        "member",
+        "member-werk",
+        "supplier",
+        "tg-account",
+        "tg-inlog"
+      ]
+    },
+    {
+      "domein": "domein:autoverkoop",
+      "functies": 5,
+      "welke": [
+        "charter",
+        "dom-verkoop",
+        "ontmoetingen",
+        "supplier",
+        "verhuur"
+      ]
+    },
+    {
+      "domein": "domein:bezorgvolg",
+      "functies": 5,
+      "welke": [
+        "bestellen",
+        "betalen",
+        "kern-state",
+        "member",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:levensgraaf",
+      "functies": 5,
+      "welke": [
+        "geldwereld",
+        "levenos",
+        "member",
+        "socialewereld",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:office",
+      "functies": 5,
+      "welke": [
+        "dom-werkplek",
+        "kantoorpakket",
+        "office",
+        "rtf-contacten",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:rtmail",
+      "functies": 5,
+      "welke": [
+        "member",
+        "office",
+        "ov-mail-binnen",
+        "ov-werkmail",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:rtmail-adres",
+      "functies": 5,
+      "welke": [
+        "member",
+        "office",
+        "ov-mail-binnen",
+        "ov-werkmail",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:rtmail-links",
+      "functies": 5,
+      "welke": [
+        "member",
+        "office",
+        "ov-mail-binnen",
+        "ov-werkmail",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:rtmail-veiligheid",
+      "functies": 5,
+      "welke": [
+        "member",
+        "office",
+        "ov-mail-binnen",
+        "ov-werkmail",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:rtmail-wie",
+      "functies": 5,
+      "welke": [
+        "kern-state",
+        "member",
+        "office",
+        "ov-mail-binnen",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:webdomein",
+      "functies": 5,
+      "welke": [
+        "dom-eigendomein",
+        "dom-site",
+        "office",
+        "ov-browser",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:webmaker",
+      "functies": 5,
+      "welke": [
+        "dom-eigendomein",
+        "dom-site",
+        "office",
+        "ov-browser",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:webmaker-blader",
+      "functies": 5,
+      "welke": [
+        "dom-eigendomein",
+        "dom-site",
+        "office",
+        "ov-browser",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:webmaker-fotos",
+      "functies": 5,
+      "welke": [
+        "dom-eigendomein",
+        "dom-site",
+        "office",
+        "ov-browser",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:webmaker-meting",
+      "functies": 5,
+      "welke": [
+        "dom-eigendomein",
+        "dom-site",
+        "office",
+        "ov-browser",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:webmaker-ontwerp",
+      "functies": 5,
+      "welke": [
+        "dom-eigendomein",
+        "dom-site",
+        "office",
+        "ov-browser",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:webmaker-paginas",
+      "functies": 5,
+      "welke": [
+        "dom-eigendomein",
+        "dom-site",
+        "office",
+        "ov-browser",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:webmaker-plan",
+      "functies": 5,
+      "welke": [
+        "dom-eigendomein",
+        "dom-site",
+        "office",
+        "ov-browser",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:webmaker-publiceren",
+      "functies": 5,
+      "welke": [
+        "dom-eigendomein",
+        "dom-site",
+        "office",
+        "ov-browser",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:webmaker-schoon",
+      "functies": 5,
+      "welke": [
+        "dom-eigendomein",
+        "dom-site",
+        "office",
+        "ov-browser",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:webmaker-spoor",
+      "functies": 5,
+      "welke": [
+        "dom-eigendomein",
+        "dom-site",
+        "office",
+        "ov-browser",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:webmaker-versies",
+      "functies": 5,
+      "welke": [
+        "dom-eigendomein",
+        "dom-site",
+        "office",
+        "ov-browser",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:werkplek",
+      "functies": 5,
+      "welke": [
+        "dom-werkplek",
+        "kantoorpakket",
+        "office",
+        "rtf-contacten",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:werkplek-kantoren",
+      "functies": 5,
+      "welke": [
+        "dom-werkplek",
+        "kantoorpakket",
+        "office",
+        "rtf-contacten",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:werkplek-kantoren-bovenbouw",
+      "functies": 5,
+      "welke": [
+        "dom-werkplek",
+        "kantoorpakket",
+        "office",
+        "rtf-contacten",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:werkplek-kantoren-onderbouw",
+      "functies": 5,
+      "welke": [
+        "dom-werkplek",
+        "kantoorpakket",
+        "office",
+        "rtf-contacten",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:werkplek-kantoren-vorm",
+      "functies": 5,
+      "welke": [
+        "dom-werkplek",
+        "kantoorpakket",
+        "office",
+        "rtf-contacten",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:agenda",
+      "functies": 4,
+      "welke": [
+        "dom-agenda",
+        "kern-state",
+        "member",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:horeca",
+      "functies": 4,
+      "welke": [
+        "avondos",
+        "gastos",
+        "ondernemersos",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:internationalehandel",
+      "functies": 4,
+      "welke": [
+        "bk-reizen",
+        "kern-state",
+        "member",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:kvkvoorcontrole",
+      "functies": 4,
+      "welke": [
+        "bk-reizen",
+        "kern-state",
+        "member",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:mailbijlage",
+      "functies": 4,
+      "welke": [
+        "member",
+        "office",
+        "ov-mail-binnen",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:mailinkomend",
+      "functies": 4,
+      "welke": [
+        "member",
+        "office",
+        "ov-mail-binnen",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:mailmime",
+      "functies": 4,
+      "welke": [
+        "member",
+        "office",
+        "ov-mail-binnen",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:mailwachtrij",
+      "functies": 4,
+      "welke": [
+        "member",
+        "office",
+        "ov-mail-binnen",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:pasprijs",
+      "functies": 4,
+      "welke": [
+        "dom-kosten",
+        "office",
+        "supplier",
+        "tg-aanmeld"
+      ]
+    },
+    {
+      "domein": "domein:rtmail-recht",
+      "functies": 4,
+      "welke": [
+        "member",
+        "office",
+        "ov-mail-binnen",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:ses-ontvangst",
+      "functies": 4,
+      "welke": [
+        "member",
+        "office",
+        "ov-mail-binnen",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:salonviraal",
+      "functies": 4,
+      "welke": [
+        "kern-state",
+        "member",
+        "office",
+        "salon"
+      ]
+    },
+    {
+      "domein": "domein:lid",
+      "functies": 4,
+      "welke": [
+        "kern-berichten",
+        "kern-waardering",
+        "ondernemersos",
+        "salon"
+      ]
+    },
+    {
+      "domein": "domein:pestgrens",
+      "functies": 4,
+      "welke": [
+        "dom-fluister",
+        "kern-locatie",
+        "ov-spar",
+        "ov-zorgprofiel"
+      ]
+    },
+    {
+      "domein": "domein:ontmoeting",
+      "functies": 4,
+      "welke": [
+        "charter",
+        "dom-verkoop",
+        "ontmoetingen",
+        "verhuur"
+      ]
+    },
+    {
+      "domein": "domein:bestuursroutes",
+      "functies": 3,
+      "welke": [
+        "member",
+        "office",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:eten",
+      "functies": 3,
+      "welke": [
+        "gastos",
+        "ondernemersos",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:levensdossier",
+      "functies": 3,
+      "welke": [
+        "member",
+        "rechterhand",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:magnaat-capabilities",
+      "functies": 3,
+      "welke": [
+        "member",
+        "office",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:magnaat-capabilities-bronnen",
+      "functies": 3,
+      "welke": [
+        "member",
+        "office",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:magnaat-controle",
+      "functies": 3,
+      "welke": [
+        "member",
+        "office",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:magnaat-dekkingsmatrix",
+      "functies": 3,
+      "welke": [
+        "member",
+        "office",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:magnaat-economenlab",
+      "functies": 3,
+      "welke": [
+        "member",
+        "office",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:magnaat-economenlab-basis",
+      "functies": 3,
+      "welke": [
+        "member",
+        "office",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:magnaat-economenlab-rapport",
+      "functies": 3,
+      "welke": [
+        "member",
+        "office",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:magnaat-economenlab-training",
+      "functies": 3,
+      "welke": [
+        "member",
+        "office",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:magnaat-economie",
+      "functies": 3,
+      "welke": [
+        "member",
+        "office",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:magnaat-kantoorregels",
+      "functies": 3,
+      "welke": [
+        "member",
+        "office",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:magnaat-motorklant",
+      "functies": 3,
+      "welke": [
+        "member",
+        "office",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:magnaat-trainingslobby",
+      "functies": 3,
+      "welke": [
+        "member",
+        "office",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:magnaat-trainingslobby-acties",
+      "functies": 3,
+      "welke": [
+        "member",
+        "office",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:magnaat-trainingslobby-regie",
+      "functies": 3,
+      "welke": [
+        "member",
+        "office",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:magnaat-werkroutefabriek",
+      "functies": 3,
+      "welke": [
+        "member",
+        "office",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:magnaatwereld",
+      "functies": 3,
+      "welke": [
+        "member",
+        "office",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:navigatie",
+      "functies": 3,
+      "welke": [
+        "dom-nav",
+        "ov-stad",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:opvang",
+      "functies": 3,
+      "welke": [
+        "office",
+        "supplier",
+        "verzorging"
+      ]
+    },
+    {
+      "domein": "domein:persoonseis",
+      "functies": 3,
+      "welke": [
+        "office",
+        "supplier",
+        "vakbewijs"
+      ]
+    },
+    {
+      "domein": "domein:persoonseis-lijst",
+      "functies": 3,
+      "welke": [
+        "office",
+        "supplier",
+        "vakbewijs"
+      ]
+    },
+    {
+      "domein": "domein:reservering",
+      "functies": 3,
+      "welke": [
+        "arrival",
+        "avondos",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:salon",
+      "functies": 3,
+      "welke": [
+        "salon",
+        "supplier",
+        "supplier-salon"
+      ]
+    },
+    {
+      "domein": "domein:tijdzone",
+      "functies": 3,
+      "welke": [
+        "gastos",
+        "ondernemersos",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:webplatform",
+      "functies": 3,
+      "welke": [
+        "dom-site",
+        "ov-browser",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:webplatform-live",
+      "functies": 3,
+      "welke": [
+        "dom-site",
+        "ov-browser",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:antivirus",
+      "functies": 3,
+      "welke": [
+        "dom-site",
+        "office",
+        "verificatie"
+      ]
+    },
+    {
+      "domein": "domein:ondertitels",
+      "functies": 3,
+      "welke": [
+        "clips",
+        "office",
+        "theater"
+      ]
+    },
+    {
+      "domein": "domein:pakketten",
+      "functies": 3,
+      "welke": [
+        "bk-bezorgen",
+        "kern-state",
+        "member"
+      ]
+    },
+    {
+      "domein": "domein:rtfclubs",
+      "functies": 3,
+      "welke": [
+        "dom-lab",
+        "dom-rtfkantoor",
+        "rtf-contacten"
+      ]
+    },
+    {
+      "domein": "domein:stadsraad",
+      "functies": 3,
+      "welke": [
+        "dom-lab",
+        "dom-rtfkantoor",
+        "rtf-contacten"
+      ]
+    },
+    {
+      "domein": "domein:festival",
+      "functies": 3,
+      "welke": [
+        "fs-gast",
+        "fs-terrein",
+        "fs-werk"
+      ]
+    },
+    {
+      "domein": "domein:herkomst",
+      "functies": 3,
+      "welke": [
+        "dagmetingen",
+        "doelen",
+        "life"
+      ]
+    },
+    {
+      "domein": "domein:zorgniveau",
+      "functies": 3,
+      "welke": [
+        "gedachten",
+        "gemoed",
+        "medicijnen"
+      ]
+    },
+    {
+      "domein": "domein:afdelingshotel",
+      "functies": 2,
+      "welke": [
+        "office",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:borden",
+      "functies": 2,
+      "welke": [
+        "member",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:care",
+      "functies": 2,
+      "welke": [
+        "dom-care",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:context",
+      "functies": 2,
+      "welke": [
+        "supplier",
+        "supplier-events"
+      ]
+    },
+    {
+      "domein": "domein:directpay",
+      "functies": 2,
+      "welke": [
+        "betalen",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:events",
+      "functies": 2,
+      "welke": [
+        "supplier",
+        "supplier-events"
+      ]
+    },
+    {
+      "domein": "domein:genrehulp",
+      "functies": 2,
+      "welke": [
+        "supplier",
+        "verzorging"
+      ]
+    },
+    {
+      "domein": "domein:homekit",
+      "functies": 2,
+      "welke": [
+        "dom-home",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:homekit-data",
+      "functies": 2,
+      "welke": [
+        "dom-home",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:homemerken",
+      "functies": 2,
+      "welke": [
+        "dom-home",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:journalistiek",
+      "functies": 2,
+      "welke": [
+        "ov-krant",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:journalistiek-blokken",
+      "functies": 2,
+      "welke": [
+        "ov-krant",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:keuken",
+      "functies": 2,
+      "welke": [
+        "supplier",
+        "supplier-pos"
+      ]
+    },
+    {
+      "domein": "domein:mailsleutel",
+      "functies": 2,
+      "welke": [
+        "member",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:metier",
+      "functies": 2,
+      "welke": [
+        "dom-metier",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:payroll",
+      "functies": 2,
+      "welke": [
+        "office",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:postdatum",
+      "functies": 2,
+      "welke": [
+        "member",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:postdatum-lezer",
+      "functies": 2,
+      "welke": [
+        "member",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:rampbeeld",
+      "functies": 2,
+      "welke": [
+        "office",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:regering",
+      "functies": 2,
+      "welke": [
+        "office",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:rtmail-ai",
+      "functies": 2,
+      "welke": [
+        "member",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:rtmail-bewaar",
+      "functies": 2,
+      "welke": [
+        "member",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:rtmail-draad",
+      "functies": 2,
+      "welke": [
+        "member",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:rtmail-inst",
+      "functies": 2,
+      "welke": [
+        "member",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:rtmail-regels",
+      "functies": 2,
+      "welke": [
+        "member",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:rtmail-schrijf",
+      "functies": 2,
+      "welke": [
+        "member",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:rtmail-vak",
+      "functies": 2,
+      "welke": [
+        "member",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:tafelticket",
+      "functies": 2,
+      "welke": [
+        "supplier",
+        "supplier-pos"
+      ]
+    },
+    {
+      "domein": "domein:thuis",
+      "functies": 2,
+      "welke": [
+        "dom-thuis",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:verzorging",
+      "functies": 2,
+      "welke": [
+        "supplier",
+        "verzorging"
+      ]
+    },
+    {
+      "domein": "domein:vracht",
+      "functies": 2,
+      "welke": [
+        "bk-bezorgen",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:webmaker-ai",
+      "functies": 2,
+      "welke": [
+        "dom-site",
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:appgids",
+      "functies": 2,
+      "welke": [
+        "kern-gids",
+        "office"
+      ]
+    },
+    {
+      "domein": "domein:appgids-data",
+      "functies": 2,
+      "welke": [
+        "kern-gids",
+        "office"
+      ]
+    },
+    {
+      "domein": "domein:atelierweb",
+      "functies": 2,
+      "welke": [
+        "dom-site",
+        "office"
+      ]
+    },
+    {
+      "domein": "domein:beschikbaar",
+      "functies": 2,
+      "welke": [
+        "office",
+        "rechterhand"
+      ]
+    },
+    {
+      "domein": "domein:checklijst",
+      "functies": 2,
+      "welke": [
+        "dom-werkvloer",
+        "office"
+      ]
+    },
+    {
+      "domein": "domein:clips-studio",
+      "functies": 2,
+      "welke": [
+        "clips",
+        "office"
+      ]
+    },
+    {
+      "domein": "domein:foundationregistratie",
+      "functies": 2,
+      "welke": [
+        "foundation",
+        "office"
+      ]
+    },
+    {
+      "domein": "domein:foundationregistratie-register",
+      "functies": 2,
+      "welke": [
+        "foundation",
+        "office"
+      ]
+    },
+    {
+      "domein": "domein:foundationregistratie-uitgifte",
+      "functies": 2,
+      "welke": [
+        "foundation",
+        "office"
+      ]
+    },
+    {
+      "domein": "domein:koppel",
+      "functies": 2,
+      "welke": [
+        "dom-werkvloer",
+        "office"
+      ]
+    },
+    {
+      "domein": "domein:muziek-samen",
+      "functies": 2,
+      "welke": [
+        "dom-muziek",
+        "office"
+      ]
+    },
+    {
+      "domein": "domein:muziek-uitgave",
+      "functies": 2,
+      "welke": [
+        "dom-muziek",
+        "office"
+      ]
+    },
+    {
+      "domein": "domein:muziek-uitgave-beeld",
+      "functies": 2,
+      "welke": [
+        "dom-muziek",
+        "office"
+      ]
+    },
+    {
+      "domein": "domein:ontmoetpoort",
+      "functies": 2,
+      "welke": [
+        "office",
+        "rechterhand"
+      ]
+    },
+    {
+      "domein": "domein:podium",
+      "functies": 2,
+      "welke": [
+        "office",
+        "podium"
+      ]
+    },
+    {
+      "domein": "domein:rendezvous",
+      "functies": 2,
+      "welke": [
+        "office",
+        "rechterhand"
+      ]
+    },
+    {
+      "domein": "domein:rendezvous-aanwezig",
+      "functies": 2,
+      "welke": [
+        "office",
+        "rechterhand"
+      ]
+    },
+    {
+      "domein": "domein:rendezvous-acties",
+      "functies": 2,
+      "welke": [
+        "office",
+        "rechterhand"
+      ]
+    },
+    {
+      "domein": "domein:rendezvous-arrange",
+      "functies": 2,
+      "welke": [
+        "office",
+        "rechterhand"
+      ]
+    },
+    {
+      "domein": "domein:rendezvous-date",
+      "functies": 2,
+      "welke": [
+        "office",
+        "rechterhand"
+      ]
+    },
+    {
+      "domein": "domein:rendezvous-kring",
+      "functies": 2,
+      "welke": [
+        "office",
+        "rechterhand"
+      ]
+    },
+    {
+      "domein": "domein:rendezvous-ontdek",
+      "functies": 2,
+      "welke": [
+        "office",
+        "rechterhand"
+      ]
+    },
+    {
+      "domein": "domein:rendezvous-samen",
+      "functies": 2,
+      "welke": [
+        "office",
+        "rechterhand"
+      ]
+    },
+    {
+      "domein": "domein:rendezvous-tafels",
+      "functies": 2,
+      "welke": [
+        "office",
+        "rechterhand"
+      ]
+    },
+    {
+      "domein": "domein:tafelwensen",
+      "functies": 2,
+      "welke": [
+        "dom-werkvloer",
+        "office"
+      ]
+    },
+    {
+      "domein": "domein:theater",
+      "functies": 2,
+      "welke": [
+        "office",
+        "theater"
+      ]
+    },
+    {
+      "domein": "domein:vonk",
+      "functies": 2,
+      "welke": [
+        "office",
+        "vonk"
+      ]
+    },
+    {
+      "domein": "domein:wereldroutes",
+      "functies": 2,
+      "welke": [
+        "kern-gids",
+        "office"
+      ]
+    },
+    {
+      "domein": "domein:berichten",
+      "functies": 2,
+      "welke": [
+        "kern-comm",
+        "member"
+      ]
+    },
+    {
+      "domein": "domein:leren",
+      "functies": 2,
+      "welke": [
+        "member",
+        "rtf-contacten"
+      ]
+    },
+    {
+      "domein": "domein:vergeten",
+      "functies": 2,
+      "welke": [
+        "kern-state",
+        "member"
+      ]
+    },
+    {
+      "domein": "domein:bibliothecaris",
+      "functies": 2,
+      "welke": [
+        "kern-rahul",
+        "rtf-contacten"
+      ]
+    },
+    {
+      "domein": "domein:aanmeldingen",
+      "functies": 2,
+      "welke": [
+        "ondernemersos",
+        "tg-aanmeld"
+      ]
+    },
+    {
+      "domein": "domein:foodcourt",
+      "functies": 2,
+      "welke": [
+        "gastos",
+        "ondernemersos"
+      ]
+    },
+    {
+      "domein": "domein:plaats",
+      "functies": 2,
+      "welke": [
+        "dom-plaats",
+        "staff"
+      ]
+    },
+    {
+      "domein": "domein:geloof",
+      "functies": 2,
+      "welke": [
+        "kern-rahul",
+        "kern-state"
+      ]
+    },
+    {
+      "domein": "domein:toegankelijk",
+      "functies": 2,
+      "welke": [
+        "kern-rahul",
+        "kern-state"
+      ]
+    },
+    {
+      "domein": "domein:ai",
+      "functies": 2,
+      "welke": [
+        "kern-berichten",
+        "kern-rahul"
+      ]
+    },
+    {
+      "domein": "domein:mobiliteit",
+      "functies": 2,
+      "welke": [
+        "avondos",
+        "mobiliteit"
+      ]
+    },
+    {
+      "domein": "domein:appstore",
+      "functies": 2,
+      "welke": [
+        "dom-appstore",
+        "dom-appstore-uitgever"
+      ]
+    },
+    {
+      "domein": "domein:mutatie",
+      "functies": 2,
+      "welke": [
+        "dom-appstore",
+        "dom-appstore-uitgever"
+      ]
+    },
+    {
+      "domein": "domein:platformfout",
+      "functies": 2,
+      "welke": [
+        "dom-appstore",
+        "dom-appstore-uitgever"
+      ]
+    },
+    {
+      "domein": "domein:onderzoekslab",
+      "functies": 2,
+      "welke": [
+        "dom-lab",
+        "dom-rtfkantoor"
+      ]
+    },
+    {
+      "domein": "domein:onderzoekslab-ai",
+      "functies": 2,
+      "welke": [
+        "dom-lab",
+        "dom-rtfkantoor"
+      ]
+    },
+    {
+      "domein": "domein:rtfkantoor",
+      "functies": 2,
+      "welke": [
+        "dom-lab",
+        "dom-rtfkantoor"
+      ]
+    },
+    {
+      "domein": "domein:rtfkantoor-advies",
+      "functies": 2,
+      "welke": [
+        "dom-lab",
+        "dom-rtfkantoor"
+      ]
+    },
+    {
+      "domein": "domein:rtfkantoor-data",
+      "functies": 2,
+      "welke": [
+        "dom-lab",
+        "dom-rtfkantoor"
+      ]
+    },
+    {
+      "domein": "domein:livinglab",
+      "functies": 2,
+      "welke": [
+        "dom-livinglab",
+        "dom-livinglab-bewoner"
+      ]
+    },
+    {
+      "domein": "domein:metingen",
+      "functies": 2,
+      "welke": [
+        "dagmetingen",
+        "life"
+      ]
+    },
+    {
+      "domein": "domein:assets",
+      "functies": 2,
+      "welke": [
+        "dom-asset",
+        "ov-media"
+      ]
+    },
+    {
+      "domein": "domein:alpine",
+      "functies": 1,
+      "welke": [
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:alpine-demo",
+      "functies": 1,
+      "welke": [
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:beveiliging",
+      "functies": 1,
+      "welke": [
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:clubs",
+      "functies": 1,
+      "welke": [
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:comm",
+      "functies": 1,
+      "welke": [
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:defensie",
+      "functies": 1,
+      "welke": [
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:gast",
+      "functies": 1,
+      "welke": [
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:gebouw",
+      "functies": 1,
+      "welke": [
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:gebouw-demo",
+      "functies": 1,
+      "welke": [
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:geschikt",
+      "functies": 1,
+      "welke": [
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:hoteldorp",
+      "functies": 1,
+      "welke": [
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:hulpdienst",
+      "functies": 1,
+      "welke": [
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:kassa",
+      "functies": 1,
+      "welke": [
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:ketenchat",
+      "functies": 1,
+      "welke": [
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:marina",
+      "functies": 1,
+      "welke": [
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:modebezorg",
+      "functies": 1,
+      "welke": [
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:ondernemerpoort",
+      "functies": 1,
+      "welke": [
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:pda",
+      "functies": 1,
+      "welke": [
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:planners",
+      "functies": 1,
+      "welke": [
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:verblijf",
+      "functies": 1,
+      "welke": [
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:webmaker-team",
+      "functies": 1,
+      "welke": [
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:zorgketen",
+      "functies": 1,
+      "welke": [
+        "supplier"
+      ]
+    },
+    {
+      "domein": "domein:economie",
+      "functies": 1,
+      "welke": [
+        "office"
+      ]
+    },
+    {
+      "domein": "domein:ledenbalie",
+      "functies": 1,
+      "welke": [
+        "office"
+      ]
+    },
+    {
+      "domein": "domein:ledenbalie-zaken",
+      "functies": 1,
+      "welke": [
+        "office"
+      ]
+    },
+    {
+      "domein": "domein:ledenbalie-zetels",
+      "functies": 1,
+      "welke": [
+        "office"
+      ]
+    },
+    {
+      "domein": "domein:ledenregister",
+      "functies": 1,
+      "welke": [
+        "office"
+      ]
+    },
+    {
+      "domein": "domein:passen",
+      "functies": 1,
+      "welke": [
+        "office"
+      ]
+    },
+    {
+      "domein": "domein:platformregister",
+      "functies": 1,
+      "welke": [
+        "office"
+      ]
+    },
+    {
+      "domein": "domein:routedekking",
+      "functies": 1,
+      "welke": [
+        "office"
+      ]
+    },
+    {
+      "domein": "domein:rtgai",
+      "functies": 1,
+      "welke": [
+        "office"
+      ]
+    },
+    {
+      "domein": "domein:rtgonderzoeker",
+      "functies": 1,
+      "welke": [
+        "office"
+      ]
+    },
+    {
+      "domein": "domein:webmerk",
+      "functies": 1,
+      "welke": [
+        "office"
+      ]
+    },
+    {
+      "domein": "domein:huis",
+      "functies": 1,
+      "welke": [
+        "member"
+      ]
+    },
+    {
+      "domein": "domein:lifestyle",
+      "functies": 1,
+      "welke": [
+        "member"
+      ]
+    },
+    {
+      "domein": "domein:pulse",
+      "functies": 1,
+      "welke": [
+        "member"
+      ]
+    },
+    {
+      "domein": "domein:rtmail-dossier",
+      "functies": 1,
+      "welke": [
+        "member"
+      ]
+    },
+    {
+      "domein": "domein:rtmail-sla",
+      "functies": 1,
+      "welke": [
+        "member"
+      ]
+    },
+    {
+      "domein": "domein:rtmail-team",
+      "functies": 1,
+      "welke": [
+        "member"
+      ]
+    },
+    {
+      "domein": "domein:rtmail-vrij",
+      "functies": 1,
+      "welke": [
+        "member"
+      ]
+    },
+    {
+      "domein": "domein:wauw",
+      "functies": 1,
+      "welke": [
+        "member"
+      ]
+    },
+    {
+      "domein": "domein:baby",
+      "functies": 1,
+      "welke": [
+        "rtf-contacten"
+      ]
+    },
+    {
+      "domein": "domein:samenrtf",
+      "functies": 1,
+      "welke": [
+        "rtf-contacten"
+      ]
+    },
+    {
+      "domein": "domein:tiener",
+      "functies": 1,
+      "welke": [
+        "rtf-contacten"
+      ]
+    },
+    {
+      "domein": "domein:welzijn",
+      "functies": 1,
+      "welke": [
+        "rtf-contacten"
+      ]
+    },
+    {
+      "domein": "domein:levensband",
+      "functies": 1,
+      "welke": [
+        "levenos"
+      ]
+    },
+    {
+      "domein": "domein:levensbeleid",
+      "functies": 1,
+      "welke": [
+        "levenos"
+      ]
+    },
+    {
+      "domein": "domein:levenslijn",
+      "functies": 1,
+      "welke": [
+        "levenos"
+      ]
+    },
+    {
+      "domein": "domein:spellen",
+      "functies": 1,
+      "welke": [
+        "spellen"
+      ]
+    },
+    {
+      "domein": "domein:agendatijd",
+      "functies": 1,
+      "welke": [
+        "ondernemersos"
+      ]
+    },
+    {
+      "domein": "domein:betrouwbaarheid",
+      "functies": 1,
+      "welke": [
+        "ondernemersos"
+      ]
+    },
+    {
+      "domein": "domein:klantenboek",
+      "functies": 1,
+      "welke": [
+        "ondernemersos"
+      ]
+    },
+    {
+      "domein": "domein:logies",
+      "functies": 1,
+      "welke": [
+        "ondernemersos"
+      ]
+    },
+    {
+      "domein": "domein:mall",
+      "functies": 1,
+      "welke": [
+        "ondernemersos"
+      ]
+    },
+    {
+      "domein": "domein:markt",
+      "functies": 1,
+      "welke": [
+        "ondernemersos"
+      ]
+    },
+    {
+      "domein": "domein:reisbureau",
+      "functies": 1,
+      "welke": [
+        "ondernemersos"
+      ]
+    },
+    {
+      "domein": "domein:reisbureau-advies",
+      "functies": 1,
+      "welke": [
+        "ondernemersos"
+      ]
+    },
+    {
+      "domein": "domein:reisbureau-besluit",
+      "functies": 1,
+      "welke": [
+        "ondernemersos"
+      ]
+    },
+    {
+      "domein": "domein:winkelcatalogus",
+      "functies": 1,
+      "welke": [
+        "ondernemersos"
+      ]
+    },
+    {
+      "domein": "domein:betaalwaarheid",
+      "functies": 1,
+      "welke": [
+        "betalen"
+      ]
+    },
+    {
+      "domein": "domein:webplatform-taal",
+      "functies": 1,
+      "welke": [
+        "ov-browser"
+      ]
+    },
+    {
+      "domein": "domein:avond",
+      "functies": 1,
+      "welke": [
+        "avondos"
+      ]
+    },
+    {
+      "domein": "domein:lidmaatschap",
+      "functies": 1,
+      "welke": [
+        "wereld"
+      ]
+    },
+    {
+      "domein": "domein:eenaccount",
+      "functies": 1,
+      "welke": [
+        "tg-account"
+      ]
+    },
+    {
+      "domein": "domein:rechterhand",
+      "functies": 1,
+      "welke": [
+        "rechterhand"
+      ]
+    },
+    {
+      "domein": "domein:stad",
+      "functies": 1,
+      "welke": [
+        "ov-stad"
+      ]
+    },
+    {
+      "domein": "domein:stadsweefsel",
+      "functies": 1,
+      "welke": [
+        "ov-stad"
+      ]
+    },
+    {
+      "domein": "domein:objectlaag",
+      "functies": 1,
+      "welke": [
+        "socialewereld"
+      ]
+    },
+    {
+      "domein": "domein:socialebeleid",
+      "functies": 1,
+      "welke": [
+        "socialewereld"
+      ]
+    },
+    {
+      "domein": "domein:socialecommand",
+      "functies": 1,
+      "welke": [
+        "socialewereld"
+      ]
+    },
+    {
+      "domein": "domein:socialegraaf",
+      "functies": 1,
+      "welke": [
+        "socialewereld"
+      ]
+    },
+    {
+      "domein": "domein:muziek",
+      "functies": 1,
+      "welke": [
+        "dom-muziek"
+      ]
+    },
+    {
+      "domein": "domein:muziek-lied",
+      "functies": 1,
+      "welke": [
+        "dom-muziek"
+      ]
+    },
+    {
+      "domein": "domein:muziek-rahul",
+      "functies": 1,
+      "welke": [
+        "dom-muziek"
+      ]
+    },
+    {
+      "domein": "domein:geldgraaf",
+      "functies": 1,
+      "welke": [
+        "geldwereld"
+      ]
+    },
+    {
+      "domein": "domein:adresopzoek",
+      "functies": 1,
+      "welke": [
+        "tg-gegevens"
+      ]
+    },
+    {
+      "domein": "domein:rtgone",
+      "functies": 1,
+      "welke": [
+        "rtgone"
+      ]
+    },
+    {
+      "domein": "domein:boekhoudkennis",
+      "functies": 1,
+      "welke": [
+        "supplier-finance"
+      ]
+    },
+    {
+      "domein": "domein:pdf",
+      "functies": 1,
+      "welke": [
+        "dom-bestanden"
+      ]
+    },
+    {
+      "domein": "domein:pdf-bouw",
+      "functies": 1,
+      "welke": [
+        "dom-bestanden"
+      ]
+    },
+    {
+      "domein": "domein:pdf-notitie",
+      "functies": 1,
+      "welke": [
+        "dom-bestanden"
+      ]
+    },
+    {
+      "domein": "domein:pdf-redactie",
+      "functies": 1,
+      "welke": [
+        "dom-bestanden"
+      ]
+    },
+    {
+      "domein": "domein:pdf-xref",
+      "functies": 1,
+      "welke": [
+        "dom-bestanden"
+      ]
+    },
+    {
+      "domein": "domein:dagcoach",
+      "functies": 1,
+      "welke": [
+        "life"
+      ]
+    },
+    {
+      "domein": "domein:life",
+      "functies": 1,
+      "welke": [
+        "life"
+      ]
+    },
+    {
+      "domein": "domein:toestellen",
+      "functies": 1,
+      "welke": [
+        "dagmetingen"
+      ]
+    },
+    {
+      "domein": "domein:dyncode",
+      "functies": 1,
+      "welke": [
+        "tg-zegel"
+      ]
+    },
+    {
+      "domein": "domein:genootschap",
+      "functies": 1,
+      "welke": [
+        "dom-genootschap"
+      ]
+    },
+    {
+      "domein": "domein:medicatie",
+      "functies": 1,
+      "welke": [
+        "medicijnen"
+      ]
+    },
+    {
+      "domein": "domein:medicatie-regels",
+      "functies": 1,
+      "welke": [
+        "medicijnen"
+      ]
+    },
+    {
+      "domein": "domein:ov",
+      "functies": 1,
+      "welke": [
+        "ov"
+      ]
+    },
+    {
+      "domein": "domein:rtfos",
+      "functies": 1,
+      "welke": [
+        "dom-rtfos"
+      ]
+    },
+    {
+      "domein": "domein:lesmaker",
+      "functies": 1,
+      "welke": [
+        "dom-les"
+      ]
+    },
+    {
+      "domein": "domein:lesmaker-demo",
+      "functies": 1,
+      "welke": [
+        "dom-les"
+      ]
+    },
+    {
+      "domein": "domein:doelen",
+      "functies": 1,
+      "welke": [
+        "doelen"
+      ]
+    },
+    {
+      "domein": "domein:gemoed",
+      "functies": 1,
+      "welke": [
+        "gemoed"
+      ]
+    },
+    {
+      "domein": "domein:gedachten",
+      "functies": 1,
+      "welke": [
+        "gedachten"
+      ]
+    },
+    {
+      "domein": "domein:bureau",
+      "functies": 1,
+      "welke": [
+        "privekantoor"
+      ]
+    },
+    {
+      "domein": "domein:labfonds",
+      "functies": 1,
+      "welke": [
+        "dom-labfonds"
+      ]
+    },
+    {
+      "domein": "domein:samen",
+      "functies": 1,
+      "welke": [
+        "dom-samen"
+      ]
+    },
+    {
+      "domein": "domein:mediaos",
+      "functies": 1,
+      "welke": [
+        "mediaos"
+      ]
+    },
+    {
+      "domein": "domein:instant-reality",
+      "functies": 1,
+      "welke": [
+        "instantreality"
+      ]
+    },
+    {
+      "domein": "domein:voeding",
+      "functies": 1,
+      "welke": [
+        "voeding"
+      ]
+    },
+    {
+      "domein": "domein:noodkaart",
+      "functies": 1,
+      "welke": [
+        "noodkaart"
+      ]
+    },
+    {
+      "domein": "domein:gewoonten",
+      "functies": 1,
+      "welke": [
+        "gewoonten"
+      ]
+    },
+    {
+      "domein": "domein:webauthn-stapop",
+      "functies": 1,
+      "welke": [
+        "dom-rtgid"
+      ]
+    },
+    {
+      "domein": "domein:trainingsschema",
+      "functies": 1,
+      "welke": [
+        "training"
+      ]
+    },
+    {
+      "domein": "domein:tijdlijn",
+      "functies": 1,
+      "welke": [
+        "tijdlijn"
+      ]
+    }
+  ],
   "functiesMetEnvelop": 204,
   "perGraad": {
     "deels-niet-toe-te-rekenen": 7,

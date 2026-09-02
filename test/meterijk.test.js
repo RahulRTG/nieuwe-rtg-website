@@ -853,6 +853,31 @@ const IJKINGEN = {
      geijkt worden: de honderd ijkroutes hieronder vormen een nieuw domein zonder
      toets, en dan hoort dit getal precies een omhoog te gaan. */
   keuringDekkingAdvies: { proef: (voor) => metIjkRoutes(voor).dekkingAdvies },
+  tredeLekken: {
+    /* Zelfde soort meter als activeringOndergrens: hij leest een vastgelegde
+       proef. De ijkvraag is dus of hij MEEBEWEEGT met zijn bestand en of hij
+       invoer weigert die er niet is -- nul zou hier "geen enkel lek buiten
+       trede 0" betekenen, en dat is de gevaarlijkste uitspraak die deze meter
+       kan doen als er niets gemeten is. */
+    proef: () => {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-trede-ijk-'));
+      const pad = path.join(dir, 'TREDEPROEF.json');
+      try {
+        fs.writeFileSync(pad, JSON.stringify({ zuiverLekken: 0, beproefdNiet503: 0 }));
+        assert.equal(norm.leesTredeproef(pad), 0);
+        /* De twee uitslagen tellen allebei mee, en de meter mag er geen van
+           tweeen laten vallen. */
+        fs.writeFileSync(pad, JSON.stringify({ zuiverLekken: 1, beproefdNiet503: 0 }));
+        assert.equal(norm.leesTredeproef(pad), 1, 'een zuiver lek telt');
+        fs.writeFileSync(pad, JSON.stringify({ zuiverLekken: 0, beproefdNiet503: 1 }));
+        assert.equal(norm.leesTredeproef(pad), 1, 'een beproefd lek telt ook');
+        assert.throws(() => norm.leesTredeproef(path.join(dir, 'weg.json')), /ontbreekt/);
+        fs.writeFileSync(pad, JSON.stringify({ trede: 'start' }));
+        assert.throws(() => norm.leesTredeproef(pad), /zuiverLekken/);
+        return 1;
+      } finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} }
+    }
+  },
   activeringOndergrens: {
     /* Deze meter MEET niet zelf: hij leest ACTIVERING.json, want de
        activeringsmeter start de app en dat hoort niet in een ratel die bij elke

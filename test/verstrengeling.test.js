@@ -117,6 +117,22 @@ test('7. ZELFIJKING: een onverklaarde rand heet ONBEKEND en niets anders', () =>
   assert.equal(res.randen[0].grond, 'niemand heeft deze rand verklaard');
 });
 
+test('7b. de eigen ingang telt niet als schade bij uitneembaarheid', () => {
+  /* De fout die deze meter bijna maakte. Wie horeca uitzet, zet de horeca-routes
+     mee uit -- dat is de bedoeling en geen breuk. Zonder dat onderscheid meldde
+     hij dat 542 van de 544 domeinen iets meeslepen, en dat leest als "niets is
+     uit te nemen" terwijl het "elk domein heeft een ingang" betekent. */
+  const r = V.meet(undefined, []);
+  assert.ok(Array.isArray(r.uitneembaar) && r.uitneembaar.length, 'de omkering hoort in de uitslag te staan');
+  for (const u of r.uitneembaar) {
+    assert.ok(u.geraakteDomeinen <= u.geraakt,
+      'de domeinen zijn een deelverzameling van alles wat geraakt wordt: ' + u.id);
+  }
+  /* En beide getallen blijven bestaan: ze mogen niet door elkaar lopen. */
+  const metIngang = r.uitneembaar.find(u => u.geraakt > u.geraakteDomeinen);
+  assert.ok(metIngang, 'er hoort minstens een knoop te zijn die meer knopen dan domeinen raakt');
+});
+
 test('8. wederkerigheid staat BIJ de rand en niet in een tweede lijst', () => {
   const res = V.analyse([
     r('server/kern/a/x.js', 'server/kern/b/x.js'),

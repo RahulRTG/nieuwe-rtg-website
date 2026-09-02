@@ -265,6 +265,24 @@ function meet() {
     routesZonderEigenaar: herkomst.zonderEigenaar,
     randenOnvindbaar: onvindbaar,
     knopenTotaal: alleKnopen,
+    /* DE OMGEKEERDE INDEX: welke FUNCTIES raken iets kwijt als dit domein er
+       niet is. VERSTRENGELING.json beantwoordt dezelfde vraag hard (een require
+       naar iets dat er niet is, faalt bij het LADEN); dit beantwoordt hem zacht
+       (een route die zijn domein via de kern-tas krijgt, laadt gewoon en valt om
+       bij de eerste aanroep). Twee soorten breuk, met opzet niet opgeteld -- ze
+       vragen verschillende reparaties en ze vallen op verschillende momenten.
+
+       Dit is het getal waar een trede op staat of valt: het zegt of RTG Horeca
+       zichtbaar kan zijn terwijl Mobility uit de runtime verdwijnt. */
+    perDomein: (() => {
+      const kaart = new Map();
+      for (const e of r.envelopen) for (const d of e.domeinen) {
+        if (!kaart.has(d)) kaart.set(d, []);
+        kaart.get(d).push(e.id);
+      }
+      return [...kaart].map(([domein, functies]) => ({ domein, functies: functies.length, welke: functies.sort() }))
+        .sort((a, b) => b.functies - a.functies);
+    })(),
     functiesMetEnvelop: r.envelopen.length,
     perGraad: r.envelopen.reduce((a, e) => { a[e.graad] = (a[e.graad] || 0) + 1; return a; }, {}),
     functiesNietToeTeRekenen: r.envelopen.filter(e => e.graad === 'deels-niet-toe-te-rekenen').length,
@@ -307,6 +325,15 @@ function rapport(r) {
   L.push('  een ondergrens is geen kleine envelop maar een onvolledige)');
   for (const e of r.envelopen.slice(-12).reverse())
     L.push(`    ${String(e.knopen).padStart(4)}  ${e.id.padEnd(22)} ${String(e.routes).padStart(4)} routes`);
+  L.push('');
+  L.push('  WELKE FUNCTIES RAKEN IETS KWIJT ALS DIT DOMEIN UIT DE RUNTIME GAAT');
+  L.push('  (zacht: via de kern-tas, dus het breekt bij de AANROEP en niet bij het laden.');
+  L.push('  De harde kant staat in VERSTRENGELING.json onder uitneembaar.)');
+  for (const d of r.perDomein.slice(0, 10))
+    L.push(`      ${d.domein.padEnd(30)} ${String(d.functies).padStart(3)} functies`);
+  const alleen = r.perDomein.filter(d => d.functies === 1).length;
+  L.push(`      ... en ${alleen} domeinen die maar EEN functie raken -- dat zijn de kandidaten`);
+  L.push('      om als eerste zichtbaar te maken of als eerste uit te zetten.');
   L.push('');
   L.push(`  ROUTES ZONDER FUNCTIE: ${r.routesZonderFunctie}`);
   L.push(`    ${r.bediening} verklaard als BEDIENING door het platformregister (de besturing zelf)`);

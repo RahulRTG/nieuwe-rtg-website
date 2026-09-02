@@ -84,6 +84,19 @@
      wederkerig  A -> B en B -> A. Twee knopen die niet los te trekken zijn,
                  en dus voor een trede altijd samen aan of samen uit.
 
+   DE OMGEKEERDE VRAAG STAAT ER OOK IN, en die is voor een trede de
+   belangrijkste. Niet "wat heeft dit domein nodig" maar: WAT BREEKT ALS DIT
+   DOMEIN ER NIET IS. Dat is de transitieve terugwaartse bereikbaarheid, en hij
+   is hard: een require naar een module die er niet is, faalt bij het LADEN --
+   niet bij het aanroepen. Een domein dat door tweehonderd knopen bereikt wordt,
+   is geen domein meer maar een verborgen kern, en dat is een besluit (zeg dat
+   het kern is) of werk (breng de koppelingen terug).
+
+   Wat deze omkering NIET dekt: de kern-tas. Een route die zijn domein via de
+   tas krijgt, laadt gewoon en valt pas om bij de eerste aanroep. Die kant staat
+   in ACTIVERING.json onder `perDomein` -- welke FUNCTIES een domein in hun
+   envelop hebben. Twee soorten breuk, twee registers, met opzet niet opgeteld.
+
    Draai: npm run verstrengeling            (rapport)
           npm run verstrengeling:vast       (schrijft VERSTRENGELING.json)
    ========================================================================== */
@@ -296,6 +309,41 @@ function meet(wortel = BRON, verklaringen) {
     if (r.soort === 'ONBEKEND') knoop(r.van).onbekend++;
   }
 
+  /* WAT BREEKT ALS DIT ER NIET IS. Terugwaartse sluiting per knoop: wie kan hem
+     transitief bereiken. Een eigen ronde omdat het een andere vraag is dan
+     'breedte' -- en omdat een knoop die niemand bereikt (uitneembaar) er precies
+     zo uit hoort te zien als een knoop die iedereen bereikt (kern), namelijk met
+     zijn getal erbij. */
+  const terug = new Map();
+  for (const r of randen) {
+    if (!terug.has(r.naar)) terug.set(r.naar, new Set());
+    terug.get(r.naar).add(r.van);
+  }
+  const uitneembaar = [];
+  for (const k of knopen.keys()) {
+    const gezien = new Set();
+    const rij = [k];
+    while (rij.length) {
+      const n = rij.pop();
+      for (const v of terug.get(n) || []) if (!gezien.has(v)) { gezien.add(v); rij.push(v); }
+    }
+    gezien.delete(k);
+    /* DE EIGEN INGANG TELT NIET ALS SCHADE, en dat is geen versoepeling maar de
+       vraag scherp stellen. Wie horeca uitzet, zet de horeca-routes mee uit --
+       dat is de bedoeling en geen breuk. De vraag van een trede is welke ANDERE
+       domeinen omvallen. Zonder dat onderscheid meldde deze meter dat 542 van de
+       544 domeinen iets meeslepen, en dat leest als "niets is uit te nemen"
+       terwijl het "elk domein heeft een ingang" betekent.
+
+       Beide getallen blijven staan: `geraakt` is alles, `geraakteDomeinen` is
+       wat de trede aangaat. Ze mogen niet door elkaar lopen. */
+    const domeinen = [...gezien].filter(x => x.startsWith('domein:'));
+    uitneembaar.push({ id: k, direct: (terug.get(k) || new Set()).size, geraakt: gezien.size,
+      geraakteDomeinen: domeinen.length, welke: domeinen.sort().slice(0, 25),
+      pct: knopen.size ? Math.round((1 - gezien.size / knopen.size) * 100) : 100 });
+  }
+  uitneembaar.sort((a, b) => b.geraakteDomeinen - a.geraakteDomeinen || b.geraakt - a.geraakt);
+
   const domeinranden = randen.filter(r => r.vanLaag === 'domein' && r.naarLaag === 'domein');
   const omhoog = randen.filter(r => r.omhoog);
 
@@ -323,6 +371,10 @@ function meet(wortel = BRON, verklaringen) {
       .filter(p => p.gebruikers >= PRIMITIEF_VANAF).sort((x, y) => y.gebruikers - x.gebruikers),
     breedste: [...knopen.values()].map(k => ({ id: k.id, uit: k.uit.size, in: k.in.size, onbekend: k.onbekend }))
       .sort((x, y) => y.uit - x.uit).slice(0, 20),
+    domeinknopen: uitneembaar.filter(u => u.id.startsWith('domein:')).length,
+    volledigUitneembaar: uitneembaar.filter(u => u.id.startsWith('domein:') && u.geraakteDomeinen === 0).length,
+    uitneembaarUitleg: 'geraakt = knopen die dit transitief via require bereiken; die falen bij het LADEN als het er niet is. De kern-tas staat hier niet in -- zie ACTIVERING.json perDomein.',
+    uitneembaar,
     werkvoorraad: randen.filter(r => r.soort === 'ONBEKEND')
       .sort((x, y) => y.gewicht - x.gewicht)
       .map(r => ({ van: r.van, naar: r.naar, gewicht: r.gewicht, wederkerig: r.wederkerig, lek: r.lek, voorbeeld: r.voorbeeld })),
@@ -361,6 +413,15 @@ function rapport(r) {
   L.push('  BREEDSTE KNOPEN (uit = hoeveel andere knopen hij nodig heeft)');
   for (const k of r.breedste.slice(0, 12))
     L.push(`      ${k.id.padEnd(28)} uit ${String(k.uit).padStart(3)}   in ${String(k.in).padStart(3)}   onverklaard ${k.onbekend}`);
+  L.push('');
+  L.push('  WAT BREEKT ALS DIT ER NIET IS (transitief, via require; laadtijd)');
+  L.push('  De twaalf die het meest meesleuren -- een domein bovenaan deze lijst is geen');
+  L.push('  domein meer maar een verborgen kern, en dat is een besluit of werk.');
+  for (const u of r.uitneembaar.slice(0, 12))
+    L.push(`      ${u.id.padEnd(28)} ${String(u.geraakteDomeinen).padStart(3)} andere domeinen  (${u.geraakt} knopen in totaal)`);
+  L.push(`  En de andere kant: ${r.volledigUitneembaar} van de ${r.domeinknopen} domeinen sleept GEEN ANDER DOMEIN mee.`);
+  L.push('  Dat is de kant die een trede mogelijk maakt -- maar alleen via require:');
+  L.push('  wat een functie via de kern-tas aanroept, breekt pas bij de aanroep (ACTIVERING.json).');
   L.push('');
   L.push('  ZWAARSTE ONVERKLAARDE RANDEN (de werkvoorraad, zwaarste eerst)');
   for (const w of r.werkvoorraad.slice(0, 20))

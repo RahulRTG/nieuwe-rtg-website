@@ -6,7 +6,7 @@
     "keuringStuk": 0,
     "keuringScheef": 18,
     "dependencies": 0,
-    "testbestanden": 1263,
+    "testbestanden": 1264,
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 18,
     "e2eBestanden": 177,
@@ -29,7 +29,7 @@
     "toetsenOngevoeligPct": 1,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
-    "ratelTanden": 53,
+    "ratelTanden": 54,
     "metingenZonderRatel": 33,
     "ladderRaak": 0,
     "ladderNietGeprobeerd": 1,
@@ -47,7 +47,8 @@
     "dbDeuren": 507,
     "dbDeurenSchrijvend": 269,
     "verstrengelingOnverklaard": 111,
-    "activeringOndergrens": 166
+    "activeringOndergrens": 166,
+    "tredeLekken": 0
   },
   "notities": [
     {
@@ -1332,7 +1333,8 @@
     "e2eBestanden": "2026-09-02",
     "schermenZonderVormtaal": "2026-08-28",
     "verstrengelingOnverklaard": "2026-09-02",
-    "activeringOndergrens": "2026-09-02"
+    "activeringOndergrens": "2026-09-02",
+    "tredeLekken": "2026-09-02"
   },
   "uitzonderingen": [
     {

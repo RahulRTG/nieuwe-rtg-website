@@ -102,15 +102,15 @@ De zeven treden van `LAUNCH.md` staan machineleesbaar in
 kijkt of er dan werkelijk niets anders openstaat. Op trede 0: <!--getal:trede.inTrede-->331<!--/getal-->
 van de <!--getal:trede.routes-->4740<!--/getal--> API-routes open, en <!--getal:trede.lekken-->0<!--/getal--> lekken.
 
-| trede | functies | routes open | zuiver | beproefd | rondgang |
-|---|---|---|---|---|---|
-| 0 · De smalle snee | 19/204 | 331 | 0 | 0 | 0 |
-| 1 · Leden onder elkaar | 26/204 | 544 | 0 | 0 | 0 |
-| 2 · De partners erbij | 29/204 | 1407 | 0 | 0 | 0 |
-| 3 · De vloer draait | 33/204 | 1445 | 0 | 0 | 0 |
-| 4 · Het fundament | 37/204 | 1474 | 0 | 0 | 0 |
-| 5 · De stad | 54/204 | 2010 | 0 | 0 | 0 |
-| 6 · Alles open | 204/204 | 4651 | 0 | 0 | 0 |
+| trede | functies | routes open | zuiver | beproefd | rondgang | onvoltooid |
+|---|---|---|---|---|---|---|
+| 0 · De smalle snee | 19/204 | 331 | 0 | 0 | 0 | 0 |
+| 1 · Leden onder elkaar | 26/204 | 544 | 0 | 0 | 0 | 0 |
+| 2 · De partners erbij | 29/204 | 1407 | 0 | 0 | 0 | 1 |
+| 3 · De vloer draait | 33/204 | 1445 | 0 | 0 | 0 | 3 |
+| 4 · Het fundament | 37/204 | 1474 | 0 | 0 | 0 | 3 |
+| 5 · De stad | 54/204 | 2010 | 0 | 0 | 0 | 3 |
+| 6 · Alles open | 204/204 | 4651 | 0 | 0 | 0 | 0 |
 
 **En een derde uitslag: de rondgang.** Zuiver en beproefd zeggen allebei dat er
 niets *anders* opengaat — een trede waarop niemand kan inloggen scoort daar
@@ -120,8 +120,25 @@ leden-app, De Salon. Zes stappen, elk gekoppeld aan de functie van de trede die
 hij beproeft, en `test/tredeproef.test.js` zakt zodra een stap een functie noemt
 die niet in trede 0 zit. Alle zes slagen, op elke trede.
 
-Wat de rondgang niet dekt: alles wat een **eigen account** eist. De korte inlog
-geeft een pas-sessie zonder account, dus `/api/ik` weigert daar terecht.
+De rondgang groeit mee met de trede: elke stap noemt zijn functie, en staat die
+aan dan hoort de stap te slagen, staat hij uit dan hoort hij 503 te geven. Op
+trede 0 is dat een rondgang van zes geslaagde en negen correct geweigerde
+stappen; op trede 6 lopen alle vijftien, inclusief de hele wig — **een zaak
+vinden, zijn kaart lezen, bestellen en betalen**.
+
+**Een derde uitkomst: onvoltooid.** Op trede 2 tot en met 5 staat `bestellen`
+open terwijl `ov-suppliers` (`/api/suppliers`, de lijst met zaken) pas op trede 6
+opengaat. De ketenstappen kunnen dan niet draaien: hun functie staat aan, maar
+wat ze voedt niet. Dat is geen zakker — de code mankeert niets — maar een
+uitspraak over de **ladder**, en hij staat apart geteld zodat niemand code gaat
+repareren die heel is. Of dat een gat in de ladder is of de bedoeling (een gast
+scant de tafel in plaats van te bladeren, zie `LINK.md`), is een besluit en geen
+meting.
+
+Wat de rondgang niet dekt: alles wat een **eigen account** eist (de korte inlog
+geeft een pas-sessie zonder account, dus `/api/ik` weigert daar terecht) en alles
+wat een **tweede mens** eist — een gesprek, een verbinding, een uitnodiging.
+`member-dm` valt daaronder.
 
 **Twee uitslagen die nooit worden opgeteld.** *Zuiver* vraagt de beslissing zelf
 over álle routes: compleet, en het bewijst de bedrading niet. *Beproefd* klopt
@@ -154,8 +171,9 @@ van gemak: je kunt niet afdwingen wat nooit in de schaduw heeft gelopen.
 - **Geen capability-register eroverheen verklaard.** `CAPABILITEIT.json` heeft die
   vraag al gemeten: er is geen capabilitylaag, er zijn er 21. Een nieuw register
   ernaast wordt de 22ste.
-- **Geen bestellen, betalen of bevestiging in de rondgang.** Die horen bij hogere
-  treden en vragen een zaak, een kassa en een betaalrail.
+- **Geen kassa en geen bevestiging aan de zaakkant.** De rondgang bestelt en
+  betaalt als LID; wat de zaak daarna op de PDA of de kassa ziet, is niet
+  beproefd.
 - **Geen afdwinging op de wekkers.** Zie hierboven: eerst de schaduw.
 - **Geen `default = dicht` in `functieAan()`.** De regel `if (!f) return true`
   staat er nog. Het gat in de vorm is echt, maar het staat vandaag niet open:

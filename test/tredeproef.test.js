@@ -65,12 +65,66 @@ test('3b. elke stap van de rondgang beproeft een functie die IN trede 0 zit', ()
   const start = FASES.find(f => f.id === 'start');
   for (const stap of T.RONDGANG) {
     assert.ok(OP_ID[stap.functie], 'de stap noemt een bestaande functie: ' + stap.functie);
+    /* Een stap zonder `vanaf` hoort bij trede 0; een stap MET `vanaf` hoort bij
+       de trede die hij noemt, en die trede moet bestaan. Zo kan de rondgang
+       meegroeien zonder dat iemand een stap aan een verzonnen trede hangt. */
+    if (stap.vanaf) {
+      const trede = FASES.find(f => f.id === stap.vanaf);
+      assert.ok(trede, 'de stap noemt een bestaande trede: ' + stap.vanaf + ' (' + stap.route + ')');
+      assert.ok(!trede.aan || trede.aan.includes(stap.functie),
+        'en die trede opent die functie ook echt: ' + stap.functie + ' in ' + stap.vanaf);
+      continue;
+    }
     assert.ok(start.aan.includes(stap.functie),
-      'en die functie staat in trede 0: ' + stap.functie + ' (' + stap.route + ')');
+      'een stap zonder vanaf hoort bij trede 0: ' + stap.functie + ' (' + stap.route + ')');
     assert.match(stap.route, /^(GET|POST) \/api\//, 'een stap noemt een echte route: ' + stap.route);
     assert.ok(stap.wat && stap.wat.length > 5, 'en zegt wat een MENS doet, niet hoe de route heet');
   }
   assert.ok(T.RONDGANG.some(s => s.levertToken), 'er is precies een stap die de sessie oplevert');
+});
+
+test('3c. een stap die gegevens doorgeeft, zegt ook waar ze vandaan komen', () => {
+  /* De ketenstappen (zaak vinden -> kaart -> bestellen -> betalen) leunen op
+     elkaar. Een stap met lijfUit heeft een voorganger met bewaar nodig; zonder
+     die voorganger meldt de proef altijd 'onvoltooid' en lijkt de ladder kapot
+     terwijl de rondgang zichzelf niet kan voeden. */
+  const metBewaar = T.RONDGANG.filter(s => s.bewaar).length;
+  const metLijfUit = T.RONDGANG.filter(s => s.lijfUit).length;
+  assert.ok(metLijfUit > 0, 'er zijn ketenstappen');
+  assert.ok(metBewaar > 0, 'en er is minstens een stap die iets bewaart');
+  /* En een stap die MEER dan een lijf aanbiedt, moet kunnen zeggen wanneer hij
+     klaar is -- anders probeert hij er vijfentwintig en merkt niets. */
+  for (const stap of T.RONDGANG) {
+    if (!stap.lijfUit) continue;
+    const uit = stap.lijfUit({ zaken: ['A', 'B'], zaak: 'A', gerecht: 'g', ref: 'r' });
+    if (Array.isArray(uit) && uit.length > 1) {
+      assert.ok(typeof stap.klaar === 'function',
+        'een stap met meerdere pogingen draagt een klaar(): ' + stap.route);
+    }
+    assert.equal(stap.lijfUit({}), null, 'en levert null als zijn voeding ontbreekt: ' + stap.route);
+  }
+});
+
+test('3d. de drie uitkomsten van een stap lopen niet door elkaar', () => {
+  /* Deze toets bestaat omdat een mutatie die 'onvoltooid' als geslaagd liet
+     tellen GEEN enkele toets liet zakken: het oordeel zat in meet(), en meet()
+     start een server. Nu staat het apart en puur. */
+  const o = T.oordeelStap;
+  assert.deepEqual(o({ aanInTrede: true, status: 200 }), { geslaagd: true, onvoltooid: false });
+  assert.deepEqual(o({ aanInTrede: true, status: 403 }), { geslaagd: false, onvoltooid: false });
+  assert.deepEqual(o({ aanInTrede: false, status: 503 }), { geslaagd: true, onvoltooid: false },
+    'een functie die uit staat HOORT 503 te geven, en dat is geslaagd');
+  assert.deepEqual(o({ aanInTrede: false, status: 200 }), { geslaagd: false, onvoltooid: false },
+    'maar een 200 op een uitgezette functie is een lek');
+  assert.deepEqual(o({ aanInTrede: false, status: 404 }), { geslaagd: false, onvoltooid: false },
+    'en een 404 betekent dat de poort omzeild is, niet gepasseerd');
+  /* De voeding, en het verschil dat de mutatie liet zien. */
+  assert.deepEqual(o({ aanInTrede: true, voedingMist: true, status: null }), { geslaagd: false, onvoltooid: true },
+    'zijn functie staat aan maar hij kon niet draaien: onvoltooid, en NIET geslaagd');
+  assert.deepEqual(o({ aanInTrede: false, voedingMist: true, status: null }), { geslaagd: true, onvoltooid: false },
+    'staat de functie toch al uit, dan is er niets aan de hand');
+  /* En een stap die antwoordt maar niet opleverde wat de volgende nodig heeft. */
+  assert.deepEqual(o({ aanInTrede: true, status: 200, klaar: false }), { geslaagd: false, onvoltooid: false });
 });
 
 test('4. elke trede noemt bestaande functies, en trede 0 is de kleinste', () => {

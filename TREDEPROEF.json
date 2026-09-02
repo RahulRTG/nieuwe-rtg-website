@@ -39,55 +39,195 @@
   "steekproefBinnen": 30,
   "beproefdBinnen503": 0,
   "beproefdBinnen503Lijst": [],
-  "rondgangStappen": 6,
+  "rondgangStappen": 15,
   "rondgangGezakt": 0,
+  "rondgangOnvoltooid": 0,
+  "rondgangOnvoltooidLijst": [],
   "rondgangLijst": [
     {
       "wat": "binnenkomen",
       "route": "POST /api/login",
       "functie": "tg-inlog",
+      "aanInTrede": true,
+      "verwacht": "<400",
       "status": 200,
-      "geslaagd": true
+      "geslaagd": true,
+      "onvoltooid": false,
+      "reden": null,
+      "pogingen": 1
     },
     {
       "wat": "zien wat ik mag",
       "route": "POST /api/state",
       "functie": "kern-state",
+      "aanInTrede": true,
+      "verwacht": "<400",
       "status": 200,
-      "geslaagd": true
+      "geslaagd": true,
+      "onvoltooid": false,
+      "reden": null,
+      "pogingen": 1
     },
     {
       "wat": "mijn gegevens beheren",
       "route": "POST /api/gegevens/nodig",
       "functie": "tg-gegevens",
+      "aanInTrede": true,
+      "verwacht": "<400",
       "status": 200,
-      "geslaagd": true
+      "geslaagd": true,
+      "onvoltooid": false,
+      "reden": null,
+      "pogingen": 1
     },
     {
       "wat": "me aanmelden voor een pas",
       "route": "POST /api/aanmeld/start",
       "functie": "tg-aanmeld",
+      "aanInTrede": true,
+      "verwacht": "<400",
       "status": 200,
-      "geslaagd": true
+      "geslaagd": true,
+      "onvoltooid": false,
+      "reden": null,
+      "pogingen": 1
     },
     {
       "wat": "de leden-app openen",
       "route": "POST /api/member/apps",
       "functie": "member",
+      "aanInTrede": true,
+      "verwacht": "<400",
       "status": 200,
-      "geslaagd": true
+      "geslaagd": true,
+      "onvoltooid": false,
+      "reden": null,
+      "pogingen": 1
     },
     {
       "wat": "De Salon lezen",
       "route": "POST /api/salon/feed",
       "functie": "salon",
+      "aanInTrede": true,
+      "verwacht": "<400",
       "status": 200,
-      "geslaagd": true
+      "geslaagd": true,
+      "onvoltooid": false,
+      "reden": null,
+      "pogingen": 1
+    },
+    {
+      "wat": "mijn kletsgesprekken zien",
+      "route": "POST /api/klets",
+      "functie": "kern-berichten",
+      "aanInTrede": false,
+      "verwacht": "503",
+      "status": 503,
+      "geslaagd": true,
+      "onvoltooid": false,
+      "reden": null,
+      "pogingen": 1
+    },
+    {
+      "wat": "mijn sollicitaties zien",
+      "route": "POST /api/member/apply/chats",
+      "functie": "member-werk",
+      "aanInTrede": false,
+      "verwacht": "503",
+      "status": 503,
+      "geslaagd": true,
+      "onvoltooid": false,
+      "reden": null,
+      "pogingen": 1
+    },
+    {
+      "wat": "mijn bestellingen zien",
+      "route": "POST /api/orders/mine",
+      "functie": "bestellen",
+      "aanInTrede": false,
+      "verwacht": "503",
+      "status": 503,
+      "geslaagd": true,
+      "onvoltooid": false,
+      "reden": null,
+      "pogingen": 1
+    },
+    {
+      "wat": "mijn saldo zien",
+      "route": "POST /api/pay/overzicht",
+      "functie": "dom-pay-wallet",
+      "aanInTrede": false,
+      "verwacht": "503",
+      "status": 503,
+      "geslaagd": true,
+      "onvoltooid": false,
+      "reden": null,
+      "pogingen": 1
+    },
+    {
+      "wat": "mijn OV-kaart zien",
+      "route": "POST /api/ov/kaart",
+      "functie": "ov",
+      "aanInTrede": false,
+      "verwacht": "503",
+      "status": 503,
+      "geslaagd": true,
+      "onvoltooid": false,
+      "reden": null,
+      "pogingen": 1
+    },
+    {
+      "wat": "een zaak vinden",
+      "route": "POST /api/suppliers",
+      "functie": "ov-suppliers",
+      "aanInTrede": false,
+      "verwacht": "503",
+      "status": 503,
+      "geslaagd": true,
+      "onvoltooid": false,
+      "reden": null,
+      "pogingen": 1
+    },
+    {
+      "wat": "de kaart van die zaak lezen",
+      "route": "POST /api/supplier/menu/get",
+      "functie": "supplier",
+      "aanInTrede": false,
+      "verwacht": "503",
+      "status": null,
+      "geslaagd": true,
+      "onvoltooid": false,
+      "reden": "de stap die deze voedt kon op deze trede niet draaien",
+      "pogingen": 0
+    },
+    {
+      "wat": "een bestelling plaatsen",
+      "route": "POST /api/order",
+      "functie": "bestellen",
+      "aanInTrede": false,
+      "verwacht": "503",
+      "status": null,
+      "geslaagd": true,
+      "onvoltooid": false,
+      "reden": "de stap die deze voedt kon op deze trede niet draaien",
+      "pogingen": 0
+    },
+    {
+      "wat": "die bestelling betalen",
+      "route": "POST /api/order/pay",
+      "functie": "bestellen",
+      "aanInTrede": false,
+      "verwacht": "503",
+      "status": null,
+      "geslaagd": true,
+      "onvoltooid": false,
+      "reden": "de stap die deze voedt kon op deze trede niet draaien",
+      "pogingen": 0
     }
   ],
   "rondgangKreegSessie": true,
   "routesGeraakt": 36,
-  "rondgangDektNiet": "alles wat een EIGEN ACCOUNT eist. De korte inlog geeft een pas-sessie zonder account, dus routes als /api/ik weigeren terecht met 403 -- die zijn met deze rondgang niet te beproeven.",
+  "rondgangDektNiet": "alles wat een EIGEN ACCOUNT eist (de korte inlog geeft een pas-sessie zonder account, dus /api/ik weigert terecht), en alles wat een TWEEDE MENS eist -- een gesprek, een verbinding, een uitnodiging. member-dm valt daaronder: die route vraagt een withKey en een actieve verbinding, en is met een enkele sessie niet te beproeven.",
   "watDitNietDoet": "de rondgang loopt niet door bestellen, betalen en een bevestiging -- die horen bij hogere treden en vragen een zaak, een kassa en een betaalrail. En alles hier is HTTP: cron, bus en AI-gereedschap komen er niet langs.",
   "treden": [
     {
@@ -99,6 +239,7 @@
       "zuiverLekken": 0,
       "beproefdNiet503": 0,
       "rondgangGezakt": 0,
+      "rondgangOnvoltooid": 0,
       "beproefdVoorDeSchakelaar": 1
     },
     {
@@ -110,6 +251,7 @@
       "zuiverLekken": 0,
       "beproefdNiet503": 0,
       "rondgangGezakt": 0,
+      "rondgangOnvoltooid": 0,
       "beproefdVoorDeSchakelaar": 1
     },
     {
@@ -121,6 +263,7 @@
       "zuiverLekken": 0,
       "beproefdNiet503": 0,
       "rondgangGezakt": 0,
+      "rondgangOnvoltooid": 1,
       "beproefdVoorDeSchakelaar": 1
     },
     {
@@ -132,6 +275,7 @@
       "zuiverLekken": 0,
       "beproefdNiet503": 0,
       "rondgangGezakt": 0,
+      "rondgangOnvoltooid": 3,
       "beproefdVoorDeSchakelaar": 1
     },
     {
@@ -143,6 +287,7 @@
       "zuiverLekken": 0,
       "beproefdNiet503": 0,
       "rondgangGezakt": 0,
+      "rondgangOnvoltooid": 3,
       "beproefdVoorDeSchakelaar": 1
     },
     {
@@ -154,6 +299,7 @@
       "zuiverLekken": 0,
       "beproefdNiet503": 0,
       "rondgangGezakt": 0,
+      "rondgangOnvoltooid": 3,
       "beproefdVoorDeSchakelaar": 1
     },
     {
@@ -165,6 +311,7 @@
       "zuiverLekken": 0,
       "beproefdNiet503": 0,
       "rondgangGezakt": 0,
+      "rondgangOnvoltooid": 0,
       "beproefdVoorDeSchakelaar": 0
     }
   ]

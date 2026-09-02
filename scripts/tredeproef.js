@@ -27,6 +27,14 @@
    en heeft bijwerkingen). Wie ze optelt tot een percentage, krijgt een getal dat
    geen van beide vragen beantwoordt.
 
+   DE RONDGANG GROEIT MEE MET DE TREDE, en dat is geen gemak maar de vorm van de
+   proef. Elke stap noemt de functie die hij beproeft; staat die functie AAN in
+   deze trede, dan hoort de stap te slagen, en staat hij UIT, dan hoort hij 503
+   te geven. Zo is dezelfde lijst op trede 0 een rondgang van zes stappen en op
+   trede 4 een van tien -- en op trede 0 bewijzen de vier extra stappen dat
+   bestellen en betalen daar werkelijk dicht zitten, in plaats van dat ze worden
+   overgeslagen. Een stap die je overslaat, bewijst niets.
+
    DE DERDE UITSLAG: DE RONDGANG
 
    Zuiver en beproefd bewijzen allebei dat er niets ANDERS opengaat. Ze zeggen
@@ -127,8 +135,69 @@ const RONDGANG = [
   { wat: 'mijn gegevens beheren', route: 'POST /api/gegevens/nodig', functie: 'tg-gegevens' },
   { wat: 'me aanmelden voor een pas', route: 'POST /api/aanmeld/start', functie: 'tg-aanmeld' },
   { wat: 'de leden-app openen', route: 'POST /api/member/apps', functie: 'member' },
-  { wat: 'De Salon lezen', route: 'POST /api/salon/feed', functie: 'salon' }
+  { wat: 'De Salon lezen', route: 'POST /api/salon/feed', functie: 'salon' },
+  /* Vanaf hier komt er per trede iets bij. Op een lagere trede horen deze
+     stappen 503 te geven -- dat is de tweede helft van dezelfde proef. */
+  /* HIER STOND /api/member/dm, EN DAT WAS DEZELFDE MISGREEP ALS /api/ik. Die
+     route is een gesprek MET iemand: hij vraagt een withKey en een actieve
+     verbinding, en weigert terecht met 403 zolang die er niet is. Er bestaat
+     geen leeslijst binnen member-dm, dus die functie is met een enkele sessie
+     niet te beproeven -- daarvoor zijn twee leden en een verbinding nodig.
+     /api/klets hoort bij kern-berichten, dat in dezelfde trede opengaat, en is
+     wel met een eigen sessie te lezen. */
+  { wat: 'mijn kletsgesprekken zien', route: 'POST /api/klets', functie: 'kern-berichten', vanaf: 'ontmoeten' },
+  { wat: 'mijn sollicitaties zien', route: 'POST /api/member/apply/chats', functie: 'member-werk', vanaf: 'partners' },
+  { wat: 'mijn bestellingen zien', route: 'POST /api/orders/mine', functie: 'bestellen', vanaf: 'bestellen' },
+  { wat: 'mijn saldo zien', route: 'POST /api/pay/overzicht', functie: 'dom-pay-wallet', vanaf: 'fundament' },
+  { wat: 'mijn OV-kaart zien', route: 'POST /api/ov/kaart', functie: 'ov', vanaf: 'stad' },
+
+  /* DE WIG UIT LAUNCH.md, in vier stappen die elkaar VOEDEN: een zaak vinden,
+     zijn kaart lezen, bestellen, betalen. Elke stap hangt aan een andere functie
+     en die functies gaan op verschillende treden open -- dat is precies wat hier
+     te beproeven valt.
+
+     Een stap die de uitkomst van een vorige nodig heeft, kan ONVOLTOOID
+     eindigen: zijn functie staat aan, maar de stap ervoor kon op deze trede niet
+     draaien. Dat is een derde uitkomst en geen zakker -- het zegt iets over de
+     LADDER, niet over de code. */
+  { wat: 'een zaak vinden', route: 'POST /api/suppliers', functie: 'ov-suppliers', vanaf: 'alles',
+    bewaar: (d, staat) => { staat.zaken = (d && d.suppliers || []).map(z => z.code); } },
+  /* NIET ELKE ZAAK HEEFT EEN KAART, en de eerste uit de lijst had er geen. Deze
+     stap kreeg daardoor op trede 6 -- waar alles open staat -- geen gerecht te
+     pakken, en de twee stappen erna bleven leeg. Dat las als een gat in de
+     ladder terwijl het gegevens waren. Hij probeert er dus meer, en de uitslag
+     zegt hoeveel pogingen het kostte: een stap die pas bij de twintigste zaak
+     slaagt, vertelt iets anders dan een die het meteen doet. */
+  { wat: 'de kaart van die zaak lezen', route: 'POST /api/supplier/menu/get', functie: 'supplier', vanaf: 'partners',
+    lijfUit: (staat) => (staat.zaken && staat.zaken.length ? staat.zaken.slice(0, 25).map(code => ({ code })) : null),
+    klaar: (staat) => !!staat.gerecht,
+    bewaar: (d, staat) => { const m = (d && d.menu || [])[0]; if (m) { staat.gerecht = m.id; staat.zaak = d.supplier && d.supplier.code; } } },
+  { wat: 'een bestelling plaatsen', route: 'POST /api/order', functie: 'bestellen', vanaf: 'bestellen',
+    lijfUit: (staat) => (staat.zaak && staat.gerecht ? { supplierCode: staat.zaak, items: [{ id: staat.gerecht, qty: 1 }] } : null),
+    bewaar: (d, staat) => { if (d && d.order) staat.ref = d.order.ref; } },
+  { wat: 'die bestelling betalen', route: 'POST /api/order/pay', functie: 'bestellen', vanaf: 'bestellen',
+    lijfUit: (staat) => (staat.ref ? { ref: staat.ref } : null) }
 ];
+
+/* HET OORDEEL OVER EEN STAP, apart en puur.
+
+   Dit stond in meet(), en meet() start een server -- dus was het niet te
+   toetsen. Een mutatie die 'onvoltooid' als geslaagd liet tellen, liet geen
+   enkele toets zakken. Dat is precies de vorm die LAT.md regel 2 verbiedt: een
+   oordeel dat niemand kan zien zakken.
+
+   Drie uitkomsten, en ze zijn niet uitwisselbaar:
+     GESLAAGD    de functie staat aan en de route antwoordt (<400), of de functie
+                 staat uit en de schakelkast weigert hem (503).
+     ONVOLTOOID  de functie staat aan, maar de stap die deze voedt kon op deze
+                 trede niet draaien. Een uitspraak over de LADDER, niet over de
+                 code -- en dus geen zakker.
+     ZAKT        al het andere. */
+function oordeelStap({ aanInTrede, status, voedingMist, klaar }) {
+  if (voedingMist) return { geslaagd: !aanInTrede, onvoltooid: !!aanInTrede };
+  if (!aanInTrede) return { geslaagd: status === 503, onvoltooid: false };
+  return { geslaagd: status !== null && status < 400 && klaar !== false, onvoltooid: false };
+}
 
 /* Hoeveel routes er ECHT worden aangeklopt, per soort. Een steekproef en geen
    volledigheid: zie de kop. Het getal staat hier zodat het in de uitslag mee
@@ -265,28 +334,65 @@ async function meet(tredeId) {
   /* ---- DE RONDGANG: werkt de trede zelf? ---- */
   let token = null;
   const rondgang = [];
+  const staat = {};
   for (const stap of RONDGANG) {
     const [methode, pad] = stap.route.split(' ');
-    const ac = new AbortController();
-    const t = setTimeout(() => ac.abort(), 5000);
-    let status = null, data = null;
-    try {
-      const res = await fetch('http://127.0.0.1:' + poort + pad, {
-        method: methode, signal: ac.signal,
-        headers: { 'content-type': 'application/json', ...(token ? { authorization: 'Bearer ' + token } : {}) },
-        body: JSON.stringify(stap.lijf || {})
-      });
-      status = res.status;
-      try { data = await res.json(); } catch (e) { data = null; }
-    } catch (e) { status = null; }
-    finally { clearTimeout(t); }
+    const aanInTredeVooraf = aan.has(stap.functie);
+    /* EEN STAP DIE ZIJN VOEDING MIST. Zijn functie staat aan, maar de stap die
+       hem zou voeden kon op deze trede niet draaien. Dat is geen zakker: de code
+       is niet stuk, de LADDER is niet rond. Zo'n uitkomst hoort een eigen naam
+       te hebben, anders leest hij als een defect en gaat iemand code repareren
+       die niets mankeert. */
+    let lijf = stap.lijf || {};
+    if (stap.lijfUit) {
+      const uit = stap.lijfUit(staat);
+      if (!uit) {
+        rondgang.push({ ...stap, aanInTrede: aanInTredeVooraf, verwacht: aanInTredeVooraf ? '<400' : '503',
+          status: null, ...oordeelStap({ aanInTrede: aanInTredeVooraf, status: null, voedingMist: true }),
+          reden: 'de stap die deze voedt kon op deze trede niet draaien' });
+        continue;
+      }
+      lijf = uit;
+    }
+    /* Een stap mag MEER DAN EEN lijf aanbieden (zie de kaartstap): hij stopt bij
+       de eerste die oplevert wat de volgende nodig heeft. */
+    const lijven = Array.isArray(lijf) ? lijf : [lijf];
+    let status = null, data = null, pogingen = 0;
+    for (const dit of lijven) {
+      pogingen++;
+      const ac = new AbortController();
+      const t = setTimeout(() => ac.abort(), 5000);
+      try {
+        const res = await fetch('http://127.0.0.1:' + poort + pad, {
+          method: methode, signal: ac.signal,
+          headers: { 'content-type': 'application/json', ...(token ? { authorization: 'Bearer ' + token } : {}) },
+          body: JSON.stringify(dit)
+        });
+        status = res.status;
+        try { data = await res.json(); } catch (e) { data = null; }
+      } catch (e) { status = null; }
+      finally { clearTimeout(t); }
+      if (stap.bewaar && status !== null && status < 400) { try { stap.bewaar(data, staat); } catch (e) { /* de volgende stap meldt zelf dat hij niets kreeg */ } }
+      if (!stap.klaar || stap.klaar(staat)) break;
+    }
     if (stap.levertToken && data && (data.token || (data.sessie && data.sessie.token))) {
       token = data.token || data.sessie.token;
     }
-    /* GESLAAGD IS STRENG: onder de 400. Een 401 op een stap die na de inlog komt
-       betekent dat de sessie niet werkt, en dat is precies wat deze rondgang
-       hoort te vangen -- niet iets om als "de route bestaat" weg te schrijven. */
-    rondgang.push({ ...stap, status, geslaagd: status !== null && status < 400 });
+
+    /* WAT GESLAAGD BETEKENT, HANGT AF VAN DE TREDE.
+
+       Staat de functie AAN, dan is geslaagd streng: onder de 400. Een 401 op een
+       stap na de inlog betekent dat de sessie niet werkt, en dat is precies wat
+       deze rondgang hoort te vangen -- niet iets om als "de route bestaat" weg
+       te schrijven.
+
+       Staat de functie UIT, dan is geslaagd exact 503: de schakelkast hoort hem
+       te weigeren. Een 200 daar is een lek dat de steekproef gemist kan hebben,
+       en een 404 of 401 betekent dat de poort niet gepasseerd is maar omzeild. */
+    const aanInTrede = aan.has(stap.functie);
+    const oordeel = oordeelStap({ aanInTrede, status, voedingMist: false,
+      klaar: stap.klaar ? stap.klaar(staat) : undefined });
+    rondgang.push({ ...stap, aanInTrede, verwacht: aanInTrede ? '<400' : '503', status, ...oordeel, pogingen });
   }
 
   /* Een route buiten de trede hoort 503 te geven. Een ANDER antwoord is de
@@ -320,11 +426,15 @@ async function meet(tredeId) {
     steekproefBinnen: binnenProef.length,
     beproefdBinnen503: binnen503.length, beproefdBinnen503Lijst: binnen503.slice(0, 20),
     rondgangStappen: rondgang.length,
-    rondgangGezakt: rondgang.filter(r => !r.geslaagd).length,
-    rondgangLijst: rondgang.map(r => ({ wat: r.wat, route: r.route, functie: r.functie, status: r.status, geslaagd: r.geslaagd })),
+    rondgangGezakt: rondgang.filter(r => !r.geslaagd && !r.onvoltooid).length,
+    rondgangOnvoltooid: rondgang.filter(r => r.onvoltooid).length,
+    rondgangOnvoltooidLijst: rondgang.filter(r => r.onvoltooid).map(r => r.wat + ' (' + r.route + ', ' + r.functie + '): ' + r.reden),
+    rondgangLijst: rondgang.map(r => ({ wat: r.wat, route: r.route, functie: r.functie,
+      aanInTrede: r.aanInTrede, verwacht: r.verwacht, status: r.status, geslaagd: r.geslaagd,
+      onvoltooid: !!r.onvoltooid, reden: r.reden || null, pogingen: r.pogingen || 0 })),
     rondgangKreegSessie: !!token,
     routesGeraakt: geraakt.size,
-    rondgangDektNiet: 'alles wat een EIGEN ACCOUNT eist. De korte inlog geeft een pas-sessie zonder account, dus routes als /api/ik weigeren terecht met 403 -- die zijn met deze rondgang niet te beproeven.',
+    rondgangDektNiet: 'alles wat een EIGEN ACCOUNT eist (de korte inlog geeft een pas-sessie zonder account, dus /api/ik weigert terecht), en alles wat een TWEEDE MENS eist -- een gesprek, een verbinding, een uitnodiging. member-dm valt daaronder: die route vraagt een withKey en een actieve verbinding, en is met een enkele sessie niet te beproeven.',
     watDitNietDoet: 'de rondgang loopt niet door bestellen, betalen en een bevestiging -- die horen bij hogere treden en vragen een zaak, een kassa en een betaalrail. En alles hier is HTTP: cron, bus en AI-gereedschap komen er niet langs.'
   };
 }
@@ -370,8 +480,16 @@ function rapport(r) {
   L.push('');
   L.push('  DE RONDGANG -- werkt de trede zelf?');
   for (const st of r.rondgangLijst)
-    L.push(`    ${st.geslaagd ? 'ok  ' : 'ZAKT'}  ${String(st.status).padStart(3)}  ${st.wat.padEnd(28)} ${st.route}  [${st.functie}]`);
+    L.push(`    ${st.onvoltooid ? 'leeg' : st.geslaagd ? 'ok  ' : 'ZAKT'}  ${String(st.status === null ? '-' : st.status).padStart(3)} (${st.verwacht.padEnd(4)})  ` +
+      `${st.aanInTrede ? 'aan ' : 'uit '} ${st.wat.padEnd(24)} ${st.route}  [${st.functie}]` +
+      `${st.pogingen > 1 ? '  (' + st.pogingen + ' pogingen)' : ''}`);
   L.push('    (dekt niet: ' + r.rondgangDektNiet.split('.')[0].toLowerCase() + ')');
+  if (r.rondgangOnvoltooid) {
+    L.push(`    ${r.rondgangOnvoltooid} stap(pen) konden NIET draaien -- hun functie staat aan, maar wat`);
+    L.push('    ze nodig hebben gaat op deze trede nog niet open. Dat is een uitspraak over de');
+    L.push('    LADDER en niet over de code:');
+    for (const x of r.rondgangOnvoltooidLijst) L.push('      ' + x);
+  }
   L.push(`    ${r.rondgangGezakt} van de ${r.rondgangStappen} stappen zakt` +
     (r.rondgangKreegSessie ? '' : '  <-- en er kwam geen sessie tot stand, dus alles erna zegt niets'));
   L.push('');
@@ -395,9 +513,22 @@ function alleTreden() {
   try {
     for (const f of FASES) {
       const doel = path.join(map, f.id + '.json');
-      cp.execFileSync(process.execPath, [__filename, '--trede', f.id, '--uit', doel],
-        { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, stdio: 'ignore',
+      /* spawnSync EN NIET execFileSync. Een kind eindigt met code 1 zodra zijn
+         eigen rondgang iets vindt -- dat is precies waarvoor die code er is --
+         en execFileSync GOOIT daarop. De verzamelaar viel dus om op de eerste
+         trede met een bevinding, en liet geen enkele uitslag achter: de proef
+         sneuvelde op zijn eigen poort.
+
+         De uitslag staat in het BESTAND, niet in de exitcode. Ontbreekt dat
+         bestand, dan is er werkelijk iets misgegaan en zeggen we dat met de
+         foutuitvoer erbij in plaats van met een lege tabel. */
+      const r = cp.spawnSync(process.execPath, [__filename, '--trede', f.id, '--uit', doel],
+        { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, stdio: ['ignore', 'ignore', 'pipe'],
           env: { ...process.env, PORT: '', RTG_DATA_DIR: '' } });
+      if (!fs.existsSync(doel)) {
+        throw new Error('trede ' + f.id + ' leverde geen uitslag (exit ' + r.status + '): ' +
+          String(r.stderr || '').slice(-400));
+      }
       uit.push(JSON.parse(fs.readFileSync(doel, 'utf8')));
     }
   } finally { try { fs.rmSync(map, { recursive: true, force: true }); } catch (e) {} }
@@ -408,7 +539,7 @@ function tabel(treden) {
   const L = [];
   L.push('ALLE TREDEN -- wat staat er open, en lekt er iets');
   L.push('');
-  L.push('  trede                              functies   routes open   dicht   zuiver   beproefd  rondgang');
+  L.push('  trede                              functies   routes open   dicht   zuiver   beproefd  rondgang  onvoltooid');
   for (const t of treden) {
     L.push('    ' + t.tredeNaam.padEnd(32) +
       String(t.functiesAan + '/' + t.functiesTotaal).padStart(9) +
@@ -416,7 +547,7 @@ function tabel(treden) {
       String(t.routesBuitenTrede).padStart(8) +
       String(t.zuiverLekken).padStart(9) +
       String(t.beproefdNiet503).padStart(11) +
-      String(t.rondgangGezakt).padStart(10));
+      String(t.rondgangGezakt).padStart(10) + String(t.rondgangOnvoltooid).padStart(11));
   }
   L.push('');
   L.push('  zuiver = routes buiten de trede die de schakelkast niet dichtzet (alle routes).');
@@ -432,7 +563,7 @@ if (require.main === module && process.argv.includes('--alle')) {
     trede: t.trede, naam: t.tredeNaam, functiesAan: t.functiesAan,
     routesInTrede: t.routesInTrede, routesBuitenTrede: t.routesBuitenTrede,
     zuiverLekken: t.zuiverLekken, beproefdNiet503: t.beproefdNiet503,
-    rondgangGezakt: t.rondgangGezakt,
+    rondgangGezakt: t.rondgangGezakt, rondgangOnvoltooid: t.rondgangOnvoltooid,
     beproefdVoorDeSchakelaar: t.beproefdVoorDeSchakelaar })) };
   fs.writeFileSync(path.join(WORTEL, 'TREDEPROEF.json'), JSON.stringify(uit, null, 2) + '\n');
   process.stdout.write(rapport(hoofd) + '\n\n' + tabel(treden) + '\n\nVastgelegd in TREDEPROEF.json\n');
@@ -450,4 +581,4 @@ if (require.main === module && process.argv.includes('--alle')) {
   }).catch(e => { process.stderr.write('de tredeproef kon niet draaien: ' + (e && e.stack || e) + '\n'); process.exit(2); });
 }
 
-module.exports = { meet, rapport, tabel, indeling, steekproef, VOOR_DE_SCHAKELAAR, isVoorDeSchakelaar, RONDGANG };
+module.exports = { meet, rapport, tabel, indeling, steekproef, oordeelStap, VOOR_DE_SCHAKELAAR, isVoorDeSchakelaar, RONDGANG };

@@ -38,6 +38,14 @@
    opstarten is de tas het doel met de meeste bijdragen -- hij heeft geen naam
    die van buiten te zien is, dus hij wordt HERKEND en niet aangewezen.
 
+   EN OP DE FABRIEK IN DE EXPORT, niet alleen op de export zelf. Het patroon
+   `require('./kern/klok').maakKlok({...})` levert een object dat door niemand
+   gemerkt is: de fabriek is een EIGENSCHAP van de export, en het inpakken zat
+   alleen op de export als geheel. De sleutel `klok` bleef daardoor onbekend en
+   de functie kern-klok hield een envelop over waar zijn eigen domein niet in
+   zat -- terwijl hij dat domein volledig bezit. Elke functiewaarde van een
+   gemerkte export wordt daarom zelf ook ingepakt.
+
    HET MERK MOET OP DE WAARDE EN NIET ALLEEN OP HET OBJECT. Een deel van de tas
    wordt gevuld met een LETTERLIJK object: `Object.assign(kern, { vonkBericht:
    mod.bericht, vonkBetaal: mod.betaal })`. Zo'n literaal komt niet uit een
@@ -121,7 +129,23 @@ function merkRequire(BRON, BRON_FN) {
       if (typeof o === 'object') {
         for (const k of Object.keys(o)) {
           let v; try { v = o[k]; } catch (e) { continue; }
-          if (typeof v === 'function' && !BRON_FN.has(v)) BRON_FN.set(v, rel);
+          if (typeof v !== 'function' || BRON_FN.has(v)) continue;
+          BRON_FN.set(v, rel);
+          /* De fabriek in de export: `require(...).maakKlok({...})`. Inpakken
+             zodat wat zij TERUGGEEFT ook een bron draagt. Het schrijven kan
+             stuklopen op een bevroren export -- dan blijft het bij het merk op
+             de functie zelf, en dat is een sleutel minder en geen fout. */
+          try {
+            const ingepakt = new Proxy(v, { apply(t, th, a) {
+              const r = Reflect.apply(t, th, a);
+              if (r && (typeof r === 'object' || typeof r === 'function')) {
+                try { if (!BRON.has(r)) BRON.set(r, rel); } catch (e) {}
+              }
+              return r;
+            } });
+            BRON_FN.set(ingepakt, rel);
+            o[k] = ingepakt;
+          } catch (e) { /* bevroren of alleen-lezen export */ }
         }
       }
     } catch (e) { /* bevroren of exotisch object */ }

@@ -62,7 +62,7 @@ const REGISTER = {
   'GLUURRONDE.json': { meter: ['gluurGaten', 'gluurGecontroleerd'] },
   'VERSTRENGELING.json': { meter: ['verstrengelingOnverklaard'] },
   'ACTIVERING.json': { meter: ['activeringOndergrens'] },
-  'TREDEPROEF.json': { meter: ['tredeLekken'] },
+  'TREDEPROEF.json': { meter: ['tredeLekken', 'tredeRondgangGezakt'] },
   'WEKKERS.json': { meter: ['wekkersOnverklaard'] },
 
   /* Deze vier dragen hun eigen grondwaarde. De ratel staat in het genoemde

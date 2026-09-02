@@ -50,10 +50,10 @@ werk (breng de koppelingen terug).
 
 Per functie uit de catalogus: welke routes, welke bestanden, welke domeinen.
 <!--getal:activering.functies-->204<!--/getal--> functies dragen routes; een doorsnee functie raakt
-<!--getal:activering.mediaan-->18<!--/getal--> knopen.
+<!--getal:activering.mediaan-->22<!--/getal--> knopen.
 
-**Drie graden, en ze zijn niet uitwisselbaar.** <!--getal:activering.gemeten-->31<!--/getal--> functies
-zijn `gemeten`; <!--getal:activering.ondergrens-->166<!--/getal--> zijn `ondergrens` (er hangt méér aan dan
+**Drie graden, en ze zijn niet uitwisselbaar.** <!--getal:activering.gemeten-->67<!--/getal--> functies
+zijn `gemeten`; <!--getal:activering.ondergrens-->130<!--/getal--> zijn `ondergrens` (er hangt méér aan dan
 hier staat) en zeven zijn `deels-niet-toe-te-rekenen` (hun route hangt in de
 bedrading, en de sluiting vanaf `server.js` is het hele huis).
 
@@ -83,17 +83,28 @@ verrekent: een rand weg in het ene domein betaalt een nieuwe in het andere.
 De zeven treden van `LAUNCH.md` staan machineleesbaar in
 `server/functies/register` (`FASES`). De proef zet er één aan, de rest uit, en
 kijkt of er dan werkelijk niets anders openstaat. Op trede 0: <!--getal:trede.inTrede-->331<!--/getal-->
-van de <!--getal:trede.routes-->4738<!--/getal--> API-routes open, en <!--getal:trede.lekken-->0<!--/getal--> lekken.
+van de <!--getal:trede.routes-->4740<!--/getal--> API-routes open, en <!--getal:trede.lekken-->0<!--/getal--> lekken.
 
-| trede | functies | routes open | zuiver | beproefd |
-|---|---|---|---|---|
-| 0 · De smalle snee | 19/204 | 331 | 0 | 0 |
-| 1 · Leden onder elkaar | 26/204 | 544 | 0 | 0 |
-| 2 · De partners erbij | 29/204 | 1407 | 0 | 0 |
-| 3 · De vloer draait | 33/204 | 1445 | 0 | 0 |
-| 4 · Het fundament | 37/204 | 1474 | 0 | 0 |
-| 5 · De stad | 54/204 | 2010 | 0 | 0 |
-| 6 · Alles open | 204/204 | 4651 | 0 | 0 |
+| trede | functies | routes open | zuiver | beproefd | rondgang |
+|---|---|---|---|---|---|
+| 0 · De smalle snee | 19/204 | 331 | 0 | 0 | 0 |
+| 1 · Leden onder elkaar | 26/204 | 544 | 0 | 0 | 0 |
+| 2 · De partners erbij | 29/204 | 1407 | 0 | 0 | 0 |
+| 3 · De vloer draait | 33/204 | 1445 | 0 | 0 | 0 |
+| 4 · Het fundament | 37/204 | 1474 | 0 | 0 | 0 |
+| 5 · De stad | 54/204 | 2010 | 0 | 0 | 0 |
+| 6 · Alles open | 204/204 | 4651 | 0 | 0 | 0 |
+
+**En een derde uitslag: de rondgang.** Zuiver en beproefd zeggen allebei dat er
+niets *anders* opengaat — een trede waarop niemand kan inloggen scoort daar
+vlekkeloos. De rondgang loopt daarom een echte ingelogde reis langs wat trede 0
+belooft: binnenkomen, zien wat ik mag, mijn gegevens, aanmelden voor een pas, de
+leden-app, De Salon. Zes stappen, elk gekoppeld aan de functie van de trede die
+hij beproeft, en `test/tredeproef.test.js` zakt zodra een stap een functie noemt
+die niet in trede 0 zit. Alle zes slagen, op elke trede.
+
+Wat de rondgang niet dekt: alles wat een **eigen account** eist. De korte inlog
+geeft een pas-sessie zonder account, dus `/api/ik` weigert daar terecht.
 
 **Twee uitslagen die nooit worden opgeteld.** *Zuiver* vraagt de beslissing zelf
 over álle routes: compleet, en het bewijst de bedrading niet. *Beproefd* klopt
@@ -109,7 +120,7 @@ een lek.
 
 De tredeproef bewijst de HTTP-kant. Daarnaast staat de gevaarlijkste vorm van
 "uit": het ziet er dicht uit en het draait. <!--getal:wekkers.totaal-->47<!--/getal--> wekkers
-(klokken, busabonnees, webhooks), waarvan er <!--getal:wekkers.onverklaard-->8<!--/getal--> geen enkele
+(klokken, busabonnees, webhooks), waarvan er <!--getal:wekkers.onverklaard-->0<!--/getal--> geen enkele
 functie raken en niet verklaard zijn.
 
 **De AI is hier geen gat**, en dat is nagekeken: `kern/stuur.js` r.130 roept zijn
@@ -126,9 +137,8 @@ van gemak: je kunt niet afdwingen wat nooit in de schaduw heeft gelopen.
 - **Geen capability-register eroverheen verklaard.** `CAPABILITEIT.json` heeft die
   vraag al gemeten: er is geen capabilitylaag, er zijn er 21. Een nieuw register
   ernaast wordt de 22ste.
-- **Geen mensenrondgang in de tredeproef.** Hij bewijst dat er niets anders
-  opengaat, niet dat de trede zelf wérkt. Die helft ontbreekt en dat staat in
-  zijn eigen uitslag.
+- **Geen bestellen, betalen of bevestiging in de rondgang.** Die horen bij hogere
+  treden en vragen een zaak, een kassa en een betaalrail.
 - **Geen afdwinging op de wekkers.** Zie hierboven: eerst de schaduw.
 - **Geen `default = dicht` in `functieAan()`.** De regel `if (!f) return true`
   staat er nog. Het gat in de vorm is echt, maar het staat vandaag niet open:
@@ -139,7 +149,12 @@ van gemak: je kunt niet afdwingen wat nooit in de schaduw heeft gelopen.
 ## Het einddoel, en waar we staan
 
 Het doel is: RTG Horeca volledig zichtbaar terwijl Mobility, School en Office uit
-de runtime verdwijnen, zonder één fout. De HTTP-helft daarvan is bewezen voor
-alle zeven treden. Wat nog niet bewezen is: dat de trede zelf werkt (dat vraagt
-een echte rondgang), en dat er niets langs een klok of de bus alsnog begint (dat
-vraagt de acht onverklaarde wekkers, en daarna een besluit over afdwingen).
+de runtime verdwijnen, zonder één fout. Voor de HTTP-kant is dat bewezen op alle
+zeven treden, in beide richtingen: er gaat niets anders open, én de trede zelf
+werkt.
+
+Wat nog niet bewezen is, en dat is de eerlijke rest: elke wekker draagt nu een
+functie of een reden, maar er wordt nog niets AFGEDWONGEN buiten HTTP om — die
+laag loopt met opzet eerst in de schaduw. En de rondgang stopt bij wat trede 0
+belooft: bestellen, betalen en een bevestiging zijn nooit end-to-end beproefd
+met de rest van het huis uit.

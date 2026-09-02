@@ -25,19 +25,10 @@
       "reden": "zelfde reden: rauwe body, handtekening, en de munt-aanbieder meldt iets dat al gebeurd is"
     }
   ],
-  "ongeschakeld": 8,
-  "ongeschakeldVerklaard": 19,
+  "ongeschakeld": 0,
+  "ongeschakeldVerklaard": 26,
   "verklaringenOngebruikt": [],
-  "ongeschakeldLijst": [
-    "BUS  server/kern/sessies.js (1x)",
-    "BUS  server/kern/sse.js (1x)",
-    "KLOK  server/bewaarveger.js (1x)",
-    "KLOK  server/kern/klok.js (1x)",
-    "KLOK  server/kern/zaakdoos/index.js (1x)",
-    "KLOK  server/kern/zelfzorg/index.js (1x)",
-    "KLOK  server/routes/techniek/bewaren.js (1x)",
-    "KLOK  server/trio.js (1x)"
-  ],
+  "ongeschakeldLijst": [],
   "lijst": [
     {
       "soort": "KLOK",
@@ -52,7 +43,8 @@
       "bestand": "server/bewaarveger.js",
       "aantal": 1,
       "functies": 0,
-      "welke": []
+      "welke": [],
+      "verklaard": "wist gegevens die over hun bewaartermijn zijn (AVG); een wettelijke plicht hoort niet achter een functieschakelaar, en uitzetten betekent hier bewaren wat weg moet"
     },
     {
       "soort": "BUS",
@@ -104,13 +96,6 @@
     },
     {
       "soort": "KLOK",
-      "bestand": "server/kern/klok.js",
-      "aantal": 1,
-      "functies": 0,
-      "welke": []
-    },
-    {
-      "soort": "KLOK",
       "bestand": "server/kern/schild.js",
       "aantal": 1,
       "functies": 0,
@@ -122,28 +107,32 @@
       "bestand": "server/kern/sessies.js",
       "aantal": 1,
       "functies": 0,
-      "welke": []
+      "welke": [],
+      "verklaard": "houdt sessies gelijk over meerdere servers; zet je dat uit, dan logt iemand uit doordat zijn verzoek bij de andere server landt"
     },
     {
       "soort": "BUS",
       "bestand": "server/kern/sse.js",
       "aantal": 1,
       "functies": 0,
-      "welke": []
+      "welke": [],
+      "verklaard": "de afleverlaag van realtime-berichten. Staat de functie kern-live uit, dan komt er geen verbinding tot stand en heeft deze abonnee niemand om aan te leveren -- hij begint zelf geen werk"
     },
     {
       "soort": "KLOK",
       "bestand": "server/kern/zaakdoos/index.js",
       "aantal": 1,
       "functies": 0,
-      "welke": []
+      "welke": [],
+      "verklaard": "draait alleen in doosmodus (`if (actief)`, gezet met RTG_DOOS_CLOUD): het kastje in de zaak dat doorwerkt als de lijn wegvalt. Buiten die modus bestaat de klok niet"
     },
     {
       "soort": "KLOK",
       "bestand": "server/kern/zelfzorg/index.js",
       "aantal": 1,
       "functies": 0,
-      "welke": []
+      "welke": [],
+      "verklaard": "de stille automaat achter RTG_ZELFZORG_MS, met een eigen knop in de boardroom (api.automaatAan); op nul zetten stopt hem, en hij draait alleen op de leider"
     },
     {
       "soort": "KLOK",
@@ -238,14 +227,25 @@
       "bestand": "server/routes/techniek/bewaren.js",
       "aantal": 1,
       "functies": 0,
-      "welke": []
+      "welke": [],
+      "verklaard": "de opruimknop van diezelfde bewaartermijnen, en hij hangt onder /api/techniek -- dat is bediening en geen functie (kern/platformregister/bediening.js)"
     },
     {
       "soort": "KLOK",
       "bestand": "server/trio.js",
       "aantal": 1,
       "functies": 0,
-      "welke": []
+      "welke": [],
+      "verklaard": "de hartslag tussen de drie servers van het failover-trio; een failover die je kunt uitzetten is geen failover"
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/kern/klok.js",
+      "aantal": 1,
+      "functies": 1,
+      "welke": [
+        "kern-klok"
+      ]
     },
     {
       "soort": "KLOK",
@@ -303,16 +303,6 @@
     },
     {
       "soort": "KLOK",
-      "bestand": "server/kern/payroll/bijwerken.js",
-      "aantal": 1,
-      "functies": 2,
-      "welke": [
-        "supplier",
-        "office"
-      ]
-    },
-    {
-      "soort": "KLOK",
       "bestand": "server/routes/social/gezinnen/toezicht.js",
       "aantal": 1,
       "functies": 2,
@@ -343,8 +333,23 @@
         "supplier",
         "kern-meldingen",
         "kern-live",
-        "kern-taal",
-        "tg-zegel"
+        "tg-zegel",
+        "kern-taal"
+      ]
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/kern/payroll/bijwerken.js",
+      "aantal": 1,
+      "functies": 7,
+      "welke": [
+        "supplier",
+        "office",
+        "member",
+        "staff",
+        "command-zien",
+        "command-doen",
+        "command-besturen"
       ]
     },
     {
@@ -439,8 +444,8 @@
         "kern-meldingen",
         "kern-live",
         "levenos",
-        "ov-browser",
-        "staff"
+        "staff",
+        "ov-browser"
       ]
     },
     {

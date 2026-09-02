@@ -58,6 +58,21 @@ test('3. wat voor de schakelaar hangt, staat er MET een reden', () => {
     'de lijst mag niet op iets anders passen dan wat er letterlijk op staat');
 });
 
+test('3b. elke stap van de rondgang beproeft een functie die IN trede 0 zit', () => {
+  /* Een rondgang die iets beproeft wat de trede niet belooft, meet de verkeerde
+     trede -- en hij zou dan ook zakken zodra die functie ergens anders wordt
+     uitgezet. Deze toets houdt de stappen vast aan FASE_START. */
+  const start = FASES.find(f => f.id === 'start');
+  for (const stap of T.RONDGANG) {
+    assert.ok(OP_ID[stap.functie], 'de stap noemt een bestaande functie: ' + stap.functie);
+    assert.ok(start.aan.includes(stap.functie),
+      'en die functie staat in trede 0: ' + stap.functie + ' (' + stap.route + ')');
+    assert.match(stap.route, /^(GET|POST) \/api\//, 'een stap noemt een echte route: ' + stap.route);
+    assert.ok(stap.wat && stap.wat.length > 5, 'en zegt wat een MENS doet, niet hoe de route heet');
+  }
+  assert.ok(T.RONDGANG.some(s => s.levertToken), 'er is precies een stap die de sessie oplevert');
+});
+
 test('4. elke trede noemt bestaande functies, en trede 0 is de kleinste', () => {
   /* De catalogus toetst dit al bij het laden; hier staat het als de aanname die
      de proef MAAKT. Zakt deze toets, dan meet de proef een trede die niet

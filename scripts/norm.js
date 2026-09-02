@@ -162,6 +162,14 @@ const METERS = [
      precies de redenering die kern/platformregister/bediening.js al voert voor
      routes -- en die staan met hun reden in scripts/lib/wekker-verklaringen.js.
      Wegverklaren wat er wel bij hoort, is deze meter kapotmaken. */
+  /* DE RONDGANG VAN TREDE 0 (TREDEPROEF.json).
+
+     tredeLekken zegt dat er niets ANDERS opengaat; dit zegt of de trede zelf
+     WERKT. Die twee horen naast elkaar en niet op een hoop: een trede waarop
+     niemand kan inloggen scoort op tredeLekken vlekkeloos. Zes stappen --
+     binnenkomen, zien wat ik mag, mijn gegevens, aanmelden voor een pas, de
+     leden-app, De Salon -- en ze horen alle zes te slagen. */
+  { sleutel: 'tredeRondgangGezakt', richting: 'omlaag', wat: 'stappen van de trede-0-rondgang die niet slagen (uit TREDEPROEF.json)' },
   { sleutel: 'wekkersOnverklaard', richting: 'omlaag', wat: 'wekkers (klok/bus) die geen enkele functie raakt en niet verklaard zijn (uit WEKKERS.json)' },
   /* DE DEUREN NAAR db.data (scripts/deuren.js).
 
@@ -618,6 +626,19 @@ function leesWekkers(pad) {
   return a.ongeschakeld;
 }
 
+/* De rondgang uit dezelfde vastgelegde proef, met zijn pad als parameter en
+   werpend bij een ontbrekend getal -- zelfde afspraak als de drie hierboven.
+   Nul zou hier "elke stap slaagt" betekenen. */
+function leesRondgang(pad) {
+  let a;
+  try { a = JSON.parse(fs.readFileSync(pad, 'utf8')); }
+  catch (e) { throw new Error('TREDEPROEF.json ontbreekt of is stuk (' + e.message + '); draai npm run tredeproef:vast'); }
+  if (!a || typeof a.rondgangGezakt !== 'number') {
+    throw new Error('TREDEPROEF.json draagt geen rondgangGezakt; een meter zonder invoer is geen meter');
+  }
+  return a.rondgangGezakt;
+}
+
 function meet(bronnen) {
   /* DE KEURING GEEFT EXITCODE 1 ZODRA HIJ IETS VINDT, en dat is precies zijn
      werk. execFileSync gooit daar standaard op, dus meet() klapte om op het
@@ -830,6 +851,7 @@ function meet(bronnen) {
   const activeringOndergrens = leesActivering(path.join(WORTEL, 'ACTIVERING.json'));
   const tredeLekken = leesTredeproef(path.join(WORTEL, 'TREDEPROEF.json'));
   const wekkersOnverklaard = leesWekkers(path.join(WORTEL, 'WEKKERS.json'));
+  const tredeRondgangGezakt = leesRondgang(path.join(WORTEL, 'TREDEPROEF.json'));
 
   /* De deuren naar db.data uit dezelfde bron als het losse script, om dezelfde
      reden als hierboven: een tweede implementatie loopt binnen een week uiteen. */
@@ -916,6 +938,7 @@ function meet(bronnen) {
     verstrengelingOnverklaard,
     activeringOndergrens,
     tredeLekken,
+    tredeRondgangGezakt,
     wekkersOnverklaard,
     bronBlindeBestanden,
     delenZonderOnderwerp,
@@ -1252,6 +1275,6 @@ function main() {
 }
 
 if (require.main === module) process.exit(main());
-module.exports = { meet, leesNorm, METERS, schoon, traagsteTanden, heeftEinde, dagenTussen, oordeel, leesActivering, leesTredeproef, leesWekkers,
+module.exports = { meet, leesNorm, METERS, schoon, traagsteTanden, heeftEinde, dagenTussen, oordeel, leesActivering, leesTredeproef, leesWekkers, leesRondgang,
   PRESTATIEMETERS, leesPrestatie, bron, PRESTATIEBESTAND, telOngeijkt, telInlineStijl, telSkips,
   telBewijslaag };

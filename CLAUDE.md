@@ -796,7 +796,7 @@ schrijft ze tussen merktekens uit de registers (`<!--getal:idem.ongemeten-->3080
 <!--getal:verstrengeling.onverklaard-->111<!--/getal--> onverklaard — en dát getal moet naar nul, niet het
 aantal randen), de activering per functie, de deltapoort die er niets bij laat
 komen, de tredeproef over alle zeven treden van LAUNCH.md (0 lekken), en de
-wekkers (<!--getal:wekkers.onverklaard-->8<!--/getal--> die geen enkele functie raken). Drie dingen daar
+wekkers (<!--getal:wekkers.onverklaard-->0<!--/getal--> die geen enkele functie raken). Drie dingen daar
 niet wegpoetsen: **een knoop is laag + domein en nooit domein alleen** (zonder de
 laag lijkt een ingang die zijn eigen domein aanroept de zwaarste verstrengeling
 van het huis), **de require-graaf ziet de kern-tas niet** (de meeste

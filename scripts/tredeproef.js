@@ -27,12 +27,21 @@
    en heeft bijwerkingen). Wie ze optelt tot een percentage, krijgt een getal dat
    geen van beide vragen beantwoordt.
 
-   WAT DEZE PROEF NIET DOET, en dat is de eerlijke helft
+   DE DERDE UITSLAG: DE RONDGANG
 
-   Hij loopt geen mensenrondgang: aanmelden, bestellen, betalen, bevestiging.
-   Hij bewijst dus dat er niets ANDERS opengaat, niet dat de trede zelf WERKT.
-   Die tweede helft hoort erbij en staat er nog niet; hij vraagt een echte
-   ingelogde reis en dat is een eigen bouwstuk.
+   Zuiver en beproefd bewijzen allebei dat er niets ANDERS opengaat. Ze zeggen
+   niets over de vraag of de trede zelf WERKT -- en een trede waarop niemand kan
+   inloggen scoort op die twee vlekkeloos. Daarom loopt de proef ook een echte
+   ingelogde reis langs wat trede 0 belooft: binnenkomen, je gegevens beheren,
+   je aanmelden voor een pas, de leden-app en De Salon.
+
+   De stappen zijn niet verzonnen maar per stuk GEKOPPELD aan de functie van de
+   trede die zij beproeven, en test/tredeproef.test.js zakt zodra een stap een
+   functie noemt die niet in trede 0 zit. Een rondgang die iets beproeft wat de
+   trede niet belooft, meet de verkeerde trede.
+
+   Wat de rondgang nog steeds NIET doet: bestellen, betalen en een bevestiging.
+   Die horen bij hogere treden en vragen een zaak, een kassa en een betaalrail.
 
    En hij ziet alleen wat over HTTP binnenkomt. Een cron, de bus of een
    AI-gereedschap kan werk beginnen zonder ooit langs een route te komen; die
@@ -98,6 +107,29 @@ const VOOR_DE_SCHAKELAAR = [
 ];
 const isVoorDeSchakelaar = r => VOOR_DE_SCHAKELAAR.some(x => x[0] === r);
 
+/* DE RONDGANG VAN TREDE 0, stap voor stap, met per stap de functie die hij
+   beproeft. `wat` is wat een mens doet, niet wat de route heet -- als die twee
+   uit elkaar lopen, beproeft de rondgang iets anders dan de belofte.
+
+   De inlog gebruikt dezelfde weg als scripts/lib/proefsleutels.js
+   (POST /api/login {tier}), zodat er geen tweede manier ontstaat om aan een
+   sessie te komen. */
+const RONDGANG = [
+  { wat: 'binnenkomen', route: 'POST /api/login', functie: 'tg-inlog', lijf: { tier: 'rtg' }, levertToken: true },
+  /* HIER STOND /api/ik, EN DAT WAS EEN VERKEERD GEKOZEN STAP. Die route eist een
+     EIGEN ACCOUNT (`uid(req) == null` -> 403), en de korte inlog geeft een
+     pas-sessie zonder account -- inlog-pas.js zegt dat in zijn eerste zin. De
+     403 was dus juist, en de rondgang meldde een gebrek dat er niet was.
+     /api/state hoort bij dezelfde functie (kern-state) en is wat een
+     pas-sessie werkelijk opvraagt. Wat een eigen account eist, dekt deze
+     rondgang niet; dat staat in de uitslag. */
+  { wat: 'zien wat ik mag', route: 'POST /api/state', functie: 'kern-state' },
+  { wat: 'mijn gegevens beheren', route: 'POST /api/gegevens/nodig', functie: 'tg-gegevens' },
+  { wat: 'me aanmelden voor een pas', route: 'POST /api/aanmeld/start', functie: 'tg-aanmeld' },
+  { wat: 'de leden-app openen', route: 'POST /api/member/apps', functie: 'member' },
+  { wat: 'De Salon lezen', route: 'POST /api/salon/feed', functie: 'salon' }
+];
+
 /* Hoeveel routes er ECHT worden aangeklopt, per soort. Een steekproef en geen
    volledigheid: zie de kop. Het getal staat hier zodat het in de uitslag mee
    kan, want een steekproef zonder omvang is een anekdote. */
@@ -137,6 +169,23 @@ async function meet(tredeId) {
   process.env.RTG_DATA_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-tredeproef-'));
   process.env.SMTP_URL = '';
   process.env.STUN_UIT = '1';
+  /* RTG_DEMO=1 IS HIER GEEN VERSOEPELING MAAR DEKKING, en die afweging staat al
+     uitgeschreven in scripts/lib/proefserver.js: zonder die vlag bestaat de
+     korte inlog (`POST /api/login {tier}`) niet en geeft de eerste stap van de
+     rondgang 403 -- waarna alle stappen erna 401 geven en de proef vijf keer
+     "zakt" meldt over iets dat helemaal niet stuk is.
+
+     Wat de vlag NIET doet is een deur openzetten: elke poort blijft staan, en de
+     schakelkast helemaal -- die is juist wat hier gemeten wordt. De zuivere en
+     beproefde kant veranderen er dan ook niet van. Hij staat in de uitslag
+     (`demoModus`), zodat niemand deze proef voor een productiemeting aanziet. */
+  process.env.RTG_DEMO = '1';
+  /* En NODE_ENV=test erbij, want testomgeving.actief() eist ALLEBEI (r.17):
+     RTG_DEMO alleen doet niets, en dat kostte een ronde waarin de proef vijf
+     zakkende stappen meldde over iets dat niet stuk was. Zelfde paar als in
+     scripts/lib/proefserver.js r.32-33. */
+  process.env.NODE_ENV = process.env.NODE_ENV || 'test';
+  process.env.ANTHROPIC_API_KEY = '';
 
   const functies = require(path.join(WORTEL, 'server', 'functies'));
   const trede = functies.FASES.find(f => f.id === tredeId);
@@ -213,6 +262,33 @@ async function meet(tredeId) {
     binnenProef.push({ route: r.methode + ' ' + r.pad, functie: r.functie, status });
   }
 
+  /* ---- DE RONDGANG: werkt de trede zelf? ---- */
+  let token = null;
+  const rondgang = [];
+  for (const stap of RONDGANG) {
+    const [methode, pad] = stap.route.split(' ');
+    const ac = new AbortController();
+    const t = setTimeout(() => ac.abort(), 5000);
+    let status = null, data = null;
+    try {
+      const res = await fetch('http://127.0.0.1:' + poort + pad, {
+        method: methode, signal: ac.signal,
+        headers: { 'content-type': 'application/json', ...(token ? { authorization: 'Bearer ' + token } : {}) },
+        body: JSON.stringify(stap.lijf || {})
+      });
+      status = res.status;
+      try { data = await res.json(); } catch (e) { data = null; }
+    } catch (e) { status = null; }
+    finally { clearTimeout(t); }
+    if (stap.levertToken && data && (data.token || (data.sessie && data.sessie.token))) {
+      token = data.token || data.sessie.token;
+    }
+    /* GESLAAGD IS STRENG: onder de 400. Een 401 op een stap die na de inlog komt
+       betekent dat de sessie niet werkt, en dat is precies wat deze rondgang
+       hoort te vangen -- niet iets om als "de route bestaat" weg te schrijven. */
+    rondgang.push({ ...stap, status, geslaagd: status !== null && status < 400 });
+  }
+
   /* Een route buiten de trede hoort 503 te geven. Een ANDER antwoord is de
      bevinding -- ook een 404 of een 401: dan is de poort niet gepasseerd maar
      omzeild, en dat wil je weten. Een null (tijd om, verbinding weg) is geen
@@ -225,6 +301,8 @@ async function meet(tredeId) {
   return {
     gemetenOp: new Date().toISOString().slice(0, 10),
     trede: trede.id, tredeNaam: trede.naam,
+    demoModus: true,
+    demoWaarom: 'RTG_DEMO=1 geeft de korte inlog waarmee de rondgang een sessie krijgt (zie scripts/lib/proefserver.js); geen enkele poort gaat erdoor open, en de schakelkast al helemaal niet',
     functiesAan: aan.size, functiesTotaal: functies.FUNCTIES.length,
     routes: routes.length,
     routesInTrede: d.inTrede.length,
@@ -241,8 +319,13 @@ async function meet(tredeId) {
     voorDeSchakelaar: VOOR_DE_SCHAKELAAR.map(([r, reden]) => ({ route: r, reden })),
     steekproefBinnen: binnenProef.length,
     beproefdBinnen503: binnen503.length, beproefdBinnen503Lijst: binnen503.slice(0, 20),
+    rondgangStappen: rondgang.length,
+    rondgangGezakt: rondgang.filter(r => !r.geslaagd).length,
+    rondgangLijst: rondgang.map(r => ({ wat: r.wat, route: r.route, functie: r.functie, status: r.status, geslaagd: r.geslaagd })),
+    rondgangKreegSessie: !!token,
     routesGeraakt: geraakt.size,
-    watDitNietDoet: 'geen mensenrondgang (bewijst dat er niets anders opengaat, niet dat de trede WERKT); en alleen HTTP -- cron, bus en AI-gereedschap komen hier niet langs'
+    rondgangDektNiet: 'alles wat een EIGEN ACCOUNT eist. De korte inlog geeft een pas-sessie zonder account, dus routes als /api/ik weigeren terecht met 403 -- die zijn met deze rondgang niet te beproeven.',
+    watDitNietDoet: 'de rondgang loopt niet door bestellen, betalen en een bevestiging -- die horen bij hogere treden en vragen een zaak, een kassa en een betaalrail. En alles hier is HTTP: cron, bus en AI-gereedschap komen er niet langs.'
   };
 }
 
@@ -285,6 +368,13 @@ function rapport(r) {
   L.push(`    ${r.steekproefBinnen} routes binnen de trede aangeklopt: ${r.beproefdBinnen503} kregen 503 (hoort nul te zijn).`);
   for (const x of r.beproefdBinnen503Lijst.slice(0, 10)) L.push(`      ${x.route}  [${x.functie}]`);
   L.push('');
+  L.push('  DE RONDGANG -- werkt de trede zelf?');
+  for (const st of r.rondgangLijst)
+    L.push(`    ${st.geslaagd ? 'ok  ' : 'ZAKT'}  ${String(st.status).padStart(3)}  ${st.wat.padEnd(28)} ${st.route}  [${st.functie}]`);
+  L.push('    (dekt niet: ' + r.rondgangDektNiet.split('.')[0].toLowerCase() + ')');
+  L.push(`    ${r.rondgangGezakt} van de ${r.rondgangStappen} stappen zakt` +
+    (r.rondgangKreegSessie ? '' : '  <-- en er kwam geen sessie tot stand, dus alles erna zegt niets'));
+  L.push('');
   L.push(`  ${r.routesGeraakt} verschillende routes zijn tijdens de proef werkelijk aangeraakt.`);
   L.push('');
   L.push('  WAT DEZE PROEF NIET DOET: ' + r.watDitNietDoet);
@@ -318,14 +408,15 @@ function tabel(treden) {
   const L = [];
   L.push('ALLE TREDEN -- wat staat er open, en lekt er iets');
   L.push('');
-  L.push('  trede                              functies   routes open   dicht   zuiver   beproefd');
+  L.push('  trede                              functies   routes open   dicht   zuiver   beproefd  rondgang');
   for (const t of treden) {
     L.push('    ' + t.tredeNaam.padEnd(32) +
       String(t.functiesAan + '/' + t.functiesTotaal).padStart(9) +
       String(t.routesInTrede).padStart(13) +
       String(t.routesBuitenTrede).padStart(8) +
       String(t.zuiverLekken).padStart(9) +
-      String(t.beproefdNiet503).padStart(11));
+      String(t.beproefdNiet503).padStart(11) +
+      String(t.rondgangGezakt).padStart(10));
   }
   L.push('');
   L.push('  zuiver = routes buiten de trede die de schakelkast niet dichtzet (alle routes).');
@@ -341,10 +432,11 @@ if (require.main === module && process.argv.includes('--alle')) {
     trede: t.trede, naam: t.tredeNaam, functiesAan: t.functiesAan,
     routesInTrede: t.routesInTrede, routesBuitenTrede: t.routesBuitenTrede,
     zuiverLekken: t.zuiverLekken, beproefdNiet503: t.beproefdNiet503,
+    rondgangGezakt: t.rondgangGezakt,
     beproefdVoorDeSchakelaar: t.beproefdVoorDeSchakelaar })) };
   fs.writeFileSync(path.join(WORTEL, 'TREDEPROEF.json'), JSON.stringify(uit, null, 2) + '\n');
   process.stdout.write(rapport(hoofd) + '\n\n' + tabel(treden) + '\n\nVastgelegd in TREDEPROEF.json\n');
-  process.exit(treden.some(t => t.zuiverLekken || t.beproefdNiet503) ? 1 : 0);
+  process.exit(treden.some(t => t.zuiverLekken || t.beproefdNiet503 || t.rondgangGezakt) ? 1 : 0);
 } else if (require.main === module) {
   meet(arg('--trede', 'start')).then(r => {
     const uitPad = arg('--uit', null);
@@ -354,8 +446,8 @@ if (require.main === module && process.argv.includes('--alle')) {
       fs.writeFileSync(path.join(WORTEL, 'TREDEPROEF.json'), JSON.stringify(r, null, 2) + '\n');
       process.stdout.write(rapport(r) + '\n\nVastgelegd in TREDEPROEF.json\n');
     } else process.stdout.write(rapport(r) + '\n');
-    process.exit(r.zuiverLekken || r.beproefdNiet503 ? 1 : 0);
+    process.exit(r.zuiverLekken || r.beproefdNiet503 || r.rondgangGezakt ? 1 : 0);
   }).catch(e => { process.stderr.write('de tredeproef kon niet draaien: ' + (e && e.stack || e) + '\n'); process.exit(2); });
 }
 
-module.exports = { meet, rapport, tabel, indeling, steekproef, VOOR_DE_SCHAKELAAR, isVoorDeSchakelaar };
+module.exports = { meet, rapport, tabel, indeling, steekproef, VOOR_DE_SCHAKELAAR, isVoorDeSchakelaar, RONDGANG };

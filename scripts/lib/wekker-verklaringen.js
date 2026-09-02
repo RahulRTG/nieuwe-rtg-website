@@ -48,5 +48,24 @@ module.exports = [
   /* DE SCHAKELKAST ZELF. De storingswachter zet functies dicht als ze omvallen.
      Hem achter een functieschakelaar zetten is letterlijk de knop die de
      schakelkast uitzet. */
-  { bestand: 'server/functies/wachter.js', reden: 'de storingswachter is de automaat van de schakelkast; een schakelaar die de schakelkast uitzet is geen schakelaar' }
+  { bestand: 'server/functies/wachter.js', reden: 'de storingswachter is de automaat van de schakelkast; een schakelaar die de schakelkast uitzet is geen schakelaar' },
+
+  /* DE AFLEVERING EN DE SESSIE. Allebei abonnees op de bus, allebei zonder eigen
+     onderwerp: ze dragen niet WAT er gebeurt maar dat het aankomt. */
+  { bestand: 'server/kern/sessies.js', reden: 'houdt sessies gelijk over meerdere servers; zet je dat uit, dan logt iemand uit doordat zijn verzoek bij de andere server landt' },
+  { bestand: 'server/kern/sse.js', reden: 'de afleverlaag van realtime-berichten. Staat de functie kern-live uit, dan komt er geen verbinding tot stand en heeft deze abonnee niemand om aan te leveren -- hij begint zelf geen werk' },
+
+  /* EEN WETTELIJKE PLICHT IS GEEN FUNCTIE MET EEN SCHAKELAAR. Zelfde regel als
+     /api/privacy in kern/platformregister/bediening.js. */
+  { bestand: 'server/bewaarveger.js', reden: 'wist gegevens die over hun bewaartermijn zijn (AVG); een wettelijke plicht hoort niet achter een functieschakelaar, en uitzetten betekent hier bewaren wat weg moet' },
+  { bestand: 'server/routes/techniek/bewaren.js', reden: 'de opruimknop van diezelfde bewaartermijnen, en hij hangt onder /api/techniek -- dat is bediening en geen functie (kern/platformregister/bediening.js)' },
+
+  /* TWEE DIE HUN EIGEN SCHAKELAAR AL HEBBEN, en die staat niet in de
+     functiecatalogus. Dat is geen gat maar een ANDERE knop; hem hier nog eens
+     aan een functie hangen zou twee schakelaars op een ding zetten. */
+  { bestand: 'server/kern/zaakdoos/index.js', reden: 'draait alleen in doosmodus (`if (actief)`, gezet met RTG_DOOS_CLOUD): het kastje in de zaak dat doorwerkt als de lijn wegvalt. Buiten die modus bestaat de klok niet' },
+  { bestand: 'server/kern/zelfzorg/index.js', reden: 'de stille automaat achter RTG_ZELFZORG_MS, met een eigen knop in de boardroom (api.automaatAan); op nul zetten stopt hem, en hij draait alleen op de leider' },
+
+  /* DE OPSTELLING ZELF. */
+  { bestand: 'server/trio.js', reden: 'de hartslag tussen de drie servers van het failover-trio; een failover die je kunt uitzetten is geen failover' }
 ];

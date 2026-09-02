@@ -853,6 +853,28 @@ const IJKINGEN = {
      geijkt worden: de honderd ijkroutes hieronder vormen een nieuw domein zonder
      toets, en dan hoort dit getal precies een omhoog te gaan. */
   keuringDekkingAdvies: { proef: (voor) => metIjkRoutes(voor).dekkingAdvies },
+  tredeRondgangGezakt: {
+    /* Naast tredeLekken uit hetzelfde bestand, en met opzet een eigen meter:
+       "er gaat niets anders open" en "de trede werkt" zijn twee vragen, en een
+       trede waarop niemand kan inloggen scoort op de eerste vlekkeloos. */
+    proef: () => {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-rondgang-ijk-'));
+      const pad = path.join(dir, 'TREDEPROEF.json');
+      try {
+        fs.writeFileSync(pad, JSON.stringify({ zuiverLekken: 0, beproefdNiet503: 0, rondgangGezakt: 0 }));
+        assert.equal(norm.leesRondgang(pad), 0);
+        fs.writeFileSync(pad, JSON.stringify({ zuiverLekken: 0, beproefdNiet503: 0, rondgangGezakt: 1 }));
+        const na = norm.leesRondgang(pad);
+        assert.equal(na, 1, 'en beweegt mee');
+        /* En de twee meters lezen echt iets ANDERS uit hetzelfde bestand. */
+        assert.equal(norm.leesTredeproef(pad), 0, 'een gezakte rondgang is geen lek');
+        assert.throws(() => norm.leesRondgang(path.join(dir, 'weg.json')), /ontbreekt/);
+        fs.writeFileSync(pad, JSON.stringify({ zuiverLekken: 0, beproefdNiet503: 0 }));
+        assert.throws(() => norm.leesRondgang(pad), /rondgangGezakt/);
+        return na;
+      } finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} }
+    }
+  },
   wekkersOnverklaard: {
     /* Leest, net als de twee hieronder, een vastgelegde meting. De ijkvraag is
        of hij meebeweegt en of hij invoer weigert die er niet is -- nul zou hier

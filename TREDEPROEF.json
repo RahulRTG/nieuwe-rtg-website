@@ -2,12 +2,14 @@
   "gemetenOp": "2026-09-02",
   "trede": "start",
   "tredeNaam": "Trede 0 · De smalle snee",
+  "demoModus": true,
+  "demoWaarom": "RTG_DEMO=1 geeft de korte inlog waarmee de rondgang een sessie krijgt (zie scripts/lib/proefserver.js); geen enkele poort gaat erdoor open, en de schakelkast al helemaal niet",
   "functiesAan": 19,
   "functiesTotaal": 204,
-  "routes": 4738,
+  "routes": 4740,
   "routesInTrede": 331,
   "routesBuitenTrede": 4320,
-  "routesZonderFunctie": 87,
+  "routesZonderFunctie": 89,
   "zuiverLekken": 0,
   "zuiverLekLijst": [],
   "zuiverDichtInTrede": 0,
@@ -37,8 +39,56 @@
   "steekproefBinnen": 30,
   "beproefdBinnen503": 0,
   "beproefdBinnen503Lijst": [],
-  "routesGeraakt": 31,
-  "watDitNietDoet": "geen mensenrondgang (bewijst dat er niets anders opengaat, niet dat de trede WERKT); en alleen HTTP -- cron, bus en AI-gereedschap komen hier niet langs",
+  "rondgangStappen": 6,
+  "rondgangGezakt": 0,
+  "rondgangLijst": [
+    {
+      "wat": "binnenkomen",
+      "route": "POST /api/login",
+      "functie": "tg-inlog",
+      "status": 200,
+      "geslaagd": true
+    },
+    {
+      "wat": "zien wat ik mag",
+      "route": "POST /api/state",
+      "functie": "kern-state",
+      "status": 200,
+      "geslaagd": true
+    },
+    {
+      "wat": "mijn gegevens beheren",
+      "route": "POST /api/gegevens/nodig",
+      "functie": "tg-gegevens",
+      "status": 200,
+      "geslaagd": true
+    },
+    {
+      "wat": "me aanmelden voor een pas",
+      "route": "POST /api/aanmeld/start",
+      "functie": "tg-aanmeld",
+      "status": 200,
+      "geslaagd": true
+    },
+    {
+      "wat": "de leden-app openen",
+      "route": "POST /api/member/apps",
+      "functie": "member",
+      "status": 200,
+      "geslaagd": true
+    },
+    {
+      "wat": "De Salon lezen",
+      "route": "POST /api/salon/feed",
+      "functie": "salon",
+      "status": 200,
+      "geslaagd": true
+    }
+  ],
+  "rondgangKreegSessie": true,
+  "routesGeraakt": 36,
+  "rondgangDektNiet": "alles wat een EIGEN ACCOUNT eist. De korte inlog geeft een pas-sessie zonder account, dus routes als /api/ik weigeren terecht met 403 -- die zijn met deze rondgang niet te beproeven.",
+  "watDitNietDoet": "de rondgang loopt niet door bestellen, betalen en een bevestiging -- die horen bij hogere treden en vragen een zaak, een kassa en een betaalrail. En alles hier is HTTP: cron, bus en AI-gereedschap komen er niet langs.",
   "treden": [
     {
       "trede": "start",
@@ -48,6 +98,7 @@
       "routesBuitenTrede": 4320,
       "zuiverLekken": 0,
       "beproefdNiet503": 0,
+      "rondgangGezakt": 0,
       "beproefdVoorDeSchakelaar": 1
     },
     {
@@ -58,6 +109,7 @@
       "routesBuitenTrede": 4107,
       "zuiverLekken": 0,
       "beproefdNiet503": 0,
+      "rondgangGezakt": 0,
       "beproefdVoorDeSchakelaar": 1
     },
     {
@@ -68,6 +120,7 @@
       "routesBuitenTrede": 3244,
       "zuiverLekken": 0,
       "beproefdNiet503": 0,
+      "rondgangGezakt": 0,
       "beproefdVoorDeSchakelaar": 1
     },
     {
@@ -78,6 +131,7 @@
       "routesBuitenTrede": 3206,
       "zuiverLekken": 0,
       "beproefdNiet503": 0,
+      "rondgangGezakt": 0,
       "beproefdVoorDeSchakelaar": 1
     },
     {
@@ -88,6 +142,7 @@
       "routesBuitenTrede": 3177,
       "zuiverLekken": 0,
       "beproefdNiet503": 0,
+      "rondgangGezakt": 0,
       "beproefdVoorDeSchakelaar": 1
     },
     {
@@ -98,6 +153,7 @@
       "routesBuitenTrede": 2641,
       "zuiverLekken": 0,
       "beproefdNiet503": 0,
+      "rondgangGezakt": 0,
       "beproefdVoorDeSchakelaar": 1
     },
     {
@@ -108,6 +164,7 @@
       "routesBuitenTrede": 0,
       "zuiverLekken": 0,
       "beproefdNiet503": 0,
+      "rondgangGezakt": 0,
       "beproefdVoorDeSchakelaar": 0
     }
   ]

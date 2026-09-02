@@ -23,7 +23,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, kantoorAlsPersoon } = require('./helper');
+const { startServer, kantoorAlsPersoon, wachtOpWaarde } = require('./helper');
 
 let BASE, child, office;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-kycspoor-'));
@@ -74,9 +74,13 @@ test('een GOEDKEURING komt in het inzagejournaal, ook bij een lege wachtrij', as
   const r = await post('/api/office/verify', { userId: id, decision: 'approve' }, office);
   assert.equal(r.status, 200);
   assert.deepEqual(r.data.pending, [], 'de wachtrij is leeg: er valt niets mee te liften');
-  await new Promise(z => setTimeout(z, 400));
-
-  const na = inzage();
+  /* WACHTEN OP DE REGEL, NIET OP DE KLOK. Hier stond een vaste 400 ms. Het
+     journaal wordt na het antwoord geschreven, en op een belaste scherf haalt
+     die 400 ms het niet: dan zakt deze toets EN de toets hieronder, die op
+     twee regels rekent die deze had moeten achterlaten (CI 2 september 2026,
+     drie gezakte toetsen uit een te trage schrijfronde). */
+  const na = await wachtOpWaarde(() => { const r2 = inzage(); return r2.length > voor ? r2 : false; },
+    { ms: 8000, wat: 'de journaalregel van de goedkeuring' });
   assert.equal(na.length, voor + 1, 'het besluit hoort een regel op te leveren');
   assert.equal(na[0].overId, String(id), 'de regel wijst de persoon aan over wie besloten is');
   assert.match(na[0].waarom, /goedgekeurd/);
@@ -90,9 +94,8 @@ test('een AFWIJZING ook, en die zegt erbij dat het bewijs is gewist', async () =
   const voor = inzage().length;
   const r = await post('/api/office/verify', { userId: id, decision: 'reject' }, office);
   assert.equal(r.status, 200);
-  await new Promise(z => setTimeout(z, 400));
-
-  const na = inzage();
+  const na = await wachtOpWaarde(() => { const r2 = inzage(); return r2.length > voor ? r2 : false; },
+    { ms: 8000, wat: 'de journaalregel van de afwijzing' });
   assert.equal(na.length, voor + 1);
   assert.match(na[0].waarom, /afgewezen/);
   assert.match(na[0].waarom, /gewist/, 'wat er met het bewijs gebeurde hoort in de reden te staan');

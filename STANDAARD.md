@@ -93,12 +93,20 @@ voornemen, en die staan hieronder ook als zodanig.
 | een ontleder van buitenbytes draagt een budget (par. 6) | -- | **geen handhaver.** Vraagt `FUZZ.json`, dat niet bestaat -- `TAKEN.md` 7.2 |
 | een scherm draagt de foutmelder (par. 4.1) | -- | **geen handhaver.** Vraagt `TAKEN.md` 7.9 |
 | een route draagt een invoercontract (par. 2) | -- | **geen handhaver.** Vraagt `TAKEN.md` 7.6 |
-| autorisatie is toewijsbaar (par. 8) | -- | **half.** Keuringsregel 28 ziet 341 routes niet -- `TAKEN.md` 7.14 |
+| een ontleder van buitenbytes hangt niet (par. 6) | een nieuwe ontleder wordt op misvormde bytes beproefd | **half.** `test/vijandigerand.test.js` bewaakt de twee gerepareerde ontleders met een tijdsbudget in een kindproces; er is nog geen fuzzer die zelf zoekt -- `TAKEN.md` 7.2 |
+| autorisatie is toewijsbaar (par. 8) | -- | **schaduw.** Regel 28 MEET sinds 2 september wat hij niet ziet (565 paden, 385 zonder bewakerslaag) en blokkeert daar nog niet op -- `TAKEN.md` 7.14 |
 
-Vijf machines, vijf voornemens, en bij elk voornemen staat wat hem in de weg
-staat. Die verhouding hoort te verschuiven; zij is zelf de voortgangsmaat van
-dit document. Wat er NIET hoort te gebeuren is dat een voornemen stilzwijgend
-als eis wordt gelezen omdat hij in dezelfde tabel staat.
+Zes machines, vier voornemens en een schaduw, en bij elk voornemen staat wat hem
+in de weg staat. Die verhouding hoort te verschuiven; zij is zelf de
+voortgangsmaat van dit document. Wat er NIET hoort te gebeuren is dat een
+voornemen stilzwijgend als eis wordt gelezen omdat hij in dezelfde tabel staat.
+
+**Waarom er een schaduwstand tussen zit.** Een eis die 565 routes in een keer
+rood zet, is binnen een week uitgezet. `CONTROLPLANE.md` schrijft daarom voor dat
+een nieuwe handhavingsregel eerst meeloopt zonder te blokkeren: je kunt niet
+afdwingen wat nooit in de schaduw heeft gelopen. Een schaduwmeting is dus geen
+halve eis maar een tussenstand met een richting -- en het getal erbij, zodat
+niemand hem voor nul aanziet.
 
 ---
 
@@ -446,9 +454,20 @@ te pullen. Een poort die je nooit hebt zien draaien is geen poort.
 
 ### 13. De keuring is bruikbaar tijdens het werk
 
-Regel 1 van `npm run check` kost ongeveer 130 seconden procesopstart waar 0,8
-volstaat, en de keuring is alles-of-niets. Zolang een ronde minuten kost,
-spreekt de kwaliteitsmachine pas na een push. `TAKEN.md` 7.18.
+**De helft die het meest kostte is af.** Regel 1 startte 4823 processen en deed
+daar 127.619 ms over; in-proces met `new vm.Script` is dat 1.188 ms, en de volle
+keuring ging daarmee van ongeveer 160 naar **34 seconden**. Dezelfde bestanden,
+aan beide kanten nul afgekeurd.
+
+Dat is geen comfort maar een meetkwestie, en deze sessie leverde het bewijs: een
+ronde kwam ROOD op `package.json` terwijl de wijziging klopte, doordat een
+ijkproces in de twee minuten ernaast even een pakket had bijgeschreven. **Een
+poort die twee minuten openstaat, meet iets anders dan de wijziging.**
+
+De zeef woont in `scripts/lib/syntaxproef.js` en niet in de keuring zelf, zodat
+een toets hem kan muteren; `test/syntaxproef.test.js` legt hem op elk geval
+naast `node --check`. Wat rest is het opknippen (`--regel=`, `--snel`, een
+stabiele id per regel). `TAKEN.md` 7.18.
 
 ---
 

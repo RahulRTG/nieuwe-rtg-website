@@ -70,12 +70,25 @@ function compileerbaar(rel) {
   for (const map of DEELMAPPEN) if (rel.startsWith(map)) return false;
   return true;
 }
+
+/* Deze regel startte 4823 processen (`spawnSync(node --check)` per bestand) en
+   deed daar 127.619 ms over -- vrijwel allemaal procesopstart. In-proces kost
+   hetzelfde werk 1.188 ms, en daarmee ging de VOLLE keuring van ongeveer 160
+   naar 34 seconden. Waarom dat meer is dan ongeduld, en waarom er een
+   CommonJS-wikkel omheen MOET: de kop van scripts/lib/syntaxproef.js.
+   test/syntaxproef.test.js legt de twee wegen op elk geval naast elkaar. */
+const { syntaxfout } = require('./lib/syntaxproef');
 for (const map of ['server', 'public', 'test']) {
   loop(path.join(ROOT, map), /\.js$/, f => {
     const rel = path.relative(ROOT, f).replace(/\\/g, '/');
     if (!compileerbaar(rel)) return;
-    const r = cp.spawnSync(process.execPath, ['--check', f]);
-    if (r.status !== 0) fout('syntaxfout in ' + rel + '\n' + r.stderr);
+    /* Zelfde ENOENT-uitzondering als in loop(): de meterijk-toets maakt
+       kortlevende bestanden, en die mogen tussen readdir en read verdwijnen. */
+    let bron;
+    try { bron = fs.readFileSync(f, 'utf8'); }
+    catch (e) { if (e && e.code === 'ENOENT') return; throw e; }
+    const m = syntaxfout(bron, f);
+    if (m) fout('syntaxfout in ' + rel + '\n  ' + m);
   });
 }
 if (!fouten) ok('alle server-, browser- en testbestanden compileren');
@@ -1902,6 +1915,39 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
   }
   if (!gaten) ok(totaal + ' API-routes: ' + viaMw + ' via een poortwachter, ' + viaBinnen +
     ' met een poort in de handler, ' + PUBLIEK.size + ' bewust publiek met een reden');
+
+  /* DE BLINDE VLEK VAN DEZE REGEL, IN DE SCHADUW GEMETEN.
+
+     Alles hierboven oordeelt over wat de uitdrukking `app.<verb>('/api/...')`
+     VINDT. Wat hij niet vindt, wordt niet afgekeurd en ook niet geteld -- en dat
+     is de gevaarlijkste vorm van groen: een regel die een deel van zijn invoer
+     niet BEKIJKT, zegt niet "in orde" maar "ik heb niet gekeken" (lat regel 10,
+     hier op de handhaver zelf toegepast).
+
+     De vergelijking staat in ./lib/poortbereik.js en gaat tegen de LEVENDE
+     routetabel, niet tegen een tweede regex. Hij MELDT en blokkeert niet: 565
+     routes in een keer rood zetten maakt van deze regel een muur die binnen een
+     week wordt uitgezet, en "geen bewakerslaag" is niet hetzelfde als
+     "onbeveiligd" -- honderden routes in die takken controleren een
+     capability-token in de handler. Wat ze nodig hebben is een oordeel per
+     route. CONTROLPLANE.md schrijft die volgorde voor: eerst meelopen, dan
+     afdwingen. TAKEN.md 7.14 draagt de weg naar hard. */
+  {
+    const { buitenBereik } = require('./lib/poortbereik');
+    const b = buitenBereik(bestaat);
+    if (b.nietVastTeStellen) {
+      console.log('  \x1b[2m? bereik van deze regel niet vast te stellen: ' + b.nietVastTeStellen + '\x1b[0m');
+    } else if (!b.paden.length) {
+      ok('en deze regel ziet elk /api-pad dat de router kent');
+    } else {
+      const takken = Object.entries(b.perTak).sort((a, b2) => b2[1] - a[1]).slice(0, 6)
+        .map(([t, n]) => t + ' ' + n).join(', ');
+      console.log('  \x1b[2m! SCHADUW: ' + b.paden.length + ' van de ' + b.bekend +
+        ' /api-paden die de router kent, vallen buiten deze regel (' + b.zonderBewaker.length +
+        ' daarvan zonder bewakerslaag). Per tak: ' + takken +
+        '. Meldt, blokkeert nog niet -- zie TAKEN.md 7.14\x1b[0m');
+    }
+  }
 }
 
 /* 29) de Authorization-kop wordt gelezen om een token te HALEN, niet om te oordelen.

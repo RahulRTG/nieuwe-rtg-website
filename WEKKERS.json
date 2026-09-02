@@ -1,4 +1,13 @@
 {
+  "stempel": {
+    "op": "2026-09-02T21:35:41.190Z",
+    "commit": "f50d8d40",
+    "boomVuil": false,
+    "boomAnders": 2,
+    "instrument": "scripts/wekkers.js",
+    "node": "v22.22.2"
+  },
+  "hoe": "npm run wekkers:vast",
   "gemetenOp": "2026-09-02",
   "meetAlleen": "deze meter blokkeert niets; hij loopt in de schaduw (CONTROLPLANE.md: je kunt niet afdwingen wat nooit in de schaduw heeft gelopen)",
   "aiIsGeenGat": "kern/stuur.js r.130 roept zijn paden aan met fetch('http://127.0.0.1:'+poort+pad): de AI gaat over echte HTTP en komt dus langs dezelfde functieschakelaars als een mens",

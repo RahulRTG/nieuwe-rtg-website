@@ -1,4 +1,13 @@
 {
+  "stempel": {
+    "op": "2026-09-02T21:36:16.621Z",
+    "commit": "f50d8d40",
+    "boomVuil": false,
+    "boomAnders": 3,
+    "instrument": "scripts/tredeproef.js",
+    "node": "v22.22.2"
+  },
+  "hoe": "node scripts/tredeproef.js --alle --vastleggen",
   "gemetenOp": "2026-09-02",
   "trede": "start",
   "tredeNaam": "Trede 0 · De smalle snee",
@@ -230,7 +239,7 @@
     {
       "bestand": "server/smtp-in-server.js",
       "functie": "ov-mail-binnen",
-      "poort": 42699,
+      "poort": 37761,
       "wat": "post van buiten aannemen (SMTP)",
       "antwoord": "220 rtg-mail RTG Mail klaar",
       "antwoordde": true,
@@ -241,7 +250,7 @@
     {
       "bestand": "server/imap-server.js",
       "functie": "member",
-      "poort": 44533,
+      "poort": 36373,
       "wat": "een postvak vrijgeven (IMAP); dat postvak is kern/rtmail-vak.js en hangt aan `member`, niet aan een mailfunctie",
       "antwoord": "* OK RTG Mail IMAP klaar",
       "antwoordde": true,

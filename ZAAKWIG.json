@@ -1,4 +1,13 @@
 {
+  "stempel": {
+    "op": "2026-09-02T21:36:30.829Z",
+    "commit": "f50d8d40",
+    "boomVuil": false,
+    "boomAnders": 4,
+    "instrument": "scripts/zaakwig.js",
+    "node": "v22.22.2"
+  },
+  "hoe": "npm run zaakwig:vast",
   "gemetenOp": "2026-09-02",
   "treden": [
     {
@@ -6,8 +15,8 @@
       "tredeNaam": "Trede 3 · De vloer draait",
       "geldAan": false,
       "zaak": "KIKUNOI",
-      "ref": "RTG-O-C61937",
-      "pickup": "L7KN",
+      "ref": "RTG-O-3DD17B",
+      "pickup": "CAUM",
       "stappen": [
         {
           "wat": "lid logt in",
@@ -87,8 +96,8 @@
       "tredeNaam": "Trede 4 · Het fundament (de wig)",
       "geldAan": true,
       "zaak": "KIKUNOI",
-      "ref": "RTG-O-8FDCBA",
-      "pickup": "AMSV",
+      "ref": "RTG-O-C69D5B",
+      "pickup": "HGYK",
       "stappen": [
         {
           "wat": "lid logt in",
@@ -151,13 +160,13 @@
         },
         {
           "wat": "de betaling hoort bij DEZELFDE bon",
-          "uitleg": "betaald: RTG-O-8FDCBA",
+          "uitleg": "betaald: RTG-O-C69D5B",
           "uitkomst": "ok",
           "goed": true
         },
         {
           "wat": "de zaak ziet DEZELFDE bon",
-          "uitleg": "op ref RTG-O-8FDCBA",
+          "uitleg": "op ref RTG-O-C69D5B",
           "uitkomst": "ok",
           "goed": true
         },
@@ -188,8 +197,8 @@
       "tredeNaam": "Trede 6 · Alles open",
       "geldAan": true,
       "zaak": "KIKUNOI",
-      "ref": "RTG-O-ADB0ED",
-      "pickup": "3PQY",
+      "ref": "RTG-O-4B367F",
+      "pickup": "J9NV",
       "stappen": [
         {
           "wat": "lid logt in",
@@ -252,13 +261,13 @@
         },
         {
           "wat": "de betaling hoort bij DEZELFDE bon",
-          "uitleg": "betaald: RTG-O-ADB0ED",
+          "uitleg": "betaald: RTG-O-4B367F",
           "uitkomst": "ok",
           "goed": true
         },
         {
           "wat": "de zaak ziet DEZELFDE bon",
-          "uitleg": "op ref RTG-O-ADB0ED",
+          "uitleg": "op ref RTG-O-4B367F",
           "uitkomst": "ok",
           "goed": true
         },

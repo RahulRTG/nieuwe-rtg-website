@@ -1,4 +1,13 @@
 {
+  "stempel": {
+    "op": "2026-09-02T21:35:40.696Z",
+    "commit": "f50d8d40",
+    "boomVuil": false,
+    "boomAnders": 1,
+    "instrument": "scripts/activering.js",
+    "node": "v22.22.2"
+  },
+  "hoe": "npm run activering:vast",
   "gemetenOp": "2026-09-02",
   "grondslag": "require-sluiting vanaf het bestand dat de route ophangt",
   "teHoog": "een require is geen aanroep: dit is wat er wakker KAN worden, niet wat er draait",
@@ -9010,9 +9019,7 @@
         "domein:zorgketen",
         "domein:zorgpolis"
       ],
-      "onverklaardeRanden": [
-        "domein:school -> domein:machtiging"
-      ]
+      "onverklaardeRanden": []
     },
     {
       "id": "office",
@@ -9477,9 +9484,7 @@
         "domein:werkvormen",
         "domein:winkelcatalogus"
       ],
-      "onverklaardeRanden": [
-        "domein:school -> domein:machtiging"
-      ]
+      "onverklaardeRanden": []
     },
     {
       "id": "member",
@@ -9793,9 +9798,7 @@
         "domein:werkcommand",
         "domein:werkvormen"
       ],
-      "onverklaardeRanden": [
-        "domein:school -> domein:machtiging"
-      ]
+      "onverklaardeRanden": []
     },
     {
       "id": "rtf-contacten",
@@ -9972,9 +9975,7 @@
         "domein:werkplek-kantoren-vorm",
         "domein:werkvormen"
       ],
-      "onverklaardeRanden": [
-        "domein:school -> domein:machtiging"
-      ]
+      "onverklaardeRanden": []
     },
     {
       "id": "kern-meldingen",
@@ -10120,9 +10121,7 @@
         "domein:werkcommand",
         "domein:werkvormen"
       ],
-      "onverklaardeRanden": [
-        "domein:school -> domein:machtiging"
-      ]
+      "onverklaardeRanden": []
     },
     {
       "id": "dom-werkplek",
@@ -10247,9 +10246,7 @@
         "domein:werkplek-kantoren-vorm",
         "domein:werkvormen"
       ],
-      "onverklaardeRanden": [
-        "domein:school -> domein:machtiging"
-      ]
+      "onverklaardeRanden": []
     },
     {
       "id": "kern-live",
@@ -10359,9 +10356,7 @@
         "domein:werkcommand",
         "domein:werkvormen"
       ],
-      "onverklaardeRanden": [
-        "domein:school -> domein:machtiging"
-      ]
+      "onverklaardeRanden": []
     },
     {
       "id": "foundation",
@@ -10516,9 +10511,7 @@
         "domein:werkcommand",
         "domein:werkvormen"
       ],
-      "onverklaardeRanden": [
-        "domein:school -> domein:machtiging"
-      ]
+      "onverklaardeRanden": []
     },
     {
       "id": "levenos",
@@ -10626,9 +10619,7 @@
         "domein:werkcommand",
         "domein:werkvormen"
       ],
-      "onverklaardeRanden": [
-        "domein:school -> domein:machtiging"
-      ]
+      "onverklaardeRanden": []
     },
     {
       "id": "kantoorpakket",
@@ -10739,9 +10730,7 @@
         "domein:werkplek-kantoren-vorm",
         "domein:werkvormen"
       ],
-      "onverklaardeRanden": [
-        "domein:school -> domein:machtiging"
-      ]
+      "onverklaardeRanden": []
     },
     {
       "id": "werk-rtf",
@@ -10863,9 +10852,7 @@
         "domein:werkcommand",
         "domein:werkvormen"
       ],
-      "onverklaardeRanden": [
-        "domein:school -> domein:machtiging"
-      ]
+      "onverklaardeRanden": []
     },
     {
       "id": "spellen",
@@ -10974,9 +10961,7 @@
         "domein:werkcommand",
         "domein:werkvormen"
       ],
-      "onverklaardeRanden": [
-        "domein:school -> domein:machtiging"
-      ]
+      "onverklaardeRanden": []
     },
     {
       "id": "foundation-school",
@@ -11236,9 +11221,7 @@
         "domein:vakbewijs-verhuis",
         "domein:werkvormen"
       ],
-      "onverklaardeRanden": [
-        "domein:school -> domein:machtiging"
-      ]
+      "onverklaardeRanden": []
     },
     {
       "id": "betalen",
@@ -11585,9 +11568,7 @@
         "domein:werkcommand",
         "domein:werkvormen"
       ],
-      "onverklaardeRanden": [
-        "domein:identiteit -> domein:totp"
-      ]
+      "onverklaardeRanden": []
     },
     {
       "id": "bk-reizen",
@@ -17804,9 +17785,7 @@
         "domein:werkcommand",
         "domein:werkvormen"
       ],
-      "onverklaardeRanden": [
-        "domein:rtfos -> domein:machtiging"
-      ]
+      "onverklaardeRanden": []
     },
     {
       "id": "dom-onderwijs",

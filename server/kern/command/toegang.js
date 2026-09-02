@@ -18,6 +18,8 @@
    rechtenboom van het platform zelf blijft waar hij is. */
 'use strict';
 
+const { NIVEAUS } = require('../frictie');
+
 /* De zware bevoegdheden. Alleen deze zijn tijdelijk uit te delen -- de rest
    hangt gewoon aan de kantoorinlog. Een lijst, want "alles kan tijdelijk" is
    hetzelfde als geen grens. */
@@ -55,7 +57,7 @@ function maakToegang({ opslag, save, crypto, journaal }) {
     rij().push(item);
     if (save) save();
     journaal.noteer({ actor: door, actie: 'recht tijdelijk geven', objectType: 'recht', objectId: item.id,
-      niveau: 'hand', reden, na: { recht: item.recht, aan: item.aan, tot: item.tot } });
+      niveau: NIVEAUS.hand, reden, na: { recht: item.recht, aan: item.aan, tot: item.tot } });
     return { recht: item };
   }
 
@@ -72,7 +74,7 @@ function maakToegang({ opslag, save, crypto, journaal }) {
     rij().push(item);
     if (save) save();
     journaal.noteer({ actor: door, actie: 'noodtoegang openen', objectType: 'recht', objectId: item.id,
-      niveau: 'hand', risico: 95, reden, na: { recht: item.recht, tot: item.tot, nood: true } });
+      niveau: NIVEAUS.hand, risico: 95, reden, na: { recht: item.recht, tot: item.tot, nood: true } });
     return { recht: item, waarschuwing: 'Deze noodtoegang staat in het journaal en vervalt om ' + item.tot + '.' };
   }
 
@@ -85,7 +87,7 @@ function maakToegang({ opslag, save, crypto, journaal }) {
     item.ingetrokken = true; item.tot = nu(); item.introkDoor = String(door);
     if (save) save();
     journaal.noteer({ actor: door, actie: 'noodtoegang sluiten', objectType: 'recht', objectId: item.id,
-      niveau: 'hand', reden: String(reden || 'niet meer nodig'), voor, na: { ingetrokken: true } });
+      niveau: NIVEAUS.hand, reden: String(reden || 'niet meer nodig'), voor, na: { ingetrokken: true } });
     return { recht: item };
   }
 
@@ -107,7 +109,7 @@ function maakToegang({ opslag, save, crypto, journaal }) {
     mandaten().push(m);
     if (save) save();
     journaal.noteer({ actor: door, actie: 'mandaat vastleggen', objectType: 'mandaat', objectId: m.id,
-      niveau: 'hand', reden: m.reden, na: { van: m.van, aan: m.aan, terrein: m.terrein, tot: m.tot } });
+      niveau: NIVEAUS.hand, reden: m.reden, na: { van: m.van, aan: m.aan, terrein: m.terrein, tot: m.tot } });
     return { mandaat: m };
   }
   const mandatenVan = (wie) => { const n = nu(); return mandaten().filter(m => (m.aan === String(wie) || m.van === String(wie)) && m.tot > n); };

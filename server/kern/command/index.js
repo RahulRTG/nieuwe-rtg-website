@@ -29,6 +29,8 @@
    ./risico.js uit het beleid van dat moment. */
 'use strict';
 
+const { NIVEAUS } = require('../frictie');
+
 function maakCommand({ db, save, crypto, anthropic, sseToOffice, kern }) {
   /* HET RTG-REGISTER, en het gaat er expliciet in. Elke laag die gegevens leest
      krijgt hem mee in plaats van hem te importeren; dat is wat het mogelijk
@@ -106,7 +108,7 @@ function maakCommand({ db, save, crypto, anthropic, sseToOffice, kern }) {
     }
     uit.push({ soort: 'zaak', id: 'zaak-openen', naam: 'Uitzondering openen',
       wat: 'Maak hier een zaak van, met eigenaar en termijn.', past: true,
-      niveau: 'hand', score: risico.beoordeel('zaak toewijzen', {}).score, waarom: 'een zaak openen is altijd mensenwerk' });
+      niveau: NIVEAUS.hand, score: risico.beoordeel('zaak toewijzen', {}).score, waarom: 'een zaak openen is altijd mensenwerk' });
     return uit;
   }
 

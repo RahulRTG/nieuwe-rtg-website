@@ -28,6 +28,8 @@
 
 const { s } = require('./register');
 
+const { NIVEAUS } = require('../frictie');
+
 const MAX_RIJEN = 5000;
 
 function maakOvername({ db, save, crypto, journaal, register, opslag }) {
@@ -152,7 +154,7 @@ function maakOvername({ db, save, crypto, journaal, register, opslag }) {
     o.stand = 'uitgevoerd';
     save();
     if (journaal) {
-      journaal.noteer({ actie: 'overname uitgevoerd', actor: door, niveau: 'hand',
+      journaal.noteer({ actie: 'overname uitgevoerd', actor: door, niveau: NIVEAUS.hand,
         objectType: o.soort, objectId: o.id, reden: String(reden || ''),
         na: { erin, aangeboden: o.rijen.length } });
     }
@@ -188,7 +190,7 @@ function maakOvername({ db, save, crypto, journaal, register, opslag }) {
     o.uitgevoerd = null;
     o.stand = 'teruggedraaid';
     save();
-    if (journaal) journaal.noteer({ actie: 'overname teruggedraaid', actor: door, niveau: 'hand',
+    if (journaal) journaal.noteer({ actie: 'overname teruggedraaid', actor: door, niveau: NIVEAUS.hand,
       objectType: o.soort, objectId: o.id, reden: weg + ' rijen eruit' });
     return { partij: kort(o), weg };
   }

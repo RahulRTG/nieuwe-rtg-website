@@ -32,7 +32,7 @@
    EN HIJ VOERT NIETS UIT: geen fetch, geen stuurRoep. Hij zegt alleen wat er
    binnen de speelruimte valt; uitvoeren blijft de bestaande keten. */
 'use strict';
-const { beleidVoor } = require('./beleid');
+const { beleidVoor, NIVEAUS } = require('./beleid');
 
 /* Wat een mandaat mag begrenzen. Elk budget is een PLAFOND en nooit een recht:
    het zegt tot waar iets nog zelfstandig mag, niet dat het mag. */
@@ -79,14 +79,14 @@ function speelruimte(toegestaan, wereld, mandaat, opties) {
   const uit = [], geweigerd = [];
   for (const pad of alles) {
     const niveau = beleidVoor(pad, wereld).niveau;   // LIVE, nooit uit een projectie
-    if (niveau === 'verboden') continue;             // stond er niet in, komt er niet bij
+    if (niveau === NIVEAUS.verboden) continue;             // stond er niet in, komt er niet bij
     if (!raakt(mandaat.capabilities, pad)) continue; // buiten het mandaat: geen zelfstandigheid
     if (NOOIT_AUTONOOM.some(re => re.test(pad))) {
       geweigerd.push({ pad, reden: 'hier geeft geen enkel mandaat autonomie: geld en het pasbesluit ' +
         'blijven mensenwerk (GELD.md, CLAUDE.md)' });
       continue;
     }
-    if (niveau === 'voorstel') {
+    if (niveau === NIVEAUS.voorstel) {
       geweigerd.push({ pad, reden: 'dit is een handeling die een mens bevestigt; een mandaat verhoogt ' +
         'geen niveau, het versmalt alleen' });
       continue;

@@ -10,7 +10,16 @@
    automatisch) en staat aan of uit. Geen regel, geen handeling. */
 
 const SOORTEN = ['minimumbuffer', 'maanddrempel', 'reserveer-maandelijks', 'gift-bevestiging'];
-const NIVEAUS = ['kijken', 'voorstellen', 'klaarzetten', 'automatisch'];
+/* DE SCHAAL WOONT HIER, EN WORDT NERGENS OVERGESCHREVEN. Hij stond als kale
+   lijst tekenreeksen; roepers elders schreven dezelfde woorden nog eens over
+   (TAKEN.md 4.55). Als bevroren object is hij op te halen -- `NIVEAUS.kijken`
+   -- zodat een hernoeming hier een fout elders geeft in plaats van een tak die
+   nooit meer vuurt. De lijst wordt AFGELEID en niet ernaast gezet: twee vormen
+   van dezelfde waarheid is precies wat dit oplost. */
+const NIVEAUS = Object.freeze({
+  kijken: 'kijken', voorstellen: 'voorstellen', klaarzetten: 'klaarzetten', automatisch: 'automatisch'
+});
+const NIVEAU_NAMEN = Object.freeze(Object.values(NIVEAUS));
 
 module.exports = (ctx) => {
   const { pak, kijk, maakId, bedragVan, zichtRegel, logSchrijf, MAX_CENTEN } = ctx;
@@ -29,12 +38,12 @@ module.exports = (ctx) => {
     // een regel wisselt niet van soort: 'laatst' en potId horen bij de betekenis en zouden stil meeverhuizen
     if (bestaand && soort !== bestaand.soort) return { status: 400, error: 'Een regel wisselt niet van soort; zet deze uit en maak een nieuwe.' };
     const niveau = String(r.niveau || (bestaand ? bestaand.niveau : 'kijken'));
-    if (!NIVEAUS.includes(niveau)) return { status: 400, error: 'Kies een niveau: ' + NIVEAUS.join(', ') + '.' };
+    if (!NIVEAU_NAMEN.includes(niveau)) return { status: 400, error: 'Kies een niveau: ' + NIVEAU_NAMEN.join(', ') + '.' };
     /* DE HARDE GRENS (GELD.md par. 3): 'automatisch' bestaat uitsluitend voor
        het oormerken binnen het eigen tegoed. Elke andere soort raakt
        (mogelijk) een betaling of een derde, en geld verlaat het huis nooit
        autonoom -- die blijven maximaal 'klaarzetten', wat het lid ook vraagt. */
-    if (niveau === 'automatisch' && soort !== 'reserveer-maandelijks')
+    if (niveau === NIVEAUS.automatisch && soort !== 'reserveer-maandelijks')
       return { status: 400, error: 'Automatisch kan alleen bij maandelijkse reserveringen binnen het eigen tegoed; al het andere blijft maximaal klaarzetten.' };
     const drempel = bedragVan(r.drempelCenten != null ? r.drempelCenten : (bestaand ? bestaand.drempelCenten : null));
     if (drempel == null) return { status: 400, error: 'Geef een drempel in hele centen (0 tot ' + MAX_CENTEN + ').' };
@@ -84,3 +93,8 @@ module.exports = (ctx) => {
 
   return { regels, regelZet, regelWeg };
 };
+
+/* De schaal hangt aan de fabriek zelf, zodat een roeper hem kan ophalen zonder
+   de context te hoeven bouwen die deze module verder nodig heeft. */
+module.exports.NIVEAUS = NIVEAUS;
+module.exports.NIVEAU_NAMEN = NIVEAU_NAMEN;

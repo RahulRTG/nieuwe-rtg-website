@@ -32,6 +32,8 @@
    'uit' is van een canary niet te onderscheiden. */
 'use strict';
 
+const { NIVEAUS } = require('../frictie');
+
 const STANDAARD = {
   deel: 0.1,        // waarmee een canary begint
   drempel: 0.02,    // meer dan 2% serverfouten op de paden van deze functie
@@ -85,7 +87,7 @@ function maakCanary({ opslag, save, meting, journaal, functies }) {
       basis: tel(f), stand: 'loopt', reden: null
     };
     save();
-    noteer('canary gestart', f.id, { actor: o.door, niveau: 'hand',
+    noteer('canary gestart', f.id, { actor: o.door, niveau: NIVEAUS.hand,
       reden: 'uitrol op ' + Math.round(d * 100) + '%', na: { deel: d } });
     return { canary: kaartVan(f, cur.canary) };
   }
@@ -105,7 +107,7 @@ function maakCanary({ opslag, save, meting, journaal, functies }) {
     cur.canary.basis = tel(f);
     cur.canary.sinds = nu();
     save();
-    noteer('canary verbreed', f.id, { actor: door, niveau: 'hand',
+    noteer('canary verbreed', f.id, { actor: door, niveau: NIVEAUS.hand,
       reden: Math.round(was * 100) + '% naar ' + Math.round(d * 100) + '%',
       voor: { deel: was }, na: { deel: d } });
     return { canary: kaartVan(f, cur.canary) };
@@ -123,7 +125,7 @@ function maakCanary({ opslag, save, meting, journaal, functies }) {
     cur.canary.automatisch = !!automatisch;
     save();
     noteer('canary teruggerold', f.id, { actor: automatisch ? 'automaat' : door,
-      niveau: automatisch ? 'auto' : 'hand', reden: cur.canary.reden,
+      niveau: automatisch ? NIVEAUS.auto : NIVEAUS.hand, reden: cur.canary.reden,
       voor: { deel: was }, na: { deel: 0 }, uitslag: 'gedaan' });
     return { canary: kaartVan(f, cur.canary) };
   }
@@ -138,7 +140,7 @@ function maakCanary({ opslag, save, meting, journaal, functies }) {
     const was = cur.canary.deel;
     delete cur.canary;
     save();
-    noteer('canary afgerond', f.id, { actor: door, niveau: 'hand',
+    noteer('canary afgerond', f.id, { actor: door, niveau: NIVEAUS.hand,
       reden: 'de functie staat nu voor iedereen open', voor: { deel: was } });
     return { af: true, id: f.id };
   }

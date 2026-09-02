@@ -33,7 +33,7 @@
    EEN AFGEWEZEN STAP LAAT HET HELE PLAN ZAKKEN. Hij wordt niet stil overgeslagen:
    een keten waarvan stap 5 wegvalt, is een andere keten dan de gebruiker las. */
 'use strict';
-const { beleidVoor } = require('./beleid');
+const { beleidVoor, NIVEAUS } = require('./beleid');
 
 const MAX_STAPPEN = 24;   // hetzelfde budget als de zware taak in ./lus.js
 const MAX_INVOER = 4000;  // een planstap is een bedoeling, geen gegevensdump
@@ -103,11 +103,11 @@ function compileer(plan, wereld, opties) {
     const rij = { id: s.id, capability: s.capability, uitkomst: s.uitkomst,
       afhankelijkVan: afhankelijk.get(s.id) || [], niveau: b.niveau, waarom: b.reden || null };
     if (b.vervalstaat) rij.bewijs = b.vervalstaat;
-    if (b.niveau === 'verboden') {
+    if (b.niveau === NIVEAUS.verboden) {
       rij.bezwaar = b.reden || 'deze capability bestaat niet voor deze rol';
       bezwaren.push({ id: s.id, reden: rij.bezwaar });
     }
-    rij.bevestigingNodig = b.niveau === 'voorstel';
+    rij.bevestigingNodig = b.niveau === NIVEAUS.voorstel;
     return rij;
   });
 

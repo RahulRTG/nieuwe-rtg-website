@@ -102,8 +102,8 @@ function maakFrictie({ beleid }) {
       const ctx = Object.assign({}, basisCtx || {}, (g && g.ctx) || {}, { aantal: 1 });
       const o = beoordeel(actie, ctx);
       const rij = { geval: g, oordeel: o };
-      if (o.niveau === 'auto' && !o.vierOgen) veilig.push(rij);
-      else if (o.niveau === 'assist') hulp.push(rij);
+      if (o.niveau === NIVEAUS.auto && !o.vierOgen) veilig.push(rij);
+      else if (o.niveau === NIVEAUS.assist) hulp.push(rij);
       else mens.push(rij);
     }
     const stapel = beoordeel(actie, Object.assign({}, basisCtx || {}, { aantal: veilig.length }));

@@ -4,6 +4,10 @@
    DROOG IS DE STANDAARD. `droog` moet expliciet op false om iets te veranderen;
    wie het veld vergeet, krijgt een droogloop en geen wijziging. Een schrijfpad
    dat standaard schrijft, is een schrijfpad waar je per ongeluk op komt. */
+'use strict';
+
+const { NIVEAUS } = require('../../kern/frictie');
+
 module.exports = ({ app, officeAuth, veilig, wie, command }) => {
 
   app.post('/api/command/runbooks', officeAuth, (req, res) => veilig(res, () =>
@@ -70,7 +74,7 @@ module.exports = ({ app, officeAuth, veilig, wie, command }) => {
     ({ zaak: command.zaken.open({
       titel: req.body.titel, domein: req.body.domein, objectType: req.body.objectType,
       objectId: req.body.objectId, oorzaak: req.body.oorzaak, bron: 'kantoor',
-      door: wie(req), niveau: 'hand', reden: req.body.reden,
+      door: wie(req), niveau: NIVEAUS.hand, reden: req.body.reden,
       bewijs: req.body.bewijs || null }) })));
 
   app.post('/api/command/zaak/neem', officeAuth, (req, res) => veilig(res, () =>

@@ -27,6 +27,8 @@
    uitgangen die er zijn, staan in de uitslag. */
 'use strict';
 
+const { NIVEAUS } = require('../frictie');
+
 const ERNST = { hoog: 3, midden: 2, laag: 1 };
 
 function maakAlarm({ opslag, save, journaal, slo, sonde, canary, kwaliteit, norm, sein }) {
@@ -139,7 +141,7 @@ function maakAlarm({ opslag, save, journaal, slo, sonde, canary, kwaliteit, norm
     const stil = a.stilTot && Date.parse(a.stilTot) > Date.now();
     try {
       journaal.noteer({ actie: richting === 'aan' ? 'alarm aan' : 'alarm af', actor: 'automaat',
-        niveau: 'auto', objectType: 'alarm', objectId: a.id,
+        niveau: NIVEAUS.auto, objectType: 'alarm', objectId: a.id,
         reden: a.naam + (richting === 'aan' ? ': ' + a.wat : ' is opgelost') + (stil ? ' (stilgezet)' : '') });
     } catch (e) { /* een journaalstoring mag het alarm niet dempen */ }
     if (!stil && typeof sein === 'function') {
@@ -157,7 +159,7 @@ function maakAlarm({ opslag, save, journaal, slo, sonde, canary, kwaliteit, norm
     const u = Math.max(1, Math.min(Number(uren || 8), d.stilteMaxUren));
     a.stilTot = new Date(Date.now() + u * 3600000).toISOString();
     save();
-    journaal.noteer({ actie: 'alarm stilgezet', actor: door, niveau: 'hand', objectType: 'alarm',
+    journaal.noteer({ actie: 'alarm stilgezet', actor: door, niveau: NIVEAUS.hand, objectType: 'alarm',
       objectId: a.id, reden: u + ' uur: ' + String(reden || 'geen reden opgegeven') });
     return { alarm: a, tot: a.stilTot, max: d.stilteMaxUren };
   }

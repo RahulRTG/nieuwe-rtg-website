@@ -137,7 +137,15 @@ const TEGENSPRAKEN = [
 /* De bestanden waar een niveaunaam GEEN gezag betekent. Elk met een reden --
    staat er geen reden, dan hoort het hier niet; dezelfde afspraak als de
    MAG-lijst in scripts/klok.js en de PUBLIEK-lijst van de poortwacht. */
-const GEEN_GEZAG = new Map([]);
+const GEEN_GEZAG = new Map([
+  ['server/kern/levenslijn/cockpit.js',
+   "De levenscockpit draagt een EIGEN tweetrapsschaal -- 'kijken' en 'openen' -- " +
+   'en die deelt alleen het woord `kijken` met de geldbeleidschaal. De kop van dat ' +
+   'bestand schrijft het uit: deze wereld voert niets uit, en zelfs `openen` wijst ' +
+   'alleen een deur aan. Hem de geldbeleidschaal laten importeren zou een ' +
+   'afhankelijkheid maken die er inhoudelijk niet is, en hem als zesde vocabulaire ' +
+   'registreren zou de ratel omhoog duwen voor twee treden die niets besturen.']
+]);
 
 function loopJs(map, uit) {
   let namen;
@@ -250,10 +258,25 @@ function meet() {
       for (const w of v.schaal) {
         if (woorden.some(x => x.woord === w)) continue;
         if (!vorm(w).test(code)) continue;
-        // staat het woord in een schaal die dit bestand WEL ophaalt, dan leest
-        // hij zijn eigen waarheid en is er niets gekopieerd
-        const gedekt = REGISTER.some(a => a.schaal.includes(w) && heeft.has(a.bestand));
-        if (!gedekt) woorden.push({ woord: w, schaal: v.bestand });
+        /* HIER STOND EEN VRIJSTELLING, EN DIE MAAKTE DE NUL ZACHT. Een bestand
+           dat de schaal ophaalde werd niet meer geteld -- ook niet als het de
+           trede DAARNAAST nog steeds als kale tekenreeks schreef. Dat is precies
+           de drift die deze meter hoort te vinden: `const { NIVEAUS } =
+           require(...)` erboven en `niveau: 'hand'` eronder overleeft een
+           hernoeming even stil als een bestand dat niets importeert. Gemeten op
+           2 september 2026: tien van die plekken, over vijf bestanden die alle
+           vijf keurig importeerden. Ze zijn omgezet, en de vrijstelling is weg.
+
+           Wat de vrijstelling ooit moest voorkomen (een correct bestand
+           beschuldigen) doet de regel eronder al: de toets gaat PER WOORD, dus
+           een bestand dat zijn trede uit de bron ophaalt schrijft het woord
+           niet meer en valt hier vanzelf buiten.
+
+           De schaal die erbij gemeld wordt is die van het bestand zelf als het
+           er een ophaalt -- 'verboden' en 'voorbereiden' staan in twee schalen,
+           en dan wijst een willekeurige de lezer de verkeerde kant op. */
+        const eigen = REGISTER.find(a => a.schaal.includes(w) && heeft.has(a.bestand));
+        woorden.push({ woord: w, schaal: (eigen || v).bestand });
       }
     }
     for (const w of woorden) los.push({ bestand: rel, schaal: w.schaal, woorden: [w.woord] });

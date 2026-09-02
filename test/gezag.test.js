@@ -218,17 +218,41 @@ test('MUTATIE: verdwijnt een kant van de tegenspraak, dan meldt hij "veranderd" 
 
 /* ---------- de negatieve controle ---------- */
 
-test('een module die de schaal WEL importeert telt niet mee als losse niveaunaam', () => {
+test('een module die de trede UIT de schaal leest telt niet mee als losse niveaunaam', () => {
+  /* De negatieve controle: niet "importeert hij iets" maar "haalt hij de trede
+     werkelijk op". Tot 2 september 2026 was importeren genoeg, en dat maakte de
+     nul zacht -- zie de toets hieronder, die de keerzijde vastlegt. */
   const voor = getal(draai().uit, 'losse niveaunamen');
   const bron = "'use strict';\n" +
-    "const { beleidVoor } = require('./stuur/beleid');\n" +
+    "const { beleidVoor, NIVEAUS } = require('./stuur/beleid');\n" +
     'module.exports = function zzIjk(pad, wereld) {\n' +
     '  const beleid = beleidVoor(pad, wereld);\n' +
-    "  return beleid.niveau === 'verboden' ? null : beleid;\n" +
+    '  return beleid.niveau === NIVEAUS.verboden ? null : beleid;\n' +
     '};\n';
   metNieuwBestand('server/kern/zz-gezag-ijk3.js', bron, () => {
     assert.equal(getal(draai().uit, 'losse niveaunamen'), voor,
-      'een module die zijn schaal ophaalt houdt geen kopie vast en hoort niet beschuldigd te worden');
+      'een module die zijn trede uit de bron ophaalt houdt geen kopie vast en hoort niet beschuldigd te worden');
+  });
+});
+
+test('importeren is NIET genoeg: een kale trede naast de import telt gewoon mee', () => {
+  /* De vrijstelling die hier tot 2 september 2026 stond, sloeg een heel bestand
+     over zodra het de schaal ophaalde -- ook de tredes die er als kale
+     tekenreeks naast bleven staan. Dat is precies de drift die deze meter zoekt:
+     `const { NIVEAUS } = require(...)` erboven en `niveau: 'verboden'` eronder
+     overleeft een hernoeming even stil als een bestand dat niets importeert.
+     Er stonden er tien, over vijf bestanden die alle vijf keurig importeerden. */
+  const voor = getal(draai().uit, 'losse niveaunamen');
+  const bron = "'use strict';\n" +
+    "const { beleidVoor, NIVEAUS } = require('./stuur/beleid');\n" +
+    'module.exports = function zzIjk(pad, wereld) {\n' +
+    '  const beleid = beleidVoor(pad, wereld);\n' +
+    '  if (beleid.niveau === NIVEAUS.lezen) return beleid;\n' +
+    "  return beleid.niveau === 'verboden' ? null : beleid;\n" +
+    '};\n';
+  metNieuwBestand('server/kern/zz-gezag-ijk4.js', bron, () => {
+    assert.equal(getal(draai().uit, 'losse niveaunamen'), voor + 1,
+      'een kale trede telt mee, ook als het bestand de schaal ophaalt');
   });
 });
 
@@ -236,11 +260,11 @@ test('server/kern/stuur.js blijft ongemoeid: hij leest zijn eigen, geimporteerde
   /* Dit is de valse positieve die de eerste versie van de meter maakte, met naam
      vastgelegd zodat hij niet terugkomt. 'verboden' staat in twee schalen. */
   const r = draai(['--lijst']);
-  assert.doesNotMatch(r.uit, /server\/kern\/stuur\.js\s+stadsweefsel/,
-    'stuur.js importeert stuur/beleid.js en mag niet aan ainiveau.js worden toegeschreven');
+  assert.doesNotMatch(r.uit, /server\/kern\/stuur\.js\s/,
+    'stuur.js haalt zijn tredes uit stuur/beleid.js en hoort hier niet te staan');
   const bron = fs.readFileSync(path.join(WORTEL, 'server/kern/stuur.js'), 'utf8');
   assert.ok(bron.includes("require('./stuur/beleid')"), 'de aanname onder deze toets: stuur.js haalt zijn schaal op');
-  assert.ok(bron.includes("niveau === 'verboden'"), 'en vergelijkt er ook echt tegen');
+  assert.ok(bron.includes('niveau === NIVEAUS.verboden'), 'en vergelijkt er ook echt tegen');
 });
 
 /* ---------- wat de meter NIET beweert ---------- */

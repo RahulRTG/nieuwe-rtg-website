@@ -95,7 +95,7 @@
 
   /* ---------- proef ---------- */
   var PROEFPADEN = ['/api/pay/stuur', '/api/bank/sepa', '/api/bank/afschrift', '/api/pay/overzicht',
-    '/api/agenda/mijn', '/api/salon/post'];
+    '/api/agenda/mijn', '/api/salon/plaats'];
 
   function proef() {
     var drager = $('d-drager').value, sleutel = $('d-sleutel').value.trim();

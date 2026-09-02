@@ -305,17 +305,27 @@ differentieel met 5000 documenten tegen de ingebouwde motor.
 zichzelf over te slaan als die ontbreekt. `kern/mailmime.js` is begrensd op
 diepte en omvang.
 
-**Wat ontbreekt.** Vier ontleders die op bytes van buiten draaien hebben geen
-enkele toets met misvormde invoer, en twee daarvan zijn aantoonbaar kapot:
+**Wat er sinds 2 september 2026 dicht is.** De twee bewezen gaten:
 
-- `server/webauthn/cbor.js` neemt een 64-bits lengte onbeperkt over. Negen bytes
-  blokkeren de event-loop 9,3 seconden, bereikbaar voor elk ingelogd lid via
-  `/api/webauthn/registreer` -- de enige webauthn-route zonder misbruikrem.
-- `server/pgwire/protocol.js` loopt in `foutVelden` oneindig als een NUL
-  ontbreekt.
+- `server/webauthn/cbor.js` nam een 64-bits lengte onbeperkt over. Negen bytes
+  blokkeerden de event-loop 9,3 seconden, bereikbaar voor elk ingelogd lid via
+  `/api/webauthn/registreer`. Nu drie budgetten: een lengte kan nooit groter
+  zijn dan wat er nog in de buffer ligt, de positie moet binnen de buffer
+  vallen, en de diepte stopt op 32. De grens is niet een verzonnen maximum maar
+  de buffer zelf -- een element kost minstens een byte -- dus hij weigert precies
+  het onmogelijke en geen enkel geldig document.
+- `server/pgwire/protocol.js` liep in `foutVelden` oneindig door als de
+  NUL-afsluiter ontbrak. Nu breekt hij af.
 
-Node is een draad, dus dit is geen trage route maar een stilstaand platform.
-`TAKEN.md` 7.2.
+`test/vijandigerand.test.js` houdt het vast, en draait zijn proeven in een
+**kindproces**: bij de eerste versie liep de suite niet rood maar VAST, precies
+zoals eerlijkheidspunt 6.7 beschrijft. Een vastloper hoort een uitslag te zijn.
+Zes toetsen zijn rood gezien vóór de reparatie en groen erna; twee tegenproeven
+bewijzen dat geldige CBOR en een goed gevormd foutbericht er nog doorheen komen.
+
+**Wat ontbreekt.** De motor. Er is nog geen fuzzer die zelf tegenvoorbeelden
+zoekt, en `sso/saml/xml.js` en `kern/mailmime.js` zijn nog niet met misvormde
+bytes beproefd. `TAKEN.md` 7.2.
 
 **De grens.** Er komt geen derde runtime bij om dit op te lossen. Het budget is
 de reparatie en de fuzzer is de handhaver; WASM of een verhuizing naar de

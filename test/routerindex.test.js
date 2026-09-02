@@ -309,3 +309,67 @@ test('7. VANGRAIL: de index blijft meetbaar sneller dan de lineaire scan', () =>
     'de dispatch hoort vlak te zijn: achteraan ' + laat.toFixed(1) + ' ms tegen vooraan ' +
     vroeg.toFixed(1) + ' ms. Loopt dit uiteen, dan scant hij weer.');
 });
+
+/* ---------- de padgrens van een gemounte laag ----------
+
+   Toegevoegd 2 september 2026, naar aanleiding van STANDAARD.md par. 6: van de
+   4191 routes die deze router kent, is er geen enkele die een MOUNT toetst met
+   een array van paden. `_routes()` leest namelijk de lagen die een METHODE
+   dragen, en een middleware heeft er geen -- dus een verkeerd gemounte
+   middleware valt buiten elke routetoets.
+
+   Wat er stond: `router.use` had een tak voor een `string` en een else waarin
+   de eerste parameter als middleware werd gelezen. Een array is geen functie,
+   werd dus overgeslagen, en de laag belandde op '/'. De aanroeper vroeg twee
+   paden en kreeg het hele huis -- in `server/server.js` gebeurde dat echt, met
+   de CORS-laag van de taalkiezer. */
+test('use() met een array van paden mount op die paden en niet op alles', () => {
+  const app = maakRouter();
+  const geraakt = [];
+  /* WAT HIER GEMETEN WORDT is WELK VERZOEK de laag bereikte, en niet `req.url`
+     binnenin. Een mount STRIPT namelijk zijn voorvoegsel -- binnen een laag die
+     op '/api/talen' hangt is `req.url` gewoon '/' -- dus `req.url` zou hier
+     twee keer '/' zijn en niets zeggen over de grens. Die val kostte de eerste
+     versie van deze toets een gezakte ronde. */
+  let huidige = null;
+  app.use(['/api/talen', '/api/vertaal/ui'], (req, res, next) => { geraakt.push(huidige); next(); });
+  app.get('/api/talen', (req, res) => res.end('talen'));
+  app.get('/api/vertaal/ui', (req, res) => res.end('ui'));
+  app.get('/api/geld/saldo', (req, res) => res.end('saldo'));
+
+  const roep = (url) => new Promise(klaar => {
+    huidige = url;
+    const res = { end: () => klaar(), setHeader() {}, writeHead() {} };
+    app({ method: 'GET', url, headers: {} }, res, () => klaar());
+  });
+
+  return roep('/api/talen')
+    .then(() => roep('/api/vertaal/ui'))
+    .then(() => roep('/api/geld/saldo'))
+    .then(() => {
+      assert.deepEqual(geraakt, ['/api/talen', '/api/vertaal/ui'],
+        'de laag hoort op zijn twee eigen paden te draaien -- en NIET op /api/geld/saldo. ' +
+        'Draaide hij overal, dan is de padgrens die de aanroeper opschreef er niet.');
+    });
+});
+
+test('DE TEGENPROEF: een echte middleware zonder pad draait nog steeds overal', () => {
+  /* Zonder deze zou een `use` die arrays afwijst en verder niets meer mount,
+     de toets hierboven gewoon halen. */
+  const app = maakRouter();
+  const geraakt = [];
+  let huidige = null;
+  app.use((req, res, next) => { geraakt.push(huidige); next(); });
+  app.get('/a', (req, res) => res.end('a'));
+  app.get('/b', (req, res) => res.end('b'));
+
+  const roep = (url) => new Promise(klaar => {
+    huidige = url;
+    const res = { end: () => klaar(), setHeader() {}, writeHead() {} };
+    app({ method: 'GET', url, headers: {} }, res, () => klaar());
+  });
+
+  return roep('/a').then(() => roep('/b')).then(() => {
+    assert.deepEqual(geraakt, ['/a', '/b'], 'een middleware zonder pad hoort overal te draaien');
+  });
+});

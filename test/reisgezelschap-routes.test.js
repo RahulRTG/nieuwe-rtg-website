@@ -191,6 +191,8 @@ test('4. wie nee zegt verdwijnt, en niet als afgewezen rij die blijft staan', as
   assert.deepEqual((await api('/api/reis/gezelschap/kring', {}, D.token)).body.gevraagd, []);
   assert.equal((await api('/api/reis/gezelschap/antwoord', { id: uit.body.lid.id, ja: true }, D.token)).status, 404);
   const bij = await api('/api/reis/gezelschap', { reis: REIS }, A.token);
+  /* Eerst dat er iemand STAAT, anders zegt "de weigeraar staat er niet" niets. */
+  assert.ok(bij.body.leden.some(l => l.codenaam === B.codenaam), 'Bram, die ja zei, hoort er nog te staan');
   assert.ok(!bij.body.leden.some(l => l.codenaam === D.codenaam), 'de weigeraar staat nog in het gezelschap');
   assert.equal((await api('/api/reis/gezelschap/reis', { reis: REIS }, D.token)).status, 404);
 });
@@ -242,6 +244,7 @@ test('6. de poort: dezelfde reis, drie gezichten -- en het boekingsnummer blijft
   assert.ok(genoot.body.reis.onderdelen.length >= 2, 'een reisgenoot hoort het draaiboek te zien');
   assert.ok(!JSON.stringify(genoot.body).includes('QQ1234'), 'het boekingsnummer bereikte de reisgenoot');
   assert.ok(!JSON.stringify(genoot.body).includes('VL9911'), 'het vluchtkenmerk bereikte de reisgenoot');
+  assert.ok(genoot.body.reis.nietZichtbaar.length >= 1, 'de reisgenoot hoort iets afgeschermd te zien; anders zegt de lege lijst van de eigenaar niets');
   assert.ok(genoot.body.reis.nietZichtbaar.includes('boekingskenmerken'),
     'hij hoort te lezen dat er iets is dat hij niet ziet');
 
@@ -276,6 +279,7 @@ test('7. het gezelschap: de eigenaar ziet ook wie nog niet geantwoord heeft, een
      openstaande uitnodiging is iets tussen de reiziger en de gevraagde. */
   const vanCees = await api('/api/reis/gezelschap', { reis: REIS }, C.token);
   assert.equal(vanCees.body.rol, 'meekijker');
+  assert.ok(vanCees.body.leden.some(l => l.codenaam === B.codenaam), 'Bram, die aanvaardde, hoort in het gezelschap dat Cees ziet');
   assert.ok(vanCees.body.leden.every(l => l.stand === 'aanvaard'), 'een openstaande uitnodiging lekte naar het gezelschap');
   assert.ok(!vanCees.body.leden.some(l => l.codenaam === D.codenaam), 'de nog twijfelende Dirk stond in de lijst');
   assert.ok(!JSON.stringify(vanCees.body).includes('Bram'), 'er staat een echte naam in het gezelschap');

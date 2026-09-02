@@ -262,6 +262,7 @@ test('5. melden verbergt pas bij twee VERSCHILLENDE melders, en liegt niet over 
     'het verbergen werd gepresenteerd als een eindoordeel');
 
   const lijst = await api('/api/rtfos/ruil/lijst', { stad: STAD }, B.token);
+  assert.ok(lijst.body.ruil.some(r => r.id === A.aanbod), 'het gewone aanbod hoort nog in de buurtlijst -- anders zegt de regel hierna niets');
   assert.ok(!lijst.body.ruil.some(r => r.id === id), 'het verborgen aanbod stond nog in de buurtlijst');
   A.gemeld = id;
 });
@@ -284,6 +285,7 @@ test('6. sluiten doet alleen de eigenaar; /mijn houdt wat de buurtlijst loslaat'
   assert.equal(mijn.status, 200, JSON.stringify(mijn.body).slice(0, 160));
   const standen = {};
   for (const r of mijn.body.ruil) standen[r.id] = r.status;
+  assert.equal(mijn.body.ruil.length, 2, 'de eigenaar hoort zijn twee aanbiedingen te zien: het gesloten en het gemelde');
   assert.equal(standen[A.aanbod], 'weg');
   assert.equal(standen[A.gemeld], 'verborgen');
   assert.ok(mijn.body.ruil.every(r => r.ikBenEigenaar), '/mijn gaf een aanbod van iemand anders');
@@ -399,6 +401,7 @@ test('11. de projectenlijst toont wat loopt; het filter is een beeld en geen gre
   assert.ok(ids.includes(PROJECT), 'het lopende project staat niet in de keuzelijst');
   assert.ok(!ids.includes(PROJECT_IDEE), 'een project dat nog een idee is stond in de keuzelijst');
   assert.equal(alles.body.aantal, alles.body.projecten.length);
+  assert.ok(alles.body.projecten.length >= 1, 'de volle lijst hoort het lopende project te dragen; anders zegt het filter hieronder niets');
   assert.match(alles.body.uitleg, /alleen met jouw toestemming herbestemd/);
   /* Karig: naam, stad, soort en doelgroep -- geen budget en geen bestedingen. */
   for (const p of alles.body.projecten) {
@@ -453,6 +456,7 @@ test('13. plan/mijn is van de gever zelf, en andermans plan stop je niet', async
   const idsP = mijnP.body.plannen.map(x => x.id);
   assert.ok(idsP.includes(P.plan));
   assert.ok(!idsP.includes(H.plan), 'de gever zag het plan van een ander lid');
+  assert.ok(mijnP.body.plannen.length >= 1, 'de gever hoort zijn eigen plan te zien');
   assert.ok(mijnP.body.plannen.every(x => x.gever === undefined),
     'de codenaam van de gever staat in zijn eigen overzicht (die hoort bij de kantoorlijst)');
 
@@ -537,6 +541,9 @@ test('15. intrekken stopt de incasso en NIET de gift; een gestopt plan laat geen
   assert.equal(gestopt.body.plan.openDitJaar, false);
 
   const na = await api('/api/rtfos/gift/machtiging/mijn', {}, P.token);
+  /* Twee, niet een: de in toets 14 ingetrokken machtiging staat er ook nog (vervallen,
+     niet gewist). Het punt is dat intrekken en stoppen een SPOOR laten. */
+  assert.ok(na.body.machtigingen.length >= 1, 'de machtiging is verdwenen in plaats van vervallen -- intrekken laat het spoor staan');
   assert.ok(na.body.machtigingen.every(m => m.actief === false),
     'er stond nog een actieve machtiging bij een gestopt plan');
 });

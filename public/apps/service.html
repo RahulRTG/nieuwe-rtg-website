@@ -169,13 +169,15 @@ async function wachtrij() {
     '<div class="tabs">'
     + '<button class="knop" id="tWachtrij" aria-current="true">Wachtrij</button>'
     + '<button class="knop" id="tPatronen">Patronen</button>'
-    + '<button class="knop" id="tFouten">Foutsignalen</button></div>'
+    + '<button class="knop" id="tFouten">Foutsignalen</button>'
+    + '<button class="knop" id="tKwaliteit">Kwaliteit</button></div>'
     + '<div class="kaart"><h2>De rij</h2>'
     + '<p class="sub">' + esc(t.open || 0) + ' open &middot; ' + esc(t.zonderEigenaar || 0) + ' zonder eigenaar &middot; '
     + esc(t.wachtOpMens || 0) + ' wacht op een mens &middot; ' + esc(t.wachtOpMelder || 0) + ' wacht op de melder</p>'
     + '<p class="sub">' + teams + '</p></div>'
     + '<div class="kaart">' + tabel(d.zaken || []) + '</div>';
   $('#tPatronen').onclick = () => poging(patronen); $('#tFouten').onclick = () => poging(fouten);
+  $('#tKwaliteit').onclick = () => poging(kwaliteit);
   bindRijen();
 }
 
@@ -330,7 +332,8 @@ async function patronen() {
   const d = await api('patronen', {});
   $('#main').innerHTML = '<div class="tabs"><button class="knop" id="tWachtrij">Wachtrij</button>'
     + '<button class="knop" aria-current="true">Patronen</button>'
-    + '<button class="knop" id="tFouten">Foutsignalen</button></div>'
+    + '<button class="knop" id="tFouten">Foutsignalen</button>'
+    + '<button class="knop" id="tKwaliteit">Kwaliteit</button></div>'
     + '<div class="kaart"><h2>Vermoedens</h2><p class="sub">' + esc(d.let) + '</p>'
     + ((d.vermoedens || []).length ? (d.vermoedens || []).map(v =>
       '<div class="waarom"><b>' + esc(v.aantal) + ' zaken</b> delen ' + esc(v.gedeeld) + '<br>'
@@ -347,6 +350,7 @@ async function patronen() {
       + '</tbody></table>' : '<p class="sub">Geen zaken aan een incident gekoppeld.</p>')
     + '</div>';
   $('#tWachtrij').onclick = () => poging(wachtrij); $('#tFouten').onclick = () => poging(fouten);
+  $('#tKwaliteit').onclick = () => poging(kwaliteit);
   document.querySelectorAll('[data-bundel]').forEach(b => b.onclick = async () => {
     const v = (d.vermoedens || []).find(x => x.sleutel === b.dataset.bundel);
     const inc = document.querySelector('[data-inc="' + CSS.escape(b.dataset.bundel) + '"]').value;
@@ -365,7 +369,8 @@ async function fouten() {
   const t = d.tel || {};
   $('#main').innerHTML = '<div class="tabs"><button class="knop" id="tWachtrij">Wachtrij</button>'
     + '<button class="knop" id="tPatronen">Patronen</button>'
-    + '<button class="knop" aria-current="true">Foutsignalen</button></div>'
+    + '<button class="knop" aria-current="true">Foutsignalen</button>'
+    + '<button class="knop" id="tKwaliteit">Kwaliteit</button></div>'
     + '<div class="kaart"><h2>Wat er in browsers stukgaat</h2>'
     + '<p class="sub">' + esc(t.signalen || 0) + ' vormen &middot; ' + esc(t.gebeurtenissen || 0) + ' gebeurtenissen</p>'
     + '<p class="stil">Geraakte gebruikers: niet te tellen. ' + esc(t.gebruikersWaarom || '') + '</p>'
@@ -375,6 +380,41 @@ async function fouten() {
       + '</tbody></table>' : '<p class="sub">Nog niets binnengekomen.</p>')
     + '</div>';
   $('#tWachtrij').onclick = () => poging(wachtrij); $('#tPatronen').onclick = () => poging(patronen);
+  $('#tKwaliteit').onclick = () => poging(kwaliteit);
+}
+
+/* ------------------------------------------------------------- kwaliteit -- */
+/* WAT DIT BORD NIET TOONT staat er even groot bij als wat het wel toont, en dat
+   is geen bescheidenheid: een medewerker die hier geen tevredenheidscijfer ziet,
+   moet weten dat er niets is gevraagd -- anders vult iemand het gat met een
+   eigen indruk en gaat DIE rondzingen. */
+async function kwaliteit() {
+  const d = await api('kwaliteit', {});
+  const maat = (m) => m.nietTeZeggen
+    ? '<span class="stil">niet te zeggen &middot; ' + esc(m.waarom) + '</span>'
+    : esc(m.procent) + '% <span class="stil">(' + esc(m.deel) + ' van ' + esc(m.van) + ')</span>';
+  const hersteld = d.herstelMediaanMinuten.nietTeZeggen
+    ? '<span class="stil">niet te zeggen &middot; ' + esc(d.herstelMediaanMinuten.waarom) + '</span>'
+    : esc(d.herstelMediaanMinuten.minuten) + ' min <span class="stil">(mediaan over ' + esc(d.herstelMediaanMinuten.van) + ')</span>';
+  $('#main').innerHTML = '<div class="tabs"><button class="knop" id="tWachtrij">Wachtrij</button>'
+    + '<button class="knop" id="tPatronen">Patronen</button>'
+    + '<button class="knop" id="tFouten">Foutsignalen</button>'
+    + '<button class="knop" aria-current="true">Kwaliteit</button></div>'
+    + '<div class="kaart"><h2>Zonder opnieuw uitleggen</h2>'
+    + '<p class="rtg-kpi">' + maat(d.zonderOpnieuwUitleggen) + '</p>'
+    + '<p class="sub">' + esc(d.zonderOpnieuwUitleggen.wat) + '</p></div>'
+    + '<div class="kaart"><h2>De rest</h2><dl class="feiten">'
+    + '<dt>heropend binnen een week</dt><dd>' + maat(d.heropendBinnenWeek) + '</dd>'
+    + '<dt>om een mens gevraagd</dt><dd>' + maat(d.omMensGevraagd) + '</dd>'
+    + '<dt>hersteltijd</dt><dd>' + hersteld + '</dd>'
+    + '<dt>zaken gewogen</dt><dd>' + esc(d.zaken) + '</dd></dl>'
+    + '<p class="sub">' + esc(d.heropendBinnenWeek.wat) + '</p>'
+    + '<p class="sub">' + esc(d.omMensGevraagd.wat) + '</p></div>'
+    + '<div class="kaart"><h2>Wat hier NIET staat</h2><ul class="waarom">'
+    + Object.entries(d.nietGemeten).map(([k, v]) => '<li>' + esc(k) + ': ' + esc(v) + '</li>').join('')
+    + '</ul></div>';
+  $('#tWachtrij').onclick = () => poging(wachtrij); $('#tPatronen').onclick = () => poging(patronen);
+  $('#tFouten').onclick = () => poging(fouten);
 }
 
 /* ------------------------------------------------------------------ start -- */

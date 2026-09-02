@@ -11,7 +11,7 @@
    eerste, en dat is precies de fout waar dit huis zich vaker op heeft gebrand.
    ========================================================================== */
 module.exports = (kern, hulp) => {
-  const { app, officeAuth, servicePatronen, serviceFoutsignaal } = kern;
+  const { app, officeAuth, servicePatronen, serviceFoutsignaal, serviceKwaliteit } = kern;
   const { veilig, lijf, kort, balieAuth } = hulp;
 
   /* ------------------------------------------------------------ patronen -- */
@@ -44,6 +44,15 @@ module.exports = (kern, hulp) => {
      staat zonder inlog open en kent dus geen mensen om te tellen. */
   app.post('/api/office/service/foutsignalen', officeAuth, balieAuth, (req, res) => veilig(res, () =>
     ({ ok: true, signalen: serviceFoutsignaal.lijst({ max: 50 }), tel: serviceFoutsignaal.tel() })));
+
+  /* ---------------------------------------------------------- kwaliteit -- */
+  /* Wat deze meting NIET doet is even belangrijk als wat zij wel doet, en dat
+     staat in het antwoord zelf (`nietGemeten`): geen tevredenheidscijfer dat
+     niemand heeft gevraagd, geen afhandeltijd per medewerker, en geen
+     samengesteld rapportcijfer. Zes eerlijke getallen bij elkaar optellen geeft
+     een zekerheid die geen van de zes draagt. */
+  app.post('/api/office/service/kwaliteit', officeAuth, balieAuth, (req, res) => veilig(res, () =>
+    Object.assign({ ok: true }, serviceKwaliteit.meting({ sinds: kort(lijf(req).sinds, 40), team: kort(lijf(req).team, 30) }))));
 
   app.post('/api/office/service/foutsignaal/koppel', officeAuth, balieAuth, (req, res) => veilig(res, () =>
     serviceFoutsignaal.koppel(kort(lijf(req).signaal, 40), kort(lijf(req).zaak, 40))));

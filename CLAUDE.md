@@ -623,7 +623,12 @@ dit lid weg is. Par. 8: de persoonlijke stand zegt NOOIT "alles werkt"
 (beschikbaarheid wordt niet per lid gemeten) en houdt uit elkaar wat een storing
 IS en wat Service erover heeft GEMELD. Par. 9: foutsignalen op vingerafdruk,
 waarbij `gebruikers` op `null` staat MET de reden -- de foutingang is zonder
-inlog en kent geen mensen om te tellen. Par. 11 is de ingang voor een ZAAK, die er
+inlog en kent geen mensen om te tellen. Par. 12 is de kwaliteitsmaat, en die is met opzet geen
+afhandeltijd: gemeten wordt hoeveel problemen zijn opgelost ZONDER dat de melder
+zijn verhaal opnieuw hoefde te doen -- en wat er NIET gemeten wordt (tevredenheid,
+afhandeltijd per medewerker, een samengesteld rapportcijfer) staat mét de reden
+in het antwoord zelf, want een leeg vak wordt gevuld met iemands eigen indruk.
+Par. 11 is de ingang voor een ZAAK, die er
 niet was: een leverancier kon RTG nergens iets melden -- er stond wel een zin over
 een vaste contactpersoon, maar geen kanaal. Het systeem vraagt daar niet wie er
 meldt (de zaakcode komt uit de sessie), de doelgroep wordt door de ROUTE gezet en

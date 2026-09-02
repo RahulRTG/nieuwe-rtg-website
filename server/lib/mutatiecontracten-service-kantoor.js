@@ -53,6 +53,9 @@ const CONTRACTEN = Object.assign({},
     'patronen.vermoedens() en perIncident(); allebei groeperen ze over bestaande zaken'),
   LEEST('POST /api/office/service/foutsignalen', 'office.service.foutsignalen',
     'foutsignaal.lijst() en tel(); lezen uit de kaart, geen teller die oploopt'),
+  LEEST('POST /api/office/service/kwaliteit', 'office.service.kwaliteit',
+    'kwaliteit.meting(): telt over de zaken en hun tijdlijnen, en schrijft nergens -- ook geen ' +
+    'meetmoment, want een meting die zichzelf bijhoudt is een teller'),
 
   BESCHERMD('POST /api/office/service/bundel', 'office.service.bundel',
     'een zaak die al aan dit incident hangt wordt overgeslagen en krijgt GEEN tweede bericht. ' +

@@ -276,7 +276,48 @@ klantweergave met menu's, foto's, kamers en evenementen erin, en een medewerker
 die een storing onderzoekt heeft daar niets aan. Alles wat daar binnenkomt, is
 meteen ook alles wat er in de wachtrij te zien is.
 
-## 12. Wat er staat, en wat er niet staat
+## 12. Hoe goed is deze service, en waarom niet op afhandeltijd
+
+Een callcenter meet *average handling time* en tickets per medewerker. Die twee
+belonen precies het verkeerde: wie een zaak snel sluit scoort beter dan wie hem
+oplost, en wie doorverwijst beter dan wie doorbijt. Binnen een half jaar meet je
+dan hoe snel mensen van een probleem afkomen.
+
+De maat die hier telt is een andere, en hij staat vooraan:
+
+> Hoeveel problemen zijn opgelost zonder dat de melder zijn verhaal opnieuw
+> hoefde te vertellen?
+
+Dat is te meten, het is niet te halen door harder te werken, en het is precies
+wat deze laag mogelijk maakt — de zaak draagt zijn context mee, dus een
+overdracht hoeft geen herstart te zijn. `kern/service/kwaliteit.js` leest het uit
+de tijdlijn, en met opzet streng: waar als de melder ná zijn verzoek om een mens
+zélf het eerstvolgende bericht stuurde. Wij meten dus niet of hij woorden
+herhaalde — dat is niet vast te stellen zonder zijn tekst te wegen — maar of de
+**structuur** hem dwong. Een zaak zonder overdracht krijgt geen oordeel (`null`
+en niet `false`), anders telt elke zaak zonder mens mee als een succes.
+
+Daarnaast: heropend binnen zeven dagen (die was dus niet opgelost, afgeleid uit
+de tijdlijn en niet uit een vlag die iemand vergeet), hoe vaak er om een mens
+werd gevraagd (**geen faalgetal** — soms hoort dat gewoon), en de hersteltijd als
+**mediaan**, zodat één zaak van drie weken het beeld niet bepaalt.
+
+Vijf dingen staan er met opzet niet in, en dat staat in het antwoord zelf onder
+`nietGemeten` — anders vult een medewerker het gat met zijn eigen indruk en gaat
+díé rondzingen:
+
+- **afhandeltijd per medewerker** — dat is een ranglijst op mensen, en die maakt
+  dit huis nergens;
+- **tevredenheid** — er wordt niets gevraagd, dus er is niets te melden; een
+  geschat cijfer is erger dan geen cijfer;
+- **een samengesteld rapportcijfer** — zes eerlijke getallen bij elkaar geven een
+  zekerheid die geen van de zes draagt (`scripts/zekerheid.js` bestaat daarvoor);
+- **een percentage zonder noemer** — elke verhouding draagt zijn `van`, want 100%
+  van twee zaken is geen 100%;
+- **een getal waar er geen is** — onder tien zaken staat er `nietTeZeggen` met de
+  reden, geen nul.
+
+## 13. Wat er staat, en wat er niet staat
 
 **Staat** (gemeten, met toetsen die zijn zien zakken):
 
@@ -294,7 +335,9 @@ meteen ook alles wat er in de wachtrij te zien is.
 - de persoonlijke stand, zonder belofte over beschikbaarheid;
 - foutsignalen op vingerafdruk, gevoed door `routes/fout.js`;
 - de cockpit op `/apps/service.html`, met de waarom-laag en zonder ledenzoeker;
-- de ingang voor een zaak, met het zaakprofiel aan de kantoorkant.
+- de ingang voor een zaak, met het zaakprofiel aan de kantoorkant, en de
+  werkplek erbij (`/apps/leverancier-service.html`);
+- de kwaliteitsmeting, met vooraan de maat die ertoe doet.
 
 **Staat niet**, met de reden en niet als lege functie:
 
@@ -304,13 +347,29 @@ meteen ook alles wat er in de wachtrij te zien is.
 - **een koppeling met de incidentstand van RTG Command**: Service weet wat zij
   zelf heeft gemeld, niet wat de gezondheidskaart zegt. Die brug is bewust niet
   gelegd zolang de melderskant geen vermogen kan aanwijzen.
-- **een scherm voor de zaakkant**: de routes bestaan en zijn gemeten, maar er is
-  nog geen werkplekscherm waarin een leverancier ze bedient — hij kan vandaag
-  alleen langs de API binnenkomen.
-- **AI-onderzoeker en copilot**: de router kiest een team, geen techniek. De
+- **AI-onderzoeker en copilot**: de router kiest een team, geen techniek, en de
   intelligentierouter (`kern/ai/router.js`) loopt in de schaduw en beslist niets.
+  Dit is bewust niet gebouwd, en de reden is hard: een copilot die "waarschijnlijk
+  een security hold" zegt, doet een uitspraak over een oorzaak. Om die te kúnnen
+  onderbouwen moet hij de betaalstand, de wijzigingsgeschiedenis en het
+  incidentbeeld kunnen lezen — precies de gegevens die deze laag achter een
+  machtiging met een bevestiging heeft gezet. Een onderzoeker bouwen betekent dus
+  eerst beslissen of een AI die machtiging mag krijgen, en dat is een besluit van
+  de eigenaar en geen bouwtaak. Tot dat besluit valt, zegt de cockpit met zoveel
+  woorden dat RTG hier geen oorzaak vaststelt (par. 10). Dat is geen gat maar de
+  eerlijke stand.
+- **telefonie en terugbellen**: er is geen provider en geen nummer, dus er valt
+  niets te bouwen dat werkt. `klassen.js` draagt ze als `gebouwd: false` met die
+  reden; een zaak uit dat kanaal is dezelfde zaak, alleen het transport ontbreekt.
+- **RTMail als ingang**: technisch een kleinere stap dan telefonie (de stack
+  bestaat), maar hij vraagt eerst een besluit dat hier niet gemaakt kan worden:
+  post komt binnen van een adres, en een adres is een persoonsgegeven dat aan een
+  codenaam gekoppeld moet worden om er een zaak van te maken. Waar die koppeling
+  woont — in de kluis, of als losse mailidentiteit — bepaalt of de envelop een
+  achterdeur naar de identiteitskluis wordt. Zolang dat openstaat is de eerlijke
+  vorm `gebouwd: false` met de reden, en niet een half kanaal.
 
-## 13. De grenzen
+## 14. De grenzen
 
 1. **Een zaak opent niets.** `betrokken` is een verwijzing; gegevens vragen een
    machtiging, en die vraagt een bevestiging van het lid.
@@ -330,7 +389,7 @@ meteen ook alles wat er in de wachtrij te zien is.
 8. **Er komt geen groen vinkje.** De persoonlijke stand zegt nooit dat alles
    werkt, want beschikbaarheid wordt niet per lid gemeten.
 
-## 14. Wat de meting vond, en wat lezen niet vond
+## 15. Wat de meting vond, en wat lezen niet vond
 
 De zevenentwintig routes zijn door een **kale ronde** gehaald: twee keer dezelfde
 aanroep, met een opname van de servicecollecties (inclusief de tijdlijn) voor en

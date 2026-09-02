@@ -31,6 +31,10 @@ module.exports = function maakService({ db, save, crypto, inzagelog, notify }) {
   const patronen = require('./patroon')({ zaken, loop, save, db });
   const persoonlijk = require('./persoonlijk')({ zaken, patronen });
   const foutsignalen = require('./foutsignaal')({ db, save });
+  /* De kwaliteitsmeting leest ALLEEN; zij hangt daarom achteraan en niemand
+     hangt aan haar. Wat zij meet staat in ./kwaliteit.js, en vooral wat zij
+     met opzet NIET meet. */
+  const kwaliteit = require('./kwaliteit')({ zaken });
 
   const mens = require('./mens');
   const router = require('./router');
@@ -67,6 +71,7 @@ module.exports = function maakService({ db, save, crypto, inzagelog, notify }) {
     serviceZaken: zaken, serviceLoop: loop,
     serviceMachtiging: machtigingen, serviceBevestiging: bevestiging,
     servicePatronen: patronen, servicePersoonlijk: persoonlijk, serviceFoutsignaal: foutsignalen,
+    serviceKwaliteit: kwaliteit,
     serviceMens: mens, serviceRouter: router, servicePrioriteit: prioriteit,
     serviceKlassen: klassen, serviceKeuzes: keuzes
   };

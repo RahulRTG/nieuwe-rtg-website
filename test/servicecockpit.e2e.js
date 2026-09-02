@@ -131,6 +131,26 @@ test('het werkblad verschijnt ook als de gedeelde schil de kop heeft verbouwd', 
   });
 });
 
+test('het kwaliteitsbord zegt even groot wat het NIET meet', { skip: geenBrowser(pw) }, async () => {
+  await metCockpit(async (page, base, lidToken) => {
+    await api(base, '/api/service/open', { onderwerp: 'app', titel: 'Het scherm blijft leeg' }, lidToken);
+    await page.goto(base + '/apps/service.html', { waitUntil: 'domcontentloaded' });
+    await page.waitForSelector('#tKwaliteit', { timeout: 20000 });
+    await page.click('#tKwaliteit');
+    await page.waitForFunction(() => /Zonder opnieuw uitleggen/.test(document.body.textContent), null, { timeout: 20000 });
+
+    const tekst = await page.textContent('#main');
+    /* Met een handvol zaken hoort er GEEN percentage te staan maar een reden.
+       Een callcenterbord zou hier 0% of 100% tonen, en allebei zijn onwaar. */
+    assert.match(tekst, /niet te zeggen/i, 'er staat een verhouding over een handvol zaken');
+    /* En wat er niet gemeten is, staat er even groot bij -- anders vult een
+       medewerker het gat met zijn eigen indruk, en gaat DIE rondzingen. */
+    assert.match(tekst, /Wat hier NIET staat/i, 'het bord verzwijgt wat het niet meet');
+    assert.match(tekst, /tevredenheid/i, 'de afwezigheid van een tevredenheidscijfer is niet uitgelegd');
+    assert.match(tekst, /ranglijst op mensen/i, 'de afwezigheid van afhandeltijd per medewerker is niet uitgelegd');
+  });
+});
+
 test('een medewerker vraagt toegang en opent niets uit zichzelf', { skip: geenBrowser(pw) }, async () => {
   await metCockpit(async (page, base, lidToken, balie) => {
     await api(base, '/api/service/open', { onderwerp: 'betaling', titel: 'Mijn uitbetaling ontbreekt' }, lidToken);

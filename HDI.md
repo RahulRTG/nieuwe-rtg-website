@@ -170,6 +170,8 @@ Wonen, recht, gezondheid en inkomen zijn er als casussoorten. Wat er niet is, is
 het besef dat ze op elkaar wachten. Dat is laag 5 en niet laag 4.
 
 ### Laag 5 — Development · **de graaf staat, de motor niet**
+*(De Advocate leest sinds par. 7.7 ook de aflopende toestemmingen mee; de motor
+uit punt 13 -- de constraint solver -- staat er nog steeds niet.)*
 De Human Development Graph is `kern/levensgraaf/`. De **constraint solver** van
 punt 13 is er niet, en dat is geen omissie maar een gemeten feit dat al
 opgeschreven staat: `EXECUTIE.md` noemt hardop dat er GEEN constraint solver is
@@ -374,7 +376,7 @@ veilige slaapplek heeft.
 | 4b | **De persoonlijke veiligheidslaag verbinden** — `kern/veiligheid/` (dodemansknop, stil codewoord, kring, laatste plek) bestaat en is vanaf de Foundation-kant onzichtbaar | zie par. 7.2: gebouwd, eerlijk, en op de verkeerde plek voor de mens uit par. 0 | **staat** (2 sep 2026) |
 | 5 | **Meldcode**: het afwegingskader van stap 5, en zeggen waarvoor hij is | zie par. 7.5 -- de vraag bleek een andere dan hij hier stond | **staat** (2 sep 2026) |
 | 6 | **Consent: doel en termijn per venster** | het scherm bestond al; zie par. 7.6 | **staat** (2 sep 2026) |
-| 7 | **De Advocate als lezer** op `levensgraaf/termijnen.js` | alle waarde van punt 10 zonder de onbewezen helft (5.6) | weken |
+| 7 | **De Advocate als lezer** op `levensgraaf/termijnen.js` | alle waarde van punt 10 zonder de onbewezen helft (5.6) | **staat** (2 sep 2026) |
 | 8 | **Constraint solver** met meerdere paden, aannames in de uitslag, `ONBEPAALD` waar niets gerekend is | het eerlijke nieuwe stuk software; `EXECUTIE.md` noemt de leemte al | maanden |
 | 9 | **Human Services Protocol**: schemaregister op `kern/envelop.js` | pas zinvol als er iets is om te delen dat de moeite waard is | maanden |
 | 10 | **Society Intelligence** op `livinglab/graden.js` | pas na 6 — een populatiemodel zonder consent-graaf is een dataverzameling met een grafiek erop | jaren |
@@ -410,6 +412,49 @@ achter een knop komen. De laag wordt hier dus niet geladen, en de eerder
 bedachte `rtgdeel-vast`-markering is weggehaald in plaats van decoratief blijven
 staan: een klas die niets afdwingt omdat zijn laag niet draait, leest als een
 garantie die er niet is.
+
+### 7.7 Regel 7: de Advocate leest, en één poort is omgezet
+
+**De lezer bestond al voor het grootste deel.** `routes/member/vooruit.js` geeft
+de Control Tower aan ELK lid, ook een gratis account en een gast: achterstallig,
+deze week, deze maand, dit kwartaal, dit jaar. Punt 10 van het voorstel ("je
+schuldhulpdocument is incompleet", "je toestemming voor instantie X verloopt
+volgende week") is dus geen nieuwe app maar een ontbrekende BRON.
+
+Die bron staat er nu: `kern/levensgraaf/bronnen-toestemming.js`. Een toestemming
+met een einddatum wordt een termijn, en daarmee komt "uw machtiging aan Zeearend
+1193 verloopt over vijf dagen" in hetzelfde overzicht als een paspoort dat
+afloopt. Dat kon pas sinds par. 7.6: vóór die ronde wist het Consent Center niet
+welke vensters een datum hadden.
+
+Twee dingen die de vorm bepalen:
+
+- **er wordt geen datum verzonnen.** Vijf van de negen lagen lopen door tot u ze
+  stopt; die worden geen termijn. Twee grendels dekken elkaar daar, en dat is
+  geen dubbeling: een laag die zich `venster` noemt zonder datum, en een laag met
+  een datum die zich niet zo noemt, zijn allebei fout en worden allebei
+  geweigerd.
+- **de knoop verlaat de kring van het lid nooit.** `deel: 'lid'` en
+  `gevoelig: BESLOTEN`, want de NAAM van de ontvanger staat erin -- een concierge
+  die leest "Huisartsenpraktijk De Linden, loopt af op de 14e" weet genoeg. "Een
+  datum zonder naam" is hier geen troost, want de naam is het punt.
+
+**En een poort is omgezet.** Toen de toets voor die derde zin eerst de kringnaam
+`'bureau'` gebruikte, kreeg hij het volledige ledenbeeld terug -- inclusief de
+BESLOTEN knopen. `'bureau'` staat niet in `KRING` (dat zijn `lid`, `rechterhand`
+en `kantoor`), en de terugval bij een onbekende naam was `KRING.lid`: de RUIMSTE
+stand. Op een poort is dat de verkeerde richting.
+
+Nagemeten was er **geen lek**: de enige aanroeper die een kring meegeeft is
+`routes/member/bureau.js`, met `'lid'` -- het lid dat zijn eigen graaf opvraagt.
+De acht `voor('bureau')`-aanroepen die de grep opleverde zitten op
+`kern/levensdossier`, een andere functie. Dat is nagelopen vóór er iets werd
+beweerd, en het staat hier omdat een bijna-melding net zo goed opgeschreven hoort
+te worden als een echte.
+
+De terugval staat nu op `KRING.kantoor`, de verste kijker. Een typefout of een
+hernoemde kring levert daarmee een LEGE graaf op, en dat valt op; het
+omgekeerde viel niet op.
 
 ### 7.6 Regel 6, en de derde meetfout van deze reeks
 

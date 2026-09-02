@@ -125,10 +125,25 @@ test('4. elke route hoort bij een functie of bij de bediening', () => {
     onverklaard.sort().join(', ') + ' -- zet ze in server/kern/bestuursroutes.js met een reden, ' +
     'of geef ze een functie. (Ruw, zonder functie maar wel verklaard: ' + zonder.length + '.)');
 
-  assert.ok(zonder.length <= 120,
+  /* 120 -> 135, EN DIE VIJFTIEN ZIJN DE ISOLATIELAAG. Zeven ledenroutes, acht
+     kantoorroutes. Geen ervan hoort aan een functieschakelaar te hangen, en om
+     dezelfde reden als de zelfbedieningslaag hierboven: een knop waarmee het
+     huis de beschermstand van een lid uitzet, hoort niet te bestaan -- dat zou
+     de laag omkeren van bescherming naar een sluipweg. Ze staan alle vijftien
+     met hun reden in kern/bestuursroutes.js.
+
+     De VOLGORDE waarin dit getal omhoog mocht is dezelfde als de vorige keer:
+     eerst moet test/platformregister.test.js groen zijn (die eist dat elke route
+     hier BENOEMD is), en dat stond hij voordat dit getal werd verzet. Zonder die
+     volgorde is een hoger getal alleen een zachtere meter.
+
+     De scherpe controle hierboven (`onverklaard <= 10`) is de echte poort en die
+     beweegt NIET mee: een route zonder functie EN zonder register blijft
+     verboden. */
+  assert.ok(zonder.length <= 135,
     zonder.length + ' routes hangen aan geen enkele functie. Dat is de bediening van ' +
-    'het platform (boardroom, techniek, gezondheid) en die hoort niet schakelbaar te zijn, ' +
-    'maar bij deze aantallen is er iets anders aan de hand.');
+    'het platform (boardroom, techniek, gezondheid, isolatie) en die hoort niet schakelbaar ' +
+    'te zijn, maar bij deze aantallen is er iets anders aan de hand.');
 
   /* EN HET RUWE GETAL MAG NIET NUL ZIJN: nul zou betekenen dat de meting stuk
      is, niet dat het huis dicht is. */

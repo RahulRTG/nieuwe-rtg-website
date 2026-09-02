@@ -815,8 +815,18 @@ function voorvoegselLijf(w) {
   if (w.entiteit) uit.push({ voorvoegsel: '/api/concern/', lijf: { entiteit: w.entiteit,
     concern: w.concern || undefined, onderneming: w.onderneming || undefined } });
   if (w.onderneming) uit.push({ voorvoegsel: '/api/onderneming/', lijf: { id: w.onderneming } });
-  if (w.studie) uit.push({ voorvoegsel: '/api/lab2/', lijf: { id: w.studie }, rol: 'office' });
-  if (w.stad) uit.push({ voorvoegsel: '/api/rtfos/', lijf: { id: w.stad }, rol: 'boardroom' });
+  /* `alleenRol`, en om exact dezelfde reden als bij /api/overheid/ hierboven: een
+     onvoorwaardelijk voorvoegsel geeft ZIJN sleutel aan alles wat eronder woont.
+     Onder /api/lab2/ zit naast het kantoorwerk ook openbaar verkeer, en onder
+     /api/rtfos/ zelfs vier publieken (office, member, boardroom en openbaar).
+     Die kregen het verkeerde token, antwoordden 401, en belandden in `ongemeten`
+     om een reden die niets met de route te maken heeft -- onzichtbaar, want een
+     401 ziet eruit als een route die nu eenmaal een andere sleutel wil.
+
+     Dit is dus geen nieuwe regel maar dezelfde die deze twee voorvoegsels bij
+     het toevoegen misten; toets D van test/idemwereld.test.js vond ze. */
+  if (w.studie) uit.push({ voorvoegsel: '/api/lab2/', lijf: { id: w.studie }, rol: 'office', alleenRol: 'office' });
+  if (w.stad) uit.push({ voorvoegsel: '/api/rtfos/', lijf: { id: w.stad }, rol: 'boardroom', alleenRol: 'boardroom' });
   return uit;
 }
 

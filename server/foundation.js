@@ -8,8 +8,7 @@
    Alles staat onder db.data.foundation, zodat het meelift op het atomische
    wegschrijven en de dagelijkse back-up van de hoofdserver. */
 const ctx = require('./foundation/basis')();
-/* De meetdeur van het huis, niet een tweede; zie de uitleg bij /health. */
-const { meetpoort } = require('./meetpoort');
+const { meetpoort } = require('./meetpoort'); // de meetdeur van het huis, niet een tweede
 const { db, save, eigenVeld, crypto,
   encS, decS, teVaak, misluktePoging, goedePoging, ipVan, anthropic, tokenUit,
   router, F, nu, rid, schoon, LETTERS, DEMO, TIPS } = ctx;
@@ -92,18 +91,10 @@ function setAutomatisering(a) {
 const { verifieerProfiel, bewaarSollicitatie, alGesolliciteerd } = require('./foundation/sollicitaties')(ctx);
 const { setMarkt } = require('./foundation/markt')(ctx);
 
-/* Een health-check hoort te zeggen DAT het werkt, niet hoeveel gezinnen er in
-   de hulpverlening zitten. Dat laatste stond hier onbeschermd: aantallen
-   gezinnen en hulpaanvragen zijn bedrijfsinformatie over kwetsbare mensen, en
-   een load balancer heeft er niets aan. De cijfers staan op het RTF-kantoor,
-   achter een inlog; hier blijft alleen het leven-teken over. */
-/* ACHTER DE MEETPOORT sinds 2 september 2026: dit endpoint had nul aanroepers
-   (de containercontrole gebruikt /api/ready) en vertelde anoniem in welke modus
-   de AI draait. `meetpoort` is de bestaande meetdeur en geen nieuwe -- 404 tenzij
-   het token klopt of het verzoek intern is. In de VLOOTSTAND, waar RTG_DOMAINS
-   staat, gaat hij zonder token helemaal dicht; dat is hier geen verlies.
-   De vier open leesroutes ernaast (/impact, /bespaartip, /gesprekskaart, /tip)
-   blijven publiek, met hun reden in scripts/lib/publiekeroutes.js. */
+/* Alleen het leven-teken, en sinds 2 september 2026 achter de meetpoort. De
+   hele geschiedenis van deze route -- waarom de cijfers eruit gingen en waarom
+   juist deze wel dichtging terwijl de vier leesroutes ernaast open bleven --
+   staat op een plek in scripts/lib/publiekeroutes.js. */
 router.get('/health', meetpoort, (req, res) => {
   const s = require('./ai-stand').beschikbaarheid(anthropic);
   res.json({ ok: true, ai: s.modus, verwerking: s.verwerking });

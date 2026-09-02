@@ -30,34 +30,18 @@ function gelijk(a, b) {
    "Maximum call stack size exceeded" halverwege een verzoekafhandelaar. */
 const MAX_DIEPTE = 32;
 
-/* DRIE BUDGETTEN, EN ZE KOMEN ALLE DRIE UIT EEN GEMETEN GAT (STANDAARD.md par. 6).
-
-   1. LEZEN VOORBIJ HET EINDE. `buf[p]` is `undefined` voorbij de buffer,
-      `undefined >> 5` is 0 en `undefined & 0x1f` is 0 -- dus las deze functie
-      daar een keurige "unsigned int 0" en liep door op verzonnen bytes. Een
-      ontleder die data VERZINT waar er geen is, is erger dan een die valt: de
-      aanroeper krijgt een geldig ogende waarde terug.
-
-   2. EEN LENGTE DIE NIET KAN. Bij `ai === 27` komt de lengte uit acht bytes en
-      werd hij onbeperkt overgenomen. Negen bytes (`9b ff ff ff ff ff ff ff ff`)
-      lieten de lus in case 4 achttien triljoen keer aftellen: gemeten 9325 ms
-      event-loop-blokkade, bereikbaar voor elk ingelogd lid via
-      POST /api/webauthn/registreer. Node is een draad, dus dat is geen trage
-      route maar een stilstaand platform.
-
-      De grens is niet een verzonnen maximum maar de buffer zelf: een element
-      kost minstens een byte en een mappaar minstens twee, dus meer beloven dan
-      er nog ligt kan per definitie niet kloppen. Daarmee weigert hij precies
-      het onmogelijke en geen enkel geldig document.
-
-   3. EEN STRING DIE MEER BELOOFT DAN ER IS. `subarray` KLEMT en gooit niet, dus
-      een bytestring van 200 die er 3 heeft kwam er als 3 uit -- met de belofte
-      dat het er 200 waren. Bij een COSE-sleutel is dat het verschil tussen een
-      sleutel en een stuk van een sleutel.
-
-   WAT ER MET OPZET NIET WORDT BEGRENSD: majortype 0 en 1. Daar is de waarde
-   geen byte-aantal maar het GETAL zelf, en een grote unsigned int is volkomen
-   geldige CBOR. Wie daar dezelfde grens op zet, weigert echte invoer. */
+/* DRIE BUDGETTEN, en ze komen alle drie uit een GEMETEN gat (STANDAARD.md
+   par. 6): lezen voorbij het einde (dat leverde een verzonnen "unsigned int 0"
+   op), een lengteveld dat meer belooft dan de buffer nog heeft (negen bytes
+   blokkeerden de lus 9325 ms, bereikbaar voor elk ingelogd lid), en een string
+   die meer belooft dan er ligt (`subarray` klemt en gooit niet). De grens is
+   nergens een verzonnen maximum maar de BUFFER zelf, dus hij weigert precies
+   het onmogelijke en geen enkel geldig document. Majortype 0 en 1 blijven met
+   opzet onbegrensd: daar is de waarde het getal en niet een byte-aantal.
+   De volledige uitleg per budget, met de gemeten getallen en de reden dat elk
+   van de drie erger was dan een crash, staat bij de toets die ze bewaakt --
+   test/vijandigerand.test.js. Dit bestand zat op 9713 van de 10240 bytes en
+   heeft die ruimte niet (TAKEN.md 7.21 is dezelfde val, een bestand eerder). */
 function cborLees(buf, p, diepte) {
   diepte = diepte || 0;
   if (diepte > MAX_DIEPTE) throw new Error('CBOR: te diep genest (grens ' + MAX_DIEPTE + ')');

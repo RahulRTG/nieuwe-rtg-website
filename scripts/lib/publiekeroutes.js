@@ -84,7 +84,25 @@ const PUBLIEK = new Map([
        Ze dragen geen persoonsgegevens en geen binnenkant: een spaartip, een
        gesprekskaart, een dagtip en drie opgetelde totalen. Hun zusje
        /api/foundation/health droeg dat wel (de AI-modus) en is daarom juist WEL
-       achter de meetpoort gezet. */
+       achter de meetpoort gezet.
+
+       DE HELE GESCHIEDENIS VAN /health STAAT HIER, en niet in
+       server/foundation.js -- dat bestand zat op 9894 van de 10240 bytes, en
+       TAKEN.md 7.21 is dezelfde val een bestand verderop. Zo staat het verhaal
+       van deze route bovendien op EEN plek in plaats van in twee helften.
+
+       Ronde een: de route gaf terug hoeveel gezinnen er in de hulpverlening
+       zaten. Een health-check hoort te zeggen DAT het werkt; aantallen gezinnen
+       en hulpaanvragen zijn bedrijfsinformatie over kwetsbare mensen, en een
+       load balancer heeft er niets aan. Die cijfers staan sindsdien op het
+       RTF-kantoor, achter een inlog.
+
+       Ronde twee (2 september 2026): wat overbleef was een leven-teken plus de
+       modus waarin de AI draait, anoniem opvraagbaar, met NUL aanroepers -- de
+       containercontrole gebruikt /api/ready. `meetpoort` geeft 404 tenzij het
+       token klopt of het verzoek intern is; in de VLOOTSTAND, waar RTG_DOMAINS
+       staat, gaat hij zonder token helemaal dicht. Voor een endpoint dat
+       niemand aanriep is dat geen verlies. */
     ['/api/foundation/impact', 'opgetelde totalen van de bijdragen -- geen namen, geen gezinnen, alleen drie getallen en een boodschap; getoetst als publiek in test/foundation.test.js'],
     ['/api/foundation/bespaartip', 'een spaartip uit een vaste lijst, gekozen op de dag; leest niets en kent niemand'],
     ['/api/foundation/gesprekskaart', 'een gespreksvraag uit een vaste lijst; leest niets en kent niemand'],

@@ -1,8 +1,8 @@
 {
   "stempel": {
-    "op": "2026-09-01T14:08:31.277Z",
-    "commit": "51e4aa0a",
-    "boomVuil": true,
+    "op": "2026-09-02T16:56:03.148Z",
+    "commit": "e1c378e2",
+    "boomVuil": false,
     "node": "v22.22.2"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
@@ -2044,6 +2044,13 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
+    "gezinsuitnodiging-verval.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
+    },
     "gezinzorg.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -2968,6 +2975,13 @@
       "scherp": "gezakt"
     },
     "leren.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "lescode-rem.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
@@ -6252,6 +6266,14 @@
       "gezakt": 11,
       "scherp": "gezakt"
     },
+    "stempel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/stempel.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "stijlbundel.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -6411,6 +6433,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 6,
       "scherp": "gezakt"
+    },
+    "syntaxproef.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/syntaxproef.js",
+      "operator": "+->-#0",
+      "gezakt": 4,
+      "geprobeerd": 2
     },
     "tafeldek.test.js": {
       "soort": "server",
@@ -6979,6 +7009,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 8,
       "scherp": "gezakt"
+    },
+    "vijandigerand.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/webauthn/cbor.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 2
     },
     "villa.test.js": {
       "soort": "server",

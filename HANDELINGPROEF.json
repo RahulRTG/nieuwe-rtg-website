@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-09-02T20:00:16.028Z",
-  "commit": "e0ba59ce",
+  "op": "2026-09-02T22:09:30.950Z",
+  "commit": "0fd5766b",
   "boomVuil": false,
   "node": "v22.22.2",
   "begrenzing": 8000
@@ -10,9 +10,9 @@
  "gemeten": {
   "routesMetRol": 3643,
   "beproefd": 3643,
-  "bewezen": 709,
+  "bewezen": 710,
   "gezakt": 0,
-  "ongemeten": 2934,
+  "ongemeten": 2933,
   "ketenOk": true,
   "begrenzing": 8000
  },
@@ -23069,9 +23069,9 @@
    "methode": "POST",
    "pad": "/api/supplier/horeca/werklijst",
    "rol": "supplier",
-   "status": 500,
-   "audit": "ongemeten",
-   "reden": "de oproep deed geen werk (status 500), dus er hoort geen regel te zijn"
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
   },
   {
    "methode": "POST",

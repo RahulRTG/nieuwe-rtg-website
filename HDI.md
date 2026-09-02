@@ -379,7 +379,7 @@ veilige slaapplek heeft.
 | 5 | **Meldcode**: het afwegingskader van stap 5, en zeggen waarvoor hij is | zie par. 7.5 -- de vraag bleek een andere dan hij hier stond | **staat** (2 sep 2026) |
 | 6 | **Consent: doel en termijn per venster** | het scherm bestond al; zie par. 7.6 | **staat** (2 sep 2026) |
 | 7 | **De Advocate als lezer** op `levensgraaf/termijnen.js` | alle waarde van punt 10 zonder de onbewezen helft (5.6) | **staat** (2 sep 2026) |
-| 8 | **Constraint solver** met meerdere paden, aannames in de uitslag, `ONBEPAALD` waar niets gerekend is | het eerlijke nieuwe stuk software; `EXECUTIE.md` noemt de leemte al | maanden |
+| 8 | **De knelpuntmotor** — meerdere wegen, aannames in de uitslag, `onbepaald` waar niets is nagegaan | het eerlijke nieuwe stuk software; `EXECUTIE.md` noemde de leemte al | **eerste laag staat** (2 sep 2026), zie par. 7.9 |
 | 9 | **Human Services Protocol**: schemaregister op `kern/envelop.js` | pas zinvol als er iets is om te delen dat de moeite waard is | maanden |
 | 10 | **Society Intelligence** op `livinglab/graden.js` | pas na 6 — een populatiemodel zonder consent-graaf is een dataverzameling met een grafiek erop | jaren |
 
@@ -414,6 +414,56 @@ achter een knop komen. De laag wordt hier dus niet geladen, en de eerder
 bedachte `rtgdeel-vast`-markering is weggehaald in plaats van decoratief blijven
 staan: een klas die niets afdwingt omdat zijn laag niet draait, leest als een
 garantie die er niet is.
+
+### 7.9 Regel 8: geen solver maar een knelpuntmotor
+
+**De naam is veranderd, en dat is het besluit.** "Constraint solver" belooft een
+optimizer die het beste pad kiest, en dat is precies wat par. 5.5 verbiedt. Wat
+er nu staat (`server/kern/knelpunt/`) beantwoordt de vraag waar het voorbeeld
+van Sarah werkelijk om draait: *de bottleneck is niet motivatie, de bottleneck
+is kinderopvang.* Vandaar de naam.
+
+Op dat voorbeeld gedraaid geeft hij: voltijd **geblokkeerd** (opvang), deeltijd
+**geblokkeerd** (opvang), avondopleiding **open** — en één knelpunt: de opvang,
+die twee van de drie wegen blokkeert. Zonder één woord aanbeveling.
+
+De vijf regels zitten in de code en niet in dit document:
+
+1. **Een geblokkeerde weg gaat nooit uit de lijst.** Hij staat er mét wat hem zou
+   openen, in de voorwaardelijke wijs. Wie hem weglaat zegt "dit is niets voor
+   jou" — en een motor die alleen mag tóevoegen (FOUNDATION.md par. 5.3) mag ook
+   niet stilletjes aftrekken.
+2. **Niet nagegaan is niet vervuld.** Een weg zonder blokkade maar met
+   onbekenden heet `onbepaald` en niet `open`. Een randvoorwaarde zonder stand is
+   onbekend, nooit geregeld.
+3. **De aannames staan in de uitslag**, en ze groeien mee: noemt een weg een
+   voorwaarde die nergens is beschreven, dan wordt die slordigheid gemeld in
+   plaats van weggepoetst. Is er maar één weg opgegeven, dan staat erbij dat dit
+   geen keuze is maar een beoordeling van die ene.
+4. **Er wordt niets gerangschikt**, en het antwoord zegt dat zelf. De volgorde is
+   die van de invoer.
+5. **Een knelpunt is een eigenschap van een RANDVOORWAARDE.** De telling gaat
+   over hoeveel wegen hij blokkeert — nooit een getal op een mens, ook niet als
+   sorteersleutel.
+
+En de zesde, die over de motor zelf gaat: **hij rekent niets uit wat hij niet
+weet.** Er zit geen opleidingsduur in, geen opvangtarief, geen inkomensgrens en
+geen wachttijd. Dat zijn getallen die dit huis niet heeft, en ze verzinnen zou
+een voorspelling maken die op niets rust — precies wat `levensgraaf/termijnen.js`
+over zijn eigen datums zegt. Een toets houdt vast dat er geen duur en geen bedrag
+in het antwoord kan sluipen.
+
+**Wat er met opzet NIET is: een opslagroute.** De motor krijgt alles als argument
+en bewaart niets. Zodra een uitkomst wordt bewaard, ontstaat er een dossier met
+wegen en blokkades per mens, en dat is het bestand dat par. 5.1 verbiedt. Dat is
+geen ontbrekende functie maar de grens zelf, en zo staat hij ook in het
+mutatiecontract.
+
+**Wat er nog niet is**, en dat is de reden dat de stand "eerste laag" heet en
+niet "staat": de motor rekent met randvoorwaarden die een mens zelf opgeeft. De
+stap daarna — die randvoorwaarden AFLEIDEN uit wat er al bekend is (de
+levensgraaf, de opportunity-keten van laag 6) — vraagt gegevens die er nog niet
+zijn. Die stap is dus geen bouwwerk maar wachten op laag 6.
 
 ### 7.8 De weg terug, en waarom hij in de route staat
 

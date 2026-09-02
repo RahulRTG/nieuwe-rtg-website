@@ -130,7 +130,7 @@ const CONTRACTEN = Object.assign({}, DEUR, Object.fromEntries([
     semantiek: { klasse: 'idempotent' },
     toegang: TOEGANG,
     stand: 'NOT_APPLICABLE',
-    nagekeken: 'Claude (Opus 5), 2026-09-02: de handler (lijst() in kern/beschermzaak/index.js) ' +
+    nagekeken: 'Claude, 2026-09-02: de handler (lijst() in kern/beschermzaak/index.js) ' +
       'roept geen save() en geen audit() aan -- hij leest S().beschermzaken, filtert en geeft ' +
       'lijstbeeld() terug. De gemeten ronde bevestigde dat: twee oproepen, hetzelfde aantal, geen ' +
       'nieuwe regel in de opslag.',

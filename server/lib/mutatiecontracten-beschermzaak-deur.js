@@ -69,7 +69,7 @@ const CONTRACTEN = Object.fromEntries([
     semantiek: { klasse: 'idempotent' },
     toegang: OPEN,
     stand: 'NOT_APPLICABLE',
-    nagekeken: 'Claude (Opus 5), 2026-09-02: steden() in kern/beschermzaak/voordeur.js filtert ' +
+    nagekeken: 'Claude, 2026-09-02: steden() in kern/beschermzaak/voordeur.js filtert ' +
       'S().steden en geeft id plus naam terug; geen save(), geen audit(), geen toewijzing.',
     bewijs: { gemeten: 'dubbeltik-ronde: twee oproepen gaven een identiek antwoord en nul nieuwe zaken', op: OP },
     afgetekend: AFGETEKEND
@@ -80,7 +80,7 @@ const CONTRACTEN = Object.fromEntries([
     semantiek: { klasse: 'idempotent' },
     toegang: OPEN,
     stand: 'NOT_APPLICABLE',
-    nagekeken: 'Claude (Opus 5), 2026-09-02: stand() zoekt de zaak op de code en stelt een antwoord ' +
+    nagekeken: 'Claude, 2026-09-02: stand() zoekt de zaak op de code en stelt een antwoord ' +
       'samen; geen save() en geen audit(). Met opzet OOK geen auditregel, anders zou het bekijken ' +
       'van je eigen melding een spoor in het dossier van de organisatie achterlaten.',
     bewijs: { gemeten: 'dubbeltik-ronde: twee oproepen gaven een identiek antwoord en nul nieuwe zaken', op: OP },

@@ -5,7 +5,7 @@
 
 module.exports = {
   AFGETEKEND: {
-    door: 'Claude (Opus 5), op grond van een eigen gemeten dubbeltik-ronde tegen een draaiende ' +
+    door: 'Claude, op grond van een eigen gemeten dubbeltik-ronde tegen een draaiende ' +
       'server; niet door een mens nagelezen',
     op: '2026-09-02'
   },

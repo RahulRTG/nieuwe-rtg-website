@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1535 bestanden en 10950 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1536 bestanden en 10959 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1535 |
-| losse beweringen (`test(...)`) | 10950 |
+| toetsbestanden | 1536 |
+| losse beweringen (`test(...)`) | 10959 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 57 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1016 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1017 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 40 |
 | alleen in de kop *genoemd*, nog niet gemeten | 143 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1342 bestanden, 10623 beweringen.
+1343 bestanden, 10632 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -513,6 +513,7 @@ toets omvalt.
 | `incidentcontrole.test.js` | 4 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `inhoudswacht.test.js` | 2 | -- | DE INHOUDSWACHT -- elke blinde route krijgt zijn vormcontract terug. INHOUDSKAART.json draagt per (voorheen) blinde route het ware antwoordprofiel: status, sleutels, en welke velden dragend zijn. |
 | `inkoopketen.test.js` | 5 | gezakt op `liegpoort /api/` | DE KETEN VAN BESTELLEN NAAR KEUKEN -- 5 endpoints uit de supplier-groep. groothandel/product, groothandel/voorraad, inkoop/annuleer, inkoop/ai-bevestig en mep/daily/done stonden als nooit aangeroepen in de... |
+| `inlinestijl.test.js` | 9 | gezakt op `&&->||#0` | DE OMZETTING VAN INLINE STIJLEN NAAR KLASSEN (TAKEN.md 4.51). WAT HIER OP HET SPEL STAAT. |
 | `inlogrem.test.js` | 2 | gezakt op `liegpoort /api/` | DE INLOGREM MOET OOK EEN VERSPREIDE AANVAL ZIEN, EN DE EIGENAAR NOOIT BUITEN ZETTEN. WAT ER MIS WAS. |
 | `inlogspoor.test.js` | 6 | -- | ELKE INLOGPOGING LAAT EEN SPOOR NA -- ook op de hoofdingang. HET INLOG-AUDITLOG BELOOFT DIT LETTERLIJK (server/server.js, logInlog): "Elke inlogpoging (gelukt of mislukt, op elk kanaal) komt in een afgeschermd log:... |
 | `instant-reality.test.js` | 3 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |

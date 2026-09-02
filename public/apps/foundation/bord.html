@@ -77,6 +77,11 @@
     .code b{letter-spacing:.2em;}
   }
 .merkvlak{display:inline-block;background:transparent;color:#C39B4A;padding:0;border-radius:0;}.merkvlak b{color:#F4F0E7;font-weight:500;}
+
+  /* Uit inline style-attributen gehaald door scripts/inlinestijl-omzet.js (TAKEN.md 4.51). Bewezen gelijk met
+     scripts/inlinestijl-proef.js: elk element, elke aangeraakte eigenschap,
+     berekend in een echte browser. Letterlijk wat er stond -- geen ontwerpbesluit. */
+  .i-85uhvc{width:1px;height:1.6rem;background:var(--lijn)}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
@@ -100,14 +105,14 @@
       <button class="tbtn aan" data-tool="pen" title="Pen">✏</button>
       <button class="tbtn" data-tool="marker" title="Marker">✎</button>
       <button class="tbtn" data-tool="gum" title="Gum">◻</button>
-      <span style="width:1px;height:1.6rem;background:var(--lijn)"></span>
+      <span class="i-85uhvc"></span>
       <span class="kleur aan" data-kleur="#ffffff" style="background:#ffffff"></span>
       <span class="kleur" data-kleur="#C9A24B" style="background:#C9A24B"></span>
       <span class="kleur" data-kleur="#6FB1E6" style="background:#6FB1E6"></span>
       <span class="kleur" data-kleur="#5FA56A" style="background:#5FA56A"></span>
       <span class="kleur" data-kleur="#E0796F" style="background:#E0796F"></span>
       <input type="range" id="dikte" min="1" max="40" value="4" title="Dikte">
-      <span style="width:1px;height:1.6rem;background:var(--lijn)"></span>
+      <span class="i-85uhvc"></span>
       <button class="tbtn" id="btnUndo" title="Ongedaan maken">↶</button>
       <button class="tbtn" id="btnWis" title="Bord wissen">✕</button>
     </div>

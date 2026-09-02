@@ -64,6 +64,14 @@
   .inlog{max-width:420px;margin:4rem auto;text-align:center;padding:0 1.2rem;}
   .inlog a{color:var(--rtg-leesgoud,var(--gold));border-bottom:1px solid var(--gold);}
   .bad{display:inline-block;min-width:1.1rem;text-align:center;background:var(--burgundy);color:#fff;border-radius:0;font-size:.68rem;padding:.02rem .35rem;margin-left:.3rem;}
+
+  /* Uit inline style-attributen gehaald door scripts/inlinestijl-omzet.js (TAKEN.md 4.51). Bewezen gelijk met
+     scripts/inlinestijl-proef.js: elk element, elke aangeraakte eigenschap,
+     berekend in een echte browser. Letterlijk wat er stond -- geen ontwerpbesluit. */
+  .i-1jknqz{color:var(--muted);font-size:.86rem;line-height:1.5;margin-top:0.25rem}
+  .i-tafq05{margin:1.25rem 0 0.5rem}
+  .i-187ie3{width:auto}
+  .i-m7nt44{margin-top:0.75rem;width:auto}
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>
@@ -80,7 +88,7 @@
   <section class="paneel" id="p-box">
     <div class="kaart">
       <h3>Berichtenbox</h3>
-      <p style="color:var(--muted);font-size:.86rem;line-height:1.5;margin-top:0.25rem;">Je officiële post van het rijk · Belastingdienst, Toeslagen, RDW, UWV/SVB. Tik een bericht aan om het te lezen.</p>
+      <p class="i-1jknqz">Je officiële post van het rijk · Belastingdienst, Toeslagen, RDW, UWV/SVB. Tik een bericht aan om het te lezen.</p>
     </div>
     <div id="boxLijst"><div class="leeg">Laden…</div></div>
   </section>
@@ -101,11 +109,11 @@
       </div>
       <div class="h-mt80" id="ibUit"></div>
       <div class="rij h-mt80">
-        <button class="knop stil" id="ibBereken" style="width:auto;">Bereken</button>
-        <button class="knop" id="ibGo" style="width:auto;">Aangifte indienen</button>
+        <button class="i-187ie3 knop stil" id="ibBereken">Bereken</button>
+        <button class="i-187ie3 knop" id="ibGo">Aangifte indienen</button>
       </div>
     </div>
-    <h3 style="margin:1.25rem 0 0.5rem;">Mijn aanslagen</h3>
+    <h3 class="i-tafq05">Mijn aanslagen</h3>
     <div id="ibMijn"><div class="leeg">Nog geen aanslagen.</div></div>
     <div class="kaart h-mt100">
       <h3>Toeslag aanvragen</h3>
@@ -122,7 +130,7 @@
     <div class="kaart">
       <h3>Rijbewijs</h3>
       <div id="rbInfo" class="meta h-mt30">Laden…</div>
-      <button class="knop stil" id="rbVerleng" style="margin-top:0.75rem;width:auto;">Rijbewijs verlengen</button>
+      <button class="i-m7nt44 knop stil" id="rbVerleng">Rijbewijs verlengen</button>
     </div>
     <div class="kaart">
       <h3>Voertuig registreren (RDW)</h3>
@@ -132,12 +140,12 @@
       </div>
       <button class="knop h-mt80" id="vtGo">Op mijn naam zetten</button>
     </div>
-    <h3 style="margin:1.25rem 0 0.5rem;">Mijn voertuigen</h3>
+    <h3 class="i-tafq05">Mijn voertuigen</h3>
     <div id="vtMijn"><div class="leeg">Nog geen voertuigen.</div></div>
     <div class="kaart h-mt100">
       <h3>Kenteken controleren</h3>
-      <p style="color:var(--muted);font-size:.86rem;line-height:1.5;margin-top:0.25rem;">Check bij de RDW of een kenteken bekend is en of de APK geldig is · handig vóór je een auto huurt of instapt.</p>
-      <div class="rij h-mt50"><input class="veld" id="chkKenteken" maxlength="12" placeholder="Kenteken" style="flex:1;min-width:8rem;"><button class="knop stil" id="chkGo" style="width:auto;">Controleer</button></div>
+      <p class="i-1jknqz">Check bij de RDW of een kenteken bekend is en of de APK geldig is · handig vóór je een auto huurt of instapt.</p>
+      <div class="rij h-mt50"><input class="veld" id="chkKenteken" maxlength="12" placeholder="Kenteken" style="flex:1;min-width:8rem;"><button class="i-187ie3 knop stil" id="chkGo">Controleer</button></div>
       <div class="h-mt60" id="chkUit"></div>
     </div>
   </section>
@@ -145,7 +153,7 @@
   <section class="paneel" id="p-kvk">
     <div class="kaart">
       <h3>Handelsregister (KVK)</h3>
-      <p style="color:var(--muted);font-size:.86rem;line-height:1.5;margin-top:0.25rem;">Start je eigen zaak: schrijf je in en krijg een KVK-nummer en uittreksel.</p>
+      <p class="i-1jknqz">Start je eigen zaak: schrijf je in en krijg een KVK-nummer en uittreksel.</p>
       <div class="lbl">Bedrijfsnaam</div>
       <input class="veld" id="kvNaam" maxlength="120" placeholder="Bijv. Casa del Sol">
       <div class="lbl">Rechtsvorm</div>
@@ -154,7 +162,7 @@
       <input class="veld" id="kvSbi" maxlength="8" placeholder="Bijv. 5610">
       <button class="knop h-mt80" id="kvGo">Inschrijven</button>
     </div>
-    <h3 style="margin:1.25rem 0 0.5rem;">Mijn inschrijvingen</h3>
+    <h3 class="i-tafq05">Mijn inschrijvingen</h3>
     <div id="kvMijn"><div class="leeg">Nog geen inschrijving.</div></div>
   </section>
 
@@ -174,7 +182,7 @@
       <input class="veld" id="bzTegen" maxlength="120" placeholder="Bijv. Aanslag IB 2026">
       <div class="lbl">Reden</div>
       <textarea class="veld" id="bzReden" maxlength="800" placeholder="Waarom ben je het er niet mee eens?"></textarea>
-      <button class="knop stil" id="bzGo" style="margin-top:0.75rem;width:auto;">Bezwaar indienen</button>
+      <button class="i-m7nt44 knop stil" id="bzGo">Bezwaar indienen</button>
     </div>
     <div id="bzMijn"></div>
   </section>
@@ -182,7 +190,7 @@
   <section class="paneel" id="p-prov">
     <div class="kaart">
       <h3>Provinciale subsidie</h3>
-      <p style="color:var(--muted);font-size:.86rem;line-height:1.5;margin-top:0.25rem;">De provincie draagt bij aan verduurzaming, natuur, cultuur en innovatie. Vraag een bijdrage aan.</p>
+      <p class="i-1jknqz">De provincie draagt bij aan verduurzaming, natuur, cultuur en innovatie. Vraag een bijdrage aan.</p>
       <div class="lbl">Regeling</div>
       <div class="chips" id="sbRegelingen"></div>
       <div class="lbl">Project</div>
@@ -214,7 +222,7 @@
 
   <section class="paneel" id="p-stem">
     <div class="kaart" id="stemKaart"><div class="leeg">Laden…</div></div>
-    <h3 style="margin:1.25rem 0 0.5rem;">Bekendmakingen</h3>
+    <h3 class="i-tafq05">Bekendmakingen</h3>
     <div id="bekLijst"><div class="leeg">Laden…</div></div>
   </section>
 </main>

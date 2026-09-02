@@ -40,6 +40,11 @@
   .deel{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted,var(--zacht,#8A8680));margin:1.6rem 0 .5rem;}
   .stat{flex:1;min-width:7rem;text-align:center;} .stat b{font-size:1.2rem;display:block;}
   .stat i{font-style:normal;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);}
+
+  /* Uit inline style-attributen gehaald door scripts/inlinestijl-omzet.js (TAKEN.md 4.51). Bewezen gelijk met
+     scripts/inlinestijl-proef.js: elk element, elke aangeraakte eigenschap,
+     berekend in een echte browser. Letterlijk wat er stond -- geen ontwerpbesluit. */
+  .i-m3b83{margin-bottom:0.5rem}
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
 <link rel="stylesheet" href="premium.css">
@@ -89,7 +94,7 @@
     <div class="kaart h-mt70"><div class="sec">Werklijsten</div><div id="kLijsten"></div></div>
     <div class="kaart h-mt70">
       <div class="sec">Rahul denkt mee in deze kamer</div>
-      <div class="rij" style="margin-bottom:0.5rem;">
+      <div class="i-m3b83 rij">
         <input class="veld" id="aVraag" placeholder="Stel een vraag, of laat leeg" maxlength="300" aria-label="Vraag aan Rahul">
         <button class="knop" id="aVraag2">Vraag</button>
       </div>
@@ -97,7 +102,7 @@
     </div>
     <div class="kaart h-mt70">
       <div class="sec">Taken van deze kamer</div>
-      <div class="rij" style="margin-bottom:0.5rem;"><input class="veld" id="tTekst" placeholder="Nieuwe taak" maxlength="200"><button class="knop" id="tMaak">+</button></div>
+      <div class="i-m3b83 rij"><input class="veld" id="tTekst" placeholder="Nieuwe taak" maxlength="200"><button class="knop" id="tMaak">+</button></div>
       <div id="kTaken"></div>
     </div>
   </div>

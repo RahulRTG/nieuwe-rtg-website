@@ -55,6 +55,13 @@
   .bub small{display:block;color:var(--zacht);font-size:.68rem;margin-top:.15rem;}
   .chatvoet{display:flex;gap:.5rem;padding:.7rem 1rem;border-top:1px solid var(--lijn);}
   .chatvoet .veld{flex:1;margin:0;}
+
+  /* Uit inline style-attributen gehaald door scripts/inlinestijl-omzet.js (TAKEN.md 4.51). Bewezen gelijk met
+     scripts/inlinestijl-proef.js: elk element, elke aangeraakte eigenschap,
+     berekend in een echte browser. Letterlijk wat er stond -- geen ontwerpbesluit. */
+  .i-gptr7p{color:var(--rood);min-height:1rem}
+  .i-cd9ewb{margin:.3rem 0 .6rem}
+  .i-1a3ola{border-top:1px solid var(--lijn);margin:.9rem 0}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
@@ -109,7 +116,7 @@
         <input class="veld" id="kopCode" placeholder="Klascode (van de leraar)" maxlength="8" autocapitalize="characters">
         <select class="veld" id="kopKind" aria-label="Welk kind nodig je uit"></select>
         <button class="knop" id="kopDoe">Uitnodigen</button>
-        <div class="mini" id="kopFout" style="color:var(--rood);min-height:1rem;"></div>
+        <div class="i-gptr7p mini" id="kopFout"></div>
       </div>
     </div>
     <div class="mini h-mt100">Ben je leraar? <a id="naarLeraar">Open de leraaromgeving</a></div>
@@ -126,19 +133,19 @@
     <div class="sec">Aanmelden en toegang</div>
     <div class="kaart blok" id="lrInlog">
       <b>1. School registreren</b>
-      <div class="mini" style="margin:.3rem 0 .6rem;">De directie registreert de school via de veilige FOUNDATION-balie. De schoolcode en het beheer-token ontstaan pas nadat BRIN, bevoegdheid en privacy-inrichting zijn gecontroleerd.</div>
+      <div class="i-cd9ewb mini">De directie registreert de school via de veilige FOUNDATION-balie. De schoolcode en het beheer-token ontstaan pas nadat BRIN, bevoegdheid en privacy-inrichting zijn gecontroleerd.</div>
       <a class="knop schakel" href="registreren.html?type=school">Open schoolregistratie</a>
-      <div style="border-top:1px solid var(--lijn);margin:.9rem 0;"></div>
+      <div class="i-1a3ola"></div>
       <b>2. Werken bij een school</b>
-      <div class="mini" style="margin:.3rem 0 .6rem;">De directie nodigt iedere medewerker persoonlijk uit op het schoolmailadres en geeft meteen de juiste rollen. Open de uitnodiging vanuit die e-mail; voor een volgende keer vraag je daar een nieuwe inloglink aan.</div>
+      <div class="i-cd9ewb mini">De directie nodigt iedere medewerker persoonlijk uit op het schoolmailadres en geeft meteen de juiste rollen. Open de uitnodiging vanuit die e-mail; voor een volgende keer vraag je daar een nieuwe inloglink aan.</div>
       <a class="knop schakel" href="/apps/schoolpartner.html">Open School Partner</a>
-      <div style="border-top:1px solid var(--lijn);margin:.9rem 0;"></div>
+      <div class="i-1a3ola"></div>
       <b>Inloggen</b>
       <div class="mini" style="margin:0.25rem 0 0.5rem;">Met je schoolcode en je token (beheer of personeel).</div>
       <input class="veld" id="inCode" placeholder="Schoolcode" maxlength="8" autocapitalize="characters" autocomplete="organization" spellcheck="false">
       <input class="veld" id="inToken" placeholder="Persoonlijke toegangssleutel" type="password" autocomplete="current-password" spellcheck="false">
       <button class="knop grijs" id="inDoe">Veilig inloggen</button>
-      <div class="mini" id="lrFout" style="color:var(--rood);min-height:1rem;"></div>
+      <div class="i-gptr7p mini" id="lrFout"></div>
     </div>
     <div id="lrOverzicht" hidden></div>
     <div id="lrDash" hidden></div>

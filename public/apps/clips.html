@@ -79,6 +79,12 @@
   .melding.zien{opacity:1;}
   .weg{display:none !important;}
   @media (prefers-reduced-motion: reduce){ *{transition:none !important;} #feed{scroll-behavior:auto;} }
+
+  /* Uit inline style-attributen gehaald door scripts/inlinestijl-omzet.js (TAKEN.md 4.51). Bewezen gelijk met
+     scripts/inlinestijl-proef.js: elk element, elke aangeraakte eigenschap,
+     berekend in een echte browser. Letterlijk wat er stond -- geen ontwerpbesluit. */
+  .i-1p8dz4{margin-top:1.25rem;font-size:0.8rem}
+  .i-1l3ksy{width:5.5rem}
 </style>
 <!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
 <script src="/shared/media.js"></script>
@@ -138,15 +144,15 @@
     <p class="stil">Er wordt niets weggegooid: een knip is een begin en een eind, dus u kunt hem
       altijd terugdraaien. Ondertitels staan wel bij RTG, want de kijker moet ze kunnen lezen.</p>
 
-    <h3 style="margin-top:1.25rem;font-size:0.8rem;">Knippen</h3>
+    <h3 class="i-1p8dz4">Knippen</h3>
     <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
-      <label for="knipVan">Van (s)</label><input id="knipVan" type="number" min="0" step="0.1" style="width:5.5rem;">
-      <label for="knipTot">Tot (s)</label><input id="knipTot" type="number" min="0" step="0.1" style="width:5.5rem;">
+      <label for="knipVan">Van (s)</label><input id="knipVan" type="number" min="0" step="0.1" class="i-1l3ksy">
+      <label for="knipTot">Tot (s)</label><input id="knipTot" type="number" min="0" step="0.1" class="i-1l3ksy">
       <button class="knop vol" id="knipZet" type="button">Zet de knip</button>
       <button class="knop" id="knipWeg" type="button">Terugdraaien</button>
     </div>
 
-    <h3 style="margin-top:1.25rem;font-size:0.8rem;">Geluid</h3>
+    <h3 class="i-1p8dz4">Geluid</h3>
     <p class="stil">We hebben geen rechten op muziek en doen dus niet alsof. Dit zegt de kijker
       wat hij gaat horen.</p>
     <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem;">
@@ -155,7 +161,7 @@
       <button class="knop" data-geluid="stem" type="button">Met gesproken toelichting</button>
     </div>
 
-    <h3 style="margin-top:1.25rem;font-size:0.8rem;">Ondertitels</h3>
+    <h3 class="i-1p8dz4">Ondertitels</h3>
     <p class="stil">Een clip zonder ondertitel is een clip die een deel van de mensen niet kan volgen.</p>
     <div class="h-mt50" id="cueLijst"></div>
     <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">

@@ -1691,6 +1691,12 @@ try {
     padding:0.6rem;font-size:0.68rem;color:var(--soft);}
   .privrij{display:flex;gap:0.5rem;}
   .privknop.wis{border-color:rgba(194,58,94,0.4);}
+
+  /* Uit inline style-attributen gehaald door scripts/inlinestijl-omzet.js (TAKEN.md 4.51). Bewezen gelijk met
+     scripts/inlinestijl-proef.js: elk element, elke aangeraakte eigenschap,
+     berekend in een echte browser. Letterlijk wat er stond -- geen ontwerpbesluit. */
+  .i-1x94f7{display:flex;gap:0.6rem}
+  .i-1ajy4d{padding:1rem 1.1rem}
 </style>
 <script src="/shared/command/catalog.js?v=b3bf2c3b" defer></script>
 <script src="/shared/command/console.js?v=b3bf2c3b" defer></script>
@@ -2267,7 +2273,7 @@ try {
       <button class="ms-close" id="rideClose" aria-label="Sluiten">✕</button>
     </div>
     <div class="ms-body" style="padding:1rem 1.1rem;display:flex;flex-direction:column;gap:0.7rem;">
-      <div style="display:flex;gap:0.6rem;">
+      <div class="i-1x94f7">
         <label class="soft-sm-grow"><span data-i18n="ride.pax">Personen</span>
           <select id="ridePax" class="ms-note h-mt30"><option>1</option><option selected>2</option><option>3</option><option>4</option><option>6</option><option>8</option></select>
         </label>
@@ -2275,7 +2281,7 @@ try {
           <select id="rideBag" class="ms-note h-mt30"><option selected>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>6</option></select>
         </label>
       </div>
-      <div style="display:flex;gap:0.6rem;">
+      <div class="i-1x94f7">
         <label class="soft-sm-grow"><span data-i18n="ride.plan">Wanneer</span>
           <select id="ridePlan" class="ms-note h-mt30"><option value="nu" data-i18n="ride.nu">Nu</option><option value="later" data-i18n="ride.later">Op een tijd</option></select>
         </label>
@@ -2319,7 +2325,7 @@ try {
       <div><b>Rahul &amp; Rahul</b><span>Een gesprek over jullie dag &middot; <span id="kletsNaam"></span></span></div>
       <button class="ms-close" id="kletsClose" aria-label="Sluiten">✕</button>
     </div>
-    <div class="ms-body" id="kletsBody" style="padding:1rem 1.1rem;"></div>
+    <div class="i-1ajy4d ms-body" id="kletsBody"></div>
   </div>
 
   <!-- salon-post delen met een connectie -->
@@ -2329,7 +2335,7 @@ try {
       <div><b data-i18n="sal.share.h">Deel met een connectie</b></div>
       <button class="ms-close" id="shareClose" aria-label="Sluiten">✕</button>
     </div>
-    <div class="ms-body" id="shareList" style="padding:1rem 1.1rem;"></div>
+    <div class="i-1ajy4d ms-body" id="shareList"></div>
   </div>
 
   <!-- inkomende oproep -->

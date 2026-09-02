@@ -35,6 +35,13 @@
   .klus{border-bottom:1px solid var(--line);padding:.6rem 0;display:flex;gap:.6rem;align-items:flex-start;}
   .klus:last-child{border-bottom:0;}
   .melding{position:fixed;left:50%;bottom:1.1rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:0;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;}
+
+  /* Uit inline style-attributen gehaald door scripts/inlinestijl-omzet.js (TAKEN.md 4.51). Bewezen gelijk met
+     scripts/inlinestijl-proef.js: elk element, elke aangeraakte eigenschap,
+     berekend in een echte browser. Letterlijk wat er stond -- geen ontwerpbesluit. */
+  .i-m3b83{margin-bottom:0.5rem}
+  .i-jwt5vg{flex:1;min-width:8rem}
+  .i-186m9v{width:100%}
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>
@@ -68,12 +75,12 @@
   <div class="deel">Aanmelden</div>
   <div class="kaart">
     <div class="sec">Ter plekke: nieuwe Stadsdoos aanmelden</div>
-    <div class="rij" style="margin-bottom:0.5rem;">
+    <div class="i-m3b83 rij">
       <input class="veld" id="aNaam" placeholder="bijv. Stadsdoos Brug" maxlength="60" style="flex:1;min-width:9rem;">
-      <select class="veld" id="aZone" style="flex:1;min-width:8rem;" aria-label="Zone"></select>
+      <select class="i-jwt5vg veld" id="aZone" aria-label="Zone"></select>
     </div>
-    <input class="veld" id="aSens" placeholder="sensoren, komma (verkeer, lucht, licht)" style="margin-bottom:0.5rem;">
-    <button class="knop" id="aMeld" style="width:100%;">Meld aan · sleutel verschijnt één keer</button>
+    <input class="i-m3b83 veld" id="aSens" placeholder="sensoren, komma (verkeer, lucht, licht)">
+    <button class="i-186m9v knop" id="aMeld">Meld aan · sleutel verschijnt één keer</button>
     <div id="aUit" style="margin-top:0.5rem;font-size:.85rem;"></div>
   </div>
 
@@ -81,11 +88,11 @@
   <div class="kaart">
     <div class="sec">Verbindingstest · praat de doos met de stad?</div>
     <p style="font-size:.8rem;color:var(--muted);margin-bottom:0.5rem;">Vul het serienummer en de apparaat-sleutel van de doos in; de test stuurt een echte hartslag over de hardware-poort.</p>
-    <div class="rij" style="margin-bottom:0.5rem;">
-      <input class="veld" id="tSerial" placeholder="SD-XXXXXX" style="flex:1;min-width:8rem;">
+    <div class="i-m3b83 rij">
+      <input class="i-jwt5vg veld" id="tSerial" placeholder="SD-XXXXXX">
       <input class="veld" id="tSleutel" placeholder="apparaat-sleutel" style="flex:2;min-width:11rem;">
     </div>
-    <button class="knop stil" id="tDoe" style="width:100%;">Stuur hartslag</button>
+    <button class="i-186m9v knop stil" id="tDoe">Stuur hartslag</button>
   </div>
 </main>
 <div class="melding" id="melding" role="status"></div>

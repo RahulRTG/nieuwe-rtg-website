@@ -130,6 +130,13 @@
   @keyframes moveAdem{50%{transform:scale(1.035);filter:brightness(1.14)}}@keyframes moveDraai{to{transform:rotate(360deg)}}@keyframes moveBaan{from{transform:rotate(0) translateX(79px)}to{transform:rotate(360deg) translateX(79px)}}
   @media (prefers-reduced-motion: reduce){ *{transition:none !important;animation:none !important;} }
   @media(max-width:560px){.moveHero{margin:.3rem 1.1rem 1rem;min-height:430px;padding:1.2rem}.moveHero h2,.moveHero>p{max-width:100%}.moveOrb{right:50%;top:150px;transform:translateX(50%);width:135px;height:135px}.moveRail{left:1.2rem;right:1.2rem}.privateForm{grid-template-columns:1fr}}
+
+  /* Uit inline style-attributen gehaald door scripts/inlinestijl-omzet.js (TAKEN.md 4.51). Bewezen gelijk met
+     scripts/inlinestijl-proef.js: elk element, elke aangeraakte eigenschap,
+     berekend in een echte browser. Letterlijk wat er stond -- geen ontwerpbesluit. */
+  .i-1hjmzy{margin-top:0.5rem}
+  .i-q78lq2{margin-top:0.75rem}
+  .i-2uh62t{font-size:0.95rem}
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <script src="/shared/glyf.js" defer></script>
@@ -166,7 +173,7 @@
   <section id="vRit" role="tabpanel" aria-labelledby="tabRit">
     <!-- de lopende rit; vervangt het boekformulier zolang hij loopt -->
     <div class="kaart rit weg" id="lopendKaart">
-      <p style="font-size:0.95rem;"><strong id="lopendStatus">Uw rit</strong></p>
+      <p class="i-2uh62t"><strong id="lopendStatus">Uw rit</strong></p>
       <p class="stil" id="lopendSub"></p>
       <div class="keten" id="lopendKeten" aria-hidden="true"></div>
       <div id="lopendEtappes"></div>
@@ -188,7 +195,7 @@
              bij hetzelfde label "Bestemming", maar een select kan geen tweede
              `for` delen en heeft geen placeholder om op terug te vallen; zonder
              eigen naam is hij voor een schermlezer een naamloos veld. -->
-        <select id="velNaar" aria-label="Bestemming kiezen uit de zoekresultaten" style="margin-top:0.5rem;"><option value="">Kies een plek</option></select>
+        <select id="velNaar" aria-label="Bestemming kiezen uit de zoekresultaten" class="i-1hjmzy"><option value="">Kies een plek</option></select>
         <p class="stil" id="velMeer"></p>
         <div class="duo">
           <div><label for="velReizigers">Reizigers</label><input id="velReizigers" type="number" min="1" max="60" value="1"></div>
@@ -208,7 +215,7 @@
         <div style="margin-top:0.9rem;">
           <button class="knop vol hoofd" id="velPlan" type="button" data-hoofdactie>Plan mijn reis</button>
         </div>
-        <p class="stil" style="margin-top:0.5rem;">U ziet alle manieren om er te komen naast elkaar: taxi, openbaar
+        <p class="i-1hjmzy stil">U ziet alle manieren om er te komen naast elkaar: taxi, openbaar
           vervoer, of een combinatie. Met de tijd, de prijs, wat u loopt en wat het uitstoot.</p>
       </div>
 
@@ -241,9 +248,9 @@
   <section id="vOv" role="tabpanel" aria-labelledby="tabOv" class="weg">
     <!-- de actieve OV-rit -->
     <div class="kaart rit weg" id="ritKaart">
-      <p style="font-size:0.95rem;"><span id="ritIcoon"></span> <strong>U bent ingecheckt</strong></p>
+      <p class="i-2uh62t"><span id="ritIcoon"></span> <strong>U bent ingecheckt</strong></p>
       <p class="stil" id="ritSub"></p>
-      <div style="margin-top:0.75rem;"><button class="knop vol" id="uitKnop" type="button">Check uit</button></div>
+      <div class="i-q78lq2"><button class="knop vol" id="uitKnop" type="button">Check uit</button></div>
     </div>
 
     <!-- twee snelle opties -->
@@ -275,7 +282,7 @@
           <div><label for="kaartVan">Instappen</label><select id="kaartVan"></select></div>
           <div><label for="kaartNaar">Uitstappen</label><select id="kaartNaar"></select></div>
         </div>
-        <div style="margin-top:0.75rem;"><button class="knop vol" id="kaartKoop" type="button">Kopen</button></div>
+        <div class="i-q78lq2"><button class="knop vol" id="kaartKoop" type="button">Kopen</button></div>
       </div>
       <p class="stil" id="kaartReden">Even kijken wat er te koop is&hellip;</p>
     </div>
@@ -284,7 +291,7 @@
     <div class="kaart">
       <div id="aboVorm" class="weg">
         <p class="stil" id="aboUitleg"></p>
-        <div style="margin-top:0.75rem;"><button class="knop vol" id="aboKoop" type="button">Abonnement nemen</button></div>
+        <div class="i-q78lq2"><button class="knop vol" id="aboKoop" type="button">Abonnement nemen</button></div>
       </div>
       <p class="stil" id="aboReden">Even kijken of er een abonnement is&hellip;</p>
       <div id="aboLijst"></div>
@@ -303,7 +310,7 @@
         <input id="velWerkgever" type="text" placeholder="Bijv. MKKX" autocomplete="off">
         <button class="knop" id="pendelHaal" type="button">Toon</button>
       </div>
-      <p class="stil" style="margin-top:0.5rem;">U ziet alleen de pendels van een bedrijf waar u ook echt staat ingeschreven
+      <p class="i-1hjmzy stil">U ziet alleen de pendels van een bedrijf waar u ook echt staat ingeschreven
         als medewerker.</p>
     </div>
     <div id="pendelLijst"></div>

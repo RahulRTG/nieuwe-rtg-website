@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-02T22:10:01.855Z",
-    "commit": "14e88841",
+    "op": "2026-09-02T23:28:18.080Z",
+    "commit": "0899622d",
     "boomVuil": true,
-    "boomAnders": 9,
+    "boomAnders": 3,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -2594,6 +2594,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 5,
       "scherp": "gezakt"
+    },
+    "inlinestijl.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/inlinestijl-omzet.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 2
     },
     "inlogrem.test.js": {
       "soort": "server",

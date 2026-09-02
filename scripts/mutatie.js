@@ -584,6 +584,10 @@ const EIGEN_MODULE = new Map([
      bestraffen. */
   ['meelezen.test.js', ['public/shared/meelezen.js']],
   ['spraaktekst.test.js', ['public/shared/spraaktekst.js']],
+  /* De omzetting van inline stijlen (TAKEN.md 4.51). Deze toets START het script
+     als kindproces -- dat is de enige manier om te toetsen wat het met een echt
+     bestand doet -- en draagt dus geen require die modulesVan() kan vinden. */
+  ['inlinestijl.test.js', ['scripts/inlinestijl-omzet.js']],
   ['loghygiene.test.js', ['server/log.js']],
   ['genreregister.test.js', ['server/seed/genres.js']],
   ['genretoegang.test.js', ['server/kern/aanmeldingen/bedrijf.js', 'server/seed/genres.js']],

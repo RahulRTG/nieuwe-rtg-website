@@ -36,6 +36,14 @@
   .chip{background:var(--paneel2);border:1px solid var(--lijn);color:var(--txt);border-radius:0;padding:.35rem .8rem;font-size:.85rem;cursor:pointer;}
   .chip.aan{border-color:var(--goud);color:var(--accent-tekst);}
   textarea.veld{width:100%;min-height:7rem;}
+
+  /* Uit inline style-attributen gehaald door scripts/inlinestijl-omzet.js (TAKEN.md 4.51). Bewezen gelijk met
+     scripts/inlinestijl-proef.js: elk element, elke aangeraakte eigenschap,
+     berekend in een echte browser. Letterlijk wat er stond -- geen ontwerpbesluit. */
+  .i-15bgfu{width:100%;margin-top:0.5rem}
+  .i-186m9v{width:100%}
+  .i-uckegf{color:var(--zacht);font-size:.82rem}
+  .i-1m9a70{text-align:center}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
@@ -82,17 +90,17 @@
   <section id="vHerhaal" hidden>
     <h1>Vandaag herhalen</h1>
     <div class="kaart kaartgroot" id="hSpeel">
-      <div style="color:var(--zacht);font-size:.82rem;" id="hTeller"></div>
+      <div class="i-uckegf" id="hTeller"></div>
       <div class="vraag" id="hVraag"></div>
       <div style="color:var(--zacht);font-size:.78rem;margin:0.25rem 0;" id="hBron"></div>
-      <input class="veld" id="hAntwoord" placeholder="Typ je antwoord" autocomplete="off" style="text-align:center;">
-      <button class="knop" id="hCheck" style="width:100%;margin-top:0.5rem;">Controleer</button>
+      <input class="i-1m9a70 veld" id="hAntwoord" placeholder="Typ je antwoord" autocomplete="off">
+      <button class="i-15bgfu knop" id="hCheck">Controleer</button>
       <div class="uitslag" id="hUitslag"></div>
     </div>
     <div class="kaart kaartgroot" id="hKlaar" hidden>
       <div class="vraag" id="hScore"></div>
       <p class="intro">Wat je goed wist komt later vanzelf terug; wat lastig was, staat morgen weer klaar. Meer hoeft niet.</p>
-      <button class="knop grijs" id="hTerug" style="width:100%;">Klaar voor vandaag</button>
+      <button class="i-186m9v knop grijs" id="hTerug">Klaar voor vandaag</button>
     </div>
   </section>
 
@@ -100,16 +108,16 @@
   <section id="vOverhoor" hidden>
     <h1 id="oTitel">Overhoren</h1>
     <div class="kaart kaartgroot">
-      <div style="color:var(--zacht);font-size:.82rem;" id="oTeller"></div>
+      <div class="i-uckegf" id="oTeller"></div>
       <div class="vraag" id="oVraag"></div>
-      <input class="veld" id="oAntwoord" placeholder="Typ je antwoord" autocomplete="off" style="text-align:center;">
-      <button class="knop" id="oCheck" style="width:100%;margin-top:0.5rem;">Controleer</button>
+      <input class="i-1m9a70 veld" id="oAntwoord" placeholder="Typ je antwoord" autocomplete="off">
+      <button class="i-15bgfu knop" id="oCheck">Controleer</button>
       <div class="uitslag" id="oUitslag"></div>
     </div>
     <div class="kaart kaartgroot" id="oKlaar" hidden>
       <div class="vraag" id="oScore"></div>
-      <button class="knop" id="oFouten" style="width:100%;" hidden>De foutjes nog eens</button>
-      <button class="knop grijs" id="oTerug" style="width:100%;margin-top:0.5rem;">Klaar</button>
+      <button class="i-186m9v knop" id="oFouten" hidden>De foutjes nog eens</button>
+      <button class="i-15bgfu knop grijs" id="oTerug">Klaar</button>
     </div>
   </section>
 
@@ -121,10 +129,10 @@
       <div class="keuzerij" id="sVrienden"><span class="leeg">Vrienden laden…</span></div>
       <input class="veld h-mt30" id="sCodenaam" placeholder="Of daag uit op codenaam">
       <div class="leeg" style="padding:.3rem 0 0;">Samen leren maakt je niet automatisch vrienden; de ander accepteert zelf.</div>
-      <button class="knop" id="sStart" style="width:100%;margin-top:0.5rem;">Daag uit</button>
+      <button class="i-15bgfu knop" id="sStart">Daag uit</button>
       <div class="fout" id="sFout"></div>
     </div>
-    <button class="knop grijs" id="sTerug" style="width:100%;">← terug</button>
+    <button class="i-186m9v knop grijs" id="sTerug">← terug</button>
   </section>
 
   <!-- het duel zelf -->
@@ -132,15 +140,15 @@
     <h1 id="dTitel">Duel</h1>
     <div class="balkjes" id="dStanden"></div>
     <div class="kaart kaartgroot" id="dSpeel">
-      <div style="color:var(--zacht);font-size:.82rem;" id="dTeller"></div>
+      <div class="i-uckegf" id="dTeller"></div>
       <div class="vraag" id="dVraag"></div>
-      <input class="veld" id="dAntwoord" placeholder="Typ je antwoord" autocomplete="off" style="text-align:center;">
-      <button class="knop" id="dCheck" style="width:100%;margin-top:0.5rem;">Controleer</button>
+      <input class="i-1m9a70 veld" id="dAntwoord" placeholder="Typ je antwoord" autocomplete="off">
+      <button class="i-15bgfu knop" id="dCheck">Controleer</button>
       <div class="uitslag" id="dUitslag"></div>
     </div>
     <div class="kaart kaartgroot" id="dKlaar" hidden>
       <div class="vraag" id="dWin"></div>
-      <button class="knop grijs" id="dTerug" style="width:100%;">Terug naar je lijsten</button>
+      <button class="i-186m9v knop grijs" id="dTerug">Terug naar je lijsten</button>
     </div>
   </section>
 </div>

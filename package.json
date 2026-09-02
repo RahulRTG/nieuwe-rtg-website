@@ -115,6 +115,8 @@
     "onderzoeksketen": "node scripts/onderzoeksketen.js",
     "wereldlijst": "node scripts/wereldlijst.js",
     "functielijst": "node scripts/functielijst.js",
+    "inlinestijl": "node scripts/inlinestijl-ronde.js",
+    "inlinestijl:toon": "node scripts/inlinestijl-ronde.js --toon",
     "deelindex": "node scripts/deelindex.js",
     "bewijs": "node scripts/bewijs.js",
     "objectmodel": "node scripts/objectmodel.js",

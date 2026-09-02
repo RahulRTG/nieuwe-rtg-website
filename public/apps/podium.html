@@ -87,6 +87,11 @@
   .melding.zien{opacity:1;}
   .weg{display:none !important;}
   @media (prefers-reduced-motion: reduce){ *{transition:none !important;} }
+
+  /* Uit inline style-attributen gehaald door scripts/inlinestijl-omzet.js (TAKEN.md 4.51). Bewezen gelijk met
+     scripts/inlinestijl-proef.js: elk element, elke aangeraakte eigenschap,
+     berekend in een echte browser. Letterlijk wat er stond -- geen ontwerpbesluit. */
+  .i-1v4gr3{position:absolute;left:-999px}
 </style>
 <!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
 <script src="/shared/media.js"></script>
@@ -148,7 +153,7 @@
     <p class="stil h-mt50" id="kijkWie"></p>
     <div id="chatKijk" class="chat" aria-live="polite" aria-label="Kanaalchat"></div>
     <form class="rij" id="chatForm">
-      <label for="chatVeld" style="position:absolute;left:-999px;">Bericht in de kanaalchat</label>
+      <label for="chatVeld" class="i-1v4gr3">Bericht in de kanaalchat</label>
       <input id="chatVeld" maxlength="300" placeholder="Praat mee (op codenaam)" autocomplete="off">
       <button class="knop vol" type="submit">Stuur</button>
     </form>
@@ -170,14 +175,14 @@
       <span class="tel" id="studioTel"></span>
     </div>
     <div class="rij">
-      <label for="studioTitel" style="position:absolute;left:-999px;">Titel van de uitzending</label>
+      <label for="studioTitel" class="i-1v4gr3">Titel van de uitzending</label>
       <input id="studioTitel" maxlength="80" placeholder="Titel van de uitzending">
       <button class="knop" id="studioAbb" type="button" aria-pressed="false">Alleen abonnees</button>
       <button class="knop vol" id="studioKnop" type="button">Ga live</button>
     </div>
     <div id="chatStudio" class="chat" aria-live="polite" aria-label="Kanaalchat"></div>
     <form class="rij" id="chatFormStudio">
-      <label for="chatVeldStudio" style="position:absolute;left:-999px;">Bericht in de kanaalchat</label>
+      <label for="chatVeldStudio" class="i-1v4gr3">Bericht in de kanaalchat</label>
       <input id="chatVeldStudio" maxlength="300" placeholder="Praat met de zaal" autocomplete="off">
       <button class="knop vol" type="submit">Stuur</button>
       <!-- LIVE TEKST VOOR DE ZAAL. Een uitzending is eenrichting: wie doof is in

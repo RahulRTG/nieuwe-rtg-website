@@ -68,6 +68,12 @@
   .ai h3{font-size:1rem;margin-bottom:.4rem;}
   .ai .uit{font-size:.86rem;color:var(--muted);line-height:1.55;white-space:pre-wrap;margin-top:.5rem;}
   .vonnis{font-style:italic;border-left:3px solid var(--gold);padding-left:.7rem;margin-top:.4rem;font-size:.82rem;color:var(--muted);line-height:1.5;}
+
+  /* Uit inline style-attributen gehaald door scripts/inlinestijl-omzet.js (TAKEN.md 4.51). Bewezen gelijk met
+     scripts/inlinestijl-proef.js: elk element, elke aangeraakte eigenschap,
+     berekend in een echte browser. Letterlijk wat er stond -- geen ontwerpbesluit. */
+  .i-1cv8gh{flex:1;min-width:12rem}
+  .i-eq0sgi{margin:0 0 0.75rem}
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>
@@ -92,7 +98,7 @@
     <div class="ai">
       <h3>AI-griffier (Rahul)</h3>
       <div class="rij h-mt0">
-        <input class="veld" id="aiV" style="flex:1;min-width:12rem;" placeholder="Bijv. hoe krijg ik de rol van deze week rond?">
+        <input class="i-1cv8gh veld" id="aiV" placeholder="Bijv. hoe krijg ik de rol van deze week rond?">
         <button class="knop" id="aiK">Vraag</button>
       </div>
       <div class="uit" id="aiA">Helpt met de rol, de planning en de voorbereiding. Oordeelt nooit: de rechter beslist altijd zelf.</div>
@@ -100,7 +106,7 @@
     <div class="tabs" id="tabs"></div>
 
     <section class="paneel" id="p-rol">
-      <div class="rij" style="margin:0 0 0.75rem;">
+      <div class="i-eq0sgi rij">
         <input class="veld" id="rolDatum" type="date">
         <button class="knop stil" id="rolLaad">Toon de rol</button>
       </div>
@@ -112,7 +118,7 @@
         <h4>Nieuwe zaak aanbrengen</h4>
         <div class="rij">
           <select class="veld" id="zType"></select>
-          <input class="veld" id="zTitel" style="flex:1;min-width:12rem;" placeholder="Titel van de zaak" maxlength="120">
+          <input class="i-1cv8gh veld" id="zTitel" placeholder="Titel van de zaak" maxlength="120">
         </div>
         <div class="rij">
           <input class="veld" id="zEiser" placeholder="Eiser (codenaam)" maxlength="60">
@@ -121,7 +127,7 @@
         </div>
         <textarea class="veld" id="zOms" rows="2" maxlength="800" placeholder="Korte omschrijving van het geschil" style="width:100%;margin-top:0.5rem;resize:vertical;"></textarea>
       </div>
-      <div class="rij" style="margin:0 0 0.75rem;">
+      <div class="i-eq0sgi rij">
         <select class="veld" id="zFilter"><option value="">Alle zaken</option><option value="aangebracht">Aangebracht</option><option value="gepland">Op de rol</option><option value="uitspraak">Uitspraak gedaan</option></select>
       </div>
       <div id="zakenLijst"></div>

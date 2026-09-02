@@ -71,6 +71,28 @@ jobs:
       - name: Het verval (verlopen schulden en uitzonderingen)
         if: always()
         run: node scripts/normverval.js
+      # DE DRIE METINGEN DIE ZICHZELF NIET VERVERSEN. activeringOndergrens,
+      # tredeLekken, tredeRondgangGezakt en wekkersOnverklaard LEZEN een
+      # vastgelegd bestand; ze meten niet zelf, want de activeringsmeter en de
+      # tredeproef starten een echte server en dat hoort niet in een ratel die
+      # bij elke push draait. De keerzijde staat in de kop van elke meter: wie
+      # het bestand niet ververst, bevriest de meter -- en een bevroren meter
+      # meldt jarenlang hetzelfde getal terwijl de code eronder wegloopt.
+      #
+      # Hier verstrijkt de tijd wel, dus hier worden ze ververst. Vóór npm run
+      # norm, anders ratelt hij op de cijfers van vorige week.
+      - name: De verstrengeling (randen tussen de delen van RTG)
+        if: always()
+        run: npm run verstrengeling:vast
+      - name: De activering (wat wordt wakker per functie)
+        if: always()
+        run: npm run activering:vast
+      - name: De wekkers (wat begint werk buiten HTTP om)
+        if: always()
+        run: npm run wekkers:vast
+      - name: De tredeproef (alle zeven treden van LAUNCH.md)
+        if: always()
+        run: npm run tredeproef:alle
       - name: De norm (structureel hard, prestatie alleen gemeten)
         if: always()
         run: npm run norm

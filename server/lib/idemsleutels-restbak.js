@@ -47,16 +47,16 @@ module.exports = {
 
   // betalen en facturen, leeskant
   'POST /api/betaal/mijn': { leest: true },           // dpMijnBetalingen
+  // pay/portefeuille, pay/graaf en pay/terugstand stonden hier ook, met dezelfde
+  // verklaring; ze wonen in ./idemsleutels-geld.js en een route mag maar in EEN
+  // zijbestand staan (./idemsleutels-eenmaal.js).
   'POST /api/betaal/verzoeken': { leest: true },      // dpVerzoekenVoor
   'POST /api/facturen/overzicht': { leest: true },    // ledenInvoices, gefilterd op jaar
 
   // RTG Pay, leeskant
   'POST /api/pay/overzicht': { leest: true },         // pay.overzicht
-  'POST /api/pay/portefeuille': { leest: true },      // pay.portefeuille
-  'POST /api/pay/graaf': { leest: true },             // afgeleid uit het grootboek
   'POST /api/pay/tegoed': { leest: true },            // tegoedOverzicht -- kijken kost niets
   'POST /api/pay/tiks': { leest: true },              // tikFeed
-  'POST /api/pay/terugstand': { leest: true },        // terugstortenStand: de stand mét de blokkades
 
   'POST /api/podium/mijn': { leest: true },           // podiumMijn
   'POST /api/pakket/typen': { leest: true },          // een vaste lijst bedrijfstypen

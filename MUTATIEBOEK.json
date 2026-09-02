@@ -1,35 +1,35 @@
 {
  "stempel": {
-  "op": "2026-09-01T11:09:20.073Z",
-  "commit": "453c5642c",
-  "boomVuil": false,
+  "op": "2026-09-02T14:52:41.359Z",
+  "commit": "189341180",
+  "boomVuil": true,
   "boomAnders": 3,
   "instrument": "scripts/mutatieboek.js",
   "node": "v22.22.2"
  },
  "uitleg": "Elke route van de router valt in precies een bak, met de reden waarom hij niet verder komt in de keten. De optelling van de bakken is gelijk aan het totaal; dat is de toets, en niet een van de getallen. Zie de kop van scripts/mutatieboek.js. Dit boek beoordeelt geen enkele route.",
- "vastgelegd": "2026-09-01",
+ "vastgelegd": "2026-09-02",
  "gemeten": {
   "routesTotaal": 4856,
   "mutaties": 4769,
-  "mutatiesVerklaard": 323,
-  "mutatiesOnverklaard": 4446,
+  "mutatiesVerklaard": 352,
+  "mutatiesOnverklaard": 4417,
   "beproefbaar": 3998,
-  "beproefbaarVerklaard": 266,
+  "beproefbaarVerklaard": 295,
   "bakken": 7,
   "statusSom": 4769,
   "statusSluit": true,
-  "nogNietGeclassificeerd": 3732,
-  "metBesluitOverDuplicaat": 323,
-  "zonderBesluitOverDuplicaat": 4446,
+  "nogNietGeclassificeerd": 3703,
+  "metBesluitOverDuplicaat": 352,
+  "zonderBesluitOverDuplicaat": 4417,
   "metGemetenDuplicaatgedrag": 0,
   "somVanDeBakken": 4856,
   "sluit": true
  },
  "bewijsgraad": {
   "metingGebruikt": false,
-  "metingReden": "de meting is van commit 16c886771 en HEAD staat op 453c5642c; een meting van een andere stand is geen grond voor een status",
-  "metingGemetenOp": "2026-09-01T10:37:43.809Z",
+  "metingReden": "de meting is van commit 8f4b3a080 en HEAD staat op 189341180; een meting van een andere stand is geen grond voor een status",
+  "metingGemetenOp": "2026-09-01T16:38:26.262Z",
   "perGraad": [
    {
     "id": "afgeleid",
@@ -42,7 +42,7 @@
    },
    {
     "id": "onbekend",
-    "aantal": 3732,
+    "aantal": 3703,
     "voorbeelden": [
      "POST /api/aandacht",
      "POST /api/aanmeld/start",
@@ -51,7 +51,7 @@
    },
    {
     "id": "verklaard",
-    "aantal": 323,
+    "aantal": 352,
     "voorbeelden": [
      "POST /api/office/bank/terugstorting",
      "POST /api/techniek/fouten/wis",
@@ -120,7 +120,7 @@
   {
    "id": "beproefbaar-verklaard",
    "uitleg": "Beproefbaar EN er staat een besluit over duplicaatgedrag in server/lib/idemsleutels.js.",
-   "aantal": 266,
+   "aantal": 295,
    "eind": true,
    "voorbeelden": [
     "POST /api/aanmelding/bewijs/herkeuring",
@@ -131,7 +131,7 @@
   {
    "id": "beproefbaar-onverklaard",
    "uitleg": "Beproefbaar, maar er is nog geen besluit over wat \"hetzelfde verzoek\" hier betekent. Dit is de enige bak die naar nul hoort.",
-   "aantal": 3732,
+   "aantal": 3703,
    "eind": true,
    "voorbeelden": [
     "POST /api/aandacht",
@@ -144,7 +144,7 @@
   {
    "id": "BESCHERMD",
    "uitleg": "Er staat verklaard hoe een herhaling wordt herkend. De idemproef kan hierop meten.",
-   "aantal": 178,
+   "aantal": 183,
    "moetNaarNul": false,
    "semantiek": true,
    "voorbeelden": [
@@ -156,7 +156,7 @@
   {
    "id": "BEWUST_NIET_IDEMPOTENT",
    "uitleg": "Een herhaling is een echte tweede handeling, met een verplichte reden erbij. Dit is klaar en geen tekort.",
-   "aantal": 62,
+   "aantal": 64,
    "moetNaarNul": false,
    "semantiek": true,
    "voorbeelden": [
@@ -168,7 +168,7 @@
   {
    "id": "NIET_VAN_TOEPASSING",
    "uitleg": "Een POST die niets verandert. Er valt niets te dedupliceren.",
-   "aantal": 83,
+   "aantal": 105,
    "moetNaarNul": false,
    "semantiek": true,
    "voorbeelden": [
@@ -204,7 +204,7 @@
   {
    "id": "NOG_NIET_GECLASSIFICEERD",
    "uitleg": "Er is geen besluit over duplicaatgedrag. De enige bak die naar nul hoort.",
-   "aantal": 3732,
+   "aantal": 3703,
    "moetNaarNul": true,
    "semantiek": false,
    "voorbeelden": [
@@ -313,13 +313,13 @@
   {
    "bron": "IDEMPROEF.json",
    "veld": "routesMetRol",
-   "vastgelegd": 3879,
+   "vastgelegd": 3998,
    "nu": 3998,
    "vastgelegdOp": "2026-09-01",
    "zelfdeVraag": "daarvan: de routes waarvoor een proefsleutel bestaat",
-   "verschil": 119,
-   "gelijk": false,
-   "duiding": "de vastlegging is van 2026-09-01; sindsdien zijn er routes bijgekomen"
+   "verschil": 0,
+   "gelijk": true,
+   "duiding": "gelijk"
   }
  ]
 }

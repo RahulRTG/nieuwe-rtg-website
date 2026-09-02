@@ -2252,6 +2252,7 @@ const hulp = {
 /* De samenstelling van de kern staat in ./opzet/kernlaag1..7.js --
    aaneengesloten stukken in precies deze volgorde. Zie de kop van kernlaag1.js. */
 require('./opzet/kernlaag1')(kern, hulp);
+require('./opzet/kernlaag1b')(kern, hulp);
 require('./opzet/kernlaag2')(kern, hulp);
 require('./opzet/kernlaag2b')(kern, hulp);
 require('./opzet/kernlaag3')(kern, hulp);

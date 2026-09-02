@@ -99,7 +99,12 @@ Object.assign(SLEUTELS,
   /* De zesentwintig die de uitgebreide proefopstelling zichtbaar maakte. */
   require('./idemsleutels-proefronde').SLEUTELS,
   /* De tien uit de objectronde: het werkdossier van een onderzoek en drie erbuiten. */
-  require('./idemsleutels-objectronde').SLEUTELS);
+  require('./idemsleutels-objectronde').SLEUTELS,
+  /* De restbak: de laatste 27 uit de bron verklaard (89a36fcac). Deze regel
+     verdween in de samenvoeging van twaalf PR's (2 september 2026) en dertig
+     verklaringen lagen ongelezen naast het register; het bestand exporteert
+     de lijst zelf, zonder SLEUTELS-omhulsel. */
+  require('./idemsleutels-restbak'));
 
 /* Drie keuringen bij het laden, en ze staan bij elkaar in ./idemsleutels-nooit.js:
    geen route in twee zijbestanden, elke verklaring compleet, en vier routes die

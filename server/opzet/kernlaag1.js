@@ -1,5 +1,5 @@
 /* ============================================================================
-   DE KERN SAMENSTELLEN -- deel 1 van 7, en de uitleg voor alle delen.
+   DE KERN SAMENSTELLEN -- deel 1, en de uitleg voor alle delen.
 
    WAAROM DIT OP POSITIE IS GEKNIPT EN NIET OP THEMA. De samenstelling was een
    aaneengesloten blok van 790 regels in server.js: honderddrie regels van de
@@ -28,7 +28,7 @@
 const { maakVolwassen } = require('../kern/volwassen');
 
 module.exports = (kern, hulp) => {
-  const { DATA_DIR, PERSONAS, accounts, anthropic, boekingenVanKlant, crypto, db, findSupplier, keyVanCodenaam, ledenAantal, leeftijdVan, lidBoardUit, log, mail, media, ordersVanKlant, ordersVanZaak, rtf, save, schoon, sendPush, sendPushToUser, sociaal, sseClients, sseToCustomer, sseToOffice } = hulp;
+  const { DATA_DIR, PERSONAS, accounts, anthropic, boekingenVanKlant, crypto, db, findSupplier, keyVanCodenaam, ledenAantal, leeftijdVan, lidBoardUit, mail, media, ordersVanKlant, ordersVanZaak, rtf, save, schoon, sendPush, sendPushToUser, sociaal, sseClients, sseToCustomer } = hulp;
 
 Object.assign(kern, sociaal); // de sociale kern-helpers erbij
 /* Tafelticket (kern/tafelticket.js): de bonnen van dezelfde tafel op een
@@ -124,32 +124,4 @@ Object.assign(kern, require('../kern/welzijn')({ save }));
 /* De RTG-kantoren (kern/afdelingen.js): twaalf afdelingskamers en de
    boardroom die alles ziet en het functieschakelbord bedient. */
 Object.assign(kern, require('../kern/afdelingen')({ db, save, crypto, anthropic, ledenAantal, accounts, keyVanCodenaam }));
-/* RTG Atelier (kern/atelier.js): het besloten ontwerpbureau van de kantoren
-   voor mode en alles wat je aan het lijf draagt. AI tekent concepten uit,
-   levert tech packs en de blik van de creatief directeur; het palet komt als
-   naam + hex mee zodat het scherm een moodboard toont. */
-Object.assign(kern, require('../kern/atelier').maakAtelier({ db, save, crypto, anthropic, schoon }));
-/* RTG Ontwerpstudio (kern/studio.js): de tegenhanger van het Atelier voor
-   alles wat je beweegt: automotive, jachten & boten, luchtvaart en
-   helikopters. AI tekent het concept uit, levert een specsheet en de blik
-   van de chef-ontwerper. */
-Object.assign(kern, require('../kern/studio').maakStudio({ db, save, crypto, anthropic, schoon }));
-/* RTG Hardwarelab (kern/hardwarelab.js): de derde ontwerptak, voor de eigen
-   apparaten: PDA's en tablets, schermen, sensoren, de zaakdoos-familie en
-   accessoires. AI tekent het concept uit, levert een stuklijst en de blik
-   van de chef-engineer. */
-Object.assign(kern, require('../kern/hardwarelab').maakHardwarelab({ db, save, crypto, anthropic, schoon }));
-
-/* Het doorgeefjournaal (kern/doorgeefjournaal.js): een leesbare regel per
-   binnenkomend verzoek en per uitgaand bericht. Vroeg in de rij: de haak waar
-   de lagen eronder aan melden (server/journaalhaak.js) moet vanaf het
-   eerste verzoek bezet zijn -- anders mist het journaal de opstartfase, en daar
-   zaten de storingen. Het bewaarde deel gaat naar een BESTAND en niet naar een
-   collectie; zie kern/journaalbestand.js. */
-Object.assign(kern, require('../kern/journaalbestand').metBestand({ db, save }));
-
-/* Het stadsweefsel (kern/stadsweefsel/) staat in ./kernlaag1-weefsel.js en
-   wordt HIER aangeroepen, want de volgorde is gedrag: het weefsel staat voor
-   zijn lezers (kern/gemeente in laag 2, kern/stad in laag 5). Zie de kop daar. */
-require('./kernlaag1-weefsel')(kern, hulp);
 };

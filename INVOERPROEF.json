@@ -1,8 +1,8 @@
 {
  "stempel": {
-  "op": "2026-09-02T18:16:11.490Z",
-  "commit": "0063cd00",
-  "boomVuil": true,
+  "op": "2026-09-02T18:50:35.864Z",
+  "commit": "ed1f1bd3",
+  "boomVuil": false,
   "node": "v22.22.2"
  },
  "uitleg": "Per route: rommel met de JUISTE rol, en of er een 5xx of een intern spoor uit kwam. Een route die hier NIET in staat is niet beproefd. Een route met invoer:\"poort\" stond achter een tweede grendel en is ONGEMETEN, geen groen. Zie scripts/lib/invoerproef.js voor de grens.",
@@ -57,11 +57,11 @@
  "routesGevonden": 4643,
  "gemeten": {
   "routesMetRol": 3803,
-  "bereikt": 3272,
+  "bereikt": 3277,
   "pogingen": 7620,
   "breuken": 1,
   "sporen": 0,
-  "achterEenPoort": 531,
+  "achterEenPoort": 526,
   "tokensHernieuwd": 15,
   "blindeRondes": 0,
   "rondesPerRoute": 2,
@@ -1436,8 +1436,8 @@
    "pogingen": 2,
    "invoer": "poort",
    "statussen": [
-    503,
-    503
+    403,
+    403
    ],
    "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
@@ -3814,7 +3814,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    503,
+    200,
     400
    ]
   },
@@ -15850,7 +15850,7 @@
    "invoer": "dicht",
    "statussen": [
     400,
-    503
+    200
    ]
   },
   {
@@ -17634,12 +17634,11 @@
    "pad": "/api/office/kamer/taak-zet",
    "rol": "office",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
-    503,
-    503
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+    404,
+    404
+   ]
   },
   {
    "methode": "POST",
@@ -27992,24 +27991,22 @@
    "pad": "/api/spar/lijst",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
-    503,
-    503
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+    200,
+    200
+   ]
   },
   {
    "methode": "POST",
    "pad": "/api/spar/parkeer",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
-    503,
-    503
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+    400,
+    400
+   ]
   },
   {
    "methode": "POST",
@@ -32654,12 +32651,11 @@
    "pad": "/api/supplier/horeca/gast/qr",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
-    503,
-    503
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+    400,
+    400
+   ]
   },
   {
    "methode": "POST",
@@ -40783,12 +40779,11 @@
    "pad": "/api/uitgaan",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
-    503,
-    503
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+    200,
+    200
+   ]
   },
   {
    "methode": "POST",

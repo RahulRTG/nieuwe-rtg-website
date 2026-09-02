@@ -45,10 +45,9 @@
 'use strict';
 
 const fs = require('fs');
-const os = require('os');
 const path = require('path');
-const { spawn } = require('child_process');
 const { alleRoutes } = require('./lib/routes');
+const wegwerp = require('./lib/wegwerpserver');
 const { plausibelLijf } = require('./lib/rolproef');
 const { stempel } = require('./lib/stempel');
 
@@ -69,41 +68,24 @@ function rolVan(bewakers) {
   return null;
 }
 
-function vrijePoort() {
-  const net = require('net');
-  return new Promise((res, rej) => {
-    const s = net.createServer();
-    s.unref(); s.on('error', rej);
-    s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => res(p)); });
-  });
-}
-
-async function wacht(basis, ms) {
-  const eind = Date.now() + ms;
-  while (Date.now() < eind) {
-    try { const r = await fetch(basis + '/api/health'); if (r.ok) return true; } catch (e) {}
-    await new Promise(r => setTimeout(r, 200));
-  }
-  return false;
-}
+/* VIA DE GEDEELDE WEGWERPSERVER, en dat was hij niet. Dit bestand had een eigen
+   `vrijePoort()`, een eigen `wacht()` en een eigen `spawn` met een eigen
+   env-lijst -- alle drie een tweede uitvoering van wat scripts/lib/wegwerpserver.js
+   al doet. Dat kostte meteen twee dingen: de standaard `RTG_SCHORSPOORT_UIT=1`
+   die daar op 2 september 2026 bij kwam kreeg deze proef niet (zie de uitleg
+   daar over de lus die zichzelf dichttrok), en `RTG_MAGNAAT_TEST` ontbrak
+   waardoor de demo-deur dichtstond en de proef struikelde op "geen token voor:
+   member, supplier". Een tweede plek voor een waarheid, en de zwakste won
+   (LAT.md regel 4). */
 
 (async () => {
-  const poort = await vrijePoort();
-  const datamap = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-handelingproef-'));
-  const basis = 'http://127.0.0.1:' + poort;
-
-  const kind = spawn(process.execPath, [path.join(WORTEL, 'server', 'server.js')], {
-    cwd: WORTEL, stdio: 'ignore',
-    /* RTG_DEMO=1 mint alleen de TOKENS; de routes die daarna worden beproefd
-       zijn de echte, met hun echte bewakers ervoor. Zelfde afweging als in
-       rolproef-route.js, en om dezelfde reden daar uitgelegd. */
-    env: { ...process.env, PORT: String(poort), RTG_DATA_DIR: datamap, SMTP_URL: '', STUN_UIT: '1',
-      RTG_DEMO: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' }
-  });
-
-  const klaar = () => { try { kind.kill('SIGKILL'); } catch (e) {} try { fs.rmSync(datamap, { recursive: true, force: true }); } catch (e) {} };
-  process.on('exit', klaar);
-  if (!await wacht(basis, 90000)) { console.error('de server kwam niet op'); klaar(); process.exit(2); }
+  /* RTG_DEMO + RTG_MAGNAAT_TEST minten alleen de TOKENS; de routes die daarna
+     worden beproefd zijn de echte, met hun echte bewakers ervoor. Zelfde
+     afweging als in rolproef-route.js, en om dezelfde reden daar uitgelegd. */
+  const server = await wegwerp.start({ naam: 'handelingproef',
+    env: { RTG_DEMO: '1', RTG_MAGNAAT_TEST: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' } });
+  const basis = server.basis;
+  const klaar = () => server.klaar();
 
   const post = async (pad, lijf, tok) => {
     try {

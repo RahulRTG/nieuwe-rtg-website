@@ -1,13 +1,20 @@
 {
+ "stempel": {
+  "op": "2026-09-02T19:21:46.020Z",
+  "commit": "ed1f1bd3",
+  "boomVuil": false,
+  "node": "v22.22.2",
+  "begrenzing": "geen"
+ },
  "uitleg": "Per route: met de JUISTE rol en plausibele invoer, en of het 2xx-antwoord gegevens van een ANDER account bevatte (kanaries) of een geheim veld. Een route die hier NIET in staat is niet beproefd. Een route met uitvoer:\"poort\" gaf nooit een 2xx en is ONGEMETEN, geen groen. Zie scripts/lib/uitvoerproef.js voor de grens en waarom de lekmerkers niet blind over een 2xx mogen.",
- "kanariekenmerk": "371383",
+ "kanariekenmerk": "884804",
  "gemeten": {
-  "routesMetRol": 3092,
-  "gemeten": 766,
-  "pogingen": 3099,
-  "schoon": 766,
-  "gezakt": 0,
-  "achterEenPoort": 2326,
+  "routesMetRol": 3642,
+  "gemeten": 940,
+  "pogingen": 3649,
+  "schoon": 935,
+  "gezakt": 5,
+  "achterEenPoort": 2702,
   "tokensHernieuwd": 7,
   "begrenzing": 0
  },
@@ -50,6 +57,12 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/aanmelding/contracten",
+   "rol": "office",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/aanmelding/een",
    "rol": "office",
    "uitvoer": "poort"
@@ -62,7 +75,19 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/aanmelding/opzeggen",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/aanmelding/termijn-voldaan",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/aanmelding/verleng",
    "rol": "office",
    "uitvoer": "poort"
   },
@@ -179,6 +204,300 @@
    "pad": "/api/annuleer",
    "rol": "member",
    "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/berichten",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/berichten/gelezen",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/bon",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/bonnen",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/brug",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/catalogus",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/dossier",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/installeer",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/kanaal",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/kantoor/afdracht",
+   "rol": "office",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/kantoor/besluit",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/kantoor/hercontrole",
+   "rol": "office",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/kantoor/intrekken",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/kantoor/journaal",
+   "rol": "office",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/kantoor/teruggave",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/kantoor/teruggaven",
+   "rol": "office",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/kantoor/toegankelijk",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/kantoor/toegankelijk/wachtrij",
+   "rol": "office",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/kantoor/uitgever",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/kantoor/wachtrij",
+   "rol": "office",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/koop",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/landen",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/mijn",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/naslag",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/open",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/persoon",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/persoon/aanvraag",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/persoon/cijfers",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/persoon/dossier",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/persoon/intrekken",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/persoon/inzenden",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/persoon/journaal",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/persoon/naslag",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/persoon/omzet",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/persoon/proef",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/tijdlijn",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/uitgever",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/uitgever/aanvraag",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/uitgever/cijfers",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/uitgever/dossier",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/uitgever/intrekken",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/uitgever/inzenden",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/uitgever/journaal",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/uitgever/omzet",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/uitgever/proef",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/uitgever/voorbeeld",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/verleen",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/weg",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/wis-opslag",
+   "rol": "member",
+   "uitvoer": "schoon"
   },
   {
    "methode": "POST",
@@ -1196,6 +1515,54 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/command/bijstand",
+   "rol": "office",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/bijstand/betreed",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/bijstand/inhoud",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/bijstand/kijk",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/bijstand/sessie",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/bijstand/sluit",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/bijstand/uitvoeren",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/bijstand/voorstel",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/command/canary",
    "rol": "office",
    "uitvoer": "schoon"
@@ -1226,6 +1593,24 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/command/gezondheid",
+   "rol": "office",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/gezondheid/controleer",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/gezondheid/vermogen",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/command/graaf",
    "rol": "office",
    "uitvoer": "schoon"
@@ -1247,6 +1632,48 @@
    "pad": "/api/command/herkomst/spoor",
    "rol": "office",
    "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/incident",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/incident/maatregel",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/incident/neem",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/incident/open",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/incident/sluit",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/incident/weeg",
+   "rol": "office",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/incidenten",
+   "rol": "office",
+   "uitvoer": "schoon"
   },
   {
    "methode": "POST",
@@ -1490,6 +1917,60 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/command/tijdlijn",
+   "rol": "office",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/tijdlijn/rondom",
+   "rol": "office",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/uitrol",
+   "rol": "office",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/uitrol/bevestig",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/uitrol/klim",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/uitrol/pauze",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/uitrol/zet",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/vloot",
+   "rol": "office",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/vloot/organisatie",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/command/werk",
    "rol": "office",
    "uitvoer": "schoon"
@@ -1563,6 +2044,78 @@
   {
    "methode": "POST",
    "pad": "/api/comment",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/commerce/aanbod",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/commerce/etalage",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/commerce/mand",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/commerce/mand/leeg",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/commerce/mand/zet",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/commerce/overdracht/lees",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/commerce/overdracht/maak",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/commerce/overdracht/mijn",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/commerce/reken",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/commerce/retour/mijn",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/commerce/retour/verstuurd",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/commerce/retour/vraag",
    "rol": "member",
    "uitvoer": "poort"
   },
@@ -2036,6 +2589,378 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/festival/bewijs",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/bewijs/teken",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/bezetting",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/boeking",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/boeking/afrekening",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/boeking/extra",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/boeking/stand",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/boekingen",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/control",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/control/weg",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/controls/seed",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/dag",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/dag/nu",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/dag/sluiten",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/dienst",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/dienst/mijn",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/dienst/weg",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/diensten",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/editie",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/gast/edities",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/gast/passen",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/gast/programma",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/geheugen",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/gereed",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/groep",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/groep/code",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/groep/mee",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/groep/mijn",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/groep/stand",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/groep/weg",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/mijn",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/nieuw",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/norm",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/norm/weg",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/normen",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/partner",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/partner/bevestig",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/partner/deelt",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/partner/inbox",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/partner/lijst",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/partner/opzeg",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/partner/weiger",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/pas",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/pas/intrek",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/plek",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/plek/weg",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/podiumbeeld",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/product",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/producten",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/rider",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/rider/vink",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/ruimte",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/scan",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/scan/bundel",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/stand",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/terrein",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/tijdlijn",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/uitzonderingen",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/verkoop",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/verkoop/los",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/verkoop/rond",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/vooruit",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/flits/meld",
    "rol": "member",
    "uitvoer": "poort"
@@ -2099,6 +3024,12 @@
    "pad": "/api/foodcourt/tijden",
    "rol": "member",
    "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/registratie/catalogus",
+   "rol": "office",
+   "uitvoer": "schoon"
   },
   {
    "methode": "POST",
@@ -2177,6 +3108,36 @@
    "pad": "/api/gast/bezorg/rekening",
    "rol": "member",
    "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gast/eten/beoordeel",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gast/eten/concierge",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gast/eten/ontdekken",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gast/eten/probleem",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gast/eten/zoeken",
+   "rol": "member",
+   "uitvoer": "schoon"
   },
   {
    "methode": "POST",
@@ -2261,6 +3222,24 @@
    "pad": "/api/geld/cockpit",
    "rol": "member",
    "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/geld/grens",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/geld/grens/weg",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/geld/grens/zet",
+   "rol": "member",
+   "uitvoer": "poort"
   },
   {
    "methode": "POST",
@@ -2816,6 +3795,24 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/instant-reality/event",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/instant-reality/partner",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/inzagekaart",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/kantoor/wereld",
    "rol": "member",
    "uitvoer": "schoon"
@@ -2828,7 +3825,49 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/kantoorpakket/ai",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/kantoorpakket/beheer",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/bewaar",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/deel",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/fase",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/maak",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/mijn",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/open",
    "rol": "member",
    "uitvoer": "poort"
   },
@@ -2841,6 +3880,42 @@
   {
    "methode": "POST",
    "pad": "/api/kantoorpakket/samen",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/ster",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/terug",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/uitslag",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/versies",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/vul",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/weg",
    "rol": "member",
    "uitvoer": "poort"
   },
@@ -2933,6 +4008,36 @@
    "pad": "/api/kmar/patrouille",
    "rol": "supplier",
    "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kosten/grens",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kosten/grens/zet",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kosten/herkomst",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kosten/mij",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kosten/vooruitblik",
+   "rol": "member",
+   "uitvoer": "schoon"
   },
   {
    "methode": "POST",
@@ -3422,6 +4527,12 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/leerstof/dag",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/leerstof/examen",
    "rol": "member",
    "uitvoer": "poort"
@@ -3434,6 +4545,18 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/leerstof/herhaal",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/leerstof/herhalen",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/leerstof/les",
    "rol": "member",
    "uitvoer": "poort"
@@ -3441,6 +4564,12 @@
   {
    "methode": "POST",
    "pad": "/api/leerstof/oefen",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/leerstof/pad",
    "rol": "member",
    "uitvoer": "poort"
   },
@@ -3531,6 +4660,24 @@
   {
    "methode": "POST",
    "pad": "/api/like",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/link/cap/aanvaard",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/link/cap/maak",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/link/cap/trek",
    "rol": "member",
    "uitvoer": "poort"
   },
@@ -4178,6 +5325,30 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/member/ai/beleid",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/ai/bundel",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/ai/bundels",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/ai/tegoed",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/member/apply",
    "rol": "member",
    "uitvoer": "poort"
@@ -4701,6 +5872,12 @@
   {
    "methode": "POST",
    "pad": "/api/member/connect",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/connect/intrek",
    "rol": "member",
    "uitvoer": "poort"
   },
@@ -5240,6 +6417,12 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/member/pin/actie/opties",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/member/pin/connect",
    "rol": "member",
    "uitvoer": "poort"
@@ -5277,6 +6460,18 @@
   {
    "methode": "POST",
    "pad": "/api/member/pin/zoek",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/prijsgarantie",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/prijsgarantie/meld",
    "rol": "member",
    "uitvoer": "poort"
   },
@@ -5768,7 +6963,49 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/member/rendezvous/aanwezig/wis",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rendezvous/akkoord",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rendezvous/arrange",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rendezvous/blokkeer",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/member/rendezvous/date",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rendezvous/encounter",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rendezvous/introductie/antwoord",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rendezvous/introducties",
    "rol": "member",
    "uitvoer": "poort"
   },
@@ -5810,6 +7047,30 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/member/rendezvous/samen",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rendezvous/samen/zet",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rendezvous/tafel/antwoord",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rendezvous/tafels",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/member/report",
    "rol": "member",
    "uitvoer": "poort"
@@ -5822,13 +7083,97 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/member/rtmail/afwezig",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/alias",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/antwoord",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/member/rtmail/assist",
    "rol": "member",
    "uitvoer": "schoon"
   },
   {
    "methode": "POST",
+   "pad": "/api/member/rtmail/bewaarbeleid",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/bewaartermijn",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/bewaring",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/bijlage",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/bijlagen",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/member/rtmail/classificeer",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/concept/bewaar",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/concept/verstuur",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/concept/weg",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/concepten",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/delegatie/weg",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/delegeer",
    "rol": "member",
    "uitvoer": "poort"
   },
@@ -5840,13 +7185,127 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/member/rtmail/draad",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/etiket",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/export",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/gesprekken",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/handtekening",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/hulp",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/imap/intrekken",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/imap/sleutel",
+   "rol": "member",
+   "uitvoer": "GEZAKT"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/imap/sleutels",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/member/rtmail/inbox",
    "rol": "member",
    "uitvoer": "schoon"
   },
   {
    "methode": "POST",
+   "pad": "/api/member/rtmail/instellingen",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/journaal",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/member/rtmail/lees",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/opruimen",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/rechten",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/regel/maak",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/regel/weg",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/regel/zet",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/regels",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/sluimer",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/ster",
    "rol": "member",
    "uitvoer": "poort"
   },
@@ -5948,7 +7407,31 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/member/rtmail/vak",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/vernietigingen",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/verplaats",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/member/rtmail/workflow",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/zoek",
    "rol": "member",
    "uitvoer": "poort"
   },
@@ -5978,9 +7461,261 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/member/spel/",
+   "pad": "/api/member/spel/antwoord",
    "rol": "member",
    "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/arcade-bord",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/arcade-score",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/dag",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/dag-klaar",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/dag-start",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/kijk",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/klasgenoten",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/mijn",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/nabespreking",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/naspelen",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/nieuw",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/online",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/opgeven",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/praat",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/praat-stuur",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/prestaties",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/projectie-open",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/projectie-sluit",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/rahul",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/random",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/replay",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/sneek-bord",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/sneek-score",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/staat",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/stand",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/sudoku-klaar",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/sudoku-nieuw",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/team-antwoord",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/team-mijn",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/team-nieuw",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/team-nodig",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/team-verlaat",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/toernooi-antwoord",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/toernooi-mijn",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/toernooi-nieuw",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/toernooi-staat",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/toewijzen",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/uitslagen",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/varianten",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/zet",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/zichtbaar",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/zichtbaar-zet",
+   "rol": "member",
+   "uitvoer": "schoon"
   },
   {
    "methode": "POST",
@@ -6584,6 +8319,12 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/nav/status",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/noodkaart",
    "rol": "member",
    "uitvoer": "schoon"
@@ -6668,9 +8409,27 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/ai/tegoed",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/aidata",
    "rol": "office",
    "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/anker",
+   "rol": "office",
+   "uitvoer": "GEZAKT"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/anker/reken",
+   "rol": "office",
+   "uitvoer": "poort"
   },
   {
    "methode": "POST",
@@ -6998,7 +8757,31 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/bank/regels/geraakt",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/bank/regels/geschiedenis",
+   "rol": "office",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/bank/regels/update",
+   "rol": "office",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/bank/regels/zzp",
+   "rol": "office",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/bank/regels/zzp/update",
    "rol": "office",
    "uitvoer": "schoon"
   },
@@ -7070,6 +8853,24 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/catalogus-wens/besluit",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/catalogus-wensen",
+   "rol": "office",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/claims/poort",
+   "rol": "office",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/clips",
    "rol": "office",
    "uitvoer": "schoon"
@@ -7079,6 +8880,24 @@
    "pad": "/api/office/clips/verwijder",
    "rol": "office",
    "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/commercie/openstaand",
+   "rol": "office",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/commercie/ronde",
+   "rol": "office",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/commercie/zaakabonnementen",
+   "rol": "office",
+   "uitvoer": "schoon"
   },
   {
    "methode": "POST",
@@ -7142,7 +8961,43 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/foundation/registraties",
+   "rol": "office",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/gateway/controleer",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/gateway/zendingen",
+   "rol": "office",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/gezondheid",
+   "rol": "office",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/ghost",
+   "rol": "office",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/handelingen",
+   "rol": "office",
+   "uitvoer": "GEZAKT"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/handhaving",
    "rol": "office",
    "uitvoer": "schoon"
   },
@@ -7263,6 +9118,18 @@
   {
    "methode": "POST",
    "pad": "/api/office/incidenten",
+   "rol": "office",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/instelling/genres",
+   "rol": "office",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/instellingen",
    "rol": "office",
    "uitvoer": "schoon"
   },
@@ -7427,6 +9294,12 @@
    "pad": "/api/office/kantoorpakket/weg",
    "rol": "office",
    "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/kernjournaal",
+   "rol": "office",
+   "uitvoer": "schoon"
   },
   {
    "methode": "POST",
@@ -7706,6 +9579,18 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/partner/regels",
+   "rol": "office",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/pay/bewijs",
+   "rol": "office",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/payroll/aangifte",
    "rol": "office",
    "uitvoer": "poort"
@@ -7779,6 +9664,12 @@
   {
    "methode": "POST",
    "pad": "/api/office/payroll/dossier",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/payroll/herbouw",
    "rol": "office",
    "uitvoer": "poort"
   },
@@ -7880,7 +9771,19 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/payroll/verklaar",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/payroll/verval",
+   "rol": "office",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/platformregister",
    "rol": "office",
    "uitvoer": "schoon"
   },
@@ -7893,6 +9796,24 @@
   {
    "methode": "POST",
    "pad": "/api/office/podium/beslis",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/prijsgarantie",
+   "rol": "office",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/prijsgarantie/afwijzen",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/prijsgarantie/rechtzetten",
    "rol": "office",
    "uitvoer": "poort"
   },
@@ -7919,6 +9840,12 @@
    "pad": "/api/office/rampbeeld/schaal",
    "rol": "office",
    "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/rechten",
+   "rol": "office",
+   "uitvoer": "schoon"
   },
   {
    "methode": "POST",
@@ -8036,7 +9963,91 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/reisaanbod",
+   "rol": "office",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/reisaanbod/weg",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/reisaanbod/zet",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/reisbureau",
+   "rol": "office",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/reisbureau/afwijzen",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/reisbureau/besluit",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/reisbureau/bevestig",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/reisbureau/klaarzetten",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/reisbureau/lees",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/reisbureau/uitnodiging-weg",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/reisbureau/uitnodigingen",
+   "rol": "office",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/rendezvous/meldingen",
+   "rol": "office",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/rendezvous/tafel/maak",
+   "rol": "office",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/rendezvous/tafel/nodig",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/rendezvous/tafels",
    "rol": "office",
    "uitvoer": "schoon"
   },
@@ -8045,6 +10056,18 @@
    "pad": "/api/office/reply",
    "rol": "office",
    "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/routedekking",
+   "rol": "office",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/routedossier",
+   "rol": "office",
+   "uitvoer": "schoon"
   },
   {
    "methode": "POST",
@@ -8092,7 +10115,13 @@
    "methode": "POST",
    "pad": "/api/office/securitylog",
    "rol": "office",
-   "uitvoer": "schoon"
+   "uitvoer": "GEZAKT"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/sociaal",
+   "rol": "office",
+   "uitvoer": "poort"
   },
   {
    "methode": "POST",
@@ -8258,6 +10287,12 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/terugval",
+   "rol": "office",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/theater",
    "rol": "office",
    "uitvoer": "schoon"
@@ -8355,6 +10390,12 @@
   {
    "methode": "POST",
    "pad": "/api/office/vonk/meldingen",
+   "rol": "office",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/voornemens",
    "rol": "office",
    "uitvoer": "schoon"
   },
@@ -8924,6 +10965,12 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/onboarding/bedrijf",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/onboarding/config",
    "rol": "member",
    "uitvoer": "poort"
@@ -8942,6 +10989,24 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/onboarding/inricht",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/onboarding/inrichten",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/onboarding/meebouwen",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/onboarding/opslaan",
    "rol": "member",
    "uitvoer": "schoon"
@@ -8949,6 +11014,12 @@
   {
    "methode": "POST",
    "pad": "/api/onboarding/paspoort",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/onboarding/salonpost",
    "rol": "member",
    "uitvoer": "schoon"
   },
@@ -9195,6 +11266,12 @@
   {
    "methode": "POST",
    "pad": "/api/onderwijs/advies",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/onderwijs/bewijs",
    "rol": "member",
    "uitvoer": "schoon"
   },
@@ -10016,6 +12093,12 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/pay/graaf",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/pay/kascode",
    "rol": "member",
    "uitvoer": "schoon"
@@ -10034,6 +12117,18 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/pay/portefeuille",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/pay/rekening",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/pay/saldo",
    "rol": "member",
    "uitvoer": "poort"
@@ -10041,6 +12136,42 @@
   {
    "methode": "POST",
    "pad": "/api/pay/stuur",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/pay/tegoed",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/pay/tegoed/koop",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/pay/tegoed/terug",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/pay/tegoed/verzilver",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/pay/terug",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/pay/terugstand",
    "rol": "member",
    "uitvoer": "poort"
   },
@@ -10101,6 +12232,42 @@
   {
    "methode": "POST",
    "pad": "/api/pin/zet",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/plaats/dienst",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/plaats/hekken",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/plaats/stand",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/plaats/venster",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/plaats/venster/sluit",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/plaats/waarneem",
    "rol": "member",
    "uitvoer": "poort"
   },
@@ -10262,7 +12429,79 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/reis/invoer/bevestig",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/reis/invoer/lees",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/reis/invoer/mijn",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/reis/invoer/weg",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/reis/landen",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/reis/los",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/reis/los/doe",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/reis/reizen",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/reis/uitnodiging/eisop",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/reis/uitnodiging/mijn",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/reis/uitnodiging/nodig-uit",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/reis/uitnodiging/weg",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/reis/wacht",
    "rol": "member",
    "uitvoer": "poort"
   },
@@ -10544,6 +12783,12 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/rtf/leerling/bewijs",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/rtf/leerling/bijles/gesprek",
    "rol": "member",
    "uitvoer": "poort"
@@ -10556,6 +12801,12 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/rtf/leerling/dag",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/rtf/leerling/examen",
    "rol": "member",
    "uitvoer": "poort"
@@ -10563,6 +12814,18 @@
   {
    "methode": "POST",
    "pad": "/api/rtf/leerling/examen-antwoord",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leerling/herhaal",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leerling/herhalen",
    "rol": "member",
    "uitvoer": "poort"
   },
@@ -10593,6 +12856,12 @@
   {
    "methode": "POST",
    "pad": "/api/rtf/leerling/oefen",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leerling/pad",
    "rol": "member",
    "uitvoer": "poort"
   },
@@ -10629,6 +12898,12 @@
   {
    "methode": "POST",
    "pad": "/api/rtf/profielen",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/uitnodiging/accepteer",
    "rol": "member",
    "uitvoer": "poort"
   },
@@ -10761,12 +13036,6 @@
   {
    "methode": "POST",
    "pad": "/api/rtfkantoor/stadsraad/stem",
-   "rol": "office",
-   "uitvoer": "poort"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/rtfos/",
    "rol": "office",
    "uitvoer": "poort"
   },
@@ -11637,6 +13906,12 @@
   {
    "methode": "POST",
    "pad": "/api/rtgid/machtig/intrek",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtgid/stapop/opties",
    "rol": "member",
    "uitvoer": "poort"
   },
@@ -12632,6 +14907,12 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/abonnement",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/accountant",
    "rol": "supplier",
    "uitvoer": "poort"
@@ -12651,6 +14932,42 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/activiteit",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/activiteit/open",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/activiteit/sluit",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/advies",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/advies/afspraak",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/advies/dossier",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/advies/dossier/status",
    "rol": "supplier",
    "uitvoer": "poort"
   },
@@ -12676,7 +14993,7 @@
    "methode": "POST",
    "pad": "/api/supplier/agenda/verwijder",
    "rol": "supplier",
-   "uitvoer": "poort"
+   "uitvoer": "schoon"
   },
   {
    "methode": "POST",
@@ -12813,6 +15130,42 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/bank/zakelijk",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/beauty",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/beauty/boek",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/beauty/status",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/beauty/uren",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/beauty/walkin",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/beauty/walkin/status",
    "rol": "supplier",
    "uitvoer": "poort"
   },
@@ -13154,6 +15507,18 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/btw/afsluiting",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/btw/herbouw",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/btw/indienen",
    "rol": "supplier",
    "uitvoer": "poort"
@@ -13179,6 +15544,18 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/btw/opmaken",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/btw/preflight",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/btw/verklaar",
    "rol": "supplier",
    "uitvoer": "poort"
   },
@@ -13688,6 +16065,30 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/eten/capaciteit",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/eten/instellingen",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/eten/status",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/eten/werkblad",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/event",
    "rol": "supplier",
    "uitvoer": "poort"
@@ -13784,6 +16185,54 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/fitclub",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/fitclub/baan",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/fitclub/checkin",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/fitclub/checkout",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/fitclub/les/in",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/fitclub/lid",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/fitclub/pt",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/fitclub/pt/status",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/fleet",
    "rol": "supplier",
    "uitvoer": "poort"
@@ -13797,6 +16246,30 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/gastlocaties",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/gateway/mandaat",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/gateway/mandaat/intrek",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/gateway/mandaten",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/gateway/zendingen",
    "rol": "supplier",
    "uitvoer": "schoon"
   },
@@ -13994,6 +16467,48 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/golf",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/golf/baan",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/golf/les",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/golf/les/klaar",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/golf/tee",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/golf/tee/weg",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/golf/wedstrijd/in",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/groothandel/functie",
    "rol": "supplier",
    "uitvoer": "poort"
@@ -14114,6 +16629,12 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/horeca/bar",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/horeca/betaal",
    "rol": "supplier",
    "uitvoer": "poort"
@@ -14217,6 +16738,12 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/horeca/dagbeeld",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/dienstmeting",
    "rol": "supplier",
    "uitvoer": "schoon"
   },
@@ -14384,6 +16911,24 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/horeca/gezelschap",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/gezelschap/stoel",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/gezelschap/stoel/weg",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/horeca/haccp/afvinken",
    "rol": "supplier",
    "uitvoer": "poort"
@@ -14462,6 +17007,12 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/horeca/kaart",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/horeca/keuken/bord",
    "rol": "supplier",
    "uitvoer": "schoon"
@@ -14483,6 +17034,12 @@
    "pad": "/api/supplier/horeca/keuken/stand",
    "rol": "supplier",
    "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/keuken/stappen",
+   "rol": "supplier",
+   "uitvoer": "schoon"
   },
   {
    "methode": "POST",
@@ -14528,6 +17085,12 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/horeca/offline/handelingen",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/horeca/offline/sync",
    "rol": "supplier",
    "uitvoer": "poort"
@@ -14540,6 +17103,36 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/horeca/pas/gereed",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/pas/los",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/pas/overneem",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/pas/pak",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/pas/uit",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/horeca/pols",
    "rol": "supplier",
    "uitvoer": "schoon"
@@ -14547,6 +17140,36 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/horeca/pols/zet",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/rahul/bevestig",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/rahul/bonnen",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/rahul/doe",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/rahul/grens",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/rahul/register",
    "rol": "supplier",
    "uitvoer": "schoon"
   },
@@ -14582,6 +17205,12 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/horeca/rekening/regel/stoel",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/horeca/rekening/regel/weg",
    "rol": "supplier",
    "uitvoer": "poort"
@@ -14589,6 +17218,12 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/horeca/rekening/splits",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/rekening/verdeel",
    "rol": "supplier",
    "uitvoer": "poort"
   },
@@ -14667,6 +17302,78 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/horeca/wave/voorstel",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/werklijst",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/wijk/aanvaard",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/wijk/bied",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/wijk/gezien",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/wijk/laat",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/wijk/neem",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/wijk/tafel-terug",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/wijk/trek-in",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/wijk/weg",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/wijk/weiger",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/wijk/zet",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/wijken",
    "rol": "supplier",
    "uitvoer": "schoon"
   },
@@ -15170,6 +17877,24 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/kosten",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/kosten/herkomst",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/kosten/vooruitblik",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/leave/decide",
    "rol": "supplier",
    "uitvoer": "poort"
@@ -15177,6 +17902,12 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/lijn",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/link/cap/aanvaard",
    "rol": "supplier",
    "uitvoer": "poort"
   },
@@ -15704,6 +18435,18 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/nav/event",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/nav/events",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/net/bericht",
    "rol": "supplier",
    "uitvoer": "poort"
@@ -15765,6 +18508,42 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/oog/overzicht",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/opvang",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/opvang/kind",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/opvang/kind/ophaal",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/opvang/nanny",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/opvang/nanny/zet",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/opvang/verslag",
    "rol": "supplier",
    "uitvoer": "poort"
   },
@@ -15884,6 +18663,24 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/pay/budget",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/pay/budget/lijst",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/pay/graaf",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/pay/in",
    "rol": "supplier",
    "uitvoer": "poort"
@@ -15896,7 +18693,73 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/pay/tegoed",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/pay/tegoed/terug",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/pay/tegoed/zet",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/pay/treasury",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/pay/treasury/apart",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/pay/treasury/vrij",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/pay/treasury/zet",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/pay/uitbetaal",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/pay/vastleg",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/pay/vooraf",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/pay/vooraf/lijst",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/pay/vrijgeef",
    "rol": "supplier",
    "uitvoer": "poort"
   },
@@ -15962,6 +18825,60 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/petcare",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/petcare/checkin",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/petcare/checkuit",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/petcare/notitie",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/petcare/ronde",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/petcare/ronde/hond",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/petcare/ronde/klaar",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/petcare/trim",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/petcare/trim/klaar",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/photo/add",
    "rol": "supplier",
    "uitvoer": "poort"
@@ -15971,6 +18888,24 @@
    "pad": "/api/supplier/photo/remove",
    "rol": "supplier",
    "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/polis",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/polis/vraag",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/polis/zet",
+   "rol": "supplier",
+   "uitvoer": "poort"
   },
   {
    "methode": "POST",
@@ -16035,6 +18970,24 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/price",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/prijsgarantie",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/prijsgarantie/betwist",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/prijsgarantie/erken",
    "rol": "supplier",
    "uitvoer": "poort"
   },
@@ -16184,6 +19137,12 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/retail/annuleer",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/retail/apart",
    "rol": "supplier",
    "uitvoer": "poort"
@@ -16193,6 +19152,12 @@
    "pad": "/api/supplier/retail/artikel",
    "rol": "supplier",
    "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/retail/bon",
+   "rol": "supplier",
+   "uitvoer": "schoon"
   },
   {
    "methode": "POST",
@@ -16251,6 +19216,24 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/retail/zoek",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/retour/lijst",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/retour/uitvoeren",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/retour/zet",
    "rol": "supplier",
    "uitvoer": "poort"
   },
@@ -16340,13 +19323,151 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/rtmail/afwezig",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/alias",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/antwoord",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/rtmail/assist",
    "rol": "supplier",
    "uitvoer": "schoon"
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/rtmail/bewaarbeleid",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/bewaartermijn",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/bewaring",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/bijlage",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/bijlagen",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/rtmail/btw-herinner",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/concept/bewaar",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/concept/verstuur",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/concept/weg",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/concepten",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/delegatie/weg",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/delegeer",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/draad",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/etiket",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/export",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/gesprekken",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/handtekening",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/hulp",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/imap/intrekken",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/imap/sleutel",
+   "rol": "supplier",
+   "uitvoer": "GEZAKT"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/imap/sleutels",
    "rol": "supplier",
    "uitvoer": "schoon"
   },
@@ -16364,6 +19485,18 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/rtmail/instellingen",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/journaal",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/rtmail/lees",
    "rol": "supplier",
    "uitvoer": "poort"
@@ -16376,7 +19509,73 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/rtmail/opruimen",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/rechten",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/regel/maak",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/regel/weg",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/regel/zet",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/regels",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/sluimer",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/ster",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/rtmail/stuur",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/vak",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/vernietigingen",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/verplaats",
    "rol": "supplier",
    "uitvoer": "poort"
   },
@@ -16385,6 +19584,12 @@
    "pad": "/api/supplier/rtmail/verzonden",
    "rol": "supplier",
    "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/zoek",
+   "rol": "supplier",
+   "uitvoer": "poort"
   },
   {
    "methode": "POST",
@@ -16485,6 +19690,18 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/samenwerking/voorstel",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/scenario/omzet",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/scenario/personeel",
    "rol": "supplier",
    "uitvoer": "poort"
   },
@@ -16713,6 +19930,12 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/tafelticket/afrekenen",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/talent/match",
    "rol": "supplier",
    "uitvoer": "poort"
   },
@@ -16994,6 +20217,12 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/verbintenis",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/verblijf/beslis",
    "rol": "supplier",
    "uitvoer": "poort"
@@ -17045,6 +20274,30 @@
    "pad": "/api/supplier/verkoop/overzicht",
    "rol": "supplier",
    "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/verkoopweg/lijst",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/verkoopweg/publiceer",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/verkoopweg/wis",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/verkoopweg/zet",
+   "rol": "supplier",
+   "uitvoer": "poort"
   },
   {
    "methode": "POST",
@@ -17150,6 +20403,36 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/weddings",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/weddings/event",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/weddings/event/status",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/weddings/taak",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/weddings/taak/klaar",
+   "rol": "supplier",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/wensen",
    "rol": "supplier",
    "uitvoer": "schoon"
@@ -17175,6 +20458,12 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/werkbeleid/zet",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/werkmail/adressen",
    "rol": "supplier",
    "uitvoer": "schoon"
   },
@@ -17373,6 +20662,12 @@
   {
    "methode": "POST",
    "pad": "/api/suppliers",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/tenant/bootstrap/mijn",
    "rol": "member",
    "uitvoer": "poort"
   },
@@ -18135,6 +21430,18 @@
   {
    "methode": "POST",
    "pad": "/api/vonk/blokkeer",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/vonk/halfweg",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/vonk/kies",
    "rol": "member",
    "uitvoer": "poort"
   },

@@ -120,7 +120,17 @@ test('8 - de rand van het platform staat apart geteld', () => {
   /* Aan de rand is `onbekend` al verboden en is de verklaring structureel. Die
      bij de routes optellen zou de dekking mooier maken dan hij is. */
   const r = M.meet();
-  assert.equal(r.gemeten.randVerklaard, 6, 'de zes methodes van de brug');
+  /* HET GETAL VOLGT DE BRUG en wordt niet overgetypt. Hier stond 6, de stand van
+     de brug op de dag dat deze toets werd geschreven; toen de arena erbij kwam
+     (drie methodes) zakte hij op een getal dat alleen nog van gisteren was.
+     Dezelfde fout stond in test/naslag.test.js. Wat deze regel moet vastzetten
+     is dat de rand VOLLEDIG verklaard is -- elke methode van de brug, niet
+     hoeveel dat er zijn. */
+  const brugmethodes = Object.keys(require('../server/kern/appstore/brugmethodes')
+    .maakMethodes({ opslag: {}, bakjes: {} }, {}) || {}).length;
+  assert.equal(r.gemeten.randVerklaard, brugmethodes,
+    'elke methode van de brug is aan de rand verklaard');
+  assert.ok(brugmethodes >= 6, 'en dat zijn er minstens zoveel als toen deze toets werd geschreven');
   for (const m of r.rand) assert.ok(m.klasse && m.klasse !== 'onbekend', m.naam + ' hoort een echte klasse te dragen');
   assert.ok(!r.verklaard.some(x => x.pad === 'bericht.zet'), 'de rand hoort niet tussen de routes te staan');
 });

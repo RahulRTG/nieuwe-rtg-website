@@ -24,6 +24,7 @@
    voorkomen. Het beeld kiest per dag welke het gebruikt, en zegt welke. */
 
 const { magHerkomst, rangVan } = require('./herkomst');
+const klok = require('../lib/klok');
 
 const DAG = 86400000;
 const VENSTER = 7;          // waarover we een gemiddelde tonen
@@ -50,7 +51,7 @@ const dagVan = d => new Date(d).toISOString().slice(0, 10);
 /* Het beeld over het venster. Het aantal dagen dat ECHT is ingevuld gaat mee
    naar buiten: een gemiddelde over een enkele nacht is geen weekbeeld, en een
    scherm dat dat verschil niet krijgt, kan het ook niet tonen. */
-function beeldVan(rijen, onderwerp, nu = new Date()) {
+function beeldVan(rijen, onderwerp, nu = klok.datum()) {
   const vanaf = dagVan(new Date(nu.getTime() - (VENSTER - 1) * DAG));
   const vandaag = dagVan(nu);
   const inVenster = rijen.filter(r => r.op >= vanaf && r.op <= vandaag);
@@ -93,7 +94,7 @@ module.exports = ({ db, save }) => {
   const vanLid = key => { const b = bak(); if (!b[key]) b[key] = {}; return b[key]; };
   const rijenVan = (key, onderwerp) => { const l = vanLid(key); if (!l[onderwerp]) l[onderwerp] = []; return l[onderwerp]; };
 
-  function metingenVan(key, nu = new Date()) {
+  function metingenVan(key, nu = klok.datum()) {
     const uit = {};
     for (const naam of Object.keys(ONDERWERPEN)) uit[naam] = beeldVan(rijenVan(key, naam), naam, nu);
     return { ok: true, onderwerpen: ONDERWERPEN, beeld: uit, vandaag: dagVan(nu) };
@@ -103,7 +104,7 @@ module.exports = ({ db, save }) => {
      gekoppelde apparaat. De herkomst komt van de DEUR en nooit uit de body --
      anders kan wie zelf invult zijn eigen schatting als apparaatmeting boeken,
      en dan is het hele onderscheid weg. */
-  function metingSchrijf(key, body, bron, nu = new Date(), door = null) {
+  function metingSchrijf(key, body, bron, nu = klok.datum(), door = null) {
     const onderwerp = String(body.onderwerp || '');
     const def = ONDERWERPEN[onderwerp];
     if (!def) return { status: 404, error: 'Dit meet RTG niet.' };
@@ -132,13 +133,13 @@ module.exports = ({ db, save }) => {
   }
 
   // de twee deuren; de herkomst zit in de deur en niet in het verzoek
-  const metingZet = (key, body, nu = new Date()) => metingSchrijf(key, body, 'zelf', nu);
-  const metingVanToestel = (key, body, nu = new Date()) => metingSchrijf(key, body, 'apparaat', nu);
-  const metingVanBehandelaar = (key, body, door, nu = new Date()) => metingSchrijf(key, body, 'behandelaar', nu, door);
+  const metingZet = (key, body, nu = klok.datum()) => metingSchrijf(key, body, 'zelf', nu);
+  const metingVanToestel = (key, body, nu = klok.datum()) => metingSchrijf(key, body, 'apparaat', nu);
+  const metingVanBehandelaar = (key, body, door, nu = klok.datum()) => metingSchrijf(key, body, 'behandelaar', nu, door);
 
   /* Weghalen hoort erbij: wie een verkeerde nacht invult, moet hem kunnen
      wissen en niet alleen kunnen overschrijven met een leugen. */
-  function metingWeg(key, body, nu = new Date()) {
+  function metingWeg(key, body, nu = klok.datum()) {
     const onderwerp = String(body.onderwerp || '');
     if (!ONDERWERPEN[onderwerp]) return { status: 404, error: 'Dit meet RTG niet.' };
     const op = String(body.op || dagVan(nu));

@@ -82,8 +82,21 @@ module.exports = (ctx) => {
       boekingen: grootboek().filter(r => r.van === rek || r.naar === rek).slice(0, 30)
     };
   }
+  /* WAAR HET GELD HEEN GAAT, EN DAT WERD NIET GEVRAAGD. Nagespeeld met de
+     echte modules: deze functie maakte de opdracht zonder `bestemming`, en dat
+     is precies het veld dat naar de rail gaat (server.js: `iban: o.bestemming`).
+     Bij een lege iban reserveert server/betaal.js en verstuurt hij niet, maar
+     het saldo was hieronder AL afgeboekt: wallet leeg, opdracht op INGEDIEND,
+     geen IBAN genoemd. Nu eerst vragen, dan pas het saldo aanraken. */
   async function partnerUitbetaal({ supplierCode, idem }) {
     const rek = rekPartner(supplierCode);
+    const heen = ctx.zaakRekening ? ctx.zaakRekening(supplierCode) : null;
+    if (!heen || !heen.iban) {
+      return { status: 409,
+        error: 'Er staat geen bankrekening voor deze zaak. Zonder rekening zou het saldo van de wallet af gaan zonder ergens aan te komen, en dat gebeurt hier niet.',
+        reden: (heen && heen.reden) || 'geen-rekening',
+        saldo: saldoVan(rek) };
+    }
     /* BESCHIKBAAR EN NIET HET SALDO, en dat is geld-veiligheid en geen detail.
        Wat de zaak zelf apart heeft gezet voor de btw of de loonrun
        (kern/pay/treasury.js) hoort niet mee de deur uit, en een borg die zij bij
@@ -135,14 +148,17 @@ module.exports = (ctx) => {
          "in behandeling" en niet "gelukt" -- dat is wat we werkelijk weten. */
       const op = opdrachten.maak({
         soort: 'pay-uit', rail: 'betaalnaad', centen: c, bron: rek, begunstigde: supplierCode,
-        oms: 'RTG Pay uitbetaling', ledgerRef: b.boeking.id,
+        oms: 'RTG Pay uitbetaling', ledgerRef: b.boeking.id, bestemming: heen.iban,
         /* De sleutel hing aan nu(), dus elke poging kreeg er een andere en twee
            klikken waren twee uitbetalingen. Hij hangt nu aan de BOEKING: die is
            er precies een per uitbetaling. */
         idemSleutel: 'pay-uit:' + supplierCode + ':' + (idem || b.boeking.id)
       });
       const na = await opdrachten.dienIn(op);
-      return { ok: true, uitbetaald: c, restant: saldoVan(rek), opdrachtId: op.id, opdrachtStatus: na.status };
+      /* Uit de OPDRACHT en niet uit `heen`: zo zakt de toets zodra de
+         bestemming er niet op meegaat -- de fout die hier zat. */
+      return { ok: true, uitbetaald: c, restant: saldoVan(rek), opdrachtId: op.id, opdrachtStatus: na.status,
+        naarRekening: na.bestemming ? String(na.bestemming).slice(-4) : null };
     });
   }
 

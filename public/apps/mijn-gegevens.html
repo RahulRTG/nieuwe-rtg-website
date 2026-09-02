@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Wat weet RTG van mij</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+  :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--card2:var(--rtg-card2);--line:var(--rtg-line);
+    --txt:var(--rtg-txt);--soft:var(--rtg-soft);--gold:#C9A24B;--rood:#DE6E92;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;min-height:100dvh;}
+  .kop{display:flex;align-items:center;gap:0.7rem;padding:calc(env(safe-area-inset-top,0px) + 0.9rem) 1.1rem 0.6rem;}
+  .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.35rem;}
+  .kop .rek{flex:1;}
+  .kop a{color:var(--txt);text-decoration:none;font-size:1.1rem;min-width:24px;min-height:24px;
+    display:inline-flex;align-items:center;justify-content:center;}
+  main{padding:0 1.1rem calc(env(safe-area-inset-bottom,0px) + 3rem);max-width:660px;margin:0 auto;}
+  h2{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);margin:1.7rem 0 0.6rem;}
+  .stil{color:var(--soft);font-size:0.82rem;line-height:1.6;}
+
+  /* DE TELLING, EN MET OPZET DRIE GETALLEN EN GEEN PERCENTAGE. Een samengesteld
+     cijfer telt een telefoonnummer even zwaar als een identiteitsbewijs, en
+     LAT-regel 11 verbiedt het bovendien. "Onbekend" staat er even groot bij als
+     de andere twee -- weglaten zou hem als een nee laten lezen. */
+  .telling{display:flex;gap:1.6rem;border:1px solid var(--line);background:var(--card);padding:1rem 1.15rem;margin-top:0.9rem;}
+  .telling div{flex:1;}
+  .telling b{display:block;font-family:'Bodoni Moda',serif;font-size:1.6rem;font-weight:600;line-height:1.1;}
+  .telling span{font-size:0.66rem;letter-spacing:0.13em;text-transform:uppercase;color:var(--soft);}
+
+  /* GEEN .rij MAAR .gegevensrij, en dat is een botsing en geen smaak. Dit huis
+     heeft een gedeelde woordenschat (rtg-ui.css: .kaart, .knop, .rij ...) en
+     daar is `body.rtg-stijl .rij` een FLEXRIJ met gap. Die regel (0,2,0) won
+     van deze pagina (0,1,0), dus de drie vragen onder een gegeven -- waarvoor,
+     waar, hoe het bij ons kwam -- kwamen NAAST elkaar te staan in plaats van
+     onder elkaar. Op een telefoon van 390 breed werd de pagina daardoor 726
+     breed (gemeten in de a11y-ronde: "te breed door div.weg, rechterrand op
+     726"). Een eigen naam is de goedkoopste reparatie die niet stuk kan door de
+     volgende gedeelde regel. */
+  .gegevensrij{background:var(--card);border:1px solid var(--line);padding:1.1rem;margin:0.6rem 0;}
+  .rijkop{display:flex;align-items:baseline;gap:0.6rem;flex-wrap:wrap;}
+  .rijkop .naam{font-family:'Bodoni Moda',serif;font-size:1.05rem;flex:1;}
+  .vlag{font-size:0.62rem;letter-spacing:0.13em;text-transform:uppercase;white-space:nowrap;}
+  /* De leestoon en niet het accent: --gold is een vulkleur en las als label
+     2,8:1 op parelmoer (champagne) en 3,4:1 op fluweel (bordeaux); de a11y-
+     themaronde vond het. --rtg-leesgoud is per thema de goudtoon die LEEST. */
+  .vlag.ja{color:var(--rtg-leesgoud,var(--gold));}
+  .vlag.nee{color:var(--soft);}
+  /* Onbekend krijgt zijn eigen gezicht en niet dat van "nee". Dat verschil IS
+     het punt van deze kaart. */
+  .vlag.onbekend{color:var(--rood);}
+  .feit{display:flex;gap:0.7rem;padding:0.55rem 0 0;font-size:0.8rem;line-height:1.5;}
+  .feit i{width:10px;height:1px;background:var(--gold);flex:0 0 auto;margin-top:0.6rem;}
+  .feit b{font-weight:600;}
+  .feit span{color:var(--soft);}
+  .waarom{border-left:2px solid var(--rood);padding:0.4rem 0 0.4rem 0.7rem;margin-top:0.7rem;
+    font-size:0.78rem;line-height:1.5;color:var(--soft);}
+  /* DE DOELEN. Een lijst, geen kaartjes: het gaat om het VERSCHIL tussen de
+     regels (vast of keuze), en dat verschil verdrinkt in vier randjes. */
+  .doelen{border-top:1px solid var(--line);margin-top:0.85rem;padding-top:0.7rem;}
+  .doelen h4{font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);margin-bottom:0.5rem;}
+  .doel{display:flex;gap:0.7rem;padding:0.4rem 0;font-size:0.79rem;line-height:1.5;}
+  .doel b{font-weight:600;}
+  .doel span{color:var(--soft);display:block;margin-top:0.15rem;}
+  /* Het merkteken links zegt in een oogopslag of hier iets te kiezen valt.
+     Goud is een keuze, grijs is het niet -- en dat verschil is de hele reden
+     dat deze lijst er staat. */
+  .doel i{width:10px;height:1px;flex:0 0 auto;margin-top:0.6rem;background:var(--soft);}
+  .doel.keuze i{background:var(--gold);height:3px;margin-top:0.55rem;}
+  .weg{border-top:1px solid var(--line);margin-top:0.85rem;padding-top:0.7rem;font-size:0.79rem;line-height:1.55;}
+  .weg.vast{color:var(--soft);}
+  .weg b{font-weight:600;color:var(--txt);}
+
+  .grens{border:1px solid var(--line);padding:0.85rem 1rem;margin:0.6rem 0;font-size:0.8rem;line-height:1.6;}
+  .grens b{font-weight:600;}
+  .grens span{color:var(--soft);display:block;margin-top:0.2rem;}
+  .let{border:1px solid var(--line);border-left:3px solid var(--gold);background:var(--card2);
+    padding:0.85rem 1rem;margin:0.9rem 0;font-size:0.8rem;line-height:1.6;}
+  details summary{cursor:pointer;font-size:0.74rem;color:var(--soft);padding:0.6rem 0;min-height:24px;
+    display:flex;align-items:center;gap:0.5rem;list-style:none;}
+  details summary::-webkit-details-marker{display:none;}
+  details summary::before{content:'+';font-size:0.9rem;line-height:1;width:0.9rem;text-align:center;color:var(--gold);}
+  details[open] summary::before{content:'\2013';}
+  details[open] summary{color:var(--txt);}
+  @media (prefers-reduced-motion: reduce){ *{transition:none !important;} }
+</style>
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<script src="/shared/seizoen.js" defer></script>
+<link href="/shared/ios.css" rel="stylesheet">
+</head>
+<body class="rtg-stijl">
+<header class="kop">
+  <a href="/apps/app.html" aria-label="Terug naar de app">&#8592;</a>
+  <h1>Wat weet RTG van mij</h1>
+  <span class="rek"></span>
+</header>
+<main>
+  <p class="stil" id="uitleg">Bezig met ophalen&#8230;</p>
+  <div id="telling"></div>
+  <div id="lijst"></div>
+  <div id="opheffen"></div>
+  <div id="grenzen"></div>
+</main>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const token = (() => { try { return localStorage.getItem('rtg_member_token'); } catch (e) { return null; } })();
+  const api = (pad, body) => fetch(pad, { method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
+    body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+  const maak = (tag, klas) => { const e = document.createElement(tag); if (klas) e.className = klas; return e; };
+  const tekst = (el, t) => { el.textContent = t; return el; };
+
+  const VLAG = {
+    true:  { klas: 'ja', woord: 'RTG heeft dit' },
+    false: { klas: 'nee', woord: 'RTG heeft dit niet' },
+    null:  { klas: 'onbekend', woord: 'Niet vast te stellen' }
+  };
+
+  function feit(label, wat, uitleg) {
+    const el = maak('div', 'feit');
+    el.appendChild(maak('i'));
+    const t = maak('div');
+    t.appendChild(tekst(maak('b'), label + ': '));
+    t.appendChild(document.createTextNode(wat));
+    if (uitleg) t.appendChild(tekst(maak('span'), ' ' + uitleg));
+    el.appendChild(t);
+    return el;
+  }
+
+  function rijVoor(r) {
+    const el = maak('article', 'gegevensrij');
+    const kop = maak('div', 'rijkop');
+    kop.appendChild(tekst(maak('span', 'naam'), r.naam));
+    const v = VLAG[String(r.aanwezig)];
+    kop.appendChild(tekst(maak('span', 'vlag ' + v.klas), v.woord));
+    el.appendChild(kop);
+
+    /* De drie vragen onder elkaar, en met opzet los: waar iets staat, hoe het
+       bij ons kwam en waarvoor het mag worden gebruikt lopen uit elkaar. Een
+       kaart die ze samenvat, wist juist het verschil weg waar iemand naar
+       zoekt. */
+    el.appendChild(feit('Waarvoor', r.doel));
+    el.appendChild(feit('Waar', r.waarUitleg));
+    el.appendChild(feit('Hoe het bij ons kwam', r.herkomstUitleg));
+
+    /* Een onbekende die je pas onderaan de pagina kunt verklaren, wordt gelezen
+       als een nee. Dus staat de reden hier, bij de rij zelf. */
+    if (r.waarom) el.appendChild(tekst(maak('div', 'waarom'), r.waarom));
+    /* EEN NEE DIE NIET ALLES ZEGT. Bij de facturen is "RTG heeft dit niet" maar
+       de helft: zodra er een komt, geldt de bewaarplicht meteen. Die tweede
+       helft komt alleen bij een harde nee -- bij onbekend zou hij een
+       afwezigheid bevestigen die niet is vastgesteld. */
+    if (r.bijAfwezig) el.appendChild(tekst(maak('div', 'waarom'), r.bijAfwezig));
+
+    /* WAARVOOR DIT GEGEVEN GEBRUIKT MAG WORDEN, uit de laag die het ook
+       afdwingt. De regel `Waarvoor:` hierboven blijft als samenvatting staan;
+       deze lijst is wat er werkelijk geldt. */
+    if ((r.doelen || []).length) {
+      const dl = maak('div', 'doelen');
+      dl.appendChild(tekst(maak('h4'), 'Waarvoor RTG dit gebruikt'));
+      for (const d of r.doelen) {
+        const el = maak('div', 'doel' + (d.weigerbaar ? ' keuze' : ''));
+        el.appendChild(maak('i'));
+        const t = maak('div');
+        t.appendChild(tekst(maak('b'), d.naam));
+        /* De grond staat erbij en niet als aparte kolom: WAAROM iets niet te
+           weigeren is, is het antwoord op de vraag die een lid hier stelt. Een
+           lijst met alleen namen laat hem denken dat alles een knop is. */
+        t.appendChild(tekst(maak('span'), d.wat + ' ' + d.grondUitleg));
+        el.appendChild(t);
+        dl.appendChild(el);
+      }
+      el.appendChild(dl);
+    }
+
+    const weg = maak('div', 'weg' + (r.weg.kan ? '' : ' vast'));
+    weg.appendChild(tekst(maak('b'), r.weg.kan ? 'Weghalen kan. ' : 'Dit kan niet weg. '));
+    weg.appendChild(document.createTextNode(r.weg.kan ? r.weg.hoe : r.weg.reden));
+    if (r.weg.grondUitleg) { weg.appendChild(maak('br')); weg.appendChild(tekst(maak('span'), r.weg.grondUitleg)); }
+    /* De termijn komt uit het bewaarbeleid en staat er als GETAL bij. "Blijft
+       staan" zonder hoe lang, laat een mens denken dat het altijd is -- en bij
+       het inzagejournaal was dat precies de fout die deze regel repareert. */
+    if (r.termijn) {
+      weg.appendChild(maak('br'));
+      weg.appendChild(tekst(maak('span'), r.termijn.bekend
+        ? 'Bewaartermijn: ' + r.termijn.inWoorden + ' \u2014 ' + r.termijn.waarom + '.'
+        : r.termijn.waarom));
+    }
+    el.appendChild(weg);
+    return el;
+  }
+
+  function toon(k) {
+    $('#uitleg').textContent = k.uitleg;
+
+    const t = $('#telling'); t.textContent = '';
+    const bak = maak('div', 'telling');
+    for (const [n, w] of [[k.telling.aanwezig, 'heeft RTG'], [k.telling.afwezig, 'heeft RTG niet'],
+                          [k.telling.onbekend, 'niet vast te stellen']]) {
+      const d = maak('div');
+      d.appendChild(tekst(maak('b'), String(n)));
+      d.appendChild(tekst(maak('span'), w));
+      bak.appendChild(d);
+    }
+    t.appendChild(bak);
+
+    const lijst = $('#lijst'); lijst.textContent = '';
+    lijst.appendChild(tekst(maak('h2'), 'Per soort gegeven'));
+    for (const r of k.rijen) lijst.appendChild(rijVoor(r));
+
+    /* WAT ER BLIJFT ALS U OPHEFT. Dit is het antwoord op de vraag waarmee de
+       meeste mensen hier komen, en het is nee -- maar alleen om deze twee. Het
+       staat apart van "kan niet los weg", want die twee door elkaar halen laat
+       iemand denken dat zijn naam net zo lang blijft staan als zijn facturen. */
+    const o = $('#opheffen'); o.textContent = '';
+    o.appendChild(tekst(maak('h2'), 'Als u uw account opheft'));
+    o.appendChild(tekst(maak('p', 'stil'),
+      'Er gebeuren dan drie dingen, en ze zijn niet hetzelfde: het meeste gaat weg, twee dingen blijven met een termijn, en van wat in het werk van een ander zit wordt u eruit gehaald.'));
+    for (const b of k.naOpheffen) {
+      const d = maak('div', 'grens');
+      d.appendChild(tekst(maak('b'), b.naam + (b.termijn && b.termijn.bekend ? ' \u2014 nog ' + b.termijn.inWoorden : '')));
+      d.appendChild(tekst(maak('span'), b.reden));
+      o.appendChild(d);
+    }
+    /* DE DERDE UITKOMST. kern/vergeten.js kent hem als "de persoon eruit, de
+       rest blijft"; het scherm noemde hem niet, en dan leest "alles gaat weg"
+       als een belofte die je later je eigen zin nog ziet tegenspreken. */
+    if (k.geanonimiseerd) {
+      const g = maak('div', 'let');
+      g.appendChild(tekst(maak('b'), 'En wat van u in het werk van een ander zit'));
+      g.appendChild(maak('br'));
+      g.appendChild(document.createTextNode(k.geanonimiseerd.hoe + ' ' + k.geanonimiseerd.waarom));
+      o.appendChild(g);
+    }
+    const d2 = maak('details');
+    d2.appendChild(tekst(maak('summary'), 'Wat niet los weg kan zolang uw account bestaat (' + k.accountNodig.length + ')'));
+    for (const b of k.accountNodig) {
+      const g = maak('div', 'grens');
+      g.appendChild(tekst(maak('b'), b.naam));
+      g.appendChild(tekst(maak('span'), b.reden));
+      d2.appendChild(g);
+    }
+    o.appendChild(d2);
+
+    const gr = $('#grenzen'); gr.textContent = '';
+    gr.appendChild(tekst(maak('h2'), 'Wat deze kaart niet zegt'));
+    for (const g of k.grenzen) {
+      const d = maak('div', 'grens');
+      d.appendChild(tekst(maak('b'), g.naam));
+      d.appendChild(tekst(maak('span'), g.reden));
+      gr.appendChild(d);
+    }
+  }
+
+  async function laad() {
+    const r = await api('/api/mijn/gegevens', {});
+    if (r.status === 401) { $('#uitleg').textContent = 'Log in om dit te zien.'; return; }
+    if (r.body.error) { $('#uitleg').textContent = r.body.error; return; }
+    toon(r.body);
+  }
+
+  laad();
+})();
+</script>
+<script src="/shared/toestelsleutel.js"></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+</body>
+</html>

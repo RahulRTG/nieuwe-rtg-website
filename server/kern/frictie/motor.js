@@ -1,15 +1,27 @@
 /* DE RISICOMOTOR EN DE VERTROUWENSROUTE -- hoeveel controle hoort bij deze
    handeling, en mag de machine hem zelf doen?
 
-   DIT IS DE ONTWERPREGEL VAN DE HELE LAAG, in code. Elke functie in RTG Command
-   bestaat op drie niveaus:
+   HIJ WOONDE IN server/kern/command/, EN DAT WAS TE KLEIN. De motor rekent
+   frictie uit op een manier die nergens iets met Command te maken heeft --
+   grondslag, bedrag, aantal, omkeerbaarheid, zekerheid -- maar hij stond in de
+   map van een van zijn lezers. Daardoor bouwde het AI-stuur zijn eigen,
+   armere model (kern/stuur/beleid.js: twee standen op een statische padlijst,
+   zonder bedrag en zonder context) in plaats van deze aan te roepen. Twee
+   plekken met dezelfde waarheid, precies de vorm van LAT.md regel 4.
+
+   Sinds de verhuizing naar kern/frictie/ heeft hij een tweede roeper, en is
+   ./bodem.js erbij gekomen -- de ondergrens die deze motor NIET zelf kan
+   bedenken, omdat niet elke drempel in dit huis uit risico voortkomt.
+
+   DIT IS DE ONTWERPREGEL VAN DE HELE LAAG, in code. Elke handeling die de
+   machine kan raken bestaat op drie niveaus:
 
      hand    een mens doet het zelf
      assist  de machine bereidt het voor, een mens drukt af
      auto    de machine doet het volledig, binnen beleid
 
    Welk niveau geldt, is GEEN eigenschap van de knop maar van de handeling plus
-   zijn omstandigheden. Dezelfde handeling ("betaling opnieuw proberen") mag
+   zijn omstandigheden -- met een ondergrens die wel vastligt (./bodem.js). Dezelfde handeling ("betaling opnieuw proberen") mag
    autonoom bij €12 en nooit autonoom bij €120.000. Daarom rekent deze motor
    het per geval uit en zet geen vaste labels in het scherm.
 
@@ -35,7 +47,7 @@
    scripts/gezag.js telt die losse namen daarom, en hangt er een ratel aan. Wie
    een trede nodig heeft, importeert hem hier vandaan.
 
-   DE NAMEN BLIJVEN LETTERLIJK IN DIT BESTAAND STAAN, en dat is geen slordigheid:
+   DE NAMEN BLIJVEN LETTERLIJK IN DIT BESTAND STAAN, en dat is geen slordigheid:
    scripts/gezag.js ijkt zichzelf door te controleren dat elke geregistreerde
    schaal terug te vinden is in het bestand waar hij hoort te wonen (LAT.md regel
    3). Een schaal die alleen nog als variabele bestaat, zou die zelfijking laten

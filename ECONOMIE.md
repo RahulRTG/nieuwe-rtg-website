@@ -134,8 +134,22 @@ en kon dus ook niet fout beantwoord worden.
 
 ## 5. Eén economische identiteit voor alles -- **deels; de rest vraagt een besluit**
 
-Wat er **staat**: vier dragersoorten (lid, zaak, gezin, huis), elk met een
-wereld, en per drager kosten, verbruik en facturen.
+Wat er **staat**: **vijf** dragersoorten (lid, zaak, gezin, lab, huis), elk met
+een wereld, en per drager kosten, verbruik en facturen.
+
+`lab` is de vijfde en de eerste die geen mens en geen huishouden is (31 augustus
+2026). Hij staat voor een lab van het RTF Living Lab en hoort bij de wereld
+`rtfoundation`, om dezelfde reden als een gezin: het is een **entiteit van de
+stichting** en geen gebruiker van RTG. Hij is er niet om de lijst vol te maken
+maar omdat er iets is dat hem meet -- en omdat zonder hem al het verbruik van het
+lab terugviel op `huis`. Dat is de juiste terugval voor verbruik zonder eigenaar,
+maar hier is er een eigenaar: RTG betaalde stilzwijgend het onderzoek van een
+andere rechtspersoon, en die rechtspersoon kon niet zeggen wat haar eigen werk
+kostte. Het onderzoeksgrootboek (`kern/livinglab/ledger.js`) leest die meter per
+lab en per studie, en zet er het firewallbesluit naast: staat er geen relatie
+`rtg-intern -> rtfoundation` met een grondslag en een plafond, dan is er **geen**
+doorbelasting en staan de kosten bij RTG -- met de reden en de weg ernaartoe, en
+niet als nul.
 
 Wat er **niet** staat: vestiging, voertuig, apparaat, API-client, AI-agent,
 project, afdeling, dochtermaatschappij, interne dienst. Die staan er met opzet

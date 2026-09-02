@@ -23,7 +23,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer } = require('./helper');
+const { startServer, kantoorAlsPersoon } = require('./helper');
 
 let BASE, child, office;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-kycspoor-'));
@@ -55,9 +55,13 @@ async function nieuwLid() {
 test.before(async () => {
   ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '',
     RTG_STORE: 'json', OFFICE_CODE: 'KANTOOR-KYCSPOOR' } }));
-  const o = await post('/api/office/login', { code: 'KANTOOR-KYCSPOOR' });
-  assert.ok(o.data && o.data.token, 'de backoffice moet binnen kunnen');
-  office = o.data.token;
+  /* OP NAAM EN NIET OP DE GEDEELDE CODE. Deze toets ging tot nu toe met
+     /api/office/login naar binnen, en dat is precies wat kern/kantoor/
+     kluispoort.js sinds kort tegenhoudt: een KYC-besluit komt in het
+     inzagejournaal, en daar hoort een mens bij en geen gedeelde code. Dat de
+     toets dat zonder mopperen deed, was zelf het bewijs dat de deur openstond. */
+  office = await kantoorAlsPersoon(BASE, 'KANTOOR-KYCSPOOR');
+  assert.ok(office, 'een kantoorsessie op naam moet te krijgen zijn');
 });
 test.after(() => {
   if (child) try { child.kill('SIGKILL'); } catch (e) {}

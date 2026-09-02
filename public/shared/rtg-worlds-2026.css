@@ -13,9 +13,41 @@ body[data-rtg-world]{
   --world-soft:var(--rtg-soft,#CDC9C0);
   --world-line:var(--rtg-line,var(--onyx-rand));
   min-width:320px;
-  background:var(--rtg-grond,var(--onyx-glans));
+  /* DE GROND IS ZWART EN HET MATERIAAL IS LICHT (31 augustus 2026).
+
+     Hier stond `background:var(--rtg-grond)` -- de GLANS van het materiaal,
+     over de hele pagina. Voor bordeaux is dat een verloop dat begint op
+     #9E1C40, en dat is `--burgundy-bright`: in CLAUDE.md staat die kleur
+     genoteerd als HOVER-STATE. Een accent dat over de volle hoogte van elk
+     scherm wordt uitgesmeerd is geen accent meer, en het resultaat was een
+     roze waas waarin kaarten, randen en tekst allemaal even hard riepen.
+
+     Dat botst met drie merkregels tegelijk: bordeaux is een accent, er komt
+     geen gradient-grond, en het ritme is stark zwart/wit.
+
+     De schermen zelf deden het al goed. /apps/rtg.html droeg
+     `radial-gradient(circle at 38% 4%, rgba(127,22,52,.25), transparent 42%)`
+     over #030303 -- zwart, met het materiaal als LICHT dat ergens vandaan
+     komt. Precies een signatuurelement. Die behandeling staat nu hier, zodat
+     elke wereld hem krijgt in plaats van hem te moeten overschrijven.
+
+     De gloed komt uit `--rtg-bg` van het gekozen materiaal, dus hij verhuist
+     mee als een materiaal verandert; hij wordt hier niet overgetypt. */
+  background:
+    radial-gradient(circle at 38% 4%,
+      color-mix(in srgb, var(--rtg-bg,#0C0C0B) 55%, transparent) 0%,
+      transparent 42%),
+    #060605;
+  background-attachment:fixed;
   color:var(--world-ink);
   font-family:var(--rtg-interface);
+}
+/* Champagne is het enige LICHTE materiaal, en een donkere grond met een
+   lichte gloed erover is daar precies verkeerd om. Pearl blijft dus gewoon
+   pearl; de gloed vervalt en het vlak wordt de glans die het altijd was. */
+:root[data-rtg-thema="champagne"] body[data-rtg-world]{
+  background:var(--rtg-grond,var(--pearl-glans));
+  background-attachment:fixed;
 }
 body[data-rtg-world]::before{
   content:"";
@@ -31,10 +63,53 @@ body[data-rtg-world]::before{
   mask-image:linear-gradient(to bottom,rgba(0,0,0,.72),transparent 72%);
 }
 
+/* DE SCHIL MOET WETEN DAT DEZE BALK ER IS.
+
+   `.rtg-edge-chrome` is een vaste overlay op `inset:0` -- de zijrail, de
+   onderbalk en de kruimel zitten daarin. Toen de switcher op elk scherm kwam,
+   legde die zich er dus overheen: de bovenste knop van de rail werd afgesneden
+   en niemand kon er nog bij.
+
+   Twee regels lossen het op, en ze horen bij elkaar: de balk wordt PLAKKEND
+   (anders ontstaat er een gat zodra je scrolt, want de schil staat vast en de
+   balk niet), en de schil begint onder de balk in plaats van bovenaan het
+   venster. De hoogte staat als variabele zodat er maar een getal is. */
+:root{ --os-switcher-h:64px; }
+/* TWEE SOORTEN SCHERMEN, TWEE KANTEN OP SCHUIVEN.
+
+   Eerst schoof hier de gedeelde schil (`.rtg-edge-chrome`) omlaag. Dat klopte
+   niet: die schil zet zelf al `padding-top` op de body, dus de switcher stond
+   al ONDER zijn balk -- en door hem ook nog eens 64px te verplaatsen kwam hij
+   precies over de switcher heen te liggen. Twee dingen die allebei ruimte
+   maakten voor elkaar.
+
+   De schil is de baas waar hij bestaat: zijn balk blijft op nul en de switcher
+   plakt eronder. Waar hij NIET bestaat draagt het scherm zijn eigen zijbalk,
+   en dan is het andersom -- daar staat de switcher bovenaan en schuift de
+   zijbalk. Die tweede regel staat hieronder. */
+body.rtg-edge-host > .os-switcher{
+  top:calc(var(--edge-top,40px) + env(safe-area-inset-top,0px));
+}
+/* Niet elk scherm gebruikt die schil: de meeste dragen hun EIGEN vaste
+   zijbalk of kopbalk, elk met een eigen klassenaam (.media-bank, .bank, ...).
+   Een regel per naam wordt een lijst die veroudert, dus wordt hier op VORM
+   geselecteerd: een landmark dat rechtstreeks in de body staat. `top` doet
+   niets bij een statisch element, dus dit raakt alleen wat werkelijk vast of
+   plakkend staat -- precies de elementen die anders onder de balk verdwijnen.
+   De hoogte krimpt mee, anders schuift de onderkant het beeld uit. */
+body:has(> .os-switcher):not(.rtg-edge-host) > aside,
+body:has(> .os-switcher):not(.rtg-edge-host) > nav,
+body:has(> .os-switcher):not(.rtg-edge-host) > header{
+  top:var(--os-switcher-h);
+}
+body:has(> .os-switcher):not(.rtg-edge-host) > aside{
+  max-height:calc(100vh - var(--os-switcher-h));
+}
 .os-switcher{
-  position:relative;
+  position:sticky;
+  top:0;
   z-index:60;
-  min-height:64px;
+  min-height:var(--os-switcher-h);
   display:grid;
   grid-template-columns:auto minmax(0,1fr) auto;
   align-items:center;
@@ -150,9 +225,20 @@ body[data-rtg-world="living"]{
   --lijn:var(--bordeaux-rand);
   --vlak:rgba(12,12,11,.72);
   --zacht:#E6CECC;
-  background:
+  /* De gloed blijft, de GROND wordt zwart. Hier stond `var(--bordeaux-diep)`
+     als paginagrond: dan is bordeaux geen accent meer maar verf, en dat is
+     precies wat CLAUDE.md verbiedt (bordeaux is de accentkleur, het ritme is
+     stark zwart/wit, geen gradient-grond). Op een volle pagina gaf het een
+     roze waas waarin kaarten, randen en tekst allemaal even hard riepen.
+     Het materiaal hoort LICHT te zijn dat ergens vandaan komt -- die radiaal
+     hieronder deed dat al goed en heeft alleen zwart onder zich nodig.
+     De waarde staat EEN keer, als --living-grond: de voorrangsregel onder
+     ::after heeft hem nog eens nodig, en twee keer overtypen is hoe een
+     gloed over een half jaar op twee plekken iets anders is. */
+  --living-grond:
     radial-gradient(circle at 76% 11%,rgba(158,28,64,.32),transparent 27rem),
-    var(--bordeaux-diep);
+    #080707;
+  background:var(--living-grond);
 }
 body[data-rtg-world="living"]::before{
   opacity:.35;
@@ -163,10 +249,93 @@ body[data-rtg-world="living"]::before{
 body[data-rtg-world="living"]::after{
   background:radial-gradient(circle at 70% 7%,rgba(192,165,68,.12),transparent 28rem);
 }
+/* DE EILANDREGEL WON VAN DE WERELDLAAG, en dat was een samenvoeging en geen
+   keuze. Twee takken van 31 augustus 2026, geen van beide voorouder van de
+   ander en geen van beide op main, samengebracht in 7070c68a2 (Merge PR #155;
+   ouders a59d39946 met de travel-tak en bb4b9f731 met de living-tak):
+
+     2bec7f271 (TravelOS, rtg-themas.css)
+       :root[data-rtg-thema] body[data-rtg-eigenvlak="bordeaux"]{background:var(--rtg-grond)}
+       specificiteit 0,3,1 -- het fluweelverloop als GROND, want TravelOS
+       draagt bordeaux als grond en niet als accent.
+     99414232c (LivingOS, dit bestand)
+       body[data-rtg-world="living"]{background:<gloed>,#080707}
+       specificiteit 0,1,1 -- zwart, met het materiaal als LICHT.
+
+   27 van de 41 LivingOS-schermen dragen `data-rtg-eigenvlak="bordeaux"` (8
+   dragen onyx, 6 niets); die vlag was nodig tegen `body:not([data-rtg-eigenvlak])`,
+   zie het bericht van 99414232c. Op elk van die 27 won de eilandregel dus op
+   specificiteit (0,3,1 tegen 0,1,1), en de hele pagina lag op fluweel vanaf
+   #7F1634 -- precies
+   de verf die 99414232c had weggehaald. Op main, zonder eilandregel, lag het
+   beginscherm op de gloed over var(--bordeaux-diep), #4A0C1E.
+
+   GEMETEN (scripts/zz-a11y-gericht.js, 2 september 2026, voor deze regel): de
+   keuring neemt de ongunstigste stop van het verloop en mengt de vaste
+   ::before/::after-lagen hierboven erover; zo kwam de grond van rtg.html op
+   rgb(148,65,69) uit (vandaag rgb(142,51,69), thuis en krant rgb(152,69,86)).
+   Daarop haalde --rtg-soft (#DCC5CB) 4,16, --rtg-leesgoud (#E7A8B8) 3,95 en
+   --gold-tekst 2,81: 22 contrastbevindingen over rtg, vandaag, thuis en krant,
+   uitgelogd en ingelogd.
+
+   NA DEZE REGEL, zelfde meting: 0 contrast over dezelfde vijf schermen, en
+   getComputedStyle(body) op rtg.html geeft de gloed over rgb(8,7,7) terwijl
+   reizen.html het fluweelverloop houdt.
+
+   Deze regel hangt aan het thema-attribuut EN de wereld EN de vlag (0,4,1;
+   :root telt als pseudoklasse mee) en
+   geeft de wereldlaag zijn grond terug. Alleen voor living: TravelOS (17
+   schermen, data-rtg-world="travel" met dezelfde vlag) haalt zijn fluweel
+   juist UIT de eilandregel en houdt hem. En hij wint ook van de
+   champagne-uitzondering bovenaan (0,3,1): een scherm dat zich bordeaux
+   verklaart doet niet mee aan het thema, dus ook onder champagne blijft het
+   zwart met de gloed.
+
+   DIT IS EEN PLEISTER, EN DE OORZAAK STAAT OPEN. De oorzaak is dat EEN
+   vlagwaarde sinds de samenvoeging twee dingen betekent: voor de 27
+   living-schermen "ik schilder mijn eigen grond en inkt" (99414232c), voor het
+   eiland in rtg-themas.css "geef mij het fluweel en de fluweeltokens"
+   (2bec7f271). Deze regel pakt alleen de GROND terug; de kaarten (--rtg-card
+   #2A0713), het accent en de leestoon op die 27 schermen komen nog steeds uit
+   het eiland, terwijl de wereldlaag hierboven zelf --goud verklaart. Of
+   LivingOS een eigen vlagwaarde krijgt, of het eiland aan de wereld travel
+   wordt gebonden, is een ontwerpbesluit en geen reparatie; tot dat besluit
+   staat hier deze voorrangsregel, met deze alinea als reden. */
+:root[data-rtg-thema] body[data-rtg-world="living"][data-rtg-eigenvlak="bordeaux"]{
+  background:var(--living-grond);
+  background-attachment:fixed;
+}
 body[data-rtg-world="living"] .os-switcher{
   background:rgba(74,12,30,.92);
 }
 body[data-rtg-world="living"] .os-switcher__links a span{color:#F4F0E9;}
+/* DEZELFDE WERELD, TWEE MATERIALEN.
+
+   LivingOS is bordeaux behalve op de sociale schermen: die staan op Pearl, en
+   dat is een besluit (MATERIAAL.md). De balk hierboven ging daar mee de fout
+   in -- hij bleef de donkere wijnband die bij bordeaux hoort, en stond dus met
+   ivoren letters op een licht scherm. Van een afstandje leek dat een keuze;
+   van dichtbij was het onleesbaar.
+
+   Op champagne wordt de balk daarom zelf pearl, met de inkt van het materiaal.
+   De actieve wereld houdt de gouden rand -- dat is het accent en dat werkt op
+   allebei de gronden. */
+:root[data-rtg-thema="champagne"] body[data-rtg-world="living"] .os-switcher{
+  background:color-mix(in srgb,var(--pearl-hoog) 94%,transparent);
+  border-bottom-color:var(--pearl-rand);
+  color:var(--op-pearl);
+}
+:root[data-rtg-thema="champagne"] body[data-rtg-world="living"] .os-switcher__brand b,
+:root[data-rtg-thema="champagne"] body[data-rtg-world="living"] .os-switcher__links a{
+  color:var(--op-pearl);
+}
+:root[data-rtg-thema="champagne"] body[data-rtg-world="living"] .os-switcher__brand span,
+:root[data-rtg-thema="champagne"] body[data-rtg-world="living"] .os-switcher__state{
+  color:#41403E;   /* de zachte toon die rtg-themas.css voor champagne heeft uitgerekend */
+}
+:root[data-rtg-thema="champagne"] body[data-rtg-world="living"] .os-switcher__links a span{
+  color:var(--gold-diep,#6B5A05);
+}
 body[data-rtg-world="living"] .schil{
   min-height:calc(100vh - 64px);
   grid-template-rows:58px 1fr;
@@ -199,7 +368,16 @@ body[data-rtg-world="living"] .werk{
   max-width:1440px;
   padding-top:clamp(2.6rem,6vw,6rem);
 }
-body[data-rtg-world="living"] .kop{
+/* DE HERO VAN HET HUIS, en alleen die. `.kop` is in dit huis de gewone naam
+   voor de kopbalk van een scherm (clips, media, muziek, podium, theater,
+   scherm ...), en twaalf LivingOS-schermen dragen er een. Zonder de `.werk >`
+   ervoor kregen al die balken de herostijl: position:relative (waardoor de
+   os-switcher-verschuiving `top:var(--os-switcher-h)` de balk 64px uit zijn
+   stroom tilde en over de knop eronder legde -- op Clips lag "Maak een clip"
+   onder "Alleen met ondertitel"), een marge van 4,5rem en een 20rem grote "L"
+   als watermerk. Het huis zelf (rtg.html) heeft die hero inmiddels als
+   .dagkop, dus de regels troffen alleen nog wat ze niet bedoelden. */
+body[data-rtg-world="living"] .werk > .kop{
   position:relative;
   max-width:1050px;
   margin:0 0 clamp(2rem,5vw,4.5rem);
@@ -207,7 +385,7 @@ body[data-rtg-world="living"] .kop{
   text-align:left;
   border-bottom:1px solid var(--bordeaux-rand);
 }
-body[data-rtg-world="living"] .kop::after{
+body[data-rtg-world="living"] .werk > .kop::after{
   content:"L";
   position:absolute;
   right:0;
@@ -216,10 +394,10 @@ body[data-rtg-world="living"] .kop::after{
   font:500 clamp(9rem,22vw,20rem)/.7 var(--rtg-display);
   pointer-events:none;
 }
-body[data-rtg-world="living"] .kop .ey{color:#F4F0E9;}
-body[data-rtg-world="living"] .kop .os-kicker,
-body[data-rtg-world="living"] .kop .os-kicker span{color:#F4F0E9;}
-body[data-rtg-world="living"] .kop h1{
+body[data-rtg-world="living"] .werk > .kop .ey{color:#F4F0E9;}
+body[data-rtg-world="living"] .werk > .kop .os-kicker,
+body[data-rtg-world="living"] .werk > .kop .os-kicker span{color:#F4F0E9;}
+body[data-rtg-world="living"] .werk > .kop h1{
   max-width:840px;
   margin:.5rem 0 1rem;
   color:var(--op-bordeaux);
@@ -227,13 +405,13 @@ body[data-rtg-world="living"] .kop h1{
   line-height:.82;
   letter-spacing:-.055em;
 }
-body[data-rtg-world="living"] .kop p{
+body[data-rtg-world="living"] .werk > .kop p{
   margin:0;
   max-width:680px;
   color:#F4F0E9;
   font-size:clamp(.9rem,1.3vw,1.08rem);
 }
-body[data-rtg-world="living"] .kop .status{
+body[data-rtg-world="living"] .werk > .kop .status{
   border-color:var(--bordeaux-rand);
   background:rgba(0,0,0,.18);
 }
@@ -298,7 +476,10 @@ body[data-rtg-world="living"] .kaart:hover{
 body[data-rtg-world="work"]{
   --world-accent:var(--gold-tekst);
   --world-accent-deep:var(--gold-basis);
-  background:var(--royal-glans);
+  /* zelfde correctie als bij living: satijn is licht, geen verf */
+  background:
+    radial-gradient(circle at 76% 11%,color-mix(in srgb,var(--royal-basis) 34%,transparent),transparent 27rem),
+    #070809;
 }
 body[data-rtg-world="work"]::before{
   opacity:.65;
@@ -420,59 +601,75 @@ body[data-rtg-world="work"] .poort span{color:#CED6E5;}
 
 /* ------------------------------------------------------------- 03 TravelOS */
 body[data-rtg-world="travel"]{
-  --world-accent:var(--gold-tekst);
-  --world-accent-deep:var(--gold-basis);
+  --world-accent:var(--bordeaux-tekst);
+  --world-accent-deep:var(--bordeaux-hoog);
   --wine:var(--bordeaux-basis);
   --wine-bright:var(--bordeaux-hoog);
-  --gold:var(--gold-tekst);
-  --onyx:var(--onyx-basis);
-  --graphite:var(--onyx-hoog);
-  --graphite-2:var(--rtg-card2);
-  --ivory:var(--op-onyx);
-  --muted:#ABA79C;
-  --line:var(--onyx-rand);
-  --line-soft:rgba(255,255,255,.055);
-  background:var(--onyx-glans);
+  --gold:var(--bordeaux-tekst);
+  /* FLUWEEL DRAAGT DIT SCHERM. Onyx was hier de ondergrond en bordeaux het
+     accent; dat is omgedraaid. Zwart blijft over voor DIEPTE onder de panelen
+     -- en dan wijnzwart, want kolenzwart naast fluweel leest als een gat. */
+  --onyx:#1B050B;
+  --graphite:#2A0713;
+  --graphite-2:#20060E;
+  --ivory:var(--op-bordeaux);
+  /* GEMETEN EN NIET GEKOZEN: op de lichtste plek van deze grond (#8F2241) haalt
+     #C6A3AD 3,74:1 en #E2C9CF 5,45. De poort mat het verschil op het
+     beginscherm zelf ("Alles staat klaar." en de leegtekst). Het zachte grijs
+     mag lichter; de grond is fluweel en geen zwart. */
+  --muted:#E2C9CF;
+  --line:rgba(244,240,233,.14);
+  --line-soft:rgba(244,240,233,.07);
+  background:var(--bordeaux-glans);
 }
 body[data-rtg-world="travel"]::before{
   opacity:1;
   background:
-    radial-gradient(ellipse at 78% 6%,rgba(42,70,128,.3),transparent 31rem),
-    linear-gradient(164deg,transparent 0 61%,rgba(127,22,52,.18) 61% 61.2%,transparent 61.2%);
+    radial-gradient(ellipse at 82% 4%,rgba(158,28,64,.34),transparent 34rem),
+    linear-gradient(164deg,transparent 0 61%,rgba(244,240,233,.07) 61% 61.2%,transparent 61.2%);
   mask-image:none;
 }
-body[data-rtg-world="travel"] .os-switcher{background:rgba(5,5,5,.94);}
+body[data-rtg-world="travel"] .os-switcher{background:rgba(27,5,11,.92);}
 body[data-rtg-world="travel"] .reisapp{background:transparent;}
+/* DE 840 PIXELS UIT rtg-ui.css ZIJN HIER TE SMAL. Dit scherm is een werktafel
+   met twee kolommen (reis en klok) en een tegelrij eronder; op 840 valt die
+   opzet terug op een kolom en staat er links en rechts een halve pagina leeg.
+   WorkOS doet ditzelfde met een eigen breedte. */
+body.rtg-stijl[data-rtg-world="travel"] main{
+  max-width:none;
+  margin:0;
+  padding:0 0 5rem;
+}
 body[data-rtg-world="travel"] .prestatiekop{
-  border-color:var(--gold-rand);
-  background:rgba(12,12,11,.91);
+  border-color:var(--bordeaux-rand);
+  background:rgba(27,5,11,.86);
 }
 body[data-rtg-world="travel"] .prestatiekop>p{color:var(--op-onyx);}
-body[data-rtg-world="travel"] .rtgmerk{color:var(--gold-tekst);}
+body[data-rtg-world="travel"] .rtgmerk{color:var(--bordeaux-tekst);}
 body[data-rtg-world="travel"] .dagkop{
   position:relative;
-  padding:clamp(1rem,3vw,2rem) 0 clamp(2rem,4vw,3.4rem);
-  border-bottom:1px solid var(--onyx-rand);
+  border-bottom:1px solid var(--bordeaux-rand);
 }
 body[data-rtg-world="travel"] .dagkop::after{
   content:"03 / TRAVELOS";
   position:absolute;
   right:0;
   top:1.1rem;
-  color:var(--gold-tekst);
+  color:#E7DFDA;
   font-size:.58rem;
   font-weight:750;
   letter-spacing:.2em;
 }
 body[data-rtg-world="travel"] .bestemmingkop h1{
   color:var(--op-onyx);
-  font-size:clamp(5rem,20vw,12rem);
-  line-height:.76;
+  font-size:clamp(1.9rem,13cqi,9rem);
+  line-height:.82;
 }
 body[data-rtg-world="travel"] .vandaagraster{gap:1px;background:var(--onyx-rand);}
 body[data-rtg-world="travel"] .volgendblok{
-  border:0;
-  background:var(--bordeaux-glans);
+  border:1px solid var(--bordeaux-rand);
+  border-left:3px solid var(--bordeaux-hoog);
+  background:linear-gradient(150deg,rgba(127,22,52,.5),rgba(23,4,9,.7));
   color:var(--op-bordeaux);
 }
 body[data-rtg-world="travel"] .volgendblok::after{
@@ -484,36 +681,69 @@ body[data-rtg-world="travel"] .volgendblok .routekort,
 body[data-rtg-world="travel"] .volgendblok .vluchtregel{color:#EDE0DC;}
 body[data-rtg-world="travel"] .volgendblok .vluchtregel{border-color:var(--bordeaux-rand);}
 body[data-rtg-world="travel"] .reiscontext{
-  padding:clamp(1.2rem,3vw,2rem);
-  background:var(--pearl-glans);
-  color:var(--op-pearl);
+  padding:0;
+  background:transparent;
+  color:var(--op-bordeaux);
 }
-body[data-rtg-world="travel"] .reiscontext .padpunt{color:#34322F;}
-body[data-rtg-world="travel"] .reiscontext .padpunt small{color:#41403E;}
-body[data-rtg-world="travel"] .reiscontext .padlijn{background:var(--pearl-rand);}
+body[data-rtg-world="travel"] .reiscontext .padpunt{color:#E7D3D8;}
+body[data-rtg-world="travel"] .reiscontext .padpunt small{color:#C6A3AD;}
+body[data-rtg-world="travel"] .reiscontext .padlijn{background:rgba(244,240,233,.2);}
 body[data-rtg-world="travel"] .reiscontext .padlijn::after{background:var(--bordeaux-basis);}
-body[data-rtg-world="travel"] .reiscontext .padpunt i{background:var(--pearl-basis);}
-body[data-rtg-world="travel"] .statuslijst{border-color:var(--pearl-rand);}
+body[data-rtg-world="travel"] .reiscontext .padpunt i{background:#20060E;}
+body[data-rtg-world="travel"] .statuslijst{border-color:rgba(244,240,233,.12);}
 body[data-rtg-world="travel"] .statuslijst button{
-  border-color:var(--pearl-rand);
-  background:rgba(255,255,255,.28);
-  color:var(--op-pearl);
+  border-color:rgba(244,240,233,.1);
+  background:rgba(23,4,9,.55);
+  color:var(--op-bordeaux);
 }
-body[data-rtg-world="travel"] .statuslijst button:hover{background:rgba(255,255,255,.58);}
-body[data-rtg-world="travel"] .statuslijst small{color:#41403E;}
-body[data-rtg-world="travel"] .statuslijst strong{color:var(--bordeaux-basis);}
+body[data-rtg-world="travel"] .statuslijst button:hover{background:rgba(58,10,24,.66);}
+body[data-rtg-world="travel"] .statuslijst small{color:#C6A3AD;}
+/* De naam in de statuslijst is LOPENDE tekst en geen merk: op deze maat is
+   het bordeauxhoogsel 3,7:1 en dat is te weinig. Het merk zelf (.rtgmerk,
+   32px) houdt het accent -- daar geldt de grens van 3,0 wel. */
+body[data-rtg-world="travel"] .statuslijst strong{color:var(--rtg-leesgoud,#E7A8B8);}
 body[data-rtg-world="travel"] .actieknop{
   clip-path:none;
-  background:var(--gold-glans);
-  color:var(--op-gold);
+  background:linear-gradient(100deg,var(--bordeaux-hoog),var(--bordeaux-basis));
+  color:var(--op-bordeaux);
 }
 body[data-rtg-world="travel"] .hoofdtabs{
   border-color:var(--onyx-rand);
   background:rgba(5,5,5,.96);
 }
+body[data-rtg-world="travel"] .hoofdtabs button.actief svg{color:var(--bordeaux-tekst);}
 body[data-rtg-world="travel"] .hoofdtabs button.actief svg,
-body[data-rtg-world="travel"] .hoofdtabs button.actief{color:var(--gold-tekst);}
-body[data-rtg-world="travel"] .hoofdtabs button::after{background:var(--gold-basis);}
+body[data-rtg-world="travel"] .hoofdtabs button.actief{color:var(--op-onyx);}
+body[data-rtg-world="travel"] .hoofdtabs button::after{background:var(--bordeaux-hoog);}
+/* De nummers in de wereldbalk zijn 8px: te klein voor het bordeauxhoogsel
+   (3,78:1). Vorm mag bordeaux zijn, deze cijfers blijven ivoor. */
+body[data-rtg-world="travel"] .os-switcher__links a span{color:#E7DFDA;}
+/* De huisvelden en de volle huisknop komen uit rtg-ui.css met een grijs vlak en
+   een gouden knop. In deze wereld is het vlak fluweel; een grijze balk erin
+   leest als een gat, en een gouden knop is precies het goud dat hier weg moest. */
+body.rtg-stijl[data-rtg-world="travel"] .rahulsnel input,
+body.rtg-stijl[data-rtg-world="travel"] .rahulformulier input{
+  background:transparent;
+  border:0;
+}
+body.rtg-stijl[data-rtg-world="travel"] .rtg-veld,
+body.rtg-stijl[data-rtg-world="travel"] textarea,
+body.rtg-stijl[data-rtg-world="travel"] select{
+  border-color:rgba(244,240,233,.14);
+  background:rgba(23,4,9,.5);
+  color:var(--op-bordeaux);
+}
+body.rtg-stijl[data-rtg-world="travel"] .rtg-knop{
+  border-color:rgba(244,240,233,.2);
+  background:rgba(23,4,9,.45);
+  color:var(--op-bordeaux);
+}
+body.rtg-stijl[data-rtg-world="travel"] .rtg-knop.vol{
+  border-color:var(--bordeaux-hoog);
+  background:linear-gradient(100deg,var(--bordeaux-hoog),var(--bordeaux-basis));
+  color:var(--op-bordeaux);
+}
+body[data-rtg-world="travel"] .klokpaneel,
 body[data-rtg-world="travel"] .canvasband,
 body[data-rtg-world="travel"] .reisdiensten,
 body[data-rtg-world="travel"] .reisdiensten a,
@@ -521,9 +751,14 @@ body[data-rtg-world="travel"] .routevelden,
 body[data-rtg-world="travel"] .voertuig,
 body[data-rtg-world="travel"] .rahulsnel,
 body[data-rtg-world="travel"] .rahulformulier{
-  border-color:var(--onyx-rand);
-  background:var(--onyx-glans);
+  border-color:rgba(244,240,233,.1);
+  background:linear-gradient(168deg,rgba(23,4,9,.72),rgba(42,7,19,.5));
 }
+
+/* TWEE NAVIGATIES OVER HETZELFDE IS ER EEN TE VEEL. Draait de schil van het
+   huis (body.rtg-edge-host), dan zit het wisselen van wereld daar al in en
+   verdwijnt deze balk; zonder schil blijft hij staan zoals hij was. */
+body.rtg-edge-host .os-switcher{display:none;}
 
 /* --------------------------------------------------------- 04 FoundationOS */
 body[data-rtg-world="foundation"]{
@@ -637,10 +872,38 @@ body[data-rtg-world="foundation"] .knop.stil{
   color:var(--bordeaux-basis);
 }
 body[data-rtg-world="foundation"] .lijnrij{border-color:var(--pearl-rand);}
-body[data-rtg-world="foundation"] .pil{border-color:var(--pearl-rand);color:#34322F;}
-body[data-rtg-world="foundation"] .uitleg,
-body[data-rtg-world="foundation"] .leeg,
-body[data-rtg-world="foundation"] .lijnrij .sub{color:#41403E;}
+
+/* ------------------------------------------- pearl is niet altijd geschilderd
+   HIER STOND DE INKT VAST, EN DAT GING MIS ZODRA IEMAND ANDERS DE GROND KOOS.
+
+   Deze wereld is Pearl, dus stonden #34322F en #41403E hier als vaste waarden:
+   donkere inkt, want de grond is licht. Dat klopt zolang deze regels de enige
+   zijn die iets schilderen. Op /apps/foundation/os-publiek.html is dat niet zo:
+   premium.css (de vormtaal van de donkere RTF-werkschermen) zet `rtf-premium`
+   op de body en maakt de vlakken bijna zwart. De wereld leverde toen de inkt en
+   de schil de grond -- gemeten haalde de uitleg in een kaart 1,73:1 en een pil
+   1,40:1, waar 4,5 moet.
+
+   De regel eronder is dus niet "licht" of "donker" maar: WIE DE GROND
+   SCHILDERT, LEVERT DE INKT. Staat de donkere schil op deze body, dan wijkt
+   Pearl -- valt hij weg, dan geldt Pearl weer, vanzelf.
+
+   Dit raakt vandaag precies EEN pagina: `data-rtg-world="foundation"` staat
+   alleen daar. Het staat hier en niet in dat scherm omdat de volgende pagina
+   die deze wereld aanzet dezelfde val zou vinden, en die zou hem opnieuw in
+   zijn eigen <style> moeten ontwijken. */
+body[data-rtg-world="foundation"]:not(.rtf-premium) .pil{border-color:var(--pearl-rand);color:#34322F;}
+body[data-rtg-world="foundation"]:not(.rtf-premium) .uitleg,
+body[data-rtg-world="foundation"]:not(.rtf-premium) .leeg,
+body[data-rtg-world="foundation"]:not(.rtf-premium) .lijnrij .sub{color:#41403E;}
+
+/* En de tegenhanger staat er NIET, want gemeten deed hij niets. Hier stond een
+   blok dat --txt, --muted, --soft en --line op de onyx-waarden zette zodra de
+   donkere schil op de body staat. Weggehaald bleven alle tien de gemeten
+   tekststijlen boven de norm: valt de regel hierboven weg, dan komt de inkt uit
+   de tokens die premium.css en schil-os.js zelf al zetten. Een blok dat je niet
+   kunt laten zakken, is geen reparatie maar ruis. */
+
 
 /* ------------------------------------------------------------ klein scherm */
 @media(max-width:760px){
@@ -660,7 +923,7 @@ body[data-rtg-world="foundation"] .lijnrij .sub{color:#41403E;}
   .os-switcher__links a span{display:none;}
   body[data-rtg-world="living"] .laagkeuze{grid-template-columns:1fr;}
   body[data-rtg-world="living"] .lifelagen{grid-template-columns:repeat(3,1fr);}
-  body[data-rtg-world="living"] .kop h1{font-size:clamp(3.2rem,17vw,6rem);}
+  body[data-rtg-world="living"] .werk > .kop h1{font-size:clamp(3.2rem,17vw,6rem);}
   body[data-rtg-world="work"] .merkkop{min-height:290px;}
   body[data-rtg-world="work"] .doelgroep{margin:-1.2rem .45rem 2.5rem;}
   body[data-rtg-world="foundation"] .grid{grid-template-columns:1fr;}
@@ -668,8 +931,12 @@ body[data-rtg-world="foundation"] .lijnrij .sub{color:#41403E;}
 
 @media(max-width:520px){
   .os-switcher__links a{font-size:.57rem;letter-spacing:.035em;}
-  body[data-rtg-world="travel"] .dagkop::after{position:static;display:block;margin-top:1rem;}
-  body[data-rtg-world="travel"] .bestemmingkop h1{font-size:clamp(4rem,22vw,6.2rem);}
+  /* Het bandje "03 / TRAVELOS" viel op een telefoon over de zin eronder; in een
+     kop die naast de klok staat is er geen ruimte voor. Het staat al in de balk. */
+  body[data-rtg-world="travel"] .dagkop::after{display:none;}
+  /* En de titel schaalt op de KOLOM, niet op het venster: 22vw was een maat uit
+     de tijd dat deze kop de volle breedte had. */
+  body[data-rtg-world="travel"] .bestemmingkop h1{font-size:clamp(1.7rem,15cqi,3.2rem);}
 }
 
 @media(prefers-reduced-motion:reduce){

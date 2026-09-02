@@ -58,7 +58,7 @@
 
   async function laad() {
     try { tekenZin((await w.Veilig.api('/api/veiligheid/codewoord')).stand); }
-    catch (e) { $('#zinKaart').innerHTML = '<p class="stil">' + w.Veilig.esc(e.message) + ' Log eerst in via de leden-app.</p>'; }
+    catch (e) { $('#zinKaart').innerHTML = RTGLeeg.html(RTGLeeg.vanFout({ status: 401, message: w.Veilig.esc(e.message) })); }
   }
 
   V.standen.push({

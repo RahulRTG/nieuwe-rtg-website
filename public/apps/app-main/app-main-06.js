@@ -65,12 +65,12 @@
     doos.querySelector('#agGo').addEventListener('click', stuur);
     inp.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); stuur(); } });
     inp.addEventListener('input', () => inp.closest('.ag-rij').classList.toggle('vol', !!inp.value.trim()));
-    // herstel-link uit de e-mail: Rahul begint meteen het herstel-gesprek.
-    // Anders begint het gewone gesprek zodra duidelijk is dat er geen sessie ligt.
+    // Herstel uit de e-mail begint meteen. Een gewone bezoeker krijgt eerst de
+    // zichtbare passkeydeur en opent die zelf: biometrie of een accountsleutel
+    // hoort nooit zonder een bewuste handeling van de mens te verschijnen.
     let onthouden = null;
     try { onthouden = localStorage.getItem('rtg_member_token'); } catch(e){}
     if (herstel){ andereManier(true); setTimeout(resetStart, 400); }
-    else if (!onthouden) setTimeout(() => passkeyInlog(true), 400);
     inp.addEventListener('focus', () => { if (!herstel && !resetStap) start(); }, { once: true });
   })();
   /* ================= SALON-CONNECTIES =================

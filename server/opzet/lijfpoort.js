@@ -74,9 +74,20 @@ module.exports = function lijfpoort(deps) {
 
      Hij staat NA de idem-poort, zodat een herhaling die daar wordt beantwoord
      niet nog een keer in het spoor belandt: dat was immers geen tweede
-     handeling. En hij wikkelt res.json, want req.session bestaat pas nadat de
-     auth-poortwachter hem heeft gezet -- bij het binnenkomen weten we nog niet
-     wie er belt. */
+     handeling.
+
+     HIJ HANGT AAN 'finish' EN NIET AAN res.json, en hier stond het omgekeerde.
+     Dat was ooit waar en is het al een tijd niet meer: middleware/compressie.js
+     stuurt elk antwoord boven ongeveer een kilobyte met res.send, volledig
+     langs res.json heen, en juist de zwaarste handelingen hebben de grootste
+     antwoorden. De module is daarop omgebouwd (zie de kop van
+     ../lib/handelingsspoor.js, en scripts/handelingproef-route.js die het gat
+     vond); deze toelichting bleef staan en zei sindsdien het tegenovergestelde
+     van wat de code doet. In een huis waar de commentaren de documentatie zijn,
+     is dat geen slordigheid maar verkeerde informatie.
+
+     Wat wel klopt aan de oude reden: `wie` kan pas worden bepaald nadat de
+     auth-poortwachter req.session heeft gezet. Op 'finish' is dat altijd zo. */
   app.use(require('../lib/handelingsspoor')({ db, save }).middleware);
 
   /* Zaakdoos, lokale modus: elke geslaagde zaak-schrijfactie komt in het

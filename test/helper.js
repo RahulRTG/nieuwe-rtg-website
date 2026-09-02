@@ -387,12 +387,36 @@ function postJson(base) {
    proefpubliek in gezelschap.js). Twee kopieen van dezelfde weg lopen uiteen
    zodra de inlog verandert -- LAT.md regel 4. Geeft null als het niet lukt, zodat
    de aanroeper zelf kan besluiten wat dat betekent. */
-async function kantoorAlsPersoon(base) {
+async function kantoorAlsPersoon(base, code) {
   const post = postJson(base);
   const eig = await post('/api/auth/login', { login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' });
-  if (!eig || !eig.token) return null;
-  const kantoor = await post('/api/account/start', { rol: 'kantoor' }, eig.token);
-  return (kantoor && kantoor.token) || null;
+  if (eig && eig.token) {
+    const kantoor = await post('/api/account/start', { rol: 'kantoor' }, eig.token);
+    if (kantoor && kantoor.token) return kantoor.token;
+  }
+  /* GEEN DEMO-EIGENAAR? DAN DE WEG DIE EEN MEDEWERKER OOK LOOPT.
+
+     De eigenaar hierboven bestaat alleen in de demo-seed. Toetsen die met een
+     eigen OFFICE_CODE en een lege database starten, kregen daarom `null` terug
+     en vielen terug op de gedeelde code -- en sinds kern/kantoor/kluispoort.js
+     komt die niet meer langs de kluisdeuren (KYC-besluit, documentnummer,
+     aftekenen).
+
+     De tweede weg is geen omweg maar het echte scenario: een eigen RTG-account,
+     daarin de kantoorrol koppelen met dezelfde code, en die rol starten. Wat je
+     terugkrijgt is een office-sessie MET een sleutel, en dat is precies wat het
+     inzagejournaal nodig heeft om een regel naar een mens terug te voeren.
+
+     Elke aanroeper krijgt een vers account, zodat twee toetsen nooit dezelfde
+     kantoormedewerker delen. */
+  const email = 'kantoor' + Date.now() + Math.random().toString(36).slice(2, 8) + '@voorbeeld.test';
+  const reg = await post('/api/auth/register', { name: 'Kantoor Toets', email,
+    password: 'geheim123', geboortedatum: '1985-05-05', pasApp: 'rtg' });
+  if (!reg || !reg.token) return null;
+  const k = await post('/api/account/koppel', { soort: 'kantoor', code: code || 'RTG-OFFICE' }, reg.token);
+  if (!k || k.error) return null;
+  const s2 = await post('/api/account/start', { rol: 'kantoor' }, reg.token);
+  return (s2 && s2.token) || null;
 }
 
 /* Een lid naar Lifestyle of Business tillen, zoals het in het echt gaat: een
@@ -989,11 +1013,13 @@ async function installeerNepMicrofoon(context) {
 
 
 const KEUR_PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M8AAAMCAoHf3ZQAAAAASUVORK5CYII=';
+
 async function keurLidGoed(base, token, codenaam, geboortedatum) {
   const post = (pad, body, tok) => fetch(base + pad, { method: 'POST',
     headers: Object.assign({ 'Content-Type': 'application/json' }, tok ? { Authorization: 'Bearer ' + tok } : {}),
     body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
-  const office = (await post('/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+  /* Op naam, want dit is een KYC-besluit: zie kantoorOpNaam hierboven. */
+  const office = await kantoorAlsPersoon(base, 'RTG-OFFICE');
   if (!office) throw new Error('kantoor-inlog mislukt; is RTG_DEMO aan?');
   await post('/api/verify/upload', { image: KEUR_PNG }, token);
   await post('/api/verify/selfie', { image: KEUR_PNG }, token);
@@ -1076,54 +1102,72 @@ async function veegDoor(page, doos, opties) {
        van de regel die we opnieuw wilden bewegen. */
     await page.waitForFunction(() => !document.querySelector('.gb-blad,.gb-lade,[data-gb]'), null,
       { timeout: 5000 }).catch(() => {});
-    const rendererPoging = await page.evaluate(({ x0, y, px, stappen, eerste }) => {
+    const rendererPoging = await page.evaluate(({
+      x0, y, px, stappen, eerste, kiezer, startFractie, afstand, vanBoven
+    }) => {
       /* De regel uit zijn rechthoek, niet het toevallige bovenste element op
          dat punt. Na een langdruk kan daar nog één frame een verdwijnende
-         dialoog liggen; de rij zelf is de ingang die deze proef bedoelt. */
-      /* DE RIJ OP DAT PUNT, EN ANDERS DE DICHTSTBIJZIJNDE.
+         dialoog liggen; de rij zelf is de ingang die deze proef bedoelt.
 
-         De rechthoek komt van de aanroeper, die hem vóór deze poging heeft
-         opgemeten. Tekent de lijst zich daartussen opnieuw (een badge die
-         binnenkomt, een rij die van hoogte verandert), dan ligt er op dat punt
-         geen rij meer en gaf deze poging `false` -- waarna de toets meldde dat
-         "de gebaarbedrading zelf stuk" was. Dat is de verkeerde conclusie uit
-         het juiste feit: er is niets stuk, het meubel is verschoven.
+         Een proef die zijn rij kent geeft bovendien een kiezer mee. Onder
+         runnerdruk kan de lijst tussen de eerste browserpoging en deze poging
+         opnieuw zijn getekend. Dan zijn de oude coordinaten geen identiteit:
+         zoek de nieuwe rij op en meet haar opnieuw.
 
-         Dus: eerst de rij die het punt echt bevat, en anders de rij waarvan het
-         midden er verticaal het dichtst bij ligt. Zakken doet deze poging nog
-         steeds -- als er GEEN enkele rij is, of als de laag de beweging niet
-         oppakt -- en de melding zegt nu welke van de twee het was. */
+         Zonder kiezer geldt hetzelfde in het klein: eerst de rij die het punt
+         echt bevat, en anders de rij waarvan het midden er verticaal het
+         dichtst bij ligt. Ligt er op dat punt geen rij meer omdat het meubel is
+         verschoven, dan is er niets stuk -- en dan hoort deze poging dat te
+         zeggen in plaats van "de gebaarbedrading zelf stuk". Zakken doet hij
+         nog steeds als er GEEN enkele rij is of als de laag de beweging niet
+         oppakt, en de melding zegt welke van de twee het was. */
+      const gekozen = kiezer ? document.querySelector(kiezer) : null;
       const rijen = [...document.querySelectorAll('.gb-rij')];
-      if (!rijen.length) return 'geen-rij';
+      if (!gekozen && !rijen.length) return 'geen-rij';
       const raakt = rijen.find((rij) => {
         const r = rij.getBoundingClientRect();
         return x0 >= r.left && x0 <= r.right && y >= r.top && y <= r.bottom;
       });
-      const doel = raakt || rijen.slice().sort((a, b) => {
+      const dichtstbij = rijen.slice().sort((a, b) => {
         const ma = a.getBoundingClientRect(), mb = b.getBoundingClientRect();
         return Math.abs((ma.top + ma.bottom) / 2 - y) - Math.abs((mb.top + mb.bottom) / 2 - y);
       })[0];
+      const doel = (gekozen && gekozen.closest('.gb-rij')) || raakt || dichtstbij;
       if (!doel) return 'geen-rij';
-      /* Op de rij die we werkelijk pakken, en niet op de oude coordinaten: na
-         een herteking kan die een stuk hoger of lager liggen. */
-      const doelDoos = doel.getBoundingClientRect();
-      y = doelDoos.top + doelDoos.height / 2;
-      x0 = Math.min(Math.max(x0, doelDoos.left + 4), doelDoos.right - 4);
+      let beginX = x0, middenY = y, verschuiving = px, eersteStap = eerste;
+      if (gekozen) {
+        const r = doel.getBoundingClientRect();
+        const fractie = Number.isFinite(startFractie) ? startFractie : 0.8;
+        beginX = r.left + r.width * fractie;
+        middenY = r.top + (Number.isFinite(vanBoven) ? Math.min(vanBoven, r.height / 2) : r.height / 2);
+        verschuiving = Number.isFinite(afstand) ? afstand : -(r.width * 0.62 + 90);
+        eersteStap = Math.sign(verschuiving || 1) * Math.max(10, Math.abs(verschuiving / stappen));
+      } else if (doel !== raakt) {
+        /* Op de rij die we werkelijk pakken, en niet op de oude coordinaten:
+           na een herteking kan die een stuk hoger of lager liggen. */
+        const doelDoos = doel.getBoundingClientRect();
+        middenY = doelDoos.top + doelDoos.height / 2;
+        beginX = Math.min(Math.max(x0, doelDoos.left + 4), doelDoos.right - 4);
+      }
       const pid = 917;
       const stuur = (type, x, buttons) => doel.dispatchEvent(new PointerEvent(type, {
         bubbles: true, cancelable: true, view: window, pointerId: pid,
         pointerType: 'mouse', isPrimary: true, button: type === 'pointermove' ? -1 : 0,
-        buttons, clientX: x, clientY: y
+        buttons, clientX: x, clientY: middenY
       }));
-      stuur('pointerdown', x0, 1);
-      stuur('pointermove', x0 + eerste, 1);
+      stuur('pointerdown', beginX, 1);
+      stuur('pointermove', beginX + eersteStap, 1);
       const begon = doel.hasAttribute('data-gb');
       if (begon) {
-        for (let i = 2; i <= stappen; i++) stuur('pointermove', x0 + (px * i) / stappen, 1);
+        for (let i = 2; i <= stappen; i++)
+          stuur('pointermove', beginX + (verschuiving * i) / stappen, 1);
       }
-      stuur('pointerup', x0 + (begon ? px : eerste), 0);
+      stuur('pointerup', beginX + (begon ? verschuiving : eersteStap), 0);
       return begon ? true : 'niet-opgepakt';
-    }, { x0, y, px, stappen, eerste });
+    }, {
+      x0, y, px, stappen, eerste, kiezer: o.kiezer || null,
+      startFractie: o.startFractie, afstand: o.afstand, vanBoven: o.vanBoven
+    });
     if (rendererPoging !== true) {
       throw new Error('het gebaar begon niet via browserinput en ook niet in één rendererhandeling (' +
         (rendererPoging === 'geen-rij' ? 'er stond geen enkele .gb-rij op het scherm'

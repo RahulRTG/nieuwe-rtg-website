@@ -90,6 +90,34 @@ const REGELS = [
      Het patroon liet eerst een schuine streep NA `link` vallen, waardoor
      /api/link zelf erbuiten viel; /api/linkkaart matcht nog steeds niet. */
   [/(?:^|\/)link(?:\/|$)/, 'intern', 'Intern & IT'],
+
+  /* DE ZELFBEDIENINGSLAAG VAN HET LID -- /api/mijn en de mijn-schermen.
+
+     Kwam mee met de samenvoeging en viel met tweeentwintig punten op de
+     restpost: vier werkprocesfamilies, veertien API-deuren en vier schermen.
+     Dat is precies de reden dat de terugval rood is en niet stil groen --
+     onbekend werk hoort niet bij Onderzoek te belanden, en hier ging het om de
+     laag waar een lid zijn wachtwoordherstel, zijn tweefactor en zijn
+     toestemmingen beheert.
+
+     HET ZIJN TWEE FAMILIES EN GEEN EEN, dus staan er twee regels. Ze bij elkaar
+     vegen zou korter zijn en onwaar: wie de tweefactor van een lid beheert doet
+     ander werk dan wie zijn toestemmingen beheert, en het controleregister is
+     er juist om die vraag te kunnen stellen.
+
+       beveiliging  tweefactor, sessies, herstelkanaal -- dezelfde familie als
+                    /login, /logout en /api/auth/tweede, die hierboven al bij
+                    Intern & IT liggen.
+       zeggenschap  gegevens, post (afmelden en voorkeuren) en relaties --
+                    dezelfde familie als /api/privacy, /api/toestemming en
+                    /api/inzagekaart, die alle drie bij Juridisch liggen.
+
+     De schermen (/apps/mijn-*.html) staan in hetzelfde patroon als hun routes,
+     om de reden die een paar regels hierboven bij routedekking staat: losse
+     regels lopen na een hernoeming uit elkaar, en dan hangt het scherm ergens
+     anders dan de deur die het bedient. */
+  [/(?:^|\/)mijn[-/](?:tweefactor|sessies|herstelkanaal)/, 'intern', 'Intern & IT'],
+  [/(?:^|\/)mijn[-/](?:gegevens|post|relaties)/, 'juridisch', 'Juridisch'],
 ];
 
 /* En de brede domeinen erachteraan: zie ./tabel-breed.js. De volgorde is

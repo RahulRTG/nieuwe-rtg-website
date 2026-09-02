@@ -31,7 +31,7 @@ module.exports = (kern) => {
   /* mutatie: idempotent -- twee keer installeren laat dezelfde app op het startscherm */
   app.post('/api/appstore/installeer', auth, (req, res) => {
     if (geenGast(req, res)) return;
-    antwoord(res, appstoreWinkel.installeer(req.session.key, req.body.sleutel, req.body.machtigingen));
+    antwoord(res, appstoreWinkel.installeer(req.session.key, req.body.sleutel, req.body.machtigingen, req.body.tot));
   });
   /* mutatie: idempotent -- de verlening wordt GEZET en niet opgeteld */
   app.post('/api/appstore/verleen', auth, (req, res) => {
@@ -39,6 +39,20 @@ module.exports = (kern) => {
     antwoord(res, appstoreWinkel.verleen(req.session.key, req.body.sleutel, req.body.machtigingen));
   });
   app.post('/api/appstore/weg', auth, (req, res) => antwoord(res, appstoreWinkel.verwijder(req.session.key, req.body.sleutel)));   /* mutatie: idempotent -- twee keer verwijderen laat dezelfde stand achter */
+  /* DE CONTEXTBRUG. Drie routes, en ze staan met opzet uit elkaar: klaarzetten
+     doet een scherm van RTG, lezen doet het scherm van het LID voordat hij
+     beslist, en doorgeven doet het lid zelf. Alle drie hangen aan de sessie van
+     dat lid; er is geen weg waarlangs een app zijn eigen overdracht ophaalt. */
+  app.post('/api/appstore/context/klaarzet', auth, (req, res) =>
+    antwoord(res, appstore.context.klaarzet(req.session.key, req.body.sleutel, req.body.velden)));   /* mutatie: nietHerhaalbaar -- elke aanroep zet een nieuwe overdracht klaar */
+  app.post('/api/appstore/context/lees', auth, (req, res) =>
+    antwoord(res, appstore.context.lees(req.session.key, req.body.id)));
+  app.post('/api/appstore/context/geef', auth, (req, res) =>
+    antwoord(res, appstore.context.geef(req.session.key, req.body.id, req.body.sleutel)));   /* mutatie: nietHerhaalbaar -- een overdracht wordt EEN keer gelezen en is daarna weg */
+
+  /* De cel vernietigen: de app weg EN alles wat hij voor dit lid bewaarde, in
+     een handeling, met de opgave van wat er verdween. */
+  app.post('/api/appstore/vernietig', auth, (req, res) => antwoord(res, appstoreWinkel.vernietig(req.session.key, req.body.sleutel)));   /* mutatie: idempotent -- twee keer vernietigen laat dezelfde lege stand achter */
   app.post('/api/appstore/wis-opslag', auth, (req, res) => antwoord(res, appstoreWinkel.wisOpslag(req.session.key, req.body.sleutel)));   /* mutatie: idempotent -- twee keer wissen laat dezelfde lege opslag */
 
   // wat de celpagina nodig heeft om een app te openen

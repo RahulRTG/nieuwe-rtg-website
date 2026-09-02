@@ -34,4 +34,27 @@ module.exports = (octx) => {
       res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' });
     }
   });
+
+  /* DE POSITIE VAN DE RTFOUNDATION. Zelfde deur, zelfde gewicht, andere
+     rechtspersoon -- zie kern/rtfwallet.js. Hij staat hier en niet bij de
+     giftroutes, omdat dit geen giftbesluit is maar het aanmaken van een
+     werkplek: precies wat dit bestand doet.
+
+     De STAND mag het hele kantoor zien (weten of de stichting een positie heeft
+     is geen besluit); hem MAKEN is boardroom, want er komt een bedrijfscode en
+     een beheer-PIN uit. */
+  app.post('/api/office/rtfwallet', officeAuth, (req, res) =>
+    stuur(res, kern.rtfWallet.stand()));
+
+  app.post('/api/office/rtfwallet/maak', boardroomAuth, async (req, res) => {
+    try {
+      const r = await kern.rtfWallet.maak(req.body || {}, boardroomWie(req));
+      if (r && r.error) return res.status(r.status || 400).json(r);
+      sseToOffice('sync', { scope: 'team' });
+      res.json(r);
+    } catch (e) {
+      console.error('[rtfwallet]', e);
+      res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' });
+    }
+  });
 };

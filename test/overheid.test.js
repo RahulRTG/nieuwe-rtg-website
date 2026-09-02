@@ -5,7 +5,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon } = require('./helper');
 
 function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -151,7 +151,7 @@ test('6. Referendum: alleen wie aantoonbaar een volwassen mens is, stemt', async
   /* De weg erdoorheen: RTG keurt het bewijs en neemt de geboortedatum van het
      document over. Zonder die laatste stap blijft de poort dicht -- en dat is
      precies het punt van de eis. */
-  const office = (await api(base, '/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+  const office = await kantoorAlsPersoon(base, 'RTG-OFFICE');
   const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M8AAAMCAoHf3ZQAAAAASUVORK5CYII=';
   await api(base, '/api/verify/upload', { image: PNG }, lid);
   await api(base, '/api/verify/selfie', { image: PNG }, lid);
@@ -211,7 +211,7 @@ test('6c. een ingetrokken verificatie trekt ook het stemrecht in', async () => {
     phone: '06' + u, password: 'geheim123', geboortedatum: '1985-05-05', tier: 'rtg', pasApp: 'rtg' });
   const twijfel = reg.body.token;
   const code = (await api(base, '/api/state', {}, twijfel)).body.state.user.codename;
-  const office = (await api(base, '/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+  const office = await kantoorAlsPersoon(base, 'RTG-OFFICE');
   const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M8AAAMCAoHf3ZQAAAAASUVORK5CYII=';
   await api(base, '/api/verify/upload', { image: PNG }, twijfel);
   await api(base, '/api/verify/selfie', { image: PNG }, twijfel);
@@ -249,7 +249,7 @@ test('6d. een gekeurde zestienjarige stemt niet', async () => {
   const jong = reg.body.token;
   assert.ok(jong, 'het lidmaatschap kan vanaf 15');
   const code = (await api(base, '/api/state', {}, jong)).body.state.user.codename;
-  const office = (await api(base, '/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+  const office = await kantoorAlsPersoon(base, 'RTG-OFFICE');
   const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M8AAAMCAoHf3ZQAAAAASUVORK5CYII=';
   await api(base, '/api/verify/upload', { image: PNG }, jong);
   await api(base, '/api/verify/selfie', { image: PNG }, jong);

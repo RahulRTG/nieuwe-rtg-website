@@ -100,7 +100,7 @@
  "de alfa: wat de poort een dag later zag": "Op 20 augustus 2026 leerde de keuring een halfdoorzichtige VOORGROND rekenen, en toen stonden er 2893 bevindingen: 949 champagne, 1106 bordeaux, 740 royal, 22 uitgelogd, 27 ingelogd. 795 van de getoonde voorbeelden waren TWEE tokens. --rtg-soft en --rtg-muted waren zelf de grootste bron van onleesbare tekst in dit huis. De oorzaak is dat alfa de verkeerde knop is: '56% van de inkt' zegt iets over sluier en niets over leesbaarheid, want wat het oplevert hangt af van de grond -- op onyx 5,6:1, op parelmoer 3,5 en op fluweel 3,6. Ze zijn nu dekkend en per thema uitgerekend: de zachte toon is de lichtste tint die op de ergste grond van dat materiaal nog 4,85:1 haalt, de gedempte staat halverwege tussen die vloer en de volle inkt. De ergste grond is opgesomd en niet gegokt (elke stop van het glansverloop, de zestien dagkleuren daarover, de twee kaartvlakken daar weer overheen); test/thema.test.js rekent het na zonder browser. Op fluweel is er nauwelijks ruimte -- de lichtste bordeaux-stop haalt met de volle ivoren inkt maar 6,40:1 -- dus daar draagt de hierarchie meer op maat en gewicht dan op toon. De rest waren tien vlakken die hun eigen grond schilderen en hun eigen inkt niet; twee daarvan waren een patroon en geen incident: (1) een VLAK binnen een scherm dat altijd donker is (een inlogpoort, een onboarding-overlay) heeft nu dezelfde afspraak als een heel scherm -- data-rtg-vlak=\"onyx\", en test/thema.test.js houdt die twee regels gelijk; (2) de UI-kit van RTG claimt `.blok` als sectiekaart, en de bloklaag van een door een LID gemaakte website gebruikte dezelfde naam. De site van een lid werd daardoor getekend met de kaartachtergrond, de rand en de padding van RTG -- op champagne een half doorzichtig wit vlak waar de hulptekst 1,91:1 op haalde. Die laag heet nu .wb-blok. Dat raakt ook een bezoeker van een gepubliceerde site, die geen lid is en niets aan die kleuren kan doen.",
  "telefoon": {
   "breed": 0,
-  "leeg": 2,
+  "leeg": 0,
   "balk": 0,
   "duim": 0,
   "waar": "de vierde ronde: 390x844, ingelogd, twee keer -- rechtshandig en linkshandig (shared/hand.js)",
@@ -152,7 +152,8 @@
    "waarom dit een bovengrens is en geen reparatie": "Dit is geen fout in een regel maar een ontbrekende VORM. WERKRUIMTE.md beschrijft RTG Desktop met zoveel woorden als a movable operational space -- surfaces met een gouden greep rond een centrale console -- en die vorm bestaat op een telefoon niet. ADAPTIEF.md zegt daar tegenover dat verbergen niet bestaat: een capability die op bureau bestaat en op telefoon geen vorm heeft, is een gebrek. Die twee documenten spreken elkaar hier tegen, en dat beslecht een mens en niet een reparatie onderweg. Besloten op 22 augustus 2026: de telefoonvorm van de werkruimte is een eigen opdracht.",
    "de sluitweg": "Geef de werkruimte een taakmodus volgens ADAPTIEF.md (een blad tegelijk, de acties binnen duimbereik) in plaats van de bureauconsole te verkleinen. Zodra die er is gaat dit getal terug naar 0 en vervalt deze paragraaf.",
    "wat deze grens NIET afdekt": "Alleen dit ene scherm. Elk ander scherm dat leeg rendert laat de ronde gewoon zakken -- de grens staat op 2 en niet op 'leeg mag'."
-  }
+  },
+  "waarom leeg van 2 naar 0": "Hier stond 2 sinds de nulmeting. Drie volle scans op 31 augustus 2026 (over 554 metingen, twee handen) meten er nul, en de scan bood de strakkere grens zelf aan. Een grens die twee toestaat waar er nul zijn, is geen grens maar ruimte -- en die ruimte vult zich vanzelf."
  },
  "tablet": {
   "breed": 0,

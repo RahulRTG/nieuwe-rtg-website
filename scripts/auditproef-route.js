@@ -31,6 +31,8 @@ const { draaiAuditproef } = require('./lib/auditproef');
 const { plausibelLijf } = require('./lib/rolproef');
 const { alleRoutes, isSchakel } = require('./lib/routes');
 const { haalSleutels, meldSleutels, BASISROLLEN } = require('./lib/proefsleutels');
+/* Wanneer is dit gemeten, en waartegen, en mag het uberhaupt meten. */
+const { stempel, eisSchoneBoom } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'AUDITPROEF.json');
@@ -63,7 +65,28 @@ async function wachtOpServer(basis, ms) {
   return false;
 }
 
+
+/* WEIGEREN VOOR HET BEGINT. Deze ronde duurt minuten en levert een register op
+   dat NERGENS meetelt zodra er ongecommit werk in de boom staat -- boomVuil
+   wordt pas aan het eind vastgesteld. Zelfde poort als de drie andere proeven
+   uit deze familie (rolproef, handelingproef, uitvoerproef); hij ontbrak hier,
+   en test/schoneboom.test.js vraagt met zoveel woorden om alle zes. */
+function wachtOpSchoneBoom() {
+  const b = eisSchoneBoom('de auditproef');
+  if (b.ok) return;
+  console.error('\n  DEZE RONDE ZOU NIET MEETELLEN\n');
+  console.error('  ' + b.reden);
+  for (const r of (b.bestanden || [])) console.error('    ' + r);
+  process.exit(3);
+}
+
+/* De wacht: dit script schrijft een register, dus het start niet bij het
+   requiren (een laadcontrole schreef zo ooit ROLPROEF.json terug naar 292
+   routes; scripts/meetkeuring.js houdt dit vast). */
+if (require.main !== module) return;
+
 (async () => {
+  wachtOpSchoneBoom();
   const poort = await vrijePoort();
   const datamap = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-auditproef-'));
   const basis = 'http://127.0.0.1:' + poort;

@@ -150,3 +150,22 @@ body.amn-zwevend .lo-rail{padding-top:56px}
    had -- die knelde net zo hard, alleen had niemand er ooit met een inkeping
    naar gekeken. */
 @media(max-width:760px){.lo-shell{grid-template-rows:1fr calc(64px + env(safe-area-inset-bottom,0px))}}
+
+/* DE SWITCHER STAAT IN DE STROOM, EN DE SCHIL WAS 100dvh.
+
+   Sinds de os-switcher op elk LivingOS-scherm staat (31 augustus 2026) staat
+   er BOVEN .lo-shell een balk in de gewone stroom. De schil hield zijn
+   height:100dvh, en de body scrolt niet: het hele raster schoof dus precies
+   de hoogte van die balk omlaag en de onderste rij -- op een telefoon de
+   wereldnavigatie -- kwam onder de vensterrand terecht (838..902 bij 844px,
+   gemeten door test/wereldbreedte.e2e.js). De balk bestond, maar een duim kon
+   er nooit bij.
+
+   Geen vaste aftrek van --os-switcher-h: die balk is op telefoonmaat lager
+   dan zijn variabele zegt, en een tweede getal dat het eerste na moet lopen
+   is precies de fout die hier al eerder is gemaakt. De body wordt een kolom
+   en de schil neemt wat er overblijft. Waar de gedeelde randschil de switcher
+   verbergt (body.rtg-edge-host) verandert er niets. */
+body:has(> .os-switcher){display:flex;flex-direction:column}
+body:has(> .os-switcher) > .os-switcher{flex:0 0 auto}
+body:has(> .os-switcher) > .lo-shell{height:auto;flex:1 1 0;min-height:0}

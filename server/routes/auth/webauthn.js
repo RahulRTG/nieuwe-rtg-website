@@ -3,9 +3,11 @@
    dezelfde sessie als het wachtwoord, met dezelfde rem op de deur en
    dezelfde pas-app-controle. Krijgt de gedeelde context een keer bij het
    opstarten vanuit routes/auth.js. */
+const { legInlogVast } = require('../../kern/identiteit/inlogherkomst');
+
 module.exports = (actx) => {
   const { app, appUrl, auth, accounts, crypto, stateFor, pasAppOk, PAS_FOUT, isBaas, tooManyTries, noteFailedTry, loginFails,
-    webauthn } = actx;
+    webauthn, sessieregister } = actx;
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const eisAccount = (req, res) => {
     if (!req.session.account) { res.status(403).json({ error: 'Passkeys horen bij een eigen RTG-account.' }); return null; }
@@ -61,6 +63,21 @@ module.exports = (actx) => {
     if (!isBaas(user) && !pasAppOk(String(req.body.pasApp || ''), user.tier)) return res.status(403).json({ error: PAS_FOUT });
     const token = accounts.issueToken(user.id);
     const sess = { tier: user.tier, key: 'user-' + user.id, account: user };
+    /* MIJN RTG blok 1: de herkomst vastleggen op het moment dat zij te halen is.
+
+       Dit is de STERKSTE claim die dit huis kan zetten: er is zojuist een
+       handtekening van een sleutel gecontroleerd, dus de methode is
+       `cryptografisch` en de graad die daaruit volgt is `bewezen`. Reconstrueer
+       je dit later uit de omstandigheden, dan is het hoogstens `afgeleid` en
+       dus `vermoed` -- achteraf invullen kost bewijs.
+
+       De credential-id gaat mee omdat een boolean nooit kan beantwoorden welke
+       passkey het was. Zonder dat kun je later niet zeggen "trek alles in dat
+       met deze sleutel is gemaakt", en dat is precies wat een gestolen toestel
+       nodig heeft. */
+    legInlogVast({ sessieregister, accounts, token, lidKey: sess.key,
+      type: 'passkey', assurance: 'bezit', methode: 'cryptografisch', bron: 'webauthn',
+      authenticatorId: vingerafdruk(credential) });
     res.json({ token, state: stateFor(sess, req.body.lang) });
   });
 };

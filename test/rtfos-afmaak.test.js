@@ -198,7 +198,7 @@ test('de gever ziet zijn eigen giften en waar ze heen gingen, en niets van een a
   const kort = await os_('donateur/periodiek', { bronId: mijn.body.bron.id, jaren: 3,
     kenmerk: 'RTF-2026-01', tot: '2029-01-01' });
   assert.equal(kort.status, 400);
-  assert.match(kort.body.error, /ten minste vijf jaar/);
+  assert.match(kort.body.error, /ten minste 5 jaar/);
 
   // zonder kenmerk ook niet: dan is er niets vastgelegd
   const naamloos = await os_('donateur/periodiek', { bronId: mijn.body.bron.id, jaren: 5, tot: '2031-01-01' });

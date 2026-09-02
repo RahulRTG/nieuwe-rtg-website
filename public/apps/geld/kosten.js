@@ -66,7 +66,7 @@
       $('#ksGrens').innerHTML = gr ? grensHtml(gr) : '<p class="stil">De grens is niet geladen.</p>';
       $('#ksNiet').innerHTML = K.niet(beeld);
     } catch (e) {
-      $('#ksHoofd').innerHTML = '<p class="stil">' + K.esc(e.message) + ' Log eerst in via de leden-app.</p>';
+      $('#ksHoofd').innerHTML = RTGLeeg.html(RTGLeeg.vanFout({ status: 401, message: K.esc(e.message) }));
     }
   }
 

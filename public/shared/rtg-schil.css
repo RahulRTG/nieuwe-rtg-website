@@ -122,8 +122,18 @@ body.rtg-stijl main.rtg-werkruimte{max-width:none;margin:0;padding:0;}
              width var(--rtg-tijd-paneel) var(--rtg-veer),
              height var(--rtg-tijd-paneel) var(--rtg-veer);
 }
+/* DE KOP EN HET CIJFER VAN DE CONSOLE LEZEN DE LEESTOON, NIET HET ACCENT.
+   Hier stond color:var(--rtg-goud) op rustende tekst, en --rtg-goud is een
+   vulkleur (rtg-themas.css: "IS EEN VULKLEUR EN GEEN TEKSTKLEUR"). Onder onyx
+   valt dat niet op, want daar zijn accent en leestoon dezelfde #C0A544 -- gemeten
+   op werkruimte.html: 8,31:1. In een bordeaux-eiland is het accent #C23A5E, en
+   dat leest op de kaart (#2A0713) 3,57:1 bij 11,5px kapitalen, waar 4,5 de grens
+   is. Dezelfde vorm die de poort op wallet.html vond. --rtg-leesgoud is per thema
+   de toon die WEL leest, onder onyx identiek aan het accent; buiten een thema
+   valt hij terug op het accent zoals eerst. De hover op de greepknop hierboven
+   houdt het accent: die is kortstondig en geen rustende tekst. */
 .rtg-console h1{margin:0;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;
-  color:var(--rtg-goud);font-weight:600;}
+  color:var(--rtg-leesgoud,var(--rtg-goud));font-weight:600;}
 .rtg-console .wie{font-size:.8rem;color:var(--rtg-soft);margin-top:.2rem;}
 .rtg-console .blok{border-top:1px solid var(--rtg-line);padding-top:.7rem;}
 .rtg-console .bloknaam{font-size:.6rem;letter-spacing:.19em;text-transform:uppercase;
@@ -145,7 +155,8 @@ body.rtg-stijl main.rtg-werkruimte{max-width:none;margin:0;padding:0;}
 
 /* de contextregel: wat op dit moment alle surfaces verbindt */
 .rtg-console .context{font-size:.78rem;color:var(--rtg-soft);line-height:1.5;}
-.rtg-console .context b{color:var(--rtg-goud);font-variant-numeric:var(--rtg-cijfers);}
+/* leestoon en geen accent, om dezelfde reden als de kop hierboven: 3,57:1 op fluweel */
+.rtg-console .context b{color:var(--rtg-leesgoud,var(--rtg-goud));font-variant-numeric:var(--rtg-cijfers);}
 
 @media (prefers-reduced-motion:reduce){
   .rtg-surface,.rtg-console,.rtg-dok,.rtg-handle::before{transition:none;}
@@ -365,5 +376,5 @@ body[data-rtg-schil="standaard"] .rtg-tab[data-vangt]::after{
   border-radius:0;padding:.45rem 1.1rem;cursor:pointer;font:inherit;font-size:.84rem;
   color:var(--rtg-txt,#F4F0E9);}
 .rtg-voorstel button.vol{background:var(--rtg-goud,#C0A544);border-color:var(--rtg-goud,#C0A544);
-  color:#1C1608;font-weight:600;}
+  color:var(--rtg-opgoud,#1C1608);font-weight:600;}
 .rtg-voorstel button:hover{border-color:var(--gold-tekst,#C0A544);}

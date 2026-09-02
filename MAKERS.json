@@ -1,9 +1,9 @@
 {
   "uitleg": "Gemeten met scripts/makers.js; de vraag en de methode staan in de kop van dat bestand en in CREATE.md par. 3. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist. De envelop is niet hier afgeleid maar overgenomen uit OBJECTMODEL.json.",
-  "vastgelegd": "2026-08-28",
+  "vastgelegd": "2026-09-01",
   "gemeten": {
     "makers": 8,
-    "bestanden": 63,
+    "bestanden": 72,
     "vormen": 19,
     "paren": 28,
     "metGedeeldeKern": 1,
@@ -59,7 +59,7 @@
     {
       "id": "appstore",
       "naam": "App Store",
-      "bestanden": 29,
+      "bestanden": 38,
       "vormen": 6,
       "talen": 6,
       "opslag": [
@@ -222,31 +222,6 @@
         "officeAuth"
       ],
       "waarom": "taal 0.09 en vorm 0.11 halen de drempel 0.6 niet"
-    },
-    {
-      "a": "appstore",
-      "b": "partnerstudio",
-      "gedeeldeKern": false,
-      "via": null,
-      "vorm": 0.07,
-      "vormA": "server/kern/appstore/versies.js",
-      "vormB": "server/kern/magnaat-partnerstudio-bedrijf.js",
-      "vormGedeeld": [
-        "categorie"
-      ],
-      "taal": 0,
-      "taalA": null,
-      "taalB": null,
-      "taalGedeeld": [],
-      "opslagGedeeld": [],
-      "levensloopGedeeld": [
-        "offline"
-      ],
-      "poortGedeeld": [
-        "auth",
-        "supplierAuth"
-      ],
-      "waarom": "taal 0 en vorm 0.07 halen de drempel 0.6 niet"
     },
     {
       "a": "websitemaker",
@@ -542,6 +517,29 @@
       "poortGedeeld": [
         "auth",
         "officeAuth",
+        "supplierAuth"
+      ],
+      "waarom": "taal 0 en vorm 0 halen de drempel 0.6 niet"
+    },
+    {
+      "a": "appstore",
+      "b": "partnerstudio",
+      "gedeeldeKern": false,
+      "via": null,
+      "vorm": 0,
+      "vormA": null,
+      "vormB": null,
+      "vormGedeeld": [],
+      "taal": 0,
+      "taalA": null,
+      "taalB": null,
+      "taalGedeeld": [],
+      "opslagGedeeld": [],
+      "levensloopGedeeld": [
+        "offline"
+      ],
+      "poortGedeeld": [
+        "auth",
         "supplierAuth"
       ],
       "waarom": "taal 0 en vorm 0 halen de drempel 0.6 niet"

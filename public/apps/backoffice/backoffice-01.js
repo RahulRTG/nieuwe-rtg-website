@@ -109,7 +109,8 @@
 
   async function loadVerify(){
     let pend = [];
-    try { pend = (await call('/office/verifications')).pending || []; } catch(e){ return; }
+    try { pend = (await call('/office/verifications')).pending || []; }
+    catch(e){ kluisDicht($('#verify'), e); return; }
     $('#verify').innerHTML = pend.length ? pend.map(v =>
       '<div class="vrow" data-id="'+v.id+'">' +
         '<div class="vi"><div class="nm">'+escHtml(v.name)+' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+escHtml(v.codename)+'</span></div>' +

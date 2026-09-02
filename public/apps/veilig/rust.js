@@ -67,7 +67,7 @@
 
   async function laad() {
     try { teken((await w.Veilig.api('/api/veiligheid/rust')).rust); }
-    catch (e) { $('#rust').innerHTML = '<p class="stil">' + w.Veilig.esc(e.message) + ' Log eerst in via de leden-app.</p>'; }
+    catch (e) { $('#rust').innerHTML = RTGLeeg.html(RTGLeeg.vanFout({ status: 401, message: w.Veilig.esc(e.message) })); }
   }
 
   V.standen.push({

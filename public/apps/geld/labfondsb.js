@@ -19,7 +19,7 @@
     catch (e) {
       /* de poort van de oude pagina: niet ingelogd (of gast), dan geen half
          scherm maar alleen de uitleg waarom */
-      $('#lfFout').innerHTML = '<p class="stil">' + Geld.esc(e.message) + ' Log eerst in via de leden-app.</p>';
+      $('#lfFout').innerHTML = RTGLeeg.html(RTGLeeg.vanFout({ status: 401, message: Geld.esc(e.message) }));
       $('#lfBody').hidden = true;
       return;
     }
@@ -75,9 +75,14 @@
     try {
       await Geld.api('/api/labfonds/voorstel/maak', {
         locId: $('#lfNLoc').value, titel: $('#lfNTitel').value,
-        doel: $('#lfNDoel').value, bedrag: Deel().getal($('#lfNBedrag').value)
+        doel: $('#lfNDoel').value, bedrag: Deel().getal($('#lfNBedrag').value),
+        /* Leeg laten mag: niet elk plan voor de omgeving is onderzoek. Staat er
+           wel iets, dan weigert de server een nummer dat nergens op slaat -- de
+           foutmelding hieronder zegt dat dan met het nummer erbij. */
+        onderzoek: $('#lfNOnderzoek').value
       });
       $('#lfNTitel').value = ''; $('#lfNDoel').value = ''; $('#lfNBedrag').value = '';
+      $('#lfNOnderzoek').value = '';
       Geld.melding('Ingediend; de scheidsrechter gaf meteen een eerste oordeel.');
       laad();
     } catch (e) { $('#lfNFout').textContent = e.message; }
@@ -138,6 +143,9 @@
             '<textarea id="lfNDoel" rows="3" maxlength="500"></textarea>' +
             '<label class="lbl stil" for="lfNBedrag">Bedrag uit de pot (€)</label>' +
             '<input id="lfNBedrag" inputmode="decimal">' +
+            '<label class="lbl stil" for="lfNOnderzoek">Onderzoeksnummer (als dit onderzoek financiert)</label>' +
+            '<input id="lfNOnderzoek" maxlength="20" placeholder="Bijv. RTF-AMS-2026-0001">' +
+            '<p class="stil">Laat leeg als dit geen onderzoek is. Met een nummer erbij ziet iedereen die bijdroeg later wat ermee onderzocht is.</p>' +
             '<div class="lf-fout" id="lfNFout"></div>' +
             '<button class="knop hoofd" id="lfNMaak" type="button">Voorstel indienen</button>' +
           '</div>' +

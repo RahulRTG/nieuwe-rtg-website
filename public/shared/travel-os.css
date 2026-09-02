@@ -1,15 +1,24 @@
 :root{
-  --tos-onyx:#080909;
-  --tos-graphite:#111313;
-  --tos-graphite-2:#171919;
+  --tos-onyx:#170409;
+  --tos-graphite:#24060f;
+  --tos-graphite-2:#2c0812;
   --tos-ivory:#f1ede5;
   --tos-muted:#969995;
-  --tos-line:#2a2d2d;
-  --tos-wine:#8e0f36;
-  --tos-wine-bright:#e24a73;
-  --tos-gold:#cba65f;
+  --tos-line:#430f1f;
+  --tos-wine:#7F1634;
+  --tos-wine-bright:#9E1C40;
+  /* Het hoogsel van het fluweel: goed voor VORM en grote letters (3,78:1 op
+     donker), niet voor kleine tekst -- die blijft ivoor. Zie CLAUDE.md. */
+  --tos-wine-licht:#C23A5E;
+  /* HET ACCENT IS VORM, DE LEESTOON IS TEKST. #C23A5E haalt op deze gronden
+     3,62 tot 3,67:1 -- goed voor een rand, een outline en een letter van
+     24px, te weinig voor een prijs van 12px (CLAUDE.md). Deze rozetint komt
+     uit dezelfde familie en haalt op wijnzwart 9,8. Waar hieronder tekst
+     wordt gekleurd staat dus --tos-lees; waar een rand of een omtrek wordt
+     gekleurd blijft --tos-wine-licht staan. */
+  --tos-lees:#E7A8B8;
   --tos-green:#35bd72;
-  --tos-danger:#e24a73;
+  --tos-danger:#C23A5E;
   --tos-top:88px;
   --tos-rail:104px;
   --tos-bottom:0px;
@@ -30,6 +39,13 @@ html.tos-ingebed{--tos-top:0px;--tos-rail:0px;--tos-bottom:0px}
 html.tos-ingebed .tos-nav,html.tos-ingebed .tos-topbar{display:none!important}
 
 body.travel-os{
+  /* FLUWEEL ALS ONDERGROND, net als op het beginscherm. Deze schermen houden
+     hun eigen kop, hun eigen scenefoto en hun eigen ritme -- het materiaal
+     eronder is gedeeld, zodat je in dezelfde wereld blijft als je van Vandaag
+     naar Vluchten loopt. Zwart blijft over voor de diepte onder de kaarten. */
+  background-color:#2E0713;
+  background-image:linear-gradient(168deg,#7F1634 0%,#4A0C1E 44%,#2E0713 100%);
+  background-attachment:fixed;
   --bg:var(--tos-onyx);
   --card:var(--tos-graphite);
   --card2:var(--tos-graphite-2);
@@ -37,13 +53,15 @@ body.travel-os{
   --txt:var(--tos-ivory);
   --muted:var(--tos-muted);
   --soft:var(--tos-muted);
-  --gold:var(--tos-gold);
+  --gold:var(--tos-wine-licht);
+  --rtg-leesgoud:#E7A8B8;
+  --goud:#E7A8B8;
   --burgundy:var(--tos-wine-bright);
   --burg:var(--tos-wine-bright);
   --green:var(--tos-green);
   --groen:var(--tos-green);
   --rood:var(--tos-danger);
-  --let:var(--tos-gold);
+  --let:var(--tos-wine-licht);
   --tos-scene:url('/images/travelos/travel-desk.jpg');
   min-width:320px;
   min-height:100dvh;
@@ -51,7 +69,7 @@ body.travel-os{
   padding-top:var(--tos-top) !important;
   padding-left:var(--tos-rail) !important;
   padding-bottom:2rem !important;
-  background:linear-gradient(180deg,#0b0c0c 0,var(--tos-onyx) 26rem) !important;
+  background:linear-gradient(180deg,#1b050b 0,var(--tos-onyx) 26rem) !important;
   color:var(--tos-ivory) !important;
   font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif !important;
   font-feature-settings:"tnum" 1,"ss01" 1;
@@ -66,7 +84,7 @@ body.travel-os{
   bottom:0;
   left:var(--tos-rail);
   pointer-events:none;
-  background-image:linear-gradient(180deg,rgba(8,9,9,.08) 0,rgba(8,9,9,.72) 28rem,var(--tos-onyx) 47rem),linear-gradient(90deg,rgba(8,9,9,.82),transparent 68%),var(--tos-scene);
+  background-image:linear-gradient(180deg,rgba(26,5,12,.08) 0,rgba(26,5,12,.72) 28rem,var(--tos-onyx) 47rem),linear-gradient(90deg,rgba(26,5,12,.82),transparent 68%),var(--tos-scene);
   background-repeat:no-repeat;
   background-size:cover,cover,min(100%,1450px) auto;
   background-position:center,center,center top;
@@ -96,19 +114,19 @@ body.travel-os[data-travelos-scene="residence"]{--tos-scene:url('/images/travelo
   margin:clamp(1.2rem,3vw,2.5rem) auto 0;
   padding:clamp(1.5rem,4vw,3.5rem);
   overflow:hidden;
-  border:1px solid rgba(203,166,95,.3);
-  background-image:linear-gradient(90deg,rgba(4,5,5,.96) 0,rgba(4,5,5,.74) 42%,rgba(4,5,5,.1) 80%),linear-gradient(0deg,rgba(4,5,5,.94),transparent 58%),var(--tos-scene);
+  border:1px solid rgba(194,58,94,.3);
+  background-image:linear-gradient(90deg,rgba(24,4,10,.96) 0,rgba(24,4,10,.74) 42%,rgba(24,4,10,.1) 80%),linear-gradient(0deg,rgba(24,4,10,.94),transparent 58%),var(--tos-scene);
   background-size:cover;
   background-position:center;
   box-shadow:0 38px 100px rgba(0,0,0,.3);
 }
-.tos-module-hero::before{content:"";position:absolute;z-index:-1;inset:0;border-left:3px solid var(--tos-wine-bright);background:linear-gradient(120deg,transparent 60%,rgba(203,166,95,.08));pointer-events:none}
+.tos-module-hero::before{content:"";position:absolute;z-index:-1;inset:0;border-left:3px solid var(--tos-wine-bright);background:linear-gradient(120deg,transparent 60%,rgba(194,58,94,.08));pointer-events:none}
 .tos-module-copy{width:min(72%,760px)}
-.tos-module-eyebrow{margin:0 0 .85rem;color:var(--tos-gold);font-size:.62rem;font-weight:750;letter-spacing:.2em;text-transform:uppercase}
+.tos-module-eyebrow{margin:0 0 .85rem;color:var(--tos-lees);font-size:.62rem;font-weight:750;letter-spacing:.2em;text-transform:uppercase}
 .tos-module-hero h2{max-width:740px;margin:0;color:var(--tos-ivory);font:500 clamp(2.7rem,6.2vw,5.5rem)/.88 "Bodoni Moda",Didot,serif;letter-spacing:-.045em;text-wrap:balance;overflow-wrap:normal!important;word-break:normal!important;hyphens:none}
 .tos-module-intro{max-width:39rem;margin:1.1rem 0 0;color:#d3d1cb;font-size:.82rem;line-height:1.65}
-.tos-module-mark{flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-end;gap:.28rem;padding-left:1.1rem;border-left:1px solid rgba(203,166,95,.42);text-align:right}
-.tos-module-mark small{color:var(--tos-gold);font:600 1.55rem/1 "Bodoni Moda",Didot,serif}.tos-module-mark span{color:#c9c7c0;font-size:.5rem;font-weight:680;letter-spacing:.17em}
+.tos-module-mark{flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-end;gap:.28rem;padding-left:1.1rem;border-left:1px solid rgba(194,58,94,.42);text-align:right}
+.tos-module-mark small{color:var(--tos-wine-licht);font:600 1.55rem/1 "Bodoni Moda",Didot,serif}.tos-module-mark span{color:#c9c7c0;font-size:.5rem;font-weight:680;letter-spacing:.17em}
 .tos-service-strip{
   position:relative;
   z-index:2;
@@ -122,13 +140,16 @@ body.travel-os[data-travelos-scene="residence"]{--tos-scene:url('/images/travelo
 }
 .tos-service-step{min-height:84px;display:grid;grid-template-columns:auto 1fr;align-items:center;gap:.85rem;padding:1rem 1.15rem;border-left:1px solid var(--tos-line)}
 .tos-service-step:first-child{border-left:0}
-.tos-service-step>span{color:var(--tos-gold);font:500 1.3rem/1 "Bodoni Moda",Didot,serif}
+/* GEEN BORDEAUX OP DE CIJFERS. 1,3rem is 20,8px en niet vet: dat telt niet
+   als grote tekst, en het hoogsel haalt op deze grond 3,74:1 -- de a11y-poort
+   ving het op vier schermen. Een rozetint uit dezelfde familie haalt ruim 7. */
+.tos-service-step>span{color:#E7A8B8;font:500 1.3rem/1 "Bodoni Moda",Didot,serif}
 .tos-service-step div{display:flex;min-width:0;flex-direction:column;gap:.2rem}
 .tos-service-step b{color:var(--tos-ivory);font-size:.61rem;letter-spacing:.15em}
 .tos-service-step small{overflow:hidden;color:var(--tos-muted);font-size:.66rem;line-height:1.35;text-overflow:ellipsis;white-space:nowrap}
 
 body.travel-os *{box-sizing:border-box}
-body.travel-os :focus-visible{outline:2px solid var(--tos-gold) !important;outline-offset:3px}
+body.travel-os :focus-visible{outline:2px solid var(--tos-wine-licht) !important;outline-offset:3px}
 .tos-topbar{
   position:fixed;
   z-index:100;
@@ -141,12 +162,12 @@ body.travel-os :focus-visible{outline:2px solid var(--tos-gold) !important;outli
   grid-template-columns:1fr auto 1fr;
   align-items:center;
   border-bottom:1px solid var(--tos-wine);
-  background:rgba(8,9,9,.94);
+  background:rgba(26,5,12,.94);
   backdrop-filter:blur(20px);
 }
 .tos-mark{
   justify-self:start;
-  color:var(--tos-gold) !important;
+  color:var(--tos-wine-licht) !important;
   font:600 2rem/1 "Bodoni Moda",Didot,serif;
   letter-spacing:-.035em;
   text-decoration:none;
@@ -183,8 +204,8 @@ body.travel-os :focus-visible{outline:2px solid var(--tos-gold) !important;outli
   grid-template-rows:repeat(4,94px);
   align-content:start;
   padding:1.2rem .4rem;
-  border-right:1px solid #2f3232;
-  background:#090a0a;
+  border-right:1px solid #491122;
+  background:#180409;
 }
 .tos-nav a{
   position:relative;
@@ -226,7 +247,7 @@ body.travel-os main h3{
 }
 body.travel-os > header h1,
 body.travel-os > .kop h1{color:var(--tos-ivory)!important;font-size:1.25rem !important;font-weight:750 !important;text-transform:uppercase}
-body.travel-os header .ey{color:var(--tos-gold) !important;font-weight:700;letter-spacing:.2em !important}
+body.travel-os header .ey{color:var(--tos-lees) !important;font-weight:700;letter-spacing:.2em !important}
 body.travel-os > main{width:min(100%,1180px);margin-inline:auto}
 body.travel-os > main:not([style]){padding-top:clamp(1.2rem,3vw,2rem)}
 body.travel-os main{color:var(--tos-ivory)}
@@ -253,7 +274,7 @@ body.travel-os .inlog{
   background:linear-gradient(120deg,rgba(17,19,19,.98),rgba(17,19,19,.86)) !important;
   box-shadow:0 22px 70px rgba(0,0,0,.2) !important;
 }
-body.travel-os .inlog::before{content:"BESLOTEN REISOMGEVING";display:block;margin-bottom:.65rem;color:var(--tos-gold);font-size:.58rem;font-weight:750;letter-spacing:.18em}
+body.travel-os .inlog::before{content:"BESLOTEN REISOMGEVING";display:block;margin-bottom:.65rem;color:var(--tos-lees);font-size:.58rem;font-weight:750;letter-spacing:.18em}
 body.travel-os .inlog h2{margin:0!important;color:var(--tos-ivory)!important;font:500 clamp(1.65rem,4vw,2.4rem)/1 "Bodoni Moda",Didot,serif!important}
 body.travel-os main>.leeg,
 body.travel-os #inhoud>.leeg,
@@ -272,30 +293,30 @@ body.travel-os #main>.leeg{
 }
 body.travel-os #inhoud > .item{border:1px solid var(--tos-line) !important;border-radius:0!important;background:var(--tos-graphite) !important}
 body.travel-os :where(.resto,.reis,.tstl){transition:border-color .18s,background-color .18s !important}
-body.travel-os :where(.resto,.reis,.tstl):hover{transform:none !important;border-color:#565a58 !important;background:#151717 !important}
+body.travel-os :where(.resto,.reis,.tstl):hover{transform:none !important;border-color:#741f35 !important;background:#2a0711 !important}
 body.travel-os .moveHero{
-  border:1px solid #343737 !important;
+  border:1px solid #4f1324 !important;
   border-left:3px solid var(--tos-wine-bright) !important;
   border-radius:0 !important;
-  background-image:linear-gradient(90deg,rgba(5,6,6,.94),rgba(5,6,6,.68) 48%,rgba(5,6,6,.2)),linear-gradient(0deg,rgba(5,6,6,.92),transparent 60%),var(--tos-scene) !important;
+  background-image:linear-gradient(90deg,rgba(24,4,10,.94),rgba(24,4,10,.68) 48%,rgba(24,4,10,.2)),linear-gradient(0deg,rgba(24,4,10,.92),transparent 60%),var(--tos-scene) !important;
   background-size:cover !important;
   background-position:center !important;
   box-shadow:none !important;
 }
-body.travel-os .moveHero .eyebrow{color:var(--tos-gold) !important}
+body.travel-os .moveHero .eyebrow{color:var(--tos-lees) !important}
 body.travel-os .moveHero h2{font-family:Inter,system-ui,sans-serif !important;font-weight:780 !important;letter-spacing:-.055em !important;text-transform:uppercase !important}
-body.travel-os .moveOrb{border-radius:50%;border-color:color-mix(in srgb,var(--tos-gold) 58%,transparent) !important;box-shadow:inset 0 0 38px rgba(203,166,95,.08),0 0 70px rgba(142,15,54,.12) !important}
+body.travel-os .moveOrb{border-radius:50%;border-color:color-mix(in srgb,var(--tos-wine-licht) 58%,transparent) !important;box-shadow:inset 0 0 38px rgba(194,58,94,.08),0 0 70px rgba(142,15,54,.12) !important}
 body.travel-os .moveOrb b{font-family:Inter,system-ui,sans-serif !important;font-size:.76rem !important;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
-body.travel-os .moveStop{border-radius:50% !important;color:var(--tos-gold) !important}
+body.travel-os .moveStop{border-radius:50% !important;color:#E7A8B8 !important}
 
 body.travel-os :where(input,select,.veld){
   min-height:46px;
-  border-color:#373a3a !important;
+  border-color:#521426 !important;
   border-radius:0!important;
-  background:#0e1010 !important;
+  background:#20060d !important;
   color:var(--tos-ivory) !important;
 }
-body.travel-os :where(textarea,.rtg-veld){border:1px solid #373a3a!important;border-radius:0!important;background:#0e1010!important;color:var(--tos-ivory)!important}
+body.travel-os :where(textarea,.rtg-veld){border:1px solid #521426!important;border-radius:0!important;background:#20060d!important;color:var(--tos-ivory)!important}
 body.travel-os :where(.kaart,.card,.item,.reis,.tstl,.pass,.stat,.kpi,.panel,.paneel){backdrop-filter:blur(12px)}
 body.travel-os :where(.kaart,.card,.item,.reis,.tstl,.pass,.stat,.kpi,.panel,.paneel) h2,
 body.travel-os :where(.kaart,.card,.item,.reis,.tstl,.pass,.stat,.kpi,.panel,.paneel) h3{color:var(--tos-ivory)!important}
@@ -312,8 +333,8 @@ body.travel-os :where(.knop,button.knop){
   letter-spacing:.04em;
 }
 body.travel-os :where(.knop.stil,.terug,.meldknop){
-  border:1px solid #3a3d3d !important;
-  background:#101212 !important;
+  border:1px solid #551527 !important;
+  background:#23060e !important;
   color:var(--tos-ivory) !important;
   border-radius:0!important;
 }
@@ -335,14 +356,14 @@ body.travel-os :where(.tabs,.chips) > button{
 body.travel-os :where(.tabs,.chips) > button.aan,
 body.travel-os :where(.tabs,.chips) > button[aria-selected="true"]{border-bottom-color:var(--tos-wine-bright) !important;color:var(--tos-ivory) !important}
 body.travel-os :where(.badge,.status,.stand,.chip){border-radius:0!important}
-body.travel-os .status.goud{border-color:var(--tos-gold) !important;color:var(--tos-gold) !important}
+body.travel-os .status.goud{border-color:var(--tos-wine-licht) !important;color:var(--tos-lees) !important}
 body.travel-os .status.ok{border-color:var(--tos-green) !important;color:var(--tos-green) !important}
 body.travel-os .status.open{border-color:var(--tos-danger) !important;color:#ed527d !important}
 body.travel-os .prijs,
 body.travel-os .vanaf,
-body.travel-os .nr{color:var(--tos-gold) !important;font-family:Inter,system-ui,sans-serif !important}
+body.travel-os .nr{color:var(--tos-lees) !important;font-family:Inter,system-ui,sans-serif !important}
 body.travel-os .melding,
-body.travel-os .toast{bottom:1.25rem !important;border:1px solid #3b3e3e !important;border-radius:0!important;background:var(--tos-ivory) !important;color:var(--tos-onyx) !important;box-shadow:0 15px 45px rgba(0,0,0,.42) !important}
+body.travel-os .toast{bottom:1.25rem !important;border:1px solid #561628 !important;border-radius:0!important;background:var(--tos-ivory) !important;color:var(--tos-onyx) !important;box-shadow:0 15px 45px rgba(0,0,0,.42) !important}
 body.travel-os .blad{
   top:var(--tos-top) !important;
   left:var(--tos-rail) !important;
@@ -359,7 +380,7 @@ body.travel-os #rtg-cookie{
   transform:translateX(-50%);
   gap:.75rem !important;
   padding:.7rem .85rem !important;
-  border:1px solid #3a3d3d !important;
+  border:1px solid #551527 !important;
   border-radius:0!important;
   background:rgba(17,19,19,.98) !important;
   color:var(--tos-muted) !important;
@@ -368,22 +389,23 @@ body.travel-os #rtg-cookie{
   white-space:nowrap;
 }
 body.travel-os #rtg-cookie a{color:var(--tos-ivory) !important}
-body.travel-os #rtg-cookie button{border:0 !important;background:none !important;color:var(--tos-gold) !important;font:inherit !important;font-weight:700 !important}
+/* De cookieknop is 14 keer gemeten op 3,74:1; leestoon in plaats van accent. */
+body.travel-os #rtg-cookie button{border:0 !important;background:none !important;color:#E7A8B8 !important;font:inherit !important;font-weight:700 !important}
 body.travel-os .rtgplek{
   bottom:calc(var(--tos-bottom) + env(safe-area-inset-bottom,0px) + 4.5rem) !important;
-  border:1px solid #3a3d3d !important;
+  border:1px solid #551527 !important;
   border-radius:0!important;
   background:rgba(17,19,19,.98) !important;
   box-shadow:0 18px 55px rgba(0,0,0,.55) !important;
 }
 body.travel-os .rtgplek button{border-radius:0!important}
 body.travel-os .rtgplek .ja{background:linear-gradient(90deg,#74102f,#a61040) !important;color:#fff !important}
-body.travel-os .rtgplek .nee{border:1px solid var(--tos-line) !important;background:#101212 !important;color:var(--tos-muted) !important}
+body.travel-os .rtgplek .nee{border:1px solid var(--tos-line) !important;background:#23060e !important;color:var(--tos-muted) !important}
 
 .tos-security{
   width:min(92vw,480px);
   margin:auto;
-  border:1px solid #3c3f3f;
+  border:1px solid #571628;
   border-radius:0;
   background:var(--tos-graphite);
   color:var(--tos-ivory);
@@ -395,7 +417,7 @@ body.travel-os .rtgplek .nee{border:1px solid var(--tos-line) !important;backgro
 .tos-security-head{display:flex;align-items:start;justify-content:space-between;gap:1rem;padding-bottom:1.1rem;border-bottom:1px solid var(--tos-line)}
 .tos-security-head small{display:block;color:var(--tos-green);font-size:.58rem;font-weight:700;letter-spacing:.18em}
 .tos-security-head h2{margin:.35rem 0 0;font:750 1.45rem/1.1 Inter,system-ui,sans-serif;letter-spacing:-.035em}
-.tos-security-close{width:44px;height:44px;border:1px solid var(--tos-line);background:#171919;color:var(--tos-ivory);font-size:1.4rem;cursor:pointer}
+.tos-security-close{width:44px;height:44px;border:1px solid var(--tos-line);background:#2c0812;color:var(--tos-ivory);font-size:1.4rem;cursor:pointer}
 .tos-security ul{list-style:none;margin:0;padding:0}
 .tos-security li{display:grid;grid-template-columns:24px 1fr;gap:.7rem;padding:1rem 0;border-bottom:1px solid var(--tos-line);font-size:.82rem;line-height:1.45}
 .tos-security li b{color:var(--tos-green)}
@@ -418,9 +440,9 @@ body.travel-os-ops{
   --tos-rail:0px;
   padding-top:calc(var(--tos-top) + 54px)!important;
   padding-left:0!important;
-  background:#080a0b!important;
+  background:#180409!important;
 }
-body.travel-os-ops .tos-atmosphere{left:0;top:calc(var(--tos-top) + 54px);opacity:.34;background-image:linear-gradient(180deg,rgba(8,10,11,.16),#080a0b 36rem),linear-gradient(90deg,rgba(8,10,11,.92),rgba(8,10,11,.25)),var(--tos-scene)}
+body.travel-os-ops .tos-atmosphere{left:0;top:calc(var(--tos-top) + 54px);opacity:.34;background-image:linear-gradient(180deg,rgba(8,10,11,.16),#180409 36rem),linear-gradient(90deg,rgba(8,10,11,.92),rgba(8,10,11,.25)),var(--tos-scene)}
 .tos-opsnav{
   position:fixed;
   z-index:95;
@@ -448,8 +470,8 @@ body.travel-os-ops .panel{background:linear-gradient(145deg,rgba(20,24,28,.97),r
 body.travel-os-ops .grid{gap:.7rem!important}
 
 /* Een uitnodiging is een gastdeur: luxe, veilig en zonder ledennavigatie. */
-body.travel-os-guest{--tos-rail:0px;padding-left:0!important;padding-bottom:3rem!important;background:#080909!important}
-body.travel-os-guest .tos-atmosphere{left:0;opacity:.66;background-image:linear-gradient(180deg,rgba(8,9,9,.16),#080909 48rem),linear-gradient(90deg,rgba(8,9,9,.84),rgba(8,9,9,.18)),var(--tos-scene)}
+body.travel-os-guest{--tos-rail:0px;padding-left:0!important;padding-bottom:3rem!important;background:#170409!important}
+body.travel-os-guest .tos-atmosphere{left:0;opacity:.66;background-image:linear-gradient(180deg,rgba(26,5,12,.16),#170409 48rem),linear-gradient(90deg,rgba(26,5,12,.84),rgba(26,5,12,.18)),var(--tos-scene)}
 body.travel-os-guest .tos-module-hero--guest{min-height:470px;margin-bottom:0;background-position:center 46%}
 body.travel-os-guest > main{
   position:relative;
@@ -458,17 +480,18 @@ body.travel-os-guest > main{
   max-width:680px!important;
   margin:-1.5rem auto 4rem!important;
   padding:clamp(1.4rem,4vw,2.4rem)!important;
-  border:1px solid rgba(203,166,95,.3);
+  border:1px solid rgba(194,58,94,.3);
   border-top:3px solid var(--tos-wine-bright);
   background:rgba(14,16,16,.97);
   box-shadow:0 32px 90px rgba(0,0,0,.52);
 }
-body.travel-os-guest > main>.rtg-ceremonie{margin:0 0 1rem!important;color:var(--tos-gold)!important;font-size:.72rem!important;font-family:Inter,system-ui,sans-serif!important;font-weight:750!important;letter-spacing:.2em!important}
+/* 0,72rem is geen grote tekst: bordeaux haalt hier 3,69:1. */
+body.travel-os-guest > main>.rtg-ceremonie{margin:0 0 1rem!important;color:var(--tos-ivory)!important;font-size:.72rem!important;font-family:Inter,system-ui,sans-serif!important;font-weight:750!important;letter-spacing:.2em!important}
 body.travel-os-guest > main>.rtg-ceremonie::after{content:" · PERSOONLIJKE UITNODIGING"}
 body.travel-os-guest #vak>h2{margin:.2rem 0 .5rem!important;color:var(--tos-ivory)!important;font-size:clamp(2rem,7vw,3.6rem)!important;line-height:.96!important}
 body.travel-os-guest :where(.rtg-sub,.rtg-intro,.rtg-uitleg){color:var(--tos-muted)!important;line-height:1.65}
 body.travel-os-guest .rtg-groep{margin-top:1.4rem!important;padding-top:1.3rem;border-top:1px solid var(--tos-line)}
-body.travel-os-guest .rtg-label{display:block;margin:.75rem 0 .32rem;color:var(--tos-gold)!important;font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+body.travel-os-guest .rtg-label{display:block;margin:.75rem 0 .32rem;color:var(--tos-lees)!important;font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
 body.travel-os-guest .rtg-veld{width:100%;min-height:48px;padding:.75rem .85rem}
 body.travel-os-guest .rtg-rij{display:grid!important;grid-template-columns:1fr auto auto;gap:.6rem;align-items:center;margin-top:.7rem;padding:1rem!important}
 
@@ -476,18 +499,18 @@ body.travel-os-guest .rtg-rij{display:grid!important;grid-template-columns:1fr a
 body.travel-os-immersive{
   padding:0!important;
   overflow:hidden!important;
-  background-image:linear-gradient(180deg,rgba(4,5,5,.2),rgba(4,5,5,.72)),var(--tos-scene)!important;
+  background-image:linear-gradient(180deg,rgba(24,4,10,.2),rgba(24,4,10,.72)),var(--tos-scene)!important;
   background-size:cover!important;
   background-position:center!important;
 }
-body.travel-os-immersive .tos-atmosphere{inset:0;opacity:.28;background-image:linear-gradient(180deg,rgba(8,9,9,.04),rgba(8,9,9,.58)),var(--tos-scene);background-size:cover;background-position:center}
-body.travel-os-immersive .tos-topbar{background:linear-gradient(180deg,rgba(5,6,6,.96),rgba(5,6,6,.78));border-bottom-color:rgba(142,15,54,.7)}
+body.travel-os-immersive .tos-atmosphere{inset:0;opacity:.28;background-image:linear-gradient(180deg,rgba(26,5,12,.04),rgba(26,5,12,.58)),var(--tos-scene);background-size:cover;background-position:center}
+body.travel-os-immersive .tos-topbar{background:linear-gradient(180deg,rgba(24,4,10,.96),rgba(24,4,10,.78));border-bottom-color:rgba(142,15,54,.7)}
 body.travel-os-immersive .kop{top:var(--tos-top)!important;padding-inline:clamp(1rem,4vw,2.3rem)!important}
 body.travel-os-immersive #poort .inlog{width:min(92vw,520px);min-height:260px;margin:28vh auto 0!important;text-align:left!important}
 body.travel-os-immersive #poort .inlog::before{content:"03 / TRAVEL OS · DE RÉSIDENCE"}
 body.travel-os-immersive:has(#poort .inlog) #wereld{opacity:.12}
-body.travel-os-immersive .laag{padding-top:calc(var(--tos-top) + 4rem)!important;background:rgba(4,5,5,.84)!important}
-body.travel-os-immersive .paneel{border-color:rgba(203,166,95,.32)!important;background:rgba(15,17,17,.97)!important;box-shadow:0 28px 90px rgba(0,0,0,.45)!important}
+body.travel-os-immersive .laag{padding-top:calc(var(--tos-top) + 4rem)!important;background:rgba(24,4,10,.84)!important}
+body.travel-os-immersive .paneel{border-color:rgba(194,58,94,.32)!important;background:rgba(15,17,17,.97)!important;box-shadow:0 28px 90px rgba(0,0,0,.45)!important}
 
 @media(max-width:939px){
   :root{--tos-top:72px;--tos-rail:0px;--tos-bottom:78px}
@@ -509,9 +532,9 @@ body.travel-os-immersive .paneel{border-color:rgba(203,166,95,.32)!important;bac
     padding:0 0 env(safe-area-inset-bottom,0px);
     grid-template-columns:repeat(4,1fr);
     grid-template-rows:1fr;
-    border-top:1px solid #2f3232;
+    border-top:1px solid #491122;
     border-right:0;
-    background:rgba(9,10,10,.97);
+    background:rgba(26,5,12,.97);
     backdrop-filter:blur(22px);
   }
   .tos-atmosphere{top:calc(var(--tos-top) + env(safe-area-inset-top,0px));left:0;bottom:calc(var(--tos-bottom) + env(safe-area-inset-bottom,0px));background-size:cover,cover,auto 32rem;background-position:center,center,62% top}
@@ -573,3 +596,60 @@ body.travel-os-immersive .paneel{border-color:rgba(203,166,95,.32)!important;bac
 @media(prefers-reduced-motion:reduce){
   body.travel-os *,body.travel-os *::before,body.travel-os *::after{animation:none !important;transition:none !important;scroll-behavior:auto !important}
 }
+
+/* ------------------------------------------------------- EEN KOP, EEN RIJ
+   Deze schermen droegen twee kopbalken: de TravelOS-kop (merk, module,
+   beveiligd) en daaronder de ios-balk met een menuknop, een terug-link, de
+   paginatitel en de Rahul-tab. De terug-link stond daarmee twee keer (het
+   RTG-merk doet hetzelfde) en de titel drie keer, en het kostte 123 pixels
+   boven de inhoud van elk reisscherm.
+
+   WAT HIER NIET GEBEURT, EN WAAROM. Ik heb eerst geprobeerd de twee unieke
+   knoppen (het app-menu en de Rahul-tab) naar de TravelOS-kop te VERPLAATSEN en
+   de oude balk te verbergen. Dat werkte op drie schermen en niet op zes: de
+   balk wordt door een ander script gebouwd en opnieuw opgebouwd, dus de
+   verhuisde knop was even later weg -- en het menu daarmee onbereikbaar. Een
+   waarnemer die daar tegenin blijft duwen is een race, en een race verlies je
+   op het scherm van iemand anders.
+
+   Dus blijft de balk staan waar hij hoort en verliest hij alleen wat dubbel is.
+   Wat overblijft is een dunne handelingsrij: menu links, Rahul rechts. */
+body.travel-os .ios-nav{
+  /* !important omdat deze balk uit een andere laag komt die zichzelf later in
+     de bundel zet; het huis doet dat op dezelfde manier bij `html.tos-ingebed`.
+     Het gaat om drie eigenschappen en niet om een heel blok. */
+  position:static!important;
+  display:flex!important;
+  align-items:center;
+  justify-content:space-between;
+  gap:.8rem;
+  min-height:0;
+  border:0;
+  background:none;
+  box-shadow:none;
+  padding:.4rem clamp(1rem,3vw,2rem) 0;
+}
+/* min-width:0 EN NIET ALLEEN flex:1. Een flexkind zakt niet vanzelf onder zijn
+   intrinsieke breedte, dus een rij met een lange kop duwde de Rahul-tab op
+   390px 46 pixels buiten beeld -- en deze balk scrolt niet zijwaarts, dus die
+   knop was daar gewoon weg. Dezelfde fout als in het vraagveld van Metier:
+   flex:1 zonder min-width:0 is geen krimpende kolom maar een duwende. */
+body.travel-os .ios-nav .ios-nav-rij{flex:1 1 0;min-width:0;display:flex;align-items:center;overflow:hidden}
+body.travel-os .ios-nav .ios-nav-acties{flex:none}
+body.travel-os .ios-nav .ios-nav-titel,
+body.travel-os .ios-nav .ios-terug,
+body.travel-os .ios-nav .terug{display:none}
+body.travel-os .ios-nav .ios-nav-rij{min-height:0;padding-block:0}
+body.travel-os .ios-nav .ios-nav-acties{display:flex;align-items:center;gap:.5rem}
+body.travel-os .ios-nav .rtg-rahul-tab{
+  flex:none;
+  display:flex;
+  align-items:baseline;
+  gap:.4rem;
+  min-height:36px;
+  border:1px solid var(--tos-line);
+  background:none;
+  padding:.3rem .7rem;
+  font-size:.68rem;
+}
+body.travel-os .ios-nav .rtg-rahul-tab small{font-size:.5rem;letter-spacing:.14em}

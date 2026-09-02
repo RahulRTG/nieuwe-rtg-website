@@ -5,7 +5,8 @@
 'use strict';
 
 module.exports = (ctx) => {
-  const { save, nu, klacht, publiek, zet, wacht, maxPogingen, STATUS, AF, DEFINITIEF, railInzenden, terugboeken } = ctx;
+  const { save, nu, klacht, publiek, zet, wacht, maxPogingen, STATUS, AF, DEFINITIEF,
+    railInzenden, terugboeken, verwerkAfwikkeling } = ctx;
 
   /* Eén poging bij de rail. Slaagt hij, dan is de opdracht ingediend (of meteen
      afgewikkeld als de rail dat zelf al meldt). Mislukt hij, dan telt de poging
@@ -42,6 +43,7 @@ module.exports = (ctx) => {
     zet(o, DEFINITIEF.has(railStatus) ? STATUS.AFGEWIKKELD : STATUS.INGEDIEND,
       { settlementRef: (uit && uit.id) || null, railStatus, laatsteFout: null, volgendeAt: null });
     save();
+    if (o.status === STATUS.AFGEWIKKELD) await verwerkAfwikkeling(o);
     return publiek(o);
   }
 

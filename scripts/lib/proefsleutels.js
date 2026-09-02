@@ -29,6 +29,8 @@
 
 /* De kantoorcode van de wegwerpserver. Staat hier omdat de proeven hem in hun
    env meegeven en het anders op twee plekken een string is. */
+const { maakZaakinlog } = require('./zaakinlog');
+
 const OFFICE_CODE = 'RTG-OFFICE-PROEF';
 
 /* Het demo-wachtwoord van de gezaaide accounts (server/server.js:
@@ -103,6 +105,25 @@ const MUNTERS = [
   ['boardroom', 'eigenaar -> /api/account/start {rol:kantoor}: een office-sessie MET lidKey, het enige wat boardroomAuth() doorlaat',
     async (post, bos) => (bos.eigenaar ? tok(await post('/api/account/start', { rol: 'kantoor' }, bos.eigenaar)) : null)],
 
+  /* KANTOOR OP NAAM, en dat is iets anders dan `office` hierboven.
+
+     `office` is de GEDEELDE backofficecode: een sessie zonder lidKey, dus zonder
+     mens erachter. Een groeiend aantal routes weigert juist die -- een Lifestyle
+     Pass toekennen, een identiteit goedkeuren, alles wat in het inzagejournaal
+     belandt -- omdat daar een herleidbaar persoon bij hoort en geen code die
+     iedereen kent (kern/kantoor/kluispoort.js zegt dat met zoveel woorden).
+
+     Zonder sleutel voor deze rol werden die routes stil als ONGEMETEN
+     overgeslagen, en ongemeten leest in een uitslag als geslaagd. Dat is precies
+     het gat dat test/proefsleutels.test.js bewaakt.
+
+     De sessie is dezelfde als die van de boardroom: de eigenaar logt in als lid
+     en opent daarmee de kantoordeur (kern/eenaccount/starten.js), en DIE sessie
+     draagt een lidKey. Hij staat hier als eigen rol en niet als alias, omdat de
+     bewakerskaart hem als eigen rol kent en de verdeling op die naam gebeurt. */
+  ['kantoor-op-naam', 'dezelfde office-sessie MET lidKey als de boardroom: een kantoorsessie met een mens erachter, wat de gedeelde code niet is',
+    async (post, bos) => bos.boardroom || null],
+
   /* baasAuth() in server/routes/werkplek.js is `wie(req).baas`, en `wie` is
      boardroomWie/boardroomBaas. Dezelfde sessie dus, met dezelfde reden. */
   ['werkplekbaas', 'dezelfde boardroom-sessie: baasAuth() vraagt boardroomBaas() en dat is de eigenaar',
@@ -123,6 +144,23 @@ const MUNTERS = [
       const s = await post('/api/techniek/sso/scimsleutel', { org }, bos.techniek);
       return (s && s.data && s.data.sleutel) || null;
     }],
+
+  /* DE DRIE LEGE SLEUTELS, en ze staan hier omdat ze GEMUNT moeten worden.
+
+     Ze stonden al in ROLLEN met de reden erbij, maar zonder munter bleef
+     `tokens.openbaar` leeg -- en dan meldt een proef "rol openbaar, maar dit
+     instrument heeft daar geen token voor" en telt de route als ONGEMETEN.
+     Gemeten op 1 september 2026: 107 routes, en er was niets mis mee.
+
+     Hun sleutel is de LEGE STRING: geen Authorization-kop meesturen is voor een
+     openbare route niet een tekort maar de JUISTE invoer. Zie de kop van
+     LEGE_SLEUTELS hieronder voor waarom het er drie zijn en geen een. */
+  ['openbaar', 'geen inlog maar het ONTBREKEN ervan: zonder kop aankloppen is precies wat een openbare route hoort te krijgen',
+    async () => ''],
+  ['omgeving', 'hangt aan een omgevingsvariabele en niet aan een sessie; ook hier is geen kop de juiste invoer',
+    async () => ''],
+  ['eigen-poort', 'een inlogdeur die zelf oordeelt (scripts/lib/bewakers.js); hij MAAKT de sessie en kan er dus geen eisen',
+    async () => ''],
 ];
 
 /* Rollen die geen DEUR zijn en dus niet in de rollenlijst horen. `eigenaar` is
@@ -152,7 +190,10 @@ async function haalSleutels({ post }) {
     waaroms[rol] = waarom;
     let t = null;
     try { t = await munt(post, tokens); } catch (e) { t = null; }
-    if (t) tokens[rol] = t; else ontbreekt.push({ rol, waarom });
+    /* `t != null` en niet `if (t)`: de lege string IS een geldige sleutel voor de
+       drie lege-sleutelrollen hierboven, en een waarheidstoets gooit hem weg.
+       Dat is precies hoe 107 openbare routes als ongemeten konden tellen. */
+    if (t != null && t !== false) tokens[rol] = t; else ontbreekt.push({ rol, waarom });
   }
   const hernieuw = async (rol) => {
     const rij = MUNTERS.find(m => m[0] === rol);
@@ -171,7 +212,39 @@ async function haalSleutels({ post }) {
     return false;
   };
   const rollen = Object.keys(tokens).filter(r => !GEEN_BEWAKER.has(r));
-  return { tokens, rollen, ontbreekt, waaroms, hernieuw, tokenVoor: (rol) => tokens[rol] };
+  /* HET ZAAKBUREAU -- een plek voor elke zaakinlog, met EEN teller.
+
+     ./zaakinlog.js houdt een rem op het aantal roosteropvragingen en een cache
+     over de zaken die het al kent. De wereldopstellingen van de
+     idempotentieproef (de genrewereld voorop) hebben er een nodig, en ze horen
+     DEZELFDE te krijgen: twee bureaus zijn twee tellers, en dan meet de proef
+     zijn eigen verbruik verkeerd -- precies wat test/eindpoort.test.js
+     ("de proef blijft onder de roster-rem, gemeten") bewaakt.
+
+     Hij staat hier en niet in de proef, omdat de sleutelbos de enige plek is
+     waar dit huis inlogt. `inlog` geeft de losse munters terug voor wie een
+     rol opnieuw wil zetten zonder de hele bos te hermunten. */
+  /* TWEE NAMEN VOOR DEZELFDE SESSIE, en dat is geen slordigheid maar een brug.
+
+     De lijfsleutelfamilies in ./lijfsleutels.js zijn geschreven tegen de
+     namen `member-lifestyle` en `member-zakelijk`; deze sleutelbos mint ze als
+     `lid-lifestyle` en `lid-business`. Dezelfde inlog, dezelfde pas, ander
+     woord -- en het gevolg was stil: `partner` en `lifestyle` konden niet
+     gebouwd worden, en alle routes erachter telden als 'geen proefsleutel'
+     terwijl de sleutel er gewoon was.
+
+     Hernoemen kan niet zonder de vijf andere proefrunners te raken, dus staat
+     de brug hier, op EEN plek, met de reden. Een alias en geen tweede inlog:
+     het is letterlijk hetzelfde token. */
+  for (const [alias, bron] of [['member-lifestyle', 'lid-lifestyle'], ['member-zakelijk', 'lid-business']]) {
+    if (tokens[bron] != null && tokens[alias] == null) tokens[alias] = tokens[bron];
+  }
+
+  const zaakbureau = maakZaakinlog({ post });
+  const inlog = Object.fromEntries(MUNTERS.map(([rol, , munt]) => [rol, () => munt(post, tokens)]));
+
+  return { tokens, rollen, ontbreekt, waaroms, hernieuw, zaakbureau, inlog,
+    tokenVoor: (rol) => tokens[rol] };
 }
 
 /* Wat een proef op het scherm zet over zijn sleutelbos. Een plek, zodat zes
@@ -192,4 +265,26 @@ function meldSleutels(bos, log) {
    een uitgeklede omgeving ontbreken, en dan is 'ongemeten' het eerlijke woord. */
 const BASISROLLEN = ['member', 'office', 'supplier'];
 
-module.exports = { haalSleutels, meldSleutels, BASISROLLEN, PASLADDER, OFFICE_CODE, DEMO_PASS, MUNTERS };
+/* DE DRIE LEGE SLEUTELS -- rollen waarvan de sleutel de LEGE STRING is.
+
+   Ze horen in deze lijst juist omdat er niets te munten valt. `openbaar` is geen
+   inlog maar het ontbreken ervan; `omgeving` hangt aan een omgevingsvariabele en
+   niet aan een sessie; `eigen-poort` is een inlogdeur die zelf oordeelt
+   (scripts/lib/bewakers.js). Voor alle drie is "geen Authorization-kop" niet een
+   tekort maar de JUISTE invoer.
+
+   Waarom ze dan toch meetellen: een rol die niet in ROLLEN staat, valt bij het
+   verdelen uit de beproefbare verzameling, en dan tellen routes die met een
+   reden openbaar zijn als instrumenttekort terwijl er niets ontbreekt. Drie
+   verschillende woorden dus, en ze mogen niet tot een samenvallen -- daar zakt
+   test/eigenpoort.test.js op. */
+const LEGE_SLEUTELS = ['openbaar', 'omgeving', 'eigen-poort'];
+
+/* ROLLEN wordt AFGELEID en niet nog eens naast de munters getypt: twee lijsten
+   van dezelfde rollen lopen uiteen zodra er een munter bij komt, en dan noemt de
+   ene lijst een rol die de andere niet kent. Dat is exact de fout die deze
+   sleutelbos zelf moest oplossen (zie de kop). */
+const ROLLEN = [...new Set([...MUNTERS.map(m => m[0]), ...LEGE_SLEUTELS])];
+
+module.exports = { haalSleutels, meldSleutels, BASISROLLEN, ROLLEN, LEGE_SLEUTELS,
+  PASLADDER, OFFICE_CODE, DEMO_PASS, MUNTERS };

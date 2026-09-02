@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0C0C0B">
+<title>Geven aan de RTFoundation</title>
+<link rel="icon" href="/icons/foundation.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<link href="premium.css" rel="stylesheet">
+<style>
+  :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--line:var(--rtg-line);--txt:var(--rtg-txt);--muted:var(--rtg-muted);--soft:var(--rtg-soft);--burgundy:#A6002F;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
+  h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;}
+  main{padding:1rem;max-width:820px;margin:0 auto;display:flex;flex-direction:column;gap:1.1rem;}
+  .gkaart{background:var(--card);border:1px solid var(--line);padding:.95rem 1rem;}
+  .gsec{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--rtg-goud,#C9A24B);margin-bottom:.6rem;}
+  .gknop{background:transparent;color:var(--txt);border:1px solid var(--line);padding:.6rem 1rem;font:inherit;font-weight:500;font-size:.88rem;cursor:pointer;min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:.4rem;text-decoration:none;}
+  .gknop.vol{background:var(--burgundy);color:#fff;border-color:var(--burgundy);font-weight:600;}
+  .gknop[disabled]{opacity:.55;cursor:not-allowed;}
+  .gveld{flex:1;min-width:8rem;background:var(--bg);border:1px solid var(--line);color:var(--txt);font:inherit;font-size:.95rem;padding:.6rem .7rem;min-height:44px;}
+  select.gveld{min-width:11rem;}
+  .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
+  .uitleg{font-size:.86rem;color:var(--muted);line-height:1.65;}
+  .melder{font-size:.9rem;padding:.65rem .8rem;border:1px solid #5C1B2C;color:#F0A9BB;}
+  .melder.goed{border-color:#2F5E42;color:#9FD6B4;}
+  .ruimte{margin-top:.7rem;}
+  /* !important, en dat is hier geen luiheid. shared/rtg-ui.css zet
+     `body.rtg-stijl .rij{display:flex}` -- twee klassen en een element, dus
+     zwaarder dan deze ene klasse. Zonder dit bleef elk verborgen blok dat OOK
+     een .rij is gewoon staan: op dit scherm het projectveld, op
+     klimaatfonds.html het aliasveld. Een verbergklasse die soms niet verbergt,
+     is erger dan geen verbergklasse. */
+  .verborgen{display:none!important;}
+
+  .onthaal{position:relative;overflow:hidden;padding:2rem 2rem 1.8rem;
+    background:linear-gradient(155deg,#1B1817 0%,#151312 54%,#0C0C0B 100%);color:#F4F0E9;border:1px solid var(--line);}
+  .onthaal::before{content:"";position:absolute;inset:0;opacity:.22;pointer-events:none;
+    background:repeating-linear-gradient(112deg,rgba(201,162,75,.07) 0 2px,transparent 2px 28px);}
+  .onthaal > *{position:relative;}
+  .onthaal .ey{font-size:.66rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--rtg-goud,#C9A24B);margin-bottom:.6rem;}
+  #gkop{font-size:clamp(1.7rem,4vw,2.4rem);line-height:1.14;font-family:'Bodoni Moda',Georgia,serif!important;font-weight:400!important;text-transform:none!important;}
+  .onthaal p{font-size:.98rem;line-height:1.6;max-width:46ch;margin-top:.9rem;color:#F4F0E9;}
+
+  .bedragen{display:flex;gap:.5rem;flex-wrap:wrap;}
+  .bedragen button{min-width:5rem;}
+  .bedragen button[aria-pressed="true"]{border-color:var(--rtg-goud,#C9A24B);box-shadow:inset 0 -3px 0 var(--rtg-goud,#C9A24B);}
+  .vraag{display:flex;gap:.6rem;align-items:flex-start;padding:.7rem 0;border-top:1px solid var(--line);}
+  .vraag input[type=checkbox]{width:22px;height:22px;flex-shrink:0;margin-top:.15rem;accent-color:var(--burgundy);}
+  .vraag label{font-size:.9rem;line-height:1.55;}
+  .vraag .bij{display:block;font-size:.78rem;color:var(--muted);margin-top:.2rem;}
+
+  /* Het voornemen: de gevolgen, vóór de bevestiging. Elke regel komt van de
+     server -- dit scherm schrijft er geen zin bij. */
+  .gevolg{border-top:1px solid var(--line);padding:.7rem 0;font-size:.92rem;line-height:1.6;}
+  .gevolg:first-child{border-top:none;}
+  .bedrag{font-family:'Bodoni Moda',serif;font-size:2rem;}
+  .kosten{font-size:.82rem;color:var(--muted);margin-top:.3rem;}
+
+  @media (max-width:760px){ .onthaal{padding:1.4rem 1.1rem 1.2rem;} .gknop{width:100%;} .bedragen button{flex:1;} }
+</style>
+<link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
+<script src="/shared/id.js"></script>
+</head>
+<body class="rtg-stijl" data-rtg-world="foundation">
+<main id="main">
+
+  <section class="onthaal" aria-labelledby="gkop">
+    <div class="ey">FoundationOS · Geven</div>
+    <h1 id="gkop">Geven aan de<br>RTFoundation.</h1>
+    <p id="onthaalzin">Wat je geeft, gaat naar het werk van de stichting in de steden. Je ziet eerst wat
+      er gebeurt, en pas daarna bevestig je.</p>
+  </section>
+
+  <div id="poort" class="gkaart verborgen">
+    <div class="gsec">Even inloggen</div>
+    <div class="uitleg">Geven werkt op je eigen RTG-account: het bedrag gaat van je wallet, en je gift
+      komt op je eigen naam in het donateursportaal te staan.</div>
+    <div class="rij ruimte"><a class="gknop vol" href="/apps/app.html">Naar het inlogscherm</a></div>
+  </div>
+
+  <!-- DE DICHTE STAND IS EEN SCHERM EN GEEN GRIJZE KNOP. Staat de giftstand
+       dicht, dan zegt de server met een zin waarom; die zin komt hier te staan.
+       Zie GIFT.md par. 4. -->
+  <div id="dicht" class="gkaart verborgen">
+    <div class="gsec">Geven kan hier nog niet</div>
+    <div class="uitleg" id="dichtzin"></div>
+    <div class="rij ruimte"><a class="gknop" href="os-donateur.html">Ik heb al gegeven en zoek mijn overzicht</a></div>
+  </div>
+
+  <div id="app" class="verborgen">
+    <div class="gkaart">
+      <div class="gsec">Wat wil je geven?</div>
+      <div class="bedragen" id="bedragen">
+        <button type="button" class="gknop" data-bedrag="10" aria-pressed="false">€ 10</button>
+        <button type="button" class="gknop" data-bedrag="25" aria-pressed="false">€ 25</button>
+        <button type="button" class="gknop" data-bedrag="50" aria-pressed="false">€ 50</button>
+      </div>
+      <div class="rij ruimte">
+        <input class="gveld" id="euro" type="number" min="1" step="1" inputmode="decimal" placeholder="Eigen bedrag in euro" aria-label="Bedrag in euro">
+        <select class="gveld" id="vorm" aria-label="Wat voor gift"></select>
+      </div>
+      <div class="rij ruimte verborgen" id="projectrij">
+        <select class="gveld" id="project" aria-label="Project"><option value="">Kies een project</option></select>
+      </div>
+
+      <div class="vraag">
+        <input type="checkbox" id="tegen">
+        <label for="tegen">Er staat iets tegenover
+          <span class="bij">Bijvoorbeeld je logo op een bord of een tegenprestatie die is afgesproken.
+            Dan is het sponsoring en geen gift, en dat verandert wat je terugkrijgt.</span></label>
+      </div>
+      <div class="vraag">
+        <input type="checkbox" id="anoniem">
+        <label for="anoniem">Ik wil niet met naam genoemd worden
+          <span class="bij">De stichting weet wel wie je bent &mdash; dat moet, voor de verantwoording.</span></label>
+      </div>
+
+      <div class="rij ruimte">
+        <button class="gknop vol" id="reken">Laat zien wat er gebeurt</button>
+      </div>
+      <div id="melding"></div>
+    </div>
+
+    <!-- Het voornemen. Bevestigen kan pas nadat dit er heeft gestaan: GRAMMATICA.md
+         vraagt bij een plechtige handeling dat een mens hem afmaakt, en dan hoort
+         hij te weten waar hij ja op zegt. -->
+    <div class="gkaart verborgen" id="voornemen">
+      <div class="gsec">Dit gebeurt er</div>
+      <div class="bedrag" id="vBedrag"></div>
+      <div class="kosten" id="vKosten"></div>
+      <div id="vGevolgen"></div>
+      <div class="rij ruimte">
+        <button class="gknop vol" id="bevestig">Ja, geef dit bedrag</button>
+        <button class="gknop" id="terug">Terug</button>
+      </div>
+      <div class="uitleg ruimte" id="vNiets"></div>
+    </div>
+
+    <!-- HET MEERJARIGE PLAN. Alleen zichtbaar als de vorm "periodiek" openstaat;
+         een periodieke gift is namelijk een AFSPRAAK en niet een bedrag, dus hij
+         hoort niet in het formulier hierboven maar hier. -->
+    <div class="gkaart verborgen" id="planKaart">
+      <div class="gsec">Meerjarig geven</div>
+      <div class="uitleg">Een periodieke gift is een afspraak voor meerdere jaren, vastgelegd in een
+        overeenkomst. Er wordt niets automatisch afgeschreven: je bevestigt elke termijn zelf.</div>
+      <div class="rij ruimte">
+        <input class="gveld" id="planEuro" type="number" min="1" step="1" placeholder="Bedrag per jaar" aria-label="Bedrag per jaar">
+        <input class="gveld" id="planJaren" type="number" min="5" step="1" value="5" placeholder="Aantal jaren" aria-label="Aantal jaren">
+        <button class="gknop" id="planVoorstel">Voorstellen</button>
+      </div>
+      <div id="planMeld"></div>
+      <div id="planLijst"></div>
+    </div>
+
+    <div class="gkaart">
+    <div class="gsec">Liever iets kopen?</div>
+    <div class="uitleg">De stichting heeft ook een winkel. Let op het verschil: bij een aankoop
+      staat er iets tegenover, dus dat is <b>geen</b> aftrekbare gift en er komt geen giftbewijs bij.
+      De opbrengst gaat wel naar hetzelfde werk.</div>
+    <div class="rij ruimte"><a class="gknop" href="/apps/foundation/winkel.html">Naar de winkel</a></div>
+  </div>
+
+  <div class="gkaart verborgen" id="klaar">
+      <div class="gsec">Gelukt</div>
+      <div id="klaarIn"></div>
+      <div class="rij ruimte">
+        <a class="gknop" href="os-donateur.html">Naar mijn overzicht</a>
+        <button class="gknop" id="nogeen">Nog een gift</button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+/* Geven aan de RTFoundation.
+
+   TWEE STAPPEN, EN DE EERSTE IS NIET DECORATIEF. Het scherm rekent niets uit:
+   het vraagt de server wat er zou gebeuren (/api/rtfos/gift/voorbereid), toont
+   die zinnen letterlijk, en pas daarna kan er bevestigd worden. Dat is de
+   volgorde uit GRAMMATICA.md -- een handeling met geld is plechtig, en die
+   maakt een mens af nadat hij de gevolgen heeft gezien.
+
+   HET SCHERM SCHRIJFT GEEN ENKELE ZIN OVER DE GEVOLGEN ZELF. Of iets een gift
+   of sponsoring is, of het eerst beoordeeld wordt, en of er een giftbewijs of
+   een ontvangstbevestiging uit komt: dat staat in kern/rtfos/gift-voornemen.js
+   en komt hier als tekst binnen. Zou dit bestand die zinnen ook kennen, dan
+   lopen ze uiteen zodra er een ANBI-beschikking komt -- en dan zegt het scherm
+   iets anders dan het portaal een maand later.
+
+   EN HET REKENT DE UITKOMST NIET MEE TERUG. Wat hier de deur uit gaat is
+   INVOER (bedrag, vorm, project, of er iets tegenover staat); de server rekent
+   het voornemen opnieuw bij het bevestigen. */
+const $ = s => document.querySelector(s);
+const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const eur = n => '€ ' + Number(n || 0).toFixed(2).replace('.', ',');
+
+function token() { try { return localStorage.getItem('rtg_member_token') || ''; } catch (e) { return ''; } }
+
+const api = (pad, body) => fetch('/api/rtfos/gift/' + pad, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token() },
+  body: JSON.stringify(body || {})
+}).then(async r => {
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok || d.error) { const e = new Error(d.error || 'Er ging iets mis.'); e.data = d; throw e; }
+  return d;
+});
+
+const VORMNAAM = { eenmalig: 'Eenmalig', geoormerkt: 'Voor een project', periodiek: 'Periodiek' };
+let STAND = null;
+/* De idempotentiesleutel wordt hier EEN keer gemaakt, bij het tonen van het
+   voornemen, en niet bij elke klik. Twee keer op bevestigen drukken is dan een
+   gift -- de server herkent dezelfde sleutel. */
+let SLEUTEL = null;
+
+function zeg(t, goed) { $('#melding').innerHTML = '<div class="melder' + (goed ? ' goed' : '') + ' ruimte">' + esc(t) + '</div>'; }
+
+async function start() {
+  /* Kom je van het Klimaatfonds met een project, dan staat de vorm meteen goed.
+     Zonder dit moet iemand die op "Hieraan geven" drukte alsnog zelf
+     "Voor een project" kiezen, en dat is precies wat hij net deed. */
+  try { if (projectUitUrl()) { const v = $('#vorm'); if (v) v.value = 'geoormerkt'; } } catch (e) {}
+  if (!token()) { $('#poort').classList.remove('verborgen'); return; }
+  try {
+    STAND = await api('stand', {});
+  } catch (e) { $('#poort').classList.remove('verborgen'); return; }
+
+  if (STAND.stand !== 'open') {
+    $('#dicht').classList.remove('verborgen');
+    $('#dichtzin').textContent = STAND.uitleg;
+    return;
+  }
+  $('#app').classList.remove('verborgen');
+  $('#vorm').innerHTML = STAND.vormen.map(v =>
+    '<option value="' + esc(v) + '">' + esc(VORMNAAM[v] || v) + '</option>').join('');
+  toonProjectrij();
+  if (STAND.vormen.includes('periodiek')) { $('#planKaart').classList.remove('verborgen'); planTeken(); }
+}
+
+function toonProjectrij() {
+  const geoormerkt = $('#vorm').value === 'geoormerkt';
+  $('#projectrij').classList.toggle('verborgen', !geoormerkt);
+  if (geoormerkt) projectenVullen();
+}
+$('#vorm').addEventListener('change', toonProjectrij);
+
+$('#bedragen').querySelectorAll('[data-bedrag]').forEach(b => b.addEventListener('click', () => {
+  $('#euro').value = b.dataset.bedrag;
+  $('#bedragen').querySelectorAll('[data-bedrag]').forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
+}));
+$('#euro').addEventListener('input', () =>
+  $('#bedragen').querySelectorAll('[data-bedrag]').forEach(x => x.setAttribute('aria-pressed', 'false')));
+
+function invoer() {
+  return { euro: Number($('#euro').value), vorm: $('#vorm').value,
+    /* HET ID EN NIET DE NAAM. Een naam uit de browser wees nergens op na te
+       kijken heen: je kon 25 euro oormerken op "Bestaat Helemaal Niet". De
+       server zoekt de naam bij dit id (kern/rtfos/gift-projecten.js). */
+    projectId: $('#project').value || undefined,
+    tegenprestatie: $('#tegen').checked, anoniem: $('#anoniem').checked };
+}
+
+$('#reken').addEventListener('click', async () => {
+  $('#melding').innerHTML = '';
+  try {
+    const r = await api('voorbereid', invoer());
+    /* RTGId en niet Date.now()+Math.random(): die tweede is milliseconde-grof en
+       levert een handvol bits, en dit is precies de sleutel waarop de server
+       twee klikken herkent als EEN gift (shared/id.js). */
+    SLEUTEL = RTGId('geven');
+    $('#vBedrag').textContent = eur(r.voornemen.euro);
+    /* De kosten staan er VOORAF bij en niet pas op de bon. Ze komen van de
+       ontvanger af (kern/pay/partner.js), dus er komt minder bij de stichting
+       binnen dan je geeft -- dat hoor je te weten voordat je ja zegt. Het
+       bedrag zelf kent dit scherm niet; het staat er als wat het is. */
+    $('#vKosten').textContent = 'Van dit bedrag gaan nog transactiekosten af voordat het bij de stichting staat.';
+    $('#vGevolgen').innerHTML = r.zegt.map(z => '<div class="gevolg">' + esc(z) + '</div>').join('');
+    $('#vNiets').textContent = r.nietGedaan;
+    $('#voornemen').classList.remove('verborgen');
+    $('#klaar').classList.add('verborgen');
+    $('#voornemen').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } catch (e) { zeg(e.message); }
+});
+
+$('#terug').addEventListener('click', () => {
+  $('#voornemen').classList.add('verborgen');
+  SLEUTEL = null;
+});
+
+$('#bevestig').addEventListener('click', async () => {
+  const knop = $('#bevestig');
+  knop.disabled = true;
+  try {
+    const r = await api('bevestig', Object.assign(invoer(), { idem: SLEUTEL }));
+    $('#voornemen').classList.add('verborgen');
+    $('#klaarIn').innerHTML =
+      '<div class="bedrag">' + esc(eur(r.gegeven)) + '</div>' +
+      '<div class="kosten">Hiervan ging ' + esc(eur((r.kosten || 0) / 100)) + ' aan transactiekosten af; ' +
+        esc(eur(r.gegeven - (r.kosten || 0) / 100)) + ' staat bij de stichting.</div>' +
+      r.zegt.map(z => '<div class="gevolg">' + esc(z) + '</div>').join('') +
+      (r.beoordeeldVooraf
+        ? '<div class="gevolg">Je hoort van de stichting zodra de beoordeling klaar is.</div>' : '');
+    $('#klaar').classList.remove('verborgen');
+    $('#klaar').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    $('#euro').value = ''; $('#tegen').checked = false; $('#anoniem').checked = false;
+  } catch (e) { zeg(e.message); }
+  finally { knop.disabled = false; SLEUTEL = null; }
+});
+
+$('#nogeen').addEventListener('click', () => {
+  $('#klaar').classList.add('verborgen');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+/* ---------------------------------------------------------------- het plan */
+const planApi = (pad, body) => api('plan/' + pad, body);
+
+/* DE MACHTIGING BIJ EEN PLAN. Twee dingen die hier op het scherm horen en niet
+   in een voetnoot: dat er NIETS wordt afgeschreven (dit huis heeft geen
+   incasso-rail), en de acht weken waarin je een afschrijving zonder reden kunt
+   laten terugboeken. Dat laatste is de belangrijkste bescherming die een
+   betaler heeft; hem klein zetten is hem verstoppen. */
+/* De projecten waar een gift aan vast kan. Eenmaal opgehaald: de lijst
+   verandert niet halverwege een gift, en elke keer opnieuw vragen zou de server
+   belasten voor een keuzemenu. Loopt het mis, dan zegt het veld dat -- niet een
+   leeg menu waar de gever naar zit te kijken. */
+let PROJECTEN = null;
+/* Een project dat via het Klimaatfonds is aangewezen (?project=<id>). Alleen
+   het ID: de naam wordt door de server opgezocht, hier net zo goed als daar. */
+function projectUitUrl() {
+  try { return new URLSearchParams(location.search).get('project') || ''; } catch (e) { return ''; }
+}
+
+async function projectenVullen() {
+  const kies = $('#project');
+  if (!kies || PROJECTEN) return;
+  try {
+    const r = await api('projecten', {});
+    PROJECTEN = r.projecten || [];
+    kies.innerHTML = '<option value="">Kies een project</option>' +
+      PROJECTEN.map(p => '<option value="' + esc(p.id) + '">' + esc(p.naam) +
+        (p.stad ? ' \u00b7 ' + esc(p.stad) : '') + '</option>').join('');
+    if (!PROJECTEN.length) kies.innerHTML = '<option value="">' + esc(r.uitleg) + '</option>';
+    /* Kwam je van het Klimaatfonds, dan staat het project al goed -- maar
+       alleen als het ECHT in de lijst staat. Een id uit een adresbalk dat
+       nergens op slaat, hoort geen selectie te worden. */
+    const uit = projectUitUrl();
+    if (uit && PROJECTEN.some(p => p.id === uit)) kies.value = uit;
+  } catch (e) {
+    PROJECTEN = null;
+    kies.innerHTML = '<option value="">De projectenlijst is nu niet op te halen</option>';
+  }
+}
+
+let MACHTIGINGEN = [];
+function machtigingBlok(p) {
+  const m = MACHTIGINGEN.find(x => x.planId === p.id && x.actief);
+  if (m) {
+    return '<div class="kosten ruimte"><b>Machtiging ' + esc(m.kenmerk) + '</b> &middot; rekening op ' +
+      esc(m.ibanEinde) + ' &middot; maximaal ' + esc(eur(m.maxCenten / 100)) + ' per jaar</div>' +
+      '<div class="kosten">Er wordt op dit moment niets afgeschreven. Je krijgt elke termijn ' +
+        m.aankondigingDagen + ' dagen van tevoren bericht, en je kunt een afschrijving tot ' +
+        m.stornoWeken + ' weken terug laten boeken via je bank, zonder opgaaf van reden.</div>' +
+      '<div class="rij ruimte"><button class="gknop" data-mweg="' + esc(m.id) + '">Machtiging intrekken</button>' +
+        '<span class="kosten">Dit stopt de incasso, niet de gift.</span></div>';
+  }
+  if (p.stand === 'gestopt') return '';
+  return '<div class="rij ruimte">' +
+    '<input class="gveld" data-mh="' + esc(p.id) + '" placeholder="Naam op de rekening" aria-label="Naam op de rekening">' +
+    '<input class="gveld" data-mi="' + esc(p.id) + '" placeholder="Laatste 4 cijfers" maxlength="4" aria-label="Laatste vier cijfers van je rekeningnummer">' +
+    '<input class="gveld" data-mm="' + esc(p.id) + '" type="number" min="1" value="' + p.euroPerJaar +
+      '" placeholder="Maximum per jaar" aria-label="Maximum per incasso">' +
+    '<button class="gknop" data-mteken="' + esc(p.id) + '">Machtiging tekenen</button></div>' +
+    '<div class="kosten">We bewaren alleen de laatste vier cijfers: er wordt hier niets geind. ' +
+      'Een machtiging zonder maximum bestaat niet.</div>';
+}
+
+async function planTeken() {
+  try {
+    const r = await planApi('mijn', {});
+    try { MACHTIGINGEN = (await api('machtiging/mijn', {})).machtigingen || []; } catch (e) { MACHTIGINGEN = []; }
+    $('#planLijst').innerHTML = (r.plannen || []).length ? r.plannen.map(p =>
+      '<div class="gevolg"><b>' + esc(eur(p.euroPerJaar)) + ' per jaar, ' + p.jaren + ' jaar</b>' +
+        ' &middot; ' + esc(p.stand) +
+        '<div class="kosten">' + p.termijnen.map(t =>
+          t.jaar + (t.voldaan ? ' voldaan' : ' open')).join(' &middot; ') + '</div>' +
+        p.zegt.map(z => '<div class="kosten">' + esc(z) + '</div>').join('') +
+        (p.stand !== 'gestopt'
+          ? '<div class="rij ruimte">' +
+              /* openDitJaar komt van de server: alleen de termijn van DIT jaar
+                 kan afgetekend worden, dus alleen dan hoort de knop er te staan. */
+              (p.openDitJaar
+                ? '<button class="gknop vol" data-termijn="' + esc(p.id) + '" data-euro="' + p.euroPerJaar + '">Termijn ' + p.ditJaar + ' geven</button>'
+                : '<span class="kosten">De termijn van ' + p.ditJaar + ' is voldaan.</span>') +
+              '<button class="gknop" data-stop="' + esc(p.id) + '">Stoppen</button></div>' +
+              machtigingBlok(p)
+          : '') +
+      '</div>').join('') : '<div class="kosten">Je hebt nog geen meerjarige afspraak.</div>';
+
+    const mMeld = t => { $('#planMeld').innerHTML = '<div class="melder ruimte">' + esc(t) + '</div>'; };
+    $('#planLijst').querySelectorAll('[data-mteken]').forEach(b => b.addEventListener('click', async () => {
+      const id = b.dataset.mteken;
+      try {
+        const r2 = await api('machtiging/teken', { planId: id,
+          houder: $('[data-mh="' + id + '"]').value.trim(),
+          ibanEinde: $('[data-mi="' + id + '"]').value.trim(),
+          max: Number($('[data-mm="' + id + '"]').value), kanaal: 'app' });
+        $('#planMeld').innerHTML = '<div class="melder goed ruimte">' +
+          r2.zegt.map(z => esc(z)).join('<br>') + '</div>';
+        planTeken();
+      } catch (e) { mMeld(e.message); }
+    }));
+    $('#planLijst').querySelectorAll('[data-mweg]').forEach(b => b.addEventListener('click', async () => {
+      try {
+        const r2 = await api('machtiging/intrek', { id: b.dataset.mweg });
+        $('#planMeld').innerHTML = '<div class="melder goed ruimte">' + r2.zegt.map(z => esc(z)).join('<br>') + '</div>';
+        planTeken();
+      } catch (e) { mMeld(e.message); }
+    }));
+    $('#planLijst').querySelectorAll('[data-stop]').forEach(b => b.addEventListener('click', async () => {
+      try { const r2 = await planApi('stop', { id: b.dataset.stop });
+        $('#planMeld').innerHTML = '<div class="melder goed ruimte">' + esc(r2.melding) + '</div>'; planTeken(); }
+      catch (e) { $('#planMeld').innerHTML = '<div class="melder ruimte">' + esc(e.message) + '</div>'; }
+    }));
+    /* De termijn loopt langs DEZELFDE bevestiging als een gewone gift, met het
+       plan erbij. Geen tweede betaalweg, en dus ook geen tweede plek waar de
+       gevolgen worden uitgerekend. */
+    $('#planLijst').querySelectorAll('[data-termijn]').forEach(b => b.addEventListener('click', async () => {
+      b.disabled = true;
+      try {
+        const r2 = await api('bevestig', { euro: Number(b.dataset.euro), vorm: 'periodiek',
+          planId: b.dataset.termijn, idem: RTGId('termijn') });
+        $('#planMeld').innerHTML = '<div class="melder goed ruimte">Termijn voldaan: ' + esc(eur(r2.gegeven)) + '.</div>';
+        planTeken();
+      } catch (e) { $('#planMeld').innerHTML = '<div class="melder ruimte">' + esc(e.message) + '</div>'; }
+      finally { b.disabled = false; }
+    }));
+  } catch (e) { $('#planLijst').innerHTML = '<div class="melder">' + esc(e.message) + '</div>'; }
+}
+
+$('#planVoorstel').addEventListener('click', async () => {
+  try {
+    await planApi('voorstel', { euroPerJaar: Number($('#planEuro').value), jaren: Number($('#planJaren').value) });
+    $('#planEuro').value = '';
+    $('#planMeld').innerHTML = '<div class="melder goed ruimte">Voorgesteld. De stichting legt de overeenkomst vast; tot dat moment is een betaling een gewone gift.</div>';
+    planTeken();
+  } catch (e) { $('#planMeld').innerHTML = '<div class="melder ruimte">' + esc(e.message) + '</div>'; }
+});
+
+start();
+</script>
+<script src="/shared/deelmenu.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/levendekleur.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+<script src="/shared/ios.js" defer></script>
+<script src="schil-os.js" defer></script>
+<script src="premium.js" defer></script>
+</body>
+</html>

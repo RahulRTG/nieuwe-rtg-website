@@ -176,7 +176,7 @@ for (const k of KOPPELS) if (!OP_ID[k.a] || !OP_ID[k.b])
 const FASE_VOORDEUR = [
   'tg-inlog', 'tg-account', 'tg-pin', 'tg-zegel', 'tg-gegevens', 'tg-aanmeld',
   'verificatie', 'paspoort', 'webauthn',
-  'member', 'kern-state', 'kern-live', 'kern-meldingen', 'kern-taal', 'kern-gids',
+  'member', 'experience-platform', 'kern-state', 'kern-live', 'kern-meldingen', 'kern-taal', 'kern-gids',
   'kern-rahul', 'kern-waardering',
   /* EN DE POST DIE ERIN VALT (`ov-mail-binnen`, /api/mail/binnen + /api/mail/ses).
      Dat stond tot 2 september 2026 pas in trede 6, en dat is dezelfde vorm als

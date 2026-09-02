@@ -78,6 +78,12 @@
   --bordeaux-glans:linear-gradient(155deg,var(--bordeaux-hoog) 0%,var(--bordeaux-basis) 52%,var(--bordeaux-diep) 100%);
   --bordeaux-rand:rgba(158,28,64,0.45);
   --op-bordeaux:#F4F0E9;
+  /* BORDEAUX OP DONKER IS HET HOOGSEL, NIET DE BASIS -- dezelfde regel als bij
+     goud hierboven, en exact de kleur die CLAUDE.md `--burgundy-on-dark` noemt.
+     Let op het verschil met goud: dit hoogsel haalt op onyx 3,78:1 en is dus
+     alleen goed voor GROTE tekst (24px, of 18,66px vet) en voor vorm -- randen,
+     iconen, een actieve stand. Kleine tekst op zwart blijft ivoor. */
+  --bordeaux-tekst:#C23A5E;
 
   /* ---- Royal: satijn ----------------------------------------------------
      Het ENIGE materiaal dat koel mag zijn. Koningsblauw, geen Microsoft-blauw:

@@ -1,0 +1,14 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html", "title": "FoundationOS — beginscherm (bureau)", "x": 0, "y": 0, "w": 1280, "h": 1160 },
+    { "file": "Telefoon.dc.html", "title": "FoundationOS — beginscherm (telefoon)", "x": 1400, "y": 0, "w": 390, "h": 1180 }
+  ],
+  "annotations": [
+    { "id": "afwijking-nav", "x": 0, "y": -260, "w": 620, "text": "VIER AFWIJKINGEN VAN DE MOCKUP, met opzet.\n\n1. De eerste wereld heet LivingOS, niet FoundationOS. In de mockup stond FoundationOS twee keer (01 en 04); de vier werelden staan in WERELDEN.md." },
+    { "id": "afwijking-beeld", "x": 660, "y": -260, "w": 620, "text": "2. Geen foto's van mensen. Site- en campagnebeeld komt uit De Salon, met naamsvermelding (CLAUDE.md): geen stockfoto's, geen modellen. De beeldvlakken staan hier als gemarkeerde plaats met het label \"Uit De Salon · [naam]\"." },
+    { "id": "afwijking-rooster", "x": 0, "y": -110, "w": 620, "text": "3. Vier tegels in het wereldrooster, niet zes. Klimaatfonds en FoundationOS winkel bestaan niet in MAPPEN; het rooster wordt geschreven door scripts/wereldrooster.js en npm run wereldrooster -- --controle zakt als er iets bij verzonnen wordt. Wil je die twee echt, dan is dat eerst een onderdeel in MAPPEN." },
+    { "id": "afwijking-telefoon", "x": 660, "y": -110, "w": 620, "text": "4. Geen nagetekende iOS-statusbalk (9:41, wifi, batterij) op het telefoonscherm. Die tekent het toestel zelf eroverheen.\n\nVerder: alle hoeken op 0 (de enige ronding is een cirkel), Bodoni voor koppen, Inter voor de rest." },
+    { "id": "vraag", "x": 0, "y": 1260, "w": 1280, "text": "TWEE DINGEN DIE IK NIET UIT DE CODE KON HALEN, en die dus een keuze van jou zijn.\n\nA. \"Goedemiddag\" en \"Jouw toekomst\" zijn je-vorm. Deze pagina is publiek en zonder inlog — er is dus geen pas en geen dagdeel bekend. De rest van de RTFoundation spreekt met u. Kies: je-vorm houden en de begroeting laten vallen, of u-vorm.\n\nB. De hero belooft \"Op wereldniveau\" terwijl de huidige pagina de maat \"een poster in het buurthuis\" aanhoudt. Dat is geen technische botsing maar wel een toonverschil — zeg maar welke van de twee wint." }
+  ],
+  "launch": { "view": "canvas" }
+}

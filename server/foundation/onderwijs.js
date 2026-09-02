@@ -5,7 +5,11 @@
    nodig: je doet mee met een lescode. Gemount vanuit foundation.js op de
    gedeelde context (foundation/basis.js). */
 module.exports = (ctx) => {
-  const { router, F, save, nu, rid, schoon, crypto, anthropic, LETTERS, SYSTEM, DEMO, TIPS } = ctx;
+  /* teVaak/ipVan komen van de gedeelde foundation-context. Ze stonden hier niet
+     in, en daardoor kon de reis-aanvraag hieronder geen rem krijgen; zie de
+     toelichting bij die route in ./onderwijs/schrift.js. */
+  const { router, F, save, nu, rid, schoon, crypto, anthropic, LETTERS, SYSTEM, DEMO, TIPS,
+    teVaak, misluktePoging, ipVan } = ctx;
 
   function nieuweCode() {
     let c; do { c = Array.from({ length: 6 }, () => LETTERS[crypto.randomInt(LETTERS.length)]).join(''); } while (F().lessen[c]);
@@ -60,6 +64,7 @@ module.exports = (ctx) => {
      een keer opgebouwd bij het opstarten; de SSE-administratie (sse/stuur)
      blijft hier en gaat als referentie mee. */
   const octx = { router, F, save, nu, rid, schoon, crypto, anthropic, LETTERS, SYSTEM, DEMO, TIPS,
+    teVaak, misluktePoging, ipVan,
     nieuweCode, sse, stuur, online, presentie, lesVan, docentCheck, leerlingVan, lesPubliek };
   require('./onderwijs/les')(octx);
   require('./onderwijs/schrift')(octx);

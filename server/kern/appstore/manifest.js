@@ -27,17 +27,9 @@
 
 const { isMachtiging, machtiging, MACHTIGINGEN, DOELEN, NIET_GEBOUWD } = require('./machtigingen');
 
-const SLEUTELS = ['sleutel', 'naam', 'versie', 'uitleg', 'categorie', 'start', 'icoon', 'machtigingen', 'taal', 'prijsCenten'];
-const CATEGORIEEN = ['sociaal', 'reizen', 'eten', 'media', 'geld', 'spelen', 'leven', 'veiligheid'];
-const TALEN = ['nl', 'en'];
-
-const SLEUTEL_VORM = /^[a-z][a-z0-9-]{2,39}$/;
-const VERSIE_VORM = /^(0|[1-9]\d{0,3})\.(0|[1-9]\d{0,3})\.(0|[1-9]\d{0,3})$/;
-/* Een pad in de bundel: geen wortel, geen `..`, geen backslash, geen dubbele
-   punt (dus ook geen `data:` of `https:`), geen stuurtekens, hooguit drie mappen
-   diep. Dezelfde vorm bewaakt ./bundel.js bij het wegschrijven; hier gaat het om
-   wat het manifest AANWIJST, daar om wat er echt binnenkomt. */
-const PAD_VORM = /^(?!\/)(?!.*\.\.)(?:[a-z0-9][a-z0-9._-]{0,39}\/){0,3}[a-z0-9][a-z0-9._-]{0,59}$/;
+/* De vormregels staan in ./manifestvorm.js: welke velden er zijn en hoe ze
+   eruitzien. Hier staat wat er met een INZENDING gebeurt. */
+const { SLEUTELS, CATEGORIEEN, TALEN, SLEUTEL_VORM, VERSIE_VORM, PAD_VORM, PRIJS_MAX, PRIJS_MIN } = require('./manifestvorm');
 
 const tekst = (v) => (typeof v === 'string' ? v.trim() : '');
 
@@ -134,23 +126,41 @@ function lees(ruw) {
      iemand naar heeft gekeken -- en dan verkoopt een uitgever morgen voor het
      tienvoudige wat RTG gisteren heeft goedgekeurd. Hier hoort hij bij de
      bundel, gaat hij door dezelfde keuring, en betekent een prijswijziging een
-     nieuwe versie met een nieuwe handtekening van een mens.
-
-     De bovengrens is er om dezelfde reden als elke andere grens in dit huis:
-     niet omdat EUR 500 een magisch getal is, maar omdat een bedrag zonder
-     bovengrens een typefout is die niemand tegenhoudt. */
+     nieuwe versie met een nieuwe handtekening van een mens. De grenzen zelf
+     staan bij de andere vormregels, in ./manifestvorm.js. */
   let prijs = 0;
   if (ruw.prijsCenten != null && ruw.prijsCenten !== '') {
     prijs = Number(ruw.prijsCenten);
-    if (!Number.isInteger(prijs) || prijs < 0 || prijs > 50000) {
-      fout('prijsCenten', 'De prijs is een heel aantal centen, van 0 (gratis) tot 50000 (EUR 500). Laat hem weg als je app gratis is.');
-    } else if (prijs > 0 && prijs < 50) {
+    if (!Number.isInteger(prijs) || prijs < 0 || prijs > PRIJS_MAX) {
+      fout('prijsCenten', 'De prijs is een heel aantal centen, van 0 (gratis) tot ' + PRIJS_MAX + ' (EUR ' + (PRIJS_MAX / 100) + '). Laat hem weg als je app gratis is.');
+    } else if (prijs > 0 && prijs < PRIJS_MIN) {
       fout('prijsCenten', 'Een prijs onder de 50 cent kost meer aan afhandeling dan hij opbrengt. Maak hem gratis, of vraag ten minste EUR 0,50.');
     }
   }
 
+  /* DE VORM VAN HET BORD STAAT IN HET MANIFEST, en dat is dezelfde redenering
+     als bij de prijs: zou een app de richting per aanroep meesturen, dan draait
+     hij het bord om zodra hij verliest. Hier gaat hij door de keuring en tekent
+     een mens hem af. Alleen zinvol met de machtiging erbij; zonder die
+     machtiging is het een veld dat nergens over gaat, en dat weigeren we met de
+     reden in plaats van het te negeren. */
+  let arena = null;
+  if (ruw.arena != null && ruw.arena !== '') {
+    const a = ruw.arena;
+    if (!a || typeof a !== 'object' || Array.isArray(a)) {
+      fout('arena', 'Arena is een object: { "richting": "hoog" of "laag", "eenheid": "punten" }.');
+    } else {
+      const richting = tekst(a.richting).toLowerCase() || 'hoog';
+      const eenheid = tekst(a.eenheid) || 'punten';
+      if (!['hoog', 'laag'].includes(richting)) fout('arena', 'De richting is "hoog" (meer is beter) of "laag" (minder is beter, bijvoorbeeld een tijd).');
+      if (eenheid.length > 20) fout('arena', 'De eenheid is hooguit 20 tekens, bijvoorbeeld punten of seconden.');
+      if (!gevraagd.includes('arena.meedoen')) fout('arena', 'Een arena zonder de machtiging "arena.meedoen" doet niets. Vraag die machtiging aan met het doel meedoen-arena, of laat dit veld weg.');
+      if (!fouten.some(f => f.veld === 'arena')) arena = { richting, eenheid };
+    }
+  }
+
   if (fouten.length) return { ok: false, manifest: null, fouten };
-  return { ok: true, fouten: [], manifest: { sleutel, naam, versie, uitleg, categorie, start, icoon: icoon || null, machtigingen: gevraagd, doelen, taal, prijsCenten: prijs } };
+  return { ok: true, fouten: [], manifest: { sleutel, naam, versie, uitleg, categorie, start, icoon: icoon || null, machtigingen: gevraagd, doelen, taal, prijsCenten: prijs, arena } };
 }
 
 module.exports = { lees, SLEUTELS, CATEGORIEEN, TALEN, PAD_VORM, VERSIE_VORM, SLEUTEL_VORM };

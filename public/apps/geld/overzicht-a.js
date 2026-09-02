@@ -29,8 +29,11 @@
     '#ovWrap .ov-som{font-weight:600;}' +
     '#ovWrap .ov-titel{margin:.45rem 0 .2rem;font-size:.98rem;font-weight:600;}' +
     '#ovWrap .ov-uitleg{margin:0 0 .6rem;font-size:.86rem;line-height:1.55;color:var(--rtg-soft);}' +
+    /* de inkt is de leestoon en niet het accent: --rtg-goud is een vulkleur en op
+       dit eiland het hoogsel #C23A5E, dat op de kaartgrond (#2A0713) ~3,6:1 leest;
+       dezelfde fout als de waarom-knop op de pas in wallet.js */
     '#ovWrap .ov-waarom{background:none;border:0;padding:0;cursor:pointer;font:inherit;' +
-      'font-size:.74rem;font-weight:600;color:var(--rtg-goud);}' +
+      'font-size:.74rem;font-weight:600;color:var(--rtg-leesgoud,var(--rtg-goud));}' +
     /* Het beleid-paneel (deel 3) hangt buiten #ovWrap en heeft daarom eigen
        scoping; het staat hier omdat een stand EEN stijlblad hoort te hebben
        en niet twee die elkaar in de head verdringen. */

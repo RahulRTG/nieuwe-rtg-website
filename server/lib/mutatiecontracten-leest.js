@@ -123,6 +123,10 @@ const CONTRACTEN = Object.assign(Object.fromEntries([
   ,
     afgetekend: { door: 'Claude (Opus 5), handler met de hand nagelezen', op: '2026-08-29' }
   },
-});
+},
+  /* De leesroutes van de identiteitslaag staan in een eigen zijbestand: dit
+     bestand ging over de 10 kB-grens, en die laag groeit met elk blok van
+     MIJNRTG.md terwijl de rest hier niet groeit. */
+  require('./mutatiecontracten-leest-identiteit').CONTRACTEN);
 
 module.exports = { CONTRACTEN };

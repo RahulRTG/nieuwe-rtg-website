@@ -20,6 +20,9 @@ const { meetpoort } = require('../../meetpoort');
 
 module.exports = (ctx) => {
   const { app, officeAuth, veilig, wie, command } = ctx;
+  /* bezitsbewijs en doelpoort staan hier niet meer: die twee zijn met de
+     schaduwmeters mee verhuisd naar ./schaduwmeters.js, en een naam pakken die
+     je niet gebruikt is precies wat regel 39 van de keuring tegenhoudt. */
   /* De routes die iets INRICHTEN (koppelingen, landen, steden, overname) staan
      in ./inrichten.js: dit bestand gaat over meten en uitrollen. Ze zijn uit
      elkaar gehaald toen dit bestand over de 10 kB-grens ging, op de naad die er
@@ -155,4 +158,6 @@ module.exports = (ctx) => {
     if (r && r.error) return res.status(r.status || 400).json({ error: r.error });
     res.json(r);
   });
+
+  require('./schaduwmeters')(ctx);
 };

@@ -233,7 +233,25 @@ test('elke routehandler die een id uit het verzoek pakt, noemt ook de sessie', (
      hieronder -- een gezin is een van duizenden, dus "poortwachter zonder
      eigenaarscontrole" is daar net zo goed een gat als bij een lid. Dat is het
      verschil tussen deze poort leren kennen en hem uitzetten. */
-  const POORT = /,\s*(auth|supplierAuth|officeAuth|techAuth|boardroomAuth|huisAuth|baasAuth|eigenaarAlleen|scimAuth|gezinsPoort)\s*[,)]|\.\.\.lid\b/;
+  /* kluisAuth hoort in deze rij, en het is de makkelijkste toevoeging die er is:
+     hij IS officeAuth, met een extra eis erbovenop. kern/kantoor/kluispoort.js
+     laat officeAuth eerst zijn werk doen en weigert daarna nog eens met 403 als
+     de sessie geen NAAM draagt -- de gedeelde backoffice-code komt er niet door,
+     want wat achter deze poort gebeurt (een paspoortscan beoordelen, een
+     BIG-nummer openen) landt in het inzagejournaal, en een spoor dat niet naar
+     een mens leidt is geen spoor.
+
+     Hij staat daarom wel in POORT en NIET in VEELPARTIJ: dat is dezelfde keuze
+     als bij officeAuth een paar regels hoger. Achter deze deur zit personeel van
+     RTG dat per functie bij de gegevens van een ander lid moet kunnen -- dat is
+     het werk, en het wordt beheerst met een journaal en een verplichte reden, niet
+     met een eigenaarscontrole die het onmogelijk zou maken.
+
+     Zonder deze naam meldde de scan POST /api/office/verify als "geen
+     poortwachter", terwijl daar juist de STRENGSTE poort van het huis op staat.
+     Dat is de gevaarlijke faalvorm van een structuurmeter: hij wees naar de
+     veiligste route die hij kon vinden. */
+  const POORT = /,\s*(auth|supplierAuth|officeAuth|techAuth|boardroomAuth|huisAuth|baasAuth|eigenaarAlleen|scimAuth|gezinsPoort|kluisAuth)\s*[,)]|\.\.\.lid\b/;
   /* Niet elke poort staat in de registratie. Een flink deel van het huis
      controleert in de handler zelf -- rtfSociaal(req, res), profiel(req, res),
      appSessie(req), rtf.verifieerProfiel(code, token) -- en stuurt bij twijfel

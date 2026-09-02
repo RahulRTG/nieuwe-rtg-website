@@ -236,6 +236,10 @@
   --rtg-card:#151312;
   --rtg-card2:#1B1817;
   --rtg-goud:var(--gold-tekst);
+  --rtg-opgoud:#1C1608;
+  /* het hoogsel op het accent terug naar de goudformule van rtg-ui.css; zie het
+     bordeaux-eiland hieronder, dat hem op het accent zet */
+  --rtg-goud-hoog:initial;
   --rtg-leesgoud:var(--gold-tekst);
   --rtg-leeszacht:var(--rtg-soft);
   --rtg-leesgroen:#4C9A75;
@@ -246,6 +250,76 @@
 :root[data-rtg-thema] body[data-rtg-eigenvlak="onyx"]{
   background:var(--rtg-grond);
   color:var(--rtg-txt);
+}
+
+/* EN EEN WERELD MAG ZEGGEN DAT ZIJ FLUWEEL IS.
+   `data-rtg-eigenvlak="bordeaux"` is dezelfde afspraak als onyx hierboven, maar
+   met het andere materiaal: TravelOS draagt bordeaux als GROND en niet als
+   accent. Het bestaat om dezelfde reden dat onyx bestaat -- een scherm dat zijn
+   vlak niet verklaart, krijgt onder een licht thema een grond die niet past bij
+   de inkt die het elders vandaan haalt.
+
+   Let op het verschil met onyx: het leesgoud gaat hier NIET mee. Goud is in deze
+   wereld teruggebracht tot het merk en de wijzers van de klok; wat een scherm
+   als accent leest, wordt het bordeauxhoogsel. En dat hoogsel haalt op fluweel
+   3,78:1 -- goed voor vorm en grote letters, niet voor lopende tekst. Vandaar
+   dat --rtg-muted en --rtg-soft ivoortinten blijven en geen roze. */
+:root[data-rtg-thema]:has(> body[data-rtg-eigenvlak="bordeaux"]){
+  --rtg-bg:#2E0713;
+  --rtg-grond:linear-gradient(168deg,#7F1634 0%,#4A0C1E 44%,#2E0713 100%);
+  --rtg-txt:var(--op-bordeaux);
+  --rtg-muted:#E2C9CF;
+  /* GEMETEN: #C09AA5 haalt op de lichtste plek van deze grond 3,40:1 -- het is
+     de tint die `.stil`, `.sub` en `.meta` dragen, dus dat telt overal mee.
+     Deze haalt 5,21 op fluweel en 11,15 op de diepe kant. */
+  --rtg-soft:#DCC5CB;
+  --rtg-line:rgba(244,240,233,.14);
+  --rtg-card:#2A0713;
+  --rtg-card2:#20060E;
+  --rtg-goud:var(--bordeaux-tekst);
+  /* DE INKT OP HET ACCENT IS EEN TOKEN GEWORDEN, en dat komt uit een fout.
+     Zes plekken in de UI-kit zetten `color:#1C1608` op `background:var(--rtg-goud)`
+     -- donkere inkt op goud, en dat klopt zolang het accent goud is. In deze
+     wereld is het accent bordeaux, en dan is diezelfde inkt 3,48:1: de
+     springlink, de volle knop en de bedoelknop zakten allemaal tegelijk door de
+     a11y-poort. Wit op dit bordeaux haalt 5,17. */
+  --rtg-opgoud:#FFFFFF;
+  /* EN HET HOOGSEL OP HET ACCENT GAAT HIER UIT. De volle knop is een verloop
+     dat bovenaan 22% wit door het accent mengt (rtg-ui.css); op dit bordeaux
+     wordt dat rgb(207,101,129), en daar haalt de witte inkt van hierboven 3,60.
+     De donkere inkt zou daar 4,99 halen, maar die zakt op de middelste stop,
+     het pure accent: 3,48. Er is dus geen inkt die op alle stops van dat
+     verloop leest. "Kanaal aanmelden" op podium en theater zakte er op door
+     de poort. Op het pure accent haalt wit 5,17 en op de donkere stop 7,53,
+     dus in dit eiland is het hoogsel het accent. Het onyx-scherm en het
+     onyx-vlak hieronder zetten dit token weer op `initial`, zodat de
+     goudformule van rtg-ui.css daar opnieuw geldt. */
+  --rtg-goud-hoog:var(--rtg-goud);
+  /* HET LEESGOUD IS DE LEESTOON, NIET HET ACCENT. Zet je hier het hoogsel
+     (#C23A5E), dan leest elk prijsje, kopje en stipje op 3,74:1 -- de poort
+     vond er veertien. Deze rozetint komt uit dezelfde familie en haalt op
+     wijnzwart 9,8. Het accent zelf blijft bordeaux, want dat is vorm. */
+  --rtg-leesgoud:#E7A8B8;
+  --rtg-leeszacht:var(--rtg-soft);
+  --rtg-leesgroen:#7BC79B;
+  --rtg-leesrood:#E7A8B8;
+  --rtg-dagsterkte:0.06;
+  color-scheme:dark;
+}
+:root[data-rtg-thema] body[data-rtg-eigenvlak="bordeaux"]{
+  background:var(--rtg-grond);
+  background-attachment:fixed;
+  color:var(--rtg-txt);
+  /* DE LEESTOON STAAT HIER OOK, EN DAT IS GEEN DUBBELING MAAR EEN VANGNET.
+     Het blok hierboven hangt aan `:root[data-rtg-thema]` -- dus aan het feit
+     dat er een thema op de html staat. Een scherm dat geladen wordt voordat de
+     schil dat attribuut zet, of dat het helemaal niet krijgt, staat wel al op
+     zijn bordeauxgrond maar zonder leestoon; elk prijsje viel dan terug op het
+     accent (#C23A5E) en las op 3,62:1. Op de body is de grond en de toon
+     voortaan hetzelfde besluit. */
+  --rtg-leesgoud:#E7A8B8;
+  --rtg-opgoud:#FFFFFF;
+  --rtg-goud-hoog:var(--rtg-goud);
 }
 
 /* EN EEN VLAK BINNEN EEN SCHERM MAG HETZELFDE ZEGGEN.
@@ -272,6 +346,20 @@
   --rtg-card:#151312;
   --rtg-card2:#1B1817;
   --rtg-goud:var(--gold-tekst);
+  /* --rtg-opgoud stond hier NIET, en dat is exact de fout waar dit blok voor
+     bestaat -- een regel lager dan waar hij hem tegenhield. Het vlak zette wel
+     zijn eigen goud maar liet de INKT daarop uit het omliggende thema komen. In
+     de bordeauxwereld is die inkt wit (regel 283), dus een volle knop in een
+     onyx-vlak op een bordeauxscherm werd wit op goud. Dezelfde donkere inkt als
+     het scherm-blok hierboven, en om dezelfde reden: hier IS het accent goud. */
+  --rtg-opgoud:#1C1608;
+  /* EN HET HOOGSEL OOK, om precies dezelfde reden -- dezelfde regel lager. Een
+     custom property met var() wordt op het element uitgerekend en erft als
+     waarde: op een bordeauxscherm staat op de body #C23A5E als hoogsel, en een
+     volle knop in een onyx-vlak daarbinnen liep dan van bordeaux over in goud,
+     met donkere inkt op het bordeaux (3,48). `initial` maakt het token hier
+     ongeldig, en dan geldt de terugval van rtg-ui.css weer: de goudformule. */
+  --rtg-goud-hoog:initial;
   --rtg-leesgoud:var(--gold-tekst);
   --rtg-leeszacht:var(--rtg-soft);
   --rtg-leesgroen:#4C9A75;

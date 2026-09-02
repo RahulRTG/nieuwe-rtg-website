@@ -22,7 +22,7 @@
 'use strict';
 
 module.exports = (kern, gedeeld) => {
-  const { app, accounts, officeAuth, persoonseis, vakbewijsTeken, vakbewijsIntrek,
+  const { app, accounts, officeAuth, kluisAuth, persoonseis, vakbewijsTeken, vakbewijsIntrek,
     vakbewijzenVerlopend } = kern;
   const { stuur } = gedeeld;
 
@@ -75,7 +75,7 @@ module.exports = (kern, gedeeld) => {
 
      EERST NOTEREN, DAN PAS TERUGGEVEN: een inzage die halverwege misgaat mag
      geen gegevens hebben opgeleverd zonder regel in het journaal. */
-  app.post('/api/office/vakbewijs/nummer', officeAuth, (req, res) => {
+  app.post('/api/office/vakbewijs/nummer', kluisAuth, (req, res) => {
     const b = req.body || {};
     const sleutel = String(b.sleutel || '');
     const wat = String(b.wat || '');
@@ -118,18 +118,30 @@ module.exports = (kern, gedeeld) => {
     try { return (accounts.getUserById(Number(m[1])) || {}).codename || null; } catch (e) { return null; }
   }
 
-  app.post('/api/office/vakbewijs/teken', officeAuth, (req, res) => {
+  /* WIE AFTEKENT KOMT UIT DE INLOG EN NIET UIT HET FORMULIER.
+
+     Hier stond `b.door` voorop: de naam van wie aftekende kwam uit de body van
+     het verzoek. Dat is precies wat routes/office/bewaarverzoek.js een paar
+     bestanden verderop uitschrijft als de fout die je niet moet maken -- "een
+     naam die je zelf mag typen is geen spoor maar een suggestie". Bij een stuk
+     dat een mens van RTG hoort af te tekenen (CLAUDE.md: nooit de werkgever
+     zelf) telt dat dubbel: dan is de handtekening het enige wat er is.
+
+     Sinds de kluispoort is er ook iets beters: een kantoorsessie op naam draagt
+     een sleutel. Die wint van de body; het veld blijft bestaan voor de
+     eigenaarssessie, die er zelf geen draagt. */
+  app.post('/api/office/vakbewijs/teken', kluisAuth, (req, res) => {
     const b = req.body || {};
-    const door = String(b.door || (req.session && req.session.naam) || '').trim();
+    const door = String(req.kantoorKey || b.door || (req.session && req.session.naam) || '').trim();
     stuur(res, vakbewijsTeken(String(b.sleutel || ''), String(b.wat || ''), door));
   });
 
   /* Intrekken. Dit is de knop die er nooit was: een afgetekend stuk kon alleen
      verlopen, en een ingetrokken BIG-registratie wacht niet netjes op zijn
      einddatum. */
-  app.post('/api/office/vakbewijs/intrek', officeAuth, (req, res) => {
+  app.post('/api/office/vakbewijs/intrek', kluisAuth, (req, res) => {
     const b = req.body || {};
-    const door = String(b.door || (req.session && req.session.naam) || '').trim();
+    const door = String(req.kantoorKey || b.door || (req.session && req.session.naam) || '').trim();
     const r = vakbewijsIntrek(String(b.sleutel || ''), String(b.wat || ''), door, b.reden);
     if (!r.error) {
       const m = /^lid:(\d+)$/.exec(String(b.sleutel || ''));

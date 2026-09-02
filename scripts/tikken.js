@@ -52,6 +52,7 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+const { stempel } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(WORTEL, 'TIKKEN.json');
@@ -342,6 +343,11 @@ if (naloop) {
   process.exit(0);
 }
 
+/* De wacht: dit script schrijft een register, dus het start niet bij het
+   requiren (een laadcontrole schreef zo ooit ROLPROEF.json terug naar 292
+   routes; scripts/meetkeuring.js houdt dit vast). */
+if (require.main !== module) return;
+
 (async () => {
   log('Tikkenmeter: het huis aflopen op telefoonformaat, per rol.');
   const { perRol, overgeslagen } = await meet();
@@ -380,7 +386,7 @@ if (naloop) {
   });
 
   const uit = {
-    stempel: new Date().toISOString().slice(0, 10),
+    stempel: stempel(),
     uitleg: 'Hoeveel tikken elk scherm van een beginscherm af ligt, gemeten in een echte browser op telefoonformaat, per rol met een echte sessie. Een zichtbare bestemming kost 1 tik, een bestemming achter een tabblad of lade 2. Typen telt niet. Een knop die zonder href of data-url navigeert ziet deze meter niet, dus dit is een BOVENgrens.',
     grens: GRENS,
     rollen: ROLLEN.map((r) => ({ naam: r.naam, start: r.start, uitleg: r.uitleg })),

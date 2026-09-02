@@ -80,7 +80,23 @@ test('4. elke route hoort bij een functie of bij de bediening', () => {
   const paren = [];
   for (const f of F) for (const p of (f.paden || [])) paren.push(p);
   const zonder = routes.filter(r => !paren.some(p => prefixLengte(r.pad, p) > 0));
-  assert.ok(zonder.length <= 100,
+  /* DE GRENS STOND OP 100 EN STAAT NU OP 120, EN DAT IS EEN BESLUIT.
+
+     De samenvoeging van twaalf takken bracht de zelfbedieningslaag van het lid
+     binnen: /api/mijn/tweefactor, /sessies, /herstelkanaal, /post, /toestel en
+     twee relatie-routes onder /api/toestemming. Twintig routes, en geen ervan
+     hoort aan een functieschakelaar te hangen -- een knop waarmee het huis de
+     tweefactor of het herstelkanaal van een lid uitzet, hoort niet te bestaan.
+     Ze staan daarom alle twintig als BEDIENING in kern/platformregister/bediening.js,
+     elk met de reden waarom hij niet schakelbaar is.
+
+     Wat deze toets bewaakt is dat het er niet STILLETJES meer worden, en dat
+     blijft precies zo werken: de grens gaat met de hand omhoog, niet vanzelf.
+     Wat de vraag beantwoordt of die twintig terecht buiten een functie vallen
+     is test/platformregister.test.js -- die eist dat elke route hier BENOEMD is,
+     en die stond groen voordat dit getal werd verzet. Zonder die volgorde is
+     een hoger getal hier alleen een zachtere meter. */
+  assert.ok(zonder.length <= 120,
     zonder.length + ' routes hangen aan geen enkele functie. Dat is de bediening van ' +
     'het platform (boardroom, techniek, gezondheid) en die hoort niet schakelbaar te zijn, ' +
     'maar bij deze aantallen is er iets anders aan de hand.');

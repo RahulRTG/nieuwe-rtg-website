@@ -36,15 +36,46 @@ function maakTokens(getUserById) {
      doen. Een oud token zonder dat derde deel geldt als uitgegeven op moment 0
      en valt dus af zodra er ooit een grens is gezet; dat is de juiste kant om
      naar te falen. */
+  /* HET VIERDE DEEL: een sessie-identiteit (sid).
+
+     Tot hier had een lid-sessie geen identiteit. Een lid komt namelijk NIET
+     door kern/sessies.js binnen maar via verifyToken, en resolveSession bouwt
+     daar bij ELK verzoek een vers sessie-object uit (opzet/diensten2.js r125).
+     Er werd dus nergens een sessie bewaard -- en daarmee was "toon mijn actieve
+     sessies" niet een ontbrekend scherm maar een onbeantwoordbare vraag.
+
+     De sid verandert daar het minimum aan: hij maakt de sessie AANWIJSBAAR,
+     zodat context (toestel, authenticator, contextbinding) ernaast kan worden
+     bewaard in plaats van in het token. Het token blijft staatloos en draagt
+     geen persoonsgegeven; wat erbij hoort staat in het register.
+
+     TERUGWAARTS VEILIG: een oud token heeft drie delen, dit er vier. body.split
+     geeft de vierde eenvoudig niet terug bij oude tokens, en sessieVan() zegt
+     dan null -- "deze sessie heeft geen identiteit", wat waar is. Geen migratie,
+     geen uitlog. */
   function issueToken(userId, days = 30) {
-    const body = userId + '.' + (Date.now() + days * 86400000) + '.' + Date.now();
+    const sid = crypto.randomBytes(9).toString('base64url');
+    const body = userId + '.' + (Date.now() + days * 86400000) + '.' + Date.now() + '.' + sid;
     return Buffer.from(body).toString('base64url') + '.' + kluis.sign(body);
+  }
+
+  /* De sid uit een token lezen. Doet NIET aan geldigheid: dat is verifyToken.
+     Wie de context van een sessie ophaalt, hoort eerst te weten dat de sessie
+     geldig is en pas daarna welke het is. Twee vragen, twee functies. */
+  function sessieVan(token) {
+    token = strikt(token);
+    if (!token) return null;
+    try {
+      const b64 = String(token).split('.')[0];
+      const sid = Buffer.from(b64, 'base64url').toString().split('.')[3];
+      return sid && /^[A-Za-z0-9_-]{12}$/.test(sid) ? sid : null;
+    } catch (e) { return null; }
   }
   /* De intreklijst (welke uitgegeven tokens niet meer gelden) staat in
      ./intreklijst.js: dat deel schrijft als enige naar de database, de rest van
      dit bestand is pure cryptografie. Hij krijgt de strikte vorm mee, zodat er
      maar EEN opvatting bestaat van wat een token is. */
-  const { trekIn, trekInActie, isIngetrokken } = require('./intreklijst')(strikt);
+  const { trekIn, trekInActie, isIngetrokken, trekInSessie, sessieIngetrokken } = require('./intreklijst')(strikt);
 
   function verifyToken(token) {
     token = strikt(token);
@@ -59,9 +90,13 @@ function maakTokens(getUserById) {
          uitgerekend deze deur, waar elk verzoek langskomt, stond nog op de
          kale vergelijking. */
       if (!veiligGelijk(kluis.sign(body), sig)) return null;
-      const [id, exp, uitgegeven] = body.split('.');
+      const [id, exp, uitgegeven, sid] = body.split('.');
       if (Number(exp) < Date.now()) return null;
       if (isIngetrokken(token)) return null; // uitgelogd: de handtekening klopt, wij niet meer
+      /* En de sessie zelf. Dit is de tweede deur, en hij bestaat omdat de eerste
+         het token nodig heeft -- dat heeft alleen de houder. Zonder deze regel
+         is "sluit die andere sessie" een knop die niets doet. */
+      if (sid && sessieIngetrokken(sid)) return null;
       const u = getUserById(Number(id));
       /* De grens per account: alles wat voor sessies_vanaf is uitgegeven, geldt
          niet meer. Een wachtwoordwijziging zet die grens (zie setPassword), en
@@ -107,7 +142,7 @@ function maakTokens(getUserById) {
      aanroepers niets merken van de knip. */
   const herstel = require('./herstel').maakHerstel(getUserById);
 
-  return { issueToken, verifyToken, trekIn, trekInActie, isIngetrokken, issueActionToken, verifyActionToken,
+  return { issueToken, verifyToken, sessieVan, trekIn, trekInActie, isIngetrokken, trekInSessie, sessieIngetrokken, issueActionToken, verifyActionToken,
     setEmailVerified: herstel.setEmailVerified, createReset: herstel.createReset,
     findByReset: herstel.findByReset, setPassword: herstel.setPassword };
 }

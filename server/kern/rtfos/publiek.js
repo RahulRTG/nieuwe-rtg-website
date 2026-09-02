@@ -76,11 +76,11 @@ module.exports = (ctx) => {
       projecten, activiteiten,
       meedoen: {
         hulp: 'Hulp nodig? Loop binnen bij een activiteit hierboven of vraag ernaar bij het buurthuis. ' +
-          'Wij leggen niets vast zonder dat u weet wat er wordt vastgelegd en waarvoor.',
+          'Wij leggen niets vast zonder dat je weet wat er wordt vastgelegd en waarvoor.',
         vrijwilliger: 'Meedoen als vrijwilliger kan in elke stad. Voor werk met kinderen en ouderen ' +
           'vragen we een VOG; die regelen we samen en betalen wij.',
         ondernemer: 'Ondernemers doen mee met geld, producten, ruimte, vervoer, stageplekken of maaltijden. ' +
-          'Wat u geeft, koppelen we aan een project en u hoort waar het terechtkwam.'
+          'Wat je geeft, koppelen we aan een project en je hoort waar het terechtkwam.'
       } };
   }
 

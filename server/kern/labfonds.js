@@ -12,7 +12,7 @@ const EENHEID = require('./geld/eenheid');
    Geld is hier een toezegging in het fondsgrootboek (centen); er wordt nooit
    geclaimd dat een echte betaling is verwerkt. Opslag: labFonds. */
 
-module.exports = ({ db, save, crypto, anthropic }) => {
+module.exports = ({ db, save, crypto, anthropic, livinglab }) => {
   const nu = () => new Date().toISOString();
   const rid = () => crypto.randomBytes(4).toString('hex');
   const schoon = (t, n) => String(t == null ? '' : t).replace(/[<>]/g, '').trim().slice(0, n || 200);
@@ -67,7 +67,10 @@ module.exports = ({ db, save, crypto, anthropic }) => {
       id: v.id, locId: v.locId, titel: v.titel, doel: v.doel, bedrag: eur(v.centen),
       door: v.doorNaam, status: v.status, voor, tegen,
       mijnStem: (v.stemmen.voor || []).includes(lidKey) ? 'voor' : (v.stemmen.tegen || []).includes(lidKey) ? 'tegen' : null,
-      scheids: v.scheids || null, besluit: v.besluit || null, at: v.at
+      scheids: v.scheids || null, besluit: v.besluit || null, at: v.at,
+      /* Welk onderzoek dit voorstel financiert. `null` betekent: dit voorstel
+         noemt er geen -- niet dat het er geen kon noemen. */
+      onderzoek: onderzoek.beeld(v)
     };
   }
 
@@ -119,8 +122,16 @@ module.exports = ({ db, save, crypto, anthropic }) => {
 
   /* De voorstellen, de stemming, de AI-scheidsrechter en de beslissing draaien
      als submodule op dezelfde context; zie labfonds/voorstellen.js. */
-  const { voorstelMaak, stem, scheidsrechter, beslis, boardroom } = require('./labfonds/voorstellen')({
-    F, loc, vindV, locBeeld, voorstelBeeld, schoon, naarCenten, eur, nu, rid, save, PRIVAAT });
+  /* De schakel naar het Living Lab: een voorstel mag het onderzoek noemen dat
+     het financiert, en een onderzoek kan terugkijken welk fondsgeld eraan is
+     toegezegd. Zie labfonds/onderzoek.js voor waarom de verwijzing maar aan een
+     kant staat. */
+  const onderzoek = require('./labfonds/onderzoek')({ F, livinglab });
+  const financiering = (studieId) => onderzoek.financiering(studieId, eur);
 
-  return { labfonds: { fonds, locatieMaak, doneer, mijnBijdragen, voorstelMaak, stem, scheidsrechter, beslis, boardroom } };
+  const { voorstelMaak, stem, scheidsrechter, beslis, boardroom } = require('./labfonds/voorstellen')({
+    F, loc, vindV, locBeeld, voorstelBeeld, schoon, naarCenten, eur, nu, rid, save, PRIVAAT, onderzoek });
+
+  return { labfonds: { fonds, locatieMaak, doneer, mijnBijdragen, voorstelMaak, stem, scheidsrechter, beslis, boardroom,
+    financiering, zoekOnderzoek: onderzoek.zoek } };
 };

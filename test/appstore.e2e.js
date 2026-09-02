@@ -260,7 +260,12 @@ test('de winkel en het uitgeversbureau openen zonder fouten', { skip: !pw && 'Pl
     await p2.goto(base + '/apps/appstore-uitgever.html');
     await p2.waitForSelector('#mSleutel', { timeout: 20000 });
     assert.deepEqual(f2, [], 'het uitgeversbureau boot zonder onopgevangen fouten');
-    assert.equal(await p2.locator('input[data-mach]').count(), 3, 'alle drie de machtigingen staan er om te vragen');
+    /* Het aantal komt uit het register en staat hier niet overgetypt: toen de
+       vierde (arena.meedoen) erbij kwam, zakte deze regel op "4 !== 3" terwijl
+       de pagina precies deed wat hij moest -- het register tonen. */
+    const { MACHTIGINGEN } = require('../server/kern/appstore/machtigingen');
+    assert.equal(await p2.locator('input[data-mach]').count(), MACHTIGINGEN.length,
+      'elke machtiging uit het register staat er om te vragen, en geen enkele dubbel');
 
     /* DE UITGEVER LEEST WAT DE KLANT LEEST. Deze knop bestaat omdat een
        leverancier die pas bij het inkoopgesprek ontdekt wat er over hem staat,

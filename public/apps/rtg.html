@@ -26,10 +26,73 @@
 .dossierkop{display:flex;align-items:flex-end;justify-content:space-between;gap:22px}.dossierkop .status{white-space:nowrap}.dossierinhoud{margin-top:20px;padding-top:20px;border-top:1px solid var(--lijn)}.mag-telling{color:var(--zacht);line-height:1.65}.mag-dossier{display:grid;gap:8px}.mag-dossier .regel{display:grid;grid-template-columns:110px 1fr;gap:16px;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.07)}.mag-dossier .wanneer,.mag-dossier .stand{font-size:.65rem;color:var(--goud);letter-spacing:.06em}.mag-dossier .titel,.mag-dossier .sub,.mag-dossier .stand{display:block}.mag-dossier .sub{color:var(--zacht);font-size:.75rem;margin-top:4px}.mag-kader{margin-top:16px;padding:18px;border:1px solid var(--lijn);border-radius:0}.mag-kader h3{margin:0 0 10px;font:500 1.1rem "Bodoni Moda",serif}.mag-lijstje{margin:0;padding-left:20px;color:var(--zacht);line-height:1.7}.mag-lijstje a{color:inherit}.mag-acties{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.mag-knop{border:1px solid var(--lijn);border-radius:0;padding:10px 15px;background:transparent;color:#eee8dc;font:600 .7rem Inter;cursor:pointer}.mag-knop.prim{background:var(--goud);color:#090908}.paginanr{font-size:.58rem;color:var(--zacht);letter-spacing:.12em;text-transform:uppercase;margin-top:16px}
 @media(max-width:850px){.schil{display:block}.bank{display:none}.topbar{display:flex;height:52px}.werk{padding:25px 18px 80px}.grid,.laagfocus{grid-template-columns:1fr}.standen{justify-content:flex-start;overflow:auto;flex-wrap:nowrap}}
 @media(max-width:650px){.laagkeuze{padding:14px}.lifelagen{gap:4px}.lifelagen button{font-size:.57rem;letter-spacing:.08em}.campagne{grid-template-columns:1fr}.campagne figure{min-height:210px}.dossierkop{align-items:flex-start;flex-direction:column}.mag-dossier .regel{grid-template-columns:1fr;gap:5px}}
+
+/* ------------------------------------------------- de stand VANDAAG (2026-08-31)
+   Drie standen in plaats van zeven: Vandaag (wat nu speelt), Alles (de hele
+   wereld met de drie paslagen) en Mensen. De zes oude standen -- Reizen,
+   Sociaal, Leven, Veilig, Geld, Media -- waren elk een hero met een knop
+   "Open X" naar precies het adres dat ook in de bank links staat; die tweede
+   ingang is weg en de bank is de enige gebleven.
+
+   Hoeken zijn nul, ook hier. De enige radius in dit blok is 50% en die zit op
+   een ring, een stip en een avatar -- een cirkel is geen hoek. */
+.dag{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:26px;align-items:start}
+.dagkolom{min-width:0}
+.dagkop{text-align:left;margin-bottom:22px}
+.dagkop h1{font:500 clamp(1.9rem,3.4vw,2.9rem)/1.05 "Bodoni Moda",serif;margin:11px 0 0}
+.dagkop .status{margin-top:16px}
+.dagkop:after{content:"";display:block;width:44px;height:1px;background:var(--goud);margin-top:16px}
+.dagtitel{display:flex;align-items:baseline;justify-content:space-between;gap:14px;margin:0 0 13px}
+.dagtitel b{font-size:.82rem}
+.dagtitel a{color:var(--goud);font-size:.68rem;text-decoration:none}
+.dagtitel a:hover{text-decoration:underline}
+/* de momentenrij schuift horizontaal en verbergt nooit iets: op een smal
+   scherm blijft elk moment bereikbaar door te vegen (ADAPTIEF.md). */
+.momentenrij{display:flex;gap:14px;overflow-x:auto;padding-bottom:6px;margin-bottom:26px;scrollbar-width:thin}
+.moment{flex:0 0 auto;width:92px;display:flex;flex-direction:column;align-items:center;gap:8px;color:inherit;text-decoration:none;text-align:center}
+.momentring{width:68px;height:68px;border-radius:50%;border:2px solid var(--goud);padding:3px;display:block}
+.moment-nieuw .momentring{border-style:dashed;border-color:rgba(255,255,255,.22);display:grid;place-items:center}
+.momentplus{color:var(--goud);font-size:1.3rem;line-height:1}
+.momentvlak{display:block;width:100%;height:100%;border-radius:50%;background:linear-gradient(150deg,#2c1a20,#141a1e)}
+.momentnaam{font-size:.7rem;line-height:1.25}
+/* een TIJDSTIP, geen aftelling: zie de kop van rtg-vandaag.js */
+.momentuur{font-size:.58rem;color:var(--zacht);margin-top:-4px}
+.dagfeed{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.dagkaart{display:block;padding:18px;border:1px solid rgba(255,255,255,.08);border-radius:0;background:#121210;color:inherit;text-decoration:none;transition:.2s}
+.dagkaart:hover{border-color:var(--goud);background:#181713}
+.dagbron{display:block;font-size:.56rem;letter-spacing:.18em;text-transform:uppercase;color:var(--goud)}
+.dagkaart b{display:block;font:500 1.15rem "Bodoni Moda",serif;margin:9px 0 6px}
+.dagmeta{display:block;color:var(--zacht);font-size:.68rem}
+.dagstand{display:inline-block;margin-top:11px;border:1px solid var(--lijn);padding:5px 9px;font-size:.56rem;letter-spacing:.1em;text-transform:uppercase}
+.dagwacht{display:block;margin-top:9px;color:#d7c18c;font-size:.66rem}
+.dagkaart-volgend{border-left:2px solid var(--burgundy,#7F1634);margin-bottom:26px}
+.dagstil{color:var(--zacht);font-size:.66rem;line-height:1.6;margin:16px 0 0;padding-top:13px;border-top:1px solid rgba(255,255,255,.07)}
+/* Een blok zonder gegevens draagt een ZIN en geen leegte. */
+.dagleeg{color:var(--zacht);font-size:.72rem;line-height:1.6;margin:0}
+.dagleeg-rij{align-self:center;max-width:22rem}
+.kompas{position:sticky;top:72px;display:flex;flex-direction:column;gap:13px}
+.kompasblok{border:1px solid rgba(255,255,255,.08);border-radius:0;background:rgba(12,12,11,.7);padding:17px}
+.kompasblok>b{display:block;font-size:.78rem;margin-bottom:4px}
+.kompasblok>span.sub{display:block;color:var(--zacht);font-size:.62rem}
+.kompasregel{display:flex;gap:11px;align-items:flex-start;font-size:.7rem;margin-top:11px}
+.kompasuur{width:2.6rem;flex:0 0 auto;color:var(--zacht)}
+.kompasstip{width:5px;height:5px;border-radius:50%;background:var(--goud);margin-top:.42rem;flex:0 0 auto}
+.kompaswat{color:var(--zacht)}
+.kompasknop{display:block;text-align:center;border:1px solid rgba(255,255,255,.16);border-radius:0;padding:10px;margin-top:15px;color:inherit;text-decoration:none;font:600 .68rem Inter}
+.kompasknop:hover{border-color:var(--goud)}
+.kompaslijst{display:flex;flex-direction:column;gap:2px;margin-top:11px}
+.kompaslijst a{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06);color:var(--zacht);text-decoration:none;font-size:.7rem}
+.kompaslijst a:last-child{border-bottom:0}
+.kompaslijst a:hover{color:#fff}
+.kompaslijst a span{color:var(--goud)}
+.kompasrahul p{color:var(--zacht);font-size:.68rem;line-height:1.6;margin:8px 0 0}
+@media(max-width:1080px){.dag{grid-template-columns:1fr}.kompas{position:static}.dagfeed{grid-template-columns:1fr}}
+@media(max-width:650px){.dagfeed{grid-template-columns:1fr}.moment{width:78px}.momentring{width:58px;height:58px}}
 [hidden]{display:none!important}
 </style>
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
 <link href="/shared/wereldrooster.css" rel="stylesheet">
+<link href="/shared/experience-kernel.css?v=20260829-7" rel="stylesheet">
 </head>
 <body class="rtg-stijl" data-ios-home data-rtg-eigenvlak="bordeaux" data-rtg-world="living">
 <a class="skip" href="#inhoud">Naar inhoud</a>
@@ -56,7 +119,62 @@
 </nav></aside>
 <header class="topbar" role="banner"><a href="/apps/app.html" aria-label="Terug naar het beginscherm"><span class="terug">‹</span><span class="titel">LivingOS · LIFE</span></a><button class="bediening" type="button" aria-label="Bedieningspaneel"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/><circle cx="9" cy="7" r="2" fill="#050504"/><circle cx="15" cy="12" r="2" fill="#050504"/><circle cx="7" cy="17" r="2" fill="#050504"/></svg></button></header>
 <main class="werk" id="inhoud">
-  <header class="kop"><div><p class="os-kicker"><span>01</span>LivingOS · uw dagelijkse wereld</p><div class="ey">LIFE · EEN ACCOUNT · DRIE LAGEN</div><h1>Uw leven, in één ritme.</h1><p>Reizen, mensen, thuis, veiligheid, geld en media bewegen samen. LivingOS brengt alleen naar voren wat vandaag werkelijk aandacht vraagt.</p></div><div class="status"><i></i><span id="lifePasStatus">RTG Pass · LIFE</span></div><span class="aiherkomst">AI-gegenereerd campagnebeeld</span></header>
+  <nav class="standen" aria-label="Standen van LivingOS">
+    <button class="actief" type="button" data-paneel="vandaag">Vandaag</button>
+    <button type="button" data-paneel="alles">Alles</button>
+    <button type="button" data-paneel="mensen">Mensen</button>
+  </nav>
+
+  <section class="paneel actief" data-inhoud="vandaag">
+    <div class="dag">
+      <div class="dagkolom">
+        <header class="dagkop">
+          <div class="ey">Vandaag &middot; uw leven</div>
+          <h1>Uw momenten, uw leven.</h1>
+          <div class="status"><i></i><span id="lifePasStatus">RTG Pass &middot; LIFE</span></div>
+        </header>
+
+        <div class="dagtitel"><b>Momenten van vandaag</b><a href="/apps/pulse.html">Bekijk alles &rsaquo;</a></div>
+        <div class="momentenrij" id="momentenrij" aria-live="polite"><p class="dagleeg">Uw momenten worden opgehaald&hellip;</p></div>
+
+        <article class="dagkaart dagkaart-volgend" id="volgendMoment" hidden>
+          <span class="dagbron">Volgend moment</span>
+          <b data-veld="titel"></b>
+          <span class="dagmeta" data-veld="tijd"></span>
+        </article>
+
+        <div class="dagtitel"><b>Wat er op u wacht</b><a href="/apps/sociaal.html">Open Sociaal &rsaquo;</a></div>
+        <div class="dagfeed" id="dagfeed" aria-live="polite"><p class="dagleeg">Wordt opgehaald&hellip;</p></div>
+        <p class="dagstil" id="dagstil" hidden></p>
+      </div>
+
+      <aside class="kompas" aria-label="Kompas">
+        <div class="ey">Kompas</div>
+        <div class="kompasblok">
+          <b>Vandaag</b><span class="sub">Uit uw agenda</span>
+          <div id="kompasAgenda" aria-live="polite"><p class="dagleeg">Wordt opgehaald&hellip;</p></div>
+          <a class="kompasknop" href="/apps/agenda.html">Volledige agenda</a>
+        </div>
+        <div class="kompasblok">
+          <b>Uw mensen</b><span class="sub">Waar het gesprek loopt</span>
+          <div class="kompaslijst">
+            <a href="/apps/comm.html">Berichten<span>&rsaquo;</span></a>
+            <a href="/apps/sociaal.html">Sociaal<span>&rsaquo;</span></a>
+            <a href="/apps/foundation/vrienden.html">Vrienden<span>&rsaquo;</span></a>
+          </div>
+        </div>
+        <div class="kompasblok kompasrahul">
+          <b>Rahul stelt voor</b><span class="sub">U bevestigt</span>
+          <p>Wat Rahul klaarzet komt hier te staan met de bron erbij. Hij zet klaar en voert niets uit &mdash; bevestigen doet u.</p>
+          <a class="kompasknop" href="/apps/living-os.html">Het Vooruitzicht</a>
+        </div>
+      </aside>
+    </div>
+
+  <section class="hero" id="reisdossier" aria-labelledby="dosDeck"><div class="dossierkop"><div><div class="ey">UW PRIVATE REISDOSSIER</div><h2 id="dosDeck">Uw reis, documenten en open acties bij elkaar.</h2><p>Bevestigd blijft bevestigd; wat nog bij u of een partner ligt, staat afzonderlijk en eerlijk benoemd.</p></div><span class="status"><i></i>Alleen voor u</span></div><div class="dossierinhoud" id="dossier" aria-live="polite"><p class="mag-telling">Het dossier wordt veilig opgehaald…</p></div></section>
+  </section>
+
+  <section class="paneel" data-inhoud="alles">
   <section class="laagkeuze" aria-labelledby="lifeLaagKop">
     <nav class="lifelagen" aria-label="Lagen van LIFE">
       <button class="actief" type="button" data-life-laag="rtg" aria-pressed="true">RTG</button>
@@ -80,23 +198,7 @@
       <a href="/apps/living-os.html"><b>Living OS</b><span>Geld, tijd, energie, mensen en beleving vooruit bekijken.</span></a>
     </div>
   </section>
-  <nav class="standen" aria-label="Onderdelen van LIFE"><button class="actief" data-paneel="vandaag">Vandaag</button><button data-paneel="reizen">Reizen</button><button data-paneel="sociaal">Sociaal</button><button data-paneel="leven">Leven</button><button data-paneel="veilig">Veilig</button><button data-paneel="geld">Geld</button><button data-paneel="media">Media</button></nav>
-  <section class="paneel actief" data-inhoud="vandaag"><div class="wereldklok os-home-klok" data-rtg-klok="ring" aria-label="RTG-horloge"></div><article class="hero"><div class="ey">UW DAG</div><h2>Goedemiddag. Alles staat rustig klaar.</h2><p>Reizen, mensen, thuis, veiligheid, geld en media komen hier samen. Alleen wat aandacht nodig heeft komt naar voren.</p></article><div class="grid">
-    <a class="kaart" href="/apps/reizen-veilig.html"><span class="nummer">01 · REIZEN</span><b>Uw volgende beweging</b><p>Planning, vervoer en veilige aankomst in één reisbeeld.</p></a>
-    <a class="kaart" href="/apps/sociaal.html"><span class="nummer">02 · SOCIAAL</span><b>Uw mensen</b><p>Gesprekken, kring en ontmoetingen zonder sociale drukte.</p></a>
-    <a class="kaart" href="/apps/leven.html"><span class="nummer">03 · LEVEN</span><b>Uw dagelijks leven</b><p>Wonen, eten, zorg en persoonlijke ondersteuning.</p></a>
-    <a class="kaart" href="/apps/veilig.html"><span class="nummer">04 · VEILIG</span><b>Uw bescherming</b><p>Identiteit, toestemming en veiligheid onder uw controle.</p></a>
-    <a class="kaart" href="/apps/geld.html"><span class="nummer">05 · GELD</span><b>Uw financiële rust</b><p>Betalen, vermogen en inzicht vanuit één cockpit.</p></a>
-    <a class="kaart" href="/apps/media.html"><span class="nummer">06 · MEDIA</span><b>Uw vrije tijd</b><p>Muziek, kijken, nieuws, sport en spelen.</p></a>
-  </div></section>
-  <section class="paneel" data-inhoud="reizen"><article class="hero"><div class="ey">REIZEN</div><h2>Van vertrek tot veilige aankomst.</h2><p>Open de volledige reiswerkruimte met planning, vervoer, verblijf en Live Circle.</p><a class="kaart" href="/apps/reizen-veilig.html"><b>Open Reizen</b><p>Uw complete reiswereld.</p></a></article></section>
-  <section class="paneel" data-inhoud="sociaal"><article class="hero"><div class="ey">SOCIAAL</div><h2>Uw kring, zonder ruis.</h2><p>Open gesprekken, relaties, communities en ontmoetingen.</p><a class="kaart" href="/apps/sociaal.html"><b>Open Sociaal</b><p>Alles rond uw mensen.</p></a></article></section>
-  <section class="paneel" data-inhoud="leven"><article class="hero"><div class="ey">LEVEN</div><h2>Een huis dat met u meedenkt.</h2><p>Wonen, gezondheid, gezin, tafel en persoonlijke service.</p><a class="kaart" href="/apps/leven.html"><b>Open Leven</b><p>Uw persoonlijke levensomgeving.</p></a></article></section>
-  <section class="paneel" data-inhoud="veilig"><article class="hero"><div class="ey">VEILIG</div><h2>Bescherming als stille standaard.</h2><p>Beheer identiteit, passkeys, juridische afspraken en hulp.</p><a class="kaart" href="/apps/veilig.html"><b>Open Veilig</b><p>Uw beveiligingscentrum.</p></a></article></section>
-  <section class="paneel" data-inhoud="geld"><article class="hero"><div class="ey">GELD</div><h2>Volledig inzicht, zonder onrust.</h2><p>Uw wallet, rekening, balans en vermogen in één financieel beeld.</p><a class="kaart" href="/apps/geld.html"><b>Open Geld</b><p>Uw financiële cockpit.</p></a></article></section>
-  <section class="paneel" data-inhoud="media"><article class="hero"><div class="ey">MEDIA</div><h2>Alles om te kijken, luisteren en beleven.</h2><p>Een hoogwaardige mediawereld zonder eindeloze afleiding.</p><a class="kaart" href="/apps/media.html"><b>Open Media</b><p>Uw persoonlijke podium.</p></a></article></section>
   <article class="hero campagne" data-life-laagpaneel="lifestyle" hidden><div><div class="ey">HET HUIS · PRIVATE EDITION</div><h2>Stille luxe, met echte regie.</h2><p>Voor een gewone rit, een gezinsreis of een afgeschermde beweging met entourage: RTG brengt vervoer, verblijf, veiligheid en service samen zonder uw privacy uit handen te geven.</p></div><figure><img src="/campagne/huis-omslag.jpg" width="640" height="641" loading="lazy" alt="Privéjet en executive auto in zwart-wit: AI-gegenereerd campagnebeeld"></figure></article>
-  <section class="hero" id="reisdossier" aria-labelledby="dosDeck"><div class="dossierkop"><div><div class="ey">UW PRIVATE REISDOSSIER</div><h2 id="dosDeck">Uw reis, documenten en open acties bij elkaar.</h2><p>Bevestigd blijft bevestigd; wat nog bij u of een partner ligt, staat afzonderlijk en eerlijk benoemd.</p></div><span class="status"><i></i>Alleen voor u</span></div><div class="dossierinhoud" id="dossier" aria-live="polite"><p class="mag-telling">Het dossier wordt veilig opgehaald…</p></div></section>
   <section class="hero" aria-labelledby="alleDiensten"><div class="ey">ALLE DIENSTEN</div><h2 id="alleDiensten">Rechtstreeks naar wat u zoekt.</h2><div class="grid">
     <a class="kaart" href="/apps/reizen.html"><b>Reizen</b></a><a class="kaart" href="/apps/vluchten.html"><b>Vluchten</b></a><a class="kaart" href="/apps/ov.html"><b>OV</b></a><a class="kaart" href="/apps/navigatie.html"><b>Navigatie</b></a><a class="kaart" href="/apps/flits.html"><b>Flits</b></a><a class="kaart" href="/apps/stad.html"><b>Stad</b></a><a class="kaart" href="/apps/reisboek.html" data-life-eist="lifestyle"><b>Reisboek</b><span class="laaglabel">Lifestyle</span></a><a class="kaart" href="/apps/hangar.html" data-life-eist="lifestyle"><b>Hangar</b><span class="laaglabel">Lifestyle</span></a><a class="kaart" href="/apps/residentie.html"><b>Residentie</b></a>
     <a class="kaart" href="/apps/commerce.html"><b>Commerce</b></a><a class="kaart" href="/apps/wallet.html"><b>Wallet</b></a><a class="kaart" href="/apps/bank.html"><b>Bank</b></a><a class="kaart" href="/apps/wbw.html"><b>Wie betaalt wat</b></a><a class="kaart" href="/apps/rtgcode.html"><b>Betaalcode</b></a><a class="kaart" href="/apps/balans.html"><b>Balans</b></a><a class="kaart" href="/apps/labfonds.html"><b>Fonds</b></a><a class="kaart" href="/apps/mecenaat.html" data-life-eist="lifestyle"><b>Mecenaat</b><span class="laaglabel">Lifestyle</span></a><a class="kaart" href="/apps/nalatenschap.html" data-life-eist="lifestyle"><b>Nalatenschap</b><span class="laaglabel">Lifestyle</span></a><a class="kaart" href="/apps/logboek.html" data-life-eist="lifestyle"><b>Logboek</b><span class="laaglabel">Lifestyle</span></a>
@@ -105,6 +207,21 @@
     <a class="kaart" href="/apps/muziek.html"><b>Muziek</b></a><a class="kaart" href="/apps/podium.html"><b>Podium</b></a><a class="kaart" href="/apps/theater.html"><b>Theater</b></a><a class="kaart" href="/apps/clips.html"><b>Video</b></a><a class="kaart" href="/apps/spelen.html"><b>Spelen</b></a><a class="kaart" href="/apps/nieuws.html"><b>Nieuws</b></a><a class="kaart" href="/apps/krant.html"><b>Krant</b></a><a class="kaart" href="/apps/sport.html"><b>Sport</b></a>
     <a class="kaart" href="/apps/living-os.html"><b>Het Vooruitzicht</b><p>Regie over wat nu speelt.</p></a><a class="kaart" href="/apps/lifestyle.html"><b>Privékantoor</b><p>Persoonlijke ondersteuning binnen LIFE.</p></a><a class="kaart" href="/apps/lifestyle.html" data-life-eist="lifestyle"><b>Privékantoor</b><p>Uw bestaande persoonlijke werkruimte en situatiekamer.</p><span class="laaglabel">Lifestyle</span></a><a class="kaart" href="/apps/living-os.html"><b>Living OS</b><p>Uw leefomgeving als verbonden onderdeel.</p></a>
   </div></section>
+  </section>
+
+  <section class="paneel" data-inhoud="mensen">
+    <article class="hero"><div class="ey">MENSEN</div><h2>Het leven tussen mensen.</h2><p>Gesprekken, kring en ontmoetingen. Wat een tweede persoon bereikt &mdash; een uitnodiging, een bericht, een introductie &mdash; wordt klaargezet en nooit vanzelf verstuurd.</p></article>
+    <div class="grid">
+      <a class="kaart" href="/apps/sociaal.html"><span class="nummer">01 &middot; KRING</span><b>Sociaal</b><p>Wat er tussen u en de mensen om u heen speelt, in een rij.</p></a>
+      <a class="kaart" href="/apps/comm.html"><span class="nummer">02 &middot; GESPREK</span><b>Berichten</b><p>Berichten, bellen en videobellen.</p></a>
+      <a class="kaart" href="/apps/pulse.html"><span class="nummer">03 &middot; MOMENTEN</span><b>Vandaag</b><p>De momenten die u en uw kring delen.</p></a>
+      <a class="kaart" href="/apps/foundation/vrienden.html"><span class="nummer">04 &middot; VRIENDEN</span><b>Vrienden</b><p>Wie er bij u hoort, en hoe u elkaar vindt.</p></a>
+      <a class="kaart" href="/apps/vonk.html"><span class="nummer">05 &middot; ONTMOETEN</span><b>Daten</b><p>Vonk zoekt de juiste mensen. 18+ en na verificatie.</p></a>
+      <a class="kaart" href="/apps/camera.html"><span class="nummer">06 &middot; VASTLEGGEN</span><b>Camera</b><p>Een moment vastleggen en delen met wie u kiest.</p></a>
+    </div>
+    <p class="paginanr">Cercle, Entourage, Rendez-vous en Attenties staan onder <b>Alles</b>, achter de Lifestyle-laag.</p>
+  </section>
+
   <!-- ALLES IN DEZE WERELD, uit de bron. Dit blok is niet met de hand
        geschreven: scripts/wereldrooster.js schrijft het uit shared/sprongindex.json,
        dat uit MAPPEN komt, en npm run wereldrooster -- --controle zakt als het
@@ -174,6 +291,7 @@
 <script src="../shared/uitvoer.js"></script>
 <script src="/apps/rtg-dossier.js"></script>
 <script src="/apps/life-lagen.js"></script>
+<script src="/apps/rtg-vandaag.js"></script>
 <script>RTGSterren.hang(document.body,{dichtheid:.9,helderheid:.75});document.querySelectorAll('[data-paneel]').forEach(function(knop){knop.addEventListener('click',function(){document.querySelectorAll('[data-paneel]').forEach(function(x){x.classList.toggle('actief',x===knop)});document.querySelectorAll('[data-inhoud]').forEach(function(x){x.classList.toggle('actief',x.dataset.inhoud===knop.dataset.paneel)});});});</script>
 <script src="../shared/schermbeeld.js" defer></script>
 <script src="../shared/metgezel.js" defer></script>
@@ -184,5 +302,7 @@
 <script src="../shared/cookie.js" defer></script>
 <script src="../shared/sneltoets.js" defer></script>
 <script src="../shared/ios.js" defer></script>
+<script src="/shared/experience-actions.js?v=20260829-7" defer></script>
+<script src="/shared/experience-kernel.js?v=20260829-7" defer></script>
 </body>
 </html>

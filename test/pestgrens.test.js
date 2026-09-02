@@ -11,6 +11,37 @@ const db = { data: {} };
 const { pestgrens } = require('../server/kern/pestgrens')({ db, save: () => {} });
 const KEY = 'user-777';
 
+/* EEN NET GESPREK LAAT GEEN SPOOR NA, EN DAT WAS NIET ZO.
+
+   `S(key)` legde bij ELKE oproep een record aan in `rahulRespect` -- ook bij een
+   vriendelijke vraag, en ook wanneer de route daarna 400 gaf. Twee gevolgen: een
+   geweigerd verzoek veranderde de toestand (de staatproef vond het, door de
+   OPSLAG te meten in plaats van het antwoord), en de collectie groeide mee met
+   het aantal sessies in plaats van met het aantal incidenten -- lege regels over
+   leden die niets verkeerd deden.
+
+   Deze toets kijkt in de bak in plaats van naar het antwoord, want precies daar
+   zat het verschil.
+
+   DE MUTATIE: laat S(key) het lege record weer wegschrijven -> deze toets zakt. */
+test('een net gesprek laat niets achter in de teller', () => {
+  const eigen = { data: {} };
+  const bak = () => (eigen.data.rahulRespect || {});
+  const grens = require('../server/kern/pestgrens')({ db: eigen, save: () => {} }).pestgrens;
+
+  assert.equal(grens.poort('user-net', 'Plan mijn dag in Ibiza'), null);
+  assert.deepEqual(Object.keys(bak()), [], 'een nette vraag hoort niets op te slaan');
+
+  /* Lezen mag ook niets aanmaken: het bord vraagt de stand van iedereen op. */
+  assert.deepEqual(grens.stand('user-net'), { n: 0, weg: false, wachtExcuus: false });
+  assert.deepEqual(Object.keys(bak()), [], 'de stand opvragen is lezen, geen schrijven');
+
+  /* En zodra er WEL iets voorvalt, staat het er gewoon. */
+  grens.poort('user-net', 'sukkel');
+  assert.deepEqual(Object.keys(bak()), ['user-net'], 'een waarschuwing hoort wel bewaard te worden');
+  assert.equal(bak()['user-net'].n, 1);
+});
+
 test('gewone berichten gaan gewoon door; drie keer pesten geeft drie oplopende waarschuwingen', () => {
   assert.equal(pestgrens.poort(KEY, 'Plan mijn dag in Ibiza'), null, 'een nette vraag passeert de poort');
   const w1 = pestgrens.poort(KEY, 'je bent dom');

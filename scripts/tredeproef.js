@@ -463,7 +463,7 @@ async function meet(tredeId) {
   const ingangen = [];
   for (const ing of [
     { bestand: 'server/smtp-in-server.js', functie: 'ov-mail-binnen', poort: mailPoort, wat: 'post van buiten aannemen (SMTP)' },
-    { bestand: 'server/imap-server.js', functie: 'ov-werkmail', poort: imapPoort, wat: 'een postvak vrijgeven (IMAP)' }
+    { bestand: 'server/imap-server.js', functie: 'member', poort: imapPoort, wat: 'een postvak vrijgeven (IMAP); dat postvak is kern/rtmail-vak.js en hangt aan `member`, niet aan een mailfunctie' }
   ]) {
     const antwoord = await klopAanPoort(ing.poort);
     const functieAan = aan.has(ing.functie);

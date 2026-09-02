@@ -177,7 +177,21 @@ const FASE_VOORDEUR = [
   'tg-inlog', 'tg-account', 'tg-pin', 'tg-zegel', 'tg-gegevens', 'tg-aanmeld',
   'verificatie', 'paspoort', 'webauthn',
   'member', 'kern-state', 'kern-live', 'kern-meldingen', 'kern-taal', 'kern-gids',
-  'kern-rahul', 'kern-waardering'
+  'kern-rahul', 'kern-waardering',
+  /* EN DE POST DIE ERIN VALT (`ov-mail-binnen`, /api/mail/binnen + /api/mail/ses).
+     Dat stond tot 2 september 2026 pas in trede 6, en dat is dezelfde vorm als
+     het gat bij `ov-suppliers`: `member` opent op trede 0 het RTG Mail-postvak
+     (/api/member/rtmail, server/routes/rtmail-vak.js), maar de enige weg waarlangs
+     post van BUITEN dat postvak bereikt bleef tot "alles open" dicht. Een postvak
+     dat een lid kan openen terwijl er niets in kan vallen, is een deur zonder
+     kamer erachter. De aannamekant is niet zorgeloos maar begrensd: de rem per
+     minuut, de onbetrouwde baan, de ontvangertoets (een adres zonder postvak
+     krijgt 550) en de bijlagescan zitten in kern/mailaanname.js en staan los van
+     deze trede.
+
+     Gevonden door scripts/tredeproef.js, die de niet-HTTP ingangen aanklopt: de
+     SMTP-ontvanger nam op trede 0 post aan terwijl zijn functie uit stond. */
+  'ov-mail-binnen'
 ];
 
 /* Trede 0. De smalste stand die een echte livegang aankan: de voordeur plus De

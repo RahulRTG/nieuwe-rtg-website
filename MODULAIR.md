@@ -115,7 +115,7 @@ verrekent: een rand weg in het ene domein betaalt een nieuwe in het andere.
 
 De zeven treden van `LAUNCH.md` staan machineleesbaar in
 `server/functies/register` (`FASES`). De proef zet er één aan, de rest uit, en
-kijkt of er dan werkelijk niets anders openstaat. Op trede 0: <!--getal:trede.inTrede-->331<!--/getal-->
+kijkt of er dan werkelijk niets anders openstaat. Op trede 0: <!--getal:trede.inTrede-->333<!--/getal-->
 van de <!--getal:trede.routes-->4740<!--/getal--> API-routes open, en <!--getal:trede.lekken-->0<!--/getal--> lekken.
 
 | trede | functies | routes open | zuiver | beproefd | rondgang | onvoltooid |
@@ -189,21 +189,41 @@ deuren.
 
 **En daar zit de scherpste bevinding van deze ronde.**
 <!--getal:wekkers.functieUitToch-->3<!--/getal--> ingangen doen het werk van een functie zonder langs
-haar schakelaar te komen. De functie `ov-mail-binnen` heet *"post van buiten
-aannemen"* en gaat pas op trede 6 open; de SMTP-ontvanger op de eigen poort komt
-langs geen enkele schakelaar. **Met de voorwaarde erbij**, want die hoort er:
-IMAP en SMTP-in starten alleen als de beheerder hun poort zet — `luister-poorten.js`
-doet dat met opzet niet vanzelf, want een mailpoort die overal openstaat is een
-deur die niemand heeft besloten open te zetten. STUN staat wél altijd aan, maar
-zijn functie `kern-live` gaat al op trede 0 open.
+haar schakelaar te komen: de SMTP-ontvanger, de IMAP-server en de eigen
+STUN-server. **Met de voorwaarde erbij**, want die hoort er: IMAP en SMTP-in
+starten alleen als de beheerder hun poort zet — `luister-poorten.js` doet dat met
+opzet niet vanzelf, want een mailpoort die overal openstaat is een deur die
+niemand heeft besloten open te zetten. STUN staat wél altijd aan.
 
 **En dat is niet gebleven bij een bewering.** De tredeproef zet die twee poorten
-zelf open en klopt aan: op trede 0 antwoordt SMTP met `220 rtg-mail RTG Mail
-klaar` en IMAP met `* OK RTG Mail IMAP klaar`, terwijl beide functies uit staan.
-<!--getal:trede.ingangLekken-->2<!--/getal--> gemeten lekken, op trede 0 tot en met 5 — en nul op
-trede 6, waar die functies aan staan. Die tegenproef is wat zegt dat deze meter
-over de poort gaat en niet over ruis. Luisteren is de opstelling; **antwoorden**
-is het werk, en alleen dat telt.
+zelf open en klopt aan. In de eerste ronde antwoordde SMTP op trede 0 met
+`220 rtg-mail RTG Mail klaar` en IMAP met `* OK RTG Mail IMAP klaar` terwijl hun
+functie uit stond: twee gemeten lekken op trede 0 tot en met 5, en nul op trede
+6. Luisteren is de opstelling; **antwoorden** is het werk, en alleen dat telt.
+
+**Die twee zijn uitgezocht, en het waren twee verschillende dingen.**
+
+- **IMAP was een meetfout van mij.** Ik had hem opgeschreven als
+  `ov-werkmail`, en dat is de bezorging van interne werkmail (`/api/werkmail`).
+  `server/imap.js` is iets anders: een leeslaag boven `kern/rtmail-vak.js`,
+  hetzelfde postvak dat over HTTP achter `/api/member/rtmail` zit. Dat valt onder
+  `member`, en `member` staat vanaf trede 0 aan. Er was hier geen lek — er was een
+  verkeerde verklaring, en die telde er wél een. Verklaringen zijn zelf ook meting.
+- **SMTP was een echt gat, van dezelfde vorm als `ov-suppliers`.** `member` opent
+  op trede 0 het RTG Mail-postvak, maar de enige weg waarlangs post van buiten
+  dat postvak bereikt (`ov-mail-binnen`) bleef tot "alles open" dicht. Een postvak
+  dat een lid kan openen terwijl er niets in kan vallen, is een deur zonder kamer
+  erachter. `ov-mail-binnen` staat sinds 2 september 2026 in `FASE_VOORDEUR`, met
+  de reden erbij in `server/functies/register/index.js`. Wat de trede open zet is
+  niet zorgeloos maar begrensd: de rem per minuut, de onbetrouwde baan, de
+  ontvangertoets (een adres zonder postvak krijgt 550) en de bijlagescan zitten in
+  `kern/mailaanname.js` en staan los van deze trede.
+
+Daarmee staat de teller op <!--getal:trede.ingangLekken-->0<!--/getal--> gemeten lekken over
+alle zeven treden, en de ratel is op nul vastgelegd. De teller
+`wekkers.functieUitToch` blijft op 3 staan en dat is juist: die telt ingangen
+**zonder schakelaar**, en dat zijn het alle drie nog. De trede eromheen klopt nu;
+de bedrading niet.
 
 Dat is een **bevinding en geen uitzondering**: hij heeft een eigen teller die
 niet daalt door er een reden bij te schrijven, en `test/wekkers.test.js` draait de

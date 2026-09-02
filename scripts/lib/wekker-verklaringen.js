@@ -104,9 +104,9 @@ module.exports = [
   { bestand: 'server/smtp-in-server.js', vertegenwoordigt: 'ov-mail-binnen',
     voorwaarde: 'alleen met MAIL_IN_POORT gezet',
     reden: 'de SMTP-ontvanger op de eigen poort is de tweede weg waarlangs post van buiten binnenkomt en hij raadpleegt geen enkele schakelaar: met ov-mail-binnen UIT komt de post alsnog binnen. WEL alleen als de beheerder MAIL_IN_POORT zet -- opzet/luister-poorten.js doet dat met opzet niet vanzelf, want een mailpoort die overal openstaat is een deur die niemand heeft besloten open te zetten' },
-  { bestand: 'server/imap-server.js', vertegenwoordigt: 'ov-werkmail',
+  { bestand: 'server/imap-server.js', vertegenwoordigt: 'member',
     voorwaarde: 'alleen met IMAP_POORT gezet',
-    reden: 'de IMAP-server geeft een postvak vrij aan een mailprogramma, buiten elke route om; wat op het bord over mail wordt geschakeld raakt deze weg niet. Ook hij start alleen als de beheerder zijn poort zet' },
+    reden: 'de IMAP-server geeft een postvak vrij aan een mailprogramma, buiten elke route om. Hier stond eerst `ov-werkmail`, en dat was FOUT: server/imap.js is een leeslaag boven kern/rtmail-vak.js -- hetzelfde postvak dat over HTTP achter /api/member/rtmail zit, en dat valt onder `member`. `ov-werkmail` gaat over de bezorging van interne werkmail (/api/werkmail) en komt hier niet langs. De vergissing kostte niets in gedrag maar wel in meting: hij liet een ingang als lek tellen die dat niet is, want `member` staat vanaf trede 0 aan' },
   { bestand: 'server/stun.js', vertegenwoordigt: 'kern-live',
     voorwaarde: 'altijd, tenzij STUN_UIT=1',
     reden: 'de eigen STUN-server bedient de ICE-kant van bellen; /api/ice hangt aan kern-live, de UDP-poort aan niets. Hij staat WEL standaard aan -- maar kern-live gaat al op trede 0 open, dus hier loopt de schakelaar niet achter op de deur' }

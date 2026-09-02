@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-02T16:23:59.389Z",
-    "commit": "b73f64f3b",
+    "op": "2026-09-02T22:10:01.855Z",
+    "commit": "14e88841",
     "boomVuil": true,
-    "boomAnders": 14,
+    "boomAnders": 9,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -3646,6 +3646,14 @@
       "gezakt": 11,
       "scherp": "gezakt"
     },
+    "meelezen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/meelezen.js",
+      "operator": "===->!==#0",
+      "gezakt": 7,
+      "geprobeerd": 1
+    },
     "meet.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -6248,6 +6256,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 10,
       "scherp": "gezakt"
+    },
+    "spraaktekst.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/spraaktekst.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 3
     },
     "spreidingsoordeel.test.js": {
       "soort": "puur",

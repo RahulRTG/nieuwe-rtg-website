@@ -576,6 +576,14 @@ const EIGEN_MODULE = new Map([
      mutatie op geschoten. Nu wel. */
   ['linkkaart.test.js', ['public/shared/linkkaart.js']],
   ['linkkoppelingenui.test.js', ['public/shared/linkkoppelingen.js']],
+  /* DE TEKSTBAAN EN DE HERKENNER ERONDER (TAKEN.md 4.31). Zelfde vorm als de
+     twee hierboven: ze laden een BROWSERmodule met readFileSync in plaats van
+     met een require, dus de modulezoeker vindt hem niet en er schiet nooit een
+     mutatie op. Zonder deze twee regels tellen ze als "niet gemeten" terwijl er
+     wel een toets op staat -- en dat is precies de meter die het goede zou
+     bestraffen. */
+  ['meelezen.test.js', ['public/shared/meelezen.js']],
+  ['spraaktekst.test.js', ['public/shared/spraaktekst.js']],
   ['loghygiene.test.js', ['server/log.js']],
   ['genreregister.test.js', ['server/seed/genres.js']],
   ['genretoegang.test.js', ['server/kern/aanmeldingen/bedrijf.js', 'server/seed/genres.js']],

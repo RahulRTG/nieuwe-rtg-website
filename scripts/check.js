@@ -3250,12 +3250,25 @@ console.log('\n48) bewijsgroen en go-live-groen blijven uit elkaar');
    OPEN, en dat is de eerlijke stand en geen slordigheid:
 
      live gesprek (6)    Een <track> kan niet bestaan voor beeld dat nu ontstaat.
-                         Wat een dove deelnemer hier nodig heeft is live tekst
-                         (spraak-naar-tekst tijdens het gesprek), en die bestaat
-                         in dit huis niet. WCAG 1.2.2 gaat hier niet over; 1.2.4
-                         wel, en die is niet gehaald.
-     live uitzending (2) Zelfde verhaal, eenrichting: het Podium en het SOS-beeld
-                         naar het kantoor.
+                         Er is sinds 2 september 2026 WEL spraak-naar-tekst
+                         (shared/spraaktekst.js, in de meeleesbaan van alle zes),
+                         maar hij staat uit tot een deelnemer hem zelf aanzet en
+                         hij transcribeert alleen de EIGEN microfoon. Zet de
+                         ander hem niet aan, dan is er van diens spraak nog geen
+                         tekst. WCAG 1.2.2 gaat hier niet over; 1.2.4 wel, en die
+                         vraagt ondertiteling die er IS -- niet een die van de
+                         goede wil van de gesprekspartner afhangt. Dus blijven ze
+                         open, en dat is het punt van dit register.
+     live uitzending (2) Zelfde verhaal, eenrichting. Het Podium: de uitzender
+                         kan zijn eigen spraak in de kanaalchat laten lopen
+                         ('Live tekst'), maar doet hij dat niet, dan is er niets.
+                         Het SOS-beeld is de enige van de acht waar het NIET om
+                         een tik vraagt -- het lid heeft bij het veiligheids-
+                         contract al toestemming gegeven voor beeld en geluid, en
+                         een noodscherm is geen plek voor een tweede tik. Ook die
+                         blijft open: hij hangt aan een browser die de Web Speech
+                         API heeft, en dat is geen voorziening waar je op kunt
+                         rekenen.
      opgenomen (0)       Dit waren er drie. Het Theater en de filmspeler van de
                          Media OS hadden geen veld voor ondertitels in het model;
                          dat veld is er nu (kern/ondertitels.js, dezelfde bron als
@@ -3324,7 +3337,7 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
   const REGISTER = new Map([
     ['public/apps/app.html#csRemote', ['gesprek', 'het beeld en geluid van de ander in een videogesprek tussen twee leden', ['public/apps/app-main.js', 'RTGMeelezen']]],
     ['public/apps/app.html#csLocal', ['spiegel', 'je eigen beeld in de hoek van dat gesprek; stil, want jezelf terughoren is een echo']],
-    ['public/apps/backoffice.html#ontLiveVid', ['uitzending', 'SOS: het kantoor kijkt live mee met de camera van een lid, met geluid erbij. GEEN tekstbaan, en dat is de eerlijke stand: wie doof is kan geen SOS-dienst draaien. Een noodscherm is niet de plek om er een even bij te zetten -- dat is een besluit, zie TOEGANKELIJK.md']],
+    ['public/apps/backoffice.html#ontLiveVid', ['uitzending', 'SOS: het kantoor kijkt live mee met de camera van een lid, met geluid erbij. Er loopt WEL een tekstbaan mee (#ontLiveTekst): het toestel van het lid zet zijn eigen stem om naar tekst en stuurt de regels langs hetzelfde seinkanaal, zonder tweede tik -- de toestemming voor beeld en geluid staat al in het veiligheidscontract. Blijft OPEN: het hangt aan een browser die de Web Speech API heeft, en dat is geen ondertiteling waar je op kunt rekenen', ['public/apps/backoffice.js', 'ontLiveTekst']]],
     ['public/apps/camera.html#beeld', ['spiegel', 'de camera-app: je eigen beeld om een foto te maken, zonder geluid']],
     ['public/apps/clips.html#studioDoek', ['spiegel', 'het opnamedoek van de clipstudio: je eigen beeld voordat de opname loopt']],
     ['public/apps/clips.html#js1', ['ondertiteld', 'de clip in de feed; de gedeelde clipdeler zet de ondertitelband van de maker eroverheen', CLIPBAND]],
@@ -3339,7 +3352,7 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
     ['public/apps/meet/kamer.js#1', ['gesprek', 'de vergaderkamer: een tegel per deelnemer, en de eigen tegel krijgt muted', ['public/apps/meet/kamer.js', 'RTGMeelezen']]],
     ['public/apps/memo/app.js#1', ['ondertiteld', 'een eigen spraakmemo; het toestel maakt er een transcript bij dat in de lijst staat en samen te vatten is', ['public/apps/memo/app.js', 'transcript']]],
     ['public/apps/oog.html#cam', ['werktuig', 'het oog schouwt een voertuig of werkvloer: beeldanalyse, geen geluid']],
-    ['public/apps/podium.html#kijkVideo', ['uitzending', 'een live uitzending van het Podium; srcObject is er altijd een stroom, nooit een bestand. Er loopt WEL een tekstbaan mee: de kanaalchat (#chatKijk, aria-live), waarin de uitzender kan meeschrijven -- geen ondertiteling, wel een weg naar tekst', ['public/apps/podium.html', 'chatKijk']]],
+    ['public/apps/podium.html#kijkVideo', ['uitzending', 'een live uitzending van het Podium; srcObject is er altijd een stroom, nooit een bestand. Er loopt WEL een tekstbaan mee: de kanaalchat (#chatKijk, aria-live), waarin de uitzender meeschrijft of zijn eigen spraak laat omzetten met de knop Live tekst (#studioSpraak) -- geen ondertiteling waar je op kunt rekenen, wel een weg naar tekst', ['public/apps/podium.html', 'studioSpraak']]],
     ['public/apps/podium.html#studioVideo', ['spiegel', 'het eigen beeld van de uitzender, voor en tijdens het uitzenden']],
     ['public/apps/scanner.html#beeld', ['werktuig', 'de documentscanner leest papier: beeld als invoer']],
     ['public/apps/theater.html#doekVideo', ['ondertiteld', 'de bioscoop van het Theater: de maker schrijft de ondertitels bij zijn eigen video, en de kijker krijgt ze mee met de zaal', ['server/kern/theater/video.js', 'videoOndertitels']]],
@@ -4800,6 +4813,88 @@ console.log('\n64) het mutatiecontractregister loopt niet achter op de code');
             open + ' nog te verklaren');
         }
       }
+    }
+  }
+}
+
+/* ============================================================================
+   65) EEN PAGINA DIE EEN GEDEELDE MODULE GEBRUIKT, LAADT HEM OOK
+
+   WAAR DIT UIT KOMT, en het is geen theorie. Bij het aansluiten van
+   spraak-naar-tekst (TAKEN.md 4.31) bleek shared/teamcall.js netjes
+   `w.RTGMeelezen` aan te roepen -- en personeel.html en leverancier.html laadden
+   shared/meelezen.js NERGENS. De tekstbaan van de teamcall bestond dus niet, op
+   geen van beide schermen, terwijl regel 49 hem als geregeld in zijn register
+   had staan.
+
+   Waarom regel 49 dat niet zag: zijn anker controleert of de NAAM in het
+   genoemde bestand staat. Dat is de goede tand voor "is de weg naar tekst er
+   nog uitgehaald", en de verkeerde voor "komt hij ooit aan". `if (w.RTGMeelezen)`
+   is bovendien precies de vorm die niets kapotmaakt als hij er niet is: geen
+   fout, geen log, alleen een baan die nooit verschijnt -- LAT.md regel 5.
+
+   Regel 38 doet dit al voor RTGMedia, met zoveel woorden ("de pagina die de
+   module ook echt binnenhaalt"). Deze regel maakt daar een lijst van in plaats
+   van een uitzondering, zodat de volgende gedeelde module er niet buiten valt.
+
+   WAT HIJ NIET ZIET: een module die pas na een tik wordt bijgeladen. Die vorm
+   komt hier vandaag niet voor; komt hij er, dan meldt deze regel hem als
+   ontbrekend en dat is de goede kant om fout te staan. */
+console.log('\n65) een pagina die een gedeelde module gebruikt, laadt hem ook');
+{
+  /* De globals die uit een eigen bestand komen. Elk paar: de naam op window, en
+     het bestand dat hem zet. Wie er een toevoegt, voegt hem hier toe. */
+  const MODULES = [
+    ['RTGMeelezen', '/shared/meelezen.js'],
+    ['RTGSpraakTekst', '/shared/spraaktekst.js']
+  ];
+  const PUB = path.join(ROOT, 'public');
+  const web = (p) => '/' + path.relative(PUB, p).split(path.sep).join('/');
+  const lees = (f) => { try { return fs.readFileSync(f, 'utf8'); } catch (e) { return ''; } };
+
+  const stuk = MODULES.filter(([naam, bestand]) =>
+    !lees(path.join(PUB, bestand.slice(1))).includes(naam));
+  if (stuk.length) {
+    /* De zelfijking: zet de module de global niet meer, dan meet alles hieronder
+       niets. Dan hoort deze regel te zakken en niet netjes 0 te melden. */
+    stuk.forEach(([naam, bestand]) => fout(bestand + ' zet ' + naam + ' niet meer; deze regel meet dan niets'));
+  } else {
+    const paginas = [];
+    loop(PUB, /\.html$/, f => { if (!web(f).startsWith('/dist/')) paginas.push(f); });
+    let mis = 0, met = 0;
+    for (const pag of paginas) {
+      const bron = lees(pag);
+      /* De scripts die deze pagina laadt, plus de delen van een bundel. */
+      const srcs = [...bron.matchAll(/<script[^>]*src="(\/[^"]+\.js)"/g)].map(m => m[1]);
+      const geladen = new Set(srcs);
+      const code = [bron];
+      for (const src of srcs) {
+        const f = path.join(PUB, src.slice(1));
+        code.push(lees(f));
+        const delen = f.replace(/\.js$/, '');
+        let namen = []; try { namen = fs.readdirSync(delen); } catch (e) { namen = []; }
+        for (const n of namen) if (n.endsWith('.js')) code.push(lees(path.join(delen, n)));
+      }
+      for (const [naam, bestand] of MODULES) {
+        if (geladen.has(bestand)) continue;
+        /* GEBRUIKT betekent: de naam staat er, en niet alleen in een commentaar
+           of in de module zelf. Vandaar zonderCommentaar en het overslaan van
+           het eigen bestand hierboven. */
+        if (!code.some(c => new RegExp('\\b' + naam + '\\b').test(zonderCommentaar(c)))) continue;
+        met++;
+        mis++;
+        fout(web(pag) + ' gebruikt ' + naam + ' maar laadt ' + bestand + ' niet -- ' +
+          'de vorm `if (window.' + naam + ')` breekt dan niets en doet ook niets');
+      }
+    }
+    if (!mis) {
+      let gebruik = 0;
+      for (const pag of paginas) {
+        const bron = lees(pag);
+        for (const [, bestand] of MODULES) if (bron.includes('src="' + bestand + '"')) gebruik++;
+      }
+      ok(gebruik + ' pagina-koppelingen naar ' + MODULES.length + ' gedeelde modules, en geen enkele pagina ' +
+        'gebruikt er een die zij niet laadt');
     }
   }
 }

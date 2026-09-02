@@ -261,23 +261,43 @@ waar de afhankelijkheid ligt: van "kan niet meedoen" naar "kan meedoen als de
 anderen meetypen". Dat is minder dan ondertiteling en meer dan niets, en die twee
 zinnen horen allebei te staan.
 
-**Waarom er geen automatische ondertiteling in zit is een BESLUIT.**
-Spraakherkenning in de browser stuurt het geluid van het gesprek naar een server
-van de leverancier, en dit huis draait op codenamen met de echte namen in een
-aparte kluis -- het gesprek van twee leden naar buiten sturen om er tekst van te
-maken is precies wat dat ontwerp voorkomt. De weg die hier wel past loopt langs
-een lokaal model (`LOCAL_AI_URL`), en dat is een inrichtingskeuze. De naad
-daarvoor ligt klaar en neemt niets aan: een regel met bron `machine` komt in
-dezelfde baan en staat er zichtbaar als machinetekst bij, want tekst die een
-machine heeft geraden is iets anders dan tekst die iemand heeft geschreven.
+**Sinds 2 september is er WEL automatische tekst, en de vorm ervan is het
+besluit.** `shared/spraaktekst.js` zet spraak om naar tekst en voedt dezelfde
+baan met bron `machine`. Eén zin draagt het hele ontwerp: **je transcribeert
+jezelf.** De herkenner luistert naar de microfoon van wie hem AANZET, nooit naar
+het binnenkomende geluid van de ander. Daarmee geef je alleen je eigen stem weg,
+en er is geen enkele stand waarin dit huis het gesprek van twee leden opneemt om
+er tekst van te maken -- precies wat het codenaam-ontwerp voorkomt. De
+herkenning gebeurt op het toestel (de Web Speech API); in sommige browsers gaat
+het geluid daarbij naar de browserleverancier, en daarom staat de knop uit tot
+iemand hem zelf aanzet en gaat er nooit geluid naar RTG. Dezelfde afspraak als
+RTG Memo.
+
+**Dat haalt WCAG 1.2.4 nog steeds niet, en de acht blijven open.** Zet de ander
+de knop niet aan, dan is er van diens spraak nog steeds geen tekst; een toestel
+zonder Web Speech API (Firefox) kan het helemaal niet, en dan zegt de knop dat
+hij niet kan, met de reden, zichtbaar en niet in een tooltip. Ondertiteling bij
+live media moet er ZIJN, niet afhangen van de goede wil van de gesprekspartner.
+De afhankelijkheid is opnieuw verplaatst en verkleind -- van "de anderen typen
+mee" naar "de anderen zetten een knop aan" -- niet weggenomen. Daarom staat er
+naast die knop ook **Vraag om live tekst**: een gewone regel in de baan waarin je
+de ander vraagt hem aan te zetten. Met opzet geen schakelaar die de microfoon van
+iemand anders aanzet -- `LIFE.md` par. 4 staat daarboven.
 
 **De twee uitzendingen staan er anders voor, en die twee verschillen onderling.**
-Het Podium heeft al een tekstbaan: de kanaalchat naast de uitzending, met
-`aria-live`, waarin de uitzender kan meeschrijven. Het SOS-scherm heeft er geen.
-Dat is de eerlijke stand en niet een gat dat nog even gedicht wordt: **wie doof
-is kan geen SOS-dienst draaien**, want daar komt het geluid van een lid in nood
-binnen en er is niets dat het opschrijft. Een noodscherm is niet de plek om er
-ongevraagd iets bij te zetten; dat is een besluit dat RTG neemt.
+Het Podium heeft een kanaalchat naast de uitzending met `aria-live`, waarin de
+uitzender meeschrijft of met de knop **Live tekst** zijn eigen spraak laat
+omzetten; die regels gaan langs dezelfde route als een getypte, met `(automatisch)`
+ervoor. Het SOS-scherm is de enige van de acht waar het NIET om een tik vraagt:
+het toestel van het lid zet zijn eigen stem om en stuurt de regels langs hetzelfde
+seinkanaal als het beeld, naar een baan naast het camerabeeld op het kantoor. Twee
+redenen die allebei moeten gelden -- het lid heeft bij het veiligheidscontract al
+toestemming gegeven dat kantoor meekijkt én meeluistert, dus dezelfde stem als
+tekst geeft niets weg wat er niet al heen ging, en iemand die 112 belt vragen om
+eerst nog een knop te vinden is geen ontwerp. Hier stond dat **wie doof is geen
+SOS-dienst kan draaien**; dat is nu minder waar, maar niet weg: het hangt aan een
+browser die de Web Speech API heeft, en dat is geen voorziening waar je op kunt
+rekenen.
 
 De keuring houdt dit vast en niet alleen dit document: een gesprek dat de
 tekstbaan verliest, laat `npm run check` regel 49 zakken -- gemeten door hem uit

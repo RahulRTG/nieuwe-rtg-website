@@ -18,16 +18,13 @@
    worden opgepoetst. Wat het wel doet is de afhankelijkheid verplaatsen: van
    "kan niet meedoen" naar "kan meedoen als de anderen meetypen".
 
-   WAAROM ER GEEN AUTOMATISCHE ONDERTITELING IN ZIT. Dat is een BESLUIT en geen
-   ontbrekende regel code. Spraakherkenning in de browser (de Web Speech API)
-   stuurt het geluid van het gesprek naar een server van de leverancier, en dit
-   huis draait op codenamen met de echte namen in een aparte kluis -- het
-   gesprek van twee leden naar buiten sturen om er tekst van te maken is precies
-   wat dat ontwerp voorkomt. De weg die hier wel past loopt langs een LOKAAL
-   model (LOCAL_AI_URL), en dat is een inrichtingskeuze. Deze module laat die
-   deur open met een naad die niets aanneemt: `voed(regel, { bron })`. Wie een
-   lokale herkenner aansluit, roept dezelfde functie aan met bron 'machine', en
-   de baan laat dan zien dat het machinetekst is.
+   ER ZIT NU WEL AUTOMATISCHE TEKST IN. De deur die hier openstond
+   (`voed(regel, { bron })`) is op 2 september 2026 gebruikt:
+   shared/spraaktekst.js zet spraak om en voedt deze baan met bron 'machine'.
+   Wat dat begrensd houdt staat in de kop van die module en komt op een zin
+   neer: JE TRANSCRIBEERT JEZELF. Zet de ander hem niet aan, dan is er van diens
+   spraak nog steeds geen tekst -- WCAG 1.2.4 is dus niet gehaald, en het
+   register van check.js regel 49 telt deze acht nog steeds als OPEN.
 
    DE NAAD NAAR HET GESPREK. Elk gesprek in dit huis heeft al een seinfunctie
    die getypte signalen doorgeeft aan de andere kant (offer, answer, ice,
@@ -68,6 +65,9 @@
     knop.style.cssText = 'padding:.35rem .7rem;border:1px solid rgba(255,255,255,.22);border-radius:0;' +
       'background:transparent;color:inherit;font:inherit;font-size:.85rem;cursor:pointer;';
     kop.appendChild(knop);
+
+    /* De bediening van de spraak hangt in deze kop maar woont ernaast: deze
+       module gaat over een baan met tekst en niet over een microfoon. */
     wrap.appendChild(kop);
 
     var baan = d.createElement('div');
@@ -109,6 +109,11 @@
       knop.setAttribute('aria-expanded', open ? 'true' : 'false');
       knop.textContent = open ? 'Meelezen sluiten' : 'Meelezen';
       if (open) veld.focus();
+      /* DE BAAN DICHT IS DE MICROFOON UIT: een herkenner die doorluistert
+         achter een paneel dat niemand ziet, is precies wat deze knop niet mag
+         opleveren. (`spraak` is bij het bouwen nog undefined; deze tak loopt
+         pas na een tik.) */
+      if (!open && spraak) spraak.stop();
     }
     knop.addEventListener('click', function () { zetOpen(!open); });
 
@@ -142,16 +147,43 @@
       return r;
     }
 
+    /* EEN REGEL DE DEUR UIT, langs precies een weg. Getypt, gesproken en
+       gevraagd komen alle drie hier langs, zodat er maar EEN plek is waar de
+       eigen regel in de baan komt en naar de ander gaat. Drie kopieen hiervan
+       was de vorm waarin het meest recente gat in dit huis ontstond. */
+    function zendEigen(tekst, bron) {
+      var t = schoon(tekst);
+      if (!t) return;
+      voeg(t, { wie: opties.ik || 'Jij', bron: bron || 'mens' });
+      /* De eigen regel staat er al voordat het sein de deur uit is: wie meeleest
+         moet zien dat zijn regel is verzonden, ook als de ander wegvalt. */
+      if (typeof opties.stuur === 'function') { try { opties.stuur(t); } catch (err) {} }
+    }
+
     rij.addEventListener('submit', function (e) {
       e.preventDefault();
       var t = schoon(veld.value);
       if (!t) return;
       veld.value = '';
-      voeg(t, { wie: opties.ik || 'Jij', bron: 'mens' });
-      /* De eigen regel staat er al voordat het sein de deur uit is: wie meeleest
-         moet zien dat zijn regel is verzonden, ook als de ander wegvalt. */
-      if (typeof opties.stuur === 'function') { try { opties.stuur(t); } catch (err) {} }
+      zendEigen(t, 'mens');
     });
+
+    /* Spraak en het verzoek erom zitten in shared/spraaktekst.js. Is die er
+       niet, dan werkt de baan als eerst: meetypen. De goede kant om te
+       ontbreken -- check.js regel 65 houdt vast dat elke pagina die hem
+       gebruikt hem ook laadt. */
+    var spraak = null;
+    if (w.RTGSpraakTekst && typeof w.RTGSpraakTekst.koppel === 'function') {
+      spraak = w.RTGSpraakTekst.koppel({
+        kop: kop,
+        na: kop,
+        knopStijl: knop.style.cssText,
+        /* Een herkende zin gaat dezelfde weg als een getypte, met bron
+           'machine': wie meeleest hoort te weten dat dit geraden tekst is. */
+        zend: function (regel, bron) { zendEigen(regel, bron); },
+        open: function () { zetOpen(true); }
+      });
+    }
 
     return {
       el: wrap,
@@ -169,7 +201,11 @@
       regels: function () {
         return Array.prototype.map.call(baan.children, function (x) { return x.textContent; });
       },
-      leeg: function () { while (baan.firstChild) baan.removeChild(baan.firstChild); }
+      leeg: function () { while (baan.firstChild) baan.removeChild(baan.firstChild); },
+      /* Voor een toets en voor een scherm dat het gesprek afsluit: de herkenner
+         hoort niet door te lopen als het gesprek weg is. */
+      get spraakAan() { return !!(spraak && spraak.aan); },
+      stopSpraak: function () { if (spraak) spraak.stop(); }
     };
   }
 

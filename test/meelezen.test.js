@@ -75,12 +75,20 @@ function vind(el, klasse) {
   return null;
 }
 
-function laad() {
+function laad(opties) {
+  opties = opties || {};
   const bron = fs.readFileSync(path.join(__dirname, '..', 'public', 'shared', 'meelezen.js'), 'utf8');
   const { d } = maakDom();
   const w = {};
+  /* Een nagemaakte spraakkoppeling. shared/spraaktekst.js heeft zijn eigen
+     toetsen; hier gaat het alleen om wat DEZE module met hem doet. */
+  const spraak = { aan: true, gestopt: 0 };
+  if (opties.metSpraak) {
+    w.RTGSpraakTekst = { koppel: () => ({ get aan() { return spraak.aan; },
+      stop: () => { spraak.gestopt++; spraak.aan = false; } }) };
+  }
   new Function('window', 'document', bron)(w, d);
-  return { w, d };
+  return { w, d, spraak };
 }
 
 /* ---------- de toetsen ---------- */
@@ -104,9 +112,9 @@ test('DE VEILIGHEID: ook de NAAM van de ander is tekst', () => {
 });
 
 test('een machineregel zegt dat hij van een machine komt', () => {
-  /* Er zit vandaag geen spraakherkenning in dit huis, en de naad die er wel is
-     mag zich niet voordoen als een mens. Wie meeleest hoort te weten of een
-     regel is geschreven of geraden. */
+  /* Sinds 2 september 2026 voedt shared/spraaktekst.js deze baan met bron
+     'machine'. Geraden tekst mag zich niet voordoen als geschreven tekst: wie
+     meeleest hoort te weten welke van de twee hij leest. */
   const { w } = laad();
   const m = w.RTGMeelezen.maak({});
   m.voed('dit is geraden', { bron: 'machine' });
@@ -217,4 +225,28 @@ test('DE ZES GESPREKKEN LADEN DE MODULE OOK ECHT', () => {
     const s = fs.readFileSync(path.join(WORTEL, rel), 'utf8');
     assert.match(s, /shared\/meelezen\.js/, rel + ' laadt shared/meelezen.js');
   }
+});
+
+test('DE BAAN DICHT IS DE MICROFOON UIT', () => {
+  /* Een herkenner die doorluistert achter een paneel dat niemand ziet, is
+     precies wat de knop niet mag opleveren: het scherm zegt dan niets meer over
+     een microfoon die wel aanstaat. Gemeten door de stop-tak weg te halen en
+     deze toets te zien zakken. */
+  const { w, spraak } = laad({ metSpraak: true });
+  const m = w.RTGMeelezen.maak({});
+  m.open();
+  assert.equal(m.spraakAan, true, 'de aanname onder deze toets: de nagemaakte koppeling staat aan');
+  m.sluit();
+  assert.equal(spraak.gestopt, 1, 'de baan ging dicht en de microfoon bleef aan');
+  assert.equal(m.spraakAan, false);
+});
+
+test('zonder spraakmodule werkt de baan gewoon als eerst', () => {
+  /* De goede kant om te ontbreken: meetypen blijft. check.js regel 65 houdt vast
+     dat elke pagina die de module gebruikt hem ook laadt. */
+  const { w } = laad();
+  const m = w.RTGMeelezen.maak({});
+  assert.equal(m.spraakAan, false);
+  m.voed('hallo', { wie: 'De ander' });
+  assert.deepEqual(m.regels(), ['De ander: hallo']);
 });

@@ -15,6 +15,11 @@
 <script src="/shared/rosthema.js" defer></script>
 <link href="/shared/rtg-ui.css" rel="stylesheet">
 <style>
+  /* de tekstbaan bij het SOS-beeld; als klasse en niet inline (TAKEN.md 4.51) */
+  .livetekst{max-height:9rem;overflow-y:auto;margin-top:0.5rem;padding:0.5rem 0.5rem;border-radius:0;background:rgba(255,255,255,.06);font-size:.9rem;line-height:1.45}
+  .livetekst p{margin:0 0 0.25rem}
+  .livetekst .geraden{opacity:.6;font-size:.85em}
+
   :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--line:var(--rtg-line);--txt:var(--rtg-txt);--muted:var(--rtg-muted);--soft:var(--rtg-soft);--burgundy:#C23A5E;--gold:#A98F1C;--green:#4C9A75;--amber:#C99A2E;}
   *{margin:0;padding:0;box-sizing:border-box;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5;}
@@ -298,6 +303,10 @@
           <button id="ontLiveClose" style="background:none;border:1px solid var(--line);border-radius:0;padding:0.4rem 0.8rem;color:var(--soft);cursor:pointer;">Sluiten</button>
         </div>
         <video id="ontLiveVid" autoplay playsinline style="width:100%;border-radius:0;background:#000;"></video>
+        <!-- De tekstbaan bij het SOS-beeld: wat het lid zegt, op zijn eigen
+             toestel omgezet naar tekst. Hier stond dat wie doof is geen
+             SOS-dienst kon draaien; dit is wat daaraan doet. -->
+        <div id="ontLiveTekst" class="livetekst" role="log" aria-live="polite" aria-label="Wat het lid zegt, automatisch omgezet naar tekst" hidden></div>
         <div id="ontLiveStatus" style="font-size:0.75rem;color:var(--soft);margin-top:0.5rem;">Verbinden met de camera van het lid…</div>
       </div>
     </div>

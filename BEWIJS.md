@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1449 bestanden en 10285 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1451 bestanden en 10287 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1449 |
-| losse beweringen (`test(...)`) | 10285 |
+| toetsbestanden | 1451 |
+| losse beweringen (`test(...)`) | 10287 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 51 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 996 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 40 |
 | alleen in de kop *genoemd*, nog niet gemeten | 126 |
-| niets van beide | 277 |
+| niets van beide | 279 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -1312,7 +1312,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-177 bestanden, 304 beweringen.
+179 bestanden, 306 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1378,6 +1378,7 @@ toets omvalt.
 | `identiteitschermen.e2e.js` | 2 | -- | DRIE SCHERMEN DIE OVER IDENTITEIT EN RUST GAAN. Uit de 104 schermen waar geen enkele toets de weg aflegt (TAKEN 4.9) zijn dit er drie waar het duurste misverstand mogelijk is: ze gaan over wie u bent en over hoe dit... |
 | `invoerbalie.e2e.js` | 1 | -- | Scherm-toets op DE INVOERBALIE in /apps/reizen.html (REIZEN.md fase 2). WAAROM DIT BESTAND ER IS. |
 | `ioslaag.e2e.js` | 3 | genoemd | De iOS-laag (public/shared/ios.js): gooit hij niets weg dat de app nog nodig heeft, en ruimt hij op wat er weg moest? WAAROM DEZE TOETS BESTAAT. |
+| `isolatie-cockpit.e2e.js` | 1 | -- | SCHERM-TEST: de isolatiecockpit van het kantoor (/apps/isolatie.html). WAAROM DEZE TOETS BESTAAT, en waarom hij meer doet dan de pagina openen. |
 | `juridischeschermen.e2e.js` | 1 | -- | DE VIER JURIDISCHE PAGINA'S: STAAT ERIN WAT ERIN MOET? WAAROM DIT EEN TOETS VERDIENT Dit zijn de saaiste schermen van het huis en tegelijk de enige waar een ontbrekende alinea een boete oplevert. |
 | `kantoor.e2e.js` | 1 | -- | Scherm-test voor RTG Kantoor, de samenhanglaag over de kantoorwereld. Wat hier bewezen wordt is de belofte van laag 2 uit PLATFORM.md, en niet of de agenda werkt -- dat toetst test/agenda.e2e.js. |
 | `kantoordeuren.e2e.js` | 1 | -- | DE KANTOOR-APPS: EEN DEUR OP DE APP ZELF, GEEN OMLEIDING. WAT ER MIS WAS (TAKEN 5.5) Acht kantoor-apps stuurden een uitgelogde bezoeker weg met een location.replace() naar personeel.html. |
@@ -1409,6 +1410,7 @@ toets omvalt.
 | `memo.e2e.js` | 2 | -- | Scherm-test voor RTG Memo: de lijst leest de kluis, de samenvatting is eerlijk (met en zonder transcript op het toestel) en weggooien gaat naar de prullenbak. Opnemen zelf (microfoon) valt buiten headless bereik; de... |
 | `metgezelwijkt.e2e.js` | 1 | -- | RAHUL BLIJFT BEREIKBAAR, MAAR LIGT NOOIT BOVEN EEN GEOPEND VENSTER. Het blok van de metgezel staat op z-index 9980 en zweeft daarmee boven vrijwel elk venster in dit huis (de bladen van Clips staan op 10, de... |
 | `metier.e2e.js` | 1 | -- | Scherm-test voor Métier. De unit-toetsen (test/metier.test.js) bewijzen de server-kant; deze bewijst dat het SCHERM het doet, en vooral dat het signatuurstuk zichtbaar werkt: je kaart bewaren, de bevestigde rol met... |
+| `mijn-isolatie.e2e.js` | 1 | -- | SCHERM-TEST: Mijn bescherming (/apps/mijn-isolatie.html). WAT HIER BEWEZEN WORDT, en waarom een geopende pagina niet genoeg is. |
 | `mobiliteitscherm.e2e.js` | 5 | -- | Scherm-toets op het Mobility OS: leggen de twee schermen de weg werkelijk af? WAAROM DEZE TOETS BESTAAT test/mobiliteit.test.js bewijst dat de API klopt. |
 | `nieuwe-schermen.e2e.js` | 3 | -- | DRIE SCHERMEN DIE MET DE VERZAMELING MEEKWAMEN, EN DIE NOG NOOIT EEN BROWSER HADDEN GEZIEN. RTG Festival bracht twee schermen mee (het organisatiescherm en de gastenkant) en RTG Reizen een derde (de klaargezette reis). |
 | `notities.e2e.js` | 1 | -- | Scherm-test voor Notities & Taken: een lijst bouwen met Enter, bewaren, afvinken op de kaart zelf (zonder de editor te openen), delen op codenaam en de andere kant die meteen mee kan doen. |

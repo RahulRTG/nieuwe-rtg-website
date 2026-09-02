@@ -10,8 +10,8 @@
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 18,
     "e2eBestanden": 174,
-    "keuringOmvang": 237,
-    "keuringDubbeling": 145,
+    "keuringOmvang": 242,
+    "keuringDubbeling": 150,
     "keuringDekkingAdvies": 53,
     "endpointsNooitAangeraakt": 0,
     "onbewaakt": 0,
@@ -21,11 +21,11 @@
     "keuringTeGroot": 17,
     "inlineStijlAttributen": 4973,
     "browserpoortToetsen": 265,
-    "kernBreedte": 1501,
-    "kernGedeeld": 212,
+    "kernBreedte": 1506,
+    "kernGedeeld": 217,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 427,
+    "toetsenNietGemeten": 440,
     "toetsenOngevoeligPct": 1,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
@@ -42,10 +42,10 @@
     "delenZonderOnderwerp": 0,
     "beweringenZonderVulcontrole": 111,
     "bewijsCellenBewezen": 16475,
-    "bewijsAchterstand": 2605,
+    "bewijsAchterstand": 2657,
     "schermenZonderVormtaal": 181,
-    "dbDeuren": 507,
-    "dbDeurenSchrijvend": 269
+    "dbDeuren": 512,
+    "dbDeurenSchrijvend": 270
   },
   "notities": [
     {
@@ -1292,6 +1292,78 @@
       "sleutel": "bewijsAchterstand",
       "waarheen": "BEWIJSSCHULD.json, veld `aflossing`: doel 0",
       "reden": "Main binnengehaald: de boom telt 4643 routes in plaats van 3282, en de idempotentieproef van main is over die nieuwe routes gedraaid. idem-ongeclassificeerd gaat daardoor van 849 naar 1477 en gevolg-onbekend van 94 naar 90 over een grotere noemer -- dezelfde schuld over een grotere boom, geen nieuwe schuld. herstel-onbevestigd ging juist omlaag (63 -> 47) doordat de herstelproef ook over de nieuwe paren is gedraaid. Geen vervaldatum, om dezelfde reden als bij 989 -> 1997: teruggaan zou betekenen dat we bestaande gaten weer onzichtbaar maken. De aflosregel blijft: doel 0, alleen omlaag, stilstand wordt gemeld."
+    },
+    {
+      "datum": "2026-09-02",
+      "soort": "schuld",
+      "sleutel": "bewijsAchterstand",
+      "van": 2605,
+      "vervalt": "2026-12-31",
+      "meter": "bewijsAchterstand 2605 -> 2657",
+      "reden": "De idempotentieproef REIKT verder, het werk niet. Commit 1916055c bracht 53 routes binnen bereik van scripts/idemproef.js die er daarvoor als onbereikbaar buiten stonden; die routes deden dat werk al, maar nu MEET de proef ze en ziet hij dat er geen besluit over ze staat in IDEMBESLUIT.json. De schuld is niet gegroeid maar zichtbaar geworden. Dezelfde groei staat met dezelfde reden in BEWIJSSCHULD.json onder `groei`; sluiten doet een mens die per route beslist wat een tweede aanroep hoort te doen. Gemeten en niet vermoed: origin/main haalt deze norm PRECIES (alle meters gelijk), dus deze groei komt volledig van de isolatietak en niet van 31 commits die er intussen op main bij kwamen. Dat is nagerekend in een aparte worktree op 8b47fa9f."
+    },
+    {
+      "datum": "2026-09-02",
+      "soort": "schuld",
+      "sleutel": "keuringOmvang",
+      "van": 237,
+      "vervalt": "2026-12-31",
+      "meter": "keuringOmvang 237 -> 242",
+      "reden": "Vijf nieuwe bestanden van de isolatielaag zitten vlak onder de 10 kB. Dat is geen slordigheid maar de vorm die keuringsregel 13 afdwingt: elk van die bestanden is ONTSTAAN door een splitsing langs een echte naad (oordeel tegenover boekhouding, lijst tegenover vraag, stand tegenover ceremonie). Wie ze verder opknipt om deze meter te halen, knipt niet meer langs een naad maar langs een getal -- en dat is precies wat de regel niet wil. Gemeten en niet vermoed: origin/main haalt deze norm PRECIES (alle meters gelijk), dus deze groei komt volledig van de isolatietak en niet van 31 commits die er intussen op main bij kwamen. Dat is nagerekend in een aparte worktree op 8b47fa9f."
+    },
+    {
+      "datum": "2026-09-02",
+      "soort": "schuld",
+      "sleutel": "keuringDubbeling",
+      "van": 145,
+      "vervalt": "2026-12-31",
+      "meter": "keuringDubbeling 145 -> 150",
+      "reden": "Vijf functienamen staan nu in meer dan twee kernmodules. Het gaat om korte, gewone namen (`stand`, `zet`, `overzicht`-achtigen) in de nieuwe isolatiemodules. Hernoemen zou hier de leesbaarheid kosten zonder een koppeling weg te nemen: het zijn gelijknamige functies en geen gedeelde waarheid. Waar er wel een gedeelde waarheid was, is die WEL samengevoegd -- zie kern/isolatie/sessiedragers.js, dat drie handmatige kopieën verving. Gemeten en niet vermoed: origin/main haalt deze norm PRECIES (alle meters gelijk), dus deze groei komt volledig van de isolatietak en niet van 31 commits die er intussen op main bij kwamen. Dat is nagerekend in een aparte worktree op 8b47fa9f."
+    },
+    {
+      "datum": "2026-09-02",
+      "soort": "schuld",
+      "sleutel": "dbDeuren",
+      "van": 507,
+      "vervalt": "2026-12-31",
+      "meter": "dbDeuren 507 -> 512",
+      "reden": "Vijf nieuwe bestanden buiten server/db/ raken db.data aan: de isolatielaag bewaart standen per drager. Zij doen dat via kern/isolatie/opslag.js en niet elk voor zich, maar de meter telt bestanden en niet ingangen. Dit is de voetafdruk van een subsysteem erbij, niet een nieuwe manier om langs de opslaglaag te komen. Gemeten en niet vermoed: origin/main haalt deze norm PRECIES (alle meters gelijk), dus deze groei komt volledig van de isolatietak en niet van 31 commits die er intussen op main bij kwamen. Dat is nagerekend in een aparte worktree op 8b47fa9f."
+    },
+    {
+      "datum": "2026-09-02",
+      "soort": "schuld",
+      "sleutel": "dbDeurenSchrijvend",
+      "van": 269,
+      "vervalt": "2026-12-31",
+      "meter": "dbDeurenSchrijvend 269 -> 270",
+      "reden": "Eén bestand erbij dat rechtstreeks in db.data schrijft. Dat is de plek waar een stand wordt weggezet, en die staat met opzet op EEN plek (kern/isolatie/zetten.js): alle andere modules van de laag lezen. Gemeten en niet vermoed: origin/main haalt deze norm PRECIES (alle meters gelijk), dus deze groei komt volledig van de isolatietak en niet van 31 commits die er intussen op main bij kwamen. Dat is nagerekend in een aparte worktree op 8b47fa9f."
+    },
+    {
+      "datum": "2026-09-02",
+      "soort": "schuld",
+      "sleutel": "kernBreedte",
+      "van": 1501,
+      "vervalt": "2026-12-31",
+      "meter": "kernBreedte 1501 -> 1506",
+      "reden": "Vijf kern-eigenschappen erbij doordat de isolatielaag routes bedient (de ledenkant, de kantoorcockpit en de ceremonie). Een laag die niets aanraakt, doet niets. Gemeten en niet vermoed: origin/main haalt deze norm PRECIES (alle meters gelijk), dus deze groei komt volledig van de isolatietak en niet van 31 commits die er intussen op main bij kwamen. Dat is nagerekend in een aparte worktree op 8b47fa9f."
+    },
+    {
+      "datum": "2026-09-02",
+      "soort": "schuld",
+      "sleutel": "kernGedeeld",
+      "van": 212,
+      "vervalt": "2026-12-31",
+      "meter": "kernGedeeld 212 -> 217",
+      "reden": "Vijf kern-eigenschappen raken meer dan een domein aan, en dat is hier de bedoeling en geen lek: de isolatielaag IS een dwarsdoorsnede -- zij geldt over lid, kantoor en AI-stuur tegelijk. Een beveiligingsstand die maar in een domein bestaat, beschermt niets. Gemeten en niet vermoed: origin/main haalt deze norm PRECIES (alle meters gelijk), dus deze groei komt volledig van de isolatietak en niet van 31 commits die er intussen op main bij kwamen. Dat is nagerekend in een aparte worktree op 8b47fa9f."
+    },
+    {
+      "datum": "2026-09-02",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 427,
+      "vervalt": "2026-12-31",
+      "meter": "toetsenNietGemeten 427 -> 440",
+      "reden": "Dertien toetsen erbij waar de mutatiemotor nog niet langs is. De pure toetsen van deze tak zijn WEL gedraaid (npm run mutatie test/isolatiepoort.test.js: gezakt, bewezen gevoelig); de dertien die overblijven zijn server- en browsertoetsen, en daarvoor gebruikt de motor de liegpoort met twee volle rondes per bestand -- uren per stuk. Elk van die dertien draagt intussen wel een HANDMATIG gedraaide mutatie, uitgeschreven in zijn eigen kop (LAT.md regel 2). Dat is niet hetzelfde als een gemeten toets, en daarom staat het hier als schuld en niet als gehaald. Gemeten en niet vermoed: origin/main haalt deze norm PRECIES (alle meters gelijk), dus deze groei komt volledig van de isolatietak en niet van 31 commits die er intussen op main bij kwamen. Dat is nagerekend in een aparte worktree op 8b47fa9f."
     }
   ],
   "prestatie": {
@@ -1310,25 +1382,27 @@
     "waarom": "Vanaf deze datum heeft elke notitie een soort: \"structureel\" (het gemetene veranderde van vorm; zeg dan met waarheen waar de belofte heen ging) of \"schuld\" (we konden het even niet; zeg dan met sleutel, van en vervalt wanneer hij terug is). scripts/normverval.js keurt alleen wat vanaf hier bij komt. DE GRENS IS NU TWEE KEER OPGESCHOVEN, en dat is geen verzachting maar twee keer dezelfde oorzaak. De eerste keer (18 -> 19 augustus) schreef main twee notities op een eigen tak waar deze regel niet bestond. De tweede keer (19 -> 21 augustus) kwamen bij de samenvoeging van 23 PR-takken elf notities van 20 augustus mee, geschreven op takken die van dezelfde dag zijn als de regel en hem dus niet kenden. WAAROM ZE NIET ALSNOG WORDEN INGEDEELD: een soort toekennen aan andermans notitie betekent hem woorden in de mond leggen -- en bij een schuld ook een vervaldatum, dus een afspraak die hij nooit heeft gemaakt. Dat is precies de reden die de eerste verschuiving al gaf. WAT DAT KOST, EERLIJK: elf verlagingen uit die ronde staan nu zonder soort in het register. Ze dragen wel allemaal een uitgeschreven reden -- wat ze missen is het VELD. En om te laten zien dat dit geen uitweg voor mezelf is: alle acht notities die deze samenvoeging zelf schrijft (2026-08-21) dragen een soort, zeven daarvan als schuld met een sleutel, een van-waarde en een einddatum. Vanaf 21 augustus geldt de eis onverkort; test/normverval.test.js toetst de logica met eigen data en staat dus niet stil tot die datum."
   },
   "sinds": {
-    "keuringOmvang": "2026-08-28",
+    "keuringOmvang": "2026-09-02",
     "testbestanden": "2026-08-28",
-    "toetsenNietGemeten": "2026-08-18",
+    "toetsenNietGemeten": "2026-09-02",
     "inlineStijlAttributen": "2026-08-18",
     "ratelTanden": "2026-08-28",
     "metingenZonderRatel": "2026-08-18",
-    "bewijsAchterstand": "2026-08-22",
+    "bewijsAchterstand": "2026-09-02",
     "toetsenOngevoeligPct": "2026-08-28",
     "endpointsZonderTest": "2026-08-28",
     "dekkingPct": "2026-08-28",
     "keuringScheef": "2026-08-28",
     "keuringTeGroot": "2026-08-28",
-    "keuringDubbeling": "2026-08-28",
+    "keuringDubbeling": "2026-09-02",
     "keuringDekkingAdvies": "2026-08-28",
-    "dbDeuren": "2026-08-28",
-    "dbDeurenSchrijvend": "2026-08-28",
+    "dbDeuren": "2026-09-02",
+    "dbDeurenSchrijvend": "2026-09-02",
     "browserpoortToetsen": "2026-08-28",
     "e2eBestanden": "2026-08-28",
-    "schermenZonderVormtaal": "2026-08-28"
+    "schermenZonderVormtaal": "2026-08-28",
+    "kernBreedte": "2026-09-02",
+    "kernGedeeld": "2026-09-02"
   },
   "uitzonderingen": [
     {

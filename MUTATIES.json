@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-01T14:08:31.277Z",
-    "commit": "51e4aa0a",
+    "op": "2026-09-02T15:50:39.829Z",
+    "commit": "d0c29664",
     "boomVuil": true,
     "node": "v22.22.2"
   },
@@ -2559,6 +2559,18 @@
       "module": "server/inzagelog.js",
       "operator": "===->!==",
       "gezakt": 8
+    },
+    "isolatiepoort.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/middleware/isolatiepoort.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "isolatieregisters.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
     },
     "journaalbestand.test.js": {
       "soort": "puur",

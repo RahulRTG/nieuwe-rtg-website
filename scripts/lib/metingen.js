@@ -74,6 +74,14 @@ const REGISTER = {
      dat ze zakken. Elk draagt nu zijn grondwaarde in de genoemde toets --
      dekking, bewezen paren, besloten treden -- en niet in NORM.json, want dit
      zijn lijsten en geen enkelvoudige getallen. */
+  /* De twee isolatieregisters. De tand op ISOLATIESCHADUW.json is smal met
+     opzet: `gewogen` mag nooit nul zijn. Dat is exact de regressie die hier is
+     gevonden -- de poort woog NUL verzoeken van een lid met een stand, en er was
+     niets dat klaagde. `zouSluiten` staat er bewust NIET in: dat beweegt mee met
+     elke nieuwe route, en een tand die om vreemde redenen rammelt wordt
+     weggeklikt. */
+  'ISOLATIESCHADUW.json': { eigenRatel: 'test/isolatieregisters.test.js' },
+  'ISOLATIEPROEF.json': { eigenRatel: 'test/isolatieregisters.test.js' },
   'RESOLVERBEREIK.json': { eigenRatel: 'test/resolverbereik.test.js' },
   'GEZAGSNOEMER.json': { eigenRatel: 'test/gezagsnoemer.test.js' },
   'EXECUTION_MAP.json': { eigenRatel: 'test/executionmap.test.js' },

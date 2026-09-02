@@ -44,7 +44,7 @@ test('Gegevenskaart: soorten en geen inhoud, met onbekend als eigen uitslag',
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, reg.token);
     await page.goto(base + '/apps/mijn-gegevens.html', { waitUntil: 'domcontentloaded' });
-    await page.waitForFunction(() => document.querySelectorAll('#lijst .rij').length > 0,
+    await page.waitForFunction(() => document.querySelectorAll('#lijst .gegevensrij').length > 0,
       null, { timeout: 15000 });
 
     /* 1. DE DRIE UITSLAGEN, elk met een eigen gezicht. */
@@ -72,7 +72,7 @@ test('Gegevenskaart: soorten en geen inhoud, met onbekend als eigen uitslag',
       await route.fulfill({ json: k });
     });
     await page.reload({ waitUntil: 'domcontentloaded' });
-    await page.waitForFunction(() => document.querySelectorAll('#lijst .rij').length > 0, null, { timeout: 15000 });
+    await page.waitForFunction(() => document.querySelectorAll('#lijst .gegevensrij').length > 0, null, { timeout: 15000 });
 
     assert.ok(await page.locator('#lijst .vlag.onbekend').count() > 0,
       'die derde uitslag moet een eigen gezicht krijgen en niet stil wegvallen');
@@ -83,7 +83,7 @@ test('Gegevenskaart: soorten en geen inhoud, met onbekend als eigen uitslag',
     assert.notEqual(kleuren.onbekend, kleuren.nee,
       '"niet vast te stellen" mag er niet uitzien als "nee"; dan bestaat het onderscheid voor een mens niet');
     assert.notEqual(kleuren.onbekend, kleuren.ja, 'en ook niet als "ja"');
-    assert.match(await page.textContent('#lijst .rij'), /niet aangesloten/,
+    assert.match(await page.textContent('#lijst .gegevensrij'), /niet aangesloten/,
       'en de reden staat bij de rij zelf, niet drie schermen verderop');
     /* EEN NEE DIE NIET ALLES ZEGT, in dezelfde gestuurde fase. */
     assert.match(await page.textContent('#lijst'), /Komt er een, dan valt die meteen onder de bewaartermijn/,
@@ -91,21 +91,21 @@ test('Gegevenskaart: soorten en geen inhoud, met onbekend als eigen uitslag',
 
     await page.unroute('**/api/mijn/gegevens');
     await page.reload({ waitUntil: 'domcontentloaded' });
-    await page.waitForFunction(() => document.querySelectorAll('#lijst .rij').length > 0, null, { timeout: 15000 });
+    await page.waitForFunction(() => document.querySelectorAll('#lijst .gegevensrij').length > 0, null, { timeout: 15000 });
 
     /* 2. ELKE RIJ BEANTWOORDT DE VIER VRAGEN -- en niet alleen met een label.
        scripts/schermmutatie.js liet zien dat dit blok half ongedekt was: de
        labels waren gedekt, maar het ANTWOORD erachter verdween ongemerkt (het
        stuk `t.appendChild(document.createTextNode(wat))` overleefde). Een rij
        die "Waarvoor:" zegt en daarna niets, is erger dan geen rij. */
-    const eerste = await page.locator('#lijst .rij').first().textContent();
+    const eerste = await page.locator('#lijst .gegevensrij').first().textContent();
     /* PER FEIT-ELEMENT en niet op de tekst van de rij. Dat laatste stond hier
        eerst, en de mutatie liet zien waarom het niets bewees: textContent plakt
        de kinderen aan elkaar, dus "Waarvoor:" gevolgd door het volgende label
        "Waar:" matchte gewoon door -- terwijl het antwoord zelf verdwenen was.
        Voor de derde keer in deze ronde dezelfde vorm: wie een container leest,
        bewijst niet welk element hij las. */
-    const feiten = page.locator('#lijst .rij').first().locator('.feit');
+    const feiten = page.locator('#lijst .gegevensrij').first().locator('.feit');
     assert.equal(await feiten.count(), 3, 'drie feiten per rij');
     for (const [i, label] of ['Waarvoor', 'Waar', 'Hoe het bij ons kwam'].entries()) {
       const t = (await feiten.nth(i).textContent()).trim();
@@ -117,14 +117,14 @@ test('Gegevenskaart: soorten en geen inhoud, met onbekend als eigen uitslag',
     /* De gouden streep voor elk feit is geen versiering: hij scheidt de vier
        antwoorden van elkaar. Zonder hem lopen ze in een telefoonbreedte in
        elkaar over. */
-    assert.equal(await page.locator('#lijst .rij').first().locator('.feit i').count(), 3,
+    assert.equal(await page.locator('#lijst .gegevensrij').first().locator('.feit i').count(), 3,
       'elk van de drie feiten draagt zijn eigen streep');
 
     /* De grond onder een gegeven dat niet weg kan, staat er in mensentaal bij.
        Ook dit stuk overleefde eerst een mutatie: "Dit kan niet weg" bleef staan
        terwijl de uitleg WAAROM verdween, en dat is precies het verschil tussen
        een mededeling en een antwoord. */
-    const vast = page.locator('#lijst .rij').filter({ hasText: 'Dit kan niet weg' }).first();
+    const vast = page.locator('#lijst .gegevensrij').filter({ hasText: 'Dit kan niet weg' }).first();
     assert.match(await vast.textContent(), /verdwijnt wel als u uw account opheft|wettelijke plicht|voor u is/,
       'bij een gegeven dat niet weg kan staat de grond in mensentaal erbij');
 
@@ -168,7 +168,7 @@ test('Gegevenskaart: soorten en geen inhoud, met onbekend als eigen uitslag',
        welke doelen een KEUZE zijn en welke niet. Een lijst waarin dat verschil
        niet te zien is, laat een lid denken dat alles een knop is -- en dat is
        precies de leugen waar doelbinding tegen moet beschermen. */
-    const tel = page.locator('#lijst .rij').filter({ hasText: 'Uw telefoonnummer' }).first();
+    const tel = page.locator('#lijst .gegevensrij').filter({ hasText: 'Uw telefoonnummer' }).first();
     const doelen = tel.locator('.doel');
     assert.ok(await doelen.count() >= 3, 'een telefoonnummer wordt voor meerdere dingen gebruikt');
     assert.ok(await tel.locator('.doel.keuze').count() >= 1, 'daarvan is er minstens een een keuze');

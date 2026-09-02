@@ -33,7 +33,16 @@
   .telling b{display:block;font-family:'Bodoni Moda',serif;font-size:1.6rem;font-weight:600;line-height:1.1;}
   .telling span{font-size:0.66rem;letter-spacing:0.13em;text-transform:uppercase;color:var(--soft);}
 
-  .rij{background:var(--card);border:1px solid var(--line);padding:1.1rem;margin:0.6rem 0;}
+  /* GEEN .rij MAAR .gegevensrij, en dat is een botsing en geen smaak. Dit huis
+     heeft een gedeelde woordenschat (rtg-ui.css: .kaart, .knop, .rij ...) en
+     daar is `body.rtg-stijl .rij` een FLEXRIJ met gap. Die regel (0,2,0) won
+     van deze pagina (0,1,0), dus de drie vragen onder een gegeven -- waarvoor,
+     waar, hoe het bij ons kwam -- kwamen NAAST elkaar te staan in plaats van
+     onder elkaar. Op een telefoon van 390 breed werd de pagina daardoor 726
+     breed (gemeten in de a11y-ronde: "te breed door div.weg, rechterrand op
+     726"). Een eigen naam is de goedkoopste reparatie die niet stuk kan door de
+     volgende gedeelde regel. */
+  .gegevensrij{background:var(--card);border:1px solid var(--line);padding:1.1rem;margin:0.6rem 0;}
   .rijkop{display:flex;align-items:baseline;gap:0.6rem;flex-wrap:wrap;}
   .rijkop .naam{font-family:'Bodoni Moda',serif;font-size:1.05rem;flex:1;}
   .vlag{font-size:0.62rem;letter-spacing:0.13em;text-transform:uppercase;white-space:nowrap;}
@@ -122,7 +131,7 @@
   }
 
   function rijVoor(r) {
-    const el = maak('article', 'rij');
+    const el = maak('article', 'gegevensrij');
     const kop = maak('div', 'rijkop');
     kop.appendChild(tekst(maak('span', 'naam'), r.naam));
     const v = VLAG[String(r.aanwezig)];

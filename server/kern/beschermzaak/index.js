@@ -109,7 +109,34 @@ module.exports = (ctx) => {
     return { ok: true, zaak: K.beeld(z) };
   }
 
-  return { open, lijst, lees, veiligheid: keten.veiligheid, stand: keten.stand,
+  /* ---------- de weg terug is een NOTITIE en geen koppeling ----------
+     Blijkt een zaak tijdens het werk toch huiselijk geweld te zijn, dan hoort er
+     een meldcode-traject te lopen (kern/rtfos/meldcode-herkomst.js). Deze zaak
+     onthoudt daarvan alleen HET ID -- niet de stappen, niet de weging, niet de
+     uitkomst. Wie het meldcode-dossier wil lezen, opent het daar, en dat laat
+     zijn eigen spoor na.
+
+     WAAROM DIT HIER STAAT EN NIET IN meldcode.js. Deze module is de enige die in
+     de beschermzaken schrijft (zie de kop). Zou de meldcode dat doen, dan zijn er
+     twee schrijvers en is die zin niet meer waar. De brug tussen de twee zit
+     daarom in de ROUTE, waar allebei bereikbaar zijn en geen van beide de ander
+     hoeft te laden. */
+  function noteerMeldcode(req, id, meldcodeId) {
+    const z = vind(id); if (!z) return { status: 404, error: 'Deze beschermzaak bestaat niet.' };
+    const w = wie(req);
+    const g = poort(w, z.stad, 'casus.beheren', 'individual_cases');
+    if (!g.ok) return g;
+    const mid = String(meldcodeId || '');
+    if (!mid) return { status: 400, error: 'Welk meldcode-dossier?' };
+    if (!Array.isArray(z.meldcodes)) z.meldcodes = [];
+    if (!z.meldcodes.includes(mid)) z.meldcodes.push(mid);
+    z.bijgewerkt = nu();
+    audit(w.key, 'beschermzaak.meldcode', z.codenaam, mid);
+    save();
+    return { ok: true, zaak: K.beeld(z) };
+  }
+
+  return { open, lijst, lees, noteerMeldcode, veiligheid: keten.veiligheid, stand: keten.stand,
     toestemming: keten.toestemming, trekIn: keten.trekIn, draagOver: keten.draagOver,
     sluit: keten.sluit, vind, voordeur,
     STANDEN: K.STANDEN, KETEN: K.KETEN, AANLEIDINGEN: K.AANLEIDINGEN };

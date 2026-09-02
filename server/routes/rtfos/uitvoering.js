@@ -42,24 +42,11 @@ module.exports = ({ app, officeAuth, rtfos, H }) => {
   // apart, met een eigen auditregel: dit is het moment dat iemand de naam ziet
   app.post('/api/rtfos/casus/contact', officeAuth, H((req, b) => rtfos.casus.contactOpen(req, b.id)));
 
-  /* ---------- beschermzaken: geweld, uitbuiting, vlucht ----------
-     EEN ANDERE DATAKLASSE EN DUS EEN ANDER PAD. Ze staan hier onder de
-     hulpvragen omdat een medewerker ze in hetzelfde scherm tegenkomt, maar ze
-     delen geen enkele route met de casus -- en dat is met opzet: een gedeeld
-     pad wordt vanzelf een gedeelde export. Zie kern/beschermzaak/klasse.js.
-
-     Let op dat er GEEN /zoek en GEEN /export bij staat, en dat /lees een eigen
-     route is. Een zaak lezen is een handeling met een auditregel, en niet iets
-     wat je en passant doet in een lijst. */
-  app.post('/api/rtfos/bescherming/zaken', officeAuth, H((req, b) => rtfos.beschermzaak.lijst(req, b.stad, b)));
-  app.post('/api/rtfos/bescherming/open', officeAuth, H((req, b) => rtfos.beschermzaak.open(req, b)));
-  app.post('/api/rtfos/bescherming/lees', officeAuth, H((req, b) => rtfos.beschermzaak.lees(req, b.id)));
-  app.post('/api/rtfos/bescherming/veiligheid', officeAuth, H((req, b) => rtfos.beschermzaak.veiligheid(req, b.id, b)));
-  app.post('/api/rtfos/bescherming/stand', officeAuth, H((req, b) => rtfos.beschermzaak.stand(req, b.id, b.naar, b)));
-  app.post('/api/rtfos/bescherming/toestemming', officeAuth, H((req, b) => rtfos.beschermzaak.toestemming(req, b.id, b)));
-  app.post('/api/rtfos/bescherming/toestemming-weg', officeAuth, H((req, b) => rtfos.beschermzaak.trekIn(req, b.id, b.reden)));
-  app.post('/api/rtfos/bescherming/overdracht', officeAuth, H((req, b) => rtfos.beschermzaak.draagOver(req, b.id, b)));
-  app.post('/api/rtfos/bescherming/sluit', officeAuth, H((req, b) => rtfos.beschermzaak.sluit(req, b.id, b)));
+  /* De beschermzaken (kern/beschermzaak/) staan in ./bescherming.js -- tien
+     routes plus de brug naar de meldcode, en dit bestand liep over de 10 KB van
+     keuringsregel 13. Ze delen geen enkel pad met de casus hierboven, en dat is
+     met opzet: een gedeeld pad wordt vanzelf een gedeelde export. */
+  require('./bescherming')({ app, officeAuth, rtfos, H });
 
   // ---------- integriteit ----------
   app.post('/api/rtfos/meldingen', officeAuth, H((req, b) => rtfos.integriteit.lijst(req, b.stad)));

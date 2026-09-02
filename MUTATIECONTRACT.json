@@ -1,25 +1,25 @@
 {
  "stempel": {
-  "op": "2026-09-02T09:34:47.141Z",
-  "commit": "90e8d2d2",
+  "op": "2026-09-02T15:14:01.850Z",
+  "commit": "caf02022",
   "boomVuil": true,
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 4666,
-  "geclassificeerd": 4666,
+  "totaal": 4667,
+  "geclassificeerd": 4667,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3201,
    "NOT_APPLICABLE": 1079,
    "PROTECTED": 303,
-   "INTENTIONALLY_NON_IDEMPOTENT": 83
+   "INTENTIONALLY_NON_IDEMPOTENT": 84
   },
-  "vastgesteldDoorMens": 1492,
+  "vastgesteldDoorMens": 1493,
   "afgeleidDoorScript": 3174,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 3827,
+   "AUTHENTICATED": 3828,
    "PUBLIC": 108,
    "OBJECT_SCOPED": 716,
    "SERVICE_TO_SERVICE": 14,
@@ -29,7 +29,7 @@
    "kale ronde: beschermd": 120,
    "kale ronde: onbeschermd": 86,
    "kale ronde: geen uitspraak": 4437,
-   "niet gemeten": 23
+   "niet gemeten": 24
   },
   "voorstellen": {},
   "metingVan": "2026-08-31T09:44:33.117Z"
@@ -80338,6 +80338,27 @@
   {
    "mutatieId": "rtfos.bescherming.lees",
    "route": "POST /api/rtfos/bescherming/lees",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "rtfos.bescherming.meldcode",
+   "route": "POST /api/rtfos/bescherming/meldcode",
    "semantiek": {
     "klasse": "nietHerhaalbaar"
    },

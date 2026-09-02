@@ -157,13 +157,15 @@ van stap 5 en zegt waarvoor hij is; wat er niet onder valt wordt naar de
 beschermzaak gewezen in plaats van stil geaccepteerd. De persoonlijke laag
 (`kern/veiligheid/`) is verbonden in par. 7.4.
 
+De weg terug staat sinds par. 7.8: een beschermzaak die tijdens het werk toch
+huiselijk geweld blijkt te zijn, wordt met een handeling een meldcode-dossier --
+en alleen de codenaam reist mee.
+
 Wat op deze laag nog OPEN staat, en eerlijk benoemd: de meldcode blijft een
 instrument voor professionals achter de kantoordeur. Een mens die zelf zorgen
 heeft over iemand anders, kan langs de voordeur wel een beschermzaak beginnen
 maar geen meldcode-traject in gang zetten -- en dat hoort ook niet, want de vijf
-stappen zijn beroepsstappen. Wat wel ontbreekt is de weg terug: er is geen route
-waarlangs een beschermzaak die tijdens het werk toch huiselijk geweld blijkt te
-zijn, een meldcode-dossier wordt. Vandaag is dat handwerk.
+stappen zijn beroepsstappen.
 
 ### Laag 4 — Recovery · **staat als registratie, mist het traject**
 Wonen, recht, gezondheid en inkomen zijn er als casussoorten. Wat er niet is, is
@@ -412,6 +414,41 @@ achter een knop komen. De laag wordt hier dus niet geladen, en de eerder
 bedachte `rtgdeel-vast`-markering is weggehaald in plaats van decoratief blijven
 staan: een klas die niets afdwingt omdat zijn laag niet draait, leest als een
 garantie die er niet is.
+
+### 7.8 De weg terug, en waarom hij in de route staat
+
+Par. 7.5 liet dit als het open gat achter: een beschermzaak die tijdens het werk
+toch huiselijk geweld blijkt te zijn, moest met de hand een meldcode-dossier
+worden. `POST /api/rtfos/bescherming/meldcode` doet dat nu, met drie grendels:
+
+- **de AARD komt uit de zaak, niet uit het verzoek.** `kindveiligheid` wordt
+  kindermishandeling, `huiselijk-geweld` en `eergerelateerd` worden huiselijk
+  geweld, en de rest wordt niets. Een uitbuitingszaak kan er dus niet als
+  "huiselijk geweld" doorheen, ook niet als de aanroeper dat meestuurt.
+- **er reist een codenaam mee en verder niets.** Geen omschrijving, geen
+  veiligheidsantwoord, geen toestemming, geen overdrachtenlijst. Dat is dezelfde
+  regel die de meldcode al had voor de hulpvraag, en hij geldt hier onverkort.
+- **de zaak onthoudt alleen het ID.** Wie het dossier wil lezen, opent het daar,
+  en dat laat zijn eigen spoor na.
+
+**En de brug staat in de ROUTE, niet in een van de twee modules.** Dat is geen
+plaatsingsvraag maar het bewaren van twee zinnen die allebei waar moeten blijven:
+`kern/beschermzaak/` is de enige die in de beschermzaken schrijft, en
+`kern/rtfos/meldcode.js` is de enige die meldcode-dossiers maakt. Zou een van
+beide de ander aanroepen, dan is een van die twee niet meer waar. In de route
+zijn ze allebei bereikbaar zonder dat een van beide de ander hoeft te laden, en
+`test/beschermzaak.test.js` toets 17 houdt vast dat er geen `require` tussen de
+twee kanten ontstaat.
+
+Er is met opzet **geen weg terug van de weg terug**: een meldcode wordt geen
+beschermzaak. De vijf stappen hebben een wettelijke grond, en ze omzetten zou
+betekenen dat een lopende meldcode kan verdwijnen in een dossier met een kortere
+bewaartermijn.
+
+De volgorde binnen de route is ook een besluit: eerst het dossier, dan de
+notitie terug. Mislukt de notitie, dan is er een meldcode zonder verwijzing --
+hinderlijk. Andersom zou er een verwijzing staan naar een dossier dat niet
+bestaat, en dat is erger. Het antwoord zegt het als de notitie niet lukte.
 
 ### 7.7 Regel 7: de Advocate leest, en één poort is omgezet
 

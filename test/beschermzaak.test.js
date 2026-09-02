@@ -307,3 +307,88 @@ test('13. zonder plaats staat de deur dicht, en zegt dat met een nummer erbij', 
 
   await post('/api/rtfos/stad/module', { id: STAD, vlag: 'individual_cases', aan: true }, LAND);
 });
+
+/* ============================================================================
+   DE WEG TERUG: EEN BESCHERMZAAK DIE EEN MELDCODE BLIJKT (HDI.md par. 7.5)
+
+   Par. 7.5 noteerde dit als het gat dat openbleef: een zaak die tijdens het werk
+   toch huiselijk geweld blijkt te zijn, moest met de hand een meldcode-dossier
+   worden. Vier zinnen:
+
+    14. de omzetting kan, en de AARD volgt uit de aanleiding van de zaak;
+    15. een zaak die niet onder de meldcode valt, wordt er geen -- ook niet als
+        de aanroeper een aard meestuurt;
+    16. er reist een CODENAAM mee en verder niets;
+    17. de zaak onthoudt alleen het ID van het dossier, en de klassen blijven
+        gescheiden (geen require tussen de twee kanten).
+
+   MET EEN MUTATIE NAGETROKKEN:
+     - AARD_UIT_BESCHERMZAAK leegmaken: RAAK op 14, 16 en 17. Dat is geen slordige
+       toets maar de vorm van die mutatie: met een lege tabel valt GEEN enkele
+       omzetting meer door, dus alle drie de zinnen die er een nodig hebben,
+       zakken. De drie die alleen over hun eigen grendel gaan (15, 16, 17) hebben
+       hieronder wel elk een eigen mutatie die alleen henzelf raakt;
+     - de `if (!aard)`-weigering in vanBeschermzaak weghalen: RAAK op 15;
+     - in meldcode.open ook `wat` van de zaak overnemen: RAAK op 16;
+     - noteerMeldcode() niets laten opslaan: RAAK op 17.
+   ========================================================================== */
+const mc = (pad, body) => post('/api/rtfos/' + pad, body, LAND);
+
+test('14. een zaak over huiselijk geweld wordt een meldcode, met de aard uit de zaak', async () => {
+  const id = await zaakTot('minimaal');   // aanleiding: huiselijk-geweld
+  const r = await post('/api/rtfos/bescherming/meldcode',
+    { stad: STAD, id, betreft: 'volwassene uit de wijkinloop' }, LAND);
+  assert.equal(r.status, 200, JSON.stringify(r.body).slice(0, 200));
+  assert.equal(r.body.dossier.aard, 'huiselijk-geweld',
+    'de aard hoort te VOLGEN uit de aanleiding van de zaak');
+  assert.equal(r.body.dossier.volgende, 'signaleren', 'het dossier begint gewoon bij stap 1');
+});
+
+test('15. een zaak die er niet onder valt, wordt er geen', async () => {
+  const o = await bz('open', { stad: STAD, aanleiding: 'uitbuiting',
+    wat: 'Werkgever houdt het paspoort in.' });
+  const id = o.body.zaak.id;
+  const r = await post('/api/rtfos/bescherming/meldcode',
+    { stad: STAD, id, betreft: 'werknemer', aard: 'huiselijk-geweld' }, LAND);
+  assert.equal(r.status, 400, 'uitbuiting valt niet onder de wettelijke meldcode');
+  assert.match(r.body.error, /uitbuiting/);
+  assert.match(r.body.error, /blijft staan/, 'de weigering hoort te zeggen dat de zaak blijft bestaan');
+});
+
+test('16. er reist een codenaam mee en verder niets', async () => {
+  const o = await bz('open', { stad: STAD, aanleiding: 'kindveiligheid',
+    wat: 'Zeer specifieke omschrijving die nergens anders hoort te staan.' });
+  const id = o.body.zaak.id;
+  const r = await post('/api/rtfos/bescherming/meldcode',
+    { stad: STAD, id, betreft: 'kind uit groep 6' }, LAND);
+  assert.equal(r.status, 200, JSON.stringify(r.body).slice(0, 200));
+  assert.equal(r.body.dossier.aard, 'kindermishandeling', 'kindveiligheid hoort kindermishandeling te worden');
+
+  const heel = JSON.stringify(r.body.dossier);
+  assert.ok(!/Zeer specifieke omschrijving/.test(heel),
+    'de omschrijving van de beschermzaak hoort NIET in het meldcode-dossier te belanden');
+  assert.match(heel, /BZ-/, 'de codenaam van de zaak hoort er wel in te staan');
+});
+
+test('17. de zaak onthoudt alleen het ID, en de klassen blijven gescheiden', async () => {
+  const id = await zaakTot('minimaal');
+  const r = await post('/api/rtfos/bescherming/meldcode',
+    { stad: STAD, id, betreft: 'volwassene' }, LAND);
+  assert.equal(r.status, 200);
+  const gelezen = await bz('lees', { id });
+  assert.deepEqual(gelezen.body.zaak.meldcodes, [r.body.dossier.id],
+    'de zaak hoort alleen het ID van het dossier te onthouden');
+
+  /* En de scheiding blijft: geen van beide kanten laadt de ander. De brug staat
+     in de route, en dat is de enige plek waar dat mag. */
+  const map = path.join(__dirname, '..', 'server', 'kern', 'beschermzaak');
+  for (const f of fs.readdirSync(map).filter(n => n.endsWith('.js'))) {
+    assert.ok(!/require\([^)]*meldcode/.test(fs.readFileSync(path.join(map, f), 'utf8')),
+      f + ' laadt de meldcode; de brug hoort in de route te staan');
+  }
+  const mcMap = path.join(__dirname, '..', 'server', 'kern', 'rtfos');
+  for (const f of fs.readdirSync(mcMap).filter(n => n.startsWith('meldcode'))) {
+    assert.ok(!/require\([^)]*beschermzaak/.test(fs.readFileSync(path.join(mcMap, f), 'utf8')),
+      f + ' laadt de beschermzaak-module; hij hoort alleen de OPSLAG te lezen');
+  }
+});

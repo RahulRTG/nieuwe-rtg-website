@@ -37,30 +37,18 @@ const STAPPEN = ['signaleren', 'overleggen', 'gesprek', 'wegen', 'beslissen'];
    beslissingen, de grendel ertussen, en de afleiding van de uitkomst. Zie de
    kop daar voor waarom dat geen keuzelijst mag zijn. */
 const AFW = require('./meldcode-afweging');
+const HERKOMST = require('./meldcode-herkomst');
 const UITKOMSTEN = AFW.UITKOMSTEN;
 
-/* WAARVOOR EEN MELDCODE-DOSSIER IS, EN WAARVOOR NIET.
-
-   De wettelijke meldcode gaat over huiselijk geweld en kindermishandeling.
-   "Huiselijk geweld" is daarbij niet beperkt tot kinderen: partnergeweld,
-   ouderenmishandeling en eergerelateerd geweld vallen eronder, en een volwassen
-   slachtoffer hoort hier dus gewoon thuis.
-
-   Wat er NIET onder valt is geweld en uitbuiting buiten de huiselijke kring:
-   een werkgever die iemands paspoort houdt, mensenhandel, een stalker die geen
-   familie is. Daar geldt geen meldplicht, gaat de route niet via Veilig Thuis,
-   en past deze vijfstappenketen niet. Daarvoor is er sinds september 2026 de
-   BESCHERMZAAK (server/kern/beschermzaak/), met een eigen keten en een eigen
-   dataklasse.
-
-   Deze lijst weigert dus niet om iemand weg te sturen maar om hem op de
-   verkeerde rails te zetten -- en de weigering noemt de goede rails. Dat is het
-   verschil met "dit is niets voor u" (FOUNDATION.md par. 5.3). */
-const AARD = ['huiselijk-geweld', 'kindermishandeling'];
+/* Waarvoor een meldcode-dossier wel en niet is, staat in
+   ./meldcode-herkomst.js -- samen met de twee bronnen waar hij uit kan
+   ontstaan, want dat is dezelfde vraag. */
+const AARD = HERKOMST.AARD;
 
 module.exports = (ctx) => {
   const { nu, rid, schoon, S, audit, wie, poort, save } = ctx;
 
+  const HERK = HERKOMST(ctx);
   const vind = id => S().meldcodes.find(m => m.id === String(id || '')) || null;
   const gezet = (m, stap) => (m.stappen || []).some(s => s.stap === stap);
 
@@ -70,7 +58,7 @@ module.exports = (ctx) => {
     stappen: (m.stappen || []).map(s => ({ stap: s.stap, tekst: s.tekst, door: s.door, at: s.at,
       overgeslagen: !!s.overgeslagen })),
     volgende: STAPPEN.find(s => !gezet(m, s)) || null,
-    weging: m.weging || null, besluit: m.besluit || null,
+    weging: m.weging || null, besluit: m.besluit || null, uitBeschermzaak: m.uitBeschermzaak || null,
     uitkomst: m.uitkomst || null, gesloten: m.gesloten || null });
 
   function open(req, b) {
@@ -82,23 +70,36 @@ module.exports = (ctx) => {
     if (betreft.length < 5) return { status: 400, error: 'Wie of wat betreft het? Een codenaam of een korte, feitelijke aanduiding.' };
     /* De aard bepaalt of dit uberhaupt een meldcode-dossier is. Zie AARD boven:
        de weigering stuurt niemand weg maar wijst de goede rails aan. */
-    const aard = String(b.aard || '');
-    if (!AARD.includes(aard)) {
+    let aard = String(b.aard || '');
+    /* Bij een omzetting uit een beschermzaak wordt de aard hieronder gezet uit
+       de zaak zelf; dan hoeft (en mag) hij niet in het verzoek te staan. */
+    if (!b.beschermzaakId && !AARD.includes(aard)) {
       return { status: 400, error: 'Waar gaat dit over: huiselijk-geweld of kindermishandeling? De meldcode geldt ' +
         'voor die twee. Gaat het om uitbuiting, mensenhandel, stalking door iemand buiten de huiselijke kring, of ' +
         'geweld dat daar niet onder valt, open dan een BESCHERMZAAK (/api/rtfos/bescherming/open): daar loopt de ' +
         'route niet via Veilig Thuis en past deze vijfstappenketen niet.' };
     }
-    /* Aan een bestaande hulpvraag hangen mag, en dan gaat de CODENAAM mee en
-       niet het dossier: een meldcode-dossier is geen onderdeel van het
-       hulpverleningsdossier en hoort er ook niet in te lekken. */
-    let codenaam = null;
+    /* Waar dit dossier vandaan komt staat in ./meldcode-herkomst.js: een
+       hulpvraag of een beschermzaak, en in beide gevallen reist er een CODENAAM
+       mee en verder niets. Zie de kop daar. */
+    let codenaam = null, uitZaak = null;
     if (b.casusId) {
-      const c = S().casussen.find(x => x.id === String(b.casusId));
-      if (!c || c.stad !== g.stad.id) return { status: 404, error: 'Die hulpvraag hoort niet bij deze stad.' };
-      codenaam = c.codenaam;
+      const h = HERK.vanCasus(b.casusId, g.stad.id);
+      if (!h.ok) return h;
+      codenaam = h.codenaam;
+    }
+    if (b.beschermzaakId) {
+      const h = HERK.vanBeschermzaak(b.beschermzaakId, g.stad.id);
+      if (!h.ok) return h;
+      codenaam = h.codenaam;
+      uitZaak = String(b.beschermzaakId);
+      /* DE AARD KOMT UIT DE ZAAK EN NIET UIT HET VERZOEK. Zou hij hier
+         meegestuurd mogen worden, dan is de grendel van de herkomst een
+         formaliteit: je kiest gewoon "huiselijk-geweld" en de zaak volgt. */
+      aard = h.aard;
     }
     const m = { id: rid(), stad: g.stad.id, betreft, aard, casusCodenaam: codenaam,
+      uitBeschermzaak: uitZaak,
       aandachtsfunctionaris: schoon(b.aandachtsfunctionaris, 60) || null,
       status: 'open', stappen: [], weging: null, besluit: null,
       uitkomst: null, gesloten: null, door: w.key, at: nu() };

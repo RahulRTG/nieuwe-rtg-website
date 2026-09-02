@@ -1,23 +1,23 @@
 /* ============================================================================
-   MUTATIECONTRACTEN -- DE DERTIEN ROUTES VAN DE BESCHERMZAAK.
+   MUTATIECONTRACTEN -- DE VEERTIEN ROUTES VAN DE BESCHERMZAAK.
 
    Deel van server/lib/mutatiecontracten.js; zie de kop daar voor de vorm en de
-   regels. Negen routes staan achter de kantoordeur (routes/rtfos/uitvoering.js)
-   en VIER staan zonder poort (routes/rtfos/voordeur.js); de klasse eronder is
-   server/kern/beschermzaak/.
+   regels. Tien routes staan achter de kantoordeur (routes/rtfos/uitvoering.js,
+   inclusief de brug naar de meldcode) en VIER staan zonder poort
+   (routes/rtfos/voordeur.js); de klasse eronder is server/kern/beschermzaak/.
 
    WAAROM DIT REGISTER HIER EERST KWAM EN DE ROUTES DAARNA. MUTATIECONTRACT.md:
-   "de volgorde is een grens en geen gewoonte". Deze dertien zijn nieuw, en een
+   "de volgorde is een grens en geen gewoonte". Deze veertien zijn nieuw, en een
    nieuwe schrijfroute zonder contract laat de bouw zakken.
 
-   ALLE DERTIEN ZIJN GEMETEN, NIET GERADEN. Er is een ronde gedraaid tegen een
+   ALLE VEERTIEN ZIJN GEMETEN, NIET GERADEN. Er is een ronde gedraaid tegen een
    draaiende server waarin elke route TWEE keer werd aangeroepen met hetzelfde
    lijf, en waarin het gevolg is nagekeken in de opslag (aantal zaken, lengte
    van de overdrachtenlijst, aantal auditregels). Wat daaruit kwam staat per
    route in `bewijs.gemeten`, en het is drie keer iets anders:
 
-     - drie routes doen bij een tweede aanroep AANTOONBAAR een tweede handeling
-       (open, lees, overdracht). Dat hoort zo, en waarom staat erbij.
+     - vier routes doen bij een tweede aanroep AANTOONBAAR een tweede handeling
+       (open, lees, overdracht, meldcode). Dat hoort zo, en waarom staat erbij.
      - vijf routes laten na twee aanroepen dezelfde stand achter (veiligheid,
        stand, toestemming, toestemming-weg, sluit).
      - drie routes veranderen niets (zaken, deur/steden, deur/stand).
@@ -116,6 +116,14 @@ const CONTRACTEN = Object.assign({}, DEUR, Object.fromEntries([
   zelfdeStand('POST /api/rtfos/bescherming/sluit', 'rtfos.bescherming.sluit',
     'De tweede oproep kwam terug met 400 ("deze zaak is al gesloten"), en de bewaartermijn van de ' +
     'eerste sluiting bleef staan. Een toestandscontrole, geen duplicaatlaag (par. 5o).'),
+
+  tweedeHandeling('POST /api/rtfos/bescherming/meldcode', 'rtfos.bescherming.meldcode',
+    'Dezelfde reden als bij /bescherming/open en bij de meldcode zelf: een nieuwe zorg is een nieuw ' +
+    'dossier. Twee keer omzetten geeft twee meldcode-dossiers, en dat is hinderlijk maar veilig -- ' +
+    'ze samenvouwen zou betekenen dat een tweede, latere zorg over dezelfde mens verdwijnt in het ' +
+    'dossier van de eerste. De zaak onthoudt beide ids, dus de dubbeling is zichtbaar en te sluiten.',
+    'dubbeltik-ronde: twee keer omzetten gaf TWEE meldcode-dossiers met verschillende ids (aantal ' +
+    '+2), en de beschermzaak droeg ze allebei in haar meldcodes-lijst'),
 
   ['POST /api/rtfos/bescherming/zaken', {
     mutatieId: 'rtfos.bescherming.zaken', herkomst: 'mens',

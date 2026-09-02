@@ -111,6 +111,9 @@ const beeld = z => Object.assign(lijstbeeld(z), {
   toestemming: z.toestemming ? { at: z.toestemming.at, ontvanger: z.toestemming.ontvanger, tekst: z.toestemming.tekst } : null,
   ingetrokken: z.ingetrokken ? { at: z.ingetrokken.at, reden: z.ingetrokken.reden } : null,
   overdrachten: (z.overdrachten || []).slice(0, 20),
+  /* Alleen de IDs van de meldcode-dossiers die hieruit zijn ontstaan. Wie er een
+     wil lezen, opent hem daar -- en dat laat zijn eigen spoor na. */
+  meldcodes: (z.meldcodes || []).slice(0, 10),
   stappen: (z.stappen || []).slice(0, 40),
   bewaarTot: z.bewaarTot || null
 });

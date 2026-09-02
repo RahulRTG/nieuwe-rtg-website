@@ -40,6 +40,7 @@ module.exports = [
   '/apps/foundation/memorie.html',
   '/apps/foundation/mijnbanden.html',
   '/apps/foundation/ochtend.html',
+  '/apps/foundation/onveilig.html',
   '/apps/foundation/oppasinfo.html',
   '/apps/foundation/opvoeden.html',
   '/apps/foundation/os-bestuur.html',

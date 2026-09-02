@@ -32,7 +32,8 @@ const SHELL = [
      test/foundationschil.js ving dat meteen -- de eerste keer dat die toets
      iets ving, want hij draaide voorheen nooit (geen browser). */
   '/apps/foundation/club.html', '/apps/foundation/klas.html',
-  '/apps/foundation/beheer.html', '/apps/foundation/privacy.html', '/apps/foundation/sessie.js',
+  '/apps/foundation/beheer.html', '/apps/foundation/privacy.html',
+  '/apps/foundation/onveilig.html', '/apps/foundation/sessie.js',
   /* Deze tien stonden WEL op de hub en NIET in de schil: spelen, de biebs, de
      schoolkant en het magazine. Precies de tegels waarmee een kind zich
      bezighoudt als er niets anders is -- en dus juist de tegels die je nodig

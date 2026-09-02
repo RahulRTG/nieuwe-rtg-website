@@ -348,8 +348,8 @@ veilige slaapplek heeft.
 
 | # | wat | waarom nu | stand |
 |---|---|---|---|
-| 1 | **Uitstapknop, neutrale titel, geen voorvertoning** over de Foundation-schermen, plus het eerlijke scherm over wat we niet kunnen verbergen | maakt al het volgende pas veilig; belooft niets wat niet waar is (5.7) | een dag |
-| 2 | **Hulpwijzer verbreden**: categorie "onveilig, misbruikt of uitgebuit", met de gespecialiseerde instanties erbij | pure tekst, geen gegevens, geen keten — en vandaag het enige wat een slachtoffer aan deze app heeft | een dag |
+| 1 | **Uitstapknop, neutrale titel, geen voorvertoning** over de Foundation-schermen, plus het eerlijke scherm over wat we niet kunnen verbergen | maakt al het volgende pas veilig; belooft niets wat niet waar is (5.7) | **staat** (2 sep 2026) |
+| 2 | **Hulpwijzer verbreden**: categorie "onveilig, misbruikt of uitgebuit", met de gespecialiseerde instanties erbij | pure tekst, geen gegevens, geen keten — en vandaag het enige wat een slachtoffer aan deze app heeft | **staat** (2 sep 2026) |
 | 3 | **`kern/foundation/safety/`: de eigen keten** — veiligheid → minimale gegevens → toestemming → stabilisatie → gecontroleerde overdracht, als eigen dataklasse (5.2) | het gat dat par. 4 laag 3 beschrijft | weken |
 | 4 | **De voordeur**: zelfingang zonder account, zonder BSN, zonder adres; eerst "ben je nu veilig" en "kan iemand meekijken" | keert de huidige richting om (office maakt casus → burger krijgt code) | weken |
 | 5 | **Meldcode verbreden** naar volwassen slachtoffers buiten het gezin, of een tweede route ernaast | de vijf wettelijke stappen blijven; de reikwijdte niet | weken |
@@ -362,6 +362,34 @@ veilige slaapplek heeft.
 Wat in deze volgorde opvalt: de eerste twee regels kosten samen twee dagen en
 verzetten meer voor de mens uit de missie dan de zes eronder. Dat is geen
 argument tegen de rest — het is het argument om ermee te beginnen.
+
+### 7.1 Wat regel 1 en 2 aan het licht brachten
+
+Drie dingen die pas zichtbaar werden door het te bouwen en in een browser te
+bekijken, en die de volgorde hierboven bevestigen:
+
+**De hulpwijzer zit zelf achter de inlog.** `hulpwijzer` staat in
+`BESCHERMDE_APPS` (`public/apps/foundation/sessie.js`), dus wie geen
+gezinsaccount heeft krijgt de deur van `shared/deur.js` en niet de lijst. Het
+verbreden van de hulpwijzer bereikt daarmee alleen wie al lid is. Daarom is het
+nieuwe scherm `onveilig.html` er BUITEN gezet: geen `sessie.js`, geen
+sessie-eis, en in de browser gemeten dat hij zonder inlog volledig laadt. Dat
+maakt regel 4 (de voordeur) niet minder nodig — het maakt hem concreter: wat
+`onveilig.html` nu is voor lezen, moet die voordeur worden voor handelen.
+
+**De RTG-schil maakte de neutrale titel waardeloos.** `shared/randen.js` laadt
+de edge-schil, en die zet bovenin het pad van de app: "RTFOUNDATION /
+WEGWIJZER". Een neutrale `<title>` heeft dan geen betekenis meer, want wie
+meekijkt leest de merknaam gewoon in de schil. `onveilig.html` laadt die laag
+daarom met opzet niet, en dat staat als reden in het bestand — anders zet de
+volgende die de pagina "consistent" maakt hem terug.
+
+**Een pagina in delen knippen botst met een noodlijst.** `shared/deelmenu.js`
+verdeelt een lange pagina over een keuzemenu. Op deze pagina zou 112 daarmee
+achter een knop komen. De laag wordt hier dus niet geladen, en de eerder
+bedachte `rtgdeel-vast`-markering is weggehaald in plaats van decoratief blijven
+staan: een klas die niets afdwingt omdat zijn laag niet draait, leest als een
+garantie die er niet is.
 
 ---
 

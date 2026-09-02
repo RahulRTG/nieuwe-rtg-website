@@ -166,7 +166,9 @@
   #zoekform input{flex:1;background:var(--rtg-card2);color:var(--rtg-txt);
     font:inherit;font-size:0.85rem;border:1px solid var(--rtg-line);
     border-radius:0;padding:0.5rem 0.95rem;}
-  #zoekform button{background:var(--rtg-acc);color:#0C0C0B;font:inherit;
+  /* dezelfde inkt-op-accent als de gekozen wereld hierboven: bijna-zwart op
+     het accent haalt 3,78:1, --rtg-acc-inkt volgt de dagkleur en leest overal */
+  #zoekform button{background:var(--rtg-acc);color:var(--rtg-acc-inkt);font:inherit;
     font-size:0.8rem;font-weight:600;border:0;border-radius:0;
     padding:0.5rem 1.1rem;cursor:pointer;}
   .via{font-size:0.72rem;color:var(--rtg-acc);margin-top:0.35rem;}

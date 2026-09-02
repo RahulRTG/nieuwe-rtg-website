@@ -148,19 +148,8 @@ Object.assign(kern, require('../kern/hardwarelab').maakHardwarelab({ db, save, c
    collectie; zie kern/journaalbestand.js. */
 Object.assign(kern, require('../kern/journaalbestand').metBestand({ db, save }));
 
-/* Het stadsweefsel (kern/stadsweefsel/): de ondergrond onder de stad --
-   geografie, objecten, indicatoren, begroting, besluitvorming en het
-   algoritmeregister.
-
-   DE VOLGORDE IS HIER GEDRAG. Het weefsel staat VOOR zijn lezers: kern/gemeente
-   (laag 2) biedt zijn meldingen bij de zaakmotor aan en kern/stad (laag 5) leest
-   zijn zones uit de geografie. Wie dit blok naar beneden schuift, start een stad
-   zonder ondergrond -- en dan hangt een gemeentemelding aan geen enkele zaak.
-   Het staat in deze laag en niet in laag 2 omdat die daarmee over de 10 KB ging;
-   eerder is hier ook goed, want alles wat het weefsel nodig heeft bestaat al. */
-const melderSeintje = (codenaam) => {
-  try { Promise.resolve(keyVanCodenaam(codenaam)).then(t => { if (t && t.key) sseToCustomer(t.key, 'sync', { scope: 'stad' }); }).catch(() => {}); }
-  catch (e) { log.uitzondering(e, { bron: 'weefsel', waar: 'melderSeintje' }); }
-};
-Object.assign(kern, require('../kern/stadsweefsel')({ db, save, crypto, sseToOffice, melderSeintje, log }));
+/* Het stadsweefsel (kern/stadsweefsel/) staat in ./kernlaag1-weefsel.js en
+   wordt HIER aangeroepen, want de volgorde is gedrag: het weefsel staat voor
+   zijn lezers (kern/gemeente in laag 2, kern/stad in laag 5). Zie de kop daar. */
+require('./kernlaag1-weefsel')(kern, hulp);
 };

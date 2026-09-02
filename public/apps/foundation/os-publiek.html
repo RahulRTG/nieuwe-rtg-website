@@ -123,6 +123,11 @@
   /* De pil brak over twee regels en liep daarmee door de rand van de kaart. */
   .doenkaart .pil{white-space:nowrap;align-self:center;}
   .doenkaart .heen{margin-top:auto;padding-top:.5rem;min-height:44px;display:flex;align-items:center;gap:.4rem;font-size:.78rem;font-weight:600;color:var(--rtg-goud,#C9A24B);}
+  /* het pijltje in de heen-regel en in de bandknop: klein en in de inkt van de
+     regel zelf, tegenover het grote kaarticoon in bordeaux hierboven */
+  .doenkaart .heen svg,.buurtknop svg{width:.9rem;height:.9rem;stroke:currentColor;fill:none;stroke-width:1.6;}
+  /* de kaart die zelf geen bestemming is (Doe mee): de knoppen erin gaan ergens heen, de kaart niet */
+  .doenkaart.vast{cursor:auto;}
   .doenkaart .knoppen{margin-top:auto;padding-top:.5rem;display:flex;flex-direction:column;gap:.45rem;width:100%;}
   .landelijk .lijnrij{align-items:flex-start;}
   .landelijk svg{width:1.5rem;height:1.5rem;flex-shrink:0;stroke:var(--rtg-goud,#857007);fill:none;stroke-width:1.2;}
@@ -200,14 +205,14 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19s-6-3.8-6-8a3.3 3.3 0 0 1 6-1.9A3.3 3.3 0 0 1 18 11c0 4.2-6 8-6 8z"/><path d="M3 20c1.6-1.4 3.4-2 5-2"/></svg>
           <div class="tekst"><b>Hulp &amp; ondersteuning</b>
           <div class="uitleg">Vind hulp, stel een vraag of vraag iets aan.</div></div>
-          <span class="heen">Lees meer <svg viewBox="0 0 24 24" style="width:.9rem;height:.9rem;stroke-width:1.6;" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></span>
+          <span class="heen">Lees meer <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></span>
         </button>
 
         <button type="button" class="doenkaart" data-heen="projecten">
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="16.5" cy="9" r="2.4"/><path d="M3 19c0-3 2.7-5 6-5s6 2 6 5M15 19c0-2 1.6-3.4 3.6-3.4S22 17 22 19"/></svg>
           <div class="tekst"><b>Wat er loopt</b>
           <div class="uitleg">Bekijk projecten en initiatieven in jouw buurt.</div></div>
-          <span class="heen">Bekijk projecten <svg viewBox="0 0 24 24" style="width:.9rem;height:.9rem;stroke-width:1.6;" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></span>
+          <span class="heen">Bekijk projecten <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></span>
         </button>
 
         <button type="button" class="doenkaart" data-heen="activiteiten">
@@ -220,10 +225,10 @@
                tekenVrijePlekken() gevuld zodra er een stad gekozen is, en
                blijft anders weg. -->
           <span class="pil let verborgen" id="vrij"></span></div>
-          <span class="heen">Bekijk activiteiten <svg viewBox="0 0 24 24" style="width:.9rem;height:.9rem;stroke-width:1.6;" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></span>
+          <span class="heen">Bekijk activiteiten <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></span>
         </button>
 
-        <div class="doenkaart" style="cursor:auto;">
+        <div class="doenkaart vast">
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="8" r="2.8"/><circle cx="16" cy="8" r="2.8"/><path d="M2 19c0-3 2.6-5 6-5s6 2 6 5M14 19c0-2.4 2-4.2 4.4-4.2S22 16.6 22 19"/></svg>
           <div class="tekst"><b>Doe mee</b>
           <div class="uitleg">Word vrijwilliger of neem deel aan projecten.</div></div>
@@ -249,7 +254,7 @@
     <div>
       <p id="bandkop">Samen bouwen we aan buurten waar iedereen mee kan doen.</p>
       <a class="buurtknop rand" href="os-vrijwilliger.html">Bekijk hoe je kunt meedoen
-        <svg viewBox="0 0 24 24" style="width:.9rem;height:.9rem;stroke:currentColor;fill:none;stroke-width:1.6;" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></a>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></a>
     </div>
   </section>
 

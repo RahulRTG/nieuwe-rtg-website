@@ -369,7 +369,7 @@ function machtigingBlok(p) {
         '<span class="kosten">Dit stopt de incasso, niet de gift.</span></div>';
   }
   if (p.stand === 'gestopt') return '';
-  return '<div class="rij ruimte" style="flex-wrap:wrap;gap:.4rem;">' +
+  return '<div class="rij ruimte">' +
     '<input class="gveld" data-mh="' + esc(p.id) + '" placeholder="Naam op de rekening" aria-label="Naam op de rekening">' +
     '<input class="gveld" data-mi="' + esc(p.id) + '" placeholder="Laatste 4 cijfers" maxlength="4" aria-label="Laatste vier cijfers van je rekeningnummer">' +
     '<input class="gveld" data-mm="' + esc(p.id) + '" type="number" min="1" value="' + p.euroPerJaar +

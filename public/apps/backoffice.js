@@ -176,7 +176,7 @@
      zijn inlog. */
   function kluisDicht(el, e){
     if (!el || !e || e.status !== 403 || !(e.data && e.data.poort === 'kluis')) return false;
-    el.innerHTML = '<div class="empty" style="padding:1.25rem;line-height:1.6;">' +
+    el.innerHTML = '<div class="empty kluisdicht">' +
       '<strong>' + T('bo.kluis.kop','Hiervoor is een kantoorsessie op naam nodig') + '</strong><br>' +
       escHtml(e.data.error || '') + '</div>';
     return true;

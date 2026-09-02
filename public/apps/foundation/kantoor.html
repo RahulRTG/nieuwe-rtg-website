@@ -26,6 +26,10 @@
   .pil{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);border-radius:0;padding:.15rem .55rem;color:var(--muted);}
   .sec{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin:.2rem 0;}
   .rij{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;}
+  /* de giftstand (giftTeken): kop en knop uit elkaar, op de grondlijn */
+  .rij.uiteen{justify-content:space-between;align-items:baseline;}
+  .giftstand{font-size:1rem;}
+  .veld.smal{max-width:12rem;}
   .veld{flex:1;background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.88rem;padding:.55rem .7rem;}
   .knop{background:var(--txt);color:#000;border:none;border-radius:0;padding:.55rem .9rem;font:inherit;font-weight:600;font-size:.84rem;cursor:pointer;}
   .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
@@ -257,23 +261,23 @@ async function giftTeken() {
     const g = await giftApi('stand/kantoor', {});
     const open = g.stand === 'open';
     $('#giftIn').innerHTML =
-      '<div class="rij" style="justify-content:space-between;align-items:baseline;">' +
-        '<b style="font-size:1rem;">' + (open ? 'Ja, giften staan open' : 'Nee, giften staan dicht') + '</b>' +
+      '<div class="rij uiteen">' +
+        '<b class="giftstand">' + (open ? 'Ja, giften staan open' : 'Nee, giften staan dicht') + '</b>' +
         '<button class="knop' + (open ? ' stil' : '') + '" id="giftWissel">' + (open ? 'Dicht zetten' : 'Open zetten') + '</button>' +
       '</div>' +
-      '<div class="kpi" style="margin-top:.4rem;">' + esc(g.uitleg) + '</div>' +
+      '<div class="kpi h-mt40">' + esc(g.uitleg) + '</div>' +
       (g.ontbreekt.length
-        ? '<div style="margin-top:.6rem;">' + g.ontbreekt.map(x =>
+        ? '<div class="h-mt60">' + g.ontbreekt.map(x =>
             '<div class="kpi">Besluit ' + x.besluit + ': ' + esc(x.vraag) +
             (x.blokkeert === false ? ' <i>(houdt de knop niet tegen)</i>' : '') + '</div>').join('') + '</div>'
         : '') +
-      '<div id="walletBlok" style="margin-top:.7rem;"></div>' +
-      '<div style="margin-top:.7rem;"><div class="sec">ANBI-status</div><div class="rij" id="giftAnbi">' +
+      '<div id="walletBlok" class="h-mt70"></div>' +
+      '<div class="h-mt70"><div class="sec">ANBI-status</div><div class="rij" id="giftAnbi">' +
         ['nee', 'aangevraagd', 'ja', 'onbekend'].map(x =>
           '<button class="knop' + (g.anbi === x ? '' : ' stil') + '" data-anbi="' + x + '">' + ANBI_TEKST[x] + '</button>').join('') +
       '</div>' +
-      (g.anbi === 'ja' ? '<div class="kpi" style="margin-top:.3rem;">RSIN ' + esc(g.rsin) + '</div>' : '') +
-      '<div class="rij" style="margin-top:.4rem;"><input class="veld" id="giftRsin" style="max-width:12rem;" placeholder="RSIN (9 cijfers)" value="' + esc(g.rsin || '') + '"></div>' +
+      (g.anbi === 'ja' ? '<div class="kpi h-mt30">RSIN ' + esc(g.rsin) + '</div>' : '') +
+      '<div class="rij h-mt40"><input class="veld smal" id="giftRsin" placeholder="RSIN (9 cijfers)" value="' + esc(g.rsin || '') + '"></div>' +
       '</div>' +
       '<div id="giftMeld"></div>';
 
@@ -311,12 +315,12 @@ async function walletTeken(g) {
     }
     doel.innerHTML = '<div class="sec">Positie in RTG Pay</div>' +
       '<div class="kpi">' + esc(w.uitleg) + '</div>' +
-      '<div class="rij" style="margin-top:.5rem;gap:.4rem;flex-wrap:wrap;">' +
-        '<input class="veld" id="walletNaam" style="max-width:12rem;" placeholder="Naam" value="RTFoundation">' +
-        '<input class="veld" id="walletBeheer" style="max-width:12rem;" placeholder="Naam van de beheerder">' +
+      '<div class="rij h-mt50">' +
+        '<input class="veld smal" id="walletNaam" placeholder="Naam" value="RTFoundation">' +
+        '<input class="veld smal" id="walletBeheer" placeholder="Naam van de beheerder">' +
         '<button class="knop" id="walletMaak">Positie aanmaken</button>' +
       '</div>' +
-      '<div class="kpi" style="margin-top:.3rem;">Er komt een bedrijfscode en een eenmalige beheer-PIN uit. Daarmee stelt de stichting zelf haar bankrekening in en betaalt ze zichzelf uit, langs dezelfde weg als elke zaak. Dit zet de giftknop niet open.</div>';
+      '<div class="kpi h-mt30">Er komt een bedrijfscode en een eenmalige beheer-PIN uit. Daarmee stelt de stichting zelf haar bankrekening in en betaalt ze zichzelf uit, langs dezelfde weg als elke zaak. Dit zet de giftknop niet open.</div>';
     $('#walletMaak').addEventListener('click', async () => {
       const b = { naam: $('#walletNaam').value.trim(), beheerder: $('#walletBeheer').value.trim() };
       const r = await fetch('/api/office/rtfwallet/maak', { method: 'POST', headers: kop(), body: JSON.stringify(b) });

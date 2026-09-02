@@ -37,7 +37,7 @@ van 2 september 2026:
 | voorgestelde laag | wat er al staat | stand |
 |---|---|---|
 | 1. Foundation Operations | `server/kern/rtfos/` — 49 modules: casus, meldcode, veld, integriteit, vrijwilligers-VOG, voorraad, geld, subsidies, projecten, gemeenteportaal, rapport, blauwdrukken, risico, beleid, bestuur, jaarverslag | **staat** |
-| 2. Human Control | `kern/consent.js` (+ dekkingsregister met eigen toets), `kern/rtgid-regie.js` (inzagelog, `namens`, herroepbare machtiging), `kern/rtgid.js` (claim zonder gegeven) | **staat, één attribuut breed** |
+| 2. Human Control | `kern/consent.js` (+ dekkingsregister met eigen toets, en sinds 2 sep 2026 doel en termijn per venster), `public/apps/toestemming.html` (wat er openstaat én wie er keek), `kern/rtgid-regie.js` (inzagelog, `namens`, herroepbare machtiging), `kern/rtgid.js` (claim zonder gegeven) | **staat; RTG iD nog één attribuut breed** |
 | 3. Safety | `server/kern/beschermzaak/` (de eigen dataklasse, sinds 2 sep 2026), `server/kern/veiligheid/` (de persoonlijke laag: dodemansknop, stil codewoord, kring — zie par. 7.2), `kern/rtfos/meldcode.js`, `kern/zorgniveau.js` | **staat** |
 | 4. Recovery | `casus.SOORTEN` dekt huisvesting, schulden, werk, zorgdoorverwijzing, noodhulp; `kern/opvang.js` doet de asielketen; `kern/rtfos/voorraad*.js` de goederen | **staat als registratie, niet als traject** |
 | 5. Development | `kern/levensgraaf/` (18+ bronnen, vijf etiketten per knoop), `kern/levenslijn/fasen.js` (fasen zonder voortgangsbalk), `kern/doelen.js` | **staat als graaf, mist de motor** |
@@ -129,13 +129,19 @@ doorheen wordt getrokken. Van de 154 rtfos-routes staan er 140 achter
 zijn de code-deuren (vrijwilliger, hulpvrager) en de buurtpagina's. Dat blijft zo:
 de voordeur van punt 4 in par. 7 komt ernáást en niet erdoorheen.
 
-### Laag 2 — Human Control · **staat, moet breder**
+### Laag 2 — Human Control · **staat**
 De consent graph van punt 21 is `kern/consent.js` met `LAGEN` en `NIET_GEDEKT`,
 en de toets `test/consent-dekking.test.js` bewaakt al dat elke gedekte laag
-werkelijk intrekt (heen én terug). Wat ontbreekt is **doel en termijn per
-venster** als eersteklas velden, en het scherm "wie weet wat over mij".
-Once-only (punt 20) is hier hetzelfde besluit: feiten één keer verifiëren, per
-gebruik toestemming, minimaal delen. **Een stap weg.**
+werkelijk intrekt (heen én terug). Doel en termijn per venster staan er sinds
+par. 7.6, en het scherm "wie weet wat over mij" bestond al
+(`public/apps/toestemming.html`) — met beide helften: wat er openstaat, en wie
+er heeft gekeken.
+
+Wat hier nog OPEN staat: RTG iD deelt vandaag één attribuut (18-plus als claim
+zonder geboortedatum). Once-only (punt 20) is de volgende stap en is een besluit
+en geen bouwwerk: feiten één keer verifiëren, per gebruik toestemming, minimaal
+delen — dat vraagt dat een tweede instantie een bestaand bewijs mag hergebruiken,
+en dat is een afspraak met die instantie voordat het code is.
 
 ### Laag 3 — Safety · **staat, met twee open randen**
 Dit was bij het schrijven van dit document het grootste gat: de woorden
@@ -367,7 +373,7 @@ veilige slaapplek heeft.
 | 4 | **De voordeur**: zelfingang zonder account, zonder BSN, zonder adres; eerst "ben je nu veilig" en "kan iemand meekijken" | keert de huidige richting om (office maakt casus → burger krijgt code) | **staat** (2 sep 2026) |
 | 4b | **De persoonlijke veiligheidslaag verbinden** — `kern/veiligheid/` (dodemansknop, stil codewoord, kring, laatste plek) bestaat en is vanaf de Foundation-kant onzichtbaar | zie par. 7.2: gebouwd, eerlijk, en op de verkeerde plek voor de mens uit par. 0 | **staat** (2 sep 2026) |
 | 5 | **Meldcode**: het afwegingskader van stap 5, en zeggen waarvoor hij is | zie par. 7.5 -- de vraag bleek een andere dan hij hier stond | **staat** (2 sep 2026) |
-| 6 | **Consent: doel en termijn per venster** + het scherm "wie weet wat over mij" | laag 2 afmaken vóór er meer instanties bijkomen | weken |
+| 6 | **Consent: doel en termijn per venster** | het scherm bestond al; zie par. 7.6 | **staat** (2 sep 2026) |
 | 7 | **De Advocate als lezer** op `levensgraaf/termijnen.js` | alle waarde van punt 10 zonder de onbewezen helft (5.6) | weken |
 | 8 | **Constraint solver** met meerdere paden, aannames in de uitslag, `ONBEPAALD` waar niets gerekend is | het eerlijke nieuwe stuk software; `EXECUTIE.md` noemt de leemte al | maanden |
 | 9 | **Human Services Protocol**: schemaregister op `kern/envelop.js` | pas zinvol als er iets is om te delen dat de moeite waard is | maanden |
@@ -404,6 +410,47 @@ achter een knop komen. De laag wordt hier dus niet geladen, en de eerder
 bedachte `rtgdeel-vast`-markering is weggehaald in plaats van decoratief blijven
 staan: een klas die niets afdwingt omdat zijn laag niet draait, leest als een
 garantie die er niet is.
+
+### 7.6 Regel 6, en de derde meetfout van deze reeks
+
+**Het scherm bestond al.** `public/apps/toestemming.html` toont wat er openstaat
+én wie er heeft gekeken, met een uitgeschreven reden waarom dat twee lijsten zijn
+en niet één ("door elkaar gehaald ziet een afgeronde inzage eruit als een
+openstaande toegang"). Ik had het gemist omdat ik greppte op `api/consent`
+terwijl de route `/api/toestemming` heet, en ik heb het bestand daarna bijna
+overschreven met een eigen versie die minder deed. Dat is in deze reeks de derde
+keer dat een grep op de verkeerde naam tot "bestaat niet" leidde; de andere twee
+staan in par. 7.1 en 7.4. **De les is niet "beter greppen" maar: een conclusie
+dat iets ONTBREEKT is pas een meting als er ook op de andere naam is gezocht.**
+
+**Wat er wel ontbrak, en gemeten is.** Per toestemming stond er wie en wat, maar
+niet WAARVOOR -- en doelbinding is de kern van toestemming; een lijst zonder doel
+is een inventaris. En de termijn was bij **vijf van de negen lagen** een kale
+`tot: null`, die twee verschillende dingen betekende:
+
+> "loopt door tot u hem stopt" (met opzet geen einddatum)
+> "deze laag houdt geen datum bij" (een gat)
+
+Op het scherm lazen die identiek, en erger: de regel verdween helemaal, want hij
+stond onder `t.tot ? ... : ''`. Een venster waar niets bij staat leest als "dat
+loopt wel af", en dat is het tegenovergestelde van waar. Dat is precies wat
+`KOSTEN.md` verbiedt (nooit een getal waar er geen is) en wat `rapport.js`
+oplost met `gemeten: false` in plaats van nette nullen.
+
+Nu draagt elke laag in `kern/consent-register.js` een `doel` en een `termijn` met
+twee standen (`venster` met datum, `zolang-het-staat` met een uitgeschreven
+reden), en het scherm toont de termijn **altijd**. Er is met opzet geen derde
+stand "onbekend": alle negen lagen zijn nagelopen, en een restpost is binnen een
+jaar de plek waar een nieuwe laag stil in verdwijnt.
+
+Eén vorm van schijnzekerheid is toegevoegd in plaats van weggepoetst: een laag
+die zich `venster` noemt en geen datum meestuurt, krijgt de stand
+`venster-zonder-datum` met de tekst dat dit gemeld hoort te worden. Dat is een
+fout in de laag, geen stand op het scherm.
+
+**Wat NIET mis bleek**, en dat is ook gemeten: alle vier de lagen met een
+einddatum filteren verlopen vensters bij de bron. Er wordt nergens een dicht
+venster als open getoond.
 
 ### 7.5 Regel 5 bleek een andere vraag, en een echte fout
 

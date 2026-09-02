@@ -3,13 +3,13 @@
   "vastgelegd": "2026-09-02",
   "gemeten": {
     "bestanden": 1904,
-    "vormen": 1294,
-    "velden": 1845,
+    "vormen": 1295,
+    "velden": 1847,
     "modules": 694,
     "domeinen": 247,
     "envelopDrempel": 15,
     "envelop": 33,
-    "veldenDomeineigen": 1292,
+    "veldenDomeineigen": 1294,
     "veldenGedeeldVanafVier": 183,
     "gelijkendeVormparen": 19
   },
@@ -62,6 +62,18 @@
       ]
     },
     {
+      "veld": "doel",
+      "domeinen": 14,
+      "waar": [
+        "kern/appstore",
+        "kern/commercie",
+        "kern/consent-register",
+        "kern/defensie",
+        "kern/labfonds",
+        "kern/magnaat-trainingslobby"
+      ]
+    },
+    {
       "veld": "waarom",
       "domeinen": 14,
       "waar": [
@@ -107,18 +119,6 @@
         "kern/geloofbieb",
         "kern/groothandel",
         "kern/magnaat-partnerstudio-bedrijf"
-      ]
-    },
-    {
-      "veld": "doel",
-      "domeinen": 13,
-      "waar": [
-        "kern/appstore",
-        "kern/commercie",
-        "kern/defensie",
-        "kern/labfonds",
-        "kern/magnaat-trainingslobby",
-        "kern/pay"
       ]
     },
     {

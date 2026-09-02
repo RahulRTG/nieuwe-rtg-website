@@ -17,7 +17,11 @@
   .tst .wie{font-family:'Bodoni Moda',Georgia,serif;font-size:1.1rem;}
   .tst .kant{font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--goldlicht);}
   .tst .wat{color:var(--soft);font-size:.85rem;line-height:1.55;margin:.3rem 0;}
-  .tst .tot{color:var(--soft);font-size:.78rem;}
+  /* Het doel staat er als eigen regel en niet als bijzin achter "wat": dat is
+     de vraag waar toestemming om draait, en hij verdwijnt zodra hij een staart
+     wordt van iets anders. */
+  .tst .doel{color:var(--txt);font-size:.85rem;line-height:1.55;margin:.3rem 0;}
+  .tst .tot{color:var(--soft);font-size:.78rem;line-height:1.5;}
   .knop.mini{padding:.4rem .7rem;font-size:.8rem;margin-top:.7rem;}
   .grens{border:1px solid var(--line);border-radius:0;padding:.9rem 1rem;margin:.7rem 0;}
   .grens b{display:block;}
@@ -84,6 +88,19 @@
   const esc = s => Veilig.esc(String(s == null ? '' : s));
   const KANT = { ziet: 'Ziet', schrijft: 'Schrijft', doet: 'Handelt namens u' };
 
+  /* DE TERMIJN STAAT ER ALTIJD, OOK ALS ER GEEN DATUM IS. Hier stond eerst
+     `t.tot ? 'Tot ...' : ''`, en dan verdween de regel bij vijf van de negen
+     lagen -- precies de lagen zonder einddatum. Een venster waar niets bij staat
+     leest als "dat loopt wel af", en dat is het tegenovergestelde van waar. De
+     server levert nu een STAND met een uitleg (kern/consent-register.js); dit
+     toont hem, en verzint er niets bij. */
+  function termijn(t) {
+    const m = t.termijn;
+    if (!m) return 'Tot wanneer dit loopt, is hier niet vast te stellen.';
+    if (m.soort === 'venster') return 'Loopt tot ' + m.tot + '.';
+    return m.uitleg || 'Loopt door tot u hem stopt.';
+  }
+
   function teken(d) {
     /* Een laag die het niet doet, staat bovenaan en niet als lege regel. Op dit
        scherm is stilte gevaarlijker dan elders: een ontbrekende regel leest als
@@ -95,7 +112,8 @@
       '<div class="tst"><span class="kant">' + esc(KANT[t.richting] || t.richting) + '</span>' +
       '<div class="wie">' + esc(t.wie) + '</div>' +
       '<div class="wat">' + esc(t.wat) + '</div>' +
-      (t.tot ? '<div class="tot">Tot ' + esc(t.tot) + '</div>' : '') +
+      (t.doel ? '<div class="doel">' + esc(t.doel) + '</div>' : '') +
+      '<div class="tot">' + esc(termijn(t)) + '</div>' +
       (t.intrekbaar
         ? '<button class="knop mini" data-intrek="' + esc(t.laag) + '|' + esc(t.id) + '">Intrekken</button>'
         : '') + '</div>').join('');

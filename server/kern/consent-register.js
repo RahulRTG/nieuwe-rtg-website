@@ -36,17 +36,65 @@
 
 /* Het register. Per laag: waar het over gaat, of het LEZEN of SCHRIJVEN is, en
    welke kern-functies hem lezen en stoppen. De volgorde is de volgorde op het
-   scherm: het zwaarste bovenaan. */
+   scherm: het zwaarste bovenaan.
+
+   TWEE VELDEN ZIJN ER LATER BIJ GEKOMEN, en allebei omdat het scherm er zonder
+   iets zou beweren dat het niet weet (HDI.md par. 7 regel 6):
+
+   `doel` -- WAARVOOR dit venster bestaat. Het bestond nog niet: elke rij zei wel
+   WAT er wordt gedeeld ("allergenen, dieet") maar nergens waarvoor. Doelbinding
+   is de kern van toestemming, en een lijst zonder doel is een inventaris. Let op
+   wat dit veld NIET is: het is het doel dat de LAAG dient, niet iets wat het lid
+   heeft onderhandeld. Dat staat ook zo op het scherm, want anders leest het als
+   een afspraak die niemand heeft gemaakt.
+
+   `termijn` -- hoe dit venster afloopt. Vijf van de negen lagen gaven hier `tot:
+   null`, en dat betekende twee verschillende dingen die op een scherm identiek
+   lezen: "loopt door tot u hem stopt" en "deze laag houdt geen einddatum bij".
+   Dat is precies wat KOSTEN.md verbiedt (nooit een getal waar er geen is) en wat
+   rapport.js oplost met `gemeten: false` in plaats van nette nullen. Twee
+   standen dus, met een uitleg per stuk:
+
+     venster            er staat een einddatum, en die wordt hier getoond
+     zolang-het-staat   loopt door tot u hem stopt; dat is met opzet en de reden
+                        staat erbij
+
+   Er is met opzet GEEN derde stand "onbekend". Alle negen lagen zijn nagelopen
+   en van alle negen is vastgesteld welke van de twee het is; een restpost zou
+   binnen een jaar de plek zijn waar een nieuwe laag stil in verdwijnt. */
 const LAGEN = [
-  { id: 'care-intake', naam: 'Medische context bij een zorgaanbieder', richting: 'ziet', gedekt: true },
-  { id: 'care-vastlegging', naam: 'Zorgaanbieders die iets in uw dossier mogen vastleggen', richting: 'schrijft', gedekt: true },
-  { id: 'paspoort-inzage', naam: 'Partners die uw identiteitsbewijs mogen inzien', richting: 'ziet', gedekt: true },
-  { id: 'rtgid-sessie', naam: 'Diensten die met RTG iD uw gegevens ophalen', richting: 'ziet', gedekt: true },
-  { id: 'rtgid-machtiging', naam: 'Mensen die namens u mogen inloggen', richting: 'doet', gedekt: true },
-  { id: 'locatie', naam: 'Zaken die live met u meekijken', richting: 'ziet', gedekt: true },
-  { id: 'zorgprofiel', naam: 'Uw zorgprofiel dat meereist met bestellingen', richting: 'ziet', gedekt: true },
-  { id: 'toestel', naam: 'Toestellen die metingen wegschrijven', richting: 'schrijft', gedekt: true },
-  { id: 'wachtlijst', naam: 'Zorgaanbieders die u mogen seinen als er iets vrijkomt', richting: 'seint', gedekt: true }
+  { id: 'care-intake', naam: 'Medische context bij een zorgaanbieder', richting: 'ziet', gedekt: true,
+    doel: 'Zodat deze zorgaanbieder u kan behandelen zonder dat u uw verhaal opnieuw hoeft te doen.',
+    termijn: 'venster' },
+  { id: 'care-vastlegging', naam: 'Zorgaanbieders die iets in uw dossier mogen vastleggen', richting: 'schrijft', gedekt: true,
+    doel: 'Zodat wat er bij een behandeling gebeurt in uw eigen dossier terechtkomt en niet alleen bij hen.',
+    termijn: 'zolang-het-staat',
+    termijnUitleg: 'Een behandelrelatie heeft geen vaste einddatum. U stopt hem zelf als u daar klaar mee bent.' },
+  { id: 'paspoort-inzage', naam: 'Partners die uw identiteitsbewijs mogen inzien', richting: 'ziet', gedekt: true,
+    doel: 'Zodat deze partner een keer kan vaststellen dat u bent wie u zegt.',
+    termijn: 'venster' },
+  { id: 'rtgid-sessie', naam: 'Diensten die met RTG iD uw gegevens ophalen', richting: 'ziet', gedekt: true,
+    doel: 'Zodat u bij deze dienst kunt inloggen zonder daar een apart account te maken.',
+    termijn: 'venster' },
+  { id: 'rtgid-machtiging', naam: 'Mensen die namens u mogen inloggen', richting: 'doet', gedekt: true,
+    doel: 'Zodat iemand die u vertrouwt iets voor u kan regelen als u dat zelf niet kunt.',
+    termijn: 'venster' },
+  { id: 'locatie', naam: 'Zaken die live met u meekijken', richting: 'ziet', gedekt: true,
+    doel: 'Zodat een zaak weet wanneer u aankomt, of u onderweg kan vinden.',
+    termijn: 'zolang-het-staat',
+    termijnUitleg: 'Dit venster loopt zolang het meekijken aanstaat. Zet u het uit, dan is het meteen dicht.' },
+  { id: 'zorgprofiel', naam: 'Uw zorgprofiel dat meereist met bestellingen', richting: 'ziet', gedekt: true,
+    doel: 'Zodat een keuken weet waar u niet tegen kunt, zonder dat u het elke keer moet zeggen.',
+    termijn: 'zolang-het-staat',
+    termijnUitleg: 'Dit reist mee met elke bestelling zolang delen aanstaat. Er zit geen einddatum op; u zet het zelf uit.' },
+  { id: 'toestel', naam: 'Toestellen die metingen wegschrijven', richting: 'schrijft', gedekt: true,
+    doel: 'Zodat uw eigen metingen in uw dossier komen in plaats van alleen in de app van de fabrikant.',
+    termijn: 'zolang-het-staat',
+    termijnUitleg: 'Een toestel blijft schrijven tot u het loskoppelt. Dat is de bedoeling van een toestel.' },
+  { id: 'wachtlijst', naam: 'Zorgaanbieders die u mogen seinen als er iets vrijkomt', richting: 'seint', gedekt: true,
+    doel: 'Zodat u bericht krijgt als er een plek vrijkomt, zonder dat u zelf hoeft te blijven bellen.',
+    termijn: 'zolang-het-staat',
+    termijnUitleg: 'Een wachtlijst loopt tot u eraf gaat of tot er een plek is. Er staat geen datum op.' }
 ];
 
 /* Wat dit scherm NIET dekt, met reden. Deze regels gaan mee naar het scherm,

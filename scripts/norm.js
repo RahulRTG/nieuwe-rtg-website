@@ -109,6 +109,33 @@ const METERS = [
      groeit vanzelf (routes schrijven is stap een, de catalogus bijwerken stap
      twee), dus het hoort aan een ratel. scripts/schakelbaar.js meet het. */
   { sleutel: 'routesNietSchakelbaar', richting: 'omlaag', wat: 'API-routes die niet vanuit de boardroom te schakelen zijn' },
+  /* DE ONVERKLAARDE RANDEN (scripts/verstrengeling.js).
+
+     Een require van het ene deel van RTG naar het andere die op geen enkele
+     afleiding past en die niemand heeft verklaard. Dat getal moet naar nul --
+     niet het aantal randen zelf: een huis waarin domeinen elkaar nooit nodig
+     hebben, is geen huis maar een map met losse programma's.
+
+     Waarom dit aan een ratel hoort en niet alleen aan een poort: de poort
+     bewaakt het bestand dat je aanraakt, deze meter bewaakt of het geheel de
+     goede kant op gaat. Een verklaring bijschrijven laat hem dalen, en een
+     verklaring weghalen laat hem stijgen -- dat laatste hoort te ratelen, want
+     een reden die niet meer klopt hoort niet stil te verdwijnen. */
+  { sleutel: 'verstrengelingOnverklaard', richting: 'omlaag', wat: 'requires tussen twee delen van RTG die niemand heeft verklaard' },
+  /* DE FUNCTIES WAARVAN DE ENVELOP EEN ONDERGRENS IS (ACTIVERING.json).
+
+     Van 204 functies is er van 31 te zeggen wat er wakker wordt als je hem
+     aanzet; bij 166 hangt er aantoonbaar meer aan dan de meting ziet, omdat een
+     sleutel uit de kern-tas nergens op uitkomt. Dat is een uitspraak over ONS
+     en niet over die functies, en hij hoort te dalen.
+
+     DEZE METER LEEST HET VASTGELEGDE BESTAND en meet niet zelf. Dat is geen
+     luiheid maar de prijs: de activeringsmeter START DE APP (anders ziet hij de
+     kern-tas niet, en dan is de hele meting fictie), en dat hoort niet in een
+     ratel die bij elke push draait. De keerzijde staat er hardop bij: wie
+     ACTIVERING.json niet ververst, bevriest deze meter. `npm run
+     activering:vast` is wat hem bijwerkt. */
+  { sleutel: 'activeringOndergrens', richting: 'omlaag', wat: 'functies waarvan de activeringsenvelop een ondergrens is (uit ACTIVERING.json)' },
   /* DE DEUREN NAAR db.data (scripts/deuren.js).
 
      De contractlaag is de enige weg naar een andere opslag, en de afbouw die
@@ -517,6 +544,26 @@ function telSkips(bestanden, lees) {
 /* `bronnen` is er alleen voor de IJKING (test/meterijk.test.js) en is optioneel:
    zonder argument leest deze meter alles van schijf zoals altijd. Zie de uitleg
    bij `mutaties` hieronder voor waarom dat er is. */
+/* DE LEZER VAN ACTIVERING.json, met zijn pad als parameter zodat een toets hem
+   ECHT kan beproeven -- dezelfde afspraak als bij leesPrestatie(), en daar
+   stond die uitnodiging maanden ongebruikt.
+
+   Hij WERPT bij een ontbrekend of stuk bestand. Nul teruggeven zou hier "van
+   elke functie is de envelop gemeten" betekenen, en dat is het tegenovergestelde
+   van wat een ontbrekende meting zegt. */
+function leesActivering(pad) {
+  let rauw;
+  try { rauw = fs.readFileSync(pad, 'utf8'); }
+  catch (e) { throw new Error('ACTIVERING.json ontbreekt (' + e.message + '); draai npm run activering:vast'); }
+  let a;
+  try { a = JSON.parse(rauw); }
+  catch (e) { throw new Error('ACTIVERING.json is niet te lezen (' + e.message + '); draai npm run activering:vast'); }
+  if (!a || !a.perGraad || typeof a.perGraad.ondergrens !== 'number') {
+    throw new Error('ACTIVERING.json draagt geen perGraad.ondergrens; een meter zonder invoer is geen meter');
+  }
+  return a.perGraad.ondergrens;
+}
+
 function meet(bronnen) {
   /* DE KEURING GEEFT EXITCODE 1 ZODRA HIJ IETS VINDT, en dat is precies zijn
      werk. execFileSync gooit daar standaard op, dus meet() klapte om op het
@@ -716,6 +763,18 @@ function meet(bronnen) {
   try { routesNietSchakelbaar = require('./schakelbaar').meet().ongedekt.length; }
   catch (e) { throw new Error('schakelbaarheid kon niet worden gemeten (' + e.message + '); een meter zonder invoer is geen meter'); }
 
+  /* De onverklaarde randen uit dezelfde bron als het losse script en als de
+     deltapoort. Drie lezers, een teller. */
+  let verstrengelingOnverklaard = 0;
+  try { verstrengelingOnverklaard = require('./verstrengeling').meet().onbekend; }
+  catch (e) { throw new Error('de verstrengeling kon niet worden gemeten (' + e.message + '); een meter zonder invoer is geen meter'); }
+
+  /* De activeringsgraden uit het vastgelegde bestand; zie de uitleg bij de
+     meter waarom dit er niet vers wordt gemeten. Ontbreekt het bestand, dan
+     zakt de meter in plaats van stil nul te melden -- nul zou hier "alles is
+     gemeten" betekenen en dat is het tegenovergestelde van onbekend. */
+  const activeringOndergrens = leesActivering(path.join(WORTEL, 'ACTIVERING.json'));
+
   /* De deuren naar db.data uit dezelfde bron als het losse script, om dezelfde
      reden als hierboven: een tweede implementatie loopt binnen een week uiteen. */
   let deuren = null;
@@ -798,6 +857,8 @@ function meet(bronnen) {
     bewijsCellenBewezen, bewijsAchterstand,
     metersOngeijkt,
     routesNietSchakelbaar,
+    verstrengelingOnverklaard,
+    activeringOndergrens,
     bronBlindeBestanden,
     delenZonderOnderwerp,
     dbDeuren: deuren.deuren,
@@ -1133,6 +1194,6 @@ function main() {
 }
 
 if (require.main === module) process.exit(main());
-module.exports = { meet, leesNorm, METERS, schoon, traagsteTanden, heeftEinde, dagenTussen, oordeel,
+module.exports = { meet, leesNorm, METERS, schoon, traagsteTanden, heeftEinde, dagenTussen, oordeel, leesActivering,
   PRESTATIEMETERS, leesPrestatie, bron, PRESTATIEBESTAND, telOngeijkt, telInlineStijl, telSkips,
   telBewijslaag };

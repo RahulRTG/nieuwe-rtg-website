@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-01T14:08:31.277Z",
-    "commit": "51e4aa0a",
+    "op": "2026-09-02T10:49:50.129Z",
+    "commit": "7592a0a2",
     "boomVuil": true,
     "node": "v22.22.2"
   },
@@ -64,6 +64,14 @@
       "module": "server/accounts/index.js",
       "operator": "return-weg",
       "gezakt": 5
+    },
+    "activering.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/activering.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
+      "geprobeerd": 1
     },
     "activiteiten.test.js": {
       "soort": "server",
@@ -6942,6 +6950,14 @@
       "module": "scripts/lib/verraadtelling.js",
       "operator": "===->!==#0",
       "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "verstrengeling.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/verstrengeling.js",
+      "operator": "===->!==#0",
+      "gezakt": 10,
       "geprobeerd": 1
     },
     "vertaal.test.js": {

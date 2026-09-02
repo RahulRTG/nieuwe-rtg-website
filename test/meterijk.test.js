@@ -853,6 +853,46 @@ const IJKINGEN = {
      geijkt worden: de honderd ijkroutes hieronder vormen een nieuw domein zonder
      toets, en dan hoort dit getal precies een omhoog te gaan. */
   keuringDekkingAdvies: { proef: (voor) => metIjkRoutes(voor).dekkingAdvies },
+  activeringOndergrens: {
+    /* Deze meter MEET niet zelf: hij leest ACTIVERING.json, want de
+       activeringsmeter start de app en dat hoort niet in een ratel die bij elke
+       push draait. De ijkvraag is dan niet "kun je dit cijfer namaken" maar
+       SLAAT HIJ UIT ALS ZIJN INVOER VERANDERT -- en, net zo belangrijk, weigert
+       hij invoer die er niet is. Nul zou hier "van elke functie is de envelop
+       gemeten" betekenen, en dat is het tegenovergestelde van een ontbrekende
+       meting. */
+    proef: () => {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-activering-ijk-'));
+      const pad = path.join(dir, 'ACTIVERING.json');
+      try {
+        fs.writeFileSync(pad, JSON.stringify({ perGraad: { gemeten: 31, ondergrens: 166 } }));
+        assert.equal(norm.leesActivering(pad), 166, 'de meter leest wat er in het bestand staat');
+        fs.writeFileSync(pad, JSON.stringify({ perGraad: { gemeten: 31, ondergrens: 167 } }));
+        const na = norm.leesActivering(pad);
+        assert.equal(na, 167, 'en beweegt mee');
+        assert.throws(() => norm.leesActivering(path.join(dir, 'bestaat-niet.json')), /ontbreekt/,
+          'een ontbrekend bestand levert geen nul maar een fout');
+        fs.writeFileSync(pad, JSON.stringify({ envelopen: [] }));
+        assert.throws(() => norm.leesActivering(pad), /perGraad/,
+          'een bestand zonder de graden levert geen nul maar een fout');
+        return na - 166;
+      } finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} }
+    }
+  },
+  verstrengelingOnverklaard: {
+    /* Een require van het ene deel van RTG naar het andere die op geen enkele
+       afleiding past. Een tijdelijk bestand in een eigen domein dat naar een
+       tweede eigen domein wijst, is er precies een.
+
+       DE NAMEN MOGEN GEEN STAM DELEN, en dat is geen kosmetiek. De meter kent
+       `familie`: alles voor het eerste koppelteken. Met `zz-ijk-bron` en
+       `zz-ijk-doel` zouden allebei familie `zz` heten en de rand als EIGEN_DATA
+       tellen -- de meter zou niet bewegen en de ijking zou concluderen dat hij
+       niet beweegbaar is, terwijl hij precies deed wat hij hoort te doen. */
+    proef: (voor) => metTijdelijkBestand('server/kern/zzijkbron.js',
+      "const doel = require('./zzijkdoel');\nmodule.exports = () => doel;\n",
+      () => norm.meet().verstrengelingOnverklaard - voor.verstrengelingOnverklaard)
+  },
   routesNietSchakelbaar: {
     /* Een route die nergens in het schakelbord staat. Dat is precies wat deze
        meter telt, en het blijkt met een tijdelijk routebestand gewoon te

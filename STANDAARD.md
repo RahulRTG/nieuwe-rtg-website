@@ -1,7 +1,7 @@
 # De RTG-standaard
 
-Dit bestand zegt wanneer iets in dit huis **af** is. `CLAUDE.md` gaat over het
-merk, `LAT.md` over hoe code geschreven hoort te worden, en dit over de
+Dit is de **minimale** standaard: de vloer, niet de ambitie. `CLAUDE.md` gaat
+over het merk, `LAT.md` over hoe code geschreven hoort te worden, en dit over de
 eigenschappen die het platform als geheel moet dragen voordat er een laag
 bovenop mag.
 
@@ -48,10 +48,57 @@ derde stand naast gehaald en niet gehaald.
 | 7 uitvoerend | intenties worden veilig gepland en uitgevoerd |
 | 8 soeverein | blijft correct bij fouten, providers, netwerken, agenten en menselijke vergissingen |
 
-**Geen aanleiding om te herbouwen.** De standaard geldt zoals `LAT.md` geldt:
-bindend voor nieuw werk, gemeten en gerangschikt voor wat er staat, en nooit met
-terugwerkende kracht. Het bestaande werk wordt niet herschreven omdat dit
-bestand is gaan bestaan.
+---
+
+## 0b. Wat "minimaal" betekent, per tijdvak
+
+Een minimumeis die je op 2905 modules tegelijk oplegt, is op dag een onwaar --
+en dan wordt hij binnen een week uitgezet. `LAT.md` heeft dat probleem al een
+keer opgelost, en deze standaard erft die vorm letterlijk.
+
+**De toekomst -- bindend.** Nieuw werk voldoet aan de instroomeisen hieronder,
+en waar een machine kan handhaven handhaaft hij. Wie een eis toevoegt, beproeft
+hem met een mutatie voordat hij hem inlevert (`LAT.md` regel 2 geldt ook voor
+eisen).
+
+De handhaver daarvan is `scripts/deltapoort.js` en niet een goed voornemen. Die
+poort weigert het SALDEREN dat een ratel toestaat: een **nieuw** bestand staat
+op de norm, een **aangeraakt** bestand mag niet zakken. Elke poortregel dient
+een meter uit `NORM.json` en verzint niets eigens -- dus een eis die hier bindend
+heet, heeft een meter, of hij heet het niet.
+
+**Het heden -- geteld en gerangschikt.** Wat er niet aan voldoet is een eindige
+lijst met een nummer: `TAKEN.md` par. 7. Naar risico gerangschikt en niet naar
+aantal.
+
+**Het verleden -- niet herschreven.** Het bestaande werk wordt niet met
+terugwerkende kracht rechtgetrokken omdat dit bestand is gaan bestaan. De
+erfenis hoeft niet weg om iets te mogen wijzigen; hij mag alleen niet groeien.
+
+---
+
+## 0c. Welke eis een machine heeft, en welke niet
+
+Dit is de eerlijke kern van dit document. Een eis zonder handhaver is een
+voornemen, en die staan hieronder ook als zodanig.
+
+| Eis | Instroomeis voor nieuw werk | Handhaver |
+|---|---|---|
+| bewijs is herhaalbaar (par. 5) | een register meet niet uit een vuile werkboom | **machine** -- meter `registersUitVuileBoom` + deltapoortregel `bewijs-uit-vuile-boom` |
+| geen tweede gezagsschaal (par. 7) | er komt geen zesde vocabulaire bij | **machine** -- `GEZAG.json` `vocabulaires`, alleen krimpend |
+| een endpoint draagt een toets (par. 2) | een nieuw endpoint komt in een toets voor | **machine** -- meter `endpointsZonderTest` + deltapoortregel |
+| geen runtime-afhankelijkheid erbij (par. 6) | `dependencies` blijft nul | **machine** -- meter `dependencies` + deltapoortregel `nieuw-pakket` |
+| elke meter is geijkt | een nieuwe meter slaat uit op bekend-foute invoer | **machine** -- keuringsregel 35 + `metersOngeijkt` |
+| geld schrijft via de poort (par. 3) | -- | **geen handhaver.** Kan er pas komen als `TAKEN.md` 7.1 staat: vandaag schrijft `pasToe()` zelf, dus de regel zou op de eerste dag rood zijn op de bron die hij moet beschermen |
+| een ontleder van buitenbytes draagt een budget (par. 6) | -- | **geen handhaver.** Vraagt `FUZZ.json`, dat niet bestaat -- `TAKEN.md` 7.2 |
+| een scherm draagt de foutmelder (par. 4.1) | -- | **geen handhaver.** Vraagt `TAKEN.md` 7.9 |
+| een route draagt een invoercontract (par. 2) | -- | **geen handhaver.** Vraagt `TAKEN.md` 7.6 |
+| autorisatie is toewijsbaar (par. 8) | -- | **half.** Keuringsregel 28 ziet 341 routes niet -- `TAKEN.md` 7.14 |
+
+Vijf machines, vijf voornemens, en bij elk voornemen staat wat hem in de weg
+staat. Die verhouding hoort te verschuiven; zij is zelf de voortgangsmaat van
+dit document. Wat er NIET hoort te gebeuren is dat een voornemen stilzwijgend
+als eis wordt gelezen omdat hij in dezelfde tabel staat.
 
 ---
 
@@ -220,8 +267,21 @@ opgeslagen. De versheidscontrole draait wekelijks met `|| true`. En de
 routeregisters zijn gemeten op sqlite terwijl productie op Postgres hoort te
 draaien -- een andere transactiesemantiek, dus een andere werkelijkheid.
 
-**Wat eruit volgt.** Een register draagt zijn paspoort, en een claim die op een
-andere motor is gemeten dan er draait komt niet als `bewezen` door.
+**Wat er sinds 2 september 2026 wel wordt afgedwongen, en het is met opzet de
+SMALLE helft.** De meter `registersUitVuileBoom` telt de registers waarvan de
+meting uit een vuile werkboom komt (bij het aanzetten: 18 van de 25), hij ratelt
+alleen omlaag, en de deltapoortregel `bewijs-uit-vuile-boom` weigert een nieuw
+register dat zo gemeten is en een bestaand register dat van schoon naar vuil
+gaat. De telling woont in `scripts/lib/paspoort.js`, zodat de poort met dezelfde
+functie telt als de meter die hij dient.
+
+Smal, omdat de andere helft -- "op wat voor MACHINE is dit gemeten" -- niet voor
+elk register geldt: een latentie hangt van de machine af, een telling van routes
+uit de bron niet. Een regel die van alle 25 een vingerafdruk zou eisen, heeft
+vanaf dag een valse gevallen, en keuringsregel 50 legt uit wat dat kost.
+
+**Wat er nog niet is.** De motorpariteit: een claim die op sqlite is gemeten
+terwijl productie Postgres draait, komt vandaag nog gewoon als bewijs door.
 `TAKEN.md` 7.3, 7.4.
 
 **De grens.** `vervallen bewijs is geen bewijs` (`BESTUUR.md`), en

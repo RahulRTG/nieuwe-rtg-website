@@ -1133,6 +1133,18 @@ const IJKINGEN = {
     proef: (voor) => metTijdelijkBestand('zz-ijk-tijdelijk.json',
       '{ "uitleg": "verzonnen meting zonder ratel, alleen tijdens de ijking" }\n',
       () => norm.meet().metingenZonderRatel - voor.metingenZonderRatel)
+  },
+  /* HET BEWIJSPASPOORT (STANDAARD.md par. 5). Dezelfde tijdelijke naam als de
+     meter hierboven, want hij staat al in de opruimcontrole -- alleen met een
+     stempel erin die zegt dat de meting uit een vuile boom komt.
+
+     Dat die twee meters allebei op DIT bestand uitslaan is geen probleem maar
+     een eigenschap: elke proef leest alleen zijn eigen sleutel, en ze draaien
+     na elkaar met een eigen opruiming. */
+  registersUitVuileBoom: {
+    proef: (voor) => metTijdelijkBestand('zz-ijk-tijdelijk.json',
+      '{ "stempel": { "commit": "0000000", "boomVuil": true } }\n',
+      () => norm.meet().registersUitVuileBoom - voor.registersUitVuileBoom)
   }
 };
 

@@ -35,6 +35,7 @@ const fs = require('fs');
 const path = require('path');
 const { execFileSync, spawnSync } = require('child_process');
 const { zonderCommentaar } = require('./lib/bron');
+const { vuileRegisters } = require('./lib/paspoort');
 
 const WORTEL = path.join(__dirname, '..');
 const NORMBESTAND = path.join(WORTEL, 'NORM.json');
@@ -285,7 +286,21 @@ const METERS = [
   { sleutel: 'ratelTanden', richting: 'omhoog', wat: 'meters die aan een ratel hangen (de ratel mag niet krimpen)' },
   { sleutel: 'bronBlindeBestanden', richting: 'omlaag', wat: '.js-bestanden waar de commentaar-verwijderaar code kwijtraakt of niet gelezen kan worden' },
   { sleutel: 'delenZonderOnderwerp', richting: 'omlaag', wat: 'bundeldelen zonder onderwerpregel bovenin (zie BUNDELS.md)' },
-  { sleutel: 'metingenZonderRatel', richting: 'omlaag', wat: 'meetbestanden in de wortel die aan geen enkele ratel hangen' }
+  { sleutel: 'metingenZonderRatel', richting: 'omlaag', wat: 'meetbestanden in de wortel die aan geen enkele ratel hangen' },
+  /* DE METER DIE OVER HET BEWIJS ZELF GAAT (STANDAARD.md par. 5).
+
+     Alles hierboven meet de code of de ratel. Deze meet of de UITSLAGEN
+     herhaalbaar zijn. Een register dat zijn meting uit een vuile boom haalt, is
+     niet te reproduceren -- niet moeilijk, maar principieel niet: er bestaat
+     geen commit om naar terug te keren. De uitslag mag bestaan; bewijs is hij
+     niet.
+
+     Hij stond bij het toevoegen op 18 van de 25 registers met een stempel,
+     waaronder VERTROUWEN.json -- waarop de bewijspoort van kern/stuur/beleid.js
+     zijn oordeel baseert. Alleen omlaag, en nul is haalbaar: het kost een
+     meetronde vanaf een schone boom. De telling staat in scripts/lib/paspoort.js
+     zodat de deltapoort met dezelfde functie telt als deze meter. */
+  { sleutel: 'registersUitVuileBoom', richting: 'omlaag', wat: 'registers waarvan de meting uit een vuile werkboom komt (dus niet te herhalen)' }
 ];
 
 /* De telling zelf, als losse functie met de bestandslijst als invoer -- zodat
@@ -816,7 +831,10 @@ function meet(bronnen) {
     dependencies: deps, devPakketten, testbestanden, zelfpoortendeToetsen, browserpoortToetsen, e2eBestanden,
     schermenZonderVormtaal,
     inlineStijlAttributen,
-    ratelTanden, metingenZonderRatel
+    ratelTanden, metingenZonderRatel,
+    /* Het bewijspaspoort. De wortel is de invoer en niet een vaste lijst: een
+       register dat er morgen bijkomt, telt vanzelf mee. */
+    registersUitVuileBoom: vuileRegisters(WORTEL).length
   };
 }
 

@@ -29,7 +29,7 @@
     "toetsenOngevoeligPct": 1,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
-    "ratelTanden": 51,
+    "ratelTanden": 52,
     "metingenZonderRatel": 33,
     "ladderRaak": 0,
     "ladderNietGeprobeerd": 1,
@@ -45,7 +45,8 @@
     "bewijsAchterstand": 2605,
     "schermenZonderVormtaal": 181,
     "dbDeuren": 507,
-    "dbDeurenSchrijvend": 269
+    "dbDeurenSchrijvend": 269,
+    "registersUitVuileBoom": 18
   },
   "notities": [
     {

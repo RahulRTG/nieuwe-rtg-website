@@ -41,7 +41,7 @@ van 2 september 2026:
 | 3. Safety | `server/kern/beschermzaak/` (de eigen dataklasse, sinds 2 sep 2026), `server/kern/veiligheid/` (de persoonlijke laag: dodemansknop, stil codewoord, kring — zie par. 7.2), `kern/rtfos/meldcode.js`, `kern/zorgniveau.js` | **staat** |
 | 4. Recovery | `casus.SOORTEN` dekt huisvesting, schulden, werk, zorgdoorverwijzing, noodhulp; `kern/opvang.js` doet de asielketen; `kern/rtfos/voorraad*.js` de goederen | **staat als registratie, niet als traject** |
 | 5. Development | `kern/levensgraaf/` (18+ bronnen, vijf etiketten per knoop), `kern/levenslijn/fasen.js` (fasen zonder voortgangsbalk), `kern/doelen.js` | **staat als graaf, mist de motor** |
-| 6. Opportunity | vacatures, opleidingen, kinderopvang en woningen bestaan als losse domeinen; er is geen keten die ze aan elkaar rijgt | **een besluit** |
+| 6. Opportunity | `kern/stadsweefsel/kansen.js` rijgt vacature -> beroep -> leerpad -> wijk al aaneen, maar over de STAD; `kern/knelpunt/openingen.js` doet het per randvoorwaarde voor de mens | **staat als kaart; drie van de vijf terreinen hebben geen ingang** |
 | 7. Federation | `kern/rtfos/netwerk.js` (blauwdrukken tussen steden), `kern/rtfos/steden.js`, `kern/envelop.js` (acht velden per bericht, ketenverwijzing) | **staat federatief, mist het protocol naar buiten** |
 | 8. Society Intelligence | `kern/livinglab/` — 21 modules met `graden.js` als causale rem, `bewijs.js`, `ethiek.js`, `cyclus.js`; `kern/rtfos/rapport.js` telt zonder te lezen | **staat als onderzoekscyclus, mist de populatiekant** |
 
@@ -181,11 +181,21 @@ en dat `kern/agent.js` op weekdagfactoren roostert — een heuristiek. Dit is du
 het eerlijkste nieuwe stuk software in het hele voorstel. **Een besluit** (zie
 5.5 voor de grens eromheen).
 
-### Laag 6 — Opportunity · **een besluit**
+### Laag 6 — Opportunity · **de keten staat, de ingang is het besluit**
 De opportunity chain (opleiding → kinderopvang → vervoer → stage → werkgever) is
 de eerste plek waar deze laag geld en instanties van derden raakt. `COMMERCE.md`
 par. 3 en `APPSTORE.md` grens 5 gelden hier onverkort: alles wat een derde raakt
 is maximaal klaarzetten.
+
+**Correctie van 2 september 2026.** Hier stond eerst: *"er is geen keten die ze
+aan elkaar rijgt."* Dat was fout. `kern/stadsweefsel/kansen.js` rijgt vacature →
+beroep → gratis leerpad → wijk aan elkaar, en doet dat zorgvuldig. De keten loopt
+alleen over de STAD en niet over de mens — met zoveel woorden: *"hier komen
+bedrijven en beroepen langs, geen werkzoekenden."* Zie par. 7.10 voor de volledige
+meting per terrein en voor het onderscheid dat er werkelijk toe doet: `geen-bron`
+(er is niets) tegenover `geen-ingang` (het bestaat, maar alleen de aanbieder kan
+erbij — kinderopvang en wonen zijn allebei van die tweede soort). Wat een besluit
+vraagt is dus niet een register maar een ingang.
 
 ### Laag 7 — Federation · **staat lokaal, mist het protocol**
 Blauwdrukken tussen steden werken al, inclusief de regel dat een overgenomen
@@ -380,6 +390,7 @@ veilige slaapplek heeft.
 | 6 | **Consent: doel en termijn per venster** | het scherm bestond al; zie par. 7.6 | **staat** (2 sep 2026) |
 | 7 | **De Advocate als lezer** op `levensgraaf/termijnen.js` | alle waarde van punt 10 zonder de onbewezen helft (5.6) | **staat** (2 sep 2026) |
 | 8 | **De knelpuntmotor** — meerdere wegen, aannames in de uitslag, `onbepaald` waar niets is nagegaan | het eerlijke nieuwe stuk software; `EXECUTIE.md` noemde de leemte al | **eerste laag staat** (2 sep 2026), zie par. 7.9 |
+| 6b | **De openingen** -- per knelpunt wat er in dit huis bestaat dat hem zou opheffen, met drie standen die nooit door elkaar lopen | laag 6 bleek te bestaan; wat ontbrak was de kant van de mens, zie par. 7.10 | **staat** (2 sep 2026) |
 | 9 | **Human Services Protocol**: schemaregister op `kern/envelop.js` | pas zinvol als er iets is om te delen dat de moeite waard is | maanden |
 | 10 | **Society Intelligence** op `livinglab/graden.js` | pas na 6 — een populatiemodel zonder consent-graaf is een dataverzameling met een grafiek erop | jaren |
 
@@ -464,6 +475,81 @@ niet "staat": de motor rekent met randvoorwaarden die een mens zelf opgeeft. De
 stap daarna — die randvoorwaarden AFLEIDEN uit wat er al bekend is (de
 levensgraaf, de opportunity-keten van laag 6) — vraagt gegevens die er nog niet
 zijn. Die stap is dus geen bouwwerk maar wachten op laag 6.
+
+### 7.10 Regel 6: laag 6 bestond al, en de meting was strenger dan de tabel
+
+**Par. 4 laag 6 stond er fout, en dat is de vijfde meetfout van deze reeks.**
+Daar staat: *"vacatures, opleidingen, kinderopvang en woningen bestaan als losse
+domeinen; er is geen keten die ze aan elkaar rijgt."* De eerste helft klopt, de
+tweede niet. `server/kern/stadsweefsel/kansen.js` rijgt ze wél aan elkaar —
+vacature → beroep → gratis leerpad → wijk — en doet dat met dependency injection
+(`bronnenKoppel`), bewust domme woordvergelijking en een eerlijkheidsmelding als
+een bron ontbreekt. Het bestand zegt in zijn eigen kop wat ik hier bijna opnieuw
+had gebouwd: *"het BOUWT MET OPZET GEEN NIEUWE REGISTERS voor dingen die al
+bestaan."*
+
+Wat wél ontbreekt is iets anders dan een register: **de keten loopt over de stad
+en niet over de mens.** `kansen.js` telt waar het werk is per wijk en zegt er
+expliciet bij: *"hier komen bedrijven en beroepen langs, geen werkzoekenden."*
+Dat is een goede grens, geen gat — maar het betekent dat de vraag van Sarah
+("wat heft mijn knelpunt op?") nergens beantwoord werd.
+
+**En de meting leverde niet twee uitkomsten op maar drie.** Dat is de eigenlijke
+opbrengst van deze regel:
+
+| terrein | wat er is | stand |
+|---|---|---|
+| werk | `db.data.vacatures` via `kern/werk.js`, ook open voor een gezin zonder pas (`/api/rtf/vacatures`) | **bron** |
+| opleiding | de Beroepen-Bibliotheek: 200 beroepen met een gratis leerpad | **bron** (leerstof, geen inschrijving) |
+| opvang | `kern/verzorging/opvang.js`: groepen met een capaciteit, een nanny-dienst | **geen ingang** |
+| vervoer | niets | **geen bron** |
+| wonen | het aanbod van een makelaarspartner, koop en huur | **geen ingang** |
+
+`geen-ingang` en `geen-bron` mogen nooit door elkaar lopen, en dat is de hele
+reden dat `server/kern/knelpunt/openingen.js` bestaat. Kinderopvang bestáát in
+dit huis — met groepen, capaciteit en gescreende nannies — en élke route
+ernaartoe is een partnerroute. Een ouder kan er niet bij. Wie die twee samenvat
+tot "geen aanbod gevonden", vertelt een moeder dat er geen kinderopvang is
+terwijl er een register vol groepen staat waar zij niet bij mag. Dat is geen
+ontbrekende functie maar **een besluit dat nog niemand genomen heeft**, en het
+hoort dus anders te klinken dan een leegte.
+
+Het huis had die regel trouwens zelf al opgeschreven, vóór ik hem nodig had.
+`kern/levenslijn/fasen.js` noemt `opvang` een fase zonder bron: *"er is geen
+opvang-inschrijving (...) Komt er ooit een echte bron (een inschrijving die de
+mens zelf deed), dan hangt hij aan deze fase en niet aan een leeftijd."*
+
+Wonen is de tweede van die soort, en daar is de formulering scherper omdat de
+verwarring duurder is: er is commercieel makelaarsaanbod, en **sociale huur, een
+woningcorporatie, een urgentieverklaring en een wachtlijst voor een woning komen
+in deze code niet voor** — nul treffers. Wie "wonen: bron" op een scherm zet,
+belooft een dakloze iets wat dit huis niet heeft.
+
+**Wat de laag met opzet niet doet.** Er zit geen enkele geschiktheidstoets in —
+geen leeftijd, geen inkomen, geen postcode. Dat is par. 5.5 en `FOUNDATION.md`
+par. 5.3 in code: een eligibility-motor mag alleen tóevoegen, dus hier komt nooit
+uit dat iets niets voor u is. Hij handelt ook niet: er wordt niets aangevraagd,
+geboekt of gereserveerd (`COMMERCE.md` par. 3, `APPSTORE.md` grens 5 — alles wat
+een derde raakt is maximaal klaarzetten), en bij elke bruikbare ingang staat die
+zin er letterlijk bij. En er komt geen aantal vrije plekken of wachttijd uit:
+geen van deze bronnen levert die per opening, dus staat er `null`, en `null`
+leest als *niet nagegaan*.
+
+**Gemeten, niet beweerd.** Tegen een draaiende server op het voorbeeld van Sarah:
+voltijd en deeltijd geblokkeerd, avond open, knelpunten `opvang ×2` en
+`inkomen ×1`, en daaronder `opvang → geen-ingang` naast
+`inkomen → werk → /api/rtf/vacatures`. Drie identieke oproepen gaven
+byte-voor-byte identieke antwoorden en lieten `rtg.db` en `store.db` ongewijzigd.
+Acht toetsen, zes mutaties, alle zes raak op de bedoelde bewering — waaronder één
+die de kaart naar een niet-bestaande route liet wijzen, want een kaart die een
+mens ergens heen stuurt waar niets is, is erger dan een lege kaart.
+
+**Wat er nog niet is.** De knelpuntmotor leidt zijn randvoorwaarden nog steeds
+niet af; par. 7.9 wachtte daarvoor op laag 6, en laag 6 blijkt de afleiding niet
+te kunnen leveren omdat drie van de vijf terreinen geen ingang voor de mens
+hebben. Dat is geen bouwopdracht maar het besluit dat par. 4 laag 6 altijd al
+was — alleen staat er nu bij welk besluit het precies is, en voor wie het
+uitmaakt.
 
 ### 7.8 De weg terug, en waarom hij in de route staat
 

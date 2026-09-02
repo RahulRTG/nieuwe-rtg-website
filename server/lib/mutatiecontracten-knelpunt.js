@@ -22,14 +22,17 @@ const CONTRACTEN = {
     semantiek: { klasse: 'idempotent' },
     toegang: { klasse: 'AUTHENTICATED' },
     stand: 'NOT_APPLICABLE',
-    nagekeken: 'Claude, 2026-09-02: de handler roept kern/knelpunt/index.js aan en geeft ' +
-      'het antwoord door. Die module raakt geen opslag aan -- hij krijgt alles als argument, heeft ' +
-      'geen db, geen save() en geen ctx, en is om die reden ook zonder database te toetsen (zelfde ' +
-      'vorm als kern/livinglab/graden.js). De route zelf schrijft evenmin.',
+    nagekeken: 'Claude, 2026-09-02: de handler roept kern/knelpunt/index.js aan en daarna, alleen ' +
+      'bij een geslaagde berekening, kern/knelpunt/openingen.js. Geen van beide raakt opslag aan -- ' +
+      'ze krijgen alles als argument, hebben geen db, geen save() en geen ctx, en zijn om die reden ' +
+      'ook zonder database te toetsen (zelfde vorm als kern/livinglab/graden.js). De openingenlaag ' +
+      'LEEST bovendien niets uit de database: haar kaart is een vaste meetuitslag in ' +
+      'kern/knelpunt/openingen-kaart.js. De route zelf schrijft evenmin.',
     bewijs: {
-      gemeten: 'dubbeltik-ronde tegen een draaiende server: twee identieke oproepen gaven een ' +
-        'byte-voor-byte identiek antwoord, en het opslagbestand veranderde niet van grootte na een ' +
-        'derde oproep. Zonder inlog antwoordt de route 401.',
+      gemeten: 'ronde tegen een draaiende server (2 sep 2026, na het toevoegen van de ' +
+        'openingenlaag): drie identieke oproepen gaven byte-voor-byte identieke antwoorden, en de ' +
+        'som over server/data/rtg.db en store.db was voor en na die drie oproepen gelijk -- dus niet ' +
+        'alleen even groot maar ongewijzigd. Zonder inlog antwoordt de route 401.',
       op: OP
     },
     afgetekend: AFGETEKEND

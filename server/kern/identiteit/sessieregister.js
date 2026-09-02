@@ -34,7 +34,6 @@
 'use strict';
 
 const ctx = require('./sessiecontext');
-const { standVan } = require('./vertrouwen');
 const klok = require('../../lib/klok');
 
 /* Een sessie zonder gebruik verdwijnt hier eerder dan het token zelf verloopt.
@@ -124,41 +123,11 @@ function maakSessieregister({ db, save }) {
     return true;
   }
 
-  /* De sessies van een lid, met per sessie de STAND per veld -- niet een cijfer.
-     Dit is wat een sessielijst hoort te lezen: elk veld met zijn graad, zodat
-     een scherm "toestelbinding: bewezen" naast "vertrouwen: vermoed, 3 uur oud"
-     kan zetten in plaats van alles even zeker te laten lijken. */
-  function vanLid(lidKey, nu = klok.nu()) {
-    const uit = [];
-    for (const [sid, rij] of Object.entries(bak())) {
-      if (!lidKey || rij.lidKey !== lidKey) continue;
-      if (nu - new Date(rij.gezienOp || 0).getTime() > REGISTER_TTL_MS) continue;
-      /* De SOORT naast de STAND. Zonder dit moet een scherm de soort raden uit de
-         graad ("bewezen dus een passkey"), en dat is precies zo lang waar tot er
-         een derde manier van inloggen bij komt. De soort is geen persoonsgegeven
-         en geen bewijs -- hij zegt WAT het was, de graad zegt hoe zeker. */
-      const st = ctx.stand(rij.context, nu);
-      uit.push({ sid, geopendOp: rij.geopendOp, gezienOp: rij.gezienOp,
-        soort: (rij.context.authenticator && rij.context.authenticator.type) || null,
-        /* De toestelId reist mee, de toestelNAAM niet: die woont in het
-           toestelregister en wordt door de route erbij gezocht. Zou hij hier
-           staan, dan had de sessie hem moeten dragen -- en dat is precies wat
-           de verbodenlijst tegenhoudt. */
-        toestelId: (rij.context.toestel && rij.context.toestel.toestelId) || null,
-        /* Dezelfde knip als bij het toestel: de CODE reist mee, de naam niet.
-           De naam van een zaak wordt door de route opgezocht bij de bron die
-           hem bezit; een sessie draagt geen namen. */
-        contextSoort: (rij.context.context && rij.context.context.contextSoort) || null,
-        contextId: (rij.context.context && rij.context.context.contextId) || null,
-        stand: st,
-        /* DE VERTROUWENSSTAND WORDT HIER BEREKEND EN NERGENS BEWAARD. Hij leest
-           de stand-per-veld die er net boven uit komt, dus hij kan nooit iets
-           zien wat het scherm niet ziet -- en hij kan niet verouderen, want hij
-           bestaat alleen op het moment dat iemand hem vraagt. */
-        vertrouwen: standVan(st, (rij.context.authenticator && rij.context.authenticator.type) || null) });
-    }
-    return uit.sort((a, b) => new Date(b.gezienOp) - new Date(a.gezienOp));
-  }
+  /* De lijst die een lid van zijn eigen sessies ziet, woont in
+     ./sessielijst.js -- een projectie is geen opslag, en dit bestand bezit de
+     collectie. Hij krijgt `bak` als functie en niet als object, zodat hij
+     altijd de huidige stand leest. */
+  const { vanLid } = require('./sessielijst').maakSessielijst({ bak, ttlMs: REGISTER_TTL_MS });
 
   /* Vangnet per lid. Zonder grens groeit het register door met elke inlog op
      elk toestel; met een grens verdwijnt de OUDSTE en nooit de zojuist geopende. */

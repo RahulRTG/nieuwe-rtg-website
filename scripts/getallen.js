@@ -78,6 +78,8 @@ const GETALLEN = {
     wat: 'functies waarvan de envelop volledig gemeten is' },
   'activering.ondergrens': { bron: 'ACTIVERING.json', veld: 'perGraad.ondergrens',
     wat: 'functies waarvan de envelop een ondergrens is' },
+  'activering.onbepaald': { bron: 'ACTIVERING.json', veld: 'onbepaald',
+    wat: 'functies waarvan de envelop onbepaald is: bronnen spreken elkaar tegen' },
   'activering.mediaan': { bron: 'ACTIVERING.json', veld: 'mediaanKnopen',
     wat: 'knopen die een doorsnee functie raakt' },
   'trede.routes': { bron: 'TREDEPROEF.json', veld: 'routes',

@@ -258,6 +258,9 @@ function lees() {
   for (const d of DOELEN) { const m = bijdragen.get(d); if (m && m.size > grootste) { grootste = m.size; tas = d; } }
   const kernBron = {};
   const kernBronViaTekst = [];
+  const kernBronViaMethoden = [];
+  const samengesteld = {};
+  const kernOnbekend = {};
   if (tas) for (const [k, v] of bijdragen.get(tas)) kernBron[k] = v;
   /* EN DE SLEUTELS DIE ER RECHTSTREEKS IN GEZET ZIJN. Niet alles komt via
      Object.assign binnen: `kern.vakwerk = require(...)(...)` zet een sleutel
@@ -334,11 +337,67 @@ function lees() {
       for (const [rel, bron] of index) { if (bron.includes(tekst)) { treffers.push(rel); if (treffers.length > 1) break; } }
       if (treffers.length === 1) { kernBron[k] = treffers[0]; kernBronViaTekst.push(k); }
     }
+
+    /* EN EEN OBJECT DAT ZIJN METHODEN VAN EEN MODULE HEEFT. Veel sleutels zijn
+       een samengesteld object dat in een opzet-bestand is gebouwd; het object
+       zelf draagt geen merk, maar zijn FUNCTIEWAARDEN wel -- die kwamen wel
+       degelijk uit een require. Wijzen ze allemaal naar hetzelfde bestand, dan
+       is dat het bestand. Wijzen ze naar meer, dan is het samengesteld en zeggen
+       we dat (die sleutel wordt hieronder ONBEPAALD).
+
+       Dit is opnieuw een AFLEIDING met een uniciteitseis en geen gok. */
+    for (const k of Object.keys(tas)) {
+      if (kernBron[k]) continue;
+      let v; try { v = tas[k]; } catch (e) { continue; }
+      if (!v || typeof v !== 'object') continue;
+      const bronnen = new Set();
+      for (const mk of Object.keys(v)) {
+        let mv; try { mv = v[mk]; } catch (e) { continue; }
+        if (typeof mv === 'function') { const b = BRON_FN.get(mv); if (b) bronnen.add(b); }
+      }
+      if (bronnen.size === 1) { kernBron[k] = [...bronnen][0]; kernBronViaMethoden.push(k); }
+      else if (bronnen.size > 1) samengesteld[k] = [...bronnen].slice(0, 6);
+    }
+
+    /* WAT ER DAARNA OVERBLIJFT, MET DE REDEN WAAROM. Een sleutel zonder bron is
+       geen restpost maar een uitkomst, en er zijn drie soorten:
+
+         WAARDE      een constante, een string, een getal, een lijst. Daar IS geen
+                     module om naar te wijzen -- PERSONAS en PAS_FOUT zijn
+                     gegevens, geen domein. Preciezer af te leiden wordt dit
+                     nooit; dat is geen tekort van de meter.
+         ONVINDBAAR  een functie of object waarvan de herkomst met de huidige
+                     bronnen niet vast te stellen is (te korte brontekst, of geen
+                     enkele treffer). Hier zou NIEUWE broninformatie helpen.
+         SAMENGESTELD  meerdere bronnen spreken elkaar tegen. Dat is ONBEPAALD en
+                     wordt met opzet niet tot een van de twee gerekend. */
+    for (const k of Object.keys(tas)) {
+      if (kernBron[k]) continue;
+      let v; try { v = tas[k]; } catch (e) { kernOnbekend[k] = { soort: 'ONVINDBAAR', reden: 'de waarde is niet te lezen' }; continue; }
+      if (samengesteld[k]) { kernOnbekend[k] = { soort: 'SAMENGESTELD', reden: 'de methoden komen uit meer dan een bestand', bronnen: samengesteld[k] }; continue; }
+      const t = typeof v;
+      if (v === null || v === undefined || t === 'string' || t === 'number' || t === 'boolean' || t === 'bigint' || t === 'symbol') {
+        kernOnbekend[k] = { soort: 'WAARDE', reden: 'een ' + (v === null ? 'null' : t) + ': gegevens, geen module' };
+      } else if (Array.isArray(v)) {
+        kernOnbekend[k] = { soort: 'WAARDE', reden: 'een lijst met gegevens, geen module' };
+      } else if (t === 'function') {
+        let tekst = ''; try { tekst = Function.prototype.toString.call(v); } catch (e) {}
+        kernOnbekend[k] = { soort: 'ONVINDBAAR',
+          reden: tekst.length < 120 ? 'een functie met te weinig brontekst om terug te zoeken (' + tekst.length + ' tekens)'
+            : 'een functie waarvan de brontekst nergens letterlijk terugkomt (waarschijnlijk gebonden of samengesteld)' };
+      } else if (v instanceof Map || v instanceof Set) {
+        kernOnbekend[k] = { soort: 'WAARDE', reden: 'een ' + (v instanceof Map ? 'Map' : 'Set') + ': gedeelde staat, geen module' };
+      } else {
+        kernOnbekend[k] = { soort: 'ONVINDBAAR', reden: 'een object zonder functiewaarden die naar een bestand wijzen' };
+      }
+    }
   }
 
   return { routes, lagen: lagen.length, zonderEigenaar: routes.filter(r => !r.bestand).length,
     wikkels: WIKKELS, kernBron, kernSleutels: Object.keys(kernBron).length,
     kernSleutelsViaTekst: kernBronViaTekst.length,
+    kernSleutelsViaMethoden: kernBronViaMethoden.length,
+    kernOnbekend,
     kernTasGevonden: !!tas };
 }
 

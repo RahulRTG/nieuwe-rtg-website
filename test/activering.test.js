@@ -132,6 +132,107 @@ test('8. de onverklaarde randen van stap 1 komen mee de envelop in', () => {
   assert.deepEqual(r.envelopen[0].onverklaardeRanden, ['domein:mall -> domein:ervaring']);
 });
 
+test('8b. de zeven constructies waarlangs een sleutel te herleiden is', () => {
+  /* De 79 ondergrenzen kwamen niet uit 79 gevallen maar uit een handvol
+     CONSTRUCTIES. Deze toets pint ze vast, want zonder toets zakt zo'n
+     afleiding stil weg bij de eerste herschrijving -- en dan stijgt het getal
+     zonder dat iemand weet waarom. */
+  const bestanden = {
+    'p-require.js': "module.exports = (kern) => { const horeca = require('../../kern/horeca')(kern); require('./kind')({ horeca }); };",
+    'p-uitpak.js': "const { eigenVeld } = require('./kern/util');\nmodule.exports = (k) => { require('./kind')({ eigenVeld }); };",
+    'p-var.js': "const ctx = require('./foundation/basis')();\nconst { db, eigenVeld } = ctx;\nmodule.exports = () => {};",
+    'p-lokaal.js': "module.exports = (kern) => { const getal = (v) => Number(v); require('./kind')({ getal }); };",
+    'p-leeg.js': "module.exports = (kern) => { require('./kind')({}); };",
+    'zuster.js': 'module.exports = (ctx) => { ctx.horecaBord = maakBord(); };'
+  };
+  const lees = f => bestanden[f] || '';
+  const kind = 'kind.js';
+  const maak = (ouder, kinders = []) => ({
+    ouders: new Map([[kind, new Set([ouder])]]),
+    kinderen: new Map([[ouder, new Set([kind, ...kinders])]])
+  });
+
+  const req = A.herleidSleutel({ sleutel: 'horeca', bestand: kind, leesBestand: lees, ...maak('p-require.js') });
+  assert.equal(req.hoe, 'ouder-require');
+  assert.match(req.pad, /kern\/horeca/, 'en hij noemt het bestand waar de sleutel vandaan komt');
+
+  assert.equal(A.herleidSleutel({ sleutel: 'eigenVeld', bestand: kind, leesBestand: lees, ...maak('p-uitpak.js') }).hoe,
+    'ouder-require', 'ook de gedestructureerde vorm');
+  assert.equal(A.herleidSleutel({ sleutel: 'eigenVeld', bestand: kind, leesBestand: lees, ...maak('p-var.js') }).hoe,
+    'ouder-require-via-variabele', 'en de vorm in twee stappen');
+  assert.equal(A.herleidSleutel({ sleutel: 'getal', bestand: kind, leesBestand: lees, ...maak('p-lokaal.js') }).hoe,
+    'ouder-lokaal', 'een sleutel die de ouder ter plekke bouwt draagt geen externe afhankelijkheid');
+  assert.equal(A.herleidSleutel({ sleutel: 'horecaBord', bestand: kind, leesBestand: lees, ...maak('p-leeg.js', ['zuster.js']) }).hoe,
+    'zuster-toewijzing', 'een zuster die in de gedeelde context schrijft');
+
+  /* EN DE GRENS: wat nergens langs een van de constructies te vinden is, komt
+     als null terug en wordt NIET geraden. */
+  assert.equal(A.herleidSleutel({ sleutel: 'onvindbaar', bestand: kind, leesBestand: lees, ...maak('p-leeg.js') }), null);
+});
+
+test('8c. de zusterzoektocht blijft binnen dezelfde ouder', () => {
+  /* Een kale zoektocht naar `.getal =` over de hele boom vond
+     server/betaal/synthetisch.js -- een bestand dat niets met charters te maken
+     heeft. Een gedeelde context bestaat alleen tussen bestanden van dezelfde
+     ouder, dus daar wordt gezocht en nergens anders. */
+  const lees = f => f === 'vreemde.js' ? 'x.getal = 1;' : 'module.exports = () => {};';
+  const uit = A.herleidSleutel({
+    sleutel: 'getal', bestand: 'kind.js', leesBestand: lees,
+    ouders: new Map([['kind.js', new Set(['ouder.js'])]]),
+    kinderen: new Map([['ouder.js', new Set(['kind.js'])]])   // vreemde.js is GEEN zuster
+  });
+  assert.equal(uit, null, 'een bestand buiten de ouder telt niet mee als bron');
+});
+
+test('8d. een lokaal gebouwde sleutel sleept zijn ouder NIET de envelop in', () => {
+  /* De duurste fout van deze ronde: de eerste versie voegde bij `ouder-lokaal`
+     het OUDERBESTAND toe, en een ouder requiret al zijn deelbestanden. De
+     envelop van `member` sprong daarmee van 43% naar 97% van het huis. Een
+     sleutel die de ouder ter plekke bouwt, draagt geen enkele afhankelijkheid. */
+  const bestanden = {
+    'server/routes/kind.js': 'module.exports = (ctx) => { const { getal } = ctx; };',
+    'server/routes/ouder.js': "module.exports = (kern) => { const getal = (v) => Number(v); require('./kind')({ getal }); };"
+  };
+  const r = A.envelopen({
+    routes: [{ methode: 'POST', pad: '/api/x', bestand: 'server/routes/kind.js' }],
+    /* De ouder hangt aan het halve huis; dat mag niet meekomen. */
+    graaf: new Map([['server/routes/ouder.js', new Set(['server/kern/alles/index.js', 'server/kern/nogmeer/index.js'])]]),
+    functieVoorPad: () => ({ id: 'f', naam: 'F' }),
+    kernBron: {}, leesBestand: b => bestanden[b] || '',
+    ouders: new Map([['server/routes/kind.js', new Set(['server/routes/ouder.js'])]]),
+    kinderen: new Map([['server/routes/ouder.js', new Set(['server/routes/kind.js'])]])
+  }).envelopen[0];
+  assert.deepEqual(r.leveranciers, [], 'een lokaal gebouwde sleutel levert geen enkele leverancier');
+  assert.equal(r.graad, 'gemeten', 'en hij maakt de envelop ook niet onzeker');
+  assert.deepEqual(r.domeinen, [], 'het huis achter de ouder hoort er niet in');
+});
+
+test('8e. tegenstrijdige bronnen heten ONBEPAALD en geen ondergrens', () => {
+  /* De twee soorten onzekerheid mogen niet door elkaar lopen. "Er hangt meer aan
+     dan we zien" vraagt nieuwe broninformatie; "de bronnen spreken elkaar tegen"
+     vraagt een besluit. Op een hoop kun je preciezer worden door onzekerheid van
+     de ene naar de andere emmer te schuiven. */
+  const bron = 'module.exports = (kern) => { const { raar } = kern; };';
+  const maak = soort => A.envelopen({
+    routes: [{ methode: 'POST', pad: '/api/x', bestand: 'server/routes/x.js' }],
+    graaf: new Map(), functieVoorPad: () => ({ id: 'f', naam: 'F' }),
+    kernBron: {}, kernOnbekend: { raar: { soort, reden: 'omdat het zo gemeten is' } },
+    leesBestand: () => bron
+  }).envelopen[0];
+
+  const sam = maak('SAMENGESTELD');
+  assert.equal(sam.graad, 'onbepaald');
+  assert.deepEqual(sam.sleutelsSamengesteld, ['raar']);
+  assert.equal(maak('ONVINDBAAR').graad, 'ondergrens');
+  /* En gegevens maken een envelop NIET onzeker: bij een constante is er geen
+     module om naar te wijzen, dus valt er ook niets te missen. */
+  const w = maak('WAARDE');
+  assert.equal(w.graad, 'gemeten');
+  assert.deepEqual(w.sleutelsWaarde, ['raar']);
+  /* Elke onzekerheid draagt haar reden -- dat is het klaarcriterium. */
+  assert.equal(sam.redenen.raar, 'omdat het zo gemeten is');
+});
+
 test('9. de wikkel om elke handler is niet de eigenaar van de route', () => {
   const { eigenaarVan } = require('../scripts/lib/routeherkomst');
   assert.equal(eigenaarVan(['server/lib/foutisolatie.js', 'server/routes/bank.js']), 'server/routes/bank.js');

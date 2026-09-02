@@ -29,7 +29,7 @@
     "toetsenOngevoeligPct": 1,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
-    "ratelTanden": 56,
+    "ratelTanden": 58,
     "metingenZonderRatel": 33,
     "ladderRaak": 0,
     "ladderNietGeprobeerd": 1,
@@ -47,10 +47,12 @@
     "dbDeuren": 507,
     "dbDeurenSchrijvend": 269,
     "verstrengelingOnverklaard": 0,
-    "activeringOndergrens": 79,
+    "activeringOndergrens": 47,
     "tredeLekken": 0,
     "wekkersOnverklaard": 0,
-    "tredeRondgangGezakt": 0
+    "tredeRondgangGezakt": 0,
+    "activeringOnbepaald": 3,
+    "activeringZonderReden": 0
   },
   "notities": [
     {
@@ -1338,7 +1340,9 @@
     "activeringOndergrens": "2026-09-02",
     "tredeLekken": "2026-09-02",
     "wekkersOnverklaard": "2026-09-02",
-    "tredeRondgangGezakt": "2026-09-02"
+    "tredeRondgangGezakt": "2026-09-02",
+    "activeringOnbepaald": "2026-09-02",
+    "activeringZonderReden": "2026-09-02"
   },
   "uitzonderingen": [
     {

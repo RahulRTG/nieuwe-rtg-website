@@ -60,10 +60,26 @@ Per functie uit de catalogus: welke routes, welke bestanden, welke domeinen.
 <!--getal:activering.functies-->204<!--/getal--> functies dragen routes; een doorsnee functie raakt
 <!--getal:activering.mediaan-->27<!--/getal--> knopen.
 
-**Drie graden, en ze zijn niet uitwisselbaar.** <!--getal:activering.gemeten-->118<!--/getal--> functies
-zijn `gemeten`; <!--getal:activering.ondergrens-->79<!--/getal--> zijn `ondergrens` (er hangt méér aan dan
-hier staat) en zeven zijn `deels-niet-toe-te-rekenen` (hun route hangt in de
+**Vier graden, en ze zijn niet uitwisselbaar.** <!--getal:activering.gemeten-->147<!--/getal--> functies
+zijn `gemeten`; <!--getal:activering.ondergrens-->47<!--/getal--> zijn `ondergrens` (er hangt méér aan dan
+hier staat, en nieuwe broninformatie zou helpen); <!--getal:activering.onbepaald-->3<!--/getal--> zijn
+`onbepaald` (de bronnen spreken elkaar tegen — dat vraagt een besluit en geen
+betere meter); en zeven zijn `deels-niet-toe-te-rekenen` (hun route hangt in de
 bedrading, en de sluiting vanaf `server.js` is het hele huis).
+
+**Die twee soorten onzekerheid worden nooit opgeteld.** Op een hoop gegooid kun
+je "preciezer" worden door onzekerheid van de ene naar de andere emmer te
+schuiven, en dan daalt het getal terwijl er niets is opgelost. Er is daarom een
+derde meter die op **nul** staat en dat moet blijven: `activeringZonderReden` —
+elke resterende onzekerheid draagt een machineleesbare reden.
+
+**Zeven constructies, geen 79 gevallen.** De ondergrenzen kwamen niet uit
+negenenzeventig losse problemen maar uit een handvol manieren waarop een sleutel
+bij een routebestand komt: via een require in de ouder (ook gedestructureerd, ook
+in twee stappen via een lokale variabele), lokaal gebouwd in de ouder, geschreven
+door een zuster in de gedeelde context, of als alias van de tas zelf
+(`const wctx = { kern }`). Elke afleiding draagt bewijs — bestand en vorm — en
+`test/activering.test.js` pint ze vast; dat bracht 79 naar 47.
 
 Drie ronden gaven drie verschillende getallen en alle drie de keren was de vorige
 fout — de fouten staan uitgeschreven in de kop van `scripts/activering.js`. De

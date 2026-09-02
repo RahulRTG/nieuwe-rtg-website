@@ -113,6 +113,83 @@ function sluiting(graaf, start) {
   return gezien;
 }
 
+/* ------------------------------------------- waar komt een sleutel vandaan -- */
+
+/* NIET ELKE SLEUTEL DIE EEN ROUTEBESTAND UITPAKT, KOMT UIT DE KERN-TAS.
+
+   Dat was de aanname onder de eerste ronden, en hij klopte voor 1672 sleutels
+   en niet voor 217. Die 217 kwamen uit vier constructies, en pas toen ze op een
+   rij stonden was te zien dat het er VIER waren en geen tweehonderd:
+
+     OUDER-REQUIRE     server/routes/supplier/horeca.js doet
+                       `const horeca = require('../../kern/horeca')(kern)` en
+                       geeft `Object.assign({}, kern, { horeca, ... })` door aan
+                       zijn deelbestanden. De sleutel draagt dus wel degelijk een
+                       afhankelijkheid -- die van de OUDER.
+     OUDER-LOKAAL      server/routes/supplier/charter.js bouwt BOOT_TYPES,
+                       isCharter, charterVan en getal ter plekke en geeft ze door.
+                       Zulke sleutels dragen GEEN externe afhankelijkheid: ze
+                       staan in hetzelfde bestand van dezelfde functie.
+     ZUSTER-TOEWIJZING een deelbestand schrijft in de gedeelde context
+                       (`kern.horecaBord = bord` in horeca/keuken.js) en een
+                       zuster leest hem. De bron is die zuster.
+     TAS-ZONDER-BRON   de sleutel staat wel in de tas maar is niet te herleiden;
+                       die drie soorten staan in scripts/lib/routeherkomst.js.
+
+   DE VIERDE MOET BEGRENSD ZIJN, en dat is geen netheid. Een kale zoektocht naar
+   `.getal =` over de hele boom vond server/betaal/synthetisch.js -- een bestand
+   dat niets met charters te maken heeft. Een gedeelde context bestaat alleen
+   tussen bestanden die van dezelfde ouder komen, dus daar wordt gezocht en
+   nergens anders. */
+const DIEPTE = 5;
+
+function herleidSleutel({ sleutel, bestand, ouders, kinderen, leesBestand }) {
+  const isRequire = new RegExp('const\\s+' + sleutel + '\\s*=\\s*require\\(\\s*[\'"]([^\'"]+)');
+  /* EN DE GEDESTRUCTUREERDE VORM, want die is hier de gewone:
+     `const { eigenVeld } = require('../kern/util')`. Zonder deze regel bleef
+     eigenVeld in 76 envelopen onvindbaar terwijl zijn herkomst in het
+     ouderbestand staat -- dezelfde constructie, andere schrijfwijze. */
+  const isRequireUitpak = new RegExp('(?:const|let|var)\\s*\\{[^}]*\\b' + sleutel + '\\b[^}]*\\}\\s*=\\s*require\\(\\s*[\'"]([^\'"]+)');
+  /* EN DE VORM IN TWEE STAPPEN, want die is in dit huis de gewone:
+       const ctx = require('./foundation/basis')();
+       const { db, save, eigenVeld, ... } = ctx;
+     De sleutel wordt uit een LOKALE variabele gehaald die zelf uit een require
+     komt. Zonder deze stap eindigt het spoor bij de variabele en heet de sleutel
+     onvindbaar, terwijl zijn bestand twee regels hoger staat. */
+  const isUitpakVanVar = new RegExp('(?:const|let|var)\\s*\\{[^}]*\\b' + sleutel + '\\b[^}]*\\}\\s*=\\s*([A-Za-z0-9_$]+)\\s*;');
+  const isLokaal = new RegExp('(?:const|let|var|function)\\s+' + sleutel + '\\s*[=(]');
+  const isToewijzing = new RegExp('\\.' + sleutel + '\\s*=[^=]');
+
+  const gezien = new Set([bestand]);
+  let laag = [bestand];
+  for (let d = 0; d < DIEPTE && laag.length; d++) {
+    const volgende = [];
+    for (const f of laag) {
+      for (const p of (ouders.get(f) || [])) {
+        if (gezien.has(p)) continue;
+        gezien.add(p);
+        const bron = leesBestand(p) || '';
+        const m = bron.match(isRequire) || bron.match(isRequireUitpak);
+        if (m) return { hoe: 'ouder-require', ouder: p, pad: m[1], klasse: 'herleid' };
+        const v = bron.match(isUitpakVanVar);
+        if (v) {
+          const via = bron.match(new RegExp('(?:const|let|var)\\s+' + v[1] + '\\s*=\\s*require\\(\\s*[\'"]([^\'"]+)'));
+          if (via) return { hoe: 'ouder-require-via-variabele', ouder: p, pad: via[1], klasse: 'herleid' };
+        }
+        if (isLokaal.test(bron)) return { hoe: 'ouder-lokaal', ouder: p, klasse: 'herleid' };
+        /* De zusters van deze ouder: alleen daar kan een gedeelde context leven. */
+        for (const z of (kinderen.get(p) || [])) {
+          if (z === bestand) continue;
+          if (isToewijzing.test(leesBestand(z) || '')) return { hoe: 'zuster-toewijzing', zuster: z, klasse: 'herleid' };
+        }
+        volgende.push(p);
+      }
+    }
+    laag = volgende;
+  }
+  return null;
+}
+
 /* --------------------------------------------------------- de kern-tas -- */
 
 /* WELKE SLEUTELS VAN DE KERN-TAS GEBRUIKT DIT BESTAND.
@@ -148,7 +225,8 @@ const isBedrading = b => b === 'server/server.js' || b.startsWith('server/opzet/
 /* Puur: krijgt de routes, de graaf en de padregel mee, en levert per functie
    haar envelop. Alles wat de app moet starten gebeurt in meet(). */
 function envelopen({ routes, graaf, functieVoorPad, onbekendeRanden = new Set(),
-  kernBron = {}, leesBestand = () => '' }) {
+  kernBron = {}, kernOnbekend = {}, ouders = new Map(), kinderen = new Map(),
+  leesBestand = () => '', resolveerPad = (p) => p }) {
   const perFunctie = new Map();
   const zonderFunctie = [];
   for (const r of routes) {
@@ -169,10 +247,65 @@ function envelopen({ routes, graaf, functieVoorPad, onbekendeRanden = new Set(),
     const leveranciers = new Set();
     const onbekendeSleutels = new Set();
     const uitBedrading = new Set();
+    /* DRIE KLASSEN NAAST 'HERLEID', en ze zijn niet uitwisselbaar:
+         WAARDE      gegevens (een constante, een lijst, een Map). Daar IS geen
+                     module om naar te wijzen -- dit wordt nooit preciezer, en
+                     dat is geen tekort van de meter.
+         ONVINDBAAR  hier zou NIEUWE broninformatie helpen.
+         SAMENGESTELD  bronnen spreken elkaar tegen: ONBEPAALD, en met opzet niet
+                     bij een van de twee andere geteld. */
+    const perKlasse = { WAARDE: [], ONVINDBAAR: [], SAMENGESTELD: [] };
     for (const b of eigen) {
-      for (const sl of kernSleutelsVan(leesBestand(b) || '')) {
+      const bronTekst = leesBestand(b) || '';
+      /* EEN SLEUTEL DIE DE TAS ZELF IS. `const wctx = { kern }` in de ouder en
+         `const { kern } = wctx` in het deelbestand: dan is `kern` geen sleutel
+         maar de hele tas onder een andere naam, en zijn `kern.x` wél echte
+         sleutels. Dat wordt niet aangenomen maar NAGEGAAN: alleen als de meeste
+         van die x-en bekende tas-sleutels zijn, telt de alias als de tas.
+         Anders zou `const { db } = kern` van db.data een sleutel maken. */
+      const sleutels = kernSleutelsVan(bronTekst);
+      for (const sl of [...sleutels]) {
+        if (kernBron[sl]) continue;
+        const leden = [...new Set([...bronTekst.matchAll(new RegExp('\\b' + sl + '\\.([A-Za-z0-9_$]+)', 'g'))].map(m => m[1]))];
+        if (leden.length < 3) continue;
+        const bekend = leden.filter(x => kernBron[x]).length;
+        if (bekend >= 3 && bekend >= leden.length / 2) {
+          sleutels.delete(sl);
+          for (const x of leden) sleutels.add(x);
+        }
+      }
+      for (const sl of sleutels) {
         const bron = kernBron[sl];
-        if (!bron) { onbekendeSleutels.add(sl); continue; }
+        if (!bron) {
+          /* Eerst de vier constructies, dan pas de restpost. */
+          const h = herleidSleutel({ sleutel: sl, bestand: b, ouders, kinderen, leesBestand });
+          if (h) {
+            /* WAT ER WEL EN NIET DE ENVELOP IN GAAT, en dit is precies de plek
+               waar de eerste poging het mis had: `member` sprong van 43% naar
+               97% omdat de OUDER werd meegenomen, en een ouder requiret al zijn
+               deelbestanden. De sleutel draagt de afhankelijkheid van de ouder
+               niet -- hij draagt hooguit die van wat de ouder ERVOOR laadde.
+
+                 ouder-lokaal       de sleutel is ter plekke gebouwd: NIETS erbij.
+                                    Geen externe afhankelijkheid, dus ook geen
+                                    knoop.
+                 ouder-require      alleen het gerequirede bestand, niet de ouder.
+                 zuster-toewijzing  alleen de zuster die de waarde zette.
+
+               En nooit de bedrading, om dezelfde reden als bij de tas-sleutels:
+               een enkele sleutel uit server.js zou het hele huis binnenhalen. */
+            if (h.hoe === 'ouder-require' || h.hoe === 'ouder-require-via-variabele') {
+              const doel = resolveerPad(path.normalize(path.join(path.dirname(h.ouder), h.pad)).replace(/\\/g, '/'));
+              if (doel && !isBedrading(doel)) leveranciers.add(doel);
+            } else if (h.hoe === 'zuster-toewijzing' && !isBedrading(h.zuster)) leveranciers.add(h.zuster);
+            continue;
+          }
+          const diag = kernOnbekend[sl];
+          if (diag && perKlasse[diag.soort]) perKlasse[diag.soort].push(sl);
+          else perKlasse.ONVINDBAAR.push(sl);
+          onbekendeSleutels.add(sl);
+          continue;
+        }
         /* EEN LEVERANCIER UIT DE BEDRADING TREKT ZIJN EIGEN SLUITING NIET MEE.
            Dezelfde fout als bij een route die in server.js hangt, maar langs een
            andere weg: `app` en `auth` komen uit server.js, en dat ene sleuteltje
@@ -201,8 +334,23 @@ function envelopen({ routes, graaf, functieVoorPad, onbekendeRanden = new Set(),
          alleen niet wat. Dat als 'gemeten' laten doorgaan is precies de fout
          die deze meter twee ronden lang maakte, en toen las 'raakt bijna niets'
          als een klein ding in plaats van als een blinde vlek. */
+      /* VIER GRADEN NU, en de volgorde is de strengheid. `onbepaald` staat
+         boven `ondergrens`: tegenstrijdige bronnen zijn erger dan onbekende, en
+         wie ze samentelt kan onzekerheid verstoppen door preciezer te worden. */
       graad: bedrading.length ? 'deels-niet-toe-te-rekenen'
-        : (onbekendeSleutels.size ? 'ondergrens' : 'gemeten'),
+        : perKlasse.SAMENGESTELD.length ? 'onbepaald'
+        : perKlasse.ONVINDBAAR.length ? 'ondergrens'
+        : 'gemeten',
+      sleutelsWaarde: [...new Set(perKlasse.WAARDE)].sort(),
+      sleutelsOnvindbaar: [...new Set(perKlasse.ONVINDBAAR)].sort(),
+      sleutelsSamengesteld: [...new Set(perKlasse.SAMENGESTELD)].sort(),
+      /* ELKE RESTERENDE ONZEKERHEID DRAAGT HAAR REDEN, machineleesbaar. Een
+         graad zonder reden is een cijfer waar niemand iets mee kan: dan weet je
+         dat het onvolledig is en niet waarom, en dus ook niet of er iets aan te
+         doen valt. */
+      redenen: Object.fromEntries([...new Set([...perKlasse.ONVINDBAAR, ...perKlasse.SAMENGESTELD, ...perKlasse.WAARDE])]
+        .sort().map(k => [k, (kernOnbekend[k] && kernOnbekend[k].reden) ||
+          'staat niet in de kern-tas en is langs geen van de zeven constructies te herleiden'])),
       inBedrading: bedrading.length,
       ophangbestanden: alle.sort(),
       leveranciers: [...leveranciers].sort(),
@@ -227,7 +375,19 @@ function meet() {
 
   const verstrengeling = V.meet();
   const onbekendeRanden = new Set(verstrengeling.alle.filter(r => r.soort === 'ONBEKEND').map(r => r.van + ' -> ' + r.naar));
-  const { graaf, onvindbaar } = bestandsgraaf(V.lees());
+  const ruw = V.lees();
+  const { graaf, onvindbaar } = bestandsgraaf(ruw);
+  /* De omgekeerde graaf (wie requiret dit bestand) en de voorwaartse per ouder:
+     samen zijn dat de ouder- en zusterrelaties waarop herleidSleutel() zoekt. */
+  const ouders = new Map(), kinderen = new Map();
+  for (const r of ruw) {
+    const naar = resolveer(r.naar);
+    if (!naar) continue;
+    if (!ouders.has(naar)) ouders.set(naar, new Set());
+    ouders.get(naar).add(r.van);
+    if (!kinderen.has(r.van)) kinderen.set(r.van, new Set());
+    kinderen.get(r.van).add(naar);
+  }
 
   const leesCache = new Map();
   const leesBestand = b => {
@@ -238,7 +398,8 @@ function meet() {
     return leesCache.get(b);
   };
   const r = envelopen({ routes: herkomst.routes, graaf, functieVoorPad, onbekendeRanden,
-    kernBron: herkomst.kernBron, leesBestand });
+    kernBron: herkomst.kernBron, kernOnbekend: herkomst.kernOnbekend || {},
+    ouders, kinderen, leesBestand, resolveerPad: resolveer });
 
   /* De routes zonder functie, gesplitst in wat het platformregister als
      BEDIENING verklaart en wat daarna overblijft. Die tweede groep is de
@@ -260,6 +421,8 @@ function meet() {
     teLaag: 'de bus (kern/envelop.js), cron, AI-gereedschap en webhooks lopen niet via require en staan hier niet in',
     kernSleutels: herkomst.kernSleutels,
     kernSleutelsViaTekst: herkomst.kernSleutelsViaTekst,
+    kernSleutelsViaMethoden: herkomst.kernSleutelsViaMethoden,
+    kernOnbekend: herkomst.kernOnbekend,
     kernSleutelsHoe: 'via het merken bij require, via de waarde bij een letterlijk object, achteraf over de tas zelf, en als laatste door de brontekst van de functie letterlijk terug te zoeken (alleen bij precies EEN treffer)',
     kernTasGevonden: herkomst.kernTasGevonden,
     routes: herkomst.routes.length,
@@ -287,6 +450,12 @@ function meet() {
     })(),
     functiesMetEnvelop: r.envelopen.length,
     perGraad: r.envelopen.reduce((a, e) => { a[e.graad] = (a[e.graad] || 0) + 1; return a; }, {}),
+    /* De twee getallen apart, en met opzet NIET opgeteld: preciezer worden mag
+       nooit betekenen dat onzekerheid van de ene naar de andere emmer schuift. */
+    ondergrens: r.envelopen.filter(e => e.graad === 'ondergrens').length,
+    onbepaald: r.envelopen.filter(e => e.graad === 'onbepaald').length,
+    zonderReden: r.envelopen.filter(e => (e.graad === 'ondergrens' || e.graad === 'onbepaald') &&
+      [...(e.sleutelsOnvindbaar || []), ...(e.sleutelsSamengesteld || [])].some(k => !(e.redenen || {})[k])).length,
     functiesNietToeTeRekenen: r.envelopen.filter(e => e.graad === 'deels-niet-toe-te-rekenen').length,
     sleutelsOnopgelost: [...new Set(r.envelopen.flatMap(e => e.sleutelsOnbekend))].sort(),
     grootste: r.envelopen[0] ? { id: r.envelopen[0].id, knopen: r.envelopen[0].knopen,
@@ -312,8 +481,9 @@ function rapport(r) {
   L.push(`  De kern-tas leverde ${r.kernSleutels} herleidbare sleutels, waarvan ${r.kernSleutelsViaTekst}`);
   L.push('  door de brontekst van de functie letterlijk terug te zoeken (uniek, anders onbekend).');
   L.push('  PER GRAAD: ' + Object.entries(r.perGraad).map(([g, n]) => `${n} ${g}`).join(', ') + '.');
-  L.push(`  'ondergrens' betekent: er hangt meer aan dan hier staat. ${r.sleutelsOnopgelost.length} sleutels`);
-  L.push('  komen nergens op uit -- de meeste uit server.js zelf (officeAuth, PERSONAS, anthropic).');
+  L.push(`  'ondergrens' (${r.ondergrens}) betekent: er hangt meer aan dan hier staat, en NIEUWE`);
+  L.push(`  broninformatie zou helpen. 'onbepaald' (${r.onbepaald}) betekent: bronnen spreken elkaar tegen.`);
+  L.push(`  Die twee worden nooit opgeteld. Envelopen met een onzekerheid ZONDER reden: ${r.zonderReden}.`);
   L.push('');
   L.push(`  GROOTSTE ENVELOP: ${r.grootste.id} raakt ${r.grootste.knopen} knopen (${r.grootste.pct}%).`);
   L.push(`  MEDIAAN: een functie raakt ${r.mediaanKnopen} knopen (${r.mediaanPct}%).`);
@@ -363,4 +533,4 @@ if (require.main === module) {
   process.exit(0);
 }
 
-module.exports = { resolveer, bestandsgraaf, sluiting, envelopen, meet, rapport, kernSleutelsVan, isBedrading };
+module.exports = { resolveer, bestandsgraaf, sluiting, envelopen, meet, rapport, kernSleutelsVan, isBedrading, herleidSleutel };

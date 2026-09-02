@@ -922,6 +922,47 @@ const IJKINGEN = {
       } finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} }
     }
   },
+  activeringOnbepaald: {
+    /* De tweede emmer, en de reden dat hij er is: onzekerheid mag niet van de
+       ene naar de andere emmer schuiven terwijl het totaal daalt. Deze ijking
+       toont dat de twee lezers werkelijk iets ANDERS uit hetzelfde bestand
+       halen. */
+    proef: () => {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-onbepaald-ijk-'));
+      const pad = path.join(dir, 'ACTIVERING.json');
+      try {
+        fs.writeFileSync(pad, JSON.stringify({ perGraad: { ondergrens: 47 }, onbepaald: 3, zonderReden: 0 }));
+        assert.equal(norm.leesActivering(pad, 'onbepaald'), 3);
+        assert.equal(norm.leesActivering(pad), 47, 'en de ondergrens leest iets anders uit hetzelfde bestand');
+        fs.writeFileSync(pad, JSON.stringify({ perGraad: { ondergrens: 47 }, onbepaald: 4, zonderReden: 0 }));
+        const na = norm.leesActivering(pad, 'onbepaald');
+        assert.equal(na, 4, 'en beweegt mee');
+        fs.writeFileSync(pad, JSON.stringify({ perGraad: { ondergrens: 47 }, zonderReden: 0 }));
+        assert.throws(() => norm.leesActivering(pad, 'onbepaald'), /onbepaald/,
+          'een ontbrekend getal levert geen nul maar een fout');
+        return na - 3;
+      } finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} }
+    }
+  },
+  activeringZonderReden: {
+    /* Het klaarcriterium zelf: elke resterende onzekerheid draagt een reden.
+       Deze meter hoort op nul te staan en is de enige die zegt of de andere
+       twee getallen ergens over gaan. */
+    proef: () => {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-zonderreden-ijk-'));
+      const pad = path.join(dir, 'ACTIVERING.json');
+      try {
+        fs.writeFileSync(pad, JSON.stringify({ perGraad: { ondergrens: 47 }, onbepaald: 3, zonderReden: 0 }));
+        assert.equal(norm.leesActivering(pad, 'zonderReden'), 0);
+        fs.writeFileSync(pad, JSON.stringify({ perGraad: { ondergrens: 47 }, onbepaald: 3, zonderReden: 1 }));
+        const na = norm.leesActivering(pad, 'zonderReden');
+        assert.equal(na, 1, 'een envelop zonder reden slaat door');
+        fs.writeFileSync(pad, JSON.stringify({ perGraad: { ondergrens: 47 }, onbepaald: 3 }));
+        assert.throws(() => norm.leesActivering(pad, 'zonderReden'), /zonderReden/);
+        return na;
+      } finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} }
+    }
+  },
   activeringOndergrens: {
     /* Deze meter MEET niet zelf: hij leest ACTIVERING.json, want de
        activeringsmeter start de app en dat hoort niet in een ratel die bij elke

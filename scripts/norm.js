@@ -136,6 +136,20 @@ const METERS = [
      ACTIVERING.json niet ververst, bevriest deze meter. `npm run
      activering:vast` is wat hem bijwerkt. */
   { sleutel: 'activeringOndergrens', richting: 'omlaag', wat: 'functies waarvan de activeringsenvelop een ondergrens is (uit ACTIVERING.json)' },
+  /* TWEE SOORTEN ONZEKERHEID, TWEE TELLERS, en met opzet niet opgeteld.
+
+     `activeringOndergrens` is "er hangt meer aan dan we zien; nieuwe
+     broninformatie zou helpen". `activeringOnbepaald` is "bronnen spreken elkaar
+     tegen" -- dat vraagt een besluit en geen betere meter. Op een hoop gegooid
+     kun je preciezer worden door onzekerheid van de ene naar de andere emmer te
+     schuiven, en dan daalt het getal terwijl er niets is opgelost.
+
+     `activeringZonderReden` staat op NUL en is het klaarcriterium zelf: elke
+     resterende onzekerheid draagt een machineleesbare reden. Een graad zonder
+     reden is een cijfer waar niemand iets mee kan -- je weet dan dat het
+     onvolledig is en niet waarom, dus ook niet of er iets aan te doen valt. */
+  { sleutel: 'activeringOnbepaald', richting: 'omlaag', wat: 'functies waarvan de envelop ONBEPAALD is: bronnen spreken elkaar tegen (uit ACTIVERING.json)' },
+  { sleutel: 'activeringZonderReden', richting: 'omlaag', wat: 'onzekere envelopen zonder machineleesbare reden -- hoort nul te zijn (uit ACTIVERING.json)' },
   /* DE LEKKEN VAN DE ONDERSTE TREDE (TREDEPROEF.json).
 
      Een route die buiten trede 0 valt en tóch antwoordt. Staat vandaag op nul
@@ -586,17 +600,26 @@ function telSkips(bestanden, lees) {
    Hij WERPT bij een ontbrekend of stuk bestand. Nul teruggeven zou hier "van
    elke functie is de envelop gemeten" betekenen, en dat is het tegenovergestelde
    van wat een ontbrekende meting zegt. */
-function leesActivering(pad) {
+function leesActivering(pad, veld) {
   let rauw;
   try { rauw = fs.readFileSync(pad, 'utf8'); }
   catch (e) { throw new Error('ACTIVERING.json ontbreekt (' + e.message + '); draai npm run activering:vast'); }
   let a;
   try { a = JSON.parse(rauw); }
   catch (e) { throw new Error('ACTIVERING.json is niet te lezen (' + e.message + '); draai npm run activering:vast'); }
-  if (!a || !a.perGraad || typeof a.perGraad.ondergrens !== 'number') {
-    throw new Error('ACTIVERING.json draagt geen perGraad.ondergrens; een meter zonder invoer is geen meter');
+  /* DRIE GETALLEN UIT EEN BESTAND, en ze worden nooit opgeteld. `ondergrens` en
+     `onbepaald` zijn verschillende soorten onzekerheid -- de eerste vraagt nieuwe
+     broninformatie, de tweede een besluit -- en wie ze samentelt kan preciezer
+     worden door onzekerheid van de ene naar de andere emmer te schuiven.
+     `zonderReden` bewaakt het klaarcriterium: elke resterende onzekerheid draagt
+     een machineleesbare reden. */
+  const uit = veld === 'onbepaald' ? a.onbepaald
+    : veld === 'zonderReden' ? a.zonderReden
+    : (a.perGraad && a.perGraad.ondergrens);
+  if (typeof uit !== 'number') {
+    throw new Error('ACTIVERING.json draagt geen ' + (veld || 'perGraad.ondergrens') + '; een meter zonder invoer is geen meter');
   }
-  return a.perGraad.ondergrens;
+  return uit;
 }
 
 /* De lezer van TREDEPROEF.json, met zijn pad als parameter -- zelfde afspraak
@@ -849,6 +872,8 @@ function meet(bronnen) {
      zakt de meter in plaats van stil nul te melden -- nul zou hier "alles is
      gemeten" betekenen en dat is het tegenovergestelde van onbekend. */
   const activeringOndergrens = leesActivering(path.join(WORTEL, 'ACTIVERING.json'));
+  const activeringOnbepaald = leesActivering(path.join(WORTEL, 'ACTIVERING.json'), 'onbepaald');
+  const activeringZonderReden = leesActivering(path.join(WORTEL, 'ACTIVERING.json'), 'zonderReden');
   const tredeLekken = leesTredeproef(path.join(WORTEL, 'TREDEPROEF.json'));
   const wekkersOnverklaard = leesWekkers(path.join(WORTEL, 'WEKKERS.json'));
   const tredeRondgangGezakt = leesRondgang(path.join(WORTEL, 'TREDEPROEF.json'));
@@ -937,6 +962,8 @@ function meet(bronnen) {
     routesNietSchakelbaar,
     verstrengelingOnverklaard,
     activeringOndergrens,
+    activeringOnbepaald,
+    activeringZonderReden,
     tredeLekken,
     tredeRondgangGezakt,
     wekkersOnverklaard,

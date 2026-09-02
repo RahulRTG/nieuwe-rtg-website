@@ -853,6 +853,28 @@ const IJKINGEN = {
      geijkt worden: de honderd ijkroutes hieronder vormen een nieuw domein zonder
      toets, en dan hoort dit getal precies een omhoog te gaan. */
   keuringDekkingAdvies: { proef: (voor) => metIjkRoutes(voor).dekkingAdvies },
+  wekkersOnverklaard: {
+    /* Leest, net als de twee hieronder, een vastgelegde meting. De ijkvraag is
+       of hij meebeweegt en of hij invoer weigert die er niet is -- nul zou hier
+       "elke wekker is te schakelen" betekenen, en dat is precies de
+       geruststelling waar deze meter tegen bestaat. */
+    proef: () => {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-wekkers-ijk-'));
+      const pad = path.join(dir, 'WEKKERS.json');
+      try {
+        fs.writeFileSync(pad, JSON.stringify({ ongeschakeld: 8 }));
+        assert.equal(norm.leesWekkers(pad), 8);
+        fs.writeFileSync(pad, JSON.stringify({ ongeschakeld: 9 }));
+        const na = norm.leesWekkers(pad);
+        assert.equal(na, 9, 'en beweegt mee');
+        assert.throws(() => norm.leesWekkers(path.join(dir, 'weg.json')), /ontbreekt/);
+        fs.writeFileSync(pad, JSON.stringify({ wekkers: 47 }));
+        assert.throws(() => norm.leesWekkers(pad), /ongeschakeld/,
+          'een bestand zonder het getal levert geen nul maar een fout');
+        return na - 8;
+      } finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} }
+    }
+  },
   tredeLekken: {
     /* Zelfde soort meter als activeringOndergrens: hij leest een vastgelegde
        proef. De ijkvraag is dus of hij MEEBEWEEGT met zijn bestand en of hij

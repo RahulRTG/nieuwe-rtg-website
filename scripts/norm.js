@@ -150,6 +150,19 @@ const METERS = [
      een server en klopt zestig routes aan, en dat hoort niet in een ratel die
      bij elke push draait. `npm run tredeproef:vast` ververst hem. */
   { sleutel: 'tredeLekken', richting: 'omlaag', wat: 'routes buiten trede 0 die tóch antwoorden (uit TREDEPROEF.json)' },
+  /* WEKKERS DIE GEEN ENKELE FUNCTIE RAAKT (WEKKERS.json).
+
+     Een setInterval of een busabonnee die werk begint zonder dat er een
+     schakelaar in de boardroom bestaat die die code raakt. De tredeproef bewijst
+     de HTTP-kant; dit is wat daarnaast staat, en het is de gevaarlijkste vorm
+     van "uit": het ziet er dicht uit en het draait.
+
+     Alleen het ONVERKLAARDE deel telt. De bus, de database, de rem, het schild,
+     de certificaten en de bedrading horen niet aan een functieschakelaar --
+     precies de redenering die kern/platformregister/bediening.js al voert voor
+     routes -- en die staan met hun reden in scripts/lib/wekker-verklaringen.js.
+     Wegverklaren wat er wel bij hoort, is deze meter kapotmaken. */
+  { sleutel: 'wekkersOnverklaard', richting: 'omlaag', wat: 'wekkers (klok/bus) die geen enkele functie raakt en niet verklaard zijn (uit WEKKERS.json)' },
   /* DE DEUREN NAAR db.data (scripts/deuren.js).
 
      De contractlaag is de enige weg naar een andere opslag, en de afbouw die
@@ -592,6 +605,19 @@ function leesTredeproef(pad) {
   return a.zuiverLekken + a.beproefdNiet503;
 }
 
+/* De lezer van WEKKERS.json -- zelfde afspraak en zelfde reden als de twee
+   hierboven: het pad als parameter, en werpen in plaats van nul teruggeven. Nul
+   zou hier "elke wekker is te schakelen" betekenen. */
+function leesWekkers(pad) {
+  let a;
+  try { a = JSON.parse(fs.readFileSync(pad, 'utf8')); }
+  catch (e) { throw new Error('WEKKERS.json ontbreekt of is stuk (' + e.message + '); draai npm run wekkers:vast'); }
+  if (!a || typeof a.ongeschakeld !== 'number') {
+    throw new Error('WEKKERS.json draagt geen ongeschakeld; een meter zonder invoer is geen meter');
+  }
+  return a.ongeschakeld;
+}
+
 function meet(bronnen) {
   /* DE KEURING GEEFT EXITCODE 1 ZODRA HIJ IETS VINDT, en dat is precies zijn
      werk. execFileSync gooit daar standaard op, dus meet() klapte om op het
@@ -803,6 +829,7 @@ function meet(bronnen) {
      gemeten" betekenen en dat is het tegenovergestelde van onbekend. */
   const activeringOndergrens = leesActivering(path.join(WORTEL, 'ACTIVERING.json'));
   const tredeLekken = leesTredeproef(path.join(WORTEL, 'TREDEPROEF.json'));
+  const wekkersOnverklaard = leesWekkers(path.join(WORTEL, 'WEKKERS.json'));
 
   /* De deuren naar db.data uit dezelfde bron als het losse script, om dezelfde
      reden als hierboven: een tweede implementatie loopt binnen een week uiteen. */
@@ -889,6 +916,7 @@ function meet(bronnen) {
     verstrengelingOnverklaard,
     activeringOndergrens,
     tredeLekken,
+    wekkersOnverklaard,
     bronBlindeBestanden,
     delenZonderOnderwerp,
     dbDeuren: deuren.deuren,
@@ -1224,6 +1252,6 @@ function main() {
 }
 
 if (require.main === module) process.exit(main());
-module.exports = { meet, leesNorm, METERS, schoon, traagsteTanden, heeftEinde, dagenTussen, oordeel, leesActivering, leesTredeproef,
+module.exports = { meet, leesNorm, METERS, schoon, traagsteTanden, heeftEinde, dagenTussen, oordeel, leesActivering, leesTredeproef, leesWekkers,
   PRESTATIEMETERS, leesPrestatie, bron, PRESTATIEBESTAND, telOngeijkt, telInlineStijl, telSkips,
   telBewijslaag };

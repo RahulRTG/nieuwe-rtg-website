@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-02T14:58:43.432Z",
-    "commit": "b32cb6e1",
+    "op": "2026-09-02T15:30:41.914Z",
+    "commit": "85361b2f",
     "boomVuil": true,
     "node": "v22.22.2"
   },
@@ -7193,6 +7193,14 @@
       "operator": "&&->||#0",
       "gezakt": 1,
       "geprobeerd": 3
+    },
+    "wekkers.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/wekkers.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 2
     },
     "wereld.test.js": {
       "soort": "server",

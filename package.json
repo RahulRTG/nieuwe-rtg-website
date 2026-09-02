@@ -132,6 +132,8 @@
     "tredeproef": "node scripts/tredeproef.js",
     "tredeproef:vast": "node scripts/tredeproef.js --vastleggen",
     "tredeproef:alle": "node scripts/tredeproef.js --alle",
+    "wekkers": "node scripts/wekkers.js",
+    "wekkers:vast": "node scripts/wekkers.js --vastleggen",
     "semantiek:vast": "node scripts/semantiek.js --vastleggen",
     "lagen": "node scripts/lagen.js",
     "droogloop": "node scripts/droogloop.js",

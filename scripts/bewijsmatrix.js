@@ -118,6 +118,7 @@ const STAAT = (argv.find(a => a.startsWith('--staat=')) || '').slice(8) || inWor
    scripts/auditproef.js voor wat hun oordelen betekenen en waar ze ophouden. */
 const OUTPUT = (argv.find(a => a.startsWith('--output=')) || '').slice(9) || inWortel('OUTPUTPROEF.json');
 const IDEMBESLUIT = (argv.find(a => a.startsWith('--idembesluit=')) || '').slice(14) || inWortel('IDEMBESLUIT.json');
+const ROLLBACKBESLUIT = (argv.find(a => a.startsWith('--rollbackbesluit=')) || '').slice(18) || inWortel('ROLLBACKBESLUIT.json');
 /* `AUDITP` STOND HIER, EN HET WAS DEZELFDE REGEL ALS `AUDIT` HIERBOVEN -- zelfde
    vlag, zelfde bestand, andere naam. Twee lezers van een waarheid (LAT.md regel
    4), en de zwakste won: `AUDITP` ging door `objectRegister()`, die NULL geeft
@@ -240,12 +241,17 @@ function vormfout(pad, verwacht, gekregen) {
    gerepareerd, dus als de meting hem dan nog onbeschermd noemt, is dat een
    TEGENSPRAAK en geen vrijstelling. */
 const BESLOTEN_ONBESCHERMD = new Set(['code-maker', 'creatie', 'berekening', 'teller']);
-function idemBesluiten(pad) {
+/* En hetzelfde voor de ROLLBACK-as: `veilige-kant` betekent dat de handeling met
+   OPZET naar die kant faalt en dat de andere kant aantoonbaar erger is.
+   `tebeslissen` staat er om dezelfde reden niet bij als daar. */
+const BESLOTEN_ROLLBACK = new Set(['veilige-kant']);
+function besluitRegister(pad) {
   try {
     const j = JSON.parse(fs.readFileSync(pad, 'utf8'));
     return new Map(Object.entries(j.routes || {}));
   } catch (e) { return null; }
 }
+const idemBesluiten = besluitRegister;
 
 function objectRegister(pad) {
   if (!pad) return null;
@@ -409,7 +415,8 @@ function bouw(invoer) {
      hierboven: uit hun eigen register, en overschrijfbaar via inv voor de
      toets. Ze werden gebruikt zonder gebouwd te worden -- een vrije naam,
      die undefined is en de kolom dus stil leeg laat. */
-  const besluit = inv.idembesluit !== undefined ? inv.idembesluit : idemBesluiten(IDEMBESLUIT);
+  const besluit = inv.idembesluit !== undefined ? inv.idembesluit : besluitRegister(IDEMBESLUIT);
+  const rbBesluit = inv.rollbackbesluit !== undefined ? inv.rollbackbesluit : besluitRegister(ROLLBACKBESLUIT);
   const handeling = inv.handeling !== undefined ? inv.handeling : perRouteKaart(HANDELINGPROEF);
   const uitvoerKaart = inv.uitvoer !== undefined ? inv.uitvoer : perRouteKaart(UITVOERPROEF);
 
@@ -538,6 +545,14 @@ function bouw(invoer) {
            iets over gezegd worden, dan zwijgt de zware bron en mag de lichte
            (de staatproef hieronder) spreken. Eerst gaf hij daar "gezakt" op, en
            dat was ongemeten vermomd als een bevinding. */
+        /* HET BESLUITREGISTER VOOR DEZE AS, met dezelfde discipline als bij
+           IDEMPOTENCY hierboven: ROLLBACKBESLUIT.json zegt per route of een
+           geweigerd verzoek daar met OPZET iets mag achterlaten, met de reden
+           en een citaat uit de code dat die reden draagt. De uitslag wordt
+           `nvt` en niet `bewezen` -- de belofte geldt hier niet, hij is niet
+           bewezen -- en de gemeten reden blijft ernaast staan. */
+        const rb = s.id === 'ROLLBACK' && rbBesluit && rbBesluit.get(r.pad);
+        const rbBesloten = rb && BESLOTEN_ROLLBACK.has(rb.klasse) ? rb : null;
         if (k && k.stil) { cellen[s.id] = { staat: 'gezakt', bron: 'ketenronde', reden: 'stil verlies' }; continue; }
         if (k && k.proven) { cellen[s.id] = { staat: 'bewezen', bron: 'ketenronde' }; continue; }
         if (k && k.beoordeeld) {
@@ -555,7 +570,10 @@ function bouw(invoer) {
         if (st && st.rollback === 'bewezen') {
           cellen[s.id] = { staat: 'bewezen', bron: 'staatproef', reden: st.reden };
         } else if (st && st.rollback === 'GEZAKT') {
-          cellen[s.id] = { staat: 'gezakt', bron: 'staatproef', reden: st.reden };
+          cellen[s.id] = rbBesloten
+            ? { staat: 'nvt', bron: 'staatproef+rollbackbesluit', reden: st.reden,
+                besluit: rb.klasse, waarom: rb.reden }
+            : { staat: 'gezakt', bron: 'staatproef', reden: st.reden };
         } else {
           cellen[s.id] = { staat: 'ongemeten' };
         }

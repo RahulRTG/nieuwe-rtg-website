@@ -1,0 +1,22 @@
+{
+ "uitleg": "Per route waarom een GEWEIGERD verzoek daar toch iets in de opslag mag achterlaten. De ROLLBACK-cel van de bewijsmatrix meet of er na een weigering niets bleef staan; dit bestand zegt of een uitzondering daarop BESLOTEN is of alleen maar zo gegroeid. Zelfde snit en zelfde discipline als IDEMBESLUIT.json, dat die vraag voor herhaalde oproepen beantwoordt -- en om dezelfde reden: zonder zo'n register komt een uitgeschreven ontwerpbesluit elke meetronde terug als defect, en zet server/middleware/schorspoort.js de route uiteindelijk met een 503 dicht.",
+ "grens": "Een besluit maakt de belofte NIET VAN TOEPASSING; het bewijst hem niet. De gemeten reden blijft naast het besluit staan in de cel. En een besluit hier is geen vrijbrief voor de VOLGENDE route: elke regel geldt voor precies een pad.",
+ "hoeGecontroleerd": "Elke regel draagt een `bron` (bestand:regel) en een `citaat` dat LETTERLIJK in dat bestand moet staan. test/rollbackbesluit.test.js zakt zodra dat citaat er niet meer is -- dan is de redenering uit de code verdwenen en staat hier een besluit zonder grond. Dat is de grendel die dit register eerlijk houdt; IDEMBESLUIT.json heeft er een andere (de eenfamilie-controle in scripts/lib/idemproef.js), want daar is de faalvorm een andere.",
+ "klassen": {
+  "veilige-kant": {
+   "uitleg": "De handeling faalt met OPZET naar deze kant, en de andere kant is aantoonbaar erger. Wat blijft staan is zichtbaar en onschadelijk. Vraagt een uitgeschreven afweging in de code: niet alleen DAT het zo valt, maar waarom andersom slechter is."
+  },
+  "tebeslissen": {
+   "uitleg": "HIER IS NOG GEEN BESLUIT OVER GENOMEN. Staat met naam in deze lijst zodat het niet als afgehandeld meetelt, en blijft in de bewijsmatrix een GEZAKTE cel."
+  }
+ },
+ "routes": {
+  "/api/supplier/pay/budget": {
+   "klasse": "veilige-kant",
+   "reden": "Een budget uitgeven doet twee dingen: de POSITIE klaarzetten (klasse, eigenaar, beleid, vervaldatum) en er geld op boeken. Faalt de boeking -- de werkgever heeft het saldo niet, of het plafond van de klasse zit in de weg -- dan blijft er een LEGE positie achter en geeft de route 402. Dat is de goede kant om op te falen: een lege positie is zichtbaar, hooguit verwarrend, en kost niemand iets. Andersom -- eerst boeken, dan de positie maken -- zou geld op een rekening zetten die nog geen klasse heeft, en dan staat er tussen die twee stappen saldo zonder regels. Dat is precies wat de hele waardelaag moet voorkomen.",
+   "bron": "server/kern/pay/budget.js",
+   "citaat": "Dat is bewust de goede kant om op te falen",
+   "wat blijft staan": "waardePosities (een lege positie) en payIdem (de idempotentie-administratie)"
+  }
+ }
+}

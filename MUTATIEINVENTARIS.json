@@ -1,8 +1,8 @@
 {
  "stempel": {
-  "op": "2026-08-29T22:50:19.454Z",
-  "commit": "e8084904",
-  "boomVuil": true,
+  "op": "2026-09-02T10:32:51.341Z",
+  "commit": "4075884d",
+  "boomVuil": false,
   "node": "v22.22.2"
  },
  "uitleg": "De vijf inventarissen uit EEN bron, met per stap hoeveel er afvallen en waarom. Zonder dit bestand heten vier verschillende getallen allemaal \"het aantal routes\", en is elk percentage dat erop rust niet na te rekenen.",
@@ -13,9 +13,9 @@
   "mutatieBuitenSchakel": 4653,
   "idempotentieAanroepbaar": 4643,
   "werkelijkAangeroepen": 4643,
-  "bewijsMetSleutel": 1384,
-  "bewijsZonderSleutel": 187,
-  "verklaard": 182
+  "bewijsMetSleutel": 1563,
+  "bewijsZonderSleutel": 206,
+  "verklaard": 319
  },
  "autorisatie": {
   "rol": 3643,

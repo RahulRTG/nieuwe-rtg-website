@@ -1,8 +1,8 @@
 {
  "stempel": {
-  "op": "2026-08-31T12:34:51.902Z",
-  "commit": "3924eac6",
-  "boomVuil": true,
+  "op": "2026-09-02T10:34:19.574Z",
+  "commit": "4075884d",
+  "boomVuil": false,
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",

@@ -1,8 +1,8 @@
 {
  "stempel": {
-  "op": "2026-08-29T23:10:05.053Z",
-  "commit": "55e4a311",
-  "boomVuil": true,
+  "op": "2026-09-02T10:32:48.075Z",
+  "commit": "4075884d",
+  "boomVuil": false,
   "node": "v22.22.2"
  },
  "uitleg": "Per handler de eerste poortvorm: een aanroep met (req, res) waarvan de uitkomst meteen tot een return leidt. Dat is de huisvorm van een bewaker die niet in de router staat maar in het lichaam.",
@@ -11,9 +11,9 @@
   "handlers": 4441,
   "metPoortvorm": 1220,
   "vormen": 60,
-  "zonderAfTeLeidenToegang": 366,
-  "daarvanMetPoortvorm": 6,
-  "vormenInDeBak": 2
+  "zonderAfTeLeidenToegang": 0,
+  "daarvanMetPoortvorm": 0,
+  "vormenInDeBak": 0
  },
  "naambotsingen": [
   {
@@ -463,28 +463,5 @@
    "routes": 2
   }
  ],
- "inDeBak": [
-  {
-   "naam": "doosSleutelOk",
-   "bestanden": [
-    "server/routes/doos.js"
-   ],
-   "routes": [
-    "POST /api/doos/meting",
-    "POST /api/doos/update/status",
-    "POST /api/doos/buurmelding",
-    "POST /api/doos/rapport"
-   ]
-  },
-  {
-   "naam": "geremd",
-   "bestanden": [
-    "server/routes/gast/tafel.js"
-   ],
-   "routes": [
-    "POST /api/gast/tafel",
-    "POST /api/gast/aanschuiven"
-   ]
-  }
- ]
+ "inDeBak": []
 }

@@ -1,8 +1,8 @@
 {
  "stempel": {
-  "op": "2026-08-31T19:13:16.701Z",
-  "commit": "fffbb0fc",
-  "boomVuil": true,
+  "op": "2026-09-02T10:34:00.568Z",
+  "commit": "4075884d",
+  "boomVuil": false,
   "node": "v22.22.2"
  },
  "uitleg": "Wat er nog niet gemeten is, en waarom niet. MAG ALLEEN KRIMPEN -- zie test/bewijsschuld.test.js. Een post van soort \"grens\" sluit nooit; die telt niet als achterstand maar als de rand van de methode.",
@@ -175,11 +175,19 @@
    {
     "op": "2026-08-31",
     "aantal": 0
+   },
+   {
+    "op": "2026-09-02",
+    "aantal": 0
    }
   ],
   "capability-in-handler": [
    {
     "op": "2026-08-31",
+    "aantal": 523
+   },
+   {
+    "op": "2026-09-02",
     "aantal": 523
    }
   ],
@@ -187,11 +195,19 @@
    {
     "op": "2026-08-31",
     "aantal": 52
+   },
+   {
+    "op": "2026-09-02",
+    "aantal": 52
    }
   ],
   "output-deuren": [
    {
     "op": "2026-08-31",
+    "aantal": 18
+   },
+   {
+    "op": "2026-09-02",
     "aantal": 18
    }
   ],
@@ -199,11 +215,19 @@
    {
     "op": "2026-08-31",
     "aantal": 63
+   },
+   {
+    "op": "2026-09-02",
+    "aantal": 63
    }
   ],
   "output-niet-toerekenbaar": [
    {
     "op": "2026-08-31",
+    "aantal": 0
+   },
+   {
+    "op": "2026-09-02",
     "aantal": 0
    }
   ],
@@ -211,11 +235,19 @@
    {
     "op": "2026-08-31",
     "aantal": 0
+   },
+   {
+    "op": "2026-09-02",
+    "aantal": 0
    }
   ],
   "output-onwaarneembaar": [
    {
     "op": "2026-08-31",
+    "aantal": 4
+   },
+   {
+    "op": "2026-09-02",
     "aantal": 4
    }
   ],
@@ -223,11 +255,19 @@
    {
     "op": "2026-08-31",
     "aantal": null
+   },
+   {
+    "op": "2026-09-02",
+    "aantal": null
    }
   ],
   "audit-verklaard": [
    {
     "op": "2026-08-31",
+    "aantal": null
+   },
+   {
+    "op": "2026-09-02",
     "aantal": null
    }
   ],
@@ -235,11 +275,19 @@
    {
     "op": "2026-08-31",
     "aantal": 0
+   },
+   {
+    "op": "2026-09-02",
+    "aantal": 0
    }
   ],
   "object-vooraf": [
    {
     "op": "2026-08-31",
+    "aantal": 932
+   },
+   {
+    "op": "2026-09-02",
     "aantal": 932
    }
   ],
@@ -247,11 +295,19 @@
    {
     "op": "2026-08-31",
     "aantal": 1
+   },
+   {
+    "op": "2026-09-02",
+    "aantal": 1
    }
   ],
   "gevolg-onbekend": [
    {
     "op": "2026-08-31",
+    "aantal": 90
+   },
+   {
+    "op": "2026-09-02",
     "aantal": 90
    }
   ],
@@ -259,11 +315,19 @@
    {
     "op": "2026-08-31",
     "aantal": 2
+   },
+   {
+    "op": "2026-09-02",
+    "aantal": 2
    }
   ],
   "herstel-onbevestigd": [
    {
     "op": "2026-08-31",
+    "aantal": 47
+   },
+   {
+    "op": "2026-09-02",
     "aantal": 47
    }
   ],
@@ -271,11 +335,19 @@
    {
     "op": "2026-08-31",
     "aantal": 1477
+   },
+   {
+    "op": "2026-09-02",
+    "aantal": 1477
    }
   ],
   "wegwerpserver-kopieen": [
    {
     "op": "2026-08-31",
+    "aantal": 4
+   },
+   {
+    "op": "2026-09-02",
     "aantal": 4
    }
   ]

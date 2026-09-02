@@ -117,6 +117,7 @@ const STAAT = (argv.find(a => a.startsWith('--staat=')) || '').slice(8) || inWor
    het routejournaal van de gewone suite; zie scripts/outputproef.js en
    scripts/auditproef.js voor wat hun oordelen betekenen en waar ze ophouden. */
 const OUTPUT = (argv.find(a => a.startsWith('--output=')) || '').slice(9) || inWortel('OUTPUTPROEF.json');
+const IDEMBESLUIT = (argv.find(a => a.startsWith('--idembesluit=')) || '').slice(14) || inWortel('IDEMBESLUIT.json');
 /* `AUDITP` STOND HIER, EN HET WAS DEZELFDE REGEL ALS `AUDIT` HIERBOVEN -- zelfde
    vlag, zelfde bestand, andere naam. Twee lezers van een waarheid (LAT.md regel
    4), en de zwakste won: `AUDITP` ging door `objectRegister()`, die NULL geeft
@@ -232,6 +233,20 @@ function vormfout(pad, verwacht, gekregen) {
     ' terwijl deze lezer ' + verwacht + ' verwacht. Dat is geen lege meting maar een lezer die ' +
     'zijn eigen register niet meer kent -- repareer de lezer of de schrijver, en tel hem niet als nul.');
 }
+/* DE KLASSEN WAARIN "ONBESCHERMD" DE BEDOELING IS, uit IDEMBESLUIT.json zelf en
+   niet hier verzonnen. `tebeslissen` staat er met opzet NIET bij: dat is de
+   eerlijke klasse voor "hier is nog geen besluit over genomen", en die hoort een
+   gezakte cel te blijven. `beschermd` evenmin -- dat betekent dat de route is
+   gerepareerd, dus als de meting hem dan nog onbeschermd noemt, is dat een
+   TEGENSPRAAK en geen vrijstelling. */
+const BESLOTEN_ONBESCHERMD = new Set(['code-maker', 'creatie', 'berekening', 'teller']);
+function idemBesluiten(pad) {
+  try {
+    const j = JSON.parse(fs.readFileSync(pad, 'utf8'));
+    return new Map(Object.entries(j.routes || {}));
+  } catch (e) { return null; }
+}
+
 function objectRegister(pad) {
   if (!pad) return null;
   let j;
@@ -394,6 +409,7 @@ function bouw(invoer) {
      hierboven: uit hun eigen register, en overschrijfbaar via inv voor de
      toets. Ze werden gebruikt zonder gebouwd te worden -- een vrije naam,
      die undefined is en de kolom dus stil leeg laat. */
+  const besluit = inv.idembesluit !== undefined ? inv.idembesluit : idemBesluiten(IDEMBESLUIT);
   const handeling = inv.handeling !== undefined ? inv.handeling : perRouteKaart(HANDELINGPROEF);
   const uitvoerKaart = inv.uitvoer !== undefined ? inv.uitvoer : perRouteKaart(UITVOERPROEF);
 
@@ -608,10 +624,46 @@ function bouw(invoer) {
            zwijgt (de eerste oproep bewoog niets) mag de idemproef nog iets
            zeggen -- die ziet soms een nieuw id in een antwoord waar de opslag
            niet zichtbaar bewoog. Elke cel noemt zijn bron. */
+        /* HET BESLUIT NAAST DE METING, en niet eroverheen. IDEMBESLUIT.json zegt
+           per route of een tweede oproep daar iets nieuws MAG doen -- door
+           mensen geschreven, met een reden per regel. Vier van de zeven klassen
+           betekenen "onbeschermd is hier de bedoeling": een codemaker hoort elke
+           keer iets nieuws te geven, een teller hoort op te hogen, een berekening
+           een verse uitkomst, en bij een creatie is een tweede item hinderlijk
+           maar geen defect.
+
+           Zonder deze koppeling werd zo'n route een gezakte cel, in
+           VERTROUWEN.json een `geschorst`, en zette server/middleware/
+           schorspoort.js hem met een 503 dicht. /api/bank/rekening/open stond zo
+           offline terwijl het register er met zoveel woorden over zegt: "Een
+           dubbeltik geeft een tweede, lege rekening op naam van hetzelfde lid:
+           hinderlijk in de lijst, en er gaat geen geld mee weg."
+
+           DE UITSLAG IS `nvt` EN NIET `bewezen`, en dat verschil is de hele
+           zorgvuldigheid: een besluit maakt de belofte NIET van toepassing, het
+           bewijst hem niet. De gemeten reden blijft in de cel staan, zodat een
+           lezer ziet WAT er is waargenomen en pas daarna dat er een besluit
+           onder ligt. `tebeslissen` en `beschermd` staan er niet bij: het eerste
+           is de eerlijke klasse voor "hier is nog niets besloten", het tweede
+           betekent dat de route is gerepareerd -- en een gerepareerde route die
+           alsnog onbeschermd meet, is een tegenspraak en geen vrijstelling. */
+        const bsl = besluit && besluit.get(r.pad);
+        const besloten = bsl && BESLOTEN_ONBESCHERMD.has(bsl.klasse) ? bsl : null;
         const stI = staat && staat.get(sleutel);
         if (stI && stI.idempotentie === 'bewezen') { cellen[s.id] = { staat: 'bewezen', bron: 'staatproef', reden: stI.idemReden }; continue; }
-        if (stI && stI.idempotentie === 'GEZAKT') { cellen[s.id] = { staat: 'gezakt', bron: 'staatproef', reden: stI.idemReden }; continue; }
+        if (stI && stI.idempotentie === 'GEZAKT') {
+          cellen[s.id] = besloten
+            ? { staat: 'nvt', bron: 'staatproef+idembesluit', reden: stI.idemReden,
+                besluit: bsl.klasse, waarom: bsl.reden }
+            : { staat: 'gezakt', bron: 'staatproef', reden: stI.idemReden };
+          continue;
+        }
         const id = idemKaart && idemKaart.get(sleutel);
+        if (id && id.idempotentie === 'onbeschermd' && besloten) {
+          cellen[s.id] = { staat: 'nvt', bron: 'idemproef+idembesluit', reden: id.reden,
+            besluit: bsl.klasse, waarom: bsl.reden };
+          continue;
+        }
         if (id && id.idempotentie === 'beschermd') cellen[s.id] = { staat: 'bewezen', bron: 'idemproef', reden: id.reden };
         /* ONBESCHERMD IS HIER GEZAKT, en dat vraagt uitleg. Het register houdt
            het neutrale woord aan, want twee notities maken op twee keer drukken

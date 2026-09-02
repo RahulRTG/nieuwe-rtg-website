@@ -1,13 +1,14 @@
 {
   "stempel": {
-    "op": "2026-09-02T21:35:40.696Z",
-    "commit": "f50d8d40",
+    "op": "2026-09-02T21:52:01.891Z",
+    "commit": "26d33620",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/activering.js",
     "node": "v22.22.2"
   },
   "hoe": "npm run activering:vast",
+  "grens": "Dit is een ONDERGRENS, geen inventaris: 48 functies dragen die graad met zoveel woorden, en daar is het echte bereik groter dan het getal. Wat hij NIET aantoont: dat een bereikt bestand ook werkelijk draait als die functie aanstaat (de schakelaar zit op de route, niet op wat erachter ligt), en niets over gedrag -- alleen over bereik.",
   "gemetenOp": "2026-09-02",
   "grondslag": "require-sluiting vanaf het bestand dat de route ophangt",
   "teHoog": "een require is geen aanroep: dit is wat er wakker KAN worden, niet wat er draait",

@@ -1,13 +1,14 @@
 {
   "stempel": {
-    "op": "2026-09-02T21:35:34.171Z",
-    "commit": "f50d8d40",
+    "op": "2026-09-02T21:51:55.686Z",
+    "commit": "26d33620",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/verstrengeling.js",
     "node": "v22.22.2"
   },
   "hoe": "npm run verstrengeling:vast",
+  "grens": "Dit meet de STATISCHE require-graaf en niets anders. Wat hij NIET ziet: de kern-tas (de meeste route-bestanden hebben nul requires en krijgen hun domein via een factory-parameter -- daarvoor is ACTIVERING.json), aanroepen over HTTP, over de bus of via de AI, en of een rand ook werkelijk wordt gebruikt op het moment dat het ertoe doet. Nul onverklaarde randen betekent dat elke rand een reden DRAAGT, niet dat elke reden goed is.",
   "gemetenOp": "2026-09-02",
   "randenGemeten": "require",
   "randenNietGemeten": "bus/envelop, cron, AI-gereedschap, webhook -- die staan niet in de require-graaf en zijn hier onzichtbaar",

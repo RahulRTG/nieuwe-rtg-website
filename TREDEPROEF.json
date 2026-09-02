@@ -1,13 +1,14 @@
 {
   "stempel": {
-    "op": "2026-09-02T21:36:16.621Z",
-    "commit": "f50d8d40",
+    "op": "2026-09-02T21:52:36.380Z",
+    "commit": "26d33620",
     "boomVuil": false,
     "boomAnders": 3,
     "instrument": "scripts/tredeproef.js",
     "node": "v22.22.2"
   },
   "hoe": "node scripts/tredeproef.js --alle --vastleggen",
+  "grens": "Vier uitslagen die nooit worden opgeteld. `zuiver` is een besluit over alle routes en bewijst de bedrading niet; `beproefd` is een STEEKPROEF van zestig routes en kan dus niet compleet zijn. De rondgang dekt niet wat een eigen account eist of wat een tweede mens eist. En alles hier is HTTP behalve de twee aangeklopte poorten: cron, bus en AI-gereedschap komen er niet langs.",
   "gemetenOp": "2026-09-02",
   "trede": "start",
   "tredeNaam": "Trede 0 · De smalle snee",
@@ -239,7 +240,7 @@
     {
       "bestand": "server/smtp-in-server.js",
       "functie": "ov-mail-binnen",
-      "poort": 37761,
+      "poort": 45013,
       "wat": "post van buiten aannemen (SMTP)",
       "antwoord": "220 rtg-mail RTG Mail klaar",
       "antwoordde": true,
@@ -250,7 +251,7 @@
     {
       "bestand": "server/imap-server.js",
       "functie": "member",
-      "poort": 36373,
+      "poort": 36385,
       "wat": "een postvak vrijgeven (IMAP); dat postvak is kern/rtmail-vak.js en hangt aan `member`, niet aan een mailfunctie",
       "antwoord": "* OK RTG Mail IMAP klaar",
       "antwoordde": true,

@@ -1,13 +1,14 @@
 {
   "stempel": {
-    "op": "2026-09-02T21:35:41.190Z",
-    "commit": "f50d8d40",
+    "op": "2026-09-02T21:52:02.282Z",
+    "commit": "26d33620",
     "boomVuil": false,
     "boomAnders": 2,
     "instrument": "scripts/wekkers.js",
     "node": "v22.22.2"
   },
   "hoe": "npm run wekkers:vast",
+  "grens": "Dit vindt ingangen aan hun PATROON in de code (setInterval, subscribe, createServer, spawn) plus de verklaarde webhooks. Wat hij NIET aantoont: dat een gevonden wekker ook echt loopt, en dat de lijst compleet is -- een ingang in een vorm die hier niet staat, bestaat voor deze meter niet. Een wekker BINNEN de envelop van een functie gaat bovendien niet vanzelf uit als die functie uit gaat.",
   "gemetenOp": "2026-09-02",
   "meetAlleen": "deze meter blokkeert niets; hij loopt in de schaduw (CONTROLPLANE.md: je kunt niet afdwingen wat nooit in de schaduw heeft gelopen)",
   "aiIsGeenGat": "kern/stuur.js r.130 roept zijn paden aan met fetch('http://127.0.0.1:'+poort+pad): de AI gaat over echte HTTP en komt dus langs dezelfde functieschakelaars als een mens",

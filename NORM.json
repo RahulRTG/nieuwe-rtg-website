@@ -1,20 +1,20 @@
 {
-  "vastgelegd": "2026-09-01",
+  "vastgelegd": "2026-09-02",
   "meters": {
-    "endpointsZonderTest": 1039,
-    "dekkingPct": 78,
+    "endpointsZonderTest": 979,
+    "dekkingPct": 80,
     "keuringStuk": 0,
     "keuringScheef": 21,
     "dependencies": 0,
-    "testbestanden": 1332,
+    "testbestanden": 1341,
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 18,
     "e2eBestanden": 180,
-    "keuringOmvang": 262,
+    "keuringOmvang": 261,
     "keuringDubbeling": 154,
-    "keuringDekkingAdvies": 57,
+    "keuringDekkingAdvies": 52,
     "endpointsNooitAangeraakt": 0,
-    "onbewaakt": 1,
+    "onbewaakt": 0,
     "routesNietSchakelbaar": 0,
     "metersOngeijkt": 0,
     "schermenZonderToets": 0,
@@ -40,7 +40,7 @@
     "gluurOnbewaakt": 0,
     "bronBlindeBestanden": 3,
     "delenZonderOnderwerp": 0,
-    "beweringenZonderVulcontrole": 112,
+    "beweringenZonderVulcontrole": 111,
     "bewijsCellenBewezen": 25500,
     "bewijsAchterstand": 2285,
     "schermenZonderVormtaal": 185,
@@ -50,11 +50,102 @@
   "notities": [
     {
       "datum": "2026-09-02",
-      "soort": "meting",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 427,
+      "vervalt": "2026-11-30",
+      "meter": "toetsenNietGemeten 427 -> 505",
+      "reden": "Twaalf gelijktijdig geopende PR's (#142-#160) zijn als een verzameling samengevoegd en daarna is main (veertien commits) erin gemerged. Elke tak apart bleef binnen zijn eigen norm; samen brengen ze meer mee dan de hoofdlijn had, en dat wordt hier per meter benoemd in plaats van stil verrekend. 78 toetsbestanden uit de takken zijn nog niet door de mutatiemotor geweest (de vijf van deze samenvoeging zelf wel, gemeten op 2 september). Aflossen is de motor erover laten lopen; dit is instrumentdekking en geen oordeel over de toetsen."
+    },
+    {
+      "datum": "2026-09-02",
+      "soort": "schuld",
+      "sleutel": "keuringOmvang",
+      "van": 237,
+      "vervalt": "2026-11-30",
+      "meter": "keuringOmvang 237 -> 261",
+      "reden": "Twaalf gelijktijdig geopende PR's (#142-#160) zijn als een verzameling samengevoegd en daarna is main (veertien commits) erin gemerged. Elke tak apart bleef binnen zijn eigen norm; samen brengen ze meer mee dan de hoofdlijn had, en dat wordt hier per meter benoemd in plaats van stil verrekend. 24 bestanden uit de takken zitten in de waarschuwingsband onder 10 kB (regel 13 zakt pas erboven). Aflossen is knippen op inhoudelijke naden zoals bij tweefactor.js en mutatiecontracten-samenvoeging.js in deze tak is gedaan."
+    },
+    {
+      "datum": "2026-09-02",
+      "soort": "schuld",
+      "sleutel": "keuringDubbeling",
+      "van": 145,
+      "vervalt": "2026-11-30",
+      "meter": "keuringDubbeling 145 -> 154",
+      "reden": "Twaalf gelijktijdig geopende PR's (#142-#160) zijn als een verzameling samengevoegd en daarna is main (veertien commits) erin gemerged. Elke tak apart bleef binnen zijn eigen norm; samen brengen ze meer mee dan de hoofdlijn had, en dat wordt hier per meter benoemd in plaats van stil verrekend. negen extra dubbelingsbevindingen van npm run keuring uit de takken. Aflossen is de vindplaatsen uit de keuring samenvoegen; de harde check blijft groen."
+    },
+    {
+      "datum": "2026-09-02",
+      "soort": "schuld",
+      "sleutel": "schermenZonderVormtaal",
+      "van": 181,
+      "vervalt": "2026-11-30",
+      "meter": "schermenZonderVormtaal 181 -> 185",
+      "reden": "Twaalf gelijktijdig geopende PR's (#142-#160) zijn als een verzameling samengevoegd en daarna is main (veertien commits) erin gemerged. Elke tak apart bleef binnen zijn eigen norm; samen brengen ze meer mee dan de hoofdlijn had, en dat wordt hier per meter benoemd in plaats van stil verrekend. vier nieuwe schermen (waaronder mijn-gegevens, mijn-sessies en appcel) dragen de vormtaal van ONTWERP.md nog niet. Aflossen is ze op de gedeelde schil zetten."
+    },
+    {
+      "datum": "2026-09-02",
+      "soort": "schuld",
+      "sleutel": "inlineStijlAttributen",
+      "van": 4973,
+      "vervalt": "2026-11-30",
+      "meter": "inlineStijlAttributen 4973 -> 4993",
+      "reden": "Twaalf gelijktijdig geopende PR's (#142-#160) zijn als een verzameling samengevoegd en daarna is main (veertien commits) erin gemerged. Elke tak apart bleef binnen zijn eigen norm; samen brengen ze meer mee dan de hoofdlijn had, en dat wordt hier per meter benoemd in plaats van stil verrekend. twintig inline stijlattributen in de nieuwe schermen. Aflossen is ze naar klassen verplaatsen; de meter is een som en verrekent niet per bestand (de deltapoort doet dat wel)."
+    },
+    {
+      "datum": "2026-09-02",
+      "soort": "schuld",
+      "sleutel": "metingenZonderRatel",
+      "van": 33,
+      "vervalt": "2026-11-30",
+      "meter": "metingenZonderRatel 33 -> 41",
+      "reden": "Twaalf gelijktijdig geopende PR's (#142-#160) zijn als een verzameling samengevoegd en daarna is main (veertien commits) erin gemerged. Elke tak apart bleef binnen zijn eigen norm; samen brengen ze meer mee dan de hoofdlijn had, en dat wordt hier per meter benoemd in plaats van stil verrekend. acht nieuwe metingen uit de takken (scripts/*.js met een register) hangen nog niet aan de ratel in NORM.json. Aflossen is per meting een tand toevoegen of met reden uitzonderen."
+    },
+    {
+      "datum": "2026-09-02",
+      "soort": "structureel",
+      "sleutel": "dbDeuren",
+      "van": 507,
+      "meter": "dbDeuren 507 -> 510",
+      "reden": "Twaalf gelijktijdig geopende PR's (#142-#160) zijn als een verzameling samengevoegd en daarna is main (veertien commits) erin gemerged. Elke tak apart bleef binnen zijn eigen norm; samen brengen ze meer mee dan de hoofdlijn had, en dat wordt hier per meter benoemd in plaats van stil verrekend. drie nieuwe deuren naar db.data van nieuwe domeinen (sessieregister, buurtruil, giftmachtiging).",
+      "waarheen": "scripts/check.js regel 63: elke collectie heeft een eigenaar en niemand schrijft in die van een ander (187 collecties, groen)"
+    },
+    {
+      "datum": "2026-09-02",
+      "soort": "structureel",
+      "sleutel": "dbDeurenSchrijvend",
+      "van": 269,
+      "meter": "dbDeurenSchrijvend 269 -> 270",
+      "reden": "Twaalf gelijktijdig geopende PR's (#142-#160) zijn als een verzameling samengevoegd en daarna is main (veertien commits) erin gemerged. Elke tak apart bleef binnen zijn eigen norm; samen brengen ze meer mee dan de hoofdlijn had, en dat wordt hier per meter benoemd in plaats van stil verrekend. een schrijvende deur erbij, van het sessieregister (kern/identiteit/sessieregister.js, eigencollectie sessiecontext).",
+      "waarheen": "scripts/check.js regel 63 en test/mutatiecontract.test.js (LEGACY_PENDING_CLASSIFICATION op 0)"
+    },
+    {
+      "datum": "2026-09-02",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1501,
+      "meter": "kernBreedte 1501 -> 1517",
+      "reden": "Twaalf gelijktijdig geopende PR's (#142-#160) zijn als een verzameling samengevoegd en daarna is main (veertien commits) erin gemerged. Elke tak apart bleef binnen zijn eigen norm; samen brengen ze meer mee dan de hoofdlijn had, en dat wordt hier per meter benoemd in plaats van stil verrekend. zestien kernmodules erbij uit de takken (o.a. kern/identiteit/*, kern/rtfos/ruil.js, kern/experience/*).",
+      "waarheen": "CAPABILITEIT.json (bekeken 3004) en ARCHITECTUUR.md tellen ze; scripts/capabilityroepers.js bewaakt dat elke capability een aanroeper heeft"
+    },
+    {
+      "datum": "2026-09-02",
+      "soort": "structureel",
+      "sleutel": "kernGedeeld",
+      "van": 212,
+      "meter": "kernGedeeld 212 -> 216",
+      "reden": "Twaalf gelijktijdig geopende PR's (#142-#160) zijn als een verzameling samengevoegd en daarna is main (veertien commits) erin gemerged. Elke tak apart bleef binnen zijn eigen norm; samen brengen ze meer mee dan de hoofdlijn had, en dat wordt hier per meter benoemd in plaats van stil verrekend. vier kernmodules meer die door meer dan een domein worden gedeeld.",
+      "waarheen": "SEMANTIEK.json en scripts/semantiek.js meten de botsingen; de vier zijn daar zichtbaar en niet stil"
+    },
+    {
+      "datum": "2026-09-02",
+      "soort": "structureel",
       "sleutel": "bewijsAchterstand",
       "van": 2275,
       "meter": "bewijsAchterstand 2275 -> 2285",
-      "reden": "Geen verslechtering maar een meter die bijtrok. De norm van 1 september is geschreven toen BEWIJSSCHULD.json nog 1477 ongeclassificeerde muterende routes droeg; diezelfde dag bleek uit een verse idemproef dat het er 1487 waren, en dat is in twee commits met de reden erbij vastgelegd (b2212be57 en 945cb109e). Wie de post vandaag narekent uit de registers van de normcommit ZELF komt ook op 1487 uit: het getal in de norm liep achter op zijn eigen invoer. Het zijn dus geen tien nieuwe schulden maar tien die er al stonden en nu geteld worden. Aflossen blijft hetzelfde werk: per route vastleggen wat een tweede keer betekent, in IDEMBESLUIT.json."
+      "reden": "Geen verslechtering maar een meter die bijtrok. De norm van 1 september is geschreven toen BEWIJSSCHULD.json nog 1477 ongeclassificeerde muterende routes droeg; diezelfde dag bleek uit een verse idemproef dat het er 1487 waren, en dat is in twee commits met de reden erbij vastgelegd (b2212be57 en 945cb109e). Wie de post vandaag narekent uit de registers van de normcommit ZELF komt ook op 1487 uit: het getal in de norm liep achter op zijn eigen invoer. Het zijn dus geen tien nieuwe schulden maar tien die er al stonden en nu geteld worden. Aflossen blijft hetzelfde werk: per route vastleggen wat een tweede keer betekent, in IDEMBESLUIT.json.",
+      "waarheen": "de aflossing staat waar hij stond: per route een besluit in IDEMBESLUIT.json; de meter zelf is niet veranderd, alleen het getal in de norm liep achter op BEWIJSSCHULD.json"
     },
     {
       "datum": "2026-08-28",
@@ -1320,26 +1411,27 @@
     "waarom": "Vanaf deze datum heeft elke notitie een soort: \"structureel\" (het gemetene veranderde van vorm; zeg dan met waarheen waar de belofte heen ging) of \"schuld\" (we konden het even niet; zeg dan met sleutel, van en vervalt wanneer hij terug is). scripts/normverval.js keurt alleen wat vanaf hier bij komt. DE GRENS IS NU TWEE KEER OPGESCHOVEN, en dat is geen verzachting maar twee keer dezelfde oorzaak. De eerste keer (18 -> 19 augustus) schreef main twee notities op een eigen tak waar deze regel niet bestond. De tweede keer (19 -> 21 augustus) kwamen bij de samenvoeging van 23 PR-takken elf notities van 20 augustus mee, geschreven op takken die van dezelfde dag zijn als de regel en hem dus niet kenden. WAAROM ZE NIET ALSNOG WORDEN INGEDEELD: een soort toekennen aan andermans notitie betekent hem woorden in de mond leggen -- en bij een schuld ook een vervaldatum, dus een afspraak die hij nooit heeft gemaakt. Dat is precies de reden die de eerste verschuiving al gaf. WAT DAT KOST, EERLIJK: elf verlagingen uit die ronde staan nu zonder soort in het register. Ze dragen wel allemaal een uitgeschreven reden -- wat ze missen is het VELD. En om te laten zien dat dit geen uitweg voor mezelf is: alle acht notities die deze samenvoeging zelf schrijft (2026-08-21) dragen een soort, zeven daarvan als schuld met een sleutel, een van-waarde en een einddatum. Vanaf 21 augustus geldt de eis onverkort; test/normverval.test.js toetst de logica met eigen data en staat dus niet stil tot die datum."
   },
   "sinds": {
-    "keuringOmvang": "2026-08-28",
-    "testbestanden": "2026-09-01",
+    "keuringOmvang": "2026-09-02",
+    "testbestanden": "2026-09-02",
     "toetsenNietGemeten": "2026-08-18",
     "inlineStijlAttributen": "2026-08-18",
     "ratelTanden": "2026-08-28",
     "metingenZonderRatel": "2026-08-18",
     "bewijsAchterstand": "2026-09-01",
     "toetsenOngevoeligPct": "2026-08-28",
-    "endpointsZonderTest": "2026-08-28",
-    "dekkingPct": "2026-08-28",
+    "endpointsZonderTest": "2026-09-02",
+    "dekkingPct": "2026-09-02",
     "keuringScheef": "2026-08-28",
     "keuringTeGroot": "2026-08-28",
     "keuringDubbeling": "2026-08-28",
-    "keuringDekkingAdvies": "2026-08-28",
+    "keuringDekkingAdvies": "2026-09-02",
     "dbDeuren": "2026-08-28",
     "dbDeurenSchrijvend": "2026-08-28",
     "browserpoortToetsen": "2026-09-01",
     "e2eBestanden": "2026-09-01",
     "schermenZonderVormtaal": "2026-08-28",
-    "bewijsCellenBewezen": "2026-09-01"
+    "bewijsCellenBewezen": "2026-09-01",
+    "beweringenZonderVulcontrole": "2026-09-02"
   },
   "uitzonderingen": [
     {

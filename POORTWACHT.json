@@ -2,11 +2,11 @@
  "uitleg": "Per route: gaat hij open voor een verzoek ZONDER token. dicht = 401 of 403, publiek = met opzet open (zie PUBLIEK in dit script), stil = iets anders dan 2xx waaruit niets valt af te leiden.",
  "grens": "klopt aan met een LEEG lichaam. Een 400 of 404 betekent dan dat de validatie of een opzoeking eerder aan de beurt was dan de autorisatie, en zegt NIETS over een slot -- die heten daarom stil en niet dicht. Sinds de TWEEDE klop met een plausibel lijf (nog steeds zonder token) is die groep kleiner: wie dan alsnog 401 of 403 geeft, telt als dicht. Zegt ook niets over wie er met een GELDIG token binnenkomt; dat is de rolproef.",
  "gemeten": {
-  "op": "2026-09-02T20:05:22.893Z",
-  "commit": "e0ba59ce",
-  "boomVuil": true,
+  "op": "2026-09-02T21:21:21.011Z",
+  "commit": "9bf5fccf",
+  "boomVuil": false,
   "node": "v22.22.2",
-  "adres": "http://127.0.0.1:37351",
+  "adres": "http://127.0.0.1:42355",
   "metricsToken": true,
   "clusterSleutel": false,
   "domeinen": false,
@@ -1097,6 +1097,14 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/bedrijf/herkomst",
+   "status": 400,
+   "statusMetLijf": 400,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/bedrijf/indienst",
    "status": 403,
    "oordeel": "dicht"
@@ -1118,22 +1126,6 @@
    "pad": "/api/bedrijf/issue/stand",
    "status": 403,
    "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/bedrijf/herkomst",
-   "status": 400,
-   "statusMetLijf": 400,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/bedrijf/herkomst/zet",
-   "status": 400,
-   "statusMetLijf": 400,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
   },
   {
    "methode": "POST",
@@ -1194,6 +1186,14 @@
    "pad": "/api/bedrijf/keuring",
    "status": 403,
    "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bedrijf/herkomst/zet",
+   "status": 400,
+   "statusMetLijf": 400,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
   },
   {
    "methode": "POST",
@@ -3973,30 +3973,6 @@
   },
   {
    "methode": "GET",
-   "pad": "/api/foundation/gezin/:code/gezondheid",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "GET",
-   "pad": "/api/foundation/gezin/:code/kanaal",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "GET",
-   "pad": "/api/foundation/gezin/:code/keuken",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "GET",
    "pad": "/api/foundation/gezin/:code/klussen",
    "status": 404,
    "statusMetLijf": 404,
@@ -4029,6 +4005,14 @@
   },
   {
    "methode": "GET",
+   "pad": "/api/foundation/gezin/:code/oppasinfo",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
+   "methode": "GET",
    "pad": "/api/foundation/bord/:code",
    "status": 404,
    "statusMetLijf": 404,
@@ -4038,78 +4022,6 @@
   {
    "methode": "GET",
    "pad": "/api/foundation/gezin/:code/agenda",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/agenda",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/agenda/verwijder",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/ai",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/bord/stroke",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/bord/undo",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/bord/wis",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "GET",
-   "pad": "/api/foundation/gezin/:code/oppasinfo",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "GET",
-   "pad": "/api/foundation/gezin/:code/spaardoelen",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "GET",
-   "pad": "/api/foundation/gezin/:code/verjaardagen",
    "status": 404,
    "statusMetLijf": 404,
    "oordeel": "stil",
@@ -4148,8 +4060,104 @@
    "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
   },
   {
+   "methode": "GET",
+   "pad": "/api/foundation/gezin/:code/gezondheid",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
+   "methode": "GET",
+   "pad": "/api/foundation/gezin/:code/kanaal",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
+   "methode": "GET",
+   "pad": "/api/foundation/gezin/:code/keuken",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
    "methode": "POST",
-   "pad": "/api/foundation/gezin/agenda/verwijder",
+   "pad": "/api/foundation/bord/undo",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/ai",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/bord/stroke",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/bord/wis",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
+   "methode": "GET",
+   "pad": "/api/foundation/gezin/:code/spaardoelen",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
+   "methode": "GET",
+   "pad": "/api/foundation/gezin/:code/verjaardagen",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/agenda",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/agenda/verwijder",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/agenda/bereik",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/agenda",
    "status": 404,
    "statusMetLijf": 404,
    "oordeel": "stil",
@@ -4158,46 +4166,6 @@
   {
    "methode": "POST",
    "pad": "/api/foundation/gezin/agenda/wijzig",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/gezin/bel",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/gezin/bericht",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/gezin/bericht/gelezen",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/gezin/chat",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/gezin/droom/behaald",
    "status": 404,
    "statusMetLijf": 404,
    "oordeel": "stil",
@@ -4317,23 +4285,55 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/foundation/gezin/agenda",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/gezin/agenda/bereik",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "POST",
    "pad": "/api/foundation/gezin/keuken/idee",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/agenda/verwijder",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/bel",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/bericht",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/bericht/gelezen",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/chat",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/droom/behaald",
    "status": 404,
    "statusMetLijf": 404,
    "oordeel": "stil",
@@ -4349,6 +4349,14 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/foundation/gezin/keuken/lijst/opruim",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/foundation/gezin/keuken/lijst",
    "status": 404,
    "statusMetLijf": 404,
@@ -4357,7 +4365,7 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/foundation/gezin/keuken/lijst/verwijder",
+   "pad": "/api/foundation/gezin/klus/keur",
    "status": 404,
    "statusMetLijf": 404,
    "oordeel": "stil",
@@ -4365,15 +4373,7 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/foundation/gezin/keuken/menu/wis",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/gezin/keuken/vast",
+   "pad": "/api/foundation/gezin/klus/verwijder",
    "status": 404,
    "statusMetLijf": 404,
    "oordeel": "stil",
@@ -4429,7 +4429,7 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/foundation/gezin/keuken/lijst/opruim",
+   "pad": "/api/foundation/gezin/keuken/lijst/verwijder",
    "status": 404,
    "statusMetLijf": 404,
    "oordeel": "stil",
@@ -4438,6 +4438,22 @@
   {
    "methode": "POST",
    "pad": "/api/foundation/gezin/keuken/menu",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/keuken/menu/wis",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/keuken/vast",
    "status": 404,
    "statusMetLijf": 404,
    "oordeel": "stil",
@@ -4462,14 +4478,6 @@
   {
    "methode": "POST",
    "pad": "/api/foundation/gezin/klus/gedaan",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/gezin/klus/keur",
    "status": 404,
    "statusMetLijf": 404,
    "oordeel": "stil",
@@ -4524,8 +4532,46 @@
    "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
   },
   {
+   "methode": "GET",
+   "pad": "/api/foundation/impact",
+   "status": 200,
+   "oordeel": "publiek"
+  },
+  {
+   "methode": "GET",
+   "pad": "/api/foundation/health",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "omgeving: meetpoort -- de opstelling beslist (configuratie), niet de bezoeker"
+  },
+  {
    "methode": "POST",
-   "pad": "/api/foundation/gezin/klus/verwijder",
+   "pad": "/api/foundation/gezin/verjaardag/persoon/verwijder",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/verjaardag/potje/bijdrage",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/verjaardag/potje/doel",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/verjaardag/wens",
    "status": 404,
    "statusMetLijf": 404,
    "oordeel": "stil",
@@ -4533,9 +4579,51 @@
   },
   {
    "methode": "GET",
-   "pad": "/api/foundation/impact",
-   "status": 200,
-   "oordeel": "publiek"
+   "pad": "/api/foundation/les/:code",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
+   "methode": "GET",
+   "pad": "/api/foundation/les/:code/stream",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/spaardoel/bijdrage",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/spaardoel/maak",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/spaardoel/verwijder",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/uitnodiging/accepteer",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
   },
   {
    "methode": "POST",
@@ -4572,38 +4660,6 @@
   {
    "methode": "POST",
    "pad": "/api/foundation/gezin/verjaardag/persoon",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/gezin/verjaardag/persoon/verwijder",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/gezin/verjaardag/potje/bijdrage",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/gezin/verjaardag/potje/doel",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/gezin/verjaardag/wens",
    "status": 404,
    "statusMetLijf": 404,
    "oordeel": "stil",
@@ -4658,62 +4714,6 @@
    "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
   },
   {
-   "methode": "GET",
-   "pad": "/api/foundation/health",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "omgeving: meetpoort -- de opstelling beslist (configuratie), niet de bezoeker"
-  },
-  {
-   "methode": "GET",
-   "pad": "/api/foundation/les/:code",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "GET",
-   "pad": "/api/foundation/les/:code/stream",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/gezin/spaardoel/bijdrage",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/gezin/spaardoel/maak",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/gezin/spaardoel/verwijder",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/gezin/uitnodiging/accepteer",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
    "methode": "POST",
    "pad": "/api/foundation/kosten",
    "status": 404,
@@ -4729,30 +4729,6 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/foundation/mail/inbox",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/mail/lees",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/mail/overzicht",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "POST",
    "pad": "/api/foundation/mail/stuur",
    "status": 404,
    "statusMetLijf": 404,
@@ -4761,15 +4737,15 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/foundation/les/join",
+   "pad": "/api/foundation/mail/verzonden",
    "status": 404,
-   "statusMetLijf": 429,
+   "statusMetLijf": 404,
    "oordeel": "stil",
    "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
   },
   {
    "methode": "POST",
-   "pad": "/api/foundation/markt/deal/voorstel",
+   "pad": "/api/foundation/markt/ai",
    "status": 404,
    "statusMetLijf": 404,
    "oordeel": "stil",
@@ -4793,6 +4769,30 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/foundation/les/join",
+   "status": 404,
+   "statusMetLijf": 429,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/mail/inbox",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/mail/lees",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/foundation/markt/chat",
    "status": 404,
    "statusMetLijf": 404,
@@ -4802,6 +4802,22 @@
   {
    "methode": "POST",
    "pad": "/api/foundation/markt/deal/betaal",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/markt/deal/hier",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/markt/deal/voorstel",
    "status": 404,
    "statusMetLijf": 404,
    "oordeel": "stil",
@@ -4881,33 +4897,17 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/foundation/mail/overzicht",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/foundation/opgave",
    "status": 404,
    "statusMetLijf": 429,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/mail/verzonden",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/markt/ai",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/markt/deal/hier",
-   "status": 404,
-   "statusMetLijf": 404,
    "oordeel": "stil",
    "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
   },
@@ -4997,6 +4997,18 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/foundation/school/bewijs/leerling",
+   "status": 403,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/school/bewijs/observatie",
+   "status": 403,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/foundation/registratie/aanvragen",
    "status": 400,
    "statusMetLijf": 400,
@@ -5034,18 +5046,6 @@
    "statusMetLijf": 404,
    "oordeel": "stil",
    "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/school/bewijs/leerling",
-   "status": 403,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/school/bewijs/observatie",
-   "status": 403,
-   "oordeel": "dicht"
   },
   {
    "methode": "GET",
@@ -5361,7 +5361,7 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/foundation/school/excursie/mijn",
+   "pad": "/api/foundation/school/excursie/toestemming",
    "status": 404,
    "statusMetLijf": 404,
    "oordeel": "stil",
@@ -5369,7 +5369,7 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/foundation/school/excursie/toestemming",
+   "pad": "/api/foundation/school/excursie/mijn",
    "status": 404,
    "statusMetLijf": 404,
    "oordeel": "stil",
@@ -5485,6 +5485,22 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/foundation/school/hulplijn",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/school/hulplijn/mijn",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/foundation/school/hulplijn/wens",
    "status": 404,
    "statusMetLijf": 404,
@@ -5517,28 +5533,6 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/foundation/school/hulplijn",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/school/hulplijn/mijn",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/school/koppelingen",
-   "status": 403,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
    "pad": "/api/foundation/school/klas/vestiging",
    "status": 403,
    "oordeel": "dicht"
@@ -5548,6 +5542,20 @@
    "pad": "/api/foundation/school/koppeling/zet",
    "status": 403,
    "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/school/koppelingen",
+   "status": 403,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/school/koppel",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
   },
   {
    "methode": "POST",
@@ -5653,14 +5661,6 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/foundation/school/machtiging/stop",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "POST",
    "pad": "/api/foundation/school/machtiging/mijn",
    "status": 404,
    "statusMetLijf": 404,
@@ -5669,7 +5669,7 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/foundation/school/mijn",
+   "pad": "/api/foundation/school/machtiging/stop",
    "status": 404,
    "statusMetLijf": 404,
    "oordeel": "stil",
@@ -5677,7 +5677,7 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/foundation/school/koppel",
+   "pad": "/api/foundation/school/mijn",
    "status": 404,
    "statusMetLijf": 404,
    "oordeel": "stil",
@@ -5811,6 +5811,14 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/foundation/school/peiling/antwoord",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/foundation/school/peiling/mijn",
    "status": 404,
    "statusMetLijf": 404,
@@ -5822,14 +5830,6 @@
    "pad": "/api/foundation/school/personeel/aanmeld",
    "status": 410,
    "statusMetLijf": 410,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/school/peiling/antwoord",
-   "status": 404,
-   "statusMetLijf": 404,
    "oordeel": "stil",
    "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
   },
@@ -5943,6 +5943,22 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/foundation/school/personeel/uitnodiging/accepteer",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/school/personeel/uitnodiging/bekijk",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/foundation/school/planner",
    "status": 404,
    "statusMetLijf": 404,
@@ -5960,22 +5976,6 @@
   {
    "methode": "POST",
    "pad": "/api/foundation/school/rapport/mijn",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/school/personeel/uitnodiging/accepteer",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/school/personeel/uitnodiging/bekijk",
    "status": 404,
    "statusMetLijf": 404,
    "oordeel": "stil",
@@ -6085,6 +6085,14 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/foundation/school/taal",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/foundation/school/telefoonboom/doorgegeven",
    "status": 404,
    "statusMetLijf": 404,
@@ -6128,14 +6136,6 @@
    "pad": "/api/foundation/school/school/maak",
    "status": 410,
    "statusMetLijf": 410,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/school/taal",
-   "status": 404,
-   "statusMetLijf": 404,
    "oordeel": "stil",
    "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
   },
@@ -6263,6 +6263,14 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/foundation/school/verlof/mijn",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/foundation/school/toets/start",
    "status": 404,
    "statusMetLijf": 404,
@@ -6295,17 +6303,9 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/foundation/school/verlof/mijn",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "GET",
-   "pad": "/api/foundation/tip",
-   "status": 200,
-   "oordeel": "publiek"
+   "pad": "/api/foundation/school/zorg/sessie",
+   "status": 403,
+   "oordeel": "dicht"
   },
   {
    "methode": "POST",
@@ -6320,10 +6320,10 @@
    "oordeel": "dicht"
   },
   {
-   "methode": "POST",
-   "pad": "/api/foundation/school/zorg/sessie",
-   "status": 403,
-   "oordeel": "dicht"
+   "methode": "GET",
+   "pad": "/api/foundation/tip",
+   "status": 200,
+   "oordeel": "publiek"
   },
   {
    "methode": "POST",
@@ -6417,7 +6417,7 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/foundation/school/ziekmelden",
+   "pad": "/api/gast/aanschuiven",
    "status": 404,
    "statusMetLijf": 404,
    "oordeel": "stil",
@@ -6425,15 +6425,7 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/foundation/schrift/opslaan",
-   "status": 429,
-   "statusMetLijf": 429,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/gast/aanschuiven",
+   "pad": "/api/foundation/school/ziekmelden",
    "status": 404,
    "statusMetLijf": 404,
    "oordeel": "stil",
@@ -6450,6 +6442,14 @@
   {
    "methode": "GET",
    "pad": "/api/foundation/schrift/:code/:studentId",
+   "status": 429,
+   "statusMetLijf": 429,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/schrift/opslaan",
    "status": 429,
    "statusMetLijf": 429,
    "oordeel": "stil",
@@ -7603,7 +7603,7 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/krant/open",
+   "pad": "/api/krant/artikel",
    "status": 404,
    "statusMetLijf": 404,
    "oordeel": "stil",
@@ -7611,7 +7611,7 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/krant/artikel",
+   "pad": "/api/krant/open",
    "status": 404,
    "statusMetLijf": 404,
    "oordeel": "stil",
@@ -7709,38 +7709,6 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/lab2/bewoner/paspoort",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geenBewaker: mw+mw -- geen autorisatielaag -- alleen een rem of cache"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/lab2/bewoner/paspoort-maak",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geenBewaker: mw -- geen autorisatielaag -- alleen een rem of cache"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/lab2/bewoner/stem",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geenBewaker: mw -- geen autorisatielaag -- alleen een rem of cache"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/lab2/bewoner/studie",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geenBewaker: mw -- geen autorisatielaag -- alleen een rem of cache"
-  },
-  {
-   "methode": "POST",
    "pad": "/api/lab2/bewoner/thema",
    "status": 404,
    "statusMetLijf": 404,
@@ -7766,6 +7734,38 @@
   {
    "methode": "POST",
    "pad": "/api/lab2/bewoner/overzicht",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geenBewaker: mw -- geen autorisatielaag -- alleen een rem of cache"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/bewoner/paspoort",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geenBewaker: mw+mw -- geen autorisatielaag -- alleen een rem of cache"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/bewoner/paspoort-maak",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geenBewaker: mw -- geen autorisatielaag -- alleen een rem of cache"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/bewoner/stem",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geenBewaker: mw -- geen autorisatielaag -- alleen een rem of cache"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/bewoner/studie",
    "status": 404,
    "statusMetLijf": 404,
    "oordeel": "stil",
@@ -8093,12 +8093,6 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/labfonds/boardroom",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
    "pad": "/api/labfonds/doneer",
    "status": 401,
    "oordeel": "dicht"
@@ -8215,6 +8209,12 @@
    "methode": "POST",
    "pad": "/api/les/leraar",
    "status": 403,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/labfonds/boardroom",
+   "status": 401,
    "oordeel": "dicht"
   },
   {
@@ -8643,7 +8643,7 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/mail/binnen",
+   "pad": "/api/mail/ses",
    "status": 400,
    "statusMetLijf": 400,
    "oordeel": "stil",
@@ -8651,7 +8651,7 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/mail/ses",
+   "pad": "/api/mail/binnen",
    "status": 400,
    "statusMetLijf": 400,
    "oordeel": "stil",
@@ -10243,12 +10243,6 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/member/pulse/weg",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
    "pad": "/api/member/rechterhand/ai",
    "status": 401,
    "oordeel": "dicht"
@@ -10292,6 +10286,42 @@
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/cellier/schenk",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/entourage/doc/weg",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/entourage/gezelschap",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/entourage/persoon",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/entourage/persoon/weg",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/garderobe",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/pulse/weg",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -10352,36 +10382,6 @@
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/entourage/doc",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/member/rechterhand/entourage/doc/weg",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/member/rechterhand/entourage/gezelschap",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/member/rechterhand/entourage/persoon",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/member/rechterhand/entourage/persoon/weg",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/member/rechterhand/garderobe",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -11395,6 +11395,24 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/member/spel/varianten",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/zet",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/zichtbaar",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/member/spel/zichtbaar-zet",
    "status": 401,
    "oordeel": "dicht"
@@ -11510,24 +11528,6 @@
   {
    "methode": "POST",
    "pad": "/api/member/vluchten/incheck",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/member/spel/varianten",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/member/spel/zet",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/member/spel/zichtbaar",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -12696,12 +12696,6 @@
    "oordeel": "dicht"
   },
   {
-   "methode": "GET",
-   "pad": "/api/office/doc",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
    "methode": "POST",
    "pad": "/api/office/boardroom/toegang/geef",
    "status": 401,
@@ -12836,6 +12830,12 @@
   {
    "methode": "POST",
    "pad": "/api/office/doos/regie",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "GET",
+   "pad": "/api/office/doc",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -12985,6 +12985,42 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/handhaving/zet",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/hardware",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/hardware/concept",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/hardware/kritiek",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/hardware/maak",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/hardware/productblad",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/hardware/serie",
    "status": 401,
    "oordeel": "dicht"
@@ -13082,42 +13118,6 @@
   {
    "methode": "POST",
    "pad": "/api/office/instelling/genres",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/handhaving/zet",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/hardware",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/hardware/concept",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/hardware/kritiek",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/hardware/maak",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/hardware/productblad",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -13273,54 +13273,6 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/office/kantoorpakket/terug",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/kantoorpakket/uitslag",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/kantoorpakket/versies",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/kantoorpakket/vul",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/kantoorpakket/weg",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/kernjournaal",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/koppel",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/kosten/beleid",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
    "pad": "/api/office/kosten/beleid/zet",
    "status": 401,
    "oordeel": "dicht"
@@ -13406,6 +13358,54 @@
   {
    "methode": "POST",
    "pad": "/api/office/kosten/tarief/zet",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/kantoorpakket/terug",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/kantoorpakket/uitslag",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/kantoorpakket/versies",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/kantoorpakket/vul",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/kantoorpakket/weg",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/kernjournaal",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/koppel",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/kosten/beleid",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -13704,6 +13704,18 @@
    "oordeel": "dicht"
   },
   {
+   "methode": "GET",
+   "pad": "/api/office/papieren",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "GET",
+   "pad": "/api/office/papieren/document",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
    "methode": "POST",
    "pad": "/api/office/onderzoeker/rapport",
    "status": 401,
@@ -13832,18 +13844,6 @@
   {
    "methode": "POST",
    "pad": "/api/office/partner/regels/check",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "GET",
-   "pad": "/api/office/papieren",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "GET",
-   "pad": "/api/office/papieren/document",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -15589,15 +15589,63 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/onderneming/plan/vastleggen",
+   "pad": "/api/onderwijs/jaar-over",
    "status": 401,
    "oordeel": "dicht"
   },
   {
-   "methode": "GET",
-   "pad": "/api/onderneming/rechtsvormen",
-   "status": 200,
-   "oordeel": "publiek"
+   "methode": "POST",
+   "pad": "/api/onderwijs/ladder",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/onderwijs/mijn",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/ontmoeten/aan",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/ontmoeten/hier",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/ontmoeten/hier-date",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/ontmoeten/kies",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/ontmoeten/signaal",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/ontmoeten/sos",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/onderneming/plan/vastleggen",
+   "status": 401,
+   "oordeel": "dicht"
   },
   {
    "methode": "POST",
@@ -15673,63 +15721,15 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/onderwijs/jaar-over",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/onderwijs/ladder",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/onderwijs/mijn",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/ontmoeten/aan",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/ontmoeten/hier",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/ontmoeten/hier-date",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/ontmoeten/kies",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/ontmoeten/signaal",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/ontmoeten/sos",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
    "pad": "/api/ontmoeten/state",
    "status": 401,
    "oordeel": "dicht"
+  },
+  {
+   "methode": "GET",
+   "pad": "/api/onderneming/rechtsvormen",
+   "status": 200,
+   "oordeel": "publiek"
   },
   {
    "methode": "POST",
@@ -16021,6 +16021,30 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/overheid/bezwaren",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/overheid/bezwaren/mijn",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/overheid/bieb",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/overheid/bieb/catalogus",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/overheid/bieb/installeer",
    "status": 401,
    "oordeel": "dicht"
@@ -16130,30 +16154,6 @@
   {
    "methode": "POST",
    "pad": "/api/overheid/pda/taken",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/overheid/bezwaren",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/overheid/bezwaren/mijn",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/overheid/bieb",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/overheid/bieb/catalogus",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -16454,18 +16454,6 @@
    "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
   },
   {
-   "methode": "GET",
-   "pad": "/api/pasprijzen",
-   "status": 200,
-   "oordeel": "publiek"
-  },
-  {
-   "methode": "GET",
-   "pad": "/api/pay/gezond",
-   "status": 200,
-   "oordeel": "publiek"
-  },
-  {
    "methode": "POST",
    "pad": "/api/partner/apply",
    "status": 403,
@@ -16596,6 +16584,18 @@
    "pad": "/api/pay/terug",
    "status": 401,
    "oordeel": "dicht"
+  },
+  {
+   "methode": "GET",
+   "pad": "/api/pasprijzen",
+   "status": 200,
+   "oordeel": "publiek"
+  },
+  {
+   "methode": "GET",
+   "pad": "/api/pay/gezond",
+   "status": 200,
+   "oordeel": "publiek"
   },
   {
    "methode": "POST",
@@ -16750,6 +16750,18 @@
    "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
   },
   {
+   "methode": "GET",
+   "pad": "/api/push/key",
+   "status": 200,
+   "oordeel": "publiek"
+  },
+  {
+   "methode": "GET",
+   "pad": "/api/ready",
+   "status": 200,
+   "oordeel": "publiek"
+  },
+  {
    "methode": "POST",
    "pad": "/api/podium/kanaal/zet",
    "status": 401,
@@ -16874,18 +16886,6 @@
    "pad": "/api/reis/invoer/bevestig",
    "status": 401,
    "oordeel": "dicht"
-  },
-  {
-   "methode": "GET",
-   "pad": "/api/push/key",
-   "status": 200,
-   "oordeel": "publiek"
-  },
-  {
-   "methode": "GET",
-   "pad": "/api/ready",
-   "status": 200,
-   "oordeel": "publiek"
   },
   {
    "methode": "GET",
@@ -17463,7 +17463,7 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/rtf/club/bericht",
+   "pad": "/api/rtf/club/portaal",
    "status": 404,
    "statusMetLijf": 404,
    "oordeel": "stil",
@@ -17471,7 +17471,7 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/rtf/club/portaal",
+   "pad": "/api/rtf/club/bericht",
    "status": 404,
    "statusMetLijf": 404,
    "oordeel": "stil",
@@ -18033,9 +18033,11 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/rtf/social/find",
-   "status": 403,
-   "oordeel": "dicht"
+   "pad": "/api/rtf/partner/raad",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geenBewaker: mw+mw -- geen autorisatielaag -- alleen een rem of cache"
   },
   {
    "methode": "POST",
@@ -18047,15 +18049,13 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/rtf/partner/besluit-start",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geenBewaker: mw+mw -- geen autorisatielaag -- alleen een rem of cache"
+   "pad": "/api/rtf/social/find",
+   "status": 403,
+   "oordeel": "dicht"
   },
   {
    "methode": "POST",
-   "pad": "/api/rtf/partner/raad",
+   "pad": "/api/rtf/partner/besluit-start",
    "status": 404,
    "statusMetLijf": 404,
    "oordeel": "stil",
@@ -18206,6 +18206,12 @@
    "oordeel": "dicht"
   },
   {
+   "methode": "GET",
+   "pad": "/api/rtf/social/stream",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
    "methode": "POST",
    "pad": "/api/rtf/social/story/view",
    "status": 403,
@@ -18341,12 +18347,6 @@
    "methode": "POST",
    "pad": "/api/rtf/spel/rahul",
    "status": 403,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "GET",
-   "pad": "/api/rtf/social/stream",
-   "status": 401,
    "oordeel": "dicht"
   },
   {
@@ -19221,30 +19221,6 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/rtfos/portaal/gemeente",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geenBewaker: mw+mw -- geen autorisatielaag -- alleen een rem of cache"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/rtfos/portaal/ondernemer",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geenBewaker: mw+mw -- geen autorisatielaag -- alleen een rem of cache"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/rtfos/portaal/partner",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geenBewaker: mw+mw -- geen autorisatielaag -- alleen een rem of cache"
-  },
-  {
-   "methode": "POST",
    "pad": "/api/rtfos/project/activiteit",
    "status": 401,
    "oordeel": "dicht"
@@ -19341,7 +19317,23 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/rtfos/portaal/donateur/bewijs",
+   "pad": "/api/rtfos/portaal/ondernemer",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geenBewaker: mw+mw -- geen autorisatielaag -- alleen een rem of cache"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtfos/portaal/partner",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geenBewaker: mw+mw -- geen autorisatielaag -- alleen een rem of cache"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtfos/portaal/vrijwilliger",
    "status": 404,
    "statusMetLijf": 404,
    "oordeel": "stil",
@@ -19373,7 +19365,15 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/rtfos/portaal/vrijwilliger",
+   "pad": "/api/rtfos/portaal/donateur/bewijs",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geenBewaker: mw+mw -- geen autorisatielaag -- alleen een rem of cache"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtfos/portaal/gemeente",
    "status": 404,
    "statusMetLijf": 404,
    "oordeel": "stil",
@@ -19669,6 +19669,24 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/rtgid/inzage",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtgid/koppel",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtgid/machtig",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/rtgid/machtig/intrek",
    "status": 401,
    "oordeel": "dicht"
@@ -19777,41 +19795,23 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/rtgid/inzage",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/rtgid/koppel",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/rtgid/machtig",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
    "pad": "/api/salon/ai/bijschrift",
    "status": 401,
    "oordeel": "dicht"
   },
   {
    "methode": "POST",
-   "pad": "/api/rtgid/start",
-   "status": 400,
-   "statusMetLijf": 400,
+   "pad": "/api/rtgid/status",
+   "status": 404,
+   "statusMetLijf": 404,
    "oordeel": "stil",
    "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
   },
   {
    "methode": "POST",
-   "pad": "/api/rtgid/status",
-   "status": 404,
-   "statusMetLijf": 404,
+   "pad": "/api/rtgid/start",
+   "status": 400,
+   "statusMetLijf": 400,
    "oordeel": "stil",
    "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
   },
@@ -19960,54 +19960,6 @@
    "oordeel": "dicht"
   },
   {
-   "methode": "GET",
-   "pad": "/api/sat/ping",
-   "status": 200,
-   "oordeel": "publiek"
-  },
-  {
-   "methode": "GET",
-   "pad": "/api/scim/v2/Groups",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "GET",
-   "pad": "/api/scim/v2/ResourceTypes",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "GET",
-   "pad": "/api/scim/v2/Schemas",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "GET",
-   "pad": "/api/scim/v2/ServiceProviderConfig",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/samen/chat",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/samen/maak",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/samen/mee",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
    "methode": "POST",
    "pad": "/api/samen/muziek",
    "status": 401,
@@ -20092,8 +20044,20 @@
    "oordeel": "dicht"
   },
   {
-   "methode": "GET",
-   "pad": "/api/scim/v2/Users",
+   "methode": "POST",
+   "pad": "/api/samen/chat",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/samen/maak",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/samen/mee",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -20106,13 +20070,37 @@
    "bewaking": "rol: member"
   },
   {
-   "methode": "POST",
+   "methode": "GET",
+   "pad": "/api/sat/ping",
+   "status": 200,
+   "oordeel": "publiek"
+  },
+  {
+   "methode": "GET",
    "pad": "/api/scim/v2/Groups",
    "status": 401,
    "oordeel": "dicht"
   },
   {
-   "methode": "POST",
+   "methode": "GET",
+   "pad": "/api/scim/v2/ResourceTypes",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "GET",
+   "pad": "/api/scim/v2/Schemas",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "GET",
+   "pad": "/api/scim/v2/ServiceProviderConfig",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "GET",
    "pad": "/api/scim/v2/Users",
    "status": 401,
    "oordeel": "dicht"
@@ -20130,8 +20118,8 @@
    "oordeel": "dicht"
   },
   {
-   "methode": "PATCH",
-   "pad": "/api/scim/v2/Groups/:id",
+   "methode": "POST",
+   "pad": "/api/scim/v2/Groups",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -20142,7 +20130,13 @@
    "oordeel": "dicht"
   },
   {
-   "methode": "PUT",
+   "methode": "POST",
+   "pad": "/api/scim/v2/Users",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "PATCH",
    "pad": "/api/scim/v2/Groups/:id",
    "status": 401,
    "oordeel": "dicht"
@@ -20150,6 +20144,12 @@
   {
    "methode": "PUT",
    "pad": "/api/scim/v2/Users/:id",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "PUT",
+   "pad": "/api/scim/v2/Groups/:id",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -20203,6 +20203,12 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/site/spoor",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/site/versies",
    "status": 401,
    "oordeel": "dicht"
@@ -20222,6 +20228,12 @@
   {
    "methode": "POST",
    "pad": "/api/sleutelwoorden/weg",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/sleutelwoorden/zet",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -20282,18 +20294,6 @@
   {
    "methode": "POST",
    "pad": "/api/sociaal/wereld",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/site/spoor",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/sleutelwoorden/zet",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -20450,6 +20450,12 @@
    "bewaking": "omgeving: meetpoort -- de opstelling beslist (configuratie), niet de bezoeker"
   },
   {
+   "methode": "GET",
+   "pad": "/api/stad/besluiten",
+   "status": 200,
+   "oordeel": "publiek"
+  },
+  {
    "methode": "POST",
    "pad": "/api/sport/team/maak",
    "status": 401,
@@ -20546,10 +20552,12 @@
    "oordeel": "dicht"
   },
   {
-   "methode": "GET",
-   "pad": "/api/stad/besluiten",
-   "status": 200,
-   "oordeel": "publiek"
+   "methode": "POST",
+   "pad": "/api/sso/saml/acs",
+   "status": 400,
+   "statusMetLijf": 400,
+   "oordeel": "stil",
+   "bewaking": "geenBewaker: mw+formulier -- geen autorisatielaag -- alleen een rem of cache"
   },
   {
    "methode": "POST",
@@ -20558,14 +20566,6 @@
    "statusMetLijf": 404,
    "oordeel": "stil",
    "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/sso/saml/acs",
-   "status": 400,
-   "statusMetLijf": 400,
-   "oordeel": "stil",
-   "bewaking": "geenBewaker: mw+formulier -- geen autorisatielaag -- alleen een rem of cache"
   },
   {
    "methode": "POST",
@@ -20583,17 +20583,17 @@
   },
   {
    "methode": "GET",
+   "pad": "/api/stad/algoritmes",
+   "status": 200,
+   "oordeel": "publiek"
+  },
+  {
+   "methode": "GET",
    "pad": "/api/sso/saml/start",
    "status": 404,
    "statusMetLijf": 404,
    "oordeel": "stil",
    "bewaking": "geenBewaker: mw -- geen autorisatielaag -- alleen een rem of cache"
-  },
-  {
-   "methode": "GET",
-   "pad": "/api/stad/algoritmes",
-   "status": 200,
-   "oordeel": "publiek"
   },
   {
    "methode": "GET",
@@ -21917,6 +21917,12 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/creator/tarief",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/dagrapport",
    "status": 401,
    "oordeel": "dicht"
@@ -22044,12 +22050,6 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/door/zet",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/supplier/creator/tarief",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -22349,24 +22349,6 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/supplier/gebouw/melding",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/supplier/gebouw/melding/status",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/supplier/gebouw/valet",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
    "pad": "/api/supplier/gebouw/valet/status",
    "status": 401,
    "oordeel": "dicht"
@@ -22482,6 +22464,24 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/ghost",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/gebouw/melding",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/gebouw/melding/status",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/gebouw/valet",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -22925,18 +22925,6 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/supplier/horeca/gast/uitverkocht",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/supplier/horeca/gast/wachtrij",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
    "pad": "/api/supplier/horeca/gasten",
    "status": 401,
    "oordeel": "dicht"
@@ -23063,7 +23051,31 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/horeca/gast/uitverkocht",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/gast/wachtrij",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/horeca/keuken/stand",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/keuken/stappen",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/keuken/tijden",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -23171,18 +23183,6 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/supplier/horeca/keuken/stappen",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/supplier/horeca/keuken/tijden",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
    "pad": "/api/supplier/horeca/rahul/bonnen",
    "status": 401,
    "oordeel": "dicht"
@@ -23208,30 +23208,6 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/horeca/recovery/beslis",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/supplier/horeca/recovery/open",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/supplier/horeca/rekening",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/supplier/horeca/rekening/open",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/supplier/horeca/rekening/regel",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -23351,31 +23327,31 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/horeca/recovery/open",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/rekening",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/rekening/open",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/rekening/regel",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/horeca/wijk/bied",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/supplier/horeca/wijk/gezien",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/supplier/horeca/wijk/laat",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/supplier/horeca/wijk/neem",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/supplier/horeca/wijk/tafel-terug",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -23490,6 +23466,30 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/hulp/consult/zet",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/wijk/gezien",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/wijk/laat",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/wijk/neem",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/wijk/tafel-terug",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -24509,18 +24509,6 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/supplier/net/lijst",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/supplier/net/verzoek",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
    "pad": "/api/supplier/notifications/read",
    "status": 401,
    "oordeel": "dicht"
@@ -24642,6 +24630,18 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/overheid/kvk/mijn",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/net/lijst",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/net/verzoek",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -24941,6 +24941,30 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/polis/vraag",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/polis/zet",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/poort",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/poort/online",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/poort/rondleiding",
    "status": 401,
    "oordeel": "dicht"
@@ -25050,30 +25074,6 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/redactie/artikel/bewaar",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/supplier/polis/vraag",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/supplier/polis/zet",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/supplier/poort",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/supplier/poort/online",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -28019,6 +28019,14 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/vracht/volg",
+   "status": 400,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/wallet",
    "status": 401,
    "oordeel": "dicht"
@@ -28124,14 +28132,6 @@
    "pad": "/api/wereld/bereik",
    "status": 401,
    "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/vracht/volg",
-   "status": 400,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
   },
   {
    "methode": "POST",
@@ -28309,6 +28309,22 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/werkplek/bureau/atelier/concept",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "objectpoort: huisAuth -- eigenaarschap van een object uit het lichaam; zonder bestaand object van een ander is 404 het enige antwoord"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/werkplek/bureau/atelier/kritiek",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "objectpoort: huisAuth -- eigenaarschap van een object uit het lichaam; zonder bestaand object van een ander is 404 het enige antwoord"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/werkplek/bureau/atelier/maak",
    "status": 404,
    "statusMetLijf": 404,
@@ -28341,7 +28357,7 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/werkplek/bureau/hardware",
+   "pad": "/api/werkplek/bureau/atelier/collectie",
    "status": 404,
    "statusMetLijf": 404,
    "oordeel": "stil",
@@ -28390,14 +28406,6 @@
   {
    "methode": "POST",
    "pad": "/api/werkplek/bureau/hardware/productblad",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "objectpoort: huisAuth -- eigenaarschap van een object uit het lichaam; zonder bestaand object van een ander is 404 het enige antwoord"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/werkplek/bureau/hardware/serie",
    "status": 404,
    "statusMetLijf": 404,
    "oordeel": "stil",
@@ -28469,31 +28477,23 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/werkplek/bureau/atelier/collectie",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "objectpoort: huisAuth -- eigenaarschap van een object uit het lichaam; zonder bestaand object van een ander is 404 het enige antwoord"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/werkplek/bureau/atelier/concept",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "objectpoort: huisAuth -- eigenaarschap van een object uit het lichaam; zonder bestaand object van een ander is 404 het enige antwoord"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/werkplek/bureau/atelier/kritiek",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "objectpoort: huisAuth -- eigenaarschap van een object uit het lichaam; zonder bestaand object van een ander is 404 het enige antwoord"
-  },
-  {
-   "methode": "POST",
    "pad": "/api/werkplek/bureau/ideeen/verwijder",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "objectpoort: huisAuth -- eigenaarschap van een object uit het lichaam; zonder bestaand object van een ander is 404 het enige antwoord"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/werkplek/bureau/hardware",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "objectpoort: huisAuth -- eigenaarschap van een object uit het lichaam; zonder bestaand object van een ander is 404 het enige antwoord"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/werkplek/bureau/hardware/serie",
    "status": 404,
    "statusMetLijf": 404,
    "oordeel": "stil",
@@ -28541,7 +28541,7 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/werkplek/bureau/redactie/artikel/verwijder",
+   "pad": "/api/werkplek/bureau/ideeen/zet",
    "status": 404,
    "statusMetLijf": 404,
    "oordeel": "stil",
@@ -28549,7 +28549,7 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/werkplek/bureau/redactie/artikel/zet",
+   "pad": "/api/werkplek/bureau/studio/collectie",
    "status": 404,
    "statusMetLijf": 404,
    "oordeel": "stil",
@@ -28590,14 +28590,6 @@
   {
    "methode": "POST",
    "pad": "/api/werkplek/bureau/studio",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "objectpoort: huisAuth -- eigenaarschap van een object uit het lichaam; zonder bestaand object van een ander is 404 het enige antwoord"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/werkplek/bureau/studio/collectie",
    "status": 404,
    "statusMetLijf": 404,
    "oordeel": "stil",
@@ -28661,6 +28653,22 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/werkplek/bureau/redactie/artikel/verwijder",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "objectpoort: huisAuth -- eigenaarschap van een object uit het lichaam; zonder bestaand object van een ander is 404 het enige antwoord"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/werkplek/bureau/redactie/artikel/zet",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "objectpoort: huisAuth -- eigenaarschap van een object uit het lichaam; zonder bestaand object van een ander is 404 het enige antwoord"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/werkplek/bureaus",
    "status": 404,
    "statusMetLijf": 404,
@@ -28677,7 +28685,39 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/werkplek/bureau/ideeen/zet",
+   "pad": "/api/werkplek/kantoorpakket/ai",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "objectpoort: huisPoort -- eigenaarschap van een object uit het lichaam; zonder bestaand object van een ander is 404 het enige antwoord"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/werkplek/mijn",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/werkplek/toegang",
+   "status": 403,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/werkplek/toegang-geef",
+   "status": 403,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/werkplek/toegang-weg",
+   "status": 403,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/werkplek/overzicht",
    "status": 404,
    "statusMetLijf": 404,
    "oordeel": "stil",
@@ -28685,7 +28725,7 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/werkplek/kantoorpakket/ai",
+   "pad": "/api/werkplek/kantoorpakket/beheer",
    "status": 404,
    "statusMetLijf": 404,
    "oordeel": "stil",
@@ -28725,31 +28765,7 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/werkplek/mijn",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/werkplek/toegang",
-   "status": 403,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/werkplek/toegang-geef",
-   "status": 403,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/werkplek/toegang-weg",
-   "status": 403,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/werkplek/kantoorpakket/beheer",
+   "pad": "/api/werkplek/kantoorpakket/open",
    "status": 404,
    "statusMetLijf": 404,
    "oordeel": "stil",
@@ -28757,7 +28773,7 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/werkplek/kantoorpakket/versies",
+   "pad": "/api/werkplek/kantoorpakket/opmerking",
    "status": 404,
    "statusMetLijf": 404,
    "oordeel": "stil",
@@ -28797,6 +28813,14 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/werkplek/kantoorpakket/versies",
+   "status": 404,
+   "statusMetLijf": 404,
+   "oordeel": "stil",
+   "bewaking": "objectpoort: huisPoort -- eigenaarschap van een object uit het lichaam; zonder bestaand object van een ander is 404 het enige antwoord"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/werkplek/kantoorpakket/vul",
    "status": 404,
    "statusMetLijf": 404,
@@ -28829,23 +28853,7 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/werkplek/overzicht",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "objectpoort: huisAuth -- eigenaarschap van een object uit het lichaam; zonder bestaand object van een ander is 404 het enige antwoord"
-  },
-  {
-   "methode": "POST",
    "pad": "/api/werkplek/plank",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "objectpoort: huisAuth -- eigenaarschap van een object uit het lichaam; zonder bestaand object van een ander is 404 het enige antwoord"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/werkplek/taak",
    "status": 404,
    "statusMetLijf": 404,
    "oordeel": "stil",
@@ -28861,19 +28869,11 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/werkplek/kantoorpakket/open",
+   "pad": "/api/werkplek/taak",
    "status": 404,
    "statusMetLijf": 404,
    "oordeel": "stil",
-   "bewaking": "objectpoort: huisPoort -- eigenaarschap van een object uit het lichaam; zonder bestaand object van een ander is 404 het enige antwoord"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/werkplek/kantoorpakket/opmerking",
-   "status": 404,
-   "statusMetLijf": 404,
-   "oordeel": "stil",
-   "bewaking": "objectpoort: huisPoort -- eigenaarschap van een object uit het lichaam; zonder bestaand object van een ander is 404 het enige antwoord"
+   "bewaking": "objectpoort: huisAuth -- eigenaarschap van een object uit het lichaam; zonder bestaand object van een ander is 404 het enige antwoord"
   },
   {
    "methode": "POST",
@@ -29022,6 +29022,12 @@
    "bewaking": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)"
   },
   {
+   "methode": "GET",
+   "pad": "/api/zegel/sleutel",
+   "status": 200,
+   "oordeel": "publiek"
+  },
+  {
    "methode": "POST",
    "pad": "/api/zakelijk/kans/reageer",
    "status": 401,
@@ -29092,12 +29098,6 @@
    "pad": "/api/zorgprofiel/zet",
    "status": 401,
    "oordeel": "dicht"
-  },
-  {
-   "methode": "GET",
-   "pad": "/api/zegel/sleutel",
-   "status": 200,
-   "oordeel": "publiek"
   }
  ]
 }

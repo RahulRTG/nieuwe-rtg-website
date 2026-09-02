@@ -43,6 +43,33 @@ const inzage = () => {
   catch (e) { return []; }
 };
 
+/* WACHTEN TOT DE REGEL ER IS, EN NIET VIERHONDERD MILLISECONDEN WACHTEN.
+
+   Hier stond `await new Promise(z => setTimeout(z, 400))`. Het schrijven naar
+   db.json gebeurt na het antwoord, dus dat getal was een gok over hoe snel de
+   machine is -- en op een belaste CI-runner is het te kort. Wat er dan gebeurt
+   is niet dat deze toets een beetje wankel wordt maar dat hij een KETEN breekt:
+   de eerste bewering ziet nul regels, de tweede ziet er daarna twee (die van
+   hemzelf plus de late van de eerste), en de derde vindt geen enkel besluit
+   meer. Een gemiste wachttijd leest zo als drie verschillende defecten.
+
+   Gemeten in run 33694515961, scherf 1: `1 !== 2` op de afwijzing en "er staan
+   besluiten in het journaal" op de hashketen, terwijl er niets mis was.
+
+   Dit wacht op de GEBEURTENIS in plaats van op de klok. De beweringen eronder
+   zijn geen letter veranderd: komt de regel er niet, dan loopt de grens af en
+   zakt dezelfde bewering als voorheen -- alleen niet meer omdat de runner het
+   even druk had. Dat is strenger en niet losser: 400ms was een bovengrens die
+   niemand had gemeten. */
+async function wachtOpRegel(vanaf, grensMs = 15000) {
+  const eind = Date.now() + grensMs;
+  for (;;) {
+    const nu = inzage();
+    if (nu.length > vanaf || Date.now() > eind) return nu;
+    await new Promise(z => setTimeout(z, 25));
+  }
+}
+
 let teller = 0;
 async function nieuwLid() {
   const u = 'kyc' + Date.now() + (++teller) + '@voorbeeld.test';
@@ -74,9 +101,7 @@ test('een GOEDKEURING komt in het inzagejournaal, ook bij een lege wachtrij', as
   const r = await post('/api/office/verify', { userId: id, decision: 'approve' }, office);
   assert.equal(r.status, 200);
   assert.deepEqual(r.data.pending, [], 'de wachtrij is leeg: er valt niets mee te liften');
-  await new Promise(z => setTimeout(z, 400));
-
-  const na = inzage();
+  const na = await wachtOpRegel(voor);
   assert.equal(na.length, voor + 1, 'het besluit hoort een regel op te leveren');
   assert.equal(na[0].overId, String(id), 'de regel wijst de persoon aan over wie besloten is');
   assert.match(na[0].waarom, /goedgekeurd/);
@@ -90,9 +115,7 @@ test('een AFWIJZING ook, en die zegt erbij dat het bewijs is gewist', async () =
   const voor = inzage().length;
   const r = await post('/api/office/verify', { userId: id, decision: 'reject' }, office);
   assert.equal(r.status, 200);
-  await new Promise(z => setTimeout(z, 400));
-
-  const na = inzage();
+  const na = await wachtOpRegel(voor);
   assert.equal(na.length, voor + 1);
   assert.match(na[0].waarom, /afgewezen/);
   assert.match(na[0].waarom, /gewist/, 'wat er met het bewijs gebeurde hoort in de reden te staan');

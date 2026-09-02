@@ -24,9 +24,17 @@
      - een niet te plaatsen knelpunt stil op 'werk' zetten: RAAK op 2;
      - `plekken: null` vervangen door een verzonnen aantal: RAAK op 3;
      - `zelfDoen` ook bij een `geen-ingang` meegeven: RAAK op 5;
+     - `dektNiet` niet doorgeven aan het antwoord: RAAK op 5;
      - het `terreinen`-blok beperken tot de geraakte terreinen: RAAK op 6;
-     - de kaart naar een niet-bestaande route laten wijzen (/api/rtf/beroepen
-       vervangen door /api/rtf/opleidingen): RAAK op 8.
+     - `dektNiet` van een bron uit de kaart halen: RAAK op 8;
+     - de kaart naar een niet-bestaande route laten wijzen: RAAK op 9.
+
+   EEN VAN DIE MUTATIES BEET EERST NIET, en dat staat hier omdat het de fout is
+   waar dit bestand tegen bedoeld is. `dektNiet` uit het ANTWOORD halen liet alle
+   negen toetsen groen: toets 8 keek naar de KAART, en niemand keek of die zin de
+   lezer ook bereikte. Een API-lezer miste dus precies de regel die "bron" van
+   "dit is geregeld" onderscheidt, terwijl de meter groen stond. Dat is LAT.md
+   regel 9 in het klein; de assertie in toets 5 is de reparatie.
 
    WAAROM DIT EEN ZUIVERE TOETS IS. Net als de motor raakt deze laag geen opslag
    aan; hij krijgt de knelpunten als argument. De kaart in ./openingen-kaart.js
@@ -61,7 +69,7 @@ const SARAH = {
 
 const opvangVan = (r) => r.openingen.find(o => o.id === 'opvang');
 
-test('1. geen-ingang is niet geen-bron', () => {
+test('1. geen-ingang is niet geen-bron, en niet hetzelfde als bron', () => {
   const r = O.voorKnelpunten(K.reken(SARAH).knelpunten);
   const o = opvangVan(r);
   assert.equal(o.terrein, 'opvang');
@@ -71,12 +79,28 @@ test('1. geen-ingang is niet geen-bron', () => {
     'bij geen-ingang hoort te staan WAT er dan wel is, anders is het onderscheid onzichtbaar');
   assert.match(o.waarom, /supplier|aanbieder|partnerroute/i,
     'en waarom de mens er niet bij kan');
+  assert.equal(o.ingang, null, 'geen-ingang betekent geen ingang, ook niet een die er half op lijkt');
 
-  // en het terrein dat er echt niets heeft, heet anders
-  const vervoer = KAART.KAART.vervoer;
-  assert.equal(vervoer.stand, 'geen-bron', 'vervoer heeft in dit huis geen enkel aanbod');
-  assert.notEqual(vervoer.stand, KAART.KAART.opvang.stand,
-    'de twee leegtes horen twee verschillende standen te dragen');
+  /* En het onderscheid met de derde stand, op hetzelfde antwoord: werk IS
+     bereikbaar. Dit was eerst opgehangen aan vervoer als `geen-bron`, en dat
+     bleek fout -- zie de kop van openingen-kaart.js. Nu hangt het aan het
+     verschil dat er werkelijk is en dat op echte data te zien is. */
+  const werk = r.openingen.find(x => x.terrein === 'werk');
+  assert.equal(werk.stand, 'bron');
+  assert.ok(werk.ingang, 'een bron hoort een ingang te dragen en geen-ingang niet');
+  assert.notEqual(werk.stand, o.stand, 'bereikbaar en onbereikbaar horen twee standen te zijn');
+
+  /* GEEN ENKEL TERREIN DRAAGT VANDAAG `geen-bron`, en dat is een uitslag en geen
+     nalatigheid: alle vijf bestaan ze in een of andere vorm. De stand blijft in
+     de woordenlijst omdat een volgend terrein wel leeg kan zijn, en deze toets
+     zorgt dat hij dan niet stilletjes zonder reden verschijnt. */
+  for (const t of KAART.TERREINEN) {
+    const k = KAART.KAART[t];
+    if (k.stand !== 'geen-bron') continue;
+    assert.ok(k.waarom && k.waarom.length > 20,
+      'terrein ' + t + ' heet geen-bron zonder reden; een leegte zonder reden is een gat');
+    assert.ok(!k.wat, 'geen-bron betekent dat er niets is; dan valt er ook niets te beschrijven: ' + t);
+  }
 });
 
 test('2. een knelpunt dat wij niet kunnen plaatsen blijft staan, zonder verzonnen terrein', () => {
@@ -121,6 +145,19 @@ test('5. bij een bruikbare ingang staat dat RTG zelf niets aanvraagt', () => {
   assert.match(werk.zelfDoen, /reserveert niets/,
     'bij een ingang hoort de zin dat RTG hier niets voor u aanvraagt (COMMERCE.md par. 3)');
 
+  /* AS 2 IN HET ANTWOORD, en niet alleen in de kaart. Toets 8 keek naar de kaart
+     en liet daardoor een mutatie door die `dektNiet` uit het ANTWOORD haalde:
+     alle negen toetsen bleven groen terwijl een lezer van de API precies de zin
+     miste die "bron" van "dit is geregeld" onderscheidt. Dat is LAT.md regel 9 --
+     een toets die op de verkeerde bewering vangt -- en het is de reden dat deze
+     regel er apart bij staat. */
+  for (const o of r.openingen) {
+    if (o.stand !== 'bron') continue;
+    assert.ok(o.dektNiet && o.dektNiet.length > 30,
+      'de opening voor ' + o.terrein + ' is een bron zonder dektNiet in het ANTWOORD; ' +
+      'dan leest "bron" voor de lezer alsnog als "dit lost uw probleem op"');
+  }
+
   // en bij een stand die GEEN ingang is, hoort er ook geen ingang en geen belofte te staan
   const opvang = opvangVan(r);
   assert.equal(opvang.ingang, null, 'zonder ingang hoort er geen pad te staan waar de mens niet langs kan');
@@ -159,6 +196,11 @@ test('8. de kaart spreekt zichzelf niet tegen', () => {
     assert.ok(['bron', 'geen-ingang', 'geen-bron'].includes(k.stand), 'onbekende stand op ' + t);
     if (k.stand === 'bron') {
       assert.ok(k.ingang && k.ingang.startsWith('/api/'), 'een bron hoort een echte ingang te noemen: ' + t);
+      /* AS 2 verplicht. Dit is de toets die de fout van 2 september 2026 had
+         gevonden als hij er toen was geweest: `bron` zonder `dektNiet` leest als
+         "dit is geregeld", en dat is een belofte die dit huis niet waarmaakt. */
+      assert.ok(k.dektNiet && k.dektNiet.length > 30,
+        'terrein ' + t + ' is een bron zonder dektNiet; dan leest "bron" als "dit lost uw probleem op"');
     } else {
       assert.ok(!k.ingang, 'een terrein zonder bruikbare ingang hoort er geen te noemen: ' + t);
       assert.ok(k.waarom && k.waarom.length > 20, 'een leegte zonder reden is een gat: ' + t);
@@ -166,16 +208,73 @@ test('8. de kaart spreekt zichzelf niet tegen', () => {
     assert.ok(KAART.WOORDEN[t] && KAART.WOORDEN[t].length,
       'terrein ' + t + ' heeft geen woorden en is dus nooit te bereiken');
   }
-  /* En de ingangen die de kaart noemt, bestaan ook echt. Een kaart die naar een
-     dood pad wijst is erger dan een lege kaart: hij stuurt een mens ergens
-     heen. Dit is de fout die MAGNAATLAB.md par. 3 beschrijft als een cap die
-     een document noemt en die nergens bestaat. */
-  const bron = require('fs').readFileSync(require('path').join(__dirname, '..', 'server', 'routes', 'rtfschool.js'), 'utf8') +
-    require('fs').readFileSync(require('path').join(__dirname, '..', 'server', 'routes', 'member', 'werk', 'rtf.js'), 'utf8');
+});
+
+test('10. een randvoorwaarde die twee terreinen raakt, wordt niet voor u gekozen', () => {
+  /* DE FOUT DIE DIT AANWEES, en hij kwam uit een ronde tegen een draaiende
+     server en niet uit nadenken. `terreinVan` gaf de EERSTE treffer in de
+     volgorde van TERREINEN, en dus belandde "kunnen reizen naar de opleiding" op
+     `opleiding` (dat woord staat erin en staat eerder in de lijst) en "een woning
+     waar de kinderen kunnen slapen" op `opvang` (want "kinderen"). Het terrein
+     waar het knelpunt werkelijk over ging werd stil weggegooid, en de mens kreeg
+     een ingang die zijn probleem niet raakte. Willekeur die eruitziet als een
+     oordeel -- dezelfde vorm als de afkapgrens uit EXECUTIE.md die midden in een
+     gelijke score sneed. */
+  const r = O.voorKnelpunten([
+    { id: 'reizen', wat: 'kunnen reizen naar de opleiding', blokkeertWegen: 1 },
+    { id: 'woning', wat: 'een woning waar de kinderen kunnen slapen', blokkeertWegen: 1 }
+  ]);
+  const terreinenVoor = (id) => r.openingen.filter(o => o.id === id).map(o => o.terrein).sort();
+
+  assert.deepEqual(terreinenVoor('reizen'), ['opleiding', 'vervoer'],
+    'beide rakende terreinen horen terug te komen; vervoer wegvallen laten is de fout zelf');
+  assert.deepEqual(terreinenVoor('woning'), ['opvang', 'wonen'],
+    'ook hier: opvang raakt op "kinderen", wonen op "woning", en er wordt niet gekozen');
+
+  assert.ok(r.aannames.some(a => /meer dan een terrein/.test(a) && /niet gekozen/.test(a)),
+    'dat er meer dan een terrein raakte hoort in de aannames te staan; anders leest de dubbele rij als een fout');
+});
+
+test('9. elke ingang die de kaart noemt bestaat echt', () => {
+  /* Een kaart die naar een dood pad wijst is erger dan een lege kaart: hij
+     stuurt een mens ergens heen. Dat is de fout die MAGNAATLAB.md par. 3
+     beschrijft -- een cap die een document noemt en die nergens bestaat, met een
+     toets eromheen die groen bleef omdat hij zijn eigen invoer verzon.
+
+     De hele routeboom wordt gelezen en niet twee bestanden: met twee bestanden
+     is deze toets zelf de volgende plek waar een nieuwe ingang stil langs komt. */
+  const fs = require('fs'), path = require('path');
+  const wortel = path.join(__dirname, '..', 'server');
+  let bron = '';
+  (function lees(map) {
+    for (const naam of fs.readdirSync(map)) {
+      if (naam === 'node_modules' || naam === 'data') continue;
+      const p = path.join(map, naam);
+      const st = fs.statSync(p);
+      if (st.isDirectory()) lees(p);
+      else if (naam.endsWith('.js')) bron += fs.readFileSync(p, 'utf8');
+    }
+  })(wortel);
+
   for (const t of KAART.TERREINEN) {
     const k = KAART.KAART[t];
     if (k.stand !== 'bron') continue;
-    assert.ok(bron.includes("'" + k.ingang + "'"),
-      'de kaart noemt ' + k.ingang + ' als ingang, maar die route staat niet in de bron');
+    const regel = new RegExp("app\\.post\\(\\s*'" + k.ingang.replace(/\//g, '\\/') + "'\\s*,");
+    assert.ok(regel.test(bron),
+      'de kaart noemt ' + k.ingang + ' als ingang van ' + t + ', maar die route staat niet in server/');
   }
+
+  /* OF DIE INGANG EEN POORT HEEFT, WORDT HIER MET OPZET NIET GETOETST. Die vraag
+     is van keuringsregel 28 (scripts/check.js), die hem over alle routes stelt en
+     drie poortvormen kent -- middleware, een poort-hulpje in de handler, en een
+     handler die zelf 401/403 kan antwoorden. Die regel is over drie rondes
+     bijgesteld en de kop erboven noemt de drie manieren waarop een simpelere
+     versie ernaast zat.
+
+     Mijn eerste poging hier was zo'n simpelere versie: hij keek alleen naar
+     middleware, en verklaarde /api/rtf/beroepen daarom voor een open deur. Dat is
+     onjuist -- de poort zit daar in de handler (`profiel(req, res)` weigert met
+     403 zonder gezinscode en profieltoken). Een tweede, zwakkere poortmeter naast
+     regel 28 is precies wat LAT.md regel 4 verbiedt, en hij zou hier een vals
+     alarm hebben opgeleverd over een route die niets mankeert. */
 });

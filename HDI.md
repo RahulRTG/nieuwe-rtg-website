@@ -41,7 +41,7 @@ van 2 september 2026:
 | 3. Safety | `server/kern/beschermzaak/` (de eigen dataklasse, sinds 2 sep 2026), `server/kern/veiligheid/` (de persoonlijke laag: dodemansknop, stil codewoord, kring — zie par. 7.2), `kern/rtfos/meldcode.js`, `kern/zorgniveau.js` | **staat** |
 | 4. Recovery | `casus.SOORTEN` dekt huisvesting, schulden, werk, zorgdoorverwijzing, noodhulp; `kern/opvang.js` doet de asielketen; `kern/rtfos/voorraad*.js` de goederen | **staat als registratie, niet als traject** |
 | 5. Development | `kern/levensgraaf/` (18+ bronnen, vijf etiketten per knoop), `kern/levenslijn/fasen.js` (fasen zonder voortgangsbalk), `kern/doelen.js` | **staat als graaf, mist de motor** |
-| 6. Opportunity | `kern/stadsweefsel/kansen.js` rijgt vacature -> beroep -> leerpad -> wijk al aaneen, maar over de STAD; `kern/knelpunt/openingen.js` doet het per randvoorwaarde voor de mens | **staat als kaart; drie van de vijf terreinen hebben geen ingang** |
+| 6. Opportunity | `kern/stadsweefsel/kansen.js` rijgt vacature -> beroep -> leerpad -> wijk al aaneen, maar over de STAD; `kern/knelpunt/openingen.js` doet het per randvoorwaarde voor de mens | **staat als kaart; vier van de vijf terreinen zijn bereikbaar, geen enkel terrein lost de randvoorwaarde op** |
 | 7. Federation | `kern/rtfos/netwerk.js` (blauwdrukken tussen steden), `kern/rtfos/steden.js`, `kern/envelop.js` (acht velden per bericht, ketenverwijzing) | **staat federatief, mist het protocol naar buiten** |
 | 8. Society Intelligence | `kern/livinglab/` — 21 modules met `graden.js` als causale rem, `bewijs.js`, `ethiek.js`, `cyclus.js`; `kern/rtfos/rapport.js` telt zonder te lezen | **staat als onderzoekscyclus, mist de populatiekant** |
 
@@ -194,8 +194,12 @@ alleen over de STAD en niet over de mens — met zoveel woorden: *"hier komen
 bedrijven en beroepen langs, geen werkzoekenden."* Zie par. 7.10 voor de volledige
 meting per terrein en voor het onderscheid dat er werkelijk toe doet: `geen-bron`
 (er is niets) tegenover `geen-ingang` (het bestaat, maar alleen de aanbieder kan
-erbij — kinderopvang en wonen zijn allebei van die tweede soort). Wat een besluit
-vraagt is dus niet een register maar een ingang.
+erbij). Let vooral op de tweede as die daar staat: van de vijf terreinen zijn er
+vier bereikbaar, en er is er **geen enkele** die de randvoorwaarde ook oplost --
+een vacature is geen inkomen, een leerpad geen diploma, een betaalde rit geen
+dagelijkse reis naar school en een koopwoning geen dak boven het hoofd. Wat een
+besluit vraagt is dus niet een register en ook niet alleen een ingang, maar de
+vraag welke van die vier gaten de RTFoundation zelf wil vullen.
 
 ### Laag 7 — Federation · **staat lokaal, mist het protocol**
 Blauwdrukken tussen steden werken al, inclusief de regel dat een overgenomen
@@ -494,36 +498,62 @@ expliciet bij: *"hier komen bedrijven en beroepen langs, geen werkzoekenden."*
 Dat is een goede grens, geen gat — maar het betekent dat de vraag van Sarah
 ("wat heft mijn knelpunt op?") nergens beantwoord werd.
 
-**En de meting leverde niet twee uitkomsten op maar drie.** Dat is de eigenlijke
-opbrengst van deze regel:
+**De meting leverde twee assen op, en ik heb ze een dag lang in elkaar geschoven.**
+Dat is de zesde meetfout van deze reeks, en hij stond een commit lang in de code:
 
-| terrein | wat er is | stand |
-|---|---|---|
-| werk | `db.data.vacatures` via `kern/werk.js`, ook open voor een gezin zonder pas (`/api/rtf/vacatures`) | **bron** |
-| opleiding | de Beroepen-Bibliotheek: 200 beroepen met een gratis leerpad | **bron** (leerstof, geen inschrijving) |
-| opvang | `kern/verzorging/opvang.js`: groepen met een capaciteit, een nanny-dienst | **geen ingang** |
-| vervoer | niets | **geen bron** |
-| wonen | het aanbod van een makelaarspartner, koop en huur | **geen ingang** |
+| terrein | wat er is | kan de mens erbij? | lost het de randvoorwaarde op? |
+|---|---|---|---|
+| werk | de vacatures van alle partners, ook zonder pas (`/api/rtf/vacatures`) | **bron** | nee — een vacature is geen inkomen |
+| opleiding | de Beroepen-Bibliotheek, 200 beroepen met een gratis leerpad | **bron** (`/api/rtf/beroepen`) | nee — leerstof, geen inschrijving, geen diploma |
+| opvang | `kern/verzorging/opvang.js`: groepen met capaciteit, een nanny-dienst | **geen ingang** | — |
+| vervoer | een rit aanvragen (`/api/ride/request`) | **bron** | nee — een losse betaalde rit is geen dagelijkse reis naar school |
+| wonen | het aanbod van een makelaarspartner, koop en huur | **bron** (`/api/vastgoed/aanbod`) | nee — commercieel aanbod, geen woonvoorziening |
 
-`geen-ingang` en `geen-bron` mogen nooit door elkaar lopen, en dat is de hele
-reden dat `server/kern/knelpunt/openingen.js` bestaat. Kinderopvang bestáát in
-dit huis — met groepen, capaciteit en gescreende nannies — en élke route
-ernaartoe is een partnerroute. Een ouder kan er niet bij. Wie die twee samenvat
-tot "geen aanbod gevonden", vertelt een moeder dat er geen kinderopvang is
-terwijl er een register vol groepen staat waar zij niet bij mag. Dat is geen
-ontbrekende functie maar **een besluit dat nog niemand genomen heeft**, en het
-hoort dus anders te klinken dan een leegte.
+Eerst stonden `wonen` en `vervoer` hier op `geen-ingang` en `geen-bron`, met als
+redenering dat een makelaarsaanbod geen woonvoorziening is en een betaalde rit
+geen structureel vervoer. Die redenering klopt — maar het is een antwoord op de
+**verkeerde vraag**. `/api/vastgoed/aanbod` en `/api/ride/request` staan allebei
+achter `auth`: een lid kán er wel degelijk bij. Ik had *"dit lost uw probleem niet
+op"* opgeschreven als *"u kunt hier niet bij"*, en dat is precies de soort stille
+onwaarheid waar deze hele laag tegen bedoeld is.
+
+Dus twee assen, en ze staan nu apart. `stand` beantwoordt alleen of deze mens hier
+iets kan bereiken; **`dektNiet` is verplicht bij elke bron** en zegt wat er níét
+mee opgelost is. De gevaarlijkste lezer van deze laag is niet degene die een
+leegte voor een gat aanziet, maar degene die `bron` leest als "dit is geregeld".
+
+`geen-ingang` blijft het scherpste woord dat hier staat. Kinderopvang bestáát in
+dit huis — met groepen, capaciteit en gescreende nannies — en élke route ernaartoe
+is een partnerroute. Een ouder kan er niet bij. Wie dat samenvat tot "geen aanbod
+gevonden", vertelt een moeder dat er geen kinderopvang is terwijl er een register
+vol groepen staat waar zij niet bij mag. Dat is geen ontbrekende functie maar
+**een besluit dat nog niemand genomen heeft**, en het hoort dus anders te klinken
+dan een leegte.
 
 Het huis had die regel trouwens zelf al opgeschreven, vóór ik hem nodig had.
 `kern/levenslijn/fasen.js` noemt `opvang` een fase zonder bron: *"er is geen
 opvang-inschrijving (...) Komt er ooit een echte bron (een inschrijving die de
 mens zelf deed), dan hangt hij aan deze fase en niet aan een leeftijd."*
 
-Wonen is de tweede van die soort, en daar is de formulering scherper omdat de
-verwarring duurder is: er is commercieel makelaarsaanbod, en **sociale huur, een
-woningcorporatie, een urgentieverklaring en een wachtlijst voor een woning komen
-in deze code niet voor** — nul treffers. Wie "wonen: bron" op een scherm zet,
-belooft een dakloze iets wat dit huis niet heeft.
+Bij wonen is de formulering scherper omdat de verwarring duurder is: **sociale
+huur, een woningcorporatie, een urgentieverklaring en een wachtlijst voor een
+woning komen in deze code niet voor** — nul treffers. De ingang bestaat, het
+aanbod niet. En `geen-bron` heeft daardoor vandaag **geen enkel lid**: alle vijf
+de terreinen bestaan in een of andere vorm. De stand blijft in de woordenlijst
+omdat een volgend terrein wel leeg kan zijn, en een toets zorgt dat hij dan niet
+zonder reden verschijnt.
+
+**Een tweede fout, gevonden door de bewijsronde en niet door nadenken.** De
+woordvergelijking gaf de EERSTE treffer in de volgorde van de terreinenlijst. Dus
+belandde *"kunnen reizen naar de opleiding"* op `opleiding` — dat woord staat erin
+en staat eerder in de lijst — en *"een woning waar de kinderen kunnen slapen"* op
+`opvang`, want "kinderen". Het terrein waar het knelpunt werkelijk over ging werd
+stil weggegooid. Dat is dezelfde vorm als de afkapgrens uit `EXECUTIE.md` die
+midden in een gelíjke score sneed: willekeur die eruitziet als een oordeel.
+
+De reparatie is níét een slimmere keuze. Er wordt **niet gekozen**: alle rakende
+terreinen komen terug, dezelfde randvoorwaarde kan dus meer dan één rij hebben, en
+dát er meer dan één was staat in de aannames.
 
 **Wat de laag met opzet niet doet.** Er zit geen enkele geschiktheidstoets in —
 geen leeftijd, geen inkomen, geen postcode. Dat is par. 5.5 en `FOUNDATION.md`
@@ -535,14 +565,18 @@ zin er letterlijk bij. En er komt geen aantal vrije plekken of wachttijd uit:
 geen van deze bronnen levert die per opening, dus staat er `null`, en `null`
 leest als *niet nagegaan*.
 
-**Gemeten, niet beweerd.** Tegen een draaiende server op het voorbeeld van Sarah:
-voltijd en deeltijd geblokkeerd, avond open, knelpunten `opvang ×2` en
-`inkomen ×1`, en daaronder `opvang → geen-ingang` naast
-`inkomen → werk → /api/rtf/vacatures`. Drie identieke oproepen gaven
-byte-voor-byte identieke antwoorden en lieten `rtg.db` en `store.db` ongewijzigd.
-Acht toetsen, zes mutaties, alle zes raak op de bedoelde bewering — waaronder één
-die de kaart naar een niet-bestaande route liet wijzen, want een kaart die een
-mens ergens heen stuurt waar niets is, is erger dan een lege kaart.
+**Gemeten, niet beweerd.** Tegen een draaiende server: voltijd en deeltijd
+geblokkeerd, knelpunten `opvang ×2`, `reizen ×2` en `inkomen ×1`, en daaronder
+`opvang → geen-ingang` naast `reizen → opleiding` én `reizen → vervoer`, met de
+aanname erbij dat er niet gekozen is. Drie identieke oproepen gaven byte-voor-byte
+identieke antwoorden en lieten `rtg.db` en `store.db` ongewijzigd. Tien toetsen,
+elf mutaties, alle elf raak op de bedoelde bewering.
+
+**En één mutatie beet eerst niet, wat de reparatie waard maakte.** `dektNiet` uit
+het ANTWOORD halen liet alle toetsen groen: er werd naar de kaart gekeken en niet
+of die zin de lezer bereikte. Een API-lezer miste dus precies de regel die "bron"
+van "dit is geregeld" onderscheidt, terwijl de meter groen stond — `LAT.md` regel 9
+in het klein.
 
 **Wat er nog niet is.** De knelpuntmotor leidt zijn randvoorwaarden nog steeds
 niet af; par. 7.9 wachtte daarvoor op laag 6, en laag 6 blijkt de afleiding niet

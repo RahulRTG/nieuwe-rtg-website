@@ -29,10 +29,11 @@ const CONTRACTEN = {
       'LEEST bovendien niets uit de database: haar kaart is een vaste meetuitslag in ' +
       'kern/knelpunt/openingen-kaart.js. De route zelf schrijft evenmin.',
     bewijs: {
-      gemeten: 'ronde tegen een draaiende server (2 sep 2026, na het toevoegen van de ' +
-        'openingenlaag): drie identieke oproepen gaven byte-voor-byte identieke antwoorden, en de ' +
-        'som over server/data/rtg.db en store.db was voor en na die drie oproepen gelijk -- dus niet ' +
-        'alleen even groot maar ongewijzigd. Zonder inlog antwoordt de route 401.',
+      gemeten: 'ronde tegen een draaiende server (2 sep 2026, herhaald na de reparatie van de ' +
+        'openingenlaag -- de eerste ronde mat code die inmiddels veranderd was, en een meting van ' +
+        'oude code is geen bewijs): drie identieke oproepen gaven byte-voor-byte identieke ' +
+        'antwoorden, en de som over server/data/rtg.db en store.db was voor en na die drie oproepen ' +
+        'gelijk -- dus niet alleen even groot maar ongewijzigd. Zonder inlog antwoordt de route 401.',
       op: OP
     },
     afgetekend: AFGETEKEND

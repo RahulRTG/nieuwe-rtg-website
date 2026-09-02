@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1444 bestanden en 10251 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1444 bestanden en 10253 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 1444 |
-| losse beweringen (`test(...)`) | 10251 |
+| losse beweringen (`test(...)`) | 10253 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 51 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 996 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1267 bestanden, 9947 beweringen.
+1267 bestanden, 9949 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -531,7 +531,7 @@ toets omvalt.
 | `klokwacht.test.js` | 6 | genoemd | DE WACHTSCHULD MAG ALLEEN KRIMPEN (scripts/klokwacht.js, KLOKWACHT.json). WAAROM DEZE RATEL ER IS. |
 | `kluis-binding.test.js` | 8 | gezakt op `return-weg#0` | De identiteitskluis met CONTEXT-BINDING (server/accounts/gebonden.js). De kluis versleutelde de inhoud van naam/e-mail/telefoon al, maar zei niets over waar die inhoud thuishoorde. |
 | `kluis-rotatie.test.js` | 7 | gezakt op `return-weg#0` | Sleutelrotatie van de identiteitskluis (server/accounts/onderhoud.js). Een gecompromitteerde kluissleutel moet te vervangen zijn zonder de gegevens te verliezen en zonder downtime. |
-| `knelpunt-openingen.test.js` | 8 | genoemd | DE OPENINGEN: DRIE STANDEN DIE NOOIT DOOR ELKAAR MOGEN LOPEN HDI.md par. 7 regel 6 (laag 6, Opportunity). |
+| `knelpunt-openingen.test.js` | 10 | genoemd | DE OPENINGEN: DRIE STANDEN DIE NOOIT DOOR ELKAAR MOGEN LOPEN HDI.md par. 7 regel 6 (laag 6, Opportunity). |
 | `knelpunt.test.js` | 6 | genoemd | DE KNELPUNTMOTOR: WAT ER OPEN LIGT, WAT BLOKKEERT, EN WAT NIET IS NAGEGAAN HDI.md par. 7 regel 8. |
 | `koppels.test.js` | 4 | gezakt op `liegpoort /api/` | Gekoppelde schakelaars (tegenhangers): twee functies die samen een dienst vormen volgen elkaar automatisch als de boardroom er een omzet, zodat er nooit een halve dienst overblijft (vacatures zonder sollicitanten,... |
 | `kosten.test.js` | 13 | genoemd | RTG KOSTPRIJS: wat kost elke gebruiker, en wie betaalt dat. Getoetst over het routecontract heen -- de schermen bouwen blind op deze routes, dus deze toetsen praten er net zo blind tegen: alleen fetch met een... |

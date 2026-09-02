@@ -228,7 +228,7 @@ test('9. de herstelcodes zijn niet scheef: de trekking verwerpt in plaats van re
      en meet niets. Zo stond hij hier eerst, en dat bleek pas toen de mutatie
      hieronder hem NIET liet zakken.
 
-     DE MUTATIE: zet in kern/identiteit/tweefactor.js de lus terug op
+     DE MUTATIE: zet in kern/identiteit/tweefactor-codes.js de lus terug op
      `ALFABET[bytes[i] % ALFABET.length]` zonder drempel -- dan is de uitkomst
      'NNNNNNNNNN' en zakt deze toets. */
   const crypto = require('crypto');

@@ -6,11 +6,13 @@
    regel gedrag: wie iets wil weten over prioriteit, routering, klokken,
    machtiging of bevestiging leest die module en niet dit bestand.
 
-   DE VOLGORDE IS GEEN SMAAK. zaak -> loop -> machtiging -> bevestiging: elk
-   hangt aan de vorige. De bevestiging maakt machtigingen aan, de machtiging
-   heeft een zaak nodig als bereik, en de loop is de enige die de tijdlijn
-   schrijft. Draai het om en er ontstaat een tak waarin een machtiging kan
-   bestaan zonder zaak, en dat is precies de vorm die deze laag verbiedt.
+   DE VOLGORDE IS GEEN SMAAK. zaak -> loop -> machtiging -> bevestiging -> patroon
+   -> persoonlijk: elk hangt aan de vorige. De bevestiging maakt machtigingen
+   aan, de machtiging heeft een zaak nodig als bereik, het patroon schrijft
+   uitsluitend via de loop (en dus via de tijdlijn), en de persoonlijke stand
+   leest wat het patroon heeft gemeld. Draai het om en er ontstaat een tak waarin
+   een machtiging kan bestaan zonder zaak, en dat is de vorm die deze laag
+   verbiedt. Het foutsignaal staat er LOS van: het kent geen zaak en geen mens.
 
    WAT ER NIET IN ZIT, EN WAAROM DAT ZO STAAT: kanalen. Mail, telefoon en
    terugbellen staan in ./klassen.js met `gebouwd: false` en een reden. Een zaak
@@ -23,6 +25,12 @@ module.exports = function maakService({ db, save, crypto, inzagelog, notify }) {
   const loop = require('./loop')({ zaken, save, notify });
   const machtigingen = require('./machtiging')({ db, save, crypto, zaken, inzagelog });
   const bevestiging = require('./bevestiging')({ db, save, crypto, zaken, machtigingen });
+  /* De patroonlaag kijkt vanaf de MELDERS en maakt geen incident: die woont in
+     kern/command. Zij levert een vermoeden, een mens beslist. En de persoonlijke
+     stand leest wat Service aan melders heeft GEMELD -- niet wat een meter zegt. */
+  const patronen = require('./patroon')({ zaken, loop, save, db });
+  const persoonlijk = require('./persoonlijk')({ zaken, patronen });
+  const foutsignalen = require('./foutsignaal')({ db, save });
 
   const mens = require('./mens');
   const router = require('./router');
@@ -58,6 +66,7 @@ module.exports = function maakService({ db, save, crypto, inzagelog, notify }) {
   return {
     serviceZaken: zaken, serviceLoop: loop,
     serviceMachtiging: machtigingen, serviceBevestiging: bevestiging,
+    servicePatronen: patronen, servicePersoonlijk: persoonlijk, serviceFoutsignaal: foutsignalen,
     serviceMens: mens, serviceRouter: router, servicePrioriteit: prioriteit,
     serviceKlassen: klassen, serviceKeuzes: keuzes
   };

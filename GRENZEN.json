@@ -332,7 +332,10 @@
       "officeAuth",
       "sseToOffice"
     ],
-    "fout": [],
+    "fout": [
+      "serviceFoutsignaal",
+      "tooManyTries"
+    ],
     "galerij": [
       "galerij"
     ],
@@ -1564,10 +1567,13 @@
     "service": [
       "magBalie",
       "serviceBevestiging",
+      "serviceFoutsignaal",
       "serviceKeuzes",
       "serviceLoop",
       "serviceMachtiging",
       "serviceMens",
+      "servicePatronen",
+      "servicePersoonlijk",
       "serviceZaken"
     ],
     "sleutelwoorden": [

@@ -9,7 +9,7 @@
 
    ER IS ECHT GEMETEN, EN DAT WAS DE MOEITE WAARD. Elke route hieronder is twee
    keer aangeroepen met exact hetzelfde lijf en zonder sleutel -- de kale ronde --
-   met voor en na een opname van de collecties van deze laag. Die ronde vond twee
+   met voor en na een opname van de collecties van deze laag. Die ronde vond vier
    fouten die geen enkele toets zag:
 
      1. Een bevestiging werd onbruikbaar zodra de zaak van team wisselde, en dat
@@ -21,12 +21,23 @@
         stilletjes het oude verzoek terug, en het lid keurde iets anders goed dan
         er gevraagd was. Opgelost in kern/service/bevestiging.js.
 
-   Dat is precies waarom deze standen een meting eisen en geen lezing: allebei
+     3. Twee keer bundelen stuurde elke gekoppelde melder een tweede keer
+        dezelfde mededeling. `koppel()` ving de dubbele koppeling wel af, maar
+        het BERICHT eronder niet -- en juist daar zit de schaal: bij twintig
+        melders is een dubbelklik twintig overbodige berichten.
+     4. Twee keer "hersteld" stuurde iedereen opnieuw dat de storing verholpen
+        was. Een tweede exemplaar van dat bericht maakt het eerste
+        ongeloofwaardig.
+
+   Dat is precies waarom deze standen een meting eisen en geen lezing: alle vier
    die takken zagen er bij het lezen prima uit.
 
    DE AFTEKENING IS EERLIJK OVER WAT ZE IS: gemeten en voorgesteld door Claude,
    niet door een mens nagelezen. Wie er een naleest en zijn naam eronder wil
    zetten, vervangt hem hier.
+
+   "Eenentwintig" hierboven is inmiddels zevenentwintig: de patroon-, status- en
+   foutlaag kwamen er later bij en zijn door dezelfde ronde gehaald.
 
    De kantoorkant staat in ./mutatiecontracten-service-kantoor.js -- samen gingen
    ze over de omvangsgrens, en de naad ligt op de LEZER, net als bij de routes
@@ -143,7 +154,13 @@ const CONTRACTEN = Object.assign({},
   EENMALIG('POST /api/service/weiger', 'service.weiger',
     'de bevestiging uit `id`, en alleen die van de melder',
     'Spiegelbeeld van bevestigen: de tweede aanroep loopt op de toestand stuk ("dit verzoek is ' +
-    'geweigerd") en niet op een duplicaatregel.', '400')
+    'geweigerd") en niet op een duplicaatregel.', '400'),
+
+  /* De persoonlijke stand. Leest de eigen lopende zaken en wat Service over de
+     gekoppelde storingen heeft GEMELD -- en zegt met zoveel woorden dat "niets
+     bekend" iets anders is dan "alles werkt". */
+  LEEST('POST /api/service/stand', 'service.stand',
+    'persoonlijk.stand(): een filter over de eigen zaken plus patronen.gemeldHersteld(), een opzoeking')
 );
 
 module.exports = { CONTRACTEN, AFGETEKEND, LEEST, TWEEDE, EENMALIG, BESCHERMD, OP, zetel };

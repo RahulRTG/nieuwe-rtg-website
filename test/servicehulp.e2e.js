@@ -19,6 +19,17 @@ const path = require('path');
 
 const pw = laadScherm();
 
+/* DE LA WORDT LEEG NEERGEZET EN DAARNA GEVULD. `.bss-hulp` bestaat dus al
+   voordat /api/service/mijn terug is, en wachten op die selector alleen levert
+   een toets die onder belasting op een lege la meet -- precies hoe deze drie
+   toetsen een keer wisselend zakten toen ze naast acht andere draaiden. Wachten
+   op een KNOP is het eerste moment waarop er echt iets staat. */
+async function laHelemaalOpen(page) {
+  await page.waitForFunction(() => window.RTGGids && window.RTGGids.open, null, { timeout: 20000 });
+  await page.evaluate(() => window.RTGGids.open());
+  await page.waitForSelector('.bss-hulp button', { timeout: 20000 });
+}
+
 async function api(base, pad, body, tok) {
   const r = await fetch(base + pad, { method: 'POST',
     headers: Object.assign({ 'content-type': 'application/json' }, tok ? { Authorization: 'Bearer ' + tok } : {}),
@@ -58,9 +69,7 @@ async function metLid(fn) {
 test('een lid meldt iets vanuit het scherm waar hij stond', { skip: geenBrowser(pw) }, async () => {
   await metLid(async (page, base, token) => {
     await page.goto(base + '/apps/wallet.html', { waitUntil: 'domcontentloaded' });
-    await page.waitForFunction(() => window.RTGGids && window.RTGGids.open, null, { timeout: 20000 });
-    await page.evaluate(() => window.RTGGids.open());
-    await page.waitForSelector('.bss-hulp', { timeout: 20000 });
+    await laHelemaalOpen(page);
 
     await page.click('.bss-hulp button');            // "Iets melden"
     await page.fill('.bss-veld', 'Mijn saldo klopt niet meer sinds vanochtend');
@@ -94,8 +103,7 @@ test('een lid bevestigt in de app wat een medewerker vraagt', { skip: geenBrowse
     assert.ok(v.bevestiging, JSON.stringify(v).slice(0, 200));
 
     await page.goto(base + '/apps/wallet.html', { waitUntil: 'domcontentloaded' });
-    await page.waitForFunction(() => window.RTGGids && window.RTGGids.open, null, { timeout: 20000 });
-    await page.evaluate(() => window.RTGGids.open());
+    await laHelemaalOpen(page);
     await page.waitForSelector('.bss-zaak', { timeout: 20000 });
 
     /* HET LID LEEST WAT ER OPENGAAT VOORDAT HIJ DRUKT. Zonder die zin is een
@@ -114,13 +122,31 @@ test('een lid bevestigt in de app wat een medewerker vraagt', { skip: geenBrowse
   });
 });
 
+test('een storing die het lid raakt staat in zijn eigen hulp-la', { skip: geenBrowser(pw) }, async () => {
+  await metLid(async (page, base, token) => {
+    const z = (await api(base, '/api/service/open',
+      { onderwerp: 'betaling', titel: 'Betalen lukt niet' }, token)).zaak;
+    const balie = await kantoorAlsPersoon(base);
+    await api(base, '/api/office/service/bundel', { zaken: [z.id], incident: 'RTG-0042' }, balie);
+
+    await page.goto(base + '/apps/wallet.html', { waitUntil: 'domcontentloaded' });
+    await laHelemaalOpen(page);
+    await page.waitForFunction(() => /RTG-0042/.test(document.body.textContent), null, { timeout: 20000 });
+
+    const tekst = await page.textContent('.bss-hulp');
+    assert.match(tekst, /Storing RTG-0042/, 'het lid ziet de storing niet in zijn eigen la');
+    /* EN ER STAAT GEEN GERUSTSTELLING. Geen groen vinkje, geen "alles werkt" --
+       beschikbaarheid wordt niet per lid gemeten. */
+    assert.doesNotMatch(tekst, /alles werkt|RTG werkt normaal/i,
+      'het scherm belooft beschikbaarheid die niemand meet');
+  });
+});
+
 test('de knop "ik wil een mens" staat er, en zet echt door', { skip: geenBrowser(pw) }, async () => {
   await metLid(async (page, base, token) => {
     await api(base, '/api/service/open', { onderwerp: 'bestelling', titel: 'Mijn bestelling kwam niet aan' }, token);
     await page.goto(base + '/apps/wallet.html', { waitUntil: 'domcontentloaded' });
-    await page.waitForFunction(() => window.RTGGids && window.RTGGids.open, null, { timeout: 20000 });
-    await page.evaluate(() => window.RTGGids.open());
-    await page.waitForSelector('.bss-hulp', { timeout: 20000 });
+    await laHelemaalOpen(page);
 
     const knop = page.locator('.bss-hulp button', { hasText: 'Ik wil een mens' });
     assert.equal(await knop.count(), 1, 'de knop om een mens te vragen staat er niet');

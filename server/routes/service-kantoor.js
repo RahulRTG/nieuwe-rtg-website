@@ -19,7 +19,8 @@
    die bevestiging staat met opzet NIET in deze antwoorden. */
 module.exports = (kern) => {
   const { app, officeAuth, boardroomWie, magBalie,
-    serviceZaken, serviceLoop, serviceMachtiging, serviceBevestiging, serviceKeuzes } = kern;
+    serviceZaken, serviceLoop, serviceMachtiging, serviceBevestiging, serviceKeuzes,
+    servicePatronen, serviceFoutsignaal } = kern;
 
   const veilig = (res, werk) => {
     try { const r = werk(); res.status(r && r.status ? r.status : 200).json(r); }
@@ -58,9 +59,16 @@ module.exports = (kern) => {
     /* De machtigingen bij deze zaak gaan mee: een medewerker hoort te zien wat
        er al openstaat voordat hij iets nieuws vraagt, en wat er van hemzelf
        nog geldig is. */
+    /* EN OF DIT EEN INDIVIDUEEL PROBLEEM IS. Kwam de melding van een scherm
+       waarop iets kapot is, dan hoort een medewerker dat te zien VOORDAT hij
+       gaat uitleggen dat het aan de browser van dit lid ligt. Alleen bij een
+       schermverwijzing: bij een betaling of een bestelling zegt een clientfout
+       niets. */
+    const b = r.zaak.betrokken;
     return Object.assign(r, {
       machtigingen: serviceMachtiging.lijst({ zaak: r.zaak.id, max: 20 }),
-      bevestigingen: serviceBevestiging.lijst({ zaak: r.zaak.id, max: 20 })
+      bevestigingen: serviceBevestiging.lijst({ zaak: r.zaak.id, max: 20 }),
+      foutsignalen: (b && b.soort === 'scherm') ? serviceFoutsignaal.bijScherm(b.code) : []
     });
   }));
 
@@ -113,4 +121,38 @@ module.exports = (kern) => {
   app.post('/api/office/service/machtigingen', officeAuth, balieAuth, (req, res) => veilig(res, () =>
     ({ ok: true, machtigingen: serviceMachtiging.lijst({ mens: req.balieKey, alleenGeldig: true, max: 50 }),
       tel: serviceMachtiging.tel() })));
+
+  /* ------------------------------------------------------------ patronen -- */
+  /* Twintig meldingen die hetzelfde zeggen. Dit LEEST alleen: er wordt niets
+     gebundeld tot een mens het bevestigt, en de uitslag zegt altijd WAAROP de
+     groep is gevormd -- anders is de drempel een orakel dat een maandagochtend
+     voor een storing aanziet. */
+  app.post('/api/office/service/patronen', officeAuth, balieAuth, (req, res) => veilig(res, () =>
+    ({ ok: true, vermoedens: servicePatronen.vermoedens(lijf(req)),
+      incidenten: servicePatronen.perIncident(),
+      let: 'Een vermoeden is een groep die iets DEELT. Wat zij delen is geen oorzaak.' })));
+
+  /* Bundelen: de schaalwinst. Vanaf hier is het een technische oplossing en
+     worden alle gekoppelde melders in een keer bijgewerkt. Het incidentnummer
+     komt uit RTG Command; deze laag geeft er geen tweede reeks bij uit. */
+  app.post('/api/office/service/bundel', officeAuth, balieAuth, (req, res) => veilig(res, () =>
+    servicePatronen.bundel(lijf(req).zaken, { incident: kort(lijf(req).incident, 60),
+      door: req.balieKey, tekst: kort(lijf(req).tekst, 1000) })));
+
+  /* Hersteld: iedereen die erop wachtte hoort het tegelijk. De zaken gaan NIET
+     op opgelost -- dat een platformstoring weg is, bewijst niet dat het probleem
+     van dit ene lid weg is. */
+  app.post('/api/office/service/incident/hersteld', officeAuth, balieAuth, (req, res) => veilig(res, () =>
+    servicePatronen.hersteld(kort(lijf(req).incident, 60), { door: req.balieKey, tekst: kort(lijf(req).tekst, 1000) })));
+
+  /* --------------------------------------------------------- foutsignalen -- */
+  /* Gegroepeerd op vingerafdruk, niet per gebeurtenis: een scherm dat op elke
+     render struikelt levert tienduizend meldingen, en tienduizend zaken is geen
+     wachtrij meer. `gebruikers` staat er als null MET de reden -- de foutingang
+     staat zonder inlog open en kent dus geen mensen om te tellen. */
+  app.post('/api/office/service/foutsignalen', officeAuth, balieAuth, (req, res) => veilig(res, () =>
+    ({ ok: true, signalen: serviceFoutsignaal.lijst({ max: 50 }), tel: serviceFoutsignaal.tel() })));
+
+  app.post('/api/office/service/foutsignaal/koppel', officeAuth, balieAuth, (req, res) => veilig(res, () =>
+    serviceFoutsignaal.koppel(kort(lijf(req).signaal, 40), kort(lijf(req).zaak, 40))));
 };

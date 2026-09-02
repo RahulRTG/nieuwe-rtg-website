@@ -1,26 +1,26 @@
 {
  "stempel": {
-  "op": "2026-09-02T19:40:54.176Z",
-  "commit": "d09f29a4",
+  "op": "2026-09-02T20:27:57.947Z",
+  "commit": "51c163fc",
   "boomVuil": true,
-  "boomAnders": 12,
+  "boomAnders": 4,
   "instrument": "scripts/mutatieinventaris.js",
   "node": "v22.22.2"
  },
  "uitleg": "De vijf inventarissen uit EEN bron, met per stap hoeveel er afvallen en waarom. Zonder dit bestand heten vier verschillende getallen allemaal \"het aantal routes\", en is elk percentage dat erop rust niet na te rekenen.",
  "grens": "Dit telt wat de ROUTER kent. Een mutatie die niet over HTTP binnenkomt -- een taak, een achtergrondlus, een migratie -- staat hier niet in en is daarmee niet geteld, niet veilig.",
  "inventarissen": {
-  "route": 4877,
-  "mutatie": 4790,
-  "mutatieBuitenSchakel": 4760,
-  "idempotentieAanroepbaar": 4750,
+  "route": 4883,
+  "mutatie": 4796,
+  "mutatieBuitenSchakel": 4766,
+  "idempotentieAanroepbaar": 4756,
   "werkelijkAangeroepen": 4729,
   "bewijsMetSleutel": 1573,
   "bewijsZonderSleutel": 217,
   "verklaard": 352
  },
  "autorisatie": {
-  "rol": 3753,
+  "rol": 3759,
   "(geen bewakerslaag)": 614,
   "geenBewaker": 56,
   "lichaamssleutel": 74,

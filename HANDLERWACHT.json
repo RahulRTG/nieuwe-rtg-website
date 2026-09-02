@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-01T08:55:57.732Z",
-  "commit": "a7f678119",
-  "boomVuil": false,
-  "boomAnders": 4,
+  "op": "2026-09-02T20:31:19.962Z",
+  "commit": "51c163fc",
+  "boomVuil": true,
+  "boomAnders": 9,
   "instrument": "scripts/handlerwacht.js",
   "node": "v22.22.2"
  },
@@ -2924,7 +2924,7 @@
   },
   {
    "sleutel": "POST /api/fout/client",
-   "bestand": "server/routes/fout.js:27",
+   "bestand": "server/routes/fout.js:46",
    "staat": "openbaar",
    "reden": "een fout uit de browser: JUIST zonder poort, want een fout die het inloggen zelf sloopt komt nooit binnen achter een poort die inloggen vereist. Er wordt niets bewaard en niets uitgevoerd, alleen gelogd, met een rem per IP en afgekapte velden (zie server/routes/fout.js voor wat er wel en niet meegaat)"
   },

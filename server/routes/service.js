@@ -20,7 +20,8 @@
    - ze beloven geen mens waar er geen is. Zonder account is het antwoord nee,
      met de reden erbij, en niet een zaak die in een wachtrij blijft staan. */
 module.exports = (kern) => {
-  const { app, auth, serviceZaken, serviceLoop, serviceBevestiging, serviceKeuzes, serviceMens } = kern;
+  const { app, auth, serviceZaken, serviceLoop, serviceBevestiging, serviceKeuzes, serviceMens,
+    servicePersoonlijk } = kern;
 
   const veilig = (res, werk) => {
     try { const r = werk(); res.status(r && r.status ? r.status : 200).json(r); }
@@ -107,4 +108,13 @@ module.exports = (kern) => {
 
   app.post('/api/service/weiger', auth, (req, res) => veilig(res, () =>
     serviceBevestiging.weiger(kort(lijf(req).id, 40), { melder: melder(req) })));
+
+  /* ------------------------------------------------- de persoonlijke stand -- */
+  /* "Werkt RTG voor mij?" -- en het antwoord is bewust kleiner dan die vraag.
+     Het gaat over de eigen lopende zaken en over storingen die daaraan gekoppeld
+     zijn, en het zegt met zoveel woorden dat "er is niets bekend" geen "alles
+     werkt" is. RTG meet beschikbaarheid niet per lid, en een groen vinkje dat
+     niet gemeten is, is precies wat BESTUUR.md verbiedt. */
+  app.post('/api/service/stand', auth, (req, res) => veilig(res, () =>
+    servicePersoonlijk.stand(melder(req))));
 };

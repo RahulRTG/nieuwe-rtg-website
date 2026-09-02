@@ -613,9 +613,20 @@ hij die zelf kan aanvragen. De vaste steuncode van de balie is vervangen door ee
 **bevestiging** (het lid ziet wie, waarvoor en wat er opengaat, en drukt zelf),
 met de code als terugval: zes cijfers, vijf minuten, een keer, aan die ene zaak
 gebonden. Par. 5 heeft vier klokken waarvan de vierde -- wacht op de melder --
-van de andere drie wordt AFGETROKKEN, want zonder hem meet je de melder; par. 9
-staat er even groot bij: de kale meetronde over de eenentwintig routes vond twee
-fouten die geen enkele toets zag en die er bij het LEZEN allebei prima uitzagen.
+van de andere drie wordt AFGETROKKEN, want zonder hem meet je de melder. Par. 7
+is de schaalwinst: twintig meldingen die hetzelfde zeggen worden een VERMOEDEN
+(geen tweede incident -- dat blijft van `kern/command/incident.js`, en het
+nummer komt daarvandaan), een mens bevestigt, en daarna is het EEN oplossing en
+twintig melders die vanzelf worden bijgewerkt -- maar **een hersteld incident
+sluit geen zaken**, want dat de storing weg is bewijst niet dat het probleem van
+dit lid weg is. Par. 8: de persoonlijke stand zegt NOOIT "alles werkt"
+(beschikbaarheid wordt niet per lid gemeten) en houdt uit elkaar wat een storing
+IS en wat Service erover heeft GEMELD. Par. 9: foutsignalen op vingerafdruk,
+waarbij `gebruikers` op `null` staat MET de reden -- de foutingang is zonder
+inlog en kent geen mensen om te tellen. En par. 12 staat er even groot bij: de
+kale meetronde over de zevenentwintig routes vond VIER fouten die geen enkele
+toets zag en die er bij het LEZEN alle vier prima uitzagen -- waaronder twee
+dubbelklikken die twintig melders twee keer hetzelfde stuurden.
 
 **`ONTWERP.md` is het RTG Design System 2.0** — de vormtaal: merk-elementen
 tegenover werk-elementen (Bodoni is ceremonieel en staat op een gesloten lijst

@@ -48,6 +48,23 @@ const CONTRACTEN = Object.assign({},
   BESCHERMD('POST /api/office/service/machtiging/intrek', 'office.service.machtiging.intrek',
     'ingetrokken blijft ingetrokken; de tweede aanroep laat de machtiging ongewijzigd'),
 
+  /* ---- de patroon-, status- en foutlaag ---- */
+  LEEST('POST /api/office/service/patronen', 'office.service.patronen',
+    'patronen.vermoedens() en perIncident(); allebei groeperen ze over bestaande zaken'),
+  LEEST('POST /api/office/service/foutsignalen', 'office.service.foutsignalen',
+    'foutsignaal.lijst() en tel(); lezen uit de kaart, geen teller die oploopt'),
+
+  BESCHERMD('POST /api/office/service/bundel', 'office.service.bundel',
+    'een zaak die al aan dit incident hangt wordt overgeslagen en krijgt GEEN tweede bericht. ' +
+    'Die bescherming zat er eerst niet: koppel() ving de dubbele koppeling wel af, maar het bericht ' +
+    'eronder niet, dus een dubbelklik stuurde twintig melders twee keer dezelfde mededeling'),
+  BESCHERMD('POST /api/office/service/incident/hersteld', 'office.service.incident.hersteld',
+    'een herstelmelding gaat een keer uit; een tweede aanroep geeft terug wanneer het al gemeld was ' +
+    'en verstuurt niets. Ook dit kwam uit de meetronde -- een tweede "de storing is verholpen" maakt ' +
+    'de eerste ongeloofwaardig'),
+  BESCHERMD('POST /api/office/service/foutsignaal/koppel', 'office.service.foutsignaal.koppel',
+    'de zaak wordt alleen toegevoegd als hij er nog niet in staat'),
+
   EENMALIG('POST /api/office/service/bevestiging/code', 'office.service.bevestiging.code', null,
     'De terugvalcode komt uit op dezelfde eenmalige bevestiging als /api/service/bevestig. Een ' +
     'tweede poging met dezelfde code wordt geweigerd omdat de code op is -- dat is de hele functie ' +

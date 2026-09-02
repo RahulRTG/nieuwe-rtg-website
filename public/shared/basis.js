@@ -674,13 +674,27 @@
       sheet.appendChild(blok);
       Promise.all([
         svc('/api/service/bevestigingen').catch(function () { return null; }),
-        svc('/api/service/mijn').catch(function () { return null; })
-      ]).then(function (uit) { teken(blok, uit[0], uit[1]); })
+        svc('/api/service/mijn').catch(function () { return null; }),
+        svc('/api/service/stand').catch(function () { return null; })
+      ]).then(function (uit) { teken(blok, uit[0], uit[1], uit[2]); })
         .catch(function () { blok.remove(); });
     }
 
-    function teken(blok, verzoeken, mijn) {
+    function teken(blok, verzoeken, mijn, stand) {
       if (!sheet || !blok.isConnected) return;
+
+      /* DE PERSOONLIJKE STAND, en alleen als hij iets ZEGT. Raakt er geen
+         storing aan uw zaken, dan staat er niets -- geen groen vinkje en geen
+         "alles werkt". Dat laatste zou een bewering zijn over beschikbaarheid,
+         en die wordt niet per lid gemeten; een geruststelling zonder meting is
+         precies wat BESTUUR.md verbiedt. De server zegt hetzelfde in zijn
+         `let`, dus dit scherm verzint er niets bij. */
+      ((stand && stand.raakt) || []).forEach(function (r) {
+        var w = el('div', 'bss-zaak');
+        w.appendChild(el('i', null, 'Storing ' + r.incident));
+        w.appendChild(el('p', null, r.zin));
+        blok.appendChild(w);
+      });
       /* HET VERZOEK OM EEN BEVESTIGING GAAT VOOR. Er zit een medewerker aan de
          telefoon te wachten; al het andere kan wachten. */
       ((verzoeken && verzoeken.verzoeken) || []).forEach(function (v) {

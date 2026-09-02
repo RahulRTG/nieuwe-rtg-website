@@ -137,7 +137,76 @@ Wat de melder aanlevert zijn **termen** (er ligt iets stil, er staat geld vast),
 nooit een prioriteit. Anders meet de wachtrij binnen een half jaar
 welbespraaktheid.
 
-## 7. Wat er staat, en wat er niet staat
+## 7. Het patroon: twintig meldingen die hetzelfde zeggen
+
+Als er een storing is, melden twintig mensen hem, en dan werken twintig
+medewerkers aan twintig zaken met dezelfde oorzaak. En als hij verholpen is,
+hoort niemand van die twintig dat vanzelf. Daar zit de schaalwinst.
+
+`kern/service/patroon.js` kijkt vanaf de **melders** en groepeert lopende zaken
+op onderwerp, de soort van het betrokken object en het scherm, binnen een venster
+van zes uur en vanaf drie zaken. Wat eruit komt is een **vermoeden**, geen
+incident:
+
+- **Het is geen tweede incident.** `kern/command/incident.js` blijft het incident
+  van dit huis; dat hangt aan een *vermogen* uit de gezondheidskaart, en de
+  melderskant heeft geen vermogen om aan te wijzen. Er komt dus ook geen tweede
+  nummerreeks: `bundel()` weigert zonder incidentnummer, en dat nummer komt uit
+  RTG Command.
+- **Correlatie is geen oorzaak, en dat staat in de uitslag.** Elk vermoeden zegt
+  waaróp de groep is gevormd. Vijf mensen die op maandagochtend over hun factuur
+  bellen delen een tijdvenster; dat is geen storing. Zonder die zin is de drempel
+  een orakel.
+- **De machine bundelt niets uit zichzelf.** Een mens bevestigt.
+
+Daarna is het één technische oplossing en twintig melders die vanzelf worden
+bijgewerkt. Maar: **een hersteld incident sluit geen zaken.** Ze gaan naar
+`inBehandeling` en niet naar `opgelost` — dat een platformstoring weg is, bewijst
+niet dat de bestelling van dit ene lid alsnog is aangekomen. Het scherm wordt er
+rustiger van om dat wel te doen, en dat is precies de reden om het niet te doen.
+
+## 8. De persoonlijke stand, zonder groen vinkje
+
+Een gewone statuspagina zegt "Payments: degraded performance", en dat is voor
+bijna iedereen onwaar in beide richtingen. `kern/service/persoonlijk.js`
+beantwoordt een kleinere en eerlijkere vraag: *raakt er op dit moment een bekende
+storing een van uw lopende zaken?*
+
+Wat er met opzet **niet** staat is "RTG werkt normaal voor u". Dat zou een
+bewering zijn over beschikbaarheid, en die wordt niet per lid gemeten. Het
+antwoord bij geen treffer is "wij zien niets dat uw zaken raakt", met de zin
+erbij dat dat iets anders is dan dat alles werkt (BESTUUR.md: `niet vast te
+stellen` is een eersteklas uitslag naast in orde en storing).
+
+En het houdt twee bronnen uit elkaar die niet hetzelfde zijn: of een storing
+verholpen **is** weet RTG Command; wat Service aan de melders heeft **verteld**
+staat hier. Een lid dat "hersteld" leest, leest dat wij dat gemeld hebben — niet
+dat een meter het bevestigt. Vandaar drie standen en niet twee, met `onbekend`
+als eersteklas uitkomst.
+
+## 9. Foutsignalen: 84.000 gebeurtenissen, geen 84.000 zaken
+
+`routes/fout.js` ving browserfouten op en gooide ze weg. Wat er nu gebeurt is
+groeperen op een **vingerafdruk** (`kern/service/foutsignaal.js`) — soort,
+melding met de getallen weggestreept, bestand, regel — zodat er één regel staat
+waar er tienduizend gebeurtenissen waren.
+
+Twee dingen die daar niet in mogen sneuvelen:
+
+- **De vingerafdruk kent geen mensen.** Geen codenaam, geen sessiesleutel, geen
+  token. Deze deur staat met opzet zonder inlog open (een fout die het inloggen
+  sloopt komt nooit binnen achter een poort die inloggen vereist), dus alles wat
+  binnenkomt is van een onbekende. Er wordt geteld hoe *vaak* iets gebeurde, niet
+  wie het overkwam.
+- **`gebruikers` is `null` met de reden erbij.** Zonder identiteit is dat niet te
+  tellen, en een geschat aantal mensen is precies het getal dat later als feit
+  wordt geciteerd.
+
+Wie vanaf een kapot scherm om hulp vraagt, laat de medewerker meteen zien dat dit
+geen individueel probleem is: `/api/office/service/zaak` geeft de signalen van
+dat scherm mee.
+
+## 10. Wat er staat, en wat er niet staat
 
 **Staat** (gemeten, met toetsen die zijn zien zakken):
 
@@ -150,19 +219,19 @@ welbespraaktheid.
 - de supportbevestiging met eenmalige terugvalcode;
 - de ledenkant in de app-gids-la (Core, op elk scherm) en de kantoorkant achter
   de balie-zetel;
-- de klacht van de ledenbalie krijgt een envelop en blijft een klacht.
+- de klacht van de ledenbalie krijgt een envelop en blijft een klacht;
+- patroonherkenning met bundelen en herstellen in één handeling;
+- de persoonlijke stand, zonder belofte over beschikbaarheid;
+- foutsignalen op vingerafdruk, gevoed door `routes/fout.js`.
 
 **Staat niet**, met de reden en niet als lege functie:
 
 - **kanalen**: mail, telefoon, terugbellen en API staan in `klassen.js` met
   `gebouwd: false` en een reden. Een zaak uit zo'n kanaal is dezelfde zaak;
   alleen het transport ontbreekt, en wie er een bouwt raakt de zaak niet aan.
-- **incidentkoppeling met patroonherkenning**: koppelen kan (`/koppel`), maar
-  niets merkt zélf op dat twintig zaken dezelfde foutcode dragen.
-- **de persoonlijke statuspagina**: volgt op het vorige punt; zonder herkenning
-  is er niets om persoonlijk over te melden.
-- **foutsignalen**: `routes/fout.js` logt clientfouten nog steeds en gooit ze
-  weg. Groeperen op fingerprint en aan een zaak koppelen bestaat niet.
+- **een koppeling met de incidentstand van RTG Command**: Service weet wat zij
+  zelf heeft gemeld, niet wat de gezondheidskaart zegt. Die brug is bewust niet
+  gelegd zolang de melderskant geen vermogen kan aanwijzen.
 - **support voor partners en leveranciers richting RTG**: een zaak kan de
   doelgroep `zaak` dragen en er is een team `zakelijk`, maar er is geen ingang
   waarlangs een leverancier hem opent.
@@ -170,7 +239,7 @@ welbespraaktheid.
 - **AI-onderzoeker en copilot**: de router kiest een team, geen techniek. De
   intelligentierouter (`kern/ai/router.js`) loopt in de schaduw en beslist niets.
 
-## 8. De grenzen
+## 11. De grenzen
 
 1. **Een zaak opent niets.** `betrokken` is een verwijzing; gegevens vragen een
    machtiging, en die vraagt een bevestiging van het lid.
@@ -184,13 +253,17 @@ welbespraaktheid.
    `server/lib/mutatiecontracten-service*.js`; `hooguitEens` is de eerlijke
    klasse voor een bevestiging die één keer werkt.
 6. **Er staat nooit een getal waar er geen is.** Klokken die niet gemeten zijn,
-   zeggen dat.
+   zeggen dat; `gebruikers` bij een foutsignaal is `null` met de reden erbij.
+7. **De machine bundelt niet en sluit niet.** Zij levert een vermoeden en licht
+   melders in; groeperen en afsluiten blijven een oordeel.
+8. **Er komt geen groen vinkje.** De persoonlijke stand zegt nooit dat alles
+   werkt, want beschikbaarheid wordt niet per lid gemeten.
 
-## 9. Wat de meting vond, en wat lezen niet vond
+## 12. Wat de meting vond, en wat lezen niet vond
 
-De eenentwintig routes zijn door een **kale ronde** gehaald: twee keer dezelfde
+De zevenentwintig routes zijn door een **kale ronde** gehaald: twee keer dezelfde
 aanroep, met een opname van de servicecollecties (inclusief de tijdlijn) voor en
-na. Dat vond twee fouten die geen enkele toets zag, en allebei zagen ze er bij
+na. Dat vond vier fouten die geen enkele toets zag, en alle vier zagen ze er bij
 het lezen prima uit:
 
 1. **Een bevestiging werd onbruikbaar zodra de zaak van team wisselde** — en dat
@@ -200,6 +273,12 @@ het lezen prima uit:
    wat er gevraagd werd.** Een medewerker die om iets anders vroeg kreeg
    stilletjes het oude verzoek terug, en het lid keurde iets anders goed dan er
    gevraagd was.
+3. **Twee keer bundelen stuurde elke melder een tweede keer dezelfde
+   mededeling.** `koppel()` ving de dubbele koppeling wel af, het bericht
+   eronder niet — en juist daar zit de schaal: bij twintig melders is een
+   dubbelklik twintig overbodige berichten.
+4. **Twee keer "hersteld" stuurde iedereen opnieuw dat de storing verholpen
+   was.** Een tweede exemplaar van dat bericht maakt het eerste ongeloofwaardig.
 
 Daarnaast bleek de eerste versie van de meter zelf blind voor de tijdlijn — en
 meldde dus "geen effect" bij een route die aantoonbaar schrijft. Dat is de

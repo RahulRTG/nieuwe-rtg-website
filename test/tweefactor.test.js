@@ -202,3 +202,57 @@ test('7d. en hij levert een BEWIJS en nooit een sessietoken', () => {
   assert.ok(gevraagd[0].ttl <= 10 * 60 * 1000, 'een bewijs dat lang leeft is een half sessietoken');
   assert.equal(p.token, undefined);
 });
+
+test('9. de herstelcodes zijn niet scheef: de trekking verwerpt in plaats van rest te delen', () => {
+  /* WAT HIER FOUT WAS. De code deelde de rest van een willekeurige byte door de
+     lengte van het alfabet (30). Een byte loopt tot 255, en 256 is geen veelvoud
+     van 30: de eerste zestien letters kwamen er negen keer uit en de laatste
+     veertien acht keer -- ruim twaalf procent scheef. CodeQL noemt dat
+     js/biased-cryptographic-random, en het raakt precies de LAATSTE uitweg van
+     een lid dat zijn toestel kwijt is.
+
+     WAAROM DEZE TOETS NIET TELT MAAR STUURT. Een statistische toets over
+     honderdduizenden trekkingen is traag en heeft een marge; deze voedt de
+     generator in plaats daarvan met bytes uit de scheve staart. Alles vanaf 240
+     hoort te worden VERWORPEN, dus mag geen enkele letter uit die greep komen.
+     Met de oude regel gaf elke byte 250 dezelfde letter (250 % 30 = 10), en
+     bestond de hele code uit tien keer dat ene teken. De bewering hieronder telt
+     daarom het aantal VERSCHILLENDE tekens en noemt geen letter bij naam: de
+     eerste versie hiervan zocht naar 'N' terwijl het 'M' moest zijn, en stond
+     daardoor groen op precies de code die hij hoorde af te keuren.
+
+     EN WAAROM HET SLOT PAS NA `begin` GAAT. De eerste keer dat deze module om
+     bytes vraagt is voor het TOTP-geheim in `begin`. Wie het slot ervoor zet,
+     voert die staartbytes aan het geheim en laat de codegenerator gewoon zijn
+     gang gaan -- de toets staat dan groen bij zowel de oude als de nieuwe regel,
+     en meet niets. Zo stond hij hier eerst, en dat bleek pas toen de mutatie
+     hieronder hem NIET liet zakken.
+
+     DE MUTATIE: zet in kern/identiteit/tweefactor.js de lus terug op
+     `ALFABET[bytes[i] % ALFABET.length]` zonder drempel -- dan is de uitkomst
+     'NNNNNNNNNN' en zakt deze toets. */
+  const crypto = require('crypto');
+  const { tf, u } = opzet();
+  const b = tf.begin(u, 'RTG', 'lid');
+  const code6 = nu(b.geheim);
+
+  const echt = crypto.randomBytes;
+  let grepen = 0;
+  crypto.randomBytes = (n) => {
+    grepen += 1;
+    /* Eerste greep binnen `bevestig`: alleen de scheve staart (>= 240). Daarna
+       gewone bytes, zodat de generator zijn code alsnog af kan maken. */
+    return grepen === 1 ? Buffer.alloc(n, 250)
+      : Buffer.from(Array.from({ length: n }, (_, i) => (i * 7 + 3) % 240));
+  };
+  let codes;
+  try { codes = tf.bevestig(u, code6).herstelcodes; }
+  finally { crypto.randomBytes = echt; }
+
+  assert.ok(codes && codes.length, 'geen herstelcodes teruggekregen');
+  assert.equal(codes[0].length, 10, 'de lengte van een herstelcode hoort niet te veranderen');
+  assert.ok(new Set(codes[0]).size > 1,
+    'elke byte uit de staart gaf hetzelfde teken: de generator deelt de rest in plaats van te verwerpen (' +
+    codes[0] + ')');
+  assert.ok(grepen >= 2, 'een greep die alleen uit de staart bestaat hoort een tweede greep te vragen');
+});

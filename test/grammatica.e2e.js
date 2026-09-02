@@ -408,27 +408,40 @@ test('de grammatica', { skip: geenBrowser(pw), concurrency: false }, async (t) =
        transform:translateY(100%). */
     await metLid(async (page) => {
       await zetProef(page, 'zwaar');
-      const voor = await page.locator('#rtgCommand .cmd-balk').boundingBox();
-      await page.evaluate(() => window.RTGDiepte.bezig());
-      /* De rail zakt IN; dat is de toestand waar deze toets over gaat, en niet
-         "het scherm is stil" -- dat is het al voordat de rail begint. */
-      await page.waitForFunction(() => {
-        const r = document.querySelector('#rtgCommand .cmd-rail');
-        if (!r) return true;
-        const b = r.getBoundingClientRect();
-        return b.height < 6 || getComputedStyle(r).visibility === 'hidden' || b.width === 0;
-      }, null, { timeout: 15000 });
-      /* Het laatste overgangsframe van de inklappende gridrij kan op een trage
-         renderer al `height < 6` melden terwijl de impliciete dockrij nog één
-         layoutcyclus op haar oude spoor staat. Wacht op STILSTAND en niet op de
-         gewenste y: een blijvend verschoven dock wordt dan nog steeds hieronder
-         afgekeurd, maar een tussenframe is geen productuitkomst. */
-      await wachtOpStilVak(page, '#rtgCommand .cmd-balk');
-      const na = await page.locator('#rtgCommand .cmd-balk').boundingBox();
-      assert.equal(Math.round(voor.y), Math.round(na.y), 'het dock hoort te blijven staan');
-      assert.ok(!(await page.locator('#rtgCommand .cmd-rail').isVisible()) ||
-        (await page.locator('#rtgCommand .cmd-rail').boundingBox()).height < 6,
-        'de rail hoort in te zakken');
+      /* DE HELE METING IN DE PAGINA, EN IN EEN FRAME. `bezig` is namelijk geen
+         stand maar een VENSTER: diepte.js zet data-bezig en ruimt hem 1400ms na
+         de laatste beweging zelf weer op (RUST). Hier stonden vier tot vijf
+         Playwright-heenreizen binnen dat venster -- boundingBox, waitForFunction,
+         boundingBox, isVisible, boundingBox -- en niemand bepaalt hoe lang die
+         duren. Op een belaste runner viel de laatste meting NA de 1400ms, stond
+         de rail alweer open, en zakte de toets: in CI aan de dock-kant (854 tegen
+         796), lokaal onder belasting aan de rail-kant. Twee gezichten van
+         hetzelfde gat, en allebei een verzonnen storing over een dock dat
+         gewoon blijft staan.
+
+         Dus: voor, de aanzet en na worden binnen de pagina gelezen, en de twee
+         eindmetingen komen uit hetzelfde frame. Geen enkele heenreis valt nog
+         binnen het venster, en de toets meet weer wat hij beweert te meten. */
+      const meting = await page.evaluate(async () => {
+        const balk = () => document.querySelector('#rtgCommand .cmd-balk');
+        const rail = () => document.querySelector('#rtgCommand .cmd-rail');
+        const frame = () => new Promise((r) => requestAnimationFrame(() => r()));
+        const ingezakt = (r) => !r || r.height < 6 || r.width === 0 ||
+          getComputedStyle(rail()).visibility === 'hidden';
+
+        const voor = balk().getBoundingClientRect().y;
+        window.RTGDiepte.bezig();
+        const grens = performance.now() + 10000;
+        let r = rail() && rail().getBoundingClientRect();
+        while (!ingezakt(r) && performance.now() < grens) {
+          await frame();
+          r = rail() && rail().getBoundingClientRect();
+        }
+        /* Hetzelfde frame: het dock en de rail worden naast elkaar gelezen. */
+        return { voor: voor, na: balk().getBoundingClientRect().y, railIn: ingezakt(r) };
+      });
+      assert.equal(Math.round(meting.voor), Math.round(meting.na), 'het dock hoort te blijven staan');
+      assert.ok(meting.railIn, 'de rail hoort in te zakken');
     });
   });
 

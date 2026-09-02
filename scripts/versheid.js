@@ -134,7 +134,16 @@ const REGISTERS = [
   ['ACTIVERING.json', 'npm run activering:vast', 'wat een functie aanzetten werkelijk aanzet, met de graad van zekerheid erbij'],
   ['TREDEPROEF.json', 'node scripts/tredeproef.js --alle --vastleggen', 'of een trede lekt: zuiver, beproefd, de rondgang en de ingangen buiten HTTP'],
   ['WEKKERS.json', 'npm run wekkers:vast', 'de ingangen die geen route zijn (klok, bus, luisteraar, werker) en welke functie ze doen'],
-  ['ZAAKWIG.json', 'npm run zaakwig:vast', 'een bestelling van het lid tot in de kassa, op drie treden, op de bedrijfsinvarianten']
+  ['ZAAKWIG.json', 'npm run zaakwig:vast', 'een bestelling van het lid tot in de kassa, op drie treden, op de bedrijfsinvarianten'],
+
+  /* EN DE MEETLEER, die over deze registers zelf gaat.
+
+     Hij hoort hier om de reden die hij zelf handhaaft, en dat is geen woordspel:
+     een verouderde meetleer meldt hoeveel registers hun lezer remmen, gemeten op
+     een boom die er niet meer is. Een instrument dat over eerlijkheid van
+     metingen gaat en zelf niet onder toezicht staat, is het eerste dat niemand
+     serieus neemt. */
+  ['MEETLEER.json', 'npm run meetleer:vast', 'of een register de lezer er meer uit laat concluderen dan het aantoont']
 ];
 
 /* Het stempel van een register. Twee vormen, en dat is historie en geen smaak:

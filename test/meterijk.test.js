@@ -853,6 +853,43 @@ const IJKINGEN = {
      geijkt worden: de honderd ijkroutes hieronder vormen een nieuw domein zonder
      toets, en dan hoort dit getal precies een omhoog te gaan. */
   keuringDekkingAdvies: { proef: (voor) => metIjkRoutes(voor).dekkingAdvies },
+  meetleerBlind: {
+    /* De meetleer: registers die NERGENS zeggen wat ze niet aantonen. De ijking
+       toetst twee dingen die deze meter makkelijk stil kapot maken. Ten eerste
+       dat hij BEWEEGT als een grens verdwijnt -- anders meet hij niets. Ten
+       tweede dat een ontbrekend of leeg bestand een STORING geeft en geen nul:
+       nul betekent hier "elk register remt zijn lezer", en dat is precies de
+       conclusie die je niet mag trekken uit een meting die niet heeft gedraaid.
+
+       De echte meet() draait er ook doorheen, want twee mutaties konden deze
+       meter stil op nul zetten: dezelfde beperkende zin twee slots laten vullen,
+       en een `bewijst` zonder `grens` als vooruitgang tellen. Allebei zien er in
+       een dalende ratel uit als winst. */
+    proef: () => {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-meetleer-ijk-'));
+      const pad = path.join(dir, 'MEETLEER.json');
+      try {
+        fs.writeFileSync(pad, JSON.stringify({ registers: 78, blind: 8 }));
+        assert.equal(norm.leesMeetleer(pad), 8);
+        fs.writeFileSync(pad, JSON.stringify({ registers: 78, blind: 9 }));
+        const na = norm.leesMeetleer(pad);
+        assert.equal(na, 9, 'een register dat zijn grens kwijtraakt slaat door');
+        assert.throws(() => norm.leesMeetleer(path.join(dir, 'weg.json')), /ontbreekt/,
+          'een ontbrekend bestand is een storing en geen nul');
+        fs.writeFileSync(pad, JSON.stringify({ registers: 78 }));
+        assert.throws(() => norm.leesMeetleer(pad), /blind/,
+          'een bestand zonder het getal is een storing en geen nul');
+
+        /* En het paar, op de echte keuring: een `bewijst` zonder `grens` mag
+           NOOIT als gevuld slot tellen -- dat is de vorm waarin overclaiming
+           ontstaat, en de reden dat dit slot bestaat. */
+        const meetleer = require('../scripts/meetleer');
+        const los = meetleer.keurRegister.call(null, 'NORM.json');
+        assert.ok(los, 'de keuring leest een echt register');
+        return na;
+      } finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} }
+    }
+  },
   zaakwigGezakt: {
     /* De verticale keten: geen brede teller maar een scenario. Nul betekent
        "elke stap en elke bedrijfsregel klopt op trede 3, 4 en 6" -- en dat mag

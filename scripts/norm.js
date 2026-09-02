@@ -225,6 +225,7 @@ const METERS = [
      een echt gat: /api/supplier/pos/redeem zette een bon administratief op
      betaald terwijl de betaalrail uit stond. Dat hoort dus op nul te blijven. */
   { sleutel: 'zaakwigGezakt', richting: 'omlaag', wat: 'stappen en invarianten van de verticale zaakketen die zakken (uit ZAAKWIG.json)' },
+  { sleutel: 'meetleerBlind', richting: 'omlaag', wat: 'registers die NERGENS zeggen wat ze niet aantonen -- veld noch zin (uit MEETLEER.json)' },
   { sleutel: 'tredeIngangLekken', richting: 'omlaag', wat: 'ingangen buiten HTTP die op trede 0 antwoorden terwijl hun functie uit staat (uit TREDEPROEF.json)' },
   { sleutel: 'wekkersFunctieUitToch', richting: 'omlaag', wat: 'ingangen buiten HTTP die het werk van een functie doen zonder langs haar schakelaar te komen (uit WEKKERS.json)' },
   { sleutel: 'wekkersZonderTrede', richting: 'omlaag', wat: 'ingangen buiten HTTP waarvan geen trede te bepalen is (uit WEKKERS.json)' },
@@ -711,6 +712,21 @@ function leesRondgang(pad, veld) {
 /* De lezer van ZAAKWIG.json -- pad als parameter, werpend bij een ontbrekend
    getal. Nul zou hier "de hele keten klopt" betekenen, en dat is precies wat je
    niet mag aannemen als er niets gemeten is. */
+/* MEETLEER.json -> het aantal registers dat NERGENS zegt wat het niet aantoont.
+   Zelfde vorm als hierboven en om dezelfde reden: ontbreekt het bestand, dan is
+   dat een storing en geen nul. Nul zou hier "elk register remt zijn lezer"
+   betekenen, en dat is precies de conclusie die je niet mag trekken uit een
+   meting die niet heeft gedraaid. */
+function leesMeetleer(pad) {
+  let a;
+  try { a = JSON.parse(fs.readFileSync(pad, 'utf8')); }
+  catch (e) { throw new Error('MEETLEER.json ontbreekt of is stuk (' + e.message + '); draai npm run meetleer:vast'); }
+  if (!a || typeof a.blind !== 'number') {
+    throw new Error('MEETLEER.json draagt geen blind; een meter zonder invoer is geen meter');
+  }
+  return a.blind;
+}
+
 function leesZaakwig(pad) {
   let a;
   try { a = JSON.parse(fs.readFileSync(pad, 'utf8')); }
@@ -940,6 +956,7 @@ function meet(bronnen) {
   const tredeRondgangGezakt = leesRondgang(path.join(WORTEL, 'TREDEPROEF.json'));
   const tredeIngangLekken = leesRondgang(path.join(WORTEL, 'TREDEPROEF.json'), 'ingangLekken');
   const zaakwigGezakt = leesZaakwig(path.join(WORTEL, 'ZAAKWIG.json'));
+  const meetleerBlind = leesMeetleer(path.join(WORTEL, 'MEETLEER.json'));
 
   /* De deuren naar db.data uit dezelfde bron als het losse script, om dezelfde
      reden als hierboven: een tweede implementatie loopt binnen een week uiteen. */
@@ -1031,6 +1048,7 @@ function meet(bronnen) {
     tredeRondgangGezakt,
     tredeIngangLekken,
     zaakwigGezakt,
+    meetleerBlind,
     wekkersOnverklaard,
     wekkersFunctieUitToch,
     wekkersZonderTrede,
@@ -1369,6 +1387,6 @@ function main() {
 }
 
 if (require.main === module) process.exit(main());
-module.exports = { meet, leesNorm, METERS, schoon, traagsteTanden, heeftEinde, dagenTussen, oordeel, leesActivering, leesTredeproef, leesWekkers, leesRondgang, leesZaakwig,
+module.exports = { meet, leesNorm, METERS, schoon, traagsteTanden, heeftEinde, dagenTussen, oordeel, leesActivering, leesTredeproef, leesWekkers, leesRondgang, leesZaakwig, leesMeetleer,
   PRESTATIEMETERS, leesPrestatie, bron, PRESTATIEBESTAND, telOngeijkt, telInlineStijl, telSkips,
   telBewijslaag };

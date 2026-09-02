@@ -141,6 +141,8 @@
     "tredeproef:alle": "node scripts/tredeproef.js --alle",
     "wekkers": "node scripts/wekkers.js",
     "wekkers:vast": "node scripts/wekkers.js --vastleggen",
+    "meetleer": "node scripts/meetleer.js",
+    "meetleer:vast": "node scripts/meetleer.js --vastleggen",
     "zaakwig": "node scripts/zaakwig.js",
     "zaakwig:vast": "node scripts/zaakwig.js --vastleggen",
     "semantiek:vast": "node scripts/semantiek.js --vastleggen",

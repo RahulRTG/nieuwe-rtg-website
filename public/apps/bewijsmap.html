@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bewijsmap</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/veiligheid.css" rel="stylesheet">
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+  /* Zelfde vormtaal als /apps/toestemming.html, en dat is met opzet: dit scherm
+     beantwoordt de tweede helft van dezelfde vraag. Daar staat wie iets van u
+     mag zien; hier staat wat u kunt aantonen. Twee schermen die over uw eigen
+     gegevens gaan horen er niet verschillend uit te zien. */
+  .bw{border:1px solid var(--line);border-radius:0;padding:1rem;margin:.7rem 0;}
+  .bw .naam{font-family:'Bodoni Moda',Georgia,serif;font-size:1.1rem;}
+  .bw .stand{font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;}
+  .bw .stand.ja{color:var(--goldlicht);}
+  .bw .stand.nee{color:var(--soft);}
+  .bw .uitleg{color:var(--soft);font-size:.85rem;line-height:1.55;margin:.3rem 0;}
+  /* De reden staat als eigen regel en niet als staart achter de uitleg: dat is
+     het enige op dit scherm waar u iets aan kunt doen, en hij verdwijnt zodra
+     hij een bijzin wordt. Zelfde redenering als .doel op het toestemmingsscherm. */
+  .bw .reden{color:var(--txt);font-size:.85rem;line-height:1.55;margin:.3rem 0;}
+  .bw .tot{color:var(--soft);font-size:.78rem;line-height:1.5;}
+  /* Verloopt binnenkort. Geen rood en geen uitroepteken: dit is informatie en
+     geen alarm, en een scherm dat om aandacht schreeuwt leert mensen wegkijken. */
+  .bw .let{border-left:2px solid var(--goldlicht);padding:.2rem 0 .2rem .7rem;
+    color:var(--txt);font-size:.82rem;line-height:1.55;margin:.4rem 0 0;}
+  .grens{border:1px solid var(--line);border-radius:0;padding:.9rem 1rem;margin:.7rem 0;}
+  .grens b{display:block;}
+  .grens span{color:var(--soft);font-size:.82rem;line-height:1.55;}
+  .storing{border:1px solid var(--rood,#DE6E92);border-radius:0;padding:.7rem .9rem;
+    margin:.6rem 0;font-size:.82rem;color:var(--soft);}
+  .voorbehoud{border-left:2px solid var(--goldlicht);padding:.2rem 0 .2rem .9rem;
+    color:var(--soft);font-size:.84rem;line-height:1.6;margin:1rem 0;}
+</style>
+<script src="/shared/seizoen.js" defer></script>
+<script src="/shared/veiligheid.js" defer></script>
+<link href="/shared/ios.css" rel="stylesheet">
+</head>
+<body class="rtg-stijl">
+<a class="skip" href="#inhoud">Naar de inhoud</a>
+<header class="kop">
+  <a href="/apps/app.html" aria-label="Terug naar de app">&#8592;</a>
+  <h1>Bewijsmap</h1>
+  <div class="rek"></div>
+  <span class="stil">wat u kunt aantonen</span>
+</header>
+<main id="inhoud">
+  <p class="stil">Wat u met RTG kunt aantonen zonder een papier te sturen. Een dienst die hierom
+  vraagt, krijgt alleen een vinkje: voldoet deze mens aan die eis, ja of nee. Nooit uw nummer, en
+  nooit een lijst van alles wat u heeft. Op dit scherm staat er meer, want dit gaat over uzelf.</p>
+
+  <section aria-label="Wat u kunt aantonen">
+    <h2>Wat u kunt aantonen</h2>
+    <div id="lijst"><p class="stil">Laden...</p></div>
+  </section>
+
+  <!-- De tweede helft van dezelfde vraag, en daarom een LINK en geen tweede
+       lijst: wie er heeft gekeken en wat u heeft weggegeven, staat al op
+       /apps/toestemming.html. Dat hier nabouwen zou twee schermen maken die
+       hetzelfde beweren en op een dag iets anders zeggen. -->
+  <section aria-label="Wie er iets van u kreeg">
+    <h2>Wie er iets van u kreeg</h2>
+    <p class="stil">Welke dienst wat van u te horen kreeg, en het intrekken daarvan, staat bij
+    <a href="/apps/toestemming.html">Toestemming</a>. Daar leeft die vraag voor al uw gegevens
+    tegelijk, en niet alleen voor uw bewijzen.</p>
+  </section>
+
+  <section aria-label="Waar deze lijst ophoudt">
+    <h2>Waar deze lijst ophoudt</h2>
+    <div id="grenzen"></div>
+  </section>
+</main>
+
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const esc = s => Veilig.esc(String(s == null ? '' : s));
+
+  /* Verloopt dit binnen zestig dagen? Het getal staat hier en niet op de server
+     omdat het een PRESENTATIEkeuze is: de server zegt tot wanneer iets geldt, en
+     wat "binnenkort" heet hangt af van wie er kijkt. Zestig dagen is dezelfde
+     horizon als kern/vakbewijs.js aanhoudt voor een zaak. */
+  const DAGEN = 60;
+  function binnenkort(tot) {
+    if (!tot) return false;
+    const grens = new Date(Date.now() + DAGEN * 86400000).toISOString().slice(0, 10);
+    const vandaag = new Date().toISOString().slice(0, 10);
+    return tot >= vandaag && tot <= grens;
+  }
+
+  function teken(d) {
+    /* GEEN BRON IS GEEN LEGE LIJST. Zonder de bewijzenlaag toont dit scherm een
+       melding en geen lege pagina: een lege lijst leest als "u heeft niets",
+       terwijl het antwoord "wij konden het niet nagaan" is. Dat onderscheid is
+       de hele reden dat de server een `bron`-vlag meestuurt. */
+    if (!d.bron) {
+      $('#lijst').innerHTML = '<div class="storing" role="status">' +
+        esc(d.uitleg || 'Wij konden dit niet nagaan.') + '</div>';
+      return;
+    }
+    const rijen = (d.eisen || []).map(e => {
+      const ja = e.voldoet === true;
+      return '<div class="bw">' +
+        '<span class="stand ' + (ja ? 'ja' : 'nee') + '">' + (ja ? 'Aan te tonen' : 'Nu niet') + '</span>' +
+        '<div class="naam">' + esc(e.naam) + '</div>' +
+        (e.uitleg ? '<div class="uitleg">' + esc(e.uitleg) + '</div>' : '') +
+        (!ja && e.reden ? '<div class="reden">' + esc(e.reden) + '</div>' : '') +
+        (ja && e.tot ? '<div class="tot">Geldig tot ' + esc(e.tot) + '.</div>' : '') +
+        (ja && !e.tot ? '<div class="tot">Hier staat geen einddatum bij.</div>' : '') +
+        (ja && binnenkort(e.tot)
+          ? '<div class="let">Dit verloopt binnenkort. Een nieuw stuk aanleveren gaat via de zaak ' +
+            'waar u werkt; RTG kan het niet voor u verlengen.</div>'
+          : '') +
+        '</div>';
+    }).join('');
+    $('#lijst').innerHTML = rijen || '<p class="stil">Er zijn hier geen eisen bekend.</p>';
+  }
+
+  /* WAT DIT SCHERM NIET IS. Deze zinnen staan er even groot bij als de lijst,
+     want een bewijsmap die alleen toont wat er kan, leest als een belofte over
+     wat er mag. Zelfde vorm als het slotblok van /apps/toestemming.html en van
+     de kanaaldossiers in de App Store. */
+  const GRENZEN = [
+    ['RTG controleert niets bij een register.',
+     'Wat hier staat is dat een medewerker van RTG uw stuk heeft GEZIEN. Wij bellen het BIG-register ' +
+     'niet en doen niet alsof. Een instantie die zekerheid nodig heeft, kijkt in haar eigen register.'],
+    ['Uw nummer staat hier niet, en gaat ook nooit mee.',
+     'Een registratienummer staat in een openbaar register. Naast uw codenaam zou het u weer een naam ' +
+     'geven, en daar is dit hele huis op gebouwd. Wie het nummer nodig heeft, vraagt het apart op, en ' +
+     'dan met een reden en een regel in uw inzagelog.'],
+    ['Een dienst krijgt nooit deze lijst.',
+     'Hij vraagt om een eis en krijgt een vinkje. Twee diensten die elk netjes vragen wat ze nodig ' +
+     'hebben, zouden samen te veel weten zodra ze lijsten kregen in plaats van antwoorden.'],
+    ['"Nu niet" is geen oordeel over u.',
+     'Het betekent dat wij het op dit moment niet kunnen aantonen. Waarom dat zo is, staat erbij, en ' +
+     'dat is het enige waar u zelf iets mee kunt.'],
+    ['Wij verlengen niets voor u.',
+     'Een verlopen stuk vernieuwt u bij de instantie die het afgeeft, en u levert het aan bij de zaak ' +
+     'waar u werkt. RTG zet hier niets voor u in gang.']
+  ];
+
+  async function laad() {
+    try { teken(await Veilig.api('/api/rtgid/bewijzen')); }
+    catch (e) { $('#lijst').innerHTML = '<div class="storing" role="status">Dit lukte niet. ' +
+      'Dat betekent dat wij het niet konden nagaan, en niet dat u niets heeft.</div>'; }
+    $('#grenzen').innerHTML = GRENZEN.map(g =>
+      '<div class="grens"><b>' + esc(g[0]) + '</b><span>' + esc(g[1]) + '</span></div>').join('');
+  }
+  document.addEventListener('DOMContentLoaded', laad);
+})();
+</script>
+<script src="/shared/deelmenu.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+<script src="/shared/ios.js" defer></script>
+</body>
+</html>

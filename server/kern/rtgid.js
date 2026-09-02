@@ -32,8 +32,15 @@ const KOPPEL_TTL_MS = 2 * 60 * 1000;      // een koppelcode leeft twee minuten
 const SESSIE_TTL_MS = 20 * 60 * 1000;     // een iD-sessie bij een dienst: twintig minuten
 const MAX_LOG = 100, MAX_KOPPELS = 300, MAX_SESSIES = 300;
 const ATTRIBUTEN = ['codenaam', '18plus', 'leeftijd', 'nationaliteit', 'naam'];
+/* Daarnaast kan een dienst een BEWIJS vragen: `bewijs:vog`, `bewijs:big`. Die
+   staan niet in de lijst hierboven omdat ze uit een ander register komen
+   (kern/persoonseis-lijst.js, via ./rtgid-bewijs.js) en daar worden afgeleid in
+   plaats van hier overgetypt. Wat er dan terugkomt is een vinkje en hooguit een
+   einddatum -- nooit het nummer, nooit een lijst stukken. Zie de kop daar. */
+const { isBewijsAttribuut } = require('./rtgid-bewijs');
+const magVragen = (a) => ATTRIBUTEN.includes(a) || isBewijsAttribuut(a);
 
-function maakRtgid({ db, save, crypto, accounts, schoon, leeftijdVan, gidsHaal, keyVanCodenaam, stapOp, passkeysVan }) {
+function maakRtgid({ db, save, crypto, accounts, schoon, leeftijdVan, gidsHaal, keyVanCodenaam, stapOp, passkeysVan, vakbewijsBron }) {
   const eigen = require('./eigencollectie')({ db, domein: 'kern/rtgid', bezit: { rtgid: 'kaart' } });
   const nu = () => Date.now();
   const iso = t => new Date(t == null ? Date.now() : t).toISOString();
@@ -61,14 +68,19 @@ function maakRtgid({ db, save, crypto, accounts, schoon, leeftijdVan, gidsHaal, 
      over WIE er aanklopt en of het lid akkoord gaat; dat over WAT er dan de
      deur uit mag. De gedeelde helpers gaan mee via de context. */
   const { niveauVoor, attributenVoor } = require('./rtgid-claims')({
-    accounts, accountVanKey, codenaamUit, leeftijdVan });
+    accounts, accountVanKey, codenaamUit, leeftijdVan,
+    /* De bewijzenlaag komt LATER in de opzet dan RTG iD (kern/vakbewijs.js
+       hangt in kernlaag3, dit in aanbouw2), dus hij wordt laat gebonden: een
+       functie die de bron ophaalt wanneer hij nodig is. Zonder bron antwoordt
+       de claim "niet na te gaan" en nooit "nee". */
+    vakbewijsBron });
 
   /* ---- de dienst-kant: een inlog starten en de uitkomst ophalen ---- */
   function start(b) {
     const s = S();
     const dienst = schoon(b.dienst, 60);
     if (!dienst) return { status: 400, error: 'Welke dienst vraagt de inlog?' };
-    const gevraagd = (Array.isArray(b.attributen) ? b.attributen : []).filter(a => ATTRIBUTEN.includes(a));
+    const gevraagd = (Array.isArray(b.attributen) ? b.attributen : []).filter(magVragen);
     if (!gevraagd.length) gevraagd.push('codenaam');
     /* Een dienst mag een betrouwbaarheidsniveau eisen: niet alleen "is dit lid
        18+", maar "en hoe hard weet u dat". Een eis die niet bestaat wordt hier
@@ -137,7 +149,13 @@ function maakRtgid({ db, save, crypto, accounts, schoon, leeftijdVan, gidsHaal, 
   const { inzage, intrek, machtig, machtigIntrek } = require('./rtgid-regie')({
     S, save, nu, iso, schoon, keyVanCodenaam, crypto, codenaamUit, logVan, cap, ATTRIBUTEN, MAX_LOG });
 
-  return { rtgid: { start, statusVan, wie, koppelZoek, bevestig, weiger, inzage, intrek, machtig, machtigIntrek } };
+  /* De bewijsmap van het lid zelf. Hij komt uit ./rtgid-bewijs.js en wordt hier
+     alleen doorgegeven, want ./rtgid-claims.js heeft dezelfde module al voor de
+     dienst-kant -- twee instanties zouden twee bronnen worden. */
+  const { mijnBewijzen } = require('./rtgid-bewijs')({ accountVanKey, vakbewijsBron });
+
+  return { rtgid: { start, statusVan, wie, koppelZoek, bevestig, weiger, inzage, intrek, machtig,
+    machtigIntrek, mijnBewijzen } };
 }
 
 module.exports = { maakRtgid };

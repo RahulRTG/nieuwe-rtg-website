@@ -1,25 +1,25 @@
 {
  "stempel": {
-  "op": "2026-09-02T16:58:22.302Z",
-  "commit": "d33da563",
+  "op": "2026-09-02T17:43:51.997Z",
+  "commit": "899a2380",
   "boomVuil": true,
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 4672,
-  "geclassificeerd": 4672,
+  "totaal": 4673,
+  "geclassificeerd": 4673,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3201,
-   "NOT_APPLICABLE": 1082,
+   "NOT_APPLICABLE": 1083,
    "PROTECTED": 304,
    "INTENTIONALLY_NON_IDEMPOTENT": 85
   },
-  "vastgesteldDoorMens": 1498,
+  "vastgesteldDoorMens": 1499,
   "afgeleidDoorScript": 3174,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 3833,
+   "AUTHENTICATED": 3834,
    "PUBLIC": 108,
    "OBJECT_SCOPED": 716,
    "SERVICE_TO_SERVICE": 14,
@@ -29,7 +29,7 @@
    "kale ronde: beschermd": 120,
    "kale ronde: onbeschermd": 86,
    "kale ronde: geen uitspraak": 4437,
-   "niet gemeten": 29
+   "niet gemeten": 30
   },
   "voorstellen": {},
   "metingVan": "2026-08-31T09:44:33.117Z"
@@ -84276,6 +84276,28 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "rtgid.bewijzen",
+   "route": "POST /api/rtgid/bewijzen",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth",
+     "eigenAccount"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },

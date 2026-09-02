@@ -7,6 +7,7 @@ module.exports = [
   '/',
   '/apps/',
   '/apps/app.html',
+  '/apps/bewijsmap.html',
   '/apps/boardroom.html',
   '/apps/bureau.html',
   '/apps/ik.html',

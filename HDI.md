@@ -37,7 +37,7 @@ van 2 september 2026:
 | voorgestelde laag | wat er al staat | stand |
 |---|---|---|
 | 1. Foundation Operations | `server/kern/rtfos/` — 49 modules: casus, meldcode, veld, integriteit, vrijwilligers-VOG, voorraad, geld, subsidies, projecten, gemeenteportaal, rapport, blauwdrukken, risico, beleid, bestuur, jaarverslag | **staat** |
-| 2. Human Control | `kern/consent.js` (+ dekkingsregister met eigen toets, en sinds 2 sep 2026 doel en termijn per venster), `public/apps/toestemming.html` (wat er openstaat én wie er keek), `kern/rtgid-regie.js` (inzagelog, `namens`, herroepbare machtiging), `kern/rtgid.js` (claim zonder gegeven) | **staat; RTG iD nog één attribuut breed** |
+| 2. Human Control | `kern/consent.js` (+ dekkingsregister met eigen toets, en sinds 2 sep 2026 doel en termijn per venster), `public/apps/toestemming.html` (wat er openstaat én wie er keek), `kern/rtgid-regie.js` (inzagelog, `namens`, herroepbare machtiging), `kern/rtgid.js` (claim zonder gegeven) | **staat; sinds 2 sep 2026 ook de bewijsmap** |
 | 3. Safety | `server/kern/beschermzaak/` (de eigen dataklasse, sinds 2 sep 2026), `server/kern/veiligheid/` (de persoonlijke laag: dodemansknop, stil codewoord, kring — zie par. 7.2), `kern/rtfos/meldcode.js`, `kern/zorgniveau.js` | **staat** |
 | 4. Recovery | `casus.SOORTEN` dekt huisvesting, schulden, werk, zorgdoorverwijzing, noodhulp; `kern/opvang.js` doet de asielketen; `kern/rtfos/voorraad*.js` de goederen | **staat als registratie, niet als traject** |
 | 5. Development | `kern/levensgraaf/` (18+ bronnen, vijf etiketten per knoop), `kern/levenslijn/fasen.js` (fasen zonder voortgangsbalk), `kern/doelen.js` | **staat als graaf, mist de motor** |
@@ -167,9 +167,15 @@ heeft over iemand anders, kan langs de voordeur wel een beschermzaak beginnen
 maar geen meldcode-traject in gang zetten -- en dat hoort ook niet, want de vijf
 stappen zijn beroepsstappen.
 
-### Laag 4 — Recovery · **staat als registratie, mist het traject**
+### Laag 4 — Recovery · **staat als registratie; het traject is laag 5**
 Wonen, recht, gezondheid en inkomen zijn er als casussoorten. Wat er niet is, is
-het besef dat ze op elkaar wachten. Dat is laag 5 en niet laag 4.
+het besef dat ze op elkaar wachten.
+
+**Let op de tegenspraak die hier stond.** De kop noemde dat een gat van laag 4
+terwijl de tekst eronder zegt dat het laag 5 is. Twee lezers kwamen daardoor tot
+twee verschillende opdrachten. Het is laag 5: het besef dat casussen op elkaar
+wachten is de MOTOR onder de levensgraaf, en die hoort bij Development. Laag 4
+zelf is af als registratie, en dat is geen tekort maar de knip.
 
 ### Laag 5 — Development · **de graaf staat, de motor niet**
 *(De Advocate leest sinds par. 7.7 ook de aflopende toestemmingen mee; de motor
@@ -399,6 +405,7 @@ veilige slaapplek heeft.
 | 8 | **De knelpuntmotor** — meerdere wegen, aannames in de uitslag, `onbepaald` waar niets is nagegaan | het eerlijke nieuwe stuk software; `EXECUTIE.md` noemde de leemte al | **eerste laag staat** (2 sep 2026), zie par. 7.9 |
 | 6b | **De openingen** -- per knelpunt wat er in dit huis bestaat dat hem zou opheffen, met twee assen: kunt u erbij, en lost het uw randvoorwaarde op | laag 6 bleek te bestaan; wat ontbrak was de kant van de mens, zie par. 7.10 | **staat** (2 sep 2026) |
 | 6c | **De ouderingang op de kinderopvang** -- het aanbod, een aanvraag klaarzetten, en hem zelf weer intrekken | de laatste `geen-ingang`, en de enige van de vier gaten die zonder een derde partij te vullen was | **staat** (2 sep 2026), zie par. 7.10 |
+| 7 | **De bewijsmap** -- een lid kan aantonen dat hij aan een eis voldoet, met een vinkje en zonder zijn nummer, plus een eigen scherm | par. 2 stelde hem voor; hij bleek te bestaan en niet aangesloten, zie par. 7.12 | **staat** (2 sep 2026) |
 | 6d | **Opleiding, wonen en vervoer** -- een inschrijfbaar aanbod, een woonvoorziening, structureel vervoer | de eigenaar koos alle vier; deze drie beginnen buiten de code | **vraagt een afspraak met een derde**, zie par. 7.11 |
 | 9 | **Human Services Protocol**: schemaregister op `kern/envelop.js` | pas zinvol als er iets is om te delen dat de moeite waard is | maanden |
 | 10 | **Society Intelligence** op `livinglab/graden.js` | pas na 6 — een populatiemodel zonder consent-graaf is een dataverzameling met een grafiek erop | jaren |
@@ -610,6 +617,77 @@ het ANTWOORD halen liet alle toetsen groen: er werd naar de kaart gekeken en nie
 of die zin de lezer bereikte. Een API-lezer miste dus precies de regel die "bron"
 van "dit is geregeld" onderscheidt, terwijl de meter groen stond — `LAT.md` regel 9
 in het klein.
+
+### 7.12 De bewijsmap, en de zesde meetfout
+
+**"RTG iD is nog één attribuut breed" was onjuist.** Die zin stond in de tabel
+van par. 1 en klopt niet: RTG iD kent er vijf — codenaam, 18plus, leeftijd,
+nationaliteit en naam — mét selectieve deling, een afgeleid 18plus-bewijs waarbij
+de geboortedatum de kluis niet verlaat, en per claim de herkomst (`paspoort` of
+`opgegeven`) plus het betrouwbaarheidsniveau. Dat is geen smalle laag.
+
+Het échte gat lag ergens anders, en hij lag er breeduit: **een lid kon zijn eigen
+BEWIJZEN niet delen.** `kern/vakbewijs.js` bestaat en is goed gebouwd — stukken
+met een aftekening door een mens, een geldigheid die bij élke vraag opnieuw wordt
+gerekend in plaats van als vlag te worden opgeslagen, en het nummer in de
+identiteitskluis. Maar hij werd alleen gelezen door `kern/persoonseis.js`, dat de
+vraag beantwoordt of iemand ergens mág werken. Dat is de vraag van de ZAAK. De
+mens zelf kon er niets mee.
+
+Zo bleek de `bewijsmap` uit par. 2 niet te ontbreken maar niet aangesloten te
+zijn — hetzelfde patroon als par. 7.10, waar de opvang wel bestond en de deur
+niet. Dat is nu twee keer gebeurd, en het is de scherpste les van deze reeks:
+**in dit huis is een gat vaker een ontbrekende verbinding dan een ontbrekend
+register.**
+
+**Wat er de deur uit gaat: een vinkje en hooguit een datum.** Een dienst vraagt
+`bewijs:vog` en krijgt `true` of `false`. Bij `true` gaat de einddatum mee, want
+wie iemand voor een half jaar inhuurt hoort te weten dat het bewijs eerder
+verloopt. Bij `false` gaat er géén datum en géén reden mee: het verschil tussen
+"nooit gehad" en "verlopen" is nuttig voor het lid en verraadt aan een dienst dat
+iemand het ooit had.
+
+Drie grenzen, en alle drie zijn ze een regel uit dit huis:
+
+- **het nummer nooit.** Een BIG-registratie staat in een OPENBAAR register; een
+  nummer naast een codenaam is niet een extra veld maar de sleutel die het hele
+  privacy-ontwerp opent. `kern/vakbewijs-nummer.js` zei dat al over zichzelf;
+- **geen lijst.** Er is geen route die "alle bewijzen van dit lid" naar buiten
+  geeft. Twee diensten die elk netjes vragen wat ze nodig hebben, weten samen te
+  veel zodra ze lijsten krijgen in plaats van antwoorden;
+- **`null` is geen `false`.** Zonder gekoppelde bewijzenlaag is het NIET NA TE
+  GAAN. Een dienst die "nee" leest waar dat hoort te staan, weigert een mens op
+  een storing (`BESTUUR.md`: *niet vast te stellen* is een eersteklas uitslag).
+
+De eisenlijst wordt **afgeleid** uit `kern/persoonseis-lijst.js` — het register
+dat een bestuurder of jurist leest — en niet hier overgetypt. Een tweede lijst zou
+binnen een jaar uiteenlopen met de eerste, en dan bestaat er een eis die nergens
+wordt afgedwongen of andersom.
+
+**En een scherm, want anders is het geen zeggenschap.** `/apps/bewijsmap.html`
+toont per eis of u hem nu kunt aantonen, tot wanneer, en bij "nu niet" de reden in
+gewone taal — het enige waar u zelf iets mee kunt. Daar staat het nummer óók niet.
+Wie er iets van u kreeg en het intrekken daarvan staat níét op dit scherm maar op
+`/apps/toestemming.html`, met een link heen en terug: die vraag leeft daar voor al
+uw gegevens tegelijk, en hem hier nabouwen zou twee schermen maken die op een dag
+iets anders zeggen.
+
+**Gemeten tegen een draaiende server met een echt account** (de demo-sessie kon
+het niet: RTG iD eist een eigen RTG-account, en dat is geen tekort van de proef
+maar de poort die werkt). Zeven eisen terug, elk met een leesbare reden, het
+nummer nergens — het woord "nummer" komt alleen voor in de uitlegtekst van de eis
+zelf, en dat is nagerekend in plaats van aangenomen. De dienstkant filtert een
+onbekende eis eruit: `bewijs:bestaatniet` valt weg, `bewijs:vog` blijft. In een
+browser op telefoonformaat: zeven rijen, vijf grensblokken, geen horizontaal
+scrollen, geen paginafouten. Acht toetsen, acht mutaties, alle acht raak.
+
+**Twee dingen die het scherm oplevert en die geen code zijn.** Zonder gekoppelde
+bewijzenlaag toont het een melding en géén lege lijst — een lege lijst leest als
+"u heeft niets" terwijl het antwoord "wij konden het niet nagaan" is. En de twee
+raakvlakken onder 24 px die de browserproef vond, komen uit de gedeelde
+cookiebalk (`shared/cookie.js`) en staan óók op `/apps/toestemming.html`. Dat is
+dus geen fout van dit scherm maar een huisbrede, en hij wordt hier gemeld in
+plaats van stil meegenomen.
 
 ### 7.11 De drie gaten die niet zonder een derde partij te vullen zijn
 

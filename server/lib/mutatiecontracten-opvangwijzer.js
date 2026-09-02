@@ -105,6 +105,28 @@ const CONTRACTEN = {
       'codenaam geeft 404, en een al bevestigde aanvraag geeft 409 met de reden erbij. Alle drie ' +
       'in test/opvangleden.test.js.', op: OP },
     afgetekend: AFGETEKEND
+  },
+
+  /* ---- de bewijsmap, en hij hoort hier niet echt thuis ----
+     Dit contract gaat over RTG iD en niet over de kinderopvang. Hij staat hier
+     omdat een eigen bestand voor EEN leesroute meer bestand dan inhoud is, en
+     omdat ./mutatiecontracten.js al negen zijbestanden telt. Verhuist hij ooit,
+     dan mag dat -- de sleutel is de route en niet de plek. */
+  'POST /api/rtgid/bewijzen': {
+    mutatieId: 'rtgid.bewijzen', herkomst: 'mens',
+    semantiek: { klasse: 'idempotent' },
+    toegang: { klasse: 'AUTHENTICATED' },
+    stand: 'NOT_APPLICABLE',
+    nagekeken: 'Claude, 2026-09-02: handler gelezen in server/kern/rtgid-bewijs.js (mijnBewijzen). ' +
+      'Hij leest kern/vakbewijs.js via een laat gebonden bron en schrijft niets -- geen save(), geen ' +
+      'bak() die aanmaakt. De sleutel komt uit de SESSIE en niet uit het lijf, en dat is hier de ' +
+      'grens en geen gewoonte: deze route geeft per eis ook de REDEN terug, en dat is precies wat ' +
+      'nuttig is over uzelf en te veel over een ander. Getoetst in test/rtgid-bewijs.test.js, acht ' +
+      'toetsen met acht mutaties.',
+    bewijs: { gemeten: 'twee identieke oproepen gaven hetzelfde antwoord; zonder gekoppelde ' +
+      'bewijzenlaag antwoordt hij `bron: false` met een uitleg, en nadrukkelijk geen lege lijst -- ' +
+      'een lege lijst leest als "u heeft niets".', op: OP },
+    afgetekend: AFGETEKEND
   }
 };
 

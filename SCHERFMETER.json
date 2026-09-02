@@ -1,6 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-02T22:27:09.468Z",
+  "op": "2026-09-02T22:48:24.766Z",
+  "commit": "b6a14a60",
+  "boomVuil": true,
+  "boomAnders": 0,
   "instrument": "scripts/scherfmeter.js",
   "node": "v22.22.2"
  },
@@ -29,10 +32,10 @@
     ]
    },
    "churn": {
-    "gedeeld": 1351,
-    "verhuisd": 961,
-    "pct": 71.1,
-    "nieuw": 1
+    "gedeeld": 1352,
+    "verhuisd": 0,
+    "pct": 0,
+    "nieuw": 0
    },
    "ongemeten": 84,
    "ongemetenNamen": [

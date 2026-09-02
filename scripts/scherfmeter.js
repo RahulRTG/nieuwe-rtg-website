@@ -69,6 +69,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { stempel } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const REGISTER = path.join(WORTEL, 'SCHERFMETER.json');
@@ -215,8 +216,13 @@ function main() {
 
   if (vastleggen) {
     const inhoud = {
-      stempel: { op: new Date().toISOString(), instrument: 'scripts/scherfmeter.js',
-        node: process.version },
+      /* HET GEDEELDE STEMPEL, en niet een eigen datumveld. scripts/versheid.js
+         beoordeelt ouderdom op de COMMIT waarop een register is gemeten en op de
+         vuilheid van de boom; een eigen stempel zonder die velden is niet te
+         beoordelen, en dan meldt hij "verouderd" over iets wat hij niet kan
+         zien. Precies het gat waar dat instrument voor bestaat -- dus dit
+         register draagt hetzelfde stempel als alle andere. */
+      stempel: Object.assign(stempel(), { instrument: 'scripts/scherfmeter.js' }),
       uitleg: 'Vier getallen per toetsklasse, zodat "de verdeler is onrustig" en "de prijs van een ' +
         'ongemeten bestand is fout" uit elkaar te houden zijn. Geen van deze getallen hangt aan een ' +
         'ratel: churn hangt af van hoeveel toetsen er bij kwamen, en een meter die rood ' +

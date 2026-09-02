@@ -86,6 +86,14 @@ const REGISTERS = [
   ['INHOUDSKAART.json', 'node scripts/inhoudskaart.js', 'wat elke route werkelijk teruggeeft'],
   ['OUTPUTPROEF.json', 'node scripts/outputproef.js', 'of de uitvoerband klopt'],
   ['DUURZAAMHEIDSKOSTEN.json', 'node scripts/duurzaamheidskosten.js', 'wat een commit aan machine en opslag kost'],
+  /* DE SCHERFMETER, EN WAAROM HIJ HIER STAAT EN NIET IN BUITEN. Zijn `churn`
+     wordt gemeten TEGEN de vorige vastlegging: hoeveel bestanden zijn sinds die
+     opname van scherf gewisseld. Een oude opname maakt dat getal dus niet
+     onnauwkeurig maar betekenisloos -- je vergelijkt met een indeling die
+     niemand meer draait. Van alle registers hier is dit er een waar veroudering
+     de meting niet vertraagt maar ONGELDIG maakt. */
+  ['SCHERFMETER.json', 'npm run scherfmeter:vast',
+    'de balans en de churn van de scherfverdeling, en wat een ongemeten bestand kostte'],
 
   /* De twee boekhoudkundige registers. Ze meten geen gedrag maar TELLINGEN, en
      juist daar doet veroudering pijn: een schuldgetal van vorige maand naast een

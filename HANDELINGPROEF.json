@@ -1,13 +1,20 @@
 {
+ "stempel": {
+  "op": "2026-09-02T20:00:16.028Z",
+  "commit": "e0ba59ce",
+  "boomVuil": false,
+  "node": "v22.22.2",
+  "begrenzing": 8000
+ },
  "uitleg": "Per schrijfroute: liet een geslaagde oproep een geketende regel na in het handelingsspoor? Een route die hier NIET in staat is niet beproefd, en dat is ongemeten en geen groen. \"ongemeten\" betekent hier: de oproep gaf geen 2xx, dus er is niets gebeurd en er hoort geen regel te zijn.",
  "gemeten": {
-  "routesMetRol": 3081,
-  "beproefd": 3081,
-  "bewezen": 575,
+  "routesMetRol": 3643,
+  "beproefd": 3643,
+  "bewezen": 709,
   "gezakt": 0,
-  "ongemeten": 2506,
+  "ongemeten": 2934,
   "ketenOk": true,
-  "begrenzing": 4000
+  "begrenzing": 8000
  },
  "perRoute": [
   {
@@ -36,6 +43,14 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/aanmelding/bewijs/herkeuring",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/aanmelding/bewijs/stand",
    "rol": "office",
    "status": 404,
@@ -49,6 +64,14 @@
    "status": 404,
    "audit": "ongemeten",
    "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/aanmelding/contracten",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
   },
   {
    "methode": "POST",
@@ -68,7 +91,23 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/aanmelding/opzeggen",
+   "rol": "office",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/aanmelding/termijn-voldaan",
+   "rol": "office",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/aanmelding/verleng",
    "rol": "office",
    "status": 404,
    "audit": "ongemeten",
@@ -225,6 +264,398 @@
    "status": 400,
    "audit": "ongemeten",
    "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/berichten",
+   "rol": "member",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/berichten/gelezen",
+   "rol": "member",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/bon",
+   "rol": "member",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/bonnen",
+   "rol": "member",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/brug",
+   "rol": "member",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/catalogus",
+   "rol": "member",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/dossier",
+   "rol": "member",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/installeer",
+   "rol": "member",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/kanaal",
+   "rol": "member",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/kantoor/afdracht",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/kantoor/besluit",
+   "rol": "office",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/kantoor/hercontrole",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/kantoor/intrekken",
+   "rol": "office",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/kantoor/journaal",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/kantoor/teruggave",
+   "rol": "office",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/kantoor/teruggaven",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/kantoor/toegankelijk",
+   "rol": "office",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/kantoor/toegankelijk/wachtrij",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/kantoor/uitgever",
+   "rol": "office",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/kantoor/wachtrij",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/koop",
+   "rol": "member",
+   "status": 400,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/landen",
+   "rol": "member",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/mijn",
+   "rol": "member",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/naslag",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/open",
+   "rol": "member",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/persoon",
+   "rol": "member",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/persoon/aanvraag",
+   "rol": "member",
+   "status": 400,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/persoon/cijfers",
+   "rol": "member",
+   "status": 409,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 409), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/persoon/dossier",
+   "rol": "member",
+   "status": 409,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 409), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/persoon/intrekken",
+   "rol": "member",
+   "status": 409,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 409), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/persoon/inzenden",
+   "rol": "member",
+   "status": 409,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 409), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/persoon/journaal",
+   "rol": "member",
+   "status": 409,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 409), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/persoon/naslag",
+   "rol": "member",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/persoon/omzet",
+   "rol": "member",
+   "status": 409,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 409), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/persoon/proef",
+   "rol": "member",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/tijdlijn",
+   "rol": "member",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/uitgever",
+   "rol": "supplier",
+   "status": 409,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 409), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/uitgever/aanvraag",
+   "rol": "supplier",
+   "status": 409,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 409), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/uitgever/cijfers",
+   "rol": "supplier",
+   "status": 409,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 409), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/uitgever/dossier",
+   "rol": "supplier",
+   "status": 409,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 409), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/uitgever/intrekken",
+   "rol": "supplier",
+   "status": 409,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 409), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/uitgever/inzenden",
+   "rol": "supplier",
+   "status": 409,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 409), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/uitgever/journaal",
+   "rol": "supplier",
+   "status": 409,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 409), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/uitgever/omzet",
+   "rol": "supplier",
+   "status": 409,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 409), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/uitgever/proef",
+   "rol": "supplier",
+   "status": 409,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 409), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/uitgever/voorbeeld",
+   "rol": "supplier",
+   "status": 409,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 409), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/verleen",
+   "rol": "member",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/weg",
+   "rol": "member",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/appstore/wis-opslag",
+   "rol": "member",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
   },
   {
    "methode": "POST",
@@ -1532,6 +1963,14 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/command/apispoor",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/command/beleid",
    "rol": "office",
    "status": 200,
@@ -1565,6 +2004,70 @@
   {
    "methode": "POST",
    "pad": "/api/command/beleid/zet",
+   "rol": "office",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/bijstand",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/bijstand/betreed",
+   "rol": "office",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/bijstand/inhoud",
+   "rol": "office",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/bijstand/kijk",
+   "rol": "office",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/bijstand/sessie",
+   "rol": "office",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/bijstand/sluit",
+   "rol": "office",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/bijstand/uitvoeren",
+   "rol": "office",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/bijstand/voorstel",
    "rol": "office",
    "status": 404,
    "audit": "ongemeten",
@@ -1612,6 +2115,30 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/command/gezondheid",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/gezondheid/controleer",
+   "rol": "office",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/gezondheid/vermogen",
+   "rol": "office",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/command/graaf",
    "rol": "office",
    "status": 200,
@@ -1641,6 +2168,62 @@
    "status": 404,
    "audit": "ongemeten",
    "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/incident",
+   "rol": "office",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/incident/maatregel",
+   "rol": "office",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/incident/neem",
+   "rol": "office",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/incident/open",
+   "rol": "office",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/incident/sluit",
+   "rol": "office",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/incident/weeg",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/incidenten",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
   },
   {
    "methode": "POST",
@@ -1964,6 +2547,22 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/command/tijdlijn",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/tijdlijn/rondom",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/command/uitrol",
    "rol": "office",
    "status": 200,
@@ -1997,6 +2596,22 @@
   {
    "methode": "POST",
    "pad": "/api/command/uitrol/zet",
+   "rol": "office",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/vloot",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/vloot/organisatie",
    "rol": "office",
    "status": 404,
    "audit": "ongemeten",
@@ -2101,6 +2716,102 @@
   {
    "methode": "POST",
    "pad": "/api/comment",
+   "rol": "member",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/commerce/aanbod",
+   "rol": "member",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/commerce/etalage",
+   "rol": "member",
+   "status": 400,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/commerce/mand",
+   "rol": "member",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/commerce/mand/leeg",
+   "rol": "member",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/commerce/mand/zet",
+   "rol": "member",
+   "status": 400,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/commerce/overdracht/lees",
+   "rol": "member",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/commerce/overdracht/maak",
+   "rol": "member",
+   "status": 409,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 409), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/commerce/overdracht/mijn",
+   "rol": "member",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/commerce/reken",
+   "rol": "member",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/commerce/retour/mijn",
+   "rol": "member",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/commerce/retour/verstuurd",
+   "rol": "member",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/commerce/retour/vraag",
    "rol": "member",
    "status": 404,
    "audit": "ongemeten",
@@ -2732,6 +3443,502 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/festival/bewijs",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/bewijs/teken",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/bezetting",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/boeking",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/boeking/afrekening",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/boeking/extra",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/boeking/stand",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/boekingen",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/control",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/control/weg",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/controls/seed",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/dag",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/dag/nu",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/dag/sluiten",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/dienst",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/dienst/mijn",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/dienst/weg",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/diensten",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/editie",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/gast/edities",
+   "rol": "member",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/gast/passen",
+   "rol": "member",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/gast/programma",
+   "rol": "member",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/geheugen",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/gereed",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/groep",
+   "rol": "member",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/groep/code",
+   "rol": "member",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/groep/mee",
+   "rol": "member",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/groep/mijn",
+   "rol": "member",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/groep/stand",
+   "rol": "member",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/groep/weg",
+   "rol": "member",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/mijn",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/nieuw",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/norm",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/norm/weg",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/normen",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/partner",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/partner/bevestig",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/partner/deelt",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/partner/inbox",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/partner/lijst",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/partner/opzeg",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/partner/weiger",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/pas",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/pas/intrek",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/plek",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/plek/weg",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/podiumbeeld",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/product",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/producten",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/rider",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/rider/vink",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/ruimte",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/scan",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/scan/bundel",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/stand",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/terrein",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/tijdlijn",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/uitzonderingen",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/verkoop",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/verkoop/los",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/verkoop/rond",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/festival/vooruit",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/flits/meld",
    "rol": "member",
    "status": 400,
@@ -2817,6 +4024,14 @@
    "status": 404,
    "audit": "ongemeten",
    "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/registratie/catalogus",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
   },
   {
    "methode": "POST",
@@ -2921,6 +4136,46 @@
    "status": 404,
    "audit": "ongemeten",
    "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gast/eten/beoordeel",
+   "rol": "member",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gast/eten/concierge",
+   "rol": "member",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gast/eten/ontdekken",
+   "rol": "member",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gast/eten/probleem",
+   "rol": "member",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gast/eten/zoeken",
+   "rol": "member",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
   },
   {
    "methode": "POST",
@@ -3033,6 +4288,30 @@
    "status": 200,
    "audit": "bewezen",
    "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/geld/grens",
+   "rol": "member",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/geld/grens/weg",
+   "rol": "member",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/geld/grens/zet",
+   "rol": "member",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
   },
   {
    "methode": "POST",
@@ -3772,6 +5051,30 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/instant-reality/event",
+   "rol": "member",
+   "status": 400,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/instant-reality/partner",
+   "rol": "member",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/inzagekaart",
+   "rol": "member",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/kantoor/wereld",
    "rol": "member",
    "status": 200,
@@ -3788,7 +5091,63 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/kantoorpakket/ai",
+   "rol": "member",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/kantoorpakket/beheer",
+   "rol": "member",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/bewaar",
+   "rol": "member",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/deel",
+   "rol": "member",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/fase",
+   "rol": "member",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/maak",
+   "rol": "member",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/mijn",
+   "rol": "member",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/open",
    "rol": "member",
    "status": 404,
    "audit": "ongemeten",
@@ -3805,6 +5164,54 @@
   {
    "methode": "POST",
    "pad": "/api/kantoorpakket/samen",
+   "rol": "member",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/ster",
+   "rol": "member",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/terug",
+   "rol": "member",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/uitslag",
+   "rol": "member",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/versies",
+   "rol": "member",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/vul",
+   "rol": "member",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/weg",
    "rol": "member",
    "status": 404,
    "audit": "ongemeten",
@@ -3929,6 +5336,46 @@
    "status": 403,
    "audit": "ongemeten",
    "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kosten/grens",
+   "rol": "member",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kosten/grens/zet",
+   "rol": "member",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kosten/herkomst",
+   "rol": "member",
+   "status": 400,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kosten/mij",
+   "rol": "member",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kosten/vooruitblik",
+   "rol": "member",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
   },
   {
    "methode": "POST",
@@ -4580,6 +6027,14 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/leerstof/dag",
+   "rol": "member",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/leerstof/examen",
    "rol": "member",
    "status": 400,
@@ -4596,6 +6051,22 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/leerstof/herhaal",
+   "rol": "member",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/leerstof/herhalen",
+   "rol": "member",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/leerstof/les",
    "rol": "member",
    "status": 404,
@@ -4605,6 +6076,14 @@
   {
    "methode": "POST",
    "pad": "/api/leerstof/oefen",
+   "rol": "member",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/leerstof/pad",
    "rol": "member",
    "status": 404,
    "audit": "ongemeten",
@@ -4725,6 +6204,30 @@
   {
    "methode": "POST",
    "pad": "/api/like",
+   "rol": "member",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/link/cap/aanvaard",
+   "rol": "member",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/link/cap/maak",
+   "rol": "member",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/link/cap/trek",
    "rol": "member",
    "status": 404,
    "audit": "ongemeten",
@@ -5588,6 +7091,38 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/member/ai/beleid",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/ai/bundel",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/ai/bundels",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/ai/tegoed",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/member/apply",
    "rol": "member",
    "status": 401,
@@ -6285,6 +7820,14 @@
   {
    "methode": "POST",
    "pad": "/api/member/connect",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/connect/intrek",
    "rol": "member",
    "status": 401,
    "audit": "ongemeten",
@@ -6996,6 +8539,94 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/member/pin",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/pin/actie/opties",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/pin/connect",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/pin/live",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/pin/live/kijk",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/pin/live/verbind",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/pin/nieuw",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/pin/uit",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/pin/zoek",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/prijsgarantie",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/prijsgarantie/meld",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/member/pulse/bewaar",
    "rol": "member",
    "status": 401,
@@ -7644,7 +9275,63 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/member/rendezvous/aanwezig/wis",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rendezvous/akkoord",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rendezvous/arrange",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rendezvous/blokkeer",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/member/rendezvous/date",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rendezvous/encounter",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rendezvous/introductie/antwoord",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rendezvous/introducties",
    "rol": "member",
    "status": 401,
    "audit": "ongemeten",
@@ -7700,6 +9387,38 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/member/rendezvous/samen",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rendezvous/samen/zet",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rendezvous/tafel/antwoord",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rendezvous/tafels",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/member/report",
    "rol": "member",
    "status": 401,
@@ -7716,7 +9435,71 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/member/rtmail/afwezig",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/alias",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/antwoord",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/member/rtmail/assist",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/bewaarbeleid",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/bewaartermijn",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/bewaring",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/bijlage",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/bijlagen",
    "rol": "member",
    "status": 401,
    "audit": "ongemeten",
@@ -7732,7 +9515,127 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/member/rtmail/concept/bewaar",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/concept/verstuur",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/concept/weg",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/concepten",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/delegatie/weg",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/delegeer",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/member/rtmail/documenten",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/draad",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/etiket",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/export",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/gesprekken",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/handtekening",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/hulp",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/imap/intrekken",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/imap/sleutel",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/imap/sleutels",
    "rol": "member",
    "status": 401,
    "audit": "ongemeten",
@@ -7748,7 +9651,87 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/member/rtmail/instellingen",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/journaal",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/member/rtmail/lees",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/opruimen",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/rechten",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/regel/maak",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/regel/weg",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/regel/zet",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/regels",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/sluimer",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/ster",
    "rol": "member",
    "status": 401,
    "audit": "ongemeten",
@@ -7884,7 +9867,39 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/member/rtmail/vak",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/vernietigingen",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/verplaats",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/member/rtmail/workflow",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/zoek",
    "rol": "member",
    "status": 401,
    "audit": "ongemeten",
@@ -7924,11 +9939,347 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/member/spel/",
+   "pad": "/api/member/spel/antwoord",
    "rol": "member",
-   "status": 404,
+   "status": 401,
    "audit": "ongemeten",
-   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/arcade-bord",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/arcade-score",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/dag",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/dag-klaar",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/dag-start",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/kijk",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/klasgenoten",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/mijn",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/nabespreking",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/naspelen",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/nieuw",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/online",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/opgeven",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/praat",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/praat-stuur",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/prestaties",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/projectie-open",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/projectie-sluit",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/rahul",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/random",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/replay",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/sneek-bord",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/sneek-score",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/staat",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/stand",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/sudoku-klaar",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/sudoku-nieuw",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/team-antwoord",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/team-mijn",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/team-nieuw",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/team-nodig",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/team-verlaat",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/toernooi-antwoord",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/toernooi-mijn",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/toernooi-nieuw",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/toernooi-staat",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/toewijzen",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/uitslagen",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/varianten",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/zet",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/zichtbaar",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/zichtbaar-zet",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
   },
   {
    "methode": "POST",
@@ -8732,6 +11083,14 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/nav/status",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/noodkaart",
    "rol": "member",
    "status": 401,
@@ -8844,11 +11203,35 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/ai/tegoed",
+   "rol": "office",
+   "status": 400,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/aidata",
    "rol": "office",
    "status": 200,
    "audit": "bewezen",
    "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/anker",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/anker/reken",
+   "rol": "office",
+   "status": 400,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
   },
   {
    "methode": "POST",
@@ -9284,7 +11667,39 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/bank/regels/geraakt",
+   "rol": "office",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/bank/regels/geschiedenis",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/bank/regels/update",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/bank/regels/zzp",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/bank/regels/zzp/update",
    "rol": "office",
    "status": 200,
    "audit": "bewezen",
@@ -9380,6 +11795,30 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/catalogus-wens/besluit",
+   "rol": "office",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/catalogus-wensen",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/claims/poort",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/clips",
    "rol": "office",
    "status": 200,
@@ -9393,6 +11832,30 @@
    "status": 404,
    "audit": "ongemeten",
    "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/commercie/openstaand",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/commercie/ronde",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/commercie/zaakabonnementen",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
   },
   {
    "methode": "POST",
@@ -9476,6 +11939,38 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/foundation/registraties",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/gateway/controleer",
+   "rol": "office",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/gateway/zendingen",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/gezondheid",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/ghost",
    "rol": "office",
    "status": 200,
@@ -9485,6 +11980,14 @@
   {
    "methode": "POST",
    "pad": "/api/office/handelingen",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/handhaving",
    "rol": "office",
    "status": 200,
    "audit": "bewezen",
@@ -9645,6 +12148,22 @@
   {
    "methode": "POST",
    "pad": "/api/office/incidenten",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/instelling/genres",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/instellingen",
    "rol": "office",
    "status": 200,
    "audit": "bewezen",
@@ -9865,6 +12384,14 @@
    "status": 404,
    "audit": "ongemeten",
    "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/kernjournaal",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
   },
   {
    "methode": "POST",
@@ -10236,6 +12763,22 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/partner/regels",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/pay/bewijs",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/payroll/aangifte",
    "rol": "office",
    "status": 404,
@@ -10333,6 +12876,14 @@
   {
    "methode": "POST",
    "pad": "/api/office/payroll/dossier",
+   "rol": "office",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/payroll/herbouw",
    "rol": "office",
    "status": 404,
    "audit": "ongemeten",
@@ -10468,7 +13019,23 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/payroll/verklaar",
+   "rol": "office",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/payroll/verval",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/platformregister",
    "rol": "office",
    "status": 200,
    "audit": "bewezen",
@@ -10485,6 +13052,30 @@
   {
    "methode": "POST",
    "pad": "/api/office/podium/beslis",
+   "rol": "office",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/prijsgarantie",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/prijsgarantie/afwijzen",
+   "rol": "office",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/prijsgarantie/rechtzetten",
    "rol": "office",
    "status": 404,
    "audit": "ongemeten",
@@ -10521,6 +13112,14 @@
    "status": 400,
    "audit": "ongemeten",
    "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/rechten",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
   },
   {
    "methode": "POST",
@@ -10676,7 +13275,119 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/reisaanbod",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/reisaanbod/weg",
+   "rol": "office",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/reisaanbod/zet",
+   "rol": "office",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/reisbureau",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/reisbureau/afwijzen",
+   "rol": "office",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/reisbureau/besluit",
+   "rol": "office",
+   "status": 400,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/reisbureau/bevestig",
+   "rol": "office",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/reisbureau/klaarzetten",
+   "rol": "office",
+   "status": 400,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/reisbureau/lees",
+   "rol": "office",
+   "status": 400,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/reisbureau/uitnodiging-weg",
+   "rol": "office",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/reisbureau/uitnodigingen",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/rendezvous/meldingen",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/rendezvous/tafel/maak",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/rendezvous/tafel/nodig",
+   "rol": "office",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/rendezvous/tafels",
    "rol": "office",
    "status": 200,
    "audit": "bewezen",
@@ -10689,6 +13400,22 @@
    "status": 404,
    "audit": "ongemeten",
    "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/routedekking",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/routedossier",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
   },
   {
    "methode": "POST",
@@ -10753,6 +13480,14 @@
    "status": 200,
    "audit": "bewezen",
    "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/sociaal",
+   "rol": "office",
+   "status": 503,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 503), dus er hoort geen regel te zijn"
   },
   {
    "methode": "POST",
@@ -10972,6 +13707,14 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/terugval",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/theater",
    "rol": "office",
    "status": 200,
@@ -11052,6 +13795,38 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/vakbewijs/intrek",
+   "rol": "office",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/vakbewijs/nummer",
+   "rol": "office",
+   "status": 400,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/vakbewijs/teken",
+   "rol": "office",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/vakbewijzen",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/verifications",
    "rol": "office",
    "status": 200,
@@ -11069,6 +13844,14 @@
   {
    "methode": "POST",
    "pad": "/api/office/vonk/meldingen",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/voornemens",
    "rol": "office",
    "status": 200,
    "audit": "bewezen",
@@ -11828,6 +14611,14 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/onboarding/bedrijf",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/onboarding/config",
    "rol": "member",
    "status": 401,
@@ -11852,6 +14643,30 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/onboarding/inricht",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/onboarding/inrichten",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/onboarding/meebouwen",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/onboarding/opslaan",
    "rol": "member",
    "status": 401,
@@ -11861,6 +14676,14 @@
   {
    "methode": "POST",
    "pad": "/api/onboarding/paspoort",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/onboarding/salonpost",
    "rol": "member",
    "status": 401,
    "audit": "ongemeten",
@@ -12189,6 +15012,14 @@
   {
    "methode": "POST",
    "pad": "/api/onderwijs/advies",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/onderwijs/bewijs",
    "rol": "member",
    "status": 401,
    "audit": "ongemeten",
@@ -13284,6 +16115,14 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/pay/graaf",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/pay/kascode",
    "rol": "member",
    "status": 401,
@@ -13308,6 +16147,22 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/pay/portefeuille",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/pay/rekening",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/pay/saldo",
    "rol": "member",
    "status": 401,
@@ -13317,6 +16172,54 @@
   {
    "methode": "POST",
    "pad": "/api/pay/stuur",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/pay/tegoed",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/pay/tegoed/koop",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/pay/tegoed/terug",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/pay/tegoed/verzilver",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/pay/terug",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/pay/terugstand",
    "rol": "member",
    "status": 401,
    "audit": "ongemeten",
@@ -13397,6 +16300,54 @@
   {
    "methode": "POST",
    "pad": "/api/pin/zet",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/plaats/dienst",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/plaats/hekken",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/plaats/stand",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/plaats/venster",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/plaats/venster/sluit",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/plaats/waarneem",
    "rol": "member",
    "status": 401,
    "audit": "ongemeten",
@@ -13612,7 +16563,103 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/reis/invoer/bevestig",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/reis/invoer/lees",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/reis/invoer/mijn",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/reis/invoer/weg",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/reis/landen",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/reis/los",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/reis/los/doe",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/reis/reizen",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/reis/uitnodiging/eisop",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/reis/uitnodiging/mijn",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/reis/uitnodiging/nodig-uit",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/reis/uitnodiging/weg",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/reis/wacht",
    "rol": "member",
    "status": 401,
    "audit": "ongemeten",
@@ -13988,6 +17035,14 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/rtf/leerling/bewijs",
+   "rol": "member",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/rtf/leerling/bijles/gesprek",
    "rol": "member",
    "status": 403,
@@ -14004,6 +17059,14 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/rtf/leerling/dag",
+   "rol": "member",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/rtf/leerling/examen",
    "rol": "member",
    "status": 403,
@@ -14013,6 +17076,22 @@
   {
    "methode": "POST",
    "pad": "/api/rtf/leerling/examen-antwoord",
+   "rol": "member",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leerling/herhaal",
+   "rol": "member",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leerling/herhalen",
    "rol": "member",
    "status": 403,
    "audit": "ongemeten",
@@ -14053,6 +17132,14 @@
   {
    "methode": "POST",
    "pad": "/api/rtf/leerling/oefen",
+   "rol": "member",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leerling/pad",
    "rol": "member",
    "status": 403,
    "audit": "ongemeten",
@@ -14101,6 +17188,14 @@
   {
    "methode": "POST",
    "pad": "/api/rtf/profielen",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/uitnodiging/accepteer",
    "rol": "member",
    "status": 401,
    "audit": "ongemeten",
@@ -14277,14 +17372,6 @@
   {
    "methode": "POST",
    "pad": "/api/rtfkantoor/stadsraad/stem",
-   "rol": "office",
-   "status": 404,
-   "audit": "ongemeten",
-   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/rtfos/",
    "rol": "office",
    "status": 404,
    "audit": "ongemeten",
@@ -15445,6 +18532,14 @@
   {
    "methode": "POST",
    "pad": "/api/rtgid/machtig/intrek",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtgid/stapop/opties",
    "rol": "member",
    "status": 401,
    "audit": "ongemeten",
@@ -16772,6 +19867,14 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/abonnement",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/accountant",
    "rol": "supplier",
    "status": 400,
@@ -16804,6 +19907,54 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/activiteit/open",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/activiteit/sluit",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/advies",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/advies/afspraak",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/advies/dossier",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/advies/dossier/status",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/agenda/ai",
    "rol": "supplier",
    "status": 200,
@@ -16830,9 +19981,9 @@
    "methode": "POST",
    "pad": "/api/supplier/agenda/verwijder",
    "rol": "supplier",
-   "status": 503,
-   "audit": "ongemeten",
-   "reden": "de oproep deed geen werk (status 503), dus er hoort geen regel te zijn"
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
   },
   {
    "methode": "POST",
@@ -17013,6 +20164,54 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/bank/zakelijk",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/beauty",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/beauty/boek",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/beauty/status",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/beauty/uren",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/beauty/walkin",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/beauty/walkin/status",
    "rol": "supplier",
    "status": 403,
    "audit": "ongemeten",
@@ -17468,6 +20667,22 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/btw/afsluiting",
+   "rol": "supplier",
+   "status": 400,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/btw/herbouw",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/btw/indienen",
    "rol": "supplier",
    "status": 404,
@@ -17501,6 +20716,22 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/btw/opmaken",
+   "rol": "supplier",
+   "status": 400,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/btw/preflight",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/btw/verklaar",
    "rol": "supplier",
    "status": 400,
    "audit": "ongemeten",
@@ -18180,6 +21411,38 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/eten/capaciteit",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/eten/instellingen",
+   "rol": "supplier",
+   "status": 400,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/eten/status",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/eten/werkblad",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/event",
    "rol": "supplier",
    "status": 404,
@@ -18308,6 +21571,70 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/fitclub",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/fitclub/baan",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/fitclub/checkin",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/fitclub/checkout",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/fitclub/les/in",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/fitclub/lid",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/fitclub/pt",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/fitclub/pt/status",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/fleet",
    "rol": "supplier",
    "status": 400,
@@ -18325,6 +21652,38 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/gastlocaties",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/gateway/mandaat",
+   "rol": "supplier",
+   "status": 400,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/gateway/mandaat/intrek",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/gateway/mandaten",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/gateway/zendingen",
    "rol": "supplier",
    "status": 200,
    "audit": "bewezen",
@@ -18588,6 +21947,62 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/golf",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/golf/baan",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/golf/les",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/golf/les/klaar",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/golf/tee",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/golf/tee/weg",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/golf/wedstrijd/in",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/groothandel/functie",
    "rol": "supplier",
    "status": 409,
@@ -18748,6 +22163,14 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/horeca/bar",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/horeca/betaal",
    "rol": "supplier",
    "status": 404,
@@ -18885,6 +22308,14 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/horeca/dagbeeld",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/dienstmeting",
    "rol": "supplier",
    "status": 200,
    "audit": "bewezen",
@@ -19108,6 +22539,30 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/horeca/gezelschap",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/gezelschap/stoel",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/gezelschap/stoel/weg",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/horeca/haccp/afvinken",
    "rol": "supplier",
    "status": 404,
@@ -19212,6 +22667,14 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/horeca/kaart",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/horeca/keuken/bord",
    "rol": "supplier",
    "status": 200,
@@ -19241,6 +22704,14 @@
    "status": 404,
    "audit": "ongemeten",
    "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/keuken/stappen",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
   },
   {
    "methode": "POST",
@@ -19300,6 +22771,14 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/horeca/offline/handelingen",
+   "rol": "supplier",
+   "status": 400,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/horeca/offline/sync",
    "rol": "supplier",
    "status": 400,
@@ -19316,6 +22795,46 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/horeca/pas/gereed",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/pas/los",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/pas/overneem",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/pas/pak",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/pas/uit",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/horeca/pols",
    "rol": "supplier",
    "status": 200,
@@ -19325,6 +22844,46 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/horeca/pols/zet",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/rahul/bevestig",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/rahul/bonnen",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/rahul/doe",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/rahul/grens",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/rahul/register",
    "rol": "supplier",
    "status": 200,
    "audit": "bewezen",
@@ -19372,6 +22931,14 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/horeca/rekening/regel/stoel",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/horeca/rekening/regel/weg",
    "rol": "supplier",
    "status": 404,
@@ -19381,6 +22948,14 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/horeca/rekening/splits",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/rekening/verdeel",
    "rol": "supplier",
    "status": 404,
    "audit": "ongemeten",
@@ -19485,6 +23060,102 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/horeca/wave/voorstel",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/werklijst",
+   "rol": "supplier",
+   "status": 500,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 500), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/wijk/aanvaard",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/wijk/bied",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/wijk/gezien",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/wijk/laat",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/wijk/neem",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/wijk/tafel-terug",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/wijk/trek-in",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/wijk/weg",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/wijk/weiger",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/wijk/zet",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/wijken",
    "rol": "supplier",
    "status": 200,
    "audit": "bewezen",
@@ -20156,6 +23827,30 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/kosten",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/kosten/herkomst",
+   "rol": "supplier",
+   "status": 400,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/kosten/vooruitblik",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/leave/decide",
    "rol": "supplier",
    "status": 404,
@@ -20169,6 +23864,14 @@
    "status": 400,
    "audit": "ongemeten",
    "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/link/cap/aanvaard",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
   },
   {
    "methode": "POST",
@@ -20868,6 +24571,22 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/nav/event",
+   "rol": "supplier",
+   "status": 400,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/nav/events",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/net/bericht",
    "rol": "supplier",
    "status": 403,
@@ -20953,6 +24672,54 @@
    "status": 503,
    "audit": "ongemeten",
    "reden": "de oproep deed geen werk (status 503), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/opvang",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/opvang/kind",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/opvang/kind/ophaal",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/opvang/nanny",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/opvang/nanny/zet",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/opvang/verslag",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
   },
   {
    "methode": "POST",
@@ -21108,6 +24875,30 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/pay/budget",
+   "rol": "supplier",
+   "status": 402,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 402), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/pay/budget/lijst",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/pay/graaf",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/pay/in",
    "rol": "supplier",
    "status": 404,
@@ -21124,11 +24915,99 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/pay/tegoed",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/pay/tegoed/terug",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/pay/tegoed/zet",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/pay/treasury",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/pay/treasury/apart",
+   "rol": "supplier",
+   "status": 409,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 409), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/pay/treasury/vrij",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/pay/treasury/zet",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/pay/uitbetaal",
    "rol": "supplier",
    "status": 400,
    "audit": "ongemeten",
    "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/pay/vastleg",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/pay/vooraf",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/pay/vooraf/lijst",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/pay/vrijgeef",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
   },
   {
    "methode": "POST",
@@ -21204,6 +25083,86 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/persoonseis",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/petcare",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/petcare/checkin",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/petcare/checkuit",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/petcare/notitie",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/petcare/ronde",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/petcare/ronde/hond",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/petcare/ronde/klaar",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/petcare/trim",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/petcare/trim/klaar",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/photo/add",
    "rol": "supplier",
    "status": 400,
@@ -21217,6 +25176,30 @@
    "status": 200,
    "audit": "bewezen",
    "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/polis",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/polis/vraag",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/polis/zet",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
   },
   {
    "methode": "POST",
@@ -21305,6 +25288,30 @@
    "status": 400,
    "audit": "ongemeten",
    "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/prijsgarantie",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/prijsgarantie/betwist",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/prijsgarantie/erken",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
   },
   {
    "methode": "POST",
@@ -21500,6 +25507,14 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/retail/annuleer",
+   "rol": "supplier",
+   "status": 400,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/retail/apart",
    "rol": "supplier",
    "status": 409,
@@ -21513,6 +25528,14 @@
    "status": 409,
    "audit": "ongemeten",
    "reden": "de oproep deed geen werk (status 409), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/retail/bon",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
   },
   {
    "methode": "POST",
@@ -21593,6 +25616,30 @@
    "status": 409,
    "audit": "ongemeten",
    "reden": "de oproep deed geen werk (status 409), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/retour/lijst",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/retour/uitvoeren",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/retour/zet",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
   },
   {
    "methode": "POST",
@@ -21708,6 +25755,30 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/rtmail/afwezig",
+   "rol": "supplier",
+   "status": 400,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/alias",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/antwoord",
+   "rol": "supplier",
+   "status": 400,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/rtmail/assist",
    "rol": "supplier",
    "status": 200,
@@ -21716,7 +25787,167 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/rtmail/bewaarbeleid",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/bewaartermijn",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/bewaring",
+   "rol": "supplier",
+   "status": 400,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/bijlage",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/bijlagen",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/rtmail/btw-herinner",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/concept/bewaar",
+   "rol": "supplier",
+   "status": 400,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/concept/verstuur",
+   "rol": "supplier",
+   "status": 400,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/concept/weg",
+   "rol": "supplier",
+   "status": 400,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/concepten",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/delegatie/weg",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/delegeer",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/draad",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/etiket",
+   "rol": "supplier",
+   "status": 400,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/export",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/gesprekken",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/handtekening",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/hulp",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/imap/intrekken",
+   "rol": "supplier",
+   "status": 400,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/imap/sleutel",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/imap/sleutels",
    "rol": "supplier",
    "status": 200,
    "audit": "bewezen",
@@ -21740,6 +25971,22 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/rtmail/instellingen",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/journaal",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/rtmail/lees",
    "rol": "supplier",
    "status": 404,
@@ -21756,7 +26003,95 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/rtmail/opruimen",
+   "rol": "supplier",
+   "status": 400,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/rechten",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/regel/maak",
+   "rol": "supplier",
+   "status": 400,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/regel/weg",
+   "rol": "supplier",
+   "status": 400,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/regel/zet",
+   "rol": "supplier",
+   "status": 400,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/regels",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/sluimer",
+   "rol": "supplier",
+   "status": 400,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/ster",
+   "rol": "supplier",
+   "status": 400,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/rtmail/stuur",
+   "rol": "supplier",
+   "status": 400,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/vak",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/vernietigingen",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/verplaats",
    "rol": "supplier",
    "status": 400,
    "audit": "ongemeten",
@@ -21769,6 +26104,14 @@
    "status": 200,
    "audit": "bewezen",
    "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/zoek",
+   "rol": "supplier",
+   "status": 400,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
   },
   {
    "methode": "POST",
@@ -21905,6 +26248,22 @@
    "status": 400,
    "audit": "ongemeten",
    "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/scenario/omzet",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/scenario/personeel",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
   },
   {
    "methode": "POST",
@@ -22209,6 +26568,14 @@
    "status": 400,
    "audit": "ongemeten",
    "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/talent/match",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
   },
   {
    "methode": "POST",
@@ -22580,6 +26947,14 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/verbintenis",
+   "rol": "supplier",
+   "status": 400,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/verblijf/beslis",
    "rol": "supplier",
    "status": 404,
@@ -22649,6 +27024,38 @@
    "status": 200,
    "audit": "bewezen",
    "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/verkoopweg/lijst",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/verkoopweg/publiceer",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/verkoopweg/wis",
+   "rol": "supplier",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/verkoopweg/zet",
+   "rol": "supplier",
+   "status": 400,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
   },
   {
    "methode": "POST",
@@ -22788,6 +27195,46 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/weddings",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/weddings/event",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/weddings/event/status",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/weddings/taak",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/weddings/taak/klaar",
+   "rol": "supplier",
+   "status": 403,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 403), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/wensen",
    "rol": "supplier",
    "status": 200,
@@ -22821,6 +27268,14 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/werkbeleid/zet",
+   "rol": "supplier",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/werkmail/adressen",
    "rol": "supplier",
    "status": 200,
    "audit": "bewezen",
@@ -23092,6 +27547,14 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/tenant/bootstrap/mijn",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/theater/abonneer",
    "rol": "member",
    "status": 401,
@@ -23149,6 +27612,14 @@
   {
    "methode": "POST",
    "pad": "/api/theater/meld",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/theater/ondertitels",
    "rol": "member",
    "status": 401,
    "audit": "ongemeten",
@@ -23628,6 +28099,22 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/vakbewijs",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/vakbewijs/zet",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/vastgoed/aanbod",
    "rol": "member",
    "status": 401,
@@ -24085,6 +28572,22 @@
   {
    "methode": "POST",
    "pad": "/api/vonk/blokkeer",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/vonk/halfweg",
+   "rol": "member",
+   "status": 401,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 401), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/vonk/kies",
    "rol": "member",
    "status": 401,
    "audit": "ongemeten",

@@ -52,9 +52,37 @@ const jsonUit = args.includes('--json');
 const perRouteUit = args.includes('--per-route');
 const BASIS = args.find(a => a.startsWith('http')) || 'http://127.0.0.1:3000';
 
-/* Routes die BEWUST open staan voor een niet-ingelogde bezoeker. Elke regel
-   heeft een reden; staat er geen reden bij, dan hoort hij hier niet. */
-const PUBLIEK = new Map([
+/* DE GEDEELDE LIJST EERST, EN DAAROM. `scripts/lib/publiekeroutes.js` is de
+   plek waar dit huis bijhoudt welke route BEWUST zonder poort open staat, met
+   per stuk een reden die een mens heeft geschreven. Zijn eigen kop zegt waarom
+   hij daar woont: "Twee plekken die dezelfde waarheid vasthouden lopen uiteen
+   (LAT.md regel 4), en dat zou hier duur zijn."
+
+   Deze sonde had zijn EIGEN lijst en las die andere niet -- een derde lezer die
+   nooit is aangesloten. Ze waren uiteen gelopen tot 64 tegenover 125, met 75
+   paden die alleen de gedeelde kende. Dat kostte echt iets: /api/claims,
+   /api/sociaalbeleid en /api/betaaldiensttarief staan met een uitgeschreven
+   reden op de gedeelde lijst, kwamen hier als OPEN uit de meting, werden
+   daardoor in de bewijsmatrix een gezakte AUTH-cel, gingen in VERTROUWEN.json
+   naar `geschorst`, en werden door server/middleware/schorspoort.js met een 503
+   dichtgezet. Vier bewust publieke routes gingen offline omdat twee lijsten uit
+   elkaar liepen.
+
+   DE AANVULLING HIERONDER BLIJFT BESTAAN, en dat is geen halve reparatie maar
+   een ander soort vraag. De gedeelde lijst beantwoordt: "deze route heeft GEEN
+   poort, en dat is met opzet." Deze sonde vraagt iets anders: "deze route
+   antwoordt met 200 aan een anonieme beller, en dat is met opzet." Die twee
+   overlappen maar vallen niet samen: /api/metrics HEEFT een poort (de
+   meetpoort) die vanaf een intern adres opengaat, en hoort dus juist NIET op de
+   gedeelde lijst -- keuringsregel 28 zou hem daar terecht als overbodige
+   uitzondering aanwijzen. Wat hier overblijft is precies die klasse, en elke
+   regel zegt waarom hij hier en niet daar staat. */
+const GEDEELD = require('./lib/publiekeroutes').PUBLIEK;
+
+/* Routes die BEWUST open staan voor een niet-ingelogde bezoeker terwijl ze wel
+   een poort hebben. Elke regel heeft een reden; staat er geen reden bij, dan
+   hoort hij hier niet. */
+const EIGEN = new Map([
   ['/api/health', 'liveness voor de load balancer'],
   ['/api/ready', 'readiness voor de load balancer'],
   ['/api/ice', 'STUN/TURN-servers voor bellen; bevat geen persoonsgegevens'],
@@ -160,6 +188,10 @@ const PUBLIEK = new Map([
      snelheidsrem (interpretRem). */
   ['/api/arrival/interpret', 'zet vrije tekst om in een CONCEPTplan en slaat niets op; de aanvraag is een aparte route met eigen controle']
 ]);
+
+/* De vereniging, met de EIGEN reden voorop waar een pad in allebei staat: die
+   is geschreven over deze meting, en de gedeelde over de poortcontrole. */
+const PUBLIEK = new Map([...GEDEELD, ...EIGEN]);
 
 /* ---- DE TWEE METRICS-DEUREN ZIJN CONFIGURATIE, GEEN CODE ----
 

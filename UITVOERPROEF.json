@@ -1,13 +1,13 @@
 {
  "stempel": {
-  "op": "2026-09-02T19:21:46.020Z",
-  "commit": "ed1f1bd3",
+  "op": "2026-09-02T20:00:40.806Z",
+  "commit": "e0ba59ce",
   "boomVuil": false,
   "node": "v22.22.2",
   "begrenzing": "geen"
  },
  "uitleg": "Per route: met de JUISTE rol en plausibele invoer, en of het 2xx-antwoord gegevens van een ANDER account bevatte (kanaries) of een geheim veld. Een route die hier NIET in staat is niet beproefd. Een route met uitvoer:\"poort\" gaf nooit een 2xx en is ONGEMETEN, geen groen. Zie scripts/lib/uitvoerproef.js voor de grens en waarom de lekmerkers niet blind over een 2xx mogen.",
- "kanariekenmerk": "884804",
+ "kanariekenmerk": "219606",
  "gemeten": {
   "routesMetRol": 3642,
   "gemeten": 940,

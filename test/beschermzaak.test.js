@@ -221,10 +221,18 @@ test('7. de beschermzaak staat los van de casus', () => {
    ========================================================================== */
 const deur = (pad, body) => post('/api/bescherming/deur/' + pad, body);
 
+/* Wat toets 8 zag toen de module nog AAN stond. Toets 13 leest hem om te
+   bewijzen dat zijn nul door de schakelaar komt en niet door een kapotte route.
+   Bewust GEEN tweede oproep aan de deur: die is geremd (30 aanmaakverzoeken per
+   minuut per ip), en een toets die zijn eigen bewijs met budget koopt laat de
+   toetsen erna omvallen. */
+let stedenMetModuleAan = 0;
+
 test('8. zonder inlog begint een mens een zaak, en de klasse weigert ook hier', async () => {
   const st = await deur('steden', {});
   assert.equal(st.status, 200, 'de stedenlijst hoort zonder inlog te werken');
   assert.ok(st.body.steden.some(s => s.id === STAD), 'onze stad hoort erin te staan');
+  stedenMetModuleAan = st.body.steden.length;
 
   // de weigering van de klasse geldt juist aan deze kant
   const metAdres = await deur('start', { stad: STAD, aanleiding: 'huiselijk-geweld',
@@ -296,6 +304,13 @@ test('13. zonder plaats staat de deur dicht, en zegt dat met een nummer erbij', 
      mag er geen zaak ontstaan die nergens landt. Dat de PAGINA het formulier
      dan wegzet, staat in wegwijzer.html; hier gaat het om de server, want een
      schermregel die niemand afdwingt is geen grendel. */
+  /* DE NUL HIERONDER MOET IETS BEWIJZEN. Een route die ALTIJD een lege lijst
+     geeft -- kapot, verkeerd gemount -- zou deze toets net zo groen laten als een
+     werkende schakelaar; scripts/tandeloos.js wees daarop en had gelijk. Het
+     bewijs komt uit toets 8, die de lijst met de module AAN heeft gezien. */
+  assert.ok(stedenMetModuleAan > 0,
+    'toets 8 hoort de lijst gevuld te hebben gezien; zonder dat zegt de nul hieronder niets');
+
   await post('/api/rtfos/stad/module', { id: STAD, vlag: 'individual_cases', aan: false }, LAND);
   const st = await deur('steden', {});
   assert.equal(st.body.steden.length, 0, 'een stad met de module uit hoort niet in de lijst te staan');

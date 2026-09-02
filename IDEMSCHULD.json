@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-02T18:34:09.203Z",
-  "commit": "a9d56bc3",
+  "op": "2026-09-02T19:03:49.672Z",
+  "commit": "64e8a7a9",
   "boomVuil": true,
-  "boomAnders": 0,
+  "boomAnders": 3,
   "instrument": "scripts/idemschuld.js",
   "node": "v22.22.2"
  },

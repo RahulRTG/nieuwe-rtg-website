@@ -16,14 +16,14 @@ het?**
 
 | | |
 |---|---|
-| Functieschakelaars (aan/uit per functie) | **205** in 17 categorieën |
+| Functieschakelaars (aan/uit per functie) | **208** in 17 categorieën |
 | Apps in de leden-catalogus | **84** in 8 categorieën |
 | Bedrijfsgenres | **74** in 27 sectoren |
 | Genre-caps (waar de apps op sturen) | **40** |
 | API-routes (uit de router) | **4738** |
 | Kernmodules (`server/kern/**`) | **1935** |
 | App-pagina's (`public/apps/**.html`) | **287** |
-| Testbestanden | **1542** |
+| Testbestanden | **1543** |
 
 ## De vier werelden
 
@@ -54,7 +54,7 @@ ook blokkeert.
 
 ---
 
-# 1. De 205 functieschakelaars
+# 1. De 208 functieschakelaars
 
 ### Leden (RTG-app) — 21
 
@@ -135,7 +135,7 @@ ook blokkeert.
 - **RTF contacten & familiekoppeling** (`rtf-contacten`) — De contactenlaag van de RTFoundation: gezinnen koppelen, kanalen en meldingen tussen leden.  
   _voor: rtg, lifestyle, business, foundation_
 
-### Eigen apps — 35
+### Eigen apps — 37
 
 - **Spelen (spellen met vrienden)** (`spellen`) — Alle spellen: schaken, dammen, rummi, Magnaat, sudoku en de partyspellen.  
   _voor: rtg, lifestyle, business, foundation_
@@ -207,6 +207,10 @@ ook blokkeert.
   _voor: rtg, lifestyle, business_
 - **Verzorging (kapper, barbier, nagels)** (`verzorging`) — De salonagenda vanaf de kant van het lid, op codenaam. Zorg en verzorging staan naast elkaar maar niet door elkaar: hier reist geen zorgprofiel mee.  
   _voor: rtg, lifestyle, business_
+- **Kinderopvang (ouderkant)** (`opvangwijzer`) — Welke kinderopvang er is en hoeveel plek daar vrij is, plus een aanvraag klaarzetten en zelf weer intrekken. Een vrije plek is geen plek: inschrijven doet de opvang zelf. De aanwezigheidslijst van een groep komt hier nooit uit; een ouder ziet een getal en niet de namen van andere kinderen.  
+  _voor: rtg, lifestyle, business_
+- **Knelpunten (welke weg ligt open)** (`knelpunt`) — Rekent uit welke weg naar een doel openligt, wat hem blokkeert en wat er niet is nagegaan. Bewaart niets: alles komt binnen in het verzoek en gaat eruit als antwoord. Er wordt niets gerangschikt en geen beste weg aangewezen.  
+  _voor: rtg, lifestyle, business_
 
 ### Partners (leveranciers) — 10
 
@@ -248,7 +252,7 @@ ook blokkeert.
 - **Tenant Control Plane (white-label)** (`tenant`) — Welke organisatie een werkruimte draait, welk merk zij daar voert, en hoe een groep van haar identiteitsprovider een rol wordt. Uit = de werkruimtes werken door onder de RTG-huisstijl, en een inlog via een provider levert geen rollen meer op.  
   _voor: intern, business_
 
-### RTFoundation — 14
+### RTFoundation — 15
 
 - **RTFoundation-app (onderwijs)** (`foundation`) — De gratis onderwijs-app: live schoolbord, leerling-schrift en de AI-bijleshulp.  
   _voor: foundation_
@@ -259,6 +263,8 @@ ook blokkeert.
 - **Het RTF-kantoor** (`dom-rtfkantoor`) — Het eigen kantoor van de stichting: kamers, clubs en het onderzoekslab.  
   _voor: foundation_
 - **Foundation OS** (`dom-rtfos`) — Steden, partnerstichtingen, projecten, vrijwilligers, geld, hulpvragen en verantwoording.  
+  _voor: foundation_
+- **Voordeur beschermzaak (zonder account)** (`dom-beschermdeur`) — De eigen ingang naar hulp bij geweld en uitbuiting: eerst "ben je nu veilig", dan pas de rest, en een code die de mens zelf weer kan intrekken. Zonder inlog, want wie hier aanklopt heeft vaak geen account. Uitzetten sluit die deur; de wegwijzer toont dan dat er geen plaats is die dit oppakt.  
   _voor: foundation_
 - **Het Onderzoekslab** (`dom-lab`) — Projecten, fases, bevindingen en de kennisbank van het lab.  
   _voor: foundation_

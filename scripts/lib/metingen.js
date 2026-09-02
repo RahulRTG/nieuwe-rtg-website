@@ -59,8 +59,10 @@ const GEEN_METING = new Set([
      Het vierde, `ongemeten`, is wel een goede kandidaat en staat er met opzet
      nog niet aan: dat zou elke tak die een toetsbestand toevoegt rood zetten tot
      de auteur de volle suite heeft gedraaid, en dat is een beleidsbesluit over
-     andermans werk. Het staat vandaag op 83; zie de kop van
-     scripts/scherfmeter.js voor het besluit dat daarover openstaat. */
+     andermans werk. De stand staat in SCHERFMETER.json zelf onder
+     `meters.ongemeten` en niet hier -- een getal in een commentaar veroudert
+     stiller dan waar ook. Zie de kop van scripts/scherfmeter.js voor het besluit
+     dat daarover openstaat. */
   'SCHERFMETER.json',
   /* CORRECTIES.json zet getallen recht die in een PERMANENT artefact staan --
      een commitboodschap, een PR-bericht. Geen meting en geen kwaliteitsgetal: het

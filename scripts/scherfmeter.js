@@ -45,8 +45,13 @@
    september, en fail-closed zou hem vroeg vangen. Hij staat hier toch niet aan,
    en dat is met opzet: een ratel erop betekent dat ELKE tak die een toetsbestand
    toevoegt rood staat tot de auteur de volle suite heeft gedraaid om hem te
-   meten. Dat is een beleidsbesluit over andermans werk, en het staat vandaag op
-   83 -- dat zet je niet stil aan in een tak die over iets anders gaat.
+   meten. Dat is een beleidsbesluit over andermans werk, en dat zet je niet stil
+   aan in een tak die over iets anders gaat.
+
+   De stand staat in SCHERFMETER.json onder `meters.ongemeten` en NIET hier. Er
+   stond eerst een getal in deze zin, en dat liep binnen een uur twee keer achter
+   (83, 84, 82) -- een getal in een commentaar veroudert stiller dan waar dan
+   ook, en dit hele document gaat over verouderde getallen.
 
    Het besluit hoort dus apart genomen te worden, met dat getal erbij. Tot die
    tijd RAPPORTEERT deze meter, en dat is ook wat hem gevraagd is: het verschil

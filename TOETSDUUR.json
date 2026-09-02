@@ -3,9 +3,9 @@
  "uitleg": "Hoe lang elk toetsbestand erover deed, als gewicht voor de scherfverdeling in scripts/lib/delen.js. PER MODUS, want met dekking aan is dezelfde toets een ander kostenmodel -- niet een uitschieter. Mediaan over alle waarnemingen; de p90 staat erbij en weegt niet mee. Een bestand dat hier NIET in staat is ongemeten en wordt om en om verdeeld -- nooit overgeslagen.",
  "hoe": "npm test (schrijft .toetsduur), daarna: node scripts/toetsduur.js --schrijf",
  "gelezen": {
-  "regels": 16,
+  "regels": 2,
   "verminkt": 0,
-  "opSchijf": 1546,
+  "opSchijf": 1547,
   "modi": [
    "dekking",
    "onbekend"
@@ -19,17 +19,17 @@
  "modi": {
   "dekking": {
    "stempel": {
-    "op": "2026-09-02T21:48:05.526Z",
+    "op": "2026-09-02T23:00:24.439Z",
     "waar": "lokaal",
     "node": "v22.22.2",
     "kernen": 4,
-    "commit": "3fdd0b34"
+    "commit": "7cf87729"
    },
    "gemeten": {
-    "bestanden": 1268,
+    "bestanden": 1270,
     "ongemeten": 277,
-    "verseWaarnemingen": 9,
-    "totaalMs": 9229775
+    "verseWaarnemingen": 2,
+    "totaalMs": 9229958
    },
    "bronnen": {
     "ci|v26.8.1|4|07ee03554": {
@@ -43,6 +43,12 @@
      "node": "v22.22.2",
      "kernen": 4,
      "commit": "3fdd0b34"
+    },
+    "lokaal|v22.22.2|4|7cf87729": {
+     "waar": "lokaal",
+     "node": "v22.22.2",
+     "kernen": 4,
+     "commit": "7cf87729"
     }
    },
    "duur": {
@@ -287,6 +293,7 @@
     "dubbeltik.test.js": 525,
     "dubbeltikgzip.test.js": 266,
     "duels2.test.js": 7954,
+    "duurprijs.test.js": 65,
     "duurzaamheid-kill.test.js": 38803,
     "duurzaamheid-pg.test.js": 53,
     "duurzaamheidskosten.test.js": 52,
@@ -998,6 +1005,7 @@
     "schakelaarsdekking.test.js": 7011,
     "schakelkast-dekking.test.js": 8350,
     "scheiding.test.js": 5269,
+    "scherfmeter.test.js": 118,
     "schermleugen.test.js": 37,
     "schermronde.test.js": 66,
     "schild.test.js": 5064,
@@ -3725,6 +3733,16 @@
       "ci|v26.8.1|4|07ee03554"
      ],
      "gemetenOp": "2026-09-01"
+    },
+    "duurprijs.test.js": {
+     "n": 1,
+     "min": 65,
+     "max": 65,
+     "p90": 65,
+     "bronnen": [
+      "lokaal|v22.22.2|4|7cf87729"
+     ],
+     "gemetenOp": "2026-09-02"
     },
     "duurzaamheid-kill.test.js": {
      "n": 1,
@@ -10835,6 +10853,16 @@
       "ci|v26.8.1|4|07ee03554"
      ],
      "gemetenOp": "2026-09-01"
+    },
+    "scherfmeter.test.js": {
+     "n": 1,
+     "min": 118,
+     "max": 118,
+     "p90": 118,
+     "bronnen": [
+      "lokaal|v22.22.2|4|7cf87729"
+     ],
+     "gemetenOp": "2026-09-02"
     },
     "schermleugen.test.js": {
      "n": 1,

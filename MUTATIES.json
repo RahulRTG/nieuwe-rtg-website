@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-02T20:41:54.847Z",
-    "commit": "a25ae0a3",
+    "op": "2026-09-02T22:11:31.430Z",
+    "commit": "0a816ed0",
     "boomVuil": true,
-    "boomAnders": 15,
+    "boomAnders": 4,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -1469,6 +1469,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 2,
       "scherp": "gezakt"
+    },
+    "duurprijs.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/delen.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 4
     },
     "duurzaamheid-kill.test.js": {
       "soort": "server",

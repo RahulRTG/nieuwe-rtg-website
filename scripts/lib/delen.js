@@ -69,6 +69,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { prijzen } = require('./duurprijs');
 
 const REGISTER = path.join(__dirname, '..', '..', 'TOETSDUUR.json');
 
@@ -174,10 +175,19 @@ function zetDuren(kaart, vertrouwen) {
 }
 
 /* Wat de verdeler op dit moment onder zich heeft. De wachter leest dit, en een
-   scherm dat over de verdeling iets beweert hoort het erbij te zetten. */
+   scherm dat over de verdeling iets beweert hoort het erbij te zetten.
+
+   `onbekend` staat erbij omdat een planner die een prijs rekent, hoort te
+   kunnen zeggen WELKE prijs en op grond waarvan. Hij komt uit dezelfde functie
+   die de verdeling gebruikt (./duurprijs.js) en wordt hier niet nagerekend --
+   een tweede berekening is een tweede waarheid. */
 function weging(lijst) {
   const d = wegingVoor(lijst || []);
-  return { vertrouwen: d.vertrouwen, modus: d.modus, gevraagd: d.gevraagd, bestanden: d.gewicht.size };
+  const p = prijzen(d.gewicht);
+  return { vertrouwen: d.vertrouwen, modus: d.modus, gevraagd: d.gevraagd, bestanden: d.gewicht.size,
+    onbekend: { algemeen: p.algemeen,
+      perKlasse: Object.fromEntries([...p.prijs].map(([k, ms]) => [k, ms])),
+      grond: Object.fromEntries([...p.grond].map(([k, g]) => [k, g])) } };
 }
 
 /* De volledige indeling: een array van `totaal` lijsten. Deterministisch --
@@ -221,11 +231,12 @@ function indeling(lijst, totaal) {
      hoe duur.
 
      Is er niets bekend, dan is elk bestand even zwaar en valt de greedy samen
-     met de oude om-en-om-verdeling; de waarde zelf doet er dan niet toe. */
-  const bekend = [...gewicht.values()].filter((v) => v > 0).sort((a, b) => a - b);
-  const duur = bekend.length ? bekend[Math.min(bekend.length - 1,
-    Math.ceil(bekend.length * 0.99) - 1)] : 1;
-  const kost = (naam) => gewicht.get(naam) || duur;
+     met de oude om-en-om-verdeling; de waarde zelf doet er dan niet toe.
+
+     EN DE p99 VAN WELKE BESTANDEN? Sinds 2 september 2026: van de EIGEN
+     KLASSE. Zie ./duurprijs.js voor waarom, en voor de meting eronder. */
+  const { prijsVoor } = prijzen(gewicht);
+  const kost = (naam) => gewicht.get(naam) || prijsVoor(naam);
 
   /* Zwaarste eerst; bij een gelijk gewicht op naam, zodat de uitkomst niet van
      de volgorde van de invoer afhangt maar alleen van de lijst zelf. */

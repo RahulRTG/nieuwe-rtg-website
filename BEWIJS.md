@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1545 bestanden en 11010 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1546 bestanden en 11016 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1545 |
-| losse beweringen (`test(...)`) | 11010 |
+| toetsbestanden | 1546 |
+| losse beweringen (`test(...)`) | 11016 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 57 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1016 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1017 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 40 |
 | alleen in de kop *genoemd*, nog niet gemeten | 151 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1350 bestanden, 10681 beweringen.
+1351 bestanden, 10687 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -291,6 +291,7 @@ toets omvalt.
 | `dubbeltik.test.js` | 14 | genoemd | DE DUBBELTIK (server/lib/dubbeltik.js): een herhaald schrijfverzoek doet het werk één keer. WAT HIER BEWEZEN MOET WORDEN is niet dat er iets uit de kast komt, maar dat de kast de juiste dingen NIET doet: geen... |
 | `dubbeltikgzip.test.js` | 4 | genoemd | DE DUBBELTIK EN DE COMPRESSIE, IN DE ECHTE VOLGORDE. DIT BESTAAT OM EEN FOUT DIE DE TOETSEN NIET ZAGEN. |
 | `duels2.test.js` | 2 | gezakt op `liegpoort /api/` | Integratietests voor de tweede duelronde: het Geheugenduel van De Arena (vijf reeksen, 4 tot en met 8 lang, foutloos natikken) en het Rangschikduel van De Societeit (vier dingen in de enige juiste volgorde; de... |
+| `duurprijs.test.js` | 6 | gezakt op `===->!==#0` | DE PRIJS VAN EEN ONGEMETEN TOETSBESTAND, EN DE STABILITEIT VAN DE PLANNER. scripts/lib/delen.js verdeelt de scherven op gemeten duur. |
 | `duurzaamheid-kill.test.js` | 3 | gezakt op `liegpoort /api/` | Duurzaamheid onder een HARDE crash (SIGKILL), niet een nette afsluiting. De beproeving toetst een DUURZAAMHEID-fase met SIGTERM (de server flusht zijn write-behind netjes); dit is strenger: we schieten het proces... |
 | `duurzaamheid-pg.test.js` | 2 | slaat zichzelf over | DE OPSLAGLAAG, HARD GEMAAKT -- wat een HERSTART moet overleven. Deze toets legt twee reparaties vast die op 100 miljoen leden zijn gevonden en tot nu toe alleen met de hand waren nagelopen. |
 | `duurzaamheidskosten.test.js` | 5 | gezakt op `return-weg#0` | DE KOSTENMETING VAN DE DUURZAME COMMIT -- het oordeel, los van twee servers. De ronde zelf start twee servers en duurt minuten; daar komt niemand met een mutatie bij. |

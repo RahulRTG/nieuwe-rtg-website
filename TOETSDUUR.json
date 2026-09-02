@@ -3,16 +3,16 @@
  "uitleg": "Hoe lang elk toetsbestand erover deed, als gewicht voor de scherfverdeling in scripts/lib/delen.js. PER MODUS, want met dekking aan is dezelfde toets een ander kostenmodel -- niet een uitschieter. Mediaan over alle waarnemingen; de p90 staat erbij en weegt niet mee. Een bestand dat hier NIET in staat is ongemeten en wordt om en om verdeeld -- nooit overgeslagen.",
  "hoe": "npm test (schrijft .toetsduur), daarna: node scripts/toetsduur.js --schrijf",
  "gelezen": {
-  "regels": 9,
+  "regels": 16,
   "verminkt": 0,
-  "opSchijf": 1545,
+  "opSchijf": 1546,
   "modi": [
    "dekking",
    "onbekend"
   ],
   "opgeruimd": {
    "weg": 0,
-   "over": 1436,
+   "over": 1452,
    "wacht": "nog niet elke modus is gemeten"
   }
  },
@@ -14000,17 +14000,17 @@
   },
   "onbekend": {
    "stempel": {
-    "op": "2026-09-02T21:08:19.166Z",
+    "op": "2026-09-02T22:06:48.356Z",
     "waar": "lokaal",
     "node": "v22.22.2",
     "kernen": 4,
-    "commit": "ad9ac732"
+    "commit": "0a816ed0"
    },
    "gemeten": {
-    "bestanden": 1436,
-    "ongemeten": 109,
-    "verseWaarnemingen": 2,
-    "totaalMs": 10951285
+    "bestanden": 1452,
+    "ongemeten": 94,
+    "verseWaarnemingen": 16,
+    "totaalMs": 11067647
    },
    "bronnen": {
     "lokaal|v22.22.2|4": {
@@ -14095,6 +14095,7 @@
     "auth-rol.test.js": 13525,
     "automatisering.test.js": 84,
     "autoverkoop.test.js": 7308,
+    "avond-scherm.e2e.js": 8376,
     "avond.test.js": 8044,
     "baby.test.js": 7312,
     "backupstand.test.js": 78,
@@ -14138,6 +14139,7 @@
     "bestand-binding.test.js": 65,
     "bestanden.e2e.js": 6715,
     "bestanden.test.js": 7490,
+    "bestellen-scherm.e2e.js": 6432,
     "betaaldienst.test.js": 7412,
     "betaaldienstfee.test.js": 65,
     "betaalopdracht.test.js": 99,
@@ -14200,9 +14202,11 @@
     "bundelprijs.test.js": 64,
     "bureau.test.js": 21212,
     "bureaupda.e2e.js": 4853,
+    "buurtruil-scherm.e2e.js": 7149,
     "ca.test.js": 197,
     "cache.test.js": 81,
     "camerascherm.e2e.js": 3590,
+    "campus-scherm.e2e.js": 8910,
     "canary.test.js": 73,
     "canvas.test.js": 73,
     "capabilities.test.js": 1441,
@@ -14214,6 +14218,7 @@
     "chaos.pg.test.js": 54,
     "chaos.test.js": 55,
     "charter.test.js": 7310,
+    "chauffeur-scherm.e2e.js": 7827,
     "ci-keten.test.js": 71,
     "claims-btw.test.js": 125,
     "clipdeler.e2e.js": 6121,
@@ -14241,6 +14246,7 @@
     "command.test.js": 157,
     "commandlagen.test.js": 7926,
     "commerce-kern.test.js": 107,
+    "commerce-mand-scherm.e2e.js": 6447,
     "commerce-overdracht.test.js": 70,
     "commerce-prijsvraag.test.js": 77,
     "commerce-publiek.test.js": 67,
@@ -14251,6 +14257,7 @@
     "commercie-ronde.e2e.js": 3513,
     "commercie.test.js": 144,
     "concern-routes.e2e.js": 9514,
+    "concern-scherm.e2e.js": 6687,
     "concern-voorstel.test.js": 116,
     "concern.test.js": 141,
     "consent-dekking.test.js": 154,
@@ -14323,6 +14330,7 @@
     "eventloop.test.js": 1729,
     "excursie.test.js": 7258,
     "executionmap.test.js": 404,
+    "experience-surface.e2e.js": 6253,
     "facturatie.test.js": 7025,
     "factuur.test.js": 6578,
     "factuursaldo.test.js": 6864,
@@ -14390,6 +14398,7 @@
     "gedachten.test.js": 8068,
     "geen-demo.test.js": 13338,
     "geenlek.test.js": 119,
+    "gegevenskaart-scherm.e2e.js": 6051,
     "gegevenspoort.test.js": 21421,
     "geheugen.test.js": 7201,
     "geld-conservatie-last.test.js": 8911,
@@ -14424,6 +14433,7 @@
     "gereedschap.test.js": 75,
     "gesprekdraad.test.js": 7955,
     "getallen.test.js": 1328,
+    "geven-scherm.e2e.js": 8689,
     "gewoonten.test.js": 7016,
     "gezag.test.js": 43221,
     "gezagsnoemer.test.js": 201,
@@ -14579,6 +14589,7 @@
     "kleef-readyourwrites.test.js": 12072,
     "kleine-grendels.test.js": 15883,
     "klets.test.js": 130,
+    "klimaatfonds-scherm.e2e.js": 7661,
     "klok.test.js": 2237,
     "klokwacht.test.js": 7112,
     "kluis-binding.test.js": 1450,
@@ -14618,6 +14629,7 @@
     "ledenschermen.e2e.js": 16980,
     "leegtemeting.e2e.js": 387,
     "leerfabric.test.js": 291,
+    "leerpaspoort-scherm.e2e.js": 9376,
     "leerstof.test.js": 7664,
     "leerstofbreed.test.js": 92,
     "leerstofvo.test.js": 7239,
@@ -14753,6 +14765,8 @@
     "middleware.test.js": 208,
     "migratierace.test.js": 1083,
     "migraties.test.js": 445,
+    "mijn-relaties-scherm.e2e.js": 6721,
+    "mijn-sessies-scherm.e2e.js": 6786,
     "minify.test.js": 13377,
     "mobiel.test.js": 79,
     "mobiliteit-werkkant-routes.test.js": 8107,
@@ -14940,6 +14954,7 @@
     "poortwacht-oordeel.test.js": 80,
     "poortwacht.test.js": 84,
     "portemonnee.test.js": 28743,
+    "post-scherm.e2e.js": 6316,
     "postdatum.test.js": 7757,
     "pragmavolgorde.test.js": 623,
     "premium.e2e.js": 38704,
@@ -15423,6 +15438,7 @@
     "werkwaarom.test.js": 7009,
     "werving-link.test.js": 28586,
     "wetten.test.js": 268,
+    "winkel-scherm.e2e.js": 6681,
     "wiring-contract.test.js": 210,
     "wisselen-en-historie.test.js": 8980,
     "woonplaats-poort.test.js": 110,
@@ -15847,6 +15863,16 @@
      "min": 7308,
      "max": 7308
     },
+    "avond-scherm.e2e.js": {
+     "n": 1,
+     "min": 8376,
+     "max": 8376,
+     "p90": 8376,
+     "bronnen": [
+      "onbekend"
+     ],
+     "gemetenOp": "2026-09-02"
+    },
     "avond.test.js": {
      "n": 1,
      "min": 8044,
@@ -16081,6 +16107,16 @@
      "n": 1,
      "min": 7490,
      "max": 7490
+    },
+    "bestellen-scherm.e2e.js": {
+     "n": 1,
+     "min": 6432,
+     "max": 6432,
+     "p90": 6432,
+     "bronnen": [
+      "onbekend"
+     ],
+     "gemetenOp": "2026-09-02"
     },
     "betaaldienst.test.js": {
      "n": 1,
@@ -16437,6 +16473,16 @@
      ],
      "gemetenOp": "2026-09-01"
     },
+    "buurtruil-scherm.e2e.js": {
+     "n": 1,
+     "min": 7149,
+     "max": 7149,
+     "p90": 7149,
+     "bronnen": [
+      "onbekend"
+     ],
+     "gemetenOp": "2026-09-02"
+    },
     "ca.test.js": {
      "n": 1,
      "min": 197,
@@ -16456,6 +16502,16 @@
       "onbekend"
      ],
      "gemetenOp": "2026-09-01"
+    },
+    "campus-scherm.e2e.js": {
+     "n": 1,
+     "min": 8910,
+     "max": 8910,
+     "p90": 8910,
+     "bronnen": [
+      "onbekend"
+     ],
+     "gemetenOp": "2026-09-02"
     },
     "canary.test.js": {
      "n": 1,
@@ -16511,6 +16567,16 @@
      "n": 1,
      "min": 7310,
      "max": 7310
+    },
+    "chauffeur-scherm.e2e.js": {
+     "n": 1,
+     "min": 7827,
+     "max": 7827,
+     "p90": 7827,
+     "bronnen": [
+      "onbekend"
+     ],
+     "gemetenOp": "2026-09-02"
     },
     "ci-keten.test.js": {
      "n": 1,
@@ -16672,6 +16738,16 @@
      "min": 107,
      "max": 107
     },
+    "commerce-mand-scherm.e2e.js": {
+     "n": 1,
+     "min": 6447,
+     "max": 6447,
+     "p90": 6447,
+     "bronnen": [
+      "onbekend"
+     ],
+     "gemetenOp": "2026-09-02"
+    },
     "commerce-overdracht.test.js": {
      "n": 1,
      "min": 70,
@@ -16736,6 +16812,16 @@
       "onbekend"
      ],
      "gemetenOp": "2026-09-01"
+    },
+    "concern-scherm.e2e.js": {
+     "n": 1,
+     "min": 6687,
+     "max": 6687,
+     "p90": 6687,
+     "bronnen": [
+      "onbekend"
+     ],
+     "gemetenOp": "2026-09-02"
     },
     "concern-voorstel.test.js": {
      "n": 1,
@@ -17137,6 +17223,16 @@
      "min": 404,
      "max": 404
     },
+    "experience-surface.e2e.js": {
+     "n": 1,
+     "min": 6253,
+     "max": 6253,
+     "p90": 6253,
+     "bronnen": [
+      "onbekend"
+     ],
+     "gemetenOp": "2026-09-02"
+    },
     "facturatie.test.js": {
      "n": 1,
      "min": 7025,
@@ -17517,6 +17613,16 @@
      "min": 119,
      "max": 119
     },
+    "gegevenskaart-scherm.e2e.js": {
+     "n": 1,
+     "min": 6051,
+     "max": 6051,
+     "p90": 6051,
+     "bronnen": [
+      "onbekend"
+     ],
+     "gemetenOp": "2026-09-02"
+    },
     "gegevenspoort.test.js": {
      "n": 1,
      "min": 21421,
@@ -17701,6 +17807,16 @@
      "n": 1,
      "min": 1328,
      "max": 1328
+    },
+    "geven-scherm.e2e.js": {
+     "n": 1,
+     "min": 8689,
+     "max": 8689,
+     "p90": 8689,
+     "bronnen": [
+      "onbekend"
+     ],
+     "gemetenOp": "2026-09-02"
     },
     "gewoonten.test.js": {
      "n": 1,
@@ -18587,6 +18703,16 @@
      "min": 130,
      "max": 130
     },
+    "klimaatfonds-scherm.e2e.js": {
+     "n": 1,
+     "min": 7661,
+     "max": 7661,
+     "p90": 7661,
+     "bronnen": [
+      "onbekend"
+     ],
+     "gemetenOp": "2026-09-02"
+    },
     "klok.test.js": {
      "n": 1,
      "min": 2237,
@@ -18811,6 +18937,16 @@
      "n": 1,
      "min": 291,
      "max": 291
+    },
+    "leerpaspoort-scherm.e2e.js": {
+     "n": 1,
+     "min": 9376,
+     "max": 9376,
+     "p90": 9376,
+     "bronnen": [
+      "onbekend"
+     ],
+     "gemetenOp": "2026-09-02"
     },
     "leerstof.test.js": {
      "n": 1,
@@ -19576,6 +19712,26 @@
      "n": 1,
      "min": 445,
      "max": 445
+    },
+    "mijn-relaties-scherm.e2e.js": {
+     "n": 1,
+     "min": 6721,
+     "max": 6721,
+     "p90": 6721,
+     "bronnen": [
+      "onbekend"
+     ],
+     "gemetenOp": "2026-09-02"
+    },
+    "mijn-sessies-scherm.e2e.js": {
+     "n": 1,
+     "min": 6786,
+     "max": 6786,
+     "p90": 6786,
+     "bronnen": [
+      "onbekend"
+     ],
+     "gemetenOp": "2026-09-02"
     },
     "minify.test.js": {
      "n": 1,
@@ -20601,6 +20757,16 @@
      "n": 1,
      "min": 28743,
      "max": 28743
+    },
+    "post-scherm.e2e.js": {
+     "n": 1,
+     "min": 6316,
+     "max": 6316,
+     "p90": 6316,
+     "bronnen": [
+      "onbekend"
+     ],
+     "gemetenOp": "2026-09-02"
     },
     "postdatum.test.js": {
      "n": 1,
@@ -23331,6 +23497,16 @@
      "n": 1,
      "min": 268,
      "max": 268
+    },
+    "winkel-scherm.e2e.js": {
+     "n": 1,
+     "min": 6681,
+     "max": 6681,
+     "p90": 6681,
+     "bronnen": [
+      "onbekend"
+     ],
+     "gemetenOp": "2026-09-02"
     },
     "wiring-contract.test.js": {
      "n": 1,

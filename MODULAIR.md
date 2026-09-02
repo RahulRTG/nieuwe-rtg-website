@@ -23,9 +23,17 @@ Dezelfde volgorde als bij `OBJECTMODEL.json` (waar `Asset` sneuvelde) en
 `npm run verstrengeling` → `VERSTRENGELING.json`
 
 <!--getal:verstrengeling.randen-->1644<!--/getal--> randen tussen de knopen van dit huis, waarvan er
-<!--getal:verstrengeling.onverklaard-->111<!--/getal--> **onverklaard** zijn. Dat laatste getal moet naar nul,
-en het aantal randen niet: een huis waarin domeinen elkaar nooit nodig hebben,
-is geen huis maar een map met losse programma's.
+<!--getal:verstrengeling.onverklaard-->0<!--/getal--> **onverklaard** zijn. Dat getal moet naar nul, en het
+aantal randen niet: een huis waarin domeinen elkaar nooit nodig hebben, is geen
+huis maar een map met losse programma's.
+
+**Het staat op nul.** Honderdelf randen zijn met de hand nagelezen -- per stuk de
+aanroepregel, met bestand en regelnummer in de reden -- en ingedeeld. Daarmee
+verschuift het risico: de gevaarlijkste beweging is nu niet een nieuwe rand maar
+een slechte verklaring. "Hoort zo" houdt de meter op nul en meet niets meer.
+`test/verstrengeling.test.js` legt de bodem (een soort die bestaat, een reden die
+iets uitlegt, geen twee verklaringen voor dezelfde rand); of een reden WAAR is,
+blijft mensenwerk, en daarom staat bij elke verklaring waar hij vandaan komt.
 
 **Een knoop is laag + domein, nooit domein alleen.** De eerste ronde meldde
 `supplier -> horeca` (37 randen) als zwaarste verstrengeling, terwijl dat

@@ -8,18 +8,19 @@
   "randenBinnenKnoop": 2262,
   "randenBuitenBereik": 12,
   "perSoort": {
-    "GEDEELDE_PRIMITIEF": 412,
-    "EIGEN_DATA": 219,
-    "DOMEINRELATIE": 6,
+    "GEDEELDE_PRIMITIEF": 411,
+    "EIGEN_DATA": 238,
+    "DOMEINRELATIE": 79,
     "LAAGRAND": 364,
-    "ONBEKEND": 111,
-    "BELEID": 1,
-    "ORKESTRATIE": 531
+    "BELEID": 10,
+    "BEWIJS": 4,
+    "ORKESTRATIE": 531,
+    "PRESENTATIE": 7
   },
-  "onbekend": 111,
-  "onbekendPct": 7,
+  "onbekend": 0,
+  "onbekendPct": 0,
   "domeinranden": 552,
-  "domeinrandenOnbekend": 84,
+  "domeinrandenOnbekend": 0,
   "randenOmhoog": 23,
   "omhoogLijst": [
     {
@@ -543,7 +544,7 @@
       "id": "domein:school",
       "uit": 27,
       "in": 1,
-      "onbekend": 11
+      "onbekend": 0
     },
     {
       "id": "ingang:supplier",
@@ -561,55 +562,55 @@
       "id": "ingang:techniek",
       "uit": 22,
       "in": 0,
-      "onbekend": 1
+      "onbekend": 0
     },
     {
       "id": "domein:foundation",
       "uit": 13,
       "in": 1,
-      "onbekend": 2
+      "onbekend": 0
     },
     {
       "id": "domein:mall",
       "uit": 13,
       "in": 3,
-      "onbekend": 6
+      "onbekend": 0
     },
     {
       "id": "domein:command",
       "uit": 12,
       "in": 4,
-      "onbekend": 1
+      "onbekend": 0
     },
     {
       "id": "motor:mail",
       "uit": 11,
       "in": 4,
-      "onbekend": 2
+      "onbekend": 0
     },
     {
       "id": "domein:onderneming",
       "uit": 11,
       "in": 3,
-      "onbekend": 4
+      "onbekend": 0
     },
     {
       "id": "domein:rendezvous",
       "uit": 10,
       "in": 1,
-      "onbekend": 2
+      "onbekend": 0
     },
     {
       "id": "domein:spellen",
       "uit": 10,
       "in": 1,
-      "onbekend": 1
+      "onbekend": 0
     },
     {
       "id": "domein:webmaker",
       "uit": 10,
       "in": 1,
-      "onbekend": 1
+      "onbekend": 0
     },
     {
       "id": "ingang:office",
@@ -645,7 +646,7 @@
       "id": "domein:overheid",
       "uit": 8,
       "in": 1,
-      "onbekend": 1
+      "onbekend": 0
     }
   ],
   "domeinknopen": 544,
@@ -25323,1130 +25324,7 @@
       "pct": 100
     }
   ],
-  "werkvoorraad": [
-    {
-      "van": "domein:bedrijf",
-      "naar": "domein:werkcommand",
-      "gewicht": 7,
-      "wederkerig": false,
-      "lek": true,
-      "voorbeeld": [
-        "server/bedrijf/geheugen.js",
-        "server/bedrijf/geheugenlezen.js",
-        "server/bedrijf/inzicht.js"
-      ]
-    },
-    {
-      "van": "domein:spellen",
-      "naar": "domein:hospitality-universe",
-      "gewicht": 3,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/spellen/magnaat/economie.js",
-        "server/kern/spellen/magnaat/economie.js",
-        "server/kern/spellen/magnaat/economie.js"
-      ]
-    },
-    {
-      "van": "domein:foundation",
-      "naar": "domein:school",
-      "gewicht": 2,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/foundation/gasten/gezinsleven.js",
-        "server/foundation.js"
-      ]
-    },
-    {
-      "van": "domein:appstore",
-      "naar": "domein:platformfout",
-      "gewicht": 2,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/appstore/brug.js",
-        "server/kern/appstore/naslag.js"
-      ]
-    },
-    {
-      "van": "domein:bankregie",
-      "naar": "domein:bevoegdheid",
-      "gewicht": 2,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/bankregie/index.js",
-        "server/kern/bankregie/vergunning.js"
-      ]
-    },
-    {
-      "van": "domein:clips-studio",
-      "naar": "domein:ondertitels",
-      "gewicht": 2,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/clips-studio.js",
-        "server/kern/clips-studio.js"
-      ]
-    },
-    {
-      "van": "domein:mall",
-      "naar": "domein:ervaring",
-      "gewicht": 2,
-      "wederkerig": false,
-      "lek": true,
-      "voorbeeld": [
-        "server/kern/mall/aanbod.js",
-        "server/kern/mall/bestellingen.js"
-      ]
-    },
-    {
-      "van": "domein:stadsweefsel",
-      "naar": "domein:navigatie",
-      "gewicht": 2,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/stadsweefsel/geografie.js",
-        "server/kern/stadsweefsel/objectseed.js"
-      ]
-    },
-    {
-      "van": "domein:vakwerk",
-      "naar": "domein:klantenboek",
-      "gewicht": 2,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/vakwerk/index.js",
-        "server/kern/vakwerk/pro2.js"
-      ]
-    },
-    {
-      "van": "domein:school",
-      "naar": "domein:schooladvies",
-      "gewicht": 2,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/school/analyse-signalen.js",
-        "server/school/rapport-tekst.js"
-      ]
-    },
-    {
-      "van": "motor:betaal-sandbox",
-      "naar": "motor:iban",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/betaal-sandbox.js"
-      ]
-    },
-    {
-      "van": "motor:betaal",
-      "naar": "motor:adyen",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/betaal.js"
-      ]
-    },
-    {
-      "van": "motor:bewaartermijnen",
-      "naar": "motor:bewaarbeleid-eigenregie",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/bewaartermijnen.js"
-      ]
-    },
-    {
-      "van": "motor:bewaarwacht",
-      "naar": "motor:bewaartermijnen",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/bewaarwacht.js"
-      ]
-    },
-    {
-      "van": "motor:bus",
-      "naar": "domein:envelop",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/bus.js"
-      ]
-    },
-    {
-      "van": "motor:bus",
-      "naar": "motor:redis",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/bus.js"
-      ]
-    },
-    {
-      "van": "motor:config",
-      "naar": "motor:local-ai",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/config/productie-ai.js"
-      ]
-    },
-    {
-      "van": "motor:db",
-      "naar": "domein:werkvormen",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/db/index.js"
-      ]
-    },
-    {
-      "van": "motor:db",
-      "naar": "motor:pg",
-      "gewicht": 1,
-      "wederkerig": true,
-      "lek": true,
-      "voorbeeld": [
-        "server/db/postgres.js"
-      ]
-    },
-    {
-      "van": "domein:foundation",
-      "naar": "domein:agenda-pro",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/foundation/gasten/gezinsleven.js"
-      ]
-    },
-    {
-      "van": "domein:appbieb",
-      "naar": "domein:appcatalogus-data",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/appbieb.js"
-      ]
-    },
-    {
-      "van": "domein:appgids",
-      "naar": "domein:wereldroutes",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/appgids.js"
-      ]
-    },
-    {
-      "van": "domein:atelierweb",
-      "naar": "domein:webmaker-schoon",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/atelierweb.js"
-      ]
-    },
-    {
-      "van": "domein:bank",
-      "naar": "domein:motorverbinding",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/bank/motorklant.js"
-      ]
-    },
-    {
-      "van": "domein:code-inventaris",
-      "naar": "domein:bestuursroutes",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/code-inventaris.js"
-      ]
-    },
-    {
-      "van": "domein:command",
-      "naar": "domein:payroll",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": true,
-      "voorbeeld": [
-        "server/kern/command/lagen.js"
-      ]
-    },
-    {
-      "van": "domein:directpay",
-      "naar": "domein:betaalwaarheid",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/directpay/betalen.js"
-      ]
-    },
-    {
-      "van": "domein:doelen",
-      "naar": "domein:herkomst",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/doelen.js"
-      ]
-    },
-    {
-      "van": "domein:doorgeefjournaal",
-      "naar": "domein:journaalvorm",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/doorgeefjournaal.js"
-      ]
-    },
-    {
-      "van": "domein:doorgeefjournaal",
-      "naar": "domein:journaalverhuizing",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/doorgeefjournaal.js"
-      ]
-    },
-    {
-      "van": "domein:ervaring",
-      "naar": "domein:reservering",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/ervaring/tafels.js"
-      ]
-    },
-    {
-      "van": "domein:facturatie",
-      "naar": "domein:regelsom",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/facturatie/motor.js"
-      ]
-    },
-    {
-      "van": "domein:gemeente",
-      "naar": "domein:stadsweefsel",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/gemeente/index.js"
-      ]
-    },
-    {
-      "van": "domein:gemeente",
-      "naar": "domein:dubbelemelding",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/gemeente/meldingen.js"
-      ]
-    },
-    {
-      "van": "domein:handelsregelbronnen",
-      "naar": "domein:internationalehandel",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/handelsregelbronnen.js"
-      ]
-    },
-    {
-      "van": "domein:handelsregelwacht",
-      "naar": "domein:handelsregelbronnen",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/handelsregelwacht.js"
-      ]
-    },
-    {
-      "van": "domein:incidentcontrole",
-      "naar": "domein:beschermstand",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/incidentcontrole.js"
-      ]
-    },
-    {
-      "van": "domein:journaalbestand",
-      "naar": "domein:journaalrotatie",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/journaalbestand.js"
-      ]
-    },
-    {
-      "van": "domein:journaalbestand",
-      "naar": "domein:journaallezen",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/journaalbestand.js"
-      ]
-    },
-    {
-      "van": "domein:journaalbestand",
-      "naar": "domein:doorgeefjournaal",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/journaalbestand.js"
-      ]
-    },
-    {
-      "van": "domein:leerstof-vervolg",
-      "naar": "domein:schooladvies",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/leerstof-vervolg.js"
-      ]
-    },
-    {
-      "van": "domein:leverancier",
-      "naar": "domein:pda",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/leverancier/state.js"
-      ]
-    },
-    {
-      "van": "domein:lid",
-      "naar": "domein:lidmaatschap",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/lid.js"
-      ]
-    },
-    {
-      "van": "domein:lidacties",
-      "naar": "domein:servicekosten",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/lidacties/bestellen.js"
-      ]
-    },
-    {
-      "van": "domein:lidacties",
-      "naar": "domein:activiteitendicht",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/lidacties.js"
-      ]
-    },
-    {
-      "van": "domein:life",
-      "naar": "domein:metingen",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/life.js"
-      ]
-    },
-    {
-      "van": "domein:magnaat-dekkingsmatrix",
-      "naar": "domein:bestuursroutes",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/magnaat-dekkingsmatrix.js"
-      ]
-    },
-    {
-      "van": "domein:magnaatwereld",
-      "naar": "domein:magnaat-werkroutefabriek",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/magnaatwereld.js"
-      ]
-    },
-    {
-      "van": "domein:magnaatwereld",
-      "naar": "domein:magnaat-capabilities",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/magnaatwereld.js"
-      ]
-    },
-    {
-      "van": "domein:magnaatwereld",
-      "naar": "domein:magnaat-economie",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/magnaatwereld.js"
-      ]
-    },
-    {
-      "van": "domein:magnaatwereld",
-      "naar": "domein:magnaat-trainingslobby",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/magnaatwereld.js"
-      ]
-    },
-    {
-      "van": "domein:magnaatwereld",
-      "naar": "domein:magnaat-controle",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/magnaatwereld.js"
-      ]
-    },
-    {
-      "van": "domein:mailauth",
-      "naar": "domein:mailspf",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/mailauth.js"
-      ]
-    },
-    {
-      "van": "domein:mailinkomend",
-      "naar": "domein:mailmime",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/mailinkomend.js"
-      ]
-    },
-    {
-      "van": "domein:mall",
-      "naar": "domein:leverancier",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": true,
-      "voorbeeld": [
-        "server/kern/mall/aanbod.js"
-      ]
-    },
-    {
-      "van": "domein:mall",
-      "naar": "domein:reisbureau",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": true,
-      "voorbeeld": [
-        "server/kern/mall/aanbodrtg.js"
-      ]
-    },
-    {
-      "van": "domein:mall",
-      "naar": "domein:logies",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": true,
-      "voorbeeld": [
-        "server/kern/mall/aanbodrtg.js"
-      ]
-    },
-    {
-      "van": "domein:mall",
-      "naar": "domein:markt",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": true,
-      "voorbeeld": [
-        "server/kern/mall/aanbodrtg.js"
-      ]
-    },
-    {
-      "van": "domein:mall",
-      "naar": "domein:winkelcatalogus",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": true,
-      "voorbeeld": [
-        "server/kern/mall/index.js"
-      ]
-    },
-    {
-      "van": "domein:metingen",
-      "naar": "domein:herkomst",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/metingen.js"
-      ]
-    },
-    {
-      "van": "domein:motorverbinding",
-      "naar": "domein:motorzekering",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/motorverbinding.js"
-      ]
-    },
-    {
-      "van": "domein:mutatiecontract",
-      "naar": "domein:mutatie",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/mutatiecontract/keuring.js"
-      ]
-    },
-    {
-      "van": "domein:onboarding",
-      "naar": "domein:paseis",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/onboarding/meebouwen.js"
-      ]
-    },
-    {
-      "van": "domein:onderneming",
-      "naar": "domein:agendatijd",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": true,
-      "voorbeeld": [
-        "server/kern/onderneming/capaciteit.js"
-      ]
-    },
-    {
-      "van": "domein:onderneming",
-      "naar": "domein:aanmeldingen",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": true,
-      "voorbeeld": [
-        "server/kern/onderneming/intake.js"
-      ]
-    },
-    {
-      "van": "domein:onderneming",
-      "naar": "domein:klantenboek",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": true,
-      "voorbeeld": [
-        "server/kern/onderneming/lagen.js"
-      ]
-    },
-    {
-      "van": "domein:onderneming",
-      "naar": "domein:regelsom",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": true,
-      "voorbeeld": [
-        "server/kern/onderneming/offertebouw.js"
-      ]
-    },
-    {
-      "van": "domein:overheid",
-      "naar": "domein:dubbelemelding",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/overheid/regio.js"
-      ]
-    },
-    {
-      "van": "domein:pay",
-      "naar": "domein:motorverbinding",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": true,
-      "voorbeeld": [
-        "server/kern/pay/motorklant.js"
-      ]
-    },
-    {
-      "van": "domein:reisbureau",
-      "naar": "domein:lid",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/reisbureau.js"
-      ]
-    },
-    {
-      "van": "domein:rendezvous",
-      "naar": "domein:ontmoetpoort",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/rendezvous.js"
-      ]
-    },
-    {
-      "van": "domein:rendezvous",
-      "naar": "domein:beschikbaar",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/rendezvous.js"
-      ]
-    },
-    {
-      "van": "domein:rtfbieb",
-      "naar": "domein:rtfappcatalogus-data",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/rtfbieb.js"
-      ]
-    },
-    {
-      "van": "domein:salon",
-      "naar": "domein:mediaopruim",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/salon/index.js"
-      ]
-    },
-    {
-      "van": "domein:staffseed-papieren",
-      "naar": "domein:persoonseis",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/staffseed-papieren.js"
-      ]
-    },
-    {
-      "van": "domein:taalcheck",
-      "naar": "domein:leerstof-taalvorm",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/taalcheck.js"
-      ]
-    },
-    {
-      "van": "domein:theater",
-      "naar": "domein:ondertitels",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/theater/video.js"
-      ]
-    },
-    {
-      "van": "domein:uploadquarantaine",
-      "naar": "domein:clamd",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/uploadquarantaine.js"
-      ]
-    },
-    {
-      "van": "domein:vakwerk",
-      "naar": "domein:agendatijd",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/vakwerk/index.js"
-      ]
-    },
-    {
-      "van": "domein:vonk",
-      "naar": "domein:ontmoetpoort",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/vonk/index.js"
-      ]
-    },
-    {
-      "van": "domein:vonk",
-      "naar": "domein:beschikbaar",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/vonk/index.js"
-      ]
-    },
-    {
-      "van": "domein:webmaker-fotos",
-      "naar": "domein:mediaopruim",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/webmaker-fotos.js"
-      ]
-    },
-    {
-      "van": "domein:webmaker",
-      "naar": "domein:webdomein",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/kern/webmaker.js"
-      ]
-    },
-    {
-      "van": "motor:local-ai",
-      "naar": "motor:openai",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/local-ai.js"
-      ]
-    },
-    {
-      "van": "motor:log",
-      "naar": "domein:doorgeefjournaal",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/log.js"
-      ]
-    },
-    {
-      "van": "motor:mail-bezorgen",
-      "naar": "motor:smtp-direct",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/mail-bezorgen.js"
-      ]
-    },
-    {
-      "van": "motor:mail-opstellen",
-      "naar": "motor:smtp",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/mail-opstellen.js"
-      ]
-    },
-    {
-      "van": "motor:mail",
-      "naar": "motor:smtp",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": true,
-      "voorbeeld": [
-        "server/mail.js"
-      ]
-    },
-    {
-      "van": "motor:mail",
-      "naar": "motor:smtp-direct",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": true,
-      "voorbeeld": [
-        "server/mail.js"
-      ]
-    },
-    {
-      "van": "motor:papieren",
-      "naar": "motor:bewaarveger",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/papieren/huidig.js"
-      ]
-    },
-    {
-      "van": "motor:pg",
-      "naar": "motor:pgwire",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/pg/index.js"
-      ]
-    },
-    {
-      "van": "motor:pgaccounts",
-      "naar": "motor:pgwire",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/pgaccounts.js"
-      ]
-    },
-    {
-      "van": "ingang:geld",
-      "naar": "ingang:geldrahul",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/routes/geld.js"
-      ]
-    },
-    {
-      "van": "ingang:kantoren",
-      "naar": "ingang:papieren-deur",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/routes/kantoren/regie.js"
-      ]
-    },
-    {
-      "van": "ingang:leven",
-      "naar": "ingang:levenmentor",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/routes/leven.js"
-      ]
-    },
-    {
-      "van": "ingang:sociaal",
-      "naar": "ingang:socialerahul",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/routes/sociaal.js"
-      ]
-    },
-    {
-      "van": "ingang:techniek",
-      "naar": "ingang:papieren-deur",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/routes/techniek/papieren.js"
-      ]
-    },
-    {
-      "van": "ingang:vakbewijs-kantoor",
-      "naar": "ingang:office",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/routes/vakbewijs-kantoor.js"
-      ]
-    },
-    {
-      "van": "ingang:werving",
-      "naar": "ingang:supplier",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/routes/werving.js"
-      ]
-    },
-    {
-      "van": "domein:school",
-      "naar": "domein:belasting",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/school/belasting.js"
-      ]
-    },
-    {
-      "van": "domein:school",
-      "naar": "domein:bijles",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/school/bijles.js"
-      ]
-    },
-    {
-      "van": "domein:school",
-      "naar": "domein:opvolging",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/school/opvolging.js"
-      ]
-    },
-    {
-      "van": "domein:school",
-      "naar": "domein:overdracht",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/school/overdracht.js"
-      ]
-    },
-    {
-      "van": "domein:school",
-      "naar": "domein:koppelvlak",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/school/overdracht.js"
-      ]
-    },
-    {
-      "van": "domein:school",
-      "naar": "domein:taalcheck",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/school/taalcheck.js"
-      ]
-    },
-    {
-      "van": "domein:school",
-      "naar": "domein:betekenis",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/school/taalpoort.js"
-      ]
-    },
-    {
-      "van": "domein:school",
-      "naar": "domein:toetsbouw",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/school/toetskeuring.js"
-      ]
-    },
-    {
-      "van": "domein:school",
-      "naar": "domein:toetsspiegel",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/school/toetskeuring.js"
-      ]
-    },
-    {
-      "van": "domein:school",
-      "naar": "domein:leerstof-denkfout",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/school/verbonden.js"
-      ]
-    },
-    {
-      "van": "motor:seed",
-      "naar": "domein:muziek-stijlen",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/seed/media.js"
-      ]
-    },
-    {
-      "van": "motor:techniek-basis",
-      "naar": "motor:trio-stand",
-      "gewicht": 1,
-      "wederkerig": false,
-      "lek": false,
-      "voorbeeld": [
-        "server/techniek-basis.js"
-      ]
-    }
-  ],
+  "werkvoorraad": [],
   "alle": [
     {
       "van": "motor:accounts",
@@ -26731,8 +25609,8 @@
     {
       "van": "domein:bedrijf",
       "naar": "domein:werkcommand",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: bedrijf/geheugen.js r.44 gebruikt maakWerkRegister: het zakelijke geheugen leest wat er te doen staat, en dat register woont in werkcommand",
       "gewicht": 7,
       "omhoog": false,
       "lek": true,
@@ -26791,8 +25669,8 @@
     {
       "van": "motor:betaal-sandbox",
       "naar": "motor:iban",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: de zandbak maakt geldige rekeningnummers aan; de IBAN-regels wonen op een plek en niet twee keer",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -26851,8 +25729,8 @@
     {
       "van": "motor:betaal",
       "naar": "motor:adyen",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: betaalrail, zelfde vorm als stripe en mollie hierboven: een adapter per rail en een motor die kiest",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -26921,8 +25799,8 @@
     {
       "van": "motor:bewaartermijnen",
       "naar": "motor:bewaarbeleid-eigenregie",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: r.44 leest EIGEN_REGIE: de termijnen die een lid zelf mag kiezen, naast het gewone beleid uit ./bewaarbeleid",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -26931,8 +25809,8 @@
     {
       "van": "motor:bewaarwacht",
       "naar": "motor:bewaartermijnen",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: de wacht leest de termijnen; hetzelfde onderwerp (AVG-bewaartermijnen) over meerdere bestanden",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -26941,8 +25819,8 @@
     {
       "van": "motor:bus",
       "naar": "domein:envelop",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "BELEID",
+      "grond": "verklaard: bus.js r.35: elk bericht krijgt de envelop van OS.md (id, tijd, actor, correlatie, oorzaak, classificatie). Een bus zonder envelop levert berichten zonder keten en zonder classificatie",
       "gewicht": 1,
       "omhoog": true,
       "lek": false,
@@ -26951,8 +25829,8 @@
     {
       "van": "motor:bus",
       "naar": "motor:redis",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: de bus over meerdere servers; zonder redis is hij in-proces, en dat is dezelfde bus met een andere rail",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -26961,8 +25839,8 @@
     {
       "van": "motor:config",
       "naar": "motor:local-ai",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: config/productie-ai.js r.16 gebruikt de URL-normalisatie van de lokale AI om de opstelling te keuren; de regel voor een geldige URL staat bij de client en niet twee keer",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -27001,8 +25879,8 @@
     {
       "van": "motor:db",
       "naar": "domein:werkvormen",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: db/index.js r.27 haakt de werkvormen aan de database (haakAan): welke soorten zaak er bestaan is een eigenschap van de opslag zelf",
       "gewicht": 1,
       "omhoog": true,
       "lek": false,
@@ -27021,8 +25899,8 @@
     {
       "van": "motor:db",
       "naar": "motor:pg",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: db/postgres.js r.132 maakt de eigen PostgreSQL-client (server/pg/) -- de opslag en haar protocol, geen twee domeinen",
       "gewicht": 1,
       "omhoog": false,
       "lek": true,
@@ -27121,8 +25999,8 @@
     {
       "van": "domein:foundation",
       "naar": "domein:agenda-pro",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: zelfde bestand: het gezinsleven zet afspraken in de agenda",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -27131,8 +26009,8 @@
     {
       "van": "domein:foundation",
       "naar": "domein:school",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: foundation/gasten/gezinsleven.js r.7 leest schoolPunten uit de schoolplanner: het gezinsleven van de RTFoundation gaat over kinderen die naar school gaan",
       "gewicht": 2,
       "omhoog": false,
       "lek": false,
@@ -27481,8 +26359,8 @@
     {
       "van": "domein:appbieb",
       "naar": "domein:appcatalogus-data",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "EIGEN_DATA",
+      "grond": "verklaard: r.12 leest CATEGORIEEN en APPS: de bieb toont de catalogus, en die staat als gegevens apart",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -27501,8 +26379,8 @@
     {
       "van": "domein:appgids",
       "naar": "domein:wereldroutes",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: r.8 gebruikt wereldVanRoute: in welke wereld een scherm hoort staat op een plek (WERELDEN.md), en de gids leest hem",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -27521,8 +26399,8 @@
     {
       "van": "domein:appstore",
       "naar": "domein:platformfout",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: appstore/brug.js r.28: de gedeelde foutvorm van het platform, zodat een derdenapp dezelfde foutmelding krijgt als de rest van het huis",
       "gewicht": 2,
       "omhoog": false,
       "lek": false,
@@ -27611,8 +26489,8 @@
     {
       "van": "domein:atelierweb",
       "naar": "domein:webmaker-schoon",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: r.27: het atelier gebruikt de schoonmaak van de Website-maker. CREATE.md par. 3: die twee delen aantoonbaar een kern, en dat is de bedoelde richting -- de maker bezit de bloktaal, het atelier gebruikt hem",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -27671,8 +26549,8 @@
     {
       "van": "domein:bank",
       "naar": "domein:motorverbinding",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: bank/motorklant.js r.18: de bank praat met de Rust-geldmotor via de gedeelde verbinding",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -27701,8 +26579,8 @@
     {
       "van": "domein:bankregie",
       "naar": "domein:bevoegdheid",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "BELEID",
+      "grond": "verklaard: bankregie/index.js r.22 leest de bevoegdheden (WALLET_SALDO, GELD_UITGEVEN): wat de bank mag is beleid en hoort niet in de bankcode zelf te staan (TOKEN.md)",
       "gewicht": 2,
       "omhoog": false,
       "lek": false,
@@ -27941,8 +26819,8 @@
     {
       "van": "domein:clips-studio",
       "naar": "domein:ondertitels",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: clips-studio.js r.42 gebruikt schoonCues en CUES_MAX: ondertiteling is een eigen onderwerp (TOEGANKELIJK.md) en wordt door de studio gebruikt, niet nagebouwd",
       "gewicht": 2,
       "omhoog": false,
       "lek": false,
@@ -27991,8 +26869,8 @@
     {
       "van": "domein:code-inventaris",
       "naar": "domein:bestuursroutes",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "BEWIJS",
+      "grond": "verklaard: r.5 gebruikt redenVoor(): de inventaris moet per bestuursroute de reden kunnen tonen, en die reden woont bij de route",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -28111,8 +26989,8 @@
     {
       "van": "domein:command",
       "naar": "domein:payroll",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: command/lagen.js r.35 leest payroll/valuta naast fiscaal/landen: de cockpit toont bedragen in de juiste munt en rekent zelf niet",
       "gewicht": 1,
       "omhoog": false,
       "lek": true,
@@ -28281,8 +27159,8 @@
     {
       "van": "domein:directpay",
       "naar": "domein:betaalwaarheid",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "BELEID",
+      "grond": "verklaard: directpay/betalen.js r.3 leest betaalwaarheid/staten: welke betaalstaten er bestaan is een waarheid van het huis en niet van een betaalweg (WAARDE.md: een poort waar elke betaling langs gaat)",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -28311,8 +27189,8 @@
     {
       "van": "domein:doelen",
       "naar": "domein:herkomst",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "BEWIJS",
+      "grond": "verklaard: doelen.js r.21 gebruikt magHerkomst en BESCHIKBAAR: een doel toont waar zijn getal vandaan komt (BESTUUR.md, bewijsgraad)",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -28331,8 +27209,8 @@
     {
       "van": "domein:doorgeefjournaal",
       "naar": "domein:journaalvorm",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "EIGEN_DATA",
+      "grond": "verklaard: r.57 gebruikt padVorm en bestemmingVorm: de vorm van een journaalregel, uit hetzelfde onderwerp",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -28341,8 +27219,8 @@
     {
       "van": "domein:doorgeefjournaal",
       "naar": "domein:journaalverhuizing",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "EIGEN_DATA",
+      "grond": "verklaard: r.80 verhuist oude journalen; eenmalige migratie van hetzelfde onderwerp",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -28431,8 +27309,8 @@
     {
       "van": "domein:ervaring",
       "naar": "domein:reservering",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: ervaring/tafels.js r.4 leest reservering/beleid: of een tafel te reserveren is, is beleid van de reservering en niet van de tafel",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -28481,8 +27359,8 @@
     {
       "van": "domein:facturatie",
       "naar": "domein:regelsom",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: facturatie/motor.js r.6: de som over factuurregels staat op een plek, zodat een bedrag nooit twee keer wordt uitgerekend (COMMERCIE.md)",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -28861,8 +27739,8 @@
     {
       "van": "domein:gemeente",
       "naar": "domein:stadsweefsel",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: gemeente/index.js r.27 leest CATS en PLOEG: waar de stad uit bestaat is een eigenschap van het stadsweefsel, en de gemeente werkt erop",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -28891,8 +27769,8 @@
     {
       "van": "domein:gemeente",
       "naar": "domein:dubbelemelding",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: gemeente/meldingen.js r.8: of dezelfde melding kort geleden al binnenkwam is een eigen vraag, en hij wordt gedeeld met wie meldingen aanneemt",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -28991,8 +27869,8 @@
     {
       "van": "domein:handelsregelbronnen",
       "naar": "domein:internationalehandel",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "EIGEN_DATA",
+      "grond": "verklaard: r.4: de internationale tak van diezelfde handelsregels",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -29001,8 +27879,8 @@
     {
       "van": "domein:handelsregelwacht",
       "naar": "domein:handelsregelbronnen",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "EIGEN_DATA",
+      "grond": "verklaard: de wacht leest zijn eigen bronnenlijst; een onderwerp over twee bestanden",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -29151,8 +28029,8 @@
     {
       "van": "domein:incidentcontrole",
       "naar": "domein:beschermstand",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "BELEID",
+      "grond": "verklaard: incidentcontrole.js r.11 maakt de beschermstand: bij een incident gaat het huis naar een strengere stand, en die stand is beleid",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -29331,8 +28209,8 @@
     {
       "van": "domein:journaalbestand",
       "naar": "domein:journaalrotatie",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "EIGEN_DATA",
+      "grond": "verklaard: journaalbestand.js r.77 maakt de rotatie; een journaal en zijn rotatie zijn een onderwerp, geknipt op de 10 KB van keuringsregel 13",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -29341,8 +28219,8 @@
     {
       "van": "domein:journaalbestand",
       "naar": "domein:journaallezen",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "EIGEN_DATA",
+      "grond": "verklaard: r.135: de leeskant van datzelfde journaal",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -29361,8 +28239,8 @@
     {
       "van": "domein:journaalbestand",
       "naar": "domein:doorgeefjournaal",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "EIGEN_DATA",
+      "grond": "verklaard: r.165: het doorgeven van datzelfde journaal naar een volgende bestemming",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -29851,8 +28729,8 @@
     {
       "van": "domein:leerstof-vervolg",
       "naar": "domein:schooladvies",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: r.11 gebruikt uitspraak() en volledig(): wat een leerling hierna kan doen leunt op het advies, dat zijn eigen grenzen draagt",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -30061,8 +28939,8 @@
     {
       "van": "domein:leverancier",
       "naar": "domein:pda",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: leverancier/state.js r.11 leest modulesVoor uit pda/modules: welke werkstanden een zaak heeft, bepaalt wat de leverancier ziet (HORECA.md, de zes werkstanden)",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -30121,8 +28999,8 @@
     {
       "van": "domein:lid",
       "naar": "domein:lidmaatschap",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "EIGEN_DATA",
+      "grond": "verklaard: lid.js r.11: een lid en zijn lidmaatschap zijn een onderwerp, geknipt op de omvangsgrens",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -30131,8 +29009,8 @@
     {
       "van": "domein:lidacties",
       "naar": "domein:servicekosten",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: lidacties/bestellen.js r.8: wat een bestelling aan servicekosten draagt staat op een plek (COMMERCIE.md: catalogusprijs is niet factuurbedrag)",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -30171,8 +29049,8 @@
     {
       "van": "domein:lidacties",
       "naar": "domein:activiteitendicht",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: lidacties.js r.46: of een activiteit op die datum dicht is, is een eigen vraag met eigen regels",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -30211,8 +29089,8 @@
     {
       "van": "domein:life",
       "naar": "domein:metingen",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: life.js r.32 leest ONDERWERPEN: waarover een mens iets over zichzelf kan bijhouden, staat in de metingen (LIFE.md par. 4: er komt geen score op het leven)",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -30361,8 +29239,8 @@
     {
       "van": "domein:magnaat-dekkingsmatrix",
       "naar": "domein:bestuursroutes",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "BEWIJS",
+      "grond": "verklaard: r.7 leest dezelfde redenVoor() als code-inventaris: de dekkingsmatrix moet per bestuursroute zeggen waarom hij er niet in zit",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -30581,8 +29459,8 @@
     {
       "van": "domein:magnaatwereld",
       "naar": "domein:magnaat-werkroutefabriek",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "EIGEN_DATA",
+      "grond": "verklaard: magnaatwereld.js is 58 KB en is opgeknipt in magnaat-*; dit is een van die delen (GAMEHALL.md)",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -30591,8 +29469,8 @@
     {
       "van": "domein:magnaatwereld",
       "naar": "domein:magnaat-capabilities",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "EIGEN_DATA",
+      "grond": "verklaard: zelfde opknipping van magnaatwereld.js",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -30611,8 +29489,8 @@
     {
       "van": "domein:magnaatwereld",
       "naar": "domein:magnaat-economie",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "EIGEN_DATA",
+      "grond": "verklaard: zelfde opknipping van magnaatwereld.js",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -30621,8 +29499,8 @@
     {
       "van": "domein:magnaatwereld",
       "naar": "domein:magnaat-trainingslobby",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "EIGEN_DATA",
+      "grond": "verklaard: zelfde opknipping van magnaatwereld.js",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -30631,8 +29509,8 @@
     {
       "van": "domein:magnaatwereld",
       "naar": "domein:magnaat-controle",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "EIGEN_DATA",
+      "grond": "verklaard: zelfde opknipping van magnaatwereld.js",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -30661,8 +29539,8 @@
     {
       "van": "domein:mailauth",
       "naar": "domein:mailspf",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "EIGEN_DATA",
+      "grond": "verklaard: mailauth.js r.18: SPF is een van de drie lagen van mailauthenticatie (met DKIM en DMARC), geknipt op de omvangsgrens",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -30691,8 +29569,8 @@
     {
       "van": "domein:mailinkomend",
       "naar": "domein:mailmime",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "EIGEN_DATA",
+      "grond": "verklaard: mailinkomend.js r.31: het uitpakken van een MIME-bericht hoort bij het inlezen ervan",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -30741,8 +29619,8 @@
     {
       "van": "domein:mall",
       "naar": "domein:ervaring",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: mall/aanbod.js r.52 leest ratingVanZaak: de waardering van een zaak hoort bij de ervaring en wordt in de mall alleen getoond",
       "gewicht": 2,
       "omhoog": false,
       "lek": true,
@@ -30751,8 +29629,8 @@
     {
       "van": "domein:mall",
       "naar": "domein:leverancier",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: mall/aanbod.js r.59 leest bezorgtNu: of een zaak nu bezorgt, weet de leverancier -- de mall toont het alleen",
       "gewicht": 1,
       "omhoog": false,
       "lek": true,
@@ -30761,8 +29639,8 @@
     {
       "van": "domein:mall",
       "naar": "domein:reisbureau",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: mall/aanbodrtg.js r.30: reizen zijn een van de dingen die in de mall te koop staan (COMMERCE.md: 437 koopbare vormen in 100 domeinen)",
       "gewicht": 1,
       "omhoog": false,
       "lek": true,
@@ -30771,8 +29649,8 @@
     {
       "van": "domein:mall",
       "naar": "domein:logies",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: r.60: zelfde reden -- logies is een koopbare vorm die in de mall verschijnt",
       "gewicht": 1,
       "omhoog": false,
       "lek": true,
@@ -30781,8 +29659,8 @@
     {
       "van": "domein:mall",
       "naar": "domein:markt",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: r.94 leest advertentieOpenbaar: wat er van een advertentie openbaar mag, beslist de markt",
       "gewicht": 1,
       "omhoog": false,
       "lek": true,
@@ -30821,8 +29699,8 @@
     {
       "van": "domein:mall",
       "naar": "domein:winkelcatalogus",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: mall/index.js r.14: de winkelcatalogus is de bron van producten; de mall is de etalage",
       "gewicht": 1,
       "omhoog": false,
       "lek": true,
@@ -31001,8 +29879,8 @@
     {
       "van": "domein:metingen",
       "naar": "domein:herkomst",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "BEWIJS",
+      "grond": "verklaard: metingen.js r.26 gebruikt magHerkomst en rangVan: elke meting draagt haar bewijsgraad (BESTUUR.md)",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -31031,8 +29909,8 @@
     {
       "van": "domein:motorverbinding",
       "naar": "domein:motorzekering",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "EIGEN_DATA",
+      "grond": "verklaard: motorverbinding.js r.27: de zekering hoort bij de verbinding met de geldmotor, geknipt op de omvangsgrens",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -31051,8 +29929,8 @@
     {
       "van": "domein:mutatiecontract",
       "naar": "domein:mutatie",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "BELEID",
+      "grond": "verklaard: mutatiecontract/keuring.js r.12: de keuring toetst tegen kern/mutatie.js, het enige huis van de mutatiesemantiek (MUTATIECONTRACT.md: vijf assen met elk precies een huis)",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -31271,8 +30149,8 @@
     {
       "van": "domein:onboarding",
       "naar": "domein:paseis",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "BELEID",
+      "grond": "verklaard: onboarding/meebouwen.js r.32 gebruikt heeftPas: of iets een pas vereist is beleid en staat op een plek",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -31301,8 +30179,8 @@
     {
       "van": "domein:onderneming",
       "naar": "domein:agendatijd",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: onderneming/capaciteit.js r.29: rekenen met tijd in een agenda staat op een plek en niet in elke capaciteitsmotor opnieuw",
       "gewicht": 1,
       "omhoog": false,
       "lek": true,
@@ -31331,8 +30209,8 @@
     {
       "van": "domein:onderneming",
       "naar": "domein:aanmeldingen",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: onderneming/intake.js r.23 leest GENRES: welke soorten zaak zich kunnen aanmelden staat bij de aanmeldingen, met hun vergunningseisen (CLAUDE.md: acht genres houden de zaak tegen)",
       "gewicht": 1,
       "omhoog": false,
       "lek": true,
@@ -31351,8 +30229,8 @@
     {
       "van": "domein:onderneming",
       "naar": "domein:klantenboek",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: onderneming/lagen.js r.30: het klantenboek van een zaak, gemaakt met de opslag van die zaak",
       "gewicht": 1,
       "omhoog": false,
       "lek": true,
@@ -31371,8 +30249,8 @@
     {
       "van": "domein:onderneming",
       "naar": "domein:regelsom",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: offertebouw.js r.37: dezelfde som over regels als de facturatie gebruikt -- een bedrag wordt niet twee keer uitgerekend",
       "gewicht": 1,
       "omhoog": false,
       "lek": true,
@@ -31621,8 +30499,8 @@
     {
       "van": "domein:overheid",
       "naar": "domein:dubbelemelding",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: overheid/regio.js r.7: zelfde vraag als bij de gemeente -- kwam deze melding kort geleden al binnen",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -31671,8 +30549,8 @@
     {
       "van": "domein:pay",
       "naar": "domein:motorverbinding",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: pay/motorklant.js r.18: de betaalpoort praat met de Rust-geldmotor via dezelfde gedeelde verbinding als de bank",
       "gewicht": 1,
       "omhoog": false,
       "lek": true,
@@ -31951,8 +30829,8 @@
     {
       "van": "domein:reisbureau",
       "naar": "domein:lid",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: reisbureau.js r.36 maakt het reisdossier van een lid; het dossier woont bij het lid en niet bij het reisbureau (REIZEN.md: de Reis bezit geen boeking maar een verwijzing)",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -32111,8 +30989,8 @@
     {
       "van": "domein:rendezvous",
       "naar": "domein:ontmoetpoort",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "BELEID",
+      "grond": "verklaard: rendezvous.js r.19: de 18+-poort met geverifieerd paspoort staat op EEN plek en wordt door beide datingapps gedeeld (ONTMOETEN.md par. 4)",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -32131,8 +31009,8 @@
     {
       "van": "domein:rendezvous",
       "naar": "domein:beschikbaar",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: rendezvous.js r.28: aanwezigheid is zelf opgegeven en wordt nooit afgeleid (ONTMOETEN.md); die regel woont in beschikbaar",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -32241,8 +31119,8 @@
     {
       "van": "domein:rtfbieb",
       "naar": "domein:rtfappcatalogus-data",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "EIGEN_DATA",
+      "grond": "verklaard: rtfbieb.js r.12 leest zijn eigen catalogusgegevens, apart gezet omdat het een tabel is",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -32671,8 +31549,8 @@
     {
       "van": "domein:salon",
       "naar": "domein:mediaopruim",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: salon/index.js r.28: media die bij een verwijderde post horen, worden door een gedeelde opruimer weggehaald",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -32871,8 +31749,8 @@
     {
       "van": "domein:spellen",
       "naar": "domein:hospitality-universe",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: Magnaat leest het wereldmodel van de hospitality-universe (economie.js r.48, r.151). MAGNAATLAB.md noemt dit met zoveel woorden: er staan TWEE synthetische werelden die elkaar aanroepen, en die vraag hoort beantwoord vóór er een derde bij komt. De rand is dus bekend en bedoeld; de vraag erachter staat open en staat daar",
       "gewicht": 3,
       "omhoog": false,
       "lek": false,
@@ -33031,8 +31909,8 @@
     {
       "van": "domein:stadsweefsel",
       "naar": "domein:navigatie",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: stadsweefsel/geografie.js r.31 gebruikt REF en BOUNDS: waar Nederland ligt staat op een plek",
       "gewicht": 2,
       "omhoog": false,
       "lek": false,
@@ -33051,8 +31929,8 @@
     {
       "van": "domein:staffseed-papieren",
       "naar": "domein:persoonseis",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "BELEID",
+      "grond": "verklaard: staffseed-papieren.js r.33 leest EISEN: welk vakbewijs een beroep vraagt is beleid en staat op een plek (CLAUDE.md: server/kern/persoonseis.js)",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -33121,8 +31999,8 @@
     {
       "van": "domein:taalcheck",
       "naar": "domein:leerstof-taalvorm",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: taalcheck.js r.29: de vorm van een taalvraag hoort bij de leerstof, de controle erop is een eigen onderwerp",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -33291,8 +32169,8 @@
     {
       "van": "domein:theater",
       "naar": "domein:ondertitels",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: theater/video.js r.7: zelfde ondertitellaag als clips-studio -- een onderwerp, twee gebruikers",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -33351,8 +32229,8 @@
     {
       "van": "domein:uploadquarantaine",
       "naar": "domein:clamd",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: uploadquarantaine.js r.11: elke upload gaat langs de losse ClamAV-container (LIVEGANG.md); de client daarvoor staat apart",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -33421,8 +32299,8 @@
     {
       "van": "domein:vakwerk",
       "naar": "domein:agendatijd",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: vakwerk/index.js r.25: rekenen met tijd staat op een plek, zie ook onderneming",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -33431,8 +32309,8 @@
     {
       "van": "domein:vakwerk",
       "naar": "domein:klantenboek",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: vakwerk/index.js r.28 gebruikt geldDag uit het klantenboek: de vakman werkt op de dagen die bij de klant staan",
       "gewicht": 2,
       "omhoog": false,
       "lek": false,
@@ -33571,8 +32449,8 @@
     {
       "van": "domein:vonk",
       "naar": "domein:ontmoetpoort",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "BELEID",
+      "grond": "verklaard: vonk/index.js r.26: zelfde gedeelde poort als bij rendez-vous -- dat is de bedoelde vorm en geen dubbeling",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -33581,8 +32459,8 @@
     {
       "van": "domein:vonk",
       "naar": "domein:beschikbaar",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: vonk/index.js r.28: zelfde reden als bij rendez-vous",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -33751,8 +32629,8 @@
     {
       "van": "domein:webmaker-fotos",
       "naar": "domein:mediaopruim",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: webmaker-fotos.js r.23: zelfde opruimer, tweede gebruiker",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -33841,8 +32719,8 @@
     {
       "van": "domein:webmaker",
       "naar": "domein:webdomein",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: webmaker.js r.43: een gemaakte site en zijn domeinnaam zijn twee onderwerpen die elkaar nodig hebben",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -34161,8 +33039,8 @@
     {
       "van": "motor:local-ai",
       "naar": "motor:openai",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: local-ai.js r.18: de lokale server spreekt het OpenAI-protocol, dus hij hergebruikt die client. Dat is een PROTOCOL en geen verbinding naar buiten -- RTG_EXTERNE_AI_UIT=1 raakt de lokale weg niet",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -34181,8 +33059,8 @@
     {
       "van": "motor:log",
       "naar": "domein:doorgeefjournaal",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: log.js r.119 laadt het doorgeefjournaal pas bij gebruik (lui): wat gelogd wordt kan worden doorgegeven, en die keten hoort niet bij het loggen zelf",
       "gewicht": 1,
       "omhoog": true,
       "lek": false,
@@ -34231,8 +33109,8 @@
     {
       "van": "motor:mail-bezorgen",
       "naar": "motor:smtp-direct",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: mail-bezorgen.js r.22: bezorgen zonder tussenpartij is een van de wegen; de andere loopt via een relay",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -34291,8 +33169,8 @@
     {
       "van": "motor:mail-opstellen",
       "naar": "motor:smtp",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: mail-opstellen.js r.38 gebruikt de kop- en datumvorm van SMTP: hoe een kop eruitziet staat in het protocol",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -34351,8 +33229,8 @@
     {
       "van": "motor:mail",
       "naar": "motor:smtp",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: mail.js r.50: de transporter van de mail; een onderwerp over meerdere bestanden",
       "gewicht": 1,
       "omhoog": false,
       "lek": true,
@@ -34431,8 +33309,8 @@
     {
       "van": "motor:mail",
       "naar": "motor:smtp-direct",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: zelfde bestand: de tweede bezorgweg, zonder relay",
       "gewicht": 1,
       "omhoog": false,
       "lek": true,
@@ -39031,8 +37909,8 @@
     {
       "van": "motor:papieren",
       "naar": "motor:bewaarveger",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: papieren/huidig.js r.15 leest STANDAARD: welke termijn standaard geldt staat bij de veger die hem uitvoert",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -39051,8 +37929,8 @@
     {
       "van": "motor:pg",
       "naar": "motor:pgwire",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "EIGEN_DATA",
+      "grond": "verklaard: pg/index.js r.28: pgwire is het draadprotocol onder de eigen PostgreSQL-client; een onderwerp, twee lagen",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -39061,8 +37939,8 @@
     {
       "van": "motor:pg",
       "naar": "motor:db",
-      "soort": "GEDEELDE_PRIMITIEF",
-      "grond": "motor:db wordt door 17 knopen gebruikt (drempel 3)",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: de tegenrichting: pg/sync.js r.49 leest TX_SOORT uit het grootboek om te weten welke tabellen gedekt zijn. Wederkerig, en dat is hier de bedoeling: het protocol moet weten wat de opslag boekt",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -39071,8 +37949,8 @@
     {
       "van": "motor:pgaccounts",
       "naar": "motor:pgwire",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: pgaccounts.js r.49: de identiteitskluis gebruikt hetzelfde draadprotocol",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -39501,8 +38379,8 @@
     {
       "van": "ingang:geld",
       "naar": "ingang:geldrahul",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "PRESENTATIE",
+      "grond": "verklaard: routes/geld.js r.118 hangt de Rahul-kant van dezelfde ingang op",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -39641,8 +38519,8 @@
     {
       "van": "ingang:kantoren",
       "naar": "ingang:papieren-deur",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "PRESENTATIE",
+      "grond": "verklaard: routes/kantoren/regie.js r.28: dezelfde papierendeur wordt door meerdere ingangen opgehangen, en dat is precies een deur en geen kopie",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -39691,8 +38569,8 @@
     {
       "van": "ingang:leven",
       "naar": "ingang:levenmentor",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "PRESENTATIE",
+      "grond": "verklaard: routes/leven.js r.61 hangt de mentorkant van dezelfde ingang op",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -40461,8 +39339,8 @@
     {
       "van": "ingang:sociaal",
       "naar": "ingang:socialerahul",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "PRESENTATIE",
+      "grond": "verklaard: routes/sociaal.js r.45 hangt de Rahul-kant van dezelfde ingang op",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -41061,8 +39939,8 @@
     {
       "van": "ingang:techniek",
       "naar": "ingang:papieren-deur",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "PRESENTATIE",
+      "grond": "verklaard: routes/techniek/papieren.js r.21: zie kantoren -- dezelfde deur, tweede ingang",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -41161,8 +40039,8 @@
     {
       "van": "ingang:vakbewijs-kantoor",
       "naar": "ingang:office",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "PRESENTATIE",
+      "grond": "verklaard: routes/vakbewijs-kantoor.js r.32 gebruikt office/wiekijkt: wie er in een dossier kijkt wordt op een plek bepaald en overal hetzelfde gelogd (CLAUDE.md: het inzagejournaal)",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -41241,8 +40119,8 @@
     {
       "van": "ingang:werving",
       "naar": "ingang:supplier",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "PRESENTATIE",
+      "grond": "verklaard: routes/werving.js r.45 gebruikt de uitnodiging van de leverancierskant: de wervingslink hoort bij de zaak die werft",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -41271,8 +40149,8 @@
     {
       "van": "domein:school",
       "naar": "domein:schooladvies",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: school/analyse-signalen.js r.15 gebruikt uitspraak(): het advies is een eigen onderwerp met een eigen grens, en de analyse leest het",
       "gewicht": 2,
       "omhoog": false,
       "lek": false,
@@ -41291,8 +40169,8 @@
     {
       "van": "domein:school",
       "naar": "domein:belasting",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: server/school/ gebruikt zijn eigen kernmodule kern/belasting: een onderwerp dat buiten kern/ woont en zijn kern daar wel heeft staan",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -41301,8 +40179,8 @@
     {
       "van": "domein:school",
       "naar": "domein:bijles",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: server/school/ gebruikt zijn eigen kernmodule kern/bijles: een onderwerp dat buiten kern/ woont en zijn kern daar wel heeft staan",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -41371,8 +40249,8 @@
     {
       "van": "domein:school",
       "naar": "domein:opvolging",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: server/school/ gebruikt zijn eigen kernmodule kern/opvolging: een onderwerp dat buiten kern/ woont en zijn kern daar wel heeft staan",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -41381,8 +40259,8 @@
     {
       "van": "domein:school",
       "naar": "domein:overdracht",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: server/school/ gebruikt zijn eigen kernmodule kern/overdracht: een onderwerp dat buiten kern/ woont en zijn kern daar wel heeft staan",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -41391,8 +40269,8 @@
     {
       "van": "domein:school",
       "naar": "domein:koppelvlak",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: server/school/ gebruikt zijn eigen kernmodule kern/koppelvlak: een onderwerp dat buiten kern/ woont en zijn kern daar wel heeft staan",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -41461,8 +40339,8 @@
     {
       "van": "domein:school",
       "naar": "domein:taalcheck",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: server/school/ gebruikt zijn eigen kernmodule kern/taalcheck: een onderwerp dat buiten kern/ woont en zijn kern daar wel heeft staan",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -41471,8 +40349,8 @@
     {
       "van": "domein:school",
       "naar": "domein:betekenis",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: server/school/ gebruikt zijn eigen kernmodule kern/betekenis: een onderwerp dat buiten kern/ woont en zijn kern daar wel heeft staan",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -41491,8 +40369,8 @@
     {
       "van": "domein:school",
       "naar": "domein:toetsbouw",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: server/school/ gebruikt zijn eigen kernmodule kern/toetsbouw: een onderwerp dat buiten kern/ woont en zijn kern daar wel heeft staan",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -41501,8 +40379,8 @@
     {
       "van": "domein:school",
       "naar": "domein:toetsspiegel",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: server/school/ gebruikt zijn eigen kernmodule kern/toetsspiegel: een onderwerp dat buiten kern/ woont en zijn kern daar wel heeft staan",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -41511,8 +40389,8 @@
     {
       "van": "domein:school",
       "naar": "domein:leerstof-denkfout",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: server/school/ gebruikt zijn eigen kernmodule kern/leerstof-denkfout: een onderwerp dat buiten kern/ woont en zijn kern daar wel heeft staan",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,
@@ -41571,8 +40449,8 @@
     {
       "van": "motor:seed",
       "naar": "domein:muziek-stijlen",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: seed/media.js r.32: de zaaiset maakt voorbeelden met de echte stijlenlijst in plaats van met verzonnen waarden",
       "gewicht": 1,
       "omhoog": true,
       "lek": false,
@@ -42701,8 +41579,8 @@
     {
       "van": "motor:techniek-basis",
       "naar": "motor:trio-stand",
-      "soort": "ONBEKEND",
-      "grond": "niemand heeft deze rand verklaard",
+      "soort": "DOMEINRELATIE",
+      "grond": "verklaard: techniek-basis.js r.105: de technische pagina toont de stand van het failover-trio",
       "gewicht": 1,
       "omhoog": false,
       "lek": false,

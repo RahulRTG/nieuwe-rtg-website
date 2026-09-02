@@ -133,6 +133,29 @@ test('7b. de eigen ingang telt niet als schade bij uitneembaarheid', () => {
   assert.ok(metIngang, 'er hoort minstens een knoop te zijn die meer knopen dan domeinen raakt');
 });
 
+test('7c. elke verklaring draagt een SOORT die bestaat en een reden die iets zegt', () => {
+  /* Nu het getal op nul staat, is de gevaarlijkste beweging niet een nieuwe rand
+     maar een SLECHTE VERKLARING: "hoort zo" houdt de meter op nul en meet
+     niets meer. Deze toets is de bodem daaronder. Hij kan niet beoordelen of een
+     reden WAAR is -- dat blijft mensenwerk, en daarom staat bij elke verklaring
+     het bestand en de regel waar hij vandaan komt. */
+  const lijst = require('../scripts/lib/verstrengeling-verklaringen');
+  const SOORTEN = new Set(['EIGEN_DATA', 'GEDEELDE_PRIMITIEF', 'DOMEINRELATIE', 'ORKESTRATIE',
+    'PRESENTATIE', 'BELEID', 'BEWIJS', 'LEGACY']);
+  assert.ok(lijst.length, 'de lijst bestaat');
+  const gezien = new Set();
+  for (const v of lijst) {
+    assert.match(v.van, /^(ingang|domein|motor|opzet):/, 'een verklaring wijst een echte knoop aan: ' + v.van);
+    assert.match(v.naar, /^(ingang|domein|motor|opzet):/, 'ook aan de andere kant: ' + v.naar);
+    assert.ok(SOORTEN.has(v.soort), 'met een soort die bestaat: ' + v.soort + ' (' + v.van + ')');
+    assert.ok(v.reden && v.reden.length > 30,
+      'en een reden die iets uitlegt in plaats van een verwijzing: ' + v.van + ' -> ' + v.naar);
+    const sleutel = v.van + ' -> ' + v.naar;
+    assert.ok(!gezien.has(sleutel), 'en geen twee verklaringen voor dezelfde rand: ' + sleutel);
+    gezien.add(sleutel);
+  }
+});
+
 test('8. wederkerigheid staat BIJ de rand en niet in een tweede lijst', () => {
   const res = V.analyse([
     r('server/kern/a/x.js', 'server/kern/b/x.js'),

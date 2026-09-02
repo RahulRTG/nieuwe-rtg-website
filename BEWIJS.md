@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1442 bestanden en 10236 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1442 bestanden en 10237 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 1442 |
-| losse beweringen (`test(...)`) | 10236 |
+| losse beweringen (`test(...)`) | 10237 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 51 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1000 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1265 bestanden, 9932 beweringen.
+1265 bestanden, 9933 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1196,7 +1196,7 @@ toets omvalt.
 | `verraad.test.js` | 20 | gezakt op `true->false#0` | DE VERRAADSMOTOR (server/lib/verraad.js) -- de wereld laten liegen. WAT HIER OP HET SPEL STAAT. |
 | `verraadtelling.test.js` | 13 | gezakt op `===->!==#0` | DE ZES GETALLEN VAN DE VERRAADRONDE (scripts/lib/verraadtelling.js). WAAROM DEZE APART GETOETST WORDEN. |
 | `versieadres.test.js` | 11 | -- | DE VERSIE VAN HET BESTAND IN HAAR ADRES. Een herhaalbezoek aan /apps/app.html deed 67 verzoeken bij de server, waarvan 62 een 304, en duurde 900 ms terwijl er maar 43 KB over de lijn ging. |
-| `verstrengeling.test.js` | 12 | gezakt op `===->!==#0` | DE VERSTRENGELINGSMETER -- en of hij werkelijk iets onderscheidt. scripts/verstrengeling.js beantwoordt de vraag die vóór een binnenpoort komt: welke delen van RTG kunnen elkaar wakker maken, en hoeveel daarvan is... |
+| `verstrengeling.test.js` | 13 | gezakt op `===->!==#0` | DE VERSTRENGELINGSMETER -- en of hij werkelijk iets onderscheidt. scripts/verstrengeling.js beantwoordt de vraag die vóór een binnenpoort komt: welke delen van RTG kunnen elkaar wakker maken, en hoeveel daarvan is... |
 | `vertaal.test.js` | 3 | gezakt op `liegpoort /api/` | RTG Vertaler: een dunne route op de bestaande vertaalmotor. Zonder AI-sleutel vertaalt het huiswoordenboek (nl<->en) en is de app eerlijk over wat niet lukt (vertaald:false), nooit kapot. |
 | `vertrouwen.test.js` | 4 | -- | DE VERVALSTATEN, NAGETROKKEN. PROOF.md paragraaf 2 belooft een staatmachine; dit bestand laat hem elke overgang echt maken (LAT.md regel 10: een meter die je niet hebt zien uitslaan meet niets). |
 | `verzadiging.test.js` | 12 | gezakt op `&&->||#0` | De verzadigingspoort van scripts/tot-crash.js (scripts/lib/verzadiging.js). Deze poort bestaat omdat het crashharnas urenlang het verkeerde heeft gemeten: het verdubbelde het aantal werkers, de doorvoer stortte in... |

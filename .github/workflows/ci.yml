@@ -211,7 +211,7 @@ jobs:
         run: |
           set -o pipefail
           uitslag=0
-          npm run test:deel -- --deel=${{ matrix.scherf }}/4 --zonder-ijkingen --dekking=dekking 2>&1 | tee -a /tmp/scherf.log || uitslag=$?
+          npm run test:deel -- --deel=${{ matrix.scherf }}/4 --zonder-ijkingen --zonder-zware --dekking=dekking 2>&1 | tee -a /tmp/scherf.log || uitslag=$?
           if [ "$uitslag" -ne 0 ]; then node scripts/gezakte-toetsen.js /tmp/scherf.log; fi
           for bestand in dekking/*.info; do
             mv "$bestand" "${bestand%.info}-scherf-${{ matrix.scherf }}.info"
@@ -310,6 +310,57 @@ jobs:
           path: routejournaal.log
           retention-days: 1
           if-no-files-found: error
+
+  # DE ZWARE TOETSEN: eigen job, en met opzet ZONDER dekking.
+  #
+  # ast-grens.test.js deed onder dekking 1272 seconden -- in zijn eentje 14% van
+  # al het toetswerk, en daarmee de bodem van het kritieke pad van de hele keten
+  # (ronde 33518796922: scherven 1335 / 512 / 516 / 809). Zonder dekking doet hij
+  # 272 seconden.
+  #
+  # Dat mag pas sinds zijn orakel (`heeftGrens_`) uit scripts/ast/regels.js naar
+  # de toets zelf is verhuisd. Zolang die regels in productiecode stonden, was
+  # deze toets de enige die ze kon dekken en moest hij dus onder dekking mee.
+  # Gemeten wat dat kost: regels.js stond zonder deze toets op 85,8% (279/325) en
+  # staat er nu op 96,7% (292/302).
+  #
+  # Er gaat hier dus geen dekkingsartefact naar boven, want er is er geen -- en
+  # dat is het punt. test/delen.test.js bewaakt dat deze matrix gelijk blijft aan
+  # scripts/lib/zwaar.js, zodat een toets die uit de scherven is gehaald nooit
+  # zonder job achterblijft.
+  zware:
+    name: De zware toets - ${{ matrix.zwaar }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        zwaar: [ast-grens]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+      - run: npm ci
+      - name: De zware toets draaien (zonder dekking, zie hierboven)
+        run: |
+          set -o pipefail
+          uitslag=0
+          npm run test:deel -- --bestanden=${{ matrix.zwaar }}.test.js --zonder-ijkingen 2>&1 | tee /tmp/zwaar.log || uitslag=$?
+          if [ "$uitslag" -ne 0 ]; then node scripts/gezakte-toetsen.js /tmp/zwaar.log; fi
+          exit "$uitslag"
+      - name: De duurmeting van deze toets bewaren
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: toetsduur-zwaar-${{ matrix.zwaar }}
+          path: .toetsduur
+          retention-days: 5
+          if-no-files-found: error
+          include-hidden-files: true
 
   # DE KEURINGEN WACHTEN OP NIETS, en dat is een reparatie.
   #
@@ -462,9 +513,14 @@ jobs:
     # de vloer handhaven en hun routejournalen samenvoegen. Een paar seconden.
     #
     # De bouw staat in `norm`, de keuringen in `keuringen`, en deze job is het
-    # oordeel over de tak als geheel -- hij zakt zodra een van de drie zakt,
+    # oordeel over de tak als geheel -- hij zakt zodra een van de vier zakt,
     # want dan draait hij niet.
-    needs: [toetsscherf, ijkingen, keuringen]
+    #
+    # `zware` staat er sinds ast-grens.test.js uit de scherven is gehaald. Zonder
+    # die regel zou een gezakte zware toets de BESCHERMDE check groen laten: het
+    # bestand draait dan nergens meer waar dit oordeel naar kijkt. Een toets
+    # verplaatsen mag nooit betekenen dat hij ophoudt te tellen.
+    needs: [toetsscherf, ijkingen, keuringen, zware]
     runs-on: ubuntu-latest
     # GEEN POSTGRES EN GEEN REDIS MEER. Die stonden hier voor de
     # PostgreSQL-integratietests, en die zijn mee verhuisd. Het opstarten van

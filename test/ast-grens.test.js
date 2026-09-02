@@ -49,7 +49,73 @@ const path = require('path');
 const WORTEL = path.join(__dirname, '..');
 const { parse } = require('../scripts/ast/parser');
 const { loop } = require('../scripts/ast/walk');
-const { heeftGrens, heeftGrens_, onder } = require('../scripts/ast/regels');
+const { heeftGrens, onder } = require('../scripts/ast/regels');
+
+/* ---- HET ORAKEL, EN WAAROM HET HIER WOONT ----
+
+   Dit blok stond in scripts/ast/regels.js. Zijn eigen commentaar zei al wat het
+   was: "hij wordt niet meer aangeroepen -- analyse() doet hetzelfde in een
+   doorloop -- maar hij blijft staan ... en de toets vergelijkt de twee". Dat is
+   geen productiecode maar het ORAKEL van deze toets, en een orakel hoort bij
+   zijn toets.
+
+   HET STOND DAAR OOK NIET GRATIS. regels.js wordt onder dekking gemeten, dus
+   telden deze 46 regels mee in de noemer van de dekkingsvloer -- en omdat alleen
+   dit bestand ze aanriep, was deze toets de enige die ze kon dekken. Zolang het
+   orakel daar stond, moest deze toets dus MET dekking draaien, en dat kost
+   1272 seconden tegen 430 zonder. Dat was het kritieke pad van de hele keten
+   (ronde 33518796922: 1335 / 512 / 516 / 809).
+
+   Gemeten wat de verhuizing kost aan echte dekking: niets. Zonder deze toets
+   stond scripts/ast/regels.js op 85,8% (279/325) en die 46 ontbrekende regels
+   waren precies dit blok; parser, walk en lexer bleven op 99-100% omdat drie
+   andere toetsen ze ook laden.
+
+   De bewering verandert niet: de snelle en de uitputtende variant worden nog
+   steeds op de ECHTE boom tegen elkaar gehouden, over alle routes. Woord voor
+   woord overgenomen -- een orakel dat je bij het verhuizen "even opschoont" is
+   geen orakel meer.
+   ------------------------------------------------------------------------- */
+/* De oude, uitputtende variant. Hij wordt niet meer aangeroepen -- analyse()
+   hierboven doet hetzelfde in een doorloop -- maar hij blijft staan als de
+   nauwkeurige beschrijving van wat "een grens" betekent, en test/ast-scan.test.js
+   vergelijkt de twee zodat ze niet uiteen kunnen lopen. */
+function heeftGrens_(fn, naam) {
+  for (const n of onder(fn.body)) {
+    if (n.type === 'CallExpression' && n.callee && n.callee.type === 'MemberExpression'
+        && n.callee.property && /^(isInteger|isSafeInteger|isFinite)$/.test(n.callee.property.name)
+        && n.arguments.some(a => a && a.type === 'Identifier' && a.name === naam)) return true;
+    /* EEN GAT DAT HIER JAREN HEEFT GEZETEN. De eerste tak was
+         if (raakt(n.left) && raakt(n.right)) return true;
+       met een `raakt` die OOK waar is voor elke `x.length`. Bij een vergelijking
+       als `kand.regels.length > basis.regels.length` -- en die staat er echt,
+       in server/kern/agent.js -- zijn beide zijden dus "raak" zonder dat de
+       gevraagde naam er ook maar in voorkomt. Gevolg: EEN zo'n vergelijking
+       ergens in een functie zette de hele index-controle voor die functie uit.
+
+       Gevonden door de snelle variant hiernaast ertegenaan te houden
+       (test/ast-grens.test.js): die was op 23 van de 1980 gevallen STRENGER, en
+       dat bleek geen fout in de nieuwe maar een gat in de oude. De naam moet er
+       gewoon in staan. */
+    if (n.type === 'BinaryExpression' && ['<', '>', '<=', '>='].includes(n.operator)) {
+      const isNaam = z => z && z.type === 'Identifier' && z.name === naam;
+      if (isNaam(n.left) || isNaam(n.right)) return true;
+    }
+  }
+  /* En de derde vorm van een grens: kijken of het ELEMENT bestaat.
+       if (!p.poll.opties[i]) return 400;
+     Dat is een volwaardige controle -- lijst[NaN] en lijst[-1] zijn undefined,
+     dus die aanroep valt er netjes op stuk. Zonder deze herkenning zou de
+     regel een correcte route aanwijzen, en een regel die goed werk afkeurt
+     wordt uitgezet. */
+  for (const n of onder(fn.body)) {
+    if (n.type === 'UnaryExpression' && n.operator === '!' && n.argument
+        && n.argument.type === 'MemberExpression' && n.argument.computed
+        && n.argument.property && n.argument.property.type === 'Identifier'
+        && n.argument.property.name === naam) return true;
+  }
+  return false;
+}
 
 function jsBestanden(wortel) {
   const uit = [];

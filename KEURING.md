@@ -217,6 +217,71 @@ deel. Die marge is met opzet een **telling en geen tijd**: als de gewichten
 verdacht zijn, is het enige dat je nog zeker weet hoeveel bestanden er zijn. De
 schade van een fout gewicht is daarmee begrensd in plaats van onbeperkt.
 
+### Wat een ongemeten bestand kost, en waar de bodem ligt
+
+De eerste ronde op het CI-gemeten kostenmodel (33518796922) leverde
+**1335 / 512 / 516 / 809** seconden. Dat is 13 seconden beter dan de ronde
+ervoor — één procent — en het antwoord is niet dat de verdeler tekortschiet.
+
+**`ast-grens.test.js` is de bodem.** Onder dekking duurt hij 1272s: in zijn
+eentje **14% van al het werk** (9214s), tegen een p99 van 46s. Zolang dat
+bestand in één scherf draait kan geen verdeling onder ~1272s komen. Het
+kritieke pad stond op 1335s — vijf procent boven een harde bodem. De
+scherfverdeling is daarmee vrijwel optimaal.
+
+**En de lege scherven kwamen door de regel voor onbekend.** Twee nieuwe
+toetsbestanden waren ongemeten en kregen elk het *zwaarste bekende* gewicht:
+1272s. Scherf 2 en 3 planden daarmee 2732s en deden er 512s en 516s over — voor
+een kwart gevuld, terwijl het echte werk in de andere twee werd geperst.
+
+Vandaar de maat: **de p99 in plaats van het maximum**. De regel blijft
+"onbekend telt als duur" — de p99 is hoger dan 99 van de 100 bestanden en negen
+keer de mediaan. Wat vervalt is dat een enkele uitschieter bepaalt hóé duur.
+Let op de rekenkunde: bij een kleine verzameling valt de p99 samen met het
+zwaarste bestand, en dat is geen fout maar de definitie.
+
+### De bodem weggehaald: een orakel dat in productiecode woonde
+
+Het kritieke pad stond op 1335s tegen een bodem van 1272s, en die bodem was één
+bestand: `ast-grens.test.js` — onder dekking 14% van al het toetswerk, tegen een
+p99 van 46s. Zonder dekking doet hij **272s**.
+
+Waarom hij toch onder dekking moest, bleek in de bron te staan. `heeftGrens_`,
+de uitputtende variant, stond in `scripts/ast/regels.js` met eigen commentaar:
+
+> hij wordt niet meer aangeroepen — `analyse()` doet hetzelfde in een doorloop —
+> maar hij blijft staan … en de toets vergelijkt de twee
+
+Dat is geen productiecode maar het **orakel** van die toets. En het stond daar
+niet gratis: `regels.js` wordt onder dekking gemeten, dus telden die regels mee
+in de noemer van de vloer, en alleen `ast-grens.test.js` kon ze dekken. Het
+orakel hield zijn eigen toets onder dekking.
+
+Het orakel is verhuisd naar de toets, woord voor woord — een orakel dat je bij
+het verhuizen "even opschoont" is geen orakel meer. Wat dat kostte aan echte
+dekking is gemeten en niet geschat:
+
+| `scripts/ast/regels.js`, zonder ast-grens | regels |
+|---|---|
+| vóór de verhuizing | 279/325 — **85,8%** |
+| ná de verhuizing | 292/302 — **96,7%** |
+
+De noemer is kleiner en de dekking hóger. `parser`, `walk` en `lexer` bleven op
+99–100%, want drie andere toetsen laden diezelfde modules.
+
+Daarna kon de toets uit de scherven: `scripts/lib/zwaar.js` met een eigen job in
+de keten, zonder dekking. Dat is **niet** de isolatielijst — die gaat over
+gedeelde staat, deze over kosten, en twee redenen verdienen twee lijsten. Wat
+een toets daar niet zomaar in mag maken: traag alleen is geen reden. Hij hoort
+er pas als hij aantoonbaar het kritieke pad zet **én** zijn dekking elders al
+gedekt is. Anders verplaats je geen kosten maar dekking.
+
+Vier wachters, want een verplaatste toets verdwijnt stil — hij is niet rood, hij
+is er gewoon niet: de matrix in `ci.yml` moet gelijk zijn aan de lijst, de
+scherven moeten de vlag écht meegeven (anders draait hij dubbel), het beschermde
+eindoordeel moet op de nieuwe job wachten (anders laat een gezakte toets de
+merge door), en de lijst mag geen bestand noemen dat niet bestaat.
+
 ### Wanneer een gewicht zonder modus mag verdwijnen
 
 `onbekend` is de bak voor metingen van vóór de modi: echt gemeten, maar niemand

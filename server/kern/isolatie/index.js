@@ -54,9 +54,13 @@ module.exports = function maakIsolatie({ db, save, functies, klok, huisStand, be
   /* Lui: de meter roept besluit() aan, en die hangt aan de laag die hier nog
      wordt opgebouwd. Hem hier meteen bouwen zou een halve laag meegeven. */
   let bruikbaarMem = null;
-  const bruikbaar = { overStanden: (standen) => {
-    if (!bruikbaarMem) bruikbaarMem = maakBruikbaarheid({ isolatie: naarBuiten, functies });
-    return bruikbaarMem.overStanden(standen);
+  const bruikbaar = { overStanden: (standen, opties) => {
+    /* De beschermstand gaat MEE, want de meter hoort ook te zien wat er
+       werkelijk wordt afgedwongen en niet alleen wat deze laag belooft. Hij
+       staat hier al; hem weglaten was de reden dat een gebroken belofte
+       onzichtbaar bleef. */
+    if (!bruikbaarMem) bruikbaarMem = maakBruikbaarheid({ isolatie: naarBuiten, functies, beschermstand });
+    return bruikbaarMem.overStanden(standen, opties);
   } };
 
   /* ---------- lezen ---------- */

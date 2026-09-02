@@ -1,12 +1,12 @@
 {
-  "stempel": "2026-09-01",
+  "stempel": "2026-09-02",
   "uitleg": "Per bestemming in de sprong: welk aandeel van de ONDERSCHEIDENDE woorden van dat scherm (woorden uit zijn koppen die op hooguit 3 bestemmingen voorkomen) er ook naartoe leidt in de zoekfilter van shared/sprong.js. Meet woorden, geen mensen: of iemand op het idee komt dat woord te typen, weet deze meter niet.",
   "vloer": 0.6,
   "drempel": 3,
-  "bestemmingen": 81,
-  "woorden": 1053,
-  "gevonden": 661,
-  "dekking": 0.6277,
+  "bestemmingen": 82,
+  "woorden": 1057,
+  "gevonden": 665,
+  "dekking": 0.6291,
   "perBestemming": [
     {
       "naam": "Magnaat",
@@ -94,7 +94,7 @@
       "naam": "Ontdekken",
       "url": "/apps/rtg.html",
       "woorden": 66,
-      "gevonden": 46,
+      "gevonden": 47,
       "mist": [
         "dagelijkse",
         "basis",
@@ -103,7 +103,6 @@
         "veilige",
         "ruis",
         "meedenkt",
-        "bescherming",
         "stille",
         "standaard",
         "inzicht",
@@ -397,22 +396,6 @@
       ]
     },
     {
-      "naam": "RTG One",
-      "url": "/apps/rtgone.html",
-      "woorden": 31,
-      "gevonden": 23,
-      "mist": [
-        "koppel",
-        "persoonlijke",
-        "account",
-        "beloften",
-        "length",
-        "persoonlijk",
-        "actieve",
-        "werkstromen"
-      ]
-    },
-    {
       "naam": "Attenties",
       "url": "/apps/attenties.html",
       "woorden": 9,
@@ -455,6 +438,21 @@
         "gezelschap",
         "aantal",
         "samenstellen"
+      ]
+    },
+    {
+      "naam": "RTG One",
+      "url": "/apps/rtgone.html",
+      "woorden": 31,
+      "gevonden": 24,
+      "mist": [
+        "koppel",
+        "persoonlijke",
+        "beloften",
+        "length",
+        "persoonlijk",
+        "actieve",
+        "werkstromen"
       ]
     },
     {
@@ -736,6 +734,16 @@
       "mist": [
         "eerstvolgende",
         "momenten"
+      ]
+    },
+    {
+      "naam": "Accountbescherming",
+      "url": "/apps/mijn-isolatie.html",
+      "woorden": 4,
+      "gevonden": 2,
+      "mist": [
+        "strenger",
+        "weer"
       ]
     },
     {

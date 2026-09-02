@@ -550,15 +550,20 @@ const noemers = {};
 /* ---------- 3d. Wat er nog WERKT -- de andere helft van de vraag ---------- */
 {
   const iso = maakIsolatie({ db: { data: {} }, save() {}, functies, klok: null, huisStand: () => 'normaal' });
-  const meter = maakBruikbaarheid({ isolatie: iso, functies });
+  const meter = maakBruikbaarheid({ isolatie: iso, functies, beschermstand });
   const perStand = meter.overStanden(['normaal', 'waakzaam', 'beperkt', 'beschermd', 'isolatie']);
   const gezakt = [];
+  const gezaktHard = [];
   for (const [stand, v] of Object.entries(perStand)) {
     for (const b of v.belofteGezakt) gezakt.push({ stand, verhaal: b.id, dicht: b.dicht });
+    for (const b of v.belofteGezaktAfgedwongen) gezaktHard.push({ stand, verhaal: b.id, dicht: b.dicht });
   }
 
   noemers.bruikbaarheid = {
     wat: 'wat er onder elke stand nog werkt, per kritiek gebruikersverhaal',
+    /* PER BAAN UITGESPLITST, want een totaal over vier banen verbergt precies wat
+       je wilt weten: dat de mens-baan er goed doorkomt en de zaak-baan niet. */
+    perBaan: Object.fromEntries(Object.entries(perStand).map(([k, v]) => [k, v.perBaan])),
     bron: ['server/kern/isolatie/bruikbaarheid.js'],
     gevonden: meter.VERHALEN.length,
     /* GEEN PERCENTAGE. Negen verhalen zijn geen steekproef, en 78% van negen
@@ -566,6 +571,16 @@ const noemers = {};
     perStand: Object.fromEntries(Object.entries(perStand).map(([k, v]) =>
       [k, { werkt: v.werkt, beperkt: v.beperkt, werktNiet: v.werktNiet }])),
     beloftesGezakt: gezakt,
+    /* TWEE KOLOMMEN EN NOOIT EEN SOM. `beloftesGezakt` is wat de BESLUITLAAG
+       zegt; `beloftesGezaktAfgedwongen` is wat een draaiende server met een
+       gewoon HTTP-verzoek doet. Die tweede was er niet, en daardoor meldde dit
+       register nul gebroken beloftes terwijl `geld-lezen` -- de belofte die dit
+       huis het hardst heeft opgeschreven -- op de enige weg die telt gebroken
+       was. Groen licht boven een gat, precies de faalvorm die deze laag zoekt. */
+    beloftesGezaktAfgedwongen: gezaktHard,
+    verschil: 'de besluitlaag (kern/isolatie/besluit.js) kent de leesset-redding; de handhavende weg ' +
+      '(kern/beschermstand.js, aangeroepen door middleware/functieschakelaars.js) niet. Waar de twee ' +
+      'uiteenlopen, telt de tweede: dat is wat een mens merkt.',
     waarom: 'de tellingen hierboven zeggen wat er DICHTGAAT, en dat is de helft die een verkeerd ' +
       'gevoel geeft: hoe meer er dicht is, hoe beter het lijkt. Een isolatiestand die niemand durft ' +
       'aan te zetten, beschermt niemand.',
@@ -763,23 +778,64 @@ const noemers = {};
 
 /* ---------- De schuld, met opzet vooraan in het bestand ---------- */
 const schuld = [
+  /* DE POST DIE ONTBRAK, EN HET REGISTER DROEG DAARDOOR DEZELFDE LEUGEN ALS HET
+     SCHERM. Drie posten hieronder zeggen STAAT -- en dat is waar over de
+     BESLUITLAAG en niet over de handhaving: geen van de drie houdt vandaag een
+     gewoon HTTP-verzoek tegen. Deze post staat daarom bovenaan en niet in een
+     voetnoot. */
+  { punt: 'handhaving in de HTTP-keten',
+    stand: 'ONTBREEKT',
+    waarom: 'GEMETEN: middleware/functieschakelaars.js leest alleen het HUIS-veld ' +
+      '(ic.modus === "beschermd") en roept beschermstand.houdtTegen() aan. Grep naar "isolatie" in ' +
+      'server/middleware/ geeft NUL treffers. isolatie.besluit() wordt in heel server/ door drie ' +
+      'plekken aangeroepen: kern/stuur/isolatiefilter.js (de AI-padlijst), routes/techniek/isolatie.js ' +
+      '(een proef die niets uitvoert) en kern/isolatie/bruikbaarheid.js (een meter).',
+    open: 'een lid dat zichzelf op `isolatie` zet, versmalt alleen de lijst waaruit het model kiest; ' +
+      'zijn gewone HTTP-paden blijven open. Het ledenscherm zegt dat inmiddels met zoveel woorden ' +
+      '(het veld `afgedwongen` op /api/isolatie/mijn, afgeleid uit de code en niet uit een tekst), ' +
+      'maar de poort zelf is er nog niet. Wie hem bouwt: hij hoort op de plek van het huis-blok in ' +
+      'functieschakelaars.js -- de enige plek die elk /api/-verzoek ziet, vóór elke router staat, de ' +
+      'bearer-kop al ontleedt en de 503 van deze as al bezit -- en hij hoort eerst in de SCHADUW te ' +
+      'lopen (CONTROLPLANE.md). Let op twee gemeten valkuilen: een voorpoort die vraagt "staat er ' +
+      'ergens een stand" kost bij 10.000 dichtgezette leden ~1 ms per verzoek (het materialiseren van ' +
+      'de sleutels), dus de vraag hoort te zijn "staat er een stand VOOR DIT VERZOEK" -- een ' +
+      'hash-opzoeking, O(1). En besluit() laat onder huis=beschermd 255 paden door die houdtTegen() ' +
+      'vandaag dichthoudt: dat is een VERZWAKKING van bestaande handhaving en een eigen besluit met ' +
+      'een eigen schaduwronde, niet iets dat meelift.' },
   { punt: 'drager-model',
-    stand: 'STAAT',
+    stand: 'STAAT ALS BESLUITLAAG',
     waarom: 'server/kern/isolatie/: vijf van de zes dragers dragen een stand, samengevoegd met een join. ' +
-      'De stand van het huis wordt GELEZEN uit de incidentcontrole en niet gekopieerd.',
-    open: 'de drager `workload` heeft nog geen bron: een achtergrondtaak meldt zich nergens aan.' },
+      'De stand van het huis wordt GELEZEN uit de incidentcontrole en niet gekopieerd. Vier dragers ' +
+      'hebben ook een SLEUTELBRON en doen dus mee bij een lopend verzoek (kern/isolatie/sessiedragers.js).',
+    open: 'twee dragers hebben geen sleutelbron. `workload`: geen achtergrondtaak meldt zich aan, en ' +
+      'er is geen gedeeld beginpunt -- gemeten in noemers.workload. `organisatie`: een sessie draagt ' +
+      'geen organisatiecode, dus RTG kan de stand wel ZETTEN vanaf de cockpit maar hij weegt bij een ' +
+      'verzoek van dat lid niet mee.' },
   { punt: 'isolatie per drager is strenger dan beschermd',
-    stand: 'STAAT',
+    stand: 'STAAT ALS BESLUITLAAG',
     waarom: 'server/kern/isolatie/leesset.js: onder isolatie blijft alleen open wat zijn lezerschap ' +
       'heeft BEWEZEN -- gemeten in IDEMPROEF.json en getoetst tegen het effectmodel, dat precies de ' +
       'blinde vlek van die meting dekt (bestanden en uitgaande aanroepen).',
     open: 'de meting kwam bij 3074 rol-paden nooit met succes langs; die gaan dicht terwijl een deel ' +
       'ervan onschuldige lezers zijn. Isolatie is dus botter dan nodig.' },
   { punt: 'ledenscherm',
-    stand: 'STAAT',
+    stand: 'STAAT ALS BESLUITLAAG',
     waarom: 'server/routes/isolatie.js en /apps/mijn-isolatie.html: een lid zet zichzelf, deze sessie ' +
       'of dit toestel strenger, met de sleutel uit de SESSIE en nooit uit het verzoek.',
-    open: 'de drager `apparaat` werkt alleen als de sessie er een draagt; vandaag draagt zij die niet.' },
+    open: 'de drager `apparaat` werkt alleen na een PASSKEY-inlog; wie met een wachtwoord inlogt draagt ' +
+      'er geen, en dat komt terug met de reden in plaats van als lege waarde.' },
+  { punt: 'de bruikbaarheidsmeter mat de verkeerde laag',
+    stand: 'GEREPAREERD',
+    waarom: 'de meter mat tegen isolatie.besluit() -- de besluitlaag, die de leesset-redding kent. ' +
+      'De laag die in de HTTP-keten werkelijk iets tegenhoudt (beschermstand.houdtTegen) kent die ' +
+      'niet. Gemeten onder huis=beschermd stond het verhaal `geld-lezen` -- een belofte met moetHeel ' +
+      '-- volgens de besluitlaag op WERKT en afgedwongen op WERKT NIET: /api/pay/overzicht, ' +
+      '/api/bank/afschrift en /api/bank/overzicht vallen alle drie dicht op de categorie "Geld". ' +
+      'Dit register meldde ondertussen beloftesGezakt: []. Groen licht boven een gat.',
+    open: 'de twee kolommen staan er nu naast elkaar (beloftesGezakt tegenover ' +
+      'beloftesGezaktAfgedwongen) en worden nooit opgeteld. Ze GELIJKTREKKEN is een tweede besluit: ' +
+      'de leesset-redding naar de handhavende weg brengen is een verzwakking van bestaande ' +
+      'handhaving en vraagt een eigen schaduwronde.' },
   { punt: 'lockdown-filter na de resolver',
     stand: 'STAAT',
     waarom: 'server/kern/stuur/isolatiefilter.js versmalt de lijst waaruit de AI kiest, per constructie ' +
@@ -827,7 +883,43 @@ const schuld = [
     stand: 'STAAT',
     waarom: 'kern/stuur.js roept het filter aan in stuurPaden(), en kern/stuur/lus.js haalt de ' +
       'context uit de SESSIE van de aanroeper. De kaart zegt er bovendien bij WAT er wegviel, zodat ' +
-      'het model niet denkt dat een vermogen niet bestaat.' }
+      'het model niet denkt dat een vermogen niet bestaat.' },
+  /* VIER VONDSTEN VAN DE BRUIKBAARHEIDSMETER, en het zijn BESLUITEN en geen bugs.
+     Ze staan hier met de meting erbij in plaats van stil te worden rechtgetrokken:
+     wie ze wegpoetst, verandert wat de stand aan een mens belooft zonder dat
+     iemand daarover heeft besloten. */
+  { punt: 'passkey-inloggen valt dicht onder beschermd',
+    stand: 'BESLUIT VAN DE EIGENAAR',
+    waarom: 'GEMETEN: /api/webauthn/opties komt er als bewezen lezer doorheen en /api/webauthn/login ' +
+      'niet -- die hangt aan de functie `webauthn` in de bevroren categorie "Betalen & verificatie". ' +
+      'Een halfopen voordeur is erger dan een dichte.',
+    open: 'drie uitwegen. (1) /api/webauthn/login en /opties in de paden van `tg-inlog` zetten: een ' +
+      'regel, de langste prefix wint dus registreren blijft bevroren, en het repareert meteen dat de ' +
+      'knop "Passkeys" op het schakelbord het passkey-INLOGGEN vandaag niet uitzet -- prijs: die twee ' +
+      'routes verhuizen van doelgroep LEDEN naar ALLE. (2) een eigen functie `tg-passkey-inlog` plus ' +
+      'een uitzondering: meer boekhouding, geen doelgroepverschuiving. (3) niets doen en vastleggen ' +
+      'dat wachtwoord-inloggen de gegarandeerde weg is. Dit is een keuze van de eigenaar.' },
+  { punt: 'een horecazaak kan niet afrekenen onder beschermd',
+    stand: 'BESLUIT VAN DE EIGENAAR',
+    waarom: 'GEMETEN: van de vier zaak-verhalen staat er onder `beschermd` GEEN ENKELE op "werkt". ' +
+      'Elke /api/supplier/-route valt onder de functie `supplier` in de bevroren categorie "Partners ' +
+      '(leveranciers)"; ook het HACCP-temperatuurlogboek en de clubdeur gaan dicht.',
+    open: 'de reden in beschermstand-lijst.js is "een leverancier schrijft hier in onze gegevens", ' +
+      'maar een zaak die haar eigen tafelrekening bijwerkt is precies wat LOOPT_DOOR onder "Werk ' +
+      '(zaken en personeel)" beschrijft als eigenaar en niet als derde. Dat is een tegenspraak in de ' +
+      'indeling. LET OP: /api/supplier/pos/checkout BEWEEGT GELD via RTG Pay en hoort er nooit zomaar ' +
+      'uit, wat er ook met de categorie gebeurt.' },
+  { punt: 'de deur van het gezinsportaal',
+    stand: 'BESLUIT VAN DE EIGENAAR',
+    waarom: 'GEMETEN: onder `isolatie` staat /api/foundation/gezin/inloggen dicht terwijl de ' +
+      'GET-reads erachter openblijven. Wie al binnen is leest door, wie erbuiten staat komt er niet in.',
+    open: 'een ouder die zijn kind zoekt terwijl RTG een incident heeft, is niet de aanvaller waar ' +
+      'deze stand tegen is. Of die deur bij de rechten van de mens hoort, is een besluit.' },
+  { punt: 'de verblijfsdeur',
+    stand: 'BESLUIT VAN DE EIGENAAR',
+    waarom: 'GEMETEN: /api/verblijf/deur -- de sleutel van je hotelkamer -- gaat onder `isolatie` dicht.',
+    open: 'iemand die op reis is en zijn kamer niet meer in kan omdat zijn account onder verdenking ' +
+      'staat, is een echte schade. Openzetten is dat ook. Dit is geen meetfout maar een keuze.' }
 ];
 
 const uit = {
@@ -873,7 +965,8 @@ function vat(naam, n) {
   if (naam === 'bruikbaarheid') {
     const i = n.perStand.isolatie;
     return String(n.gevonden).padStart(6) + ' verhalen, onder isolatie: ' + i.werkt + ' werkt, ' +
-      i.beperkt + ' beperkt, ' + i.werktNiet + ' niet  (beloftes gezakt: ' + n.beloftesGezakt.length + ')';
+      i.beperkt + ' beperkt, ' + i.werktNiet + ' niet  (beloftes gezakt: ' + n.beloftesGezakt.length +
+      ' volgens het besluit, ' + n.beloftesGezaktAfgedwongen.length + ' afgedwongen)';
   }
   if (naam === 'herkomst') {
     return String(n.gevonden).padStart(6) + ' kanalen ingedeeld, ' + n.sluitBijOnvertrouwd +

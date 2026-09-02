@@ -62,13 +62,25 @@ const GETALLEN = {
   'semantiek.namen': { bron: 'SEMANTIEK.json', veld: 'namenInMeerDomeinen',
     wat: 'namen die in meer dan een domein voorkomen' },
   'semantiek.betekenissen': { bron: 'SEMANTIEK.json', veld: 'woordenMetMeerBetekenissen',
-    wat: 'namen die meer dan een betekenis dragen' }
+    wat: 'namen die meer dan een betekenis dragen' },
+  /* De isolatielaag. Deze vier stonden als los getal in ISOLATIE.md en verouderden
+     op de dag dat de meter opnieuw draaide -- precies waarvoor dit register er is. */
+  'isolatie.verhalen': { bron: 'ISOLATIEPROEF.json', veld: 'noemers.bruikbaarheid.gevonden',
+    wat: 'kritieke gebruikersverhalen die de bruikbaarheidsmeter naloopt' },
+  'isolatie.werktOnderIsolatie': { bron: 'ISOLATIEPROEF.json',
+    veld: 'noemers.bruikbaarheid.perStand.isolatie.werkt',
+    wat: 'verhalen die onder `isolatie` HEEL blijven' },
+  'isolatie.dragersMetSleutel': { bron: 'ISOLATIEPROEF.json', veld: 'noemers.dragers.metSleutelbron',
+    wat: 'dragers die bij een lopend verzoek een sleutel hebben' },
+  'isolatie.achtergrondsites': { bron: 'ISOLATIEPROEF.json', veld: 'noemers.workload.gevonden',
+    wat: 'plekken waar achtergrondwerk start zonder drager' }
 };
 
 /* De documenten die merktekens mogen dragen. Bewust een lijst en geen glob over
    alles: een generator die elk .md-bestand mag herschrijven, herschrijft op een
    dag ook iets dat niemand had bedoeld. */
-const DOCUMENTEN = ['CLAUDE.md', 'CREATE.md', 'EXECUTIE.md', 'OS.md', 'BEWIJSMACHINE.md'];
+const DOCUMENTEN = ['CLAUDE.md', 'CREATE.md', 'EXECUTIE.md', 'OS.md', 'BEWIJSMACHINE.md',
+  'ISOLATIE.md'];
 
 const MERK = /<!--getal:([a-zA-Z0-9._-]+)-->([\s\S]*?)<!--\/getal-->/g;
 

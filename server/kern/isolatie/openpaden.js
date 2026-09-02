@@ -65,7 +65,37 @@ const EIGEN_UITGANG = Object.freeze({
     'te vragen; deze route dicht en de vorige open zou een uitgang zijn die je alleen nog met een ' +
     'onbewezen stap kunt nemen',
   '/api/isolatie/mijn/ontsluiting/commit': 'de uitgang afmaken',
-  '/api/isolatie/mijn/ontsluiting/afbreken': 'de uitgang laten vallen'
+  '/api/isolatie/mijn/ontsluiting/afbreken': 'de uitgang laten vallen',
+
+  /* DE UITGANG VAN HET KANTOOR, en die ontbrak hier -- dezelfde val die deze
+     lijst voor het LID moest voorkomen, stond voor de EIGENAAR gewoon open.
+
+     Gemeten voor de reparatie: alle vijf paden hieronder stonden onder `isolatie`
+     DICHT met de grond NIET_BEWEZEN_LEZER. Ze hangen aan geen enkele functie in
+     de catalogus, dus de leesset kende ze niet, en de proef kon ze nooit als
+     lezer bewijzen -- het zijn schrijvers, dat is nu juist het punt.
+
+     De zin die de ledenuitgang openzette geldt hier woord voor woord: **een
+     stand zonder uitgang is een val, en een val zet niemand aan.** Wie de
+     isolatiestand als eigenaar aanzet en hem daarna niet meer kan opheffen, zet
+     hem de volgende keer niet aan -- en dan is de knop er wel en gebruikt
+     niemand hem (BESTUUR.md grens 6.10). Het is bovendien de hand die REPAREERT,
+     dezelfde redenering waarmee 'RTG-Backoffice' in beschermstand-lijst.js
+     doorloopt.
+
+     LET OP WAT HIER NIET STAAT: /api/techniek/controle/incident. Die route zet de
+     stand van het HUIS, en de huis-stand woont niet in deze laag maar in
+     kern/incidentcontrole.js -- die kent zijn eigen weg terug (de ceremonie via
+     huisCeremoniePoort). Hem hier opnemen zou suggereren dat deze lijst er iets
+     over te zeggen heeft. */
+  '/api/techniek/isolatie/zet': 'de hand die de stand zet moet hem ook kunnen VERSTRENGEN tijdens ' +
+    'een incident; verstrengen kent geen ceremonie en mag dus nooit dichtvallen',
+  '/api/techniek/isolatie/ontsluiting': 'de uitgang van het kantoor aanvragen',
+  '/api/techniek/isolatie/ontsluiting/stap/opties': 'het bewijs voor een stap aanvragen; deze dicht ' +
+    'en de volgende open zou een uitgang zijn die alleen nog met een onbewezen stap te nemen is',
+  '/api/techniek/isolatie/ontsluiting/stap': 'de uitgang van het kantoor aflopen',
+  '/api/techniek/isolatie/ontsluiting/commit': 'de uitgang van het kantoor afmaken',
+  '/api/techniek/isolatie/ontsluiting/afbreken': 'de uitgang van het kantoor laten vallen'
 });
 
 const RECHT_VAN_DE_MENS = Object.freeze({

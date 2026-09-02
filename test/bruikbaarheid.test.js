@@ -43,9 +43,13 @@ const maakIsolatie = require('../server/kern/isolatie');
 const { maakBruikbaarheid, VERHALEN } = require('../server/kern/isolatie/bruikbaarheid');
 const { alleRoutes } = require('../scripts/lib/routes');
 
+/* De beschermstand gaat MEE, zoals in het echt: zonder hem meet deze meter
+   alleen wat de laag BELOOFT en niet wat er wordt afgedwongen -- en precies dat
+   verschil hield een gebroken belofte een half jaar onzichtbaar. */
 function meter() {
+  const { maakBeschermstand } = require('../server/kern/beschermstand');
   const iso = maakIsolatie({ db: { data: {} }, save() {}, functies, klok: null, huisStand: () => 'normaal' });
-  return maakBruikbaarheid({ isolatie: iso, functies });
+  return maakBruikbaarheid({ isolatie: iso, functies, beschermstand: maakBeschermstand({ functies }) });
 }
 
 test('1. elke belofte staat heel onder elke stand', () => {
@@ -81,13 +85,75 @@ test('3. de uitgang is nooit door de stand zelf te sluiten', () => {
   }
 });
 
-test('4. elk verhaal wijst naar paden die bestaan', () => {
-  const bestaat = new Set(alleRoutes().map(r => r.pad));
+test('4. elk verhaal wijst naar paden die bestaan MET DEZE METHODE', () => {
+  /* DE METHODE TELT MEE, en dat was een gat. Deze toets keek alleen of het PAD
+     bestond, en de meter legde elk pad hard op POST. Een GET-route die als POST
+     wordt gemeten krijgt een strenger antwoord dan de werkelijkheid -- de meter
+     meldt dan een gat dat er niet is, en dat is precies wat een meter waardeloos
+     maakt. Sinds de verhalen hun methode zelf dragen, hoort die er ook bij te
+     worden nagekeken.
+
+     MUTATIE die hem laat zakken: zet `GET /api/foundation/gezin/:code/gezondheid`
+     om naar de POST-vorm. Het pad bestaat nog, de methode niet -- en deze toets
+     zou daar vandaag groen op blijven. */
+  const bestaat = new Map();
+  for (const r of alleRoutes()) {
+    if (typeof r.pad !== 'string') continue;
+    const m = String(r.methode || r.method || 'POST').toUpperCase();
+    if (!bestaat.has(r.pad)) bestaat.set(r.pad, new Set());
+    bestaat.get(r.pad).add(m);
+  }
+  const { ontleedPad } = meter();
   const wezen = [];
-  for (const v of VERHALEN) for (const p of v.paden) if (!bestaat.has(p)) wezen.push(v.id + ' -> ' + p);
+  for (const v of VERHALEN) {
+    for (const regel of v.paden) {
+      const { methode, pad } = ontleedPad(regel);
+      const m = bestaat.get(pad);
+      if (!m) wezen.push(v.id + ' -> ' + regel + ' (pad bestaat niet)');
+      else if (!m.has(methode)) wezen.push(v.id + ' -> ' + regel + ' (bestaat wel, maar als ' +
+        [...m].join('/') + ')');
+    }
+  }
   assert.deepEqual(wezen, [],
-    'deze verhalen wijzen naar een route die niet bestaat: ' + wezen.join(', ') +
-    ' -- zo\'n verhaal staat altijd op "werkt niet" en zegt niets');
+    'deze verhalen wijzen naar iets dat niet bestaat: ' + wezen.join(', ') +
+    ' -- zo\'n verhaal staat altijd op "werkt niet" of juist te streng, en zegt niets');
+});
+
+test('6. geen verhaal bestaat alleen uit GET-paden', () => {
+  /* DE TWEELINGREGEL VAN TOETS 4. `besluit()` laat een GET in beide vallen door
+     (kern/isolatie/besluit.js en kern/beschermstand.js laten GET altijd langs),
+     dus een verhaal dat alleen uit GET's bestaat staat onder ELKE stand op
+     "werkt" -- en zegt daarmee precies evenveel als een verhaal naar een route
+     die niet bestaat. Een verhaal dat niet kan zakken, meet niets.
+
+     MUTATIE: haal /api/foundation/gezin/inloggen uit `kind-gezondheid-lezen`,
+     zodat alleen de GET overblijft -> ZAKT. */
+  const { ontleedPad } = meter();
+  const blind = VERHALEN.filter(v =>
+    v.paden.every(regel => /^(GET|HEAD|OPTIONS)$/.test(ontleedPad(regel).methode)));
+  assert.deepEqual(blind.map(v => v.id), [],
+    'deze verhalen bestaan alleen uit leesroutes en staan daarom onder elke stand op "werkt": ' +
+    blind.map(v => v.id).join(', '));
+});
+
+test('7. het scherm van een lid krijgt geen rij uit een andere baan', () => {
+  /* Zonder dit filter leest een lid op zijn EIGEN scherm "dan werkt niet meer:
+     afrekenen aan de kassa" -- een zin over iemand anders zijn werk, op de plek
+     waar hij besluit of hij zichzelf beschermt. Het filter hoort in de module en
+     niet in de client: twee filters zijn twee waarheden.
+
+     MUTATIE: haal het `banen`-argument weg in server/routes/isolatie.js, of laat
+     meet() het negeren -> ZAKT met zaak-afrekenen erbij. */
+  const { LEDENBANEN } = require('../server/kern/isolatie/bruikbaarheid');
+  const uit = meter().overStanden(['isolatie'], { banen: LEDENBANEN }).isolatie;
+  const vreemd = uit.rijen.filter(r => !LEDENBANEN.includes(r.wie));
+  assert.deepEqual(vreemd.map(r => r.id + ' (' + r.wie + ')'), [],
+    'deze rijen horen niet op het scherm van een lid: ' + vreemd.map(r => r.id).join(', '));
+
+  /* En er blijft wél iets over -- een filter dat alles wegneemt, zou deze toets
+     stil laten slagen. */
+  assert.ok(uit.rijen.length > 20, 'het filter neemt te veel weg: ' + uit.rijen.length);
+  assert.ok(uit.rijen.some(r => r.wie === 'gezin'), 'een gezinsverhaal hoort er wel bij te staan');
 });
 
 /* ---------------------------------------------------------------------------
@@ -151,4 +217,62 @@ test('5. wat open blijft heeft een grond, en wat dicht blijft ook', () => {
      bij een refactor sneuvelt omdat hij contra-intuïtief oogt. */
   assert.ok(openpaden.RECHT_VAN_DE_MENS['/api/toestemming/intrek'],
     'toestemming intrekken maakt de verzameling wat mag KLEINER en hoort altijd te kunnen');
+});
+
+/* ---------------------------------------------------------------------------
+   8. DE METER MEET OOK DE LAAG DIE ECHT HANDHAAFT.
+
+   Dit is de scherpste toets van dit bestand, en hij bestaat omdat de meter een
+   half jaar de verkeerde laag mat. `isolatie.besluit()` is de BESLUITLAAG: hij
+   kent de leesset-redding en hij wordt afgedwongen in het AI-filter. De laag die
+   in de HTTP-keten werkelijk iets tegenhoudt is `beschermstand.houdtTegen()`, en
+   die kent die redding NIET.
+
+   Gemeten onder huis=`beschermd`: `geld-lezen` -- een belofte met `moetHeel` --
+   staat volgens de besluitlaag op WERKT en volgens de handhavende weg op WERKT
+   NIET, want /api/pay/overzicht, /api/bank/afschrift en /api/bank/overzicht
+   vallen alle drie dicht op de categorie "Geld". Het register meldde ondertussen
+   `beloftesGezakt: []`.
+
+   DEZE TOETS EIST NIET DAT DE TWEE GELIJK ZIJN. Dat zouden ze moeten worden, en
+   dat is een besluit met een schaduwronde eronder (ISOLATIEPROEF.json). Hij eist
+   dat het VERSCHIL WORDT GEMETEN -- een meter die maar een van de twee lagen
+   kent, geeft groen licht boven een gat.
+
+   MUTATIES die zijn gedraaid (LAT.md regel 2):
+   - `beschermstand` niet meegeven aan maakBruikbaarheid -> ZAKT (de tweede kolom
+     is dan `null` en het verschil verdwijnt).
+   - `belofteGezaktAfgedwongen` laten teruggeven op de besluitkolom -> ZAKT.
+   ------------------------------------------------------------------------ */
+test('8. de meter kent beide lagen, en het verschil is zichtbaar', () => {
+  const { maakBeschermstand } = require('../server/kern/beschermstand');
+  const functies = require('../server/functies');
+  const uit = meter().overStanden(['beschermd']).beschermd;
+
+  /* De tweede kolom bestaat en is geen null: "we hebben niet gekeken" mag hier
+     niet als "het staat open" langskomen. */
+  for (const r of uit.rijen) {
+    assert.ok(r.afgedwongen !== null && r.afgedwongen !== undefined,
+      r.id + ' heeft geen afgedwongen-kolom; dan meet deze meter alleen de belofte');
+  }
+
+  /* En hij zegt iets ANDERS dan de besluitkolom, want dat is de hele reden dat
+     hij er is. Zou dit ooit gelijk worden, dan is dat goed nieuws -- maar dan
+     hoort deze toets te worden herschreven met de meting erbij, niet stil
+     geschrapt. */
+  const verschil = uit.rijen.filter(r => r.stand !== r.afgedwongen);
+  assert.ok(verschil.length > 0,
+    'de twee lagen zeggen hetzelfde; als dat klopt is het gat gedicht en hoort deze toets te ' +
+    'worden herschreven met de meting erbij');
+
+  /* De belofte hangt aan wat er wordt AFGEDWONGEN. Vandaag zakt `geld-lezen`
+     daar, en dat staat als schuldpunt in het register -- niet als groen vinkje. */
+  const bs = maakBeschermstand({ functies });
+  const dicht = ['/api/pay/overzicht', '/api/bank/afschrift', '/api/bank/overzicht']
+    .filter(p => !!bs.houdtTegen(p, 'POST'));
+  assert.deepEqual(dicht, ['/api/pay/overzicht', '/api/bank/afschrift', '/api/bank/overzicht'],
+    'als deze drie niet meer dichtvallen op de handhavende weg, is de belofte geld-lezen echt ' +
+    'gerepareerd -- werk dan dit bestand EN ISOLATIEPROEF.json bij in plaats van de toets te slopen');
+  assert.ok(uit.belofteGezaktAfgedwongen.some(b => b.id === 'geld-lezen'),
+    'de meter hoort dit als gebroken belofte te melden: ' + JSON.stringify(uit.belofteGezaktAfgedwongen));
 });

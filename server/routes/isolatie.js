@@ -31,7 +31,9 @@
 const functies = require('../functies');
 const klok = require('../lib/klok');
 const maakIsolatie = require('../kern/isolatie');
-const { maakBruikbaarheid } = require('../kern/isolatie/bruikbaarheid');
+const { maakBruikbaarheid, LEDENBANEN } = require('../kern/isolatie/bruikbaarheid');
+const { maakBeschermstand } = require('../kern/beschermstand');
+const handhaving = require('../kern/isolatie/handhaving');
 const { dragersVanVerzoek, EIGEN_LAGEN } = require('../kern/isolatie/sessiedragers');
 
 module.exports = (kern) => {
@@ -55,7 +57,7 @@ module.exports = (kern) => {
      opzet niet een tweede lijst: een lid dat overweegt zichzelf dicht te zetten,
      hoort precies te zien wat het kantoor ook ziet. Wie de knop niet durft in te
      drukken, wordt er niet door beschermd. */
-  const bruikbaar = maakBruikbaarheid({ isolatie, functies });
+  const bruikbaar = maakBruikbaarheid({ isolatie, functies, beschermstand: maakBeschermstand({ functies }) });
 
   /* De sleutels van dit lid, alle uit de sessie en de Authorization-kop. De
      vertaling staat in kern/isolatie/sessiedragers.js -- hier stond hem met de
@@ -108,9 +110,29 @@ module.exports = (kern) => {
         open: isolatie.ontsluiting.open().filter(v => EIGEN_LAGEN.includes(v.drager) &&
           Object.values(sleutels).includes(v.sleutel)),
         /* Per stand: wat blijft er van je dagelijkse dingen over. Alleen de
-           verhalen van een LID -- wat een zaak of het kantoor nog kan, is niet
-           iets waar dit scherm over gaat. */
-        werktNog: bruikbaar.overStanden(['beschermd', 'isolatie'])
+           banen van een LID -- wat een zaak of het kantoor nog kan, is niet iets
+           waar dit scherm over gaat, en zonder dit filter leest een lid op zijn
+           eigen scherm "dan werkt niet meer: afrekenen aan de kassa". Het filter
+           zit in de MODULE (bruikbaarheid.LEDENBANEN) en niet hier of in de
+           client: twee filters zijn twee waarheden, en een client die rijen
+           binnenkrijgt die hij niet mag tonen, toont ze op een dag. */
+        werktNog: bruikbaar.overStanden(['beschermd', 'isolatie'], { banen: LEDENBANEN }),
+        /* WAAR DEZE STAND WERKELIJK GELDT -- gemeten en niet beloofd.
+
+           Het scherm zei "dat werkt meteen". Dat is vandaag niet waar: de
+           per-drager-stand versmalt wél de lijst waaruit de AI kiest, maar
+           middleware/functieschakelaars.js kijkt alleen naar de HUIS-modus, dus
+           een gewoon HTTP-verzoek van dit lid loopt gewoon door. Een scherm dat
+           meer belooft dan de code doet, is de duurste soort fout: het lid denkt
+           dat hij beschermd is en gedraagt zich daarnaar.
+
+           Dit veld komt uit de CODE (bestaat de poort?) en niet uit een tekst,
+           zodat het scherm vanzelf omslaat zodra de poort er is en nooit meer
+           kan voorlopen op de werkelijkheid. */
+        afgedwongen: (() => {
+          const h = handhaving.stand();
+          return { http: h.afdwingen, ai: true, waarom: h.waarom };
+        })()
       });
     } catch (e) { faal(res, e); }
   });

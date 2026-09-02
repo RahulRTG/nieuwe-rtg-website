@@ -73,15 +73,43 @@ test('3. wat NIET actief is, is te benoemen en klein', () => {
 test('4. elke route hoort bij een functie of bij de bediening', () => {
   /* De tegenhanger van toets 2: niet "een schakelaar zonder route" maar "een
      route zonder schakelaar". Die mogen bestaan -- de bediening van het platform
-     zelf hoort niet uitschakelbaar te zijn -- maar ze horen BENOEMD te zijn, en
-     dat bewaakt test/platformregister.test.js. Hier alleen dat het er niet
-     stilletjes meer worden. */
+     zelf hoort niet uitschakelbaar te zijn -- maar ze horen BENOEMD te zijn.
+
+     DE RATEL TELDE HET VERKEERDE DING, en dat kwam uit toen deze toets op een
+     nieuwe laag zakte. Hij bewaakte "routes zonder functie <= 100", en dat is
+     een GROVER getal dan de zin eronder belooft: een route zonder functie kan
+     keurig verklaard zijn. server/kern/bestuursroutes.js is precies dat
+     register -- de enige lijst van paden die BEWUST buiten de schakelkast staan,
+     met per prefix de reden -- en test/schakelkast-dekking.test.js toets 1 eist
+     al dat élke ongedekte route daarin staat.
+
+     Deze toets vroeg dus een tweede keer, in een tweede getal, naar dezelfde
+     zaak (LAT.md regel 4). Hij telt nu wat de zin zegt: routes die aan geen
+     functie hangen EN nergens verklaard zijn. Dat is een STRENGERE grens en
+     geen ruimere: van 100 naar 10, en 10 is de gemeten stand die sinds het
+     vertrekpunt van deze tak niet is bewogen -- terwijl het ruwe getal in
+     dezelfde periode van 97 naar 112 ging doordat er een hele isolatielaag bij
+     kwam, verklaard en wel.
+
+     MUTATIES (LAT.md regel 2):
+     - de regel /api/isolatie/mijn uit bestuursroutes.js halen -> ZAKT (7 erbij).
+     - de grens op 9 zetten -> ZAKT (dat is de ratel zelf: hij mag krimpen). */
+  const { redenVoor } = require('../server/kern/bestuursroutes');
   const routes = alleRoutes();
   const paren = [];
   for (const f of F) for (const p of (f.paden || [])) paren.push(p);
   const zonder = routes.filter(r => !paren.some(p => prefixLengte(r.pad, p) > 0));
-  assert.ok(zonder.length <= 100,
-    zonder.length + ' routes hangen aan geen enkele functie. Dat is de bediening van ' +
-    'het platform (boardroom, techniek, gezondheid) en die hoort niet schakelbaar te zijn, ' +
-    'maar bij deze aantallen is er iets anders aan de hand.');
+  const onverklaard = zonder.filter(r => !redenVoor(r.pad)).map(r => r.pad);
+
+  assert.ok(onverklaard.length <= 10,
+    onverklaard.length + ' routes hangen aan geen enkele functie EN staan in geen enkel register. ' +
+    'Ze zijn dan niet schakelbaar en niemand heeft opgeschreven waarom: ' +
+    onverklaard.sort().join(', ') + ' -- zet ze in server/kern/bestuursroutes.js met een reden, ' +
+    'of geef ze een functie. (Ruw, zonder functie maar wel verklaard: ' + zonder.length + '.)');
+
+  /* EN HET RUWE GETAL BLIJFT ZICHTBAAR, want het is niet niets: elke route die
+     buiten de schakelkast valt, is een route die de boardroom niet kan sluiten.
+     Hij ratelt alleen niet meer, omdat de vraag "mag dit buiten de kast" al
+     ergens anders wordt beantwoord. */
+  assert.ok(zonder.length > 0, 'nul zou betekenen dat de meting stuk is, niet dat het huis dicht is');
 });

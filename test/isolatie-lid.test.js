@@ -293,3 +293,65 @@ test('7. het antwoord vertelt wat er onder elke stand nog werkt', async () => {
      heeft geen lijst nodig van wat er zou wegvallen als hij niets doet. */
   assert.ok(!r.body.werktNog.normaal);
 });
+
+/* ---------------------------------------------------------------------------
+   8. HET SCHERM BELOOFT NIET MEER DAN DE CODE DOET.
+
+   Het ledenscherm zei "dat werkt meteen". Dat was niet waar, en het is de
+   duurste soort fout: een lid dat denkt dat hij beschermd is, gedraagt zich
+   daarnaar. De per-drager-stand versmalt wél de lijst waaruit de AI kiest, maar
+   middleware/functieschakelaars.js kijkt alleen naar de HUIS-modus -- een gewoon
+   HTTP-verzoek van dit lid loopt vandaag gewoon door.
+
+   De belofte is daarom vervangen door een GEMETEN veld. Deze toets houdt vast
+   dat het gemeten blijft: hij vergelijkt wat de route zegt met wat er werkelijk
+   in de code staat, en niet met een verwachte tekst. Zo slaat het scherm vanzelf
+   om zodra de poort er is, en kan het nooit meer voorlopen op de werkelijkheid.
+
+   MUTATIES die zijn gedraaid (LAT.md regel 2):
+   - `http: true` hardcoderen in routes/isolatie.js -> ZAKT.
+   - de zin "Dat werkt meteen" terugzetten in mijn-isolatie.html -> ZAKT.
+   ------------------------------------------------------------------------ */
+test('8. het scherm belooft niet meer dan de code doet', async () => {
+  const fs2 = require('fs');
+  const path2 = require('path');
+  const lid = await nieuwLid();
+  const r = await api('/api/isolatie/mijn', {}, lid);
+  assert.equal(r.status, 200);
+
+  const a = r.body.afgedwongen;
+  assert.ok(a && typeof a === 'object', 'het antwoord hoort te zeggen WAAR deze stand geldt');
+  assert.equal(a.ai, true, 'de AI-kant wordt wel afgedwongen (kern/stuur/isolatiefilter.js)');
+  assert.ok(String(a.waarom || '').length > 40, 'en met een reden, niet met een vlaggetje');
+
+  /* DE BEWERING WORDT TEGEN DE CODE GEHOUDEN. Meldt er geen handhaver zich in
+     kern/isolatie/handhaving.js, dan MAG het antwoord niet zeggen dat http wordt
+     afgedwongen. Dit is de kern van deze toets: niet "de tekst is goed" maar "de
+     tekst is afgeleid". */
+  const handhaving = require('../server/kern/isolatie/handhaving');
+  const h = handhaving.stand();
+  assert.equal(a.http, h.afdwingen,
+    'het scherm zegt iets anders dan de aanmeldplek: ' + JSON.stringify(h));
+  if (!h.gemonteerd) {
+    assert.equal(a.http, false,
+      'zonder handhaver hoort dit veld false te zijn -- een lid dat denkt dat hij beschermd is, ' +
+      'gedraagt zich daarnaar');
+    assert.match(String(a.waarom), /staat er nog niet/);
+  }
+
+  /* EN SCHADUW IS GEEN HANDHAVING. Een poort die meeloopt zonder te blokkeren
+     telt, maar houdt niets tegen; die twee door elkaar halen is dezelfde leugen
+     in een nieuwe vorm. */
+  handhaving.meldHandhaver({ waar: 'toets', modus: 'schaduw' });
+  assert.equal(handhaving.stand().afdwingen, false, 'schaduw is geen handhaving');
+  assert.equal(handhaving.stand().gemonteerd, true, 'maar hij is wel gemonteerd');
+  assert.throws(() => handhaving.meldHandhaver({ waar: 'toets', modus: 'misschien' }),
+    /schaduw. of .afdwingen/, 'een onbekende modus hoort te gooien en niet stil door te lopen');
+
+  /* En de oude belofte staat niet meer in de pagina. Een gemeten veld naast een
+     stellige zin is nog steeds een stellige zin. */
+  const html = fs2.readFileSync(
+    path2.join(__dirname, '..', 'public/apps/mijn-isolatie.html'), 'utf8');
+  assert.ok(!/Dat werkt meteen/.test(html),
+    'de pagina belooft nog steeds handhaving in vaste tekst; die hoort uit het antwoord te komen');
+});

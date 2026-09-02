@@ -141,6 +141,31 @@ function maakBesluitlaag({ functies, beschermstand }) {
       return uit;
     }
 
+    /* EEN VERKLAARDE UITGANG IS EEN BESLUIT EN GEEN AFWEZIGHEID.
+
+       Deze tak stond ONDER de GEEN_PROFIEL-tak, en daardoor kreeg een pad uit
+       kern/isolatie/openpaden.js de grond `GEEN_PROFIEL` -- "het besluit is
+       doorlaten omdat er niets is om op te weigeren". Dat is precies het
+       tegenovergestelde van wat er aan de hand is: over die paden is juist WEL
+       nagedacht, en de reden staat er met naam bij.
+
+       Het verschil is niet cosmetisch. Zou iemand morgen een functie achter
+       /api/techniek/isolatie/ontsluiting hangen, dan verschuift het antwoord
+       stilzwijgend van "doorlaten want geen profiel" naar "de categorie is
+       bevroren, dus dicht" -- en dan is de uitgang weg zonder dat iemand een
+       besluit heeft genomen. Met de grond hier vooraan blijft hij open OMDAT hij
+       een verklaarde uitgang is, en dat is de bedoeling. */
+    if (!tegen && samen.trede !== 'normaal') {
+      const uitgang = leesbesluit || leesset.magOnderIsolatie(pad, functie);
+      if (uitgang.mag && (uitgang.grond === 'EIGEN_UITGANG' || uitgang.grond === 'RECHT_VAN_DE_MENS')) {
+        uit.reden = uitgang.grond;
+        uit.regel = uitgang.grond;
+        uit.uitleg = uitgang.waarom;
+        uit.bewijs = ['kern/isolatie/openpaden.js: ' + uitgang.grond];
+        return uit;
+      }
+    }
+
     /* GEEN FUNCTIE ACHTER DIT PAD IS GEEN GOEDKEURING. De beschermstand laat
        zo'n pad met opzet door -- tegenhouden op grond van niets is raden -- maar
        het antwoord zegt dat, in plaats van te doen alsof er is nagedacht. */

@@ -447,7 +447,7 @@ werken". **Twee vragen onder één veldnaam.** Er staan nu twee kolommen:
 | | Wat het zegt | Vandaag |
 |---|---|---|
 | `metBron` | er is een plek waar de stand *staat* | 5 van 6 |
-| `metSleutelbron` | bij een lopend verzoek is er ook een *sleutel* om hem aan te hangen | 4 van 6 |
+| `metSleutelbron` | bij een lopend verzoek is er ook een *sleutel* om hem aan te hangen | <!--getal:isolatie.dragersMetSleutel-->4<!--/getal--> van 6 |
 
 Ze worden nooit opgeteld: RTG kan een organisatie wél dichtzetten vanaf de cockpit
 (de opslag werkt) terwijl die stand bij een verzoek van dat lid nog niet meeweegt
@@ -471,7 +471,7 @@ in plaats van als lege waarde.
 > (`kern/initdata/isolatiesleutels.js`).
 
 `organisatie` en `workload` hebben nog steeds geen sleutel, en dat staat er met de
-maat bij in plaats van als belofte: **45 achtergrondsites in 41 bestanden, 1
+maat bij in plaats van als belofte: **<!--getal:isolatie.achtergrondsites-->45<!--/getal--> achtergrondsites in 41 bestanden, 1
 binnen een async-context**. De context die er wél is (`kern/kosten/haak.js`) wordt
 op drie plekken betreden en alle drie zijn HTTP-poorten; een achtergrondtaak krijgt
 daar `huis`, en dat woord betekent op die plek tegelijk "achtergrondtaak",
@@ -649,9 +649,10 @@ pad überhaupt mag kiezen. Een andere vraag, eerder in de keten al beantwoord.)*
 
 ### Wat er nog wérkt
 
-`kern/isolatie/bruikbaarheid.js`: negen kritieke gebruikersverhalen, per stand
-nagelopen. De tellingen elders zeggen wat er *dichtgaat*, en dat is de helft die
-een verkeerd gevoel geeft: hoe meer er dicht is, hoe beter het lijkt.
+`kern/isolatie/bruikbaarheid.js`: <!--getal:isolatie.verhalen-->39<!--/getal-->
+kritieke gebruikersverhalen, per stand nagelopen. De tellingen elders zeggen wat er
+*dichtgaat*, en dat is de helft die een verkeerd gevoel geeft: hoe meer er dicht
+is, hoe beter het lijkt.
 
 **Deze meting vond meteen drie echte ontwerpfouten**, alle drie in mijn eigen werk:
 
@@ -661,8 +662,46 @@ een verkeerd gevoel geeft: hoe meer er dicht is, hoe beter het lijkt.
 | `zelf-beschermen` | de knop waarmee een mens zich beschermt viel dicht door de bescherming zelf |
 | `ontsluiten-aanvragen` | een stand zonder uitgang is een val, en een val zet niemand aan |
 
-Alle drie gerepareerd. Onder `isolatie` staan nu 8 van de 9 verhalen op *werkt*;
-het negende is `geld-sturen`, en dat hoort dicht te zitten.
+Alle drie gerepareerd. En daarna is de lijst van negen naar
+<!--getal:isolatie.verhalen-->39<!--/getal--> gegaan, want negen is te weinig om
+iets te betekenen: er was geen enkel verhaal van een **zaak**, van een **gezin**,
+van het **kantoor**, en geen enkel dat over medicatie, noodgegevens of een reis
+ging. De lijst was bovendien constructief blind — de meter legde elk pad hard op
+`POST`, dus de GET-routes van het gezinsportaal konden er niet eerlijk in staan.
+Elk pad draagt nu zijn eigen methode.
+
+**Het totaal verbergt precies wat je wilt weten**, dus de meter splitst per baan:
+
+| Baan | onder `beschermd` | onder `isolatie` |
+|---|---|---|
+| iedereen (5) | 4 werkt · 1 beperkt | 4 werkt · 1 beperkt |
+| lid (21) | 18 werkt · 3 niet | 13 werkt · 1 beperkt · 7 niet |
+| gezin (5) | 5 werkt | 2 beperkt · 3 niet |
+| zaak + gast (5) | 1 werkt · 1 beperkt · 3 niet | 0 werkt · 1 beperkt · 4 niet |
+| kantoor (3) | 3 werkt | 3 werkt |
+
+In totaal blijven er onder `isolatie`
+<!--getal:isolatie.werktOnderIsolatie-->20<!--/getal--> van de
+<!--getal:isolatie.verhalen-->39<!--/getal--> verhalen HEEL.
+De mens-baan komt er goed doorheen; de **zaak-baan komt er onder `beschermd` niet
+één keer heel doorheen**. Dat is geen bug om weg te poetsen maar een tegenspraak
+in de indeling: elke `/api/supplier/`-route valt onder de bevroren categorie
+"Partners (leveranciers)" met als reden *"een leverancier schrijft hier in onze
+gegevens"* — terwijl een zaak die haar eigen tafelrekening bijwerkt precies is wat
+`LOOPT_DOOR` onder "Werk" als eigenaar beschrijft. Ook het HACCP-temperatuurlogboek
+gaat dicht, en dat is een wettelijke registratieplicht die stilvalt door een
+beveiligingsstand van RTG. Vier van zulke vondsten staan als **besluit van de
+eigenaar** in `ISOLATIEPROEF.json`, met de meting erbij en niet stil rechtgetrokken.
+
+> **En de uitgang van het kantoor stond dicht.** De vijf ceremonieroutes van
+> `/apps/isolatie.html` hingen aan geen enkele functie, waren dus geen bewezen
+> lezer, en vielen onder `isolatie` dicht met de grond `NIET_BEWEZEN_LEZER`. De
+> zin die de ledenuitgang openzette geldt voor de eigenaar woord voor woord: *een
+> stand zonder uitgang is een val, en een val zet niemand aan.* Ze staan nu in
+> `EIGEN_UITGANG`, en `besluit()` noemt die grond ook — hij las eerst
+> `GEEN_PROFIEL`, "doorlaten omdat er niets is om op te weigeren", en dat is het
+> tegenovergestelde van een verklaarde uitgang: geef iemand die paden morgen een
+> functie, en de uitgang verdwijnt zonder besluit.
 
 > **Twee reparaties met een regel eronder.** De belofte "het lezen loopt door"
 > moest ook waar zijn als het lezen over POST gaat — de leesset is de meetbare
@@ -730,3 +769,75 @@ staat de stand" en werd gelezen als "kan dit werken"; `zonderFunctie` betekende
 "geen schakelaar" en werd gelezen als "niemand heeft dit ingedeeld". Allebei keken
 ze groen. De reparatie is in beide gevallen dezelfde: twee kolommen, nooit
 opgeteld, met per kolom wat hij zegt.
+
+## 8. De vijfde leugen: de laag houdt niets tegen
+
+De vier gaten van paragraaf 7 deelden een vorm — een regel die bestond en nergens
+werkte. Er was er een vijfde, en die is groter dan de vier samen: **de
+isolatiestand per drager wordt in de HTTP-keten nergens afgedwongen.**
+
+Gemeten, niet vermoed. `server/middleware/functieschakelaars.js` leest alleen het
+HUIS-veld (`ic.modus === 'beschermd'`) en roept `beschermstand.houdtTegen()` aan;
+grep naar "isolatie" in `server/middleware/` geeft **nul** treffers.
+`isolatie.besluit()` wordt in heel `server/` door drie plekken aangeroepen: het
+AI-filter, een proefroute die niets uitvoert, en een meter. Een lid dat zichzelf
+op `isolatie` zet, versmalt dus alleen de lijst waaruit het model kiest — zijn
+gewone HTTP-paden blijven open.
+
+Het ledenscherm zei ondertussen *"dat werkt meteen"*. Dat is de duurste soort
+fout: een mens die denkt dat hij beschermd is, gedraagt zich daarnaar.
+
+### Drie leugens op één as
+
+| Waar | Wat er stond | Wat er was |
+|---|---|---|
+| De keten | — | geen enkele middleware kent deze laag |
+| De meter | `beloftesGezakt: []` | `geld-lezen` (`moetHeel`) staat op de handhavende weg op **werkt niet** |
+| Het scherm | "dat werkt meteen" | de stand geldt voor de assistent, niet voor een gewoon verzoek |
+
+De middelste is de gemeenste. `kern/isolatie/bruikbaarheid.js` mat tegen
+`besluit()` — de **besluitlaag**, die de leesset-redding kent. De laag die
+werkelijk iets tegenhoudt is `beschermstand.houdtTegen()`, en die kent hem niet.
+Onder `beschermd` vallen `/api/pay/overzicht`, `/api/bank/afschrift` en
+`/api/bank/overzicht` alle drie dicht op de categorie "Geld" — de belofte die dit
+document het hardst heeft opgeschreven (*"de eerste handeling van iemand die zijn
+account niet vertrouwt"*), gebroken op de enige weg die telt, met een meter die
+zei dat het goed was.
+
+### Wat er nu staat
+
+De meter kent **beide lagen** en toont het verschil; ze worden nooit opgeteld.
+`ISOLATIEPROEF.json` draagt `beloftesGezakt` naast `beloftesGezaktAfgedwongen`, en
+die tweede staat niet meer op nul. Het scherm zegt in een **afgeleid** veld waar
+de stand geldt — uit de code, niet uit een tekst, zodat het vanzelf omslaat zodra
+de poort er is en nooit meer kan voorlopen. En de drie posten die `STAAT` zeiden
+heten nu `STAAT ALS BESLUITLAAG`.
+
+### Wat er níét staat, met de reden
+
+De poort zelf. Hij hoort op de plek van het huis-blok in
+`functieschakelaars.js` — de enige plek die elk `/api/`-verzoek ziet, vóór elke
+router staat, de bearer-kop al ontleedt en de 503 van deze as al bezit — en hij
+hoort eerst in de **schaduw** te lopen (`CONTROLPLANE.md`: je kunt niet afdwingen
+wat nooit heeft meegelopen). Twee dingen daarbij zijn al gemeten en horen niet
+opnieuw te worden ontdekt:
+
+- **De voorpoort mag nooit vragen "staat er ergens een stand".** Dat kost bij nul
+  leden 0,02 µs en bij tienduizend dichtgezette leden ~1 ms per verzoek — het
+  materialiseren van de sleutels van een dictionary-object. Honderd keer duurder
+  dan het besluit dat hij moest vermijden, en precies op het moment dat de laag
+  wordt gebruikt. De vraag is *"staat er een stand vóór dít verzoek"*: een
+  hash-opzoeking, O(1) hoe groot de kaart ook wordt.
+- **`besluit()` is op 255 paden LOSSER dan de huidige beschermstand** (1148 → 893
+  onder `beschermd`, uitsluitend dicht → open). Dat is de leesset-redding, en
+  inhoudelijk waarschijnlijk gewenst — maar het is een *verzwakking* van bestaande
+  handhaving en dus een eigen besluit met een eigen schaduwronde. Paragraaf 6 van
+  dit document zegt het zelf: een uitzondering is een verzwakking en vraagt
+  dezelfde ceremonie.
+
+En één correctie op de aanname: handhaving repareert dit voor **twee** van de vijf
+standen, niet vijf. Onder `normaal`, `waakzaam` én `beperkt` blokkeert `besluit()`
+er nul van de 4655. Voor `waakzaam` is dat ontwerp; `beperkt` sluit gericht per
+functie via de huis-brede schakelaars, en die hebben geen drager-as. Het
+ledenscherm biedt `beperkt` niet aan, dus dat is geen leugen — het is wel een gat
+met een naam.

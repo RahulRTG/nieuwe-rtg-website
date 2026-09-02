@@ -24,6 +24,20 @@
     { stand: 'isolatie',  t: 'Alles dicht',      u: 'Het strengst wat we hebben. Alleen wat bewezen niets verandert, blijft werken.' }
   ];
 
+  /* WAAR DEZE STAND GELDT -- uit het antwoord van de server en niet uit een zin
+     hier. Het scherm zei "dat werkt meteen", en dat was niet waar: de stand
+     versmalt wat de assistent mag doen, maar een gewoon verzoek loopt vandaag
+     langs de poort heen. Een scherm dat meer belooft dan de code doet is de
+     duurste soort fout -- het lid denkt dat hij beschermd is en gedraagt zich
+     daarnaar. Deze regel slaat vanzelf om zodra de poort er is. */
+  function tekenBereik(d) {
+    var doos = $('bereik');
+    if (!doos) return;
+    leeg(doos);
+    var a = d.afgedwongen || {};
+    doos.appendChild(maak('p', 'voet', a.waarom || ''));
+  }
+
   function maak(tag, klas, tekst) {
     var e = document.createElement(tag);
     if (klas) e.className = klas;
@@ -142,7 +156,7 @@
   function laad() {
     haal('/api/isolatie/mijn', {}).then(function (d) {
       stand = d;
-      tekenNu(d); tekenKeuzes(d); tekenTerug(d);
+      tekenNu(d); tekenBereik(d); tekenKeuzes(d); tekenTerug(d);
     }).catch(function (e) { meld('fout', e.message); });
   }
 

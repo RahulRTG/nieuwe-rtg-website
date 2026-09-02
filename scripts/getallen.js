@@ -68,7 +68,7 @@ const GETALLEN = {
 /* De documenten die merktekens mogen dragen. Bewust een lijst en geen glob over
    alles: een generator die elk .md-bestand mag herschrijven, herschrijft op een
    dag ook iets dat niemand had bedoeld. */
-const DOCUMENTEN = ['CLAUDE.md', 'CREATE.md', 'EXECUTIE.md', 'OS.md', 'BEWIJSMACHINE.md'];
+const DOCUMENTEN = ['CLAUDE.md', 'CREATE.md', 'EXECUTIE.md', 'OS.md', 'BEWIJSMACHINE.md', 'HDI.md'];
 
 const MERK = /<!--getal:([a-zA-Z0-9._-]+)-->([\s\S]*?)<!--\/getal-->/g;
 

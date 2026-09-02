@@ -127,6 +127,8 @@
     "semantiek": "node scripts/semantiek.js",
     "verstrengeling": "node scripts/verstrengeling.js",
     "verstrengeling:vast": "node scripts/verstrengeling.js --vastleggen",
+    "activering": "node scripts/activering.js",
+    "activering:vast": "node scripts/activering.js --vastleggen",
     "semantiek:vast": "node scripts/semantiek.js --vastleggen",
     "lagen": "node scripts/lagen.js",
     "droogloop": "node scripts/droogloop.js",

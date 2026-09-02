@@ -28,7 +28,7 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
-const { versheid, nuCommit, WORTEL } = require('./lib/stempel');
+const { versheid, nuCommit, stempelVan, WORTEL } = require('./lib/stempel');
 
 /* De registers die een instrument bijhoudt, met het instrument erbij -- zodat
    de uitslag niet alleen zegt DAT iets achterloopt maar ook wat je moet draaien.
@@ -56,6 +56,14 @@ const REGISTERS = [
   ['IDEMPROEF.json', 'npm run meetronde -- --alleen=idemproef', 'of een herhaalde oproep niets dubbel doet'],
   ['STAATPROEF.json', 'npm run meetronde -- --alleen=staatproef', 'of de toestand na afloop klopt'],
   ['KETENS.json', 'npm run meetronde -- --alleen=ketenronde', 'of een keten netjes faalt onder sabotage'],
+  /* DE VIER DIE HIER NIET STONDEN, en dat is geen kleinigheid: de bewijsmatrix
+     LEEST ze alle vier, en geen enkele versheidsmeter keek ernaar. Een register
+     dat de matrix voedt en dat niemand op ouderdom nakijkt, veroudert stil --
+     precies waarvoor deze lijst bestaat. */
+  ['OUTPUTPROEF.json', 'npm run meetronde -- --alleen=outputproef', 'of een antwoord meer prijsgeeft dan het hoort'],
+  ['AUDITPROEF.json', 'npm run meetronde -- --alleen=auditproef', 'of een geslaagde handeling een spoor nalaat'],
+  ['HANDELINGPROEF.json', 'npm run meetronde -- --alleen=handelingproef', 'of dat spoor geketend is'],
+  ['UITVOERPROEF.json', 'npm run meetronde -- --alleen=uitvoerproef', 'of een antwoord gegevens van een ander bevat'],
   ['BEWIJSMATRIX.json', 'npm run bewijsmatrix:vast', 'de elf schakels per route, uit de vijf registers hierboven'],
   ['MUTATIES.json', 'npm run mutatie', 'welke toetsen kunnen zakken'],
   ['BEPROEVING.json', 'npm run beproeving', 'storm, geld, misbruik en herstel'],
@@ -64,11 +72,10 @@ const REGISTERS = [
   ['WAAROM.json', 'node scripts/waarom.js --vastleggen', 'waarom een route niet te bewijzen valt, in zijn eigen woorden']
 ];
 
-/* Het stempel van een register. Twee vormen, en dat is historie en geen smaak:
-   DEKKING.json zette zijn tijdstempel vanaf het begin onder `gemeten`, de rest
-   krijgt hem onder `stempel`. Een van de twee hernoemen zou een bestand breken
-   dat een toets al leest; hier wordt het op EEN plek opgevangen. */
-function stempelVan(naam) {
+/* De lezer van beide stempelvormen woont in ./lib/stempel.js -- hij stond hier,
+   en scripts/vertrouwen.js had zijn eigen kortere versie die er een van de twee
+   miste. Zie de uitleg bij stempelVan() daar. */
+function ongebruikt_stempelVan(naam) {
   try {
     const j = JSON.parse(fs.readFileSync(path.join(WORTEL, naam), 'utf8'));
     return j.stempel || (j.gemeten && j.gemeten.op ? j.gemeten : null);

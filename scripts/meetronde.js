@@ -72,6 +72,25 @@ const STAPPEN = [
   { id: 'ketenronde', register: 'KETENS.json', duur: '~4 min',
     wat: 'of een keten netjes faalt onder sabotage',
     cmd: ['scripts/ketenronde.js'] },
+  /* DE VIER DIE HIER NIET STONDEN. De bewijsmatrix hieronder leest TIEN
+     registers; deze ronde ververste er zes. De andere vier hadden elk hun eigen
+     npm-opdracht en stonden in geen enkele ronde -- dus verouderden ze stil, en
+     twee van hen droegen niet eens een stempel waarmee scripts/versheid.js dat
+     had kunnen zien. Een ronde die de matrix vult, hoort alles te vullen waar
+     die matrix uit leest; anders is "de meetronde is gedraaid" een halve
+     mededeling. */
+  { id: 'outputproef', register: 'OUTPUTPROEF.json', duur: '~1 min',
+    wat: 'of een antwoord meer prijsgeeft dan het hoort',
+    cmd: ['scripts/outputproef.js'] },
+  { id: 'auditproef', register: 'AUDITPROEF.json', duur: '~4 min',
+    wat: 'of een geslaagde handeling een spoor nalaat',
+    cmd: ['scripts/auditproef-route.js'] },
+  { id: 'handelingproef', register: 'HANDELINGPROEF.json', duur: '~4 min',
+    wat: 'of dat spoor geketend is',
+    cmd: ['scripts/handelingproef-route.js', '--max=8000'] },
+  { id: 'uitvoerproef', register: 'UITVOERPROEF.json', duur: '~5 min',
+    wat: 'of een antwoord gegevens van een ander bevat',
+    cmd: ['scripts/uitvoerproef-route.js'] },
   { id: 'bewijsmatrix', register: 'BEWIJSMATRIX.json', snel: true, duur: '~1 min',
     wat: 'de elf schakels per route, uit de registers hierboven',
     cmd: ['scripts/bewijsmatrix.js'] }

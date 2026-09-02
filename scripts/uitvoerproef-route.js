@@ -33,6 +33,7 @@ const os = require('os');
 const path = require('path');
 const { spawn } = require('child_process');
 const { draaiUitvoerproef, maakKanaries, kanarieLijst } = require('./lib/uitvoerproef');
+const { stempel } = require('./lib/stempel');
 const { plausibelLijf } = require('./lib/rolproef');
 const { alleRoutes, isSchakel } = require('./lib/routes');
 
@@ -189,6 +190,9 @@ async function wacht(basis, ms) {
   for (const b of uit.bevindingen.lekken.slice(0, 20)) console.log('      ' + b);
 
   fs.writeFileSync(UITSLAG, JSON.stringify({
+    /* Zonder stempel is een register een meting zonder datum, en die leest als
+       vers. scripts/versheid.js en scripts/vertrouwen.js lezen hem allebei. */
+    stempel: stempel({ begrenzing: MAX || 'geen' }),
     uitleg: 'Per route: met de JUISTE rol en plausibele invoer, en of het 2xx-antwoord gegevens ' +
       'van een ANDER account bevatte (kanaries) of een geheim veld. Een route die hier NIET in staat ' +
       'is niet beproefd. Een route met uitvoer:"poort" gaf nooit een 2xx en is ONGEMETEN, geen groen. ' +

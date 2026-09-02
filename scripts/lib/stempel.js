@@ -48,6 +48,7 @@
    tweede waarheid (LAT.md regel 4). */
 'use strict';
 const { execFileSync } = require('child_process');
+const fs = require('fs');
 const path = require('path');
 
 const WORTEL = path.join(__dirname, '..', '..');
@@ -127,4 +128,26 @@ function versheid(gemeten, huidigeCommit) {
 
 const nuCommit = () => git(['rev-parse', '--short', 'HEAD']) || null;
 
-module.exports = { stempel, versheid, nuCommit, WORTEL, CODE };
+/* HET STEMPEL VAN EEN REGISTER, en waarom die vraag hierheen is verhuisd.
+
+   Er zijn TWEE vormen, en dat is historie en geen smaak: DEKKING.json en
+   POORTWACHT.json zetten hun tijdstempel onder `gemeten`, de rest onder
+   `stempel`. Een van de twee hernoemen breekt een bestand dat een toets al
+   leest, dus wordt het verschil hier opgevangen -- op EEN plek.
+
+   Dat het er twee waren, was op zichzelf niet erg. Erg was dat er ook twee
+   LEZERS waren en er maar een van beide vormen kende: scripts/versheid.js ving
+   ze allebei op, scripts/vertrouwen.js las alleen `j.stempel.op`. Gevolg:
+   POORTWACHT.json -- het OUDSTE register van de stapel -- viel bij vertrouwen.js
+   stilzwijgend buiten de berekening, en de ouderdom van het bewijs kwam uit de
+   registers die er wel in zaten. Het bewijs zag er dus verser uit dan het was,
+   en juist die meter bestaat om dat te voorkomen (LAT.md regel 4: twee plekken
+   voor een waarheid, en de zwakste wint zodra iemand hem gebruikt). */
+function stempelVan(bestand) {
+  try {
+    const j = JSON.parse(fs.readFileSync(path.isAbsolute(bestand) ? bestand : path.join(WORTEL, bestand), 'utf8'));
+    return j.stempel || (j.gemeten && j.gemeten.op ? j.gemeten : null);
+  } catch (e) { return undefined; }   // undefined = het bestand is er niet; null = wel, maar zonder stempel
+}
+
+module.exports = { stempel, versheid, nuCommit, stempelVan, WORTEL, CODE };

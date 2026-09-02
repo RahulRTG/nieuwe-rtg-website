@@ -42,7 +42,7 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
-const { stempel } = require('./lib/stempel');
+const { stempel, stempelVan } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'VERTROUWEN.json');
@@ -58,7 +58,11 @@ const HALFWAARDETIJD_DAGEN = 30;
    dat ontbreekt telt niet mee (de matrix zet die cellen dan al op ongemeten,
    en dat is de straf -- twee keer straffen zou dubbel tellen). */
 const BRONNEN = ['POORTWACHT.json', 'ROLPROEF.json', 'KETENS.json', 'INVOERPROEF.json',
-  'IDEMPROEF.json', 'STAATPROEF.json', 'OUTPUTPROEF.json', 'AUDITPROEF.json'];
+  'IDEMPROEF.json', 'STAATPROEF.json', 'OUTPUTPROEF.json', 'AUDITPROEF.json',
+  /* Deze twee stonden er niet terwijl de matrix ze wel leest. Ze droegen ook geen
+     stempel, dus ze hadden hier hoe dan ook niets bijgedragen -- twee gaten die
+     elkaar dekten. */
+  'HANDELINGPROEF.json', 'UITVOERPROEF.json'];
 
 /* De staat van EEN route, uit zijn elf cellen en de ouderdom van het bewijs.
    Pure functie: de toets voert hem elke overgang (LAT.md regel 10), en wie de
@@ -132,9 +136,15 @@ function ouderdom(nu, lees) {
   const bronnen = {};
   let oudste = null;
   for (const naam of BRONNEN) {
-    let j;
-    try { j = JSON.parse(lezer(naam)); } catch (e) { continue; }
-    const op = j && j.stempel && j.stempel.op;
+    /* VIA DE GEDEELDE LEZER, want hier stond `j.stempel && j.stempel.op` en dat
+       kent maar EEN van de twee stempelvormen. POORTWACHT.json draagt de zijne
+       onder `gemeten` en viel daardoor stilzwijgend buiten deze berekening -- het
+       OUDSTE register van de stapel, in de meter die juist over ouderdom gaat. */
+    let st;
+    if (lees) { let j; try { j = JSON.parse(lezer(naam)); } catch (e) { continue; }
+      st = j && (j.stempel || (j.gemeten && j.gemeten.op ? j.gemeten : null)); }
+    else st = stempelVan(naam);
+    const op = st && st.op;
     if (!op) continue;
     const dagen = (nu - new Date(op).getTime()) / 86400000;
     bronnen[naam] = { op, dagen: Math.round(dagen * 10) / 10 };

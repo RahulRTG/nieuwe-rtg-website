@@ -85,14 +85,13 @@ const KAART = {
     bron: 'kern/beroepenbieb/'
   },
   opvang: {
-    stand: 'geen-ingang',
-    wat: 'Kinderopvang bestaat hier wel: groepen met een capaciteit, en een nanny-dienst.',
-    waarom: 'Alleen de opvangorganisatie kan erbij. Elke route ernaartoe is een partnerroute ' +
-      '(/api/supplier/opvang); er is geen enkele ingang voor een ouder. kern/levenslijn/fasen.js ' +
-      'zegt hetzelfde over zichzelf: de fase "opvang" heeft geen bron omdat er geen ' +
-      'opvang-inschrijving bestaat die een mens zelf deed. Let op: kern/opvang.js gaat over de ' +
-      'asielketen en is hier een valse treffer.',
-    bron: 'kern/verzorging/opvang.js'
+    stand: 'bron', ingang: '/api/opvang',
+    wat: 'De kinderopvangpartners met hun groepen en hoeveel plek daar vrij is, plus een aanvraag ' +
+      'die u kunt klaarzetten en zelf weer kunt intrekken.',
+    dektNiet: 'Een vrije plek is geen plek. Het inschrijven van een kind doet de opvang zelf, na ' +
+      'een gesprek, en een aanvraag blijft "aangevraagd" tot een mens daar hem bevestigt. Dit zegt ' +
+      'ook niets over de kosten of over een vergoeding: kinderopvangtoeslag bestaat in deze code niet.',
+    bron: 'kern/verzorging/opvangleden.js; het register zelf blijft kern/verzorging/opvang.js'
   },
   vervoer: {
     stand: 'bron', ingang: '/api/ride/request',

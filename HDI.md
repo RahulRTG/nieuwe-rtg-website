@@ -41,7 +41,7 @@ van 2 september 2026:
 | 3. Safety | `server/kern/beschermzaak/` (de eigen dataklasse, sinds 2 sep 2026), `server/kern/veiligheid/` (de persoonlijke laag: dodemansknop, stil codewoord, kring — zie par. 7.2), `kern/rtfos/meldcode.js`, `kern/zorgniveau.js` | **staat** |
 | 4. Recovery | `casus.SOORTEN` dekt huisvesting, schulden, werk, zorgdoorverwijzing, noodhulp; `kern/opvang.js` doet de asielketen; `kern/rtfos/voorraad*.js` de goederen | **staat als registratie, niet als traject** |
 | 5. Development | `kern/levensgraaf/` (18+ bronnen, vijf etiketten per knoop), `kern/levenslijn/fasen.js` (fasen zonder voortgangsbalk), `kern/doelen.js` | **staat als graaf, mist de motor** |
-| 6. Opportunity | `kern/stadsweefsel/kansen.js` rijgt vacature -> beroep -> leerpad -> wijk al aaneen, maar over de STAD; `kern/knelpunt/openingen.js` doet het per randvoorwaarde voor de mens | **staat als kaart; vier van de vijf terreinen zijn bereikbaar, geen enkel terrein lost de randvoorwaarde op** |
+| 6. Opportunity | `kern/stadsweefsel/kansen.js` rijgt vacature -> beroep -> leerpad -> wijk al aaneen, maar over de STAD; `kern/knelpunt/openingen.js` doet het per randvoorwaarde voor de mens | **staat als kaart; alle vijf de terreinen bereikbaar sinds de ouderingang op de kinderopvang, geen enkel terrein lost de randvoorwaarde op** |
 | 7. Federation | `kern/rtfos/netwerk.js` (blauwdrukken tussen steden), `kern/rtfos/steden.js`, `kern/envelop.js` (acht velden per bericht, ketenverwijzing) | **staat federatief, mist het protocol naar buiten** |
 | 8. Society Intelligence | `kern/livinglab/` — 21 modules met `graden.js` als causale rem, `bewijs.js`, `ethiek.js`, `cyclus.js`; `kern/rtfos/rapport.js` telt zonder te lezen | **staat als onderzoekscyclus, mist de populatiekant** |
 
@@ -194,12 +194,15 @@ alleen over de STAD en niet over de mens — met zoveel woorden: *"hier komen
 bedrijven en beroepen langs, geen werkzoekenden."* Zie par. 7.10 voor de volledige
 meting per terrein en voor het onderscheid dat er werkelijk toe doet: `geen-bron`
 (er is niets) tegenover `geen-ingang` (het bestaat, maar alleen de aanbieder kan
-erbij). Let vooral op de tweede as die daar staat: van de vijf terreinen zijn er
-vier bereikbaar, en er is er **geen enkele** die de randvoorwaarde ook oplost --
+erbij). Let vooral op de tweede as die daar staat: sinds de ouderingang op de
+kinderopvang zijn alle vijf de terreinen bereikbaar, en er is er **geen enkele**
+die de randvoorwaarde ook oplost --
 een vacature is geen inkomen, een leerpad geen diploma, een betaalde rit geen
 dagelijkse reis naar school en een koopwoning geen dak boven het hoofd. Wat een
 besluit vraagt is dus niet een register en ook niet alleen een ingang, maar de
-vraag welke van die vier gaten de RTFoundation zelf wil vullen.
+vraag welke van die gaten de RTFoundation zelf wil vullen. Een ervan is inmiddels
+gevuld (de ouderingang); de andere drie kunnen niet zonder een derde partij, en
+par. 7.10 zegt per stuk wat er precies aan ontbreekt.
 
 ### Laag 7 — Federation · **staat lokaal, mist het protocol**
 Blauwdrukken tussen steden werken al, inclusief de regel dat een overgenomen
@@ -394,7 +397,9 @@ veilige slaapplek heeft.
 | 6 | **Consent: doel en termijn per venster** | het scherm bestond al; zie par. 7.6 | **staat** (2 sep 2026) |
 | 7 | **De Advocate als lezer** op `levensgraaf/termijnen.js` | alle waarde van punt 10 zonder de onbewezen helft (5.6) | **staat** (2 sep 2026) |
 | 8 | **De knelpuntmotor** — meerdere wegen, aannames in de uitslag, `onbepaald` waar niets is nagegaan | het eerlijke nieuwe stuk software; `EXECUTIE.md` noemde de leemte al | **eerste laag staat** (2 sep 2026), zie par. 7.9 |
-| 6b | **De openingen** -- per knelpunt wat er in dit huis bestaat dat hem zou opheffen, met drie standen die nooit door elkaar lopen | laag 6 bleek te bestaan; wat ontbrak was de kant van de mens, zie par. 7.10 | **staat** (2 sep 2026) |
+| 6b | **De openingen** -- per knelpunt wat er in dit huis bestaat dat hem zou opheffen, met twee assen: kunt u erbij, en lost het uw randvoorwaarde op | laag 6 bleek te bestaan; wat ontbrak was de kant van de mens, zie par. 7.10 | **staat** (2 sep 2026) |
+| 6c | **De ouderingang op de kinderopvang** -- het aanbod, een aanvraag klaarzetten, en hem zelf weer intrekken | de laatste `geen-ingang`, en de enige van de vier gaten die zonder een derde partij te vullen was | **staat** (2 sep 2026), zie par. 7.10 |
+| 6d | **Opleiding, wonen en vervoer** -- een inschrijfbaar aanbod, een woonvoorziening, structureel vervoer | de eigenaar koos alle vier; deze drie beginnen buiten de code | **vraagt een afspraak met een derde**, zie par. 7.11 |
 | 9 | **Human Services Protocol**: schemaregister op `kern/envelop.js` | pas zinvol als er iets is om te delen dat de moeite waard is | maanden |
 | 10 | **Society Intelligence** op `livinglab/graden.js` | pas na 6 — een populatiemodel zonder consent-graaf is een dataverzameling met een grafiek erop | jaren |
 
@@ -505,7 +510,7 @@ Dat is de zesde meetfout van deze reeks, en hij stond een commit lang in de code
 |---|---|---|---|
 | werk | de vacatures van alle partners, ook zonder pas (`/api/rtf/vacatures`) | **bron** | nee — een vacature is geen inkomen |
 | opleiding | de Beroepen-Bibliotheek, 200 beroepen met een gratis leerpad | **bron** (`/api/rtf/beroepen`) | nee — leerstof, geen inschrijving, geen diploma |
-| opvang | `kern/verzorging/opvang.js`: groepen met capaciteit, een nanny-dienst | **geen ingang** | — |
+| opvang | groepen met capaciteit, een nanny-dienst, en sinds 2 sep 2026 een ouderingang (`/api/opvang`) | **bron** | nee — een vrije plek is geen plek; inschrijven doet de opvang, na een gesprek |
 | vervoer | een rit aanvragen (`/api/ride/request`) | **bron** | nee — een losse betaalde rit is geen dagelijkse reis naar school |
 | wonen | het aanbod van een makelaarspartner, koop en huur | **bron** (`/api/vastgoed/aanbod`) | nee — commercieel aanbod, geen woonvoorziening |
 
@@ -555,6 +560,34 @@ De reparatie is níét een slimmere keuze. Er wordt **niet gekozen**: alle raken
 terreinen komen terug, dezelfde randvoorwaarde kan dus meer dan één rij hebben, en
 dát er meer dan één was staat in de aannames.
 
+**En toen is de laatste `geen-ingang` gesloten.** De eigenaar koos ervoor alle
+vier de gaten te vullen; van die vier bleek er één zonder een derde partij te
+bouwen, en dat is deze. `server/kern/verzorging/opvangleden.js` is de ouderkant
+van een register dat er al volledig stond — en de moeite zit niet in de route
+maar in de **projectie**. `opvang.js` houdt per groep een lijst `aanwezig` bij, en
+daar staan **voornamen van kinderen met de naam van hun ouder** in. Dat is de
+gevoeligste data van dit genre en precies wat een andere ouder nooit mag zien. De
+ouderkant leest die bak dus wel, maar geeft er per groep een **getal** uit:
+hoeveel plekken vrij. Nanny's idem — een aantal gescreende, nooit hun namen; dat
+zijn medewerkers op hun werkplek.
+
+Er is met opzet géén route die een kind inschrijft: dat is de handeling waarmee
+een kind érgens staat, en die hoort een mens te doen die het kind heeft gezien.
+Een aanvraag komt binnen op `aangevraagd` en blijft daar tot iemand bij de opvang
+hem bevestigt. En de ouder kan hem zélf weer intrekken — dat is geen extraatje
+maar de toets uit par. 3: *kan de persoon dit uitzetten zonder iemand te bellen?*
+Kan hij dat niet, dan is het volgen in plaats van in beeld houden.
+
+Het besluit erbij: **alle partners met het genre komen in beeld**, niet alleen wie
+zich ergens voor aanmeldt. Een lijst die leeg begint leest voor een ouder niet als
+"nog niemand aangemeld" maar als "er is niets" — dezelfde verwarring die deze hele
+laag moet voorkomen.
+
+Daarmee draagt **geen enkel terrein meer `geen-ingang` of `geen-bron`**. Beide
+standen blijven in de woordenlijst, want een volgend terrein kan onbereikbaar of
+leeg zijn; ze worden getoetst op `maakRij` met een kaartregel als argument, want
+een tak die niemand doorloopt kan stil breken.
+
 **Wat de laag met opzet niet doet.** Er zit geen enkele geschiktheidstoets in —
 geen leeftijd, geen inkomen, geen postcode. Dat is par. 5.5 en `FOUNDATION.md`
 par. 5.3 in code: een eligibility-motor mag alleen tóevoegen, dus hier komt nooit
@@ -578,12 +611,31 @@ of die zin de lezer bereikte. Een API-lezer miste dus precies de regel die "bron
 van "dit is geregeld" onderscheidt, terwijl de meter groen stond — `LAT.md` regel 9
 in het klein.
 
-**Wat er nog niet is.** De knelpuntmotor leidt zijn randvoorwaarden nog steeds
-niet af; par. 7.9 wachtte daarvoor op laag 6, en laag 6 blijkt de afleiding niet
-te kunnen leveren omdat drie van de vijf terreinen geen ingang voor de mens
-hebben. Dat is geen bouwopdracht maar het besluit dat par. 4 laag 6 altijd al
-was — alleen staat er nu bij welk besluit het precies is, en voor wie het
-uitmaakt.
+### 7.11 De drie gaten die niet zonder een derde partij te vullen zijn
+
+De eigenaar koos "alles". Eén van de vier is gebouwd (de ouderingang, par. 7.10);
+de andere drie zijn geen bouwopdracht maar een afspraak die buiten deze code
+begint. Ze staan hier met wat er precies aan ontbreekt, zodat het besluit erover
+scherp is en niet als "nog te doen" blijft hangen.
+
+| gat | wat er nu is | wat het vullen vraagt | wat er NIET aan ontbreekt |
+|---|---|---|---|
+| **opleiding** — iets waar je je op kunt inschrijven | leerstof (200 gratis leerpaden) en een school-interne opleidingenlijst mét capaciteit en wachtlijst, waar de administratie leerlingen invoert | een onderwijsinstelling die haar aanbod openstelt. De vorm ligt er al: `server/school/inschrijving.js` kent `aanmelding → wachtlijst → ingeschreven`, en een ledenkant erop is dezelfde bouw als de ouderingang van par. 7.10 | de software. Zonder instelling is het een leeg scherm, en een leeg scherm leest als "er is niets" |
+| **wonen** — een woonvoorziening | het aanbod van een makelaarspartner, koop en huur | een corporatie of een gemeente. Sociale huur, urgentie en een woningwachtlijst bestaan hier niet, en RTG kan geen woning toewijzen — wie dat nabouwt, bouwt een belofte | een register. `kern/stadsweefsel/voorzieningregister.js` houdt al voorzieningen bij mét plekken, wachttijd en doelgroep; er is alleen geen woonsoort en geen partij die hem vult |
+| **vervoer** — structureel in plaats van een losse rit | een rit aanvragen (`/api/ride/request`) | geld, en dus een besluit wie het draagt: reiskosten, een OV-abonnement of leerlingenvervoer zijn een regeling en geen functie. `GELD.md` staat daarboven, en de harde grens daar is dat geld het huis nooit vanzelf verlaat | de rit zelf, die werkt |
+
+Twee dingen om niet te verwarren. Dit is **geen** lijst met werk dat is
+overgeslagen: alle drie zijn ze gemeten, staan ze met hun `dektNiet` in de kaart,
+en ziet een mens ze in het antwoord van `/api/knelpunt`. En het is **geen** lijst
+die vanzelf korter wordt — hij wordt korter zodra er een handtekening onder een
+afspraak staat, niet zodra er iemand gaat programmeren.
+
+**Wat er hierna nog ontbreekt.** De knelpuntmotor leidt zijn randvoorwaarden nog
+steeds niet af; par. 7.9 wachtte daarvoor op laag 6. Laag 6 kan die afleiding ook
+nu niet leveren, maar om een andere reden dan eerst gedacht: niet omdat de
+terreinen onbereikbaar zijn — dat zijn ze inmiddels allemaal — maar omdat geen van
+de vijf een randvoorwaarde werkelijk OPHEFT. Zolang een vacature geen inkomen is
+en een vrije plek geen plek, valt er niets af te leiden dat een mens houvast geeft.
 
 ### 7.8 De weg terug, en waarom hij in de route staat
 

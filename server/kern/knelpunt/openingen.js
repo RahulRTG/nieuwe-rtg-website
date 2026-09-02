@@ -79,6 +79,34 @@ function terreinenVan(voorwaarde) {
   return TERREINEN.filter(terrein => WOORDEN[terrein].some(w => t.includes(w)));
 }
 
+/* Een rij: dit knelpunt op dit terrein, met wat de kaart daarover zegt.
+
+   HIJ KRIJGT DE KAARTREGEL MEE EN LEEST HEM NIET ZELF, en dat is geen
+   test-opening maar de enige manier waarop het gedrag PER STAND te toetsen is.
+   Sinds de ouderingang op de kinderopvang bestaat, draagt namelijk geen enkel
+   terrein meer `geen-ingang` of `geen-bron`: alle vijf zijn bereikbaar. Die twee
+   standen blijven in de woordenlijst -- een volgend terrein kan onbereikbaar of
+   leeg zijn -- maar zonder deze functie zou hun gedrag nergens meer worden
+   uitgevoerd, en een tak die niemand doorloopt is een tak die stil kan breken. */
+function maakRij(knel, terrein, kaart) {
+  return {
+    id: knel.id, wat: knel.wat, terrein,
+    stand: kaart.stand,
+    /* Alleen bij een echte bron staat er een ingang, en nergens een aantal
+       plekken of een wachttijd: zie punt 4 hierboven. */
+    ingang: kaart.stand === 'bron' ? kaart.ingang : null,
+    plekken: null, wachttijd: null,
+    watErIs: kaart.wat || null,
+    /* AS 2, en hij reist MEE met de ingang en staat er nooit los van. Dit is de
+       reparatie van 2 september 2026: `bron` beantwoordt alleen de vraag of u
+       erbij kunt, en zonder deze zin leest dat als "dit is geregeld". */
+    dektNiet: kaart.dektNiet || null,
+    waarom: kaart.waarom || null,
+    bron: kaart.bron || null,
+    zelfDoen: kaart.stand === 'bron' ? ZELF_DOEN : null
+  };
+}
+
 /* ---------------------------------------------------------------------------
    De brug. Krijgt de knelpunten zoals ./index.js ze teruggeeft, en zegt per
    knelpunt wat er in dit huis bestaat dat hem zou kunnen opheffen.
@@ -109,25 +137,7 @@ function voorKnelpunten(knelpunten) {
     /* EEN RIJ PER TERREIN. Er wordt niet gekozen welke de "beste" is; zie de kop
        van terreinenVan(). Dezelfde knelpunt-id kan dus meer dan een keer
        voorkomen, en dat is de bedoeling en geen dubbeling. */
-    for (const terrein of terreinen) {
-      const kaart = KAART[terrein];
-      uit.push({
-        id: knel.id, wat: knel.wat, terrein,
-        stand: kaart.stand,
-        /* Alleen bij een echte bron staat er een ingang, en nergens een aantal
-           plekken of een wachttijd: zie punt 4 hierboven. */
-        ingang: kaart.stand === 'bron' ? kaart.ingang : null,
-        plekken: null, wachttijd: null,
-        watErIs: kaart.wat || null,
-        /* AS 2, en hij reist MEE met de ingang en staat er nooit los van. Dit is
-           de reparatie van 2 september 2026: `bron` beantwoordt alleen de vraag
-           of u erbij kunt, en zonder deze zin leest dat als "dit is geregeld". */
-        dektNiet: kaart.dektNiet || null,
-        waarom: kaart.waarom || null,
-        bron: kaart.bron || null,
-        zelfDoen: kaart.stand === 'bron' ? ZELF_DOEN : null
-      });
-    }
+    for (const terrein of terreinen) uit.push(maakRij(knel, terrein, KAART[terrein]));
   }
 
   const aannames = [
@@ -159,4 +169,4 @@ function voorKnelpunten(knelpunten) {
   };
 }
 
-module.exports = { voorKnelpunten, terreinenVan, ZELF_DOEN, TERREINEN, KAART };
+module.exports = { voorKnelpunten, terreinenVan, maakRij, ZELF_DOEN, TERREINEN, KAART };

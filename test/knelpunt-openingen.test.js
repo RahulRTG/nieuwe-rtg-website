@@ -4,9 +4,12 @@
    HDI.md par. 7 regel 6 (laag 6, Opportunity). De laag zelf is klein; wat hem
    waardevol maakt is precies wat hier kan zakken. Zeven zinnen:
 
-     1. `geen-ingang` is NIET `geen-bron` -- kinderopvang bestaat in dit huis en
-        een ouder kan er niet bij. Wie die twee samenvat, vertelt een moeder dat
-        er geen opvang is terwijl er een register vol groepen staat;
+     1. de drie standen zijn onderscheiden en dragen elk wat ze moeten dragen.
+        LET OP: sinds de ouderingang op de kinderopvang bestaat, draagt GEEN
+        ENKEL terrein nog `geen-ingang` of `geen-bron` -- alle vijf zijn
+        bereikbaar. Die twee standen blijven in de woordenlijst en worden hier
+        op `maakRij` getoetst, want een tak die niemand doorloopt kan stil
+        breken;
      2. een knelpunt dat wij niet kunnen plaatsen verdwijnt niet en krijgt geen
         verzonnen terrein;
      3. er komt nooit een aantal plekken of een wachttijd uit -- geen bron
@@ -20,7 +23,7 @@
 
    MET EEN MUTATIE NAGETROKKEN (LAT.md regel 2, en op de JUISTE bewering -- dat
    ging in deze reeks twee keer mis, zie HDI.md par. 7.5 en 7.9):
-     - `geen-ingang` van opvang op `geen-bron` zetten: RAAK op 1;
+     - `bron` van opvang terug op `geen-ingang` zetten (de deur weer dicht): RAAK op 1;
      - een niet te plaatsen knelpunt stil op 'werk' zetten: RAAK op 2;
      - `plekken: null` vervangen door een verzonnen aantal: RAAK op 3;
      - `zelfDoen` ook bij een `geen-ingang` meegeven: RAAK op 5;
@@ -37,7 +40,8 @@
    regel 9 in het klein; de assertie in toets 5 is de reparatie.
 
    WAAROM DIT EEN ZUIVERE TOETS IS. Net als de motor raakt deze laag geen opslag
-   aan; hij krijgt de knelpunten als argument. De kaart in ./openingen-kaart.js
+   aan; hij krijgt de knelpunten als argument, en `maakRij` krijgt zelfs de
+   kaartregel als argument. De kaart in ./openingen-kaart.js
    is een MEETUITSLAG, en toets 8 houdt vast dat die uitslag zichzelf niet
    tegenspreekt -- een terrein zonder bron dat geen reden draagt, is een gat dat
    zich voordoet als een besluit.
@@ -69,38 +73,41 @@ const SARAH = {
 
 const opvangVan = (r) => r.openingen.find(o => o.id === 'opvang');
 
-test('1. geen-ingang is niet geen-bron, en niet hetzelfde als bron', () => {
-  const r = O.voorKnelpunten(K.reken(SARAH).knelpunten);
-  const o = opvangVan(r);
-  assert.equal(o.terrein, 'opvang');
-  assert.equal(o.stand, 'geen-ingang',
-    'kinderopvang BESTAAT in dit huis; alleen de ouder kan er niet bij. Dat is een andere uitslag dan "er is niets"');
-  assert.ok(/bestaat hier wel/i.test(o.watErIs || ''),
-    'bij geen-ingang hoort te staan WAT er dan wel is, anders is het onderscheid onzichtbaar');
-  assert.match(o.waarom, /supplier|aanbieder|partnerroute/i,
-    'en waarom de mens er niet bij kan');
-  assert.equal(o.ingang, null, 'geen-ingang betekent geen ingang, ook niet een die er half op lijkt');
+test('1. de drie standen zijn onderscheiden, en dragen elk wat ze moeten dragen', () => {
+  /* SINDS 2 SEPTEMBER 2026 DRAAGT GEEN ENKEL TERREIN MEER `geen-ingang` OF
+     `geen-bron`. De ouderingang op de kinderopvang (kern/verzorging/opvangleden.js)
+     was de laatste `geen-ingang`, en alle vijf de terreinen zijn nu bereikbaar.
 
-  /* En het onderscheid met de derde stand, op hetzelfde antwoord: werk IS
-     bereikbaar. Dit was eerst opgehangen aan vervoer als `geen-bron`, en dat
-     bleek fout -- zie de kop van openingen-kaart.js. Nu hangt het aan het
-     verschil dat er werkelijk is en dat op echte data te zien is. */
-  const werk = r.openingen.find(x => x.terrein === 'werk');
-  assert.equal(werk.stand, 'bron');
-  assert.ok(werk.ingang, 'een bron hoort een ingang te dragen en geen-ingang niet');
-  assert.notEqual(werk.stand, o.stand, 'bereikbaar en onbereikbaar horen twee standen te zijn');
+     Dat maakt deze toets niet overbodig maar juist nodig: de twee standen
+     blijven in de woordenlijst, want een volgend terrein kan onbereikbaar of leeg
+     zijn. Zonder een toets erop zou hun gedrag nergens meer worden uitgevoerd, en
+     een tak die niemand doorloopt is een tak die stil kan breken. Daarom hangt
+     deze toets aan `maakRij` met een kaartregel als argument, en niet aan een
+     terrein dat toevallig die stand draagt. */
+  const knel = { id: 'x', wat: 'iets', blokkeertWegen: 1 };
 
-  /* GEEN ENKEL TERREIN DRAAGT VANDAAG `geen-bron`, en dat is een uitslag en geen
-     nalatigheid: alle vijf bestaan ze in een of andere vorm. De stand blijft in
-     de woordenlijst omdat een volgend terrein wel leeg kan zijn, en deze toets
-     zorgt dat hij dan niet stilletjes zonder reden verschijnt. */
-  for (const t of KAART.TERREINEN) {
-    const k = KAART.KAART[t];
-    if (k.stand !== 'geen-bron') continue;
-    assert.ok(k.waarom && k.waarom.length > 20,
-      'terrein ' + t + ' heet geen-bron zonder reden; een leegte zonder reden is een gat');
-    assert.ok(!k.wat, 'geen-bron betekent dat er niets is; dan valt er ook niets te beschrijven: ' + t);
-  }
+  const geenIngang = O.maakRij(knel, 'opvang', { stand: 'geen-ingang',
+    wat: 'het bestaat wel', waarom: 'alleen de aanbieder kan erbij', bron: 'ergens.js' });
+  assert.equal(geenIngang.ingang, null, 'geen-ingang betekent geen ingang, ook niet een die er half op lijkt');
+  assert.equal(geenIngang.zelfDoen, null, 'de zin "dit is de ingang" hoort niet onder iets zonder ingang');
+  assert.ok(geenIngang.watErIs, 'bij geen-ingang hoort te staan WAT er dan wel is; anders is het onderscheid onzichtbaar');
+  assert.ok(geenIngang.waarom, 'en waarom de mens er niet bij kan');
+
+  const geenBron = O.maakRij(knel, 'vervoer', { stand: 'geen-bron', waarom: 'er is hier niets' });
+  assert.equal(geenBron.watErIs, null, 'geen-bron betekent dat er niets is; dan valt er ook niets te beschrijven');
+  assert.ok(geenBron.waarom, 'een leegte zonder reden is een gat');
+  assert.notEqual(geenBron.stand, geenIngang.stand, 'de twee leegtes horen twee verschillende standen te dragen');
+
+  const brn = O.maakRij(knel, 'werk', { stand: 'bron', ingang: '/api/x', wat: 'iets',
+    dektNiet: 'maar het lost dit niet op, en dat is een hele zin', bron: 'ergens.js' });
+  assert.equal(brn.ingang, '/api/x', 'een bron hoort zijn ingang te dragen');
+  assert.ok(brn.zelfDoen, 'en de zin dat RTG hier niets voor u aanvraagt');
+
+  /* En op de ECHTE kaart: opvang is nu bereikbaar. Deze regel bewaakt dat de
+     ouderingang niet stilletjes weer verdwijnt. */
+  assert.equal(KAART.KAART.opvang.stand, 'bron',
+    'kinderopvang heeft sinds de ouderingang een deur; zakt dit, dan is die deur weg');
+  assert.equal(KAART.KAART.opvang.ingang, '/api/opvang');
 });
 
 test('2. een knelpunt dat wij niet kunnen plaatsen blijft staan, zonder verzonnen terrein', () => {
@@ -158,11 +165,8 @@ test('5. bij een bruikbare ingang staat dat RTG zelf niets aanvraagt', () => {
       'dan leest "bron" voor de lezer alsnog als "dit lost uw probleem op"');
   }
 
-  // en bij een stand die GEEN ingang is, hoort er ook geen ingang en geen belofte te staan
-  const opvang = opvangVan(r);
-  assert.equal(opvang.ingang, null, 'zonder ingang hoort er geen pad te staan waar de mens niet langs kan');
-  assert.equal(opvang.zelfDoen, null,
-    'de zin "dit is de ingang" onder iets waar geen ingang is, is een belofte die niet waar is');
+  /* De tegenhanger -- geen ingang, dus ook geen pad en geen belofte -- staat in
+     toets 1 op `maakRij`, omdat geen enkel terrein die stand nog draagt. */
 });
 
 test('6. de stand van elk terrein komt mee, ook de niet-geraakte', () => {

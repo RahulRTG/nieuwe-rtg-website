@@ -38,7 +38,7 @@ van 2 september 2026:
 |---|---|---|
 | 1. Foundation Operations | `server/kern/rtfos/` — 49 modules: casus, meldcode, veld, integriteit, vrijwilligers-VOG, voorraad, geld, subsidies, projecten, gemeenteportaal, rapport, blauwdrukken, risico, beleid, bestuur, jaarverslag | **staat** |
 | 2. Human Control | `kern/consent.js` (+ dekkingsregister met eigen toets), `kern/rtgid-regie.js` (inzagelog, `namens`, herroepbare machtiging), `kern/rtgid.js` (claim zonder gegeven) | **staat, één attribuut breed** |
-| 3. Safety | `server/kern/beschermzaak/` (de eigen dataklasse, sinds 2 sep 2026), `server/kern/veiligheid/` (de persoonlijke laag: dodemansknop, stil codewoord, kring — zie par. 7.2), `kern/rtfos/meldcode.js`, `kern/zorgniveau.js` | **staat; de meldcode is nog smal en de persoonlijke laag hangt los** |
+| 3. Safety | `server/kern/beschermzaak/` (de eigen dataklasse, sinds 2 sep 2026), `server/kern/veiligheid/` (de persoonlijke laag: dodemansknop, stil codewoord, kring — zie par. 7.2), `kern/rtfos/meldcode.js`, `kern/zorgniveau.js` | **staat** |
 | 4. Recovery | `casus.SOORTEN` dekt huisvesting, schulden, werk, zorgdoorverwijzing, noodhulp; `kern/opvang.js` doet de asielketen; `kern/rtfos/voorraad*.js` de goederen | **staat als registratie, niet als traject** |
 | 5. Development | `kern/levensgraaf/` (18+ bronnen, vijf etiketten per knoop), `kern/levenslijn/fasen.js` (fasen zonder voortgangsbalk), `kern/doelen.js` | **staat als graaf, mist de motor** |
 | 6. Opportunity | vacatures, opleidingen, kinderopvang en woningen bestaan als losse domeinen; er is geen keten die ze aan elkaar rijgt | **een besluit** |
@@ -145,10 +145,19 @@ was geen ontbrekend label maar een ontbrekende KETEN: de casusketen wil koppelen
 aan een lokale partner en zet bij afronding een bewaartermijn van 730 dagen, en
 bij een geweldszaak zijn dat allebei risico's in plaats van functies.
 
-`server/kern/beschermzaak/` is die keten, als eigen dataklasse (par. 7.2). Wat
-er nog open staat: de meldcode dekt alleen huiselijk geweld en kindermishandeling
-en alleen de kantoorkant (regel 5), en de persoonlijke veiligheidslaag hangt los
-van de Foundation (regel 4b).
+`server/kern/beschermzaak/` is die keten, als eigen dataklasse (par. 7.2), met de
+voordeur ervoor (par. 7.3). De meldcode draagt sinds par. 7.5 het afwegingskader
+van stap 5 en zegt waarvoor hij is; wat er niet onder valt wordt naar de
+beschermzaak gewezen in plaats van stil geaccepteerd. De persoonlijke laag
+(`kern/veiligheid/`) is verbonden in par. 7.4.
+
+Wat op deze laag nog OPEN staat, en eerlijk benoemd: de meldcode blijft een
+instrument voor professionals achter de kantoordeur. Een mens die zelf zorgen
+heeft over iemand anders, kan langs de voordeur wel een beschermzaak beginnen
+maar geen meldcode-traject in gang zetten -- en dat hoort ook niet, want de vijf
+stappen zijn beroepsstappen. Wat wel ontbreekt is de weg terug: er is geen route
+waarlangs een beschermzaak die tijdens het werk toch huiselijk geweld blijkt te
+zijn, een meldcode-dossier wordt. Vandaag is dat handwerk.
 
 ### Laag 4 — Recovery · **staat als registratie, mist het traject**
 Wonen, recht, gezondheid en inkomen zijn er als casussoorten. Wat er niet is, is
@@ -357,7 +366,7 @@ veilige slaapplek heeft.
 | 3 | **De eigen keten** — veiligheid → minimale gegevens → toestemming → stabilisatie → gecontroleerde overdracht, als eigen dataklasse (5.2) | het gat dat par. 4 laag 3 beschrijft | **staat** als `server/kern/beschermzaak/` (2 sep 2026) |
 | 4 | **De voordeur**: zelfingang zonder account, zonder BSN, zonder adres; eerst "ben je nu veilig" en "kan iemand meekijken" | keert de huidige richting om (office maakt casus → burger krijgt code) | **staat** (2 sep 2026) |
 | 4b | **De persoonlijke veiligheidslaag verbinden** — `kern/veiligheid/` (dodemansknop, stil codewoord, kring, laatste plek) bestaat en is vanaf de Foundation-kant onzichtbaar | zie par. 7.2: gebouwd, eerlijk, en op de verkeerde plek voor de mens uit par. 0 | **staat** (2 sep 2026) |
-| 5 | **Meldcode verbreden** naar volwassen slachtoffers buiten het gezin, of een tweede route ernaast | de vijf wettelijke stappen blijven; de reikwijdte niet | weken |
+| 5 | **Meldcode**: het afwegingskader van stap 5, en zeggen waarvoor hij is | zie par. 7.5 -- de vraag bleek een andere dan hij hier stond | **staat** (2 sep 2026) |
 | 6 | **Consent: doel en termijn per venster** + het scherm "wie weet wat over mij" | laag 2 afmaken vóór er meer instanties bijkomen | weken |
 | 7 | **De Advocate als lezer** op `levensgraaf/termijnen.js` | alle waarde van punt 10 zonder de onbewezen helft (5.6) | weken |
 | 8 | **Constraint solver** met meerdere paden, aannames in de uitslag, `ONBEPAALD` waar niets gerekend is | het eerlijke nieuwe stuk software; `EXECUTIE.md` noemt de leemte al | maanden |
@@ -395,6 +404,62 @@ achter een knop komen. De laag wordt hier dus niet geladen, en de eerder
 bedachte `rtgdeel-vast`-markering is weggehaald in plaats van decoratief blijven
 staan: een klas die niets afdwingt omdat zijn laag niet draait, leest als een
 garantie die er niet is.
+
+### 7.5 Regel 5 bleek een andere vraag, en een echte fout
+
+**De vraag zoals hij hierboven stond was verkeerd.** "Meldcode verbreden naar
+volwassen slachtoffers" gaat uit van de aanname dat de meldcode alleen over
+kinderen gaat. Dat klopt niet: de wettelijke meldcode dekt *huiselijk geweld en
+kindermishandeling*, en huiselijk geweld is niet leeftijdsgebonden --
+partnergeweld, ouderenmishandeling en eergerelateerd geweld vallen eronder. In
+de code stond ook nergens een leeftijdsgrens. Een volwassen slachtoffer van
+huiselijk geweld paste er dus altijd al in, en "verbreden" zou de reikwijdte van
+een wettelijk instrument hebben opgerekt op grond van een misvatting van mij.
+
+**Wat er wél mis was, is ernstiger.** De meldcode vraagt sinds 2019 in stap 5 een
+afwegingskader met TWEE beslissingen, in volgorde: is melden noodzakelijk, en is
+hulp verlenen of organiseren (ook) mogelijk. En de regel die het geheel draagt:
+**melden is altijd noodzakelijk bij acute of structurele onveiligheid, ook als
+hulp mogelijk is.**
+
+`meldcode.js` kende stap 5 als één keuze uit vier gelijkwaardige opties. Daarmee
+kon een medewerker `hulp_georganiseerd` kiezen terwijl hij bij stap 4 acute
+onveiligheid had vastgesteld, en niets hield hem tegen. Dat is precies de
+uitkomst die het afwegingskader onmogelijk wil maken: hulp organiseren komt
+ernaast en niet in de plaats. Een lijstje met vier gelijkwaardige opties
+suggereert een keuze waar de wet er geen laat.
+
+Wat er nu staat (`kern/rtfos/meldcode-afweging.js`):
+
+- **stap 4 vraagt twee harde antwoorden** -- acute onveiligheid ja/nee,
+  structurele onveiligheid ja/nee. "Weet niet" bestaat niet en weegt als ja,
+  dezelfde keuze als bij de veiligheidsvraag van de beschermzaak: een derde
+  stand zou de grendel laten wegvallen op precies de dossiers waar hij het
+  hardst nodig is;
+- **stap 5 weigert** een besluit waarin melden wordt overgeslagen terwijl er
+  acute of structurele onveiligheid is vastgesteld, met de reden erbij en met de
+  aanwijzing dat een weging die niet meer klopt hoort te worden herzien -- niet
+  de beslissing;
+- **"hulp mogelijk" vraagt waarom die hulp tot DUURZAME veiligheid leidt.** Dat
+  is het criterium dat in de praktijk wordt overgeslagen: er wordt iets geregeld,
+  het is even rustig, en het dossier gaat dicht;
+- **de uitkomst wordt AFGELEID** uit de twee beslissingen in plaats van apart
+  gekozen. Twee plekken die hetzelfde zeggen lopen uiteen (LAT.md regel 4), en
+  hier zou dat betekenen dat een dossier een uitkomst draagt die niet volgt uit
+  de afweging eronder. Het sluiten neemt hem over en negeert een meegestuurde
+  waarde.
+
+**En de rails.** Een meldcode-dossier draagt nu een `aard` (`huiselijk-geweld`
+of `kindermishandeling`), en wie iets anders opgeeft -- uitbuiting, mensenhandel,
+een stalker buiten de huiselijke kring -- krijgt geen dossier maar de aanwijzing
+naar de beschermzaak. Dat is geen "dit is niets voor u" (FOUNDATION.md par. 5.3):
+het weigert niet de mens maar de verkeerde rails, en het noemt de goede.
+
+Vijf mutaties, alle vijf raak op precies één bewering. De vijfde kostte een extra
+toets: de afleiding zat eerst als losse assert onderaan de hulptoelichting-toets,
+en dan liet een mutatie op `uitkomstVan()` die toets zakken -- de suite meet dan
+de afleiding onder de verkeerde naam. Dat is LAT.md regel 9, en de reparatie is
+een eigen toets over alle vier de combinaties.
 
 ### 7.4 Wat regel 4b opleverde, en een correctie op mezelf
 

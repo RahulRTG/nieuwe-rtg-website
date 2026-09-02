@@ -342,7 +342,8 @@ test('een grote gift staat stil tot het landelijke bestuur de herkomst heeft beo
 
 /* ------------------------------------------------------------------------- */
 test('wegen en beslissen kan niet zonder overleg, en het gesprek overslaan niet zonder reden', async () => {
-  const d = await os_('meldcode/open', { stad: STAD, betreft: 'kind uit de huiswerkklas, groep 7' }, TWEE);
+  const d = await os_('meldcode/open', { stad: STAD, aard: 'kindermishandeling',
+    betreft: 'kind uit de huiswerkklas, groep 7' }, TWEE);
   assert.equal(d.status, 200);
   const id = d.body.dossier.id;
   assert.equal(d.body.dossier.volgende, 'signaleren');
@@ -371,24 +372,29 @@ test('wegen en beslissen kan niet zonder overleg, en het gesprek overslaan niet 
     tekst: 'gesprek met de ouders zou de veiligheid van het kind op dit moment verslechteren' }, TWEE);
   assert.equal(metReden.status, 200);
 
-  await os_('meldcode/stap', { id, stap: 'wegen', tekst: 'ernstig genoeg om te melden, geen acute onveiligheid' }, TWEE);
+  await os_('meldcode/stap', { id, stap: 'wegen', acuut: false, structureel: true,
+    tekst: 'ernstig genoeg om te melden, geen acute onveiligheid maar wel een patroon' }, TWEE);
 
   // sluiten kan niet voor stap 5
-  const voorbarig = await os_('meldcode/sluit', { id, uitkomst: 'geen_actie',
+  const voorbarig = await os_('meldcode/sluit', { id,
     afweging: 'we houden het in de gaten en kijken over een maand opnieuw' }, TWEE);
   assert.equal(voorbarig.status, 400);
   assert.match(voorbarig.body.error, /beslissen/);
 
-  await os_('meldcode/stap', { id, stap: 'beslissen', tekst: 'hulp georganiseerd via de partner en gemeld' }, TWEE);
+  await os_('meldcode/stap', { id, stap: 'beslissen', meldenNoodzakelijk: true, hulpMogelijk: true,
+    hulpToelichting: 'De school en de voedselbank pakken het samen op, de ouders werken mee, en dat houdt stand.',
+    tekst: 'hulp georganiseerd via de partner en gemeld' }, TWEE);
 
   // en een besluit zonder afweging in woorden is geen afweging
-  const kaal = await os_('meldcode/sluit', { id, uitkomst: 'beide', afweging: 'ok' }, TWEE);
+  const kaal = await os_('meldcode/sluit', { id, afweging: 'ok' }, TWEE);
   assert.equal(kaal.status, 400);
   assert.match(kaal.body.error, /Schrijf de afweging op/);
 
-  const dicht = await os_('meldcode/sluit', { id, uitkomst: 'beide',
+  const dicht = await os_('meldcode/sluit', { id,
     afweging: 'Er is hulp geregeld via de voedselbank en de school, en gemeld bij Veilig Thuis omdat het patroon aanhield.' }, TWEE);
-  assert.equal(dicht.status, 200);
+  assert.equal(dicht.status, 200, JSON.stringify(dicht.body).slice(0, 200));
+  assert.equal(dicht.body.dossier.uitkomst, 'beide',
+    'de uitkomst hoort te VOLGEN uit de twee beslissingen en niet apart gekozen te worden');
 
   /* NIEMAND KAN EEN DOSSIER WEGHALEN. Dat wordt hier niet getoetst met een
      mislukte poging maar met de bron: er bestaat geen route die het doet. Een
@@ -471,4 +477,144 @@ test('de lijsten tellen wat er open staat, en een herbeoordeling vraagt een oord
     verhaal: 'tweede opzet, met de cijfers erin', bijlage: { naam: 'balans 2025', url: '/stukken/balans-2025' } });
   assert.equal(welBij.status, 200);
   assert.equal(welBij.body.jaarverslag.bijlagen.length, 1);
+});
+
+/* ============================================================================
+   HET AFWEGINGSKADER VAN STAP 5 (kern/rtfos/meldcode-afweging.js)
+
+   De meldcode vraagt sinds 2019 in stap 5 TWEE beslissingen, na elkaar: is
+   melden noodzakelijk, en is hulp (ook) mogelijk. Melden is altijd noodzakelijk
+   bij acute of structurele onveiligheid -- ook als hulp mogelijk is.
+
+   Deze module kende stap 5 als EEN keuze uit vier gelijkwaardige opties, en
+   daarmee kon een medewerker "hulp georganiseerd" kiezen terwijl hij bij stap 4
+   acute onveiligheid had vastgesteld. Vier beweringen:
+
+     A. stap 4 vraagt of er acute en structurele onveiligheid is, allebei hard;
+     B. bij acute of structurele onveiligheid is melden geen keuze meer;
+     C. "hulp mogelijk" vraagt waarom die hulp tot DUURZAME veiligheid leidt;
+     D. een dossier dat niet onder de meldcode valt, krijgt de goede rails;
+     E. de uitkomst volgt uit de twee beslissingen en wordt niet apart gekozen.
+
+   MET EEN MUTATIE NAGETROKKEN:
+     - keurWeging() null laten teruggeven: RAAK op A;
+     - de `onveilig && !meldenNoodzakelijk`-grendel weghalen: RAAK op B;
+     - de lengte-eis op hulpToelichting weghalen: RAAK op C;
+     - de AARD-controle in open() weghalen: RAAK op D;
+     - uitkomstVan() altijd 'beide' laten geven: RAAK op E.
+
+   BEWERING E STAAT ER APART OM EEN REDEN. Hij zat eerst verstopt in B en C, als
+   een extra assert onderaan. De mutatie op uitkomstVan() liet dan C zakken, en
+   dan meet de suite de afleiding onder de naam van de hulptoelichting -- de val
+   van LAT.md regel 9. Een bewering die een eigen mutatie heeft, hoort een eigen
+   toets te hebben.
+   ========================================================================== */
+async function meldcodeTot(stapVier) {
+  const d = await os_('meldcode/open', { stad: STAD, aard: 'huiselijk-geweld',
+    betreft: 'volwassene, partnergeweld' }, TWEE);
+  assert.equal(d.status, 200, JSON.stringify(d.body).slice(0, 200));
+  const id = d.body.dossier.id;
+  await os_('meldcode/stap', { id, stap: 'signaleren', tekst: 'blauwe plekken en steeds afzeggen' }, TWEE);
+  await os_('meldcode/stap', { id, stap: 'overleggen', metWie: 'aandachtsfunctionaris',
+    tekst: 'overlegd en anoniem besproken met Veilig Thuis' }, TWEE);
+  await os_('meldcode/stap', { id, stap: 'gesprek', tekst: 'gesproken; zij wil geen aangifte doen' }, TWEE);
+  if (stapVier) {
+    const w = await os_('meldcode/stap', Object.assign({ id, stap: 'wegen',
+      tekst: 'gewogen met het kader' }, stapVier), TWEE);
+    assert.equal(w.status, 200, 'wegen mislukte: ' + JSON.stringify(w.body).slice(0, 160));
+  }
+  return id;
+}
+
+test('A. stap 4 vraagt acute en structurele onveiligheid, allebei als een echt antwoord', async () => {
+  const id = await meldcodeTot(null);
+  const leeg = await os_('meldcode/stap', { id, stap: 'wegen', tekst: 'het valt wel mee denk ik' }, TWEE);
+  assert.equal(leeg.status, 400, 'wegen zonder oordeel over acute onveiligheid hoort te weigeren');
+  assert.match(leeg.body.error, /ACUTE/);
+
+  const half = await os_('meldcode/stap', { id, stap: 'wegen', acuut: false, tekst: 'half gewogen' }, TWEE);
+  assert.equal(half.status, 400, 'de tweede vraag is niet optioneel');
+  assert.match(half.body.error, /STRUCTURELE/);
+});
+
+test('B. bij acute of structurele onveiligheid is melden geen keuze meer', async () => {
+  const id = await meldcodeTot({ acuut: true, structureel: false });
+  const ontwijk = await os_('meldcode/stap', { id, stap: 'beslissen', meldenNoodzakelijk: false,
+    hulpMogelijk: true, hulpToelichting: 'We regelen hulp via de wijkverpleging, dat lost het op.',
+    tekst: 'liever zelf hulp regelen' }, TWEE);
+  assert.equal(ontwijk.status, 400,
+    'hulp organiseren mag melden niet VERVANGEN als er acute onveiligheid is vastgesteld');
+  assert.match(ontwijk.body.error, /acute/);
+  assert.match(ontwijk.body.error, /ernaast/);
+
+  // met melden erbij mag het wel, en hulp komt ernaast
+  const goed = await os_('meldcode/stap', { id, stap: 'beslissen', meldenNoodzakelijk: true,
+    hulpMogelijk: true, hulpToelichting: 'Wijkverpleging en Veilig Thuis pakken het samen op en dat houdt stand.',
+    tekst: 'gemeld en hulp geregeld' }, TWEE);
+  assert.equal(goed.status, 200, JSON.stringify(goed.body).slice(0, 180));
+  assert.equal(goed.body.dossier.uitkomst, 'beide');
+});
+
+test('C. "hulp mogelijk" vraagt waarom het tot duurzame veiligheid leidt', async () => {
+  const id = await meldcodeTot({ acuut: false, structureel: false });
+  const kaal = await os_('meldcode/stap', { id, stap: 'beslissen', meldenNoodzakelijk: false,
+    hulpMogelijk: true, tekst: 'hulp geregeld' }, TWEE);
+  assert.equal(kaal.status, 400, 'hulp "mogelijk" noemen zonder onderbouwing hoort te weigeren');
+  assert.match(kaal.body.error, /DUURZAME/);
+
+  const goed = await os_('meldcode/stap', { id, stap: 'beslissen', meldenNoodzakelijk: false,
+    hulpMogelijk: true, hulpToelichting: 'Beiden werken mee aan begeleiding en de situatie is al maanden stabiel.',
+    tekst: 'hulp geregeld' }, TWEE);
+  assert.equal(goed.status, 200);
+  /* Welke uitkomst hieruit volgt, toetst bewering E. Die assert stond hier
+     eerst ook, en dan liet een mutatie op de AFLEIDING deze toets zakken --
+     dan meet de suite de afleiding onder de naam van de hulptoelichting
+     (LAT.md regel 9). Een bewering per toets. */
+});
+
+test('D. een dossier dat nergens over gaat wordt niet geopend, maar krijgt de goede rails', async () => {
+  /* De meldcode geldt voor huiselijk geweld en kindermishandeling -- en dat
+     eerste is NIET beperkt tot kinderen. Uitbuiting door een werkgever valt er
+     niet onder, en de weigering hoort te zeggen waar het dan wel hoort. */
+  const fout = await os_('meldcode/open', { stad: STAD, aard: 'uitbuiting',
+    betreft: 'werknemer, paspoort ingenomen' }, TWEE);
+  assert.equal(fout.status, 400);
+  assert.match(fout.body.error, /bescherming\/open/i,
+    'de weigering hoort de beschermzaak aan te wijzen en niet alleen nee te zeggen');
+
+  const volwassene = await os_('meldcode/open', { stad: STAD, aard: 'huiselijk-geweld',
+    betreft: 'volwassene, ouderenmishandeling' }, TWEE);
+  assert.equal(volwassene.status, 200,
+    'een volwassen slachtoffer van huiselijk geweld hoort hier gewoon te passen');
+});
+
+test('E. de uitkomst volgt uit de twee beslissingen, in alle vier de combinaties', async () => {
+  /* Vier combinaties, vier uitkomsten. Ze worden nergens gekozen: de tabel in
+     meldcode-afweging.js IS de afleiding, en het sluiten neemt hem over. Zonder
+     deze toets zou een mutatie op uitkomstVan() een andere bewering laten zakken
+     en de afleiding onder de verkeerde naam gemeten worden. */
+  const gevallen = [
+    { melden: true, hulp: true, uit: 'beide' },
+    { melden: true, hulp: false, uit: 'gemeld_veilig_thuis' },
+    { melden: false, hulp: true, uit: 'hulp_georganiseerd' },
+    { melden: false, hulp: false, uit: 'geen_actie' }
+  ];
+  for (const g of gevallen) {
+    // geen acute of structurele onveiligheid, anders bijt grendel B eerst
+    const id = await meldcodeTot({ acuut: false, structureel: false });
+    const b = await os_('meldcode/stap', { id, stap: 'beslissen',
+      meldenNoodzakelijk: g.melden, hulpMogelijk: g.hulp,
+      hulpToelichting: g.hulp ? 'Betrokkenen werken mee en de begeleiding houdt de situatie stabiel.' : '',
+      tekst: 'besloten volgens het afwegingskader' }, TWEE);
+    assert.equal(b.status, 200, JSON.stringify(b.body).slice(0, 160));
+    assert.equal(b.body.dossier.uitkomst, g.uit,
+      'melden=' + g.melden + ' en hulp=' + g.hulp + ' hoort "' + g.uit + '" te geven');
+
+    // en het sluiten neemt hem over in plaats van hem opnieuw te vragen
+    const dicht = await os_('meldcode/sluit', { id, uitkomst: 'beide',
+      afweging: 'De afweging staat hierboven en is met de aandachtsfunctionaris doorgenomen.' }, TWEE);
+    assert.equal(dicht.status, 200, JSON.stringify(dicht.body).slice(0, 160));
+    assert.equal(dicht.body.dossier.uitkomst, g.uit,
+      'een meegestuurde uitkomst hoort GENEGEERD te worden; de afweging is de bron');
+  }
 });

@@ -32,7 +32,31 @@
    en wie hem nodig heeft opent hem daar -- met een auditregel. */
 
 const STAPPEN = ['signaleren', 'overleggen', 'gesprek', 'wegen', 'beslissen'];
-const UITKOMSTEN = ['hulp_georganiseerd', 'gemeld_veilig_thuis', 'beide', 'geen_actie'];
+
+/* Het afwegingskader van stap 5 staat in ./meldcode-afweging.js: de twee
+   beslissingen, de grendel ertussen, en de afleiding van de uitkomst. Zie de
+   kop daar voor waarom dat geen keuzelijst mag zijn. */
+const AFW = require('./meldcode-afweging');
+const UITKOMSTEN = AFW.UITKOMSTEN;
+
+/* WAARVOOR EEN MELDCODE-DOSSIER IS, EN WAARVOOR NIET.
+
+   De wettelijke meldcode gaat over huiselijk geweld en kindermishandeling.
+   "Huiselijk geweld" is daarbij niet beperkt tot kinderen: partnergeweld,
+   ouderenmishandeling en eergerelateerd geweld vallen eronder, en een volwassen
+   slachtoffer hoort hier dus gewoon thuis.
+
+   Wat er NIET onder valt is geweld en uitbuiting buiten de huiselijke kring:
+   een werkgever die iemands paspoort houdt, mensenhandel, een stalker die geen
+   familie is. Daar geldt geen meldplicht, gaat de route niet via Veilig Thuis,
+   en past deze vijfstappenketen niet. Daarvoor is er sinds september 2026 de
+   BESCHERMZAAK (server/kern/beschermzaak/), met een eigen keten en een eigen
+   dataklasse.
+
+   Deze lijst weigert dus niet om iemand weg te sturen maar om hem op de
+   verkeerde rails te zetten -- en de weigering noemt de goede rails. Dat is het
+   verschil met "dit is niets voor u" (FOUNDATION.md par. 5.3). */
+const AARD = ['huiselijk-geweld', 'kindermishandeling'];
 
 module.exports = (ctx) => {
   const { nu, rid, schoon, S, audit, wie, poort, save } = ctx;
@@ -40,11 +64,13 @@ module.exports = (ctx) => {
   const vind = id => S().meldcodes.find(m => m.id === String(id || '')) || null;
   const gezet = (m, stap) => (m.stappen || []).some(s => s.stap === stap);
 
-  const beeld = m => ({ id: m.id, stad: m.stad, betreft: m.betreft, casusCodenaam: m.casusCodenaam || null,
+  const beeld = m => ({ id: m.id, stad: m.stad, betreft: m.betreft, aard: m.aard || null,
+    casusCodenaam: m.casusCodenaam || null,
     status: m.status, geopendOp: m.at, aandachtsfunctionaris: m.aandachtsfunctionaris || null,
     stappen: (m.stappen || []).map(s => ({ stap: s.stap, tekst: s.tekst, door: s.door, at: s.at,
       overgeslagen: !!s.overgeslagen })),
     volgende: STAPPEN.find(s => !gezet(m, s)) || null,
+    weging: m.weging || null, besluit: m.besluit || null,
     uitkomst: m.uitkomst || null, gesloten: m.gesloten || null });
 
   function open(req, b) {
@@ -54,6 +80,15 @@ module.exports = (ctx) => {
     if (!g.ok) return g;
     const betreft = schoon(b.betreft, 200);
     if (betreft.length < 5) return { status: 400, error: 'Wie of wat betreft het? Een codenaam of een korte, feitelijke aanduiding.' };
+    /* De aard bepaalt of dit uberhaupt een meldcode-dossier is. Zie AARD boven:
+       de weigering stuurt niemand weg maar wijst de goede rails aan. */
+    const aard = String(b.aard || '');
+    if (!AARD.includes(aard)) {
+      return { status: 400, error: 'Waar gaat dit over: huiselijk-geweld of kindermishandeling? De meldcode geldt ' +
+        'voor die twee. Gaat het om uitbuiting, mensenhandel, stalking door iemand buiten de huiselijke kring, of ' +
+        'geweld dat daar niet onder valt, open dan een BESCHERMZAAK (/api/rtfos/bescherming/open): daar loopt de ' +
+        'route niet via Veilig Thuis en past deze vijfstappenketen niet.' };
+    }
     /* Aan een bestaande hulpvraag hangen mag, en dan gaat de CODENAAM mee en
        niet het dossier: een meldcode-dossier is geen onderdeel van het
        hulpverleningsdossier en hoort er ook niet in te lekken. */
@@ -63,9 +98,10 @@ module.exports = (ctx) => {
       if (!c || c.stad !== g.stad.id) return { status: 404, error: 'Die hulpvraag hoort niet bij deze stad.' };
       codenaam = c.codenaam;
     }
-    const m = { id: rid(), stad: g.stad.id, betreft, casusCodenaam: codenaam,
+    const m = { id: rid(), stad: g.stad.id, betreft, aard, casusCodenaam: codenaam,
       aandachtsfunctionaris: schoon(b.aandachtsfunctionaris, 60) || null,
-      status: 'open', stappen: [], uitkomst: null, gesloten: null, door: w.key, at: nu() };
+      status: 'open', stappen: [], weging: null, besluit: null,
+      uitkomst: null, gesloten: null, door: w.key, at: nu() };
     S().meldcodes.push(m);
     audit(w.key, 'meldcode.geopend', m.id, betreft);
     save();
@@ -104,11 +140,30 @@ module.exports = (ctx) => {
     } else if (tekst.length < 10) {
       return { status: 400, error: 'Schrijf op wat er bij deze stap is gebeurd. Een stap zonder inhoud is een vinkje.' };
     }
+    /* STAP 4 EN 5 DRAGEN NU HET AFWEGINGSKADER (./meldcode-afweging.js). Ze
+       staan hier voor de tekstcontrole hieronder, want een dossier waarin de
+       weging ontbreekt hoort niet eerst op een tekstlengte te struikelen. */
+    if (naam === 'wegen') {
+      const stuk = AFW.keurWeging(b); if (stuk) return stuk;
+    }
+    if (naam === 'beslissen') {
+      const stuk = AFW.keurBesluit(b, m.weging); if (stuk) return stuk;
+    }
     if (naam === 'overleggen' && !m.aandachtsfunctionaris && !schoon(b.metWie, 60)) {
       return { status: 400, error: 'Met wie is overlegd? Een overleg zonder tegenpartij is geen overleg.' };
     }
     if (naam === 'overleggen' && schoon(b.metWie, 60)) m.aandachtsfunctionaris = schoon(b.metWie, 60);
 
+    if (naam === 'wegen') m.weging = { acuut: b.acuut, structureel: b.structureel, door: w.key, at: nu() };
+    if (naam === 'beslissen') {
+      m.besluit = { meldenNoodzakelijk: b.meldenNoodzakelijk, hulpMogelijk: b.hulpMogelijk,
+        hulpToelichting: schoon(b.hulpToelichting, 600) || null, door: w.key, at: nu() };
+      /* De uitkomst wordt hier AFGELEID en bij het sluiten niet opnieuw
+         gevraagd: twee plekken die hetzelfde zeggen lopen uiteen, en hier zou
+         dat betekenen dat een dossier een uitkomst draagt die niet volgt uit de
+         afweging eronder. */
+      m.uitkomst = AFW.uitkomstVan(b.meldenNoodzakelijk, b.hulpMogelijk);
+    }
     if (!Array.isArray(m.stappen)) m.stappen = [];
     m.stappen.push({ stap: naam, tekst, overgeslagen, door: w.key, at: nu() });
     m.status = naam === 'beslissen' ? 'afgewogen' : 'in_behandeling';
@@ -117,47 +172,11 @@ module.exports = (ctx) => {
     return { ok: true, dossier: beeld(m) };
   }
 
-  /* Sluiten: alleen na stap 5, met een uitkomst en een afweging in woorden. */
-  function sluit(req, id, b) {
-    b = b || {};
-    const m = vind(id);
-    if (!m) return { status: 404, error: 'Dit meldcode-dossier bestaat niet.' };
-    if (m.gesloten) return { status: 400, error: 'Dit dossier is al afgesloten.' };
-    const w = wie(req);
-    const g = poort(w, m.stad, 'casus.beheren', 'individual_cases');
-    if (!g.ok) return g;
-    if (!gezet(m, 'beslissen')) {
-      return { status: 400, error: 'Stap 5 (beslissen) staat nog niet in dit dossier. Afsluiten voor de beslissing is ' +
-        'het dossier sluiten zonder besluit.' };
-    }
-    const uitkomst = UITKOMSTEN.includes(b.uitkomst) ? b.uitkomst : null;
-    if (!uitkomst) return { status: 400, error: 'Wat is de uitkomst? ' + UITKOMSTEN.join(', ') + '.' };
-    const afweging = schoon(b.afweging, 1200);
-    if (afweging.length < 20) {
-      return { status: 400, error: 'Schrijf de afweging op. Ook "geen actie" is een besluit, en juist dat besluit moet ' +
-        'later te lezen zijn -- door u, door een collega, door een inspecteur.' };
-    }
-    m.uitkomst = uitkomst;
-    m.status = 'gesloten';
-    m.gesloten = { uitkomst, afweging, door: w.key, at: nu() };
-    audit(w.key, 'meldcode.gesloten', m.id, uitkomst);
-    save();
-    return { ok: true, dossier: beeld(m),
-      melding: 'Afgesloten. Het dossier blijft staan -- wissen kan niet, en dat is met opzet.' };
-  }
+  /* Sluiten en de lijst staan in ./meldcode-sluiten.js -- dit bestand liep over
+     de 10 KB van keuringsregel 13 toen het afwegingskader erbij kwam. */
+  const s = require('./meldcode-sluiten')(ctx, { vind, beeld, gezet, STAPPEN, UITKOMSTEN });
 
-  function lijst(req, stadId) {
-    const w = wie(req);
-    const g = poort(w, stadId, 'casus.lezen', 'individual_cases');
-    if (!g.ok) return g;
-    const rijen = S().meldcodes.filter(m => m.stad === g.stad.id)
-      .sort((a, b) => String(b.at).localeCompare(String(a.at)));
-    return { ok: true, aantal: rijen.length, stappen: STAPPEN, uitkomsten: UITKOMSTEN,
-      open: rijen.filter(m => !m.gesloten).length,
-      dossiers: rijen.slice(0, 200).map(beeld) };
-  }
-
-  return { open, stap, sluit, lijst, vind, beeld, STAPPEN, UITKOMSTEN };
+  return { open, stap, sluit: s.sluit, lijst: s.lijst, vind, beeld, STAPPEN, UITKOMSTEN, AARD };
 };
 module.exports.STAPPEN = STAPPEN;
 module.exports.UITKOMSTEN = UITKOMSTEN;

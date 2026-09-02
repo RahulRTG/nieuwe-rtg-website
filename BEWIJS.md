@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1543 bestanden en 11007 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1543 bestanden en 11008 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 1543 |
-| losse beweringen (`test(...)`) | 11007 |
+| losse beweringen (`test(...)`) | 11008 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 57 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1014 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1350 bestanden, 10680 beweringen.
+1350 bestanden, 10681 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -147,7 +147,7 @@ toets omvalt.
 | `beroepenbieb.test.js` | 3 | gezakt op `liegpoort /api/` | De Beroepen-Bibliotheek van de RTFoundation: twee werelden van elk precies een miljoen gratis leer-apps (technisch/agrarisch + bedrijfsleven). |
 | `beschermd.test.js` | 4 | gezakt op `liegpoort /api/` | Integratietests voor de kinderbescherming in de vriendenlaag: profielen van 15 of jonger (groepen mini/kind/tiener, of rol kind) zijn onvindbaar en onbenaderbaar; alleen een ouder/verzorger voegt contacten voor hen toe. |
 | `beschermstand.test.js` | 6 | gezakt op `===->!==#0` | DE VEILIGE NOODSTAND -- de stand die BESCHERMT in plaats van uitzet. BESTUUR.md grens 6.10: "Een noodknop die alles platlegt, wordt niet gebruikt." De incidentcontrole kende drie standen en alle drie zetten iets UIT. |
-| `beschermzaak.test.js` | 17 | genoemd | DE BESCHERMZAAK: EEN ANDERE DATAKLASSE, EN DE GRENDELS DIE DAT WAARMAKEN HDI.md par. 5.2 zegt dat veiligheidsgegevens een andere dataklasse zijn en geen gevoeliger veld. |
+| `beschermzaak.test.js` | 18 | genoemd | DE BESCHERMZAAK: EEN ANDERE DATAKLASSE, EN DE GRENDELS DIE DAT WAARMAKEN HDI.md par. 5.2 zegt dat veiligheidsgegevens een andere dataklasse zijn en geen gevoeliger veld. |
 | `besluit.test.js` | 11 | -- | DE BESLISVRAAG: een vraag, een antwoord, een vorm. Dit huis stelt "mag dit gebeuren" op tientallen plekken en beantwoordt hem elke keer anders. |
 | `bestand-binding.test.js` | 6 | gezakt op `+->-#1` | Opgeslagen bestanden zijn aan hun NAAM gebonden (server/kluis.js). De versleuteling beschermde al de inhoud van een bestand, maar zei niets over welk bestand het was. |
 | `bestanden.test.js` | 5 | gezakt op `liegpoort /api/` | RTG Bestanden: de kluis met mappen en quotum, versies, delen op codenaam, de prullenbak als zichtbare la en de stukken-upload voor grote bestanden. |

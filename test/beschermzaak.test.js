@@ -407,3 +407,60 @@ test('17. de zaak onthoudt alleen het ID, en de klassen blijven gescheiden', asy
       f + ' laadt de beschermzaak-module; hij hoort alleen de OPSLAG te lezen');
   }
 });
+
+/* ============================================================================
+   ELKE DEUR VOLUIT, EN WAAROM DAT NIET ALLEEN EEN METERKWESTIE IS.
+
+   De toetsen hierboven roepen deze routes aan via `bz()` en `deur()`, die het
+   pad OPBOUWEN uit een voorvoegsel plus een deel. Dat leest prettig en het kost
+   iets: scripts/deltapoort.js leest literalen, en een endpoint dat nergens
+   letterlijk staat, telt voor hem als ongetoetst. Terecht ook -- dezelfde reden
+   waarom server/routes/rtfos/ zijn paden aan de bronkant voluit schrijft: een
+   opgebouwd pad is onzichtbaar voor de poort-audit, de schakelbaarheid en de
+   dubbele-routecontrole.
+
+   Deze toets schrijft ze dus uit, en toetst meteen het enige dat over alle elf
+   hetzelfde is: WIE ER NIET IN MAG. De vier voordeurroutes horen zonder inlog te
+   werken (dat is hun hele bestaansrecht), de zeven kantoorroutes horen dat
+   nadrukkelijk NIET te doen. Een kantoorroute die per ongeluk opengaat, is
+   precies het gat waar de dwaler-trede van scripts/ladder.js op jaagt.
+   ========================================================================== */
+test('18. de kantoordeuren zijn dicht zonder inlog, de voordeur staat open', async () => {
+  const kantoor = [
+    '/api/rtfos/bescherming/zaken',
+    '/api/rtfos/bescherming/open',
+    '/api/rtfos/bescherming/lees',
+    '/api/rtfos/bescherming/stand',
+    '/api/rtfos/bescherming/veiligheid',
+    '/api/rtfos/bescherming/toestemming',
+    '/api/rtfos/bescherming/toestemming-weg',
+    '/api/rtfos/bescherming/overdracht',
+    '/api/rtfos/bescherming/sluit',
+    '/api/rtfos/bescherming/meldcode'
+  ];
+  for (const pad of kantoor) {
+    const r = await post(pad, { id: 'x', stad: STAD });
+    assert.ok(r.status === 401 || r.status === 403,
+      pad + ' liet een verzoek ZONDER kantoorinlog door met ' + r.status +
+      '; hier hangt een dossier over geweld achter');
+  }
+
+  /* En de vier aan de andere kant. Ze horen te ANTWOORDEN zonder inlog -- wie
+     hier aanklopt heeft vaak geen account -- maar niet met een 5xx en niet met
+     inhoud van een ander. Op een leeg of onzinnig lijf hoort een nette
+     weigering te komen. */
+  const steden = await post('/api/bescherming/deur/steden', {});
+  assert.equal(steden.status, 200, 'de stedenlijst hoort zonder inlog te werken');
+
+  const start = await post('/api/bescherming/deur/start', {});
+  assert.equal(start.status, 400, 'een leeg verzoek hoort een reden te krijgen, geen zaak');
+  assert.ok(start.body.error);
+
+  const stand = await post('/api/bescherming/deur/stand', { code: 'BESTAATNIET' });
+  assert.ok(stand.status === 200 || stand.status === 404,
+    'een onbekende code hoort niets te lekken en geen 5xx te geven; kreeg ' + stand.status);
+
+  const intrekken = await post('/api/bescherming/deur/intrekken', { code: 'BESTAATNIET' });
+  assert.ok(intrekken.status === 404 || intrekken.status === 400,
+    'intrekken op een onbekende code hoort netjes te weigeren; kreeg ' + intrekken.status);
+});

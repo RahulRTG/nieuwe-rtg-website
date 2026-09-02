@@ -386,6 +386,9 @@
       "gedachtenVan",
       "status"
     ],
+    "gegevenskaart": [
+      "gegevenskaart"
+    ],
     "geld": [
       "geldbeleid",
       "geldgraaf"
@@ -445,9 +448,6 @@
     "inzagekaart": [
       "inzagekaartVan",
       "status"
-    ],
-    "gegevenskaart": [
-      "gegevenskaart"
     ],
     "journaal": [
       "boardroomAuth",
@@ -1560,6 +1560,15 @@
     ],
     "scim-groepen": [
       "tenant"
+    ],
+    "service": [
+      "magBalie",
+      "serviceBevestiging",
+      "serviceKeuzes",
+      "serviceLoop",
+      "serviceMachtiging",
+      "serviceMens",
+      "serviceZaken"
     ],
     "sleutelwoorden": [
       "swInfo",

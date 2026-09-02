@@ -585,6 +585,38 @@ release-provenance (geen SLSA, geen SBOM, geen build-attestatie) en een zoeker
 die zelf tegenvoorbeelden genereert — `scripts/sabotage.js` overtreedt elke wet
 één keer met opzet, en dat is iets anders dan zoeken.
 
+**`SERVICE.md` is de laag die de hulplijnen orkestreert** -- RTG Service: niet
+een vijfde klantenservice naast de vier die er al waren (de AI van de RTG Pass,
+de menselijke concierge, de ledenbalie en RTG Bijstand), maar de
+GEMEENSCHAPPELIJKE ENVELOP eromheen. Lees die voor je iets bouwt waarmee een
+gebruiker om hulp vraagt of waarmee een medewerker in het dossier van iemand
+anders kijkt. Die vier blijven bepalen wat iets BETEKENT -- een klacht blijft van
+`kern/ledenbalie-zaken.js` -- en Service bepaalt wie eraan werkt, sinds wanneer,
+met welke bevoegdheid en wat de melder ziet. Het fundamentele object is daarom
+een **Zaak met een tijdlijn** en geen ticket met een status: stand, eigenaar,
+prioriteit en de vier klokken zijn er allemaal uit AF TE LEIDEN, en
+`kern/service/loop.js` is de enige module die die tijdlijn schrijft. Drie dingen
+die niet mogen sneuvelen: **een zaak weet waarover het gaat en opent niets** (het
+veld `betrokken` is een soort plus een code, en `verwijzing()` gooit al het
+andere weg -- gegevens vragen een machtiging, en die vraagt een bevestiging van
+het lid), **een machtiging kan alleen versmallen** (de doorsnede met wat het team
+nodig heeft, met verval als BEREKENDE toestand en een tweede handtekening onder
+zwaar werk -- de vorm van `kern/command/bijstand.js`, met de zaak als bereik), en
+**"ik wil een mens" is een contract en geen beleefdheid**. Dat laatste herstelt
+een echt gebrek: `kern/ai.js` zette voor de RTG Pass hard `needsConcierge = false`,
+en dat klopte als merkregel (de RTG Pass krijgt De Rechterhand niet) maar liet
+een lid nergens bij een MENS uitkomen terwijl de ledenbalie hem gewoon helpt.
+`kern/service/mens.js` haalt die twee uit elkaar -- De Rechterhand is
+UITVOERING en blijft gekocht, een mens bij een probleem is een ONDERGRENS voor
+elk lid met een account -- en `test/servicemens.test.js` houdt per pas vast dat
+hij die zelf kan aanvragen. De vaste steuncode van de balie is vervangen door een
+**bevestiging** (het lid ziet wie, waarvoor en wat er opengaat, en drukt zelf),
+met de code als terugval: zes cijfers, vijf minuten, een keer, aan die ene zaak
+gebonden. Par. 5 heeft vier klokken waarvan de vierde -- wacht op de melder --
+van de andere drie wordt AFGETROKKEN, want zonder hem meet je de melder; par. 9
+staat er even groot bij: de kale meetronde over de eenentwintig routes vond twee
+fouten die geen enkele toets zag en die er bij het LEZEN allebei prima uitzagen.
+
 **`ONTWERP.md` is het RTG Design System 2.0** — de vormtaal: merk-elementen
 tegenover werk-elementen (Bodoni is ceremonieel en staat op een gesloten lijst
 rollen), de drie modi World/Pro/Command, uitzonderingsgestuurd ontwerpen, kleur

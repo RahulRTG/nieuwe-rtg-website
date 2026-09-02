@@ -164,10 +164,10 @@
           sheet.appendChild(tip);
         })
         .catch(function () { if (sheet) sheet.querySelector('.bss-wat').textContent = 'De uitleg is er zo weer; probeer het straks opnieuw.'; });
+      hulplaag();
     }
-    window.RTGGids = { open: openGids, sluit: sluit };
-    document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') sluit(); });
-  }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
-  else start();
-})();
+
+    /* De hulplaag (4b) staat in ./basis-02b.js: dit bestand ging er met 15,6 KB
+       mee over de omvangsgrens van keuringsregel 13. De delen worden rauw
+       aaneengeplakt op alfabet (scripts/bundel.js), dus de knip loopt gewoon
+       midden door start() heen -- net als die tussen basis-01 en -01b. */

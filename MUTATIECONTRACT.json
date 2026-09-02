@@ -1,27 +1,27 @@
 {
  "stempel": {
-  "op": "2026-09-01T18:24:06.848Z",
-  "commit": "2e969458a",
+  "op": "2026-09-02T19:40:33.999Z",
+  "commit": "d09f29a4",
   "boomVuil": true,
-  "boomAnders": 0,
+  "boomAnders": 12,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 4739,
-  "geclassificeerd": 4739,
+  "totaal": 4760,
+  "geclassificeerd": 4760,
   "perStand": {
-   "BLOCKED_BY_TEST_FIXTURE": 3273,
-   "NOT_APPLICABLE": 1088,
-   "PROTECTED": 296,
-   "INTENTIONALLY_NON_IDEMPOTENT": 82
+   "BLOCKED_BY_TEST_FIXTURE": 3274,
+   "NOT_APPLICABLE": 1095,
+   "PROTECTED": 300,
+   "INTENTIONALLY_NON_IDEMPOTENT": 91
   },
-  "vastgesteldDoorMens": 1493,
+  "vastgesteldDoorMens": 1514,
   "afgeleidDoorScript": 3246,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 3894,
+   "AUTHENTICATED": 3915,
    "PUBLIC": 113,
    "OBJECT_SCOPED": 716,
    "(niet af te leiden -- vraagt een verklaring)": 1,
@@ -32,7 +32,7 @@
    "kale ronde: beschermd": 129,
    "kale ronde: onbeschermd": 88,
    "kale ronde: geen uitspraak": 4512,
-   "niet gemeten": 10
+   "niet gemeten": 31
   },
   "voorstellen": {},
   "metingVan": "2026-09-01T16:38:26.262Z"
@@ -54,6 +54,102 @@
    "route": "POST /api/lab2/bewoner/studie",
    "bedoeld": "AUTHENTICATED",
    "waargenomen": "PUBLIC",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/office/service/bericht",
+   "bedoeld": "CAPABILITY_GATED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/office/service/bevestiging/code",
+   "bedoeld": "CAPABILITY_GATED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/office/service/bevestiging/vraag",
+   "bedoeld": "CAPABILITY_GATED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/office/service/eigenaar",
+   "bedoeld": "CAPABILITY_GATED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/office/service/koppel",
+   "bedoeld": "CAPABILITY_GATED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/office/service/machtiging/intrek",
+   "bedoeld": "CAPABILITY_GATED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/office/service/machtiging/tekenbij",
+   "bedoeld": "CAPABILITY_GATED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/office/service/machtigingen",
+   "bedoeld": "CAPABILITY_GATED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/office/service/stand",
+   "bedoeld": "CAPABILITY_GATED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/office/service/wachtrij",
+   "bedoeld": "CAPABILITY_GATED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/office/service/weeg",
+   "bedoeld": "CAPABILITY_GATED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/office/service/zaak",
+   "bedoeld": "CAPABILITY_GATED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/service/bericht",
+   "bedoeld": "OBJECT_SCOPED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/service/bevestig",
+   "bedoeld": "OBJECT_SCOPED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/service/mens",
+   "bedoeld": "OBJECT_SCOPED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/service/weiger",
+   "bedoeld": "OBJECT_SCOPED",
+   "waargenomen": "AUTHENTICATED",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
   }
  ],
@@ -3260,7 +3356,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast, en de bank moet live zijn",
@@ -3287,7 +3383,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast, en de bank moet live zijn",
@@ -3314,7 +3410,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast, en de bank moet live zijn",
@@ -3341,7 +3437,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast",
@@ -3368,7 +3464,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "velden",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast, en de bank moet live zijn",
@@ -3422,7 +3518,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast, en de bank moet live zijn",
@@ -3449,7 +3545,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast, en de bank moet live zijn",
@@ -3611,7 +3707,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast",
@@ -3773,7 +3869,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast, en de bank moet live zijn",
@@ -3800,7 +3896,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast, en de bank moet live zijn",
@@ -3854,7 +3950,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast, en de bank moet live zijn",
@@ -3989,7 +4085,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast, en de bank moet live zijn",
@@ -4097,7 +4193,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast, en de bank moet live zijn",
@@ -4124,7 +4220,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast, en de bank moet live zijn",
@@ -7403,7 +7499,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -7457,7 +7553,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -15465,7 +15561,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -55598,7 +55694,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -62366,6 +62462,270 @@
     "grond": null,
     "hindernis": null
    },
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "office.service.bericht",
+   "route": "POST /api/office/service/bericht",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "CAPABILITY_GATED",
+    "bewakers": [
+     "officeAuth",
+     "balieAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "office.service.bevestiging.code",
+   "route": "POST /api/office/service/bevestiging/code",
+   "semantiek": {
+    "klasse": "hooguitEens"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "CAPABILITY_GATED",
+    "bewakers": [
+     "officeAuth",
+     "balieAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "office.service.bevestiging.vraag",
+   "route": "POST /api/office/service/bevestiging/vraag",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "CAPABILITY_GATED",
+    "bewakers": [
+     "officeAuth",
+     "balieAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "office.service.eigenaar",
+   "route": "POST /api/office/service/eigenaar",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "CAPABILITY_GATED",
+    "bewakers": [
+     "officeAuth",
+     "balieAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "office.service.koppel",
+   "route": "POST /api/office/service/koppel",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "CAPABILITY_GATED",
+    "bewakers": [
+     "officeAuth",
+     "balieAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "office.service.machtiging.intrek",
+   "route": "POST /api/office/service/machtiging/intrek",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "CAPABILITY_GATED",
+    "bewakers": [
+     "officeAuth",
+     "balieAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "office.service.machtiging.tekenbij",
+   "route": "POST /api/office/service/machtiging/tekenbij",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "CAPABILITY_GATED",
+    "bewakers": [
+     "officeAuth",
+     "balieAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "office.service.machtigingen",
+   "route": "POST /api/office/service/machtigingen",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "CAPABILITY_GATED",
+    "bewakers": [
+     "officeAuth",
+     "balieAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "office.service.stand",
+   "route": "POST /api/office/service/stand",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "CAPABILITY_GATED",
+    "bewakers": [
+     "officeAuth",
+     "balieAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "office.service.wachtrij",
+   "route": "POST /api/office/service/wachtrij",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "CAPABILITY_GATED",
+    "bewakers": [
+     "officeAuth",
+     "balieAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "office.service.weeg",
+   "route": "POST /api/office/service/weeg",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "CAPABILITY_GATED",
+    "bewakers": [
+     "officeAuth",
+     "balieAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "office.service.zaak",
+   "route": "POST /api/office/service/zaak",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "CAPABILITY_GATED",
+    "bewakers": [
+     "officeAuth",
+     "balieAuth"
+    ]
+   },
+   "bewijs": null,
    "stand": "NOT_APPLICABLE",
    "herkomst": "mens",
    "voorstel": null,
@@ -71405,7 +71765,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -71852,7 +72212,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
@@ -71987,7 +72347,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
@@ -72203,7 +72563,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
@@ -72930,7 +73290,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
@@ -73038,7 +73398,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "velden",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
@@ -88144,6 +88504,195 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "service.bericht",
+   "route": "POST /api/service/bericht",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "service.bevestig",
+   "route": "POST /api/service/bevestig",
+   "semantiek": {
+    "klasse": "hooguitEens"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "service.bevestigingen",
+   "route": "POST /api/service/bevestigingen",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "service.keuzes",
+   "route": "POST /api/service/keuzes",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "service.mens",
+   "route": "POST /api/service/mens",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "service.mijn",
+   "route": "POST /api/service/mijn",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "service.open",
+   "route": "POST /api/service/open",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "service.weiger",
+   "route": "POST /api/service/weiger",
+   "semantiek": {
+    "klasse": "hooguitEens"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "service.zaak",
+   "route": "POST /api/service/zaak",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "site.ai",
    "route": "POST /api/site/ai",
    "semantiek": {
@@ -96096,7 +96645,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -97365,7 +97914,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -111401,7 +111950,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,

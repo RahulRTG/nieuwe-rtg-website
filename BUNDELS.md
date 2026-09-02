@@ -9,7 +9,7 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**59 bundels, 460 delen, 0 zonder onderwerp.**
+**59 bundels, 461 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
@@ -546,7 +546,7 @@ omlaag.
 
 ## `shared/basis.js`
 
-`public/shared/basis/` -- 4 delen, 603 regels in de delen
+`public/shared/basis/` -- 5 delen, 760 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -554,6 +554,7 @@ omlaag.
 | `basis-01b.js` | Vervolg van basis-01 (op de 10 kB-grens geknipt na de thema-toevoeging van de consolidatieronde; de bundelvolgorde is... |
 | `basis-01c.js` | de toegankelijkheidshelpers van de gedeelde laag |
 | `basis-02.js` | 5. het lopende werk: de gangreserve-laag van het huis |
+| `basis-02b.js` | Vervolg van basis-02: de hulplaag van de app-gids, plus de afsluiting van start() en van de omhulling |
 
 ## `shared/bediening.js`
 

@@ -2093,7 +2093,7 @@ const OFFICE_CODE = process.env.OFFICE_CODE || (DEMO ? 'RTG-OFFICE' : crypto.ran
    die draagt ze mee in elke system prompt. */
 const stemming = require('./kern/rahul/stemming')({ db, save, crypto });
 const geloof = require('./kern/geloof')({ accounts });
-const { aiSystemPrompt, cannedAnswer, generateAiReply, convOf, memberSays, noteerBeurt, conciergeInbox } =
+const { aiSystemPrompt, cannedAnswer, generateAiReply, convOf, memberSays, noteerBeurt, conciergeInbox, zetServiceOverdracht } =
   maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice, i18n, ledenInhoudVan,
     stemmingVoor: (c) => stemming.stemmingVoor(c), geloofRegel: (key) => {
       const id = idVanKey(key);
@@ -2236,7 +2236,7 @@ const hulp = {
      paar doorgeven zonder de andere. */
   ordersVanKlant, ordersVanZaak, pasTegoedToe, herstelTegoed, path, pickupCode, pinSlot, pushLive, rememberSession,
   reserveerTafel, rtf, rtmail, save, schoon, sessieregister, sendPush, sendPushToUser, sociaal, sseToCustomer,
-  sseToOffice, sseToSupplier, supplierState, ticketsVoorSlot, verdienPunten, zetRtgai, zorgContact,
+  sseToOffice, sseToSupplier, supplierState, ticketsVoorSlot, verdienPunten, zetRtgai, zetServiceOverdracht, zorgContact,
   /* Voor "wie van je vrienden is er nu" (kern/spellen/presence.js): de levende
      lijst van open live-verbindingen, en dezelfde functiepoort die
      /api/member/spel zou weigeren. Ze gaan naar de KERNLAGEN en niet naar de

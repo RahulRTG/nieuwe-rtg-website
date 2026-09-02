@@ -127,21 +127,13 @@ require('./theater')(kern, hulp);
    de natuurlijke naad van dit bestand -- alles hierboven BOUWT de kern op,
    vanaf daar wordt er alleen nog opgehangen. De volgorde daarbinnen is
    gedrag en geen smaak; zie de kop van dat bestand. */
-/* De ledenbalie (kern/ledenbalie*.js): de afdeling die een lid mag HELPEN --
-   zoeken op codenaam of steuncode, het dossier inzien met een reden erbij, een
-   wachtwoordherstel in gang zetten, een klacht vastleggen en een abo-wijziging
-   VOORSTELLEN.
-
-   Wat hij met opzet NIET kan (merkregels, geen voorzichtigheid): een naam,
-   adres of nummer zien; een wachtwoord zien of zetten; Lifestyle of Business
-   toekennen. herstelStart komt uit routes/auth/herstel.js -- DEZELFDE stroom als
-   /api/auth/forgot, geen tweede kopie. Late binding, want die route hangt later. */
-Object.assign(kern, require('../kern/ledenbalie')({
-  db, save, accounts, onboarding,
-  geldPasprijzen: () => (kern.geldPasprijzen ? kern.geldPasprijzen() : null),
-  magBoardroom: (k) => (kern.magBoardroom ? kern.magBoardroom(k) : false),
-  herstelStart: (u, req) => (kern.herstelStart ? kern.herstelStart(u, req) : null)
-}));
+/* DE HULPLAAG: de ledenbalie en RTG Service, in ./hulplaag.js. Samen omdat ze
+   dezelfde ZETEL delen -- werk aan het account van een lid hoort herleidbaar te
+   zijn tot een mens, en dat geldt aan de balie en in een servicezaak even hard.
+   Eigen bestand om de reden van ./theater.js: dit bestand stond met 10.141 byte
+   al op 99% van de grens van keuringsregel 13, dus elke regel erbij duwde hem
+   eroverheen. */
+require('./hulplaag')(kern, hulp);
 
 /* LET OP DE VOLGORDE: dit MOET boven de regel hieronder staan die de routers
    ophangt. routes/rtfos/index.js pakt zijn kern bij het ophangen uit elkaar

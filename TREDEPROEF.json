@@ -3,6 +3,8 @@
   "trede": "start",
   "tredeNaam": "Trede 0 · De smalle snee",
   "demoModus": true,
+  "geldAan": false,
+  "geldWaarom": "RTG_BETALEN_UIT=1: onder trede 4 weigert elke betaalactie fail-closed (503 met code betalingen-uit), en dat wordt hier beproefd in plaats van aangenomen",
   "demoWaarom": "RTG_DEMO=1 geeft de korte inlog waarmee de rondgang een sessie krijgt (zie scripts/lib/proefserver.js); geen enkele poort gaat erdoor open, en de schakelkast al helemaal niet",
   "functiesAan": 19,
   "functiesTotaal": 204,
@@ -18,10 +20,8 @@
   "beproefdNiet503": 0,
   "beproefdNiet503Lijst": [],
   "beproefdGeenAntwoord": 0,
-  "beproefdVoorDeSchakelaar": 1,
-  "beproefdVoorDeSchakelaarLijst": [
-    "POST /api/betaal/webhook (200)"
-  ],
+  "beproefdVoorDeSchakelaar": 0,
+  "beproefdVoorDeSchakelaarLijst": [],
   "voorDeSchakelaar": [
     {
       "route": "POST /api/betaal/webhook",
@@ -226,7 +226,7 @@
     }
   ],
   "rondgangKreegSessie": true,
-  "routesGeraakt": 36,
+  "routesGeraakt": 35,
   "rondgangDektNiet": "alles wat een EIGEN ACCOUNT eist (de korte inlog geeft een pas-sessie zonder account, dus /api/ik weigert terecht), en alles wat een TWEEDE MENS eist -- een gesprek, een verbinding, een uitnodiging. member-dm valt daaronder: die route vraagt een withKey en een actieve verbinding, en is met een enkele sessie niet te beproeven.",
   "watDitNietDoet": "de rondgang loopt niet door bestellen, betalen en een bevestiging -- die horen bij hogere treden en vragen een zaak, een kassa en een betaalrail. En alles hier is HTTP: cron, bus en AI-gereedschap komen er niet langs.",
   "treden": [
@@ -240,7 +240,7 @@
       "beproefdNiet503": 0,
       "rondgangGezakt": 0,
       "rondgangOnvoltooid": 0,
-      "beproefdVoorDeSchakelaar": 1
+      "beproefdVoorDeSchakelaar": 0
     },
     {
       "trede": "ontmoeten",
@@ -252,54 +252,54 @@
       "beproefdNiet503": 0,
       "rondgangGezakt": 0,
       "rondgangOnvoltooid": 0,
-      "beproefdVoorDeSchakelaar": 1
+      "beproefdVoorDeSchakelaar": 0
     },
     {
       "trede": "partners",
       "naam": "Trede 2 · De partners erbij",
-      "functiesAan": 29,
-      "routesInTrede": 1407,
-      "routesBuitenTrede": 3244,
+      "functiesAan": 30,
+      "routesInTrede": 1408,
+      "routesBuitenTrede": 3243,
       "zuiverLekken": 0,
       "beproefdNiet503": 0,
       "rondgangGezakt": 0,
-      "rondgangOnvoltooid": 1,
-      "beproefdVoorDeSchakelaar": 1
+      "rondgangOnvoltooid": 0,
+      "beproefdVoorDeSchakelaar": 0
     },
     {
       "trede": "bestellen",
       "naam": "Trede 3 · De vloer draait",
-      "functiesAan": 33,
-      "routesInTrede": 1445,
-      "routesBuitenTrede": 3206,
+      "functiesAan": 34,
+      "routesInTrede": 1446,
+      "routesBuitenTrede": 3205,
       "zuiverLekken": 0,
       "beproefdNiet503": 0,
       "rondgangGezakt": 0,
-      "rondgangOnvoltooid": 3,
-      "beproefdVoorDeSchakelaar": 1
+      "rondgangOnvoltooid": 0,
+      "beproefdVoorDeSchakelaar": 0
     },
     {
       "trede": "fundament",
       "naam": "Trede 4 · Het fundament (de wig)",
-      "functiesAan": 37,
-      "routesInTrede": 1474,
-      "routesBuitenTrede": 3177,
+      "functiesAan": 38,
+      "routesInTrede": 1475,
+      "routesBuitenTrede": 3176,
       "zuiverLekken": 0,
       "beproefdNiet503": 0,
       "rondgangGezakt": 0,
-      "rondgangOnvoltooid": 3,
+      "rondgangOnvoltooid": 0,
       "beproefdVoorDeSchakelaar": 1
     },
     {
       "trede": "stad",
       "naam": "Trede 5 · De stad",
-      "functiesAan": 54,
-      "routesInTrede": 2010,
-      "routesBuitenTrede": 2641,
+      "functiesAan": 55,
+      "routesInTrede": 2011,
+      "routesBuitenTrede": 2640,
       "zuiverLekken": 0,
       "beproefdNiet503": 0,
       "rondgangGezakt": 0,
-      "rondgangOnvoltooid": 3,
+      "rondgangOnvoltooid": 0,
       "beproefdVoorDeSchakelaar": 1
     },
     {

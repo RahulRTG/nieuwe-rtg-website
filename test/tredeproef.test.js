@@ -125,6 +125,17 @@ test('3d. de drie uitkomsten van een stap lopen niet door elkaar', () => {
     'staat de functie toch al uit, dan is er niets aan de hand');
   /* En een stap die antwoordt maar niet opleverde wat de volgende nodig heeft. */
   assert.deepEqual(o({ aanInTrede: true, status: 200, klaar: false }), { geslaagd: false, onvoltooid: false });
+
+  /* HET TWEEDE SLOT: geld. Onder trede 4 hoort een betaalactie fail-closed te
+     weigeren met 503 EN code 'betalingen-uit' (RTG_BETALEN_UIT=1). Twee
+     weigeringen met dezelfde statuscode die iets anders zeggen -- wie alleen
+     naar 503 kijkt, kan de belofte van trede 3 niet nakijken. */
+  assert.deepEqual(o({ aanInTrede: true, geldUit: true, status: 503, code: 'betalingen-uit' }),
+    { geslaagd: true, onvoltooid: false }, 'de betaalstop weigert zoals beloofd');
+  assert.deepEqual(o({ aanInTrede: true, geldUit: true, status: 503, code: 'iets-anders' }),
+    { geslaagd: false, onvoltooid: false }, 'een 503 zonder die code is een ANDERE weigering en bewijst de belofte niet');
+  assert.deepEqual(o({ aanInTrede: true, geldUit: true, status: 200 }),
+    { geslaagd: false, onvoltooid: false }, 'en een geslaagde betaling onder trede 4 is precies wat niet mag');
 });
 
 test('4. elke trede noemt bestaande functies, en trede 0 is de kleinste', () => {

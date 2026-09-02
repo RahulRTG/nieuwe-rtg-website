@@ -106,10 +106,10 @@ van de <!--getal:trede.routes-->4740<!--/getal--> API-routes open, en <!--getal:
 |---|---|---|---|---|---|---|
 | 0 · De smalle snee | 19/204 | 331 | 0 | 0 | 0 | 0 |
 | 1 · Leden onder elkaar | 26/204 | 544 | 0 | 0 | 0 | 0 |
-| 2 · De partners erbij | 29/204 | 1407 | 0 | 0 | 0 | 1 |
-| 3 · De vloer draait | 33/204 | 1445 | 0 | 0 | 0 | 3 |
-| 4 · Het fundament | 37/204 | 1474 | 0 | 0 | 0 | 3 |
-| 5 · De stad | 54/204 | 2010 | 0 | 0 | 0 | 3 |
+| 2 · De partners erbij | 30/204 | 1408 | 0 | 0 | 0 | 0 |
+| 3 · De vloer draait | 34/204 | 1446 | 0 | 0 | 0 | 0 |
+| 4 · Het fundament | 38/204 | 1475 | 0 | 0 | 0 | 0 |
+| 5 · De stad | 55/204 | 2011 | 0 | 0 | 0 | 0 |
 | 6 · Alles open | 204/204 | 4651 | 0 | 0 | 0 | 0 |
 
 **En een derde uitslag: de rondgang.** Zuiver en beproefd zeggen allebei dat er
@@ -126,14 +126,23 @@ trede 0 is dat een rondgang van zes geslaagde en negen correct geweigerde
 stappen; op trede 6 lopen alle vijftien, inclusief de hele wig — **een zaak
 vinden, zijn kaart lezen, bestellen en betalen**.
 
-**Een derde uitkomst: onvoltooid.** Op trede 2 tot en met 5 staat `bestellen`
-open terwijl `ov-suppliers` (`/api/suppliers`, de lijst met zaken) pas op trede 6
-opengaat. De ketenstappen kunnen dan niet draaien: hun functie staat aan, maar
-wat ze voedt niet. Dat is geen zakker — de code mankeert niets — maar een
-uitspraak over de **ladder**, en hij staat apart geteld zodat niemand code gaat
-repareren die heel is. Of dat een gat in de ladder is of de bedoeling (een gast
-scant de tafel in plaats van te bladeren, zie `LINK.md`), is een besluit en geen
-meting.
+**Een derde uitkomst: onvoltooid** — een stap wiens functie aan staat, maar wiens
+voeding op die trede nog dicht zit. Geen zakker (de code mankeert niets) maar een
+uitspraak over de **ladder**, apart geteld zodat niemand code gaat repareren die
+heel is.
+
+Die uitkomst verdiende zich meteen terug. Op trede 2 t/m 5 stond `bestellen`
+open terwijl `ov-suppliers` (`/api/suppliers`, het partneroverzicht) pas op
+trede 6 openging: een lid kon op "de vloer draait" geen zaak vínden om bij te
+bestellen. De code deed precies wat de fase-lijst zei, en de fase-lijst kwam niet
+rond. `ov-suppliers` staat nu in trede 2, waar de partners binnenkomen, en de
+kolom staat overal op nul.
+
+**Geld heeft een tweede slot, en dat is niet de schakelkast.** Trede 3 belooft de
+complete werkvloer *zonder geld*, afgedwongen met `RTG_BETALEN_UIT=1`. De proef
+zet die vlag nu zelf onder trede 4 en kijkt of de betaalstap dan weigert met 503
+**én** `code: 'betalingen-uit'` — twee weigeringen met dezelfde statuscode die
+iets anders zeggen. Wie alleen naar 503 kijkt, kan die belofte niet nakijken.
 
 Wat de rondgang niet dekt: alles wat een **eigen account** eist (de korte inlog
 geeft een pas-sessie zonder account, dus `/api/ik` weigert daar terecht) en alles

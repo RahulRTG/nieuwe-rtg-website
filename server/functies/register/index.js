@@ -197,8 +197,19 @@ const FASE_ONTMOETEN = [...FASE_START,
 /* Trede 2. De partnerkant komt binnen: de partner-app, vacatures en
    solliciteren. member-werk en supplier-apply zitten in KOPPELS aan elkaar
    vast -- solliciteren zonder vacatures werkt niet, en andersom. Er gaat hier
-   nog geen geld om. */
-const FASE_PARTNERS = [...FASE_ONTMOETEN, 'supplier', 'supplier-apply', 'member-werk'];
+   nog geen geld om.
+
+   EN HET PARTNEROVERZICHT (`ov-suppliers`, /api/suppliers). Dat stond tot 2
+   september 2026 pas in trede 6, en dat was een gat dat niemand kon zien: de
+   partners kwamen op trede 2 binnen en de LIJST met partners bleef tot "alles
+   open" dicht. Op trede 3 stond `bestellen` daardoor open terwijl een lid geen
+   zaak kon vinden om bij te bestellen -- de code deed precies wat hier stond, en
+   wat hier stond kwam niet rond.
+
+   Gevonden door scripts/tredeproef.js, die de rondgang van een lid ECHT loopt
+   (een zaak vinden, de kaart lezen, bestellen, betalen) en meldt wanneer een
+   stap niet kan draaien omdat wat hem voedt op die trede nog dicht zit. */
+const FASE_PARTNERS = [...FASE_ONTMOETEN, 'supplier', 'supplier-apply', 'member-werk', 'ov-suppliers'];
 
 /* Trede 3. De vloer draait: bestellen en bezorgen, de kassa, het personeel en
    de aansturing. Nog steeds zonder betaalrail -- met RTG_BETALEN_UIT=1 weigert

@@ -176,6 +176,9 @@ const RONDGANG = [
     lijfUit: (staat) => (staat.zaak && staat.gerecht ? { supplierCode: staat.zaak, items: [{ id: staat.gerecht, qty: 1 }] } : null),
     bewaar: (d, staat) => { if (d && d.order) staat.ref = d.order.ref; } },
   { wat: 'die bestelling betalen', route: 'POST /api/order/pay', functie: 'bestellen', vanaf: 'bestellen',
+    /* De functie `bestellen` opent deze route al op trede 3, maar het GELD gaat
+       pas op trede 4 aan. Onder die trede hoort hij fail-closed te weigeren. */
+    geldVanaf: 'fundament',
     lijfUit: (staat) => (staat.ref ? { ref: staat.ref } : null) }
 ];
 
@@ -193,9 +196,19 @@ const RONDGANG = [
                  trede niet draaien. Een uitspraak over de LADDER, niet over de
                  code -- en dus geen zakker.
      ZAKT        al het andere. */
-function oordeelStap({ aanInTrede, status, voedingMist, klaar }) {
+function oordeelStap({ aanInTrede, status, voedingMist, klaar, geldUit, code }) {
   if (voedingMist) return { geslaagd: !aanInTrede, onvoltooid: !!aanInTrede };
   if (!aanInTrede) return { geslaagd: status === 503, onvoltooid: false };
+  /* GELD HEEFT EEN TWEEDE SLOT, en dat is niet de schakelkast. LAUNCH.md zegt
+     over trede 3: de complete werkvloer ZONDER GELD, afgedwongen met
+     RTG_BETALEN_UIT=1. Die stop hangt vóór de body-parser en weigert met 503 en
+     `code: 'betalingen-uit'`.
+
+     Twee weigeringen met dezelfde statuscode dus, en ze zeggen iets anders: de
+     ene is "deze functie staat uit", de andere is "dit huis doet geen geld".
+     Wie alleen naar 503 kijkt, kan niet zien of de belofte van trede 3
+     werkelijk wordt nagekomen -- daarom kijkt dit ook naar de code. */
+  if (geldUit) return { geslaagd: status === 503 && code === 'betalingen-uit', onvoltooid: false };
   return { geslaagd: status !== null && status < 400 && klaar !== false, onvoltooid: false };
 }
 
@@ -258,6 +271,15 @@ async function meet(tredeId) {
 
   const functies = require(path.join(WORTEL, 'server', 'functies'));
   const trede = functies.FASES.find(f => f.id === tredeId);
+  /* HET GELD GAAT PAS OP TREDE 4 AAN, en dat is geen functieschakelaar maar een
+     omgevingsvlag (LIVEGANG.md: RTG_BETALEN_UIT=1 laat elke betaalactie
+     fail-closed weigeren). Een proef die hem niet zet, laat trede 3 betalingen
+     doen die daar niet horen -- en meldt dan groen over een belofte die hij niet
+     heeft beproefd. Hij moet vóór het laden staan. */
+  const tredeNr = functies.FASES.findIndex(f => f.id === tredeId);
+  const geldNr = functies.FASES.findIndex(f => f.id === 'fundament');
+  const geldAan = tredeNr >= geldNr;
+  if (!geldAan) process.env.RTG_BETALEN_UIT = '1';
   if (!trede) throw new Error('onbekende trede: ' + tredeId + ' (' + functies.FASES.map(f => f.id).join(', ') + ')');
   /* Trede 6 zet alles open; `aan: null` betekent daar de hele catalogus. */
   const aan = new Set(trede.aan || functies.FUNCTIES.map(f => f.id));
@@ -390,9 +412,11 @@ async function meet(tredeId) {
        te weigeren. Een 200 daar is een lek dat de steekproef gemist kan hebben,
        en een 404 of 401 betekent dat de poort niet gepasseerd is maar omzeild. */
     const aanInTrede = aan.has(stap.functie);
-    const oordeel = oordeelStap({ aanInTrede, status, voedingMist: false,
-      klaar: stap.klaar ? stap.klaar(staat) : undefined });
-    rondgang.push({ ...stap, aanInTrede, verwacht: aanInTrede ? '<400' : '503', status, ...oordeel, pogingen });
+    const geldUit = !!stap.geldVanaf && !geldAan;
+    const oordeel = oordeelStap({ aanInTrede, status, voedingMist: false, geldUit,
+      code: data && data.code, klaar: stap.klaar ? stap.klaar(staat) : undefined });
+    rondgang.push({ ...stap, aanInTrede, verwacht: geldUit ? '503g' : aanInTrede ? '<400' : '503',
+      status, ...oordeel, pogingen });
   }
 
   /* Een route buiten de trede hoort 503 te geven. Een ANDER antwoord is de
@@ -408,6 +432,8 @@ async function meet(tredeId) {
     gemetenOp: new Date().toISOString().slice(0, 10),
     trede: trede.id, tredeNaam: trede.naam,
     demoModus: true,
+    geldAan,
+    geldWaarom: geldAan ? 'deze trede draagt de betaalrail' : 'RTG_BETALEN_UIT=1: onder trede 4 weigert elke betaalactie fail-closed (503 met code betalingen-uit), en dat wordt hier beproefd in plaats van aangenomen',
     demoWaarom: 'RTG_DEMO=1 geeft de korte inlog waarmee de rondgang een sessie krijgt (zie scripts/lib/proefserver.js); geen enkele poort gaat erdoor open, en de schakelkast al helemaal niet',
     functiesAan: aan.size, functiesTotaal: functies.FUNCTIES.length,
     routes: routes.length,

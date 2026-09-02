@@ -168,7 +168,14 @@ function buitenBereik(gezienePaden, opties) {
   const paden = [...new Set(buiten.map(r => norm(r.pad)))].sort();
   const perTak = {};
   for (const p of paden) { const t = p.split('/').slice(0, 3).join('/'); perTak[t] = (perTak[t] || 0) + 1; }
-  const uit = { paden, perTak, gezien: gezien.size, bekend: new Set(api.map(r => norm(r.pad))).size };
+  /* `alleApiPaden` gaat mee naar buiten omdat regel 28 hem nodig heeft voor een
+     TWEEDE vraag: staat er iets op de publieke lijst dat niet meer bestaat? Die
+     controle keek naar de paden die de regel ZELF had gevonden, en die scan mist
+     per definitie alles wat via een mount hangt. Zet je zo'n gemonteerde route
+     op de publieke lijst, dan meldt hij hem als dode regel terwijl hij springlevend
+     is -- precies wat er gebeurde toen /api/foundation/impact erbij kwam. */
+  const alleApiPaden = new Set(api.map(r => norm(r.pad)));
+  const uit = { paden, perTak, alleApiPaden, gezien: gezien.size, bekend: alleApiPaden.size };
 
   /* Zonder de poortlijsten blijft het bij tellen. Dat MELDEN we, want een
      classificatie die stilletjes ontbreekt leest als "geen gaten". */

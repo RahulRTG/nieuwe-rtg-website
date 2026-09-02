@@ -1952,10 +1952,24 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
         ' -- zet er een poortwachter voor, of neem hem met een REDEN op in PUBLIEK (check.js regel 28)');
     }
   });
+  /* DE SCHADUWMETING WORDT HIER AL GEDAAN, en niet pas onderaan, omdat de
+     opruimcontrole hieronder zijn padenlijst nodig heeft. Die controle keek naar
+     wat deze regel ZELF had gevonden, en dat mist alles wat via een mount hangt:
+     /api/foundation/impact op de publieke lijst zetten leverde meteen vier
+     meldingen "bestaat niet (meer) als route" op, over routes die gewoon
+     draaien. */
+  const { buitenBereik } = require('./lib/poortbereik');
+  const schaduw = buitenBereik(bestaat, { poortMw: POORT_MW, poortBinnen: POORT_BINNEN, publiek: PUBLIEK });
+  const echtBestaand = (pad) => bestaat.has(pad) ||
+    !!(schaduw.alleApiPaden && schaduw.alleApiPaden.has(pad));
+
   /* Een publieke lijst die namen bevat die niet meer bestaan, groeit stil vol en
      verliest zijn betekenis. Dit is dezelfde controle als regel 25b. */
   for (const pad of PUBLIEK.keys()) {
     if (gezien.has(pad)) continue;
+    /* Staat hij in de LEVENDE routetabel, dan bestaat hij -- ook als de scan van
+       deze regel hem niet ziet. Dan is er niets op te ruimen. */
+    if (!bestaat.has(pad) && echtBestaand(pad)) continue;
     gaten++;
     /* Twee heel verschillende gevallen, en ze verwarren zou de lijst juist
        stiller maken. Bestaat de route nog wel, dan heeft hij inmiddels een
@@ -1986,8 +2000,7 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
      route. CONTROLPLANE.md schrijft die volgorde voor: eerst meelopen, dan
      afdwingen. TAKEN.md 7.14 draagt de weg naar hard. */
   {
-    const { buitenBereik } = require('./lib/poortbereik');
-    const b = buitenBereik(bestaat, { poortMw: POORT_MW, poortBinnen: POORT_BINNEN, publiek: PUBLIEK });
+    const b = schaduw;
     if (b.nietVastTeStellen) {
       console.log('  \x1b[2m? bereik van deze regel niet vast te stellen: ' + b.nietVastTeStellen + '\x1b[0m');
     } else if (!b.paden.length) {

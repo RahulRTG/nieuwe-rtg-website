@@ -67,6 +67,28 @@ const PUBLIEK = new Map([
     ['/api/webauthn/login', 'de tegenhanger van /api/webauthn/opties: de ondertekende uitdaging IS het bewijs, en die geldt eenmalig'],
     ['/api/pin/herstel', 'pin vergeten: de eenmalige sleutel uit de mail IS het bewijs, net als bij /api/auth/reset'],
     ['/api/aanmelding/aanvraag', 'een aanstaande aanvrager is nog geen lid (met rem per ip)'],
+    /* DE VIER OPEN LEESROUTES VAN DE RTFOUNDATION, vastgelegd op 2 september 2026.
+
+       Ze stonden niet op deze lijst en ook niet achter een poort -- niet uit
+       nalatigheid, maar omdat regel 28 ze nooit heeft GEZIEN: ze hangen via
+       `app.use('/api/foundation', router)` en zijn pas met de schaduwmeting
+       (scripts/lib/poortbereik.js) boven water gekomen.
+
+       Ze zijn alle vier BEWUST publiek, en dat was al vastgelegd voordat ik
+       ernaar keek: test/foundation.test.js:988 heet letterlijk 'impact-
+       momentopname: publiek en geaggregeerd, zonder namen', en regel 197-198
+       haalt bespaartip en gesprekskaart anoniem op. Wat hier bij komt is dus
+       geen nieuw besluit maar het OPSCHRIJVEN van een bestaand besluit op de
+       plek waar de keuring kijkt.
+
+       Ze dragen geen persoonsgegevens en geen binnenkant: een spaartip, een
+       gesprekskaart, een dagtip en drie opgetelde totalen. Hun zusje
+       /api/foundation/health droeg dat wel (de AI-modus) en is daarom juist WEL
+       achter de meetpoort gezet. */
+    ['/api/foundation/impact', 'opgetelde totalen van de bijdragen -- geen namen, geen gezinnen, alleen drie getallen en een boodschap; getoetst als publiek in test/foundation.test.js'],
+    ['/api/foundation/bespaartip', 'een spaartip uit een vaste lijst, gekozen op de dag; leest niets en kent niemand'],
+    ['/api/foundation/gesprekskaart', 'een gespreksvraag uit een vaste lijst; leest niets en kent niemand'],
+    ['/api/foundation/tip', 'een dagtip voor in het schrift, uit een vaste lijst; leest niets en kent niemand'],
     ['/api/foundation/registratie/aanvragen', 'een school, vrijwilliger of stichting heeft vóór toelating nog geen account of code (met rem per ip)'],
     ['/api/foundation/registratie/status', 'de willekeurige, gehashte statussleutel is de geloofsbrief en toont uitsluitend die ene aanvraag (met rem per ip)'],
     /* Het bewijsstuk voor de gereguleerde genres hoort bij dezelfde aanvraag en

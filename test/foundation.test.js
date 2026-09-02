@@ -51,7 +51,16 @@ async function les() {
 
 test('les maken en meedoen geeft een code en tokens', async () => {
   const d = await json(await api('/les/maak', { vak: 'Taal', naam: 'Meester' }));
-  assert.equal(d.code.length, 6);
+  /* ACHT EN NIET ZES, sinds 2 september 2026. De lescode IS de geloofsbrief van
+     een les -- wie hem heeft ziet leerlingnamen, schriften en het bord -- en zes
+     tekens uit 31 is 29,7 bits. Acht maakt er 39,6 van, tienduizend keer zo veel
+     werk voor wie raadt. Zie de uitleg bij `nieuweCode()` in
+     server/foundation/onderwijs.js, en TAKEN.md 7.24.
+
+     De ondergrens staat er als BEWERING en niet als exact getal: wie de code
+     later langer maakt, hoeft deze toets niet aan te raken; wie hem KORTER
+     maakt, loopt er tegenaan. Dat is de richting die bewaakt hoort te worden. */
+  assert.ok(d.code.length >= 8, 'een lescode is minstens acht tekens (nu ' + d.code.length + ')');
   assert.ok(d.token);
   const s = await api('/les/join', { code: d.code, naam: 'Kim' });
   assert.equal(s.status, 200);
@@ -992,3 +1001,4 @@ test('impact-momentopname: publiek en geaggregeerd, zonder namen', async () => {
   assert.equal(typeof d.gezinnen, 'number', 'aantal gezinnen');
   assert.ok(d.boodschap && d.boodschap.length > 0, 'een warme boodschap');
 });
+

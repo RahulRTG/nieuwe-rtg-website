@@ -15,11 +15,11 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 1521 |
 | losse beweringen (`test(...)`) | 10916 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 57 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 996 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 997 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 40 |
 | alleen in de kop *genoemd*, nog niet gemeten | 145 |
-| niets van beide | 330 |
+| niets van beide | 329 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -1026,7 +1026,7 @@ toets omvalt.
 | `salonviraal.test.js` | 8 | gezakt op `true->false#0` | De Salon-gate (kern/salonviraal.js): vreemden zien alleen wat viraal gaat of maatschappelijk belangrijk is; van een vriend of iemand die je volgt zie je een bericht altijd; partner-etalage en RTG-uitgelichte posts... |
 | `samen.test.js` | 7 | gezakt op `liegpoort /api/` | Samen: meekijken en samen doen door het leden-OS. Kamers op code, alles op codenaam, live seintjes via de SSE-stroom; gasten doen niet mee en kamers verlopen vanzelf. |
 | `samendelen.test.js` | 3 | gezakt op `liegpoort /api/` | SAMEN DELEN -- vrienden worden, samen uitgeven, verrekenen, en de wekker. WAAROM DIT ER IS Wie betaalt wat (WBW) is het lijstje waar vriendschappen op stuklopen: een weekend weg, vier mensen, iedereen legt iets voor,... |
-| `samenvoeging-routes.test.js` | 6 | -- | ELF ROUTES UIT DE SAMENVOEGING DIE GEEN TOETS OVER DE DRAAD HADDEN. De twaalf takken van 1 september 2026 brachten routes mee waarvan de handler wel getoetst was (rechtstreeks aangeroepen, zoals... |
+| `samenvoeging-routes.test.js` | 6 | gezakt op `liegpoort /api/` | ELF ROUTES UIT DE SAMENVOEGING DIE GEEN TOETS OVER DE DRAAD HADDEN. De twaalf takken van 1 september 2026 brachten routes mee waarvan de handler wel getoetst was (rechtstreeks aangeroepen, zoals... |
 | `samenwerking.test.js` | 5 | gezakt op `liegpoort /api/` | End-to-end tests voor de samenwerkingslaag (kern/samenwerking.js): EGn knop om als creator een leverancier voor te stellen, en een oproep waarop creators reageren en de leverancier er een kiest. We loggen als manager... |
 | `samlacs.test.js` | 6 | gezakt op `liegpoort /api/` | DE SAML-DEUR ALS DEUR: van de heenreis tot een echt sessietoken. test/samlxsw.test.js doet de aanvallen op de handtekening, los van een server. |
 | `samlc14n.test.js` | 5 | gezakt op `===->!==#0` | CANONICALISATIE, MET LIBXML2 ALS SCHEIDSRECHTER. Waarom deze toets apart staat van de aanvalstoets. |

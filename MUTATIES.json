@@ -1,8 +1,10 @@
 {
   "stempel": {
-    "op": "2026-09-01T14:08:31.277Z",
-    "commit": "51e4aa0a",
+    "op": "2026-09-02T10:15:11.868Z",
+    "commit": "9cf891015",
     "boomVuil": true,
+    "boomAnders": 1,
+    "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
@@ -5461,6 +5463,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "scherp": "gezakt"
+    },
+    "samenvoeging-routes.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
       "scherp": "gezakt"
     },
     "samenwerking.test.js": {

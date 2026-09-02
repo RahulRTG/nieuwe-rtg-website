@@ -954,16 +954,26 @@ sleutelverzameling van een dictionary-object voordat de lus begint. Er bestaat d
 geen goedkope leegtetest, en daarom vraagt de poort er geen. Hij vraagt *"staat er
 een stand vóór dít verzoek"*, en dat is een gewone opzoeking.
 
-**De hele poort is daarmee vlak**: 3,0 – 3,7 µs bij 0, 1.000, 10.000 en 50.000
+**De hele poort is daarmee vlak**: 1,09 – 1,38 µs bij 0, 1.000, 10.000 en 50.000
 standen. Dat is de eigenschap die telt, want een O(n)-poort wordt trager naarmate
 *méér* mensen zich beschermen — precies op het moment dat de laag gebruikt wordt.
 
-> **Die 3 µs wordt wél door elk schrijvend verzoek betaald**, ook in een
+> **Een getal zonder zijn methode is geen getal.** Hier stond eerst 3,0 – 3,7 µs,
+> en dat was dezelfde poort op dezelfde machine: gemeten met 200 ronden, het
+> aantal dat toets 7 gebruikt. Bij zo weinig ronden meet je vooral de opwarming
+> van de JIT, en dat is te zien ook — in die opstelling kwam 50.000 standen er
+> als de *snelste* uit. Met 20.000 ronden ligt de meting stil en staat hij op
+> 1,09 µs leeg tegen 1,38 µs bij 50.000. Toets 7 houdt bewust de korte ronde
+> aan, want hij vergelijkt de poort met **zichzelf** en hoeft geen absoluut
+> getal te kennen; wie hier een absoluut getal opschrijft, hoort de lange ronde
+> te draaien.
+
+> **Die ~1 µs wordt wél door elk schrijvend verzoek betaald**, ook in een
 > installatie waar niemand een stand heeft, en het meeste ervan is crypto (de
 > sha256 voor de sessiesleutel plus de HMAC voor de apparaatsleutel). Dat is
 > bewust niet weggehaald met een teller *"hoeveel standen zijn er"*: die moet bij
 > elke schrijfweg worden bijgewerkt, en de faalvorm als iemand er één vergeet is
-> **fail-open** — de poort slaat dan een echte stand over. Drie microseconde is
+> **fail-open** — de poort slaat dan een echte stand over. Eén microseconde is
 > een lage prijs voor het niet hebben van die faalvorm.
 
 `test/isolatiepoort.test.js` toets 7 houdt de vlakheid vast. Hij meet tijd, wat

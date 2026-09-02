@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1448 bestanden en 10269 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1449 bestanden en 10278 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1448 |
-| losse beweringen (`test(...)`) | 10269 |
+| toetsbestanden | 1449 |
+| losse beweringen (`test(...)`) | 10278 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 51 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 996 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 40 |
 | alleen in de kop *genoemd*, nog niet gemeten | 126 |
-| niets van beide | 276 |
+| niets van beide | 277 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1271 bestanden, 9965 beweringen.
+1272 bestanden, 9974 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -496,11 +496,12 @@ toets omvalt.
 | `invoerproef.test.js` | 11 | geen bruikbare mutatie | HET OORDEEL VAN DE INVOERPROEF, los van een server. scripts/invoerproef-route.js heeft een echte server nodig en duurt minuten; daar komt niemand ooit met een mutatie bij. |
 | `inzagekaart.test.js` | 11 | -- | De inzagekaart (kern/inzagekaart.js): wie heeft er in mijn gegevens gekeken. Deze kaart bestaat omdat het antwoord op die vraag over drie sporen verspreid lag. |
 | `inzagelog.test.js` | 10 | gezakt op `===->!==` | Het inzagejournaal: wie keek er in wiens identiteitskluis. De twee regels die dit journaal bruikbaar EN veilig maken staan hier als test, want ze zijn allebei makkelijk stuk te maken zonder dat je het merkt: 1. |
-| `isolatie-lid.test.js` | 8 | genoemd | DE ISOLATIEMODUS VAN EEN LID -- end-to-end, tegen een draaiende server. WAT DEZE TOETS BEWIJST, en de tweede is verreweg de belangrijkste: 1. |
+| `isolatie-lid.test.js` | 9 | genoemd | DE ISOLATIEMODUS VAN EEN LID -- end-to-end, tegen een draaiende server. WAT DEZE TOETS BEWIJST, en de tweede is verreweg de belangrijkste: 1. |
 | `isolatie-passkey.test.js` | 8 | genoemd | DE PASSKEY ONDER DE ONTSLUITCEREMONIE -- end-to-end, tegen een draaiende server, met echte P-256-crypto (test/webauthn-authenticator.js). WAT DEZE TOETS BEWIJST, en de derde is de belangrijkste: de stap `passkey`... |
+| `isolatie-techniek.test.js` | 7 | -- | DE ISOLATIECOCKPIT VAN HET KANTOOR, over de echte HTTP-weg. WAAROM DEZE TOETS ER IS. |
 | `isolatie.test.js` | 9 | genoemd | DE ISOLATIELAAG -- zes dragers, een join, en verlagen als protocol. WAT DEZE TOETS BEWIJST, en de derde en de vijfde zijn de belangrijkste: 1. |
 | `isolatiedragers.test.js` | 6 | genoemd | DE DRAGERS BIJ EEN LOPEND VERZOEK -- welke laag heeft echt een sleutel. HET GAT DAT DIT SLUIT, en het was er een van het soort dat groen kijkt. |
-| `isolatiepoort.test.js` | 7 | genoemd | DE BEVEILIGINGS-AS IN DE HTTP-KETEN -- telt hij, en houdt hij niets tegen? HET GAT DAT DIT SLUIT. |
+| `isolatiepoort.test.js` | 8 | genoemd | DE BEVEILIGINGS-AS IN DE HTTP-KETEN -- telt hij, en houdt hij niets tegen? HET GAT DAT DIT SLUIT. |
 | `journaalbestand.test.js` | 11 | gezakt op `getal+1#7` | HET JOURNAAL OP SCHIJF (server/kern/journaalbestand.js). Het doorgeefjournaal woonde in db.data.doorgeefjournaal: één array van 20.000 regels, dus één blob in één rij van de opslag. |
 | `journaalschrijf.test.js` | 6 | gezakt op `true->false#0` | EEN LOGBOEK MAG DE SERVER NIET TRAAG MAKEN. WAT ER MIS WAS, en het was mijn eigen code van dezelfde dag. |
 | `journalistiek-redactie.test.js` | 11 | gezakt op `liegpoort /api/` | DE REDACTIE VAN EEN NIEUWSBEDRIJF -- 13 endpoints achter de leverancier-inlog. Deze dertien wees de waargenomen dekkingsmeting aan als nooit aangeroepen: niet een enkele test raakte /api/supplier/redactie/*. |

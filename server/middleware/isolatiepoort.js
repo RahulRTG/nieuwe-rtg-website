@@ -19,9 +19,8 @@
       blijft en alleen het drager-been erbij komt: `dicht = huis || drager`, nooit
       `drager` in plaats van `huis`.
    2. De schaduwnoemer is "verzoeken van accounts die een stand dragen", en dat
-      zijn er vandaag nul. Deze regel rijpt dus waarschijnlijk NIET vanzelf uit
-      productieverkeer; "rijp" moet hier uit een gerichte proef komen. Dat staat
-      hier omdat een teller die nooit vult, anders als bewijs gaat gelden.
+      zijn er vandaag nul: deze regel rijpt NIET vanzelf uit productieverkeer.
+      stand() in ./isolatiepoort-stand.js zegt dat zelf, en daar staat waarom.
 
    DE VOLGORDE IS HUIS, DAN UITGANG, DAN DRAGER -- en die middelste plek is een
    correctie op de eerste versie, die de uitgangen VOOR beide benen zette.
@@ -30,37 +29,39 @@
    dat. Zie de uitleg bij stap 3 in weeg().
 
    TWEE HOOGTES OP EEN AS, EN DAAROM STAAN ZE HIER SAMEN. Het HUIS-been (de
-   veilige noodstand uit kern/beschermstand.js) stond in ./functieschakelaars.js
-   en is meeverhuisd: dat bestand schuift als iemand in de boardroom een knop
-   omzet, deze as schuift als er een incident is of een mens zichzelf beschermt.
-   Twee onderwerpen. De PLEK in de keten is onveranderd -- boven de snelle uitgang
-   van de schakelkast, want juist op een verse installatie hoort een noodstand te
-   werken.
+   noodstand uit kern/beschermstand.js) stond in ./functieschakelaars.js en is
+   meeverhuisd: dat bestand schuift als iemand in de boardroom een knop omzet,
+   deze as als er een incident is. Twee onderwerpen. De PLEK in de keten is
+   onveranderd -- boven de snelle uitgang van de schakelkast, want juist op een
+   verse installatie hoort een noodstand te werken.
 
    DIE PLEK IS HET ANTWOORD OP "WIE ZIET ELK VERZOEK": de enige plek die (i) elk
    /api/-verzoek ziet, (ii) vóór ELKE router staat, (iii) de bearer-kop al
    ontleedt en (iv) de 503 van deze as al bezit. `auth` heeft de sessie wél maar
    dekt alleen ledenroutes; leverancier, kantoor en techniek hebben eigen deuren.
 
-   DE VOORPOORT MAG NOOIT VRAGEN "STAAT ER ERGENS EEN STAND". Bij 50.000
-   dichtgezette leden kost `Object.keys(kaart).length === 0` **8,5 milliseconde**
-   per verzoek -- en `for (const k in kaart) return false;`, de voor de hand
-   liggende slimme uitweg, kost 8,4 ms, want V8 materialiseert de sleutels van
-   een dictionary-object voordat de lus begint. Die tweede staat er met naam bij
-   omdat hij eruitziet als de oplossing en het niet is.
+   DE VOORPOORT MAG NOOIT VRAGEN "STAAT ER ERGENS EEN STAND". Er is geen goedkope
+   leegtetest: bij 50.000 dichtgezette leden kost `Object.keys(kaart).length === 0`
+   milliseconden per verzoek, en `for (const k in kaart) return false;` -- de voor
+   de hand liggende slimme uitweg -- is even duur, want V8 materialiseert de
+   sleutels van een dictionary-object voordat de lus begint. Die tweede staat er
+   met naam bij omdat hij eruitziet als de oplossing en het niet is.
 
-   Er is dus geen goedkope leegtetest, en daarom vraagt deze poort er geen. Hij
-   vraagt "staat er een stand vóór DIT verzoek": een gewone opzoeking, 0,013 us
-   bij 50.000 sleutels. De hele weeg() is daarmee VLAK -- 3,0 tot 3,7 us bij 0 tot
-   50.000 standen -- en toets 7 in test/isolatiepoort.test.js houdt die vlakheid
-   vast, zodat een latere wijziging die er O(n) van maakt de bouw laat zakken in
-   plaats van stil traag te worden.
+   Daarom vraagt deze poort "staat er een stand voor DIT verzoek": een gewone
+   opzoeking, en daarmee is weeg() VLAK. Toets 7 in test/isolatiepoort.test.js
+   houdt die vlakheid vast, zodat een latere wijziging die er O(n) van maakt de
+   bouw laat zakken in plaats van stil traag te worden.
 
-   Die vlakke 3 us wordt wel door ELK schrijvend verzoek betaald, ook waar niemand
+   DE METINGEN ZELF STAAN IN ISOLATIE.md PAR. 10 EN NIET HIER, en dat is geen
+   verwijzing uit gemak: ze stonden op allebei de plekken, en toen de meting werd
+   overgedaan liep deze kop achter met een getal dat er twee keer zo hoog naast
+   zat. Een getal met een methode hoort op een plek te wonen. Wat hier blijft is
+   de REGEL, want die stuurt de code hieronder.
+
+   De vlakke prijs wordt wel door ELK schrijvend verzoek betaald, ook waar niemand
    een stand heeft, en het meeste ervan is crypto. Dat is bewust niet weggehaald
    met een teller "hoeveel standen zijn er": zo'n teller moet bij elke schrijfweg
-   worden bijgewerkt, en de faalvorm als iemand er een vergeet is FAIL-OPEN. De
-   meetgetallen staan in ISOLATIE.md par. 10. */
+   worden bijgewerkt, en de faalvorm als iemand er een vergeet is FAIL-OPEN. */
 
 'use strict';
 
@@ -68,36 +69,11 @@ const { dragersVanSessie } = require('../kern/isolatie/sessiedragers');
 const handhaving = require('../kern/isolatie/handhaving');
 const openpaden = require('../kern/isolatie/openpaden');
 
-/* De late binding, zelfde patroon als zetWacht/zetScanNet in
-   opzet/verzoekketen.js: de isolatielaag wordt pas bij het monteren van de
-   routes opgehangen, en deze middleware staat daarvoor. */
-let laag = null;
-let bijt = false;
-const telling = { gewogen: 0, zouSluiten: 0, paden: [], dragers: {} };
-
-function zetLaag(l, opties) {
-  laag = l || null;
-  bijt = !!(opties && opties.afdwingen);
-  if (laag) handhaving.meldHandhaver({ waar: 'middleware/isolatiepoort.js', modus: bijt ? 'afdwingen' : 'schaduw' });
-  return stand();
-}
-
-function stand() {
-  return Object.assign({ gemonteerd: !!laag, bijt }, handhaving.stand(), {
-    gewogen: telling.gewogen, zouSluiten: telling.zouSluiten,
-    voorbeelden: telling.paden.slice(0, 20), perDrager: Object.assign({}, telling.dragers),
-    /* WAAROM DIT GETAL VOORLOPIG NUL BLIJFT, en dat is geen storing: de noemer
-       is "verzoeken van accounts die een stand dragen". Zet er niemand een stand,
-       dan weegt deze poort niets -- en dan bewijst hij ook niets. */
-    let: telling.gewogen === 0
-      ? 'nog geen enkel verzoek van een account met een stand; deze teller bewijst dus niets'
-      : null
-  });
-}
-
-/* Alleen voor de toets: een verse start. Nooit uit productiecode aanroepen --
-   een teller die zichzelf kan wissen, is geen bewijs. */
-function _wisTelling() { telling.gewogen = 0; telling.zouSluiten = 0; telling.paden = []; telling.dragers = {}; }
+/* De montage en de schaduwtelling staan ernaast, in ./isolatiepoort-stand.js --
+   zie de kop daar voor de naad. `laag` en `bijt` worden dus OPGEVRAAGD en niet
+   hier bewaard: twee plekken die weten of de laag er is, is er een te veel. */
+const poortstand = require('./isolatiepoort-stand');
+const { telling } = poortstand;
 
 /* HET OORDEEL. Geeft `null` als er niets aan de hand is, en anders het besluit
    met zijn reden. Hij BLOKKEERT niet: dat doet de aanroeper, en alleen als de
@@ -128,6 +104,7 @@ function weeg(req, ctx) {
     }
   }
 
+  const laag = poortstand.huidig();
   if (!laag) return null;
 
   /* 3. DE VERKLAARDE UITGANGEN -- NA HET HUIS EN VOOR DE DRAGER, en die volgorde
@@ -180,19 +157,19 @@ function weeg(req, ctx) {
      bestaat" en "de regel doet iets", en dit huis heeft die twee al een keer door
      elkaar gehaald -- toen stond `handhaaft: true` in een register boven een tak
      die nooit draaide. */
-  if (!bijt) return null;
+  if (!poortstand.bijtHij()) return null;
   return { been: 'drager', besluit: b, antwoord: antwoordVoor(b) };
 }
 
 /* WAT DE AANROEPER ERMEE DOET. In de schaduw: niets, behalve tellen. Met de vlag
-   om: een 503 met `as: 'isolatie'` erin, zodat een scherm weet dat deze
-   weigering bij dezelfde as hoort als de stand die het lid zelf heeft gezet.
-   Statuscode 503 en geen 423, want functies/wachter.js slaat 503 met opzet over
-   ("bewust dicht, geen storing") -- een 423 zou de storingsautomaat verdunnen. */
-/* De zin van het HUIS-been, letterlijk overgenomen uit middleware/schakelaar-antwoord.js
-   (ZIN.bescherming). Hij wordt daar opgehaald en niet overgetypt: twee teksten
-   voor dezelfde stand zouden een mens twee verschillende dingen vertellen over
-   wat er aan de hand is. */
+   om: een 503 met `as: 'isolatie'` erin, zodat een scherm weet dat deze weigering
+   bij dezelfde as hoort als de stand die het lid zelf zette. 503 en geen 423,
+   want functies/wachter.js slaat 503 met opzet over ("bewust dicht, geen
+   storing") -- een 423 zou de storingsautomaat verdunnen.
+
+   De zin van het HUIS-been wordt OPGEHAALD uit ./schakelaar-antwoord.js en niet
+   overgetypt: twee teksten voor dezelfde stand vertellen een mens twee
+   verschillende dingen over wat er aan de hand is. */
 const HUISZIN = require('./schakelaar-antwoord').ZIN.bescherming;
 
 function antwoordVoor(besluit) {
@@ -205,4 +182,5 @@ function antwoordVoor(besluit) {
   };
 }
 
-module.exports = { zetLaag, stand, weeg, antwoordVoor, _wisTelling };
+module.exports = { zetLaag: poortstand.zetLaag, stand: poortstand.stand,
+  weeg, antwoordVoor, _wisTelling: poortstand._wisTelling };

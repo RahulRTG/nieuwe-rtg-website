@@ -38,35 +38,31 @@ function maakTokens(getUserById) {
      naar te falen. */
   /* HET VIERDE EN HET VIJFDE DEEL: EEN SESSIE-ID EN EEN APPARAAT.
 
-     TWEE TAKKEN CLAIMDEN ALLEBEI PLEK VIER, en dat is hier opgelost in plaats
-     van weggekozen. De sid van main is de fundamentelere: hij maakt een sessie
-     AANWIJSBAAR, en daar hangen "toon mijn actieve sessies", het intrekken van
-     een sessie en de contextbinding aan. De apparaatsleutel van de isolatielaag
-     is een kenmerk VAN die sessie. De sid houdt dus plek vier en het apparaat
-     schuift naar vijf -- wie het andersom doet, breekt elk token dat main al
-     heeft uitgegeven.
+     TWEE TAKKEN CLAIMDEN ALLEBEI PLEK VIER, en dat is opgelost in plaats van
+     weggekozen. De sid is de fundamentelere -- hij maakt een sessie AANWIJSBAAR,
+     en daar hangen "toon mijn actieve sessies", het intrekken van een sessie en
+     de contextbinding aan. De apparaatsleutel is een kenmerk VAN die sessie. De
+     sid houdt dus plek vier en het apparaat schuift naar vijf; andersom breekt
+     elk token dat al is uitgegeven.
 
      DE SID (deel 4). Een lid komt niet door kern/sessies.js binnen maar via
-     verifyToken, en resolveSession bouwt bij ELK verzoek een vers sessie-object
-     (opzet/diensten2.js). Er werd dus nergens een sessie bewaard, en daarmee was
-     "toon mijn actieve sessies" niet een ontbrekend scherm maar een
-     onbeantwoordbare vraag. Het token blijft staatloos en draagt geen
-     persoonsgegeven; wat erbij hoort staat in het register.
+     verifyToken, en resolveSession bouwt bij ELK verzoek een vers sessie-object.
+     Er werd dus nergens een sessie bewaard, en "toon mijn actieve sessies" was
+     geen ontbrekend scherm maar een onbeantwoordbare vraag. Het token blijft
+     staatloos; wat erbij hoort staat in het register.
 
-     HET APPARAAT (deel 5) IS EEN AFGELEIDE, geen credential-id. De sleutel komt
-     uit kluis.sleutelVoor('isolatie-apparaat') met HKDF-domeinscheiding: stabiel
-     per toestel, en niet terug te rekenen naar de passkey waar hij vandaan komt.
-     Zonder die afleiding zou een token het id van een authenticator dragen -- een
-     kenmerk dat over accounts heen te herkennen is. Alleen een PASSKEY-inlog
-     levert er een; een wachtwoordinlog niet, en dat is geen tekortkoming maar de
-     waarheid: RTG kent dan geen toestel, en een verzonnen sleutel zou een stand
-     opleveren die aan niets hangt.
+     HET APPARAAT (deel 5) IS EEN AFGELEIDE, geen credential-id: uit
+     kluis.sleutelVoor('isolatie-apparaat') met HKDF-domeinscheiding, stabiel per
+     toestel en niet terug te rekenen naar de passkey. Zonder die afleiding zou
+     een token het id van een authenticator dragen -- herkenbaar over accounts
+     heen. Alleen een PASSKEY-inlog levert er een; bij een wachtwoordinlog kent
+     RTG geen toestel, en een verzonnen sleutel zou een stand opleveren die aan
+     niets hangt.
 
      TERUGWAARTS VEILIG, en dat is de vorm van de lezers en geen aanname: een oud
-     token heeft drie delen, een token van main vier, dit er vijf. `body.split`
-     geeft eenvoudig minder terug, en elke lezer hieronder valt dan terug op null
-     -- "dit token draagt dat gegeven niet", wat waar is. De handtekening dekt de
-     hele body, dus er valt niets bij te schrijven. Geen migratie, geen uitlog. */
+     token heeft drie delen, een van main vier, dit er vijf. `body.split` geeft
+     eenvoudig minder terug en elke lezer valt dan terug op null. De handtekening
+     dekt de hele body, dus er valt niets bij te schrijven. */
   function issueToken(userId, days = 30, apparaat) {
     const sid = crypto.randomBytes(9).toString('base64url');
     const kop = userId + '.' + (Date.now() + days * 86400000) + '.' + Date.now() + '.' + sid;

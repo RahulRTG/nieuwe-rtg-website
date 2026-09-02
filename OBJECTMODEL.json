@@ -2,14 +2,14 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-09-02",
   "gemeten": {
-    "bestanden": 2002,
-    "vormen": 1340,
-    "velden": 1941,
-    "modules": 720,
-    "domeinen": 253,
+    "bestanden": 2039,
+    "vormen": 1348,
+    "velden": 1947,
+    "modules": 725,
+    "domeinen": 255,
     "envelopDrempel": 16,
     "envelop": 30,
-    "veldenDomeineigen": 1379,
+    "veldenDomeineigen": 1384,
     "veldenGedeeldVanafVier": 193,
     "gelijkendeVormparen": 20
   },
@@ -83,20 +83,8 @@
       ]
     },
     {
-      "veld": "type",
-      "domeinen": 14,
-      "waar": [
-        "bedrijf",
-        "kern/antivirus",
-        "kern/command",
-        "kern/commerce",
-        "kern/instant-reality",
-        "kern/magnaat-werkroutefabriek"
-      ]
-    },
-    {
       "veld": "waarom",
-      "domeinen": 14,
+      "domeinen": 15,
       "waar": [
         "kern/bureau",
         "kern/command",
@@ -108,14 +96,26 @@
     },
     {
       "veld": "wie",
-      "domeinen": 14,
+      "domeinen": 15,
       "waar": [
         "bedrijf",
         "kern/comm",
         "kern/commerce",
         "kern/consent-lezers",
-        "kern/livinglab",
-        "kern/onderzoekslab"
+        "kern/isolatie",
+        "kern/livinglab"
+      ]
+    },
+    {
+      "veld": "type",
+      "domeinen": 14,
+      "waar": [
+        "bedrijf",
+        "kern/antivirus",
+        "kern/command",
+        "kern/commerce",
+        "kern/instant-reality",
+        "kern/magnaat-werkroutefabriek"
       ]
     },
     {

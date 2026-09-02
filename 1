@@ -8232,3 +8232,642 @@ AUDIT GET /api/health 2xx geen
 POST /api/cluster/:actie
 TOETS POST /api/cluster/:actie trio-wees.test.js
 AUDIT POST /api/cluster/:actie 2xx geen
+POST /api/notities/mijn
+TOETS POST /api/notities/mijn trio-wees.test.js
+AUDIT POST /api/notities/mijn 4xx geen
+GET /
+TOETS GET / boot-smoke.test.js
+SCHERM /apps/app.html boot-smoke.test.js nevenverzoek
+AUDIT GET / 2xx geen
+GET /api/health
+TOETS GET /api/health lidfactuur.test.js
+AUDIT GET /api/health 2xx geen
+GET /api/ready
+TOETS GET /api/ready lidfactuur.test.js
+AUDIT GET /api/ready 2xx geen
+POST /api/auth/register
+TOETS POST /api/auth/register lidfactuur.test.js
+AUDIT POST /api/auth/register 2xx geen
+POST /api/auth/login
+TOETS POST /api/auth/login lidfactuur.test.js
+AUDIT POST /api/auth/login 2xx securityLog
+POST /api/account/start
+TOETS POST /api/account/start lidfactuur.test.js
+AUDIT POST /api/account/start 2xx securityLog
+POST /api/verify/upload
+TOETS POST /api/verify/upload lidfactuur.test.js
+AUDIT POST /api/verify/upload 2xx geen
+POST /api/verify/selfie
+TOETS POST /api/verify/selfie lidfactuur.test.js
+AUDIT POST /api/verify/selfie 2xx geen
+POST /api/office/verifications
+TOETS POST /api/office/verifications lidfactuur.test.js
+AUDIT POST /api/office/verifications 2xx inzageLog
+POST /api/office/verify
+TOETS POST /api/office/verify lidfactuur.test.js
+AUDIT POST /api/office/verify 2xx inzageLog
+POST /api/supplier/roster
+TOETS POST /api/supplier/roster lidfactuur.test.js
+AUDIT POST /api/supplier/roster 2xx geen
+POST /api/supplier/login
+TOETS POST /api/supplier/login lidfactuur.test.js
+AUDIT POST /api/supplier/login 2xx securityLog
+POST /api/supplier/menu/get
+TOETS POST /api/supplier/menu/get lidfactuur.test.js
+AUDIT POST /api/supplier/menu/get 2xx geen
+POST /api/order
+TOETS POST /api/order lidfactuur.test.js
+AUDIT POST /api/order 2xx geen
+POST /api/supplier/facturen/mijn
+TOETS POST /api/supplier/facturen/mijn lidfactuur.test.js
+AUDIT POST /api/supplier/facturen/mijn 2xx geen
+POST /api/order/pay
+TOETS POST /api/order/pay lidfactuur.test.js
+AUDIT POST /api/order/pay 2xx geen
+GET /api/health
+TOETS GET /api/health lidfactuur.test.js
+AUDIT GET /api/health 2xx geen
+GET /api/ready
+TOETS GET /api/ready lidfactuur.test.js
+AUDIT GET /api/ready 2xx geen
+POST /api/supplier/roster
+TOETS POST /api/supplier/roster lidfactuur.test.js
+AUDIT POST /api/supplier/roster 2xx geen
+POST /api/supplier/login
+TOETS POST /api/supplier/login lidfactuur.test.js
+AUDIT POST /api/supplier/login 2xx securityLog
+POST /api/supplier/settings
+TOETS POST /api/supplier/settings lidfactuur.test.js
+AUDIT POST /api/supplier/settings 2xx geen
+POST /api/auth/register
+TOETS POST /api/auth/register lidfactuur.test.js
+AUDIT POST /api/auth/register 2xx geen
+POST /api/auth/login
+TOETS POST /api/auth/login lidfactuur.test.js
+AUDIT POST /api/auth/login 2xx securityLog
+POST /api/account/start
+TOETS POST /api/account/start lidfactuur.test.js
+AUDIT POST /api/account/start 2xx securityLog
+POST /api/verify/upload
+TOETS POST /api/verify/upload lidfactuur.test.js
+AUDIT POST /api/verify/upload 2xx geen
+POST /api/verify/selfie
+TOETS POST /api/verify/selfie lidfactuur.test.js
+AUDIT POST /api/verify/selfie 2xx geen
+POST /api/office/verifications
+TOETS POST /api/office/verifications lidfactuur.test.js
+AUDIT POST /api/office/verifications 2xx inzageLog
+POST /api/office/verify
+TOETS POST /api/office/verify lidfactuur.test.js
+AUDIT POST /api/office/verify 2xx inzageLog
+POST /api/supplier/menu/get
+TOETS POST /api/supplier/menu/get lidfactuur.test.js
+AUDIT POST /api/supplier/menu/get 2xx geen
+POST /api/order
+TOETS POST /api/order lidfactuur.test.js
+AUDIT POST /api/order 2xx geen
+POST /api/rekening/betaal
+TOETS POST /api/rekening/betaal lidfactuur.test.js
+AUDIT POST /api/rekening/betaal 2xx geen
+POST /api/supplier/facturen/mijn
+TOETS POST /api/supplier/facturen/mijn lidfactuur.test.js
+AUDIT POST /api/supplier/facturen/mijn 2xx geen
+GET /api/health
+TOETS GET /api/health lidfactuur.test.js
+AUDIT GET /api/health 2xx geen
+GET /api/ready
+TOETS GET /api/ready lidfactuur.test.js
+AUDIT GET /api/ready 2xx geen
+POST /api/auth/register
+TOETS POST /api/auth/register lidfactuur.test.js
+AUDIT POST /api/auth/register 2xx geen
+POST /api/auth/login
+TOETS POST /api/auth/login lidfactuur.test.js
+AUDIT POST /api/auth/login 2xx securityLog
+POST /api/account/start
+TOETS POST /api/account/start lidfactuur.test.js
+AUDIT POST /api/account/start 2xx securityLog
+POST /api/verify/upload
+TOETS POST /api/verify/upload lidfactuur.test.js
+AUDIT POST /api/verify/upload 2xx geen
+POST /api/verify/selfie
+TOETS POST /api/verify/selfie lidfactuur.test.js
+AUDIT POST /api/verify/selfie 2xx geen
+POST /api/office/verifications
+TOETS POST /api/office/verifications lidfactuur.test.js
+AUDIT POST /api/office/verifications 2xx inzageLog
+POST /api/office/verify
+TOETS POST /api/office/verify lidfactuur.test.js
+AUDIT POST /api/office/verify 2xx inzageLog
+POST /api/supplier/roster
+TOETS POST /api/supplier/roster lidfactuur.test.js
+AUDIT POST /api/supplier/roster 2xx geen
+POST /api/supplier/login
+TOETS POST /api/supplier/login lidfactuur.test.js
+AUDIT POST /api/supplier/login 2xx securityLog
+POST /api/booking/request
+TOETS POST /api/booking/request lidfactuur.test.js
+AUDIT POST /api/booking/request 2xx geen
+POST /api/booking/pay
+TOETS POST /api/booking/pay lidfactuur.test.js
+AUDIT POST /api/booking/pay 2xx geen
+POST /api/supplier/facturen/mijn
+TOETS POST /api/supplier/facturen/mijn lidfactuur.test.js
+AUDIT POST /api/supplier/facturen/mijn 2xx geen
+POST /api/ride/request
+TOETS POST /api/ride/request lidfactuur.test.js
+AUDIT POST /api/ride/request 2xx geen
+POST /api/ride/pay
+TOETS POST /api/ride/pay lidfactuur.test.js
+AUDIT POST /api/ride/pay 2xx geen
+GET /api/health
+TOETS GET /api/health lidfactuur.test.js
+AUDIT GET /api/health 2xx geen
+GET /api/ready
+TOETS GET /api/ready lidfactuur.test.js
+AUDIT GET /api/ready 2xx geen
+POST /api/supplier/roster
+TOETS POST /api/supplier/roster lidfactuur.test.js
+AUDIT POST /api/supplier/roster 2xx geen
+POST /api/supplier/login
+TOETS POST /api/supplier/login lidfactuur.test.js
+AUDIT POST /api/supplier/login 2xx securityLog
+POST /api/auth/register
+TOETS POST /api/auth/register lidfactuur.test.js
+AUDIT POST /api/auth/register 2xx geen
+POST /api/auth/login
+TOETS POST /api/auth/login lidfactuur.test.js
+AUDIT POST /api/auth/login 2xx securityLog
+POST /api/account/start
+TOETS POST /api/account/start lidfactuur.test.js
+AUDIT POST /api/account/start 2xx securityLog
+POST /api/verify/upload
+TOETS POST /api/verify/upload lidfactuur.test.js
+AUDIT POST /api/verify/upload 2xx geen
+POST /api/verify/selfie
+TOETS POST /api/verify/selfie lidfactuur.test.js
+AUDIT POST /api/verify/selfie 2xx geen
+POST /api/office/verifications
+TOETS POST /api/office/verifications lidfactuur.test.js
+AUDIT POST /api/office/verifications 2xx inzageLog
+POST /api/office/verify
+TOETS POST /api/office/verify lidfactuur.test.js
+AUDIT POST /api/office/verify 2xx inzageLog
+POST /api/supplier/menu/get
+TOETS POST /api/supplier/menu/get lidfactuur.test.js
+AUDIT POST /api/supplier/menu/get 2xx geen
+POST /api/order
+TOETS POST /api/order lidfactuur.test.js
+AUDIT POST /api/order 2xx geen
+POST /api/supplier/pos/redeem
+TOETS POST /api/supplier/pos/redeem lidfactuur.test.js
+AUDIT POST /api/supplier/pos/redeem 2xx geen
+POST /api/supplier/facturen/mijn
+TOETS POST /api/supplier/facturen/mijn lidfactuur.test.js
+AUDIT POST /api/supplier/facturen/mijn 2xx geen
+POST /api/orders/mine
+TOETS POST /api/orders/mine lidfactuur.test.js
+AUDIT POST /api/orders/mine 2xx geen
+GET /api/health
+TOETS GET /api/health lidfactuur.test.js
+AUDIT GET /api/health 2xx geen
+GET /api/ready
+TOETS GET /api/ready lidfactuur.test.js
+AUDIT GET /api/ready 2xx geen
+POST /api/supplier/roster
+TOETS POST /api/supplier/roster lidfactuur.test.js
+AUDIT POST /api/supplier/roster 2xx geen
+POST /api/supplier/login
+TOETS POST /api/supplier/login lidfactuur.test.js
+AUDIT POST /api/supplier/login 2xx securityLog
+POST /api/auth/register
+TOETS POST /api/auth/register lidfactuur.test.js
+AUDIT POST /api/auth/register 2xx geen
+POST /api/auth/login
+TOETS POST /api/auth/login lidfactuur.test.js
+AUDIT POST /api/auth/login 2xx securityLog
+POST /api/account/start
+TOETS POST /api/account/start lidfactuur.test.js
+AUDIT POST /api/account/start 2xx securityLog
+POST /api/verify/upload
+TOETS POST /api/verify/upload lidfactuur.test.js
+AUDIT POST /api/verify/upload 2xx geen
+POST /api/verify/selfie
+TOETS POST /api/verify/selfie lidfactuur.test.js
+AUDIT POST /api/verify/selfie 2xx geen
+POST /api/office/verifications
+TOETS POST /api/office/verifications lidfactuur.test.js
+AUDIT POST /api/office/verifications 2xx inzageLog
+POST /api/office/verify
+TOETS POST /api/office/verify lidfactuur.test.js
+AUDIT POST /api/office/verify 2xx inzageLog
+POST /api/supplier/menu/get
+TOETS POST /api/supplier/menu/get lidfactuur.test.js
+AUDIT POST /api/supplier/menu/get 2xx geen
+POST /api/order
+TOETS POST /api/order lidfactuur.test.js
+AUDIT POST /api/order 2xx geen
+POST /api/order/pay
+TOETS POST /api/order/pay lidfactuur.test.js
+AUDIT POST /api/order/pay 2xx geen
+POST /api/supplier/facturen/mijn
+TOETS POST /api/supplier/facturen/mijn lidfactuur.test.js
+AUDIT POST /api/supplier/facturen/mijn 2xx geen
+POST /api/supplier/pos/redeem
+TOETS POST /api/supplier/pos/redeem lidfactuur.test.js
+AUDIT POST /api/supplier/pos/redeem 2xx geen
+GET /api/health
+TOETS GET /api/health lidfactuur.test.js
+AUDIT GET /api/health 2xx geen
+GET /api/ready
+TOETS GET /api/ready lidfactuur.test.js
+AUDIT GET /api/ready 2xx geen
+POST /api/supplier/roster
+TOETS POST /api/supplier/roster lidfactuur.test.js
+AUDIT POST /api/supplier/roster 2xx geen
+POST /api/supplier/login
+TOETS POST /api/supplier/login lidfactuur.test.js
+AUDIT POST /api/supplier/login 2xx securityLog
+POST /api/supplier/settings
+TOETS POST /api/supplier/settings lidfactuur.test.js
+AUDIT POST /api/supplier/settings 2xx geen
+POST /api/auth/register
+TOETS POST /api/auth/register lidfactuur.test.js
+AUDIT POST /api/auth/register 2xx geen
+POST /api/auth/login
+TOETS POST /api/auth/login lidfactuur.test.js
+AUDIT POST /api/auth/login 2xx securityLog
+POST /api/account/start
+TOETS POST /api/account/start lidfactuur.test.js
+AUDIT POST /api/account/start 2xx securityLog
+POST /api/verify/upload
+TOETS POST /api/verify/upload lidfactuur.test.js
+AUDIT POST /api/verify/upload 2xx geen
+POST /api/verify/selfie
+TOETS POST /api/verify/selfie lidfactuur.test.js
+AUDIT POST /api/verify/selfie 2xx geen
+POST /api/office/verifications
+TOETS POST /api/office/verifications lidfactuur.test.js
+AUDIT POST /api/office/verifications 2xx inzageLog
+POST /api/office/verify
+TOETS POST /api/office/verify lidfactuur.test.js
+AUDIT POST /api/office/verify 2xx inzageLog
+POST /api/supplier/menu/get
+TOETS POST /api/supplier/menu/get lidfactuur.test.js
+AUDIT POST /api/supplier/menu/get 2xx geen
+POST /api/order
+TOETS POST /api/order lidfactuur.test.js
+AUDIT POST /api/order 2xx geen
+POST /api/supplier/tafelticket
+TOETS POST /api/supplier/tafelticket lidfactuur.test.js
+AUDIT POST /api/supplier/tafelticket 2xx geen
+POST /api/supplier/tafelticket/afrekenen
+TOETS POST /api/supplier/tafelticket/afrekenen lidfactuur.test.js
+AUDIT POST /api/supplier/tafelticket/afrekenen 2xx geen
+POST /api/supplier/facturen/mijn
+TOETS POST /api/supplier/facturen/mijn lidfactuur.test.js
+AUDIT POST /api/supplier/facturen/mijn 2xx geen
+GET /api/health
+TOETS GET /api/health lidfactuur.test.js
+AUDIT GET /api/health 2xx geen
+GET /api/ready
+TOETS GET /api/ready lidfactuur.test.js
+AUDIT GET /api/ready 2xx geen
+POST /api/supplier/roster
+TOETS POST /api/supplier/roster lidfactuur.test.js
+AUDIT POST /api/supplier/roster 2xx geen
+POST /api/supplier/login
+TOETS POST /api/supplier/login lidfactuur.test.js
+AUDIT POST /api/supplier/login 2xx securityLog
+POST /api/supplier/settings
+TOETS POST /api/supplier/settings lidfactuur.test.js
+AUDIT POST /api/supplier/settings 2xx geen
+POST /api/auth/register
+TOETS POST /api/auth/register lidfactuur.test.js
+AUDIT POST /api/auth/register 2xx geen
+POST /api/auth/login
+TOETS POST /api/auth/login lidfactuur.test.js
+AUDIT POST /api/auth/login 2xx securityLog
+POST /api/account/start
+TOETS POST /api/account/start lidfactuur.test.js
+AUDIT POST /api/account/start 2xx securityLog
+POST /api/verify/upload
+TOETS POST /api/verify/upload lidfactuur.test.js
+AUDIT POST /api/verify/upload 2xx geen
+POST /api/verify/selfie
+TOETS POST /api/verify/selfie lidfactuur.test.js
+AUDIT POST /api/verify/selfie 2xx geen
+POST /api/office/verifications
+TOETS POST /api/office/verifications lidfactuur.test.js
+AUDIT POST /api/office/verifications 2xx inzageLog
+POST /api/office/verify
+TOETS POST /api/office/verify lidfactuur.test.js
+AUDIT POST /api/office/verify 2xx inzageLog
+POST /api/supplier/menu/get
+TOETS POST /api/supplier/menu/get lidfactuur.test.js
+AUDIT POST /api/supplier/menu/get 2xx geen
+POST /api/order
+TOETS POST /api/order lidfactuur.test.js
+AUDIT POST /api/order 2xx geen
+POST /api/supplier/tafelticket
+TOETS POST /api/supplier/tafelticket lidfactuur.test.js
+AUDIT POST /api/supplier/tafelticket 2xx geen
+POST /api/supplier/tafelticket/afrekenen
+TOETS POST /api/supplier/tafelticket/afrekenen lidfactuur.test.js
+AUDIT POST /api/supplier/tafelticket/afrekenen 2xx geen
+POST /api/supplier/facturen/mijn
+TOETS POST /api/supplier/facturen/mijn lidfactuur.test.js
+AUDIT POST /api/supplier/facturen/mijn 2xx geen
+POST /api/supplier/finance
+TOETS POST /api/supplier/finance lidfactuur.test.js
+AUDIT POST /api/supplier/finance 2xx geen
+GET /api/health
+TOETS GET /api/health lidfactuur.test.js
+AUDIT GET /api/health 2xx geen
+GET /api/ready
+TOETS GET /api/ready lidfactuur.test.js
+AUDIT GET /api/ready 2xx geen
+POST /api/supplier/roster
+TOETS POST /api/supplier/roster lidfactuur.test.js
+AUDIT POST /api/supplier/roster 2xx geen
+POST /api/supplier/login
+TOETS POST /api/supplier/login lidfactuur.test.js
+AUDIT POST /api/supplier/login 2xx securityLog
+POST /api/supplier/giftcard/sell
+TOETS POST /api/supplier/giftcard/sell lidfactuur.test.js
+AUDIT POST /api/supplier/giftcard/sell 2xx geen
+POST /api/supplier/finance
+TOETS POST /api/supplier/finance lidfactuur.test.js
+AUDIT POST /api/supplier/finance 2xx geen
+POST /api/supplier/pos/sale
+TOETS POST /api/supplier/pos/sale lidfactuur.test.js
+AUDIT POST /api/supplier/pos/sale 2xx geen
+POST /api/supplier/facturen/mijn
+TOETS POST /api/supplier/facturen/mijn lidfactuur.test.js
+AUDIT POST /api/supplier/facturen/mijn 2xx geen
+POST /api/supplier/giftcard/redeem
+TOETS POST /api/supplier/giftcard/redeem lidfactuur.test.js
+AUDIT POST /api/supplier/giftcard/redeem 4xx geen
+AUDIT POST /api/supplier/giftcard/redeem 2xx geen
+POST /api/supplier/btw/opmaken
+TOETS POST /api/supplier/btw/opmaken lidfactuur.test.js
+AUDIT POST /api/supplier/btw/opmaken 2xx geen
+GET /api/health
+TOETS GET /api/health lidfactuur.test.js
+AUDIT GET /api/health 2xx geen
+GET /api/ready
+TOETS GET /api/ready lidfactuur.test.js
+AUDIT GET /api/ready 2xx geen
+POST /api/supplier/roster
+TOETS POST /api/supplier/roster lidfactuur.test.js
+AUDIT POST /api/supplier/roster 2xx geen
+POST /api/supplier/login
+TOETS POST /api/supplier/login lidfactuur.test.js
+AUDIT POST /api/supplier/login 2xx securityLog
+POST /api/auth/register
+TOETS POST /api/auth/register lidfactuur.test.js
+AUDIT POST /api/auth/register 2xx geen
+POST /api/auth/login
+TOETS POST /api/auth/login lidfactuur.test.js
+AUDIT POST /api/auth/login 2xx securityLog
+POST /api/account/start
+TOETS POST /api/account/start lidfactuur.test.js
+AUDIT POST /api/account/start 2xx securityLog
+POST /api/verify/upload
+TOETS POST /api/verify/upload lidfactuur.test.js
+AUDIT POST /api/verify/upload 2xx geen
+POST /api/verify/selfie
+TOETS POST /api/verify/selfie lidfactuur.test.js
+AUDIT POST /api/verify/selfie 2xx geen
+POST /api/office/verifications
+TOETS POST /api/office/verifications lidfactuur.test.js
+AUDIT POST /api/office/verifications 2xx inzageLog
+POST /api/office/verify
+TOETS POST /api/office/verify lidfactuur.test.js
+AUDIT POST /api/office/verify 2xx inzageLog
+POST /api/supplier/menu/get
+TOETS POST /api/supplier/menu/get lidfactuur.test.js
+AUDIT POST /api/supplier/menu/get 2xx geen
+POST /api/order
+TOETS POST /api/order lidfactuur.test.js
+AUDIT POST /api/order 2xx geen
+POST /api/order/pay
+TOETS POST /api/order/pay lidfactuur.test.js
+AUDIT POST /api/order/pay 2xx geen
+POST /api/supplier/pos/redeem
+TOETS POST /api/supplier/pos/redeem lidfactuur.test.js
+AUDIT POST /api/supplier/pos/redeem 2xx geen
+POST /api/supplier/facturen/mijn
+TOETS POST /api/supplier/facturen/mijn lidfactuur.test.js
+AUDIT POST /api/supplier/facturen/mijn 2xx geen
+POST /api/supplier/finance
+TOETS POST /api/supplier/finance lidfactuur.test.js
+AUDIT POST /api/supplier/finance 2xx geen
+POST /api/supplier/btw/opmaken
+TOETS POST /api/supplier/btw/opmaken lidfactuur.test.js
+AUDIT POST /api/supplier/btw/opmaken 2xx geen
+GET /api/health
+TOETS GET /api/health lidfactuur.test.js
+AUDIT GET /api/health 2xx geen
+GET /api/ready
+TOETS GET /api/ready lidfactuur.test.js
+AUDIT GET /api/ready 2xx geen
+POST /api/supplier/roster
+TOETS POST /api/supplier/roster lidfactuur.test.js
+AUDIT POST /api/supplier/roster 2xx geen
+POST /api/supplier/login
+TOETS POST /api/supplier/login lidfactuur.test.js
+AUDIT POST /api/supplier/login 2xx securityLog
+POST /api/auth/register
+TOETS POST /api/auth/register lidfactuur.test.js
+AUDIT POST /api/auth/register 2xx geen
+POST /api/auth/login
+TOETS POST /api/auth/login lidfactuur.test.js
+AUDIT POST /api/auth/login 2xx securityLog
+POST /api/account/start
+TOETS POST /api/account/start lidfactuur.test.js
+AUDIT POST /api/account/start 2xx securityLog
+POST /api/verify/upload
+TOETS POST /api/verify/upload lidfactuur.test.js
+AUDIT POST /api/verify/upload 2xx geen
+POST /api/verify/selfie
+TOETS POST /api/verify/selfie lidfactuur.test.js
+AUDIT POST /api/verify/selfie 2xx geen
+POST /api/office/verifications
+TOETS POST /api/office/verifications lidfactuur.test.js
+AUDIT POST /api/office/verifications 2xx inzageLog
+POST /api/office/verify
+TOETS POST /api/office/verify lidfactuur.test.js
+AUDIT POST /api/office/verify 2xx inzageLog
+POST /api/supplier/menu/get
+TOETS POST /api/supplier/menu/get lidfactuur.test.js
+AUDIT POST /api/supplier/menu/get 2xx geen
+POST /api/supplier/giftcard/sell
+TOETS POST /api/supplier/giftcard/sell lidfactuur.test.js
+AUDIT POST /api/supplier/giftcard/sell 2xx geen
+POST /api/supplier/finance
+TOETS POST /api/supplier/finance lidfactuur.test.js
+AUDIT POST /api/supplier/finance 2xx geen
+POST /api/supplier/pos/sale
+TOETS POST /api/supplier/pos/sale lidfactuur.test.js
+AUDIT POST /api/supplier/pos/sale 2xx geen
+POST /api/supplier/facturen/mijn
+TOETS POST /api/supplier/facturen/mijn lidfactuur.test.js
+AUDIT POST /api/supplier/facturen/mijn 2xx geen
+POST /api/supplier/btw/opmaken
+TOETS POST /api/supplier/btw/opmaken lidfactuur.test.js
+AUDIT POST /api/supplier/btw/opmaken 2xx geen
+AUDIT POST /api/supplier/pos/sale 4xx geen
+POST /api/supplier/giftcard/redeem
+TOETS POST /api/supplier/giftcard/redeem lidfactuur.test.js
+AUDIT POST /api/supplier/giftcard/redeem 2xx geen
+GET /api/health
+TOETS GET /api/health lidfactuur.test.js
+AUDIT GET /api/health 2xx geen
+GET /api/ready
+TOETS GET /api/ready lidfactuur.test.js
+AUDIT GET /api/ready 2xx geen
+POST /api/supplier/roster
+TOETS POST /api/supplier/roster lidfactuur.test.js
+AUDIT POST /api/supplier/roster 2xx geen
+POST /api/supplier/login
+TOETS POST /api/supplier/login lidfactuur.test.js
+AUDIT POST /api/supplier/login 2xx securityLog
+POST /api/supplier/giftcard/sell
+TOETS POST /api/supplier/giftcard/sell lidfactuur.test.js
+AUDIT POST /api/supplier/giftcard/sell 2xx geen
+AUDIT POST /api/supplier/giftcard/sell 4xx geen
+POST /api/supplier/finance
+TOETS POST /api/supplier/finance lidfactuur.test.js
+AUDIT POST /api/supplier/finance 2xx geen
+GET /api/foundation/health
+TOETS GET /api/foundation/health vloot.test.js
+AUDIT GET /api/foundation/health 2xx geen
+GET /api/health
+TOETS GET /api/health vloot.test.js
+AUDIT GET /api/health 2xx geen
+POST /api/office/login
+TOETS POST /api/office/login vloot.test.js
+AUDIT POST /api/office/login 2xx securityLog
+POST /api/test/bug
+TOETS POST /api/test/bug vloot.test.js
+AUDIT POST /api/test/bug 5xx geen
+POST /api/login
+TOETS POST /api/login vloot.test.js
+AUDIT POST /api/login 2xx geen
+POST /api/test/crash
+TOETS POST /api/test/crash vloot.test.js
+AUDIT POST /api/test/crash 2xx geen
+POST /api/office/login
+TOETS POST /api/office/login vloot.test.js
+AUDIT POST /api/office/login 2xx securityLog
+GET /api/health
+TOETS GET /api/health zaakdoos.test.js
+AUDIT GET /api/health 2xx geen
+GET /api/sat/ping
+TOETS GET /api/sat/ping zaakdoos.test.js
+AUDIT GET /api/sat/ping 2xx geen
+GET /api/doos/kloon
+TOETS GET /api/doos/kloon zaakdoos.test.js
+GET /api/health
+TOETS GET /api/health zaakdoos.test.js
+AUDIT GET /api/health 2xx geen
+GET /api/ready
+TOETS GET /api/ready zaakdoos.test.js
+AUDIT GET /api/ready 2xx geen
+POST /api/doos/meting
+TOETS POST /api/doos/meting zaakdoos.test.js
+GET /api/doos/status
+TOETS GET /api/doos/status zaakdoos.test.js
+AUDIT GET /api/doos/status 2xx geen
+AUDIT POST /api/doos/meting 2xx geen
+POST /api/supplier/login
+TOETS POST /api/supplier/login zaakdoos.test.js
+AUDIT POST /api/supplier/login 2xx securityLog
+AUDIT GET /api/doos/kloon 2xx securityLog
+POST /api/supplier/state
+TOETS POST /api/supplier/state zaakdoos.test.js
+AUDIT POST /api/supplier/state 2xx geen
+AUDIT GET /api/doos/kloon 4xx geen
+AUDIT POST /api/doos/meting 4xx geen
+POST /api/doos/rapport
+TOETS POST /api/doos/rapport zaakdoos.test.js
+AUDIT POST /api/doos/rapport 4xx geen
+AUDIT POST /api/doos/rapport 2xx geen
+POST /api/doos/buurmelding
+TOETS POST /api/doos/buurmelding zaakdoos.test.js
+AUDIT POST /api/doos/buurmelding 4xx geen
+AUDIT POST /api/doos/buurmelding 2xx geen
+POST /api/auth/login
+TOETS POST /api/auth/login zaakdoos.test.js
+AUDIT POST /api/auth/login 2xx securityLog
+POST /api/office/kamer
+TOETS POST /api/office/kamer zaakdoos.test.js
+AUDIT POST /api/office/kamer 2xx geen
+POST /api/office/wereld
+TOETS POST /api/office/wereld zaakdoos.test.js
+AUDIT POST /api/office/wereld 2xx geen
+POST /api/office/wereld/actie
+TOETS POST /api/office/wereld/actie zaakdoos.test.js
+AUDIT POST /api/office/wereld/actie 2xx kantoorAudit
+AUDIT POST /api/doos/meting 2xx kantoorAudit
+GET /media/:naam
+TOETS GET /media/:naam zaakdoos.test.js
+AUDIT GET /media/:naam 2xx geen
+GET /api/doos/rapport
+TOETS GET /api/doos/rapport zaakdoos.test.js
+AUDIT GET /api/doos/rapport 2xx geen
+POST /api/supplier/login
+TOETS POST /api/supplier/login zaakdoos.test.js
+AUDIT POST /api/supplier/login 2xx securityLog
+POST /api/supplier/overschot
+TOETS POST /api/supplier/overschot zaakdoos.test.js
+AUDIT POST /api/supplier/overschot 2xx geen
+POST /api/supplier/state
+TOETS POST /api/supplier/state zaakdoos.test.js
+AUDIT POST /api/supplier/state 2xx geen
+GET /api/health
+TOETS GET /api/health zaakdoos.test.js
+AUDIT GET /api/health 2xx geen
+GET /api/sat/ping
+TOETS GET /api/sat/ping zaakdoos.test.js
+AUDIT GET /api/sat/ping 2xx geen
+POST /api/doos/meting
+TOETS POST /api/doos/meting zaakdoos.test.js
+AUDIT POST /api/doos/meting 2xx geen
+POST /api/supplier/login
+TOETS POST /api/supplier/login zaakdoos.test.js
+AUDIT POST /api/supplier/login 2xx securityLog
+POST /api/supplier/overschot
+TOETS POST /api/supplier/overschot zaakdoos.test.js
+AUDIT POST /api/supplier/overschot 2xx geen
+GET /api/doos/kloon
+TOETS GET /api/doos/kloon zaakdoos.test.js
+AUDIT GET /api/doos/kloon 2xx geen
+POST /api/supplier/state
+TOETS POST /api/supplier/state zaakdoos.test.js
+AUDIT POST /api/supplier/state 2xx geen
+GET /api/health
+TOETS GET /api/health zaakdoos.test.js
+AUDIT GET /api/health 2xx geen
+GET /api/health
+TOETS GET /api/health zaakdoos.test.js
+AUDIT GET /api/health 2xx geen
+GET /api/sat/ping
+TOETS GET /api/sat/ping zaakdoos.test.js
+AUDIT GET /api/sat/ping 2xx geen
+GET /api/doos/kloon
+TOETS GET /api/doos/kloon zaakdoos.test.js
+AUDIT GET /api/doos/kloon 2xx geen
+GET /api/health
+TOETS GET /api/health zaakdoos.test.js
+AUDIT GET /api/health 2xx geen
+GET /api/ready
+TOETS GET /api/ready zaakdoos.test.js
+AUDIT GET /api/ready 2xx geen
+GET /api/doos/status
+TOETS GET /api/doos/status zaakdoos.test.js
+AUDIT GET /api/doos/status 2xx geen
+GET /api/sat/ping
+TOETS GET /api/sat/ping zaakdoos.test.js
+AUDIT GET /api/sat/ping 2xx geen

@@ -237,6 +237,9 @@
   --rtg-card2:#1B1817;
   --rtg-goud:var(--gold-tekst);
   --rtg-opgoud:#1C1608;
+  /* het hoogsel op het accent terug naar de goudformule van rtg-ui.css; zie het
+     bordeaux-eiland hieronder, dat hem op het accent zet */
+  --rtg-goud-hoog:initial;
   --rtg-leesgoud:var(--gold-tekst);
   --rtg-leeszacht:var(--rtg-soft);
   --rtg-leesgroen:#4C9A75;
@@ -281,6 +284,17 @@
      springlink, de volle knop en de bedoelknop zakten allemaal tegelijk door de
      a11y-poort. Wit op dit bordeaux haalt 5,17. */
   --rtg-opgoud:#FFFFFF;
+  /* EN HET HOOGSEL OP HET ACCENT GAAT HIER UIT. De volle knop is een verloop
+     dat bovenaan 22% wit door het accent mengt (rtg-ui.css); op dit bordeaux
+     wordt dat rgb(207,101,129), en daar haalt de witte inkt van hierboven 3,60.
+     De donkere inkt zou daar 4,99 halen, maar die zakt op de middelste stop,
+     het pure accent: 3,48. Er is dus geen inkt die op alle stops van dat
+     verloop leest. "Kanaal aanmelden" op podium en theater zakte er op door
+     de poort. Op het pure accent haalt wit 5,17 en op de donkere stop 7,53,
+     dus in dit eiland is het hoogsel het accent. Het onyx-scherm en het
+     onyx-vlak hieronder zetten dit token weer op `initial`, zodat de
+     goudformule van rtg-ui.css daar opnieuw geldt. */
+  --rtg-goud-hoog:var(--rtg-goud);
   /* HET LEESGOUD IS DE LEESTOON, NIET HET ACCENT. Zet je hier het hoogsel
      (#C23A5E), dan leest elk prijsje, kopje en stipje op 3,74:1 -- de poort
      vond er veertien. Deze rozetint komt uit dezelfde familie en haalt op
@@ -305,6 +319,7 @@
      voortaan hetzelfde besluit. */
   --rtg-leesgoud:#E7A8B8;
   --rtg-opgoud:#FFFFFF;
+  --rtg-goud-hoog:var(--rtg-goud);
 }
 
 /* EN EEN VLAK BINNEN EEN SCHERM MAG HETZELFDE ZEGGEN.
@@ -338,6 +353,13 @@
      onyx-vlak op een bordeauxscherm werd wit op goud. Dezelfde donkere inkt als
      het scherm-blok hierboven, en om dezelfde reden: hier IS het accent goud. */
   --rtg-opgoud:#1C1608;
+  /* EN HET HOOGSEL OOK, om precies dezelfde reden -- dezelfde regel lager. Een
+     custom property met var() wordt op het element uitgerekend en erft als
+     waarde: op een bordeauxscherm staat op de body #C23A5E als hoogsel, en een
+     volle knop in een onyx-vlak daarbinnen liep dan van bordeaux over in goud,
+     met donkere inkt op het bordeaux (3,48). `initial` maakt het token hier
+     ongeldig, en dan geldt de terugval van rtg-ui.css weer: de goudformule. */
+  --rtg-goud-hoog:initial;
   --rtg-leesgoud:var(--gold-tekst);
   --rtg-leeszacht:var(--rtg-soft);
   --rtg-leesgroen:#4C9A75;

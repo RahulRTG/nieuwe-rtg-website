@@ -79,6 +79,8 @@
   --rtg-muted:rgba(244,241,236,0.70);
   --rtg-soft:rgba(244,241,236,0.60);
   --rtg-goud:#C9A24B;
+  /* het hoogsel OP dat accent (--rtg-goud-hoog) staat bewust niet hier maar
+     als terugval bij het knopverloop verderop -- zie de toelichting daar */
   --rtg-groen:#4C9A75;
   --rtg-rood:#DE6E92;
   /* het accent ademt mee met de levende dagkleur (shared/dagkleur.css); staat
@@ -888,8 +890,22 @@ body.rtg-stijl .tab,body.rtg-stijl .chip,body.rtg-stijl .pil{
 body.rtg-stijl .knop.vol,body.rtg-stijl .knop.primair,
 body.rtg-stijl .tab.aan,body.rtg-stijl .tab.actief,
 body.rtg-stijl .chip.aan{
+  /* HET HOOGSEL OP HET ACCENT IS EEN TOKEN GEWORDEN, om dezelfde reden als
+     --rtg-opgoud. Dit verloop mengt bovenaan 22% wit door het accent, en
+     onder goud is dat gewoon glans: de donkere inkt leest op elke stop. In
+     het bordeaux-eiland (podium, theater) is --rtg-goud #C23A5E en de inkt
+     wit, en dan wordt de lichtste stop rgb(207,101,129): wit haalt daar 3,60
+     en #1C1608 4,99, maar op de middelste stop (het pure accent) is het
+     andersom, wit 5,17 en #1C1608 3,48 -- er bestaat geen inkt die op ALLE
+     stops van dat verloop leest. De poort vond het op "Kanaal aanmelden", op
+     beide schermen. Op het
+     pure accent haalt wit 5,17 en op de donkere stop 7,53, dus het eiland zet
+     het hoogsel op het accent zelf (rtg-themas.css). De terugval staat HIER
+     en niet in het basisblok, net als bij --rtg-opgoud: een token in :root{}
+     moet van test/thema.test.js in alle zes de themablokken staan, en zes
+     keer dezelfde formule overtypen is de dubbeling die dit token wegneemt. */
   background:linear-gradient(155deg,
-    color-mix(in srgb,var(--rtg-goud) 78%,white),
+    var(--rtg-goud-hoog,color-mix(in srgb,var(--rtg-goud) 78%,white)),
     var(--rtg-goud) 52%,
     color-mix(in srgb,var(--rtg-goud) 78%,black));
   box-shadow:0 1px 0 rgba(255,255,255,.28) inset,

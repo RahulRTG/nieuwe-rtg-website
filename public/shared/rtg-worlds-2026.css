@@ -231,10 +231,14 @@ body[data-rtg-world="living"]{
      stark zwart/wit, geen gradient-grond). Op een volle pagina gaf het een
      roze waas waarin kaarten, randen en tekst allemaal even hard riepen.
      Het materiaal hoort LICHT te zijn dat ergens vandaan komt -- die radiaal
-     hieronder deed dat al goed en heeft alleen zwart onder zich nodig. */
-  background:
+     hieronder deed dat al goed en heeft alleen zwart onder zich nodig.
+     De waarde staat EEN keer, als --living-grond: de voorrangsregel onder
+     ::after heeft hem nog eens nodig, en twee keer overtypen is hoe een
+     gloed over een half jaar op twee plekken iets anders is. */
+  --living-grond:
     radial-gradient(circle at 76% 11%,rgba(158,28,64,.32),transparent 27rem),
     #080707;
+  background:var(--living-grond);
 }
 body[data-rtg-world="living"]::before{
   opacity:.35;
@@ -244,6 +248,62 @@ body[data-rtg-world="living"]::before{
 }
 body[data-rtg-world="living"]::after{
   background:radial-gradient(circle at 70% 7%,rgba(192,165,68,.12),transparent 28rem);
+}
+/* DE EILANDREGEL WON VAN DE WERELDLAAG, en dat was een samenvoeging en geen
+   keuze. Twee takken van 31 augustus 2026, geen van beide voorouder van de
+   ander en geen van beide op main, samengebracht in 7070c68a2 (Merge PR #155;
+   ouders a59d39946 met de travel-tak en bb4b9f731 met de living-tak):
+
+     2bec7f271 (TravelOS, rtg-themas.css)
+       :root[data-rtg-thema] body[data-rtg-eigenvlak="bordeaux"]{background:var(--rtg-grond)}
+       specificiteit 0,3,1 -- het fluweelverloop als GROND, want TravelOS
+       draagt bordeaux als grond en niet als accent.
+     99414232c (LivingOS, dit bestand)
+       body[data-rtg-world="living"]{background:<gloed>,#080707}
+       specificiteit 0,1,1 -- zwart, met het materiaal als LICHT.
+
+   27 van de 41 LivingOS-schermen dragen `data-rtg-eigenvlak="bordeaux"` (8
+   dragen onyx, 6 niets); die vlag was nodig tegen `body:not([data-rtg-eigenvlak])`,
+   zie het bericht van 99414232c. Op elk van die 27 won de eilandregel dus op
+   specificiteit (0,3,1 tegen 0,1,1), en de hele pagina lag op fluweel vanaf
+   #7F1634 -- precies
+   de verf die 99414232c had weggehaald. Op main, zonder eilandregel, lag het
+   beginscherm op de gloed over var(--bordeaux-diep), #4A0C1E.
+
+   GEMETEN (scripts/zz-a11y-gericht.js, 2 september 2026, voor deze regel): de
+   keuring neemt de ongunstigste stop van het verloop en mengt de vaste
+   ::before/::after-lagen hierboven erover; zo kwam de grond van rtg.html op
+   rgb(148,65,69) uit (vandaag rgb(142,51,69), thuis en krant rgb(152,69,86)).
+   Daarop haalde --rtg-soft (#DCC5CB) 4,16, --rtg-leesgoud (#E7A8B8) 3,95 en
+   --gold-tekst 2,81: 22 contrastbevindingen over rtg, vandaag, thuis en krant,
+   uitgelogd en ingelogd.
+
+   NA DEZE REGEL, zelfde meting: 0 contrast over dezelfde vijf schermen, en
+   getComputedStyle(body) op rtg.html geeft de gloed over rgb(8,7,7) terwijl
+   reizen.html het fluweelverloop houdt.
+
+   Deze regel hangt aan het thema-attribuut EN de wereld EN de vlag (0,4,1;
+   :root telt als pseudoklasse mee) en
+   geeft de wereldlaag zijn grond terug. Alleen voor living: TravelOS (17
+   schermen, data-rtg-world="travel" met dezelfde vlag) haalt zijn fluweel
+   juist UIT de eilandregel en houdt hem. En hij wint ook van de
+   champagne-uitzondering bovenaan (0,3,1): een scherm dat zich bordeaux
+   verklaart doet niet mee aan het thema, dus ook onder champagne blijft het
+   zwart met de gloed.
+
+   DIT IS EEN PLEISTER, EN DE OORZAAK STAAT OPEN. De oorzaak is dat EEN
+   vlagwaarde sinds de samenvoeging twee dingen betekent: voor de 27
+   living-schermen "ik schilder mijn eigen grond en inkt" (99414232c), voor het
+   eiland in rtg-themas.css "geef mij het fluweel en de fluweeltokens"
+   (2bec7f271). Deze regel pakt alleen de GROND terug; de kaarten (--rtg-card
+   #2A0713), het accent en de leestoon op die 27 schermen komen nog steeds uit
+   het eiland, terwijl de wereldlaag hierboven zelf --goud verklaart. Of
+   LivingOS een eigen vlagwaarde krijgt, of het eiland aan de wereld travel
+   wordt gebonden, is een ontwerpbesluit en geen reparatie; tot dat besluit
+   staat hier deze voorrangsregel, met deze alinea als reden. */
+:root[data-rtg-thema] body[data-rtg-world="living"][data-rtg-eigenvlak="bordeaux"]{
+  background:var(--living-grond);
+  background-attachment:fixed;
 }
 body[data-rtg-world="living"] .os-switcher{
   background:rgba(74,12,30,.92);

@@ -121,9 +121,25 @@ async function main() {
       const voor = await standVanPoort(roep, OWNER);
       for (const p of paden) await roep(p, {}, tok);
       const na = await standVanPoort(roep, OWNER);
+      /* EN WELKE PADEN DAT ZIJN, met de reden erbij. De teller zegt HOEVEEL er
+         dichtgaan; een mens die moet besluiten of de poort mag bijten, wil weten
+         WELKE -- anders is 85 een getal zonder betekenis. De proefroute geeft per
+         pad een verklaard besluit en voert niets uit; zij is dus de juiste bron,
+         en het is dezelfde besluitlaag die de poort gebruikt. In stukken van
+         veertig, want de route kapt op tweehonderd paden af en een stille
+         afkapping zou de lijst korter maken dan de werkelijkheid. */
+      const gesloten = [];
+      for (let i = 0; i < paden.length; i += 40) {
+        const deel = paden.slice(i, i + 40);
+        const pr = await roep('/api/techniek/isolatie/proef',
+          { [drager]: zet.body.uit.sleutel, paden: deel, wereld: 'member' }, _tech);
+        for (const b of (pr.body && pr.body.besluiten) || []) {
+          if (!b.toegestaan) gesloten.push({ pad: b.pad, waarom: b.uitleg, reden: b.reden });
+        }
+      }
       rondes.push({ stand, drager, paden: paden.length,
         gewogen: na.gewogen - voor.gewogen, zouSluiten: na.zouSluiten - voor.zouSluiten,
-        voorbeelden: (na.voorbeelden || []).slice(-8) });
+        gesloten });
     }
 
     const uit = {

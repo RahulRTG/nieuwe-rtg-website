@@ -1,6 +1,6 @@
 {
   "stempel": {
-    "op": "2026-09-02T14:46:52.553Z",
+    "op": "2026-09-02T17:24:05.932Z",
     "node": "v22.22.2"
   },
   "uitleg": "Wat middleware/isolatiepoort.js zou sluiten als hij beet. Gemeten met echt HTTP-verkeer van een echt lid met een echte stand, niet geschat.",
@@ -13,7 +13,7 @@
       "paden": 120,
       "gewogen": 117,
       "zouSluiten": 0,
-      "voorbeelden": []
+      "gesloten": []
     },
     {
       "stand": "beperkt",
@@ -21,7 +21,7 @@
       "paden": 120,
       "gewogen": 117,
       "zouSluiten": 0,
-      "voorbeelden": []
+      "gesloten": []
     },
     {
       "stand": "beschermd",
@@ -29,15 +29,152 @@
       "paden": 120,
       "gewogen": 117,
       "zouSluiten": 26,
-      "voorbeelden": [
-        "POST /api/bank/salaris",
-        "POST /api/bank/sepa",
-        "POST /api/bank/spaardoel",
-        "POST /api/bank/storten",
-        "POST /api/bank/terugkerend/stop",
-        "POST /api/bank/terugkerend/zet",
-        "POST /api/bank/van-wallet",
-        "POST /api/pay/kascode"
+      "gesloten": [
+        {
+          "pad": "/api/bank/advies",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/bank/akkoord",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/bank/bevries",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/bank/bulk",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/bank/krediet",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/bank/krediet/aanvraag",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/bank/krediet/aflossing",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/bank/naar-wallet",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/bank/overboek",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/bank/pas/betaal",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/bank/pas/bevries",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/bank/pas/limiet",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/bank/pas/sluit",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/bank/rekening/open",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/bank/rente-voorbeeld",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/bank/salaris",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/bank/sepa",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/bank/spaardoel",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/bank/storten",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/bank/terugkerend/stop",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/bank/terugkerend/zet",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/bank/van-wallet",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/pay/kascode",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/pay/oplaad",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/pay/saldo",
+          "waarom": "geld dat tijdens een incident beweegt, beweegt terug met een bank en niet met een knop.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/pay/stuur",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/pay/tik",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/pay/verzoek/betaal",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/pay/verzoek/intrek",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        }
       ]
     },
     {
@@ -46,15 +183,447 @@
       "paden": 120,
       "gewogen": 117,
       "zouSluiten": 85,
-      "voorbeelden": [
-        "POST /api/bank/salaris",
-        "POST /api/bank/sepa",
-        "POST /api/bank/spaardoel",
-        "POST /api/bank/storten",
-        "POST /api/bank/terugkerend/stop",
-        "POST /api/bank/terugkerend/zet",
-        "POST /api/bank/van-wallet",
-        "POST /api/pay/kascode"
+      "gesloten": [
+        {
+          "pad": "/api/agenda/antwoord",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/agenda/bereik",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/agenda/bewaar",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/agenda/uitnodig",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/agenda/verwijder",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/agenda/wijzig",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/asset/document",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/asset/gebruik",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/asset/herroep",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/asset/koop",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/asset/uitstap",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/asset/wachtlijst",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/bank/advies",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/bank/akkoord",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/bank/bevries",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/bank/bulk",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/bank/krediet",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/bank/krediet/aanvraag",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/bank/krediet/aflossing",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/bank/naar-wallet",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/bank/overboek",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/bank/pas/betaal",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/bank/pas/bevries",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/bank/pas/limiet",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/bank/pas/sluit",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/bank/rekening/open",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/bank/rente-voorbeeld",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/bank/salaris",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/bank/sepa",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/bank/spaardoel",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/bank/storten",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/bank/terugkerend/stop",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/bank/terugkerend/zet",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/bank/van-wallet",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/bijles/gesprek",
+          "waarom": "de opslagmeting zag geen collectie bewegen, maar zij kijkt niet naar bestanden en uitgaande aanroepen; het effectmodel ziet hier UITGAANDE_AANROEP",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/bijles/vraag",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/booking/pay",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/booking/request",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/kantoorpakket/deel",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/kantoorpakket/fase",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/kantoorpakket/maak",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/kantoorpakket/ster",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/kantoorpakket/terug",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/kantoorpakket/uitslag",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/kantoorpakket/vul",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/kantoorpakket/weg",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/leerstof/antwoord",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/leerstof/examen",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/leerstof/examen-antwoord",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/leerstof/les",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/leerstof/oefen",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/leerstof/vakken",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/locatie/deel",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/locatie/stop",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/mediaos/stuk",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/mediaos/stuur",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/mediaos/volg",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/meet/kom",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/meet/maak",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/meet/sein",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/meet/weg",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/onderwijs/advies",
+          "waarom": "de opslagmeting zag geen collectie bewegen, maar zij kijkt niet naar bestanden en uitgaande aanroepen; het effectmodel ziet hier UITGAANDE_AANROEP",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/onderwijs/doel",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/onderwijs/inschrijf",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/onderwijs/jaar-over",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/pay/kascode",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/pay/oplaad",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/pay/saldo",
+          "waarom": "geld dat tijdens een incident beweegt, beweegt terug met een bank en niet met een knop.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/pay/stuur",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/pay/tik",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/pay/verzoek/betaal",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/pay/verzoek/intrek",
+          "waarom": "zelfde reden, en dit is de categorie waar het om bedragen gaat in plaats van om een betaalpoging.",
+          "reden": "BESCHERMSTAND_CATEGORIE"
+        },
+        {
+          "pad": "/api/reservering/annuleer",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/site/cijfers",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/site/domein",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/site/foto",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/site/foto-weg",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/site/fotos",
+          "waarom": "de opslagmeting zag geen collectie bewegen, maar zij kijkt niet naar bestanden en uitgaande aanroepen; het effectmodel ziet hier ONVERTROUWDE_BYTES",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/site/haal",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/site/herstel",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/site/live",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/site/offline",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/site/plan",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/site/publiceer",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/site/sjabloon",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/site/spoor",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/site/versies",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        },
+        {
+          "pad": "/api/site/verwijder",
+          "waarom": "van dit pad is niet gemeten dat het werk doet zonder iets te veranderen; onder isolatie gaat dicht wat zijn lezerschap niet heeft bewezen",
+          "reden": "ISOLATIE_LEESSET"
+        }
       ]
     }
   ]

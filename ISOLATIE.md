@@ -1044,6 +1044,51 @@ inhangregel eruit) laat hem zakken.
 > vergissing maar de leesset, en het is precies waarom `besluit()` op 255 paden
 > losser is dan de beschermstand.
 
+### De leeslijst: wat gaat er dicht, en wat kost dat een lid
+
+Dit is de lijst die er moet liggen vóór de vlag omgaat. Niet een getal maar de
+paden zelf, met wat een lid dan niet meer kan — want "85 van de 117" is geen
+besluit waar iemand ja op kan zeggen.
+
+**Onder `beschermd` sluiten 29 paden, en ze zijn alle 29 hetzelfde onderwerp:
+geld.** 22 op `/api/bank` en 7 op `/api/pay`. Overboeken, SEPA, storten, salaris,
+spaardoel, terugkerende opdrachten, pas betalen en bevriezen, saldo opladen,
+tikken en betaalverzoeken. Wat er níét bij zit is even belangrijk: lezen loopt
+door — het afschrift, het advies en het overzicht blijven werken. Een lid in de
+beschermstand ziet zijn geld dus wel en beweegt het niet. Grond:
+`BESCHERMSTAND_CATEGORIE`.
+
+**Onder `isolatie` komen daar 59 paden bij, en die zijn van een andere soort.**
+Grond `ISOLATIE_LEESSET`: van deze paden is niet *gemeten* dat ze werk doen
+zonder iets te veranderen, en onder isolatie gaat dicht wat zijn lezerschap niet
+heeft bewezen. Per familie, zodat te zien is wat een mens kwijtraakt:
+
+| familie | aantal | wat een lid dan niet meer kan |
+|---|---|---|
+| `/api/site` | 15 | zijn eigen site bewerken, publiceren, foto's, herstellen, versies |
+| `/api/kantoorpakket` | 8 | een pakket maken, vullen, delen, een fase zetten |
+| `/api/agenda` | 6 | afspraken maken, wijzigen, verwijderen, uitnodigen, antwoorden |
+| `/api/asset` | 6 | kopen, uitstappen, herroepen, wachtlijst, documenten |
+| `/api/leerstof` | 6 | lessen, oefeningen, examens en antwoorden |
+| `/api/onderwijs` | 4 | inschrijven, doelen, advies, jaar overslaan |
+| `/api/meet` | 4 | een afspraak maken, komen, seinen, weghalen |
+| `/api/mediaos` | 3 | sturen, volgen, een stuk plaatsen |
+| `/api/bijles`, `/api/booking`, `/api/locatie`, `/api/reservering` | 7 | bijles vragen, boeken en betalen, locatie delen, annuleren |
+
+**Drie paden staan in deze telling maar bereiken de poort niet**, en dat is
+gemeten en geen aanname: `/api/bank/krediet`, `/api/bank/krediet/aanvraag` en
+`/api/bank/krediet/aflossing` geven **503** vóór de isolatielaag. Ze zijn al dicht
+om een strengere reden — RTG heeft geen kredietvergunning — en de
+bevoegdheidslaag komt eerder in de keten. Vandaar 88 in het besluit en 85 aan de
+poort; het verschil is precies deze drie.
+
+> **De vraag die hier voorligt** is niet of dit werkt, maar of dit *bedoeld* is.
+> Twee dingen springen eruit. Dat `/api/site` dichtgaat betekent dat een lid in
+> isolatie zijn website niet meer kan bijwerken — verdedigbaar bij een
+> overgenomen account, maar het is een keuze. En de grond `ISOLATIE_LEESSET` is
+> geen oordeel over die paden: hij zegt dat er niet is *gemeten* dat ze lezen.
+> Wie die meting doet, maakt de lijst korter zonder de beveiliging te verzwakken.
+
 ### Wat er nog steeds openstaat, met de reden
 
 De vlag omzetten. `CONTROLPLANE.md` eist 200 waarnemingen en zeven dagen. De

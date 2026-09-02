@@ -188,12 +188,30 @@ function buitenBereik(gezienePaden, opties) {
     return t;
   });
 
-  const bak = { poortwachter: [], inHandler: [], publiek: [], onbekend: [], gat: [], bronOnvindbaar: [] };
+  /* DE GEGENEREERDE FAMILIES. Een handvol routes wordt in een LUS aangemaakt
+     (`app.post('/api/rtf/spel/' + naam, ...)`), dus hun pad is een expressie en
+     staat nergens letterlijk. Geen enkele lezer van de brontekst vindt ze, en
+     `plekVan()` geeft daarom `bestand: null`.
+
+     Dit huis had dat al opgelost: `server/kern/handlerpoorten/buiten.js` draagt
+     een register van voorvoegsels met de poort die de lus aanroept EN de bron
+     erbij. Die 43 rtf-spelroutes hebben dus wel degelijk een deur. Ze hier als
+     "bron onvindbaar" laten staan zou een bestaand antwoord negeren en de lijst
+     langer maken dan hij is. */
+  let families = [];
+  try { families = require('../../server/kern/handlerpoorten/buiten').FAMILIES || []; } catch (e) { families = []; }
+  const familiePoort = (pad) => {
+    const seg = pad.split('/').filter(Boolean);
+    return families.find(f => (f.segmenten || []).every((s2, i) => seg[i] === s2)) || null;
+  };
+
+  const bak = { poortwachter: [], familie: [], inHandler: [], publiek: [], onbekend: [], gat: [], bronOnvindbaar: [] };
   for (const r of buiten) {
     const p = norm(r.pad);
     if (o.publiek && o.publiek.has(p)) { bak.publiek.push(p); continue; }
     if (!r.bewakersBekend) { bak.onbekend.push(p); continue; }
     if ((r.bewakers || []).some(n => o.poortMw.has(n))) { bak.poortwachter.push(p); continue; }
+    if (familiePoort(p)) { bak.familie.push(p); continue; }
     if (!r.bestand || !r.regel) { bak.bronOnvindbaar.push(p); continue; }
     const lijf = lijfVan(r.bestand, r.regel, lees);
     if (lijf === null) { bak.bronOnvindbaar.push(p); continue; }

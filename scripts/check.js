@@ -1999,7 +1999,8 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
       const k = b.klasse;
       console.log('  \x1b[2m! SCHADUW: ' + b.paden.length + ' van de ' + b.bekend +
         ' /api-paden die de router kent, vallen buiten de uitdrukking van deze regel. Geclassificeerd: ' +
-        k.poortwachter.length + ' via een poortwachter, ' + k.inHandler.length + ' met een poort in de handler, ' +
+        k.poortwachter.length + ' via een poortwachter, ' + k.familie.length + ' via een gegenereerde familie, ' +
+        k.inHandler.length + ' met een poort in de handler, ' +
         k.publiek.length + ' publiek met reden, ' + k.bronOnvindbaar.length + ' bron onvindbaar, ' +
         k.onbekend.length + ' bewakers onbekend.\x1b[0m');
       if (k.gat.length) {

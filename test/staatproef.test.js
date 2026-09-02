@@ -10,7 +10,13 @@
      2. de OMGEVINGSRUIS -- doorgeefjournaal en rtgai bewegen bij elk verzoek,
         ook bij een 404;
      3. de EERSTE-AANRAKING -- een kern die zijn la inricht, verandert de
-        toestand ook als het verzoek daarna wordt afgewezen.
+        toestand ook als het verzoek daarna wordt afgewezen;
+     4. de BOEKHOUDING VAN DE AANROEP -- de kostenmeter en de auditjournalen
+        bewegen bij ELKE aanroep, ook de tweede, en dat hoort. Zonder die vierde
+        klasse las de proef "de herhaling bewoog de toestand opnieuw: kosten",
+        werd dat in de bewijsmatrix een gezakte cel, in VERTROUWEN.json een
+        `geschorst`, en zette server/middleware/schorspoort.js negen routes met
+        een 503 dicht -- terwijl er in geen van de negen iets tweemaal gebeurde.
 
    Draai los: node --test test/staatproef.test.js */
 const test = require('node:test');
@@ -377,4 +383,58 @@ test('een vingerafdruk die niet terugkomt is een kapotte MEETOPSTELLING, geen be
   });
   assert.match(uit.perRoute['POST /api/a'].reden, /vingerafdruk kwam niet terug/);
   assert.equal(uit.perRoute['POST /api/a'].state, 'ongemeten');
+});
+
+
+/* ---------- de vierde klasse: boekhouding van de aanroep ---------- */
+
+test('BOEKHOUDING: een herhaling die alleen de kostenmeter raakte, is geen tweede uitvoering', () => {
+  /* Dit is de negen routes van 2 september 2026, in het klein. `kosten` beweegt
+     niet vanzelf -- alleen als je belt -- dus het stille venster vindt hem nooit.
+     De belofte van deze kolom gaat over de OPDRACHT, en die is niet herhaald.
+
+     Mutatie nagetrokken: `kosten` uit BOEKHOUDING halen laat deze toets zakken
+     op GEZAKT, en dan staat de boardroom-export weer op 503. */
+  const o = weegStaat({ a: ok, b: ok, d01: d('bestellingen', 'kosten'), d12: d('kosten'),
+    dStil: niets });
+  assert.equal(o.idempotentie, 'bewezen');
+  assert.match(o.idemReden, /boekhouding van de aanroep/);
+  assert.match(o.idemReden, /kosten/, 'en hij noemt de collectie, zodat zichtbaar blijft dat een tweede aanroep geld kost');
+});
+
+test('en dat geldt ook voor een auditjournaal, want die lijst komt uit de code', () => {
+  /* `kantoorAudit` staat in server/kern/auditsporen.js. Deze toets zakt dus ook
+     als die afleiding wordt losgelaten en er weer een lijst met de hand in dit
+     bestand komt te staan. */
+  const o = weegStaat({ a: ok, b: ok, d01: d('exports', 'kantoorAudit'), d12: d('kantoorAudit'),
+    dStil: niets });
+  assert.equal(o.idempotentie, 'bewezen');
+  assert.match(o.idemReden, /kantoorAudit/);
+});
+
+test('DE WRINGER: boekhouding wast alleen zichzelf weg, niet de echte collectie', () => {
+  /* Zonder deze toets zou een te ruime vierde klasse elke tweede uitvoering
+     kunnen verbergen -- precies de fout waar de ruisparagraaf van staatproef.js
+     voor waarschuwt. Beweegt er naast de kosten ook een echte collectie, dan
+     blijft het een bevinding, en de reden noemt allebei apart. */
+  const o = weegStaat({ a: ok, b: ok, d01: d('bestellingen', 'kosten'),
+    d12: d('bestellingen', 'kosten'), dStil: niets });
+  assert.equal(o.idempotentie, 'GEZAKT');
+  assert.match(o.idemReden, /bestellingen/);
+  assert.match(o.idemReden, /boekhouding van de aanroep: kosten/);
+});
+
+test('een GEWEIGERD verzoek dat alleen boekhouding naliet, is geen gezakte rollback', () => {
+  /* Aankloppen wordt opgeschreven, ook als de deur dichtblijft. Dat is geen
+     toestand die bleef staan. Maar bewoog er ook iets echts, dan wel -- de
+     tweede helft van deze toets is de grendel daarop. */
+  const goed = weegStaat({ a: nee(400), b: nee(400), d01: d('kosten'), d12: d('kosten'),
+    dStil: niets });
+  assert.equal(goed.rollback, 'bewezen');
+  assert.match(goed.reden, /boekhouding van de aanroep/);
+
+  const fout = weegStaat({ a: nee(400), b: nee(400), d01: d('kosten', 'vacatures'),
+    d12: d('kosten', 'vacatures'), dStil: niets });
+  assert.equal(fout.rollback, 'GEZAKT');
+  assert.match(fout.reden, /vacatures/);
 });

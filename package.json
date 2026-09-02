@@ -131,6 +131,7 @@
     "activering:vast": "node scripts/activering.js --vastleggen",
     "tredeproef": "node scripts/tredeproef.js",
     "tredeproef:vast": "node scripts/tredeproef.js --vastleggen",
+    "tredeproef:alle": "node scripts/tredeproef.js --alle",
     "semantiek:vast": "node scripts/semantiek.js --vastleggen",
     "lagen": "node scripts/lagen.js",
     "droogloop": "node scripts/droogloop.js",

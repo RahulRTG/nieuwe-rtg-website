@@ -38,6 +38,12 @@
    AI-gereedschap kan werk beginnen zonder ooit langs een route te komen; die
    kant is stap 6 en met deze proef niet te halen.
 
+   ALLE TREDEN ACHTER ELKAAR (--alle) draait deze proef per trede in een EIGEN
+   PROCES. Dat is geen omslachtigheid: de app wordt een keer geladen en houdt
+   dan zijn routers, zijn poort en zijn modulecache vast; een tweede trede in
+   hetzelfde proces zou de stand van de eerste meedragen en dus meten wat er
+   niet staat.
+
    Draai: npm run tredeproef              (trede 0)
           npm run tredeproef -- --trede bestellen
           npm run tredeproef -- --vastleggen
@@ -49,6 +55,19 @@ const path = require('path');
 
 const WORTEL = path.join(__dirname, '..');
 const arg = (naam, std) => { const i = process.argv.indexOf(naam); return i > 0 ? process.argv[i + 1] : std; };
+
+/* DE UITSLAG VAN EEN KIND GAAT NIET DOOR DE PIJP MAAR NAAR EEN BESTAND (--uit).
+
+   Twee pogingen gingen hier mis en allebei op dezelfde aanname: dat stdout van
+   ons is. Eerst mengden de opstartregels van de app door de JSON ("Unexpected
+   token 'R'"); daarna, met de console de hele rit gesmoord, deed de LOGGER het
+   opnieuw -- die schrijft rechtstreeks naar process.stdout en trekt zich van
+   console niets aan.
+
+   Een uitslag naar een eigen bestand kan door geen enkele meelezer worden
+   vervuild. Dat is ook waarom de smoring hieronder blijft staan maar niet meer
+   het mechanisme IS: zij maakt de uitvoer rustig, het bestand maakt hem juist. */
+const JSONUIT = process.argv.includes('--json') || process.argv.includes('--uit');
 
 /* WAT VOOR DE SCHAKELAAR HANGT, EN WAAROM.
 
@@ -131,7 +150,7 @@ async function meet(tredeId) {
   try {
     app = require(path.join(WORTEL, 'server', 'server')).app;
     db = require(path.join(WORTEL, 'server', 'db'));
-  } finally { Object.assign(console, echt); }
+  } finally { if (!JSONUIT) Object.assign(console, echt); }
 
   /* DE STAND ZETTEN ZOALS DE BOARDROOM HEM ZET, en niet met een eigen vlag: als
      deze proef zijn eigen weg neemt om iets uit te zetten, bewijst hij niets
@@ -274,9 +293,63 @@ function rapport(r) {
 
 /* ------------------------------------------------------------------ start -- */
 
-if (require.main === module) {
+/* ---------------------------------------------------------- alle treden -- */
+
+/* Per trede een eigen proces; zie de kop waarom. De uitslag van trede 0 blijft
+   de hoofduitslag (daar hangt de meter aan); de rest komt eronder te staan. */
+function alleTreden() {
+  const cp = require('child_process');
+  const { FASES } = require(path.join(WORTEL, 'server', 'functies', 'register'));
+  const uit = [];
+  const map = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-treden-'));
+  try {
+    for (const f of FASES) {
+      const doel = path.join(map, f.id + '.json');
+      cp.execFileSync(process.execPath, [__filename, '--trede', f.id, '--uit', doel],
+        { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, stdio: 'ignore',
+          env: { ...process.env, PORT: '', RTG_DATA_DIR: '' } });
+      uit.push(JSON.parse(fs.readFileSync(doel, 'utf8')));
+    }
+  } finally { try { fs.rmSync(map, { recursive: true, force: true }); } catch (e) {} }
+  return uit;
+}
+
+function tabel(treden) {
+  const L = [];
+  L.push('ALLE TREDEN -- wat staat er open, en lekt er iets');
+  L.push('');
+  L.push('  trede                              functies   routes open   dicht   zuiver   beproefd');
+  for (const t of treden) {
+    L.push('    ' + t.tredeNaam.padEnd(32) +
+      String(t.functiesAan + '/' + t.functiesTotaal).padStart(9) +
+      String(t.routesInTrede).padStart(13) +
+      String(t.routesBuitenTrede).padStart(8) +
+      String(t.zuiverLekken).padStart(9) +
+      String(t.beproefdNiet503).padStart(11));
+  }
+  L.push('');
+  L.push('  zuiver = routes buiten de trede die de schakelkast niet dichtzet (alle routes).');
+  L.push('  beproefd = daarvan werkelijk aangeklopt en toch een ander antwoord dan 503');
+  L.push('  (steekproef; wat voor de schakelaar hangt staat apart en verklaard).');
+  return L.join('\n');
+}
+
+if (require.main === module && process.argv.includes('--alle')) {
+  const treden = alleTreden();
+  const hoofd = treden.find(t => t.trede === 'start') || treden[0];
+  const uit = { ...hoofd, treden: treden.map(t => ({
+    trede: t.trede, naam: t.tredeNaam, functiesAan: t.functiesAan,
+    routesInTrede: t.routesInTrede, routesBuitenTrede: t.routesBuitenTrede,
+    zuiverLekken: t.zuiverLekken, beproefdNiet503: t.beproefdNiet503,
+    beproefdVoorDeSchakelaar: t.beproefdVoorDeSchakelaar })) };
+  fs.writeFileSync(path.join(WORTEL, 'TREDEPROEF.json'), JSON.stringify(uit, null, 2) + '\n');
+  process.stdout.write(rapport(hoofd) + '\n\n' + tabel(treden) + '\n\nVastgelegd in TREDEPROEF.json\n');
+  process.exit(treden.some(t => t.zuiverLekken || t.beproefdNiet503) ? 1 : 0);
+} else if (require.main === module) {
   meet(arg('--trede', 'start')).then(r => {
-    if (process.argv.includes('--json')) process.stdout.write(JSON.stringify(r, null, 2) + '\n');
+    const uitPad = arg('--uit', null);
+    if (uitPad) fs.writeFileSync(uitPad, JSON.stringify(r, null, 2) + '\n');
+    else if (process.argv.includes('--json')) process.stdout.write(JSON.stringify(r, null, 2) + '\n');
     else if (process.argv.includes('--vastleggen')) {
       fs.writeFileSync(path.join(WORTEL, 'TREDEPROEF.json'), JSON.stringify(r, null, 2) + '\n');
       process.stdout.write(rapport(r) + '\n\nVastgelegd in TREDEPROEF.json\n');
@@ -285,4 +358,4 @@ if (require.main === module) {
   }).catch(e => { process.stderr.write('de tredeproef kon niet draaien: ' + (e && e.stack || e) + '\n'); process.exit(2); });
 }
 
-module.exports = { meet, rapport, indeling, steekproef, VOOR_DE_SCHAKELAAR, isVoorDeSchakelaar };
+module.exports = { meet, rapport, tabel, indeling, steekproef, VOOR_DE_SCHAKELAAR, isVoorDeSchakelaar };

@@ -38,5 +38,77 @@
   "beproefdBinnen503": 0,
   "beproefdBinnen503Lijst": [],
   "routesGeraakt": 31,
-  "watDitNietDoet": "geen mensenrondgang (bewijst dat er niets anders opengaat, niet dat de trede WERKT); en alleen HTTP -- cron, bus en AI-gereedschap komen hier niet langs"
+  "watDitNietDoet": "geen mensenrondgang (bewijst dat er niets anders opengaat, niet dat de trede WERKT); en alleen HTTP -- cron, bus en AI-gereedschap komen hier niet langs",
+  "treden": [
+    {
+      "trede": "start",
+      "naam": "Trede 0 · De smalle snee",
+      "functiesAan": 19,
+      "routesInTrede": 331,
+      "routesBuitenTrede": 4320,
+      "zuiverLekken": 0,
+      "beproefdNiet503": 0,
+      "beproefdVoorDeSchakelaar": 1
+    },
+    {
+      "trede": "ontmoeten",
+      "naam": "Trede 1 · Leden onder elkaar",
+      "functiesAan": 26,
+      "routesInTrede": 544,
+      "routesBuitenTrede": 4107,
+      "zuiverLekken": 0,
+      "beproefdNiet503": 0,
+      "beproefdVoorDeSchakelaar": 1
+    },
+    {
+      "trede": "partners",
+      "naam": "Trede 2 · De partners erbij",
+      "functiesAan": 29,
+      "routesInTrede": 1407,
+      "routesBuitenTrede": 3244,
+      "zuiverLekken": 0,
+      "beproefdNiet503": 0,
+      "beproefdVoorDeSchakelaar": 1
+    },
+    {
+      "trede": "bestellen",
+      "naam": "Trede 3 · De vloer draait",
+      "functiesAan": 33,
+      "routesInTrede": 1445,
+      "routesBuitenTrede": 3206,
+      "zuiverLekken": 0,
+      "beproefdNiet503": 0,
+      "beproefdVoorDeSchakelaar": 1
+    },
+    {
+      "trede": "fundament",
+      "naam": "Trede 4 · Het fundament (de wig)",
+      "functiesAan": 37,
+      "routesInTrede": 1474,
+      "routesBuitenTrede": 3177,
+      "zuiverLekken": 0,
+      "beproefdNiet503": 0,
+      "beproefdVoorDeSchakelaar": 1
+    },
+    {
+      "trede": "stad",
+      "naam": "Trede 5 · De stad",
+      "functiesAan": 54,
+      "routesInTrede": 2010,
+      "routesBuitenTrede": 2641,
+      "zuiverLekken": 0,
+      "beproefdNiet503": 0,
+      "beproefdVoorDeSchakelaar": 1
+    },
+    {
+      "trede": "alles",
+      "naam": "Trede 6 · Alles open",
+      "functiesAan": 204,
+      "routesInTrede": 4651,
+      "routesBuitenTrede": 0,
+      "zuiverLekken": 0,
+      "beproefdNiet503": 0,
+      "beproefdVoorDeSchakelaar": 0
+    }
+  ]
 }

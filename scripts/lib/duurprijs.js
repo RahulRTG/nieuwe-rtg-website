@@ -100,45 +100,97 @@ function p99(rij) {
   return rij[Math.min(rij.length - 1, Math.ceil(rij.length * 0.99) - 1)];
 }
 
-/* Uit een gewichtenkaart (naam -> ms) de prijs per klasse afleiden.
-
-   Geeft terug wat er betaald wordt EN waarom, want een planner die een prijs
-   rekent hoort te kunnen zeggen welke. `weging()` in ./delen.js geeft dit door,
-   zodat een scherm of een script het kan tonen zonder het na te rekenen -- een
-   tweede berekening is een tweede waarheid. */
-function prijzen(gewicht) {
+/* De rijen per klasse uit een gewichtenkaart, oplopend gesorteerd. */
+function rijenVan(gewicht) {
   const perKlasse = new Map();
   const alles = [];
-  for (const [naam, ms] of gewicht) {
+  for (const [naam, ms] of gewicht || []) {
     if (!(ms > 0)) continue;
     alles.push(ms);
     const k = klasseVan(naam);
     if (!perKlasse.has(k)) perKlasse.set(k, []);
     perKlasse.get(k).push(ms);
   }
+  alles.sort((a, b) => a - b);
+  for (const rij of perKlasse.values()) rij.sort((a, b) => a - b);
+  return { perKlasse, alles };
+}
+
+/* DE TERUGVALLADDER, en de enige regel die er bovenuit steekt: een sport lager
+   mag de prijs nooit VERLAGEN. Bewijs dat ontbreekt is geen reden om goedkoper
+   te worden -- dat is de hoofdregel van KEURING.md, en zonder die klem is een
+   ladder alleen maar een langere weg naar een lager getal.
+
+     1. eigen-klasse         p99 van deze modus en deze klasse
+     2. klasse-andere-modus  p99 van deze klasse in een ANDERE modus, en dan
+                             hooguit als hij HOGER uitkomt dan sport 3. Een
+                             andere modus is een ander kostenmodel (daar gaat
+                             `vertrouwen` in ./delen.js over), dus hij mag wel
+                             waarschuwen en niet geruststellen.
+     3. algemeen             p99 over alle klassen van deze modus
+
+   Sport 2 bestaat voor een geval dat hier echt voorkomt: in de modus `dekking`
+   staan 1268 unit-metingen en NUL schermtoetsen. Zonder die sport wordt een
+   ongemeten schermtoets daar geprijsd op 45,6s (de unit-p99) terwijl de
+   schermtoetsen in de modus ernaast 97,1s zeggen. Met de klem kan diezelfde
+   sport een unit-toets niet goedkoper maken dan zijn eigen modus al zei. */
+function prijzen(gewicht, opties) {
+  const andere = (opties && opties.andere) || [];
+  const { perKlasse, alles } = rijenVan(gewicht);
 
   /* Zonder ook maar een meting is elk bestand even zwaar; dan valt de greedy
      samen met de oude om-en-om-verdeling en doet de waarde zelf er niet toe. */
-  const algemeen = alles.length ? p99(alles.sort((a, b) => a - b)) : 1;
+  const algemeen = alles.length ? p99(alles) : 1;
+
+  /* Wat de andere modi over ELKE klasse te zeggen hebben; de hoogste telt, want
+     sport 2 mag alleen omhoog werken. */
+  const elders = new Map();
+  for (const a of andere) {
+    for (const [k, rij] of rijenVan(a && a.kaart).perKlasse) {
+      if (rij.length < KLASSE_MINIMUM) continue;
+      const ms = p99(rij);
+      const nu = elders.get(k);
+      if (!nu || ms > nu.ms) elders.set(k, { ms, modus: a.modus, metingen: rij.length });
+    }
+  }
 
   const prijs = new Map();
   const grond = new Map();
-  for (const [k, rij] of perKlasse) {
+  const klassen = new Set([...perKlasse.keys(), ...elders.keys()]);
+  for (const k of klassen) {
+    const rij = perKlasse.get(k) || [];
     if (rij.length >= KLASSE_MINIMUM) {
-      prijs.set(k, p99(rij.sort((a, b) => a - b)));
-      grond.set(k, { grond: 'eigen-klasse', metingen: rij.length });
-    } else {
-      grond.set(k, { grond: 'algemeen', metingen: rij.length,
-        waarom: 'minder dan ' + KLASSE_MINIMUM + ' metingen; dan is de p99 het maximum' });
+      prijs.set(k, p99(rij));
+      grond.set(k, { sport: 1, grond: 'eigen-klasse', metingen: rij.length });
+      continue;
     }
+    const ver = elders.get(k);
+    if (ver && ver.ms > algemeen) {
+      prijs.set(k, ver.ms);
+      grond.set(k, { sport: 2, grond: 'klasse-andere-modus', modus: ver.modus,
+        metingen: ver.metingen, eigenMetingen: rij.length,
+        waarom: 'deze klasse heeft in deze modus minder dan ' + KLASSE_MINIMUM +
+          ' metingen; een andere modus zegt hoger, en hoger mag' });
+      continue;
+    }
+    grond.set(k, { sport: 3, grond: 'algemeen', metingen: rij.length,
+      waarom: rij.length >= KLASSE_MINIMUM ? 'algemeen'
+        : 'minder dan ' + KLASSE_MINIMUM + ' metingen; dan is de p99 het maximum' +
+          (ver ? ', en een andere modus zegt niet hoger' : '') });
   }
 
   const prijsVoor = (naam) => {
     const k = klasseVan(naam);
     return prijs.has(k) ? prijs.get(k) : algemeen;
   };
+  /* Welke sport een NAAM betaalt, voor een meter die het per bestand wil tonen. */
+  const bronVoor = (naam) => {
+    const k = klasseVan(naam);
+    return grond.get(k) || { sport: 3, grond: 'algemeen', metingen: 0,
+      waarom: 'deze klasse komt in geen enkele modus voor' };
+  };
 
-  return { prijsVoor, algemeen, prijs, grond, klasseVan };
+  return { prijsVoor, bronVoor, algemeen, prijs, grond, klasseVan };
 }
 
 module.exports = { prijzen, klasseVan, p99, KLASSE_MINIMUM };

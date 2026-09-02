@@ -230,7 +230,9 @@
     "waarom": "node scripts/waarom.js",
     "swcache": "node scripts/swcache.js",
     "swcache:vast": "node scripts/swcache.js --schrijf",
-    "herstelproef": "node scripts/herstelproef.js"
+    "herstelproef": "node scripts/herstelproef.js",
+    "scherfmeter": "node scripts/scherfmeter.js",
+    "scherfmeter:vast": "node scripts/scherfmeter.js --vastleggen"
   },
   "devDependencies": {
     "playwright": "^1.62.1"

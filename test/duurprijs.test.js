@@ -199,6 +199,56 @@ test('5. meten koopt stabiliteit: een gemeten bestand verplaatst er minder dan e
      passen, maar alleen door een verdeling die bestaande bestanden laat staan. */
 });
 
+test('7. de terugvalladder gaat omhoog van sport 1 naar 3, en nooit naar een lagere prijs', () => {
+  /* DE LADDER. Sport 1 is de eigen klasse in de eigen modus; sport 2 is dezelfde
+     klasse in een ANDERE modus, maar alleen als die HOGER uitkomt; sport 3 is de
+     algemene p99 van de eigen modus.
+
+     Sport 2 bestaat voor een geval dat hier echt voorkomt: in de modus `dekking`
+     staan duizenden unit-metingen en NUL schermtoetsen. Zonder die sport wordt
+     een ongemeten schermtoets daar geprijsd op de unit-p99.
+
+     EN DE KLEM IS HET HELE PUNT: een andere modus is een ander kostenmodel, dus
+     hij mag waarschuwen en niet geruststellen. Zegt hij LAGER, dan blijft de
+     algemene p99 staan.
+
+     MUTATIE: `ver.ms > algemeen` vervangen door `ver` -> de tweede helft van
+     deze toets ZAKT (RAAK): de goedkope andere modus wint dan. */
+  const eigen = kaart(300, () => 1000, 0, () => 0);          // alleen unit, p99 = 1000
+
+  const duurderElders = kaart(0, () => 0, 150, () => 90000); // e2e elders: duur
+  const opUit = prijzen(eigen, { andere: [{ modus: 'elders', kaart: duurderElders }] });
+  assert.equal(opUit.prijsVoor('nieuw.e2e.js'), 90000,
+    'een klasse die hier niet bestaat, hoort de hogere prijs van elders te krijgen');
+  assert.equal(opUit.bronVoor('nieuw.e2e.js').sport, 2);
+  assert.equal(opUit.bronVoor('nieuw.e2e.js').modus, 'elders');
+  assert.equal(opUit.bronVoor('nieuw.test.js').sport, 1, 'de eigen klasse blijft sport 1');
+
+  const goedkoperElders = kaart(0, () => 0, 150, () => 5);   // e2e elders: spotgoedkoop
+  const omlaag = prijzen(eigen, { andere: [{ modus: 'elders', kaart: goedkoperElders }] });
+  assert.equal(omlaag.prijsVoor('nieuw.e2e.js'), omlaag.algemeen,
+    'een goedkopere andere modus mag de prijs NIET verlagen');
+  assert.equal(omlaag.bronVoor('nieuw.e2e.js').sport, 3);
+  assert.match(omlaag.bronVoor('nieuw.e2e.js').waarom, /niet hoger/,
+    'en de uitslag hoort te zeggen dat elders wel keek maar niet hoger zei');
+});
+
+test('8. een andere modus met te weinig metingen telt niet mee als sport 2', () => {
+  /* Dezelfde drempel geldt op elke sport. Anders zou een modus met drie
+     schermtoetsen waarvan er een uitschiet, alsnog de prijs zetten -- via een
+     omweg, en dat is de uitschieterfout terug.
+
+     MUTATIE: in duurprijs.js de regel `if (rij.length < KLASSE_MINIMUM) continue;`
+     in de elders-lus weghalen -> deze toets ZAKT (RAAK). */
+  const eigen = kaart(300, () => 1000, 0, () => 0);
+  const dunElders = kaart(0, () => 0, 3, (i) => (i === 0 ? 900000 : 10));
+  const p = prijzen(eigen, { andere: [{ modus: 'elders', kaart: dunElders }] });
+
+  assert.equal(p.prijsVoor('nieuw.e2e.js'), p.algemeen,
+    'drie metingen elders horen de prijs niet te zetten');
+  assert.equal(p.bronVoor('nieuw.e2e.js').sport, 3);
+});
+
 test('6. de klasse komt van de bestandsnaam, en alles wat geen van beide is heet overig', () => {
   assert.equal(klasseVan('a.e2e.js'), 'e2e');
   assert.equal(klasseVan('a.test.js'), 'unit');

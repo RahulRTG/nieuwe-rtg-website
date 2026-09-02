@@ -49,7 +49,24 @@ const GEEN_METING = new Set([
      register bleven als dode tak achter. Ze zijn op 1 september 2026 opgeruimd
      en de weging is in delen.js hersteld -- twee verdelers met elk een eigen
      duurregister is LAT.md regel 4 op de plek waar hij het duurst is. */
-  'TOETSDUUR.json'
+  'TOETSDUUR.json',
+  /* SCHERFMETER.json rapporteert vier getallen over de scherfverdeling (balans,
+     churn, ongemeten, prijsbron). Drie ervan HOREN geen ratel te hebben: churn
+     hangt af van hoeveel toetsen er sinds de vorige vastlegging bij kwamen,
+     balans beweegt met de echte duren mee, en prijsbron is een indeling en geen
+     getal. Een ratel daarop staat rood van gewoon werk.
+
+     Het vierde, `ongemeten`, is wel een goede kandidaat en staat er met opzet
+     nog niet aan: dat zou elke tak die een toetsbestand toevoegt rood zetten tot
+     de auteur de volle suite heeft gedraaid, en dat is een beleidsbesluit over
+     andermans werk. Het staat vandaag op 83; zie de kop van
+     scripts/scherfmeter.js voor het besluit dat daarover openstaat. */
+  'SCHERFMETER.json',
+  /* CORRECTIES.json zet getallen recht die in een PERMANENT artefact staan --
+     een commitboodschap, een PR-bericht. Geen meting en geen kwaliteitsgetal: het
+     hoort te GROEIEN naarmate er meer wordt rechtgezet, en een ratel erop zou
+     precies het rechtzetten bestraffen. */
+  'CORRECTIES.json'
 ]);
 
 const REGISTER = {

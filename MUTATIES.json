@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-02T22:11:31.430Z",
-    "commit": "0a816ed0",
+    "op": "2026-09-02T22:31:01.973Z",
+    "commit": "80477bd7",
     "boomVuil": true,
-    "boomAnders": 4,
+    "boomAnders": 6,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -5677,6 +5677,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 4,
       "scherp": "gezakt"
+    },
+    "scherfmeter.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/delen.js",
+      "operator": "===->!==#0",
+      "gezakt": 5,
+      "geprobeerd": 1
     },
     "schermleugen.test.js": {
       "soort": "puur",

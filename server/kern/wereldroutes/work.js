@@ -36,6 +36,7 @@ module.exports = [
   '/apps/horeca-pda.html',
   '/apps/horeca-vloer.html',
   '/apps/horeca.html',
+  '/apps/isolatie.html',
   '/apps/kantoor.html',
   '/apps/kantoorpda.html',
   '/apps/kantoren.html',

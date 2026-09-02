@@ -15,6 +15,7 @@ module.exports = [
   '/apps/juridisch/partnervoorwaarden.html',
   '/apps/juridisch/privacy.html',
   '/apps/juridisch/voorwaarden.html',
+  '/apps/mijn-isolatie.html',
   '/apps/passkeys.html',
   '/apps/rtgid.html',
   '/apps/toestemming.html'

@@ -25,7 +25,7 @@
         if (s) s.value = M.loonland;
       } else toon(M.coachHtml());
     } catch (e) {
-      toon('<p class="stil">' + Geld.esc(e.message) + ' Log eerst in via de leden-app.</p>');
+      toon(RTGLeeg.html(RTGLeeg.vanFout({ status: 401, message: Geld.esc(e.message) })));
     }
   }
 

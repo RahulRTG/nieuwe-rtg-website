@@ -60,9 +60,18 @@ test('3. er is geen derde stand, en dus geen restpost', () => {
       'laag "' + l.id + '" heeft termijn "' + l.termijn + '"; dat hoort ' + SOORTEN.join(' of ') +
       ' te zijn. Een restpost is binnen een jaar de plek waar een nieuwe laag stil in verdwijnt.');
   }
-  // en de verdeling is gemeten en niet aangenomen: vier met een datum, vijf zonder
+  /* De verdeling is GEMETEN en niet aangenomen: vier met een datum, zeven
+     zonder. Dit getal is met opzet hard: het dwingt een mens om bij elke nieuwe
+     laag te kiezen welke termijn hij draagt, in plaats van hem stil in een
+     restpost te laten vallen.
+
+     HIJ HEEFT ZIJN WERK GEDAAN. Op 2 september 2026 stond hier 4 en 5, en de
+     toets zakte bij het binnenhalen van de hoofdlijn: die had er twee lagen bij
+     gezet (`metier-naam` en `commercieel`) die nog geen termijn hadden. Allebei
+     `zolang-het-staat`, allebei met een uitleg -- en dat is een besluit dat
+     iemand heeft genomen omdat deze regel hem stelde. */
   assert.equal(LAGEN.filter(l => l.termijn === 'venster').length, 4);
-  assert.equal(LAGEN.filter(l => l.termijn === 'zolang-het-staat').length, 5);
+  assert.equal(LAGEN.filter(l => l.termijn === 'zolang-het-staat').length, 7);
 });
 
 test('4. het scherm toont de termijn altijd, ook zonder datum', () => {

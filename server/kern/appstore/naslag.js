@@ -47,7 +47,23 @@ const VORMEN = {
   'opslag.lijst': { args: null, uit: '{ sleutels: string[] }' },
   'opslag.zet': { args: '{ sleutel: string; waarde: string }', uit: '{ ok: true; sleutel: string }' },
   'opslag.wis': { args: '{ sleutel: string }', uit: '{ ok: true }' },
-  'bericht.zet': { args: '{ tekst: string }', uit: '{ ok: true; klaargezet: string }' }
+  'bericht.zet': { args: '{ tekst: string }', uit: '{ ok: true; klaargezet: string }' },
+  /* DE ARENA. Let op de vorm van het antwoord en niet alleen op de velden: bij
+     alle drie is `ranglijst: false` met een `reden` een NORMALE uitkomst en geen
+     fout. Onder de 18+-poort (kern/spellen/grens.js) speelt het spel gewoon door
+     en wordt er alleen niets bewaard -- een uitgever die dat als fout afhandelt,
+     bouwt een spel dat voor een deel van de leden stukloopt terwijl er niets
+     stuk is. Vandaar dat de reden in de typing staat. */
+  'arena.zet': { args: '{ score: number }',
+    uit: '{ bewaard: boolean; ranglijst: boolean; reden?: string; score?: number; ' +
+      'persoonlijkRecord?: boolean; beste?: number | null; positie?: number | null; vorm: object }' },
+  'arena.bord': { args: '{ periode?: "altijd" | "week" }',
+    uit: '{ periode: string; vorm: object; ranglijst: boolean; reden?: string; deelnemers?: number; ' +
+      'bord: { plaats: number; codenaam: string; score: number; ik: boolean }[]; ' +
+      'ik?: { plaats: number; buitenBord: boolean; score: number } | null }' },
+  'arena.mijn': { args: null,
+    uit: '{ vorm: object; ranglijst: boolean; reden?: string; beste: number | null; ' +
+      'pogingen?: number; sinds?: string | null; plaats?: number | null; plaatsDezeWeek?: number | null }' }
 };
 
 /* De brug wordt ECHT opgebouwd, op een opslag in het geheugen. Dat is geen

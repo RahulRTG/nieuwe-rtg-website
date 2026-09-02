@@ -27,5 +27,7 @@
       'link:rtfbuurt', 'link:rtfportaal',
     /* Twee uit de tikkenmeting (scripts/tikken.js): het bord en het schrift
        bestonden en hingen nergens aan. */
-      'link:rtfbord', 'link:rtfschrift'] }
+    /* Het Klimaatfonds is een VENSTER op het Living Lab en geen tweede lab:
+       klimaat is daar de soort 'duurzaam' (kern/livinglab/kader.js). */
+      'link:rtfbord', 'link:rtfschrift', 'link:klimaat', 'link:buurtruil', 'link:geven'] }
   ];

@@ -40,6 +40,7 @@
 const fs = require('fs');
 const crypto = require('crypto');
 const path = require('path');
+const { stempel } = require('./lib/stempel');
 const { DatabaseSync } = require('node:sqlite');
 const { start } = require('./lib/wegwerpserver');
 const { gevolgVan } = require('../server/kern/stuur/gevolg');
@@ -248,6 +249,7 @@ async function main() {
       'een voorspelling op `onbekend` wordt niet beoordeeld: onbekend kan niet fout zijn, en dat als goed tellen zou de uitslag opkloppen'
     ]
   };
+  Object.assign(uit, { stempel: stempel() });
   fs.writeFileSync(path.join(WORTEL, 'DROOGLOOP.json'), JSON.stringify(uit, null, 1) + '\n');
   console.log('\n  ' + gemeten + ' van ' + stappen.length + ' stappen gemeten; ' +
     geraakt.length + ' collectie(s) bewogen.');

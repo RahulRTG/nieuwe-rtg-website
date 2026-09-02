@@ -79,6 +79,27 @@ const LAGEN = [
   { id: 'rtgid-machtiging', naam: 'Mensen die namens u mogen inloggen', richting: 'doet', gedekt: true,
     doel: 'Zodat iemand die u vertrouwt iets voor u kan regelen als u dat zelf niet kunt.',
     termijn: 'venster' },
+  /* GEVONDEN OP 31 AUGUSTUS 2026, en het was precies de fout waar de kop van dit
+     bestand voor waarschuwt: een zaak die uw ECHTE NAAM mag opvragen
+     (kern/metier/bewijs.js) stond hier niet, en ook niet bij het niet-gedekte.
+     Hij had zijn eigen scherm binnen /api/metier/ik en bleef daardoor buiten het
+     overzicht dat "wie ziet wat" heet -- terwijl het een lopende toestemming is
+     met een doel en een intrekknop, dus precies de vorm die hier hoort. Hij viel
+     buiten de dekkingstoets omdat zijn rij `ingetrokken: null` gebruikt in
+     plaats van `status: 'actief'`. */
+  { id: 'metier-naam', naam: 'Zaken die uw echte naam mogen opvragen', richting: 'ziet', gedekt: true,
+    doel: 'Zodat deze zaak u kan aanspreken en aanschrijven met de naam die op uw papieren staat, ' +
+      'daar waar een codenaam niet volstaat.',
+    termijn: 'zolang-het-staat',
+    termijnUitleg: 'Deze toestemming loopt door tot u hem intrekt; er staat geen datum op.' },
+  /* Commerciele post is ook een toestemming, en hij hoort hier omdat een lid
+     niet hoort te moeten weten dat "wie mag mij benaderen" ergens anders woont
+     dan "wie mag iets van mij zien". Hij verschilt wel van alle andere: hier
+     verstuurt RTG ZELF, dus de partij is dit huis en niet een derde. */
+  { id: 'commercieel', naam: 'Post van RTG waarvoor u toestemming gaf', richting: 'seint', gedekt: true,
+    doel: 'Zodat RTG u mag benaderen over aanbod en nieuws waar u om heeft gevraagd.',
+    termijn: 'zolang-het-staat',
+    termijnUitleg: 'Dit loopt door tot u het uitzet. Er zit geen einddatum op, en elke boodschap draagt zelf ook een afmeldweg.' },
   { id: 'locatie', naam: 'Zaken die live met u meekijken', richting: 'ziet', gedekt: true,
     doel: 'Zodat een zaak weet wanneer u aankomt, of u onderweg kan vinden.',
     termijn: 'zolang-het-staat',

@@ -1,8 +1,10 @@
 {
   "stempel": {
-    "op": "2026-09-01T14:08:31.277Z",
-    "commit": "51e4aa0a",
+    "op": "2026-09-02T16:23:59.389Z",
+    "commit": "b73f64f3b",
     "boomVuil": true,
+    "boomAnders": 14,
+    "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
@@ -262,6 +264,13 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
+    "appstore-lab-toestemming-routes.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 15,
+      "scherp": "gezakt"
+    },
     "archief.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -346,6 +355,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "avond-scherm.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
       "scherp": "gezakt"
     },
     "avond.test.js": {
@@ -574,6 +590,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "bestellen-scherm.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
       "scherp": "gezakt"
     },
     "betaaldienst.test.js": {
@@ -904,6 +927,13 @@
       "gezakt": 16,
       "scherp": "gezakt"
     },
+    "buurtruil-scherm.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "ca.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -925,6 +955,13 @@
       "operator": "&&->||#7",
       "gezakt": 1,
       "geprobeerd": 26
+    },
+    "campus-scherm.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
+      "scherp": "gezakt"
     },
     "canary.test.js": {
       "soort": "puur",
@@ -978,6 +1015,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 8,
+      "scherp": "gezakt"
+    },
+    "chauffeur-scherm.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
       "scherp": "gezakt"
     },
     "ci-keten.test.js": {
@@ -1140,6 +1184,13 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "commerce-mand-scherm.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "commerce-retour.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -1170,6 +1221,13 @@
       "operator": "&&->||#0",
       "gezakt": 1,
       "geprobeerd": 3
+    },
+    "concern-scherm.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "concern-voorstel.test.js": {
       "soort": "puur",
@@ -1953,6 +2011,13 @@
       "operator": "!==->===#0",
       "gezakt": 2,
       "geprobeerd": 3
+    },
+    "geven-scherm.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "gewichtdrift.test.js": {
       "soort": "puur",
@@ -2781,6 +2846,13 @@
       "gezakt": 1,
       "geprobeerd": 3
     },
+    "klimaatfonds-scherm.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "klok.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -2937,6 +3009,13 @@
       "operator": "===->!==#0",
       "gezakt": 3,
       "geprobeerd": 1
+    },
+    "leerpaspoort-scherm.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
+      "scherp": "gezakt"
     },
     "leerstof.test.js": {
       "soort": "server",
@@ -3692,6 +3771,27 @@
       "operator": "&&->||#0",
       "gezakt": 7,
       "geprobeerd": 1
+    },
+    "mijn-relaties-scherm.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "mijn-sessies-scherm.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "mijnrtg-routes.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 12,
+      "scherp": "gezakt"
     },
     "minify.test.js": {
       "soort": "puur",
@@ -4954,6 +5054,13 @@
       "gezakt": 6,
       "scherp": "gezakt"
     },
+    "reisgezelschap-routes.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 12,
+      "scherp": "gezakt"
+    },
     "reisplan.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -5211,6 +5318,13 @@
       "gezakt": 6,
       "scherp": "gezakt"
     },
+    "rtfos-gift-ruil-routes.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 18,
+      "scherp": "gezakt"
+    },
     "rtfos-governance.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -5461,6 +5575,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "scherp": "gezakt"
+    },
+    "samenvoeging-routes.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
       "scherp": "gezakt"
     },
     "samenwerking.test.js": {
@@ -7432,6 +7553,13 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "winkel-scherm.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "wiring-contract.test.js": {
       "soort": "puur",

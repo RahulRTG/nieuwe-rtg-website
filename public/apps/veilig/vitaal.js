@@ -107,7 +107,7 @@
           }).join('')
         : '<p class="stil">Nog niets. Zo hoort het.</p>';
     } catch (e) {
-      $('#wacht').innerHTML = '<p class="stil">' + Veilig.esc(e.message) + ' Log eerst in via de leden-app.</p>';
+      $('#wacht').innerHTML = RTGLeeg.html(RTGLeeg.vanFout({ status: 401, message: Veilig.esc(e.message) }));
       $('#log').innerHTML = '';
     }
   }

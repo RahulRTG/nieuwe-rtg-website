@@ -30,7 +30,7 @@
 const MAX_PER_LID = 25;   // meer open budgetten per lid is een lek, geen gebruik
 
 module.exports = ({ api, crypto, nu }) => {
-  const { KLASSEN, registreer, positie, positiesVan } = api;
+  const { KLASSEN, registreer, registratieTerug, positie, positiesVan } = api;
 
   /* De rekening van een uitgegeven positie. De vorm 'waarde:' + id is een regel
      van dit domein, net als 'lid:' en 'partner:' dat zijn -- wie hem nodig heeft
@@ -68,5 +68,9 @@ module.exports = ({ api, crypto, nu }) => {
       oms: String(oms || spec.naam).slice(0, 80), positie: positie(rek) };
   }
 
-  return { uitgifteVoorbereiden: bereidVoor, rekVanWaarde: rekVan, MAX_PER_LID };
+  /* De terugname gaat hier doorheen zodat de aanroeper (kern/pay/budget.js)
+     hem heeft zonder de hele waardelaag te kennen. De GUARD zit in
+     ./index.js: zonder aangetoond saldo nul wordt er niets teruggenomen. */
+  return { uitgifteVoorbereiden: bereidVoor, uitgifteTerug: registratieTerug,
+    rekVanWaarde: rekVan, MAX_PER_LID };
 };

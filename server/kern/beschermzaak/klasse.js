@@ -62,29 +62,53 @@ const AANLEIDINGEN = ['huiselijk-geweld', 'seksueel-geweld', 'uitbuiting', 'mens
    die je omzeilt door het anders te noemen -- het is de vangnet-laag onder een
    klasse die deze velden simpelweg niet HEEFT. Hij staat er omdat een
    goedbedoelende aanroeper anders `adres` meestuurt, niets hoort, en denkt dat
-   het bewaard is. */
-const WEIGERT = {
-  adres: 'Een beschermzaak heeft geen adresveld. Een opvangadres in een database is de kortste weg van een dossier naar een voordeur.',
-  straat: 'Zie adres.',
-  postcode: 'Ook een postcode wijst een plek aan; in een klein dorp wijst hij een huis aan.',
-  huisnummer: 'Zie adres.',
-  woonplaats: 'Zie adres. De stad van de zaak staat al vast en is genoeg om hulp te zoeken.',
-  telefoon: 'Contactgegevens horen in de kluis van de organisatie die de hulp geeft, niet in deze zaak.',
-  email: 'Zie telefoon.',
-  naam: 'Deze klasse draait op een codenaam. De naam staat in de kluis, en wie hem nodig heeft opent hem daar.',
-  achternaam: 'Zie naam.',
-  geboortedatum: 'Een geboortedatum naast een codenaam voert die codenaam terug naar een mens.',
-  bsn: 'Nooit. Niet hier, en niet in een veld dat er anders heet.',
-  dader: 'Wij zijn geen opsporingsdienst. Een daderomschrijving die wij bewaren, kan tegen het slachtoffer gebruikt worden zodra iemand hem verkeerd leest.',
-  letsel: 'Medische gegevens horen bij een behandelaar. Wij noteren dat er hulp nodig is, niet wat er te zien was.',
-  zoek: 'Deze klasse kent geen vrije zoekfunctie. Wie een zaak zoekt, kent zijn codenaam; een zoekveld over deze zaken is een zeef waarmee je mensen vindt.'
-};
+   het bewaard is.
+
+   HIJ STAAT ALS PARENLIJST EN NIET ALS OBJECT, EN DAT IS EEN REPARATIE.
+
+   Eerst stond hier `const WEIGERT = { adres: '...', bsn: '...' }`. Leesbaar, en
+   toch fout: scripts/afleidbaar.js leest elk objectliteraal in server/ als een
+   stel velden dat SAMEN REIST, en bouwt daar een graaf van. Voor die meter zag
+   deze weigerlijst er dus uit als een record waarin `geboortedatum` en `bsn`
+   naast elkaar wonen. Het gevolg stond in test/afleidbaar.test.js: het bsn werd
+   vanuit een codenaam bereikbaar in twee stappen (codenaam -> geboortedatum ->
+   bsn), precies de bevinding die op NUL hoort te staan.
+
+   Er was niets gelekt -- er is geen beschermzaak die een bsn draagt, en deze
+   lijst zorgt er juist voor dat dat niet kan. Maar de meter had gelijk over wat
+   hij zag, en de verleiding was hem een uitzondering te leren. Dat zou de
+   verkeerde helft repareren: een meter met een uitzonderingenlijst wordt precies
+   zo blind als de fout die hij moest vinden. De VORM was fout. Een weigerlijst
+   is een lijst van paren en geen record, en zo staat hij er nu.
+
+   Wie hier een veld bijzet: houd de parenvorm aan. Een object met veldnamen als
+   sleutels zet de meter opnieuw op rood, en de volgende lezer weet dan niet meer
+   of het een vals alarm is of een echt lek. */
+const WEIGERT_LIJST = [
+  ['adres', 'Een beschermzaak heeft geen adresveld. Een opvangadres in een database is de kortste weg van een dossier naar een voordeur.'],
+  ['straat', 'Zie adres.'],
+  ['postcode', 'Ook een postcode wijst een plek aan; in een klein dorp wijst hij een huis aan.'],
+  ['huisnummer', 'Zie adres.'],
+  ['woonplaats', 'Zie adres. De stad van de zaak staat al vast en is genoeg om hulp te zoeken.'],
+  ['telefoon', 'Contactgegevens horen in de kluis van de organisatie die de hulp geeft, niet in deze zaak.'],
+  ['email', 'Zie telefoon.'],
+  ['naam', 'Deze klasse draait op een codenaam. De naam staat in de kluis, en wie hem nodig heeft opent hem daar.'],
+  ['achternaam', 'Zie naam.'],
+  ['geboortedatum', 'Een geboortedatum naast een codenaam voert die codenaam terug naar een mens.'],
+  ['bsn', 'Nooit. Niet hier, en niet in een veld dat er anders heet.'],
+  ['dader', 'Wij zijn geen opsporingsdienst. Een daderomschrijving die wij bewaren, kan tegen het slachtoffer gebruikt worden zodra iemand hem verkeerd leest.'],
+  ['letsel', 'Medische gegevens horen bij een behandelaar. Wij noteren dat er hulp nodig is, niet wat er te zien was.'],
+  ['zoek', 'Deze klasse kent geen vrije zoekfunctie. Wie een zaak zoekt, kent zijn codenaam; een zoekveld over deze zaken is een zeef waarmee je mensen vindt.']
+];
+/* Een Map en geen object: hetzelfde opzoeken, zonder dat er ergens een literaal
+   met veldnamen als sleutels ontstaat. */
+const WEIGERT = new Map(WEIGERT_LIJST);
 
 /* De poort die WEIGERT in plaats van filtert. Hij kijkt naar de sleutels die
    binnenkomen, niet naar wat wij ervan overnemen -- dat is het hele punt. */
 function keurInvoer(b) {
   for (const sleutel of Object.keys(b || {})) {
-    const reden = WEIGERT[sleutel.toLowerCase()];
+    const reden = WEIGERT.get(sleutel.toLowerCase());
     if (reden) {
       return { status: 400, error: 'Het veld "' + sleutel + '" bestaat niet in een beschermzaak. ' + reden };
     }
@@ -118,4 +142,4 @@ const beeld = z => Object.assign(lijstbeeld(z), {
   bewaarTot: z.bewaarTot || null
 });
 
-module.exports = { STANDEN, KETEN, AANLEIDINGEN, WEIGERT, keurInvoer, beeld, lijstbeeld };
+module.exports = { STANDEN, KETEN, AANLEIDINGEN, WEIGERT, WEIGERT_LIJST, keurInvoer, beeld, lijstbeeld };

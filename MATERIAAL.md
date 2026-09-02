@@ -115,6 +115,67 @@ voelen.
 
 ---
 
+## Het materiaal is licht, geen verf
+
+Gevonden op 31 augustus 2026 door naar het scherm te kijken in plaats van naar
+de code. `rtg-worlds-2026.css` zette het materiaal van een wereld als
+**paginagrond**: `body[data-rtg-world="living"]{ background:var(--bordeaux-diep) }`
+en WorkOS de royal-glans. Over de volle hoogte van een scherm gaf dat een waas
+waarin kaarten, randen en tekst allemaal even hard riepen — en `--bordeaux-glans`
+begint op `#9E1C40`, dat is `--burgundy-bright`, in `CLAUDE.md` genoteerd als
+**hover-state**.
+
+Dat botst met drie merkregels tegelijk: bordeaux is een accent, er komt geen
+gradient-grond, en het ritme is stark zwart/wit.
+
+**De regel luidt daarom: de grond is zwart, en het materiaal is het licht dat
+erop valt.** Eén radiale gloed uit een hoek, en verder niets — precies één
+signatuurelement. De schermen deden dat al goed en werden overschilderd;
+`/apps/rtg.html` droeg
+`radial-gradient(circle at 38% 4%, rgba(127,22,52,.25), transparent 42%)` over
+`#030303`. Die behandeling staat nu in de wereldlaag, zodat elke wereld hem
+krijgt in plaats van hem te moeten overschrijven.
+
+Champagne is de uitzondering en blijft dat: een donkere grond met een lichte
+gloed erover is bij het enige lichte materiaal precies verkeerd om.
+
+Wie hier een materiaal weer als vlakvulling wil gebruiken, verandert een
+merkregel en geen instelling. `npm run wereldstijl` meet de gemeten grond per
+scherm tegen het palet, dus een afwijking valt op — maar hij kan niet zien of
+een grond mooi is, alleen of hij uit het palet komt.
+
+---
+
+## De sociale kant staat op Pearl, en dat is een besluit
+
+Gemeten op 31 augustus 2026 met `npm run wereldstijl`: de sociale schermen van
+LivingOS — Sociaal, Vonk, Rendez-vous, Cercle, Entourage, Attenties en Vandaag —
+staan op een **lichte** grond terwijl de rest van de wereld donker is. Dat is
+**geen fout en geen achterstand**, het is een keuze, en hij staat hier omdat een
+keuze die nergens staat opgeschreven vroeg of laat door iemand wordt
+weggerepareerd met de beste bedoelingen.
+
+Waarom het klopt: het huis heeft al een licht materiaal, en dit ís het. Vonk en
+Rendez-vous meten **exact `--pearl-basis` (`#F4F0E9`)** en Sociaal zit er drie
+vanaf. Parelmoer waar mensen elkaar ontmoeten en pianolak waar het huis werkt is
+een verdedigbare grens: het onderwerp van die schermen is een ander mens, en dat
+verdraagt geen zwart.
+
+Wat er wél uit die meting volgt, en dat is klein en concreet: **vier schermen
+staan op `#DDD6C9`** (Attenties, Cercle, Entourage, Vandaag) en dat is
+`--suite-paper` uit `shared/social-suite.css` — 32 stappen naast `--pearl-basis`,
+een zesde kleur die in geen enkel materiaal staat. Dat is geen tweede besluit
+maar een drift: dezelfde bedoeling, een eigen getal. Of die vier naar Pearl gaan
+of `suite-paper` een naam in dit bestand krijgt, is een open punt.
+
+`scripts/wereldstijl.js` weet dit inmiddels. Hij vroeg eerst of een grond DONKER
+was, en zette elk licht scherm daarmee in de bak "ombouwen" — een oordeel dat een
+meter niet mag vellen. Hij houdt de gemeten pixel nu tegen het **palet** uit
+`rtg-materiaal.css`: Pearl is een goed antwoord, Onyx ook, en een zelfbedachte
+kleur valt op — ook als die toevallig donker is.
+
+---
+
 ## Een scherm dat geen materiaal verdraagt, zegt dat
 
 Een zoeker, een kaart, een speler, een cockpit. Dat zijn schermen waar het

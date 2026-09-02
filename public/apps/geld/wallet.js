@@ -40,9 +40,13 @@
       '#paneel .wa-pas .mrow b{display:block;font-size:.78rem;color:var(--rtg-txt);font-weight:500;margin-top:.2rem;letter-spacing:.08em;}' +
       '#paneel .wa-pas .qr{background:#fff;padding:4px;border-radius:0;line-height:0;flex-shrink:0;}' +
       '#paneel .wa-pas .qr canvas{width:62px;height:62px;display:block;}' +
-      /* padding en min-height: 14px hoog was onder de 24 van WCAG 2.5.8 */
+      /* padding en min-height: 14px hoog was onder de 24 van WCAG 2.5.8.
+         En de inkt is de LEESTOON en niet het accent: --rtg-goud is een vulkleur
+         (rtg-themas.css), op dit eiland het hoogsel #C23A5E, en dat las hier
+         3,50:1 op de pas (36,16,22). --rtg-leesgoud is wat er OP een grond leest
+         en haalt daar 9,2. */
       '#paneel .wa-pas .waarom{margin-top:1rem;background:none;border:0;padding:5px 0;min-height:24px;cursor:pointer;' +
-        'color:var(--rtg-goud);font-size:.72rem;font-weight:600;text-align:left;font-family:inherit;}' +
+        'color:var(--rtg-leesgoud,var(--rtg-goud));font-size:.72rem;font-weight:600;text-align:left;font-family:inherit;}' +
       '#paneel .wa-uitleg{display:none;font-size:.72rem;line-height:1.6;color:var(--rtg-soft);margin-top:.7rem;}' +
       '#paneel .wa-uitleg.open{display:block;}' +
       '#paneel .wa-uitleg b{color:var(--rtg-txt);font-weight:600;}' +
@@ -88,7 +92,8 @@
      De echte naam ligt in de gescheiden kluis (privacy by design). */
   function tekenPas(user) {
     var esc = w.Geld.esc;
-    if (!user) { $('#waPas').innerHTML = '<p class="stil">Geen pas te tonen.</p>'; return; }
+    if (!user) { $('#waPas').innerHTML = RTGLeeg.html(RTGLeeg.inlogStand({
+      ey: 'Wallet', wat: 'Uw pas hoort bij uw account en wordt niet zonder aanmelding getoond.' })); return; }
     $('#waPas').innerHTML =
       '<div class="wa-pas">' +
         '<div class="label">Uw codenaam, uw identiteit in onze systemen</div>' +
@@ -124,7 +129,8 @@
     try {
       var r = await w.Geld.api('/api/state');
       tekenPas(r && r.state && r.state.user);
-    } catch (e) { $('#waPas').innerHTML = '<p class="stil">Geen pas te tonen.</p>'; }
+    } catch (e) { $('#waPas').innerHTML = RTGLeeg.html(RTGLeeg.vanFout(e, { ey: 'Wallet',
+      titel: 'Uw pas is nu niet op te halen.' })); }
   }
 
   var Deel = w.RTGGeldDeel = w.RTGGeldDeel || {};

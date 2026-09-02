@@ -1,0 +1,145 @@
+/* De routes van de buurtruil (kern/rtfos/ruil.js).
+
+   DE ENIGE RTFOS-DEUR DIE OP EEN LEDENSESSIE OPENGAAT. Alle andere ingangen van
+   dit domein staan achter de kantoordeur of op een uitgegeven code; deze staat
+   open voor wie een eigen RTG-account heeft, want een buurtruil waar je een code
+   voor moet aanvragen is geen buurtruil.
+
+   DAT IS METEEN DE LEEFTIJDSGRENS, en hij is geen apart lijstje. Een eigen
+   RTG-account is precies wat een beschermd kind NIET heeft: gezinsprofielen
+   onder de RTFoundation hangen aan een gezin en dragen geen eigen sessie (zie
+   de kop van kern/volwassen.js, die dezelfde eigenschap gebruikt). Wie hier
+   binnenkomt, is dus geen kind uit de besloten laag -- zonder dat deze module
+   een geboortedatum hoeft te lezen.
+
+   WAAROM NIET volwassen(): die poort vraagt A3 -- RTG heeft het paspoort
+   gezien. Voor een bewaarde spelprestatie is dat de juiste lat; voor het
+   weggeven van een kinderfiets sluit hij vrijwel iedereen buiten, en dan wijkt
+   de buurt uit naar een groep waar niemand meekijkt. De grens die hier telt is
+   "een mens met een eigen account, aanspreekbaar op een codenaam".
+
+   DE REM STAAT OP DE SESSIE EN NIET OP HET IP. Een IP is in een flat gedeeld,
+   en juist daar wonen de mensen voor wie dit bedoeld is. */
+'use strict';
+
+const rem = require('../../rem');
+
+module.exports = ({ app, auth, geenGast, liveCodename, rtfos, veilig }) => {
+  const ik = req => liveCodename(req.session);
+  const lijf = req => req.body || {};
+
+  /* Schrijven mag vaker dan een mens typt en veel minder vaak dan een script
+     lukt. Lezen mag ruim: de lijst ververst na elke handeling. */
+  const schrijfRem = rem({ windowMs: 60000, limit: 20, key: req => 'rtfruil|' + String(ik(req) || req.ip) });
+  const leesRem = rem({ windowMs: 60000, limit: 120, key: req => 'rtfruil-lees|' + String(ik(req) || req.ip) });
+
+  app.post('/api/rtfos/ruil/lijst', auth, leesRem, (req, res) => {
+    if (geenGast(req, res)) return;
+    veilig(res, () => rtfos.ruil.lijst(Object.assign({}, lijf(req), { codenaam: ik(req) })));
+  });
+  app.post('/api/rtfos/ruil/mijn', auth, leesRem, (req, res) => {
+    if (geenGast(req, res)) return;
+    veilig(res, () => rtfos.ruil.mijn(ik(req)));
+  });
+  app.post('/api/rtfos/ruil/plaats', auth, schrijfRem, (req, res) => {
+    if (geenGast(req, res)) return;
+    veilig(res, () => rtfos.ruil.plaats(ik(req), lijf(req)));
+  });
+  app.post('/api/rtfos/ruil/sluit', auth, schrijfRem, (req, res) => {
+    if (geenGast(req, res)) return;
+    veilig(res, () => rtfos.ruil.sluit(ik(req), lijf(req)));
+  });
+  app.post('/api/rtfos/ruil/interesse', auth, schrijfRem, (req, res) => {
+    if (geenGast(req, res)) return;
+    veilig(res, () => rtfos.ruil.interesse(ik(req), lijf(req)));
+  });
+  app.post('/api/rtfos/ruil/meld', auth, schrijfRem, (req, res) => {
+    if (geenGast(req, res)) return;
+    veilig(res, () => rtfos.ruil.meld(ik(req), lijf(req)));
+  });
+
+  /* ---------- de giftstand ----------
+     LEZEN MAG IEDER LID, want de stand is geen geheim: wie wil geven hoort te
+     zien dat het (nog) niet kan en waarom. ZETTEN doet alleen de boardroom --
+     die poort hangt op de route hieronder en niet in de kern, zodat er maar een
+     plek is waar hij te vinden is. Zie GIFT.md. */
+  app.post('/api/rtfos/gift/stand', auth, leesRem, (req, res) => {
+    if (geenGast(req, res)) return;
+    veilig(res, () => rtfos.gift.stand());
+  });
+  app.post('/api/rtfos/gift/voorbereid', auth, schrijfRem, (req, res) => {
+    if (geenGast(req, res)) return;
+    veilig(res, () => rtfos.gift.voorbereid(lijf(req)));
+  });
+  /* Het meerjarige plan: voorstellen, bekijken en stoppen doet de GEVER zelf.
+     Vastleggen doet de stichting -- die route staat bij de andere kantoorroutes,
+     want een voorstel van een gever is nog geen overeenkomst. */
+  app.post('/api/rtfos/gift/plan/voorstel', auth, schrijfRem, (req, res) => {
+    if (geenGast(req, res)) return;
+    veilig(res, () => rtfos.gift.plan.voorstel(ik(req), lijf(req)));
+  });
+  app.post('/api/rtfos/gift/plan/mijn', auth, leesRem, (req, res) => {
+    if (geenGast(req, res)) return;
+    veilig(res, () => rtfos.gift.plan.mijn(ik(req)));
+  });
+  app.post('/api/rtfos/gift/plan/stop', auth, schrijfRem, (req, res) => {
+    if (geenGast(req, res)) return;
+    veilig(res, () => rtfos.gift.plan.stop(ik(req), lijf(req)));
+  });
+
+  /* DE WINKEL. Hij hangt bij de ledendeur en niet bij de giftroutes, en dat is
+     het hele punt: een aankoop is geen gift. De etalage mag iedereen met een
+     account zien; kopen doet de sessie zelf, en de prijs komt van de server. */
+  app.post('/api/rtfos/winkel', auth, leesRem, (req, res) => {
+    if (geenGast(req, res)) return;
+    veilig(res, () => rtfos.winkel.etalage());
+  });
+  app.post('/api/rtfos/winkel/koop', auth, schrijfRem, (req, res) => {
+    if (geenGast(req, res)) return;
+    /* GEEN GEGEVENSPOORT, EN DAT IS EEN BESLUIT MET EEN HOUDBAARHEIDSDATUM.
+       Hij stond er even wel, met soort 'bestelling' -- maar die vraagt een
+       telefoonnummer met de reden "de zaak moet je kunnen bereiken als er iets
+       verandert aan je tafel". Een horecareden onder een webwinkel van een
+       stichting. Deze winkel verstuurt niets: je haalt op, en de stichting ziet
+       een codenaam. Komt er bezorging bij, dan hoort hier
+       `gegevensStop(req, res, 'bezorging')` te staan en gaat de regel in
+       scripts/check.js weg. Zie kern/rtfos/winkel.js. */
+    veilig(res, () => rtfos.winkel.koop(Object.assign({}, lijf(req), { codenaam: ik(req) })));
+  });
+  app.post('/api/rtfos/winkel/mijn', auth, leesRem, (req, res) => {
+    if (geenGast(req, res)) return;
+    veilig(res, () => rtfos.winkel.mijn(ik(req)));
+  });
+
+  /* WAAR EEN GEOORMERKTE GIFT HEEN KAN. Een lijst en geen vrij tekstveld: het
+     oormerk wees hiervoor nergens op na te kijken heen. `soort` is een beeld en
+     geen grens -- zie kern/rtfos/gift-projecten.js. */
+  app.post('/api/rtfos/gift/projecten', auth, leesRem, (req, res) => {
+    if (geenGast(req, res)) return;
+    veilig(res, () => rtfos.gift.projecten.lijst(lijf(req)));
+  });
+
+  /* DE SEPA-MACHTIGING, en die tekent de GEVER zelf. Er is met opzet geen
+     route waarlangs het kantoor er een namens iemand aanmaakt: dat zou het
+     woord "getekend" leegmaken. Intrekken kan altijd, zonder reden en per
+     direct -- en het stopt de incasso, niet de gift. */
+  app.post('/api/rtfos/gift/machtiging/mijn', auth, leesRem, (req, res) => {
+    if (geenGast(req, res)) return;
+    veilig(res, () => rtfos.gift.machtiging.mijn(ik(req)));
+  });
+  app.post('/api/rtfos/gift/machtiging/teken', auth, schrijfRem, (req, res) => {
+    if (geenGast(req, res)) return;
+    veilig(res, () => rtfos.gift.machtiging.teken(ik(req), lijf(req)));
+  });
+  app.post('/api/rtfos/gift/machtiging/intrek', auth, schrijfRem, (req, res) => {
+    if (geenGast(req, res)) return;
+    veilig(res, () => rtfos.gift.machtiging.trekIn(ik(req), lijf(req)));
+  });
+
+  /* De bevestiging: hier beweegt er geld. De codenaam komt uit de SESSIE en
+     niet uit het lijf -- anders geeft de een namens de ander. */
+  app.post('/api/rtfos/gift/bevestig', auth, schrijfRem, (req, res) => {
+    if (geenGast(req, res)) return;
+    veilig(res, () => rtfos.gift.bevestig(Object.assign({}, lijf(req), { codenaam: ik(req) })));
+  });
+};

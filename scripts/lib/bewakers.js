@@ -102,6 +102,21 @@ const KAART = new Map([
   // ---- eigenrol: identiteit met een rol buiten het drietal ----
   ['boardroomAuth', ['eigenrol', 'boardroom',
     'draait eerst officeAuth en eist daarna boardroomtoegang; member en supplier stranden op de eerste, office op de tweede']],
+  /* DE KLUISPOORT (server/kern/kantoor/kluispoort.js). Hij draait eerst
+     officeAuth en eist daarna een IDENTITEIT: de gedeelde backoffice-code komt
+     er niet door, een kantoorsessie op naam wel.
+
+     Waarom een eigen rolnaam en niet 'office': met het office-token van de
+     gedeelde code komt de proef hier nooit binnen, dus zou elke route erachter
+     als "geweigerd" tellen -- en dat is geen meting van idempotentie maar van
+     de deur. En niet 'boardroom': de kluis staat open voor elke kantoorsessie
+     op naam, niet alleen voor de eigenaar. In de PROEFopstelling is de eigenaar
+     toevallig het enige lid met zo'n sessie; in productie zijn dat er meer.
+
+     Gevonden door de idemproef zelf, die hem meldde als "bewaker van onbekende
+     soort" -- precies waar die melding voor is. */
+  ['kluisAuth', ['eigenrol', 'kantoor-op-naam',
+    'officeAuth plus identiteit: een kantoorsessie met een sleutel. De gedeelde backoffice-code komt er niet door']],
   ['techAuth', ['eigenrol', 'techniek',
     'verifieert het token als ECHT account en toetst daarna magInzien(); een geldig lid krijgt 403 en een kritieke melding op het veiligheidsbord']],
   ['baasAuth', ['eigenrol', 'werkplekbaas',
@@ -181,12 +196,33 @@ function namenVan(soort) {
    officeAuth EN boardroomAuth is voor het kruisen een kantoorroute plus een
    extra slot -- het kantoortoken is dan de juiste rol en member/supplier zijn
    fout, en dat is de scherpere meting). Verfijners doen nooit mee. */
+const { PUBLIEK } = require('./publiek');
+/* Een route zonder middleware waarvan de HANDLER zelf oordeelt. Zie de kop van
+   ./eigenpoort.js voor waarom dat een eigen lijst is en niet de openbaar-lijst. */
+const { EIGEN_POORT } = require('./eigenpoort');
+
 function beoordeel(route) {
   const r = route || {};
   if (!r.bewakersBekend) return { rol: null, reden: 'de router kon geen bewakers noemen' };
 
   const namen = Array.isArray(r.bewakers) ? r.bewakers : [];
   if (!namen.length) {
+    /* GEEN BEWAKER IS NIET ALTIJD EEN GAT -- soms is het een BESLUIT.
+
+       Een route die met een reden op de openbaar-lijst staat (scripts/lib/publiek.js)
+       hoort zonder sleutel open te gaan. Zonder deze tak viel hij hier onder "geen
+       bewakerslaag" en daarmee in de bak GEEN_PROEFSLEUTEL van de trechter: een
+       instrumenttekort, terwijl er niets ontbreekt. Er valt hier juist WEL te
+       meten, en op de enige juiste manier -- zonder token, want dat is precies
+       wat een bezoeker meestuurt.
+
+       De lijst komt uit lib/publiek.js en wordt hier niet nog een keer bedacht;
+       twee lijsten van wat openbaar mag zijn lopen uiteen (LAT.md regel 4), en
+       dat is met deze lijst al een keer gebeurd. */
+    if (r.pad && PUBLIEK.has(r.pad)) return { rol: 'openbaar', reden: null };
+    /* De poort staat in de handler: geen token mee, en dat is de bedoeling.
+       Een inlogdeur die een sessie eist, laat niemand inloggen. */
+    if (r.pad && EIGEN_POORT.has(r.pad)) return { rol: 'eigen-poort', reden: null };
     return { rol: null, reden: 'geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)' };
   }
 
@@ -206,6 +242,21 @@ function beoordeel(route) {
      wat er dan WEL staat -- en de zwaarste telt, want die bepaalt de reparatie. */
   const dragend = namen.filter((n, i) => soorten[i] !== 'verfijner');
   if (!dragend.length) {
+    /* EN OOK HIER GELDT: OPENBAAR MET REDEN IS EEN BESLUIT.
+
+       De openbaar-tak stond hierboven, op de tak ZONDER enige middleware. Maar
+       een openbare route heeft juist vaak wel iets voor zich staan -- een rem,
+       want open en scheppend hoort begrensd te zijn. `/api/arrival/interpret`,
+       de twee betaal-webhooks, de hele lab2-bewonerkant en het rtfos-portaal
+       kwamen daardoor hier terecht, onder "geen laag die een identiteit
+       vaststelt". Dat is waar en het is niet de conclusie: er valt WEL te
+       meten, zonder token, precies zoals een bezoeker het doet.
+
+       Eenenveertig routes stonden zo als instrumenttekort geboekt terwijl er
+       niets ontbrak. Dezelfde fout als hierboven, een tak dieper -- en die
+       herhaling is het argument om de vraag "is dit met reden openbaar" niet
+       aan de vorm van de bewakerslijst te hangen. */
+    if (r.pad && PUBLIEK.has(r.pad)) return { rol: 'openbaar', reden: null };
     return { rol: null, reden: 'alleen verfijners (' + namen.join('+') +
       '), geen laag die een identiteit vaststelt' };
   }
@@ -226,6 +277,34 @@ function beoordeel(route) {
     geenBewaker: 'geen autorisatielaag -- alleen een rem of cache',
     omgeving: 'de opstelling beslist (configuratie), niet de bezoeker'
   }[soort] || 'niet te kruisen';
+  /* OPENBAAR MET REDEN, EN ALLEEN WAAR ER GEEN DEUR IS.
+
+     Deze tak hoort hier en niet hoger: `mw` is geen verfijner maar een
+     `geenBewaker` -- een rem, geen autorisatielaag -- dus een openbare route
+     met een rem ervoor kwam helemaal tot hier. Eenenveertig routes stonden zo
+     als instrumenttekort geboekt (arrival, de twee betaal-webhooks, de hele
+     lab2-bewonerkant, het rtfos-portaal) terwijl er niets ontbrak.
+
+     EN ALLEEN BIJ `geenBewaker`. Staat er een lichaamssleutel, een objectpoort
+     of een omgevingsbeslissing voor, dan is er wel degelijk een deur, en dan
+     mag "hij staat op de openbaar-lijst" die deur niet wegschrijven. De zwakste
+     bewering mag de sterkste niet overschrijven -- dezelfde regel als die van
+     de rangorde hierboven, en om dezelfde reden. */
+  if (soort === 'geenBewaker' && r.pad && PUBLIEK.has(r.pad)) return { rol: 'openbaar', reden: null };
+  if (soort === 'geenBewaker' && r.pad && EIGEN_POORT.has(r.pad)) return { rol: 'eigen-poort', reden: null };
+  /* DE OPSTELLING BESLIST, EN DAT IS EEN ROL EN GEEN GAT.
+
+     `meetpoort` (server/meetpoort.js) laat binnen op ADRES: met
+     RTG_METRICS_TOKEN gezet moet dat token mee, en zonder token gaat de deur
+     alleen open vanaf een intern adres. De proeven kloppen aan vanaf 127.0.0.1
+     en dat IS zo'n adres -- de weg die de opstelling bedoelt.
+
+     Zolang dit `rol: null` gaf, stond /api/sonde/melding als instrumenttekort
+     geboekt terwijl de proef er gewoon bij kan. Hij heet daarom `omgeving` en
+     niet `openbaar`: van buiten geeft deze deur 404, en dat verschil hoort in
+     het register te staan in plaats van gladgestreken te worden. */
+  if (soort === 'omgeving') return { rol: 'omgeving', reden: null };
+
   return { rol: null, reden: soort + ': ' + dragend.join('+') + ' -- ' + uitleg };
 }
 

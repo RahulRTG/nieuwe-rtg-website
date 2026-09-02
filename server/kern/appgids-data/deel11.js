@@ -56,4 +56,11 @@ module.exports = {
   '/apps/sport.html': G('RTG Sport: kampen, lessen en sportieve activiteiten van partners.',
     ['Bekijk het aanbod en de data', 'Meld je aan voor een kamp of les', 'Stel een vraag aan de organisatie'],
     'Begin klein: één vast uur per week houd je langer vol dan een groots plan.'),
+  /* De winkel staat hier en niet bij de andere FoundationOS-schermen in deel
+     10b: dat bestand zit op 10.222 van de 10.240 bytes. */
+  '/apps/foundation/winkel.html': G('De winkel van de RTFoundation: spullen kopen waarvan de opbrengst naar het werk in de steden gaat.',
+    ['Kies een artikel en het aantal; de prijs komt van de server en nooit uit je scherm',
+      'Afrekenen gaat van je RTG Pay-wallet naar de wallet van de stichting, dezelfde weg als een gift',
+      'Volg onderaan wat je hebt gekocht; wanneer het verstuurd of klaargelegd is, zet een mens van de stichting dat erbij'],
+    'Dit is een winkel en geen collectebus: er staat iets tegenover, dus een aankoop is GEEN aftrekbare gift en je krijgt er geen giftbewijs voor. Wil je geven, ga dan naar Geven \u2014 daar is het wel een gift.'),
 };

@@ -84,7 +84,7 @@
         '<div class="lb-meta">' +
           [esc(o.soort), esc(o.merk), o.bouwjaar, (o.regelAantal || 0) + ' regels', eu(o.kosten)]
             .filter(Boolean).join(' · ') + '</div></div>';
-    }).join('') : '<div class="kaart"><p class="stil">Nog geen objecten in het logboek.</p></div>';
+    }).join('') : '<div class="kaart"><p class="leeg">Nog geen objecten in het logboek.</p></div>';
     h += '<h2>Vraag de vlootbeheerder</h2><div class="kaart">' +
       '<form class="lb-rij" id="lbAiForm">' +
       '<input id="lbAiIn" placeholder="Bijv. wat staat er dit kwartaal op de planning?" ' +
@@ -121,7 +121,7 @@
             r.kosten ? eu(r.kosten) : ''].filter(Boolean).join(' · ') + '</small></div>' +
           '<button class="knop lb-weg" data-regel="' + esc(r.id) + '" type="button" ' +
             'aria-label="Regel verwijderen">&times;</button></div>';
-      }).join('') : '<p class="stil">Nog geen regels.</p>') + '</div>';
+      }).join('') : '<p class="leeg">Nog geen regels.</p>') + '</div>';
     $('#lbVak').innerHTML = h;
   }
 

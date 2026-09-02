@@ -44,6 +44,7 @@ const BELEID = {
   'business-lite': { stand: 'doorbelasten', bestaatNog: false, uitleg: 'Business Lite betaalt een lage bijdrage en rekent het eigen verbruik af.' },
   zaak: { stand: 'inbegrepen', uitleg: 'Wat een zaak betaalt staat in zijn leverancierscontract; een tweede rekening ernaast zou daarmee botsen.' },
   gezin: { stand: 'rtfoundation', uitleg: 'De RTFoundation is gratis voor elk gezin. Het gezin ziet wat het kost; de RTFoundation betaalt.' },
+  lab: { stand: 'rtfoundation', uitleg: 'Een lab van het Living Lab draait op de begroting van de RTFoundation. Het lab ziet tot op de cent wat het kost -- dat is precies wat een subsidiegever vraagt -- en de deelnemers krijgen er nooit een rekening voor.' },
   huis: { stand: 'huis', uitleg: 'Verbruik zonder eigenaar: onze eigen rekening.' }
 };
 
@@ -55,6 +56,7 @@ const STANDEN = ['inbegrepen', 'doorbelasten', 'rtfoundation', 'huis'];
    configuratie maar het intrekken van "gratis voor elk gezin" -- dat hoort een
    besluit te zijn dat je opschrijft, niet een vinkje dat je omzet. */
 const VAST = {
+  lab: 'Een lab factureert zijn deelnemers niet. Onderzoek waarin de bewoner meebetaalt aan het onderzoek waaraan hij meedoet, is geen onderzoek maar een verkoop; die schakelaar hoort niet te bestaan.',
   gezin: 'De RTFoundation is gratis voor elk gezin. Dat is een belofte en geen instelling; wie dat wil veranderen verandert de RTFoundation, niet deze schakelaar.',
   huis: 'Verbruik zonder eigenaar is onze eigen rekening. Die aan een gebruiker toewijzen zou een rekening zijn voor iets dat hij niet heeft gedaan.'
 };

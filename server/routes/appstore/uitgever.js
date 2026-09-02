@@ -46,7 +46,16 @@ module.exports = (kern) => {
      is gevonden EN hoe het wel kan; dat is het verschil tussen een poort waar je
      doorheen leert komen en een poort waar je tegenaan blijft lopen. */
   /* mutatie: idempotent -- dezelfde bundel levert dezelfde hash en dus geen tweede versie */
+  /* DE MENS ACHTER DE INZENDING gaat mee, en niet alleen de organisatie. Dat is
+     de helft van de vier-ogenregel die aan deze kant hoort: zonder dit weet het
+     aftekenmoment straks alleen van welke org een bundel komt
+     (kern/appstore/vierogen.js). `req.actor` staat er al -- de leverancierspoort
+     zet hem voor de toeschrijving van elke handeling in een werkplek. */
   app.post('/api/appstore/uitgever/inzenden', supplierAuth, metOrg((req, o) => appstore.inzenden({
+    inzender: { soort: 'medewerker',
+      id: req.actor && req.actor.staffId ? 'staff:' + req.supplier.code + ':' + req.actor.staffId
+        : (req.actor && req.actor.lidKey ? req.actor.lidKey : null),
+      naam: req.actor ? req.actor.name : null },
     org: o.org, manifest: req.body.manifest, bestanden: req.body.bestanden })));
 
   // de eigen app terugtrekken: dat wacht niet op een kantoor

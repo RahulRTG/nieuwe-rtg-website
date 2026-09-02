@@ -14,6 +14,8 @@
    ========================================================================== */
 'use strict';
 
+const vierogen = require('./vierogen');
+
 const { MACHTIGINGEN, DOELEN, NIET_GEBOUWD } = require('./machtigingen');
 const { BUDGET } = require('./keuring');
 
@@ -49,13 +51,18 @@ module.exports = function maakBesluit({ S, save, nu, boek, eigen, norm, uitgever
      mens (`door`) en een organisatie (`doorOrg`, als die er is). Is die
      organisatie de uitgever zelf, dan is dit geen keuring maar een handtekening
      onder je eigen stuk. */
-  function besluit({ versieId, besluit: keuze, reden, door, doorOrg }) {
+  function besluit({ versieId, besluit: keuze, reden, door, doorOrg, doorKey }) {
     const v = versie(versieId);
     if (!v) return { status: 404, error: 'Deze inzending bestaat niet.' };
     if (v.status !== 'wacht-op-mens') return { status: 409, error: 'Over deze inzending is al besloten (' + v.status + ').' };
     const wie = String(door || '').trim().slice(0, 80);
     if (!wie) return { status: 400, error: 'Zet je naam erbij: een keuring hoort een mens te hebben gedaan.' };
     if (doorOrg && norm(doorOrg) === v.org) return { status: 403, error: 'Een uitgever tekent zijn eigen inzending niet af. Een mens van RTG keurt.' };
+    /* EN DE VIER-OGENREGEL OP DE MENS (./vierogen.js). De regel hierboven kijkt
+       naar de ORGANISATIE; bij RTG's eigen uitgever is dat niets, want daar kan
+       dezelfde mens inzenden en aftekenen. */
+    const ogen = vierogen.toets({ inzender: v.inzender, doorKey, doorNaam: wie });
+    if (!ogen.mag) return { status: 403, error: ogen.reden, code: ogen.code, scheiding: ogen.graad };
     if (!['gepubliceerd', 'geweigerd'].includes(keuze)) return { status: 400, error: 'Een besluit is gepubliceerd of geweigerd.' };
     if (keuze === 'geweigerd' && String(reden || '').trim().length < 10) return { status: 400, error: 'Een weigering draagt een reden van ten minste tien tekens; die leest de uitgever.' };
     const u = uitgever(v.org);
@@ -72,7 +79,10 @@ module.exports = function maakBesluit({ S, save, nu, boek, eigen, norm, uitgever
     }
 
     v.status = keuze;
-    v.besluit = { door: wie, at: nu(), reden: String(reden || '').trim().slice(0, 600) || null };
+    /* Met de GRAAD van de scheiding: "twee mensen" is een andere bewering op
+       twee inlogs dan op twee ingetypte namen (BESTUUR.md). */
+    v.besluit = { door: wie, at: nu(), reden: String(reden || '').trim().slice(0, 600) || null,
+      scheiding: { graad: ogen.graad, uitleg: ogen.reden } };
     const a = app(v.sleutel);
     if (keuze === 'gepubliceerd' && a) {
       /* De vorige live versie wordt niet weggegooid maar losgelaten: hij blijft

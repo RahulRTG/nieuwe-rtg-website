@@ -1,0 +1,2690 @@
+{
+  "stempel": "2026-08-31",
+  "uitleg": "Per scherm van een wereld: draagt het de vormtaal van die wereld? De grond en de letter zijn GEMETEN in een echte browser (getComputedStyle), niet uit de CSS gelezen -- twee eerdere versies van deze meter lazen de cascade verkeerd. Vier klassen: schil (klaar), aankleden (alleen de schil ontbreekt), ombouwen (de binnenkant moet mee), niet gemeten (pagina ging niet open). Ziet niet of een scherm mooi is.",
+  "bron": "public/shared/sprongindex.json (afgeleid van MAPPEN) + een browsermeting",
+  "werelden": [
+    {
+      "wereld": "LivingOS",
+      "schermen": 41,
+      "telling": {
+        "schil": 41
+      },
+      "lijst": [
+        {
+          "namen": [
+            "App-dossier"
+          ],
+          "bestand": "/apps/appstore-dossier.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #440b1c",
+            "waarde": "#080707",
+            "pixel": {
+              "r": 8,
+              "g": 7,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.028284705882352938,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(8, 7, 7)"
+          },
+          "regels": 220,
+          "bytes": 12723,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Attenties"
+          ],
+          "bestand": "/apps/attenties.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal champagne, boven #171815",
+            "waarde": "#f4f0e9",
+            "pixel": {
+              "r": 244,
+              "g": 240,
+              "b": 233,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.9425294117647058,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(244, 240, 233)"
+          },
+          "regels": 152,
+          "bytes": 14339,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Camera"
+          ],
+          "bestand": "/apps/camera.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #161513",
+            "waarde": "#090909",
+            "pixel": {
+              "r": 9,
+              "g": 9,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.03529411764705883,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": null
+          },
+          "regels": 618,
+          "bytes": 36132,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": false,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Cellier"
+          ],
+          "bestand": "/apps/cellier.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #440b1c",
+            "waarde": "#080707",
+            "pixel": {
+              "r": 8,
+              "g": 7,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.028284705882352938,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(8, 7, 7)"
+          },
+          "regels": 124,
+          "bytes": 10542,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Cercle"
+          ],
+          "bestand": "/apps/cercle.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal champagne, boven #171815",
+            "waarde": "#f4f0e9",
+            "pixel": {
+              "r": 244,
+              "g": 240,
+              "b": 233,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.9425294117647058,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(244, 240, 233)"
+          },
+          "regels": 153,
+          "bytes": 13823,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Video"
+          ],
+          "bestand": "/apps/clips.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #440b1c",
+            "waarde": "#080707",
+            "pixel": {
+              "r": 8,
+              "g": 7,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.028284705882352938,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(8, 7, 7)"
+          },
+          "regels": 477,
+          "bytes": 27224,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Berichten"
+          ],
+          "bestand": "/apps/comm.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal champagne, boven #171815",
+            "waarde": "#1b1a18",
+            "pixel": {
+              "r": 27,
+              "g": 26,
+              "b": 24,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.10222823529411765,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(244, 240, 233)"
+          },
+          "regels": 793,
+          "bytes": 42287,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Commerce"
+          ],
+          "bestand": "/apps/commerce.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #440b1c",
+            "waarde": "#080707",
+            "pixel": {
+              "r": 8,
+              "g": 7,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.028284705882352938,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(8, 7, 7)"
+          },
+          "regels": 521,
+          "bytes": 30889,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Entourage"
+          ],
+          "bestand": "/apps/entourage.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal champagne, boven #171815",
+            "waarde": "#f4f0e9",
+            "pixel": {
+              "r": 244,
+              "g": 240,
+              "b": 233,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.9425294117647058,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(244, 240, 233)"
+          },
+          "regels": 155,
+          "bytes": 14018,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Food Court"
+          ],
+          "bestand": "/apps/foodcourt.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #440b1c",
+            "waarde": "#080707",
+            "pixel": {
+              "r": 8,
+              "g": 7,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.028284705882352938,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(8, 7, 7)"
+          },
+          "regels": 215,
+          "bytes": 14236,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Vrienden"
+          ],
+          "bestand": "/apps/foundation/vrienden.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux",
+            "waarde": "#08090c",
+            "pixel": {
+              "r": 8,
+              "g": 9,
+              "b": 12,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.03530980392156863,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(7, 17, 27)"
+          },
+          "regels": 1065,
+          "bytes": 67845,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": false,
+            "bodoni": true,
+            "inter": false,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Garde-robe"
+          ],
+          "bestand": "/apps/garderobe.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #080808",
+            "waarde": "#090809",
+            "pixel": {
+              "r": 9,
+              "g": 8,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.032489411764705885,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(8, 7, 7)"
+          },
+          "regels": 127,
+          "bytes": 10899,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Geld"
+          ],
+          "bestand": "/apps/geld-command.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #080808",
+            "waarde": "#090809",
+            "pixel": {
+              "r": 9,
+              "g": 8,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.032489411764705885,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(8, 7, 7)"
+          },
+          "regels": 36,
+          "bytes": 18676,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": false,
+            "inter": false,
+            "uniform": false
+          }
+        },
+        {
+          "namen": [
+            "Balans",
+            "Bank",
+            "Betaalcode",
+            "Fonds",
+            "Logboek",
+            "Mecenaat",
+            "Nalatenschap",
+            "Samen betalen",
+            "Wallet"
+          ],
+          "bestand": "/apps/geld.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux",
+            "waarde": "#080707",
+            "pixel": {
+              "r": 8,
+              "g": 7,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.028284705882352938,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(8, 7, 7)"
+          },
+          "regels": 176,
+          "bytes": 9761,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": false,
+            "inter": false,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Krant"
+          ],
+          "bestand": "/apps/krant.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #440b1c",
+            "waarde": "#080707",
+            "pixel": {
+              "r": 8,
+              "g": 7,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.028284705882352938,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(8, 7, 7)"
+          },
+          "regels": 194,
+          "bytes": 15307,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Mijn leven"
+          ],
+          "bestand": "/apps/leven.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #090909",
+            "waarde": "#090809",
+            "pixel": {
+              "r": 9,
+              "g": 8,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.032489411764705885,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(12, 12, 11)"
+          },
+          "regels": 23,
+          "bytes": 6112,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": false,
+            "inter": false,
+            "uniform": false
+          }
+        },
+        {
+          "namen": [
+            "Privekantoor"
+          ],
+          "bestand": "/apps/lifestyle.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #440b1c",
+            "waarde": "#080707",
+            "pixel": {
+              "r": 8,
+              "g": 7,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.028284705882352938,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(8, 7, 7)"
+          },
+          "regels": 770,
+          "bytes": 57939,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Het Vooruitzicht"
+          ],
+          "bestand": "/apps/living-os.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #450c1d",
+            "waarde": "#0b0a0a",
+            "pixel": {
+              "r": 11,
+              "g": 10,
+              "b": 10,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.040049411764705875,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(12, 12, 11)"
+          },
+          "regels": 19,
+          "bytes": 8792,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": false,
+            "inter": false,
+            "uniform": false
+          }
+        },
+        {
+          "namen": [
+            "Maison"
+          ],
+          "bestand": "/apps/maison.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #080808",
+            "waarde": "#090809",
+            "pixel": {
+              "r": 9,
+              "g": 8,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.032489411764705885,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(8, 7, 7)"
+          },
+          "regels": 121,
+          "bytes": 10927,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Mall"
+          ],
+          "bestand": "/apps/mall.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #440b1c",
+            "waarde": "#080707",
+            "pixel": {
+              "r": 8,
+              "g": 7,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.028284705882352938,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(8, 7, 7)"
+          },
+          "regels": 1461,
+          "bytes": 96933,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "RTG Media"
+          ],
+          "bestand": "/apps/media.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #450c1d",
+            "waarde": "#080808",
+            "pixel": {
+              "r": 8,
+              "g": 8,
+              "b": 8,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.03137254901960784,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": null
+          },
+          "regels": 276,
+          "bytes": 16965,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Mijn bestellingen"
+          ],
+          "bestand": "/apps/mijnmall.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #440b1c",
+            "waarde": "#080707",
+            "pixel": {
+              "r": 8,
+              "g": 7,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.028284705882352938,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(8, 7, 7)"
+          },
+          "regels": 148,
+          "bytes": 9011,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Muziek"
+          ],
+          "bestand": "/apps/muziek.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #450c1d",
+            "waarde": "#110f0e",
+            "pixel": {
+              "r": 17,
+              "g": 15,
+              "b": 14,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.0602078431372549,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": null
+          },
+          "regels": 384,
+          "bytes": 22474,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Nieuws"
+          ],
+          "bestand": "/apps/nieuws.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #440b1c",
+            "waarde": "#080707",
+            "pixel": {
+              "r": 8,
+              "g": 7,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.028284705882352938,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(8, 7, 7)"
+          },
+          "regels": 132,
+          "bytes": 9748,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Betalen"
+          ],
+          "bestand": "/apps/pay.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #440b1c",
+            "waarde": "#080707",
+            "pixel": {
+              "r": 8,
+              "g": 7,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.028284705882352938,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(8, 7, 7)"
+          },
+          "regels": 589,
+          "bytes": 33800,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Live"
+          ],
+          "bestand": "/apps/podium.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #430a1b",
+            "waarde": "#080707",
+            "pixel": {
+              "r": 8,
+              "g": 7,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.028284705882352938,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(8, 7, 7)"
+          },
+          "regels": 665,
+          "bytes": 39704,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Vandaag"
+          ],
+          "bestand": "/apps/pulse.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal champagne, boven #171815",
+            "waarde": "#f4f0e9",
+            "pixel": {
+              "r": 244,
+              "g": 240,
+              "b": 233,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.9425294117647058,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(244, 240, 233)"
+          },
+          "regels": 248,
+          "bytes": 21579,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Rendez-vous"
+          ],
+          "bestand": "/apps/rendezvous.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal champagne, boven #171815",
+            "waarde": "#f4f0e9",
+            "pixel": {
+              "r": 244,
+              "g": 240,
+              "b": 233,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.9425294117647058,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(244, 240, 233)"
+          },
+          "regels": 389,
+          "bytes": 35829,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": false,
+            "inter": false,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "LivingOS",
+            "Ontdekken"
+          ],
+          "bestand": "/apps/rtg.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #440b1c",
+            "waarde": "#040404",
+            "pixel": {
+              "r": 4,
+              "g": 4,
+              "b": 4,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.01568627450980392,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(8, 7, 7)"
+          },
+          "regels": 306,
+          "bytes": 33823,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Tweede scherm"
+          ],
+          "bestand": "/apps/scherm.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux",
+            "waarde": "#080707",
+            "pixel": {
+              "r": 8,
+              "g": 7,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.028284705882352938,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(8, 7, 7)"
+          },
+          "regels": 242,
+          "bytes": 14730,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Sociaal"
+          ],
+          "bestand": "/apps/sociaal.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal champagne, boven #571e2e",
+            "waarde": "#f1eee7",
+            "pixel": {
+              "r": 241,
+              "g": 238,
+              "b": 231,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.9338525490196078,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": null
+          },
+          "regels": 790,
+          "bytes": 40021,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": false,
+            "inter": false,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Spelen"
+          ],
+          "bestand": "/apps/spelen.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #07111b",
+            "waarde": "#07101c",
+            "pixel": {
+              "r": 7,
+              "g": 16,
+              "b": 28,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.05863921568627451,
+            "letter": "Inter, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(7, 17, 28)"
+          },
+          "regels": 1937,
+          "bytes": 121093,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": false,
+            "bodoni": false,
+            "inter": false,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Game Night"
+          ],
+          "bestand": "/apps/spelscherm.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #440b1c",
+            "waarde": "#080707",
+            "pixel": {
+              "r": 8,
+              "g": 7,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.028284705882352938,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(8, 7, 7)"
+          },
+          "regels": 154,
+          "bytes": 7966,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": false,
+            "bodoni": true,
+            "inter": true,
+            "uniform": false
+          }
+        },
+        {
+          "namen": [
+            "Sport"
+          ],
+          "bestand": "/apps/sport.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #440b1c",
+            "waarde": "#080707",
+            "pixel": {
+              "r": 8,
+              "g": 7,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.028284705882352938,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(8, 7, 7)"
+          },
+          "regels": 234,
+          "bytes": 17786,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Table"
+          ],
+          "bestand": "/apps/table.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #080808",
+            "waarde": "#090809",
+            "pixel": {
+              "r": 9,
+              "g": 8,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.032489411764705885,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(8, 7, 7)"
+          },
+          "regels": 135,
+          "bytes": 12379,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Films en series"
+          ],
+          "bestand": "/apps/theater.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #440b1c",
+            "waarde": "#080707",
+            "pixel": {
+              "r": 8,
+              "g": 7,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.028284705882352938,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(8, 7, 7)"
+          },
+          "regels": 780,
+          "bytes": 44568,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Thuis"
+          ],
+          "bestand": "/apps/thuis.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #430a1b",
+            "waarde": "#080707",
+            "pixel": {
+              "r": 8,
+              "g": 7,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.028284705882352938,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(8, 7, 7)"
+          },
+          "regels": 409,
+          "bytes": 30169,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Uitgaan"
+          ],
+          "bestand": "/apps/uitgaan.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #440b1c",
+            "waarde": "#080707",
+            "pixel": {
+              "r": 8,
+              "g": 7,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.028284705882352938,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(8, 7, 7)"
+          },
+          "regels": 263,
+          "bytes": 17807,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Vandaag"
+          ],
+          "bestand": "/apps/vandaag.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #440b1c",
+            "waarde": "#080707",
+            "pixel": {
+              "r": 8,
+              "g": 7,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.028284705882352938,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(8, 7, 7)"
+          },
+          "regels": 60,
+          "bytes": 5454,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": false
+          }
+        },
+        {
+          "namen": [
+            "Daten"
+          ],
+          "bestand": "/apps/vonk.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal champagne, boven #171815",
+            "waarde": "#f4f0e9",
+            "pixel": {
+              "r": 244,
+              "g": 240,
+              "b": 233,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.9425294117647058,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(244, 240, 233)"
+          },
+          "regels": 365,
+          "bytes": 39434,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": false,
+            "inter": false,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Alles bij elkaar"
+          ],
+          "bestand": "/apps/wereld.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #440b1c",
+            "waarde": "#460b1c",
+            "pixel": {
+              "r": 70,
+              "g": 11,
+              "b": 28,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.09714039215686275,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(8, 7, 7)"
+          },
+          "regels": 621,
+          "bytes": 29937,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        }
+      ]
+    },
+    {
+      "wereld": "WorkOS",
+      "schermen": 13,
+      "telling": {
+        "aankleden": 12,
+        "schil": 1
+      },
+      "lijst": [
+        {
+          "namen": [
+            "Web"
+          ],
+          "bestand": "/apps/browser.html",
+          "klasse": "aankleden",
+          "reden": "grond #080807 = onyx (4 naast de basis), huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #0a0908",
+            "waarde": "#080807",
+            "pixel": {
+              "r": 8,
+              "g": 8,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.03108941176470588,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": null
+          },
+          "regels": 433,
+          "bytes": 31226,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Horeca"
+          ],
+          "bestand": "/apps/horeca.html",
+          "klasse": "aankleden",
+          "reden": "grond #070707 = onyx (5 naast de basis), huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #201c1d",
+            "waarde": "#070707",
+            "pixel": {
+              "r": 7,
+              "g": 7,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.02745098039215686,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(11, 11, 10)"
+          },
+          "regels": 201,
+          "bytes": 15058,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": false,
+            "inter": false,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Loon"
+          ],
+          "bestand": "/apps/loonstrook.html",
+          "klasse": "aankleden",
+          "reden": "grond #090909 = onyx (3 naast de basis), huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #0f1111",
+            "waarde": "#090909",
+            "pixel": {
+              "r": 9,
+              "g": 9,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.03529411764705883,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": null
+          },
+          "regels": 251,
+          "bytes": 13858,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Magnaat"
+          ],
+          "bestand": "/apps/magnaat.html",
+          "klasse": "aankleden",
+          "reden": "grond #070707 = onyx (5 naast de basis), huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #100f0e",
+            "waarde": "#070707",
+            "pixel": {
+              "r": 7,
+              "g": 7,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.02745098039215686,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": null
+          },
+          "regels": 591,
+          "bytes": 109517,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": false
+          }
+        },
+        {
+          "namen": [
+            "Documenten"
+          ],
+          "bestand": "/apps/office.html",
+          "klasse": "aankleden",
+          "reden": "grond #080807 = onyx (4 naast de basis), huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #090908",
+            "waarde": "#080807",
+            "pixel": {
+              "r": 8,
+              "g": 8,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.03108941176470588,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": null
+          },
+          "regels": 629,
+          "bytes": 40754,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Onderneming"
+          ],
+          "bestand": "/apps/onderneming.html",
+          "klasse": "aankleden",
+          "reden": "grond #080807 = onyx (4 naast de basis), huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #0a0908",
+            "waarde": "#080807",
+            "pixel": {
+              "r": 8,
+              "g": 8,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.03108941176470588,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": null
+          },
+          "regels": 898,
+          "bytes": 53165,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Partner Network"
+          ],
+          "bestand": "/apps/partner-network.html",
+          "klasse": "aankleden",
+          "reden": "grond #070707 = onyx (5 naast de basis), huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #201c1d",
+            "waarde": "#070707",
+            "pixel": {
+              "r": 7,
+              "g": 7,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.02745098039215686,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(12, 12, 11)"
+          },
+          "regels": 9,
+          "bytes": 6812,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": false,
+            "inter": false,
+            "uniform": false
+          }
+        },
+        {
+          "namen": [
+            "RTG One"
+          ],
+          "bestand": "/apps/rtgone.html",
+          "klasse": "aankleden",
+          "reden": "grond #180e0d = onyx (12 naast de basis), huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #0d0c0a",
+            "waarde": "#180e0d",
+            "pixel": {
+              "r": 24,
+              "g": 14,
+              "b": 13,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.06295607843137255,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(18, 12, 11)"
+          },
+          "regels": 29,
+          "bytes": 31678,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": false
+          }
+        },
+        {
+          "namen": [
+            "School"
+          ],
+          "bestand": "/apps/rtgschool.html",
+          "klasse": "aankleden",
+          "reden": "grond #080807 = onyx (4 naast de basis), huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #090807",
+            "waarde": "#080807",
+            "pixel": {
+              "r": 8,
+              "g": 8,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.03108941176470588,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(17, 12, 11)"
+          },
+          "regels": 183,
+          "bytes": 11287,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "RTMail"
+          ],
+          "bestand": "/apps/rtmail.html",
+          "klasse": "aankleden",
+          "reden": "grond #080807 = onyx (4 naast de basis), huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #1b2326",
+            "waarde": "#080807",
+            "pixel": {
+              "r": 8,
+              "g": 8,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.03108941176470588,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": null
+          },
+          "regels": 474,
+          "bytes": 34797,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Website"
+          ],
+          "bestand": "/apps/sitemaker.html",
+          "klasse": "aankleden",
+          "reden": "grond #080807 = onyx (4 naast de basis), huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #0a0908",
+            "waarde": "#080807",
+            "pixel": {
+              "r": 8,
+              "g": 8,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.03108941176470588,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": null
+          },
+          "regels": 654,
+          "bytes": 48934,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "RTG Werk OS"
+          ],
+          "bestand": "/apps/werk.html",
+          "klasse": "aankleden",
+          "reden": "grond #060606 = onyx (6 naast de basis), huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #201c1d",
+            "waarde": "#060606",
+            "pixel": {
+              "r": 6,
+              "g": 6,
+              "b": 6,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.023529411764705882,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(12, 12, 11)"
+          },
+          "regels": 157,
+          "bytes": 15332,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": false,
+            "inter": false,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "WorkOS"
+          ],
+          "bestand": "/apps/kantoor.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal royal, boven #33447c",
+            "waarde": "#090a0b",
+            "pixel": {
+              "r": 9,
+              "g": 10,
+              "b": 11,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.03866509803921569,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": null
+          },
+          "regels": 482,
+          "bytes": 26868,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": false,
+            "uniform": true
+          }
+        }
+      ]
+    },
+    {
+      "wereld": "TravelOS",
+      "schermen": 13,
+      "telling": {
+        "aankleden": 12,
+        "schil": 1
+      },
+      "lijst": [
+        {
+          "namen": [
+            "Aankomst"
+          ],
+          "bestand": "/apps/arrival.html",
+          "klasse": "aankleden",
+          "reden": "grond #080808 = onyx (4 naast de basis), huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx",
+            "waarde": "#080808",
+            "pixel": {
+              "r": 8,
+              "g": 8,
+              "b": 8,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.03137254901960784,
+            "letter": "Inter, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(8, 8, 8)"
+          },
+          "regels": 9,
+          "bytes": 6400,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": false
+          }
+        },
+        {
+          "namen": [
+            "Verkeer"
+          ],
+          "bestand": "/apps/flits.html",
+          "klasse": "aankleden",
+          "reden": "grond #090a0a = onyx (3 naast de basis), huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #080808",
+            "waarde": "#090a0a",
+            "pixel": {
+              "r": 9,
+              "g": 10,
+              "b": 10,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.038381960784313725,
+            "letter": "Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+            "letterEr": true,
+            "eigenschap": null
+          },
+          "regels": 296,
+          "bytes": 16359,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Hangar"
+          ],
+          "bestand": "/apps/hangar.html",
+          "klasse": "aankleden",
+          "reden": "grond #090a0a = onyx (3 naast de basis), huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #080808",
+            "waarde": "#090a0a",
+            "pixel": {
+              "r": 9,
+              "g": 10,
+              "b": 10,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.038381960784313725,
+            "letter": "Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+            "letterEr": true,
+            "eigenschap": null
+          },
+          "regels": 139,
+          "bytes": 13106,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Navigatie"
+          ],
+          "bestand": "/apps/navigatie.html",
+          "klasse": "aankleden",
+          "reden": "grond #090a0a = onyx (3 naast de basis), huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #080808",
+            "waarde": "#090a0a",
+            "pixel": {
+              "r": 9,
+              "g": 10,
+              "b": 10,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.038381960784313725,
+            "letter": "Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+            "letterEr": true,
+            "eigenschap": null
+          },
+          "regels": 719,
+          "bytes": 42790,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Openbaar vervoer"
+          ],
+          "bestand": "/apps/ov.html",
+          "klasse": "aankleden",
+          "reden": "grond #090a0a = onyx (3 naast de basis), huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #080808",
+            "waarde": "#090a0a",
+            "pixel": {
+              "r": 9,
+              "g": 10,
+              "b": 10,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.038381960784313725,
+            "letter": "Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+            "letterEr": true,
+            "eigenschap": null
+          },
+          "regels": 1021,
+          "bytes": 61534,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "OV-routes"
+          ],
+          "bestand": "/apps/ovroutes.html",
+          "klasse": "aankleden",
+          "reden": "grond #07090a = onyx (5 naast de basis), huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #080808",
+            "waarde": "#07090a",
+            "pixel": {
+              "r": 7,
+              "g": 9,
+              "b": 10,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.03390980392156863,
+            "letter": "Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(8, 10, 11)"
+          },
+          "regels": 306,
+          "bytes": 17424,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Reisboek"
+          ],
+          "bestand": "/apps/reisboek.html",
+          "klasse": "aankleden",
+          "reden": "grond #090a0a = onyx (3 naast de basis), huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #0a0b0b",
+            "waarde": "#090a0a",
+            "pixel": {
+              "r": 9,
+              "g": 10,
+              "b": 10,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.038381960784313725,
+            "letter": "Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+            "letterEr": true,
+            "eigenschap": null
+          },
+          "regels": 137,
+          "bytes": 13376,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Reizen & Veilig"
+          ],
+          "bestand": "/apps/reizen-veilig.html",
+          "klasse": "aankleden",
+          "reden": "grond #070707 = onyx (5 naast de basis), huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #131010",
+            "waarde": "#070707",
+            "pixel": {
+              "r": 7,
+              "g": 7,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.02745098039215686,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(12, 12, 11)"
+          },
+          "regels": 97,
+          "bytes": 7523,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": false,
+            "inter": false,
+            "uniform": false
+          }
+        },
+        {
+          "namen": [
+            "Verblijven"
+          ],
+          "bestand": "/apps/residentie.html",
+          "klasse": "aankleden",
+          "reden": "grond #0d0b08 = onyx (3 naast de basis), huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #040505",
+            "waarde": "#0d0b08",
+            "pixel": {
+              "r": 13,
+              "g": 11,
+              "b": 8,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.04395529411764706,
+            "letter": "Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+            "letterEr": true,
+            "eigenschap": null
+          },
+          "regels": 182,
+          "bytes": 12202,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Routedossier"
+          ],
+          "bestand": "/apps/routedossier.html",
+          "klasse": "aankleden",
+          "reden": "grond #080807 = onyx (4 naast de basis), huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #090807",
+            "waarde": "#080807",
+            "pixel": {
+              "r": 8,
+              "g": 8,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.03108941176470588,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgba(16, 12, 11, 0.996)"
+          },
+          "regels": 320,
+          "bytes": 16943,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": false,
+            "inter": false,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Stad"
+          ],
+          "bestand": "/apps/stad.html",
+          "klasse": "aankleden",
+          "reden": "grond #090a0a = onyx (3 naast de basis), huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #080808",
+            "waarde": "#090a0a",
+            "pixel": {
+              "r": 9,
+              "g": 10,
+              "b": 10,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.038381960784313725,
+            "letter": "Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+            "letterEr": true,
+            "eigenschap": null
+          },
+          "regels": 164,
+          "bytes": 11015,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Vluchten"
+          ],
+          "bestand": "/apps/vluchten.html",
+          "klasse": "aankleden",
+          "reden": "grond #090a0a = onyx (3 naast de basis), huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #080808",
+            "waarde": "#090a0a",
+            "pixel": {
+              "r": 9,
+              "g": 10,
+              "b": 10,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.038381960784313725,
+            "letter": "Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+            "letterEr": true,
+            "eigenschap": null
+          },
+          "regels": 183,
+          "bytes": 14346,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "TravelOS"
+          ],
+          "bestand": "/apps/reizen.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #070606",
+            "waarde": "#050505",
+            "pixel": {
+              "r": 5,
+              "g": 5,
+              "b": 5,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.019607843137254898,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(8, 9, 9)"
+          },
+          "regels": 943,
+          "bytes": 56790,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": false,
+            "inter": false,
+            "uniform": false
+          }
+        }
+      ]
+    },
+    {
+      "wereld": "Instellingen",
+      "schermen": 4,
+      "telling": {
+        "aankleden": 4
+      },
+      "lijst": [
+        {
+          "namen": [
+            "Wie ben ik"
+          ],
+          "bestand": "/apps/ik.html",
+          "klasse": "aankleden",
+          "reden": "grond #090909 = onyx (3 naast de basis), huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #0f1111",
+            "waarde": "#090909",
+            "pixel": {
+              "r": 9,
+              "g": 9,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.03529411764705883,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": null
+          },
+          "regels": 343,
+          "bytes": 19230,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": false,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Juridisch"
+          ],
+          "bestand": "/apps/juridisch.html",
+          "klasse": "aankleden",
+          "reden": "grond #090909 = onyx (3 naast de basis), huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #1b2326",
+            "waarde": "#090909",
+            "pixel": {
+              "r": 9,
+              "g": 9,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.03529411764705883,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": null
+          },
+          "regels": 72,
+          "bytes": 3802,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Passkeys"
+          ],
+          "bestand": "/apps/passkeys.html",
+          "klasse": "aankleden",
+          "reden": "grond #090909 = onyx (3 naast de basis), huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #0f1111",
+            "waarde": "#090909",
+            "pixel": {
+              "r": 9,
+              "g": 9,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.03529411764705883,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": null
+          },
+          "regels": 225,
+          "bytes": 11613,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "RTG Veilig"
+          ],
+          "bestand": "/apps/veilig.html",
+          "klasse": "aankleden",
+          "reden": "grond #090809 = onyx (4 naast de basis), huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #090a0a",
+            "waarde": "#090809",
+            "pixel": {
+              "r": 9,
+              "g": 8,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.032489411764705885,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": null
+          },
+          "regels": 116,
+          "bytes": 5978,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": false,
+            "inter": false,
+            "uniform": true
+          }
+        }
+      ]
+    },
+    {
+      "wereld": "FoundationOS",
+      "schermen": 4,
+      "telling": {
+        "aankleden": 3,
+        "schil": 1
+      },
+      "lijst": [
+        {
+          "namen": [
+            "Het bord"
+          ],
+          "bestand": "/apps/foundation/bord.html",
+          "klasse": "aankleden",
+          "reden": "grond #08090c = onyx (4 naast de basis), huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx",
+            "waarde": "#08090c",
+            "pixel": {
+              "r": 8,
+              "g": 9,
+              "b": 12,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.03530980392156863,
+            "letter": "Inter, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(7, 17, 28)"
+          },
+          "regels": 261,
+          "bytes": 17200,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": false,
+            "bodoni": false,
+            "inter": false,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "RTFoundation portaal"
+          ],
+          "bestand": "/apps/foundation/os-portaal.html",
+          "klasse": "aankleden",
+          "reden": "grond #07101b = onyx (16 naast de basis), huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #07101a",
+            "waarde": "#07101b",
+            "pixel": {
+              "r": 7,
+              "g": 16,
+              "b": 27,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.058356078431372554,
+            "letter": "Inter, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(7, 17, 26)"
+          },
+          "regels": 242,
+          "bytes": 15911,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": false
+          }
+        },
+        {
+          "namen": [
+            "Het schrift"
+          ],
+          "bestand": "/apps/foundation/schrift.html",
+          "klasse": "aankleden",
+          "reden": "grond #08090c = onyx (4 naast de basis), huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx",
+            "waarde": "#08090c",
+            "pixel": {
+              "r": 8,
+              "g": 9,
+              "b": 12,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.03530980392156863,
+            "letter": "Inter, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(8, 18, 25)"
+          },
+          "regels": 271,
+          "bytes": 19935,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": false,
+            "bodoni": false,
+            "inter": false,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "FoundationOS",
+            "RTFoundation in uw buurt"
+          ],
+          "bestand": "/apps/foundation/os-publiek.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal champagne, boven #07111b",
+            "waarde": "#07101c",
+            "pixel": {
+              "r": 7,
+              "g": 16,
+              "b": 28,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.05863921568627451,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(7, 17, 28)"
+          },
+          "regels": 186,
+          "bytes": 11112,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": false
+          }
+        }
+      ]
+    }
+  ]
+}

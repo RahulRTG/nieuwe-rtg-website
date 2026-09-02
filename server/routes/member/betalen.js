@@ -5,6 +5,7 @@
 module.exports = (kern) => {
   const { app, auth, db, save, accounts, memberTemplate, betaal, fonds, factuur, broadcastSync, stateFor,
           liveCodename } = kern;
+  const { principalVoorSession } = require('../../kern/economie/principal');
 
   /* Het dossier van dit lid: een echt account heeft een eigen ledenstaat, een
      demo-sessie deelt de gedeelde demo. Deze twee regels stonden op DRIE
@@ -44,7 +45,7 @@ module.exports = (kern) => {
     // dubbel af. In demo-stand bevestigt de provider direct ('betaald'); met een
     // echte Stripe-sleutel komt de definitieve bevestiging via de webhook, en
     // markeren we hier nog niets als betaald.
-    const wie = own ? ('acc:' + req.session.account.id) : ('sess:' + req.session.tier);
+    const wie = principalVoorSession(req.session);
     let foundation = 0, provider = betaal.AANBIEDER, intents = [];
     for (const inv of targets) {
       let uitslag;

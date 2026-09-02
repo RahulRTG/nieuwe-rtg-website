@@ -20,8 +20,8 @@ Drie soorten onderdeel, en ze gedragen zich verschillend:
 | **LivingOS** | `/apps/rtg.html` | 59 |
 | **WorkOS** | `/apps/kantoor.html` | 13 |
 | **TravelOS** | `/apps/reizen.html` | 14 |
-| **FoundationOS** | `/apps/foundation/os-publiek.html` | 4 |
-| | **samen** | **90** |
+| **FoundationOS** | `/apps/foundation/os-publiek.html` | 7 |
+| | **samen** | **93** |
 
 ## LivingOS
 
@@ -132,14 +132,17 @@ Huis: `/apps/reizen.html` — 14 onderdelen.
 
 ## FoundationOS
 
-Huis: `/apps/foundation/os-publiek.html` — 4 onderdelen.
+Huis: `/apps/foundation/os-publiek.html` — 7 onderdelen.
 
 | onderdeel | soort | komt uit op |
 |---|---|---|
-| RTFoundation in uw buurt | `link:rtfbuurt` | `/apps/foundation/os-publiek.html` |
+| RTFoundation in jouw buurt | `link:rtfbuurt` | `/apps/foundation/os-publiek.html` |
 | RTFoundation portaal | `link:rtfportaal` | `/apps/foundation/os-portaal.html` |
 | Het bord | `link:rtfbord` | `/apps/foundation/bord.html` |
 | Het schrift | `link:rtfschrift` | `/apps/foundation/schrift.html` |
+| Klimaatfonds | `link:klimaat` | `/apps/foundation/klimaatfonds.html` |
+| Buurtruil | `link:buurtruil` | `/apps/foundation/buurtruil.html` |
+| Geven | `link:geven` | `/apps/foundation/geven.html` |
 
 ## Wat er buiten de werelden valt
 
@@ -153,6 +156,11 @@ beginscherm (`WERELDEN.md`, *RTG Core*). Maar het hoort wel zichtbaar te
 staan, want het verschil tussen "met opzet overal" en "per ongeluk
 nergens" is van buiten niet te zien.
 
-Er is geen onderdeel zonder plek: alles wat de registry kent, wordt door
-een map genoemd.
+**Deze onderdelen hebben geen plek en dat is een gat.** Ze bestaan in de
+registry, maar geen enkele map noemt ze — een lid vindt ze alleen als
+hij het pad al kent:
+
+- `link:rtfwinkel` (Winkel van de RTFoundation)
+
+Geef ze een map, of haal ze weg. Een derde uitkomst is er niet.
 

@@ -28,6 +28,13 @@
   header a{color:var(--soft);text-decoration:none;font-size:.85rem;}
   .sp{flex:1 1 auto;}
   main{max-width:56rem;margin:0 auto;padding:1.3rem 1rem;display:flex;flex-direction:column;gap:1.4rem;}
+  /* #hoofd is een eigen laag IN main en niet main zelf. De iOS-schil (shared/ios.js)
+     verplaatst de kop-<h1> als grote titel naar het begin van main; stond de
+     inhoud direct in main, dan wiste elke herlaad() met innerHTML die titel mee
+     en gaf $('#titel') daarna null -- de TypeError werd door elke knop gevangen
+     en het scherm ververste na een handeling niet meer (gevonden door
+     test/concern-scherm.e2e.js). */
+  #hoofd{display:flex;flex-direction:column;gap:1.4rem;}
   .vak{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1.1rem 1.15rem;}
   .vak > h2{font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));
     font-family:'Inter',sans-serif;font-weight:700;margin-bottom:.8rem;}
@@ -83,7 +90,7 @@
   <span class="sp"></span>
   <select id="kiezer" class="knop" hidden aria-label="Kies entiteit"></select>
 </header>
-<main id="hoofd"><div class="vak"><p class="stil">Laden&hellip;</p></div></main>
+<main><div id="hoofd"><div class="vak"><p class="stil">Laden&hellip;</p></div></div></main>
 <div class="melding" id="melding" role="status" aria-live="polite"></div>
 
 <script>
@@ -257,7 +264,9 @@ function vulKiezer(){
 
 async function herlaad(){
   const o=await api('overzicht');
-  if(o.leeg){ $('#hoofd').innerHTML=leeg(); knopen(); return; }
+  /* ook de lege stand krijgt zijn rechtsvormen meteen, en niet pas na een
+     aanraking van het land */
+  if(o.leeg){ $('#hoofd').innerHTML=leeg(); await vulRechtsvormen(); knopen(); return; }
   ENTS=(await api('entiteiten')).entiteiten||[];
   if(!HUIDIG||!ENTS.some(e=>e.id===HUIDIG)) HUIDIG=ENTS[0]&&ENTS[0].id;
   vulKiezer();

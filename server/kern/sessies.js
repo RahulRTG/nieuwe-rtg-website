@@ -15,7 +15,7 @@ const klok = require('../lib/klok');
 // alleen als vangnet knijpt; verlopen sessies gaan sowieso eerst weg.
 const MAX_SESSIONS = Math.max(400, Number(process.env.RTG_MAX_SESSIONS) || 50000);
 
-function maakSessies({ db, save, crypto }) {
+function maakSessies({ db, save, crypto, sessieIngetrokken }) {
   const sessions = new Map(); // hash -> { tier, key, at, ... }
   const bron = crypto.randomBytes(12).toString('hex');
   const KANAAL = 'rtg:sessies:v1';
@@ -54,6 +54,13 @@ function maakSessies({ db, save, crypto }) {
 
   function rememberSession(token, sess) {
     sess.at = klok.datum().toISOString();
+    /* ELKE SESSIE KRIJGT EEN IDENTITEIT (MIJN RTG blok 1). Voor een lid-token
+       komt de sid uit het token zelf; hier moet hij worden gezet, want deze
+       sessies bestaan alleen als record. Zonder sid kan een werksessie niet in
+       "waar ben ik aanwezig" staan en dus ook niet worden gesloten -- en juist
+       een werkplek op een gedeelde computer is er een die je wilt kunnen
+       afsluiten. */
+    if (!sess.sid) sess.sid = crypto.randomBytes(9).toString('base64url');
     const h = tokenHash(token);
     sessions.set(h, sess);
     sessieBak()[h] = sess;
@@ -92,6 +99,14 @@ function maakSessies({ db, save, crypto }) {
     if (!sess) return null;
     const age = klok.nu() - new Date(sess.at || 0).getTime();
     if (age > TOKEN_TTL_MS) { forgetSession(h); return null; }
+    /* EEN INTREKKING OP DE SID GELDT OOK HIER. Dit huis heeft twee soorten
+       sessies (staatloos lid-token en dit record), en zonder deze regel zou
+       "sluit deze sessie" alleen op de eerste soort werken -- terwijl het
+       scherm ze naast elkaar toont. Een knop die op de ene rij werkt en op de
+       andere niet, is erger dan geen knop. */
+    if (sess.sid && typeof sessieIngetrokken === 'function' && sessieIngetrokken(sess.sid)) {
+      forgetSession(h); return null;
+    }
     if (age > 60 * 60 * 1000) {
       sess.at = klok.datum().toISOString();
       sessieBak()[h] = sess;

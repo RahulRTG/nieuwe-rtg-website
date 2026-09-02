@@ -16,14 +16,14 @@ het?**
 
 | | |
 |---|---|
-| Functieschakelaars (aan/uit per functie) | **145** in 16 categorieën |
-| Apps in de leden-catalogus | **83** in 8 categorieën |
-| Bedrijfsgenres | **73** in 26 sectoren |
+| Functieschakelaars (aan/uit per functie) | **205** in 17 categorieën |
+| Apps in de leden-catalogus | **84** in 8 categorieën |
+| Bedrijfsgenres | **74** in 27 sectoren |
 | Genre-caps (waar de apps op sturen) | **40** |
-| API-endpoints | ~2.950 |
-| Kernmodules (`server/kern/**`) | ~905 |
-| App-pagina's (`public/apps/**.html`) | 212 |
-| Testbestanden | 722 |
+| API-routes (uit de router) | **4738** |
+| Kernmodules (`server/kern/**`) | **1935** |
+| App-pagina's (`public/apps/**.html`) | **287** |
+| Testbestanden | **1542** |
 
 ## De vier werelden
 
@@ -54,9 +54,9 @@ ook blokkeert.
 
 ---
 
-# 1. De 145 functieschakelaars
+# 1. De 205 functieschakelaars
 
-### Leden (RTG-app) — 19
+### Leden (RTG-app) — 21
 
 - **Leden-app (algemeen)** (`member`) — Alle ledenfuncties in de RTG-app. Zet je dit uit, dan valt de hele ledenkant stil (behalve wat hieronder apart aan staat).  
   _voor: rtg, lifestyle, business, gast_
@@ -64,12 +64,16 @@ ook blokkeert.
   _voor: rtg, lifestyle, business_
 - **Snaps & 24-uurs verhalen** (`member-snaps`) — Foto-snaps en verhalen die na 24 uur verdwijnen.  
   _voor: rtg, lifestyle, business_
-- **Vrienden verbinden** (`member-connect`) — Vriendschapsverzoeken en de vriendengraaf tussen leden.  
+- **Vrienden verbinden** (`member-connect`) — Vriendschapsverzoeken en de vriendengraaf tussen leden: zoeken op codenaam, of toevoegen met de eigen contactpin (ook als QR).  
   _voor: rtg, lifestyle, business_
 - **Vacatures & solliciteren (leden)** (`member-werk`) — Leden solliciteren met hun cv op vacatures bij partners.  
   _voor: rtg, lifestyle, business_
+- **De Rechterhand (Lifestyle-suite)** (`rechterhand`) — De veertien premium-apps van de Lifestyle Pass: Reisboek, Cellier, Table, Maison, Garde-robe, Mecenaat, Nalatenschap, Logboek, Cercle, Hangar, Entourage, Attenties en Rendez-vous. Uit = de hele suite is dicht; de rest van de ledenapp blijft draaien.  
+  _voor: lifestyle, business_
 - **RTG Zakelijk (professioneel netwerk)** (`zakelijk`) — De LinkedIn-laag van de Lifestyle en Business Pass: zakelijk profiel, gids, verbinden, feed, aanbevelingen en het kansenbord.  
   _voor: lifestyle, business_
+- **RTG Wereld (de ene sociale app)** (`wereld`) — De laag over De Salon, Pulse, RTG Zakelijk, de genootschappen en de verhalen heen: één tijdlijn met een schakelaar (Alles, Lifestyle, Business, Communities, Privé) en de sprong naar de berichten-app. Uit zetten laat de vijf onderliggende apps gewoon staan; alleen de verbindende laag verdwijnt -- net als bij de Media OS.  
+  _voor: rtg, lifestyle, business_
 - **Het Privékantoor (Lifestyle)** (`privekantoor`) — De ene app van de Lifestyle Pass: de levensgraaf over de premium-apps heen, de Control Tower met alle termijnen, het mandaat (wat mag het kantoor zelf) en zaken met een team en een tijdlijn. Uit zetten laat de onderliggende apps staan; alleen de samenhang verdwijnt.  
   _voor: lifestyle, business_
 - **De app-staat** (`kern-state`) — De ene aanroep waarmee de app zijn hele beeld ophaalt. Uit betekent een lege app voor iedereen.  
@@ -82,7 +86,7 @@ ook blokkeert.
   _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_
 - **Communicatieplatform** (`kern-comm`) — Het ene gespreksmodel: de inbox met al zijn laden, threads, reacties, zoeken over alles, en @Rahul die opstelt maar nooit verstuurt. Ook de gesprekken die modules aanmaken (een rit, een bestelling) lopen hierlangs.  
   _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_
-- **Taal en vertaling** (`kern-taal`) — Alle 114 talen staan standaard aan; de gedeelde laag vertaalt vaste én dynamisch getekende schermtekst en berichten, met een veilige lokale terugval zonder modelprovider.
+- **Taal en vertaling** (`kern-taal`) — De talenlijst en het vertalen van schermteksten en berichten.  
   _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_
 - **Locatie delen** (`kern-locatie`) — Het delen van de eigen positie onderweg, en het stoppen daarvan.  
   _voor: rtg, lifestyle, business_
@@ -97,73 +101,7 @@ ook blokkeert.
 - **Waarderen en reageren** (`kern-waardering`) — Likes, reacties, reviews en favorieten door het hele platform.  
   _voor: rtg, lifestyle, business, gast_
 
-### Diensten (leden) — 22
-
-- **Overheidsloket** (`dom-overheid`) — Belasting, toeslagen, rijbewijs, voertuigen, KVK, uitkeringen, bezwaar, subsidies en waterschap in een loket.  
-  _voor: rtg, lifestyle, business_
-- **Gemeenteloket** (`dom-gemeente`) — Meldingen, aanvragen en gemeentezaken.  
-  _voor: rtg, lifestyle, business_
-- **Thuis (verhuur en logeren)** (`dom-thuis`) — Advertenties, reviews en boekingen tussen leden onderling.  
-  _voor: rtg, lifestyle, business_
-- **Residentie** (`dom-residentie`) — Het woon- en verblijfsdeel van het platform.  
-  _voor: rtg, lifestyle, business_
-- **Luchtvaart en luchthaven** (`dom-lucht`) — Vluchten, boarding passes en de luchthavendiensten.  
-  _voor: rtg, lifestyle, business_
-- **Reisbureau** (`dom-reisbureau`) — Reisadvies en het samenstellen van een reis.  
-  _voor: rtg, lifestyle, business, gast_
-- **Zorg en welzijn** (`dom-care`) — De zorgkant: intakes, begeleiding en welzijnsdiensten.  
-  _voor: rtg, lifestyle, business_
-- **Agenda** (`dom-agenda`) — De agenda: afspraken, uitnodigingen en planning.  
-  _voor: rtg, lifestyle, business, foundation_
-- **RTG Meet (vergaderkamers)** (`dom-meet`) — Vergaderkamers op codenaam; beeld en geluid lopen peer-to-peer.  
-  _voor: rtg, lifestyle, business_
-- **Navigatie** (`dom-nav`) — Routes en navigatie onderweg.  
-  _voor: rtg, lifestyle, business_
-- **Reizen boeken** (`bk-reizen`) — Het boeken zelf: aanbod, slots, betalen en de eigen boekingen, inclusief het partnerkanaal voor niet-leden.  
-  _voor: rtg, lifestyle, business, gast_
-- **Verblijf en reserveringen** (`bk-verblijf`) — Verblijf, de deur van een kamer, reserveren en het annuleren daarvan.  
-  _voor: rtg, lifestyle, business_
-- **Reiswijzer en landeninfo** (`bk-reiswijzer`) — De wijzer met landen, regels en wat je moet weten voor je gaat.  
-  _voor: rtg, lifestyle, business, gast_
-- **Ritten en transfers** (`bk-ritten`) — Een rit aanvragen en betalen, en de transfer die bij een ticket hoort.  
-  _voor: rtg, lifestyle, business_
-- **Tickets en evenementen** (`bk-tickets`) — Kaarten kopen, uitgaan, aanmelden voor een evenement en de wachtlijst.  
-  _voor: rtg, lifestyle, business_
-- **Bezorgen en vracht** (`bk-bezorgen`) — Bezorging van mode en goederen, pakketten en het volgen van vracht.  
-  _voor: rtg, lifestyle, business_
-- **Foodcourt** (`bk-eten`) — Het foodcourt met de vrije tijdsloten van de zaken.  
-  _voor: rtg, lifestyle, business, gast_
-- **Stad en zaakdoos** (`ov-stad`) — De stadslaag met bewoners, en de hartslag en metingen van een zaakdoos ter plaatse.  
-  _voor: rtg, lifestyle, business_
-- **Partneroverzicht** (`ov-suppliers`) — De lijst met aangesloten partners die een lid kan zien.  
-  _voor: rtg, lifestyle, business, gast_
-- **Zorgprofiel** (`ov-zorgprofiel`) — Het zorgprofiel van een lid: allergieen en wat een zaak moet weten.  
-  _voor: rtg, lifestyle, business_
-- **Aandacht en voorspellen** (`ov-aandacht`) — De aandachtslaag en de vooruitblik op wat een lid waarschijnlijk nodig heeft.  
-  _voor: rtg, lifestyle, business_
-- **Sparren en parkeren** (`ov-spar`) — De sparlijst: iets parkeren om er later op terug te komen.  
-  _voor: rtg, lifestyle, business_
-
-### Toegang en identiteit — 8
-
-- **Inloggen en registreren** (`tg-inlog`) — De voordeur: inloggen, uitloggen, registreren en wachtwoord vergeten. Uit betekent dat niemand meer binnenkomt; de eigenaar houdt het techniekbord.  
-  _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_
-- **Account en profiel** (`tg-account`) — Het eigen account: rollen, koppelingen en het cv van een lid.  
-  _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_
-- **Inloggen via een andere partij (SSO)** (`tg-sso`) — De terugkeer van een identiteitsprovider, met de ondertekende state als poort.  
-  _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_
-- **Pincode en sleutelwoorden** (`tg-pin`) — De algemene pin voor prive-apps en de sleutelwoord-inlog met zijn uitdaging.  
-  _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_
-- **Zegel, codes en rechtenbeheer** (`tg-zegel`) — Het RTG-zegel, dynamische codes, scanbare codes en de rechtenlaag op media.  
-  _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_
-- **De gegevenspoort** (`tg-gegevens`) — Het gesprek waarin een lid zelf zijn ontbrekende gegevens aanvult, inclusief het opzoeken van een adres bij postcode en huisnummer.  
-  _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_
-- **Aanmelden voor een pas** (`tg-aanmeld`) — Het aanmeldgesprek en de aanmeldingen die daaruit volgen; het besluit blijft mensenwerk.  
-  _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_
-- **Wervingslink van een werkgever** (`tg-werving`) — De link /werken/<code> waarmee een werkgever iemand uitnodigt die nog geen account heeft; aanmelden en in dienst treden worden dan een handeling.  
-  _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_
-
-### Genres & diensten — 9
+### Genres & diensten — 10
 
 - **Bestellen & bezorgen** (`bestellen`) — Bestellen bij een zaak (ophalen of laten bezorgen) met live volgen.  
   _voor: rtg, lifestyle, business, gast_
@@ -183,23 +121,8 @@ ook blokkeert.
   _voor: rtg, lifestyle, business_
 - **Groothandel & markt** (`groothandel`) — De brede B2B/B2C-marktplaats: horeca koopt in, leden bestellen boodschappen, met AI-bijbestellen. Elke groothandel zet zijn eigen functies aan/uit.  
   _voor: rtg, lifestyle, business, leverancier_
-
-### Cultuur en gezelschap — 7
-
-- **Het Genootschap** (`dom-genootschap`) — Het besloten genootschap: kringen, bijeenkomsten en beheer.  
+- **RTG Commerce (mand & retour)** (`commerce`) — De verkooplaag boven de domeinen: wat er te koop staat en wat NIET met de reden erbij, een mand over verkopers heen met een afrekening per verkoper, de overdracht naar de deur die bevestigt, en de weg terug. RTG bevestigt hier zelf niets.  
   _voor: rtg, lifestyle, business_
-- **Sport** (`dom-sport`) — Sportprogramma's, teams en wedstrijden.  
-  _voor: rtg, lifestyle, business, foundation_
-- **Muziek** (`dom-muziek`) — Van lied tot zaal: maken, uitgeven en beluisteren.  
-  _voor: rtg, lifestyle, business, foundation_
-- **Galerij** (`dom-galerij`) — De beeldgalerij van leden en partners.  
-  _voor: rtg, lifestyle, business_
-- **Boeken** (`dom-boeken`) — De bibliotheek en het lezen.  
-  _voor: rtg, lifestyle, business, foundation_
-- **Fluister** (`dom-fluister`) — De fluisterlijn binnen de sociale laag.  
-  _voor: rtg, lifestyle, business_
-- **De krant** (`ov-krant`) — De openbare krant: de gids, een uitgave openen en een artikel lezen.  
-  _voor: rtg, lifestyle, business, gast_
 
 ### Sociaal (De Salon) — 4
 
@@ -212,7 +135,7 @@ ook blokkeert.
 - **RTF contacten & familiekoppeling** (`rtf-contacten`) — De contactenlaag van de RTFoundation: gezinnen koppelen, kanalen en meldingen tussen leden.  
   _voor: rtg, lifestyle, business, foundation_
 
-### Eigen apps — 13
+### Eigen apps — 35
 
 - **Spelen (spellen met vrienden)** (`spellen`) — Alle spellen: schaken, dammen, rummi, Magnaat, sudoku en de partyspellen.  
   _voor: rtg, lifestyle, business, foundation_
@@ -228,7 +151,15 @@ ook blokkeert.
   _voor: rtg, lifestyle, business, leverancier, personeel_
 - **Wie betaalt wat** (`wbw`) — Groepsuitgaven met een live balans en verrekenen via RTG Pay.  
   _voor: rtg, lifestyle, business_
+- **RTG Geld (financieel besturingssysteem)** (`geldwereld`) — Het command center over alle gelddomeinen: hoe u ervoor staat, wat eraan komt, uw eigen beleidsregels met reserveringspotten, het actielog en de gegronde Rahul. Uit = het overzicht en de regels verdwijnen; betalen en verrekenen blijven werken via hun eigen schakelaars.  
+  _voor: rtg, lifestyle, business_
+- **RTFoundation (levenslijn, mentor en levenspas)** (`levenos`) — De levenslijn met wat er speelt en wat eraan komt, de mentor die opent en nooit stuurt, en de levenspas: wie mag wat van u zien. De eerste twee lezen alleen; uitzetten verwijdert daar geen enkel gegeven. De levenspas beheert wel iets, namelijk uw TOESTEMMING -- uitzetten bevriest die dus: bestaande banden blijven staan zoals ze zijn, maar niemand kan er meer een leggen, verbreken of intrekken.  
+  _voor: rtg, lifestyle, business, foundation_
+- **RTG Sociaal (de kring op een plek)** (`socialewereld`) — De samenhanglaag over De Salon, berichten, pulse en de ontmoetingen: wat er tussen u en uw kring speelt. De onderliggende apps hebben hun eigen schakelaars.  
+  _voor: rtg, lifestyle, business_
 - **RTG Office (kantoorpakket)** (`kantoorpakket`) — Het eigen kantoorpakket: tekstdocumenten en rekenbladen op uw account, alleen-lezen te delen op codenaam.  
+  _voor: rtg, lifestyle, business_
+- **RTG Ondernemers-OS** (`ondernemersos`) — Van "ik denk erover na" tot een draaiend bedrijf in een scherm: de verkenning en de stress test, de rechtsvorm en het oprichtingsproject, het dagbeeld met debiteuren, btw, kas en capaciteit, de verkooppijplijn en het bestuur met de UBO-afleiding.  
   _voor: rtg, lifestyle, business_
 - **RTG Vonk (dating)** (`vonk`) — Dating op codenaam met de Salon-veiligheidslat: 18+, geverifieerd paspoort, een eindige dagselectie, en bij een match automatisch een tafel rond het midden van beide woonplaatsen (EUR 10 p.p., waarvan EUR 5 voor RTG).  
   _voor: rtg, lifestyle, business_
@@ -240,27 +171,44 @@ ook blokkeert.
   _voor: leverancier, personeel_
 - **Ghost Driver (simulatie)** (`ghost`) — De voorspellende verkeers- en logistieksimulatie. Standaard alleen voor vervoerders; de verkeersleiding (kantoor) ziet altijd alles.  
   _voor: leverancier, intern_
-
-### Winkel en media — 8
-
-- **De Mall** (`dom-mall`) — De etages en de gids met alle partners.  
+- **RTG Hospitality Guest OS (de gastkant)** (`gastos`) — Bestellen vanaf je eigen telefoon: aan tafel via de QR, op je hotelkamer op de gastrekening, in de club op je polsband, en van huis uit laten bezorgen, afhalen of een foodcourt-mandje bij meer loketten. Dezelfde rekening die de bediening ziet; dit zet de gastdeur open of dicht, niet het horecasysteem van de zaak.  
   _voor: rtg, lifestyle, business, gast_
-- **Bestanden (kluis)** (`dom-bestanden`) — De persoonlijke bestandenkluis.  
-  _voor: rtg, lifestyle, business, foundation_
-- **Notities** (`dom-notities`) — De notitie-app: losse aantekeningen en lijstjes van een lid.  
-  _voor: rtg, lifestyle, business, foundation_
-- **Leden-website** (`dom-site`) — De eigen website die een lid of zaak kan bouwen.  
+- **RTG Evening OS (een avond plannen)** (`avondos`) — Een hele avond als plan: eten, iets drinken en de rit naar huis, binnen je budget en op tijd thuis. Elke stap wijst naar een echte boeking in zijn eigen domein en draagt zijn eigen staat; een tafel wordt aangevraagd en nooit door de planner bevestigd. Hier zit ook de Hospitality DNA: wat een zaak van je te zien krijgt, per soort en per zaak.  
   _voor: rtg, lifestyle, business_
-- **Media-assets** (`dom-asset`) — Het uitleveren van geuploade media.  
-  _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_
-- **Home Kit (slim huis)** (`dom-home`) — De aansturing van apparaten in huis.  
+- **RTG Invisible Arrival** (`arrival`) — Een beveiligde aankomstpas voor reservering, capaciteitscontrole en minimale live aankomststatus.  
+  _voor: rtg, lifestyle, business, gast_
+- **RTG Het Vooruitzicht (scenario- en eventlaag)** (`instantreality`) — De persoonlijke scenario- en eventlaag waarmee een lid een toekomstige ervaring veilig kan verkennen: intenties, drie werelden, providerbewijs en herstel bij een verstoring.  
   _voor: rtg, lifestyle, business_
-- **Media uitleveren** (`ov-media`) — Het uitleveren van geuploade afbeeldingen en bestanden aan de app.  
-  _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_
-- **Browser** (`ov-browser`) — De ingebouwde browser met zijn gids.  
+- **RTG One** (`rtgone`) — De bestuurlijke regielaag voor intenties, beloften, overdracht, goedkeuringen, projecten en herstelbare automatisering.  
+  _voor: intern_
+- **RTG Experience Platform** (`experience-platform`) — De vier werelden, hun contextprojecties, resume state, attention en gebrokerde acties. Domeinen blijven eigenaar van hun brondata.  
+  _voor: rtg, lifestyle, business_
+- **RTG Life (het ene scherm)** (`life`) — Het overzichtsscherm en de dagcoach: ze lezen de lagen hieronder en leggen ze naast elkaar. Ze meten zelf niets en bezitten niets, dus uitzetten haalt geen gegevens weg.  
+  _voor: rtg, lifestyle, business_
+- **Doelen** (`doelen`) — Waar u begon, waar u heen wilt en waarom; de mijlpalen worden afgeleid en niet bewaard.  
+  _voor: rtg, lifestyle, business_
+- **Dagmetingen en toestellen** (`dagmetingen`) — Slaap, beweging, water en gewicht, zelf ingevuld of door een gekoppeld toestel weggeschreven. Zet u dit uit, dan kunt u ook geen nieuw toestel meer koppelen.  
+  _voor: rtg, lifestyle, business_
+- **Dagcheck-in (hoe zit u erbij)** (`gemoed`) — Een tik per dag, met de keuze om er iets bij te schrijven. Wat u schrijft gaat door de grens uit kern/zorgniveau.js.  
+  _voor: rtg, lifestyle, business_
+- **Gewoonten** (`gewoonten`) — Kleine dingen die u vaker wilt doen; de dagenteller staat uit tot u hem zelf aanzet.  
+  _voor: rtg, lifestyle, business_
+- **Gedachtenboek** (`gedachten`) — Opschrijven voor uzelf. Er leest geen model mee en er wordt niets samengevat.  
+  _voor: rtg, lifestyle, business_
+- **Medicijnen (eigen schema)** (`medicijnen`) — Uw eigen medicatieschema en voorraad. RTG bepaalt nooit een dosering en controleert geen combinaties.  
+  _voor: rtg, lifestyle, business_
+- **Training (eigen schema)** (`training`) — Uw eigen trainingsschema en wat u ervan deed. RTG schrijft geen training voor en rekent geen belasting uit.  
+  _voor: rtg, lifestyle, business_
+- **Tijdlijn (terugkijken)** (`tijdlijn`) — Wat er in de tijd met u gebeurd is, gelezen uit de lagen die u al had. Legt zelf niets vast, dus uitzetten haalt geen gegevens weg.  
+  _voor: rtg, lifestyle, business_
+- **Voeding (weekplan)** (`voeding`) — Een weekplan voor wat u wilt eten. Er wordt niets geteld en er komt geen oordeel over wat u eet.  
+  _voor: rtg, lifestyle, business_
+- **Noodkaart** (`noodkaart`) — Een noodcontact en, als u dat wilt, uw allergenen en middelen. U toont hem zelf; niemand kan hem opvragen.  
+  _voor: rtg, lifestyle, business_
+- **Verzorging (kapper, barbier, nagels)** (`verzorging`) — De salonagenda vanaf de kant van het lid, op codenaam. Zorg en verzorging staan naast elkaar maar niet door elkaar: hier reist geen zorgprofiel mee.  
   _voor: rtg, lifestyle, business_
 
-### Partners (leveranciers) — 8
+### Partners (leveranciers) — 10
 
 - **Partner-app (algemeen)** (`supplier`) — Alle leveranciersfuncties. Uit = partners kunnen niets meer doen (behalve wat hieronder apart aan staat).  
   _voor: leverancier_
@@ -278,37 +226,26 @@ ook blokkeert.
   _voor: leverancier_
 - **Sollicitaties bij partners** (`supplier-apply`) — Vacatures uitzetten en sollicitaties ontvangen bij de partner.  
   _voor: leverancier_
+- **Regie: zien & op de lijst zetten** (`zaakregie`) — De stand van de eigen zaak, de zoekbalk erover, het objectdossier en de uitzonderingenrij -- ook op de PDA van de vloer.  
+  _voor: leverancier_
+- **Regie: rechtzetten & regels** (`zaakregie-beheer`) — Administratieve drift rechtzetten, een ronde terugdraaien, de eigen grenzen zetten en het spoor van de zaak lezen.  
+  _voor: leverancier_
 
-### Werk (zaken en personeel) — 10
-
-- **De werkvloer** (`dom-werkvloer`) — Tafels, keukenbord en bedieningskaart op de vloer van een zaak.  
-  _voor: leverancier, personeel_
-- **De werkplek** (`dom-werkplek`) — Het persoonlijke werkstation van een medewerker.  
-  _voor: leverancier, personeel_
-- **Metier (vakwerk)** (`dom-metier`) — Het vakwerk van zelfstandigen en ambachtslieden.  
-  _voor: leverancier, personeel_
-- **Vakritmes** (`dom-vak`) — Werkritmes en tijdregistratie per vak.  
-  _voor: leverancier, personeel_
-- **Verkoop** (`dom-verkoop`) — De verkoopkant van een zaak, inclusief proefritten.  
-  _voor: leverancier, personeel_
-- **De zaakdoos** (`dom-doos`) — De doos op locatie: zaakserver, netwerk en updates.  
-  _voor: leverancier, personeel_
-- **Facturen** (`dom-facturen`) — De facturatie van en naar een zaak.  
-  _voor: leverancier, personeel_
-- **Kantoorgesprek** (`ov-kantoorgesprek`) — Het gesprek waarmee een zaak zijn kantoor inricht.  
-  _voor: leverancier, personeel_
-- **Werkmail bezorgen** (`ov-werkmail`) — De bezorging van interne werkmail.  
-  _voor: leverancier, personeel_
-- **RTG Mail: post van buiten aannemen** (`ov-mail-binnen`) — De buitenpoort die echte e-mail van een vreemde mailserver aanneemt, uitpakt en in het juiste postvak aflevert. Uit betekent: post van buiten komt niet meer binnen.  
-  _voor: leverancier, personeel_
-
-### RTG-Backoffice — 3
+### RTG-Backoffice — 7
 
 - **Backoffice (algemeen)** (`office`) — Het RTG-actiecentrum: orders, ritten, prestaties, verificaties en partneraanvragen.  
   _voor: intern_
 - **Schoolgoedkeuring (RTF School)** (`office-school`) — Scholen goedkeuren of afwijzen voordat ze personeel en klassen kunnen aanmaken.  
   _voor: intern_
 - **Werk OS (werkruimtes)** (`bedrijf`) — De werkplek van een organisatie: leden, rollen, startscherm, projecten, kennis, klanten, service, bouw, contracten, IT en besluiten. Uit = geen enkele werkruimte werkt meer.  
+  _voor: intern, business, leverancier, personeel_
+- **RTG Command: zien** (`command-zien`) — De puls van alle domeinen, de zoekbalk over alles en het objectdossier met zijn tijdlijn.  
+  _voor: intern_
+- **RTG Command: doen** (`command-doen`) — De operator, de runbooks en de uitzonderingenrij: herstellen en afhandelen.  
+  _voor: intern_
+- **RTG Command: besturen** (`command-besturen`) — Beleidsregels zetten, simuleren, agents begrenzen en zware rechten tijdelijk uitdelen.  
+  _voor: intern_
+- **Tenant Control Plane (white-label)** (`tenant`) — Welke organisatie een werkruimte draait, welk merk zij daar voert, en hoe een groep van haar identiteitsprovider een rol wordt. Uit = de werkruimtes werken door onder de RTG-huisstijl, en een inlog via een provider levert geen rollen meer op.  
   _voor: intern, business_
 
 ### RTFoundation — 14
@@ -342,6 +279,142 @@ ook blokkeert.
 - **Bijles** (`ov-bijles`) — Het bijlesgesprek met de begeleider.  
   _voor: foundation_
 
+### Betalen & verificatie — 5
+
+- **Betaalverkeer** (`betalen`) — Betalingen (demo of Stripe) en de RTG Pay-wallet. Uit = er kan tijdelijk niet betaald worden.  
+  _voor: rtg, lifestyle, business, gast_
+- **Passkeys (WebAuthn)** (`webauthn`) — Inloggen met vingerafdruk, gezicht of beveiligingssleutel. Wachtwoord-inloggen blijft altijd werken.  
+  _voor: rtg, lifestyle, business_
+- **Identiteitsverificatie (KYC)** (`verificatie`) — Leden uploaden hun identiteitsbewijs en RTG beoordeelt het.  
+  _voor: rtg, lifestyle, business, gast_
+- **Paspoort delen (gecontroleerd)** (`paspoort`) — Het toestemmingsgestuurde kanaal waarlangs een partner een identiteit opvraagt (ja/nee, ID-kaart of scan), met melding en weigering voor het lid.  
+  _voor: rtg, lifestyle, business, leverancier_
+- **Vakbewijs indienen** (`vakbewijs`) — Leden leggen de stukken vast die hun werk vraagt (VOG, BIG-registratie, legitimatiebewijs); RTG tekent af dat het stuk is gezien en beoordeelt de inhoud niet.  
+  _voor: rtg, lifestyle, business_
+
+### Personeel & integraties — 3
+
+- **Personeels-app (PDA)** (`staff`) — De personeels-app: rooster, klokken, verlof/ziek, taken, team en de vertrouwenspersoon.  
+  _voor: personeel_
+- **Wervingslink (in dienst via een link)** (`werving`) — De uitnodigingslink van een werkgever: kijken wie je uitnodigt (openbaar, alleen bedrijfsnaam en functie) en jezelf eraan verbinden met je eigen RTG-account.  
+  _voor: intern, business, leverancier, personeel_
+- **Rahul doet het (AI-stuur)** (`stuur`) — De AI voert acties uit op elk toegestaan API-pad, met de eigen inlog van wie het vraagt (nooit meer rechten dan de persoon zelf). Geld-acties vragen altijd eerst een bevestiging.  
+  _voor: rtg, lifestyle, business, gast, leverancier, personeel_
+
+### Diensten (leden) — 23
+
+- **Overheidsloket** (`dom-overheid`) — Belasting, toeslagen, rijbewijs, voertuigen, KVK, uitkeringen, bezwaar, subsidies en waterschap in een loket.  
+  _voor: rtg, lifestyle, business_
+- **Gemeenteloket** (`dom-gemeente`) — Meldingen, aanvragen en gemeentezaken.  
+  _voor: rtg, lifestyle, business_
+- **Thuis (verhuur en logeren)** (`dom-thuis`) — Advertenties, reviews en boekingen tussen leden onderling.  
+  _voor: rtg, lifestyle, business_
+- **Residentie** (`dom-residentie`) — Het woon- en verblijfsdeel van het platform.  
+  _voor: rtg, lifestyle, business_
+- **Luchtvaart en luchthaven** (`dom-lucht`) — Vluchten, boarding passes en de luchthavendiensten.  
+  _voor: rtg, lifestyle, business_
+- **Reisbureau** (`dom-reisbureau`) — Reisadvies en het samenstellen van een reis.  
+  _voor: rtg, lifestyle, business, gast_
+- **Zorg en welzijn** (`dom-care`) — De zorgkant: intakes, begeleiding en welzijnsdiensten.  
+  _voor: rtg, lifestyle, business_
+- **Agenda** (`dom-agenda`) — De agenda: afspraken, uitnodigingen en planning.  
+  _voor: rtg, lifestyle, business, foundation_
+- **RTG Meet (vergaderkamers)** (`dom-meet`) — Vergaderkamers op codenaam; beeld en geluid lopen peer-to-peer.  
+  _voor: rtg, lifestyle, business_
+- **Navigatie** (`dom-nav`) — Routes en navigatie onderweg.  
+  _voor: rtg, lifestyle, business_
+- **Plaats (aanwezigheid en nadering)** (`dom-plaats`) — Hekken, toestemmingsvensters en waarnemingen; de motor draait op het toestel.  
+  _voor: rtg, lifestyle, business_
+- **Reizen boeken** (`bk-reizen`) — Het boeken zelf: aanbod, slots, betalen en de eigen boekingen, inclusief het partnerkanaal voor niet-leden.  
+  _voor: rtg, lifestyle, business, gast_
+- **Verblijf en reserveringen** (`bk-verblijf`) — Verblijf, de deur van een kamer, reserveren en het annuleren daarvan.  
+  _voor: rtg, lifestyle, business_
+- **Reiswijzer en landeninfo** (`bk-reiswijzer`) — De wijzer met landen, regels en wat je moet weten voor je gaat.  
+  _voor: rtg, lifestyle, business, gast_
+- **Ritten en transfers** (`bk-ritten`) — Een rit aanvragen en betalen, en de transfer die bij een ticket hoort.  
+  _voor: rtg, lifestyle, business_
+- **Tickets en evenementen** (`bk-tickets`) — Kaarten kopen, uitgaan, aanmelden voor een evenement en de wachtlijst.  
+  _voor: rtg, lifestyle, business_
+- **Bezorgen en vracht** (`bk-bezorgen`) — Bezorging van mode en goederen, pakketten en het volgen van vracht.  
+  _voor: rtg, lifestyle, business_
+- **Foodcourt** (`bk-eten`) — Het foodcourt met de vrije tijdsloten van de zaken.  
+  _voor: rtg, lifestyle, business, gast_
+- **Stad en zaakdoos** (`ov-stad`) — De stadslaag met bewoners, en de hartslag en metingen van een zaakdoos ter plaatse.  
+  _voor: rtg, lifestyle, business_
+- **Partneroverzicht** (`ov-suppliers`) — De lijst met aangesloten partners die een lid kan zien.  
+  _voor: rtg, lifestyle, business, gast_
+- **Zorgprofiel** (`ov-zorgprofiel`) — Het zorgprofiel van een lid: allergieen en wat een zaak moet weten.  
+  _voor: rtg, lifestyle, business_
+- **Aandacht en voorspellen** (`ov-aandacht`) — De aandachtslaag en de vooruitblik op wat een lid waarschijnlijk nodig heeft.  
+  _voor: rtg, lifestyle, business_
+- **Sparren en parkeren** (`ov-spar`) — De sparlijst: iets parkeren om er later op terug te komen.  
+  _voor: rtg, lifestyle, business_
+
+### Cultuur en gezelschap — 7
+
+- **Het Genootschap** (`dom-genootschap`) — Het besloten genootschap: kringen, bijeenkomsten en beheer.  
+  _voor: rtg, lifestyle, business_
+- **Sport** (`dom-sport`) — Sportprogramma's, teams en wedstrijden.  
+  _voor: rtg, lifestyle, business, foundation_
+- **Muziek** (`dom-muziek`) — Van lied tot zaal: maken, uitgeven en beluisteren.  
+  _voor: rtg, lifestyle, business, foundation_
+- **Galerij** (`dom-galerij`) — De beeldgalerij van leden en partners.  
+  _voor: rtg, lifestyle, business_
+- **Boeken** (`dom-boeken`) — De bibliotheek en het lezen.  
+  _voor: rtg, lifestyle, business, foundation_
+- **Fluister** (`dom-fluister`) — De fluisterlijn binnen de sociale laag.  
+  _voor: rtg, lifestyle, business_
+- **De krant** (`ov-krant`) — De openbare krant: de gids, een uitgave openen en een artikel lezen.  
+  _voor: rtg, lifestyle, business, gast_
+
+### Werk (zaken en personeel) — 10
+
+- **De werkvloer** (`dom-werkvloer`) — Tafels, keukenbord en bedieningskaart op de vloer van een zaak.  
+  _voor: intern, business, leverancier, personeel_
+- **De werkplek** (`dom-werkplek`) — Het persoonlijke werkstation van een medewerker.  
+  _voor: intern, business, leverancier, personeel_
+- **Metier (vakwerk)** (`dom-metier`) — Het vakwerk van zelfstandigen en ambachtslieden.  
+  _voor: intern, business, leverancier, personeel_
+- **Vakritmes** (`dom-vak`) — Werkritmes en tijdregistratie per vak.  
+  _voor: intern, business, leverancier, personeel_
+- **Verkoop** (`dom-verkoop`) — De verkoopkant van een zaak, inclusief proefritten.  
+  _voor: intern, business, leverancier, personeel_
+- **De zaakdoos** (`dom-doos`) — De doos op locatie: zaakserver, netwerk en updates.  
+  _voor: intern, business, leverancier, personeel_
+- **Facturen** (`dom-facturen`) — De facturatie van en naar een zaak.  
+  _voor: intern, business, leverancier, personeel_
+- **Kantoorgesprek** (`ov-kantoorgesprek`) — Het gesprek waarmee een zaak zijn kantoor inricht.  
+  _voor: intern, business, leverancier, personeel_
+- **Werkmail bezorgen** (`ov-werkmail`) — De bezorging van interne werkmail.  
+  _voor: leverancier, personeel_
+- **RTG Mail: post van buiten aannemen** (`ov-mail-binnen`) — De buitenpoort die echte e-mail van een vreemde mailserver aanneemt, uitpakt en in het juiste postvak aflevert. Uit betekent: post van buiten komt niet meer binnen.  
+  _voor: intern, business, leverancier, personeel_
+
+### Winkel en media — 11
+
+- **De Mall** (`dom-mall`) — De etages en de gids met alle partners.  
+  _voor: rtg, lifestyle, business, gast_
+- **App Store (apps van derden)** (`dom-appstore`) — De winkelkant van het derdenkanaal: bladeren, installeren, machtigen, kopen en openen in de cel. Zet dit uit en er draait geen enkele app van een derde meer; wat al is toegelaten blijft staan.  
+  _voor: rtg, lifestyle, business, gast_
+- **App Store: inzenden door uitgevers** (`dom-appstore-uitgever`) — De uitgeverskant: een organisatie vraagt een uitgeversplek aan en zendt een app in. Zet dit uit en er komt niets nieuws binnen, terwijl de winkel gewoon doorloopt.  
+  _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_
+- **Bestanden (kluis)** (`dom-bestanden`) — De persoonlijke bestandenkluis.  
+  _voor: rtg, lifestyle, business, foundation_
+- **Notities** (`dom-notities`) — De notitie-app: losse aantekeningen en lijstjes van een lid.  
+  _voor: rtg, lifestyle, business, foundation_
+- **Leden-website** (`dom-site`) — De eigen website die een lid of zaak kan bouwen.  
+  _voor: rtg, lifestyle, business_
+- **Eigen domein (buiten het RTG-web)** (`dom-eigendomein`) — Een eigen adres zoals hotelazur.nl naast hotelazur.rtg. Zet dit aan en een site kan buiten het RTG-web leesbaar worden -- ook voor wie geen lid is.  
+  _voor: rtg, lifestyle, business_
+- **Media-assets** (`dom-asset`) — Het uitleveren van geuploade media.  
+  _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_
+- **Home Kit (slim huis)** (`dom-home`) — De aansturing van apparaten in huis.  
+  _voor: rtg, lifestyle, business_
+- **Media uitleveren** (`ov-media`) — Het uitleveren van geuploade afbeeldingen en bestanden aan de app.  
+  _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_
+- **Browser** (`ov-browser`) — De ingebouwde browser met zijn gids.  
+  _voor: rtg, lifestyle, business_
+
 ### Identiteit en veiligheid — 5
 
 - **Storingsmelding uit de browser** (`dom-foutmelder`) — Meldt een onafgevangen fout aan het logboek: melding, bestand, regel en pagina. Geen naam, geen codenaam, geen ingetypte tekst.  
@@ -355,23 +428,48 @@ ook blokkeert.
 - **Onboarding** (`dom-onboarding`) — De eerste stappen na aanmelden: profiel compleet maken.  
   _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_
 
-### Betalen & verificatie — 4
-
-- **Betaalverkeer** (`betalen`) — Betalingen (demo of Stripe) en de RTG Pay-wallet. Uit = er kan tijdelijk niet betaald worden.  
-  _voor: rtg, lifestyle, business, gast_
-- **Passkeys (WebAuthn)** (`webauthn`) — Inloggen met vingerafdruk, gezicht of beveiligingssleutel. Wachtwoord-inloggen blijft altijd werken.  
-  _voor: rtg, lifestyle, business_
-- **Identiteitsverificatie (KYC)** (`verificatie`) — Leden uploaden hun identiteitsbewijs en RTG beoordeelt het.  
-  _voor: rtg, lifestyle, business, gast_
-- **Paspoort delen (gecontroleerd)** (`paspoort`) — Het toestemmingsgestuurde kanaal waarlangs een partner een identiteit opvraagt (ja/nee, ID-kaart of scan), met melding en weigering voor het lid.  
-  _voor: rtg, lifestyle, business, leverancier_
-
-### Geld — 8
+### Geld — 29
 
 - **RTG Rekening** (`dom-rekening`) — Saldo, afschriften en betalingen op de eigen rekeninglaag.  
   _voor: rtg, lifestyle, business_
+- **Uitgaven-inzichten** (`dom-bank-inzicht`) — Uitgaven per maand en per soort, en het gezamenlijke afschrift.  
+  _voor: rtg, lifestyle, business_
+- **Vaste-lasten-radar** (`dom-bank-vastelasten`) — Terugkerende afschrijvingen die vanzelf worden herkend.  
+  _voor: rtg, lifestyle, business_
+- **Spaardoelen** (`dom-bank-spaardoel`) — Een streefbedrag op een spaarrekening, en het wisselgeld erheen vegen.  
+  _voor: rtg, lifestyle, business_
+- **Rekeningen aanhouden** (`dom-bank-rekening-open`) — Een eigen betaal-, spaar- of zakelijke rekening met een IBAN.  
+  _voor: rtg, lifestyle, business_
+- **Storten op de rekening** (`dom-bank-storten`) — Geld op de eigen rekening zetten, via de kaart-naad of eigen emissie.  
+  _voor: rtg, lifestyle, business_
+- **SEPA versturen** (`dom-bank-sepa`) — Een overboeking naar een rekening buiten RTG.  
+  _voor: rtg, lifestyle, business_
+- **Terugkerende betalingen** (`dom-bank-incasso`) — Een vaste overboeking per week of maand.  
+  _voor: rtg, lifestyle, business_
+- **Passen en creditcards** (`dom-bank-passen`) — Een betaalpas of creditcard op een rekening, met limiet.  
+  _voor: rtg, lifestyle, business_
+- **Krediet en leningen** (`dom-bank-krediet`) — Een lening aanvragen en aflossen; rood staan valt hier ook onder.  
+  _voor: rtg, lifestyle, business_
+- **Zakelijk bankieren** (`dom-bank-zakelijk`) — Bulkbetalingen en de salarisrun vanaf een zakelijke rekening.  
+  _voor: business_
+- **De AI-bankier** (`dom-bank-advies`) — Rahul kijkt mee met de rekeningen en geeft advies; hij besluit niets.  
+  _voor: rtg, lifestyle, business_
 - **Wallet** (`dom-wallet`) — De wallet van een lid binnen RTG Pay.  
   _voor: rtg, lifestyle, business, gast_
+- **Walletsaldo en betalen binnen RTG** (`dom-pay-wallet`) — Saldo aanhouden, opladen, tikken en betaalverzoeken binnen het gesloten RTG-circuit.  
+  _voor: rtg, lifestyle, business, gast_
+- **Tegoed voor een ander** (`dom-pay-tegoed`) — Tegoed kopen voor iemand anders, verzilveren met een code, en verlopen tegoed terugnemen.  
+  _voor: rtg, lifestyle, business_
+- **Tegoed vanuit een zaak** (`dom-pay-tegoed-zaak`) — Een zaak zet tegoed klaar voor personeel of klanten, en neemt verlopen tegoed terug.  
+  _voor: leverancier_
+- **Saldo terugstorten naar het lid** (`dom-pay-terug`) — Het eigen walletsaldo terugstorten naar de eigen bankrekening.  
+  _voor: rtg, lifestyle, business_
+- **Vooraf vastzetten aan de kassa** (`dom-pay-vooraf`) — Een zaak zet een maximum vast op de code van een lid (borg, open rekening, ritprijs) en legt later het werkelijke bedrag vast.  
+  _voor: leverancier_
+- **Partnersaldo uitbetalen** (`dom-partner-uitbetaling`) — Het RTG Pay-saldo van een zaak naar zijn bankrekening sturen.  
+  _voor: leverancier_
+- **Wat mijn gebruik kost** (`dom-kosten`) — Het lid ziet wat zijn eigen gebruik van RTG kost, met de bewijsgraad erbij, en wie dat betaalt.  
+  _voor: rtg, lifestyle, business_
 - **Betalen en betaalverzoeken** (`gld-munt`) — Rechtstreeks betalen aan een partner, betaalverzoeken en de betaalopties.  
   _voor: rtg, lifestyle, business, gast_
 - **Rekening en facturen** (`gld-rekening`) — De openstaande rekening, het afrekenen daarvan en losse facturen.  
@@ -380,111 +478,135 @@ ook blokkeert.
   _voor: rtg, lifestyle, business_
 - **Cadeaukaarten** (`gld-cadeau`) — Cadeaukaarten kopen en de eigen kaarten bekijken.  
   _voor: rtg, lifestyle, business_
-- **Punten en verzilveren** (`gld-punten`) — Gespaarde punten en het verzilveren daarvan.  
+- **Punten en verzilveren** (`gld-punten`) — Gespaarde punten en het verzilveren daarvan naar tegoed.  
   _voor: rtg, lifestyle, business_
 - **Pasprijzen en balans** (`gld-prijzen`) — De publieke prijslijst van de passen en het balansoverzicht van een lid.  
   _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_
+- **Commerciele claims en tarieven** (`gld-claims`) — Wat RTG publiek belooft over prijzen, vergoedingen en de sociale afdracht, met per bewering de bron en hoe hard zij is. Voedt de voorwaardenpagina's.  
+  _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_
+- **Ledenprijsgarantie melden** (`gld-prijsgarantie`) — Een lid meldt dat het bij de zaak zelf goedkoper zag; de zaak erkent of betwist, en het verschil wordt rechtgezet.  
+  _voor: rtg, lifestyle, business_
+- **AI-tegoed en bundels** (`gld-aitegoed`) — De stand van het inbegrepen AI-tegoed, wat er bij het plafond gebeurt, en het bijkopen van een bundel.  
+  _voor: rtg, lifestyle, business_
 
-### Personeel & integraties — 3
+### Toegang en identiteit — 8
 
-- **Personeels-app (PDA)** (`staff`) — De personeels-app: rooster, klokken, verlof/ziek, taken, team en de vertrouwenspersoon.  
-  _voor: personeel_
-- **Wervingslink (in dienst via een link)** (`werving`) — De uitnodigingslink van een werkgever: kijken wie je uitnodigt (openbaar, alleen bedrijfsnaam en functie) en jezelf eraan verbinden met je eigen RTG-account.  
+- **Inloggen en registreren** (`tg-inlog`) — De voordeur: inloggen, uitloggen, registreren en wachtwoord vergeten. Uit betekent dat niemand meer binnenkomt; de eigenaar houdt het techniekbord.  
+  _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_
+- **Account en profiel** (`tg-account`) — Het eigen account: rollen, koppelingen en het cv van een lid.  
+  _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_
+- **Inloggen via een andere partij (SSO en SCIM)** (`tg-sso`) — De terugkeer van een identiteitsprovider, met de ondertekende state als poort, en de SCIM-deur waarlangs die provider accounts aanmaakt en uitzet.  
+  _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_
+- **Pincode en sleutelwoorden** (`tg-pin`) — De algemene pin voor prive-apps en de sleutelwoord-inlog met zijn uitdaging.  
+  _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_
+- **Zegel, codes en rechtenbeheer** (`tg-zegel`) — Het RTG-zegel, dynamische codes, scanbare codes en de rechtenlaag op media.  
+  _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_
+- **RTG Link (scannen en capabilities)** (`tg-link`) — De adres- en capabilitylaag: een gescande code duiden, het bedoelingsscherm, tijdelijke capabilities (zoals een vraagcode of een kassacode) en de eigen koppelingenlijst.  
+  _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_
+- **De gegevenspoort** (`tg-gegevens`) — Het gesprek waarin een lid zelf zijn ontbrekende gegevens aanvult, inclusief het opzoeken van een adres bij postcode en huisnummer.  
+  _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_
+- **Aanmelden voor een pas** (`tg-aanmeld`) — Het aanmeldgesprek en de aanmeldingen die daaruit volgen; het besluit blijft mensenwerk.  
+  _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_
+
+### Festival — 3
+
+- **Festival: terrein en poort** (`fs-terrein`) — Het terrein draaien: de poort en de scans, plekken en ruimtes, de dag en het podiumbeeld, en de uitzonderingen die aandacht vragen.  
   _voor: leverancier, personeel_
-- **Rahul doet het (AI-stuur)** (`stuur`) — De AI voert acties uit op elk toegestaan API-pad, met de eigen inlog van wie het vraagt (nooit meer rechten dan de persoon zelf). Geld-acties vragen altijd eerst een bevestiging.  
-  _voor: rtg, lifestyle, business, gast, leverancier, personeel_
+- **Festival: diensten, artiesten en verkoop** (`fs-werk`) — De organisatie eromheen: roosters en diensten, de rider en het bewijs van een artiest, boekingen, producten en de verkoop.  
+  _voor: leverancier, personeel_
+- **Festival: uw pas, programma en groep** (`fs-gast`) — De kant van de bezoeker: de eigen pas en edities, het programma met wat er getekend is, en een groep waarvan u zelf de code deelt.  
+  _voor: rtg, lifestyle, business, gast_
 
----
-
-# 2. De 83 apps in de leden-catalogus
+# 2. De 84 apps in de leden-catalogus
 
 Wat een lid op zijn homescreen kan zetten. De schakelaars hierboven bepalen of
 ze werken; dit is wat hij ziet.
 
-### Sociaal & contact — 10
+### Sociaal & contact — 11
 
-- **Berichten** `/apps/comm.html` — Alle gesprekken van het platform op een plek -- mensen, zaken, onderweg, officieel -- met bellen en videobellen in de kop van het gesprek.
-- **De Salon** `/apps/salon.html` — Het besloten sociale netwerk van RTG: zelf plaatsen met foto's en onderwerpen, leden volgen, bewaren en reageren.
-- **Genootschap** `/apps/genootschap.html` — Besloten groepen met een prikbord, peilingen en bijeenkomsten.
+- **RTG Sociaal** `/apps/sociaal.html` — Wat er tussen u en de mensen om u heen speelt -- gesprekken die op antwoord wachten, aanstaande bijeenkomsten, en wat er in uw kring geplaatst is. Praten en plaatsen blijft in de app die het echte werk doet.
+- **Berichten** `/apps/comm.html` — Alle gesprekken van het platform op een plek -- mensen, zaken, onderweg, officieel -- met bellen en videobellen in de kop van het gesprek. Rahul vat samen, stelt een antwoord op en haalt de afspraken eruit.
+- **De Salon** `/apps/salon.html` — Het besloten sociale netwerk van RTG: zelf plaatsen met foto's en onderwerpen, leden volgen, bewaren en reageren. Rahul schrijft een bijschrift mee en vat de reacties samen.
+- **Genootschap** `/apps/genootschap.html` — Besloten groepen met een prikbord, peilingen en bijeenkomsten. Geheim is echt geheim, en er is geen enkele groeitruc.
 - **Pulse** `/apps/pulse.html` — De hoogtepunten van vandaag in jouw RTG-wereld, rustig gebundeld, geen eindeloze feed.
-- **Cercle** `/apps/cercle.html` — Je besloten kring: de mensen die dichtbij staan, op één plek.
-- **Entourage** `/apps/entourage.html` — Je vaste mensen en hun rol om je heen, overzichtelijk bij elkaar.
-- **Rendez-vous** `/apps/rendezvous.html` — Afspraken en ontmoetingen plannen met je kring.
-- **Vonk** `/apps/vonk.html` — RTG Vonk: kennismaken op wens; bij een wederzijdse match reserveert RTG een tafel in het midden.
-- **Attenties** `/apps/attenties.html` — Attenties en cadeaus regelen voor wie je waardeert.
-- **Meet** `/apps/meet.html` — Vergaderen op codenaam: kamers met een korte code, scherm delen, en een Vergaderruimte-knop op elke agenda-afspraak.
+- **Cercle** `/apps/cercle.html` — Uw besloten clubs en lidmaatschappen: stad, lidnummer, dresscode, met welke clubs er reciprociteit is en hoeveel gastpassen u nog heeft. Vraag "waar kan ik in Milaan terecht" en u ziet op welk lidmaatschap.
+- **Entourage** `/apps/entourage.html` — Uw vaste reisgezelschap: wie u meeneemt, hun band, dieet en documenten met vervaldatum. Stel een gezelschap samen en zie wat er ontbreekt voordat u aan de balie staat.
+- **Rendez-vous** `/apps/rendezvous.html` — Besloten introducties voor Lifestyle en Business: waar u tegelijk bent en welk dagdeel u beiden uitkomt, en met Arrange it regelt De Rechterhand de ontmoeting.
+- **Vonk** `/apps/vonk.html` — RTG Vonk: zeg wat er echt toe doet (verplicht, sterke voorkeur, leuk meegenomen); hooguit zes mensen per dag, en bij een match kiest u blind uit drie plekken op gelijke reistijd.
+- **Attenties** `/apps/attenties.html` — Uw relatiebeheer: per relatie de band, de belangrijke data en hun voorkeuren, plus de giftgeschiedenis zodat u nooit twee keer hetzelfde geeft.
+- **Meet** `/apps/meet.html` — Vergaderen op codenaam: kamers met een korte code, scherm delen, en een Vergaderruimte-knop op elke agenda-afspraak. Beeld en geluid lopen peer-to-peer.
 
-### Reizen & verblijf — 11
+### Reizen & verblijf — 13
 
+- **RTG Reizen** `/apps/reizen.html` — Uw komende reis bij elkaar -- vlucht, verblijf, reis en charter -- ongeacht in welke app u hem boekte. Boeken en annuleren blijft in de app die het echte werk doet.
 - **Het Huis** `/apps/rtg.html` — Reserveren, boeken en bestellen bij alle partners, alles op codenaam.
 - **Verblijven** `/apps/hotels.html` — Hotels, appartementen en villa's met ledenprijzen en keyless toegang.
 - **Reisbureau** `/apps/reisbureau.html` — Samengestelde reizen tegen de nettoprijs, met AI-reisadvies in gewone woorden.
-- **Reisboek** `/apps/reisboek.html` — Je reisdagboek: boekingen en momenten worden vanzelf een mooi verslag.
+- **Mijn Mall** `/apps/mijnmall.html` — Je lijsten, je reismanden en de vragen die je in de Mall hebt uitgezet.
+- **Reisboek** `/apps/reisboek.html` — Uw prive-reisdossier: per reis een draaiboek met de heen- en terugreis, de verblijven, de reisdocumenten met geldigheid en een dag-tot-dag-programma.
 - **Vluchten** `/apps/vluchten.html` — Vluchten zoeken, boeken en volgen.
-- **Hangar** `/apps/hangar.html` — De Hangar: privéjets en charters vanaf Business Aviation.
+- **Hangar** `/apps/hangar.html` — Uw privevliegtuigen en charters: per toestel type, registratie, thuishaven en stoelen, met de vluchten, de vlieguren en de laatst bekende positie.
 - **RTG OV** `/apps/ov.html` — Bus, trein, metro, veerboot en taxi in één reisapp, met live GPS en snelle check-in.
 - **Navigatie** `/apps/navigatie.html` — Navigeren met de RTG-kaart.
 - **Flits** `/apps/flits.html` — Een ingetogen rijscherm met community-meldingen (flitser, file, ongeval) en spraak.
 - **Mijn Stad** `/apps/stad.html` — Alles om je heen in het RTG-web, op de kaart van je stad.
-- **Maison** `/apps/maison.html` — Je vaste verblijven en tweede huizen bij elkaar.
+- **Maison** `/apps/maison.html` — Huishouden en staf: uw huishoudelijk personeel met rol en contact, de lopende taken met wie en wanneer, en een logboek van wat er in en om huis speelt.
 
 ### Eten & uitgaan — 4
 
 - **Food Court** `/apps/foodcourt.html` — Alle restaurants op een rij; reserveren met tijdsloten in een paar tikken.
-- **Table** `/apps/table.html` — Je tafelreserveringen en gastenlijsten.
-- **Cellier** `/apps/cellier.html` — Je wijnkelder en proefnotities.
+- **Table** `/apps/table.html` — De prive-diners en events die u zelf geeft: gastenlijst met dieet en voorkeuren, tafelindeling, menu per gang. Herbruikbaar voor de volgende keer.
+- **Cellier** `/apps/cellier.html` — Uw wijnkelder: per fles domein, jaargang, aantal, waarde en drinkvenster. Het overzicht wijst aan wat nu op dronk is, met de kelderwaarde. Een fles schenken telt af.
 - **Uitgaan** `/apps/uitgaan.html` — Bars, clubs en beachclubs met hun avonden en gastenlijsten.
 
-### Media & creatie — 24
+### Media & creatie — 25
 
 - **RTG Media** `/apps/media.html` — Eén mediawereld over Klankwerk, Theater, Clips en Podium heen: muziek, kijk en flow als drie standen op dezelfde catalogus, met één makersprofiel en uw eigen regelaars in plaats van een algoritme.
 - **Camera** `/apps/camera.html` — Fotograferen, plus RTG Eye: voertuigschouw en hands-free werkvloerlog.
 - **RTG Sound** `/apps/muziek.html` — Je muziek, rustig en zonder reclame.
 - **Theater** `/apps/theater.html` — Videobibliotheek op bioscoopniveau, tot 4K, met kanalen en reacties.
 - **Clips** `/apps/clips.html` — Korte video's die lokaal bij de maker blijven; een eindige dagselectie.
-- **RTG Klankwerk** `/apps/klankwerk.html` — Zelf muziek maken: een raster, een notenrol en Rahul die iets neerzet.
-- **De Zaal** `/apps/zaal.html` — Wat leden zelf gemaakt hebben, op volgorde van wanneer het uitkwam.
+- **RTG Klankwerk** `/apps/klankwerk.html` — Zelf muziek maken: een raster, een notenrol en Rahul die iets neerzet. Alles wordt opgewekt, dus alles is van jou.
+- **De Zaal** `/apps/zaal.html` — Wat leden zelf gemaakt hebben, op volgorde van wanneer het uitkwam. Geen hitlijst.
 - **Podium** `/apps/podium.html` — Je eigen live-kanaal (18+), met chat, RTG Pay-cadeaus en abonnementen.
 - **Website-maker** `/apps/sitemaker.html` — Bouw met blokken je eigen RTG-site, met eigen foto's en beeld uit De Salon.
 - **RTG Browser** `/apps/browser.html` — Blader door de sites die leden in het RTG-web publiceren.
-- **RTG Werk OS** `/apps/werk.html` — De werkplek van een hele organisatie: startscherm per rol, projecten, kennisbank, klanten, servicedesk, bouw, apparaten, contracten en besluiten.
+- **RTG Werk OS** `/apps/werk.html` — De werkplek van een hele organisatie: startscherm per rol, projecten, kennisbank, klanten, servicedesk, bouw, apparaten, contracten en besluiten. Wat niet gemeten wordt, staat er als niet gemeten en niet als nul.
+- **RTG Kantoor** `/apps/kantoor.html` — Uw werkdag bij elkaar -- afspraken, open taken, documenten en gedeelde bestanden -- ongeacht in welke app ze leven. Maken en wijzigen blijft in de app die het echte werk doet.
 - **RTG Office** `/apps/office.html` — Tekst en rekenblad met autosave, delen op codenaam en export.
 - **Agenda** `/apps/agenda.html` — Maand, week en lijst; uitnodigen op codenaam, herinneringen, en je RTG-boekingen staan er vanzelf in.
 - **Notities & Taken** `/apps/notities.html` — Notities en lijstjes met vinkjes; delen op codenaam is samen werken, en een datum wordt vanzelf een agenda-afspraak.
-- **Bestanden** `/apps/bestanden.html` — De versleutelde kluis: mappen, versies, delen op codenaam en een prullenbak die 30 dagen bewaart.
-- **Galerij** `/apps/galerij.html` — Al je beelden op een plek: tijdlijn per maand, albums en favorieten.
-- **Gereedschap** `/apps/gereedschap.html` — Rekenmachine (met btw en rekening delen), wekkers en timers die op de server aftellen, stopwatch en wereldklok.
-- **Vertaler** `/apps/vertaler.html` — Typen of spreken, live vertalen, voorlezen en reiszinnen per situatie.
-- **Memo** `/apps/memo.html` — Spraakmemo's opnemen; de audio staat als gewoon bestand in je Bestanden-kluis.
+- **Bestanden** `/apps/bestanden.html` — De versleutelde kluis: mappen, versies, delen op codenaam en een prullenbak die 30 dagen bewaart. Je Office-werk staat er vanzelf bij.
+- **Galerij** `/apps/galerij.html` — Al je beelden op een plek: tijdlijn per maand, albums en favorieten. Leest De Salon en Bestanden; niets dubbel, geen gezichtsherkenning.
+- **Gereedschap** `/apps/gereedschap.html` — Rekenmachine (met btw en rekening delen), wekkers en timers die op de server aftellen, stopwatch en wereldklok. Rahul zet ze ook voor je.
+- **Vertaler** `/apps/vertaler.html` — Typen of spreken, live vertalen, voorlezen en reiszinnen per situatie. Geschiedenis blijft op het toestel; zonder AI-sleutel vertaalt het huiswoordenboek eerlijk.
+- **Memo** `/apps/memo.html` — Spraakmemo's opnemen; de audio staat als gewoon bestand in je Bestanden-kluis. Het toestel luistert mee voor een transcript en Rahul vat samen als jij dat vraagt.
 - **Scanner** `/apps/scanner.html` — Documenten vastleggen met de camera of uit je foto's, documentmodus voor leesbaar papier, en bewaren als PDF of losse foto's in je Bestanden-kluis.
-- **Boeken** `/apps/boeken.html` — De huisbibliotheek plus je eigen tekstbestanden uit de kluis, met een rustige lezer.
+- **Boeken** `/apps/boeken.html` — De huisbibliotheek plus je eigen tekstbestanden uit de kluis, met een rustige lezer. Alleen je leesplek reist mee; geen leesdoelen, geen reeksen.
 - **RTG Krant** `/apps/krant.html` — De kiosk: de kranten die nieuwsbedrijven binnen RTG uitgeven, elk in de eigen huisstijl.
 - **Nieuws** `/apps/nieuws.html` — RTG Nieuws per rubriek, met wat je later wilt lezen bewaard.
-- **Garde-robe** `/apps/garderobe.html` — Je kledingkast en looks bij elkaar.
+- **Garde-robe** `/apps/garderobe.html` — Uw digitale garderobe: per stuk type, merk, kleur, maat en waar het hangt -- welke woning, welke kast. Plus uw vaklui: kleermaker, schoenmaker, stomerij.
 
 ### Geld & werk — 8
 
-- **Métier** `/apps/metier.html` — Je beroepsprofiel op codenaam, met de rollen die RTG zelf heeft bevestigd.
-- **Wie betaalt wat** `/apps/wbw.html` — Groepsuitgaven met live balans en verrekenen via RTG Pay.
-- **Balans** `/apps/balans.html` — Je saldo en tikgeschiedenis in één overzicht.
-- **RTG-code** `/apps/rtgcode.html` — Je betaal- en toegangscodes veilig op één plek.
-- **Logboek** `/apps/logboek.html` — Je acties en bevestigingen, netjes vastgelegd.
-- **Mecenaat** `/apps/mecenaat.html` — Steun projecten en goede doelen als mecenas.
-- **Lab-fonds** `/apps/labfonds.html` — Steun het RTG-onderzoekslab en volg waar je bijdrage heen gaat.
-- **Nalatenschap** `/apps/nalatenschap.html` — Regel wat er later met je account en bezittingen gebeurt.
+- **Métier** `/apps/geld.html#metier` — Je beroepsprofiel op codenaam, met de rollen die RTG zelf heeft bevestigd. Je naam geef je per werkgever vrij, en je trekt hem net zo makkelijk weer in.
+- **Wie betaalt wat** `/apps/geld.html#wbw` — Groepsuitgaven met live balans en verrekenen via RTG Pay.
+- **Balans** `/apps/geld.html#balans` — Je saldo en tikgeschiedenis in één overzicht.
+- **RTG-code** `/apps/geld.html#rtgcode` — Je betaal- en toegangscodes veilig op één plek.
+- **Logboek** `/apps/geld.html#logboek` — Het onderhoudsboek van uw jacht, jet, oldtimer of ander kostbaar bezit: keuringen, servicebeurten, reparaties en verzekeringen met datum, kosten en wanneer het weer aan de beurt is.
+- **Mecenaat** `/apps/geld.html#mecenaat` — Uw filantropie op orde: per gift het doel, het thema, het bedrag, en of het een toezegging is of al betaald. Het overzicht toont wat er via de RTFoundation loopt.
+- **Lab-fonds** `/apps/geld.html#labfonds` — Steun het RTG-onderzoekslab en volg waar je bijdrage heen gaat.
+- **Nalatenschap** `/apps/geld.html#nalatenschap` — Een discreet, versleuteld dossier voor later: welke documenten er zijn en waar ze liggen, uw vertrouwenspersonen, en uw persoonlijke wensen.
 
 ### Spelen & sport — 2
 
 - **Spelen** `/apps/spelen.html` — Dammen, rummikub, Magnaat, partyspellen, sudoku en meer, samen of alleen.
 - **Sport** `/apps/sport.html` — Je sportactiviteiten en clubs.
 
-### Veiligheid & identiteit — 7
+### Veiligheid & identiteit — 4
 
-- **Thuiswacht** `/apps/thuiswacht.html` — Zeg hoe lang je onderweg bent; meld je je niet, dan krijgt je kring bericht met je laatst bekende plek.
-- **Codewoord** `/apps/codewoord.html` — Een gewone zin die je kring stil waarschuwt met je plek; op je scherm gebeurt er niets zichtbaars.
-- **Vitaal** `/apps/vitaal.html` — Een knop per dag: het gaat goed.
-- **Thuisrust** `/apps/thuisrust.html` — Niet storen tot je thuis bent; je eigen kring komt er altijd doorheen.
-- **Wie ben ik** `/apps/ik.html` — Wat Rahul over je mag weten: hoe hij tegen je doet, je voornaamwoorden en je eigen geloofskeuze.
+- **RTG Veilig** `/apps/veilig.html` — Thuiswacht, Codewoord, Vitaal en Thuisrust in een app: zeggen hoe lang je onderweg bent, je kring stil waarschuwen, dagelijks laten weten dat het goed gaat, en stil zijn zonder onbereikbaar te worden. De klok tikt op de server, dus het werkt ook als je telefoon uitvalt.
+- **Wie ben ik** `/apps/ik.html` — Wat Rahul over je mag weten: hoe hij tegen je doet, je voornaamwoorden en je eigen geloofskeuze. Alles optioneel.
 - **Passkeys** `/apps/passkeys.html` — Inloggen met vingerafdruk, gezicht of een fysieke sleutel.
 - **Juridisch** `/apps/juridisch.html` — Voorwaarden, contracten en je eigen akkoorden.
 
@@ -508,9 +630,7 @@ ze werken; dit is wat hij ziet.
 - **RTF-Bibliotheek** `/apps/foundation/bieb.html` — Gratis kind- en gezinsapps van de RTFoundation.
 - **Geloof & Wijsheid** `/apps/foundation/geloofbieb.html` — De Geloof & Wijsheid-Bibliotheek: alle tradities als gelijken, met echte leesbare teksten.
 
----
-
-# 3. De 73 genres in 26 sectoren
+# 3. De 74 genres in 27 sectoren
 
 Er is **één** partner-app en **één** personeels-PDA. Welke schermen een zaak
 krijgt volgt niet uit zijn genre maar uit zijn *genre-caps*: een hotel en een
@@ -534,6 +654,7 @@ is de reden dat er geen 130 losse apps zijn.
 - **maritime** (2) — Boten & jachten (`charter`), Marina & jachthaven (`marina`)
 - **media** (3) — Journalistiek (`journalistiek`), Content creator (`creator`), Fotografie & film (`fotograaf`)
 - **mobility** (6) — Taxi (`taxi`), Autoverhuur (`verhuur`), Tweewielers & quads (`tweewielers`), Vervoer & transfers (`vervoer`), Openbaar vervoer (`ov`), Vracht & expeditie (`vracht`)
+- **nonprofit** (1) — RTFoundation (`rtfoundation`)
 - **pharmacy** (1) — Apotheek (`apotheek`)
 - **professional** (2) — Professionele diensten (`professioneel`), Zelfstandig professional (`zzp`)
 - **realestate** (1) — Vastgoed & makelaar (`vastgoed`)
@@ -547,7 +668,6 @@ is de reden dat er geen 130 losse apps zijn.
 De 40 genre-caps waar de apps naar kijken (nooit naar het genre zelf):
 
 `advies`, `alpine`, `beauty`, `beveiliging`, `bezorgen`, `boerderij`, `bookings`, `care`, `charter`, `creator`, `doors`, `fitclub`, `fleet`, `gebouw`, `gemeente`, `golf`, `groothandel`, `huur`, `location`, `luchthaven`, `marechaussee`, `marina`, `menu`, `opvang`, `orders`, `ov`, `petcare`, `polis`, `pricing`, `redactie`, `reservations`, `retail`, `rides`, `rijk`, `services`, `sportclub`, `tickets`, `vastgoed`, `vracht`, `weddings`
----
 
 # 4. De lagen die overal doorheen lopen
 

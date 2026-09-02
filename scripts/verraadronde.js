@@ -45,6 +45,11 @@ const path = require('path');
 const { start: wegwerp } = require('./lib/wegwerpserver');
 const { CATALOGUS } = require('../server/lib/verraad');
 const { telSamen, zakt } = require('./lib/verraadtelling');
+/* Wanneer is dit gemeten, en waartegen. Zonder stempel is een register niet na
+   te lopen: verouderd ziet er identiek uit aan vers, en scripts/versheid.js kan
+   er niets over zeggen. Zeven registers misten hem; zie de kop van
+   scripts/lib/stempel.js. */
+const { stempel } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'VERRAAD.json');
@@ -199,6 +204,7 @@ if (require.main !== module) { module.exports = {}; return; }
     t.verklaard + ' (de rest is nog niet ingebouwd).');
 
   fs.writeFileSync(UITSLAG, JSON.stringify({
+    stempel: stempel(),
     uitleg: 'De Verraadronde meldt nooit alleen PASS. TOEGEDIEND min WAARGENOMEN is het ' +
       'belangrijkste getal: dat zijn blinde injecties, en daar is niets geleerd. ' +
       'De ronde zakt op blindheid en op onherhaalbaarheid, niet op een bevinding -- ' +

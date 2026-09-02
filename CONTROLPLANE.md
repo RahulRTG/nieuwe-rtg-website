@@ -388,10 +388,13 @@ verse boeking per uitbetaling, dus de terugvalsleutel is per definitie uniek en
 er bestaat geen legitieme tweede uitbetaling op één boeking. Een reeds afgeronde
 opdracht wordt bovendien niet opnieuw ingediend.
 
-**Wat er nog niet is:** dit dekt de uitbetaalkant. De ene wereldwijde
-`economic_intent` die door order, betaling, grootboek, leverancier, settlement én
-refund loopt, vraagt de intent-laag van §6.6. Wat er nu staat is de plek waar het
-geld het huis verlaat — de duurste plek om het níet te hebben.
+**Wat er nu wel en nog niet is:** de eerste productiecel bestaat inmiddels. Een
+betaalde abonnementsbijdrage krijgt één `economic_intent`, drie claims, sluitende
+ledgerbundles, settlements, reconciliation en een principal-geïsoleerd Economic
+Proof in LivingOS (zie `EXPERIENCE.md`). De universele migratie is nog niet af:
+order, leverancier, payroll, travel en refund moeten ditzelfde pad nog krijgen.
+De uitbetaalkant hieronder blijft de plek waar geld het huis verlaat — de
+duurste plek om idempotentie níet te hebben.
 
 ### 5.6 Het voornemen (was §6.6, nu gebouwd)
 

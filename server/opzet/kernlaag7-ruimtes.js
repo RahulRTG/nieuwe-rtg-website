@@ -24,6 +24,17 @@ Object.assign(kern, require('../kern/magnaatwereld')({
   partnerstudio: partnerstudio.magnaatPartnerstudio, codenaamVan: kern.codenaamVan
 }));
 
+/* De positie van de RTFoundation in RTG Pay (kern/rtfwallet.js): waar een gift
+   landt en wie hem uitbetaalt. Hij hangt hier en niet bij de andere
+   supplier-wegen in kernlaag2b, omdat het aanmaken twee dingen nodig heeft die
+   pas later bestaan: de giftstand uit kern/rtfos (de ontvanger wordt meteen
+   ingevuld) en de economielaag uit kernlaag4 (de stichting hoort niet als
+   commerciele klant in de firewall te belanden). */
+Object.assign(kern, require('../kern/rtfwallet').maakRtfWallet({
+  db: hulp.db, save: hulp.save, accounts: hulp.accounts,
+  ensureSupplierDefaults: kern.ensureSupplierDefaults, makeSupplierCode: kern.makeSupplierCode,
+  economie: kern.economie, rtfos: kern.rtfos }));
+
 // De Media OS hangt HIER, als laatste: hij LEEST de vier media-domeinen en
 // die moeten er dus al zijn. Uitleg: ./mediaos.js.
 require('./mediaos')(kern, hulp);

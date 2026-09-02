@@ -443,6 +443,12 @@ function draaiToets(bestand, env, wacht, forceer) {
    De tien andere staan nog open; dat is een geteld gat in TAKEN.md en geen
    vergeten hoekje. */
 const EIGEN_MODULE = new Map([
+  /* De Workspace-platformtoets laadt browsermodules bewust in een VM en heeft
+     daardoor geen statische require die modulesVan() kan vinden. Dit is wel
+     degelijk zijn bron: de SDK-validatie omkeren laat de eerste en tweede
+     bewering zakken. De expliciete koppeling voorkomt dat een echte VM-toets
+     als "geen module gevonden" buiten de mutatiemeting blijft. */
+  ['workspace-platform.test.js', ['public/shared/interface/module-sdk.js']],
   /* DE TENANTLAAG: twee toetsen die de server als kindproces starten en dus
      geen require van hun module dragen. Beide regels zijn met een mutatie
      nagetrokken en niet gegokt.

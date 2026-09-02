@@ -1,5 +1,5 @@
 /* ============================================================================
-   DE KERN SAMENSTELLEN -- deel 1 van 7, en de uitleg voor alle delen.
+   DE KERN SAMENSTELLEN -- deel 1, en de uitleg voor alle delen.
 
    WAAROM DIT OP POSITIE IS GEKNIPT EN NIET OP THEMA. De samenstelling was een
    aaneengesloten blok van 790 regels in server.js: honderddrie regels van de
@@ -28,7 +28,7 @@
 const { maakVolwassen } = require('../kern/volwassen');
 
 module.exports = (kern, hulp) => {
-  const { DATA_DIR, PERSONAS, accounts, anthropic, boekingenVanKlant, crypto, db, findSupplier, keyVanCodenaam, ledenAantal, leeftijdVan, lidBoardUit, log, mail, media, ordersVanKlant, ordersVanZaak, rtf, save, schoon, sendPush, sendPushToUser, sociaal, sseClients, sseToCustomer, sseToOffice } = hulp;
+  const { DATA_DIR, PERSONAS, accounts, anthropic, boekingenVanKlant, crypto, db, findSupplier, keyVanCodenaam, ledenAantal, leeftijdVan, lidBoardUit, mail, media, ordersVanKlant, ordersVanZaak, rtf, save, schoon, sendPush, sendPushToUser, sociaal, sseClients, sseToCustomer } = hulp;
 
 Object.assign(kern, sociaal); // de sociale kern-helpers erbij
 /* Tafelticket (kern/tafelticket.js): de bonnen van dezelfde tafel op een
@@ -43,6 +43,14 @@ Object.assign(kern, { dyncode: require('../kern/dyncode')({ crypto, dataDir: DAT
 kern.magnaatLeren = require('../kern/spellen/magnaat/leerkring')({ db, save, crypto });
 /* Spellen (kern/spellen.js): het spelplatform op de vriendenlaag; RTF- en
    RTG-leden spelen tegen elkaar. */
+/* DE 18+-POORT KOMT OP DE KERN EN NIET ALLEEN IN DE SPELLENLAAG. Hij stond
+   hieronder als argument van kern/spellen en nergens anders, en toen de App
+   Store dezelfde grens nodig had (kern/appstore/arena.js: een score van een app
+   van derden) was hij niet te bereiken zonder hem opnieuw te maken. Een tweede
+   leeftijdsregel in een huis is er een te veel (LAT-regel 4), dus staat hij nu
+   op de kern -- een regel die bepaalt wat er van iemand bewaard blijft, hoort
+   vindbaar te zijn onder een naam. */
+kern.volwassen = maakVolwassen({ accounts: hulp.accounts });
 Object.assign(kern, require('../kern/spellen')({
   db, save, crypto, zijnVrienden: kern.zijnVrienden, codenaamVan: kern.codenaamVan, sseToCustomer,
   isGeblokkeerd: kern.isGeblokkeerd, socialZoek: kern.socialZoek, sociaalRate: kern.sociaalRate,
@@ -57,7 +65,7 @@ Object.assign(kern, require('../kern/spellen')({
   /* De 18+-poort staat in kern/volwassen.js: een eigen account, door RTG
      gekeurd (A3) en 18 of ouder. Daar staat ook waarom die keuring er eerst
      niet in zat en wat dat gat betekende. */
-  volwassen: maakVolwassen({ accounts: hulp.accounts })
+  volwassen: kern.volwassen
 }));
 /* RTG Veilig (kern/veilig/): de ruggengraat onder vier apps -- Thuiswacht
    ("ik ben over X minuten thuis"), het stille Codewoord, de Vitale check-in
@@ -116,43 +124,4 @@ Object.assign(kern, require('../kern/welzijn')({ save }));
 /* De RTG-kantoren (kern/afdelingen.js): twaalf afdelingskamers en de
    boardroom die alles ziet en het functieschakelbord bedient. */
 Object.assign(kern, require('../kern/afdelingen')({ db, save, crypto, anthropic, ledenAantal, accounts, keyVanCodenaam }));
-/* RTG Atelier (kern/atelier.js): het besloten ontwerpbureau van de kantoren
-   voor mode en alles wat je aan het lijf draagt. AI tekent concepten uit,
-   levert tech packs en de blik van de creatief directeur; het palet komt als
-   naam + hex mee zodat het scherm een moodboard toont. */
-Object.assign(kern, require('../kern/atelier').maakAtelier({ db, save, crypto, anthropic, schoon }));
-/* RTG Ontwerpstudio (kern/studio.js): de tegenhanger van het Atelier voor
-   alles wat je beweegt: automotive, jachten & boten, luchtvaart en
-   helikopters. AI tekent het concept uit, levert een specsheet en de blik
-   van de chef-ontwerper. */
-Object.assign(kern, require('../kern/studio').maakStudio({ db, save, crypto, anthropic, schoon }));
-/* RTG Hardwarelab (kern/hardwarelab.js): de derde ontwerptak, voor de eigen
-   apparaten: PDA's en tablets, schermen, sensoren, de zaakdoos-familie en
-   accessoires. AI tekent het concept uit, levert een stuklijst en de blik
-   van de chef-engineer. */
-Object.assign(kern, require('../kern/hardwarelab').maakHardwarelab({ db, save, crypto, anthropic, schoon }));
-
-/* Het doorgeefjournaal (kern/doorgeefjournaal.js): een leesbare regel per
-   binnenkomend verzoek en per uitgaand bericht. Vroeg in de rij: de haak waar
-   de lagen eronder aan melden (server/journaalhaak.js) moet vanaf het
-   eerste verzoek bezet zijn -- anders mist het journaal de opstartfase, en daar
-   zaten de storingen. Het bewaarde deel gaat naar een BESTAND en niet naar een
-   collectie; zie kern/journaalbestand.js. */
-Object.assign(kern, require('../kern/journaalbestand').metBestand({ db, save }));
-
-/* Het stadsweefsel (kern/stadsweefsel/): de ondergrond onder de stad --
-   geografie, objecten, indicatoren, begroting, besluitvorming en het
-   algoritmeregister.
-
-   DE VOLGORDE IS HIER GEDRAG. Het weefsel staat VOOR zijn lezers: kern/gemeente
-   (laag 2) biedt zijn meldingen bij de zaakmotor aan en kern/stad (laag 5) leest
-   zijn zones uit de geografie. Wie dit blok naar beneden schuift, start een stad
-   zonder ondergrond -- en dan hangt een gemeentemelding aan geen enkele zaak.
-   Het staat in deze laag en niet in laag 2 omdat die daarmee over de 10 KB ging;
-   eerder is hier ook goed, want alles wat het weefsel nodig heeft bestaat al. */
-const melderSeintje = (codenaam) => {
-  try { Promise.resolve(keyVanCodenaam(codenaam)).then(t => { if (t && t.key) sseToCustomer(t.key, 'sync', { scope: 'stad' }); }).catch(() => {}); }
-  catch (e) { log.uitzondering(e, { bron: 'weefsel', waar: 'melderSeintje' }); }
-};
-Object.assign(kern, require('../kern/stadsweefsel')({ db, save, crypto, sseToOffice, melderSeintje, log }));
 };

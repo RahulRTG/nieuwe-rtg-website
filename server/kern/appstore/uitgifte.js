@@ -19,7 +19,21 @@
    ========================================================================== */
 'use strict';
 
+const crypto = require('crypto');
 const { toonbaar } = require('./machtigingen');
+const { paspoort } = require('./paspoort');
+
+/* DE CELNAAM. Een cel hoort een naam te hebben op het scherm waarop hij draait:
+   wie ziet dat zijn app in CEL 0184 zit, begrijpt zonder uitleg dat het ding
+   ergens IN staat en niet overal bij kan.
+
+   Hij wordt AFGELEID uit het lid en de app, en niet uitgedeeld uit een teller.
+   Een oplopend nummer zou over alle leden heen tellen en daarmee verklappen
+   hoeveel apps er in dit huis geopend zijn; deze naam is voor dit lid en deze
+   app stabiel en verder van niemand af te lezen. Vier tekens, want het is een
+   naam en geen sleutel -- er hangt niets aan, en botsen mag. */
+const celnaam = (key, sleutel) =>
+  crypto.createHash('sha256').update(String(key) + '\u0000' + String(sleutel)).digest('hex').slice(0, 4).toUpperCase();
 
 /* Krijgt de ETALAGE mee in plaats van hem zelf te maken. Twee keer
    require('./etalage')(kern) geeft twee objecten die dezelfde toestand lezen, en
@@ -38,6 +52,15 @@ function maakUitgifte(kern, E) {
     if (!v || v.status !== 'gepubliceerd') return { status: 404, error: 'Deze app is niet (meer) beschikbaar.' };
     const verleend = verleendeVan(key, sleutel);
     if (!verleend) return { status: 403, error: 'Zet deze app eerst in de App Store op je startscherm; dan kies je ook wat hij mag.' };
+    /* EEN TIJDELIJKE CEL DIE VERLOPEN IS, GAAT NIET MEER OPEN -- en hij wordt
+       ook niet stilletjes opgeruimd. Wat de app voor dit lid bewaarde staat er
+       nog, want dat is zijn inhoud (grens 5); pas "vernietig de cel" haalt het
+       weg. Het antwoord zegt daarom allebei: dat hij verlopen is, en dat er nog
+       iets staat. */
+    if (require('./tijdelijk').isVerlopen(verleend.tot, kern.nu())) {
+      return { status: 403, error: 'Deze app stond er tot en met ' + verleend.tot + '. Zet hem opnieuw op je startscherm om verder te gaan, of vernietig de cel.',
+        verlopen: true, tot: verleend.tot, sleutel };
+    }
     /* En hij blijft dicht als de aanschaf er niet (meer) is. Dat kan: een lid
        dat een app verwijderde en terugzet, komt langs installeer(); een lid dat
        hem hield terwijl de prijs van nul naar iets ging, komt hier. */
@@ -54,7 +77,14 @@ function maakUitgifte(kern, E) {
          weigering op de brug kan er dan bij zeggen of de app het niet vroeg of
          het lid het niet gaf. Het bepaalt nooit wat er mag -- dat doet
          `machtigingen` hierboven, en dat is wat het lid verleende. */
-      vraagt: toonbaar(v.manifest.machtigingen, v.manifest.doelen) };
+      vraagt: toonbaar(v.manifest.machtigingen, v.manifest.doelen),
+      /* DE CEL ZELF, ZICHTBAAR. De grenzen van dit kanaal zijn het sterkste wat
+         er over deze app te zeggen valt, en ze stonden alleen in een dossier dat
+         je apart moest opzoeken. Ze gaan nu mee met de opening, zodat het scherm
+         eromheen kan tonen waar de app in zit -- afgeleid, niet getypt: het
+         paspoort en de bereikklasse worden op een plek gerekend. */
+      cel: { naam: celnaam(key, sleutel) },
+      paspoort: paspoort({ app: a, versie: v, uitgever: u, verleend }) };
   }
 
   /* De poort van de celroute: mag deze hash van deze app uberhaupt uitgeleverd

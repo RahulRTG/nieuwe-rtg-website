@@ -1,0 +1,14 @@
+{
+  "sleutel": "rtg-tetris",
+  "naam": "Tetris",
+  "versie": "1.0.0",
+  "uitleg": "Vallende blokken. Speel zonder meer, of doe mee aan de arena van dit spel met je codenaam.",
+  "categorie": "spelen",
+  "taal": "nl",
+  "start": "index.html",
+  "arena": { "richting": "hoog", "eenheid": "punten" },
+  "machtigingen": [
+    { "id": "arena.meedoen", "doel": "meedoen-arena" },
+    { "id": "opslag.eigen", "doel": "voortgang-onthouden" }
+  ]
+}

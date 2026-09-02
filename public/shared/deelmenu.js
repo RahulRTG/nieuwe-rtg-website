@@ -34,7 +34,16 @@
          (11,5px halfvet is geen grote tekst), en op champagne stond de actieve
          tab licht op licht. Gemeten over alle schermen: 70 keer, op elk scherm
          dat deze balk draagt. */
-      'color:var(--rtg-muted,var(--muted,var(--zacht,#8A8680)));border-bottom:2px solid transparent;white-space:nowrap;}' +
+      'color:var(--rtg-muted,var(--muted,var(--zacht,#8A8680)));border-bottom:2px solid transparent;white-space:nowrap;' +
+      /* EEN LABEL DAT NIET PAST, WIJKT NIET UIT MAAR DUWT. De balk wikkelt wel
+         (flex-wrap), maar wikkelen verdeelt KNOPPEN over regels en helpt niet
+         tegen een knop die in zijn eentje breder is dan de kolom. Met nowrap
+         erbij groeide zo'n knop gewoon door: op /apps/foundation/veilig.html
+         heet een kopje "Geen bereik? Noodbericht via satelliet", en dat werd
+         op 390px een knop van 333px in een kolom van 317 -- zes pixels buiten
+         het scherm, op een pagina die niet zijwaarts scrolt. De volledige naam
+         blijft staan voor wie hem voorleest; alleen het beeld kort af. */
+      'max-width:100%;overflow:hidden;text-overflow:ellipsis;}' +
     '.rtgdeel-balk button:hover{color:var(--rtg-txt,var(--txt,#F7F5F1));}' +
     '.rtgdeel-balk button[aria-current="true"]{color:var(--rtg-txt,var(--txt,#F7F5F1));' +
       'border-bottom-color:var(--gold,var(--goud,#857007));}' +

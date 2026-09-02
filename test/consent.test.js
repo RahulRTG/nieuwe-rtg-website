@@ -158,7 +158,16 @@ test('het register en het scherm lopen niet uiteen', () => {
     wachtlijstVan: () => ({ lijsten: [{ id: 'w1', aanbiederNaam: 'Zenith Spa', sinds: '2026-08-01' }] }),
     locMijn: () => ({ actief: [{ id: 'l1', supplierName: 'Kikunoi' }] }),
     zorgVan: () => ({ allergenen: ['noten'], dieet: '', medisch: '', delen: true }),
-    toestellenVan: () => ({ toestellen: [{ id: 't1', naam: 'Horloge', geschreven: 3 }] })
+    toestellenVan: () => ({ toestellen: [{ id: 't1', naam: 'Horloge', geschreven: 3 }] }),
+    /* De twee lagen die er later bij kwamen: een zaak die uw echte naam mag
+       opvragen, en de commerciele post van RTG zelf. Ze staan hier omdat deze
+       toets het REGISTER tegen het SCHERM houdt -- een laag die wel in het
+       register staat maar hier niet wordt aangesloten, laat de toets zakken, en
+       dat is precies de bedoeling. */
+    metierBewijs: { mijnToestemmingen: () => ({ toestemmingen: [
+      { code: 'ZAAK-1', zaak: 'Atelier Nord', waarvoor: 'de opdrachtbon', actief: true }] }) },
+    commercieelStand: () => ({ soorten: [
+      { id: 'reisaanbod', naam: 'Reisaanbod', kanalen: ['e-mail'], aan: true }] })
   } });
   const d = alles.consentVan('sleutel');
   assert.deepEqual(d.storingen, []);
@@ -228,5 +237,20 @@ test('een laag die het niet doet, wordt gemeld en niet als leegte getoond', () =
   const d = stuk.consentVan('sleutel');
   assert.ok(d.storingen.length >= 1);
   assert.match(d.storingen[0], /Zorg/i, 'de laag die stukging staat met naam in de melding');
-  assert.equal(d.storingen.length, 8, 'en de zeven lagen die ontbreken melden zich ook, geen stilte');
+
+  /* HET AANTAL WORDT AFGELEID EN NIET OVERGETYPT. Hier stond `8`, de stand van
+     het register op de dag dat deze toets werd geschreven. Toen er twee lagen
+     bij kwamen (metier-naam en commercieel) zakte deze regel zonder dat er iets
+     mis was -- en dat is precies de vorm die dit huis elders bestrijdt.
+
+     Wat de regel WEL moet vastzetten is: geen enkele laag wordt stil. Dat is te
+     meten zonder getal: een kern waarin niets is aangesloten hoort evenveel
+     meldingen te geven als deze, waarin een laag is aangesloten maar stukgaat.
+     Zou een ontbrekende laag stil worden, dan zakt de lege kern hieronder. */
+  const leeg = maak({ kern: {} }).consentVan('sleutel');
+  assert.equal(d.storingen.length, leeg.storingen.length,
+    'een laag die stukgaat en een laag die er niet is, melden zich allebei -- geen stilte');
+  assert.ok(leeg.storingen.length >= 8, 'en dat zijn er minstens zoveel als toen deze toets werd geschreven');
+  assert.deepEqual(leeg.toestemmingen, [],
+    'zonder een aangesloten laag staat er geen enkele toestemming, en dat mag nooit als "niemand kijkt mee" lezen');
 });

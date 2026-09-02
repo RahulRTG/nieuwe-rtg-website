@@ -96,21 +96,16 @@ module.exports = (ctx) => {
      wat intrekken betekent. Wat blijft is een auditregel dat er iets weg is, met
      het aantal, want een intrekking die geen spoor achterlaat is niet te
      controleren en een spoor mét inhoud is de intrekking ongedaan maken. */
+  /* HET WISSEN ZELF STAAT IN ./terugtrekken.js, en deze functie geeft het door.
+
+     Waarom hij niet gewoon is verhuisd: `deelnemerWeg` is de naam die de routes
+     en de rest van de map kennen. Waarom hij niet is gebleven: sinds er ook
+     METINGEN van een deelnemer bestaan (./instrument.js) en conclusies op zijn
+     observaties kunnen leunen (./bewijs.js), is terugtrekken meer dan een lijst
+     filteren -- en twee plekken die allebei "haal deze mens eruit" doen, laten
+     binnen een jaar allebei iets anders staan (LAT-regel 4). */
   function deelnemerWeg(id, b, wie) {
-    const s = vindStudie(id); if (!s) return { status: 404, error: 'Dit onderzoek bestaat niet.' };
-    b = b || {};
-    const a = schoon(b.alias, 40);
-    const p = s.dossier.deelnemers.find(x => x.alias === a);
-    if (!p) return { status: 404, error: 'Deze deelnemer staat niet op dit onderzoek.' };
-    const eigen = s.dossier.observaties.filter(o => o.door === a).length;
-    s.dossier.observaties = s.dossier.observaties.filter(o => o.door !== a);
-    s.dossier.deelnemers = s.dossier.deelnemers.filter(x => x.alias !== a);
-    const voor = K().length;
-    db_koppelWeg(a, s.id);
-    audit(s.labId, 'mens.weg', wie, s.id, a + ': ' + eigen + ' observaties gewist, ' + (voor - K().length) + ' koppelrij(en) gewist');
-    s.dossier.logboek.unshift({ id: rid(), tekst: 'Deelnemer ' + a + ' trok zich terug; zijn ' + eigen + ' observaties zijn gewist.', wie: schoon(wie, 80) || 'lab', at: nu() });
-    save();
-    return { ok: true, gewist: eigen };
+    return ctx.terugtrekken.voerUit(id, schoon((b || {}).alias, 40), wie);
   }
   function db_koppelWeg(a, studieId) {
     const over = K().filter(k => !(k.alias === a && k.studieId === studieId));
@@ -145,5 +140,8 @@ module.exports = (ctx) => {
     return { ok: true, deelnemer: { alias: p.alias, rol: p.rol } };
   }
 
-  return { deelnemerBij, deelnemerWeg, opPas, rolZet };
+  return { deelnemerBij, deelnemerWeg, opPas, rolZet,
+    /* De koppelrij opruimen hoort bij dit bestand (hier woont de koppeling met
+       het Foundation-profiel), maar wordt aangeroepen door ./terugtrekken.js. */
+    koppelWeg: db_koppelWeg };
 };

@@ -61,7 +61,61 @@ const REGISTERS = [
   ['BEPROEVING.json', 'npm run beproeving', 'storm, geld, misbruik en herstel'],
   ['SCHERMLEUGEN.json', 'node --test test/liegend-scherm.e2e.js', 'of een scherm iets toont dat er niet is'],
   ['SABOTAGE.json', 'node scripts/sabotage.js', 'of elke handhaver echt aan staat'],
-  ['WAAROM.json', 'node scripts/waarom.js --vastleggen', 'waarom een route niet te bewijzen valt, in zijn eigen woorden']
+  ['WAAROM.json', 'node scripts/waarom.js --vastleggen', 'waarom een route niet te bewijzen valt, in zijn eigen woorden'],
+  /* EN DE SCHULDENLIJST. Hij leest de registers hierboven en is dus per
+     definitie zo oud als de oudste daarvan -- maar hij droeg zijn eigen
+     ouderdom niet uit. Gevonden op 31 augustus 2026: tien dagen stil, 126
+     commits achter, en gemeten op een vuile boom. Precies het gat waar dit
+     instrument voor bestaat, en het stond er zelf niet in. */
+  ['BEWIJSSCHULD.json', 'node scripts/bewijsschuld.js --vastleggen', 'wat er nog niet gemeten is, en waarom niet'],
+  /* TIEN REGISTERS DIE HIER NIET IN STONDEN, en dat was het gat waar dit
+     instrument juist voor is. Zeven ervan droegen zelfs helemaal geen stempel:
+     hun ouderdom was niet vast te stellen, en ze zeiden dat ook niet -- ze
+     toonden gewoon getallen. Gevonden bij de vraag "wat staat er nog open",
+     nadat dertien instrumenten bleken stil te staan zonder dat iets het meldde.
+
+     Ze staan hier in de volgorde waarin ze iets over de code zeggen: eerst de
+     vier route-proeven, dan de rondes, dan de meters die over de machine gaan. */
+  ['AUDITPROEF.json', 'npm run auditproef', 'of een geslaagde schrijfactie een regel in het API-spoor nalaat'],
+  ['HANDELINGPROEF.json', 'npm run handelingproef', 'of een geslaagde schrijfactie een geketende regel nalaat'],
+  ['UITVOERPROEF.json', 'npm run uitvoerproef', 'of een 2xx-antwoord gegevens teruggeeft die er niet in horen'],
+  ['IDOR.json', 'node scripts/idorproef.js', 'of het object van een ander te openen is'],
+  ['ROLRONDE.json', 'node scripts/rolronde.js', 'welke rol waar binnenkomt, gevraagd aan een echte server'],
+  ['GLUURRONDE.json', 'node scripts/gluurronde.js', 'de horizontale scheiding tussen twee leden'],
+  ['VERRAAD.json', 'node scripts/verraadronde.js', 'wat een verraden seed of zegel doet'],
+  ['INHOUDSKAART.json', 'node scripts/inhoudskaart.js', 'wat elke route werkelijk teruggeeft'],
+  ['OUTPUTPROEF.json', 'node scripts/outputproef.js', 'of de uitvoerband klopt'],
+  ['DUURZAAMHEIDSKOSTEN.json', 'node scripts/duurzaamheidskosten.js', 'wat een commit aan machine en opslag kost'],
+
+  /* De twee boekhoudkundige registers. Ze meten geen gedrag maar TELLINGEN, en
+     juist daar doet veroudering pijn: een schuldgetal van vorige maand naast een
+     routelijst van vandaag leest als vooruitgang. */
+  ['IDEMSCHULD.json', 'npm run idemschuld:vast', 'welke schrijfroutes nog geen besluit over duplicaatgedrag dragen'],
+  ['MUTATIEBOEK.json', 'npm run mutatieboek:vast', 'in welke bak elke route valt, en of de optelling sluit'],
+  ['ONBEWEZEN.json', 'npm run onbewezen:vast', 'waarom een mutatie geen geldig bewijs heeft, van goedkoop naar duur'],
+  ['HANDLERWACHT.json', 'npm run handlerwacht:vast', 'wie de routes bewaakt waar de router geen bewakerslaag ziet'],
+
+  /* ACHT METERS DIE MET DE SAMENVOEGING BINNENKWAMEN.
+
+     Ze stonden nergens onder toezicht, en dat is precies het gat dat
+     test/versheidsdekking.test.js dicht hoort te houden: een verouderd register
+     geeft getallen, en getallen worden geloofd. Bij deze acht is dat geen
+     theorie -- vier ervan meten in een ECHTE browser of tegen een DRAAIENDE
+     server, en zo'n meting hoort bij de code van die dag en bij geen andere.
+
+     Vijf van de acht dragen (nog) geen stempel. Dat wordt hier niet weggepoetst:
+     versheid meldt ze dan als "ouderdom niet vast te stellen", en dat is de
+     eerlijke uitslag en tevens de aansporing om er een te zetten. Ze hier
+     WEGLATEN omdat ze geen stempel hebben, zou de meter stil maken over precies
+     de registers waarover het minst bekend is. */
+  ['TIKKEN.json', 'npm run tikken', 'hoeveel tikken elke functie van het beginscherm af ligt, in een echte browser'],
+  ['VINDBAAR.json', 'npm run vindbaar', 'of je een functie terugvindt met het woord dat erop staat'],
+  ['WERELDSTIJL.json', 'npm run wereldstijl', 'of elk scherm de vormtaal van zijn wereld draagt'],
+  ['SCHERMMUTATIES.json', 'npm run mutatie:scherm', 'of een schermtoets het merkt als er iets van het scherm verdwijnt'],
+  ['RESOLVERBEREIK.json', 'npm run resolverbereik', 'de dekking van de resolver over elke toegestane route'],
+  ['HERSTELPROEF.json', 'npm run herstelproef', 'of de tegenhanger werkelijk ongedaan maakt wat de heenweg deed'],
+  ['DROOGLOOP.json', 'npm run droogloop', 'een plan werkelijk laten lopen, maar nergens waar het telt'],
+  ['ONDERZOEKSKETEN.json', 'npm run onderzoeksketen', 'welke stations van het onderzoek van elkaar weten']
 ];
 
 /* Het stempel van een register. Twee vormen, en dat is historie en geen smaak:

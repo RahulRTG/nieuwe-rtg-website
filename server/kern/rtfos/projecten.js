@@ -42,7 +42,13 @@ const SOORTEN = {
   ouderen: 'elderly_support', eenzaamheid: 'elderly_support',
   vervoer: 'transport_support', taal: 'city_projects', schuldhulp: 'city_projects',
   werk: 'city_projects', digitaal: 'city_projects', noodfonds: 'emergency_fund',
-  evenement: 'events', ondernemers: 'business_sponsorships', overig: 'city_projects'
+  evenement: 'events', ondernemers: 'business_sponsorships',
+  /* Duurzaamheid als eigen soort werk, onder de stadsprojecten. Het Klimaatfonds
+     toonde tot nu toe alleen VRAGEN uit het Living Lab (soort 'duurzaam' daar);
+     wat ontbrak was de andere helft -- het werk dat eruit voortkomt, en dus iets
+     om een gift aan vast te zetten. Onder city_projects en niet onder een eigen
+     modulevlag: een stad die stadsprojecten aan heeft staan, kan dit werk doen. */
+  duurzaam: 'city_projects', overig: 'city_projects'
 };
 
 module.exports = (ctx) => {

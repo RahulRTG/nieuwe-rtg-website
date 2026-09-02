@@ -52,6 +52,7 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-kaleronde').CONTRACTEN,
   require('./mutatiecontracten-kaleronde-b').CONTRACTEN,
   require('./mutatiecontracten-tweedehandeling-b').CONTRACTEN,
+  require('./mutatiecontracten-samenvoeging').CONTRACTEN,
   require('./mutatiecontracten-beschermzaak').CONTRACTEN,
   require('./mutatiecontracten-knelpunt').CONTRACTEN,
   require('./mutatiecontracten-opvangwijzer').CONTRACTEN,
@@ -81,7 +82,8 @@ const CONTRACTEN = Object.assign({},
     require('./mutatiecontracten-padparameter').CONTRACTEN,
     require('./mutatiecontracten-kaleronde').CONTRACTEN,
     require('./mutatiecontracten-kaleronde-b').CONTRACTEN,
-    require('./mutatiecontracten-tweedehandeling-b').CONTRACTEN);
+    require('./mutatiecontracten-tweedehandeling-b').CONTRACTEN,
+    require('./mutatiecontracten-samenvoeging').CONTRACTEN);
   const overschreven = Object.keys(effect).filter(k => k in eerder);
   if (overschreven.length) {
     throw new Error('mutatiecontracten: ./mutatiecontracten-effect overschrijft een specifieker ' +

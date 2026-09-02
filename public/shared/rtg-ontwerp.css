@@ -172,10 +172,18 @@
 /* ------------------------------------------------------------- action line -- */
 /* Wat er nu moet gebeuren, of waarop gewacht wordt. Hiermee wordt een scherm
    procesgedreven in plaats van beschrijvend. */
+/* DE ACTIELIJN IS RUSTENDE TEKST EN LEEST DAAROM DE LEESTOON. Hier stond
+   color:var(--rtg-goud), en dat token is een vulkleur (rtg-themas.css). Onder
+   onyx maakt het niets uit -- accent en leestoon zijn allebei #C0A544 -- maar in
+   een bordeaux-eiland zoals geld.html is het accent #C23A5E en leest hij op de
+   kaart (#2A0713) 3,57:1 bij 11,8px. Geen enkel scherm zet vandaag een
+   .rtg-actie in zijn markup, dus de poort kon dit niet vinden; de regel is uit
+   de token-afspraak gerepareerd en met een ingeplant element nagemeten.
+   .rtg-ref:hover hierboven houdt het accent: een hover is kortstondig. */
 .rtg-actie{
   display:inline-flex;align-items:center;gap:0.4em;
   font-size:0.74rem;letter-spacing:0.08em;text-transform:uppercase;
-  color:var(--rtg-goud);
+  color:var(--rtg-leesgoud,var(--rtg-goud));
 }
 .rtg-actie[data-wacht]{color:var(--rtg-soft);}
 
@@ -276,7 +284,7 @@
    anders uit. ONTWERP.md par. 4 wijst goud aan als "autoriteit, primair" -- en
    een bevestiging is precies dat. Zelfde paring als .knop.vol in rtg-ui.css,
    inclusief de donkere inkt (7,5:1 op goud). */
-.rtg-bedoeling button.doen{background:var(--rtg-goud);border-color:var(--rtg-goud);color:#1C1608;}
+.rtg-bedoeling button.doen{background:var(--rtg-goud);border-color:var(--rtg-goud);color:var(--rtg-opgoud,#1C1608);}
 .rtg-bedoeling button:focus-visible{outline:2px solid var(--rtg-goud);outline-offset:2px;}
 .rtg-bedoeling .fout{color:var(--rtg-sig-incident);font-size:0.85rem;margin-top:var(--rtg-ruim-klein);}
 

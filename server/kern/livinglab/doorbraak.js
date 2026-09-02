@@ -99,7 +99,13 @@ module.exports = (ctx) => {
     const veld = ctx.lab.VELDEN[b.veld] ? b.veld : null;
     if (!veld) return { status: 400, error: 'Kies een onderzoeksveld van het Onderzoekslab: ' + Object.keys(ctx.lab.VELDEN).join(', ') + '.' };
     const r = ctx.lab.projectMaak({ titel: x.titel, veld, voorWie: 'samen',
-      doel: (x.omschrijving || s.vraagstuk).slice(0, 400), budget: x.bedrag }, schoon(wie, 80));
+      doel: (x.omschrijving || s.vraagstuk).slice(0, 400), budget: x.bedrag,
+      /* De herkomst gaat mee als GEGEVEN en niet alleen als logregel: vanaf het
+         project moet je het onderzoek kunnen terugvinden waar het uit kwam. Het
+         onderzoeksnummer gaat mee zodat die verwijzing ook buiten de software
+         naar hetzelfde ding wijst. */
+      herkomst: { systeem: 'livinglab', studieId: s.id, uitgangId: x.id, nummer: s.nummer || null } },
+      schoon(wie, 80));
     if (r.error) return r;
     x.koppeling = { systeem: 'onderzoekslab', id: r.project.id, at: nu() };
     ctx.lab.logMaak(r.project.id, 'Komt uit het Living Lab (' + s.titel + '), bewijsgraad ' + (kader.graad(x.graad) || {}).naam + '.', 'livinglab');

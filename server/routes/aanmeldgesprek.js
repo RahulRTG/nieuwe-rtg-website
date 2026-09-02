@@ -12,6 +12,8 @@
 const vertaler = require('../translate');
 const { NL2EN } = require('../translate/woordenboek');
 
+const { legInlogVast } = require('../kern/identiteit/inlogherkomst');
+
 module.exports = (kern) => {
   const { app, intakeStart, intakeZeg, accounts, stateFor } = kern;
 
@@ -74,6 +76,13 @@ module.exports = (kern) => {
       if (!user) return res.status(401).json({ error: await naarTaal('Inloggen lukte net niet; probeer het opnieuw.', lang) });
       const token = accounts.issueToken(user.id);
       const sess = { tier: user.tier, key: 'user-' + user.id, account: user };
+      /* MIJN RTG blok 1. Dit pad logt in met SLEUTELWOORDEN (zie de sw-stappen in
+         kern/aanmeldgesprek-inlog.js) en niet met een wachtwoord. Die twee als
+         hetzelfde opschrijven zou het sessiescherm laten zeggen dat iemand een
+         wachtwoord gebruikte terwijl dat niet zo is -- en juist bij een melding
+         "dit was ik niet" is dat het eerste wat een mens narekent. */
+      legInlogVast({ sessieregister: kern.sessieregister, accounts, token, lidKey: sess.key,
+        type: 'sleutelwoorden', assurance: 'kennis', methode: 'gemeten', bron: 'aanmeldgesprek' });
       return res.json({ tekst: await naarTaal(r.tekst, lang), ingelogd: true, token, state: stateFor(sess, lang) });
     }
     r.tekst = await naarTaal(r.tekst, lang);

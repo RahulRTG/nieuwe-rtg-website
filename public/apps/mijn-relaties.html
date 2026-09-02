@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Wie heeft toegang tot mij</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+  :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--card2:var(--rtg-card2);--line:var(--rtg-line);
+    --txt:var(--rtg-txt);--soft:var(--rtg-soft);--gold:#C9A24B;--rood:#DE6E92;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;min-height:100dvh;}
+  .kop{display:flex;align-items:center;gap:0.7rem;padding:calc(env(safe-area-inset-top,0px) + 0.9rem) 1.1rem 0.6rem;}
+  .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.35rem;}
+  .kop .rek{flex:1;}
+  .kop a{color:var(--txt);text-decoration:none;font-size:1.1rem;min-width:24px;min-height:24px;
+    display:inline-flex;align-items:center;justify-content:center;}
+  main{padding:0 1.1rem calc(env(safe-area-inset-bottom,0px) + 3rem);max-width:660px;margin:0 auto;}
+  h2{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);margin:1.7rem 0 0.6rem;}
+  .stil{color:var(--soft);font-size:0.82rem;line-height:1.6;}
+  button{font:inherit;cursor:pointer;}
+  .knop{background:var(--card);border:1px solid var(--line);border-radius:0;color:var(--txt);
+    font-size:0.85rem;padding:0.6rem 0.95rem;min-height:44px;}
+  .knop.rood{border-color:rgba(222,110,146,0.55);color:var(--rood);}
+  .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;font-weight:600;}
+  .knop:focus-visible,summary:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  .knop[disabled]{opacity:0.5;cursor:default;}
+
+  .partij{background:var(--card);border:1px solid var(--line);padding:1.15rem;margin:0.75rem 0;}
+  .partijkop{display:flex;align-items:baseline;gap:0.6rem;flex-wrap:wrap;}
+  .partijkop .naam{font-family:'Bodoni Moda',serif;font-size:1.1rem;}
+  .telling{font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);}
+  /* Wat een partij mag: een regel per stuk, met een gouden streep ervoor.
+     Geen bolletjes -- dit is geen opsomming maar een lijst bevoegdheden. */
+  .mag{display:flex;gap:0.7rem;padding:0.6rem 0;border-top:1px solid var(--line);
+    background:transparent !important;border-left:0 !important;border-right:0 !important;border-bottom:0 !important;}
+  .mag:first-of-type{margin-top:0.85rem;}
+  .mag i{width:10px;height:1px;background:var(--gold);flex:0 0 auto;margin-top:0.62rem;}
+  .mag .tekst{flex:1;}
+  .mag .wat{font-size:0.85rem;line-height:1.5;}
+  /* De geldigheid ONDER de regel en niet ernaast: bij een aflopende tekst
+     kwam de datum middenin te hangen en leek hij bij de volgende regel te
+     horen. Een vervaldatum die bij het verkeerde recht lijkt te staan, is
+     erger dan geen vervaldatum. */
+  .mag .tot{display:block;font-size:0.68rem;color:var(--soft);margin-top:0.25rem;}
+  .acties{display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:1.1rem;}
+
+  /* De gevolgen: een aparte staat binnen de kaart, niet een venster erover.
+     Simulatie vóór uitvoering (MIJNRTG.md), dus hij hoort bij het ding waar
+     hij over gaat. */
+  .gevolg{border-top:1px solid var(--line);margin-top:1rem;padding-top:0.9rem;}
+  .gevolg h3{font-size:0.68rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-bottom:0.5rem;}
+  .gevolg ul{list-style:none;margin:0 0 0.9rem;}
+  .gevolg li{font-size:0.82rem;line-height:1.55;padding:0.28rem 0 0.28rem 0.9rem;position:relative;}
+  .gevolg li::before{content:'';position:absolute;left:0;top:0.85rem;width:5px;height:1px;background:var(--soft);}
+  .gevolg .waarschuw{color:var(--soft);}
+
+  .let{border:1px solid var(--line);border-left:3px solid var(--gold);background:var(--card2);
+    padding:0.85rem 1rem;margin:0.9rem 0;font-size:0.8rem;line-height:1.6;}
+  .grens{border:1px solid var(--line);padding:0.85rem 1rem;margin:0.6rem 0;font-size:0.8rem;line-height:1.6;}
+  .grens b{font-weight:600;}
+  .grens span{color:var(--soft);display:block;margin-top:0.2rem;}
+  .melding{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 1rem);transform:translateX(-50%);
+    background:var(--card2);border:1px solid var(--line);padding:0.55rem 1rem;font-size:0.8rem;
+    max-width:88vw;opacity:0;pointer-events:none;transition:opacity 0.25s;}
+  .melding.zien{opacity:1;}
+  details summary{cursor:pointer;font-size:0.74rem;color:var(--soft);padding:0.6rem 0;min-height:24px;
+    display:flex;align-items:center;gap:0.5rem;list-style:none;}
+  details summary::-webkit-details-marker{display:none;}
+  details summary::before{content:'+';font-size:0.9rem;line-height:1;width:0.9rem;text-align:center;color:var(--gold);}
+  details[open] summary::before{content:'\2013';}
+  details[open] summary{color:var(--txt);}
+  .weg{display:none !important;}
+  @media (prefers-reduced-motion: reduce){ *{transition:none !important;} }
+</style>
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<script src="/shared/seizoen.js" defer></script>
+<link href="/shared/ios.css" rel="stylesheet">
+</head>
+<body class="rtg-stijl">
+<header class="kop">
+  <a href="/apps/app.html" aria-label="Terug naar de app">&#8592;</a>
+  <h1>Wie heeft toegang tot mij</h1>
+  <span class="rek"></span>
+</header>
+<main>
+  <p class="stil">Hier staat wat er op dit moment openstaat, gegroepeerd per partij in plaats van per soort.
+    Alles wat u hier ziet, kunt u hier ook sluiten. Wat dit scherm niet dekt, staat er onderaan bij.</p>
+  <div id="lijst"><p class="stil">Bezig met ophalen&#8230;</p></div>
+  <div id="los"></div>
+  <div id="grenzen"></div>
+</main>
+<div class="melding" id="melding" role="status" aria-live="polite"></div>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const token = (() => { try { return localStorage.getItem('rtg_member_token'); } catch (e) { return null; } })();
+  const api = (pad, body) => fetch(pad, { method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
+    body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+  let meldT;
+  const zeg = t => { const m = $('#melding'); m.textContent = t; m.classList.add('zien');
+    clearTimeout(meldT); meldT = setTimeout(() => m.classList.remove('zien'), 5000); };
+  const maak = (tag, klas) => { const e = document.createElement(tag); if (klas) e.className = klas; return e; };
+  const tekst = (el, t) => { el.textContent = t; return el; };
+
+  function magRij(r) {
+    const el = maak('div', 'mag');
+    el.appendChild(maak('i'));
+    const t = maak('div', 'tekst');
+    t.appendChild(tekst(maak('div', 'wat'), r.wat));
+    if (r.tot) t.appendChild(tekst(maak('span', 'tot'), 'geldig tot ' + r.tot));
+    el.appendChild(t);
+    return el;
+  }
+
+  /* DE GEVOLGEN, IN DE KAART ZELF. Niet in een venster eroverheen: dit is een
+     voorbeschouwing van wat er met DEZE partij gebeurt, en die hoort te staan
+     waar die partij staat. De bevestigknop verschijnt pas hier, zodat sluiten
+     nooit een enkele tik is. */
+  async function toonGevolgen(kaart, partij, knop) {
+    knop.disabled = true;
+    const r = await api('/api/toestemming/relatie/gevolgen', { partij });
+    knop.disabled = false;
+    if (r.body.error) return zeg(r.body.error);
+    const oud = kaart.querySelector('.gevolg'); if (oud) oud.remove();
+    /* De sluitknop gaat weg zolang de voorbeschouwing staat: twee knoppen die
+       allebei "sluiten" heten, waarvan er een de gevolgen overslaat, is precies
+       de tik die je hier niet wilt kunnen maken. */
+    knop.closest('.acties').classList.add('weg');
+    const g = maak('div', 'gevolg');
+
+    const kop = maak('h3');
+    kop.textContent = 'Dit gebeurt er: ' + r.body.sluit.length + ' ' +
+      (r.body.sluit.length === 1 ? 'toestemming wordt ingetrokken' : 'toestemmingen worden ingetrokken');
+    g.appendChild(kop);
+    const ul = maak('ul');
+    for (const s of r.body.sluit) ul.appendChild(tekst(maak('li'), s.wat));
+    g.appendChild(ul);
+
+    if (r.body.blijft.length) {
+      g.appendChild(tekst(maak('h3'), 'Dit blijft staan'));
+      const b = maak('ul');
+      for (const s of r.body.blijft) b.appendChild(tekst(maak('li'), s.wat + ': ' + s.reden));
+      g.appendChild(b);
+    }
+
+    /* Wat de voorbeschouwing NIET heeft gerekend, staat er even groot bij. Een
+       preview die alleen het geruststellende deel toont, koopt vertrouwen dat
+       hij niet heeft verdiend. */
+    g.appendChild(tekst(maak('h3'), 'Wat hier niet mee ophoudt'));
+    const n = maak('ul');
+    for (const t of r.body.nietGerekend) n.appendChild(tekst(maak('li', 'waarschuw'), t));
+    g.appendChild(n);
+
+    const rij = maak('div', 'acties');
+    const bevestig = maak('button', 'knop rood');
+    bevestig.type = 'button';
+    bevestig.textContent = 'Ja, sluit deze ' + r.body.sluit.length + ' toestemming(en)';
+    bevestig.addEventListener('click', () => sluit(partij, bevestig));
+    const terug = maak('button', 'knop');
+    terug.type = 'button';
+    terug.textContent = 'Laat maar';
+    terug.addEventListener('click', () => { g.remove(); knop.closest('.acties').classList.remove('weg'); });
+    rij.appendChild(bevestig); rij.appendChild(terug);
+    g.appendChild(rij);
+    kaart.appendChild(g);
+  }
+
+  async function sluit(partij, knop) {
+    knop.disabled = true;
+    const r = await api('/api/toestemming/relatie/sluit', { partij });
+    if (r.body.error) { knop.disabled = false; return zeg(r.body.error); }
+    zeg(r.body.mislukt
+      ? r.body.gesloten + ' gesloten, ' + r.body.mislukt + ' niet gelukt. Zie de lijst.'
+      : r.body.gesloten + ' toestemming(en) ingetrokken.');
+    laad();
+  }
+
+  function kaartVoor(rel) {
+    const el = maak('article', 'partij');
+    const kop = maak('div', 'partijkop');
+    kop.appendChild(tekst(maak('span', 'naam'), rel.naam));
+    kop.appendChild(tekst(maak('span', 'telling'), rel.aantal + (rel.aantal === 1 ? ' toestemming' : ' toestemmingen')));
+    el.appendChild(kop);
+    for (const r of rel.rijen) el.appendChild(magRij(r));
+    const acties = maak('div', 'acties');
+    const knop = maak('button', 'knop rood');
+    knop.type = 'button';
+    knop.textContent = 'Sluit deze relatie';
+    knop.setAttribute('aria-label', 'Sluit de relatie met ' + rel.naam);
+    knop.addEventListener('click', () => toonGevolgen(el, rel.partij, knop));
+    acties.appendChild(knop);
+    el.appendChild(acties);
+    return el;
+  }
+
+  async function laad() {
+    const r = await api('/api/toestemming/relaties');
+    const lijst = $('#lijst'); lijst.textContent = '';
+    if (r.status === 401) { lijst.appendChild(tekst(maak('p', 'stil'), 'Log in om dit te zien.')); return; }
+    if (r.body.error) { lijst.appendChild(tekst(maak('p', 'stil'), r.body.error)); return; }
+
+    const rel = r.body.relaties || [];
+    lijst.appendChild(tekst(maak('h2'), rel.length ? 'Partijen met toegang' : 'Partijen met toegang'));
+    if (!rel.length) {
+      lijst.appendChild(tekst(maak('p', 'stil'),
+        'Er staat op dit moment niets open bij een partij. Dat betekent niet dat niemand ooit iets van u heeft gezien; wat al gebeurd is, staat op uw inzagekaart.'));
+    }
+    for (const x of rel) lijst.appendChild(kaartVoor(x));
+
+    /* Storingen eerst: als een laag niet gelezen kon worden, is deze lijst
+       onvolledig en dat hoort bovenaan te staan en niet onderaan. */
+    if ((r.body.storingen || []).length) {
+      const w = maak('div', 'let');
+      w.textContent = 'Let op: ' + r.body.storingen.length + ' laag/lagen konden niet worden gelezen, dus deze lijst is nu onvolledig. ' + r.body.storingen.join(' | ');
+      lijst.prepend(w);
+    }
+
+    const los = $('#los'); los.textContent = '';
+    if (r.body.nietGebonden) {
+      los.appendChild(tekst(maak('h2'), 'Niet aan een partij gebonden'));
+      los.appendChild(tekst(maak('p', 'stil'), r.body.nietGebonden.uitleg));
+      const k = maak('article', 'partij');
+      for (const rij of r.body.nietGebonden.rijen) k.appendChild(magRij(rij));
+      los.appendChild(k);
+    }
+
+    const gr = $('#grenzen'); gr.textContent = '';
+    gr.appendChild(tekst(maak('h2'), 'Wat dit scherm niet dekt'));
+    gr.appendChild(tekst(maak('p', 'stil'), r.body.voorbehoud || ''));
+    for (const b of (r.body.buiten || []).concat(r.body.nietGedekt || [])) {
+      const d = maak('div', 'grens');
+      d.appendChild(tekst(maak('b'), b.naam));
+      d.appendChild(tekst(maak('span'), b.reden));
+      gr.appendChild(d);
+    }
+  }
+
+  laad();
+})();
+</script>
+<script src="/shared/toestelsleutel.js"></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+</body>
+</html>

@@ -118,7 +118,7 @@ function maakSimulatie({ db, runbooks, zaken, beleid, risico, register }) {
       getal: (k, d) => k === id ? Number(nieuweWaarde) : beleid.getal(k, d),
       waarde: (k, d) => k === id ? nieuweWaarde : beleid.waarde(k, d)
     };
-    const proefRisico = require('./risico').maakRisico({ beleid: schaduw });
+    const proefRisico = require('../frictie').maakRisico({ beleid: schaduw });
     const na = rbs.map(rb => {
       const vol = runbooks.OP_ID.get(rb.id);
       const o = proefRisico.beoordeel(vol.actie, { aantal: rb.kandidaten || 1,

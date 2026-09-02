@@ -32,7 +32,7 @@
 const klok = require('../../lib/klok');
 
 const poorten = require('./transactie-poorten');
-const { NIVEAUS } = require('./risico');
+const { NIVEAUS } = require('../frictie');
 
 /* Zonder certificaat draait een recept gewoon, maar dan zonder bovengrens en
    met alleen de universele verificatie. Een standaardcertificaat verzinnen zou

@@ -32,4 +32,11 @@ Object.assign(kern, require('../kern/socialewereld').maakSocialeWereld({ kern })
    niets zelf op wat een domein al optelt. Geldbeleid en geldgraaf mounten
    direct hierna in ./kernlaag3b.js: de omvangregel hield ze hier weg. */
 Object.assign(kern, require('../kern/geldwereld').maakGeldwereld({ kern }));
+/* Het Experience Platform projecteert deze wereldlagen en de later gemounte
+   levenslijn. Het krijgt de kern daarom bij referentie en leest pas per
+   verzoek; het wordt nooit een tweede eigenaar van hun gegevens. */
+Object.assign(kern, require('../kern/experience').maakExperience({
+  kern, db: hulp.db, save: hulp.save, crypto: hulp.crypto,
+  bijeen: hulp.bijeen, inBundel: hulp.inBundel
+}));
 };

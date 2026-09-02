@@ -1,7 +1,8 @@
 :root{
-  --onyx:#080909;--graphite:#111313;--graphite-2:#171919;--ivory:#f1ede5;
-  --muted:#969995;--line:#2a2d2d;--line-soft:#1d2020;--wine:#8e0f36;
-  --wine-bright:#e24a73;--gold:#cba65f;--green:#35bd72;--danger:#e24a73;
+  --werkbreedte:min(100%,1680px);
+  --onyx:#170409;--graphite:#24060f;--graphite-2:#2c0812;--ivory:#f1ede5;
+  --muted:#969995;--line:#430f1f;--line-soft:#360916;--wine:#7F1634;
+  --wine-bright:#9E1C40;--wine-licht:#C23A5E;--green:#35bd72;--danger:#C23A5E;
   --sans:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   --serif:"Bodoni Moda",Didot,serif;--header:88px;--nav:88px;
   color-scheme:dark;
@@ -24,38 +25,42 @@ svg{display:block;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:
 .skip{position:fixed;left:1rem;top:-5rem;z-index:1000;background:var(--ivory);color:var(--onyx);padding:.75rem 1rem;text-decoration:none;font-weight:700;transition:top .16s}
 .skip:focus{top:0}
 .sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-.reisapp{min-height:100dvh;background:linear-gradient(180deg,#0b0c0c 0,var(--onyx) 24rem)}
+.reisapp{min-height:100dvh;background:linear-gradient(180deg,#1b050b 0,var(--onyx) 24rem)}
 
-.prestatiekop{position:sticky;top:0;z-index:30;height:calc(var(--header) + env(safe-area-inset-top));padding:env(safe-area-inset-top) clamp(1.15rem,4vw,2.25rem) 0;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;border-bottom:1px solid var(--wine);background:rgba(8,9,9,.93);backdrop-filter:blur(20px)}
-.rtgmerk{justify-self:start;color:var(--gold);font:600 2rem/1 var(--serif);text-decoration:none;letter-spacing:-.035em}
+.prestatiekop{position:sticky;top:0;z-index:30;height:calc(var(--header) + env(safe-area-inset-top));padding:env(safe-area-inset-top) clamp(1.15rem,4vw,2.25rem) 0;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;border-bottom:1px solid var(--wine);background:rgba(26,5,12,.93);backdrop-filter:blur(20px)}
+.rtgmerk{justify-self:start;color:var(--wine-licht);font:600 2rem/1 var(--serif);text-decoration:none;letter-spacing:-.035em}
 .prestatiekop>p{margin:0;font-size:.78rem;font-weight:650;letter-spacing:.25em}
 .veiligknop{justify-self:end;display:flex;align-items:center;gap:.48rem;min-height:44px;border:0;background:none;color:var(--ivory);padding:0;font-size:.61rem;font-weight:650;letter-spacing:.16em}
 .veiligknop svg{width:20px;height:20px}.veiligknop i{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 14px rgba(53,189,114,.55)}
 
 main{min-height:calc(100dvh - var(--header));padding-bottom:calc(var(--nav) + env(safe-area-inset-bottom))}
 .appblad{min-height:calc(100dvh - var(--header) - var(--nav));animation:blad-in .28s ease both}
-.bladbinnen{width:min(100%,1180px);margin:0 auto;padding:clamp(2rem,5vw,4.5rem) clamp(1.2rem,4vw,3.2rem) 4rem}
-.micro{margin:0;color:#b5b7b3;font-size:.65rem;font-weight:650;letter-spacing:.22em;text-transform:uppercase}
+.bladbinnen{width:var(--werkbreedte);margin:0 auto;padding:clamp(1.2rem,2.5vw,2.2rem) clamp(1.2rem,2.5vw,2.4rem) 3.5rem}
+/* Op fluweel haalt #b5b7b3 4,2:1; deze tint 5,95. */
+.micro{margin:0;color:#E7D3D8;font-size:.65rem;font-weight:650;letter-spacing:.22em;text-transform:uppercase}
 .sub,.sectiekop>p:last-child{color:var(--muted)}
 .tekstknop{border:0;border-bottom:1px solid var(--wine);background:none;color:var(--ivory);padding:.4rem 0;font-size:.62rem;font-weight:700;letter-spacing:.16em}
 
-.dagkop{position:relative;isolation:isolate;min-height:clamp(340px,44vw,500px);display:flex;align-items:flex-end;margin-bottom:clamp(2rem,5vw,3.6rem);padding:clamp(1.5rem,4vw,3.25rem);overflow:hidden;border:1px solid #343737;background-image:linear-gradient(90deg,rgba(5,6,6,.96) 0,rgba(5,6,6,.75) 38%,rgba(5,6,6,.16) 76%),linear-gradient(0deg,rgba(5,6,6,.93),transparent 56%),url('/images/travelos/ibiza-chauffeur.jpg');background-size:cover;background-position:center 58%;box-shadow:0 34px 90px rgba(0,0,0,.34)}
-.dagkop::before{content:"";position:absolute;z-index:-1;inset:0;background:linear-gradient(115deg,transparent 55%,rgba(203,166,95,.08));pointer-events:none}
-.dagkop-inhoud{position:relative;z-index:1;width:min(72%,760px)}
-.reisdag-klok{position:absolute;z-index:2;right:clamp(1.1rem,3vw,2.5rem);bottom:clamp(1.1rem,3vw,2.5rem);display:flex;flex-direction:column;align-items:center;gap:.45rem;padding:1rem;background:rgba(5,6,6,.62);border:1px solid rgba(203,166,95,.4);backdrop-filter:blur(10px)}
-.reisdag-klok>span{color:var(--gold);font-size:.55rem;font-weight:680;letter-spacing:.19em}
-.reisdag-klok>[data-rtg-klok]{--rtg-klok-maat:clamp(8rem,17vw,11.5rem)}
-.bestemmingkop{display:flex;align-items:end;justify-content:space-between;gap:1rem;margin-top:.65rem}
-.bestemmingkop h1{margin:0;font:800 clamp(4.1rem,18vw,8rem)/.88 var(--sans);letter-spacing:-.07em;text-transform:uppercase}
-.gereed{margin-bottom:.35rem;color:var(--ivory);font-size:.78rem;font-weight:650;letter-spacing:.22em;white-space:nowrap}.gereed::first-letter{color:var(--gold)}
-.dagkop .sub{margin:.85rem 0 0;font-size:1rem}
-.vandaagraster{display:grid;gap:2rem}
-.volgendblok{position:relative;overflow:hidden;border:1px solid #363939;background:linear-gradient(115deg,#141616 0,#0d0f0f 70%);padding:1.6rem 1.55rem 1.45rem}
-.volgendblok::after{content:"";position:absolute;right:-4rem;top:-2rem;width:9rem;height:130%;border-left:1px solid #272a2a;transform:skew(-17deg);background:repeating-linear-gradient(90deg,transparent 0,transparent 7px,#181a1a 8px,#181a1a 9px);pointer-events:none}
+.dagkop{position:relative;isolation:isolate;container-type:inline-size;min-height:clamp(230px,24vw,330px);display:flex;align-items:flex-end;padding:clamp(1.1rem,2.5vw,1.8rem);overflow:hidden;border:1px solid #4f1324;background-image:linear-gradient(90deg,rgba(24,4,10,.96) 0,rgba(24,4,10,.75) 38%,rgba(24,4,10,.16) 76%),linear-gradient(0deg,rgba(24,4,10,.93),transparent 56%),url('/images/travelos/ibiza-chauffeur.jpg');background-size:cover;background-position:center 58%;box-shadow:0 34px 90px rgba(0,0,0,.34)}
+.dagkop::before{content:"";position:absolute;z-index:-1;inset:0;background:linear-gradient(115deg,transparent 55%,rgba(194,58,94,.08));pointer-events:none}
+.dagkop-inhoud{position:relative;z-index:1;width:min(88%,520px)}
+.bestemmingkop{display:flex;flex-direction:column;align-items:flex-start;gap:.7rem;margin-top:.65rem}
+.bestemmingkop h1{margin:0;font:800 clamp(3rem,13cqi,7.4rem)/.88 var(--sans);letter-spacing:-.07em;text-transform:uppercase}
+.gereed{display:inline-flex;align-items:center;border:1px solid var(--line);padding:.3rem .6rem;color:var(--ivory);font-size:.78rem;font-weight:650;letter-spacing:.22em;white-space:nowrap}.gereed::first-letter{color:var(--wine-licht)}
+/* DE KOP STAAT OP FLUWEEL EN NIET OP ZWART. Het huisgrijs (#b5b7b3) en het
+   zachte roze halen daar 3,48:1; op deze grond hoort ivoor. De a11y-poort ving
+   het op het beginscherm zelf. */
+.dagkop .sub{margin:.85rem 0 0;font-size:1rem;color:var(--ivory)}
+.dagkop .micro,.dagtitel .micro{color:#F4F0E9}
+.dagtitel .sub,.samenblad .sub{color:#E7D3D8}
+.leegtekst{color:#E2C9CF}
+.vandaagraster{display:grid;gap:2rem;align-items:start}
+.volgendblok{position:relative;overflow:hidden;border:1px solid #511425;background:linear-gradient(115deg,#280710 0,#1e050c 70%);padding:1.6rem 1.55rem 1.45rem}
+.volgendblok::after{content:"";position:absolute;right:-4rem;top:-2rem;width:9rem;height:130%;border-left:1px solid #400e1e;transform:skew(-17deg);background:repeating-linear-gradient(90deg,transparent 0,transparent 7px,#2e0813 8px,#2e0813 9px);pointer-events:none}
 .tijdregel{position:relative;z-index:1;display:flex;align-items:baseline;gap:1.1rem;margin:1.3rem 0 .75rem;flex-wrap:wrap}
 .tijdregel strong{font-size:clamp(3.9rem,17vw,7rem);line-height:.84;letter-spacing:-.055em}.tijdregel span{font-size:clamp(1.15rem,4vw,1.55rem);font-weight:500}
-.routekort{display:flex;align-items:center;gap:1rem;color:#d8d5cf;font-size:.78rem;font-weight:650;letter-spacing:.2em}.routekort b{color:var(--gold);font-size:1.25rem;font-weight:400}
-.vluchtregel{margin:1.45rem 0;border-top:1px solid #393c3c;padding-top:1.1rem;color:#d2d0ca;font-size:.72rem;font-weight:600;letter-spacing:.18em}
+.routekort{display:flex;align-items:center;gap:1rem;color:#d8d5cf;font-size:.78rem;font-weight:650;letter-spacing:.2em}.routekort b{color:var(--wine-licht);font-size:1.25rem;font-weight:400}
+.vluchtregel{margin:1.45rem 0;border-top:1px solid #541527;padding-top:1.1rem;color:#d2d0ca;font-size:.72rem;font-weight:600;letter-spacing:.18em}
 .actieknop{position:relative;isolation:isolate;width:100%;min-height:64px;display:flex;align-items:center;justify-content:space-between;gap:1rem;border:0;color:white;background:linear-gradient(90deg,#74102f,#a61040);padding:0 1.5rem;font-weight:750;letter-spacing:.12em;text-align:left;clip-path:polygon(0 0,calc(100% - 24px) 0,100% 50%,calc(100% - 24px) 100%,0 100%)}
 .actieknop::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.11),transparent);transform:translateX(-110%);z-index:-1;transition:transform .45s}
 .actieknop:hover::before{transform:translateX(110%)}.actieknop b{font-size:1.55rem;font-weight:300}
@@ -63,40 +68,111 @@ main{min-height:calc(100dvh - var(--header));padding-bottom:calc(var(--nav) + en
 
 .reiscontext{display:grid;gap:1.6rem}
 .prestatiepad{position:relative;display:grid;grid-template-columns:repeat(4,1fr);min-height:112px;padding:0 .25rem}
-.padlijn{position:absolute;left:7%;right:7%;top:61px;height:1px;background:#5a5d5d}
+.padlijn{position:absolute;left:7%;right:7%;top:61px;height:1px;background:#792137}
 .padlijn::after{content:"";display:block;width:36%;height:2px;background:var(--wine-bright);transform:translateY(-.5px)}
 .padpunt{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center;color:#d6d4ce;font-size:.72rem;letter-spacing:.1em}
 .padpunt span{min-height:43px}.padpunt small{display:block;margin-top:.25rem;color:#c1c2bf;font-size:.58rem;letter-spacing:.17em}
 .padpunt i{position:relative;z-index:2;width:14px;height:14px;margin-top:.72rem;border:2px solid #777b79;border-radius:50%;background:var(--onyx)}
 .padpunt.actief i{border-color:#cbc8c0;background:var(--wine);box-shadow:0 0 0 4px var(--onyx)}
 .padpunt.nu{align-items:flex-start;text-align:left}.padpunt.einde{align-items:flex-end;text-align:right}
-.padpunt.nu i,.padpunt.einde i{width:36px;height:36px;margin-top:-.05rem;border-color:var(--gold);display:grid;place-items:center;color:var(--gold)}
+.padpunt.nu i,.padpunt.einde i{width:36px;height:36px;margin-top:-.05rem;border-color:var(--wine-licht);display:grid;place-items:center;color:var(--wine-licht)}
 .padpunt.nu svg,.padpunt.einde svg{width:23px;height:23px}
-.statuslijst{border:1px solid #2f3232}
-.statuslijst button,.statuslijst>a{width:100%;min-height:82px;display:grid;grid-template-columns:42px 1fr auto auto;align-items:center;gap:1rem;border:0;border-bottom:1px solid var(--line);background:#0d0f0f;color:var(--ivory);padding:.9rem 1rem;text-align:left;text-decoration:none}
-.statuslijst button:last-child,.statuslijst>a:last-child{border-bottom:0}.statuslijst button:hover,.statuslijst>a:hover{background:#131515}
-.statusicoon{width:34px;height:34px;display:grid;place-items:center;border:1px solid;border-radius:50%;font-style:normal}.statusicoon.goed{color:var(--gold)}.statusicoon.wacht{color:#8e918e}.statusicoon.let{color:var(--danger)}
-.statuslijst span{display:flex;flex-direction:column;gap:.22rem}.statuslijst b{font-size:.9rem;font-weight:570}.statuslijst small{color:var(--muted);font-size:.7rem}.statuslijst strong{color:var(--wine-bright);font-size:.62rem;letter-spacing:.13em}.statuslijst em{color:var(--gold);font-size:1.35rem;font-style:normal}
-.rahulsnel{display:grid;grid-template-columns:1fr 52px;border:1px solid #323535;background:#101212;margin-top:2rem}
-.rahulsnel label{position:absolute;left:-9999px}.rahulsnel input{min-width:0;border:0;background:transparent;color:var(--ivory);outline:0;padding:0 1.2rem}.rahulsnel input::placeholder{color:#80847f}.rahulsnel button{height:58px;border:0;border-left:1px solid #323535;background:none;color:var(--gold);font-size:1.3rem}
+.statuslijst{border:1px solid #491122}
+.statuslijst button,.statuslijst>a{width:100%;min-height:82px;display:grid;grid-template-columns:42px 1fr auto auto;align-items:center;gap:1rem;border:0;border-bottom:1px solid var(--line);background:#1e050c;color:var(--ivory);padding:.9rem 1rem;text-align:left;text-decoration:none}
+.statuslijst button:last-child,.statuslijst>a:last-child{border-bottom:0}.statuslijst button:hover,.statuslijst>a:hover{background:#270710}
+.statusicoon{width:34px;height:34px;display:grid;place-items:center;border:1px solid;border-radius:50%;font-style:normal}.statusicoon.goed{color:var(--green)}.statusicoon.wacht{color:#8e918e}.statusicoon.let{color:var(--danger)}
+.statuslijst span{display:flex;flex-direction:column;gap:.22rem}.statuslijst b{font-size:.9rem;font-weight:570}.statuslijst small{color:var(--muted);font-size:.7rem}.statuslijst strong{color:var(--wine-bright);font-size:.62rem;letter-spacing:.13em}.statuslijst em{color:var(--ivory);font-size:1.35rem;font-style:normal}
+.rahulsnel{display:grid;grid-template-columns:1fr 52px;border:1px solid #4c1223;background:#23060e;margin-top:2rem}
+.rahulsnel label{position:absolute;left:-9999px}.rahulsnel input{min-width:0;border:0;background:transparent;color:var(--ivory);outline:0;padding:0 1.2rem}.rahulsnel input::placeholder{color:#80847f}/* De pijl stond in het accent op een wijnvlak: 2,53:1; de leestoon haalt 6,66. */
+.rahulsnel button{height:58px;border:0;border-left:1px solid #4c1223;background:none;color:#E7A8B8;font-size:1.3rem}
+
+/* ------------------------------------------------------------------ HET DEK
+   Werkkolom en kompas. Links de reis zoals hij loopt: titel, de momenten van
+   deze reis als strook, en daaronder de kaarten. Rechts de losse feiten --
+   vandaag, de tijd, de stand. De klok stond hiervoor ABSOLUUT in de fotokaart
+   en lag over de bestemmingsnaam heen; in een eigen kolom kan dat niet meer. */
+.dagdek{display:grid;gap:clamp(.9rem,2vw,1.5rem);align-items:start;margin-bottom:clamp(1.2rem,3vw,2rem)}
+.daghoofd{display:flex;flex-direction:column;gap:clamp(.9rem,2vw,1.4rem);min-width:0}
+.dagtitel{display:flex;flex-direction:column;gap:.45rem}
+.dagtitel h1{margin:0;font:400 clamp(2.1rem,4.4vw,3.4rem)/1.04 var(--serif);letter-spacing:.01em}
+.dagtitel .sub{margin:0;font-size:.95rem}
+
+/* De momenten van deze reis. Een pion is rond -- dat is de enige ronding die
+   dit huis kent (CLAUDE.md: een cirkel is geen hoek). */
+.strook{display:flex;flex-direction:column;gap:.7rem}
+.strookkop{display:flex;align-items:baseline;justify-content:space-between;gap:1rem}
+.strookkop h2{margin:0;font-size:.95rem;font-weight:600}
+.pionnen{display:flex;gap:.8rem;overflow-x:auto;padding-bottom:.35rem;scrollbar-width:none}
+.pionnen::-webkit-scrollbar{display:none}
+.pion{flex:0 0 auto;width:88px;display:flex;flex-direction:column;align-items:center;gap:.4rem;color:inherit;text-decoration:none;text-align:center}
+.pionrond{width:62px;height:62px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--wine-licht);
+  background:linear-gradient(160deg,rgba(158,28,64,.34),rgba(23,4,9,.8));color:var(--ivory);font-size:1.3rem;line-height:1}
+.pionrond.let{border-color:var(--danger)}
+.pion-toe .pionrond{border-style:dashed;border-color:var(--line);color:var(--muted)}
+.pion b{font-size:.72rem;font-weight:600;max-width:88px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pion small{color:var(--muted);font-size:.62rem;letter-spacing:.06em}
+.pion:hover .pionrond{filter:brightness(1.18)}
+
+.kaartraster{display:grid;gap:clamp(.9rem,2vw,1.2rem)}
+
+/* Het kompas: losse kaarten met elk een feit, niet een tweede werkblad. */
+.kompas{display:flex;flex-direction:column;gap:clamp(.7rem,1.6vw,1rem);min-width:0}
+.kompaslabel{margin:0;color:#E7D3D8;font-size:.58rem;font-weight:700;letter-spacing:.22em}
+.kompaskaart{border:1px solid var(--line);background:rgba(23,4,9,.42);padding:1rem 1.1rem}
+.kompaskop{display:flex;align-items:baseline;justify-content:space-between;gap:.8rem;margin-bottom:.8rem}
+.kompaskop .micro{margin:0}
+.kompaskaart .tel{color:var(--muted);font-size:.66rem}
+.klokpaneel{display:flex;flex-direction:column;align-items:center;gap:.7rem}
+.klokpaneel>.micro{color:#E7D3D8;font-size:.52rem;text-align:center}
+/* GEEN PROCENT IN DEZE MAAT: .rtg-ring zet er zowel de breedte als de HOOGTE
+   mee, en een percentage in een hoogte zonder vaste ouderhoogte is onbepaald
+   -- de klok werd dan 192 breed en 0 hoog. */
+.klokpaneel>[data-rtg-klok]{--rtg-klok-maat:clamp(7rem,12vw,11rem)}
+.kompas .statuslijst{border:0}
+.kompas .statuslijst:empty{display:none}
+.kompas .statuslijst button,.kompas .statuslijst>a{min-height:60px;padding:.65rem 0;gap:.7rem;background:transparent}
+.kompas .reiscontext{display:block}
+.rahulsnel{margin-top:0}
+
+/* De twee werkblokken onder de tabbladen staan naast elkaar. Ze blijven in main. */
+.dagkaarten{width:calc(var(--werkbreedte) - clamp(2.4rem,5vw,4.8rem));margin:clamp(1.2rem,2.5vw,2rem) auto 0;display:grid;gap:clamp(1rem,2vw,1.6rem)}
+.dagkaart{min-width:0}
+.dagkaart .regkop{margin-top:0}
+@media(min-width:1000px){
+  .dagdek{grid-template-columns:minmax(0,1fr) clamp(290px,24vw,360px)}
+  .kaartraster{grid-template-columns:1.25fr 1fr;align-items:start}
+  .dagkaarten{grid-template-columns:1fr 1fr;align-items:start}
+}
+@media(max-width:999px){
+  .kompas{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+  .klokpaneel>[data-rtg-klok]{--rtg-klok-maat:clamp(6rem,22vw,9rem)}
+}
+@media(max-width:520px){
+  .dagkaarten{width:calc(100% - 2rem)}
+  .kompas{grid-template-columns:1fr}
+  .pionrond{width:54px;height:54px}
+  .pion{width:76px}
+}
 
 .sectiekop{margin-bottom:2.4rem}.sectiekop>div{display:flex;align-items:end;justify-content:space-between;gap:1.5rem}.sectiekop h1{max-width:820px;margin:.65rem 0 .5rem;font-size:clamp(2.2rem,7vw,4.8rem);line-height:.95;letter-spacing:-.05em;text-transform:uppercase}.sectiekop>p:last-child{max-width:640px;margin:.8rem 0 0;line-height:1.6}
-.canvasband{display:grid;border-block:1px solid var(--line);background:#0d0f0f;margin-bottom:2.5rem}
-.canvasband .cv-stand{padding:1.5rem 1.25rem 1rem}.canvasband .cv-app{color:var(--gold);font-family:var(--sans)}
+.canvasband{display:grid;border-block:1px solid var(--line);background:#1e050c;margin-bottom:2.5rem}
+.canvasband .cv-stand{padding:1.5rem 1.25rem 1rem}.canvasband .cv-app{color:var(--ivory);font-family:var(--sans)}
 .canvasband .cv-woord{font-family:var(--sans);font-size:2rem;font-weight:720;text-transform:uppercase;letter-spacing:-.035em}.canvasband .cv-cijfers{border-color:var(--line)}
 .canvasband .cv-cijfers>span{color:var(--muted)}.canvasband .cv-rust{padding:0 1.25rem 1.5rem}.canvasband .cv-rust h2{font-family:var(--sans);font-size:1rem}.canvasband .cv-rust p{color:var(--muted)}
 .reisregister{border-top:1px solid var(--line)}.registerkop{display:flex;align-items:center;justify-content:space-between;padding:1.1rem 0}.registerkop h2{margin:0;font-size:.78rem;letter-spacing:.15em;text-transform:uppercase}.registerkop span{color:var(--muted);font-size:.7rem}
-.reisregel{display:grid;grid-template-columns:72px 1fr auto;align-items:center;gap:1.1rem;color:inherit;text-decoration:none;border-top:1px solid var(--line-soft);padding:1.15rem .2rem}.reisregel:hover{background:#0e1010}.reisdatum{display:flex;flex-direction:column;color:var(--muted);font-size:.58rem;letter-spacing:.12em;text-transform:uppercase}.reisdatum b{color:var(--ivory);font-size:1.55rem;line-height:1.1}.reiskern{display:flex;flex-direction:column;gap:.3rem}.reiskern b{font-size:1rem}.reiskern small{color:var(--muted)}.reisstatus{display:flex;align-items:center;gap:.45rem;color:var(--gold);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase}.leegtekst{color:var(--muted);line-height:1.6}
-.reisdiensten{display:grid;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:2.6rem}.reisdiensten a{display:grid;grid-template-columns:40px 1fr;align-items:center;gap:1rem;background:#0e1010;color:inherit;text-decoration:none;padding:1.15rem}.reisdiensten a:hover{background:#151717}.reisdiensten svg{width:26px;height:26px;color:var(--gold)}.reisdiensten span{display:flex;flex-direction:column;gap:.2rem}.reisdiensten b{font-size:.86rem}.reisdiensten small{color:var(--muted);font-size:.68rem}
-#vandaagVak{border-top:1px solid var(--line);margin-top:2rem;padding-top:1.2rem}#vandaagVak .cv-lijn{max-width:none;padding:1.25rem 0}#vandaagVak .cv-uur{color:var(--muted)}#vandaagVak .cv-wat{border-color:var(--line)}#vandaagVak .cv-toe{color:var(--muted)}
+.reisregel{display:grid;grid-template-columns:72px 1fr auto;align-items:center;gap:1.1rem;color:inherit;text-decoration:none;border-top:1px solid var(--line-soft);padding:1.15rem .2rem}.reisregel:hover{background:#20060d}.reisdatum{display:flex;flex-direction:column;color:var(--muted);font-size:.58rem;letter-spacing:.12em;text-transform:uppercase}.reisdatum b{color:var(--ivory);font-size:1.55rem;line-height:1.1}.reiskern{display:flex;flex-direction:column;gap:.3rem}.reiskern b{font-size:1rem}.reiskern small{color:var(--muted)}.reisstatus{display:flex;align-items:center;gap:.45rem;color:#d8d5cf;font-size:.66rem;letter-spacing:.1em;text-transform:uppercase}.leegtekst{color:var(--muted);line-height:1.6}
+.reisdiensten{display:grid;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:2.6rem}.reisdiensten a{display:grid;grid-template-columns:40px 1fr;align-items:center;gap:1rem;background:#20060d;color:inherit;text-decoration:none;padding:1.15rem}.reisdiensten a:hover{background:#2a0711}.reisdiensten svg{width:26px;height:26px;color:var(--wine-licht)}.reisdiensten span{display:flex;flex-direction:column;gap:.2rem}.reisdiensten b{font-size:.86rem}.reisdiensten small{color:var(--muted);font-size:.68rem}
+#vandaagVak .cv-lijn{padding:.7rem 0}#vandaagVak .cv-lijn{max-width:none;padding:1.25rem 0}#vandaagVak .cv-uur{color:var(--muted)}#vandaagVak .cv-wat{border-color:var(--line)}#vandaagVak .cv-toe{color:var(--muted)}
 
-main>.regkop:has(+ #poorten),main>#poorten{width:min(calc(100% - clamp(2rem,8vw,6.4rem)),1180px);margin-inline:auto}
+main>.regkop,main>#poorten,main>.wrooster{width:calc(var(--werkbreedte) - clamp(2.4rem,5vw,4.8rem));margin-inline:auto}
+main>.regkop.rtgdeel-vast{margin-top:clamp(2.5rem,5vw,4rem);padding-bottom:1rem;border-bottom:1px solid var(--line)}
+main>.wrooster{margin-bottom:4rem}
 main>.regkop:has(+ #poorten){margin-top:clamp(3.5rem,7vw,6rem);padding-bottom:1rem;border-bottom:1px solid var(--line)}
-#poorten{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;border:1px solid var(--line);background:var(--line)}
-#poorten .poort{position:relative;isolation:isolate;min-height:215px;display:flex;flex-direction:column;justify-content:flex-end;gap:.38rem;padding:1.25rem;overflow:hidden;border:0;background-color:#0d0f0f;background-image:linear-gradient(0deg,rgba(5,6,6,.96),rgba(5,6,6,.38) 76%),linear-gradient(90deg,rgba(5,6,6,.74),transparent),var(--poort-beeld);background-size:cover;background-position:center;color:var(--ivory);text-decoration:none;transition:filter .18s}
-#poorten .poort::before{content:"";position:absolute;z-index:-1;inset:0;border-top:2px solid transparent;background:linear-gradient(125deg,transparent 58%,rgba(203,166,95,.07));pointer-events:none}
-#poorten .poort:hover{filter:brightness(1.15)}#poorten .poort:hover::before{border-top-color:var(--gold)}
-#poorten .poort .ic{width:34px;height:34px;display:grid;place-items:center;margin-bottom:auto;color:var(--gold)}
+#poorten{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1px;border:1px solid var(--line);background:var(--line)}
+#poorten .poort{position:relative;isolation:isolate;min-height:215px;display:flex;flex-direction:column;justify-content:flex-end;gap:.38rem;padding:1.25rem;overflow:hidden;border:0;background-color:#1e050c;background-image:linear-gradient(0deg,rgba(24,4,10,.96),rgba(24,4,10,.38) 76%),linear-gradient(90deg,rgba(24,4,10,.74),transparent),var(--poort-beeld);background-size:cover;background-position:center;color:var(--ivory);text-decoration:none;transition:filter .18s}
+#poorten .poort::before{content:"";position:absolute;z-index:-1;inset:0;border-top:2px solid transparent;background:linear-gradient(125deg,transparent 58%,rgba(194,58,94,.07));pointer-events:none}
+#poorten .poort:hover{filter:brightness(1.15)}#poorten .poort:hover::before{border-top-color:var(--wine-licht)}
+#poorten .poort .ic{width:34px;height:34px;display:grid;place-items:center;margin-bottom:auto;color:var(--wine-licht)}
 #poorten .poort b{font-size:1rem;letter-spacing:.05em;text-transform:uppercase}#poorten .poort>span:last-child{max-width:25ch;color:#c9c7c0;font-size:.68rem;line-height:1.5}
 #poorten .poort[data-scene="aviation"]{--poort-beeld:url('/images/travelos/private-aviation.jpg')}
 #poorten .poort[data-scene="villa"]{--poort-beeld:url('/images/travelos/ibiza-villa.jpg')}
@@ -108,32 +184,124 @@ main>.regkop:has(+ #poorten){margin-top:clamp(3.5rem,7vw,6rem);padding-bottom:1r
 #poorten .poort[data-scene="residence"]{--poort-beeld:url('/images/travelos/residence-lobby.jpg')}
 #poorten .poort:last-child{grid-column:span 2}
 
-.taxikop{position:relative;isolation:isolate;min-height:clamp(300px,38vw,430px);display:flex;align-items:flex-end;margin-bottom:1.4rem;padding:clamp(1.35rem,4vw,3rem);overflow:hidden;border:1px solid #343737;background-image:linear-gradient(90deg,rgba(4,5,5,.96),rgba(4,5,5,.7) 42%,rgba(4,5,5,.1) 78%),linear-gradient(0deg,rgba(4,5,5,.9),transparent 58%),url('/images/travelos/hotel-executive.jpg');background-size:cover;background-position:center 56%;box-shadow:0 34px 90px rgba(0,0,0,.35)}
-.taxikop::after{content:"";position:absolute;z-index:-1;inset:0;border-left:3px solid var(--wine-bright);background:linear-gradient(120deg,transparent 60%,rgba(203,166,95,.08));pointer-events:none}
+.taxikop{position:relative;isolation:isolate;min-height:clamp(300px,38vw,430px);display:flex;align-items:flex-end;margin-bottom:1.4rem;padding:clamp(1.35rem,4vw,3rem);overflow:hidden;border:1px solid #4f1324;background-image:linear-gradient(90deg,rgba(24,4,10,.96),rgba(24,4,10,.7) 42%,rgba(24,4,10,.1) 78%),linear-gradient(0deg,rgba(24,4,10,.9),transparent 58%),url('/images/travelos/hotel-executive.jpg');background-size:cover;background-position:center 56%;box-shadow:0 34px 90px rgba(0,0,0,.35)}
+.taxikop::after{content:"";position:absolute;z-index:-1;inset:0;border-left:3px solid var(--wine-bright);background:linear-gradient(120deg,transparent 60%,rgba(194,58,94,.08));pointer-events:none}
 .taxikop>.taxikop-inhoud{position:relative;z-index:1;display:block;width:min(78%,720px);max-width:720px}
-.taxikop .micro{color:var(--gold)}
+.taxikop .micro{color:#d8d5cf}
 .taxikop h1{margin:.65rem 0 .7rem}
 .taxikop-inhoud>p:last-child{max-width:34rem;margin:0;color:#d0d0cb;font-size:.78rem;line-height:1.6;letter-spacing:.05em}
-.taxiraster{display:grid;gap:1.4rem}.routevelden{position:relative;border:1px solid #353838;background:#111313;padding:0;margin:0}.routevelden legend{position:absolute;width:1px;height:1px;overflow:hidden}.routevelden label{position:relative;min-height:90px;display:grid;grid-template-columns:28px 1fr 48px;align-items:center;gap:.65rem;padding:0 1rem;border-bottom:1px solid var(--line)}.routevelden label:last-child{border:0}.routevelden label:first-of-type::after{content:"";position:absolute;left:1.84rem;top:57px;height:65px;width:1px;background:#8d918d}.routepunt{z-index:1;width:14px;height:14px;border:3px solid #c4c6c1;border-radius:50%;background:var(--wine)}.routepunt.aankomst{width:17px;height:22px;border:0;border-radius:0;background:var(--gold);transform:rotate(-45deg)}
+.taxiraster{display:grid;gap:1.4rem}.routevelden{position:relative;border:1px solid #501325;background:#24060f;padding:0;margin:0}.routevelden legend{position:absolute;width:1px;height:1px;overflow:hidden}.routevelden label{position:relative;min-height:90px;display:grid;grid-template-columns:28px 1fr 48px;align-items:center;gap:.65rem;padding:0 1rem;border-bottom:1px solid var(--line)}.routevelden label:last-child{border:0}.routevelden label:first-of-type::after{content:"";position:absolute;left:1.84rem;top:57px;height:65px;width:1px;background:#8d918d}.routepunt{z-index:1;width:14px;height:14px;border:3px solid #c4c6c1;border-radius:50%;background:var(--wine)}.routepunt.aankomst{width:17px;height:22px;border:0;border-radius:0;background:var(--wine-licht);transform:rotate(-45deg)}
 .routevelden span{display:flex;flex-direction:column;gap:.18rem}.routevelden small{color:var(--muted);font-size:.6rem;letter-spacing:.16em}.routevelden input{width:100%;border:0;background:none;color:var(--ivory);outline:0;padding:.1rem 0;font-size:1rem}.routevelden input:focus{box-shadow:0 2px 0 var(--wine)}
 .locatieknop,.wisselknop{width:44px;height:44px;display:grid;place-items:center;border:0;border-left:1px solid var(--line);background:none;color:#d4d5d1}.locatieknop svg{width:21px;height:21px}.wisselknop{font-size:1.4rem}
-.suggesties{position:absolute;z-index:12;left:1.2rem;right:1.2rem;max-height:240px;overflow:auto;border:1px solid #3a3d3d;background:#121414;box-shadow:0 16px 35px #000}.suggesties button{width:100%;display:flex;justify-content:space-between;gap:1rem;border:0;border-bottom:1px solid var(--line);background:none;color:var(--ivory);padding:.9rem;text-align:left}.suggesties button:hover{background:#1a1c1c}.suggesties small{color:var(--muted)}
-.ritkeuzes{display:grid;grid-template-columns:1fr 1.25fr;gap:.65rem;margin-top:.65rem}.momentkeuze{display:grid;grid-template-columns:1fr 1fr;border:1px solid #353838}.momentkeuze button,.reizigersknop{min-height:58px;border:0;background:#111313;color:#b8bab6;font-size:.72rem;font-weight:650;letter-spacing:.15em}.momentkeuze button+button{border-left:1px solid var(--line)}.momentkeuze button.actief{background:linear-gradient(90deg,#74102f,#931139);color:#fff}.reizigersknop{display:flex;align-items:center;justify-content:space-between;border:1px solid #353838;padding:0 1rem}.reizigersknop b{font-size:1.1rem}
-.laterinvoer{display:flex;flex-direction:column;gap:.45rem;margin-top:.65rem;color:var(--muted);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase}.laterinvoer input{min-height:54px;border:1px solid #353838;background:#111313;color:var(--ivory);padding:0 1rem;color-scheme:dark}
-.routekaart{position:relative;overflow:hidden;min-height:190px;border:1px solid #353838;background:#0b0d0d;margin-top:1rem}.kaartlijnen{position:absolute;inset:0;width:100%;height:100%}.straten{stroke:#303333;stroke-width:2}.ritlijn{stroke:var(--wine-bright);stroke-width:4}.startstip{fill:var(--wine);stroke:#d8d9d5;stroke-width:3}.eindstip{fill:var(--gold);stroke:#0b0d0d;stroke-width:3}.routekaart>div{position:absolute;left:1.2rem;right:1.2rem;bottom:1rem;display:flex;justify-content:space-between}.routekaart strong{font-size:1.65rem}.routekaart small{font-size:.65rem;letter-spacing:.15em}
-.voertuigen{border:1px solid #323535}.voertuig{width:100%;min-height:102px;display:grid;grid-template-columns:minmax(94px,160px) 1fr auto;align-items:center;gap:1rem;border:0;border-bottom:1px solid var(--line);background:#101212;color:var(--ivory);padding:1rem;text-align:left;position:relative}.voertuig:last-child{border-bottom:0}.voertuig:hover{background:#151717}.voertuig.actief{background:linear-gradient(90deg,#171919,#111313)}.voertuig.actief::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--wine-bright)}.voertuig svg{width:100%;height:auto;max-height:50px;stroke:#b5b7b4;fill:#181a1a}.voertuig span{display:flex;flex-direction:column;gap:.3rem}.voertuig b{font-size:.93rem;letter-spacing:.08em}.voertuig span small{color:var(--muted);font-size:.68rem}.voertuig>strong{display:flex;flex-direction:column;align-items:end;font-size:1.35rem}.voertuig>strong small{color:var(--muted);font-size:.48rem;letter-spacing:.12em}
-.vertrouwen{display:grid;grid-template-columns:1.2fr 1fr;border:1px solid #323535;margin-top:1rem}.vertrouwen span{min-height:64px;display:flex;align-items:center;gap:.6rem;padding:.8rem;color:#d4d4d0;font-size:.68rem}.vertrouwen span+span{border-left:1px solid var(--line)}.vertrouwen svg{width:23px;height:23px;color:var(--gold)}.boekknop{margin-top:1rem}.annuleren{margin:.7rem 0 0;color:var(--muted);text-align:center;font-size:.66rem}
-.lopendeRit{border-left:3px solid var(--green);background:#111413;margin-top:1rem;padding:1.1rem}.lopendeRit .micro{color:var(--green)}.lopendeRit h3{margin:.45rem 0;font-size:1.15rem}.lopendeRit p{margin:.35rem 0;color:var(--muted);font-size:.78rem}.lopendeRit a{display:inline-block;margin-top:.6rem;color:var(--gold);font-size:.7rem;text-decoration:none;border-bottom:1px solid}
+.suggesties{position:absolute;z-index:12;left:1.2rem;right:1.2rem;max-height:240px;overflow:auto;border:1px solid #551527;background:#25060f;box-shadow:0 16px 35px #000}.suggesties button{width:100%;display:flex;justify-content:space-between;gap:1rem;border:0;border-bottom:1px solid var(--line);background:none;color:var(--ivory);padding:.9rem;text-align:left}.suggesties button:hover{background:#310814}.suggesties small{color:var(--muted)}
+.ritkeuzes{display:grid;grid-template-columns:1fr 1.25fr;gap:.65rem;margin-top:.65rem}.momentkeuze{display:grid;grid-template-columns:1fr 1fr;border:1px solid #501325}.momentkeuze button,.reizigersknop{min-height:58px;border:0;background:#24060f;color:#b8bab6;font-size:.72rem;font-weight:650;letter-spacing:.15em}.momentkeuze button+button{border-left:1px solid var(--line)}.momentkeuze button.actief{background:linear-gradient(90deg,#74102f,#931139);color:#fff}.reizigersknop{display:flex;align-items:center;justify-content:space-between;border:1px solid #501325;padding:0 1rem}.reizigersknop b{font-size:1.1rem}
+.laterinvoer{display:flex;flex-direction:column;gap:.45rem;margin-top:.65rem;color:var(--muted);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase}.laterinvoer input{min-height:54px;border:1px solid #501325;background:#24060f;color:var(--ivory);padding:0 1rem;color-scheme:dark}
+.routekaart{position:relative;overflow:hidden;min-height:190px;border:1px solid #501325;background:#1c050b;margin-top:1rem}.kaartlijnen{position:absolute;inset:0;width:100%;height:100%}.straten{stroke:#4a1222;stroke-width:2}.ritlijn{stroke:var(--wine-bright);stroke-width:4}.startstip{fill:var(--wine);stroke:#d8d9d5;stroke-width:3}.eindstip{fill:var(--wine-licht);stroke:#1c050b;stroke-width:3}.routekaart>div{position:absolute;left:1.2rem;right:1.2rem;bottom:1rem;display:flex;justify-content:space-between}.routekaart strong{font-size:1.65rem}.routekaart small{font-size:.65rem;letter-spacing:.15em}
+.voertuigen{border:1px solid #4c1223}.voertuig{width:100%;min-height:102px;display:grid;grid-template-columns:minmax(94px,160px) 1fr auto;align-items:center;gap:1rem;border:0;border-bottom:1px solid var(--line);background:#23060e;color:var(--ivory);padding:1rem;text-align:left;position:relative}.voertuig:last-child{border-bottom:0}.voertuig:hover{background:#2a0711}.voertuig.actief{background:linear-gradient(90deg,#2c0812,#24060f)}.voertuig.actief::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--wine-bright)}.voertuig svg{width:100%;height:auto;max-height:50px;stroke:#b5b7b4;fill:#2e0813}.voertuig span{display:flex;flex-direction:column;gap:.3rem}.voertuig b{font-size:.93rem;letter-spacing:.08em}.voertuig span small{color:var(--muted);font-size:.68rem}.voertuig>strong{display:flex;flex-direction:column;align-items:end;font-size:1.35rem}.voertuig>strong small{color:var(--muted);font-size:.48rem;letter-spacing:.12em}
+.vertrouwen{display:grid;grid-template-columns:1.2fr 1fr;border:1px solid #4c1223;margin-top:1rem}.vertrouwen span{min-height:64px;display:flex;align-items:center;gap:.6rem;padding:.8rem;color:#d4d4d0;font-size:.68rem}.vertrouwen span+span{border-left:1px solid var(--line)}.vertrouwen svg{width:23px;height:23px;color:var(--wine-licht)}.boekknop{margin-top:1rem}.annuleren{margin:.7rem 0 0;color:var(--muted);text-align:center;font-size:.66rem}
+.lopendeRit{border-left:3px solid var(--green);background:#25060f;margin-top:1rem;padding:1.1rem}.lopendeRit .micro{color:var(--green)}.lopendeRit h3{margin:.45rem 0;font-size:1.15rem}.lopendeRit p{margin:.35rem 0;color:var(--muted);font-size:.78rem}.lopendeRit a{display:inline-block;margin-top:.6rem;color:var(--ivory);font-size:.7rem;text-decoration:none;border-bottom:1px solid}
 
-.rahulblad{max-width:840px}.chat{min-height:250px;border-block:1px solid var(--line);padding:1.5rem 0;display:flex;flex-direction:column;gap:.8rem}.chatregel{max-width:78%;margin:0;padding:.9rem 1rem;background:#141616;color:#d9d7d1;line-height:1.5}.chatregel.gebruiker{align-self:flex-end;border-right:2px solid var(--wine-bright);background:#191416}.chatregel.assistent{border-left:2px solid var(--gold)}.snelvragen{display:flex;gap:.55rem;flex-wrap:wrap;margin:1rem 0}.snelvragen button{min-height:42px;border:1px solid #363939;background:#101212;color:#cacac5;padding:.6rem .8rem;font-size:.7rem}.rahulformulier{display:grid;grid-template-columns:1fr auto;border:1px solid #363939}.rahulformulier label{position:absolute;left:-9999px}.rahulformulier input{min-width:0;min-height:64px;border:0;background:#0f1111;color:var(--ivory);padding:0 1rem;outline:0}.rahulformulier button{border:0;border-left:1px solid #363939;background:#74102f;color:white;padding:0 1.1rem;font-size:.67rem;font-weight:700;letter-spacing:.12em}
+.rahulblad{max-width:840px}.chat{min-height:250px;border-block:1px solid var(--line);padding:1.5rem 0;display:flex;flex-direction:column;gap:.8rem}.chatregel{max-width:78%;margin:0;padding:.9rem 1rem;background:#280710;color:#d9d7d1;line-height:1.5}.chatregel.gebruiker{align-self:flex-end;border-right:2px solid var(--wine-bright);background:#2a0711}.chatregel.assistent{border-left:2px solid var(--wine-licht)}.snelvragen{display:flex;gap:.55rem;flex-wrap:wrap;margin:1rem 0}.snelvragen button{min-height:42px;border:1px solid #511425;background:#23060e;color:#cacac5;padding:.6rem .8rem;font-size:.7rem}.rahulformulier{display:grid;grid-template-columns:1fr auto;border:1px solid #511425}.rahulformulier label{position:absolute;left:-9999px}.rahulformulier input{min-width:0;min-height:64px;border:0;background:#21060d;color:var(--ivory);padding:0 1rem;outline:0}.rahulformulier button{border:0;border-left:1px solid #511425;background:#74102f;color:white;padding:0 1.1rem;font-size:.67rem;font-weight:700;letter-spacing:.12em}
 
-.hoofdtabs{position:fixed;z-index:25;left:0;right:0;bottom:0;height:calc(var(--nav) + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid #2f3232;background:rgba(9,10,10,.97);backdrop-filter:blur(22px)}
-.hoofdtabs button{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.42rem;border:0;background:none;color:#929591;font-size:.66rem}.hoofdtabs button::after{content:"";position:absolute;bottom:0;width:0;height:3px;background:var(--wine-bright);transition:width .18s}.hoofdtabs button.actief{color:var(--ivory)}.hoofdtabs button.actief::after{width:52px}.hoofdtabs svg{width:25px;height:25px}.hoofdtabs button.actief svg{color:var(--wine-bright)}
+.hoofdtabs{position:fixed;z-index:25;left:0;right:0;bottom:0;height:calc(var(--nav) + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid #491122;background:rgba(26,5,12,.97);backdrop-filter:blur(22px)}
+/* DE INACTIEVE TAB VOLGT DE LEESTOON VAN DE WERELD. Hier stond een vast grijs
+   (#929591), gekozen toen de balk altijd een eigen donkere grond had. Op een
+   bureau haalt rtg-edge-system.css die grond weg (background:none) en staat de
+   balk rechtstreeks op het fluweel van TravelOS: grijs op #8F2241 haalde 2,80:1
+   voor "Reizen", "Taxi" en "Samen", uitgelogd en ingelogd. TravelOS zet --muted
+   op #E2C9CF (5,45 op diezelfde grond, gemeten in rtg-worlds-2026.css); op
+   telefoonformaat, waar de balk zijn donkere grond wel houdt, leest die toon ook.
+   De actieve tab houdt zijn ivoor (specifiekere regels hieronder en in het
+   wereldblok) en de iconen tekenen met currentColor, dus die gaan vanzelf mee.
+   Zonder terugval in de var(): dit blad zet --muted zelf in zijn :root
+   (#969995, bovenaan), dus er is geen weg waarop het token ontbreekt. */
+.hoofdtabs button{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.42rem;border:0;background:none;color:var(--muted);font-size:.66rem}.hoofdtabs button::after{content:"";position:absolute;bottom:0;width:0;height:3px;background:var(--wine-bright);transition:width .18s}.hoofdtabs button.actief{color:var(--ivory)}.hoofdtabs button.actief::after{width:52px}.hoofdtabs svg{width:25px;height:25px}.hoofdtabs button.actief svg{color:var(--wine-bright)}
 
-.keuzedialoog{width:min(92vw,480px);max-height:88dvh;overflow:auto;border:1px solid #3c3f3f;background:#111313;color:var(--ivory);padding:0;box-shadow:0 30px 90px #000}.keuzedialoog::backdrop{background:rgba(0,0,0,.75);backdrop-filter:blur(5px)}.keuzedialoog form,.bevestiginginhoud{padding:1.35rem}.dialoogkop{display:flex;align-items:start;justify-content:space-between;gap:1rem;margin-bottom:1.4rem}.dialoogkop h2,.bevestiging h2{margin:.4rem 0 0;font-size:1.6rem}.dialoogkop>button{width:44px;height:44px;border:0;background:#1b1d1d;color:var(--ivory);font-size:1.4rem}.keuzedialoog label:not(.vink){display:grid;grid-template-columns:1fr 100px;align-items:center;border-top:1px solid var(--line);padding:.8rem 0}.keuzedialoog select{min-height:46px;border:1px solid #3b3e3e;background:#0d0f0f;color:var(--ivory);padding:0 .7rem}.vink{display:flex;gap:.7rem;align-items:center;border-top:1px solid var(--line);padding:1rem 0}.keuzedialoog .actieknop{margin-top:1rem}.bevestiginginhoud{text-align:center}.bevestigdicoon{width:64px;height:64px;display:grid;place-items:center;border:1px solid var(--green);border-radius:50%;color:var(--green);font-size:1.8rem;margin:0 auto 1.2rem}.bevestiging h2{font-size:1.8rem}.bevestiging p{color:var(--muted);line-height:1.55}.bevestiging #bevestigingFeiten{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);margin:1.3rem 0}.bevestiging #bevestigingFeiten span{display:flex;flex-direction:column;gap:.25rem;background:#0b0d0d;padding:1rem}.bevestiging #bevestigingFeiten small{color:var(--muted);font-size:.6rem;letter-spacing:.1em}.veiliglijst{list-style:none;margin:0;padding:0}.veiliglijst li{display:flex;gap:.8rem;padding:1rem 0;border-top:1px solid var(--line)}.veiliglijst b{color:var(--green)}
+.keuzedialoog{width:min(92vw,480px);max-height:88dvh;overflow:auto;border:1px solid #571628;background:#24060f;color:var(--ivory);padding:0;box-shadow:0 30px 90px #000}.keuzedialoog::backdrop{background:rgba(0,0,0,.75);backdrop-filter:blur(5px)}.keuzedialoog form,.bevestiginginhoud{padding:1.35rem}.dialoogkop{display:flex;align-items:start;justify-content:space-between;gap:1rem;margin-bottom:1.4rem}.dialoogkop h2,.bevestiging h2{margin:.4rem 0 0;font-size:1.6rem}.dialoogkop>button{width:44px;height:44px;border:0;background:#320915;color:var(--ivory);font-size:1.4rem}.keuzedialoog label:not(.vink){display:grid;grid-template-columns:1fr 100px;align-items:center;border-top:1px solid var(--line);padding:.8rem 0}.keuzedialoog select{min-height:46px;border:1px solid #561628;background:#1e050c;color:var(--ivory);padding:0 .7rem}.vink{display:flex;gap:.7rem;align-items:center;border-top:1px solid var(--line);padding:1rem 0}.keuzedialoog .actieknop{margin-top:1rem}.bevestiginginhoud{text-align:center}.bevestigdicoon{width:64px;height:64px;display:grid;place-items:center;border:1px solid var(--green);border-radius:50%;color:var(--green);font-size:1.8rem;margin:0 auto 1.2rem}.bevestiging h2{font-size:1.8rem}.bevestiging p{color:var(--muted);line-height:1.55}.bevestiging #bevestigingFeiten{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);margin:1.3rem 0}.bevestiging #bevestigingFeiten span{display:flex;flex-direction:column;gap:.25rem;background:#1c050b;padding:1rem}.bevestiging #bevestigingFeiten small{color:var(--muted);font-size:.6rem;letter-spacing:.1em}.veiliglijst{list-style:none;margin:0;padding:0}.veiliglijst li{display:flex;gap:.8rem;padding:1rem 0;border-top:1px solid var(--line)}.veiliglijst b{color:var(--green)}
 .toast{position:fixed;z-index:80;left:50%;bottom:calc(var(--nav) + 1rem + env(safe-area-inset-bottom));transform:translate(-50%,20px);width:max-content;max-width:calc(100vw - 2rem);background:var(--ivory);color:var(--onyx);padding:.8rem 1rem;font-size:.75rem;font-weight:650;opacity:0;pointer-events:none;transition:.2s}.toast.zichtbaar{opacity:1;transform:translate(-50%,0)}
 
-:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+/* ------------------------------------------------- ONDER DE SCHIL VAN HET HUIS
+   Met de RTG-schil eromheen (shared/randen.js) verbergt rtg-edge-system.css de
+   eigen kop en de bladbalk van deze pagina. Voor de KOP is dat juist: die zei
+   RTG, TRAVELOS en BEVEILIGD, en dat staat allemaal al in de schilbalk. Voor de
+   BLADEN is het dat niet: Vandaag, Reizen, Taxi en Rahul zijn geen schil maar
+   inhoud -- vier gezichten van dit scherm, niet vier plekken in het huis. Die
+   komen dus terug, direct onder de schilbalk, met de bank links vrij. */
+body.rtg-stijl.rtg-edge-host .hoofdtabs{
+  display:grid!important;
+  position:fixed;
+  z-index:8700;
+  left:var(--edge-side);
+  right:0;
+  top:calc(var(--edge-top) + env(safe-area-inset-top,0px));
+  bottom:auto;
+  width:auto;
+  height:48px;
+  padding:0 clamp(1rem,3vw,2.5rem);
+  grid-template-columns:repeat(5,minmax(0,140px));
+  justify-content:start;
+  gap:clamp(.5rem,3vw,2.2rem);
+  border-top:0;
+  border-bottom:1px solid var(--line);
+  background:rgba(27,5,11,.92);
+  backdrop-filter:blur(20px);
+}
+body.rtg-stijl.rtg-edge-host .hoofdtabs button{flex-direction:row;gap:.55rem;justify-content:flex-start;font-size:.7rem}
+body.rtg-stijl.rtg-edge-host .hoofdtabs svg{width:18px;height:18px}
+body.rtg-stijl.rtg-edge-host .hoofdtabs button::after{left:0;bottom:0;width:0;height:2px}
+body.rtg-stijl.rtg-edge-host .hoofdtabs button.actief::after{width:100%;height:2px}
+/* De inhoud begint onder die balk; de schil rekent alleen met zijn eigen kop. */
+body.rtg-stijl.rtg-edge-host .reisapp>main{padding-top:48px!important}
+@media(max-width:520px){
+  body.rtg-stijl.rtg-edge-host .hoofdtabs{grid-template-columns:repeat(5,minmax(0,1fr));padding:0;gap:0}
+  body.rtg-stijl.rtg-edge-host .hoofdtabs button{flex-direction:column;gap:.3rem;justify-content:center;align-items:center;font-size:.6rem}
+}
+
+/* ------------------------------------------------------------------- SAMEN
+   Het gezelschap rond een reis. De vormen komen uit het kompas hierboven; wat
+   hier bij komt is de tijdlijn, de ledenlijst en het uitnodigen. */
+.reiskeuzes{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:clamp(.9rem,2vw,1.4rem)}
+.reiskeuze{display:flex;flex-direction:column;gap:.2rem;align-items:flex-start;border:1px solid var(--line);background:rgba(23,4,9,.42);color:var(--ivory);padding:.6rem .9rem;text-align:left}
+.reiskeuze b{font-size:.86rem;font-weight:600}
+.reiskeuze small{color:var(--muted);font-size:.66rem}
+.reiskeuze.actief{border-color:var(--wine-licht);background:linear-gradient(150deg,rgba(127,22,52,.5),rgba(23,4,9,.7))}
+.pionrond.klein{width:34px;height:34px;font-size:.68rem;font-weight:700}
+.gezellid{display:grid;grid-template-columns:auto 1fr auto;gap:.6rem;align-items:center;border-top:1px solid var(--line-soft);padding:.7rem 0}
+.gezellid:first-child{border-top:0}
+.gezelnaam{display:flex;flex-direction:column;gap:.15rem;min-width:0}
+.gezelnaam b{font-size:.88rem;font-weight:600}
+.gezelnaam small{color:var(--muted);font-size:.68rem}
+.rolpil{font-style:normal;font-size:.55rem;font-weight:700;letter-spacing:.14em;color:#E7D3D8;border:1px solid var(--line);padding:.15rem .45rem;white-space:nowrap}
+.gezelpost{display:grid;grid-template-columns:auto 1fr;gap:.7rem;border-top:1px solid var(--line-soft);padding:.9rem 0}
+.gezelpost:first-child{border-top:0}
+.gezelkop{display:flex;align-items:baseline;gap:.5rem;flex-wrap:wrap}
+.gezelkop b{font-size:.88rem;font-weight:600}
+.gezelkop small{color:var(--muted);font-size:.68rem}
+.gezelpost p{margin:.3rem 0 0;color:#E7D3D8;font-size:.92rem;line-height:1.5}
+.nodigvorm{display:flex;flex-direction:column;gap:.45rem;border-top:1px solid var(--line-soft);margin-top:.9rem;padding-top:.9rem}
+.nodigvorm .rtg-label{font-size:.6rem;letter-spacing:.14em}
+.nodigvorm .rtg-sub{margin:0;color:var(--muted);font-size:.72rem;line-height:1.5}
+.zichtblok{display:flex;flex-direction:column;gap:.35rem}
+.zichtblok b{font-size:.9rem;font-weight:600}
+.zichtblok small{color:var(--muted);font-size:.75rem;line-height:1.5}
+.zichtblok .nietzicht{color:#E7D3D8}
+.samenblad .rahulsnel{margin-top:1rem}
+.deelregel{display:grid;grid-template-columns:1fr auto;gap:.7rem;align-items:center;border-top:1px solid var(--line-soft);padding:.7rem 0}
+.deelregel:first-child{border-top:0}
+.schakel{min-width:64px;border:1px solid var(--line);background:transparent;color:var(--muted);padding:.3rem .6rem;font-size:.58rem;font-weight:700;letter-spacing:.14em}
+.schakel.aan{border-color:var(--wine-licht);background:linear-gradient(100deg,var(--wine-bright),var(--wine));color:#fff}
+#samenDelenKaart .rtg-knop{width:100%;margin-top:.9rem}
+#samenDelenKaart .rtg-sub{margin:.6rem 0 0;color:var(--muted);font-size:.72rem;line-height:1.5}
+.beeldbalk{border-top:1px solid var(--line-soft);margin-top:1rem;padding-top:1rem;display:flex;flex-direction:column;gap:.45rem}
+.beeldbalk .rtg-label{font-size:.6rem;letter-spacing:.14em}
+.beeldbalk .rtg-sub{margin:0;color:var(--muted);font-size:.72rem;line-height:1.5}
+.beeldkiezer{display:grid;grid-template-columns:1fr auto;gap:.5rem}
+.postbeeld{margin-top:.6rem;border:1px solid var(--line);background:rgba(23,4,9,.5);padding:.5rem;color:var(--muted);font-size:.72rem}
+/* Een staande foto mag de tijdlijn niet opeten; hij wordt bijgesneden
+   getoond en opent op ware grootte in de kluis. */
+.postbeeld img{display:block;width:100%;max-width:460px;max-height:320px;height:auto;object-fit:cover}
+
+:focus-visible{outline:2px solid var(--wine-licht);outline-offset:3px}
 @keyframes blad-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 @media(min-width:720px){
   .canvasband{grid-template-columns:1fr 1.2fr;align-items:center}.canvasband .cv-rust{padding:1.5rem;border-left:1px solid var(--line)}
@@ -141,17 +309,25 @@ main>.regkop:has(+ #poorten){margin-top:clamp(3.5rem,7vw,6rem);padding-bottom:1r
 }
 @media(min-width:940px){
   :root{--header:96px;--nav:0px}
-  .reisapp{padding-left:104px}.prestatiekop{margin-left:-104px;padding-left:calc(104px + 2.5rem);grid-template-columns:1fr auto 1fr}
-  main{padding-bottom:0}.appblad{min-height:calc(100dvh - var(--header))}.bladbinnen{padding-bottom:5rem}
-  .hoofdtabs{left:0;right:auto;top:var(--header);bottom:0;width:104px;height:auto;padding:1.2rem .4rem;grid-template-columns:1fr;grid-template-rows:repeat(4,94px);border-top:0;border-right:1px solid #2f3232;background:#090a0a}
-  .hoofdtabs button::after{left:0;bottom:auto;width:3px;height:0}.hoofdtabs button.actief::after{width:3px;height:48px}.hoofdtabs button{font-size:.63rem}
-  .vandaagraster{grid-template-columns:1.08fr .92fr;align-items:start}.volgendblok{min-height:436px;display:flex;flex-direction:column}.volgendblok .actieknop{margin-top:auto}
+  .reisapp{padding-left:0}.prestatiekop{grid-template-columns:1fr auto 1fr}
+  main{padding-bottom:0}
+  /* Een blad hoefde het scherm te vullen toen het het HELE scherm was; nu staan
+     de werkblokken eronder en levert die hoogte alleen een gat op. */
+  .appblad{min-height:0}.bladbinnen{padding-bottom:5rem}
+  /* OP EEN BUREAU STAAN DE VIER BLADEN BOVENAAN, niet in een zijrail: de duim
+     zit hier niet onderaan het scherm en het oog begint linksboven. Op een
+     telefoon blijft de balk onderin staan -- daar is de duim wel de maat. */
+  .hoofdtabs{position:sticky;left:auto;right:auto;top:var(--header);bottom:auto;width:auto;height:56px;padding:0 clamp(1rem,3vw,2.5rem);grid-template-columns:repeat(5,minmax(0,160px));justify-content:start;gap:clamp(.5rem,3vw,2.5rem);border-top:0;border-bottom:1px solid var(--line);background:rgba(27,5,11,.86);backdrop-filter:blur(20px)}
+  .hoofdtabs button{flex-direction:row;gap:.6rem;justify-content:flex-start}
+  .hoofdtabs svg{width:19px;height:19px}
+  .hoofdtabs button::after{left:0;bottom:0;width:0;height:2px}.hoofdtabs button.actief::after{width:100%;height:2px}
+.volgendblok{min-height:0;display:flex;flex-direction:column}.volgendblok .actieknop{margin-top:auto}
   .taxiraster{grid-template-columns:minmax(0,1fr) minmax(410px,.92fr);align-items:start;gap:1.6rem}.taxikop h1{font-size:4.7rem}
   .toast{bottom:1.5rem}
 }
 @media(max-width:520px){
   :root{--header:72px;--nav:78px}.prestatiekop{grid-template-columns:1fr auto 1fr}.prestatiekop>p{font-size:.65rem}.rtgmerk{font-size:1.65rem}.veiligknop span{display:none}.veiligknop{gap:.35rem}
-  .bladbinnen{padding-top:1.8rem;padding-inline:1rem}.dagkop{min-height:390px;margin-inline:-1rem;padding:1.25rem;background-position:64% center}.dagkop-inhoud{width:100%;padding-right:7.2rem}.bestemmingkop{align-items:flex-end}.bestemmingkop h1{font-size:clamp(3.8rem,20vw,5.4rem)}.gereed{position:absolute;left:0;bottom:-1.35rem;font-size:.61rem;letter-spacing:.14em}.reisdag-klok{right:1rem;bottom:1rem;padding:.7rem}.reisdag-klok>[data-rtg-klok]{--rtg-klok-maat:6.6rem}.reisdag-klok>span{font-size:.45rem}.volgendblok{padding:1.3rem 1rem}.tijdregel{display:block}.tijdregel span{display:block;margin-top:.8rem}.statuslijst button{grid-template-columns:36px 1fr auto;padding:.8rem}.statuslijst strong{grid-column:2}.statuslijst em{grid-column:3;grid-row:1/3}.taxikop{min-height:330px;margin-inline:-1rem;padding:1.25rem;background-position:65% center}.taxikop>.taxikop-inhoud{width:88%}.taxikop h1{font-size:clamp(2.65rem,14vw,4rem)}.ritkeuzes{grid-template-columns:1fr}.routekaart{min-height:160px}.voertuig{grid-template-columns:82px 1fr auto;gap:.7rem;padding:.8rem}.voertuig svg{max-height:40px}.voertuig>strong{font-size:1.1rem}.vertrouwen{grid-template-columns:1fr}.vertrouwen span+span{border-left:0;border-top:1px solid var(--line)}.sectiekop h1{font-size:2.8rem}.rahulformulier{grid-template-columns:1fr}.rahulformulier button{min-height:52px;border-left:0;border-top:1px solid #363939}.chatregel{max-width:92%}
+  .bladbinnen{padding-top:1.8rem;padding-inline:1rem}.dagkop{min-height:300px;padding:1rem;background-position:64% center}.dagkop-inhoud{width:100%;padding-right:0}.bestemmingkop{align-items:flex-start}.bestemmingkop h1{font-size:clamp(2rem,15cqi,3.4rem)}.gereed{font-size:.58rem;letter-spacing:.12em}.volgendblok{padding:1.3rem 1rem}.tijdregel{display:block}.tijdregel span{display:block;margin-top:.8rem}.statuslijst button{grid-template-columns:36px 1fr auto;padding:.8rem}.statuslijst strong{grid-column:2}.statuslijst em{grid-column:3;grid-row:1/3}.taxikop{min-height:330px;margin-inline:-1rem;padding:1.25rem;background-position:65% center}.taxikop>.taxikop-inhoud{width:88%}.taxikop h1{font-size:clamp(2.65rem,14vw,4rem)}.ritkeuzes{grid-template-columns:1fr}.routekaart{min-height:160px}.voertuig{grid-template-columns:82px 1fr auto;gap:.7rem;padding:.8rem}.voertuig svg{max-height:40px}.voertuig>strong{font-size:1.1rem}.vertrouwen{grid-template-columns:1fr}.vertrouwen span+span{border-left:0;border-top:1px solid var(--line)}.sectiekop h1{font-size:2.8rem}.rahulformulier{grid-template-columns:1fr}.rahulformulier button{min-height:52px;border-left:0;border-top:1px solid #511425}.chatregel{max-width:92%}
 }
 @media(max-width:820px){#poorten{grid-template-columns:repeat(2,minmax(0,1fr))}#poorten .poort{min-height:185px}}
 @media(max-width:520px){main>.regkop:has(+ #poorten),main>#poorten{width:calc(100% - 2rem)}#poorten .poort{min-height:165px;padding:1rem}}

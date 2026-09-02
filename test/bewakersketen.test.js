@@ -51,7 +51,14 @@ const WORTEL = path.join(__dirname, '..');
    namen betekent "een van deze volstaat" (de boardroom is een zwaardere office,
    en een staff-route mag ook door de zaak zelf bewaakt worden). */
 const INVARIANTEN = [
-  { voorvoegsel: '/api/office/', bewakers: ['officeAuth', 'boardroomAuth'],
+  /* `kluisAuth` staat hier omdat hij officeAuth ZELF aanroept en er daarna nog
+     een eis bovenop legt: een naamloze gedeelde kantoorsessie komt er niet door
+     (kern/kantoor/kluispoort.js). Hem hier weglaten zou de vijf zwaarste
+     kantoorroutes -- een paspoortscan beoordelen, een BIG-nummer openen -- als
+     ONBEWAAKT laten melden terwijl ze juist strenger bewaakt zijn dan de rest.
+     Een invariant die zijn eigen strengste slot niet kent, meldt de verkeerde
+     kant op. */
+  { voorvoegsel: '/api/office/', bewakers: ['officeAuth', 'boardroomAuth', 'kluisAuth'],
     wat: 'het kantoor' },
   { voorvoegsel: '/api/supplier/', bewakers: ['supplierAuth'],
     wat: 'de zaak' },

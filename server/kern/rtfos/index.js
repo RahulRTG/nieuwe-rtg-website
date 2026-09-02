@@ -45,6 +45,9 @@
      herkomst         grote en contante giften: het geld staat stil tot er gekeken is
      meldcode         de vijf wettelijke stappen bij zorg om een kind
      beschermzaak     geweld en uitbuiting: een EIGEN klasse, in ../beschermzaak/
+     ruil             de buurtruil tussen leden: spullen, zonder geld
+     gift             de giftstand, het voornemen en de bevestigde gift
+     winkel           kopen bij de stichting -- en dat is met opzet GEEN gift
 
    WAT DIT NIET IS. Geen tweede ledenadministratie en geen tweede boekhouding.
    De 30%-afdracht van RTG naar de stichting blijft in kern/fonds.js; dit OS
@@ -53,11 +56,11 @@
 const kluis = require('../../kluis');
 
 module.exports = (state) => {
-  const { db, save, crypto, boardroomWie, magBoardroom } = state;
+  const { db, save, crypto, boardroomWie, magBoardroom, pay } = state;
   const ctx = require('./basis')({ db, save, crypto, boardroomWie, magBoardroom });
   // De schrijflaag en de kluis gaan mee op dezelfde context: elk deel schrijft
   // via dezelfde save() en versleutelt via dezelfde sleutel.
-  Object.assign(ctx, { db, save, crypto, kluis });
+  Object.assign(ctx, { db, save, crypto, kluis, pay });
 
   const steden = require('./steden')(ctx);
   const partners = require('./partners')(ctx);
@@ -91,6 +94,17 @@ module.exports = (state) => {
      plaats van hem opnieuw te bedenken (LAT.md regel 4). */
   const subsidies = require('./subsidies')(ctx, { bronUitSubsidie: geld.bronUitSubsidie });
   const voorraad = require('./voorraad')(ctx);
+  const ruil = require('./ruil')(ctx);
+  ctx.bronUitGift = (x) => geld.bronUitGift(x);
+  const gift = require('./gift')(ctx);
+  /* De winkel. Hij leunt op de giftstand voor EEN ding: waar het geld landt.
+     Twee walletcodes naast elkaar zou betekenen dat de opbrengst van een boek
+     ergens anders binnenkomt dan een gift, en dan klopt geen enkel overzicht. */
+  ctx.winkelOntvanger = () => {
+    const o = gift.stand().ontvanger;
+    return o && o.soort === 'wallet' && o.code ? o.code : null;
+  };
+  const winkel = require('./winkel')(ctx);
   const activiteiten = require('./activiteiten')(ctx, { vogGeldig: vrijwilligers.vogGeldig });
   const berichten = require('./berichten')(ctx);
   /* Fase vier: het netwerkeffect. Delen, samen kopen, mensen uitwisselen en
@@ -104,16 +118,16 @@ module.exports = (state) => {
      eigen ingang met een eigen, engere blik -- zie de kop van elke module. */
   /* Fase drie: de governance-laag. Het bestuur zelf (vergaderingen, quorum,
      besluiten), de regels die het stelt, de verantwoording achteraf en de
-     dingen die mis kunnen gaan. Het jaarverslag leunt op twee andere delen --
-     de cijfers uit rapport.js en de besluitcontrole uit bestuur-notulen.js --
-     en maakt geen van beide na (LAT.md regel 4). */
+     dingen die mis kunnen gaan. Het jaarverslag leunt op drie delen -- rapport.js
+     (cijfers), bestuur-notulen.js (besluit) en gift.js (de ANBI-stand, die
+     het aannam) -- en maakt er geen na (LAT.md regel 4). */
   const bestuur = require('./bestuur')(ctx);
   const notulen = require('./bestuur-notulen')(ctx, { vind: bestuur.vind, beeld: bestuur.beeld,
     mag: bestuur.mag, quorumVan: bestuur.quorumVan });
   Object.assign(bestuur, notulen);
   const beleid = require('./beleid')(ctx);
   const jaarverslag = require('./jaarverslag')(ctx, { cijfersVan: rapport.cijfersVan,
-    besluitVindbaar: notulen.besluitVindbaar });
+    besluitVindbaar: notulen.besluitVindbaar, anbiVan: gift.stand });
   const risico = require('./risico')(ctx);
   const meldcode = require('./meldcode')(ctx);
   // Buiten deze map, en dat is het punt (../beschermzaak/index.js).
@@ -130,29 +144,10 @@ module.exports = (state) => {
   const veld = require('./veld')(ctx, { vind: casus.vind, contactVan: casus.contactVan });
   const donateur = require('./donateur')(ctx, { cijfersVan: rapport.cijfersVan });
 
-  /* Het auditspoor uitlezen. Alleen landelijk, en alleen lezen -- er is nergens
-     een functie die erin schrijft behalve ctx.audit zelf, en nergens een die
-     eruit haalt. De afkapteller gaat mee: "er staat niets meer" en "er is nooit
-     iets geweest" mogen niet hetzelfde lezen (LAT.md regel 3). */
-  function auditlog(req, filter) {
-    const w = ctx.wie(req);
-    if (!w.landelijk) return { status: 403, error: 'Het auditspoor is van het landelijke RTF-bestuur.' };
-    const f = filter || {};
-    let rijen = ctx.S().audit;
-    if (f.wat) rijen = rijen.filter(r => r.wat.startsWith(String(f.wat)));
-    if (f.wie) rijen = rijen.filter(r => r.wie === String(f.wie));
-    return { ok: true, totaal: rijen.length, afgekapt: Number(ctx.S().auditAfgekapt) || 0,
-      regels: rijen.slice(0, 300) };
-  }
-
-  // Wie ben ik in dit OS: het scherm bouwt hier zijn menu op.
-  function ik(req) {
-    const w = ctx.wie(req);
-    return { ok: true, ingelogd: !!w.key, key: w.key, landelijk: w.landelijk,
-      zetels: w.zetels.map(z => ({ stad: z.stad, rol: z.rol,
-        stadNaam: (ctx.stadVan(z.stad) || {}).naam || z.stad })),
-      vlaggen: ctx.VLAGGEN, rollen: ctx.ROLLEN };
-  }
+  /* De spiegel van dit OS -- "wat mag ik zien" en "wat is er gedaan" --
+     staat hiernaast: dit bestand is bedrading, en dat zijn de enige twee
+     functies die naar het systeem zelf kijken. */
+  const { auditlog, ik } = require('./index-spiegel')(ctx);
 
   return { rtfos: {
     ik, auditlog,
@@ -160,7 +155,7 @@ module.exports = (state) => {
     vlagZet: steden.vlagZet, limietZet: steden.limietZet, zetelZet: steden.zetelZet,
     zetelWeg: steden.zetelWeg, kernteamZet: steden.kernteamZet,
     partners, projecten, vrijwilligers, geld, casus, integriteit, rapport, gemeente, ondernemers,
-    subsidies, voorraad, activiteiten, berichten,
+    subsidies, voorraad, ruil, gift, winkel, activiteiten, berichten,
     netwerk, inkoop, uitwisseling, campagnes, koppeling,
     bestuur, beleid, jaarverslag, risico, herkomst, meldcode, beschermzaak,
     vrijwilligerportaal, deelnemerportaal, publiek,

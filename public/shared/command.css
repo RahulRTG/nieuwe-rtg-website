@@ -360,7 +360,17 @@ body.rtg-stijl main.cmd-werk,.cmd-werk{min-width:0;min-height:0;width:auto;max-w
   /* Zelfde selectorlijst als de basisregel hierboven: die draagt
      `body.rtg-stijl main.cmd-werk` en wint anders van een kale .cmd-werk --
      dan kreeg .cmd-panes de 56px-rij en de balk de rest. */
-  body.rtg-stijl main.cmd-werk,.cmd-werk{grid-template-rows:minmax(0,1fr) auto}
+  /* DRIE zichtbare delen, dus ook drie expliciete gridrijen: werkvlak, Trust
+     Rail en dock. Met maar twee rijen kwam het dock in een impliciete derde
+     rij. Chromium/Linux schoof die rij na het inklappen van de rail 58px onder
+     het viewport, terwijl WebKit/Blink op macOS hem toevallig onderaan hield.
+     De namen hieronder maken de plaats onafhankelijk van display/overgangen. */
+  body.rtg-stijl main.cmd-werk,.cmd-werk{
+    grid-template-rows:minmax(0,1fr) auto calc(48px + env(safe-area-inset-bottom,0px))
+  }
+  .cmd-panes{grid-row:1}
+  .cmd-rail{grid-row:2}
+  .cmd-balk{grid-row:3}
 
   /* ---- de schilbalk ----
      Drie zones: de bank links, waar je bent in het midden, weg hier rechts.

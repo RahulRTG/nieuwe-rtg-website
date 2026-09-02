@@ -42,8 +42,8 @@ function maakAgendaPro({ db, save, bijeen, inBundel, crypto, schoon, keyVanCoden
   const vastleggen = require('../lib/duurzaam')({ bijeen, save, inBundel, bron: 'agenda-pro' });
   const nu = () => new Date().toISOString();
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));
-  const store = () => { if (!db.data.agendas || typeof db.data.agendas !== 'object') db.data.agendas = {}; return db.data.agendas; };
-  const ruw = k => { const s = store(); if (!Array.isArray(s[k])) s[k] = []; return s[k]; };
+  const { agendaWortel: store, agendaItems } = require('./agenda-opslag')({ db });
+  const ruw = k => agendaItems(k);
   const lidVan = ownerKey => String(ownerKey).startsWith('lid:') ? ownerKey.slice(4) : null;
   const naam = ownerKey => { const k = lidVan(ownerKey); return k ? (codenaamVan(k) || 'een lid') : 'de zaak'; };
   const isDatum = d => /^\d{4}-\d{2}-\d{2}$/.test(String(d || ''));

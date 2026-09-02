@@ -220,7 +220,7 @@ function tabel() {
     {
       /* WIE MAG WAT ZELF. Tot deze soort erbij kwam keek er niemand naar de
          vraag die in RTG op vijf plekken los van elkaar wordt beantwoord --
-         stuur/beleid.js, command/risico.js, geldbeleid/regels.js,
+         stuur/beleid.js, frictie/motor.js, geldbeleid/regels.js,
          stadsweefsel/ainiveau.js en bureau/delegatie.js hebben elk een eigen
          schaal, en geen van de vijf kan de andere vier lezen. Dat is precies
          het soort ding waar deze census voor is: niet "zakt er iets" maar

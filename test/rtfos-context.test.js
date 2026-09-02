@@ -48,11 +48,38 @@ function bouwContext() {
     db, save: () => {}, crypto,
     boardroomWie: () => null, magBoardroom: () => false
   });
-  Object.assign(ctx, { db, save: () => {}, crypto, kluis: require('../server/kluis') });
-  /* Wat index.js na het opbouwen van de delen op de context zet. Beide zijn
-     late binding: een module die er later komt, gebruikt ze wel. */
+  /* `pay` hoort hier ook bij: index.js regel 62 zet hem mee in dezelfde
+     Object.assign, uit de state die de server meegeeft. Hij stond hier niet, en
+     daardoor meldde deze toets gift-betalen.js en winkel.js als stuk terwijl ze
+     het niet waren. */
+  Object.assign(ctx, { db, save: () => {}, crypto, kluis: require('../server/kluis'),
+    pay: {} });
+  /* Wat index.js en zijn delen na het opbouwen op de context zetten. Allemaal
+     late binding: een module die er later komt, gebruikt ze wel.
+
+     DE ZES ONDERAAN KWAMEN MEE MET DE GIFT- EN WINKELLAAG (#160), en ze stonden
+     hier niet. Dat is de valse melding die de kop hierboven aankondigt, en die
+     richting blijft goed -- maar hij hoort wel te worden nagelopen in plaats van
+     genegeerd. Nagegaan is per naam WAAR hij echt gezet wordt; alle zes bestaan
+     op de draaiende context, dus geen van deze meldingen was een runtime-fout:
+
+       giftAnbi           kern/rtfos/gift.js regel 173
+       giftRsin           kern/rtfos/gift.js regel 174
+       giftMachtigingWeg  kern/rtfos/gift.js regel 181
+       bronUitGift        kern/rtfos/index.js regel 97
+       winkelOntvanger    kern/rtfos/index.js regel 102
+
+     Ze worden alle zes LUI gelezen (binnen een handler of een lambda), dus de
+     volgorde van het ophangen doet er niet toe. Was dat niet zo, dan was het
+     wel een echte fout geweest -- dat is de vraag die bij elke volgende naam
+     hier gesteld hoort te worden, en niet of de lijst weer klopt. */
   ctx.herkomstBepaal = () => {};
   ctx.magInStad = () => false;
+  ctx.giftAnbi = () => 'onbekend';
+  ctx.giftRsin = () => '';
+  ctx.giftMachtigingWeg = () => [];
+  ctx.bronUitGift = () => null;
+  ctx.winkelOntvanger = () => null;
   return ctx;
 }
 

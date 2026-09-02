@@ -162,6 +162,31 @@ test('6. de modus is een lens: dezelfde waarheid, minder soorten', () => {
   assert.equal(alles.nu.length, 2, 'alles ziet allebei');
   // een onbekende modus valt terug op alles, en verbergt dus nooit stilletjes werk
   assert.equal(bouw('directeur').modus, 'alles');
+
+  /* EEN ONBEKENDE MODUS WERD OPGEVANGEN, EEN ONTBREKENDE NIET -- en dat is
+     precies waarom deze fout maanden onzichtbaar bleef.
+
+     De regel luidde: `MODI[String(opties.modus || 'alles')] ? String(opties.modus) : 'alles'`.
+     Links stond de TERUGVAL en rechts de RAUWE waarde. Zonder `modus` slaagde
+     de test op 'alles' en werd daarna de tekenreeks "undefined" gebruikt --
+     MODI daarvan bestaat niet, en de regel eronder las er `.soorten` van. Een
+     harde 500 op elke oproep zonder modus, en dat is de gewone oproep van de
+     PDA. De toets hierboven dekte 'directeur' (onbekend, wel een tekenreeks) en
+     miste daardoor precies het geval dat stuk was.
+
+     Gevonden door de invoerproef, die hem meldde als 500 op een diep genest
+     veld `centen` -- dat veld had er niets mee te maken. Een fuzzer wijst de
+     plek aan, niet de oorzaak. */
+  for (const leeg of [undefined, null, '', 0, false]) {
+    const uit = bouw(leeg);
+    assert.equal(uit.modus, 'alles', 'modus ' + JSON.stringify(leeg) + ' hoort terug te vallen op alles');
+    assert.ok(Array.isArray(uit.nu), 'en een werkende lijst te geven in plaats van te struikelen');
+  }
+  // ook zonder opties-object helemaal: dat is hoe een kale oproep binnenkomt
+  const kaal = require('../server/kern/horeca/werklijst')(
+    { horeca, schoon, verzoeklaag: verzoeklaagMet([]) })
+    .werklijst({ rekeningen: {}, instel: {} }, 'KIKUNOI', {});
+  assert.equal(kaal.modus, 'alles');
 });
 
 test('7. er staat nergens een score, een cijfer of een telling per mens', () => {

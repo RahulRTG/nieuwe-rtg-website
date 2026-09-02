@@ -51,7 +51,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon } = require('./helper');
 
 const ZAAK = 'MERIDIAAN';     // Meridiaan Toren -- NL, dus hier kan loon draaien
 const ANDERE = 'KIKUNOI';     // Sal de Mar -- het tweede paar ogen
@@ -106,9 +106,10 @@ test.before(async () => {
   taxiPda = (await inlog(TAXI, 0, '5678')).token;
   wasBaas = (await inlog(WASSERIJ, 'manager', '1234')).token;
 
-  const k = await api('/api/office/login', { code: KANTOOR });
-  kantoor = k.body.token;
-  assert.ok(kantoor, 'kantoorsessie: ' + JSON.stringify(k.body).slice(0, 120));
+  /* Op naam: een KYC-goedkeuring verderop in dit bestand staat achter de
+     kluispoort (kern/kantoor/kluispoort.js). */
+  kantoor = await kantoorAlsPersoon(base, KANTOOR);
+  assert.ok(kantoor, 'kantoorsessie op naam');
 
   /* Nova komt binnen zoals iedereen binnenkomt: de manager nodigt uit, zij maakt
      haar eigen RTG-account en verbindt zichzelf met de kassacode. Haar

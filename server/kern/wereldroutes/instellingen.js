@@ -16,6 +16,13 @@ module.exports = [
   '/apps/juridisch/partnervoorwaarden.html',
   '/apps/juridisch/privacy.html',
   '/apps/juridisch/voorwaarden.html',
+  /* MIJN RTG: mijn gegevens, mijn post, wie er toegang tot mij heeft en waar
+     ik aanwezig ben. Identiteit, toegang en toestemming -- dus deze schil, en
+     niet LIFE: het gaat niet over wat ik doe maar over wie mij mag kennen. */
+  '/apps/mijn-gegevens.html',
+  '/apps/mijn-post.html',
+  '/apps/mijn-relaties.html',
+  '/apps/mijn-sessies.html',
   '/apps/passkeys.html',
   '/apps/rtgid.html',
   '/apps/toestemming.html'

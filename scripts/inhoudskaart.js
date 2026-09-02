@@ -125,7 +125,13 @@ if (require.main !== module) return;
      juist de makkelijkste om in kaart te brengen -- gewoon aankloppen zonder
      token. Eigenrollen (boardroom, scim, webauthn, werkplekbaas) blijven
      erbuiten met hun reden: dit instrument heeft er geen sleutel voor. */
-  const KENT = new Set(['member', 'office', 'supplier']);
+  /* `kantoor-op-naam` staat er sinds de sleutelbos hem KAN munten (zie
+     ./lib/proefsleutels.js). De kluisdeuren -- een KYC-besluit, een
+     documentnummer, aftekenen -- dragen sinds kern/kantoor/kluispoort.js die
+     eigenrol, en zonder deze regel viel hun antwoordprofiel terug op de 403 van
+     de gedeelde code. Dan beschrijft de kaart de dichte deur in plaats van het
+     antwoord erachter, en dat is precies wat dit instrument NIET moet doen. */
+  const KENT = new Set(['member', 'office', 'supplier', 'kantoor-op-naam']);
   const routes = [];
   let zonderSleutel = 0;
   for (const r of alleRoutes()) {

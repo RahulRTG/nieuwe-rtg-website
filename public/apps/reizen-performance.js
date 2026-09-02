@@ -46,13 +46,21 @@
     return new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format((Number(centen) || 0) / 100);
   };
   R.wisselBlad = function (naam, schrijfHash) {
-    if (!['vandaag', 'reizen', 'taxi', 'rahul'].includes(naam)) naam = 'vandaag';
+    /* De lijst bladen staat hier EEN keer; wie er een toevoegt aan het scherm
+       moet hem hier ook noemen, anders valt de tab stil terug op Vandaag. */
+    if (!['vandaag', 'reizen', 'taxi', 'samen', 'rahul'].includes(naam)) naam = 'vandaag';
     R.staat.blad = naam;
     R.$$('[data-blad]').forEach(function (blad) { var aan = blad.dataset.blad === naam; blad.hidden = !aan; blad.classList.toggle('actief', aan); });
     R.$$('[data-tab]').forEach(function (knop) { var aan = knop.dataset.tab === naam; knop.classList.toggle('actief', aan);
       if (aan) knop.setAttribute('aria-current', 'page'); else knop.removeAttribute('aria-current'); });
     if (schrijfHash !== false) history.replaceState(null, '', '#' + naam);
-    d.title = 'RTG Reizen · ' + naam.charAt(0).toUpperCase() + naam.slice(1);
+    var bladNaam = naam.charAt(0).toUpperCase() + naam.slice(1);
+    d.title = 'RTG Reizen · ' + bladNaam;
+    /* HET KRUIMELPAD VOLGT HET BLAD. De schil van het huis zet zijn pad bij het
+       openen van de pagina; deze vier bladen zijn geen aparte pagina's, dus
+       bleef er "VANDAAG" staan terwijl je op Samen keek. Een pad dat iets
+       anders zegt dan het scherm is erger dan geen pad. */
+    if (w.RTGEdge && w.RTGEdge.setContext) w.RTGEdge.setContext({ title: bladNaam });
     w.scrollTo({ top: 0, behavior: 'smooth' });
     if (naam === 'taxi' && R.laadMobiliteit) R.laadMobiliteit();
     R.meldAdaptief();

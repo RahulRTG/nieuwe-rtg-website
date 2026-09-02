@@ -55,6 +55,57 @@ test('3. de patronen zijn smal en dragen alle drie een naam', () => {
     'en niet een naam die er alleen op lijkt');
 });
 
+test('3b. een ingang die het werk van een functie doet, telt NIET als verklaard', () => {
+  /* De gevaarlijkste beweging in deze lijst: een gat dichtplakken met een
+     reden. `vertegenwoordigt` zegt "deze ingang DOET wat een functie doet en
+     komt niet langs haar schakelaar" -- dat is een bevinding, geen uitzondering,
+     en hij hoort in een eigen teller die niet daalt door er tekst bij te
+     schrijven. */
+  const lijst = require('../scripts/lib/wekker-verklaringen');
+  const met = lijst.filter(v => v.vertegenwoordigt);
+  assert.ok(met.length, 'er zijn zulke ingangen (vandaag: smtp-in, imap, stun)');
+  const R = require('../server/functies/register');
+  for (const v of met) {
+    assert.ok(R.OP_ID[v.vertegenwoordigt],
+      'de genoemde functie bestaat: ' + v.vertegenwoordigt + ' (' + v.bestand + ')');
+    assert.ok(v.reden && v.reden.length > 25, 'en er staat bij wat er dan misgaat');
+  }
+});
+
+test('3c. de METING zelf telt de bevindingen, en ze zijn niet weg te schrijven', () => {
+  /* Twee mutaties veranderden de meting zonder dat een toets zakte: de
+     vertegenwoordigers bij de verklaarde gevallen tellen (3 -> 0) en het
+     LUISTERAAR-patroon weghalen (62 -> 51 ingangen). Allebei zien er in de ratel
+     uit als VOORUITGANG, want die telt omlaag. Precies de faalvorm waar deze
+     hele meetronde tegen bestaat: preciezer worden mag nooit betekenen dat je
+     de bevinding verstopt.
+
+     Deze toets draait de echte meting -- hij leest bestanden, hij start niets --
+     en houdt twee dingen vast: elke verklaarde vertegenwoordiger die als ingang
+     wordt gevonden, telt ook in de bevinding; en de vier soorten worden alle
+     vier gevonden. */
+  const r = W.meet();
+  const gevonden = new Set(r.lijst.map(w => w.bestand));
+  const genoemd = r.functieUitMaarUitvoerbaarLijst.join(' | ');
+  for (const v of require('../scripts/lib/wekker-verklaringen')) {
+    if (!v.vertegenwoordigt || !gevonden.has(v.bestand)) continue;
+    assert.ok(genoemd.includes(v.bestand),
+      'een ingang die het werk van een functie doet, hoort in de bevinding: ' + v.bestand);
+  }
+  assert.ok(r.functieUitMaarUitvoerbaar > 0, 'en dat getal staat vandaag niet op nul');
+
+  /* De vier soorten. Verdwijnt er een patroon, dan verdwijnen zijn ingangen uit
+     het beeld en daalt elk getal -- zonder dat er iets is opgelost. */
+  for (const soort of ['KLOK', 'BUS', 'LUISTERAAR', 'WERKER']) {
+    assert.ok(r.perSoort[soort] > 0, 'de soort ' + soort + ' wordt nog gevonden');
+  }
+  /* En de drie eigen servers van dit huis, met naam: een IMAP-server, een
+     SMTP-ontvanger en een STUN-server zijn deuren die geen /api/ dragen. */
+  for (const b of ['server/imap-server.js', 'server/smtp-in-server.js', 'server/stun.js']) {
+    assert.ok(gevonden.has(b), 'deze ingang hoort gevonden te worden: ' + b);
+  }
+});
+
 test('4. de verklaringen dragen allemaal een reden', () => {
   /* Een verklaringenlijst zonder redenen is een skiplijst, en die groeit tot de
      meter niets meer meet. */

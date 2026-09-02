@@ -15,11 +15,16 @@
    loopt eerst mee in de schaduw, want je kunt niet afdwingen wat nooit in de
    schaduw heeft gelopen.
 
-   DRIE SOORTEN WEKKERS, EN EEN VIERDE DIE ER GEEN BLEEK
+   VIJF SOORTEN INGANGEN, EN EEN ZESDE DIE ER GEEN BLEEK
 
-     KLOK      setInterval/setTimeout in server/: werk dat vanzelf terugkomt.
-     BUS       een abonnee op de berichtenbus (server/bus.js subscribe).
-     WEBHOOK   een aanroep van buiten die vóór de schakelkast binnenkomt.
+     KLOK        setInterval/setTimeout in server/: werk dat vanzelf terugkomt.
+     BUS         een abonnee op de berichtenbus (server/bus.js subscribe).
+     WEBHOOK     een aanroep van buiten die vóór de schakelkast binnenkomt.
+     LUISTERAAR  een eigen server op een eigen poort, buiten de webrouter om.
+                 Dit huis draait er meer dan je denkt: een IMAP-server, een
+                 SMTP-ontvanger, een STUN-server en het CA-loket. Wie alleen naar
+                 /api/ kijkt, ziet die vier niet -- en het zijn wel deuren.
+     WERKER      een tweede proces of thread dat zelfstandig doorwerkt.
 
      AI -- EN DIE IS GEEN GAT. kern/stuur.js roept zijn paden aan met
      `fetch('http://127.0.0.1:' + poort + pad)` (regel 130): de AI gaat over
@@ -66,7 +71,12 @@ const V = require('./verstrengeling');
    weggekeken. */
 const PATRONEN = [
   { soort: 'KLOK', rx: /\bsetInterval\s*\(/g, wat: 'werk dat vanzelf terugkomt' },
-  { soort: 'BUS', rx: /\.subscribe\s*\(/g, wat: 'een abonnee op de berichtenbus' }
+  { soort: 'BUS', rx: /\.subscribe\s*\(/g, wat: 'een abonnee op de berichtenbus' },
+  /* Een eigen server op een eigen poort. `createServer` van net, tls of http en
+     `createSocket` van dgram -- vier vormen, een vraag: luistert dit bestand
+     zelf naar de buitenwereld? */
+  { soort: 'LUISTERAAR', rx: /\b(?:createServer|createSocket)\s*\(/g, wat: 'een eigen server op een eigen poort' },
+  { soort: 'WERKER', rx: /\b(?:new Worker|spawn)\s*\(/g, wat: 'een tweede proces of thread dat zelfstandig doorwerkt' }
 ];
 
 /* De webhooks staan niet met een patroon maar met hun pad: ze zijn al gevonden
@@ -124,10 +134,37 @@ function meet() {
     }
   }
 
-  const verklaard = new Map(require('./lib/wekker-verklaringen').map(v => [v.bestand, v.reden]));
-  for (const w of wekkers) if (w.functies === 0 && verklaard.has(w.bestand)) w.verklaard = verklaard.get(w.bestand);
+  const lijst = require('./lib/wekker-verklaringen');
+  const verklaard = new Map(lijst.map(v => [v.bestand, v]));
+  for (const w of wekkers) {
+    const v = w.functies === 0 && verklaard.get(w.bestand);
+    if (!v) continue;
+    w.verklaard = v.reden;
+    if (v.vertegenwoordigt) w.vertegenwoordigt = v.vertegenwoordigt;
+  }
   const ongeschakeld = wekkers.filter(w => w.functies === 0 && !w.verklaard);
-  const ongeschakeldVerklaard = wekkers.filter(w => w.functies === 0 && w.verklaard);
+  const ongeschakeldVerklaard = wekkers.filter(w => w.functies === 0 && w.verklaard && !w.vertegenwoordigt);
+  /* DE BEVINDING, EN NIET DE UITZONDERING. Een ingang die het werk van een
+     functie doet zonder langs haar schakelaar te komen: zet die functie uit en
+     hij draait door. Apart geteld, want wegverklaren zou hier het gat zelf
+     dichtplakken -- en de teller mag NIET met de verklaarde uitzonderingen op
+     een hoop, anders daalt hij door er een reden bij te schrijven. */
+  const functieUitMaarUitvoerbaar = wekkers.filter(w => w.vertegenwoordigt);
+
+  /* WELKE TREDE OPENT DE FUNCTIE DIE DEZE INGANG DOET. Zonder trede is niet te
+     zeggen wanneer hij hoort te werken -- dat is een eigen soort onwetendheid. */
+  let FASES = [];
+  try { FASES = require(path.join(WORTEL, 'server', 'functies', 'register')).FASES; } catch (e) { /* dan blijft trede null */ }
+  const tredeVan = id => {
+    for (const f of FASES) if (!f.aan || f.aan.includes(id)) return f.id;
+    return null;
+  };
+  for (const w of wekkers) {
+    const ids = (w.welke || []).concat(w.vertegenwoordigt ? [w.vertegenwoordigt] : []);
+    const treden = ids.map(tredeVan).filter(Boolean);
+    w.trede = treden.length ? treden[0] : null;
+  }
+  const zonderTrede = wekkers.filter(w => !w.trede && !w.verklaard);
   const perSoort = {};
   for (const w of wekkers) perSoort[w.soort] = (perSoort[w.soort] || 0) + 1;
 
@@ -141,6 +178,11 @@ function meet() {
     webhooks: webhooks(),
     ongeschakeld: ongeschakeld.length,
     ongeschakeldVerklaard: ongeschakeldVerklaard.length,
+    functieUitMaarUitvoerbaar: functieUitMaarUitvoerbaar.length,
+    functieUitMaarUitvoerbaarLijst: functieUitMaarUitvoerbaar.map(w =>
+      w.bestand + ' doet het werk van ' + w.vertegenwoordigt + (w.trede ? ' (opent op trede ' + w.trede + ')' : '') ),
+    zonderTrede: zonderTrede.length,
+    zonderTredeLijst: zonderTrede.map(w => w.soort + '  ' + w.bestand).sort(),
     verklaringenOngebruikt: [...verklaard.keys()].filter(b => !wekkers.some(w => w.bestand === b)),
     ongeschakeldLijst: ongeschakeld.map(w => w.soort + '  ' + w.bestand + ' (' + w.aantal + 'x)').sort(),
     lijst: wekkers.sort((a, b) => a.functies - b.functies || (a.bestand < b.bestand ? -1 : 1))
@@ -161,6 +203,15 @@ function rapport(r) {
   L.push('  Wat hieronder staat raakt GEEN schakelaar in de boardroom, op geen enkele trede.');
   for (const x of r.ongeschakeldLijst.slice(0, 25)) L.push('      ' + x);
   if (r.ongeschakeldLijst.length > 25) L.push(`      ... en nog ${r.ongeschakeldLijst.length - 25}`);
+  L.push('');
+  L.push(`  FUNCTIE UIT MAAR TOCH UITVOERBAAR: ${r.functieUitMaarUitvoerbaar}.`);
+  L.push('  Deze ingangen doen het werk van een functie zonder langs haar schakelaar te komen.');
+  L.push('  Zet die functie uit en ze draaien door. Dit is een BEVINDING en geen uitzondering:');
+  L.push('  hij wordt apart geteld en nooit bij de verklaarde gevallen opgeteld.');
+  for (const x of r.functieUitMaarUitvoerbaarLijst) L.push('      ' + x);
+  L.push('');
+  L.push(`  ZONDER TREDE: ${r.zonderTrede}. Van deze ingangen is niet te zeggen wanneer ze horen te werken.`);
+  for (const x of r.zonderTredeLijst.slice(0, 12)) L.push('      ' + x);
   L.push('');
   if (r.verklaringenOngebruikt.length) {
     L.push('  LET OP -- verklaringen die nergens meer op slaan (het bestand is weg of');

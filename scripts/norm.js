@@ -184,6 +184,25 @@ const METERS = [
      binnenkomen, zien wat ik mag, mijn gegevens, aanmelden voor een pas, de
      leden-app, De Salon -- en ze horen alle zes te slagen. */
   { sleutel: 'tredeRondgangGezakt', richting: 'omlaag', wat: 'stappen van de trede-0-rondgang die niet slagen (uit TREDEPROEF.json)' },
+  /* DE TWEE METERS VAN DE INGANGENKAART BUITEN HTTP.
+
+     `wekkersFunctieUitToch` telt de ingangen die HET WERK VAN EEN FUNCTIE doen
+     zonder langs haar schakelaar te komen. Het scherpste geval: de functie
+     `ov-mail-binnen` heet "post van buiten aannemen" en gaat pas op trede 6
+     open, terwijl de SMTP-ontvanger op de eigen poort vanaf trede 0 gewoon post
+     aanneemt. Op het bord staat dan uit en de post komt binnen.
+
+     Dit getal mag NOOIT bij de verklaarde uitzonderingen worden opgeteld: dan
+     daalt het door er een reden bij te schrijven, en dat is precies wat het niet
+     mag meten. Het gaat naar nul door de ingang achter dezelfde poort te
+     brengen, of door een besluit dat die weg buiten de kast hoort te vallen --
+     en dat besluit is er nog niet.
+
+     `wekkersZonderTrede` telt de ingangen waarvan niet te zeggen is wanneer ze
+     horen te werken. Staat op nul; stijgt zodra iemand een ingang toevoegt die
+     aan geen enkele trede hangt. */
+  { sleutel: 'wekkersFunctieUitToch', richting: 'omlaag', wat: 'ingangen buiten HTTP die het werk van een functie doen zonder langs haar schakelaar te komen (uit WEKKERS.json)' },
+  { sleutel: 'wekkersZonderTrede', richting: 'omlaag', wat: 'ingangen buiten HTTP waarvan geen trede te bepalen is (uit WEKKERS.json)' },
   { sleutel: 'wekkersOnverklaard', richting: 'omlaag', wat: 'wekkers (klok/bus) die geen enkele functie raakt en niet verklaard zijn (uit WEKKERS.json)' },
   /* DE DEUREN NAAR db.data (scripts/deuren.js).
 
@@ -639,14 +658,15 @@ function leesTredeproef(pad) {
 /* De lezer van WEKKERS.json -- zelfde afspraak en zelfde reden als de twee
    hierboven: het pad als parameter, en werpen in plaats van nul teruggeven. Nul
    zou hier "elke wekker is te schakelen" betekenen. */
-function leesWekkers(pad) {
+function leesWekkers(pad, veld) {
   let a;
   try { a = JSON.parse(fs.readFileSync(pad, 'utf8')); }
   catch (e) { throw new Error('WEKKERS.json ontbreekt of is stuk (' + e.message + '); draai npm run wekkers:vast'); }
-  if (!a || typeof a.ongeschakeld !== 'number') {
-    throw new Error('WEKKERS.json draagt geen ongeschakeld; een meter zonder invoer is geen meter');
+  const naam = veld || 'ongeschakeld';
+  if (!a || typeof a[naam] !== 'number') {
+    throw new Error('WEKKERS.json draagt geen ' + naam + '; een meter zonder invoer is geen meter');
   }
-  return a.ongeschakeld;
+  return a[naam];
 }
 
 /* De rondgang uit dezelfde vastgelegde proef, met zijn pad als parameter en
@@ -876,6 +896,8 @@ function meet(bronnen) {
   const activeringZonderReden = leesActivering(path.join(WORTEL, 'ACTIVERING.json'), 'zonderReden');
   const tredeLekken = leesTredeproef(path.join(WORTEL, 'TREDEPROEF.json'));
   const wekkersOnverklaard = leesWekkers(path.join(WORTEL, 'WEKKERS.json'));
+  const wekkersFunctieUitToch = leesWekkers(path.join(WORTEL, 'WEKKERS.json'), 'functieUitMaarUitvoerbaar');
+  const wekkersZonderTrede = leesWekkers(path.join(WORTEL, 'WEKKERS.json'), 'zonderTrede');
   const tredeRondgangGezakt = leesRondgang(path.join(WORTEL, 'TREDEPROEF.json'));
 
   /* De deuren naar db.data uit dezelfde bron als het losse script, om dezelfde
@@ -967,6 +989,8 @@ function meet(bronnen) {
     tredeLekken,
     tredeRondgangGezakt,
     wekkersOnverklaard,
+    wekkersFunctieUitToch,
+    wekkersZonderTrede,
     bronBlindeBestanden,
     delenZonderOnderwerp,
     dbDeuren: deuren.deuren,

@@ -178,9 +178,27 @@ een lek.
 `npm run wekkers` → `WEKKERS.json`
 
 De tredeproef bewijst de HTTP-kant. Daarnaast staat de gevaarlijkste vorm van
-"uit": het ziet er dicht uit en het draait. <!--getal:wekkers.totaal-->47<!--/getal--> wekkers
-(klokken, busabonnees, webhooks), waarvan er <!--getal:wekkers.onverklaard-->0<!--/getal--> geen enkele
-functie raken en niet verklaard zijn.
+"uit": het ziet er dicht uit en het draait. <!--getal:wekkers.totaal-->62<!--/getal--> ingangen in
+vijf soorten — klok, bus, webhook, **luisteraar** en **werker** — waarvan er
+<!--getal:wekkers.onverklaard-->0<!--/getal--> geen enkele functie raken en niet verklaard zijn.
+
+Die luisteraars zijn de reden dat deze kaart breder moest dan klokken: dit huis
+draait **een eigen IMAP-server, een SMTP-ontvanger, een STUN-server en een
+CA-loket**. Wie alleen naar `/api/` kijkt, ziet die vier niet — en het zijn wel
+deuren.
+
+**En daar zit de scherpste bevinding van deze ronde.**
+<!--getal:wekkers.functieUitToch-->3<!--/getal--> ingangen doen het werk van een functie zonder langs
+haar schakelaar te komen. De functie `ov-mail-binnen` heet *"post van buiten
+aannemen"* en gaat pas op trede 6 open; de SMTP-ontvanger op de eigen poort neemt
+vanaf trede 0 gewoon post aan. Op het bord staat uit, en de post komt binnen.
+
+Dat is een **bevinding en geen uitzondering**: hij heeft een eigen teller die
+niet daalt door er een reden bij te schrijven, en `test/wekkers.test.js` draait de
+echte meting om te bewaken dat hij niet stilletjes op nul wordt gezet. Twee
+mutaties deden dat namelijk — de bevindingen bij de verklaarde gevallen tellen,
+en het luisteraar-patroon weghalen — en allebei zagen ze er in de ratel uit als
+vooruitgang, want die telt omlaag.
 
 **De AI is hier geen gat**, en dat is nagekeken: `kern/stuur.js` r.130 roept zijn
 paden aan met `fetch('http://127.0.0.1:' + poort + pad)`, dus over echte HTTP en

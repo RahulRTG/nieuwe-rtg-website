@@ -63,7 +63,7 @@ const REGISTER = {
   'VERSTRENGELING.json': { meter: ['verstrengelingOnverklaard'] },
   'ACTIVERING.json': { meter: ['activeringOndergrens'] },
   'TREDEPROEF.json': { meter: ['tredeLekken', 'tredeRondgangGezakt'] },
-  'WEKKERS.json': { meter: ['wekkersOnverklaard'] },
+  'WEKKERS.json': { meter: ['wekkersOnverklaard', 'wekkersFunctieUitToch', 'wekkersZonderTrede'] },
 
   /* Deze vier dragen hun eigen grondwaarde. De ratel staat in het genoemde
      bestand en niet in NORM.json -- dat is geen tekortkoming maar een keuze:

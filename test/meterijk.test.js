@@ -875,6 +875,43 @@ const IJKINGEN = {
       } finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} }
     }
   },
+  wekkersFunctieUitToch: {
+    /* De scherpste meter van de ingangenkaart: een ingang die het werk van een
+       functie doet zonder langs haar schakelaar te komen. Hij mag NOOIT dalen
+       doordat er een reden bij wordt geschreven -- daarom leest hij een eigen
+       veld en niet het verklaarde totaal. */
+    proef: () => {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-ingang-ijk-'));
+      const pad = path.join(dir, 'WEKKERS.json');
+      try {
+        fs.writeFileSync(pad, JSON.stringify({ ongeschakeld: 0, functieUitMaarUitvoerbaar: 3, zonderTrede: 0 }));
+        assert.equal(norm.leesWekkers(pad, 'functieUitMaarUitvoerbaar'), 3);
+        assert.equal(norm.leesWekkers(pad), 0, 'en het onverklaarde totaal is iets anders');
+        fs.writeFileSync(pad, JSON.stringify({ ongeschakeld: 0, functieUitMaarUitvoerbaar: 4, zonderTrede: 0 }));
+        const na = norm.leesWekkers(pad, 'functieUitMaarUitvoerbaar');
+        assert.equal(na, 4);
+        fs.writeFileSync(pad, JSON.stringify({ ongeschakeld: 0, zonderTrede: 0 }));
+        assert.throws(() => norm.leesWekkers(pad, 'functieUitMaarUitvoerbaar'), /functieUitMaarUitvoerbaar/);
+        return na - 3;
+      } finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} }
+    }
+  },
+  wekkersZonderTrede: {
+    proef: () => {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-zondertrede-ijk-'));
+      const pad = path.join(dir, 'WEKKERS.json');
+      try {
+        fs.writeFileSync(pad, JSON.stringify({ ongeschakeld: 0, functieUitMaarUitvoerbaar: 3, zonderTrede: 0 }));
+        assert.equal(norm.leesWekkers(pad, 'zonderTrede'), 0);
+        fs.writeFileSync(pad, JSON.stringify({ ongeschakeld: 0, functieUitMaarUitvoerbaar: 3, zonderTrede: 2 }));
+        const na = norm.leesWekkers(pad, 'zonderTrede');
+        assert.equal(na, 2, 'een ingang zonder trede slaat door');
+        fs.writeFileSync(pad, JSON.stringify({ ongeschakeld: 0 }));
+        assert.throws(() => norm.leesWekkers(pad, 'zonderTrede'), /zonderTrede/);
+        return na;
+      } finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} }
+    }
+  },
   wekkersOnverklaard: {
     /* Leest, net als de twee hieronder, een vastgelegde meting. De ijkvraag is
        of hij meebeweegt en of hij invoer weigert die er niet is -- nul zou hier

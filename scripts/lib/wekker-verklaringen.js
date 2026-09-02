@@ -15,6 +15,19 @@
    Een regel is { bestand, reden }. Wat hier niet op staat en geen functie raakt,
    telt als onverklaard -- en dat is het getal dat naar nul moet.
 
+   EN ER IS EEN TWEEDE SOORT REGEL, want niet elke ingang zonder functie is
+   onschuldig. Draagt een regel `vertegenwoordigt`, dan zegt hij: deze ingang
+   DOET wat een functie doet, maar hij komt niet langs de schakelkast. Zet die
+   functie uit en de ingang werkt door. Dat is geen verklaring maar een
+   BEVINDING, en hij wordt apart geteld -- wegverklaren zou hier het gat zelf
+   dichtplakken.
+
+   Het scherpste voorbeeld staat hieronder: de functie `ov-mail-binnen` heet
+   "post van buiten aannemen" en dekt /api/mail/binnen. De SMTP-ontvanger op de
+   eigen poort is de TWEEDE weg naar binnen, en die raadpleegt geen enkele
+   schakelaar. Op het bord staat dan "post aannemen: uit" terwijl de post
+   binnenkomt.
+
    WAT HIER NIET IN HOORT: een wekker die echt bij een functie hoort. Die
    verklaar je niet weg, die krijgt een functie. */
 'use strict';
@@ -67,5 +80,31 @@ module.exports = [
   { bestand: 'server/kern/zelfzorg/index.js', reden: 'de stille automaat achter RTG_ZELFZORG_MS, met een eigen knop in de boardroom (api.automaatAan); op nul zetten stopt hem, en hij draait alleen op de leider' },
 
   /* DE OPSTELLING ZELF. */
-  { bestand: 'server/trio.js', reden: 'de hartslag tussen de drie servers van het failover-trio; een failover die je kunt uitzetten is geen failover' }
+  { bestand: 'server/trio.js', reden: 'de hartslag tussen de drie servers van het failover-trio; een failover die je kunt uitzetten is geen failover' },
+
+  /* ---- DE LUISTERAARS DIE DE WEBVOORDEUR ZELF ZIJN ----
+     Deze zes maken de HTTP-kant waar de schakelkast IN hangt. Ze zijn geen
+     ingang naast de router; ze zijn de router. */
+  { bestand: 'server/web/index.js', reden: 'de webserver zelf: alles wat hierachter binnenkomt gaat juist WEL langs de functieschakelaars' },
+  { bestand: 'server/poort.js', reden: 'het openen van de luisterpoort voor diezelfde webserver' },
+  { bestand: 'server/lib/tls.js', reden: 'de TLS-kant van diezelfde voordeur' },
+  { bestand: 'server/lib/tls-acme.js', reden: 'de ACME-uitdaging voor het certificaat van diezelfde voordeur' },
+  { bestand: 'server/lib/http1.js', reden: 'de HTTP/1-kant van diezelfde voordeur' },
+  { bestand: 'server/lib/http2.js', reden: 'de HTTP/2-kant van diezelfde voordeur' },
+  { bestand: 'server/trio-loket.js', reden: 'het CA-loket naast de voordeur: het levert het certificaatbestand uit dat een toestel nodig heeft om de voordeur te kunnen vertrouwen' },
+
+  /* ---- DE WERKERS ---- */
+  { bestand: 'server/trio-wacht.js', reden: 'de wacht van het failover-trio; zelfde reden als trio.js' },
+  { bestand: 'server/vloot.js', reden: 'het starten en bewaken van de servers zelf; infrastructuur en geen functie' },
+  { bestand: 'server/lib/cdp.js', reden: 'de browser die dit huis zelf aanstuurt voor beeld en pdf; hij begint geen werk uit zichzelf maar wordt aangeroepen' },
+
+  /* ---- EN DE DRIE DIE WEL EEN FUNCTIE DOEN EN GEEN SCHAKELAAR KENNEN ----
+     Deze staan hier NIET om ze weg te verklaren. Ze zijn geteld, met de functie
+     erbij die ze in werkelijkheid uitvoeren. */
+  { bestand: 'server/smtp-in-server.js', vertegenwoordigt: 'ov-mail-binnen',
+    reden: 'de SMTP-ontvanger op de eigen poort is de tweede weg waarlangs post van buiten binnenkomt; hij raadpleegt geen enkele schakelaar, dus met ov-mail-binnen UIT komt de post alsnog binnen' },
+  { bestand: 'server/imap-server.js', vertegenwoordigt: 'ov-werkmail',
+    reden: 'de IMAP-server geeft een postvak vrij aan een mailprogramma, buiten elke route om; wat op het bord over mail wordt geschakeld, raakt deze weg niet' },
+  { bestand: 'server/stun.js', vertegenwoordigt: 'kern-live',
+    reden: 'de eigen STUN-server bedient de ICE-kant van bellen; /api/ice hangt aan kern-live, de UDP-poort aan niets' }
 ];

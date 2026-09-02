@@ -10,6 +10,33 @@
 module.exports = (kern) => {
   const { app, auth, supplierAuth, stuurRoep, stuurBevestig, stuurPaden } = kern;
 
+  /* DE ISOLATIECONTEXT HOORT OOK HIER, en dat werd bijna vergeten. De tool-lus
+     (kern/stuur/lus.js) versmalt zijn kaart al op de stand van de aanroeper --
+     maar deze drie /kaart-routes zijn een TWEEDE weg naar dezelfde lijst, en die
+     versmalde niet. Een lid in de beschermstand kreeg hier gewoon te lezen wat
+     hij normaal mag, en dat is precies de faalvorm waar de laag tegen is: de
+     weigering komt dan pas bij de aanroep, dus na de belofte.
+
+     Hij komt uit de SESSIE en niet uit het verzoek -- zelfde reden als in
+     kern/stuur/luscontext.js: zou de aanroeper hem meesturen, dan kiest hij zelf
+     welke stand op hem van toepassing is. */
+  const isoContext = (req) => {
+    const s = (req && req.session) || null;
+    if (!s || !kern.isolatie) return null;
+    try {
+      return kern.isolatie.context({ identiteit: s.key || null, sessie: s.id || s.sid || s.key || null });
+    } catch (e) { return null; }
+  };
+
+  /* Wat er door een stand wegviel, gaat MEE in het antwoord. Een kaart die
+     stilletjes korter is, laat de aanroeper denken dat die vermogens niet
+     bestaan (EXECUTIE.md blok 0). */
+  const metUitleg = (paden) => {
+    const iso = paden.isolatie;
+    if (!iso || !iso.actief || !iso.weggevallen.length) return { ok: true, paden };
+    return { ok: true, paden, beveiligingsstand: { weggevallen: iso.weggevallen.length, uitleg: iso.uitleg } };
+  };
+
   const antwoord = (res, r) => {
     if (r.bevestigNodig) return res.status(428).json(r);
     if (r.error) return res.status(r.status || 500).json({ error: r.error });
@@ -46,14 +73,18 @@ module.exports = (kern) => {
   // de kaart per wereld: leden zien geen werk-paden en andersom
   const WERK = ['/api/supplier', '/api/staff', '/api/office', '/api/foundation', '/api/partner'];
   app.post('/api/member/doe/kaart', auth, (req, res) => {
-    const paden = stuurPaden(app, 'member').filter(p => !WERK.some(w => p.startsWith(w)));
-    res.json({ ok: true, paden });
+    const alle = stuurPaden(app, 'member', isoContext(req));
+    const paden = alle.filter(p => !WERK.some(w => p.startsWith(w)));
+    /* De vlag reist mee over het filteren heen: `filter` levert een gewone array
+       en die draagt de niet-opsombare eigenschap niet. */
+    Object.defineProperty(paden, 'isolatie', { value: alle.isolatie, enumerable: false });
+    res.json(metUitleg(paden));
   });
   app.post('/api/supplier/doe/kaart', supplierAuth, (req, res) => {
-    res.json({ ok: true, paden: stuurPaden(app, 'supplier') });
+    res.json(metUitleg(stuurPaden(app, 'supplier', isoContext(req))));
   });
   app.post('/api/staff/doe/kaart', supplierAuth, (req, res) => {
     if (!alleenPersoneel(req, res, 'staff')) return;
-    res.json({ ok: true, paden: stuurPaden(app, 'staff') });
+    res.json(metUitleg(stuurPaden(app, 'staff', isoContext(req))));
   });
 };

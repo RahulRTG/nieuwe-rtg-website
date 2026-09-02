@@ -85,14 +85,36 @@ const noemers = {};
        houdtTegen() geeft `null` zodra er geen functie achter een pad hangt: er
        valt dan niets in te delen, en tegenhouden op grond van niets is raden.
        Dat is een verdedigbare keuze, maar het betekent wel dat deze paden de
-       beschermstand ONGEMERKT passeren. Ze staan hier met naam, want een blinde
-       vlek die je niet kunt opnoemen, is er geen die je kunt sluiten. */
-    blindeVlek: {
-      aantal: zonderFunctie.length,
-      waarom: 'geen functie in de functiecatalogus achter dit pad; de beschermstand deelt hem daarom ' +
-        'niet in en laat hem door',
-      paden: zonderFunctie
-    }
+       beschermstand ONGEMERKT passeren. */
+    /* DE BLINDE VLEK, UIT ELKAAR GETROKKEN. Een getal van 81 leest als 81
+       problemen, en dat is het niet: 68 zijn de eigen console van de eigenaar
+       (eigenaar-only en bewust buiten de functieschakelaars, zie
+       server/routes/techniek/controle.js) en 6 zijn de UITGANG van deze laag
+       zelf, die met opzet niet dichtvalt (kern/isolatie/leesset.js EIGEN_UITGANG).
+       Wie die twee meetelt in de werklijst, gaat werk zoeken dat er niet is --
+       en wie ze weglaat, verzwijgt dat de beschermstand geen grip heeft op de
+       console van de eigenaar. Dus staan ze er alle drie, apart. */
+    blindeVlek: (() => {
+      const uitgang = Object.keys(
+        require(path.join(root, 'server/kern/isolatie/leesset')).EIGEN_UITGANG || {});
+      const console_ = zonderFunctie.filter(p => /^\/api\/(techniek|boardroom)\//.test(p));
+      const eigen = zonderFunctie.filter(p => uitgang.includes(p));
+      const rest = zonderFunctie.filter(p => !console_.includes(p) && !eigen.includes(p));
+      return {
+        aantal: zonderFunctie.length,
+        waarom: 'geen functie in de functiecatalogus achter dit pad; de beschermstand deelt hem daarom ' +
+          'niet in en laat hem door',
+        eigenaarConsole: { aantal: console_.length,
+          wat: 'eigenaar-only en bewust buiten de functieschakelaars: de hand die repareert',
+          bron: 'server/routes/techniek/controle.js',
+          maar: 'de beschermstand heeft daarmee geen grip op die console' },
+        eigenUitgang: { aantal: eigen.length, paden: eigen,
+          wat: 'de uitgang van de stand zelf; die valt met opzet niet dicht',
+          bron: 'server/kern/isolatie/leesset.js: EIGEN_UITGANG' },
+        werklijst: { aantal: rest.length, paden: rest,
+          wat: 'blinde vlekken zonder verklaring; dit is het werk' }
+      };
+    })()
   };
 }
 
@@ -628,8 +650,10 @@ const schuld = [
       'vastgestelde identiteit die een mens heeft moeten zien -- en niet omdat de proef er niet bij kon.' },
   { punt: 'blinde vlek in de beschermstand',
     stand: 'GEMETEN',
-    waarom: noemers.httpPaden.blindeVlek.aantal + ' paden hebben geen functie in de catalogus en ' +
-      'passeren de beschermstand ongemerkt.' },
+    waarom: noemers.httpPaden.blindeVlek.werklijst.aantal + ' paden hebben geen functie in de ' +
+      'catalogus en geen verklaring waarom niet. De andere ' +
+      (noemers.httpPaden.blindeVlek.aantal - noemers.httpPaden.blindeVlek.werklijst.aantal) +
+      ' zijn de eigenaar-console (bij ontwerp) en de uitgang van deze laag zelf.' },
   { punt: 'egress deny-by-default',
     stand: 'ONBEPAALD_INFRA',
     waarom: 'niet uit deze repo te bewijzen; hoort bij de uitrol.' },
@@ -679,7 +703,9 @@ function vat(naam, n) {
     return String(n.gevonden).padStart(6) + ' gevonden, ' +
       String(n.BEWEZEN_GEBLOKKEERD).padStart(5) + ' geblokkeerd, ' +
       String(n.ONBESLIST).padStart(4) + ' onbeslist, ' +
-      String(n.ONBEPAALD_INFRA).padStart(4) + ' onbepaald-infra';
+      String(n.ONBEPAALD_INFRA).padStart(4) + ' onbepaald-infra' +
+      (naam === 'httpPaden' ? '  (blind: ' + n.blindeVlek.werklijst.aantal + ' werklijst, ' +
+        n.blindeVlek.eigenaarConsole.aantal + ' console, ' + n.blindeVlek.eigenUitgang.aantal + ' uitgang)' : '');
   }
   if (naam === 'schaduw') {
     return String(n.gevonden).padStart(6) + ' gewogen, ' + String(n.strenger).padStart(5) + ' strenger, ' +

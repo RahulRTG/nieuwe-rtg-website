@@ -1740,6 +1740,7 @@
       "werkbeleidPauzeStand"
     ],
     "stuur": [
+      "isolatie",
       "stuurBevestig",
       "stuurPaden",
       "stuurRoep"

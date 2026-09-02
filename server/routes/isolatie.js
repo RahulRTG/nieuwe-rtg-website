@@ -29,6 +29,7 @@
 const functies = require('../functies');
 const klok = require('../lib/klok');
 const maakIsolatie = require('../kern/isolatie');
+const { maakBruikbaarheid } = require('../kern/isolatie/bruikbaarheid');
 
 const EIGEN_LAGEN = ['identiteit', 'sessie', 'apparaat'];
 
@@ -49,6 +50,11 @@ module.exports = (kern) => {
     }
   });
   const isolatie = kern.isolatie;
+  /* WAT ER NOG WERKT, voor het lid zelf. Dezelfde meter als op de cockpit en met
+     opzet niet een tweede lijst: een lid dat overweegt zichzelf dicht te zetten,
+     hoort precies te zien wat het kantoor ook ziet. Wie de knop niet durft in te
+     drukken, wordt er niet door beschermd. */
+  const bruikbaar = maakBruikbaarheid({ isolatie, functies });
 
   /* De drie sleutels van dit lid, alle drie uit de sessie. `apparaat` bestaat
      alleen als de sessie er een draagt; hem verzinnen zou een stand opleveren
@@ -98,7 +104,11 @@ module.exports = (kern) => {
            onbegrijpelijk ("waarom kan ik dit niet, ik sta op normaal"). */
         platform: ctx.standen.huis,
         open: isolatie.ontsluiting.open().filter(v => EIGEN_LAGEN.includes(v.drager) &&
-          Object.values(sleutels).includes(v.sleutel))
+          Object.values(sleutels).includes(v.sleutel)),
+        /* Per stand: wat blijft er van je dagelijkse dingen over. Alleen de
+           verhalen van een LID -- wat een zaak of het kantoor nog kan, is niet
+           iets waar dit scherm over gaat. */
+        werktNog: bruikbaar.overStanden(['beschermd', 'isolatie'])
       });
     } catch (e) { faal(res, e); }
   });

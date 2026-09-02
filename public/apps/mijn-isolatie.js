@@ -79,6 +79,20 @@
     $('nuvoet').textContent = voet.join(' ');
   }
 
+  /* WAT ER DAN NOG WERKT. Hij staat bij de KEUZE en niet ergens onderaan: wie
+     overweegt zichzelf dicht te zetten, wil dat weten voordat hij drukt en niet
+     erna. */
+  function watWerktNog(d, stand) {
+    var w = d.werktNog && d.werktNog[stand];
+    if (!w) return null;
+    var uit = maak('div', 'voet');
+    var dicht = w.rijen.filter(function (r) { return r.stand !== 'werkt'; });
+    uit.textContent = dicht.length
+      ? 'Dan werkt niet meer: ' + dicht.map(function (r) { return r.wat; }).join(', ') + '. De rest blijft.'
+      : 'Alles wat je dagelijks doet blijft werken.';
+    return uit;
+  }
+
   function tekenKeuzes(d) {
     var doos = $('keuzes');
     leeg(doos);
@@ -103,6 +117,9 @@
       if (a.stand === nu) {
         k.disabled = true;
         k.querySelector('.u').textContent = 'Hier sta je nu op.';
+      } else {
+        var gevolg = watWerktNog(d, a.stand);
+        if (gevolg) k.appendChild(gevolg);
       }
       k.addEventListener('click', function () {
         var r = ($('reden').value || '').trim();

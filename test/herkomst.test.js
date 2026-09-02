@@ -28,6 +28,8 @@
    - de leesset-uitzondering uit het filter halen    -> 3 ZAKT (RAAK).
    - `toegestaan: null` veranderen in `true` bij een
      ontbrekend effectprofiel                        -> 4 ZAKT (RAAK).
+   - de isolatiecontext uit een van de /kaart-routes
+     in routes/stuur.js weghalen                     -> 7 ZAKT (RAAK).
 
    Draai los: node --test test/herkomst.test.js */
 'use strict';
@@ -121,4 +123,48 @@ test('6. de kanalen en de effecten zijn bij het laden gekeurd', () => {
   const { NAMEN } = require('../server/kern/isolatie/effectwoorden');
   for (const e of herkomst.NOOIT_UIT_ACTIEF) assert.ok(NAMEN.includes(e), e + ' bestaat niet');
   for (const k of Object.values(herkomst.KANALEN)) assert.ok(herkomst.KLASSENAMEN.includes(k));
+});
+
+/* ---------------------------------------------------------------------------
+   7. ELKE WEG NAAR DE KAART VERSMALT.
+
+   Dit is de fout die bijna bleef staan. De tool-lus (kern/stuur/lus.js) versmalt
+   zijn kaart al op de stand van de aanroeper -- maar routes/stuur.js is een
+   TWEEDE weg naar dezelfde lijst, met drie /kaart-routes, en die versmalde niet.
+   Een lid in de beschermstand kreeg daar gewoon te lezen wat hij normaal mag.
+
+   Dat is precies de faalvorm waar deze laag tegen is: de weigering komt dan pas
+   bij de aanroep, dus NA de belofte aan de mens. En het was niet te zien -- de
+   route werkte, gaf een lijst terug, en niets zei dat die lijst te lang was.
+
+   De toets leest de BRON en niet het gedrag: elke aanroep van stuurPaden() moet
+   een derde argument meegeven, of met zoveel woorden zeggen waarom niet.
+   ------------------------------------------------------------------------ */
+test('7. elke aanroep van stuurPaden geeft een isolatiecontext mee', () => {
+  const fs2 = require('fs');
+  const path2 = require('path');
+  const wortel = path2.join(__dirname, '..', 'server');
+  const { codeRegelsUit } = require('../scripts/lib/werkelijkheid');
+
+  const zonder = [];
+  (function loop(map) {
+    for (const naam of fs2.readdirSync(map, { withFileTypes: true })) {
+      const p = path2.join(map, naam.name);
+      if (naam.isDirectory()) { if (naam.name !== 'data' && naam.name !== 'node_modules') loop(p); continue; }
+      if (!naam.name.endsWith('.js')) continue;
+      const rel = path2.relative(path2.join(__dirname, '..'), p).replace(/\\/g, '/');
+      /* De definitie zelf telt niet mee, en ook niet het bestand dat hem maakt. */
+      if (rel === 'server/kern/stuur/paden.js') continue;
+      for (const [lijn, code] of codeRegelsUit(fs2.readFileSync(p, 'utf8'))) {
+        const m = /stuurPaden\s*\(([^)]*)\)/.exec(code);
+        if (!m) continue;
+        const argumenten = m[1].split(',').length;
+        if (argumenten < 3) zonder.push(rel + ':' + lijn + '  ' + code.trim().slice(0, 80));
+      }
+    }
+  })(wortel);
+
+  assert.deepEqual(zonder, [],
+    'deze aanroepen halen de kaart op zonder isolatiecontext, dus zij versmallen niet: ' +
+    zonder.join(' | ') + ' -- een tweede weg naar dezelfde lijst is een weg om de stand heen');
 });

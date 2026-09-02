@@ -244,3 +244,28 @@ test('6. een tweede aanroep op de ledenroutes', async () => {
   const o2 = await api('/api/isolatie/mijn', {}, lid);
   assert.deepEqual(o1.body.mijn, o2.body.mijn);
 });
+
+/* ---------------------------------------------------------------------------
+   7. HET SCHERM ZEGT WAT ER DAN NOG WERKT.
+
+   Een lid dat overweegt zichzelf dicht te zetten, hoort te weten wat dat kost --
+   en vóór hij drukt, niet erna. Dezelfde meter als op de cockpit van het kantoor
+   en met opzet niet een tweede lijst: wie de knop niet durft in te drukken, wordt
+   er niet door beschermd, en dat is precies waarom `bruikbaarheid` bestaat.
+   ------------------------------------------------------------------------ */
+test('7. het antwoord vertelt wat er onder elke stand nog werkt', async () => {
+  const lid = await nieuwLid();
+  const r = await api('/api/isolatie/mijn', {}, lid);
+  assert.equal(r.status, 200);
+  assert.ok(r.body.werktNog, 'het antwoord hoort te zeggen wat er nog werkt');
+  for (const stand of ['beschermd', 'isolatie']) {
+    const w = r.body.werktNog[stand];
+    assert.ok(w, stand + ' hoort erin te staan');
+    assert.ok(w.werkt > 0, 'er hoort onder ' + stand + ' iets te blijven werken');
+    assert.deepEqual(w.belofteGezakt, [],
+      'onder ' + stand + ' zakt een belofte: ' + JSON.stringify(w.belofteGezakt));
+  }
+  /* En de stand die niets sluit hoort er NIET in: een lid dat op normaal staat,
+     heeft geen lijst nodig van wat er zou wegvallen als hij niets doet. */
+  assert.ok(!r.body.werktNog.normaal);
+});

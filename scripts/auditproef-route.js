@@ -28,6 +28,7 @@ const os = require('os');
 const path = require('path');
 const { spawn } = require('child_process');
 const { draaiAuditproef } = require('./lib/auditproef');
+const { stempel } = require('./lib/stempel');
 const { plausibelLijf } = require('./lib/rolproef');
 const { alleRoutes, isSchakel } = require('./lib/routes');
 const { haalSleutels, meldSleutels, BASISROLLEN } = require('./lib/proefsleutels');
@@ -170,6 +171,13 @@ async function wachtOpServer(basis, ms) {
   if (gezakt.length > 20) console.log('      ... en nog ' + (gezakt.length - 20));
 
   fs.writeFileSync(UITSLAG, JSON.stringify({
+    /* DE STEMPEL STOND HIER NIET, en dat was geen schoonheidsfoutje. Twee lezers
+       hebben hem nodig: scripts/vertrouwen.js bepaalt de OUDERDOM van het bewijs
+       uit de oudste stempel van zijn bronregisters, en zonder stempel valt van
+       dit register niet vast te stellen of het bij de huidige code hoort. Een
+       register zonder stempel is een meting zonder datum, en die leest als vers.
+       TAKEN.md 7.22. */
+    stempel: stempel({ begrenzing: MAX || 'geen' }),
     uitleg: 'Per schrijfroute: is er na een geslaagde oproep een regel bijgekomen in het API-spoor ' +
       '(server/opzet/auditspoor.js), gelezen via dezelfde kantoorroute die een auditor gebruikt. ' +
       '"gezakt" is hier WEL een defect-oordeel: een handeling die lukt zonder spoor is achteraf niet ' +

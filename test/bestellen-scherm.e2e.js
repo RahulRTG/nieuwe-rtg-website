@@ -134,10 +134,31 @@ test('Bestellen: zoeken vindt het gerecht, alcohol krijgt geen plusknop, en een 
       await page.locator('[data-ingang="ontdekken"]').click();
       assert.equal((await ontdekt).status(), 200);
       await page.waitForSelector('#zaken .zaakknop[data-zaak="PONTO"]', { state: 'visible', timeout: 15000 });
-      const kaart2 = page.waitForResponse((r) => r.url().endsWith('/api/gast/bezorg/kaart'), { timeout: 20000 });
+      /* HIER STOND EEN WACHT OP /api/gast/bezorg/kaart, EN DIE OPROEP IS NIET
+         GEGARANDEERD. bestellen.html r.557 leest de kaart uit een cache zodra
+         hij die heeft:
+
+           var klaar = PROFIELEN[code] ? Promise.resolve(PROFIELEN[code])
+                                       : api('/api/gast/bezorg/kaart', ...)
+
+         Is het profiel warm -- en r.1034 maakt hem warm zodra de app een lopende
+         bestelling hervat -- dan gaat er geen verzoek uit en wacht de toets
+         twintig seconden op iets wat nooit komt. Dat is niet traagheid maar een
+         toets die op een NETWERKOPROEP steunt terwijl hij over een SCHERM gaat.
+
+         Wat hij wil weten is of het klikken op het tweede loket de kaart van dat
+         loket toont, en dat stond er al onder. Die DOM-controle is bovendien
+         sterker: hij kan alleen slagen als de kaart er werkelijk is, of die nu
+         uit het netwerk of uit de cache komt. De 200 van de heenweg voegt daar
+         niets aan toe wat kaart1 hierboven niet al aantoont.
+
+         EERLIJK ERBIJ: de CI-fout van 2 september 2026 (drie keer regel 137,
+         twintig seconden) is hier NIET gereproduceerd -- niet met een trage
+         runner, niet met twee runs achter elkaar, en de databases zijn per
+         bestand gescheiden (proefserver.js r.29). Dit haalt dus een aantoonbare
+         broosheid weg; of het exact DIE fout was, staat niet vast. */
       await page.locator('#zaken .zaakknop[data-zaak="PONTO"]').click();
-      assert.equal((await kaart2).status(), 200);
-      await page.waitForSelector('#kaartLijst [data-plus="' + gewoonB.id + '"]', { state: 'visible', timeout: 15000 });
+      await page.waitForSelector('#kaartLijst [data-plus="' + gewoonB.id + '"]', { state: 'visible', timeout: 20000 });
       await page.locator('#kaartLijst [data-plus="' + gewoonB.id + '"]').click();
       await page.waitForFunction(() => /bij 2 loketten/.test(document.querySelector('#mandTekst').textContent),
         null, { timeout: 10000 });

@@ -1,10 +1,10 @@
 {
   "wat": "of elk register in de wortel de lezer machinaal belet er meer uit te concluderen dan het aantoont",
   "stempel": {
-    "op": "2026-09-02T22:14:48.473Z",
-    "commit": "c629411d",
-    "boomVuil": true,
-    "boomAnders": 3,
+    "op": "2026-09-03T09:29:57.233Z",
+    "commit": "c5da8ec4",
+    "boomVuil": false,
+    "boomAnders": 4,
     "instrument": "scripts/meetleer.js",
     "node": "v22.22.2"
   },
@@ -12,46 +12,46 @@
   "bewijst": "Dat er per register en per slot IETS staat, en of dat als veld (machinaal leesbaar) of alleen als zin in vrije tekst staat. Meer niet: leesbaarheid, geen juistheid.",
   "grens": "Dit meet of er IETS staat waar een machine bij kan, nooit of het KLOPT: een register met grens: \"geen\" haalt deze toets. Dat een mens de grenzen eerlijk opschrijft is de aanname waar deze laag op rust en die is hier niet getoetst. Proza wordt alleen herkend bij de twee beperkingsslots; bij de rest zou raden als gevuld tellen en dat maakt de meter waardeloos.",
   "blindeVlekken": "Alleen registers in de wortel met een HOOFDLETTERnaam. Registers elders (server/data, .github) worden niet gezien, en een register dat helemaal niet geschreven wordt al helemaal niet.",
-  "registers": 79,
+  "registers": 85,
   "slots": 7,
-  "onleesbaar": 382,
+  "onleesbaar": 410,
   "blind": 8,
   "losseClaims": 0,
   "perSlot": {
     "watMeetIk": {
-      "veld": 0,
+      "veld": 1,
       "proza": 0,
-      "ontbreekt": 79
+      "ontbreekt": 84
     },
     "hoeGemeten": {
-      "veld": 15,
+      "veld": 16,
       "proza": 0,
-      "ontbreekt": 64
+      "ontbreekt": 69
     },
     "gemetenOp": {
-      "veld": 60,
+      "veld": 64,
       "proza": 0,
-      "ontbreekt": 19
+      "ontbreekt": 21
     },
     "resultaat": {
-      "veld": 70,
+      "veld": 74,
       "proza": 0,
-      "ontbreekt": 9
+      "ontbreekt": 11
     },
     "watBewijstDit": {
-      "veld": 0,
+      "veld": 1,
       "proza": 0,
-      "ontbreekt": 79
+      "ontbreekt": 84
     },
     "watBewijstDitNiet": {
-      "veld": 25,
-      "proza": 46,
+      "veld": 28,
+      "proza": 49,
       "ontbreekt": 8
     },
     "blindeVlekken": {
       "veld": 1,
       "proza": 0,
-      "ontbreekt": 78
+      "ontbreekt": 84
     }
   },
   "rijen": [
@@ -144,6 +144,22 @@
         "resultaat": "veld",
         "watBewijstDit": "ontbreekt",
         "watBewijstDitNiet": "ontbreekt",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 1,
+      "proza": 0,
+      "ontbreekt": 6
+    },
+    {
+      "register": "ROLLBACKBESLUIT.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "ontbreekt",
+        "resultaat": "ontbreekt",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "veld",
         "blindeVlekken": "ontbreekt"
       },
       "losseClaim": false,
@@ -376,6 +392,22 @@
       "ontbreekt": 5
     },
     {
+      "register": "SCHERFMETER.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "ontbreekt",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 1,
+      "proza": 1,
+      "ontbreekt": 5
+    },
+    {
       "register": "SLO.json",
       "slots": {
         "watMeetIk": "ontbreekt",
@@ -525,6 +557,22 @@
         "watMeetIk": "ontbreekt",
         "hoeGemeten": "ontbreekt",
         "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 2,
+      "proza": 1,
+      "ontbreekt": 4
+    },
+    {
+      "register": "CORRECTIES.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "veld",
+        "gemetenOp": "ontbreekt",
         "resultaat": "veld",
         "watBewijstDit": "ontbreekt",
         "watBewijstDitNiet": "proza",
@@ -744,6 +792,38 @@
       "ontbreekt": 4
     },
     {
+      "register": "ISOLATIEPROEF.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 2,
+      "proza": 1,
+      "ontbreekt": 4
+    },
+    {
+      "register": "ISOLATIESCHADUW.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "veld",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 3,
+      "proza": 0,
+      "ontbreekt": 4
+    },
+    {
       "register": "KETENS.json",
       "slots": {
         "watMeetIk": "ontbreekt",
@@ -773,6 +853,22 @@
       "losseClaim": false,
       "velden": 2,
       "proza": 1,
+      "ontbreekt": 4
+    },
+    {
+      "register": "LAATSPOOR.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "veld",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 3,
+      "proza": 0,
       "ontbreekt": 4
     },
     {
@@ -1306,18 +1402,18 @@
     {
       "register": "MEETLEER.json",
       "slots": {
-        "watMeetIk": "ontbreekt",
+        "watMeetIk": "veld",
         "hoeGemeten": "veld",
         "gemetenOp": "veld",
         "resultaat": "veld",
-        "watBewijstDit": "ontbreekt",
+        "watBewijstDit": "veld",
         "watBewijstDitNiet": "veld",
         "blindeVlekken": "veld"
       },
       "losseClaim": false,
-      "velden": 5,
+      "velden": 7,
       "proza": 0,
-      "ontbreekt": 2
+      "ontbreekt": 0
     }
   ]
 }

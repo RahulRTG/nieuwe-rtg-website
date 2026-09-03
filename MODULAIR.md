@@ -22,7 +22,7 @@ Dezelfde volgorde als bij `OBJECTMODEL.json` (waar `Asset` sneuvelde) en
 
 `npm run verstrengeling` → `VERSTRENGELING.json`
 
-<!--getal:verstrengeling.randen-->1696<!--/getal--> randen tussen de knopen van dit huis, waarvan er
+<!--getal:verstrengeling.randen-->1748<!--/getal--> randen tussen de knopen van dit huis, waarvan er
 <!--getal:verstrengeling.onverklaard-->0<!--/getal--> **onverklaard** zijn. Dat getal moet naar nul, en het
 aantal randen niet: een huis waarin domeinen elkaar nooit nodig hebben, is geen
 huis maar een map met losse programma's.
@@ -47,7 +47,7 @@ kern** — `SEMANTIEK.json` laat zien dat hetzelfde woord op drie plekken nog ge
 gedeelde betekenis is.
 
 Omgekeerd staat er wat er breekt als iets er niet is:
-<!--getal:verstrengeling.uitneembaar-->60<!--/getal--> van de <!--getal:verstrengeling.domeinen-->559<!--/getal--> domeinen sleept géén ander
+<!--getal:verstrengeling.uitneembaar-->60<!--/getal--> van de <!--getal:verstrengeling.domeinen-->568<!--/getal--> domeinen sleept géén ander
 domein mee. Bovenaan de andere kant staat `eigencollectie` met 246: dat is geen
 domein meer maar een verborgen kern, en dat is een besluit (noem het kern) of
 werk (breng de koppelingen terug).
@@ -57,10 +57,10 @@ werk (breng de koppelingen terug).
 `npm run activering` → `ACTIVERING.json`
 
 Per functie uit de catalogus: welke routes, welke bestanden, welke domeinen.
-<!--getal:activering.functies-->205<!--/getal--> functies dragen routes; een doorsnee functie raakt
-<!--getal:activering.mediaan-->27<!--/getal--> knopen.
+<!--getal:activering.functies-->210<!--/getal--> functies dragen routes; een doorsnee functie raakt
+<!--getal:activering.mediaan-->26<!--/getal--> knopen.
 
-**Vier graden, en ze zijn niet uitwisselbaar.** <!--getal:activering.gemeten-->147<!--/getal--> functies
+**Vier graden, en ze zijn niet uitwisselbaar.** <!--getal:activering.gemeten-->152<!--/getal--> functies
 zijn `gemeten`; <!--getal:activering.ondergrens-->48<!--/getal--> zijn `ondergrens` (er hangt méér aan dan
 hier staat, en nieuwe broninformatie zou helpen); <!--getal:activering.onbepaald-->3<!--/getal--> zijn
 `onbepaald` (de bronnen spreken elkaar tegen — dat vraagt een besluit en geen
@@ -300,8 +300,8 @@ eerste twee uitslagen is het hele punt.
 | `proza` | de betekenis staat er, maar in een vrije zin. Een zorgvuldige lezer wordt niet misleid; een dashboard wel, want dat leest geen proza |
 | `ontbreekt` | er staat niets |
 
-**De stand over <!--getal:meetleer.registers-->79<!--/getal--> registers.** Twee getallen die nooit worden
-opgeteld: <!--getal:meetleer.onleesbaar-->382<!--/getal--> slots zijn onleesbaar voor een machine (proza óf
+**De stand over <!--getal:meetleer.registers-->85<!--/getal--> registers.** Twee getallen die nooit worden
+opgeteld: <!--getal:meetleer.onleesbaar-->410<!--/getal--> slots zijn onleesbaar voor een machine (proza óf
 leeg — dat daalt ook als een zin een veld wordt), en <!--getal:meetleer.blind-->8<!--/getal-->
 registers zijn **blind**: die zeggen nergens wat ze niet aantonen, veld noch zin.
 Daar wordt zelfs een zorgvuldige lezer niet geremd, en dat is het gevaarlijke

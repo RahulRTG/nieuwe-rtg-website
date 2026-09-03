@@ -241,7 +241,9 @@
     "ketenvorm": "node scripts/ketenvorm.js",
     "ketenvorm:vast": "node scripts/ketenvorm.js --vastleggen",
     "ritmigratie": "node scripts/ritmigratie.js",
-    "ritmigratie:vast": "node scripts/ritmigratie.js --vastleggen"
+    "ritmigratie:vast": "node scripts/ritmigratie.js --vastleggen",
+    "doorwerking": "node scripts/doorwerking.js",
+    "doorwerking:vast": "node scripts/doorwerking.js --vastleggen"
   },
   "devDependencies": {
     "playwright": "^1.62.1"

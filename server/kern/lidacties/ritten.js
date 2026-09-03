@@ -8,7 +8,7 @@ module.exports = (ctx) => {
   const { db, save, crypto, schoon, PERSONAS, findSupplier, ledenPrijs, optieAan,
     leeftijdVan, geborenVan, alcoholGrensVan, pickupCode, entreeCode, ticketsVoorSlot,
     fooiUit, pasTegoedToe, verdienPunten, liveCodename, haversine, pushLive,
-    notifySupplier, sseToSupplier, sseToOffice, zorgVoor, zorgContact, keuken,
+    notifySupplier, sseToSupplier, sseToOffice, zorgVoor, zorgMee, zorgContact, keuken,
     orderMetRef, ordersVoegToe, boekingMetRef, boekingenVoegToe, openLijnVoor, ledenvoordeelVoor, factuurVoorLid } = ctx;
   const { rekenAf } = require('./afrekenen')(ctx);
 function vraagRitVoor(session, body) {
@@ -76,7 +76,7 @@ function vraagRitVoor(session, body) {
     })(),
     passengers: pax, luggage: koffers, note: schoon(body.note, 140),
     // de chauffeur weet het (alleen met toestemming): bijv. rolstoel of medicatie
-    zorg: zorgVoor(session.key),
+    zorg: zorgMee(session.key, { zaak: s.code, reden: 'zorgprofiel meegegeven bij een rit' }),
     km: Math.round(km * 10) / 10, quote,
     driver: null, vehicle: null,
     // de vervoerder kiest het betaalmoment: vooraf (standaard) of achteraf;

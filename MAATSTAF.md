@@ -56,7 +56,7 @@ de tabel na en zakt zodra de telregel eronder niet meer klopt.
 | U7 | Een claim zonder bewijs telt niet; de route kiest op bewijskwaliteit (proof-aware routing) — het mechanisme | FABRIC.md, PROOF.md | bewijspoort in `kern/stuur/beleid.js` laat een geschorste capability uit de paden vallen | toets op de poort | mechanisme aanwezig | **staat** |
 | U8 | …en dat bewijs is sterk genoeg om routes werkelijk verschillend te laten handelen | PROOF.md par. 0: bewijs mag alleen groeien | `scripts/vertrouwen.js`, `BEWIJSSCHULD.json` met sluitweg per route | normtanden `bewijsCellenBewezen`, `bewijsAchterstand` | <!--getal:vertrouwen.bewezen-->0<!--/getal--> bewezen, <!--getal:vertrouwen.routes-->4180<!--/getal--> verzwakt | **jaren weg** |
 | U9 | Elke hoofdactie is omkeerbaar of compenseerbaar, en die twee worden nooit samengeteld | EXECUTIE.md blok 5 | `scripts/herstelproef.js`, `scripts/lib/herstelwereld.js`; voor horeca `kern/horeca/correctie.js` (compensatie met een bevroren bedrag) | proef zakt op een verdict zonder grond; `test/horeca-correctie.test.js` | 13 exact, 30 compensatie, 1 geen-herstel, 46 vragen een wereld | **staat** |
-| U10 | Vraag een gegeven maar één keer, en hergebruik alleen met doel, toestemming, bron en actualiteit | LEVEN.md par. 2, LINK.md par. 3, `kern/consent-register.js` | kluis + codenamen; doelbinding per verlening | `scripts/afleidbaar.js` meet de afstand codenaam → identificator | doorwerking over domeinen (dieet → reizen → evenement) is niet gebouwd en niet gemeten | **besluit** |
+| U10 | Vraag een gegeven maar één keer, en hergebruik alleen met doel, toestemming, bron en actualiteit | LEVEN.md par. 2, LINK.md par. 3, `kern/consent-register.js` | één bron (`db.data.zorgProfielen`), projectie erop: `zorgMee` eist een zaak + reden en stempelt de kopie, `zorgActueel` laat de bron winnen | `scripts/afleidbaar.js`; `scripts/doorwerking.js` telt naamloze lezers en ongestempelde kopieën | DOORWERKING.json: 12 lezers naar een derde, **0 naamloos, 0 bevroren** (was 14 en 12) — voor het zorgprofiel; andere gegevens ongemeten | **staat** |
 | U11 | Eén werkelijkheid, meerdere perspectieven: consument, zaak, keuken, koerier, support en finance kijken naar hetzelfde object | HORECA.md: de rekening is één waarheid over alle kanalen | per domein; `kern/mobiliteit/appbrug.js` brengt de app-rit naar het dispatchbord | `test/appbrug.test.js`, ritproef schakel 1 | horeca gemeten; mobiliteit: de brug staat, de 34 lezers van `rides` zijn nog niet omgezet (par. 7.5) | **stap weg** |
 | U12 | Geen enkele actie eindigt in een dood spoor: elke handeling heeft een ontvanger, of een verklaring | par. 3 hieronder | `scripts/doodspoor.js`, `DOODSPOOR.json` | `npm run doodspoor:controle` zakt op een verlopen verklaring; de regel zelf is nog geen poort | <!--getal:doodspoor.bronroutes-->282<!--/getal--> bronroutes, <!--getal:doodspoor.open-->109<!--/getal--> open na de triage (was 163) | **stap weg** |
 | U13 | De interface toont de taak, niet de organisatie | TIKKEN.md, `shared/sprong.js` | resolver + sprong (handelingen uit de schermen zelf) | `scripts/vindbaar.js` | VINDBAAR.json | **staat** |
@@ -74,7 +74,7 @@ de tabel na en zakt zodra de telregel eronder niet meer klopt.
 | U25 | Eén vaste mentale structuur: vind, kies, bevestig, volg, los op | GRAMMATICA.md: zeven zinnen, vijf gebaren met elk één betekenis | schilbalk, orb, gewichten | `test/ontwerp.test.js`, grammatica-toetsen | toetsen | **staat** |
 | U26 | Eén shell met vijf vaste gebieden: Vandaag, Doen, Inbox, Ruimtes, Jij | WERELD.md: één beginscherm, de lege werktafel, geen voorgekookt werkblad | `vandaag.html`, Rahul in de schilbalk, werelden in de bank, bedieningspaneel in de voet | `test/wereldregister.test.js` | vier van de vijf bestaan als projectie | **geprojecteerd** |
 | U27 | Een inbox: alles waarvoor deze actor nu ontvanger, eigenaar of beslisser is | par. 3 en 4: hangt aan het ontvangercontract en het statuscontract | niet gebouwd | geen | geen | **stap weg** |
-| U28 | Elke objectpagina draagt dezelfde structuur: samenvatting, status, volgende actie, tijdlijn, betrokkenen, geld, documenten, bewijs, rechten, probleem oplossen | ONTWERP.md (Context Pane, Reference, Action Line) | per scherm | `test/ontwerp.test.js` op de vormtaal, niet op de objectstructuur | geen | **besluit** |
+| U28 | Elke objectpagina draagt dezelfde structuur: samenvatting, status, volgende actie, tijdlijn, betrokkenen, geld, documenten, bewijs, rechten, probleem oplossen | ONTWERP.md (Context Pane, Reference, Action Line); `kern/objectlaag/` | `kern/objectlaag/pagina.js` stelt de tien secties SAMEN uit aangemelde bijdragers; een sectie zonder bijdrager komt terug als `nietGevraagd` | `test/objectpagina.test.js`: elf secties knallen, een verzonnen sectie knalt, `leeg` ≠ `nietGevraagd` | route `POST /api/sociaal/object/pagina` | **staat** |
 | U29 | Interactiesnelheid is een releasebudget (50 ms reactie, 400 ms warme weergave, 300 ms opdracht ontvangen) | KEURING.md; `scripts/tikken.js` draait al een echte browser | `scripts/prestaties.js` meet de motor, niet de interface | geen | geen | **stap weg** |
 | U30 | Uitkomstsnelheid wordt gemeten: van bedoeling tot boeking, van klacht tot besluit, van verkoop tot afwikkeling | nergens | niets meet een doorlooptijd over actoren heen | geen | geen | **jaren weg** |
 | U31 | Dezelfde opdracht twee keer versturen veroorzaakt niet twee bestellingen | MUTATIECONTRACT.md: 100% geclassificeerd, niet 100% idempotent | `IDEMPROEF.json`, `lib/idemsleutels.js` | toetsen op de classificatie | <!--getal:idem.beoordeeld-->1573<!--/getal--> beoordeeld | **staat** |
@@ -82,7 +82,7 @@ de tabel na en zakt zodra de telregel eronder niet meer klopt.
 | U33 | Een organisatie start bijna zonder configuratie: per branche een veilige standaard, en de klant past alleen afwijkingen aan | PLATFORM.md par. 5: veertig sectormotoren is jaren werk; TENANT.md levenscyclus | 73 genres met werkvormen; geen branchestandaard als voorstel | geen | geen | **jaren weg** |
 | U34 | De organisatie is een digitale tweeling die voorspelt ("71% kan automatisch worden verplaatst") | BESTUUR.md: nooit een getal waar geen meting is; KOSTEN.md: bandbreedte pas na drie gemeten maanden | `kern/kosten/vooruitblik.js` (trefzekerheid meet zichzelf), gevolgsimulatie in TENANT met `nietGerekend` | toetsen | per voorspelling een graad | **geprojecteerd** |
 | U35 | Eén identiteit, meerdere contexten; rechten zijn relationeel, tijdelijk, bedrag- en objectgebonden | CONTROLPLANE.md (wat, waar, hoeveel, wanneer; delegatie versmalt), BESTUUR.md (toegang is een uitnodiging) | `kern/bevoegdheid/`, `kern/stuur/mandaat.js`, `sociaal/pin-deur.js` | `scripts/capabilityroepers.js` | CAPABILITEIT.json | **staat** |
-| U36 | De audit is cryptografisch tegen stille wijziging beschermd | OS.md: de envelop; PROOF.md | `kern/envelop.js` draagt actor en oorzaak; geen keten van afdrukken | geen | geen | **besluit** |
+| U36 | De audit is cryptografisch tegen stille wijziging beschermd | OS.md: de envelop; PROOF.md | `lib/keten.js` (hashketen per journaal), `lib/keten-anker.js` (kopafknipping), `lib/ankerdienst.js` (één blok over vier journalen), `lib/ankerpost.js` (bestemming: tweede machine) | aangesloten in `server.js` en `routes/office/toegang.js`; `stand()` meldt `inBedrijf: false` zolang er geen blok buiten staat | `test/keten.test.js`, `test/ankerdienst*.test.js`, `test/ankerpost.test.js` | **staat** |
 | U37 | Alle geld gaat door één ledger, dubbel geboekt; een correctie is een nieuwe boeking en nooit geschiedenis herschrijven | WAARDE.md, GELD.md: geen tweede boekhouding | `kern/pay/poort.js`, `kern/waarde/` | check.js regel 62 en 63 (een domein raakt opslag alleen door zijn eigen deur) | toetsen | **staat** |
 | U38 | RTG Grade 0–5 als productscore | LAT-regel 11, `scripts/check.js` regel 48: bewijsgroen is geen go-live-groen; BEWIJSMACHINE.md | `scripts/zekerheid.js` | regel 48 zakt zodra de go-live-keuring een bewijsregister leest | — | **geprojecteerd** |
 | U39 | Harde poorten die nooit compenseerbaar zijn: ledger, audit, herstel, toegankelijkheid, prestatie, actor-compleetheid, dood spoor, uitstap | KEURING.md, TOEGANKELIJK.md, TENANT.md (uitgang) | `scripts/check.js` (64 regels), a11y-poorten, `kern/tenant/uitgang.js` | bestaand: ja; dood spoor en actor: nog niet | per poort | **stap weg** |
@@ -94,7 +94,7 @@ de tabel na en zakt zodra de telregel eronder niet meer klopt.
 | U45 | De repo verhuist naar /products, /domains, /capabilities, /trust | 415 kerndomeinen in `server/kern`; EXECUTION_MAP is een projectie | een gegenereerde leesweergave kan; een fysieke verhuizing niet | — | — | **geprojecteerd** |
 | U46 | De doctrine komt letterlijk in PLATFORM.md | dit document | MAATSTAF projecteert; PLATFORM.md houdt de vier-productregel | — | — | **geprojecteerd** |
 
-Geteld uit de tabel: 46 uitspraken -- staat 18, stap weg 10, besluit 5, jaren weg 4, geprojecteerd 9.
+Geteld uit de tabel: 46 uitspraken -- staat 21, stap weg 10, besluit 2, jaren weg 4, geprojecteerd 9.
 
 Wat die telling níét zegt: dat RTG voor 18/46 klaar is. De rijen wegen niet
 gelijk. U8 alleen (bewijs dat routes verschillend laat handelen) is meer werk
@@ -742,6 +742,137 @@ terugkomt loopt langs `kern/pay` en is niet gemeten. Bij de rit loopt de betalin
 over de demo-rail; dat het geld bij de vervoerder landt is evenmin gemeten.
 
 ---
+
+## 7b. Het anker — waar het blok heen gaat (U36)
+
+**Dit stond in de tabel verkeerd, en dat is de eerste bevinding.** U36 heette
+hier een *besluit* — "geen keten van afdrukken". Dat was niet zo. De hashketen
+per journaal staat (`server/lib/keten.js`), de laag die kopafknipping kan zien
+staat (`keten-anker.js`), en de dienst die de koppen van de vier journalen tot
+één getekend blok maakt staat ook (`ankerdienst.js`), aangesloten in
+`server/server.js` en `routes/office/toegang.js`. Een tabelregel die achterloopt
+op de code stuurt het werk verkeerd; hij is bijgewerkt naar **staat**.
+
+Wat er wél open was, stond in de code zelf uitgeschreven: `ankerdienst.js` zegt
+dat hij níét bepaalt waar het blok heen gaat, want *"een anker dat deze software
+zelf op dezelfde schijf wegschrijft is geen anker maar een tweede regel om te
+wijzigen"*, en dat de bestemming *"een besluit over de infrastructuur"* is dat
+bij een mens hoort.
+
+**Dat besluit is genomen (3 september 2026, eigenaar): een tweede machine binnen
+RTG.** `server/lib/ankerpost.js` is dat besluit in code, en vijf dingen liggen
+er vast:
+
+1. **Dezelfde schijf is geen bestemming.** `file:`, een pad, `localhost` en
+   `127.0.0.1` worden geweigerd mét de reden — precies de vorm die de
+   ankerdienst voorzag en niet wilde.
+2. **Geen bestemming is niet in bedrijf.** Zonder `RTG_ANKERPOST_URL` doet de
+   post niets en meldt hij dat. Fail-closed: hij maakt nooit van "niet gemeten"
+   een "in orde", en de stand van de ankerdienst blijft zeggen wat zij al zei.
+3. **Alleen bijschrijven.** De post kent één werkwoord richting de tweede
+   machine. Kan deze kant daar iets weghalen, dan is het anker een sier.
+4. **Wat terugkomt is invoer en geen waarheid.** Een teruggehaald blok gaat
+   ongewijzigd naar `ankerdienst.reken()` en raakt geen enkel journaal aan; iets
+   dat niet op een blok lijkt is een bevinding over de tweede machine en geen
+   aanleiding om hier te repareren.
+5. **Wat het niet bewijst, staat in elke stand.** Een tweede machine *binnen*
+   RTG ziet kopafknipping door één hand. Wie beide machines bestuurt, knipt
+   beide koppen af. Daarvoor is een partij buiten dit huis nodig, en dat is een
+   tweede besluit dat niet is genomen — `stand()` noemt die grens elke keer mee,
+   zodat niemand het anker voor meer aanziet dan het is.
+
+Twee routes voeren het uit: `POST /api/office/anker/post` brengt het blok van nu
+weg, `POST /api/office/anker/post/reken` rekent af met het blok dat op de tweede
+machine *ligt* in plaats van met een blok dat iemand hier overtypt. Het verschil
+is klein en het is het hele punt.
+
+## 7c. De doorwerking van één gegeven (U10)
+
+**Ook deze regel stond half verkeerd.** De tabel zei dat doorwerking over
+domeinen "niet gebouwd en niet gemeten" was. Gebouwd was hij wél: het
+zorgprofiel — allergenen, dieet, medische aandachtspunten — staat op één plek
+(`db.data.zorgProfielen`, `kern/gastzorg.js`) en reist mee naar bestellingen,
+ritten, tickets, bezorging, charter, autohuur, verblijven, tafelreserveringen,
+zorgboekingen en de reisplanner. Dieet → reizen → evenement liep dus al.
+
+Wat er niet was, is de **meting**, en die legde twee gaten bloot die je per
+call-punt niet ziet omdat elk punt er los redelijk uitziet
+(`scripts/doorwerking.js`, `DOORWERKING.json`):
+
+| | vóór | na |
+|---|---|---|
+| lezers naar een derde | 15 | 12 |
+| **naamloos** (geen zaak → geen regel in het inzagejournaal) | **14** | **0** |
+| **bevroren** (kopie in opgeslagen data, zonder datum of bron) | **12** | **0** |
+
+*Naamloos* betekende dat een lid nooit kon zien welke zaak zijn allergieën had
+gelezen — precies het gat dat de kop van `gastzorg.js` zegt te hebben gedicht.
+*Bevroren* betekende dat intrekken niet terugwerkte: haalt een lid morgen een
+allergie weg of zet hij het delen uit, dan blijft de kopie in de bestelling
+staan. Toestemming die niet terugwerkt, is geen toestemming.
+
+**De scherpste vondst is het doorgeefluik.** Precies één plek noemde netjes een
+zaak (`kern/avond/voorkeuren.js`), en één laag erboven stond
+`zorgVoor: (k) => kern.zorgVoor(k)` — het tweede argument viel op de grond. De
+enige lezer die het goed deed, was ontwapend door een wrapper. Dat is een fout
+die geen enkele toets op één bestand ooit vindt.
+
+**De reparatie is één bron met een projectie erop** (`kern/gastzorg-profiel.js`):
+
+- `zorgMee(key, { zaak, reden })` — geeft **niets** terug zonder zaak, noteert in
+  het inzagejournaal en stempelt de kopie met `op`, `bron` en `voor`. Een kopie
+  zonder ontvanger is geen doorwerking maar een afdruk, en een afdruk is niet in
+  te trekken.
+- `zorgActueel(key, bewaard)` — zet de kopie naast de bron van nu. De bron wint
+  altijd; de kopie zegt alleen nog wat er stond. Vier standen, en `ingetrokken`
+  is met opzet iets anders dan `leeg`: het eerste is een besluit van het lid.
+
+Wat er níét in staat: kopieën die al in de database stonden. Die dragen geen
+datum, en `zorgActueel` zegt dat met zoveel woorden in plaats van te doen alsof.
+En dit is **één** doorwerking, niet alle — dat staat als `nietGemeten` in het
+register zelf.
+
+## 7d. De objectpagina als samenstelling (U28)
+
+De gemakkelijke uitvoering van "elke objectpagina draagt dezelfde structuur" is:
+schrijf de tien secties op in ONTWERP.md en tel achteraf hoeveel schermen zich
+eraan houden. Dat is een belofte met een meter erachter, en dit huis weet wat
+daarmee gebeurt — PLATFORM.md par. 0: zeventien app-beschrijvingen beloofden
+functies die geen route hadden.
+
+**Daarom is de structuur geen afspraak maar een samenstelling**
+(`server/kern/objectlaag/pagina.js`). Een scherm vraagt niet om een object en
+tekent er tien blokken omheen; het vraagt om de **pagina**, en die komt terug met
+alle tien secties in dezelfde volgorde, gevuld door **bijdragers** die zich per
+soort aanmelden. Een capability die morgen iets nieuws weet over een bijeenkomst,
+meldt zich aan als bijdrager en staat op élke eventpagina — zonder dat er één
+scherm verandert. Dat is de reden dat dit op de objectlaag hangt en niet in de
+vormtaal: die laag beantwoordde al de vraag *wat kan ik met dit ding*, en de
+pagina is diezelfde vraag met negen andere ernaast.
+
+**Vier dingen liggen vast:**
+
+1. **Verbergen bestaat niet** (ADAPTIEF.md). Een sectie zonder inhoud verdwijnt
+   niet. En `leeg` is met opzet iets anders dan `nietGevraagd`: het eerste is een
+   feit over het object (er is een bijdrager, en die weet hier niets), het tweede
+   een gat in het platform (niemand heeft zich voor deze soort aangemeld). Een
+   structuur die haar eigen gaten wegvouwt, meet zichzelf nooit.
+2. **Elke bijdrage draagt een bron en een bewijsgraad** (BESTUUR.md), met
+   `onbekend` als veilige val — een bijdrager die niets over de hardheid zegt,
+   krijgt geen graad cadeau.
+3. **De pagina bezit niets**, net als de objectlaag eromheen: geen opslag, geen
+   schrijffunctie, en de bijdragers krijgen alleen wat `object()` al teruggaf.
+4. **De secties staan vast en zijn met tien.** Een elfde is geen uitbreiding maar
+   het einde van de structuur; wie iets nieuws wil tonen, meldt een bijdrager aan
+   in een bestaande sectie. `test/objectpagina.test.js` laat een verzonnen sectie
+   knallen bij het aanmelden en niet pas op het scherm.
+
+**De eerste lichting bijdragers is met opzet mager, en dat is de opbrengst.** Zij
+lezen uitsluitend wat de objectlaag al teruggaf. Een eventpagina komt daardoor
+terug met vier gevulde secties, één lege en **vijf `nietGevraagd`** — de eerste
+eerlijke uitdraai van wat dit huis over een bijeenkomst kan zeggen. Geld,
+documenten en bewijs staan er leeg bij, met de soort erbij, in plaats van weg te
+zijn.
 
 ## 8. De volgorde
 

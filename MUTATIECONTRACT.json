@@ -1,27 +1,28 @@
 {
  "stempel": {
-  "op": "2026-09-03T11:25:14.321Z",
-  "commit": "a90d01c0",
+  "op": "2026-09-03T17:30:55.414Z",
+  "commit": "3761652e",
   "boomVuil": true,
-  "boomAnders": 10,
+  "boomAnders": 12,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 4740,
+  "totaal": 4743,
   "geclassificeerd": 4740,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3273,
    "NOT_APPLICABLE": 1088,
    "PROTECTED": 297,
-   "INTENTIONALLY_NON_IDEMPOTENT": 82
+   "INTENTIONALLY_NON_IDEMPOTENT": 82,
+   "LEGACY_PENDING_CLASSIFICATION": 3
   },
   "vastgesteldDoorMens": 1494,
   "afgeleidDoorScript": 3246,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 3895,
+   "AUTHENTICATED": 3898,
    "PUBLIC": 113,
    "OBJECT_SCOPED": 716,
    "(niet af te leiden -- vraagt een verklaring)": 1,
@@ -32,7 +33,7 @@
    "kale ronde: beschermd": 129,
    "kale ronde: onbeschermd": 88,
    "kale ronde: geen uitspraak": 4512,
-   "niet gemeten": 11
+   "niet gemeten": 14
   },
   "voorstellen": {},
   "metingVan": "2026-09-01T16:38:26.262Z"
@@ -52617,6 +52618,44 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "office.anker.post",
+   "route": "POST /api/office/anker/post",
+   "semantiek": null,
+   "duplicaatregel": "nietIdempotent",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "office.anker.post.reken",
+   "route": "POST /api/office/anker/post/reken",
+   "semantiek": null,
+   "duplicaatregel": "leest",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
    "mutatieId": "office.anker.reken",
    "route": "POST /api/office/anker/reken",
    "semantiek": {
@@ -88952,6 +88991,25 @@
    "herkomst": "afgeleid",
    "voorstel": null,
    "voorstelGrond": null
+  },
+  {
+   "mutatieId": "sociaal.object.pagina",
+   "route": "POST /api/sociaal/object/pagina",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen anonieme demo-gast",
+    "bedoeld": null,
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
   },
   {
    "mutatieId": "sociaal.rahul",

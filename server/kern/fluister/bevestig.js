@@ -5,7 +5,7 @@
    ./betalen. Elke handler krijgt {q,p,klaar,key,codenaam,sess} en geeft een
    klaar(...)-antwoord of null (dan probeert de orkestrator de volgende). */
 module.exports = (ctx) => {
-  const { db, save, reserveerTafel, annuleerReservering, zorgVoor, pay, nu, eur, datumInZin, voerUit } = ctx;
+  const { db, save, reserveerTafel, annuleerReservering, zorgVoor, zorgMee, pay, nu, eur, datumInZin, voerUit } = ctx;
   const poort = require('./gegevens')(ctx);
 
   // "ja": het openstaande voorstel uitvoeren
@@ -95,7 +95,7 @@ module.exports = (ctx) => {
     const r = reserveerTafel({ key, tier: sess.tier }, codenaam, { supplierCode: s.code, datum, tijd: tijd[1].padStart(2, '0') + ':' + tijd[2], personen });
     if (r.error) return klaar('Dat lukt niet: ' + r.error);
     // het zorgprofiel reist mee, precies zoals bij een gewone reservering
-    const z = zorgVoor && zorgVoor(key);
+    const z = zorgMee && zorgMee(key, { zaak: s.code, reden: 'zorgprofiel meegegeven bij een tafelreservering' });
     if (z) { r.reservering.zorg = z; save(); }
     return klaar('Aangevraagd: ' + s.name + ', ' + datum + ' om ' + r.reservering.tijd + ' voor ' + personen + '. De zaak bevestigt zo; u ziet het in de bel.', true);
   }

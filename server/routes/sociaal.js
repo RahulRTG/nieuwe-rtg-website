@@ -113,4 +113,17 @@ module.exports = (kern) => {
     if (!r) return res.status(404).json({ error: 'Dit vinden we niet.' });
     res.json(r);
   });
+
+  /* DE OBJECTPAGINA (MAATSTAF.md U28): hetzelfde object, maar in de tien
+     secties die op ELKE objectpagina staan. Het verschil met de route hierboven
+     is niet cosmetisch: die geeft wat dit object toevallig heeft, deze geeft de
+     hele structuur -- inclusief de secties die niemand vult, met de reden.
+     Verbergen bestaat niet (ADAPTIEF.md), ook niet als het over onszelf gaat. */
+  app.post('/api/sociaal/object/pagina', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    const b = req.body || {};
+    const r = kern.objectlaag.pagina(req.session.key, String(b.soort || ''), b.id);
+    if (!r) return res.status(404).json({ error: 'Dit vinden we niet.' });
+    res.json(r);
+  });
 };

@@ -1155,6 +1155,7 @@
       "zetVoorkeur",
       "zijnVrienden",
       "zorgContact",
+      "zorgMee",
       "zorgVan",
       "zorgVoor",
       "zorgZet",
@@ -1283,6 +1284,7 @@
     "office": [
       "OFFICE_CODE",
       "ankerdienst",
+      "ankerpost",
       "appUrl",
       "archief",
       "assetFeesInnen",

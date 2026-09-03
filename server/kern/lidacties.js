@@ -15,7 +15,7 @@ const subsidie = require('./commercie/subsidie');
 module.exports = ({ db, save, crypto, schoon, PERSONAS, findSupplier, ledenPrijs, optieAan,
   leeftijdVan, geborenVan, idGeverifieerd, alcoholGrensVan, pickupCode, entreeCode, ticketsVoorSlot,
   fooiUit, pasTegoedToe, herstelTegoed, verdienPunten, liveCodename, haversine, pushLive,
-  notifySupplier, sseToSupplier, sseToOffice, zorgVoor, zorgContact, keuken,
+  notifySupplier, sseToSupplier, sseToOffice, zorgVoor, zorgMee, zorgContact, keuken,
   ledenvoordeelVoor, facturatie, pay }) => {
 
   /* Een betaalde lidtransactie wordt een factuur -- waarom dat er niet was en
@@ -58,7 +58,7 @@ function koopTicketVoor(session, body) {
     customerTier: session.tier, customerKey: session.key, customerCodename: codename,
     service: { id: act.id, name: act.name, soort: 'ticket' },
     activiteitId: act.id, datum, tijd, personen,
-    zorg: zorgVoor(session.key),
+    zorg: zorgMee(session.key, { zaak: s.code, reden: 'zorgprofiel meegegeven bij een boeking' }),
     price: (act.prijs || 0) * personen,
     wanneer: datum + ' ' + tijd,
     betaalMoment: 'vooraf', status: 'wacht-op-betaling', paid: false, at: new Date().toISOString()
@@ -110,7 +110,7 @@ function betaalBoekingVoor(session, body) {
   const ctx = { db, save, crypto, schoon, PERSONAS, findSupplier, ledenPrijs, optieAan, factuurVoorLid,
     leeftijdVan, geborenVan, idGeverifieerd, alcoholGrensVan, pickupCode, entreeCode, ticketsVoorSlot,
     fooiUit, pasTegoedToe, herstelTegoed, verdienPunten, liveCodename, haversine, pushLive, pay,
-    notifySupplier, sseToSupplier, sseToOffice, zorgVoor, zorgContact, keuken,
+    notifySupplier, sseToSupplier, sseToOffice, zorgVoor, zorgMee, zorgContact, keuken,
     orderMetRef, ordersVoegToe, ordersVanKlant, boekingMetRef, boekingenVoegToe, openLijnVoor, ledenvoordeelVoor };
   const { plaatsOrderVoor, betaalOrderVoor } = require('./lidacties/bestellen')(ctx);
   const { rekeningVoor, betaalRekeningVoor } = require('./lidacties/rekening')(ctx);

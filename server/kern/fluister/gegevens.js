@@ -18,7 +18,7 @@
    van het kanaal waarin je toevallig zit. Ook "waarom?" en "laat maar" doen het
    daardoor hier precies zo. */
 module.exports = (ctx) => {
-  const { van, save, nu, reserveerTafel, zorgVoor, gegevensStart, gegevensZeg, voerUit } = ctx;
+  const { van, save, nu, reserveerTafel, zorgMee, gegevensStart, gegevensZeg, voerUit } = ctx;
   const VERS_MS = 10 * 60 * 1000;      // even lang als een openstaand voorstel
 
   const vers = (p) => !!(p && p.wachtGeg && Date.now() - Date.parse(p.wachtGeg.at) < VERS_MS);
@@ -44,7 +44,7 @@ module.exports = (ctx) => {
       const r = reserveerTafel({ key, tier: sess.tier }, codenaam,
         { supplierCode: b.supplierCode, datum: b.datum, tijd: b.tijd, personen: b.personen });
       if (r.error) return { tekst: 'Dat lukt niet: ' + r.error };
-      const z = zorgVoor && zorgVoor(key);
+      const z = zorgMee && zorgMee(key, { zaak: b.supplierCode, reden: 'zorgprofiel meegegeven bij een tafelreservering' });
       if (z) { r.reservering.zorg = z; save(); }
       return { tekst: 'Aangevraagd: ' + b.naam + ', ' + b.datum + ' om ' + r.reservering.tijd +
         ' voor ' + b.personen + '. De zaak bevestigt zo; u ziet het in de bel.', gedaan: true };

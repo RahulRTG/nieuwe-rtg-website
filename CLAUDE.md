@@ -811,7 +811,7 @@ viel op alfabet af terwijl /api/bank/advies bleef. Een gelijke score afkappen is
 willekeur, en willekeur verbergt een vermogen zonder dat iemand het merkt.
 **En meetgetallen in de documenten verouderen niet meer**: `npm run getallen`
 schrijft ze tussen merktekens uit de registers (`<!--getal:idem.ongemeten-->3156<!--/getal--> bronroutes,
-<!--getal:doodspoor.open-->109<!--/getal--> open. Dat is een triagelijst en
+<!--getal:doodspoor.open-->85<!--/getal--> open. Dat is een triagelijst en
 geen beschuldiging (drie betekenissen lopen erin door elkaar, par. 3.3), en
 daarom een meting en nog geen poort. **De eerste gouden keten staat**
 (`scripts/tafelproef.js`, `npm run tafelproef`): de horecaketen van het openen

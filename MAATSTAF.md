@@ -58,7 +58,7 @@ de tabel na en zakt zodra de telregel eronder niet meer klopt.
 | U9 | Elke hoofdactie is omkeerbaar of compenseerbaar, en die twee worden nooit samengeteld | EXECUTIE.md blok 5 | `scripts/herstelproef.js`, `scripts/lib/herstelwereld.js`; voor horeca `kern/horeca/correctie.js` (compensatie met een bevroren bedrag) | proef zakt op een verdict zonder grond; `test/horeca-correctie.test.js` | 13 exact, 30 compensatie, 1 geen-herstel, 46 vragen een wereld | **staat** |
 | U10 | Vraag een gegeven maar één keer, en hergebruik alleen met doel, toestemming, bron en actualiteit | LEVEN.md par. 2, LINK.md par. 3, `kern/consent-register.js` | één bron (`db.data.zorgProfielen`), projectie erop: `zorgMee` eist een zaak + reden en stempelt de kopie, `zorgActueel` laat de bron winnen | `scripts/afleidbaar.js`; `scripts/doorwerking.js` telt naamloze lezers en ongestempelde kopieën | DOORWERKING.json: 12 lezers naar een derde, **0 naamloos, 0 bevroren** (was 14 en 12) — voor het zorgprofiel; andere gegevens ongemeten | **staat** |
 | U11 | Eén werkelijkheid, meerdere perspectieven: consument, zaak, keuken, koerier, support en finance kijken naar hetzelfde object | HORECA.md: de rekening is één waarheid over alle kanalen | per domein; `kern/mobiliteit/appbrug.js` brengt de app-rit naar het dispatchbord | `test/appbrug.test.js`, ritproef schakel 1 | horeca gemeten; mobiliteit: de brug staat, de 34 lezers van `rides` zijn nog niet omgezet (par. 7.5) | **stap weg** |
-| U12 | Geen enkele actie eindigt in een dood spoor: elke handeling heeft een ontvanger, of een verklaring | par. 3 hieronder | `scripts/doodspoor.js`, `DOODSPOOR.json` | `npm run doodspoor:controle` zakt op een verlopen verklaring; de regel zelf is nog geen poort | <!--getal:doodspoor.bronroutes-->282<!--/getal--> bronroutes, <!--getal:doodspoor.open-->109<!--/getal--> open na de triage (was 163) | **stap weg** |
+| U12 | Geen enkele actie eindigt in een dood spoor: elke handeling heeft een ontvanger, of een verklaring | par. 3 hieronder | `scripts/doodspoor.js`, `DOODSPOOR.json` | `npm run doodspoor:controle` zakt op een verlopen verklaring; de regel zelf is nog geen poort | <!--getal:doodspoor.bronroutes-->282<!--/getal--> bronroutes, <!--getal:doodspoor.open-->85<!--/getal--> open na de triage (was 163) | **stap weg** |
 | U13 | De interface toont de taak, niet de organisatie | TIKKEN.md, `shared/sprong.js` | resolver + sprong (handelingen uit de schermen zelf) | `scripts/vindbaar.js` | VINDBAAR.json | **staat** |
 | U14 | Elke weigering, prijs of beperking is verklaarbaar in gewone taal, met de weg eromheen | ECONOMIE.md (firewall zegt hoe het wél kan), GRAMMATICA.md (een verhindering draagt een reden) | `kern/economie/firewall.js`, verhinderingen | toetsen per weigering | toetsen | **staat** |
 | U15 | Elke niet-terminale toestand heeft een eigenaar, een volgende stap, een termijn en een verval | par. 4 hieronder | lokaal: `kern/commerce/retour.js` (vijf standen die zeggen welke partij ze zet), `kern/mobiliteit/keten.js` (tien standen met VOLGENDE per stand) | ritproef storing 2 en 3 | twee domeinen met een echte statusmachine; huisbreed geen regel | **stap weg** |
@@ -269,10 +269,10 @@ Infrastructuur die elke aanroep raakt (sessies, idempotentiesleutels) staat in
 | bronroutes met gemeten werk | 282 | <!--getal:doodspoor.bronroutes-->282<!--/getal--> |
 | gesloten (gemeten) | 65 | <!--getal:doodspoor.gesloten-->65<!--/getal--> |
 | gezien (vermoed of aangewezen) | 49 | <!--getal:doodspoor.gezien-->51<!--/getal--> |
-| tussen leden (verklaard) | — | <!--getal:doodspoor.tussen-->14<!--/getal--> |
-| terminaal (verklaard) | 5 | <!--getal:doodspoor.terminaal-->36<!--/getal--> |
-| open | 163 | <!--getal:doodspoor.open-->109<!--/getal--> |
-| collecties met minstens één open bronroute | 121 | <!--getal:doodspoor.openCollecties-->93<!--/getal--> |
+| tussen leden (verklaard) | — | <!--getal:doodspoor.tussen-->18<!--/getal--> |
+| terminaal (verklaard) | 5 | <!--getal:doodspoor.terminaal-->56<!--/getal--> |
+| open | 163 | <!--getal:doodspoor.open-->85<!--/getal--> |
+| collecties met minstens één open bronroute | 121 | <!--getal:doodspoor.openCollecties-->81<!--/getal--> |
 | routes die in de proef geen werk deden en dus buiten de meting vallen | 3123 | <!--getal:doodspoor.nietGemeten-->3123<!--/getal--> |
 
 De matrix (bron → ontvanger, gesloten relaties per collectie) staat in
@@ -334,12 +334,34 @@ met werk dat niemand mag doen; hem terminaal noemen zou liegen. Vandaar de stand
 **`besluit`**, met de vindplaats erbij — en `test/doodspoor.test.js` toets 12b
 zakt zodra dat document niet bestaat of de verklaring niet meer wordt gebruikt.
 
-**3. Wat overblijft: <!--getal:doodspoor.openCollecties-->93<!--/getal--> collecties met een echt open handoff.** Daar zit het
-werk. De grootste posten zijn `rtfos` (7 bronroutes: gift, stad, winkel — een
-gift heeft aantoonbaar een ontvanger), `concern` (5), `bankregie` (4, waaronder
-`/api/office/bank/leden`, dat leden raakt) en `genootschap`, `leren`, `wereld`,
-`zaakCommand` met elk 3. De volledige lijst staat gesorteerd in DOODSPOOR.json
-onder `openCollecties`.
+**3. Wat overblijft: <!--getal:doodspoor.openCollecties-->81<!--/getal--> collecties met een echt open handoff.** Daar zit het
+werk. De grootste post is `concern` (5). De volledige lijst staat gesorteerd in
+DOODSPOOR.json onder `openCollecties`.
+
+### De derde ronde (3 september 2026)
+
+Twaalf collecties erbij verklaard, 109 open bronroutes → <!--getal:doodspoor.open-->85<!--/getal-->. Twee soorten,
+en ze zijn allebei nagelezen in de code en niet afgeleid uit de naam:
+
+- **terminaal `huis` (10):** de vier ontwerpbureaus (`architect`, `atelier`,
+  `hardware`, `studio` — concept én chefsblik komen uit dezelfde module, er
+  wacht niemand op), de ops-cockpit (`commandAgents`, `commandBeleid`,
+  `commandPlannen`, naast de al verklaarde `zandbakken` en `apiPoort`), het
+  bestuursvlak van een zaak (`zaakCommand` — *"er is geen sleutel die buiten de
+  zaak wijst"*), `bankregie` en `webMerken`.
+- **tussen leden (2):** `salon` (lid A schrijft, lid B leest in de feed) en
+  `genootschap` (lid A richt op en nodigt uit, lid B komt binnen via
+  `/api/genootschap/binnen`).
+
+Eén van die tien is een regel die hoort te sneuvelen: `OBJECTMODEL.json` noemt
+de **ontwerpopdracht** als de enige kandidaat die de drempel voor een gedeeld
+type haalt. Komt er ooit een klant aan zo'n opdracht te hangen, dan is dat
+precies het moment waarop de vier bureaus geen terminaal huis meer zijn. Dat
+staat er met zoveel woorden bij in `scripts/doodspoor.js`.
+
+`rtfos` (7) blijft de grootste `besluit`-post en `bankregie` is nu verklaard als
+regie van RTG zelf — de LEDEN zien het resultaat via hun eigen rekening, en die
+collectie staat apart.
 
 Wat de meter principieel niet ziet, staat in zijn uitslag onder `grens`: een
 ontvanger die niet via een collectie loopt (mail, sms, webhook), routes die in de
@@ -348,7 +370,7 @@ proef geen werk deden, en eigenaar, termijn en verval van een stand (par. 4).
 **Daarom is dit nog steeds een meting en geen poort.** Pas als "open" schoon is,
 mag de regel hard worden: dan zakt de bouw op een onverklaarde open handoff, en
 niet eerder. Twee triagerondes brachten hem van 163 naar
-<!--getal:doodspoor.open-->109<!--/getal-->, met zes standen die elk iets anders
+<!--getal:doodspoor.open-->85<!--/getal-->, met zes standen die elk iets anders
 zeggen. Wat er nu ligt is voor het eerst een lijst waar één betekenis onder zit.
 
 ---

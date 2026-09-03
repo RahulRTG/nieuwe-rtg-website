@@ -6,39 +6,39 @@
     "bronroutes": 282,
     "gesloten": 65,
     "gezien": 51,
-    "tussen": 14,
-    "terminaal": 36,
+    "tussen": 18,
+    "terminaal": 56,
     "besluit": 7,
-    "open": 109,
-    "openCollecties": 93
+    "open": 85,
+    "openCollecties": 81
   },
   "perGroep": {
     "consument": {
       "bronroutes": 133,
       "gesloten": 27,
       "gezien": 20,
-      "tussen": 14,
+      "tussen": 18,
       "terminaal": 23,
       "besluit": 0,
-      "open": 49
+      "open": 45
     },
     "aanbieder": {
       "bronroutes": 70,
       "gesloten": 26,
       "gezien": 22,
       "tussen": 0,
-      "terminaal": 0,
+      "terminaal": 3,
       "besluit": 0,
-      "open": 22
+      "open": 19
     },
     "kantoor": {
       "bronroutes": 79,
       "gesloten": 12,
       "gezien": 9,
       "tussen": 0,
-      "terminaal": 13,
+      "terminaal": 30,
       "besluit": 7,
-      "open": 38
+      "open": 21
     },
     "platform": {
       "bronroutes": 0,
@@ -78,12 +78,13 @@
     "lezers": null
   },
   "infra": 14,
-  "terminaalVerklaard": 24,
-  "tussenVerklaard": 5,
+  "terminaalVerklaard": 34,
+  "tussenVerklaard": 7,
   "aangewezen": 1,
   "tussenOngemeten": [
     "contactPins -> POST /api/member/pin/zoek (de proef kreeg status 400)",
-    "contactPinRetired -> POST /api/member/pin/zoek (de proef kreeg status 400)"
+    "contactPinRetired -> POST /api/member/pin/zoek (de proef kreeg status 400)",
+    "genootschap -> POST /api/genootschap/binnen (de proef kreeg status 400)"
   ],
   "verlopen": {
     "terminaal": [],
@@ -99,34 +100,6 @@
       "bronroutes": 5
     },
     {
-      "collectie": "bankregie",
-      "bronroutes": 4
-    },
-    {
-      "collectie": "genootschap",
-      "bronroutes": 3
-    },
-    {
-      "collectie": "zaakCommand",
-      "bronroutes": 3
-    },
-    {
-      "collectie": "architect",
-      "bronroutes": 2
-    },
-    {
-      "collectie": "atelier",
-      "bronroutes": 2
-    },
-    {
-      "collectie": "commandAgents",
-      "bronroutes": 2
-    },
-    {
-      "collectie": "hardware",
-      "bronroutes": 2
-    },
-    {
       "collectie": "labFonds",
       "bronroutes": 2
     },
@@ -139,23 +112,11 @@
       "bronroutes": 2
     },
     {
-      "collectie": "salon",
-      "bronroutes": 2
-    },
-    {
       "collectie": "spellen",
       "bronroutes": 2
     },
     {
-      "collectie": "studio",
-      "bronroutes": 2
-    },
-    {
       "collectie": "wallet",
-      "bronroutes": 2
-    },
-    {
-      "collectie": "webMerken",
       "bronroutes": 2
     },
     {
@@ -180,14 +141,6 @@
     },
     {
       "collectie": "campagnes",
-      "bronroutes": 1
-    },
-    {
-      "collectie": "commandBeleid",
-      "bronroutes": 1
-    },
-    {
-      "collectie": "commandPlannen",
       "bronroutes": 1
     },
     {
@@ -645,20 +598,20 @@
     {
       "collectie": "architect",
       "bronnen": 2,
-      "stand": "open",
-      "graad": null,
+      "stand": "terminaal",
+      "graad": "huis",
       "zetStand": {},
       "leest": {},
-      "reden": null
+      "reden": "het RTG Architectenbureau (kern/architect/); concept en chefsblik komen uit dezelfde module, er wacht niemand op"
     },
     {
       "collectie": "atelier",
       "bronnen": 2,
-      "stand": "open",
-      "graad": null,
+      "stand": "terminaal",
+      "graad": "huis",
       "zetStand": {},
       "leest": {},
-      "reden": null
+      "reden": "RTG Atelier (draagbaar); zelfde vorm als architect"
     },
     {
       "collectie": "atelierSites",
@@ -690,11 +643,11 @@
     {
       "collectie": "bankregie",
       "bronnen": 4,
-      "stand": "open",
-      "graad": null,
+      "stand": "terminaal",
+      "graad": "huis",
       "zetStand": {},
       "leest": {},
-      "reden": null
+      "reden": "de regie over de ledenbank door RTG zelf (draaien, noodstand); de LEDEN zien het resultaat via hun eigen rekening, en die staat apart"
     },
     {
       "collectie": "bankRekeningen",
@@ -800,11 +753,11 @@
     {
       "collectie": "commandAgents",
       "bronnen": 2,
-      "stand": "open",
-      "graad": null,
+      "stand": "terminaal",
+      "graad": "huis",
       "zetStand": {},
       "leest": {},
-      "reden": null
+      "reden": "de agenten van de ops-cockpit met hun laatste teken (kern/command/toezicht.js)"
     },
     {
       "collectie": "commandAlarmen",
@@ -822,20 +775,20 @@
     {
       "collectie": "commandBeleid",
       "bronnen": 1,
-      "stand": "open",
-      "graad": null,
+      "stand": "terminaal",
+      "graad": "huis",
       "zetStand": {},
       "leest": {},
-      "reden": null
+      "reden": "de eigen grenzen van de cockpit (kern/command/beleid.js); een instelling wacht op niemand"
     },
     {
       "collectie": "commandPlannen",
       "bronnen": 1,
-      "stand": "open",
-      "graad": null,
+      "stand": "terminaal",
+      "graad": "huis",
       "zetStand": {},
       "leest": {},
-      "reden": null
+      "reden": "de plannen van de operator (kern/command/operator.js); uitvoeren gaat langs de transactiepoorten"
     },
     {
       "collectie": "commandZaken",
@@ -1031,11 +984,11 @@
     {
       "collectie": "genootschap",
       "bronnen": 3,
-      "stand": "open",
-      "graad": null,
+      "stand": "tussen",
+      "graad": "verklaard",
       "zetStand": {},
       "leest": {},
-      "reden": null
+      "reden": "lid A richt een genootschap op en nodigt uit, lid B komt binnen -- twee mensen, en de tweede handeling heeft een eigen route"
     },
     {
       "collectie": "gewoonten",
@@ -1093,11 +1046,11 @@
     {
       "collectie": "hardware",
       "bronnen": 2,
-      "stand": "open",
-      "graad": null,
+      "stand": "terminaal",
+      "graad": "huis",
       "zetStand": {},
       "leest": {},
-      "reden": null
+      "reden": "het RTG Hardwarelab (apparaten); zelfde vorm als architect"
     },
     {
       "collectie": "homekit",
@@ -2040,11 +1993,11 @@
     {
       "collectie": "salon",
       "bronnen": 2,
-      "stand": "open",
-      "graad": null,
+      "stand": "tussen",
+      "graad": "verklaard",
       "zetStand": {},
       "leest": {},
-      "reden": null
+      "reden": "lid A schrijft een post of een bio, lid B leest hem in de feed; De Salon bestaat om gelezen te worden"
     },
     {
       "collectie": "samenKamers",
@@ -2136,11 +2089,11 @@
     {
       "collectie": "studio",
       "bronnen": 2,
-      "stand": "open",
-      "graad": null,
+      "stand": "terminaal",
+      "graad": "huis",
       "zetStand": {},
       "leest": {},
-      "reden": null
+      "reden": "de RTG Ontwerpstudio (voertuigen en vaartuigen); zelfde vorm als architect"
     },
     {
       "collectie": "supplierNotifications",
@@ -2295,11 +2248,11 @@
     {
       "collectie": "webMerken",
       "bronnen": 2,
-      "stand": "open",
-      "graad": null,
+      "stand": "terminaal",
+      "graad": "huis",
       "zetStand": {},
       "leest": {},
-      "reden": null
+      "reden": "de merksjablonen van de website-maker; een sjabloon is materiaal en geen opdracht aan iemand"
     },
     {
       "collectie": "weefsel",
@@ -2394,11 +2347,11 @@
     {
       "collectie": "zaakCommand",
       "bronnen": 3,
-      "stand": "open",
-      "graad": null,
+      "stand": "terminaal",
+      "graad": "huis",
       "zetStand": {},
       "leest": {},
-      "reden": null
+      "reden": "het eigen bestuursvlak van een zaak (kern/zaakcommand/); per zaak een vak, en geen sleutel wijst naar buiten"
     },
     {
       "collectie": "zandbakken",
@@ -2816,19 +2769,19 @@
       "pad": "/api/command/agent/hervat",
       "rol": "office",
       "groep": "kantoor",
-      "stand": "open",
+      "stand": "terminaal",
       "collecties": [
         {
           "collectie": "commandAgents",
-          "stand": "open",
-          "graad": null,
+          "stand": "terminaal",
+          "graad": "huis",
           "zetStand": [],
           "leest": []
         },
         {
           "collectie": "commandBeleid",
-          "stand": "open",
-          "graad": null,
+          "stand": "terminaal",
+          "graad": "huis",
           "zetStand": [],
           "leest": []
         }
@@ -2839,12 +2792,12 @@
       "pad": "/api/command/agent/stop",
       "rol": "office",
       "groep": "kantoor",
-      "stand": "open",
+      "stand": "terminaal",
       "collecties": [
         {
           "collectie": "commandAgents",
-          "stand": "open",
-          "graad": null,
+          "stand": "terminaal",
+          "graad": "huis",
           "zetStand": [],
           "leest": []
         }
@@ -2889,12 +2842,12 @@
       "pad": "/api/command/operator/plan",
       "rol": "office",
       "groep": "kantoor",
-      "stand": "open",
+      "stand": "terminaal",
       "collecties": [
         {
           "collectie": "commandPlannen",
-          "stand": "open",
-          "graad": null,
+          "stand": "terminaal",
+          "graad": "huis",
           "zetStand": [],
           "leest": []
         }
@@ -3076,8 +3029,8 @@
         },
         {
           "collectie": "genootschap",
-          "stand": "open",
-          "graad": null,
+          "stand": "tussen",
+          "graad": "verklaard",
           "zetStand": [],
           "leest": []
         },
@@ -3267,12 +3220,12 @@
       "pad": "/api/genootschap/richt-op",
       "rol": "member",
       "groep": "consument",
-      "stand": "open",
+      "stand": "tussen",
       "collecties": [
         {
           "collectie": "genootschap",
-          "stand": "open",
-          "graad": null,
+          "stand": "tussen",
+          "graad": "verklaard",
           "zetStand": [],
           "leest": []
         }
@@ -4530,12 +4483,12 @@
       "pad": "/api/office/architect/maak",
       "rol": "office",
       "groep": "kantoor",
-      "stand": "open",
+      "stand": "terminaal",
       "collecties": [
         {
           "collectie": "architect",
-          "stand": "open",
-          "graad": null,
+          "stand": "terminaal",
+          "graad": "huis",
           "zetStand": [],
           "leest": []
         }
@@ -4546,12 +4499,12 @@
       "pad": "/api/office/architect/project",
       "rol": "office",
       "groep": "kantoor",
-      "stand": "open",
+      "stand": "terminaal",
       "collecties": [
         {
           "collectie": "architect",
-          "stand": "open",
-          "graad": null,
+          "stand": "terminaal",
+          "graad": "huis",
           "zetStand": [],
           "leest": []
         }
@@ -4562,12 +4515,12 @@
       "pad": "/api/office/atelier/collectie",
       "rol": "office",
       "groep": "kantoor",
-      "stand": "open",
+      "stand": "terminaal",
       "collecties": [
         {
           "collectie": "atelier",
-          "stand": "open",
-          "graad": null,
+          "stand": "terminaal",
+          "graad": "huis",
           "zetStand": [],
           "leest": []
         }
@@ -4578,12 +4531,12 @@
       "pad": "/api/office/atelier/maak",
       "rol": "office",
       "groep": "kantoor",
-      "stand": "open",
+      "stand": "terminaal",
       "collecties": [
         {
           "collectie": "atelier",
-          "stand": "open",
-          "graad": null,
+          "stand": "terminaal",
+          "graad": "huis",
           "zetStand": [],
           "leest": []
         }
@@ -4610,12 +4563,12 @@
       "pad": "/api/office/bank/draai",
       "rol": "boardroom",
       "groep": "kantoor",
-      "stand": "open",
+      "stand": "terminaal",
       "collecties": [
         {
           "collectie": "bankregie",
-          "stand": "open",
-          "graad": null,
+          "stand": "terminaal",
+          "graad": "huis",
           "zetStand": [],
           "leest": []
         }
@@ -4626,12 +4579,12 @@
       "pad": "/api/office/bank/leden",
       "rol": "office",
       "groep": "kantoor",
-      "stand": "open",
+      "stand": "terminaal",
       "collecties": [
         {
           "collectie": "bankregie",
-          "stand": "open",
-          "graad": null,
+          "stand": "terminaal",
+          "graad": "huis",
           "zetStand": [],
           "leest": []
         }
@@ -4642,12 +4595,12 @@
       "pad": "/api/office/bank/mislukking",
       "rol": "office",
       "groep": "kantoor",
-      "stand": "open",
+      "stand": "terminaal",
       "collecties": [
         {
           "collectie": "bankregie",
-          "stand": "open",
-          "graad": null,
+          "stand": "terminaal",
+          "graad": "huis",
           "zetStand": [],
           "leest": []
         }
@@ -4658,12 +4611,12 @@
       "pad": "/api/office/bank/nood",
       "rol": "office",
       "groep": "kantoor",
-      "stand": "open",
+      "stand": "terminaal",
       "collecties": [
         {
           "collectie": "bankregie",
-          "stand": "open",
-          "graad": null,
+          "stand": "terminaal",
+          "graad": "huis",
           "zetStand": [],
           "leest": []
         }
@@ -4741,12 +4694,12 @@
       "pad": "/api/office/hardware/maak",
       "rol": "office",
       "groep": "kantoor",
-      "stand": "open",
+      "stand": "terminaal",
       "collecties": [
         {
           "collectie": "hardware",
-          "stand": "open",
-          "graad": null,
+          "stand": "terminaal",
+          "graad": "huis",
           "zetStand": [],
           "leest": []
         }
@@ -4757,12 +4710,12 @@
       "pad": "/api/office/hardware/serie",
       "rol": "office",
       "groep": "kantoor",
-      "stand": "open",
+      "stand": "terminaal",
       "collecties": [
         {
           "collectie": "hardware",
-          "stand": "open",
-          "graad": null,
+          "stand": "terminaal",
+          "graad": "huis",
           "zetStand": [],
           "leest": []
         }
@@ -4975,12 +4928,12 @@
       "pad": "/api/office/merk/maak",
       "rol": "office",
       "groep": "kantoor",
-      "stand": "open",
+      "stand": "terminaal",
       "collecties": [
         {
           "collectie": "webMerken",
-          "stand": "open",
-          "graad": null,
+          "stand": "terminaal",
+          "graad": "huis",
           "zetStand": [],
           "leest": []
         }
@@ -4991,12 +4944,12 @@
       "pad": "/api/office/merk/sjabloon",
       "rol": "office",
       "groep": "kantoor",
-      "stand": "open",
+      "stand": "terminaal",
       "collecties": [
         {
           "collectie": "webMerken",
-          "stand": "open",
-          "graad": null,
+          "stand": "terminaal",
+          "graad": "huis",
           "zetStand": [],
           "leest": []
         }
@@ -5224,12 +5177,12 @@
       "pad": "/api/office/studio/collectie",
       "rol": "office",
       "groep": "kantoor",
-      "stand": "open",
+      "stand": "terminaal",
       "collecties": [
         {
           "collectie": "studio",
-          "stand": "open",
-          "graad": null,
+          "stand": "terminaal",
+          "graad": "huis",
           "zetStand": [],
           "leest": []
         }
@@ -5240,12 +5193,12 @@
       "pad": "/api/office/studio/maak",
       "rol": "office",
       "groep": "kantoor",
-      "stand": "open",
+      "stand": "terminaal",
       "collecties": [
         {
           "collectie": "studio",
-          "stand": "open",
-          "graad": null,
+          "stand": "terminaal",
+          "graad": "huis",
           "zetStand": [],
           "leest": []
         }
@@ -5416,7 +5369,7 @@
       "pad": "/api/onboarding/salonpost",
       "rol": "member",
       "groep": "consument",
-      "stand": "open",
+      "stand": "tussen",
       "collecties": [
         {
           "collectie": "posts",
@@ -5430,8 +5383,8 @@
         },
         {
           "collectie": "salon",
-          "stand": "open",
-          "graad": null,
+          "stand": "tussen",
+          "graad": "verklaard",
           "zetStand": [],
           "leest": []
         }
@@ -6003,12 +5956,12 @@
       "pad": "/api/salon/bio",
       "rol": "member",
       "groep": "consument",
-      "stand": "open",
+      "stand": "tussen",
       "collecties": [
         {
           "collectie": "salon",
-          "stand": "open",
-          "graad": null,
+          "stand": "tussen",
+          "graad": "verklaard",
           "zetStand": [],
           "leest": []
         }
@@ -6074,12 +6027,12 @@
       "pad": "/api/sociaal/command",
       "rol": "member",
       "groep": "consument",
-      "stand": "open",
+      "stand": "tussen",
       "collecties": [
         {
           "collectie": "genootschap",
-          "stand": "open",
-          "graad": null,
+          "stand": "tussen",
+          "graad": "verklaard",
           "zetStand": [],
           "leest": []
         }
@@ -6256,12 +6209,12 @@
       "pad": "/api/supplier/backoffice",
       "rol": "supplier",
       "groep": "aanbieder",
-      "stand": "open",
+      "stand": "terminaal",
       "collecties": [
         {
           "collectie": "zaakCommand",
-          "stand": "open",
-          "graad": null,
+          "stand": "terminaal",
+          "graad": "huis",
           "zetStand": [],
           "leest": []
         }
@@ -6288,12 +6241,12 @@
       "pad": "/api/supplier/command/journaal",
       "rol": "supplier",
       "groep": "aanbieder",
-      "stand": "open",
+      "stand": "terminaal",
       "collecties": [
         {
           "collectie": "zaakCommand",
-          "stand": "open",
-          "graad": null,
+          "stand": "terminaal",
+          "graad": "huis",
           "zetStand": [],
           "leest": []
         }
@@ -6304,12 +6257,12 @@
       "pad": "/api/supplier/command/operator/plan",
       "rol": "supplier",
       "groep": "aanbieder",
-      "stand": "open",
+      "stand": "terminaal",
       "collecties": [
         {
           "collectie": "zaakCommand",
-          "stand": "open",
-          "graad": null,
+          "stand": "terminaal",
+          "graad": "huis",
           "zetStand": [],
           "leest": []
         }

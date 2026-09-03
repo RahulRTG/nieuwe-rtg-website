@@ -135,6 +135,33 @@ const TERMINAAL = {
   onderzoeker: { soort: 'huis', reden: 'de tweede AI van het RTG Kantoor, gebouwd door de eerste (kern/rtgonderzoeker.js)' },
   boardroom: { soort: 'huis', reden: 'de uitrolregie van RTG zelf (kern/command/uitrolregie.js)' },
 
+  /* ---- DERDE RONDE (3 september 2026) ----
+
+     De vier ONTWERPBUREAUS van de RTG-kantoren. Een concept begint met een
+     brief, de AI tekent het uit, en de blik van de chef komt uit dezelfde
+     module -- er is geen tweede partij die op het ontwerp wacht. Wordt er ooit
+     een klant aan een ontwerpopdracht gehangen (OBJECTMODEL.json noemt de
+     ontwerpopdracht als de enige kandidaat die de drempel haalt), dan is dat
+     precies het moment waarop deze regel hoort te sneuvelen. */
+  architect: { soort: 'huis', reden: 'het RTG Architectenbureau (kern/architect/); concept en chefsblik komen uit dezelfde module, er wacht niemand op' },
+  atelier: { soort: 'huis', reden: 'RTG Atelier (draagbaar); zelfde vorm als architect' },
+  hardware: { soort: 'huis', reden: 'het RTG Hardwarelab (apparaten); zelfde vorm als architect' },
+  studio: { soort: 'huis', reden: 'de RTG Ontwerpstudio (voertuigen en vaartuigen); zelfde vorm als architect' },
+
+  /* De OPS-COCKPIT van RTG. Staat naast zandbakken, sondeMonsters en apiPoort,
+     die hier al als `huis` staan: een agent die meekijkt, een beleidsregel en
+     een operatorplan gaan over de machine zelf. De mens die erop reageert zit
+     aan hetzelfde bureau. */
+  commandAgents: { soort: 'huis', reden: 'de agenten van de ops-cockpit met hun laatste teken (kern/command/toezicht.js)' },
+  commandBeleid: { soort: 'huis', reden: 'de eigen grenzen van de cockpit (kern/command/beleid.js); een instelling wacht op niemand' },
+  commandPlannen: { soort: 'huis', reden: 'de plannen van de operator (kern/command/operator.js); uitvoeren gaat langs de transactiepoorten' },
+  /* Hetzelfde bestuursvlak, maar dan van een ZAAK. kern/zaakcommand/index.js:
+     "er is geen sleutel die buiten de zaak wijst" -- journaal, beleid en
+     uitzonderingen wonen per zaak en worden met niemand gedeeld. */
+  zaakCommand: { soort: 'huis', reden: 'het eigen bestuursvlak van een zaak (kern/zaakcommand/); per zaak een vak, en geen sleutel wijst naar buiten' },
+  bankregie: { soort: 'huis', reden: 'de regie over de ledenbank door RTG zelf (draaien, noodstand); de LEDEN zien het resultaat via hun eigen rekening, en die staat apart' },
+  webMerken: { soort: 'huis', reden: 'de merksjablonen van de website-maker; een sjabloon is materiaal en geen opdracht aan iemand' },
+
   paySaldi: { soort: 'boeking', reden: 'de saldopositie in RTG Pay; een positie wacht op niemand -- wie eraan moet doen, staat in payVerzoeken' },
   payBoekingen: { soort: 'boeking', reden: 'de grootboekregels van RTG Pay (WAARDE.md: dubbel geboekt, een correctie is een nieuwe regel)' },
   bankSaldi: { soort: 'boeking', reden: 'de saldopositie van de bank' },
@@ -175,7 +202,11 @@ const TUSSEN = {
   contactPins: { tegenroute: 'POST /api/member/pin/zoek', reden: 'een lid geeft zijn RTG-code, een ander zoekt hem op (LINK.md); de pin-deur is de ontvanger' },
   residentie: { tegenroute: 'POST /api/residentie/pols', reden: 'De Residence is een gedeelde ruimte: wie binnenloopt of een emote doet, wordt gezien door de andere leden in dezelfde zaal -- pols() geeft de staat van de kamer terug' },
   wereld: { tegenroute: 'POST /api/wereld/profiel/van', reden: 'lid A zet zijn profiellagen, lid B leest ze op codenaam -- twee mensen, en het profiel bestaat juist om gezien te worden' },
-  contactPinRetired: { tegenroute: 'POST /api/member/pin/zoek', reden: 'een ingetrokken pin blijft opzoekbaar zodat een oude code niet stil bij iemand anders uitkomt' }
+  contactPinRetired: { tegenroute: 'POST /api/member/pin/zoek', reden: 'een ingetrokken pin blijft opzoekbaar zodat een oude code niet stil bij iemand anders uitkomt' },
+
+  /* ---- DERDE RONDE (3 september 2026) ---- */
+  salon: { tegenroute: 'POST /api/salon/feed', reden: 'lid A schrijft een post of een bio, lid B leest hem in de feed; De Salon bestaat om gelezen te worden' },
+  genootschap: { tegenroute: 'POST /api/genootschap/binnen', reden: 'lid A richt een genootschap op en nodigt uit, lid B komt binnen -- twee mensen, en de tweede handeling heeft een eigen route' }
 };
 
 /* DE ONTVANGER BESTAAT NOG NIET, EN DAT IS EEN BESLUIT EN GEEN GAT.

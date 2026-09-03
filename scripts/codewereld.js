@@ -78,7 +78,7 @@ function oogst(j) {
 /* De eigen uitslag telt niet mee. Zonder deze regel meet de tweede ronde zijn
    eigen paren en zakt de tegenspraakcontrole van `niet vast te stellen` naar
    een vals `0`: het bewijs van de meter werd zijn eigen bron. */
-const symboolNaarRegisters = new Map(), verklaardeSoort = new Map();
+const symboolNaarRegisters = new Map(), verklaardeSoort = new Map(), ruweRegisters = new Map();
 const registers = fs.readdirSync(WORTEL).filter(f => f.endsWith('.json') && !f.startsWith('package') && f !== 'CODEWERELD.json').sort();
 const perRegister = [], padNaarRegisters = new Map(), bestandNaarRegisters = new Map(), brug = new Map();
 
@@ -87,6 +87,7 @@ for (const f of registers) {
   catch (e) { perRegister.push({ register: f, as: 'ONLEESBAAR', reden: e.message.slice(0, 80) }); continue; }
   const o = oogst(j);
   if (j && typeof j === 'object' && typeof j.soort === 'string') verklaardeSoort.set(f, j.soort);
+  if (j && typeof j === 'object') ruweRegisters.set(f, j);
   const as = o.paden.size >= o.bestanden.size * 2 && o.paden.size > 0 ? 'route'
     : (o.bestanden.size > 0 && o.bestanden.size >= o.paden.size ? 'bestand' : (o.paden.size ? 'route' : 'geen'));
   perRegister.push({ register: f, as: o.symbolen.size > o.paden.size ? 'symbool' : as, paden: o.paden.size, bestanden: o.bestanden.size, symbolen: o.symbolen.size, paren: o.paren.length });
@@ -162,6 +163,16 @@ const genoemd = bron.filter(b => bestandNaarRegisters.has(b));
    De grens ligt op 95% van een boom. Wie daarboven zit is een index en telt
    niet mee voor de gedragsteller; welke registers dat zijn staat in de uitslag,
    zodat de keuze na te rekenen is in plaats van te geloven. */
+/* Een register mag zeggen over welke bestanden het NIETS beweert. Die tellen
+   dan niet als dekking, ook al staat het bestand erin. Zonder deze aftrek zou
+   een meter die over een derde van zijn onderwerp zwijgt de gedragsteller toch
+   omhoog duwen -- de derde variant van dezelfde fout. */
+const zwijgt = new Map();                          // register -> Set(bestanden)
+for (const [f, j] of ruweRegisters) {
+  const lijst = j && j.zonderUitspraak;
+  if (Array.isArray(lijst) && lijst.length) zwijgt.set(f, new Set(lijst));
+}
+
 const INDEXGRENS = 0.95;
 const INDEXREGISTERS = new Set(), indexWaarom = new Map();
 /* Twee wegen naar dezelfde vaststelling, en allebei nodig. Een register mag
@@ -180,7 +191,8 @@ for (const [boom, lijst] of Object.entries(bronPerBoom)) {
     if (!indexWaarom.has(r)) indexWaarom.set(r, 'noemt ' + Math.round(n / lijst.length * 100) + '% van ' + boom + '/');
   }
 }
-const buitenIndex = b => [...(bestandNaarRegisters.get(b) || [])].some(r => !INDEXREGISTERS.has(r));
+const buitenIndex = b => [...(bestandNaarRegisters.get(b) || [])].some(r =>
+  !INDEXREGISTERS.has(r) && !(zwijgt.get(r) && zwijgt.get(r).has(b)));
 const gedrag = bron.filter(buitenIndex);
 const perBoom = Object.entries(bronPerBoom).map(([boom, lijst]) => {
   const g = lijst.filter(b => bestandNaarRegisters.has(b)).length;
@@ -265,6 +277,7 @@ const uit = {
     gedragPct: bron.length ? Math.round(gedrag.length / bron.length * 1000) / 10 : 0,
     relatie: bron.filter(b => [...(bestandNaarRegisters.get(b) || [])].some(r => INDEXREGISTERS.has(r))).length,
     indexregisters: [...INDEXREGISTERS].sort().map(r => ({ register: r, waarom: indexWaarom.get(r) })),
+    zwijgendeRegisters: [...zwijgt].map(([r, set]) => ({ register: r, bestanden: set.size })),
     indexgrens: 'een register telt als index als hij zichzelf zo verklaart (soort: index) of minstens ' + Math.round(INDEXGRENS * 100) + '% van een boom noemt. Een index zegt WAAR iets woont en WAT met wat samenhangt; hij zegt niet of het schrijft, klopt of bewezen is -- daarom telt hij niet mee voor de gedragsteller.',
     perBoom,
     /* platte velden voor de levende getallen in de documenten (scripts/getallen.js

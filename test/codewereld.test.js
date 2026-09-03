@@ -52,7 +52,33 @@ test('3. de gedragsteller is kleiner dan de structuurteller', () => {
   assert.ok(b.gedragPct < b.pct, 'gedrag (' + b.gedragPct + '%) hoort onder structuur (' + b.pct + '%) te liggen');
 });
 
-test('4. een bevinding van de meters staat op nul -- en dat is een ratel', () => {
+test('4. een register dat over bestanden zwijgt, telt die niet als dekking', () => {
+  /* De derde variant van dezelfde fout: niet een index die alles noemt, maar een
+     METING die een deel van haar onderwerp niet haalt. SCHERMGEDRAG.json kan over
+     137 van de 368 schermen niets zeggen (ze bouwen hun paden op). Die staan er
+     met een reden in -- dat hoort -- maar als dekking tellen ze niet mee. Zonder
+     die aftrek stond public/ op 26,1% in plaats van 21%. */
+  const sg = lees('SCHERMGEDRAG.json');
+  assert.ok(Array.isArray(sg.zonderUitspraak) && sg.zonderUitspraak.length > 0,
+    'SCHERMGEDRAG.json hoort te declareren over welke bestanden het niets zegt (zonderUitspraak)');
+  assert.strictEqual(sg.zonderUitspraak.length, sg.gemeten.zonderGrond,
+    'de lijst zonderUitspraak en de teller zonderGrond horen hetzelfde te zeggen');
+  const cw = lees('CODEWERELD.json');
+  const zwijgend = (cw.bronbereik.zwijgendeRegisters || []).find(x => x.register === 'SCHERMGEDRAG.json');
+  assert.ok(zwijgend, 'CODEWERELD.json trekt de zwijgende bestanden van SCHERMGEDRAG.json niet af. ' +
+    'Draai `npm run codewereld`; blijft het weg, dan telt een meting die zwijgt toch als dekking.');
+  assert.strictEqual(zwijgend.bestanden, sg.zonderUitspraak.length);
+});
+
+test('5. elk `niet vast te stellen` in het schermgedrag draagt een reden', () => {
+  /* Een lege reden naast een lege uitslag laat de lezer raden of de meter faalde
+     of dat er niets te meten viel. Dat zijn twee verschillende dingen. */
+  const zonder = lees('SCHERMGEDRAG.json').perScherm.filter(x => x.routesGeraakt === 0 && !x.reden);
+  assert.deepStrictEqual(zonder.map(x => x.bestand), [],
+    'deze schermen hebben geen uitspraak EN geen reden');
+});
+
+test('6. een bevinding van de meters staat op nul -- en dat is een ratel', () => {
   /* Beide meters vonden bij hun bouw honderden "fouten" die alle in de meter
      zaten (587 respectievelijk 118). Nu ze op nul staan, hoort er niet
      ongemerkt eentje bij te komen: of het is een echte vondst in de code, of de

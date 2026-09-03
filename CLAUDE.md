@@ -976,10 +976,10 @@ ROUTER in plaats van uit de bronboom), de dekking staat op
 dat die meting afdwong: een verschil tussen twee registers van VERSCHILLENDE
 leeftijd is een leeftijdsverschil en geen tegenspraak, en die twee worden nooit
 opgeteld. Verder is het bronbereik voor gedrag
-<!--getal:codewereld.bronGedragPct-->33.4<!--/getal-->% -- over de meerderheid van de bronbestanden zegt geen enkel
+<!--getal:codewereld.bronGedragPct-->36.9<!--/getal-->% -- over de meerderheid van de bronbestanden zegt geen enkel
 register iets over gedrag, dus een "80-95% zonder bron te beantwoorden" haalt die
 grens vandaag niet -- en dat ene getal verbergt nog iets, want `server/` haalt
-<!--getal:codewereld.bronServerPct-->41.9<!--/getal-->% en `public/` <!--getal:codewereld.bronPublicPct-->6.6<!--/getal-->%: over de schermen wisten de registers
+<!--getal:codewereld.bronServerPct-->41.9<!--/getal-->% en `public/` <!--getal:codewereld.bronPublicPct-->21<!--/getal-->%: over de schermen wisten de registers
 vrijwel niets (6,6%) tot `SCHERMROUTES.json` erbij kwam, dat per bestand in
 public/ leest welke API-paden het noemt en daarmee de keten scherm -> route legt.
 De aanroepgraaf ligt er sinds dezelfde dag naast (`AANROEPGRAAF.json`,
@@ -993,7 +993,14 @@ eigenschap van dit huis en geen meetfout. Ten tweede telt CODEWERELD.json sinds
 die dag DRIE dingen apart (structuur, relatie, gedrag), omdat een index die elk
 bestand noemt elke dekkingsvraag triviaal waar maakt: dat gebeurde twee keer op
 rij, en het zag er beide keren uit als vooruitgang. Alleen de gedragsteller
-(<!--getal:codewereld.bronGedragPct-->33.4<!--/getal-->%) is de bovengrens voor een vraag als "klopt het". Die meter begon
+(<!--getal:codewereld.bronGedragPct-->36.9<!--/getal-->%) is de bovengrens voor een vraag als "klopt het" -- en die kwam
+voor de schermen pas op gang met `SCHERMGEDRAG.json`, dat per scherm SAMENSTELT
+wat de routes eronder al gemeten hadden (schrijft het, welke rol, wat is het
+bewijs waard). Twee dingen daar niet wegpoetsen: het is AFGELEID gedrag, dus
+`schrijft: nee` betekent "verandert niets aan de SERVERKANT" en niet "verandert
+niets"; en de <!--getal:schermgedrag.zonderGrond-->137<!--/getal--> schermen waarover het niets kan zeggen staan er MET reden
+in maar tellen niet als dekking (`zonderUitspraak`) -- anders stijgt een
+dekkingsgetal doordat er een meter bij komt die zwijgt. Die meter begon
 op 118 "dode paden" en eindigde op <!--getal:schermroutes.dood-->0<!--/getal-->; de aanroepgraaf begon op 587 onbekende
 doelen en eindigde op <!--getal:graaf.doelOnbekend-->0<!--/getal-->, en in beide gevallen zat de fout in de METER en niet
 in de code. Wat ertussen zat zijn regels die overal gelden -- een pad kan VERDERGAAN (`'/api/agenda/' + id`),

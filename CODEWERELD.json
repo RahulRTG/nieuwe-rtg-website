@@ -2,12 +2,12 @@
   "uitleg": "Kan er een canonieke Codewereld bestaan? Gemeten over de registers in de wortel: op welke as staan ze, hoeveel sleutels delen ze, en spreken ze elkaar tegen. Deze meter voegt niets samen en kiest bij tegenspraak geen winnaar.",
   "stempel": {
     "op": "2026-09-03",
-    "commit": "c7f7b719"
+    "commit": "2a51f136"
   },
   "registers": {
-    "geteld": 81,
+    "geteld": 82,
     "opRoute": 39,
-    "opBestand": 32,
+    "opBestand": 33,
     "opSymbool": 1,
     "zonderAs": 9
   },
@@ -18,7 +18,7 @@
     },
     "bestand": {
       "sleutels": 4287,
-      "registers": 58
+      "registers": 59
     },
     "symbool": {
       "sleutels": 19517,
@@ -33,7 +33,7 @@
         "gefaald": 0,
         "gefaaldLijst": [],
         "symbolen": 13832,
-        "seconden": 4.5
+        "seconden": 5.6
       }
     }
   },
@@ -183,8 +183,8 @@
     "bestanden": 3987,
     "genoemd": 3987,
     "pct": 100,
-    "gedrag": 1331,
-    "gedragPct": 33.4,
+    "gedrag": 1470,
+    "gedragPct": 36.9,
     "relatie": 3987,
     "indexregisters": [
       {
@@ -198,6 +198,12 @@
       {
         "register": "SYMBOLEN.json",
         "waarom": "verklaart zichzelf als index"
+      }
+    ],
+    "zwijgendeRegisters": [
+      {
+        "register": "SCHERMGEDRAG.json",
+        "bestanden": 137
       }
     ],
     "indexgrens": "een register telt als index als hij zichzelf zo verklaart (soort: index) of minstens 95% van een boom noemt. Een index zegt WAAR iets woont en WAT met wat samenhangt; hij zegt niet of het schrijft, klopt of bewezen is -- daarom telt hij niet mee voor de gedragsteller.",
@@ -215,12 +221,12 @@
         "bestanden": 960,
         "genoemd": 960,
         "pct": 100,
-        "gedrag": 63,
-        "gedragPct": 6.6
+        "gedrag": 202,
+        "gedragPct": 21
       }
     ],
     "serverPct": 41.9,
-    "publicPct": 6.6,
+    "publicPct": 21,
     "nooitGenoemdVoorbeeld": [],
     "zonderGedragVoorbeeld": [
       "server/accounts/demohash.js",
@@ -572,6 +578,14 @@
       "as": "route",
       "paden": 405,
       "bestanden": 1,
+      "symbolen": 0,
+      "paren": 0
+    },
+    {
+      "register": "SCHERMGEDRAG.json",
+      "as": "bestand",
+      "paden": 0,
+      "bestanden": 368,
       "symbolen": 0,
       "paren": 0
     },

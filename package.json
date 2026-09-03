@@ -144,6 +144,7 @@
     "routebron": "node scripts/routebron.js",
     "schermroutes": "node scripts/schermroutes.js",
     "aanroepgraaf": "node scripts/aanroepgraaf.js",
+    "schermgedrag": "node scripts/schermgedrag.js",
     "getallen": "node scripts/getallen.js",
     "getallen:controle": "node scripts/getallen.js --controle",
     "gezagsnoemer": "node scripts/gezagsnoemer.js",

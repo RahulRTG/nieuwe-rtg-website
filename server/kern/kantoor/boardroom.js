@@ -45,7 +45,8 @@ function boardroomAuth(req, res, next) {
     if (!magBoardroom(key)) {
       return res.status(403).json({ error: 'De boardroom is gesloten: alleen de eigenaar komt binnen, of wie van hem toegang heeft gekregen. Log in met het eigen RTG-account.' });
     }
-    req.boardroomKey = key;
+    /* req.boardroomKey is weg (TAKEN.md 4.72): wie er handelt staat in de envelop
+       hieronder, en daar leest envelop.wie(req) hem generiek uit. */
     req.boardroomBaas = boardroomBaas(key);
     // scherper dan officeAuth: een sleutel EN waar de bevoegdheid vandaan komt
     envelop.zet(req, { soort: req.boardroomBaas ? 'eigenaar' : 'kantoor', id: key,

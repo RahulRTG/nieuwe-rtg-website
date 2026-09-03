@@ -3,6 +3,10 @@
    per fase of alles ineens), Rahuls karakteraanvulling, de geld-regie (pasprijzen,
    partnervergoeding, ledenvoordeel), de Mall-regie, de paniekkamer (knoppen
    worden voorstellen) en de wereldkaart. Afgesplitst uit kantoren/index.js. */
+/* Wie handelt hier: uit de canonieke envelop en niet uit req.boardroomKey
+   (TAKEN.md 4.72). Zie server/opzet/envelop.js voor waarom die lezer bestaat. */
+const { wie: envelopWie } = require('../../opzet/envelop');
+
 module.exports = (ctx) => {
   const { app, officeAuth, boardroomAuth, boardroomLijst, keyVanCodenaam, veilig, afdelingen,
           sseToOffice, db, save, kern } = ctx;
@@ -30,7 +34,7 @@ module.exports = (ctx) => {
     prefix: '/api/office',
     poort: boardroomAuth,
     isBaas: (req) => !!req.boardroomBaas,
-    wie: (req) => req.boardroomKey || null
+    wie: (req) => envelopWie(req)
   });
 
   /* De sleutel van de kamer: de eigenaar geeft toegang op codenaam en trekt

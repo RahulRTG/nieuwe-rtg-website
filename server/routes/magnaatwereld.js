@@ -1,5 +1,9 @@
 /* Magnaat Wereld heeft twee deuren: spelers komen binnen met hun ledenpas;
    de Future Engine en testfases zitten achter de menselijke boardroom-poort. */
+/* Wie handelt hier: uit de canonieke envelop en niet uit req.boardroomKey
+   (TAKEN.md 4.72). Zie server/opzet/envelop.js voor waarom die lezer bestaat. */
+const { wie: envelopWie } = require('../opzet/envelop');
+
 module.exports = (kern) => {
   const { app, auth, geenGast, boardroomAuth, supplierAuth, managerOnly, magnaatWereld } = kern;
   const magnaatPartnerstudio = magnaatWereld.partnerstudio;
@@ -92,7 +96,7 @@ module.exports = (kern) => {
   app.post('/api/supplier/magnaat/studio/indienen/intrekken', supplierAuth, (req, res) =>
     alsPartner(req, res, (supplier, actor) => magnaatPartnerstudio.indieningIntrekken(supplier, actor)));
 
-  const wie = req => req.boardroomKey || 'boardroom';
+  const wie = req => envelopWie(req) || 'boardroom';
   const boardroomActor = req => ({
     sleutel: wie(req), naam: req.boardroomBaas ? 'RTG-eigenaar' : wie(req),
     rol: req.boardroomBaas ? 'publicist' : 'controleur'

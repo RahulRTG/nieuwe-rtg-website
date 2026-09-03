@@ -3,11 +3,13 @@
   "hoe": "node scripts/envelop.js --velden",
   "gemeten": {
     "veldenZonderHuis": 3,
-    "actorVormen": 7,
+    "actorVormen": 6,
     "routesZonderEnvelop": 382,
     "routesMetEnvelop": 3421,
     "routesMetPoortwachter": 3424,
-    "routesTotaal": 3803
+    "routesTotaal": 3803,
+    "actorDuplicaten": 0,
+    "actorSessies": 6
   },
   "veldenZonderHuis": [
     {
@@ -24,13 +26,12 @@
     }
   ],
   "actorVormen": [
+    "req.session",
     "req.actor",
-    "req.boardroomKey",
-    "req.drive",
+    "req.techUser",
     "req.gast",
     "req.gezinslid",
-    "req.session",
-    "req.techUser"
+    "req.drive"
   ],
   "poortwachters": [
     {
@@ -141,5 +142,78 @@
       "stand": "opgelost voor de uitgifte; het kantoortoken kent nog steeds geen personen"
     }
   ],
-  "reden": "routesZonderEnvelop met de hand van 360 naar 373 bij het binnenhalen van main (24 augustus). Die dertien komen NIET uit deze tak: main voegde 33 routes toe, waarvan er twintig via een bestaande poortwachter al een envelop dragen en dertien buiten de elf geregistreerde poortwachters vallen. Ze een envelop geven betekent routes aanraken die in deze tak nooit zijn gezien, en dat hoort niet in een merge-commit -- dezelfde afweging die in NORM.json staat bij schermenZonderVormtaal. De ratel blijft doen waar hij voor is: dit getal mag hierna alleen omlaag, en de dertien horen bij de eerstvolgende ronde over die routes een envelop te krijgen.\n\nEN NOG EEN KEER, van 373 naar 380, bij het binnenhalen van #113 (24 augustus). Main voegde 29 routes toe; 22 daarvan landden op een bestaande poortwachter en dragen dus al een envelop. De zeven die overblijven zijn met naam en toenaam: /api/tenant/bijstand, /api/tenant/bijstand/besluit, /api/tenant/bijstand/dossier, /api/tenant/bijstand/inhoud, /api/tenant/bijstand/intrekken, /api/tenant/bijstand/niveaus en /api/tenant/bijstand/vraag. DIT IS GEEN GAT IN DE TOEGANGSCONTROLE. Alle zeven dragen een poort -- viaBeheerOfDirectie() -- en npm run check regel 28 controleert per route of die er staat en is groen. De poort staat daar bewust BINNEN de handler; het bestand legt zelf uit waarom (\"een deur die achter een eigen wrapper verdwijnt, is een deur die niemand bij het lezen ziet\"). Deze meter leest de middleware-positie van de route, en een poort in de handler kan hij per constructie niet zien. Het is dus een blinde vlek van de meter en geen ontbrekende deur -- en dat verschil hoort hier te staan, want anders leest een volgende lezer dit getal als zeven onbewaakte routes. Wat er wel ontbreekt is de canonieke VORM: wie handelt, waarop, met welk gezag. Die zeven horen bij dezelfde eerstvolgende ronde als de dertien hierboven.\n\nEN TWEE ERBIJ, van 380 naar 382, bij de vierde keer main binnenhalen. /api/rtf/talent/interesse en /api/rtf/talent/mijn, allebei in server/routes/member/werk/talent.js. Zelfde soort als de zeven hierboven en om dezelfde reden geen gat: ze controleren zelf met rtf.verifieerProfiel(code, token) en geven 403 als dat mislukt, en /interesse eist daarbovenop rtf.magSolliciteren() -- werkmatches vanaf zestien. Die controles staan in de handler en niet in de middlewarelijst, en dat is precies wat deze meter leest. Dit getal telt dus inmiddels negen routes die een eigen poort dragen. Dat is een patroon en geen toeval, en het hoort de eerstvolgende envelop-ronde te sturen: niet negen routes een van de elf poortwachters opdringen, maar de meter leren dat een poort in de handler ook een poort is -- of anders vaststellen dat een eigen poort per definitie geen envelop kan dragen en dat dus als aparte categorie tellen in plaats van als schuld."
+  "reden": "routesZonderEnvelop met de hand van 360 naar 373 bij het binnenhalen van main (24 augustus). Die dertien komen NIET uit deze tak: main voegde 33 routes toe, waarvan er twintig via een bestaande poortwachter al een envelop dragen en dertien buiten de elf geregistreerde poortwachters vallen. Ze een envelop geven betekent routes aanraken die in deze tak nooit zijn gezien, en dat hoort niet in een merge-commit -- dezelfde afweging die in NORM.json staat bij schermenZonderVormtaal. De ratel blijft doen waar hij voor is: dit getal mag hierna alleen omlaag, en de dertien horen bij de eerstvolgende ronde over die routes een envelop te krijgen.\n\nEN NOG EEN KEER, van 373 naar 380, bij het binnenhalen van #113 (24 augustus). Main voegde 29 routes toe; 22 daarvan landden op een bestaande poortwachter en dragen dus al een envelop. De zeven die overblijven zijn met naam en toenaam: /api/tenant/bijstand, /api/tenant/bijstand/besluit, /api/tenant/bijstand/dossier, /api/tenant/bijstand/inhoud, /api/tenant/bijstand/intrekken, /api/tenant/bijstand/niveaus en /api/tenant/bijstand/vraag. DIT IS GEEN GAT IN DE TOEGANGSCONTROLE. Alle zeven dragen een poort -- viaBeheerOfDirectie() -- en npm run check regel 28 controleert per route of die er staat en is groen. De poort staat daar bewust BINNEN de handler; het bestand legt zelf uit waarom (\"een deur die achter een eigen wrapper verdwijnt, is een deur die niemand bij het lezen ziet\"). Deze meter leest de middleware-positie van de route, en een poort in de handler kan hij per constructie niet zien. Het is dus een blinde vlek van de meter en geen ontbrekende deur -- en dat verschil hoort hier te staan, want anders leest een volgende lezer dit getal als zeven onbewaakte routes. Wat er wel ontbreekt is de canonieke VORM: wie handelt, waarop, met welk gezag. Die zeven horen bij dezelfde eerstvolgende ronde als de dertien hierboven.\n\nEN TWEE ERBIJ, van 380 naar 382, bij de vierde keer main binnenhalen. /api/rtf/talent/interesse en /api/rtf/talent/mijn, allebei in server/routes/member/werk/talent.js. Zelfde soort als de zeven hierboven en om dezelfde reden geen gat: ze controleren zelf met rtf.verifieerProfiel(code, token) en geven 403 als dat mislukt, en /interesse eist daarbovenop rtf.magSolliciteren() -- werkmatches vanaf zestien. Die controles staan in de handler en niet in de middlewarelijst, en dat is precies wat deze meter leest. Dit getal telt dus inmiddels negen routes die een eigen poort dragen. Dat is een patroon en geen toeval, en het hoort de eerstvolgende envelop-ronde te sturen: niet negen routes een van de elf poortwachters opdringen, maar de meter leren dat een poort in de handler ook een poort is -- of anders vaststellen dat een eigen poort per definitie geen envelop kan dragen en dat dus als aparte categorie tellen in plaats van als schuld.",
+  "actorVormenUitleg": "AFGELEID door scripts/actorvormen.js -- hier stond een met de hand getypt getal dat zichzelf \"geratelde stand\" noemde terwijl geen script en geen toets het narekende (LAT.md regel 6). DUPLICAAT betekent: de naam draagt niets anders dan de identiteit die req.envelop al draagt, en hoort dus weg -- dat getal moet naar 0. SESSIE betekent: de naam draagt domeindata (tier, staffId, zaakcode) die de envelop met opzet NIET draagt; die overzetten zou de envelop een achtste sessieobject maken. Beide getallen mogen alleen omlaag.",
+  "actorVormenPerNaam": [
+    {
+      "naam": "req.session",
+      "soort": "sessie",
+      "zetters": 2,
+      "bestanden": 208,
+      "velden": [
+        "account",
+        "gast",
+        "key",
+        "naam",
+        "sid",
+        "tier"
+      ]
+    },
+    {
+      "naam": "req.actor",
+      "soort": "sessie",
+      "zetters": 1,
+      "bestanden": 162,
+      "velden": [
+        "id",
+        "lid",
+        "lidKey",
+        "manager",
+        "naam",
+        "name",
+        "role",
+        "staffId"
+      ]
+    },
+    {
+      "naam": "req.techUser",
+      "soort": "sessie",
+      "zetters": 1,
+      "bestanden": 13,
+      "velden": [
+        "id",
+        "password_hash"
+      ]
+    },
+    {
+      "naam": "req.gast",
+      "soort": "sessie",
+      "zetters": 1,
+      "bestanden": 7,
+      "velden": [
+        "deelnemer",
+        "rekening",
+        "zaakcode"
+      ]
+    },
+    {
+      "naam": "req.gezinslid",
+      "soort": "sessie",
+      "zetters": 5,
+      "bestanden": 8,
+      "velden": [
+        "beschermd",
+        "handle"
+      ]
+    },
+    {
+      "naam": "req.drive",
+      "soort": "sessie",
+      "zetters": 1,
+      "bestanden": 1,
+      "velden": [
+        "key"
+      ]
+    }
+  ]
 }

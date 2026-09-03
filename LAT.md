@@ -143,8 +143,18 @@ moeten worden, en de achtste poortwachter zou de eerste zeven weer niet kennen.
 de elf poortwachters zetten hem. Hij is er ADDITIEF bij gezet en heeft niets
 weggehaald -- een vervanging in het authenticatiepad van 3349 routes ineens is
 precies het soort wijziging waarvan je pas maanden later merkt wat er stuk ging.
-De zeven oude vormen blijven daarom geteld in `ENVELOP.json` tot ze route voor
-route zijn afgebouwd.
+
+*En het narekenen daarvan is zelf een voorbeeld bij deze regel* (3 september
+2026, TAKEN.md 4.72). Het getal `actorVormen` in `ENVELOP.json` noemde zichzelf
+"geratelde stand, mag alleen omlaag" en werd door geen script en geen toets
+nagerekend: met de hand getypt, en dus niet in staat te zakken -- regel 6 in het
+register dat over de canonieke vorm gaat. `scripts/actorvormen.js` leidt het nu
+af. En toen bleek het er geen zeven van hetzelfde te zijn: ZES van de zeven zijn
+sessieobjecten die ook domeindata dragen (`.tier`, `.staffId`, `.zaakcode`), en
+die "overzetten op de envelop" zou de envelop een zevende sessie maken. Alleen
+`req.boardroomKey` was een kaal duplicaat, en die is weg. De les is niet dat de
+schuld kleiner was dan gedacht, maar dat een getal dat niemand narekent ook de
+VRAAG verkeerd kan stellen.
 
 **Handhaver:** `check.js` regel 26 (elke naam die je uit een module haalt bestaat
 daar), regel 25, regel 27, regel 28 (de publieke-routelijst mag geen namen

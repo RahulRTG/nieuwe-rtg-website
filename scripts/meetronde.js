@@ -108,7 +108,7 @@ const STAPPEN = [
      omdat een schakel die aantoonbaar niet sluit een uitgeschreven reden mag
      dragen (`openBekend` in scripts/ritproef.js) en dan geen defect is.
 
-     De ketenvorm draait erachteraan: hij leest de twee registers en telt wat ze
+     De ketenvorm draait erachteraan: hij leest de drie registers en telt wat ze
      delen. Die meet en oordeelt, want een gedeelde vorm is een bevinding en
      geen eis. */
   { id: 'tafelproef', register: 'TAFELPROEF.json', duur: '~2 min',
@@ -117,8 +117,11 @@ const STAPPEN = [
   { id: 'ritproef', register: 'RITPROEF.json', duur: '~2 min',
     wat: 'of de ritketen sluit: van aanvraag tot afronding, over de appbrug',
     cmd: ['scripts/ritproef.js', '--vastleggen'] },
+  { id: 'toelatingsproef', register: 'TOELATINGSPROEF.json', duur: '~2 min',
+    wat: 'of de toelatingsketen sluit: van aanvraag tot zaak, met bewijs en herkeuring',
+    cmd: ['scripts/toelatingsproef.js', '--vastleggen'] },
   { id: 'ketenvorm', register: 'KETENVORM.json', snel: true, duur: '~1 sec',
-    wat: 'wat de twee gouden ketens werkelijk delen (actoren, beloften)',
+    wat: 'wat de drie gouden ketens werkelijk delen (actoren, beloften)',
     cmd: ['scripts/ketenvorm.js', '--vastleggen'] },
   { id: 'bewijsmatrix', register: 'BEWIJSMATRIX.json', snel: true, duur: '~1 min',
     wat: 'de elf schakels per route, uit de registers hierboven',

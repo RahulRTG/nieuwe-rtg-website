@@ -107,9 +107,13 @@ test('6. de ketenvorm meet en oordeelt niet', () => {
     'de uitkomst waarschuwt niet dat twee ketens van dezelfde hand geen bewijs zijn');
 });
 
-test('7. wat de twee ketens delen, is geteld en niet verklaard', () => {
+test('7. wat de ketens delen, is geteld en niet verklaard', () => {
   const j = lees('KETENVORM.json');
-  assert.equal(j.ketens.length, 2);
+  /* Er waren er twee; sinds de toelatingsproef zijn het er drie. De eis is dus
+     niet een aantal maar dat de meter ALLE ketens meeneemt -- zie
+     test/toelatingsproef.test.js toets 6. */
+  assert.ok(j.ketens.length >= 2, 'de ketenvorm leest minder dan twee registers');
+  assert.equal(j.ketens.length, j.telling.ketens);
   /* De uitkomst zelf is een MEETRESULTAAT en mag bewegen; wat vastligt is dat
      de meting de drie soorten uit elkaar houdt. */
   for (const veld of ['vorm', 'actoren', 'beloften']) assert.ok(j[veld], veld + ' ontbreekt in de uitslag');
@@ -119,9 +123,10 @@ test('7. wat de twee ketens delen, is geteld en niet verklaard', () => {
     'een belofte die in geen thema past hoort zichtbaar te zijn en niet weg te vallen');
 });
 
-test('8. de twee proeven delen geen module -- de vorm wordt gevonden, niet verklaard', () => {
+test('8. de proeven delen geen module -- de vorm wordt gevonden, niet verklaard', () => {
   const tafel = fs.readFileSync(path.join(WORTEL, 'scripts', 'tafelproef.js'), 'utf8');
-  for (const [naam, b] of [['ritproef', bron], ['tafelproef', tafel]])
+  const toelating = fs.readFileSync(path.join(WORTEL, 'scripts', 'toelatingsproef.js'), 'utf8');
+  for (const [naam, b] of [['ritproef', bron], ['tafelproef', tafel], ['toelatingsproef', toelating]])
     assert.doesNotMatch(b, /require\(.*(lib\/keten|lib\/ketenvorm|lib\/proefvorm)/,
       naam + ' hangt aan een gedeelde ketenmodule; dan meet ketenvorm.js zijn eigen aanname (de Asset-fout)');
 });

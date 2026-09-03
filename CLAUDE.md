@@ -915,17 +915,39 @@ stil uit de lijst laten vallen.
 De domeingrens (`GRENZEN.json`) hield de brug trouwens tegen tot iemand hem op
 de lijst zette, precies zoals bedoeld.
 
-**En wat de twee ketens werkelijk delen is GEMETEN** (`scripts/ketenvorm.js`,
+**DE DERDE KETEN IS DE TOELATING** (`scripts/toelatingsproef.js`,
+`npm run toelatingsproef`): van een aanvraag zonder account naar een toegelaten
+zaak in een gereguleerd genre -- bewijs indienen, aftekenen op naam, besluit,
+zaak, herkeuring. Twee ketens dragen geen contract (twee punten liggen altijd op
+een lijn), dus hij is met opzet maximaal ANDERS: de klant is geen lid, er zit een
+KANTOOR in, het gaat over een document met een houdbaarheid, en de uitkomst is
+TOEGANG in plaats van een geleverde dienst. Zeven schakels sluiten, zeven
+storingen houden hun belofte. **Het bouwen legde een grens bloot die nergens
+stond**: aftekenen en beslissen eisen een naam, en `boardroomWie()` geeft die
+alleen als er een lid-account achter het kantoortoken hangt -- wie met de
+GEDEELDE kantoorcode inlogt, kan de keten niet afmaken. Dat is een grens en geen
+gat, en hij zit nu in de meting (storing 1 en 7) in plaats van eromheen.
+
+**En wat de ketens werkelijk delen is GEMETEN** (`scripts/ketenvorm.js`,
 `KETENVORM.json`) in plaats van verklaard -- de proeven delen met opzet geen
 module, want een gedeelde ketenklasse eroverheen zou de `Asset`-fout zijn.
-Uitkomst: <!--getal:ketenvorm.actorenGedeeld-->0<!--/getal--> van
-<!--getal:ketenvorm.actorenTotaal-->8<!--/getal--> actoren gedeeld (gast/zaak/
-zaal/keuken tegenover lid/vervoerder/dispatch/chauffeur -- geen enkele naam
-komt in beide voor) en <!--getal:ketenvorm.themasGedeeld-->3<!--/getal--> van
-<!--getal:ketenvorm.themasTotaal-->8<!--/getal--> beloftethema's. Die drie gaan
-alle drie over de MACHINE en niet over het domein: herhaling, volgorde, en wat
-niet bestaat bestaat niet. Dat is het eerste bewijs uit twee onafhankelijke
-ketens voor de grens die OS.md trekt tussen platformvermogen en domeinvermogen.
+Uitkomst over drie ketens: <!--getal:ketenvorm.actorenGedeeld-->0<!--/getal-->
+van <!--getal:ketenvorm.actorenTotaal-->13<!--/getal--> actoren gedeeld
+(gast/zaal/keuken tegenover lid/vervoerder/dispatch/chauffeur tegenover
+aanvrager/kantoor/keurder/dossier/tijd) en
+<!--getal:ketenvorm.themasGedeeld-->2<!--/getal--> van
+<!--getal:ketenvorm.themasTotaal-->10<!--/getal--> beloftethema's in ALLE drie.
+Die twee gaan allebei over de MACHINE en niet over het domein: mag dit twee
+keer, en zegt een weigering waarom. Er is een woord dat twee ketens delen --
+`zaak` -- en het betekent er niet hetzelfde (ontvanger tegenover uitkomst),
+precies de vorm die `SEMANTIEK.json` meet. **Een status-, actor- of
+uitkomstcontract over domeinen heen is daarmee niet gerechtvaardigd**, en dat is
+een antwoord op MAATSTAF.md U40/U41 en geen uitstel; wat er wel onder ligt is de
+grens die OS.md trekt tussen platformvermogen en domeinvermogen, nu met bewijs
+uit drie onafhankelijke ketens. Let bij het lezen op een eerlijkheid die in de
+bron staat: de themalijst is een keer uitgebreid toen zes van de zeven beloften
+van de derde keten erbuiten vielen -- de actoren zijn niet aangeraakt, en die
+staan op nul.
 
 ## Structuur en starten (kort)
 

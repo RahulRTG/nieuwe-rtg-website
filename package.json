@@ -243,7 +243,9 @@
     "ritmigratie": "node scripts/ritmigratie.js",
     "ritmigratie:vast": "node scripts/ritmigratie.js --vastleggen",
     "doorwerking": "node scripts/doorwerking.js",
-    "doorwerking:vast": "node scripts/doorwerking.js --vastleggen"
+    "doorwerking:vast": "node scripts/doorwerking.js --vastleggen",
+    "toelatingsproef": "node scripts/toelatingsproef.js",
+    "toelatingsproef:vast": "node scripts/toelatingsproef.js --vastleggen"
   },
   "devDependencies": {
     "playwright": "^1.62.1"

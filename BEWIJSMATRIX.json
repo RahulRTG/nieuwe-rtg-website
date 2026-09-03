@@ -1,106 +1,106 @@
 {
   "stempel": {
-    "op": "2026-08-20T15:47:51.090Z",
-    "commit": "fcba02e",
-    "boomVuil": true,
+    "op": "2026-09-03T02:39:00.167Z",
+    "commit": "948bc51d",
+    "boomVuil": false,
     "node": "v22.22.2"
   },
   "herkomst": "routekaart (draaiende server)",
   "gedegradeerd": false,
   "journaalGelezen": ".routejournaal",
-  "routes": 4188,
+  "routes": 4738,
   "schakels": 11,
-  "cellen": 46068,
+  "cellen": 52118,
   "telling": {
-    "bewezen": 16475,
+    "bewezen": 25556,
     "verklaard": 0,
-    "nvt": 272,
-    "ongemeten": 29205,
-    "gezakt": 116
+    "nvt": 310,
+    "ongemeten": 26252,
+    "gezakt": 0
   },
   "perSchakel": {
     "AUTH": {
-      "bewezen": 4187,
+      "bewezen": 4416,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 297,
+      "ongemeten": 322,
       "gezakt": 0
     },
     "ACL": {
-      "bewezen": 3079,
+      "bewezen": 3820,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 1117,
+      "ongemeten": 918,
       "gezakt": 0
     },
     "INPUT": {
-      "bewezen": 2632,
+      "bewezen": 3279,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 1556,
+      "ongemeten": 1459,
       "gezakt": 0
     },
     "OUTPUT": {
-      "bewezen": 4157,
+      "bewezen": 4151,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 4188,
+      "ongemeten": 587,
       "gezakt": 0
     },
     "STATE": {
-      "bewezen": 266,
+      "bewezen": 416,
       "verklaard": 0,
-      "nvt": 68,
-      "ongemeten": 3854,
+      "nvt": 77,
+      "ongemeten": 4245,
       "gezakt": 0
     },
     "SIDE_EFFECT": {
-      "bewezen": 266,
+      "bewezen": 416,
       "verklaard": 0,
-      "nvt": 68,
-      "ongemeten": 3854,
+      "nvt": 77,
+      "ongemeten": 4245,
       "gezakt": 0
     },
     "AUDIT": {
-      "bewezen": 575,
+      "bewezen": 1039,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 3613,
+      "ongemeten": 3699,
       "gezakt": 0
     },
     "IDEMPOTENCY": {
-      "bewezen": 175,
+      "bewezen": 1638,
       "verklaard": 0,
-      "nvt": 68,
-      "ongemeten": 3840,
-      "gezakt": 105
+      "nvt": 78,
+      "ongemeten": 3022,
+      "gezakt": 0
     },
     "FAILURE": {
       "bewezen": 2,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 4186,
+      "ongemeten": 4736,
       "gezakt": 0
     },
     "ROLLBACK": {
-      "bewezen": 2214,
+      "bewezen": 2559,
       "verklaard": 0,
-      "nvt": 68,
-      "ongemeten": 1896,
-      "gezakt": 10
+      "nvt": 78,
+      "ongemeten": 2101,
+      "gezakt": 0
     },
     "PRIVACY": {
-      "bewezen": 3079,
+      "bewezen": 3820,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 1117,
+      "ongemeten": 918,
       "gezakt": 0
     }
   },
   "verslechteringToegestaan": {
-    "reden": "De routeset groeide van 3987 naar 4188 (+201, waaronder de uitrol-routes en wat er met main meekwam), dus het aantal cellen van 43857 naar 46068. Absoluut staat er daardoor meer ongemeten, maar PROPORTIONEEL is elke kolom gelijk gebleven of vooruitgegaan, en AUDIT ging van 0 naar 13,7 procent (575 routes) doordat scripts/handelingproef-route.js nu bestaat. Alle vijf de meetrondes zijn ruimer gedraaid dan de vorige vastlegging: rolproef 2937->3081, invoerproef 2510->2634, staatproef 2338->2491.",
-    "cellenVoor": 43857,
-    "cellenNa": 46068
+    "reden": "De routetabel groeide van 4188 naar 4738 (+550, +13%): deze stand is de eerste sinds 20 augustus die tegen de HUIDIGE tabel is gemeten, met alle tien bronregisters vers en op een schone boom. Absoluut is het beeld eenduidig -- bewezen 16475 -> 25556, ongemeten 29205 -> 26252. Per kolom groeit ongemeten in zes kolommen, telkens met MINDER dan de 550 nieuwe routes, dus de instrumenten dekken een deel van de groei maar niet alles. EN DIT MOET ERBIJ, want het is niet louter noemer: OUTPUT en AUTH zijn ook PROPORTIONEEL slechter (OUTPUT 99,3% -> 87,6%, AUTH 100% -> 93,2%), omdat de outputproef en de poortwacht de 550 nieuwe routes nog niet hebben gezien. OUTPUT verliest daarbovenop 6 absolute cellen; die komen uit een routejournaal van een suiteronde die zelf nog toetsen liet zakken. FAILURE staat weer op 2 nadat de geldketen -- die door een ontbrekende omgevingsvlag helemaal niet draaide -- is hersteld.",
+    "cellenVoor": 46068,
+    "cellenNa": 52118
   },
   "uitleg": "Gegenereerd door scripts/bewijsmatrix.js. ongemeten MAG ALLEEN KRIMPEN."
 }

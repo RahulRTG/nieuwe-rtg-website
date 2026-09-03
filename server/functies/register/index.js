@@ -13,6 +13,11 @@ const { CATEGORIEEN, DOELGROEPEN, DOELGROEP_IDS, DOELGROEP_OP_ID, LEDEN, LEDEN_R
 // welke doelgroepen deze functie bedient (en dus apart te schakelen zijn).
 const FUNCTIES = [].concat(
   require('./cat-leden'),
+  /* PRECIES HIER, zodat de volgorde van FUNCTIES onveranderd blijft: de genres
+     stonden in ./cat-leden.js direct na de leden-app en voor De Salon, en bij
+     twee functies met hetzelfde pad wint de eerste. Een afsplitsing mag de
+     uitkomst niet verschuiven, alleen de plek van de tekst. */
+  require('./cat-genres'),
   require('./cat-apps'),
   require('./cat-apps2'),
   require('./cat-life'),

@@ -521,11 +521,22 @@ namen in een aparte kluis. Er is geen instelling die dat goedmaakt. En de laag
 bij de derde aanbieder net zo goed is — geluid is dat niet, dat is de stem van een
 lid.
 
-De ratel staat daarmee op **2**, en die twee zijn geen restpost: het Podium en het
-SOS-beeld naar het kantoor zijn **eenrichting**, dus zichzelf ondertitelen helpt de
+De ratel staat daarmee op **4**. Twee daarvan zijn het Podium en het
+SOS-beeld naar het kantoor: **eenrichting**, dus zichzelf ondertitelen helpt de
 kijker niets. Daarvoor is een tweede weg nodig — de zender laten ondertitelen — en
 bij SOS betekent dat dat het geluid van iemand in nood door een model gaat. Dat
 besluit wordt hier niet stilzwijgend genomen.
+
+De andere twee zijn een **overschatting die binnen het uur boven kwam**, en die
+staat er liever dan een mooi getal. De ondertiteldeur hangt aan een LEDENsessie,
+en `shared/meeluister.js` leest daarvoor `rtg_member_token`. De teamcall van het
+personeel en het schoolgesprek draaien op een personeels- of partnersessie; daar
+is dat token er hooguit toevallig, want het huis kóppelt een kantoorrol aan een
+RTG-account maar dwingt dat niet af. De knop verschijnt daar dus soms wel en soms
+niet, en een register mag geen "soms" als "ja" tellen. Wat het weer omlaag brengt
+is opnieuw een adres: een ondertiteldeur die élke sessie van dit huis aanneemt.
+Dat raakt de authenticatielaag en hoort een eigen ronde te zijn — niet een
+haastige toevoeging aan deze.
 
 **Wat het narekenen onderweg vond, en geen toets zag.** De ankers wezen naar de
 AANROEP en niet naar de scripttag, dus `teamcall-01.js` "droeg" de tekstbaan
@@ -592,6 +603,37 @@ bestand in plaats van de werkelijkheid. Bij het ondertitelen staat er ook het
 **gevolg** bij: zonder model kan wie doof is een gesprek alleen volgen als de
 anderen meetypen, en bij een hulplijn weegt dat het zwaarst.
 
+## 13g. Wat de volledige suite vond, en `npm run check` niet
+
+`npm run check` stond groen terwijl er vier dingen mis waren. Ze staan hier omdat
+ze alle vier dezelfde vorm hebben: een REGISTER dat een bewering doet die niemand
+naliep, omdat de keuring dat register niet leest.
+
+1. **Drie serviceschermen stonden niet in de wereldcatalogus.** `service.html`,
+   `service-bel.html` en `leverancier-service.html` hoorden bij geen van de vier
+   werelden — uit de eerdere rondes, en niemand merkte het.
+2. **De hele ledenkant van RTG Service stond niet in de schakelkast.** Zestien
+   routes waren vanuit de boardroom niet te schakelen: niet uit te zetten, niet
+   per stad te sluiten, en de storingswachter greep er nooit op in. Precies het
+   gat dat `test/schakelkast-dekking.test.js` beschrijft als *"routes schrijven is
+   stap een; de catalogus bijwerken is stap twee, en stap twee wordt vergeten"*.
+   Er staan nu drie functies (`service`, `service-bel`, `ondertiteling`) en geen
+   één, want ze schakelen verschillende dingen — de stem hoort bij de ladder, een
+   mens vragen is een ondergrens.
+3. **De hulplijn viel in het Controleregister terug op "Onderzoek & data".** Die
+   terugval bestaat juist om te voorkomen dat onbekend werk stilletjes ergens
+   belandt; RTG Service heeft nu een eigen regel naar de Klantenservice.
+4. **`service.html` laadde het bedieningspaneel zonder de randen**, waardoor dat
+   paneel niet te openen was.
+
+En één van mijn eigen toetsen was een valse groene: de opnamefunctie las
+`db.json`, en dat bestand bestaat niet meer — de opslag is SQLite. De peiling gaf
+dus altijd "onleesbaar" en "er is niets bewaard" was groen omdat er naar niets
+werd gekeken. Er staat nu een **positieve controle** omheen: de proef eist eerst
+dat een gewone schrijfactie de peiling wél ziet bewegen. Diezelfde toets wachtte
+op de klok in plaats van op een toestand; dat is nu een latere schrijfactie zien
+landen, wat pas echt bewijst dat de ronde voorbij is.
+
 ## 14. Wat er staat, en wat er niet staat
 
 **Staat** (gemeten, met toetsen die zijn zien zakken):
@@ -617,7 +659,7 @@ anderen meetypen, en bij een hulplijn weegt dat het zwaarst.
   werkplek erbij (`/apps/leverancier-service.html`);
 - de kwaliteitsmeting, met vooraan de maat die ertoe doet;
 - automatisch ondertitelen in een live gesprek, lokaal (par. 13d) -- alle acht
-  gesprekken in dit huis, en de ratel van regel 49 van 10 naar 2;
+  gesprekken in dit huis, en de ratel van regel 49 van 10 naar 4;
 - het kanalenbord dat zegt welke ingang open staat en wat er niet vast te
   stellen is (par. 13f);
 - RTMail als ingang: post aan `hulp@` wordt een zaak, met de melder uit de

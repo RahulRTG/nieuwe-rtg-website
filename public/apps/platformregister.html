@@ -120,17 +120,32 @@
   <div class="voet"><button id="kSluit">Sluiten</button></div>
 </dialog>
 
+<!-- De kantoordeur van het huis: hij probeert eerst het RTG-account dat op
+     dit toestel is ingelogd en vraagt pas om de kantoorcode als dat niet gaat. -->
+<script src="/shared/kantoorgesprek.js"></script>
 <script>
 (function () {
   const $ = s => document.querySelector(s);
   const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g,
     c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-  const naarInlog = () => location.replace('/apps/personeel.html?kantoor=1&terug=' +
-    encodeURIComponent(location.pathname));
+  /* DE DEUR STAAT HIER, NIET OP EEN ANDERE PAGINA. Dit scherm deed een
+     location.replace naar de personeels-app -- de kwaal uit TAKEN 5.5: je
+     verliest waar je heen wilde, en je krijgt een codeveld terwijl je eigen
+     RTG-account de kantoorsleutel misschien allang draagt. De gedeelde
+     kantoordeur (shared/kantoorgesprek.js) probeert die sleutel eerst en vraagt
+     de code pas als dat niet gaat, zonder dat je deze pagina verlaat. */
+  const naarInlog = () => {
+    const doel = document.getElementById('lijst');
+    doel.innerHTML = '<div id="kgDeur"></div>';
+    window.RTGKantoorGesprek.toon(document.getElementById('kgDeur'), (token) => {
+      TOKEN = token;
+      try { localStorage.setItem('rtg_office_token', TOKEN); } catch (e) {}
+      ververs();
+    });
+  };
   let TOKEN = null;
   try { TOKEN = localStorage.getItem('rtg_office_token'); } catch (e) { TOKEN = null; }
-  if (!TOKEN) return naarInlog();
 
   let pagina = 1, soort = '', laatste = null;
 

@@ -17,6 +17,19 @@
      het veld; er komt geen bellenrij met je code erin, en de browser krijgt
      autocomplete="off" zodat hij hem niet onthoudt.
 
+   - DE SLEUTELBOS GAAT VOOR DE CODE. Hangt de kantoorsleutel al aan het
+     RTG-account waarmee dit toestel is ingelogd (kern/eenaccount.js; bij de
+     eigenaar is die AFGELEID en koppelt hij niets), dan probeert dit gesprek
+     eerst /api/account/start en vraagt het pas iets als dat niet gaat.
+
+     Dat was een gat en geen gemak: officeAuth liet de eigenaar met zijn eigen
+     lid-token allang door (server/kern/kantoor/index.js) terwijl vier schermen
+     hem om een kantoorcode vroegen en vier andere doodliepen op "Geen
+     backoffice-sessie". Een inlogvraag die niet nodig is, leert mensen hun
+     code intypen waar dat niet hoeft. De algemene pin blijft gelden: zegt de
+     server pinNodig, dan vraagt Rahul die hier, gemaskeerd, in hetzelfde
+     gesprek. Het ene account is geen achterdeur (kern/eenaccount/starten.js).
+
    Gebruik:  RTGKantoorGesprek.toon(element, function (token, state) { ... })  */
 (function (w) {
   'use strict';
@@ -42,6 +55,14 @@
     '.kg-rij button:disabled{opacity:.45;cursor:default;}' +
     '.kg-fout{font-size:.86rem;line-height:1.5;color:var(--burgundy-on-dark,#C23A5E);margin:.8rem 0 0;min-height:1.2rem;}';
 
+  /* EEN STILLE SLEUTEL PROBEER JE EEN KEER PER PAGINA. De deur kan twee keer
+     opengaan: als er geen sleutel is, en nog eens als een verzoek alsnog 401
+     geeft. Zou de sleutelbos dan opnieuw stil munten, dan draaien scherm en
+     deur rond -- de lus die backoffice.js eerder in vier seconden tweeenveertig
+     keer liet herladen. Een sleutel die niet hielp, helpt de tweede keer ook
+     niet; dan is de code aan de beurt, met de reden erbij. */
+  var sleutelGebruikt = false;
+
   var stijlGezet = false;
   function stijl() {
     if (stijlGezet) return;
@@ -53,6 +74,19 @@
   function post(pad, lijf) {
     return fetch('/api/kantoor/gesprek/' + pad, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(lijf || {})
+    }).then(function (r) { return r.json().catch(function () { return {}; }); });
+  }
+
+  // het lid-token van dit toestel; null als er niemand als lid is ingelogd
+  function lidToken() {
+    try { return localStorage.getItem('rtg_member_token') || null; } catch (e) { return null; }
+  }
+
+  // de sleutelbos-kant (kern/eenaccount.js), met het lid-token als bewijs
+  function accountPost(pad, lijf, token) {
+    return fetch('/api/account/' + pad, {
+      method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
       body: JSON.stringify(lijf || {})
     }).then(function (r) { return r.json().catch(function () { return {}; }); });
   }
@@ -87,22 +121,35 @@
       veld.focus();
     }
 
+    /* WAT "VERDER" NU DOET. Het gesprek heeft twee standen -- de code van het
+       kantoor, en de algemene pin bij het ene account -- en die verschillen
+       alleen in waar het antwoord heen gaat. Een vlag zou hier twee keer
+       moeten worden uitgelezen; een verwijzing naar de ontvanger maar een keer
+       worden gezet. */
+    var ontvanger = zegCode;
+
     function stuur() {
       var tekst = veld.value;
-      if (!tekst || !id) return;
+      if (!tekst) return;
       veld.value = '';                       // meteen uit beeld
       veld.disabled = true; knop.disabled = true;
       fout.textContent = '';
+      ontvanger(tekst);
+    }
+
+    function zegCode(tekst) {
+      if (!id) { melden(''); return; }
       post('zeg', { id: id, tekst: tekst }).then(function (d) {
         if (d.token) { zegt.textContent = d.tekst || 'U bent binnen.'; return klaar(d.token, d.state); }
         if (d.gestopt) { zegt.textContent = d.tekst || 'Goed.'; veld.disabled = true; knop.disabled = true; return; }
-        if (d.error) { melden(d.error); if (!d.veld) begin(); return; }
+        if (d.error) { melden(d.error); if (!d.veld) codeGesprek(); return; }
         if (d.id) id = d.id;
         vraag(d);
       }).catch(function () { melden('Dat lukte even niet. Probeer het opnieuw.'); });
     }
 
-    function begin() {
+    function codeGesprek() {
+      ontvanger = zegCode;
       post('start', {}).then(function (d) {
         if (d.error) { zegt.textContent = d.error; veld.disabled = true; knop.disabled = true; return; }
         id = d.id;
@@ -110,9 +157,49 @@
       }).catch(function () { zegt.textContent = 'Het kantoor is even niet bereikbaar.'; });
     }
 
+    /* DE SLEUTELBOS EERST: /api/account/start munt dezelfde sessie als de code
+       zou doen (kern/eenaccount/starten.js), met dezelfde logregel. Lukt dat
+       niet, dan valt het gesprek terug op de code -- en NIET stil: de reden van
+       de server komt in het foutvak. Een terugval zonder reden laat iemand een
+       code intypen zonder te weten waarom zijn eigen account niet volstond. */
+    function viaAccount() {
+      var lt = lidToken();
+      if (!lt) return codeGesprek();
+      if (sleutelGebruikt) {
+        codeGesprek();
+        fout.textContent = 'Uw RTG-account opende deze deur al eerder en het was niet genoeg. Daarom nu de kantoorcode.';
+        return;
+      }
+      zegt.textContent = 'Een moment, ik kijk of uw eigen RTG-account hier al toegang heeft...';
+      accountPost('rollen', {}, lt).then(function (d) {
+        var heeft = (d.rollen || []).some(function (r) { return r && r.rol === 'kantoor'; });
+        if (!heeft) return codeGesprek();
+        start(null);
+      }).catch(function () { codeGesprek(); });
+
+      function start(pin) {
+        accountPost('start', pin ? { rol: 'kantoor', pin: pin } : { rol: 'kantoor' }, lt).then(function (s) {
+          if (s.token) {
+            sleutelGebruikt = true;
+            zegt.textContent = 'Welkom terug. U bent binnen met uw eigen RTG-account.';
+            return klaar(s.token, s.state);
+          }
+          if (s.pinNodig) return vraagPin();
+          // geen sleutel (meer), of iets anders mis: de code, met de reden erbij
+          codeGesprek();
+          fout.textContent = s.error || '';
+        }).catch(function () { codeGesprek(); });
+      }
+
+      function vraagPin() {
+        ontvanger = function (tekst) { start(tekst); };
+        vraag({ tekst: 'Uw algemene pin, dan zet ik de kantoordeur open.', verborgen: true });
+      }
+    }
+
     knop.addEventListener('click', stuur);
     veld.addEventListener('keydown', function (e) { if (e.key === 'Enter') stuur(); });
-    begin();
+    viaAccount();
   }
 
   w.RTGKantoorGesprek = { toon: toon };

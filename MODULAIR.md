@@ -57,10 +57,10 @@ werk (breng de koppelingen terug).
 `npm run activering` → `ACTIVERING.json`
 
 Per functie uit de catalogus: welke routes, welke bestanden, welke domeinen.
-<!--getal:activering.functies-->210<!--/getal--> functies dragen routes; een doorsnee functie raakt
-<!--getal:activering.mediaan-->26<!--/getal--> knopen.
+<!--getal:activering.functies-->212<!--/getal--> functies dragen routes; een doorsnee functie raakt
+<!--getal:activering.mediaan-->24<!--/getal--> knopen.
 
-**Vier graden, en ze zijn niet uitwisselbaar.** <!--getal:activering.gemeten-->152<!--/getal--> functies
+**Vier graden, en ze zijn niet uitwisselbaar.** <!--getal:activering.gemeten-->154<!--/getal--> functies
 zijn `gemeten`; <!--getal:activering.ondergrens-->48<!--/getal--> zijn `ondergrens` (er hangt méér aan dan
 hier staat, en nieuwe broninformatie zou helpen); <!--getal:activering.onbepaald-->3<!--/getal--> zijn
 `onbepaald` (de bronnen spreken elkaar tegen — dat vraagt een besluit en geen

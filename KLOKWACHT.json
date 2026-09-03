@@ -4,10 +4,10 @@
  "gemeten": {
   "scherm": 0,
   "schermBestanden": 0,
-  "server": 35,
-  "serverBestanden": 18,
-  "totaal": 35,
-  "bestanden": 18
+  "server": 34,
+  "serverBestanden": 17,
+  "totaal": 34,
+  "bestanden": 17
  },
  "schuld": {
   "alarmweg.test.js": 1,
@@ -26,8 +26,7 @@
   "schoolkoppel.test.js": 1,
   "sloophamer.pg.test.js": 5,
   "speldag.test.js": 1,
-  "spelsudoku.test.js": 1,
-  "spraaktekst.test.js": 1
+  "spelsudoku.test.js": 1
  },
  "verantwoord": {
   "eventloop.test.js": "de toets BLOKKEERT de event-loop een aantal ms en wacht tot de meter dat ziet; de tijd is hier de meting zelf en niet een gok erover",

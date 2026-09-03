@@ -16,7 +16,7 @@ het?**
 
 | | |
 |---|---|
-| Functieschakelaars (aan/uit per functie) | **210** in 17 categorieën |
+| Functieschakelaars (aan/uit per functie) | **212** in 17 categorieën |
 | Apps in de leden-catalogus | **84** in 8 categorieën |
 | Bedrijfsgenres | **74** in 27 sectoren |
 | Genre-caps (waar de apps op sturen) | **40** |
@@ -54,9 +54,9 @@ ook blokkeert.
 
 ---
 
-# 1. De 210 functieschakelaars
+# 1. De 212 functieschakelaars
 
-### Leden (RTG-app) — 22
+### Leden (RTG-app) — 24
 
 - **Leden-app (algemeen)** (`member`) — Alle ledenfuncties in de RTG-app. Zet je dit uit, dan valt de hele ledenkant stil (behalve wat hieronder apart aan staat).  
   _voor: rtg, lifestyle, business, gast_
@@ -74,10 +74,14 @@ ook blokkeert.
   _voor: lifestyle, business_
 - **RTG Wereld (de ene sociale app)** (`wereld`) — De laag over De Salon, Pulse, RTG Zakelijk, de genootschappen en de verhalen heen: één tijdlijn met een schakelaar (Alles, Lifestyle, Business, Communities, Privé) en de sprong naar de berichten-app. Uit zetten laat de vijf onderliggende apps gewoon staan; alleen de verbindende laag verdwijnt -- net als bij de Media OS.  
   _voor: rtg, lifestyle, business_
+- **RTG Service (hulp vragen)** (`service`) — De hulplijn van een lid: iets melden vanuit het scherm waar je stond, je lopende zaken zien, een medewerker toegang bevestigen, en om een MENS vragen. Uit zetten sluit die weg helemaal -- ook de ondergrens dat elk lid bij een mens kan uitkomen.  
+  _voor: rtg, lifestyle, business_
+- **Bellen met RTG (in de app)** (`service-bel`) — Bellen met RTG Service binnen de app, zonder telefoonnet en zonder nummer. Hoort bij de Lifestyle en Business Pass; om een mens vragen blijft voor elk account bestaan en gaat hier niet mee uit.  
+  _voor: lifestyle, business_
+- **Automatisch ondertitelen in een gesprek** (`ondertiteling`) — Een deelnemer laat zijn eigen stem omzetten naar tekst met een LOKAAL model; de regel komt in de meeleesbaan van het gesprek. Uit zetten laat die baan staan -- meetypen blijft werken -- maar wie doof is is dan weer afhankelijk van de anderen.  
+  _voor: rtg, lifestyle, business_
 - **Het Privékantoor (Lifestyle)** (`privekantoor`) — De ene app van de Lifestyle Pass: de levensgraaf over de premium-apps heen, de Control Tower met alle termijnen, het mandaat (wat mag het kantoor zelf) en zaken met een team en een tijdlijn. Uit zetten laat de onderliggende apps staan; alleen de samenhang verdwijnt.  
   _voor: lifestyle, business_
-- **RTG Service (een zaak, een mens, bellen)** (`service`) — Een servicezaak met een tijdlijn, de bevestiging waarmee een lid een medewerker of de AI-onderzoeker iets laat openen, en bellen naar RTG binnen de app met een meeleesbaan. Uitzetten sluit de envelop, niet de vier hulplijnen eronder.  
-  _voor: rtg, lifestyle, business_
 - **De app-staat** (`kern-state`) — De ene aanroep waarmee de app zijn hele beeld ophaalt. Uit betekent een lege app voor iedereen.  
   _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_
 - **De live-verbinding** (`kern-live`) — De open lijn (SSE) waarover meldingen en verversingen binnenkomen, plus de verbindingsgegevens voor bellen.  
@@ -103,6 +107,17 @@ ook blokkeert.
 - **Waarderen en reageren** (`kern-waardering`) — Likes, reacties, reviews en favorieten door het hele platform.  
   _voor: rtg, lifestyle, business, gast_
 
+### Sociaal (De Salon) — 4
+
+- **De Salon (feed, volgen, deals)** (`salon`) — De Salon-tijdlijn: partner-posts volgen, aanbiedingen claimen, polls en de etalage.  
+  _voor: rtg, lifestyle, business, gast_
+- **Salon-ontmoetingen (in de buurt)** (`ontmoetingen`) — Wederzijdse connecties die vlakbij zijn spreken veilig af (18+, geverifieerd), met contract, live-locatie naar RTG en SOS.  
+  _voor: rtg, lifestyle, business_
+- **Sociale laag (RTG + RTF)** (`social`) — De gedeelde sociale laag: zoeken, verbinden, DM, snaps, verhalen en bellen op codenaam. De kinderbescherming (t/m 15 gesloten) blijft altijd gelden.  
+  _voor: rtg, lifestyle, business, foundation_
+- **RTF contacten & familiekoppeling** (`rtf-contacten`) — De contactenlaag van de RTFoundation: gezinnen koppelen, kanalen en meldingen tussen leden.  
+  _voor: rtg, lifestyle, business, foundation_
+
 ### Genres & diensten — 10
 
 - **Bestellen & bezorgen** (`bestellen`) — Bestellen bij een zaak (ophalen of laten bezorgen) met live volgen.  
@@ -125,17 +140,6 @@ ook blokkeert.
   _voor: rtg, lifestyle, business, leverancier_
 - **RTG Commerce (mand & retour)** (`commerce`) — De verkooplaag boven de domeinen: wat er te koop staat en wat NIET met de reden erbij, een mand over verkopers heen met een afrekening per verkoper, de overdracht naar de deur die bevestigt, en de weg terug. RTG bevestigt hier zelf niets.  
   _voor: rtg, lifestyle, business_
-
-### Sociaal (De Salon) — 4
-
-- **De Salon (feed, volgen, deals)** (`salon`) — De Salon-tijdlijn: partner-posts volgen, aanbiedingen claimen, polls en de etalage.  
-  _voor: rtg, lifestyle, business, gast_
-- **Salon-ontmoetingen (in de buurt)** (`ontmoetingen`) — Wederzijdse connecties die vlakbij zijn spreken veilig af (18+, geverifieerd), met contract, live-locatie naar RTG en SOS.  
-  _voor: rtg, lifestyle, business_
-- **Sociale laag (RTG + RTF)** (`social`) — De gedeelde sociale laag: zoeken, verbinden, DM, snaps, verhalen en bellen op codenaam. De kinderbescherming (t/m 15 gesloten) blijft altijd gelden.  
-  _voor: rtg, lifestyle, business, foundation_
-- **RTF contacten & familiekoppeling** (`rtf-contacten`) — De contactenlaag van de RTFoundation: gezinnen koppelen, kanalen en meldingen tussen leden.  
-  _voor: rtg, lifestyle, business, foundation_
 
 ### Eigen apps — 37
 

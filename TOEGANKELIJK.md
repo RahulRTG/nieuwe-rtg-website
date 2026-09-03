@@ -267,7 +267,7 @@ weg die hierboven als open deur stond beschreven.** `kern/spraaktekst.js` zet
 spraak om met een LOKAAL model (`LOCAL_AI_URL` plus `LOCAL_AI_MODEL_SPRAAK`), en
 `shared/meeluister.js` zet de knop in de meeleesbaan zelf -- dus alle acht
 gesprekken kregen hem tegelijk. De ratel van keuringsregel 49 ging daarmee van
-tien naar twee.
+tien naar vier.
 
 **Iedereen ondertitelt zichzelf.** Elke deelnemer laat zijn eigen microfoon
 omzetten en de regel reist over dezelfde seinweg als een getypte regel. Dat is
@@ -300,8 +300,7 @@ leest een rode regel als een ontbrekend extraatje.
 Zichzelf ondertitelen helpt hier niet: dit is eenrichting, de kijker spreekt niet.
 Daarvoor is een tweede weg nodig -- de ZENDER laten ondertitelen -- en bij SOS
 betekent dat dat het geluid van iemand in nood door een model gaat. Dat besluit
-wordt hier niet stilzwijgend genomen, en daarom staat de ratel op twee en niet op
-nul.
+wordt hier niet stilzwijgend genomen.
 Het Podium heeft al een tekstbaan: de kanaalchat naast de uitzending, met
 `aria-live`, waarin de uitzender kan meeschrijven. Het SOS-scherm heeft er geen.
 Dat is de eerlijke stand en niet een gat dat nog even gedicht wordt: **wie doof

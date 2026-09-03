@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-03T11:11:40.323Z",
-    "commit": "cd999c7a",
+    "op": "2026-09-03T11:41:29.777Z",
+    "commit": "44f4c264",
     "boomVuil": false,
-    "boomAnders": 10,
+    "boomAnders": 7,
     "instrument": "scripts/verstrengeling.js",
     "node": "v22.22.2"
   },
@@ -15,7 +15,7 @@
   "primitiefVanaf": 3,
   "knopen": 887,
   "randen": 1748,
-  "randenBinnenKnoop": 2537,
+  "randenBinnenKnoop": 2539,
   "randenBuitenBereik": 13,
   "perSoort": {
     "GEDEELDE_PRIMITIEF": 435,

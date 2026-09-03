@@ -112,8 +112,9 @@ test('een stukke modelserver levert een fout en geen lege regel', async () => {
    draaien, en de grens uit local-ai.js laat hem daarom door. */
 const http = require('http');
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
-const { startServer, stop, postJson } = require('./helper');
+const { startServer, stop, postJson, wachtOpWaarde } = require('./helper');
 
 test('over de echte route: geluid erin, tekst eruit, en niets bewaard', async () => {
   let gezien = 0;
@@ -129,7 +130,13 @@ test('over de echte route: geluid erin, tekst eruit, en niets bewaard', async ()
   await new Promise(r => model.listen(0, '127.0.0.1', r));
   const poort = model.address().port;
 
-  const srv = await startServer({ env: { SMTP_URL: '',
+  /* EIGEN DATAMAP, EN DAT IS GEEN NETHEID. Zonder deze regel viel de opname
+     terug op server/data van de ONTWIKKELSERVER: die verandert niet door wat
+     deze toets doet, dus "er is niets bewaard" was groen omdat er naar de
+     verkeerde map werd gekeken. Een meting die niet kan bewegen, bewijst niets
+     (LAT.md regel 3). */
+  const datamap = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-spraak-'));
+  const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: datamap,
     LOCAL_AI_URL: 'http://127.0.0.1:' + poort, LOCAL_AI_MODEL_SPRAAK: 'nep-whisper' } });
   try {
     const post = postJson(srv.base);
@@ -145,7 +152,7 @@ test('over de echte route: geluid erin, tekst eruit, en niets bewaard', async ()
     assert.match(stand.let, /lokaal model/i);
     assert.match(stand.let, /niet bewaard/i);
 
-    const voor = kijkjeInDeOpslag(srv);
+    const voor = kijkjeInDeOpslag(datamap);
     const r = await fetch(srv.base + '/api/ondertiteling/fragment', { method: 'POST',
       headers: { 'Content-Type': 'audio/webm', Authorization: 'Bearer ' + reg.token },
       body: Buffer.from('nepgeluidbytes-nepgeluidbytes') });
@@ -154,19 +161,59 @@ test('over de echte route: geluid erin, tekst eruit, en niets bewaard', async ()
     assert.equal(uit.tekst, 'mijn boeking is niet doorgekomen');
     assert.equal(gezien, 1, 'de laag sprak het lokale model niet aan, of te vaak');
 
-    await new Promise(x => setTimeout(x, 400));
-    assert.equal(kijkjeInDeOpslag(srv), voor,
-      'er is iets bewaard van een geluidsfragment; het contract zegt dat dat niet gebeurt');
+    /* NIET OP DE KLOK WACHTEN MAAR OP EEN TOESTAND. Een `setTimeout` van een
+       halve seconde bewijst niets: hij is te kort op een trage machine en te
+       lang op een snelle. Wat wel bewijst dat de schrijfronde voorbij is, is een
+       LATERE schrijfactie zien landen -- had het fragment iets weggeschreven,
+       dan stond dat er dan al lang in. */
+    const na = await post('/api/service/open', { titel: 'Een gewone melding om de opslag te laten schrijven',
+      tekst: 'zodat de volgende regel iets heeft om op te wachten' }, reg.token);
+    assert.ok(na.zaak, JSON.stringify(na).slice(0, 200));
+    await wachtOpWaarde(() => kijkjeInDeOpslag(datamap) !== voor,
+      { wat: 'de opslag verandert door een gewone schrijfactie (positieve controle op de peiling)', ms: 10000 });
+
+    /* En dan de eigenlijke vraag: staat er iets van het GELUID in? Niet "is de
+       opslag gelijk gebleven" -- die is nu terecht veranderd door de zaak
+       hierboven -- maar: zijn de bytes of een fragmentbestand ergens terug te
+       vinden. Dat is de bewering van het mutatiecontract. */
+    const alles = [];
+    (function loop(m) {
+      for (const n of fs.readdirSync(m, { withFileTypes: true })) {
+        const q = path.join(m, n.name);
+        if (n.isDirectory()) loop(q); else alles.push(q);
+      }
+    })(datamap);
+    assert.deepEqual(alles.filter(q => /fragment|audio|\.webm$|\.ogg$|\.wav$/i.test(path.basename(q))), [],
+      'er is een geluidsbestand achtergebleven');
+    const metBytes = alles.filter(q => {
+      try { return fs.readFileSync(q).includes('nepgeluidbytes'); } catch (e) { return false; }
+    });
+    assert.deepEqual(metBytes, [], 'de bytes van het fragment staan in de opslag');
   } finally {
     await stop(srv);
     await new Promise(r => model.close(r));
+    try { fs.rmSync(datamap, { recursive: true, force: true }); } catch (e) {}
   }
 });
 
-/* De opslag als een tekenreeks. Grof met opzet: elke schrijfactie in db.json
-   verandert hem, en dat is precies wat hier NIET mag gebeuren. */
-function kijkjeInDeOpslag(srv) {
-  const map = srv.dataDir || path.join(__dirname, '..', 'server', 'data');
-  try { return fs.readFileSync(path.join(map, 'db.json'), 'utf8').length + ':' +
-    fs.readdirSync(map).sort().join(','); } catch (e) { return 'onleesbaar'; }
+/* De opslag als een tekenreeks: elk bestand met zijn grootte en wijzigtijd.
+
+   HIER STOND EERST `db.json`, EN DAT BESTAND BESTAAT NIET MEER -- de opslag is
+   SQLite (rtg.db en vrienden). De peiling gaf dus altijd 'onleesbaar', en de
+   assertie "er is niets bewaard" was groen omdat er naar niets werd gekeken.
+   Een meting die niet kan bewegen bewijst niets (LAT.md regel 3), en daarom
+   staat er nu een positieve controle omheen: de proef eist eerst dat een gewone
+   schrijfactie deze peiling WEL ziet veranderen. */
+function kijkjeInDeOpslag(map) {
+  const uit = [];
+  const loop = (m, voor) => {
+    for (const n of fs.readdirSync(m, { withFileTypes: true }).sort((a, b) => a.name < b.name ? -1 : 1)) {
+      const q = path.join(m, n.name);
+      if (n.isDirectory()) { loop(q, voor + n.name + '/'); continue; }
+      const st = fs.statSync(q);
+      uit.push(voor + n.name + ':' + st.size + ':' + st.mtimeMs);
+    }
+  };
+  try { loop(map, ''); } catch (e) { return 'onleesbaar'; }
+  return uit.join('|');
 }

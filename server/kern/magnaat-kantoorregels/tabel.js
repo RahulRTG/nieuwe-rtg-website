@@ -21,6 +21,18 @@ const REGELS = [
   [/office\/regering|\/rijksloket|\/defensie/, 'regering', 'Het Regeringskantoor'],
   [/office\/opvang/, 'opvang', 'Opvang & migratie'],
   [/office\/balie|\/ledenregister/, 'balie', 'De Ledenbalie'],
+  /* RTG SERVICE HOORT BIJ DE KLANTENSERVICE, en dat moest hier staan: zonder
+     deze regel viel de hele hulplijn terug op "Onderzoek & data", en die
+     terugval bestaat juist om te voorkomen dat onbekend werk stilletjes ergens
+     belandt (zie de kop van ../magnaat-kantoorregels.js). Hij staat VOOR de
+     brede office- en ledenregels hieronder, want /api/office/service/* is
+     servicewerk en geen kantoorwerk -- en de volgorde is hier gedrag.
+
+     Het ondertitelen staat er los bij: die deur wordt door ELK gesprek in dit
+     huis gebruikt en niet alleen door de hulplijn, maar hij is wel in dezelfde
+     ronde en met hetzelfde doel gebouwd (SERVICE.md par. 13d). */
+  [/\/api\/service\b|\/service\/(?:zaak|bevestig|machtiging|gesprek|kanalen)|service-bel|leverancier-service|\/service\.html/, 'klantenservice', 'Klantenservice'],
+  [/\/api\/ondertiteling\b/, 'klantenservice', 'Klantenservice'],
   [/office\/redactie|\/redactie|\/krant|\/nieuws/, 'redactie', 'RTG Redactie'],
   [/office\/atelier(?:web)?|\/atelier/, 'atelier', 'RTG Atelier'],
   [/office\/studio|\/studio/, 'studio', 'RTG Ontwerpstudio'],

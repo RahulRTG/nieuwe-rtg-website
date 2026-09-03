@@ -3,8 +3,9 @@
    Het vervolg van ./tabel.js, en om dezelfde reden een eigen bestand: de tabel
    liep tegen de 10 KB (keuringsregel 13) en dat is de dakpan die zegt dat er
    een tweede onderwerp in zit. Dat onderwerp is de kant van het LID zelf: wat
-   een lid over zijn eigen account beheert (/api/mijn) en waar hij om hulp
-   vraagt (RTG Service). De kantoorkant van beide blijft in ./tabel.js.
+   een lid over zijn eigen account beheert (/api/mijn). RTG Service staat niet
+   hier maar in ./tabel.js, VOOR de office-regel, want de kantoorkant van de
+   hulplijn is servicewerk en geen kantoorwerk.
 
    VOLGORDE IS GEDRAG, ook hier: deze lijst wordt achter ./tabel.js geplakt en
    voor ./tabel-hdi.js, precies waar hij stond toen hij nog in de tabel zelf
@@ -39,15 +40,5 @@ module.exports = [
      regels lopen na een hernoeming uit elkaar, en dan hangt het scherm ergens
      anders dan de deur die het bedient. */
   [/(?:^|\/)mijn[-/](?:tweefactor|sessies|herstelkanaal)/, 'intern', 'Intern & IT'],
-  [/(?:^|\/)mijn[-/](?:gegevens|post|relaties)/, 'juridisch', 'Juridisch'],
-
-  /* RTG SERVICE, DE KANT VAN DE MELDER (routes/service.js): een lid dat een
-     zaak opent, een mens vraagt of belt -- Klantenservice, dezelfde kamer als
-     de chat en de live vormen in ./tabel-breed.js. De kantoorkant
-     (/api/office/service) blijft bij Intern & IT achter de office-regel
-     hierboven; vandaar `/api/` VOOR `service`. De ondertiteling
-     (routes/spraaktekst.js) staat in dezelfde regel omdat de functiecatalogus
-     hem naast /api/service draagt, en een functie in twee kamers is precies
-     wat deze tabel moet voorkomen. */
-  [/\/api\/(?:service|ondertiteling)(?:\/|$)|\/apps\/(?:leverancier-)?service(?:-bel)?\.html/, 'klantenservice', 'Klantenservice']
+  [/(?:^|\/)mijn[-/](?:gegevens|post|relaties)/, 'juridisch', 'Juridisch']
 ];

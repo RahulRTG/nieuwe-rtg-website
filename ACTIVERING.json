@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-03T11:11:47.012Z",
-    "commit": "cd999c7a",
+    "op": "2026-09-03T11:41:36.912Z",
+    "commit": "44f4c264",
     "boomVuil": false,
-    "boomAnders": 14,
+    "boomAnders": 12,
     "instrument": "scripts/activering.js",
     "node": "v22.22.2"
   },
@@ -368,6 +368,622 @@
   "perDomein": [
     {
       "domein": "domein:util",
+      "functies": 200,
+      "welke": [
+        "arrival",
+        "avondos",
+        "bedrijf",
+        "bestellen",
+        "betalen",
+        "bk-bezorgen",
+        "bk-eten",
+        "bk-reiswijzer",
+        "bk-reizen",
+        "bk-ritten",
+        "bk-tickets",
+        "charter",
+        "clips",
+        "command-besturen",
+        "command-doen",
+        "command-zien",
+        "commerce",
+        "dagmetingen",
+        "doelen",
+        "dom-agenda",
+        "dom-appstore",
+        "dom-appstore-uitgever",
+        "dom-asset",
+        "dom-bank-advies",
+        "dom-bank-incasso",
+        "dom-bank-inzicht",
+        "dom-bank-krediet",
+        "dom-bank-passen",
+        "dom-bank-rekening-open",
+        "dom-bank-sepa",
+        "dom-bank-spaardoel",
+        "dom-bank-storten",
+        "dom-bank-vastelasten",
+        "dom-bank-zakelijk",
+        "dom-bestanden",
+        "dom-boeken",
+        "dom-care",
+        "dom-doos",
+        "dom-eigendomein",
+        "dom-facturen",
+        "dom-fluister",
+        "dom-foutmelder",
+        "dom-galerij",
+        "dom-gemeente",
+        "dom-genootschap",
+        "dom-home",
+        "dom-kmar",
+        "dom-kosten",
+        "dom-lab",
+        "dom-labfonds",
+        "dom-leerstof",
+        "dom-les",
+        "dom-livinglab",
+        "dom-livinglab-bewoner",
+        "dom-lucht",
+        "dom-mall",
+        "dom-meet",
+        "dom-metier",
+        "dom-muziek",
+        "dom-nav",
+        "dom-notities",
+        "dom-onboarding",
+        "dom-onderwijs",
+        "dom-overheid",
+        "dom-partner-uitbetaling",
+        "dom-pay-tegoed",
+        "dom-pay-tegoed-zaak",
+        "dom-pay-terug",
+        "dom-pay-vooraf",
+        "dom-pay-wallet",
+        "dom-plaats",
+        "dom-reisbureau",
+        "dom-rekening",
+        "dom-residentie",
+        "dom-rtfkantoor",
+        "dom-rtfos",
+        "dom-rtgid",
+        "dom-samen",
+        "dom-site",
+        "dom-sport",
+        "dom-thuis",
+        "dom-vak",
+        "dom-veiligheid",
+        "dom-verkoop",
+        "dom-wallet",
+        "dom-werkplek",
+        "dom-werkvloer",
+        "flits",
+        "foundation",
+        "foundation-school",
+        "fs-gast",
+        "fs-terrein",
+        "fs-werk",
+        "gastos",
+        "gedachten",
+        "geldwereld",
+        "gemoed",
+        "gewoonten",
+        "ghost",
+        "gld-aitegoed",
+        "gld-cadeau",
+        "gld-claims",
+        "gld-munt",
+        "gld-prijsgarantie",
+        "gld-prijzen",
+        "gld-rekening",
+        "groothandel",
+        "instantreality",
+        "kantoorpakket",
+        "kern-berichten",
+        "kern-comm",
+        "kern-gids",
+        "kern-klok",
+        "kern-live",
+        "kern-locatie",
+        "kern-meldingen",
+        "kern-memo",
+        "kern-rahul",
+        "kern-state",
+        "kern-taal",
+        "kern-waardering",
+        "knelpunt",
+        "levenos",
+        "life",
+        "mediaos",
+        "medicijnen",
+        "member",
+        "member-werk",
+        "mobiliteit",
+        "noodkaart",
+        "office",
+        "ondernemersos",
+        "ondertiteling",
+        "onderweg",
+        "ontmoetingen",
+        "oog",
+        "opvangwijzer",
+        "ov",
+        "ov-aandacht",
+        "ov-bijles",
+        "ov-browser",
+        "ov-kantoorgesprek",
+        "ov-krant",
+        "ov-mail-binnen",
+        "ov-media",
+        "ov-spar",
+        "ov-stad",
+        "ov-suppliers",
+        "ov-werkmail",
+        "ov-zorgprofiel",
+        "paspoort",
+        "podium",
+        "privekantoor",
+        "rechterhand",
+        "retail",
+        "rtf-contacten",
+        "rtgone",
+        "salon",
+        "service",
+        "service-bel",
+        "socialewereld",
+        "spellen",
+        "staff",
+        "stuur",
+        "supplier",
+        "supplier-apply",
+        "supplier-events",
+        "supplier-finance",
+        "supplier-haccp",
+        "supplier-pos",
+        "supplier-ride",
+        "supplier-rooms",
+        "supplier-salon",
+        "tenant",
+        "tg-aanmeld",
+        "tg-account",
+        "tg-gegevens",
+        "tg-inlog",
+        "tg-link",
+        "tg-pin",
+        "tg-sso",
+        "tg-zegel",
+        "theater",
+        "tickets",
+        "tijdlijn",
+        "training",
+        "vakbewijs",
+        "verhuur",
+        "verificatie",
+        "verzorging",
+        "voeding",
+        "vonk",
+        "wbw",
+        "webauthn",
+        "wereld",
+        "werk-rtf",
+        "werving",
+        "zaakregie",
+        "zaakregie-beheer",
+        "zakelijk"
+      ]
+    },
+    {
+      "domein": "domein:bedrijf",
+      "functies": 199,
+      "welke": [
+        "arrival",
+        "avondos",
+        "bedrijf",
+        "bestellen",
+        "betalen",
+        "bk-bezorgen",
+        "bk-eten",
+        "bk-reiswijzer",
+        "bk-reizen",
+        "bk-ritten",
+        "bk-tickets",
+        "charter",
+        "clips",
+        "command-besturen",
+        "command-doen",
+        "command-zien",
+        "commerce",
+        "dagmetingen",
+        "doelen",
+        "dom-agenda",
+        "dom-appstore",
+        "dom-appstore-uitgever",
+        "dom-asset",
+        "dom-bank-advies",
+        "dom-bank-incasso",
+        "dom-bank-inzicht",
+        "dom-bank-krediet",
+        "dom-bank-passen",
+        "dom-bank-rekening-open",
+        "dom-bank-sepa",
+        "dom-bank-spaardoel",
+        "dom-bank-storten",
+        "dom-bank-vastelasten",
+        "dom-bank-zakelijk",
+        "dom-bestanden",
+        "dom-boeken",
+        "dom-care",
+        "dom-doos",
+        "dom-eigendomein",
+        "dom-facturen",
+        "dom-fluister",
+        "dom-foutmelder",
+        "dom-galerij",
+        "dom-gemeente",
+        "dom-genootschap",
+        "dom-home",
+        "dom-kmar",
+        "dom-kosten",
+        "dom-lab",
+        "dom-labfonds",
+        "dom-leerstof",
+        "dom-les",
+        "dom-livinglab",
+        "dom-livinglab-bewoner",
+        "dom-lucht",
+        "dom-mall",
+        "dom-meet",
+        "dom-metier",
+        "dom-muziek",
+        "dom-nav",
+        "dom-notities",
+        "dom-onboarding",
+        "dom-onderwijs",
+        "dom-overheid",
+        "dom-partner-uitbetaling",
+        "dom-pay-tegoed",
+        "dom-pay-tegoed-zaak",
+        "dom-pay-terug",
+        "dom-pay-vooraf",
+        "dom-pay-wallet",
+        "dom-plaats",
+        "dom-reisbureau",
+        "dom-rekening",
+        "dom-residentie",
+        "dom-rtfkantoor",
+        "dom-rtfos",
+        "dom-rtgid",
+        "dom-samen",
+        "dom-site",
+        "dom-sport",
+        "dom-thuis",
+        "dom-vak",
+        "dom-veiligheid",
+        "dom-verkoop",
+        "dom-wallet",
+        "dom-werkplek",
+        "dom-werkvloer",
+        "flits",
+        "foundation",
+        "foundation-school",
+        "fs-gast",
+        "fs-terrein",
+        "fs-werk",
+        "gastos",
+        "gedachten",
+        "geldwereld",
+        "gemoed",
+        "gewoonten",
+        "ghost",
+        "gld-aitegoed",
+        "gld-cadeau",
+        "gld-claims",
+        "gld-munt",
+        "gld-prijsgarantie",
+        "gld-prijzen",
+        "gld-rekening",
+        "groothandel",
+        "instantreality",
+        "kantoorpakket",
+        "kern-berichten",
+        "kern-comm",
+        "kern-gids",
+        "kern-klok",
+        "kern-live",
+        "kern-locatie",
+        "kern-meldingen",
+        "kern-memo",
+        "kern-rahul",
+        "kern-state",
+        "kern-taal",
+        "kern-waardering",
+        "knelpunt",
+        "levenos",
+        "life",
+        "mediaos",
+        "medicijnen",
+        "member",
+        "member-werk",
+        "mobiliteit",
+        "noodkaart",
+        "office",
+        "ondernemersos",
+        "ondertiteling",
+        "onderweg",
+        "ontmoetingen",
+        "oog",
+        "opvangwijzer",
+        "ov",
+        "ov-aandacht",
+        "ov-bijles",
+        "ov-browser",
+        "ov-kantoorgesprek",
+        "ov-krant",
+        "ov-mail-binnen",
+        "ov-media",
+        "ov-spar",
+        "ov-stad",
+        "ov-suppliers",
+        "ov-werkmail",
+        "ov-zorgprofiel",
+        "paspoort",
+        "podium",
+        "privekantoor",
+        "rechterhand",
+        "retail",
+        "rtf-contacten",
+        "rtgone",
+        "salon",
+        "service",
+        "service-bel",
+        "socialewereld",
+        "spellen",
+        "staff",
+        "stuur",
+        "supplier",
+        "supplier-events",
+        "supplier-finance",
+        "supplier-haccp",
+        "supplier-pos",
+        "supplier-ride",
+        "supplier-rooms",
+        "supplier-salon",
+        "tenant",
+        "tg-aanmeld",
+        "tg-account",
+        "tg-gegevens",
+        "tg-inlog",
+        "tg-link",
+        "tg-pin",
+        "tg-sso",
+        "tg-zegel",
+        "theater",
+        "tickets",
+        "tijdlijn",
+        "training",
+        "vakbewijs",
+        "verhuur",
+        "verificatie",
+        "verzorging",
+        "voeding",
+        "vonk",
+        "wbw",
+        "webauthn",
+        "wereld",
+        "werk-rtf",
+        "werving",
+        "zaakregie",
+        "zaakregie-beheer",
+        "zakelijk"
+      ]
+    },
+    {
+      "domein": "domein:geld",
+      "functies": 199,
+      "welke": [
+        "arrival",
+        "avondos",
+        "bedrijf",
+        "bestellen",
+        "betalen",
+        "bk-bezorgen",
+        "bk-eten",
+        "bk-reiswijzer",
+        "bk-reizen",
+        "bk-ritten",
+        "bk-tickets",
+        "charter",
+        "clips",
+        "command-besturen",
+        "command-doen",
+        "command-zien",
+        "commerce",
+        "dagmetingen",
+        "doelen",
+        "dom-agenda",
+        "dom-appstore",
+        "dom-appstore-uitgever",
+        "dom-asset",
+        "dom-bank-advies",
+        "dom-bank-incasso",
+        "dom-bank-inzicht",
+        "dom-bank-krediet",
+        "dom-bank-passen",
+        "dom-bank-rekening-open",
+        "dom-bank-sepa",
+        "dom-bank-spaardoel",
+        "dom-bank-storten",
+        "dom-bank-vastelasten",
+        "dom-bank-zakelijk",
+        "dom-bestanden",
+        "dom-boeken",
+        "dom-care",
+        "dom-doos",
+        "dom-eigendomein",
+        "dom-facturen",
+        "dom-fluister",
+        "dom-foutmelder",
+        "dom-galerij",
+        "dom-gemeente",
+        "dom-genootschap",
+        "dom-home",
+        "dom-kmar",
+        "dom-kosten",
+        "dom-lab",
+        "dom-labfonds",
+        "dom-leerstof",
+        "dom-les",
+        "dom-livinglab",
+        "dom-livinglab-bewoner",
+        "dom-lucht",
+        "dom-mall",
+        "dom-meet",
+        "dom-metier",
+        "dom-muziek",
+        "dom-nav",
+        "dom-notities",
+        "dom-onboarding",
+        "dom-onderwijs",
+        "dom-overheid",
+        "dom-partner-uitbetaling",
+        "dom-pay-tegoed",
+        "dom-pay-tegoed-zaak",
+        "dom-pay-terug",
+        "dom-pay-vooraf",
+        "dom-pay-wallet",
+        "dom-plaats",
+        "dom-reisbureau",
+        "dom-rekening",
+        "dom-residentie",
+        "dom-rtfkantoor",
+        "dom-rtfos",
+        "dom-rtgid",
+        "dom-samen",
+        "dom-site",
+        "dom-sport",
+        "dom-thuis",
+        "dom-vak",
+        "dom-veiligheid",
+        "dom-verkoop",
+        "dom-wallet",
+        "dom-werkplek",
+        "dom-werkvloer",
+        "flits",
+        "foundation",
+        "foundation-school",
+        "fs-gast",
+        "fs-terrein",
+        "fs-werk",
+        "gastos",
+        "gedachten",
+        "geldwereld",
+        "gemoed",
+        "gewoonten",
+        "ghost",
+        "gld-aitegoed",
+        "gld-cadeau",
+        "gld-claims",
+        "gld-munt",
+        "gld-prijsgarantie",
+        "gld-prijzen",
+        "gld-rekening",
+        "groothandel",
+        "instantreality",
+        "kantoorpakket",
+        "kern-berichten",
+        "kern-comm",
+        "kern-gids",
+        "kern-klok",
+        "kern-live",
+        "kern-locatie",
+        "kern-meldingen",
+        "kern-memo",
+        "kern-rahul",
+        "kern-state",
+        "kern-taal",
+        "kern-waardering",
+        "knelpunt",
+        "levenos",
+        "life",
+        "mediaos",
+        "medicijnen",
+        "member",
+        "member-werk",
+        "mobiliteit",
+        "noodkaart",
+        "office",
+        "ondernemersos",
+        "ondertiteling",
+        "onderweg",
+        "ontmoetingen",
+        "oog",
+        "opvangwijzer",
+        "ov",
+        "ov-aandacht",
+        "ov-bijles",
+        "ov-browser",
+        "ov-kantoorgesprek",
+        "ov-krant",
+        "ov-mail-binnen",
+        "ov-media",
+        "ov-spar",
+        "ov-stad",
+        "ov-suppliers",
+        "ov-werkmail",
+        "ov-zorgprofiel",
+        "paspoort",
+        "podium",
+        "privekantoor",
+        "rechterhand",
+        "retail",
+        "rtf-contacten",
+        "rtgone",
+        "salon",
+        "service",
+        "service-bel",
+        "socialewereld",
+        "spellen",
+        "staff",
+        "stuur",
+        "supplier",
+        "supplier-events",
+        "supplier-finance",
+        "supplier-haccp",
+        "supplier-pos",
+        "supplier-ride",
+        "supplier-rooms",
+        "supplier-salon",
+        "tenant",
+        "tg-aanmeld",
+        "tg-account",
+        "tg-gegevens",
+        "tg-inlog",
+        "tg-link",
+        "tg-pin",
+        "tg-sso",
+        "tg-zegel",
+        "theater",
+        "tickets",
+        "tijdlijn",
+        "training",
+        "vakbewijs",
+        "verhuur",
+        "verificatie",
+        "verzorging",
+        "voeding",
+        "vonk",
+        "wbw",
+        "webauthn",
+        "wereld",
+        "werk-rtf",
+        "werving",
+        "zaakregie",
+        "zaakregie-beheer",
+        "zakelijk"
+      ]
+    },
+    {
+      "domein": "domein:command",
       "functies": 198,
       "welke": [
         "arrival",
@@ -459,7 +1075,6 @@
         "dom-werkvloer",
         "flits",
         "foundation",
-        "foundation-school",
         "fs-gast",
         "fs-terrein",
         "fs-werk",
@@ -502,6 +1117,7 @@
         "noodkaart",
         "office",
         "ondernemersos",
+        "ondertiteling",
         "onderweg",
         "ontmoetingen",
         "oog",
@@ -528,615 +1144,7 @@
         "rtgone",
         "salon",
         "service",
-        "socialewereld",
-        "spellen",
-        "staff",
-        "stuur",
-        "supplier",
-        "supplier-apply",
-        "supplier-events",
-        "supplier-finance",
-        "supplier-haccp",
-        "supplier-pos",
-        "supplier-ride",
-        "supplier-rooms",
-        "supplier-salon",
-        "tenant",
-        "tg-aanmeld",
-        "tg-account",
-        "tg-gegevens",
-        "tg-inlog",
-        "tg-link",
-        "tg-pin",
-        "tg-sso",
-        "tg-zegel",
-        "theater",
-        "tickets",
-        "tijdlijn",
-        "training",
-        "vakbewijs",
-        "verhuur",
-        "verificatie",
-        "verzorging",
-        "voeding",
-        "vonk",
-        "wbw",
-        "webauthn",
-        "wereld",
-        "werk-rtf",
-        "werving",
-        "zaakregie",
-        "zaakregie-beheer",
-        "zakelijk"
-      ]
-    },
-    {
-      "domein": "domein:bedrijf",
-      "functies": 197,
-      "welke": [
-        "arrival",
-        "avondos",
-        "bedrijf",
-        "bestellen",
-        "betalen",
-        "bk-bezorgen",
-        "bk-eten",
-        "bk-reiswijzer",
-        "bk-reizen",
-        "bk-ritten",
-        "bk-tickets",
-        "charter",
-        "clips",
-        "command-besturen",
-        "command-doen",
-        "command-zien",
-        "commerce",
-        "dagmetingen",
-        "doelen",
-        "dom-agenda",
-        "dom-appstore",
-        "dom-appstore-uitgever",
-        "dom-asset",
-        "dom-bank-advies",
-        "dom-bank-incasso",
-        "dom-bank-inzicht",
-        "dom-bank-krediet",
-        "dom-bank-passen",
-        "dom-bank-rekening-open",
-        "dom-bank-sepa",
-        "dom-bank-spaardoel",
-        "dom-bank-storten",
-        "dom-bank-vastelasten",
-        "dom-bank-zakelijk",
-        "dom-bestanden",
-        "dom-boeken",
-        "dom-care",
-        "dom-doos",
-        "dom-eigendomein",
-        "dom-facturen",
-        "dom-fluister",
-        "dom-foutmelder",
-        "dom-galerij",
-        "dom-gemeente",
-        "dom-genootschap",
-        "dom-home",
-        "dom-kmar",
-        "dom-kosten",
-        "dom-lab",
-        "dom-labfonds",
-        "dom-leerstof",
-        "dom-les",
-        "dom-livinglab",
-        "dom-livinglab-bewoner",
-        "dom-lucht",
-        "dom-mall",
-        "dom-meet",
-        "dom-metier",
-        "dom-muziek",
-        "dom-nav",
-        "dom-notities",
-        "dom-onboarding",
-        "dom-onderwijs",
-        "dom-overheid",
-        "dom-partner-uitbetaling",
-        "dom-pay-tegoed",
-        "dom-pay-tegoed-zaak",
-        "dom-pay-terug",
-        "dom-pay-vooraf",
-        "dom-pay-wallet",
-        "dom-plaats",
-        "dom-reisbureau",
-        "dom-rekening",
-        "dom-residentie",
-        "dom-rtfkantoor",
-        "dom-rtfos",
-        "dom-rtgid",
-        "dom-samen",
-        "dom-site",
-        "dom-sport",
-        "dom-thuis",
-        "dom-vak",
-        "dom-veiligheid",
-        "dom-verkoop",
-        "dom-wallet",
-        "dom-werkplek",
-        "dom-werkvloer",
-        "flits",
-        "foundation",
-        "foundation-school",
-        "fs-gast",
-        "fs-terrein",
-        "fs-werk",
-        "gastos",
-        "gedachten",
-        "geldwereld",
-        "gemoed",
-        "gewoonten",
-        "ghost",
-        "gld-aitegoed",
-        "gld-cadeau",
-        "gld-claims",
-        "gld-munt",
-        "gld-prijsgarantie",
-        "gld-prijzen",
-        "gld-rekening",
-        "groothandel",
-        "instantreality",
-        "kantoorpakket",
-        "kern-berichten",
-        "kern-comm",
-        "kern-gids",
-        "kern-klok",
-        "kern-live",
-        "kern-locatie",
-        "kern-meldingen",
-        "kern-memo",
-        "kern-rahul",
-        "kern-state",
-        "kern-taal",
-        "kern-waardering",
-        "knelpunt",
-        "levenos",
-        "life",
-        "mediaos",
-        "medicijnen",
-        "member",
-        "member-werk",
-        "mobiliteit",
-        "noodkaart",
-        "office",
-        "ondernemersos",
-        "onderweg",
-        "ontmoetingen",
-        "oog",
-        "opvangwijzer",
-        "ov",
-        "ov-aandacht",
-        "ov-bijles",
-        "ov-browser",
-        "ov-kantoorgesprek",
-        "ov-krant",
-        "ov-mail-binnen",
-        "ov-media",
-        "ov-spar",
-        "ov-stad",
-        "ov-suppliers",
-        "ov-werkmail",
-        "ov-zorgprofiel",
-        "paspoort",
-        "podium",
-        "privekantoor",
-        "rechterhand",
-        "retail",
-        "rtf-contacten",
-        "rtgone",
-        "salon",
-        "service",
-        "socialewereld",
-        "spellen",
-        "staff",
-        "stuur",
-        "supplier",
-        "supplier-events",
-        "supplier-finance",
-        "supplier-haccp",
-        "supplier-pos",
-        "supplier-ride",
-        "supplier-rooms",
-        "supplier-salon",
-        "tenant",
-        "tg-aanmeld",
-        "tg-account",
-        "tg-gegevens",
-        "tg-inlog",
-        "tg-link",
-        "tg-pin",
-        "tg-sso",
-        "tg-zegel",
-        "theater",
-        "tickets",
-        "tijdlijn",
-        "training",
-        "vakbewijs",
-        "verhuur",
-        "verificatie",
-        "verzorging",
-        "voeding",
-        "vonk",
-        "wbw",
-        "webauthn",
-        "wereld",
-        "werk-rtf",
-        "werving",
-        "zaakregie",
-        "zaakregie-beheer",
-        "zakelijk"
-      ]
-    },
-    {
-      "domein": "domein:geld",
-      "functies": 197,
-      "welke": [
-        "arrival",
-        "avondos",
-        "bedrijf",
-        "bestellen",
-        "betalen",
-        "bk-bezorgen",
-        "bk-eten",
-        "bk-reiswijzer",
-        "bk-reizen",
-        "bk-ritten",
-        "bk-tickets",
-        "charter",
-        "clips",
-        "command-besturen",
-        "command-doen",
-        "command-zien",
-        "commerce",
-        "dagmetingen",
-        "doelen",
-        "dom-agenda",
-        "dom-appstore",
-        "dom-appstore-uitgever",
-        "dom-asset",
-        "dom-bank-advies",
-        "dom-bank-incasso",
-        "dom-bank-inzicht",
-        "dom-bank-krediet",
-        "dom-bank-passen",
-        "dom-bank-rekening-open",
-        "dom-bank-sepa",
-        "dom-bank-spaardoel",
-        "dom-bank-storten",
-        "dom-bank-vastelasten",
-        "dom-bank-zakelijk",
-        "dom-bestanden",
-        "dom-boeken",
-        "dom-care",
-        "dom-doos",
-        "dom-eigendomein",
-        "dom-facturen",
-        "dom-fluister",
-        "dom-foutmelder",
-        "dom-galerij",
-        "dom-gemeente",
-        "dom-genootschap",
-        "dom-home",
-        "dom-kmar",
-        "dom-kosten",
-        "dom-lab",
-        "dom-labfonds",
-        "dom-leerstof",
-        "dom-les",
-        "dom-livinglab",
-        "dom-livinglab-bewoner",
-        "dom-lucht",
-        "dom-mall",
-        "dom-meet",
-        "dom-metier",
-        "dom-muziek",
-        "dom-nav",
-        "dom-notities",
-        "dom-onboarding",
-        "dom-onderwijs",
-        "dom-overheid",
-        "dom-partner-uitbetaling",
-        "dom-pay-tegoed",
-        "dom-pay-tegoed-zaak",
-        "dom-pay-terug",
-        "dom-pay-vooraf",
-        "dom-pay-wallet",
-        "dom-plaats",
-        "dom-reisbureau",
-        "dom-rekening",
-        "dom-residentie",
-        "dom-rtfkantoor",
-        "dom-rtfos",
-        "dom-rtgid",
-        "dom-samen",
-        "dom-site",
-        "dom-sport",
-        "dom-thuis",
-        "dom-vak",
-        "dom-veiligheid",
-        "dom-verkoop",
-        "dom-wallet",
-        "dom-werkplek",
-        "dom-werkvloer",
-        "flits",
-        "foundation",
-        "foundation-school",
-        "fs-gast",
-        "fs-terrein",
-        "fs-werk",
-        "gastos",
-        "gedachten",
-        "geldwereld",
-        "gemoed",
-        "gewoonten",
-        "ghost",
-        "gld-aitegoed",
-        "gld-cadeau",
-        "gld-claims",
-        "gld-munt",
-        "gld-prijsgarantie",
-        "gld-prijzen",
-        "gld-rekening",
-        "groothandel",
-        "instantreality",
-        "kantoorpakket",
-        "kern-berichten",
-        "kern-comm",
-        "kern-gids",
-        "kern-klok",
-        "kern-live",
-        "kern-locatie",
-        "kern-meldingen",
-        "kern-memo",
-        "kern-rahul",
-        "kern-state",
-        "kern-taal",
-        "kern-waardering",
-        "knelpunt",
-        "levenos",
-        "life",
-        "mediaos",
-        "medicijnen",
-        "member",
-        "member-werk",
-        "mobiliteit",
-        "noodkaart",
-        "office",
-        "ondernemersos",
-        "onderweg",
-        "ontmoetingen",
-        "oog",
-        "opvangwijzer",
-        "ov",
-        "ov-aandacht",
-        "ov-bijles",
-        "ov-browser",
-        "ov-kantoorgesprek",
-        "ov-krant",
-        "ov-mail-binnen",
-        "ov-media",
-        "ov-spar",
-        "ov-stad",
-        "ov-suppliers",
-        "ov-werkmail",
-        "ov-zorgprofiel",
-        "paspoort",
-        "podium",
-        "privekantoor",
-        "rechterhand",
-        "retail",
-        "rtf-contacten",
-        "rtgone",
-        "salon",
-        "service",
-        "socialewereld",
-        "spellen",
-        "staff",
-        "stuur",
-        "supplier",
-        "supplier-events",
-        "supplier-finance",
-        "supplier-haccp",
-        "supplier-pos",
-        "supplier-ride",
-        "supplier-rooms",
-        "supplier-salon",
-        "tenant",
-        "tg-aanmeld",
-        "tg-account",
-        "tg-gegevens",
-        "tg-inlog",
-        "tg-link",
-        "tg-pin",
-        "tg-sso",
-        "tg-zegel",
-        "theater",
-        "tickets",
-        "tijdlijn",
-        "training",
-        "vakbewijs",
-        "verhuur",
-        "verificatie",
-        "verzorging",
-        "voeding",
-        "vonk",
-        "wbw",
-        "webauthn",
-        "wereld",
-        "werk-rtf",
-        "werving",
-        "zaakregie",
-        "zaakregie-beheer",
-        "zakelijk"
-      ]
-    },
-    {
-      "domein": "domein:command",
-      "functies": 196,
-      "welke": [
-        "arrival",
-        "avondos",
-        "bedrijf",
-        "bestellen",
-        "betalen",
-        "bk-bezorgen",
-        "bk-eten",
-        "bk-reiswijzer",
-        "bk-reizen",
-        "bk-ritten",
-        "bk-tickets",
-        "charter",
-        "clips",
-        "command-besturen",
-        "command-doen",
-        "command-zien",
-        "commerce",
-        "dagmetingen",
-        "doelen",
-        "dom-agenda",
-        "dom-appstore",
-        "dom-appstore-uitgever",
-        "dom-asset",
-        "dom-bank-advies",
-        "dom-bank-incasso",
-        "dom-bank-inzicht",
-        "dom-bank-krediet",
-        "dom-bank-passen",
-        "dom-bank-rekening-open",
-        "dom-bank-sepa",
-        "dom-bank-spaardoel",
-        "dom-bank-storten",
-        "dom-bank-vastelasten",
-        "dom-bank-zakelijk",
-        "dom-bestanden",
-        "dom-boeken",
-        "dom-care",
-        "dom-doos",
-        "dom-eigendomein",
-        "dom-facturen",
-        "dom-fluister",
-        "dom-foutmelder",
-        "dom-galerij",
-        "dom-gemeente",
-        "dom-genootschap",
-        "dom-home",
-        "dom-kmar",
-        "dom-kosten",
-        "dom-lab",
-        "dom-labfonds",
-        "dom-leerstof",
-        "dom-les",
-        "dom-livinglab",
-        "dom-livinglab-bewoner",
-        "dom-lucht",
-        "dom-mall",
-        "dom-meet",
-        "dom-metier",
-        "dom-muziek",
-        "dom-nav",
-        "dom-notities",
-        "dom-onboarding",
-        "dom-onderwijs",
-        "dom-overheid",
-        "dom-partner-uitbetaling",
-        "dom-pay-tegoed",
-        "dom-pay-tegoed-zaak",
-        "dom-pay-terug",
-        "dom-pay-vooraf",
-        "dom-pay-wallet",
-        "dom-plaats",
-        "dom-reisbureau",
-        "dom-rekening",
-        "dom-residentie",
-        "dom-rtfkantoor",
-        "dom-rtfos",
-        "dom-rtgid",
-        "dom-samen",
-        "dom-site",
-        "dom-sport",
-        "dom-thuis",
-        "dom-vak",
-        "dom-veiligheid",
-        "dom-verkoop",
-        "dom-wallet",
-        "dom-werkplek",
-        "dom-werkvloer",
-        "flits",
-        "foundation",
-        "fs-gast",
-        "fs-terrein",
-        "fs-werk",
-        "gastos",
-        "gedachten",
-        "geldwereld",
-        "gemoed",
-        "gewoonten",
-        "ghost",
-        "gld-aitegoed",
-        "gld-cadeau",
-        "gld-claims",
-        "gld-munt",
-        "gld-prijsgarantie",
-        "gld-prijzen",
-        "gld-rekening",
-        "groothandel",
-        "instantreality",
-        "kantoorpakket",
-        "kern-berichten",
-        "kern-comm",
-        "kern-gids",
-        "kern-klok",
-        "kern-live",
-        "kern-locatie",
-        "kern-meldingen",
-        "kern-memo",
-        "kern-rahul",
-        "kern-state",
-        "kern-taal",
-        "kern-waardering",
-        "knelpunt",
-        "levenos",
-        "life",
-        "mediaos",
-        "medicijnen",
-        "member",
-        "member-werk",
-        "mobiliteit",
-        "noodkaart",
-        "office",
-        "ondernemersos",
-        "onderweg",
-        "ontmoetingen",
-        "oog",
-        "opvangwijzer",
-        "ov",
-        "ov-aandacht",
-        "ov-bijles",
-        "ov-browser",
-        "ov-kantoorgesprek",
-        "ov-krant",
-        "ov-mail-binnen",
-        "ov-media",
-        "ov-spar",
-        "ov-stad",
-        "ov-suppliers",
-        "ov-werkmail",
-        "ov-zorgprofiel",
-        "paspoort",
-        "podium",
-        "privekantoor",
-        "rechterhand",
-        "retail",
-        "rtf-contacten",
-        "rtgone",
-        "salon",
-        "service",
+        "service-bel",
         "socialewereld",
         "spellen",
         "staff",
@@ -1180,7 +1188,7 @@
     },
     {
       "domein": "domein:wereld",
-      "functies": 196,
+      "functies": 198,
       "welke": [
         "arrival",
         "avondos",
@@ -1313,6 +1321,7 @@
         "noodkaart",
         "office",
         "ondernemersos",
+        "ondertiteling",
         "onderweg",
         "ontmoetingen",
         "oog",
@@ -1339,6 +1348,7 @@
         "rtgone",
         "salon",
         "service",
+        "service-bel",
         "socialewereld",
         "spellen",
         "staff",
@@ -1382,7 +1392,7 @@
     },
     {
       "domein": "domein:werkcommand",
-      "functies": 196,
+      "functies": 198,
       "welke": [
         "arrival",
         "avondos",
@@ -1515,6 +1525,7 @@
         "noodkaart",
         "office",
         "ondernemersos",
+        "ondertiteling",
         "onderweg",
         "ontmoetingen",
         "oog",
@@ -1541,6 +1552,7 @@
         "rtgone",
         "salon",
         "service",
+        "service-bel",
         "socialewereld",
         "spellen",
         "staff",
@@ -1584,7 +1596,7 @@
     },
     {
       "domein": "domein:eigencollectie",
-      "functies": 158,
+      "functies": 159,
       "welke": [
         "arrival",
         "avondos",
@@ -1712,6 +1724,7 @@
         "rtgone",
         "salon",
         "service",
+        "service-bel",
         "social",
         "socialewereld",
         "spellen",
@@ -4643,6 +4656,23 @@
       ]
     },
     {
+      "domein": "domein:service",
+      "functies": 11,
+      "welke": [
+        "dom-fluister",
+        "dom-foutmelder",
+        "kern-berichten",
+        "kern-locatie",
+        "kern-rahul",
+        "office",
+        "ov-spar",
+        "ov-zorgprofiel",
+        "service",
+        "service-bel",
+        "supplier"
+      ]
+    },
+    {
       "domein": "domein:servicekosten",
       "functies": 11,
       "welke": [
@@ -4727,11 +4757,10 @@
       ]
     },
     {
-      "domein": "domein:service",
+      "domein": "domein:passen",
       "functies": 10,
       "welke": [
         "dom-fluister",
-        "dom-foutmelder",
         "kern-berichten",
         "kern-locatie",
         "kern-rahul",
@@ -4739,6 +4768,7 @@
         "ov-spar",
         "ov-zorgprofiel",
         "service",
+        "service-bel",
         "supplier"
       ]
     },
@@ -4816,21 +4846,6 @@
         "supplier",
         "tg-inlog",
         "webauthn"
-      ]
-    },
-    {
-      "domein": "domein:passen",
-      "functies": 9,
-      "welke": [
-        "dom-fluister",
-        "kern-berichten",
-        "kern-locatie",
-        "kern-rahul",
-        "office",
-        "ov-spar",
-        "ov-zorgprofiel",
-        "service",
-        "supplier"
       ]
     },
     {
@@ -4917,6 +4932,20 @@
         "ov-zorgprofiel",
         "supplier",
         "supplier-events"
+      ]
+    },
+    {
+      "domein": "domein:rtmail-adres",
+      "functies": 8,
+      "welke": [
+        "bedrijf",
+        "member",
+        "office",
+        "ov-mail-binnen",
+        "ov-werkmail",
+        "service",
+        "service-bel",
+        "supplier"
       ]
     },
     {
@@ -5060,19 +5089,6 @@
         "kern-meldingen",
         "paspoort",
         "retail",
-        "supplier"
-      ]
-    },
-    {
-      "domein": "domein:rtmail-adres",
-      "functies": 7,
-      "welke": [
-        "bedrijf",
-        "member",
-        "office",
-        "ov-mail-binnen",
-        "ov-werkmail",
-        "service",
         "supplier"
       ]
     },
@@ -6860,7 +6876,7 @@
       "functies": 2,
       "welke": [
         "office",
-        "service"
+        "ondertiteling"
       ]
     },
     {
@@ -8198,12 +8214,12 @@
       ]
     }
   ],
-  "functiesMetEnvelop": 210,
+  "functiesMetEnvelop": 212,
   "perGraad": {
     "deels-niet-toe-te-rekenen": 7,
     "ondergrens": 48,
     "onbepaald": 3,
-    "gemeten": 152
+    "gemeten": 154
   },
   "ondergrens": 48,
   "onbepaald": 3,
@@ -8354,7 +8370,7 @@
     "knopen": 379,
     "pct": 43
   },
-  "mediaanKnopen": 26,
+  "mediaanKnopen": 24,
   "mediaanPct": 3,
   "routesZonderFunctie": 135,
   "bediening": 135,
@@ -8889,7 +8905,7 @@
         "wervingsLink",
         "zaakBoard"
       ],
-      "bestandenBereikt": 1309,
+      "bestandenBereikt": 1310,
       "knopen": 379,
       "perLaag": {
         "domein": 264,
@@ -9418,7 +9434,7 @@
         "geparkeerd",
         "kern"
       ],
-      "bestandenBereikt": 1027,
+      "bestandenBereikt": 1028,
       "knopen": 328,
       "perLaag": {
         "domein": 219,
@@ -9792,7 +9808,7 @@
         "kern",
         "lidboard"
       ],
-      "bestandenBereikt": 765,
+      "bestandenBereikt": 766,
       "knopen": 230,
       "perLaag": {
         "domein": 159,
@@ -10039,7 +10055,7 @@
       "sleutelsOnbekend": [
         "kern"
       ],
-      "bestandenBereikt": 487,
+      "bestandenBereikt": 488,
       "knopen": 153,
       "perLaag": {
         "domein": 89,
@@ -10191,7 +10207,7 @@
         "PASPOORT_NIVEAUS",
         "retailIsRetail"
       ],
-      "bestandenBereikt": 462,
+      "bestandenBereikt": 463,
       "knopen": 136,
       "perLaag": {
         "domein": 83,
@@ -10325,7 +10341,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 452,
+      "bestandenBereikt": 453,
       "knopen": 128,
       "perLaag": {
         "domein": 74,
@@ -10437,7 +10453,7 @@
       ],
       "sleutelsUitBedrading": [],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 444,
+      "bestandenBereikt": 445,
       "knopen": 124,
       "perLaag": {
         "domein": 72,
@@ -10595,7 +10611,7 @@
         "oppasinfoPubliek",
         "pushHook"
       ],
-      "bestandenBereikt": 465,
+      "bestandenBereikt": 466,
       "knopen": 120,
       "perLaag": {
         "domein": 69,
@@ -10707,7 +10723,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 421,
+      "bestandenBereikt": 422,
       "knopen": 117,
       "perLaag": {
         "domein": 65,
@@ -10818,7 +10834,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 415,
+      "bestandenBereikt": 416,
       "knopen": 117,
       "perLaag": {
         "domein": 65,
@@ -10938,7 +10954,7 @@
       "sleutelsOnbekend": [
         "PERSONAS"
       ],
-      "bestandenBereikt": 426,
+      "bestandenBereikt": 427,
       "knopen": 116,
       "perLaag": {
         "motor": 47,
@@ -11054,7 +11070,7 @@
         "geenGast"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 413,
+      "bestandenBereikt": 414,
       "knopen": 113,
       "perLaag": {
         "domein": 60,
@@ -11471,7 +11487,7 @@
         "path",
         "sessions"
       ],
-      "bestandenBereikt": 284,
+      "bestandenBereikt": 285,
       "knopen": 84,
       "perLaag": {
         "domein": 39,
@@ -11573,7 +11589,7 @@
         "dpMijnBetalingen",
         "memberTemplate"
       ],
-      "bestandenBereikt": 299,
+      "bestandenBereikt": 300,
       "knopen": 80,
       "perLaag": {
         "domein": 39,
@@ -11684,7 +11700,7 @@
         "PERSONAS",
         "memberTemplate"
       ],
-      "bestandenBereikt": 296,
+      "bestandenBereikt": 297,
       "knopen": 80,
       "perLaag": {
         "domein": 45,
@@ -11814,7 +11830,7 @@
         "PERSONAS",
         "retailIsRetail"
       ],
-      "bestandenBereikt": 270,
+      "bestandenBereikt": 271,
       "knopen": 77,
       "perLaag": {
         "domein": 55,
@@ -11923,7 +11939,7 @@
       "sleutelsOnbekend": [
         "memberTemplate"
       ],
-      "bestandenBereikt": 267,
+      "bestandenBereikt": 268,
       "knopen": 71,
       "perLaag": {
         "domein": 36,
@@ -12046,7 +12062,7 @@
         "hasCred",
         "sseClients"
       ],
-      "bestandenBereikt": 335,
+      "bestandenBereikt": 336,
       "knopen": 71,
       "perLaag": {
         "domein": 41,
@@ -12173,7 +12189,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 330,
+      "bestandenBereikt": 331,
       "knopen": 70,
       "perLaag": {
         "domein": 43,
@@ -12300,7 +12316,7 @@
         "path",
         "sessions"
       ],
-      "bestandenBereikt": 253,
+      "bestandenBereikt": 254,
       "knopen": 67,
       "perLaag": {
         "domein": 30,
@@ -12395,7 +12411,7 @@
       "sleutelsOnbekend": [
         "PERSONAS"
       ],
-      "bestandenBereikt": 239,
+      "bestandenBereikt": 240,
       "knopen": 66,
       "perLaag": {
         "domein": 44,
@@ -12511,7 +12527,7 @@
         "convOf",
         "kern"
       ],
-      "bestandenBereikt": 242,
+      "bestandenBereikt": 243,
       "knopen": 66,
       "perLaag": {
         "domein": 37,
@@ -12610,7 +12626,7 @@
       "sleutelsOnbekend": [
         "PERSONAS"
       ],
-      "bestandenBereikt": 235,
+      "bestandenBereikt": 236,
       "knopen": 64,
       "perLaag": {
         "domein": 42,
@@ -12704,7 +12720,7 @@
       "sleutelsOnbekend": [
         "memberTemplate"
       ],
-      "bestandenBereikt": 252,
+      "bestandenBereikt": 253,
       "knopen": 63,
       "perLaag": {
         "domein": 29,
@@ -12775,7 +12791,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 289,
+      "bestandenBereikt": 290,
       "knopen": 63,
       "perLaag": {
         "domein": 44,
@@ -12868,7 +12884,7 @@
       "sleutelsOnbekend": [
         "anthropic"
       ],
-      "bestandenBereikt": 254,
+      "bestandenBereikt": 255,
       "knopen": 63,
       "perLaag": {
         "domein": 32,
@@ -12950,7 +12966,7 @@
       "sleutelsOnbekend": [
         "anthropic"
       ],
-      "bestandenBereikt": 254,
+      "bestandenBereikt": 255,
       "knopen": 63,
       "perLaag": {
         "domein": 32,
@@ -13032,7 +13048,7 @@
       "sleutelsOnbekend": [
         "anthropic"
       ],
-      "bestandenBereikt": 254,
+      "bestandenBereikt": 255,
       "knopen": 63,
       "perLaag": {
         "domein": 32,
@@ -13114,7 +13130,7 @@
       "sleutelsOnbekend": [
         "anthropic"
       ],
-      "bestandenBereikt": 254,
+      "bestandenBereikt": 255,
       "knopen": 63,
       "perLaag": {
         "domein": 32,
@@ -13193,7 +13209,7 @@
         "sseToCustomer"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 222,
+      "bestandenBereikt": 223,
       "knopen": 62,
       "perLaag": {
         "domein": 41,
@@ -13320,7 +13336,7 @@
         "kern",
         "retailIsRetail"
       ],
-      "bestandenBereikt": 228,
+      "bestandenBereikt": 229,
       "knopen": 59,
       "perLaag": {
         "domein": 38,
@@ -13416,7 +13432,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 222,
+      "bestandenBereikt": 223,
       "knopen": 57,
       "perLaag": {
         "domein": 31,
@@ -13506,7 +13522,7 @@
         "sseToSupplier"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 246,
+      "bestandenBereikt": 247,
       "knopen": 57,
       "perLaag": {
         "domein": 34,
@@ -13585,7 +13601,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 234,
+      "bestandenBereikt": 235,
       "knopen": 57,
       "perLaag": {
         "domein": 33,
@@ -13663,7 +13679,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 189,
+      "bestandenBereikt": 190,
       "knopen": 57,
       "perLaag": {
         "domein": 34,
@@ -13739,7 +13755,7 @@
         "tooManyTries"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 242,
+      "bestandenBereikt": 243,
       "knopen": 56,
       "perLaag": {
         "domein": 27,
@@ -13812,7 +13828,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 244,
+      "bestandenBereikt": 245,
       "knopen": 55,
       "perLaag": {
         "domein": 33,
@@ -13882,7 +13898,7 @@
       ],
       "sleutelsUitBedrading": [],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 221,
+      "bestandenBereikt": 222,
       "knopen": 54,
       "perLaag": {
         "domein": 25,
@@ -13952,7 +13968,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 242,
+      "bestandenBereikt": 243,
       "knopen": 53,
       "perLaag": {
         "domein": 32,
@@ -14029,7 +14045,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 242,
+      "bestandenBereikt": 243,
       "knopen": 53,
       "perLaag": {
         "domein": 32,
@@ -14115,7 +14131,7 @@
         "sseToSupplier"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 211,
+      "bestandenBereikt": 212,
       "knopen": 52,
       "perLaag": {
         "motor": 20,
@@ -14189,7 +14205,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 204,
+      "bestandenBereikt": 205,
       "knopen": 52,
       "perLaag": {
         "domein": 27,
@@ -14273,7 +14289,7 @@
       "sleutelsOnbekend": [
         "POS_METHODS"
       ],
-      "bestandenBereikt": 218,
+      "bestandenBereikt": 219,
       "knopen": 52,
       "perLaag": {
         "domein": 32,
@@ -14355,7 +14371,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 278,
+      "bestandenBereikt": 279,
       "knopen": 52,
       "perLaag": {
         "domein": 23,
@@ -14578,7 +14594,7 @@
         "werkPoort",
         "zetWie"
       ],
-      "bestandenBereikt": 228,
+      "bestandenBereikt": 229,
       "knopen": 51,
       "perLaag": {
         "domein": 32,
@@ -14675,7 +14691,7 @@
         "DOOR_RELOCK_MS",
         "PERSONAS"
       ],
-      "bestandenBereikt": 207,
+      "bestandenBereikt": 208,
       "knopen": 50,
       "perLaag": {
         "domein": 29,
@@ -14767,7 +14783,7 @@
         "AUTHOR_TIER",
         "PERSONAS"
       ],
-      "bestandenBereikt": 212,
+      "bestandenBereikt": 213,
       "knopen": 49,
       "perLaag": {
         "domein": 27,
@@ -14832,7 +14848,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 177,
+      "bestandenBereikt": 178,
       "knopen": 49,
       "perLaag": {
         "domein": 28,
@@ -14923,7 +14939,7 @@
         "anthropic",
         "convOf"
       ],
-      "bestandenBereikt": 174,
+      "bestandenBereikt": 175,
       "knopen": 48,
       "perLaag": {
         "domein": 29,
@@ -14992,7 +15008,7 @@
         "findSupplier"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 238,
+      "bestandenBereikt": 239,
       "knopen": 48,
       "perLaag": {
         "domein": 21,
@@ -15057,7 +15073,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 220,
+      "bestandenBereikt": 221,
       "knopen": 48,
       "perLaag": {
         "domein": 26,
@@ -15141,7 +15157,7 @@
         "sseToSupplier"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 213,
+      "bestandenBereikt": 214,
       "knopen": 47,
       "perLaag": {
         "domein": 24,
@@ -15223,7 +15239,7 @@
         "sseToSupplier"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 213,
+      "bestandenBereikt": 214,
       "knopen": 47,
       "perLaag": {
         "domein": 24,
@@ -15304,7 +15320,7 @@
       "sleutelsOnbekend": [
         "PERSONAS"
       ],
-      "bestandenBereikt": 203,
+      "bestandenBereikt": 204,
       "knopen": 47,
       "perLaag": {
         "domein": 25,
@@ -15371,7 +15387,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 216,
+      "bestandenBereikt": 217,
       "knopen": 47,
       "perLaag": {
         "domein": 21,
@@ -15439,7 +15455,7 @@
         "liveCodename"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 208,
+      "bestandenBereikt": 209,
       "knopen": 47,
       "perLaag": {
         "domein": 26,
@@ -15503,7 +15519,7 @@
       ],
       "sleutelsUitBedrading": [],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 175,
+      "bestandenBereikt": 176,
       "knopen": 47,
       "perLaag": {
         "domein": 25,
@@ -15566,7 +15582,7 @@
       ],
       "sleutelsUitBedrading": [],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 175,
+      "bestandenBereikt": 176,
       "knopen": 47,
       "perLaag": {
         "domein": 25,
@@ -15638,7 +15654,7 @@
         "sseToSupplier"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 200,
+      "bestandenBereikt": 201,
       "knopen": 46,
       "perLaag": {
         "motor": 19,
@@ -15720,7 +15736,7 @@
         "sseToSupplier"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 212,
+      "bestandenBereikt": 213,
       "knopen": 46,
       "perLaag": {
         "motor": 21,
@@ -15799,7 +15815,7 @@
         "RIT_KETEN",
         "RIT_LEGACY"
       ],
-      "bestandenBereikt": 213,
+      "bestandenBereikt": 214,
       "knopen": 46,
       "perLaag": {
         "domein": 21,
@@ -15869,7 +15885,7 @@
       "sleutelsOnbekend": [
         "anthropic"
       ],
-      "bestandenBereikt": 216,
+      "bestandenBereikt": 217,
       "knopen": 46,
       "perLaag": {
         "domein": 24,
@@ -15931,7 +15947,7 @@
       ],
       "sleutelsUitBedrading": [],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 218,
+      "bestandenBereikt": 219,
       "knopen": 46,
       "perLaag": {
         "domein": 25,
@@ -16002,7 +16018,7 @@
       "sleutelsOnbekend": [
         "doelpoort"
       ],
-      "bestandenBereikt": 241,
+      "bestandenBereikt": 242,
       "knopen": 46,
       "perLaag": {
         "domein": 19,
@@ -16066,7 +16082,7 @@
       "sleutelsOnbekend": [
         "doelpoort"
       ],
-      "bestandenBereikt": 241,
+      "bestandenBereikt": 242,
       "knopen": 46,
       "perLaag": {
         "domein": 19,
@@ -16125,7 +16141,7 @@
         "liveCodename"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 190,
+      "bestandenBereikt": 191,
       "knopen": 46,
       "perLaag": {
         "domein": 20,
@@ -16189,7 +16205,7 @@
         "resolveSession"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 214,
+      "bestandenBereikt": 215,
       "knopen": 46,
       "perLaag": {
         "domein": 18,
@@ -16255,7 +16271,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 205,
+      "bestandenBereikt": 206,
       "knopen": 45,
       "perLaag": {
         "domein": 23,
@@ -16326,7 +16342,7 @@
         "sseToCustomer"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 238,
+      "bestandenBereikt": 239,
       "knopen": 45,
       "perLaag": {
         "domein": 24,
@@ -16392,7 +16408,7 @@
         "logInlog"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 175,
+      "bestandenBereikt": 176,
       "knopen": 45,
       "perLaag": {
         "domein": 18,
@@ -16483,7 +16499,7 @@
       "sleutelsOnbekend": [
         "gastKaartVanZaak"
       ],
-      "bestandenBereikt": 224,
+      "bestandenBereikt": 225,
       "knopen": 45,
       "perLaag": {
         "domein": 25,
@@ -16547,7 +16563,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 200,
+      "bestandenBereikt": 201,
       "knopen": 44,
       "perLaag": {
         "domein": 23,
@@ -16633,7 +16649,7 @@
         "DOOR_RELOCK_MS",
         "PERSONAS"
       ],
-      "bestandenBereikt": 196,
+      "bestandenBereikt": 197,
       "knopen": 44,
       "perLaag": {
         "domein": 23,
@@ -16710,7 +16726,7 @@
       "sleutelsOnbekend": [
         "PERSONAS"
       ],
-      "bestandenBereikt": 196,
+      "bestandenBereikt": 197,
       "knopen": 44,
       "perLaag": {
         "domein": 24,
@@ -16790,7 +16806,7 @@
         "ALT_IDEE",
         "anthropic"
       ],
-      "bestandenBereikt": 192,
+      "bestandenBereikt": 193,
       "knopen": 44,
       "perLaag": {
         "domein": 24,
@@ -16854,7 +16870,7 @@
         "liveCodename"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 238,
+      "bestandenBereikt": 239,
       "knopen": 44,
       "perLaag": {
         "domein": 22,
@@ -16913,7 +16929,7 @@
       ],
       "sleutelsUitBedrading": [],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 234,
+      "bestandenBereikt": 235,
       "knopen": 44,
       "perLaag": {
         "domein": 18,
@@ -16989,7 +17005,7 @@
         "PERSONAS",
         "kern"
       ],
-      "bestandenBereikt": 189,
+      "bestandenBereikt": 190,
       "knopen": 43,
       "perLaag": {
         "domein": 23,
@@ -17053,7 +17069,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 170,
+      "bestandenBereikt": 171,
       "knopen": 43,
       "perLaag": {
         "domein": 21,
@@ -17112,7 +17128,7 @@
       ],
       "sleutelsUitBedrading": [],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 213,
+      "bestandenBereikt": 214,
       "knopen": 43,
       "perLaag": {
         "domein": 21,
@@ -17199,7 +17215,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 226,
+      "bestandenBereikt": 227,
       "knopen": 43,
       "perLaag": {
         "domein": 17,
@@ -17255,7 +17271,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 193,
+      "bestandenBereikt": 194,
       "knopen": 42,
       "perLaag": {
         "domein": 21,
@@ -17326,7 +17342,7 @@
         "PERSONAS",
         "gcCode"
       ],
-      "bestandenBereikt": 198,
+      "bestandenBereikt": 199,
       "knopen": 42,
       "perLaag": {
         "domein": 22,
@@ -17399,7 +17415,7 @@
       "sleutelsOnbekend": [
         "HK_STATUSES"
       ],
-      "bestandenBereikt": 202,
+      "bestandenBereikt": 203,
       "knopen": 42,
       "perLaag": {
         "motor": 20,
@@ -17458,7 +17474,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 177,
+      "bestandenBereikt": 178,
       "knopen": 42,
       "perLaag": {
         "domein": 21,
@@ -17515,7 +17531,7 @@
       ],
       "sleutelsUitBedrading": [],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 190,
+      "bestandenBereikt": 191,
       "knopen": 41,
       "perLaag": {
         "domein": 15,
@@ -17569,7 +17585,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 175,
+      "bestandenBereikt": 176,
       "knopen": 40,
       "perLaag": {
         "domein": 19,
@@ -17636,7 +17652,7 @@
       "sleutelsOnbekend": [
         "loginFails"
       ],
-      "bestandenBereikt": 171,
+      "bestandenBereikt": 172,
       "knopen": 39,
       "perLaag": {
         "domein": 26,
@@ -17701,7 +17717,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 167,
+      "bestandenBereikt": 168,
       "knopen": 39,
       "perLaag": {
         "domein": 18,
@@ -17766,7 +17782,7 @@
         "liveCodename"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 242,
+      "bestandenBereikt": 243,
       "knopen": 39,
       "perLaag": {
         "domein": 17,
@@ -17823,7 +17839,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 138,
+      "bestandenBereikt": 139,
       "knopen": 37,
       "perLaag": {
         "domein": 13,
@@ -17871,7 +17887,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 166,
+      "bestandenBereikt": 167,
       "knopen": 37,
       "perLaag": {
         "domein": 16,
@@ -17923,7 +17939,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 164,
+      "bestandenBereikt": 165,
       "knopen": 37,
       "perLaag": {
         "domein": 16,
@@ -17979,7 +17995,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 167,
+      "bestandenBereikt": 168,
       "knopen": 36,
       "perLaag": {
         "domein": 15,
@@ -18030,7 +18046,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 163,
+      "bestandenBereikt": 164,
       "knopen": 36,
       "perLaag": {
         "domein": 15,
@@ -18085,7 +18101,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 151,
+      "bestandenBereikt": 152,
       "knopen": 34,
       "perLaag": {
         "domein": 28,
@@ -18154,7 +18170,7 @@
         "liveCodename"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 152,
+      "bestandenBereikt": 153,
       "knopen": 34,
       "perLaag": {
         "domein": 28,
@@ -18220,7 +18236,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 156,
+      "bestandenBereikt": 157,
       "knopen": 34,
       "perLaag": {
         "domein": 14,
@@ -18270,7 +18286,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 127,
+      "bestandenBereikt": 128,
       "knopen": 33,
       "perLaag": {
         "domein": 29,
@@ -18334,7 +18350,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 125,
+      "bestandenBereikt": 126,
       "knopen": 31,
       "perLaag": {
         "domein": 27,
@@ -18404,7 +18420,7 @@
         "tooManyTries"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 104,
+      "bestandenBereikt": 105,
       "knopen": 30,
       "perLaag": {
         "domein": 26,
@@ -18467,7 +18483,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 180,
+      "bestandenBereikt": 181,
       "knopen": 29,
       "perLaag": {
         "domein": 11,
@@ -18514,7 +18530,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 151,
+      "bestandenBereikt": 152,
       "knopen": 27,
       "perLaag": {
         "domein": 16,
@@ -18569,7 +18585,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 128,
+      "bestandenBereikt": 129,
       "knopen": 26,
       "perLaag": {
         "domein": 12,
@@ -18618,7 +18634,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 102,
+      "bestandenBereikt": 103,
       "knopen": 24,
       "perLaag": {
         "domein": 12,
@@ -18671,7 +18687,7 @@
         "geenGast"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 110,
+      "bestandenBereikt": 111,
       "knopen": 24,
       "perLaag": {
         "domein": 18,
@@ -18726,7 +18742,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 170,
+      "bestandenBereikt": 171,
       "knopen": 24,
       "perLaag": {
         "domein": 13,
@@ -18792,7 +18808,7 @@
         "anthropic",
         "kern"
       ],
-      "bestandenBereikt": 122,
+      "bestandenBereikt": 123,
       "knopen": 23,
       "perLaag": {
         "domein": 17,
@@ -18868,7 +18884,7 @@
         "PASPOORT_NIVEAUS",
         "retailIsRetail"
       ],
-      "bestandenBereikt": 102,
+      "bestandenBereikt": 103,
       "knopen": 23,
       "perLaag": {
         "domein": 18,
@@ -18924,7 +18940,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 118,
+      "bestandenBereikt": 119,
       "knopen": 23,
       "perLaag": {
         "motor": 8,
@@ -18974,7 +18990,7 @@
         "liveCodename"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 126,
+      "bestandenBereikt": 127,
       "knopen": 23,
       "perLaag": {
         "domein": 19,
@@ -19029,7 +19045,7 @@
         "liveCodename"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 126,
+      "bestandenBereikt": 127,
       "knopen": 23,
       "perLaag": {
         "domein": 19,
@@ -19084,7 +19100,7 @@
         "liveCodename"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 126,
+      "bestandenBereikt": 127,
       "knopen": 23,
       "perLaag": {
         "domein": 19,
@@ -19139,7 +19155,7 @@
         "liveCodename"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 126,
+      "bestandenBereikt": 127,
       "knopen": 23,
       "perLaag": {
         "domein": 19,
@@ -19194,7 +19210,7 @@
         "liveCodename"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 126,
+      "bestandenBereikt": 127,
       "knopen": 23,
       "perLaag": {
         "domein": 19,
@@ -19249,7 +19265,7 @@
         "liveCodename"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 126,
+      "bestandenBereikt": 127,
       "knopen": 23,
       "perLaag": {
         "domein": 19,
@@ -19304,7 +19320,7 @@
         "liveCodename"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 126,
+      "bestandenBereikt": 127,
       "knopen": 23,
       "perLaag": {
         "domein": 19,
@@ -19359,7 +19375,7 @@
         "liveCodename"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 126,
+      "bestandenBereikt": 127,
       "knopen": 23,
       "perLaag": {
         "domein": 19,
@@ -19414,7 +19430,7 @@
         "liveCodename"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 126,
+      "bestandenBereikt": 127,
       "knopen": 23,
       "perLaag": {
         "domein": 19,
@@ -19473,7 +19489,7 @@
       "sleutelsOnbekend": [
         "PERSONAS"
       ],
-      "bestandenBereikt": 104,
+      "bestandenBereikt": 105,
       "knopen": 22,
       "perLaag": {
         "domein": 18,
@@ -19535,7 +19551,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 165,
+      "bestandenBereikt": 166,
       "knopen": 22,
       "perLaag": {
         "domein": 18,
@@ -19597,7 +19613,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 165,
+      "bestandenBereikt": 166,
       "knopen": 22,
       "perLaag": {
         "domein": 18,
@@ -19655,7 +19671,7 @@
         "tooManyTries"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 142,
+      "bestandenBereikt": 143,
       "knopen": 22,
       "perLaag": {
         "domein": 9,
@@ -19699,7 +19715,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 96,
+      "bestandenBereikt": 97,
       "knopen": 22,
       "perLaag": {
         "domein": 16,
@@ -19770,7 +19786,7 @@
         "PASPOORT_NIVEAUS",
         "retailIsRetail"
       ],
-      "bestandenBereikt": 100,
+      "bestandenBereikt": 101,
       "knopen": 21,
       "perLaag": {
         "domein": 17,
@@ -19842,7 +19858,7 @@
         "PASPOORT_NIVEAUS",
         "retailIsRetail"
       ],
-      "bestandenBereikt": 100,
+      "bestandenBereikt": 101,
       "knopen": 21,
       "perLaag": {
         "domein": 17,
@@ -19893,7 +19909,7 @@
         "tooManyTries"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 94,
+      "bestandenBereikt": 95,
       "knopen": 21,
       "perLaag": {
         "domein": 11,
@@ -19947,7 +19963,7 @@
       "sleutelsOnbekend": [
         "geldbeleid"
       ],
-      "bestandenBereikt": 113,
+      "bestandenBereikt": 114,
       "knopen": 21,
       "perLaag": {
         "domein": 14,
@@ -19999,7 +20015,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 124,
+      "bestandenBereikt": 125,
       "knopen": 21,
       "perLaag": {
         "domein": 17,
@@ -20024,60 +20040,6 @@
         "domein:wereld",
         "domein:werkcommand",
         "domein:zorgpolis"
-      ],
-      "onverklaardeRanden": []
-    },
-    {
-      "id": "service",
-      "naam": "RTG Service (een zaak, een mens, bellen)",
-      "categorie": "Leden (RTG-app)",
-      "standaard": true,
-      "routes": 16,
-      "graad": "gemeten",
-      "sleutelsWaarde": [],
-      "sleutelsOnvindbaar": [],
-      "sleutelsSamengesteld": [],
-      "redenen": {},
-      "inBedrading": 0,
-      "ophangbestanden": [
-        "server/routes/service.js",
-        "server/routes/spraaktekst.js"
-      ],
-      "leveranciers": [
-        "server/bedrijf/index.js",
-        "server/kern/service/bevestiging.js",
-        "server/kern/service/gesprek.js",
-        "server/kern/service/index.js",
-        "server/kern/service/loop.js",
-        "server/kern/service/mens.js",
-        "server/kern/service/persoonlijk.js",
-        "server/kern/service/zaak.js",
-        "server/kern/spraaktekst.js",
-        "server/web/index.js"
-      ],
-      "sleutelsUitBedrading": [
-        "auth"
-      ],
-      "sleutelsOnbekend": [],
-      "bestandenBereikt": 129,
-      "knopen": 20,
-      "perLaag": {
-        "domein": 11,
-        "motor": 7,
-        "ingang": 2
-      },
-      "domeinen": [
-        "domein:bedrijf",
-        "domein:command",
-        "domein:eigencollectie",
-        "domein:geld",
-        "domein:passen",
-        "domein:rtmail-adres",
-        "domein:service",
-        "domein:spraaktekst",
-        "domein:util",
-        "domein:wereld",
-        "domein:werkcommand"
       ],
       "onverklaardeRanden": []
     },
@@ -20109,7 +20071,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 122,
+      "bestandenBereikt": 123,
       "knopen": 20,
       "perLaag": {
         "domein": 16,
@@ -20164,7 +20126,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 122,
+      "bestandenBereikt": 123,
       "knopen": 20,
       "perLaag": {
         "domein": 16,
@@ -20278,7 +20240,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 151,
+      "bestandenBereikt": 152,
       "knopen": 19,
       "perLaag": {
         "domein": 15,
@@ -20329,7 +20291,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 94,
+      "bestandenBereikt": 95,
       "knopen": 19,
       "perLaag": {
         "domein": 15,
@@ -20376,7 +20338,7 @@
       ],
       "sleutelsUitBedrading": [],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 131,
+      "bestandenBereikt": 132,
       "knopen": 18,
       "perLaag": {
         "domein": 13,
@@ -20425,7 +20387,7 @@
         "tooManyTries"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 119,
+      "bestandenBereikt": 120,
       "knopen": 18,
       "perLaag": {
         "motor": 10,
@@ -20465,7 +20427,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 94,
+      "bestandenBereikt": 95,
       "knopen": 18,
       "perLaag": {
         "domein": 12,
@@ -20512,7 +20474,7 @@
       ],
       "sleutelsUitBedrading": [],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 100,
+      "bestandenBereikt": 101,
       "knopen": 18,
       "perLaag": {
         "domein": 14,
@@ -20566,7 +20528,7 @@
         "resolveSession"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 103,
+      "bestandenBereikt": 104,
       "knopen": 17,
       "perLaag": {
         "domein": 11,
@@ -20614,7 +20576,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 97,
+      "bestandenBereikt": 98,
       "knopen": 17,
       "perLaag": {
         "domein": 10,
@@ -20668,7 +20630,7 @@
       "sleutelsOnbekend": [
         "anthropic"
       ],
-      "bestandenBereikt": 99,
+      "bestandenBereikt": 100,
       "knopen": 17,
       "perLaag": {
         "domein": 13,
@@ -20717,7 +20679,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 91,
+      "bestandenBereikt": 92,
       "knopen": 17,
       "perLaag": {
         "domein": 12,
@@ -20764,7 +20726,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 89,
+      "bestandenBereikt": 90,
       "knopen": 16,
       "perLaag": {
         "domein": 12,
@@ -20813,7 +20775,7 @@
         "liveCodename"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 89,
+      "bestandenBereikt": 90,
       "knopen": 16,
       "perLaag": {
         "domein": 11,
@@ -20863,7 +20825,7 @@
         "geenGast"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 97,
+      "bestandenBereikt": 98,
       "knopen": 15,
       "perLaag": {
         "domein": 10,
@@ -20914,7 +20876,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 94,
+      "bestandenBereikt": 95,
       "knopen": 15,
       "perLaag": {
         "domein": 10,
@@ -20968,7 +20930,7 @@
       "sleutelsOnbekend": [
         "kern"
       ],
-      "bestandenBereikt": 90,
+      "bestandenBereikt": 91,
       "knopen": 15,
       "perLaag": {
         "domein": 10,
@@ -21014,7 +20976,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 110,
+      "bestandenBereikt": 111,
       "knopen": 15,
       "perLaag": {
         "domein": 10,
@@ -21059,7 +21021,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 88,
+      "bestandenBereikt": 89,
       "knopen": 15,
       "perLaag": {
         "domein": 11,
@@ -21106,7 +21068,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 100,
+      "bestandenBereikt": 101,
       "knopen": 15,
       "perLaag": {
         "domein": 10,
@@ -21152,7 +21114,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 100,
+      "bestandenBereikt": 101,
       "knopen": 15,
       "perLaag": {
         "domein": 10,
@@ -21167,6 +21129,48 @@
         "domein:motorverbinding",
         "domein:motorzekering",
         "domein:pay",
+        "domein:util",
+        "domein:wereld",
+        "domein:werkcommand"
+      ],
+      "onverklaardeRanden": []
+    },
+    {
+      "id": "ondertiteling",
+      "naam": "Automatisch ondertitelen in een gesprek",
+      "categorie": "Leden (RTG-app)",
+      "standaard": true,
+      "routes": 2,
+      "graad": "gemeten",
+      "sleutelsWaarde": [],
+      "sleutelsOnvindbaar": [],
+      "sleutelsSamengesteld": [],
+      "redenen": {},
+      "inBedrading": 0,
+      "ophangbestanden": [
+        "server/routes/spraaktekst.js"
+      ],
+      "leveranciers": [
+        "server/bedrijf/index.js",
+        "server/kern/spraaktekst.js",
+        "server/web/index.js"
+      ],
+      "sleutelsUitBedrading": [
+        "auth"
+      ],
+      "sleutelsOnbekend": [],
+      "bestandenBereikt": 103,
+      "knopen": 15,
+      "perLaag": {
+        "domein": 7,
+        "motor": 7,
+        "ingang": 1
+      },
+      "domeinen": [
+        "domein:bedrijf",
+        "domein:command",
+        "domein:geld",
+        "domein:spraaktekst",
         "domein:util",
         "domein:wereld",
         "domein:werkcommand"
@@ -21198,7 +21202,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 88,
+      "bestandenBereikt": 89,
       "knopen": 15,
       "perLaag": {
         "domein": 10,
@@ -21243,7 +21247,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 102,
+      "bestandenBereikt": 103,
       "knopen": 14,
       "perLaag": {
         "motor": 6,
@@ -21291,7 +21295,7 @@
         "geenGast"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 94,
+      "bestandenBereikt": 95,
       "knopen": 14,
       "perLaag": {
         "domein": 9,
@@ -21306,6 +21310,106 @@
         "domein:genootschap",
         "domein:util",
         "domein:veilig",
+        "domein:wereld",
+        "domein:werkcommand"
+      ],
+      "onverklaardeRanden": []
+    },
+    {
+      "id": "service",
+      "naam": "RTG Service (hulp vragen)",
+      "categorie": "Leden (RTG-app)",
+      "standaard": true,
+      "routes": 10,
+      "graad": "gemeten",
+      "sleutelsWaarde": [],
+      "sleutelsOnvindbaar": [],
+      "sleutelsSamengesteld": [],
+      "redenen": {},
+      "inBedrading": 0,
+      "ophangbestanden": [
+        "server/routes/service.js"
+      ],
+      "leveranciers": [
+        "server/bedrijf/index.js",
+        "server/kern/service/bevestiging.js",
+        "server/kern/service/gesprek.js",
+        "server/kern/service/index.js",
+        "server/kern/service/loop.js",
+        "server/kern/service/mens.js",
+        "server/kern/service/persoonlijk.js",
+        "server/kern/service/zaak.js"
+      ],
+      "sleutelsUitBedrading": [
+        "auth"
+      ],
+      "sleutelsOnbekend": [],
+      "bestandenBereikt": 110,
+      "knopen": 14,
+      "perLaag": {
+        "domein": 10,
+        "motor": 3,
+        "ingang": 1
+      },
+      "domeinen": [
+        "domein:bedrijf",
+        "domein:command",
+        "domein:eigencollectie",
+        "domein:geld",
+        "domein:passen",
+        "domein:rtmail-adres",
+        "domein:service",
+        "domein:util",
+        "domein:wereld",
+        "domein:werkcommand"
+      ],
+      "onverklaardeRanden": []
+    },
+    {
+      "id": "service-bel",
+      "naam": "Bellen met RTG (in de app)",
+      "categorie": "Leden (RTG-app)",
+      "standaard": true,
+      "routes": 4,
+      "graad": "gemeten",
+      "sleutelsWaarde": [],
+      "sleutelsOnvindbaar": [],
+      "sleutelsSamengesteld": [],
+      "redenen": {},
+      "inBedrading": 0,
+      "ophangbestanden": [
+        "server/routes/service.js"
+      ],
+      "leveranciers": [
+        "server/bedrijf/index.js",
+        "server/kern/service/bevestiging.js",
+        "server/kern/service/gesprek.js",
+        "server/kern/service/index.js",
+        "server/kern/service/loop.js",
+        "server/kern/service/mens.js",
+        "server/kern/service/persoonlijk.js",
+        "server/kern/service/zaak.js"
+      ],
+      "sleutelsUitBedrading": [
+        "auth"
+      ],
+      "sleutelsOnbekend": [],
+      "bestandenBereikt": 110,
+      "knopen": 14,
+      "perLaag": {
+        "domein": 10,
+        "motor": 3,
+        "ingang": 1
+      },
+      "domeinen": [
+        "domein:bedrijf",
+        "domein:command",
+        "domein:eigencollectie",
+        "domein:geld",
+        "domein:passen",
+        "domein:rtmail-adres",
+        "domein:service",
+        "domein:util",
         "domein:wereld",
         "domein:werkcommand"
       ],
@@ -21336,7 +21440,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 107,
+      "bestandenBereikt": 108,
       "knopen": 14,
       "perLaag": {
         "domein": 10,
@@ -21383,7 +21487,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 107,
+      "bestandenBereikt": 108,
       "knopen": 14,
       "perLaag": {
         "domein": 10,
@@ -21429,7 +21533,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 99,
+      "bestandenBereikt": 100,
       "knopen": 14,
       "perLaag": {
         "domein": 10,
@@ -21475,7 +21579,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 87,
+      "bestandenBereikt": 88,
       "knopen": 14,
       "perLaag": {
         "domein": 10,
@@ -21529,7 +21633,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 112,
+      "bestandenBereikt": 113,
       "knopen": 14,
       "perLaag": {
         "domein": 9,
@@ -21572,7 +21676,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 87,
+      "bestandenBereikt": 88,
       "knopen": 14,
       "perLaag": {
         "domein": 10,
@@ -21622,7 +21726,7 @@
         "liveCodename"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 90,
+      "bestandenBereikt": 91,
       "knopen": 13,
       "perLaag": {
         "domein": 9,
@@ -21677,7 +21781,7 @@
         "groothandel",
         "kern"
       ],
-      "bestandenBereikt": 100,
+      "bestandenBereikt": 101,
       "knopen": 13,
       "perLaag": {
         "domein": 7,
@@ -21718,7 +21822,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 86,
+      "bestandenBereikt": 87,
       "knopen": 13,
       "perLaag": {
         "domein": 9,
@@ -21762,7 +21866,7 @@
         "liveCodename"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 97,
+      "bestandenBereikt": 98,
       "knopen": 13,
       "perLaag": {
         "domein": 9,
@@ -21806,7 +21910,7 @@
         "liveCodename"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 97,
+      "bestandenBereikt": 98,
       "knopen": 13,
       "perLaag": {
         "domein": 9,
@@ -21851,7 +21955,7 @@
         "liveCodename"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 90,
+      "bestandenBereikt": 91,
       "knopen": 13,
       "perLaag": {
         "domein": 9,
@@ -21899,7 +22003,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 90,
+      "bestandenBereikt": 91,
       "knopen": 13,
       "perLaag": {
         "domein": 9,
@@ -21944,7 +22048,7 @@
         "liveCodename"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 92,
+      "bestandenBereikt": 93,
       "knopen": 13,
       "perLaag": {
         "domein": 9,
@@ -21985,7 +22089,7 @@
       ],
       "sleutelsUitBedrading": [],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 108,
+      "bestandenBereikt": 109,
       "knopen": 13,
       "perLaag": {
         "domein": 9,
@@ -22028,7 +22132,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 86,
+      "bestandenBereikt": 87,
       "knopen": 13,
       "perLaag": {
         "domein": 9,
@@ -22071,7 +22175,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 86,
+      "bestandenBereikt": 87,
       "knopen": 13,
       "perLaag": {
         "domein": 9,
@@ -22114,7 +22218,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 86,
+      "bestandenBereikt": 87,
       "knopen": 13,
       "perLaag": {
         "domein": 9,
@@ -22163,7 +22267,7 @@
       "sleutelsOnbekend": [
         "PERSONAS"
       ],
-      "bestandenBereikt": 93,
+      "bestandenBereikt": 94,
       "knopen": 12,
       "perLaag": {
         "domein": 8,
@@ -22212,7 +22316,7 @@
       "sleutelsOnbekend": [
         "kern"
       ],
-      "bestandenBereikt": 85,
+      "bestandenBereikt": 86,
       "knopen": 12,
       "perLaag": {
         "domein": 7,
@@ -22253,7 +22357,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 85,
+      "bestandenBereikt": 86,
       "knopen": 12,
       "perLaag": {
         "domein": 8,
@@ -22296,7 +22400,7 @@
         "liveCodename"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 101,
+      "bestandenBereikt": 102,
       "knopen": 12,
       "perLaag": {
         "domein": 8,
@@ -22338,7 +22442,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 86,
+      "bestandenBereikt": 87,
       "knopen": 12,
       "perLaag": {
         "domein": 8,
@@ -22381,7 +22485,7 @@
         "liveCodename"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 85,
+      "bestandenBereikt": 86,
       "knopen": 12,
       "perLaag": {
         "domein": 8,
@@ -22425,7 +22529,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 85,
+      "bestandenBereikt": 86,
       "knopen": 12,
       "perLaag": {
         "domein": 8,
@@ -22467,7 +22571,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 85,
+      "bestandenBereikt": 86,
       "knopen": 12,
       "perLaag": {
         "domein": 8,
@@ -22512,7 +22616,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 91,
+      "bestandenBereikt": 92,
       "knopen": 12,
       "perLaag": {
         "domein": 8,
@@ -22557,7 +22661,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 96,
+      "bestandenBereikt": 97,
       "knopen": 12,
       "perLaag": {
         "domein": 8,
@@ -22599,7 +22703,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 85,
+      "bestandenBereikt": 86,
       "knopen": 12,
       "perLaag": {
         "domein": 8,
@@ -22641,7 +22745,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 85,
+      "bestandenBereikt": 86,
       "knopen": 12,
       "perLaag": {
         "domein": 8,
@@ -22683,7 +22787,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 85,
+      "bestandenBereikt": 86,
       "knopen": 12,
       "perLaag": {
         "domein": 8,
@@ -22725,7 +22829,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 85,
+      "bestandenBereikt": 86,
       "knopen": 12,
       "perLaag": {
         "domein": 8,
@@ -22769,7 +22873,7 @@
         "liveCodename"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 85,
+      "bestandenBereikt": 86,
       "knopen": 11,
       "perLaag": {
         "domein": 7,
@@ -22812,7 +22916,7 @@
         "liveCodename"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 85,
+      "bestandenBereikt": 86,
       "knopen": 11,
       "perLaag": {
         "domein": 7,
@@ -22853,7 +22957,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 84,
+      "bestandenBereikt": 85,
       "knopen": 11,
       "perLaag": {
         "domein": 7,
@@ -22894,7 +22998,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 84,
+      "bestandenBereikt": 85,
       "knopen": 11,
       "perLaag": {
         "domein": 7,
@@ -22935,7 +23039,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 84,
+      "bestandenBereikt": 85,
       "knopen": 11,
       "perLaag": {
         "domein": 7,
@@ -22988,7 +23092,7 @@
         "supplierAuth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 96,
+      "bestandenBereikt": 97,
       "knopen": 11,
       "perLaag": {
         "domein": 7,
@@ -23028,7 +23132,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 86,
+      "bestandenBereikt": 87,
       "knopen": 11,
       "perLaag": {
         "domein": 7,
@@ -23069,7 +23173,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 84,
+      "bestandenBereikt": 85,
       "knopen": 11,
       "perLaag": {
         "domein": 7,
@@ -23111,7 +23215,7 @@
         "liveCodename"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 84,
+      "bestandenBereikt": 85,
       "knopen": 11,
       "perLaag": {
         "domein": 7,
@@ -23151,7 +23255,7 @@
         "auth"
       ],
       "sleutelsOnbekend": [],
-      "bestandenBereikt": 84,
+      "bestandenBereikt": 85,
       "knopen": 10,
       "perLaag": {
         "domein": 6,

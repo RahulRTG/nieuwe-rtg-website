@@ -90,16 +90,5 @@ module.exports = [
   { id: 'dom-doos', categorie: 'Werk (zaken en personeel)', naam: 'De zaakdoos', standaard: true, doelgroepen: WERKOS,
     uitleg: 'De doos op locatie: zaakserver, netwerk en updates.', paden: ['/api/doos'] },
   { id: 'dom-facturen', categorie: 'Werk (zaken en personeel)', naam: 'Facturen', standaard: true, doelgroepen: WERKOS,
-    uitleg: 'De facturatie van en naar een zaak.', paden: ['/api/facturen'] },
-  /* RTG SERVICE (SERVICE.md): de envelop over de vier hulplijnen. Deze paden
-     stonden na de samenvoeging van 3 september 2026 buiten de schakelkast --
-     zestien routes die vanuit de boardroom niet uit te zetten waren. Een mens
-     bij een probleem is een ondergrens voor ELK account, vandaar LEDEN en niet
-     alleen de passen met De Rechterhand. De kantoor- en zaakkant van dezelfde
-     laag (/api/office/service, /api/supplier/service) valt onder hun eigen
-     deur; de ondertiteling hoort bij het gesprek dat hier gevoerd wordt. */
-  { id: 'service', categorie: 'Leden (RTG-app)', naam: 'RTG Service (een zaak, een mens, bellen)', standaard: true, doelgroepen: LEDEN,
-    uitleg: 'Een servicezaak met een tijdlijn, de bevestiging waarmee een lid een medewerker of de AI-onderzoeker iets laat openen, ' +
-      'en bellen naar RTG binnen de app met een meeleesbaan. Uitzetten sluit de envelop, niet de vier hulplijnen eronder.',
-    paden: ['/api/service', '/api/ondertiteling'] }
+    uitleg: 'De facturatie van en naar een zaak.', paden: ['/api/facturen'] }
 ];

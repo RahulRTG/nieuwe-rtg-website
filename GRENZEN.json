@@ -184,8 +184,8 @@
     "command": [
       "apiSpoor",
       "bezitsbewijs",
-      "doelpoort",
       "command",
+      "doelpoort",
       "veilig",
       "wie"
     ],
@@ -386,6 +386,9 @@
       "gedachtenVan",
       "status"
     ],
+    "gegevenskaart": [
+      "gegevenskaart"
+    ],
     "geld": [
       "geldbeleid",
       "geldgraaf"
@@ -446,9 +449,6 @@
       "inzagekaartVan",
       "status"
     ],
-    "gegevenskaart": [
-      "gegevenskaart"
-    ],
     "journaal": [
       "boardroomAuth",
       "journaalBeeld",
@@ -467,52 +467,20 @@
     "kantoorpakket": [
       "boardroomBaas",
       "boardroomWie",
-      "officeAI",
-      "officeAanwezig",
-      "officeBeheer",
-      "officeBewaar",
-      "officeDeel",
-      "officeFase",
-      "officeKring",
-      "officeMaak",
-      "officeMijn",
-      "officeOpen",
-      "officeOpmerking",
-      "officeSamen",
-      "officeSter",
-      "officeTerug",
-      "officeUitslag",
-      "officeVersies",
-      "officeVul",
-      "officeWeg",
+      "office",
       "rtf",
       "werkplek"
     ],
     "kantoorpakket-huis": [
       "boardroomBaas",
-      "officeAI",
-      "officeBewaar",
-      "officeFase",
-      "officeKring",
-      "officeMaak",
-      "officeMijn",
-      "officeOpen",
-      "officeSter",
-      "officeTerug",
-      "officeUitslag",
-      "officeVersies",
-      "officeVul",
-      "officeWeg",
+      "office",
       "ruim",
       "stuur",
       "werkplek"
     ],
     "kantoorpakket-samen": [
       "boardroomBaas",
-      "officeAanwezig",
-      "officeBeheer",
-      "officeOpmerking",
-      "officeSamen",
+      "office",
       "werkplek"
     ],
     "kantoren": [
@@ -658,7 +626,10 @@
     "livinglab": [
       "id",
       "labfonds",
+      "lijf",
       "livinglab",
+      "remLezen",
+      "remSchrijf",
       "staf",
       "veilig",
       "veiligAsync",
@@ -859,6 +830,7 @@
       "gegevensNodig",
       "gegevensStart",
       "gegevensZeg",
+      "gegevenskaart",
       "geldAiInkoop",
       "gemeente",
       "genootschap",

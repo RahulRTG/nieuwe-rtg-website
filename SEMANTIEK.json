@@ -1,9 +1,9 @@
 {
-  "catalogi": 1062,
-  "verschillendeNamen": 626,
+  "catalogi": 1061,
+  "verschillendeNamen": 627,
   "namenInMeerDomeinen": 117,
   "woordenMetMeerBetekenissen": 100,
-  "betekenissenTotaal": 380,
+  "betekenissenTotaal": 378,
   "ergsteWoord": "SOORTEN",
   "ergsteAantal": 47,
   "dubbelingen": 32,
@@ -363,7 +363,7 @@
     },
     {
       "naam": "NIVEAUS",
-      "betekenissenVanDitWoord": 9,
+      "betekenissenVanDitWoord": 8,
       "waar": [
         "server/kern/rampbeeld/index.js",
         "server/kern/spellen/sudoku.js"
@@ -1903,122 +1903,6 @@
       ]
     },
     {
-      "naam": "NIVEAUS",
-      "domeinen": 10,
-      "betekenissen": 9,
-      "hoogsteOverlap": 0.17,
-      "soort": "gemengd",
-      "waar": [
-        {
-          "bestanden": [
-            "server/kern/bureau/beveiliging.js"
-          ],
-          "leden": 3,
-          "voorbeeld": [
-            "laag",
-            "verhoogd",
-            "hoog"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/command/bijstand-niveaus.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "kijken",
-            "meedenken",
-            "herstellen",
-            "nood"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/concern/scope.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "concern",
-            "entiteit",
-            "vestiging",
-            "afdeling"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/geldbeleid/regels.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "kijken",
-            "voorstellen",
-            "klaarzetten",
-            "automatisch"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/paspoort.js"
-          ],
-          "leden": 3,
-          "voorbeeld": [
-            "bevestiging",
-            "idkaart",
-            "paspoort"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/rampbeeld/index.js",
-            "server/kern/spellen/sudoku.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "normaal",
-            "incident",
-            "opgeschaald",
-            "ramp"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/stadsweefsel/geografie.js"
-          ],
-          "leden": 5,
-          "voorbeeld": [
-            "stad",
-            "wijk",
-            "buurt",
-            "zone"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/wereldkern.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "verstoord",
-            "onbekend",
-            "aandacht",
-            "gezond"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/log.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "debug",
-            "info",
-            "warn",
-            "error"
-          ]
-        }
-      ]
-    },
-    {
       "naam": "VELDEN",
       "domeinen": 9,
       "betekenissen": 9,
@@ -2131,6 +2015,110 @@
             "klas",
             "opleiding",
             "vestiging"
+          ]
+        }
+      ]
+    },
+    {
+      "naam": "NIVEAUS",
+      "domeinen": 9,
+      "betekenissen": 8,
+      "hoogsteOverlap": 0.17,
+      "soort": "gemengd",
+      "waar": [
+        {
+          "bestanden": [
+            "server/kern/bureau/beveiliging.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "laag",
+            "verhoogd",
+            "hoog"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/command/bijstand-niveaus.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "kijken",
+            "meedenken",
+            "herstellen",
+            "nood"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/concern/scope.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "concern",
+            "entiteit",
+            "vestiging",
+            "afdeling"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/paspoort.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "bevestiging",
+            "idkaart",
+            "paspoort"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/rampbeeld/index.js",
+            "server/kern/spellen/sudoku.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "normaal",
+            "incident",
+            "opgeschaald",
+            "ramp"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/stadsweefsel/geografie.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "stad",
+            "wijk",
+            "buurt",
+            "zone"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/wereldkern.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "verstoord",
+            "onbekend",
+            "aandacht",
+            "gezond"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/log.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "debug",
+            "info",
+            "warn",
+            "error"
           ]
         }
       ]
@@ -2552,8 +2540,8 @@
     },
     {
       "naam": "RANG",
-      "domeinen": 8,
-      "betekenissen": 8,
+      "domeinen": 7,
+      "betekenissen": 7,
       "hoogsteOverlap": 0,
       "soort": "botsing",
       "waar": [
@@ -2577,17 +2565,6 @@
             "betaalinstelling",
             "elektronischgeldinstelling",
             "bank"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/geldgraaf/uitzonderingen.js"
-          ],
-          "leden": 3,
-          "voorbeeld": [
-            "klaarzetten",
-            "voorstellen",
-            "kijken"
           ]
         },
         {
@@ -3383,7 +3360,7 @@
       "waar": [
         {
           "bestanden": [
-            "server/functies/register/index.js"
+            "server/functies/register/fases.js"
           ],
           "leden": 7,
           "voorbeeld": [
@@ -3544,5 +3521,5 @@
       ]
     }
   ],
-  "bestanden": 3123
+  "bestanden": 3132
 }

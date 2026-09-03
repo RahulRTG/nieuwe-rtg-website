@@ -13,10 +13,10 @@
  "routes": {
   "/api/supplier/pay/budget": {
    "klasse": "veilige-kant",
-   "reden": "Een budget uitgeven doet twee dingen: de POSITIE klaarzetten (klasse, eigenaar, beleid, vervaldatum) en er geld op boeken. Faalt de boeking -- de werkgever heeft het saldo niet, of het plafond van de klasse zit in de weg -- dan blijft er een LEGE positie achter en geeft de route 402. Dat is de goede kant om op te falen: een lege positie is zichtbaar, hooguit verwarrend, en kost niemand iets. Andersom -- eerst boeken, dan de positie maken -- zou geld op een rekening zetten die nog geen klasse heeft, en dan staat er tussen die twee stappen saldo zonder regels. Dat is precies wat de hele waardelaag moet voorkomen.",
+   "reden": "Een budget uitgeven doet twee dingen: de POSITIE klaarzetten (klasse, eigenaar, beleid, vervaldatum) en er geld op boeken. Eerst de positie, dan boeken -- andersom zou geld op een rekening zetten die nog geen klasse heeft, en dan staat er tussen die twee stappen saldo zonder regels. Faalt de boeking (de werkgever heeft het saldo niet, of het plafond van de klasse zit in de weg; 402), dan neemt de module sinds 31 augustus 2026 de lege positie zelf terug via kern/waarde (uitgifteTerug), want vierentwintig mislukte pogingen van een werkgever lieten anders vierentwintig lege posities achter en sloten het LID bij de vijfentwintigste buiten (MAX_PER_LID). Wat er na een weigering met OPZET blijft staan is de idempotentie-administratie (payIdem): een herhaalde oproep hoort hetzelfde antwoord te krijgen, en die administratie is een uitkomst en geen invoer. Mislukt de terugname zelf, dan blijft de lege positie staan en zegt het antwoord dat erbij (legePositie, legePositieReden) -- stil opruimen is erger dan niet opruimen. Herbeslist bij de samenvoeging van 3 september 2026: het oude citaat ('de goede kant om op te falen') was uit budget.js verdwenen omdat de redenering zelf veranderd was.",
    "bron": "server/kern/pay/budget.js",
-   "citaat": "Dat is bewust de goede kant om op te falen",
-   "wat blijft staan": "waardePosities (een lege positie) en payIdem (de idempotentie-administratie)"
+   "citaat": "stil opruimen is erger dan niet opruimen",
+   "wat blijft staan": "payIdem (de idempotentie-administratie); een lege positie alleen wanneer de terugname mislukt, en dan met de reden in het antwoord"
   }
  }
 }

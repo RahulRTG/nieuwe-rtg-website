@@ -1,22 +1,22 @@
 {
  "stempel": {
-  "op": "2026-09-03T09:02:18.236Z",
-  "commit": "1873e69b",
+  "op": "2026-09-03T09:24:17.631Z",
+  "commit": "8c24cbf3",
   "boomVuil": true,
-  "boomAnders": 43,
+  "boomAnders": 3,
   "instrument": "scripts/handlerwacht.js",
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
   "zonderBewakerslaag": 614,
-  "bewaakt": 531,
+  "bewaakt": 530,
   "openbaarMetReden": 47,
   "eigenControle": 16,
   "sleutelDoorgegeven": 12,
   "zonderWachtMetReden": 8,
   "laat": 0,
-  "onbewaakt": 0,
+  "onbewaakt": 1,
   "nietGelezen": 0,
   "gezagsfuncties": 26,
   "publiekeLijstenVerschillen": 19
@@ -65,7 +65,7 @@
   },
   {
    "naam": "rtfSpeler -> rtf.verifieerProfiel",
-   "aantal": 43
+   "aantal": 42
   },
   {
    "naam": "gezinSessie",
@@ -517,19 +517,19 @@
   },
   {
    "sleutel": "POST /api/bedrijf/handeling/bonnen",
-   "bestand": "server/bedrijf/handeling.js:188",
+   "bestand": "server/bedrijf/handeling.js:194",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
   {
    "sleutel": "POST /api/bedrijf/handeling/doe",
-   "bestand": "server/bedrijf/handeling.js:124",
+   "bestand": "server/bedrijf/handeling.js:130",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
   {
    "sleutel": "POST /api/bedrijf/handeling/plan",
-   "bestand": "server/bedrijf/handeling.js:80",
+   "bestand": "server/bedrijf/handeling.js:86",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
@@ -625,7 +625,7 @@
   },
   {
    "sleutel": "POST /api/bedrijf/keuring",
-   "bestand": "server/bedrijf/regelpoort.js:134",
+   "bestand": "server/bedrijf/regelpoort.js:141",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
@@ -1038,37 +1038,37 @@
   },
   {
    "sleutel": "POST /api/foundation/agenda",
-   "bestand": "server/foundation/onderwijs/schrift.js:65",
+   "bestand": "server/foundation/onderwijs/schrift.js:64",
    "staat": "bewaakt",
    "wacht": "lesVan"
   },
   {
    "sleutel": "POST /api/foundation/agenda/verwijder",
-   "bestand": "server/foundation/onderwijs/schrift.js:73",
+   "bestand": "server/foundation/onderwijs/schrift.js:72",
    "staat": "bewaakt",
    "wacht": "lesVan"
   },
   {
    "sleutel": "POST /api/foundation/ai",
-   "bestand": "server/foundation/onderwijs/schrift.js:83",
+   "bestand": "server/foundation/onderwijs/schrift.js:82",
    "staat": "bewaakt",
    "wacht": "lesVan"
   },
   {
    "sleutel": "POST /api/foundation/bord/stroke",
-   "bestand": "server/foundation/onderwijs/les.js:62",
+   "bestand": "server/foundation/onderwijs/les.js:84",
    "staat": "bewaakt",
    "wacht": "lesVan"
   },
   {
    "sleutel": "POST /api/foundation/bord/undo",
-   "bestand": "server/foundation/onderwijs/les.js:82",
+   "bestand": "server/foundation/onderwijs/les.js:104",
    "staat": "bewaakt",
    "wacht": "lesVan"
   },
   {
    "sleutel": "POST /api/foundation/bord/wis",
-   "bestand": "server/foundation/onderwijs/les.js:78",
+   "bestand": "server/foundation/onderwijs/les.js:100",
    "staat": "bewaakt",
    "wacht": "lesVan"
   },
@@ -1164,43 +1164,43 @@
   },
   {
    "sleutel": "POST /api/foundation/gezin/gezondheid/afspraak",
-   "bestand": "server/foundation/gasten/gezondheid.js:77",
+   "bestand": "server/foundation/gasten/gezondheid.js:97",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/gezondheid/afspraak/verwijder",
-   "bestand": "server/foundation/gasten/gezondheid.js:90",
+   "bestand": "server/foundation/gasten/gezondheid.js:109",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/gezondheid/medicijn",
-   "bestand": "server/foundation/gasten/gezondheid.js:47",
+   "bestand": "server/foundation/gasten/gezondheid.js:68",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/gezondheid/medicijn/gegeven",
-   "bestand": "server/foundation/gasten/gezondheid.js:65",
+   "bestand": "server/foundation/gasten/gezondheid.js:85",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/gezondheid/medicijn/verwijder",
-   "bestand": "server/foundation/gasten/gezondheid.js:58",
+   "bestand": "server/foundation/gasten/gezondheid.js:78",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/gezondheid/meting",
-   "bestand": "server/foundation/gasten/gezondheid.js:99",
+   "bestand": "server/foundation/gasten/gezondheid.js:118",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/gezondheid/meting/verwijder",
-   "bestand": "server/foundation/gasten/gezondheid.js:113",
+   "bestand": "server/foundation/gasten/gezondheid.js:132",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
@@ -1212,55 +1212,55 @@
   },
   {
    "sleutel": "POST /api/foundation/gezin/keuken/idee",
-   "bestand": "server/foundation/gasten/keuken.js:49",
+   "bestand": "server/foundation/gasten/keuken.js:69",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/keuken/lijst",
-   "bestand": "server/foundation/gasten/keuken.js:59",
-   "staat": "bewaakt",
-   "wacht": "familieVan"
-  },
-  {
-   "sleutel": "POST /api/foundation/gezin/keuken/lijst/af",
-   "bestand": "server/foundation/gasten/keuken.js:71",
-   "staat": "bewaakt",
-   "wacht": "familieVan"
-  },
-  {
-   "sleutel": "POST /api/foundation/gezin/keuken/lijst/opruim",
-   "bestand": "server/foundation/gasten/keuken.js:85",
-   "staat": "bewaakt",
-   "wacht": "familieVan"
-  },
-  {
-   "sleutel": "POST /api/foundation/gezin/keuken/lijst/verwijder",
    "bestand": "server/foundation/gasten/keuken.js:79",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
   {
+   "sleutel": "POST /api/foundation/gezin/keuken/lijst/af",
+   "bestand": "server/foundation/gasten/keuken.js:91",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/keuken/lijst/opruim",
+   "bestand": "server/foundation/gasten/keuken.js:104",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/keuken/lijst/verwijder",
+   "bestand": "server/foundation/gasten/keuken.js:98",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
    "sleutel": "POST /api/foundation/gezin/keuken/menu",
-   "bestand": "server/foundation/gasten/keuken.js:32",
+   "bestand": "server/foundation/gasten/keuken.js:52",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/keuken/menu/wis",
-   "bestand": "server/foundation/gasten/keuken.js:43",
+   "bestand": "server/foundation/gasten/keuken.js:63",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/keuken/vast",
-   "bestand": "server/foundation/gasten/keuken.js:93",
+   "bestand": "server/foundation/gasten/keuken.js:112",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/keuken/vast/verwijder",
-   "bestand": "server/foundation/gasten/keuken.js:102",
+   "bestand": "server/foundation/gasten/keuken.js:121",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
@@ -1410,43 +1410,43 @@
   },
   {
    "sleutel": "POST /api/foundation/gezin/verjaardag/persoon",
-   "bestand": "server/foundation/gasten/verjaardagen.js:31",
+   "bestand": "server/foundation/gasten/verjaardagen.js:51",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/verjaardag/persoon/verwijder",
-   "bestand": "server/foundation/gasten/verjaardagen.js:48",
+   "bestand": "server/foundation/gasten/verjaardagen.js:68",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/verjaardag/potje/bijdrage",
-   "bestand": "server/foundation/gasten/verjaardagen.js:98",
+   "bestand": "server/foundation/gasten/verjaardagen.js:118",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/verjaardag/potje/doel",
-   "bestand": "server/foundation/gasten/verjaardagen.js:111",
+   "bestand": "server/foundation/gasten/verjaardagen.js:135",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/verjaardag/wens",
-   "bestand": "server/foundation/gasten/verjaardagen.js:61",
+   "bestand": "server/foundation/gasten/verjaardagen.js:81",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/verjaardag/wens/claim",
-   "bestand": "server/foundation/gasten/verjaardagen.js:79",
+   "bestand": "server/foundation/gasten/verjaardagen.js:99",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/verjaardag/wens/verwijder",
-   "bestand": "server/foundation/gasten/verjaardagen.js:73",
+   "bestand": "server/foundation/gasten/verjaardagen.js:93",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
@@ -1482,13 +1482,13 @@
   },
   {
    "sleutel": "POST /api/foundation/les/join",
-   "bestand": "server/foundation/onderwijs/les.js:24",
+   "bestand": "server/foundation/onderwijs/les.js:40",
    "staat": "bewaakt",
    "wacht": "lesVan"
   },
   {
    "sleutel": "POST /api/foundation/les/maak",
-   "bestand": "server/foundation/onderwijs/les.js:14",
+   "bestand": "server/foundation/onderwijs/les.js:30",
    "staat": "zonderWachtMetReden",
    "reden": "een les openen is als een kamer openen: wie hem maakt krijgt de docenttoken terug, en zonder lescode komt er niemand binnen"
   },
@@ -1632,7 +1632,7 @@
   },
   {
    "sleutel": "POST /api/foundation/reis/aanvraag",
-   "bestand": "server/foundation/onderwijs/schrift.js:123",
+   "bestand": "server/foundation/onderwijs/schrift.js:122",
    "staat": "zonderWachtMetReden",
    "reden": "een open aanvraagformulier voor gezinnen zonder foundation-account -- dat is het punt ervan. Sinds deze meting met een rem per IP-adres, want de lijst kapt op duizend en een vloed duwde echte aanvragen eruit"
   },
@@ -1662,7 +1662,7 @@
   },
   {
    "sleutel": "POST /api/foundation/school/absentie/afhandelen",
-   "bestand": "server/school/klas.js:135",
+   "bestand": "server/school/klas.js:143",
    "staat": "bewaakt",
    "wacht": "klasVan"
   },
@@ -1806,7 +1806,7 @@
   },
   {
    "sleutel": "POST /api/foundation/school/cijfer/geef",
-   "bestand": "server/school/klas.js:112",
+   "bestand": "server/school/klas.js:120",
    "staat": "bewaakt",
    "wacht": "klasVan"
   },
@@ -2034,7 +2034,7 @@
   },
   {
    "sleutel": "POST /api/foundation/school/huiswerk/maak",
-   "bestand": "server/school/klas.js:98",
+   "bestand": "server/school/klas.js:106",
    "staat": "bewaakt",
    "wacht": "klasVan"
   },
@@ -2298,7 +2298,7 @@
   },
   {
    "sleutel": "POST /api/foundation/school/mededeling",
-   "bestand": "server/school/klas.js:125",
+   "bestand": "server/school/klas.js:133",
    "staat": "bewaakt",
    "wacht": "klasVan"
   },
@@ -2607,7 +2607,7 @@
   },
   {
    "sleutel": "POST /api/foundation/school/rooster/zet",
-   "bestand": "server/school/klas.js:87",
+   "bestand": "server/school/klas.js:95",
    "staat": "bewaakt",
    "wacht": "klasVan"
   },
@@ -2810,7 +2810,7 @@
   },
   {
    "sleutel": "POST /api/foundation/school/uitnodiging/antwoord",
-   "bestand": "server/school/klas.js:72",
+   "bestand": "server/school/klas.js:80",
    "staat": "bewaakt",
    "wacht": "gezinSessie"
   },
@@ -3477,9 +3477,8 @@
   },
   {
    "sleutel": "POST /api/rtf/spel/antwoord",
-   "bestand": "server/routes/spellen.js:139",
-   "staat": "bewaakt",
-   "wacht": "rtfSpeler -> rtf.verifieerProfiel"
+   "bestand": "server/routes/rtmail-vak.js:127",
+   "staat": "onbewaakt"
   },
   {
    "sleutel": "POST /api/rtf/spel/arcade-bord",

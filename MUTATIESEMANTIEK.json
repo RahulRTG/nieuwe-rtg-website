@@ -2,12 +2,12 @@
   "uitleg": "Gemeten met scripts/mutatiesemantiek.js; de vraag en de methode staan in de kop van dat bestand en in CREATE.md par. 10. Dit script plakt geen etiketten: het legt VERKLAARD naast GEMETEN en meldt de tegenspraak.",
   "vastgelegd": "2026-09-03",
   "gemeten": {
-    "routesMetRol": 3998,
+    "routesMetRol": 3803,
     "routesGevonden": 4338,
     "verklaard": 35,
     "onverklaard": 4303,
-    "beproefd": 1573,
-    "onbereikbaarVoorDeProef": 3156,
+    "beproefd": 1564,
+    "onbereikbaarVoorDeProef": 3079,
     "verklaardEnBeproefd": 12,
     "tegenspraken": 0,
     "onbekendeKlassen": 0,
@@ -158,8 +158,8 @@
       "regel": 48,
       "klasse": "nietHerhaalbaar",
       "waarom": "elke aanroep zet een nieuwe overdracht klaar */",
-      "gemeten": "ongemeten",
-      "reden": "de eerste oproep deed geen werk (status 404)",
+      "gemeten": null,
+      "reden": null,
       "tegenspraak": null
     },
     {
@@ -169,8 +169,8 @@
       "regel": 50,
       "klasse": "nietHerhaalbaar",
       "waarom": "elke aanroep zet een nieuwe overdracht klaar */",
-      "gemeten": "ongemeten",
-      "reden": "de eerste oproep deed geen werk (status 404)",
+      "gemeten": null,
+      "reden": null,
       "tegenspraak": null
     },
     {
@@ -180,8 +180,8 @@
       "regel": 55,
       "klasse": "idempotent",
       "waarom": "twee keer vernietigen laat dezelfde lege stand achter */",
-      "gemeten": "ongemeten",
-      "reden": "de eerste oproep deed geen werk (status 404)",
+      "gemeten": null,
+      "reden": null,
       "tegenspraak": null
     },
     {

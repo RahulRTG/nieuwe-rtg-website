@@ -330,7 +330,7 @@ wachten, en de reden is een getal en geen gevoel.
 
 `VERTROUWEN.json` staat op <!--getal:vertrouwen.bewezen-->0<!--/getal--> bewezen,
 <!--getal:vertrouwen.geschorst-->0<!--/getal--> geschorst en
-<!--getal:vertrouwen.routes-->4180<!--/getal--> verzwakt. De bewijspoort in
+<!--getal:vertrouwen.routes-->4716<!--/getal--> verzwakt. De bewijspoort in
 `kern/stuur/beleid.js` houdt vandaag dus niets tegen. `EXECUTIE.md` blok 4 meet
 dat van 176 bereikbare paden er 96 een **onbekend** gevolg hebben — en "de proef
 kwam er niet bij" is iets anders dan "er gebeurt niets".

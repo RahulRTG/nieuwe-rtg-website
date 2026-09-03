@@ -499,30 +499,31 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
     'server/opzet/leverancierpoort.js',
     'public/apps/app-main/app-main-09a.js',
     'public/shared/teamcall/teamcall-01.js',
-    /* DRIE UIT DE IDEM- EN UITROLRONDE. Ze staan hier en niet in MAG, want bij
-       alle drie is de naad aan te wijzen -- en een naad die je kunt benoemen
-       hoort geknipt te worden, niet vrijgesteld.
+    /* DRIE UIT DE IDEM- EN UITROLRONDE, en op 3 september 2026 zijn ze alle drie
+       geknipt op de naad die hier stond (TAKEN.md 5.57). Twee zijn daarmee van
+       deze lijst af:
 
-         server/lib/idem-poort.js          11,3 KB / 4,1 KB code
-           de bewaarkast IS eruit (./idem-kast.js, 4,3 KB): de ring, het venster
-           en de regel dat alleen een geslaagd antwoord erin mag, staan nu los
-           en zonder een enkel begrip uit het web erin. Wat hier over is, is het
-           http-deel -- en dat ligt nog boven de maat. De volgende naad is de
-           SLEUTELBEPALING (welke sleutel geldt, en van wie) los van wat de
-           poort met een herhaling doet.
+         server/lib/idem-poort.js          13,8 -> 9,1 KB
+           de SLEUTELBEPALING is eruit (./idem-sleutelbepaling.js): welke sleutel
+           geldt en van wie, los van wat de poort met een herhaling doet.
+         server/functies/register/index.js 15,0 -> 6,0 KB
+           de FASES-ladder is eruit (./fases.js), met de drie controles MEE --
+           die binden de ladder aan het register, en achterblijven zou de ladder
+           stil naast het register laten staan. Ze draaien nu bij het bouwen:
+           het register geeft zijn OP_ID mee.
 
-         server/kern/command/uitrolregie.js  12,7 KB / 7,6 KB code
-           naad: het METEN (5xx over al het verkeer sinds de sport) los van het
-           BESLUIT (klimmen, zakken, wachten op een mens). Nu deelt het een
-           bestand omdat het meten er ooit bij hoorde.
+       De derde is geknipt en staat er nog:
 
-         server/functies/register/index.js  12,8 KB / 5,8 KB code
-           naad: de FASES-ladder los van het register zelf. Ze hangen aan elkaar
-           via een controle bij het laden, en die controle hoort mee te
-           verhuizen -- anders valt de ladder stil naast het register. */
-    'server/lib/idem-poort.js',
+         server/kern/command/uitrolregie.js  13,0 -> 10,1 KB
+           het METEN is eruit (./uitrolmeting.js), met de drie keuzes uit de kop
+           mee -- een reden die achterblijft bij een bestand dat de code niet
+           meer draagt, leest niemand meer. Wat er nu nog over de grens staat is
+           geen tweede naad maar 113 bytes; de volgende echte naad is het BEELD
+           (`stand()`, wat de bediener ziet) los van de BEDIENING (zet, klim,
+           pauze, bevestig). Die is bewust NIET geknipt om een teller te halen:
+           `stand()` heeft zes stukken bedrading nodig, en dat is een duurdere
+           naad dan de winst. */
     'server/kern/command/uitrolregie.js',
-    'server/functies/register/index.js',
     /* Drie van de vier NOG-gevallen uit de samenvoeging van 24 augustus
        (state.js, functieschakelaars.js, poortwachters.js) staan er niet meer:
        op 26 augustus zijn ze onder de grens teruggebracht door het proza in te
@@ -2022,7 +2023,7 @@ console.log('\n29) de Authorization-kop wordt gelezen om een token te halen, nie
       'tokenUit() HAALT alleen het token uit het verzoek; de aanroepers verifieren het (profielVan zoekt het op in de profielen van dat gezin). Een extractor is geen beslissing.'],
     ["server/kern/stuur.js|const auth = req.get && req.get('authorization');",
       'geeft de kop ONGEWIJZIGD door aan een interne dienst op 127.0.0.1, die zelf verifieert. Hier wordt niets besloten.'],
-    ["server/lib/idem-poort.js|const auth = (typeof req.get === 'function' && req.get('authorization')) || '';",
+    ["server/lib/idem-sleutelbepaling.js|const auth = (typeof req.get === 'function' && req.get('authorization')) || '';",
       'hasht de kop tot een SCOPE en beslist er niets mee: de idem-poort verleent geen toegang, hij zorgt ' +
       'alleen dat twee afzenders nooit dezelfde opslagsleutel delen. De echte authenticatie staat achter de ' +
       'poort, en alleen een 2xx gaat de kast in -- een verzonnen kop levert dus nooit een bewaard antwoord op.'],

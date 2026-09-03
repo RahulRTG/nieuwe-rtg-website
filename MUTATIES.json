@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-03T11:19:08.113Z",
-    "commit": "09567dd0",
+    "op": "2026-09-03T12:45:34.902Z",
+    "commit": "25edd708",
     "boomVuil": true,
-    "boomAnders": 3,
+    "boomAnders": 6,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -202,10 +202,10 @@
     "alarm.test.js": {
       "soort": "puur",
       "staat": "gezakt",
-      "module": "server/kern/command/alarm.js",
-      "operator": "!==->===#0",
+      "module": "server/kern/command/opslag.js",
+      "operator": "===->!==#0",
       "gezakt": 5,
-      "geprobeerd": 2
+      "geprobeerd": 5
     },
     "alarmweg.test.js": {
       "soort": "puur",
@@ -2554,6 +2554,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 4,
       "scherp": "gezakt"
+    },
+    "idem-poort.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/idem-poort.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
+      "geprobeerd": 1
     },
     "idemproef.test.js": {
       "soort": "puur",
@@ -6925,6 +6933,14 @@
       "module": "scripts/uitrol.js",
       "operator": "===->!==#0",
       "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "uitrolregie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/command/uitrolregie.js",
+      "operator": "===->!==#0",
+      "gezakt": 12,
       "geprobeerd": 1
     },
     "uitvoerproef.test.js": {

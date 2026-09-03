@@ -26,6 +26,7 @@
    SLO.md), en het hoort niet stilzwijgend hier ingebouwd te worden. De
    uitgangen die er zijn, staan in de uitslag. */
 'use strict';
+const { maakTikker } = require('./tikker');
 
 const { NIVEAUS } = require('../frictie');
 
@@ -183,11 +184,7 @@ function maakAlarm({ opslag, save, journaal, slo, sonde, canary, kwaliteit, norm
     };
   }
 
-  function tikker() {
-    const t = setInterval(() => { try { weeg(); } catch (e) { /* nooit de lus breken */ } }, 60000);
-    if (t.unref) t.unref();
-    return t;
-  }
+  const tikker = maakTikker(weeg, 60000);   // zie ./tikker.js
 
   return { weeg, stand, stilzetten, controles, tikker };
 }

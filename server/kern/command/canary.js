@@ -31,6 +31,7 @@
    en de functie is met één knop weer op tien procent te zetten. Een functie op
    'uit' is van een canary niet te onderscheiden. */
 'use strict';
+const { maakTikker } = require('./tikker');
 
 const { NIVEAUS } = require('../frictie');
 
@@ -218,11 +219,7 @@ function maakCanary({ opslag, save, meting, journaal, functies }) {
 
   /* De tikker. Zonder deze zou "automatische terugroldrempel" betekenen: pas
      als er iemand kijkt. unref, zodat hij een proces nooit openhoudt. */
-  function tikker() {
-    const t = setInterval(() => { try { weeg(); } catch (e) { /* nooit de lus breken */ } }, STANDAARD.tikMs);
-    if (t.unref) t.unref();
-    return t;
-  }
+  const tikker = maakTikker(weeg, STANDAARD.tikMs);   // zie ./tikker.js
 
   return { start, breder, terug, af, weeg, stand, lopende, tikker, STANDAARD };
 }

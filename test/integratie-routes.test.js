@@ -1,11 +1,20 @@
-/* DE DRIE ROUTES DIE DEZE TAKKEN TOEVOEGDEN, over HTTP.
+/* DE VIER ROUTES DIE DEZE TAKKEN TOEVOEGDEN, over HTTP.
 
    `endpointsZonderTest` in NORM.json telt endpoints die in geen enkele toets
-   voorkomen. Drie daarvan zijn hier bijgekomen, en ze hadden alle drie wel
-   unit-toetsen maar geen enkele die ze als ROUTE aanroept. Dat verschil is
-   echt: de eenheid kan kloppen terwijl de route niet gemonteerd is, achter de
-   verkeerde poort hangt of een naam vraagt die de domeingrens niet kent -- dat
-   laatste is bij deze drie twee keer gebeurd tijdens het bouwen.
+   voorkomen. Vier daarvan zijn hier bijgekomen, en ze hadden alle vier wel
+   unit-toetsen maar geen enkele die ze als ROUTE aanroept.
+
+   DE VIERDE STOND ER EERST NIET BIJ, en de deltapoort vond hem: de
+   correctieroute wordt wel over HTTP beproefd, maar door
+   scripts/tafelproef.js -- en dat is een SCRIPT en geen toets. Het verschil
+   telt: een script draait in de meetronde, een toets in elke CI-run. In de
+   woorden van de poort zelf: schrijf de toets in dezelfde wijziging, want
+   een endpoint dat later een toets krijgt, krijgt hem niet.
+
+   Het verschil met een unit-toets is echt: de eenheid kan kloppen terwijl de
+   route niet gemonteerd is, achter de verkeerde poort hangt of een naam vraagt
+   die de domeingrens niet kent -- dat laatste is hier twee keer gebeurd tijdens
+   het bouwen.
 
    WAT ELKE TOETS HIER MEET is dus niet de logica (die staat in
    test/ankerpost.test.js en test/objectpagina.test.js) maar de BEDRADING: komt
@@ -19,11 +28,12 @@ const assert = require('node:assert/strict');
 const wegwerp = require('../scripts/lib/wegwerpserver');
 
 const KANTOOR = 'RTG-OFFICE-TOETS';
+const ZAAK = 'KIKUNOI';          // de horecazaak uit de seed
 
 let srv;
 test.before(async () => {
   srv = await wegwerp.start({ naam: 'integratieroutes', gereed: 'ready',
-    env: { NODE_ENV: 'test', RTG_DEMO: '1', OFFICE_CODE: KANTOOR } });
+    env: { NODE_ENV: 'test', RTG_DEMO: '1', OFFICE_CODE: KANTOOR, DEMO_SUPPLIER: ZAAK } });
 });
 test.after(() => { try { srv.klaar(); } catch (e) {} });
 
@@ -98,4 +108,47 @@ test('4. de objectpagina geeft alle tien secties, ook de lege', async () => {
 test('5. de objectpagina is niet openbaar', async () => {
   const zonder = await post('/api/sociaal/object/pagina', { soort: 'persoon', id: 'Sperwer' });
   assert.equal(zonder.status, 401);
+});
+
+test('6. de correctie op een rekeningregel: de regel blijft staan en telt nul', async () => {
+  /* De vierde route. Wat hier telt is de invariant uit kern/horeca/correctie.js:
+     een gecorrigeerde regel wordt NIET verwijderd -- hij blijft zichtbaar en
+     telt nul via regelSom. Weghalen zou de geschiedenis wissen; nul tellen doet
+     het bedrag kloppen. */
+  const sup = await post('/api/supplier/login', { username: 'rahul', password: 'Imran' });
+  const S = sup.data && sup.data.token;
+  assert.ok(S, 'geen zaaksessie (status ' + sup.status + ')');
+
+  const kaart = await post('/api/supplier/horeca/kaart', {}, S);
+  const item = kaart.data.groepen[0].items[0];
+  const rek = await post('/api/supplier/horeca/rekening/open', { tafel: 'TOETS-1' }, S);
+  const rekeningId = rek.data.rekening.id;
+  await post('/api/supplier/horeca/rekening/regel', { rekeningId, itemId: item.id, aantal: 1 }, S);
+
+  const voor = await post('/api/supplier/horeca/rekening', { rekeningId }, S);
+  const regel = voor.data.rekening.regels[0];
+  const brutoVoor = voor.data.rekening.totalen.bruto;
+
+  const zonderGrond = await post('/api/supplier/horeca/rekening/regel/corrigeer',
+    { rekeningId, regelId: regel.id, reden: 'zomaar' }, S);
+  assert.ok(zonderGrond.status >= 400, 'een correctie zonder grond komt erdoor');
+
+  const uit = await post('/api/supplier/horeca/rekening/regel/corrigeer',
+    { rekeningId, regelId: regel.id, grond: 'verkeerd-bereid', reden: 'koud geserveerd' }, S);
+  assert.equal(uit.status, 200);
+
+  const na = await post('/api/supplier/horeca/rekening', { rekeningId }, S);
+  const zelfdeRegel = na.data.rekening.regels.find(r => r.id === regel.id);
+  assert.ok(zelfdeRegel, 'de gecorrigeerde regel is verdwenen; dan is de geschiedenis weg');
+  assert.ok(zelfdeRegel.gecorrigeerd, 'de regel draagt geen correctie');
+  assert.ok(na.data.rekening.totalen.bruto < brutoVoor, 'de correctie telt niet mee in het totaal');
+
+  /* Een tweede correctie op dezelfde regel hoort te weigeren; anders trekt hij
+     twee keer af. Dat is de toestandscontrole uit het mutatiecontract. */
+  const nogmaals = await post('/api/supplier/horeca/rekening/regel/corrigeer',
+    { rekeningId, regelId: regel.id, grond: 'niet-gebracht', reden: 'tweede poging' }, S);
+  assert.ok(nogmaals.status >= 400, 'een tweede correctie op dezelfde regel komt erdoor');
+  const na2 = await post('/api/supplier/horeca/rekening', { rekeningId }, S);
+  assert.equal(na2.data.rekening.totalen.bruto, na.data.rekening.totalen.bruto,
+    'de tweede correctie veranderde het totaal; dan trekt hij twee keer af');
 });

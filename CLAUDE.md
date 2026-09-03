@@ -273,6 +273,47 @@ afdwingen wat nooit in de schaduw heeft gelopen (`schaduw.js`).
 per capability of er ergens een caller is, en hij vond er vijf die er geen
 hadden. Draai hem vóór je een capability toevoegt. Paragraaf 6.1 is de eerlijke
 lijst van wat er nog openstaat.
+**`KANTOORMACHT.md` is de kantoorkant daarvan** — niet wat een LID mag (dat is
+CONTROLPLANE.md) maar wat een MEDEWERKER van RTG mag, en tot waar zijn macht
+reikt. Lees die vóór je een kantoorscherm, een backofficeroute of een
+"adminfunctie" bouwt. De kern is een omkering: het uitgangspunt *bouw geen
+almachtige SUPER_ADMIN* is juist en het is een verkeerde tijd — die is er al.
+Eén gedeelde `OFFICE_CODE`, één rol `office`, **26 kamers achter één sleutel** en
+**548 muterende kantoorroutes** waarvan er 37 een reden vragen, 99 een spoor
+nalaten, 10 allebei en **0** een tweede paar ogen kennen (lexicaal gemeten, graad
+`vermoed`). De eerste functie van de laag is dus niet macht toevoegen maar
+bestaande macht uit elkaar halen. **Bijna elk onderdeel bestaat al en hangt
+alleen niet aan de kantoordeur**: `commercie/voornemen.js` ÍS het execution plan
+(vijf harde regels, waaronder dat een goedgekeurd plan niet meer kan veranderen
+en dat een nee geen ja wordt door het nog eens te vragen), `commercie/rechten.js`
+ÍS de machtskaart (nominaal náást effectief, en met opzet uitsluitend lezend),
+`kern/envelop.js` draagt met `correlatie` en `oorzaak` de causale auditketen, en
+`command/simulatie.js` heet letterlijk de digitale tweeling. Vier dingen die de
+uitwerking corrigeren en die je nergens anders moet herhalen: **de
+afdwingladder gaat andersom** (`ENFORCE_EXECUTE` vóór `ENFORCE_READ` — lezen
+raakt élk scherm voor de kleinste risicoreductie, en de gevaarlijkste lezing is
+al door `kluispoort.js` afgedwongen); **de 26 kamers zijn werkkamers en geen
+machtsdomeinen** — 18 zijn bruikbaar, `kantine` en zeven productkamers (atelier,
+studio, hardware, architect, reisbureau, regering, opvang) niet, en van de vier
+kamers die het model nodig heeft bestaat alleen RISICO nergens: VEILIGHEID,
+OPERATIES en BESTUUR zijn bestaande macht zónder kamerdeur; **canary op een
+percentage is bij drie medewerkers niet streng maar zinloos** (de verdeling is
+deterministisch op de persoon, dus kantoorbeleid rolt per KAMER uit); en **een
+Critic op dezelfde invoer als de Planner is een stempel** — de tegenspraak ziet
+het plan en het beleid, nooit de redenering erachter. Wat werkelijk vanaf nul
+begint zijn drie dingen: er is **geen enkele risicomodule**, er is **geen
+historische toestand** van entiteiten (tijdreizen botst bovendien met de eigen
+bewaartermijnen), en er is **geen gegevensklasse per VELD** — zonder die derde
+wordt het samengestelde klantbeeld een met de hand onderhouden lijst blokken die
+binnen een jaar uit de code loopt. De AI is blok 9 en niet uit voorzichtigheid
+maar uit rekenkunde: `kern/stuur/beleid.js` kent 0 `/api/office`-paden en
+`VERTROUWEN.json` staat op 0 bewezen, dus de bewijspoort waar dat idee op leunt
+houdt vandaag niets tegen; 9a (alleen lezen) kan wel vooruit, want `tonen` is de
+laagste gezagstrede. Twee grenzen die niet mogen sneuvelen: **een score op een
+mens draagt altijd zijn opbouw** en wordt nooit een sorteersleutel — niet op
+klanten en niet op medewerkers — en **een versmalling die het gevraagde vermogen
+verbergt is een gebrek en geen veiligheid**, dus dekking gaat vóór compactheid,
+precies zoals bij `npm run resolverbereik`.
 **`MUTATIECONTRACT.md` is de laag ernaast** — niet wie iets mag (dat is
 CONTROLPLANE.md) maar wat een TWEEDE aanroep doet, en hoe hard dit huis dat weet.
 Lees die vóór je een schrijfroute toevoegt of aan idempotentie werkt. De kern in

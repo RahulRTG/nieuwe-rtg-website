@@ -57,7 +57,19 @@ async function nieuwLid(naam) {
   const r = await api('/api/auth/register', { name: naam, email: u + '@x.nl',
     phone: '06' + u.replace(/\D/g, '').slice(-8), password: 'geheim123', geboortedatum: '1990-01-01' });
   assert.equal(r.status, 200, naam + ' kon zich niet aanmelden: ' + JSON.stringify(r.body));
-  const lid = { naam, token: r.body.token, codenaam: r.body.state.user.codename };
+  /* DE CODENAAM WORDT NAGEKEKEN EN NIET AANGENOMEN, en dat staat hier omdat het
+     een keer is misgegaan. Dit bestand nodigt mensen uit OP hun codenaam; komt
+     die niet terug uit de aanmelding, dan is `codenaam` undefined en maakt
+     schoon() in kern/reisgezelschap.js er een lege reeks van. De route zegt dan
+     400 "Geef de codenaam van de persoon die u uitnodigt" -- twee toetsen
+     verderop, bij het uitnodigen van Dirk, en die melding wijst naar het
+     uitnodigen terwijl de aanmelding de oorzaak was (CI 2 september 2026,
+     toets 4 en 7, allebei 400 !== 200). Een opstelling die stil doorloopt is
+     erger dan een die zakt: nu zakt hij hier, met het antwoord van de server. */
+  const codenaam = r.body && r.body.state && r.body.state.user && r.body.state.user.codename;
+  assert.ok(codenaam, naam + ' kreeg geen codenaam terug bij de aanmelding: '
+    + JSON.stringify(r.body).slice(0, 240));
+  const lid = { naam, token: r.body.token, codenaam };
   /* Eén geauthenticeerd verzoek zet hem in de ledengids (kern/gids.js:
      dirTouch hangt aan de sessiepoort). Zonder die stap is hij voor
      `keyVanCodenaam` onvindbaar en zou toets 2 om de verkeerde reden slagen. */
@@ -74,6 +86,18 @@ test.before(async () => {
 
   A = await nieuwLid('Anna'); B = await nieuwLid('Bram');
   C = await nieuwLid('Cees'); D = await nieuwLid('Dirk');
+
+  /* VIER VERSCHILLENDE CODENAMEN, en dat is een echte aanname van dit bestand
+     en geen formaliteit. Uitnodigen gaat op codenaam, en keyVanCodenaam
+     (kern/gids.js) geeft de EERSTE treffer terug. Delen twee van deze vier er
+     een, dan wijst een uitnodiging naar de verkeerde mens en toetst de rest
+     van dit bestand iets anders dan het beweert -- zonder dat er iets rood
+     wordt. kluis.makeCodename() trekt uit 15 woorden plus twee bytes en
+     controleert niet op uniciteit, dus zeldzaam is niet hetzelfde als
+     onmogelijk. */
+  const codenamen = [A, B, C, D].map(x => x.codenaam);
+  assert.equal(new Set(codenamen).size, 4,
+    'twee leden delen een codenaam, dus uitnodigen wijst naar de verkeerde: ' + codenamen.join(', '));
 
   /* DE REIS ONTSTAAT NIET HIER. Het gezelschap bezit geen reis -- hij leest er
      een uit kern/mijnReizen. Die weg loopt langs de kantoorbalie (een reis

@@ -2,11 +2,11 @@
   "uitleg": "Kan er een canonieke Codewereld bestaan? Gemeten over de registers in de wortel: op welke as staan ze, hoeveel sleutels delen ze, en spreken ze elkaar tegen. Deze meter voegt niets samen en kiest bij tegenspraak geen winnaar.",
   "stempel": {
     "op": "2026-09-03",
-    "commit": "2a51f136"
+    "commit": "1e69b190"
   },
   "registers": {
-    "geteld": 82,
-    "opRoute": 39,
+    "geteld": 83,
+    "opRoute": 40,
     "opBestand": 33,
     "opSymbool": 1,
     "zonderAs": 9
@@ -14,7 +14,7 @@
   "assen": {
     "route": {
       "sleutels": 5835,
-      "registers": 45
+      "registers": 46
     },
     "bestand": {
       "sleutels": 4287,
@@ -28,12 +28,12 @@
       "gereedschap": "scripts/ast/ (eigen parser, met lijn- en positie-informatie)",
       "proef": {
         "gedraaid": true,
-        "bestanden": 3027,
-        "geparsed": 3027,
+        "bestanden": 3028,
+        "geparsed": 3028,
         "gefaald": 0,
         "gefaaldLijst": [],
-        "symbolen": 13832,
-        "seconden": 5.6
+        "symbolen": 13837,
+        "seconden": 4.5
       }
     }
   },
@@ -44,47 +44,47 @@
     "verdeling": [
       {
         "registers": 25,
-        "paden": 3
+        "paden": 6
       },
       {
         "registers": 24,
-        "paden": 9
+        "paden": 18
       },
       {
         "registers": 23,
-        "paden": 45
+        "paden": 59
       },
       {
         "registers": 22,
-        "paden": 298
+        "paden": 342
       },
       {
         "registers": 21,
-        "paden": 695
+        "paden": 723
       },
       {
         "registers": 20,
-        "paden": 1251
+        "paden": 1275
       },
       {
         "registers": 19,
-        "paden": 1052
+        "paden": 944
       },
       {
         "registers": 18,
-        "paden": 235
+        "paden": 239
       },
       {
         "registers": 17,
-        "paden": 130
+        "paden": 134
       },
       {
         "registers": 16,
-        "paden": 121
+        "paden": 110
       },
       {
         "registers": 15,
-        "paden": 194
+        "paden": 184
       },
       {
         "registers": 14,
@@ -92,7 +92,7 @@
       },
       {
         "registers": 13,
-        "paden": 321
+        "paden": 320
       },
       {
         "registers": 12,
@@ -100,19 +100,19 @@
       },
       {
         "registers": 11,
-        "paden": 48
+        "paden": 54
       },
       {
         "registers": 10,
-        "paden": 12
+        "paden": 7
       },
       {
         "registers": 9,
-        "paden": 29
+        "paden": 30
       },
       {
         "registers": 8,
-        "paden": 49
+        "paden": 47
       },
       {
         "registers": 7,
@@ -180,7 +180,7 @@
   },
   "bronbereik": {
     "uitleg": "twee getallen, met opzet. `genoemd` = door enig register (de symboolindex noemt alles, dus dit meet STRUCTUUR: welke functies, wat uitgevoerd, wie hangt ervan af). `gedrag` = door minstens een register buiten die index (schrijft het, is het bewezen, is het herhaalbaar). Alleen het tweede is de bovengrens voor een vraag over gedrag.",
-    "bestanden": 3987,
+    "bestanden": 3988,
     "genoemd": 3987,
     "pct": 100,
     "gedrag": 1470,
@@ -210,7 +210,7 @@
     "perBoom": [
       {
         "boom": "server",
-        "bestanden": 3027,
+        "bestanden": 3028,
         "genoemd": 3027,
         "pct": 100,
         "gedrag": 1268,
@@ -227,7 +227,9 @@
     ],
     "serverPct": 41.9,
     "publicPct": 21,
-    "nooitGenoemdVoorbeeld": [],
+    "nooitGenoemdVoorbeeld": [
+      "server/opzet/contextspoor.js"
+    ],
     "zonderGedragVoorbeeld": [
       "server/accounts/demohash.js",
       "server/accounts/dossier.js",
@@ -353,6 +355,10 @@
       {
         "register": "TIKKEN.json",
         "paden": 529
+      },
+      {
+        "register": "CONTEXTPROEF.json",
+        "paden": 407
       },
       {
         "register": "INHOUDSKAART.json",
@@ -569,6 +575,14 @@
       "register": "TIKKEN.json",
       "as": "route",
       "paden": 529,
+      "bestanden": 0,
+      "symbolen": 0,
+      "paren": 0
+    },
+    {
+      "register": "CONTEXTPROEF.json",
+      "as": "route",
+      "paden": 407,
       "bestanden": 0,
       "symbolen": 0,
       "paren": 0

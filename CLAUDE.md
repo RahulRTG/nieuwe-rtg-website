@@ -988,8 +988,13 @@ De aanroepgraaf ligt er sinds dezelfde dag naast (`AANROEPGRAAF.json`,
 functie uit registers alleen. Let daar op twee dingen. Ten eerste is
 <!--getal:graaf.opgelostPct-->18.1<!--/getal-->% opgelost geen tekort maar een indeling: het meeste dat overblijft is
 `res.json()` of `String()`, en <!--getal:graaf.contextobject-->20961<!--/getal--> aanroepen lopen via het CONTEXTOBJECT dat
-in server/opzet/ wordt samengesteld -- statisch onherleidbaar, en dat is een
-eigenschap van dit huis en geen meetfout. Ten tweede telt CODEWERELD.json sinds
+in server/opzet/ wordt samengesteld. Dat leek statisch onherleidbaar tot
+`CONTEXTPROEF.json` het NAMAT (`npm run contextproef`, een runtime-meting in de
+domeingrens-Proxy): van de <!--getal:context.aanHetWerk-->3214<!--/getal--> routes die werk deden reiken er maar
+<!--getal:context.metSpoor-->213<!--/getal--> TIJDENS het verzoek naar de kern, tegenover <!--getal:context.bedrading-->2222<!--/getal--> namen die bij het
+BEDRADEN worden opgehaald. Het gat is dus grotendeels statisch (`kern.save`
+terugvoeren naar de module die hem erin zette) en niet runtime -- de meting
+keerde de voorspelling om, en dat is precies waarom hij er is. Ten tweede telt CODEWERELD.json sinds
 die dag DRIE dingen apart (structuur, relatie, gedrag), omdat een index die elk
 bestand noemt elke dekkingsvraag triviaal waar maakt: dat gebeurde twee keer op
 rij, en het zag er beide keren uit als vooruitgang. Alleen de gedragsteller

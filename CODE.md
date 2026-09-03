@@ -23,14 +23,14 @@ gevonden. Dus eerst meten — `npm run codewereld`, uitslag in `CODEWERELD.json`
 
 | Wat | Uitslag |
 |---|---|
-| Registers in de wortel | <!--getal:codewereld.registers-->82<!--/getal--> (37 op route, 31 op bestand, 1 op symbool, 9 zonder as) |
+| Registers in de wortel | <!--getal:codewereld.registers-->83<!--/getal--> (37 op route, 31 op bestand, 1 op symbool, 9 zonder as) |
 | As **route** | 5709 paden, in 42 registers |
 | As **bestand** | 1457 bestanden, in 54 registers |
 | As **symbool** | <!--getal:codewereld.symboolSleutels-->19517<!--/getal--> symbolen — *stond op 0 tot 3 september 2026, zie §0.2* |
 | Ruggengraat | **<!--getal:codewereld.ruggengraat-->5142<!--/getal--> van <!--getal:codewereld.paden-->5835<!--/getal--> paden (<!--getal:codewereld.ruggengraatPct-->88.1<!--/getal-->%) staan in meer dan één register** |
 | Brug route → bestand | <!--getal:codewereld.brugPaden-->5113<!--/getal--> paden, uit **2** registers |
 | Verschillen in die brug | 1, getoetst op <!--getal:codewereld.brugToetsbaar-->4443<!--/getal--> paden (<!--getal:codewereld.brugDekkingPct-->86.9<!--/getal-->%) — soort: zie §0.3 |
-| Bronbereik **structuur** | <!--getal:codewereld.bronGenoemd-->3987<!--/getal--> van <!--getal:codewereld.bronBestanden-->3987<!--/getal--> (<!--getal:codewereld.bronPct-->100<!--/getal-->%) — welke functies er wonen, wie ervan afhangt |
+| Bronbereik **structuur** | <!--getal:codewereld.bronGenoemd-->3987<!--/getal--> van <!--getal:codewereld.bronBestanden-->3988<!--/getal--> (<!--getal:codewereld.bronPct-->100<!--/getal-->%) — welke functies er wonen, wie ervan afhangt |
 | Bronbereik **gedrag** | **<!--getal:codewereld.bronGedrag-->1470<!--/getal--> van 3987 (<!--getal:codewereld.bronGedragPct-->36.9<!--/getal-->%)** — schrijft het, is het bewezen, is het herhaalbaar |
 | — gedrag in `server/` | <!--getal:codewereld.bronServerPct-->41.9<!--/getal-->% |
 | — gedrag in `public/` | <!--getal:codewereld.bronPublicPct-->21<!--/getal-->% |
@@ -77,7 +77,7 @@ verschilt.
 parser in `scripts/ast/` (lexer, recursive-descent parser, walker — geen enkele
 dependency) is over de hele serverboom gehaald:
 
-**<!--getal:codewereld.geparsed-->3027<!--/getal--> bestanden geparsed, <!--getal:codewereld.parseFout-->0<!--/getal--> gefaald, <!--getal:codewereld.symbolen-->13832<!--/getal--> benoemde
+**<!--getal:codewereld.geparsed-->3028<!--/getal--> bestanden geparsed, <!--getal:codewereld.parseFout-->0<!--/getal--> gefaald, <!--getal:codewereld.symbolen-->13837<!--/getal--> benoemde
 symbolen, in vijf seconden.**
 
 Nul gefaald telt hier dubbel, want deze parser gooit op wat hij niet begrijpt in
@@ -349,6 +349,72 @@ trekt die bestanden af. Zonder die aftrek stond `public/` op 26,1%; met de
 aftrek op <!--getal:codewereld.bronPublicPct-->21<!--/getal-->%. Dat verschil van vijf punten is precies het deel waarover
 niemand iets weet, en het hoort niet aan onze kant van de streep.
 
+### 0.6 De runtime-meting — en waarom zij mijn eigen voorspelling omkeerde
+*(3 september 2026)*
+
+Na §0.4 stond hier dat de <!--getal:graaf.contextobject-->20961<!--/getal--> statisch onherleidbare
+contextobject-aanroepen "een runtime-meting worden of niets". Die meting staat er
+nu, en zij zegt iets anders dan verwacht.
+
+`server/opzet/contextspoor.js` hangt in de **domeingrens-Proxy** — het enige punt
+waar elke toegang tot het contextobject langskomt — en noteert welke kernnaam
+door welk verzoek wordt opgehaald, met de route uit de async-context van
+`opzet/handeling.js`. `scripts/contextproef.js` (`npm run contextproef`) zet een
+wegwerpserver op met die stand aan, rijdt elke route één keer en legt het vast in
+`CONTEXTPROEF.json`.
+
+| | |
+|---|---|
+| routes gereden | <!--getal:context.gereden-->4769<!--/getal--> |
+| daarvan aan het werk (geen 401/404/405) | <!--getal:context.aanHetWerk-->3214<!--/getal--> |
+| **reikt tijdens het verzoek naar de kern** | **<!--getal:context.metSpoor-->213<!--/getal-->** |
+| doet werk zonder dat te doen | <!--getal:context.zonderSpoor-->3075<!--/getal--> |
+| losse kernnamen tijdens een verzoek | <!--getal:context.namen-->78<!--/getal--> |
+| kernnamen opgehaald bij het **bedraden** | <!--getal:context.bedrading-->2222<!--/getal--> |
+
+**Van de routes die werkelijk werk deden, reikt 6,6% tijdens het verzoek naar het
+contextobject.** De rest niet — en dat is geen tekort van de proef maar het
+antwoord: een module doet één keer `const { app, auth, save } = kern` bij het
+ophangen, en werkt daarna met gewone variabelen. Vandaar 2222 namen bij de
+bedrading tegenover 78 tijdens een verzoek.
+
+Wat dat betekent voor het gat uit §0.4: de 20.961 onherleidbare aanroepen zijn
+**geen runtime-raadsel**. Het zijn aanroepen op namen die één keer, bij het
+bedraden, uit de zak zijn gehaald — statisch zichtbaar, alleen niet met de
+resolver zoals die nu werkt. De vraag verschuift daarmee van *"wat gebeurt er
+tijdens een verzoek"* naar *"welke module heeft `kern.save` erin gezet"*, en dat
+is een andere en waarschijnlijk goedkopere klus dan een runtime-meting.
+
+Ik had dat andersom voorspeld. De meting is er niet voor niets: zonder haar was
+de volgende stap een dure runtime-infrastructuur geweest voor een probleem dat
+grotendeels statisch is.
+
+**Wat de proef wél ziet en niets anders kan zien** is de late binding: 213 routes
+die pas tijdens het verzoek een naam ophalen — `bank.bankLedenAan` (24 routes),
+`geld.geldbeleid` (11), `kantoren.hardware` (11). Precies de plekken waar
+`routes/supplier/genrepuls.js` in zijn eigen kop over schrijft: *"de motoren
+hangen pas NA deze routes aan de kern, dus we pakken ze op aanroepmoment via hun
+kern-sleutel"*. Die tak is met geen enkele statische lezer te volgen.
+
+#### Twee garanties in een heet pad
+
+De haak zit in de Proxy waar élke kerntoegang langskomt. `test/contextspoor.test.js`
+houdt daarom twee dingen vast, en allebei zijn ze zien zakken op een mutatie:
+de stand staat **uit** zonder de vlag (geen bestand, geen geheugen), en met de
+vlag aan weigert de grens **precies hetzelfde**. Die tweede is de scherpste: de
+haak zit vlak vóór de regel die weigert, dus een meetronde die stilletjes een
+grensovertreding doorlaat is één regel verschil.
+
+Nog twee dingen die het bouwen opleverde:
+
+- **Wegschrijven mag niet op afsluiten leunen.** `scripts/lib/wegwerpserver.js`
+  ruimt zijn server op met `SIGKILL`, en dat sein is niet af te vangen: de eerste
+  ronde verloor haar hele spoor zonder één foutmelding. Het spoor schrijft nu
+  tijdens het draaien, hooguit eens per 750 ms.
+- **De proef schrijft geen ander register.** De idempotentieproef rijdt dezelfde
+  routes en had gratis meegekund — maar dan hangt die meting aan deze, en een
+  ronde van de één overschrijft het register van de ander.
+
 ---
 
 ## 1. De invariant, en waarom hij in code staat
@@ -435,13 +501,15 @@ sleutels, geen productiegegevens, en een dak op wat er per vraag uit mag.
 
 | Onderdeel | Stand |
 |---|---|
-| Deterministische code-analyse | **staat** — <!--getal:codewereld.registers-->82<!--/getal--> registers, alle uit `scripts/`, geen model |
+| Deterministische code-analyse | **staat** — <!--getal:codewereld.registers-->83<!--/getal--> registers, alle uit `scripts/`, geen model |
 | Scheiding runtime ↔ bron | **staat**, en afgedwongen (`test/codegrens.test.js`) |
 | Ruggengraat op route | **staat** — <!--getal:codewereld.ruggengraatPct-->88.1<!--/getal-->%, gemeten |
 | Symboolas | **staat** — `SYMBOLEN.json`, §0.2 |
 | Codewereld als één object | **een stap weg** — drie assen, en de brug route→bestand heeft sinds §0.3 twee bronnen |
 | Brug scherm → route | **staat** — `SCHERMROUTES.json`, §0.3 |
 | Gedrag van een scherm | **staat** — `SCHERMGEDRAG.json`, §0.5 (afgeleid, met de grens erbij) |
+| Runtime-meting van het contextobject | **staat** — `CONTEXTPROEF.json`, §0.6 |
+| `kern.X` → de module die hem erin zette | **een stap weg** — de echte rest van het contextobject-gat |
 | Brug route → symbool | **staat** — `AANROEPGRAAF.json`, §0.4 |
 | Aanroepgraaf (wie roept wie) | **staat** — §0.4, met de restbak ingedeeld |
 | Impactketen scherm → functie | **staat**, uit registers alleen — §0.4 |
@@ -549,11 +617,16 @@ Drie stappen, in deze volgorde:
 1. ~~**Gedragsdekking van `public/`**~~ — gedaan in §0.5: 6,6% → <!--getal:codewereld.bronPublicPct-->21<!--/getal-->%.
    Wat er nu nog onder zit zijn de <!--getal:schermgedrag.zonderGrond-->137<!--/getal--> schermen die hun paden opbouwen; die
    zijn statisch niet te volgen en vallen onder punt 2.
-2. **Gedragsdekking van de <!--getal:graaf.contextobject-->20961<!--/getal--> contextobject-aanroepen** (en van de <!--getal:schermgedrag.zonderGrond-->137<!--/getal-->
-   schermen hierboven). Allebei statisch onbereikbaar, dus dat wordt een
-   RUNTIME-meting of het wordt niets — zoals `scripts/schrijfanalyse.js` in zijn
-   kop al voorstelt. Dit is nu het grootste gat.
-3. **Pas dan de Architect**, met een eerlijke opgave van wat hij niet weet.
+2. ~~**De <!--getal:graaf.contextobject-->20961<!--/getal--> contextobject-aanroepen via een runtime-meting**~~ — gemeten in
+   §0.6, en de uitkomst keert de stap om: maar <!--getal:context.metSpoor-->213<!--/getal--> routes reiken tijdens een
+   verzoek naar de kern. De rest haalt zijn namen bij het BEDRADEN op, en dat is
+   statisch zichtbaar. Wat overblijft voor runtime is de late binding, en dat is
+   klein.
+3. **`kern.save` terugvoeren naar de module die hem erin zette.** Dat is wat §0.6
+   blootlegde als de echte klus: de resolver kan `const { save } = kern` volgen
+   tot de zak, maar niet tot de eigenaar. Vermoedelijk goedkoper dan de
+   runtime-weg die ik ervoor in gedachten had — en pas na die meting te zeggen.
+4. **Pas dan de Architect**, met een eerlijke opgave van wat hij niet weet.
 
 En twee dingen die hier horen te blijven staan, allebei omdat ze iets zeggen over
 wat een register waard is:

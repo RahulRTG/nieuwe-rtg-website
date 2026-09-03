@@ -15,6 +15,20 @@
 <link href="/shared/ios.css" rel="stylesheet">
 <link href="/shared/workos-premium.css" rel="stylesheet">
 <link href="/shared/horeca-command.css" rel="stylesheet"><link href="/shared/horeca-enterprise-modules.css" rel="stylesheet"><script src="/shared/horeca-enterprise.js" defer></script>
+<style>
+  /* Dit scherm had geen eigen stijlblok, en dan heeft
+     scripts/inlinestijl-omzet.js nergens om zijn klassen neer te zetten: vijf
+     horeca-schermen kwamen daardoor als "omzetting mislukt" terug in plaats van
+     als bewezen of afgekeurd (TAKEN.md 4.51). */
+
+  /* Uit inline style-attributen gehaald door scripts/inlinestijl-omzet.js (TAKEN.md 4.51). Bewezen gelijk met
+     scripts/inlinestijl-proef.js: elk element, elke aangeraakte eigenschap,
+     berekend in een echte browser. Letterlijk wat er stond -- geen ontwerpbesluit. */
+  .i-12sanw{flex:0 1 6rem}
+  .i-12sbaw{flex:0 1 7rem}
+  .i-12sbxv{flex:0 1 8rem}
+  .i-12sckv{flex:0 1 9rem}
+</style>
 </head>
 <body class="rtg-stijl" data-rtg-eigenvlak="onyx" data-workos-premium data-workos-home="/apps/horeca.html">
 <header>
@@ -32,25 +46,25 @@
     <div class="kop">Offerte</div>
     <div class="rij">
       <input class="veld" id="vNaam" maxlength="80" placeholder="Naam van het event" aria-label="Naam van het event">
-      <input class="veld" id="vDatum" maxlength="10" placeholder="Datum" aria-label="Datum" style="flex:0 1 9rem;">
-      <input class="veld" id="vGasten" type="number" min="1" max="20000" value="50" aria-label="Aantal gasten" style="flex:0 1 6rem;">
+      <input class="i-12sckv veld" id="vDatum" maxlength="10" placeholder="Datum" aria-label="Datum">
+      <input class="i-12sanw veld" id="vGasten" type="number" min="1" max="20000" value="50" aria-label="Aantal gasten">
       <input class="veld" id="vContact" maxlength="80" placeholder="Contactpersoon" aria-label="Contactpersoon">
-      <input class="veld" id="vRuimte" maxlength="60" placeholder="Ruimte" aria-label="Ruimte" style="flex:0 1 9rem;">
+      <input class="i-12sckv veld" id="vRuimte" maxlength="60" placeholder="Ruimte" aria-label="Ruimte">
     </div>
     <div class="rij h-mt60">
       <input class="veld" id="vPost1" maxlength="100" placeholder="Post 1" aria-label="Post 1">
-      <input class="veld" id="vAantal1" type="number" min="1" value="50" aria-label="Aantal post 1" style="flex:0 1 6rem;">
-      <input class="veld" id="vPrijs1" type="number" min="0" step="0.01" placeholder="Prijs" aria-label="Prijs post 1" style="flex:0 1 7rem;">
+      <input class="i-12sanw veld" id="vAantal1" type="number" min="1" value="50" aria-label="Aantal post 1">
+      <input class="i-12sbaw veld" id="vPrijs1" type="number" min="0" step="0.01" placeholder="Prijs" aria-label="Prijs post 1">
     </div>
     <div class="rij h-mt40">
       <input class="veld" id="vPost2" maxlength="100" placeholder="Post 2" aria-label="Post 2">
-      <input class="veld" id="vAantal2" type="number" min="1" value="1" aria-label="Aantal post 2" style="flex:0 1 6rem;">
-      <input class="veld" id="vPrijs2" type="number" min="0" step="0.01" placeholder="Prijs" aria-label="Prijs post 2" style="flex:0 1 7rem;">
+      <input class="i-12sanw veld" id="vAantal2" type="number" min="1" value="1" aria-label="Aantal post 2">
+      <input class="i-12sbaw veld" id="vPrijs2" type="number" min="0" step="0.01" placeholder="Prijs" aria-label="Prijs post 2">
     </div>
     <div class="rij h-mt40">
       <input class="veld" id="vPost3" maxlength="100" placeholder="Post 3" aria-label="Post 3">
-      <input class="veld" id="vAantal3" type="number" min="1" value="1" aria-label="Aantal post 3" style="flex:0 1 6rem;">
-      <input class="veld" id="vPrijs3" type="number" min="0" step="0.01" placeholder="Prijs" aria-label="Prijs post 3" style="flex:0 1 7rem;">
+      <input class="i-12sanw veld" id="vAantal3" type="number" min="1" value="1" aria-label="Aantal post 3">
+      <input class="i-12sbaw veld" id="vPrijs3" type="number" min="0" step="0.01" placeholder="Prijs" aria-label="Prijs post 3">
     </div>
     <div class="rij h-mt60">
       <button class="knop p" id="vOfferte" type="button">Nieuwe offerte</button>
@@ -63,12 +77,12 @@
     <div class="kop">Akkoord en aanbetaling</div>
     <div class="rij">
       <input class="veld" id="vDoor" maxlength="80" placeholder="Wie geeft akkoord" aria-label="Wie geeft akkoord">
-      <select class="veld" id="vKanaal" aria-label="Kanaal van het akkoord" style="flex:0 1 8rem;">
+      <select class="i-12sbxv veld" id="vKanaal" aria-label="Kanaal van het akkoord">
         <option value="mail">Mail</option><option value="getekend">Getekend</option>
         <option value="telefoon">Telefoon</option>
       </select>
       <button class="knop p" id="vAkkoord" type="button">Akkoord vastleggen</button>
-      <input class="veld" id="vAanbedrag" type="number" min="0" step="0.01" placeholder="Aanbetaling" aria-label="Aanbetaling" style="flex:0 1 8rem;">
+      <input class="i-12sbxv veld" id="vAanbedrag" type="number" min="0" step="0.01" placeholder="Aanbetaling" aria-label="Aanbetaling">
       <button class="knop" id="vAanbetaling" type="button">Boeken</button>
     </div>
     <p class="stil h-mt40">Een offerte is pas een opdracht na een akkoord met een naam erbij. Een keuken die kookt voor 350 gasten omdat iemand aan de telefoon ja zei, is precies hoe het misgaat.</p>
@@ -77,14 +91,14 @@
   <div class="kaart">
     <div class="kop">Verbruik en nacalculatie</div>
     <div class="rij">
-      <select class="veld" id="vKostSoort" aria-label="Soort kosten" style="flex:0 1 8rem;">
+      <select class="i-12sbxv veld" id="vKostSoort" aria-label="Soort kosten">
         <option value="inkoop">Inkoop</option><option value="uren">Uren</option>
         <option value="materiaal">Materiaal</option><option value="derden">Derden</option>
         <option value="overig">Overig</option>
       </select>
       <input class="veld" id="vKostWat" maxlength="100" placeholder="Omschrijving" aria-label="Omschrijving van de kosten">
-      <input class="veld" id="vKostBedrag" type="number" min="0" step="0.01" placeholder="Bedrag" aria-label="Bedrag" style="flex:0 1 7rem;">
-      <input class="veld" id="vKostUren" type="number" min="0" step="0.5" placeholder="Uren" aria-label="Uren" style="flex:0 1 6rem;">
+      <input class="i-12sbaw veld" id="vKostBedrag" type="number" min="0" step="0.01" placeholder="Bedrag" aria-label="Bedrag">
+      <input class="i-12sanw veld" id="vKostUren" type="number" min="0" step="0.5" placeholder="Uren" aria-label="Uren">
       <button class="knop p" id="vKosten" type="button">Kosten erbij</button>
       <button class="knop" id="vNa" type="button">Nacalculatie</button>
     </div>

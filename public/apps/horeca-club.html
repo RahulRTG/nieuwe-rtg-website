@@ -15,6 +15,19 @@
 <link href="/shared/ios.css" rel="stylesheet">
 <link href="/shared/workos-premium.css" rel="stylesheet">
 <link href="/shared/horeca-command.css" rel="stylesheet"><link href="/shared/horeca-enterprise-modules.css" rel="stylesheet"><script src="/shared/horeca-enterprise.js" defer></script>
+<style>
+  /* Dit scherm had geen eigen stijlblok, en dan heeft
+     scripts/inlinestijl-omzet.js nergens om zijn klassen neer te zetten: vijf
+     horeca-schermen kwamen daardoor als "omzetting mislukt" terug in plaats van
+     als bewezen of afgekeurd (TAKEN.md 4.51). */
+
+  /* Uit inline style-attributen gehaald door scripts/inlinestijl-omzet.js (TAKEN.md 4.51). Bewezen gelijk met
+     scripts/inlinestijl-proef.js: elk element, elke aangeraakte eigenschap,
+     berekend in een echte browser. Letterlijk wat er stond -- geen ontwerpbesluit. */
+  .i-12sbxv{flex:0 1 8rem}
+  .i-12sa0x{flex:0 1 5rem}
+  .i-1trguu{flex:0 1 10rem}
+</style>
 </head>
 <body class="rtg-stijl" data-rtg-eigenvlak="onyx" data-workos-premium data-workos-home="/apps/horeca.html">
 <header>
@@ -32,8 +45,8 @@
   <div class="kaart">
     <div class="kop">Polsband</div>
     <div class="rij">
-      <input class="veld" id="cNummer" maxlength="40" placeholder="Bandnummer" aria-label="Bandnummer" style="flex:0 1 10rem;">
-      <input class="veld" id="cBedrag" type="number" min="0" step="0.01" placeholder="Bedrag" aria-label="Bedrag" style="flex:0 1 8rem;">
+      <input class="i-1trguu veld" id="cNummer" maxlength="40" placeholder="Bandnummer" aria-label="Bandnummer">
+      <input class="i-12sbxv veld" id="cBedrag" type="number" min="0" step="0.01" placeholder="Bedrag" aria-label="Bedrag">
       <button class="knop p" id="cBandOp" type="button">Opwaarderen</button>
       <button class="knop" id="cBandBetaal" type="button">Afboeken</button>
       <button class="knop" id="cBandTerug" type="button">Restsaldo terug</button>
@@ -46,11 +59,11 @@
     <div class="kop">Tafels met minimum spend</div>
     <div id="cTafels"></div>
     <div class="rij z-mt60">
-      <input class="veld" id="cTafel" maxlength="30" placeholder="Tafel" aria-label="Tafel" style="flex:0 1 8rem;">
+      <input class="i-12sbxv veld" id="cTafel" maxlength="30" placeholder="Tafel" aria-label="Tafel">
       <input class="veld" id="cTafelGast" maxlength="60" placeholder="Op naam van" aria-label="Naam van de gast">
-      <input class="veld" id="cTafelPersonen" type="number" min="1" max="60" value="6" aria-label="Aantal personen" style="flex:0 1 5rem;">
-      <input class="veld" id="cTafelMin" type="number" min="0" step="0.01" placeholder="Minimum" aria-label="Minimumbedrag" style="flex:0 1 8rem;">
-      <input class="veld" id="cTafelRek" maxlength="40" placeholder="Rekeningnummer" aria-label="Rekeningnummer" style="flex:0 1 10rem;">
+      <input class="i-12sa0x veld" id="cTafelPersonen" type="number" min="1" max="60" value="6" aria-label="Aantal personen">
+      <input class="i-12sbxv veld" id="cTafelMin" type="number" min="0" step="0.01" placeholder="Minimum" aria-label="Minimumbedrag">
+      <input class="i-1trguu veld" id="cTafelRek" maxlength="40" placeholder="Rekeningnummer" aria-label="Rekeningnummer">
       <button class="knop p" id="cTafelZet" type="button">Vastleggen</button>
       <button class="knop" id="cTafelToon" type="button">Toon</button>
     </div>
@@ -61,7 +74,7 @@
     <div class="kop">De deur</div>
     <div class="rij">
       <input class="veld" id="dCapaciteit" type="number" min="1" max="20000" value="300" aria-label="Capaciteit" style="flex:0 1 7rem;">
-      <input class="veld" id="dPersonen" type="number" min="1" max="50" value="1" aria-label="Aantal personen" style="flex:0 1 5rem;">
+      <input class="i-12sa0x veld" id="dPersonen" type="number" min="1" max="50" value="1" aria-label="Aantal personen">
       <label class="stil"><input type="checkbox" id="dLeeftijd" checked> Leeftijd gecontroleerd</label>
       <button class="knop p" id="dIn" type="button">Naar binnen</button>
       <button class="knop" id="dUit" type="button">Naar buiten</button>
@@ -76,8 +89,8 @@
     <div class="rij">
       <input class="veld" id="dDatum" maxlength="10" placeholder="Datum (leeg = vandaag)" aria-label="Datum" style="flex:0 1 11rem;">
       <input class="veld" id="dPromoter" maxlength="40" placeholder="Promoter" aria-label="Promoter" style="flex:0 1 9rem;">
-      <input class="veld" id="dGastPersonen" type="number" min="1" max="20" value="1" aria-label="Personen per naam" style="flex:0 1 5rem;">
-      <input class="veld" id="dKorting" maxlength="40" placeholder="Korting" aria-label="Korting" style="flex:0 1 8rem;">
+      <input class="i-12sa0x veld" id="dGastPersonen" type="number" min="1" max="20" value="1" aria-label="Personen per naam">
+      <input class="i-12sbxv veld" id="dKorting" maxlength="40" placeholder="Korting" aria-label="Korting">
       <button class="knop" id="dGastToon" type="button">Toon</button>
     </div>
     <div class="rij z-mt60">

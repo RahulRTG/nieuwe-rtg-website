@@ -15,6 +15,20 @@
 <link href="/shared/ios.css" rel="stylesheet">
 <link href="/shared/workos-premium.css" rel="stylesheet">
 <link href="/shared/horeca-command.css" rel="stylesheet"><link href="/shared/horeca-enterprise-modules.css" rel="stylesheet"><script src="/shared/horeca-enterprise.js" defer></script>
+<style>
+  /* Dit scherm had geen eigen stijlblok, en dan heeft
+     scripts/inlinestijl-omzet.js nergens om zijn klassen neer te zetten: vijf
+     horeca-schermen kwamen daardoor als "omzetting mislukt" terug in plaats van
+     als bewezen of afgekeurd (TAKEN.md 4.51). */
+
+  /* Uit inline style-attributen gehaald door scripts/inlinestijl-omzet.js (TAKEN.md 4.51). Bewezen gelijk met
+     scripts/inlinestijl-proef.js: elk element, elke aangeraakte eigenschap,
+     berekend in een echte browser. Letterlijk wat er stond -- geen ontwerpbesluit. */
+  .i-12sbaw{flex:0 1 7rem}
+  .i-12sanw{flex:0 1 6rem}
+  .i-1trhhu{flex:0 1 11rem}
+  .i-12sbxv{flex:0 1 8rem}
+</style>
 </head>
 <body class="rtg-stijl" data-rtg-eigenvlak="onyx" data-workos-premium data-workos-home="/apps/horeca.html">
 <header>
@@ -46,10 +60,10 @@
     <div class="rij h-mt60">
       <input class="veld" id="bZoneNaam" maxlength="40" placeholder="Naam" aria-label="Zonenaam">
       <input class="veld" id="bZonePost" maxlength="200" placeholder="Postcodes, komma's ertussen" aria-label="Postcodes">
-      <input class="veld" id="bZoneKm" type="number" min="0" max="100" step="0.1" placeholder="Straal km" aria-label="Straal in kilometer" style="flex:0 1 7rem;">
-      <input class="veld" id="bZoneKosten" type="number" min="0" step="0.01" placeholder="Kosten" aria-label="Bezorgkosten" style="flex:0 1 7rem;">
-      <input class="veld" id="bZoneMin" type="number" min="0" step="0.01" placeholder="Minimum" aria-label="Minimumbedrag" style="flex:0 1 7rem;">
-      <input class="veld" id="bZoneMinuten" type="number" min="5" max="180" value="30" aria-label="Bezorgtijd in minuten" style="flex:0 1 6rem;">
+      <input class="i-12sbaw veld" id="bZoneKm" type="number" min="0" max="100" step="0.1" placeholder="Straal km" aria-label="Straal in kilometer">
+      <input class="i-12sbaw veld" id="bZoneKosten" type="number" min="0" step="0.01" placeholder="Kosten" aria-label="Bezorgkosten">
+      <input class="i-12sbaw veld" id="bZoneMin" type="number" min="0" step="0.01" placeholder="Minimum" aria-label="Minimumbedrag">
+      <input class="i-12sanw veld" id="bZoneMinuten" type="number" min="5" max="180" value="30" aria-label="Bezorgtijd in minuten">
       <button class="knop p" id="bZoneZet" type="button">Zone erbij</button>
     </div>
     <!-- Deze rij MOET kunnen afbreken. Op telefoonformaat nemen het label en de
@@ -73,15 +87,15 @@
   <div class="kaart">
     <div class="kop">Tijdsloten</div>
     <div class="rij">
-      <input class="veld" id="bDatum" maxlength="10" placeholder="Datum (leeg = vandaag)" aria-label="Datum" style="flex:0 1 11rem;">
+      <input class="i-1trhhu veld" id="bDatum" maxlength="10" placeholder="Datum (leeg = vandaag)" aria-label="Datum">
       <button class="knop" id="bSlotToon" type="button">Toon</button>
     </div>
     <div class="h-mt50" id="bSloten"></div>
     <div class="rij h-mt60">
-      <input class="veld" id="bSlotTijd" maxlength="5" placeholder="18:30" aria-label="Tijdslot" style="flex:0 1 6rem;">
-      <input class="veld" id="bSlotCap" type="number" min="0" max="600" placeholder="Capaciteit in minuten" aria-label="Capaciteit in keukenminuten" style="flex:0 1 11rem;">
+      <input class="i-12sanw veld" id="bSlotTijd" maxlength="5" placeholder="18:30" aria-label="Tijdslot">
+      <input class="i-1trhhu veld" id="bSlotCap" type="number" min="0" max="600" placeholder="Capaciteit in minuten" aria-label="Capaciteit in keukenminuten">
       <button class="knop" id="bSlotZet" type="button">Slot instellen</button>
-      <input class="veld" id="bSlotMin" type="number" min="1" max="600" value="15" aria-label="Te reserveren minuten" style="flex:0 1 6rem;">
+      <input class="i-12sanw veld" id="bSlotMin" type="number" min="1" max="600" value="15" aria-label="Te reserveren minuten">
       <button class="knop p" id="bSlotNeem" type="button">Reserveer</button>
     </div>
     <p class="stil h-mt40">De capaciteit staat in keukenminuten en niet in bestellingen: tien pizza's zijn geen tien diners. Een vol slot noemt het eerstvolgende dat wel kan.</p>
@@ -92,8 +106,8 @@
     <div id="bStops"></div>
     <div class="rij h-mt60">
       <input class="veld" id="bStopAdres" maxlength="120" placeholder="Adres" aria-label="Adres">
-      <input class="veld" id="bStopLat" type="number" step="0.0001" placeholder="Breedte" aria-label="Breedtegraad" style="flex:0 1 8rem;">
-      <input class="veld" id="bStopLng" type="number" step="0.0001" placeholder="Lengte" aria-label="Lengtegraad" style="flex:0 1 8rem;">
+      <input class="i-12sbxv veld" id="bStopLat" type="number" step="0.0001" placeholder="Breedte" aria-label="Breedtegraad">
+      <input class="i-12sbxv veld" id="bStopLng" type="number" step="0.0001" placeholder="Lengte" aria-label="Lengtegraad">
       <input class="veld" id="bStopMin" type="number" min="0" max="120" placeholder="Min" aria-label="Keukenminuten" style="flex:0 1 5rem;">
       <button class="knop" id="bStopVoeg" type="button">Stop erbij</button>
       <button class="knop p" id="bRoute" type="button">Volgorde</button>

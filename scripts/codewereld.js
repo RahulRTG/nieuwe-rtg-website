@@ -45,7 +45,7 @@ function bestandVan(s) {
    register dat die twee bij elkaar horen. Twee losse lijsten in hetzelfde
    bestand zeggen niets over elkaar. */
 function oogst(j) {
-  const paden = new Set(), bestanden = new Set(), methoden = new Set(), paren = [];
+  const paden = new Set(), bestanden = new Set(), methoden = new Set(), paren = [], symbolen = new Set();
   (function loop(n, diepte) {
     if (n == null || diepte > 10) return;
     if (typeof n === 'string') { const p = padVan(n); if (p) paden.add(p); const b = bestandVan(n); if (b) bestanden.add(b); return; }
@@ -64,14 +64,21 @@ function oogst(j) {
       }
       loop(v, diepte + 1);
     }
+    /* Een symboolsleutel is een naam MET een plaats. Een losse functienaam
+       zonder bestand is geen sleutel -- daar kun je niets mee terugvinden, en
+       dat is precies waarom deze as tot 3 september 2026 leeg stond. */
+    if (Array.isArray(n.symbolen) && typeof n.bestand === 'string') {
+      for (const sy of n.symbolen) if (sy && typeof sy.naam === 'string' && sy.lijn != null) symbolen.add(n.bestand + '#' + sy.naam);
+    }
     if (rijPad && rijBestand) paren.push([rijPad, rijBestand]);
   })(j, 0);
-  return { paden, bestanden, methoden, paren };
+  return { paden, bestanden, methoden, paren, symbolen };
 }
 
 /* De eigen uitslag telt niet mee. Zonder deze regel meet de tweede ronde zijn
    eigen paren en zakt de tegenspraakcontrole van `niet vast te stellen` naar
    een vals `0`: het bewijs van de meter werd zijn eigen bron. */
+const symboolNaarRegisters = new Map();
 const registers = fs.readdirSync(WORTEL).filter(f => f.endsWith('.json') && !f.startsWith('package') && f !== 'CODEWERELD.json').sort();
 const perRegister = [], padNaarRegisters = new Map(), bestandNaarRegisters = new Map(), brug = new Map();
 
@@ -81,9 +88,10 @@ for (const f of registers) {
   const o = oogst(j);
   const as = o.paden.size >= o.bestanden.size * 2 && o.paden.size > 0 ? 'route'
     : (o.bestanden.size > 0 && o.bestanden.size >= o.paden.size ? 'bestand' : (o.paden.size ? 'route' : 'geen'));
-  perRegister.push({ register: f, as, paden: o.paden.size, bestanden: o.bestanden.size, paren: o.paren.length });
+  perRegister.push({ register: f, as: o.symbolen.size > o.paden.size ? 'symbool' : as, paden: o.paden.size, bestanden: o.bestanden.size, symbolen: o.symbolen.size, paren: o.paren.length });
   for (const p of o.paden) { if (!padNaarRegisters.has(p)) padNaarRegisters.set(p, new Set()); padNaarRegisters.get(p).add(f); }
   for (const b of o.bestanden) { if (!bestandNaarRegisters.has(b)) bestandNaarRegisters.set(b, new Set()); bestandNaarRegisters.get(b).add(f); }
+  for (const sy of o.symbolen) { if (!symboolNaarRegisters.has(sy)) symboolNaarRegisters.set(sy, new Set()); symboolNaarRegisters.get(sy).add(f); }
   for (const [p, b] of o.paren) { if (!brug.has(p)) brug.set(p, new Map()); const m = brug.get(p); if (!m.has(b)) m.set(b, new Set()); m.get(b).add(f); }
 }
 
@@ -108,7 +116,16 @@ for (const [p, m] of brug) {
 
 /* 4) Het bronbereik: hoeveel van de code die er ECHT staat, wordt door enig
       register genoemd? Dit is de eerlijke bovengrens van wat een Architect kan
-      beantwoorden zonder bron te lezen. */
+      beantwoorden zonder bron te lezen.
+
+      HET WORDT GESPLITST, en dat is geen detail. Toen de symboolas erbij kwam
+      (SYMBOLEN.json noemt elk bestand) sprong dit getal van 33% naar 100%, en
+      dan meet het zichzelf: een index van alles maakt elke dekkingsvraag
+      triviaal waar. Wat een index je geeft is STRUCTUUR -- welke functies er
+      wonen, wat een bestand uitvoert, wie ervan afhangt. Wat hij je niet geeft
+      is GEDRAG: of het klopt, wat het schrijft, of het bewezen is. Die tweede
+      vraag beantwoorden alleen de andere registers, en daarvoor blijft de
+      oude teller staan. */
 function bronBestanden(map) {
   const uit = [];
   (function loop(d) {
@@ -126,9 +143,15 @@ function bronBestanden(map) {
 const bronPerBoom = { server: bronBestanden('server'), public: bronBestanden('public') };
 const bron = [...bronPerBoom.server, ...bronPerBoom.public];
 const genoemd = bron.filter(b => bestandNaarRegisters.has(b));
+/* buiten de index: door minstens een register dat NIET louter een symboolindex is */
+const INDEXREGISTERS = new Set(perRegister.filter(r => r.as === 'symbool').map(r => r.register));
+const buitenIndex = b => [...(bestandNaarRegisters.get(b) || [])].some(r => !INDEXREGISTERS.has(r));
+const gedrag = bron.filter(buitenIndex);
 const perBoom = Object.entries(bronPerBoom).map(([boom, lijst]) => {
   const g = lijst.filter(b => bestandNaarRegisters.has(b)).length;
-  return { boom, bestanden: lijst.length, genoemd: g, pct: lijst.length ? Math.round(g / lijst.length * 1000) / 10 : 0 };
+  const gd = lijst.filter(buitenIndex).length;
+  return { boom, bestanden: lijst.length, genoemd: g, pct: lijst.length ? Math.round(g / lijst.length * 1000) / 10 : 0,
+    gedrag: gd, gedragPct: lijst.length ? Math.round(gd / lijst.length * 1000) / 10 : 0 };
 });
 
 /* 5) De symboolas. Nul is hier de uitkomst en geen fout: geen enkel register
@@ -171,11 +194,14 @@ try { commit = execSync('git rev-parse --short HEAD', { cwd: WORTEL }).toString(
 const uit = {
   uitleg: 'Kan er een canonieke Codewereld bestaan? Gemeten over de registers in de wortel: op welke as staan ze, hoeveel sleutels delen ze, en spreken ze elkaar tegen. Deze meter voegt niets samen en kiest bij tegenspraak geen winnaar.',
   stempel: { op: new Date().toISOString().slice(0, 10), commit },
-  registers: { geteld: registers.length, opRoute: perRegister.filter(r => r.as === 'route').length, opBestand: perRegister.filter(r => r.as === 'bestand').length, zonderAs: perRegister.filter(r => r.as === 'geen').length },
+  registers: { geteld: registers.length, opRoute: perRegister.filter(r => r.as === 'route').length, opBestand: perRegister.filter(r => r.as === 'bestand').length,
+    opSymbool: perRegister.filter(r => r.as === 'symbool').length, zonderAs: perRegister.filter(r => r.as === 'geen').length },
   assen: {
     route: { sleutels: padNaarRegisters.size, registers: perRegister.filter(r => r.paden > 0).length },
     bestand: { sleutels: bestandNaarRegisters.size, registers: perRegister.filter(r => r.bestanden > 0).length },
-    symbool: { sleutels: 0, registers: 0, reden: 'geen register draagt een functienaam met een plaats in een bestand', gereedschapAanwezig: astAanwezig, gereedschap: 'scripts/ast/ (eigen parser, met lijn- en positie-informatie)', proef: proef }
+    symbool: { sleutels: symboolNaarRegisters.size, registers: perRegister.filter(r => r.symbolen > 0).length,
+      reden: symboolNaarRegisters.size ? null : 'geen register draagt een functienaam met een plaats in een bestand',
+      gereedschapAanwezig: astAanwezig, gereedschap: 'scripts/ast/ (eigen parser, met lijn- en positie-informatie)', proef: proef }
   },
   ruggengraat: {
     paden: padNaarRegisters.size, inMeerDanEenRegister: inMeer,
@@ -196,15 +222,18 @@ const uit = {
     tegenspraakLijst: tegenspraken.slice(0, 25)
   },
   bronbereik: {
-    uitleg: 'hoeveel van de bronbestanden die er echt staan, worden door enig register genoemd -- de bovengrens van wat zonder bronlezing te beantwoorden is',
+    uitleg: 'twee getallen, met opzet. `genoemd` = door enig register (de symboolindex noemt alles, dus dit meet STRUCTUUR: welke functies, wat uitgevoerd, wie hangt ervan af). `gedrag` = door minstens een register buiten die index (schrijft het, is het bewezen, is het herhaalbaar). Alleen het tweede is de bovengrens voor een vraag over gedrag.',
     bestanden: bron.length, genoemd: genoemd.length,
     pct: bron.length ? Math.round(genoemd.length / bron.length * 1000) / 10 : 0,
+    gedrag: gedrag.length,
+    gedragPct: bron.length ? Math.round(gedrag.length / bron.length * 1000) / 10 : 0,
     perBoom,
     /* platte velden voor de levende getallen in de documenten (scripts/getallen.js
        leest een pad, geen lijst) */
-    serverPct: (perBoom.find(b => b.boom === 'server') || {}).pct,
-    publicPct: (perBoom.find(b => b.boom === 'public') || {}).pct,
-    nooitGenoemdVoorbeeld: bron.filter(b => !bestandNaarRegisters.has(b)).slice(0, 20)
+    serverPct: (perBoom.find(b => b.boom === 'server') || {}).gedragPct,
+    publicPct: (perBoom.find(b => b.boom === 'public') || {}).gedragPct,
+    nooitGenoemdVoorbeeld: bron.filter(b => !bestandNaarRegisters.has(b)).slice(0, 20),
+    zonderGedragVoorbeeld: bron.filter(b => !buitenIndex(b)).slice(0, 20)
   },
   noemers: {
     uitleg: 'elk register telt zijn eigen aantal routes. Wie ze samenvoegt kiest een noemer, en dat is een besluit -- geen afleiding (zelfde vondst als MUTATIEINVENTARIS.json).',
@@ -215,13 +244,15 @@ const uit = {
 
 fs.writeFileSync(path.join(WORTEL, 'CODEWERELD.json'), JSON.stringify(uit, null, 2) + '\n');
 console.log('CODEWERELD.json geschreven');
-console.log('  registers        ', uit.registers.geteld, '(route:', uit.registers.opRoute + ', bestand:', uit.registers.opBestand + ', geen as:', uit.registers.zonderAs + ')');
+console.log('  registers        ', uit.registers.geteld, '(route:', uit.registers.opRoute + ', bestand:', uit.registers.opBestand + ', symbool:', uit.registers.opSymbool + ', geen as:', uit.registers.zonderAs + ')');
 console.log('  as route         ', uit.assen.route.sleutels, 'paden in', uit.assen.route.registers, 'registers');
 console.log('  as bestand       ', uit.assen.bestand.sleutels, 'bestanden in', uit.assen.bestand.registers, 'registers');
-console.log('  as symbool       ', uit.assen.symbool.sleutels, '(' + uit.assen.symbool.reden + ')');
+console.log('  as symbool       ', uit.assen.symbool.sleutels, 'symbolen in', uit.assen.symbool.registers, 'register(s)',
+  uit.assen.symbool.reden ? '(' + uit.assen.symbool.reden + ')' : '');
 if (proef.gedraaid) console.log('    proef          ', proef.geparsed + '/' + proef.bestanden, 'bestanden geparsed,', proef.gefaald, 'gefaald,', proef.symbolen, 'symbolen in', proef.seconden + 's');
 console.log('  ruggengraat      ', uit.ruggengraat.inMeerDanEenRegister + '/' + uit.ruggengraat.paden, 'paden in meer dan een register =', uit.ruggengraat.pct + '%');
 console.log('  brug route->best.', uit.brug.paden, 'paden uit', uit.brug.registersDieSpreken.length, 'register(s); tegenspraak:', uit.brug.tegenspraken,
   '(getoetst op ' + uit.brug.tegenspraakToetsbaar + ' paden = ' + uit.brug.tegenspraakDekkingPct + '%; de rest rust op een enkel register)');
-console.log('  bronbereik       ', uit.bronbereik.genoemd + '/' + uit.bronbereik.bestanden, '=', uit.bronbereik.pct + '%',
-  '(' + perBoom.map(b => b.boom + ' ' + b.pct + '%').join(', ') + ')');
+console.log('  bronbereik struct', uit.bronbereik.genoemd + '/' + uit.bronbereik.bestanden, '=', uit.bronbereik.pct + '%  (welke functies, wie hangt ervan af)');
+console.log('  bronbereik gedrag', uit.bronbereik.gedrag + '/' + uit.bronbereik.bestanden, '=', uit.bronbereik.gedragPct + '%',
+  '(' + perBoom.map(b => b.boom + ' ' + b.gedragPct + '%').join(', ') + ')');

@@ -23,16 +23,17 @@ gevonden. Dus eerst meten — `npm run codewereld`, uitslag in `CODEWERELD.json`
 
 | Wat | Uitslag |
 |---|---|
-| Registers in de wortel | <!--getal:codewereld.registers-->77<!--/getal--> (37 op route, 31 op bestand, 9 zonder as) |
+| Registers in de wortel | <!--getal:codewereld.registers-->78<!--/getal--> (37 op route, 31 op bestand, 1 op symbool, 9 zonder as) |
 | As **route** | 5709 paden, in 42 registers |
 | As **bestand** | 1457 bestanden, in 54 registers |
-| As **symbool** | **0** — geen register kent een functienaam met een plaats |
+| As **symbool** | <!--getal:codewereld.symboolSleutels-->19503<!--/getal--> symbolen — *stond op 0 tot 3 september 2026, zie §0.2* |
 | Ruggengraat | **<!--getal:codewereld.ruggengraat-->4912<!--/getal--> van <!--getal:codewereld.paden-->5709<!--/getal--> paden (<!--getal:codewereld.ruggengraatPct-->86<!--/getal-->%) staan in meer dan één register** |
 | Brug route → bestand | <!--getal:codewereld.brugPaden-->4444<!--/getal--> paden, uit **2** registers |
 | Tegenspraak in die brug | 0 — maar getoetst op <!--getal:codewereld.brugToetsbaar-->32<!--/getal--> paden (**<!--getal:codewereld.brugDekkingPct-->0.7<!--/getal-->%**) |
-| Bronbereik | **<!--getal:codewereld.bronGenoemd-->1314<!--/getal--> van <!--getal:codewereld.bronBestanden-->3987<!--/getal--> bronbestanden (<!--getal:codewereld.bronPct-->33<!--/getal-->%)** wordt door enig register genoemd |
-| — daarvan `server/` | <!--getal:codewereld.bronServerPct-->41.3<!--/getal-->% |
-| — daarvan `public/` | <!--getal:codewereld.bronPublicPct-->6.6<!--/getal-->% |
+| Bronbereik **structuur** | <!--getal:codewereld.bronGenoemd-->3987<!--/getal--> van <!--getal:codewereld.bronBestanden-->3987<!--/getal--> (<!--getal:codewereld.bronPct-->100<!--/getal-->%) — welke functies er wonen, wie ervan afhangt |
+| Bronbereik **gedrag** | **<!--getal:codewereld.bronGedrag-->1314<!--/getal--> van 3987 (<!--getal:codewereld.bronGedragPct-->33<!--/getal-->%)** — schrijft het, is het bewezen, is het herhaalbaar |
+| — gedrag in `server/` | <!--getal:codewereld.bronServerPct-->41.3<!--/getal-->% |
+| — gedrag in `public/` | <!--getal:codewereld.bronPublicPct-->6.6<!--/getal-->% |
 
 Vier dingen volgen daaruit, en ze zijn belangrijker dan het plan zelf.
 
@@ -40,10 +41,12 @@ Vier dingen volgen daaruit, en ze zijn belangrijker dan het plan zelf.
 meer dan één register: er is een echte ruggengraat, geen verzameling losse
 lenzen. Dat is de sterkste uitslag hier.
 
-**Het voorbeeldobject uit het voorstel bestaat vandaag niet.** `pay.boeken` met
-`source.bestand` én `source.symbol` veronderstelt een symboolas, en die is nul.
-Niet moeilijk — **nul**. Wie het model dat objectformaat belooft, belooft een
-veld dat geen enkele meter vult.
+**Het voorbeeldobject uit het voorstel bestond niet — en bestaat nu wel.**
+`pay.boeken` met `source.bestand` én `source.symbol` veronderstelt een
+symboolas, en die stond op **nul**: geen enkele meter vulde dat veld. Sinds
+3 september 2026 vult `SYMBOLEN.json` hem (§0.2). De volgorde is hier het punt:
+eerst meten dat de as ontbrak, dan hem bouwen — niet een objectformaat beloven
+en er daarna een meter bij zoeken.
 
 **"0 tegenspraken" is hier geen groen.** De brug tussen route en bestand rust op
 één register (`SCHRIJFANALYSE.json`, met `MUTATIESEMANTIEK.json` voor 35 paden).
@@ -51,7 +54,7 @@ Over 0,7% van de paden viel er iets te vergelijken, en daar klopte het. Over de
 rest spreekt niemand tegen, omdat er niemand tweede is. De meter zegt daarom
 `niet vast te stellen` en geen `0` — dezelfde regel als in `BESTUUR.md`.
 
-**De belofte "80–95% zonder bron te beantwoorden" haalt vandaag <!--getal:codewereld.bronPct-->33<!--/getal-->%.** Tweederde
+**De belofte "80–95% zonder bron te beantwoorden" haalt vandaag <!--getal:codewereld.bronGedragPct-->33<!--/getal-->%.** Tweederde
 van de bronbestanden wordt door geen enkel register genoemd — `server/accounts/`
 vrijwel volledig, de hele `server/ai-*`-familie. Dat is de eerlijke bovengrens
 van een Architect die alleen registers leest. Niet omdat de meters slecht zijn,
@@ -61,9 +64,9 @@ En dat ene percentage verbergt nog iets, dus het staat gesplitst: `server/` haal
 <!--getal:codewereld.bronServerPct-->41.3<!--/getal-->%, `public/` haalt <!--getal:codewereld.bronPublicPct-->6.6<!--/getal-->%. Over de schermen weten de registers dus
 vrijwel niets. Een Architect die gevraagd wordt waarom een knop niet werkt, staat
 meteen op niveau 3 van de ladder hieronder — bij de bron. Wie het gemengde getal
-van <!--getal:codewereld.bronPct-->33<!--/getal-->% aanhoudt, plant voor een dekking die aan de voorkant niet bestaat.
+van <!--getal:codewereld.bronGedragPct-->33<!--/getal-->% aanhoudt, plant voor een dekking die aan de voorkant niet bestaat.
 
-### 0.1 Wat wél al bewezen is: de symboolas is bouwbaar
+### 0.1 De symboolas was bouwbaar, en is beproefd vóór hij gebouwd werd
 
 "Bouwbaar" is zelf een bewering, dus die is beproefd en niet beloofd. De eigen
 parser in `scripts/ast/` (lexer, recursive-descent parser, walker — geen enkele
@@ -77,6 +80,47 @@ plaats van stil over te slaan (`parser.js`: *"wat de parser NIET begrijpt is een
 harde fout"*). Een symboolas met onzichtbare gaten kan hier dus niet ontstaan.
 En bij enkele seconden voor de hele boom is de incrementele herbouw uit punt 17 van
 het voorstel voorlopig een oplossing voor een probleem dat niemand heeft.
+
+### 0.2 De symboolas staat (3 september 2026)
+
+`scripts/symbolen.js` → `SYMBOLEN.json` (`npm run symbolen`):
+
+**<!--getal:symbolen.gelezen-->3684<!--/getal--> bestanden gelezen, <!--getal:symbolen.totaal-->19638<!--/getal--> benoemde symbolen met een regelnummer,
+<!--getal:symbolen.kanten-->4727<!--/getal--> require-kanten** — heen (waar hang ik van af) én terug (wie hangt van
+mij af). Die tweede richting is de dure kant om met de hand te zoeken, en precies
+wat een impactvraag nodig heeft.
+
+<!--getal:symbolen.nietGelezen-->303<!--/getal--> bestanden zijn **niet** gelezen, en die staan in het register met hun
+reden: alle <!--getal:symbolen.bundeldeel-->303<!--/getal--> zijn bundeldelen (`public/apps/<naam>/`), fragmenten die middenin een
+functie beginnen en pas samengevoegd een programma vormen. Echte parsefouten:
+<!--getal:symbolen.parsefout-->0<!--/getal--> — en elke andere waarde dan nul laat het script met een foutcode
+eindigen, want een parsefout búiten een bundeldeel is een bevinding en geen ruis.
+
+Drie dingen doet dit register met opzet niet, en ze staan er ook in:
+
+1. **Het raadt geen aanroeper.** Een naam in aanroeppositie is een naam, geen
+   verwijzing — twee bestanden mogen allebei een `bouw()` hebben. De kanten hier
+   zijn require-kanten, want die wijzen naar een bestand dat bestaat. De
+   symbool-naar-symboolgraaf is een volgende stap en staat er niet als halve
+   waarheid.
+2. **Het slaat niets stil over.** Zie de 303 hierboven.
+3. **Het beweert niets over routes.** Welk symbool ín een bestand een route
+   afhandelt, is niet gemeten en wordt dus niet gesuggereerd.
+
+Eén detail dat er bijna stil verkeerd in ging, en dat overal elders net zo geldt:
+`module.exports` kent **drie** standen, niet twee. Een bestand dat
+`module.exports = (kern) => {...}` doet, exporteert wel degelijk iets maar zonder
+namen — dat als een lege lijst noteren leest als "exporteert niets", en dat is
+onwaar voor <!--getal:symbolen.uitvoerZonderNamen-->2019<!--/getal--> bestanden hier. Het register draagt daarom de vórm
+(`object`, `functie`, `anders`), en `geexporteerd` staat per symbool op
+`onbekend` in plaats van op een vals `nee`.
+
+En één ding dat het meten meteen opleverde: toen deze as erbij kwam sprong het
+bronbereik van 33% naar 100%, want een index noemt élk bestand. Dat getal mat
+toen zichzelf. Het staat daarom gesplitst in **structuur** (welke functies wonen
+hier, wie hangt ervan af — nu 100%) en **gedrag** (schrijft het, is het bewezen —
+onveranderd <!--getal:codewereld.bronGedragPct-->33<!--/getal-->%). Een index van alles maakt elke dekkingsvraag triviaal
+waar; alleen de tweede teller zegt nog iets.
 
 ---
 
@@ -164,15 +208,17 @@ sleutels, geen productiegegevens, en een dak op wat er per vraag uit mag.
 
 | Onderdeel | Stand |
 |---|---|
-| Deterministische code-analyse | **staat** — 77 registers, alle uit `scripts/`, geen model |
-| Scheiding runtime ↔ bron | **staat**, en sinds nu afgedwongen (`test/codegrens.test.js`) |
-| Ruggengraat op route | **staat** — 86%, gemeten |
-| Codewereld als één object | **een stap weg** op route + bestand; de symboolas moet eerst bestaan |
+| Deterministische code-analyse | **staat** — <!--getal:codewereld.registers-->78<!--/getal--> registers, alle uit `scripts/`, geen model |
+| Scheiding runtime ↔ bron | **staat**, en afgedwongen (`test/codegrens.test.js`) |
+| Ruggengraat op route | **staat** — <!--getal:codewereld.ruggengraatPct-->86<!--/getal-->%, gemeten |
+| Symboolas | **staat** — `SYMBOLEN.json`, §0.2 |
+| Codewereld als één object | **een stap weg** — de drie assen bestaan; de brug ertussen rust nog op één bron |
 | Code Resolver | **een stap weg** — `kern/stuur/resolver.js` is er het model voor, mét zijn dekkingsmeter |
-| Impactmap / blast radius | **een stap weg** — `EXECUTION_MAP.json` is de helft ervan |
-| Architect-AI | **vraagt een besluit** — zie §6 |
-| Bronfragment-broker | **vraagt een besluit** |
-| Hypothese → meter → bewijs | **vraagt een besluit** (zie hieronder) |
+| Impactmap / blast radius | **een stap weg** — `EXECUTION_MAP.json` plus de omgekeerde require-graaf uit `SYMBOLEN.json` |
+| Architect-AI | **besloten, nog niet gebouwd** — read-only, na de twee gaten in §7 |
+| Bronfragment-broker | **besloten** — alleen lokaal (`LOCAL_AI_URL`), nog niet gebouwd |
+| Hypothese → meter → bewijs | **besloten** — een mens tekent af, zie §7 en hieronder |
+| Symbool-naar-symboolgraaf | **een stap weg**, met opzet niet meegenomen — zie §0.2 |
 | Testsynthese, patchvoorstellen | **jaren weg** |
 | Code-time-travel | **jaren weg**, maar goedkoper dan het lijkt: registers dragen al een `stempel.commit` |
 | Content-addressed caching | **niet doen, nog niet** — zie hieronder |
@@ -220,18 +266,45 @@ stil oplost, verkoopt een percentage tussen twee verschillende noemers.
 
 ---
 
-## 7. Wat een besluit van de eigenaar vraagt
+## 7. De besluiten (genomen 3 september 2026)
 
-1. **Komt de Architect er?** Niet "mag AI code lezen" maar: er komt een tweede
-   interne AI met een eigen vertrouwensdomein, en die is niet gratis in
-   onderhoud.
-2. **Wordt de symboolas gebouwd?** Bewezen haalbaar (4,8s, 0 fouten). Zonder
-   hem blijft de Codewereld op routeniveau en is het bronbereik 33%.
-3. **Mag een bronfragment naar een model?** Ook met een broker verlaat er dan
-   eigen code het huis, tenzij het via `LOCAL_AI_URL` gaat. Dat is dezelfde
-   vraag als bij `RTG_EXTERNE_AI_UIT`, maar nu over onze eigen bron.
-4. **Wie tekent een gegenereerde meter af** voordat hij bewijs mag promoveren?
+Vier vragen lagen bij de eigenaar. Alle vier zijn beantwoord.
 
-De eerste twee zijn goedkoop en omkeerbaar. De derde is een merkbesluit en geen
-technisch besluit. De vierde hoort beantwoord vóór punt 15 gebouwd wordt, niet
-erna.
+**1. De symboolas wordt gebouwd.** *Uitgevoerd* — §0.2. Hij draait in `scripts/`,
+raakt `server/` niet, en is dus omkeerbaar: een register weggooien kan.
+
+**2. Er komt een Architect, read-only, en pas na de symboolas.** Eigen
+vertrouwensdomein: hij leest de Codewereld en bedient nooit productie. Dat "pas
+na" is geen volgorde uit netheid — een Architect die tweederde van de code niet
+kan zien, vult dat gat met aannames, en grens 3 verbiedt precies dat. Hij is er
+dus nog niet: wat er nu staat is de wereld waarin hij straks leest.
+
+**3. Een bronfragment gaat alleen naar een lokaal model.** Eigen code verlaat het
+huis niet. De broker mag dus alleen praten met `LOCAL_AI_URL`; zonder lokaal
+model werkt de Architect niet, en dat is de bedoelde uitkomst en geen storing.
+`RTG_EXTERNE_AI_UIT=1` bestond al voor gebruikersdata — dit is dezelfde regel,
+nu over onze bron. Wie hier later een uitzondering op wil, neemt een merkbesluit
+en geen technisch besluit: dit is niet terug te draaien nadat het één keer is
+gebeurd.
+
+**4. Een gegenereerde meter wordt door een mens afgetekend, en promoveert tot
+die tijd niets.** Hij mag draaien en melden; zijn uitslag wordt geen register
+voordat iemand hem heeft gelezen. Dat sluit het gat in punt 15: een meter die
+zijn eigen hypothese bevestigt is geen bewijs. Het overwogen alternatief — een
+meter telt zodra hij eerst rood gaf op de huidige code — is afgevallen omdat de
+meter dan zelf zijn tegenvoorbeeld kiest.
+
+### Wat daarmee de eerstvolgende stap is
+
+Niet de Architect. Eerst de twee gaten die besluit 2 blokkeren, in deze volgorde:
+
+1. **Een tweede bron voor de brug route → bestand.** Nu <!--getal:codewereld.brugDekkingPct-->0.7<!--/getal-->% toetsbaar. Met de
+   symboolas erbij is die tweede bron dichterbij: een routebestand kent nu zijn
+   symbolen, dus een onafhankelijke afleiding is te maken en tegen
+   `SCHRIJFANALYSE.json` te leggen. Pas dan betekent "0 tegenspraken" iets.
+2. **Gedragsdekking van `public/`,** nu <!--getal:codewereld.bronPublicPct-->6.6<!--/getal-->%. Zolang die zo laag is, is elke
+   vraag over een scherm meteen een bronvraag — en dus meteen niveau 3.
+
+De symbool-naar-symboolgraaf is een derde stap en geen eerste: hij is pas
+betrouwbaar te maken als require-kanten en uitvoernamen kloppen, en die staan er
+nu.

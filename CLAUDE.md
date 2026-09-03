@@ -961,19 +961,31 @@ in plaats van aangenomen -- zelfde reden als bij `Asset`: <!--getal:codewereld.r
 <!--getal:codewereld.paden-->5709<!--/getal--> paden staan in meer dan één register, dus er IS een ruggengraat, maar hij
 loopt over de as ROUTE. De as SYMBOOL is **nul** -- geen register kent een
 functienaam met een plaats, dus het objectvoorbeeld `pay.boeken` met een
-`symbol`-veld belooft iets wat geen enkele meter vult. Bouwbaar is het wel, en
-dat is beproefd en niet beloofd: de eigen parser in `scripts/ast/` haalt
-<!--getal:codewereld.geparsed-->3027<!--/getal--> serverbestanden met <!--getal:codewereld.parseFout-->0<!--/getal--> fouten en <!--getal:codewereld.symbolen-->13832<!--/getal--> symbolen in
-enkele seconden. Twee dingen daar niet wegpoetsen: de brug route -> bestand rust
+`symbol`-veld belooft iets wat geen enkele meter vult. Die as is
+inmiddels GEBOUWD (`npm run symbolen`, `SYMBOLEN.json`): <!--getal:symbolen.totaal-->19638<!--/getal--> benoemde symbolen
+met een regelnummer en <!--getal:symbolen.kanten-->4727<!--/getal--> require-kanten heen en terug, met de eigen parser
+en <!--getal:symbolen.parsefout-->0<!--/getal--> parsefouten. De <!--getal:symbolen.nietGelezen-->303<!--/getal--> niet-gelezen bestanden staan er MET reden in
+(bundeldelen die pas samengevoegd een programma vormen) -- weglaten zou ze
+onzichtbaar maken. Wat hij met opzet niet doet: aanroepers raden (een naam in
+aanroeppositie is geen verwijzing), en iets beweren over welk symbool een route
+afhandelt. Twee dingen daar niet wegpoetsen: de brug route -> bestand rust
 op ÉÉN register, dus de nul tegenspraken erin is `niet vast te stellen` en geen
 groen (getoetst op <!--getal:codewereld.brugDekkingPct-->0.7<!--/getal-->% van de paden), en het bronbereik is
-<!--getal:codewereld.bronPct-->33<!--/getal-->% -- tweederde van de bronbestanden wordt door geen enkel register
+<!--getal:codewereld.bronGedragPct-->33<!--/getal-->% -- tweederde van de bronbestanden wordt door geen enkel register
 genoemd, dus een "80-95% zonder bron te beantwoorden" haalt die grens vandaag
 niet -- en dat ene getal verbergt nog iets, want `server/` haalt
 <!--getal:codewereld.bronServerPct-->41.3<!--/getal-->% en `public/` <!--getal:codewereld.bronPublicPct-->6.6<!--/getal-->%: over de schermen weten de registers
 vrijwel niets. De regel die het geheel draagt: **AI mag betekenis voorstellen, alleen
 deterministische systemen mogen waarheid vaststellen** -- een modelbevinding
-wordt dus nooit een register.
+wordt dus nooit een register. **De vier besluiten zijn genomen (3 september
+2026)** en staan in par. 7: de symboolas is gebouwd, er komt een read-only
+Architect maar pas na de twee gaten die hem blind zouden houden, een bronfragment
+gaat alleen naar een LOKAAL model (`LOCAL_AI_URL` -- eigen code verlaat het huis
+niet), en een gegenereerde meter wordt door een mens afgetekend en promoveert tot
+die tijd niets. Let bij het lezen op de gesplitste teller: toen de symboolas erbij
+kwam sprong het bronbereik naar 100%, want een index noemt elk bestand. Structuur
+(welke functies wonen hier) en gedrag (schrijft het, is het bewezen) staan daarom
+apart, en alleen die tweede zegt nog iets.
 
 **`LAT.md` is de technische lat** — elf regels die allemaal uit een fout komen die hier écht is gemaakt, met per regel wat hem handhaaft en waar er alleen op mensen wordt vertrouwd. Lees die vóór je code schrijft of repareert. De belangrijkste twee: repareer de oorzaak en niet het symptoom, en trek elke bewering na met een mutatie (een toets die je niet hebt zien zakken is geen toets). LAT.md gaat over de code, CLAUDE.md over het merk.
 

@@ -2,12 +2,13 @@
   "uitleg": "Kan er een canonieke Codewereld bestaan? Gemeten over de registers in de wortel: op welke as staan ze, hoeveel sleutels delen ze, en spreken ze elkaar tegen. Deze meter voegt niets samen en kiest bij tegenspraak geen winnaar.",
   "stempel": {
     "op": "2026-09-03",
-    "commit": "d09f29a4"
+    "commit": "e19d50d7"
   },
   "registers": {
-    "geteld": 77,
+    "geteld": 78,
     "opRoute": 37,
     "opBestand": 31,
+    "opSymbool": 1,
     "zonderAs": 9
   },
   "assen": {
@@ -16,13 +17,13 @@
       "registers": 42
     },
     "bestand": {
-      "sleutels": 1457,
-      "registers": 54
+      "sleutels": 4133,
+      "registers": 55
     },
     "symbool": {
-      "sleutels": 0,
-      "registers": 0,
-      "reden": "geen register draagt een functienaam met een plaats in een bestand",
+      "sleutels": 19503,
+      "registers": 1,
+      "reden": null,
       "gereedschapAanwezig": true,
       "gereedschap": "scripts/ast/ (eigen parser, met lijn- en positie-informatie)",
       "proef": {
@@ -32,7 +33,7 @@
         "gefaald": 0,
         "gefaaldLijst": [],
         "symbolen": 13832,
-        "seconden": 4.7
+        "seconden": 4.6
       }
     }
   },
@@ -149,27 +150,34 @@
     "tegenspraakLijst": []
   },
   "bronbereik": {
-    "uitleg": "hoeveel van de bronbestanden die er echt staan, worden door enig register genoemd -- de bovengrens van wat zonder bronlezing te beantwoorden is",
+    "uitleg": "twee getallen, met opzet. `genoemd` = door enig register (de symboolindex noemt alles, dus dit meet STRUCTUUR: welke functies, wat uitgevoerd, wie hangt ervan af). `gedrag` = door minstens een register buiten die index (schrijft het, is het bewezen, is het herhaalbaar). Alleen het tweede is de bovengrens voor een vraag over gedrag.",
     "bestanden": 3987,
-    "genoemd": 1314,
-    "pct": 33,
+    "genoemd": 3987,
+    "pct": 100,
+    "gedrag": 1314,
+    "gedragPct": 33,
     "perBoom": [
       {
         "boom": "server",
         "bestanden": 3027,
-        "genoemd": 1251,
-        "pct": 41.3
+        "genoemd": 3027,
+        "pct": 100,
+        "gedrag": 1251,
+        "gedragPct": 41.3
       },
       {
         "boom": "public",
         "bestanden": 960,
-        "genoemd": 63,
-        "pct": 6.6
+        "genoemd": 960,
+        "pct": 100,
+        "gedrag": 63,
+        "gedragPct": 6.6
       }
     ],
     "serverPct": 41.3,
     "publicPct": 6.6,
-    "nooitGenoemdVoorbeeld": [
+    "nooitGenoemdVoorbeeld": [],
+    "zonderGedragVoorbeeld": [
       "server/accounts/demohash.js",
       "server/accounts/dossier.js",
       "server/accounts/gebonden.js",
@@ -299,6 +307,7 @@
       "as": "route",
       "paden": 4441,
       "bestanden": 604,
+      "symbolen": 0,
       "paren": 4643
     },
     {
@@ -306,6 +315,7 @@
       "as": "route",
       "paden": 4835,
       "bestanden": 0,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -313,6 +323,7 @@
       "as": "route",
       "paden": 4735,
       "bestanden": 1,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -320,6 +331,7 @@
       "as": "route",
       "paden": 4729,
       "bestanden": 4,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -327,6 +339,7 @@
       "as": "route",
       "paden": 4729,
       "bestanden": 1,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -334,6 +347,7 @@
       "as": "route",
       "paden": 4726,
       "bestanden": 1,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -341,6 +355,7 @@
       "as": "route",
       "paden": 4717,
       "bestanden": 1,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -348,6 +363,7 @@
       "as": "route",
       "paden": 4584,
       "bestanden": 1,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -355,6 +371,7 @@
       "as": "route",
       "paden": 4446,
       "bestanden": 1,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -362,6 +379,7 @@
       "as": "route",
       "paden": 4413,
       "bestanden": 1,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -369,6 +387,15 @@
       "as": "route",
       "paden": 4172,
       "bestanden": 0,
+      "symbolen": 0,
+      "paren": 0
+    },
+    {
+      "register": "SYMBOLEN.json",
+      "as": "symbool",
+      "paden": 0,
+      "bestanden": 3992,
+      "symbolen": 19503,
       "paren": 0
     },
     {
@@ -376,6 +403,7 @@
       "as": "route",
       "paden": 3910,
       "bestanden": 1,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -383,6 +411,7 @@
       "as": "route",
       "paden": 3891,
       "bestanden": 1,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -390,6 +419,7 @@
       "as": "route",
       "paden": 3805,
       "bestanden": 0,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -397,6 +427,7 @@
       "as": "route",
       "paden": 3638,
       "bestanden": 1,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -404,6 +435,7 @@
       "as": "route",
       "paden": 3636,
       "bestanden": 1,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -411,6 +443,7 @@
       "as": "route",
       "paden": 3635,
       "bestanden": 1,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -418,6 +451,7 @@
       "as": "route",
       "paden": 3246,
       "bestanden": 1,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -425,6 +459,7 @@
       "as": "route",
       "paden": 1705,
       "bestanden": 1,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -432,6 +467,7 @@
       "as": "route",
       "paden": 1026,
       "bestanden": 0,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -439,6 +475,7 @@
       "as": "route",
       "paden": 627,
       "bestanden": 13,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -446,6 +483,7 @@
       "as": "route",
       "paden": 529,
       "bestanden": 0,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -453,6 +491,7 @@
       "as": "route",
       "paden": 405,
       "bestanden": 1,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -460,6 +499,7 @@
       "as": "bestand",
       "paden": 0,
       "bestanden": 343,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -467,6 +507,7 @@
       "as": "bestand",
       "paden": 6,
       "bestanden": 242,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -474,6 +515,7 @@
       "as": "bestand",
       "paden": 0,
       "bestanden": 237,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -481,6 +523,7 @@
       "as": "bestand",
       "paden": 37,
       "bestanden": 123,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -488,6 +531,7 @@
       "as": "route",
       "paden": 128,
       "bestanden": 0,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -495,6 +539,7 @@
       "as": "route",
       "paden": 94,
       "bestanden": 0,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -502,6 +547,7 @@
       "as": "route",
       "paden": 94,
       "bestanden": 0,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -509,6 +555,7 @@
       "as": "route",
       "paden": 88,
       "bestanden": 1,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -516,6 +563,7 @@
       "as": "bestand",
       "paden": 0,
       "bestanden": 81,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -523,6 +571,7 @@
       "as": "route",
       "paden": 75,
       "bestanden": 0,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -530,6 +579,7 @@
       "as": "bestand",
       "paden": 0,
       "bestanden": 53,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -537,6 +587,7 @@
       "as": "route",
       "paden": 49,
       "bestanden": 1,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -544,6 +595,7 @@
       "as": "route",
       "paden": 35,
       "bestanden": 4,
+      "symbolen": 0,
       "paren": 35
     },
     {
@@ -551,6 +603,7 @@
       "as": "bestand",
       "paden": 2,
       "bestanden": 37,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -558,6 +611,7 @@
       "as": "bestand",
       "paden": 0,
       "bestanden": 28,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -565,6 +619,7 @@
       "as": "bestand",
       "paden": 0,
       "bestanden": 26,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -572,6 +627,7 @@
       "as": "route",
       "paden": 22,
       "bestanden": 2,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -579,6 +635,7 @@
       "as": "route",
       "paden": 17,
       "bestanden": 0,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -586,6 +643,7 @@
       "as": "bestand",
       "paden": 0,
       "bestanden": 13,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -593,6 +651,7 @@
       "as": "bestand",
       "paden": 0,
       "bestanden": 13,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -600,6 +659,7 @@
       "as": "bestand",
       "paden": 0,
       "bestanden": 13,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -607,6 +667,7 @@
       "as": "bestand",
       "paden": 0,
       "bestanden": 8,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -614,6 +675,7 @@
       "as": "bestand",
       "paden": 0,
       "bestanden": 7,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -621,6 +683,7 @@
       "as": "route",
       "paden": 6,
       "bestanden": 0,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -628,6 +691,7 @@
       "as": "bestand",
       "paden": 0,
       "bestanden": 5,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -635,6 +699,7 @@
       "as": "route",
       "paden": 5,
       "bestanden": 0,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -642,6 +707,7 @@
       "as": "bestand",
       "paden": 0,
       "bestanden": 5,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -649,6 +715,7 @@
       "as": "bestand",
       "paden": 0,
       "bestanden": 5,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -656,6 +723,7 @@
       "as": "bestand",
       "paden": 0,
       "bestanden": 5,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -663,6 +731,7 @@
       "as": "bestand",
       "paden": 0,
       "bestanden": 4,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -670,6 +739,7 @@
       "as": "bestand",
       "paden": 0,
       "bestanden": 4,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -677,6 +747,7 @@
       "as": "bestand",
       "paden": 0,
       "bestanden": 3,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -684,6 +755,7 @@
       "as": "route",
       "paden": 2,
       "bestanden": 1,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -691,6 +763,7 @@
       "as": "route",
       "paden": 2,
       "bestanden": 0,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -698,6 +771,7 @@
       "as": "bestand",
       "paden": 1,
       "bestanden": 1,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -705,6 +779,7 @@
       "as": "bestand",
       "paden": 1,
       "bestanden": 1,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -712,6 +787,7 @@
       "as": "bestand",
       "paden": 0,
       "bestanden": 1,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -719,6 +795,7 @@
       "as": "bestand",
       "paden": 0,
       "bestanden": 1,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -726,6 +803,7 @@
       "as": "bestand",
       "paden": 0,
       "bestanden": 1,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -733,6 +811,7 @@
       "as": "bestand",
       "paden": 0,
       "bestanden": 1,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -740,6 +819,7 @@
       "as": "bestand",
       "paden": 0,
       "bestanden": 1,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -747,6 +827,7 @@
       "as": "route",
       "paden": 1,
       "bestanden": 0,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -754,6 +835,7 @@
       "as": "bestand",
       "paden": 0,
       "bestanden": 1,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -761,6 +843,7 @@
       "as": "bestand",
       "paden": 0,
       "bestanden": 1,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -768,6 +851,7 @@
       "as": "bestand",
       "paden": 0,
       "bestanden": 1,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -775,6 +859,7 @@
       "as": "geen",
       "paden": 0,
       "bestanden": 0,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -782,6 +867,7 @@
       "as": "geen",
       "paden": 0,
       "bestanden": 0,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -789,6 +875,7 @@
       "as": "geen",
       "paden": 0,
       "bestanden": 0,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -796,6 +883,7 @@
       "as": "geen",
       "paden": 0,
       "bestanden": 0,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -803,6 +891,7 @@
       "as": "geen",
       "paden": 0,
       "bestanden": 0,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -810,6 +899,7 @@
       "as": "geen",
       "paden": 0,
       "bestanden": 0,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -817,6 +907,7 @@
       "as": "geen",
       "paden": 0,
       "bestanden": 0,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -824,6 +915,7 @@
       "as": "geen",
       "paden": 0,
       "bestanden": 0,
+      "symbolen": 0,
       "paren": 0
     },
     {
@@ -831,6 +923,7 @@
       "as": "geen",
       "paden": 0,
       "bestanden": 0,
+      "symbolen": 0,
       "paren": 0
     }
   ]

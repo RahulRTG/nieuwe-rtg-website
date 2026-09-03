@@ -54,6 +54,13 @@ const GEISOLEERD = [
      binnenkomt. Alle drie staan in een finally terug; alle drie zijn ze in die
      halve seconde het bestand dat een startende server leest. */
   'handeling-massa.test.js',
+  /* En de zevende, gevonden door dezelfde zeef: stempel.test.js zet een echt
+     bestand in server/kern/ neer om te bewijzen dat de boom er vuil van wordt.
+     Dat bestand is een halve seconde lang gewoon broncode voor iedereen die op
+     dat moment een server start -- precies waar deze lijst voor is. Hij ruimt
+     het in een finally op, en dat is hier geen verzachting maar de reden dat
+     niemand hem eerder betrapte. */
+  'stempel.test.js',
   /* En de zesde (TAKEN.md 4.67): wachtwijze.test.js zet een `waitUntil` in twee
      echte schermtoetsen om en haalt het woord `load` uit een reden, om te
      bewijzen dat de meter zakt. Allebei in een finally terug -- en juist die

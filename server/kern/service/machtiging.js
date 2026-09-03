@@ -77,7 +77,8 @@ module.exports = function maakMachtigingen({ db, save, crypto, zaken, inzagelog 
     const r = schoon(reden, 300);
     if (inhoud(r) < 10) return { status: 400, error: 'Noteer waarom dit nodig is voor deze zaak. Het lid kan die reden later opvragen.' };
 
-    const mag = router.benodigd(binnenTeam || z.team);
+    // nooit breder dan wat het lid heeft gelezen; zie ./teams.js
+    const mag = router.teVragen(binnenTeam || z.team);
     const gevraagd = (Array.isArray(capabilities) ? capabilities : []).map(c => schoon(c, 60)).filter(Boolean);
     if (!gevraagd.length) return { status: 400, error: 'Zeg wat u nodig heeft. Een machtiging zonder inhoud opent niets.' };
     let gekregen = gevraagd.filter(c => mag.includes(c));

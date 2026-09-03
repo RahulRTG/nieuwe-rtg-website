@@ -75,13 +75,20 @@ module.exports = function maakBevestiging({ db, save, crypto, zaken, machtiginge
        Het team gaat mee, zodat ./machtiging.js straks tegen DEZELFDE grens
        versmalt als hier getoond. Verruimen kan niet: het blijft
        `router.benodigd()` van een echt team. */
-    const mag = router.benodigd(z.team);
+    /* `teVragen` en niet `benodigd`: wat de ZETEL al verleent hoort niet in een
+       bevestiging (./teams.js legt uit wat dat kostte). */
+    const mag = router.teVragen(z.team);
     const gevraagd = (Array.isArray(capabilities) ? capabilities : []).map(c => schoon(c, 60)).filter(Boolean);
     const gekregen = gevraagd.filter(c => mag.includes(c));
     if (!gekregen.length) {
-      return { status: 403, geweigerd: gevraagd,
-        error: 'Het team ' + z.team + ' heeft dit niet nodig voor deze zaak. Zet de zaak eerst door ' +
-          'naar het team dat het wel mag; vraag het lid daarna pas om te bevestigen.' };
+      /* De weigering noemt WAT er dan wel te vragen valt: "dit mag niet" is een
+         raadsel voor wie net op een knop drukte die het scherm hem aanbood. */
+      return { status: 403, geweigerd: gevraagd, teVragen: mag,
+        error: mag.length
+          ? 'Dat heeft team ' + z.team + ' hier niet nodig, of uw zetel verleent het al. ' +
+            'Wel te vragen: ' + mag.join(', ') + '.'
+          : 'Team ' + z.team + ' vraagt het lid nergens toestemming voor: uw zetel verleent alles ' +
+            'wat dit team doet. Zet de zaak door naar het team dat verder kijkt.' };
     }
 
     /* Een lopende bevestiging voor dezelfde zaak, dezelfde mens EN DEZELFDE

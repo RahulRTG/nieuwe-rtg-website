@@ -53,6 +53,11 @@ const CONTRACTEN = Object.assign({},
      gevraagde capability nodig heeft, en of hij niet zwaar is. `vraag` schrijft
      wel -- hij zet een verzoek klaar -- maar hergebruikt een lopend verzoek langs
      dezelfde weg als een medewerker, want het gaat door bevestiging.vraag(). */
+  /* Het kanalenbord: leest de inrichting van dit proces (een adres, een
+     modelnaam, een netwerkgrens) en raakt geen enkele collectie aan. */
+  LEEST('POST /api/office/service/kanalen', 'office.service.kanalen',
+    'servicePost.hulpAdres() en spraaktekst.beschikbaar(); allebei lezen ze env en een tabel'),
+
   LEEST('POST /api/office/service/ai/mag', 'office.service.ai.mag',
     'onderzoeker.mag(): router.benodigd() en de ZWAAR-tabel, allebei zonder state'),
   BESCHERMD('POST /api/office/service/ai/vraag', 'office.service.ai.vraag',

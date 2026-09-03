@@ -641,6 +641,19 @@ volgens zijn eigen regel alleen omlaag; de verhoging staat daar dus
 UITGESCHREVEN, met de reden en met het adres van wat hem weer omlaag brengt (een
 lokaal spraakmodel via LOCAL_AI_URL). Wie een ratel omzeilt zonder het te zeggen,
 sloopt de ratel zelf.
+Par. 13d is het ondertitelen: `kern/spraaktekst.js` zet spraak om met een LOKAAL
+model en wijkt NOOIT uit naar buiten -- een tekstantwoord bij de derde aanbieder
+is net zo goed, de stem van een lid niet. Iedereen ondertitelt ZICHZELF (de
+spreker beslist over zijn eigen stem, en niemand ondertitelt een ander achter zijn
+rug), de knop hangt in de meeleesbaan zelf zodat alle acht gesprekken hem tegelijk
+kregen, en de ratel van keuringsregel 49 ging daarmee van 10 naar 2. Die twee zijn
+UITZENDINGEN: eenrichting, dus zichzelf ondertitelen helpt de kijker niets. Par.
+13e is de capability-telling (`scripts/servicecaps.js`), en die vond eerst geen
+ontbrekende poort maar een bevoegdheid die er niet in hoorde: **`zaak.lezen` hangt
+aan de ZETEL en niet aan een bevestiging** -- het lid las bij elk verzoek "opent:
+zaak.lezen" en gaf dus toestemming voor iets dat de medewerker al mocht. Elke
+bevoegdheid draagt nu een GROND, en 8 van de 9 die het lid bevestigt hebben nog
+geen lezer: ratel 65, mag alleen omlaag.
 Par. 12 is de kwaliteitsmaat, en die is met opzet geen
 afhandeltijd: gemeten wordt hoeveel problemen zijn opgelost ZONDER dat de melder
 zijn verhaal opnieuw hoefde te doen -- en wat er NIET gemeten wordt (tevredenheid,

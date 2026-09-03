@@ -87,13 +87,24 @@ function routeer({ doelgroep, onderwerp, soort, prioriteit } = {}) {
 /* Wat een team NODIG heeft om zijn werk te doen. Uitdrukkelijk een vraag en
    geen uitgifte -- zie de kop. ./machtiging.js gebruikt dit als bovengrens:
    een machtiging kan hier alleen uit versmallen, nooit iets toevoegen. */
+/* WAT EEN TEAM NODIG HEEFT, en dat is niet hetzelfde als wat je aan het LID
+   vraagt. `benodigd` is de hele tabel; `teVragen` (./teams.js) is de tabel min
+   wat de ZETEL al verleent. Een bevestiging vraagt om het tweede, want een
+   verzoek dat om iets vraagt wat de medewerker al mocht, leert een lid
+   doorklikken -- en dan is de knop niets meer waard waar hij wel telt. */
 function benodigd(team) {
   return (TEAMS[team] && TEAMS[team].capabilities.slice()) || [];
 }
+const teVragen = (team) => require('./teams').teVragen(team);
 
 /* De teams als keuzelijst, voor een scherm dat een zaak wil doorzetten. */
 function keuzelijst() {
-  return Object.entries(TEAMS).map(([id, t]) => ({ id, naam: t.naam, capabilities: t.capabilities.slice() }));
+  return Object.entries(TEAMS).map(([id, t]) => ({ id, naam: t.naam,
+    capabilities: t.capabilities.slice(),
+    /* Wat een scherm aan het lid MAG voorleggen. Apart veld, want een cockpit
+       die `capabilities` in een keuzelijst zet, laat anders `zaak.lezen` vragen
+       -- iets dat de zetel al gaf. */
+    teVragen: require('./teams').teVragen(id) }));
 }
 
-module.exports = { routeer, benodigd, keuzelijst, DOELGROEP_TEAM, BOVEN_ALLES };
+module.exports = { routeer, benodigd, teVragen, keuzelijst, DOELGROEP_TEAM, BOVEN_ALLES };

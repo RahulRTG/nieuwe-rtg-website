@@ -165,7 +165,11 @@
     }
 
     return { start: start, ontvang: ontvang, stop: stop,
-      get actief() { return !dood; } };
+      get actief() { return !dood; },
+      /* De eigen microfoonstroom, voor shared/meeluister.js. Een getter en geen
+         tweede aanvraag: nog een getUserMedia voor dezelfde microfoon zet een
+         tweede lampje aan en kan op sommige toestellen de eerste stroom stelen. */
+      get stroom() { return stream; } };
   }
 
   w.RTGServiceBel = { maak: maak };

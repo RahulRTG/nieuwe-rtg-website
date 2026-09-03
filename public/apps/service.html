@@ -96,6 +96,7 @@
 
 <script src="/shared/media.js"></script>
 <script src="/shared/meelezen.js"></script>
+<script src="/shared/meeluister.js"></script>
 <script src="/shared/servicebel.js"></script>
 <script>
 /* ============================================================================
@@ -175,6 +176,7 @@ async function wachtrij() {
     + '<button class="knop" id="tPatronen">Patronen</button>'
     + '<button class="knop" id="tFouten">Foutsignalen</button>'
     + '<button class="knop" id="tKwaliteit">Kwaliteit</button>'
+    + '<button class="knop" id="tKanalen">Ingangen</button>'
     + '<button class="knop" id="tBel">Bellen</button></div>'
     + '<div class="kaart"><h2>De rij</h2>'
     + '<p class="sub">' + esc(t.open || 0) + ' open &middot; ' + esc(t.zonderEigenaar || 0) + ' zonder eigenaar &middot; '
@@ -183,6 +185,7 @@ async function wachtrij() {
     + '<div class="kaart">' + tabel(d.zaken || []) + '</div>';
   $('#tPatronen').onclick = () => poging(patronen); $('#tFouten').onclick = () => poging(fouten);
   $('#tKwaliteit').onclick = () => poging(kwaliteit); $('#tBel').onclick = () => poging(belrij);
+  $('#tKanalen').onclick = () => poging(kanalen);
   bindRijen();
 }
 
@@ -327,9 +330,13 @@ function actieBlok(z) {
     + 'als aanvrager. Zwaar werk gaat nooit naar de AI &mdash; dat vraagt een tweede mens.</p>'
     + '</div>';
 }
+/* WAT JE AAN HET LID KUNT VRAGEN, en dat is minder dan wat het team mag: alles
+   wat de ZETEL al verleent hoort niet in een bevestiging (kern/service/teams.js).
+   Stond `capabilities` hier, dan bood dit scherm `zaak.lezen` aan en las het lid
+   "opent: zaak.lezen" -- toestemming voor iets dat de medewerker al mocht. */
 function capsVoor(team) {
   const t = ((STAND.keuzes && STAND.keuzes.teams) || []).find(x => x.id === team);
-  return (t && t.capabilities) || ['zaak.lezen'];
+  return (t && t.teVragen && t.teVragen.length) ? t.teVragen : [];
 }
 
 function bindZaak(z) {
@@ -406,6 +413,44 @@ async function fouten() {
    is geen bescheidenheid: een medewerker die hier geen tevredenheidscijfer ziet,
    moet weten dat er niets is gevraagd -- anders vult iemand het gat met een
    eigen indruk en gaat DIE rondzingen. */
+/* DE INGANGEN. Twee voorzieningen van deze laag hangen aan INRICHTING en niet
+   aan code -- post aan hulp@ en het automatisch ondertitelen -- en allebei falen
+   ze stil op de goede manier: een geweigerde zaak met een reden, een knop die
+   niet verschijnt. Juist daarom ziet niemand van RTG dat een deur dichtstaat.
+
+   Dit bord toont per ingang ook wat er NIET is vastgesteld, en dat is geen
+   nette bijzin: of er werkelijk post aankomt hangt af van DNS en een provider,
+   en dat kan deze server niet over zichzelf zien. Groen waar niets gemeten is,
+   is precies wat BESTUUR.md verbiedt. */
+async function kanalen() {
+  const d = await api('kanalen', {});
+  const rij = (k) => '<div class="waarom"><b>' + esc(k.naam) + '</b> &middot; '
+    + '<span class="stil">' + esc(k.stand) + ' (' + esc(k.graad) + ')</span>'
+    + (k.adres ? '<br><code>' + esc(k.adres) + '</code>' : '')
+    + '<p>' + esc(k.wat) + '</p>'
+    + (k.gevolg ? '<p><b>' + esc(k.gevolg) + '</b></p>' : '')
+    + ((k.nietVastgesteld || []).length
+      ? '<p class="stil">Niet vastgesteld:</p><ul>' + k.nietVastgesteld.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>'
+      : '')
+    + (k.hoeTeMeten ? '<p class="stil">' + esc(k.hoeTeMeten) + '</p>' : '')
+    + '</div>';
+  $('#main').innerHTML = '<div class="tabs"><button class="knop" id="tWachtrij">Wachtrij</button>'
+    + '<button class="knop" id="tPatronen">Patronen</button>'
+    + '<button class="knop" id="tFouten">Foutsignalen</button>'
+    + '<button class="knop" id="tKwaliteit">Kwaliteit</button>'
+    + '<button class="knop" aria-current="true">Ingangen</button></div>'
+    + '<div class="kaart"><h2>Waar een melding binnenkomt</h2>'
+    + '<p class="sub">' + esc(d.let) + '</p>'
+    + (d.kanalen || []).map(rij).join('') + '</div>'
+    + '<div class="kaart"><h2>Kanalen die er met opzet niet zijn</h2>'
+    + ((d.nogNiet || []).length
+      ? (d.nogNiet || []).map(k => '<div class="waarom"><b>' + esc(k.naam) + '</b><p>' + esc(k.waarom) + '</p></div>').join('')
+      : '<p class="sub">Geen.</p>')
+    + '</div>';
+  $('#tWachtrij').onclick = () => poging(wachtrij); $('#tPatronen').onclick = () => poging(patronen);
+  $('#tFouten').onclick = () => poging(fouten); $('#tKwaliteit').onclick = () => poging(kwaliteit);
+}
+
 async function kwaliteit() {
   const d = await api('kwaliteit', {});
   const maat = (m) => m.nietTeZeggen
@@ -496,6 +541,7 @@ async function neemOp(id) {
      live gesprek zonder weg naar tekst sluit een dove deelnemer uit. */
   if (window.RTGMeelezen) {
     BELMEE = window.RTGMeelezen.maak({ ik: 'RTG',
+      stroom: () => BELMOTOR && BELMOTOR.stroom,
       stuur: (regel) => api('gesprek/signaal', { gesprek: r.gesprek.id, kind: 'tekst', payload: { r: regel } }).catch(() => {}) });
     $('#belMeelees').appendChild(BELMEE.el);
   }

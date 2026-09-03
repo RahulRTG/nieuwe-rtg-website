@@ -1571,6 +1571,7 @@
       "serviceFoutsignaal",
       "serviceGesprek",
       "serviceKeuzes",
+      "serviceKlassen",
       "serviceKwaliteit",
       "serviceLoop",
       "serviceMachtiging",
@@ -1578,7 +1579,9 @@
       "serviceOnderzoeker",
       "servicePatronen",
       "servicePersoonlijk",
+      "servicePost",
       "serviceZaken",
+      "spraaktekst",
       "supplierAuth"
     ],
     "sleutelwoorden": [
@@ -2430,6 +2433,9 @@
       "status",
       "wallet",
       "zorgpolis"
+    ],
+    "spraaktekst": [
+      "spraaktekst"
     ]
   }
 }

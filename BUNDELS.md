@@ -13,7 +13,7 @@ omlaag.
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 97 delen, 9830 regels in de delen
+`public/apps/app-main/` -- 97 delen, 9831 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -179,7 +179,7 @@ omlaag.
 
 ## `apps/foundation/gezin-rt.js`
 
-`public/apps/foundation/gezin-rt/` -- 3 delen, 190 regels in de delen
+`public/apps/foundation/gezin-rt/` -- 3 delen, 192 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -834,7 +834,7 @@ omlaag.
 
 ## `shared/teamcall.js`
 
-`public/shared/teamcall/` -- 3 delen, 312 regels in de delen
+`public/shared/teamcall/` -- 3 delen, 314 regels in de delen
 
 | deel | onderwerp |
 |---|---|

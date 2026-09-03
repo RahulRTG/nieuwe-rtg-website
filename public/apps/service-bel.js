@@ -63,11 +63,19 @@ function tekenGesprek(stand) {
   $('#bStop').onclick = ophangen;
   /* DE MEELEESBAAN. Een live gesprek zonder weg naar tekst sluit een dove
      deelnemer uit; shared/meelezen.js bestaat daarvoor en wordt hier gedeeld
-     met het kantoor. Wat erin staat is getypt door een MENS -- het is geen
-     ondertiteling, en dat zegt de baan zelf ook. */
+     met het kantoor. Twee soorten regels komen er binnen: getypt door een MENS,
+     en herkend door een LOKAAL model (shared/meeluister.js). De baan zet erbij
+     welke van de twee het is -- tekst die een machine heeft geraden is iets
+     anders dan tekst die iemand heeft geschreven. Draait er geen model, dan
+     verschijnt de ondertitelknop niet en blijft meetypen over. */
   if (window.RTGMeelezen) {
-    MEE = window.RTGMeelezen.maak({ ik: 'U',
-      stuur: function (regel) { api('bel/signaal', { gesprek: GESPREK.id, kind: 'tekst', payload: { r: regel } }).catch(function () {}); } });
+    const stuurRegel = function (regel) {
+      api('bel/signaal', { gesprek: GESPREK.id, kind: 'tekst', payload: { r: regel } }).catch(function () {});
+    };
+    /* `stroom` is alles wat de ondertiteling hier nodig heeft: de baan maakt de
+       luisteraar en de knop zelf (shared/meelezen.js). Geen model, geen knop. */
+    MEE = window.RTGMeelezen.maak({ ik: 'U', stuur: stuurRegel,
+      stroom: function () { return MOTOR && MOTOR.stroom; } });
     $('#meelees').appendChild(MEE.el);
   }
 }

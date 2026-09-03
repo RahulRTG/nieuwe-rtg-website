@@ -491,6 +491,107 @@ DKIM moeten kunnen ondertekenen. De keten tot en met de weigering is wel echt
 (`test/servicepost.test.js`, laatste toets, over `/api/mail/binnen`); de rest
 staat op moduleniveau.
 
+## 13d. Ondertitelen, en de ratel die daardoor omlaag kon
+
+Regel 48 van `scripts/check.js` telde tien live media-elementen zonder weg naar
+tekst, en die ratel ging van 8 naar 10 toen bellen erbij kwam. Dat was een schuld
+met een naam, en de notitie erbij noemde geen belofte maar een **adres**: een
+lokaal model via `LOCAL_AI_URL` dat spraak naar tekst zet zonder het gesprek naar
+buiten te sturen. Dat is er nu.
+
+Drie stukken: `kern/spraaktekst.js` (de laag), `routes/spraaktekst.js` (de deur)
+en `shared/meeluister.js` (de browserkant). De knop hangt in de meeleesbaan zelf,
+dus alle acht gesprekken in dit huis kregen hem tegelijk — bellen met RTG Service,
+het gezinsgesprek, bellen met een vriend, de vergaderkamer, het schoolgesprek, de
+teamcall, het videogesprek tussen twee leden en de cockpit. Vijf kopieën van
+dezelfde knop zouden binnen een maand vier verschillende teksten dragen.
+
+**Iedereen ondertitelt zichzelf**, en dat is geen implementatiedetail: de spreker
+beslist zelf of zijn stem door een model gaat, er hoeft nergens een tweede
+geluidsstroom te worden afgetapt, en niemand ondertitelt een ander achter zijn
+rug. De herkende regel reist daarna over dezelfde seinweg als een getypte regel.
+
+**Waar het geluid heen gaat, eerlijk gezegd:** naar de server van RTG, en daar
+naar een lokaal model. Niet naar een browserleverancier, niet naar een derde, en
+het wordt niet bewaard. Dat is iets anders dan "het verlaat uw toestel niet", en
+dat verschil staat op de knop. De Web Speech API bestaat hier niet: die stuurt het
+geluid van het gesprek naar de leverancier, en dit huis draait op codenamen met de
+namen in een aparte kluis. Er is geen instelling die dat goedmaakt. En de laag
+**wijkt nooit uit**: `kern/ai.js` heeft een uitwijkketen omdat een tekstantwoord
+bij de derde aanbieder net zo goed is — geluid is dat niet, dat is de stem van een
+lid.
+
+De ratel staat daarmee op **2**, en die twee zijn geen restpost: het Podium en het
+SOS-beeld naar het kantoor zijn **eenrichting**, dus zichzelf ondertitelen helpt de
+kijker niets. Daarvoor is een tweede weg nodig — de zender laten ondertitelen — en
+bij SOS betekent dat dat het geluid van iemand in nood door een model gaat. Dat
+besluit wordt hier niet stilzwijgend genomen.
+
+**Wat het narekenen onderweg vond, en geen toets zag.** De ankers wezen naar de
+AANROEP en niet naar de scripttag, dus `teamcall-01.js` "droeg" de tekstbaan
+netjes terwijl `personeel.html` en `leverancier.html` `shared/meelezen.js` nergens
+laadden — `if (w.RTGMeelezen)` was daar altijd onwaar en de baan verscheen stil
+niet. De toets die dat had moeten vangen bestond al, maar droeg een handgetypte
+lijst van zes schermen en miste precies deze twee. Nu wordt die lijst afgeleid uit
+wie de baan aanroept, en het anker wijst naar de scripttag. Een anker op een
+aanroep bewijst een intentie; een anker op de scripttag bewijst dat het er staat.
+
+Wat het getal **niet** zegt is dat elk huis dat deze code draait ook werkelijk
+ondertitelt: dat hangt aan een ingerichte `LOCAL_AI_MODEL_SPRAAK`, net zoals
+`ondertiteld` niet zegt dat elke maker cues heeft getypt. Wat de keuring wél
+afdwingt: elk gesprek noemt WAAR het de luisteraar aansluit, de gedeelde module
+moet bestaan, en de baan moet de **uitleg** dragen voor als het niet kan. Een
+ondertitelknop die niets doet is erger dan geen knop — die laat iemand aan een
+gesprek beginnen in de veronderstelling dat hij het kan volgen.
+
+## 13e. Wat de capability-telling vond
+
+De teamtabel bepaalt wat een medewerker met een bevestiging kan openen, dus die
+hoort door een mens te worden nagekeken. `scripts/servicecaps.js` maakt dat
+mogelijk — en stelde meteen de scherpere vraag: **leest er iemand die
+toestemming?** (CONTROLPLANE.md: geen capability zonder caller.)
+
+De uitkomst was streng. Van de tien bevoegdheden had er **één** een lezer. En de
+eerste bevinding was geen ontbrekende poort maar een bevoegdheid die er niet in
+thuishoorde: **`zaak.lezen` stond bij alle zeven teams**, terwijl geen enkele
+route hem uitleest — en dat kán ook niet, want een medewerker moet de wachtrij
+zien vóórdat er iets te bevestigen valt. Die hangt aan de **zetel**, niet aan een
+bevestiging van het lid.
+
+Blind meenemen was niet onschuldig. Het lid las bij élk verzoek "opent:
+zaak.lezen" — toestemming geven voor iets dat de medewerker al mocht. Een
+bevestiging die vraagt om wat al verleend is, leert mensen doorklikken, en dan is
+de knop niets meer waard voor de gevallen waar hij wél telt. Elke bevoegdheid
+draagt daarom nu een **grond** (`zetel` of `bevestiging`, `kern/service/teams.js`),
+en `router.teVragen()` is wat een scherm aan het lid mag voorleggen. Een naam
+zonder grond valt weg in plaats van door.
+
+Wat er **open** blijft staat er even groot bij: **acht van de negen** bevoegdheden
+die het lid bevestigt, hebben nog geen lezer. Dat is de eerlijke stand — deze laag
+is jong, en elke poort is een besluit over wat een medewerker werkelijk te zien
+krijgt. Wat er niet meer kan is dat het getal ONGEMERKT groeit: regel 65 van
+`scripts/check.js` is een ratel op acht, en een negende stille bevoegdheid laat de
+keuring zakken. De keuze is dan: er een lezer bij bouwen, of hem niet aan het lid
+voorleggen.
+
+## 13f. Het kanalenbord: welke deur staat er open?
+
+Twee ingangen van deze laag hangen aan **inrichting** en niet aan code — post aan
+`hulp@` komt alleen binnen als de provider die kant op wijst en stempelt, en
+ondertitelen werkt alleen met een lokaal model. Allebei falen ze stil en op de
+goede manier (een geweigerde zaak met een reden, een knop die niet verschijnt), en
+juist daarom ziet niemand van RTG dat een deur dichtstaat. Een weigering die
+alleen de melder leest, is voor het huis geen signaal.
+
+`/api/office/service/kanalen` maakt dat zichtbaar, en houdt zich aan de huisregel
+van BESTUUR.md: elke bewering draagt een bewijsgraad, en *niet vast te stellen* is
+een eersteklas uitslag. Voor de post is dat het belangrijkste veld — of er
+werkelijk iets aankomt hangt af van DNS en een provider, en dat kan deze server
+niet zien. Wie daar "in orde" zou schrijven omdat de code klopt, meet zijn eigen
+bestand in plaats van de werkelijkheid. Bij het ondertitelen staat er ook het
+**gevolg** bij: zonder model kan wie doof is een gesprek alleen volgen als de
+anderen meetypen, en bij een hulplijn weegt dat het zwaarst.
+
 ## 14. Wat er staat, en wat er niet staat
 
 **Staat** (gemeten, met toetsen die zijn zien zakken):
@@ -515,6 +616,10 @@ staat op moduleniveau.
 - de ingang voor een zaak, met het zaakprofiel aan de kantoorkant, en de
   werkplek erbij (`/apps/leverancier-service.html`);
 - de kwaliteitsmeting, met vooraan de maat die ertoe doet;
+- automatisch ondertitelen in een live gesprek, lokaal (par. 13d) -- alle acht
+  gesprekken in dit huis, en de ratel van regel 49 van 10 naar 2;
+- het kanalenbord dat zegt welke ingang open staat en wat er niet vast te
+  stellen is (par. 13f);
 - RTMail als ingang: post aan `hulp@` wordt een zaak, met de melder uit de
   identiteitskluis en alleen op een bevestigde afzender (par. 13c);
 - bellen naar RTG binnen de app, voor Lifestyle en Business: de belknop in de
@@ -539,6 +644,14 @@ staat op moduleniveau.
   nog steeds met zoveel woorden dat RTG hier geen oorzaak vaststelt (par. 10). De
   onderzoeker mag met een bevestiging KIJKEN; concluderen is iets anders, en dat
   blijft mensenwerk zolang niemand die conclusie kan onderbouwen.
+- **een lezer voor acht van de negen bevoegdheden** die het lid bevestigt
+  (par. 13e). Elke poort is een besluit over wat een medewerker werkelijk te zien
+  krijgt, en die worden hier niet en passant genomen. Wat er wél staat is de
+  meting (`npm run servicecaps`) en de ratel die het getal niet laat groeien.
+- **ondertiteling van een UITZENDING**: het Podium en het SOS-beeld zijn
+  eenrichting, dus zichzelf ondertitelen helpt de kijker niets. Daarvoor moet de
+  ZENDER ondertitelen, en bij SOS betekent dat dat het geluid van iemand in nood
+  door een model gaat. Dat is een besluit en geen ontbrekende regel code.
 - **telefonie over het telefoonnet**: geen provider en geen nummer. Bellen kán
   wel, binnen de app (par. 13); `klassen.js` draagt `telefoon` daarom als
   `gebouwd: false` met een verwijzing naar het kanaal dat er wél is.

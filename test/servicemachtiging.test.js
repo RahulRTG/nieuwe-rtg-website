@@ -161,3 +161,55 @@ test('de hele keten over de echte routes: vragen, bevestigen, openen', async () 
       'er is permanente toegang ontstaan; deze laag hoort er nul te houden');
   } finally { await stop(srv); }
 });
+
+/* WAT DE ZETEL AL VERLEENT, WORDT HET LID NIET GEVRAAGD.
+
+   `zaak.lezen` stond bij alle zeven teams in de machtigingstabel, en het lid las
+   dus bij elk verzoek "opent: zaak.lezen" -- toestemming voor iets dat de
+   medewerker al mocht (hij moet de wachtrij zien voordat er iets te bevestigen
+   valt). Dat is niet onschuldig: een bevestiging die om iets vraagt wat al is
+   verleend, leert mensen doorklikken, en dan is de knop niets meer waard voor de
+   gevallen waar hij wel telt.
+
+   Gevonden door te TELLEN, niet door te lezen: scripts/servicecaps.js vroeg per
+   bevoegdheid of er ergens een `magNu()` staat, en `zaak.lezen` had er geen --
+   die kon er ook geen hebben. */
+test('een bevoegdheid die de zetel al geeft, wordt niet aan het lid voorgelegd', () => {
+  const teams = require('../server/kern/service/teams');
+  const router = require('../server/kern/service/router');
+
+  assert.equal(teams.GROND['zaak.lezen'], 'zetel',
+    'zaak.lezen is geen zetelbevoegdheid meer; dan hoort hij een lezer te hebben');
+  for (const id of Object.keys(teams.TEAMS)) {
+    assert.ok(!router.teVragen(id).includes('zaak.lezen'),
+      'team ' + id + ' legt zaak.lezen alsnog aan het lid voor');
+  }
+
+  /* En elke bevoegdheid die WEL aan het lid wordt voorgelegd, draagt een grond.
+     Een naam zonder grond valt weg in plaats van door: wie er een toevoegt en
+     vergeet hem in te delen, krijgt hem niet stilzwijgend voorgelegd. */
+  for (const [id, t] of Object.entries(teams.TEAMS)) {
+    for (const c of router.teVragen(id)) {
+      assert.equal(teams.GROND[c], 'bevestiging', c + ' (team ' + id + ') heeft geen grond');
+    }
+  }
+});
+
+test('een verzoek om een zetelbevoegdheid wordt geweigerd, met wat er wel kan', () => {
+  const crypto = require('crypto');
+  const db = { data: {} };
+  const save = () => {};
+  const zaken = require('../server/kern/service/zaak')({ db, save, crypto });
+  const mach = require('../server/kern/service/machtiging')({ db, save, crypto, zaken });
+  const bev = require('../server/kern/service/bevestiging')({ db, save, crypto, zaken, machtigingen: mach });
+
+  const z = zaken.open({ melder: 'lid-90', doelgroep: 'lid', onderwerp: 'zaak',
+    titel: 'Onze werkruimte doet raar' }).zaak;
+  const r = bev.vraag({ zaakId: z.id, mens: 'nadia', capabilities: ['zaak.lezen'],
+    reden: 'ik wil de zaak van dit lid bekijken' });
+  assert.equal(r.status, 403, JSON.stringify(r));
+  /* De weigering wijst een weg. Zonder dat lijstje is "dit mag niet" een raadsel
+     voor iemand die net op een knop drukte die het scherm hem aanbood. */
+  assert.ok(Array.isArray(r.teVragen) && r.teVragen.length, 'de weigering noemt geen alternatief');
+  assert.ok(!r.teVragen.includes('zaak.lezen'));
+});

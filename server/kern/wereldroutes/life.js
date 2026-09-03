@@ -73,6 +73,7 @@ module.exports = [
   '/apps/rtg.html',
   '/apps/rtgcode.html',
   '/apps/salon.html',
+  '/apps/service-bel.html',
   '/apps/sociaal-prive.html',
   '/apps/sociaal.html',
   '/apps/spelen.html',

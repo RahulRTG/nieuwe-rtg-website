@@ -233,7 +233,11 @@ test('de AI-onderzoeker opent pas iets nadat het lid heeft bevestigd, en leent n
 
   const z = zaken.open({ melder: 'lid-77', doelgroep: 'lid', onderwerp: 'account',
     titel: 'Ik kom niet meer in mijn account' }).zaak;
-  const cap = require('../server/kern/service/router').benodigd(z.team).find(c => !mach.ZWAAR[c]);
+  /* `teVragen` en niet `benodigd`: wat de ZETEL al verleent hoort niet in een
+     bevestiging, en `zaak.lezen` was de eerste die `benodigd` opleverde. Deze
+     toets koos dus precies de bevoegdheid die er niet meer in thuishoort. */
+  const cap = require('../server/kern/service/router').teVragen(z.team).find(c => !mach.ZWAAR[c]);
+  assert.ok(cap, 'dit team kan het lid nergens toestemming voor vragen');
 
   /* Wat de AI zonder iets al heeft, is de zaak zelf en verder niets. */
   const s = ond.stof(z.id);

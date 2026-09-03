@@ -158,4 +158,8 @@ module.exports = (kern) => {
      de bevestiging van het lid gaat. Eigen bestand om dezelfde reden als de
      andere twee: hier is de aanvrager een MACHINE, en dat is een echte naad. */
   require('./service-kantoor-ai')(kern, { veilig, lijf, kort, balieAuth });
+
+  /* En het bord dat zegt of de INGANGEN werken: die hangen aan inrichting en
+     falen stil op de goede manier. Zie ./service-kantoor-kanalen.js. */
+  require('./service-kantoor-kanalen')(kern, { veilig, balieAuth });
 };

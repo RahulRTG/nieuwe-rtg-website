@@ -112,6 +112,7 @@
     "samenhang": "node scripts/samenhang.js",
     "samenhang:vast": "node scripts/samenhang.js --vastleggen",
     "kaart": "node scripts/kaart.js",
+    "servicecaps": "node scripts/servicecaps.js",
     "onderzoeksketen": "node scripts/onderzoeksketen.js",
     "wereldlijst": "node scripts/wereldlijst.js",
     "functielijst": "node scripts/functielijst.js",

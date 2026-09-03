@@ -1,27 +1,27 @@
 {
  "stempel": {
-  "op": "2026-09-03T07:18:11.060Z",
-  "commit": "9d9a5acf",
+  "op": "2026-09-03T08:22:20.099Z",
+  "commit": "80c194a8",
   "boomVuil": true,
-  "boomAnders": 12,
+  "boomAnders": 17,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 4787,
-  "geclassificeerd": 4787,
+  "totaal": 4790,
+  "geclassificeerd": 4790,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3274,
-   "NOT_APPLICABLE": 1109,
+   "NOT_APPLICABLE": 1112,
    "PROTECTED": 308,
    "INTENTIONALLY_NON_IDEMPOTENT": 96
   },
-  "vastgesteldDoorMens": 1541,
+  "vastgesteldDoorMens": 1544,
   "afgeleidDoorScript": 3246,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 3942,
+   "AUTHENTICATED": 3945,
    "PUBLIC": 113,
    "OBJECT_SCOPED": 716,
    "(niet af te leiden -- vraagt een verklaring)": 1,
@@ -32,7 +32,7 @@
    "kale ronde: beschermd": 129,
    "kale ronde: onbeschermd": 88,
    "kale ronde: geen uitspraak": 4512,
-   "niet gemeten": 58
+   "niet gemeten": 61
   },
   "voorstellen": {},
   "metingVan": "2026-09-01T16:38:26.262Z"
@@ -136,6 +136,12 @@
   },
   {
    "route": "POST /api/office/service/incident/hersteld",
+   "bedoeld": "CAPABILITY_GATED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/office/service/kanalen",
    "bedoeld": "CAPABILITY_GATED",
    "waargenomen": "AUTHENTICATED",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
@@ -62884,6 +62890,28 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "office.service.kanalen",
+   "route": "POST /api/office/service/kanalen",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "CAPABILITY_GATED",
+    "bewakers": [
+     "officeAuth",
+     "balieAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "office.service.koppel",
    "route": "POST /api/office/service/koppel",
    "semantiek": {
@@ -68553,6 +68581,48 @@
     "hindernis": null
    },
    "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "ondertiteling.fragment",
+   "route": "POST /api/ondertiteling/fragment",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "ondertiteling.stand",
+   "route": "POST /api/ondertiteling/stand",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null

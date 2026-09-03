@@ -60,7 +60,29 @@ const CONTRACTEN = Object.assign({},
     'gesprek.signaal(): controleert de richting en geeft het pakket door langs sseToOffice; ' +
     'er wordt niets bewaard, ook het pakket zelf niet'),
   LEEST('POST /api/office/service/gesprek/signaal', 'office.service.gesprek.signaal',
-    'spiegelbeeld van de ledenkant: richting bewaken en doorgeven langs sseToCustomer, zonder opslag')
+    'spiegelbeeld van de ledenkant: richting bewaken en doorgeven langs sseToCustomer, zonder opslag'),
+
+  /* ---- ondertitelen ----
+     Deze twee horen bij het bellen en niet bij RTG Service: acht gesprekken in
+     dit huis delen ze (kern/spraaktekst.js). Allebei LEEST: `stand` leest een
+     modelnaam en een netwerkgrens uit de omgeving, en `fragment` stuurt geluid
+     naar een lokale modelserver en krijgt tekst terug.
+
+     DAT `fragment` NIETS BEWAART IS DE KERN VAN DE ZAAK EN GEEN DETAIL. Er wordt
+     geen bestand geschreven, geen rij aangelegd en geen kopie "voor de
+     kwaliteit" gemaakt; wat overblijft is de tekst, en die staat al in de
+     meeleesbaan van het gesprek. Een tweede aanroep met hetzelfde fragment
+     levert dus dezelfde tekst en verder niets -- er is geen toestand om te
+     verdubbelen. */
+  LEEST('POST /api/ondertiteling/stand', 'ondertiteling.stand',
+    'spraaktekst.beschikbaar(): een modelnaam en de netwerkgrens uit local-ai.js, zonder opslag'),
+  LEEST('POST /api/ondertiteling/fragment', 'ondertiteling.fragment',
+    'spraaktekst.transcribeer(): geluid naar de EIGEN modelserver en tekst terug. Er wordt niets ' +
+    'bewaard -- geen bestand, geen rij, geen kopie; de tekst gaat terug naar de aanroeper en verder ' +
+    'nergens heen. GEMETEN over de GESLAAGDE weg en niet alleen over de weigering: ' +
+    'test/spraaktekst.test.js zet een neplokaal model op loopback, stuurt een fragment door de echte ' +
+    'route en vergelijkt de opslag ervoor en erna. Zonder dat model meet je alleen de 503, en juist ' +
+    'de weg waar wel iets gebeurt is de weg waar iemand "even" een kopie wegschrijft')
 );
 
 module.exports = { CONTRACTEN };

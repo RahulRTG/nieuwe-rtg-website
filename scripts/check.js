@@ -3302,6 +3302,10 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
     spiegel:     { open: false, stil: true },   // je eigen beeld, zichtbaar, zonder geluid
     werktuig:    { open: false, stil: true },   // beeld als invoer of rekenmiddel
     ondertiteld: { open: false, anker: true },  // opgenomen inhoud MET een weg naar tekst
+    /* LIVE, TWEERICHTING. Draagt altijd een tekstbaan waarin deelnemers
+       meeschrijven (`baan`). Draagt hij DAARNAAST een spraakanker, dan is er ook
+       automatische ondertiteling en telt hij niet meer als open -- zie `SPRAAK`
+       hieronder voor wat dat anker moet bewijzen. */
     gesprek:     { open: true, baan: true },    // live, tweerichting -- MOET een tekstbaan dragen
     uitzending:  { open: true },                // live, eenrichting
     onbedekt:    { open: true }                 // opgenomen inhoud ZONDER weg naar tekst
@@ -3315,36 +3319,71 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
      ondertitelgat maar een knop voor een functie die niet bestaat, en die is
      weggehaald in plaats van beschreven. Mag alleen omlaag.
 
-     8 -> 10 OP 3 SEPTEMBER 2026, EN DIT IS EEN VERHOGING. Die staat hier
+     8 -> 10 OP 3 SEPTEMBER 2026, EN DIT WAS EEN VERHOGING. Die staat hier
      uitgeschreven omdat de regel hierboven zegt dat hij alleen omlaag mag, en
-     wie dat omzeilt zonder het te zeggen sloopt de ratel zelf.
+     wie dat omzeilt zonder het te zeggen sloopt de ratel zelf. Wat erbij kwam:
+     bellen met RTG Service (SERVICE.md par. 13) -- het beeld van de ander aan
+     de kant van het lid en aan de kant van de medewerker. Een live
+     tweerichtingsgesprek is per definitie `open`; er was geen indeling waarmee
+     dit er geen twee zouden zijn.
 
-     WAT ER BIJ KWAM: bellen met RTG Service (SERVICE.md par. 13) -- het beeld
-     van de ander aan de kant van het lid en aan de kant van de medewerker. Een
-     live tweerichtingsgesprek is per definitie `open`; er is geen indeling
-     waarmee dit er geen twee zouden zijn.
-
-     WAAROM HET TOCH IS GEBOUWD: een besluit van de eigenaar, met een reden die
-     op deze regel zelf slaat. Het alternatief was telefonie, en dat is voor wie
-     doof is GEEN kanaal en levert bovendien geen enkele weg naar tekst. Bellen
-     binnen de app draagt wel een meeleesbaan (shared/meelezen.js) waarin beide
-     kanten meeschrijven, en die is er bij een telefoongesprek nooit.
-
-     WAT HEM WEER OMLAAG BRENGT, en dat is geen belofte maar een adres:
-     shared/meelezen.js beschrijft de deur die openstaat -- een LOKAAL model via
+     10 -> 2, DEZELFDE DAG, EN DIT IS DE SCHULD DIE WORDT AFGELOST. De notitie
+     hierboven noemde geen belofte maar een ADRES: "een LOKAAL model via
      LOCAL_AI_URL dat spraak naar tekst zet zonder het gesprek naar buiten te
      sturen. Zodra dat er is, zijn deze twee (en de acht andere) geen open
-     elementen meer maar ondertitelde. Tot die tijd is dit een schuld met een
-     naam, en niet een getal dat vanzelf oploopt. */
-  const OPEN_MAX = 10;
+     elementen meer maar ondertitelde." Dat is er nu -- kern/spraaktekst.js,
+     routes/spraaktekst.js en shared/meeluister.js -- en de acht gesprekken zijn
+     alle acht aangesloten.
+
+     WAT ER OPEN BLIJFT, EN WAAROM DAT GEEN RESTPOST IS: de twee UITZENDINGEN.
+     Het Podium en het SOS-beeld naar het kantoor zijn eenrichting -- de kijker
+     spreekt niet, dus zichzelf ondertitelen helpt hem niets. Daar is een tweede
+     weg voor nodig (de ZENDER laten ondertitelen), en dat is een ander gesprek:
+     bij SOS zou dat betekenen dat het geluid van iemand in nood door een model
+     gaat. Dat besluit staat in TOEGANKELIJK.md en wordt hier niet stilzwijgend
+     genomen.
+
+     EN WAT DIT GETAL NIET ZEGT: dat elk huis dat deze code draait ook werkelijk
+     ondertitelt. Dat hangt aan een ingerichte LOCAL_AI_MODEL_SPRAAK, precies
+     zoals `ondertiteld` niet zegt dat elke maker cues heeft getypt. Wat de code
+     wel afdwingt staat in `SPRAAK` hieronder: er is een weg, en waar hij niet
+     open staat ZEGT het scherm dat -- geen knop die niets doet. */
+  const OPEN_MAX = 2;
   /* De band woonde als private functie IN de clipdeler; sinds het Theater en de
      Media OS dezelfde cue-lijst tonen staat hij als gedeelde laag in
      shared/ondertitelband.js. Deze regel merkte die verhuizing zelf op: het
      oude anker (toonOndertitels in clipdeler-01.js) viel weg en twee elementen
      zakten. Dat is precies waar een anker voor is. */
   const CLIPBAND = ['public/shared/ondertitelband.js', 'RTGOndertitelband'];
+  /* HET SPRAAKANKER. Een vierde veld op een gespreksregel: het bestand waarin
+     DIT scherm de luisteraar aansluit, en de naam die daar moet staan. Een
+     gedeelde constante zou hier niet werken -- die zou het bestand tegen
+     zichzelf houden en altijd slagen; het punt is juist dat elk SCHERM hem
+     aanroept. Haalt iemand die aansluiting weg, dan telt dat gesprek weer als
+     open en zakt de ratel.
+
+     Twee dingen worden er BOVENDIEN nagekeken, en die staan er omdat de
+     voorziening aan een ingerichte modelserver hangt en dus stil kan wegvallen:
+     de gedeelde luisteraar moet bestaan, en de baan moet de UITLEG dragen voor
+     het geval hij niet kan. Een ondertitelknop die niets doet is erger dan geen
+     knop -- die laat iemand aan een gesprek beginnen in de veronderstelling dat
+     hij het kan volgen. */
+  /* HET ANKER WIJST NAAR DE PAGINA DIE DE MODULE LAADT, en niet naar het
+     bestand dat de naam noemt. Dat verschil is hier echt gebleken: het
+     meelees-anker keek of de AANROEPER `RTGMeelezen` noemt, en dat deed
+     teamcall-01.js keurig -- terwijl personeel.html en leverancier.html
+     `/shared/meelezen.js` nergens laadden. `if (w.RTGMeelezen)` was daar dus
+     altijd onwaar en de tekstbaan verscheen stil niet, met een register dat hem
+     wel claimde. Een anker op een aanroep bewijst een intentie; een anker op de
+     scripttag bewijst dat het er staat. */
+  const SPRAAKMODULE = 'public/shared/meeluister.js';
+  /* De uitleg-voor-als-het-niet-kan woont bij de KNOP en niet bij de baan, want
+     hij zegt iets over deze voorziening. Deze regel merkte die verhuizing zelf
+     op toen de knop van meelezen.js naar meeluister.js ging -- precies waarvoor
+     een anker bestaat. */
+  const SPRAAKEERLIJK = ['public/shared/meeluister.js', 'meelees-geenauto'];
   const REGISTER = new Map([
-    ['public/apps/app.html#csRemote', ['gesprek', 'het beeld en geluid van de ander in een videogesprek tussen twee leden', ['public/apps/app-main.js', 'RTGMeelezen']]],
+    ['public/apps/app.html#csRemote', ['gesprek', 'het beeld en geluid van de ander in een videogesprek tussen twee leden', ['public/apps/app-main.js', 'RTGMeelezen'], ['public/apps/app.html', 'meeluister.js']]],
     ['public/apps/app.html#csLocal', ['spiegel', 'je eigen beeld in de hoek van dat gesprek; stil, want jezelf terughoren is een echo']],
     ['public/apps/backoffice.html#ontLiveVid', ['uitzending', 'SOS: het kantoor kijkt live mee met de camera van een lid, met geluid erbij. GEEN tekstbaan, en dat is de eerlijke stand: wie doof is kan geen SOS-dienst draaien. Een noodscherm is niet de plek om er een even bij te zetten -- dat is een besluit, zie TOEGANKELIJK.md']],
     ['public/apps/camera.html#beeld', ['spiegel', 'de camera-app: je eigen beeld om een foto te maken, zonder geluid']],
@@ -3356,18 +3395,18 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
        live gesprek zonder weg naar tekst sluit een dove deelnemer uit, en dat
        geldt bij een HULPlijn het hardst: wie niet kan bellen, houdt dan geen
        kanaal over waar de anderen er wel een bij kregen. */
-    ['public/apps/service-bel.js#vExtern', ['gesprek', 'bellen met RTG Service: het beeld en geluid van de medewerker', ['public/apps/service-bel.js', 'RTGMeelezen']]],
+    ['public/apps/service-bel.js#vExtern', ['gesprek', 'bellen met RTG Service: het beeld en geluid van de medewerker', ['public/apps/service-bel.js', 'RTGMeelezen'], ['public/apps/service-bel.html', 'meeluister.js']]],
     ['public/apps/service-bel.js#vLokaal', ['spiegel', 'je eigen beeld tijdens dat gesprek; stil, want jezelf terughoren is een echo']],
-    ['public/apps/service.html#bExtern', ['gesprek', 'de cockpit neemt op: het beeld en geluid van de beller', ['public/apps/service.html', 'RTGMeelezen']]],
+    ['public/apps/service.html#bExtern', ['gesprek', 'de cockpit neemt op: het beeld en geluid van de beller', ['public/apps/service.html', 'RTGMeelezen'], ['public/apps/service.html', 'meeluister.js']]],
     ['public/apps/service.html#bLokaal', ['spiegel', 'het eigen beeld van de medewerker in dat gesprek']],
-    ['public/apps/foundation/gezin-rt/gezin-rt-03.js#grt-remote', ['gesprek', 'het gezinsgesprek van RTFoundation: het beeld van de ander', ['public/apps/foundation/gezin-rt.js', 'RTGMeelezen']]],
+    ['public/apps/foundation/gezin-rt/gezin-rt-03.js#grt-remote', ['gesprek', 'het gezinsgesprek van RTFoundation: het beeld van de ander', ['public/apps/foundation/gezin-rt.js', 'RTGMeelezen'], ['public/apps/foundation/contact.html', 'meeluister.js']]],
     ['public/apps/foundation/gezin-rt/gezin-rt-03.js#grt-local', ['spiegel', 'je eigen beeld in dat gezinsgesprek']],
-    ['public/apps/foundation/vrienden.html#belRemote', ['gesprek', 'bellen met een vriend: het beeld van de ander', ['public/apps/foundation/vrienden.html', 'RTGMeelezen']]],
+    ['public/apps/foundation/vrienden.html#belRemote', ['gesprek', 'bellen met een vriend: het beeld van de ander', ['public/apps/foundation/vrienden.html', 'RTGMeelezen'], ['public/apps/foundation/vrienden.html', 'meeluister.js']]],
     ['public/apps/foundation/vrienden.html#belLocal', ['spiegel', 'je eigen beeld tijdens dat bellen']],
     ['public/apps/geld/rtgcodeb.js#rcCam', ['werktuig', 'de camera leest een RTG-code; shared/media.js vraagt bij een camera nooit geluid']],
     ['public/apps/media.html#film', ['ondertiteld', 'een opgenomen film uit het Theater; de kaart uit kern/mediaos draagt de cue-lijst mee en de gedeelde band toont hem', ['server/kern/mediaos/catalogus.js', 'ondertitels']]],
     ['public/apps/media.html#clipfilm', ['ondertiteld', 'een clip speelt hier via dezelfde clipdeler, met dezelfde ondertitelband', CLIPBAND]],
-    ['public/apps/meet/kamer.js#1', ['gesprek', 'de vergaderkamer: een tegel per deelnemer, en de eigen tegel krijgt muted', ['public/apps/meet/kamer.js', 'RTGMeelezen']]],
+    ['public/apps/meet/kamer.js#1', ['gesprek', 'de vergaderkamer: een tegel per deelnemer, en de eigen tegel krijgt muted', ['public/apps/meet/kamer.js', 'RTGMeelezen'], ['public/apps/meet.html', 'meeluister.js']]],
     ['public/apps/memo/app.js#1', ['ondertiteld', 'een eigen spraakmemo; het toestel maakt er een transcript bij dat in de lijst staat en samen te vatten is', ['public/apps/memo/app.js', 'transcript']]],
     ['public/apps/oog.html#cam', ['werktuig', 'het oog schouwt een voertuig of werkvloer: beeldanalyse, geen geluid']],
     ['public/apps/podium.html#kijkVideo', ['uitzending', 'een live uitzending van het Podium; srcObject is er altijd een stroom, nooit een bestand. Er loopt WEL een tekstbaan mee: de kanaalchat (#chatKijk, aria-live), waarin de uitzender kan meeschrijven -- geen ondertiteling, wel een weg naar tekst', ['public/apps/podium.html', 'chatKijk']]],
@@ -3379,9 +3418,9 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
     ['public/shared/paspoortscan.js#pscanVid', ['werktuig', 'de paspoortscan leest de MRZ-regels van een document']],
     ['public/shared/scanknop.js#js1', ['werktuig', 'de gedeelde scanknop: hetzelfde leesinstrument, in een eigen venster']],
     ['public/shared/scanner.js#js1', ['werktuig', 'het reserve-element van de scanner zelf, als de aanroeper er geen meegeeft']],
-    ['public/shared/schoolbel.js#sbelAudio', ['gesprek', 'het schoolgesprek is een live audiogesprek: wie opneemt hoort de ander rechtstreeks', ['public/shared/schoolbel.js', 'RTGMeelezen']]],
+    ['public/shared/schoolbel.js#sbelAudio', ['gesprek', 'het schoolgesprek is een live audiogesprek: wie opneemt hoort de ander rechtstreeks', ['public/shared/schoolbel.js', 'RTGMeelezen'], ['public/apps/schoolpartner.html', 'meeluister.js']]],
     ['public/shared/teamcall/teamcall-01.js#1', ['spiegel', 'de teamcall van het personeel: je eigen tegel, stil, want je eigen stem terughoren is een echo']],
-    ['public/shared/teamcall/teamcall-01.js#2', ['gesprek', 'de teamcall van het personeel: de tegel van een collega, met diens stem erbij', ['public/shared/teamcall/teamcall-01.js', 'RTGMeelezen']]]
+    ['public/shared/teamcall/teamcall-01.js#2', ['gesprek', 'de teamcall van het personeel: de tegel van een collega, met diens stem erbij', ['public/shared/teamcall/teamcall-01.js', 'RTGMeelezen'], ['public/apps/personeel.html', 'meeluister.js']]]
   ]);
 
   const bundelPaden = new Set(Object.keys(BUNDELLIJST).map(k => 'public/' + k));
@@ -3435,34 +3474,76 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
       }
     }
   }
+  /* DE TWEE GEDEELDE DELEN WAAR ELK SPRAAKANKER OP LEUNT. Ze staan hier en niet
+     per element: een aansluiting per scherm zonder de gedeelde luisteraar is een
+     aanroep in het niets, en zonder de eerlijke uitleg in de baan is de knop bij
+     een huis zonder modelserver een lege belofte. Zakt een van beide, dan zakt
+     hij voor alle acht tegelijk -- en dat is juist wat je wilt weten. */
+  if ([...gevonden.keys()].some(k => (REGISTER.get(k) || [])[3])) {
+    if (!fs.existsSync(path.join(ROOT, SPRAAKMODULE))) {
+      klachten.push('check.js regel 49: ' + SPRAAKMODULE + ' is weg, maar er zijn gesprekken die zeggen dat zij automatisch ondertitelen');
+    }
+    const [eb, en] = SPRAAKEERLIJK;
+    if (!fs.existsSync(path.join(ROOT, eb)) || !fs.readFileSync(path.join(ROOT, eb), 'utf8').includes(en)) {
+      klachten.push('check.js regel 49: ' + eb + ' draagt "' + en + '" niet meer -- een huis zonder spraakmodel krijgt dan een knop zonder uitleg');
+    }
+  }
+
   /* Een register dat namen bevat die niet meer bestaan, groeit stil vol en leest
      als dekking die er niet is -- dezelfde controle als bij regel 28 en 47. */
   for (const sleutel of REGISTER.keys()) {
     if (!gevonden.has(sleutel)) klachten.push('check.js regel 49: ' + sleutel + ' staat in het register maar bestaat niet (meer) als media-element');
   }
 
-  const open = [...gevonden.keys()].filter(k => REGISTER.has(k) && (SOORTEN[REGISTER.get(k)[0]] || {}).open);
+  /* WAT ER OPEN STAAT. Een `gesprek` met een geldig SPRAAKANKER heeft een
+     automatische weg naar tekst en telt niet mee -- dat is precies de schuld die
+     de ratelnotitie hierboven beschrijft. Een anker dat NIET klopt telt wel mee,
+     en dan gaat het getal omhoog en zakt de ratel: dat is de bedoeling, want dan
+     is de weg eruit gehaald zonder dat iemand het zei. */
+  const spraakOk = (k) => {
+    const a = (REGISTER.get(k) || [])[3];
+    if (!a) return false;
+    const [bestand, naam] = a;
+    if (!bestand || !naam) return false;
+    const pad = path.join(ROOT, bestand);
+    return fs.existsSync(pad) && fs.readFileSync(pad, 'utf8').includes(naam);
+  };
+  const open = [...gevonden.keys()].filter(k => REGISTER.has(k) &&
+    (SOORTEN[REGISTER.get(k)[0]] || {}).open && !spraakOk(k));
   if (open.length > OPEN_MAX) {
     klachten.push(open.length + ' open media-elementen terwijl OPEN_MAX op ' + OPEN_MAX + ' staat: ' + open.join(', '));
   }
 
   if (klachten.length) klachten.forEach(fout);
   else {
-    const per = {};
-    for (const k of gevonden.keys()) { const s = REGISTER.get(k)[0]; per[s] = (per[s] || 0) + 1; }
-    const noem = (lijst) => lijst.filter(s => per[s]).map(s => per[s] + ' ' + s).join(', ');
-    /* De open elementen tellen mee als open, ook als ze een tekstbaan dragen.
-       Dat is geen slordigheid maar het punt: meelezen is GEEN ondertiteling --
-       er wordt niets van spraak naar tekst omgezet, en WCAG 1.2.4 is dus niet
-       gehaald. Het getal zou stil dalen als we ze hier zouden wegstrepen, en dan
-       leest dit register als dekking die er niet is. Wat er WEL is, telt apart. */
+    /* DE TELLING VOLGT DE UITKOMST EN NIET DE TABEL. Zolang een gesprek open
+       stond, was "8 gesprek" hetzelfde getal als "8 open". Sinds een gesprek met
+       een spraakanker niet meer open telt, zijn dat twee verschillende dingen --
+       en een regel die de tabel opsomt naast een getal dat de uitkomst telt,
+       leest als onzin ("9 van die 2"). Hier wordt dus geteld wat er werkelijk
+       uit `spraakOk` komt. */
+    const perUitkomst = {};
+    for (const k of gevonden.keys()) {
+      const soort = REGISTER.get(k)[0];
+      const s = (SOORTEN[soort] || {}).open && spraakOk(k) ? 'gesprek met ondertiteling' : soort;
+      perUitkomst[s] = (perUitkomst[s] || 0) + 1;
+    }
+    const noem = (lijst) => lijst.filter(s => perUitkomst[s]).map(s => perUitkomst[s] + ' ' + s).join(', ');
+    /* Wat er WEL is, telt apart en wordt nooit met "geregeld" op een hoop
+       gegooid. Meelezen is GEEN ondertiteling: daar zet niemand spraak om, en
+       dat een deelnemer MEETYPT is een andere belofte dan dat het gesprek
+       ondertiteld wordt. */
     const metBaan = [...gevonden.keys()].filter(k => REGISTER.has(k) &&
       ((SOORTEN[REGISTER.get(k)[0]] || {}).baan || ((SOORTEN[REGISTER.get(k)[0]] || {}).open && (REGISTER.get(k)[2] || []).length)));
+    const metSpraak = [...gevonden.keys()].filter(spraakOk);
     ok(gevonden.size + ' media-elementen, elk met een besluit en een reden: ' +
-      (gevonden.size - open.length) + ' geregeld (' + noem(['spiegel', 'werktuig', 'ondertiteld']) + '), ' +
+      (gevonden.size - open.length) + ' geregeld (' +
+      noem(['spiegel', 'werktuig', 'ondertiteld', 'gesprek met ondertiteling']) + '), ' +
       open.length + ' open (' + noem(['gesprek', 'uitzending', 'onbedekt']) + '), ratel op ' + OPEN_MAX +
-      '\n  ' + metBaan.length + ' van die ' + open.length + ' dragen een TEKSTBAAN waarin deelnemers meeschrijven ' +
-      '(geen ondertiteling: WCAG 1.2.4 blijft open)');
+      '\n  ' + metBaan.length + ' dragen een TEKSTBAAN waarin deelnemers meeschrijven, en ' +
+      metSpraak.length + ' daarvan ook automatische ondertiteling uit een LOKAAL model' +
+      '\n  (die ondertiteling hangt aan een ingerichte LOCAL_AI_MODEL_SPRAAK; staat die er niet, ' +
+      'dan zegt de baan dat en blijft meetypen over)');
   }
 }
 
@@ -4833,6 +4914,48 @@ console.log('\n64) het mutatiecontractregister loopt niet achter op de code');
       }
     }
   }
+}
+
+/* ============================================================================
+   65) ELKE SERVICEBEVOEGDHEID DIE HET LID BEVESTIGT, WORDT ERGENS UITGELEZEN
+
+   CONTROLPLANE.md: geen capability zonder caller. Voor RTG Service weegt die
+   regel dubbel, want hier drukt een MENS op een knop. Een bevoegdheid die
+   nergens wordt uitgelezen legt toestemming vast en opent niets: het lid
+   bevestigt iets dat daarna nergens wordt afgedwongen, en een keurder die de
+   tabel leest denkt dat er een grendel zit.
+
+   Gemeten op 3 september 2026 met scripts/servicecaps.js: 8 van de 9
+   bevoegdheden die het lid bevestigt, hadden geen lezer -- alleen
+   `organisatie.stand` had er een. Dat is de eerlijke stand en geen slordigheid:
+   de laag is jong en elke poort is een besluit over wat een medewerker
+   werkelijk te zien krijgt. Wat deze regel doet is voorkomen dat het getal
+   GROEIT. Een negende stille bevoegdheid erbij zakt hier, en dan is de keuze:
+   er een lezer bij bouwen, of hem niet aan het lid voorleggen.
+
+   MAG ALLEEN OMLAAG, net als de ratel van regel 49. Wie hem verhoogt, schrijft
+   erbij waarom -- anders is de ratel zelf stuk.
+   ========================================================================== */
+console.log('\n65) elke servicebevoegdheid die het lid bevestigt, wordt ergens uitgelezen');
+{
+  const STIL_MAX = 8;
+  try {
+    const uit = cp.execFileSync(process.execPath, [path.join(ROOT, 'scripts', 'servicecaps.js')],
+      { cwd: ROOT, encoding: 'utf8', timeout: 120000, maxBuffer: 16 * 1024 * 1024 });
+    const m = /^\s*(\d+) van (\d+) bevoegdheden die het LID bevestigt/m.exec(uit);
+    if (!m) fout('de servicecap-meting gaf geen telling terug');
+    else {
+      const stil = Number(m[1]), totaal = Number(m[2]);
+      if (stil > STIL_MAX) {
+        fout(stil + ' servicebevoegdheden zonder lezer terwijl de ratel op ' + STIL_MAX + ' staat. ' +
+          'Bouw er een poort bij (magNu), of haal hem uit de tabel: een bevoegdheid die niets opent, ' +
+          'laat een lid iets bevestigen dat nergens wordt afgedwongen.');
+      } else {
+        ok((totaal - stil) + ' van ' + totaal + ' bevoegdheden die het lid bevestigt worden uitgelezen, ' +
+          stil + ' nog niet (ratel op ' + STIL_MAX + ', mag alleen omlaag)');
+      }
+    }
+  } catch (e) { fout('de servicecap-meting kon niet draaien: ' + e.message); }
 }
 
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');

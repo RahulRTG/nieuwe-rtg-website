@@ -204,3 +204,32 @@ test('de AI vraagt het lid om toegang, en opent niets uit zichzelf', { skip: gee
     assert.equal(verzoeken.verzoeken[0].machine, true, 'het lid kan niet zien dat er een machine vraagt');
   });
 });
+
+/* HET KANALENBORD ZEGT WAT ER NIET IS VASTGESTELD.
+
+   Twee ingangen van deze laag hangen aan inrichting en falen stil op de goede
+   manier. Dit bord maakt dat zichtbaar -- maar de verleiding is dan om "in orde"
+   te schrijven omdat de code klopt, en dat is je eigen bestand meten in plaats
+   van de werkelijkheid. Deze toets houdt vast dat het bord dat NIET doet: bij de
+   post staat er even groot bij dat DNS en de provider buiten beeld blijven. */
+test('het kanalenbord zegt even groot wat het niet kan vaststellen', { skip: geenBrowser(pw) }, async () => {
+  await metCockpit(async (page, base) => {
+    await page.goto(base + '/apps/service.html', { waitUntil: 'domcontentloaded' });
+    await page.waitForSelector('#tKanalen', { timeout: 20000 });
+    await page.click('#tKanalen');
+    await page.waitForFunction(() => /Waar een melding binnenkomt/.test(document.body.textContent), null, { timeout: 20000 });
+    const tekst = await page.evaluate(() => document.body.textContent);
+
+    /* OP DE RIJ EN NIET OP DE PAGINA. De inleidende zin van dit bord noemt DNS
+       ook, dus een `match` op de hele body slaagde ook toen de rij zijn lijst
+       kwijt was -- de toets mat de kop in plaats van wat hij beweert te toetsen.
+       Gevonden door de rij met opzet stuk te maken en te zien dat er niets zakte. */
+    const items = await page.$$eval('.waarom li', els => els.map(e => e.textContent));
+    assert.ok(items.some(t => /niet over zichzelf vaststellen/i.test(t)),
+      'de mailingang doet alsof hij weet of er post aankomt: ' + JSON.stringify(items));
+    /* En zonder spraakmodel staat het GEVOLG erbij in gewone woorden. Zonder die
+       zin leest een rode regel als een ontbrekend extraatje in plaats van als
+       een uitsluiting. */
+    assert.match(tekst, /meetypen/i, 'het gevolg van geen ondertiteling staat er niet bij');
+  });
+});

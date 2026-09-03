@@ -55,9 +55,12 @@ const EIGEN_POORT = new Map([
   // ---- machine naar machine: het bewijs zit in het verzoek zelf ----
   ['/api/betaal/webhook/adyen', 'de derde kaartwebhook; hij telt een handtekening na en weigert zonder secret'],
 
-  // ---- bewust zonder account, met een eigen rem ----
-  ['/api/foundation/reis/aanvraag', 'wie een reis aanvraagt of iemand voordraagt heeft geen ' +
-    'foundation-account; dat is het punt ervan. Eigen rem per adres (test/foundation-reisrem.test.js)']
+  /* /api/foundation/reis/aanvraag stond hier tot 3 september 2026 onder
+     "bewust zonder account, met een eigen rem". Sinds de samenvoeging met #176
+     staat hij op de openbaar-lijst (scripts/lib/publiek.js, PUBLIEK) met zijn
+     rem erbij -- daar horen bewust open routes, en een pad mag niet op allebei
+     staan (test/eigenpoort.test.js). Hier stond hij alleen omdat keuringsregel
+     28 een gemonteerde route op PUBLIEK toen niet kon terugvinden. */
 ]);
 
 module.exports = { EIGEN_POORT };

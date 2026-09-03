@@ -115,7 +115,7 @@ function routekaart() {
 
 /* ---- WAAR HET STAAT: de bron, als verrijking ----
    Dezelfde uitdrukking als voorheen, maar hij beslist niets meer over bestaan.
-   Vijf ingangen, van zeker naar onzeker, en de volgorde IS de zekerheid:
+   Zes ingangen, van zeker naar onzeker, en de volgorde IS de zekerheid:
 
      exact          de route staat letterlijk zo in de bron
      samengesteld   het pad is in de bron opgebouwd uit een voorvoegsel dat in
@@ -124,6 +124,11 @@ function routekaart() {
                     af te leiden en is dit net zo hard als exact.
      staart         een route op een sub-router staat daar met zijn pad binnen de
                     mount: `/les/maak` voor `/api/foundation/les/maak`
+     voorvoegsel    een LETTERLIJK voorvoegsel met een variabele staart:
+                    `app.post('/api/rtf/spel/' + naam, ...)` in een lus over een
+                    actietabel. Het bestand zegt hier zelf, naast de
+                    registratie, welk voorvoegsel het claimt -- de hardste
+                    voorvoegselclaim die er is, en per methode.
      staartVoorvoegsel  wel een `X + '/alias'`, maar het voorvoegsel staat niet
                     in dit bestand (het komt als parameter binnen). Dan blijft
                     alleen de staart over.
@@ -132,14 +137,19 @@ function routekaart() {
                     statisch niet. Het voorvoegsel staat er wel als tekst, dus
                     de vraag wordt omgekeerd: welk bestand claimt dit
                     voorvoegsel en bouwt paden op? Alleen bij precies een.
-                    Hieronder valt ook de spiegelvorm met een LETTERLIJK
-                    voorvoegsel en een variabele staart:
-                    `app.post('/api/rtf/spel/' + naam, ...)` in een lus over
-                    een actietabel.
 
    De laatste drie accepteren we alleen bij precies EEN treffer -- een verkeerd
    toegewezen bronbestand is erger dan geen bronbestand, want dan wijst een
    melding je naar het verkeerde bestand.
+
+   WAAROM HET VOORVOEGSEL VOOR DE OPGEBOUWDE STAART KOMT, en niet erna. Met de
+   omgekeerde volgorde viel /api/rtf/spel/antwoord op de staart `/antwoord` van
+   `app.post(p.pad + '/antwoord')` in server/routes/rtmail-vak.js -- een
+   bestand dat er niets mee te maken heeft, terwijl server/routes/spellen.js
+   het voorvoegsel `/api/rtf/spel/` letterlijk naast zijn registratie draagt.
+   Een claim naast de registratie weegt zwaarder dan een staart zonder
+   voorvoegsel; wie dat omdraait, wijst precies de route toe die al een keer
+   verkeerd is toegewezen (test/routebron.test.js houdt dit vast).
 
    WAAROM DEZE INGANGEN ERBIJ ZIJN GEKOMEN, in twee rondes die elkaar dekten.
 
@@ -202,7 +212,8 @@ function bronIndex() {
   const perStaart = new Map();
   const samengesteld = new Map();
   const perStaartVoorvoegsel = new Map();
-  const perVoorvoegselBestand = new Map();
+  const perVoorvoegsel = new Map();          // 'POST /api/rtf/spel' -> de registratie(s) naast dat letterlijke voorvoegsel
+  const perVoorvoegselBestand = new Map();   // '/api/supplier/beauty' -> het bestand dat paden bouwt en dit voorvoegsel noemt
   const zet = (kaart, sleutel, plek) => {
     const lijst = kaart.get(sleutel) || [];
     lijst.push(plek);
@@ -275,6 +286,14 @@ function bronIndex() {
       if (!vv.startsWith('/api/')) continue;
       const plek = plekOp(m.index, m[1] === 'router', '');
       plek.viaVoorvoegsel = true;
+      /* Twee kaarten, met opzet. De claim naast de registratie kent zijn
+         METHODE en is de hardste die er is; die gaat in perVoorvoegsel en wordt
+         vóór de opgebouwde staarten geraadpleegd. Dezelfde plek telt daarnaast
+         als bestand dat dit voorvoegsel bouwt, voor de fabriek-ingang -- want
+         een bestand dat zijn voorvoegsel naast de registratie noemt EN elders
+         als losse tekst, is nog steeds een ondubbelzinnig antwoord op WAAR
+         (zie enigBestand). */
+      zet(perVoorvoegsel, m[2].toUpperCase() + ' ' + vv, plek);
       zet(perVoorvoegselBestand, vv, plek);
     }
     if (BOUWT_RE.test(tekst)) {
@@ -286,7 +305,7 @@ function bronIndex() {
       for (const vv of voorvoegsels) zet(perVoorvoegselBestand, vv, plek);
     }
   });
-  _bron = { exact, perStaart, samengesteld, perStaartVoorvoegsel, perVoorvoegselBestand };
+  _bron = { exact, perStaart, samengesteld, perStaartVoorvoegsel, perVoorvoegsel, perVoorvoegselBestand };
   return _bron;
 }
 
@@ -313,7 +332,7 @@ function enigBestand(kaart, sleutel) {
 }
 
 function plekVan(methode, pad) {
-  const { exact, perStaart, samengesteld, perStaartVoorvoegsel, perVoorvoegselBestand } = bronIndex();
+  const { exact, perStaart, samengesteld, perStaartVoorvoegsel, perVoorvoegsel, perVoorvoegselBestand } = bronIndex();
   const heel = exact.get(methode + ' ' + pad);
   if (heel) return heel;
   const opgebouwd = enige(samengesteld, methode + ' ' + pad);
@@ -327,6 +346,19 @@ function plekVan(methode, pad) {
     const staart = '/' + delen.slice(i).join('/');
     const kandidaten = perStaart.get(methode + ' ' + staart);
     if (kandidaten && kandidaten.length === 1) return kandidaten[0];
+  }
+  /* Het letterlijke voorvoegsel naast een registratie, van lang naar kort en
+     per methode. Het LANGSTE voorvoegsel dat past beslist; wijst dat op meer
+     dan een bestand, dan stopt de wandeling en valt hij niet terug op een
+     korter voorvoegsel -- een kortere claim van iemand anders is geen antwoord
+     op deze route. Twee claims uit HETZELFDE bestand zijn wel een antwoord
+     (enigBestand), want de vraag is WAAR en niet op welke regel. */
+  for (let i = delen.length; i >= 3; i--) {
+    const vv = delen.slice(0, i).join('/');
+    if (vv.split('/').length < 3) break;
+    const kandidaten = perVoorvoegsel.get(methode + ' ' + vv);
+    if (!kandidaten || !kandidaten.length) continue;
+    return enigBestand(perVoorvoegsel, methode + ' ' + vv);
   }
   /* En dezelfde wandeling over de opgebouwde staarten. Pas hier, want dit is
      de onzekerste van de staartvormen: het voorvoegsel is niet gezien.

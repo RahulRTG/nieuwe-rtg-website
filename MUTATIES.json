@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-03T14:15:53.499Z",
-    "commit": "a56af7dc",
+    "op": "2026-09-03T14:45:26.335Z",
+    "commit": "ee96807f",
     "boomVuil": true,
-    "boomAnders": 76,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -858,7 +858,7 @@
       "staat": "gezakt",
       "module": "scripts/lib/bron.js",
       "operator": "===->!==#0",
-      "gezakt": 5,
+      "gezakt": 10,
       "geprobeerd": 1
     },
     "bronblind.test.js": {

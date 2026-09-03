@@ -96,7 +96,10 @@ function schermenVan(toetsPad) {
 function scriptBereik(bron) {
   const start = bron.indexOf('<script>');
   if (start < 0) return null;
-  const eind = bron.indexOf('</script>', start);
+  /* Via lib/bron.js: `</script >` met witruimte sluit ook, en een letterlijke
+     indexOf mist dat (CodeQL, 3 september 2026). Derde van de drie plekken. */
+  const dicht = require('./lib/bron').eindTag(bron, 'script', start);
+  const eind = dicht ? dicht.begin : -1;
   if (eind < 0) return null;
   return { van: start + 8, tot: eind };
 }

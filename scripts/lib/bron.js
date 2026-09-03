@@ -121,16 +121,38 @@
    gemeten wordt (LAT.md regel 4). */
 const BLOK_OPEN = /<(script|style)\b[^>]*>/gi;
 
+/* WAAR SLUIT DIT BLOK? -- en dat is niet `indexOf('</script>')`.
+
+   HTML staat witruimte toe VOOR de sluithaak: `</script >` sluit het element net
+   zo goed als `</script>`. Hier stond een letterlijke zoekactie, en die vond de
+   eerste vorm niet -- dan loopt het blok door tot de volgende sluiter of tot het
+   eind van het bestand, en wordt markup als script behandeld (of omgekeerd).
+
+   Gevonden door CodeQL op de PR van 3 september 2026 ("Bad HTML filtering
+   regexp", hoog), op scripts/inlinestijl-omzet.js. Diezelfde vorm stond op DRIE
+   plekken: daar, hier, en in scripts/schermmutatie.js. Hij staat nu een keer, en
+   de andere twee halen hem hier op (LAT.md regel 4).
+
+   Wat hij NIET probeert te zijn: een HTML-parser. Een sluittag met een attribuut
+   erin (`</script foo>`) is ongeldige HTML en die zoeken we niet; wat we zoeken
+   is de vorm die een browser WEL accepteert en wij misten. */
+function eindTag(bron, tag, vanaf) {
+  const re = new RegExp('</' + tag + '\\s*>', 'i');
+  const rest = bron.slice(vanaf);
+  const m = re.exec(rest);
+  return m ? { begin: vanaf + m.index, eind: vanaf + m.index + m[0].length } : null;
+}
+
 function stukken(bron) {
-  const laag = bron.toLowerCase();
   const uit = [];
   let i = 0;
   BLOK_OPEN.lastIndex = 0;
   let m;
   while ((m = BLOK_OPEN.exec(bron))) {
     const na = m.index + m[0].length;
-    const sluit = laag.indexOf('</' + m[1].toLowerCase() + '>', na);
-    if (sluit < 0) break;
+    const dicht = eindTag(bron, m[1].toLowerCase(), na);
+    if (!dicht) break;
+    const sluit = dicht.begin;
     uit.push({ soort: null, tekst: bron.slice(i, na) });
     uit.push({ soort: m[1].toLowerCase(), tekst: bron.slice(na, sluit) });
     i = sluit;
@@ -255,4 +277,4 @@ function zonderTekst(bron) {
     m => m.replace(/[^\n]/g, ' '));
 }
 
-module.exports = { zonderCommentaar, zonderTekst, stukken };
+module.exports = { zonderCommentaar, zonderTekst, stukken, eindTag };

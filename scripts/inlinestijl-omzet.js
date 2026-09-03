@@ -54,6 +54,7 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
+const { eindTag } = require('./lib/bron');
 
 const WORTEL = path.join(__dirname, '..');
 const argv = process.argv.slice(2);
@@ -72,11 +73,26 @@ const OVERSLAAN = (() => {
 /* De stukken buiten <script>. Een style-attribuut in een JavaScript-string is
    een ander soort ding: het komt pas op het scherm na een aanroep, en de proef
    ernaast kan het niet zien. Wat niet te bewijzen valt, wordt niet omgezet. */
+/* HIER STOND `<\/script>` EN DAT MISTE `</script >`. HTML staat witruimte toe
+   voor de sluithaak, en dan liep dit blok door tot de volgende sluiter -- met als
+   gevolg dat markup als script gold en niet werd omgezet, of erger: dat een stuk
+   script als markup gold. Gevonden door CodeQL op deze PR ("Bad HTML filtering
+   regexp", hoog).
+
+   De sluitvorm komt nu uit ./lib/bron.js, waar hij ook voor de
+   commentaar-verwijderaar wordt gebruikt: dezelfde vraag hoort niet op drie
+   plekken anders beantwoord te worden (LAT.md regel 4). */
 function markupStukken(bron) {
   const uit = [];
-  const re = /<script[\s\S]*?<\/script>/gi;
+  const open = /<script\b[^>]*>/gi;
   let laatste = 0, m;
-  while ((m = re.exec(bron))) { uit.push([laatste, m.index]); laatste = m.index + m[0].length; }
+  while ((m = open.exec(bron))) {
+    const dicht = eindTag(bron, 'script', m.index + m[0].length);
+    if (!dicht) break;
+    uit.push([laatste, m.index]);
+    laatste = dicht.eind;
+    open.lastIndex = dicht.eind;
+  }
   uit.push([laatste, bron.length]);
   return uit;
 }

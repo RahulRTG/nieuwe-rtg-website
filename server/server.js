@@ -2272,6 +2272,7 @@ require('./opzet/kernlaag4c')(kern, hulp);   // de drie kantoorkamers; NA 4b, wa
 require('./opzet/kernlaag5')(kern, hulp);
 require('./opzet/kernlaag5f')(kern, hulp);  // RTG Festival; hangt onder EEN naam, zie de kop daar
 require('./opzet/kernlaag6')(kern, hulp);
+require('./opzet/kernlaag6b')(kern, hulp);
 require('./opzet/kernlaag7')(kern, hulp);
 require('./opzet/kernlaag7b')(kern, hulp);   // de routers ophangen; zie de kop daar waarom dat NA alle Object.assign moet
 

@@ -332,12 +332,16 @@
       "officeAuth",
       "sseToOffice"
     ],
-    "fout": [],
+    "fout": [
+      "serviceFoutsignaal",
+      "tooManyTries"
+    ],
     "galerij": [
       "galerij"
     ],
     "gast": [
       "H",
+      "Hlees",
       "afrekenlaag",
       "appUrl",
       "beleid",
@@ -449,6 +453,21 @@
       "inzagekaartVan",
       "status"
     ],
+    "isolatie": [
+      "appUrl",
+      "beveilig",
+      "isolatie",
+      "standen",
+      "webauthnAantal",
+      "webauthnStapOpMaak",
+      "webauthnStapOpOpties"
+    ],
+    "isolatie-ceremonie": [
+      "appUrl",
+      "webauthnAantal",
+      "webauthnStapOpMaak",
+      "webauthnStapOpOpties"
+    ],
     "journaal": [
       "boardroomAuth",
       "journaalBeeld",
@@ -467,6 +486,7 @@
     "kantoorpakket": [
       "boardroomBaas",
       "boardroomWie",
+      "office",
       "officeAI",
       "officeAanwezig",
       "officeBeheer",
@@ -490,6 +510,7 @@
     ],
     "kantoorpakket-huis": [
       "boardroomBaas",
+      "office",
       "officeAI",
       "officeBewaar",
       "officeFase",
@@ -509,6 +530,7 @@
     ],
     "kantoorpakket-samen": [
       "boardroomBaas",
+      "office",
       "officeAanwezig",
       "officeBeheer",
       "officeOpmerking",
@@ -584,6 +606,9 @@
     ],
     "klok": [
       "klok"
+    ],
+    "knelpunt": [
+      "status"
     ],
     "kosten": [
       "boardroomAuth",
@@ -1568,6 +1593,63 @@
     "scim-groepen": [
       "tenant"
     ],
+    "service": [
+      "findSupplier",
+      "magBalie",
+      "serviceBevestiging",
+      "serviceFoutsignaal",
+      "serviceGesprek",
+      "serviceKeuzes",
+      "serviceKlassen",
+      "serviceKwaliteit",
+      "serviceLoop",
+      "serviceMachtiging",
+      "serviceMens",
+      "serviceOnderzoeker",
+      "servicePatronen",
+      "servicePersoonlijk",
+      "servicePost",
+      "serviceZaken",
+      "spraaktekst",
+      "supplierAuth"
+    ],
+    "service-kantoor": [
+      "findSupplier",
+      "magBalie",
+      "serviceBevestiging",
+      "serviceFoutsignaal",
+      "serviceGesprek",
+      "serviceKeuzes",
+      "serviceLoop",
+      "serviceMachtiging",
+      "serviceZaken"
+    ],
+    "service-kantoor-ai": [
+      "serviceOnderzoeker"
+    ],
+    "service-kantoor-borden": [
+      "balieAuth",
+      "kort",
+      "lijf",
+      "serviceFoutsignaal",
+      "serviceKwaliteit",
+      "servicePatronen",
+      "veilig"
+    ],
+    "service-kantoor-kanalen": [
+      "serviceKlassen",
+      "servicePost",
+      "spraaktekst"
+    ],
+    "service-kantoor-zaakbeeld": [],
+    "service-zaak": [
+      "serviceBevestiging",
+      "serviceKeuzes",
+      "serviceLoop",
+      "serviceMens",
+      "servicePersoonlijk",
+      "serviceZaken"
+    ],
     "sleutelwoorden": [
       "swInfo",
       "swWeg",
@@ -1724,6 +1806,9 @@
     "sportclub": [
       "sport"
     ],
+    "spraaktekst": [
+      "spraaktekst"
+    ],
     "sso": [
       "accounts",
       "appUrl",
@@ -1771,6 +1856,7 @@
       "werkbeleidPauzeStand"
     ],
     "stuur": [
+      "isolatie",
       "stuurBevestig",
       "stuurPaden",
       "stuurRoep"
@@ -2104,6 +2190,7 @@
     "techniek": [
       "LANDEN",
       "antivirus",
+      "appUrl",
       "archief",
       "av",
       "bank",
@@ -2133,15 +2220,20 @@
       "mail",
       "noteFailedTry",
       "onboarding",
+      "ontsluitpoort",
       "pay",
       "sendPushToUser",
       "sessions",
       "spelTelemetrie",
       "staat",
       "stad",
+      "standen",
       "techniek",
       "tenant",
       "wacht",
+      "webauthnAantal",
+      "webauthnStapOpMaak",
+      "webauthnStapOpOpties",
       "zekeringMag"
     ],
     "tenant": [
@@ -2201,6 +2293,7 @@
       "trainingZet"
     ],
     "uitgifte": [
+      "naamAuth",
       "overheid",
       "uitgifte"
     ],
@@ -2273,6 +2366,7 @@
     "verzorging": [
       "beauty",
       "opvang",
+      "opvangwijzer",
       "petcare",
       "status",
       "verzorgingLeden"

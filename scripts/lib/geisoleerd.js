@@ -24,6 +24,26 @@ const GEISOLEERD = [
   'meterijk.test.js',
   'gezag.test.js',
   'envelop.test.js',
+  /* ERBIJ OP 3 SEPTEMBER 2026 (TAKEN.md 4.72). Hij hernoemt `req.envelop` in
+     server/opzet/envelop.js om te bewijzen dat de meter zakt zodra de canonieke
+     vorm weg is, en hij zet req.boardroomKey terug in de boardroom-poort. Beide
+     staan in een finally weer goed -- maar precies daar gaat 4.77 over: een
+     andere toets die op dat moment een server start, leest het kapotte bestand.
+     Deze regel is niet met de hand gevonden maar door test/bronmutanten.test.js,
+     die er onmiddellijk over viel toen de toets erbij kwam. */
+  'actorvormen.test.js',
+  /* DEZE TWEE ZIJN GEVONDEN DOOR DE ZEEF ZELF, op 3 september 2026, toen die
+     leerde kijken naar een schrijf op een pad uit een VARIABELE (TAKEN.md 4.77).
+     Ze stonden hier niet en muteerden wel echte bron:
+
+       capabilities.test.js       zet server/kern/zz-capmeting-proef.js neer
+       gezagshandelingen.test.js  muteert kern/frictie/bodem.js
+
+     Allebei zetten ze het netjes terug in een finally, en allebei zijn ze
+     daarmee precies het geval waar deze lijst voor bestaat: terwijl dat halve
+     seconde duurt, start een andere toets een server. */
+  'capabilities.test.js',
+  'gezagshandelingen.test.js',
   /* ERBIJ OP 22 AUGUSTUS 2026, en met een eerlijke slag om de arm. Deze toets
      slaagt drie van de drie keer alleen en zakte in CI binnen een scherf van 272
      bestanden op 'de zaak laat achteraf betalen' -- een betaalinstelling van een

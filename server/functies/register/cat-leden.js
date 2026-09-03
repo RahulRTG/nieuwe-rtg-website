@@ -46,6 +46,30 @@ module.exports = [
   { id: 'wereld', categorie: 'Leden (RTG-app)', naam: 'RTG Wereld (de ene sociale app)', standaard: true, doelgroepen: LEDEN,
     uitleg: 'De laag over De Salon, Pulse, RTG Zakelijk, de genootschappen en de verhalen heen: één tijdlijn met een schakelaar (Alles, Lifestyle, Business, Communities, Privé) en de sprong naar de berichten-app. Uit zetten laat de vijf onderliggende apps gewoon staan; alleen de verbindende laag verdwijnt -- net als bij de Media OS.',
     paden: ['/api/wereld'] },
+  /* RTG SERVICE STOND HIER NIET, en daarmee viel de hele hulplijn buiten de
+     boardroom: niet uit te zetten, niet per stad te sluiten, en de
+     storingswachter greep er nooit op in. Gevonden door de volle suite te
+     draaien (test/schakelkast-dekking.test.js), niet door te lezen -- precies
+     het gat dat die toets beschrijft als "stap twee wordt vergeten".
+
+     DRIE FUNCTIES EN GEEN EEN, want ze schakelen verschillende dingen. `service`
+     is de hele ledenkant van de hulplijn; `service-bel` is de STEM en hoort bij
+     Lifestyle en Business (SERVICE.md par. 13, en dat is de ladder en geen
+     weglating); `ondertiteling` staat los omdat hij door elk gesprek in dit huis
+     wordt gebruikt en niet alleen door de hulplijn.
+
+     WAT ER GEBEURT ALS IEMAND `service` UITZET: een lid kan niets melden en niet
+     om een mens vragen. Dat is een zware knop, en de uitleg zegt dat -- de
+     ondergrens uit kern/service/mens.js is dan weg. */
+  { id: 'service', categorie: 'Leden (RTG-app)', naam: 'RTG Service (hulp vragen)', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'De hulplijn van een lid: iets melden vanuit het scherm waar je stond, je lopende zaken zien, een medewerker toegang bevestigen, en om een MENS vragen. Uit zetten sluit die weg helemaal -- ook de ondergrens dat elk lid bij een mens kan uitkomen.',
+    paden: ['/api/service'] },
+  { id: 'service-bel', categorie: 'Leden (RTG-app)', naam: 'Bellen met RTG (in de app)', standaard: true, doelgroepen: ['lifestyle', 'business'],
+    uitleg: 'Bellen met RTG Service binnen de app, zonder telefoonnet en zonder nummer. Hoort bij de Lifestyle en Business Pass; om een mens vragen blijft voor elk account bestaan en gaat hier niet mee uit.',
+    paden: ['/api/service/bel'] },
+  { id: 'ondertiteling', categorie: 'Leden (RTG-app)', naam: 'Automatisch ondertitelen in een gesprek', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'Een deelnemer laat zijn eigen stem omzetten naar tekst met een LOKAAL model; de regel komt in de meeleesbaan van het gesprek. Uit zetten laat die baan staan -- meetypen blijft werken -- maar wie doof is is dan weer afhankelijk van de anderen.',
+    paden: ['/api/ondertiteling'] },
   { id: 'privekantoor', categorie: 'Leden (RTG-app)', naam: 'Het Privékantoor (Lifestyle)', standaard: true, doelgroepen: ['lifestyle', 'business'],
     uitleg: 'De ene app van de Lifestyle Pass: de levensgraaf over de premium-apps heen, de Control Tower met alle termijnen, het mandaat (wat mag het kantoor zelf) en zaken met een team en een tijdlijn. Uit zetten laat de onderliggende apps staan; alleen de samenhang verdwijnt.',
     paden: ['/api/member/bureau', '/api/office/bureau'] },

@@ -646,7 +646,7 @@ model en wijkt NOOIT uit naar buiten -- een tekstantwoord bij de derde aanbieder
 is net zo goed, de stem van een lid niet. Iedereen ondertitelt ZICHZELF (de
 spreker beslist over zijn eigen stem, en niemand ondertitelt een ander achter zijn
 rug), de knop hangt in de meeleesbaan zelf zodat alle acht gesprekken hem tegelijk
-kregen, en de ratel van keuringsregel 49 ging daarmee van 10 naar 2. Die twee zijn
+kregen, en de ratel van keuringsregel 49 ging daarmee van 10 naar 4 -- en die 4 is met opzet geen 2: de ondertiteldeur hangt aan een LEDENsessie, dus bij de teamcall en het schoolgesprek (personeels- en partnersessie) verschijnt de knop soms wel en soms niet, en een register mag geen "soms" als "ja" tellen. Twee van de vier zijn
 UITZENDINGEN: eenrichting, dus zichzelf ondertitelen helpt de kijker niets. Par.
 13e is de capability-telling (`scripts/servicecaps.js`), en die vond eerst geen
 ontbrekende poort maar een bevoegdheid die er niet in hoorde: **`zaak.lezen` hangt

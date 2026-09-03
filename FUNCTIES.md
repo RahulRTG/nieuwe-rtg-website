@@ -16,7 +16,7 @@ het?**
 
 | | |
 |---|---|
-| Functieschakelaars (aan/uit per functie) | **205** in 17 categorieën |
+| Functieschakelaars (aan/uit per functie) | **208** in 17 categorieën |
 | Apps in de leden-catalogus | **84** in 8 categorieën |
 | Bedrijfsgenres | **74** in 27 sectoren |
 | Genre-caps (waar de apps op sturen) | **40** |
@@ -54,9 +54,9 @@ ook blokkeert.
 
 ---
 
-# 1. De 205 functieschakelaars
+# 1. De 208 functieschakelaars
 
-### Leden (RTG-app) — 21
+### Leden (RTG-app) — 24
 
 - **Leden-app (algemeen)** (`member`) — Alle ledenfuncties in de RTG-app. Zet je dit uit, dan valt de hele ledenkant stil (behalve wat hieronder apart aan staat).  
   _voor: rtg, lifestyle, business, gast_
@@ -73,6 +73,12 @@ ook blokkeert.
 - **RTG Zakelijk (professioneel netwerk)** (`zakelijk`) — De LinkedIn-laag van de Lifestyle en Business Pass: zakelijk profiel, gids, verbinden, feed, aanbevelingen en het kansenbord.  
   _voor: lifestyle, business_
 - **RTG Wereld (de ene sociale app)** (`wereld`) — De laag over De Salon, Pulse, RTG Zakelijk, de genootschappen en de verhalen heen: één tijdlijn met een schakelaar (Alles, Lifestyle, Business, Communities, Privé) en de sprong naar de berichten-app. Uit zetten laat de vijf onderliggende apps gewoon staan; alleen de verbindende laag verdwijnt -- net als bij de Media OS.  
+  _voor: rtg, lifestyle, business_
+- **RTG Service (hulp vragen)** (`service`) — De hulplijn van een lid: iets melden vanuit het scherm waar je stond, je lopende zaken zien, een medewerker toegang bevestigen, en om een MENS vragen. Uit zetten sluit die weg helemaal -- ook de ondergrens dat elk lid bij een mens kan uitkomen.  
+  _voor: rtg, lifestyle, business_
+- **Bellen met RTG (in de app)** (`service-bel`) — Bellen met RTG Service binnen de app, zonder telefoonnet en zonder nummer. Hoort bij de Lifestyle en Business Pass; om een mens vragen blijft voor elk account bestaan en gaat hier niet mee uit.  
+  _voor: lifestyle, business_
+- **Automatisch ondertitelen in een gesprek** (`ondertiteling`) — Een deelnemer laat zijn eigen stem omzetten naar tekst met een LOKAAL model; de regel komt in de meeleesbaan van het gesprek. Uit zetten laat die baan staan -- meetypen blijft werken -- maar wie doof is is dan weer afhankelijk van de anderen.  
   _voor: rtg, lifestyle, business_
 - **Het Privékantoor (Lifestyle)** (`privekantoor`) — De ene app van de Lifestyle Pass: de levensgraaf over de premium-apps heen, de Control Tower met alle termijnen, het mandaat (wat mag het kantoor zelf) en zaken met een team en een tijdlijn. Uit zetten laat de onderliggende apps staan; alleen de samenhang verdwijnt.  
   _voor: lifestyle, business_

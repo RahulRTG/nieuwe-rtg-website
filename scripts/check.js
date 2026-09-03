@@ -3335,6 +3335,21 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
      routes/spraaktekst.js en shared/meeluister.js -- en de acht gesprekken zijn
      alle acht aangesloten.
 
+     EN HET WERDEN ER VIER EN GEEN TWEE, NA NAREKENEN. Het eerste getal was 2,
+     en dat was een OVERSCHATTING die binnen het uur boven kwam: de
+     ondertiteldeur (`/api/ondertiteling/*`) hangt aan een LEDENsessie, en
+     shared/meeluister.js leest daarvoor `rtg_member_token`. De teamcall van het
+     personeel en het schoolgesprek draaien op een personeels- respectievelijk
+     partnersessie; daar is dat token er hooguit toevallig (het huis koppelt een
+     kantoorrol aan een RTG-account, maar dwingt dat niet af). De knop verschijnt
+     daar dus soms wel en soms niet, en een register mag geen "soms" als "ja"
+     tellen. Die twee dragen daarom geen spraakanker.
+
+     WAT DAT WEER OMLAAG BRENGT is opnieuw een adres en geen belofte: een
+     ondertiteldeur die ELKE sessie van dit huis aanneemt in plaats van alleen
+     een ledensessie. Dat raakt de authenticatielaag en hoort dus een eigen
+     ronde te zijn, niet een haastige toevoeging aan deze.
+
      WAT ER OPEN BLIJFT, EN WAAROM DAT GEEN RESTPOST IS: de twee UITZENDINGEN.
      Het Podium en het SOS-beeld naar het kantoor zijn eenrichting -- de kijker
      spreekt niet, dus zichzelf ondertitelen helpt hem niets. Daar is een tweede
@@ -3348,7 +3363,7 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
      zoals `ondertiteld` niet zegt dat elke maker cues heeft getypt. Wat de code
      wel afdwingt staat in `SPRAAK` hieronder: er is een weg, en waar hij niet
      open staat ZEGT het scherm dat -- geen knop die niets doet. */
-  const OPEN_MAX = 2;
+  const OPEN_MAX = 4;
   /* De band woonde als private functie IN de clipdeler; sinds het Theater en de
      Media OS dezelfde cue-lijst tonen staat hij als gedeelde laag in
      shared/ondertitelband.js. Deze regel merkte die verhuizing zelf op: het
@@ -3418,9 +3433,9 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
     ['public/shared/paspoortscan.js#pscanVid', ['werktuig', 'de paspoortscan leest de MRZ-regels van een document']],
     ['public/shared/scanknop.js#js1', ['werktuig', 'de gedeelde scanknop: hetzelfde leesinstrument, in een eigen venster']],
     ['public/shared/scanner.js#js1', ['werktuig', 'het reserve-element van de scanner zelf, als de aanroeper er geen meegeeft']],
-    ['public/shared/schoolbel.js#sbelAudio', ['gesprek', 'het schoolgesprek is een live audiogesprek: wie opneemt hoort de ander rechtstreeks', ['public/shared/schoolbel.js', 'RTGMeelezen'], ['public/apps/schoolpartner.html', 'meeluister.js']]],
+    ['public/shared/schoolbel.js#sbelAudio', ['gesprek', 'het schoolgesprek is een live audiogesprek: wie opneemt hoort de ander rechtstreeks', ['public/shared/schoolbel.js', 'RTGMeelezen']]],
     ['public/shared/teamcall/teamcall-01.js#1', ['spiegel', 'de teamcall van het personeel: je eigen tegel, stil, want je eigen stem terughoren is een echo']],
-    ['public/shared/teamcall/teamcall-01.js#2', ['gesprek', 'de teamcall van het personeel: de tegel van een collega, met diens stem erbij', ['public/shared/teamcall/teamcall-01.js', 'RTGMeelezen'], ['public/apps/personeel.html', 'meeluister.js']]]
+    ['public/shared/teamcall/teamcall-01.js#2', ['gesprek', 'de teamcall van het personeel: de tegel van een collega, met diens stem erbij', ['public/shared/teamcall/teamcall-01.js', 'RTGMeelezen']]]
   ]);
 
   const bundelPaden = new Set(Object.keys(BUNDELLIJST).map(k => 'public/' + k));

@@ -3,7 +3,7 @@
   "hoe": "node scripts/envelop.js --velden",
   "gemeten": {
     "envelopVelden": 11,
-    "veldenZonderHuis": 3,
+    "veldenZonderHuis": 1,
     "actorVormen": 6,
     "actorDuplicaten": 0,
     "actorSessies": 6
@@ -12,17 +12,7 @@
     {
       "veld": "intent",
       "wat": "wat de actor probeert te bereiken",
-      "reden": "een intentie spreekt een MENS uit; hem afleiden uit een verzoek is raden, en een geraden intentie in een bonnetje is erger dan een leeg veld"
-    },
-    {
-      "veld": "risicoklasse",
-      "wat": "hoe zwaar deze handeling weegt",
-      "reden": "vraagt BELEID dat een handeling een klasse geeft; kern/frictie/motor.js rekent wel een frictiescore maar alleen voor de handelingen die RTG Command kent, en dat is geen klasse voor de 3800 routes"
-    },
-    {
-      "veld": "omkeerbaarheid",
-      "wat": "is dit terug te draaien, en hoe",
-      "reden": "HERSTELPROEF.json MEET dit voor 90 routeparen (13 exact, 30 compensatie, 1 geen-herstel, 46 zonder wereld) en dat is een waarneming en geen beleid -- maar het dekt 90 van 3800 routes. Hem op de envelop zetten zou betekenen dat 3710 routes een leeg oordeel dragen dat als oordeel leest. Zie TAKEN.md 4.71: eerst beleid, dan een drager"
+      "reden": "een intentie spreekt een MENS uit; hem afleiden uit een verzoek is raden, en een geraden intentie in een bonnetje is erger dan een leeg veld. Anders dan risico en omkeerbaarheid is er GEEN bestaande bron om uit te lezen: dit huis heeft geen plek waar een mens voor een gewone route een doel uitspreekt"
     }
   ],
   "actorVormen": [
@@ -251,25 +241,25 @@
     {
       "veld": "doel",
       "staat": "gedragen",
-      "drager": "server/opzet/handeling.js :: function verschil"
+      "drager": "server/opzet/handelingtelling.js :: function verschil"
     },
     {
       "veld": "wijzigingen",
       "staat": "gedragen",
-      "drager": "server/opzet/handeling.js :: wijzigingen.push("
-    },
-    {
-      "veld": "intent",
-      "staat": "dakloos",
-      "drager": null
+      "drager": "server/opzet/handelingtelling.js :: wijzigingen.push("
     },
     {
       "veld": "risicoklasse",
-      "staat": "dakloos",
-      "drager": null
+      "staat": "gedragen",
+      "drager": "server/kern/handelingsklasse.js :: risicoklasse: risico.klasse"
     },
     {
       "veld": "omkeerbaarheid",
+      "staat": "gedragen",
+      "drager": "server/kern/handelingsklasse.js :: omkeerbaarheid: omkeerbaar.klasse"
+    },
+    {
+      "veld": "intent",
       "staat": "dakloos",
       "drager": null
     }

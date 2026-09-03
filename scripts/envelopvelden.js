@@ -78,24 +78,36 @@ const VELDEN = [
     drager: ['server/opzet/envelop.js', 'context: context(req'] },
   { veld: 'correlatie', wat: 'req.id, dat de logmiddleware al zet',
     drager: ['server/opzet/envelop.js', "'correlatie'"] },
+  /* Deze twee verhuisden op 3 september 2026 mee met de rij-telling naar
+     ./handelingtelling.js, en de meter ving dat: hij meldde "EEN DRAGER IS WEG"
+     op precies deze twee regels. Dat is waar het citaat voor is. */
   { veld: 'doel', wat: 'welke collecties deze handeling raakt',
-    drager: ['server/opzet/handeling.js', 'function verschil'] },
+    drager: ['server/opzet/handelingtelling.js', 'function verschil'] },
   { veld: 'wijzigingen', wat: 'wat er werkelijk is veranderd',
-    drager: ['server/opzet/handeling.js', 'wijzigingen.push('] },
+    drager: ['server/opzet/handelingtelling.js', 'wijzigingen.push('] },
 
-  /* DE DRIE OORDELEN. Geen drager, en dat is het besluit en niet het gat. */
+  /* TWEE VAN DE DRIE OORDELEN HEBBEN SINDS 3 SEPTEMBER 2026 EEN DRAGER, en het
+     verschil met de vorige stand is niet dat er beleid is verzonnen maar dat
+     het BESTAANDE beleid nu wordt uitgelezen. kern/handelingsklasse.js leidt
+     risico af uit de bodem onder de frictie en de AI-allowlist, en
+     omkeerbaarheid uit de herstelproef -- vier bronnen die dit huis al had, elk
+     met een citaat. Elke waarde draagt zijn bron en zijn bewijsgraad, en
+     `onbekend` is een eersteklas uitslag met een reden.
+
+     Ze hangen aan de HANDELING en niet aan de envelop, en dat is geen detail:
+     de kop van server/opzet/envelop.js zegt met recht dat een poortwachter deze
+     twee niet kent. */
+  { veld: 'risicoklasse', wat: 'hoe zwaar deze handeling weegt',
+    drager: ['server/kern/handelingsklasse.js', 'risicoklasse: risico.klasse'] },
+  { veld: 'omkeerbaarheid', wat: 'is dit terug te draaien, en hoe',
+    drager: ['server/kern/handelingsklasse.js', 'omkeerbaarheid: omkeerbaar.klasse'] },
+
+  /* EN DE ENIGE DIE DAKLOOS BLIJFT, en dat is het besluit en niet het gat. */
   { veld: 'intent', wat: 'wat de actor probeert te bereiken', drager: null,
     reden: 'een intentie spreekt een MENS uit; hem afleiden uit een verzoek is raden, ' +
-      'en een geraden intentie in een bonnetje is erger dan een leeg veld' },
-  { veld: 'risicoklasse', wat: 'hoe zwaar deze handeling weegt', drager: null,
-    reden: 'vraagt BELEID dat een handeling een klasse geeft; kern/frictie/motor.js rekent wel ' +
-      'een frictiescore maar alleen voor de handelingen die RTG Command kent, en dat is geen ' +
-      'klasse voor de 3800 routes' },
-  { veld: 'omkeerbaarheid', wat: 'is dit terug te draaien, en hoe', drager: null,
-    reden: 'HERSTELPROEF.json MEET dit voor 90 routeparen (13 exact, 30 compensatie, 1 geen-herstel, ' +
-      '46 zonder wereld) en dat is een waarneming en geen beleid -- maar het dekt 90 van 3800 routes. ' +
-      'Hem op de envelop zetten zou betekenen dat 3710 routes een leeg oordeel dragen dat als ' +
-      'oordeel leest. Zie TAKEN.md 4.71: eerst beleid, dan een drager' }
+      'en een geraden intentie in een bonnetje is erger dan een leeg veld. Anders dan ' +
+      'risico en omkeerbaarheid is er GEEN bestaande bron om uit te lezen: dit huis heeft ' +
+      'geen plek waar een mens voor een gewone route een doel uitspreekt' }
 ];
 
 function meet() {

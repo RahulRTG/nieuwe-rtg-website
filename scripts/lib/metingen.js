@@ -83,6 +83,7 @@ const REGISTER = {
      het register zijn eigen grondwaarde en houdt de toets hem vast. */
   'GEZAGSHANDELINGEN.json': { eigenRatel: 'test/gezagshandelingen.test.js' },
   'WACHTWIJZE.json': { eigenRatel: 'test/wachtwijze.test.js' },
+  'HANDELINGSKLASSE.json': { eigenRatel: 'test/handelingsklasse.test.js' },
   'EXECUTION_MAP.json': { eigenRatel: 'test/executionmap.test.js' },
   'HERSTEL.json': { eigenRatel: 'test/herstel.test.js' },
   'HERSTELPROEF.json': { eigenRatel: 'test/herstelproef.test.js' },

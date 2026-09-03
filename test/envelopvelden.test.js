@@ -17,12 +17,15 @@
      2. DAKLOOS EIST EEN REDEN. Een veld dat geen drager heeft en ook geen uitleg
         waarom niet, is een gat dat niemand heeft uitgelegd -- en dan meet deze
         lijst een mening en geen stand.
-     3. DE DRIE DAKLOZEN BLIJVEN DAKLOOS, en dat is het besluit uit 4.71 en geen
-        tekortkoming: `intent`, `risicoklasse` en `omkeerbaarheid` zijn OORDELEN
-        die een poortwachter niet kan aflezen. Een verzonnen risicoklasse is
-        gevaarlijker dan geen. Deze toets bewaakt dat van twee kanten: er mogen
-        er niet MEER dakloos worden, en wie er een drager onder zet moet de ratel
-        met de hand strakker zetten -- een besluit in plaats van een sluiproute.
+     3. DE DAKLOZE BLIJFT DAKLOOS, en dat is het besluit uit 4.71 en geen
+        tekortkoming: `intent` is een OORDEEL dat een mens uitspreekt en dat
+        nergens in dit huis wordt vastgelegd. Er waren er drie; `risicoklasse` en
+        `omkeerbaarheid` hebben op 3 september 2026 een drager gekregen door het
+        BESTAANDE beleid uit te lezen (kern/handelingsklasse.js) in plaats van
+        beleid te verzinnen. Een verzonnen risicoklasse blijft gevaarlijker dan
+        geen. Deze toets bewaakt dat van twee kanten: er mogen er niet MEER
+        dakloos worden, en wie er een drager onder zet moet de ratel met de hand
+        strakker zetten -- een besluit in plaats van een sluiproute.
 
    Draai los: node --test test/envelopvelden.test.js */
 'use strict';
@@ -49,14 +52,19 @@ function metVervangen(rel, van, naar, doe) {
   finally { fs.writeFileSync(vol, origineel); }
 }
 
-test('de grondstand is groen: elf velden, acht gedragen, drie dakloos', () => {
+test('de grondstand is groen: elf velden, tien gedragen, EEN dakloos', () => {
   const r = draai();
   assert.equal(r.code, 0, r.uit);
   const nu = meter.meet();
   assert.deepEqual(nu.stuk, []);
   assert.equal(nu.velden, 11);
-  assert.equal(nu.dakloos.length, 3);
-  assert.deepEqual(nu.dakloos.map(v => v.veld), ['intent', 'risicoklasse', 'omkeerbaarheid']);
+  /* WAS DRIE, IS EEN (3 september 2026). risicoklasse en omkeerbaarheid hebben
+     een drager gekregen in server/kern/handelingsklasse.js -- niet door beleid
+     te verzinnen maar door het BESTAANDE beleid uit te lezen (de bodem onder de
+     frictie, de AI-allowlist, de herstelproef). `intent` blijft dakloos, en dat
+     is de enige van de drie waarvoor er geen bestaande bron IS. */
+  assert.equal(nu.dakloos.length, 1);
+  assert.deepEqual(nu.dakloos.map(v => v.veld), ['intent']);
   assert.deepEqual(nu.weg, [], 'een drager is uit de bron verdwenen');
 });
 
@@ -99,7 +107,7 @@ test('MUTATIE: een veld erbij zonder drager laat de ratel zakken', () => {
     "const VELDEN = [",
     "const VELDEN = [\n  { veld: 'sfeer', wat: 'hoe voelt dit', drager: null, reden: 'een verzonnen veld voor de mutatieproef, met een reden die lang genoeg is om de eis te halen' },", () => {
       const r = draai();
-      assert.match(r.uit, /ZAKT: daklozen 3 -> 4/);
+      assert.match(r.uit, /ZAKT: daklozen 1 -> 2/);
       assert.equal(r.code, 1);
     });
 });

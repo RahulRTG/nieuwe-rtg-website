@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-03T13:10:42.910Z",
-    "commit": "d7313ad4",
+    "op": "2026-09-03T13:58:22.861Z",
+    "commit": "4aab12b5",
     "boomVuil": true,
-    "boomAnders": 4,
+    "boomAnders": 12,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -2208,6 +2208,14 @@
       "module": "server/opzet/handeling.js",
       "operator": "true->false#0",
       "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "handelingsklasse.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/handelingsklasse.js",
+      "operator": "!==->===#0",
+      "gezakt": 10,
       "geprobeerd": 1
     },
     "handelsketen.test.js": {

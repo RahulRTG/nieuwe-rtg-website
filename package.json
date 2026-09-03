@@ -173,6 +173,7 @@
     "leugens": "node scripts/leugendetector.js",
     "mutatie": "node scripts/mutatie.js",
     "wachtwijze": "node scripts/wachtwijze.js",
+    "handelingsklasse": "node scripts/handelingsklasse.js",
     "mutatie:scherm": "node scripts/schermmutatie.js",
     "grenslijst": "node scripts/grenslijst.js",
     "wetten": "node scripts/wetten.js",

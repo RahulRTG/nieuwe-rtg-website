@@ -256,3 +256,47 @@ test('de testdraaier gooit een meegegeven RTG_ROUTELOG niet weg', () => {
   assert.match(terugval, /\.routejournaal$/,
     'zonder RTG_ROUTELOG hoort de draaier zijn eigen journaal te kiezen en niet niets');
 });
+
+/* RTG_ROUTELOG="1" IS EEN PAD DAT NIEMAND BEDOELT.
+
+   Deze variabele verwacht een BESTANDSPAD, en dat is een footgun: bijna elke
+   andere vlag in dit huis is een boolean, dus `RTG_ROUTELOG=1` is precies wat
+   iemand typt. Wat er dan gebeurde was het slechtste van twee werelden -- er
+   verscheen een bestand dat letterlijk `1` heet met het journaal erin, EN
+   .routejournaal bleef staan zoals het was. Elke dekkingsmeting daarna rekende
+   op een journaal van uren eerder en meldde routes als ongedekt die wel degelijk
+   waren aangeraakt.
+
+   MUTATIE: AAN_WOORDEN leegmaken in server/routelog.js -> deze toets zakt op het
+   pad, gedraaid. */
+test('een aan-waarde is geen pad: RTG_ROUTELOG=1 schrijft naar het gewone journaal', () => {
+  const fs = require('fs');
+  const os = require('os');
+  const path = require('path');
+  const log = require('../server/routelog');
+
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-routelog-aan-'));
+  const hier = process.cwd();
+  try {
+    process.chdir(tmp);
+    for (const waarde of ['1', 'true', 'JA', ' on ']) {
+      assert.equal(log.begin(waarde), true, '"' + waarde + '" hoort het journaal AAN te zetten');
+      log.noteer('GET', '/api/proef');
+      assert.equal(fs.existsSync(path.join(tmp, waarde.trim())), false,
+        'er hoort geen bestand te ontstaan dat naar de vlagwaarde "' + waarde.trim() + '" is genoemd');
+      assert.equal(fs.existsSync(path.join(tmp, '.routejournaal')), true,
+        '"' + waarde + '" hoort naar .routejournaal te schrijven');
+      fs.rmSync(path.join(tmp, '.routejournaal'), { force: true });
+    }
+    /* En een ECHT pad blijft gewoon een pad -- anders zou deze reparatie de
+       normale weg (en dus CI) stilletjes omleiden. */
+    log.begin(path.join(tmp, 'eigen.log'));
+    log.noteer('GET', '/api/proef2');
+    assert.equal(fs.existsSync(path.join(tmp, 'eigen.log')), true,
+      'een opgegeven pad hoort onveranderd gebruikt te worden');
+  } finally {
+    log.begin(null);
+    process.chdir(hier);
+    try { fs.rmSync(tmp, { recursive: true, force: true }); } catch (e) {}
+  }
+});

@@ -1,7 +1,7 @@
 {
   "vastgelegd": "2026-09-02",
   "meters": {
-    "endpointsZonderTest": 978,
+    "endpointsZonderTest": 979,
     "dekkingPct": 80,
     "keuringStuk": 0,
     "keuringScheef": 18,
@@ -11,7 +11,7 @@
     "zelfpoortendeToetsen": 18,
     "e2eBestanden": 193,
     "keuringOmvang": 268,
-    "keuringDubbeling": 154,
+    "keuringDubbeling": 158,
     "keuringDekkingAdvies": 53,
     "endpointsNooitAangeraakt": 0,
     "onbewaakt": 0,
@@ -21,11 +21,11 @@
     "keuringTeGroot": 16,
     "inlineStijlAttributen": 4973,
     "browserpoortToetsen": 295,
-    "kernBreedte": 1518,
-    "kernGedeeld": 216,
+    "kernBreedte": 1522,
+    "kernGedeeld": 221,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 514,
+    "toetsenNietGemeten": 519,
     "toetsenOngevoeligPct": 1,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
@@ -44,8 +44,8 @@
     "bewijsCellenBewezen": 25500,
     "bewijsAchterstand": 2285,
     "schermenZonderVormtaal": 185,
-    "dbDeuren": 511,
-    "dbDeurenSchrijvend": 270,
+    "dbDeuren": 515,
+    "dbDeurenSchrijvend": 271,
     "verstrengelingOnverklaard": 0,
     "activeringOndergrens": 48,
     "activeringOnbepaald": 3,
@@ -1468,6 +1468,69 @@
       "vervalt": "2026-11-30",
       "meter": "beweringenZonderVulcontrole 111 -> 113",
       "reden": "De HDI-tak (PR #173: beschermlaag, knelpuntmotor, ouderingang kinderopvang, bewijsmap) brengt 20 nieuwe schrijfroutes, 7 nieuwe toetsbestanden en 1 nieuw scherm mee. Twee meters die eerst ook slechter stonden zijn WEL hersteld in plaats van hier weggeschreven: routesNietSchakelbaar (9 -> 0, de routes staan nu in de boardroomcatalogus) en schermenZonderVormtaal (186 -> 185, bewijsmap.html draagt de tokenlaag). Wat hieronder staat is wat overblijft, per meter met zijn eigen aflosweg. 2 beweringen toetsen een verzameling die bij een vers account met opzet LEEG is (geen opvangaanvragen, geen steden zodra de module uit staat). Een derde van deze soort is in deze tak juist WEGGEWERKT: test/beschermzaak.test.js toont nu eerst dat de lijst gevuld was, zodat zijn nul iets bewijst. Bij de twee die overblijven kost dat een echte opvangpartner met een goedgekeurde vergunning (genre kinderopvang staat op `bewijs`), en dat is de aflosweg."
+    },
+    {
+      "datum": "2026-09-02",
+      "soort": "schuld",
+      "sleutel": "keuringOmvang",
+      "van": 261,
+      "vervalt": "2026-12-31",
+      "meter": "keuringOmvang 261 -> 268",
+      "reden": "Nieuwe bestanden van de isolatielaag zitten vlak onder de 10 kB. Dat is geen slordigheid maar de vorm die keuringsregel 13 afdwingt: elk ervan is ONTSTAAN door een splitsing langs een echte naad (oordeel tegenover boekhouding, lijst tegenover vraag, stand tegenover ceremonie). Wie ze verder opknipt om deze meter te halen, knipt langs een getal in plaats van langs een naad. Gemeten en niet vermoed: origin/main haalt zijn eigen norm precies -- nagerekend in een aparte worktree. Deze groei komt dus volledig van de isolatietak."
+    },
+    {
+      "datum": "2026-09-02",
+      "soort": "schuld",
+      "sleutel": "keuringDubbeling",
+      "van": 154,
+      "vervalt": "2026-12-31",
+      "meter": "keuringDubbeling 154 -> 158",
+      "reden": "Vier functienamen staan nu in meer dan twee kernmodules. Het zijn korte, gewone namen in de nieuwe isolatiemodules -- gelijknamige functies, geen gedeelde waarheid. Waar er wel een gedeelde waarheid was, is die WEL samengevoegd: kern/isolatie/sessiedragers.js verving drie handmatige kopieën. Gemeten en niet vermoed: origin/main haalt zijn eigen norm precies -- nagerekend in een aparte worktree. Deze groei komt dus volledig van de isolatietak."
+    },
+    {
+      "datum": "2026-09-02",
+      "soort": "schuld",
+      "sleutel": "dbDeuren",
+      "van": 510,
+      "vervalt": "2026-12-31",
+      "meter": "dbDeuren 510 -> 515",
+      "reden": "Vijf bestanden buiten server/db/ raken db.data aan: de isolatielaag bewaart standen per drager. Zij doen dat via kern/isolatie/opslag.js en niet elk voor zich, maar de meter telt bestanden en geen ingangen. Voetafdruk van een subsysteem, geen nieuwe weg langs de opslaglaag. Gemeten en niet vermoed: origin/main haalt zijn eigen norm precies -- nagerekend in een aparte worktree. Deze groei komt dus volledig van de isolatietak."
+    },
+    {
+      "datum": "2026-09-02",
+      "soort": "schuld",
+      "sleutel": "dbDeurenSchrijvend",
+      "van": 270,
+      "vervalt": "2026-12-31",
+      "meter": "dbDeurenSchrijvend 270 -> 271",
+      "reden": "Eén bestand erbij dat rechtstreeks in db.data schrijft: de plek waar een stand wordt weggezet. Die staat met opzet op EEN plek (kern/isolatie/zetten.js); alle andere modules van de laag lezen. Gemeten en niet vermoed: origin/main haalt zijn eigen norm precies -- nagerekend in een aparte worktree. Deze groei komt dus volledig van de isolatietak."
+    },
+    {
+      "datum": "2026-09-02",
+      "soort": "schuld",
+      "sleutel": "kernBreedte",
+      "van": 1517,
+      "vervalt": "2026-12-31",
+      "meter": "kernBreedte 1517 -> 1522",
+      "reden": "Vijf kern-eigenschappen erbij doordat de isolatielaag routes bedient: de ledenkant, de kantoorcockpit en de ceremonie. Een laag die niets aanraakt, doet niets. Gemeten en niet vermoed: origin/main haalt zijn eigen norm precies -- nagerekend in een aparte worktree. Deze groei komt dus volledig van de isolatietak."
+    },
+    {
+      "datum": "2026-09-02",
+      "soort": "schuld",
+      "sleutel": "kernGedeeld",
+      "van": 216,
+      "vervalt": "2026-12-31",
+      "meter": "kernGedeeld 216 -> 221",
+      "reden": "Vijf kern-eigenschappen raken meer dan een domein aan, en dat is hier de bedoeling en geen lek: de isolatielaag IS een dwarsdoorsnede -- zij geldt over lid, kantoor en AI-stuur tegelijk. Een beveiligingsstand die maar in een domein bestaat, beschermt niets. Gemeten en niet vermoed: origin/main haalt zijn eigen norm precies -- nagerekend in een aparte worktree. Deze groei komt dus volledig van de isolatietak."
+    },
+    {
+      "datum": "2026-09-02",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 505,
+      "vervalt": "2026-12-31",
+      "meter": "toetsenNietGemeten 505 -> 519",
+      "reden": "Veertien toetsen erbij waar de mutatiemotor nog niet langs is. De pure toetsen van deze tak zijn WEL gedraaid (npm run mutatie test/isolatiepoort.test.js: gezakt, dus bewezen gevoelig); wat overblijft zijn server- en browsertoetsen, en daarvoor gebruikt de motor de liegpoort met twee volle rondes per bestand -- uren per stuk. Elk van die veertien draagt wel een HANDMATIG gedraaide mutatie, uitgeschreven in zijn eigen kop (LAT.md regel 2). Dat is niet hetzelfde als een gemeten toets, en daarom staat het hier als schuld en niet als gehaald. Gemeten en niet vermoed: origin/main haalt zijn eigen norm precies -- nagerekend in een aparte worktree. Deze groei komt dus volledig van de isolatietak."
     }
   ],
   "prestatie": {
@@ -1518,7 +1581,9 @@
     "wekkersFunctieUitToch": "2026-09-02",
     "wekkersZonderTrede": "2026-09-02",
     "wekkersOnverklaard": "2026-09-02",
-    "meetleerBlind": "2026-09-02"
+    "meetleerBlind": "2026-09-02",
+    "kernBreedte": "2026-09-02",
+    "kernGedeeld": "2026-09-02"
   },
   "uitzonderingen": [
     {

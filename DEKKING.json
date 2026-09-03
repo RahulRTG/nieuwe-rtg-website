@@ -4881,6 +4881,21 @@
     "GET /scriptbundel.js",
     "GET /stijlblok.css",
     "GET /stijlbundel.css",
-    "GET /werken/:code"
+    "GET /werken/:code",
+    "POST /api/isolatie/mijn",
+    "POST /api/isolatie/mijn/ontsluiting",
+    "POST /api/isolatie/mijn/ontsluiting/afbreken",
+    "POST /api/isolatie/mijn/ontsluiting/commit",
+    "POST /api/isolatie/mijn/ontsluiting/stap",
+    "POST /api/isolatie/mijn/ontsluiting/stap/opties",
+    "POST /api/isolatie/mijn/zet",
+    "GET /api/techniek/isolatie",
+    "POST /api/techniek/isolatie/ontsluiting",
+    "POST /api/techniek/isolatie/ontsluiting/afbreken",
+    "POST /api/techniek/isolatie/ontsluiting/commit",
+    "POST /api/techniek/isolatie/ontsluiting/stap",
+    "POST /api/techniek/isolatie/ontsluiting/stap/opties",
+    "POST /api/techniek/isolatie/proef",
+    "POST /api/techniek/isolatie/zet"
   ]
 }

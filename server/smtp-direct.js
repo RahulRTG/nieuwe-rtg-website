@@ -33,6 +33,7 @@ const tls = require('tls');
 const { sniVan } = require('./lib/sni');
 const dns = require('dns').promises;
 const os = require('os');
+const ssrf = require('./kern/ssrf');
 
 const CRLF = '\r\n';
 const TIJD = Number(process.env.MAIL_TIMEOUT_MS || 20000);
@@ -144,9 +145,30 @@ async function bezorg({ van, naar, bericht, naam, mx, poort }) {
   const adres = String(naar || '');
   const domein = adres.split('@')[1];
   if (!domein) return { ok: false, soort: 'permanent', waarom: 'dat is geen e-mailadres' };
-  const servers = mx && mx.length ? mx : await mxVan(domein);
+  /* WIE KOOS DIT DOEL? Dat is de hele vraag, en het antwoord verschilt per tak.
+
+     Komt de MX uit DNS, dan koos de ONTVANGER hem: wie een domein beheert, zet
+     zijn MX waar hij wil, en dus ook op 10.0.0.5 of 127.0.0.1. Dan spreken wij
+     SMTP tegen iets binnen ons eigen netwerk -- een buitenstaander kiest het doel
+     en wij openen de deur. Dat is precies waar ./kern/ssrf.js voor is, en deze
+     weg liep er nooit langs terwijl de smarthost-kant (server/smtp.js) dat wel
+     deed.
+
+     Wordt `mx` MEEGEGEVEN, dan koos onze eigen code hem -- een vaste route, of
+     een toets die tegen een lokale mailserver draait. Daar is 127.0.0.1 geen
+     aanval maar de bedoeling, en hem daar weigeren zou een uitrol met een interne
+     mailserver onmogelijk maken. De eerste versie van deze poort deed dat wel,
+     en zes toetsen zakten erop: de meting wees de te brede regel meteen aan. */
+  const uitDns = !(mx && mx.length);
+  const servers = uitDns ? await mxVan(domein) : mx;
   const pogingen = [];
   for (const s of servers) {
+    const doel = String((s && s.exchange) || '');
+    if (uitDns && ssrf.onveiligIpLiteral(doel)) {
+      pogingen.push({ soort: 'permanent', host: doel,
+        waarom: 'deze MX wijst naar een privé- of gereserveerd adres; daar bezorgen wij niet' });
+      continue;
+    }
     const uit = await bijServer(s.exchange, poort, { van, naar: adres, bericht, naam });
     pogingen.push(uit);
     if (uit.soort === 'bezorgd') return { ok: true, soort: 'bezorgd', via: uit.host, code: uit.code, pogingen };

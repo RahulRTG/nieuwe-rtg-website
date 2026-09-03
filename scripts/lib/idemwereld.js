@@ -74,10 +74,18 @@ async function zetWereldKlaar({ post, tokens, datamap }) {
      welke voorwerpen NIET zijn klaargekomen, met de status en de melding van de
      stap die ze had moeten opleveren. */
   const logboek = [];
-  const stil = async (pad, lijf, tok) => {
+  /* `merk` is er voor routes die MEER DAN EEN voorwerp opleveren. `gemist` zoekt
+     de LAATSTE aanroep van een pad, en dat klopt zolang een route hoort bij een
+     object. Zodra een lus dezelfde route voor drie genres aanroept, wijst de
+     melding altijd de laatste aan -- en dan staat er "gaf 200" bij het voorwerp
+     dat juist wel klaarkwam, terwijl het gebroken exemplaar zwijgt. Precies dat
+     gebeurde hier: de marechaussee kwam niet klaar en de melding toonde de status
+     van de aansluiting die daarna kwam. Een diagnose die de verkeerde regel
+     aanwijst, is duurder dan geen diagnose. */
+  const stil = async (pad, lijf, tok, merk) => {
     let r;
     try { r = await post(pad, lijf, tok); } catch (e) { r = { status: 0, data: { error: e.message } }; }
-    logboek.push({ pad, status: r.status, error: (r.data && r.data.error) || null });
+    logboek.push({ pad: merk || pad, status: r.status, error: (r.data && r.data.error) || null });
     return r;
   };
   const veld = (r, ...pad) => { let v = r && r.data; for (const k of pad) { if (!v) return null; v = v[k]; } return v || null; };
@@ -289,6 +297,43 @@ async function zetWereldKlaar({ post, tokens, datamap }) {
     }
   }
 
+  /* 11d2. EEN LEERLING IN DIE KLAS.
+
+           Na de klas bleven 28 schoolroutes staan op vier varianten van dezelfde
+           zin: "Deze leerling staat niet in de administratie", "Dit kind zit niet
+           in deze klas", "Deze leerling zit niet in jouw klas", "Geen kind van
+           jullie in deze klas". Een klas zonder leerling is voor de helft van de
+           schooladministratie een lege huls -- absentie, rapporten, documenten,
+           bijdragen en berichten aan het gezin gaan allemaal over een KIND.
+
+           De echte weg, en niet de snelle: aanmelden en dan PLAATSEN. Dat zijn
+           twee routes omdat het in het echt ook twee handelingen zijn -- een
+           aanmelding is nog geen leerling, en de administratie besluit. De proef
+           doorloopt allebei en slaat niets over.
+
+           `gezinCode` gaat mee zodat het kind aan het proefgezin hangt: zonder
+           die koppeling blijven de routes staan die vragen of dit een kind van
+           JOUW gezin is, en dat is precies een van de vier zinnen hierboven. */
+  if (w.schoolCode && w.personeelToken && w.klasCode) {
+    const aanmelding = await stil('/api/foundation/school/leerling/aanmeld', {
+      schoolCode: w.schoolCode, personeelToken: w.personeelToken,
+      naam: 'Proefleerling', geboren: '2014-05-05',
+      gezinCode: w.gezinCode || undefined
+    });
+    const leerlingId = veld(aanmelding, 'leerling', 'id');
+    if (leerlingId) {
+      const plaatsing = await stil('/api/foundation/school/leerling/besluit', {
+        schoolCode: w.schoolCode, personeelToken: w.personeelToken,
+        leerlingId, besluit: 'plaatsen', klasCode: w.klasCode
+      });
+      /* Pas als het PLAATSEN slaagde is er een leerling IN een klas. Bleef hij
+         op de aanmelding staan, dan is de sleutel er niet -- en dan hoort hij
+         ook niet in het lijf, want een id dat nergens bij hoort levert dezelfde
+         404 op als geen id. */
+      if (plaatsing.status >= 200 && plaatsing.status < 300) w.leerlingId = leerlingId;
+    }
+  }
+
   /* 11e. EEN DOCUMENT PER KANTOORPAKKET, en dat is met opzet vier keer.
           51 routes stonden op "Document niet gevonden." De laag eronder is een
           en dezelfde (kern/office/docs.js), maar de DOOS verschilt per kring:
@@ -410,6 +455,76 @@ async function zetWereldKlaar({ post, tokens, datamap }) {
         w.ovToken = veld(login, 'token');
         if (w.ovToken) tokens.ov = w.ovToken;   // zelfde reden als bij `rijk`
       }
+    }
+  }
+
+  /* 11h2. DRIE INTERNE GENRES MEER, langs dezelfde weg en op hetzelfde besluit.
+
+           `gemeente`, `luchthaven` en `marechaussee` staan in
+           seed/genres-lijst-a.js en -b.js met `status: 'intern'` -- exact dezelfde
+           stand als `rijk` en `ov`. Het besluit van de eigenaar van 30 augustus
+           2026 gaat over die stand en niet over die twee namen: een intern genre
+           wordt niet door een partner AANGEVRAAGD maar door RTG zelf aangesloten,
+           en er komt geen vergunningreferentie aan te pas. Ze horen hier dus bij,
+           en dat ze er niet stonden was een gat en geen grens.
+
+           WAT HIER NIET BIJ KOMT, en dat is de scherpere helft. `beveiliging`
+           draagt `status: 'bewijs'`: acht genres krijgen pas een zaak als een mens
+           het papier heeft gezien. Eenentwintig routes onder /api/supplier/beveiliging
+           blijven daarom ongemeten, net als de vierenveertig onder `mob`, `oog` en
+           `flits` die om een Kiwa-vergunning vragen. Een proefronde die daar een
+           verzonnen vergunningnummer intypt om een kolom leeg te krijgen, verzint
+           bewijs voor een gereguleerd beroep -- zie 11g.
+
+           `politie`, `brandweer` en `ambulance` zijn ook intern maar leveren elk
+           EEN ongemeten route op (de aansluitroute zelf), dus ze staan er niet in:
+           drie extra instellingen in de proefdatabase voor drie regels is de
+           ruis niet waard. Ze staan hier genoemd zodat de volgende lezer weet dat
+           ze zijn overwogen en niet vergeten.
+
+           EN `marechaussee` HEEFT HIER GESTAAN EN IS ER WEER AF -- met een reden
+           die de moeite van het opschrijven waard is. Het genre is intern, dus
+           aansluiten mag: dat gaf ook gewoon 200. De personeelslogin daarna gaf
+           403: "Voor werk in dit genre is een eigen RTG-account met een
+           vastgestelde identiteit nodig." Dat is server/kern/persoonseis.js met
+           reikwijdte `werk` -- grensdiensten houden de SESSIE tegen tot er een
+           mens achter zit die RTG heeft gezien, en dat geldt uitdrukkelijk ook
+           voor de beheerder.
+
+           Dat is dezelfde grens als bij `beveiliging` (status `bewijs`) en bij de
+           Kiwa-vergunning van `mob`, alleen op de PERSOON in plaats van op de
+           zaak. Acht routes onder /api/kmar/ blijven daarom ongemeten, en dat is
+           de eerlijke uitslag: een proefronde die een identiteit vaststelt die
+           niemand heeft gezien, verzint precies het bewijs waar die eis voor is.
+
+           HET KOSTTE EEN OMWEG OM DIT TE WETEN, en die is hier gerepareerd. De
+           melding zei eerst "aansluiten gaf 200" -- want `gemist` zoekt de
+           LAATSTE aanroep van een pad, en drie genres delen die ene route. De
+           diagnose wees dus de aansluiting aan die juist wel lukte. Zie `merk` in
+           stil() hierboven. */
+  if (tokens.boardroom) {
+    for (const [genre, sleutel, naam] of [
+      ['gemeente', 'gemeenteToken', 'Proefgemeente (idemproef)'],
+      ['luchthaven', 'luchthavenToken', 'Proefluchthaven (idemproef)']
+    ]) {
+      const merk = 'intern genre ' + genre;
+      const inst = await stil('/api/office/instelling/aansluiten', {
+        genre, naam, plaats: 'Proefstad', beheerder: 'Proefbeheerder'
+      }, tokens.boardroom, merk + ': aansluiten');
+      const code = veld(inst, 'code'), pin = veld(inst, 'pin');
+      if (!code || !pin) continue;
+      const rooster = await stil('/api/supplier/roster', { code }, null, merk + ': rooster');
+      const eerste = ((rooster.data && rooster.data.staff) || [])[0];
+      if (!eerste) { logboek.push({ pad: merk, status: rooster.status,
+        error: 'het rooster gaf geen personeelslid terug' }); continue; }
+      const login = await stil('/api/supplier/login', { code, staffId: eerste.id, pin }, null, merk);
+      w[sleutel] = veld(login, 'token');
+      /* DE SLEUTEL IN DE BOS, om dezelfde reden als bij `rijk`: een voorvoegsel
+         geeft hier een ROL door en geen lijf, en tokenVoor() leest die rol
+         rechtstreeks uit deze bak. Zonder deze regel wijst de rol naar een
+         sleutel die niet bestaat en roept de proef de routes aan met GEEN token
+         -- stiller mis dan met de verkeerde. */
+      if (w[sleutel]) tokens[genre] = w[sleutel];
     }
   }
 
@@ -548,12 +663,15 @@ const VERWACHT = [
   { sleutel: 'schoolCode', wat: 'een school', via: '/api/foundation/school/school/activeren' },
   { sleutel: 'personeelToken', wat: 'een leraar', via: '/api/foundation/school/personeel/uitnodiging/accepteer' },
   { sleutel: 'klasCode', wat: 'een klas', via: '/api/foundation/school/leraar/klas/maak' },
+  { sleutel: 'leerlingId', wat: 'een leerling in die klas', via: '/api/foundation/school/leerling/besluit' },
   { sleutel: 'kp', wat: 'een document van het lid', via: '/api/kantoorpakket/maak' },
   { sleutel: 'kpOffice', wat: 'een document van het kantoor', via: '/api/office/kantoorpakket/maak' },
   { sleutel: 'kpSupplier', wat: 'een document van de zaak', via: '/api/supplier/kantoorpakket/maak' },
   { sleutel: 'kpWerkplek', wat: 'een document van de werkplek', via: '/api/werkplek/kantoorpakket/maak' },
   { sleutel: 'rijkToken', wat: 'een Rijksoverheid-zaak', via: '/api/office/instelling/aansluiten' },
   { sleutel: 'ovToken', wat: 'een OV-zaak', via: '/api/supplier/login' },
+  { sleutel: 'gemeenteToken', wat: 'een gemeente', via: 'intern genre gemeente' },
+  { sleutel: 'luchthavenToken', wat: 'een luchthaven', via: 'intern genre luchthaven' },
   { sleutel: 'festival', wat: 'een festival', via: '/api/festival/nieuw' },
   { sleutel: 'entiteit', wat: 'een entiteit', via: '/api/concern/entiteit/nieuw' },
   { sleutel: 'onderneming', wat: 'een onderneming', via: '/api/onderneming/nieuw' },
@@ -592,10 +710,20 @@ function voorvoegselLijf(w) {
     /* `klasCode` erbij: de directie mag met haar beheerToken bij alle klassen
        (server/school/poorten.js klasVan), dus de klascode is het enige dat nog
        ontbrak. Een eigen tokenveld is niet nodig en zou botsen met de gezinssleutel. */
+    /* `personeelToken` STOND HIER NIET, EN WERD WEL GEBOUWD. Achttien routes
+       gaven "Onbekende school of verkeerd personeel-token" terwijl de leraar in
+       de wereld gewoon bestond -- server/school/poorten.js kent drie deuren
+       (schoolVan op beheerToken, personeelVan op personeelToken, klasVan op
+       alledrie) en het lijf droeg er maar twee. Dat is precies de stille
+       halvering waar VERWACHT voor bedoeld is: het object stond op de lijst en
+       kwam klaar, dus `gemist` zweeg -- maar niemand controleerde of hij ook
+       werd doorgegeven. Zie de toets in test/idemwereld.test.js. */
     uit.push({ voorvoegsel: '/api/foundation/school/',
       lijf: { code: w.gezinCode, token: w.gezinToken,
         schoolCode: w.schoolCode || undefined, beheerToken: w.schoolBeheerToken || undefined,
-        klasCode: w.klasCode || undefined } });
+        personeelToken: w.personeelToken || undefined,
+        klasCode: w.klasCode || undefined,
+        leerlingId: w.leerlingId || undefined } });
     uit.push({ voorvoegsel: '/api/foundation/', lijf: { code: w.gezinCode, token: w.gezinToken } });
 
     /* EN /api/rtf/, DE GROOTSTE POST VAN ALLEMAAL -- 208 routes.
@@ -630,7 +758,14 @@ function voorvoegselLijf(w) {
   /* De overheidskant draait op een EIGEN ROL en niet op een eigen lijf: die 64
      routes willen geen extra veld, ze willen een zaak van het genre `rijk`. Het
      voorvoegsel geeft dus de sleutel mee en verder niets. */
-  if (w.rijkToken) uit.push({ voorvoegsel: '/api/overheid/', lijf: {}, rol: 'rijk' });
+  /* `alleenRol: 'supplier'`, en dat was hier een BESTAANDE fout die pas opviel
+     toen /api/gemeente/ hem herhaalde. Onder /api/overheid/ wonen 33 routes voor
+     een BURGER naast 64 voor de dienst zelf; de onvoorwaardelijke rol gaf die 33
+     het rijkstoken, en alle 33 antwoordden "Niet ingelogd als lid". Ze stonden
+     dus in de kolom `ongemeten` om een reden die niets met de route te maken
+     had -- en niemand kon dat zien, want een 401 ziet eruit als een route die
+     nu eenmaal een andere sleutel wil. */
+  if (w.rijkToken) uit.push({ voorvoegsel: '/api/overheid/', lijf: {}, rol: 'rijk', alleenRol: 'supplier' });
 
   /* De OV-kant, om dezelfde reden een ROL en geen lijf. Smal gehouden: alleen de
      twee ov-voorvoegsels, want /api/staff/ of /api/supplier/ in zijn geheel zou
@@ -639,6 +774,18 @@ function voorvoegselLijf(w) {
     uit.push({ voorvoegsel: '/api/staff/ov/', lijf: {}, rol: 'ov' });
     uit.push({ voorvoegsel: '/api/supplier/ov/', lijf: {}, rol: 'ov' });
   }
+  /* De twee nieuwe interne genres, elk met het voorvoegsel waar hun routes
+     wonen. Die namen komen uit de ROUTELIJST en niet uit de genrenaam -- het
+     luchthavengenre bedient /api/lucht/ en niet /api/luchthaven/, en zo een
+     aanname raakt stil nul routes. Toets 3 in test/idemwereld.test.js houdt dat
+     vast. */
+  /* `alleenRol: 'supplier'` en niet zomaar `rol`. Onder /api/gemeente/ wonen
+     vijftien routes voor een BURGER naast acht voor de gemeente zelf; de eerste
+     ronde gaf ze allemaal het leveranciers-token en maakte vijf gemeten routes
+     ongemeten. Een wereld die de meting verslechtert, is erger dan een wereld die
+     hem niet verbetert -- die eerste ziet er namelijk uit als vooruitgang. */
+  if (w.gemeenteToken) uit.push({ voorvoegsel: '/api/gemeente/', lijf: {}, rol: 'gemeente', alleenRol: 'supplier' });
+  if (w.luchthavenToken) uit.push({ voorvoegsel: '/api/lucht/', lijf: {}, rol: 'luchthaven' });
 
   /* De kantoorpakketten, elk met het document van HUN kring. Deze staan hier
      onderaan maar zijn SPECIALER dan /api/werkplek/ en /api/supplier/ hierboven,
@@ -668,8 +815,18 @@ function voorvoegselLijf(w) {
   if (w.entiteit) uit.push({ voorvoegsel: '/api/concern/', lijf: { entiteit: w.entiteit,
     concern: w.concern || undefined, onderneming: w.onderneming || undefined } });
   if (w.onderneming) uit.push({ voorvoegsel: '/api/onderneming/', lijf: { id: w.onderneming } });
-  if (w.studie) uit.push({ voorvoegsel: '/api/lab2/', lijf: { id: w.studie }, rol: 'office' });
-  if (w.stad) uit.push({ voorvoegsel: '/api/rtfos/', lijf: { id: w.stad }, rol: 'boardroom' });
+  /* `alleenRol`, en om exact dezelfde reden als bij /api/overheid/ hierboven: een
+     onvoorwaardelijk voorvoegsel geeft ZIJN sleutel aan alles wat eronder woont.
+     Onder /api/lab2/ zit naast het kantoorwerk ook openbaar verkeer, en onder
+     /api/rtfos/ zelfs vier publieken (office, member, boardroom en openbaar).
+     Die kregen het verkeerde token, antwoordden 401, en belandden in `ongemeten`
+     om een reden die niets met de route te maken heeft -- onzichtbaar, want een
+     401 ziet eruit als een route die nu eenmaal een andere sleutel wil.
+
+     Dit is dus geen nieuwe regel maar dezelfde die deze twee voorvoegsels bij
+     het toevoegen misten; toets D van test/idemwereld.test.js vond ze. */
+  if (w.studie) uit.push({ voorvoegsel: '/api/lab2/', lijf: { id: w.studie }, rol: 'office', alleenRol: 'office' });
+  if (w.stad) uit.push({ voorvoegsel: '/api/rtfos/', lijf: { id: w.stad }, rol: 'boardroom', alleenRol: 'boardroom' });
   return uit;
 }
 

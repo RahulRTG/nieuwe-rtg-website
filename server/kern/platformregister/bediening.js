@@ -79,6 +79,14 @@ module.exports = [
     'een noodweg hoort niet af te hangen van een schakelaar op het bord'],
   ['/api/toestel', 'Toestelregistratie', 'Welk apparaat is dit, en mag het meedoen.',
     'hoort bij de identiteit van het toestel, niet bij een functie'],
+  /* MET NAAM EN NIET VIA DE VANGNETREGEL '/'. Deze zeven vielen aanvankelijk
+     onder de laatste regel van deze lijst, en dat leest als "benoemd" terwijl
+     niemand ze had bekeken -- precies het patroon dat deze tabel moest opheffen.
+     De kantoorkant (/api/techniek/isolatie/*) valt al onder /api/techniek. */
+  ['/api/isolatie/mijn', 'Mijn bescherming', 'Waar een lid zichzelf, deze inlog of dit toestel ' +
+    'strenger zet, en waar hij er langs de ceremonie weer uit komt.',
+    'dit is de uitgang van de beveiligingsstand zelf: een schakelaar erop maakt van de stand een val, ' +
+    'en een val zet niemand aan'],
   ['/apps', 'De voordeur', 'De pagina-routes en de bundels die elke pagina dragen.',
     'zonder voordeur is er geen huis om iets in te schakelen'],
   /* DE VIER DIE DE STRENGE PADREGEL AAN HET LICHT BRACHT. Ze vielen eerst onder

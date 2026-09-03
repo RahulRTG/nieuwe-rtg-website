@@ -24,22 +24,19 @@ function kopie(v) { return JSON.parse(JSON.stringify(v)); }
 function eigen(o, k) { return Object.prototype.hasOwnProperty.call(o || {}, k); }
 function fout(status, tekst) { const e = new Error(tekst); e.status = status; throw e; }
 
-module.exports = function maakIncidentcontrole({ db, save, functies, beveilig, journaal }) {
+/* DE ONTSLUITPOORT. `herstel` verlaagt de stand van het hele platform en vroeg
+   alleen om eigenaar-only, een getypte zin en een reden -- sinds de dragers
+   eronder een ceremonie hebben, was dat de zwakste schakel. De poort komt van
+   BUITEN zodat deze module niet zelf kan besluiten dat er een ceremonie was.
+   Zonder poort valt hij terug op de zin, en dat staat zichtbaar in de status als
+   `ceremonieAfgedwongen: false`. */
+module.exports = function maakIncidentcontrole({ db, save, functies, beveilig, journaal, ontsluitpoort }) {
   const beschermstand = maakBeschermstand({ functies });
 
-  function techniek() {
-    if (!db.data.techniek) db.data.techniek = {};
-    const t = db.data.techniek;
-    if (!t.functies || typeof t.functies !== 'object') t.functies = {};
-    if (!t.zekeringen || typeof t.zekeringen !== 'object') t.zekeringen = {};
-    if (!t.incidentcontrole || typeof t.incidentcontrole !== 'object')
-      t.incidentcontrole = { modus: 'normaal', revisie: 0, actief: null, audit: [] };
-    const s = t.incidentcontrole;
-    if (!Array.isArray(s.audit)) s.audit = [];
-    if (!Number.isSafeInteger(s.revisie)) s.revisie = 0;
-    if (!MODI.includes(s.modus)) s.modus = 'normaal';
-    return { t, s };
-  }
+  /* De opgeslagen stand lezen, inclusief de terugval bij een onleesbare waarde
+     (SEC-LOCK-004). Staat in ./incidentcontrole-stand.js omdat het een besluit is
+     en geen bedrading. */
+  const techniek = require('./incidentcontrole-stand')({ db, MODI, beveilig });
 
   function actorVan(actor) {
     const id = actor && actor.id;
@@ -153,10 +150,17 @@ module.exports = function maakIncidentcontrole({ db, save, functies, beveilig, j
   const bescherm = maakBescherm({ techniek, redenVan, nieuwActief, schrijfAudit,
     save, meld, status, fout, journaal });
 
-  function herstel(redenIn, actor) {
+  function herstel(redenIn, actor, ceremonie) {
     const reden = redenVan(redenIn);
     const { t, s } = techniek();
     if (!s.actief) fout(409, 'Er is geen actief incident om te herstellen.');
+
+    /* DE ENIGE VERLAGENDE HANDELING VAN HET HUIS, langs dezelfde ceremonie als de
+       dragers eronder. Waarom er geen wachttijd bij zit: kern/isolatie/ceremonie-eisen.js. */
+    let ceremoniebewijs = null;
+    if (typeof ontsluitpoort === 'function') {
+      ceremoniebewijs = ontsluitpoort({ id: ceremonie, actor, van: s.modus, naar: 'normaal' });
+    }
     const geraakt = Object.keys(s.actief.herstel.functies || {});
     for (const id of geraakt) {
       const oud = s.actief.herstel.functies[id];
@@ -167,7 +171,8 @@ module.exports = function maakIncidentcontrole({ db, save, functies, beveilig, j
     const incidentId = s.actief.id;
     s.actief = null; s.modus = 'normaal';
     schrijfAudit(s, 'herstel', actor, reden, geraakt);
-    s.laatstGesloten = { id: incidentId, at: klok.datum().toISOString(), reden, door: actorVan(actor) };
+    s.laatstGesloten = { id: incidentId, at: klok.datum().toISOString(), reden, door: actorVan(actor),
+      ceremonie: ceremoniebewijs || null };
     save(); meld('herstel', reden, geraakt);
     return status();
   }
@@ -192,6 +197,13 @@ module.exports = function maakIncidentcontrole({ db, save, functies, beveilig, j
         bevriest: Object.keys(beschermstand.BEVRIEST),
         looptDoor: Object.keys(beschermstand.LOOPT_DOOR),
         uitzonderingen: beschermstand.UITZONDERINGEN },
+      /* Een teruggevallen stand staat in het antwoord en niet alleen in de
+         melding: wie het scherm leest hoort te zien dat hier geen mens heeft
+         gekozen. */
+      standOnbepaald: s.standOnbepaald || null,
+      /* Of de verlaging van het HUIS achter een ceremonie staat. Een opstelling
+         zonder poort is zichtbaar zwakker en niet stilzwijgend. */
+      ceremonieAfgedwongen: typeof ontsluitpoort === 'function',
       auditAantal: s.audit.length,
       audit: s.audit.slice(-50).reverse(),
       laatstGesloten: s.laatstGesloten || null

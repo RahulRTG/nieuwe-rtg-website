@@ -68,6 +68,12 @@ const REGISTERS = [
      commits achter, en gemeten op een vuile boom. Precies het gat waar dit
      instrument voor bestaat, en het stond er zelf niet in. */
   ['BEWIJSSCHULD.json', 'node scripts/bewijsschuld.js --vastleggen', 'wat er nog niet gemeten is, en waarom niet'],
+  /* DE SCHADUWPROEF VAN DE ISOLATIEPOORT. Hij hoort hier omdat hij het enige is
+     dat zegt wat die poort ZOU doen -- en dat getal veroudert sneller dan de
+     meeste: elke nieuwe route in de member-allowlist verandert het, zonder dat
+     iemand de proef opnieuw draait. Een oude uitslag leest als een uitspraak
+     over het huis van vandaag. */
+  ['ISOLATIESCHADUW.json', 'npm run isolatieschaduw:vast', 'wat de isolatiepoort zou sluiten, gemeten met echt verkeer'],
   /* TIEN REGISTERS DIE HIER NIET IN STONDEN, en dat was het gat waar dit
      instrument juist voor is. Zeven ervan droegen zelfs helemaal geen stempel:
      hun ouderdom was niet vast te stellen, en ze zeiden dat ook niet -- ze

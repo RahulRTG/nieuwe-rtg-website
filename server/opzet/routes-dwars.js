@@ -28,6 +28,11 @@
 'use strict';
 
 module.exports = function hangDwarseRoutersOp(grens) {
+  /* RTG Isolatiemodus voor het LID zelf (kern/isolatie/): zichzelf, deze sessie
+     of dit toestel strenger zetten zonder RTG te bellen. De eigenaar-console
+     staat in routes/techniek/isolatie.js en deelt dezelfde laag -- dit is de
+     andere kant van dezelfde knop en niet een tweede knop. */
+  require('../routes/isolatie')(grens('isolatie'));
   require('../routes/sleutelwoorden')(grens('sleutelwoorden'));
   require('../routes/agenda')(grens('agenda'));
   require('../routes/notities')(grens('notities'));

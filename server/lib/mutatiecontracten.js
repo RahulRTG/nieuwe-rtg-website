@@ -52,6 +52,8 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-kaleronde').CONTRACTEN,
   require('./mutatiecontracten-kaleronde-b').CONTRACTEN,
   require('./mutatiecontracten-tweedehandeling-b').CONTRACTEN,
+  require('./mutatiecontracten-isolatie').CONTRACTEN,
+  require('./mutatiecontracten-isolatie-lid').CONTRACTEN,
   require('./mutatiecontracten-samenvoeging').CONTRACTEN,
   /* RTG Service: eenentwintig nieuwe schrijfroutes, en dus eenentwintig
      contracten VOORAF -- MUTATIECONTRACT.md verbiedt `onbekend` voor wat nieuw
@@ -90,6 +92,8 @@ const CONTRACTEN = Object.assign({},
     require('./mutatiecontracten-kaleronde').CONTRACTEN,
     require('./mutatiecontracten-kaleronde-b').CONTRACTEN,
     require('./mutatiecontracten-tweedehandeling-b').CONTRACTEN,
+    require('./mutatiecontracten-isolatie').CONTRACTEN,
+    require('./mutatiecontracten-isolatie-lid').CONTRACTEN,
     require('./mutatiecontracten-samenvoeging').CONTRACTEN);
   const overschreven = Object.keys(effect).filter(k => k in eerder);
   if (overschreven.length) {

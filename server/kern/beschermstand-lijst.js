@@ -57,7 +57,13 @@ const UITZONDERINGEN = {
     'is de ruil die 6.10 verbiedt.',
   'dom-kmar': 'grensdiensten, om dezelfde reden.',
   'dom-foutmelder': 'dit is het kanaal waarlangs wij hóren dat er iets mis is. Hem dichtzetten ' +
-    'tijdens een incident is de meter uitzetten omdat hij slecht nieuws geeft.'
+    'tijdens een incident is de meter uitzetten omdat hij slecht nieuws geeft.',
+  'supplier-haccp': 'het temperatuurlogboek van een keuken is een WETTELIJKE registratieplicht. ' +
+    'Hem stilzetten omdat RTG een incident heeft, verplaatst onze storing naar de administratie van ' +
+    'een ander -- en die schade is niet terug te draaien als het incident voorbij is. Gemeten: ' +
+    'onder `beschermd` stond geen enkel zaak-verhaal op "werkt", en dit is het enige waar een WET ' +
+    'aan hangt. Afrekenen blijft met opzet dicht: dat beweegt geld, en dat is precies wat een ' +
+    'gesloten stand hoort te stoppen.'
 };
 
 /* WAT ER PER ONDERDEEL WEL EN NIET DOORLOOPT, en waar dat werkelijk wordt

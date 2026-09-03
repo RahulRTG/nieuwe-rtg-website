@@ -8,6 +8,21 @@ module.exports = [
   // ---- Partners (leveranciers) ----
   { id: 'supplier', categorie: 'Partners (leveranciers)', naam: 'Partner-app (algemeen)', standaard: true, doelgroepen: ['leverancier'],
     uitleg: 'Alle leveranciersfuncties. Uit = partners kunnen niets meer doen (behalve wat hieronder apart aan staat).', paden: ['/api/supplier', '/api/partner'] },
+  /* EEN EIGEN SCHAKELAAR OMDAT HIJ EEN EIGEN UITZONDERING NODIG HEEFT.
+
+     Het HACCP-temperatuurlogboek viel onder `supplier`, en die zit in een
+     BEVROREN categorie: onder de beschermstand kon een keuken haar koeling niet
+     meer registreren. Dat is een WETTELIJKE registratieplicht die stilvalt door
+     een beveiligingsstand van RTG -- schade bij een derde die wij veroorzaken,
+     en precies de ruil die BESTUUR.md grens 6.10 verbiedt.
+
+     Hij staat in dezelfde categorie als zijn broers (daar hoort hij inhoudelijk)
+     en loopt door via kern/beschermstand-lijst.js UITZONDERINGEN, want dat is de
+     plek waar dit huis "bevroren categorie, toch open" opschrijft -- met een
+     verplichte reden. De langste prefix wint, dus de rest van /api/supplier
+     blijft gewoon bij `supplier`. */
+  { id: 'supplier-haccp', categorie: 'Partners (leveranciers)', naam: 'Voedselveiligheid (HACCP)', standaard: true, doelgroepen: ['leverancier'],
+    uitleg: 'Het temperatuurlogboek en de HACCP-metingen van een keuken. Een wettelijke registratieplicht.', paden: ['/api/supplier/horeca/haccp'] },
   { id: 'supplier-pos', categorie: 'Partners (leveranciers)', naam: 'Kassa (POS)', standaard: true, doelgroepen: ['leverancier'],
     uitleg: 'Het kassascherm per sector: afrekenen en RTG-code innen.', paden: ['/api/supplier/pos'] },
   { id: 'supplier-salon', categorie: 'Partners (leveranciers)', naam: 'Partner-Salon (marketing)', standaard: true, doelgroepen: ['leverancier'],

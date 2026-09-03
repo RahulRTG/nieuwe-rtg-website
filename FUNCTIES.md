@@ -16,14 +16,14 @@ het?**
 
 | | |
 |---|---|
-| Functieschakelaars (aan/uit per functie) | **208** in 17 categorieën |
+| Functieschakelaars (aan/uit per functie) | **209** in 17 categorieën |
 | Apps in de leden-catalogus | **84** in 8 categorieën |
 | Bedrijfsgenres | **74** in 27 sectoren |
 | Genre-caps (waar de apps op sturen) | **40** |
 | API-routes (uit de router) | **4738** |
-| Kernmodules (`server/kern/**`) | **1961** |
-| App-pagina's (`public/apps/**.html`) | **290** |
-| Testbestanden | **1565** |
+| Kernmodules (`server/kern/**`) | **1999** |
+| App-pagina's (`public/apps/**.html`) | **292** |
+| Testbestanden | **1579** |
 
 ## De vier werelden
 
@@ -54,7 +54,7 @@ ook blokkeert.
 
 ---
 
-# 1. De 208 functieschakelaars
+# 1. De 209 functieschakelaars
 
 ### Leden (RTG-app) — 21
 
@@ -212,9 +212,11 @@ ook blokkeert.
 - **Knelpunten (welke weg ligt open)** (`knelpunt`) — Rekent uit welke weg naar een doel openligt, wat hem blokkeert en wat er niet is nagegaan. Bewaart niets: alles komt binnen in het verzoek en gaat eruit als antwoord. Er wordt niets gerangschikt en geen beste weg aangewezen.  
   _voor: rtg, lifestyle, business_
 
-### Partners (leveranciers) — 10
+### Partners (leveranciers) — 11
 
 - **Partner-app (algemeen)** (`supplier`) — Alle leveranciersfuncties. Uit = partners kunnen niets meer doen (behalve wat hieronder apart aan staat).  
+  _voor: leverancier_
+- **Voedselveiligheid (HACCP)** (`supplier-haccp`) — Het temperatuurlogboek en de HACCP-metingen van een keuken. Een wettelijke registratieplicht.  
   _voor: leverancier_
 - **Kassa (POS)** (`supplier-pos`) — Het kassascherm per sector: afrekenen en RTG-code innen.  
   _voor: leverancier_
@@ -497,7 +499,7 @@ ook blokkeert.
 
 ### Toegang en identiteit — 8
 
-- **Inloggen en registreren** (`tg-inlog`) — De voordeur: inloggen, uitloggen, registreren en wachtwoord vergeten. Uit betekent dat niemand meer binnenkomt; de eigenaar houdt het techniekbord.  
+- **Inloggen en registreren** (`tg-inlog`) — De voordeur: inloggen, uitloggen, registreren en wachtwoord vergeten -- met een wachtwoord of met een passkey. Uit betekent dat niemand meer binnenkomt; de eigenaar houdt het techniekbord.  
   _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_
 - **Account en profiel** (`tg-account`) — Het eigen account: rollen, koppelingen en het cv van een lid.  
   _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_

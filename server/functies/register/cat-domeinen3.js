@@ -23,7 +23,11 @@ const LEDEN_GAST = ['rtg', 'lifestyle', 'business', 'gast'];
 module.exports = [
   // ---------- de deuren waar mensen doorheen moeten ----------
   { id: 'tg-inlog', categorie: 'Toegang en identiteit', naam: 'Inloggen en registreren', standaard: true, doelgroepen: ALLE,
-    uitleg: 'De voordeur: inloggen, uitloggen, registreren en wachtwoord vergeten. Uit betekent dat niemand meer binnenkomt; de eigenaar houdt het techniekbord.', paden: ['/api/auth', '/api/login', '/api/logout'] },
+    uitleg: 'De voordeur: inloggen, uitloggen, registreren en wachtwoord vergeten -- met een wachtwoord of met een passkey. Uit betekent dat niemand meer binnenkomt; de eigenaar houdt het techniekbord.',
+    /* De passkey-INLOG hoort bij de voordeur; registreren en verwijderen blijven
+       bij de functie `webauthn` (de langste prefix wint). Waarom dat een besluit
+       was en niet een verhuizing, staat in ISOLATIE.md par. 10. */
+    paden: ['/api/auth', '/api/login', '/api/logout', '/api/webauthn/login', '/api/webauthn/opties'] },
   { id: 'tg-account', categorie: 'Toegang en identiteit', naam: 'Account en profiel', standaard: true, doelgroepen: ALLE,
     uitleg: 'Het eigen account: rollen, koppelingen en het cv van een lid.', paden: ['/api/account', '/api/cv'] },
   /* SSO EN SCIM ZIJN DE TWEE HELFTEN VAN DEZELFDE DEUR: de identiteitsprovider

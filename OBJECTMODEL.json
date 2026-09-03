@@ -2,15 +2,15 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-09-03",
   "gemeten": {
-    "bestanden": 2044,
-    "vormen": 1357,
-    "velden": 1965,
-    "modules": 733,
-    "domeinen": 256,
+    "bestanden": 2081,
+    "vormen": 1365,
+    "velden": 1971,
+    "modules": 738,
+    "domeinen": 258,
     "envelopDrempel": 16,
-    "envelop": 30,
-    "veldenDomeineigen": 1393,
-    "veldenGedeeldVanafVier": 194,
+    "envelop": 31,
+    "veldenDomeineigen": 1398,
+    "veldenGedeeldVanafVier": 193,
     "gelijkendeVormparen": 20
   },
   "envelop": [
@@ -43,6 +43,7 @@
     "tot",
     "uitleg",
     "van",
+    "waarom",
     "wat"
   ],
   "gedeeld": [
@@ -95,15 +96,15 @@
       ]
     },
     {
-      "veld": "waarom",
+      "veld": "wie",
       "domeinen": 15,
       "waar": [
-        "kern/bureau",
-        "kern/command",
+        "bedrijf",
+        "kern/comm",
         "kern/commerce",
-        "kern/commercie",
-        "kern/concern",
-        "kern/gewoonten"
+        "kern/consent-lezers",
+        "kern/isolatie",
+        "kern/livinglab"
       ]
     },
     {
@@ -116,18 +117,6 @@
         "kern/commerce",
         "kern/instant-reality",
         "kern/magnaat-werkroutefabriek"
-      ]
-    },
-    {
-      "veld": "wie",
-      "domeinen": 14,
-      "waar": [
-        "bedrijf",
-        "kern/comm",
-        "kern/commerce",
-        "kern/consent-lezers",
-        "kern/livinglab",
-        "kern/onderzoekslab"
       ]
     },
     {
@@ -525,6 +514,18 @@
         "kern/labfonds",
         "kern/livinglab"
       ]
+    },
+    {
+      "veld": "actie",
+      "domeinen": 9,
+      "waar": [
+        "bedrijf",
+        "kern/bankregie",
+        "kern/command",
+        "kern/frictie",
+        "kern/geldbeleid",
+        "kern/magnaat-controle"
+      ]
     }
   ],
   "paren": [
@@ -543,20 +544,6 @@
         "terugDraaibaar",
         "type",
         "veld"
-      ]
-    },
-    {
-      "gelijkenis": 1,
-      "a": "server/kern/command/index.js",
-      "b": "server/kern/zaakcommand/beeld.js",
-      "domeinA": "kern/command",
-      "domeinB": "kern/zaakcommand",
-      "gedeeld": [
-        "niveau",
-        "score",
-        "vierOgen",
-        "waarom",
-        "waaromNiet"
       ]
     },
     {
@@ -599,6 +586,19 @@
         "rk",
         "rt",
         "type"
+      ]
+    },
+    {
+      "gelijkenis": 1,
+      "a": "server/kern/command/index.js",
+      "b": "server/kern/zaakcommand/beeld.js",
+      "domeinA": "kern/command",
+      "domeinB": "kern/zaakcommand",
+      "gedeeld": [
+        "niveau",
+        "score",
+        "vierOgen",
+        "waaromNiet"
       ]
     },
     {

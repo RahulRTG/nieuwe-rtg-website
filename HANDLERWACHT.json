@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-03T08:58:34.518Z",
-  "commit": "dd4d57c9",
+  "op": "2026-09-03T09:02:18.236Z",
+  "commit": "1873e69b",
   "boomVuil": true,
-  "boomAnders": 47,
+  "boomAnders": 43,
   "instrument": "scripts/handlerwacht.js",
   "node": "v22.22.2"
  },
@@ -3933,13 +3933,13 @@
   },
   {
    "sleutel": "POST /api/webauthn/login",
-   "bestand": "server/routes/auth/webauthn.js:49",
+   "bestand": "server/routes/auth/webauthn.js:50",
    "staat": "openbaar",
    "reden": "de tegenhanger van /api/webauthn/opties: de ondertekende uitdaging IS het bewijs, en die geldt eenmalig"
   },
   {
    "sleutel": "POST /api/webauthn/opties",
-   "bestand": "server/routes/auth/webauthn.js:42",
+   "bestand": "server/routes/auth/webauthn.js:43",
    "staat": "openbaar",
    "reden": "de uitdaging moet er zijn VOOR je hem kunt beantwoorden; het bewijs volgt bij /login"
   },

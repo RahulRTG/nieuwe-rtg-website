@@ -133,4 +133,13 @@ function toegestanePaden(paden, wereld) {
 const DIRECT = Object.freeze(Object.fromEntries(
   Object.keys(LEZEN).map(w => [w, LEZEN[w].concat(KLEIN[w] || [])])));
 
-module.exports = { LEZEN, KLEIN, DIRECT, VOORSTEL, beleidVoor, toegestanePaden };
+/* DE TREDEN ALS WAARDE, zodat wie ze nodig heeft ze kan OPHALEN in plaats van
+   overschrijven. scripts/gezag.js telt precies dat: een bestand dat een woord
+   van deze schaal op een `niveau`-veld gebruikt zonder de schaal te importeren,
+   houdt een kopie van deze waarheid vast -- en dan zegt een hernoeming hier
+   niets meer over daar. kern/stuur/isolatiefilter.js was de 23e; hij krijgt het
+   woord nu hiervandaan. De volgorde is de ordening: verboden < lezen < voorstel
+   < klein is de schaal zoals het register hem kent. */
+const NIVEAUS = Object.freeze({ VERBODEN: 'verboden', LEZEN: 'lezen', KLEIN: 'klein', VOORSTEL: 'voorstel' });
+
+module.exports = { LEZEN, KLEIN, DIRECT, VOORSTEL, NIVEAUS, beleidVoor, toegestanePaden };

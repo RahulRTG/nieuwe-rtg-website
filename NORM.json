@@ -25,7 +25,7 @@
     "kernGedeeld": 237,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 550,
+    "toetsenNietGemeten": 551,
     "toetsenOngevoeligPct": 1,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
@@ -1720,6 +1720,15 @@
       "meter": "toetsenNietGemeten 547 -> 550",
       "vervalt": "2027-03-31",
       "reden": "Drie nieuwe toetsbestanden (herstelquorum, eigenaarherstel, eigenaarherstel-routes) waar de mutatiemotor nog niet overheen is geweest. Met de hand zijn er VIER mutaties gedaan en alle vier gezien zakken: de wachttijd weghalen, afbreken zonder effect maken, de poort uit een route halen, en de twee woordenlijsten laten overlappen. Dat is geen vervanging voor de motor -- die probeert wat een mens niet bedenkt -- maar het is ook niet niets. Aflossen is de motor erover laten lopen."
+    },
+    {
+      "datum": "2026-09-03",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 550,
+      "vervalt": "2027-03-31",
+      "meter": "toetsenNietGemeten 550 -> 551",
+      "reden": "test/passkeys-eerste.test.js is er bijgekomen: het scherm dat doodliep voor wie nog geen passkey had. De mutatiemotor is er nog niet overheen; met de hand is het oude gedrag teruggezet en die mutatie zakte (1 rood). Aflossen is de motor erover laten lopen."
     }
   ],
   "prestatie": {

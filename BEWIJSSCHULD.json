@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-09-03T02:37:07.671Z",
-  "commit": "4f271d46",
+  "op": "2026-09-03T08:32:47.386Z",
+  "commit": "df1a581a",
   "boomVuil": false,
   "node": "v22.22.2"
  },
@@ -9,14 +9,14 @@
  "grens": "Dit is een lijst van wat we WETEN dat we niet hebben gemeten. Wat niemand heeft bedacht staat er per definitie niet in, en dat is de gevaarlijkste categorie -- een schuldenlijst is geen dekkingsbewijs. De aantallen komen uit de registers en zijn dus zo vers als de laatste ronde; zie scripts/versheid.js.",
  "telling": {
   "posten": 18,
-  "meetwerk": 1958,
+  "meetwerk": 1960,
   "instrument": 932,
   "grens": 708
  },
  "aflossing": {
   "doel": 0,
   "wat": "de achterstand (meetwerk + instrument) gaat naar nul. `grens` telt niet mee en sluit nooit -- dat is de rand van de methode en geen werk.",
-  "staat": 2890,
+  "staat": 2892,
   "regels": [
    "de achterstand mag nooit groeien zonder een reden IN dit register (--groei=...)",
    "een post mag niet van soort veranderen om onder de poort uit te komen: naar `grens` verplaatsen laat de achterstand dalen zonder dat er iets gemeten is",
@@ -69,7 +69,7 @@
    "id": "output-niet-toerekenbaar",
    "soort": "meetwerk",
    "wat": "routes waar inhoudgevoelige toetsen op zitten, maar die toetsen raken er meer",
-   "aantal": 284,
+   "aantal": 285,
    "waarom": "een toets die op de lege inhoud zakt en tien routes raakt, kan op de inhoud van een van die tien zijn gezakt. Aan DEZE route valt dan niets toe te rekenen.",
    "sluit": "node scripts/outputproef.js --meet=<n>. Die liegt over EEN route en draait alleen de toetsen die hem raken; de uitslagen stapelen in OUTPUTPROEF.json. Een paar honderd per ronde, dus dit sluit met werk en niet met een doorbraak."
   },
@@ -133,7 +133,7 @@
    "id": "gevolg-onbekend",
    "soort": "meetwerk",
    "wat": "bereikbare capabilities waarvan niemand heeft gemeten WAT ze veranderen",
-   "aantal": 90,
+   "aantal": 91,
    "waarom": "server/kern/stuur/gevolg.js projecteert een EERDERE proefronde op de stappen van een plan. Staat een pad niet in die ronde, dan is de eerlijke uitslag `onbekend` -- en een plan dat voor het merendeel uit onbekende gevolgen bestaat, is geen voorspelling.",
    "sluit": "de idempotentieproef over deze paden halen, of ze in de droogloop opnemen. Het gereedschap staat er (scripts/droogloop.js meet per stap welke collectie werkelijk bewoog); wat rest is meten."
   },
@@ -252,7 +252,7 @@
    },
    {
     "op": "2026-09-03",
-    "aantal": 284
+    "aantal": 285
    }
   ],
   "output-blind": [
@@ -364,7 +364,7 @@
    },
    {
     "op": "2026-09-03",
-    "aantal": 90
+    "aantal": 91
    }
   ],
   "droogloop-onbeoordeeld": [
@@ -444,12 +444,6 @@
    "reden": "staat 3 meetdagen op hetzelfde getal; de aflossing stokt hier. Sluitweg: de ruis meten: tien rondes op dezelfde commit, en per as de spreiding vastleggen. Dan weet de ratel wat een echte verslechtering is en wat niet."
   },
   {
-   "id": "gevolg-onbekend",
-   "aantal": 90,
-   "meetdagen": 3,
-   "reden": "staat 3 meetdagen op hetzelfde getal; de aflossing stokt hier. Sluitweg: de idempotentieproef over deze paden halen, of ze in de droogloop opnemen. Het gereedschap staat er (scripts/droogloop.js meet per stap welke collectie werkelijk bewoog); wat rest is meten."
-  },
-  {
    "id": "droogloop-onbeoordeeld",
    "aantal": 2,
    "meetdagen": 3,
@@ -498,6 +492,12 @@
    "van": 2605,
    "naar": 2890,
    "reden": "De routetabel groeide van 4188 naar 4738 (+13%) doordat de meetronde voor het eerst sinds 20 augustus tegen de HUIDIGE tabel draaide. De groei zit in EEN post: output-niet-toerekenbaar van 0 naar 284. Dat zijn geen nieuwe gaten maar dezelfde inhoudstoetsen die door de bredere tabel meer routes raken, waardoor hun uitkomst niet meer aan een route toe te rekenen is. De twee andere stijgers (capability-in-handler +89, lichaamssleutel +11) vallen onder GRENS, de post die per definitie nooit sluit, en tellen dus niet in de achterstand. Nagemeten per post; nagerekend: 2605 + 284 + 1 (rollback-gezakt, de vastgelegde uitzondering van pay/budget) + 1 (idem-ongeclassificeerd) = 2891."
+  },
+  {
+   "op": "2026-09-03",
+   "van": 2890,
+   "naar": 2892,
+   "reden": "Twee routes erbij (2890 -> 2892), en het is dezelfde ruisvloer die BEWIJSMATRIX.json deze ronde met een reden vastlegde: 42 POST-routes die vooral LEZEN wisselden van oordeel in de staatproef, 18 omhoog en 24 omlaag, op state/sideEffect/idempotentie tegelijk. Of de proef ziet dat er een collectie beweegt hangt af van de volgorde waarin de ronde ze aantreft en niet van hun code; per saldo komen er twee routes bij in de achterstand. Geen van de 42 hangt aan een bestand dat deze tak wijzigde, op twee na -- en die twee gingen juist omhoog. De sluitweg is niet 'deze twee nakijken' maar de proef zelf minder volgorde-afhankelijk maken; zolang dat niet is gebeurd, hoort dit getal een paar te ademen."
   }
  ]
 }

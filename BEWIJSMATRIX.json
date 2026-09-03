@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-03T02:39:00.167Z",
-    "commit": "948bc51d",
+    "op": "2026-09-03T08:30:37.996Z",
+    "commit": "df1a581a",
     "boomVuil": false,
     "node": "v22.22.2"
   },
@@ -12,18 +12,18 @@
   "schakels": 11,
   "cellen": 52118,
   "telling": {
-    "bewezen": 25556,
+    "bewezen": 25545,
     "verklaard": 0,
     "nvt": 310,
-    "ongemeten": 26252,
+    "ongemeten": 26263,
     "gezakt": 0
   },
   "perSchakel": {
     "AUTH": {
-      "bewezen": 4416,
+      "bewezen": 4417,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 322,
+      "ongemeten": 321,
       "gezakt": 0
     },
     "ACL": {
@@ -48,31 +48,31 @@
       "gezakt": 0
     },
     "STATE": {
-      "bewezen": 416,
+      "bewezen": 410,
       "verklaard": 0,
       "nvt": 77,
-      "ongemeten": 4245,
+      "ongemeten": 4251,
       "gezakt": 0
     },
     "SIDE_EFFECT": {
-      "bewezen": 416,
+      "bewezen": 410,
       "verklaard": 0,
       "nvt": 77,
-      "ongemeten": 4245,
+      "ongemeten": 4251,
       "gezakt": 0
     },
     "AUDIT": {
-      "bewezen": 1039,
+      "bewezen": 1042,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 3699,
+      "ongemeten": 3696,
       "gezakt": 0
     },
     "IDEMPOTENCY": {
-      "bewezen": 1638,
+      "bewezen": 1635,
       "verklaard": 0,
       "nvt": 78,
-      "ongemeten": 3022,
+      "ongemeten": 3025,
       "gezakt": 0
     },
     "FAILURE": {
@@ -98,8 +98,8 @@
     }
   },
   "verslechteringToegestaan": {
-    "reden": "De routetabel groeide van 4188 naar 4738 (+550, +13%): deze stand is de eerste sinds 20 augustus die tegen de HUIDIGE tabel is gemeten, met alle tien bronregisters vers en op een schone boom. Absoluut is het beeld eenduidig -- bewezen 16475 -> 25556, ongemeten 29205 -> 26252. Per kolom groeit ongemeten in zes kolommen, telkens met MINDER dan de 550 nieuwe routes, dus de instrumenten dekken een deel van de groei maar niet alles. EN DIT MOET ERBIJ, want het is niet louter noemer: OUTPUT en AUTH zijn ook PROPORTIONEEL slechter (OUTPUT 99,3% -> 87,6%, AUTH 100% -> 93,2%), omdat de outputproef en de poortwacht de 550 nieuwe routes nog niet hebben gezien. OUTPUT verliest daarbovenop 6 absolute cellen; die komen uit een routejournaal van een suiteronde die zelf nog toetsen liet zakken. FAILURE staat weer op 2 nadat de geldketen -- die door een ontbrekende omgevingsvlag helemaal niet draaide -- is hersteld.",
-    "cellenVoor": 46068,
+    "reden": "Elf cellen minder bewezen (25556 -> 25545), en dat is de RUISVLOER van de staatproef en geen verslechtering van deze tak. Nagemeten tegen STAATPROEF.json van de vorige ronde: precies 42 routes wisselden van oordeel, en ze wisselden in BEIDE richtingen -- 18 omhoog, 24 omlaag -- op state, sideEffect en idempotentie tegelijk. Het zijn allemaal POST-routes die vooral LEZEN (/api/ov/mijn, /api/salon/promo, /api/mall/collecties, /api/verblijf/mijn); of de proef ziet dat er een collectie beweegt hangt af van de volgorde waarin de ronde ze aantreft, niet van hun code. De reden in het register wisselt letterlijk tussen 'bevestigd, en gemeten welke collecties bewogen' en 'de route bevestigde zonder dat er iets in de opslag bewoog'. Geen van de 42 hangt aan een bestand dat deze tak heeft gewijzigd, op twee na -- en die twee gingen juist OMHOOG (/api/supplier/mijn/taal en /api/supplier/horeca/fooienpot/lijst, allebei ongemeten -> bewezen). Wat deze ronde WEL structureel verbeterde staat naast dit getal: POORTWACHT 0 open routes, en laatspoor 72 -> 3.",
+    "cellenVoor": 52118,
     "cellenNa": 52118
   },
   "uitleg": "Gegenereerd door scripts/bewijsmatrix.js. ongemeten MAG ALLEEN KRIMPEN."

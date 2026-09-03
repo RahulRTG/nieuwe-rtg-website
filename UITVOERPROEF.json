@@ -1,20 +1,20 @@
 {
  "stempel": {
-  "op": "2026-09-02T22:11:03.746Z",
-  "commit": "9b35c937",
+  "op": "2026-09-03T08:27:17.199Z",
+  "commit": "df1a581a",
   "boomVuil": false,
   "node": "v22.22.2",
   "begrenzing": "geen"
  },
  "uitleg": "Per route: met de JUISTE rol en plausibele invoer, en of het 2xx-antwoord gegevens van een ANDER account bevatte (kanaries) of een geheim veld. Een route die hier NIET in staat is niet beproefd. Een route met uitvoer:\"poort\" gaf nooit een 2xx en is ONGEMETEN, geen groen. Zie scripts/lib/uitvoerproef.js voor de grens en waarom de lekmerkers niet blind over een 2xx mogen.",
- "kanariekenmerk": "042180",
+ "kanariekenmerk": "018673",
  "gemeten": {
   "routesMetRol": 3642,
-  "gemeten": 941,
+  "gemeten": 942,
   "pogingen": 3649,
-  "schoon": 936,
-  "gezakt": 5,
-  "achterEenPoort": 2701,
+  "schoon": 938,
+  "gezakt": 4,
+  "achterEenPoort": 2700,
   "tokensHernieuwd": 7,
   "begrenzing": 0
  },
@@ -1949,7 +1949,7 @@
    "methode": "POST",
    "pad": "/api/command/uitrol/pauze",
    "rol": "office",
-   "uitvoer": "poort"
+   "uitvoer": "schoon"
   },
   {
    "methode": "POST",
@@ -19463,7 +19463,7 @@
    "methode": "POST",
    "pad": "/api/supplier/rtmail/imap/sleutel",
    "rol": "supplier",
-   "uitvoer": "GEZAKT"
+   "uitvoer": "schoon"
   },
   {
    "methode": "POST",

@@ -115,53 +115,203 @@ function routekaart() {
 
 /* ---- WAAR HET STAAT: de bron, als verrijking ----
    Dezelfde uitdrukking als voorheen, maar hij beslist niets meer over bestaan.
-   Twee ingangen: op het volle pad (een route die letterlijk zo in de bron staat)
-   en op de STAART (een route op een sub-router staat daar met zijn pad binnen de
-   mount: `/les/maak` voor `/api/foundation/les/maak`). Die tweede accepteren we
-   alleen bij precies EEN treffer -- een verkeerd toegewezen bronbestand is erger
-   dan geen bronbestand, want dan wijst een melding je naar het verkeerde bestand. */
-const ROUTE_RE = /\b(app|router)\.(post|get|put|delete|patch)\(\s*(['"`])([^'"`]+)\3([^\n]*)/g;
+   Vier ingangen, van zeker naar onzeker, en de volgorde IS de zekerheid:
+
+     exact          de route staat letterlijk zo in de bron
+     samengesteld   het pad is in de bron opgebouwd uit een voorvoegsel dat in
+                    HETZELFDE bestand als tekst staat: `app.post(p.pad + '/alias')`
+                    naast `{ pad: '/api/member/rtmail' }`. Dan is het volle pad
+                    af te leiden en is dit net zo hard als exact.
+     staart         een route op een sub-router staat daar met zijn pad binnen de
+                    mount: `/les/maak` voor `/api/foundation/les/maak`
+     staartVoorvoegsel  wel een `X + '/alias'`, maar het voorvoegsel staat niet
+                    in dit bestand (het komt als parameter binnen). Dan blijft
+                    alleen de staart over.
+     fabriek        het bestand registreert EEN keer met een opgebouwd pad en
+                    roept dat daarna tientallen keren aan; de staart bestaat
+                    statisch niet. Het voorvoegsel staat er wel als tekst, dus
+                    de vraag wordt omgekeerd: welk bestand claimt dit
+                    voorvoegsel en bouwt paden op? Alleen bij precies een.
+
+   De laatste drie accepteren we alleen bij precies EEN treffer -- een verkeerd
+   toegewezen bronbestand is erger dan geen bronbestand, want dan wijst een
+   melding je naar het verkeerde bestand.
+
+   WAAROM DE TWEEDE EN VIERDE ERBIJ ZIJN GEKOMEN. `scripts/laatspoor.js` kon van
+   226 schrijfroutes de bron niet vinden, en die stonden apart geteld met "niet
+   gekeken is geen in orde". De oorzaak was niet dat die routes ergens raar
+   staan: ze staan in een LUS over twee of drie voorvoegsels
+   (server/routes/rtmail-*.js schrijft elke route een keer en hangt hem op
+   /api/member/rtmail en /api/supplier/rtmail). De uitdrukking hierboven eist een
+   letterlijke tekenreeks als eerste argument en zag daar dus NIETS van -- 58
+   registraties, goed voor 226 routes. Dezelfde blinde vlek die keuringsregel 28
+   had met `app.use` op een lijst paden, nu op een `+`. */
+/* De staart wordt met een VOORUITBLIK gevangen en niet opgegeten. Dat is geen
+   stijl maar een reparatie: `([^\n]*)` schuift lastIndex naar het regeleinde, dus
+   van een bestand met meer registraties op EEN regel werd alleen de eerste
+   gezien. server/routes/instant-reality.js is zo'n bestand -- drie routes, een
+   regel -- en daar bleven er twee van onvindbaar. */
+const ROUTE_RE = /\b(app|router)\.(post|get|put|delete|patch)\(\s*(['"`])([^'"`]+)\3(?=([^\n]*))/g;
+/* Een registratie waarvan het pad wordt OPGEBOUWD: `app.post(p.pad + '/alias'`.
+   Het linkerdeel mag van alles zijn (een variabele, een veld, een index) zolang
+   er geen aanhalingsteken in staat -- dan was het immers de vorm hierboven. */
+const SAMEN_RE = /\b(app|router)\.(post|get|put|delete|patch)\(\s*([A-Za-z_$][\w.$\[\]]*)\s*\+\s*(['"`])([^'"`]+)\4(?=([^\n]*))/g;
+/* De voorvoegsels die IN dit bestand als tekst staan. Bewust smal: het moet op
+   /api beginnen en mag geen sjabloonstuk dragen, anders komt er van alles langs
+   dat toevallig met een schuine streep begint. */
+const VOORVOEGSEL_RE = /(['"`])(\/api\/[a-z0-9/_:-]*[a-z0-9_:-])\1/gi;
+/* Bouwt dit bestand paden op? Een registratie waarvan het eerste argument NIET
+   met een aanhalingsteken begint. Dat is precies de vorm die de twee
+   uitdrukkingen hierboven niet tot een volledig pad kunnen maken. */
+const BOUWT_RE = /\b(app|router)\.(post|get|put|delete|patch)\(\s*[A-Za-z_$]/g;
+/* En de spiegelvorm: een LETTERLIJK voorvoegsel met een variabele staart,
+   `app.post('/api/member/spel/' + naam, ...)`. Hier zegt het bestand zelf welk
+   voorvoegsel het claimt -- dat is de hardste voorvoegselclaim die er is, want
+   hij staat naast de registratie en niet ergens anders in het bestand. */
+const VOOR_RE = /\b(app|router)\.(post|get|put|delete|patch)\(\s*(['"`])(\/[^'"`]+)\3\s*\+/g;
 
 let _bron = null;
 function bronIndex() {
   if (_bron) return _bron;
   const exact = new Map();
   const perStaart = new Map();
+  const samengesteld = new Map();
+  const perStaartVoorvoegsel = new Map();
+  const perVoorvoegselBestand = new Map();
+  const zet = (kaart, sleutel, plek) => {
+    const lijst = kaart.get(sleutel) || [];
+    lijst.push(plek);
+    kaart.set(sleutel, lijst);
+  };
   loopMap(path.join(WORTEL, 'server'), /\.js$/, f => {
-    const tekst = fs.readFileSync(f, 'utf8');
+    /* MET HET COMMENTAAR PLATGESLAGEN, en dat is geen netheid maar een
+       reparatie. Deze index leest brontekst met uitdrukkingen, en een
+       uitdrukking ziet geen verschil tussen code en een voorbeeld in een
+       commentaarblok. server/kern/handlerpoorten/buiten.js legt in proza uit dat
+       een handvol routes in een lus wordt aangemaakt en citeert daarbij
+       `app.post('/api/rtf/spel/' + ...)`. Daarmee claimden twee bestanden
+       hetzelfde voorvoegsel, werd de claim dubbelzinnig, en verloren 42
+       spelroutes hun bron. De platgeslagen vorm houdt regelnummers EN
+       tekenposities heel, dus de melding blijft naar de goede regel wijzen. */
+    const tekst = require('./bron').zonderCommentaar(fs.readFileSync(f, 'utf8'), { regelsHeel: true });
+    const bestand = path.relative(WORTEL, f).replace(/\\/g, '/');
+    const plekOp = (index, viaRouter, staart) => ({
+      bestand, regel: tekst.slice(0, index).split('\n').length,
+      viaRouter, rauw: (staart || '').trim().slice(0, 160)
+    });
     let m;
     ROUTE_RE.lastIndex = 0;
     while ((m = ROUTE_RE.exec(tekst))) {
       const pad = m[4];
       if (!pad.startsWith('/')) continue;
-      const plek = {
-        bestand: path.relative(WORTEL, f).replace(/\\/g, '/'),
-        regel: tekst.slice(0, m.index).split('\n').length,
-        viaRouter: m[1] === 'router',
-        rauw: (m[5] || '').trim().slice(0, 160)
-      };
+      const plek = plekOp(m.index, m[1] === 'router', m[5]);
       const sleutel = m[2].toUpperCase() + ' ' + pad;
       if (!exact.has(sleutel)) exact.set(sleutel, plek);
-      const lijst = perStaart.get(sleutel) || [];
-      lijst.push(plek);
-      perStaart.set(sleutel, lijst);
+      zet(perStaart, sleutel, plek);
+    }
+    /* De opgebouwde paden. Eerst de voorvoegsels van dit bestand ophalen; die
+       lijst is meestal leeg en dan valt alles vanzelf terug op de staart. */
+    const voorvoegsels = new Set();
+    VOORVOEGSEL_RE.lastIndex = 0;
+    let v;
+    while ((v = VOORVOEGSEL_RE.exec(tekst))) voorvoegsels.add(v[2].replace(/\/$/, ''));
+    SAMEN_RE.lastIndex = 0;
+    while ((m = SAMEN_RE.exec(tekst))) {
+      const staart = m[5];
+      if (!staart.startsWith('/')) continue;
+      const methode = m[2].toUpperCase();
+      const plek = plekOp(m.index, m[1] === 'router', m[6]);
+      plek.viaVoorvoegsel = true;
+      for (const vv of voorvoegsels) zet(samengesteld, methode + ' ' + vv + staart, plek);
+      zet(perStaartVoorvoegsel, methode + ' ' + staart, plek);
+    }
+    /* DE FABRIEK, en dat is de laatste vorm die overbleef. server/routes/verzorging.js
+       schrijft EEN registratie -- `app.post(basis + pad, ...)` -- en roept die daarna
+       veertig keer aan met een tail die nergens als tekst naast een app.post staat.
+       Statisch is de staart daar niet te vinden; het VOORVOEGSEL wel, want dat staat
+       er letterlijk (`maak('/api/supplier/beauty', ...)`). Dus keren we de vraag om:
+       welk bestand claimt dit voorvoegsel, en bouwt het paden op? Staat het antwoord
+       op precies EEN bestand, dan is dat het bestand -- en anders zwijgen we. */
+    VOOR_RE.lastIndex = 0;
+    while ((m = VOOR_RE.exec(tekst))) {
+      const vv = m[4].replace(/\/+$/, '');
+      if (!vv.startsWith('/api/')) continue;
+      const plek = plekOp(m.index, m[1] === 'router', '');
+      plek.viaVoorvoegsel = true;
+      zet(perVoorvoegselBestand, vv, plek);
+    }
+    if (BOUWT_RE.test(tekst)) {
+      BOUWT_RE.lastIndex = 0;
+      const eerste = BOUWT_RE.exec(tekst);
+      const plek = plekOp(eerste ? eerste.index : 0, /router\s*\./.test(eerste ? eerste[0] : ''), '');
+      plek.viaVoorvoegsel = true;
+      plek.viaFabriek = true;
+      for (const vv of voorvoegsels) zet(perVoorvoegselBestand, vv, plek);
     }
   });
-  _bron = { exact, perStaart };
+  _bron = { exact, perStaart, samengesteld, perStaartVoorvoegsel, perVoorvoegselBestand };
   return _bron;
 }
 
+/* Precies EEN kandidaat, of niets. Twee bestanden die dezelfde staart bouwen
+   zeggen samen niets over welk van de twee je zoekt, en dan is stil de
+   verkeerde noemen erger dan zwijgen. */
+function enige(kaart, sleutel) {
+  const k = kaart.get(sleutel);
+  return k && k.length === 1 ? k[0] : null;
+}
+
+/* Voor de voorvoegselkaart is de vraag een ANDERE: niet "staat er precies een
+   registratie" maar "wijst alles naar hetzelfde bestand". Een bestand dat zijn
+   voorvoegsel twee keer claimt (een keer naast de registratie, een keer als
+   losse tekst) is nog steeds een ondubbelzinnig antwoord op de vraag WAAR. Zou
+   je hier op het aantal regels tellen, dan straft de kaart een bestand voor het
+   feit dat het duidelijk is -- en dat kostte 42 rtf-spelroutes hun bron. */
+function enigBestand(kaart, sleutel) {
+  const k = kaart.get(sleutel);
+  if (!k || !k.length) return null;
+  const namen = new Set(k.map(x => x.bestand));
+  if (namen.size !== 1) return null;
+  return k.slice().sort((a, b) => a.regel - b.regel)[0];
+}
+
 function plekVan(methode, pad) {
-  const { exact, perStaart } = bronIndex();
+  const { exact, perStaart, samengesteld, perStaartVoorvoegsel, perVoorvoegselBestand } = bronIndex();
   const heel = exact.get(methode + ' ' + pad);
   if (heel) return heel;
+  const opgebouwd = enige(samengesteld, methode + ' ' + pad);
+  if (opgebouwd) return opgebouwd;
   /* De staart: loop de padgrenzen af van lang naar kort, en neem de eerste
-     lengte die precies EEN kandidaat heeft. */
+     lengte die precies EEN kandidaat heeft. Lang gaat voor kort, zodat een
+     route met een eigen letterlijke registratie nooit door een kortere staart
+     van iemand anders wordt ingepikt. */
   const delen = pad.split('/');
   for (let i = 1; i < delen.length; i++) {
     const staart = '/' + delen.slice(i).join('/');
     const kandidaten = perStaart.get(methode + ' ' + staart);
     if (kandidaten && kandidaten.length === 1) return kandidaten[0];
+  }
+  /* En als laatste dezelfde wandeling over de opgebouwde staarten. Pas hier,
+     want dit is de onzekerste van de vier: het voorvoegsel is niet gezien. */
+  for (let i = 1; i < delen.length; i++) {
+    const staart = '/' + delen.slice(i).join('/');
+    const k = enige(perStaartVoorvoegsel, methode + ' ' + staart);
+    if (k) return k;
+  }
+  /* De fabriek, van lang voorvoegsel naar kort. Hier staat geen methode in de
+     sleutel: een fabriek registreert vaak een handvol werkwoorden op hetzelfde
+     voorvoegsel, en wie die uit elkaar wil houden moet de bron lezen. Wat dit
+     oplevert is het BESTAND, en dat is precies wat de vraag was. */
+  for (let i = delen.length; i >= 3; i--) {
+    /* Begin bij het VOLLE pad en niet een segment korter. Een fabriek
+       registreert vaak ook zijn eigen wortel (`b('', ...)` wordt
+       `/api/supplier/beauty`), en dat pad is dan gelijk aan het voorvoegsel.
+       Sloeg je die stap over, dan bleven precies de acht wortelroutes van
+       server/routes/verzorging.js en zijn buren zonder bron staan. */
+    const vv = delen.slice(0, i).join('/');
+    if (vv.split('/').length < 3) break;
+    const k = enigBestand(perVoorvoegselBestand, vv);
+    if (k) return k;
   }
   return null;
 }
@@ -328,5 +478,11 @@ const SCHAKELPADEN = [
 ];
 const isSchakel = (pad) => SCHAKELPADEN.some(p => String(pad || '').startsWith(p));
 
+/* `enigBestand` gaat mee naar buiten, en niet uit gemak: hij DRAAGT de regel die
+   de bronverrijking eerlijk houdt -- bij twee bestanden die dezelfde claim doen,
+   zwijgen in plaats van de eerste noemen. Dat is precies de faalvorm die je aan
+   de uitkomst niet ziet: allebei de bestanden bevatten het voorvoegsel, dus geen
+   enkele controle op de TEKST kan zien dat de verkeerde is gekozen. Wie die regel
+   wil bewaken, moet hem los kunnen aanroepen (test/routesbron.test.js). */
 module.exports = { alleRoutes, routesInBron, WORTEL, loopMap, SCHAKELPADEN, isSchakel,
-  rolVan, redenZonderRol, verdeelOpRol, meldZonderRol, bewakerskaart };
+  rolVan, redenZonderRol, verdeelOpRol, meldZonderRol, bewakerskaart, enigBestand };

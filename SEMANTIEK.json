@@ -1,12 +1,12 @@
 {
-  "catalogi": 1061,
-  "verschillendeNamen": 627,
-  "namenInMeerDomeinen": 117,
+  "catalogi": 1067,
+  "verschillendeNamen": 630,
+  "namenInMeerDomeinen": 118,
   "woordenMetMeerBetekenissen": 100,
-  "betekenissenTotaal": 378,
+  "betekenissenTotaal": 380,
   "ergsteWoord": "SOORTEN",
   "ergsteAantal": 47,
-  "dubbelingen": 32,
+  "dubbelingen": 33,
   "dubbelingLijst": [
     {
       "naam": "PALET",
@@ -222,7 +222,7 @@
     },
     {
       "naam": "NIET_GEBOUWD",
-      "betekenissenVanDitWoord": 4,
+      "betekenissenVanDitWoord": 5,
       "waar": [
         "server/kern/command/opslag-register.js",
         "server/kern/concern/opslag.js",
@@ -322,6 +322,21 @@
       "waar": [
         "server/kern/command/gezondheid.js",
         "server/kern/kosten/soorten.js"
+      ],
+      "leden": 4,
+      "voorbeeld": [
+        "onbekend",
+        "vermoed",
+        "gemeten",
+        "bewezen"
+      ]
+    },
+    {
+      "naam": "GRADEN",
+      "betekenissenVanDitWoord": 1,
+      "waar": [
+        "server/kern/identiteit/sessievelden.js",
+        "server/kern/objectlaag/pagina.js"
       ],
       "leden": 4,
       "voorbeeld": [
@@ -511,7 +526,7 @@
       ]
     }
   ],
-  "dubbelingenZonderNaam": 210,
+  "dubbelingenZonderNaam": 214,
   "dubbelingZonderNaamLijst": [
     {
       "overlap": 1,
@@ -2810,6 +2825,81 @@
       ]
     },
     {
+      "naam": "NIET_GEBOUWD",
+      "domeinen": 11,
+      "betekenissen": 5,
+      "hoogsteOverlap": 1,
+      "soort": "gemengd",
+      "waar": [
+        {
+          "bestanden": [
+            "server/kern/appstore/machtigingen.js"
+          ],
+          "leden": 6,
+          "voorbeeld": [
+            "betalen",
+            "agenda",
+            "bestanden",
+            "locatie"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/command/opslag-register.js",
+            "server/kern/concern/opslag.js",
+            "server/kern/isolatie/opslag.js",
+            "server/kern/levensdossier/velden.js",
+            "server/kern/mobiliteit/opslag.js",
+            "server/kern/payroll/opslag.js",
+            "server/kern/veiligheid/opslag.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "schema",
+            "validatie",
+            "bevoegdheid",
+            "gebeurtenissen"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/commerce/retourlijst.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "ruilen-tegen-ander-artikel",
+            "retourlabel",
+            "automatisch-terugboeken",
+            "retourpercentage"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/horeca/correctielijst.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "automatisch-terugboeken",
+            "correctie-door-de-gast",
+            "voorraad-afboeken",
+            "correctiepercentage-per-medewerker"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/livinglab/instrumentsoorten.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "foto",
+            "locatie",
+            "audio",
+            "doorlopend"
+          ]
+        }
+      ]
+    },
+    {
       "naam": "REGISTER",
       "domeinen": 5,
       "betekenissen": 5,
@@ -2942,69 +3032,6 @@
             "contrast",
             "beweging",
             "links"
-          ]
-        }
-      ]
-    },
-    {
-      "naam": "NIET_GEBOUWD",
-      "domeinen": 10,
-      "betekenissen": 4,
-      "hoogsteOverlap": 1,
-      "soort": "gemengd",
-      "waar": [
-        {
-          "bestanden": [
-            "server/kern/appstore/machtigingen.js"
-          ],
-          "leden": 6,
-          "voorbeeld": [
-            "betalen",
-            "agenda",
-            "bestanden",
-            "locatie"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/command/opslag-register.js",
-            "server/kern/concern/opslag.js",
-            "server/kern/isolatie/opslag.js",
-            "server/kern/levensdossier/velden.js",
-            "server/kern/mobiliteit/opslag.js",
-            "server/kern/payroll/opslag.js",
-            "server/kern/veiligheid/opslag.js"
-          ],
-          "leden": 5,
-          "voorbeeld": [
-            "schema",
-            "validatie",
-            "bevoegdheid",
-            "gebeurtenissen"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/commerce/retourlijst.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "ruilen-tegen-ander-artikel",
-            "retourlabel",
-            "automatisch-terugboeken",
-            "retourpercentage"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/livinglab/instrumentsoorten.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "foto",
-            "locatie",
-            "audio",
-            "doorlopend"
           ]
         }
       ]
@@ -3521,5 +3548,5 @@
       ]
     }
   ],
-  "bestanden": 3132
+  "bestanden": 3147
 }

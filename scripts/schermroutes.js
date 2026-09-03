@@ -91,10 +91,21 @@ const ontdoe = s => String(s).replace(/^['"`]|['"`]$/g, '');
 
 /* De scriptblokken uit een HTML-bestand; een scherm draagt zijn aanroepen vaak
    inline. Wat buiten een <script> staat wordt niet gelezen -- een pad in een
-   attribuut is geen aanroep. */
+   attribuut is geen aanroep.
+
+   DE SLUITTAG MAG WITRUIMTE DRAGEN. Hier stond `<\/script>`, en dat matcht
+   `</script >` niet -- een vorm die de HTML-standaard wel toestaat. CodeQL
+   meldde het als "bad HTML filtering regexp", en de bevinding klopt: een
+   scriptblok dat zo eindigt liep hier door tot het VOLGENDE `</script>`, en
+   alles ertussen werd als scriptinhoud gelezen. Voor deze meter betekende dat
+   verzonnen aanroepen uit gewone HTML; in een filter zou het een gat zijn.
+
+   Dit is een MEETscript en geen sanitizer -- het leest schermen en beslist
+   niets -- maar een regex die de standaard niet volgt, meet verkeerd, en dat is
+   hier reden genoeg. */
 function scriptsUit(html) {
   const uit = [];
-  for (const m of html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)) uit.push(m[1]);
+  for (const m of html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script\s*>/gi)) uit.push(m[1]);
   return uit;
 }
 

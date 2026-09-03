@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-03T18:26:14.550Z",
-  "commit": "16af4bfd",
-  "boomVuil": false,
-  "boomAnders": 7,
+  "op": "2026-09-03T19:17:38.151Z",
+  "commit": "6b68189d",
+  "boomVuil": true,
+  "boomAnders": 3,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.2"
  },
@@ -11,15 +11,14 @@
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
   "totaal": 4828,
-  "geclassificeerd": 4825,
+  "geclassificeerd": 4828,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3274,
-   "NOT_APPLICABLE": 1121,
+   "NOT_APPLICABLE": 1123,
    "PROTECTED": 324,
-   "INTENTIONALLY_NON_IDEMPOTENT": 106,
-   "LEGACY_PENDING_CLASSIFICATION": 3
+   "INTENTIONALLY_NON_IDEMPOTENT": 107
   },
-  "vastgesteldDoorMens": 1579,
+  "vastgesteldDoorMens": 1582,
   "afgeleidDoorScript": 3246,
   "toegangWaargenomen": {
    "AUTHENTICATED": 3979,
@@ -281,6 +280,12 @@
   },
   {
    "route": "POST /api/service/weiger",
+   "bedoeld": "OBJECT_SCOPED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/sociaal/object/pagina",
    "bedoeld": "OBJECT_SCOPED",
    "waargenomen": "AUTHENTICATED",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
@@ -53126,40 +53131,44 @@
   {
    "mutatieId": "office.anker.post",
    "route": "POST /api/office/anker/post",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
    },
    "bewijs": null,
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "niet gemeten"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.anker.post.reken",
    "route": "POST /api/office/anker/post/reken",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
    },
    "bewijs": null,
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "niet gemeten"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.anker.reken",
@@ -90703,21 +90712,23 @@
   {
    "mutatieId": "sociaal.object.pagina",
    "route": "POST /api/sociaal/object/pagina",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
      "auth"
     ]
    },
    "bewijs": null,
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "niet gemeten"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "sociaal.rahul",

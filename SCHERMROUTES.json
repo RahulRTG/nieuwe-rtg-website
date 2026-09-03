@@ -3,23 +3,23 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-09-03",
-  "commit": "c7f7b719"
+  "commit": "6b68189d"
  },
  "grens": "Een voorvoegsel uit een sjabloon met een gat is GEEN route en wordt nooit tegen de routelijst gelegd. Exacte paden wel: een exact pad dat niet bestaat, is een dood pad.",
  "gemetenTegen": {
   "register": "ROUTEBRON.json",
   "stempel": {
-   "op": "2026-09-03T08:14:43.858Z",
-   "commit": "a89f398e"
+   "op": "2026-09-03T19:18:43.125Z",
+   "commit": "6b68189d"
   },
-  "bekendePaden": 4835
+  "bekendePaden": 4925
  },
  "gemeten": {
-  "schermenMetPad": 368,
+  "schermenMetPad": 380,
   "nietGelezen": 3,
-  "exactePaden": 843,
-  "verwijzingen": 974,
-  "voorvoegsels": 128,
+  "exactePaden": 873,
+  "verwijzingen": 1007,
+  "voorvoegsels": 132,
   "basisPaden": 2,
   "doodPad": 0,
   "doodPadVerwijzingen": 0
@@ -70,6 +70,21 @@
    "aantal": 13
   },
   {
+   "pad": "/api/ice",
+   "schermen": [
+    "public/apps/app-main/app-main-10.js",
+    "public/apps/backoffice/backoffice-03.js",
+    "public/apps/foundation/gezin-rt/gezin-rt-02.js",
+    "public/apps/foundation/vrienden.html",
+    "public/apps/meet/kamer.js",
+    "public/apps/podium.html",
+    "public/shared/schoolbel.js",
+    "public/shared/servicebel.js",
+    "public/shared/teamcall/teamcall-01.js"
+   ],
+   "aantal": 9
+  },
+  {
    "pad": "/api/supplier/login",
    "schermen": [
     "public/apps/belastingkantoor.html",
@@ -98,20 +113,6 @@
     "public/apps/sportclub.html"
    ],
    "aantal": 9
-  },
-  {
-   "pad": "/api/ice",
-   "schermen": [
-    "public/apps/app-main/app-main-10.js",
-    "public/apps/backoffice/backoffice-03.js",
-    "public/apps/foundation/gezin-rt/gezin-rt-02.js",
-    "public/apps/foundation/vrienden.html",
-    "public/apps/meet/kamer.js",
-    "public/apps/podium.html",
-    "public/shared/schoolbel.js",
-    "public/shared/teamcall/teamcall-01.js"
-   ],
-   "aantal": 8
   },
   {
    "pad": "/api/supplier/ai",
@@ -469,6 +470,14 @@
    "aantal": 2
   },
   {
+   "pad": "/api/bank/afschrift",
+   "schermen": [
+    "public/apps/geld/bankb.js",
+    "public/apps/isolatie.js"
+   ],
+   "aantal": 2
+  },
+  {
    "pad": "/api/chat/send",
    "schermen": [
     "public/apps/geld/metierc.js",
@@ -521,6 +530,14 @@
    "schermen": [
     "public/apps/ik.html",
     "public/shared/toegankelijk.js"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/salon/plaats",
+   "schermen": [
+    "public/apps/isolatie.js",
+    "public/apps/salon.html"
    ],
    "aantal": 2
   },
@@ -1158,6 +1175,13 @@
    "pad": "/api/gast/foodcourt/mijn",
    "schermen": [
     "public/apps/bestellen.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtgid/bewijzen",
+   "schermen": [
+    "public/apps/bewijsmap.html"
    ],
    "aantal": 1
   },
@@ -1970,13 +1994,6 @@
    "pad": "/api/bank/afschrift.csv",
    "schermen": [
     "public/apps/geld/bank.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/bank/afschrift",
-   "schermen": [
-    "public/apps/geld/bankb.js"
    ],
    "aantal": 1
   },
@@ -2845,6 +2862,83 @@
    "pad": "/api/rahul/stemming",
    "schermen": [
     "public/apps/ik.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/techniek/isolatie/ontsluiting/afbreken",
+   "schermen": [
+    "public/apps/isolatie-ontsluiting.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/techniek/isolatie/ontsluiting/commit",
+   "schermen": [
+    "public/apps/isolatie-ontsluiting.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/techniek/isolatie/ontsluiting/stap",
+   "schermen": [
+    "public/apps/isolatie-ontsluiting.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/techniek/isolatie/ontsluiting/stap/opties",
+   "schermen": [
+    "public/apps/isolatie-ontsluiting.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/agenda/mijn",
+   "schermen": [
+    "public/apps/isolatie.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/bank/sepa",
+   "schermen": [
+    "public/apps/isolatie.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/pay/overzicht",
+   "schermen": [
+    "public/apps/isolatie.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/pay/stuur",
+   "schermen": [
+    "public/apps/isolatie.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/techniek/isolatie",
+   "schermen": [
+    "public/apps/isolatie.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/techniek/isolatie/proef",
+   "schermen": [
+    "public/apps/isolatie.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/techniek/isolatie/zet",
+   "schermen": [
+    "public/apps/isolatie.js"
    ],
    "aantal": 1
   },
@@ -3888,6 +3982,55 @@
    "pad": "/api/mijn/gegevens",
    "schermen": [
     "public/apps/mijn-gegevens.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/isolatie/mijn/ontsluiting",
+   "schermen": [
+    "public/apps/mijn-isolatie-terug.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/isolatie/mijn/ontsluiting/afbreken",
+   "schermen": [
+    "public/apps/mijn-isolatie-terug.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/isolatie/mijn/ontsluiting/commit",
+   "schermen": [
+    "public/apps/mijn-isolatie-terug.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/isolatie/mijn/ontsluiting/stap",
+   "schermen": [
+    "public/apps/mijn-isolatie-terug.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/isolatie/mijn/ontsluiting/stap/opties",
+   "schermen": [
+    "public/apps/mijn-isolatie-terug.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/isolatie/mijn",
+   "schermen": [
+    "public/apps/mijn-isolatie.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/isolatie/mijn/zet",
+   "schermen": [
+    "public/apps/mijn-isolatie.js"
    ],
    "aantal": 1
   },
@@ -5082,13 +5225,6 @@
    "aantal": 1
   },
   {
-   "pad": "/api/salon/plaats",
-   "schermen": [
-    "public/apps/salon.html"
-   ],
-   "aantal": 1
-  },
-  {
    "pad": "/api/salon/reactie-weg",
    "schermen": [
     "public/apps/salon.html"
@@ -5726,6 +5862,69 @@
    "aantal": 1
   },
   {
+   "pad": "/api/service/bel/mijn",
+   "schermen": [
+    "public/shared/basis/basis-02b.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/service/bevestig",
+   "schermen": [
+    "public/shared/basis/basis-02b.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/service/bevestigingen",
+   "schermen": [
+    "public/shared/basis/basis-02b.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/service/keuzes",
+   "schermen": [
+    "public/shared/basis/basis-02b.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/service/mens",
+   "schermen": [
+    "public/shared/basis/basis-02b.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/service/mijn",
+   "schermen": [
+    "public/shared/basis/basis-02b.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/service/open",
+   "schermen": [
+    "public/shared/basis/basis-02b.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/service/stand",
+   "schermen": [
+    "public/shared/basis/basis-02b.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/service/weiger",
+   "schermen": [
+    "public/shared/basis/basis-02b.js"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/fout/client",
    "schermen": [
     "public/shared/foutmelder.js"
@@ -5813,6 +6012,20 @@
    "pad": "/api/link/cap/trek",
    "schermen": [
     "public/shared/linkkoppelingen.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/ondertiteling/fragment",
+   "schermen": [
+    "public/shared/meeluister.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/ondertiteling/stand",
+   "schermen": [
+    "public/shared/meeluister.js"
    ],
    "aantal": 1
   },
@@ -6282,6 +6495,13 @@
     "/api/gast/eten/zoeken",
     "/api/gast/foodcourt/bestel",
     "/api/gast/foodcourt/mijn"
+   ],
+   "voorvoegsels": []
+  },
+  {
+   "bestand": "public/apps/bewijsmap.html",
+   "exact": [
+    "/api/rtgid/bewijzen"
    ],
    "voorvoegsels": []
   },
@@ -7091,6 +7311,13 @@
    ]
   },
   {
+   "bestand": "public/apps/foundation/wegwijzer.html",
+   "exact": [],
+   "voorvoegsels": [
+    "/api/bescherming/deur/"
+   ]
+  },
+  {
    "bestand": "public/apps/foundation/werk.html",
    "exact": [],
    "voorvoegsels": [
@@ -7503,6 +7730,31 @@
    "voorvoegsels": []
   },
   {
+   "bestand": "public/apps/isolatie-ontsluiting.js",
+   "exact": [
+    "/api/techniek/isolatie/ontsluiting/afbreken",
+    "/api/techniek/isolatie/ontsluiting/commit",
+    "/api/techniek/isolatie/ontsluiting/stap",
+    "/api/techniek/isolatie/ontsluiting/stap/opties"
+   ],
+   "voorvoegsels": []
+  },
+  {
+   "bestand": "public/apps/isolatie.js",
+   "exact": [
+    "/api/agenda/mijn",
+    "/api/bank/afschrift",
+    "/api/bank/sepa",
+    "/api/pay/overzicht",
+    "/api/pay/stuur",
+    "/api/salon/plaats",
+    "/api/techniek/isolatie",
+    "/api/techniek/isolatie/proef",
+    "/api/techniek/isolatie/zet"
+   ],
+   "voorvoegsels": []
+  },
+  {
    "bestand": "public/apps/juridisch/partnervoorwaarden.html",
    "exact": [
     "/api/betaaldiensttarief",
@@ -7679,6 +7931,13 @@
    "voorvoegsels": [
     "/api/supplier/rtmail/",
     "/api/supplier/werkmail/"
+   ]
+  },
+  {
+   "bestand": "public/apps/leverancier-service.js",
+   "exact": [],
+   "voorvoegsels": [
+    "/api/supplier/service/"
    ]
   },
   {
@@ -7977,6 +8236,25 @@
    "bestand": "public/apps/mijn-gegevens.html",
    "exact": [
     "/api/mijn/gegevens"
+   ],
+   "voorvoegsels": []
+  },
+  {
+   "bestand": "public/apps/mijn-isolatie-terug.js",
+   "exact": [
+    "/api/isolatie/mijn/ontsluiting",
+    "/api/isolatie/mijn/ontsluiting/afbreken",
+    "/api/isolatie/mijn/ontsluiting/commit",
+    "/api/isolatie/mijn/ontsluiting/stap",
+    "/api/isolatie/mijn/ontsluiting/stap/opties"
+   ],
+   "voorvoegsels": []
+  },
+  {
+   "bestand": "public/apps/mijn-isolatie.js",
+   "exact": [
+    "/api/isolatie/mijn",
+    "/api/isolatie/mijn/zet"
    ],
    "voorvoegsels": []
   },
@@ -8709,6 +8987,22 @@
    ]
   },
   {
+   "bestand": "public/apps/service-bel.js",
+   "exact": [],
+   "voorvoegsels": [
+    "/api/service/",
+    "/api/stream?token="
+   ]
+  },
+  {
+   "bestand": "public/apps/service.html",
+   "exact": [],
+   "voorvoegsels": [
+    "/api/office/service/",
+    "/api/stream?token="
+   ]
+  },
+  {
    "bestand": "public/apps/sitemaker.html",
    "exact": [
     "/api/salon/promo"
@@ -9155,6 +9449,21 @@
    "voorvoegsels": []
   },
   {
+   "bestand": "public/shared/basis/basis-02b.js",
+   "exact": [
+    "/api/service/bel/mijn",
+    "/api/service/bevestig",
+    "/api/service/bevestigingen",
+    "/api/service/keuzes",
+    "/api/service/mens",
+    "/api/service/mijn",
+    "/api/service/open",
+    "/api/service/stand",
+    "/api/service/weiger"
+   ],
+   "voorvoegsels": []
+  },
+  {
    "bestand": "public/shared/bureaupda/bureaupda-02.js",
    "exact": [],
    "voorvoegsels": [
@@ -9324,6 +9633,14 @@
    "voorvoegsels": []
   },
   {
+   "bestand": "public/shared/meeluister.js",
+   "exact": [
+    "/api/ondertiteling/fragment",
+    "/api/ondertiteling/stand"
+   ],
+   "voorvoegsels": []
+  },
+  {
    "bestand": "public/shared/metgezel/metgezel-01b2.js",
    "exact": [
     "/api/fluister",
@@ -9441,6 +9758,13 @@
    "voorvoegsels": [
     "/api/foundation/school/belkanaal?"
    ]
+  },
+  {
+   "bestand": "public/shared/servicebel.js",
+   "exact": [
+    "/api/ice"
+   ],
+   "voorvoegsels": []
   },
   {
    "bestand": "public/shared/social-intelligence-data.js",

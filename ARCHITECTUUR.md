@@ -19,12 +19,12 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 | Wat | Aantal |
 |---|---|
 | API-endpoints | 4946 |
-| servermodules (`server/**/*.js`) | 3166 |
-| routebestanden (`server/routes/**`) | 567 |
+| servermodules (`server/**/*.js`) | 3170 |
+| routebestanden (`server/routes/**`) | 569 |
 | kernmodules (`server/kern/**`) | 2014 |
 | schermen (`public/**/*.html`) | 293 |
 | gedeelde browsermodules (`public/shared/*.js`) | 314 |
-| toetsbestanden (`test/*.test.js`) | 1414 |
+| toetsbestanden (`test/*.test.js`) | 1415 |
 | schermtoetsen (`test/*.e2e.js`) | 201 |
 
 ## 2. De weg van een verzoek
@@ -87,6 +87,7 @@ kernlaag4c
 kernlaag5
 kernlaag5f
 kernlaag6
+kernlaag6b
 kernlaag7
 kernlaag7b
 start
@@ -110,8 +111,8 @@ zie §5 -- er zijn nog 222 kern-namen die meer dan één domein aanraakt.
 |---|---|---|---|---|
 | `auth` | 19 | 6 | 8 | 50 |
 | `member` | 692 | 69 | 16 | 421 |
-| `supplier` | 616 | 120 | 6 | 311 |
-| `office` | 63 | 15 | 3 | 78 |
+| `supplier` | 616 | 121 | 6 | 311 |
+| `office` | 63 | 16 | 3 | 78 |
 | `staff` | 26 | 8 | 1 | 42 |
 | `social` | 76 | 10 | 31 | 70 |
 | `techniek` | 76 | 18 | 1 | 61 |
@@ -138,7 +139,7 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 | daarvan door **meer dan één** domein (de echte koppeling) | 222 |
 | daarvan door precies één domein | 1306 |
 | breedste enkele routebestand | 71 namen |
-| gepakt uit kern en nergens gebruikt | 0 |
+| gepakt uit kern en nergens gebruikt | 2 |
 
 Dat derde getal is de opening: 85% van wat er in de gedeelde zak zit, wordt door
 precies één domein gebruikt. Dat hoort geen gedeelde kern te zijn maar bezit van dat

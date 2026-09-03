@@ -134,8 +134,8 @@ elke dekkingsvraag triviaal waar; alleen de tweede teller zegt nog iets.
 bronboom aflopen (dat doet `SCHRIJFANALYSE.json`) maar het de **router** vragen —
 wat de server werkelijk aanbiedt — en daar de plek in de bron bij zoeken.
 
-<!--getal:routebron.vergeleken-->4120<!--/getal--> routes kennen beide wegen (was 32), <!--getal:routebron.gelijk-->4119<!--/getal--> geven hetzelfde bestand,
-**<!--getal:routebron.tegenspraak-->0<!--/getal--> echte tegenspraken** en <!--getal:routebron.verouderd-->1<!--/getal--> verschil dat er geen is.
+<!--getal:routebron.vergeleken-->4122<!--/getal--> routes kennen beide wegen (was 32), <!--getal:routebron.gelijk-->4114<!--/getal--> geven hetzelfde bestand,
+**<!--getal:routebron.tegenspraak-->1<!--/getal--> echte tegenspraken** en <!--getal:routebron.verouderd-->5<!--/getal--> verschil dat er geen is.
 
 Dat ene verschil is de opbrengst van de hele oefening. `POST /api/auth/me` staat
 volgens de router in `inlog-pas.js` en volgens `SCHRIJFANALYSE.json` in
@@ -158,8 +158,8 @@ twee betekenissen is precies wat `SEMANTIEK.json` hier 99 keer heeft geteld.
 
 **Gat 2 — over de schermen wisten de registers niets** (gedragsdekking 6,6%).
 `scripts/schermroutes.js` → `SCHERMROUTES.json` (`npm run schermroutes`) leest
-per bestand in `public/` welke API-paden het noemt: <!--getal:schermroutes.schermen-->368<!--/getal--> schermen,
-<!--getal:schermroutes.paden-->843<!--/getal--> exacte paden over <!--getal:schermroutes.verwijzingen-->974<!--/getal--> verwijzingen, plus <!--getal:schermroutes.voorvoegsels-->128<!--/getal--> voorvoegsels.
+per bestand in `public/` welke API-paden het noemt: <!--getal:schermroutes.schermen-->380<!--/getal--> schermen,
+<!--getal:schermroutes.paden-->873<!--/getal--> exacte paden over <!--getal:schermroutes.verwijzingen-->1007<!--/getal--> verwijzingen, plus <!--getal:schermroutes.voorvoegsels-->132<!--/getal--> voorvoegsels.
 Daarmee bestaat de keten **scherm → route** die een impactvraag nodig heeft.
 
 **Correctie op een eerdere versie van deze paragraaf.** Hier stond dat `public/`
@@ -197,11 +197,11 @@ geldt:
    bestaan er". Daardoor heette `/api/instant-reality/event` dood terwijl de
    router hem gewoon aanbiedt — zijn routebestand staat op één regel, dus de
    bronindex vond hem niet. `ROUTEBRON.json` draagt daarom **twee** lijsten:
-   `alleRoutes` (<!--getal:routebron.routerRoutes-->4856<!--/getal-->, bestaan) en `perRoute` (met bestand), en
-   <!--getal:routebron.zonderBestand-->54<!--/getal--> routes zitten wél in de eerste en niet in de tweede.
+   `alleRoutes` (<!--getal:routebron.routerRoutes-->4946<!--/getal-->, bestaan) en `perRoute` (met bestand), en
+   <!--getal:routebron.zonderBestand-->4<!--/getal--> routes zitten wél in de eerste en niet in de tweede.
 
-Nul dode paden is hier geen lege controle: <!--getal:schermroutes.paden-->843<!--/getal--> exacte paden zijn tegen
-<!--getal:routebron.routerRoutes-->4856<!--/getal--> echte routes gehouden.
+Nul dode paden is hier geen lege controle: <!--getal:schermroutes.paden-->873<!--/getal--> exacte paden zijn tegen
+<!--getal:routebron.routerRoutes-->4946<!--/getal--> echte routes gehouden.
 
 ### 0.4 De aanroepgraaf en de brug route → symbool (3 september 2026)
 
@@ -789,7 +789,7 @@ meter dan zelf zijn tegenvoorbeeld kiest.
 Beide zijn gedicht op 3 september 2026, en de meting staat in §0.3:
 
 1. **De brug route → bestand heeft een tweede bron** (`ROUTEBRON.json`):
-   <!--getal:codewereld.brugDekkingPct-->88.6<!--/getal-->% toetsbaar in plaats van 0,7%, met <!--getal:routebron.tegenspraak-->0<!--/getal--> echte tegenspraken.
+   <!--getal:codewereld.brugDekkingPct-->88.6<!--/getal-->% toetsbaar in plaats van 0,7%, met <!--getal:routebron.tegenspraak-->1<!--/getal--> echte tegenspraken.
 2. **`public/` heeft gedragsdekking** (`SCHERMROUTES.json`): <!--getal:codewereld.bronPublicPct-->21<!--/getal-->% in plaats
    van 6,6%, en de keten scherm → route bestaat.
 

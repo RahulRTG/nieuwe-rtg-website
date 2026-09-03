@@ -34,6 +34,20 @@
    het getal en vraagt de ratel om --vastleggen, en dan is het een besluit in
    plaats van een sluiproute.
 
+   EN HIJ RUIMT OP WAT HIJ NIET KAN BEREKENEN. Bij het nalopen van alle registers
+   op deze fout (3 september 2026) bleek ENVELOP.json nog VIER getallen te
+   dragen die geen enkel script berekent en geen enkele toets leest:
+   `routesZonderEnvelop`, `routesMetEnvelop`, `routesMetPoortwachter` en
+   `routesTotaal`. Ze waren al uiteengelopen met de tekst die ze aanhaalde --
+   TAKEN.md 4.71 sprak van "3346 van de 3706 routes" waar het register 3421 van
+   3803 zei. Twee getallen over dezelfde vraag, allebei met de hand, allebei
+   verouderd.
+
+   Zo'n getal is geen informatie maar decoratie die later als feit wordt
+   aangehaald. Deze meter schrijft daarom alleen de sleutels die hij en
+   scripts/actorvormen.js WERKELIJK berekenen, en meldt wat hij weghaalt. Wie ze
+   terug wil, bouwt eerst de meting -- en dat is precies de goede volgorde.
+
    Draai:  node scripts/envelopvelden.js
            node scripts/envelopvelden.js --lijst
            node scripts/envelopvelden.js --vastleggen
@@ -158,10 +172,25 @@ function main() {
        BEREKEND en houdt zijn naam. Er een `veldenZonderHuisAantal` naast zetten
        zou twee namen voor een waarheid geven -- precies de fout die deze hele
        ronde opruimt (LAT.md regel 4). */
-    e.gemeten = Object.assign({}, e.gemeten, {
-      envelopVelden: nu.velden,
-      veldenZonderHuis: nu.dakloos.length
-    });
+    /* ALLEEN WAT ER GEMETEN IS. Elke sleutel hieronder wordt door een script
+       berekend; wat er verder in `gemeten` stond, gaat eruit met een melding.
+       De twee van scripts/actorvormen.js blijven staan omdat die meter ze zelf
+       bijwerkt -- ze staan hier bij naam zodat deze lijst niet stilzwijgend
+       andermans werk weggooit. */
+    const BEREKEND = ['envelopVelden', 'veldenZonderHuis',
+      'actorVormen', 'actorDuplicaten', 'actorSessies'];
+    const oudGemeten = (e.gemeten || {});
+    const weggehaald = Object.keys(oudGemeten).filter(k => !BEREKEND.includes(k));
+    const gemeten = {};
+    for (const k of BEREKEND) if (oudGemeten[k] != null) gemeten[k] = oudGemeten[k];
+    gemeten.envelopVelden = nu.velden;
+    gemeten.veldenZonderHuis = nu.dakloos.length;
+    e.gemeten = gemeten;
+    if (weggehaald.length) {
+      console.log('\n  WEGGEHAALD uit `gemeten` (geen enkel script berekent ze): ' + weggehaald.join(', '));
+      console.log('  Een getal dat niemand narekent is geen informatie maar decoratie,');
+      console.log('  en het wordt later als feit aangehaald. Wie ze terug wil, bouwt eerst de meting.');
+    }
     e.veldenZonderHuis = nu.dakloos.map(r => ({ veld: r.veld, wat: r.wat, reden: r.reden }));
     e.veldenZonderHuisUitleg =
       'AFGELEID door scripts/envelopvelden.js -- hier stond een met de hand getypte lijst waarvan ' +

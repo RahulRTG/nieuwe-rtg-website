@@ -2,15 +2,11 @@
   "uitleg": "Wat weet RTG op het moment dat een poortwachter JA zegt, en wat is er daarna werkelijk veranderd? `veldenZonderHuis` telt de envelopvelden die door NIEMAND worden gevuld; `actorVormen` telt onder hoeveel verschillende namen \"wie handelt hier\" op het verzoek wordt gezet; `routesZonderEnvelop` telt de routes zonder canonieke vorm. ALLE DRIE MOGEN ALLEEN OMLAAG. EEN GRENS DIE ER NOG NIET IS: `doel` en `wijzigingen` worden ACHTERAF gemeten (server/opzet/handeling.js). Daarmee is een massamutatie te ZIEN en te melden, maar niet te WEIGEREN -- daarvoor zou de omvang voor de uitvoering bekend moeten zijn, en dat vraagt een simulatie die hier niet bestaat. Detecteren is niet tegenhouden, en dat verschil hoort in het register te staan in plaats van in iemands hoofd.",
   "hoe": "node scripts/envelop.js --velden",
   "gemeten": {
+    "envelopVelden": 11,
     "veldenZonderHuis": 3,
     "actorVormen": 6,
-    "routesZonderEnvelop": 382,
-    "routesMetEnvelop": 3421,
-    "routesMetPoortwachter": 3424,
-    "routesTotaal": 3803,
     "actorDuplicaten": 0,
-    "actorSessies": 6,
-    "envelopVelden": 11
+    "actorSessies": 6
   },
   "veldenZonderHuis": [
     {

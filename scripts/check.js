@@ -4907,5 +4907,60 @@ console.log('\n65) een pagina die een gedeelde module gebruikt, laadt hem ook');
   }
 }
 
+/* ============================================================================
+   66) ELK `npm run X` IN EEN DOCUMENT BESTAAT OOK ECHT
+
+   WAAR DIT UIT KOMT. TAKEN.md 4.71 zei "Gemeten en geratelde stand in
+   ENVELOP.json (`npm run envelop:velden`)" -- en dat commando bestond niet. Het
+   getal werd door geen script berekend en door geen toets gecontroleerd; het
+   was met de hand getypt, en het VERZONNEN COMMANDO maakte dat erger. Wie het
+   wilde narekenen kreeg "Missing script" en concludeerde dat hij zelf iets fout
+   deed, niet dat het getal nergens vandaan kwam.
+
+   Het nalopen van alle documenten hierop (3 september 2026) vond er nog twee,
+   allebei in een RUNBOOK: `npm run productie:installeer` en
+   `npm run sleutels:bestand`. Dat is de duurste plek waar dit kan staan -- een
+   runbook wordt gelezen door iemand die onder druk een productiestap doet, en
+   die krijgt dan een foutmelding in plaats van een sleutelbestand.
+
+   DE REGEL IS DUS KLEIN EN HARD: staat er `npm run X` in een .md in de wortel,
+   dan staat X in package.json. Meer niet. Een document dat een commando belooft
+   dat niet bestaat, is een belofte in tekst zonder handhaver (LAT.md regel 6) in
+   de meest letterlijke vorm die er is.
+
+   WAT HIJ NIET ZIET: een commando dat WEL bestaat maar iets anders doet dan het
+   document belooft. Dat is een inhoudelijke vraag en geen bestaanscontrole.
+
+   EN WAT HIJ NIET KAN ONDERSCHEIDEN: een document dat een commando AANRAADT van
+   een document dat over een verdwenen commando SCHRIJFT. Dat is meteen gebeurd:
+   het eerlijkheidspunt dat deze regel oplevert noemde de twee dode namen als
+   voorbeeld, en werd er zelf op afgekeurd. De uitweg is niet een uitzonderings-
+   lijst maar de schrijfwijze -- noem zo'n naam zonder `npm run` ervoor, dan
+   leest hij als een naam en niet als een instructie. Een uitzonderingslijst zou
+   hier precies het gat maken dat de regel dicht. */
+console.log('\n66) elk `npm run X` in een document bestaat ook echt');
+{
+  const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8'));
+  const scripts = pkg.scripts || {};
+  if (!Object.keys(scripts).length) {
+    fout('package.json heeft geen scripts; dan meet deze regel niets');
+  } else {
+    const docs = fs.readdirSync(ROOT).filter(n => n.endsWith('.md'));
+    let gezien = 0, mis = 0;
+    for (const d of docs) {
+      let bron; try { bron = fs.readFileSync(path.join(ROOT, d), 'utf8'); } catch (e) { continue; }
+      for (const m of bron.matchAll(/npm run ([a-z0-9:_-]+)/g)) {
+        gezien++;
+        if (!scripts[m[1]]) {
+          mis++;
+          fout(d + ' noemt `npm run ' + m[1] + '` en dat script bestaat niet -- ' +
+            'wie het probeert krijgt "Missing script" en denkt dat hij zelf iets fout doet');
+        }
+      }
+    }
+    if (!mis) ok(gezien + ' verwijzingen naar `npm run ...` in ' + docs.length + ' documenten, allemaal bestaand');
+  }
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

@@ -555,7 +555,7 @@ achter de poortwachter, met Postgres en Redis overal aan.**
 De eerste twee stappen zijn geautomatiseerd:
 
 ```bash
-npm run sleutels:bestand # schrijft .env.productie met rechten 600, zonder secrets in logs
+npm run sleutels -- --schrijf --stil # schrijft .env.productie; --stil houdt de geheimen uit de terminal
 npm run golive     # keurt de omgeving: exitcode 0 = klaar om live te gaan
 ```
 

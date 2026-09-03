@@ -118,6 +118,23 @@ test('ENVELOP.json loopt niet achter, en draagt EEN naam voor dit getal', () => 
   assert.deepEqual(reg.veldenZonderHuis.map(v => v.veld), nu.dakloos.map(v => v.veld));
 });
 
+test('`gemeten` draagt alleen getallen die een script berekent', () => {
+  /* Bij het nalopen van alle registers op deze fout (3 september 2026) bleek
+     ENVELOP.json nog vier getallen te dragen die geen enkel script berekent en
+     geen enkele toets leest: routesZonderEnvelop, routesMetEnvelop,
+     routesMetPoortwachter en routesTotaal. Ze waren al uiteengelopen met de
+     tekst die ze aanhaalde -- TAKEN.md sprak van "3346 van de 3706 routes"
+     waar het register 3421 van 3803 zei. Twee getallen over dezelfde vraag,
+     allebei met de hand, allebei verouderd.
+
+     Deze bewering houdt ze weg: wie een getal terug wil, bouwt eerst de meting. */
+  const reg = JSON.parse(fs.readFileSync(path.join(WORTEL, 'ENVELOP.json'), 'utf8'));
+  const BEREKEND = ['envelopVelden', 'veldenZonderHuis', 'actorVormen', 'actorDuplicaten', 'actorSessies'];
+  const vreemd = Object.keys(reg.gemeten).filter(k => !BEREKEND.includes(k));
+  assert.deepEqual(vreemd, [],
+    'er staan getallen in `gemeten` die geen enkel script berekent: ' + vreemd.join(', '));
+});
+
 test('het npm-commando dat 4.71 noemt, bestaat nu ook echt', () => {
   /* Dit is geen vormcontrole maar de kern van de bevinding: de takenlijst
      verwees naar `npm run envelop:velden` en dat gaf "Missing script". Wie een

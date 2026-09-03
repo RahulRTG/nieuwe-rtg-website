@@ -1,19 +1,19 @@
 {
   "stempel": {
-    "op": "2026-09-03T11:41:23.449Z",
-    "commit": "44f4c264",
+    "op": "2026-09-03T13:14:23.874Z",
+    "commit": "d13538f9",
     "boomVuil": false,
-    "boomAnders": 5,
+    "boomAnders": 0,
     "instrument": "scripts/vindbaar.js",
     "node": "v22.22.2"
   },
   "uitleg": "Per bestemming in de sprong: welk aandeel van de ONDERSCHEIDENDE woorden van dat scherm (woorden uit zijn koppen die op hooguit 3 bestemmingen voorkomen) er ook naartoe leidt in de zoekfilter van shared/sprong.js. Meet woorden, geen mensen: of iemand op het idee komt dat woord te typen, weet deze meter niet.",
   "vloer": 0.6,
   "drempel": 3,
-  "bestemmingen": 89,
-  "woorden": 1081,
-  "gevonden": 700,
-  "dekking": 0.6475,
+  "bestemmingen": 88,
+  "woorden": 1077,
+  "gevonden": 697,
+  "dekking": 0.6472,
   "perBestemming": [
     {
       "naam": "Magnaat",
@@ -394,6 +394,22 @@
       ]
     },
     {
+      "naam": "RTG One",
+      "url": "/apps/rtgone.html",
+      "woorden": 30,
+      "gevonden": 22,
+      "mist": [
+        "koppel",
+        "persoonlijke",
+        "account",
+        "beloften",
+        "length",
+        "persoonlijk",
+        "actieve",
+        "werkstromen"
+      ]
+    },
+    {
       "naam": "Commerce",
       "url": "/apps/commerce.html",
       "woorden": 13,
@@ -406,21 +422,6 @@
         "tekoop",
         "length",
         "aanbiedernaam"
-      ]
-    },
-    {
-      "naam": "RTG One",
-      "url": "/apps/rtgone.html",
-      "woorden": 30,
-      "gevonden": 23,
-      "mist": [
-        "koppel",
-        "persoonlijke",
-        "beloften",
-        "length",
-        "persoonlijk",
-        "actieve",
-        "werkstromen"
       ]
     },
     {
@@ -709,16 +710,6 @@
       "mist": [
         "stylist",
         "vaklui"
-      ]
-    },
-    {
-      "naam": "Accountbescherming",
-      "url": "/apps/mijn-isolatie.html",
-      "woorden": 4,
-      "gevonden": 2,
-      "mist": [
-        "strenger",
-        "weer"
       ]
     },
     {

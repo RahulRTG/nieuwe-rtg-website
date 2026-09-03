@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 4860 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 4856 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,13 +18,13 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 4860 |
-| servermodules (`server/**/*.js`) | 3037 |
-| routebestanden (`server/routes/**`) | 551 |
-| kernmodules (`server/kern/**`) | 1926 |
+| API-endpoints | 4856 |
+| servermodules (`server/**/*.js`) | 3028 |
+| routebestanden (`server/routes/**`) | 550 |
+| kernmodules (`server/kern/**`) | 1919 |
 | schermen (`public/**/*.html`) | 285 |
 | gedeelde browsermodules (`public/shared/*.js`) | 309 |
-| toetsbestanden (`test/*.test.js`) | 1351 |
+| toetsbestanden (`test/*.test.js`) | 1345 |
 | schermtoetsen (`test/*.e2e.js`) | 193 |
 
 ## 2. De weg van een verzoek
@@ -104,14 +104,14 @@ luister
 Acht domeinen, uit `server/opzet/routes.js`. Met `RTG_DOMAINS=member,social` draait
 een proces alleen die domeinen; een gateway (`server/poort.js`) stuurt de
 padvoorvoegsels dan naar het juiste proces. **Die belofte is nog niet waargemaakt:**
-zie §5 -- er zijn nog 217 kern-namen die meer dan één domein aanraakt.
+zie §5 -- er zijn nog 216 kern-namen die meer dan één domein aanraakt.
 
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
 | `auth` | 19 | 6 | 8 | 50 |
-| `member` | 692 | 69 | 16 | 421 |
-| `supplier` | 616 | 119 | 6 | 311 |
-| `office` | 63 | 15 | 3 | 78 |
+| `member` | 692 | 69 | 16 | 419 |
+| `supplier` | 615 | 118 | 6 | 309 |
+| `office` | 61 | 15 | 3 | 77 |
 | `staff` | 26 | 8 | 1 | 42 |
 | `social` | 76 | 10 | 31 | 70 |
 | `techniek` | 68 | 16 | 1 | 55 |
@@ -126,7 +126,7 @@ lessen en schoolborden van de RTFoundation bijvoorbeeld) en hebben dus geen
 bewakerslaag. Regel 28 van de keuring eist per route een poort **of** een plek op de
 publieke lijst met reden. Deze kolom is een wegwijzer, geen verdict.
 
-Daarnaast 3262 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 3261 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 
@@ -134,9 +134,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1521 |
-| daarvan door **meer dan één** domein (de echte koppeling) | 217 |
-| daarvan door precies één domein | 1304 |
+| kern-namen die routes aanraken | 1517 |
+| daarvan door **meer dan één** domein (de echte koppeling) | 216 |
+| daarvan door precies één domein | 1301 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 
@@ -163,10 +163,10 @@ loginFails(5) logInlog(5) overheid(5) sseToCustomer(5)
 |---|---|
 | 71 | `server/routes/member/rechterhand.js` |
 | 43 | `server/routes/auth/account.js` |
-| 42 | `server/routes/member/voertuigen/huur.js` |
-| 41 | `server/routes/member/voertuigen/charter.js` |
-| 41 | `server/routes/member/voertuigen.js` |
+| 41 | `server/routes/member/voertuigen/huur.js` |
+| 40 | `server/routes/member/voertuigen/charter.js` |
 | 40 | `server/routes/member/voertuigen/verkoop.js` |
+| 40 | `server/routes/member/voertuigen.js` |
 | 39 | `server/routes/member/voertuigen/ontmoeten.js` |
 | 38 | `server/routes/staff.js` |
 | 34 | `server/routes/auth/herstel.js` |

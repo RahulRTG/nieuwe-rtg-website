@@ -1,103 +1,108 @@
 {
   "stempel": {
-    "op": "2026-09-03T11:41:51.324Z",
-    "commit": "44f4c264",
+    "op": "2026-09-03T12:34:50.251Z",
+    "commit": "1c5dc892",
     "boomVuil": false,
-    "boomAnders": 14,
+    "boomAnders": 4,
     "instrument": "scripts/bewijsmatrix.js",
     "node": "v22.22.2"
   },
   "herkomst": "routekaart (draaiende server)",
   "gedegradeerd": false,
-  "journaalGelezen": ".routejournaal",
-  "routes": 4932,
+  "journaalGelezen": null,
+  "routes": 4846,
   "schakels": 11,
-  "cellen": 54252,
+  "cellen": 53306,
   "telling": {
-    "bewezen": 25557,
-    "verklaard": 192,
-    "nvt": 313,
-    "ongemeten": 28190,
-    "gezakt": 0
+    "bewezen": 26093,
+    "verklaard": 0,
+    "nvt": 308,
+    "ongemeten": 26861,
+    "gezakt": 44
   },
   "perSchakel": {
     "AUTH": {
-      "bewezen": 4417,
-      "verklaard": 192,
+      "bewezen": 4516,
+      "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 323,
+      "ongemeten": 330,
       "gezakt": 0
     },
     "ACL": {
-      "bewezen": 3820,
+      "bewezen": 3824,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 1112,
-      "gezakt": 0
+      "ongemeten": 993,
+      "gezakt": 29
     },
     "INPUT": {
-      "bewezen": 3279,
+      "bewezen": 3444,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 1653,
+      "ongemeten": 1402,
       "gezakt": 0
     },
     "OUTPUT": {
       "bewezen": 4151,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 781,
+      "ongemeten": 695,
       "gezakt": 0
     },
     "STATE": {
-      "bewezen": 410,
+      "bewezen": 438,
       "verklaard": 0,
-      "nvt": 78,
-      "ongemeten": 4444,
+      "nvt": 77,
+      "ongemeten": 4331,
       "gezakt": 0
     },
     "SIDE_EFFECT": {
-      "bewezen": 410,
+      "bewezen": 438,
       "verklaard": 0,
-      "nvt": 78,
-      "ongemeten": 4444,
+      "nvt": 77,
+      "ongemeten": 4331,
       "gezakt": 0
     },
     "AUDIT": {
-      "bewezen": 1042,
+      "bewezen": 1059,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 3890,
+      "ongemeten": 3787,
       "gezakt": 0
     },
     "IDEMPOTENCY": {
-      "bewezen": 1647,
+      "bewezen": 1642,
       "verklaard": 0,
-      "nvt": 78,
-      "ongemeten": 3207,
-      "gezakt": 0
+      "nvt": 77,
+      "ongemeten": 3117,
+      "gezakt": 10
     },
     "FAILURE": {
       "bewezen": 2,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 4930,
+      "ongemeten": 4844,
       "gezakt": 0
     },
     "ROLLBACK": {
-      "bewezen": 2559,
+      "bewezen": 2726,
       "verklaard": 0,
-      "nvt": 79,
-      "ongemeten": 2294,
-      "gezakt": 0
+      "nvt": 77,
+      "ongemeten": 2038,
+      "gezakt": 5
     },
     "PRIVACY": {
-      "bewezen": 3820,
+      "bewezen": 3853,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 1112,
+      "ongemeten": 993,
       "gezakt": 0
     }
+  },
+  "verslechteringToegestaan": {
+    "reden": "Eerste volledige meetronde op EEN boom (40ff1c66). De vorige matrix stelde registers van drie commits samen (5dc3b081, 47c119c3, 9ce86fe98); die vergelijking is dus tussen twee wereldbeelden en niet tussen twee metingen van dezelfde code. Netto: bewezen 25500 -> 26093, ongemeten 27453 -> 26861, AUTH +41, ROLLBACK +1067, AUDIT +350. ACL en PRIVACY verliezen elk 5 routes; WELKE vijf is uit de artefacten niet te herleiden -- de oude matrix draagt geen per-route-gegevens en de oude rolproef is gemeten op een commit die in deze boom niet bestaat. Vastgelegd omdat de ronde intern samenhangend is; de vijf staan hiermee open als vraag, niet als opgelost.",
+    "cellenVoor": 53306,
+    "cellenNa": 53306
   },
   "uitleg": "Gegenereerd door scripts/bewijsmatrix.js. ongemeten MAG ALLEEN KRIMPEN."
 }

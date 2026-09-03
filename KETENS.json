@@ -1,8 +1,10 @@
 {
   "stempel": {
-    "op": "2026-09-03T08:25:21.437Z",
-    "commit": "df1a581a",
+    "op": "2026-09-03T12:31:24.363Z",
+    "commit": "1c5dc892",
     "boomVuil": false,
+    "boomAnders": 3,
+    "instrument": "scripts/ketenronde.js",
     "node": "v22.22.2"
   },
   "uitleg": "Sabotage op echte businessketens, acht velden per scenario. Een verraad telt pas als bewijs wanneer het de zevenstappenlat haalt (zie scripts/lib/ketenproef.js): injecteerbaar, aantoonbaar toegeslagen, zichtbaar, reproduceerbaar, businessuitkomst gemeten, invariant beoordeeld, rollback beoordeeld.",

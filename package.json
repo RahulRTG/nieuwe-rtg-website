@@ -233,7 +233,9 @@
     "herstelproef": "node scripts/herstelproef.js",
     "doodspoor": "node scripts/doodspoor.js",
     "doodspoor:vast": "node scripts/doodspoor.js --vastleggen",
-    "doodspoor:controle": "node scripts/doodspoor.js --controle"
+    "doodspoor:controle": "node scripts/doodspoor.js --controle",
+    "tafelproef": "node scripts/tafelproef.js",
+    "tafelproef:vast": "node scripts/tafelproef.js --vastleggen"
   },
   "devDependencies": {
     "playwright": "^1.62.1"

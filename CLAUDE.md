@@ -813,9 +813,25 @@ willekeur, en willekeur verbergt een vermogen zonder dat iemand het merkt.
 schrijft ze tussen merktekens uit de registers (`<!--getal:idem.ongemeten-->3156<!--/getal--> bronroutes,
 <!--getal:doodspoor.open-->122<!--/getal--> open. Dat is een triagelijst en
 geen beschuldiging (drie betekenissen lopen erin door elkaar, par. 3.3), en
-daarom een meting en nog geen poort. Wat erna komt staat in par. 8: één gouden
-horecaketen als volledig verhaal over actoren heen, en pas daaruit de status-,
-actor- en uitkomstcontracten -- niet andersom.
+daarom een meting en nog geen poort. **De eerste gouden keten staat**
+(`scripts/tafelproef.js`, `npm run tafelproef`): de horecaketen van het openen
+van een rekening tot de afrekening, gemeten per SCHAKEL (handelt actor A, en
+ziet actor B dat?) en per STORING (houdt de keten zijn belofte als het misgaat?).
+Negen schakels gesloten, vijf storingen gehouden, en één open schakel geeft
+foutcode 1 -- dit is een proef en geen triagelijst. Drie dingen die geen losse
+routetoets kon zien: schakel 5 is een handoff die nergens beschreven stond (vóór
+`gang/vrij` staat de bestelling NIET op het keukenbord, dus het werk wacht bij de
+zaal, en beide routes zijn `supplier` dus doodspoor.js ziet hem niet), schakel 6
+laat zien dat de stoel tot op de keukenbon staat (de kok ziet voor wie hij
+kookt), en schakel 9 verried een fout in de proef zelf -- hij toetste twee velden
+uit het antwoord van de ZAAK terwijl deze proef juist de ONTVANGER meet, stond
+daardoor op groen en had nooit kunnen zakken. Wat de gast na het afrekenen
+werkelijk ziet is 401 `sessie-weg` met "Scan de QR opnieuw", en dat is een grens
+en geen gat. Wat de keten NIET bewijst staat er even groot bij: hij eindigt bij
+de betaling en niet bij een creditnota, want `kern/commerce/retour.js` hangt aan
+een leverancierbestelling en niet aan een horecarekening. Die naad leggen is werk
+en geen proef. Pas daaruit volgen de status-, actor- en uitkomstcontracten --
+niet andersom.
 
 ## Structuur en starten (kort)
 

@@ -62,7 +62,7 @@ de tabel na en zakt zodra de telregel eronder niet meer klopt.
 | U13 | De interface toont de taak, niet de organisatie | TIKKEN.md, `shared/sprong.js` | resolver + sprong (handelingen uit de schermen zelf) | `scripts/vindbaar.js` | VINDBAAR.json | **staat** |
 | U14 | Elke weigering, prijs of beperking is verklaarbaar in gewone taal, met de weg eromheen | ECONOMIE.md (firewall zegt hoe het wél kan), GRAMMATICA.md (een verhindering draagt een reden) | `kern/economie/firewall.js`, verhinderingen | toetsen per weigering | toetsen | **staat** |
 | U15 | Elke niet-terminale toestand heeft een eigenaar, een volgende stap, een termijn en een verval | par. 4 hieronder | lokaal: `kern/commerce/retour.js` (vijf standen die zeggen welke partij ze zet) | geen | geen | **stap weg** |
-| U16 | Falen is een normale producttoestand: leeg, laden, traag, gedeeltelijk, offline, conflict, fout, herstel, geannuleerd, betwist | ADAPTIEF.md (verbergen bestaat niet), `scripts/chaos.js` | achterkant: chaos en aanvalsbatterij; voorkant: per scherm en ongemeten | geen | geen, over 258 schermen | **jaren weg** |
+| U16 | Falen is een normale producttoestand: leeg, laden, traag, gedeeltelijk, offline, conflict, fout, herstel, geannuleerd, betwist | ADAPTIEF.md (verbergen bestaat niet), `scripts/chaos.js` | achterkant: chaos en aanvalsbatterij; voorkant: per scherm en ongemeten | vijf storingen in `scripts/tafelproef.js`, alleen voor de tafelketen | geen, over 258 schermen | **jaren weg** |
 | U17 | AI handelt binnen een mandaat met doel, objecten, acties, bedrag, duur, verval en stopvoorwaarden | CONTROLPLANE.md (vier dimensies), EXECUTIE.md blok 6 | `kern/stuur/mandaat.js`: versmalt alleen, leeg is dicht, hoogt geen niveau op | toetsen | toetsen | **staat** |
 | U18 | Autonomieniveaus A0–A4 als eigen schaal | EXECUTIE.md: de noemer geen / tonen / klaarzetten / uitvoeren | `scripts/gezagsnoemer.js` | `test/gezagsnoemer.test.js` | noemer op 18 evident | **geprojecteerd** |
 | U19 | A2 "veilige, omkeerbare acties zelfstandig uitvoeren" als platformwaarheid | FOUNDATION.md par. 2: geen `EXECUTE_LOW_RISK`, wie bouwt weet niet in wiens leven hij staat | `klein` bestaat in LivingOS en WorkOS; niet in FoundationOS | toetsen op de wereldgrens | per wereld anders | **geprojecteerd** |
@@ -88,17 +88,17 @@ de tabel na en zakt zodra de telregel eronder niet meer klopt.
 | U39 | Harde poorten die nooit compenseerbaar zijn: ledger, audit, herstel, toegankelijkheid, prestatie, actor-compleetheid, dood spoor, uitstap | KEURING.md, TOEGANKELIJK.md, TENANT.md (uitgang) | `scripts/check.js` (64 regels), a11y-poorten, `kern/tenant/uitgang.js` | bestaand: ja; dood spoor en actor: nog niet | per poort | **stap weg** |
 | U40 | Elk product draagt een machineleesbaar contract (PRODUCT-360) dat in de toetsing meeloopt | PLATFORM.md par. 0: vier apps, en wat technisch nog losse pagina's zijn; EXECUTION_MAP.json is een projectie per route | per route: ja; per product: de eenheid "product" is niet vastgesteld | `npm run executionmap` zakt op handwerk | — | **besluit** |
 | U41 | Elke capability draagt een contract: objecten, commando's, events, rechten, fouten, herstel, SLO, gebruikers, toetsen | OS.md par. 4; `kern/appstore/machtigingen.js` is het enige bestand met doel én grens | 21 capability-lijsten met 250 leden | `scripts/capabilityroepers.js` | CAPABILITEIT.json | **besluit** |
-| U42 | Een journey wordt als volledig verhaal over actoren heen getest, inclusief verstoring, herhaling en herstel | par. 7 hieronder | `scripts/lib/herstelwereld.js` en `idemwereld.js` als bouwstenen | geen | geen keten bewezen | **stap weg** |
+| U42 | Een journey wordt als volledig verhaal over actoren heen getest, inclusief verstoring, herhaling en herstel | par. 7 hieronder | `scripts/tafelproef.js`: negen schakels, vijf storingen, tegen een wegwerpserver | `npm run tafelproef` geeft foutcode 1 op één open schakel; `test/tafelproef.test.js` bewaakt de proef | <!--getal:tafel.schakels-->9<!--/getal--> schakels gesloten, <!--getal:tafel.storingen-->5<!--/getal--> storingen gehouden — één keten, tot aan de afrekening | **staat** |
 | U43 | Het register koppelt product, actor, bedoeling, journey, capability, object, route, event, beleid, bewijs, scherm, toets, prestatie en herstelpad | `kern/platformregister/` | functie ↔ routes ↔ bewijs ↔ scherm | check.js regel 64 | — | **stap weg** |
 | U44 | Volgorde: eerst de gedeelde grond, dan drie gouden ketens (mobiliteit, horeca, werk), dan de families | EXECUTIE.md par. 7: één bewezen keten vóór honderd functies | besloten 3 september 2026: horeca eerst (par. 7) | — | — | **staat** |
 | U45 | De repo verhuist naar /products, /domains, /capabilities, /trust | 415 kerndomeinen in `server/kern`; EXECUTION_MAP is een projectie | een gegenereerde leesweergave kan; een fysieke verhuizing niet | — | — | **geprojecteerd** |
 | U46 | De doctrine komt letterlijk in PLATFORM.md | dit document | MAATSTAF projecteert; PLATFORM.md houdt de vier-productregel | — | — | **geprojecteerd** |
 
-Geteld uit de tabel: 46 uitspraken -- staat 17, stap weg 11, besluit 5, jaren weg 4, geprojecteerd 9.
+Geteld uit de tabel: 46 uitspraken -- staat 18, stap weg 10, besluit 5, jaren weg 4, geprojecteerd 9.
 
-Wat die telling níét zegt: dat RTG voor 17/46 klaar is. De rijen wegen niet
+Wat die telling níét zegt: dat RTG voor 18/46 klaar is. De rijen wegen niet
 gelijk. U8 alleen (bewijs dat routes verschillend laat handelen) is meer werk
-dan de zeventien die staan bij elkaar, en zonder U8 houdt U7 niets tegen. Het
+dan de achttien die staan bij elkaar, en zonder U8 houdt U7 niets tegen. Het
 precieze stadium is dus: **kern gebouwd, huis coherent, ketenbewijs begonnen.**
 
 ---
@@ -408,54 +408,93 @@ het minimum, en hoort dus eerst in de schaduw te lopen.
 
 ---
 
-## 7. De eerste gouden keten: horeca — **niet gebouwd, wel gekozen**
+## 7. De eerste gouden keten: horeca — **de tafel sluit; de creditnota niet**
 
-De doctrine wil drie gouden ecosystemen (mobiliteit, horeca, werk). Horeca gaat
-eerst, omdat daar de meeste ketenwaarheid al staat: de rekening is één waarheid
-over alle kanalen, de retour kent standen die zeggen wie ze zet, en de stoel —
-in HORECA.md ooit het ontbrekende scharnier — bleek al te bestaan als
-`deelnemer.nr` ↔ `regel.gastNr`, met `kern/horeca/gezelschap.js` als tweede
-deur. Let op het verschil met EXECUTIE.md par. 7: die keten (*bereid een
-standaard inkoopbestelling voor*, vier routes) bewijst een **autonome
-AI-keten**; deze bewijst een **actorketen**. Het zijn twee vragen, en de tweede
-vraagt geen AI.
+De doctrine wil drie gouden ecosystemen (mobiliteit, horeca, werk). Horeca ging
+eerst, omdat daar de meeste ketenwaarheid al staat. Let op het verschil met
+EXECUTIE.md par. 7: die keten (*bereid een standaard inkoopbestelling voor*,
+vier routes) bewijst een **autonome AI-keten**; deze bewijst een **actorketen**.
+Het zijn twee vragen, en de tweede vraagt geen AI.
 
-Niet "heel horeca" is de journey, maar één gesloten verhaal:
+`scripts/tafelproef.js` (`npm run tafelproef`) legt die keten af tegen een
+wegwerpserver met een eigen datamap. Hij vraagt per stap niet "geeft de route
+200" maar **handelt actor A, en ziet actor B dat vervolgens?** Een schakel is
+`gesloten` als de ontvanger de verandering aantoonbaar ziet, `open` als hij hem
+niet ziet, en `stuk` als de handeling zelf al niet lukte. Eén open schakel laat
+de proef zakken: dit is geen triagelijst zoals DOODSPOOR.json maar één keten die
+hoort te sluiten.
 
-```
-gast wordt aan stoel, tafel en gezelschap gekoppeld
-→ bestelling ontstaat vanuit een kanaal (QR, gastvrouw, PDA)
-→ de rekening blijft één over de betrokken kanalen
-→ keuken ontvangt een uitvoerbare productieopdracht
-→ een medewerker zet toestand en bewijs
-→ uitgifte wordt bevestigd
-→ betaling loopt via de ene poort
-→ gast meldt één ontbrekend onderdeel
-→ de retourzaak krijgt eigenaar en volgende stap
-→ gedeeltelijke teruggave maakt compensatieboekingen
-→ creditnota en zaakpositie sluiten
-→ elke actorprojectie toont dezelfde kernwerkelijkheid
-→ audit en bewijs sluiten
-```
+### 7.1 De negen schakels
 
-Met minstens één verstoring per ronde: een dubbele opdracht, een keuken die niet
-reageert, een artikel dat niet beschikbaar blijkt, een betaling die wel
-geautoriseerd maar niet afgerekend is, een uitgifteclaim met verzwakt bewijs, een
-teruggavetermijn die verloopt zonder behandelaar.
+| # | van → naar | wat er gebeurt | wat de ontvanger ziet |
+|---|---|---|---|
+| 1 | zaak → gast | opent een rekening op de tafel | de gast leest tafel en zaaknaam na het scannen |
+| 2 | zaak → zaak | zet een stoel aan tafel (de tweede deur) | één stoel, en die draagt **geen** eigen sessie |
+| 3 | gast → zaak | schuift aan via de QR | dezelfde rekening-id, nu met twee stoelen |
+| 4 | gast → zaak | bestelt | de regel staat op de bon van de zaak |
+| 5 | zaal → keuken | geeft de gang vrij | keukenbord **0 → 1** bon |
+| 6 | keuken → keuken | leest de bon | de bon draagt `gastNr 2` en de stoelnaam |
+| 7 | keuken → gast | zet de bon op uitgegeven | de gast leest 1 van 1 uitgegeven |
+| 8 | gast → gast | splitst per stoel | 2 delen, som gelijk aan het te betalen bedrag |
+| 9 | zaak → gast | rekent af | de gastsessie sluit met een reden en een weg terug |
 
-Wat die ene keten dan aantoont: geen dood spoor (par. 3 als poort, voor deze
-keten), elke toestand heeft een eigenaar (par. 4, eerste vorm), elke actor ziet
-zijn bevoegde perspectief (par. 5), geld wordt niet dubbel bijgehouden, herstel
-is exact of compenserend, bewijs beïnvloedt werkelijk de route, herhaling maakt
-geen tweede transactie, en de einduitkomst is over de hele keten aantoonbaar.
-Uit die echte keten volgen de precieze status-, actor- en uitkomstcontracten.
-Niet andersom: een contract dat vóór de keten wordt geschreven, brengt alsnog
-R0–R5 of een universele objectnaam als nieuwe waarheid binnen.
+Drie dingen die deze proef aantoonde en die geen enkele losse routetoets kon
+zien:
 
-De bouwstenen bestaan: `scripts/lib/herstelwereld.js` zet een wereld op, laat
-een onderwerp langs de gewone route ontstaan en draait drie sessies met de rol
-uit IDEMPROEF.json. Wat ontbreekt is de keten zelf als proef, en `test/…` die
-zakt zodra één schakel een andere waarheid toont dan de vorige.
+**Schakel 5 is de handoff die nergens beschreven stond.** Vóór
+`/api/supplier/horeca/gang/vrij` staat de bestelling níét op het keukenbord —
+`if (!regel.vrijAt) continue`. Het werk wacht dus bij de zaal, en dat is een
+overdracht met een eigenaar. In DOODSPOOR.json is dat onzichtbaar, want beide
+routes zijn `supplier`.
+
+**Schakel 6 laat zien dat de stoel het hele eind meegaat.** HORECA.md noemde de
+stoel het ontbrekende scharnier en vond hem daarna terug in de data; hier blijkt
+dat hij tot op de keukenbon staat. De kok ziet voor wie hij kookt.
+
+**Schakel 9 verried een fout in de proef zelf, en dat is de nuttigste vondst.**
+De eerste versie toetste `openstaand === 0 && gesloten === true` — allebei
+velden uit het antwoord van de *zaak*. De proef die bestaat om de ontvanger te
+meten, keek naar de bron, stond op groen, en had daar nooit van kunnen zakken.
+De enige aanwijzing was `gastbeeld: undefined` in de uitslag. Wat de gast
+werkelijk ziet is **401 `sessie-weg`** met "Scan de QR op tafel opnieuw" — geen
+gat maar een grens, want een sleutel die na het afrekenen geldig blijft, is een
+tafel waar een vreemde later nog op kan kijken. `test/tafelproef.test.js` toets 8
+houdt vast dat elke schakel over actoren heen de gemeten waarde vastlegt en
+nooit een booleaan.
+
+### 7.2 De vijf storingen
+
+Falen is een normale producttoestand (U16), en dit is de helft die zonder proef
+op "dat vangen we af" blijft staan. Elke storing noemt wat hij belooft; komt het
+antwoord niet overeen, dan zakt de proef.
+
+| storing | belofte | wat er gebeurde |
+|---|---|---|
+| dubbele tik op Bestellen | dezelfde sleutel geeft geen tweede regel | 1 regel, ook na de herhaling |
+| een stand terugzetten zonder reden | wordt geweigerd, en de weigering zegt waarom | 400: *"kan, maar noteer waarom; dat blijft op de bon staan"* |
+| betalen met een rail die de gastdeur niet heeft | weigert, noemt de reden en zegt wat er wel kan | 501, met `rails: ["bon","tegoed","kamer"]` |
+| een verzonnen gastsleutel | opent geen rekening, ook niet leeg-maar-geldig | 401, geen rekening in het antwoord |
+| een tweede rekening op dezelfde tafel | weigert en wijst naar de bestaande | 409, met het id van de open rekening |
+
+### 7.3 Wat deze keten níét bewijst
+
+De grens staat in de uitslag zelf, niet alleen hier. Het is de **tafel**-keten:
+bezorging, hotel en club hebben eigen naden. Er komt geen browser aan te pas,
+dus dit zegt niets over de schermen. En het belangrijkste gat: **de rekening
+loopt niet door tot een creditnota.** De doctrine wil dat de gast één ontbrekend
+onderdeel meldt, dat de retourzaak een eigenaar krijgt en dat een gedeeltelijke
+teruggave compensatieboekingen maakt. `kern/commerce/retour.js` kan dat — zes
+gronden, vijf standen die elk zeggen welke partij ze zetten — maar hij hangt aan
+een **leverancierbestelling** en niet aan een horecarekening. Die naad leggen is
+werk en geen proef, en zolang hij er niet is, eindigt deze keten bij de
+afrekening.
+
+Wat de keten wél aantoont: op deze negen schakels is geen dood spoor, ziet elke
+actor dezelfde werkelijkheid, sluit de splitsing op de cent, maakt een herhaling
+geen tweede transactie, en draagt elke weigering een reden. Uit die echte keten
+volgen de status-, actor- en uitkomstcontracten van par. 4 en 5 — niet andersom.
+Een contract dat vóór de keten wordt geschreven, brengt alsnog R0–R5 of een
+universele objectnaam als nieuwe waarheid binnen.
 
 ---
 
@@ -469,14 +508,21 @@ zakt zodra één schakel een andere waarheid toont dan de vorige.
    een betekenis heeft.*
 3. **Het platformregister** krijgt alleen de actorgroep per functie, afgeleid
    uit de routes. *Stap weg.*
-4. **Eén gouden horecaketen** als volledig verhaal, met verstoring. *Niet
-   gebouwd.*
-5. **Uit die keten** de status-, actor- en uitkomstcontracten. *Volgt op 4.*
+4. **Eén gouden horecaketen** als volledig verhaal, met verstoring. *Staat voor
+   de tafel: negen schakels, vijf storingen, `npm run tafelproef`. Het
+   ontbrekende stuk is de naad naar een creditnota (par. 7.3).*
+5. **Uit die keten** de status-, actor- en uitkomstcontracten. *Volgt op 4, en
+   de eerste vorm ligt er nu: schakel 5 en 9 zijn allebei een toestand met een
+   eigenaar en een volgende stap.*
 
-Zodra één horecajourney volledig sluit en `scripts/doodspoor.js` geen
-onverklaarde primaire dode sporen meer vindt, verandert de claim opnieuw. Dan is
-*Verified Outcome Platform* niet langer alleen een goede naam voor de
-architectuur, maar een door de code aantoonbaar gedragen eigenschap van RTG.
+De eerste helft daarvan is binnen: één horecajourney sluit, van het openen van
+de rekening tot de afrekening, met vijf storingen die zich aan hun belofte
+houden. De tweede helft niet: die keten eindigt bij de betaling in plaats van bij
+een gesloten creditnota, en `scripts/doodspoor.js` vindt nog 122 open handoffs.
+Zodra de keten dóórloopt tot de compensatieboeking én die lijst een betekenis
+draagt, verandert de claim opnieuw. Dan is *Verified Outcome Platform* niet
+langer alleen een goede naam voor de architectuur, maar een door de code
+aantoonbaar gedragen eigenschap van RTG.
 
 ---
 

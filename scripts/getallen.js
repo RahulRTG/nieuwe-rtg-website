@@ -77,6 +77,10 @@ const GETALLEN = {
     wat: 'bronroutes zonder gemeten ontvanger, zonder gevonden lezer en zonder verklaring' },
   'doodspoor.openCollecties': { bron: 'DOODSPOOR.json', veld: 'telling.openCollecties',
     wat: 'collecties waarop minstens een bronroute open staat' },
+  'tafel.schakels': { bron: 'TAFELPROEF.json', veld: 'telling.gesloten',
+    wat: 'schakels van de horecaketen waar de ontvangende actor de verandering aantoonbaar ziet' },
+  'tafel.storingen': { bron: 'TAFELPROEF.json', veld: 'telling.gehouden',
+    wat: 'storingen in die keten waarbij het systeem zich aan zijn uitgeschreven belofte hield' },
   'doodspoor.nietGemeten': { bron: 'DOODSPOOR.json', veld: 'nietGezien.nietGemeten',
     wat: 'routes die in de idempotentieproef geen werk deden en dus buiten deze meting vallen' }
 };

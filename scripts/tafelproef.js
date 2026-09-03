@@ -146,14 +146,18 @@ async function loop(basis, uit) {
   if (!aan) return uit;
   const K = aan.data.sleutel;
 
-  /* 4 -- de gast bestelt. Ontvanger: de rekening van de zaak. */
+  /* 4 -- de gast bestelt. Ontvanger: de rekening van de zaak.
+     TWEE regels, want verderop gaat er één mis: een keten waarin de correctie
+     de laatste regel is, kan daarna niet meer afrekenen en dan bewijst hij het
+     halve verhaal. */
   await stap(
-    schakel(4, 'gast', 'zaak', 'bestelt, en de regel landt op de rekening van de zaak'),
-    () => P('/api/gast/bestel', { sleutel: K, items: [{ itemId: item.id, aantal: 1 }], idem: 'tafelproef-1' }),
+    schakel(4, 'gast', 'zaak', 'bestelt twee gerechten, en de regels landen op de rekening van de zaak'),
+    () => P('/api/gast/bestel', { sleutel: K,
+      items: [{ itemId: item.id, aantal: 1 }, { itemId: item.id, aantal: 1 }], idem: 'tafelproef-1' }),
     async () => {
       const r = await P('/api/supplier/horeca/rekening', { rekeningId: rekId }, S);
       const regels = (r.data && r.data.rekening && r.data.rekening.regels) || [];
-      return { klopt: regels.length === 1 && regels[0].itemId === item.id,
+      return { klopt: regels.length === 2 && regels.every(x => x.itemId === item.id),
         wat: regels.length + ' regel(s) op de bon van de zaak' };
     });
 
@@ -168,7 +172,7 @@ async function loop(basis, uit) {
       const na = await P('/api/supplier/horeca/keuken/bord', {}, S);
       const voor = (bordVoor.data && bordVoor.data.aantal) || 0;
       const nu = (na.data && na.data.aantal) || 0;
-      return { klopt: voor === 0 && nu === 1, wat: 'keukenbord ' + voor + ' -> ' + nu + ' bon(nen)' };
+      return { klopt: voor === 0 && nu === 2, wat: 'keukenbord ' + voor + ' -> ' + nu + ' bon(nen)' };
     });
 
   const bord = await P('/api/supplier/horeca/keuken/bord', {}, S);
@@ -206,7 +210,48 @@ async function loop(basis, uit) {
         wat: d.length + ' delen, som ' + som + ' van ' + (r.data && r.data.teBetalen) + ' centen' };
     });
 
-  /* 9 -- de zaak rekent af. De ontvanger is de gast, en die ziet iets ANDERS
+  /* 9 -- de zaal corrigeert een regel NADAT de keuken eraan begon, en de gast
+     ziet wat er misging.
+
+     DIT WAS HET DODE SPOOR. Tot 3 september 2026 zei `rekening/regel/weg` in
+     dit geval: "Haal hem eraf via derving, met een reden" -- en die derving
+     bestaat alleen in de KASSA, op losse items, zonder rekening. De medewerker
+     werd naar een deur gestuurd die er niet was, en het gerecht bleef op de bon
+     staan. Zie kern/horeca/correctie.js. */
+  const rek9 = await P('/api/supplier/horeca/rekening', { rekeningId: rekId }, S);
+  const regel9 = ((rek9.data.rekening || {}).regels || [])[0];
+  const brutoVoor = rek9.data.rekening.totalen.bruto;
+  await stap(
+    schakel(9, 'zaal', 'gast', 'corrigeert een regel met grond en reden; de gast ziet wat er misging'),
+    () => P('/api/supplier/horeca/rekening/regel/corrigeer',
+      { rekeningId: rekId, regelId: regel9 && regel9.id, grond: 'verkeerd-bereid', reden: 'koud geserveerd' }, S),
+    async () => {
+      const g = await P('/api/gast/rekening', { sleutel: K });
+      const r = (g.data && g.data.rekening) || {};
+      const opRegel = (r.regels || []).find(x => x.id === (regel9 && regel9.id));
+      const inLijst = (r.correcties || [])[0];
+      return { klopt: !!(opRegel && opRegel.gecorrigeerd && opRegel.gecorrigeerd.grondLabel) &&
+          !!(inLijst && inLijst.reden),
+        wat: 'de gast leest "' + (opRegel && opRegel.gecorrigeerd && opRegel.gecorrigeerd.grondLabel) +
+          ': ' + (inLijst && inLijst.reden) + '" bij ' + (opRegel && opRegel.naam) };
+    });
+
+  /* 10 -- de rekening zakt met precies het bedrag van de correctie, en de regel
+     staat er nog. Dat tweede is de grens uit gezelschap.js: laat je hem
+     verdampen, dan ziet de keuken zijn werk verdwijnen. */
+  await stap(
+    schakel(10, 'zaal', 'zaak', 'de rekening zakt met het bevroren bedrag, en de regel blijft staan'),
+    () => P('/api/supplier/horeca/rekening', { rekeningId: rekId }, S),
+    async (r) => {
+      const rek = (r.data && r.data.rekening) || {};
+      const c = (rek.correcties || [])[0];
+      const nog = (rek.regels || []).some(x => x.id === (regel9 && regel9.id));
+      return { klopt: !!c && rek.totalen.bruto === brutoVoor - c.centen && nog,
+        wat: 'bruto ' + brutoVoor + ' -> ' + rek.totalen.bruto + ' (correctie ' + (c && c.centen) +
+          '), regel staat er nog: ' + nog };
+    });
+
+  /* 11 -- de zaak rekent de REST af. De ontvanger is de gast, en die ziet iets ANDERS
      dan een gesloten bon: zijn sessie is voorbij.
 
      DE EERSTE VERSIE VAN DEZE SCHAKEL TOETSTE DE VERKEERDE KANT. Er stond
@@ -221,10 +266,10 @@ async function loop(basis, uit) {
      kijken. De belofte is dus niet "de gast leest gesloten" maar "de gast wordt
      netjes afgesloten, met een reden en een weg terug" -- en dat is precies wat
      GRAMMATICA.md van elke verhindering vraagt. */
-  const rek9 = await P('/api/supplier/horeca/rekening', { rekeningId: rekId }, S);
-  const teBetalen = (rek9.data && rek9.data.rekening && rek9.data.rekening.openstaand) || 0;
+  const rek11 = await P('/api/supplier/horeca/rekening', { rekeningId: rekId }, S);
+  const teBetalen = (rek11.data && rek11.data.rekening && rek11.data.rekening.openstaand) || 0;
   await stap(
-    schakel(9, 'zaak', 'gast', 'rekent af; de gastsessie sluit met een reden en een weg terug'),
+    schakel(11, 'zaak', 'gast', 'rekent af; de gastsessie sluit met een reden en een weg terug'),
     () => P('/api/supplier/horeca/betaal', { rekeningId: rekId, wijze: 'pin', centen: teBetalen }, S),
     async (r) => {
       const zaakDicht = r.data && r.data.openstaand === 0 && r.data.gesloten === true;
@@ -247,7 +292,7 @@ async function storingen(basis, uit) {
   const P = (pad, lijf, tok) => post(basis, pad, lijf, tok);
   const S = (await P('/api/supplier/login', { username: 'rahul', password: 'Imran' })).data.token;
   const item = (await P('/api/supplier/horeca/kaart', {}, S)).data.groepen[0].items[0];
-  const TAFEL = 'PROEF-2';
+  const TAFEL = "PROEF-2";
   const qrToken = (await P('/api/supplier/horeca/gast/qr', { tafel: TAFEL, naam: TAFEL }, S)).data.token;
   const rekId = (await P('/api/supplier/horeca/rekening/open', { tafel: TAFEL }, S)).data.rekening.id;
   const K = (await P('/api/gast/aanschuiven', { token: qrToken, naam: 'Gast' })).data.sleutel;
@@ -295,7 +340,58 @@ async function storingen(basis, uit) {
     vreemd.status >= 400 && !(vreemd.data && vreemd.data.rekening),
     'status ' + vreemd.status + ', rekening in het antwoord: ' + !!(vreemd.data && vreemd.data.rekening));
 
-  /* 5. TWEE REKENINGEN OP EEN TAFEL. Dan betaalt de ene tafel de bestelling van
+  /* 5. EEN CORRECTIE NA DE BETALING MAAKT EEN TERUGGAVERECHT DAT KLAARSTAAT.
+     Dit is de creditnota-helft: geld gaat niet vanzelf terug (GELD.md par. 3),
+     maar het bedrag verdwijnt ook niet. De invariant: wat er te veel binnen is
+     (het negatieve openstaand) is precies de som van de nog niet uitgevoerde
+     teruggaven. */
+  const TAFEL3 = 'PROEF-3';
+  const qr3 = (await P('/api/supplier/horeca/gast/qr', { tafel: TAFEL3, naam: TAFEL3 }, S)).data.token;
+  const rek3 = (await P('/api/supplier/horeca/rekening/open', { tafel: TAFEL3 }, S)).data.rekening.id;
+  const K3 = (await P('/api/gast/aanschuiven', { token: qr3, naam: 'Gast' })).data.sleutel;
+  await P('/api/gast/bestel', { sleutel: K3, items: [{ itemId: item.id, aantal: 2 }], idem: 'storing-5' });
+  const voor3 = await P('/api/supplier/horeca/rekening', { rekeningId: rek3 }, S);
+  await P('/api/supplier/horeca/betaal', { rekeningId: rek3, wijze: 'pin', centen: voor3.data.rekening.openstaand }, S);
+  const regel3 = voor3.data.rekening.regels[0];
+  const corr3 = await P('/api/supplier/horeca/rekening/regel/corrigeer',
+    { rekeningId: rek3, regelId: regel3.id, grond: 'niet-gebracht', reden: 'gast belde: nooit gekregen' }, S);
+  const na3 = await P('/api/supplier/horeca/rekening', { rekeningId: rek3 }, S);
+  const tg = corr3.data && corr3.data.correctie && corr3.data.correctie.teruggave;
+  const openstaand3 = na3.data && na3.data.rekening && na3.data.rekening.openstaand;
+  noteer('een correctie op een rekening die al betaald is',
+    'zet een teruggaverecht klaar zonder het uit te voeren, en het te veel betaalde spiegelt dat bedrag',
+    !!tg && tg.uitgevoerd === false && tg.centen > 0 && openstaand3 === -tg.centen,
+    'teruggave ' + (tg && tg.centen) + ' centen, uitgevoerd: ' + (tg && tg.uitgevoerd) +
+      '; openstaand ' + openstaand3);
+
+  /* 6. TWEE KEER DEZELFDE REGEL CORRIGEREN. */
+  const nogmaals = await P('/api/supplier/horeca/rekening/regel/corrigeer',
+    { rekeningId: rek3, regelId: regel3.id, grond: 'breuk', reden: 'nog een keer' }, S);
+  noteer('dezelfde regel twee keer corrigeren',
+    'weigert, want anders zakt de rekening twee keer voor hetzelfde gerecht',
+    nogmaals.status === 409, 'status ' + nogmaals.status + ': ' + (nogmaals.data && nogmaals.data.error));
+
+  /* 7. DE MELDING DIE NAAR EEN DEUR STUURT. Waar `regel/weg` weigert omdat de
+     keuken al begon, hoort de weg die hij noemt ook echt te bestaan -- dat was
+     het dode spoor. Deze storing is de wacht daarop. */
+  const TAFEL4 = 'PROEF-4';
+  const qr4 = (await P('/api/supplier/horeca/gast/qr', { tafel: TAFEL4, naam: TAFEL4 }, S)).data.token;
+  const rek4 = (await P('/api/supplier/horeca/rekening/open', { tafel: TAFEL4 }, S)).data.rekening.id;
+  const K4 = (await P('/api/gast/aanschuiven', { token: qr4, naam: 'Gast' })).data.sleutel;
+  await P('/api/gast/bestel', { sleutel: K4, items: [{ itemId: item.id, aantal: 1 }], idem: 'storing-7' });
+  const rek4v = await P('/api/supplier/horeca/rekening', { rekeningId: rek4 }, S);
+  const regel4 = rek4v.data.rekening.regels[0];
+  await P('/api/supplier/horeca/gang/vrij', { rekeningId: rek4, gang: 0 }, S);
+  await P('/api/supplier/horeca/keuken/stand', { rekeningId: rek4, regelId: regel4.id, stand: 'gestart' }, S);
+  const geweigerd = await P('/api/supplier/horeca/rekening/regel/weg', { rekeningId: rek4, regelId: regel4.id }, S);
+  const via = geweigerd.data && geweigerd.data.via;
+  const bestaat = via ? await P(via, { rekeningId: rek4, regelId: regel4.id, grond: 'breuk', reden: 'proef' }, S) : null;
+  noteer('een weigering die naar een andere weg verwijst',
+    'die weg bestaat werkelijk en doet wat de melding belooft',
+    geweigerd.status === 409 && !!via && !!bestaat && bestaat.status === 200,
+    'weigering wees naar ' + via + ', en die gaf ' + (bestaat && bestaat.status));
+
+  /* 8. TWEE REKENINGEN OP EEN TAFEL. Dan betaalt de ene tafel de bestelling van
      de andere -- de route weigert dat met de bestaande rekening erbij. */
   const tweede = await P('/api/supplier/horeca/rekening/open', { tafel: TAFEL }, S);
   noteer('een tweede rekening op dezelfde tafel', 'weigert en wijst naar de bestaande',

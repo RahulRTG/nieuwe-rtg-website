@@ -827,11 +827,28 @@ kookt), en schakel 9 verried een fout in de proef zelf -- hij toetste twee velde
 uit het antwoord van de ZAAK terwijl deze proef juist de ONTVANGER meet, stond
 daardoor op groen en had nooit kunnen zakken. Wat de gast na het afrekenen
 werkelijk ziet is 401 `sessie-weg` met "Scan de QR opnieuw", en dat is een grens
-en geen gat. Wat de keten NIET bewijst staat er even groot bij: hij eindigt bij
-de betaling en niet bij een creditnota, want `kern/commerce/retour.js` hangt aan
-een leverancierbestelling en niet aan een horecarekening. Die naad leggen is werk
-en geen proef. Pas daaruit volgen de status-, actor- en uitkomstcontracten --
-niet andersom.
+en geen gat. **En het bouwen van die keten legde een dood spoor bloot dat er
+jaren stond**: wie een regel van de rekening haalde waar de keuken al aan
+begonnen was, kreeg *"Haal hem eraf via derving, met een reden"* -- en die
+derving bestaat alleen in de KASSA (`/api/supplier/kassa/derving`, losse items,
+geen rekening). Je werd naar een deur gestuurd die er niet was; de enige
+uitwegen waren korting op de HELE bon of de hele rekening oninbaar boeken. De
+reparatie is **`kern/horeca/correctie.js`**, en vier dingen liggen daar vast: de
+regel BLIJFT staan en telt nul via `regelSom` in `kern/horeca.js` (één plek, dus
+splitsen, samenvoegen en de verdeling per stoel bewegen mee en `controleerSom()`
+blijft kloppen), grond én reden zijn allebei verplicht (vijf gronden, elk met wie
+het meldt), geld wordt KLAARGEZET en nooit verplaatst (is er al betaald, dan
+ontstaat een teruggaveRECHT met `uitgevoerd: false`; een mens voert het uit langs
+kern/pay), en een negatief `openstaand` blijft staan omdat het exact spiegelt met
+de openstaande teruggaven -- afkappen op nul zou het bedrag stil laten
+verdwijnen. Waarom dit geen `kern/commerce/retour.js` is: die laag is voor een
+koper die goederen terugstuurt naar een verkoper, met verzendstanden en een
+`orderRef` naar een vreemd domein; een gast aan tafel stuurt niets terug en de
+medewerker die corrigeert IS de verkoper. Wat de keten nog steeds NIET bewijst
+staat er even groot bij: het is de tafel-keten (bezorging, hotel en club hebben
+eigen naden), er komt geen browser aan te pas, en dat het geld werkelijk
+terugkomt loopt langs kern/pay en is met opzet niet gemeten. Pas uit zo'n keten
+volgen de status-, actor- en uitkomstcontracten -- niet andersom.
 
 ## Structuur en starten (kort)
 

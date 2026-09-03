@@ -1,17 +1,17 @@
 {
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
-  "vastgelegd": "2026-09-02",
+  "vastgelegd": "2026-09-03",
   "gemeten": {
-    "bestanden": 2002,
+    "bestanden": 2004,
     "vormen": 1340,
-    "velden": 1941,
+    "velden": 1939,
     "modules": 720,
     "domeinen": 253,
     "envelopDrempel": 16,
     "envelop": 30,
     "veldenDomeineigen": 1379,
-    "veldenGedeeldVanafVier": 193,
-    "gelijkendeVormparen": 20
+    "veldenGedeeldVanafVier": 192,
+    "gelijkendeVormparen": 19
   },
   "envelop": [
     "aantal",
@@ -83,6 +83,18 @@
       ]
     },
     {
+      "veld": "wie",
+      "domeinen": 15,
+      "waar": [
+        "bedrijf",
+        "kern/comm",
+        "kern/commerce",
+        "kern/consent-lezers",
+        "kern/horeca",
+        "kern/livinglab"
+      ]
+    },
+    {
       "veld": "type",
       "domeinen": 14,
       "waar": [
@@ -104,18 +116,6 @@
         "kern/commercie",
         "kern/concern",
         "kern/gewoonten"
-      ]
-    },
-    {
-      "veld": "wie",
-      "domeinen": 14,
-      "waar": [
-        "bedrijf",
-        "kern/comm",
-        "kern/commerce",
-        "kern/consent-lezers",
-        "kern/livinglab",
-        "kern/onderzoekslab"
       ]
     },
     {
@@ -800,24 +800,6 @@
         "gratis",
         "nr",
         "prijsCenten"
-      ]
-    },
-    {
-      "gelijkenis": 0.6,
-      "a": "server/kern/gast/order-beeld.js",
-      "b": "server/kern/horeca/regel.js",
-      "domeinA": "kern/gast",
-      "domeinB": "kern/horeca",
-      "gedeeld": [
-        "allergenen",
-        "allergie",
-        "gang",
-        "gastNr",
-        "happy",
-        "ingredienten",
-        "itemId",
-        "lijstprijs",
-        "opties"
       ]
     },
     {

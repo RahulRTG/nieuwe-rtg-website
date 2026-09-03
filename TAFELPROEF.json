@@ -12,7 +12,7 @@
       "status": 200,
       "ziet": "de gast leest tafel PROEF-1 bij Sal de Mar",
       "fout": null,
-      "ms": 19
+      "ms": 13
     },
     {
       "nr": 2,
@@ -32,7 +32,7 @@
       "wat": "schuift aan via de QR en komt op dezelfde rekening",
       "stand": "gesloten",
       "status": 200,
-      "ziet": "gast op rekening cfed56efa7 (zaak opende cfed56efa7), 2 stoelen",
+      "ziet": "gast op rekening f93fa2a39f (zaak opende f93fa2a39f), 2 stoelen",
       "fout": null,
       "ms": 13
     },
@@ -40,10 +40,10 @@
       "nr": 4,
       "van": "gast",
       "naar": "zaak",
-      "wat": "bestelt, en de regel landt op de rekening van de zaak",
+      "wat": "bestelt twee gerechten, en de regels landen op de rekening van de zaak",
       "stand": "gesloten",
       "status": 200,
-      "ziet": "1 regel(s) op de bon van de zaak",
+      "ziet": "2 regel(s) op de bon van de zaak",
       "fout": null,
       "ms": 13
     },
@@ -54,9 +54,9 @@
       "wat": "geeft de gang vrij, en pas dan ziet de keuken de bon",
       "stand": "gesloten",
       "status": 200,
-      "ziet": "keukenbord 0 -> 1 bon(nen)",
+      "ziet": "keukenbord 0 -> 2 bon(nen)",
       "fout": null,
-      "ms": 11
+      "ms": 15
     },
     {
       "nr": 6,
@@ -76,9 +76,9 @@
       "wat": "zet de bon op uitgegeven, en de gast ziet dat",
       "stand": "gesloten",
       "status": 200,
-      "ziet": "1 van 1 uitgegeven",
+      "ziet": "1 van 2 uitgegeven",
       "fout": null,
-      "ms": 11
+      "ms": 9
     },
     {
       "nr": 8,
@@ -87,12 +87,34 @@
       "wat": "splitst de rekening per stoel, en de delen sluiten op de cent",
       "stand": "gesloten",
       "status": 200,
-      "ziet": "2 delen, som 1600 van 1600 centen",
+      "ziet": "2 delen, som 3200 van 3200 centen",
       "fout": null,
-      "ms": 5
+      "ms": 6
     },
     {
       "nr": 9,
+      "van": "zaal",
+      "naar": "gast",
+      "wat": "corrigeert een regel met grond en reden; de gast ziet wat er misging",
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "de gast leest \"Verkeerd bereid: koud geserveerd\" bij Gazpacho de sandia",
+      "fout": null,
+      "ms": 11
+    },
+    {
+      "nr": 10,
+      "van": "zaal",
+      "naar": "zaak",
+      "wat": "de rekening zakt met het bevroren bedrag, en de regel blijft staan",
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "bruto 3200 -> 1600 (correctie 1600), regel staat er nog: true",
+      "fout": null,
+      "ms": 4
+    },
+    {
+      "nr": 11,
       "van": "zaak",
       "naar": "gast",
       "wat": "rekent af; de gastsessie sluit met een reden en een weg terug",
@@ -100,7 +122,7 @@
       "status": 200,
       "ziet": "zaak: openstaand 0, gesloten true | gast: 401 sessie-weg -- \"Deze tafelsessie is niet meer geldig. Scan de QR op tafel opnieuw.\"",
       "fout": null,
-      "ms": 10
+      "ms": 11
     }
   ],
   "storingen": [
@@ -129,20 +151,38 @@
       "wat": "status 401, rekening in het antwoord: false"
     },
     {
+      "naam": "een correctie op een rekening die al betaald is",
+      "belofte": "zet een teruggaverecht klaar zonder het uit te voeren, en het te veel betaalde spiegelt dat bedrag",
+      "stand": "gehouden",
+      "wat": "teruggave 3200 centen, uitgevoerd: false; openstaand -3200"
+    },
+    {
+      "naam": "dezelfde regel twee keer corrigeren",
+      "belofte": "weigert, want anders zakt de rekening twee keer voor hetzelfde gerecht",
+      "stand": "gehouden",
+      "wat": "status 409: Deze regel is al gecorrigeerd."
+    },
+    {
+      "naam": "een weigering die naar een andere weg verwijst",
+      "belofte": "die weg bestaat werkelijk en doet wat de melding belooft",
+      "stand": "gehouden",
+      "wat": "weigering wees naar /api/supplier/horeca/rekening/regel/corrigeer, en die gaf 200"
+    },
+    {
       "naam": "een tweede rekening op dezelfde tafel",
       "belofte": "weigert en wijst naar de bestaande",
       "stand": "gehouden",
-      "wat": "status 409, wijst naar 1f472e1f92"
+      "wat": "status 409, wijst naar b24b99ccd1"
     }
   ],
-  "rekening": "cfed56efa7",
+  "rekening": "f93fa2a39f",
   "telling": {
-    "schakels": 9,
-    "gesloten": 9,
+    "schakels": 11,
+    "gesloten": 11,
     "open": 0,
     "stuk": 0,
-    "storingen": 5,
-    "gehouden": 5,
+    "storingen": 8,
+    "gehouden": 8,
     "gebroken": 0
   },
   "sluit": true

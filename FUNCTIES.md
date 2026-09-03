@@ -107,6 +107,17 @@ ook blokkeert.
 - **Waarderen en reageren** (`kern-waardering`) — Likes, reacties, reviews en favorieten door het hele platform.  
   _voor: rtg, lifestyle, business, gast_
 
+### Sociaal (De Salon) — 4
+
+- **De Salon (feed, volgen, deals)** (`salon`) — De Salon-tijdlijn: partner-posts volgen, aanbiedingen claimen, polls en de etalage.  
+  _voor: rtg, lifestyle, business, gast_
+- **Salon-ontmoetingen (in de buurt)** (`ontmoetingen`) — Wederzijdse connecties die vlakbij zijn spreken veilig af (18+, geverifieerd), met contract, live-locatie naar RTG en SOS.  
+  _voor: rtg, lifestyle, business_
+- **Sociale laag (RTG + RTF)** (`social`) — De gedeelde sociale laag: zoeken, verbinden, DM, snaps, verhalen en bellen op codenaam. De kinderbescherming (t/m 15 gesloten) blijft altijd gelden.  
+  _voor: rtg, lifestyle, business, foundation_
+- **RTF contacten & familiekoppeling** (`rtf-contacten`) — De contactenlaag van de RTFoundation: gezinnen koppelen, kanalen en meldingen tussen leden.  
+  _voor: rtg, lifestyle, business, foundation_
+
 ### Genres & diensten — 10
 
 - **Bestellen & bezorgen** (`bestellen`) — Bestellen bij een zaak (ophalen of laten bezorgen) met live volgen.  
@@ -129,17 +140,6 @@ ook blokkeert.
   _voor: rtg, lifestyle, business, leverancier_
 - **RTG Commerce (mand & retour)** (`commerce`) — De verkooplaag boven de domeinen: wat er te koop staat en wat NIET met de reden erbij, een mand over verkopers heen met een afrekening per verkoper, de overdracht naar de deur die bevestigt, en de weg terug. RTG bevestigt hier zelf niets.  
   _voor: rtg, lifestyle, business_
-
-### Sociaal (De Salon) — 4
-
-- **De Salon (feed, volgen, deals)** (`salon`) — De Salon-tijdlijn: partner-posts volgen, aanbiedingen claimen, polls en de etalage.  
-  _voor: rtg, lifestyle, business, gast_
-- **Salon-ontmoetingen (in de buurt)** (`ontmoetingen`) — Wederzijdse connecties die vlakbij zijn spreken veilig af (18+, geverifieerd), met contract, live-locatie naar RTG en SOS.  
-  _voor: rtg, lifestyle, business_
-- **Sociale laag (RTG + RTF)** (`social`) — De gedeelde sociale laag: zoeken, verbinden, DM, snaps, verhalen en bellen op codenaam. De kinderbescherming (t/m 15 gesloten) blijft altijd gelden.  
-  _voor: rtg, lifestyle, business, foundation_
-- **RTF contacten & familiekoppeling** (`rtf-contacten`) — De contactenlaag van de RTFoundation: gezinnen koppelen, kanalen en meldingen tussen leden.  
-  _voor: rtg, lifestyle, business, foundation_
 
 ### Eigen apps — 35
 

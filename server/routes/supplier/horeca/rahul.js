@@ -81,7 +81,14 @@ module.exports = (kern) => {
        spoor. Zie ook kern/horeca.js bij Hlees(); daar staat waarom dat onderscheid
        bestaat. */
     const bonId = String((req.body || {}).bonId || '');
-    if (!recht.bonnen(Hlees(req.supplier.code), recht.MAX).some((b) => b.id === bonId)) {
+    /* RECHTSTREEKS LEZEN, want ook `recht.bonnen()` schrijft: die gaat via
+       doos(h), en doos zet `h.rahulBonnen = []` neer als het veld er nog niet
+       is. Op een BESTAANDE zaak geeft Hlees() de echte doos terug, dus dan
+       landt die lege lijst er alsnog in -- en dan blijft een 404 een spoor
+       nalaten. Kijken doet hier dus niets meer dan kijken. */
+    const bak = Hlees(req.supplier.code);
+    const bonnen = Array.isArray(bak && bak.rahulBonnen) ? bak.rahulBonnen : [];
+    if (!bonnen.some((b) => String(b.id) === bonId)) {
       return res.status(404).json({ error: 'Deze actiebon kennen we niet.' });
     }
     const h = H(req.supplier.code);

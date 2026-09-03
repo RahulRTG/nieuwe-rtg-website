@@ -35,8 +35,13 @@ module.exports = (kern) => {
     res.json({ ok: true, borden: motor.zichtbaar(borden, req.actor.staffId || null, manager) });
   });
   app.post('/api/supplier/bord', supplierAuth, (req, res) => {
-    const borden = motor.bak('borden', req.supplier.code);
     const actie = String(req.body.actie || '');
+    /* KIJKEN ZONDER SCHEPPEN op alles wat geen bord MAAKT. `motor.bak()` zet
+       `db.data.borden[code] = []` neer voor een zaak die er nog geen had -- ook
+       als het bord daarna niet blijkt te bestaan en het verzoek met een 404
+       teruggaat. Alleen de 'maak'-tak heeft die rij echt nodig. */
+    const borden = actie === 'maak' ? motor.bak('borden', req.supplier.code)
+      : ((db.data.borden || {})[req.supplier.code] || []);
     let b = null;
     if (actie !== 'maak') {
       b = motor.bordVind(borden, String(req.body.id || ''));

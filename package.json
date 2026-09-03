@@ -230,7 +230,10 @@
     "waarom": "node scripts/waarom.js",
     "swcache": "node scripts/swcache.js",
     "swcache:vast": "node scripts/swcache.js --schrijf",
-    "herstelproef": "node scripts/herstelproef.js"
+    "herstelproef": "node scripts/herstelproef.js",
+    "doodspoor": "node scripts/doodspoor.js",
+    "doodspoor:vast": "node scripts/doodspoor.js --vastleggen",
+    "doodspoor:controle": "node scripts/doodspoor.js --controle"
   },
   "devDependencies": {
     "playwright": "^1.62.1"

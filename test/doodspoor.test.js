@@ -1,0 +1,177 @@
+/* DE DOODSPOORMETER (scripts/doodspoor.js) -- ziet hij een dood spoor?
+
+   MAATSTAF.md par. 3 maakt "geen dood spoor" meetbaar: een handeling van een
+   actor die een collectie aanraakt, hoort een ontvanger in een andere
+   actorgroep te hebben, of een verklaring waarom niet. Dit bestand bewaakt de
+   meter zelf, niet het product: een meter die altijd "gesloten" zegt is
+   slechter dan geen meter (LAT.md regel 9), dus elke uitslag wordt hier een
+   keer verdiend door een tegenproef die hem laat omslaan.
+
+   De proef gebruikt een NAGEBOOTSTE IDEMPROEF.json -- klein, met de hand
+   geschreven, zodat elke uitslag herleidbaar is tot een regel hierboven. De
+   echte uitslag (DOODSPOOR.json) wordt alleen op zijn vorm en op zijn
+   verklaringen getoetst; wat erin staat is een meting en geen norm.
+
+   Draai los: node --test test/doodspoor.test.js */
+'use strict';
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const fs = require('fs');
+const path = require('path');
+const O = require('../scripts/doodspoor');
+
+function route(pad, rol, opslag, status = 200) {
+  return { methode: 'POST', pad, rol, statussen: [status, status, status], opslag: { a: opslag, b: {}, c: {} } };
+}
+function proefMet(...routes) { return { perRoute: routes }; }
+
+const EIGEN_NAAM = Object.keys(O.EIGEN)[0];
+const INFRA_NAAM = Object.keys(O.INFRA)[0];
+
+test('0. zonder proef zakt de meter en zegt wat er ontbreekt', () => {
+  const u = O.meet({ proef: { perRoute: null } });
+  assert.ok(u.fout && /IDEMPROEF/.test(u.fout));
+});
+
+test('1. gesloten: een andere groep zet gemeten een stand op dezelfde collectie', () => {
+  const u = O.meet({ proef: proefMet(
+    route('/api/bestel', 'member', { orders: 1 }),
+    route('/api/supplier/bestel/accepteer', 'supplier', { orders: 'gewijzigd' })) });
+  const lid = u.perRoute.find(r => r.pad === '/api/bestel');
+  assert.equal(lid.stand, 'gesloten');
+  assert.deepEqual(lid.collecties[0].zetStand, ['aanbieder']);
+  assert.equal(u.matrix.consument.aanbieder, 1);
+});
+
+test('2. TEGENPROEF: haal de ontvanger weg en dezelfde route staat open', () => {
+  const u = O.meet({ proef: proefMet(route('/api/bestel', 'member', { orders: 1 })) });
+  assert.equal(u.perRoute[0].stand, 'open');
+  assert.deepEqual(u.openCollecties, [{ collectie: 'orders', bronroutes: 1 }]);
+  assert.equal(u.telling.openCollecties, 1);
+});
+
+test('3. een ontvanger uit DEZELFDE groep is geen handoff', () => {
+  const u = O.meet({ proef: proefMet(
+    route('/api/bestel', 'member', { orders: 1 }),
+    route('/api/bestel/wijzig', 'openbaar', { orders: 'gewijzigd' })) });
+  assert.equal(u.perRoute.find(r => r.pad === '/api/bestel').stand, 'open',
+    'member en openbaar zijn allebei consument; elkaar aanraken is geen handoff');
+});
+
+test('4. eigen: een collectie zonder tweede partij is verklaard, niet open', () => {
+  const u = O.meet({ proef: proefMet(route('/api/eigen', 'member', { [EIGEN_NAAM]: 1 })) });
+  assert.equal(u.perRoute[0].stand, 'eigen');
+  assert.equal(u.perRoute[0].collecties[0].graad, 'verklaard');
+  assert.ok(!u.verlopen.eigen.includes(EIGEN_NAAM), 'een gebruikte verklaring is niet verlopen');
+});
+
+test('5. een verklaring die niemand meer nodig heeft, staat als verlopen in de uitslag', () => {
+  const u = O.meet({ proef: proefMet(route('/api/x', 'member', { iets: 1 })) });
+  assert.ok(u.verlopen.eigen.includes(EIGEN_NAAM));
+  assert.ok(u.verlopen.infra.includes(INFRA_NAAM));
+});
+
+test('6. infra telt niet mee: een route die alleen de sessietabel raakt is geen bron', () => {
+  const u = O.meet({ proef: proefMet(route('/api/x', 'member', { [INFRA_NAAM]: 1 })) });
+  assert.equal(u.telling.bronroutes, 0);
+});
+
+test('7. niet gemeten is geen oordeel: een 404 in de proef telt niet als open', () => {
+  const u = O.meet({ proef: proefMet(route('/api/x', 'member', { orders: 1 }, 404)) });
+  assert.equal(u.telling.bronroutes, 0);
+  assert.equal(u.nietGezien.nietGemeten, 1);
+});
+
+test('8. zonder rol geen groep: de route wordt geteld als niet gezien, niet als open', () => {
+  const u = O.meet({ proef: proefMet(route('/api/x', null, { orders: 1 })) });
+  assert.equal(u.telling.bronroutes, 0);
+  assert.equal(u.nietGezien.zonderRol, 1);
+});
+
+test('9. de stand van een route is de zwakste van zijn collecties', () => {
+  const u = O.meet({ proef: proefMet(
+    route('/api/twee', 'member', { orders: 1, los: 1 }),
+    route('/api/s', 'supplier', { orders: 1 })) });
+  assert.equal(u.perRoute.find(r => r.pad === '/api/twee').stand, 'open',
+    'een gesloten collectie naast een open collectie is nog steeds een dood spoor');
+});
+
+test('10. een aangewezen ontvanger wordt getoetst tegen de proef', () => {
+  const [c, d] = Object.entries(O.ONTVANGER)[0];
+  const [, pad] = d.route.split(' ');
+  /* aanwezig en met werk: de collectie is gezien, graad aangewezen */
+  let u = O.meet({ proef: proefMet(route('/api/lid', 'member', { [c]: 1 }), route(pad, 'office', {})) });
+  const r = u.perRoute.find(x => x.pad === '/api/lid');
+  assert.equal(r.stand, 'gezien');
+  assert.equal(r.collecties[0].graad, 'aangewezen');
+  assert.deepEqual(u.verlopen.ontvanger, []);
+  /* TEGENPROEF: de aangewezen route deed geen werk -> de aanwijzing is verlopen en de collectie open */
+  u = O.meet({ proef: proefMet(route('/api/lid', 'member', { [c]: 1 }), route(pad, 'office', {}, 404)) });
+  assert.equal(u.perRoute.find(x => x.pad === '/api/lid').stand, 'open');
+  assert.ok(u.verlopen.ontvanger.some(v => v.startsWith(c + ' -> ')));
+  /* en als de meter de ontvanger ZELF ziet, is de aanwijzing overbodig en dus verlopen */
+  u = O.meet({ proef: proefMet(route('/api/lid', 'member', { [c]: 1 }), route(pad, 'office', { [c]: 1 })) });
+  assert.equal(u.perRoute.find(x => x.pad === '/api/lid').stand, 'gesloten');
+  assert.ok(u.verlopen.ontvanger.some(v => v.includes('niet meer nodig')));
+});
+
+test('11. gezien: een lezer in de bron van een andere groep, vermoed en zo gelabeld', () => {
+  const map = fs.mkdtempSync(path.join(require('os').tmpdir(), 'doodspoor-'));
+  const rel = path.relative(path.join(__dirname, '..'), path.join(map, 'lezer.js')).replace(/\\/g, '/');
+  fs.writeFileSync(path.join(map, 'lezer.js'), "module.exports = (db) => db.data.orders.length;\n");
+  try {
+    const u = O.meet({
+      proef: proefMet(route('/api/bestel', 'member', { orders: 1 }), route('/api/office/lees', 'office', {})),
+      routes: [{ methode: 'POST', pad: '/api/office/lees', bestand: rel }]
+    });
+    const r = u.perRoute.find(x => x.pad === '/api/bestel');
+    assert.equal(r.stand, 'gezien');
+    assert.equal(r.collecties[0].graad, 'vermoed');
+    assert.deepEqual(r.collecties[0].leest, ['kantoor']);
+  } finally { fs.rmSync(map, { recursive: true, force: true }); }
+});
+
+test('12. zonder routelijst zegt de uitslag dat "gezien" niet kon worden vastgesteld', () => {
+  const u = O.meet({ proef: proefMet(route('/api/x', 'member', { orders: 1 })) });
+  assert.ok(u.nietGezien.lezers && /routelijst/.test(u.nietGezien.lezers));
+});
+
+test('13. elke verklaring draagt een reden die iets zegt', () => {
+  for (const lijst of [O.INFRA, O.EIGEN])
+    for (const [k, v] of Object.entries(lijst)) assert.ok(typeof v === 'string' && v.length > 15, k + ' heeft geen reden');
+  for (const [k, v] of Object.entries(O.ONTVANGER)) {
+    assert.ok(/^(POST|GET) \/api\//.test(v.route), k + ': route zonder methode en pad');
+    assert.ok(v.reden && v.reden.length > 15, k + ' heeft geen reden');
+  }
+});
+
+test('14. het register bestaat, sluit, en heeft geen verlopen verklaringen', () => {
+  const j = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'DOODSPOOR.json'), 'utf8'));
+  const t = j.telling;
+  assert.ok(t.bronroutes > 0, 'nul bronroutes: de meter zag niets en mag niet groen zijn (LAT.md regel 3)');
+  assert.equal(t.gesloten + t.gezien + t.eigen + t.open, t.bronroutes, 'de vier standen tellen niet op tot het geheel');
+  assert.deepEqual(j.verlopen, { eigen: [], infra: [], ontvanger: [] }, 'verlopen verklaring in DOODSPOOR.json; draai npm run doodspoor:vast en ruim op');
+  assert.ok(j.grens && /geen poort/.test(j.grens), 'het register hoort te zeggen dat de eerste ronde geen poort is');
+});
+
+test('15. MAATSTAF.md telt zijn uitspraken zoals de tabel ze draagt', () => {
+  const tekst = fs.readFileSync(path.join(__dirname, '..', 'MAATSTAF.md'), 'utf8');
+  const rijen = tekst.split('\n').filter(l => /^\| U\d+ \|/.test(l));
+  assert.ok(rijen.length >= 20, 'de uitsprakentabel is te kort om een noemer te zijn');
+  const telling = {};
+  for (const r of rijen) {
+    const cellen = r.split('|').map(x => x.trim());
+    const uitkomst = cellen[cellen.length - 2].replace(/\*/g, '');
+    telling[uitkomst] = (telling[uitkomst] || 0) + 1;
+  }
+  const m = tekst.match(/Geteld uit de tabel: (\d+) uitspraken -- staat (\d+), stap weg (\d+), besluit (\d+), jaren weg (\d+), geprojecteerd (\d+)\./);
+  assert.ok(m, 'de telregel ontbreekt of heeft een andere vorm');
+  assert.equal(Number(m[1]), rijen.length, 'het totaal in de telregel is niet het aantal rijen');
+  assert.equal(Number(m[2]), telling['staat'] || 0, 'staat');
+  assert.equal(Number(m[3]), telling['stap weg'] || 0, 'stap weg');
+  assert.equal(Number(m[4]), telling['besluit'] || 0, 'besluit');
+  assert.equal(Number(m[5]), telling['jaren weg'] || 0, 'jaren weg');
+  assert.equal(Number(m[6]), telling['geprojecteerd'] || 0, 'geprojecteerd');
+  const onbekend = Object.keys(telling).filter(k => !['staat', 'stap weg', 'besluit', 'jaren weg', 'geprojecteerd'].includes(k));
+  assert.deepEqual(onbekend, [], 'een uitkomst die geen van de vijf is: ' + onbekend.join(', '));
+});

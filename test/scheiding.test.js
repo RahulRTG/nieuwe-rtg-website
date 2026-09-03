@@ -250,8 +250,15 @@ test('elke routehandler die een id uit het verzoek pakt, noemt ook de sessie', (
      Zonder deze naam meldde de scan POST /api/office/verify als "geen
      poortwachter", terwijl daar juist de STRENGSTE poort van het huis op staat.
      Dat is de gevaarlijke faalvorm van een structuurmeter: hij wees naar de
-     veiligste route die hij kon vinden. */
-  const POORT = /,\s*(auth|supplierAuth|officeAuth|techAuth|boardroomAuth|huisAuth|baasAuth|eigenaarAlleen|scimAuth|gezinsPoort|kluisAuth)\s*[,)]|\.\.\.lid\b/;
+     veiligste route die hij kon vinden.
+
+     `naamAuth` staat er sinds 3 september 2026 bij, en het is precies dezelfde
+     val: hij is DEZELFDE poort als kluisAuth met een andere reden (TAKEN.md
+     4.73) en hangt op de vier-ogen-uitgifte -- de plek waar een handtekening
+     onder een document komt. Zonder deze naam meldde de scan
+     POST /api/office/uitgifte/teken als "geen poortwachter", terwijl daar juist
+     de strengere van de twee kantoorsloten op zit. */
+  const POORT = /,\s*(auth|supplierAuth|officeAuth|techAuth|boardroomAuth|huisAuth|baasAuth|eigenaarAlleen|scimAuth|gezinsPoort|kluisAuth|naamAuth)\s*[,)]|\.\.\.lid\b/;
   /* Niet elke poort staat in de registratie. Een flink deel van het huis
      controleert in de handler zelf -- rtfSociaal(req, res), profiel(req, res),
      appSessie(req), rtf.verifieerProfiel(code, token) -- en stuurt bij twijfel

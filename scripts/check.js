@@ -1854,8 +1854,16 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
        Een gedeelde backoffice-code komt er niet door, want wat erachter gebeurt
        komt in het inzagejournaal en daar hoort een mens bij. Hij staat hier als
        eigen naam en niet als variant van officeAuth: dat is precies het
-       onderscheid dat deze regel zichtbaar hoort te maken. */
-    'kluisAuth', 'techAuth', 'boardroomAuth',
+       onderscheid dat deze regel zichtbaar hoort te maken.
+
+       `naamAuth` is DEZELFDE poort met een andere reden (TAKEN.md 4.73): hij
+       hangt op de vier-ogen-uitgifte, waar de ondertekenaar uit de body kwam --
+       zelfgetypte tekst onder een handtekening. Ook hij staat hier als eigen
+       naam, en dat is niet cosmetisch: toen de gedeelde implementatie eenmalig
+       een gedeelde naam kreeg, vielen beide deuren in de registers samen en
+       gingen acht routes rood. Een gedeelde implementatie mag geen gedeelde
+       identiteit worden. */
+    'kluisAuth', 'naamAuth', 'techAuth', 'boardroomAuth',
     'huisAuth', 'baasAuth', 'lid', 'geenGast', 'eigenaarAlleen', 'meetpoort', 'gastAuth',
     /* de gezinsdeur van het RTFoundation-huis (gezinscode + profieltoken, gasten
        erbuiten). Stond eerst als aanroep BINNEN de handler; is middleware geworden

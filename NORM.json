@@ -21,7 +21,7 @@
     "keuringTeGroot": 16,
     "inlineStijlAttributen": 4973,
     "browserpoortToetsen": 295,
-    "kernBreedte": 1517,
+    "kernBreedte": 1518,
     "kernGedeeld": 216,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
@@ -48,6 +48,15 @@
     "dbDeurenSchrijvend": 270
   },
   "notities": [
+    {
+      "datum": "2026-09-03",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1517,
+      "meter": "kernBreedte 1517 -> 1518",
+      "reden": "EEN kern-eigenschap erbij: kern.naamAuth, de poort die de vier-ogen-uitgifte op naam zet (TAKEN.md 4.73). Functieprijs en geen erosie -- en de goedkoopste vorm die er was: het is DEZELFDE poort als kluisAuth (kern/kantoor/kluispoort.js) met een andere reden, dus er komt implementatie noch controle bij, alleen een tweede instantie met een eigen naam. Wat hij repareert is dat de ondertekenaar bij een uitgifte met vier ogen uit req.body.wie kwam: zelfgetypte tekst onder een handtekening. Wie deze naam terugdraait, draait dat terug.",
+      "waarheen": "GRENZEN.json (het domein uitgifte draagt naamAuth bij naam), scripts/check.js regel 28, test/bewakersketen.test.js en test/scheiding.test.js -- alle vier kennen hem als eigen poort en niet als variant van officeAuth"
+    },
     {
       "datum": "2026-09-02",
       "soort": "schuld",

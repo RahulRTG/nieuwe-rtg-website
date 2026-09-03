@@ -78,6 +78,11 @@
      scripts/inlinestijl-proef.js: elk element, elke aangeraakte eigenschap,
      berekend in een echte browser. Letterlijk wat er stond -- geen ontwerpbesluit. */
   .i-186qv2{width:6rem}
+
+  /* Uit inline style-attributen gehaald door scripts/inlinestijl-omzet.js (TAKEN.md 4.51). Bewezen gelijk met
+     scripts/inlinestijl-proef.js: elk element, elke aangeraakte eigenschap,
+     berekend in een echte browser. Letterlijk wat er stond -- geen ontwerpbesluit. */
+  .i-11uf7p{font-size:.8rem;display:flex;gap:.35rem;align-items:center;color:var(--muted)}
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
@@ -107,7 +112,7 @@
       <span><label class="lbl" for="zVan">Aankomst</label><input class="veld" id="zVan" type="date"></span>
       <span><label class="lbl" for="zTot">Vertrek</label><input class="veld" id="zTot" type="date"></span>
       <span><label class="lbl" for="zGasten">Gasten</label><input class="veld" id="zGasten" type="number" min="1" max="20" value="2" style="width:4.5rem;"></span>
-      <label style="font-size:.8rem;display:flex;gap:.35rem;align-items:center;color:var(--muted);"><input type="checkbox" id="zInstant"> Instant boeken</label>
+      <label class="i-11uf7p"><input type="checkbox" id="zInstant"> Instant boeken</label>
       <button class="knop" id="zGo" data-hoofdactie>Zoek</button>
     </div>
     <div class="sec">Aanbod</div>
@@ -139,8 +144,8 @@
         <span><span class="lbl">Schoonmaak (€)</span><input class="i-186qv2 veld" id="nSchoon" type="number" min="0" value="0"></span>
         <span><span class="lbl">Weekkorting %</span><input class="i-186qv2 veld" id="nWeek" type="number" min="0" max="50" value="10"></span>
         <span><span class="lbl">Annulering</span><select class="veld" id="nAnnul"><option value="flex">Flexibel</option><option value="gemiddeld">Gemiddeld</option><option value="streng">Streng</option></select></span>
-        <label style="font-size:.8rem;display:flex;gap:.35rem;align-items:center;color:var(--muted);"><input type="checkbox" id="nInstant" checked> Instant</label>
-        <label style="font-size:.8rem;display:flex;gap:.35rem;align-items:center;color:var(--muted);"><input type="checkbox" id="nKeyless" checked> Keyless deurcode</label>
+        <label class="i-11uf7p"><input type="checkbox" id="nInstant" checked> Instant</label>
+        <label class="i-11uf7p"><input type="checkbox" id="nKeyless" checked> Keyless deurcode</label>
         <button class="knop" id="nZet">Zet live</button>
       </div>
       <div style="font-size:.76rem;color:var(--soft);margin-top:0.5rem;">RTG houdt 0% in; de uitbetaling staat gepland naar je RTG Rekening. Host en gast kennen elkaar als codenaam.</div>

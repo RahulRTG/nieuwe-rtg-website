@@ -73,13 +73,19 @@ app.post('/api/office/anker', officeAuth, (req, res) => {
    bestemming is genomen -- een tweede machine binnen RTG -- maar de post doet
    niets zolang er geen adres staat, en zegt dat dan ook. */
 app.post('/api/office/anker/post', officeAuth, async (req, res) => {
-  res.json(Object.assign({ ok: true, post: ankerpost.stand() }, await ankerpost.post()));
+  /* DE UITKOMST NEST, en dat is geen opmaak. Hier stond een Object.assign, en
+     die liet `ok: false` uit de post het `ok: true` van de ROUTE overschrijven.
+     Gevolg: geen bestemming las als een mislukte aanroep, terwijl er niets mis
+     is -- er is alleen nog geen tweede machine besloten. Precies het verschil
+     dat ankerpost.js overal bewaakt, weggegooid door een merge van twee velden
+     met dezelfde naam. Gevonden door test/integratie-routes.test.js toets 2. */
+  res.json({ ok: true, post: ankerpost.stand(), uitkomst: await ankerpost.post() });
 });
 
 /* Afrekenen met het blok dat op de tweede machine LIGT, in plaats van met een
    blok dat iemand hier overtypt. */
 app.post('/api/office/anker/post/reken', officeAuth, async (req, res) => {
-  res.json(Object.assign({ ok: true, post: ankerpost.stand() }, await ankerpost.afrekenen()));
+  res.json({ ok: true, post: ankerpost.stand(), uitkomst: await ankerpost.afrekenen() });
 });
 
 app.post('/api/office/anker/reken', officeAuth, (req, res) => {

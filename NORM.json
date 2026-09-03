@@ -1664,7 +1664,8 @@
       "sleutel": "kernGedeeld",
       "van": 232,
       "meter": "kernGedeeld 232 -> 234",
-      "reden": "De zware poort (kern/zwaarbewijs.js) hangt als EEN naam op de kern en wordt door drie domeinen gelezen: auth, techniek en kantoren. Dat is de koppeling die deze meter hoort te tellen, en hier is zij het doel en geen slijtage. Het alternatief was de poort per domein bouwen, en dan hadden die drie alle drie accounts, beveilig en appUrl in GRENZEN.json moeten bijschrijven -- het kantoor zou dan rechtstreeks in de identiteitskluis mogen kijken. Deze meter zou dan niet bewogen zijn en het huis was zwakker geweest. Aflossen is hier niet aan de orde; dit is een besluit."
+      "reden": "De zware poort (kern/zwaarbewijs.js) hangt als EEN naam op de kern en wordt door drie domeinen gelezen: auth, techniek en kantoren. Dat is de koppeling die deze meter hoort te tellen, en hier is zij het doel en geen slijtage. Het alternatief was de poort per domein bouwen, en dan hadden die drie alle drie accounts, beveilig en appUrl in GRENZEN.json moeten bijschrijven -- het kantoor zou dan rechtstreeks in de identiteitskluis mogen kijken. Deze meter zou dan niet bewogen zijn en het huis was zwakker geweest. Aflossen is hier niet aan de orde; dit is een besluit.",
+      "waarheen": "GRENZEN.json draagt het nu: auth, techniek en kantoren mogen elk exact EEN naam noemen (zwaarbewijs) en krijgen accounts/beveilig/appUrl NIET, wat server/opzet/domeingrens.js bij elke start afdwingt -- die grens sloeg tijdens de bouw ook echt aan. Dat de poort werkelijk bijt, draagt test/eigenaarbevestiging.test.js (elf beweringen over de echte routes, twee mutaties gezien zakken)."
     },
     {
       "datum": "2026-09-03",
@@ -1672,7 +1673,8 @@
       "sleutel": "kernBreedte",
       "van": 1540,
       "meter": "kernBreedte 1540 -> 1544",
-      "reden": "Zelfde wijziging als kernGedeeld: vier kern-eigenschappen erbij doordat drie domeinen en de montage naar dezelfde poort reiken (kern.zwaarbewijs, kern.zwaarBeveiliging). Breedte die terugkomt als EEN gedeelde poort in plaats van drie eigen kopieen."
+      "reden": "Zelfde wijziging als kernGedeeld: vier kern-eigenschappen erbij doordat drie domeinen en de montage naar dezelfde poort reiken (kern.zwaarbewijs, kern.zwaarBeveiliging). Breedte die terugkomt als EEN gedeelde poort in plaats van drie eigen kopieen.",
+      "waarheen": "Zelfde dragers als kernGedeeld: GRENZEN.json plus server/opzet/domeingrens.js voor de reikwijdte, test/eigenaarbevestiging.test.js voor de werking. De breedte die erbij kwam is EEN gedeelde poort (kern/zwaarbewijs.js) in plaats van drie eigen kopieen, en dat is precies wat LAT.md regel 4 vraagt."
     },
     {
       "datum": "2026-09-03",

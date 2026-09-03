@@ -1,27 +1,27 @@
 {
  "stempel": {
-  "op": "2026-09-03T11:41:19.600Z",
-  "commit": "44f4c264",
+  "op": "2026-09-03T18:58:35.888Z",
+  "commit": "ab29358ed",
   "boomVuil": false,
-  "boomAnders": 2,
+  "boomAnders": 6,
   "instrument": "scripts/mutatiecontract.js",
-  "node": "v22.22.2"
+  "node": "v24.18.0"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 4824,
-  "geclassificeerd": 4824,
+  "totaal": 4827,
+  "geclassificeerd": 4827,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3274,
    "NOT_APPLICABLE": 1121,
    "PROTECTED": 323,
-   "INTENTIONALLY_NON_IDEMPOTENT": 106
+   "INTENTIONALLY_NON_IDEMPOTENT": 109
   },
-  "vastgesteldDoorMens": 1578,
+  "vastgesteldDoorMens": 1581,
   "afgeleidDoorScript": 3246,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 3975,
+   "AUTHENTICATED": 3978,
    "PUBLIC": 117,
    "OBJECT_SCOPED": 716,
    "(niet af te leiden -- vraagt een verklaring)": 1,
@@ -32,7 +32,7 @@
    "kale ronde: beschermd": 129,
    "kale ronde: onbeschermd": 88,
    "kale ronde: geen uitspraak": 4512,
-   "niet gemeten": 95
+   "niet gemeten": 98
   },
   "voorstellen": {},
   "metingVan": "2026-09-01T16:38:26.262Z"
@@ -55230,6 +55230,27 @@
     "hindernis": null
    },
    "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "zwaar.opties.boardroom",
+   "route": "POST /api/office/boardroom/bevestig/opties",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "boardroomAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
@@ -119876,6 +119897,28 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "zwaar.opties.techniek",
+   "route": "POST /api/techniek/bevestig/opties",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "techAuth",
+     "eigenaarAlleen"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "techniek.controle.incident",
    "route": "POST /api/techniek/controle/incident",
    "semantiek": {
@@ -125302,6 +125345,27 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "zwaar.opties.passkey",
+   "route": "POST /api/webauthn/bevestig/opties",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "een eigen RTG-account",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },

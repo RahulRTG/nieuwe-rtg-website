@@ -1,11 +1,11 @@
 {
  "stempel": {
-  "op": "2026-09-03T11:41:19.292Z",
-  "commit": "44f4c264",
+  "op": "2026-09-03T18:58:30.094Z",
+  "commit": "ab29358ed",
   "boomVuil": false,
-  "boomAnders": 1,
+  "boomAnders": 3,
   "instrument": "scripts/handlerwacht.js",
-  "node": "v22.22.2"
+  "node": "v24.18.0"
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
@@ -3933,13 +3933,13 @@
   },
   {
    "sleutel": "POST /api/webauthn/login",
-   "bestand": "server/routes/auth/webauthn.js:50",
+   "bestand": "server/routes/auth/webauthn.js:71",
    "staat": "openbaar",
    "reden": "de tegenhanger van /api/webauthn/opties: de ondertekende uitdaging IS het bewijs, en die geldt eenmalig"
   },
   {
    "sleutel": "POST /api/webauthn/opties",
-   "bestand": "server/routes/auth/webauthn.js:43",
+   "bestand": "server/routes/auth/webauthn.js:64",
    "staat": "openbaar",
    "reden": "de uitdaging moet er zijn VOOR je hem kunt beantwoorden; het bewijs volgt bij /login"
   },

@@ -545,6 +545,66 @@ keuring heeft gelijk: zij kan niet zien dat het een voorbeeld is, en een
 uitzondering voor commentaar zou precies de plek openzetten waar iemand een echte
 import verstopt.
 
+### 0.9 De eerste bewezen route — en waarom er nul waren (3 september 2026)
+
+Na §0.8 stond er dat gedrag (<!--getal:codewereld.bronGedragPct-->36.9<!--/getal-->%) alleen omhoog gaat met méér bewijs,
+en dat `VERTROUWEN.json` huisbreed op **0 bewezen** staat. Dat getal is
+nagetrokken, en het bleek geen achterstand maar een **fout in de bewijsketen**.
+
+**De diagnose, in drie stappen.** Van de 4180 routes in het register staat er één
+op één schakel van bewezen: `POST /api/pay/oplaad` mist alleen `AUDIT`. Zeventien
+routes missen er twee. Tegelijk zegt `AUDITPROEF.json` voor precies die route:
+`"audit": "bewezen", "reden": "de handeling staat in het spoor"`.
+
+Beide waar, en dus was er iets stuk tussen de proef en de matrix.
+
+**De oorzaak.** `scripts/bewijsmatrix.js` heeft **drie** takken voor de
+AUDIT-cel. De tweede leest de handelingproef en zette de cel op `ongemeten` óók
+als die proef niets wist — met een `continue` erachter. Daarmee was de derde tak,
+die `AUDITPROEF.json` als lijst leest, **onbereikbaar**. 3635 gemeten routes
+werden weggegooid.
+
+Het pijnlijke detail: precies die fout staat in datzelfde bestand al uitgeschreven
+als *opgelost*, in een commentaarblok van vijftien regels bij de eerste tak. Hij
+was niet opgelost maar **verhuisd**.
+
+**Het gevolg van de reparatie**, gemeten met en zonder:
+
+| | zonder | met |
+|---|---|---|
+| AUDIT-cellen bewezen | 709 | **1041** |
+| cellen bewezen totaal | 25.453 | 25.785 |
+| routes `bewezen` (vers gerekend) | 0 | **1** |
+
+Verder beweegt er niets: `verklaard`, `nvt` en `gezakt` zijn identiek. En
+`POST /api/pay/oplaad` — de oplaadroute van RTG Pay — draagt nu **elf van de elf
+cellen**, van AUTH tot ROLLBACK.
+
+**Wat dit NIET betekent.** Het register zegt nog steeds 0, en dat blijft zo:
+`scripts/vertrouwen.js --vastleggen` **weigert** te schrijven omdat alle acht
+bronregisters op andere commits zijn gemeten. Die weigering is de meter die zijn
+werk doet — een route die ten onrechte `geschorst` heet, zou door de bewijspoort
+worden geweigerd, en dan staat er software stil om een meting die niet bij deze
+versie hoort. De weg vooruit staat in zijn eigen uitvoer: draai de acht proeven
+opnieuw op deze boom, dán vastleggen.
+
+Twee dingen die de verse berekening bovendien laat zien en het register niet:
+**44 routes staan op `geschorst`** waar het register er 0 kent (een cel die zegt
+dat het bewijs zakt), en de verzwakte groep is 4180 → 4786. Wie het register
+citeert zonder zijn stempel te lezen, citeert 20 augustus.
+
+**En waarom 0 óók zonder deze fout laag zou blijven.** `bewezen` eist alle elf
+cellen. Twee daarvan — `FAILURE` en `ROLLBACK` — komen alleen uit de ketenronde,
+en die dekt **twee routes**: `POST /api/pay/oplaad` en `POST /api/notities/bewaar`.
+Voor de overige ~4800 routes is `FAILURE` structureel ongemeten, en geen enkele
+hermeting verandert dat. Het getal 0 was dus voor de helft een fout en voor de
+helft een **definitie**: zolang er geen per-route failure-instrument is, kan dit
+huis er hooguit twee bewijzen.
+
+`test/bewijsmatrix-audit.test.js` bewaakt niet de uitkomst van de kolom (dat is
+een meting en die mag bewegen) maar de **bereikbaarheid van de tweede bron**.
+Twee van zijn vier toetsen zakken op de oude matrix.
+
 ---
 
 ## 1. De invariant, en waarom hij in code staat
@@ -761,8 +821,16 @@ Wat er ná deze ronde nog ligt, in volgorde van wat het waard is:
 
 - **De gedragsteller staat op <!--getal:codewereld.bronGedragPct-->36.9<!--/getal-->%** en dat is nog steeds het enige getal dat
   telt voor "klopt het". Structuur en relaties zijn compleet; gedrag is een
-  derde. Dat lost geen graaf op — daar is meer BEWIJS voor nodig, en
-  `VERTROUWEN.json` staat huisbreed op 0 bewezen.
+  derde. Dat lost geen graaf op — daar is meer BEWIJS voor nodig. §0.9 laat zien
+  waar dat op vastzit, en het was niet wat het leek: één helft was een fout in
+  de bewijsketen (gerepareerd, eerste bewezen route), de andere helft is een
+  **definitie** — `FAILURE` en `ROLLBACK` komen alleen uit de ketenronde, en die
+  dekt twee routes. Zonder een per-route failure-instrument blijft `bewezen`
+  onbereikbaar voor de overige ~4800, hoe vaak je de proeven ook draait.
+- **De acht bronregisters zijn van andere commits**, dus `VERTROUWEN.json` mag
+  niet worden bijgewerkt en staat op 20 augustus. Dat is de eerstvolgende
+  concrete klus: de acht proeven op deze boom draaien, dán vastleggen. Pas
+  daarna zegt het register wat de code van vandaag waard is.
 - **De restbak van de aanroepgraaf** is nu <!--getal:graaf.overig-->361<!--/getal--> aanroepen (2,3%). Dat is klein
   genoeg om met de hand door te lopen, en groot genoeg om er iets in te vinden.
 - **De 32 onopgeloste vulplekken** van `KERNHERKOMST.json`: drie spreads en een

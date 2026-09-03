@@ -766,7 +766,11 @@ drie gebeurtenissen** die er als een knop uitzien terwijl GELD.md erboven staat,
 en de **executiekaart is een projectie en nooit een bron** -- wie hem met de hand
 kan bijwerken heeft de 22e capabilitylijst gemaakt. Let op par. 5 voor je een
 volgorde kiest: `VERTROUWEN.json` staat op **0 bewezen, 0 geschorst en 4180
-verzwakt**, dus de bewijspoort houdt vandaag niets tegen en de regel "onbekende
+verzwakt** -- maar dat register draagt het stempel van 20 augustus en zijn acht
+bronnen zijn op andere commits gemeten, dus `--vastleggen` weigert terecht; VERS
+gerekend is het 1 bewezen (sinds de reparatie in CODE.md par. 0.9), 44 GESCHORST
+en 4786 verzwakt. Wie het register citeert zonder zijn stempel te lezen, citeert
+20 augustus. De bewijspoort houdt vandaag niets tegen en de regel "onbekende
 uitvoeringssemantiek krijgt nooit maximale autonomie" zet nu ALLES op het
 minimum -- die hoort dus eerst in de schaduw te lopen. De stuurmaat is niet
 "wanneer hebben we Mijn AI" maar **wanneer kan RTG een volledige keten

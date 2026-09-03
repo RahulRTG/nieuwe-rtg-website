@@ -55,7 +55,12 @@ function roepers(cap) {
        caller binnen de eigen module is geen caller. */
     const rel = path.relative(ROOT, f);
     if (rel.endsWith('kern/service/teams.js') || rel.endsWith('kern/service/machtiging-grenzen.js')) continue;
-    if (new RegExp('magNu\\([^)]*[\'"]' + cap.replace(/\./g, '\\.') + '[\'"]').test(t)) uit.push(rel);
+    /* De naam gaat als LETTERLIJKE tekenreeks de regex in: elk metateken
+       ontsnapt, niet alleen de punt (CodeQL: incomplete string escaping). Een
+       capability heet 'bank.gegevens' en draagt geen backslash, maar een
+       ontsnapping die de helft doet is er geen. */
+    const letterlijk = cap.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    if (new RegExp('magNu\\([^)]*[\'"]' + letterlijk + '[\'"]').test(t)) uit.push(rel);
   }
   return uit;
 }

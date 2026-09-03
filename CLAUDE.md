@@ -810,7 +810,9 @@ afkapgrens van vijftien sneed midden in een GELIJKE score, dus /api/bank/pas/bet
 viel op alfabet af terwijl /api/bank/advies bleef. Een gelijke score afkappen is
 willekeur, en willekeur verbergt een vermogen zonder dat iemand het merkt.
 **En meetgetallen in de documenten verouderen niet meer**: `npm run getallen`
-schrijft ze tussen merktekens uit de registers (`<!--getal:idem.ongemeten-->`), en
+schrijft ze tussen merktekens uit de registers (`<!--getal:idem.ongemeten-->3156<!--/getal-->`,
+en dit voorbeeld is er zelf een: een merkteken ZONDER sluittag slokt het
+eerstvolgende getal in het document op, en dat is precies een keer gebeurd), en
 `test/getallen.test.js` zakt zodra een document iets anders beweert dan zijn
 register -- inclusief een zelfijking die een met opzet verkeerd getal moet vinden.
 Nul merktekens is daar geen "in orde" maar een gezakte meter. **Blok 1 staat**: `EXECUTION_MAP.json`
@@ -941,6 +943,37 @@ duur, want een ontbrekende meting hoort de keten trager te maken en nooit
 stiller. Diezelfde weging stond tot 28 augustus 2026 al in `scripts/scherf.js`
 en ging bij een verhuizing naar `test:deel` verloren; dat script en zijn eigen
 register zijn opgeruimd.
+
+**`CODE.md` is de laag waarin RTG naar zijn EIGEN software kijkt** -- de Code
+Intelligence Plane, als richtingsdocument met per onderdeel of het **staat**,
+**een stap weg** is, **een besluit vraagt** of **jaren weg** is. Lees die vóór je
+de interne AI iets over de eigen code laat zeggen. De kern in één zin: **de
+runtime-AI bestuurt RTG en komt nooit aan de bron; de meters lezen de bron en
+bedienen niets** -- en die scheiding bestaat vandaag gratis, dus geef hem niet
+weg. Dat is `CODE-AI-001`, en hij staat niet in een document maar in
+`test/codegrens.test.js`, want een document houdt niemand tegen die morgen
+`readFileSync` schrijft. De grens is scherper dan "geen fs" en dat bleek pas bij
+het meten: de sluiting van het stuur is klein en precies één module leest van
+schijf -- `VERTROUWEN.json`, een REGISTER. Een register lezen mag, een `.js`
+lezen niet; dát onderscheid is de invariant. De vraag of de 77 registers samen
+één Codewereld vormen is eerst GEMETEN (`npm run codewereld`, `CODEWERELD.json`)
+in plaats van aangenomen -- zelfde reden als bij `Asset`: <!--getal:codewereld.ruggengraat-->4912<!--/getal--> van
+<!--getal:codewereld.paden-->5709<!--/getal--> paden staan in meer dan één register, dus er IS een ruggengraat, maar hij
+loopt over de as ROUTE. De as SYMBOOL is **nul** -- geen register kent een
+functienaam met een plaats, dus het objectvoorbeeld `pay.boeken` met een
+`symbol`-veld belooft iets wat geen enkele meter vult. Bouwbaar is het wel, en
+dat is beproefd en niet beloofd: de eigen parser in `scripts/ast/` haalt
+<!--getal:codewereld.geparsed-->3027<!--/getal--> serverbestanden met <!--getal:codewereld.parseFout-->0<!--/getal--> fouten en <!--getal:codewereld.symbolen-->13832<!--/getal--> symbolen in
+enkele seconden. Twee dingen daar niet wegpoetsen: de brug route -> bestand rust
+op ÉÉN register, dus de nul tegenspraken erin is `niet vast te stellen` en geen
+groen (getoetst op <!--getal:codewereld.brugDekkingPct-->0.7<!--/getal-->% van de paden), en het bronbereik is
+<!--getal:codewereld.bronPct-->33<!--/getal-->% -- tweederde van de bronbestanden wordt door geen enkel register
+genoemd, dus een "80-95% zonder bron te beantwoorden" haalt die grens vandaag
+niet -- en dat ene getal verbergt nog iets, want `server/` haalt
+<!--getal:codewereld.bronServerPct-->41.3<!--/getal-->% en `public/` <!--getal:codewereld.bronPublicPct-->6.6<!--/getal-->%: over de schermen weten de registers
+vrijwel niets. De regel die het geheel draagt: **AI mag betekenis voorstellen, alleen
+deterministische systemen mogen waarheid vaststellen** -- een modelbevinding
+wordt dus nooit een register.
 
 **`LAT.md` is de technische lat** — elf regels die allemaal uit een fout komen die hier écht is gemaakt, met per regel wat hem handhaaft en waar er alleen op mensen wordt vertrouwd. Lees die vóór je code schrijft of repareert. De belangrijkste twee: repareer de oorzaak en niet het symptoom, en trek elke bewering na met een mutatie (een toets die je niet hebt zien zakken is geen toets). LAT.md gaat over de code, CLAUDE.md over het merk.
 

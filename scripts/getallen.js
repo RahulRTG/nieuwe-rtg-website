@@ -62,13 +62,48 @@ const GETALLEN = {
   'semantiek.namen': { bron: 'SEMANTIEK.json', veld: 'namenInMeerDomeinen',
     wat: 'namen die in meer dan een domein voorkomen' },
   'semantiek.betekenissen': { bron: 'SEMANTIEK.json', veld: 'woordenMetMeerBetekenissen',
-    wat: 'namen die meer dan een betekenis dragen' }
+    wat: 'namen die meer dan een betekenis dragen' },
+  'codewereld.registers': { bron: 'CODEWERELD.json', veld: 'registers.geteld',
+    wat: 'registers in de wortel die iets over deze code beweren' },
+  'codewereld.paden': { bron: 'CODEWERELD.json', veld: 'ruggengraat.paden',
+    wat: 'losse paden die de registers samen kennen' },
+  'codewereld.ruggengraat': { bron: 'CODEWERELD.json', veld: 'ruggengraat.inMeerDanEenRegister',
+    wat: 'paden die in meer dan een register staan -- de ruggengraat van een Codewereld' },
+  'codewereld.ruggengraatPct': { bron: 'CODEWERELD.json', veld: 'ruggengraat.pct',
+    wat: 'diezelfde ruggengraat als percentage' },
+  'codewereld.brugPaden': { bron: 'CODEWERELD.json', veld: 'brug.paden',
+    wat: 'paden waarvoor een register een bestand noemt' },
+  'codewereld.brugToetsbaar': { bron: 'CODEWERELD.json', veld: 'brug.tegenspraakToetsbaar',
+    wat: 'paden waar TWEE registers een bestand noemen -- alleen daar valt tegenspraak vast te stellen' },
+  'codewereld.brugDekkingPct': { bron: 'CODEWERELD.json', veld: 'brug.tegenspraakDekkingPct',
+    wat: 'die toetsbare paden als percentage van de brug' },
+  'codewereld.bronBestanden': { bron: 'CODEWERELD.json', veld: 'bronbereik.bestanden',
+    wat: 'bronbestanden die er echt staan' },
+  'codewereld.bronGenoemd': { bron: 'CODEWERELD.json', veld: 'bronbereik.genoemd',
+    wat: 'daarvan genoemd door enig register' },
+  'codewereld.bronPct': { bron: 'CODEWERELD.json', veld: 'bronbereik.pct',
+    wat: 'het bronbereik als percentage -- de bovengrens zonder bronlezing' },
+  'codewereld.symbolen': { bron: 'CODEWERELD.json', veld: 'assen.symbool.proef.symbolen',
+    wat: 'benoemde symbolen die de eigen parser in server/ vindt' },
+  'codewereld.geparsed': { bron: 'CODEWERELD.json', veld: 'assen.symbool.proef.geparsed',
+    wat: 'serverbestanden die de eigen parser aankon' },
+  'codewereld.parseFout': { bron: 'CODEWERELD.json', veld: 'assen.symbool.proef.gefaald',
+    wat: 'serverbestanden waarop die parser stukliep' },
+  'codewereld.bronServerPct': { bron: 'CODEWERELD.json', veld: 'bronbereik.serverPct',
+    wat: 'bronbereik binnen server/ -- daar kijken de meters' },
+  'codewereld.bronPublicPct': { bron: 'CODEWERELD.json', veld: 'bronbereik.publicPct',
+    wat: 'bronbereik binnen public/ -- daar hebben de meters vrijwel niets' },
+  /* De duur van die parseronde staat MET OPZET niet in deze lijst. Een levend
+     getal moet uit een register komen dat bij gelijke code hetzelfde zegt; een
+     tijdmeting doet dat niet (4,6 of 4,8 op dezelfde commit), en een controle
+     die willekeurig zakt leert mensen hem te negeren. Hij staat in
+     CODEWERELD.json en in CODE.md als orde van grootte. */
 };
 
 /* De documenten die merktekens mogen dragen. Bewust een lijst en geen glob over
    alles: een generator die elk .md-bestand mag herschrijven, herschrijft op een
    dag ook iets dat niemand had bedoeld. */
-const DOCUMENTEN = ['CLAUDE.md', 'CREATE.md', 'EXECUTIE.md', 'OS.md', 'BEWIJSMACHINE.md'];
+const DOCUMENTEN = ['CLAUDE.md', 'CREATE.md', 'EXECUTIE.md', 'OS.md', 'BEWIJSMACHINE.md', 'CODE.md'];
 
 const MERK = /<!--getal:([a-zA-Z0-9._-]+)-->([\s\S]*?)<!--\/getal-->/g;
 

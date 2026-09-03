@@ -81,6 +81,12 @@ const REGELS = [
      `/api/tenant` als codepunt: een regel die de routes wel pakt en de functie
      niet, dekt de helft en meldt zich niet. */
   [/\/api\/tenant\/(?:export|herstelproef|status)/, 'juridisch', 'Juridisch'],
+  /* Het herstel van het eigenaarsaccount (EIGENAAR.md par. 5). Bij Intern & IT
+     en niet bij Techniek: dit gaat over de SLEUTELS van een account, net als
+     /api/webauthn, en niet over de gezondheid van het systeem. Expliciet
+     opgeschreven omdat de terugval hier rood is -- onbekend werk hoort niet
+     stilletjes bij Onderzoek te belanden. */
+  [/\/api\/herstel\/eigenaar(?:\/|$)|\/api\/techniek\/herstel(?:\/|$)/, 'intern', 'Intern & IT'],
   [/\/api\/tenant(?:\/|$)/, 'intern', 'Intern & IT'],
   /* SCIM (routes/scim.js) is de deur waar de IdP van een klant zelf accounts
      aanmaakt en uitzet: toegangsbeheer, dezelfde familie als de bootstrap. */

@@ -69,21 +69,113 @@ for (const rel of bestanden('server')) {
 /* De namen die een FUNCTIE teruggeeft: het laatste `return { ... }` op het eigen
    niveau. Nested functies worden overgeslagen -- daar staat de uitvoer van iets
    anders. */
+/* De namen die een uitdrukking in RETURN-positie oplevert. Drie vormen, en de
+   tweede en derde zijn er omdat ze samen het merendeel van de fabrieken in dit
+   huis dekken:
+
+     return { a, b }                 letterlijk
+     return Object.assign({ a }, x)  samengevoegd -- de letterlijke helft telt,
+                                     en wat er verder in gaat maakt de lijst
+                                     onvolledig als het niet te volgen is
+     return api                      een lokaal object dat eerder is gebouwd
+
+   Wat NIET wordt gevolgd is een hulpfunctie die de sleutels verbouwt
+   (`huisNaam(obj, 'Rtf')` hangt een achtervoegsel aan elke naam). Dat zou
+   betekenen dat deze meter de betekenis van een specifieke functie uit het hoofd
+   kent, en dan klopt hij precies tot iemand die functie verandert. Zulke plekken
+   blijven onopgelost, met de naam van de hulpfunctie in de reden. */
+function namenUitRetour(expr, lokaal, diepte, vanBuiten) {
+  if (!expr || diepte > 3) return null;
+  if (expr.type === 'ObjectExpression') {
+    const namen = [];
+    let onvolledig = false, doorgegeven = 0;
+    for (const p of expr.properties || []) {
+      if (p.type === 'SpreadElement') { onvolledig = true; continue; }
+      if (!p.key || !p.key.name) continue;
+      /* DOORGEVEN IS GEEN HERKOMST. `maakMobiliteit(state)` doet
+         `const { db, save } = state` en geeft die via een gedeelde context weer
+         terug. Zonder deze regel heet mobiliteit de herkomst van kern.db -- en
+         dat is precies de verkeerde module aanwijzen, wat erger is dan niets
+         weten. Een naam telt alleen als zijn WAARDE hier ontstaat, niet als hij
+         hier doorheen reist. */
+      const w = p.value;
+      if (w && w.type === 'Identifier' && vanBuiten && vanBuiten.has(w.name)) { doorgegeven++; continue; }
+      namen.push(p.key.name);
+    }
+    return { namen, onvolledig, doorgegeven };
+  }
+  if (expr.type === 'Identifier' && lokaal && lokaal.has(expr.name)) {
+    return namenUitRetour(lokaal.get(expr.name), lokaal, diepte + 1, vanBuiten);
+  }
+  if (expr.type === 'CallExpression' && expr.callee && expr.callee.type === 'MemberExpression' &&
+      expr.callee.object && expr.callee.object.name === 'Object' &&
+      expr.callee.property && expr.callee.property.name === 'assign') {
+    const namen = []; let onvolledig = false, doorgegeven = 0;
+    for (const arg of expr.arguments || []) {
+      const r = namenUitRetour(arg, lokaal, diepte + 1, vanBuiten);
+      if (!r) { onvolledig = true; continue; }
+      namen.push(...r.namen);
+      doorgegeven += r.doorgegeven || 0;
+      if (r.onvolledig) onvolledig = true;
+    }
+    return { namen, onvolledig, doorgegeven };
+  }
+  return null;
+}
+
+/* Elke naam die een patroon bindt, hoe diep ook genest. Zelfde functie als in
+   scripts/aanroepgraaf.js, en om dezelfde reden: een array- of objectpatroon in
+   een parameterlijst bindt namen die je anders niet ziet. */
+function patroonNamen(knoop, uit) {
+  if (!knoop || typeof knoop !== 'object') return uit;
+  switch (knoop.type) {
+    case 'Identifier': if (knoop.name) uit.add(knoop.name); break;
+    case 'ObjectPattern':
+      for (const p of knoop.properties || []) {
+        if (p.type === 'RestElement') patroonNamen(p.argument, uit);
+        else patroonNamen(p.value || p.key, uit);
+      }
+      break;
+    case 'ArrayPattern': for (const el of knoop.elements || []) patroonNamen(el, uit); break;
+    case 'AssignmentPattern': patroonNamen(knoop.left, uit); break;
+    case 'RestElement': patroonNamen(knoop.argument, uit); break;
+    default: break;
+  }
+  return uit;
+}
+
 function returnNamen(fn) {
   if (!isFunctie(fn)) return null;
   let gevonden = null, onvolledig = false;
+  /* De objecten die op het EIGEN niveau van deze functie worden verklaard --
+     nodig voor `const api = {...}; ... return api;` */
+  const lokaal = new Map();
+  /* Wat deze fabriek van BUITEN krijgt: zijn eigen parameters, en alles wat
+     daar rechtstreeks uit wordt uitgepakt. */
+  const vanBuiten = new Set();
+  for (const par of fn.params || []) patroonNamen(par, vanBuiten);
+  (function verzamel(knoop, diepte) {
+    if (!knoop || typeof knoop !== 'object') return;
+    if (Array.isArray(knoop)) { for (const k of knoop) verzamel(k, diepte); return; }
+    if (typeof knoop.type !== 'string') return;
+    if (diepte > 0 && (isFunctie(knoop) || knoop.type === 'MethodDefinition')) return;
+    if (knoop.type === 'VariableDeclarator' && knoop.id && knoop.id.name && knoop.init) lokaal.set(knoop.id.name, knoop.init);
+    if (knoop.type === 'VariableDeclarator' && knoop.id && knoop.id.type === 'ObjectPattern' &&
+        knoop.init && knoop.init.type === 'Identifier' && vanBuiten.has(knoop.init.name)) patroonNamen(knoop.id, vanBuiten);
+    for (const sleutel in knoop) {
+      if (sleutel === 'start' || sleutel === 'end' || sleutel === 'lijn') continue;
+      const v = knoop[sleutel];
+      if (v && typeof v === 'object') verzamel(v, diepte + 1);
+    }
+  })(fn.body, 0);
   (function daal(knoop, diepte) {
     if (!knoop || typeof knoop !== 'object') return;
     if (Array.isArray(knoop)) { for (const k of knoop) daal(k, diepte); return; }
     if (typeof knoop.type !== 'string') return;
     if (diepte > 0 && (isFunctie(knoop) || knoop.type === 'MethodDefinition')) return;   // niet in een geneste functie
-    if (knoop.type === 'ReturnStatement' && knoop.argument && knoop.argument.type === 'ObjectExpression') {
-      const namen = [];
-      for (const p of knoop.argument.properties || []) {
-        if (p.type === 'SpreadElement') { onvolledig = true; continue; }
-        if (p.key && p.key.name) namen.push(p.key.name);
-      }
-      gevonden = namen;                                    // de laatste wint
+    if (knoop.type === 'ReturnStatement' && knoop.argument) {
+      const r = namenUitRetour(knoop.argument, lokaal, 0, vanBuiten);
+      if (r && r.namen.length) { gevonden = r.namen; if (r.onvolledig) onvolledig = true; }  // de laatste wint
     }
     for (const sleutel in knoop) {
       if (sleutel === 'start' || sleutel === 'end' || sleutel === 'lijn') continue;
@@ -194,6 +286,7 @@ function bindingenVan(rel) {
   return uit;
 }
 
+const BASISBESTAND = 'server/server.js';        // waar de zak wordt gemaakt
 const perNaam = new Map();                     // kernnaam -> [{bestand, hoe, via}]
 const onopgelost = [];
 let basisNamen = 0, plekken = 0;
@@ -207,8 +300,20 @@ function noteer(naam, herkomst) {
 for (const [rel, ast] of bomen) {
   const bindingen = bindingenVan(rel);
   loop(ast, n => {
-    /* 1) het basisobject */
-    if (n.type === 'VariableDeclarator' && n.id && n.id.name === 'kern' && n.init && n.init.type === 'ObjectExpression') {
+    /* 1) HET basisobject -- en alleen dat ene.
+
+       Hier stond `elke const kern = {...}`, en dat gaf meteen een verkeerde
+       herkomst: server/kern/command/journaal.js bouwt een LOKAAL object dat
+       toevallig `kern` heet, en daarmee kregen namen als `id` en `herkomst` een
+       tweede, verzonnen oorsprong. Precies de fout waar dit register tegen zou
+       moeten beschermen -- een herkomst die je naar de verkeerde module wijst is
+       erger dan geen herkomst.
+
+       De zak wordt op een plek GEMAAKT (server/server.js) en op veel plekken
+       uitgebreid. Alleen die ene plek telt als basisobject; het uitbreiden loopt
+       via de twee regels hieronder, en dat mag overal. */
+    if (rel === BASISBESTAND && n.type === 'VariableDeclarator' && n.id && n.id.name === 'kern' &&
+        n.init && n.init.type === 'ObjectExpression') {
       plekken++;
       for (const p of n.init.properties || []) {
         if (p.type === 'SpreadElement') { onopgelost.push({ bestand: rel, lijn: n.lijn, vorm: 'basis', reden: 'een spread in het basisobject' }); continue; }

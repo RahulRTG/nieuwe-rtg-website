@@ -3,32 +3,17 @@
  "uitleg": "Welke module heeft welke naam op het contextobject gezet. Drie vormen: het basisobject, een directe toewijzing, en Object.assign met een fabriek -- die laatste gelezen uit het laatste letterlijke return-object van die fabriek.",
  "stempel": {
   "op": "2026-09-03",
-  "commit": "981df130"
+  "commit": "db63488d"
  },
  "grens": "Er wordt niet geraden. Een samenvoeging die niet te volgen is levert geen naam maar een regel in `onopgelost`, met de reden. Een herkomst die je naar de verkeerde module wijst is erger dan geen herkomst.",
  "gemeten": {
-  "namen": 1120,
-  "vulplekken": 282,
-  "basisNamen": 473,
-  "namenMetMeerdereHerkomsten": 1,
-  "onopgelost": 32
+  "namen": 1190,
+  "vulplekken": 280,
+  "basisNamen": 453,
+  "namenMetMeerdereHerkomsten": 0,
+  "onopgelost": 28
  },
- "meerdereHerkomsten": [
-  {
-   "naam": "herkomst",
-   "herkomsten": [
-    {
-     "bestand": "server/kern/tenant/merkkern.js",
-     "hoe": "basisobject"
-    },
-    {
-     "bestand": "server/kern/fiscaal/herkomst.js",
-     "hoe": "fabriek maakHerkomst",
-     "via": "server/opzet/kernlaag4c.js"
-    }
-   ]
-  }
- ],
+ "meerdereHerkomsten": [],
  "onopgelost": [
   {
    "bestand": "server/opzet/aanbouw2.js",
@@ -40,7 +25,7 @@
    "bestand": "server/opzet/aanbouw2.js",
    "lijn": 70,
    "vorm": "Object.assign",
-   "reden": "de bron draagt een spread, dus deze lijst is onvolledig"
+   "reden": "server/kern/verzorging.js geeft geen letterlijk object terug"
   },
   {
    "bestand": "server/opzet/aanbouw2.js",
@@ -98,12 +83,6 @@
   },
   {
    "bestand": "server/opzet/kernlaag3.js",
-   "lijn": 153,
-   "vorm": "Object.assign",
-   "reden": "server/kern/lifestyle/index.js geeft geen letterlijk object terug"
-  },
-  {
-   "bestand": "server/opzet/kernlaag3.js",
    "lijn": 155,
    "vorm": "Object.assign",
    "reden": "server/kern/rechterhand/index.js geeft geen letterlijk object terug"
@@ -130,7 +109,7 @@
    "bestand": "server/opzet/kernlaag4.js",
    "lijn": 64,
    "vorm": "Object.assign",
-   "reden": "server/kern/pulse/index.js geeft geen letterlijk object terug"
+   "reden": "de bron draagt een spread, dus deze lijst is onvolledig"
   },
   {
    "bestand": "server/opzet/kernlaag4.js",
@@ -154,13 +133,7 @@
    "bestand": "server/opzet/kernlaag4b.js",
    "lijn": 139,
    "vorm": "Object.assign",
-   "reden": "server/kern/onderneming/index.js geeft geen letterlijk object terug"
-  },
-  {
-   "bestand": "server/opzet/kernlaag4b.js",
-   "lijn": 185,
-   "vorm": "Object.assign",
-   "reden": "server/kern/concern/index.js geeft geen letterlijk object terug"
+   "reden": "de bron draagt een spread, dus deze lijst is onvolledig"
   },
   {
    "bestand": "server/opzet/kernlaag5.js",
@@ -172,19 +145,13 @@
    "bestand": "server/opzet/kernlaag5.js",
    "lijn": 122,
    "vorm": "Object.assign",
-   "reden": "server/kern/podium/index.js#maakPodium geeft geen letterlijk object terug"
+   "reden": "de bron draagt een spread, dus deze lijst is onvolledig"
   },
   {
    "bestand": "server/opzet/kernlaag6.js",
    "lijn": 30,
    "vorm": "Object.assign",
-   "reden": "server/kern/ov/index.js#maakOv geeft geen letterlijk object terug"
-  },
-  {
-   "bestand": "server/opzet/kernlaag6.js",
-   "lijn": 39,
-   "vorm": "Object.assign",
-   "reden": "server/kern/mobiliteit/index.js#maakMobiliteit geeft geen letterlijk object terug"
+   "reden": "de bron draagt een spread, dus deze lijst is onvolledig"
   },
   {
    "bestand": "server/opzet/kernlaag6.js",
@@ -196,25 +163,19 @@
    "bestand": "server/opzet/kernlaag6.js",
    "lijn": 86,
    "vorm": "Object.assign",
-   "reden": "server/kern/clips.js#maakClips geeft geen letterlijk object terug"
+   "reden": "de bron draagt een spread, dus deze lijst is onvolledig"
   },
   {
    "bestand": "server/opzet/kernlaag6.js",
    "lijn": 96,
    "vorm": "Object.assign",
-   "reden": "de bron draagt een spread, dus deze lijst is onvolledig"
-  },
-  {
-   "bestand": "server/opzet/kernlaag7.js",
-   "lijn": 55,
-   "vorm": "Object.assign",
-   "reden": "server/kern/vonk/index.js#maakVonk geeft geen letterlijk object terug"
+   "reden": "server/kern/office.js#maakOffice geeft geen letterlijk object terug"
   },
   {
    "bestand": "server/opzet/mediaos.js",
    "lijn": 27,
    "vorm": "Object.assign",
-   "reden": "server/kern/mediaos/index.js#maakMediaOS geeft geen letterlijk object terug"
+   "reden": "de bron draagt een spread, dus deze lijst is onvolledig"
   },
   {
    "bestand": "server/server.js",
@@ -320,24 +281,6 @@
      "bestand": "server/kern/eenaccount.js",
      "hoe": "fabriek maakEenAccount",
      "via": "server/opzet/kernlaag6.js"
-    }
-   ]
-  },
-  {
-   "naam": "actie",
-   "herkomsten": [
-    {
-     "bestand": "server/kern/command/journaal.js",
-     "hoe": "basisobject"
-    }
-   ]
-  },
-  {
-   "naam": "actor",
-   "herkomsten": [
-    {
-     "bestand": "server/kern/command/journaal.js",
-     "hoe": "basisobject"
     }
    ]
   },
@@ -870,15 +813,6 @@
      "bestand": "server/kern/assets.js",
      "hoe": "fabriek",
      "via": "server/opzet/kernlaag3.js"
-    }
-   ]
-  },
-  {
-   "naam": "at",
-   "herkomsten": [
-    {
-     "bestand": "server/kern/command/journaal.js",
-     "hoe": "basisobject"
     }
    ]
   },
@@ -1490,15 +1424,6 @@
     {
      "bestand": "server/routes/bedrijf.js",
      "hoe": "toewijzing"
-    }
-   ]
-  },
-  {
-   "naam": "beleid",
-   "herkomsten": [
-    {
-     "bestand": "server/kern/command/journaal.js",
-     "hoe": "basisobject"
     }
    ]
   },
@@ -2320,6 +2245,26 @@
    ]
   },
   {
+   "naam": "catalogusWensBesluit",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/onderneming/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag4b.js"
+    }
+   ]
+  },
+  {
+   "naam": "catalogusWensen",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/onderneming/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag4b.js"
+    }
+   ]
+  },
+  {
    "naam": "cateringDishes",
    "herkomsten": [
     {
@@ -2380,6 +2325,156 @@
     {
      "bestand": "server/kern/stuur.js",
      "hoe": "fabriek maakStuur",
+     "via": "server/opzet/kernlaag6.js"
+    }
+   ]
+  },
+  {
+   "naam": "clipsAanwezig",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/clips.js",
+     "hoe": "fabriek maakClips",
+     "via": "server/opzet/kernlaag6.js"
+    }
+   ]
+  },
+  {
+   "naam": "clipsFeed",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/clips.js",
+     "hoe": "fabriek maakClips",
+     "via": "server/opzet/kernlaag6.js"
+    }
+   ]
+  },
+  {
+   "naam": "clipsMaak",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/clips.js",
+     "hoe": "fabriek maakClips",
+     "via": "server/opzet/kernlaag6.js"
+    }
+   ]
+  },
+  {
+   "naam": "clipsMeld",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/clips.js",
+     "hoe": "fabriek maakClips",
+     "via": "server/opzet/kernlaag6.js"
+    }
+   ]
+  },
+  {
+   "naam": "clipsMetTrack",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/clips.js",
+     "hoe": "fabriek maakClips",
+     "via": "server/opzet/kernlaag6.js"
+    }
+   ]
+  },
+  {
+   "naam": "clipsOfficeLijst",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/clips.js",
+     "hoe": "fabriek maakClips",
+     "via": "server/opzet/kernlaag6.js"
+    }
+   ]
+  },
+  {
+   "naam": "clipsOfficeVerwijder",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/clips.js",
+     "hoe": "fabriek maakClips",
+     "via": "server/opzet/kernlaag6.js"
+    }
+   ]
+  },
+  {
+   "naam": "clipsReactie",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/clips.js",
+     "hoe": "fabriek maakClips",
+     "via": "server/opzet/kernlaag6.js"
+    }
+   ]
+  },
+  {
+   "naam": "clipsReacties",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/clips.js",
+     "hoe": "fabriek maakClips",
+     "via": "server/opzet/kernlaag6.js"
+    }
+   ]
+  },
+  {
+   "naam": "clipsSignaal",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/clips.js",
+     "hoe": "fabriek maakClips",
+     "via": "server/opzet/kernlaag6.js"
+    }
+   ]
+  },
+  {
+   "naam": "clipsVan",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/clips.js",
+     "hoe": "fabriek maakClips",
+     "via": "server/opzet/kernlaag6.js"
+    }
+   ]
+  },
+  {
+   "naam": "clipsVolg",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/clips.js",
+     "hoe": "fabriek maakClips",
+     "via": "server/opzet/kernlaag6.js"
+    }
+   ]
+  },
+  {
+   "naam": "clipsVolgersVan",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/clips.js",
+     "hoe": "fabriek maakClips",
+     "via": "server/opzet/kernlaag6.js"
+    }
+   ]
+  },
+  {
+   "naam": "clipsVolgMaker",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/clips.js",
+     "hoe": "fabriek maakClips",
+     "via": "server/opzet/kernlaag6.js"
+    }
+   ]
+  },
+  {
+   "naam": "clipsWeg",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/clips.js",
+     "hoe": "fabriek maakClips",
      "via": "server/opzet/kernlaag6.js"
     }
    ]
@@ -2592,11 +2687,81 @@
    ]
   },
   {
+   "naam": "concernHangtAan",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/concern/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag4b.js"
+    }
+   ]
+  },
+  {
+   "naam": "concernOverzicht",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/concern/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag4b.js"
+    }
+   ]
+  },
+  {
+   "naam": "conciergeDesk",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/lifestyle/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag3.js"
+    }
+   ]
+  },
+  {
    "naam": "conciergeInbox",
    "herkomsten": [
     {
      "bestand": "server/server.js",
      "hoe": "basisobject"
+    }
+   ]
+  },
+  {
+   "naam": "conciergeIntrek",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/lifestyle/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag3.js"
+    }
+   ]
+  },
+  {
+   "naam": "conciergeVerzoeken",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/lifestyle/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag3.js"
+    }
+   ]
+  },
+  {
+   "naam": "conciergeVoortgang",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/lifestyle/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag3.js"
+    }
+   ]
+  },
+  {
+   "naam": "conciergeVraag",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/lifestyle/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag3.js"
     }
    ]
   },
@@ -3882,15 +4047,6 @@
    ]
   },
   {
-   "naam": "grens",
-   "herkomsten": [
-    {
-     "bestand": "server/kern/tenant/merkkern.js",
-     "hoe": "basisobject"
-    }
-   ]
-  },
-  {
    "naam": "groothandel",
    "herkomsten": [
     {
@@ -3984,10 +4140,6 @@
   {
    "naam": "herkomst",
    "herkomsten": [
-    {
-     "bestand": "server/kern/tenant/merkkern.js",
-     "hoe": "basisobject"
-    },
     {
      "bestand": "server/kern/fiscaal/herkomst.js",
      "hoe": "fabriek maakHerkomst",
@@ -4128,8 +4280,9 @@
    "naam": "id",
    "herkomsten": [
     {
-     "bestand": "server/kern/command/journaal.js",
-     "hoe": "basisobject"
+     "bestand": "server/kern/mobiliteit/index.js",
+     "hoe": "fabriek maakMobiliteit",
+     "via": "server/opzet/kernlaag6.js"
     }
    ]
   },
@@ -4762,6 +4915,26 @@
    ]
   },
   {
+   "naam": "lifestyleVoorkeuren",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/lifestyle/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag3.js"
+    }
+   ]
+  },
+  {
+   "naam": "lifestyleVoorkeurenZet",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/lifestyle/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag3.js"
+    }
+   ]
+  },
+  {
    "naam": "lifeVoor",
    "herkomsten": [
     {
@@ -5380,6 +5553,156 @@
    ]
   },
   {
+   "naam": "MEDIA_MELD_SOORTEN",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/mediaos/index.js",
+     "hoe": "fabriek maakMediaOS",
+     "via": "server/opzet/mediaos.js"
+    }
+   ]
+  },
+  {
+   "naam": "MEDIA_MODI",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/mediaos/index.js",
+     "hoe": "fabriek maakMediaOS",
+     "via": "server/opzet/mediaos.js"
+    }
+   ]
+  },
+  {
+   "naam": "mediaBewaar",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/mediaos/index.js",
+     "hoe": "fabriek maakMediaOS",
+     "via": "server/opzet/mediaos.js"
+    }
+   ]
+  },
+  {
+   "naam": "mediaBieb",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/mediaos/index.js",
+     "hoe": "fabriek maakMediaOS",
+     "via": "server/opzet/mediaos.js"
+    }
+   ]
+  },
+  {
+   "naam": "mediaBord",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/mediaos/index.js",
+     "hoe": "fabriek maakMediaOS",
+     "via": "server/opzet/mediaos.js"
+    }
+   ]
+  },
+  {
+   "naam": "mediaMaker",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/mediaos/index.js",
+     "hoe": "fabriek maakMediaOS",
+     "via": "server/opzet/mediaos.js"
+    }
+   ]
+  },
+  {
+   "naam": "mediaMeldVan",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/mediaos/index.js",
+     "hoe": "fabriek maakMediaOS",
+     "via": "server/opzet/mediaos.js"
+    }
+   ]
+  },
+  {
+   "naam": "mediaMeldZet",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/mediaos/index.js",
+     "hoe": "fabriek maakMediaOS",
+     "via": "server/opzet/mediaos.js"
+    }
+   ]
+  },
+  {
+   "naam": "mediaNieuwWerk",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/mediaos/index.js",
+     "hoe": "fabriek maakMediaOS",
+     "via": "server/opzet/mediaos.js"
+    }
+   ]
+  },
+  {
+   "naam": "mediaSmaakStuur",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/mediaos/index.js",
+     "hoe": "fabriek maakMediaOS",
+     "via": "server/opzet/mediaos.js"
+    }
+   ]
+  },
+  {
+   "naam": "mediaSmaakVan",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/mediaos/index.js",
+     "hoe": "fabriek maakMediaOS",
+     "via": "server/opzet/mediaos.js"
+    }
+   ]
+  },
+  {
+   "naam": "mediaStuk",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/mediaos/index.js",
+     "hoe": "fabriek maakMediaOS",
+     "via": "server/opzet/mediaos.js"
+    }
+   ]
+  },
+  {
+   "naam": "mediaVolg",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/mediaos/index.js",
+     "hoe": "fabriek maakMediaOS",
+     "via": "server/opzet/mediaos.js"
+    }
+   ]
+  },
+  {
+   "naam": "mediaVolgersVan",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/mediaos/index.js",
+     "hoe": "fabriek maakMediaOS",
+     "via": "server/opzet/mediaos.js"
+    }
+   ]
+  },
+  {
+   "naam": "mediaWereld",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/mediaos/index.js",
+     "hoe": "fabriek maakMediaOS",
+     "via": "server/opzet/mediaos.js"
+    }
+   ]
+  },
+  {
    "naam": "MEDICATIE_GRENS",
    "herkomsten": [
     {
@@ -5508,15 +5831,6 @@
    "herkomsten": [
     {
      "bestand": "server/server.js",
-     "hoe": "basisobject"
-    }
-   ]
-  },
-  {
-   "naam": "merk",
-   "herkomsten": [
-    {
-     "bestand": "server/kern/tenant/merkkern.js",
      "hoe": "basisobject"
     }
    ]
@@ -5731,21 +6045,52 @@
    ]
   },
   {
+   "naam": "mobAanbod",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/mobiliteit/index.js",
+     "hoe": "fabriek maakMobiliteit",
+     "via": "server/opzet/kernlaag6.js"
+    }
+   ]
+  },
+  {
+   "naam": "mobAnnuleer",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/mobiliteit/index.js",
+     "hoe": "fabriek maakMobiliteit",
+     "via": "server/opzet/kernlaag6.js"
+    }
+   ]
+  },
+  {
+   "naam": "mobMijn",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/mobiliteit/index.js",
+     "hoe": "fabriek maakMobiliteit",
+     "via": "server/opzet/kernlaag6.js"
+    }
+   ]
+  },
+  {
+   "naam": "mobVraag",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/mobiliteit/index.js",
+     "hoe": "fabriek maakMobiliteit",
+     "via": "server/opzet/kernlaag6.js"
+    }
+   ]
+  },
+  {
    "naam": "MODI",
    "herkomsten": [
     {
      "bestand": "server/kern/bankregie/index.js",
      "hoe": "fabriek maakBankregie",
      "via": "server/opzet/kernlaag4b.js"
-    }
-   ]
-  },
-  {
-   "naam": "modus",
-   "herkomsten": [
-    {
-     "bestand": "server/kern/tenant/merkkern.js",
-     "hoe": "basisobject"
     }
    ]
   },
@@ -6085,15 +6430,6 @@
    ]
   },
   {
-   "naam": "na",
-   "herkomsten": [
-    {
-     "bestand": "server/kern/command/journaal.js",
-     "hoe": "basisobject"
-    }
-   ]
-  },
-  {
    "naam": "naamlaag",
    "herkomsten": [
     {
@@ -6192,15 +6528,6 @@
    ]
   },
   {
-   "naam": "niveau",
-   "herkomsten": [
-    {
-     "bestand": "server/kern/command/journaal.js",
-     "hoe": "basisobject"
-    }
-   ]
-  },
-  {
    "naam": "noodkaartVan",
    "herkomsten": [
     {
@@ -6285,11 +6612,12 @@
    ]
   },
   {
-   "naam": "objectId",
+   "naam": "nu",
    "herkomsten": [
     {
-     "bestand": "server/kern/command/journaal.js",
-     "hoe": "basisobject"
+     "bestand": "server/kern/mobiliteit/index.js",
+     "hoe": "fabriek maakMobiliteit",
+     "via": "server/opzet/kernlaag6.js"
     }
    ]
   },
@@ -6300,15 +6628,6 @@
      "bestand": "server/kern/objectlaag/index.js",
      "hoe": "fabriek",
      "via": "server/opzet/kernlaag3b.js"
-    }
-   ]
-  },
-  {
-   "naam": "objectType",
-   "herkomsten": [
-    {
-     "bestand": "server/kern/command/journaal.js",
-     "hoe": "basisobject"
     }
    ]
   },
@@ -6345,6 +6664,266 @@
     {
      "bestand": "server/server.js",
      "hoe": "basisobject"
+    }
+   ]
+  },
+  {
+   "naam": "ONDERNEMING_RECHTSVORMEN",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/onderneming/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag4b.js"
+    }
+   ]
+  },
+  {
+   "naam": "ondernemingAanvraag",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/onderneming/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag4b.js"
+    }
+   ]
+  },
+  {
+   "naam": "ondernemingAanvraagStand",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/onderneming/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag4b.js"
+    }
+   ]
+  },
+  {
+   "naam": "ondernemingBeeld",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/onderneming/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag4b.js"
+    }
+   ]
+  },
+  {
+   "naam": "ondernemingDagbeeld",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/onderneming/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag4b.js"
+    }
+   ]
+  },
+  {
+   "naam": "ondernemingEersteKlant",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/onderneming/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag4b.js"
+    }
+   ]
+  },
+  {
+   "naam": "ondernemingFeiten",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/onderneming/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag4b.js"
+    }
+   ]
+  },
+  {
+   "naam": "ondernemingIngeschreven",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/onderneming/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag4b.js"
+    }
+   ]
+  },
+  {
+   "naam": "ondernemingIntakeBeeld",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/onderneming/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag4b.js"
+    }
+   ]
+  },
+  {
+   "naam": "ondernemingIntakeZet",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/onderneming/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag4b.js"
+    }
+   ]
+  },
+  {
+   "naam": "ondernemingKans",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/onderneming/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag4b.js"
+    }
+   ]
+  },
+  {
+   "naam": "ondernemingKoppel",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/onderneming/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag4b.js"
+    }
+   ]
+  },
+  {
+   "naam": "ondernemingMallProfiel",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/onderneming/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag4b.js"
+    }
+   ]
+  },
+  {
+   "naam": "ondernemingNaam",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/onderneming/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag4b.js"
+    }
+   ]
+  },
+  {
+   "naam": "ondernemingNieuw",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/onderneming/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag4b.js"
+    }
+   ]
+  },
+  {
+   "naam": "ondernemingPlan",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/onderneming/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag4b.js"
+    }
+   ]
+  },
+  {
+   "naam": "ondernemingPlanVastleggen",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/onderneming/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag4b.js"
+    }
+   ]
+  },
+  {
+   "naam": "ondernemingRechtsvorm",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/onderneming/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag4b.js"
+    }
+   ]
+  },
+  {
+   "naam": "ondernemingRechtsvormenVanLand",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/onderneming/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag4b.js"
+    }
+   ]
+  },
+  {
+   "naam": "ondernemingRechtsvormLanden",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/onderneming/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag4b.js"
+    }
+   ]
+  },
+  {
+   "naam": "ondernemingSimuleer",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/onderneming/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag4b.js"
+    }
+   ]
+  },
+  {
+   "naam": "ondernemingStress",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/onderneming/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag4b.js"
+    }
+   ]
+  },
+  {
+   "naam": "ondernemingVanEigenaar",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/onderneming/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag4b.js"
+    }
+   ]
+  },
+  {
+   "naam": "ondernemingVanZaak",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/onderneming/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag4b.js"
+    }
+   ]
+  },
+  {
+   "naam": "ondernemingVerkenning",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/onderneming/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag4b.js"
+    }
+   ]
+  },
+  {
+   "naam": "ondernemingVind",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/onderneming/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag4b.js"
     }
    ]
   },
@@ -6467,6 +7046,16 @@
    ]
   },
   {
+   "naam": "opslag",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/concern/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag4b.js"
+    }
+   ]
+  },
+  {
    "naam": "optieAan",
    "herkomsten": [
     {
@@ -6522,21 +7111,42 @@
    ]
   },
   {
-   "naam": "org",
-   "herkomsten": [
-    {
-     "bestand": "server/kern/tenant/merkkern.js",
-     "hoe": "basisobject"
-    }
-   ]
-  },
-  {
    "naam": "overheid",
    "herkomsten": [
     {
      "bestand": "server/kern/overheid/index.js",
      "hoe": "fabriek maakOverheid",
      "via": "server/opzet/kernlaag2b.js"
+    }
+   ]
+  },
+  {
+   "naam": "ovLijnVan",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/ov/index.js",
+     "hoe": "fabriek maakOv",
+     "via": "server/opzet/kernlaag6.js"
+    }
+   ]
+  },
+  {
+   "naam": "ovPrijsVan",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/ov/index.js",
+     "hoe": "fabriek maakOv",
+     "via": "server/opzet/kernlaag6.js"
+    }
+   ]
+  },
+  {
+   "naam": "ovZaakVan",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/ov/index.js",
+     "hoe": "fabriek maakOv",
+     "via": "server/opzet/kernlaag6.js"
     }
    ]
   },
@@ -6937,6 +7547,16 @@
    ]
   },
   {
+   "naam": "podiumKanaalVan",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/podium/index.js",
+     "hoe": "fabriek maakPodium",
+     "via": "server/opzet/kernlaag5.js"
+    }
+   ]
+  },
+  {
    "naam": "POS_METHODS",
    "herkomsten": [
     {
@@ -7059,6 +7679,86 @@
    ]
   },
   {
+   "naam": "pulseFeed",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/pulse/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag4.js"
+    }
+   ]
+  },
+  {
+   "naam": "pulseLike",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/pulse/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag4.js"
+    }
+   ]
+  },
+  {
+   "naam": "pulseMeld",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/pulse/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag4.js"
+    }
+   ]
+  },
+  {
+   "naam": "pulsePost",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/pulse/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag4.js"
+    }
+   ]
+  },
+  {
+   "naam": "pulseProfiel",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/pulse/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag4.js"
+    }
+   ]
+  },
+  {
+   "naam": "pulseReactie",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/pulse/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag4.js"
+    }
+   ]
+  },
+  {
+   "naam": "pulseVolg",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/pulse/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag4.js"
+    }
+   ]
+  },
+  {
+   "naam": "pulseWeg",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/pulse/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag4.js"
+    }
+   ]
+  },
+  {
    "naam": "puntenKoppelPlafond",
    "herkomsten": [
     {
@@ -7140,15 +7840,6 @@
      "bestand": "server/kern/redactie/index.js",
      "hoe": "fabriek maakRedactie",
      "via": "server/opzet/kernlaag3.js"
-    }
-   ]
-  },
-  {
-   "naam": "reden",
-   "herkomsten": [
-    {
-     "bestand": "server/kern/command/journaal.js",
-     "hoe": "basisobject"
     }
    ]
   },
@@ -7499,15 +8190,6 @@
      "bestand": "server/kern/rijksbieb.js",
      "hoe": "fabriek maakRijksBieb",
      "via": "server/opzet/aanbouw.js"
-    }
-   ]
-  },
-  {
-   "naam": "risico",
-   "herkomsten": [
-    {
-     "bestand": "server/kern/command/journaal.js",
-     "hoe": "basisobject"
     }
    ]
   },
@@ -9636,15 +10318,6 @@
    ]
   },
   {
-   "naam": "uitslag",
-   "herkomsten": [
-    {
-     "bestand": "server/kern/command/journaal.js",
-     "hoe": "basisobject"
-    }
-   ]
-  },
-  {
    "naam": "unlockDoor",
    "herkomsten": [
     {
@@ -9780,6 +10453,16 @@
    ]
   },
   {
+   "naam": "vandaag",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/concern/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag4b.js"
+    }
+   ]
+  },
+  {
    "naam": "veiligBeeld",
    "herkomsten": [
     {
@@ -9908,15 +10591,6 @@
    ]
   },
   {
-   "naam": "versie",
-   "herkomsten": [
-    {
-     "bestand": "server/kern/tenant/merkkern.js",
-     "hoe": "basisobject"
-    }
-   ]
-  },
-  {
    "naam": "vervolg",
    "herkomsten": [
     {
@@ -9993,11 +10667,12 @@
    ]
   },
   {
-   "naam": "voor",
+   "naam": "vonkProfielZet",
    "herkomsten": [
     {
-     "bestand": "server/kern/command/journaal.js",
-     "hoe": "basisobject"
+     "bestand": "server/kern/vonk/index.js",
+     "hoe": "fabriek maakVonk",
+     "via": "server/opzet/kernlaag7.js"
     }
    ]
   },
@@ -10026,15 +10701,6 @@
      "bestand": "server/kern/voorspel/index.js",
      "hoe": "fabriek maakVoorspel",
      "via": "server/opzet/kernlaag7.js"
-    }
-   ]
-  },
-  {
-   "naam": "vorig",
-   "herkomsten": [
-    {
-     "bestand": "server/kern/command/journaal.js",
-     "hoe": "basisobject"
     }
    ]
   },
@@ -10546,6 +11212,16 @@
     {
      "bestand": "server/server.js",
      "hoe": "basisobject"
+    }
+   ]
+  },
+  {
+   "naam": "werkOverzicht",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/concern/index.js",
+     "hoe": "fabriek",
+     "via": "server/opzet/kernlaag4b.js"
     }
    ]
   },

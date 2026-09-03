@@ -983,11 +983,11 @@ grens vandaag niet -- en dat ene getal verbergt nog iets, want `server/` haalt
 vrijwel niets (6,6%) tot `SCHERMROUTES.json` erbij kwam, dat per bestand in
 public/ leest welke API-paden het noemt en daarmee de keten scherm -> route legt.
 De aanroepgraaf ligt er sinds dezelfde dag naast (`AANROEPGRAAF.json`,
-<!--getal:graaf.kanten-->22121<!--/getal--> kanten): wie roept wie aan, en welk symbool handelt welke route af
-(<!--getal:graaf.routesMetSymbool-->2978<!--/getal--> routes). Daarmee loopt de impactketen scherm -> route -> bestand ->
+<!--getal:graaf.kanten-->23716<!--/getal--> kanten): wie roept wie aan, en welk symbool handelt welke route af
+(<!--getal:graaf.routesMetSymbool-->2987<!--/getal--> routes). Daarmee loopt de impactketen scherm -> route -> bestand ->
 functie uit registers alleen. Let daar op twee dingen. Ten eerste is
-<!--getal:graaf.opgelostPct-->24.3<!--/getal-->% opgelost geen tekort maar een indeling: het meeste dat overblijft is
-`res.json()` of `String()`, en <!--getal:graaf.contextobject-->15798<!--/getal--> aanroepen lopen via het CONTEXTOBJECT dat
+<!--getal:graaf.opgelostPct-->25.8<!--/getal-->% opgelost geen tekort maar een indeling: het meeste dat overblijft is
+`res.json()` of `String()`, en <!--getal:graaf.contextobject-->14395<!--/getal--> aanroepen lopen via het CONTEXTOBJECT dat
 in server/opzet/ wordt samengesteld. Dat leek statisch onherleidbaar tot
 `CONTEXTPROEF.json` het NAMAT (`npm run contextproef`, een runtime-meting in de
 domeingrens-Proxy): van de <!--getal:context.aanHetWerk-->3214<!--/getal--> routes die werk deden reiken er maar
@@ -995,10 +995,14 @@ domeingrens-Proxy): van de <!--getal:context.aanHetWerk-->3214<!--/getal--> rout
 BEDRADEN worden opgehaald. Het gat is dus grotendeels statisch en niet runtime -- de meting
 keerde de voorspelling om, en dat is precies waarom hij er is. `KERNHERKOMST.json`
 (`npm run kernherkomst`) volgt die aanwijzing en beantwoordt wie welke naam in de
-zak legt: <!--getal:kern.namen-->1120<!--/getal--> namen over <!--getal:kern.vulplekken-->282<!--/getal--> vulplekken, met <!--getal:kern.onopgelost-->32<!--/getal--> plekken die
+zak legt: <!--getal:kern.namen-->1190<!--/getal--> namen over <!--getal:kern.vulplekken-->280<!--/getal--> vulplekken, met <!--getal:kern.onopgelost-->28<!--/getal--> plekken die
 niet te volgen zijn (elk met een reden, geen daarvan geraden). Dat leverde
-<!--getal:graaf.viaKern-->4519<!--/getal--> nieuwe kanten en bracht de graaf van 18,1% naar <!--getal:graaf.opgelostPct-->24.3<!--/getal-->%. Twee
-dingen daar niet wegpoetsen: <!--getal:graaf.viaKernZonderSymbool-->4045<!--/getal--> van die kanten wijzen alleen het BESTAND
+<!--getal:graaf.viaKern-->5660<!--/getal--> nieuwe kanten en bracht de graaf van 18,1% naar <!--getal:graaf.opgelostPct-->25.8<!--/getal-->%; de restbak
+van de graaf ging in dezelfde ronde van 3071 naar <!--getal:graaf.overig-->361<!--/getal--> aanroepen (0,27%), en
+daar zat geen raadsel in maar vijf BEKENDE vormen die de meter niet herkende --
+een restbak vol bekende vormen laat je denken dat je code ondoorgrondelijk is
+terwijl je meter te weinig weet. Twee
+dingen daar niet wegpoetsen: <!--getal:graaf.viaKernZonderSymbool-->3960<!--/getal--> van die kanten wijzen alleen het BESTAND
 aan en niet de functie (een fabriek mag `{ walletVoeg: voeg }` teruggeven, en dan
 is de zaknaam niet de symboolnaam), en een parameter die `save` heet wordt NIET
 op zijn naam als kernnaam herkend maar op zijn functie -- alleen de fabrieken die

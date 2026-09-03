@@ -2,7 +2,7 @@
   "uitleg": "Kan er een canonieke Codewereld bestaan? Gemeten over de registers in de wortel: op welke as staan ze, hoeveel sleutels delen ze, en spreken ze elkaar tegen. Deze meter voegt niets samen en kiest bij tegenspraak geen winnaar.",
   "stempel": {
     "op": "2026-09-03",
-    "commit": "981df130"
+    "commit": "db63488d"
   },
   "registers": {
     "geteld": 84,
@@ -33,7 +33,7 @@
         "gefaald": 0,
         "gefaaldLijst": [],
         "symbolen": 13837,
-        "seconden": 4.6
+        "seconden": 4.5
       }
     }
   },
@@ -56,27 +56,27 @@
       },
       {
         "registers": 22,
-        "paden": 381
+        "paden": 383
       },
       {
         "registers": 21,
-        "paden": 788
+        "paden": 790
       },
       {
         "registers": 20,
-        "paden": 1414
+        "paden": 1412
       },
       {
         "registers": 19,
-        "paden": 716
+        "paden": 713
       },
       {
         "registers": 18,
-        "paden": 247
+        "paden": 252
       },
       {
         "registers": 17,
-        "paden": 112
+        "paden": 108
       },
       {
         "registers": 16,
@@ -84,11 +84,11 @@
       },
       {
         "registers": 15,
-        "paden": 200
+        "paden": 198
       },
       {
         "registers": 14,
-        "paden": 125
+        "paden": 127
       },
       {
         "registers": 13,
@@ -96,11 +96,11 @@
       },
       {
         "registers": 12,
-        "paden": 110
+        "paden": 109
       },
       {
         "registers": 11,
-        "paden": 51
+        "paden": 52
       },
       {
         "registers": 10,
@@ -120,11 +120,11 @@
       },
       {
         "registers": 6,
-        "paden": 17
+        "paden": 18
       },
       {
         "registers": 5,
-        "paden": 32
+        "paden": 31
       },
       {
         "registers": 4,
@@ -153,7 +153,7 @@
       "ROUTEBRON.json",
       "SCHRIJFANALYSE.json"
     ],
-    "verschilToetsbaar": 4530,
+    "verschilToetsbaar": 4531,
     "verschilDekkingPct": 88.6,
     "verschillen": 1,
     "soortBeslistIn": "ROUTEBRON.json -- daar wordt een verschil ingedeeld als `verouderd` of `tegenspraak`; deze meter telt alleen DAT ze verschillen",
@@ -337,7 +337,7 @@
       },
       {
         "register": "AANROEPGRAAF.json",
-        "paden": 2969
+        "paden": 2978
       },
       {
         "register": "IDOR.json",
@@ -377,10 +377,10 @@
     {
       "register": "AANROEPGRAAF.json",
       "as": "route",
-      "paden": 2969,
-      "bestanden": 2638,
+      "paden": 2978,
+      "bestanden": 2710,
       "symbolen": 0,
-      "paren": 2978
+      "paren": 2987
     },
     {
       "register": "ROUTEBRON.json",
@@ -634,7 +634,7 @@
       "register": "KERNHERKOMST.json",
       "as": "bestand",
       "paden": 0,
-      "bestanden": 223,
+      "bestanden": 233,
       "symbolen": 0,
       "paren": 0
     },

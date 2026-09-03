@@ -150,13 +150,14 @@ const lijst = BOMEN.flatMap(bestanden);
 
 /* Ronde 1: per bestand de symbolen en de invoerbindingen. */
 const bomen = new Map(), symbolenVan = new Map(), invoer = new Map(), uitvoerVan = new Map(), fabrieksparams = new Map(),
-  contextnamen = new Map(), lokaleWaarden = new Map(), nietGelezen = [];
+  contextnamen = new Map(), lokaleWaarden = new Map(), externeModules = new Map(), uitgepakt = new Map(), nietGelezen = [];
 for (const rel of lijst) {
   let ast;
   try { ast = parse(fs.readFileSync(path.join(WORTEL, rel), 'utf8'), {}); }
   catch (e) { nietGelezen.push({ bestand: rel, fout: String(e.message).slice(0, 90) }); continue; }
   bomen.set(rel, ast);
   const sym = new Set(), bind = new Map(), uitvoerNamen = new Set(), schaduw = new Set();
+  const externBind = new Set(), uitObjectBind = new Set();
   let uitvoerVorm = null;
   loop(ast, n => {
     /* `module.exports.zin = function ...` -- een expressie, geen declaratie.
@@ -204,6 +205,47 @@ for (const rel of lijst) {
       /* require-bindingen: los (`const m = require(x)`) en uitgepakt
          (`const { a, b: c } = require(x)`). */
       const init = n.init;
+      /* Een require die NIET naar dit huis wijst: node zelf of een pakket. */
+      if (init && init.type === 'CallExpression' && init.callee && init.callee.name === 'require' && n.id && n.id.name) {
+        const a0 = (init.arguments || [])[0];
+        const padTekst = a0 && a0.type === 'Literal' && a0.kind === 'string'
+          ? String(a0.raw).replace(/^['"`]|['"`]$/g, '') : null;
+        if (padTekst && !padTekst.startsWith('.')) externBind.add(n.id.name);
+      }
+      /* `const { a, b } = eenObject` -- uitgepakt uit iets dat hier staat. */
+      /* UITGEPAKT UIT EEN FABRIEK-AANROEP: een module die met een relatief pad
+         wordt opgehaald, meteen wordt aangeroepen, en waarvan het resultaat
+         wordt uitgepakt -- of hetzelfde met een fabriek uit dit bestand:
+           const { nu, vandaag, id } = maakHulp({ db, save, crypto })
+         Dat is een van de gewoonste vormen in dit huis en hij stond volledig in
+         de restbak. De namen komen aantoonbaar uit dat ENE bestand; welk symbool
+         het daar is, is een tweede vraag (een fabriek mag `{ publiek: maakBeeld }`
+         teruggeven), dus bij twijfel wijst de kant het bestand aan. */
+      if (init && init.type === 'CallExpression' && n.id && n.id.type === 'ObjectPattern') {
+        const c0 = init.callee;
+        let fabriekBestand = null;
+        if (c0 && c0.type === 'CallExpression' && c0.callee && c0.callee.name === 'require') {
+          const a1 = (c0.arguments || [])[0];
+          const pd = a1 && a1.type === 'Literal' && a1.kind === 'string' ? String(a1.raw).replace(/^['"`]|['"`]$/g, '') : null;
+          fabriekBestand = pd ? losOp(rel, pd) : null;
+        } else if (c0 && c0.type === 'MemberExpression' && c0.object && c0.object.type === 'CallExpression' &&
+          c0.object.callee && c0.object.callee.name === 'require') {
+          const a1 = (c0.object.arguments || [])[0];
+          const pd = a1 && a1.type === 'Literal' && a1.kind === 'string' ? String(a1.raw).replace(/^['"`]|['"`]$/g, '') : null;
+          fabriekBestand = pd ? losOp(rel, pd) : null;
+        }
+        if (fabriekBestand) for (const pp of n.id.properties || []) {
+          const nm = (pp.value && pp.value.name) || (pp.key && pp.key.name);
+          if (nm) bind.set(nm, { bestand: fabriekBestand, soort: 'uitFabriek', doelNaam: (pp.key && pp.key.name) || nm });
+        }
+      }
+      const uitBron = init && init.type === 'LogicalExpression' ? init.left : init;
+      if (uitBron && uitBron.type === 'Identifier' && n.id && n.id.type === 'ObjectPattern') {
+        for (const pp of n.id.properties || []) {
+          const nm = (pp.value && pp.value.name) || (pp.key && pp.key.name);
+          if (nm) uitObjectBind.add(nm);
+        }
+      }
       if (init && init.type === 'CallExpression' && init.callee && init.callee.name === 'require') {
         /* De parser zet een stringliteraal in `raw` MET zijn aanhalingstekens
            (kind: 'string'); er is geen `value`. Dat verschil kostte hier een
@@ -277,6 +319,8 @@ for (const rel of lijst) {
      aanroep als `uit.push(...)` of `eigen.bak(...)` is een methode op zo'n
      waarde en geen aanroep van eigen code. */
   lokaleWaarden.set(rel, schaduw);
+  externeModules.set(rel, externBind);
+  uitgepakt.set(rel, uitObjectBind);
   symbolenVan.set(rel, sym); invoer.set(rel, bind);
   uitvoerVan.set(rel, uitvoerVorm === 'object' ? uitvoerNamen : null);
 }
@@ -287,23 +331,37 @@ for (const rel of lijst) {
    percentage zonder noemer nodigt uit tot de verkeerde reparatie -- iemand gaat
    de resolver "verbeteren" tot hij res.json aan een bestand knoopt. */
 const INGEBOUWD = new Set(['String', 'Number', 'Boolean', 'Array', 'Object', 'JSON', 'Math', 'Date', 'Promise', 'RegExp',
+  'isFinite', 'Infinity', 'globalThis', 'AbortSignal', 'WeakSet', 'TextEncoder', 'TextDecoder', 'Function',
   'Map', 'Set', 'WeakMap', 'Error', 'Symbol', 'BigInt', 'parseInt', 'parseFloat', 'isNaN', 'require', 'setTimeout',
   'setInterval', 'clearTimeout', 'clearInterval', 'queueMicrotask', 'structuredClone', 'encodeURIComponent',
   'decodeURIComponent', 'fetch', 'console', 'process', 'Buffer', 'URL', 'AbortController', 'Intl', 'Reflect', 'Proxy']);
 const KADER = new Set(['res', 'req', 'app', 'next', 'router', 'express', 'db', 'console', 'process']);
-const soorten = { ingebouwd: 0, kader: 0, contextobject: 0, lokaleWaarde: 0, methodeOpWaarde: 0, overig: 0 };
+const soorten = { ingebouwd: 0, externeModule: 0, kader: 0, contextobject: 0, uitgepaktObject: 0, lokaleWaarde: 0, methodeOpWaarde: 0, overig: 0 };
 function soortVanOnopgeloste(c, rel) {
   if (c.type === 'Identifier') {
     if (INGEBOUWD.has(c.name)) return 'ingebouwd';
     if ((contextnamen.get(rel) || EMPTY).has(c.name)) return 'contextobject';
+    /* UITGEPAKT UIT EEN OBJECT DAT GEEN KERN IS. `const { H, heleCenten } =
+       horeca` en `const { db, save, nu } = ctx`: een domein geeft zijn eigen
+       deelmodules een eigen zak mee. Dezelfde VORM als het contextobject, maar
+       het IS de kern niet -- en die twee door elkaar halen zou de post
+       `contextobject` laten groeien met iets waar KERNHERKOMST.json niets over
+       kan zeggen. Ze stonden tot 3 september in de restbak, en dan lijkt die een
+       verzameling raadsels terwijl het een bekende vorm is. */
+    if ((externeModules.get(rel) || EMPTY).has(c.name)) return 'externeModule';
+    if ((uitgepakt.get(rel) || EMPTY).has(c.name)) return 'uitgepaktObject';
     if ((lokaleWaarden.get(rel) || EMPTY).has(c.name)) return 'lokaleWaarde';
     return 'overig';
   }
   if (c.type === 'MemberExpression' && c.object && c.object.name) {
     const o = c.object.name;
     if (INGEBOUWD.has(o)) return 'ingebouwd';
+    /* `path.join()`, `fs.readFileSync()`: een module van buiten dit huis. Geen
+       eigen code, dus geen kant -- maar ook geen raadsel. */
+    if ((externeModules.get(rel) || EMPTY).has(o)) return 'externeModule';
     if (KADER.has(o)) return 'kader';
     if ((fabrieksparams.get(rel) || EMPTY).has(o) || (contextnamen.get(rel) || EMPTY).has(o)) return 'contextobject';
+    if ((uitgepakt.get(rel) || EMPTY).has(o)) return 'uitgepaktObject';
     if ((lokaleWaarden.get(rel) || EMPTY).has(o)) return 'lokaleWaarde';
     return 'overig';
   }
@@ -341,7 +399,7 @@ function routehandlers(ast) {
 
 /* Ronde 2: de aanroepen. */
 const kanten = [], onopgelost = new Map(), doelOnbekend = [];
-const routeKanten = [];
+const routeKanten = [], perSoort = new Map(), overigWaar = new Map();
 let calls = 0, doelNietVastTeStellen = 0;
 for (const [rel, ast] of bomen) {
   const eigen = symbolenVan.get(rel), bind = invoer.get(rel);
@@ -372,6 +430,18 @@ for (const [rel, ast] of bomen) {
       else if (bind.has(c.name)) {
         const b = bind.get(c.name);
         if (b.soort === 'ingevoerd') { doelBestand = b.bestand; doelNaam = b.doelNaam; hoe = 'ingevoerd'; }
+        else if (b.soort === 'uitFabriek') {
+          doelBestand = b.bestand; hoe = 'uitFabriek';
+          const daar = symbolenVan.get(b.bestand);
+          doelNaam = daar && daar.has(b.doelNaam) ? b.doelNaam : null;
+        }
+        /* Een module die ZELF de functie is: opgehaald met een relatief pad en
+           meteen aangeroepen. Welk symbool dat is staat er niet bij (een
+           naamloze export), dus dit wijst het BESTAND aan en niet de functie.
+           Dat is wat we weten. (Geen voorbeeld met een letterlijk modulepad in
+           dit commentaar: keuringsregel 22 leest dat als een echte import van
+           DIT bestand, en dan is het een kapot pad. Twee keer gebeurd.) */
+        else if (b.soort === 'module') { doelBestand = b.bestand; doelNaam = null; hoe = 'moduleAlsFunctie'; }
       }
       /* Uit de zak gehaald, en de zak weet wie hem gevuld heeft. */
       else if ((contextnamen.get(rel) || EMPTY).has(c.name) && kernherkomst.has(c.name)) {
@@ -381,6 +451,10 @@ for (const [rel, ast] of bomen) {
       ruw = c.object.name + '.' + c.property.name;
       const b = bind.get(c.object.name);
       if (b && b.soort === 'module') { doelBestand = b.bestand; doelNaam = c.property.name; hoe = 'lid'; }
+      /* Een naam die uitgepakt uit een eigen module komt, met een methode
+         erop (`log.warn`). De naam komt aantoonbaar uit ons eigen bestand, de
+         METHODE erop is daar geen symbool. Bestand wel, functie niet. */
+      else if (b && b.soort === 'ingevoerd') { doelBestand = b.bestand; doelNaam = null; hoe = 'lidOpInvoer'; }
       /* `k.instantMutate()` -- de zak zelf, met de naam erop. Zelfde herkomst
          als de uitgepakte vorm hierboven; alleen de schrijfwijze verschilt. */
       else if (((fabrieksparams.get(rel) || EMPTY).has(c.object.name) || (contextnamen.get(rel) || EMPTY).has(c.object.name)) &&
@@ -394,7 +468,20 @@ for (const [rel, ast] of bomen) {
     if (!doelBestand) {
       const sleutel = ruw || '?';
       onopgelost.set(sleutel, (onopgelost.get(sleutel) || 0) + 1);
-      soorten[soortVanOnopgeloste(c, rel)]++;
+      const soort = soortVanOnopgeloste(c, rel);
+      soorten[soort]++;
+      /* Per soort apart bijhouden, want alleen zo is de RESTBAK te lezen. In
+         een gezamenlijke lijst wordt `overig` (2,3%) volledig overstemd door
+         String() en res.json(), en dan is de enige post die nog een vraag
+         bevat, de enige die je niet ziet. */
+      if (!perSoort.has(soort)) perSoort.set(soort, new Map());
+      const m = perSoort.get(soort);
+      m.set(sleutel, (m.get(sleutel) || 0) + 1);
+      if (soort === 'overig') {
+        if (!overigWaar.has(sleutel)) overigWaar.set(sleutel, new Set());
+        const w = overigWaar.get(sleutel);
+        if (w.size < 3) w.add(rel + ':' + n.lijn);
+      }
       return;
     }
     /* Bestaat het doel echt? DRIE uitkomsten, want twee zijn er te weinig:
@@ -409,7 +496,12 @@ for (const [rel, ast] of bomen) {
        een ontbrekend symbool dat statisch nooit zichtbaar kan zijn. */
     const daar = symbolenVan.get(doelBestand);
     const uitDaar = uitvoerVan.get(doelBestand);
-    if (daar && !daar.has(doelNaam) && !(uitDaar && uitDaar.has(doelNaam))) {
+    /* Een kant die met OPZET alleen een bestand aanwijst (`moduleAlsFunctie`,
+       `lidOpInvoer`) draagt geen symbool. Die door de bestaanscontrole halen
+       maakte er 303 "bevindingen" van: de meter beschuldigde de code van een
+       ontbrekend symbool dat hij zelf niet had ingevuld. */
+    if (doelNaam == null) { /* bestand bekend, functie niet -- niets te toetsen */ }
+    else if (daar && !daar.has(doelNaam) && !(uitDaar && uitDaar.has(doelNaam))) {
       /* Een zaknaam hoeft niet de symboolnaam te zijn (`{ walletVoeg: voeg }`).
          Dan weten we het BESTAND en niet de functie, en dat is wat er komt te
          staan -- geen gok naar een symbool dat er niet is. */
@@ -457,6 +549,9 @@ const uit = {
     kantenIngevoerd: kanten.filter(k => k.hoe === 'ingevoerd').length,
     kantenLid: kanten.filter(k => k.hoe === 'lid').length,
     kantenViaKern: kanten.filter(k => k.hoe === 'viaKern').length,
+    kantenModuleAlsFunctie: kanten.filter(k => k.hoe === 'moduleAlsFunctie').length,
+    kantenLidOpInvoer: kanten.filter(k => k.hoe === 'lidOpInvoer').length,
+    kantenUitFabriek: kanten.filter(k => k.hoe === 'uitFabriek').length,
     /* Geteld over de ONTDUBBELDE kanten, niet over de voorvallen. De eerste
        versie telde elke aanroep en meldde er daardoor meer "zonder symbool" dan
        er kanten waren -- een getal dat zichzelf tegenspreekt is erger dan geen
@@ -480,6 +575,11 @@ const uit = {
     return m;
   }, new Map()).values()].sort((a, b) => b.symbolen.length - a.symbolen.length),
   onopgelostTop: onopgelostGesorteerd.slice(0, 40).map(([naam, aantal]) => ({ naam, aantal })),
+  onopgelostPerSoort: [...perSoort].map(([soort, m]) => ({
+    soort,
+    namen: [...m].sort((a, b) => b[1] - a[1]).slice(0, soort === 'overig' ? 120 : 15)
+      .map(([naam, aantal]) => ({ naam, aantal, waar: soort === 'overig' ? [...(overigWaar.get(naam) || [])] : undefined }))
+  })),
   doelOnbekend: doelOnbekend.slice(0, 40),
   nietGelezen,
   kanten

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1594 bestanden en 11339 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1597 bestanden en 11364 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1594 |
-| losse beweringen (`test(...)`) | 11339 |
+| toetsbestanden | 1597 |
+| losse beweringen (`test(...)`) | 11364 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 57 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1032 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 42 |
 | alleen in de kop *genoemd*, nog niet gemeten | 167 |
-| niets van beide | 343 |
+| niets van beide | 346 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1393 bestanden, 10988 beweringen.
+1396 bestanden, 11013 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -310,6 +310,8 @@ toets omvalt.
 | `eigenaar-wedloop.test.js` | 1 | gezakt op `&&->||#0` | TWEE SERVERS DIE TEGELIJK OPKOMEN OP DEZELFDE DATABASE. In de vloot (server/vloot.js) draait elke groep als eigen proces, maar ze delen een database. |
 | `eigenaar.test.js` | 4 | gezakt op `liegpoort /api/` | De eigenaar (Roellie) heeft overal toegang tot de BEHEER-omgevingen met zijn eigen accountlogin, maar de juridische grenzen (kinderdata, privé tussen personen, ruwe identiteitsbewijzen, platte wachtwoorden) blijven... |
 | `eigenaarbevestiging.test.js` | 11 | -- | DE ZWARE POORT: vraagt een eigenaarshandeling opnieuw om de passkey? Dit bestand bestaat omdat de vorige twee niet genoeg zijn. |
+| `eigenaarherstel-routes.test.js` | 7 | -- | HET EIGENAARSHERSTEL OVER DE ECHTE ROUTES. test/eigenaarherstel.test.js toetst de ceremonie met een gezette klok; dat is de enige manier om zeven dagen wachttijd te meten. |
+| `eigenaarherstel.test.js` | 10 | -- | HET EIGENAARSHERSTEL: de ceremonie, met een klok die ik zelf vooruit zet. Waarom hier een neppe klok en geen echte server: de hele belofte van deze weg is een WACHTTIJD van zeven dagen, en een toets die zeven dagen... |
 | `eigenaarschap.test.js` | 8 | gezakt op `liegpoort /api/` | Het eigenaarschap van het platform: wie het is, en hoe het overgaat. Dit is de zwaarste bevoegdheid die het systeem kent. |
 | `eigenaarwerkplek.test.js` | 1 | gezakt op `liegpoort /api/` | De eigenaar ziet zijn werkplek, OOK in productie. server/eigenaar.js legt vast dat de eigenaar bij de beheeromgevingen kan, met zoveel woorden: "de RTG-Backoffice (met zijn eigen accountlogin, zonder aparte code)". |
 | `eigenip.test.js` | 2 | gezakt op `liegpoort /api/` | EEN ADRES DAT DE BEZOEKER ZELF MAG KIEZEN, IS GEEN ADRES. Elke snelheidslimiet, elk verbod en elke teller in dit huis rekent op het adres van de aanroeper. |
@@ -468,6 +470,7 @@ toets omvalt.
 | `herstelgat.test.js` | 2 | gezakt op `liegpoort /api/` | Het gat in de herstelroute: dev-velden aan een vreemde. WAT ER MIS WAS. |
 | `herstelkanaal.test.js` | 14 | genoemd | HET TELEFOONNUMMER IS EEN HERSTELKANAAL. DE BEVINDING DIE HIERONDER ZIT. |
 | `herstelproef.test.js` | 13 | gezakt op `liegpoort /api/` | De herstelproef beproefd op de vier oordelen die zij velt, en vooral op het onderscheid dat ze het makkelijkst kwijtraakt: `nietBeproefd` is geen `geen-herstel`, en `compensatie` is geen `exact`. De proef zelf draait... |
+| `herstelquorum.test.js` | 8 | -- | HET HERSTELQUORUM: klopt de rekenkant, en klopt vooral wat er NIET uit komt. Dit is het bestand waar een fout niet opvalt door te falen maar door te slagen: een quorum dat met een deel te openen is, doet in elke... |
 | `hersteltransactie.test.js` | 9 | gezakt op `!==->===#0` | HERSTEL ALS TRANSACTIE: negen beweringen over de twee stappen die een herstelknop normaal gesproken NIET heeft. 1. |
 | `herstelzondertelefoon.test.js` | 2 | gezakt op `liegpoort /api/` | HERSTELLEN MOET KUNNEN, OOK ZONDER TELEFOONNUMMER. WAT ER MISGING. |
 | `homekit.test.js` | 5 | gezakt op `liegpoort /api/` | De RTG Home Kit: alle elektronica op een plek, scenes met AI-hulp, en de vaste veiligheidsregel dat sloten nooit via een scene of de AI gaan. |

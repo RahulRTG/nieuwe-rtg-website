@@ -175,10 +175,7 @@ kern.foundationregistratie = require('../kern/foundationregistratie-register')({
    routers van kernlaag7b, want de kern wordt hier nog gevuld. */
 require('./kernlaag7-ruimtes')(kern, hulp);
 
-/* De zware poort (kern/zwaarbewijs.js), EEN keer gebouwd: elk domein reikt zo
-   naar EEN naam in GRENZEN.json in plaats van naar accounts/beveilig/appUrl.
-   Getters, want die twee bestaan hier nog niet; de reden staat in die kop. */
-kern.zwaarbewijs = require('../kern/zwaarbewijs')({ zwaarBeveiliging: kern.zwaarBeveiliging,
-  accounts, log: hulp.log, appUrl: (req) => kern.appUrl(req), beveiligVan: () => kern.beveilig });
+/* De zware poort en het herstelquorum: ./kernlaag7-eigenaar.js. */
+require('./kernlaag7-eigenaar')(kern, hulp);
 
 };

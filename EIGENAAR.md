@@ -10,9 +10,9 @@ zodat niemand die vier voor elkaar aanziet.*
 
 Dat is geen belofte over de toekomst maar een richting met een prijs, en die
 prijs staat in paragraaf 5: een cryptografische identiteit zonder herstelweg is
-geen sterker slot maar een enkelvoudig totaalverlies. Zolang het quorum van
-paragraaf 5 niet staat, blijft het wachtwoord het vangnet — en dat is een
-besluit en geen achterstand.
+geen sterker slot maar een enkelvoudig totaalverlies. Dat quorum staat inmiddels;
+het wachtwoord blijft ernaast tot het een keer met echte papieren delen is
+doorlopen (par. 7, besluit 3).
 
 ## 1. Vier begrippen, en ze zijn niet hetzelfde
 
@@ -40,14 +40,13 @@ precies waarom een assertie aan een actienaam hangt en niet aan een tijdvenster.
 | Toestellenkaart voor de eigenaar | **staat** | boardroom, `public/apps/kantoren.html` |
 | Beleidsmotor met vier dimensies en acht uitkomsten | **staat** | `kern/bevoegdheid/`, zie `CONTROLPLANE.md` |
 | Gezagsherkomst op elk verzoek | **staat** | `envelop.zet(... gezagBron, gezagBaas)` |
-| Wachtwoordloze eigenaar | **vraagt een besluit** | par. 5 |
-| Recovery-quorum (2-uit-3) | **jaren weg zonder besluit, een maand met** | par. 5 |
+| Recovery-quorum (2-uit-3), traag, luid en afbreekbaar | **staat** | `kern/herstelquorum.js`, `kern/eigenaarherstel.js` |
+| Wachtwoordloze eigenaar | **vraagt een besluit** | par. 7, besluit 3 |
 | Sessies met aflopend vertrouwen | **een stap weg** | par. 4 |
 | Eigenaar als sleutel-root los van het e-mailadres | **vraagt een besluit** | par. 6 |
 
-Wat er **niet** is en ook niet stiekem half: er is geen Shamir-implementatie, geen
-tijdslot op een gevoelige handeling, en geen herstelweg die buiten het
-wachtwoord om loopt. Nagemeten op 3 september 2026.
+Wat er **niet** is en ook niet stiekem half: sessies met aflopend vertrouwen, en
+een wachtwoordloze eigenaar. Nagemeten op 3 september 2026.
 
 ## 3. De ratel, en waarom er een terugval in zit
 
@@ -92,10 +91,11 @@ Wat ontbreekt is een leeftijd op de sessie plus een lezer die daarop let. Doe je
 dat, doe het dan zo dat *lezen* nooit afloopt — een cockpit die om je vinger
 vraagt om een getal te tonen, wordt een cockpit die niemand meer opent.
 
-## 5. Het recovery-quorum — het ontwerp
+## 5. Het recovery-quorum
 
-Dit is het stuk dat er niet is, en het stuk dat er moet zijn vóór het wachtwoord
-weg kan.
+Gebouwd op 3 september 2026: `kern/herstelquorum.js` (de rekenkant) en
+`kern/eigenaarherstel.js` (de ceremonie), met de routes in
+`routes/eigenaarherstel.js`. Wat hieronder staat is het ontwerp én wat er draait.
 
 ### 5.1 Wat het moet kunnen
 
@@ -105,11 +105,19 @@ de data; het herstelt alleen het vermogen om weer sleutels te hebben.
 
 ### 5.2 De vorm
 
-Bij inrichting ontstaat één herstelgeheim. Dat wordt met Shamir gesplitst in
-**drie delen waarvan er twee volstaan**. De server bewaart **alleen een
-verifier** (een commitment), nooit het geheim en nooit een deel — anders is een
-gestolen database een gestolen platform, en dat is precies wat deze hele
-architectuur wil uitsluiten.
+Bij inrichting ontstaat één herstelgeheim, gesplitst in **drie delen waarvan er
+twee volstaan**. De server bewaart **alleen een verifier** (een HMAC met het
+geheim als sleutel), nooit het geheim en nooit een deel — anders is een gestolen
+database een gestolen platform.
+
+**Geen Shamir, en dat is een keuze met een reden.** Voor precies 2-uit-3 volstaat
+een vorm die je kunt nalezen: kies drie willekeurige blokken x, y, z met geheim =
+x⊕y⊕z, en geef deel 1 = (x,y), deel 2 = (y,z), deel 3 = (z,x). Elk paar draagt
+alle drie de blokken; één deel draagt er twee en mist er altijd één, en dat
+ontbrekende blok is uniform willekeurig — dus een enkel deel zegt niet "weinig"
+maar *niets*. Dezelfde garantie als Shamir, zonder wiskunde die je moet geloven.
+De prijs: dit generaliseert niet. Wil je ooit 3-uit-5, dan vervang je het bestand
+door echte Shamir in plaats van het uit te breiden.
 
 ### 5.3 De drie eigenschappen die het veilig maken
 
@@ -170,23 +178,31 @@ toegevoegd en geen veiligheid.
    identiteitsbewijzen, platte wachtwoorden) wordt door geen enkele hoeveelheid
    passkeys alsnog opengezet. Een sterkere sleutel geeft geen breder recht.
 
-## 7. Wat er nog niet is, en de drie besluiten die openstaan
+## 7. De besluiten — twee genomen, een open
 
-**Besluit 1 — waar liggen de drie delen?** Alle drie bij de eigenaar (dan is een
-huisbrand totaalverlies), of één bij een derde (dan bestaat er een partij die
-met één diefstal erbij binnen is). Dit is een besluit van de eigenaar over zijn
-eigen risico en niet van wie het bouwt. **Dit besluit gaat vooraf aan de bouw**,
-want het bepaalt de vorm.
+**Besluit 1 — waar liggen de drie delen? GENOMEN: alle drie bij de eigenaar, en
+RTG houdt er geen.** Dat volgt uit grens 5 en niet uit voorkeur: een deel bij dit
+huis plus één gestolen deel is een overname door het huis zelf, en dan is de
+belofte "RTG kan uw account niet overnemen" weg. De prijs staat er eerlijk bij —
+verlies je alle drie de bewaarplekken tegelijk, dan is er geen weg terug, en
+`kern/eigenaarherstel.js` zegt dat met zoveel woorden in zijn kop.
 
-**Besluit 2 — hoe lang is de wachttijd?** Te kort en punt 3 van par. 5.3 werkt
-niet; te lang en een echte noodsituatie duurt een maand. Zeven dagen is de
-verdedigbare middenweg, maar het is een keuze en geen afleiding.
+*Wat dit besluit NIET oplost:* waar die drie plekken fysiek zijn. Dat is
+mensenwerk en geen code. Twee delen in dezelfde la maken van 2-uit-3 een 1-uit-1.
 
-**Besluit 3 — verdwijnt het wachtwoord van het eigenaarsaccount?** Pas
-beantwoordbaar als 1 en 2 staan en het quorum daadwerkelijk een keer is
-beproefd. Tot dan is "wachtwoord + verplichte passkey op zware handelingen" de
-eerlijke stand, en die staat nu.
+**Besluit 2 — hoe lang is de wachttijd? GENOMEN: zeven dagen**
+(`WACHTTIJD_MS` in `kern/eigenaarherstel.js`). Te kort en de afbreekbaarheid uit
+par. 5.3 doet niets; te lang en een echte noodsituatie duurt een maand. Zeven
+dagen is één keer per week je telefoon aanraken, en dat is de handeling die het
+slot dichthoudt.
 
-**Nog te bouwen, met de reden erbij:** het quorum zelf (besluit 1), het tijdslot
-(besluit 2), de afbreekknop op een lopend herstel (volgt uit het tijdslot), en
-sessies met aflopend vertrouwen (par. 4 — een stap weg, geen besluit nodig).
+**Besluit 3 — verdwijnt het wachtwoord van het eigenaarsaccount? NOG OPEN, en nu
+pas eerlijk te beantwoorden.** Het quorum staat en is beproefd in de toetsen,
+maar niet in het echt: er is nog nooit iemand met twee papieren delen in zijn
+hand een herstel doorgelopen. Dat is de proef die vooraf gaat aan dit besluit, en
+hij kost een middag en drie bewaarplekken. Tot dan blijft "wachtwoord + verplichte
+passkey op zware handelingen" de stand.
+
+**Nog te bouwen:** sessies met aflopend vertrouwen (par. 4 — een stap weg, geen
+besluit nodig), en een scherm voor de herstelkant (de routes staan; de
+technische pagina toont de stand nog niet).

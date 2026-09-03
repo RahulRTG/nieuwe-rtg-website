@@ -14,7 +14,7 @@
 
 module.exports = (kern) => {
   const { app, save, schoon, supplierAuth, managerOnly, logActivity, sseToSupplier, horeca } = kern;
-  const { H } = horeca;
+  const { H, Hlees } = horeca;
   const wijk = require('../../../kern/horeca/wijk')({ horeca, schoon });
   /* Het wijkbeeld (hoeveel open werk draagt elke wijk) komt uit de WERKLIJST en
      wordt hier niet nog eens geteld: dat is dezelfde som die de PDA toont, en
@@ -89,6 +89,23 @@ module.exports = (kern) => {
         'iedereen. Een wijk verdeelt werk en verbergt het nooit.' });
   });
 
+  /* KIJKEN MET Hlees, SCHEPPEN MET H. H() zet de horecadoos van een zaak neer
+     zodra iemand ernaar vraagt -- ook als het verzoek daarna met een 404 terug
+     moet omdat die wijk niet bestaat, en dan zeggen de statuscode en de opslag
+     iets anders over hetzelfde verzoek (zie kern/horeca.js bij Hlees).
+
+     Weghalen, nemen en loslaten kunnen alleen slagen op een wijk die er al is,
+     en een wijk bestaat alleen in een doos die er al is. Bestaat die doos, dan
+     geeft Hlees hem ECHT terug en landt de wijziging gewoon in de opslag;
+     bestaat hij niet, dan is er niets te vinden en eindigt de aanroep sowieso
+     op een 404 -- nu zonder spoor.
+
+     `zet` hieronder houdt daarom bewust H(): hij is de enige van de vier die
+     ook op een zaak zonder doos kan SLAGEN, want hij maakt de eerste wijk. Met
+     een leesdoos zou die eerste wijk in een losse vorm landen en verdwijnen.
+     Zijn keuring woont in kern/horeca/wijk.js, in dezelfde aanroep die
+     schrijft, dus de route kan er niet tussen komen zonder die keuring over te
+     typen -- en twee plekken die dezelfde regel kennen lopen uiteen. */
   app.post('/api/supplier/horeca/wijk/zet', supplierAuth, (req, res) => {
     if (!managerOnly(req, res)) return;
     const h = H(req.supplier.code);
@@ -102,7 +119,7 @@ module.exports = (kern) => {
 
   app.post('/api/supplier/horeca/wijk/weg', supplierAuth, (req, res) => {
     if (!managerOnly(req, res)) return;
-    const h = H(req.supplier.code);
+    const h = Hlees(req.supplier.code);
     const uit = wijk.weg(h, req.body.wijkId);
     if (uit.error) return res.status(uit.status || 400).json({ error: uit.error });
     save();
@@ -114,7 +131,7 @@ module.exports = (kern) => {
   app.post('/api/supplier/horeca/wijk/neem', supplierAuth, (req, res) => {
     const ik = wieVan(req);
     if (ik.staffId == null) return res.status(403).json({ error: 'Alleen vanaf een persoonlijke inlog.' });
-    const h = H(req.supplier.code);
+    const h = Hlees(req.supplier.code);
     const uit = wijk.neem(h, req.body.wijkId, ik);
     if (uit.error) return res.status(uit.status || 400).json({ error: uit.error, code: uit.code || null, van: uit.van });
     if (!uit.al) {
@@ -126,7 +143,7 @@ module.exports = (kern) => {
   });
 
   app.post('/api/supplier/horeca/wijk/laat', supplierAuth, (req, res) => {
-    const h = H(req.supplier.code);
+    const h = Hlees(req.supplier.code);
     const uit = wijk.laat(h, req.body.wijkId, wieVan(req));
     if (uit.error) return res.status(uit.status || 400).json({ error: uit.error });
     save();

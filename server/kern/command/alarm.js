@@ -131,55 +131,10 @@ function maakAlarm({ opslag, save, journaal, slo, sonde, canary, kwaliteit, norm
     return { nieuw, opgelost, actief: gevonden.length };
   }
 
-  /* De uitgang. DRIE kanalen nu, en het derde is er bijgekomen om een reden die
-     in de oude versie van dit blok zelf stond: de eerste twee eindigen allebei
-     BINNEN het huis. Een regel in het journaal staat in het spoor, een sein gaat
-     naar het kantoorbord -- en om drie uur 's nachts kijkt daar niemand naar. Een
-     alarm dat alleen op een scherm eindigt dat niemand openheeft, is een
-     rapportcijfer achteraf (TAKEN.md 7.12).
-
-     Het derde kanaal is de bestaande foutmelder (server/foutmelder.js): een dunne
-     webhook-POST met SSRF-keuring, die er al was en op nul aanroepers stond voor
-     alarmen. Hij gaat alleen af op de OVERGANG -- aan en af -- en nooit op elke
-     ronde; weeg() roept meld() ook alleen daarvoor aan.
-
-     Stilgezet? Dan wel noteren en niet seinen -- stilte hoort in het spoor te
-     staan, en dat geldt voor alle drie de kanalen. Wie een alarm stilzet, wil ook
-     geen telefoon om drie uur. */
-  function meld(a, richting) {
-    const stil = a.stilTot && Date.parse(a.stilTot) > Date.now();
-    try {
-      journaal.noteer({ actie: richting === 'aan' ? 'alarm aan' : 'alarm af', actor: 'automaat',
-        niveau: 'auto', objectType: 'alarm', objectId: a.id,
-        reden: a.naam + (richting === 'aan' ? ': ' + a.wat : ' is opgelost') + (stil ? ' (stilgezet)' : '') });
-    } catch (e) { /* een journaalstoring mag het alarm niet dempen */ }
-    if (stil) return;
-    if (typeof sein === 'function') {
-      try { sein('sync', { scope: 'alarm', id: a.id, richting, ernst: a.ernst, naam: a.naam }); } catch (e) {}
-    }
-    naarBuiten(a, richting);
-  }
-
-  /* De melder wordt LAAT opgehaald: hij hangt aan de kern en die is nog niet
-     compleet op het moment dat deze laag wordt gebouwd. Zonder melder gebeurt er
-     niets -- en dat is geen stilte maar een stand die stand() hieronder gewoon
-     uitspreekt. */
-  const melderNu = () => { try { return typeof foutmelder === 'function' ? foutmelder() : foutmelder; } catch (e) { return null; } };
-  function naarBuiten(a, richting) {
-    const m = melderNu();
-    if (!m || !m.actief || typeof m.melden !== 'function') return;
-    try {
-      const kop = richting === 'aan'
-        ? 'ALARM ' + String(a.ernst || '').toUpperCase() + ': ' + a.naam
-        : 'Alarm opgelost: ' + a.naam;
-      /* Een Error en geen los object, want dat is wat melden() verwacht -- maar
-         de context zegt er expliciet bij dat dit een ALARM is en geen crash. Wie
-         de webhook leest, hoort die twee uit elkaar te kunnen houden. */
-      const e = new Error(kop + (richting === 'aan' ? ' -- ' + a.wat : ''));
-      e.name = 'RTGAlarm';
-      m.melden(e, { soort: 'alarm', id: a.id, ernst: a.ernst, richting, sinds: a.sinds || null });
-    } catch (e) { /* bezorging faalt liever dan het alarm te dempen */ }
-  }
+  /* De uitgang staat in ./alarm-uitgang.js: drie kanalen, waarvan het derde
+     buiten het huis komt. Waarom dat een eigen bestand is, staat in de kop
+     daarvan; kort: melden is een ander onderwerp dan wegen. */
+  const { meld, buitenStand } = require('./alarm-uitgang')({ journaal, sein, foutmelder });
 
   /* Stilzetten, met een einde eraan. Een alarm dat voor onbepaalde tijd stil
      kan, is een alarm dat je uitzet en vergeet; daarom een maximum uit de norm
@@ -194,16 +149,6 @@ function maakAlarm({ opslag, save, journaal, slo, sonde, canary, kwaliteit, norm
     journaal.noteer({ actie: 'alarm stilgezet', actor: door, niveau: 'hand', objectType: 'alarm',
       objectId: a.id, reden: u + ' uur: ' + String(reden || 'geen reden opgegeven') });
     return { alarm: a, tot: a.stilTot, max: d.stilteMaxUren };
-  }
-
-  /* Is er een weg naar buiten, en zo nee: waarom niet. Dit is met opzet een
-     UITSPRAAK en geen stilte -- een alarmweg die niet bestaat, hoort op het bord
-     te staan naast de alarmen zelf. */
-  function buitenStand() {
-    const m = melderNu();
-    if (!m) return { actief: false, reden: 'er is geen foutmelder aangesloten op deze laag; alarmen blijven binnen het huis' };
-    if (!m.actief) return { actief: false, reden: 'ERR_WEBHOOK_URL is niet gezet of werd geweigerd; er gaat niets naar buiten' };
-    return { actief: true, reden: null };
   }
 
   function stand() {

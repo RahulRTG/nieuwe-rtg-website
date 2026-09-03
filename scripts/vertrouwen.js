@@ -70,7 +70,7 @@ const BRONNEN = ['POORTWACHT.json', 'ROLPROEF.json', 'KETENS.json', 'INVOERPROEF
 
    `cellen` is het object uit een matrixrij: { AUTH: { staat: 'bewezen' }, .. }
    `ouderdomDagen` is een getal; NaN of undefined is een gezakte meting. */
-function staatVan(cellen, ouderdomDagen, halfwaardetijd) {
+function staatVan(cellen, ouderdomDagen, halfwaardetijd, onreproduceerbaar) {
   if (!cellen || typeof cellen !== 'object' || !Object.keys(cellen).length) {
     throw new Error('een route zonder cellen heeft geen staat; dit is een gezakte meting en geen ongemeten');
   }
@@ -108,6 +108,30 @@ function staatVan(cellen, ouderdomDagen, halfwaardetijd) {
         ' dagen oud (halfwaardetijd ' + hw + '); het spreekt over een vorige wereld',
       heropent: 'draai de proeven opnieuw; het bewijs zelf is niet in twijfel, alleen zijn leeftijd' };
   }
+  /* HET LAATSTE FILTER, EN HET WORDT NIET GEHAALD DOOR OUDERDOM MAAR DOOR
+     HERKOMST. Een bronregister dat is gemeten terwijl er ongecommitte CODE in de
+     boom stond, hoort niet bij de commit die in zijn stempel staat -- hij hoort
+     bij iets wat nergens is vastgelegd. Zo'n meting is niet na te lopen, en wat
+     niemand kan overdoen is geen bewijs (TAKEN.md 7.3).
+
+     HIJ ZAKT NAAR `verschaald` EN NIET NAAR `geschorst`, en dat is een besluit.
+     De meting is niet FOUT -- er is wel degelijk iets gemeten, en waarschijnlijk
+     klopt het -- hij is alleen onreproduceerbaar. Dat is precies wat `verschaald`
+     betekent in PROOF.md par. 2: het bewijs zelf is niet in twijfel, alleen de
+     waarde die je eraan mag hechten. Een route hierop schorsen zou de
+     schorspoort dichttrekken op een boekhoudkundig gebrek, en dat is geen
+     veiligheid maar een storing.
+
+     De namen gaan mee in de reden. "Het bewijs is onreproduceerbaar" zonder te
+     zeggen WELKE meting, stuurt de lezer op een zoektocht die de meter zelf al
+     had kunnen afsluiten. */
+  const vuil = Array.isArray(onreproduceerbaar) ? onreproduceerbaar.filter(Boolean) : [];
+  if (vuil.length) {
+    return { staat: 'verschaald',
+      reden: 'het bewijs is compleet en vers, maar ' + vuil.length + ' bronregister(s) zijn gemeten ' +
+        'met ongecommitte code in de boom en dus niet na te lopen: ' + vuil.join(', '),
+      heropent: 'commit de code en meet opnieuw; een meting hoort bij de commit die in zijn stempel staat' };
+  }
   return { staat: 'bewezen',
     reden: 'alle schakels dragen bewijs en de meting is ' + Math.round(ouderdomDagen) + ' dag(en) oud',
     heropent: 'dit vervalt zodra een cel zakt, een schakel zijn bewijs verliest, of de meting ouder ' +
@@ -116,11 +140,11 @@ function staatVan(cellen, ouderdomDagen, halfwaardetijd) {
 
 /* Alle routes: de matrixrijen door de staatmachine. Losgetrokken van meet()
    zodat de toets hem verzonnen rijen kan voeren zonder de echte registers. */
-function bereken(rijen, ouderdomDagen, halfwaardetijd) {
+function bereken(rijen, ouderdomDagen, halfwaardetijd, onreproduceerbaar) {
   const telling = { bewezen: 0, verschaald: 0, verzwakt: 0, geschorst: 0, ongemeten: 0 };
   const perRoute = {};
   for (const rij of rijen) {
-    const uit = staatVan(rij.cellen, ouderdomDagen, halfwaardetijd);
+    const uit = staatVan(rij.cellen, ouderdomDagen, halfwaardetijd, onreproduceerbaar);
     telling[uit.staat]++;
     perRoute[rij.methode + ' ' + rij.pad] = uit;
   }
@@ -134,6 +158,7 @@ function bereken(rijen, ouderdomDagen, halfwaardetijd) {
 function ouderdom(nu, lees) {
   const lezer = lees || ((naam) => fs.readFileSync(path.join(WORTEL, naam), 'utf8'));
   const bronnen = {};
+  const vuil = [];
   let oudste = null;
   for (const naam of BRONNEN) {
     /* VIA DE GEDEELDE LEZER, want hier stond `j.stempel && j.stempel.op` en dat
@@ -147,14 +172,19 @@ function ouderdom(nu, lees) {
     const op = st && st.op;
     if (!op) continue;
     const dagen = (nu - new Date(op).getTime()) / 86400000;
-    bronnen[naam] = { op, dagen: Math.round(dagen * 10) / 10 };
+    bronnen[naam] = { op, dagen: Math.round(dagen * 10) / 10, boomVuil: st.boomVuil === true };
+    /* `boomVuil: null` is met opzet GEEN vuil: dat betekent dat git niet te
+       bevragen was, en onbekend als vuil lezen zou elke meting buiten een
+       repo onbruikbaar maken. Onbekend hoort hier niet zwaarder te wegen dan
+       gemeten -- maar ook niet lichter, en daarom staat het er wel bij. */
+    if (st.boomVuil === true) vuil.push(naam);
     if (oudste === null || dagen > oudste) oudste = dagen;
   }
   if (oudste === null) {
     throw new Error('geen enkel bronregister draagt een stempel; dan is de versheid niet te meten ' +
       'en is dit een gezakte meting, geen verse');
   }
-  return { dagen: oudste, bronnen };
+  return { dagen: oudste, bronnen, onreproduceerbaar: vuil };
 }
 
 function meet() {
@@ -164,7 +194,7 @@ function meet() {
       'halve routelijst is gevaarlijker dan geen');
   }
   const oud = ouderdom(Date.now());
-  const uit = bereken(matrix.rijen, oud.dagen, HALFWAARDETIJD_DAGEN);
+  const uit = bereken(matrix.rijen, oud.dagen, HALFWAARDETIJD_DAGEN, oud.onreproduceerbaar);
   return {
     stempel: stempel(),
     uitleg: 'De vervalstaat per route (PROOF.md par. 2): bewezen, verschaald, verzwakt, geschorst of ' +
@@ -177,6 +207,10 @@ function meet() {
     halfwaardetijdDagen: HALFWAARDETIJD_DAGEN,
     ouderdomDagen: Math.round(oud.dagen * 10) / 10,
     bronnen: oud.bronnen,
+    /* Welke bronnen niet zijn na te lopen, apart en met naam: dit is de reden
+       waarom er geen enkele route op `bewezen` kan staan, en die reden hoort in
+       het register te staan en niet alleen in de tekst per route. */
+    onreproduceerbaar: oud.onreproduceerbaar,
     routes: matrix.routes,
     telling: uit.telling,
     perRoute: uit.perRoute

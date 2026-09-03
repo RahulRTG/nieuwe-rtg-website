@@ -28,6 +28,22 @@ module.exports = (kern) => {
     }
   }
 
+  /* SCHEPPEN PAS ALS ER WERKELIJK IETS BIJ KOMT. De motor kent twee lezers:
+     bak() zet de rij van een eigenaar neer zodra iemand hem opvraagt, kijk()
+     doet dat niet. Op elke weg die kan eindigen in een 404 (bord bestaat niet),
+     403 (niet in de groep) of 400 (lege naam) hoort kijk(), anders staat er na
+     een weigering een lege rij die er niet was.
+
+     Alleen 'maak' voegt echt iets toe, en dat blijkt pas als de motor akkoord
+     is. Bestond de rij al, dan gaf kijk() hem ECHT terug en heeft bordMaak er
+     rechtstreeks in geschreven -- dan is hier niets meer te doen. Bestond hij
+     niet, dan hing de lijst nergens aan en wordt hij nu alsnog neergezet, met
+     het nieuwe bord erin. */
+  function vastzetten(vak, sleutel, los, bord) {
+    if (motor.kijk(vak, sleutel) === los) return;
+    motor.bak(vak, sleutel).push(bord); save();
+  }
+
   // ---- de zaak: borden per bedrijf, zichtbaar per bord-lidmaatschap ----
   app.post('/api/supplier/borden', supplierAuth, (req, res) => {
     const borden = motor.bak('borden', req.supplier.code);
@@ -36,11 +52,11 @@ module.exports = (kern) => {
   });
   app.post('/api/supplier/bord', supplierAuth, (req, res) => {
     const actie = String(req.body.actie || '');
-    /* Kijken zonder scheppen op alles wat geen bord MAAKT: bak() zet de rij neer
-       voor een zaak die er nog geen had, ook als het bord daarna niet blijkt te
-       bestaan. Alleen de 'maak'-tak heeft die rij echt nodig. */
-    const borden = actie === 'maak' ? motor.bak('borden', req.supplier.code)
-      : motor.kijk('borden', req.supplier.code);
+    /* Kijken zonder scheppen, OOK bij 'maak'. De la-opener van de motor zet de
+       rij neer voor een zaak die er nog geen had -- ook als het bord daarna niet
+       blijkt te bestaan, en ook als bordMaak de naam afkeurt. Wat bordMaak in
+       deze losse lijst schrijft, bewaart vastzetten() hieronder alsnog. */
+    const borden = motor.kijk('borden', req.supplier.code);
     let b = null;
     if (actie !== 'maak') {
       b = motor.bordVind(borden, String(req.body.id || ''));
@@ -53,24 +69,28 @@ module.exports = (kern) => {
     }
     const r = voerUit(borden, b, actie, req.body, req.actor.name);
     if (r.error) return res.status(r.status || 400).json({ error: r.error });
-    if (actie === 'maak') logActivity(req.supplier.code, req.actor, 'maakte het bord "' + r.bord.naam + '"');
+    if (actie === 'maak') {
+      vastzetten('borden', req.supplier.code, borden, r.bord);
+      logActivity(req.supplier.code, req.actor, 'maakte het bord "' + r.bord.naam + '"');
+    }
     sseToSupplier(req.supplier.code, 'sync', { scope: 'borden' });
     res.json(r);
   });
 
   // ---- het lid: eigen projectborden bij de Business Pass ----
-  function lidBak(req) { return motor.bak('bordenLid', req.session.key); }
+  // kijken schept niet; om dezelfde reden als hierboven bij vastzetten()
+  const lidKijk = (req) => motor.kijk('bordenLid', req.session.key);
   const lidOk = (req, res) => {
     if (req.session.tier !== 'business') { res.status(403).json({ error: 'Borden zijn onderdeel van de Business Pass.' }); return false; }
     return true;
   };
   app.post('/api/member/borden', auth, (req, res) => {
     if (!lidOk(req, res)) return;
-    res.json({ ok: true, borden: lidBak(req) });
+    res.json({ ok: true, borden: motor.bak('bordenLid', req.session.key) });
   });
   app.post('/api/member/bord', auth, (req, res) => {
     if (!lidOk(req, res)) return;
-    const borden = lidBak(req);
+    const borden = lidKijk(req);
     const actie = String(req.body.actie || '');
     let b = null;
     if (actie !== 'maak') {
@@ -79,6 +99,7 @@ module.exports = (kern) => {
     }
     const r = voerUit(borden, b, actie, req.body, null);
     if (r.error) return res.status(r.status || 400).json({ error: r.error });
+    if (actie === 'maak') vastzetten('bordenLid', req.session.key, borden, r.bord);
     res.json(r);
   });
 };

@@ -96,42 +96,12 @@ const log = {
     const veld = Object.assign({ fout: (err && err.message) || String(err), stack: err && err.stack }, context || {});
     schrijf('error', 'uitzondering', veld);
     try { noteerFout(err, context || {}); } catch (e) {}
-    try { telServerfout(err, context || {}); } catch (e) {}
+    try { require('./log-meting').telServerfout(err, context || {}); } catch (e) {}
     if (foutHaak) { try { foutHaak(err, context || {}); } catch (e) {} }
   }
 };
 
-/* ---------------------------------------------------------------------------
-   DE 5XX-TELLER VAN /metrics, EN WAAROM HIJ HIER HANGT EN NIET OP TWEE PLEKKEN.
 
-   `rtg_fouten_totaal` stond in server/meting-tekst.js netjes uitgeschreven met
-   een HELP- en een TYPE-regel, en `meting.telFout()` had in de hele
-   productiecode geen enkele aanroeper. Die teller stond dus voor altijd op nul
-   -- een meter die niet kan uitslaan, precies wat LAT.md regel 10 verbiedt. Het
-   stond als TAKEN.md 7.10 met "hoort op de twee plekken waar een 5xx ontstaat
-   (log.js en opzet/afsluiters.js)".
-
-   Het zijn er geen twee. Allebei die plekken roepen `log.uitzondering()` aan, en
-   dat doen ook de vijftig andere plekken die een storing melden; ze hier apart
-   ophangen zou twee aanroepers maken waar er een nodig is, en de rest missen.
-
-   WAT ER GETELD WORDT IS EEN SERVERFOUT EN NIET ELKE MELDING. `afsluiters.js`
-   meldt ook een 413 en een 400 langs deze weg -- dat is de client die iets
-   verkeerds stuurt, geen storing van ons. De regel is daarom: tellen tenzij de
-   context een status ONDER de 500 draagt. Een uitzondering zonder status is per
-   definitie van ons; die telt dus mee, en dat is de meerderheid.
-
-   DE SOORT IS DE NAAM VAN DE FOUT EN NOOIT HET PAD. Een Prometheus-label met een
-   pad erin laat de reeks meegroeien met het verkeer, en op een route met een id
-   erin groeit hij ongelimiteerd. `TypeError`, `RangeError`, `Error`: een korte,
-   gesloten verzameling die zegt WAT voor storing het was zonder te zeggen wie
-   hem opriep. */
-function telServerfout(err, context) {
-  const status = context && context.status;
-  if (status !== undefined && status !== null && Number(status) < 500) return;
-  const soort = (err && err.name) || (err && err.constructor && err.constructor.name) || 'Error';
-  require('./meting').telFout(soort);
-}
 
 /* Express-middleware: log elk verzoek met een correlatie-id, methode, pad,
    status en duur. Het id komt terug in de response-header (X-Request-Id) zodat

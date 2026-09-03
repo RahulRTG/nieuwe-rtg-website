@@ -19,7 +19,15 @@
 
 module.exports = (kern) => {
   const { app, schoon, horeca, gastAuth } = kern;
-  const { H, heleCenten } = horeca;
+  const { Hlees, heleCenten } = horeca;
+
+  /* KIJKEN IS Hlees EN NIET H. Beide routes hieronder LEZEN alleen -- ze zetten
+     niets op de rekening en niets op de band. H() zou de horecadoos van de zaak
+     neerzetten zodra iemand ernaar vraagt, ook bij de 404 op een geraden
+     boncode, en dan laat een geweigerd verzoek iets achter dat er niet was.
+     Bestaat de doos wel -- en dat is hier altijd zo, want gastAuth komt niet
+     langs zonder open rekening -- dan geeft Hlees hem ECHT terug. Zie
+     kern/horeca.js bij Hlees. */
 
   /* ---------- mijn polsband ----------
      Op saldo vragen kan alleen met de boncode, dus met de band in je hand. Het
@@ -30,7 +38,7 @@ module.exports = (kern) => {
     const { zaakcode } = req.gast;
     const code = schoon((req.body || {}).bonCode, 40);
     if (!code) return res.status(400).json({ error: 'Scan de code op je polsband.', code: 'band-leeg' });
-    const h = H(zaakcode);
+    const h = Hlees(zaakcode);
     const bon = Object.prototype.hasOwnProperty.call(h.bonnen, code) ? h.bonnen[code] : null;
     if (!bon || bon.soort !== 'tegoed') return res.status(404).json({
       error: 'Deze code hoort niet bij een polsband van deze zaak.', code: 'band-onbekend' });
@@ -46,7 +54,7 @@ module.exports = (kern) => {
      komt bedrogen uit. */
   app.post('/api/gast/club/tafel', gastAuth, (req, res) => {
     const { zaakcode, rekening } = req.gast;
-    const h = H(zaakcode);
+    const h = Hlees(zaakcode);
     const club = h.club || {};
     const afspraak = Object.values(club.tafels || {}).find(t =>
       t.rekeningId === rekening.id || (rekening.tafel && t.tafel === rekening.tafel)) || null;

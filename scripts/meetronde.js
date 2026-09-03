@@ -143,6 +143,22 @@ async function poortwachtRonde() {
   } finally { srv.klaar(); }
 }
 
+/* DE STAPPENLIJST GAAT NAAR BUITEN, EN DE RONDE START NIET MEER BIJ HET LADEN.
+
+   Dit stond er niet, en het is een keer echt misgegaan: een controle die alleen
+   wilde weten WELKE registers deze ronde verst maakt, deed `require()` op dit
+   bestand -- en startte daarmee de volledige ronde van drie kwartier, die
+   ondertussen drie registers overschreef vanuit een boom met ongecommit werk.
+   Precies de faalvorm waar scripts/handelingproef-route.js al een wacht voor
+   heeft ("een laadcontrole schreef ROLPROEF.json terug van 3377 beproefde
+   routes naar 292, en het zag er daarna volkomen normaal uit").
+
+   Die wacht ontbrak hier omdat dit bestand zelf geen register schrijft en dus
+   buiten het bereik van scripts/meetkeuring.js viel. Hij schrijft ze alleen
+   allemaal via zijn kinderen -- wat erger is en niet minder erg. */
+module.exports = { STAPPEN };
+if (require.main !== module) return;
+
 (async () => {
   const start = Date.now();
   const commit = nuCommit();

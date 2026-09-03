@@ -37,16 +37,26 @@ module.exports = (kern) => {
   /* ---------- de kortingsgrens zetten (manager) ---------- */
   app.post('/api/supplier/horeca/rahul/grens', supplierAuth, (req, res) => {
     if (!managerOnly(req, res)) return;
+    /* EERST KEUREN, DAN PAS DE DOOS OPHALEN. De getter H zet de horecadoos van
+       een zaak neer zodra iemand ernaar vraagt, en hij stond hier boven de
+       bedragcontrole: een zaak die nog nooit iets met horeca deed hield aan een
+       afgekeurd bedrag (400) een verse lege doos over. Zie kern/horeca.js bij
+       Hlees voor waarom dat onderscheid bestaat. Wissen keurt niets aan de
+       invoer, dus daar is de vraag zelf de keuring. */
+    const wissen = req.body.centen === null || req.body.centen === '';
+    let c = 0;
+    if (!wissen) {
+      c = Math.round(Number(req.body.centen));
+      if (!Number.isFinite(c) || c < 0 || c > 100000)
+        return res.status(400).json({ error: 'Kies een bedrag in centen tussen 0 en 100.000.' });
+    }
     const h = H(req.supplier.code);
-    if (req.body.centen === null || req.body.centen === '') {
+    if (wissen) {
       delete h.instel.rahulKortingGrensCenten;
       save();
       return res.json({ ok: true, kortingGrensCenten: null,
         let: 'Geen grens: vanaf nu vraagt elke korting van Rahul een mens.' });
     }
-    const c = Math.round(Number(req.body.centen));
-    if (!Number.isFinite(c) || c < 0 || c > 100000)
-      return res.status(400).json({ error: 'Kies een bedrag in centen tussen 0 en 100.000.' });
     h.instel.rahulKortingGrensCenten = c;
     save();
     logActivity(req.supplier.code, req.actor, 'zette de kortingsgrens van Rahul op € ' + (c / 100).toFixed(2));
@@ -75,23 +85,28 @@ module.exports = (kern) => {
      voorraadverschil, korting) allemaal geld of veiligheid raken. */
   app.post('/api/supplier/horeca/rahul/bevestig', supplierAuth, (req, res) => {
     if (!managerOnly(req, res)) return;
-    /* H() MAAKT de doos van een zaak aan zodra iemand ernaar vraagt, ook als er
-       daarna een 404 volgt omdat de bon niet bestaat. Eerst kijken met Hlees()
-       -- is er niets, dan is er ook geen bon en gaat het verzoek terug zonder
-       spoor. Zie ook kern/horeca.js bij Hlees(); daar staat waarom dat onderscheid
-       bestaat. */
+    /* De getter H maakt de doos van een zaak aan zodra iemand ernaar vraagt, ook
+       als er daarna een 404 volgt omdat de bon niet bestaat. Eerst kijken met
+       Hlees dus -- is er niets, dan is er ook geen bon en gaat het verzoek terug
+       zonder spoor. Zie kern/horeca.js bij Hlees; daar staat waarom dat
+       onderscheid bestaat.
+
+       En rechtstreeks lezen, want ook de bonnenlezer van de rechtenlaag
+       schrijft: die zet de bonnenlijst neer als het veld er nog niet is. Op een
+       BESTAANDE zaak geeft Hlees de echte doos terug, dus dan landt die lege
+       lijst er alsnog in -- en dan blijft een 404 alsnog een spoor nalaten.
+       Kijken doet hier dus niets meer dan kijken. */
     const bonId = String((req.body || {}).bonId || '');
-    /* RECHTSTREEKS LEZEN, want ook `recht.bonnen()` schrijft: die gaat via
-       doos(h), en doos zet `h.rahulBonnen = []` neer als het veld er nog niet
-       is. Op een BESTAANDE zaak geeft Hlees() de echte doos terug, dus dan
-       landt die lege lijst er alsnog in -- en dan blijft een 404 een spoor
-       nalaten. Kijken doet hier dus niets meer dan kijken. */
-    const bak = Hlees(req.supplier.code);
-    const bonnen = Array.isArray(bak && bak.rahulBonnen) ? bak.rahulBonnen : [];
+    const h = Hlees(req.supplier.code);
+    const bonnen = Array.isArray(h && h.rahulBonnen) ? h.rahulBonnen : [];
     if (!bonnen.some((b) => String(b.id) === bonId)) {
       return res.status(404).json({ error: 'Deze actiebon kennen we niet.' });
     }
-    const h = H(req.supplier.code);
+    /* Vanaf hier is `h` aantoonbaar de ECHTE doos van deze zaak -- er zit immers
+       een bon in, en Hlees geeft de doos van H terug zodra die bestaat. Hier
+       stond daarom een tweede aanroep van H; die maakte niets meer aan, maar hij
+       LAS als "maak zo nodig aan" vlak boven een uitgang die alsnog 4xx kan
+       geven, en zo raakt de volgende lezer het onderscheid weer kwijt. */
     const uit = recht.bevestig(h, (req.body || {}).bonId, wieVan(req), (bon) => {
       const f = UITVOERDERS[bon.handeling];
       return f ? f(h, bon.gegevens, wieVan(req), req.supplier)

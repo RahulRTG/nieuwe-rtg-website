@@ -57,7 +57,21 @@ const WEIGERT = /res\s*\.\s*status\s*\(\s*4\d\d\s*\)|status:\s*4\d\d|\{\s*error\
    horen bij het bestand zoals het op schijf staat. */
 function lijfVan(bestand, regel) {
   let bron;
-  try { bron = fs.readFileSync(bestand, 'utf8'); } catch (e) { return null; }
+  try {
+    /* MET HET COMMENTAAR PLATGESLAGEN, en dat is geen netheid. De reparatieronde
+       van 3 september 2026 leverde vijf overgebleven verdenkingen op, en DRIE
+       daarvan waren geen code: `server/routes/supplier/vervoer.js` citeert in
+       een uitlegblok de oude fout letterlijk ("Hier stond `s.fleet = s.fleet ||
+       []` boven de keuring"), en in personeel.js staat "P() en H()" in een zin.
+       Een meter die zijn eigen uitleg als bevinding terugleest, straft precies
+       het commentaar dat de vorige reparatie heeft opgeschreven -- en de enige
+       manier om hem stil te krijgen is die uitleg weghalen. Dat is de omgekeerde
+       wereld.
+
+       De platgeslagen vorm houdt regelnummers en tekenposities heel, dus de
+       melding blijft naar de goede regel wijzen (zie scripts/lib/bron.js). */
+    bron = require('./lib/bron').zonderCommentaar(fs.readFileSync(bestand, 'utf8'), { regelsHeel: true });
+  } catch (e) { return null; }
   const regels = bron.split('\n');
   if (regel < 1 || regel > regels.length) return null;
   const uit = [];

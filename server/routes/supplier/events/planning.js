@@ -57,16 +57,22 @@ app.post('/api/supplier/event/runsheet', supplierAuth, (req, res) => {
   if (!managerOnly(req, res)) return;
   const e = (req.supplier.events || []).find(x => x.id === req.body.id);
   if (!e) return res.status(404).json({ error: 'Event niet gevonden.' });
+  /* Eerst alles keuren wat kan weigeren, en pas daarna de runsheet aanraken.
+     Andersom hield een event dat er nog geen had na een onbekende actie of een
+     lege regel een lege runsheet over die er niet was -- en dan zeggen de 400 en
+     de database iets anders over hetzelfde verzoek. */
+  const actie = req.body.action;
+  if (actie !== 'add' && actie !== 'remove') return res.status(400).json({ error: 'Onbekende actie.' });
+  const it = req.body.item || {};
+  if (actie === 'add' && !String(it.text || '').trim()) return res.status(400).json({ error: 'Omschrijf wat er moet gebeuren.' });
   e.runsheet = e.runsheet || [];
-  if (req.body.action === 'add') {
-    const it = req.body.item || {};
-    if (!String(it.text || '').trim()) return res.status(400).json({ error: 'Omschrijf wat er moet gebeuren.' });
+  if (actie === 'add') {
     e.runsheet.push(runItem(it.time, it.station, it.text, it.daysBefore));
     if (e.runsheet.length > 60) e.runsheet = e.runsheet.slice(0, 60);
     sortRunsheet(e);
-  } else if (req.body.action === 'remove') {
+  } else {
     e.runsheet = e.runsheet.filter(x => x.id !== req.body.itemId);
-  } else return res.status(400).json({ error: 'Onbekende actie.' });
+  }
   save();
   sseToSupplier(req.supplier.code, 'sync', { scope: 'events' });
   res.json({ ok: true, event: e });

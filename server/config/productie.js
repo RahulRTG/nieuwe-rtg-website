@@ -99,19 +99,10 @@ function keur(env, fouten, waarschuwingen) {
        server/foutmelder.js nam zijn plaats in, op ERR_WEBHOOK_URL. De
        waarschuwing stuurde de beheerder dus naar een knop die nergens op zit.
        Zie test/alarmweg.test.js en check.js regel 27. */
-    /* SINDS 3 SEPTEMBER 2026 GAAT HET ALARM HIER OOK LANGS. Deze waarschuwing
-       ging over uitzonderingen; het alarm van server/kern/command/alarm.js heeft
-       er nu zijn derde uitgang op (TAKEN.md 7.12). Zonder deze url eindigen
-       ALLE alarmen binnen het huis: een regel in het journaal en een sein naar
-       het kantoorbord, en daar kijkt om drie uur 's nachts niemand naar. Dat
-       staat er nu bij, want een beheerder die deze regel leest hoort te weten
-       wat hij precies mist.
-
-       En de tweede tak is nieuw: een url die er WEL staat maar door de
-       SSRF-keuring wordt geweigerd, is gevaarlijker dan een lege. Dan denkt
-       iedereen dat de alarmering aanstaat terwijl server/foutmelder.js hem bij
-       het opstarten heeft weggegooid. Dat hoort geen waarschuwing te zijn maar
-       een fout: de belofte op het scherm klopt dan niet meer. */
+    /* Het alarm gaat hier sinds 3 september 2026 ook langs (TAKEN.md 7.12); dat
+       staat nu in de waarschuwing. Gevaarlijker dan een lege url is een url die
+       er WEL staat en wordt geweigerd: dan gooit de foutmelder hem bij het
+       opstarten weg terwijl het bord "externe alarmering" toont. */
     if (!env.ERR_WEBHOOK_URL) waarschuwingen.push('ERR_WEBHOOK_URL niet gezet: geen EXTERNE alarmering. De eigen fout-aggregatie op het techniekbord draait altijd, maar die zie je alleen als je zelf kijkt -- en niet als de doos plat ligt. Ook het ALARM (SLO, journaalketen, canary) blijft dan binnen: journaal en kantoorbord, en verder niets. Zet een webhook (Slack/Discord/eigen endpoint) en beproef hem met de zelfproef op het techniekbord.');
     else {
       let keur = { ok: true };

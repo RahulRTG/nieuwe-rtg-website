@@ -25,6 +25,26 @@ module.exports = (ctx) => {
     if (!Array.isArray(g.keuken.vast)) g.keuken.vast = [];
     return g.keuken;
   }
+  /* KIJKEN ZONDER SCHEPPEN, en dat onderscheid is hier geen netheid.
+
+     `bak()` zet de keukenla neer voor een gezin dat er nog geen had. Op de weg
+     die werkelijk iets TOEVOEGT hoort dat ook zo, en op een weg die daarna nog
+     kan weigeren is het verkeerd: wie een boodschap afvinkt die er niet staat
+     krijgt een 404, en dan hoort er niets achter te blijven -- anders zeggen de
+     statuscode en de database twee verschillende dingen over hetzelfde verzoek.
+
+     Bestaat de la wel, dan geeft dit de ECHTE lijsten terug en geen kopie: een
+     regel die je hier vindt en afvinkt landt gewoon in de opslag. Bestaat hij
+     niet, dan krijg je een lege vorm die nergens aan vastzit, en loopt elke
+     zoektocht dood op een nette 404. */
+  const kijk = (g) => {
+    const k = (g && g.keuken && typeof g.keuken === 'object') ? g.keuken : {};
+    return {
+      menu: (k.menu && typeof k.menu === 'object') ? k.menu : {},
+      lijst: Array.isArray(k.lijst) ? k.lijst : [],
+      vast: Array.isArray(k.vast) ? k.vast : []
+    };
+  };
   const isDatum = d => /^\d{4}-\d{2}-\d{2}$/.test(String(d || ''));
   const naamVan = (g, pid) => (pid && g.profielen[pid] ? g.profielen[pid].naam : '');
 
@@ -60,18 +80,17 @@ module.exports = (ctx) => {
     const s = familieVan(req, res); if (!s) return;
     const wat = schoon(req.body.wat, 60);
     if (!wat) return res.status(400).json({ error: 'Wat moet er op de lijst?' });
-    const k = bak(s.g);
+    const k = kijk(s.g);
     if (k.lijst.length >= 150) return res.status(400).json({ error: 'De lijst is vol. Ruim eerst wat afgevinkte spullen op.' });
     if (!k.lijst.some(x => !x.af && x.wat.toLowerCase() === wat.toLowerCase())) {
-      k.lijst.push({ id: rid(3), wat, af: false, doorPid: s.p.id, at: nu() });
+      bak(s.g).lijst.push({ id: rid(3), wat, af: false, doorPid: s.p.id, at: nu() });
       save();
     }
     res.json({ ok: true });
   });
   router.post('/gezin/keuken/lijst/af', (req, res) => {
     const s = familieVan(req, res); if (!s) return;
-    const k = bak(s.g);
-    const it = k.lijst.find(x => x.id === req.body.itemId);
+    const it = kijk(s.g).lijst.find(x => x.id === req.body.itemId);
     if (!it) return res.status(404).json({ error: 'Dit staat niet meer op de lijst.' });
     it.af = req.body.af === true; it.doorPid = s.p.id; save();
     res.json({ ok: true });
@@ -94,9 +113,9 @@ module.exports = (ctx) => {
     const s = familieVan(req, res); if (!s) return;
     const wat = schoon(req.body.wat, 60);
     if (!wat) return res.status(400).json({ error: 'Wat komt er elke week terug?' });
-    const k = bak(s.g);
+    const k = kijk(s.g);
     if (k.vast.length >= 40) return res.status(400).json({ error: 'Veertig vaste boodschappen is genoeg.' });
-    if (!k.vast.some(x => x.toLowerCase() === wat.toLowerCase())) { k.vast.push(wat); save(); }
+    if (!k.vast.some(x => x.toLowerCase() === wat.toLowerCase())) { bak(s.g).vast.push(wat); save(); }
     res.json({ ok: true });
   });
   router.post('/gezin/keuken/vast/verwijder', (req, res) => {

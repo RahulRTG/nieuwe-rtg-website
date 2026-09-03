@@ -18,15 +18,19 @@
      voorgerecht al weg is. */
 module.exports = (kern) => {
   const { app, save, schoon, supplierAuth, logActivity, sseToSupplier, horeca } = kern;
-  const { KANALEN, H, nu, id, totaal, openstaand } = horeca;
+  const { KANALEN, H, Hlees, nu, id, totaal, openstaand } = horeca;
   const { bouwRegel } = require('../../../kern/horeca/regel')({ schoon, horeca });
   /* Dezelfde kaartopbouw die de gastdeur leest (kern/horeca/kaart.js). Niet
      `kern.gastKaartVanZaak`: dat is een naam van het gast-domein en het
      supplier-domein hoort daar niet in te grijpen. */
   const { kaartVanZaak, kaartPerGroep } = require('../../../kern/horeca/kaart')({ findSupplier: kern.findSupplier, horeca });
 
+  /* OPZOEKEN IS KIJKEN, dus Hlees en niet H: H() zet de doos van een zaak neer
+     zodra iemand ernaar vraagt, ook als die vraag hieronder met een 404 eindigt.
+     Bestaat de doos wel, dan geeft Hlees hem ECHT terug en landt elke wijziging
+     gewoon in de opslag (zie kern/horeca.js). */
   const rekVan = (req, res) => {
-    const h = H(req.supplier.code);
+    const h = Hlees(req.supplier.code);
     const r = Object.prototype.hasOwnProperty.call(h.rekeningen, String(req.body.rekeningId || ''))
       ? h.rekeningen[String(req.body.rekeningId)] : null;
     if (!r) { res.status(404).json({ error: 'Deze rekening kennen we niet.' }); return null; }
@@ -40,12 +44,12 @@ module.exports = (kern) => {
   app.post('/api/supplier/horeca/rekening/open', supplierAuth, (req, res) => {
     const kanaal = String(req.body.kanaal || 'tafel');
     if (!KANALEN.includes(kanaal)) return res.status(400).json({ error: 'Onbekend verkoopkanaal. Kies uit: ' + KANALEN.join(', ') + '.' });
-    const h = H(req.supplier.code);
     const tafel = schoon(req.body.tafel, 30) || null;
     // een tafel heeft er hooguit een open: anders staan er twee rekeningen op
-    // tafel 12 en betaalt de ene tafel de bestelling van de andere
+    // tafel 12 en betaalt de ene tafel de bestelling van de andere. Die controle
+    // KIJKT alleen: een 409 hoort geen verse doos achter te laten.
     if (kanaal === 'tafel' && tafel) {
-      const bestaand = Object.values(h.rekeningen).find(r => r.status === 'open' && r.kanaal === 'tafel' && r.tafel === tafel);
+      const bestaand = Object.values(Hlees(req.supplier.code).rekeningen).find(r => r.status === 'open' && r.kanaal === 'tafel' && r.tafel === tafel);
       if (bestaand) return res.status(409).json({ error: 'Op ' + tafel + ' staat al een open rekening.', rekeningId: bestaand.id });
     }
     const r = { id: id(5), kanaal, tafel, naam: schoon(req.body.naam, 60) || null,
@@ -53,7 +57,7 @@ module.exports = (kern) => {
       status: 'open', regels: [], kortingen: [], betalingen: [], fooiCenten: 0,
       gastId: schoon(req.body.gastId, 40) || null, kamer: schoon(req.body.kamer, 20) || null,
       geopendAt: nu(), door: req.actor.name, at: nu() };
-    h.rekeningen[r.id] = r;
+    H(req.supplier.code).rekeningen[r.id] = r;
     save();
     logActivity(req.supplier.code, req.actor, 'opende een rekening op ' + (tafel || kanaal));
     sseToSupplier(req.supplier.code, 'sync', { scope: 'horeca' });

@@ -25,7 +25,7 @@
       staan op de regel. Anders is "klaar" een knop die niets betekent. */
 module.exports = (kern) => {
   const { app, save, schoon, supplierAuth, sseToSupplier, horeca } = kern;
-  const { REGELSTANDEN, H, nu } = horeca;
+  const { REGELSTANDEN, H, Hlees, nu } = horeca;
 
   /* Hoe lang een gerecht normaal duurt staat in kern/horeca/keukenlaag.js en
      niet hier: de polslaag toont dezelfde wachttijd aan een gast, en die kan
@@ -140,7 +140,10 @@ module.exports = (kern) => {
 
   /* ---------- een regel doorzetten ---------- */
   app.post('/api/supplier/horeca/keuken/stand', supplierAuth, (req, res) => {
-    const h = H(req.supplier.code);
+    /* Hlees en niet H: dat laatste zet de doos van een zaak neer zodra iemand
+       ernaar vraagt, ook als het verzoek daarna met een 404 terug moet. Staat de
+       bon er wel, dan is dit de ECHTE doos (zie kern/horeca.js). */
+    const h = Hlees(req.supplier.code);
     const rek = h.rekeningen[String(req.body.rekeningId || '')];
     const regel = rek && (rek.regels || []).find(x => x.id === String(req.body.regelId || ''));
     if (!regel) return res.status(404).json({ error: 'Die bon staat niet meer op het bord.' });

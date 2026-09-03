@@ -52,18 +52,26 @@ module.exports = (sctx) => {
     if (!kind) return res.status(404).json({ error: 'Dat profiel bestaat niet in jouw gezin.' });
     const sleutel = leerlingSleutel(s.g.code, kind.id);
     if ((k.leerlingen || []).some(l => l.sleutel === sleutel)) return res.status(409).json({ error: 'Dit kind zit al in deze klas.' });
-    k.uitnodigingen = k.uitnodigingen || [];
+    /* De uitnodigingenlijst wordt hier GELEZEN en nog niet neergezet. Er volgen
+       nog twee wegen die weigeren -- een kind dat een ander wil aansluiten, en
+       een uitnodiging die al klaarstaat -- en die horen geen lege lijst achter
+       te laten bij een klas die er nog geen had; dan zeggen de statuscode en de
+       opslag twee verschillende dingen over hetzelfde verzoek. Bestaat de lijst
+       wel, dan is dit de ECHTE lijst en landt alles wat er hieronder bij komt
+       gewoon. */
+    const uitnodigingen = k.uitnodigingen || [];
     if (!s.beheerder) {
       // een kind sluit alleen ZICHZELF aan; eigen keuze, dus meteen actief
       if (profielId !== s.p.id) return res.status(403).json({ error: 'Je kunt alleen jezelf aansluiten bij een klas.' });
-      k.uitnodigingen = k.uitnodigingen.filter(u => u.sleutel !== sleutel);
+      k.uitnodigingen = uitnodigingen.filter(u => u.sleutel !== sleutel);
       k.leerlingen.push({ sleutel, gezinCode: s.g.code, profielId: kind.id, naam: schoon(kind.naam, 60), at: nu() });
       save();
       return res.json({ ok: true, klas: { code: k.code, naam: k.naam, leraar: k.leraar, school: k.school } });
     }
     // de ouder nodigt uit; het kind accepteert de uitnodiging zelf
-    if (k.uitnodigingen.some(u => u.sleutel === sleutel)) return res.status(409).json({ error: 'Er staat al een uitnodiging voor dit kind klaar.' });
-    k.uitnodigingen.push({ sleutel, gezinCode: s.g.code, profielId: kind.id, naam: schoon(kind.naam, 60), door: schoon(s.p.naam, 60), at: nu() });
+    if (uitnodigingen.some(u => u.sleutel === sleutel)) return res.status(409).json({ error: 'Er staat al een uitnodiging voor dit kind klaar.' });
+    uitnodigingen.push({ sleutel, gezinCode: s.g.code, profielId: kind.id, naam: schoon(kind.naam, 60), door: schoon(s.p.naam, 60), at: nu() });
+    k.uitnodigingen = uitnodigingen;              // pas nu staat de lijst er echt
     save();
     res.json({ ok: true, uitgenodigd: true, klas: { code: k.code, naam: k.naam, leraar: k.leraar, school: k.school } });
   });

@@ -1,0 +1,133 @@
+{
+  "stempel": "2026-09-03",
+  "uitleg": "Wat twee onafhankelijk geschreven ketenproeven werkelijk delen, geteld uit hun registers. De vorm is per definitie gelijk (beide proeven zijn zo geschreven) en zegt dus niets; de actoren en de beloften zeggen wel iets. Zie de kop van scripts/ketenvorm.js.",
+  "grens": "Twee ketens is een kleine steekproef, en ze zijn door dezelfde hand geschreven -- gedeelde beloften kunnen dus ook gedeelde gewoonte zijn. Een derde keten van een andere hand zou dat scheiden. De thema-indeling gebruikt een gesloten woordenlijst; wat er niet in past staat in nietIngedeeld en verdwijnt niet.",
+  "ketens": [
+    {
+      "naam": "tafel",
+      "domein": "horeca",
+      "proef": "scripts/tafelproef.js",
+      "schakels": 11,
+      "storingen": 8,
+      "sluit": true,
+      "bevindingen": 0
+    },
+    {
+      "naam": "rit",
+      "domein": "mobiliteit",
+      "proef": "scripts/ritproef.js",
+      "schakels": 8,
+      "storingen": 6,
+      "sluit": false,
+      "bevindingen": 1
+    }
+  ],
+  "vorm": {
+    "gedeeld": {
+      "schakel": [
+        "fout",
+        "ms",
+        "naar",
+        "nr",
+        "stand",
+        "status",
+        "van",
+        "wat",
+        "ziet"
+      ],
+      "storing": [
+        "belofte",
+        "naam",
+        "stand",
+        "wat"
+      ]
+    },
+    "apart": {
+      "schakel": [
+        "bekend"
+      ],
+      "storing": []
+    },
+    "let": "gelijke vorm is de ondergrens en geen vondst: beide proeven zijn zo geschreven"
+  },
+  "actoren": {
+    "perKeten": {
+      "tafel": [
+        "gast",
+        "keuken",
+        "zaak",
+        "zaal"
+      ],
+      "rit": [
+        "chauffeur",
+        "dispatch",
+        "lid",
+        "vervoerder"
+      ]
+    },
+    "gedeeld": [],
+    "eigen": {
+      "tafel": [
+        "gast",
+        "keuken",
+        "zaak",
+        "zaal"
+      ],
+      "rit": [
+        "chauffeur",
+        "dispatch",
+        "lid",
+        "vervoerder"
+      ]
+    }
+  },
+  "beloften": {
+    "perKeten": {
+      "tafel": [
+        "bereikbareWeg",
+        "dubbelObject",
+        "geldKlaargezet",
+        "herhaling",
+        "onbekendObject",
+        "volgorde",
+        "weigeringMetReden"
+      ],
+      "rit": [
+        "herhaling",
+        "nietsKlaarZonderGrond",
+        "onbekendObject",
+        "volgorde"
+      ]
+    },
+    "gedeeld": [
+      "herhaling",
+      "onbekendObject",
+      "volgorde"
+    ],
+    "eigen": {
+      "tafel": [
+        "bereikbareWeg",
+        "dubbelObject",
+        "geldKlaargezet",
+        "weigeringMetReden"
+      ],
+      "rit": [
+        "nietsKlaarZonderGrond"
+      ]
+    },
+    "nietIngedeeld": [
+      {
+        "keten": "rit",
+        "storing": "een stand die niet in de ritketen staat",
+        "belofte": "weigert, en noemt niet stilzwijgend een andere stand"
+      }
+    ]
+  },
+  "telling": {
+    "actorenGedeeld": 0,
+    "actorenTotaal": 8,
+    "themasGedeeld": 3,
+    "themasTotaal": 8,
+    "nietIngedeeld": 1
+  }
+}

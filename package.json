@@ -235,7 +235,11 @@
     "doodspoor:vast": "node scripts/doodspoor.js --vastleggen",
     "doodspoor:controle": "node scripts/doodspoor.js --controle",
     "tafelproef": "node scripts/tafelproef.js",
-    "tafelproef:vast": "node scripts/tafelproef.js --vastleggen"
+    "tafelproef:vast": "node scripts/tafelproef.js --vastleggen",
+    "ritproef": "node scripts/ritproef.js",
+    "ritproef:vast": "node scripts/ritproef.js --vastleggen",
+    "ketenvorm": "node scripts/ketenvorm.js",
+    "ketenvorm:vast": "node scripts/ketenvorm.js --vastleggen"
   },
   "devDependencies": {
     "playwright": "^1.62.1"

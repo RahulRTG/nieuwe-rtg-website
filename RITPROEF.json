@@ -1,0 +1,167 @@
+{
+  "stempel": "2026-09-03",
+  "uitleg": "Een ritketen van aanvraag tot afronding, gemeten per SCHAKEL (handelt actor A, en ziet actor B dat?) en per STORING (houdt de keten zijn belofte als het misgaat?). Tweede keten naast scripts/tafelproef.js, in een ander domein -- zie MAATSTAF.md par. 7.",
+  "grens": "Alleen de rit bij een vervoerszaak; OV, vluchten en zakelijk vervoer hebben eigen naden. De proef zet een chauffeur klaar omdat de seed er geen heeft. Er komt geen browser aan te pas, en de betaling loopt via de demo-rail: dat het geld werkelijk bij de vervoerder landt, is hier niet gemeten.",
+  "schakels": [
+    {
+      "nr": 1,
+      "van": "lid",
+      "naar": "vervoerder",
+      "wat": "vraagt een rit aan; de vervoerder vindt hem in een werklijst",
+      "bekend": "Er is geen route waarmee een vervoerder zijn OPENSTAANDE ritaanvragen ophaalt: history toont alleen afgeronde ritten, backoffice alleen betaalde zonder ref, en het dispatchbord leest een andere lijst (db.data.mobOpdrachten). Wat er is, is een melding over de SSE-stroom. Het besluit hoort bij de vraag of de twee ritwerelden samengaan -- zie `bevindingen` in dit register en MAATSTAF.md par. 7.5.",
+      "stand": "openBekend",
+      "status": 200,
+      "ziet": "rit RTG-R-AB4B6B, klant heet \"Amberen Vos\"; in de werklijst van de vervoerder: false; op ref te bereiken: true",
+      "fout": null,
+      "ms": 16
+    },
+    {
+      "nr": 2,
+      "van": "lid",
+      "naar": "vervoerder",
+      "wat": "betaalt vooraf, en pas dan mag de rit worden toegewezen",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "betaald: true, stand nu \"aangevraagd\"",
+      "fout": null,
+      "ms": 21
+    },
+    {
+      "nr": 3,
+      "van": "dispatch",
+      "naar": "lid",
+      "wat": "wijst een chauffeur toe, en het lid leest wie hem komt halen",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "het lid leest chauffeur \"Chauffeur Proef\" bij stand \"geaccepteerd\"",
+      "fout": null,
+      "ms": 26
+    },
+    {
+      "nr": 4,
+      "van": "chauffeur",
+      "naar": "lid",
+      "wat": "meldt zich onderweg, en het lid ziet die stand",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "het lid leest stand \"onderweg\"",
+      "fout": null,
+      "ms": 13
+    },
+    {
+      "nr": 5,
+      "van": "chauffeur",
+      "naar": "lid",
+      "wat": "meldt zich aangekomen bij het lid, en het lid ziet die stand",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "het lid leest stand \"aangekomen\"",
+      "fout": null,
+      "ms": 12
+    },
+    {
+      "nr": 6,
+      "van": "chauffeur",
+      "naar": "lid",
+      "wat": "meldt dat het lid is ingestapt, en het lid ziet die stand",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "het lid leest stand \"aan-boord\"",
+      "fout": null,
+      "ms": 13
+    },
+    {
+      "nr": 7,
+      "van": "chauffeur",
+      "naar": "lid",
+      "wat": "rondt de rit af, en die verdwijnt uit het live-beeld van het lid",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "stand \"afgerond\", nog in het live-beeld: false",
+      "fout": null,
+      "ms": 11
+    },
+    {
+      "nr": 8,
+      "van": "vervoerder",
+      "naar": "vervoerder",
+      "wat": "houdt de afgeronde rit in zijn eigen historie",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "staat in de historie met stand \"afgerond\"",
+      "fout": null,
+      "ms": 5
+    }
+  ],
+  "storingen": [
+    {
+      "naam": "een rit toewijzen die nog niet betaald is",
+      "belofte": "weigert, en zegt dat er nog niet betaald is",
+      "stand": "gehouden",
+      "wat": "status 409: Deze rit is nog niet betaald."
+    },
+    {
+      "naam": "een rit terugzetten naar een eerdere stand",
+      "belofte": "weigert; de ritketen loopt alleen vooruit",
+      "stand": "gehouden",
+      "wat": "status 409: Deze rit is al onderweg."
+    },
+    {
+      "naam": "een stand die niet in de ritketen staat",
+      "belofte": "weigert, en noemt niet stilzwijgend een andere stand",
+      "stand": "gehouden",
+      "wat": "status 400: Onbekende status."
+    },
+    {
+      "naam": "een rit die niet van deze vervoerder is",
+      "belofte": "bestaat niet voor hem",
+      "stand": "gehouden",
+      "wat": "status 404"
+    },
+    {
+      "naam": "twee keer betalen voor dezelfde rit",
+      "belofte": "de tweede betaling voegt niets toe aan wat de rit kostte",
+      "stand": "gehouden",
+      "wat": "eerste 200, tweede 409: Al betaald."
+    },
+    {
+      "naam": "het live-beeld van een onbetaalde rit",
+      "belofte": "toont geen chauffeur, want die is nog niet toegewezen",
+      "stand": "gehouden",
+      "wat": "chauffeur in beeld: null"
+    }
+  ],
+  "rit": "RTG-R-AB4B6B",
+  "wereld": {
+    "chauffeur": "via /api/supplier/staff/add, want de seed geeft ISLATR geen personeel"
+  },
+  "telling": {
+    "schakels": 8,
+    "gesloten": 7,
+    "open": 0,
+    "openBekend": 1,
+    "stuk": 0,
+    "storingen": 6,
+    "gehouden": 6,
+    "gebroken": 0
+  },
+  "sluit": false,
+  "sluitMetBevinding": true,
+  "bevindingen": [
+    {
+      "schakel": 1,
+      "van": "lid",
+      "naar": "vervoerder",
+      "wat": "vraagt een rit aan; de vervoerder vindt hem in een werklijst",
+      "gemeten": "rit RTG-R-AB4B6B, klant heet \"Amberen Vos\"; in de werklijst van de vervoerder: false; op ref te bereiken: true",
+      "reden": "Er is geen route waarmee een vervoerder zijn OPENSTAANDE ritaanvragen ophaalt: history toont alleen afgeronde ritten, backoffice alleen betaalde zonder ref, en het dispatchbord leest een andere lijst (db.data.mobOpdrachten). Wat er is, is een melding over de SSE-stroom. Het besluit hoort bij de vraag of de twee ritwerelden samengaan -- zie `bevindingen` in dit register en MAATSTAF.md par. 7.5."
+    }
+  ]
+}

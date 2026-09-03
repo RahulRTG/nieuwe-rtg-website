@@ -850,6 +850,46 @@ eigen naden), er komt geen browser aan te pas, en dat het geld werkelijk
 terugkomt loopt langs kern/pay en is met opzet niet gemeten. Pas uit zo'n keten
 volgen de status-, actor- en uitkomstcontracten -- niet andersom.
 
+**De TWEEDE keten staat, en die is er om een andere vraag te beantwoorden**
+(`scripts/ritproef.js`, `npm run ritproef`): is er een GEDEELDE VORM, of is elke
+keten zijn eigen ding? Daarom de rit en niet de bezorging -- bezorging deelt de
+rekening, de kaart en de keuken met de tafel, dus dan meet je hetzelfde nog een
+keer. Zeven schakels sluiten, zes storingen houden hun belofte, en de ritketen
+doet vier dingen ANDERS dan de tafel: eerst betalen dan leveren (`assign`
+weigert een onbetaalde rit), standen die alleen vooruit mogen, de naam van de
+werker gaat WEL naar de klant (je stapt bij iemand in de auto) en de klant heet
+een codenaam. **Eén schakel staat open, met een uitgeschreven reden** -- de
+nieuwe stand `openBekend`, in de vorm van `MET_REDEN` uit `scripts/tikken.js`:
+zonder die uitweg heeft een proef die iets echts vindt maar twee uitgangen,
+altijd zakken of de bevinding wegpoetsen. De proef meldt daarom `sluit` en
+`sluitMetBevinding` apart en nooit één cijfer.
+
+**Die bevinding is de opbrengst: er zijn TWEE RITWERELDEN.** `db.data.rides` (de
+lidkant: `/api/ride/request`, `supplier/ride/*`, zes standen uit
+`kern/vervoer.js`) en `db.data.mobOpdrachten` (het dispatchcentrum:
+`/api/supplier/mob/*`, tien standen uit `kern/mobiliteit/keten.js`, met matching
+en overboeken) -- met **nul verwijzingen in beide richtingen**. Vier standen
+delen ze letterlijk, twee betekenen hetzelfde onder een andere naam
+(`aan-boord`/`ingestapt`, `afgerond`/`voltooid`), en één woord botst echt:
+`rijdt` is in de ene wereld een verouderde naam voor `aan-boord` en in de andere
+een eigen stand ná `ingestapt`. Pijnlijk detail: `kern/mobiliteit/dispatch.js`
+belooft in zijn kop dat een telefoonboeking "dezelfde keten" krijgt als een
+app-rit -- en het is juist de APP-rit die het dispatchbord nooit haalt. Dat is
+een besluit van de eigenaar (welke wereld is de waarheid?) en geen bouwopdracht,
+dus het staat in MAATSTAF.md par. 7.5 en niet als halve reparatie in de code.
+
+**En wat de twee ketens werkelijk delen is GEMETEN** (`scripts/ketenvorm.js`,
+`KETENVORM.json`) in plaats van verklaard -- de proeven delen met opzet geen
+module, want een gedeelde ketenklasse eroverheen zou de `Asset`-fout zijn.
+Uitkomst: <!--getal:ketenvorm.actorenGedeeld-->0<!--/getal--> van
+<!--getal:ketenvorm.actorenTotaal-->8<!--/getal--> actoren gedeeld (gast/zaak/
+zaal/keuken tegenover lid/vervoerder/dispatch/chauffeur -- geen enkele naam
+komt in beide voor) en <!--getal:ketenvorm.themasGedeeld-->3<!--/getal--> van
+<!--getal:ketenvorm.themasTotaal-->8<!--/getal--> beloftethema's. Die drie gaan
+alle drie over de MACHINE en niet over het domein: herhaling, volgorde, en wat
+niet bestaat bestaat niet. Dat is het eerste bewijs uit twee onafhankelijke
+ketens voor de grens die OS.md trekt tussen platformvermogen en domeinvermogen.
+
 ## Structuur en starten (kort)
 
 - `public/` — de webroot: `apps/` (portaal, PWA-app, leverancier, backoffice; 182 schermen), `apps/foundation/` (de RTFoundation, 71), `apps/juridisch/` (3), `site/` (alleen `404.html`), `shared/` (i18n, realtime), `fonts/`, `campagne/`, `sw.js` + `manifest.webmanifest` (PWA). **Er is geen `index.html` en geen marketingsite**: wie naar `/` gaat krijgt `/apps/app.html` via een interne herschrijving in `server/middleware/voordeur.js` (bewust geen 302, zodat de nonce-laag er gewoon overheen gaat), en die pagina draagt de inlogpoort zelf. Je komt dus direct bij de inlog

@@ -539,6 +539,26 @@ function bouw(invoer) {
            passeert alleen 'bewezen'. Hij kan een zwaardere bron nooit
            overstemmen, en een gezakt oordeel geeft hij niet: 'geen spoor' is in
            het journaal een vraag en geen defect-oordeel. */
+        /* EEN TWEEDE AUDIT-BLOK STOND HIER ONDER, en het was onbereikbaar.
+
+           Dat is geen slordigheid van een van de takken maar van de SAMENVOEGING:
+           twee takken hebben deze drie-blokken-knoop los van elkaar ontward, in
+           tegengestelde volgorde, en een unie van beide zette de knoop terug.
+           test/bewijsmatrix-audit.test.js ving het -- de toets die precies
+           daarvoor is geschreven, en die zijn werk deed op de dag dat hij het
+           moest doen.
+
+           WELKE VOLGORDE HET IS GEWORDEN, en waarom. De auditproef spreekt
+           eerst, ook als hij `gezakt` zegt en de handelingproef `bewezen`. Dat
+           is de conservatieve kant: de auditproef is voor deze vraag gebouwd en
+           telt het spoor voor en na de oproep, de handelingproef meet iets
+           anders en draagt `audit` als bijvangst. Een defect-oordeel van de
+           zware bron laten overstemmen door een bewezen van de lichte is precies
+           het stille promoveren dat PROOF.md verbiedt (bewijs mag alleen
+           groeien, degraderen is nooit stil).
+
+           De andere tak koos omgekeerd, en dat is een verdedigbare keuze -- maar
+           dan wel een die iemand moet NEMEN, niet een die uit een merge rolt. */
         const a = auditKaart && auditKaart.get(sleutel);
         if (a && a.audit === 'bewezen') { cellen[s.id] = { staat: 'bewezen', bron: 'auditproef', reden: a.reden }; continue; }
         if (a && a.audit === 'gezakt') { cellen[s.id] = { staat: 'gezakt', bron: 'auditproef', reden: a.reden }; continue; }
@@ -617,33 +637,6 @@ function bouw(invoer) {
           cellen[s.id] = { staat: 'ongemeten' };
         }
         continue;
-      }
-
-      if (s.id === 'AUDIT') {
-        const beproefd = handeling && handeling.get(sleutel);
-        /* 'ongemeten' in de proef betekent: de oproep gaf geen 2xx, dus er is
-           niets gebeurd en er HOORT geen regel te zijn. Dat is geen bewijs en
-           ook geen bevinding -- het is niet gemeten.
-
-           EN DAAROM CLAIMT HIJ DE CEL DAN NIET. Hier stond een `else` die de
-           cel op ongemeten zette en doorging, en daarmee was de derde
-           AUDIT-tak (die AUDITPROEF.json als lijst leest) onbereikbaar --
-           precies de fout die in de eerste tak hierboven met naam en toenaam
-           staat beschreven als opgelost. Hij was niet opgelost maar verhuisd:
-           3635 gemeten routes van de auditproef werden weggegooid, waaronder
-           de ENIGE route van dit huis die verder alle elf cellen draagt
-           (POST /api/pay/oplaad, 10 van 11, en deze regel was de elfde).
-
-           Wie hier iets toevoegt: claim alleen wat je weet, en laat de rest
-           door. De laatste tak zet de vloer op ongemeten. */
-        if (beproefd && beproefd.audit === 'bewezen') {
-          cellen[s.id] = { staat: 'bewezen', bron: 'handelingproef' };
-          continue;
-        }
-        if (beproefd && beproefd.audit === 'gezakt') {
-          cellen[s.id] = { staat: 'gezakt', bron: 'handelingproef', reden: beproefd.reden };
-          continue;
-        }
       }
 
       if (s.id === 'ACL' || s.id === 'PRIVACY') {

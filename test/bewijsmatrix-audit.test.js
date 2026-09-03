@@ -47,12 +47,30 @@ test('1. zwijgt de handelingproef, dan spreekt de auditproef', () => {
   assert.equal(cel(m).bron, 'auditproef');
 });
 
-test('2. de handelingproef gaat VOOR als hij wel een oordeel heeft', () => {
+test('2. spreken ze elkaar tegen, dan wint de ZWARE bron -- ook met een gezakt', () => {
+  /* DEZE TOETS IS OMGEDRAAID BIJ DE SAMENVOEGING VAN #180, #181 EN #182, en dat
+     hoort hier te staan in plaats van in een commit-bericht.
+
+     Twee takken hebben de AUDIT-knoop los van elkaar ontward, in tegengestelde
+     volgorde. Er moest er een gekozen worden, en het is deze geworden: de
+     auditproef spreekt eerst, ook als hij `gezakt` zegt en de handelingproef
+     `bewezen`. De auditproef is voor deze vraag gebouwd (spoor voor en na de
+     oproep); de handelingproef meet iets anders en draagt `audit` als
+     bijvangst. Een defect-oordeel van de zware bron laten overstemmen door een
+     bewezen van de lichte is het stille promoveren dat PROOF.md verbiedt.
+
+     Wat deze toets NIET meer bewaakt is de volgorde als voorkeur -- dat is nu
+     een besluit met een reden in scripts/bewijsmatrix.js. Wat hij WEL bewaakt is
+     dat de tegenspraak een uitkomst heeft en dat de cel zijn bron noemt: een
+     cel die van twee bronnen iets anders hoort en er geen van beide noemt, is
+     onnavolgbaar. */
   const m = basis({
     handeling: new Map([[SLEUTEL, { audit: 'bewezen' }]]),
     audit: new Map([[SLEUTEL, { audit: 'gezakt', reden: 'iets anders' }]])
   });
-  assert.equal(cel(m).bron, 'handelingproef', 'de volgorde tussen de twee bronnen is omgedraaid');
+  assert.equal(cel(m).bron, 'auditproef', 'de volgorde tussen de twee bronnen is omgedraaid');
+  assert.equal(cel(m).staat, 'gezakt',
+    'een gezakt van de zware bron is stil bewezen geworden -- dat is precies wat hier niet mag');
 });
 
 test('3. weet geen van beide iets, dan is de cel ongemeten -- en niet stil bewezen', () => {

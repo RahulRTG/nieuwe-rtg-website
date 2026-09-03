@@ -1,8 +1,8 @@
 {
   "stempel": {
-    "op": "2026-09-02T16:56:03.148Z",
-    "commit": "e1c378e2",
-    "boomVuil": false,
+    "op": "2026-09-03T02:48:53.239Z",
+    "commit": "32cf8e2a",
+    "boomVuil": true,
     "node": "v22.22.2"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
@@ -2358,6 +2358,10 @@
       "gezakt": 9,
       "scherp": "gezakt"
     },
+    "horeca-werklijst-modus.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
+    },
     "horeca-werklijst.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -3594,6 +3598,22 @@
       "module": "scripts/lib/meetbron.js",
       "operator": "return-weg#0",
       "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "meetkeuring.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/meetkeuring.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
+    "meetserver-schorspoort.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/wegwerpserver.js",
+      "operator": "true->false#0",
+      "gezakt": 2,
       "geprobeerd": 1
     },
     "memo.test.js": {
@@ -5095,6 +5115,14 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "rollbackbesluit.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/bewijsmatrix.js",
+      "operator": "&&->||#5",
+      "gezakt": 1,
+      "geprobeerd": 28
+    },
     "rollenmatrix.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -5680,6 +5708,14 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "schorspoort.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/web/index.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
     "schrijfanalyse.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -5835,6 +5871,10 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "socialebeleid-volgorde.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
     },
     "socialebeleid.test.js": {
       "soort": "puur",

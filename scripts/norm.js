@@ -300,7 +300,21 @@ const METERS = [
      zijn oordeel baseert. Alleen omlaag, en nul is haalbaar: het kost een
      meetronde vanaf een schone boom. De telling staat in scripts/lib/paspoort.js
      zodat de deltapoort met dezelfde functie telt als deze meter. */
-  { sleutel: 'registersUitVuileBoom', richting: 'omlaag', wat: 'registers waarvan de meting uit een vuile werkboom komt (dus niet te herhalen)' }
+  { sleutel: 'registersUitVuileBoom', richting: 'omlaag', wat: 'registers waarvan de meting uit een vuile werkboom komt (dus niet te herhalen)' },
+  /* DE TWEE REGISTERS VAN 3 SEPTEMBER 2026, elk met de tand die erbij hoort.
+
+     `laatSpoorVerdacht` telt schrijfroutes die de opslag aanraken VOORDAT ze de
+     invoer keuren -- dertien daarvan zijn deze week gerepareerd, en de meter
+     bestaat omdat ze een voor een werden gevonden door een proefronde van een
+     half uur die telkens ANDERE opleverde. Statisch is de lijst eindig.
+
+     `rollbackUitzonderingen` telt de routes waarvan is BESLOTEN dat een
+     geweigerd verzoek er toch iets mag achterlaten. Een uitzondering is een
+     schuld en geen prestatie: hij mag alleen krimpen. Dat is met opzet de tand
+     op dit register en niet "het aantal besluiten", want dan zou uitzonderingen
+     toevoegen de meter juist beter maken. */
+  { sleutel: 'laatSpoorVerdacht', richting: 'omlaag', wat: 'schrijfroutes die de opslag aanraken voordat ze de invoer keuren (scripts/laatspoor.js)' },
+  { sleutel: 'rollbackUitzonderingen', richting: 'omlaag', wat: 'routes die met een BESLUIT een spoor mogen nalaten na een weigering (ROLLBACKBESLUIT.json)' }
 ];
 
 /* De telling zelf, als losse functie met de bestandslijst als invoer -- zodat
@@ -532,6 +546,14 @@ function telSkips(bestanden, lees) {
 /* `bronnen` is er alleen voor de IJKING (test/meterijk.test.js) en is optioneel:
    zonder argument leest deze meter alles van schijf zoals altijd. Zie de uitleg
    bij `mutaties` hieronder voor waarom dat er is. */
+/* Een register uit de wortel, met de eerlijke uitkomst als hij er niet is:
+   `undefined` en geen nul. Een meter die een ontbrekend bestand als nul leest,
+   meldt zijn beste stand op het moment dat hij niets meet. */
+function leesRegister(naam, uit) {
+  try { return uit(JSON.parse(fs.readFileSync(path.join(WORTEL, naam), 'utf8'))); }
+  catch (e) { return undefined; }
+}
+
 function meet(bronnen) {
   /* DE KEURING GEEFT EXITCODE 1 ZODRA HIJ IETS VINDT, en dat is precies zijn
      werk. execFileSync gooit daar standaard op, dus meet() klapte om op het
@@ -834,7 +856,9 @@ function meet(bronnen) {
     ratelTanden, metingenZonderRatel,
     /* Het bewijspaspoort. De wortel is de invoer en niet een vaste lijst: een
        register dat er morgen bijkomt, telt vanzelf mee. */
-    registersUitVuileBoom: vuileRegisters(WORTEL).length
+    registersUitVuileBoom: vuileRegisters(WORTEL).length,
+    laatSpoorVerdacht: leesRegister('LAATSPOOR.json', (j) => j.gemeten.verdacht),
+    rollbackUitzonderingen: leesRegister('ROLLBACKBESLUIT.json', (j) => Object.keys(j.routes || {}).length)
   };
 }
 

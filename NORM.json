@@ -42,7 +42,7 @@
     "delenZonderOnderwerp": 0,
     "beweringenZonderVulcontrole": 111,
     "bewijsCellenBewezen": 16475,
-    "bewijsAchterstand": 2605,
+    "bewijsAchterstand": 2890,
     "schermenZonderVormtaal": 181,
     "dbDeuren": 507,
     "dbDeurenSchrijvend": 269,
@@ -1293,6 +1293,11 @@
       "sleutel": "bewijsAchterstand",
       "waarheen": "BEWIJSSCHULD.json, veld `aflossing`: doel 0",
       "reden": "Main binnengehaald: de boom telt 4643 routes in plaats van 3282, en de idempotentieproef van main is over die nieuwe routes gedraaid. idem-ongeclassificeerd gaat daardoor van 849 naar 1477 en gevolg-onbekend van 94 naar 90 over een grotere noemer -- dezelfde schuld over een grotere boom, geen nieuwe schuld. herstel-onbevestigd ging juist omlaag (63 -> 47) doordat de herstelproef ook over de nieuwe paren is gedraaid. Geen vervaldatum, om dezelfde reden als bij 989 -> 1997: teruggaan zou betekenen dat we bestaande gaten weer onzichtbaar maken. De aflosregel blijft: doel 0, alleen omlaag, stilstand wordt gemeld."
+    },
+    {
+      "meter": "bewijsAchterstand 2605 -> 2890",
+      "op": "2026-09-03",
+      "waarom": "Met de hand VERHOOGD, en dat is een besluit en geen meting die daalde. De reden staat voluit in BEWIJSSCHULD.json onder `groei` -- daar hoort hij, bij het getal dat hij verklaart. Kort: de routetabel groeide van 4188 naar 4738 doordat de meetronde voor het eerst sinds 20 augustus tegen de HUIDIGE tabel draaide, en de groei zit in EEN post (output-niet-toerekenbaar, 0 -> 284): dezelfde inhoudstoetsen raken door de bredere tabel meer routes, waardoor hun uitkomst niet meer aan een route toe te rekenen is. Geen nieuwe gaten dus, maar een bredere noemer. Wie deze tand later ziet staan hoort te weten dat hij omhoog is gezet."
     }
   ],
   "prestatie": {
@@ -1317,7 +1322,7 @@
     "inlineStijlAttributen": "2026-08-18",
     "ratelTanden": "2026-08-28",
     "metingenZonderRatel": "2026-08-18",
-    "bewijsAchterstand": "2026-08-22",
+    "bewijsAchterstand": "2026-09-03",
     "toetsenOngevoeligPct": "2026-08-28",
     "endpointsZonderTest": "2026-09-02",
     "dekkingPct": "2026-08-28",

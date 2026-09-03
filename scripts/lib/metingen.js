@@ -53,6 +53,8 @@ const GEEN_METING = new Set([
 ]);
 
 const REGISTER = {
+  'LAATSPOOR.json': { meter: ['laatSpoorVerdacht'] },
+  'ROLLBACKBESLUIT.json': { meter: ['rollbackUitzonderingen'] },
   'BEPROEVING.json': { meter: ['p99Ms', 'doorvoerPerSec', 'eventLoopP99Ms', 'herstelSeconden', 'geheugenHellingMBPerMin'] },
   'MUTATIES.json': { meter: ['toetsenOngevoeligPct', 'toetsenNietGemeten'] },
   'GRENZEN.json': { meter: ['kernBreedte', 'kernGedeeld', 'kernBreedsteBestand', 'kernOngebruikt'] },

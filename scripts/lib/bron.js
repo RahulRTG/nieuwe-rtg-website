@@ -87,7 +87,75 @@
 */
 'use strict';
 
-function zonderCommentaar(bron) {
+/* ============================================================================
+   HIJ MOET WETEN WELKE TAAL HIJ LEEST, en dat was de laatste blinde vlek.
+
+   Deze functie kreeg alleen een string binnen en behandelde alles als
+   JavaScript. Twee gevallen waarin dat fout is, en allebei zijn ze gemeten:
+
+     MARKUP. Buiten een <script> is `/*` geen commentaar maar tekst die een
+     bezoeker leest. Geen enkele pagina doet dat vandaag -- daarom sloeg het
+     nergens uit -- maar wie het schrijft, ziet zijn tekst verdwijnen uit elke
+     keuring die hierop leunt.
+
+     CSS. `//` is in een stylesheet geen commentaar. `url(//static.example/x.png)`
+     is een geldige verwijzing, en de uitzondering voor `http://` dekt hem niet:
+     het teken ervoor is een haakje en geen dubbele punt. Gemeten met
+     ./bronblind.js: die regel verdwijnt in zijn geheel. Geen van de 72
+     stylesheets in dit huis bevat hem vandaag.
+
+   DE STANDAARD BLIJFT JAVASCRIPT, en dat is geen luiheid maar de voorwaarde om
+   dit te kunnen doen: alle bestaande aanroepers -- elf in check.js, plus
+   keuring.js, norm.js, schakelbaar.js en ai-oproepen.js -- lezen precies
+   hetzelfde als eerst. Wie HTML of CSS leest, zegt dat erbij.
+   ========================================================================== */
+
+/* De blokken van een pagina in documentvolgorde: markup, blokinhoud, markup, ...
+   `soort` is null voor markup, 'script' of 'style' voor de inhoud van zo'n blok.
+   Een blok dat niet sluit stopt de verdeling; scripts/check.js regel 12 klaagt
+   daar al over en dit is niet de plek om dat nog eens te doen.
+
+   Hij woont HIER en niet in ./bronblind.js, waar hij vandaan komt: die proef en
+   deze verwijderaar moeten een pagina op precies dezelfde manier in stukken
+   knippen, anders bewijst de proef iets over een andere indeling dan degene die
+   gemeten wordt (LAT.md regel 4). */
+const BLOK_OPEN = /<(script|style)\b[^>]*>/gi;
+
+function stukken(bron) {
+  const laag = bron.toLowerCase();
+  const uit = [];
+  let i = 0;
+  BLOK_OPEN.lastIndex = 0;
+  let m;
+  while ((m = BLOK_OPEN.exec(bron))) {
+    const na = m.index + m[0].length;
+    const sluit = laag.indexOf('</' + m[1].toLowerCase() + '>', na);
+    if (sluit < 0) break;
+    uit.push({ soort: null, tekst: bron.slice(i, na) });
+    uit.push({ soort: m[1].toLowerCase(), tekst: bron.slice(na, sluit) });
+    i = sluit;
+    BLOK_OPEN.lastIndex = sluit;
+  }
+  uit.push({ soort: null, tekst: bron.slice(i) });
+  return uit;
+}
+
+/* De aanroep. `soort` is 'js' (standaard), 'css' of 'html'. */
+function zonderCommentaar(bron, opties) {
+  const soort = (opties && opties.soort) || 'js';
+  if (soort === 'html') {
+    /* De markup blijft ONAANGERAAKT staan, inclusief de openende tags van de
+       blokken zelf: alleen wat ERIN staat is code van een andere taal. */
+    return stukken(String(bron)).map(d =>
+      d.soort === 'script' ? kaal(d.tekst, true)
+        : d.soort === 'style' ? kaal(d.tekst, false)
+          : d.tekst).join('');
+  }
+  return kaal(String(bron), soort !== 'css');
+}
+
+/* regelCommentaar: staat `//` voor commentaar? In JavaScript wel, in CSS niet. */
+function kaal(bron, regelCommentaar) {
   const s = String(bron);
   const n = s.length;
   let uit = '';
@@ -106,7 +174,7 @@ function zonderCommentaar(bron) {
     /* Regelcommentaar. De uitzonderingen komen uit de vorige versie: `http://`
        (voorafgegaan door een dubbele punt) en een `//` direct achter een quote
        of backslash zijn geen commentaar. */
-    if (c === '/' && s[i + 1] === '/') {
+    if (regelCommentaar && c === '/' && s[i + 1] === '/') {
       const voor = i > 0 ? s[i - 1] : '';
       if (voor !== ':' && voor !== '"' && voor !== "'" && voor !== '\\') {
         const nl = s.indexOf('\n', i);
@@ -164,4 +232,4 @@ function zonderTekst(bron) {
     m => m.replace(/[^\n]/g, ' '));
 }
 
-module.exports = { zonderCommentaar, zonderTekst };
+module.exports = { zonderCommentaar, zonderTekst, stukken };

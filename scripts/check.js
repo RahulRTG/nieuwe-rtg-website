@@ -21,6 +21,14 @@ const regexVeilig = (waarde) => String(waarde).replace(/[.*+?^${}()|[\]\\]/g, '\
 const { zonderCommentaar, zonderTekst } = require('./lib/bron');
 const { paginaDraagt } = require('./lib/hulpcss');
 
+/* EEN BESTAND LEZEN MET DE JUISTE TAAL (TAKEN.md 4.48). Drie keuringen hieronder
+   lopen over .html en kregen die pagina als JAVASCRIPT te lezen -- en dan is
+   `/*` in markuptekst geen tekst maar een commentaar dat vooruit eet. De soort
+   volgt hier uit de extensie, op EEN plek, zodat de volgende keuring die over
+   pagina's loopt hem niet opnieuw hoeft te bedenken. */
+const kaalBron = (f) => zonderCommentaar(fs.readFileSync(f, 'utf8'),
+  { soort: f.endsWith('.html') ? 'html' : f.endsWith('.css') ? 'css' : 'js' });
+
 function loop(dir, filter, fn) {
   for (const naam of fs.readdirSync(dir)) {
     const vol = path.join(dir, naam);
@@ -1386,7 +1394,7 @@ console.log('\n22) een glyfnaam wordt getoond als beeld, niet als woord');
     let isBundel = false;
     try { isBundel = new Set(Object.keys(require('./bundel').bundels).map(k => 'public/' + k)).has(rel); } catch (e) { /* geen bundellijst */ }
     if (isBundel) return;
-    const bron = zonderCommentaar(fs.readFileSync(f, 'utf8'));
+    const bron = kaalBron(f);
     const treffers = [...bron.matchAll(/\+\s*(?:esc\()?\s*(\w+)\.icon\b\)?\s*\+/g)];
     if (!treffers.length) return;
     plekken += treffers.length;
@@ -2168,7 +2176,7 @@ console.log('\n33) tekst wordt niet in een kader geperst');
   let geperst = 0;
   loop(path.join(ROOT, 'public'), /\.(js|html|svg)$/, f => {
     // commentaar eruit: een uitleg WAAROM dit niet mag, mag zelf geen alarm geven
-    const bron = zonderCommentaar(fs.readFileSync(f, 'utf8')).replace(/<!--[\s\S]*?-->/g, ' ');
+    const bron = kaalBron(f).replace(/<!--[\s\S]*?-->/g, ' ');
     if (!/spacingAndGlyphs/.test(bron)) return;
     geperst++;
     fout('spacingAndGlyphs in ' + path.relative(ROOT, f) +
@@ -3379,7 +3387,7 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
   loop(path.join(ROOT, 'public'), /\.(html|js)$/, (f) => {
     const rel = path.relative(ROOT, f).replace(/\\/g, '/');
     if (bundelPaden.has(rel)) return;
-    const bron = zonderCommentaar(fs.readFileSync(f, 'utf8'));
+    const bron = kaalBron(f);
     let m, n = 0, jsN = 0;
     const tag = /<(video|audio)(\s[^>]*)?>/gi;
     while ((m = tag.exec(bron))) {

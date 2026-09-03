@@ -317,7 +317,42 @@ díé rondzingen:
 - **een getal waar er geen is** — onder tien zaken staat er `nietTeZeggen` met de
   reden, geen nul.
 
-## 13. Wat er staat, en wat er niet staat
+## 13. Bellen naar RTG, binnen de app
+
+Een telefoonkanaal vraagt een provider, een nummer, en een telefoonnummer dat de
+identiteitskluis verlaat. Geen van die drie is nodig: dit huis heeft al een
+belstack tussen leden (WebRTC met ring/accept/offer/answer/ice). Wat ontbrak was
+een kant waar RTG **opneemt**.
+
+En het levert iets op wat een telefooncentrale nooit heeft: de zaak ligt ernaast
+open. Wie belt, belt niet "RTG" maar over SUP-xxxxxx — met de tijdlijn, de
+klokken en de bevoegdheden erbij. Een gesprek komt daarom ook ín die tijdlijn te
+staan; anders is het een half uur werk waar later niets van terugkomt. Is er nog
+geen zaak, dan wordt er een geopend.
+
+**Bellen is een dienst van de Lifestyle- en Business Pass** — een besluit van de
+eigenaar, en het past op de ladder waar De Rechterhand ook op staat.
+
+> **Maar een mens is geen premium-dienst.** Elk lid met een account kan
+> zelfstandig een mens vragen; dat is de ondergrens uit par. 3 en die verandert
+> hier met geen enkele regel. Wat premium is, is de **stem**. Een RTG-lid krijgt
+> nog steeds een mens, schriftelijk, in zijn zaak — en de weigering om te bellen
+> zegt dat er ook bij, want "u mag niet bellen" wordt anders gelezen als "u
+> krijgt geen hulp". `test/servicegesprek.test.js` toetst beide helften.
+
+Er wordt niets beloofd wat niet gemeten is: geen wachttijd, geen "u bent nummer
+drie". Neemt niemand op, dan is het gesprek **gemist** — en dan blijft de zaak
+staan met een regel in de tijdlijn en een bericht aan de melder, zodat hij niet
+voor niets heeft gebeld. Een gemiste oproep krijgt `null` seconden en geen nul:
+wie daar nul wegschrijft, telt gemiste oproepen mee in een gemiddelde
+gespreksduur, en dat gemiddelde wordt dan beter naarmate er minder mensen worden
+geholpen.
+
+De signalering is een **doorgeefluik** dat niet in het pakket kijkt — een
+WebRTC-onderhandeling is geen inhoud — maar wel de richting bewaakt: alleen de
+melder van dit gesprek en de mens die opnam komen erin.
+
+## 14. Wat er staat, en wat er niet staat
 
 **Staat** (gemeten, met toetsen die zijn zien zakken):
 
@@ -337,7 +372,11 @@ díé rondzingen:
 - de cockpit op `/apps/service.html`, met de waarom-laag en zonder ledenzoeker;
 - de ingang voor een zaak, met het zaakprofiel aan de kantoorkant, en de
   werkplek erbij (`/apps/leverancier-service.html`);
-- de kwaliteitsmeting, met vooraan de maat die ertoe doet.
+- de kwaliteitsmeting, met vooraan de maat die ertoe doet;
+- bellen naar RTG binnen de app, voor Lifestyle en Business, met de belrij aan
+  de kantoorkant. **De schermen daarvoor staan nog niet** — de routes zijn
+  gemeten en beproefd, maar er is nog geen belknop in de app en geen
+  aanneemknop in de cockpit.
 
 **Staat niet**, met de reden en niet als lege functie:
 
@@ -358,9 +397,9 @@ díé rondzingen:
   de eigenaar en geen bouwtaak. Tot dat besluit valt, zegt de cockpit met zoveel
   woorden dat RTG hier geen oorzaak vaststelt (par. 10). Dat is geen gat maar de
   eerlijke stand.
-- **telefonie en terugbellen**: er is geen provider en geen nummer, dus er valt
-  niets te bouwen dat werkt. `klassen.js` draagt ze als `gebouwd: false` met die
-  reden; een zaak uit dat kanaal is dezelfde zaak, alleen het transport ontbreekt.
+- **telefonie over het telefoonnet**: geen provider en geen nummer. Bellen kán
+  wel, binnen de app (par. 13); `klassen.js` draagt `telefoon` daarom als
+  `gebouwd: false` met een verwijzing naar het kanaal dat er wél is.
 - **RTMail als ingang**: technisch een kleinere stap dan telefonie (de stack
   bestaat), maar hij vraagt eerst een besluit dat hier niet gemaakt kan worden:
   post komt binnen van een adres, en een adres is een persoonsgegeven dat aan een
@@ -369,7 +408,7 @@ díé rondzingen:
   achterdeur naar de identiteitskluis wordt. Zolang dat openstaat is de eerlijke
   vorm `gebouwd: false` met de reden, en niet een half kanaal.
 
-## 14. De grenzen
+## 15. De grenzen
 
 1. **Een zaak opent niets.** `betrokken` is een verwijzing; gegevens vragen een
    machtiging, en die vraagt een bevestiging van het lid.
@@ -389,7 +428,7 @@ díé rondzingen:
 8. **Er komt geen groen vinkje.** De persoonlijke stand zegt nooit dat alles
    werkt, want beschikbaarheid wordt niet per lid gemeten.
 
-## 15. Wat de meting vond, en wat lezen niet vond
+## 16. Wat de meting vond, en wat lezen niet vond
 
 De zevenentwintig routes zijn door een **kale ronde** gehaald: twee keer dezelfde
 aanroep, met een opname van de servicecollecties (inclusief de tijdlijn) voor en

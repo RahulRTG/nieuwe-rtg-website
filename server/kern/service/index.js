@@ -20,7 +20,7 @@
    er een bouwt, hoeft aan deze bedrading niets te veranderen. */
 'use strict';
 
-module.exports = function maakService({ db, save, crypto, inzagelog, notify }) {
+module.exports = function maakService({ db, save, crypto, inzagelog, notify, sseToCustomer, sseToOffice }) {
   const zaken = require('./zaak')({ db, save, crypto });
   const loop = require('./loop')({ zaken, save, notify });
   const machtigingen = require('./machtiging')({ db, save, crypto, zaken, inzagelog });
@@ -35,6 +35,10 @@ module.exports = function maakService({ db, save, crypto, inzagelog, notify }) {
      hangt aan haar. Wat zij meet staat in ./kwaliteit.js, en vooral wat zij
      met opzet NIET meet. */
   const kwaliteit = require('./kwaliteit')({ zaken });
+  /* Bellen naar RTG binnen de app: geen provider, geen nummer, en de zaak ligt
+     ernaast open. De signaleringskanalen komen van buiten -- deze laag legt zelf
+     geen verbinding aan en kijkt niet in het pakket. */
+  const gesprekken = require('./gesprek')({ db, save, crypto, zaken, loop, sseToCustomer, sseToOffice });
 
   const mens = require('./mens');
   const router = require('./router');
@@ -71,7 +75,7 @@ module.exports = function maakService({ db, save, crypto, inzagelog, notify }) {
     serviceZaken: zaken, serviceLoop: loop,
     serviceMachtiging: machtigingen, serviceBevestiging: bevestiging,
     servicePatronen: patronen, servicePersoonlijk: persoonlijk, serviceFoutsignaal: foutsignalen,
-    serviceKwaliteit: kwaliteit,
+    serviceKwaliteit: kwaliteit, serviceGesprek: gesprekken,
     serviceMens: mens, serviceRouter: router, servicePrioriteit: prioriteit,
     serviceKlassen: klassen, serviceKeuzes: keuzes
   };

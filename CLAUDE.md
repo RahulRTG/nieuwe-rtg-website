@@ -623,7 +623,12 @@ dit lid weg is. Par. 8: de persoonlijke stand zegt NOOIT "alles werkt"
 (beschikbaarheid wordt niet per lid gemeten) en houdt uit elkaar wat een storing
 IS en wat Service erover heeft GEMELD. Par. 9: foutsignalen op vingerafdruk,
 waarbij `gebruikers` op `null` staat MET de reden -- de foutingang is zonder
-inlog en kent geen mensen om te tellen. Par. 12 is de kwaliteitsmaat, en die is met opzet geen
+inlog en kent geen mensen om te tellen. Par. 13 is bellen naar RTG BINNEN de app (geen
+provider, geen nummer, en de zaak ligt ernaast open): een dienst van Lifestyle en
+Business, terwijl EEN MENS dat nadrukkelijk niet is -- die ondergrens uit par. 3
+blijft voor elk account gelden, en de weigering om te bellen zegt er de weg naar
+een mens bij.
+Par. 12 is de kwaliteitsmaat, en die is met opzet geen
 afhandeltijd: gemeten wordt hoeveel problemen zijn opgelost ZONDER dat de melder
 zijn verhaal opnieuw hoefde te doen -- en wat er NIET gemeten wordt (tevredenheid,
 afhandeltijd per medewerker, een samengesteld rapportcijfer) staat mét de reden

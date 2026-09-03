@@ -20,7 +20,7 @@
 module.exports = (kern) => {
   const { app, officeAuth, boardroomWie, magBalie,
     serviceZaken, serviceLoop, serviceMachtiging, serviceBevestiging, serviceKeuzes,
-    serviceFoutsignaal, findSupplier } = kern;
+    serviceFoutsignaal, findSupplier, serviceGesprek } = kern;
 
   /* WIE MELDT DIT, ALS HET GEEN LID IS. Een zaak hoeft zijn eigen nummer niet op
      te zoeken om hulp te vragen: de melder draagt `zaak-<code>`, en dat is genoeg
@@ -142,6 +142,22 @@ module.exports = (kern) => {
   app.post('/api/office/service/machtigingen', officeAuth, balieAuth, (req, res) => veilig(res, () =>
     ({ ok: true, machtigingen: serviceMachtiging.lijst({ mens: req.balieKey, alleenGeldig: true, max: 50 }),
       tel: serviceMachtiging.tel() })));
+
+  /* ---------------------------------------------------------- bellen ------ */
+  /* De belrij. Alleen wat er NU rinkelt of loopt: een gemiste oproep hoort in de
+     zaak thuis en niet in een rij die iemand nog denkt te kunnen aannemen. */
+  app.post('/api/office/service/gesprekken', officeAuth, balieAuth, (req, res) => veilig(res, () =>
+    ({ ok: true, gesprekken: serviceGesprek.rij() })));
+
+  app.post('/api/office/service/gesprek/neem', officeAuth, balieAuth, (req, res) => veilig(res, () =>
+    serviceGesprek.neem(kort(lijf(req).gesprek, 40), { mens: req.balieKey })));
+
+  app.post('/api/office/service/gesprek/signaal', officeAuth, balieAuth, (req, res) => veilig(res, () =>
+    serviceGesprek.signaal(kort(lijf(req).gesprek, 40), { van: 'mens', wie: req.balieKey,
+      kind: kort(lijf(req).kind, 20), payload: lijf(req).payload })));
+
+  app.post('/api/office/service/gesprek/eind', officeAuth, balieAuth, (req, res) => veilig(res, () =>
+    serviceGesprek.eind(kort(lijf(req).gesprek, 40), { door: req.balieKey })));
 
   /* De borden die OVER zaken heen kijken -- patronen, bundelen, herstellen en
      foutsignalen -- staan in ./service-kantoor-borden.js. De naad ligt op een

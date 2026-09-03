@@ -29,6 +29,9 @@ function hangOp(kern, hulp) {
   Object.assign(kern, require('../kern/service')({
     db, save, crypto,
     inzagelog: require('../inzagelog'),
+    /* De twee live-kanalen voor het bellen. Deze laag legt zelf geen verbinding
+       aan: zij geeft WebRTC-signalen door en kijkt niet in het pakket. */
+    sseToCustomer: hulp.sseToCustomer, sseToOffice: hulp.sseToOffice,
     notify: (melderKey, bericht) => {
       const id = idVanKey(melderKey);
       if (id == null || typeof hulp.sendPushToUser !== 'function') return;

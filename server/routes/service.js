@@ -21,7 +21,7 @@
      met de reden erbij, en niet een zaak die in een wachtrij blijft staan. */
 module.exports = (kern) => {
   const { app, auth, serviceZaken, serviceLoop, serviceBevestiging, serviceKeuzes, serviceMens,
-    servicePersoonlijk } = kern;
+    servicePersoonlijk, serviceGesprek } = kern;
 
   const veilig = (res, werk) => {
     try { const r = werk(); res.status(r && r.status ? r.status : 200).json(r); }
@@ -117,4 +117,34 @@ module.exports = (kern) => {
      niet gemeten is, is precies wat BESTUUR.md verbiedt. */
   app.post('/api/service/stand', auth, (req, res) => veilig(res, () =>
     servicePersoonlijk.stand(melder(req))));
+
+  /* ---------------------------------------------------------- bellen ------ */
+  /* BINNEN de app, dus zonder telefoonnet: geen provider, geen nummer, en geen
+     telefoonnummer dat de identiteitskluis verlaat. Dienst van de Lifestyle- en
+     Business Pass; de kern weigert de rest MET de reden en met wat er wel kan.
+
+     Die tweede zin is geen beleefdheid maar de grens: een mens is geen
+     premium-dienst. Elk lid met een account kan een mens vragen (zie
+     /api/service/mens hierboven) -- wat premium is, is de stem. */
+  app.post('/api/service/bel', auth, (req, res) => veilig(res, () =>
+    serviceGesprek.bel({ melder: melder(req), tier: req.session.tier,
+      zaakId: kort(lijf(req).id, 40), video: lijf(req).video === true,
+      titel: kort(lijf(req).titel, 200) })));
+
+  /* Het doorgeefluik voor de WebRTC-onderhandeling. De kern kijkt niet in het
+     pakket -- dat is geen inhoud -- maar bewaakt wel de richting: alleen de
+     melder van dit gesprek komt hier binnen. */
+  app.post('/api/service/bel/signaal', auth, (req, res) => veilig(res, () =>
+    serviceGesprek.signaal(kort(lijf(req).gesprek, 40), { van: 'melder', wie: melder(req),
+      kind: kort(lijf(req).kind, 20), payload: lijf(req).payload })));
+
+  app.post('/api/service/bel/eind', auth, (req, res) => veilig(res, () => {
+    const g = serviceGesprek.vind(kort(lijf(req).gesprek, 40));
+    if (!g || g.melder !== melder(req)) return { status: 404, error: 'Deze oproep kennen wij niet.' };
+    return serviceGesprek.eind(g.id, { door: 'melder' });
+  }));
+
+  app.post('/api/service/bel/mijn', auth, (req, res) => veilig(res, () =>
+    ({ ok: true, gesprekken: serviceGesprek.mijne(melder(req)),
+      mag: serviceGesprek.magBellen(req.session.tier) })));
 };

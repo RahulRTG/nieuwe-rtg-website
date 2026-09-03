@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1543 bestanden en 10993 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1544 bestanden en 10999 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1543 |
-| losse beweringen (`test(...)`) | 10993 |
+| toetsbestanden | 1544 |
+| losse beweringen (`test(...)`) | 10999 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 57 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1014 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 40 |
 | alleen in de kop *genoemd*, nog niet gemeten | 143 |
-| niets van beide | 336 |
+| niets van beide | 337 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1347 bestanden, 10652 beweringen.
+1348 bestanden, 10658 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1077,6 +1077,7 @@ toets omvalt.
 | `sentinel.test.js` | 1 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `server.test.js` | 9 | gezakt op `liegpoort /api/` | Integratietests: een echte server draaien in een geisoleerde datamap en de kernflows over HTTP uitoefenen. Dit bewaakt precies de plekken waar geld en wet aan hangen: de fiscale rekenmachine, de leeftijdslaag, De... |
 | `service.test.js` | 7 | -- | RTG SERVICE: DE GEMEENSCHAPPELIJKE ENVELOP. Deze toetsen leggen vooral vast wat de servicelaag NIET doet, want dat is waar de merkregels zitten en wat bij een verbouwing als eerste sneuvelt: 1. |
+| `servicegesprek.test.js` | 6 | -- | BELLEN NAAR RTG, BINNEN DE APP. Geen telefoonnet: geen provider, geen nummer, en geen telefoonnummer dat de identiteitskluis verlaat. |
 | `servicekwaliteit.test.js` | 6 | -- | DE KWALITEITSMETING -- en vooral wat zij NIET meet. Een callcenter meet afhandeltijd en tickets per medewerker, en beloont daarmee precies het verkeerde: wie een zaak snel sluit scoort beter dan wie hem oplost. |
 | `servicemachtiging.test.js` | 9 | -- | DE SERVICEMACHTIGING EN DE SUPPORTBEVESTIGING. TWEE FOUTEN DIE HIER WORDEN VASTGEZET. |
 | `servicemens.test.js` | 9 | -- | "IK WIL EEN MENS" -- HET CONTRACT. DE FOUT DIE HIER WORDT VASTGEZET. |

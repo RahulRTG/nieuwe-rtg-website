@@ -97,9 +97,13 @@ const KANALEN = {
   app:         { naam: 'In de app',          gebouwd: true },
   balie:       { naam: 'Via de ledenbalie',  gebouwd: true },
   automatisch: { naam: 'Door RTG opgemerkt', gebouwd: true },
+  /* Bellen BINNEN de app (kern/service/gesprek.js): geen telefoonnet, geen
+     provider, en geen nummer dat de kluis verlaat. Dienst van de Lifestyle- en
+     Business Pass -- de STEM is premium, een mens is dat niet. */
+  gesprek:     { naam: 'Gebeld in de app',   gebouwd: true },
   mail:        { naam: 'Per e-mail',         gebouwd: false, waarom: 'RTMail heeft geen ingang die post aan een zaak koppelt.' },
-  telefoon:    { naam: 'Telefonisch',        gebouwd: false, waarom: 'Er is geen telefoniekoppeling.' },
-  terugbel:    { naam: 'Terugbelverzoek',    gebouwd: false, waarom: 'Volgt op telefonie; los heeft het geen zin.' },
+  telefoon:    { naam: 'Telefonisch',        gebouwd: false, waarom: 'Geen provider en geen nummer. Bellen kan wel BINNEN de app; zie het kanaal "gesprek".' },
+  terugbel:    { naam: 'Terugbelverzoek',    gebouwd: false, waarom: 'Volgt op telefonie; binnen de app belt men direct.' },
   api:         { naam: 'Via een koppeling',  gebouwd: false, waarom: 'Wacht op de App Store-brug.' }
 };
 

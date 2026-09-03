@@ -10,50 +10,48 @@
                              standen uit ./keten.js, met matching, overboeken
                              en telefoonboekingen
 
-   Nul verwijzingen in beide richtingen. Het gevolg was gemeten in
-   scripts/ritproef.js schakel 1: een vervoerder kan een aangevraagde app-rit
-   nergens terugvinden -- niet in zijn historie (alleen afgerond), niet in de
-   backoffice (alleen betaald, zonder ref) en niet op zijn dispatchbord (dat
-   leest de andere lijst). Wat hij krijgt is een melding over de SSE-stroom, en
-   is die verbinding weg, dan is de rit alleen nog te bereiken door de ref te
-   kennen.
+   Nul verwijzingen in beide richtingen. Gemeten in scripts/ritproef.js schakel
+   1: een vervoerder kon een aangevraagde app-rit nergens terugvinden -- niet in
+   zijn historie (alleen afgerond), niet in de backoffice (alleen betaald,
+   zonder ref) en niet op zijn dispatchbord (dat leest de andere lijst). Wat hij
+   kreeg was een melding over de SSE-stroom; was die verbinding weg, dan was de
+   rit alleen nog te bereiken door de ref te kennen.
 
    Pijnlijk detail: de kop van ./dispatch.js belooft dat een telefoonboeking
-   "een volwaardige opdracht" is en "dezelfde keten" krijgt als een app-rit. Die
-   belofte klopt omgekeerd -- de telefoonboeking kreeg de volle keten, de
-   app-rit haalde het bord nooit.
+   "dezelfde keten" krijgt als een app-rit. Die belofte klopt omgekeerd -- het
+   was de app-rit die het bord nooit haalde.
 
    HET BESLUIT: DE OPDRACHT WORDT DE WAARHEID. Een app-rit komt binnen als
-   vervoersopdracht; de rij in `rides` blijft bestaan als projectie voor de 34
-   plekken die haar lezen (fiscaal, kantoormetrics, waardering, spaarpot,
-   annuleren, de leverancierstaat) en draagt voortaan `opdrachtRef` naar zijn
-   opdracht.
+   vervoersopdracht; de rij in `rides` blijft bestaan voor de plekken die haar
+   lezen (scripts/ritmigratie.js deelt ze in) en draagt voortaan `opdrachtRef`.
 
    ================== DRIE DINGEN DIE HIER VASTLIGGEN ==================
 
-   1. EEN MISLUKTE OPDRACHT BREEKT DE RIT NIET. `opdrachtMaak` heeft poorten die
-      de app-rit tot nu toe niet passeerde: de module moet aanstaan in dat gebied
-      (./register.js) en vertrek én bestemming moeten oplosbare PLEKKEN zijn
-      (./plekken.js). Een app-rit draagt vaak alleen een tekst ("Haven"), en
-      daar kan plekBepaal niets mee. Dan ontstaat er geen opdracht en blijft de
-      rit precies zoals hij was -- met `opdrachtReden` erop, zodat het verschil
-      leesbaar is in plaats van stil. Een besluit uitvoeren mag geen bestaande
-      aanvragen weigeren die het gisteren nog deed.
+   1. EEN MISLUKTE OPDRACHT BREEKT DE RIT NIET. `opdrachtMaak` kan weigeren: een
+      vervoersmodule die in dat gebied uitstaat, een vertrekpunt dat niet is op
+      te lossen. Dan ontstaat er geen opdracht en blijft de rit precies zoals hij
+      was -- met `opdrachtReden` erop, zodat het verschil leesbaar is in plaats
+      van stil. Een besluit uitvoeren mag geen aanvragen weigeren die het
+      gisteren nog deed.
+
+      Een rit ZONDER bestemming is geen mislukking meer: als de vervoerder die
+      soort aanneemt (ZAAK_OPTIES.rittenZonderDoel), krijgt de opdracht een
+      bestemming die expliciet `onbekend` heet. Neemt hij hem niet aan, dan is
+      de rit al geweigerd voordat deze brug aan de beurt komt. Zie MAATSTAF.md
+      par. 7.5b.
 
    2b. DE RITKETEN IS GROVER, DUS DE BRUG LOOPT EEN PAD. `rides` kent zes
-      standen, de opdrachtketen tien, en die laatste laat GEEN overslaan toe
-      (./keten.js VOLGENDE). Een rit die van `aangevraagd` naar `geaccepteerd`
-      gaat, doorloopt in de opdrachtwereld drie gebeurtenissen: geprijsd,
-      aangeboden, geaccepteerd. En van `aan-boord` naar `afgerond` zijn het er
-      twee: rijdt, voltooid.
+      standen, de opdrachtketen tien, en die laat GEEN overslaan toe (./keten.js
+      VOLGENDE). `aangevraagd` -> `geaccepteerd` is daar drie gebeurtenissen
+      (geprijsd, aangeboden, geaccepteerd) en `aan-boord` -> `afgerond` twee
+      (rijdt, voltooid).
 
-      Die tussenstappen zijn geen kunstgrepen. Bij een app-rit staat de prijs
-      meteen vast (de offerte zat in de aanvraag) en is hij meteen aangeboden
-      aan die ene vervoerder -- de gebeurtenissen zijn dus echt gebeurd, alleen
-      niet apart zichtbaar in de grovere ritketen. De brug loopt daarom de
-      kortste weg door de HOOFDketen; uitzonderingsstanden (incident,
-      no-show, betaalprobleem) doen daar niet aan mee, want die zijn nooit een
-      tussenstap maar een besluit.
+      Geen kunstgrepen: bij een app-rit staat de prijs meteen vast en is hij
+      meteen aangeboden aan die ene vervoerder -- de gebeurtenissen zijn echt
+      gebeurd, alleen niet apart zichtbaar in de grovere ritketen. De brug loopt
+      de kortste weg door de HOOFDketen; uitzonderingsstanden (incident,
+      no-show, betaalprobleem) doen niet mee, want die zijn nooit een tussenstap
+      maar een besluit.
 
    2. DE STANDEN WORDEN VERTAALD EN NIET GELIJKGETROKKEN. De twee ketens delen
       vier standen letterlijk en twee onder een andere naam. Het gevaarlijke
@@ -120,10 +118,17 @@ module.exports = ({ opdrachtMaak, opdrachtMet, opdrachtNaar, keten }) => {
 
      `naar` alleen als er een ZAAK of een punt achter zit; een vrije tekst is
      geen plek (zie NIET_OVERBRUGD). */
-  function lijfVan(ride, body, vanaf) {
+  function lijfVan(ride, body, vanaf, magZonderDoel) {
+    /* Een bestemming die de reiziger nog niet noemt is een NORMALE taxirit, en
+       geen ontbrekend gegeven -- mits deze vervoerder die soort aanneemt
+       (ZAAK_OPTIES.rittenZonderDoel). Dan krijgt de opdracht een expliciet
+       onbekende bestemming: geen afstand, geen vaste prijs, wel een plek op het
+       dispatchbord. Neemt hij die soort NIET aan, dan is de rit hier al
+       geweigerd door kern/lidacties/ritten.js en komen we hier niet. */
     const naar = ride.toCode ? { zaak: ride.toCode }
       : (body && Number.isFinite(body.toLat) && Number.isFinite(body.toLng)
-        ? { lat: body.toLat, lng: body.toLng, label: ride.to } : null);
+        ? { lat: body.toLat, lng: body.toLng, label: ride.to }
+        : (magZonderDoel ? { onbekend: true } : null));
     if (!naar) return { error: NIET_OVERBRUGD['bestemming-als-tekst'] };
     const van = (vanaf && Number.isFinite(vanaf.lat))
       ? { lat: vanaf.lat, lng: vanaf.lng, label: vanaf.label || 'Vertrekpunt' }
@@ -144,11 +149,11 @@ module.exports = ({ opdrachtMaak, opdrachtMet, opdrachtNaar, keten }) => {
   /* Maak de opdracht bij een zojuist aangevraagde rit. Geeft ALTIJD iets terug:
      `{ ok, ref }` of `{ ok: false, reden }` -- nooit een uitzondering, want een
      brug die de aanvraag laat klappen is erger dan geen brug. */
-  function opdrachtBijRit(ride, session, body, vanaf) {
+  function opdrachtBijRit(ride, session, body, vanaf, magZonderDoel) {
     if (!ride || !ride.ref) return { ok: false, reden: 'geen rit' };
     let uit;
     try {
-      const v = lijfVan(ride, body, vanaf);
+      const v = lijfVan(ride, body, vanaf, magZonderDoel);
       if (v.error) return { ok: false, reden: v.error };
       uit = opdrachtMaak({ soort: 'lid', key: session.key, session, groep: session.tier,
         org: null, stad: null }, v.lijf);

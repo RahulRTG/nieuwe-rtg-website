@@ -890,13 +890,28 @@ KANT OP: twee lijsten die elkaar bijwerken hebben geen waarheid meer. **De migra
 plekken die `db.data.rides` noemen lezen er <!--getal:ritmigratie.stand-->7<!--/getal-->
 de lopende rit, tellen <!--getal:ritmigratie.historie-->9<!--/getal--> historie af,
 schrijven er 2 en noemen er 3 hem alleen in commentaar. De kaart bewees haar nut
-meteen: de eerste versie zei "zeven kunnen nu om", maar een rit ZONDER opdracht
-valt dan uit beeld -- en dan ziet een lid zijn eigen taxi niet meer in
-`/api/live/state`. Dat is een regressie, geen migratie. Stand nu:
-<!--getal:ritmigratie.kanNu-->0<!--/getal--> kunnen om,
-<!--getal:ritmigratie.wacht-->16<!--/getal--> wachten. De blokkade is dat niet
-elke rit een opdracht KAN krijgen (de app stuurt `toCode` alleen bij een gekozen
-bestemming), en het besluit dat dat opheft staat in MAATSTAF.md par. 7.5.
+binnen het uur: de eerste versie zei "zeven kunnen nu om", maar een rit ZONDER
+opdracht valt dan uit beeld -- en dan ziet een lid zijn eigen taxi niet meer in
+`/api/live/state`. Dat is een regressie, geen migratie, en de kaart ging op nul.
+
+**Het besluit van de eigenaar hief die blokkade op: de VERVOERDER kiest zelf**
+welke soort ritten hij aanneemt -- `rittenMetDoel` en `rittenZonderDoel`, twee
+booleans in `ZAAK_OPTIES` (`kern/leverancier.js`), want "beide aan of een uit"
+IS twee booleans en dat register draagt er al. Neemt hij ritten zonder
+bestemming aan, dan krijgt zo'n rit een opdracht met een bestemming die
+expliciet `onbekend` heet (`{ onbekend: true }` in `kern/mobiliteit/plekken.js`):
+geen afstand, geen vaste prijs, wel een plek op het dispatchbord. Neemt hij hem
+niet aan, dan weigert `kern/lidacties/ritten.js` met de reden en de weg
+eromheen. Zo of zo heeft elke rit die BESTAAT voortaan een opdracht. Stand nu:
+<!--getal:ritmigratie.kanNu-->7<!--/getal--> lezers kunnen om (de stand-lezers),
+daarna <!--getal:ritmigratie.daarna-->11<!--/getal--> (historie, dan de
+schrijvers). **De losse chauffeur is geen bijzonder geval**: hij is een zaak met
+een persoon erin, meldt zich aan op eigen naam en wijst zichzelf de rit toe met
+`self: true` -- wie met het BEDRIJFSaccount inlogt heeft geen `staffId` en kan
+dat niet, en dat is de grens en geen gebrek. Wat overblijft is een restrisico en
+geen blokkade: `opdrachtMaak` kan per geval weigeren, en dan draagt de rit
+`opdrachtReden` -- elke lezer die omgaat moet zo'n rit afvangen en hem nooit
+stil uit de lijst laten vallen.
 De domeingrens (`GRENZEN.json`) hield de brug trouwens tegen tot iemand hem op
 de lijst zette, precies zoals bedoeld.
 

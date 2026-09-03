@@ -89,7 +89,12 @@ module.exports = (kern) => {
       const L = db.data.live && db.data.live[req.session.key];
       const zaak = findSupplier(r.ride.supplierCode);
       const vanaf = (L && Number.isFinite(L.lat)) ? L : (zaak && zaak.loc) || null;
-      const b = kern.appbrug.opdrachtBijRit(r.ride, req.session, req.body || {}, vanaf);
+      /* Neemt deze vervoerder ritten zonder bestemming aan? Zo ja, dan krijgt
+         ook zo'n rit een opdracht -- met een expliciet onbekende bestemming.
+         De rit zelf is dan al langs dezelfde optie gekomen in
+         kern/lidacties/ritten.js; hier gaat het alleen om het dispatchbord. */
+      const magZonder = zaak ? kern.optieAan(zaak, 'rittenZonderDoel') : false;
+      const b = kern.appbrug.opdrachtBijRit(r.ride, req.session, req.body || {}, vanaf, magZonder);
       if (b.ok) { r.ride.opdrachtRef = b.ref; r.opdrachtRef = b.ref; }
       else { r.ride.opdrachtReden = b.reden; r.opdrachtReden = b.reden; }
       save();

@@ -84,6 +84,21 @@ module.exports = (ctx) => {
       return { lat: L.lat, lng: L.lng, label: 'Huidige locatie', bron: 'live' };
     }
 
+    /* EEN BESTEMMING DIE DE REIZIGER NOG NIET NOEMT, en dat is iets anders dan
+       een plek die wij niet kunnen oplossen. In een taxi stap je in en zeg je
+       het onderweg; dat is geen ontbrekend gegeven maar een normale rit. De
+       aanvrager moet er wel expliciet om vragen (`{ onbekend: true }`) -- de
+       weigering onderaan blijft dus staan voor alles wat WEL een plek had
+       moeten zijn.
+
+       Zonder lat/lng: haversine geeft dan 0, de rit krijgt geen afstand en de
+       prijs valt terug op het minimumtarief. Dat is de eerlijke uitkomst -- een
+       vaste prijs zonder bestemming zou verzonnen zijn. Of een vervoerder zulke
+       ritten aanneemt, staat in zijn eigen opties (ZAAK_OPTIES.rittenZonderDoel). */
+    if (spec.onbekend === true) {
+      return { label: 'Bestemming nog niet bekend', bron: 'onbekend', onbekend: true };
+    }
+
     if (Number.isFinite(spec.lat) && Number.isFinite(spec.lng)) {
       if (Math.abs(spec.lat) > 90 || Math.abs(spec.lng) > 180) return { error: 'Dat punt ligt niet op de aarde.' };
       return { lat: spec.lat, lng: spec.lng, label: schoon(spec.label, 80) || 'Punt op de kaart', bron: 'kaart' };

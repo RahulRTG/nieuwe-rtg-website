@@ -13,9 +13,15 @@
    "zeven lezers kunnen nu om", omdat een stand-lezer alleen de lopende rit
    toont en de opdracht die rijker draagt. Wat daarbij werd overgezien: een rit
    ZONDER opdracht valt dan uit die weergave, en dan ziet een lid zijn eigen
-   taxi niet meer staan. Toets 3 houdt vast dat `kanNu` nul blijft zolang de
-   blokkade er is -- anders is deze kaart een uitnodiging om verkeerd te
-   beginnen.
+   taxi niet meer staan. Dat is een regressie en geen migratie, en de kaart
+   stond daarop een dag op nul.
+
+   Het besluit van de eigenaar heeft die blokkade opgeheven -- de vervoerder
+   kiest zelf welke soort ritten hij aanneemt, en een rit zonder bestemming
+   krijgt een opdracht met een bestemming die `onbekend` heet. Wat blijft is het
+   RESTRISICO: opdrachtMaak kan nog per geval weigeren. Toets 4 houdt vast dat
+   dat zichtbaar blijft, want een kaart die alleen het goede nieuws draagt,
+   laat de omzetting met een schoner beeld beginnen dan er is.
 
    Draai los: node --test test/ritmigratie.test.js */
 'use strict';
@@ -48,24 +54,27 @@ test('2. elke plek in de kaart bestaat ook echt', () => {
     assert.ok(fs.existsSync(path.join(WORTEL, rel)), rel + ' bestaat niet');
 });
 
-test('3. zolang de blokkade er is, kan geen enkele lezer om', () => {
+test('3. de kaart telt op, en de volgorde van het werk staat erin', () => {
   const u = M.meet();
-  assert.ok(u.blokkade && u.blokkade.besluit, 'de blokkade en het bijbehorende besluit ontbreken');
-  assert.equal(u.telling.kanNu, 0,
-    'de kaart zegt dat er lezers om kunnen terwijl er ritten zonder opdracht bestaan -- ' +
-    'dan valt zo\'n rit uit beeld, en dat is een regressie en geen migratie');
-  assert.equal(u.telling.wachtOpBesluit, u.telling.stand + u.telling.historie);
+  assert.equal(u.telling.kanNu + u.telling.daarna, u.telling.stand + u.telling.historie + u.telling.schrijver,
+    'de telling van wie wanneer om kan, dekt niet alle lezers');
+  assert.equal(u.telling.wachtOpBesluit, 0, 'er wacht nog iets op een besluit dat genomen is');
+  /* De stand-lezers eerst en de schrijvers laatst: die laatste worden de plek
+     waar de projectie ontstaat, en dat kan pas als de lezers om zijn. */
+  assert.equal(u.telling.kanNu, u.telling.stand);
 });
 
-test('4. de blokkade noemt een besluit en geen bouwopdracht', () => {
+test('4. het opgeheven besluit blijft leesbaar, met het restrisico erbij', () => {
   const u = M.meet();
-  /* Het verschil is niet cosmetisch: een bouwopdracht zou hier gewoon worden
-     uitgevoerd. Dit is een keuze over wat een rit zonder bestemming IS, en die
-     hoort bij de eigenaar. */
-  assert.match(u.blokkade.besluit, /eigenaar/i, 'het besluit zegt niet wie het neemt');
-  assert.ok(u.blokkade.besluit.includes('of'), 'een besluit zonder alternatief is geen besluit maar een mening');
-  assert.match(u.blokkade.gevolg, /GEEN ENKELE lezer/,
-    'het gevolg verzwijgt dat ook de stand-lezers geblokkeerd zijn');
+  assert.equal(u.blokkade.stand, 'opgeheven');
+  assert.ok(u.blokkade.op, 'een opgeheven blokkade zonder datum is een bewering');
+  assert.match(u.blokkade.besluit, /vervoerder kiest/i, 'het besluit zegt niet wat er is besloten');
+  /* Wat een besluit oplost, lost het nooit helemaal op. Dat hoort te blijven
+     staan, anders begint de omzetting met een schoner beeld dan er is. */
+  assert.ok(u.restrisico && u.restrisico.wat && u.restrisico.bijOmzetting,
+    'het restrisico ontbreekt; dan lijkt de weg vrijer dan hij is');
+  assert.match(u.restrisico.bijOmzetting, /stil/i,
+    'het restrisico zegt niet dat een rit nooit stil uit een lijst mag vallen');
 });
 
 test('5. de kaart oordeelt over de code en niet andersom', () => {

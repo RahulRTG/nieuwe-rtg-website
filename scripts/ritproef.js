@@ -286,17 +286,26 @@ async function storingen(basis, uit) {
     'toont geen chauffeur, want die is nog niet toegewezen',
     !beeld || !beeld.driver, 'chauffeur in beeld: ' + (beeld ? beeld.driver : 'geen rit in beeld'));
 
-  /* 7. EEN BESTEMMING DIE GEEN PLEK IS. De brug vertaalt een zaak, een halte,
-     een favoriet, de live locatie of een punt op de kaart; een vrije tekst
-     niet. Dan hoort de rit gewoon door te gaan -- een besluit uitvoeren mag
-     geen aanvragen weigeren die gisteren nog werkten -- met de reden erbij. */
+  /* 7. EEN BESTEMMING DIE ALLEEN EEN TEKST IS. `to: 'Ergens bij de haven'` is
+     geen plek die ./plekken.js kan oplossen, en de verleiding is om er dan maar
+     iets van te maken. Dat mag niet: een verzonnen locatie geeft een verzonnen
+     afstand en dus een verzonnen prijs.
+
+     Sinds de vervoerder zelf kiest welke ritten hij aanneemt, telt zo'n rit als
+     een rit ZONDER bestemming. Hij krijgt dus wel een opdracht -- met een
+     bestemming die expliciet `onbekend` heet, zonder afstand -- en niet met de
+     tekst als plek. DEZE STORING BEWAAKTE EERST HET TEGENOVERGESTELDE ("krijgt
+     geen opdracht") en is bij het besluit van de eigenaar meegegaan; hij zakte
+     ook meteen, en dat is precies wat een storing hoort te doen als de
+     werkelijkheid verandert. */
   const tekst = await P('/api/ride/request', { supplierCode: VERVOERDER, to: 'Ergens bij de haven' }, M);
+  const oref7 = tekst.data && tekst.data.opdrachtRef;
+  const bord7 = oref7 ? await P('/api/supplier/mob/dispatch', {}, S) : { data: {} };
+  const o7 = [].concat((bord7.data && bord7.data.open) || []).find(o => o.ref === oref7);
   noteer('een bestemming die alleen een tekst is',
-    'de rit gaat gewoon door, krijgt geen opdracht, en zegt waarom',
-    tekst.status === 200 && !!(tekst.data && tekst.data.ride) &&
-      !(tekst.data && tekst.data.opdrachtRef) && !!(tekst.data && tekst.data.opdrachtReden),
-    'status ' + tekst.status + ', opdracht: ' + ((tekst.data && tekst.data.opdrachtRef) || 'geen') +
-      ', reden: ' + String((tekst.data && tekst.data.opdrachtReden) || '').slice(0, 60) + '...');
+    'wordt nooit een plek op de kaart: de opdracht draagt een bestemming die onbekend heet en geen afstand',
+    tekst.status === 200 && !!oref7 && !!o7 && !!(o7.naar && o7.naar.onbekend) && !o7.km,
+    'opdracht ' + oref7 + ', bestemming: ' + JSON.stringify(o7 && o7.naar) + ', km: ' + (o7 && o7.km));
 
   /* 8. DE VERTALING VAN DE STANDEN. `aan-boord` heet in de opdrachtketen
      `ingestapt`, en `rijdt` betekent in de twee werelden iets anders. Deze
@@ -312,6 +321,48 @@ async function storingen(basis, uit) {
     'de opdracht heet dan "ingestapt" en niet "rijdt" -- dat woord betekent hier iets anders',
     !!o8 && o8.status === 'ingestapt',
     'rit aan-boord, opdracht ' + (o8 ? o8.status : '(niet gevonden)'));
+
+  /* 9-11. WIE NEEMT WELKE RIT AAN. Besluit van de eigenaar: een vervoerder
+     kiest zelf of hij ritten met een bestemming vooraf aanneemt, ritten waarbij
+     de gast het onderweg zegt, of allebei -- en dat geldt voor een losse
+     chauffeur net zo goed als voor een bedrijf. */
+  const zonderDoel = await P('/api/ride/request', { supplierCode: VERVOERDER }, M);
+  noteer('een rit zonder bestemming, bij een vervoerder die die soort aanneemt',
+    'gaat gewoon door en krijgt een opdracht met een bestemming die nog niet bekend is',
+    zonderDoel.status === 200 && !!(zonderDoel.data && zonderDoel.data.opdrachtRef),
+    'status ' + zonderDoel.status + ', opdracht: ' + ((zonderDoel.data && zonderDoel.data.opdrachtRef) || 'geen'));
+
+  await P('/api/supplier/settings', { opties: { rittenZonderDoel: false } }, S);
+  const geweigerd = await P('/api/ride/request', { supplierCode: VERVOERDER }, M);
+  const nogSteeds = await P('/api/ride/request', { supplierCode: VERVOERDER, toCode: BESTEMMING }, M);
+  await P('/api/supplier/settings', { opties: { rittenZonderDoel: true } }, S);
+  noteer('een vervoerder die alleen ritten mét bestemming aanneemt',
+    'weigert de andere soort met een reden, en blijft de zijne gewoon aannemen',
+    geweigerd.status === 409 && /bestemming/i.test(String(geweigerd.data && geweigerd.data.error)) &&
+      nogSteeds.status === 200,
+    'zonder doel: ' + geweigerd.status + ' "' + String((geweigerd.data && geweigerd.data.error) || '').slice(0, 60) +
+      '"; met doel: ' + nogSteeds.status);
+
+  /* 11. DE LOSSE CHAUFFEUR. Hij is geen bijzonder geval maar een zaak met een
+     persoon erin: hij meldt zich aan op eigen naam en wijst zichzelf toe. Wie
+     met het BEDRIJFSaccount inlogt heeft geen staffId en kan dat niet -- dat is
+     de grens, niet een gebrek. */
+  const eigen = await P('/api/supplier/staff/add', { name: 'Losse Chauffeur', func: 'chauffeur' }, S);
+  const pers = await P('/api/supplier/login',
+    { code: VERVOERDER, staffId: eigen.data && eigen.data.staff && eigen.data.staff.id, pin: eigen.data && eigen.data.pin });
+  const C = pers.data && pers.data.token;
+  const eigenRit = (await P('/api/ride/request', { supplierCode: VERVOERDER, toCode: BESTEMMING }, M)).data;
+  await P('/api/ride/pay', { ref: eigenRit.ride.ref }, M);
+  const zelf = C ? await P('/api/supplier/ride/assign', { ref: eigenRit.ride.ref, self: true }, C) : { status: 0 };
+  const eigenBord = C ? await P('/api/supplier/mob/dispatch', {}, C) : { data: {} };
+  const opBord = [].concat((eigenBord.data && eigenBord.data.open) || [], (eigenBord.data && eigenBord.data.lopend) || [])
+    .some(o => o.ref === eigenRit.opdrachtRef);
+  noteer('een losse chauffeur die zichzelf een rit toewijst',
+    'kan dat op eigen naam, en ziet de rit op zijn eigen dispatchbord',
+    zelf.status === 200 && !!(zelf.data && zelf.data.ride && zelf.data.ride.driver) && opBord,
+    'toewijzen: ' + zelf.status + ', chauffeur: ' +
+      ((zelf.data && zelf.data.ride && zelf.data.ride.driver && zelf.data.ride.driver.name) || 'geen') +
+      ', op zijn bord: ' + opBord);
 
   return uit;
 }

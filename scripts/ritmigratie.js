@@ -36,14 +36,25 @@
    migratie te stoppen voordat zij verkeerd begint, en niet achteraf te
    verklaren waarom een teller zakte.
 
-   HET GAT DAT DE MIGRATIE BLOKKEERT, en dit script maakt het zichtbaar in
-   plaats van het te omzeilen: niet elke rit KAN een opdracht krijgen. De
-   ledenapp stuurt `toCode` alleen als het lid een bestemming heeft gekozen
-   (public/apps/app-main.js, verstuurRit); zonder bestemming kan
-   kern/mobiliteit/plekken.js geen plek oplossen en maakt de brug geen opdracht.
-   Zolang dat zo is, zou een historie-lezer die alleen opdrachten telt, de
-   bestemmingsloze ritten uit de cijfers laten vallen. Dat is een BESLUIT van de
-   eigenaar en geen bouwkeuze -- het staat in de uitslag onder `blokkade`.
+   DE BLOKKADE IS OPGEHEVEN (3 september 2026, besluit van de eigenaar). Zij
+   was: niet elke rit KAN een opdracht krijgen, want de ledenapp stuurt `toCode`
+   alleen als het lid een bestemming koos en zonder bestemming loste
+   kern/mobiliteit/plekken.js geen plek op.
+
+   Het besluit maakt er een keuze van de VERVOERDER van: hij kiest zelf of hij
+   ritten met een bestemming vooraf aanneemt, ritten waarbij de gast het
+   onderweg zegt, of allebei (ZAAK_OPTIES in kern/leverancier.js, twee
+   booleans). Neemt hij de tweede soort aan, dan krijgt zo'n rit een opdracht
+   met een bestemming die expliciet `onbekend` heet -- geen afstand, geen vaste
+   prijs, wel een plek op het dispatchbord. Neemt hij hem niet aan, dan bestaat
+   die rit bij hem niet: kern/lidacties/ritten.js weigert hem met de reden en de
+   weg eromheen. Zo of zo heeft elke rit die BESTAAT voortaan een opdracht.
+
+   WAT ER OVERBLIJFT IS GEEN BLOKKADE MAAR EEN GEVAL PER GEVAL. `opdrachtMaak`
+   kan nog steeds weigeren -- een module die in dat gebied uitstaat, een
+   vertrekpunt dat niet op te lossen is -- en dan draagt de rit `opdrachtReden`.
+   Dat is zichtbaar en telbaar, en het is precies het soort ding dat een lezer
+   bij het omzetten moet afvangen. Het staat in de uitslag onder `restrisico`.
 
    Draaien:  npm run ritmigratie            (print)
              npm run ritmigratie:vast       (schrijft RITMIGRATIE.json)
@@ -164,9 +175,14 @@ function meet() {
     stempel: new Date().toISOString().slice(0, 10),
     uitleg: 'Per lezer van db.data.rides: wat hij eruit haalt en of de opdrachtwereld dat kan leveren. Geschreven vóór de migratie, zodat die niet wordt geraden. Zie MAATSTAF.md par. 7.5.',
     blokkade: {
-      wat: 'Niet elke rit kan een opdracht krijgen. De ledenapp stuurt `toCode` alleen als het lid een bestemming heeft gekozen (public/apps/app-main.js, verstuurRit); zonder bestemming lost kern/mobiliteit/plekken.js geen plek op en maakt de brug geen opdracht.',
-      gevolg: 'GEEN ENKELE lezer kan om zolang dat niet is opgelost. Bij een historie-teller vallen bestemmingsloze ritten stil uit de cijfers (en bij server/routes/office/toegang.js is dat een onvolledig antwoord op een inzageverzoek); bij een stand-lezer ziet een lid met zo\'n rit zijn eigen taxi niet meer staan in /api/live/state. Het tweede is zichtbaarder, het eerste stiller.',
-      besluit: 'Van de eigenaar: krijgt een rit zonder bestemming ook een opdracht (met een onbekende bestemming, dus zonder afstand en zonder vaste prijs), of blijft die soort rit buiten de opdrachtwereld en lezen de historie-tellers beide lijsten?'
+      stand: 'opgeheven',
+      wat: 'Was: niet elke rit kan een opdracht krijgen, want zonder bestemming loste kern/mobiliteit/plekken.js geen plek op.',
+      besluit: 'De vervoerder kiest zelf welke soort ritten hij aanneemt (ZAAK_OPTIES.rittenMetDoel en .rittenZonderDoel, twee booleans). Een rit zonder bestemming krijgt een opdracht met een bestemming die expliciet `onbekend` heet; neemt de vervoerder die soort niet aan, dan wordt de rit geweigerd met de reden. Elke rit die bestaat, heeft dus een opdracht.',
+      op: '2026-09-03'
+    },
+    restrisico: {
+      wat: 'opdrachtMaak kan nog steeds per geval weigeren: een vervoersmodule die in dat gebied uitstaat, of een vertrekpunt dat niet op te lossen is. De rit draagt dan `opdrachtReden`.',
+      bijOmzetting: 'elke lezer die naar de opdrachtwereld gaat, moet zo\'n rit afvangen -- zichtbaar, met de reden erbij, en nooit door hem stil uit de lijst te laten vallen.'
     },
     telling: {
       bestanden: gevonden.size,
@@ -176,10 +192,13 @@ function meet() {
       historie: perSoort.historie.length,
       geenLezer: Object.keys(GEEN_LEZER).length,
       onbekend: onbekend.length,
-      /* NUL, en dat is de correctie op de eerste versie van deze kaart: ook een
-         stand-lezer laat een rit zonder opdracht uit beeld vallen. */
-      kanNu: 0,
-      wachtOpBesluit: perSoort.stand.length + perSoort.historie.length
+      /* De blokkade is opgeheven, dus de stand-lezers kunnen. De historie-lezers
+         blijven riskanter (een teller die stil zakt valt niemand op) en gaan als
+         tweede; de schrijvers als laatste, want zij worden de plek waar de
+         projectie ontstaat. */
+      kanNu: perSoort.stand.length,
+      wachtOpBesluit: 0,
+      daarna: perSoort.historie.length + perSoort.schrijver.length
     },
     perSoort, onbekend, verdwenen
   };
@@ -202,10 +221,10 @@ function druk(u) {
     console.log('\n  VERDWENEN (staan in de lijst maar noemen db.data.rides niet meer):');
     for (const x of u.verdwenen) console.log('    ' + x);
   }
-  console.log('\n  BLOKKADE: ' + u.blokkade.wat);
-  console.log('  BESLUIT : ' + u.blokkade.besluit);
-  console.log('\n  ' + t.kanNu + ' lezers kunnen nu om; ' + t.wachtOpBesluit + ' wachten op dat besluit ' +
-    '(' + t.stand + ' stand, ' + t.historie + ' historie). De schrijvers volgen als laatste.');
+  console.log('\n  BLOKKADE: ' + u.blokkade.stand + ' -- ' + u.blokkade.besluit);
+  console.log('  RESTRISICO: ' + u.restrisico.wat);
+  console.log('\n  ' + t.kanNu + ' lezers kunnen nu om (de stand-lezers); daarna ' + t.daarna +
+    ' (' + t.historie + ' historie, ' + t.schrijver + ' schrijvers, in die volgorde).');
 }
 
 module.exports = { meet, LEZERS, GEEN_LEZER, DOEL };

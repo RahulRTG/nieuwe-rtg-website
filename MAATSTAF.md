@@ -88,7 +88,7 @@ de tabel na en zakt zodra de telregel eronder niet meer klopt.
 | U39 | Harde poorten die nooit compenseerbaar zijn: ledger, audit, herstel, toegankelijkheid, prestatie, actor-compleetheid, dood spoor, uitstap | KEURING.md, TOEGANKELIJK.md, TENANT.md (uitgang) | `scripts/check.js` (64 regels), a11y-poorten, `kern/tenant/uitgang.js` | bestaand: ja; dood spoor en actor: nog niet | per poort | **stap weg** |
 | U40 | Elk product draagt een machineleesbaar contract (PRODUCT-360) dat in de toetsing meeloopt | PLATFORM.md par. 0: vier apps, en wat technisch nog losse pagina's zijn; EXECUTION_MAP.json is een projectie per route | per route: ja; per product: de eenheid "product" is niet vastgesteld | `npm run executionmap` zakt op handwerk | — | **besluit** |
 | U41 | Elke capability draagt een contract: objecten, commando's, events, rechten, fouten, herstel, SLO, gebruikers, toetsen | OS.md par. 4; `kern/appstore/machtigingen.js` is het enige bestand met doel én grens | 21 capability-lijsten met 250 leden | `scripts/capabilityroepers.js` | CAPABILITEIT.json | **besluit** |
-| U42 | Een journey wordt als volledig verhaal over actoren heen getest, inclusief verstoring, herhaling en herstel | par. 7 hieronder | `scripts/tafelproef.js` en `scripts/ritproef.js`, los geschreven; `scripts/ketenvorm.js` telt wat ze delen | beide geven foutcode 1 op een open schakel; `test/tafelproef.test.js` en `test/ritproef.test.js` bewaken de proeven | tafel <!--getal:tafel.schakels-->11<!--/getal--> schakels en <!--getal:tafel.storingen-->8<!--/getal--> storingen; rit <!--getal:rit.schakels-->8<!--/getal--> gesloten + <!--getal:rit.bevindingen-->0<!--/getal--> bevinding, <!--getal:rit.storingen-->8<!--/getal--> storingen | **staat** |
+| U42 | Een journey wordt als volledig verhaal over actoren heen getest, inclusief verstoring, herhaling en herstel | par. 7 hieronder | `scripts/tafelproef.js` en `scripts/ritproef.js`, los geschreven; `scripts/ketenvorm.js` telt wat ze delen | beide geven foutcode 1 op een open schakel; `test/tafelproef.test.js` en `test/ritproef.test.js` bewaken de proeven | tafel <!--getal:tafel.schakels-->11<!--/getal--> schakels en <!--getal:tafel.storingen-->8<!--/getal--> storingen; rit <!--getal:rit.schakels-->8<!--/getal--> gesloten + <!--getal:rit.bevindingen-->0<!--/getal--> bevinding, <!--getal:rit.storingen-->11<!--/getal--> storingen | **staat** |
 | U43 | Het register koppelt product, actor, bedoeling, journey, capability, object, route, event, beleid, bewijs, scherm, toets, prestatie en herstelpad | `kern/platformregister/` | functie ↔ routes ↔ bewijs ↔ scherm | check.js regel 64 | — | **stap weg** |
 | U44 | Volgorde: eerst de gedeelde grond, dan drie gouden ketens (mobiliteit, horeca, werk), dan de families | EXECUTIE.md par. 7: één bewezen keten vóór honderd functies | besloten 3 september 2026: horeca eerst (par. 7) | — | — | **staat** |
 | U45 | De repo verhuist naar /products, /domains, /capabilities, /trust | 415 kerndomeinen in `server/kern`; EXECUTION_MAP is een projectie | een gegenereerde leesweergave kan; een fysieke verhuizing niet | — | — | **geprojecteerd** |
@@ -626,36 +626,71 @@ vast:
 
 De aanvraag verschijnt nu op het dispatchbord, en schakel 1 sluit.
 
-**De migratie is in kaart gebracht en staat stil op één besluit.**
+**De migratie is in kaart gebracht, en de kaart stopte hem meteen.**
 `scripts/ritmigratie.js` (`npm run ritmigratie`) deelt de <!--getal:ritmigratie.bestanden-->21<!--/getal-->
 plekken die `db.data.rides` noemen in naar wat ze ermee doen:
 <!--getal:ritmigratie.stand-->7<!--/getal--> lezen de **lopende** rit,
 <!--getal:ritmigratie.historie-->9<!--/getal--> tellen **historie** af,
 2 **schrijven**, en 3 noemen hem alleen in commentaar.
 
-Die kaart is geschreven vóór er een regel verplaatst werd, en zij heeft haar nut
-meteen bewezen: de eerste versie zei *"zeven lezers kunnen nu om"*, omdat een
-stand-lezer alleen de lopende rit toont en de opdracht die rijker draagt. Wat
-daarbij werd overgezien is dat een rit **zonder** opdracht dan uit die weergave
-valt — en dan ziet een lid met een bestemmingsloze rit zijn eigen taxi niet meer
-staan in `/api/live/state`. Dat is geen migratie maar een regressie. De eerlijke
-uitkomst staat er nu: **<!--getal:ritmigratie.kanNu-->0<!--/getal--> lezers kunnen
-om, <!--getal:ritmigratie.wacht-->16<!--/getal--> wachten**, en
-`test/ritmigratie.test.js` toets 3 houdt dat vast zolang de blokkade bestaat.
+Die kaart is geschreven vóór er een regel verplaatst werd, en zij bewees haar
+nut binnen het uur: de eerste versie zei *"zeven lezers kunnen nu om"*, omdat
+een stand-lezer alleen de lopende rit toont en de opdracht die rijker draagt.
+Wat daarbij werd overgezien is dat een rit **zonder** opdracht dan uit die
+weergave valt — en dan ziet een lid met een bestemmingsloze rit zijn eigen taxi
+niet meer staan in `/api/live/state`. Dat is een regressie en geen migratie, en
+de kaart ging daarop naar nul.
 
-**De blokkade, en het besluit dat hem opheft.** Niet elke rit kán een opdracht
-krijgen: de ledenapp stuurt `toCode` alleen als het lid een bestemming heeft
-gekozen (`public/apps/app-main.js`, `verstuurRit`), en zonder bestemming lost
-`kern/mobiliteit/plekken.js` geen plek op. De vraag die de eigenaar moet
-beantwoorden staat in de uitslag onder `blokkade.besluit`:
+### 7.5b Het besluit dat de blokkade ophief: de vervoerder kiest
 
-> Krijgt een rit zonder bestemming ook een opdracht (met een onbekende
-> bestemming, dus zonder afstand en zonder vaste prijs), of blijft die soort rit
-> buiten de opdrachtwereld en lezen de historie-tellers beide lijsten?
+De blokkade was principieel: de ledenapp stuurt `toCode` alleen als het lid een
+bestemming koos, en zonder bestemming loste `kern/mobiliteit/plekken.js` geen
+plek op. **Het besluit van de eigenaar (3 september 2026) maakt er een keuze van
+de vervoerder van** — en die geldt voor een losse chauffeur net zo goed als voor
+een bedrijf:
 
-Zolang dat openstaat is `rides` een echte lijst en geen projectie. De richting
-staat vast, de migratie niet — en dat staat in de kop van de brug, niet alleen
-hier.
+| | |
+|---|---|
+| `rittenMetDoel` | de gast noemt de bestemming vooraf |
+| `rittenZonderDoel` | de gast zegt het onderweg, zoals in een straattaxi |
+
+Twee booleans in `ZAAK_OPTIES` (`kern/leverancier.js`) en geen keuzelijst met
+drie standen: dat register draagt booleans, de instellingenroute toetst er
+letterlijk op, en *"beide aan, of één uit"* ís twee booleans. Beide uit betekent
+hetzelfde als `ritten: false`, en dat wordt gezegd in plaats van een lege lijst
+te tonen.
+
+Wat er gebeurt bij een rit zonder bestemming:
+
+- **neemt de vervoerder die soort aan** → de opdracht krijgt een bestemming die
+  expliciet `onbekend` heet: geen afstand, geen vaste prijs, wel een plek op het
+  dispatchbord. `kern/mobiliteit/plekken.js` heeft daarvoor een eigen spec
+  (`{ onbekend: true }`), en die is met opzet expliciet — de weigering voor
+  alles wat wél een plek had moeten zijn, blijft staan.
+- **neemt hij hem niet aan** → `kern/lidacties/ritten.js` weigert met de reden
+  én de weg eromheen: *"vraagt om een bestemming voordat de rit begint."*
+
+Zo of zo heeft elke rit die bestáát voortaan een opdracht. De teller in de
+migratiekaart staat daarmee op **<!--getal:ritmigratie.kanNu-->7<!--/getal-->
+lezers die om kunnen** (de stand-lezers), daarna
+<!--getal:ritmigratie.daarna-->11<!--/getal--> (historie, dan de schrijvers).
+
+**En de losse chauffeur is geen bijzonder geval.** Hij is een zaak met één
+persoon erin: hij meldt zich aan op eigen naam (`staffId` + pincode), wijst
+zichzelf de rit toe met `self: true`, en ziet hem op zijn eigen dispatchbord.
+Wie met het *bedrijfsaccount* inlogt heeft geen `staffId` en kan dat niet — dat
+is de grens en geen gebrek: elke handeling staat op een persoon. Storing 11 in
+de ritproef meet die hele weg.
+
+**Wat er overblijft is geen blokkade maar een restrisico**, en het staat in de
+uitslag: `opdrachtMaak` kan nog per geval weigeren (een vervoersmodule die in
+dat gebied uitstaat, een vertrekpunt dat niet op te lossen is), en dan draagt de
+rit `opdrachtReden`. Elke lezer die omgaat moet zo'n rit afvangen — zichtbaar,
+met de reden erbij, en nooit door hem stil uit de lijst te laten vallen.
+
+Zolang de lezers niet om zijn, blijft `rides` een echte lijst en geen projectie.
+De richting staat vast, de blokkade is weg, en de volgorde van het werk staat in
+de kaart — niet alleen hier.
 
 Eén ding kwam bij het bouwen naar boven en is de moeite waard: de domeingrens
 (`GRENZEN.json`) hield de brug tegen tot iemand hem op de lijst zette. Precies

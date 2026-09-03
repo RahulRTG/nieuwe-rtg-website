@@ -2,9 +2,14 @@
   "stempel": "2026-09-03",
   "uitleg": "Per lezer van db.data.rides: wat hij eruit haalt en of de opdrachtwereld dat kan leveren. Geschreven vóór de migratie, zodat die niet wordt geraden. Zie MAATSTAF.md par. 7.5.",
   "blokkade": {
-    "wat": "Niet elke rit kan een opdracht krijgen. De ledenapp stuurt `toCode` alleen als het lid een bestemming heeft gekozen (public/apps/app-main.js, verstuurRit); zonder bestemming lost kern/mobiliteit/plekken.js geen plek op en maakt de brug geen opdracht.",
-    "gevolg": "GEEN ENKELE lezer kan om zolang dat niet is opgelost. Bij een historie-teller vallen bestemmingsloze ritten stil uit de cijfers (en bij server/routes/office/toegang.js is dat een onvolledig antwoord op een inzageverzoek); bij een stand-lezer ziet een lid met zo'n rit zijn eigen taxi niet meer staan in /api/live/state. Het tweede is zichtbaarder, het eerste stiller.",
-    "besluit": "Van de eigenaar: krijgt een rit zonder bestemming ook een opdracht (met een onbekende bestemming, dus zonder afstand en zonder vaste prijs), of blijft die soort rit buiten de opdrachtwereld en lezen de historie-tellers beide lijsten?"
+    "stand": "opgeheven",
+    "wat": "Was: niet elke rit kan een opdracht krijgen, want zonder bestemming loste kern/mobiliteit/plekken.js geen plek op.",
+    "besluit": "De vervoerder kiest zelf welke soort ritten hij aanneemt (ZAAK_OPTIES.rittenMetDoel en .rittenZonderDoel, twee booleans). Een rit zonder bestemming krijgt een opdracht met een bestemming die expliciet `onbekend` heet; neemt de vervoerder die soort niet aan, dan wordt de rit geweigerd met de reden. Elke rit die bestaat, heeft dus een opdracht.",
+    "op": "2026-09-03"
+  },
+  "restrisico": {
+    "wat": "opdrachtMaak kan nog steeds per geval weigeren: een vervoersmodule die in dat gebied uitstaat, of een vertrekpunt dat niet op te lossen is. De rit draagt dan `opdrachtReden`.",
+    "bijOmzetting": "elke lezer die naar de opdrachtwereld gaat, moet zo'n rit afvangen -- zichtbaar, met de reden erbij, en nooit door hem stil uit de lijst te laten vallen."
   },
   "telling": {
     "bestanden": 21,
@@ -14,8 +19,9 @@
     "historie": 9,
     "geenLezer": 3,
     "onbekend": 0,
-    "kanNu": 0,
-    "wachtOpBesluit": 16
+    "kanNu": 7,
+    "wachtOpBesluit": 0,
+    "daarna": 11
   },
   "perSoort": {
     "schrijver": [

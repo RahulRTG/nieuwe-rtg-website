@@ -19,6 +19,21 @@ function vraagRitVoor(session, body) {
   // activiteitenzaken rijden alleen hun eigen transfers: die regel je via je ticket
   if (s.type === 'activiteit') return { status: 409, error: 'De transfer van ' + s.name + ' regel je via je ticket (Ter plaatse, Mijn tickets).' };
   if (!optieAan(s, 'ritten')) return { status: 409, error: s.name + ' neemt op dit moment geen ritaanvragen aan.' };
+  /* WELKE SOORT RIT NEEMT DEZE VERVOERDER AAN. Besluit van de eigenaar: een
+     chauffeur kiest zelf of hij ritten met een bestemming vooraf aanneemt,
+     ritten waarbij de gast het onderweg zegt, of allebei (ZAAK_OPTIES in
+     kern/leverancier.js). Het geldt voor een losse chauffeur net zo goed als
+     voor een bedrijf -- het is een eigenschap van de ZAAK, en een eenmanszaak
+     is er ook een.
+
+     De controle staat HIER en niet in de appbrug: hij bepaalt of de rit
+     überhaupt bestaat, en niet of hij ook op het dispatchbord komt. Een
+     weigering noemt de reden en de weg eromheen (GRAMMATICA.md). */
+  const metDoel = !!(body.toCode || (Number.isFinite(body.toLat) && Number.isFinite(body.toLng)));
+  if (metDoel && !optieAan(s, 'rittenMetDoel'))
+    return { status: 409, error: s.name + ' rijdt alleen ritten waarbij u de bestemming onderweg doorgeeft.', code: 'alleen-zonder-doel' };
+  if (!metDoel && !optieAan(s, 'rittenZonderDoel'))
+    return { status: 409, error: s.name + ' vraagt om een bestemming voordat de rit begint. Kies er een en probeer het opnieuw.', code: 'doel-nodig' };
   /* Leeftijd uit het paspoort: privejets en helikopters boek je vanaf 18 jaar.
      Hier stond `lftR != null &&` voor, en dat maakte de grens fail-open:
      leeftijdVan geeft null zodra de geboortedatum ontbreekt of niet klopt, dus

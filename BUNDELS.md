@@ -189,7 +189,7 @@ omlaag.
 
 ## `apps/foundation/samen.js`
 
-`public/apps/foundation/samen/` -- 2 delen, 180 regels in de delen
+`public/apps/foundation/samen/` -- 2 delen, 198 regels in de delen
 
 | deel | onderwerp |
 |---|---|

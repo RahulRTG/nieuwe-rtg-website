@@ -3,6 +3,15 @@
     "server/kern/gastzorg.js",
     "server/kern/gastzorg-profiel.js"
   ],
+  "stempel": {
+    "op": "2026-09-03T21:20:22.663Z",
+    "commit": "98f560fd",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/doorwerking.js",
+    "node": "v22.22.2"
+  },
+  "grens": "Dit is een LEESMETING op de bron: hij telt aanroepen van zorgVoor en zorgMee en kijkt of er een zaak bij staat en of het antwoord wordt bewaard. Hij bewijst NIET dat een doorgegeven profiel klopt, niet dat de ontvanger het gebruikt, en niet dat kopieën die al in de database staan een stempel hebben gekregen. Het is een van de doorwerkingen in dit huis en niet alle.",
   "telling": {
     "punten": 18,
     "eigen": 6,

@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-02T23:28:18.080Z",
-    "commit": "0899622d",
+    "op": "2026-09-02T23:44:15.759Z",
+    "commit": "dbea7815",
     "boomVuil": true,
-    "boomAnders": 3,
+    "boomAnders": 5,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -2048,6 +2048,14 @@
       "module": "scripts/gezag.js",
       "operator": "===->!==#0",
       "gezakt": 3,
+      "geprobeerd": 2
+    },
+    "gezagshandelingen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/gezagshandelingen.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
       "geprobeerd": 2
     },
     "gezagsnoemer.test.js": {

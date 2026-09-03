@@ -143,6 +143,8 @@
     "resolverbereik": "node scripts/resolverbereik.js",
     "getallen": "node scripts/getallen.js",
     "getallen:controle": "node scripts/getallen.js --controle",
+    "gezagshandelingen": "node scripts/gezagshandelingen.js",
+    "gezagshandelingen:lijst": "node scripts/gezagshandelingen.js --lijst",
     "gezagsnoemer": "node scripts/gezagsnoemer.js",
     "gezag": "node scripts/gezag.js",
     "gezag:lijst": "node scripts/gezag.js --lijst",

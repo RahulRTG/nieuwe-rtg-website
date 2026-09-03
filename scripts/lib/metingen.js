@@ -76,6 +76,12 @@ const REGISTER = {
      zijn lijsten en geen enkelvoudige getallen. */
   'RESOLVERBEREIK.json': { eigenRatel: 'test/resolverbereik.test.js' },
   'GEZAGSNOEMER.json': { eigenRatel: 'test/gezagsnoemer.test.js' },
+  /* De gedeelde namespace van handelingen (TAKEN.md 4.54). Drie getallen, en
+     ze lopen niet dezelfde kant op: gedeelde onderwerpen mogen alleen OMHOOG
+     (meer vergelijkbaarheid), schalen die alleen staan en tegenspraken alleen
+     omlaag. Dat past niet als een enkelvoudig getal in NORM.json, dus draagt
+     het register zijn eigen grondwaarde en houdt de toets hem vast. */
+  'GEZAGSHANDELINGEN.json': { eigenRatel: 'test/gezagshandelingen.test.js' },
   'EXECUTION_MAP.json': { eigenRatel: 'test/executionmap.test.js' },
   'HERSTEL.json': { eigenRatel: 'test/herstel.test.js' },
   'HERSTELPROEF.json': { eigenRatel: 'test/herstelproef.test.js' },

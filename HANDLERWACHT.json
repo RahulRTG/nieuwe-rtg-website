@@ -1,22 +1,22 @@
 {
  "stempel": {
-  "op": "2026-09-03T09:29:56.796Z",
-  "commit": "c5da8ec4",
+  "op": "2026-09-03T10:01:27.172Z",
+  "commit": "b190b0b0",
   "boomVuil": false,
-  "boomAnders": 2,
+  "boomAnders": 1,
   "instrument": "scripts/handlerwacht.js",
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
   "zonderBewakerslaag": 614,
-  "bewaakt": 530,
+  "bewaakt": 531,
   "openbaarMetReden": 47,
   "eigenControle": 16,
   "sleutelDoorgegeven": 12,
   "zonderWachtMetReden": 8,
   "laat": 0,
-  "onbewaakt": 1,
+  "onbewaakt": 0,
   "nietGelezen": 0,
   "gezagsfuncties": 26,
   "publiekeLijstenVerschillen": 19
@@ -65,7 +65,7 @@
   },
   {
    "naam": "rtfSpeler -> rtf.verifieerProfiel",
-   "aantal": 42
+   "aantal": 43
   },
   {
    "naam": "gezinSessie",
@@ -3477,8 +3477,9 @@
   },
   {
    "sleutel": "POST /api/rtf/spel/antwoord",
-   "bestand": "server/routes/rtmail-vak.js:127",
-   "staat": "onbewaakt"
+   "bestand": "server/routes/spellen.js:139",
+   "staat": "bewaakt",
+   "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/arcade-bord",

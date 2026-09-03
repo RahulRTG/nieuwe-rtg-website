@@ -17,14 +17,14 @@
 'use strict';
 
 module.exports = (ctx) => {
-  const { regOpties, regMaak, loginOpties, loginMaak, publiekeLijst, weg,
+  const { regOpties, regMaak, loginOpties, loginMaak, publiekeLijst, spoorLees, weg,
     actieNodig, actieOpties, actieMaak,
     zwaarNodig, zwaarOpties, zwaarMaak } = ctx;
   return {
     webauthn: {
       registratie: { opties: regOpties, maak: regMaak },
       login: { opties: loginOpties, maak: loginMaak },
-      lijst: user => ({ status: 200, sleutels: publiekeLijst(user) }),
+      lijst: user => ({ status: 200, sleutels: publiekeLijst(user), spoor: spoorLees(user) }),
       weg
     },
     pinBeveiliging: { nodig: actieNodig, opties: actieOpties, maak: actieMaak },

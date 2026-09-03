@@ -200,5 +200,17 @@ test('registreren, in de lijst, inloggen zonder wachtwoord, en weer weghalen', a
     ceremonie: wegOpties.body.ceremonie,
     antwoord: auth.loginAntwoord(wegOpties.body.opties.challenge, origin, 9) }, lid);
   assert.equal(weg.status, 200, 'met de vinger erbij mag het wel: ' + JSON.stringify(weg.body).slice(0, 160));
-  assert.deepEqual((await api('/api/webauthn/lijst', {}, lid)).body.sleutels, [], 'daarna is het beheer weer leeg');
+  assert.equal(weg.body.laatste, true,
+    'en het antwoord zegt dat dit de laatste was -- dat hoort het scherm te weten op het moment ' +
+    'zelf, want zonder sleutel valt de zware poort terug op het wachtwoord');
+
+  const na = await api('/api/webauthn/lijst', {}, lid);
+  assert.deepEqual(na.body.sleutels, [], 'daarna is het beheer weer leeg');
+  /* MAAR HET SPOOR NIET. Een weggehaalde sleutel liet niets achter, en dat is
+     precies de vraag die je stelt nadat er iets gebeurd is. */
+  assert.equal(na.body.spoor.length, 1, 'het weghalen staat in het spoor');
+  assert.equal(na.body.spoor[0].naam, 'Telefoon van het lid', 'met het label dat de mens zelf gaf');
+  assert.ok(na.body.spoor[0].weg, 'en het moment waarop hij verdween');
+  assert.ok(!('id' in na.body.spoor[0]),
+    'zonder credential-id: dat is over accounts heen te herkennen en hoort niet achter te blijven');
 });

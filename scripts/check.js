@@ -1957,7 +1957,12 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
      vraag, en twee lijsten van wat openbaar mag zijn lopen uiteen (LAT.md regel
      4). ./lib/publiekeroutes.js is de doorgang voor het contractregister en
      houdt zelf niets vast. */
-  const { PUBLIEK } = require('./lib/publiek');
+  /* Beide lijsten van ./lib/publiek.js tellen hier als 'publiek met reden':
+     PUBLIEK (zonder poort, met opzet) en ALLEEN_ANONIEM (mag 2xx aan een
+     anonieme klop, zoals health en de opvoedtip). De poortwacht kijkt naar
+     dezelfde vereniging (POORTWACHT); een regel die de tweede lijst niet zag,
+     zette acht bewust open GET-routes van de foundation als gat neer. */
+  const { PUBLIEK, POORTWACHT } = require('./lib/publiek');
 
   let gaten = 0, viaMw = 0, viaBinnen = 0, totaal = 0;
   /* DE STAART NIET MEE-MATCHEN. Hier stond ([\s\S]{0,800}) in het patroon zelf,
@@ -2011,7 +2016,7 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
      meldingen "bestaat niet (meer) als route" op, over routes die gewoon
      draaien. */
   const { buitenBereik } = require('./lib/poortbereik');
-  const schaduw = buitenBereik(bestaat, { poortMw: POORT_MW, poortBinnen: POORT_BINNEN, publiek: PUBLIEK });
+  const schaduw = buitenBereik(bestaat, { poortMw: POORT_MW, poortBinnen: POORT_BINNEN, publiek: POORTWACHT });
   const echtBestaand = (pad) => bestaat.has(pad) ||
     !!(schaduw.alleApiPaden && schaduw.alleApiPaden.has(pad));
 

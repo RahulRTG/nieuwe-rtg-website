@@ -39,7 +39,9 @@
      verandert geen rij-aantal en is hier onzichtbaar: de grootste blinde vlek,
      bewust geaccepteerd, want het alternatief is een diep diff over de hele
      database bij elk verzoek. Wie die klasse wil vangen, laat de handeling zelf
-     zeggen wat hij aanraakt -- daar is `raakt()` voor, nog nergens aangeroepen.
+     zeggen wat hij aanraakt -- daar is `raakt()` voor. De drie zwaarste
+     bewerkingen roepen hem aan (de loonrun, het weekrooster, het bord van een
+     lid); al het andere valt nog steeds in deze vlek, en dat staat er zo.
    - VERVANGING MET GELIJK AANTAL. Vijf rijen weg en vijf erbij is delta nul.
    - WAT ER NIET DOOR EEN VERZOEK KOMT. Een cronjob, de onderhoudsveger of een
      migratie draait buiten deze context; die zijn hier onzichtbaar en horen dat
@@ -107,9 +109,11 @@ function huidige() {
 }
 
 /* Een handeling laten zeggen wat hij aanraakt, voor de gevallen die een
-   rij-telling niet ziet (een wijziging BINNEN een rij). Vandaag nog nergens
-   aangeroepen, en dat staat zo in de kop -- een functie die er is en niets doet
-   is een voornemen, geen dekking. */
+   rij-telling niet ziet (een wijziging BINNEN een rij).
+
+   HIJ MELDT EN HIJ WEIGERT NIET. Buiten een verzoek geeft hij false; een
+   aanroeper mag dat nooit als toestemming lezen. Zou hij kunnen weigeren, dan
+   liep een loonrun vast op een meting. */
 function raakt(soort, aantal) {
   const h = huidige();
   if (!h) return false;

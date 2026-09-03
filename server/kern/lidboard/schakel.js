@@ -18,6 +18,11 @@
    dubbelklik het spoor met ruis. */
 
 const { CAPS, OP_ID, standaardAan } = require('./catalogus');
+/* "Alles uit" zet tientallen functies om binnen EEN rij van het lid. De
+   rij-telling van server/opzet/handeling.js ziet daar niets van; schrijf()
+   is de enige plek waar die standen veranderen, dus meldt hij de omvang daar --
+   voor zet, zetVeel, herstel en de kinder-boardroom tegelijk. */
+const handeling = require('../../opzet/handeling');
 
 module.exports = (ctx) => {
   const { store, versie, aan, save, journaal, bord, beheerStand } = ctx;
@@ -61,6 +66,7 @@ module.exports = (ctx) => {
       bak._at = new Date().toISOString();
     }
     save();
+    if (wijzigingen.length) handeling.raakt('lidfuncties', wijzigingen.length);
     if (wijzigingen.length) journaal.noteer(sleutel, wijzigingen, { door: o.door, bron: o.bron });
     return wijzigingen;
   }

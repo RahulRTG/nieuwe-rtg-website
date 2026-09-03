@@ -48,6 +48,12 @@ const GEISOLEERD = [
      envelopvelden.test.js hernoemt de tenant-regel in server/opzet/envelop.js om
      te bewijzen dat de meter een weggevallen drager ziet. */
   'envelopvelden.test.js',
+  /* En de vijfde (TAKEN.md 4.74): handeling-massa.test.js haalt de melding uit
+     drie echte kernbestanden -- lidboard/schakel.js, agent.js en payroll/run.js
+     -- om te bewijzen dat de massa-bewerking zonder die regel weer als nul
+     binnenkomt. Alle drie staan in een finally terug; alle drie zijn ze in die
+     halve seconde het bestand dat een startende server leest. */
+  'handeling-massa.test.js',
   /* ERBIJ OP 22 AUGUSTUS 2026, en met een eerlijke slag om de arm. Deze toets
      slaagt drie van de drie keer alleen en zakte in CI binnen een scherf van 272
      bestanden op 'de zaak laat achteraf betalen' -- een betaalinstelling van een

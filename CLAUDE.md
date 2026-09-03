@@ -957,7 +957,7 @@ het meten: de sluiting van het stuur is klein en precies één module leest van
 schijf -- `VERTROUWEN.json`, een REGISTER. Een register lezen mag, een `.js`
 lezen niet; dát onderscheid is de invariant. De vraag of de 77 registers samen
 één Codewereld vormen is eerst GEMETEN (`npm run codewereld`, `CODEWERELD.json`)
-in plaats van aangenomen -- zelfde reden als bij `Asset`: <!--getal:codewereld.ruggengraat-->5142<!--/getal--> van
+in plaats van aangenomen -- zelfde reden als bij `Asset`: <!--getal:codewereld.ruggengraat-->5207<!--/getal--> van
 <!--getal:codewereld.paden-->5835<!--/getal--> paden staan in meer dan één register, dus er IS een ruggengraat, maar hij
 loopt over de as ROUTE. De as SYMBOOL is **nul** -- geen register kent een
 functienaam met een plaats, dus het objectvoorbeeld `pay.boeken` met een
@@ -972,7 +972,7 @@ afhandelt. Twee dingen daar niet wegpoetsen: de brug route -> bestand rustte
 op ÉÉN register, dus de nul tegenspraken erin was `niet vast te stellen` en geen
 groen -- er ligt sinds 3 september een tweede bron naast (`ROUTEBRON.json`, uit de
 ROUTER in plaats van uit de bronboom), de dekking staat op
-<!--getal:codewereld.brugDekkingPct-->86.9<!--/getal-->% en er zijn <!--getal:routebron.tegenspraak-->0<!--/getal--> echte tegenspraken. Let daarbij op het onderscheid
+<!--getal:codewereld.brugDekkingPct-->88.6<!--/getal-->% en er zijn <!--getal:routebron.tegenspraak-->0<!--/getal--> echte tegenspraken. Let daarbij op het onderscheid
 dat die meting afdwong: een verschil tussen twee registers van VERSCHILLENDE
 leeftijd is een leeftijdsverschil en geen tegenspraak, en die twee worden nooit
 opgeteld. Verder is het bronbereik voor gedrag
@@ -983,18 +983,26 @@ grens vandaag niet -- en dat ene getal verbergt nog iets, want `server/` haalt
 vrijwel niets (6,6%) tot `SCHERMROUTES.json` erbij kwam, dat per bestand in
 public/ leest welke API-paden het noemt en daarmee de keten scherm -> route legt.
 De aanroepgraaf ligt er sinds dezelfde dag naast (`AANROEPGRAAF.json`,
-<!--getal:graaf.kanten-->17596<!--/getal--> kanten): wie roept wie aan, en welk symbool handelt welke route af
-(<!--getal:graaf.routesMetSymbool-->2346<!--/getal--> routes). Daarmee loopt de impactketen scherm -> route -> bestand ->
+<!--getal:graaf.kanten-->22121<!--/getal--> kanten): wie roept wie aan, en welk symbool handelt welke route af
+(<!--getal:graaf.routesMetSymbool-->2978<!--/getal--> routes). Daarmee loopt de impactketen scherm -> route -> bestand ->
 functie uit registers alleen. Let daar op twee dingen. Ten eerste is
-<!--getal:graaf.opgelostPct-->18.1<!--/getal-->% opgelost geen tekort maar een indeling: het meeste dat overblijft is
-`res.json()` of `String()`, en <!--getal:graaf.contextobject-->20961<!--/getal--> aanroepen lopen via het CONTEXTOBJECT dat
+<!--getal:graaf.opgelostPct-->24.3<!--/getal-->% opgelost geen tekort maar een indeling: het meeste dat overblijft is
+`res.json()` of `String()`, en <!--getal:graaf.contextobject-->15798<!--/getal--> aanroepen lopen via het CONTEXTOBJECT dat
 in server/opzet/ wordt samengesteld. Dat leek statisch onherleidbaar tot
 `CONTEXTPROEF.json` het NAMAT (`npm run contextproef`, een runtime-meting in de
 domeingrens-Proxy): van de <!--getal:context.aanHetWerk-->3214<!--/getal--> routes die werk deden reiken er maar
 <!--getal:context.metSpoor-->213<!--/getal--> TIJDENS het verzoek naar de kern, tegenover <!--getal:context.bedrading-->2222<!--/getal--> namen die bij het
-BEDRADEN worden opgehaald. Het gat is dus grotendeels statisch (`kern.save`
-terugvoeren naar de module die hem erin zette) en niet runtime -- de meting
-keerde de voorspelling om, en dat is precies waarom hij er is. Ten tweede telt CODEWERELD.json sinds
+BEDRADEN worden opgehaald. Het gat is dus grotendeels statisch en niet runtime -- de meting
+keerde de voorspelling om, en dat is precies waarom hij er is. `KERNHERKOMST.json`
+(`npm run kernherkomst`) volgt die aanwijzing en beantwoordt wie welke naam in de
+zak legt: <!--getal:kern.namen-->1120<!--/getal--> namen over <!--getal:kern.vulplekken-->282<!--/getal--> vulplekken, met <!--getal:kern.onopgelost-->32<!--/getal--> plekken die
+niet te volgen zijn (elk met een reden, geen daarvan geraden). Dat leverde
+<!--getal:graaf.viaKern-->4519<!--/getal--> nieuwe kanten en bracht de graaf van 18,1% naar <!--getal:graaf.opgelostPct-->24.3<!--/getal-->%. Twee
+dingen daar niet wegpoetsen: <!--getal:graaf.viaKernZonderSymbool-->4045<!--/getal--> van die kanten wijzen alleen het BESTAND
+aan en niet de functie (een fabriek mag `{ walletVoeg: voeg }` teruggeven, en dan
+is de zaknaam niet de symboolnaam), en een parameter die `save` heet wordt NIET
+op zijn naam als kernnaam herkend maar op zijn functie -- alleen de fabrieken die
+het register aanwijst leveren zaknamen. Ten tweede telt CODEWERELD.json sinds
 die dag DRIE dingen apart (structuur, relatie, gedrag), omdat een index die elk
 bestand noemt elke dekkingsvraag triviaal waar maakt: dat gebeurde twee keer op
 rij, en het zag er beide keren uit als vooruitgang. Alleen de gedragsteller

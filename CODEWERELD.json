@@ -2,11 +2,11 @@
   "uitleg": "Kan er een canonieke Codewereld bestaan? Gemeten over de registers in de wortel: op welke as staan ze, hoeveel sleutels delen ze, en spreken ze elkaar tegen. Deze meter voegt niets samen en kiest bij tegenspraak geen winnaar.",
   "stempel": {
     "op": "2026-09-03",
-    "commit": "1e69b190"
+    "commit": "981df130"
   },
   "registers": {
-    "geteld": 83,
-    "opRoute": 40,
+    "geteld": 84,
+    "opRoute": 41,
     "opBestand": 33,
     "opSymbool": 1,
     "zonderAs": 9
@@ -17,8 +17,8 @@
       "registers": 46
     },
     "bestand": {
-      "sleutels": 4287,
-      "registers": 59
+      "sleutels": 4288,
+      "registers": 60
     },
     "symbool": {
       "sleutels": 19517,
@@ -33,14 +33,14 @@
         "gefaald": 0,
         "gefaaldLijst": [],
         "symbolen": 13837,
-        "seconden": 4.5
+        "seconden": 4.6
       }
     }
   },
   "ruggengraat": {
     "paden": 5835,
-    "inMeerDanEenRegister": 5142,
-    "pct": 88.1,
+    "inMeerDanEenRegister": 5207,
+    "pct": 89.2,
     "verdeling": [
       {
         "registers": 25,
@@ -48,83 +48,83 @@
       },
       {
         "registers": 24,
-        "paden": 18
+        "paden": 24
       },
       {
         "registers": 23,
-        "paden": 59
+        "paden": 62
       },
       {
         "registers": 22,
-        "paden": 342
+        "paden": 381
       },
       {
         "registers": 21,
-        "paden": 723
+        "paden": 788
       },
       {
         "registers": 20,
-        "paden": 1275
+        "paden": 1414
       },
       {
         "registers": 19,
-        "paden": 944
+        "paden": 716
       },
       {
         "registers": 18,
-        "paden": 239
+        "paden": 247
       },
       {
         "registers": 17,
-        "paden": 134
+        "paden": 112
       },
       {
         "registers": 16,
-        "paden": 110
+        "paden": 103
       },
       {
         "registers": 15,
-        "paden": 184
+        "paden": 200
       },
       {
         "registers": 14,
-        "paden": 135
+        "paden": 125
       },
       {
         "registers": 13,
-        "paden": 320
+        "paden": 317
       },
       {
         "registers": 12,
-        "paden": 108
+        "paden": 110
       },
       {
         "registers": 11,
-        "paden": 54
+        "paden": 51
       },
       {
         "registers": 10,
-        "paden": 7
+        "paden": 2
       },
       {
         "registers": 9,
-        "paden": 30
+        "paden": 31
       },
       {
         "registers": 8,
-        "paden": 47
+        "paden": 58
       },
       {
         "registers": 7,
-        "paden": 39
+        "paden": 30
       },
       {
         "registers": 6,
-        "paden": 16
+        "paden": 17
       },
       {
         "registers": 5,
-        "paden": 36
+        "paden": 32
       },
       {
         "registers": 4,
@@ -132,15 +132,15 @@
       },
       {
         "registers": 3,
-        "paden": 94
+        "paden": 96
       },
       {
         "registers": 2,
-        "paden": 218
+        "paden": 281
       },
       {
         "registers": 1,
-        "paden": 693
+        "paden": 628
       }
     ]
   },
@@ -153,8 +153,8 @@
       "ROUTEBRON.json",
       "SCHRIJFANALYSE.json"
     ],
-    "verschilToetsbaar": 4443,
-    "verschilDekkingPct": 86.9,
+    "verschilToetsbaar": 4530,
+    "verschilDekkingPct": 88.6,
     "verschillen": 1,
     "soortBeslistIn": "ROUTEBRON.json -- daar wordt een verschil ingedeeld als `verouderd` of `tegenspraak`; deze meter telt alleen DAT ze verschillen",
     "verschilReden": null,
@@ -165,6 +165,7 @@
           {
             "bestand": "server/routes/auth/inlog-pas.js",
             "volgens": [
+              "AANROEPGRAAF.json",
               "ROUTEBRON.json"
             ]
           },
@@ -181,14 +182,18 @@
   "bronbereik": {
     "uitleg": "twee getallen, met opzet. `genoemd` = door enig register (de symboolindex noemt alles, dus dit meet STRUCTUUR: welke functies, wat uitgevoerd, wie hangt ervan af). `gedrag` = door minstens een register buiten die index (schrijft het, is het bewezen, is het herhaalbaar). Alleen het tweede is de bovengrens voor een vraag over gedrag.",
     "bestanden": 3988,
-    "genoemd": 3987,
+    "genoemd": 3988,
     "pct": 100,
     "gedrag": 1470,
     "gedragPct": 36.9,
-    "relatie": 3987,
+    "relatie": 3988,
     "indexregisters": [
       {
         "register": "AANROEPGRAAF.json",
+        "waarom": "verklaart zichzelf als index"
+      },
+      {
+        "register": "KERNHERKOMST.json",
         "waarom": "verklaart zichzelf als index"
       },
       {
@@ -211,7 +216,7 @@
       {
         "boom": "server",
         "bestanden": 3028,
-        "genoemd": 3027,
+        "genoemd": 3028,
         "pct": 100,
         "gedrag": 1268,
         "gedragPct": 41.9
@@ -227,9 +232,7 @@
     ],
     "serverPct": 41.9,
     "publicPct": 21,
-    "nooitGenoemdVoorbeeld": [
-      "server/opzet/contextspoor.js"
-    ],
+    "nooitGenoemdVoorbeeld": [],
     "zonderGedragVoorbeeld": [
       "server/accounts/demohash.js",
       "server/accounts/dossier.js",
@@ -334,7 +337,7 @@
       },
       {
         "register": "AANROEPGRAAF.json",
-        "paden": 2338
+        "paden": 2969
       },
       {
         "register": "IDOR.json",
@@ -371,6 +374,14 @@
     ]
   },
   "perRegister": [
+    {
+      "register": "AANROEPGRAAF.json",
+      "as": "route",
+      "paden": 2969,
+      "bestanden": 2638,
+      "symbolen": 0,
+      "paren": 2978
+    },
     {
       "register": "ROUTEBRON.json",
       "as": "route",
@@ -426,14 +437,6 @@
       "bestanden": 1,
       "symbolen": 0,
       "paren": 0
-    },
-    {
-      "register": "AANROEPGRAAF.json",
-      "as": "bestand",
-      "paden": 2338,
-      "bestanden": 2387,
-      "symbolen": 0,
-      "paren": 2346
     },
     {
       "register": "POORTWACHT.json",
@@ -624,6 +627,14 @@
       "as": "bestand",
       "paden": 0,
       "bestanden": 237,
+      "symbolen": 0,
+      "paren": 0
+    },
+    {
+      "register": "KERNHERKOMST.json",
+      "as": "bestand",
+      "paden": 0,
+      "bestanden": 223,
       "symbolen": 0,
       "paren": 0
     },

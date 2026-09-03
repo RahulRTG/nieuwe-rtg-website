@@ -103,6 +103,48 @@ function omhullende(pad) {
   return null;                                        // op moduleniveau
 }
 
+/* DE HERKOMST VAN DE ZAK (KERNHERKOMST.json). Zonder dit register is een
+   aanroep als `save(...)` -- uit `const { save } = kern` -- een naam zonder
+   plaats, en belandt hij in de post `contextobject`. Mét dit register weten we
+   welk bestand die naam in de zak heeft gelegd, en wordt het een kant.
+
+   TWEE VOORWAARDEN, en ze zijn er allebei omdat een verkeerde kant erger is dan
+   geen kant:
+
+     - alleen bij PRECIES EEN herkomst. Draagt een naam er twee, dan is niet te
+       zeggen welke deze aanroep bedoelt;
+     - het SYMBOOL is een tweede vraag. Een fabriek mag `{ walletVoeg: voeg }`
+       teruggeven: de zaknaam is dan `walletVoeg` en het symbool heet `voeg`.
+       Bestaat de zaknaam niet als symbool in dat bestand, dan wijst de kant naar
+       het BESTAND en blijft het symbool leeg -- dat is wat we weten, en niet
+       meer. */
+let kernherkomst = new Map();
+/* Welke FABRIEKEN vullen de zak, en in welk bestand staan ze? Dat weet
+   KERNHERKOMST.json (`hoe: 'fabriek maakHandelsketen'`), en het is precies wat
+   nodig is om de laatste vorm te herkennen:
+
+     function maakHandelsketen({ db, save, crypto }) { ... save() ... }
+
+   Hier komt `save` niet uit `const { save } = kern` en ook niet uit de parameter
+   van `module.exports`, maar uit de parameter van een BENOEMDE fabriek. Dat is
+   dezelfde zak, en we weten dat het die zak is omdat dit register zegt dat juist
+   deze functie de kern vult. Geen heuristiek op de naam `save`: een parameter
+   heet hier pas een kernnaam als het register die fabriek aanwijst. */
+const kernfabrieken = new Map();               // bestand -> Set(fabrieksnamen)
+try {
+  const kh = JSON.parse(fs.readFileSync(path.join(WORTEL, 'KERNHERKOMST.json'), 'utf8'));
+  for (const rij of kh.perNaam || []) {
+    const bestanden = [...new Set((rij.herkomsten || []).map(h => h.bestand))];
+    if (bestanden.length === 1) kernherkomst.set(rij.naam, bestanden[0]);
+    for (const h of rij.herkomsten || []) {
+      const m = /^fabriek (.+)$/.exec(String(h.hoe || ''));
+      if (!m || !h.bestand) continue;
+      if (!kernfabrieken.has(h.bestand)) kernfabrieken.set(h.bestand, new Set());
+      kernfabrieken.get(h.bestand).add(m[1]);
+    }
+  }
+} catch (e) { /* geen register: dan blijft alles zoals het was, en dat staat in de uitslag */ }
+
 const BOMEN = ['server'];
 const lijst = BOMEN.flatMap(bestanden);
 
@@ -193,20 +235,38 @@ for (const rel of lijst) {
      principieel niet te herleiden zonder de opbouw na te spelen. Dat is een
      eigenschap van deze architectuur en geen tekort van de meter -- maar dan
      moet het wel als zodanig geteld worden. */
-  const params = new Set();
+  const params = new Set(), uitContextVooraf = new Set(), uitvoerParamPatronen = [];
   loop(ast, n => {
     if (n.type !== 'AssignmentExpression' || !n.left || n.left.type !== 'MemberExpression') return;
     const o = n.left.object, p2 = n.left.property;
     if (!(o && o.name === 'module' && p2 && p2.name === 'exports')) return;
+    if (isFunctie(n.right)) for (const par of n.right.params || []) uitvoerParamPatronen.push(par);
     if (isFunctie(n.right)) for (const par of n.right.params || []) patroonNamen(par, params);
   });
   fabrieksparams.set(rel, params);
+  /* DE ZAK WORDT VAAK AL IN DE PARAMETER UITGEPAKT:
+       module.exports = ({ app, auth, save }) => { ... }
+     Dat is dezelfde herkomst als `const { save } = kern`, alleen een regel
+     eerder. Zonder deze tak bleef `save` -- 1206 aanroepen, en met een bekende
+     herkomst -- in de restbak zitten. */
+  if (uitvoerParamPatronen.length) for (const par of uitvoerParamPatronen) {
+    if (par && par.type === 'ObjectPattern') patroonNamen(par, uitContextVooraf);
+  }
+  /* En de benoemde fabrieken die dit bestand aan de kern levert. */
+  const fabrieken = kernfabrieken.get(rel);
+  if (fabrieken && fabrieken.size) loop(ast, n => {
+    let naam = null, fn = null;
+    if (n.type === 'FunctionDeclaration' && n.id) { naam = n.id.name; fn = n; }
+    else if (n.type === 'VariableDeclarator' && n.id && n.id.name && isFunctie(n.init)) { naam = n.id.name; fn = n.init; }
+    if (!naam || !fabrieken.has(naam)) return;
+    for (const par of (fn && fn.params) || []) if (par && par.type === 'ObjectPattern') patroonNamen(par, uitContextVooraf);
+  });
   /* En de namen die UIT dat contextobject worden gehaald:
        module.exports = (kern) => { const { app, auth, save } = kern; ... }
      Dat is dezelfde herkomst als `kern.save()`, alleen uitgepakt. Zonder deze
      tak vielen save (3023x), schoon (2268x) en nu (1516x) in de restbak, en
      dan verklaart de grootste post van de meting niets. */
-  const uitContext = new Set();
+  const uitContext = new Set(uitContextVooraf);
   if (params.size) loop(ast, n => {
     if (n.type !== 'VariableDeclarator' || !n.id || n.id.type !== 'ObjectPattern') return;
     if (!n.init || n.init.type !== 'Identifier' || !params.has(n.init.name)) return;
@@ -313,10 +373,20 @@ for (const [rel, ast] of bomen) {
         const b = bind.get(c.name);
         if (b.soort === 'ingevoerd') { doelBestand = b.bestand; doelNaam = b.doelNaam; hoe = 'ingevoerd'; }
       }
+      /* Uit de zak gehaald, en de zak weet wie hem gevuld heeft. */
+      else if ((contextnamen.get(rel) || EMPTY).has(c.name) && kernherkomst.has(c.name)) {
+        doelBestand = kernherkomst.get(c.name); doelNaam = c.name; hoe = 'viaKern';
+      }
     } else if (c.type === 'MemberExpression' && c.object && c.object.name && c.property && c.property.name) {
       ruw = c.object.name + '.' + c.property.name;
       const b = bind.get(c.object.name);
       if (b && b.soort === 'module') { doelBestand = b.bestand; doelNaam = c.property.name; hoe = 'lid'; }
+      /* `k.instantMutate()` -- de zak zelf, met de naam erop. Zelfde herkomst
+         als de uitgepakte vorm hierboven; alleen de schrijfwijze verschilt. */
+      else if (((fabrieksparams.get(rel) || EMPTY).has(c.object.name) || (contextnamen.get(rel) || EMPTY).has(c.object.name)) &&
+        kernherkomst.has(c.property.name)) {
+        doelBestand = kernherkomst.get(c.property.name); doelNaam = c.property.name; hoe = 'viaKern';
+      }
     } else {
       ruw = c.type;
     }
@@ -340,9 +410,12 @@ for (const [rel, ast] of bomen) {
     const daar = symbolenVan.get(doelBestand);
     const uitDaar = uitvoerVan.get(doelBestand);
     if (daar && !daar.has(doelNaam) && !(uitDaar && uitDaar.has(doelNaam))) {
-      if (uitDaar === null || uitDaar === undefined) { doelNietVastTeStellen++; return; }
-      doelOnbekend.push({ van: rel + '#' + van, naar: doelBestand + '#' + doelNaam, hoe, lijn: n.lijn });
-      return;
+      /* Een zaknaam hoeft niet de symboolnaam te zijn (`{ walletVoeg: voeg }`).
+         Dan weten we het BESTAND en niet de functie, en dat is wat er komt te
+         staan -- geen gok naar een symbool dat er niet is. */
+      if (hoe === 'viaKern') doelNaam = null;
+      else if (uitDaar === null || uitDaar === undefined) { doelNietVastTeStellen++; return; }
+      else { doelOnbekend.push({ van: rel + '#' + van, naar: doelBestand + '#' + doelNaam, hoe, lijn: n.lijn }); return; }
     }
     const sleutel = rel + '#' + van + ' -> ' + doelBestand + '#' + doelNaam;
     if (gezien.has(sleutel)) return;
@@ -383,6 +456,13 @@ const uit = {
     kantenLokaal: kanten.filter(k => k.hoe === 'lokaal').length,
     kantenIngevoerd: kanten.filter(k => k.hoe === 'ingevoerd').length,
     kantenLid: kanten.filter(k => k.hoe === 'lid').length,
+    kantenViaKern: kanten.filter(k => k.hoe === 'viaKern').length,
+    /* Geteld over de ONTDUBBELDE kanten, niet over de voorvallen. De eerste
+       versie telde elke aanroep en meldde er daardoor meer "zonder symbool" dan
+       er kanten waren -- een getal dat zichzelf tegenspreekt is erger dan geen
+       getal. */
+    kantenViaKernZonderSymbool: kanten.filter(k => k.hoe === 'viaKern' && !k.naar).length,
+    kernherkomstGelezen: kernherkomst.size,
     onopgelosteAanroepen: onopgelostTotaal,
     onopgelosteNamen: onopgelost.size,
     onopgelostNaarSoort: soorten,
@@ -409,7 +489,8 @@ fs.writeFileSync(path.join(WORTEL, 'AANROEPGRAAF.json'), JSON.stringify(uit, nul
 const g = uit.gemeten;
 console.log('AANROEPGRAAF.json geschreven');
 console.log('  bestanden   ', g.bestanden, '| aanroepen gezien:', g.aanroepen);
-console.log('  kanten      ', g.kanten, '(lokaal', g.kantenLokaal + ', ingevoerd', g.kantenIngevoerd + ', lid', g.kantenLid + ')');
+console.log('  kanten      ', g.kanten, '(lokaal', g.kantenLokaal + ', ingevoerd', g.kantenIngevoerd + ', lid', g.kantenLid + ', viaKern', g.kantenViaKern + ')');
+console.log('    viaKern   ', g.kantenViaKern, 'kanten uit de zak, waarvan', g.kantenViaKernZonderSymbool, 'alleen naar het BESTAND (zaknaam != symboolnaam)');
 console.log('  onopgelost  ', g.onopgelosteAanroepen, 'aanroepen over', g.onopgelosteNamen, 'namen -> opgelost:', g.opgelostPct + '%');
 console.log('    waarvan   ', Object.entries(soorten).map(([k, v]) => k + ': ' + v).join(', '));
 console.log('  doelOnbekend', g.doelOnbekend, '(ingevoerde naam die het doelbestand niet kent -- een BEVINDING) |',

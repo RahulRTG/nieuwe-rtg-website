@@ -108,3 +108,62 @@ test('de nieuwe deuren van deze ronde bestaan en staan achter hun poort', async 
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });
+
+/* ---------------------------------------------------------------------------
+   DE BAND MET DE ISOLATIELEESSET -- twee registers, en ze mogen elkaar niet
+   kwijtraken.
+
+   `server/kern/isolatie/openpaden.js` beantwoordt een ANDERE vraag dan
+   bestuursroutes.js: blijft dit pad open onder de stand `isolatie`, tegenover
+   mag hier een boardroom-schakelaar op. Ze zijn met opzet niet samengevoegd --
+   op /api/privacy/delete spreken ze elkaar tegen (geen schakelaar, maar onder
+   isolatie wel dicht), en samenvoegen zou dat onderscheid wegpoetsen.
+
+   Wat ze WEL moeten delen is dit: een pad dat de leesset vrijstelt, is ergens
+   verklaard. Zonder deze band kan er een vrijstelling in de leesset staan voor
+   een pad dat niemand heeft ingedeeld -- en dat is precies de blinde vlek die
+   deze hele meting moest vinden.
+
+   MUTATIES die zijn gedraaid (LAT.md regel 2):
+   - '/api/verzonnen/pad' aan RECHT_VAN_DE_MENS toevoegen -> ZAKT, met dat pad
+     bij naam.
+   - de regel /api/privacy uit REDENEN halen                -> ZAKT, drie paden.
+   ------------------------------------------------------------------------ */
+test('elk pad dat de isolatieleesset vrijstelt, is ergens verklaard', () => {
+  const openpaden = require('../server/kern/isolatie/openpaden');
+  const { redenVoor } = require('../server/kern/bestuursroutes');
+  const alle = [].concat(
+    Object.keys(openpaden.EIGEN_UITGANG || {}),
+    Object.keys(openpaden.RECHT_VAN_DE_MENS || {}),
+    Object.keys(openpaden.BEWUST_DICHT || {}));
+  assert.ok(alle.length > 10, 'de leesset hoort gevuld te zijn; leeg zou deze toets stil laten slagen');
+
+  const onverklaard = alle.filter(p => !functies.functieVoorPad(p) && !redenVoor(p));
+  assert.deepEqual(onverklaard, [],
+    'deze paden staan in de leesset zonder functie en zonder bestuursgrond: ' + onverklaard.join(', '));
+});
+
+/* De definitie van ONBESLIST in ISOLATIEPROEF.json, hier vastgepind zodat de
+   generator hem niet in zijn eentje kan verschuiven. `npm run isolatieproef`
+   opnieuw draaien is GEEN bewijs -- een generator die zijn eigen uitvoer
+   bevestigt, bewijst niets. Deze toets rekent de definitie na tegen de bronnen.
+
+   MUTATIE: in scripts/isolatieproef.js `heeftGrond` altijd false laten geven
+   -> ZAKT (het register meldt dan weer 81 onbeslist terwijl er 81 verklaard
+   zijn). */
+test('onbeslist betekent: geen functie EN geen grond', () => {
+  const proef = require('../ISOLATIEPROEF.json');
+  const openpaden = require('../server/kern/isolatie/openpaden');
+  const { redenVoor } = require('../server/kern/bestuursroutes');
+  const kaart = require('../EXECUTION_MAP.json');
+
+  const paden = [...new Set((kaart.capabilities || []).map(r => r.pad))];
+  assert.ok(paden.length > 1000, 'de kaart hoort gevuld te zijn');
+  const heeftGrond = p => !!(redenVoor(p) || openpaden.EIGEN_UITGANG[p] ||
+    openpaden.RECHT_VAN_DE_MENS[p] || openpaden.BEWUST_DICHT[p]);
+  const verwacht = paden.filter(p => !functies.functieVoorPad(p) && !heeftGrond(p));
+
+  assert.equal(proef.noemers.httpPaden.ONBESLIST, verwacht.length,
+    'ISOLATIEPROEF.json telt iets anders dan de bronnen zeggen; voorbeelden: ' +
+    verwacht.slice(0, 5).join(', '));
+});

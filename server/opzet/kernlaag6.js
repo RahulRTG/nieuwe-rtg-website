@@ -93,19 +93,18 @@ Object.assign(kern, require('../kern/clips').maakClips({
 /* RTG Office (kern/office.js): het eigen kantoorpakket. Documenten
    (tekstdocument of rekenblad) op het account, alleen-lezen te delen op
    codenaam. Na sociaal gemount (codenamen en de codenaam-opzoeker). */
-const _office = require('../kern/office');
-const _officePlat = _office.maakOffice({
+Object.assign(kern, require('../kern/office').maakOffice({
   db, save, crypto, schoon, codenaamVan: kern.codenaamVan, keyVanCodenaam, sseToCustomer, anthropic
-});
-Object.assign(kern, _officePlat);
-/* EN ALS EEN NAAM ERNAAST (TAKEN.md 5.14). De twee kantoorpakket-domeinen
-   hingen elk aan twaalf losse namen uit de gedeelde zak; ze hangen nu aan deze
-   ene. De platte namen blijven staan voor de aanroepers binnen de kern zelf. */
-kern.office = _office.alsPakket(_officePlat);
+}));
 /* Het AI-stuur (kern/stuur.js): Rahul voert acties uit op elk toegestaan
    API-pad, als interne aanroep met de eigen inlog van de gebruiker. Een
    codepad, dezelfde rechten en dezelfde schakelkast als de app-knoppen. */
-Object.assign(kern, require('../kern/stuur').maakStuur({ log, anthropic, app, crypto }));
+/* `isolatie` gaat LUI mee: de isolatielaag hangt zichzelf op kern.isolatie op
+   vanuit routes/isolatie.js, en die wordt na deze regel gemount. Hem hier als
+   waarde meegeven zou hem voorgoed op `undefined` vastzetten -- en dan versmalt
+   het stuur nooit, zonder dat iets dat zegt. */
+Object.assign(kern, require('../kern/stuur').maakStuur({ log, anthropic, app, crypto,
+  isolatie: () => kern.isolatie }));
 /* Passkeys (kern/webauthn.js): inloggen met vingerafdruk/gezicht/sleutel.
    De verificatie draait op de eigen WebAuthn-laag (server/webauthn.js) op Node's
    crypto; wij bewaren alleen publieke sleutels per account, challenges leven kort

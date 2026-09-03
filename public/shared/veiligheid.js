@@ -32,12 +32,20 @@
   /* De grensregel. Staat op alle vier de schermen, altijd zichtbaar, nooit
      weg te klikken. Wie denkt beschermd te zijn en het niet is, is slechter
      af dan wie het weet; daarom is dit geen kleine lettertjes maar gewoon
-     tekst op het scherm. */
+     tekst op het scherm.
+
+     DE ZINNEN ZIJN EEN KOPIE VAN server/kern/veiligheid/grens.js, en dat is
+     zichtbaar gemaakt in plaats van weggepoetst: een browser kan dat bestand
+     niet laden, dus houdt test/veiligheidgrens.test.js vast dat ze woord voor
+     woord gelijk blijven. Wijzig je er hier een, dan zakt de bouw -- en dat is
+     de bedoeling, want een belofte die op twee plekken uit elkaar loopt is
+     erger dan een belofte op een plek. */
   V.grens = function () {
     return '<div class="grens" role="note">' +
-      '<strong>Wat dit niet is.</strong> RTG is geen alarmcentrale. Er wordt niemand gebeld, ' +
-      'er kijkt geen mens mee, en er komt geen hulpdienst. Alleen de mensen die u zelf in uw ' +
-      'kring zet krijgen bericht. Zonder internet, of als de server plat ligt, gaat er niets af. ' +
+      '<strong>Wat dit niet is.</strong> RTG is geen alarmcentrale. ' +
+      'Er wordt niemand gebeld, er kijkt geen mens mee, en er komt geen hulpdienst. ' +
+      'Alleen de mensen die u zelf in uw kring zet krijgen bericht. ' +
+      'Zonder internet, of als de server plat ligt, gaat er niets af. ' +
       '<strong>Bij levensgevaar belt u het alarmnummer.</strong></div>';
   };
 

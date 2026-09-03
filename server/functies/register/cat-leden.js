@@ -46,37 +46,33 @@ module.exports = [
   { id: 'wereld', categorie: 'Leden (RTG-app)', naam: 'RTG Wereld (de ene sociale app)', standaard: true, doelgroepen: LEDEN,
     uitleg: 'De laag over De Salon, Pulse, RTG Zakelijk, de genootschappen en de verhalen heen: één tijdlijn met een schakelaar (Alles, Lifestyle, Business, Communities, Privé) en de sprong naar de berichten-app. Uit zetten laat de vijf onderliggende apps gewoon staan; alleen de verbindende laag verdwijnt -- net als bij de Media OS.',
     paden: ['/api/wereld'] },
+  /* RTG SERVICE STOND HIER NIET, en daarmee viel de hele hulplijn buiten de
+     boardroom: niet uit te zetten, niet per stad te sluiten, en de
+     storingswachter greep er nooit op in. Gevonden door de volle suite te
+     draaien (test/schakelkast-dekking.test.js), niet door te lezen -- precies
+     het gat dat die toets beschrijft als "stap twee wordt vergeten".
+
+     DRIE FUNCTIES EN GEEN EEN, want ze schakelen verschillende dingen. `service`
+     is de hele ledenkant van de hulplijn; `service-bel` is de STEM en hoort bij
+     Lifestyle en Business (SERVICE.md par. 13, en dat is de ladder en geen
+     weglating); `ondertiteling` staat los omdat hij door elk gesprek in dit huis
+     wordt gebruikt en niet alleen door de hulplijn.
+
+     WAT ER GEBEURT ALS IEMAND `service` UITZET: een lid kan niets melden en niet
+     om een mens vragen. Dat is een zware knop, en de uitleg zegt dat -- de
+     ondergrens uit kern/service/mens.js is dan weg. */
+  { id: 'service', categorie: 'Leden (RTG-app)', naam: 'RTG Service (hulp vragen)', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'De hulplijn van een lid: iets melden vanuit het scherm waar je stond, je lopende zaken zien, een medewerker toegang bevestigen, en om een MENS vragen. Uit zetten sluit die weg helemaal -- ook de ondergrens dat elk lid bij een mens kan uitkomen.',
+    paden: ['/api/service'] },
+  { id: 'service-bel', categorie: 'Leden (RTG-app)', naam: 'Bellen met RTG (in de app)', standaard: true, doelgroepen: ['lifestyle', 'business'],
+    uitleg: 'Bellen met RTG Service binnen de app, zonder telefoonnet en zonder nummer. Hoort bij de Lifestyle en Business Pass; om een mens vragen blijft voor elk account bestaan en gaat hier niet mee uit.',
+    paden: ['/api/service/bel'] },
+  { id: 'ondertiteling', categorie: 'Leden (RTG-app)', naam: 'Automatisch ondertitelen in een gesprek', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'Een deelnemer laat zijn eigen stem omzetten naar tekst met een LOKAAL model; de regel komt in de meeleesbaan van het gesprek. Uit zetten laat die baan staan -- meetypen blijft werken -- maar wie doof is is dan weer afhankelijk van de anderen.',
+    paden: ['/api/ondertiteling'] },
   { id: 'privekantoor', categorie: 'Leden (RTG-app)', naam: 'Het Privékantoor (Lifestyle)', standaard: true, doelgroepen: ['lifestyle', 'business'],
     uitleg: 'De ene app van de Lifestyle Pass: de levensgraaf over de premium-apps heen, de Control Tower met alle termijnen, het mandaat (wat mag het kantoor zelf) en zaken met een team en een tijdlijn. Uit zetten laat de onderliggende apps staan; alleen de samenhang verdwijnt.',
     paden: ['/api/member/bureau', '/api/office/bureau'] },
-
-  // ---- Genres & diensten (leden boeken/kopen per sector) ----
-  { id: 'bestellen', categorie: 'Genres & diensten', naam: 'Bestellen & bezorgen', standaard: true, doelgroepen: LEDEN_GAST,
-    uitleg: 'Bestellen bij een zaak (ophalen of laten bezorgen) met live volgen.', paden: ['/api/order', '/api/orders', '/api/bezorg'] },
-  { id: 'tickets', categorie: 'Genres & diensten', naam: 'Tickets & activiteiten', standaard: true, doelgroepen: LEDEN_GAST,
-    uitleg: 'Tickets kopen met tijdslot en een oplichtende entreecode.', paden: ['/api/tickets'] },
-  { id: 'verhuur', categorie: 'Genres & diensten', naam: 'Autoverhuur', standaard: true, doelgroepen: LEDEN,
-    uitleg: 'Auto huren met foto\'s voor/na, borg, SOS-knop en live locatie.', paden: ['/api/huur', '/api/verhuur'] },
-  { id: 'charter', categorie: 'Genres & diensten', naam: 'Boten & jachten (charter)', standaard: true, doelgroepen: LEDEN,
-    uitleg: 'Vaartuigen charteren met schipper, borg, SOS op zee en live positie.', paden: ['/api/charter'] },
-  { id: 'vastgoed', categorie: 'Genres & diensten', naam: 'Vastgoed', standaard: true, doelgroepen: LEDEN,
-    uitleg: 'Panden bekijken, interesse tonen of bieden en keyless bezichtigen.', paden: ['/api/vastgoed'] },
-  { id: 'retail', categorie: 'Genres & diensten', naam: 'Mode & retail', standaard: true, doelgroepen: LEDEN,
-    uitleg: 'De modecatalogus: wishlist, apart leggen en de paskamer.', paden: ['/api/retail'] },
-  { id: 'onderweg', categorie: 'Genres & diensten', naam: 'Onderweg (live locatie)', standaard: true, doelgroepen: LEDEN,
-    uitleg: 'Het live onderweg-scherm: positie, ETA en verbonden partners.', paden: ['/api/live'] },
-  { id: 'contracten', categorie: 'Genres & diensten', naam: 'Contracten (leden tekenen)', standaard: true, doelgroepen: LEDEN,
-    uitleg: 'Digitale contracten die een lid in de app ondertekent.', paden: ['/api/contract', '/api/contracten'] },
-  { id: 'groothandel', categorie: 'Genres & diensten', naam: 'Groothandel & markt', standaard: true, doelgroepen: ['rtg', 'lifestyle', 'business', 'leverancier'],
-    uitleg: 'De brede B2B/B2C-marktplaats: horeca koopt in, leden bestellen boodschappen, met AI-bijbestellen. Elke groothandel zet zijn eigen functies aan/uit.', paden: ['/api/groothandel', '/api/supplier/groothandel', '/api/supplier/inkoop'] },
-  /* RTG Commerce (COMMERCE.md): de kopersKANT. Uit zetten haalt de mand, de
-     afrekening, de overdracht en het retourverzoek weg; de domeinen zelf
-     verkopen daarna gewoon door zoals ze dat altijd al deden -- deze laag
-     bevestigt niets en is dus ook nergens de enige weg naar. De zaakkant staat
-     bij Zaakregie. */
-  { id: 'commerce', categorie: 'Genres & diensten', naam: 'RTG Commerce (mand & retour)', standaard: true, doelgroepen: LEDEN,
-    uitleg: 'De verkooplaag boven de domeinen: wat er te koop staat en wat NIET met de reden erbij, een mand over verkopers heen met een afrekening per verkoper, de overdracht naar de deur die bevestigt, en de weg terug. RTG bevestigt hier zelf niets.',
-    paden: ['/api/commerce'] },
 
   // ---- Sociaal (De Salon) ----
   { id: 'salon', categorie: 'Sociaal (De Salon)', naam: 'De Salon (feed, volgen, deals)', standaard: true, doelgroepen: LEDEN_GAST,

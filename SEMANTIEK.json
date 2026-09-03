@@ -1,12 +1,12 @@
 {
-  "catalogi": 1026,
-  "verschillendeNamen": 605,
-  "namenInMeerDomeinen": 116,
-  "woordenMetMeerBetekenissen": 99,
-  "betekenissenTotaal": 367,
+  "catalogi": 1062,
+  "verschillendeNamen": 626,
+  "namenInMeerDomeinen": 117,
+  "woordenMetMeerBetekenissen": 100,
+  "betekenissenTotaal": 380,
   "ergsteWoord": "SOORTEN",
-  "ergsteAantal": 46,
-  "dubbelingen": 31,
+  "ergsteAantal": 47,
+  "dubbelingen": 32,
   "dubbelingLijst": [
     {
       "naam": "PALET",
@@ -78,7 +78,7 @@
     },
     {
       "naam": "KETEN",
-      "betekenissenVanDitWoord": 3,
+      "betekenissenVanDitWoord": 4,
       "waar": [
         "server/kern/mobiliteit/keten.js",
         "server/kern/modebezorg.js"
@@ -146,7 +146,8 @@
       "betekenissenVanDitWoord": 2,
       "waar": [
         "server/kern/clips.js",
-        "server/kern/podium/index.js"
+        "server/kern/podium/index.js",
+        "server/kern/service/gesprek-lijn.js"
       ],
       "leden": 6,
       "voorbeeld": [
@@ -225,6 +226,7 @@
       "waar": [
         "server/kern/command/opslag-register.js",
         "server/kern/concern/opslag.js",
+        "server/kern/isolatie/opslag.js",
         "server/kern/levensdossier/velden.js",
         "server/kern/mobiliteit/opslag.js",
         "server/kern/payroll/opslag.js",
@@ -255,7 +257,7 @@
     },
     {
       "naam": "SOORTEN",
-      "betekenissenVanDitWoord": 46,
+      "betekenissenVanDitWoord": 47,
       "waar": [
         "server/kern/avond/plan.js",
         "server/kern/invoer.js"
@@ -330,6 +332,21 @@
       ]
     },
     {
+      "naam": "KANALEN",
+      "betekenissenVanDitWoord": 3,
+      "waar": [
+        "server/kern/machtiging.js",
+        "server/kern/service/klassen.js"
+      ],
+      "leden": 4,
+      "voorbeeld": [
+        "papier",
+        "app",
+        "balie",
+        "brief"
+      ]
+    },
+    {
       "naam": "KLAAR",
       "betekenissenVanDitWoord": 2,
       "waar": [
@@ -393,7 +410,7 @@
     },
     {
       "naam": "STANDEN",
-      "betekenissenVanDitWoord": 16,
+      "betekenissenVanDitWoord": 19,
       "waar": [
         "server/kern/gast/verzoek.js",
         "server/kern/rtfos/ruil.js"
@@ -453,7 +470,7 @@
     },
     {
       "naam": "SOORTEN",
-      "betekenissenVanDitWoord": 46,
+      "betekenissenVanDitWoord": 47,
       "waar": [
         "server/kern/bank/index.js",
         "server/kern/koppel.js"
@@ -467,7 +484,7 @@
     },
     {
       "naam": "STANDEN",
-      "betekenissenVanDitWoord": 16,
+      "betekenissenVanDitWoord": 19,
       "waar": [
         "server/kern/avond/voorkeuren.js",
         "server/kern/werkvenster.js"
@@ -494,7 +511,7 @@
       ]
     }
   ],
-  "dubbelingenZonderNaam": 192,
+  "dubbelingenZonderNaam": 210,
   "dubbelingZonderNaamLijst": [
     {
       "overlap": 1,
@@ -800,8 +817,8 @@
   "top": [
     {
       "naam": "SOORTEN",
-      "domeinen": 48,
-      "betekenissen": 46,
+      "domeinen": 49,
+      "betekenissen": 47,
       "hoogsteOverlap": 0.2,
       "soort": "gemengd",
       "waar": [
@@ -1261,6 +1278,18 @@
         },
         {
           "bestanden": [
+            "server/kern/service/klassen.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "ondersteuning",
+            "klacht",
+            "opdracht",
+            "toegang"
+          ]
+        },
+        {
+          "bestanden": [
             "server/kern/stad/bewoner.js"
           ],
           "leden": 5,
@@ -1357,8 +1386,8 @@
     },
     {
       "naam": "STANDEN",
-      "domeinen": 18,
-      "betekenissen": 16,
+      "domeinen": 21,
+      "betekenissen": 19,
       "hoogsteOverlap": 0.4,
       "soort": "gemengd",
       "waar": [
@@ -1383,6 +1412,18 @@
             "nooit",
             "gevraagd",
             "altijd"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/beschermzaak/klasse.js"
+          ],
+          "leden": 6,
+          "voorbeeld": [
+            "veiligheid",
+            "minimaal",
+            "toestemming",
+            "stabilisatie"
           ]
         },
         {
@@ -1419,6 +1460,17 @@
             "kennis",
             "tweefactor",
             "bezit"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/knelpunt/index.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "vervuld",
+            "ontbreekt",
+            "onbekend"
           ]
         },
         {
@@ -1502,6 +1554,18 @@
             "blij",
             "chagrijnig",
             "moe"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/service/klassen.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "nieuw",
+            "onderzoek",
+            "opgelost",
+            "gesloten"
           ]
         },
         {
@@ -2769,6 +2833,75 @@
       ]
     },
     {
+      "naam": "REGISTER",
+      "domeinen": 5,
+      "betekenissen": 5,
+      "hoogsteOverlap": 0,
+      "soort": "botsing",
+      "waar": [
+        {
+          "bestanden": [
+            "server/kern/command/opslag-register.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "steden",
+            "landen",
+            "zandbakken",
+            "overnames"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/concern/opslag.js"
+          ],
+          "leden": 8,
+          "voorbeeld": [
+            "concerns",
+            "entiteiten",
+            "vestigingen",
+            "employments"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/fiscaal/zekerheid.js"
+          ],
+          "leden": 19,
+          "voorbeeld": [
+            "btw.aangifte",
+            "btw.regel",
+            "btw.herbouw",
+            "btw.categorie"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/isolatie/opslag.js"
+          ],
+          "leden": 6,
+          "voorbeeld": [
+            "organisatie",
+            "identiteit",
+            "sessie",
+            "apparaat"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/veiligheid/opslag.js"
+          ],
+          "leden": 8,
+          "voorbeeld": [
+            "alarmen",
+            "wachten",
+            "momenten",
+            "kring"
+          ]
+        }
+      ]
+    },
+    {
       "naam": "STANDAARD",
       "domeinen": 5,
       "betekenissen": 5,
@@ -2838,7 +2971,7 @@
     },
     {
       "naam": "NIET_GEBOUWD",
-      "domeinen": 9,
+      "domeinen": 10,
       "betekenissen": 4,
       "hoogsteOverlap": 1,
       "soort": "gemengd",
@@ -2859,6 +2992,7 @@
           "bestanden": [
             "server/kern/command/opslag-register.js",
             "server/kern/concern/opslag.js",
+            "server/kern/isolatie/opslag.js",
             "server/kern/levensdossier/velden.js",
             "server/kern/mobiliteit/opslag.js",
             "server/kern/payroll/opslag.js",
@@ -2894,6 +3028,64 @@
             "locatie",
             "audio",
             "doorlopend"
+          ]
+        }
+      ]
+    },
+    {
+      "naam": "KETEN",
+      "domeinen": 5,
+      "betekenissen": 4,
+      "hoogsteOverlap": 0.18,
+      "soort": "gemengd",
+      "waar": [
+        {
+          "bestanden": [
+            "server/kern/beschermzaak/klasse.js"
+          ],
+          "leden": 6,
+          "voorbeeld": [
+            "veiligheid",
+            "minimaal",
+            "toestemming",
+            "stabilisatie"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/bureau/keten.js"
+          ],
+          "leden": 12,
+          "voorbeeld": [
+            "reizen",
+            "gelegenheden",
+            "huishouden",
+            "vervoer"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/mobiliteit/keten.js",
+            "server/kern/modebezorg.js"
+          ],
+          "leden": 10,
+          "voorbeeld": [
+            "aangevraagd",
+            "geprijsd",
+            "aangeboden",
+            "geaccepteerd"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/rtfos/projecten.js"
+          ],
+          "leden": 9,
+          "voorbeeld": [
+            "idee",
+            "aanvraag",
+            "beoordeling",
+            "goedgekeurd"
           ]
         }
       ]
@@ -3065,6 +3257,62 @@
             "jacht",
             "vliegtuig",
             "helikopter"
+          ]
+        }
+      ]
+    },
+    {
+      "naam": "DOELGROEPEN",
+      "domeinen": 4,
+      "betekenissen": 4,
+      "hoogsteOverlap": 0.1,
+      "soort": "botsing",
+      "waar": [
+        {
+          "bestanden": [
+            "server/functies/register/doelgroepen.js"
+          ],
+          "leden": 8,
+          "voorbeeld": [
+            "rtg",
+            "lifestyle",
+            "business",
+            "gast"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/rtfos/berichten.js"
+          ],
+          "leden": 6,
+          "voorbeeld": [
+            "vrijwilligers",
+            "partners",
+            "projectgroep",
+            "deelnemers"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/service/klassen.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "gast",
+            "lid",
+            "zaak",
+            "organisatie"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/school/peiling.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "ouders",
+            "leerlingen",
+            "personeel"
           ]
         }
       ]
@@ -3294,176 +3542,7 @@
           ]
         }
       ]
-    },
-    {
-      "naam": "RECHTEN",
-      "domeinen": 4,
-      "betekenissen": 4,
-      "hoogsteOverlap": 0,
-      "soort": "botsing",
-      "waar": [
-        {
-          "bestanden": [
-            "server/bedrijf/rollen-register.js"
-          ],
-          "leden": 17,
-          "voorbeeld": [
-            "werkruimte",
-            "mens",
-            "mens.gevoelig",
-            "project"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/magnaat-partnerstudio-bedrijf.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "bekijken",
-            "bewerken",
-            "goedkeuren",
-            "oefenen"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/rtfos/basis.js"
-          ],
-          "leden": 3,
-          "voorbeeld": [
-            "stadsbestuur",
-            "projectleider",
-            "medewerker"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/rtmail-recht.js"
-          ],
-          "leden": 12,
-          "voorbeeld": [
-            "metadata",
-            "lezen",
-            "antwoorden",
-            "verzenden"
-          ]
-        }
-      ]
-    },
-    {
-      "naam": "REGISTER",
-      "domeinen": 4,
-      "betekenissen": 4,
-      "hoogsteOverlap": 0,
-      "soort": "botsing",
-      "waar": [
-        {
-          "bestanden": [
-            "server/kern/command/opslag-register.js"
-          ],
-          "leden": 5,
-          "voorbeeld": [
-            "steden",
-            "landen",
-            "zandbakken",
-            "overnames"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/concern/opslag.js"
-          ],
-          "leden": 8,
-          "voorbeeld": [
-            "concerns",
-            "entiteiten",
-            "vestigingen",
-            "employments"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/fiscaal/zekerheid.js"
-          ],
-          "leden": 19,
-          "voorbeeld": [
-            "btw.aangifte",
-            "btw.regel",
-            "btw.herbouw",
-            "btw.categorie"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/veiligheid/opslag.js"
-          ],
-          "leden": 8,
-          "voorbeeld": [
-            "alarmen",
-            "wachten",
-            "momenten",
-            "kring"
-          ]
-        }
-      ]
-    },
-    {
-      "naam": "SCENARIOS",
-      "domeinen": 4,
-      "betekenissen": 4,
-      "hoogsteOverlap": 0,
-      "soort": "botsing",
-      "waar": [
-        {
-          "bestanden": [
-            "server/betaal/synthetisch.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "betaald",
-            "geweigerd",
-            "traag",
-            "terugboeking"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/magnaatwereld.js"
-          ],
-          "leden": 6,
-          "voorbeeld": [
-            "planning",
-            "controle",
-            "gesprek",
-            "impact"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/onderneming/simulatie.js"
-          ],
-          "leden": 3,
-          "voorbeeld": [
-            "slecht",
-            "basis",
-            "groei"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/stadsweefsel/klimaat.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "extreme-regen",
-            "hittegolf",
-            "droogte",
-            "hoogwater"
-          ]
-        }
-      ]
     }
   ],
-  "bestanden": 3001
+  "bestanden": 3123
 }

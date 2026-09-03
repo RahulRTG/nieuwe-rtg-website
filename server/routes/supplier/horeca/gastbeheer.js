@@ -19,7 +19,7 @@
 
 module.exports = (kern) => {
   const { app, save, schoon, supplierAuth, logActivity, sseToSupplier, horeca } = kern;
-  const { H, nu } = horeca;
+  const { H, Hlees, nu } = horeca;
   const sessie = require('../../../kern/gast/sessie')({ db: kern.db, save, crypto: kern.crypto, schoon, horeca });
   const beleid = require('../../../kern/gast/beleid')({ horeca });
 
@@ -44,12 +44,19 @@ module.exports = (kern) => {
           : 'Druk deze code af voor op tafel; hij blijft geldig als de rekening sluit.') });
   });
 
-  /* ---------- uitverkocht ---------- */
+  /* ---------- uitverkocht ----------
+
+     KEUREN VOOR SCHEPPEN. H() zet de horecadoos van een zaak neer zodra iemand
+     ernaar vraagt, en die aanroep stond hier boven de 400: een zaak die de doos
+     nog niet had hield er een lege aan over aan een verzoek dat werd geweigerd,
+     en dan zeggen de statuscode en de opslag iets anders over hetzelfde verzoek.
+     Het gerecht wordt nu eerst gekeurd; de doos komt er pas waar er werkelijk
+     iets in wordt gezet -- en daar hoort H() dus nog steeds. */
   app.post('/api/supplier/horeca/gast/uitverkocht', supplierAuth, (req, res) => {
-    const h = H(req.supplier.code);
-    if (!h.instel.uitverkocht) h.instel.uitverkocht = {};
     const itemId = schoon((req.body || {}).itemId, 40);
     if (!itemId) return res.status(400).json({ error: 'Welk gerecht?' });
+    const h = H(req.supplier.code);
+    if (!h.instel.uitverkocht) h.instel.uitverkocht = {};
     const uit = (req.body || {}).uit !== false;
     if (uit) h.instel.uitverkocht[itemId] = { at: nu(), door: req.actor.name };
     else delete h.instel.uitverkocht[itemId];
@@ -82,7 +89,12 @@ module.exports = (kern) => {
   });
 
   app.post('/api/supplier/horeca/gast/bevestig', supplierAuth, (req, res) => {
-    const h = H(req.supplier.code);
+    /* OPZOEKEN IS KIJKEN, en dus Hlees en niet H: de weg hierna eindigt drie keer
+       op een 4xx (regel onbekend, wacht niet, afwijzen zonder reden), en dan hoort
+       er niets achter te blijven. Bestaat de doos wel, dan geeft Hlees hem ECHT
+       terug -- de bevestiging hieronder landt gewoon in de opslag. Zie
+       kern/horeca.js bij Hlees. */
+    const h = Hlees(req.supplier.code);
     const b = req.body || {};
     const r = h.rekeningen[String(b.rekeningId || '')];
     const regel = r && (r.regels || []).find(x => x.id === String(b.regelId || ''));

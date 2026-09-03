@@ -10,7 +10,7 @@ const maakInventaris = require('../../kern/code-inventaris');
 const maakIncident = require('../../kern/incidentcontrole');
 
 module.exports = function mountControle(c) {
-  const { app, db, save, beveilig, av, techAuth, eigenaarAlleen, journaal } = c;
+  const { app, db, save, beveilig, av, techAuth, eigenaarAlleen, journaal, ontsluitpoort } = c;
   const root = path.join(__dirname, '../../..');
   const integriteit = maakIntegriteit({ root });
   const inventaris = maakInventaris({ app, functies, integriteit });
@@ -27,7 +27,7 @@ module.exports = function mountControle(c) {
      een getal te verzinnen. */
   function maakIncidentcontrole() {
     return maakIncident({ db, save, functies, beveilig,
-      journaal });
+      journaal, ontsluitpoort });
   }
 
   function dreiging() {
@@ -91,7 +91,11 @@ module.exports = function mountControle(c) {
       } else if (body.actie === 'herstel') {
         if (body.bevestiging !== 'HERSTEL RTG')
           return res.status(400).json({ error: 'Typ exact HERSTEL RTG om de bewaarde standen terug te zetten.' });
-        uit = incident.herstel(body.reden, req.techUser);
+        /* DE GETYPTE ZIN IS NIET MEER DE GRENS, alleen nog de rem tegen een
+           misklik. De grens is de ceremonie: `body.ceremonie` is het nummer van
+           een voltooide ontsluiting voor het HUIS, en zonder die komt herstel
+           niet langs kern/incidentcontrole.js. */
+        uit = incident.herstel(body.reden, req.techUser, body.ceremonie);
       } else return res.status(400).json({ error: 'Actie moet waakzaam, beperk, bescherm, isoleer of herstel zijn.' });
       res.json({ ok: true, incident: uit });
     } catch (e) { res.status(e.status || 500).json({ error: e.status ? e.message : 'Incidenthandeling mislukte.' }); }

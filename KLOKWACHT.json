@@ -4,10 +4,10 @@
  "gemeten": {
   "scherm": 0,
   "schermBestanden": 0,
-  "server": 36,
-  "serverBestanden": 18,
-  "totaal": 36,
-  "bestanden": 18
+  "server": 34,
+  "serverBestanden": 17,
+  "totaal": 34,
+  "bestanden": 17
  },
  "schuld": {
   "alarmweg.test.js": 1,
@@ -17,7 +17,6 @@
   "eventloop.test.js": 7,
   "foutmelder.test.js": 1,
   "journaalschrijf.test.js": 3,
-  "kycspoor.test.js": 2,
   "ledengids-race.test.js": 3,
   "lidfactuur.test.js": 1,
   "link.test.js": 1,

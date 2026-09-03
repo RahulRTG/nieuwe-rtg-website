@@ -88,9 +88,14 @@ async function wacht(basis, ms) {
 
 wachtOpSchoneBoom();
 
-/* De wacht: dit script schrijft een register, dus het start niet bij het
-   requiren (een laadcontrole schreef zo ooit ROLPROEF.json terug naar 292
-   routes; scripts/meetkeuring.js houdt dit vast). */
+/* DE WACHT VOOR HET REQUIREN, en die stond hier niet.
+
+   Dit script SCHRIJFT een register. Een laadcontrole (`node -e "require(...)"`)
+   startte daarmee de hele proef met de standaardbegrenzing en schreef het
+   register terug -- dat is een keer echt gebeurd met ROLPROEF.json, dat van 3377
+   beproefde routes terugviel naar 292 en er daarna volkomen normaal uitzag.
+   scripts/meetkeuring.js handhaaft deze regel; hij zag dit bestand pas toen het
+   op 2 september 2026 een stempel kreeg en daarmee als register meetelde. */
 if (require.main !== module) return;
 
 (async () => {
@@ -221,7 +226,9 @@ if (require.main !== module) return;
   for (const b of (uit.bevindingen.verklaard || []).slice(0, 10)) console.log('      ' + b);
 
   fs.writeFileSync(UITSLAG, JSON.stringify({
-    stempel: stempel(),
+    /* Zonder stempel is een register een meting zonder datum, en die leest als
+       vers. scripts/versheid.js en scripts/vertrouwen.js lezen hem allebei. */
+    stempel: stempel({ begrenzing: MAX || 'geen' }),
     uitleg: 'Per route: met de JUISTE rol en plausibele invoer, en of het 2xx-antwoord gegevens ' +
       'van een ANDER account bevatte (kanaries) of een geheim veld. Een route die hier NIET in staat ' +
       'is niet beproefd. Een route met uitvoer:"poort" gaf nooit een 2xx en is ONGEMETEN, geen groen. ' +

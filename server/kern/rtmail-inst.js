@@ -32,16 +32,32 @@ module.exports = ({ save, rtmail, vrij, nu, busVan, vakInst, kap }) => {
   /* Afwezigheid: tekst plus een venster. Zonder tot-datum staat hij aan tot
      iemand hem uitzet -- dat is een keuze en geen omissie, want een
      afwezigheidsbericht dat vanzelf verloopt terwijl u nog weg bent, is erger. */
+  /* KEUREN VOOR VERWERVEN, en dat is de reparatie van 2 september 2026. Hier
+     stond `vakInst(adres, true)` op de eerste regel, en die tweede parameter
+     betekent MAKEN: een postvak dat nog nooit een instelling had, kreeg er een
+     -- ook als het verzoek daarna met een 400 werd afgewezen omdat de tekst
+     leeg was of de datum nergens op sloeg. De staatproef ving dat als een
+     gezakte ROLLBACK ("geweigerd (status 400) en de toestand veranderde toch:
+     rtmailSchrijf").
+
+     Het uitzetten hoeft ook niets te maken: is er geen postvakinstelling, dan
+     is er geen afwezigheidsbericht om weg te halen, en dan is het antwoord
+     hetzelfde zonder dat er iets ontstaat. */
   function zetAfwezig(adres, { aan, tekst, van, tot } = {}) {
-    const i = vakInst(adres, true);
-    if (!i) return { error: 'Dit postvak is niet te bepalen.' };
-    if (aan === false) { i.afwezig = null; save(); return { ok: true, afwezig: null }; }
+    if (!vakInst(adres, false)) return { error: 'Dit postvak is niet te bepalen.' };
+    if (aan === false) {
+      const bestaand = vakInst(adres, false);
+      if (bestaand && bestaand.afwezig) { vakInst(adres, true).afwezig = null; save(); }
+      return { ok: true, afwezig: null };
+    }
     const t = kap(tekst, 1000).trim();
     if (!t) return { error: 'Wat moet er in het afwezigheidsbericht staan?' };
     const dat = (x) => { if (!x) return null; const d = new Date(x); return isNaN(d.getTime()) ? undefined : d.toISOString(); };
     const v = dat(van), o = dat(tot);
     if (v === undefined || o === undefined) return { error: 'Dat is geen tijdstip.' };
     if (v && o && v > o) return { error: 'De einddatum ligt voor de begindatum.' };
+    /* Vanaf hier kan er niets meer worden geweigerd. */
+    const i = vakInst(adres, true);
     i.afwezig = { tekst: t, van: v, tot: o };
     i.beantwoord = {};   // een nieuw venster begint met een schone lei
     save();

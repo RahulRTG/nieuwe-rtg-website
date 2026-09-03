@@ -253,55 +253,76 @@ doof is kan daarmee het gesprek volgen en eraan meedoen -- lezen wat er getypt
 wordt, en zelf typen. Bij het schoolgesprek weegt dat het zwaarst, want dat is
 alleen geluid: daar valt niet eens van te liplezen.
 
-**Dat is GEEN ondertiteling, en dit register mag daar niet voor worden
-opgepoetst.** Er wordt niets van spraak naar tekst omgezet: wat in de baan staat,
-staat er omdat een mens het heeft getypt. WCAG 1.2.4 is dus niet gehaald, en de
-acht tellen in de keuring gewoon door als open. Wat er wel is veranderd, is
+**De baan zelf is GEEN ondertiteling, en dit register mag daar niet voor worden
+opgepoetst.** Er wordt daar niets van spraak naar tekst omgezet: wat in de baan
+staat, staat er omdat een mens het heeft getypt. Dat blijft gelden en is niet
+vervangen -- een herkenner die een naam verkeerd verstaat, wordt met een getypte
+regel gecorrigeerd, en waar geen model draait is meetypen het enige dat er is. Wat er wel is veranderd, is
 waar de afhankelijkheid ligt: van "kan niet meedoen" naar "kan meedoen als de
 anderen meetypen". Dat is minder dan ondertiteling en meer dan niets, en die twee
 zinnen horen allebei te staan.
 
-**Sinds 2 september is er WEL automatische tekst, en de vorm ervan is het
-besluit.** `shared/spraaktekst.js` zet spraak om naar tekst en voedt dezelfde
-baan met bron `machine`. Eén zin draagt het hele ontwerp: **je transcribeert
-jezelf.** De herkenner luistert naar de microfoon van wie hem AANZET, nooit naar
-het binnenkomende geluid van de ander. Daarmee geef je alleen je eigen stem weg,
-en er is geen enkele stand waarin dit huis het gesprek van twee leden opneemt om
-er tekst van te maken -- precies wat het codenaam-ontwerp voorkomt. De
-herkenning gebeurt op het toestel (de Web Speech API); in sommige browsers gaat
-het geluid daarbij naar de browserleverancier, en daarom staat de knop uit tot
-iemand hem zelf aanzet en gaat er nooit geluid naar RTG. Dezelfde afspraak als
-RTG Memo.
+**Sinds 3 september is er WEL automatische ondertiteling, en langs precies de
+weg die hierboven als open deur stond beschreven.** `kern/spraaktekst.js` zet
+spraak om met een LOKAAL model (`LOCAL_AI_URL` plus `LOCAL_AI_MODEL_SPRAAK`), en
+`shared/meeluister.js` zet de knop in de meeleesbaan zelf -- dus alle acht
+gesprekken kregen hem tegelijk. De ratel van keuringsregel 49 ging daarmee van
+tien naar vier.
 
-**Dat haalt WCAG 1.2.4 nog steeds niet, en de acht blijven open.** Zet de ander
-de knop niet aan, dan is er van diens spraak nog steeds geen tekst; een toestel
-zonder Web Speech API (Firefox) kan het helemaal niet, en dan zegt de knop dat
-hij niet kan, met de reden, zichtbaar en niet in een tooltip. Ondertiteling bij
-live media moet er ZIJN, niet afhangen van de goede wil van de gesprekspartner.
-De afhankelijkheid is opnieuw verplaatst en verkleind -- van "de anderen typen
-mee" naar "de anderen zetten een knop aan" -- niet weggenomen. Daarom staat er
-naast die knop ook **Vraag om live tekst**: een gewone regel in de baan waarin je
-de ander vraagt hem aan te zetten. Met opzet geen schakelaar die de microfoon van
-iemand anders aanzet -- `LIFE.md` par. 4 staat daarboven.
+**Iedereen ondertitelt zichzelf.** Elke deelnemer laat zijn eigen microfoon
+omzetten en de regel reist over dezelfde seinweg als een getypte regel. Dat is
+geen implementatiedetail: de spreker beslist zelf of zijn stem door een model
+gaat, er hoeft nergens een tweede geluidsstroom te worden afgetapt, en niemand
+ondertitelt een ander achter zijn rug.
+
+**Waar het geluid heen gaat, eerlijk gezegd:** naar de server van RTG, en daar
+naar een lokaal model. Niet naar een browserleverancier, niet naar een derde
+partij, en het wordt niet bewaard -- gemeten over de geslaagde weg en niet alleen
+over de weigering (`test/spraaktekst.test.js` zet een neplokaal model op loopback
+en vergelijkt de opslag ervoor en erna). Dat is iets anders dan "het verlaat uw
+toestel niet", en dat verschil staat op de knop. De Web Speech API blijft
+uitgesloten: die stuurt het geluid naar de browserleverancier, en dit huis draait
+op codenamen met de echte namen in een aparte kluis. Er is geen instelling die
+dat goedmaakt. De laag wijkt ook nooit uit naar een externe aanbieder: een
+tekstantwoord bij de derde partij is net zo goed, de stem van een lid niet.
+
+**Wat dit NIET zegt, en dat hoort er even hard bij.** Dat elk huis dat deze code
+draait ook werkelijk ondertitelt, hangt aan een ingerichte
+`LOCAL_AI_MODEL_SPRAAK` -- net zoals een ondertitelspoor niet zegt dat elke maker
+cues heeft getypt. Staat er geen model, dan **verschijnt de knop niet** en zegt de
+baan waarom, en dan blijft meetypen over. Dat is met opzet: een ondertitelknop die
+niets doet is erger dan geen knop, want die laat iemand aan een gesprek beginnen
+in de veronderstelling dat hij het kan volgen. Het kantoor ziet die stand op
+`/api/office/service/kanalen`, met het gevolg erbij in gewone woorden -- anders
+leest een rode regel als een ontbrekend extraatje.
 
 **De twee uitzendingen staan er anders voor, en die twee verschillen onderling.**
-Het Podium heeft een kanaalchat naast de uitzending met `aria-live`, waarin de
-uitzender meeschrijft of met de knop **Live tekst** zijn eigen spraak laat
-omzetten; die regels gaan langs dezelfde route als een getypte, met `(automatisch)`
-ervoor. Het SOS-scherm is de enige van de acht waar het NIET om een tik vraagt:
-het toestel van het lid zet zijn eigen stem om en stuurt de regels langs hetzelfde
-seinkanaal als het beeld, naar een baan naast het camerabeeld op het kantoor. Twee
-redenen die allebei moeten gelden -- het lid heeft bij het veiligheidscontract al
-toestemming gegeven dat kantoor meekijkt én meeluistert, dus dezelfde stem als
-tekst geeft niets weg wat er niet al heen ging, en iemand die 112 belt vragen om
-eerst nog een knop te vinden is geen ontwerp. Hier stond dat **wie doof is geen
-SOS-dienst kan draaien**; dat is nu minder waar, maar niet weg: het hangt aan een
-browser die de Web Speech API heeft, en dat is geen voorziening waar je op kunt
-rekenen.
+Zichzelf ondertitelen helpt hier niet: dit is eenrichting, de kijker spreekt niet.
+Daarvoor is een tweede weg nodig -- de ZENDER laten ondertitelen -- en bij SOS
+betekent dat dat het geluid van iemand in nood door een model gaat. Dat besluit
+wordt hier niet stilzwijgend genomen.
+Het Podium heeft al een tekstbaan: de kanaalchat naast de uitzending, met
+`aria-live`, waarin de uitzender kan meeschrijven. Het SOS-scherm heeft er geen.
+Dat is de eerlijke stand en niet een gat dat nog even gedicht wordt: **wie doof
+is kan geen SOS-dienst draaien**, want daar komt het geluid van een lid in nood
+binnen en er is niets dat het opschrijft. Een noodscherm is niet de plek om er
+ongevraagd iets bij te zetten; dat is een besluit dat RTG neemt.
 
 De keuring houdt dit vast en niet alleen dit document: een gesprek dat de
 tekstbaan verliest, laat `npm run check` regel 49 zakken -- gemeten door hem uit
 het schoolgesprek te halen en de keuring te zien klagen.
+
+**En daar zat een gat dat het narekenen blootlegde.** Het anker keek of de
+AANROEPER de naam `RTGMeelezen` noemt, en dat deed `teamcall-01.js` keurig --
+terwijl `personeel.html` en `leverancier.html` de module nergens laadden.
+`if (w.RTGMeelezen)` was daar dus altijd onwaar: de tekstbaan van de teamcall
+verscheen stil niet, met een register dat hem wél claimde. De toets die dit had
+moeten vangen bestond ook al, maar droeg een **met de hand getypte lijst van zes
+schermen** en miste juist deze twee. Beide zijn gerepareerd: de pagina's laden de
+modules, het anker wijst nu naar de scripttag in plaats van naar de aanroep, en de
+lijst in `test/meelezen.test.js` wordt **afgeleid** uit wie de baan aanroept. Een
+anker op een aanroep bewijst een intentie; een anker op de scripttag bewijst dat
+het er staat.
 
 Wat hier eerst stond als "ook open" -- een spraakbericht in de teamchat zonder
 tekstversie -- bleek bij het narekenen geen gat maar DOOD HOUT. De speler stond

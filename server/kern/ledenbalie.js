@@ -40,7 +40,7 @@ const { maandCentenVoor, contractueel } = require('./pasprijs');  // een antwoor
 const REDEN_MIN = 10;
 const { PASSEN, pasVan } = require('./passen');   // een plek, zie ./passen.js
 
-module.exports = ({ db, save, accounts, onboarding, geldPasprijzen, magBoardroom, herstelStart }) => {
+module.exports = ({ db, save, accounts, onboarding, geldPasprijzen, magBoardroom, herstelStart, serviceEnvelop }) => {
   const nu = () => new Date().toISOString();
   const rid = () => crypto.randomBytes(4).toString('hex');
   const kort = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, n);
@@ -54,7 +54,7 @@ module.exports = ({ db, save, accounts, onboarding, geldPasprijzen, magBoardroom
   }
 
   const zetels = require('./ledenbalie-zetels')({ db, save, accounts, magBoardroom });
-  const zaken = require('./ledenbalie-zaken')({ db, save, inzagelog,
+  const zaken = require('./ledenbalie-zaken')({ db, save, inzagelog, serviceEnvelop,
     hulp: { nu, rid, kort, inhoud, wie, redenOf, lidOf, pasVan, PASSEN, REDEN_MIN, geenReden, geenLid } });
 
   /* DE STEUNCODE: waarmee een lid zich aan de balie meldt zonder zijn naam te

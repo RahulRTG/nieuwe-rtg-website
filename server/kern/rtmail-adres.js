@@ -64,7 +64,12 @@ const domeinVoor = (soort) => DOMEINEN[String(soort || '').toLowerCase()] || DOM
 /* Namen die het huis zelf gebruikt. Niemand krijgt ze, want dan zou zijn postvak
    samenvallen met dat van de systeem-afzender (rtg@rtmail). Wie zo heet, krijgt
    er een streepje en zijn soort achter -- lelijk noch verwarrend, en van hem. */
-const GERESERVEERD = ['rtg', 'rtmail', 'postmaster', 'systeem', 'admin', 'noreply'];
+/* `hulp` staat erbij sinds RTG Service een mailingang heeft
+   (kern/service/post.js): dat adres IS de servicebus, en zonder deze regel
+   krijgt de eerste medewerker die zo heet hem als persoonlijk postvak -- of erger,
+   hij slokt de meldingen op die voor de wachtrij bedoeld waren. Dat is precies
+   waar deze lijst voor bestaat. */
+const GERESERVEERD = ['rtg', 'rtmail', 'postmaster', 'systeem', 'admin', 'noreply', 'hulp'];
 
 /* Een adres opbouwen. `soort` komt uit de pas of de rol, `naam` is de codenaam
    (lid) of de werknaam/zaakcode (personeel, zaak, overheid). */

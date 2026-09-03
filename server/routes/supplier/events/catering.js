@@ -22,14 +22,22 @@ app.post('/api/supplier/event/allergy', supplierAuth, (req, res) => {
   if (!managerOnly(req, res)) return;
   const e = (req.supplier.events || []).find(x => x.id === req.body.id);
   if (!e) return res.status(404).json({ error: 'Event niet gevonden.' });
-  e.allergies = e.allergies || [];
+  /* KIJKEN ZET DE LIJST NIET NEER. De allergenenlijst werd hier lui aangehangen
+     nog voor de keuringen begonnen, dus een leeg allergeen (400), een dubbele
+     (409) of een onbekende actie (400) liet een lege lijst achter op een event
+     dat er nog geen had -- en dan zeggen de statuscode en de opslag iets anders
+     over hetzelfde verzoek. Bestaat de lijst wel, dan is dit de ECHTE lijst en
+     landt alles wat je erin duwt gewoon. Bestaat hij niet, dan hangt hij nergens
+     aan tot een van de twee takken hieronder hem aan het event geeft. */
+  const bestaand = Array.isArray(e.allergies) ? e.allergies : [];
   if (req.body.action === 'add') {
     const allergen = String(req.body.allergen || '').trim().toLowerCase().slice(0, 30);
     if (!allergen) return res.status(400).json({ error: 'Vul het allergeen in.' });
-    if (e.allergies.some(a => a.allergen === allergen)) return res.status(409).json({ error: 'Dit allergeen staat er al.' });
-    e.allergies.push({ id: crypto.randomBytes(3).toString('hex'), allergen, count: Math.min(500, Math.max(1, parseInt(req.body.count, 10) || 1)), alternative: null });
+    if (bestaand.some(a => a.allergen === allergen)) return res.status(409).json({ error: 'Dit allergeen staat er al.' });
+    e.allergies = bestaand;
+    bestaand.push({ id: crypto.randomBytes(3).toString('hex'), allergen, count: Math.min(500, Math.max(1, parseInt(req.body.count, 10) || 1)), alternative: null });
   } else if (req.body.action === 'remove') {
-    e.allergies = e.allergies.filter(a => a.id !== req.body.allergyId);
+    e.allergies = bestaand.filter(a => a.id !== req.body.allergyId);
   } else return res.status(400).json({ error: 'Onbekende actie.' });
   save();
   sseToSupplier(req.supplier.code, 'sync', { scope: 'events' });

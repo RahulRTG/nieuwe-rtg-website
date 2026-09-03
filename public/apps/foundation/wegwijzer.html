@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- DEZELFDE NEUTRALE TITEL ALS onveilig.html, en dat is met opzet. Twee
+     pagina's die in de geschiedenis identiek lezen, verraden samen minder dan
+     een pagina die "hulp gevraagd" heet. Zie het blok over wat wij niet kunnen
+     verbergen op onveilig.html; die grens geldt hier onverkort. -->
+<title>Wegwijzer</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#08090C">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<script src="palet.js"></script>
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+  .topnav{display:flex;align-items:center;gap:.7rem;padding:.7rem 1rem;border-bottom:1px solid var(--lijn);}
+  .topnav .brand{font-family:var(--serif);font-weight:500;}
+  .topnav a{margin-left:auto;color:var(--zacht);text-decoration:none;font-size:.85rem;padding:.35rem 0;}
+  .wrap{max-width:40rem;margin:0 auto;padding:1.1rem 1.1rem 5rem;}
+  h1{font-family:var(--serif);font-weight:500;font-size:1.6rem;margin:.4rem 0 .2rem;}
+  .intro{color:var(--zacht);line-height:1.55;margin-bottom:1.2rem;}
+  .spoed{padding:1rem 1.1rem;margin-bottom:1.2rem;border:1px solid var(--goud);}
+  .spoed p{line-height:1.55;margin:0;} .spoed p + p{margin-top:.5rem;} .spoed b{color:var(--txt);}
+  .nr{font-weight:700;color:var(--rtg-leesgoud,var(--goud));white-space:nowrap;}
+  .blok{padding:1.1rem;margin-bottom:1rem;}
+  .blok h2{font-family:var(--serif);font-weight:500;font-size:1.1rem;margin-bottom:.15rem;}
+  .blok .h{color:var(--zacht);font-size:.86rem;line-height:1.5;margin-bottom:.9rem;}
+  .keus{display:flex;gap:.5rem;flex-wrap:wrap;}
+  .keus button{background:var(--paneel2);border:1px solid var(--lijn);color:var(--txt);border-radius:0;
+    padding:.6rem 1rem;min-height:44px;font-size:.92rem;cursor:pointer;}
+  .keus button[aria-pressed="true"]{border-color:var(--goud);color:var(--rtg-leesgoud,var(--goud));font-weight:600;}
+  .veld,select,textarea{width:100%;background:var(--paneel2);border:1px solid var(--lijn);color:var(--txt);
+    border-radius:0;padding:.65rem .75rem;font:inherit;min-height:44px;}
+  label.rij{display:block;margin-bottom:.9rem;}
+  label.rij span{display:block;color:var(--zacht);font-size:.86rem;margin-bottom:.35rem;}
+  .knop{background:var(--goud);color:#1a1710;border:0;border-radius:0;padding:.8rem 1.2rem;
+    min-height:44px;font-weight:700;font-size:.98rem;cursor:pointer;}
+  .knop.grijs{background:var(--paneel2);border:1px solid var(--lijn);color:var(--txt);font-weight:500;}
+  .fout{color:var(--rood-tekst,#ff8f9e);font-size:.88rem;line-height:1.5;margin-top:.6rem;min-height:1.1rem;}
+  .code{font:700 1.4rem/1.2 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.06em;
+    color:var(--rtg-leesgoud,var(--goud));background:var(--paneel2);border:1px solid var(--goud);
+    padding:.8rem 1rem;margin:.6rem 0;word-break:break-all;}
+  .waar{color:var(--zacht);line-height:1.55;font-size:.9rem;}
+  .waar b{color:var(--txt);}
+</style>
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/ios.css" rel="stylesheet">
+<link rel="stylesheet" href="premium.css">
+</head>
+<body class="rtg-stijl">
+
+<div class="topnav">
+  <div class="brand">Wegwijzer</div>
+  <a href="onveilig.html">Alle nummers &rsaquo;</a>
+</div>
+
+<div class="wrap" role="main">
+  <h1>Zelf iets in gang zetten</h1>
+  <div class="intro">U hoeft hiervoor geen account te hebben. Wij vragen geen naam, geen adres, geen
+    telefoonnummer en geen burgerservicenummer. U krijgt een code, en daarmee kunt u terugkijken en
+    het ook weer intrekken.</div>
+
+  <!-- BOVENAAN EN NIET ONDERAAN. Een knop die eruitziet alsof er hulp komt, is
+       de gevaarlijkste fout van deze laag; zie de kop van
+       server/kern/beschermzaak/voordeur.js. -->
+  <div class="spoed kaart">
+    <p><b>Hier zit niemand klaar.</b> Wat u achterlaat, leest een medewerker van de RTFoundation in de
+      plaats die u kiest, tijdens werktijd. Er kijkt hier 's nachts niemand mee.</p>
+    <p><b>Moet er nu iemand komen?</b> Bel <span class="nr">112</span>.</p>
+    <p><b>Wilt u nu iemand spreken?</b> Veilig Thuis, <span class="nr">0800-2000</span>. Gratis, dag en
+      nacht, en u mag anoniem bellen.</p>
+  </div>
+
+  <div class="kaart blok" id="geenplaats" hidden>
+    <h2>Hier kan het nu niet</h2>
+    <div class="waar">Er is op dit moment geen plaats waar dit kan worden opgepakt. Dat ligt aan ons en
+      niet aan u. Bel <b>Veilig Thuis</b>, <span class="nr">0800-2000</span>: gratis, dag en nacht, en u
+      mag anoniem bellen. Moet er nu iemand komen, bel dan <span class="nr">112</span>.</div>
+  </div>
+
+  <div id="formulier">
+    <div class="kaart blok">
+      <h2>1. Bent u op dit moment veilig?</h2>
+      <div class="h">Dit is de eerste vraag omdat elk volgend antwoord ervan afhangt. Twijfelt u, kies dan nee.</div>
+      <div class="keus" data-veld="nuVeilig">
+        <button type="button" data-w="ja" aria-pressed="false">Ja, op dit moment wel</button>
+        <button type="button" data-w="nee" aria-pressed="false">Nee, of ik weet het niet</button>
+      </div>
+    </div>
+
+    <div class="kaart blok">
+      <h2>2. Kan iemand meekijken op dit toestel?</h2>
+      <div class="h">Hier hangt van af hoe wij u uw code laten zien. Wij sturen hem nooit ergens heen.</div>
+      <div class="keus" data-veld="kanMeekijken">
+        <button type="button" data-w="ja" aria-pressed="false">Ja, dat kan</button>
+        <button type="button" data-w="nee" aria-pressed="false">Nee</button>
+      </div>
+    </div>
+
+    <div class="kaart blok">
+      <h2>3. Waar bent u?</h2>
+      <div class="h">Alleen de plaats, zodat iemand in de buurt het kan oppakken. Geen adres.</div>
+      <label class="rij"><span>Plaats</span><select id="stad"></select></label>
+      <label class="rij"><span>Waar gaat het over? (u mag dit overslaan)</span>
+        <select id="aanleiding">
+          <option value="anders">Liever niet zeggen</option>
+          <option value="huiselijk-geweld">Geweld thuis</option>
+          <option value="seksueel-geweld">Seksueel geweld</option>
+          <option value="uitbuiting">Uitbuiting of gedwongen werk</option>
+          <option value="mensenhandel">Mensenhandel</option>
+          <option value="stalking">Iemand laat mij niet met rust</option>
+          <option value="eergerelateerd">Druk vanuit de familie</option>
+          <option value="kindveiligheid">Zorgen om een kind</option>
+          <option value="dakloos">Geen slaapplek</option>
+        </select></label>
+    </div>
+
+    <div class="kaart blok">
+      <h2>4. Wat mogen wij bewaren?</h2>
+      <div class="h">Wat u hier kiest, is wat er staat. Kiest u het eerste, dan wordt uw toelichting
+        nergens bewaard, ook niet "voor de context".</div>
+      <div class="keus" data-veld="bewaren">
+        <button type="button" data-w="alleen_dat" aria-pressed="false">Alleen dat ik hulp zocht</button>
+        <button type="button" data-w="ook_wat" aria-pressed="false">Ook kort wat er speelt</button>
+      </div>
+      <label class="rij h-mt80" id="watRij" hidden><span>Kort, in uw eigen woorden</span>
+        <textarea id="wat" rows="3" maxlength="300" placeholder="Bijvoorbeeld: mijn partner bedreigt mij en ik weet niet waar ik heen kan."></textarea></label>
+      <button class="knop h-mt80" id="stuur" type="button">Verstuur</button>
+      <div class="fout" id="fout"></div>
+    </div>
+  </div>
+
+  <div class="kaart blok" id="klaar" hidden>
+    <h2>Dit is uw code</h2>
+    <div class="code" id="code"></div>
+    <div class="waar" id="codeuitleg"></div>
+    <div class="waar h-mt80" id="klaarNiets"></div>
+  </div>
+
+  <div class="kaart blok">
+    <h2>Ik heb al een code</h2>
+    <div class="h">Kijk hoe het ervoor staat, of trek het weer in. Intrekken kan altijd en u hoeft
+      daarvoor niemand te bellen.</div>
+    <label class="rij"><span>Uw code</span><input class="veld" id="mijncode" maxlength="40" placeholder="RTFB-..."></label>
+    <div class="keus">
+      <button type="button" class="knop grijs" id="kijk">Bekijk de stand</button>
+      <button type="button" class="knop grijs" id="trekin">Trek het in</button>
+    </div>
+    <div class="waar h-mt80" id="standuit"></div>
+    <div class="fout" id="fout2"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (s) { return document.querySelector(s); };
+  var keuze = { nuVeilig: null, kanMeekijken: null, bewaren: null };
+
+  function api(pad, lijf) {
+    return fetch('/api/bescherming/deur/' + pad, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(lijf || {})
+    }).then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) {
+      return { ok: r.ok, d: d };
+    }); });
+  }
+  function esc(t) { return String(t == null ? '' : t).replace(/[&<>"]/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+  document.querySelectorAll('.keus[data-veld]').forEach(function (groep) {
+    var veld = groep.dataset.veld;
+    groep.querySelectorAll('button').forEach(function (b) {
+      b.addEventListener('click', function () {
+        groep.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+        keuze[veld] = b.dataset.w;
+        if (veld === 'bewaren') $('#watRij').hidden = b.dataset.w !== 'ook_wat';
+      });
+    });
+  });
+
+  // de plaatsen komen van de server; een lijst hier zou een tweede waarheid zijn
+  api('steden', {}).then(function (r) {
+    var sel = $('#stad');
+    (r.d.steden || []).forEach(function (s) {
+      var o = document.createElement('option'); o.value = s.id; o.textContent = s.naam; sel.appendChild(o);
+    });
+    /* GEEN PLAATS = GEEN DEUR, EN DAT ZEGGEN WE METEEN. Het formulier laten
+       staan zou iemand zijn verhaal laten typen om het daarna te weigeren; dat
+       is de wreedste vorm van een kapotte pagina. De knop gaat uit en er staat
+       een nummer dat het wel oppakt. */
+    if (!sel.options.length) {
+      sel.innerHTML = '<option value="">geen plaats beschikbaar</option>';
+      $('#stuur').disabled = true;
+      $('#formulier').hidden = true;
+      $('#geenplaats').hidden = false;
+    }
+  });
+
+  $('#stuur').addEventListener('click', function () {
+    $('#fout').textContent = '';
+    if (keuze.nuVeilig === null) { $('#fout').textContent = 'Beantwoord vraag 1.'; return; }
+    if (keuze.kanMeekijken === null) { $('#fout').textContent = 'Beantwoord vraag 2.'; return; }
+    if (!keuze.bewaren) { $('#fout').textContent = 'Kies bij vraag 4 wat wij mogen bewaren.'; return; }
+    $('#stuur').disabled = true;
+    api('start', {
+      stad: $('#stad').value, aanleiding: $('#aanleiding').value,
+      nuVeilig: keuze.nuVeilig === 'ja', kanMeekijken: keuze.kanMeekijken === 'ja',
+      bewaren: keuze.bewaren, wat: keuze.bewaren === 'ook_wat' ? $('#wat').value : ''
+    }).then(function (r) {
+      $('#stuur').disabled = false;
+      if (!r.ok) { $('#fout').textContent = r.d.error || 'Er ging iets mis. Probeer het nog eens.'; return; }
+      $('#formulier').hidden = true;
+      $('#code').textContent = r.d.code;
+      $('#codeuitleg').textContent = r.d.melding || '';
+      $('#klaarNiets').textContent = r.d.nietsKlaar || '';
+      $('#klaar').hidden = false;
+      $('#klaar').scrollIntoView({ block: 'start' });
+    });
+  });
+
+  $('#kijk').addEventListener('click', function () {
+    $('#fout2').textContent = ''; $('#standuit').textContent = '';
+    api('stand', { code: $('#mijncode').value }).then(function (r) {
+      if (!r.ok) { $('#fout2').textContent = r.d.error || 'Er ging iets mis.'; return; }
+      $('#standuit').innerHTML = '<b>' + esc(r.d.uitleg) + '</b><br>' + esc(r.d.nietsKlaar || '');
+    });
+  });
+
+  $('#trekin').addEventListener('click', function () {
+    $('#fout2').textContent = ''; $('#standuit').textContent = '';
+    api('intrekken', { code: $('#mijncode').value }).then(function (r) {
+      if (!r.ok) { $('#fout2').textContent = r.d.error || 'Er ging iets mis.'; return; }
+      $('#standuit').textContent = r.d.melding || 'Ingetrokken.';
+    });
+  });
+})();
+</script>
+<script src="/shared/uitstap.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<!-- Net als op onveilig.html met opzet GEEN /shared/randen.js: die schil zet
+     "RTFOUNDATION / WEGWIJZER" bovenin en maakt de neutrale titel waardeloos. -->
+<script src="/shared/ios.js" defer></script>
+<script src="premium.js" defer></script>
+</body>
+</html>

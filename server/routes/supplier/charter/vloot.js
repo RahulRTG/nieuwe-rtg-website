@@ -10,12 +10,18 @@ module.exports = (cctx) => {
     if (!managerOnly(req, res)) return;
     const s = req.supplier;
     if (!isCharter(s, res)) return;
-    if (!Array.isArray(s.boten)) s.boten = [];
+    /* KIJKEN ZONDER SCHEPPEN. De lege vloot stond hier bovenaan, dus een bedrijf
+       dat nog geen vaartuig had hield een lege `boten` over aan een verzoek dat
+       daarna met 400 of 404 werd afgewezen -- de statuscode en de opslag zeggen
+       dan iets anders over hetzelfde verzoek. Bestaat de vloot wel, dan geeft dit
+       hem ECHT terug: wat je erin wijzigt landt gewoon. Neergezet wordt hij pas
+       waar er werkelijk een vaartuig bij komt. */
+    const vloot = () => Array.isArray(s.boten) ? s.boten : [];
     if (req.body.weg) {
-      const b = s.boten.find(x => x.id === req.body.id);
+      const b = vloot().find(x => x.id === req.body.id);
       if (b) b.actief = false; // nooit echt weg: lopende charters verwijzen ernaar
       save(); sseToSupplier(s.code, 'sync', { scope: 'charter' });
-      return res.json({ ok: true, boten: s.boten });
+      return res.json({ ok: true, boten: vloot() });
     }
     const naam = schoon(req.body.naam, 60);
     const dagprijs = Number(req.body.dagprijs);
@@ -44,11 +50,12 @@ module.exports = (cctx) => {
     };
     if (velden.foto === undefined) delete velden.foto;
     if (req.body.id) {
-      const b = s.boten.find(x => x.id === req.body.id);
+      const b = vloot().find(x => x.id === req.body.id);
       if (!b) return res.status(404).json({ error: 'Vaartuig niet gevonden.' });
       Object.assign(b, velden);
     } else {
-      if (s.boten.length >= 60) return res.status(400).json({ error: 'Tot 60 vaartuigen per bedrijf.' });
+      if (vloot().length >= 60) return res.status(400).json({ error: 'Tot 60 vaartuigen per bedrijf.' });
+      if (!Array.isArray(s.boten)) s.boten = [];
       s.boten.push({ id: 'v' + crypto.randomBytes(3).toString('hex'), ...velden });
     }
     save();

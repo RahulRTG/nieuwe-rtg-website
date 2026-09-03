@@ -32,6 +32,10 @@ const { niveauVan, bronVan } = require('./betrouwbaarheid');
 
 module.exports = (ctx) => {
   const { accounts, accountVanKey, codenaamUit, leeftijdVan } = ctx;
+  /* De bewijsclaim (./rtgid-bewijs.js): "voldoet deze mens aan eis X", ja of
+     nee. Hij staat apart omdat hij uit een ANDER register komt en zijn eigen
+     grenzen draagt -- geen nummer, geen lijst stukken, en `false` zonder reden. */
+  const bewijs = require('./rtgid-bewijs')(ctx);
 
   const staatVan = key => {
     const u = accountVanKey(key);
@@ -62,6 +66,19 @@ module.exports = (ctx) => {
       else if (a === 'leeftijd') { uit.leeftijd = lft; uit.leeftijdBron = leeftijdBron; }
       else if (a === 'nationaliteit') uit.nationaliteit = md.nationaliteit || null;
       else if (a === 'naam') uit.naam = u ? accounts.realNameOf(u) : null;
+      else if (bewijs.isBewijsAttribuut(a)) {
+        /* Een vinkje en hooguit een einddatum. Bewust GEEN `reden` bij `false`:
+           het verschil tussen "nooit gehad" en "verlopen" is nuttig voor het lid
+           en verraadt aan een dienst dat iemand het ooit had. Het lid ziet die
+           reden op zijn eigen scherm (mijnBewijzen). */
+        const r = bewijs.voldoetAan(key, bewijs.soortVan(a));
+        uit[a] = r.voldoet;
+        if (r.tot) uit[a + ':tot'] = r.tot;
+        /* `null` is geen `false`. Kon de bewijzenlaag niets vaststellen, dan
+           staat dat er met zoveel woorden bij -- een dienst die "nee" leest waar
+           "niet na te gaan" hoort, weigert een mens op een storing. */
+        if (r.voldoet === null && r.reden) uit[a + ':nietVastgesteld'] = r.reden;
+      }
     }
     return uit;
   }

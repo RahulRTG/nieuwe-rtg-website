@@ -45,9 +45,9 @@
    Gemount vanuit opzet/kernlaag3.js, vóór kern/bureau (dat hem gebruikt). */
 'use strict';
 
-module.exports = ({ db, paspoortVervalt }) => {
+module.exports = ({ db, paspoortVervalt, toestemmingen }) => {
   const vandaag = () => new Date().toISOString().slice(0, 10);
-  const graafMod = require('./graaf')({ db, vandaag, paspoortVervalt });
+  const graafMod = require('./graaf')({ db, vandaag, paspoortVervalt, toestemmingen });
   const termijnenMod = require('./termijnen')({ graaf: graafMod.graaf });
 
   /* De zaken-graaf: zelfde motor, eigen bronnen, en met opzet GEEN

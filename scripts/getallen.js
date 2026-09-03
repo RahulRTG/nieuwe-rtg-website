@@ -62,13 +62,71 @@ const GETALLEN = {
   'semantiek.namen': { bron: 'SEMANTIEK.json', veld: 'namenInMeerDomeinen',
     wat: 'namen die in meer dan een domein voorkomen' },
   'semantiek.betekenissen': { bron: 'SEMANTIEK.json', veld: 'woordenMetMeerBetekenissen',
-    wat: 'namen die meer dan een betekenis dragen' }
+    wat: 'namen die meer dan een betekenis dragen' },
+  /* De meetleer: mag de lezer dit geloven, en hoeveel (MODULAIR.md par. 7). */
+  'meetleer.registers': { bron: 'MEETLEER.json', veld: 'registers',
+    wat: 'registers in de wortel die de meetleer keurt' },
+  'meetleer.blind': { bron: 'MEETLEER.json', veld: 'blind',
+    wat: 'registers die NERGENS zeggen wat ze niet aantonen' },
+  'meetleer.onleesbaar': { bron: 'MEETLEER.json', veld: 'onleesbaar',
+    wat: 'slots waar een machine niet bij kan (proza of leeg)' },
+  /* De vijf registers van de binnenpoort (MODULAIR.md). */
+  'verstrengeling.randen': { bron: 'VERSTRENGELING.json', veld: 'randen',
+    wat: 'randen tussen twee knopen van RTG' },
+  'verstrengeling.onverklaard': { bron: 'VERSTRENGELING.json', veld: 'onbekend',
+    wat: 'randen die niemand heeft verklaard' },
+  'verstrengeling.domeinen': { bron: 'VERSTRENGELING.json', veld: 'domeinknopen',
+    wat: 'domeinen in de graaf' },
+  'verstrengeling.uitneembaar': { bron: 'VERSTRENGELING.json', veld: 'volledigUitneembaar',
+    wat: 'domeinen die geen ander domein meeslepen' },
+  'activering.functies': { bron: 'ACTIVERING.json', veld: 'functiesMetEnvelop',
+    wat: 'functies met een activeringsenvelop' },
+  'activering.gemeten': { bron: 'ACTIVERING.json', veld: 'perGraad.gemeten',
+    wat: 'functies waarvan de envelop volledig gemeten is' },
+  'activering.ondergrens': { bron: 'ACTIVERING.json', veld: 'perGraad.ondergrens',
+    wat: 'functies waarvan de envelop een ondergrens is' },
+  'activering.onbepaald': { bron: 'ACTIVERING.json', veld: 'onbepaald',
+    wat: 'functies waarvan de envelop onbepaald is: bronnen spreken elkaar tegen' },
+  'activering.mediaan': { bron: 'ACTIVERING.json', veld: 'mediaanKnopen',
+    wat: 'knopen die een doorsnee functie raakt' },
+  'trede.routes': { bron: 'TREDEPROEF.json', veld: 'routes',
+    wat: 'API-routes die de tredeproef telde' },
+  'trede.inTrede': { bron: 'TREDEPROEF.json', veld: 'routesInTrede',
+    wat: 'routes die op trede 0 openstaan' },
+  'trede.lekken': { bron: 'TREDEPROEF.json', veld: 'zuiverLekken',
+    wat: 'routes buiten trede 0 die de schakelkast niet dichtzet' },
+  'trede.ingangLekken': { bron: 'TREDEPROEF.json', veld: 'ingangLekken',
+    wat: 'ingangen buiten HTTP die op trede 0 antwoorden terwijl hun functie uit staat' },
+  'wekkers.totaal': { bron: 'WEKKERS.json', veld: 'wekkers',
+    wat: 'plekken die werk kunnen beginnen zonder dat iemand een pad opvraagt' },
+  'wekkers.onverklaard': { bron: 'WEKKERS.json', veld: 'ongeschakeld',
+    wat: 'wekkers die geen functie raken en niet verklaard zijn' },
+  'wekkers.functieUitToch': { bron: 'WEKKERS.json', veld: 'functieUitMaarUitvoerbaar',
+    wat: 'ingangen buiten HTTP die het werk van een functie doen zonder haar schakelaar' },
+  'zaakwig.gezakt': { bron: 'ZAAKWIG.json', veld: 'gezakt',
+    wat: 'stappen en invarianten van de verticale zaakketen die zakken' },
+  /* De isolatielaag. Deze vier stonden als los getal in ISOLATIE.md en verouderden
+     op de dag dat de meter opnieuw draaide -- precies waarvoor dit register er is. */
+  'isolatie.verhalen': { bron: 'ISOLATIEPROEF.json', veld: 'noemers.bruikbaarheid.gevonden',
+    wat: 'kritieke gebruikersverhalen die de bruikbaarheidsmeter naloopt' },
+  'isolatie.werktOnderIsolatie': { bron: 'ISOLATIEPROEF.json',
+    veld: 'noemers.bruikbaarheid.perStand.isolatie.werkt',
+    wat: 'verhalen die onder `isolatie` HEEL blijven' },
+  'isolatie.dragersMetSleutel': { bron: 'ISOLATIEPROEF.json', veld: 'noemers.dragers.metSleutelbron',
+    wat: 'dragers die bij een lopend verzoek een sleutel hebben' },
+  'isolatie.achtergrondsites': { bron: 'ISOLATIEPROEF.json', veld: 'noemers.workload.gevonden',
+    wat: 'plekken waar achtergrondwerk start zonder drager' },
+  'isolatie.kanalen': { bron: 'ISOLATIEPROEF.json', veld: 'noemers.herkomst.gevonden',
+    wat: 'kanalen waarlangs invoer een gesprek in kan komen, elk met een vertrouwensklasse' },
+  'isolatie.herkomstprijsLid': { bron: 'ISOLATIEPROEF.json', veld: 'noemers.herkomst.prijsPerRol.member.na',
+    wat: 'AI-paden die een lid overhoudt nadat onvertrouwde invoer het gesprek raakte' }
 };
 
 /* De documenten die merktekens mogen dragen. Bewust een lijst en geen glob over
    alles: een generator die elk .md-bestand mag herschrijven, herschrijft op een
    dag ook iets dat niemand had bedoeld. */
-const DOCUMENTEN = ['CLAUDE.md', 'CREATE.md', 'EXECUTIE.md', 'OS.md', 'BEWIJSMACHINE.md'];
+const DOCUMENTEN = ['CLAUDE.md', 'CREATE.md', 'EXECUTIE.md', 'OS.md', 'BEWIJSMACHINE.md', 'MODULAIR.md', 'HDI.md',
+  'ISOLATIE.md'];
 
 const MERK = /<!--getal:([a-zA-Z0-9._-]+)-->([\s\S]*?)<!--\/getal-->/g;
 

@@ -91,13 +91,51 @@ test('een echte klasinschrijving activeert de Schoolpas automatisch', async () =
   assert.equal(r.body.school.aantalKlassen, 1);
 });
 
+/* DRIE SCHERMEN DRAGEN DE DEUR MET OPZET NIET, en dat is per stuk een besluit.
+
+   `privacy` stond hier al: inzage, export en verwijdering zijn WETTELIJKE
+   RECHTEN, en een deur waarmee RTG die kan sluiten hoort niet te bestaan.
+
+   `onveilig` en `wegwijzer` zijn er sinds 2 september 2026 bij, om een reden van
+   dezelfde soort: dit zijn de twee schermen voor iemand die in gevaar is. Wie
+   daar aanklopt heeft heel vaak geen account, en sessie.js toont zonder toegang
+   "Deze ruimte blijft nog dicht" -- precies de zin die deze twee schermen
+   onbruikbaar zou maken voor de mens voor wie ze bestaan. Een deur die eerst een
+   account vraagt, is voor hem geen deur (HDI.md par. 7.3).
+
+   DE UITZONDERING BEWIJST ZICHZELF, en dat is de helft die telt: hieronder wordt
+   niet alleen overgeslagen maar ook VASTGELEGD dat deze drie de deur echt niet
+   dragen. Zonder die tegencontrole is een uitzonderingenlijst een plek waar een
+   scherm stil in verdwijnt zodra iemand hem eraan toevoegt. */
+const ZONDER_DEUR = new Map([
+  ['privacy', 'inzage, export en verwijdering zijn wettelijke rechten; een knop waarmee RTG die kan sluiten hoort niet te bestaan'],
+  ['onveilig', 'de hulpwijzer bij geweld en uitbuiting: wie hier aanklopt heeft vaak geen account, en een dichte deur is hier het gevaar zelf'],
+  ['wegwijzer', 'zelf een hulpvraag achterlaten zonder account, zonder naam en zonder adres; een sessiedeur zou de voordeur sluiten']
+]);
+
 test('elk niet-openbaar catalogusscherm draagt de centrale sessiedeur', () => {
   const pub = path.join(__dirname, '..', 'public');
   for (const app of APPS) {
     const url = new URL(app.url, 'https://rtg.test');
-    if (!url.pathname.startsWith('/apps/foundation/') || app.sleutel === 'privacy') continue;
+    if (!url.pathname.startsWith('/apps/foundation/')) continue;
     const bron = fs.readFileSync(path.join(pub, url.pathname.slice(1)), 'utf8');
+    if (ZONDER_DEUR.has(app.sleutel)) {
+      /* De tegencontrole: zo'n scherm hoort de deur ECHT niet te dragen. Draagt
+         hij hem alsnog, dan klopt de uitzondering niet meer en hoort iemand daar
+         opnieuw naar te kijken -- in beide richtingen. */
+      assert.ok(!/sessie\.js/.test(bron),
+        app.naam + ' staat als uitzondering (' + ZONDER_DEUR.get(app.sleutel) + ') maar draagt de deur ' +
+        'wel; haal hem uit de lijst of uit het scherm');
+      continue;
+    }
     assert.match(bron, /sessie\.js/, app.naam + ' mist de centrale leerlingdeur');
+  }
+  /* En de lijst mag niet stil groeien: elke uitzondering hoort ook echt in de
+     catalogus te staan. Een sleutel die nergens meer bestaat, is een vergeten
+     regel die de volgende uitzondering dekt. */
+  for (const sleutel of ZONDER_DEUR.keys()) {
+    assert.ok(APPS.some(a => a.sleutel === sleutel),
+      'de uitzondering "' + sleutel + '" hoort bij geen enkel scherm meer; haal hem weg');
   }
   const sessie = fs.readFileSync(path.join(pub, 'apps', 'foundation', 'sessie.js'), 'utf8');
   assert.match(sessie, /\/api\/rtf\/toegang/);

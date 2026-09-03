@@ -43,12 +43,18 @@ app.post('/api/supplier/booking/status', supplierAuth, (req, res) => {
 app.post('/api/supplier/service', supplierAuth, (req, res) => {
   if (!req.actor.manager) return res.status(403).json({ error: 'Alleen voor de eigenaar.' });
   const s = req.supplier;
-  s.services = s.services || [];
+  /* Eerst KIJKEN naar het aanbod, en het veld pas neerzetten als er werkelijk
+     iets bij komt. Werd de aanbodlijst hierboven al lui aangemaakt, dan liet een
+     geweigerde actie ("Onbekende actie", een dienst zonder prijs) een lege lijst
+     achter bij een zaak die er geen had -- en dan zegt de statuscode 400 terwijl
+     de opslag zegt dat er iets gebeurd is. */
+  const huidig = s.services || [];
   const a = String(req.body.action || '');
   if (a === 'add') {
     const name = schoon(req.body.name, 80);
     const price = Math.round(Number(req.body.price) * 100) / 100;
     if (!name || !(price > 0)) return res.status(400).json({ error: 'Geef de dienst een naam en een prijs.' });
+    s.services = huidig;
     s.services.push({
       id: 'sv' + Date.now().toString(36),
       name, desc: schoon(req.body.desc, 140), price,
@@ -56,7 +62,7 @@ app.post('/api/supplier/service', supplierAuth, (req, res) => {
       soort: req.body.soort === 'product' ? 'product' : 'dienst'
     });
   } else if (a === 'remove') {
-    s.services = s.services.filter(x => x.id !== req.body.id);
+    s.services = huidig.filter(x => x.id !== req.body.id);
   } else return res.status(400).json({ error: 'Onbekende actie.' });
   save();
   logActivity(s.code, req.actor, 'werkte het aanbod bij');

@@ -21,6 +21,27 @@ module.exports = (ctx) => {
     if (!Array.isArray(h.metingen)) h.metingen = [];
     return h;
   }
+  /* KIJKEN ZONDER SCHEPPEN, en dat onderscheid is hier geen netheid.
+
+     `bak()` zet de kaart van een gezinslid neer voor wie er nog geen had. Op de
+     weg die er werkelijk iets aan TOEVOEGT hoort dat ook zo, en op elke andere
+     weg is het verkeerd: wie een medicijn afvinkt dat niet bestaat krijgt een
+     404, en dan hoort er geen verse kaart achter te blijven -- de statuscode en
+     de database zeggen anders twee verschillende dingen over hetzelfde verzoek.
+
+     Bestaat de kaart wel, dan geeft dit de ECHTE lijsten terug en geen kopie:
+     wat je hier vindt en aanpast (een medicijn afvinken) landt gewoon in de
+     opslag. Bestaat hij niet, dan krijg je een lege vorm die nergens aan
+     vastzit, en dan loopt elke zoektocht dood op een nette 404. */
+  function kijk(g, pid) {
+    const alles = (g && g.gezondheid && typeof g.gezondheid === 'object') ? g.gezondheid : {};
+    const h = (alles[pid] && typeof alles[pid] === 'object') ? alles[pid] : {};
+    return {
+      medicijnen: Array.isArray(h.medicijnen) ? h.medicijnen : [],
+      afspraken: Array.isArray(h.afspraken) ? h.afspraken : [],
+      metingen: Array.isArray(h.metingen) ? h.metingen : []
+    };
+  }
   /* Het doel-profiel: standaard jezelf. Een ouder of de beheerder mag de kaart
      van een gezinslid beheren -- dat is het hele punt van een gezinskaart, want
      een kind van zes houdt zijn eigen medicijnen niet bij.
@@ -49,9 +70,8 @@ module.exports = (ctx) => {
     const pid = doelVan(s, req, res); if (!pid) return;
     const naam = schoon(req.body.naam, 80);
     if (!naam) return res.status(400).json({ error: 'Welk medicijn?' });
-    const h = bak(s.g, pid);
-    if (h.medicijnen.length >= 40) return res.status(400).json({ error: 'De medicijnlijst is vol.' });
-    h.medicijnen.push({ id: rid(3), naam: encS(naam), dosis: encS(schoon(req.body.dosis, 60)), tijd: schoon(req.body.tijd, 24), gegeven: null, door: s.p.id, at: nu() });
+    if (kijk(s.g, pid).medicijnen.length >= 40) return res.status(400).json({ error: 'De medicijnlijst is vol.' });
+    bak(s.g, pid).medicijnen.push({ id: rid(3), naam: encS(naam), dosis: encS(schoon(req.body.dosis, 60)), tijd: schoon(req.body.tijd, 24), gegeven: null, door: s.p.id, at: nu() });
     save();
     res.json({ ok: true });
   });
@@ -65,8 +85,8 @@ module.exports = (ctx) => {
   router.post('/gezin/gezondheid/medicijn/gegeven', (req, res) => {
     const s = familieVan(req, res); if (!s) return;
     const pid = doelVan(s, req, res); if (!pid) return;
-    const h = bak(s.g, pid);
-    const m = h.medicijnen.find(x => x.id === req.body.medId);
+    // gevonden = de kaart bestaat, dus hier hoeft niets te worden neergezet
+    const m = kijk(s.g, pid).medicijnen.find(x => x.id === req.body.medId);
     if (!m) return res.status(404).json({ error: 'Dit medicijn staat er niet meer.' });
     m.gegeven = req.body.gegeven === false ? null : { datum: vandaagStr(), door: s.p.id, at: nu() };
     save();
@@ -81,9 +101,8 @@ module.exports = (ctx) => {
     if (!wat) return res.status(400).json({ error: 'Wat voor afspraak?' });
     if (!isDatum(req.body.datum)) return res.status(400).json({ error: 'Kies een datum.' });
     const tijd = /^\d{2}:\d{2}$/.test(req.body.tijd || '') ? req.body.tijd : '';
-    const h = bak(s.g, pid);
-    if (h.afspraken.length >= 60) return res.status(400).json({ error: 'Er staan al veel afspraken.' });
-    h.afspraken.push({ id: rid(3), wat: encS(wat), datum: req.body.datum, tijd, waar: encS(schoon(req.body.waar, 80)), door: s.p.id, at: nu() });
+    if (kijk(s.g, pid).afspraken.length >= 60) return res.status(400).json({ error: 'Er staan al veel afspraken.' });
+    bak(s.g, pid).afspraken.push({ id: rid(3), wat: encS(wat), datum: req.body.datum, tijd, waar: encS(schoon(req.body.waar, 80)), door: s.p.id, at: nu() });
     save();
     res.json({ ok: true });
   });

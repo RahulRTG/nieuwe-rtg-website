@@ -139,13 +139,14 @@
       "naam": "req.session",
       "soort": "sessie",
       "zetters": 2,
-      "bestanden": 208,
+      "bestanden": 217,
       "velden": [
         "account",
         "gast",
         "key",
         "naam",
         "sid",
+        "supplier",
         "tier"
       ]
     },
@@ -153,7 +154,7 @@
       "naam": "req.actor",
       "soort": "sessie",
       "zetters": 1,
-      "bestanden": 162,
+      "bestanden": 163,
       "velden": [
         "id",
         "lid",
@@ -169,7 +170,7 @@
       "naam": "req.techUser",
       "soort": "sessie",
       "zetters": 1,
-      "bestanden": 13,
+      "bestanden": 15,
       "velden": [
         "id",
         "password_hash"

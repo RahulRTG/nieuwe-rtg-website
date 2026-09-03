@@ -87,6 +87,8 @@ function sleutelVoor(methode, pad) {
    loopt is geen controle. */
 Object.assign(SLEUTELS,
   require('./idemsleutels-basis').SLEUTELS,
+  /* De isolatielaag: drie groepen, en het onderscheid staat in de kop daar. */
+  require('./idemsleutels-isolatie').SLEUTELS,
   require('./idemsleutels-werelden').SLEUTELS,
   require('./idemsleutels-geld').SLEUTELS,
   require('./idemsleutels-kosten').SLEUTELS,
@@ -100,6 +102,10 @@ Object.assign(SLEUTELS,
   require('./idemsleutels-proefronde').SLEUTELS,
   /* De tien uit de objectronde: het werkdossier van een onderzoek en drie erbuiten. */
   require('./idemsleutels-objectronde').SLEUTELS,
+  /* De beschermlaag, de knelpuntmotor, de ouderingang op de kinderopvang en de
+     bewijsmap (2 september 2026). Elf ervan LEZEN alleen, en dat is daar een
+     besluit en geen gat; zie de kop van dat bestand. */
+  require('./idemsleutels-bescherming').SLEUTELS,
   /* De restbak: de laatste 27 uit de bron verklaard (89a36fcac). Deze regel
      verdween in de samenvoeging van twaalf PR's (2 september 2026) en dertig
      verklaringen lagen ongelezen naast het register; het bestand exporteert

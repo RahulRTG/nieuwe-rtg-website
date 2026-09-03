@@ -104,12 +104,22 @@ app.post('/api/supplier/apply/chat/send', supplierAuth, (req, res) => {
 app.post('/api/supplier/vacature', supplierAuth, (req, res) => {
   if (!managerOnly(req, res)) return;
   const b = req.body || {};
-  const list = db.data.vacatures[req.supplier.code] = (db.data.vacatures[req.supplier.code] || []);
+  /* LEZEN, NIET SCHRIJVEN, en dat is de hele reparatie. Hier stond
+     `const list = db.data.vacatures[code] = (db.data.vacatures[code] || [])`:
+     een toewijzing, dus een zaak die nog nooit een vacature plaatste kreeg zijn
+     lege lijst al aangemaakt VOORDAT `vulVacature` de invoer had gekeurd. Een
+     verzoek dat daarna met een 400 werd afgewezen, liet dus toch een spoor na.
+     De staatproef ving dat als een gezakte ROLLBACK -- "geweigerd (status 400)
+     en de toestand veranderde toch: vacatures" -- en via VERTROUWEN.json en de
+     schorspoort werd die route met een 503 dichtgezet.
+     De lijst wordt nu pas VASTGEZET als er werkelijk iets bij komt. */
+  const list = db.data.vacatures[req.supplier.code] || [];
   const bestaand = b.id ? list.find(v => v.id === b.id) : null;
   const vac = bestaand || { id: crypto.randomBytes(4).toString('hex'), at: new Date().toISOString() };
   const ingevuld = vulVacature(vac, b, VAC_SOORTEN);
   if (ingevuld.error) return res.status(400).json({ error: ingevuld.error });
-  if (!bestaand) { list.unshift(vac); db.data.vacatures[req.supplier.code] = list.slice(0, 40); }
+  if (!bestaand) { list.unshift(vac); }
+  db.data.vacatures[req.supplier.code] = list.slice(0, 40);
   save();
   logActivity(req.supplier.code, req.actor, (bestaand ? 'wijzigde de vacature ' : 'plaatste een vacature ') + ingevuld.func);
   sseToSupplier(req.supplier.code, 'sync', { scope: 'team' });

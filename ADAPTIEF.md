@@ -108,6 +108,30 @@ staat zonder `telefoon:`. Kan een handeling niet zichtbaar zijn, dan krijgt hij
 een andere vorm — een lade, een paneel, een taakmodus. Weglaten is de fout waar
 deze hele laag tegen is.
 
+> **Verruimd op 2 september 2026: een generatief scherm mag KIEZEN.** De eigenaar
+> heeft besloten dat een AI de samenstelling van een scherm mag bepalen — welke
+> onderdelen verschijnen en in welke volgorde. Dat botst met deze regel zoals hij
+> hierboven staat, want componeren is per definitie ook weglaten.
+>
+> **Wat er verschuift is de VORM van de eis, niet de eis zelf.** Regel 1 bestaat
+> omdat een functie die stil verdwijnt niemand alarmeert; dat blijft waar, ook
+> als een model hem weglaat in plaats van een ontwerper. De regel wordt daarom:
+> een generatief scherm mag **ordenen, inklappen en naar een tweede laag
+> verplaatsen** — het mag een handeling niet ONBEREIKBAAR maken. Zichtbaar zijn
+> is niet de eis; bereikbaar zijn wel.
+>
+> **En daar hoort een handhaver bij, anders is dit een verzwakking met een
+> nette zin eromheen.** De oude grendel was `test/adaptief.test.js` op de
+> DECLARATIE; die kan een gegenereerd scherm niet zien. Wat ervoor in de plaats
+> moet: een meter `handelingenZonderVorm` die per rol de kortste weg naar elke
+> handeling meet in het scherm zoals het WERKELIJK is samengesteld, en die op
+> nul staat. `scripts/tikken.js` doet dat al voor schermen en `RTGAppMenu.functies()`
+> kent de handelingen per scherm — de twee moeten aan elkaar. Zolang die meter er
+> niet is, geldt regel 1 onverkort en mag er niets gegenereerd worden weggelaten.
+>
+> Dat is geen vertraging maar dezelfde volgorde als overal: eerst de meting, dan
+> de vrijheid. `TAKEN.md` 7.16 en 7.23.
+
 **2. Eén dominante laag tegelijk.** `RTGLagen` sluit wat er stond voordat hij iets
 nieuws opent. Twee laden over elkaar is de vorm waarin een mens niet meer weet
 waar "terug" heen gaat, en dan verlaat hij het scherm in plaats van de laag.

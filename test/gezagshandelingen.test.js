@@ -117,7 +117,16 @@ test('GRENS 3: niets in server/ importeert deze meter', () => {
       if (st.isDirectory()) { if (naam !== 'data' && naam !== 'node_modules') loop(p); continue; }
       if (!naam.endsWith('.js')) continue;
       let bron; try { bron = fs.readFileSync(p, 'utf8'); } catch (e) { continue; }
-      if (bron.includes('gezagshandelingen')) gevonden.push(path.relative(WORTEL, p));
+      /* EEN REQUIRE, EN NIET HET WOORD. Dit stond als `bron.includes(...)` en
+         zakte op 3 september 2026 op een COMMENTAARREGEL: de kop van
+         server/kern/handelingsklasse/risico.js noemt deze meter als de plek waar
+         dezelfde fout eerder is gemaakt (een lijst met patronen vergelijken op
+         hun tekst). Een verwijzing in een uitleg is geen aanroep, en een toets
+         die daar op zakt straft juist het opschrijven van een les af.
+
+         Wat hij WEL moet vangen staat er nu letterlijk: een require van dit
+         script. Dat is de vorm waarin hij een zesde gezagsschaal zou worden. */
+      if (/require\([^)]*gezagshandelingen/.test(bron)) gevonden.push(path.relative(WORTEL, p));
     }
   })(path.join(WORTEL, 'server'));
   assert.deepEqual(gevonden, [],

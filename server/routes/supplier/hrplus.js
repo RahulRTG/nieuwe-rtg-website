@@ -11,6 +11,22 @@ module.exports = (kern) => {
     if (!db.data[naam][code]) db.data[naam][code] = [];
     return db.data[naam][code];
   };
+  /* KIJKEN ZONDER SCHEPPEN, en dat onderscheid is hier geen netheid.
+
+     `bak()` zet het vak van een zaak neer zodra iemand ernaar vraagt. Op de weg
+     die werkelijk iets TOEVOEGT hoort dat ook zo; op elke andere weg is het
+     verkeerd. Wie een traject of een certificaat opzoekt dat niet bestaat krijgt
+     een 404, en dan hoort er niets achter te blijven -- anders zeggen de
+     statuscode en de database twee verschillende dingen over hetzelfde verzoek.
+
+     Bestaat het vak wel, dan geeft dit de ECHTE lijst terug en geen kopie: een
+     stap afvinken of een certificaat weghalen landt gewoon in de opslag.
+     Bestaat het niet, dan krijg je een lege lijst die nergens aan vastzit, en
+     dan loopt elke zoektocht dood op een nette 404. */
+  const kijk = (naam, code) => {
+    const vak = db.data[naam] && db.data[naam][code];
+    return Array.isArray(vak) ? vak : [];
+  };
   const rid = () => crypto.randomBytes(4).toString('hex');
   const txt = (v, n) => String(v == null ? '' : v).trim().slice(0, n);
   const INWERK = [
@@ -54,11 +70,10 @@ module.exports = (kern) => {
     if (!managerOnly(req, res)) return;
     const st = accounts.getStaffById(Number(req.body.staffId));
     if (!st || String(st.supplier_code).toUpperCase() !== req.supplier.code) return res.status(404).json({ error: 'Teamlid niet gevonden.' });
-    const lijst = bak('inwerk', req.supplier.code);
-    if (lijst.some(t => t.staffId === st.id && !t.klaarOp)) return res.status(409).json({ error: 'Er loopt al een inwerktraject.' });
+    if (kijk('inwerk', req.supplier.code).some(t => t.staffId === st.id && !t.klaarOp)) return res.status(409).json({ error: 'Er loopt al een inwerktraject.' });
     const traject = { id: rid(), staffId: st.id, name: st.name, gestart: new Date().toISOString(),
       stappen: INWERK.map(([fase, tekst]) => ({ id: rid(), fase, tekst, klaar: false })), klaarOp: null };
-    lijst.push(traject);
+    bak('inwerk', req.supplier.code).push(traject);
     save();
     logActivity(req.supplier.code, req.actor, 'startte het inwerktraject van ' + st.name);
     sseToSupplier(req.supplier.code, 'sync', { scope: 'hr' });
@@ -67,7 +82,7 @@ module.exports = (kern) => {
 
   app.post('/api/supplier/hr/inwerk/stap', supplierAuth, (req, res) => {
     if (!managerOnly(req, res)) return;
-    const t = bak('inwerk', req.supplier.code).find(x => x.id === req.body.trajectId);
+    const t = kijk('inwerk', req.supplier.code).find(x => x.id === req.body.trajectId);
     if (!t) return res.status(404).json({ error: 'Traject niet gevonden.' });
     const tekst = txt(req.body.tekst, 120);
     const fase = ['dag1', 'week1', 'maand1'].includes(req.body.fase) ? req.body.fase : 'week1';
@@ -80,7 +95,7 @@ module.exports = (kern) => {
   });
 
   app.post('/api/supplier/hr/inwerk/vink', supplierAuth, (req, res) => {
-    const t = bak('inwerk', req.supplier.code).find(x => x.id === req.body.trajectId);
+    const t = kijk('inwerk', req.supplier.code).find(x => x.id === req.body.trajectId);
     if (!t) return res.status(404).json({ error: 'Traject niet gevonden.' });
     if (!magZien(req, t.staffId)) return res.status(403).json({ error: 'Alleen management of de medewerker zelf.' });
     const s = t.stappen.find(x => x.id === req.body.stapId);
@@ -133,7 +148,7 @@ module.exports = (kern) => {
 
   app.post('/api/supplier/hr/certificaat/weg', supplierAuth, (req, res) => {
     if (!managerOnly(req, res)) return;
-    const lijst = bak('certificaten', req.supplier.code);
+    const lijst = kijk('certificaten', req.supplier.code);
     const i = lijst.findIndex(c => c.id === req.body.id);
     if (i < 0) return res.status(404).json({ error: 'Certificaat niet gevonden.' });
     lijst.splice(i, 1);

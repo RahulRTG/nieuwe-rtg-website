@@ -180,16 +180,13 @@ function maakRouter() {
   router._handle = handle;
   router._routes = function (voorvoegsel) { return leesLagen(lagen, voorvoegsel || ''); };
 
+  // Een array van paden wordt een laag per pad.
   router.use = function (arg0, ...rest) {
-    if (typeof arg0 === 'string') {
-      for (const fn of rest) {
-        if (typeof fn !== 'function') continue;
-        lagen.push({ method: null, mount: true, prefix: arg0, fn, fout: fn.length === 4 });
-      }
-    } else {
-      for (const fn of [arg0, ...rest]) {
-        if (typeof fn !== 'function') continue;
-        lagen.push({ method: null, mount: true, prefix: '/', fn, fout: fn.length === 4 });
+    const pn = typeof arg0 === 'string' ? [arg0]
+      : Array.isArray(arg0) && arg0.length && arg0.every(x => typeof x === 'string') ? arg0 : null;
+    for (const prefix of pn || ['/']) {
+      for (const fn of (pn ? rest : [arg0, ...rest])) {
+        if (typeof fn === 'function') lagen.push({ method: null, mount: true, prefix, fn, fout: fn.length === 4 });
       }
     }
     indexWeg();

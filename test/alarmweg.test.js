@@ -184,3 +184,39 @@ test('6. een fout-storm gaat er niet ongetemperd doorheen', async () => {
     assert.equal(o.binnen.length, 2, 'de tempering geldt per vingerafdruk, niet globaal');
   } finally { o.stop(); }
 });
+
+/* ============================================================================
+   EN WAT DE KEURING ERVAN ZEGT -- want de vorige helft van dit bestand gaat over
+   de melder, en dit over de BELOFTE eromheen.
+
+   Sinds 3 september 2026 hangt het alarm van server/kern/command/alarm.js op
+   dezelfde melder (TAKEN.md 7.12). Daarmee verandert wat een lege
+   ERR_WEBHOOK_URL betekent: het gaat niet langer alleen over uitzonderingen maar
+   over ELK alarm -- SLO, journaalketen, canary -- dat dan binnen het huis blijft.
+   Die zin hoort in de waarschuwing te staan, want een beheerder die hem leest
+   moet weten wat hij precies mist.
+
+   De tweede is de gevaarlijkste en bestond nog niet: een url die er WEL staat
+   maar door de SSRF-keuring wordt geweigerd. Dan gooit server/foutmelder.js hem
+   bij het opstarten weg, staat er op het techniekbord "externe alarmering" en
+   gaat er niets naar buiten. Dat is geen waarschuwing maar een fout: de belofte
+   op het scherm klopt niet meer.
+   ========================================================================== */
+test('7. de productiekeuring zegt WAT je mist zonder webhook, en weigert een url die nooit werkt', () => {
+  const { keur } = require('../server/config/productie');
+  const doe = (env) => { const f = [], w = []; keur(Object.assign({ NODE_ENV: 'production' }, env), f, w); return { f, w }; };
+
+  const leeg = doe({});
+  const wLeeg = leeg.w.filter(x => /ERR_WEBHOOK_URL/.test(x));
+  assert.equal(wLeeg.length, 1, 'precies EEN waarschuwing over de lege uitgang, niet twee op twee plekken');
+  assert.match(wLeeg[0], /ALARM/, 'en hij zegt dat ook het alarm binnen blijft, niet alleen de uitzonderingen');
+
+  const geweigerd = doe({ ERR_WEBHOOK_URL: 'http://127.0.0.1:9000/hook' });
+  const fout = geweigerd.f.filter(x => /ERR_WEBHOOK_URL/.test(x));
+  assert.equal(fout.length, 1, 'een geweigerde url is een FOUT en geen waarschuwing: ' + JSON.stringify(geweigerd.f.slice(0, 3)));
+  assert.match(fout[0], /NIETS naar buiten/, 'met wat het gevolg is, niet alleen dat hij is afgekeurd');
+
+  const goed = doe({ ERR_WEBHOOK_URL: 'https://hooks.slack.com/services/abc' });
+  assert.equal(goed.f.filter(x => /ERR_WEBHOOK_URL/.test(x)).length, 0, 'een geldige url geeft geen fout');
+  assert.equal(goed.w.filter(x => /ERR_WEBHOOK_URL/.test(x)).length, 0, 'en ook geen waarschuwing');
+});

@@ -365,6 +365,12 @@ const PUBLIEK = new Map([
   ['GET /api/stad/algoritmes', 'idem'],
   ['POST /api/stad/besluiten', 'het besluitenregister: fracties stemmen met zetels, er staat geen persoon in'],
   ['GET /api/stad/besluiten', 'idem'],
+  /* De voordeur van de beschermzaak. Alleen deze ene van de vier komt hier
+     terecht: de andere drie geven zonder een geldig lijf een 400 of 404 en zijn
+     voor deze trede dus geen "geslaagd antwoord". Dat is geen verschil in
+     bedoeling -- alle vier staan met reden in scripts/lib/publiek.js -- maar in
+     wat de dwaler kan waarnemen. */
+  ['POST /api/bescherming/deur/steden', 'alleen de NAMEN van plaatsen die een beschermzaak kunnen oppakken. Geen enkel getal en geen enkele zaak, en met opzet zonder inlog: wie hier aanklopt heeft vaak geen account, en een deur die eerst een account vraagt is voor die mens geen deur'],
   ['POST /api/rtfos/publiek/steden', 'de buurt zonder code; getemperd'],
   ['POST /api/rtfos/publiek/campagnes', 'idem'],
   ['POST /api/rtfos/publiek/jaarverslagen', 'de ANBI-publicatie -- openbaar, want anders is het geen publicatie'],

@@ -42,7 +42,7 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
-const { stempel, eisSchoneBoom, versheid, nuCommit } = require('./lib/stempel');
+const { stempel, stempelVan, eisSchoneBoom, versheid, nuCommit } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'VERTROUWEN.json');
@@ -58,7 +58,11 @@ const HALFWAARDETIJD_DAGEN = 30;
    dat ontbreekt telt niet mee (de matrix zet die cellen dan al op ongemeten,
    en dat is de straf -- twee keer straffen zou dubbel tellen). */
 const BRONNEN = ['POORTWACHT.json', 'ROLPROEF.json', 'KETENS.json', 'INVOERPROEF.json',
-  'IDEMPROEF.json', 'STAATPROEF.json', 'OUTPUTPROEF.json', 'AUDITPROEF.json'];
+  'IDEMPROEF.json', 'STAATPROEF.json', 'OUTPUTPROEF.json', 'AUDITPROEF.json',
+  /* Deze twee stonden er niet terwijl de matrix ze wel leest. Ze droegen ook geen
+     stempel, dus ze hadden hier hoe dan ook niets bijgedragen -- twee gaten die
+     elkaar dekten. */
+  'HANDELINGPROEF.json', 'UITVOERPROEF.json'];
 
 /* De staat van EEN route, uit zijn elf cellen en de ouderdom van het bewijs.
    Pure functie: de toets voert hem elke overgang (LAT.md regel 10), en wie de
@@ -66,7 +70,7 @@ const BRONNEN = ['POORTWACHT.json', 'ROLPROEF.json', 'KETENS.json', 'INVOERPROEF
 
    `cellen` is het object uit een matrixrij: { AUTH: { staat: 'bewezen' }, .. }
    `ouderdomDagen` is een getal; NaN of undefined is een gezakte meting. */
-function staatVan(cellen, ouderdomDagen, halfwaardetijd) {
+function staatVan(cellen, ouderdomDagen, halfwaardetijd, onreproduceerbaar) {
   if (!cellen || typeof cellen !== 'object' || !Object.keys(cellen).length) {
     throw new Error('een route zonder cellen heeft geen staat; dit is een gezakte meting en geen ongemeten');
   }
@@ -104,6 +108,30 @@ function staatVan(cellen, ouderdomDagen, halfwaardetijd) {
         ' dagen oud (halfwaardetijd ' + hw + '); het spreekt over een vorige wereld',
       heropent: 'draai de proeven opnieuw; het bewijs zelf is niet in twijfel, alleen zijn leeftijd' };
   }
+  /* HET LAATSTE FILTER, EN HET WORDT NIET GEHAALD DOOR OUDERDOM MAAR DOOR
+     HERKOMST. Een bronregister dat is gemeten terwijl er ongecommitte CODE in de
+     boom stond, hoort niet bij de commit die in zijn stempel staat -- hij hoort
+     bij iets wat nergens is vastgelegd. Zo'n meting is niet na te lopen, en wat
+     niemand kan overdoen is geen bewijs (TAKEN.md 7.3).
+
+     HIJ ZAKT NAAR `verschaald` EN NIET NAAR `geschorst`, en dat is een besluit.
+     De meting is niet FOUT -- er is wel degelijk iets gemeten, en waarschijnlijk
+     klopt het -- hij is alleen onreproduceerbaar. Dat is precies wat `verschaald`
+     betekent in PROOF.md par. 2: het bewijs zelf is niet in twijfel, alleen de
+     waarde die je eraan mag hechten. Een route hierop schorsen zou de
+     schorspoort dichttrekken op een boekhoudkundig gebrek, en dat is geen
+     veiligheid maar een storing.
+
+     De namen gaan mee in de reden. "Het bewijs is onreproduceerbaar" zonder te
+     zeggen WELKE meting, stuurt de lezer op een zoektocht die de meter zelf al
+     had kunnen afsluiten. */
+  const vuil = Array.isArray(onreproduceerbaar) ? onreproduceerbaar.filter(Boolean) : [];
+  if (vuil.length) {
+    return { staat: 'verschaald',
+      reden: 'het bewijs is compleet en vers, maar ' + vuil.length + ' bronregister(s) zijn gemeten ' +
+        'met ongecommitte code in de boom en dus niet na te lopen: ' + vuil.join(', '),
+      heropent: 'commit de code en meet opnieuw; een meting hoort bij de commit die in zijn stempel staat' };
+  }
   return { staat: 'bewezen',
     reden: 'alle schakels dragen bewijs en de meting is ' + Math.round(ouderdomDagen) + ' dag(en) oud',
     heropent: 'dit vervalt zodra een cel zakt, een schakel zijn bewijs verliest, of de meting ouder ' +
@@ -112,11 +140,11 @@ function staatVan(cellen, ouderdomDagen, halfwaardetijd) {
 
 /* Alle routes: de matrixrijen door de staatmachine. Losgetrokken van meet()
    zodat de toets hem verzonnen rijen kan voeren zonder de echte registers. */
-function bereken(rijen, ouderdomDagen, halfwaardetijd) {
+function bereken(rijen, ouderdomDagen, halfwaardetijd, onreproduceerbaar) {
   const telling = { bewezen: 0, verschaald: 0, verzwakt: 0, geschorst: 0, ongemeten: 0 };
   const perRoute = {};
   for (const rij of rijen) {
-    const uit = staatVan(rij.cellen, ouderdomDagen, halfwaardetijd);
+    const uit = staatVan(rij.cellen, ouderdomDagen, halfwaardetijd, onreproduceerbaar);
     telling[uit.staat]++;
     perRoute[rij.methode + ' ' + rij.pad] = uit;
   }
@@ -130,21 +158,33 @@ function bereken(rijen, ouderdomDagen, halfwaardetijd) {
 function ouderdom(nu, lees) {
   const lezer = lees || ((naam) => fs.readFileSync(path.join(WORTEL, naam), 'utf8'));
   const bronnen = {};
+  const vuil = [];
   let oudste = null;
   for (const naam of BRONNEN) {
-    let j;
-    try { j = JSON.parse(lezer(naam)); } catch (e) { continue; }
-    const op = j && j.stempel && j.stempel.op;
+    /* VIA DE GEDEELDE LEZER, want hier stond `j.stempel && j.stempel.op` en dat
+       kent maar EEN van de twee stempelvormen. POORTWACHT.json draagt de zijne
+       onder `gemeten` en viel daardoor stilzwijgend buiten deze berekening -- het
+       OUDSTE register van de stapel, in de meter die juist over ouderdom gaat. */
+    let st;
+    if (lees) { let j; try { j = JSON.parse(lezer(naam)); } catch (e) { continue; }
+      st = j && (j.stempel || (j.gemeten && j.gemeten.op ? j.gemeten : null)); }
+    else st = stempelVan(naam);
+    const op = st && st.op;
     if (!op) continue;
     const dagen = (nu - new Date(op).getTime()) / 86400000;
-    bronnen[naam] = { op, dagen: Math.round(dagen * 10) / 10 };
+    bronnen[naam] = { op, dagen: Math.round(dagen * 10) / 10, boomVuil: st.boomVuil === true };
+    /* `boomVuil: null` is met opzet GEEN vuil: dat betekent dat git niet te
+       bevragen was, en onbekend als vuil lezen zou elke meting buiten een
+       repo onbruikbaar maken. Onbekend hoort hier niet zwaarder te wegen dan
+       gemeten -- maar ook niet lichter, en daarom staat het er wel bij. */
+    if (st.boomVuil === true) vuil.push(naam);
     if (oudste === null || dagen > oudste) oudste = dagen;
   }
   if (oudste === null) {
     throw new Error('geen enkel bronregister draagt een stempel; dan is de versheid niet te meten ' +
       'en is dit een gezakte meting, geen verse');
   }
-  return { dagen: oudste, bronnen };
+  return { dagen: oudste, bronnen, onreproduceerbaar: vuil };
 }
 
 function meet() {
@@ -154,7 +194,7 @@ function meet() {
       'halve routelijst is gevaarlijker dan geen');
   }
   const oud = ouderdom(Date.now());
-  const uit = bereken(matrix.rijen, oud.dagen, HALFWAARDETIJD_DAGEN);
+  const uit = bereken(matrix.rijen, oud.dagen, HALFWAARDETIJD_DAGEN, oud.onreproduceerbaar);
   return {
     stempel: stempel(),
     uitleg: 'De vervalstaat per route (PROOF.md par. 2): bewezen, verschaald, verzwakt, geschorst of ' +
@@ -167,6 +207,10 @@ function meet() {
     halfwaardetijdDagen: HALFWAARDETIJD_DAGEN,
     ouderdomDagen: Math.round(oud.dagen * 10) / 10,
     bronnen: oud.bronnen,
+    /* Welke bronnen niet zijn na te lopen, apart en met naam: dit is de reden
+       waarom er geen enkele route op `bewezen` kan staan, en die reden hoort in
+       het register te staan en niet alleen in de tekst per route. */
+    onreproduceerbaar: oud.onreproduceerbaar,
     routes: matrix.routes,
     telling: uit.telling,
     perRoute: uit.perRoute
@@ -217,8 +261,8 @@ function poortVoorSchrijven(watIsHet) {
 
   /* EEN SCHONE BOOM IS NIET GENOEG -- DE BRONNEN MOETEN OOK BIJ DEZE BOOM HOREN.
 
-     Dit register LEIDT AF uit acht proefregisters. Die dragen elk hun eigen
-     stempel, en die kan van een heel andere versie van de code zijn. Op
+     Dit register LEIDT AF uit de proefregisters in BRONNEN. Die dragen elk hun
+     eigen stempel, en die kan van een heel andere versie van de code zijn. Op
      1 september 2026 gebeurde precies dat: ROLPROEF.json was gemeten op
      5dc3b081, twee uur voordat de twee lijsten van publieke routes werden
      samengevoegd. De ACL-cellen kenden die lijst dus niet, en /api/auth/forgot
@@ -238,9 +282,16 @@ function poortVoorSchrijven(watIsHet) {
   const nu = nuCommit();
   const oud = [];
   for (const bron of BRONNEN) {
-    let j = null;
-    try { j = JSON.parse(fs.readFileSync(path.join(WORTEL, bron), 'utf8')); } catch (e) { continue; }
-    const v = versheid(j.stempel, nu);
+    /* Via dezelfde lezer als ouderdom() hierboven: hier stond `j.stempel`, en
+       dat kent maar een van de twee stempelvormen. POORTWACHT.json draagt de
+       zijne onder `gemeten` en zou hier dus als "geen stempel" zijn geweigerd
+       -- niet omdat hij oud was, maar omdat deze poort hem niet kon lezen.
+       `undefined` is "het bestand is er niet" en telt niet mee, precies zoals
+       ouderdom() een ontbrekend register overslaat; `null` is "wel een
+       bestand, geen stempel" en dat weigert versheid() met de reden erbij. */
+    const st = stempelVan(bron);
+    if (st === undefined) continue;
+    const v = versheid(st, nu);
     if (!v.vers) oud.push(bron + ' -- ' + v.reden);
   }
   if (oud.length) {

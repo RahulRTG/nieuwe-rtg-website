@@ -21,6 +21,18 @@ const REGELS = [
   [/office\/regering|\/rijksloket|\/defensie/, 'regering', 'Het Regeringskantoor'],
   [/office\/opvang/, 'opvang', 'Opvang & migratie'],
   [/office\/balie|\/ledenregister/, 'balie', 'De Ledenbalie'],
+  /* RTG SERVICE HOORT BIJ DE KLANTENSERVICE, en dat moest hier staan: zonder
+     deze regel viel de hele hulplijn terug op "Onderzoek & data", en die
+     terugval bestaat juist om te voorkomen dat onbekend werk stilletjes ergens
+     belandt (zie de kop van ../magnaat-kantoorregels.js). Hij staat VOOR de
+     brede office- en ledenregels hieronder, want /api/office/service/* is
+     servicewerk en geen kantoorwerk -- en de volgorde is hier gedrag.
+
+     Het ondertitelen staat er los bij: die deur wordt door ELK gesprek in dit
+     huis gebruikt en niet alleen door de hulplijn, maar hij is wel in dezelfde
+     ronde en met hetzelfde doel gebouwd (SERVICE.md par. 13d). */
+  [/\/api\/service\b|\/service\/(?:zaak|bevestig|machtiging|gesprek|kanalen)|service-bel|leverancier-service|\/service\.html/, 'klantenservice', 'Klantenservice'],
+  [/\/api\/ondertiteling\b/, 'klantenservice', 'Klantenservice'],
   [/office\/redactie|\/redactie|\/krant|\/nieuws/, 'redactie', 'RTG Redactie'],
   [/office\/atelier(?:web)?|\/atelier/, 'atelier', 'RTG Atelier'],
   [/office\/studio|\/studio/, 'studio', 'RTG Ontwerpstudio'],
@@ -70,10 +82,21 @@ const REGELS = [
      niet, dekt de helft en meldt zich niet. */
   [/\/api\/tenant\/(?:export|herstelproef|status)/, 'juridisch', 'Juridisch'],
   [/\/api\/tenant(?:\/|$)/, 'intern', 'Intern & IT'],
+  /* SCIM (routes/scim.js) is de deur waar de IdP van een klant zelf accounts
+     aanmaakt en uitzet: toegangsbeheer, dezelfde familie als de bootstrap. */
+  [/\/api\/scim(?:\/|$)/, 'intern', 'Intern & IT'],
   [/office\/(?:aidata)|\/belastingkantoor|\/loonstrook/, 'financien', 'Financiën'],
   [/office\/wereld|\/wereld\b/, 'controleregister', 'RTG Controleregister'],
   [/\/api\/office\b|\/kantoor\/gesprek|\/living-os|\/scherm\.html|\/app\.html/, 'intern', 'Intern & IT'],
-  [/\/techniek|\/wacht|\/incident|\/storing/, 'techniek', 'Techniek & De Wacht'],
+  /* ISOLATIE HOORT BIJ DEZELFDE HAND ALS DE INCIDENTCONTROLE, en dat is geen
+     naamsgelijkenis maar de opzet: kern/isolatie/ leest zijn huisstand uit de
+     incidentcontrole en de cockpit staat achter dezelfde deur (techAuth,
+     eigenaarAlleen). De ledenkant valt er ook onder -- wie een gestolen sessie
+     dichtzet doet incidentwerk, ook als hij het over zijn eigen account doet.
+     Zonder deze regel viel de hele laag in de terugval "Onderzoek & data", en
+     die terugval is met opzet rood: onbekend werk hoort niet stilletjes een
+     eigenaar te krijgen. */
+  [/\/techniek|\/wacht|\/incident|\/storing|[/-]isolatie/, 'techniek', 'Techniek & De Wacht'],
   /* RTG Link (LINK.md): de adres- en capabilitylaag. Hij hoort bij Intern & IT,
      bij de familie waar hij thuishoort -- codes, scanners, sleutels, identiteit
      (zie de platformregel verderop met /code, /scanner en /rtgid).
@@ -89,37 +112,11 @@ const REGELS = [
      De volle toetssuite wees dat aan (test/kantoren.test.js, acht gaten).
      Het patroon liet eerst een schuine streep NA `link` vallen, waardoor
      /api/link zelf erbuiten viel; /api/linkkaart matcht nog steeds niet. */
-  [/(?:^|\/)link(?:\/|$)/, 'intern', 'Intern & IT'],
-
-  /* DE ZELFBEDIENINGSLAAG VAN HET LID -- /api/mijn en de mijn-schermen.
-
-     Kwam mee met de samenvoeging en viel met tweeentwintig punten op de
-     restpost: vier werkprocesfamilies, veertien API-deuren en vier schermen.
-     Dat is precies de reden dat de terugval rood is en niet stil groen --
-     onbekend werk hoort niet bij Onderzoek te belanden, en hier ging het om de
-     laag waar een lid zijn wachtwoordherstel, zijn tweefactor en zijn
-     toestemmingen beheert.
-
-     HET ZIJN TWEE FAMILIES EN GEEN EEN, dus staan er twee regels. Ze bij elkaar
-     vegen zou korter zijn en onwaar: wie de tweefactor van een lid beheert doet
-     ander werk dan wie zijn toestemmingen beheert, en het controleregister is
-     er juist om die vraag te kunnen stellen.
-
-       beveiliging  tweefactor, sessies, herstelkanaal -- dezelfde familie als
-                    /login, /logout en /api/auth/tweede, die hierboven al bij
-                    Intern & IT liggen.
-       zeggenschap  gegevens, post (afmelden en voorkeuren) en relaties --
-                    dezelfde familie als /api/privacy, /api/toestemming en
-                    /api/inzagekaart, die alle drie bij Juridisch liggen.
-
-     De schermen (/apps/mijn-*.html) staan in hetzelfde patroon als hun routes,
-     om de reden die een paar regels hierboven bij routedekking staat: losse
-     regels lopen na een hernoeming uit elkaar, en dan hangt het scherm ergens
-     anders dan de deur die het bedient. */
-  [/(?:^|\/)mijn[-/](?:tweefactor|sessies|herstelkanaal)/, 'intern', 'Intern & IT'],
-  [/(?:^|\/)mijn[-/](?:gegevens|post|relaties)/, 'juridisch', 'Juridisch'],
+  [/(?:^|\/)link(?:\/|$)/, 'intern', 'Intern & IT']
 ];
 
-/* En de brede domeinen erachteraan: zie ./tabel-breed.js. De volgorde is
-   gedrag, dus deze twee lijsten worden geplakt en niet apart doorzocht. */
-module.exports = REGELS.concat(require('./tabel-breed'));
+/* Daarachter de ledenlaag (./tabel-lid.js), de HDI-laag (./tabel-hdi.js) en
+   dan de brede domeinen (./tabel-breed.js). De volgorde is gedrag, dus deze
+   vier lijsten worden geplakt en niet apart doorzocht: smal voor breed, en de
+   brede het laatst. */
+module.exports = REGELS.concat(require('./tabel-lid'), require('./tabel-hdi'), require('./tabel-breed'));

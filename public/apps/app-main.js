@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '7c919501';
+var RTG_BOUW = '04be3a1c';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -2206,14 +2206,15 @@ var RTG_BOUW = '7c919501';
   let csMee = null;       // de tekstbaan van het gesprek (shared/meelezen.js)
 
   /* MEELEZEN. Zonder tekstbaan kan wie doof is niet meedoen aan een gesprek in
-     dit huis (TOEGANKELIJK.md). Wat erin staat is getypt door een mens en niet
-     uit spraak herkend -- zie de kop van /shared/meelezen.js voor waarom hier
-     geen automatische ondertiteling in zit. */
+     dit huis (TOEGANKELIJK.md). Getypt EN, waar een lokaal model draait,
+     herkend uit de eigen stem -- zie /shared/meelezen.js en /shared/meeluister.js. */
   function csBaan(){
     if (csMee || !window.RTGMeelezen) return csMee;
-    csMee = window.RTGMeelezen.maak({ stuur: r => {
-      if (call) API.call('/member/call', { toKey: call.withKey, kind: 'tekst', payload: { r } }).catch(()=>{});
-    } });
+    csMee = window.RTGMeelezen.maak({
+      stroom: () => (call && call.stream) || null,
+      stuur: r => {
+        if (call) API.call('/member/call', { toKey: call.withKey, kind: 'tekst', payload: { r } }).catch(()=>{});
+      } });
     csMee.el.style.cssText += 'position:absolute;left:12px;right:12px;bottom:96px;z-index:4;color:#F7F5F1;';
     const scherm = $('#callScreen'); if (scherm) scherm.appendChild(csMee.el);
     return csMee;
@@ -4218,6 +4219,11 @@ var RTG_BOUW = '7c919501';
        geinstalleerde PWA komt nog steeds uit waar hij hoort. */
     ik:          { naam: 'Wie ben ik',   url: '/apps/ik.html' },
     veilig:      { naam: 'RTG Veilig',   url: '/apps/veilig.html' },
+    /* ACCOUNTbescherming en niet "Bescherming": `veilig` hierboven is de
+       veiligheid van een MENS (stil alarm, codewoord), dit die van een ACCOUNT.
+       Twee tegels die allebei "bescherming" heten, laten een lid op het
+       verkeerde moment op de verkeerde drukken. */
+    bescherming: { naam: 'Accountbescherming', url: '/apps/mijn-isolatie.html' },
     ov:          { naam: 'Openbaar vervoer',           url: '/apps/ov.html' },
     stad:        { naam: 'Stad',    url: '/apps/stad.html' },
     clips:       { naam: 'Video',        url: '/apps/clips.html' },
@@ -4357,6 +4363,12 @@ var RTG_BOUW = '7c919501';
      tekenlaag aan te raken -- en zodat hier staat waarom hij leeg is. */
   const FUNCTIES = [];
 
+  /* Afgesplitst van app-main-24.js, dat over de 10 KB ging toen er een tegel
+     bijkwam. De snede loopt langs een echte grens: hierboven staat WAT er is
+     (de registry van alle apps), hieronder WAAR het hangt (de mappen), en hier
+     ertussen staat waarom die mappen zo werken. Dat het maar een blok
+     commentaar is, maakt het niet minder de juiste plek -- de uitleg hoort bij
+     de MAPPEN in app-main-24a2.js en niet bij de registry ervoor. */
   /* ---------- de mappen, boven de klok ----------
      Vier mappen, en daar zit alles in waar je pas je recht op geeft. Niets
      installeren: het staat er al. Wil je iets niet zien, dan zet je het uit
@@ -4463,7 +4475,8 @@ var RTG_BOUW = '7c919501';
        in de voet. Vandaar `paneel`: geen vijfde wereldtegel, geen tweede
        instellingenscherm. wereldBij() in 29c filtert deze map er vanzelf uit. */
     { sleutel: 'map-instellingen', naam: 'Instellingen', paneel: '#osCcBtn', items: [
-      'link:ik', 'link:veilig', 'link:passkeys', 'link:sessies', 'link:relaties', 'link:gegevens', 'link:post', 'link:juridisch'] },
+      'link:ik', 'link:veilig', 'link:passkeys', 'link:bescherming',
+      'link:sessies', 'link:relaties', 'link:gegevens', 'link:post', 'link:juridisch'] },
     /* WORKOS IS EEN CONTEXT EN GEEN PRODUCT MET EEN PRIJS. De naam ging van
        "RTG Kantoor" naar WorkOS omdat er twee verschillende toegangsmodellen in
        dezelfde wereld wonen, en die verschillen mogen de wereld niet splitsen:
@@ -9632,28 +9645,9 @@ var RTG_BOUW = '7c919501';
       const offer = await pc.createOffer();
       await pc.setLocalDescription(offer);
       await API.call('/ontmoeten/signaal', { dateId, payload: { sdp: pc.localDescription } });
-      sosTekstStart(dateId);
     } catch(e){ /* camera geweigerd of niet beschikbaar: de SOS zelf is al binnen */ }
   }
-  /* LIVE TEKST BIJ EEN SOS (TAKEN.md 4.31), als enige van de acht zonder tik.
-     Het lid gaf bij het veiligheidscontract al toestemming dat kantoor meekijkt
-     EN meeluistert (`audio: true` hierboven), dus dezelfde stem als tekst geeft
-     niets weg wat er niet al heen ging -- en een noodscherm is geen plek voor
-     een tweede tik. Aan de andere kant kon een dove medewerker geen SOS-dienst
-     draaien. Zelfde seinkanaal als het beeld; kan het toestel het niet, dan
-     gebeurt er niets.*/
-
-  let ontmoetSosTekst = null;
-  function sosTekstStart(dateId){
-    const S = window.RTGSpraakTekst;
-    if (!S || !S.beschikbaar() || ontmoetSosTekst) return;
-    ontmoetSosTekst = S.maak({ opRegel: (r) => {
-      API.call('/ontmoeten/signaal', { dateId, payload: { tekst: r } }).catch(() => {}); } });
-    ontmoetSosTekst.start();
-  }
-  function sosTekstStop(){ if (ontmoetSosTekst){ try { ontmoetSosTekst.stop(); } catch(e){} ontmoetSosTekst = null; } }
   function ontmoetSosStop(){
-    sosTekstStop();
     if (ontmoetSosPc){ try { ontmoetSosPc.getSenders().forEach(s => s.track && s.track.stop()); ontmoetSosPc.close(); } catch(e){} ontmoetSosPc = null; ontmoetSosDate = null; }
   }
   // antwoord van RTG-kantoor op ons SOS-beeld (WebRTC-signaal)

@@ -54,10 +54,16 @@ module.exports = (sctx) => {
   const P = (w) => { if (!w.handelplannen) w.handelplannen = {}; return w.handelplannen; };
   const B = (w) => { if (!w.actiebonnen) w.actiebonnen = []; return w.actiebonnen; };
 
+  /* KIJKEN ZONDER NEERZETTEN. P() zet de plannenla neer zodra iemand ernaar
+     VRAAGT, ook als dat eindigt in een 404 of een 400 -- en dan zegt de
+     statuscode iets anders dan de werkruimte. Bestaat de la wel, dan is dit hem
+     ECHT. Neerzetten doet P(), pas waar er een voornemen bij komt. */
+  const Pkijk = (w) => (w && w.handelplannen && typeof w.handelplannen === 'object') ? w.handelplannen : {};
+
   /* Verlopen voornemens opruimen bij elke aanraking. Een plannenlijst die
      alleen groeit, is een lijst met geheimen die niemand meer bekijkt. */
   function veeg(w) {
-    const p = P(w);
+    const p = Pkijk(w);
     const grens = klokNu() - GELDIG_MS;
     for (const id of Object.keys(p)) if (Date.parse(p[id].at) < grens) delete p[id];
   }
@@ -124,7 +130,7 @@ module.exports = (sctx) => {
   app.post('/api/bedrijf/handeling/doe', (req, res) => {
     const g = werkPoort(req, res); if (!g) return;
     veeg(g.w);
-    const plan = eigenVeld(P(g.w), String(req.body.planId || ''));
+    const plan = eigenVeld(Pkijk(g.w), String(req.body.planId || ''));
     if (!plan) return res.status(404).json({ error: 'Dit voornemen bestaat niet meer. Voornemens verlopen na ' + (GELDIG_MS / 60000) + ' minuten; maak een nieuw plan.' });
 
     const eigen = plan.lidId === (g.l ? g.l.id : null);

@@ -133,8 +133,8 @@
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
-<script src="/shared/spraaktekst.js"></script>
 <script src="/shared/meelezen.js"></script>
+<script src="/shared/meeluister.js"></script>
 <script src="/shared/media.js"></script>
 <link href="/shared/ios.css" rel="stylesheet">
 <link rel="stylesheet" href="premium.css">
@@ -986,7 +986,9 @@ function belUI(open){ $('#belOv').classList.toggle('open', !!open); if(!open){ $
 let belMee = null;
 function belMeeBaan(){
   if(belMee || !window.RTGMeelezen) return belMee;
-  belMee = window.RTGMeelezen.maak({ stuur: r => { if(call) belSein(call.met,'tekst',{payload:{r}}); } });
+  belMee = window.RTGMeelezen.maak({
+    stroom: () => (call && call.stream) || null,
+    stuur: r => { if(call) belSein(call.met,'tekst',{payload:{r}}); } });
   const vak = $('#belOv'); if(vak) vak.appendChild(belMee.el);
   return belMee;
 }

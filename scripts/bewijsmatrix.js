@@ -117,7 +117,23 @@ const STAAT = (argv.find(a => a.startsWith('--staat=')) || '').slice(8) || inWor
    het routejournaal van de gewone suite; zie scripts/outputproef.js en
    scripts/auditproef.js voor wat hun oordelen betekenen en waar ze ophouden. */
 const OUTPUT = (argv.find(a => a.startsWith('--output=')) || '').slice(9) || inWortel('OUTPUTPROEF.json');
-const AUDITP = (argv.find(a => a.startsWith('--audit=')) || '').slice(8) || inWortel('AUDITPROEF.json');
+const IDEMBESLUIT = (argv.find(a => a.startsWith('--idembesluit=')) || '').slice(14) || inWortel('IDEMBESLUIT.json');
+const ROLLBACKBESLUIT = (argv.find(a => a.startsWith('--rollbackbesluit=')) || '').slice(18) || inWortel('ROLLBACKBESLUIT.json');
+/* `AUDITP` STOND HIER, EN HET WAS DEZELFDE REGEL ALS `AUDIT` HIERBOVEN -- zelfde
+   vlag, zelfde bestand, andere naam. Twee lezers van een waarheid (LAT.md regel
+   4), en de zwakste won: `AUDITP` ging door `objectRegister()`, die NULL geeft
+   zodra `perRoute` een array is, en dat is hij in AUDITPROEF.json. Zo bleef de
+   AUDIT-kolom op 0 staan terwijl het register 860 bewezen routes droeg. Zie de
+   uitleg bij de AUDIT-tak hieronder.
+
+   WAT DIE REGEL WEL BEDOELDE, heeft nu een eigen bestand. scripts/auditproef.js
+   (de journaalproef, perRoute als OBJECT met een veld `staat`) schrijft sinds
+   de splitsing AUDITPROEF-JOURNAAL.json, zodat hij het register van de
+   routeproef niet meer overschrijft. Die object-vorm werd hier gelezen -- zodra
+   hij op schijf lag -- en dat lezen blijft: als DERDE en lichtste bron in de
+   AUDIT-tak, via dezelfde objectRegister() die nu omvalt op de verkeerde vorm
+   in plaats van stil nul te tellen. */
+const AUDITJOURNAAL = (argv.find(a => a.startsWith('--auditjournaal=')) || '').slice(16) || inWortel('AUDITPROEF-JOURNAAL.json');
 const JOURNAAL = (argv.find(a => a.startsWith('--journaal=')) || '').slice(11) ||
   path.join(WORTEL, '.routejournaal');
 
@@ -210,13 +226,49 @@ function routetabel() {
    precies een uitspraak hebben en geen lijst pogingen. Een plek die beide
    vormen aankan zou hier de verkeerde soort netheid zijn: dan verdwijnt het
    verschil dat de registers zelf maken. */
-function objectRegister(pad) {
-  if (!pad) return null;
+/* EEN LEZER DIE NIET KAN LEZEN, ZEGT DAT HARDOP.
+
+   Hier stond `return null` voor alle drie de gevallen: bestand weg, bestand
+   stuk, en bestand aanwezig maar met een ANDERE vorm dan deze lezer kent. De
+   eerste twee zijn eerlijk -- er is niets te lezen. De derde is de gevaarlijkste
+   uitslag die dit huis kent: het register is er, het draagt 860 bewezen routes,
+   en de kolom meldt 0 zonder een woord. Zo stond de AUDIT-kolom ruim een jaar op
+   nul (TAKEN.md 7.22).
+
+   Een vormverschil is dus een DEFECT AAN HET INSTRUMENT en geen lege meting, en
+   daar hoort de bouw op om te vallen. Hetzelfde geldt voor perRouteKaart()
+   hieronder, die de andere vorm leest. */
+function vormfout(pad, verwacht, gekregen) {
+  throw new Error('bewijsmatrix: ' + path.basename(pad) + ' draagt perRoute als ' + gekregen +
+    ' terwijl deze lezer ' + verwacht + ' verwacht. Dat is geen lege meting maar een lezer die ' +
+    'zijn eigen register niet meer kent -- repareer de lezer of de schrijver, en tel hem niet als nul.');
+}
+/* DE KLASSEN WAARIN "ONBESCHERMD" DE BEDOELING IS, uit IDEMBESLUIT.json zelf en
+   niet hier verzonnen. `tebeslissen` staat er met opzet NIET bij: dat is de
+   eerlijke klasse voor "hier is nog geen besluit over genomen", en die hoort een
+   gezakte cel te blijven. `beschermd` evenmin -- dat betekent dat de route is
+   gerepareerd, dus als de meting hem dan nog onbeschermd noemt, is dat een
+   TEGENSPRAAK en geen vrijstelling. */
+const BESLOTEN_ONBESCHERMD = new Set(['code-maker', 'creatie', 'berekening', 'teller']);
+/* En hetzelfde voor de ROLLBACK-as: `veilige-kant` betekent dat de handeling met
+   OPZET naar die kant faalt en dat de andere kant aantoonbaar erger is.
+   `tebeslissen` staat er om dezelfde reden niet bij als daar. */
+const BESLOTEN_ROLLBACK = new Set(['veilige-kant']);
+function besluitRegister(pad) {
   try {
     const j = JSON.parse(fs.readFileSync(pad, 'utf8'));
-    if (!j || !j.perRoute || Array.isArray(j.perRoute)) return null;
-    return new Map(Object.entries(j.perRoute));
+    return new Map(Object.entries(j.routes || {}));
   } catch (e) { return null; }
+}
+const idemBesluiten = besluitRegister;
+
+function objectRegister(pad) {
+  if (!pad) return null;
+  let j;
+  try { j = JSON.parse(fs.readFileSync(pad, 'utf8')); } catch (e) { return null; }
+  if (!j || j.perRoute === undefined || j.perRoute === null) return null;
+  if (Array.isArray(j.perRoute)) vormfout(pad, 'een object', 'een array');
+  return new Map(Object.entries(j.perRoute));
 }
 
 function bewakersPerRoute() {
@@ -275,13 +327,15 @@ function handelingproefUitslag() {
    beoordeeld -- dat verschil houden we vast, want het is een werklijst. */
 function perRouteKaart(bestand) {
   if (!bestand) return null;
-  try {
-    const j = JSON.parse(fs.readFileSync(bestand, 'utf8'));
-    if (!Array.isArray(j.perRoute)) return null;
-    const kaart = new Map();
-    for (const r of j.perRoute) kaart.set(r.methode + ' ' + r.pad, r);
-    return kaart;
-  } catch (e) { return null; }
+  let j;
+  try { j = JSON.parse(fs.readFileSync(bestand, 'utf8')); } catch (e) { return null; }
+  if (!j || j.perRoute === undefined || j.perRoute === null) return null;
+  /* Zie vormfout() hierboven: een register met de verkeerde vorm is een defect
+     en nooit een nul. */
+  if (!Array.isArray(j.perRoute)) vormfout(bestand, 'een array', 'een object');
+  const kaart = new Map();
+  for (const r of j.perRoute) kaart.set(r.methode + ' ' + r.pad, r);
+  return kaart;
 }
 
 /* De ketenronde: welke ROUTES zitten in een keten die onder echte sabotage is
@@ -366,13 +420,17 @@ function bouw(invoer) {
   const auditKaart = inv.audit !== undefined ? inv.audit : perRouteKaart(AUDIT);
   const staat = inv.staat !== undefined ? inv.staat : perRouteKaart(STAAT);
   const output = inv.output !== undefined ? inv.output : objectRegister(OUTPUT);
-  const auditp = inv.auditp !== undefined ? inv.auditp : objectRegister(AUDITP);
   /* De handelingproef en de uitvoerproef, op dezelfde manier als de buren
      hierboven: uit hun eigen register, en overschrijfbaar via inv voor de
      toets. Ze werden gebruikt zonder gebouwd te worden -- een vrije naam,
      die undefined is en de kolom dus stil leeg laat. */
+  const besluit = inv.idembesluit !== undefined ? inv.idembesluit : besluitRegister(IDEMBESLUIT);
+  const rbBesluit = inv.rollbackbesluit !== undefined ? inv.rollbackbesluit : besluitRegister(ROLLBACKBESLUIT);
   const handeling = inv.handeling !== undefined ? inv.handeling : perRouteKaart(HANDELINGPROEF);
   const uitvoerKaart = inv.uitvoer !== undefined ? inv.uitvoer : perRouteKaart(UITVOERPROEF);
+  /* De journaalproef, in de object-vorm (zie AUDITJOURNAAL hierboven). Dezelfde
+     naam `auditp` als vroeger, zodat een toets die hem injecteert blijft werken. */
+  const auditp = inv.auditp !== undefined ? inv.auditp : objectRegister(AUDITJOURNAAL);
 
   const rijen = [];
   for (const r of tabel.routes) {
@@ -443,37 +501,61 @@ function bouw(invoer) {
       }
 
       if (s.id === 'AUDIT') {
-        const a = auditp && auditp.get(sleutel);
-        /* 'wisselend' is een BEVINDING en geen bewijs: soms wel en soms geen
-           spoor betekent dat het ergens van afhangt. 'geen spoor' is voor een
-           leesroute juist en voor een schrijfroute een vraag -- maar in beide
-           gevallen geen bewijs dat er iets wordt vastgelegd. En 'verklaard'
-           evenmin: dat is dezelfde wisselende waarneming met een uitgezochte
-           reden eronder, en een reden is geen meting. Alleen 'bewezen' passeert
-           hier, zodat een verklaring nooit een cel kan vullen. */
-        /* HIJ CLAIMDE DE CEL OOK ALS ZIJN BRON LEEG WAS, en daarmee waren de
-           twee AUDIT-takken verderop in deze lus onbereikbaar.
+        /* EEN TAK, EN DAT WAREN ER DRIE. Er stonden hieronder nog twee
+           `if (s.id === 'AUDIT')`-blokken in dezelfde lus, allebei met een
+           `continue` erboven en dus allebei onbereikbaar: elke keer dat er een
+           bron bij kwam, kwam er een blok bij in plaats van een regel. Het
+           eerste blok las `AUDITPROEF.json` via `objectRegister()` -- die geeft
+           NULL zodra `perRoute` een array is, en dat is hij -- en toetste
+           bovendien op `a.staat` terwijl de vermeldingen `audit:` dragen. Twee
+           fouten die elkaar dekten, met als uitkomst dat de kolom 0 bewezen
+           meldde terwijl het register er 860 droeg (TAKEN.md 7.22).
 
-           `auditp` komt uit objectRegister(), en die geeft null zodra
-           AUDITPROEF.json zijn perRoute als LIJST schrijft in plaats van als
-           object -- wat scripts/auditproef-route.js doet. Elke route kreeg dus
-           `{ staat: 'ongemeten' }` en een `continue`, waarna de tak die de
-           handelingproef leest (en de tak die AUDITPROEF wél als lijst leest)
-           nooit aan de beurt kwam. De hele AUDIT-kolom stond stil op nul,
-           terwijl beide proeven honderden bewezen routes rapporteerden.
+           DE VOLGORDE IS DIE VAN ROLLBACK HIERONDER: waar de zware bron spreekt
+           telt de zware, waar hij zwijgt mag de lichte iets zeggen, en elke cel
+           noemt zijn bron. De auditproef is hier de zware -- hij is voor deze
+           vraag gebouwd en telt het spoor voor en na de oproep (`spoorVoor`,
+           `spoorNa`) over 3091 routes. De handelingproef is de lichte: hij meet
+           iets anders en draagt `audit` als bijvangst.
 
-           Zichtbaar geworden toen de proefinstrumenten weer konden draaien: de
-           ratel meldde "AUDIT bewezen 575 -> 0 (is de meetronde meegeleverd?)"
-           terwijl hij dat wél was. Die vraag was de juiste vraag op de
-           verkeerde plek -- het lag niet aan de ronde maar aan deze regel.
+           ALLEEN 'bewezen' PASSEERT. 'wisselend' is een BEVINDING en geen
+           bewijs: soms wel en soms geen spoor betekent dat het ergens van
+           afhangt. 'geen spoor' is voor een leesroute juist en voor een
+           schrijfroute een vraag -- in beide gevallen geen bewijs dat er iets
+           wordt vastgelegd. En 'verklaard' evenmin: dat is dezelfde wisselende
+           waarneming met een uitgezochte reden eronder, en een reden is geen
+           meting.
 
-           Nu claimt hij alleen wat hij werkelijk weet en laat de rest door. */
-        if (a) {
-          cellen[s.id] = a.staat === 'bewezen'
-            ? { staat: 'bewezen', bron: 'auditproef', reden: a.reden }
-            : { staat: 'ongemeten', bron: 'auditproef', reden: a.reden };
-          continue;
-        }
+           GEZAKT IS HIER WEL EEN DEFECT-OORDEEL, anders dan bij IDEMPOTENCY. Een
+           schrijfhandeling die lukt zonder spoor is achteraf niet terug te
+           vinden, en dat is letterlijk wat deze kolom belooft.
+
+           EN EEN DERDE BRON, DE LICHTSTE: de journaalproef (AUDITPROEF-JOURNAAL.json,
+           object-vorm, veld `staat`). Het eerste van de drie oude blokken las
+           precies die vorm, en op main was dat blok net gerepareerd zodat hij
+           alleen claimt wat hij werkelijk weet en de rest doorlaat. Dat gedrag
+           blijft: waar routeproef en handelingproef allebei zwijgen, mag het
+           journaal een 'bewezen' leveren -- en niets anders, want ook daar
+           passeert alleen 'bewezen'. Hij kan een zwaardere bron nooit
+           overstemmen, en een gezakt oordeel geeft hij niet: 'geen spoor' is in
+           het journaal een vraag en geen defect-oordeel. */
+        const a = auditKaart && auditKaart.get(sleutel);
+        if (a && a.audit === 'bewezen') { cellen[s.id] = { staat: 'bewezen', bron: 'auditproef', reden: a.reden }; continue; }
+        if (a && a.audit === 'gezakt') { cellen[s.id] = { staat: 'gezakt', bron: 'auditproef', reden: a.reden }; continue; }
+
+        /* De handelingproef mag pas spreken waar de auditproef niets zei. Zijn
+           'ongemeten' betekent daar: de oproep gaf geen 2xx, dus er is niets
+           gebeurd en er HOORT geen regel te zijn -- geen bewijs en geen
+           bevinding, maar niet gemeten. */
+        const beproefd = handeling && handeling.get(sleutel);
+        const jp = auditp && auditp.get(sleutel);
+        if (beproefd && beproefd.audit === 'bewezen') cellen[s.id] = { staat: 'bewezen', bron: 'handelingproef' };
+        else if (beproefd && beproefd.audit === 'gezakt') cellen[s.id] = { staat: 'gezakt', bron: 'handelingproef', reden: beproefd.reden };
+        else if (jp && jp.staat === 'bewezen') cellen[s.id] = { staat: 'bewezen', bron: 'auditproef-journaal', reden: jp.reden };
+        else if (a) cellen[s.id] = { staat: 'ongemeten', bron: 'auditproef', reden: a.reden };
+        else if (jp) cellen[s.id] = { staat: 'ongemeten', bron: 'auditproef-journaal', reden: jp.reden };
+        else cellen[s.id] = { staat: 'ongemeten' };
+        continue;
       }
 
       if (s.id === 'FAILURE' || s.id === 'ROLLBACK') {
@@ -488,6 +570,14 @@ function bouw(invoer) {
            iets over gezegd worden, dan zwijgt de zware bron en mag de lichte
            (de staatproef hieronder) spreken. Eerst gaf hij daar "gezakt" op, en
            dat was ongemeten vermomd als een bevinding. */
+        /* HET BESLUITREGISTER VOOR DEZE AS, met dezelfde discipline als bij
+           IDEMPOTENCY hierboven: ROLLBACKBESLUIT.json zegt per route of een
+           geweigerd verzoek daar met OPZET iets mag achterlaten, met de reden
+           en een citaat uit de code dat die reden draagt. De uitslag wordt
+           `nvt` en niet `bewezen` -- de belofte geldt hier niet, hij is niet
+           bewezen -- en de gemeten reden blijft ernaast staan. */
+        const rb = s.id === 'ROLLBACK' && rbBesluit && rbBesluit.get(r.pad);
+        const rbBesloten = rb && BESLOTEN_ROLLBACK.has(rb.klasse) ? rb : null;
         if (k && k.stil) { cellen[s.id] = { staat: 'gezakt', bron: 'ketenronde', reden: 'stil verlies' }; continue; }
         if (k && k.proven) { cellen[s.id] = { staat: 'bewezen', bron: 'ketenronde' }; continue; }
         if (k && k.beoordeeld) {
@@ -505,7 +595,10 @@ function bouw(invoer) {
         if (st && st.rollback === 'bewezen') {
           cellen[s.id] = { staat: 'bewezen', bron: 'staatproef', reden: st.reden };
         } else if (st && st.rollback === 'GEZAKT') {
-          cellen[s.id] = { staat: 'gezakt', bron: 'staatproef', reden: st.reden };
+          cellen[s.id] = rbBesloten
+            ? { staat: 'nvt', bron: 'staatproef+rollbackbesluit', reden: st.reden,
+                besluit: rb.klasse, waarom: rb.reden }
+            : { staat: 'gezakt', bron: 'staatproef', reden: st.reden };
         } else {
           cellen[s.id] = { staat: 'ongemeten' };
         }
@@ -526,20 +619,6 @@ function bouw(invoer) {
         continue;
       }
 
-      if (s.id === 'AUDIT') {
-        const beproefd = handeling && handeling.get(sleutel);
-        /* 'ongemeten' in de proef betekent: de oproep gaf geen 2xx, dus er is
-           niets gebeurd en er HOORT geen regel te zijn. Dat is geen bewijs en
-           ook geen bevinding -- het is niet gemeten. */
-        if (beproefd && beproefd.audit === 'bewezen') {
-          cellen[s.id] = { staat: 'bewezen', bron: 'handelingproef' };
-        } else if (beproefd && beproefd.audit === 'gezakt') {
-          cellen[s.id] = { staat: 'gezakt', bron: 'handelingproef', reden: beproefd.reden };
-        } else {
-          cellen[s.id] = { staat: 'ongemeten' };
-        }
-        continue;
-      }
 
       if (s.id === 'ACL' || s.id === 'PRIVACY') {
         const beproefd = rol && rol.get(sleutel);
@@ -580,17 +659,6 @@ function bouw(invoer) {
         continue;
       }
 
-      if (s.id === 'AUDIT') {
-        /* GEZAKT IS HIER WEL EEN DEFECT-OORDEEL, anders dan bij IDEMPOTENCY. Een
-           schrijfhandeling die lukt zonder spoor is achteraf niet terug te
-           vinden, en dat is letterlijk wat deze kolom belooft. */
-        const a = auditKaart && auditKaart.get(sleutel);
-        if (a && a.audit === 'bewezen') cellen[s.id] = { staat: 'bewezen', bron: 'auditproef', reden: a.reden };
-        else if (a && a.audit === 'gezakt') cellen[s.id] = { staat: 'gezakt', bron: 'auditproef', reden: a.reden };
-        else if (a) cellen[s.id] = { staat: 'ongemeten', bron: 'auditproef', reden: a.reden };
-        else cellen[s.id] = { staat: 'ongemeten' };
-        continue;
-      }
 
       if (s.id === 'IDEMPOTENCY') {
         /* TWEE INSTRUMENTEN, EEN VOLGORDE. De staatproef kijkt naar de TOESTAND en
@@ -599,10 +667,46 @@ function bouw(invoer) {
            zwijgt (de eerste oproep bewoog niets) mag de idemproef nog iets
            zeggen -- die ziet soms een nieuw id in een antwoord waar de opslag
            niet zichtbaar bewoog. Elke cel noemt zijn bron. */
+        /* HET BESLUIT NAAST DE METING, en niet eroverheen. IDEMBESLUIT.json zegt
+           per route of een tweede oproep daar iets nieuws MAG doen -- door
+           mensen geschreven, met een reden per regel. Vier van de zeven klassen
+           betekenen "onbeschermd is hier de bedoeling": een codemaker hoort elke
+           keer iets nieuws te geven, een teller hoort op te hogen, een berekening
+           een verse uitkomst, en bij een creatie is een tweede item hinderlijk
+           maar geen defect.
+
+           Zonder deze koppeling werd zo'n route een gezakte cel, in
+           VERTROUWEN.json een `geschorst`, en zette server/middleware/
+           schorspoort.js hem met een 503 dicht. /api/bank/rekening/open stond zo
+           offline terwijl het register er met zoveel woorden over zegt: "Een
+           dubbeltik geeft een tweede, lege rekening op naam van hetzelfde lid:
+           hinderlijk in de lijst, en er gaat geen geld mee weg."
+
+           DE UITSLAG IS `nvt` EN NIET `bewezen`, en dat verschil is de hele
+           zorgvuldigheid: een besluit maakt de belofte NIET van toepassing, het
+           bewijst hem niet. De gemeten reden blijft in de cel staan, zodat een
+           lezer ziet WAT er is waargenomen en pas daarna dat er een besluit
+           onder ligt. `tebeslissen` en `beschermd` staan er niet bij: het eerste
+           is de eerlijke klasse voor "hier is nog niets besloten", het tweede
+           betekent dat de route is gerepareerd -- en een gerepareerde route die
+           alsnog onbeschermd meet, is een tegenspraak en geen vrijstelling. */
+        const bsl = besluit && besluit.get(r.pad);
+        const besloten = bsl && BESLOTEN_ONBESCHERMD.has(bsl.klasse) ? bsl : null;
         const stI = staat && staat.get(sleutel);
         if (stI && stI.idempotentie === 'bewezen') { cellen[s.id] = { staat: 'bewezen', bron: 'staatproef', reden: stI.idemReden }; continue; }
-        if (stI && stI.idempotentie === 'GEZAKT') { cellen[s.id] = { staat: 'gezakt', bron: 'staatproef', reden: stI.idemReden }; continue; }
+        if (stI && stI.idempotentie === 'GEZAKT') {
+          cellen[s.id] = besloten
+            ? { staat: 'nvt', bron: 'staatproef+idembesluit', reden: stI.idemReden,
+                besluit: bsl.klasse, waarom: bsl.reden }
+            : { staat: 'gezakt', bron: 'staatproef', reden: stI.idemReden };
+          continue;
+        }
         const id = idemKaart && idemKaart.get(sleutel);
+        if (id && id.idempotentie === 'onbeschermd' && besloten) {
+          cellen[s.id] = { staat: 'nvt', bron: 'idemproef+idembesluit', reden: id.reden,
+            besluit: bsl.klasse, waarom: bsl.reden };
+          continue;
+        }
         if (id && id.idempotentie === 'beschermd') cellen[s.id] = { staat: 'bewezen', bron: 'idemproef', reden: id.reden };
         /* ONBESCHERMD IS HIER GEZAKT, en dat vraagt uitleg. Het register houdt
            het neutrale woord aan, want twee notities maken op twee keer drukken
@@ -744,7 +848,12 @@ function ketenKaartUit(scenarios) {
   return kaart;
 }
 
-module.exports = { bouw, achteruit, ketenUitslag, ketenKaartUit, SCHAKELS, LEESMETHODEN, CONTROL };
+/* objectRegister en perRouteKaart gaan mee naar buiten zodat een toets de
+   vormgrendel kan zien AFGAAN. Een grendel die niemand heeft zien dichtvallen,
+   is geen grendel (LAT.md regel 10) -- en juist deze is er omdat een stille
+   `return null` de AUDIT-kolom ruim een jaar op nul hield. */
+module.exports = { bouw, achteruit, ketenUitslag, ketenKaartUit, objectRegister, perRouteKaart,
+  SCHAKELS, LEESMETHODEN, CONTROL };
 
 /* Alleen doen als iemand dit bestand DRAAIT. Wordt het geladen (door een toets,
    of straks door de keuring), dan hoort er niets te gebeuren en al helemaal geen

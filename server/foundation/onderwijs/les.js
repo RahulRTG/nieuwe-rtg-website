@@ -4,17 +4,33 @@
    foundation/onderwijs.js. */
 module.exports = (octx) => {
   const { router, F, save, nu, rid, schoon, crypto, anthropic, LETTERS, SYSTEM, DEMO, TIPS,
-    nieuweCode, sse, stuur, online, presentie, lesVan, docentCheck, leerlingVan, lesPubliek,
-    teVaak, misluktePoging, ipVan } = octx;
+    teVaak, misluktePoging, ipVan,
+    nieuweCode, sse, stuur, online, presentie, lesVan, docentCheck, leerlingVan, lesPubliek } = octx;
 
   /* ---------- les maken / meedoen ---------- */
-  /* Bewust zonder inlog: een quizbord in de klas. De rem hangt daarom hier,
-     op de route zelf -- de gelijknamige route van de lesmaker
-     (server/routes/lesmaker.js) heeft een eigen teller en dekt deze niet. */
+  /* EEN REM OP HET MAKEN, en niet alleen op het raden. `lesVan()` begrenst wie
+     een BESTAANDE les binnenkomt; deze route maakt er een NIEUWE, zonder inlog en
+     zonder bovengrens op `F().lessen`. Onbegrensd is dat een emmer die vanzelf
+     volloopt: elke les blijft staan, wordt bij elke opslag meegeschreven, en
+     niemand ruimt hem op.
+
+     TWINTIG PER UUR PER ADRES, en dat getal komt weer uit de gebruiker. Een les
+     maakt een BEGELEIDER, geen klas -- maar een school zit met al haar docenten
+     achter een adres, en op een maandagochtend beginnen die tegelijk. Twintig
+     laat dat ruim door en houdt een aanvaller op ongeveer 480 lessen per dag,
+     tegen een handvol per school. Twee takken zetten hier los van elkaar een rem
+     (twintig en dertig); de strengste is gehouden, en test/foundation-lesrem.test.js
+     legt hem vast. De gelijknamige route van de lesmaker (server/routes/lesmaker.js)
+     heeft een eigen teller en dekt deze niet.
+
+     ANDERS DAN BIJ HET RADEN telt hier de GESLAAGDE poging, want die is het
+     probleem: er komt een les bij. Vandaar `misluktePoging` zonder een misser --
+     de functie heet naar zijn eerste gebruik en telt gewoon een tik. Zie
+     `/gezin/maak` in ../gezin.js, waar precies hetzelfde staat met acht. */
   router.post('/les/maak', (req, res) => {
-    const bucket = 'lesmaak:' + ipVan(req);
-    if (teVaak(res, bucket)) return;
-    misluktePoging(bucket, 20, 60);   // hooguit twintig lessen per adres per uur
+    const bak = 'lesmaak:' + ipVan(req);
+    if (teVaak(res, bak)) return;
+    misluktePoging(bak, 20, 60);
     const code = nieuweCode();
     const les = { code, vak: schoon(req.body.vak, 40) || 'Les', docentNaam: schoon(req.body.naam, 40) || 'Begeleider',
       teacherToken: rid(24), bord: { strokes: [] }, leerlingen: {}, opgaven: [], agenda: [], at: nu() };
@@ -30,16 +46,22 @@ module.exports = (octx) => {
     res.json({ token: l.token, studentId: l.studentId, naam: l.naam, les: lesPubliek(les), bord: les.bord.strokes, schrift: l.schrift });
     presentie(les.code);
   });
+  /* VIA lesVan() EN NIET RECHTSTREEKS, hoe verleidelijk kort dat ook staat: de
+     rem op het raden van een lescode woont daar, en dit is juist de LEESkant
+     waar raden loont. Wie hier weer `F().lessen[...]` schrijft, zet de rem uit
+     voor precies de routes die de leerlingnamen tonen. */
   router.get('/les/:code', (req, res) => {
-    const les = F().lessen[String(req.params.code).toUpperCase()];
-    if (!les) return res.status(404).json({ error: 'Onbekende les.' });
+    const les = lesVan(req, res); if (!les) return;
     res.json({ les: lesPubliek(les) });
   });
 
   /* ---------- live meekijken ---------- */
+  /* Ook de stream loopt langs de rem. Hij antwoordde bij een onbekende code met
+     een kaal `404.end()`; `lesVan()` stuurt daar een JSON-lijf bij. Dat is voor
+     een EventSource geen verschil -- die kijkt naar de statuscode en opent geen
+     stroom bij een 404 -- en het scheelt een tweede 404-vorm in dit bestand. */
   router.get('/les/:code/stream', (req, res) => {
-    const les = F().lessen[String(req.params.code).toUpperCase()];
-    if (!les) return res.status(404).end();
+    const les = lesVan(req, res); if (!les) return;
     const role = req.query.role === 'docent' ? 'docent' : 'leerling';
     if (role === 'docent' && req.query.token !== les.teacherToken) return res.status(403).end();
     let studentId = null;
@@ -84,8 +106,7 @@ module.exports = (octx) => {
     les.bord.strokes.pop(); save(); stuur(les.code, 'bord', { strokes: les.bord.strokes }, c => c.role === 'leerling'); res.json({ ok: true });
   });
   router.get('/bord/:code', (req, res) => {
-    const les = F().lessen[String(req.params.code).toUpperCase()];
-    if (!les) return res.status(404).json({ error: 'Onbekende les.' });
+    const les = lesVan(req, res); if (!les) return;
     res.json({ strokes: les.bord.strokes });
   });
 };

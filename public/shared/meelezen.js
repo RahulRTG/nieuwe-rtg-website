@@ -18,13 +18,21 @@
    worden opgepoetst. Wat het wel doet is de afhankelijkheid verplaatsen: van
    "kan niet meedoen" naar "kan meedoen als de anderen meetypen".
 
-   ER ZIT NU WEL AUTOMATISCHE TEKST IN. De deur die hier openstond
-   (`voed(regel, { bron })`) is op 2 september 2026 gebruikt:
-   shared/spraaktekst.js zet spraak om en voedt deze baan met bron 'machine'.
-   Wat dat begrensd houdt staat in de kop van die module en komt op een zin
-   neer: JE TRANSCRIBEERT JEZELF. Zet de ander hem niet aan, dan is er van diens
-   spraak nog steeds geen tekst -- WCAG 1.2.4 is dus niet gehaald, en het
-   register van check.js regel 49 telt deze acht nog steeds als OPEN.
+   AUTOMATISCHE ONDERTITELING ZIT ER INMIDDELS WEL IN, en langs precies de weg
+   die hier eerder als open deur stond beschreven: een LOKAAL model
+   (LOCAL_AI_URL) via shared/meeluister.js. Wat er NIET in zit is de Web Speech
+   API -- die stuurt het geluid van het gesprek naar een server van de
+   browserleverancier, en dit huis draait op codenamen met de echte namen in een
+   aparte kluis. Het gesprek van twee leden naar buiten sturen om er tekst van te
+   maken is precies wat dat ontwerp voorkomt, en daar is geen instelling voor.
+
+   DRIE DINGEN DIE DAARDOOR BLIJVEN GELDEN. De baan LAAT ZIEN dat een regel van
+   een machine komt (`bron: 'machine'`), want tekst die een machine heeft geraden
+   is iets anders dan tekst die iemand heeft geschreven. Meetypen blijft bestaan
+   en is niet vervangen: een herkenner die een naam verkeerd verstaat, wordt met
+   een getypte regel gecorrigeerd. En is er GEEN lokaal model ingericht, dan
+   verschijnt de knop niet en zegt de baan wat er wel is -- een ondertitelknop
+   die niets doet is erger dan geen knop.
 
    DE NAAD NAAR HET GESPREK. Elk gesprek in dit huis heeft al een seinfunctie
    die getypte signalen doorgeeft aan de andere kant (offer, answer, ice,
@@ -66,8 +74,16 @@
       'background:transparent;color:inherit;font:inherit;font-size:.85rem;cursor:pointer;';
     kop.appendChild(knop);
 
-    /* De bediening van de spraak hangt in deze kop maar woont ernaast: deze
-       module gaat over een baan met tekst en niet over een microfoon. */
+    /* De ondertitelknop hoort bij de LUISTERAAR en wordt daar gemaakt
+       (shared/meeluister.js): wat hij zegt en wanneer hij verschijnt staat op
+       EEN plek. */
+    /* DE LUISTERAAR WORDT HIER GEMAAKT en niet door de aanroeper. Die weet
+       alleen WAAR zijn microfoonstroom zit (`stroom`); hoe een herkende regel in
+       deze baan komt en hoe hij de andere kant bereikt, is een zaak van de baan.
+       Stond dat bij de aanroeper, dan schreven acht gesprekken dezelfde vier
+       regels over -- en dan lopen ze uiteen. */
+    var luister = (opties.stroom && w.RTGMeeluister && w.RTGMeeluister.knop)
+      ? w.RTGMeeluister.maak({ opRegel: function (t) { naarBuiten(t, 'machine'); } }) : null;
     wrap.appendChild(kop);
 
     var baan = d.createElement('div');
@@ -109,13 +125,16 @@
       knop.setAttribute('aria-expanded', open ? 'true' : 'false');
       knop.textContent = open ? 'Meelezen sluiten' : 'Meelezen';
       if (open) veld.focus();
-      /* DE BAAN DICHT IS DE MICROFOON UIT: een herkenner die doorluistert
-         achter een paneel dat niemand ziet, is precies wat deze knop niet mag
-         opleveren. (`spraak` is bij het bouwen nog undefined; deze tak loopt
-         pas na een tik.) */
-      if (!open && spraak) spraak.stop();
     }
     knop.addEventListener('click', function () { zetOpen(!open); });
+
+    if (luister) {
+      w.RTGMeeluister.knop({
+        kop: kop, wrap: wrap, luister: luister,
+        stroom: opties.stroom, stijl: knop.style.cssText,
+        open: function () { zetOpen(true); }
+      });
+    }
 
     /* Een regel erbij. `bron` zegt waar hij vandaan komt: 'mens' (iemand typte
        hem) of 'machine' (een lokale herkenner). Dat verschil staat op het
@@ -147,16 +166,13 @@
       return r;
     }
 
-    /* EEN REGEL DE DEUR UIT, langs precies een weg. Getypt, gesproken en
-       gevraagd komen alle drie hier langs, zodat er maar EEN plek is waar de
-       eigen regel in de baan komt en naar de ander gaat. Drie kopieen hiervan
-       was de vorm waarin het meest recente gat in dit huis ontstond. */
-    function zendEigen(tekst, bron) {
+    /* Een EIGEN regel: hij komt in de baan en gaat naar de andere kant. Apart
+       van `voed`, want die stuurt met opzet niets door -- anders zou een
+       binnengekomen regel terugkaatsen. */
+    function naarBuiten(tekst, bron) {
       var t = schoon(tekst);
       if (!t) return;
       voeg(t, { wie: opties.ik || 'Jij', bron: bron || 'mens' });
-      /* De eigen regel staat er al voordat het sein de deur uit is: wie meeleest
-         moet zien dat zijn regel is verzonden, ook als de ander wegvalt. */
       if (typeof opties.stuur === 'function') { try { opties.stuur(t); } catch (err) {} }
     }
 
@@ -165,25 +181,10 @@
       var t = schoon(veld.value);
       if (!t) return;
       veld.value = '';
-      zendEigen(t, 'mens');
+      /* De eigen regel staat er al voordat het sein de deur uit is: wie meeleest
+         moet zien dat zijn regel is verzonden, ook als de ander wegvalt. */
+      naarBuiten(t, 'mens');
     });
-
-    /* Spraak en het verzoek erom zitten in shared/spraaktekst.js. Is die er
-       niet, dan werkt de baan als eerst: meetypen. De goede kant om te
-       ontbreken -- check.js regel 65 houdt vast dat elke pagina die hem
-       gebruikt hem ook laadt. */
-    var spraak = null;
-    if (w.RTGSpraakTekst && typeof w.RTGSpraakTekst.koppel === 'function') {
-      spraak = w.RTGSpraakTekst.koppel({
-        kop: kop,
-        na: kop,
-        knopStijl: knop.style.cssText,
-        /* Een herkende zin gaat dezelfde weg als een getypte, met bron
-           'machine': wie meeleest hoort te weten dat dit geraden tekst is. */
-        zend: function (regel, bron) { zendEigen(regel, bron); },
-        open: function () { zetOpen(true); }
-      });
-    }
 
     return {
       el: wrap,
@@ -202,10 +203,7 @@
         return Array.prototype.map.call(baan.children, function (x) { return x.textContent; });
       },
       leeg: function () { while (baan.firstChild) baan.removeChild(baan.firstChild); },
-      /* Voor een toets en voor een scherm dat het gesprek afsluit: de herkenner
-         hoort niet door te lopen als het gesprek weg is. */
-      get spraakAan() { return !!(spraak && spraak.aan); },
-      stopSpraak: function () { if (spraak) spraak.stop(); }
+      luistert: function () { return !!(luister && luister.loopt); }
     };
   }
 

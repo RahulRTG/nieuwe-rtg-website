@@ -31,7 +31,13 @@ function maak(opties) {
   const db = { data: {} };
   const regels = [];
   const seinen = [];
+  const buiten = [];
+  /* De derde uitgang, als nepmelder. `actief` is de schakelaar die in het echt
+     uit ERR_WEBHOOK_URL komt; standaard staat hij hier AAN, zodat een toets die
+     er niets over zegt toch merkt als er ineens niets meer naar buiten gaat. */
+  const melder = { actief: o.buitenUit ? false : true, melden: (e, ctx) => buiten.push({ bericht: e.message, ctx }) };
   const alarm = maakAlarm({
+    foutmelder: () => (o.geenMelder ? null : melder),
     db, opslag: maakCmdOpslag({ db }), save: () => {},
     journaal: {
       noteer: r => regels.push(r),
@@ -47,7 +53,7 @@ function maak(opties) {
     norm: () => ({ alarmen: { budgetRestDeel: 0.25, defectenDrempel: 25, buitenStilUren: 24, stilteMaxUren: 72 } }),
     sein: (ev, d) => seinen.push(d)
   });
-  return { db, alarm, regels, seinen };
+  return { db, alarm, regels, seinen, buiten, o };
 }
 
 const RUSTIG = { slo: { doelen: [] }, buiten: { gemeten: true }, sondestand: { buiten: { pogingen: 5, mislukt: 0 } } };
@@ -164,4 +170,65 @@ test('de uitslag zegt welke uitgangen er zijn en welke niet', () => {
   assert.ok(st.uitgangen.length >= 2);
   assert.match(st.let, /geen mail en geen telefoonmelding/);
   assert.match(st.let, /piept op verandering/);
+});
+
+/* ============================================================================
+   DE DERDE UITGANG -- want de eerste twee eindigen allebei binnen het huis.
+
+   Het journaal is een spoor en het kantoorbord is een scherm; om drie uur 's
+   nachts kijkt naar geen van beide iemand. TAKEN.md 7.12. De uitgang zelf
+   bestond al (server/foutmelder.js, een webhook met SSRF-keuring) en stond op
+   nul aanroepers voor alarmen.
+
+   Drie dingen worden hier vastgehouden, en het derde is het belangrijkste:
+   hij gaat af op de OVERGANG, hij zwijgt bij een stilgezet alarm, en als er
+   GEEN uitgang is zegt de stand dat met zoveel woorden. Een lege ERR_WEBHOOK_URL
+   die als bezorging leest, is precies de stille faalvorm die deze hele laag
+   moet uitsluiten.
+   ========================================================================== */
+test('een alarm gaat ook naar buiten, en alleen op de overgang', () => {
+  const { alarm, buiten } = maak({ defecten: 99, buiten: { gemeten: true },
+    sondestand: { buiten: { pogingen: 5, mislukt: 0 } } });
+  alarm.weeg();
+  assert.equal(buiten.length, 1, 'de aanmelding gaat naar buiten: ' + JSON.stringify(buiten));
+  assert.match(buiten[0].bericht, /^ALARM /, 'met een kop die zegt dat het een alarm is');
+  assert.equal(buiten[0].ctx.soort, 'alarm', 'en met een context die het van een crash onderscheidt');
+  assert.equal(buiten[0].ctx.richting, 'aan');
+
+  alarm.weeg(); alarm.weeg();
+  assert.equal(buiten.length, 1, 'een lopend alarm belt niet elke ronde opnieuw -- dat leert mensen wegklikken');
+});
+
+test('een stilgezet alarm gaat niet naar buiten, maar staat wel in het spoor', () => {
+  const { alarm, regels, buiten, o } = maak({ defecten: 99, buiten: { gemeten: true },
+    sondestand: { buiten: { pogingen: 5, mislukt: 0 } } });
+  const eerste = alarm.weeg().nieuw[0];
+  assert.ok(eerste, 'er is een alarm om stil te zetten');
+  alarm.stilzetten(eerste.id, 4, 'iemand', 'we weten het al');
+  buiten.length = 0; regels.length = 0;
+
+  // laat de bevinding verdwijnen: nu volgt de AFmelding, en die hoort gedempt
+  o.defecten = 0;
+  const na = alarm.weeg();
+  assert.deepEqual(na.opgelost.map(a => a.id), [eerste.id], 'het alarm is opgelost');
+  assert.equal(buiten.length, 0, 'wie een alarm stilzet, wil ook geen telefoon om drie uur');
+  assert.ok(regels.some(r => r.actie === 'alarm af'),
+    'maar de afmelding staat wel in het spoor -- stilte hoort genoteerd te worden');
+});
+
+test('zonder uitgang zegt de stand DAT er geen uitgang is, in plaats van te zwijgen', () => {
+  const uit = maak(Object.assign({ buitenUit: true }, RUSTIG));
+  const st = uit.alarm.stand();
+  assert.equal(st.uitgangen.length, 2, 'de webhook staat niet in de lijst als hij er niet is');
+  assert.ok(st.geenUitgang, 'en er staat wat eraan ontbreekt: ' + st.geenUitgang);
+  assert.match(st.geenUitgang, /ERR_WEBHOOK_URL/, 'met de naam van wat er gezet moet worden');
+
+  const aan = maak(RUSTIG);
+  const st2 = aan.alarm.stand();
+  assert.equal(st2.uitgangen.length, 3, 'met een werkende melder staat hij er wel bij');
+  assert.equal(st2.geenUitgang, null);
+
+  const zonder = maak(Object.assign({ geenMelder: true }, RUSTIG));
+  assert.match(zonder.alarm.stand().geenUitgang, /geen foutmelder/,
+    'en helemaal geen melder is een ANDERE reden dan een lege url -- dat verschil hoort te blijven');
 });

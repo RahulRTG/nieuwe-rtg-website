@@ -140,24 +140,46 @@ function stukken(bron) {
   return uit;
 }
 
-/* De aanroep. `soort` is 'js' (standaard), 'css' of 'html'. */
+/* De aanroep. `soort` is 'js' (standaard), 'css' of 'html'; `regelsHeel` is de
+   derde vorm uit de kop hierboven -- commentaar platgeslagen in plaats van
+   weggehaald, zodat regelnummers EN tekenposities kloppen.
+
+   DE TWEE OPTIES ZIJN OP DEZELFDE DAG UIT TWEE TAKKEN GEKOMEN en ze staan
+   loodrecht op elkaar: `soort` zegt WELKE tekens commentaar zijn, `regelsHeel`
+   wat er met dat commentaar gebeurt. Ze zijn hier samengevoegd en niet
+   uitgevochten; de walker eronder krijgt ze als twee losse vlaggen. */
 function zonderCommentaar(bron, opties) {
   const soort = (opties && opties.soort) || 'js';
+  const heel = !!(opties && opties.regelsHeel);
   if (soort === 'html') {
     /* De markup blijft ONAANGERAAKT staan, inclusief de openende tags van de
-       blokken zelf: alleen wat ERIN staat is code van een andere taal. */
+       blokken zelf: alleen wat ERIN staat is code van een andere taal. Met
+       `regelsHeel` klopt dat vanzelf -- onaangeraakte markup houdt zijn posities,
+       en de blokken worden platgeslagen in plaats van ingekort. */
     return stukken(String(bron)).map(d =>
-      d.soort === 'script' ? kaal(d.tekst, true)
-        : d.soort === 'style' ? kaal(d.tekst, false)
+      d.soort === 'script' ? kaal(d.tekst, true, heel)
+        : d.soort === 'style' ? kaal(d.tekst, false, heel)
           : d.tekst).join('');
   }
-  return kaal(String(bron), soort !== 'css');
+  return kaal(String(bron), soort !== 'css', heel);
 }
 
-/* regelCommentaar: staat `//` voor commentaar? In JavaScript wel, in CSS niet. */
-function kaal(bron, regelCommentaar) {
+/* regelCommentaar: staat `//` voor commentaar? In JavaScript wel, in CSS niet.
+   heel: platslaan in plaats van weghalen (zie de aanroep hierboven). */
+function kaal(bron, regelCommentaar, heel) {
   const s = String(bron);
   const n = s.length;
+  /* DE DERDE VORM, waar de kop hierboven om vroeg: dezelfde wandeling, maar het
+     commentaar wordt PLATGESLAGEN in plaats van weggehaald -- elk teken een
+     spatie, elke regelovergang blijft staan. Daarmee blijven zowel de
+     regelnummers als de TEKENPOSITIES gelijk aan de echte bron, en dat is wat
+     een scanner nodig heeft die een treffer wil terugmelden als bestand:regel.
+     Zonder deze stand moest zo'n scanner kiezen tussen commentaar meelezen (en
+     dan een uitgecommentarieerde route als echt melden) of zijn regelnummers
+     kwijtraken. scripts/lib/routes.js koos daardoor het eerste, en dat kostte 42
+     routes hun bron: een voorbeeld IN een commentaarblok liet twee bestanden
+     hetzelfde voorvoegsel claimen. */
+  const plet = (stuk) => heel ? stuk.replace(/[^\n]/g, ' ') : '';
   let uit = '';
   let i = 0;
   while (i < n) {
@@ -166,8 +188,8 @@ function kaal(bron, regelCommentaar) {
        dat is wat een JS-parser er ook van maakt. */
     if (c === '/' && s[i + 1] === '*') {
       const eind = s.indexOf('*/', i + 2);
-      uit += ' ';
-      if (eind < 0) break;
+      if (eind < 0) { uit += heel ? plet(s.slice(i)) : ' '; break; }
+      uit += heel ? plet(s.slice(i, eind + 2)) : ' ';
       i = eind + 2;
       continue;
     }
@@ -178,7 +200,8 @@ function kaal(bron, regelCommentaar) {
       const voor = i > 0 ? s[i - 1] : '';
       if (voor !== ':' && voor !== '"' && voor !== "'" && voor !== '\\') {
         const nl = s.indexOf('\n', i);
-        if (nl < 0) break;
+        if (nl < 0) { uit += plet(s.slice(i)); break; }
+        uit += plet(s.slice(i, nl));
         i = nl;
         continue;
       }

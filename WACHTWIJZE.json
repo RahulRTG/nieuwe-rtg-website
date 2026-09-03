@@ -2,7 +2,7 @@
   "uitleg": "Gemeten door scripts/wachtwijze.js (npm run wachtwijze). `zonderReden` is de ratel en mag alleen omlaag; `metReden` is een besluit met de meting erbij in het bestand.",
   "grens": "Deze meter zegt NIET dat `load` fout is. Hij zegt dat een navigatie die op meer wacht dan haar bewering nodig heeft, een reden hoort te dragen -- anders is het een restpost.",
   "gemeten": {
-    "e2eBestanden": 193,
+    "e2eBestanden": 201,
     "loadNavigaties": 3,
     "metReden": 3,
     "zonderReden": 0

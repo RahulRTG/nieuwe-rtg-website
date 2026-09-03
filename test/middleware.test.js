@@ -318,3 +318,59 @@ test('11. de CSP noemt geen unsafe-inline voor scripts, en voor stijlblokken eve
   assert.match(c, /frame-ancestors 'self'/);
   assert.match(c, /base-uri 'self'/);
 });
+
+/* ============================================================================
+   DE FOUTMELDER STAAT OP ELK SCHERM -- en op de goede plek.
+
+   Hij stond op EEN van de 277 schermen (apps/app.html, met een eigen tag). Dat
+   is de verkeerde helft van de belofte die in public/shared/foutmelder.js staat:
+   "een fout die niemand ziet, bestaat wel" -- alleen op het beginscherm dan.
+   Zo'n melder laat je bovendien geloven dat het elders niet stukgaat, en dat is
+   erger dan geen melder (TAKEN.md 7.9).
+
+   Hij hangt daarom in server/middleware/kopinjectie.js, waar de hand en de
+   sprong al huisbreed worden ingespoten. De VOLGORDE is daar heilig en deze
+   toets is er de helft van: de stempelaar blijft het allereerste script, de
+   melder komt voor de hand (want hij hoort ook de fouten van de hand en de
+   sprong te vangen), en in Magnaat blijft de sandbox-blokkade het eerste
+   EXTERNE script -- dat laatste bewaakt toets 4b hierboven.
+   ========================================================================== */
+test('4c. elk scherm krijgt de foutmelder, na de stempelaar en voor de hand', async () => {
+  const uit = await draai(cspNonce(PUBLIC, true), nepReq('/apps/medicijnen.html'), nepRes());
+  const html = String(uit.res.body);
+
+  const iMelder = html.indexOf('/shared/foutmelder.js');
+  const iHand = html.indexOf('/shared/hand.js');
+  const iSprong = html.indexOf('/shared/sprong.js');
+  assert.ok(iMelder > -1, 'dit scherm draagt de foutmelder niet zelf en hoort hem dus gespoten te krijgen');
+  assert.ok(iHand > -1 && iSprong > -1, 'hand en sprong horen er ook te staan');
+  assert.ok(iMelder < iHand, 'de melder staat VOOR de hand, anders vangt hij diens fouten niet');
+  assert.ok(iHand < iSprong, 'en de bestaande volgorde hand -> sprong blijft');
+
+  /* De stempelaar blijft het eerste script van de pagina. Hij is inline, dus we
+     zoeken hem niet op een src maar op zijn plek: het eerste <script> dat er
+     staat mag geen src hebben. */
+  const eerste = /<script([^>]*)>/i.exec(html);
+  assert.ok(eerste, 'er staat een script in de pagina');
+  assert.doesNotMatch(eerste[1], /\bsrc=/i,
+    'het eerste script is de inline stempelaar; staat er een src, dan is er iets voor hem gekomen');
+});
+
+test('4d. een scherm dat de foutmelder zelf al draagt, krijgt er geen tweede', async () => {
+  const uit = await draai(cspNonce(PUBLIC, true), nepReq('/apps/app.html'), nepRes());
+  const html = String(uit.res.body);
+  const aantal = (html.match(/src="[^"]*\/shared\/foutmelder\.js/g) || []).length;
+  assert.equal(aantal, 1,
+    'twee melders zouden elke fout dubbel melden en allebei hun eigen grens van drie tellen; gevonden: ' + aantal);
+});
+
+test('4e. in Magnaat blijft de blokkade het eerste externe script, met de melder erachter', async () => {
+  const req = nepReq('/apps/medicijnen.html?magnaat=1');
+  req.query = { magnaat: '1' };
+  const uit = await draai(cspNonce(PUBLIC, true), req, nepRes());
+  const html = String(uit.res.body);
+  const padVan = (u) => String(u).split('?')[0];
+  const externe = [...html.matchAll(/<script[^>]+src="([^"]+)"/g)].map(m => padVan(m[1]));
+  assert.equal(externe[0], '/apps/magnaat-sandbox.js', 'de blokkade blijft voorop');
+  assert.equal(externe[1], '/shared/foutmelder.js', 'en de melder komt er direct achter, voor de hand');
+});

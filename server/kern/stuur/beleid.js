@@ -66,8 +66,24 @@ function raakt(lijst, pad) {
    ./plan.js, ./mandaat.js) schreven diezelfde woorden nog eens over -- TAKEN.md
    4.55. Als bevroren object is hij op te halen, zodat een hernoeming hier een
    fout elders geeft in plaats van een tak die nooit meer vuurt. */
+/* TWEE TAKKEN ZETTEN HEM OP DEZELFDE DAG NEER, en die zijn hier samengevoegd
+   in plaats van uitgevochten. De reden was aan beide kanten dezelfde en staat
+   het scherpst in de woorden van de andere: een bestand dat een woord van deze
+   schaal op een `niveau`-veld gebruikt zonder de schaal te IMPORTEREN, houdt een
+   kopie van deze waarheid vast -- en dan zegt een hernoeming hier niets meer over
+   daar. scripts/gezag.js telt precies dat; kern/stuur/isolatiefilter.js was de
+   23e en haalt het woord nu hiervandaan.
+
+   DE SLEUTELS ZIJN KLEIN GESCHREVEN, en dat is de enige keuze die hier gemaakt
+   is: de sleutel is dezelfde tekenreeks als de waarde, zoals in de rest van dit
+   bestand. De HOOFDLETTER-vorm uit de andere tak staat er als alias naast, zodat
+   `NIVEAUS.LEZEN` blijft werken -- twee namen voor een waarde is niet mooi, maar
+   een lezer die stil `undefined` teruggeeft en dan `=== undefined` vergelijkt is
+   erger, en dat is precies wat een niveau-vergelijking met een verkeerde sleutel
+   doet. */
 const NIVEAUS = Object.freeze({
-  verboden: 'verboden', lezen: 'lezen', klein: 'klein', voorstel: 'voorstel'
+  verboden: 'verboden', lezen: 'lezen', klein: 'klein', voorstel: 'voorstel',
+  VERBODEN: 'verboden', LEZEN: 'lezen', KLEIN: 'klein', VOORSTEL: 'voorstel'
 });
 
 function beleidVoor(pad, wereld) {

@@ -11,6 +11,7 @@ const path = require('path');
 const { db, save, DATA_DIR } = require('./../db');
 const { eigenVeld } = require('./../kern/util'); // veilige objecttoegang (geen prototype-pollution)
 const foutisolatie = require('../lib/foutisolatie');
+const klok = require('../lib/klok');
 
 module.exports = function maakBasis() {
   /* ---------- versleuteling van gevoelige gezinsdata ----------
@@ -80,7 +81,17 @@ module.exports = function maakBasis() {
   }
 
   /* ---------- helpers ---------- */
-  const nu = () => new Date().toISOString();
+  /* DE TIJD VAN DE HELE FOUNDATION-LAAG LOOPT HIERDOORHEEN, en sinds 2 september
+     2026 via de huisklok. Hier stond `new Date()`, en daarmee was er in deze hele
+     tak niets om aan te draaien: elke vervaltijd -- de 48 uur van een
+     gezinsuitnodiging, de 15 minuten van een schoolinloglink -- was alleen te
+     toetsen door de opgeslagen datum met de hand te verzetten, en dat toetst de
+     opslag en niet de regel. `../lib/klok` bestaat juist voor die vraag (zie zijn
+     kop) en werd in deze map al gebruikt door ./rem.js.
+
+     Zonder RTG_KLOK is dit dezelfde waarde als ervoor. Met RTG_KLOK weigert de
+     module in productie te laden, dus een verzette klok kan hier niet in glippen. */
+  const nu = () => klok.datum().toISOString();
   const rid = (n = 3) => crypto.randomBytes(n).toString('hex');
   const schoon = (v, n = 200) => String(v == null ? '' : v).replace(/[<>]/g, '').slice(0, n).trim();
   // het alfabet voor les- en gezinscodes: zonder verwarrende tekens (I/L/O/0/1)

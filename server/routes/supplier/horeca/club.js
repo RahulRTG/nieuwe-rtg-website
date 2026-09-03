@@ -21,26 +21,40 @@
       onderwerpgrens: hier het geld van de gast, daar de deur. */
 module.exports = (kern) => {
   const { app, save, schoon, supplierAuth, logActivity, horeca } = kern;
-  const { H, nu, id, heleCenten, uitEuro, bonMaak, bonBoek } = horeca;
+  const { H, Hlees, nu, id, heleCenten, uitEuro, bonMaak, bonBoek } = horeca;
 
   /* De doos van de club (banden, tafels, lijst, deur) komt uit
      kern/horeca/clublaag.js, zodat dit bestand en clubdeur.js er niet elk een
      eigen versie van aanmaken. */
   const { C } = kern.clublaag;
 
+  /* EEN BAND OPZOEKEN IS KIJKEN, EN KIJKEN SCHEPT NIET. C() zet de clubdoos van
+     een zaak neer zodra iemand ernaar vraagt -- ook als die vraag daarna wordt
+     geweigerd. Een club die nog nooit een band had en een onbekend bandnummer
+     laat scannen, kreeg zo een verse clubdoos bij een 404: de statuscode en de
+     opslag zeggen dan twee verschillende dingen over hetzelfde verzoek.
+
+     Deze kijker leunt op Hlees (kern/horeca.js) en niet op C(). Bestaat de doos,
+     dan is dit de ECHTE band -- wat eraan verandert landt gewoon in de opslag.
+     Bestaat hij niet, dan is er geen band en loopt de zoektocht dood op een
+     nette 404. Neerzetten blijft C(), en dat gebeurt hieronder pas waar er
+     werkelijk een band bij komt. Hij staat hier en niet naast C() in de
+     clublaag omdat hij niets van de vorm van de clubdoos weet: hij zoekt een
+     band op, en dat is alles. */
+  const bandVan = (code, nummer) => ((Hlees(code).club || {}).banden || {})[nummer];
+
   /* ---------- polsbanden ---------- */
   app.post('/api/supplier/horeca/club/band', supplierAuth, (req, res) => {
-    const c = C(req.supplier.code);
     const nummer = schoon(req.body.nummer, 40);
     if (!nummer) return res.status(400).json({ error: 'Welk bandnummer? (het nummer dat op de band staat, geen naam)' });
     const bedrag = req.body.bedrag != null ? uitEuro(req.body.bedrag) : heleCenten(req.body.centen);
     if (!bedrag) return res.status(400).json({ error: 'Voor hoeveel wordt de band opgewaardeerd?' });
-    let band = c.banden[nummer];
+    let band = bandVan(req.supplier.code, nummer);
     if (!band) {
       const bon = bonMaak(req.supplier.code, { soort: 'tegoed', centen: bedrag, naam: 'Polsband ' + nummer });
-      band = c.banden[nummer] = { nummer, bonCode: bon.code, at: nu(), opgewaardeerd: bedrag };
+      band = C(req.supplier.code).banden[nummer] = { nummer, bonCode: bon.code, at: nu(), opgewaardeerd: bedrag };
     } else {
-      const h = H(req.supplier.code);
+      const h = Hlees(req.supplier.code);
       const bon = h.bonnen[band.bonCode];
       if (!bon) return res.status(404).json({ error: 'Het tegoed van deze band is niet gevonden.' });
       bon.saldo += bedrag;
@@ -49,7 +63,7 @@ module.exports = (kern) => {
       band.opgewaardeerd = (band.opgewaardeerd || 0) + bedrag;
     }
     save();
-    const saldo = H(req.supplier.code).bonnen[band.bonCode].saldo;
+    const saldo = Hlees(req.supplier.code).bonnen[band.bonCode].saldo;
     logActivity(req.supplier.code, req.actor, 'waardeerde band ' + nummer + ' op met ' + (bedrag / 100).toFixed(2));
     /* De BONCODE gaat mee terug. Die is het bewijs-in-handen waarmee een gast
        op zijn telefoon zijn saldo kan zien en kan afrekenen (routes/gast/club.js):
@@ -61,8 +75,7 @@ module.exports = (kern) => {
   });
 
   app.post('/api/supplier/horeca/club/band/betaal', supplierAuth, (req, res) => {
-    const c = C(req.supplier.code);
-    const band = c.banden[schoon(req.body.nummer, 40)];
+    const band = bandVan(req.supplier.code, schoon(req.body.nummer, 40));
     if (!band) return res.status(404).json({ error: 'Deze band kennen we niet.' });
     const bedrag = req.body.bedrag != null ? uitEuro(req.body.bedrag) : heleCenten(req.body.centen);
     const uit = bonBoek(req.supplier.code, band.bonCode, bedrag);
@@ -72,10 +85,11 @@ module.exports = (kern) => {
   });
 
   app.post('/api/supplier/horeca/club/band/terug', supplierAuth, (req, res) => {
-    const c = C(req.supplier.code);
-    const band = c.banden[schoon(req.body.nummer, 40)];
+    /* Terugbetalen voegt niets toe: het haalt het restsaldo van een BESTAANDE
+       band af. Er is hier dus geen enkele weg waarop een doos hoort te ontstaan. */
+    const band = bandVan(req.supplier.code, schoon(req.body.nummer, 40));
     if (!band) return res.status(404).json({ error: 'Deze band kennen we niet.' });
-    const h = H(req.supplier.code);
+    const h = Hlees(req.supplier.code);
     const bon = h.bonnen[band.bonCode];
     if (!bon || !bon.saldo) return res.status(409).json({ error: 'Er staat niets meer op deze band.' });
     const terug = bon.saldo;
@@ -90,10 +104,11 @@ module.exports = (kern) => {
 
   /* ---------- minimum spend op een tafel ---------- */
   app.post('/api/supplier/horeca/club/tafel', supplierAuth, (req, res) => {
-    const c = C(req.supplier.code);
     const naam = schoon(req.body.tafel, 30);
     if (!naam) return res.status(400).json({ error: 'Welke tafel?' });
     const minimum = req.body.minimum != null ? uitEuro(req.body.minimum) : heleCenten(req.body.minimumCenten);
+    // pas hier staat vast dat er werkelijk een tafel bij komt; eerder was de 400 nog open
+    const c = C(req.supplier.code);
     c.tafels[naam] = { tafel: naam, minimumCenten: minimum, gastnaam: schoon(req.body.gastnaam, 60) || null,
       personen: Math.max(1, Math.min(60, parseInt(req.body.personen, 10) || 2)),
       rekeningId: schoon(req.body.rekeningId, 40) || null, at: nu(), door: req.actor.name };

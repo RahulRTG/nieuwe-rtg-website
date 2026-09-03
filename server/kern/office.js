@@ -16,6 +16,16 @@ const { maakBasis } = require('./office/basis');
 
 function maakOffice(state) {
   const basis = maakBasis(state);
+  const plat = platteNamen(state, basis);
+  /* EN HET PAKKET ZIT ERBIJ, onder EEN naam (zie alsPakket hieronder). Dat het
+     hier gebeurt en niet in opzet/kernlaag6.js is een keuze: de module bepaalt
+     hoe hij zich aanbiedt, en het opzetbestand stond al op 34 bytes van de
+     10 kB-grens -- twee regels bedrading daar hadden hem eroverheen geduwd voor
+     iets dat hier hoort. */
+  return Object.assign(plat, { office: alsPakket(plat) });
+}
+
+function platteNamen(state, basis) {
   return {
     ...require('./office/docs')(state, basis),
     ...require('./office/delen')(state, basis),

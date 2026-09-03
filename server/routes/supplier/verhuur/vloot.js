@@ -9,12 +9,20 @@ app.post('/api/supplier/auto', supplierAuth, (req, res) => {
   if (!managerOnly(req, res)) return;
   const s = req.supplier;
   if (!isVerhuur(s, res)) return;
-  if (!Array.isArray(s.autos)) s.autos = [];
+  /* KIJKEN ZET DE LIJST NIET NEER. De vlootlijst werd hier lui aangemaakt boven
+     alle keuringen, dus een zaak zonder vloot hield een lege vlootlijst over aan
+     een verzoek dat daarna met 400 of 404 terugging -- en dan zeggen de
+     statuscode en de opslag iets anders over hetzelfde verzoek. Bestaat de lijst
+     wel, dan is dit de ECHTE lijst en landt alles wat je erin vindt en aanpast
+     gewoon in de opslag; bestaat hij niet, dan werk je op een lege lijst die
+     nergens aan vastzit. Neerzetten gebeurt hieronder pas waar er werkelijk een
+     auto bij komt. */
+  const autos = Array.isArray(s.autos) ? s.autos : [];
   if (req.body.weg) {
-    const a = s.autos.find(x => x.id === req.body.id);
+    const a = autos.find(x => x.id === req.body.id);
     if (a) a.actief = false; // nooit echt weg: lopende huren verwijzen ernaar
     save(); sseToSupplier(s.code, 'sync', { scope: 'huur' });
-    return res.json({ ok: true, autos: s.autos });
+    return res.json({ ok: true, autos });
   }
   const name = schoon(req.body.name, 60);
   const dagprijs = Number(req.body.dagprijs);
@@ -36,17 +44,18 @@ app.post('/api/supplier/auto', supplierAuth, (req, res) => {
     icoon: schoon(req.body.icoon, 4) || '\uD83D\uDE97'
   };
   if (req.body.id) {
-    const a = s.autos.find(x => x.id === req.body.id);
+    const a = autos.find(x => x.id === req.body.id);
     if (!a) return res.status(404).json({ error: 'Auto niet gevonden.' });
     Object.assign(a, velden);
   } else {
-    if (s.autos.length >= 60) return res.status(400).json({ error: 'Tot 60 auto\'s per zaak.' });
-    s.autos.push({ id: 'c' + crypto.randomBytes(3).toString('hex'), ...velden });
+    if (autos.length >= 60) return res.status(400).json({ error: 'Tot 60 auto\'s per zaak.' });
+    s.autos = autos;   // hier komt de vlootlijst er werkelijk te staan, en geen regel eerder
+    autos.push({ id: 'c' + crypto.randomBytes(3).toString('hex'), ...velden });
   }
   save();
   logActivity(s.code, req.actor, 'werkte de verhuurvloot bij');
   sseToSupplier(s.code, 'sync', { scope: 'huur' });
-  res.json({ ok: true, autos: s.autos });
+  res.json({ ok: true, autos });
 });
 
 app.post('/api/supplier/huur/overzicht', supplierAuth, (req, res) => {

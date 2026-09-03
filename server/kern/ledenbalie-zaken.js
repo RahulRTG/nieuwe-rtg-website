@@ -16,7 +16,7 @@ const SOORTEN = ['reis', 'betaling', 'app', 'partner', 'anders'];
 const STATUSSEN = ['open', 'in behandeling', 'opgelost', 'gesloten'];
 const MENSELIJK = ['lifestyle', 'business']; // deze twee gaan nooit buiten een mens om
 
-module.exports = ({ db, save, inzagelog, hulp }) => {
+module.exports = ({ db, save, inzagelog, hulp, serviceEnvelop }) => {
   const { nu, rid, kort, inhoud, wie, redenOf, lidOf, pasVan, PASSEN, REDEN_MIN, geenReden, geenLid } = hulp;
 
   const eigen = require('./eigencollectie')({ db, domein: 'kern/ledenbalie-zaken', bezit: { balieKlachten: 'lijst', balieAboVoorstellen: 'lijst' } });
@@ -49,7 +49,25 @@ module.exports = ({ db, save, inzagelog, hulp }) => {
     K().unshift(k);
     if (K().length > 5000) K().pop();
     save();
-    return { ok: true, klacht: k };
+
+    /* DE ENVELOP ERBIJ, DE KLACHT BLIJFT VAN DIT BESTAND.
+
+       RTG Service (kern/service/) weet wie eraan werkt, sinds wanneer en met
+       welke bevoegdheid; het OORDEEL over wat er misging blijft hier. Dat is
+       geen nette scheiding maar een noodzakelijke: een servicezaak kan opgelost
+       worden terwijl de klacht nog onderzoek, oordeel en maatregel voor zich
+       heeft. Zou de klacht met de zaak meesluiten, dan verdwijnt "de medewerker
+       was onbeschoft" op het moment dat de bestelling alsnog wordt geleverd.
+
+       Late gebonden en met een lege tak: de balie draaide er jaren zonder, en
+       een klacht die niet meer kan worden vastgelegd omdat een LATERE laag
+       ontbreekt, is een slechtere uitkomst dan een klacht zonder envelop. */
+    let zaak = null;
+    if (typeof serviceEnvelop === 'function') {
+      try { zaak = serviceEnvelop(k) || null; } catch (e) { console.error('[ledenbalie] service-envelop', e && e.message); }
+    }
+    if (zaak) k.zaak = zaak;
+    return { ok: true, klacht: k, zaak };
   }
 
   /* De stand verandert, de klacht blijft staan -- met wie hem verzette en

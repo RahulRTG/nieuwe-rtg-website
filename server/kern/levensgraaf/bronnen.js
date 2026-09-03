@@ -172,4 +172,9 @@ const DEEL1 = [
                        van over zijn spullen -- wie de lijst leest, komt ze
                        tegen op de plek waar de uitleg over hun poort begint. */
 module.exports = { ALLE: require('./bronnen-basis').concat(DEEL1, require('./bronnen2'),
-  require('./bronnen3'), require('./bronnen-platform'), require('./bronnen-leven')) };
+  require('./bronnen3'), require('./bronnen-platform'), require('./bronnen-leven'),
+  /* En als allerlaatste de toestemmingen (HDI.md par. 7 regel 7). Ze gaan niet
+     over spullen en ook niet over de mens zelf, maar over wat ANDEREN van hem
+     mogen -- en ze zijn de enige bron waarvan elke knoop BESLOTEN is en de kring
+     van het lid nooit verlaat. */
+  require('./bronnen-toestemming')) };

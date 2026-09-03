@@ -10,8 +10,40 @@
    interne hosts inherent uit. Daarnaast een generieke `veiligeExternalUrl` die
    privé/gereserveerde IP-ranges en metadata-adressen weigert, als vangnet voor
    toekomstige uitgaande fetches. Pure functies, geen state, geen DNS-lookup
-   (een hostname op de allowlist volstaat; DNS-rebinding hoort thuis achter de
-   egress-proxy in productie -- zie PRODUCTION.md). */
+   (een hostname op de allowlist volstaat; DNS-rebinding hoort thuis achter een
+   egress-proxy in de uitrol).
+
+   DE MAILWEG LIEP HIER NIET LANGS, EN DAT WAS HET SCHERPSTE GAT.
+   server/smtp-direct.js `bezorg()` zoekt de MX van het domein achter de @ op en
+   opent daar een TCP-verbinding: de enige uitgaande verbinding van dit huis
+   waarvan de BESTEMMING door een ander wordt gekozen. Wie een domein beheert kan
+   zijn MX op 10.0.0.5 of 127.0.0.1 zetten, en dan spreken wij SMTP tegen iets
+   binnen ons eigen netwerk -- de aanvaller kiest het doel, wij openen de deur.
+   De smarthost-kant (server/smtp.js) gebruikte deze poort wél; twee helften van
+   dezelfde functie, één ervan gepoort. Sinds 2 september 2026 allebei, met
+   `onveiligIpLiteral` en niet met `metadataDoel`: die tweede vangt alleen het
+   cloud-metadata-adres, en 127.0.0.1 is hier net zo goed fout.
+
+   ALLEEN OP DE DNS-TAK, en dat is geen verzachting maar de vraag zelf: wie koos
+   dit doel? Een MX uit DNS is gekozen door de ontvanger, een MX die onze eigen
+   code meegeeft (een vaste route, een toets tegen een lokale mailserver) niet.
+   De eerste versie poortte allebei, en zes toetsen zakten erop -- de meting wees
+   de te brede regel meteen aan. Een uitrol met een interne mailserver zou er
+   ook op zijn gesneuveld.
+
+   WAT DAT NIET DICHT DOET: een hostnaam die pas NA de DNS-opzoeking naar binnen
+   wijst. Dat is DNS-rebinding, en dat hoort achter een egress-poort in de uitrol
+   -- een ONBEPAALD_INFRA-punt in ISOLATIEPROEF.json. De regel maakt het gat
+   kleiner en niet dicht, en dat verschil hoort erbij te staan.
+
+   DIE VERWIJZING NAAR PRODUCTION.md IS WEGGEHAALD, en dat is geen schoonmaak.
+   Er stond "zie PRODUCTION.md", en dat document noemt egress NERGENS -- alle tien
+   proxy-vermeldingen daar gaan over een INKOMENDE reverse proxy of CDN. Een
+   verwijzing naar een paragraaf die nooit heeft bestaan, leest als een geregelde
+   zaak: dezelfde fout als de cap `rooms` in CLAUDE.md en `kern/stuur/schaduw.js`
+   in ISOLATIE.md. De egress-proxy is een UITROLvraag die vandaag door niets in
+   dit huis wordt beantwoord, en dat staat als ONBEPAALD_INFRA in
+   ISOLATIEPROEF.json -- daar hoort hij, en nergens anders. */
 
 // IPv4-literal? (vier decimale octetten)
 function isIpv4(host) {

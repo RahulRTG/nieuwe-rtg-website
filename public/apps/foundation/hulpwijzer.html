@@ -37,6 +37,9 @@
   .rijveld .veld{flex:1;}
   .nood{font-size:.82rem;color:var(--zacht);line-height:1.5;margin-top:.6rem;text-align:center;}
   .nood b{color:var(--txt);}
+  .veiliglink{display:block;padding:1rem 1.1rem;margin-bottom:1rem;border-color:var(--goud);text-decoration:none;color:inherit;}
+  .veiliglink b{display:block;font-size:1.02rem;color:var(--rtg-leesgoud,var(--goud));}
+  .veiliglink span{display:block;margin-top:.25rem;color:var(--zacht);font-size:.88rem;line-height:1.5;}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
@@ -47,6 +50,14 @@
 <div class="wrap" role="main">
   <h1>Hulpwijzer</h1>
   <div class="intro">Je hoeft het niet alleen te doen. Hieronder staat waar je in Nederland gratis hulp kunt vinden. Alles kosteloos aanvragen; schamen hoeft nooit.</div>
+
+  <!-- Als een echte link en niet alleen als categorie in de lijst hieronder: wie
+       hier komt omdat het thuis niet veilig is, hoort niet eerst een lijst over
+       voedselpakketten door te moeten. -->
+  <a class="kaart veiliglink" href="onveilig.html">
+    <b>Ben je niet veilig?</b>
+    <span>Mishandeling, seksueel geweld, uitbuiting, stalking, of vannacht geen slaapplek - waar je dan gratis terechtkunt, staat hier apart.</span>
+  </a>
 
   <div class="cats" id="cats"></div>
 
@@ -75,6 +86,16 @@ Sessie.balk($('#balk'), { terug:'index.html' });
 function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]); }
 
 const CATS = [
+  /* DEZE STAAT BEWUST BOVENAAN. De rest van deze lijst gaat over rondkomen; dit
+     gaat over veilig zijn, en dat kan niet wachten tot iemand vijf categorieen
+     verder heeft geklikt. De nummers zelf staan op onveilig.html en niet hier,
+     zodat er maar EEN plek is waar ze onderhouden worden (LAT.md regel 4) --
+     die pagina draagt ook de uitstapknop en het eerlijke blok over wat wij op
+     een meegekeken toestel niet kunnen verbergen. */
+  { ic:'', titel:'Onveilig, mishandeld of uitgebuit', items:[
+    ['Direct gevaar','Bel 112. Onveilig thuis, of zorgen om iemand anders? Veilig Thuis is gratis, dag en nacht en ook anoniem: 0800-2000.'],
+    ['Waar je terechtkunt','Op de pagina "Als je niet veilig bent" staat per situatie waar je gratis hulp krijgt: seksueel geweld, geweld thuis, uitbuiting en gedwongen werk, stalking, geen slaapplek vannacht, en hulp voor kinderen. Open onveilig.html.']
+  ]},
   { ic:'', titel:'Eten', items:[
     ['Voedselbank','Gratis voedselpakketten als je even niet rondkomt. Aanmelden kan via voedselbankennederland.nl of je gemeente; er wordt vertrouwelijk gekeken of je in aanmerking komt.'],
     ['Buurtmaaltijden','Veel buurthuizen en kerken koken goedkope of gratis maaltijden waar iedereen welkom is. Vraag bij je wijkcentrum.']
@@ -138,6 +159,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigat
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/ios.js" defer></script>
+<script src="/shared/uitstap.js" defer></script>
 <script src="premium.js" defer></script>
 </body>
 </html>

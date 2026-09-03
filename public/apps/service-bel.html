@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bellen met RTG</title>
+<link rel="icon" href="/icon.svg">
+<meta name="theme-color" content="#0C0C0B">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<link href="/shared/rtg-ontwerp.css" rel="stylesheet">
+<link href="/shared/media.css" rel="stylesheet">
+<style>
+  :root{ --bg:var(--rtg-bg); --card:var(--rtg-card); --line:var(--rtg-line);
+    --txt:var(--rtg-txt); --muted:var(--rtg-muted); --soft:var(--rtg-soft);
+    --merkgoud:var(--rtg-leesgoud,#A98F1C); --sig-uit:var(--rtg-sig-incident,#C23A5E); }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;}
+  h1{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;font-size:1.3rem;}
+  a{color:inherit;}
+  header{padding:calc(env(safe-area-inset-top) + 1rem) 1.1rem .7rem;border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--merkgoud);}
+  .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:0;
+    padding:.5rem .8rem;font:inherit;font-size:.8rem;text-decoration:none;min-height:2.6rem;
+    display:inline-flex;align-items:center;}
+  main{padding:1.1rem;max-width:640px;margin:0 auto;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1rem 1.1rem;margin-bottom:.75rem;}
+  .kaart h2{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--merkgoud);margin-bottom:.4rem;}
+  .oms{font-size:.84rem;color:var(--soft);line-height:1.6;}
+  .stand{font-size:1.05rem;font-weight:600;margin:.3rem 0;}
+  .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-top:.7rem;}
+  .knop{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:0;font:inherit;
+    font-size:.85rem;padding:.6rem .9rem;min-height:2.75rem;min-width:2.75rem;cursor:pointer;}
+  .knop.doe{background:var(--txt);color:#000;border-color:var(--txt);font-weight:600;}
+  .knop.uit{border-color:var(--sig-uit);color:var(--sig-uit);}
+  .beeld{display:grid;gap:.5rem;grid-template-columns:1fr;margin-top:.7rem;}
+  @media(min-width:620px){ .beeld.video{grid-template-columns:1fr 1fr;} }
+  video{width:100%;background:#000;border:1px solid var(--line);border-radius:0;aspect-ratio:4/3;object-fit:cover;}
+  video[hidden]{display:none;}
+  .stil{color:var(--soft);font-size:.8rem;line-height:1.6;}
+</style>
+</head>
+<body class="rtg-stijl">
+<header>
+  <a class="terug" href="/apps/app.html">&#8592; Terug</a>
+  <div><div class="ey">RTG Service</div><h1>Bellen met RTG</h1></div>
+</header>
+<main id="main"><div class="kaart"><p class="oms">Bezig met laden&hellip;</p></div></main>
+<script src="/shared/media.js"></script>
+<script src="/shared/meelezen.js"></script>
+<script src="/shared/meeluister.js"></script>
+<script src="/shared/servicebel.js"></script>
+<script src="/apps/service-bel.js"></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+</body>
+</html>

@@ -21,31 +21,38 @@ module.exports = (b) => {
     const f = functies.OP_ID[req.body.id];
     if (!f) return res.status(404).json({ error: 'Onbekende functie.' });
     const aan = req.body.aan !== false && req.body.aan !== 'false';
+    /* Eerst uitrekenen WELKE as geraakt wordt en of die klopt, en pas daarna de
+       stand aanraken. Andersom kostte een geweigerd verzoek toch iets: een
+       onbekende codenaam of een landcode van een letter liet een verse
+       functie-stand achter EN wiste het automaat-merk van een bestaande -- dus
+       een 404 die de storingswachter stilzette. */
+    let as = '', sleutel = '';
+    if (req.body.persoon) {
+      const p = await herleidPersoon(req.body.persoon);
+      if (!p) return res.status(404).json({ error: 'Geen account gevonden op die codenaam of e-mail.' });
+      as = 'perPersoon'; sleutel = p.key;
+    } else if (req.body.plaats) {
+      const plaats = functies.plaatsNorm(req.body.plaats);
+      if (!plaats) return res.status(400).json({ error: 'Geef een plaatsnaam (stad of dorp).' });
+      as = 'perPlaats'; sleutel = plaats;
+    } else if (req.body.land) {
+      const land = String(req.body.land).toUpperCase().replace(/[^A-Z]/g, '').slice(0, 2);
+      if (land.length !== 2) return res.status(400).json({ error: 'Geef een geldige landcode (2 letters).' });
+      as = 'perLand'; sleutel = land;
+    } else if (req.body.doelgroep) {
+      const dg = String(req.body.doelgroep);
+      if (!(f.doelgroepen || []).includes(dg)) return res.status(400).json({ error: 'Deze functie kent die doelgroep niet.' });
+      as = 'perDoelgroep'; sleutel = dg;
+    }
     const cur = t.functies[f.id] = t.functies[f.id] || {};
     /* De hand wint van de automaat: elke greep van de eigenaar wist het
        automaat-merk, zodat de storingswachter deze stand nooit meer als de
        zijne behandelt (en dus niet stiekem terugschakelt). */
     delete cur.automaat;
-    if (req.body.persoon) {
-      const p = await herleidPersoon(req.body.persoon);
-      if (!p) return res.status(404).json({ error: 'Geen account gevonden op die codenaam of e-mail.' });
-      cur.perPersoon = cur.perPersoon || {};
-      if (aan) delete cur.perPersoon[p.key]; else cur.perPersoon[p.key] = false;
-    } else if (req.body.plaats) {
-      const plaats = functies.plaatsNorm(req.body.plaats);
-      if (!plaats) return res.status(400).json({ error: 'Geef een plaatsnaam (stad of dorp).' });
-      cur.perPlaats = cur.perPlaats || {};
-      if (aan) delete cur.perPlaats[plaats]; else cur.perPlaats[plaats] = false;
-    } else if (req.body.land) {
-      const land = String(req.body.land).toUpperCase().replace(/[^A-Z]/g, '').slice(0, 2);
-      if (land.length !== 2) return res.status(400).json({ error: 'Geef een geldige landcode (2 letters).' });
-      cur.perLand = cur.perLand || {};
-      if (aan) delete cur.perLand[land]; else cur.perLand[land] = false;
-    } else if (req.body.doelgroep) {
-      const dg = String(req.body.doelgroep);
-      if (!(f.doelgroepen || []).includes(dg)) return res.status(400).json({ error: 'Deze functie kent die doelgroep niet.' });
-      cur.perDoelgroep = cur.perDoelgroep || {};
-      if (aan) delete cur.perDoelgroep[dg]; else cur.perDoelgroep[dg] = false;
+    if (as) {
+      cur[as] = cur[as] || {};
+      // op een as betekent aan=true: de beperking verdwijnt weer
+      if (aan) delete cur[as][sleutel]; else cur[as][sleutel] = false;
     } else {
       cur.aan = aan;
     }

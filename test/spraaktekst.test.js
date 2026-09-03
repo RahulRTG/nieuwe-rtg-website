@@ -1,218 +1,219 @@
-/* SPRAAK NAAR TEKST: de herkenner onder de meeleesbaan (TAKEN.md 4.31).
+/* SPRAAK NAAR TEKST -- lokaal, of helemaal niet.
 
-   WAT HIER HET ZWAARST WEEGT, en het zijn er vier:
+   Dit is de helft die ontbrak onder de meeleesbaan. TOEGANKELIJK.md en regel 48
+   van scripts/check.js telden tien live vormen zonder weg naar tekst; meelezen
+   verplaatste dat naar "kan meedoen als de anderen meetypen", en deze laag maakt
+   de tekst vanzelf.
 
-     1. UIT IS DE STARTSTAND. Een herkenner die vanzelf begint is een microfoon
-        die meeluistert zonder dat iemand daarom vroeg. Deze toets zakt zodra
-        het bouwen van de bediening zelf al een herkenner start.
-     2. GERADEN TEKST HEET GERADEN. Elke regel gaat de baan in met bron
-        'machine'; zou hij als 'mens' binnenkomen, dan doet een gok zich voor
-        als een mens die iets zei.
-     3. HET VERZOEK ZET NIETS AAN BIJ DE ANDER. "Vraag om live tekst" is een
-        REGEL en geen schakelaar -- LIFE.md par. 4: alles wat een tweede persoon
-        bereikt wordt klaargezet, nooit automatisch. Deze toets zakt zodra die
-        knop iets anders doet dan tekst sturen.
-     4. EEN VERHINDERING DRAAGT EEN REDEN. Kan de browser het niet, dan staat de
-        knop uit MET de reden erbij, en niet grijs zonder uitleg
-        (GRAMMATICA.md).
+   Wat hier wordt vastgelegd is vooral wat er NIET gebeurt:
 
-   Zonder browser, met dezelfde DOM-stomp als test/meelezen.test.js en een
-   nagemaakte SpeechRecognition die precies genoeg kan. Dit huis heeft geen
-   dependencies, dus geen jsdom.
-
-   Draai los: node --test test/spraaktekst.test.js */
+   1. GEEN UITWIJK NAAR BUITEN. kern/ai.js heeft een uitwijkketen omdat een
+      tekstantwoord bij de derde aanbieder net zo goed is. Geluid is dat niet:
+      dat is de stem van een lid. Zonder lokaal model is het antwoord "kan hier
+      niet", en nooit een andere aanbieder.
+   2. EEN TEKSTMODEL WORDT NIET STILZWIJGEND VOOR GELUID GEBRUIKT. Een aparte
+      LOCAL_AI_MODEL_SPRAAK, om dezelfde reden als de andere drie in local-ai.js.
+   3. DE NETWERKGRENS IS DIE VAN local-ai.js EN GEEN TWEEDE. Een publieke host is
+      geen lokale modelserver, hoe je hem ook noemt.
+   4. Een fragment is een paar seconden en geen opname -- een lange opname is
+      trouwens ook geen LIVE ondertiteling meer.
+   5. De route zegt of het kan, en waarom niet. Een ondertitelknop die niets doet
+      is erger dan geen knop: die laat iemand aan een gesprek beginnen in de
+      veronderstelling dat hij het kan volgen.
+   Draai: node --test test/spraaktekst.test.js */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const laag = require('../server/kern/spraaktekst');
+
+const LOKAAL = { LOCAL_AI_URL: 'http://127.0.0.1:8080', LOCAL_AI_MODEL_SPRAAK: 'whisper-nl' };
+
+test('zonder lokale modelserver bestaat deze voorziening niet, met de reden erbij', async () => {
+  const st = laag.beschikbaar({});
+  assert.equal(st.beschikbaar, false);
+  assert.match(st.reden, /lokaal/i, 'de reden legt niet uit dat het lokaal moet');
+
+  /* En hij wijkt NIET uit: geen andere aanbieder, geen stille leegte. */
+  const r = await laag.transcribeer(Buffer.from('x'.repeat(2000)), { env: {} });
+  assert.equal(r.ingericht, false, JSON.stringify(r));
+  assert.equal(r.status, 503);
+  assert.ok(!r.ok);
+});
+
+test('een tekstmodel wordt niet stilzwijgend voor geluid gebruikt', () => {
+  const st = laag.beschikbaar({ LOCAL_AI_URL: 'http://127.0.0.1:8080', LOCAL_AI_MODEL: 'een-tekstmodel' });
+  assert.equal(st.beschikbaar, false, 'het tekstmodel werd voor spraak aangezien');
+  assert.match(st.reden, /LOCAL_AI_MODEL_SPRAAK/);
+});
+
+test('de netwerkgrens is die van local-ai.js: een publieke host telt niet als lokaal', () => {
+  const st = laag.beschikbaar({ LOCAL_AI_URL: 'https://spraak.example.com', LOCAL_AI_MODEL_SPRAAK: 'whisper' });
+  assert.equal(st.beschikbaar, false, 'een publieke host kwam door als lokale modelserver');
+  assert.match(st.reden, /netwerkgrens/i);
+
+  /* Het eigen netwerk mag alleen met de vlag die daarvoor bestaat -- dezelfde
+     vlag als in local-ai.js, en niet een tweede met een andere naam. */
+  const zonder = laag.beschikbaar({ LOCAL_AI_URL: 'http://192.168.1.9:8080', LOCAL_AI_MODEL_SPRAAK: 'whisper' });
+  assert.equal(zonder.beschikbaar, false);
+  const met = laag.beschikbaar({ LOCAL_AI_URL: 'http://192.168.1.9:8080', LOCAL_AI_MODEL_SPRAAK: 'whisper',
+    LOCAL_AI_LAN_TOESTAAN: '1' });
+  assert.equal(met.beschikbaar, true, JSON.stringify(met));
+});
+
+test('een fragment is een paar seconden, geen opname', async () => {
+  const groot = Buffer.alloc(laag.MAX_BYTES + 1);
+  const r = await laag.transcribeer(groot, { env: LOKAAL });
+  assert.equal(r.status, 413, JSON.stringify(r).slice(0, 200));
+  assert.match(r.error, /live/i, 'de weigering legt niet uit waarom een opname iets anders is');
+});
+
+test('met een lokaal model gaat het geluid naar de eigen server en komt er tekst terug', async () => {
+  let gezien = null;
+  const nep = async (url, opties) => {
+    gezien = { url: url, methode: opties.methode || opties.method };
+    return { ok: true, status: 200, text: async () => 'Ik kom niet in mijn account.' };
+  };
+  const r = await laag.transcribeer(Buffer.from('geluidbytes'), { env: LOKAAL, fetchImpl: nep });
+  assert.equal(r.ok, true, JSON.stringify(r));
+  assert.equal(r.tekst, 'Ik kom niet in mijn account.');
+
+  /* NAAR DE EIGEN SERVER, en naar het pad dat een OpenAI-compatibele
+     transcriptie-server draagt. Niet naar een andere host, hoe dan ook. */
+  assert.ok(gezien.url.startsWith('http://127.0.0.1:8080/'), gezien.url);
+  assert.match(gezien.url, /\/v1\/audio\/transcriptions$/);
+});
+
+test('een JSON-antwoord van een server die geen platte tekst geeft, wordt gewoon gelezen', async () => {
+  const nep = async () => ({ ok: true, status: 200, text: async () => '{"text":"hallo daar"}' });
+  const r = await laag.transcribeer(Buffer.from('x'), { env: LOKAAL, fetchImpl: nep });
+  assert.equal(r.tekst, 'hallo daar');
+});
+
+test('een stukke modelserver levert een fout en geen lege regel', async () => {
+  const stuk = async () => { throw new Error('connection refused'); };
+  const r = await laag.transcribeer(Buffer.from('x'), { env: LOKAAL, fetchImpl: stuk });
+  assert.ok(!r.ok, JSON.stringify(r));
+  assert.equal(r.status, 502);
+  /* Een lege string zou op stilte lijken terwijl er iets misging, en dan zoekt
+     iemand naar woorden die nooit komen. */
+  assert.equal(r.tekst, undefined);
+});
+
+/* DE HELE KETEN OVER DE ECHTE ROUTE, met een neplokaal model.
+
+   De toetsen hierboven staan op moduleniveau. Deze doet het over de deur die een
+   scherm werkelijk gebruikt, en beproeft de bewering die het mutatiecontract
+   doet: er wordt NIETS bewaard. Dat is niet af te leiden uit lezen -- een route
+   die geluid aanneemt is precies het soort route waar iemand "even" een kopie
+   wegschrijft.
+
+   Het nepmodel is een gewone HTTP-server op loopback. Dat is geen truc om de
+   netwerkgrens te omzeilen: loopback is exact waar een lokaal model hoort te
+   draaien, en de grens uit local-ai.js laat hem daarom door. */
+const http = require('http');
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
+const { startServer, stop, postJson, wachtOpWaarde } = require('./helper');
 
-/* ---------- de DOM-stomp ---------- */
-function maakDom() {
-  function El(tag) {
-    this.tagName = String(tag).toUpperCase();
-    this.children = [];
-    this.attrs = {};
-    this.style = { cssText: '' };
-    this.luisteraars = {};
-    this._tekst = '';
-    this.hidden = false;
-    this.disabled = false;
+test('over de echte route: geluid erin, tekst eruit, en niets bewaard', async () => {
+  let gezien = 0;
+  const model = http.createServer((req, res) => {
+    gezien++;
+    /* Een OpenAI-compatibele transcriptieserver antwoordt op dit pad. Zou de
+       laag ergens anders heen sturen, dan komt hier niets binnen en zakt deze
+       toets -- dat is de bedoeling. */
+    if (!/\/v1\/audio\/transcriptions$/.test(req.url)) { res.writeHead(404); res.end(); return; }
+    req.resume();
+    req.on('end', () => { res.writeHead(200, { 'Content-Type': 'text/plain' }); res.end('mijn boeking is niet doorgekomen'); });
+  });
+  await new Promise(r => model.listen(0, '127.0.0.1', r));
+  const poort = model.address().port;
+
+  /* EIGEN DATAMAP, EN DAT IS GEEN NETHEID. Zonder deze regel viel de opname
+     terug op server/data van de ONTWIKKELSERVER: die verandert niet door wat
+     deze toets doet, dus "er is niets bewaard" was groen omdat er naar de
+     verkeerde map werd gekeken. Een meting die niet kan bewegen, bewijst niets
+     (LAT.md regel 3). */
+  const datamap = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-spraak-'));
+  const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: datamap,
+    LOCAL_AI_URL: 'http://127.0.0.1:' + poort, LOCAL_AI_MODEL_SPRAAK: 'nep-whisper' } });
+  try {
+    const post = postJson(srv.base);
+    const reg = await post('/api/auth/register', { name: 'Ondertitel Proef', email: 'ondertitel@x.nl',
+      phone: '0612345698', password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
+    assert.ok(reg.token, JSON.stringify(reg).slice(0, 200));
+
+    const stand = await post('/api/ondertiteling/stand', {}, reg.token);
+    assert.equal(stand.beschikbaar, true, JSON.stringify(stand));
+    /* Wat het scherm de gebruiker vertelt, is niet "het verlaat uw toestel niet"
+       -- dat zou onwaar zijn. De zin hoort te zeggen waar het geluid WEL heen
+       gaat en wat er niet mee gebeurt. */
+    assert.match(stand.let, /lokaal model/i);
+    assert.match(stand.let, /niet bewaard/i);
+
+    const voor = kijkjeInDeOpslag(datamap);
+    const r = await fetch(srv.base + '/api/ondertiteling/fragment', { method: 'POST',
+      headers: { 'Content-Type': 'audio/webm', Authorization: 'Bearer ' + reg.token },
+      body: Buffer.from('nepgeluidbytes-nepgeluidbytes') });
+    const uit = await r.json();
+    assert.equal(uit.ok, true, JSON.stringify(uit).slice(0, 200));
+    assert.equal(uit.tekst, 'mijn boeking is niet doorgekomen');
+    assert.equal(gezien, 1, 'de laag sprak het lokale model niet aan, of te vaak');
+
+    /* NIET OP DE KLOK WACHTEN MAAR OP EEN TOESTAND. Een `setTimeout` van een
+       halve seconde bewijst niets: hij is te kort op een trage machine en te
+       lang op een snelle. Wat wel bewijst dat de schrijfronde voorbij is, is een
+       LATERE schrijfactie zien landen -- had het fragment iets weggeschreven,
+       dan stond dat er dan al lang in. */
+    const na = await post('/api/service/open', { titel: 'Een gewone melding om de opslag te laten schrijven',
+      tekst: 'zodat de volgende regel iets heeft om op te wachten' }, reg.token);
+    assert.ok(na.zaak, JSON.stringify(na).slice(0, 200));
+    await wachtOpWaarde(() => kijkjeInDeOpslag(datamap) !== voor,
+      { wat: 'de opslag verandert door een gewone schrijfactie (positieve controle op de peiling)', ms: 10000 });
+
+    /* En dan de eigenlijke vraag: staat er iets van het GELUID in? Niet "is de
+       opslag gelijk gebleven" -- die is nu terecht veranderd door de zaak
+       hierboven -- maar: zijn de bytes of een fragmentbestand ergens terug te
+       vinden. Dat is de bewering van het mutatiecontract. */
+    const alles = [];
+    (function loop(m) {
+      for (const n of fs.readdirSync(m, { withFileTypes: true })) {
+        const q = path.join(m, n.name);
+        if (n.isDirectory()) loop(q); else alles.push(q);
+      }
+    })(datamap);
+    assert.deepEqual(alles.filter(q => /fragment|audio|\.webm$|\.ogg$|\.wav$/i.test(path.basename(q))), [],
+      'er is een geluidsbestand achtergebleven');
+    const metBytes = alles.filter(q => {
+      try { return fs.readFileSync(q).includes('nepgeluidbytes'); } catch (e) { return false; }
+    });
+    assert.deepEqual(metBytes, [], 'de bytes van het fragment staan in de opslag');
+  } finally {
+    await stop(srv);
+    await new Promise(r => model.close(r));
+    try { fs.rmSync(datamap, { recursive: true, force: true }); } catch (e) {}
   }
-  El.prototype.appendChild = function (k) { this.children.push(k); k.ouder = this; return k; };
-  El.prototype.insertBefore = function (k) { this.children.push(k); k.ouder = this; return k; };
-  El.prototype.setAttribute = function (n, v) { this.attrs[n] = String(v); };
-  El.prototype.getAttribute = function (n) { return this.attrs[n] === undefined ? null : this.attrs[n]; };
-  El.prototype.addEventListener = function (n, f) { (this.luisteraars[n] = this.luisteraars[n] || []).push(f); };
-  El.prototype.vuur = function (n, ev) { for (const f of (this.luisteraars[n] || [])) f(ev || { preventDefault() {} }); };
-  Object.defineProperty(El.prototype, 'nextSibling', { get() { return null; } });
-  Object.defineProperty(El.prototype, 'parentNode', { get() { return this.ouder || null; } });
-  Object.defineProperty(El.prototype, 'textContent', {
-    get() { return this.children.length ? this.children.map(k => k.textContent).join('') : this._tekst; },
-    set(v) { this.children = []; this._tekst = String(v); }
-  });
-  const d = {
-    documentElement: { lang: 'nl' },
-    createElement: (t) => new El(t),
-    createTextNode: (t) => ({ textContent: String(t) })
+});
+
+/* De opslag als een tekenreeks: elk bestand met zijn grootte en wijzigtijd.
+
+   HIER STOND EERST `db.json`, EN DAT BESTAND BESTAAT NIET MEER -- de opslag is
+   SQLite (rtg.db en vrienden). De peiling gaf dus altijd 'onleesbaar', en de
+   assertie "er is niets bewaard" was groen omdat er naar niets werd gekeken.
+   Een meting die niet kan bewegen bewijst niets (LAT.md regel 3), en daarom
+   staat er nu een positieve controle omheen: de proef eist eerst dat een gewone
+   schrijfactie deze peiling WEL ziet veranderen. */
+function kijkjeInDeOpslag(map) {
+  const uit = [];
+  const loop = (m, voor) => {
+    for (const n of fs.readdirSync(m, { withFileTypes: true }).sort((a, b) => a.name < b.name ? -1 : 1)) {
+      const q = path.join(m, n.name);
+      if (n.isDirectory()) { loop(q, voor + n.name + '/'); continue; }
+      const st = fs.statSync(q);
+      uit.push(voor + n.name + ':' + st.size + ':' + st.mtimeMs);
+    }
   };
-  return { d, El };
+  try { loop(map, ''); } catch (e) { return 'onleesbaar'; }
+  return uit.join('|');
 }
-
-/* ---------- een nagemaakte herkenner ----------
-
-   Hij houdt bij hoe vaak hij gestart is; dat is wat toets 1 meet. `zeg()` doet
-   alsof er een zin is afgerond. */
-function maakMotor() {
-  const gestart = [];
-  function SR() { this.lang = null; this.continuous = null; this.interimResults = null; SR.laatste = this; }
-  SR.prototype.start = function () { gestart.push(this); };
-  SR.prototype.stop = function () { if (this.onend) this.onend(); };
-  SR.prototype.zeg = function (t) {
-    this.onresult({ resultIndex: 0, results: [{ isFinal: true, 0: { transcript: t }, length: 1 }] });
-  };
-  return { SR, gestart };
-}
-
-function laad(opties) {
-  opties = opties || {};
-  const bron = fs.readFileSync(path.join(__dirname, '..', 'public', 'shared', 'spraaktekst.js'), 'utf8');
-  const { d } = maakDom();
-  const motor = maakMotor();
-  const w = { isSecureContext: opties.onveilig ? false : true };
-  if (!opties.geenMotor) w.SpeechRecognition = motor.SR;
-  new Function('window', 'document', bron)(w, d);
-  return { w, d, motor };
-}
-
-function bedien(w, d, zend) {
-  const kop = d.createElement('div');
-  const wrap = d.createElement('div');
-  wrap.appendChild(kop);
-  const regels = [];
-  const koppel = w.RTGSpraakTekst.koppel({
-    kop: kop,
-    knopStijl: '',
-    zend: (r, bron) => { regels.push({ r, bron }); if (zend) zend(r, bron); },
-    open: () => {}
-  });
-  const knop = (klasse) => kop.children.find(k => k.className === klasse);
-  return { koppel, kop, regels, spraakKnop: knop('meelees-spraak'), vraagKnop: knop('meelees-vraag') };
-}
-
-/* ---------- de toetsen ---------- */
-
-test('UIT IS DE STARTSTAND: het bouwen van de bediening start geen herkenner', () => {
-  const { w, d, motor } = laad();
-  const b = bedien(w, d);
-  assert.equal(motor.gestart.length, 0, 'er is een herkenner gestart zonder dat iemand op de knop drukte');
-  assert.equal(b.spraakKnop.getAttribute('aria-pressed'), 'false');
-  assert.equal(b.spraakKnop.textContent, 'Spreek mee');
-});
-
-test('een tik start hem, en een tweede tik stopt hem', () => {
-  const { w, d, motor } = laad();
-  const b = bedien(w, d);
-  b.spraakKnop.vuur('click');
-  assert.equal(motor.gestart.length, 1);
-  assert.equal(b.spraakKnop.getAttribute('aria-pressed'), 'true');
-  assert.equal(b.spraakKnop.textContent, 'Stop met spreken');
-  b.spraakKnop.vuur('click');
-  assert.equal(b.spraakKnop.getAttribute('aria-pressed'), 'false');
-  assert.equal(b.spraakKnop.textContent, 'Spreek mee');
-});
-
-test('GERADEN TEKST HEET GERADEN: elke herkende zin gaat de baan in als machine', () => {
-  const { w, d, motor } = laad();
-  const b = bedien(w, d);
-  b.spraakKnop.vuur('click');
-  motor.SR.laatste.zeg('dit heeft niemand getypt');
-  assert.deepEqual(b.regels, [{ r: 'dit heeft niemand getypt', bron: 'machine' }],
-    'een geraden regel die als mens binnenkomt, doet een gok voorkomen als iemand die iets zei');
-});
-
-test('HET VERZOEK ZET NIETS AAN: de vraagknop stuurt tekst en start geen herkenner', () => {
-  /* LIFE.md par. 4 staat hierboven: alles wat een tweede persoon bereikt wordt
-     klaargezet en nooit automatisch. Zou deze knop de microfoon van de ander
-     aanzetten, dan is dat precies wat daar verboden is -- en het zou hier ook
-     niet eens KUNNEN, want dit draait bij de vrager. */
-  const { w, d, motor } = laad();
-  const b = bedien(w, d);
-  b.vraagKnop.vuur('click');
-  assert.equal(motor.gestart.length, 0, 'het verzoek startte een herkenner');
-  assert.equal(b.regels.length, 1);
-  assert.equal(b.regels[0].bron, 'mens', 'het verzoek komt van een mens en niet van een machine');
-  assert.match(b.regels[0].r, /Spreek mee/, 'het verzoek zegt wat de ander moet doen');
-});
-
-test('EEN VERHINDERING DRAAGT EEN REDEN: zonder motor staat de knop uit met uitleg', () => {
-  const { w, d } = laad({ geenMotor: true });
-  assert.equal(w.RTGSpraakTekst.beschikbaar(), false);
-  const b = bedien(w, d);
-  assert.equal(b.spraakKnop.disabled, true);
-  /* ZICHTBAAR, en niet in een `title`. Een tooltip op een uitgeschakelde knop
-     krijg je met een toetsenbord niet te pakken en een schermlezer leest hem
-     niet betrouwbaar voor -- dan bereikt de reden precies de mensen niet voor
-     wie deze knop bestaat. Deze toets vond die fout in de eerste versie. */
-  const stand = (b.kop.parentNode.children || []).find(k => k.className === 'meelees-stand');
-  assert.equal(stand.hidden, false, 'de reden staat er niet zichtbaar bij');
-  assert.match(stand.textContent, /kan geen spraak/,
-    'een knop die uitstaat zonder reden is precies wat GRAMMATICA.md verbiedt');
-});
-
-test('buiten een beveiligde verbinding zegt hij dat, en niet iets anders', () => {
-  const { w } = laad({ onveilig: true });
-  assert.match(w.RTGSpraakTekst.waarom(), /beveiligde verbinding/);
-});
-
-test('de taal komt van de PAGINA en niet van het toestel', () => {
-  /* Een RTG-scherm in het Nederlands hoort niet naar Engels te luisteren omdat
-     iemands telefoon zo staat. */
-  const { w, d, motor } = laad();
-  const b = bedien(w, d);
-  b.spraakKnop.vuur('click');
-  assert.equal(motor.SR.laatste.lang, 'nl-NL');
-  assert.equal(w.RTGSpraakTekst.taalVanPagina(), 'nl-NL');
-});
-
-test('alleen AFGERONDE zinnen: interimResults staat uit', () => {
-  /* Een tussenstand die bij elk woord verandert is in een aria-live-baan
-     onleesbaar: een schermlezer begint elke keer opnieuw. */
-  const { w, d, motor } = laad();
-  const b = bedien(w, d);
-  b.spraakKnop.vuur('click');
-  assert.equal(motor.SR.laatste.interimResults, false);
-  assert.equal(motor.SR.laatste.continuous, true);
-});
-
-test('een herkenner die uit zichzelf stopt, komt terug zolang de gebruiker hem aan wil', () => {
-  /* De stilste manier waarop deze functie kapot kan: het lampje staat aan, de
-     gebruiker denkt dat hij gevolgd wordt, en er komt niets meer. */
-  const { w, d, motor } = laad();
-  const b = bedien(w, d);
-  b.spraakKnop.vuur('click');
-  assert.equal(motor.gestart.length, 1);
-  motor.SR.laatste.onend();
-  assert.equal(motor.gestart.length, 2, 'hij kwam niet terug na een stilte');
-  assert.equal(b.spraakKnop.getAttribute('aria-pressed'), 'true');
-});
-
-test('een geweigerde microfoon zet de knop uit MET de reden', () => {
-  const { w, d, motor } = laad();
-  const b = bedien(w, d);
-  b.spraakKnop.vuur('click');
-  motor.SR.laatste.onerror({ error: 'not-allowed' });
-  assert.equal(b.spraakKnop.getAttribute('aria-pressed'), 'false');
-  const stand = (b.kop.parentNode.children || []).find(k => k.className === 'meelees-stand');
-  assert.match(stand.textContent, /geen toegang tot de microfoon/);
-  assert.equal(stand.hidden, false, 'een reden die verborgen blijft, is geen reden');
-});
-
-test('stilte is geen storing: no-speech laat hem gewoon staan', () => {
-  const { w, d, motor } = laad();
-  const b = bedien(w, d);
-  b.spraakKnop.vuur('click');
-  motor.SR.laatste.onerror({ error: 'no-speech' });
-  assert.equal(b.spraakKnop.getAttribute('aria-pressed'), 'true',
-    'even niets zeggen mag de herkenner niet uitzetten');
-});

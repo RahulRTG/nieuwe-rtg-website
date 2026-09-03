@@ -34,7 +34,13 @@ module.exports = (kern, hulp) => {
 // De levensgraaf: de motor onder het Privekantoor, maar voor ELKE pas. Staat
 // vóór kern/bureau, dat hem gebruikt; paspoortVervalt als thunk (andere laag).
 Object.assign(kern, require('../kern/levensgraaf')({ db,
-  paspoortVervalt: (key) => (kern.paspoortVervaldatumVan ? kern.paspoortVervaldatumVan(key) : null) }));
+  paspoortVervalt: (key) => (kern.paspoortVervaldatumVan ? kern.paspoortVervaldatumVan(key) : null),
+  /* LUI OPZOEKEN, net als paspoortVervalt hierboven, en hier is dat geen stijl
+     maar noodzaak: het Consent Center wordt pas in opzet/aanbouw3.js gemonteerd,
+     dus op DIT moment bestaat kern.consentVan nog niet. Een directe verwijzing
+     zou hier stil `undefined` vastleggen en de bron zou voor altijd niets
+     opleveren -- zonder dat iets klaagt. */
+  toestemmingen: (key) => (kern.consentVan ? kern.consentVan(key) : null) }));
 // bezitZet komt uit de lifestyle-mount hierboven: een geregelde inkoopzaak
 // schrijft zichzelf in het register. Vandaar NA die twee.
 

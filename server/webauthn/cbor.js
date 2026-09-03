@@ -23,39 +23,76 @@ function gelijk(a, b) {
    maps, tags (overgeslagen) en de simpele waarden (true/false/null). Geen floats
    nodig voor attestatie 'none'. Geeft { waarde, eind } terug zodat de aanroeper de
    exacte byte-lengte kent (nodig om de COSE-sleutel uit authData te knippen). */
-function cborLees(buf, p) {
+/* DE DIEPTEGRENS. WebAuthn is ondiep: het attestationObject is een map met drie
+   sleutels en de COSE-sleutel is een platte map. Tweeendertig is dus ruim boven
+   alles wat een echte authenticator stuurt, en ver onder de stapel van node --
+   zodat een geneste invoer een NETTE weigering geeft in plaats van een
+   "Maximum call stack size exceeded" halverwege een verzoekafhandelaar. */
+const MAX_DIEPTE = 32;
+
+/* DRIE BUDGETTEN, en ze komen alle drie uit een GEMETEN gat (STANDAARD.md
+   par. 6): lezen voorbij het einde (dat leverde een verzonnen "unsigned int 0"
+   op), een lengteveld dat meer belooft dan de buffer nog heeft (negen bytes
+   blokkeerden de lus 9325 ms, bereikbaar voor elk ingelogd lid), en een string
+   die meer belooft dan er ligt (`subarray` klemt en gooit niet). De grens is
+   nergens een verzonnen maximum maar de BUFFER zelf, dus hij weigert precies
+   het onmogelijke en geen enkel geldig document. Majortype 0 en 1 blijven met
+   opzet onbegrensd: daar is de waarde het getal en niet een byte-aantal.
+   De volledige uitleg per budget, met de gemeten getallen en de reden dat elk
+   van de drie erger was dan een crash, staat bij de toets die ze bewaakt --
+   test/vijandigerand.test.js. Dit bestand zat op 9713 van de 10240 bytes en
+   heeft die ruimte niet (TAKEN.md 7.21 is dezelfde val, een bestand eerder). */
+function cborLees(buf, p, diepte) {
+  diepte = diepte || 0;
+  if (diepte > MAX_DIEPTE) throw new Error('CBOR: te diep genest (grens ' + MAX_DIEPTE + ')');
+  if (!(p >= 0) || p >= buf.length) throw new Error('CBOR: lezen voorbij het einde van de buffer');
   const eerste = buf[p];
   const major = eerste >> 5;
   const ai = eerste & 0x1f;
   p += 1;
   let lengte = ai, extra = 0;
-  if (ai === 24) { lengte = buf[p]; extra = 1; }
-  else if (ai === 25) { lengte = buf.readUInt16BE(p); extra = 2; }
-  else if (ai === 26) { lengte = buf.readUInt32BE(p); extra = 4; }
-  else if (ai === 27) { lengte = Number(buf.readBigUInt64BE(p)); extra = 8; }
+  if (ai === 24) extra = 1;
+  else if (ai === 25) extra = 2;
+  else if (ai === 26) extra = 4;
+  else if (ai === 27) extra = 8;
   else if (ai > 27) throw new Error('CBOR: ongeldige lengte-codering');
+  if (p + extra > buf.length) throw new Error('CBOR: het lengteveld loopt voorbij het einde van de buffer');
+  if (extra === 1) lengte = buf[p];
+  else if (extra === 2) lengte = buf.readUInt16BE(p);
+  else if (extra === 4) lengte = buf.readUInt32BE(p);
+  else if (extra === 8) lengte = Number(buf.readBigUInt64BE(p));
   p += extra;
+
+  /* De ruimte die er nog IS, als bovengrens voor alles wat een aantal bytes of
+     elementen belooft. */
+  const rest = buf.length - p;
 
   switch (major) {
     case 0: return { waarde: lengte, eind: p };                       // unsigned int
     case 1: return { waarde: -1 - lengte, eind: p };                  // negative int
-    case 2: return { waarde: buf.subarray(p, p + lengte), eind: p + lengte }; // byte string
-    case 3: return { waarde: buf.toString('utf8', p, p + lengte), eind: p + lengte }; // text
+    case 2:                                                            // byte string
+      if (lengte > rest) throw new Error('CBOR: bytestring belooft ' + lengte + ' bytes, er zijn er ' + rest);
+      return { waarde: buf.subarray(p, p + lengte), eind: p + lengte };
+    case 3:                                                            // text
+      if (lengte > rest) throw new Error('CBOR: tekststring belooft ' + lengte + ' bytes, er zijn er ' + rest);
+      return { waarde: buf.toString('utf8', p, p + lengte), eind: p + lengte };
     case 4: {                                                          // array
+      if (lengte > rest) throw new Error('CBOR: array belooft ' + lengte + ' elementen, er passen er hoogstens ' + rest);
       const arr = [];
-      for (let i = 0; i < lengte; i++) { const r = cborLees(buf, p); arr.push(r.waarde); p = r.eind; }
+      for (let i = 0; i < lengte; i++) { const r = cborLees(buf, p, diepte + 1); arr.push(r.waarde); p = r.eind; }
       return { waarde: arr, eind: p };
     }
     case 5: {                                                          // map
+      if (lengte > rest / 2) throw new Error('CBOR: map belooft ' + lengte + ' paren, er passen er hoogstens ' + Math.floor(rest / 2));
       const m = new Map();
       for (let i = 0; i < lengte; i++) {
-        const k = cborLees(buf, p); p = k.eind;
-        const v = cborLees(buf, p); p = v.eind;
+        const k = cborLees(buf, p, diepte + 1); p = k.eind;
+        const v = cborLees(buf, p, diepte + 1); p = v.eind;
         m.set(k.waarde, v.waarde);
       }
       return { waarde: m, eind: p };
     }
-    case 6: { const r = cborLees(buf, p); return { waarde: r.waarde, eind: r.eind }; } // tag: inhoud
+    case 6: { const r = cborLees(buf, p, diepte + 1); return { waarde: r.waarde, eind: r.eind }; } // tag: inhoud
     case 7:                                                            // simple
       if (ai === 20) return { waarde: false, eind: p };
       if (ai === 21) return { waarde: true, eind: p };

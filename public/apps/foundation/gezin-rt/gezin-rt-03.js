@@ -35,7 +35,9 @@
        (TOEGANKELIJK.md). Wat erin staat is getypt door een mens en niet uit
        spraak herkend -- zie de kop van shared/meelezen.js. */
     if (w.RTGMeelezen) {
-      mee = w.RTGMeelezen.maak({ stuur: function (regel) { if (call) seinNaar(call.met, 'tekst', { r: regel }); } });
+      mee = w.RTGMeelezen.maak({
+        stroom: function () { return (call && call.stream) || null; },
+        stuur: function (regel) { if (call) seinNaar(call.met, 'tekst', { r: regel }); } });
       var meeVak = document.getElementById('grt-mee'); if (meeVak) meeVak.appendChild(mee.el);
     }
     document.getElementById('grt-weg').onclick = function () { eindeGesprek(true); };

@@ -79,7 +79,10 @@ function maakCommand({ db, save, crypto, anthropic, sseToOffice, kern }) {
      daar; wat ze delen is dat geen van vijven iets twee keer meet. */
   const { sonde, slo, alarm, gezondheid, incident, bijstand, vlootbeeld } =
     require('./meetlagen').maakMeetlagen({ db, save, crypto, journaal, kwaliteit, canary, sseToOffice,
-      tenant: () => kern && kern.tenant, opslag });
+      tenant: () => kern && kern.tenant, opslag,
+      // de bestaande webhook-melder van server.js, laat opgehaald: het alarm heeft
+      // er een uitgang naar buiten aan (zie ./alarm.js, meld -> naarBuiten)
+      foutmelder: () => kern && kern.foutmelder });
 
   /* HERSTEL ALS TRANSACTIE: het enige pad waarlangs de routes een recept
      draaien. Na de kaart: zijn voorcontrole leest die. */

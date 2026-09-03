@@ -205,7 +205,7 @@ niet aangenomen.
 |---|---|
 | bewezen | **<!--getal:vertrouwen.bewezen-->0<!--/getal-->** |
 | verschaald | 0 |
-| verzwakt | <!--getal:vertrouwen.routes-->4180<!--/getal--> |
+| verzwakt | <!--getal:vertrouwen.routes-->4716<!--/getal--> |
 | geschorst | **<!--getal:vertrouwen.geschorst-->0<!--/getal-->** |
 | ongemeten | 5 |
 

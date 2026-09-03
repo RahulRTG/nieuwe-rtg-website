@@ -22,10 +22,21 @@ module.exports = ({ db, save, codenaamVan, notify, genootschap }) => {
   const ANTWOORDEN = ['ja', 'misschien', 'nee'];
   const nu = () => new Date().toISOString();
 
+  /* lijstVan SCHRIJFT: hij zet een lege rij neer voor een genootschap dat er nog
+     geen had. Dat hoort ook zo op de weg die een bijeenkomst AANMAAKT. Op elke
+     andere weg is het verkeerd: wie een bijeenkomst opzoekt die niet bestaat,
+     krijgt een 400 en hoort niets achter te laten. De staatproef ving dat als
+     een gezakte ROLLBACK, en via VERTROUWEN.json zette de schorspoort
+     /api/genootschap/afgelast met een 503 dicht. */
   const lijstVan = (id) => {
     const g = genootschap.S();
     if (!Array.isArray(g.bijeenkomst[id])) g.bijeenkomst[id] = [];
     return g.bijeenkomst[id];
+  };
+  // kijken zonder scheppen -- voor alles wat alleen opzoekt of toont
+  const kijkVan = (id) => {
+    const g = genootschap.S();
+    return Array.isArray(g.bijeenkomst[id]) ? g.bijeenkomst[id] : [];
   };
 
   const poort = (sess, groepId) => {
@@ -78,7 +89,7 @@ module.exports = ({ db, save, codenaamVan, notify, genootschap }) => {
   function antwoord(sess, groepId, id, wat) {
     const p = poort(sess, groepId);
     if (p.error) return p;
-    const b = lijstVan(groepId).find(x => String(x.id) === String(id));
+    const b = kijkVan(groepId).find(x => String(x.id) === String(id));
     if (!b) return { error: 'Deze bijeenkomst bestaat niet.' };
     if (b.afgelast) return { error: 'Deze bijeenkomst is afgelast.' };
     if (!ANTWOORDEN.includes(wat)) return { error: 'Antwoord met ja, misschien of nee.' };
@@ -94,7 +105,7 @@ module.exports = ({ db, save, codenaamVan, notify, genootschap }) => {
   function afgelast(sess, groepId, id, reden) {
     const p = poort(sess, groepId);
     if (p.error) return p;
-    const b = lijstVan(groepId).find(x => String(x.id) === String(id));
+    const b = kijkVan(groepId).find(x => String(x.id) === String(id));
     if (!b) return { error: 'Deze bijeenkomst bestaat niet.' };
     if (b.vanKey !== sess.key && !genootschap.isBeheer(p.gr, sess.key)) return { error: 'Alleen de gastheer of een beheerder last af.' };
     b.afgelast = { at: nu(), reden: String(reden || '').slice(0, 200).trim() };
@@ -128,7 +139,7 @@ module.exports = ({ db, save, codenaamVan, notify, genootschap }) => {
     const p = poort(sess, groepId);
     if (p.error) return p;
     const vandaag = new Date().toISOString().slice(0, 10);
-    const alle = lijstVan(groepId).map(b => publiek(b, sess));
+    const alle = kijkVan(groepId).map(b => publiek(b, sess));
     return {
       ok: true,
       komt: alle.filter(b => b.datum >= vandaag && !b.afgelast).sort((a, b) => a.datum.localeCompare(b.datum)),
@@ -141,7 +152,7 @@ module.exports = ({ db, save, codenaamVan, notify, genootschap }) => {
     const vandaag = new Date().toISOString().slice(0, 10);
     const uit = [];
     for (const gr of genootschap.mijne(sess.key)) {
-      for (const b of lijstVan(gr.id)) {
+      for (const b of kijkVan(gr.id)) {
         if (b.datum < vandaag || b.afgelast) continue;
         uit.push(Object.assign({ groep: gr.naam, groepId: gr.id }, publiek(b, sess)));
       }

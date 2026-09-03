@@ -4,7 +4,6 @@
 <meta charset="utf-8">
 <!-- id.js zonder defer en vooraan: RTGId levert id's die al tijdens het parsen nodig zijn -->
 <script src="/shared/id.js"></script>
-<script src="/shared/spraaktekst.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RTG Podium</title>
 <meta name="theme-color" content="#0C0C0B">
@@ -20,9 +19,6 @@
      stijlbundel meegaat en er geen tweede bundel bijkomt (test/stijlbundel.test.js) -->
 <link rel="stylesheet" href="/shared/media.css">
 <style>
-  /* de standregel van de knop Live tekst; een inline stijl zou inlineStijlAttributen omhoog duwen (TAKEN.md 4.51) */
-  .spraakstand{margin:0.25rem 0 0;font-size:.82rem;opacity:.75}
-
   :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--card2:var(--rtg-card2);--line:var(--rtg-line);--txt:var(--rtg-txt);
     --soft:var(--rtg-soft);--gold:#C9A24B;--rood:#DE6E92;--rood-diep:#C23A5E;--groen:#4C9A75;}
   *{margin:0;padding:0;box-sizing:border-box;}
@@ -87,11 +83,6 @@
   .melding.zien{opacity:1;}
   .weg{display:none !important;}
   @media (prefers-reduced-motion: reduce){ *{transition:none !important;} }
-
-  /* Uit inline style-attributen gehaald door scripts/inlinestijl-omzet.js (TAKEN.md 4.51). Bewezen gelijk met
-     scripts/inlinestijl-proef.js: elk element, elke aangeraakte eigenschap,
-     berekend in een echte browser. Letterlijk wat er stond -- geen ontwerpbesluit. */
-  .i-1v4gr3{position:absolute;left:-999px}
 </style>
 <!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
 <script src="/shared/media.js"></script>
@@ -153,7 +144,7 @@
     <p class="stil h-mt50" id="kijkWie"></p>
     <div id="chatKijk" class="chat" aria-live="polite" aria-label="Kanaalchat"></div>
     <form class="rij" id="chatForm">
-      <label for="chatVeld" class="i-1v4gr3">Bericht in de kanaalchat</label>
+      <label for="chatVeld" style="position:absolute;left:-999px;">Bericht in de kanaalchat</label>
       <input id="chatVeld" maxlength="300" placeholder="Praat mee (op codenaam)" autocomplete="off">
       <button class="knop vol" type="submit">Stuur</button>
     </form>
@@ -175,24 +166,17 @@
       <span class="tel" id="studioTel"></span>
     </div>
     <div class="rij">
-      <label for="studioTitel" class="i-1v4gr3">Titel van de uitzending</label>
+      <label for="studioTitel" style="position:absolute;left:-999px;">Titel van de uitzending</label>
       <input id="studioTitel" maxlength="80" placeholder="Titel van de uitzending">
       <button class="knop" id="studioAbb" type="button" aria-pressed="false">Alleen abonnees</button>
       <button class="knop vol" id="studioKnop" type="button">Ga live</button>
     </div>
     <div id="chatStudio" class="chat" aria-live="polite" aria-label="Kanaalchat"></div>
     <form class="rij" id="chatFormStudio">
-      <label for="chatVeldStudio" class="i-1v4gr3">Bericht in de kanaalchat</label>
+      <label for="chatVeldStudio" style="position:absolute;left:-999px;">Bericht in de kanaalchat</label>
       <input id="chatVeldStudio" maxlength="300" placeholder="Praat met de zaal" autocomplete="off">
       <button class="knop vol" type="submit">Stuur</button>
-      <!-- LIVE TEKST VOOR DE ZAAL. Een uitzending is eenrichting: wie doof is in
-           de zaal kan niets typen dat helpt, hij heeft de tekst van de UITZENDER
-           nodig. Deze knop zet shared/spraaktekst.js aan op het toestel van de
-           uitzender en zet wat hij zegt in de kanaalchat, waar de zaal hem al
-           leest. Uit tot hij hem zelf aanzet; alleen zijn eigen microfoon. -->
-      <button class="knop" id="studioSpraak" type="button" aria-pressed="false">Live tekst</button>
     </form>
-    <p id="studioSpraakStand" class="spraakstand" role="status" hidden></p>
     <!-- de kraam beheren: alleen zichtbaar in de wereld waar verkocht mag worden -->
     <section id="kraamBeheer" class="weg" aria-label="Uw kraam"></section>
     <h2>Kijkers</h2>
@@ -645,43 +629,6 @@
     const r = await api('chat', { id: zaal.mijn.id, tekst: t });
     if (r.body.error) zeg(r.body.error); else $('#chatVeldStudio').value = '';
   });
-  /* ---- live tekst van de uitzender (TAKEN.md 4.31) ----
-
-     De herkende zin gaat langs DEZELFDE route als een getypte zin
-     (/api/podium/chat): er komt geen tweede weg naar de zaal bij, en dus ook
-     geen tweede plek waar een uitzending tekst kan lekken. Het merkteken staat
-     in de regel zelf, want de kanaalchat kent geen veld voor "geraden tekst" en
-     een stil verschil tussen mens en machine is erger dan een zichtbaar. */
-  let studioLuister = null;
-  function studioSpraakStand(tekst) {
-    const el = $('#studioSpraakStand'); el.textContent = tekst || ''; el.hidden = !tekst;
-  }
-  $('#studioSpraak').addEventListener('click', () => {
-    if (!window.RTGSpraakTekst) return studioSpraakStand('Live tekst is op dit scherm niet geladen.');
-    if (studioLuister && studioLuister.aan) { studioLuister.stop(); return; }
-    if (!studioLuister) {
-      studioLuister = window.RTGSpraakTekst.maak({
-        opRegel: async (regel) => {
-          if (!zaal || !zaal.mijn) return;
-          await api('chat', { id: zaal.mijn.id, tekst: '(automatisch) ' + regel });
-        },
-        opStand: (aan, reden) => {
-          $('#studioSpraak').setAttribute('aria-pressed', aan ? 'true' : 'false');
-          $('#studioSpraak').textContent = aan ? 'Live tekst uit' : 'Live tekst';
-          studioSpraakStand(reden || (aan
-            ? 'Wat je zegt wordt op dit toestel omgezet naar tekst en verschijnt in de kanaalchat. Alleen jouw microfoon.'
-            : ''));
-        }
-      });
-    }
-    if (!studioLuister.aan) studioLuister.start();
-  });
-  if (window.RTGSpraakTekst && !window.RTGSpraakTekst.beschikbaar()) {
-    $('#studioSpraak').disabled = true;
-    $('#studioSpraak').title = window.RTGSpraakTekst.waarom() || '';
-    $('#studioSpraak').style.opacity = '.55';
-  }
-
   $('#abbKnop').addEventListener('click', async () => {
     if (!open) return;
     const r = await api('abonneer', { id: open.id, idem: idem() });

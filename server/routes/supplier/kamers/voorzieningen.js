@@ -22,11 +22,16 @@ app.post('/api/supplier/photo/add', express.json({ limit: '6mb' }), supplierAuth
   const img = String(req.body.image || '');
   if (!/^data:image\/(jpeg|png|webp);base64,/.test(img)) return res.status(400).json({ error: 'Alleen JPG, PNG of WebP.' });
   if (img.length > 1.5 * 1024 * 1024) return res.status(413).json({ error: 'Foto te groot (max ~1 MB).' });
-  req.supplier.photos = req.supplier.photos || [];
-  if (req.supplier.photos.length >= 6) return res.status(409).json({ error: 'Maximaal 6 foto\'s. Verwijder er eerst een.' });
+  /* TELLEN MAG ZONDER DE LIJST NEER TE ZETTEN. Stond die toewijzing hierboven,
+     dan hield de zeven-en-meerde zaak een 409 en de zaak zonder foto's een lege
+     lijst over aan een verzoek dat werd geweigerd -- en dan zeggen de statuscode
+     en de opslag twee verschillende dingen. De lijst ontstaat nu pas als de foto
+     werkelijk bewaard is. */
+  if ((req.supplier.photos || []).length >= 6) return res.status(409).json({ error: 'Maximaal 6 foto\'s. Verwijder er eerst een.' });
   // Bewaar de foto in de mediastore (schijf of S3); in db.data komt alleen de /media-URL.
   const ref = await media.bewaarPubliek(img, 1.5 * 1024 * 1024);
   if (!ref) return res.status(400).json({ error: 'Foto kon niet worden opgeslagen.' });
+  req.supplier.photos = req.supplier.photos || [];
   req.supplier.photos.push(ref);
   save();
   logActivity(req.supplier.code, req.actor, 'plaatste een foto op de pagina');

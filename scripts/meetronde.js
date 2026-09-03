@@ -93,6 +93,25 @@ const STAPPEN = [
   { id: 'ketenronde', register: 'KETENS.json', duur: '~4 min',
     wat: 'of een keten netjes faalt onder sabotage',
     cmd: ['scripts/ketenronde.js'] },
+  /* DE VIER DIE HIER NIET STONDEN. De bewijsmatrix hieronder leest TIEN
+     registers; deze ronde ververste er zes. De andere vier hadden elk hun eigen
+     npm-opdracht en stonden in geen enkele ronde -- dus verouderden ze stil, en
+     twee van hen droegen niet eens een stempel waarmee scripts/versheid.js dat
+     had kunnen zien. Een ronde die de matrix vult, hoort alles te vullen waar
+     die matrix uit leest; anders is "de meetronde is gedraaid" een halve
+     mededeling. */
+  { id: 'outputproef', register: 'OUTPUTPROEF.json', duur: '~1 min',
+    wat: 'of een antwoord meer prijsgeeft dan het hoort',
+    cmd: ['scripts/outputproef.js'] },
+  { id: 'auditproef', register: 'AUDITPROEF.json', duur: '~4 min',
+    wat: 'of een geslaagde handeling een spoor nalaat',
+    cmd: ['scripts/auditproef-route.js'] },
+  { id: 'handelingproef', register: 'HANDELINGPROEF.json', duur: '~4 min',
+    wat: 'of dat spoor geketend is',
+    cmd: ['scripts/handelingproef-route.js', '--max=8000'] },
+  { id: 'uitvoerproef', register: 'UITVOERPROEF.json', duur: '~5 min',
+    wat: 'of een antwoord gegevens van een ander bevat',
+    cmd: ['scripts/uitvoerproef-route.js'] },
   { id: 'bewijsmatrix', register: 'BEWIJSMATRIX.json', snel: true, duur: '~1 min',
     wat: 'de elf schakels per route, uit de registers hierboven',
     cmd: ['scripts/bewijsmatrix.js'] }
@@ -144,6 +163,22 @@ async function poortwachtRonde() {
         uitslag.dicht + ' dicht, ' + uitslag.stil + ' stil, ' + uitslag.publiek + ' publiek' };
   } finally { srv.klaar(); }
 }
+
+/* DE STAPPENLIJST GAAT NAAR BUITEN, EN DE RONDE START NIET MEER BIJ HET LADEN.
+
+   Dit stond er niet, en het is een keer echt misgegaan: een controle die alleen
+   wilde weten WELKE registers deze ronde verst maakt, deed `require()` op dit
+   bestand -- en startte daarmee de volledige ronde van drie kwartier, die
+   ondertussen drie registers overschreef vanuit een boom met ongecommit werk.
+   Precies de faalvorm waar scripts/handelingproef-route.js al een wacht voor
+   heeft ("een laadcontrole schreef ROLPROEF.json terug van 3377 beproefde
+   routes naar 292, en het zag er daarna volkomen normaal uit").
+
+   Die wacht ontbrak hier omdat dit bestand zelf geen register schrijft en dus
+   buiten het bereik van scripts/meetkeuring.js viel. Hij schrijft ze alleen
+   allemaal via zijn kinderen -- wat erger is en niet minder erg. */
+module.exports = { STAPPEN };
+if (require.main !== module) return;
 
 (async () => {
   const start = Date.now();

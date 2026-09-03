@@ -20,15 +20,15 @@ module.exports = (octx) => {
     l.schrift.updatedAt = nu(); save();
     res.json({ ok: true }); presentie(les.code);
   });
+  /* Via lesVan(): zie de uitleg boven /les/:code in ./les.js. Het schrift van
+     een leerling is de gevoeligste van de drie leesroutes. */
   router.get('/schrift/:code', (req, res) => {
-    const les = F().lessen[String(req.params.code).toUpperCase()];
-    if (!les) return res.status(404).json({ error: 'Onbekende les.' });
+    const les = lesVan(req, res); if (!les) return;
     const l = leerlingVan(les, req, res); if (!l) return;
     res.json({ schrift: l.schrift });
   });
   router.get('/schrift/:code/:studentId', (req, res) => {
-    const les = F().lessen[String(req.params.code).toUpperCase()];
-    if (!les) return res.status(404).json({ error: 'Onbekende les.' });
+    const les = lesVan(req, res); if (!les) return;
     if (!docentCheck(les, req, res)) return;
     const l = les.leerlingen[req.params.studentId];
     if (!l) return res.status(404).json({ error: 'Leerling niet gevonden.' });
@@ -55,8 +55,7 @@ module.exports = (octx) => {
     presentie(les.code); res.json({ ok: true });
   });
   router.get('/opgaven/:code', (req, res) => {
-    const les = F().lessen[String(req.params.code).toUpperCase()];
-    if (!les) return res.status(404).json({ error: 'Onbekende les.' });
+    const les = lesVan(req, res); if (!les) return;
     if (!docentCheck(les, req, res)) return;
     res.json({ opgaven: les.opgaven });
   });
@@ -102,28 +101,28 @@ module.exports = (octx) => {
     res.json({ tip: TIPS[dag % TIPS.length], nog: TIPS[Math.floor(Math.random() * TIPS.length)] });
   });
 
-  /* ---------- op reis met de foundation: aanvraag of voordracht ----------
+  /* ---------- op reis met de foundation: aanvraag of voordracht ---------- */
+  /* EEN REM, EN HIER IS DE SCHADE ANDERS DAN ELDERS. Deze lijst is AFGEKAPT op
+     duizend (`slice(0, 1000)` hieronder) en nieuwe aanvragen komen er vooraan in.
+     Wie hem duizend keer volschrijft, duwt de echte aanvragen er dus achteraan
+     uit -- en dat zijn precies de gezinnen waarvoor de RTFoundation bestaat. Een
+     open schrijfroute zonder rem is hier geen ongemak maar het wissen van
+     hulpvragen.
 
-     EEN OPEN FORMULIER MOET EEN REM HEBBEN, en die had hij niet.
-
-     Deze route is met opzet zonder sleutel: wie een reis aanvraagt of iemand
-     voordraagt, heeft geen gezin en geen account bij de foundation -- dat is
-     juist het punt. Maar de lijst kapt op duizend (`slice(0, 1000)` op een
-     `unshift`), en zonder rem betekent dat: wie duizend keer post, duwt elke
-     echte aanvraag eruit. Niet stelen, maar wissen -- en niemand merkt het,
-     want er komt gewoon `ok: true` terug.
+     ZES PER UUR PER ADRES. Een gezin dient er een in, hooguit twee. Een
+     schoolmaatschappelijk werker die er een paar op een middag voordraagt, past
+     daar nog in; duizend volschrijven kost bij deze grens ruim honderdzestig
+     uur. Twee takken zetten hier los van elkaar een rem (zes en tien); de
+     strengste is gehouden, en test/foundation-reisrem.test.js legt hem vast.
 
      Gevonden door scripts/handlerwacht.js: van de 612 routes zonder
      bewakerslaag was dit er een van acht die geen enkele controle deed, en de
-     enige daarvan die geen deur is.
-
-     Dezelfde rem als /gezin/maak hiernaast (foundation/gezin.js): een teller per
-     IP-adres. Ruim genoeg voor een gezin dat zich vergist, krap genoeg voor
-     duizend berichten. */
+     enige daarvan die geen deur is. Dezelfde rem als /gezin/maak hiernaast
+     (foundation/gezin.js): een teller per IP-adres. */
   router.post('/reis/aanvraag', (req, res) => {
-    const bucket = 'reisaanvraag:' + ipVan(req);
-    if (teVaak(res, bucket)) return;
-    misluktePoging(bucket, 6, 60);   // hooguit zes aanvragen per adres per uur
+    const bak = 'reisaanvraag:' + ipVan(req);
+    if (teVaak(res, bak)) return;
+    misluktePoging(bak, 6, 60);
     const a = {
       id: rid(4),
       soort: req.body.soort === 'voordracht' ? 'voordracht' : 'aanvraag',

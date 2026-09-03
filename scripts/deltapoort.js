@@ -105,6 +105,10 @@ const { GRENS } = require('./lib/omvang');
 const { routesInBron } = require('./lib/routes');
 const { maakZoeker } = require('./lib/routedekking');
 const { zonderCommentaar } = require('./lib/bron');
+const V = require('./verstrengeling');
+const { PATRONEN: INGANGPATRONEN } = require('./wekkers');
+const VERKLAARDE_INGANGEN = new Set(require('./lib/wekker-verklaringen').map(v => v.bestand));
+const { uitVuileBoom } = require('./lib/paspoort');
 
 const arg = (naam, std) => { const i = process.argv.indexOf(naam); return i > 0 ? process.argv[i + 1] : std; };
 const TOON = process.argv.includes('--toon');
@@ -191,6 +195,10 @@ const bundelPaden = new Set(Object.keys(require('./bundel').bundels).map(k => 'p
 const isPubliek = (p) => /^public\/.+\.(html|js)$/.test(p) && !p.includes('/dist/') && !bundelPaden.has(p);
 const isServer = (p) => /^server\/.+\.js$/.test(p);
 const isDienstToets = (p) => /^test\/.+\.test\.js$/.test(p);
+/* Een register in de WORTEL, en alleen daar: de registers die als bewijs worden
+   aangehaald staan er allemaal. Een .json dieper in de boom is zaaidata, een
+   landpakket of een vertaling en draagt geen meting. */
+const isRegister = (p) => /^[A-Z0-9_-]+\.json$/.test(p);
 
 function telStijl(tekst) { return telInlineStijl(() => tekst, ['x']); }
 
@@ -209,6 +217,52 @@ function telSkips(tekst) {
 /* Elke regel krijgt (bestand, voor, na) en geeft nul of meer bevindingen.
    `voor` is null bij een nieuw bestand -- dat is precies het onderscheid
    tussen de twee latten, en het staat daarom in elke regel expliciet. */
+/* DE ONVERKLAARDE RANDEN VAN DIT BESTAND.
+
+   Een rand is hier een require van het ene deel van RTG naar het andere, en
+   VERSTRENGELING.json deelt ze in. Wat geen enkele afleiding en geen enkele
+   verklaring past, heet ONBEKEND -- 111 op 2 september 2026.
+
+   Die 111 hoeven niet weg om ergens aan te mogen werken; er mag alleen niets
+   bijkomen. Dat is precies waarom deze regel in de deltapoort hoort en niet in
+   de keuring: de som over het huis verrekent (een rand weg in het ene domein
+   betaalt een nieuwe in het andere), en de verrekening is hier het gevaar. Een
+   nieuwe onverklaarde rand tussen twee domeinen is het begin van de
+   verstrengeling die een trede onmogelijk maakt, en die kost NIETS om te
+   voorkomen op het moment dat hij ontstaat -- en heel veel daarna.
+
+   De uitweg is niet de rand weghalen maar hem VERKLAREN, in
+   scripts/lib/verstrengeling-verklaringen.js, met een reden die klopt. Daarom
+   staat die uitweg in de hulp van elke bevinding. */
+function randenVanBron(pad, bron) {
+  const uit = new Set();
+  const van = V.knoopVan(pad);
+  if (!van || typeof bron !== 'string') return uit;
+  for (const m of bron.matchAll(/require\(\s*['"](\.[^'"]+)['"]\s*\)/g)) {
+    const doel = path.normalize(path.join(path.dirname(pad), m[1])).replace(/\\/g, '/');
+    const naar = V.knoopVan(doel);
+    if (!naar) continue;
+    const a = van.laag + ':' + van.domein, b = naar.laag + ':' + naar.domein;
+    if (a !== b) uit.add(a + ' -> ' + b);
+  }
+  return uit;
+}
+
+/* De indeling van het HELE huis, want of een rand onverklaard is hangt af van
+   de rest: een doel dat door drie knopen wordt gebruikt is een gemeten
+   primitief, en dat kun je aan een enkel bestand niet zien. Een keer berekend,
+   en in de toets te vervangen door een eigen verzameling. */
+let onbekendCache = null;
+function onbekendeRanden() {
+  if (!onbekendCache) {
+    try {
+      onbekendCache = new Set(V.meet(path.join(WORTEL, 'server')).alle
+        .filter(r => r.soort === 'ONBEKEND').map(r => r.van + ' -> ' + r.naar));
+    } catch (e) { onbekendCache = new Set(); }
+  }
+  return onbekendCache;
+}
+
 const REGELS = [
   {
     naam: 'inline-stijl',
@@ -244,6 +298,30 @@ const REGELS = [
     }
   },
   {
+    /* HET BEWIJSPASPOORT (STANDAARD.md par. 5).
+
+       Een register waarvan de meting uit een vuile werkboom komt, is niet te
+       herhalen: er bestaat geen commit om naar terug te keren. Voor NIEUW werk
+       is de norm nul, en een bestaand register mag niet van schoon naar vuil.
+
+       De omgekeerde weg -- vuil naar schoon -- is juist het doel en gaat vrij
+       door de poort. Dat is hier het verschil tussen een poort en een slot: hij
+       houdt de verkeerde richting tegen en niet de beweging. */
+    naam: 'bewijs-uit-vuile-boom',
+    meter: 'registersUitVuileBoom',
+    wat: 'registers waarvan de meting uit een vuile werkboom komt',
+    geldt: isRegister,
+    keur(pad, voor, na) {
+      const nu = uitVuileBoom(na);
+      if (!nu) return [];
+      const hulp = 'commit eerst je wijzigingen en draai de meetronde daarna opnieuw; ' +
+        'een uitslag uit een boom die geen commit was, is niet te herhalen en dus geen bewijs';
+      if (voor === null) return [{ bericht: 'nieuw register met een meting uit een vuile werkboom; de norm voor nieuw werk is nul', hulp }];
+      if (!uitVuileBoom(voor)) return [{ bericht: 'dit register was schoon gemeten en komt nu uit een vuile werkboom', hulp }];
+      return [];
+    }
+  },
+  {
     naam: 'zelfpoortende-toets',
     meter: 'zelfpoortendeToetsen',
     wat: 'toetsen die zichzelf overslaan als een dienst ontbreekt',
@@ -255,6 +333,57 @@ const REGELS = [
       const toen = telSkips(voor);
       if (nu > toen) return [{ bericht: 'zelfpoortende toetsen gaan van ' + toen + ' naar ' + nu }];
       return [];
+    }
+  },
+  {
+    naam: 'nieuwe-ingang-buiten-http',
+    meter: 'wekkersOnverklaard',
+    wat: 'klokken, busabonnees, eigen servers en werkers: werk dat begint zonder dat iemand een pad opvraagt',
+    geldt: isServer,
+    keur(pad, voor, na) {
+      /* DE INGANGENKAART BEWAAKT HET GEHEEL, DEZE REGEL HET NIEUWE WERK.
+
+         Een setInterval, een busabonnee, een eigen server op een eigen poort of
+         een tweede proces: alle vier kunnen ze werk beginnen buiten de
+         functieschakelaars om. Bestaande gevallen staan geteld en verklaard
+         (scripts/lib/wekker-verklaringen.js); wat er BIJ komt, hoort meteen
+         gezegd te worden -- want achteraf uitzoeken waar een timer vandaan komt
+         is precies het werk dat deze hele ronde heeft gekost.
+
+         Een bestand dat al verklaard is, mag zijn ingangen houden: die vraag is
+         beantwoord. */
+      if (VERKLAARDE_INGANGEN.has(pad)) return [];
+      const tel = (bron) => INGANGPATRONEN.map(p => ({ soort: p.soort,
+        n: (String(bron || '').match(new RegExp(p.rx.source, 'g')) || []).length }));
+      const nu = tel(na), toen = tel(voor === null ? '' : voor);
+      const uit = [];
+      for (let i = 0; i < nu.length; i++) {
+        if (nu[i].n <= toen[i].n) continue;
+        uit.push({ bericht: (voor === null ? 'nieuw bestand met ' : 'erbij: ') + (nu[i].n - toen[i].n) +
+            ' ingang(en) van de soort ' + nu[i].soort + ' (' + INGANGPATRONEN[i].wat + ')',
+          hulp: 'hang hem aan een functie zodat de boardroom hem kan uitzetten, of zet hem met een reden in ' +
+            'scripts/lib/wekker-verklaringen.js -- npm run wekkers laat zien hoe hij nu telt' });
+      }
+      return uit;
+    }
+  },
+  {
+    naam: 'nieuwe-onverklaarde-rand',
+    meter: 'verstrengelingOnverklaard',
+    wat: 'requires tussen twee delen van RTG die niemand heeft verklaard',
+    geldt: isServer,
+    keur(pad, voor, na, ctx) {
+      const onbekend = (ctx && ctx.onbekendeRanden) || onbekendeRanden();
+      const nu = randenVanBron(pad, na);
+      const toen = randenVanBron(pad, voor === null ? '' : voor);
+      const uit = [];
+      for (const r of nu) {
+        if (!onbekend.has(r) || toen.has(r)) continue;
+        uit.push({ bericht: (voor === null ? 'nieuw bestand met een onverklaarde rand: ' : 'nieuwe onverklaarde rand: ') + r,
+          hulp: 'verklaar hem in scripts/lib/verstrengeling-verklaringen.js met een reden die klopt, ' +
+            'of gebruik iets wat er al is -- npm run verstrengeling laat zien hoe hij nu heet' });
+      }
+      return uit;
     }
   },
   {

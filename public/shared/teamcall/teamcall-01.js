@@ -90,7 +90,9 @@
        alleen het beeld. De baan hangt onder de knoppenbalk in dezelfde overlay
        (shared/meelezen.js) -- getypt door mensen, niet uit spraak herkend. */
     if (w.RTGMeelezen && !mee){
-      mee = w.RTGMeelezen.maak({ ik: (mij() || {}).name || 'Jij', stuur: regel => {
+      mee = w.RTGMeelezen.maak({ ik: (mij() || {}).name || 'Jij',
+        stroom: () => stream,
+        stuur: regel => {
         if (kamer) zend('tekst', { kamer, payload: { r: regel } });
         else peers.forEach((p, id) => zend('tekst', { staffId: id, payload: { r: regel } }));
       } });

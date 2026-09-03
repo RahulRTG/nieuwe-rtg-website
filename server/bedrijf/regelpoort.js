@@ -115,10 +115,17 @@ module.exports = (sctx) => {
       let: s.eist.length ? null
         : 'Dit ' + soort + ' valt onder geen enkele regel' + (soort === 'contract'
           ? '; het heeft alleen de twee handtekeningen nodig.' : '.') });
-    if (!Array.isArray(obj.goedkeuringen)) obj.goedkeuringen = [];
-    if (obj.goedkeuringen.some(k => k.lidId === g.l.id && !k.vervallen)) return res.status(409).json({
+    /* Keuren voor scheppen. De lijst werd hier neergezet VOOR de vier-ogen-vraag
+       hem las; hij staat nu erna. Nagetrokken en niet aangenomen: dat repareert
+       hier geen gat, want deze 409 valt alleen als er AL een goedkeuring in de
+       lijst staat -- en dan bestond hij dus. Het gaat om de volgorde: lezen kan
+       zonder scheppen (wie er niet in staat, keurde niet), en dan blijft dit
+       goed zodra er ooit een controle tussen komt die wel zonder lijst valt. */
+    const gegeven = Array.isArray(obj.goedkeuringen) ? obj.goedkeuringen : [];
+    if (gegeven.some(k => k.lidId === g.l.id && !k.vervallen)) return res.status(409).json({
       error: 'U heeft dit ' + soort + ' al goedgekeurd. Eén mens keurt één keer goed -- anders vinkt iemand met twee rechten een vier-ogen-regel in zijn eentje af.' });
 
+    if (!Array.isArray(obj.goedkeuringen)) obj.goedkeuringen = [];
     obj.goedkeuringen.push({ id: rid(3), lidId: g.l.id, naam: g.l.naam, recht,
       bijWaardeCenten: Number(obj.waardeCenten || 0), at: nu(), vervallen: null });
     const na = soort === 'contract' ? herzie(g.w, obj) : stand(g.w, soort, obj);

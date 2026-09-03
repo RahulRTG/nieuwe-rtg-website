@@ -96,28 +96,9 @@
       const offer = await pc.createOffer();
       await pc.setLocalDescription(offer);
       await API.call('/ontmoeten/signaal', { dateId, payload: { sdp: pc.localDescription } });
-      sosTekstStart(dateId);
     } catch(e){ /* camera geweigerd of niet beschikbaar: de SOS zelf is al binnen */ }
   }
-  /* LIVE TEKST BIJ EEN SOS (TAKEN.md 4.31), als enige van de acht zonder tik.
-     Het lid gaf bij het veiligheidscontract al toestemming dat kantoor meekijkt
-     EN meeluistert (`audio: true` hierboven), dus dezelfde stem als tekst geeft
-     niets weg wat er niet al heen ging -- en een noodscherm is geen plek voor
-     een tweede tik. Aan de andere kant kon een dove medewerker geen SOS-dienst
-     draaien. Zelfde seinkanaal als het beeld; kan het toestel het niet, dan
-     gebeurt er niets.*/
-
-  let ontmoetSosTekst = null;
-  function sosTekstStart(dateId){
-    const S = window.RTGSpraakTekst;
-    if (!S || !S.beschikbaar() || ontmoetSosTekst) return;
-    ontmoetSosTekst = S.maak({ opRegel: (r) => {
-      API.call('/ontmoeten/signaal', { dateId, payload: { tekst: r } }).catch(() => {}); } });
-    ontmoetSosTekst.start();
-  }
-  function sosTekstStop(){ if (ontmoetSosTekst){ try { ontmoetSosTekst.stop(); } catch(e){} ontmoetSosTekst = null; } }
   function ontmoetSosStop(){
-    sosTekstStop();
     if (ontmoetSosPc){ try { ontmoetSosPc.getSenders().forEach(s => s.track && s.track.stop()); ontmoetSosPc.close(); } catch(e){} ontmoetSosPc = null; ontmoetSosDate = null; }
   }
   // antwoord van RTG-kantoor op ons SOS-beeld (WebRTC-signaal)

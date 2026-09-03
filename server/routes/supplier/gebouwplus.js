@@ -19,10 +19,17 @@ module.exports = (kern) => {
      voordat de controles ook maar begonnen. Een afgekeurd verzoek hoort NIETS
      achter te laten, ook geen leeg vakje -- anders kan niemand meer aan de
      opslag zien of er werk is gedaan (TAKEN.md 4.35). Vandaar twee functies:
-     `bak` leest en laat met rust, `bakSchrijf` maakt aan, en die tweede staat
-     in elke route ONDER de controles. */
+     `kijk` leest en laat met rust, `bakSchrijf` maakt aan, en die tweede staat
+     in elke route ONDER de controles.
+
+     De leesfunctie heette hier `bak`, en dat is in dit huis juist het woord voor
+     het tegenovergestelde: in kern/horeca.js en foundation/gasten/verjaardagen.js
+     is `bak()` de la-opener die WEL aanmaakt. Wie dat woord kende en hier een
+     route bijschreef, koos precies de verkeerde helft -- en die vergissing valt
+     nergens op, want lezen uit een verse lege bak gaat gewoon goed. Vandaar
+     `kijk`, dezelfde naam als in het sjabloon. */
   const LEEG = () => ({ contracten: [], leads: [], energie: [] });
-  function bak(code) {
+  function kijk(code) {
     return (db.data.gebouwPlus && db.data.gebouwPlus[code]) || LEEG();
   }
   function bakSchrijf(code) {
@@ -59,7 +66,7 @@ module.exports = (kern) => {
 
   app.post('/api/supplier/gebouwplus/overzicht', supplierAuth, (req, res) => {
     if (!managerOnly(req, res)) return;
-    const b = bak(req.supplier.code);
+    const b = kijk(req.supplier.code);
     res.json({ ok: true, contracten: b.contracten.slice(0, 60), leads: b.leads.slice(0, 60),
       energie: b.energie.slice(0, 26), signalen: signalen(b), fasen: LEADFASEN });
   });
@@ -85,7 +92,7 @@ module.exports = (kern) => {
 
   app.post('/api/supplier/gebouwplus/contract/zet', supplierAuth, (req, res) => {
     if (!managerOnly(req, res)) return;
-    const b = bak(req.supplier.code);
+    const b = kijk(req.supplier.code);
     const c = b.contracten.find(x => x.id === req.body.id);
     if (!c) return res.status(404).json({ error: 'Contract niet gevonden.' });
     if (req.body.actie === 'verleng') {
@@ -115,7 +122,7 @@ module.exports = (kern) => {
 
   app.post('/api/supplier/gebouwplus/lead/fase', supplierAuth, (req, res) => {
     if (!managerOnly(req, res)) return;
-    const b = bak(req.supplier.code);
+    const b = kijk(req.supplier.code);
     const l = b.leads.find(x => x.id === req.body.id);
     if (!l) return res.status(404).json({ error: 'Lead niet gevonden.' });
     if (!LEADFASEN.includes(req.body.fase)) return res.status(400).json({ error: 'Kies een bestaande fase.' });

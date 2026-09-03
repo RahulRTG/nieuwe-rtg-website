@@ -13,6 +13,19 @@ module.exports = (kern) => {
     if (!db.data.campagnes[code]) db.data.campagnes[code] = [];
     return db.data.campagnes[code];
   };
+  /* KIJKEN ZONDER SCHEPPEN, en dat onderscheid is hier geen netheid.
+
+     `bak()` zet het vak van een zaak neer die er nog geen had. Op de weg die
+     werkelijk een campagne TOEVOEGT hoort dat ook zo; op elke andere weg is het
+     verkeerd. Wie een geplande campagne weghaalt die er niet staat krijgt een
+     404, en dan hoort er niets achter te blijven -- anders zeggen de statuscode
+     en de database twee verschillende dingen over hetzelfde verzoek.
+
+     Bestaat het vak wel, dan geeft dit de ECHTE lijst terug en geen kopie: een
+     splice erop landt gewoon in de opslag. Bestaat het niet, dan krijg je een
+     lege lijst die nergens aan vastzit, en loopt elke zoektocht dood op een
+     nette 404. */
+  const kijk = code => (db.data.campagnes && Array.isArray(db.data.campagnes[code])) ? db.data.campagnes[code] : [];
 
   function publiceer(s, c) {
     const post = {
@@ -77,8 +90,7 @@ module.exports = (kern) => {
   app.post('/api/supplier/pr/plan', supplierAuth, (req, res) => {
     if (!managerOnly(req, res)) return;
     const code = req.supplier.code;
-    const lijst = bak(code);
-    if (lijst.filter(c => c.status === 'gepland').length >= 20) return res.status(409).json({ error: 'Maximaal 20 geplande campagnes tegelijk.' });
+    if (kijk(code).filter(c => c.status === 'gepland').length >= 20) return res.status(409).json({ error: 'Maximaal 20 geplande campagnes tegelijk.' });
     const soort = req.body.soort === 'deal' ? 'deal' : 'post';
     const tekst = schoon(req.body.tekst, 600);
     const titel = schoon(req.body.titel, 80);
@@ -91,7 +103,7 @@ module.exports = (kern) => {
       geldigTot: /^\d{4}-\d{2}-\d{2}$/.test(String(req.body.geldigTot || '')) ? req.body.geldigTot : null,
       photoIndex: Number.isInteger(pi) ? pi : null,
       publiceerOp: new Date(op).toISOString(), status: 'gepland', door: req.actor.name, at: new Date().toISOString() };
-    lijst.push(c);
+    bak(code).push(c);
     save();
     logActivity(code, req.actor, 'plande een campagne (' + soort + ') voor ' + c.publiceerOp.slice(0, 16).replace('T', ' '));
     sseToSupplier(code, 'sync', { scope: 'pr' });
@@ -100,7 +112,7 @@ module.exports = (kern) => {
 
   app.post('/api/supplier/pr/plan/weg', supplierAuth, (req, res) => {
     if (!managerOnly(req, res)) return;
-    const lijst = bak(req.supplier.code);
+    const lijst = kijk(req.supplier.code);
     const i = lijst.findIndex(c => c.id === req.body.id && c.status === 'gepland');
     if (i < 0) return res.status(404).json({ error: 'Geplande campagne niet gevonden.' });
     lijst.splice(i, 1);

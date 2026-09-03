@@ -53,10 +53,4 @@ const ZWARE_ACTIES = Object.freeze([
   'passkey-weg'                 // POST /api/webauthn/weg
 ]);
 
-/* De binding die met de ceremonie meereist. Hij bevat de actienaam en de
-   sessiesleutel, zodat een assertie niet van de ene sessie naar de andere te
-   verplaatsen is. Het voorvoegsel draagt een versienummer: verandert de vorm
-   ooit, dan verlopen oude ceremonies vanzelf in plaats van half te passen. */
-const ZWAAR_BINDING = 'rtg-zwaar-v1';
-
-module.exports = { PIN_ACTIES, ZWARE_ACTIES, ZWAAR_BINDING };
+module.exports = { PIN_ACTIES, ZWARE_ACTIES };

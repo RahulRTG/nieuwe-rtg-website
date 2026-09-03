@@ -24,7 +24,12 @@
    geslaagde bevestiging ook toegang gaan betekenen. */
 'use strict';
 const crypto = require('crypto');
-const { ZWAAR_BINDING } = require('./webauthn-acties');
+
+/* Het voorvoegsel van de binding, en het woont hier omdat DEZE poort hem maakt
+   -- niet in ./webauthn-acties.js, dat de woordenlijsten draagt. Het draagt een
+   versienummer: verandert de vorm ooit, dan verlopen oude ceremonies vanzelf in
+   plaats van half te passen. */
+const ZWAAR_BINDING = 'rtg-zwaar-v1';
 
 /* DE SESSIESLEUTEL VOOR DE BINDING -- een vingerafdruk van het bearer-token en
    niet het token zelf, want dat zou daarmee in de ceremonie-opslag terechtkomen.

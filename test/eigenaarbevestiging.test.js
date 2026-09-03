@@ -166,6 +166,19 @@ test('8. een passkey weghalen is zelf zwaar', async () => {
   assert.equal(kaal.body.actie, 'passkey-weg');
 });
 
+test('10. het boardroom-loket is dezelfde ceremonie achter een andere deur', async () => {
+  const dicht = await api('/api/office/boardroom/bevestig/opties', { actie: 'eigenaar-boardroomtoegang' });
+  assert.equal(dicht.status, 401, 'zonder sessie komt er geen challenge uit');
+
+  const r = await api('/api/office/boardroom/bevestig/opties', { actie: 'eigenaar-boardroomtoegang' }, lid);
+  assert.equal(r.status, 200, 'de eigenaar krijgt er een: ' + JSON.stringify(r.body).slice(0, 160));
+  assert.ok(r.body.ceremonie, 'met een ceremoniesleutel');
+  assert.equal(r.body.opties.rpId, rpID, 'gebonden aan dit domein en niet aan een kop uit het verzoek');
+
+  const pin = await api('/api/office/boardroom/bevestig/opties', { actie: 'rtg-pin-vernieuw' }, lid);
+  assert.equal(pin.status, 400, 'ook hier kent de zware poort de PIN-woordenlijst niet');
+});
+
 test('9. de eigendomsoverdracht vraagt het wachtwoord EN de passkey', async () => {
   const fout = await api('/api/techniek/eigenaar', { email: gast, wachtwoord: 'nietgoed' }, tech);
   assert.equal(fout.status, 401, 'een fout wachtwoord blijft het eerste slot');

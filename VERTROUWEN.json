@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-09-03T00:25:57.351Z",
-  "commit": "f2d0c485",
+  "op": "2026-09-03T00:48:08.334Z",
+  "commit": "323d39b1",
   "boomVuil": false,
   "node": "v22.22.2"
  },
@@ -31,7 +31,7 @@
    "dagen": 0
   },
   "STAATPROEF.json": {
-   "op": "2026-09-03T00:25:26.007Z",
+   "op": "2026-09-03T00:47:37.695Z",
    "dagen": 0
   },
   "OUTPUTPROEF.json": {
@@ -1447,7 +1447,7 @@
   },
   "POST /api/betaal/verzoeken": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, IDEMPOTENCY, FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/betaal/webhook": {
@@ -2167,7 +2167,7 @@
   },
   "POST /api/command/land": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/command/land/activeer": {
@@ -2782,7 +2782,7 @@
   },
   "POST /api/concern/vestigingen": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/contract/teken": {
@@ -3102,7 +3102,7 @@
   },
   "POST /api/festival/mijn": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (OUTPUT, FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (OUTPUT, STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/festival/nieuw": {
@@ -5277,7 +5277,7 @@
   },
   "POST /api/geld/beleid": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/geld/beleid/weg": {
@@ -6922,7 +6922,7 @@
   },
   "POST /api/mall/home": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/mall/land": {
@@ -7692,7 +7692,7 @@
   },
   "POST /api/member/connections": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/member/dm": {
@@ -8197,7 +8197,7 @@
   },
   "POST /api/member/pulse/feed": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/member/pulse/like": {
@@ -9237,7 +9237,7 @@
   },
   "POST /api/member/sport/sponsors": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/member/sport/stand": {
@@ -9452,7 +9452,7 @@
   },
   "POST /api/metier/zoek": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/metingen": {
@@ -9827,7 +9827,7 @@
   },
   "POST /api/office/anker": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (OUTPUT, FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (OUTPUT, STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/anker/reken": {
@@ -13507,7 +13507,7 @@
   },
   "POST /api/pay/tegoed": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (OUTPUT, FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (OUTPUT, STATE, SIDE_EFFECT, IDEMPOTENCY, FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/pay/tegoed/koop": {
@@ -13787,7 +13787,7 @@
   },
   "POST /api/reis/landen": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/reis/los": {
@@ -13802,7 +13802,7 @@
   },
   "POST /api/reis/reizen": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (OUTPUT, FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (OUTPUT, STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/reis/uitnodiging/eisop": {
@@ -15231,9 +15231,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/rtfkantoor/kamer/taak-zet": {
-   "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
-   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
+   "staat": "geschorst",
+   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op ROLLBACK",
+   "heropent": "repareer de oorzaak en laat de proef op ROLLBACK opnieuw slagen; een staat gaat alleen omhoog door hermeting"
   },
   "POST /api/rtfkantoor/kamers": {
    "staat": "verzwakt",
@@ -16537,7 +16537,7 @@
   },
   "POST /api/sociaal/command": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/sociaal/graaf": {
@@ -17087,7 +17087,7 @@
   },
   "POST /api/supplier/abonnement": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (OUTPUT, FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (OUTPUT, STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/accountant": {
@@ -17102,7 +17102,7 @@
   },
   "POST /api/supplier/accountant/vragen": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/activiteit": {
@@ -17571,13 +17571,13 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/bord": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op ROLLBACK",
-   "heropent": "repareer de oorzaak en laat de proef op ROLLBACK opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/borden": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/btw/aangifte": {
@@ -17757,7 +17757,7 @@
   },
   "POST /api/supplier/command/graaf": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/command/herkomst": {
@@ -18717,7 +18717,7 @@
   },
   "POST /api/supplier/horeca/fooienpot/lijst": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/horeca/gang/vrij": {
@@ -18757,7 +18757,7 @@
   },
   "POST /api/supplier/horeca/gasten": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/horeca/gezelschap": {
@@ -18776,9 +18776,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/horeca/haccp/afvinken": {
-   "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
-   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
+   "staat": "geschorst",
+   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op ROLLBACK",
+   "heropent": "repareer de oorzaak en laat de proef op ROLLBACK opnieuw slagen; een staat gaat alleen omhoog door hermeting"
   },
   "POST /api/supplier/horeca/haccp/batch": {
    "staat": "verzwakt",
@@ -18857,7 +18857,7 @@
   },
   "POST /api/supplier/horeca/keuken/regie": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/horeca/keuken/stand": {
@@ -18956,13 +18956,13 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/horeca/rahul/bevestig": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op ROLLBACK",
-   "heropent": "repareer de oorzaak en laat de proef op ROLLBACK opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (OUTPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/horeca/rahul/bonnen": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (OUTPUT, STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (OUTPUT, FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/horeca/rahul/doe": {
@@ -19037,7 +19037,7 @@
   },
   "POST /api/supplier/horeca/rekeningen": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/horeca/signalen": {
@@ -19432,7 +19432,7 @@
   },
   "POST /api/supplier/kassa/instel": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/kassa/kasopmaak": {
@@ -19862,7 +19862,7 @@
   },
   "POST /api/supplier/mijn/taal": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/mijn/wissel": {
@@ -20067,7 +20067,7 @@
   },
   "POST /api/supplier/net/lijst": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/net/verzoek": {
@@ -20182,7 +20182,7 @@
   },
   "POST /api/supplier/overheid/kvk/zorg": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/overheid/subsidie": {
@@ -20307,7 +20307,7 @@
   },
   "POST /api/supplier/pay/vooraf/lijst": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (OUTPUT, STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (OUTPUT, FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/pay/vrijgeef": {
@@ -20317,7 +20317,7 @@
   },
   "POST /api/supplier/payroll/aangiftes": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/payroll/bevindingen": {
@@ -20417,7 +20417,7 @@
   },
   "POST /api/supplier/photo/remove": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/polis": {
@@ -20517,7 +20517,7 @@
   },
   "POST /api/supplier/puls/blik": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/puls/plan": {
@@ -20892,7 +20892,7 @@
   },
   "POST /api/supplier/rtmail/hulp": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/rtmail/imap/intrekken": {
@@ -20907,7 +20907,7 @@
   },
   "POST /api/supplier/rtmail/imap/sleutels": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/rtmail/inbox": {
@@ -21002,7 +21002,7 @@
   },
   "POST /api/supplier/rtmail/verzonden": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/rtmail/zoek": {
@@ -21047,7 +21047,7 @@
   },
   "POST /api/supplier/salon/status": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/samenwerking/beslis": {
@@ -21207,7 +21207,7 @@
   },
   "POST /api/supplier/site/versies": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/staff/add": {
@@ -21617,7 +21617,7 @@
   },
   "POST /api/supplier/vertaal/ui": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/verzuim/planning": {
@@ -21937,7 +21937,7 @@
   },
   "POST /api/techniek/archief": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (OUTPUT, AUDIT, FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (OUTPUT, STATE, SIDE_EFFECT, AUDIT, FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/techniek/betalingen/keuze": {
@@ -22467,7 +22467,7 @@
   },
   "POST /api/thuis/typen": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/thuis/wens": {
@@ -22507,7 +22507,7 @@
   },
   "POST /api/tijdlijn": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/toestel/meting": {
@@ -22602,7 +22602,7 @@
   },
   "POST /api/vak/offertes/mijn": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/vak/review": {
@@ -22647,7 +22647,7 @@
   },
   "POST /api/vastgoed/aanbod": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/vastgoed/bod": {
@@ -22687,7 +22687,7 @@
   },
   "POST /api/veiligheid/codewoord/check": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (OUTPUT, FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (OUTPUT, STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/veiligheid/codewoord/proef": {
@@ -22737,7 +22737,7 @@
   },
   "POST /api/veiligheid/moment": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/veiligheid/moment/maak": {
@@ -22877,7 +22877,7 @@
   },
   "POST /api/vertaal": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/vertaal/talen": {
@@ -22907,7 +22907,7 @@
   },
   "POST /api/verzorging/mijn": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/voeding": {
@@ -23027,7 +23027,7 @@
   },
   "POST /api/wbw/mijn": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/wbw/uitgave": {
@@ -23142,7 +23142,7 @@
   },
   "POST /api/wereld/state": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/wereld/zoek": {

@@ -6,19 +6,21 @@
     "bronroutes": 282,
     "gesloten": 65,
     "gezien": 51,
-    "tussen": 11,
-    "terminaal": 33,
-    "open": 122,
-    "openCollecties": 96
+    "tussen": 14,
+    "terminaal": 36,
+    "besluit": 7,
+    "open": 109,
+    "openCollecties": 93
   },
   "perGroep": {
     "consument": {
       "bronroutes": 133,
       "gesloten": 27,
       "gezien": 20,
-      "tussen": 11,
-      "terminaal": 20,
-      "open": 55
+      "tussen": 14,
+      "terminaal": 23,
+      "besluit": 0,
+      "open": 49
     },
     "aanbieder": {
       "bronroutes": 70,
@@ -26,6 +28,7 @@
       "gezien": 22,
       "tussen": 0,
       "terminaal": 0,
+      "besluit": 0,
       "open": 22
     },
     "kantoor": {
@@ -34,7 +37,8 @@
       "gezien": 9,
       "tussen": 0,
       "terminaal": 13,
-      "open": 45
+      "besluit": 7,
+      "open": 38
     },
     "platform": {
       "bronroutes": 0,
@@ -42,6 +46,7 @@
       "gezien": 0,
       "tussen": 0,
       "terminaal": 0,
+      "besluit": 0,
       "open": 0
     }
   },
@@ -73,8 +78,8 @@
     "lezers": null
   },
   "infra": 14,
-  "terminaalVerklaard": 23,
-  "tussenVerklaard": 4,
+  "terminaalVerklaard": 24,
+  "tussenVerklaard": 5,
   "aangewezen": 1,
   "tussenOngemeten": [
     "contactPins -> POST /api/member/pin/zoek (de proef kreeg status 400)",
@@ -83,15 +88,12 @@
   "verlopen": {
     "terminaal": [],
     "tussen": [],
+    "besluit": [],
     "tegenroute": [],
     "infra": [],
     "ontvanger": []
   },
   "openCollecties": [
-    {
-      "collectie": "rtfos",
-      "bronroutes": 7
-    },
     {
       "collectie": "concern",
       "bronroutes": 5
@@ -102,14 +104,6 @@
     },
     {
       "collectie": "genootschap",
-      "bronroutes": 3
-    },
-    {
-      "collectie": "leren",
-      "bronroutes": 3
-    },
-    {
-      "collectie": "wereld",
       "bronroutes": 3
     },
     {
@@ -1292,11 +1286,11 @@
     {
       "collectie": "leren",
       "bronnen": 3,
-      "stand": "open",
-      "graad": null,
+      "stand": "terminaal",
+      "graad": "mens",
       "zetStand": {},
       "leest": {},
-      "reden": null
+      "reden": "wat een lid zelf oefent, herhaalt en opschrijft (kern/levensgraaf); School houdt vast aan \"leren is geen wedstrijd\", dus er is ook geen tweede partij die het beoordeelt"
     },
     {
       "collectie": "levensbeleid",
@@ -1951,11 +1945,11 @@
     {
       "collectie": "rtfos",
       "bronnen": 7,
-      "stand": "open",
-      "graad": null,
+      "stand": "besluit",
+      "graad": "GIFT.md",
       "zetStand": {},
       "leest": {},
-      "reden": null
+      "reden": "de ontvanger van deze handelingen is een DONATEUR, en die bestaat niet: er is met opzet geen doneerknop en geen incasso. GIFT.md par. 1 legt drie besluiten vast die daaraan voorafgaan -- waar het geld landt, welke giftvormen opengaan, en of de stichting zelf een ANBI is."
     },
     {
       "collectie": "rtgid",
@@ -2346,11 +2340,11 @@
     {
       "collectie": "wereld",
       "bronnen": 3,
-      "stand": "open",
-      "graad": null,
+      "stand": "tussen",
+      "graad": "verklaard",
       "zetStand": {},
       "leest": {},
-      "reden": null
+      "reden": "lid A zet zijn profiellagen, lid B leest ze op codenaam -- twee mensen, en het profiel bestaat juist om gezien te worden"
     },
     {
       "collectie": "werkbeleid",
@@ -3986,12 +3980,12 @@
       "pad": "/api/member/leren/herhaal",
       "rol": "member",
       "groep": "consument",
-      "stand": "open",
+      "stand": "terminaal",
       "collecties": [
         {
           "collectie": "leren",
-          "stand": "open",
-          "graad": null,
+          "stand": "terminaal",
+          "graad": "mens",
           "zetStand": [],
           "leest": []
         }
@@ -4002,12 +3996,12 @@
       "pad": "/api/member/leren/project-maak",
       "rol": "member",
       "groep": "consument",
-      "stand": "open",
+      "stand": "terminaal",
       "collecties": [
         {
           "collectie": "leren",
-          "stand": "open",
-          "graad": null,
+          "stand": "terminaal",
+          "graad": "mens",
           "zetStand": [],
           "leest": []
         }
@@ -4018,12 +4012,12 @@
       "pad": "/api/member/leren/schrijf-bewaar",
       "rol": "member",
       "groep": "consument",
-      "stand": "open",
+      "stand": "terminaal",
       "collecties": [
         {
           "collectie": "leren",
-          "stand": "open",
-          "graad": null,
+          "stand": "terminaal",
+          "graad": "mens",
           "zetStand": [],
           "leest": []
         }
@@ -5881,12 +5875,12 @@
       "pad": "/api/rtfos/gift/plan/lijst",
       "rol": "office",
       "groep": "kantoor",
-      "stand": "open",
+      "stand": "besluit",
       "collecties": [
         {
           "collectie": "rtfos",
-          "stand": "open",
-          "graad": null,
+          "stand": "besluit",
+          "graad": "GIFT.md",
           "zetStand": [],
           "leest": []
         }
@@ -5897,12 +5891,12 @@
       "pad": "/api/rtfos/gift/stand/kantoor",
       "rol": "boardroom",
       "groep": "kantoor",
-      "stand": "open",
+      "stand": "besluit",
       "collecties": [
         {
           "collectie": "rtfos",
-          "stand": "open",
-          "graad": null,
+          "stand": "besluit",
+          "graad": "GIFT.md",
           "zetStand": [],
           "leest": []
         }
@@ -5913,12 +5907,12 @@
       "pad": "/api/rtfos/gift/stand/zet",
       "rol": "boardroom",
       "groep": "kantoor",
-      "stand": "open",
+      "stand": "besluit",
       "collecties": [
         {
           "collectie": "rtfos",
-          "stand": "open",
-          "graad": null,
+          "stand": "besluit",
+          "graad": "GIFT.md",
           "zetStand": [],
           "leest": []
         }
@@ -5929,12 +5923,12 @@
       "pad": "/api/rtfos/stad/kernteam",
       "rol": "office",
       "groep": "kantoor",
-      "stand": "open",
+      "stand": "besluit",
       "collecties": [
         {
           "collectie": "rtfos",
-          "stand": "open",
-          "graad": null,
+          "stand": "besluit",
+          "graad": "GIFT.md",
           "zetStand": [],
           "leest": []
         }
@@ -5945,12 +5939,12 @@
       "pad": "/api/rtfos/stad/maak",
       "rol": "office",
       "groep": "kantoor",
-      "stand": "open",
+      "stand": "besluit",
       "collecties": [
         {
           "collectie": "rtfos",
-          "stand": "open",
-          "graad": null,
+          "stand": "besluit",
+          "graad": "GIFT.md",
           "zetStand": [],
           "leest": []
         }
@@ -5961,12 +5955,12 @@
       "pad": "/api/rtfos/winkel/artikelen",
       "rol": "office",
       "groep": "kantoor",
-      "stand": "open",
+      "stand": "besluit",
       "collecties": [
         {
           "collectie": "rtfos",
-          "stand": "open",
-          "graad": null,
+          "stand": "besluit",
+          "graad": "GIFT.md",
           "zetStand": [],
           "leest": []
         }
@@ -5977,12 +5971,12 @@
       "pad": "/api/rtfos/winkel/bestellingen",
       "rol": "office",
       "groep": "kantoor",
-      "stand": "open",
+      "stand": "besluit",
       "collecties": [
         {
           "collectie": "rtfos",
-          "stand": "open",
-          "graad": null,
+          "stand": "besluit",
+          "graad": "GIFT.md",
           "zetStand": [],
           "leest": []
         }
@@ -7445,12 +7439,12 @@
       "pad": "/api/wereld/bezoekers",
       "rol": "member",
       "groep": "consument",
-      "stand": "open",
+      "stand": "tussen",
       "collecties": [
         {
           "collectie": "wereld",
-          "stand": "open",
-          "graad": null,
+          "stand": "tussen",
+          "graad": "verklaard",
           "zetStand": [],
           "leest": []
         }
@@ -7461,12 +7455,12 @@
       "pad": "/api/wereld/profiel",
       "rol": "member",
       "groep": "consument",
-      "stand": "open",
+      "stand": "tussen",
       "collecties": [
         {
           "collectie": "wereld",
-          "stand": "open",
-          "graad": null,
+          "stand": "tussen",
+          "graad": "verklaard",
           "zetStand": [],
           "leest": []
         }
@@ -7477,12 +7471,12 @@
       "pad": "/api/wereld/profiel/van",
       "rol": "member",
       "groep": "consument",
-      "stand": "open",
+      "stand": "tussen",
       "collecties": [
         {
           "collectie": "wereld",
-          "stand": "open",
-          "graad": null,
+          "stand": "tussen",
+          "graad": "verklaard",
           "zetStand": [],
           "leest": []
         }

@@ -811,7 +811,7 @@ viel op alfabet af terwijl /api/bank/advies bleef. Een gelijke score afkappen is
 willekeur, en willekeur verbergt een vermogen zonder dat iemand het merkt.
 **En meetgetallen in de documenten verouderen niet meer**: `npm run getallen`
 schrijft ze tussen merktekens uit de registers (`<!--getal:idem.ongemeten-->3156<!--/getal--> bronroutes,
-<!--getal:doodspoor.open-->122<!--/getal--> open. Dat is een triagelijst en
+<!--getal:doodspoor.open-->109<!--/getal--> open. Dat is een triagelijst en
 geen beschuldiging (drie betekenissen lopen erin door elkaar, par. 3.3), en
 daarom een meting en nog geen poort. **De eerste gouden keten staat**
 (`scripts/tafelproef.js`, `npm run tafelproef`): de horecaketen van het openen
@@ -864,7 +864,7 @@ zonder die uitweg heeft een proef die iets echts vindt maar twee uitgangen,
 altijd zakken of de bevinding wegpoetsen. De proef meldt daarom `sluit` en
 `sluitMetBevinding` apart en nooit één cijfer.
 
-**Die bevinding is de opbrengst: er zijn TWEE RITWERELDEN.** `db.data.rides` (de
+**Die bevinding werd een besluit en is uitgevoerd: er waren TWEE RITWERELDEN.** `db.data.rides` (de
 lidkant: `/api/ride/request`, `supplier/ride/*`, zes standen uit
 `kern/vervoer.js`) en `db.data.mobOpdrachten` (het dispatchcentrum:
 `/api/supplier/mob/*`, tien standen uit `kern/mobiliteit/keten.js`, met matching
@@ -874,9 +874,22 @@ delen ze letterlijk, twee betekenen hetzelfde onder een andere naam
 `rijdt` is in de ene wereld een verouderde naam voor `aan-boord` en in de andere
 een eigen stand ná `ingestapt`. Pijnlijk detail: `kern/mobiliteit/dispatch.js`
 belooft in zijn kop dat een telefoonboeking "dezelfde keten" krijgt als een
-app-rit -- en het is juist de APP-rit die het dispatchbord nooit haalt. Dat is
-een besluit van de eigenaar (welke wereld is de waarheid?) en geen bouwopdracht,
-dus het staat in MAATSTAF.md par. 7.5 en niet als halve reparatie in de code.
+app-rit -- en het is juist de APP-rit die het dispatchbord nooit haalt. De eigenaar heeft besloten dat de OPDRACHT de waarheid is, en
+`kern/mobiliteit/appbrug.js` legt de brug: een app-rit wordt ook een
+vervoersopdracht en verschijnt op het dispatchbord. Vier dingen liggen daar
+vast. Een mislukte opdracht BREEKT DE RIT NIET (een bestemming die alleen een
+tekst is kan `kern/mobiliteit/plekken.js` niet oplossen; dan blijft de rit staan
+met de reden erbij -- een besluit uitvoeren mag geen aanvragen weigeren die het
+gisteren nog deed). De ritketen is GROVER, dus de brug loopt een PAD:
+`aangevraagd` naar `geaccepteerd` is in de opdrachtwereld drie gebeurtenissen,
+en het pad gaat nooit via `incident` of `geannuleerd` -- dat zou een gebeurtenis
+verzinnen die niet plaatsvond. De standen worden VERTAALD en niet overgetypt
+(toets 4 zakt zodra een ritstand naar `rijdt` vertaalt). En de brug loopt ÉÉN
+KANT OP: twee lijsten die elkaar bijwerken hebben geen waarheid meer. Wat nog
+niet gebeurd is: de 34 lezers van `db.data.rides` zijn niet omgezet, dus die
+lijst is nog geen projectie -- de richting staat vast, de migratie niet.
+De domeingrens (`GRENZEN.json`) hield de brug trouwens tegen tot iemand hem op
+de lijst zette, precies zoals bedoeld.
 
 **En wat de twee ketens werkelijk delen is GEMETEN** (`scripts/ketenvorm.js`,
 `KETENVORM.json`) in plaats van verklaard -- de proeven delen met opzet geen

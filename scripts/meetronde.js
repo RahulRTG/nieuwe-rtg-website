@@ -93,6 +93,33 @@ const STAPPEN = [
   { id: 'ketenronde', register: 'KETENS.json', duur: '~4 min',
     wat: 'of een keten netjes faalt onder sabotage',
     cmd: ['scripts/ketenronde.js'] },
+  /* DE GOUDEN KETENS. Ze meten iets anders dan alle proeven hierboven: die
+     kijken naar routes, deze naar een VERHAAL over actoren heen -- handelt
+     actor A, en ziet actor B dat vervolgens (MAATSTAF.md par. 7).
+
+     Ze staan hier op verzoek van de eigenaar (3 september 2026), en om de reden
+     die in de kop van dit bestand staat: een instrument dat alleen draait als
+     iemand eraan denkt, verslapt. Een gebroken schakel hoort binnen een ronde op
+     te vallen en niet bij de volgende verbouwing.
+
+     ZE ZIJN EEN POORT EN GEEN METING, anders dan de proeven erboven: een open
+     schakel geeft foutcode 1 en laat deze ronde zakken. Dat kan omdat ze niet
+     over een percentage gaan maar over een keten die hoort te sluiten -- en
+     omdat een schakel die aantoonbaar niet sluit een uitgeschreven reden mag
+     dragen (`openBekend` in scripts/ritproef.js) en dan geen defect is.
+
+     De ketenvorm draait erachteraan: hij leest de twee registers en telt wat ze
+     delen. Die meet en oordeelt, want een gedeelde vorm is een bevinding en
+     geen eis. */
+  { id: 'tafelproef', register: 'TAFELPROEF.json', duur: '~2 min',
+    wat: 'of de horecaketen sluit: van tafel tot correctie, met vijf storingen',
+    cmd: ['scripts/tafelproef.js', '--vastleggen'] },
+  { id: 'ritproef', register: 'RITPROEF.json', duur: '~2 min',
+    wat: 'of de ritketen sluit: van aanvraag tot afronding, over de appbrug',
+    cmd: ['scripts/ritproef.js', '--vastleggen'] },
+  { id: 'ketenvorm', register: 'KETENVORM.json', snel: true, duur: '~1 sec',
+    wat: 'wat de twee gouden ketens werkelijk delen (actoren, beloften)',
+    cmd: ['scripts/ketenvorm.js', '--vastleggen'] },
   { id: 'bewijsmatrix', register: 'BEWIJSMATRIX.json', snel: true, duur: '~1 min',
     wat: 'de elf schakels per route, uit de registers hierboven',
     cmd: ['scripts/bewijsmatrix.js'] }

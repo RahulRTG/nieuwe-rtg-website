@@ -41,6 +41,10 @@ const { start } = require('./lib/wegwerpserver');
 const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(WORTEL, 'RITPROEF.json');
 const VERVOERDER = 'ISLATR';                  // de vervoerszaak uit de seed
+/* Een BESTEMMING met een locatie op de kaart. De appbrug kan een vrije tekst
+   niet naar een plek vertalen (kern/mobiliteit/plekken.js), en storing 7 meet
+   dat geval apart; hier hoort de keten wel door te lopen. */
+const BESTEMMING = 'KIKUNOI';
 
 async function post(basis, pad, lijf, tok) {
   const r = await fetch(basis + pad, {
@@ -113,49 +117,37 @@ async function loop(basis, uit) {
   if (!staffId) throw new Error('geen chauffeur aan te maken (status ' + staf.status + ') -- zonder rijder meet deze proef de opstelling');
   uit.wereld = { chauffeur: 'via /api/supplier/staff/add, want de seed geeft ' + VERVOERDER + ' geen personeel' };
 
-  /* 1 -- het lid vraagt een rit. Ontvanger: de vervoerder.
+  /* 1 -- het lid vraagt een rit. Ontvanger: de vervoerder, op zijn DISPATCHBORD.
 
-     EN HIER LOOPT DE PROEF VAST OP IETS ECHTS. De vervoerder heeft geen route
-     waarmee hij zijn openstaande ritaanvragen ophaalt. Gemeten op 3 september
-     2026, over alle leverancierroutes die ritten kennen:
+     DIT WAS DE BEVINDING VAN DE EERSTE RONDE, en zij is nu een besluit én een
+     brug geworden. Er waren twee ritwerelden die niets van elkaar wisten: een
+     app-rit landde in `db.data.rides` en het dispatchbord leest
+     `db.data.mobOpdrachten`. De vervoerder kon een aanvraag daardoor nergens
+     terugvinden -- niet in zijn historie (alleen afgerond), niet in de
+     backoffice (alleen betaald, zonder ref), niet op zijn bord. Alleen een
+     melding over de SSE-stroom, en was die verbinding weg, dan was de rit
+     alleen nog te bereiken door de ref te kennen.
 
-       /api/supplier/ride/history   alleen `afgerond` en `gearriveerd`
-       /api/supplier/backoffice     alleen `paid`, en noemt de ref niet
-       kern/vervoer.js regel 36     alleen `geaccepteerd` en verder
-       /api/supplier/mob/dispatch   leest db.data.mobOpdrachten -- een ANDERE lijst
+     De eigenaar heeft besloten dat de OPDRACHT de waarheid is
+     (MAATSTAF.md par. 7.5); kern/mobiliteit/appbrug.js legt de brug. Deze
+     schakel meet het resultaat: staat de aanvraag op het bord?
 
-     Wat de vervoerder wel krijgt is een MELDING (notifySupplier) en een
-     sync-signaal over de SSE-stroom. Die melding is alleen te lezen zolang er
-     een live verbinding openstaat; er is geen POST-route die hem teruggeeft
-     (`/api/supplier/notifications/read` markeert alleen als gelezen). Verliest
-     de dispatcher die verbinding, dan is de rit alleen nog te bereiken door de
-     ref te kennen.
-
-     De schakel meet daarom wat er WEL is -- de rit bestaat voor de vervoerder
-     en is op zijn ref te bedienen -- en draagt de reden waarom hij open staat.
-     De bevinding zelf staat in de uitslag onder `bevindingen`. */
+     De bestemming is hier een ZAAK en geen tekst, en dat is geen truc maar de
+     grens van de brug: ./plekken.js lost een zaak, een halte, een favoriet, de
+     live locatie of een punt op de kaart op -- geen vrije tekst. Storing 7
+     hieronder meet juist het geval waarin dat NIET lukt. */
   const gevraagd = await stap(
-    schakel(1, 'lid', 'vervoerder', 'vraagt een rit aan; de vervoerder vindt hem in een werklijst',
-      'Er is geen route waarmee een vervoerder zijn OPENSTAANDE ritaanvragen ophaalt: history toont ' +
-      'alleen afgeronde ritten, backoffice alleen betaalde zonder ref, en het dispatchbord leest een ' +
-      'andere lijst (db.data.mobOpdrachten). Wat er is, is een melding over de SSE-stroom. Het besluit ' +
-      'hoort bij de vraag of de twee ritwerelden samengaan -- zie `bevindingen` in dit register en ' +
-      'MAATSTAF.md par. 7.5.'),
-    () => P('/api/ride/request', { supplierCode: VERVOERDER, to: 'Haven', passengers: 2 }, M),
+    schakel(1, 'lid', 'vervoerder', 'vraagt een rit aan; hij verschijnt op het dispatchbord'),
+    () => P('/api/ride/request', { supplierCode: VERVOERDER, toCode: BESTEMMING, passengers: 2 }, M),
     async (r) => {
       const ride = r.data && r.data.ride;
-      const h = await P('/api/supplier/ride/history', {}, S);
-      const lijst = (h.data && h.data.items) || [];
-      const bij = lijst.find(x => x.ref === (ride && ride.ref));
-      /* Wat er WEL is, en dat hoort in de uitslag te staan: de rit bestaat voor
-         deze vervoerder en is op ref te bereiken. Met `ride/suggest`, want die
-         LEEST -- een meting die de toestand verandert meet zichzelf, en hier
-         stond eerst `ride/status`, wat een schrijfroute is. */
-      const bereikbaar = await P('/api/supplier/ride/suggest', { ref: ride && ride.ref }, S);
-      return { klopt: !!bij,
-        wat: 'rit ' + (ride && ride.ref) + ', klant heet "' + (ride && ride.customerCodename) +
-          '"; in de werklijst van de vervoerder: ' + !!bij +
-          '; op ref te bereiken: ' + (bereikbaar.status === 200) };
+      const oref = r.data && r.data.opdrachtRef;
+      const d = await P('/api/supplier/mob/dispatch', {}, S);
+      const open = (d.data && d.data.open) || [];
+      const bij = open.find(o => o.ref === oref);
+      return { klopt: !!oref && !!bij && !!(ride && ride.customerCodename),
+        wat: 'rit ' + (ride && ride.ref) + ' -> opdracht ' + oref + ', op het bord: ' + !!bij +
+          ', klant heet "' + (ride && ride.customerCodename) + '"' };
     });
 
   if (!gevraagd) return uit;
@@ -244,7 +236,7 @@ async function storingen(basis, uit) {
 
   /* 1. LEVEREN VOOR ER BETAALD IS. De omgekeerde volgorde van de tafel, en
      daarom de eerste storing: hij hoort een grens te zijn en geen gewoonte. */
-  const r1 = (await P('/api/ride/request', { supplierCode: VERVOERDER, to: 'Haven' }, M)).data.ride;
+  const r1 = (await P('/api/ride/request', { supplierCode: VERVOERDER, toCode: BESTEMMING }, M)).data.ride;
   const vroeg = await P('/api/supplier/ride/assign', { ref: r1.ref, staffId }, S);
   noteer('een rit toewijzen die nog niet betaald is',
     'weigert, en zegt dat er nog niet betaald is',
@@ -276,7 +268,7 @@ async function storingen(basis, uit) {
 
   /* 5. TWEE KEER BETALEN. De tafel kent de dubbele tik bij het bestellen; hier
      is de dubbeltik bij het BETALEN het geval dat geld kost. */
-  const r2 = (await P('/api/ride/request', { supplierCode: VERVOERDER, to: 'Haven' }, M)).data.ride;
+  const r2 = (await P('/api/ride/request', { supplierCode: VERVOERDER, toCode: BESTEMMING }, M)).data.ride;
   const eerste = await P('/api/ride/pay', { ref: r2.ref }, M);
   const tweede = await P('/api/ride/pay', { ref: r2.ref }, M);
   noteer('twee keer betalen voor dezelfde rit',
@@ -288,11 +280,38 @@ async function storingen(basis, uit) {
 
   /* 6. EEN LID DAT NIET BETAALD HEEFT, ZIET GEEN CHAUFFEUR. De keerzijde van
      schakel 3: er hoort niets klaar te staan zolang de rit niet betaald is. */
-  const r3 = (await P('/api/ride/request', { supplierCode: VERVOERDER, to: 'Haven' }, M)).data.ride;
+  const r3 = (await P('/api/ride/request', { supplierCode: VERVOERDER, toCode: BESTEMMING }, M)).data.ride;
   const beeld = await ritVanLid(basis, M, r3.ref);
   noteer('het live-beeld van een onbetaalde rit',
     'toont geen chauffeur, want die is nog niet toegewezen',
     !beeld || !beeld.driver, 'chauffeur in beeld: ' + (beeld ? beeld.driver : 'geen rit in beeld'));
+
+  /* 7. EEN BESTEMMING DIE GEEN PLEK IS. De brug vertaalt een zaak, een halte,
+     een favoriet, de live locatie of een punt op de kaart; een vrije tekst
+     niet. Dan hoort de rit gewoon door te gaan -- een besluit uitvoeren mag
+     geen aanvragen weigeren die gisteren nog werkten -- met de reden erbij. */
+  const tekst = await P('/api/ride/request', { supplierCode: VERVOERDER, to: 'Ergens bij de haven' }, M);
+  noteer('een bestemming die alleen een tekst is',
+    'de rit gaat gewoon door, krijgt geen opdracht, en zegt waarom',
+    tekst.status === 200 && !!(tekst.data && tekst.data.ride) &&
+      !(tekst.data && tekst.data.opdrachtRef) && !!(tekst.data && tekst.data.opdrachtReden),
+    'status ' + tekst.status + ', opdracht: ' + ((tekst.data && tekst.data.opdrachtRef) || 'geen') +
+      ', reden: ' + String((tekst.data && tekst.data.opdrachtReden) || '').slice(0, 60) + '...');
+
+  /* 8. DE VERTALING VAN DE STANDEN. `aan-boord` heet in de opdrachtketen
+     `ingestapt`, en `rijdt` betekent in de twee werelden iets anders. Deze
+     storing bewaakt dat de brug vertaalt in plaats van overtypt. */
+  const r8 = (await P('/api/ride/request', { supplierCode: VERVOERDER, toCode: BESTEMMING }, M)).data;
+  await P('/api/ride/pay', { ref: r8.ride.ref }, M);
+  await P('/api/supplier/ride/assign', { ref: r8.ride.ref, staffId }, S);
+  for (const stand of ['onderweg', 'aangekomen', 'aan-boord']) await P('/api/supplier/ride/status', { ref: r8.ride.ref, status: stand }, S);
+  const bord8 = await P('/api/supplier/mob/dispatch', {}, S);
+  const alle8 = [].concat(bord8.data.open || [], bord8.data.lopend || [], bord8.data.klaar || []);
+  const o8 = alle8.find(x => x.ref === r8.opdrachtRef);
+  noteer('een rit die op "aan-boord" gaat',
+    'de opdracht heet dan "ingestapt" en niet "rijdt" -- dat woord betekent hier iets anders',
+    !!o8 && o8.status === 'ingestapt',
+    'rit aan-boord, opdracht ' + (o8 ? o8.status : '(niet gevonden)'));
 
   return uit;
 }

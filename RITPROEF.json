@@ -7,13 +7,13 @@
       "nr": 1,
       "van": "lid",
       "naar": "vervoerder",
-      "wat": "vraagt een rit aan; de vervoerder vindt hem in een werklijst",
-      "bekend": "Er is geen route waarmee een vervoerder zijn OPENSTAANDE ritaanvragen ophaalt: history toont alleen afgeronde ritten, backoffice alleen betaalde zonder ref, en het dispatchbord leest een andere lijst (db.data.mobOpdrachten). Wat er is, is een melding over de SSE-stroom. Het besluit hoort bij de vraag of de twee ritwerelden samengaan -- zie `bevindingen` in dit register en MAATSTAF.md par. 7.5.",
-      "stand": "openBekend",
+      "wat": "vraagt een rit aan; hij verschijnt op het dispatchbord",
+      "bekend": null,
+      "stand": "gesloten",
       "status": 200,
-      "ziet": "rit RTG-R-AB4B6B, klant heet \"Amberen Vos\"; in de werklijst van de vervoerder: false; op ref te bereiken: true",
+      "ziet": "rit RTG-R-65B316 -> opdracht RTG-M-4F2A41, op het bord: true, klant heet \"Amberen Vos\"",
       "fout": null,
-      "ms": 16
+      "ms": 21
     },
     {
       "nr": 2,
@@ -25,7 +25,7 @@
       "status": 200,
       "ziet": "betaald: true, stand nu \"aangevraagd\"",
       "fout": null,
-      "ms": 21
+      "ms": 20
     },
     {
       "nr": 3,
@@ -37,7 +37,7 @@
       "status": 200,
       "ziet": "het lid leest chauffeur \"Chauffeur Proef\" bij stand \"geaccepteerd\"",
       "fout": null,
-      "ms": 26
+      "ms": 33
     },
     {
       "nr": 4,
@@ -49,7 +49,7 @@
       "status": 200,
       "ziet": "het lid leest stand \"onderweg\"",
       "fout": null,
-      "ms": 13
+      "ms": 17
     },
     {
       "nr": 5,
@@ -61,7 +61,7 @@
       "status": 200,
       "ziet": "het lid leest stand \"aangekomen\"",
       "fout": null,
-      "ms": 12
+      "ms": 20
     },
     {
       "nr": 6,
@@ -73,7 +73,7 @@
       "status": 200,
       "ziet": "het lid leest stand \"aan-boord\"",
       "fout": null,
-      "ms": 13
+      "ms": 17
     },
     {
       "nr": 7,
@@ -85,7 +85,7 @@
       "status": 200,
       "ziet": "stand \"afgerond\", nog in het live-beeld: false",
       "fout": null,
-      "ms": 11
+      "ms": 20
     },
     {
       "nr": 8,
@@ -97,7 +97,7 @@
       "status": 200,
       "ziet": "staat in de historie met stand \"afgerond\"",
       "fout": null,
-      "ms": 5
+      "ms": 4
     }
   ],
   "storingen": [
@@ -136,32 +136,35 @@
       "belofte": "toont geen chauffeur, want die is nog niet toegewezen",
       "stand": "gehouden",
       "wat": "chauffeur in beeld: null"
+    },
+    {
+      "naam": "een bestemming die alleen een tekst is",
+      "belofte": "de rit gaat gewoon door, krijgt geen opdracht, en zegt waarom",
+      "stand": "gehouden",
+      "wat": "status 200, opdracht: geen, reden: Een app-rit draagt vaak alleen een tekst (\"Haven\"). ./plekke..."
+    },
+    {
+      "naam": "een rit die op \"aan-boord\" gaat",
+      "belofte": "de opdracht heet dan \"ingestapt\" en niet \"rijdt\" -- dat woord betekent hier iets anders",
+      "stand": "gehouden",
+      "wat": "rit aan-boord, opdracht ingestapt"
     }
   ],
-  "rit": "RTG-R-AB4B6B",
+  "rit": "RTG-R-65B316",
   "wereld": {
     "chauffeur": "via /api/supplier/staff/add, want de seed geeft ISLATR geen personeel"
   },
   "telling": {
     "schakels": 8,
-    "gesloten": 7,
+    "gesloten": 8,
     "open": 0,
-    "openBekend": 1,
+    "openBekend": 0,
     "stuk": 0,
-    "storingen": 6,
-    "gehouden": 6,
+    "storingen": 8,
+    "gehouden": 8,
     "gebroken": 0
   },
-  "sluit": false,
+  "sluit": true,
   "sluitMetBevinding": true,
-  "bevindingen": [
-    {
-      "schakel": 1,
-      "van": "lid",
-      "naar": "vervoerder",
-      "wat": "vraagt een rit aan; de vervoerder vindt hem in een werklijst",
-      "gemeten": "rit RTG-R-AB4B6B, klant heet \"Amberen Vos\"; in de werklijst van de vervoerder: false; op ref te bereiken: true",
-      "reden": "Er is geen route waarmee een vervoerder zijn OPENSTAANDE ritaanvragen ophaalt: history toont alleen afgeronde ritten, backoffice alleen betaalde zonder ref, en het dispatchbord leest een andere lijst (db.data.mobOpdrachten). Wat er is, is een melding over de SSE-stroom. Het besluit hoort bij de vraag of de twee ritwerelden samengaan -- zie `bevindingen` in dit register en MAATSTAF.md par. 7.5."
-    }
-  ]
+  "bevindingen": []
 }

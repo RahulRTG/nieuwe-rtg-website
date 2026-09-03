@@ -57,11 +57,11 @@ de tabel na en zakt zodra de telregel eronder niet meer klopt.
 | U8 | …en dat bewijs is sterk genoeg om routes werkelijk verschillend te laten handelen | PROOF.md par. 0: bewijs mag alleen groeien | `scripts/vertrouwen.js`, `BEWIJSSCHULD.json` met sluitweg per route | normtanden `bewijsCellenBewezen`, `bewijsAchterstand` | <!--getal:vertrouwen.bewezen-->0<!--/getal--> bewezen, <!--getal:vertrouwen.routes-->4180<!--/getal--> verzwakt | **jaren weg** |
 | U9 | Elke hoofdactie is omkeerbaar of compenseerbaar, en die twee worden nooit samengeteld | EXECUTIE.md blok 5 | `scripts/herstelproef.js`, `scripts/lib/herstelwereld.js`; voor horeca `kern/horeca/correctie.js` (compensatie met een bevroren bedrag) | proef zakt op een verdict zonder grond; `test/horeca-correctie.test.js` | 13 exact, 30 compensatie, 1 geen-herstel, 46 vragen een wereld | **staat** |
 | U10 | Vraag een gegeven maar één keer, en hergebruik alleen met doel, toestemming, bron en actualiteit | LEVEN.md par. 2, LINK.md par. 3, `kern/consent-register.js` | kluis + codenamen; doelbinding per verlening | `scripts/afleidbaar.js` meet de afstand codenaam → identificator | doorwerking over domeinen (dieet → reizen → evenement) is niet gebouwd en niet gemeten | **besluit** |
-| U11 | Eén werkelijkheid, meerdere perspectieven: consument, zaak, keuken, koerier, support en finance kijken naar hetzelfde object | HORECA.md: de rekening is één waarheid over alle kanalen | per domein; huisbreed geen meting | geen | horeca: gemeten (tafelproef). Mobiliteit: **twee werelden**, `rides` en `mobOpdrachten`, met nul verwijzingen over en weer (par. 7.5) | **stap weg** |
-| U12 | Geen enkele actie eindigt in een dood spoor: elke handeling heeft een ontvanger, of een verklaring | par. 3 hieronder | `scripts/doodspoor.js`, `DOODSPOOR.json` | `npm run doodspoor:controle` zakt op een verlopen verklaring; de regel zelf is nog geen poort | <!--getal:doodspoor.bronroutes-->282<!--/getal--> bronroutes, <!--getal:doodspoor.open-->122<!--/getal--> open na de triage (was 163) | **stap weg** |
+| U11 | Eén werkelijkheid, meerdere perspectieven: consument, zaak, keuken, koerier, support en finance kijken naar hetzelfde object | HORECA.md: de rekening is één waarheid over alle kanalen | per domein; `kern/mobiliteit/appbrug.js` brengt de app-rit naar het dispatchbord | `test/appbrug.test.js`, ritproef schakel 1 | horeca gemeten; mobiliteit: de brug staat, de 34 lezers van `rides` zijn nog niet omgezet (par. 7.5) | **stap weg** |
+| U12 | Geen enkele actie eindigt in een dood spoor: elke handeling heeft een ontvanger, of een verklaring | par. 3 hieronder | `scripts/doodspoor.js`, `DOODSPOOR.json` | `npm run doodspoor:controle` zakt op een verlopen verklaring; de regel zelf is nog geen poort | <!--getal:doodspoor.bronroutes-->282<!--/getal--> bronroutes, <!--getal:doodspoor.open-->109<!--/getal--> open na de triage (was 163) | **stap weg** |
 | U13 | De interface toont de taak, niet de organisatie | TIKKEN.md, `shared/sprong.js` | resolver + sprong (handelingen uit de schermen zelf) | `scripts/vindbaar.js` | VINDBAAR.json | **staat** |
 | U14 | Elke weigering, prijs of beperking is verklaarbaar in gewone taal, met de weg eromheen | ECONOMIE.md (firewall zegt hoe het wél kan), GRAMMATICA.md (een verhindering draagt een reden) | `kern/economie/firewall.js`, verhinderingen | toetsen per weigering | toetsen | **staat** |
-| U15 | Elke niet-terminale toestand heeft een eigenaar, een volgende stap, een termijn en een verval | par. 4 hieronder | lokaal: `kern/commerce/retour.js` (vijf standen die zeggen welke partij ze zet) | geen | geen | **stap weg** |
+| U15 | Elke niet-terminale toestand heeft een eigenaar, een volgende stap, een termijn en een verval | par. 4 hieronder | lokaal: `kern/commerce/retour.js` (vijf standen die zeggen welke partij ze zet), `kern/mobiliteit/keten.js` (tien standen met VOLGENDE per stand) | ritproef storing 2 en 3 | twee domeinen met een echte statusmachine; huisbreed geen regel | **stap weg** |
 | U16 | Falen is een normale producttoestand: leeg, laden, traag, gedeeltelijk, offline, conflict, fout, herstel, geannuleerd, betwist | ADAPTIEF.md (verbergen bestaat niet), `scripts/chaos.js` | achterkant: chaos en aanvalsbatterij; voorkant: per scherm en ongemeten | vijf storingen in `scripts/tafelproef.js`, alleen voor de tafelketen | geen, over 258 schermen | **jaren weg** |
 | U17 | AI handelt binnen een mandaat met doel, objecten, acties, bedrag, duur, verval en stopvoorwaarden | CONTROLPLANE.md (vier dimensies), EXECUTIE.md blok 6 | `kern/stuur/mandaat.js`: versmalt alleen, leeg is dicht, hoogt geen niveau op | toetsen | toetsen | **staat** |
 | U18 | Autonomieniveaus A0–A4 als eigen schaal | EXECUTIE.md: de noemer geen / tonen / klaarzetten / uitvoeren | `scripts/gezagsnoemer.js` | `test/gezagsnoemer.test.js` | noemer op 18 evident | **geprojecteerd** |
@@ -88,7 +88,7 @@ de tabel na en zakt zodra de telregel eronder niet meer klopt.
 | U39 | Harde poorten die nooit compenseerbaar zijn: ledger, audit, herstel, toegankelijkheid, prestatie, actor-compleetheid, dood spoor, uitstap | KEURING.md, TOEGANKELIJK.md, TENANT.md (uitgang) | `scripts/check.js` (64 regels), a11y-poorten, `kern/tenant/uitgang.js` | bestaand: ja; dood spoor en actor: nog niet | per poort | **stap weg** |
 | U40 | Elk product draagt een machineleesbaar contract (PRODUCT-360) dat in de toetsing meeloopt | PLATFORM.md par. 0: vier apps, en wat technisch nog losse pagina's zijn; EXECUTION_MAP.json is een projectie per route | per route: ja; per product: de eenheid "product" is niet vastgesteld | `npm run executionmap` zakt op handwerk | — | **besluit** |
 | U41 | Elke capability draagt een contract: objecten, commando's, events, rechten, fouten, herstel, SLO, gebruikers, toetsen | OS.md par. 4; `kern/appstore/machtigingen.js` is het enige bestand met doel én grens | 21 capability-lijsten met 250 leden | `scripts/capabilityroepers.js` | CAPABILITEIT.json | **besluit** |
-| U42 | Een journey wordt als volledig verhaal over actoren heen getest, inclusief verstoring, herhaling en herstel | par. 7 hieronder | `scripts/tafelproef.js` en `scripts/ritproef.js`, los geschreven; `scripts/ketenvorm.js` telt wat ze delen | beide geven foutcode 1 op een open schakel; `test/tafelproef.test.js` en `test/ritproef.test.js` bewaken de proeven | tafel <!--getal:tafel.schakels-->11<!--/getal--> schakels en <!--getal:tafel.storingen-->8<!--/getal--> storingen; rit <!--getal:rit.schakels-->7<!--/getal--> gesloten + <!--getal:rit.bevindingen-->1<!--/getal--> bevinding, <!--getal:rit.storingen-->6<!--/getal--> storingen | **staat** |
+| U42 | Een journey wordt als volledig verhaal over actoren heen getest, inclusief verstoring, herhaling en herstel | par. 7 hieronder | `scripts/tafelproef.js` en `scripts/ritproef.js`, los geschreven; `scripts/ketenvorm.js` telt wat ze delen | beide geven foutcode 1 op een open schakel; `test/tafelproef.test.js` en `test/ritproef.test.js` bewaken de proeven | tafel <!--getal:tafel.schakels-->11<!--/getal--> schakels en <!--getal:tafel.storingen-->8<!--/getal--> storingen; rit <!--getal:rit.schakels-->8<!--/getal--> gesloten + <!--getal:rit.bevindingen-->0<!--/getal--> bevinding, <!--getal:rit.storingen-->8<!--/getal--> storingen | **staat** |
 | U43 | Het register koppelt product, actor, bedoeling, journey, capability, object, route, event, beleid, bewijs, scherm, toets, prestatie en herstelpad | `kern/platformregister/` | functie ↔ routes ↔ bewijs ↔ scherm | check.js regel 64 | — | **stap weg** |
 | U44 | Volgorde: eerst de gedeelde grond, dan drie gouden ketens (mobiliteit, horeca, werk), dan de families | EXECUTIE.md par. 7: één bewezen keten vóór honderd functies | besloten 3 september 2026: horeca eerst (par. 7) | — | — | **staat** |
 | U45 | De repo verhuist naar /products, /domains, /capabilities, /trust | 415 kerndomeinen in `server/kern`; EXECUTION_MAP is een projectie | een gegenereerde leesweergave kan; een fysieke verhuizing niet | — | — | **geprojecteerd** |
@@ -269,10 +269,10 @@ Infrastructuur die elke aanroep raakt (sessies, idempotentiesleutels) staat in
 | bronroutes met gemeten werk | 282 | <!--getal:doodspoor.bronroutes-->282<!--/getal--> |
 | gesloten (gemeten) | 65 | <!--getal:doodspoor.gesloten-->65<!--/getal--> |
 | gezien (vermoed of aangewezen) | 49 | <!--getal:doodspoor.gezien-->51<!--/getal--> |
-| tussen leden (verklaard) | — | <!--getal:doodspoor.tussen-->11<!--/getal--> |
-| terminaal (verklaard) | 5 | <!--getal:doodspoor.terminaal-->33<!--/getal--> |
-| open | 163 | <!--getal:doodspoor.open-->122<!--/getal--> |
-| collecties met minstens één open bronroute | 121 | <!--getal:doodspoor.openCollecties-->96<!--/getal--> |
+| tussen leden (verklaard) | — | <!--getal:doodspoor.tussen-->14<!--/getal--> |
+| terminaal (verklaard) | 5 | <!--getal:doodspoor.terminaal-->36<!--/getal--> |
+| open | 163 | <!--getal:doodspoor.open-->109<!--/getal--> |
+| collecties met minstens één open bronroute | 121 | <!--getal:doodspoor.openCollecties-->93<!--/getal--> |
 | routes die in de proef geen werk deden en dus buiten de meting vallen | 3123 | <!--getal:doodspoor.nietGemeten-->3123<!--/getal--> |
 
 De matrix (bron → ontvanger, gesloten relaties per collectie) staat in
@@ -324,7 +324,17 @@ prijzen en limieten) en `commandPlannen` (een plan van de AI-operator dat een
 mens uitvoert) staan er daarom **niet** in en blijven open — hun effect landt bij
 een klant, en dan is "wie is nu aan zet" een echte vraag.
 
-**3. Wat overblijft: 96 collecties met een echt open handoff.** Daar zit het
+**2b. De ontvanger bestaat nog niet, en dat is elders al besloten.** De tweede
+triageronde vond een groep die in geen bak paste: het kantoor zet de giftstand
+van de RTFoundation, richt een stad in, beheert haar winkel — en de ontvanger zou
+een **donateur** zijn. Die bestaat niet, en dat is geen omissie: GIFT.md legt
+vast dat er met opzet geen doneerknop en geen incasso is, en dat er drie
+besluiten aan voorafgaan. Zo'n collectie open laten staan zou de lijst vervuilen
+met werk dat niemand mag doen; hem terminaal noemen zou liegen. Vandaar de stand
+**`besluit`**, met de vindplaats erbij — en `test/doodspoor.test.js` toets 12b
+zakt zodra dat document niet bestaat of de verklaring niet meer wordt gebruikt.
+
+**3. Wat overblijft: <!--getal:doodspoor.openCollecties-->93<!--/getal--> collecties met een echt open handoff.** Daar zit het
 werk. De grootste posten zijn `rtfos` (7 bronroutes: gift, stad, winkel — een
 gift heeft aantoonbaar een ontvanger), `concern` (5), `bankregie` (4, waaronder
 `/api/office/bank/leden`, dat leden raakt) en `genootschap`, `leren`, `wereld`,
@@ -337,8 +347,9 @@ proef geen werk deden, en eigenaar, termijn en verval van een stand (par. 4).
 
 **Daarom is dit nog steeds een meting en geen poort.** Pas als "open" schoon is,
 mag de regel hard worden: dan zakt de bouw op een onverklaarde open handoff, en
-niet eerder. De triage bracht hem van 163 naar 122; wat er nu ligt is voor het
-eerst een lijst waar één betekenis onder zit.
+niet eerder. Twee triagerondes brachten hem van 163 naar
+<!--getal:doodspoor.open-->109<!--/getal-->, met zes standen die elk iets anders
+zeggen. Wat er nu ligt is voor het eerst een lijst waar één betekenis onder zit.
 
 ---
 
@@ -538,7 +549,7 @@ De oude toets op dit gedrag keek of het wóórd "derving" in de foutmelding ston
 Hij loopt nu de aangewezen weg af en controleert dat die werkt — een melding die
 ergens heen wijst, is pas een melding als daar iets is.
 
-### 7.4 De tweede keten: de rit — **loopt door, met één bevinding**
+### 7.4 De tweede keten: de rit — **sluit**
 
 Eén keten die sluit bewijst dat het kan. De vraag daarna is een andere: **is er
 een gedeelde vorm, of is elke keten zijn eigen ding?** Die vraag beantwoord je
@@ -558,57 +569,71 @@ hij nuttig is als tweede meting:
 | naam van de werker | gaat **niet** naar de gast | gaat **wel** naar het lid — je stapt bij iemand in de auto |
 | naam van de klant | zelfgekozen handle | codenaam (privacy by design) |
 
-**Een schakel staat open, met een uitgeschreven reden.** Dat is een nieuwe stand
-in dit huis: `openBekend`. De vorm komt van `MET_REDEN` in `scripts/tikken.js` —
+**De stand `openBekend` blijft bestaan, en dat is geen restant.** Een schakel die
+aantoonbaar niet sluit mag een uitgeschreven reden dragen. De vorm komt van
+`MET_REDEN` in `scripts/tikken.js` —
 een scherm dat buiten bereik ligt mag bestaan zolang iemand heeft opgeschreven
 waarom. Zonder die uitweg heeft een proef die iets echts vindt maar twee
 uitgangen: altijd zakken (dan zet iemand hem uit) of de bevinding wegpoetsen
 (dan meet hij niets meer). De proef meldt daarom twee dingen apart — `sluit` en
-`sluitMetBevinding` — en nooit één samengesteld cijfer.
+`sluitMetBevinding` — en nooit één samengesteld cijfer. Dat die uitweg hier nu
+leeg staat, is het bewijs dat hij werkte: de bevinding is niet weggepoetst maar
+opgelost.
 
-### 7.5 De bevinding: er zijn twee ritwerelden
+### 7.5 De twee ritwerelden — **besluit genomen, brug gelegd**
 
-Schakel 1 vraagt of de vervoerder een aangevraagde rit terugvindt in een
-werklijst. Hij vindt hem niet, en dat komt door iets groters dan een ontbrekende
-route. Gemeten op 3 september 2026:
-
-| waar een vervoerder zijn ritten zou zoeken | wat hij ziet |
-|---|---|
-| `/api/supplier/ride/history` | alleen `afgerond` en `gearriveerd` |
-| `/api/supplier/backoffice` | alleen betaalde ritten, en zonder de ref |
-| `kern/vervoer.js` regel 36 | alleen `geaccepteerd` en verder |
-| `/api/supplier/mob/dispatch` | **een andere lijst**: `db.data.mobOpdrachten` |
-
-Er zijn **twee ritwerelden, met nul verwijzingen in beide richtingen**:
+Schakel 1 vroeg of de vervoerder een aangevraagde rit terugvindt in een
+werklijst. Hij vond hem niet, en de oorzaak was groter dan een ontbrekende
+route: er waren **twee ritwerelden met nul verwijzingen in beide richtingen**.
 
 - `db.data.rides` — de lidkant. `/api/ride/request`, `ride/pay`,
-  `supplier/ride/assign|status|history`. Standen: `RIT_KETEN` uit
-  `kern/vervoer.js`, zes lang.
+  `supplier/ride/*`. Zes standen (`RIT_KETEN`, `kern/vervoer.js`).
 - `db.data.mobOpdrachten` — het dispatchcentrum. `/api/supplier/mob/*`, met
-  matching, overboeken naar een partner, telefoonboekingen. Standen: `KETEN` uit
-  `kern/mobiliteit/keten.js`, tien lang, plus uitzonderingsstanden.
+  matching, overboeken en telefoonboekingen. Tien standen (`KETEN`,
+  `kern/mobiliteit/keten.js`) plus uitzonderingen.
 
-Vier standen delen ze letterlijk (`aangevraagd`, `geaccepteerd`, `onderweg`,
-`aangekomen`). Twee betekenen hetzelfde onder een andere naam: `aan-boord`
-tegenover `ingestapt`, `afgerond` tegenover `voltooid`. En één woord botst
-echt: **`rijdt` is in `rides` een verouderde naam voor `aan-boord`** (`RIT_LEGACY`
-mapt hem weg) **en in `mobOpdrachten` een eigen stand ná `ingestapt`.** Dat is
-exact de vorm die `SEMANTIEK.json` meet — hetzelfde woord, twee betekenissen,
-binnen één onderwerp.
+Vier standen deelden ze letterlijk, twee onder een andere naam
+(`aan-boord`/`ingestapt`, `afgerond`/`voltooid`), en één woord botste echt:
+**`rijdt`** is in `rides` een verouderde naam vóór `aan-boord` (`RIT_LEGACY`
+mapt hem weg) en in de opdrachtketen een eigen stand ná `ingestapt`. En
+`kern/mobiliteit/dispatch.js` beloofde in zijn eigen kop dat een
+telefoonboeking *"dezelfde keten"* krijgt als een app-rit — omgekeerd waar: de
+**app-rit** haalde het dispatchbord nooit.
 
-De pijnlijke kant: `kern/mobiliteit/dispatch.js` belooft in zijn eigen kop dat
-een telefoonboeking *"een volwaardige opdracht"* is en *"dezelfde keten"* krijgt
-als een app-rit. Die belofte klopt omgekeerd. De telefoonboeking krijgt de volle
-keten met dispatch en matching; de **app-rit** is degene die het dispatchbord
-nooit haalt.
+**Het besluit van de eigenaar (3 september 2026): de opdracht wordt de
+waarheid.** `kern/mobiliteit/appbrug.js` legt de brug. Vier dingen liggen daar
+vast:
 
-**Dit is een besluit van de eigenaar en geen bouwopdracht**, en daarom staat het
-hier en niet als halve reparatie in de code. Twee domeinmodellen samenvoegen
-vraagt antwoord op: welke is de waarheid, wat gebeurt er met bestaande ritten, en
-draagt de lidkant de zwaardere begrippen (prijzen, aanbieden, overboeken) of komt
-de app-rit als opdracht binnen bij de dispatch? Wat er ondertussen niet gebeurt
-is dat de bevinding wegzakt: `test/ritproef.test.js` toets 3 eist dat de reden
-blijft staan en naar deze paragraaf wijst.
+1. **Een mislukte opdracht breekt de rit niet.** `opdrachtMaak` heeft poorten
+   die de app-rit niet passeerde: de module moet aanstaan, en vertrek én
+   bestemming moeten oplosbare *plekken* zijn. Een app-rit draagt vaak alleen
+   een tekst ("Haven"). Dan ontstaat er geen opdracht en blijft de rit precies
+   zoals hij was, met `opdrachtReden` erop. Een besluit uitvoeren mag geen
+   aanvragen weigeren die het gisteren nog deed.
+2. **De ritketen is grover, dus de brug loopt een pad.** `aangevraagd` →
+   `geaccepteerd` is in de opdrachtwereld drie gebeurtenissen (geprijsd,
+   aangeboden, geaccepteerd); `aan-boord` → `afgerond` er twee (rijdt,
+   voltooid). Die tussenstappen zijn geen kunstgreep: bij een app-rit staat de
+   prijs meteen vast en is hij meteen aangeboden aan die ene vervoerder. Het pad
+   loopt alleen door de hoofdketen — nooit via `incident` of `geannuleerd`, want
+   dat zou een gebeurtenis verzinnen die niet plaatsvond.
+3. **De standen worden vertaald, niet overgetypt.** De tabel staat uitgeschreven
+   in de brug, met de `rijdt`-botsing erbij. `test/appbrug.test.js` toets 4 zakt
+   zodra een ritstand naar `rijdt` vertaalt.
+4. **De brug loopt één kant op.** Van rit naar opdracht, nooit terug. Twee
+   lijsten die elkaar bijwerken hebben geen waarheid meer — en het besluit was
+   juist dat de opdracht dat is.
+
+De aanvraag verschijnt nu op het dispatchbord, en schakel 1 sluit. Wat nog
+**niet** is gebeurd: de 34 lezers van `db.data.rides` (fiscaal, kantoormetrics,
+waardering, spaarpot, annuleren, de leverancierstaat) zijn niet omgezet, dus
+`rides` is vandaag nog een echte lijst en geen projectie. De richting staat vast,
+de migratie niet — en dat staat in de kop van de brug, niet alleen hier.
+
+Eén ding kwam bij het bouwen naar boven en is de moeite waard: de domeingrens
+(`GRENZEN.json`) hield de brug tegen tot iemand hem op de lijst zette. Precies
+zoals bedoeld — *"de lijst wordt compleet doordat hij ergens knelt, niet doordat
+iemand goed heeft geraden."*
 
 ### 7.6 Wat de twee ketens delen — gemeten, niet verklaard
 

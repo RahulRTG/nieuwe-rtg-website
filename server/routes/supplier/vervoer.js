@@ -34,6 +34,17 @@ app.post('/api/supplier/ride/status', supplierAuth, (req, res) => {
   } else if (['aan-boord', 'afgerond'].includes(RIT_LEGACY[r.status] || r.status)) {
     return res.status(409).json({ error: 'Een lopende of afgeronde rit kan niet meer geweigerd worden.' });
   }
+  /* DE APPBRUG: de opdracht is de waarheid (MAATSTAF.md par. 7.5), dus die
+     krijgt de stand ook. Stil overslaan waar er geen opdracht is -- een rit van
+     voor deze brug, of een die geen oplosbare bestemming had -- want dan is er
+     niets om bij te werken en is dat geen fout van deze route.
+
+     De vertaling staat in kern/mobiliteit/appbrug.js en niet hier: `aan-boord`
+     heet daar `ingestapt`, en `rijdt` betekent in de twee ketens iets anders. */
+  if (kern.appbrug) {
+    const b = kern.appbrug.standDoor(r, status);
+    if (!b.ok) r.opdrachtStandReden = b.reden; else r.opdrachtStand = b.stand;
+  }
   ritVerder(req, res, r, status);
 });
 
@@ -65,6 +76,13 @@ app.post('/api/supplier/ride/assign', supplierAuth, (req, res) => {
   if (!wilZelf && !req.actor.manager && req.actor.staffId !== staffId)
     return res.status(403).json({ error: 'Alleen een manager wijst ritten aan anderen toe.' });
   const v = (req.supplier.fleet || []).find(x => x.id === String(req.body.vehicleId || '')) || null;
+  /* DE APPBRUG: toewijzen is in de opdrachtwereld `geaccepteerd`, en de
+     opdracht is de waarheid (MAATSTAF.md par. 7.5). Hier en niet alleen bij
+     ride/status, want assign is de plek waar de rit die stand krijgt. */
+  if (kern.appbrug) {
+    const b = kern.appbrug.standDoor(r, 'geaccepteerd');
+    if (!b.ok) r.opdrachtStandReden = b.reden; else r.opdrachtStand = b.stand;
+  }
   r.driver = { staffId: m.id, name: m.name };
   r.vehicle = v ? { id: v.id, name: v.name, plate: v.plate, seats: v.seats } : null;
   if ((RIT_LEGACY[r.status] || r.status) === 'aangevraagd') r.status = 'geaccepteerd';

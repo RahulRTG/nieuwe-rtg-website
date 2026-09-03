@@ -163,6 +163,22 @@ test('12. zonder routelijst zegt de uitslag dat "gezien" niet kon worden vastges
   assert.ok(u.nietGezien.lezers && /routelijst/.test(u.nietGezien.lezers));
 });
 
+test('12b. een besluit-verklaring wijst naar een document dat bestaat', () => {
+  /* De derde verklaringssoort uit de tweede triageronde: de ontvanger bestaat
+     niet omdat de FUNCTIE nog niet bestaat, en dat is elders vastgelegd. Zonder
+     deze toets is "wacht op een besluit" een etiket waarmee elke open collectie
+     te verstoppen valt. */
+  const fs2 = require('fs');
+  for (const [c, d] of Object.entries(O.WACHT_OP_BESLUIT)) {
+    assert.ok(d.document && /\.md$/.test(d.document), c + ': geen document met het besluit');
+    assert.ok(fs2.existsSync(path.join(__dirname, '..', d.document)),
+      c + ': ' + d.document + ' bestaat niet');
+    assert.ok(d.reden && d.reden.length > 80, c + ': de reden is te kort om een besluit te beschrijven');
+  }
+  const u = O.meet({ proef: proefMet(route('/api/x', 'member', { iets: 1 })) });
+  assert.ok(u.verlopen.besluit.length, 'een ongebruikte besluit-verklaring hoort verlopen te heten');
+});
+
 test('13. elke verklaring draagt een reden die iets zegt', () => {
   for (const [k, v] of Object.entries(O.INFRA))
     assert.ok(typeof v === 'string' && v.length > 15, k + ' heeft geen reden');
@@ -184,9 +200,9 @@ test('14. het register bestaat, sluit, en heeft geen verlopen verklaringen', () 
   const j = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'DOODSPOOR.json'), 'utf8'));
   const t = j.telling;
   assert.ok(t.bronroutes > 0, 'nul bronroutes: de meter zag niets en mag niet groen zijn (LAT.md regel 3)');
-  assert.equal(t.gesloten + t.gezien + t.tussen + t.terminaal + t.open, t.bronroutes,
-    'de vijf standen tellen niet op tot het geheel');
-  assert.deepEqual(j.verlopen, { terminaal: [], tussen: [], tegenroute: [], infra: [], ontvanger: [] },
+  assert.equal(t.gesloten + t.gezien + t.tussen + t.terminaal + t.besluit + t.open, t.bronroutes,
+    'de zes standen tellen niet op tot het geheel');
+  assert.deepEqual(j.verlopen, { terminaal: [], tussen: [], besluit: [], tegenroute: [], infra: [], ontvanger: [] },
     'verlopen verklaring in DOODSPOOR.json; draai npm run doodspoor:vast en ruim op');
   assert.ok(j.grens && /geen poort/.test(j.grens), 'het register hoort te zeggen dat de eerste ronde geen poort is');
 });

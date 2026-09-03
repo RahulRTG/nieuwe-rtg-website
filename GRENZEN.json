@@ -184,8 +184,8 @@
     "command": [
       "apiSpoor",
       "bezitsbewijs",
-      "doelpoort",
       "command",
+      "doelpoort",
       "veilig",
       "wie"
     ],
@@ -386,6 +386,9 @@
       "gedachtenVan",
       "status"
     ],
+    "gegevenskaart": [
+      "gegevenskaart"
+    ],
     "geld": [
       "geldbeleid",
       "geldgraaf"
@@ -445,9 +448,6 @@
     "inzagekaart": [
       "inzagekaartVan",
       "status"
-    ],
-    "gegevenskaart": [
-      "gegevenskaart"
     ],
     "journaal": [
       "boardroomAuth",
@@ -658,7 +658,10 @@
     "livinglab": [
       "id",
       "labfonds",
+      "lijf",
       "livinglab",
+      "remLezen",
+      "remSchrijf",
       "staf",
       "veilig",
       "veiligAsync",
@@ -742,6 +745,7 @@
       "apiSpoor",
       "appUrl",
       "appbieb",
+      "appbrug",
       "applyChatVertaald",
       "assetDocument",
       "assetGebruik",
@@ -859,6 +863,7 @@
       "gegevensNodig",
       "gegevensStart",
       "gegevensZeg",
+      "gegevenskaart",
       "geldAiInkoop",
       "gemeente",
       "genootschap",
@@ -1806,6 +1811,7 @@
       "aiFindRoom",
       "alcoholGrensVan",
       "alpine",
+      "appbrug",
       "applyChatVertaald",
       "avBeslis",
       "avDealerInbox",
@@ -1920,6 +1926,7 @@
       "herkomst",
       "horeca",
       "horecaBord",
+      "horecaCorrectie",
       "horecaFolioBoek",
       "horecaGezelschap",
       "horecaPas",

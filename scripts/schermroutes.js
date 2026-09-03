@@ -93,19 +93,28 @@ const ontdoe = s => String(s).replace(/^['"`]|['"`]$/g, '');
    inline. Wat buiten een <script> staat wordt niet gelezen -- een pad in een
    attribuut is geen aanroep.
 
-   DE SLUITTAG MAG WITRUIMTE DRAGEN. Hier stond `<\/script>`, en dat matcht
-   `</script >` niet -- een vorm die de HTML-standaard wel toestaat. CodeQL
-   meldde het als "bad HTML filtering regexp", en de bevinding klopt: een
-   scriptblok dat zo eindigt liep hier door tot het VOLGENDE `</script>`, en
-   alles ertussen werd als scriptinhoud gelezen. Voor deze meter betekende dat
-   verzonnen aanroepen uit gewone HTML; in een filter zou het een gat zijn.
+   DE SLUITTAG MAG MEER DRAGEN DAN WITRUIMTE, en dat is de tweede ronde van
+   dezelfde bevinding. Eerst stond hier `<\/script>`, wat `</script >` misliep.
+   Daarna `<\/script\s*>`, en CodeQL meldde opnieuw: dat matcht
+   `</script\t\n bar>` niet. Ook die vorm staat de HTML-standaard toe -- een
+   eindtag hoort op de naam te eindigen bij witruimte, `/` of `>`, en alles
+   daarna tot de `>` wordt genegeerd. De browser sluit het blok daar dus wel en
+   deze regex niet.
+
+   Het gevolg is elke keer hetzelfde: een scriptblok dat zo eindigt liep door
+   tot het VOLGENDE `</script>`, en alles ertussen werd als scriptinhoud
+   gelezen. Voor deze meter betekent dat verzonnen aanroepen uit gewone HTML; in
+   een filter zou het een gat zijn.
+
+   De vorm die het wel doet: na de naam een vooruitblik op witruimte, `/` of
+   `>`, en dan alles tot de sluithaak.
 
    Dit is een MEETscript en geen sanitizer -- het leest schermen en beslist
    niets -- maar een regex die de standaard niet volgt, meet verkeerd, en dat is
    hier reden genoeg. */
 function scriptsUit(html) {
   const uit = [];
-  for (const m of html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script\s*>/gi)) uit.push(m[1]);
+  for (const m of html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script(?=[\s/>])[^>]*>/gi)) uit.push(m[1]);
   return uit;
 }
 

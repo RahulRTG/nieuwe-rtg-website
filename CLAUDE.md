@@ -957,8 +957,8 @@ het meten: de sluiting van het stuur is klein en precies één module leest van
 schijf -- `VERTROUWEN.json`, een REGISTER. Een register lezen mag, een `.js`
 lezen niet; dát onderscheid is de invariant. De vraag of de 77 registers samen
 één Codewereld vormen is eerst GEMETEN (`npm run codewereld`, `CODEWERELD.json`)
-in plaats van aangenomen -- zelfde reden als bij `Asset`: <!--getal:codewereld.ruggengraat-->4912<!--/getal--> van
-<!--getal:codewereld.paden-->5709<!--/getal--> paden staan in meer dan één register, dus er IS een ruggengraat, maar hij
+in plaats van aangenomen -- zelfde reden als bij `Asset`: <!--getal:codewereld.ruggengraat-->4934<!--/getal--> van
+<!--getal:codewereld.paden-->5824<!--/getal--> paden staan in meer dan één register, dus er IS een ruggengraat, maar hij
 loopt over de as ROUTE. De as SYMBOOL is **nul** -- geen register kent een
 functienaam met een plaats, dus het objectvoorbeeld `pay.boeken` met een
 `symbol`-veld belooft iets wat geen enkele meter vult. Die as is
@@ -968,14 +968,26 @@ en <!--getal:symbolen.parsefout-->0<!--/getal--> parsefouten. De <!--getal:symbo
 (bundeldelen die pas samengevoegd een programma vormen) -- weglaten zou ze
 onzichtbaar maken. Wat hij met opzet niet doet: aanroepers raden (een naam in
 aanroeppositie is geen verwijzing), en iets beweren over welk symbool een route
-afhandelt. Twee dingen daar niet wegpoetsen: de brug route -> bestand rust
-op ÉÉN register, dus de nul tegenspraken erin is `niet vast te stellen` en geen
-groen (getoetst op <!--getal:codewereld.brugDekkingPct-->0.7<!--/getal-->% van de paden), en het bronbereik is
-<!--getal:codewereld.bronGedragPct-->33<!--/getal-->% -- tweederde van de bronbestanden wordt door geen enkel register
-genoemd, dus een "80-95% zonder bron te beantwoorden" haalt die grens vandaag
-niet -- en dat ene getal verbergt nog iets, want `server/` haalt
-<!--getal:codewereld.bronServerPct-->41.3<!--/getal-->% en `public/` <!--getal:codewereld.bronPublicPct-->6.6<!--/getal-->%: over de schermen weten de registers
-vrijwel niets. De regel die het geheel draagt: **AI mag betekenis voorstellen, alleen
+afhandelt. Twee dingen daar niet wegpoetsen: de brug route -> bestand rustte
+op ÉÉN register, dus de nul tegenspraken erin was `niet vast te stellen` en geen
+groen -- er ligt sinds 3 september een tweede bron naast (`ROUTEBRON.json`, uit de
+ROUTER in plaats van uit de bronboom), de dekking staat op
+<!--getal:codewereld.brugDekkingPct-->80.8<!--/getal-->% en er zijn <!--getal:routebron.tegenspraak-->0<!--/getal--> echte tegenspraken. Let daarbij op het onderscheid
+dat die meting afdwong: een verschil tussen twee registers van VERSCHILLENDE
+leeftijd is een leeftijdsverschil en geen tegenspraak, en die twee worden nooit
+opgeteld. Verder is het bronbereik voor gedrag
+<!--getal:codewereld.bronGedragPct-->38.2<!--/getal-->% -- over de meerderheid van de bronbestanden zegt geen enkel
+register iets over gedrag, dus een "80-95% zonder bron te beantwoorden" haalt die
+grens vandaag niet -- en dat ene getal verbergt nog iets, want `server/` haalt
+<!--getal:codewereld.bronServerPct-->41.9<!--/getal-->% en `public/` <!--getal:codewereld.bronPublicPct-->26.6<!--/getal-->%: over de schermen wisten de registers
+vrijwel niets (6,6%) tot `SCHERMROUTES.json` erbij kwam, dat per bestand in
+public/ leest welke API-paden het noemt en daarmee de keten scherm -> route legt.
+Die meter begon op 118 "dode paden" en eindigde op <!--getal:schermroutes.dood-->0<!--/getal-->; wat ertussen zat zijn
+drie regels die overal gelden -- een pad kan VERDERGAAN (`'/api/agenda/' + id`),
+een pad kan een GEGEVEN zijn in plaats van een doel (in een `.replace()`), en
+vindbaar zijn is niet hetzelfde als BESTAAN (een route zonder vindbaar bestand
+bestaat gewoon; die laatste staat in de kop van `scripts/lib/routes.js` als
+gemaakte fout, en werd hier prompt herhaald). De regel die het geheel draagt: **AI mag betekenis voorstellen, alleen
 deterministische systemen mogen waarheid vaststellen** -- een modelbevinding
 wordt dus nooit een register. **De vier besluiten zijn genomen (3 september
 2026)** en staan in par. 7: de symboolas is gebouwd, er komt een read-only

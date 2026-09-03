@@ -73,10 +73,32 @@ const GETALLEN = {
     wat: 'diezelfde ruggengraat als percentage' },
   'codewereld.brugPaden': { bron: 'CODEWERELD.json', veld: 'brug.paden',
     wat: 'paden waarvoor een register een bestand noemt' },
-  'codewereld.brugToetsbaar': { bron: 'CODEWERELD.json', veld: 'brug.tegenspraakToetsbaar',
-    wat: 'paden waar TWEE registers een bestand noemen -- alleen daar valt tegenspraak vast te stellen' },
-  'codewereld.brugDekkingPct': { bron: 'CODEWERELD.json', veld: 'brug.tegenspraakDekkingPct',
+  'codewereld.brugToetsbaar': { bron: 'CODEWERELD.json', veld: 'brug.verschilToetsbaar',
+    wat: 'paden waar TWEE registers een bestand noemen -- alleen daar valt een verschil vast te stellen' },
+  'codewereld.brugDekkingPct': { bron: 'CODEWERELD.json', veld: 'brug.verschilDekkingPct',
     wat: 'die toetsbare paden als percentage van de brug' },
+  'routebron.vergeleken': { bron: 'ROUTEBRON.json', veld: 'gemeten.beideKennen',
+    wat: 'routes die de router-afleiding en de bronwandeling allebei kennen' },
+  'routebron.gelijk': { bron: 'ROUTEBRON.json', veld: 'gemeten.gelijk',
+    wat: 'daarvan met hetzelfde bestand' },
+  'routebron.verouderd': { bron: 'ROUTEBRON.json', veld: 'gemeten.waarvanVerouderd',
+    wat: 'verschillen die een leeftijdsverschil zijn en geen meningsverschil' },
+  'routebron.tegenspraak': { bron: 'ROUTEBRON.json', veld: 'gemeten.waarvanTegenspraak',
+    wat: 'echte tegenspraken: beide bestanden staan stil en toch verschillen de wegen' },
+  'routebron.routerRoutes': { bron: 'ROUTEBRON.json', veld: 'gemeten.routerRoutes',
+    wat: 'routes die de router werkelijk aanbiedt' },
+  'routebron.zonderBestand': { bron: 'ROUTEBRON.json', veld: 'gemeten.routerRoutesZonderBestand',
+    wat: 'daarvan zonder vindbare plek in de bron -- bestaan is iets anders dan vindbaar zijn' },
+  'schermroutes.schermen': { bron: 'SCHERMROUTES.json', veld: 'gemeten.schermenMetPad',
+    wat: 'bestanden in public/ die minstens een API-pad noemen' },
+  'schermroutes.paden': { bron: 'SCHERMROUTES.json', veld: 'gemeten.exactePaden',
+    wat: 'exacte API-paden die de schermen noemen' },
+  'schermroutes.verwijzingen': { bron: 'SCHERMROUTES.json', veld: 'gemeten.verwijzingen',
+    wat: 'verwijzingen naar die paden, over alle schermen' },
+  'schermroutes.voorvoegsels': { bron: 'SCHERMROUTES.json', veld: 'gemeten.voorvoegsels',
+    wat: 'paden die verdergaan (sjabloon, optelling of vraagteken) en dus geen route zijn' },
+  'schermroutes.dood': { bron: 'SCHERMROUTES.json', veld: 'gemeten.doodPad',
+    wat: 'exacte paden die geen bestaande route zijn en ook geen stam ervan' },
   'codewereld.bronBestanden': { bron: 'CODEWERELD.json', veld: 'bronbereik.bestanden',
     wat: 'bronbestanden die er echt staan' },
   'codewereld.bronGenoemd': { bron: 'CODEWERELD.json', veld: 'bronbereik.genoemd',
@@ -147,6 +169,20 @@ function ronde({ schrijf }) {
     const pad = path.join(WORTEL, doc);
     let tekst;
     try { tekst = fs.readFileSync(pad, 'utf8'); } catch (e) { continue; }
+    /* EERST TELLEN OF DE MERKTEKENS IN BALANS ZIJN. Zonder deze controle is een
+       sluittag met een typefout (`<!--/getal>` in plaats van `<!--/getal-->`)
+       onzichtbaar: de reguliere uitdrukking loopt dan door tot de VOLGENDE
+       sluittag en slikt het getal ertussen op. Dat is hier twee keer gebeurd,
+       en beide keren viel het alleen op omdat de opgeslokte waarde toevallig
+       verschilde van zijn register. Een merkteken dat zijn sluittag mist, hoort
+       de controle te laten zakken en niet af te hangen van toeval. */
+    const openers = (tekst.match(/<!--getal:[a-zA-Z0-9._-]+-->/g) || []).length;
+    const sluiters = (tekst.match(/<!--\/getal-->/g) || []).length;
+    if (openers !== sluiters) {
+      bevindingen.push({ doc, id: '(document)', soort: 'onbalans',
+        wat: openers + ' openende merktekens tegenover ' + sluiters + ' sluitende. Een sluittag ontbreekt of is verkeerd geschreven; ' +
+          'de eerstvolgende waarde wordt dan opgeslokt.' });
+    }
     let nieuw = tekst;
     nieuw = tekst.replace(MERK, (heel, id, staat) => {
       merktekens++;

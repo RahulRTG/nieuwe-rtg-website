@@ -102,9 +102,17 @@ const verdeling = new Map();
 for (const [, regs] of padNaarRegisters) verdeling.set(regs.size, (verdeling.get(regs.size) || 0) + 1);
 const inMeer = [...padNaarRegisters.values()].filter(s => s.size > 1).length;
 
-/* 3) De brug, en de tegenspraak. Twee registers die hetzelfde pad aan een
-      ANDER bestand hangen is geen detail: dat is de plek waar een samengevoegde
-      waarheid stilletjes zou gaan liegen. */
+/* 3) De brug, en de VERSCHILLEN. Twee registers die hetzelfde pad aan een ander
+      bestand hangen is geen detail: dat is de plek waar een samengevoegde
+      waarheid stilletjes zou gaan liegen.
+
+      Het woord `tegenspraak` staat hier met opzet NIET meer. Deze meter ziet
+      alleen dat twee registers iets anders zeggen; of dat een echte tegenspraak
+      is of een LEEFTIJDSVERSCHIL (het ene register is ouder dan de code)
+      beslist scripts/routebron.js, dat de stempels erbij pakt. Zou dit een
+      `tegenspraak` noemen wat daar `verouderd` heet, dan dragen twee registers
+      hetzelfde woord met twee betekenissen -- de fout die SEMANTIEK.json in dit
+      huis 99 keer heeft geteld. */
 const tegenspraken = [];
 let toetsbaar = 0;                                          // paden waar MEER DAN EEN register een bestand noemt
 const brugRegisters = new Set();
@@ -215,11 +223,12 @@ const uit = {
        Legt maar EEN register de brug, dan is de uitslag `niet vast te stellen`
        en niet `in orde` -- dezelfde regel als BESTUUR.md: vervallen bewijs is
        geen bewijs, en een wachter zonder tweede bron zegt dat hij niet kijkt. */
-    tegenspraakToetsbaar: toetsbaar,
-    tegenspraakDekkingPct: brug.size ? Math.round(toetsbaar / brug.size * 1000) / 10 : 0,
-    tegenspraken: toetsbaar ? tegenspraken.length : 'niet vast te stellen',
-    tegenspraakReden: toetsbaar ? null : 'geen enkel pad krijgt van twee registers een bestand toegewezen: er valt niets te vergelijken',
-    tegenspraakLijst: tegenspraken.slice(0, 25)
+    verschilToetsbaar: toetsbaar,
+    verschilDekkingPct: brug.size ? Math.round(toetsbaar / brug.size * 1000) / 10 : 0,
+    verschillen: toetsbaar ? tegenspraken.length : 'niet vast te stellen',
+    soortBeslistIn: 'ROUTEBRON.json -- daar wordt een verschil ingedeeld als `verouderd` of `tegenspraak`; deze meter telt alleen DAT ze verschillen',
+    verschilReden: toetsbaar ? null : 'geen enkel pad krijgt van twee registers een bestand toegewezen: er valt niets te vergelijken',
+    verschilLijst: tegenspraken.slice(0, 25)
   },
   bronbereik: {
     uitleg: 'twee getallen, met opzet. `genoemd` = door enig register (de symboolindex noemt alles, dus dit meet STRUCTUUR: welke functies, wat uitgevoerd, wie hangt ervan af). `gedrag` = door minstens een register buiten die index (schrijft het, is het bewezen, is het herhaalbaar). Alleen het tweede is de bovengrens voor een vraag over gedrag.',
@@ -251,8 +260,8 @@ console.log('  as symbool       ', uit.assen.symbool.sleutels, 'symbolen in', ui
   uit.assen.symbool.reden ? '(' + uit.assen.symbool.reden + ')' : '');
 if (proef.gedraaid) console.log('    proef          ', proef.geparsed + '/' + proef.bestanden, 'bestanden geparsed,', proef.gefaald, 'gefaald,', proef.symbolen, 'symbolen in', proef.seconden + 's');
 console.log('  ruggengraat      ', uit.ruggengraat.inMeerDanEenRegister + '/' + uit.ruggengraat.paden, 'paden in meer dan een register =', uit.ruggengraat.pct + '%');
-console.log('  brug route->best.', uit.brug.paden, 'paden uit', uit.brug.registersDieSpreken.length, 'register(s); tegenspraak:', uit.brug.tegenspraken,
-  '(getoetst op ' + uit.brug.tegenspraakToetsbaar + ' paden = ' + uit.brug.tegenspraakDekkingPct + '%; de rest rust op een enkel register)');
+console.log('  brug route->best.', uit.brug.paden, 'paden uit', uit.brug.registersDieSpreken.length, 'register(s); verschillen:', uit.brug.verschillen,
+  '(getoetst op ' + uit.brug.verschilToetsbaar + ' paden = ' + uit.brug.verschilDekkingPct + '%; soort: zie ROUTEBRON.json)');
 console.log('  bronbereik struct', uit.bronbereik.genoemd + '/' + uit.bronbereik.bestanden, '=', uit.bronbereik.pct + '%  (welke functies, wie hangt ervan af)');
 console.log('  bronbereik gedrag', uit.bronbereik.gedrag + '/' + uit.bronbereik.bestanden, '=', uit.bronbereik.gedragPct + '%',
   '(' + perBoom.map(b => b.boom + ' ' + b.gedragPct + '%').join(', ') + ')');

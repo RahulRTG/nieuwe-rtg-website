@@ -2,23 +2,23 @@
   "uitleg": "Kan er een canonieke Codewereld bestaan? Gemeten over de registers in de wortel: op welke as staan ze, hoeveel sleutels delen ze, en spreken ze elkaar tegen. Deze meter voegt niets samen en kiest bij tegenspraak geen winnaar.",
   "stempel": {
     "op": "2026-09-03",
-    "commit": "e19d50d7"
+    "commit": "a89f398e"
   },
   "registers": {
-    "geteld": 78,
-    "opRoute": 37,
+    "geteld": 80,
+    "opRoute": 39,
     "opBestand": 31,
     "opSymbool": 1,
     "zonderAs": 9
   },
   "assen": {
     "route": {
-      "sleutels": 5709,
-      "registers": 42
+      "sleutels": 5824,
+      "registers": 44
     },
     "bestand": {
-      "sleutels": 4133,
-      "registers": 55
+      "sleutels": 4287,
+      "registers": 57
     },
     "symbool": {
       "sleutels": 19503,
@@ -33,149 +33,173 @@
         "gefaald": 0,
         "gefaaldLijst": [],
         "symbolen": 13832,
-        "seconden": 4.6
+        "seconden": 4.5
       }
     }
   },
   "ruggengraat": {
-    "paden": 5709,
-    "inMeerDanEenRegister": 4912,
-    "pct": 86,
+    "paden": 5824,
+    "inMeerDanEenRegister": 4934,
+    "pct": 84.7,
     "verdeling": [
       {
+        "registers": 24,
+        "paden": 3
+      },
+      {
         "registers": 23,
-        "paden": 2
+        "paden": 12
       },
       {
         "registers": 22,
-        "paden": 4
+        "paden": 58
       },
       {
         "registers": 21,
-        "paden": 39
+        "paden": 451
       },
       {
         "registers": 20,
-        "paden": 98
+        "paden": 1090
       },
       {
         "registers": 19,
-        "paden": 1324
+        "paden": 1616
       },
       {
         "registers": 18,
-        "paden": 1657
+        "paden": 314
       },
       {
         "registers": 17,
-        "paden": 402
-      },
-      {
-        "registers": 16,
-        "paden": 96
-      },
-      {
-        "registers": 15,
-        "paden": 145
-      },
-      {
-        "registers": 14,
         "paden": 120
       },
       {
+        "registers": 16,
+        "paden": 113
+      },
+      {
+        "registers": 15,
+        "paden": 119
+      },
+      {
+        "registers": 14,
+        "paden": 249
+      },
+      {
         "registers": 13,
-        "paden": 222
+        "paden": 335
       },
       {
         "registers": 12,
-        "paden": 366
+        "paden": 116
       },
       {
         "registers": 11,
-        "paden": 112
+        "paden": 47
       },
       {
         "registers": 10,
-        "paden": 55
+        "paden": 9
       },
       {
         "registers": 9,
-        "paden": 10
+        "paden": 8
       },
       {
         "registers": 8,
-        "paden": 5
+        "paden": 28
       },
       {
         "registers": 7,
-        "paden": 5
-      },
-      {
-        "registers": 6,
-        "paden": 84
-      },
-      {
-        "registers": 5,
-        "paden": 33
-      },
-      {
-        "registers": 4,
-        "paden": 48
-      },
-      {
-        "registers": 3,
         "paden": 72
       },
       {
+        "registers": 6,
+        "paden": 26
+      },
+      {
+        "registers": 5,
+        "paden": 39
+      },
+      {
+        "registers": 4,
+        "paden": 5
+      },
+      {
+        "registers": 3,
+        "paden": 76
+      },
+      {
         "registers": 2,
-        "paden": 13
+        "paden": 28
       },
       {
         "registers": 1,
-        "paden": 797
+        "paden": 890
       }
     ]
   },
   "brug": {
     "uitleg": "paren route -> bestand die BINNEN EEN RIJ van een register staan; alleen daar beweert een register dat die twee bij elkaar horen",
-    "paden": 4444,
+    "paden": 5102,
     "registersDieSpreken": [
       "MUTATIESEMANTIEK.json",
+      "ROUTEBRON.json",
       "SCHRIJFANALYSE.json"
     ],
-    "tegenspraakToetsbaar": 32,
-    "tegenspraakDekkingPct": 0.7,
-    "tegenspraken": 0,
-    "tegenspraakReden": null,
-    "tegenspraakLijst": []
+    "verschilToetsbaar": 4123,
+    "verschilDekkingPct": 80.8,
+    "verschillen": 1,
+    "soortBeslistIn": "ROUTEBRON.json -- daar wordt een verschil ingedeeld als `verouderd` of `tegenspraak`; deze meter telt alleen DAT ze verschillen",
+    "verschilReden": null,
+    "verschilLijst": [
+      {
+        "pad": "/api/auth/me",
+        "bestanden": [
+          {
+            "bestand": "server/routes/auth/inlog-pas.js",
+            "volgens": [
+              "ROUTEBRON.json"
+            ]
+          },
+          {
+            "bestand": "server/routes/auth/inlog.js",
+            "volgens": [
+              "SCHRIJFANALYSE.json"
+            ]
+          }
+        ]
+      }
+    ]
   },
   "bronbereik": {
     "uitleg": "twee getallen, met opzet. `genoemd` = door enig register (de symboolindex noemt alles, dus dit meet STRUCTUUR: welke functies, wat uitgevoerd, wie hangt ervan af). `gedrag` = door minstens een register buiten die index (schrijft het, is het bewezen, is het herhaalbaar). Alleen het tweede is de bovengrens voor een vraag over gedrag.",
     "bestanden": 3987,
     "genoemd": 3987,
     "pct": 100,
-    "gedrag": 1314,
-    "gedragPct": 33,
+    "gedrag": 1523,
+    "gedragPct": 38.2,
     "perBoom": [
       {
         "boom": "server",
         "bestanden": 3027,
         "genoemd": 3027,
         "pct": 100,
-        "gedrag": 1251,
-        "gedragPct": 41.3
+        "gedrag": 1268,
+        "gedragPct": 41.9
       },
       {
         "boom": "public",
         "bestanden": 960,
         "genoemd": 960,
         "pct": 100,
-        "gedrag": 63,
-        "gedragPct": 6.6
+        "gedrag": 255,
+        "gedragPct": 26.6
       }
     ],
-    "serverPct": 41.3,
-    "publicPct": 6.6,
+    "serverPct": 41.9,
+    "publicPct": 26.6,
     "nooitGenoemdVoorbeeld": [],
     "zonderGedragVoorbeeld": [
       "server/accounts/demohash.js",
@@ -203,6 +227,10 @@
   "noemers": {
     "uitleg": "elk register telt zijn eigen aantal routes. Wie ze samenvoegt kiest een noemer, en dat is een besluit -- geen afleiding (zelfde vondst als MUTATIEINVENTARIS.json).",
     "perRegister": [
+      {
+        "register": "ROUTEBRON.json",
+        "paden": 4855
+      },
       {
         "register": "DEKKING.json",
         "paden": 4835
@@ -284,6 +312,10 @@
         "paden": 1026
       },
       {
+        "register": "SCHERMROUTES.json",
+        "paden": 969
+      },
+      {
         "register": "HANDLERWACHT.json",
         "paden": 627
       },
@@ -302,6 +334,14 @@
     ]
   },
   "perRegister": [
+    {
+      "register": "ROUTEBRON.json",
+      "as": "route",
+      "paden": 4855,
+      "bestanden": 624,
+      "symbolen": 0,
+      "paren": 4802
+    },
     {
       "register": "SCHRIJFANALYSE.json",
       "as": "route",
@@ -459,6 +499,14 @@
       "as": "route",
       "paden": 1705,
       "bestanden": 1,
+      "symbolen": 0,
+      "paren": 0
+    },
+    {
+      "register": "SCHERMROUTES.json",
+      "as": "route",
+      "paden": 969,
+      "bestanden": 372,
       "symbolen": 0,
       "paren": 0
     },

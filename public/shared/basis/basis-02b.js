@@ -58,12 +58,13 @@
       Promise.all([
         svc('/api/service/bevestigingen').catch(function () { return null; }),
         svc('/api/service/mijn').catch(function () { return null; }),
-        svc('/api/service/stand').catch(function () { return null; })
-      ]).then(function (uit) { teken(blok, uit[0], uit[1], uit[2]); })
+        svc('/api/service/stand').catch(function () { return null; }),
+        svc('/api/service/bel/mijn').catch(function () { return null; })
+      ]).then(function (uit) { teken(blok, uit[0], uit[1], uit[2], uit[3]); })
         .catch(function () { blok.remove(); });
     }
 
-    function teken(blok, verzoeken, mijn, stand) {
+    function teken(blok, verzoeken, mijn, stand, bel) {
       if (!sheet || !blok.isConnected) return;
 
       /* DE PERSOONLIJKE STAND, en alleen als hij iets ZEGT. Raakt er geen
@@ -118,6 +119,19 @@
           svc('/api/service/mens', { id: lopend[0].id }).then(function (d) {
             rij.replaceWith(el('p', null, (d && d.let) || 'Doorgezet.'));
           });
+        }));
+      }
+      /* DE BELKNOP, en alleen waar hij bestaat. Bellen hoort bij de Lifestyle-
+         en Business Pass; voor de rest staat hij er niet, en dat is geen
+         weglating maar de ladder. Wat er WEL is -- een mens vragen -- staat er
+         hierboven al, want dat is een ondergrens voor elk account en geen
+         premium-dienst (kern/service/mens.js). Hij gaat naar een eigen scherm:
+         deze la verdwijnt zodra je ergens heen navigeert, en een gesprek dat
+         daarmee wegvalt is erger dan geen belknop. */
+      if (bel && bel.mag && bel.mag.mag) {
+        rij.appendChild(knop(null, 'Bel RTG', function () {
+          var z = lopend.length ? ('?zaak=' + encodeURIComponent(lopend[0].id)) : '';
+          location.href = '/apps/service-bel.html' + z;
         }));
       }
       blok.appendChild(rij);

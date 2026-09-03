@@ -88,7 +88,12 @@ module.exports = function maakGesprekLijn(c) {
      WebRTC-onderhandeling is geen inhoud. Wat hij wel doet is de richting
      bewaken -- alleen de melder van dit gesprek en de mens die opnam mogen
      erin, en een derde die het nummer raadt komt er niet tussen. */
-  const SIGNALEN = ['accept', 'offer', 'answer', 'ice', 'hangup', 'decline', 'busy'];
+  /* `tekst` rijdt mee als signaal en niet als bericht. Het is de MEELEESBAAN
+   (shared/meelezen.js): een weg naar tekst in een live gesprek, zodat een dove
+   deelnemer kan meedoen. Hij wordt doorgegeven en nergens bewaard -- net als de
+   stem. Wie hem wel wil bewaren, neemt daarmee een besluit over de inhoud van
+   een gesprek, en dat is iets anders dan vastleggen DAT er gebeld is. */
+const SIGNALEN = ['accept', 'offer', 'answer', 'ice', 'hangup', 'decline', 'busy', 'tekst'];
   function signaal(id, { van, wie, kind, payload } = {}) {
     const g = vind(id);
     if (!g) return { status: 404, error: 'Deze oproep kennen wij niet.' };

@@ -627,7 +627,13 @@ inlog en kent geen mensen om te tellen. Par. 13 is bellen naar RTG BINNEN de app
 provider, geen nummer, en de zaak ligt ernaast open): een dienst van Lifestyle en
 Business, terwijl EEN MENS dat nadrukkelijk niet is -- die ondergrens uit par. 3
 blijft voor elk account gelden, en de weigering om te bellen zegt er de weg naar
-een mens bij.
+een mens bij. Beide kanten dragen een MEELEESBAAN (`shared/meelezen.js`), want een
+live gesprek zonder weg naar tekst sluit een dove deelnemer uit -- en dat gesprek
+heeft de ratel `OPEN_MAX` in `scripts/check.js` van 8 naar 10 gezet. Die mag
+volgens zijn eigen regel alleen omlaag; de verhoging staat daar dus
+UITGESCHREVEN, met de reden en met het adres van wat hem weer omlaag brengt (een
+lokaal spraakmodel via LOCAL_AI_URL). Wie een ratel omzeilt zonder het te zeggen,
+sloopt de ratel zelf.
 Par. 12 is de kwaliteitsmaat, en die is met opzet geen
 afhandeltijd: gemeten wordt hoeveel problemen zijn opgelost ZONDER dat de melder
 zijn verhaal opnieuw hoefde te doen -- en wat er NIET gemeten wordt (tevredenheid,

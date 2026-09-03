@@ -9,6 +9,7 @@
 <link href="/fonts/fonts.css" rel="stylesheet">
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
+<link href="/shared/media.css" rel="stylesheet">
 <link href="/shared/rtg-materiaal.css" rel="stylesheet">
 <link href="/shared/rtg-ontwerp.css" rel="stylesheet">
 <style>
@@ -93,6 +94,9 @@
 <main id="main"><div class="kaart"><p class="sub">Bezig met laden&hellip;</p></div></main>
 <div class="melding" id="melding" role="status"></div>
 
+<script src="/shared/media.js"></script>
+<script src="/shared/meelezen.js"></script>
+<script src="/shared/servicebel.js"></script>
 <script>
 /* ============================================================================
    DE SERVICE-COCKPIT.
@@ -170,14 +174,15 @@ async function wachtrij() {
     + '<button class="knop" id="tWachtrij" aria-current="true">Wachtrij</button>'
     + '<button class="knop" id="tPatronen">Patronen</button>'
     + '<button class="knop" id="tFouten">Foutsignalen</button>'
-    + '<button class="knop" id="tKwaliteit">Kwaliteit</button></div>'
+    + '<button class="knop" id="tKwaliteit">Kwaliteit</button>'
+    + '<button class="knop" id="tBel">Bellen</button></div>'
     + '<div class="kaart"><h2>De rij</h2>'
     + '<p class="sub">' + esc(t.open || 0) + ' open &middot; ' + esc(t.zonderEigenaar || 0) + ' zonder eigenaar &middot; '
     + esc(t.wachtOpMens || 0) + ' wacht op een mens &middot; ' + esc(t.wachtOpMelder || 0) + ' wacht op de melder</p>'
     + '<p class="sub">' + teams + '</p></div>'
     + '<div class="kaart">' + tabel(d.zaken || []) + '</div>';
   $('#tPatronen').onclick = () => poging(patronen); $('#tFouten').onclick = () => poging(fouten);
-  $('#tKwaliteit').onclick = () => poging(kwaliteit);
+  $('#tKwaliteit').onclick = () => poging(kwaliteit); $('#tBel').onclick = () => poging(belrij);
   bindRijen();
 }
 
@@ -415,6 +420,90 @@ async function kwaliteit() {
     + '</ul></div>';
   $('#tWachtrij').onclick = () => poging(wachtrij); $('#tPatronen').onclick = () => poging(patronen);
   $('#tFouten').onclick = () => poging(fouten);
+}
+
+/* ---------------------------------------------------------------- bellen -- */
+/* DE BELRIJ. Alleen wat er NU rinkelt of loopt -- een gemiste oproep hoort in de
+   zaak thuis en niet in een rij waarvan iemand denkt dat hij hem nog kan
+   aannemen. De WebRTC-dans staat in /shared/servicebel.js en is dezelfde als
+   die van het lid; twee kopieen van dezelfde onderhandeling lopen gegarandeerd
+   uit elkaar. */
+let BELMOTOR = null, BELGESPREK = null, BELBRON = null, BELMEE = null;
+
+function belLuister() {
+  if (!window.EventSource || BELBRON) return;
+  BELBRON = new EventSource('/api/stream?token=' + encodeURIComponent(TOKEN));
+  BELBRON.addEventListener('servicebel', (ev) => {
+    let d = null; try { d = JSON.parse(ev.data); } catch (e) { return; }
+    if (!d) return;
+    /* Een rinkel is voor iedereen; een signaal alleen voor wie opnam. */
+    if (d.kind === 'rinkelt') { if (STAND.blad === 'bel') poging(belrij); return; }
+    if (!BELGESPREK || d.gesprek !== BELGESPREK.id || !BELMOTOR) return;
+    BELMOTOR.ontvang(d.kind, d.payload);
+  });
+}
+
+async function belrij() {
+  STAND.blad = 'bel';
+  belLuister();
+  const d = await api('gesprekken', {});
+  $('#main').innerHTML = '<div class="tabs"><button class="knop" id="tWachtrij">Wachtrij</button>'
+    + '<button class="knop" id="tPatronen">Patronen</button>'
+    + '<button class="knop" id="tFouten">Foutsignalen</button>'
+    + '<button class="knop" id="tKwaliteit">Kwaliteit</button>'
+    + '<button class="knop" aria-current="true">Bellen</button></div>'
+    + '<div class="kaart"><h2>Wie er belt</h2>'
+    + ((d.gesprekken || []).length
+      ? '<table><thead><tr><th>Oproep</th><th>Zaak</th><th>Stand</th><th></th></tr></thead><tbody>'
+        + d.gesprekken.map(g => '<tr><td>' + esc(g.id) + (g.video ? ' <span class="pil">video</span>' : '') + '</td>'
+          + '<td>' + esc(g.zaak) + '</td><td>' + esc(g.status) + '</td>'
+          + '<td>' + (g.status === 'rinkelt' ? '<button class="knop doe" data-neem="' + esc(g.id) + '">Opnemen</button>'
+            : '<span class="stil">' + esc(g.mens || '') + '</span>') + '</td></tr>').join('')
+        + '</tbody></table>'
+      : '<p class="sub">Niemand aan de lijn.</p>')
+    + '<p class="stil">Bellen hoort bij de Lifestyle- en Business Pass. Een RTG-lid dat een mens wil, '
+    + 'komt in de wachtrij terecht met de stand &quot;wacht op een mens&quot; \u2014 dat is een ondergrens en geen belknop.</p>'
+    + '</div><div id="belblad"></div>';
+  $('#tWachtrij').onclick = () => poging(wachtrij); $('#tPatronen').onclick = () => poging(patronen);
+  $('#tFouten').onclick = () => poging(fouten); $('#tKwaliteit').onclick = () => poging(kwaliteit);
+  document.querySelectorAll('[data-neem]').forEach(b => { b.onclick = () => poging(() => neemOp(b.dataset.neem)); });
+}
+
+async function neemOp(id) {
+  const r = await api('gesprek/neem', { gesprek: id });
+  BELGESPREK = r.gesprek;
+  $('#belblad').innerHTML = '<div class="kaart"><h2>Gesprek ' + esc(r.gesprek.id) + '</h2>'
+    + '<p class="sub" id="belStand">Verbinden&hellip;</p>'
+    + '<div class="rij"><video id="bLokaal" muted autoplay playsinline hidden></video>'
+    + '<video id="bExtern" autoplay playsinline hidden></video></div>'
+    + '<div id="belMeelees"></div>'
+    + '<div class="rij"><button class="knop" id="bOpen">Open de zaak</button>'
+    + '<button class="knop" id="bStop">Ophangen</button></div></div>';
+  /* De meeleesbaan, gedeeld met de kant van het lid (shared/meelezen.js): een
+     live gesprek zonder weg naar tekst sluit een dove deelnemer uit. */
+  if (window.RTGMeelezen) {
+    BELMEE = window.RTGMeelezen.maak({ ik: 'RTG',
+      stuur: (regel) => api('gesprek/signaal', { gesprek: r.gesprek.id, kind: 'tekst', payload: { r: regel } }).catch(() => {}) });
+    $('#belMeelees').appendChild(BELMEE.el);
+  }
+  $('#bOpen').onclick = () => poging(() => openZaak(r.gesprek.zaak));
+  $('#bStop').onclick = () => poging(belStop);
+  BELMOTOR = window.RTGServiceBel.maak({
+    rol: 'opnemer', video: !!r.gesprek.video,
+    elLokaal: $('#bLokaal'), elExtern: $('#bExtern'),
+    stuur: (kind, payload) => api('gesprek/signaal', { gesprek: r.gesprek.id, kind, payload }),
+    opStand: (stand) => { const el = $('#belStand'); if (el) el.textContent = stand; },
+    opTekst: (regel) => { if (BELMEE && regel) BELMEE.voed(regel, { wie: 'De beller', bron: 'mens' }); }
+  });
+  if (!(await BELMOTOR.start())) meld('Wij kunnen uw microfoon niet gebruiken.');
+}
+
+async function belStop() {
+  if (BELMOTOR) BELMOTOR.stop();
+  if (BELGESPREK) await api('gesprek/eind', { gesprek: BELGESPREK.id });
+  BELGESPREK = null; BELMOTOR = null;
+  meld('Opgehangen.');
+  await belrij();
 }
 
 /* ------------------------------------------------------------------ start -- */

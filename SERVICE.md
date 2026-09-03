@@ -352,6 +352,38 @@ De signalering is een **doorgeefluik** dat niet in het pakket kijkt — een
 WebRTC-onderhandeling is geen inhoud — maar wel de richting bewaakt: alleen de
 melder van dit gesprek en de mens die opnam komen erin.
 
+### De schermen, en de meeleesbaan
+
+Het lid belt op `/apps/service-bel.html` (een eigen scherm en geen laatje: een
+gesprek moet een navigatie overleven), de medewerker neemt op in de cockpit. De
+WebRTC-dans staat één keer geschreven, in `shared/servicebel.js` — twee kopieën
+van dezelfde onderhandeling lopen gegarandeerd uit elkaar. Camera en microfoon
+gaan langs de **mediapoort** (`shared/media.js`), die vijf verschillende
+oorzaken uit elkaar houdt in plaats van ze op "geen toegang" te gooien.
+
+Beide kanten dragen een **meeleesbaan** (`shared/meelezen.js`): een tekstbaan
+waarin allebei kan worden meegetypt. Bij een hulplijn weegt die het zwaarst —
+wie niet kan bellen, houdt anders geen kanaal over waar de rest er wel een bij
+kreeg. De regels rijden mee over hetzelfde doorgeefluik en worden **nergens
+bewaard**, net als de stem: dat er gebeld is staat in de tijdlijn, wat er gezegd
+is niet.
+
+> **Let op: dit is geen ondertiteling.** Wat in de baan staat, staat er omdat een
+> mens het heeft getypt. WCAG 1.2.4 wordt hiermee niet gehaald; wat het doet is
+> de afhankelijkheid verplaatsen van "kan niet meedoen" naar "kan meedoen als de
+> anderen meetypen".
+
+**En dit gesprek heeft de ratel van `check.js` verhoogd, van 8 naar 10.** Die
+teller staat er om te voorkomen dat het aantal live media-elementen zónder weg
+naar tekst vanzelf oploopt, en hij mag volgens zijn eigen regel alleen omlaag.
+Een live tweerichtingsgesprek is per definitie `open`; er is geen indeling
+waarmee dit er geen twee zouden zijn. De verhoging staat daarom **uitgeschreven**
+in `scripts/check.js` met de reden, met wat het alternatief was (telefonie, dat
+voor wie doof is helemáál geen kanaal is en nooit een tekstbaan draagt), en met
+het adres van wat hem weer omlaag brengt: een lokaal spraakmodel via
+`LOCAL_AI_URL`, de deur die `meelezen.js` zelf openhoudt. Het is een schuld met
+een naam, geen getal dat vanzelf groeit.
+
 ## 14. Wat er staat, en wat er niet staat
 
 **Staat** (gemeten, met toetsen die zijn zien zakken):
@@ -373,10 +405,9 @@ melder van dit gesprek en de mens die opnam komen erin.
 - de ingang voor een zaak, met het zaakprofiel aan de kantoorkant, en de
   werkplek erbij (`/apps/leverancier-service.html`);
 - de kwaliteitsmeting, met vooraan de maat die ertoe doet;
-- bellen naar RTG binnen de app, voor Lifestyle en Business, met de belrij aan
-  de kantoorkant. **De schermen daarvoor staan nog niet** — de routes zijn
-  gemeten en beproefd, maar er is nog geen belknop in de app en geen
-  aanneemknop in de cockpit.
+- bellen naar RTG binnen de app, voor Lifestyle en Business: de belknop in de
+  hulp-la, het belscherm, de belrij en de aanneemkant in de cockpit, met aan
+  beide zijden een meeleesbaan.
 
 **Staat niet**, met de reden en niet als lege functie:
 

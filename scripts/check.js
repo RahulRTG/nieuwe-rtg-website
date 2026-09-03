@@ -3313,8 +3313,30 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
      huis schrijft dat veld ooit: /api/supplier/team/message neemt alleen `text`
      aan, en geen enkele aanroeper stuurt iets anders. Het was dus geen
      ondertitelgat maar een knop voor een functie die niet bestaat, en die is
-     weggehaald in plaats van beschreven. Mag alleen omlaag. */
-  const OPEN_MAX = 8;
+     weggehaald in plaats van beschreven. Mag alleen omlaag.
+
+     8 -> 10 OP 3 SEPTEMBER 2026, EN DIT IS EEN VERHOGING. Die staat hier
+     uitgeschreven omdat de regel hierboven zegt dat hij alleen omlaag mag, en
+     wie dat omzeilt zonder het te zeggen sloopt de ratel zelf.
+
+     WAT ER BIJ KWAM: bellen met RTG Service (SERVICE.md par. 13) -- het beeld
+     van de ander aan de kant van het lid en aan de kant van de medewerker. Een
+     live tweerichtingsgesprek is per definitie `open`; er is geen indeling
+     waarmee dit er geen twee zouden zijn.
+
+     WAAROM HET TOCH IS GEBOUWD: een besluit van de eigenaar, met een reden die
+     op deze regel zelf slaat. Het alternatief was telefonie, en dat is voor wie
+     doof is GEEN kanaal en levert bovendien geen enkele weg naar tekst. Bellen
+     binnen de app draagt wel een meeleesbaan (shared/meelezen.js) waarin beide
+     kanten meeschrijven, en die is er bij een telefoongesprek nooit.
+
+     WAT HEM WEER OMLAAG BRENGT, en dat is geen belofte maar een adres:
+     shared/meelezen.js beschrijft de deur die openstaat -- een LOKAAL model via
+     LOCAL_AI_URL dat spraak naar tekst zet zonder het gesprek naar buiten te
+     sturen. Zodra dat er is, zijn deze twee (en de acht andere) geen open
+     elementen meer maar ondertitelde. Tot die tijd is dit een schuld met een
+     naam, en niet een getal dat vanzelf oploopt. */
+  const OPEN_MAX = 10;
   /* De band woonde als private functie IN de clipdeler; sinds het Theater en de
      Media OS dezelfde cue-lijst tonen staat hij als gedeelde laag in
      shared/ondertitelband.js. Deze regel merkte die verhuizing zelf op: het
@@ -3329,6 +3351,15 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
     ['public/apps/clips.html#studioDoek', ['spiegel', 'het opnamedoek van de clipstudio: je eigen beeld voordat de opname loopt']],
     ['public/apps/clips.html#js1', ['ondertiteld', 'de clip in de feed; de gedeelde clipdeler zet de ondertitelband van de maker eroverheen', CLIPBAND]],
     ['public/apps/clips.html#js2', ['werktuig', 'een onzichtbaar element dat het eerste frame als affiche uitleest']],
+    /* BELLEN MET RTG (SERVICE.md par. 13): binnen de app, dus zonder telefoonnet.
+       Beide kanten dragen dezelfde meeleesbaan uit shared/meelezen.js -- een
+       live gesprek zonder weg naar tekst sluit een dove deelnemer uit, en dat
+       geldt bij een HULPlijn het hardst: wie niet kan bellen, houdt dan geen
+       kanaal over waar de anderen er wel een bij kregen. */
+    ['public/apps/service-bel.js#vExtern', ['gesprek', 'bellen met RTG Service: het beeld en geluid van de medewerker', ['public/apps/service-bel.js', 'RTGMeelezen']]],
+    ['public/apps/service-bel.js#vLokaal', ['spiegel', 'je eigen beeld tijdens dat gesprek; stil, want jezelf terughoren is een echo']],
+    ['public/apps/service.html#bExtern', ['gesprek', 'de cockpit neemt op: het beeld en geluid van de beller', ['public/apps/service.html', 'RTGMeelezen']]],
+    ['public/apps/service.html#bLokaal', ['spiegel', 'het eigen beeld van de medewerker in dat gesprek']],
     ['public/apps/foundation/gezin-rt/gezin-rt-03.js#grt-remote', ['gesprek', 'het gezinsgesprek van RTFoundation: het beeld van de ander', ['public/apps/foundation/gezin-rt.js', 'RTGMeelezen']]],
     ['public/apps/foundation/gezin-rt/gezin-rt-03.js#grt-local', ['spiegel', 'je eigen beeld in dat gezinsgesprek']],
     ['public/apps/foundation/vrienden.html#belRemote', ['gesprek', 'bellen met een vriend: het beeld van de ander', ['public/apps/foundation/vrienden.html', 'RTGMeelezen']]],

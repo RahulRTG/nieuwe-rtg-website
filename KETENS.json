@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-08-31T18:47:11.024Z",
-    "commit": "47c119c3",
+    "op": "2026-09-03T11:31:03.087Z",
+    "commit": "40ff1c66",
     "boomVuil": false,
-    "boomAnders": 3,
+    "boomAnders": 0,
     "instrument": "scripts/ketenronde.js",
     "node": "v22.22.2"
   },

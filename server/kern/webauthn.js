@@ -147,9 +147,12 @@ function maakWebauthn({ db, save, accounts, schoon }) {
   const { stapOpOpties, stapOpMaak } = require('./webauthn-stapop')({
     credsVan, zetChallenge, pakChallenge, vanB64, save,
     generateAuthenticationOptions, verifyAuthenticationResponse });
-  const { webauthnActieNodig, webauthnActieOpties, webauthnActieMaak } = require('./webauthn-actie')({
-    crypto, generateAuthenticationOptions, verifyAuthenticationResponse,
-    credsVan, zetChallenge, pakChallenge, vanB64, save });
+  // twee poorten, een motor; woordenlijsten in ./webauthn-acties.js
+  const aCtx = { crypto, generateAuthenticationOptions, verifyAuthenticationResponse,
+    credsVan, zetChallenge, pakChallenge, vanB64, save };
+  const A = require('./webauthn-acties'), poort = require('./webauthn-actie');
+  const { webauthnActieNodig, webauthnActieOpties, webauthnActieMaak } = poort(aCtx, A.PIN_ACTIES);
+  const zwaar = poort(aCtx, A.ZWARE_ACTIES);
 
   /* ---- beheer ---- */
   function publiekeLijst(user) {
@@ -165,18 +168,22 @@ function maakWebauthn({ db, save, accounts, schoon }) {
     return { status: 200, ok: true, sleutels: publiekeLijst(user) };
   }
 
-  const { webauthn, pinBeveiliging } = require('./webauthn-poorten')({
+  const { webauthn, pinBeveiliging, zwaarBeveiliging } = require('./webauthn-poorten')({
     regOpties, regMaak, loginOpties, loginMaak, publiekeLijst, weg,
     actieNodig: webauthnActieNodig,
     actieOpties: webauthnActieOpties,
-    actieMaak: webauthnActieMaak
+    actieMaak: webauthnActieMaak,
+    zwaarNodig: zwaar.webauthnActieNodig,
+    zwaarOpties: zwaar.webauthnActieOpties,
+    zwaarMaak: zwaar.webauthnActieMaak
   });
 
   return { webauthnRegOpties: regOpties, webauthnRegMaak: regMaak, webauthnLoginOpties: loginOpties,
     webauthnLoginMaak: loginMaak, webauthnLijst: user => ({ status: 200, sleutels: publiekeLijst(user) }),
     webauthnWeg: weg, webauthnStapOpOpties: stapOpOpties, webauthnStapOpMaak: stapOpMaak,
     webauthnAantal: user => (user ? credsVan(user.id).length : 0),
-    webauthnActieNodig, webauthnActieOpties, webauthnActieMaak, webauthn, pinBeveiliging };
+    webauthnActieNodig, webauthnActieOpties, webauthnActieMaak, webauthn, pinBeveiliging,
+    zwaarBeveiliging };
 }
 
 module.exports = { maakWebauthn, maakCeremonieOpslag };

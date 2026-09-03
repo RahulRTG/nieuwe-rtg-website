@@ -94,7 +94,8 @@
       "webauthnRegOpties",
       "webauthnWeg",
       "werkplekkenBijLogin",
-      "wisselCodeIn"
+      "wisselCodeIn",
+      "zwaarbewijs"
     ],
     "avond": [
       "favLijst",
@@ -599,7 +600,8 @@
       "weefsel",
       "werkplaats",
       "zaakAbonnement",
-      "zelfzorg"
+      "zelfzorg",
+      "zwaarbewijs"
     ],
     "klok": [
       "klok"
@@ -2226,7 +2228,8 @@
       "webauthnAantal",
       "webauthnStapOpMaak",
       "webauthnStapOpOpties",
-      "zekeringMag"
+      "zekeringMag",
+      "zwaarbewijs"
     ],
     "tenant": [
       "bedrijf",

@@ -183,7 +183,22 @@ test('registreren, in de lijst, inloggen zonder wachtwoord, en weer weghalen', a
   assert.notEqual(nep.status, 200, 'een handtekening van een andere sleutel wordt geweigerd');
   assert.ok(!nep.body.token, 'en levert geen sessie op');
 
-  // en het lid kan zijn eigen sleutel weer weghalen
-  assert.equal((await api('/api/webauthn/weg', { id: lijst.body.sleutels[0].id }, lid)).status, 200);
+  /* En het lid kan zijn eigen sleutel weer weghalen -- maar niet zomaar meer.
+     Weghalen is sinds de zware poort (kern/zwaarbewijs.js) zelf een handeling
+     die om de passkey vraagt: anders haalt een gestolen open sessie eerst de
+     sleutels weg en staat daarna alles weer open met alleen een wachtwoord.
+     Het gevolg voor een mens staat in EIGENAAR.md: wie maar één toestel heeft
+     en dat kwijtraakt, krijgt zijn eigen sleutel er niet meer af. Vandaar de
+     regel dat er twee staan. */
+  const kaal = await api('/api/webauthn/weg', { id: lijst.body.sleutels[0].id }, lid);
+  assert.equal(kaal.status, 401, 'weghalen zonder bevestiging kan niet meer');
+  assert.equal(kaal.body.actie, 'passkey-weg');
+
+  const wegOpties = await api('/api/webauthn/bevestig/opties', {}, lid);
+  assert.equal(wegOpties.status, 200, JSON.stringify(wegOpties.body).slice(0, 160));
+  const weg = await api('/api/webauthn/weg', { id: lijst.body.sleutels[0].id,
+    ceremonie: wegOpties.body.ceremonie,
+    antwoord: auth.loginAntwoord(wegOpties.body.opties.challenge, origin, 9) }, lid);
+  assert.equal(weg.status, 200, 'met de vinger erbij mag het wel: ' + JSON.stringify(weg.body).slice(0, 160));
   assert.deepEqual((await api('/api/webauthn/lijst', {}, lid)).body.sleutels, [], 'daarna is het beheer weer leeg');
 });

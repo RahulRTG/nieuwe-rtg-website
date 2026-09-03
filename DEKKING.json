@@ -1,9 +1,9 @@
 {
   "uitleg": "Elke route (METHODE + patroon) die tijdens de volledige testsuite ECHT is aangeraakt, uit het routejournaal van server/routelog.js en niet uit de tekst van de toetsen. De eis is 100%: scripts/dekking.js zakt op elk gat en kent geen norm om die eis te verlagen. Het RTG Kantoor leest dit bestand (routes/office/dekking.js) en houdt het naast wat de server op dit moment registreert, zodat een route die er na de meting bij komt meteen als ongemeten opvalt. Bijwerken met: npm run dekking:vast",
   "gemeten": {
-    "op": "2026-09-03T10:56:26.676Z",
-    "commit": "7f4ee696",
-    "routesToen": 4942
+    "op": "2026-09-03T21:17:38.096Z",
+    "commit": "0fdf9ac2b",
+    "routesToen": 4952
   },
   "aangeraakt": [
     "GET /",
@@ -1145,6 +1145,10 @@
     "POST /api/groothandel/markt",
     "POST /api/groothandel/mijn",
     "GET /api/health",
+    "POST /api/herstel/eigenaar/passkey",
+    "POST /api/herstel/eigenaar/passkey/opties",
+    "POST /api/herstel/eigenaar/start",
+    "POST /api/herstel/eigenaar/voltooien",
     "POST /api/home",
     "POST /api/home/alles-uit",
     "POST /api/home/merk/ontkoppel",
@@ -2115,6 +2119,7 @@
     "POST /api/office/boardroom",
     "POST /api/office/boardroom/ai",
     "POST /api/office/boardroom/alles",
+    "POST /api/office/boardroom/bevestig/opties",
     "POST /api/office/boardroom/fase",
     "POST /api/office/boardroom/genre",
     "POST /api/office/boardroom/magnaat/besluit",
@@ -4572,6 +4577,7 @@
     "GET /api/techniek/betalingen/status",
     "POST /api/techniek/beveiliging/afhandelen",
     "POST /api/techniek/beveiliging/auto",
+    "POST /api/techniek/bevestig/opties",
     "POST /api/techniek/bewaren/veeg",
     "POST /api/techniek/controle/incident",
     "POST /api/techniek/controle/integriteit",
@@ -4582,6 +4588,9 @@
     "POST /api/techniek/functie",
     "POST /api/techniek/functie/ai",
     "POST /api/techniek/functie/besluit",
+    "POST /api/techniek/herstel/afbreken",
+    "POST /api/techniek/herstel/inrichten",
+    "POST /api/techniek/herstel/stand",
     "POST /api/techniek/inloggen",
     "GET /api/techniek/isolatie",
     "POST /api/techniek/isolatie/ontsluiting",
@@ -4798,6 +4807,7 @@
     "POST /api/wbw/uitgave",
     "POST /api/wbw/verreken",
     "POST /api/wbw/verzoek",
+    "POST /api/webauthn/bevestig/opties",
     "POST /api/webauthn/lijst",
     "POST /api/webauthn/login",
     "POST /api/webauthn/opties",

@@ -1,19 +1,19 @@
 {
   "stempel": {
-    "op": "2026-09-03T11:41:23.449Z",
-    "commit": "44f4c264",
+    "op": "2026-09-03T20:59:38.863Z",
+    "commit": "0fdf9ac2b",
     "boomVuil": false,
-    "boomAnders": 5,
+    "boomAnders": 1,
     "instrument": "scripts/vindbaar.js",
-    "node": "v22.22.2"
+    "node": "v24.18.0"
   },
   "uitleg": "Per bestemming in de sprong: welk aandeel van de ONDERSCHEIDENDE woorden van dat scherm (woorden uit zijn koppen die op hooguit 3 bestemmingen voorkomen) er ook naartoe leidt in de zoekfilter van shared/sprong.js. Meet woorden, geen mensen: of iemand op het idee komt dat woord te typen, weet deze meter niet.",
   "vloer": 0.6,
   "drempel": 3,
   "bestemmingen": 89,
-  "woorden": 1081,
+  "woorden": 1083,
   "gevonden": 700,
-  "dekking": 0.6475,
+  "dekking": 0.6464,
   "perBestemming": [
     {
       "naam": "Magnaat",
@@ -681,6 +681,17 @@
       ]
     },
     {
+      "naam": "Passkeys",
+      "url": "/apps/passkeys.html",
+      "woorden": 5,
+      "gevonden": 2,
+      "mist": [
+        "eerste",
+        "inloggen",
+        "inlog"
+      ]
+    },
+    {
       "naam": "Loon",
       "url": "/apps/loonstrook.html",
       "woorden": 4,
@@ -794,15 +805,6 @@
       "gevonden": 3,
       "mist": [
         "eerstvolgende"
-      ]
-    },
-    {
-      "naam": "Passkeys",
-      "url": "/apps/passkeys.html",
-      "woorden": 3,
-      "gevonden": 2,
-      "mist": [
-        "inloggen"
       ]
     },
     {

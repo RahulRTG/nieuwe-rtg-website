@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1597 bestanden en 11364 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1598 bestanden en 11368 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1597 |
-| losse beweringen (`test(...)`) | 11364 |
+| toetsbestanden | 1598 |
+| losse beweringen (`test(...)`) | 11368 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 57 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1032 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 42 |
 | alleen in de kop *genoemd*, nog niet gemeten | 167 |
-| niets van beide | 346 |
+| niets van beide | 347 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1396 bestanden, 11013 beweringen.
+1397 bestanden, 11017 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -870,6 +870,7 @@ toets omvalt.
 | `paspoort.test.js` | 11 | gezakt op `liegpoort /api/` | End-to-end tests voor de paspoort-/identiteitslaag (kern/paspoort.js): het gecontroleerde, toestemmingsgestuurde kanaal waarlangs een partner de identiteit achter een codenaam opvraagt. Dekt: de directe... |
 | `pasprijs.test.js` | 6 | gezakt op `===->!==#0` | WAT KOST EEN PAS PER MAAND? EEN ANTWOORD. |
 | `pasroutes.test.js` | 5 | -- | De pasroutes: deuren die om een betaalde pas vragen. De eenvoudigste van de vijf verfijningen -- geen account, geen persoon, geen geverifieerde identiteit, gewoon een andere pas. |
+| `passkeys-eerste.test.js` | 4 | -- | HET PASSKEY-SCHERM VOOR WIE ER NOG GEEN HEEFT. WAAROM DIT BESTAAT. |
 | `pay-grootboek.test.js` | 6 | gezakt op `liegpoort /api/` | DE BOEKINGSHISTORIE VAN RTG PAY IN HET TRANSACTIEGROOTBOEK (TAKEN.md 4.39). De crashproef-ronde staat in test/duurzaamheid-kill.test.js: die schiet de server dood, gooit de historie-blob leeg en eist de bevestigde... |
 | `pay.test.js` | 15 | gezakt op `liegpoort /api/` | RTG Pay: de interne betaallaag. Een wallet per lid op een dubbel grootboek, alles EEN knop: opladen via de betaal-naad, Klompjes (de RTG-eigen betaalverzoeken, ook gesplitst) die je met een tik betaalt waarbij de... |
 | `paybudget.test.js` | 8 | gezakt op `liegpoort /api/` | BUDGETTEN EN SLIM BETALEN -- meerdere potjes, één tik. WAAROM DEZE TOETS ER IS Zodra een lid meer dan één positie heeft, is "betaal 72 euro" geen opdracht meer maar een vraag: waar komt het vandaan? |

@@ -23,7 +23,7 @@ het?**
 | API-routes (uit de router) | **4738** |
 | Kernmodules (`server/kern/**`) | **2007** |
 | App-pagina's (`public/apps/**.html`) | **292** |
-| Testbestanden | **1597** |
+| Testbestanden | **1598** |
 
 ## De vier werelden
 

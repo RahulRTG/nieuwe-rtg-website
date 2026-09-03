@@ -196,23 +196,37 @@ test('het vloerscherm toont de verdeling en draagt een wijk over',
     assert.match(m.voorMij, new RegExp(vloer.name + ' biedt u Serre aan'), 'het aanbod staat bovenaan: ' + m.voorMij);
     assert.match(m.voorMij, new RegExp('draagt ' + vloer.name + ' het nog'), 'met wat er tot dan geldt');
 
-    await pM.fill('[data-reden]', 'ik sta zelf bij de pas');
+    /* PIN DE TOETS OP DIT AANBOD, EN NIET OP "HET VELD DAT EERST STAAT".
+       vloer-aanbod.js bewaart een half ingetypte reden PER AANBOD
+       (redenen[o.id], r.104) en zet hem na elke hertekening terug. Die kant is
+       in orde. Wat hier stond was `[data-reden]` zonder id: dat pakt het eerste
+       veld in het document. Komt er een tweede golf met een ander aanbod, dan
+       vult de toets het ene veld en leest hij het andere -- en dan meldt hij
+       een verloren reden terwijl er niets verloren is. */
+    const redenSel = await pM.evaluate((naam) => {
+      const kaart = [...document.querySelectorAll('#vVoorMij article.v-bod')]
+        .find((a) => a.textContent.includes(naam));
+      const veld = kaart && kaart.querySelector('[data-reden]');
+      return veld ? '[data-reden="' + veld.dataset.reden + '"]' : null;
+    }, vloer.name);
+    assert.ok(redenSel, 'het aanbod van ' + vloer.name + ' heeft een redenveld');
+    await pM.fill(redenSel, 'ik sta zelf bij de pas');
     /* Zelfde les als bij het indelen: dit scherm ververst op elke duw van een
        collega, en een reden die daarbij wordt weggegooid is een reden die
        niemand meer opschrijft. */
     // het veld zelf wordt bij elke ronde opnieuw getekend, dus is het zijn eigen bewijs
-    await verversEnHerteken(pM, '[data-reden]');
+    await verversEnHerteken(pM, redenSel);
     /* Met een korte genadetermijn, want dit scherm ververst ook op de duw van
        een COLLEGA: tussen het hertekende veld en het terugzetten van de reden
        kan onder runnerbelasting nog een tweede golf zitten, en dan meet de
        bewering het verse, nog lege veld van die tweede golf. De wacht is op de
        WAARDE en loopt hooguit twee seconden; een herstel dat echt stuk is,
        zakt daarna nog precies zo -- met dezelfde melding. */
-    await wachtTot(pM, () => {
-      const el = document.querySelector('[data-reden]');
+    await wachtTot(pM, (s) => {
+      const el = document.querySelector(s);
       return !!el && el.value === 'ik sta zelf bij de pas';
-    }, null, { wat: 'de teruggezette reden', ms: 2000 }).catch(() => {});
-    assert.equal(await pM.inputValue('[data-reden]'), 'ik sta zelf bij de pas',
+    }, redenSel, { wat: 'de teruggezette reden', ms: 2000 }).catch(() => {});
+    assert.equal(await pM.inputValue(redenSel), 'ik sta zelf bij de pas',
       'een verversing tijdens het typen gooit de reden niet weg');
     await pM.click('[data-nee]');
     // een nee haalt het aanbod weg bij de gevraagde: we wachten tot het blok

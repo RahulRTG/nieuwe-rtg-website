@@ -87,7 +87,7 @@ function zet(req, gegevens) {
       correlatie: leesVeilig(() => (req && req.id) || null, 'correlatie', fouten),
       fout: tekst([e && e.message].concat(fouten).filter(Boolean).join('; '), 240) };
   }
-  try { if (req) req.enveloppe = env; } catch (e) { /* een bevroren req: dan alleen teruggeven */ }
+  try { if (req) req.envelop = env; } catch (e) { /* een bevroren req: dan alleen teruggeven */ }
   return env;
 }
 

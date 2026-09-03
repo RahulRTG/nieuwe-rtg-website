@@ -185,4 +185,9 @@ function toon(uit) {
   console.log('\n  ' + uit.grens + '\n');
 }
 
+/* DE WACHT VOOR HET REQUIREN. Dit script schrijft een register; een
+   laadcontrole mag de proef niet starten (scripts/meetkeuring.js, regel
+   'wacht' -- ROLPROEF.json is zo ooit teruggeschreven naar 292 routes). */
+if (require.main !== module) return;
+
 main().catch(e => { console.error('\n  De schaduwproef is GEZAKT: ' + (e && e.message) + '\n'); process.exit(1); });

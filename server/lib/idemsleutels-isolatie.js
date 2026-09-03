@@ -10,24 +10,28 @@
       van de twee: hij heet "wat zou er gebeuren als", en als hij ooit iets
       verandert is deze verklaring de plek waar dat opvalt.
 
-   2. WAT EEN DUBBELTIK MOET SLIKKEN. Verstrengen en een ceremonie beginnen. Twee
-      woordelijk gelijke verzoeken binnen het venster zijn een dubbeltik: bij
-      `zet` zou de tweede een tweede regel in het spoor zetten voor dezelfde
-      handeling, bij `ontsluiting` zou hij een TWEEDE openstaand verzoek maken --
-      en twee openstaande ceremonies voor dezelfde drager is precies de
-      verwarring waar een mens een verkeerde aftekent.
+   2. WAT DE KERN ZELF ONTDUBBELT, en wat de poort daarom NIET mag naspelen.
+      Verstrengen, een ceremonie beginnen en een stap aftekenen leken kandidaten
+      voor de bewaarde-antwoordsoort (zie de kop van ./idemsleutels.js): twee
+      woordelijk gelijke verzoeken binnen het venster zijn een dubbeltik. Maar de
+      proef in test/isolatie-lid.test.js en test/isolatie-passkey.test.js liet
+      zien dat de kern het al zelf afhandelt, en anders dan een bewaard antwoord:
+      `zet` antwoordt bij een herhaling `ongewijzigd` in plaats van het eerste
+      antwoord te herhalen, want kern/isolatie/zetten.js vergelijkt met de stand
+      die er NU staat; een tweede `ontsluiting` is met opzet een NIEUW verzoek
+      met een eigen id, want een ceremonie die door de poort wordt weggeplakt
+      terwijl de eerste allang is afgebroken laat de drager zonder weg; en een
+      tweede `stap` krijgt 401 omdat de assertie eenmalig is. Een bewaard
+      antwoord zou in alle drie de gevallen iets terugsturen dat niet meer waar
+      is. Dezelfde vondst als bij bank/akkoord (#171): de kern ontdubbelt op de
+      STAND, en de poort hoort dan van de route af te blijven.
 
    3. WAT MET OPZET WEIGERT, en dat is geen tekortkoming. `commit` en `afbreken`
       lopen langs `if (v.status !== 'open') fout(409, ...)`: een tweede aanroep
       krijgt een nette 409 omdat het verzoek al voltooid of afgebroken IS. Dat is
       een toestandscontrole. `stap/opties` vraagt elke keer een VERSE
       WebAuthn-uitdaging aan -- die hergebruiken zou de bevestiging waardeloos
-      maken, want dan is een onderschepte assertie een tweede keer bruikbaar.
-
-   `stap` staat bewust bij groep 2 en niet bij 3: kern/isolatie/ontsluiting.js
-   houdt de EERSTE aftekening vast (`if (!v.voltooid[soort])`), dus een herhaling
-   verandert niets en verschuift ook het tijdstip niet -- juist het gegeven waar
-   een wachttijd en een onderzoek achteraf aan hangen. */
+      maken, want dan is een onderschepte assertie een tweede keer bruikbaar. */
 'use strict';
 
 const SLEUTELS = {
@@ -35,13 +39,24 @@ const SLEUTELS = {
   'POST /api/isolatie/mijn': { leest: true },
   'POST /api/techniek/isolatie/proef': { leest: true },
 
-  /* ---- 2. een dubbeltik is geen tweede bedoeling ---- */
-  'POST /api/isolatie/mijn/zet': { zelfdeVerzoek: true },                   // drager + naar + reden
-  'POST /api/techniek/isolatie/zet': { zelfdeVerzoek: true },               // drager + sleutel + naar + reden
-  'POST /api/isolatie/mijn/ontsluiting': { zelfdeVerzoek: true },           // drager + naar + reden
-  'POST /api/techniek/isolatie/ontsluiting': { zelfdeVerzoek: true },       // drager + sleutel + naar + reden
-  'POST /api/isolatie/mijn/ontsluiting/stap': { zelfdeVerzoek: true },      // id + soort
-  'POST /api/techniek/isolatie/ontsluiting/stap': { zelfdeVerzoek: true },  // id + soort
+  /* ---- 2. de kern ontdubbelt zelf, de poort blijft eraf ---- */
+  'POST /api/isolatie/mijn/zet': { nietIdempotent: true,
+    waarom: 'kern/isolatie/zetten.js antwoordt bij een herhaling `ongewijzigd` op grond van de ' +
+      'stand die er NU staat; een bewaard eerste antwoord zou zeggen dat er iets ' +
+      'veranderd is terwijl dat niet meer zo is' },
+  'POST /api/techniek/isolatie/zet': { nietIdempotent: true,
+    waarom: 'idem: de kern vergelijkt met de huidige stand en ontdubbelt daarop zelf' },
+  'POST /api/isolatie/mijn/ontsluiting': { nietIdempotent: true,
+    waarom: 'een tweede verzoek is met opzet een NIEUW verzoek met een eigen id: wordt het ' +
+      'eerste afgebroken, dan moet de drager opnieuw kunnen beginnen zonder dat de poort ' +
+      'hem het oude id teruggeeft' },
+  'POST /api/techniek/isolatie/ontsluiting': { nietIdempotent: true,
+    waarom: 'idem: kern/isolatie/ontsluiting.js maakt per aanroep een verzoek, en dat is de bedoeling' },
+  'POST /api/isolatie/mijn/ontsluiting/stap': { nietIdempotent: true,
+    waarom: 'de assertie is eenmalig: een tweede aanroep met dezelfde assertie krijgt 401, en dat ' +
+      'is een toestandscontrole van de uitdaging en geen herhaalde handeling' },
+  'POST /api/techniek/isolatie/ontsluiting/stap': { nietIdempotent: true,
+    waarom: 'idem: een gebruikte uitdaging bewijst niets meer, dus de tweede stap wordt geweigerd' },
 
   /* ---- 3. weigert met opzet, en dat is een toestandscontrole ---- */
   'POST /api/isolatie/mijn/ontsluiting/commit': { nietIdempotent: true,

@@ -134,15 +134,19 @@ const REGISTERS = [
 
      Ze staan hier in de volgorde waarin ze iets over de code zeggen: eerst de
      vier route-proeven, dan de rondes, dan de meters die over de machine gaan. */
-  ['AUDITPROEF.json', 'npm run auditproef', 'of een geslaagde schrijfactie een regel in het API-spoor nalaat'],
-  ['HANDELINGPROEF.json', 'npm run handelingproef', 'of een geslaagde schrijfactie een geketende regel nalaat'],
-  ['UITVOERPROEF.json', 'npm run uitvoerproef', 'of een 2xx-antwoord gegevens teruggeeft die er niet in horen'],
+  /* Het API-spoor in journaalvorm: de derde, lichtste AUDIT-bron van de
+     bewijsmatrix (#176 splitste hem af van AUDITPROEF.json). Zelfde ronde als
+     de auditproef, dus dezelfde ouderdom. */
+  ['AUDITPROEF-JOURNAAL.json', 'npm run auditproef', 'het API-spoor per schrijfroute in journaalvorm'],
+  /* Het laatspoor (#176): schrijfroutes die de opslag aanraken voordat ze de
+     invoer keuren. Statisch gemeten, maar een register dat wordt geschreven
+     hoort hier te staan of buiten met een reden (test/versheidsdekking). */
+  ['LAATSPOOR.json', 'node scripts/laatspoor.js', 'schrijfroutes die de opslag aanraken voordat ze de invoer keuren'],
   ['IDOR.json', 'node scripts/idorproef.js', 'of het object van een ander te openen is'],
   ['ROLRONDE.json', 'node scripts/rolronde.js', 'welke rol waar binnenkomt, gevraagd aan een echte server'],
   ['GLUURRONDE.json', 'node scripts/gluurronde.js', 'de horizontale scheiding tussen twee leden'],
   ['VERRAAD.json', 'node scripts/verraadronde.js', 'wat een verraden seed of zegel doet'],
   ['INHOUDSKAART.json', 'node scripts/inhoudskaart.js', 'wat elke route werkelijk teruggeeft'],
-  ['OUTPUTPROEF.json', 'node scripts/outputproef.js', 'of de uitvoerband klopt'],
   ['DUURZAAMHEIDSKOSTEN.json', 'node scripts/duurzaamheidskosten.js', 'wat een commit aan machine en opslag kost'],
   /* DE SCHERFMETER, EN WAAROM HIJ HIER STAAT EN NIET IN BUITEN. Zijn `churn`
      wordt gemeten TEGEN de vorige vastlegging: hoeveel bestanden zijn sinds die

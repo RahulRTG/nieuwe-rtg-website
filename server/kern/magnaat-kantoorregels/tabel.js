@@ -70,6 +70,9 @@ const REGELS = [
      niet, dekt de helft en meldt zich niet. */
   [/\/api\/tenant\/(?:export|herstelproef|status)/, 'juridisch', 'Juridisch'],
   [/\/api\/tenant(?:\/|$)/, 'intern', 'Intern & IT'],
+  /* SCIM (routes/scim.js) is de deur waar de IdP van een klant zelf accounts
+     aanmaakt en uitzet: toegangsbeheer, dezelfde familie als de bootstrap. */
+  [/\/api\/scim(?:\/|$)/, 'intern', 'Intern & IT'],
   [/office\/(?:aidata)|\/belastingkantoor|\/loonstrook/, 'financien', 'Financiën'],
   [/office\/wereld|\/wereld\b/, 'controleregister', 'RTG Controleregister'],
   [/\/api\/office\b|\/kantoor\/gesprek|\/living-os|\/scherm\.html|\/app\.html/, 'intern', 'Intern & IT'],
@@ -125,7 +128,17 @@ const REGELS = [
      regels lopen na een hernoeming uit elkaar, en dan hangt het scherm ergens
      anders dan de deur die het bedient. */
   [/(?:^|\/)mijn[-/](?:tweefactor|sessies|herstelkanaal)/, 'intern', 'Intern & IT'],
-  [/(?:^|\/)mijn[-/](?:gegevens|post|relaties)/, 'juridisch', 'Juridisch']
+  [/(?:^|\/)mijn[-/](?:gegevens|post|relaties)/, 'juridisch', 'Juridisch'],
+
+  /* RTG SERVICE, DE KANT VAN DE MELDER (routes/service.js): een lid dat een
+     zaak opent, een mens vraagt of belt -- Klantenservice, dezelfde kamer als
+     de chat en de live vormen in ./tabel-breed.js. De kantoorkant
+     (/api/office/service) blijft bij Intern & IT achter de office-regel
+     hierboven; vandaar `/api/` VOOR `service`. De ondertiteling
+     (routes/spraaktekst.js) staat in dezelfde regel omdat de functiecatalogus
+     hem naast /api/service draagt, en een functie in twee kamers is precies
+     wat deze tabel moet voorkomen. */
+  [/\/api\/(?:service|ondertiteling)(?:\/|$)|\/apps\/(?:leverancier-)?service(?:-bel)?\.html/, 'klantenservice', 'Klantenservice']
 ];
 
 /* Daarachter de HDI-laag (./tabel-hdi.js) en dan de brede domeinen

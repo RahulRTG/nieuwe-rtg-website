@@ -1489,16 +1489,15 @@
    "rol": "publiek",
    "status": 200,
    "sleutels": [
-    "ai",
-    "ok",
-    "verwerking"
+    "dienst",
+    "ok"
    ],
    "dragend": [
-    "ai",
-    "ok",
-    "verwerking"
+    "dienst",
+    "ok"
    ],
-   "op": "2026-08-20T09:03:01.642Z"
+   "op": "2026-09-03T00:00:00.000Z",
+   "reden": "Met de hand bijgesteld nadat de route zelf smaller werd gemaakt (de AI-modus lekte eruit). De generator ververst dit profiel niet: hij brengt alleen blinde en onbesliste routes in kaart, en deze staat in OUTPUTPROEF.json op bewezen. Het profiel is de VORM van het antwoord dat server/foundation.js nu geeft; test/inhoudswacht.test.js dwingt hem af en zag de afwijking ook."
   },
   "GET /api/push/key": {
    "methode": "GET",

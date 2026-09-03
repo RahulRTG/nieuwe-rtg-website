@@ -346,8 +346,29 @@ async function nieuwLid(naam) {
 
 test.before(async () => {
   /* De nagebootste PDOK. Hij antwoordt alleen op de Dam en onthoudt elke vraag,
-     zodat de toets kan nalezen wat er werkelijk over de lijn ging. */
+     zodat de toets kan nalezen wat er werkelijk over de lijn ging.
+
+     EN HIJ ANTWOORDT ALLEEN OP ZIJN EIGEN PAD. Dat stond er niet, en het heeft
+     een keer echt iets stils gedaan: in een volle suite stonden er 29 vragen in
+     `gezien` voordat toets 14 een letter had gedaan. Ze kwamen niet van deze
+     server -- ze kwamen van een BUURPROCES. test/helper.js kiest een vrije poort
+     door op 0 te binden, hem weer los te laten en het nummer door te geven; komt
+     dit neppertje er tussen die twee stappen doorheen met zijn eigen listen(0),
+     dan spreekt de buur zijn kindserver aan op de poort waar WIJ zitten. En omdat
+     dit neppertje overal 200 op gaf, hield die buur zijn gezondheidspeiling voor
+     geslaagd terwijl zijn server nergens draaide. Een neppertje dat op alles ja
+     zegt, maakt van een poortbotsing een groene toets bij de ander en een rode
+     hier.
+
+     De onderliggende race (vrijePoort() bindt, laat los, en geeft het nummer aan
+     iemand anders) is hiermee NIET weg -- die zit in de helper en gaat over alle
+     toetsen. Wat hier weggaat is dat dit neppertje hem verergert en verbergt. */
   nepPdok = http.createServer((req, res) => {
+    if (!String(req.url || '').startsWith('/locatieserver')) {
+      res.writeHead(404, { 'content-type': 'application/json' });
+      res.end(JSON.stringify({ error: 'dit is de nagebootste PDOK van test/adresopzoek.test.js en niet uw server' }));
+      return;
+    }
     gezien.push(req.url);
     res.writeHead(200, { 'content-type': 'application/json' });
     res.end(JSON.stringify(DAM));
@@ -365,9 +386,14 @@ test.after(() => {
 });
 
 test('14. POST /api/adres/zoek staat achter de leden-poort', async () => {
+  /* Eerst schoon, want de bewering gaat over DEZE aanvraag. `gezien` is van het
+     hele bestand; deed een eerdere toets een vraag, dan zakte deze op andermans
+     verkeer -- en dan zegt de melding iets anders dan de toets meet. Elke andere
+     toets hieronder doet hetzelfde. */
+  gezien = [];
   const zonder = await api('/api/adres/zoek', { postcode: '1012JS', huisnummer: '1' });
   assert.equal(zonder.status, 401, 'zonder token komt er niets uit: ' + JSON.stringify(zonder.body).slice(0, 140));
-  assert.equal(gezien.length, 0, 'en er ging ook niets naar de bron');
+  assert.equal(gezien.length, 0, 'en er ging ook niets naar de bron; er ging wel: ' + JSON.stringify(gezien).slice(0, 200));
 });
 
 test('15. POST /api/adres/zoek vult straat, woonplaats en land aan -- en niets anders', async () => {

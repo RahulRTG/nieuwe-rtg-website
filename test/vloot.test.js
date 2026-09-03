@@ -116,7 +116,13 @@ test('crasht de kantoor-groep, dan valt ALLEEN kantoor uit; de rest draait door'
 
   // de andere apps merken er NIETS van
   assert.equal((await post('/api/login', { tier: 'business', pasApp: 'business' })).status, 200, 'leden draait door');
-  assert.equal((await fetch(BASE + '/api/foundation/health')).status, 200, 'de foundation draait door');
+  /* En dat is de FOUNDATION die antwoordt, niet zomaar een 200 op dat pad. De
+     gateway verdeelt op pad; valt de groep erachter weg, dan is een kale status
+     geen bewijs dat de rtf-groep nog leeft. Vandaar dat het levensteken zijn
+     eigen naam draagt (zie server/foundation.js). */
+  const rtf = await fetch(BASE + '/api/foundation/health');
+  assert.equal(rtf.status, 200, 'de foundation draait door');
+  assert.equal((await rtf.json()).dienst, 'rtfoundation', 'en het is de rtf-groep zelf die antwoordt');
 
   // de vloot herstart de groep vanzelf; daarna doet kantoor het weer
   /* Ook dit is een server die opkomt, dus dezelfde grens als hierboven. */

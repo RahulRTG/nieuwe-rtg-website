@@ -147,6 +147,7 @@
     "schermgedrag": "node scripts/schermgedrag.js",
     "contextproef": "node scripts/contextproef.js",
     "kernherkomst": "node scripts/kernherkomst.js",
+    "faalproef": "node scripts/faalproef.js",
     "getallen": "node scripts/getallen.js",
     "getallen:controle": "node scripts/getallen.js --controle",
     "gezagsnoemer": "node scripts/gezagsnoemer.js",

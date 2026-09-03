@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1594 bestanden en 11338 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1594 bestanden en 11339 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 1594 |
-| losse beweringen (`test(...)`) | 11338 |
+| losse beweringen (`test(...)`) | 11339 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 57 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1032 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1393 bestanden, 10987 beweringen.
+1393 bestanden, 10988 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -309,7 +309,7 @@ toets omvalt.
 | `eigen-website.test.js` | 6 | gezakt op `liegpoort /api/` | DE EIGEN WEBSITE VAN EEN LID -- 5 endpoints van de Website-maker. Deze vijf wees de waargenomen dekkingsmeting aan als nooit aangeroepen: site/haal, site/publiceer, site/offline, site/fotos en site/foto-weg. |
 | `eigenaar-wedloop.test.js` | 1 | gezakt op `&&->||#0` | TWEE SERVERS DIE TEGELIJK OPKOMEN OP DEZELFDE DATABASE. In de vloot (server/vloot.js) draait elke groep als eigen proces, maar ze delen een database. |
 | `eigenaar.test.js` | 4 | gezakt op `liegpoort /api/` | De eigenaar (Roellie) heeft overal toegang tot de BEHEER-omgevingen met zijn eigen accountlogin, maar de juridische grenzen (kinderdata, privé tussen personen, ruwe identiteitsbewijzen, platte wachtwoorden) blijven... |
-| `eigenaarbevestiging.test.js` | 10 | -- | DE ZWARE POORT: vraagt een eigenaarshandeling opnieuw om de passkey? Dit bestand bestaat omdat de vorige twee niet genoeg zijn. |
+| `eigenaarbevestiging.test.js` | 11 | -- | DE ZWARE POORT: vraagt een eigenaarshandeling opnieuw om de passkey? Dit bestand bestaat omdat de vorige twee niet genoeg zijn. |
 | `eigenaarschap.test.js` | 8 | gezakt op `liegpoort /api/` | Het eigenaarschap van het platform: wie het is, en hoe het overgaat. Dit is de zwaarste bevoegdheid die het systeem kent. |
 | `eigenaarwerkplek.test.js` | 1 | gezakt op `liegpoort /api/` | De eigenaar ziet zijn werkplek, OOK in productie. server/eigenaar.js legt vast dat de eigenaar bij de beheeromgevingen kan, met zoveel woorden: "de RTG-Backoffice (met zijn eigen accountlogin, zonder aparte code)". |
 | `eigenip.test.js` | 2 | gezakt op `liegpoort /api/` | EEN ADRES DAT DE BEZOEKER ZELF MAG KIEZEN, IS GEEN ADRES. Elke snelheidslimiet, elk verbod en elke teller in dit huis rekent op het adres van de aanroeper. |

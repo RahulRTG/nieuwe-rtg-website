@@ -193,6 +193,15 @@ if (require.main !== module) return;
   if (gezakt.length > 20) console.log('      ... en nog ' + (gezakt.length - 20));
 
   fs.writeFileSync(UITSLAG, JSON.stringify({
+    /* WANNEER IS DIT GEMETEN, EN WAARTEGEN. Deze regel ontbrak, terwijl het
+       bestand `stempel` wel importeerde -- een ongebruikte invoer was de enige
+       aanwijzing. Gevolg: dit register droeg geen datum en geen commit, en
+       scripts/vertrouwen.js weigerde daarom ELKE vastlegging van de
+       vervalstaten: "geen stempel: dit register zegt niet wanneer het is
+       gemeten". Een verse ronde veranderde daar niets aan, want de uitslag zag
+       er na afloop hetzelfde uit als daarvoor. Precies wat een stempel hoort te
+       voorkomen: verouderd ziet er identiek uit aan vers. */
+    stempel: stempel(),
     uitleg: 'Per schrijfroute: is er na een geslaagde oproep een regel bijgekomen in het API-spoor ' +
       '(server/opzet/auditspoor.js), gelezen via dezelfde kantoorroute die een auditor gebruikt. ' +
       '"gezakt" is hier WEL een defect-oordeel: een handeling die lukt zonder spoor is achteraf niet ' +

@@ -25,7 +25,7 @@ function route(pad, rol, opslag, status = 200) {
 }
 function proefMet(...routes) { return { perRoute: routes }; }
 
-const EIGEN_NAAM = Object.keys(O.EIGEN)[0];
+const TERM_NAAM = Object.keys(O.TERMINAAL)[0];
 const INFRA_NAAM = Object.keys(O.INFRA)[0];
 
 test('0. zonder proef zakt de meter en zegt wat er ontbreekt', () => {
@@ -58,16 +58,24 @@ test('3. een ontvanger uit DEZELFDE groep is geen handoff', () => {
     'member en openbaar zijn allebei consument; elkaar aanraken is geen handoff');
 });
 
-test('4. eigen: een collectie zonder tweede partij is verklaard, niet open', () => {
-  const u = O.meet({ proef: proefMet(route('/api/eigen', 'member', { [EIGEN_NAAM]: 1 })) });
-  assert.equal(u.perRoute[0].stand, 'eigen');
-  assert.equal(u.perRoute[0].collecties[0].graad, 'verklaard');
-  assert.ok(!u.verlopen.eigen.includes(EIGEN_NAAM), 'een gebruikte verklaring is niet verlopen');
+test('4. terminaal: een collectie zonder tweede partij is verklaard, met de soort erbij', () => {
+  const u = O.meet({ proef: proefMet(route('/api/eigen', 'member', { [TERM_NAAM]: 1 })) });
+  assert.equal(u.perRoute[0].stand, 'terminaal');
+  assert.equal(u.perRoute[0].collecties[0].graad, O.TERMINAAL[TERM_NAAM].soort,
+    'de graad van een terminale collectie IS zijn soort; "verklaard" zou de reden weggooien');
+  assert.ok(!u.verlopen.terminaal.includes(TERM_NAAM), 'een gebruikte verklaring is niet verlopen');
+});
+
+test('4b. elke terminale soort is een van de drie, en drie is een besluit', () => {
+  const soorten = new Set(Object.values(O.TERMINAAL).map(x => x.soort));
+  assert.deepEqual([...soorten].sort(), ['boeking', 'huis', 'mens'],
+    'een vierde soort erbij is een besluit en geen sluiproute voor een open collectie');
 });
 
 test('5. een verklaring die niemand meer nodig heeft, staat als verlopen in de uitslag', () => {
   const u = O.meet({ proef: proefMet(route('/api/x', 'member', { iets: 1 })) });
-  assert.ok(u.verlopen.eigen.includes(EIGEN_NAAM));
+  assert.ok(u.verlopen.terminaal.includes(TERM_NAAM));
+  assert.ok(u.verlopen.tussen.includes(Object.keys(O.TUSSEN)[0]));
   assert.ok(u.verlopen.infra.includes(INFRA_NAAM));
 });
 
@@ -88,6 +96,25 @@ test('8. zonder rol geen groep: de route wordt geteld als niet gezien, niet als 
   assert.equal(u.nietGezien.zonderRol, 1);
 });
 
+test('8b. tussen: de ontvanger is een ander lid, en dat ziet dit groepenmodel niet', () => {
+  const [c, d] = Object.entries(O.TUSSEN)[0];
+  const [methode, pad] = d.tegenroute.split(' ');
+  /* de tegenroute bestaat in de routelijst -> stand tussen, niet open */
+  let u = O.meet({ proef: proefMet(route('/api/lid', 'member', { [c]: 1 })),
+    routes: [{ methode, pad, bestand: null }] });
+  assert.equal(u.perRoute[0].stand, 'tussen');
+  assert.equal(u.perRoute[0].collecties[0].graad, 'verklaard');
+  /* hij deed in de proef geen werk -> dat wordt GEMELD en niet verzwegen */
+  assert.ok(u.tussenOngemeten.some(x => x.startsWith(c + ' -> ')),
+    'een tegenroute die de proef niet kon meten hoort in de uitslag te staan (LAT.md regel 12)');
+  /* TEGENPROEF: bestaat de tegenroute niet, dan is de verklaring verlopen en staat de bron open */
+  u = O.meet({ proef: proefMet(route('/api/lid', 'member', { [c]: 1 })),
+    routes: [{ methode: 'POST', pad: '/api/iets/anders', bestand: null }] });
+  assert.equal(u.perRoute[0].stand, 'open');
+  assert.ok(u.verlopen.tegenroute.some(x => x.startsWith(c + ' ->')),
+    'een tegenroute die niet bestaat hoort in zijn eigen bak, niet bij de aangewezen ontvangers');
+});
+
 test('9. de stand van een route is de zwakste van zijn collecties', () => {
   const u = O.meet({ proef: proefMet(
     route('/api/twee', 'member', { orders: 1, los: 1 }),
@@ -104,7 +131,7 @@ test('10. een aangewezen ontvanger wordt getoetst tegen de proef', () => {
   const r = u.perRoute.find(x => x.pad === '/api/lid');
   assert.equal(r.stand, 'gezien');
   assert.equal(r.collecties[0].graad, 'aangewezen');
-  assert.deepEqual(u.verlopen.ontvanger, []);
+  assert.deepEqual(u.verlopen.ontvanger.filter(x => x.startsWith(c + ' ->')), []);
   /* TEGENPROEF: de aangewezen route deed geen werk -> de aanwijzing is verlopen en de collectie open */
   u = O.meet({ proef: proefMet(route('/api/lid', 'member', { [c]: 1 }), route(pad, 'office', {}, 404)) });
   assert.equal(u.perRoute.find(x => x.pad === '/api/lid').stand, 'open');
@@ -137,8 +164,16 @@ test('12. zonder routelijst zegt de uitslag dat "gezien" niet kon worden vastges
 });
 
 test('13. elke verklaring draagt een reden die iets zegt', () => {
-  for (const lijst of [O.INFRA, O.EIGEN])
-    for (const [k, v] of Object.entries(lijst)) assert.ok(typeof v === 'string' && v.length > 15, k + ' heeft geen reden');
+  for (const [k, v] of Object.entries(O.INFRA))
+    assert.ok(typeof v === 'string' && v.length > 15, k + ' heeft geen reden');
+  for (const [k, v] of Object.entries(O.TERMINAAL)) {
+    assert.ok(['mens', 'huis', 'boeking'].includes(v.soort), k + ' heeft geen geldige soort');
+    assert.ok(v.reden && v.reden.length > 25, k + ' heeft geen reden');
+  }
+  for (const [k, v] of Object.entries(O.TUSSEN)) {
+    assert.ok(/^(POST|GET) \/api\//.test(v.tegenroute), k + ': tegenroute zonder methode en pad');
+    assert.ok(v.reden && v.reden.length > 25, k + ' heeft geen reden');
+  }
   for (const [k, v] of Object.entries(O.ONTVANGER)) {
     assert.ok(/^(POST|GET) \/api\//.test(v.route), k + ': route zonder methode en pad');
     assert.ok(v.reden && v.reden.length > 15, k + ' heeft geen reden');
@@ -149,8 +184,10 @@ test('14. het register bestaat, sluit, en heeft geen verlopen verklaringen', () 
   const j = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'DOODSPOOR.json'), 'utf8'));
   const t = j.telling;
   assert.ok(t.bronroutes > 0, 'nul bronroutes: de meter zag niets en mag niet groen zijn (LAT.md regel 3)');
-  assert.equal(t.gesloten + t.gezien + t.eigen + t.open, t.bronroutes, 'de vier standen tellen niet op tot het geheel');
-  assert.deepEqual(j.verlopen, { eigen: [], infra: [], ontvanger: [] }, 'verlopen verklaring in DOODSPOOR.json; draai npm run doodspoor:vast en ruim op');
+  assert.equal(t.gesloten + t.gezien + t.tussen + t.terminaal + t.open, t.bronroutes,
+    'de vijf standen tellen niet op tot het geheel');
+  assert.deepEqual(j.verlopen, { terminaal: [], tussen: [], tegenroute: [], infra: [], ontvanger: [] },
+    'verlopen verklaring in DOODSPOOR.json; draai npm run doodspoor:vast en ruim op');
   assert.ok(j.grens && /geen poort/.test(j.grens), 'het register hoort te zeggen dat de eerste ronde geen poort is');
 });
 

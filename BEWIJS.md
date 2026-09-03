@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1534 bestanden en 10936 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1535 bestanden en 10954 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1534 |
-| losse beweringen (`test(...)`) | 10936 |
+| toetsbestanden | 1535 |
+| losse beweringen (`test(...)`) | 10954 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 57 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1014 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 40 |
 | alleen in de kop *genoemd*, nog niet gemeten | 143 |
-| niets van beide | 327 |
+| niets van beide | 328 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1341 bestanden, 10609 beweringen.
+1342 bestanden, 10627 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -278,6 +278,7 @@ toets omvalt.
 | `doelen.test.js` | 8 | gezakt op `liegpoort /api/` | De doelenmotor (kern/doelen.js). Het punt van deze motor is dat mijlpalen worden AFGELEID en niet bewaard: een gemiste week is dan geen mislukking maar een ander pad. |
 | `domeinalleen.test.js` | 2 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `domeingrens.test.js` | 8 | gezakt op `===->!==#0` | DE DOMEINGRENS: laat hij door wat mag, en houdt hij tegen wat niet mag? Waar dit over gaat: server.js geeft elke router hetzelfde object `kern` met ruim negenhonderd eigenschappen, dus kan elk domein bij alles van... |
+| `doodspoor.test.js` | 18 | -- | DE DOODSPOORMETER (scripts/doodspoor.js) -- ziet hij een dood spoor? MAATSTAF.md par. |
 | `doorgeefjournaal.test.js` | 7 | gezakt op `liegpoort /api/` | HET DOORGEEFJOURNAAL: zien wat er binnenkwam en wat de deur uitging. WAAROM DIT ER IS. |
 | `doos-journaal.test.js` | 3 | gezakt op `true->false` | Zaakdoos-journaal, beveiliging: het journaal wordt na herstel nagespeeld naar de cloud met de inlog van de doos. Daarom is het gezegeld (HMAC), genummerd (seq) en padgebonden. |
 | `doos-regie.test.js` | 5 | gezakt op `liegpoort /api/` | De doos-regie: het beheer op afstand van de Zaakdoos-vloot. Het kantoor zet een doelversie en per doos een netwerkrol (accesspoint, versterker, gastwifi); de doos haalt beide zelf op bij zijn eigen melding en meldt... |

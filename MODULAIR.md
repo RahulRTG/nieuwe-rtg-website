@@ -271,6 +271,69 @@ en er ging geen geld door de poort van RTG Pay, dus de interne stop kwam er niet
 aan te pas. Het precedent stond een regel hoger: `giftcard/redeem` staat er al in,
 om precies dezelfde reden. Eén regel erbij, en de wig is groen.
 
+## 7. De meetleer — mag de lezer dit geloven, en hoeveel
+
+`npm run meetleer` → `MEETLEER.json`
+
+De zes meters hierboven beantwoorden vragen over RTG. Deze beantwoordt een vraag
+over de meters zelf, en het is de vraag die daarna komt: **kan iemand die alleen
+het register heeft, er meer uit concluderen dan erin zit?**
+
+`VERSTRENGELING.json` meldt "0 onverklaarde randen". Dat is waar, en het betekent
+iets veel kleiners dan het klinkt: elke rand *draagt* een reden, niet elke reden
+is goed — en de meter ziet de kern-tas helemaal niet. Wie dat getal op een bord
+zet als "architectuur in orde", liegt niet en heeft toch ongelijk. Het
+bronregister hoort die lezing onmogelijk te maken.
+
+Dat is geen nieuwe gedachte hier. `TOETSDUUR.json` mocht niet suggereren dat een
+modus op deze machine gemeten was terwijl dat niet zo was. Dit is dezelfde regel,
+een stap verder: **een register mag niet liegen over waar zijn bewijs vandaan
+komt, én het mag de lezer niet meer laten concluderen dan het aantoont.**
+
+**Zeven slots, en drie uitslagen per slot.** De slots zijn niet verzonnen maar
+gezocht: welk veld draagt vandaag al welke betekenis? Het verschil tussen de
+eerste twee uitslagen is het hele punt.
+
+| uitslag | wat het betekent |
+|---|---|
+| `veld` | machinaal leesbaar — een dashboard **kan** de beperking tonen |
+| `proza` | de betekenis staat er, maar in een vrije zin. Een zorgvuldige lezer wordt niet misleid; een dashboard wel, want dat leest geen proza |
+| `ontbreekt` | er staat niets |
+
+**De stand over <!--getal:meetleer.registers-->79<!--/getal--> registers.** Twee getallen die nooit worden
+opgeteld: <!--getal:meetleer.onleesbaar-->382<!--/getal--> slots zijn onleesbaar voor een machine (proza óf
+leeg — dat daalt ook als een zin een veld wordt), en <!--getal:meetleer.blind-->8<!--/getal-->
+registers zijn **blind**: die zeggen nergens wat ze niet aantonen, veld noch zin.
+Daar wordt zelfs een zorgvuldige lezer niet geremd, en dat is het gevaarlijke
+geval. De blinde acht gaat aan de ratel, de 380 niet.
+
+**Drie dingen die niet mogen sneuvelen.**
+
+`bewijst` zonder `grens` is **geen vooruitgang maar een verslechtering**: een
+positieve claim zonder de bijbehorende beperking is precies de vorm waarin
+overclaiming ontstaat. Zo'n register wordt teruggedraaid en apart geteld
+(`losseClaims`), en telt nooit als gevuld slot.
+
+**Proza telt maar voor één slot**, en die grens moest in de meter zelf worden
+gerepareerd. Eerst vulde één beperkende zin zowel `watBewijstDitNiet` als
+`blindeVlekken` — 46 en 59 — maar dat is één zin die als antwoord op twee vragen
+wordt geteld. Wat een meting niet *aantoont* en wat zij niet *ziet* zijn
+verschillende dingen. `blindeVlekken` ging daarmee van 59 naar 0: geen
+verslechtering, maar het wegvallen van een getal dat de meter zelf had opgeblazen.
+
+**`gemetenOp` draagt drie namen** — `stempel` (41), `gemeten` (42) en `gemetenOp`
+(6) — en die staan er alle drie in als **benoemde botsing**. Dit instrument meet
+en ruimt niet op; een vierde naam bijzetten zou hem verergeren. `SEMANTIEK.json`
+noemt dat patroon duur, en dit is er een binnen de meetlaag zelf.
+
+**Hij blokkeert niets.** `CONTROLPLANE.md`: je kunt niet afdwingen wat nooit in de
+schaduw heeft gelopen. Eerst zichtbaar dalen, dan pas een regel in
+`scripts/meetkeuring.js`.
+
+`MEETLEER.json` vult als enige register zijn eigen zeven slots. Dat is geen
+netheid: een meetleer die 5 van de 7 scoort op zijn eigen schaal, vraagt van
+anderen wat hij zelf niet doet.
+
 ## Wat er bewust NIET staat
 
 - **Geen mapverhuizing.** Een indeling in `kern/ domeinen/ producten/` verplaatst

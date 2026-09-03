@@ -63,6 +63,13 @@ const GETALLEN = {
     wat: 'namen die in meer dan een domein voorkomen' },
   'semantiek.betekenissen': { bron: 'SEMANTIEK.json', veld: 'woordenMetMeerBetekenissen',
     wat: 'namen die meer dan een betekenis dragen' },
+  /* De meetleer: mag de lezer dit geloven, en hoeveel (MODULAIR.md par. 7). */
+  'meetleer.registers': { bron: 'MEETLEER.json', veld: 'registers',
+    wat: 'registers in de wortel die de meetleer keurt' },
+  'meetleer.blind': { bron: 'MEETLEER.json', veld: 'blind',
+    wat: 'registers die NERGENS zeggen wat ze niet aantonen' },
+  'meetleer.onleesbaar': { bron: 'MEETLEER.json', veld: 'onleesbaar',
+    wat: 'slots waar een machine niet bij kan (proza of leeg)' },
   /* De vijf registers van de binnenpoort (MODULAIR.md). */
   'verstrengeling.randen': { bron: 'VERSTRENGELING.json', veld: 'randen',
     wat: 'randen tussen twee knopen van RTG' },

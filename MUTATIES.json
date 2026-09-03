@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-02T23:44:15.759Z",
-    "commit": "dbea7815",
+    "op": "2026-09-03T08:02:23.196Z",
+    "commit": "e7506075",
     "boomVuil": true,
-    "boomAnders": 5,
+    "boomAnders": 8,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -73,6 +73,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 6,
       "scherp": "gezakt"
+    },
+    "actorvormen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/actorvormen.js",
+      "operator": "===->!==#0",
+      "gezakt": 5,
+      "geprobeerd": 1
     },
     "administratie.test.js": {
       "soort": "server",
@@ -1576,6 +1584,14 @@
       "module": "server/kern/envelop.js",
       "operator": "!==->===#0",
       "gezakt": 3,
+      "geprobeerd": 1
+    },
+    "envelopvelden.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/envelopvelden.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
       "geprobeerd": 1
     },
     "ervaring.test.js": {

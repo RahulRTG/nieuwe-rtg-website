@@ -588,6 +588,12 @@ const EIGEN_MODULE = new Map([
      als kindproces -- dat is de enige manier om te toetsen wat het met een echt
      bestand doet -- en draagt dus geen require die modulesVan() kan vinden. */
   ['inlinestijl.test.js', ['scripts/inlinestijl-omzet.js']],
+  /* De twee meters die op 3 september uit een met de hand getypt getal zijn
+     gehaald (TAKEN.md 4.72 en 4.71). Beide toetsen starten hun script als
+     kindproces -- de enige manier om de exitcode te toetsen -- en dragen dus
+     geen require die modulesVan() kan vinden. */
+  ['actorvormen.test.js', ['scripts/actorvormen.js']],
+  ['envelopvelden.test.js', ['scripts/envelopvelden.js']],
   ['loghygiene.test.js', ['server/log.js']],
   ['genreregister.test.js', ['server/seed/genres.js']],
   ['genretoegang.test.js', ['server/kern/aanmeldingen/bedrijf.js', 'server/seed/genres.js']],

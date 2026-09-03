@@ -44,6 +44,10 @@ const GEISOLEERD = [
      seconde duurt, start een andere toets een server. */
   'capabilities.test.js',
   'gezagshandelingen.test.js',
+  /* En de vierde, gevonden door dezelfde zeef een dag later (TAKEN.md 4.71):
+     envelopvelden.test.js hernoemt de tenant-regel in server/opzet/envelop.js om
+     te bewijzen dat de meter een weggevallen drager ziet. */
+  'envelopvelden.test.js',
   /* ERBIJ OP 22 AUGUSTUS 2026, en met een eerlijke slag om de arm. Deze toets
      slaagt drie van de drie keer alleen en zakte in CI binnen een scherf van 272
      bestanden op 'de zaak laat achteraf betalen' -- een betaalinstelling van een

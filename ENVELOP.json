@@ -9,20 +9,24 @@
     "routesMetPoortwachter": 3424,
     "routesTotaal": 3803,
     "actorDuplicaten": 0,
-    "actorSessies": 6
+    "actorSessies": 6,
+    "envelopVelden": 11
   },
   "veldenZonderHuis": [
     {
       "veld": "intent",
-      "wat": "wat de actor probeert te bereiken"
+      "wat": "wat de actor probeert te bereiken",
+      "reden": "een intentie spreekt een MENS uit; hem afleiden uit een verzoek is raden, en een geraden intentie in een bonnetje is erger dan een leeg veld"
     },
     {
       "veld": "risicoklasse",
-      "wat": "hoe zwaar deze handeling weegt"
+      "wat": "hoe zwaar deze handeling weegt",
+      "reden": "vraagt BELEID dat een handeling een klasse geeft; kern/frictie/motor.js rekent wel een frictiescore maar alleen voor de handelingen die RTG Command kent, en dat is geen klasse voor de 3800 routes"
     },
     {
       "veld": "omkeerbaarheid",
-      "wat": "is dit terug te draaien, en hoe"
+      "wat": "is dit terug te draaien, en hoe",
+      "reden": "HERSTELPROEF.json MEET dit voor 90 routeparen (13 exact, 30 compensatie, 1 geen-herstel, 46 zonder wereld) en dat is een waarneming en geen beleid -- maar het dekt 90 van 3800 routes. Hem op de envelop zetten zou betekenen dat 3710 routes een leeg oordeel dragen dat als oordeel leest. Zie TAKEN.md 4.71: eerst beleid, dan een drager"
     }
   ],
   "actorVormen": [
@@ -214,6 +218,64 @@
       "velden": [
         "key"
       ]
+    }
+  ],
+  "veldenZonderHuisUitleg": "AFGELEID door scripts/envelopvelden.js -- hier stond een met de hand getypte lijst waarvan TAKEN.md 4.71 beweerde dat hij geratelde was, met een commando erbij (npm run envelop:velden) dat niet bestond. Elk veld met een drager noemt een LETTERLIJKE zin uit de bron; verdwijnt die, dan zakt de meter. De drie daklozen horen dakloos te blijven tot er beleid is dat ze toekent: een verzonnen risicoklasse is gevaarlijker dan geen.",
+  "envelopVelden": [
+    {
+      "veld": "actor",
+      "staat": "gedragen",
+      "drager": "server/opzet/envelop.js :: actor: {"
+    },
+    {
+      "veld": "tenant",
+      "staat": "gedragen",
+      "drager": "server/opzet/envelop.js :: tenant: g.tenantId"
+    },
+    {
+      "veld": "capability",
+      "staat": "gedragen",
+      "drager": "server/opzet/envelop.js :: capability: tekst(g.capability"
+    },
+    {
+      "veld": "gezag",
+      "staat": "gedragen",
+      "drager": "server/opzet/envelop.js :: gezag: g.gezagBron"
+    },
+    {
+      "veld": "context",
+      "staat": "gedragen",
+      "drager": "server/opzet/envelop.js :: context: context(req"
+    },
+    {
+      "veld": "correlatie",
+      "staat": "gedragen",
+      "drager": "server/opzet/envelop.js :: 'correlatie'"
+    },
+    {
+      "veld": "doel",
+      "staat": "gedragen",
+      "drager": "server/opzet/handeling.js :: function verschil"
+    },
+    {
+      "veld": "wijzigingen",
+      "staat": "gedragen",
+      "drager": "server/opzet/handeling.js :: wijzigingen.push("
+    },
+    {
+      "veld": "intent",
+      "staat": "dakloos",
+      "drager": null
+    },
+    {
+      "veld": "risicoklasse",
+      "staat": "dakloos",
+      "drager": null
+    },
+    {
+      "veld": "omkeerbaarheid",
+      "staat": "dakloos",
+      "drager": null
     }
   ]
 }

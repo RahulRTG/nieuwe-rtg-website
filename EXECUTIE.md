@@ -205,8 +205,8 @@ niet aangenomen.
 |---|---|
 | bewezen | **<!--getal:vertrouwen.bewezen-->0<!--/getal-->** |
 | verschaald | 0 |
-| verzwakt | <!--getal:vertrouwen.routes-->4658<!--/getal--> |
-| geschorst | **<!--getal:vertrouwen.geschorst-->8<!--/getal-->** |
+| verzwakt | <!--getal:vertrouwen.routes-->4716<!--/getal--> |
+| geschorst | **<!--getal:vertrouwen.geschorst-->0<!--/getal-->** |
 | ongemeten | 5 |
 
 Daar volgen twee dingen uit die niet in een roadmap horen te ontbreken.
@@ -228,10 +228,10 @@ bestaat. Daarom: eerst schaduw, dan tanden.
 | | aantal |
 |---|---|
 | routes met een rol | <!--getal:idem.routesMetRol-->3803<!--/getal--> |
-| beoordeeld | <!--getal:idem.beoordeeld-->1563<!--/getal--> |
-| beschermd | <!--getal:idem.beschermd-->1561<!--/getal--> |
+| beoordeeld | <!--getal:idem.beoordeeld-->1564<!--/getal--> |
+| beschermd | <!--getal:idem.beschermd-->1562<!--/getal--> |
 | onbeschermd | **<!--getal:idem.onbeschermd-->2<!--/getal-->** |
-| ongemeten | <!--getal:idem.ongemeten-->3080<!--/getal--> |
+| ongemeten | <!--getal:idem.ongemeten-->3079<!--/getal--> |
 
 Dit staat er beter voor dan `CLAUDE.md` beweert (dat noemt nog 115 gemeten; dat
 cijfer is verouderd). Van alles wat beoordeeld is, is niets onbeschermd. De

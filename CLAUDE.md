@@ -427,7 +427,7 @@ ding, met `scripts/aanval.js` en `scripts/chaos.js` als eerste bouwstenen), de
 App Store-keuring keek niet naar toegankelijkheid (inmiddels wél, en als POORT:
 zie par. 9.2), en er is geen kostenvlak. En
 par. 10 draait één aanname om die vaak fout gaat: van <!--getal:idem.routesMetRol-->3803<!--/getal--> routes met een rol
-zijn er <!--getal:idem.beoordeeld-->1563<!--/getal--> beproefd op herhaalbaarheid en <!--getal:idem.ongemeten-->3080<!--/getal--> ongemeten (`IDEMPROEF.json`,
+zijn er <!--getal:idem.beoordeeld-->1564<!--/getal--> beproefd op herhaalbaarheid en <!--getal:idem.ongemeten-->3079<!--/getal--> ongemeten (`IDEMPROEF.json`,
 levend getal — `npm run getallen` houdt het bij),
 maar het doel is **niet alles idempotent — het is alles geclassificeerd**, met
 `UNKNOWN` verboden voor nieuwe publiek aanroepbare ontwikkelaarsopdrachten.
@@ -455,8 +455,8 @@ weigert wat op een contactgegeven lijkt, want met `REDIS_URL` gaat hij over een
 netwerk), **`onbekend` is geen `openbaar`** (en een gevolg erft de classificatie
 niet — dat zou raden zijn), en **de levering gaat voor** (een geweigerde actor
 houdt een melding nooit tegen, maar verdwijnt ook nooit stil). Wat er nog niet is,
-staat er met de meting erbij: van de <!--getal:idem.beoordeeld-->1563<!--/getal--> beproefde muterende routes zijn er
-<!--getal:idem.beschermd-->1561<!--/getal--> retry-veilig, en een schemaregister (`payment.authorized.v1` met een vorm
+staat er met de meting erbij: van de <!--getal:idem.beoordeeld-->1564<!--/getal--> beproefde muterende routes zijn er
+<!--getal:idem.beschermd-->1562<!--/getal--> retry-veilig, en een schemaregister (`payment.authorized.v1` met een vorm
 erachter) bestaat niet — de envelop zegt met opzet nooit WAT. Zeven punten die een besluit van de eigenaar vragen staan in par. 4.
 **Het goedkoopste daarvan is genomen (27 augustus 2026):** het woord dat in twee
 lagenmodellen niet hetzelfde betekende, is hernoemd — laag 4 van `PLATFORM.md`

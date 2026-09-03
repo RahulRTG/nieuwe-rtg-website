@@ -78,6 +78,16 @@ function rolVan(bewakers) {
    member, supplier". Een tweede plek voor een waarheid, en de zwakste won
    (LAT.md regel 4). */
 
+/* DE WACHT VOOR HET REQUIREN, en die stond hier niet.
+
+   Dit script SCHRIJFT een register. Een laadcontrole (`node -e "require(...)"`)
+   startte daarmee de hele proef met de standaardbegrenzing en schreef het
+   register terug -- dat is een keer echt gebeurd met ROLPROEF.json, dat van 3377
+   beproefde routes terugviel naar 292 en er daarna volkomen normaal uitzag.
+   scripts/meetkeuring.js handhaaft deze regel; hij zag dit bestand pas toen het
+   op 2 september 2026 een stempel kreeg en daarmee als register meetelde. */
+if (require.main !== module) return;
+
 (async () => {
   /* RTG_DEMO + RTG_MAGNAAT_TEST minten alleen de TOKENS; de routes die daarna
      worden beproefd zijn de echte, met hun echte bewakers ervoor. Zelfde

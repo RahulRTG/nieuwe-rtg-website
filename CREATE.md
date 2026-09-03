@@ -706,8 +706,8 @@ journaal zou het onaanvaardbaar zijn, en daarom staat dat ergens anders.
 ## 10. Mutatiesemantiek: geclassificeerd, niet idempotent
 
 `IDEMPROEF.json` meet wat er gebeurt als een route twee keer wordt aangeroepen:
-van **<!--getal:idem.routesMetRol-->3803<!--/getal--> routes met een rol** zijn er **<!--getal:idem.beoordeeld-->1563<!--/getal--> beoordeeld,
-<!--getal:idem.beschermd-->1561<!--/getal--> beschermd, <!--getal:idem.onbeschermd-->2<!--/getal--> onbeschermd en <!--getal:idem.ongemeten-->3080<!--/getal--> ongemeten**
+van **<!--getal:idem.routesMetRol-->3803<!--/getal--> routes met een rol** zijn er **<!--getal:idem.beoordeeld-->1564<!--/getal--> beoordeeld,
+<!--getal:idem.beschermd-->1562<!--/getal--> beschermd, <!--getal:idem.onbeschermd-->2<!--/getal--> onbeschermd en <!--getal:idem.ongemeten-->3079<!--/getal--> ongemeten**
 (levende getallen: `npm run getallen` schrijft ze uit `IDEMPROEF.json`). Het
 bestand zegt er zelf bij dat "onbeschermd" een telling is en geen defect-oordeel
 — en dat is juist. Het getal dat ertoe doet is dat van de ongemeten routes.

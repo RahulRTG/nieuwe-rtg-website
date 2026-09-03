@@ -231,7 +231,7 @@ module.exports = { meet, LEZERS, GEEN_LEZER, DOEL };
 
 if (require.main === module) {
   const u = meet();
-  if (process.argv.includes('--json')) { console.log(JSON.stringify(u)); process.exit(0); }
+  if (process.argv.includes('--json')) { console.log(JSON.stringify(u)); return; }
   druk(u);
   /* Zakt op een lezer die niemand heeft ingedeeld, en op een die uit de lijst
      is verdwenen: allebei betekenen ze dat deze kaart niet meer klopt met de

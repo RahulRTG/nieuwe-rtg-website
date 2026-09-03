@@ -500,7 +500,7 @@ if (require.main === module) {
   const { alleRoutes } = require('./lib/routes');
   const u = meet({ routes: alleRoutes() });
   if (u.fout) { console.error(u.fout); process.exit(1); }
-  if (argv.includes('--json')) { console.log(JSON.stringify(u)); process.exit(0); }
+  if (argv.includes('--json')) { console.log(JSON.stringify(u)); return; }
   druk(u);
   if (argv.includes('--vastleggen')) {
     fs.writeFileSync(DOEL, JSON.stringify(u, null, 2) + '\n');

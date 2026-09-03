@@ -34,6 +34,7 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
+const { stempel } = require('./lib/stempel');
 const WORTEL = path.join(__dirname, '..');
 const BRON = ['server/kern/gastzorg.js', 'server/kern/gastzorg-profiel.js'];
 
@@ -95,6 +96,17 @@ function meet() {
   const bevroren = kopieen.filter(p => !p.gestempeld);
   return {
     bron: BRON,
+    /* WANNEER, EN TEGEN WELKE CODE. Zonder dit ziet een register van vorige
+       maand er identiek uit aan een verse, en worden de getallen geloofd. */
+    stempel: stempel(),
+    /* WAT DEZE METER NIET AANTOONT. Zonder deze zin leest "0 naamloos, 0
+       bevroren" als "gegevens werken overal correct door", en dat is drie maten
+       te groot: hij leest de BRON en volgt geen enkele waarde door een verzoek. */
+    grens: 'Dit is een LEESMETING op de bron: hij telt aanroepen van zorgVoor en zorgMee en ' +
+      'kijkt of er een zaak bij staat en of het antwoord wordt bewaard. Hij bewijst NIET dat een ' +
+      'doorgegeven profiel klopt, niet dat de ontvanger het gebruikt, en niet dat kopieën die al ' +
+      'in de database staan een stempel hebben gekregen. Het is een van de doorwerkingen in dit ' +
+      'huis en niet alle.',
     telling: {
       punten: punten.length, eigen: punten.length - derde.length, derde: derde.length,
       benoemd: derde.length - naamloos.length, naamloos: naamloos.length,

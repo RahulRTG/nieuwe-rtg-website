@@ -441,7 +441,7 @@ module.exports = { meet, DOEL };
 
 if (require.main === module) {
   meet().then(u => {
-    if (process.argv.includes('--json')) { console.log(JSON.stringify(u)); process.exit(u.sluit ? 0 : 1); }
+    if (process.argv.includes('--json')) { console.log(JSON.stringify(u)); process.exitCode = u.sluit ? 0 : 1; return; }
     druk(u);
     if (process.argv.includes('--vastleggen')) {
       fs.writeFileSync(DOEL, JSON.stringify(u, null, 2) + '\n');

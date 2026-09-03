@@ -224,7 +224,7 @@ module.exports = { meet, THEMAS, KETENS, DOEL };
 if (require.main === module) {
   const u = meet();
   if (u.fout) { console.error(u.fout); process.exit(1); }
-  if (process.argv.includes('--json')) { console.log(JSON.stringify(u)); process.exit(0); }
+  if (process.argv.includes('--json')) { console.log(JSON.stringify(u)); return; }
   druk(u);
   if (process.argv.includes('--vastleggen')) {
     fs.writeFileSync(DOEL, JSON.stringify(u, null, 2) + '\n');

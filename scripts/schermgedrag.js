@@ -31,6 +31,15 @@
 
    Draaien: npm run schermgedrag -> SCHERMGEDRAG.json */
 'use strict';
+
+/* DE WACHT. Dit script rekent en SCHRIJFT bij het laden: er is geen meet()
+   die je los kunt aanroepen, alles staat op het hoogste niveau. Een enkele
+   laadcontrole (node -e "require('./scripts/schermgedrag')") zou het register dus
+   overschrijven met wat die aanroep toevallig meet -- exact de fout waarmee
+   ROLPROEF.json van 3377 beproefde routes terugviel naar 292, en het register
+   zag er daarna volkomen normaal uit. Vandaar dat requiren hier niets doet.
+   Wie de uitslag in code nodig heeft, leest het register. */
+if (require.main !== module) return;
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');

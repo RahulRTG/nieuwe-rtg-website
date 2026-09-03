@@ -36,6 +36,20 @@
     '.bss-wat{font-size:.84rem;color:#ccc;line-height:1.55;}' +
     '.bss-doe{margin:0;padding-left:1.1rem;font-size:.82rem;color:#bbb;line-height:1.6;}' +
     '.bss-tip{font-size:.8rem;color:#d7c690;line-height:1.5;border-top:1px solid rgba(255,255,255,.08);padding-top:.55rem;}' +
+    /* De hulplaag onder de uitleg. Eigen scheidingslijn, want het is een ander
+       soort ding: hierboven staat wat dit scherm IS, hieronder wat je doet als
+       het niet werkt. De knoppen halen 2,6rem zodat ze op telefoonformaat boven
+       de 24x24 van WCAG 2.5.8 blijven; dat is de maat die de a11y-keuring op
+       elk raakvlak natelt. */
+    '.bss-hulp{border-top:1px solid rgba(255,255,255,.08);padding-top:.55rem;display:flex;flex-direction:column;gap:.45rem;}' +
+    '.bss-hulp b{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:#d7c690;font-weight:600;}' +
+    '.bss-hulp p{font-size:.8rem;color:#bbb;line-height:1.5;margin:0;}' +
+    '.bss-rij{display:flex;gap:.4rem;flex-wrap:wrap;}' +
+    '.bss-hulp button,.bss-zaak button{background:transparent;border:1px solid #555;border-radius:0;color:#eee;font:inherit;font-size:.8rem;padding:.5rem .7rem;min-height:2.6rem;min-width:2.6rem;cursor:pointer;}' +
+    '.bss-hulp button.bss-ja,.bss-zaak button.bss-ja{background:#eee;color:#111;border-color:#eee;font-weight:600;}' +
+    '.bss-zaak{font-size:.78rem;color:#bbb;line-height:1.5;border-left:2px solid #444;padding-left:.55rem;display:flex;flex-direction:column;gap:.35rem;}' +
+    '.bss-zaak i{font-style:normal;color:#d7c690;}' +
+    '.bss-veld{width:100%;background:transparent;color:#eee;border:1px solid #555;border-radius:0;font:inherit;font-size:.82rem;padding:.5rem;}' +
     /* In een split-paneel is de grote titel dubbelop: je hebt de app zelf net
        gekozen in de paneelkiezer. De titel en de terugknop gaan daarom uit het
        zicht maar blijven in de toegankelijkheidsboom (zelfde techniek als

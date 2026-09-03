@@ -1,16 +1,16 @@
 {
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
-  "vastgelegd": "2026-09-02",
+  "vastgelegd": "2026-09-03",
   "gemeten": {
-    "bestanden": 2002,
-    "vormen": 1340,
-    "velden": 1941,
-    "modules": 720,
-    "domeinen": 253,
+    "bestanden": 2027,
+    "vormen": 1348,
+    "velden": 1955,
+    "modules": 728,
+    "domeinen": 254,
     "envelopDrempel": 16,
     "envelop": 30,
-    "veldenDomeineigen": 1379,
-    "veldenGedeeldVanafVier": 193,
+    "veldenDomeineigen": 1390,
+    "veldenGedeeldVanafVier": 194,
     "gelijkendeVormparen": 20
   },
   "envelop": [
@@ -95,6 +95,18 @@
       ]
     },
     {
+      "veld": "doel",
+      "domeinen": 14,
+      "waar": [
+        "kern/appstore",
+        "kern/commercie",
+        "kern/defensie",
+        "kern/labfonds",
+        "kern/magnaat-trainingslobby",
+        "kern/pay"
+      ]
+    },
+    {
       "veld": "waarom",
       "domeinen": 14,
       "waar": [
@@ -140,18 +152,6 @@
         "kern/livinglab",
         "kern/magnaat-economenlab-rapport",
         "kern/magnaat-economie"
-      ]
-    },
-    {
-      "veld": "doel",
-      "domeinen": 13,
-      "waar": [
-        "kern/appstore",
-        "kern/commercie",
-        "kern/defensie",
-        "kern/labfonds",
-        "kern/magnaat-trainingslobby",
-        "kern/pay"
       ]
     },
     {
@@ -236,6 +236,18 @@
         "kern/magnaat-capabilities",
         "kern/magnaatwereld",
         "kern/mailsleutel"
+      ]
+    },
+    {
+      "veld": "zaak",
+      "domeinen": 11,
+      "waar": [
+        "kern/appstore",
+        "kern/avond",
+        "kern/bureau",
+        "kern/commerce",
+        "kern/fiscaal",
+        "kern/mobiliteit"
       ]
     },
     {
@@ -392,18 +404,6 @@
         "kern/gebouw-demo",
         "kern/mobiliteit",
         "kern/rtfos"
-      ]
-    },
-    {
-      "veld": "zaak",
-      "domeinen": 10,
-      "waar": [
-        "kern/appstore",
-        "kern/avond",
-        "kern/bureau",
-        "kern/commerce",
-        "kern/fiscaal",
-        "kern/mobiliteit"
       ]
     },
     {

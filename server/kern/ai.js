@@ -21,8 +21,18 @@ const { dagContext } = require('./context');
 // regelantwoorden (die komen niet langs een model, dus een prompt helpt daar niet).
 const { schrob } = require('./rahul/taal');
 const router = require('./ai/router');
+/* De overnameregel woont in de servicelaag en niet hier: welke pas een mens
+   kent, is geen eigenschap van de AI. Pure module, geen state -- zie
+   kern/service/mens.js. */
+const mensLaag = require('./service/mens');
 
 function maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice, i18n, ledenInhoudVan, stemmingVoor, geloofRegel }) {
+  /* DE HAAK NAAR RTG SERVICE, LAAT GEBONDEN. maakAi() draait in server.js
+     ruim voordat kern/service in kernlaag7 wordt opgehangen, dus de laag kan
+     hier niet gewoon worden meegegeven. Zelfde vorm als zetRtgai elders: een
+     zetter, en een eerlijke tak voor het geval hij nooit wordt aangeroepen. */
+  let overdracht = null;
+  const zetServiceOverdracht = (fn) => { overdracht = typeof fn === 'function' ? fn : null; };
   /* De promptlaag (system prompt + regelantwoorden) draait als submodule
      op een gedeelde context, een keer opgebouwd bij het opstarten. */
   const ctx = { db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice, i18n, ledenInhoudVan,
@@ -79,7 +89,35 @@ function maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice,
       // Rahul (AI) antwoordt meteen, in de taal van het lid.
       const reply = await generateAiReply(user.tier, md.conversation, lang, 'user-' + user.id);
       md.conversation.push({ from: 'rahul', text: reply.text, lang: reply.lang, at: new Date().toISOString(), channel: 'rahul' });
+
+      /* HIER STOND `md.needsConcierge = false;` EN VERDER NIETS.
+
+         Dat was geen bug maar de merkregel, eerlijk uitgevoerd: de RTG Pass
+         krijgt De Rechterhand niet. Het GEVOLG was wel een gebrek -- een
+         RTG-lid dat in de chat om een mens vroeg, kwam nergens uit. Er was een
+         mens voor hem (de ledenbalie helpt elk lid), en de melder was de enige
+         die niet bij hem kon.
+
+         De regel blijft dus staan, met de betekenis die hij hoorde te hebben:
+         geen CONCIERGE. Dat is iets anders dan geen mens. Vraagt het lid om
+         een mens, dan gaat dat verzoek naar RTG Service, dat er een zaak van
+         maakt en hem bij het team Leden neerlegt. De concierge-inbox blijft
+         onaangeroerd -- die is en blijft van Lifestyle en Business.
+
+         WAAROM DE ANDERS-TAK LUID IS. Zonder haak zou dit stilletjes terugvallen
+         op precies het gedrag dat hersteld moest worden, en niemand zou het
+         merken. Een lid dat om een mens vraagt en niets hoort, is de duurste
+         stille breuk die deze laag kan hebben (LAT.md regel 5). */
       md.needsConcierge = false;
+      if (mensLaag.vraagtOmMens(text)) {
+        if (overdracht) {
+          try { overdracht(user, String(text).slice(0, 500)); }
+          catch (e) { console.error('[ai] overdracht naar service', e && e.message); }
+        } else {
+          console.error('[ai] een lid vroeg om een mens, maar RTG Service is niet aangesloten ' +
+            '(zetServiceOverdracht is nooit aangeroepen). Het verzoek is NIET doorgezet.');
+        }
+      }
     } else {
       // Lifestyle/Business: een mens (concierge) reageert via de backoffice.
       md.needsConcierge = true;
@@ -130,6 +168,6 @@ function maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice,
       .sort((a, b) => (b.needsConcierge - a.needsConcierge) || (new Date(b.lastAt) - new Date(a.lastAt)));
   }
 
-  return { aiSystemPrompt, cannedAnswer, generateAiReply, convOf, memberSays, noteerBeurt, conciergeInbox };
+  return { aiSystemPrompt, cannedAnswer, generateAiReply, convOf, memberSays, noteerBeurt, conciergeInbox, zetServiceOverdracht };
 }
 module.exports = { AI_TONE, maakAi };

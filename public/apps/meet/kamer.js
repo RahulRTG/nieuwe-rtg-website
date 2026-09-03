@@ -156,7 +156,9 @@
        dus we lopen de deelnemers langs. Wie later binnenkomt mist wat er voor
        zijn tijd is getypt -- dat is dezelfde grens als bij het gesprek zelf. */
     if (window.RTGMeelezen && !mee) {
-      mee = window.RTGMeelezen.maak({ ik: ik, stuur: function (regel) {
+      mee = window.RTGMeelezen.maak({ ik: ik,
+        stroom: function () { return stream; },
+        stuur: function (regel) {
         Object.keys(peers).forEach(function (n) { if (n !== ik) sein(n, 'tekst', { r: regel }); });
       } });
       var vak = $('#tegels'); if (vak && vak.parentNode) vak.parentNode.insertBefore(mee.el, vak.nextSibling);

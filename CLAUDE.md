@@ -626,6 +626,111 @@ release-provenance (geen SLSA, geen SBOM, geen build-attestatie) en een zoeker
 die zelf tegenvoorbeelden genereert — `scripts/sabotage.js` overtreedt elke wet
 één keer met opzet, en dat is iets anders dan zoeken.
 
+**`SERVICE.md` is de laag die de hulplijnen orkestreert** -- RTG Service: niet
+een vijfde klantenservice naast de vier die er al waren (de AI van de RTG Pass,
+de menselijke concierge, de ledenbalie en RTG Bijstand), maar de
+GEMEENSCHAPPELIJKE ENVELOP eromheen. Lees die voor je iets bouwt waarmee een
+gebruiker om hulp vraagt of waarmee een medewerker in het dossier van iemand
+anders kijkt. Die vier blijven bepalen wat iets BETEKENT -- een klacht blijft van
+`kern/ledenbalie-zaken.js` -- en Service bepaalt wie eraan werkt, sinds wanneer,
+met welke bevoegdheid en wat de melder ziet. Het fundamentele object is daarom
+een **Zaak met een tijdlijn** en geen ticket met een status: stand, eigenaar,
+prioriteit en de vier klokken zijn er allemaal uit AF TE LEIDEN, en
+`kern/service/loop.js` is de enige module die die tijdlijn schrijft. Drie dingen
+die niet mogen sneuvelen: **een zaak weet waarover het gaat en opent niets** (het
+veld `betrokken` is een soort plus een code, en `verwijzing()` gooit al het
+andere weg -- gegevens vragen een machtiging, en die vraagt een bevestiging van
+het lid), **een machtiging kan alleen versmallen** (de doorsnede met wat het team
+nodig heeft, met verval als BEREKENDE toestand en een tweede handtekening onder
+zwaar werk -- de vorm van `kern/command/bijstand.js`, met de zaak als bereik), en
+**"ik wil een mens" is een contract en geen beleefdheid**. Dat laatste herstelt
+een echt gebrek: `kern/ai.js` zette voor de RTG Pass hard `needsConcierge = false`,
+en dat klopte als merkregel (de RTG Pass krijgt De Rechterhand niet) maar liet
+een lid nergens bij een MENS uitkomen terwijl de ledenbalie hem gewoon helpt.
+`kern/service/mens.js` haalt die twee uit elkaar -- De Rechterhand is
+UITVOERING en blijft gekocht, een mens bij een probleem is een ONDERGRENS voor
+elk lid met een account -- en `test/servicemens.test.js` houdt per pas vast dat
+hij die zelf kan aanvragen. De vaste steuncode van de balie is vervangen door een
+**bevestiging** (het lid ziet wie, waarvoor en wat er opengaat, en drukt zelf),
+met de code als terugval: zes cijfers, vijf minuten, een keer, aan die ene zaak
+gebonden. Par. 5 heeft vier klokken waarvan de vierde -- wacht op de melder --
+van de andere drie wordt AFGETROKKEN, want zonder hem meet je de melder. Par. 7
+is de schaalwinst: twintig meldingen die hetzelfde zeggen worden een VERMOEDEN
+(geen tweede incident -- dat blijft van `kern/command/incident.js`, en het
+nummer komt daarvandaan), een mens bevestigt, en daarna is het EEN oplossing en
+twintig melders die vanzelf worden bijgewerkt -- maar **een hersteld incident
+sluit geen zaken**, want dat de storing weg is bewijst niet dat het probleem van
+dit lid weg is. Par. 8: de persoonlijke stand zegt NOOIT "alles werkt"
+(beschikbaarheid wordt niet per lid gemeten) en houdt uit elkaar wat een storing
+IS en wat Service erover heeft GEMELD. Par. 9: foutsignalen op vingerafdruk,
+waarbij `gebruikers` op `null` staat MET de reden -- de foutingang is zonder
+inlog en kent geen mensen om te tellen. Par. 13c is RTMail als INGANG: post aan `hulp@` wordt een zaak, met de melder
+uit de identiteitskluis -- een besluit van de eigenaar met een prijs die
+uitgeschreven staat, want de mailingang wordt daarmee een LEESWEG NAAR DE KLUIS
+en draagt dus reden en journaalregel. De scherpste vraag daar is niet de kluis
+maar de AFZENDER: `From:` is door iedereen te typen, dus de kluis wordt pas
+bevraagd als DKIM of DMARC hem bevestigt (SPF alleen niet -- die spreekt over de
+envelop en niet over de From die wij opzoeken). Zonder stempel geen zaak, mét de
+reden en nooit stil. Par. 13 is bellen naar RTG BINNEN de app (geen
+provider, geen nummer, en de zaak ligt ernaast open): een dienst van Lifestyle en
+Business, terwijl EEN MENS dat nadrukkelijk niet is -- die ondergrens uit par. 3
+blijft voor elk account gelden, en de weigering om te bellen zegt er de weg naar
+een mens bij. Beide kanten dragen een MEELEESBAAN (`shared/meelezen.js`), want een
+live gesprek zonder weg naar tekst sluit een dove deelnemer uit -- en dat gesprek
+heeft de ratel `OPEN_MAX` in `scripts/check.js` van 8 naar 10 gezet. Die mag
+volgens zijn eigen regel alleen omlaag; de verhoging staat daar dus
+UITGESCHREVEN, met de reden en met het adres van wat hem weer omlaag brengt (een
+lokaal spraakmodel via LOCAL_AI_URL). Wie een ratel omzeilt zonder het te zeggen,
+sloopt de ratel zelf.
+Par. 13d is het ondertitelen: `kern/spraaktekst.js` zet spraak om met een LOKAAL
+model en wijkt NOOIT uit naar buiten -- een tekstantwoord bij de derde aanbieder
+is net zo goed, de stem van een lid niet. Iedereen ondertitelt ZICHZELF (de
+spreker beslist over zijn eigen stem, en niemand ondertitelt een ander achter zijn
+rug), de knop hangt in de meeleesbaan zelf zodat alle acht gesprekken hem tegelijk
+kregen, en de ratel van keuringsregel 49 ging daarmee van 10 naar 2. Die twee zijn
+UITZENDINGEN: eenrichting, dus zichzelf ondertitelen helpt de kijker niets. Par.
+13e is de capability-telling (`scripts/servicecaps.js`), en die vond eerst geen
+ontbrekende poort maar een bevoegdheid die er niet in hoorde: **`zaak.lezen` hangt
+aan de ZETEL en niet aan een bevestiging** -- het lid las bij elk verzoek "opent:
+zaak.lezen" en gaf dus toestemming voor iets dat de medewerker al mocht. Elke
+bevoegdheid draagt nu een GROND, en 8 van de 9 die het lid bevestigt hebben nog
+geen lezer: ratel 65, mag alleen omlaag.
+Par. 12 is de kwaliteitsmaat, en die is met opzet geen
+afhandeltijd: gemeten wordt hoeveel problemen zijn opgelost ZONDER dat de melder
+zijn verhaal opnieuw hoefde te doen -- en wat er NIET gemeten wordt (tevredenheid,
+afhandeltijd per medewerker, een samengesteld rapportcijfer) staat mét de reden
+in het antwoord zelf, want een leeg vak wordt gevuld met iemands eigen indruk.
+Par. 11 is de ingang voor een ZAAK, die er
+niet was: een leverancier kon RTG nergens iets melden -- er stond wel een zin over
+een vaste contactpersoon, maar geen kanaal. Het systeem vraagt daar niet wie er
+meldt (de zaakcode komt uit de sessie), de doelgroep wordt door de ROUTE gezet en
+niet uit het lichaam gelezen, en een zaak krijgt een MENS en niet De Rechterhand
+-- welke tabel geldt leest `loop.mensVraag()` uit de DOELGROEP van de zaak.
+De AI heeft er drie rollen en maar
+een ervan kan iets OPENEN: die vraagt langs dezelfde weg als een medewerker
+(`kern/service/onderzoeker.js`) en het lid ziet dat er een MACHINE vraagt --
+afgeleid uit het voorvoegsel `ai:`, dat niemand zelf kan zetten. Vier grenzen
+eromheen: de AI vraagt niet uit zichzelf (het zijn routes van een mens, want een
+machine die overal standaard om toegang vraagt maakt van de bevestigingsknop een
+reflex), krijgt nooit zwaar werk (dat vraagt een tweede MENS, en die
+handtekening kan hij niet zetten), leent nooit een machtiging die op naam van een
+mens staat, en opent niets voordat het lid heeft gedrukt. Dat is meteen de eerste
+plek waar `magNu()` een AANROEPER heeft -- tot dan legde de machtiging toestemming
+vast maar opende zij niets, voor een mens net zo min als voor een AI. Par. 10 is de cockpit
+(`/apps/service.html`): zaakgericht en met opzet ZONDER ledenzoeker -- vrije
+inzage blijft bij de ledenbalie, met een reden en een journaalregel -- en alles
+wat het bord beweert draagt een "waarom?", inclusief wat er NIET is gewogen. Het
+bord stelt geen oorzaak vast en zegt dat er ook bij. En par. 13 staat er even
+groot bij: de kale meetronde over de zevenentwintig routes vond VIER fouten die
+geen enkele toets zag en die er bij het LEZEN alle vier prima uitzagen --
+waaronder twee dubbelklikken die twintig melders twee keer hetzelfde stuurden.
+Twee vondsten uit de browsertoets horen daar los bij, want ze gelden voor ELK
+scherm: een functie `open()` op het hoogste niveau van een klassiek script
+overschaduwt `window.open` die de gedeelde schil gebruikt, en die schil laadt met
+`defer` en verbouwt de header -- schrijf je als eerste in `#titel`, dan sloopt de
+TypeError je hele werkblad voordat het gevuld is, en dat ziet eruit als een
+willekeurige flake.
+
 **`ONTWERP.md` is het RTG Design System 2.0** — de vormtaal: merk-elementen
 tegenover werk-elementen (Bodoni is ceremonieel en staat op een gesloten lijst
 rollen), de drie modi World/Pro/Command, uitzonderingsgestuurd ontwerpen, kleur

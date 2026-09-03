@@ -2206,14 +2206,15 @@ var RTG_BOUW = 'b3bf2c3b';
   let csMee = null;       // de tekstbaan van het gesprek (shared/meelezen.js)
 
   /* MEELEZEN. Zonder tekstbaan kan wie doof is niet meedoen aan een gesprek in
-     dit huis (TOEGANKELIJK.md). Wat erin staat is getypt door een mens en niet
-     uit spraak herkend -- zie de kop van /shared/meelezen.js voor waarom hier
-     geen automatische ondertiteling in zit. */
+     dit huis (TOEGANKELIJK.md). Getypt EN, waar een lokaal model draait,
+     herkend uit de eigen stem -- zie /shared/meelezen.js en /shared/meeluister.js. */
   function csBaan(){
     if (csMee || !window.RTGMeelezen) return csMee;
-    csMee = window.RTGMeelezen.maak({ stuur: r => {
-      if (call) API.call('/member/call', { toKey: call.withKey, kind: 'tekst', payload: { r } }).catch(()=>{});
-    } });
+    csMee = window.RTGMeelezen.maak({
+      stroom: () => (call && call.stream) || null,
+      stuur: r => {
+        if (call) API.call('/member/call', { toKey: call.withKey, kind: 'tekst', payload: { r } }).catch(()=>{});
+      } });
     csMee.el.style.cssText += 'position:absolute;left:12px;right:12px;bottom:96px;z-index:4;color:#F7F5F1;';
     const scherm = $('#callScreen'); if (scherm) scherm.appendChild(csMee.el);
     return csMee;

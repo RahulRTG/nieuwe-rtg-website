@@ -125,4 +125,18 @@ module.exports = function hangDwarseRoutersOp(grens) {
      wachtwoord of een klacht. Achter een eigen zetel, niet achter de gedeelde
      kantoorcode -- iemands account aanraken hoort een naam te hebben. */
   require('../routes/ledenbalie')(grens('ledenbalie'));
+  /* RTG Service: de gedeelde envelop over de vier bestaande hulplijnen. De kant
+     van de melder en de kant van het kantoor staan in twee bestanden, met de
+     naad op de LEZER -- een lid ziet zijn eigen zaken, het kantoor ziet de
+     wachtrij en beslist. Zelfde domeingrens: een tweede lezer van dezelfde kern
+     is geen tweede domein. Na de ledenbalie, want de kantoorkant hangt aan
+     dezelfde zetel. */
+  require('../routes/service')(grens('service'));
+  require('../routes/service-kantoor')(grens('service'));
+  /* En de kant van een ZAAK. Een leverancier, restaurant, vervoerder of gemeente
+     kon RTG nergens een hulpvraag stellen -- er was wel een zin over een vaste
+     contactpersoon, maar geen kanaal. Derde bestand om dezelfde reden als de
+     tweede: de naad ligt op de LEZER, en dit is een derde poort (supplierAuth)
+     en geen derde domein. */
+  require('../routes/service-zaak')(grens('service'));
 };

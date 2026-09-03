@@ -205,16 +205,62 @@ test('DE BEDRADING: elke gespreksvorm die de baan draagt, stuurt en ontvangt hem
   }
 });
 
-test('DE ZES GESPREKKEN LADEN DE MODULE OOK ECHT', () => {
+test('ELKE PAGINA DIE DE BAAN GEBRUIKT, LAADT DE MODULE OOK ECHT', () => {
   /* Een module die in de code wordt aangeroepen maar nergens wordt ingeladen,
      is een stille `if (window.RTGMeelezen)` die altijd false is -- en dan ziet
      het scherm er compleet uit terwijl er niets is. Dit is precies de vorm die
-     LAT.md regel 9 bedoelt. */
+     LAT.md regel 9 bedoelt.
+
+     DEZE TOETS STOND HIER AL, MET EEN LIJST VAN ZES SCHERMEN DIE MET DE HAND WAS
+     GETYPT -- en hij miste er twee. `personeel.html` en `leverancier.html` laden
+     `shared/teamcall.js`, dat netjes `w.RTGMeelezen` aanroept, maar zij laadden
+     `shared/meelezen.js` nergens. De tekstbaan van de teamcall verscheen daar dus
+     stil niet, terwijl het toegankelijkheidsregister hem claimde en deze toets
+     groen stond. Een handgetypte lijst mist precies wat er nieuw bij komt.
+
+     Daarom wordt de lijst nu AFGELEID: elk bestand in public/ dat de baan
+     aanroept, wordt teruggezocht naar de pagina's die het laden -- rechtstreeks
+     of via zijn bundel -- en die moeten allebei de modules dragen. */
   const WORTEL = path.join(__dirname, '..');
-  const SCHERMEN = ['public/apps/app.html', 'public/apps/meet.html', 'public/apps/schoolpartner.html',
-    'public/apps/foundation/school.html', 'public/apps/foundation/contact.html', 'public/apps/foundation/vrienden.html'];
-  for (const rel of SCHERMEN) {
-    const s = fs.readFileSync(path.join(WORTEL, rel), 'utf8');
-    assert.match(s, /shared\/meelezen\.js/, rel + ' laadt shared/meelezen.js');
+
+  const alles = (map, uit = []) => {
+    for (const n of fs.readdirSync(map, { withFileTypes: true })) {
+      const q = path.join(map, n.name);
+      if (n.isDirectory()) { if (n.name !== 'dist') alles(q, uit); }
+      else if (/\.(js|html)$/.test(n.name)) uit.push(q);
+    }
+    return uit;
+  };
+  const bestanden = alles(path.join(WORTEL, 'public'));
+  const lees = (f) => fs.readFileSync(f, 'utf8');
+  const rel = (f) => path.relative(WORTEL, f).replace(/\\/g, '/');
+
+  /* Wie roept de baan aan? Alleen een echte aanroep telt; een module die het
+     woord in een commentaar noemt, gebruikt hem niet. */
+  const aanroepers = bestanden.filter(f => f.endsWith('.js') && /RTGMeelezen\.maak/.test(lees(f)))
+    .map(rel).filter(r => r !== 'public/shared/meelezen.js');
+  assert.ok(aanroepers.length >= 6, 'de baan wordt bijna nergens aangeroepen: ' + aanroepers.join(', '));
+
+  /* Een bundeldeel wordt niet los geladen; zijn BUNDEL wel. public/x/y-01.js
+     hoort bij public/x.js -- zo knipt scripts/bundel.js. */
+  const zoekNamen = (r) => {
+    const m = /^(.*)\/([^/]+)-\d+[a-z]?\.js$/.exec(r);
+    return m ? [r, m[1] + '.js', m[1].replace(/\/[^/]+$/, '') + '/' + path.basename(m[1]) + '.js'] : [r];
+  };
+
+  const paginas = bestanden.filter(f => f.endsWith('.html'));
+  const zonder = [];
+  for (const r of aanroepers) {
+    const namen = zoekNamen(r).map(x => x.replace(/^public/, ''));
+    for (const pg of paginas) {
+      const t = lees(pg);
+      if (!namen.some(n => t.includes('src="' + n + '"'))) continue;
+      if (!/shared\/meelezen\.js/.test(t)) zonder.push(rel(pg) + ' laadt ' + r + ' maar niet meelezen.js');
+      /* En de ondertiteling erbij: zonder shared/meeluister.js verschijnt de knop
+         nergens, en dan draagt dit gesprek alleen meetypen -- terwijl de keuring
+         hem als ondertiteld telt. */
+      if (!/shared\/meeluister\.js/.test(t)) zonder.push(rel(pg) + ' laadt ' + r + ' maar niet meeluister.js');
+    }
   }
+  assert.deepEqual(zonder, [], zonder.join('\n  '));
 });

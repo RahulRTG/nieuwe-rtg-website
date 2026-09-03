@@ -130,6 +130,11 @@ module.exports = function bouwKernAan(kern, grens) {
   require('../routes/podium')(grens('podium'));
   require('../routes/ghost')(grens('ghost'));
   require('../routes/flits')(grens('flits'));
+  /* ONDERTITELEN IN EEN LIVE GESPREK, huisbreed. Vijf gesprekssoorten delen
+     dezelfde meeleesbaan; die delen daarom ook dezelfde ondertitelweg. Een route
+     per soort zou vier keer dezelfde grens opnieuw bedenken, en dan is de vijfde
+     de eerste die hem mist (kern/spraaktekst.js). */
+  require('../routes/spraaktekst')(grens('spraaktekst'));
   require('../routes/theater')(grens('theater'));
   require('../routes/wbw')(grens('wbw'));
   require('../routes/ov')(grens('ov'));

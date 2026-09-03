@@ -123,6 +123,12 @@ let commit = 'onbekend';
 try { commit = execSync('git rev-parse --short HEAD', { cwd: WORTEL }).toString().trim(); } catch (e) { /* geen git */ }
 
 const uit = {
+  /* Wat voor SOORT bewering doet dit register? `index` = structuur en
+     relaties (waar woont wat, wat hangt met wat samen). `meting` = een
+     uitspraak over gedrag (schrijft het, klopt het, is het bewezen). Het
+     verschil is niet cosmetisch: een index noemt bijna alles en maakt elke
+     dekkingsvraag triviaal waar, dus scripts/codewereld.js telt hem apart. */
+  soort: 'meting',
   uitleg: 'De tweede, onafhankelijke bron onder de brug route -> bestand: gevraagd aan de ROUTER (wat de server werkelijk aanbiedt) in plaats van gelezen uit de bronboom. Bestaat om ' + ANDER + ' toetsbaar te maken; zonder tweede bron betekent "geen tegenspraak" niets.',
   stempel: { op: new Date().toISOString(), commit },
   vergelekenMet: { register: ANDER, stempel: anderStempel },

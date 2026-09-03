@@ -74,19 +74,53 @@ function bestanden(map) {
    Bij de eerste twee blijft `geexporteerd` per symbool ONBEKEND in plaats van
    vals nee -- dat verschil is de hele reden dat deze functie bestaat. */
 function uitvoer(ast) {
-  let gevonden = null;
+  let gevonden = null, bijgemengd = false;
   loop(ast, n => {
+    /* `Object.assign(module.exports, require('./x'))` mengt een heel ander
+       bestand bij. Wat daaruit komt is hier niet te zien, dus de lijst is
+       vanaf dat moment onvolledig. */
+    if (n.type === 'CallExpression' && n.callee && n.callee.type === 'MemberExpression' &&
+        n.callee.object && n.callee.object.name === 'Object' && n.callee.property && n.callee.property.name === 'assign') {
+      const doel = (n.arguments || [])[0];
+      if (doel && doel.type === 'MemberExpression' && doel.object && doel.object.name === 'module' &&
+          doel.property && doel.property.name === 'exports') bijgemengd = true;
+    }
     if (n.type !== 'AssignmentExpression' || !n.left || n.left.type !== 'MemberExpression') return;
     const o = n.left.object, p = n.left.property;
-    if (!o || o.name !== 'module' || !p || p.name !== 'exports') return;
+    const isModuleExports = o && o.name === 'module' && p && p.name === 'exports';
+    const isModuleExportsLid = o && o.type === 'MemberExpression' && o.object && o.object.name === 'module' &&
+      o.property && o.property.name === 'exports';
+    if (!isModuleExports && !isModuleExportsLid) return;
+    /* module.exports.NAAM = ... voegt een naam TOE aan de uitvoer; het vervangt
+       de uitvoer niet. */
+    if (n.left.object && n.left.object.type === 'MemberExpression' &&
+        n.left.object.object && n.left.object.object.name === 'module' &&
+        n.left.object.property && n.left.object.property.name === 'exports' &&
+        n.left.property && n.left.property.name) {
+      const namen = new Set(gevonden && gevonden.namen ? gevonden.namen : []);
+      namen.add(n.left.property.name);
+      gevonden = { vorm: 'object', namen: [...namen] };
+      return;
+    }
     if (n.right && n.right.type === 'ObjectExpression') {
+      /* Een SPREAD maakt de lijst ONVOLLEDIG: `module.exports = { a, ...users }`
+         exporteert meer dan hier staat, en wat erbij komt is statisch niet te
+         zien. Een onvolledige lijst als volledig noteren is erger dan geen
+         lijst -- daarop meldde de aanroepgraaf tientallen symbolen als
+         "bestaat niet" die gewoon via de spread naar buiten komen. */
+      const heeftSpread = (n.right.properties || []).some(prop => prop.type === 'SpreadElement');
       const namen = new Set(gevonden && gevonden.namen ? gevonden.namen : []);
       for (const prop of n.right.properties || []) if (prop.key && prop.key.name) namen.add(prop.key.name);
-      gevonden = { vorm: 'object', namen: [...namen] };
+      gevonden = heeftSpread
+        ? { vorm: 'object-onvolledig', namen: [...namen], reden: 'een spread (...) voegt namen toe die hier niet te zien zijn' }
+        : { vorm: 'object', namen: [...namen] };
     } else if (!gevonden) {
       gevonden = { vorm: /Function|Arrow/.test(n.right && n.right.type || '') ? 'functie' : 'anders', namen: null };
     }
   });
+  if (gevonden && bijgemengd && gevonden.vorm === 'object') {
+    gevonden = { vorm: 'object-onvolledig', namen: gevonden.namen, reden: 'Object.assign(module.exports, ...) mengt namen bij die hier niet te zien zijn' };
+  }
   return gevonden;
 }
 
@@ -94,6 +128,18 @@ function symbolenVan(ast) {
   const uit = [];
   loop(ast, (n, pad) => {
     const inKlasse = pad.some(p => p.type === 'ClassDeclaration' || p.type === 'ClassExpression');
+    /* `module.exports.zin = function zin(sql) {...}` is een EXPRESSIE en geen
+       declaratie; zonder deze tak mist het register zulke functies volledig.
+       Gevonden doordat de aanroepgraaf 587 keer meldde dat een ingevoerde naam
+       niet bestond -- terwijl hij gewoon zo geschreven was. */
+    if (n.type === 'AssignmentExpression' && n.left && n.left.type === 'MemberExpression' &&
+        n.left.object && n.left.object.type === 'MemberExpression' &&
+        n.left.object.object && n.left.object.object.name === 'module' &&
+        n.left.object.property && n.left.object.property.name === 'exports' &&
+        n.left.property && n.left.property.name && /Function|Arrow/.test(n.right && n.right.type || '')) {
+      uit.push({ naam: n.left.property.name, soort: 'uitvoerfunctie', lijn: n.lijn });
+      return;
+    }
     if (n.type === 'FunctionDeclaration' && n.id) uit.push({ naam: n.id.name, soort: 'functie', lijn: n.lijn });
     else if (n.type === 'ClassDeclaration' && n.id) uit.push({ naam: n.id.name, soort: 'klasse', lijn: n.lijn });
     else if (n.type === 'MethodDefinition' && n.key && n.key.name) uit.push({ naam: n.key.name, soort: inKlasse ? 'methode' : 'methode', lijn: n.lijn });
@@ -137,7 +183,7 @@ for (const boom of BOMEN) {
       continue;
     }
     const sym = symbolenVan(ast), ex = uitvoer(ast), k = kanten(src, rel);
-    const namen = ex && ex.vorm === 'object' ? new Set(ex.namen) : null;
+    const namen = ex && ex.vorm === 'object' ? new Set(ex.namen) : null;   // onvolledig telt niet als lijst
     totaalSymbolen += sym.length;
     perBestand.push({ bestand: rel,
       symbolen: sym.map(s => ({ ...s, geexporteerd: namen ? namen.has(s.naam) : 'onbekend' })),
@@ -161,6 +207,12 @@ let commit = 'onbekend';
 try { commit = execSync('git rev-parse --short HEAD', { cwd: WORTEL }).toString().trim(); } catch (e) { /* geen git */ }
 
 const uit = {
+  /* Wat voor SOORT bewering doet dit register? `index` = structuur en
+     relaties (waar woont wat, wat hangt met wat samen). `meting` = een
+     uitspraak over gedrag (schrijft het, klopt het, is het bewezen). Het
+     verschil is niet cosmetisch: een index noemt bijna alles en maakt elke
+     dekkingsvraag triviaal waar, dus scripts/codewereld.js telt hem apart. */
+  soort: 'index',
   uitleg: 'De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.',
   stempel: { op: new Date().toISOString().slice(0, 10), commit },
   grens: 'Dit register kent GEEN symbool-naar-symboolaanroepen: een naam in aanroeppositie is geen verwijzing. De kanten hier zijn require-kanten, en die wijzen naar een bestand dat bestaat.',
@@ -172,7 +224,8 @@ const uit = {
     waarvanParsefout: nietGelezen.length - bundeldelen,
     symbolen: totaalSymbolen,
     bestandenMetUitvoer: perBestand.filter(b => b.uitvoer).length,
-    uitvoerMetNamen: perBestand.filter(b => b.uitvoer && b.uitvoer.namen).length,
+    uitvoerMetNamen: perBestand.filter(b => b.uitvoer && b.uitvoer.vorm === 'object').length,
+    uitvoerOnvolledig: perBestand.filter(b => b.uitvoer && b.uitvoer.vorm === 'object-onvolledig').length,
     uitvoerZonderNamen: perBestand.filter(b => b.uitvoer && !b.uitvoer.namen).length,
     zonderUitvoer: perBestand.filter(b => !b.uitvoer).length,
     requireKanten: perBestand.reduce((n, b) => n + b.requires.length, 0),
@@ -187,7 +240,8 @@ const g = uit.gemeten;
 console.log('SYMBOLEN.json geschreven');
 console.log('  gelezen     ', g.gelezen + '/' + g.bestandenGezien, 'bestanden,', g.symbolen, 'symbolen,', g.requireKanten, 'require-kanten in', g.seconden + 's');
 console.log('  niet gelezen', g.nietGelezen, '(' + g.waarvanBundeldeel, 'bundeldelen,', g.waarvanParsefout, 'parsefouten)');
-console.log('  uitvoer     ', g.uitvoerMetNamen, 'met namen,', g.uitvoerZonderNamen, 'zonder namen (exporteert iets, maar niet af te leiden),', g.zonderUitvoer, 'geen module.exports');
+console.log('  uitvoer     ', g.uitvoerMetNamen, 'met een volledige namenlijst,', g.uitvoerOnvolledig, 'onvolledig (spread of Object.assign),',
+  g.uitvoerZonderNamen, 'zonder namen,', g.zonderUitvoer, 'geen module.exports');
 if (g.waarvanParsefout > 0) {
   console.log('\n  Een parsefout buiten een bundeldeel is een BEVINDING, geen ruis:');
   for (const x of nietGelezen.filter(y => !y.reden.startsWith('bundeldeel')).slice(0, 10)) console.log('   ', x.bestand, '--', x.melding);

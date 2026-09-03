@@ -78,7 +78,7 @@ function oogst(j) {
 /* De eigen uitslag telt niet mee. Zonder deze regel meet de tweede ronde zijn
    eigen paren en zakt de tegenspraakcontrole van `niet vast te stellen` naar
    een vals `0`: het bewijs van de meter werd zijn eigen bron. */
-const symboolNaarRegisters = new Map();
+const symboolNaarRegisters = new Map(), verklaardeSoort = new Map();
 const registers = fs.readdirSync(WORTEL).filter(f => f.endsWith('.json') && !f.startsWith('package') && f !== 'CODEWERELD.json').sort();
 const perRegister = [], padNaarRegisters = new Map(), bestandNaarRegisters = new Map(), brug = new Map();
 
@@ -86,6 +86,7 @@ for (const f of registers) {
   let j; try { j = JSON.parse(fs.readFileSync(path.join(WORTEL, f), 'utf8')); }
   catch (e) { perRegister.push({ register: f, as: 'ONLEESBAAR', reden: e.message.slice(0, 80) }); continue; }
   const o = oogst(j);
+  if (j && typeof j === 'object' && typeof j.soort === 'string') verklaardeSoort.set(f, j.soort);
   const as = o.paden.size >= o.bestanden.size * 2 && o.paden.size > 0 ? 'route'
     : (o.bestanden.size > 0 && o.bestanden.size >= o.paden.size ? 'bestand' : (o.paden.size ? 'route' : 'geen'));
   perRegister.push({ register: f, as: o.symbolen.size > o.paden.size ? 'symbool' : as, paden: o.paden.size, bestanden: o.bestanden.size, symbolen: o.symbolen.size, paren: o.paren.length });
@@ -151,8 +152,34 @@ function bronBestanden(map) {
 const bronPerBoom = { server: bronBestanden('server'), public: bronBestanden('public') };
 const bron = [...bronPerBoom.server, ...bronPerBoom.public];
 const genoemd = bron.filter(b => bestandNaarRegisters.has(b));
-/* buiten de index: door minstens een register dat NIET louter een symboolindex is */
-const INDEXREGISTERS = new Set(perRegister.filter(r => r.as === 'symbool').map(r => r.register));
+/* WELK REGISTER IS EEN INDEX? Niet naar de naam en niet naar een label, maar
+   GEMETEN: een register dat (bijna) elk bestand van een boom noemt, kan per
+   definitie geen dekking onderscheiden -- het maakt elke dekkingsvraag triviaal
+   waar. Dat gebeurde hier twee keer: eerst bij de symboolas (33% -> 100%) en
+   daarna bij de aanroepgraaf (server 41,9% -> 85,5%). Beide keren zag het eruit
+   als vooruitgang terwijl er over gedrag niets was bijgekomen.
+
+   De grens ligt op 95% van een boom. Wie daarboven zit is een index en telt
+   niet mee voor de gedragsteller; welke registers dat zijn staat in de uitslag,
+   zodat de keuze na te rekenen is in plaats van te geloven. */
+const INDEXGRENS = 0.95;
+const INDEXREGISTERS = new Set(), indexWaarom = new Map();
+/* Twee wegen naar dezelfde vaststelling, en allebei nodig. Een register mag
+   zichzelf `soort: 'index'` noemen -- dat is een verklaring van wie hem schreef.
+   En los daarvan wordt het GEMETEN: wie boven de grens uitkomt is een index,
+   ook als hij dat zelf niet zegt. Een verklaring die je niet nameet is een
+   belofte, en een meting zonder verklaring mist een index die toevallig maar
+   80% van een boom raakt. */
+for (const [f, j] of verklaardeSoort) if (j === 'index') { INDEXREGISTERS.add(f); indexWaarom.set(f, 'verklaart zichzelf als index'); }
+for (const [boom, lijst] of Object.entries(bronPerBoom)) {
+  if (!lijst.length) continue;
+  const perReg = new Map();
+  for (const b of lijst) for (const r of bestandNaarRegisters.get(b) || []) perReg.set(r, (perReg.get(r) || 0) + 1);
+  for (const [r, n] of perReg) if (n / lijst.length >= INDEXGRENS) {
+    INDEXREGISTERS.add(r);
+    if (!indexWaarom.has(r)) indexWaarom.set(r, 'noemt ' + Math.round(n / lijst.length * 100) + '% van ' + boom + '/');
+  }
+}
 const buitenIndex = b => [...(bestandNaarRegisters.get(b) || [])].some(r => !INDEXREGISTERS.has(r));
 const gedrag = bron.filter(buitenIndex);
 const perBoom = Object.entries(bronPerBoom).map(([boom, lijst]) => {
@@ -236,6 +263,9 @@ const uit = {
     pct: bron.length ? Math.round(genoemd.length / bron.length * 1000) / 10 : 0,
     gedrag: gedrag.length,
     gedragPct: bron.length ? Math.round(gedrag.length / bron.length * 1000) / 10 : 0,
+    relatie: bron.filter(b => [...(bestandNaarRegisters.get(b) || [])].some(r => INDEXREGISTERS.has(r))).length,
+    indexregisters: [...INDEXREGISTERS].sort().map(r => ({ register: r, waarom: indexWaarom.get(r) })),
+    indexgrens: 'een register telt als index als hij zichzelf zo verklaart (soort: index) of minstens ' + Math.round(INDEXGRENS * 100) + '% van een boom noemt. Een index zegt WAAR iets woont en WAT met wat samenhangt; hij zegt niet of het schrijft, klopt of bewezen is -- daarom telt hij niet mee voor de gedragsteller.',
     perBoom,
     /* platte velden voor de levende getallen in de documenten (scripts/getallen.js
        leest een pad, geen lijst) */
@@ -265,3 +295,6 @@ console.log('  brug route->best.', uit.brug.paden, 'paden uit', uit.brug.registe
 console.log('  bronbereik struct', uit.bronbereik.genoemd + '/' + uit.bronbereik.bestanden, '=', uit.bronbereik.pct + '%  (welke functies, wie hangt ervan af)');
 console.log('  bronbereik gedrag', uit.bronbereik.gedrag + '/' + uit.bronbereik.bestanden, '=', uit.bronbereik.gedragPct + '%',
   '(' + perBoom.map(b => b.boom + ' ' + b.gedragPct + '%').join(', ') + ')');
+console.log('  bronbereik relatie', uit.bronbereik.relatie + '/' + uit.bronbereik.bestanden,
+  '(waar woont het, wat roept het aan, welk scherm gebruikt het)');
+console.log('    indexregisters (tellen niet als gedrag):', [...INDEXREGISTERS].sort().join(', ') || '(geen)');

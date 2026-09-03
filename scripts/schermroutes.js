@@ -199,6 +199,12 @@ let commit = 'onbekend';
 try { commit = execSync('git rev-parse --short HEAD', { cwd: WORTEL }).toString().trim(); } catch (e) { /* geen git */ }
 
 const uit = {
+  /* Wat voor SOORT bewering doet dit register? `index` = structuur en
+     relaties (waar woont wat, wat hangt met wat samen). `meting` = een
+     uitspraak over gedrag (schrijft het, klopt het, is het bewezen). Het
+     verschil is niet cosmetisch: een index noemt bijna alles en maakt elke
+     dekkingsvraag triviaal waar, dus scripts/codewereld.js telt hem apart. */
+  soort: 'index',
   uitleg: 'Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is "dit bestand noemt dit pad" -- niet "roept het aan".',
   stempel: { op: new Date().toISOString().slice(0, 10), commit },
   grens: 'Een voorvoegsel uit een sjabloon met een gat is GEEN route en wordt nooit tegen de routelijst gelegd. Exacte paden wel: een exact pad dat niet bestaat, is een dood pad.',

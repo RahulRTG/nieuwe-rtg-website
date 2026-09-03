@@ -210,6 +210,13 @@
   .bk-tegel.rood{border-color:var(--burgundy);}
   .bk-tegel .lab{font-size:.72rem;color:var(--soft);}
   .bk-tegel .waarde{font-size:1.05rem;color:var(--rtg-leesgoud,var(--gold));margin-top:.25rem;}
+  /* De toestellenkaart. Eigen klassen in plaats van style="..." -- die
+     attributen houden style-src-attr in de CSP open, en NORM.json telt ze. */
+  .tstUitleg{font-size:.78rem;color:var(--soft);margin:0 0 0.5rem;}
+  .tstLijst{font-size:.82rem;}
+  .tstSpoor{margin-top:0.6rem;font-size:.78rem;color:var(--soft);}
+  .tstVoet{font-size:.74rem;color:var(--soft);line-height:1.6;margin:0.7rem 0 0;border-top:1px solid var(--line);padding-top:0.6rem;}
+  .tstMeta{color:var(--soft);font-size:.74rem;}
 </style>
 <!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
 <script src="/shared/media.js"></script>
@@ -442,10 +449,10 @@
          tweede factor kreeg (keuringsregel 18). -->
     <h3 class="sec" id="bToestelKop" hidden>Uw toestellen</h3>
     <div class="kaart" id="bToestellen" hidden>
-      <p class="stil" style="font-size:.78rem;color:var(--soft);margin:0 0 0.5rem;">De sleutels waarmee u de zware handelingen in dit huis bevestigt: eigendom overdragen, toegang geven, de terugstortstand omzetten. Staat hier niets, dan vraagt het huis daarvoor alleen uw wachtwoord -- en dat weet een gestolen open sessie ook.</p>
-      <div id="bToestelLijst" style="font-size:.82rem;"></div>
-      <div id="bToestelSpoor" style="margin-top:0.6rem;font-size:.78rem;color:var(--soft);"></div>
-      <p class="stil" style="font-size:.74rem;color:var(--soft);line-height:1.6;margin:0.7rem 0 0;border-top:1px solid var(--line);padding-top:0.6rem;">Wat deze lijst <strong>niet</strong> zegt: een sleutelhanger-passkey (iCloud, Google) reist mee met uw hanger en dekt dus meer dan één apparaat. En een sleutel bewijst dat dit dezelfde authenticator is als vorige keer -- niet wie hem vasthield. Toevoegen en intrekken doet u op <a href="/apps/passkeys.html">Passkeys</a>; dat is de enige plek, met opzet.</p>
+      <p class="stil tstUitleg">De sleutels waarmee u de zware handelingen in dit huis bevestigt: eigendom overdragen, toegang geven, de terugstortstand omzetten. Staat hier niets, dan vraagt het huis daarvoor alleen uw wachtwoord -- en dat weet een gestolen open sessie ook.</p>
+      <div id="bToestelLijst" class="tstLijst"></div>
+      <div id="bToestelSpoor" class="tstSpoor"></div>
+      <p class="stil tstVoet">Wat deze lijst <strong>niet</strong> zegt: een sleutelhanger-passkey (iCloud, Google) reist mee met uw hanger en dekt dus meer dan één apparaat. En een sleutel bewijst dat dit dezelfde authenticator is als vorige keer -- niet wie hem vasthield. Toevoegen en intrekken doet u op <a href="/apps/passkeys.html">Passkeys</a>; dat is de enige plek, met opzet.</p>
     </div>
 
     <!-- Het papierwerk: de achttien dingen die alleen een mens kan invullen.
@@ -3327,7 +3334,7 @@ function balieTekenKlachten(){
   box.innerHTML = ks.length ? ks.map(k =>
     '<div style="border-bottom:1px solid var(--line);padding:.5rem 0;">'+
       '<div style="font-size:.85rem;"><b>'+esc(k.soort || 'klacht')+'</b> '+
-        '<span class="stil" style="color:var(--soft);font-size:.74rem;">'+esc(balDatum(k.at))+'</span></div>'+
+        '<span class="stil tstMeta">'+esc(balDatum(k.at))+'</span></div>'+
       '<div style="font-size:.82rem;color:var(--muted);">'+esc(k.tekst || '')+'</div>'+
       '<div class="taakrij"><select class="veld" style="max-width:11rem;" data-balstat="'+esc(k.id)+'" aria-label="Status van deze klacht">'+
         BALIE_STATUS.map(s => '<option value="'+s[0]+'"'+(k.status === s[0] ? ' selected' : '')+'>'+s[1]+'</option>').join('')+

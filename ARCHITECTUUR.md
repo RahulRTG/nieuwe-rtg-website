@@ -139,7 +139,7 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 | daarvan door **meer dan één** domein (de echte koppeling) | 222 |
 | daarvan door precies één domein | 1306 |
 | breedste enkele routebestand | 71 namen |
-| gepakt uit kern en nergens gebruikt | 2 |
+| gepakt uit kern en nergens gebruikt | 0 |
 
 Dat derde getal is de opening: 85% van wat er in de gedeelde zak zit, wordt door
 precies één domein gebruikt. Dat hoort geen gedeelde kern te zijn maar bezit van dat

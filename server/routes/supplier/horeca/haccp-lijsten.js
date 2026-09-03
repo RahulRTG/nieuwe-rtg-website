@@ -16,7 +16,7 @@
 
 module.exports = (kern) => {
   const { app, save, schoon, supplierAuth, horeca } = kern;
-  const { H, nu, id } = horeca;
+  const { H, Hlees, nu, id } = horeca;
 
   /* Dezelfde greep als in ./haccp.js, en met opzet geen gedeelde import: het is
      een regel van EEN regel die zegt waar het haccp-blok van een zaak woont.
@@ -37,9 +37,13 @@ module.exports = (kern) => {
   });
 
   app.post('/api/supplier/horeca/haccp/afvinken', supplierAuth, (req, res) => {
-    const ha = HA(req.supplier.code);
-    const lijst = ha.lijsten[schoon(req.body.naam, 60)];
+    /* Eerst KIJKEN. HA() richt de haccp-la in voor een zaak die er nog geen had,
+       ook als de controlelijst daarna niet blijkt te bestaan en het verzoek met
+       een 404 teruggaat. Zie scripts/laatspoor.js. */
+    const kijk = (Hlees(req.supplier.code) || {}).haccp;
+    const lijst = kijk && kijk.lijsten && kijk.lijsten[schoon(req.body.naam, 60)];
     if (!lijst) return res.status(404).json({ error: 'Die controlelijst kennen we niet.' });
+    const ha = HA(req.supplier.code);
     const antwoorden = Array.isArray(req.body.antwoorden) ? req.body.antwoorden : [];
     if (antwoorden.length !== lijst.vragen.length)
       return res.status(400).json({ error: 'Beantwoord alle ' + lijst.vragen.length + ' punten; een lijst in een keer afvinken bestaat hier niet.' });

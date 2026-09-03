@@ -45,10 +45,49 @@
    DE VERTALING STAAT HIER EN NIET IN DERTIEN BESTANDEN. Wie om de demo-stand
    vraagt, krijgt de omgeving waarin die stand bestaat. Wie hem niet vraagt,
    merkt niets: er wordt nooit een testomgeving aangezet die de aanroeper niet
-   heeft gevraagd. */
+   heeft gevraagd.
+
+   Dit is ook de ENE plek waar een meetserver zijn meetstand krijgt (de
+   schorspoort en de tikkers uit, zie hieronder): scripts/handelingproef-route.js
+   start zijn server zelf en haalt zijn omgeving hier vandaan, zodat een
+   instrument dat niet via start() loopt dezelfde standaardwaarden draagt. */
 function gereedschapsomgeving({ poort, datamap }, eigen) {
   const env = Object.assign({}, process.env, {
-    PORT: String(poort), RTG_DATA_DIR: datamap, SMTP_URL: '', STUN_UIT: '1'
+    PORT: String(poort), RTG_DATA_DIR: datamap, SMTP_URL: '', STUN_UIT: '1',
+    /* DE SCHORSPOORT STAAT UIT OP EEN MEETSERVER, en dat is geen versoepeling
+       maar de reparatie van een lus die zichzelf dichttrok.
+
+       server/middleware/schorspoort.js weigert met 503 elke schrijvende aanroep
+       op een route die in VERTROUWEN.json `geschorst` heet. Dat is de bedoeling
+       -- in PRODUCTIE. Op een MEETserver is het fataal, en wel zo:
+
+         1. een route krijgt een gezakte bewijscel  -> geschorst
+         2. de schorspoort geeft 503 op die route
+         3. de volgende proefronde kan hem niet meer uitvoeren -> ongemeten
+         4. ongemeten wordt nooit meer bewezen
+         5. de route blijft voor altijd geschorst
+
+       Het register zegt zelf dat de weg omhoog "een geslaagde hermeting" is --
+       en precies die hermeting werd geblokkeerd door de staat die hij moest
+       opheffen. Gemeten op 2 september 2026: alle ACHT geschorste routes gaven
+       in de verse idemproef `de eerste oproep deed geen werk (status 503)`, en
+       het aantal `onbeschermd` in dat register viel van een handvol naar NUL --
+       niet omdat er iets gerepareerd was, maar omdat er niets meer te meten
+       viel. Een register dat leeg raakt doordat de deur dichtzit, leest als
+       vooruitgang.
+
+       Dit raakt alleen wegwerpservers: elk instrument in scripts/ start er een
+       met een eigen datamap, en geen daarvan is het huis van een lid. Een
+       aanroeper die de poort juist WIL zien, zet hem in `eigen` terug -- die
+       gaat hierna en wint dus van deze regel (test/meetserver-schorspoort.test.js
+       toetst die volgorde). */
+    RTG_SCHORSPOORT_UIT: '1',
+    /* De achtergrondtikkers van RTG Command uit: een klok die binnen het
+       meetvenster afgaat, krijgt zijn schrijfactie toegerekend aan de route
+       die op dat moment onder de meetklok ligt. Zie
+       server/kern/command/tikkerstand.js -- twee routes stonden daardoor
+       geschorst en gaven 503 op echt verkeer. */
+    RTG_TIKKERS_UIT: '1'
   }, eigen || {});
   if (env.RTG_DEMO === '1' && env.RTG_MAGNAAT_TEST !== '1' && env.NODE_ENV !== 'test') {
     env.RTG_MAGNAAT_TEST = '1';

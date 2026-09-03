@@ -133,16 +133,23 @@ module.exports = (ctx) => {
   /* Favorieten van het lid zelf. Bewust maar tien: een lijst van honderd
      opgeslagen punten is een bewegingsprofiel, en dat willen we hier niet
      aanleggen. Weghalen wist echt, want dit is het enige exemplaar. */
+  /* LEZEN, EN PAS SCHRIJVEN ALS ER IETS BIJ KOMT. Hier stond meteen
+     `bak[session.key] || (bak[session.key] = [])`: een lid dat nog nooit een
+     favoriet had, kreeg zijn lege rij aangemaakt VOORDAT er iets was gekeurd --
+     en een verzoek dat daarna met een 400 of 404 werd afgewezen, liet dus toch
+     een spoor na. De staatproef ving dat als een gezakte ROLLBACK. */
   function favZet(session, body = {}) {
-    opslag.bak('mobFavorieten');
-    const lijst = opslag.bak('mobFavorieten')[session.key] || (opslag.bak('mobFavorieten')[session.key] = []);
+    const bak = opslag.bak('mobFavorieten');
+    const lijst = Array.isArray(bak[session.key]) ? bak[session.key] : [];
     const favId = schoon(body.id, 40);
     if (body.weg) {
-      const voor = lijst.length;
-      opslag.bak('mobFavorieten')[session.key] = lijst.filter(f => f.id !== favId);
+      /* Wie niets heeft, kan niets kwijtraken -- en hoeft daarvoor geen rij te
+         krijgen. */
+      const over = lijst.filter(f => f.id !== favId);
+      if (over.length === lijst.length) return { status: 404, error: 'Onbekende favoriete plek.' };
+      bak[session.key] = over;
       ctx.save();
-      return voor === opslag.bak('mobFavorieten')[session.key].length
-        ? { status: 404, error: 'Onbekende favoriete plek.' } : { ok: true, weg: favId };
+      return { ok: true, weg: favId };
     }
     const plek = plekBepaal(body.plek, session);
     if (plek.error) return { status: 400, error: plek.error };
@@ -150,9 +157,11 @@ module.exports = (ctx) => {
     const bestaand = favId ? lijst.find(f => f.id === favId) : null;
     if (favId && !bestaand) return { status: 404, error: 'Onbekende favoriete plek.' };
     if (!bestaand && lijst.length >= 10) return { status: 409, error: 'Tien favoriete plekken is het maximum; haal er eerst een weg.' };
+    /* Vanaf hier kan er niets meer worden geweigerd, dus nu pas de rij vastzetten. */
     const f = bestaand || { id: ctx.id('fv') };
     Object.assign(f, { naam, lat: plek.lat, lng: plek.lng, bron: plek.bron });
     if (!bestaand) lijst.push(f);
+    bak[session.key] = lijst;
     ctx.save();
     return { ok: true, favoriet: f };
   }

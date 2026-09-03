@@ -15,6 +15,16 @@ function maakBorden({ db, save, crypto }) {
     const root = db.data[vak] = db.data[vak] || {};
     return root[sleutel] = root[sleutel] || [];
   }
+  /* KIJKEN ZONDER SCHEPPEN. bak() zet het vak en de rij neer voor een zaak die
+     er nog geen had -- ook als het verzoek daarna met een 404 teruggaat omdat
+     het bord niet bestaat. Deze hoort HIER en niet in de route: db.data blijft
+     achter de deur van zijn eigen module (keuringsregel 62), en een tweede
+     lezer in een routebestand zou die deur openbreken. Zie scripts/laatspoor.js
+     voor de meter op dit patroon. */
+  function kijk(vak, sleutel) {
+    const root = db.data[vak];
+    return (root && Array.isArray(root[sleutel])) ? root[sleutel] : [];
+  }
 
   /* wie ziet welk bord: een bord zonder leden is van het hele team; met leden
      alleen voor die collega's (de manager ziet altijd alles, die beheert) */
@@ -137,7 +147,7 @@ function maakBorden({ db, save, crypto }) {
     return { status: 200, ok: true };
   }
 
-  return { bak, zichtbaar, bordMaak, bordVind, bordLeden, bordHernoem, bordWeg, lijstMaak, lijstBewerk, kaartMaak, kaartBewerk, kaartZet, kaartWeg };
+  return { bak, kijk, zichtbaar, bordMaak, bordVind, bordLeden, bordHernoem, bordWeg, lijstMaak, lijstBewerk, kaartMaak, kaartBewerk, kaartZet, kaartWeg };
 }
 
 module.exports = { maakBorden };

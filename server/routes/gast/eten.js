@@ -46,18 +46,25 @@ module.exports = (kern) => {
         waarschuwing:vrij.menselijkeControle ? 'Allergenen zijn gefilterd op kaartinformatie. De zaak controleert uw bestelling altijd nog persoonlijk.' : null } } : {});
   }
 
-  app.post('/api/gast/eten/ontdekken', auth, (req, res) => res.json(resultaat(req, 'ontdekken')));
-  app.post('/api/gast/eten/zoeken', auth, (req, res) => res.json(resultaat(req, 'zoeken')));
-  app.post('/api/gast/eten/concierge', auth, (req, res) => res.json(resultaat(req, 'concierge')));
-
+  /* OPZOEKEN IS KIJKEN, en dus Hlees en niet H. H() zet de horecadoos van een
+     zaak neer zodra iemand ernaar vraagt -- ook als het antwoord daarna een 404
+     is. Dan staat er een verse doos van een zaak waar deze gast nooit iets
+     bestelde, en zeggen de statuscode en de opslag twee verschillende dingen
+     over hetzelfde verzoek. Bestaat de doos wel, dan geeft Hlees hem ECHT terug:
+     wat de aanroeper hierna aan de rekening verandert (een incident aantekenen)
+     landt gewoon. Zie kern/horeca.js bij Hlees. */
   function eigenRekening(req, res) {
     const code = schoon((req.body || {}).zaak, 30);
     const s = findSupplier(code);
     if (!s) { res.status(404).json({ error:'Deze zaak kennen we niet.' }); return null; }
-    const rek = horeca.H(code).rekeningen[String((req.body || {}).rekeningId || '')];
+    const rek = horeca.Hlees(code).rekeningen[String((req.body || {}).rekeningId || '')];
     if (!rek || !naad.isVan(rek, handleVan(req))) { res.status(404).json({ error:'Deze bestelling is niet van jou.' }); return null; }
     return { s, rek };
   }
+
+  app.post('/api/gast/eten/ontdekken', auth, (req, res) => res.json(resultaat(req, 'ontdekken')));
+  app.post('/api/gast/eten/zoeken', auth, (req, res) => res.json(resultaat(req, 'zoeken')));
+  app.post('/api/gast/eten/concierge', auth, (req, res) => res.json(resultaat(req, 'concierge')));
 
   app.post('/api/gast/eten/probleem', auth, (req, res) => {
     const x = eigenRekening(req, res); if (!x) return;
@@ -73,8 +80,11 @@ module.exports = (kern) => {
   app.post('/api/gast/eten/beoordeel', auth, (req, res) => {
     if (req.session.tier === 'guest') return res.status(403).json({ error:'Beoordelen is voor leden.' });
     const x = eigenRekening(req, res); if (!x) return;
+    /* De doos bestaat hier zeker -- de rekening is er zojuist in gevonden -- dus
+       Hlees geeft dezelfde doos terug als H, zonder er een te kunnen scheppen op
+       de weg die daarna nog op 409 of 400 uitkomt. */
     const beeld = orders.projecteerRekening({ zaakcode:x.s.code, zaak:x.s, rekening:x.rek,
-      horecaDoos:horeca.H(x.s.code) });
+      horecaDoos:horeca.Hlees(x.s.code) });
     if (!['geleverd','opgehaald'].includes(beeld.statussen.fulfillment))
       return res.status(409).json({ error:'Beoordelen kan zodra de bestelling is geleverd of opgehaald.' });
     const ref = beeld.id;

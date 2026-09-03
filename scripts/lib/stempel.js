@@ -18,27 +18,51 @@
      commit      waartegen. Twee registers van verschillende commits zijn niet
                  met elkaar te vergelijken, en een register van een oudere commit
                  dan HEAD is per definitie achterhaald.
-     boomVuil    stond er ongecommit werk in de CODE tijdens het meten? Zo ja,
+     boomVuil    stond er ongecommit CODE in de boom tijdens het meten? Zo ja,
                  dan hoort die meting NIET bij die commit -- hij hoort bij iets
                  wat nergens is vastgelegd. Dat is geen detail: precies zo
                  ontstaat een register dat niemand kan reproduceren.
+
+                 CODE, EN NIET DE HELE BOOM. Hier stond `git status --porcelain`
+                 over alles, en daarmee was een schone stand onbereikbaar --
+                 exact de fout die bij `versheid()` verderop al een keer is
+                 gemaakt en gerepareerd. De reden is dezelfde en de vorm ook:
+                 zodra de eerste meetronde zijn register WEGSCHRIJFT, is de boom
+                 vuil, en stempelt elke volgende meting van diezelfde ronde
+                 zichzelf als onreproduceerbaar. Gemeten op 2 september 2026:
+                 van drie generatoren achter elkaar kwam alleen de EERSTE schoon
+                 binnen; de meetronde schrijft in stap 1 POORTWACHT.json, en
+                 daarna weigerden stap 2 tot en met 7 op de uitvoer van hun
+                 eigen ronde. Zes van de negen registers zijn zo nooit in een
+                 volle ronde bijgewerkt.
      boomAnders   hoeveel ongecommitte bestanden er BUITEN de code stonden. Nul
                  of niet, het staat er -- een uitzondering die je niet kunt
                  tellen, is een uitzondering die je niet kunt narekenen.
 
-   WAT "CODE" HIER IS, en waarom dat een grens is en geen versoepeling.
-   `versheid()` verderop besloot dit al: een commit die alleen registers of
-   documentatie aanraakt, maakt een meting niet ongeldig -- alleen server/,
-   scripts/ en public/ doen dat. Het vooraf-oordeel (`boomVuil`) hanteerde een
-   ANDERE grens: elk gewijzigd bestand telde. Twee regels over dezelfde vraag,
-   en de strengste van de twee sloeg toe op zijn eigen uitvoer: de meetronde
-   schrijft in stap 1 POORTWACHT.json, en daarna weigerden stap 2 tot en met 7
-   omdat de boom vuil was -- door hun eigen ronde. Zes van de negen registers
-   zijn zo nooit in een volle ronde bijgewerkt.
+   WAT "CODE" HIER IS, en waarom dat een grens is en geen versoepeling. Een
+   register dat naast je ligt is een UITKOMST en geen invoer van de code. Wat
+   een meting onreproduceerbaar maakt, is ongecommitte CODE -- en dat zijn
+   TWEE lijsten die elkaar omvatten, met een reden per verschil:
 
-   Nu is er EEN regel (`CODEPADEN`), en die staat aan de kant van de reden: een
-   meting is reproduceerbaar als de CODE eronder is vastgelegd. Een register is
-   uitvoer en geen invoer.
+     CODE        wat een MEETUITKOMST kan veranderen: server, scripts, public,
+                 test, motor en de pakketlijst. Dit is de grens van `boomVuil`
+                 en van de poort vooraf (`eisSchoneBoom`). `test` staat erin
+                 omdat de mutatiemotor de toetsen MEET, en package.json omdat de
+                 meter `dependencies` hem rechtstreeks leest -- juist daarop is
+                 een keuring omgevallen toen een gestrand ijkproces er even een
+                 pakket in had bijgeschreven.
+     CODEPADEN   de code die gemeten WORDT: server, scripts, public. Dit is de
+                 grens van `versheid()` -- is een register nog van deze code? --
+                 en die vraag wordt onder scripts/ bovendien per instrument
+                 versmald (`sluiting()`). Een commit die alleen een toets of de
+                 pakketlijst raakt, veroudert een register hier dus niet; wie
+                 dat wel wil, hoort het via de sluiting per instrument te doen
+                 en niet door deze lijst te verbreden, anders is "alles
+                 tegelijk vers" opnieuw onbereikbaar (LAT.md regel 9).
+
+   De ene lijst is een deelverzameling van de andere, en beide staan hieronder
+   op EEN plek. Wie CODE uitbreidt: neem er alleen iets in op dat een
+   meetuitkomst kan veranderen -- documenten en registers horen er nooit in.
      instrument   WELK script deze meting heeft geschreven, als pad in de repo.
                  Niet om het na te vertellen: hiermee is uit te rekenen welke
                  wijzigingen onder scripts/ deze meting werkelijk raken. Zie
@@ -56,10 +80,23 @@ const path = require('path');
 
 const WORTEL = path.join(__dirname, '..', '..');
 
-/* De drie mappen waarin een wijziging een meting ongeldig maakt. Dezelfde
-   drie die `versheid()` gebruikt -- en met opzet dezelfde constante, want twee
-   lijsten die hetzelfde horen te zeggen lopen uiteen (LAT.md regel 4). */
+/* De drie mappen waarin een wijziging een register veroudert: de code die
+   gemeten WORDT. `versheid()` gebruikt deze constante, en niets anders --
+   twee lijsten die hetzelfde horen te zeggen lopen uiteen (LAT.md regel 4). */
 const CODEPADEN = ['server', 'scripts', 'public'];
+
+/* WAT ALS CODE TELT VOOR HET STEMPEL. Alles waarvan een wijziging een
+   MEETUITKOMST kan veranderen -- en verder niets. Registers (*.json in de
+   wortel) en documenten zijn uitkomsten; die maken een meting niet
+   onreproduceerbaar.
+
+   `test` staat er wel bij en dat is geen slordigheid: de mutatiemotor MEET de
+   toetsen, dus een ongecommitte toets verandert daar de uitslag. Hetzelfde
+   geldt voor de pakketlijst -- de meter `dependencies` leest hem rechtstreeks,
+   en juist daar is een keuring op omgevallen. AFGELEID van CODEPADEN, zodat de
+   twee lijsten elkaar niet kunnen tegenspreken: wat een register veroudert,
+   maakt een meting ook onreproduceerbaar. */
+const CODE = CODEPADEN.concat(['test', 'motor', 'package.json', 'package-lock.json']);
 
 function git(args) {
   try {
@@ -170,8 +207,9 @@ function stempel(extra) {
   }, extra || {});
 }
 
-/* Wat er ongecommit staat, gesplitst in code en de rest. Faalt git, dan null:
-   onbekend als schoon lezen is precies de fout die dit veld moet voorkomen. */
+/* Wat er ongecommit staat, gesplitst in code (de lijst CODE hierboven) en de
+   rest. Faalt git, dan null: onbekend als schoon lezen is precies de fout die
+   dit veld moet voorkomen. */
 function vuileBoom() {
   /* ONGETRIMD opvragen. `git()` trimt zijn uitvoer, en daarmee verdwijnt de
      spatie waarmee " M pad" begint -- een vaste positie tellen gaf dan een pad
@@ -186,7 +224,7 @@ function vuileBoom() {
        hernoeming staat er "oud -> nieuw"; dan tellen beide kanten mee. */
     const pad = r.slice(3);   // XY + spatie; de regel is hier nog ongetrimd
     const delen = pad.split(' -> ');
-    (delen.some(d => CODEPADEN.some(c => d === c || d.startsWith(c + '/'))) ? code : anders).push(r.trim());
+    (delen.some(d => CODE.some(c => d === c || d.startsWith(c + '/'))) ? code : anders).push(r.trim());
   }
   return { code, anders };
 }
@@ -224,7 +262,7 @@ function eisSchoneBoom(naam) {
   if (!vuil || vuil.code.length === 0) {
     return { ok: true, buitenDeCode: vuil ? vuil.anders.length : 0,
       reden: 'geen ongecommitte code op ' + commit +
-        (vuil && vuil.anders.length ? ' (' + vuil.anders.length + ' bestand(en) buiten server/scripts/public; die maken een meting niet onreproduceerbaar)' : '') };
+        (vuil && vuil.anders.length ? ' (' + vuil.anders.length + ' bestand(en) buiten de code; die maken een meting niet onreproduceerbaar)' : '') };
   }
   return { ok: false, commit, bestanden: vuil.code.slice(0, 8),
     reden: (naam || 'deze meting') + ' zou een uitslag opleveren met boomVuil: true, en die telt nergens mee. ' +
@@ -284,4 +322,27 @@ function versheid(gemeten, huidigeCommit) {
 
 const nuCommit = () => git(['rev-parse', '--short', 'HEAD']) || null;
 
-module.exports = { stempel, eisSchoneBoom, versheid, vuileBoom, sluiting, nuCommit, CODEPADEN, WORTEL };
+/* HET STEMPEL VAN EEN REGISTER, en waarom die vraag hierheen is verhuisd.
+
+   Er zijn TWEE vormen, en dat is historie en geen smaak: DEKKING.json en
+   POORTWACHT.json zetten hun tijdstempel onder `gemeten`, de rest onder
+   `stempel`. Een van de twee hernoemen breekt een bestand dat een toets al
+   leest, dus wordt het verschil hier opgevangen -- op EEN plek.
+
+   Dat het er twee waren, was op zichzelf niet erg. Erg was dat er ook twee
+   LEZERS waren en er maar een van beide vormen kende: scripts/versheid.js ving
+   ze allebei op, scripts/vertrouwen.js las alleen `j.stempel.op`. Gevolg:
+   POORTWACHT.json -- het OUDSTE register van de stapel -- viel bij vertrouwen.js
+   stilzwijgend buiten de berekening, en de ouderdom van het bewijs kwam uit de
+   registers die er wel in zaten. Het bewijs zag er dus verser uit dan het was,
+   en juist die meter bestaat om dat te voorkomen (LAT.md regel 4: twee plekken
+   voor een waarheid, en de zwakste wint zodra iemand hem gebruikt). */
+function stempelVan(bestand) {
+  try {
+    const j = JSON.parse(fs.readFileSync(path.isAbsolute(bestand) ? bestand : path.join(WORTEL, bestand), 'utf8'));
+    return j.stempel || (j.gemeten && j.gemeten.op ? j.gemeten : null);
+  } catch (e) { return undefined; }   // undefined = het bestand is er niet; null = wel, maar zonder stempel
+}
+
+module.exports = { stempel, eisSchoneBoom, versheid, vuileBoom, sluiting, nuCommit, stempelVan,
+  CODEPADEN, CODE, WORTEL };

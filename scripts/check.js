@@ -70,12 +70,25 @@ function compileerbaar(rel) {
   for (const map of DEELMAPPEN) if (rel.startsWith(map)) return false;
   return true;
 }
+
+/* Deze regel startte 4823 processen (`spawnSync(node --check)` per bestand) en
+   deed daar 127.619 ms over -- vrijwel allemaal procesopstart. In-proces kost
+   hetzelfde werk 1.188 ms, en daarmee ging de VOLLE keuring van ongeveer 160
+   naar 34 seconden. Waarom dat meer is dan ongeduld, en waarom er een
+   CommonJS-wikkel omheen MOET: de kop van scripts/lib/syntaxproef.js.
+   test/syntaxproef.test.js legt de twee wegen op elk geval naast elkaar. */
+const { syntaxfout } = require('./lib/syntaxproef');
 for (const map of ['server', 'public', 'test']) {
   loop(path.join(ROOT, map), /\.js$/, f => {
     const rel = path.relative(ROOT, f).replace(/\\/g, '/');
     if (!compileerbaar(rel)) return;
-    const r = cp.spawnSync(process.execPath, ['--check', f]);
-    if (r.status !== 0) fout('syntaxfout in ' + rel + '\n' + r.stderr);
+    /* Zelfde ENOENT-uitzondering als in loop(): de meterijk-toets maakt
+       kortlevende bestanden, en die mogen tussen readdir en read verdwijnen. */
+    let bron;
+    try { bron = fs.readFileSync(f, 'utf8'); }
+    catch (e) { if (e && e.code === 'ENOENT') return; throw e; }
+    const m = syntaxfout(bron, f);
+    if (m) fout('syntaxfout in ' + rel + '\n  ' + m);
   });
 }
 if (!fouten) ok('alle server-, browser- en testbestanden compileren');
@@ -1866,6 +1879,17 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
        de kantoorpakket-paden voluit kwamen te staan (regel 45) */
     'ledenAuth', 'rtfPoort']);
   POORT_MW.add('arrivalPassAuth'); // bezit van de tijdelijke, gehashte Arrival Pass
+  /* `scimAuth` (routes/scim.js) -- de deur waar de IdP van een klant zelf
+     doorheen loopt: Bearer-sleutel, opgezocht met scim.sleutels.vanSleutel(),
+     401 met www-authenticate als hij niet klopt. Hij stond hier niet, en de
+     zeven /api/scim/v2-paden vielen daardoor in de schaduwmeting onder "bron
+     onvindbaar" -- niet omdat er geen poort is, maar omdat hun pad een
+     EXPRESSIE is (`BASIS + '/Users'`) en geen lezer van de brontekst hem vindt.
+     De levende routetabel kent zijn bewakers wel; die stonden alleen niet in
+     dit vocabulaire. scripts/lib/bewakers.js kende hem al als eigenrol en
+     scripts/mutatiecontract.js leest hem als SERVICE_TO_SERVICE, dus dit is de
+     derde plek die dezelfde deur nu bij dezelfde naam noemt. */
+  POORT_MW.add('scimAuth');
   /* `viaBeheerOfDirectie` (routes/tenant.js) is geen derde poort maar een keuze
      tussen de twee die er al zijn: het beheer-token, of een lid met het recht
      `werkruimte`. Hij belandde hier omdat deze regel 800 tekens vooruitkijkt en
@@ -1873,7 +1897,60 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
      route, dan valt zijn 403 buiten het venster en heet de eerste route
      ongepoort. Bij naam noemen is eerlijker dan de code herschikken om een
      tekstafstand te plezieren. */
-  const POORT_BINNEN = /\b(profiel|schoolProfiel|rtfSociaal|eisAccount|resolveSession|verifyToken|sessionFor|magInzien|isEigenaar|boardroomWie|magBoardroom|doosSleutelOk|magMeten|metPartner|samenSess|kantoorSess|werkPoort|beheerVan|lidVan|viaBeheerOfDirectie)\s*\(/;
+  /* DE POORTEN VAN DE RTFOUNDATION- EN SCHOOLTAK, toegevoegd 2 september 2026.
+
+     Die takken hangen via `app.use('/api/foundation', router)` en waren daardoor
+     onzichtbaar voor de uitdrukking hierboven -- 342 van de 565 paden die deze
+     regel niet zag (zie de schaduwmeting onderaan). Ze dragen geen bewakerslaag
+     en poorten in de HANDLER, met een eigen vocabulaire dat hier niet stond.
+
+     ELKE NAAM IS IN ZIJN DEFINITIE NAGEKEKEN, en dat is geen formaliteit: de
+     eerste meting gaf ook `schoon`, `getal`, `String` en `isDatum` als kandidaat,
+     want die bewaken ook een vroege return. Wie die lijst op frequentie vult,
+     keurt honderden routes goed op een opschoonfunctie.
+
+       gezinVan        gezinshulp.js:147   return null
+       sessieVan       foundation.js:44    403 + return null
+       familieVan      foundation.js:51    403 (weigert gasten) + return null
+       gezinSessie     poorten.js:69       403 + return null
+       schoolVan       poorten.js:13       403 + return null
+       personeelVan    poorten.js:32       403 + return null
+       klasVan         poorten.js:44       403 + return null
+       docentCheck     onderwijs.js:44     403
+       lesVan          onderwijs.js:38     return null
+       beheerderVan    gezinshulp.js:158   403
+       magKlus         gezinsleven.js:105  403
+       marktVolwassen  markt.js:14         403
+       sessie          leden-mail.js:19    403 (weigert gasten) + return null
+
+     BEWUST NIET OPGENOMEN, en met de reden:
+       geldigePin   `p => /^\d{4,6}$/.test(p)` -- een controle op VORM is geen
+                    controle (LAT.md regel 8). Vier cijfers is geen bewijs.
+       magGeld,     rolpredicaten op een AL geauthenticeerde sessie
+       isGast       (`s.p.rol`). Ze verfijnen een poort; ze zijn er geen.
+       schoon,      opschonen en omzetten. Ze bewaken wel een vroege return,
+       getal        en juist daarom staan ze hier met naam als tegenvoorbeeld.
+       mijn, ipVan  een gefilterde berichtenlijst en het IP-adres. Ze staan naast
+                    een poort, ze zijn er geen.
+
+     EN `poort` STAAT ER WEL IN, MAAR ALLEEN IN DE VORM `poort(req, ...)`. Deze
+     naam draagt in dit huis twee betekenissen, en ik heb ze bij het schrijven
+     van deze lijst eerst verwisseld -- met de gevaarlijke uitkomst, want ik
+     sloot de echte poort uit:
+
+       `server/school/rollen.js:84`  function poort(req, res, recht)
+                                     schoolcode, token, actieve status EN een
+                                     rechtencontrole, alle vier met 403. Dit is
+                                     de poort van de hele schooltak.
+       `server/school/taalcheck.js:34`  const poort = mag(doel, taal, beleid)
+                                     een TAALBELEID-uitkomst met 400. Geen
+                                     autorisatie, en toevallig dezelfde naam.
+
+     De vorm scheidt ze: de poort wordt met `(req` aangeroepen, de variabele
+     wordt toegekend. Vandaar de tweede tak in de uitdrukking hieronder en niet
+     de kale naam. Dit is SEMANTIEK.json in het klein -- een naam met twee
+     betekenissen, in de veiligheidslaag. */
+  const POORT_BINNEN = /\b(profiel|schoolProfiel|rtfSociaal|eisAccount|resolveSession|verifyToken|sessionFor|magInzien|isEigenaar|boardroomWie|magBoardroom|doosSleutelOk|magMeten|metPartner|samenSess|kantoorSess|werkPoort|beheerVan|lidVan|viaBeheerOfDirectie|gezinVan|sessieVan|familieVan|gezinSessie|schoolVan|personeelVan|klasVan|docentCheck|lesVan|beheerderVan|magKlus|marktVolwassen|sessie)\s*\(|\bpoort\s*\(\s*req/;
 
   /* PUBLIEK MET REDEN woont in ./lib/publiek.js, en daar alleen: keuringsregel
      28, scripts/handlerwacht.js en het mutatiecontractregister stellen dezelfde
@@ -1927,10 +2004,24 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
         ' -- zet er een poortwachter voor, of neem hem met een REDEN op in PUBLIEK (check.js regel 28)');
     }
   });
+  /* DE SCHADUWMETING WORDT HIER AL GEDAAN, en niet pas onderaan, omdat de
+     opruimcontrole hieronder zijn padenlijst nodig heeft. Die controle keek naar
+     wat deze regel ZELF had gevonden, en dat mist alles wat via een mount hangt:
+     /api/foundation/impact op de publieke lijst zetten leverde meteen vier
+     meldingen "bestaat niet (meer) als route" op, over routes die gewoon
+     draaien. */
+  const { buitenBereik } = require('./lib/poortbereik');
+  const schaduw = buitenBereik(bestaat, { poortMw: POORT_MW, poortBinnen: POORT_BINNEN, publiek: PUBLIEK });
+  const echtBestaand = (pad) => bestaat.has(pad) ||
+    !!(schaduw.alleApiPaden && schaduw.alleApiPaden.has(pad));
+
   /* Een publieke lijst die namen bevat die niet meer bestaan, groeit stil vol en
      verliest zijn betekenis. Dit is dezelfde controle als regel 25b. */
   for (const pad of PUBLIEK.keys()) {
     if (gezien.has(pad)) continue;
+    /* Staat hij in de LEVENDE routetabel, dan bestaat hij -- ook als de scan van
+       deze regel hem niet ziet. Dan is er niets op te ruimen. */
+    if (!bestaat.has(pad) && echtBestaand(pad)) continue;
     gaten++;
     /* Twee heel verschillende gevallen, en ze verwarren zou de lijst juist
        stiller maken. Bestaat de route nog wel, dan heeft hij inmiddels een
@@ -1943,6 +2034,71 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
   }
   if (!gaten) ok(totaal + ' API-routes: ' + viaMw + ' via een poortwachter, ' + viaBinnen +
     ' met een poort in de handler, ' + PUBLIEK.size + ' bewust publiek met een reden');
+
+  /* DE BLINDE VLEK VAN DEZE REGEL, IN DE SCHADUW GEMETEN.
+
+     Alles hierboven oordeelt over wat de uitdrukking `app.<verb>('/api/...')`
+     VINDT. Wat hij niet vindt, wordt niet afgekeurd en ook niet geteld -- en dat
+     is de gevaarlijkste vorm van groen: een regel die een deel van zijn invoer
+     niet BEKIJKT, zegt niet "in orde" maar "ik heb niet gekeken" (lat regel 10,
+     hier op de handhaver zelf toegepast).
+
+     De vergelijking staat in ./lib/poortbereik.js en gaat tegen de LEVENDE
+     routetabel, niet tegen een tweede regex. Hij begon als MELDING en niet als
+     blokkade: 565 routes in een keer rood zetten maakt van deze regel een muur
+     die binnen een week wordt uitgezet, en "geen bewakerslaag" is niet hetzelfde
+     als "onbeveiligd" -- honderden routes in die takken controleren een
+     capability-token in de handler. Wat ze nodig hadden was een oordeel per
+     route. CONTROLPLANE.md schrijft die volgorde voor: eerst meelopen, dan
+     afdwingen.
+
+     HIJ IS HARD SINDS 2 SEPTEMBER 2026, en dat mocht omdat de schaduw op nul
+     staat: alle 565 zijn geclassificeerd (181 poortwachter, 43 gegenereerde
+     familie, 329 poort in de handler, 12 publiek met reden), nul zonder poort,
+     nul met een onvindbare bron, nul met onbekende bewakers. De weg ernaartoe
+     stond in TAKEN.md 7.14 en liep over vier stappen: de poortnamen van de
+     RTFoundation- en schooltak in POORT_MW, `scimAuth` erbij, een rem plus een
+     reden op de acht open deuren van de foundation, en de lescode-leesroutes
+     door `lesVan()`.
+
+     WAT ER NU ROOD WORDT ZIJN VIER DINGEN, en drie ervan zeggen "ik heb niet
+     gekeken" in plaats van "er is iets fout". Dat is met opzet even hard: een
+     handhaver die zijn eigen blinde vlek groen meldt, is precies waar deze
+     schaduwmeting tegen bestaat (LAT.md regel 10). Dus zakt de keuring ook als
+     de routetabel niet op te halen is, als de classificatie niet kon draaien, en
+     als een pad wel bestaat maar zijn bron of zijn bewakers onvindbaar zijn.
+     Wie een nieuwe route zonder poort toevoegt, ziet hem hier meteen. */
+  {
+    const b = schaduw;
+    if (b.nietVastTeStellen) {
+      fout('check.js regel 28: het bereik van deze regel is niet vast te stellen (' + b.nietVastTeStellen +
+        ') -- niet gemeten is geen "in orde"');
+    } else if (!b.paden.length) {
+      ok('en deze regel ziet elk /api-pad dat de router kent');
+    } else if (b.nietGeclassificeerd) {
+      fout('check.js regel 28: ' + b.paden.length + ' paden vallen buiten deze regel en konden niet worden ' +
+        'geclassificeerd (' + b.nietGeclassificeerd + ') -- niet gemeten is geen "in orde"');
+    } else {
+      const k = b.klasse;
+      console.log('  \x1b[2m  ' + b.paden.length + ' van de ' + b.bekend +
+        ' /api-paden die de router kent, vallen buiten de uitdrukking van deze regel. Geclassificeerd: ' +
+        k.poortwachter.length + ' via een poortwachter, ' + k.familie.length + ' via een gegenereerde familie, ' +
+        k.inHandler.length + ' met een poort in de handler, ' +
+        k.publiek.length + ' publiek met reden, ' + k.bronOnvindbaar.length + ' bron onvindbaar, ' +
+        k.onbekend.length + ' bewakers onbekend.\x1b[0m');
+      for (const g of k.gat) fout('check.js regel 28: ' + g + ' heeft geen enkele poort -- ' +
+        'geef hem er een, of zet hem met een reden op de publieke lijst (scripts/lib/publiekeroutes.js)');
+      for (const p2 of k.bronOnvindbaar) fout('check.js regel 28: ' + p2 + ' bestaat als route maar zijn bron ' +
+        'is niet te vinden, dus over zijn poort valt niets te zeggen -- zet de bewaker bij naam in POORT_MW, ' +
+        'of het voorvoegsel in server/kern/handlerpoorten/buiten.js (FAMILIES)');
+      for (const p2 of k.onbekend) fout('check.js regel 28: van ' + p2 + ' kent de routetabel de bewakers niet, ' +
+        'dus over zijn poort valt niets te zeggen');
+      if (!k.gat.length && !k.bronOnvindbaar.length && !k.onbekend.length) {
+        ok('en de ' + b.paden.length + ' paden buiten die uitdrukking zijn alle ' + b.paden.length +
+          ' geclassificeerd: geen enkele zonder poort');
+      }
+    }
+  }
 }
 
 /* 29) de Authorization-kop wordt gelezen om een token te HALEN, niet om te oordelen.

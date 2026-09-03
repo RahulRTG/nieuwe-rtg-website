@@ -542,6 +542,52 @@ hij hetzelfde is, en de kop laten waar hij verschilt.**
 
 ---
 
+## 3b. De topologie: één schrijver per domein — besluit van 2 september 2026
+
+**De vraag die openstond.** Blijft elk domein één schrijver, of schrijven meerdere
+instances dezelfde data? Dat was geen prestatievraag maar een **correctheidsvraag**,
+en hij moest vóór het ontwerp van de geldlaag beantwoord worden.
+
+Waarom: `server/db/merge.js` regel 29 kiest bij twee gewijzigde scalars "de onze".
+`paySaldi` is zo'n platte map, dus onder twee gelijktijdige schrijvers verdwijnt
+een bevestigde boeking stil — nagerekend met de echte functie:
+
+```
+merge3({A:10000,B:0}, {A:7000,B:3000}, {A:6000,B:4000})  ->  {A:7000,B:3000}
+```
+
+De grootboekregel van de verloren boeking blijft staan en de idempotentiesleutel
+overleeft, dus de retry krijgt "al geboekt" voor een boeking die niet bestaat.
+Dezelfde samenvoeging staat aan de leeskant (`server/pg/inlezen.js`), die op
+NOTIFY en elke twee seconden draait — buiten elk slot om.
+
+**Het besluit: één schrijver per domein.** De vloot (`server/vloot.js`) is de
+vorm: elk domein een eigen proces dat zijn eigen data bezit. Twee instances
+schrijven nooit dezelfde rekening, dus `merge3` komt op geld niet meer voor.
+
+**Wat dat oplevert.** De geldreparatie krimpt van "een append-only grootboek met
+geprojecteerde saldi bouwen" naar "`pasToe()` via het bestaande
+`bewerkCollectie` laten schrijven, en `merge3` laten weigeren op elke collectie
+die `voorcheck.exactNodig()` als geld herkent". Dat is dagen op iets dat er al
+ligt (`server/pg/collectietransactie.js`, advisory lock plus `SELECT FOR UPDATE`
+in één transactie), in plaats van maanden.
+
+**Wat dat kost, en dat hoort er even hard bij.** Je schaalt per domein en niet per
+instance: een domein dat te zwaar wordt, moet worden gesplitst en kan niet worden
+verdubbeld. En **PostgreSQL en Redis worden verplicht in plaats van aanbevolen** —
+`server/vloot.js` schrijft zelf uit dat losse processen hun data alleen veilig
+delen via `DATABASE_URL` en de Redis-bus; zonder die twee heeft elk proces zijn
+eigen snapshot. `TAKEN.md` §2.3 en §2.4 verhuizen daarmee van "sterk aangeraden"
+naar blokkerend voor de vlootstand.
+
+**Wat er NIET mee besloten is.** De weigering in `merge3` op geldcollecties komt
+er hoe dan ook. Hij is onder dit besluit geen reparatie meer maar een **grendel**:
+de weg is dicht, en de code zegt dat ook als iemand hem ooit weer opent.
+
+`TAKEN.md` 7.5 en 7.1.
+
+---
+
 ## 4. De volgorde
 
 Klein en omkeerbaar eerst, en elke stap levert op zichzelf iets op. Niets

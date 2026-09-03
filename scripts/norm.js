@@ -35,6 +35,7 @@ const fs = require('fs');
 const path = require('path');
 const { execFileSync, spawnSync } = require('child_process');
 const { zonderCommentaar } = require('./lib/bron');
+const { vuileRegisters } = require('./lib/paspoort');
 
 const WORTEL = path.join(__dirname, '..');
 const NORMBESTAND = path.join(WORTEL, 'NORM.json');
@@ -406,7 +407,35 @@ const METERS = [
   { sleutel: 'ratelTanden', richting: 'omhoog', wat: 'meters die aan een ratel hangen (de ratel mag niet krimpen)' },
   { sleutel: 'bronBlindeBestanden', richting: 'omlaag', wat: '.js-bestanden waar de commentaar-verwijderaar code kwijtraakt of niet gelezen kan worden' },
   { sleutel: 'delenZonderOnderwerp', richting: 'omlaag', wat: 'bundeldelen zonder onderwerpregel bovenin (zie BUNDELS.md)' },
-  { sleutel: 'metingenZonderRatel', richting: 'omlaag', wat: 'meetbestanden in de wortel die aan geen enkele ratel hangen' }
+  { sleutel: 'metingenZonderRatel', richting: 'omlaag', wat: 'meetbestanden in de wortel die aan geen enkele ratel hangen' },
+  /* DE METER DIE OVER HET BEWIJS ZELF GAAT (STANDAARD.md par. 5).
+
+     Alles hierboven meet de code of de ratel. Deze meet of de UITSLAGEN
+     herhaalbaar zijn. Een register dat zijn meting uit een vuile boom haalt, is
+     niet te reproduceren -- niet moeilijk, maar principieel niet: er bestaat
+     geen commit om naar terug te keren. De uitslag mag bestaan; bewijs is hij
+     niet.
+
+     Hij stond bij het toevoegen op 18 van de 25 registers met een stempel,
+     waaronder VERTROUWEN.json -- waarop de bewijspoort van kern/stuur/beleid.js
+     zijn oordeel baseert. Alleen omlaag, en nul is haalbaar: het kost een
+     meetronde vanaf een schone boom. De telling staat in scripts/lib/paspoort.js
+     zodat de deltapoort met dezelfde functie telt als deze meter. */
+  { sleutel: 'registersUitVuileBoom', richting: 'omlaag', wat: 'registers waarvan de meting uit een vuile werkboom komt (dus niet te herhalen)' },
+  /* DE TWEE REGISTERS VAN 3 SEPTEMBER 2026, elk met de tand die erbij hoort.
+
+     `laatSpoorVerdacht` telt schrijfroutes die de opslag aanraken VOORDAT ze de
+     invoer keuren -- dertien daarvan zijn deze week gerepareerd, en de meter
+     bestaat omdat ze een voor een werden gevonden door een proefronde van een
+     half uur die telkens ANDERE opleverde. Statisch is de lijst eindig.
+
+     `rollbackUitzonderingen` telt de routes waarvan is BESLOTEN dat een
+     geweigerd verzoek er toch iets mag achterlaten. Een uitzondering is een
+     schuld en geen prestatie: hij mag alleen krimpen. Dat is met opzet de tand
+     op dit register en niet "het aantal besluiten", want dan zou uitzonderingen
+     toevoegen de meter juist beter maken. */
+  { sleutel: 'laatSpoorVerdacht', richting: 'omlaag', wat: 'schrijfroutes die de opslag aanraken voordat ze de invoer keuren (scripts/laatspoor.js)' },
+  { sleutel: 'rollbackUitzonderingen', richting: 'omlaag', wat: 'routes die met een BESLUIT een spoor mogen nalaten na een weigering (ROLLBACKBESLUIT.json)' }
 ];
 
 /* De telling zelf, als losse functie met de bestandslijst als invoer -- zodat
@@ -735,6 +764,14 @@ function leesZaakwig(pad) {
     throw new Error('ZAAKWIG.json draagt geen gezakt; een meter zonder invoer is geen meter');
   }
   return a.gezakt;
+}
+
+/* Een register uit de wortel, met de eerlijke uitkomst als hij er niet is:
+   `undefined` en geen nul. Een meter die een ontbrekend bestand als nul leest,
+   meldt zijn beste stand op het moment dat hij niets meet. */
+function leesRegister(naam, uit) {
+  try { return uit(JSON.parse(fs.readFileSync(path.join(WORTEL, naam), 'utf8'))); }
+  catch (e) { return undefined; }
 }
 
 function meet(bronnen) {
@@ -1070,7 +1107,12 @@ function meet(bronnen) {
     dependencies: deps, devPakketten, testbestanden, zelfpoortendeToetsen, browserpoortToetsen, e2eBestanden,
     schermenZonderVormtaal,
     inlineStijlAttributen,
-    ratelTanden, metingenZonderRatel
+    ratelTanden, metingenZonderRatel,
+    /* Het bewijspaspoort. De wortel is de invoer en niet een vaste lijst: een
+       register dat er morgen bijkomt, telt vanzelf mee. */
+    registersUitVuileBoom: vuileRegisters(WORTEL).length,
+    laatSpoorVerdacht: leesRegister('LAATSPOOR.json', (j) => j.gemeten.verdacht),
+    rollbackUitzonderingen: leesRegister('ROLLBACKBESLUIT.json', (j) => Object.keys(j.routes || {}).length)
   };
 }
 

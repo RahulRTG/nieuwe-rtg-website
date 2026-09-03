@@ -89,11 +89,50 @@ async function startServer(opts = {}) {
    tests gewoon blijven werken. */
 const serverUitzonderingen = [];
 const FATAAL = /"bron":"(uncaughtException|unhandledRejection)"|"serverfout":true/;
+
+/* EEN STORING DIE JE ZELF UITLOKT, en waarom daar een deur voor is die niet
+   openblijft staan.
+
+   De poort hierboven laat een toetsbestand zakken zodra een kindserver een echte
+   5xx logt. Dat is goed, en het maakt een hele klasse toetsen onmogelijk: wie wil
+   BEWIJZEN dat een storing ergens aankomt -- in een teller, in een alarm, in een
+   logregel -- moet er een veroorzaken. test/metingpoort.test.js doet dat om aan te
+   tonen dat `rtg_fouten_totaal` werkelijk oploopt (TAKEN.md 7.10), en zonder deze
+   deur zou zo'n toets alleen met een eigen spawn kunnen bestaan -- naast de helper
+   om, en daarmee ook naast alles wat de helper verder bewaakt.
+
+   TWEE DINGEN HOUDEN HEM EERLIJK, en zonder die twee is dit gewoon een dempknop:
+
+     1. De verwachting is SMAL. Je geeft een patroon op; alleen regels die daaraan
+        voldoen worden niet meegeteld. Al het andere zakt gewoon.
+     2. Een verwachting die NIET uitkomt, laat de toets net zo hard zakken. Zeg je
+        "ik ga hier een storing uitlokken" en gebeurt dat niet, dan is er iets
+        anders mis dan je dacht -- en dat is precies de situatie waarin een toets
+        stilletjes niets meer bewijst.
+
+   De regel wordt nog steeds gewoon getoond op stderr. Wat hier verandert is of hij
+   de run laat zakken, niet of je hem ziet. */
+const verwachteFouten = [];
+function verwachtServerfout(patroon, waarom) {
+  wapenStrengePoort();
+  verwachteFouten.push({ patroon, waarom: waarom || String(patroon), geraakt: 0 });
+}
+const verwachtingVoor = (regel) => verwachteFouten.find(v => v.patroon.test(regel));
+
 let poortGewapend = false;
 function wapenStrengePoort() {
   if (poortGewapend) return;
   poortGewapend = true;
   process.on('exit', () => {
+    /* Een verwachting die nooit is uitgekomen, is zelf een gezakte bewering. */
+    const gemist = verwachteFouten.filter(v => !v.geraakt);
+    if (gemist.length) {
+      const wie = require('path').basename(process.argv[1] || 'onbekend');
+      process.stderr.write('\n\x1b[31mSTRENGE POORT (' + wie + '): ' + gemist.length +
+        ' verwachte serverfout(en) zijn NOOIT opgetreden. De run faalt.\x1b[0m\n');
+      for (const v of gemist) process.stderr.write('  - verwacht maar niet gezien: ' + v.waarom + '\n');
+      if (!process.exitCode) process.exitCode = 1;
+    }
     if (!serverUitzonderingen.length) return;
     /* WELK TOETSBESTAND, en dat stond er niet. In een volle, parallelle run
        schrijven tientallen kindprocessen door elkaar heen; deze melding kwam dan
@@ -120,7 +159,12 @@ function luisterOpFouten(child) {
     process.stderr.write(buf); // gewoon tonen, net als 'inherit'
     rest += buf.toString();
     const regels = rest.split('\n'); rest = regels.pop();
-    for (const regel of regels) if (FATAAL.test(regel)) serverUitzonderingen.push(regel.trim().slice(0, 300));
+    for (const regel of regels) {
+      if (!FATAAL.test(regel)) continue;
+      const verwacht = verwachtingVoor(regel);
+      if (verwacht) { verwacht.geraakt++; continue; }   // uitgelokt en aangekondigd: geen reden om te zakken
+      serverUitzonderingen.push(regel.trim().slice(0, 300));
+    }
   });
 }
 
@@ -1249,4 +1293,5 @@ module.exports = { bankDeur, bewaakKind, binnenEenDag, browserOpties, drukte, el
   wachtOpRust, wachtTot, wachtOpTekst, wachtOpZichtbaar, wachtOpVerandering,
   wachtOpNetstilte, wachtOpBestand, klikEnWacht, tekstVan, postJson,
   // testhaken om de strenge poort zelf te kunnen verifieren
-  _poort: { luisterOpFouten, serverUitzonderingen, isFataal: (r) => FATAAL.test(r) } };
+  verwachtServerfout,
+  _poort: { luisterOpFouten, serverUitzonderingen, verwachteFouten, isFataal: (r) => FATAAL.test(r) } };

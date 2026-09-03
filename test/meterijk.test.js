@@ -1400,8 +1400,54 @@ const IJKINGEN = {
     proef: (voor) => metTijdelijkBestand('zz-ijk-tijdelijk.json',
       '{ "uitleg": "verzonnen meting zonder ratel, alleen tijdens de ijking" }\n',
       () => norm.meet().metingenZonderRatel - voor.metingenZonderRatel)
+  },
+  /* HET BEWIJSPASPOORT (STANDAARD.md par. 5). Dezelfde tijdelijke naam als de
+     meter hierboven, want hij staat al in de opruimcontrole -- alleen met een
+     stempel erin die zegt dat de meting uit een vuile boom komt.
+
+     Dat die twee meters allebei op DIT bestand uitslaan is geen probleem maar
+     een eigenschap: elke proef leest alleen zijn eigen sleutel, en ze draaien
+     na elkaar met een eigen opruiming. */
+  registersUitVuileBoom: {
+    proef: (voor) => metTijdelijkBestand('zz-ijk-tijdelijk.json',
+      '{ "stempel": { "commit": "0000000", "boomVuil": true } }\n',
+      () => norm.meet().registersUitVuileBoom - voor.registersUitVuileBoom)
+  },
+
+  /* DE TWEE VAN 3 SEPTEMBER 2026. Allebei lezen ze een register dat er AL is,
+     dus een nieuw bestand helpt niet -- ze worden geijkt door er tijdelijk een
+     regel aan toe te voegen en te kijken of de meter meebeweegt.
+
+     Waarom dat de goede ijking is: deze twee meters tellen posten IN een
+     register. Een meter die zijn register verkeerd leest (verkeerd veld, of een
+     ontbrekend bestand als nul) verandert dan NIET mee, en dat is precies de
+     faalvorm die hier moet opvallen. */
+  laatSpoorVerdacht: {
+    proef: (voor) => metVervangenJson('LAATSPOOR.json',
+      (j) => { j.gemeten.verdacht = (j.gemeten.verdacht || 0) + 7; return j; },
+      () => norm.meet().laatSpoorVerdacht - voor.laatSpoorVerdacht)
+  },
+  rollbackUitzonderingen: {
+    proef: (voor) => metVervangenJson('ROLLBACKBESLUIT.json',
+      (j) => { j.routes['/api/zz-ijk-verzonnen'] = { klasse: 'veilige-kant', reden: 'ijking' }; return j; },
+      () => norm.meet().rollbackUitzonderingen - voor.rollbackUitzonderingen)
   }
 };
+
+/* Een bestaand JSON-register tijdelijk aanpassen en daarna byte voor byte
+   terugzetten. metAanbouw() hierboven plakt tekst achter een bestand; dat kan
+   niet bij JSON, want dan is het geen geldige JSON meer en leest de meter niets
+   -- en een meter die niets leest, beweegt ook niet, waardoor de ijking zou
+   slagen om de verkeerde reden. */
+function metVervangenJson(relPad, wijzig, doe) {
+  const vol = path.join(WORTEL, relPad);
+  assert.equal(fs.existsSync(vol), true, 'de ijking wijzigt alleen iets dat bestaat: ' + relPad);
+  const oud = fs.readFileSync(vol, 'utf8');
+  try {
+    fs.writeFileSync(vol, JSON.stringify(wijzig(JSON.parse(oud)), null, 1) + '\n');
+    return doe();
+  } finally { fs.writeFileSync(vol, oud); }
+}
 
 /* De proef achter alle zes. Ze verschillen alleen in hun sleutel, dus staat de
    inhoud op EEN plek -- zes kopieen zijn zes kansen om er een te vergeten bij

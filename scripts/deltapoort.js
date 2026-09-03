@@ -108,6 +108,7 @@ const { zonderCommentaar } = require('./lib/bron');
 const V = require('./verstrengeling');
 const { PATRONEN: INGANGPATRONEN } = require('./wekkers');
 const VERKLAARDE_INGANGEN = new Set(require('./lib/wekker-verklaringen').map(v => v.bestand));
+const { uitVuileBoom } = require('./lib/paspoort');
 
 const arg = (naam, std) => { const i = process.argv.indexOf(naam); return i > 0 ? process.argv[i + 1] : std; };
 const TOON = process.argv.includes('--toon');
@@ -194,6 +195,10 @@ const bundelPaden = new Set(Object.keys(require('./bundel').bundels).map(k => 'p
 const isPubliek = (p) => /^public\/.+\.(html|js)$/.test(p) && !p.includes('/dist/') && !bundelPaden.has(p);
 const isServer = (p) => /^server\/.+\.js$/.test(p);
 const isDienstToets = (p) => /^test\/.+\.test\.js$/.test(p);
+/* Een register in de WORTEL, en alleen daar: de registers die als bewijs worden
+   aangehaald staan er allemaal. Een .json dieper in de boom is zaaidata, een
+   landpakket of een vertaling en draagt geen meting. */
+const isRegister = (p) => /^[A-Z0-9_-]+\.json$/.test(p);
 
 function telStijl(tekst) { return telInlineStijl(() => tekst, ['x']); }
 
@@ -289,6 +294,30 @@ const REGELS = [
         hulp: 'het aantal modules over de grens mag niet groeien -- haal er iets uit of zet het nieuwe in een eigen module' }];
       if (nu > toen) return [{ bericht: 'dit bestand staat al over de grens (' + toen + ' bytes) en groeit naar ' + nu,
         hulp: 'over de grens mag je repareren, niet uitbreiden' }];
+      return [];
+    }
+  },
+  {
+    /* HET BEWIJSPASPOORT (STANDAARD.md par. 5).
+
+       Een register waarvan de meting uit een vuile werkboom komt, is niet te
+       herhalen: er bestaat geen commit om naar terug te keren. Voor NIEUW werk
+       is de norm nul, en een bestaand register mag niet van schoon naar vuil.
+
+       De omgekeerde weg -- vuil naar schoon -- is juist het doel en gaat vrij
+       door de poort. Dat is hier het verschil tussen een poort en een slot: hij
+       houdt de verkeerde richting tegen en niet de beweging. */
+    naam: 'bewijs-uit-vuile-boom',
+    meter: 'registersUitVuileBoom',
+    wat: 'registers waarvan de meting uit een vuile werkboom komt',
+    geldt: isRegister,
+    keur(pad, voor, na) {
+      const nu = uitVuileBoom(na);
+      if (!nu) return [];
+      const hulp = 'commit eerst je wijzigingen en draai de meetronde daarna opnieuw; ' +
+        'een uitslag uit een boom die geen commit was, is niet te herhalen en dus geen bewijs';
+      if (voor === null) return [{ bericht: 'nieuw register met een meting uit een vuile werkboom; de norm voor nieuw werk is nul', hulp }];
+      if (!uitVuileBoom(voor)) return [{ bericht: 'dit register was schoon gemeten en komt nu uit een vuile werkboom', hulp }];
       return [];
     }
   },

@@ -66,9 +66,15 @@ module.exports = (ctx) => {
     const centen = Math.round(Number(req.body.centen));
     if (!Number.isFinite(sterren) || sterren < 1) return res.status(400).json({ error: 'Hoeveel sterren verzilver je?' });
     if (!Number.isFinite(centen) || centen < 1 || centen > 50000) return res.status(400).json({ error: 'Kies een bedrag tot 500 euro.' });
-    const verz = (s.g.sterrenVerzilverd = s.g.sterrenVerzilverd || {});
-    const beschikbaar = ((s.g.sterren || {})[p.id] || 0) - (verz[p.id] || 0);
+    /* Eerst REKENEN op wat er staat, en pas boeken als het mag. Het boekje
+       aanleggen (hier en in boekBij) hoort bij het verzilveren zelf; deed je
+       het ervoor, dan liet een geweigerde poging een leeg register achter dat
+       er niet was -- en dan zeggen de 400 en de database twee verschillende
+       dingen over hetzelfde verzoek. Een kind zonder register heeft nul
+       verzilverde sterren, dus de som hieronder verandert er niet van. */
+    const beschikbaar = ((s.g.sterren || {})[p.id] || 0) - ((s.g.sterrenVerzilverd || {})[p.id] || 0);
     if (sterren > beschikbaar) return res.status(400).json({ error: 'Zoveel sterren staan er niet open. Er ' + (beschikbaar === 1 ? 'staat er nog 1' : 'staan er nog ' + beschikbaar) + '.' });
+    const verz = (s.g.sterrenVerzilverd = s.g.sterrenVerzilverd || {});
     verz[p.id] = (verz[p.id] || 0) + sterren;
     boekBij(p, centen, 'Sterren verzilverd (' + sterren + ')');
     save();

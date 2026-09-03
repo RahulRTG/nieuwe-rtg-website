@@ -17,9 +17,17 @@
      de klassieke fout in kassasystemen, en hij staat hier in een toets. */
 module.exports = (kern) => {
   const { app, save, schoon, supplierAuth, logActivity, sseToSupplier, horeca } = kern;
-  const { H, nu, id, totaal, openstaand, controleerSom, waarde, kortingCenten } = horeca;
+  const { H, Hlees, nu, id, totaal, openstaand, controleerSom, waarde, kortingCenten } = horeca;
   const rekVan = kern.horecaRekVan;
   const publiek = kern.horecaPubliek;
+
+  /* KIJKEN IS Hlees EN NIET H. H() zet de horecadoos van een zaak neer zodra
+     iemand ernaar vraagt -- ook als het verzoek daarna op een 400, 404 of 409
+     eindigt, en dan zeggen de statuscode en de opslag twee verschillende dingen
+     over hetzelfde verzoek. Bestaat de doos wel, dan geeft Hlees hem ECHT
+     terug: de rekening die hieronder wordt bijgewerkt landt gewoon in de opslag
+     (zie kern/horeca.js bij Hlees). Alleen het splitsen zet er werkelijk
+     rekeningen BIJ, en daar staat H() dus nog -- maar pas na de somcontrole. */
 
   const openCheck = (r, res) => {
     if (r.status !== 'open') { res.status(409).json({ error: 'Deze rekening is al ' + r.status + '.' }); return false; }
@@ -31,7 +39,7 @@ module.exports = (kern) => {
   app.post('/api/supplier/horeca/rekening/verplaats', supplierAuth, (req, res) => {
     const r = rekVan(req, res); if (!r) return;
     if (!openCheck(r, res)) return;
-    const h = H(req.supplier.code);
+    const h = Hlees(req.supplier.code);
     const naar = schoon(req.body.naarTafel, 30);
     if (!naar) return res.status(400).json({ error: 'Naar welke tafel?' });
     const bezet = Object.values(h.rekeningen).find(x => x.status === 'open' && x.id !== r.id && x.kanaal === 'tafel' && x.tafel === naar);
@@ -49,7 +57,7 @@ module.exports = (kern) => {
   app.post('/api/supplier/horeca/rekening/voeg-samen', supplierAuth, (req, res) => {
     const r = rekVan(req, res); if (!r) return;
     if (!openCheck(r, res)) return;
-    const h = H(req.supplier.code);
+    const h = Hlees(req.supplier.code);
     const ander = Object.prototype.hasOwnProperty.call(h.rekeningen, String(req.body.metId || ''))
       ? h.rekeningen[String(req.body.metId)] : null;
     if (!ander) return res.status(404).json({ error: 'Die tweede rekening kennen we niet.' });
@@ -86,7 +94,6 @@ module.exports = (kern) => {
   app.post('/api/supplier/horeca/rekening/splits', supplierAuth, (req, res) => {
     const r = rekVan(req, res); if (!r) return;
     if (!openCheck(r, res)) return;
-    const h = H(req.supplier.code);
     const perPersoon = Math.max(0, Math.min(50, parseInt(req.body.perPersoon, 10) || 0));
     const delen = Array.isArray(req.body.delen) ? req.body.delen : null;
     if (!perPersoon && !delen) return res.status(400).json({ error: 'Splits per persoon (perPersoon: 3) of per product (delen: [[regelId, ...], ...]).' });
@@ -132,6 +139,10 @@ module.exports = (kern) => {
     if (!controleerSom(voor, nieuw))
       return res.status(500).json({ error: 'De som klopt niet na splitsen; er is niets gewijzigd.' });
 
+    /* Hier komen er werkelijk rekeningen BIJ, dus hier hoort H(). Pas NA de
+       somcontrole: die zegt met zoveel woorden dat er niets is gewijzigd, en
+       dan hoort er ook niets te zijn ontstaan. */
+    const h = H(req.supplier.code);
     const gemaakt = nieuw.map((deel, i) => {
       const n = { id: id(5), kanaal: r.kanaal, tafel: r.tafel, naam: (r.naam || 'Rekening') + ' · deel ' + (i + 1),
         gasten: 1, status: 'open', regels: deel.regels, kortingen: deel.kortingen, betalingen: [], fooiCenten: 0,

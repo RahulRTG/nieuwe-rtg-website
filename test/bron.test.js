@@ -194,3 +194,52 @@ test('over de hele bron haalt hij nooit MEER weg dan de oude regex deed', () => 
   assert.ok(bestanden > 3000, 'er zijn echt bestanden gelezen: ' + bestanden);
   assert.deepEqual(verdacht, [], 'deze bestanden zouden minder zichtbaar worden dan met de oude regex');
 });
+
+/* ---------------------------------------------------------------- DE DERDE VORM
+
+   `zonderCommentaar(bron, { regelsHeel: true })` slaat commentaar PLAT in plaats
+   van het weg te halen: elk teken wordt een spatie, elke regelovergang blijft
+   staan. De kop van scripts/lib/bron.js vroeg al om deze vorm ("wie de
+   REGELNUMMERS heel wil houden heeft een derde vorm nodig"); scripts/lib/routes.js
+   had hem nodig omdat hij een treffer moet kunnen terugmelden als bestand:regel.
+
+   Twee eigenschappen dragen alles wat hierop leunt, en ze worden hier apart
+   getoetst: de LENGTE blijft gelijk (dus tekenposities kloppen) en het AANTAL
+   REGELS blijft gelijk (dus regelnummers kloppen). Zakt een van beide, dan wijst
+   elke melding die hierop leunt naar de verkeerde plek -- stil. */
+test('de derde vorm houdt lengte en regelnummers heel, en het commentaar is er wel uit', () => {
+  const bron = [
+    "const a = 1; /* een blok",
+    "dat over regels loopt */ const b = 2;",
+    "const c = 3; // een regelcommentaar",
+    "const pad = '/api/rtf/spel/nieuw';"
+  ].join('\n');
+  const heel = zonderCommentaar(bron, { regelsHeel: true });
+  assert.equal(heel.length, bron.length, 'even lang, anders schuiven de tekenposities');
+  assert.equal(heel.split('\n').length, bron.split('\n').length, 'even veel regels, anders schuiven de regelnummers');
+  assert.equal(heel.includes('een blok'), false, 'het blokcommentaar is eruit');
+  assert.equal(heel.includes('een regelcommentaar'), false, 'het regelcommentaar is eruit');
+  assert.ok(heel.includes("'/api/rtf/spel/nieuw'"), 'de tekenreeksen blijven staan -- daar staan de paden in');
+  // en de regel waarop de code staat is nog steeds dezelfde regel
+  assert.equal(heel.split('\n')[3], bron.split('\n')[3], 'een regel zonder commentaar verandert niet');
+});
+
+test('de derde vorm verandert de gewone vorm niet', () => {
+  const bron = "const a = 1; /* weg */ const b = 2; // ook weg\nconst c = 3;";
+  const gewoon = zonderCommentaar(bron);
+  assert.equal(gewoon.split('\n').length, 2, 'de gewone vorm plet een blok tot EEN spatie en houdt dus zijn oude gedrag');
+  assert.equal(gewoon.includes('weg'), false);
+  assert.notEqual(gewoon.length, bron.length, 'juist WEL korter -- dat is het verschil met de derde vorm');
+});
+
+/* Een commentaarblok dat niet wordt afgesloten. De gewone vorm laat de rest van
+   het bestand vallen (dat doet een JS-parser ook); de derde vorm moet hem
+   platslaan en NIET afkappen, anders klopt de lengte niet meer precies daar waar
+   het misgaat. */
+test('een niet-afgesloten blok wordt platgeslagen en niet afgekapt', () => {
+  const bron = "const a = 1;\n/* dit blok sluit nooit\nconst b = 2;";
+  const heel = zonderCommentaar(bron, { regelsHeel: true });
+  assert.equal(heel.length, bron.length, 'even lang');
+  assert.equal(heel.split('\n').length, bron.split('\n').length, 'even veel regels');
+  assert.equal(heel.includes('const b'), false, 'en de inhoud is wel degelijk commentaar');
+});

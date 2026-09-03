@@ -20,6 +20,13 @@ module.exports = ({ db, save, crypto, anthropic }) => {
     if (!Array.isArray(d().rtfKantoorTaken[afd])) d().rtfKantoorTaken[afd] = [];
     return d().rtfKantoorTaken[afd];
   }
+  /* Kijken zonder scheppen: taken() zet de rij neer voor een afdeling die er nog
+     geen had, ook als het verzoek daarna met een 404 teruggaat. Zie
+     scripts/laatspoor.js voor waarom dit patroon een eigen meter heeft. */
+  const takenKijk = (afd) => {
+    const w = d().rtfKantoorTaken;
+    return (w && Array.isArray(w[afd])) ? w[afd] : [];
+  };
   function taakMaak(afd, tekst) {
     if (!AFDELINGEN[afd]) return { status: 404, error: 'Deze kamer bestaat niet.' };
     const t = String(tekst || '').replace(/[<>]/g, '').trim().slice(0, 200);
@@ -31,7 +38,7 @@ module.exports = ({ db, save, crypto, anthropic }) => {
     return { ok: true, taken: rij.slice(0, 30) };
   }
   function taakZet(afd, id, af) {
-    const t = taken(afd).find(x => x.id === id);
+    const t = takenKijk(afd).find(x => x.id === id);
     if (!t) return { status: 404, error: 'Deze taak staat er niet meer.' };
     t.af = af === true;
     save();

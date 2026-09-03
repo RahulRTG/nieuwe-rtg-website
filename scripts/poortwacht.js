@@ -60,11 +60,26 @@ const BASIS = args.find(a => a.startsWith('http')) || 'http://127.0.0.1:3000';
    alleen hier, waarvan er twee niet eens meer bestonden als route en een een
    rem beloofde die op een gelijknamige route van een ander domein stond.
 
+   WAT DAT UITEENLOPEN KOSTTE, zodat niemand de lijst hier terugzet. Deze sonde
+   las scripts/lib/publiekeroutes.js niet -- een derde lezer die nooit was
+   aangesloten -- en de twee waren uiteengelopen tot 64 tegenover 125.
+   /api/claims, /api/sociaalbeleid en /api/betaaldiensttarief (GET en POST) plus
+   /api/foundation/school/personeel/inloglink stonden met een uitgeschreven reden
+   op de gedeelde lijst, kwamen hier als OPEN uit de meting, werden daardoor in
+   de bewijsmatrix een gezakte AUTH-cel, gingen in VERTROUWEN.json naar
+   `geschorst` en werden door server/middleware/schorspoort.js met een 503
+   dichtgezet. Zeven route-ingangen dicht, puur omdat twee lijsten uit elkaar
+   liepen. De kop van publiekeroutes.js had dat letterlijk voorspeld.
+
    Ze wonen nu allebei in ./lib/publiek.js, en met opzet niet als een lijst: dat
    bestand houdt PUBLIEK (welke SCHRIJFroute mag zonder gezagsfunctie) en
    ALLEEN_ANONIEM (welke route mag 2xx antwoorden aan een anonieme klop, ook een
-   GET) uit elkaar, zodat geen van beide poorten ruimer wordt. POORTWACHT is de
-   som en is wat deze ronde nodig heeft. Wie een pad toevoegt, doet dat daar. */
+   GET) uit elkaar, zodat geen van beide poorten ruimer wordt. Dat tweede is de
+   klasse die deze sonde eigen had: /api/metrics HEEFT een poort (de meetpoort)
+   die vanaf een intern adres opengaat, en hoort dus juist NIET op de lijst van
+   routes zonder poort -- keuringsregel 28 zou hem daar terecht als overbodige
+   uitzondering aanwijzen. POORTWACHT is de som en is wat deze ronde nodig
+   heeft. Wie een pad toevoegt, doet dat daar. */
 const { POORTWACHT: PUBLIEK } = require('./lib/publiek');
 
 /* ---- DE TWEE METRICS-DEUREN ZIJN CONFIGURATIE, GEEN CODE ----

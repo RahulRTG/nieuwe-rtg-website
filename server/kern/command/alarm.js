@@ -29,7 +29,15 @@
 
 const ERNST = { hoog: 3, midden: 2, laag: 1 };
 
-function maakAlarm({ opslag, save, journaal, slo, sonde, canary, kwaliteit, norm, sein }) {
+/* Stilzetten is een MENSENhandeling, en die trede komt uit de schaal in
+   ./risico.js en niet uit een overgetypte tekenreeks -- zie de kop van
+   ./alarm-uitgang.js voor waarom dat verschil telt. */
+/* De niveaus wonen sinds de samenvoeging #161 in kern/frictie (het
+   risicomodel verhuisde van command/risico.js naar frictie/motor.js); de
+   naam is dezelfde, de plek niet. */
+const { NIVEAUS } = require('../frictie');
+
+function maakAlarm({ opslag, save, journaal, slo, sonde, canary, kwaliteit, norm, sein, foutmelder }) {
   const D = () => {
     const n = (typeof norm === 'function' ? norm() : norm) || {};
     return Object.assign({ budgetRestDeel: 0.25, defectenDrempel: 25, buitenStilUren: 24, stilteMaxUren: 72 },
@@ -131,21 +139,10 @@ function maakAlarm({ opslag, save, journaal, slo, sonde, canary, kwaliteit, norm
     return { nieuw, opgelost, actief: gevonden.length };
   }
 
-  /* De uitgang. Twee kanalen, allebei van het huis zelf: een regel in het
-     journaal (zodat het in het spoor staat) en een sein naar het kantoorbord
-     (zodat iemand het ziet zonder te zoeken). Stilgezet? Dan wel noteren en
-     niet seinen -- stilte hoort in het spoor te staan. */
-  function meld(a, richting) {
-    const stil = a.stilTot && Date.parse(a.stilTot) > Date.now();
-    try {
-      journaal.noteer({ actie: richting === 'aan' ? 'alarm aan' : 'alarm af', actor: 'automaat',
-        niveau: 'auto', objectType: 'alarm', objectId: a.id,
-        reden: a.naam + (richting === 'aan' ? ': ' + a.wat : ' is opgelost') + (stil ? ' (stilgezet)' : '') });
-    } catch (e) { /* een journaalstoring mag het alarm niet dempen */ }
-    if (!stil && typeof sein === 'function') {
-      try { sein('sync', { scope: 'alarm', id: a.id, richting, ernst: a.ernst, naam: a.naam }); } catch (e) {}
-    }
-  }
+  /* De uitgang staat in ./alarm-uitgang.js: drie kanalen, waarvan het derde
+     buiten het huis komt. Waarom dat een eigen bestand is, staat in de kop
+     daarvan; kort: melden is een ander onderwerp dan wegen. */
+  const { meld, buitenStand } = require('./alarm-uitgang')({ journaal, sein, foutmelder });
 
   /* Stilzetten, met een einde eraan. Een alarm dat voor onbepaalde tijd stil
      kan, is een alarm dat je uitzet en vergeet; daarom een maximum uit de norm
@@ -157,7 +154,7 @@ function maakAlarm({ opslag, save, journaal, slo, sonde, canary, kwaliteit, norm
     const u = Math.max(1, Math.min(Number(uren || 8), d.stilteMaxUren));
     a.stilTot = new Date(Date.now() + u * 3600000).toISOString();
     save();
-    journaal.noteer({ actie: 'alarm stilgezet', actor: door, niveau: 'hand', objectType: 'alarm',
+    journaal.noteer({ actie: 'alarm stilgezet', actor: door, niveau: NIVEAUS.hand, objectType: 'alarm',
       objectId: a.id, reden: u + ' uur: ' + String(reden || 'geen reden opgegeven') });
     return { alarm: a, tot: a.stilTot, max: d.stilteMaxUren };
   }
@@ -173,7 +170,12 @@ function maakAlarm({ opslag, save, journaal, slo, sonde, canary, kwaliteit, norm
       tel: { actief: actief.length, hoog: actief.filter(a => a.ernst === 'hoog').length,
         stil: actief.filter(a => a.stilTot && Date.parse(a.stilTot) > Date.now()).length },
       drempels: D(),
-      uitgangen: ['het journaal (elke aan- en afmelding)', 'het kantoorbord via de office-SSE'],
+      /* De uitgangen worden GETELD en niet beloofd. Stond ERR_WEBHOOK_URL leeg,
+         dan hoort daar niet stilzwijgend een kanaal in de lijst te staan dat er
+         niet is -- een lege url leest anders als bezorging. */
+      uitgangen: ['het journaal (elke aan- en afmelding)', 'het kantoorbord via de office-SSE']
+        .concat(buitenStand().actief ? ['de externe webhook (ERR_WEBHOOK_URL), alleen op de overgang'] : []),
+      geenUitgang: buitenStand().actief ? null : buitenStand().reden,
       let: 'er gaat geen mail en geen telefoonmelding uit. Dat is een kanaalbesluit met een piket ' +
         'eraan vast (SLO.md, punt 4) en hoort niet stilzwijgend hier ingebouwd te worden. En het alarm ' +
         'piept op verandering en niet elke ronde: een melding die elke dertig seconden terugkomt, leert ' +
@@ -182,12 +184,17 @@ function maakAlarm({ opslag, save, journaal, slo, sonde, canary, kwaliteit, norm
   }
 
   function tikker() {
+    /* Niet in een meetserver: zie ./tikkerstand.js voor waarom een klok die
+       binnen het meetvenster afgaat, zijn schrijfactie aan een willekeurige
+       route toegerekend krijgt. Alleen de LUS gaat uit; een weeg() die een
+       route zelf aanroept blijft gewoon schrijven. */
+    if (require('./tikkerstand').tikkersUit()) return null;
     const t = setInterval(() => { try { weeg(); } catch (e) { /* nooit de lus breken */ } }, 60000);
     if (t.unref) t.unref();
     return t;
   }
 
-  return { weeg, stand, stilzetten, controles, tikker };
+  return { weeg, stand, stilzetten, controles, tikker, buitenStand };
 }
 
 module.exports = { maakAlarm, ERNST };

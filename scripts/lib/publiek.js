@@ -57,6 +57,14 @@ const PUBLIEK = new Map([
   ['/api/aanmelding/aanvraag', 'een aanstaande aanvrager is nog geen lid (met rem per ip)'],
   ['/api/foundation/registratie/aanvragen', 'een school, vrijwilliger of stichting heeft vóór toelating nog geen account of code (met rem per ip)'],
   ['/api/foundation/registratie/status', 'de willekeurige, gehashte statussleutel is de geloofsbrief en toont uitsluitend die ene aanvraag (met rem per ip)'],
+  /* Vijf uit #176 ("vier bewust publieke routes gingen offline omdat twee
+     lijsten uiteenliepen"): daar stonden ze in de oude lijst van
+     publiekeroutes.js, hier in de ene lijst die overbleef. */
+  ['/api/foundation/gezin/maak', 'een gezin dat zichzelf aanmaakt heeft nog geen gezinscode en geen profiel; rem 8 per adres per half uur (server/foundation/gezin.js)'],
+  ['/api/foundation/reis/aanvraag', 'een gezin dat om een reis vraagt of wordt voorgedragen heeft geen account; rem 6 per adres per uur, want de lijst is afgekapt op duizend en volschrijven zou echte hulpvragen eruit duwen (server/foundation/onderwijs/schrift.js)'],
+  ['/api/foundation/school/personeel/aanmeld', 'oude testfixture, buiten de toetsenreeks 410: in productie geeft de directie een persoonlijke uitnodiging; rem 6 per adres per kwartier (server/school/beheer.js)'],
+  ['/api/foundation/school/personeel/uitnodiging/bekijk', 'de uitnodigingssleutel IS de geloofsbrief en toont uitsluitend die ene uitnodiging; rem 8 per adres per kwartier (server/school/personeelstoegang.js)'],
+  ['/api/foundation/school/personeel/uitnodiging/accepteer', 'de uitnodigingssleutel IS de geloofsbrief; hij verloopt, gaat na gebruik dicht en de hash wordt gewist, rem 6 per adres per kwartier (server/school/personeelstoegang.js)'],
   /* Het bewijsstuk voor de gereguleerde genres hoort bij dezelfde aanvraag en
      loopt dus dezelfde weg: wie een apotheek aanvraagt heeft op dat moment
      geen zaak, geen personeelslogin en soms geen account -- alleen zijn

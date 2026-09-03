@@ -90,14 +90,18 @@ const log = {
   // De eigen in-memory fout-aggregatie (voor het techniekbord).
   foutenSamenvatting, foutenReset,
   // Meld een echte uitzondering (met stack): log hem, tel hem in de eigen
-  // aggregatie, en geef hem door aan een optionele externe tracker (Sentry).
+  // aggregatie, tel hem in de meting, en geef hem door aan een optionele
+  // externe tracker (Sentry).
   uitzondering(err, context) {
     const veld = Object.assign({ fout: (err && err.message) || String(err), stack: err && err.stack }, context || {});
     schrijf('error', 'uitzondering', veld);
     try { noteerFout(err, context || {}); } catch (e) {}
+    try { require('./log-meting').telServerfout(err, context || {}); } catch (e) {}
     if (foutHaak) { try { foutHaak(err, context || {}); } catch (e) {} }
   }
 };
+
+
 
 /* Express-middleware: log elk verzoek met een correlatie-id, methode, pad,
    status en duur. Het id komt terug in de response-header (X-Request-Id) zodat

@@ -121,21 +121,29 @@ app.post('/api/supplier/rides.csv', supplierAuth, (req, res) => {
 app.post('/api/supplier/fleet', supplierAuth, (req, res) => {
   if (!req.actor.manager) return res.status(403).json({ error: 'Alleen voor management.' });
   const s = req.supplier;
-  s.fleet = s.fleet || [];
+  /* LEZEN, NIET ZETTEN. Hier stond `s.fleet = s.fleet || []` boven de keuring:
+     een zaak zonder vloot kreeg zijn lege lijst al aangemaakt, ook als de actie
+     daarna onbekend bleek of de naam ontbrak. De staatproef ving dat als een
+     gezakte ROLLBACK ("geweigerd (status 400) en de toestand veranderde toch:
+     suppliers"), en via VERTROUWEN.json zette de schorspoort deze route met een
+     503 dicht. De lijst wordt nu pas vastgezet als er werkelijk iets verandert. */
+  const vloot = Array.isArray(s.fleet) ? s.fleet : [];
   const a = String(req.body.action || '');
   if (a === 'add') {
     const name = schoon(req.body.name, 50), plate = schoon(req.body.plate, 16);
     if (!name) return res.status(400).json({ error: 'Geef het voertuig een naam.' });
-    s.fleet.push({ id: 'v' + Date.now().toString(36), name, plate, seats: Math.min(20, Math.max(1, Number(req.body.seats) || 4)), active: true });
+    vloot.push({ id: 'v' + Date.now().toString(36), name, plate, seats: Math.min(20, Math.max(1, Number(req.body.seats) || 4)), active: true });
+    s.fleet = vloot;
   } else if (a === 'remove') {
-    s.fleet = s.fleet.filter(v => v.id !== req.body.id);
+    s.fleet = vloot.filter(v => v.id !== req.body.id);
   } else if (a === 'toggle') {
-    const v = s.fleet.find(x => x.id === req.body.id);
+    const v = vloot.find(x => x.id === req.body.id);
     if (v) v.active = !v.active;
+    s.fleet = vloot;
   } else return res.status(400).json({ error: 'Onbekende actie.' });
   save();
   sseToSupplier(s.code, 'sync', { scope: 'settings' });
   logActivity(s.code, req.actor, 'werkte de vloot bij');
-  res.json({ ok: true, fleet: s.fleet });
+  res.json({ ok: true, fleet: s.fleet || [] });
 });
 };

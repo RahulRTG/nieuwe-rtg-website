@@ -9,17 +9,26 @@ module.exports = (kern) => {
   const partnerwerk = require('../../kern/eten/partnerwerk')(kern, horeca);
 
   const doos = code => horeca.H(code);
+  /* De leesbroer van doos(). H() zet de horecadoos van een zaak neer zodra
+     iemand ernaar vraagt -- ook als het antwoord daarna een 404 is, en dan zegt
+     de statuscode dat er niets gebeurde terwijl er in de opslag wel iets bij
+     kwam. Bestaat de doos wel, dan geeft Hlees hem ECHT terug: wat hieronder in
+     de rekening verandert landt gewoon. Zie kern/horeca.js bij Hlees. */
+  const leesdoos = code => horeca.Hlees(code);
 
   app.post('/api/supplier/eten/werkblad', supplierAuth, (req, res) => {
     res.json(partnerwerk.werkbladVan(req.supplier, req.body || {}, req.actor));
   });
 
   app.post('/api/supplier/eten/capaciteit', supplierAuth, (req, res) => {
-    const h = doos(req.supplier.code), b = req.body || {};
+    const b = req.body || {};
+    /* De rechtenvraag gaat VOOR de doos: wie geen manager is krijgt een 403, en
+       dan hoort er geen verse horecadoos achter te blijven. */
+    if (b.wijzig === true && !managerOnly(req, res)) return;
+    const h = doos(req.supplier.code);
     h.etenCapaciteit = h.etenCapaciteit || {};
     const c = h.etenCapaciteit;
     if (b.wijzig === true) {
-      if (!managerOnly(req, res)) return;
       if (b.open != null) c.open = !!b.open;
       if (b.auto != null) c.auto = !!b.auto;
       if (b.extraMinuten != null) c.extraMinuten = Math.max(0, Math.min(120, parseInt(b.extraMinuten, 10) || 0));
@@ -56,7 +65,7 @@ module.exports = (kern) => {
   });
 
   function rekeningVan(req, res) {
-    const r = doos(req.supplier.code).rekeningen[String((req.body || {}).rekeningId || '')];
+    const r = leesdoos(req.supplier.code).rekeningen[String((req.body || {}).rekeningId || '')];
     if (!r || !beeld.OPEN_KANALEN.includes(r.kanaal)) { res.status(404).json({ error:'Deze RTG Eten-order is niet gevonden.' }); return null; }
     return r;
   }
@@ -92,9 +101,25 @@ module.exports = (kern) => {
         return res.status(409).json({ error:'Start de bereiding eerst.' });
       for (const r of regels) if (r.stand !== 'uitgegeven') { r.stand = 'klaar'; r.klaarAt = r.klaarAt || horeca.nu(); }
     }
+    /* EERST DE DRIE UITGIFTESTANDEN KEUREN, DAN PAS DE LA NEERZETTEN. Dit stond
+       andersom: `rek.fulfillment` werd aangemaakt voordat er iets was gekeurd,
+       en alle drie de controles hieronder eindigen op een 409 -- dan zei de
+       statuscode dat er niets gebeurde terwijl er op de rekening een verse la
+       stond. Kijken kan uit een lege vorm: een rekening zonder la heeft geen
+       uitgiftestand, en dat is precies wat deze controles vragen. */
+    const uitgifte = rek.fulfillment || {};
+    if (naar === 'overgedragen' && (!regels.length || !regels.every(r => ['klaar','uitgegeven'].includes(r.stand))))
+      return res.status(409).json({ error:'Markeer eerst alle gerechten als klaar.' });
+    if (naar === 'onderweg') {
+      if (rek.kanaal !== 'bezorging') return res.status(409).json({ error:'Een afhaalbestelling gaat niet onderweg.' });
+      if (uitgifte.status !== 'overgedragen') return res.status(409).json({ error:'Controleer eerst verpakking en overdracht.' });
+    }
+    if (naar === 'geleverd') {
+      if (rek.kanaal === 'afhaal') return res.status(409).json({ error:'Een afhaalbestelling rond je af met overdragen.' });
+      if (rek.kanaal === 'bezorging' && uitgifte.status !== 'onderweg') return res.status(409).json({ error:'De bestelling moet eerst onderweg zijn.' });
+    }
     rek.fulfillment = rek.fulfillment || {};
     if (naar === 'overgedragen') {
-      if (!regels.length || !regels.every(r => ['klaar','uitgegeven'].includes(r.stand))) return res.status(409).json({ error:'Markeer eerst alle gerechten als klaar.' });
       for (const r of regels) { r.stand = 'uitgegeven'; r.uitAt = r.uitAt || horeca.nu(); }
       rek.fulfillment.status = rek.kanaal === 'afhaal' ? 'opgehaald' : 'overgedragen';
       rek.fulfillment.overgedragenAt = horeca.nu();
@@ -102,13 +127,9 @@ module.exports = (kern) => {
       if (rek.bezorg) rek.bezorg.stand = 'overgedragen';
     }
     if (naar === 'onderweg') {
-      if (rek.kanaal !== 'bezorging') return res.status(409).json({ error:'Een afhaalbestelling gaat niet onderweg.' });
-      if (rek.fulfillment.status !== 'overgedragen') return res.status(409).json({ error:'Controleer eerst verpakking en overdracht.' });
       rek.fulfillment.status = 'onderweg'; rek.fulfillment.onderwegAt = horeca.nu(); rek.bezorg.stand = 'onderweg';
     }
     if (naar === 'geleverd') {
-      if (rek.kanaal === 'afhaal') return res.status(409).json({ error:'Een afhaalbestelling rond je af met overdragen.' });
-      if (rek.kanaal === 'bezorging' && rek.fulfillment.status !== 'onderweg') return res.status(409).json({ error:'De bestelling moet eerst onderweg zijn.' });
       rek.fulfillment.status = rek.kanaal === 'afhaal' ? 'opgehaald' : 'geleverd';
       rek.fulfillment.geleverdAt = horeca.nu();
       if (rek.bezorg) rek.bezorg.stand = 'geleverd';

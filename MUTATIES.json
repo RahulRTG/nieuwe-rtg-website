@@ -1,10 +1,8 @@
 {
   "stempel": {
-    "op": "2026-09-02T22:31:01.973Z",
-    "commit": "80477bd7",
+    "op": "2026-09-03T02:48:53.239Z",
+    "commit": "32cf8e2a",
     "boomVuil": true,
-    "boomAnders": 6,
-    "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
@@ -7854,6 +7852,84 @@
       "operator": "liegpoort /api/",
       "gezakt": 1,
       "scherp": "gezakt"
+    },
+    "gezinsuitnodiging-verval.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
+    },
+    "horeca-werklijst-modus.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
+    },
+    "lescode-rem.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "meetkeuring.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/meetkeuring.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
+    "meetserver-schorspoort.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/wegwerpserver.js",
+      "operator": "true->false#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "rollbackbesluit.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/bewijsmatrix.js",
+      "operator": "&&->||#5",
+      "gezakt": 1,
+      "geprobeerd": 28
+    },
+    "schorspoort.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/web/index.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
+    "socialebeleid-volgorde.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
+    },
+    "stempel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/stempel.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "syntaxproef.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/syntaxproef.js",
+      "operator": "+->-#0",
+      "gezakt": 4,
+      "geprobeerd": 2
+    },
+    "vijandigerand.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/webauthn/cbor.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 2
     }
   }
 }

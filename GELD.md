@@ -99,12 +99,52 @@ RTG. Niet alleen banktransacties; alles wat de graaf ziet.
   verzekeringsadvies. Dat vraagt vergunningen, menselijke controle en eigen
   compliance-lagen; als het ooit komt, komt het als apart, expliciet
   ontworpen geheel -- niet als sluipende functie van de cockpit.
-- **Autonome betalingen.** Zie par. 3.
+- **Autonome betalingen.** Zie par. 3 -- en par. 7b, want de eigenaar heeft deze
+  grens op 2 september 2026 opengezet onder voorwaarden.
 - **Echte merken als partners of in demobeelden.** Huisregel; demo-data
   gebruikt fictieve namen.
 - **Verslavende patronen.** Geen kunstmatige urgentie, geen oneindige
   lijsten; de cockpit is klaar als hij rust geeft.
 - **Een tweede boekhouding.** Zie par. 1.
+
+## 7b. Een mandaat MAG geld bewegen -- besluit van 2 september 2026
+
+**Wat er verandert.** De regel was absoluut: geld verlaat het huis nooit
+vanzelf, en `server/kern/stuur/mandaat.js` schrijft uit dat een mandaat een
+bestelling mag laten voorbereiden en zelfs een verplichting mag laten aangaan,
+*betalen niet*. De eigenaar heeft besloten dat een agent binnen een grens wél
+zelfstandig mag afrekenen.
+
+**Wat er NIET verandert.** De grens verschuift, hij verdwijnt niet. Een mandaat
+blijft een VERSMALLING van bestaand, bewezen vermogen -- het kan nooit iets
+toevoegen, en leeg blijft dicht. Wat `voorstel` is in `kern/stuur/beleid.js`
+blijft een mens vragen; dit besluit gaat over wat een mandaat mag omvatten, niet
+over het opheffen van de bevestigingsniveaus.
+
+**De prijs, en die is niet onderhandelbaar.** Deze verruiming maakt de
+correctheid van de geldlaag **blokkerend** in plaats van belangrijk. Vandaag laat
+`server/db/merge.js` onder twee gelijktijdige schrijvers een BEVESTIGDE boeking
+vallen terwijl de idempotentiesleutel overleeft -- de klant die opnieuw probeert
+krijgt "al geboekt" voor een boeking die niet bestaat. Een agent op zo'n laag
+laten afrekenen is geld laten verdwijnen met een machine ervoor.
+
+**Daarom de volgorde, en niet andersom:**
+
+1. `TAKEN.md` 7.1 af: `pasToe()` schrijft via `bewerkCollectie`, `merge3` weigert
+   op elke collectie die `voorcheck.exactNodig()` als geld herkent, en de toets
+   die twee instances op een gedeelde Postgres laat boeken is EERST rood gezien.
+2. Pas daarna het mandaat verruimen.
+
+Met het topologiebesluit van dezelfde dag (`PLATFORM.md` par. 3b: een schrijver
+per domein) is stap 1 klein geworden -- dagen op iets dat er al ligt, in plaats
+van een append-only kernel. Dat is precies waarom die twee besluiten bij elkaar
+horen.
+
+**Wat een verruimd mandaat nodig heeft bovenop 7.1**, en dit is geen wenslijst
+maar de rekening: een bedrag- en looptijdgrens per mandaat, een ontvanger die
+vooraf vaststaat, een bewijsregel per betaling die naar het mandaat wijst, en
+een uitgang waarmee een mens het kan intrekken zonder de agent te stoppen.
+Zolang die vier er niet zijn, blijft `mandaat.js` staan zoals hij staat.
 
 ## 8. De elf gezichtspunten
 

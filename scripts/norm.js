@@ -109,6 +109,127 @@ const METERS = [
      groeit vanzelf (routes schrijven is stap een, de catalogus bijwerken stap
      twee), dus het hoort aan een ratel. scripts/schakelbaar.js meet het. */
   { sleutel: 'routesNietSchakelbaar', richting: 'omlaag', wat: 'API-routes die niet vanuit de boardroom te schakelen zijn' },
+  /* DE ONVERKLAARDE RANDEN (scripts/verstrengeling.js).
+
+     Een require van het ene deel van RTG naar het andere die op geen enkele
+     afleiding past en die niemand heeft verklaard. Dat getal moet naar nul --
+     niet het aantal randen zelf: een huis waarin domeinen elkaar nooit nodig
+     hebben, is geen huis maar een map met losse programma's.
+
+     Waarom dit aan een ratel hoort en niet alleen aan een poort: de poort
+     bewaakt het bestand dat je aanraakt, deze meter bewaakt of het geheel de
+     goede kant op gaat. Een verklaring bijschrijven laat hem dalen, en een
+     verklaring weghalen laat hem stijgen -- dat laatste hoort te ratelen, want
+     een reden die niet meer klopt hoort niet stil te verdwijnen. */
+  { sleutel: 'verstrengelingOnverklaard', richting: 'omlaag', wat: 'requires tussen twee delen van RTG die niemand heeft verklaard' },
+  /* DE FUNCTIES WAARVAN DE ENVELOP EEN ONDERGRENS IS (ACTIVERING.json).
+
+     Van 204 functies is er van 31 te zeggen wat er wakker wordt als je hem
+     aanzet; bij 166 hangt er aantoonbaar meer aan dan de meting ziet, omdat een
+     sleutel uit de kern-tas nergens op uitkomt. Dat is een uitspraak over ONS
+     en niet over die functies, en hij hoort te dalen.
+
+     DEZE METER LEEST HET VASTGELEGDE BESTAND en meet niet zelf. Dat is geen
+     luiheid maar de prijs: de activeringsmeter START DE APP (anders ziet hij de
+     kern-tas niet, en dan is de hele meting fictie), en dat hoort niet in een
+     ratel die bij elke push draait. De keerzijde staat er hardop bij: wie
+     ACTIVERING.json niet ververst, bevriest deze meter. `npm run
+     activering:vast` is wat hem bijwerkt. */
+  { sleutel: 'activeringOndergrens', richting: 'omlaag', wat: 'functies waarvan de activeringsenvelop een ondergrens is (uit ACTIVERING.json)' },
+  /* TWEE SOORTEN ONZEKERHEID, TWEE TELLERS, en met opzet niet opgeteld.
+
+     `activeringOndergrens` is "er hangt meer aan dan we zien; nieuwe
+     broninformatie zou helpen". `activeringOnbepaald` is "bronnen spreken elkaar
+     tegen" -- dat vraagt een besluit en geen betere meter. Op een hoop gegooid
+     kun je preciezer worden door onzekerheid van de ene naar de andere emmer te
+     schuiven, en dan daalt het getal terwijl er niets is opgelost.
+
+     `activeringZonderReden` staat op NUL en is het klaarcriterium zelf: elke
+     resterende onzekerheid draagt een machineleesbare reden. Een graad zonder
+     reden is een cijfer waar niemand iets mee kan -- je weet dan dat het
+     onvolledig is en niet waarom, dus ook niet of er iets aan te doen valt. */
+  { sleutel: 'activeringOnbepaald', richting: 'omlaag', wat: 'functies waarvan de envelop ONBEPAALD is: bronnen spreken elkaar tegen (uit ACTIVERING.json)' },
+  { sleutel: 'activeringZonderReden', richting: 'omlaag', wat: 'onzekere envelopen zonder machineleesbare reden -- hoort nul te zijn (uit ACTIVERING.json)' },
+  /* DE LEKKEN VAN DE ONDERSTE TREDE (TREDEPROEF.json).
+
+     Een route die buiten trede 0 valt en tóch antwoordt. Staat vandaag op nul
+     en hoort daar te blijven: dit is het getal waarop de belofte rust dat een
+     kleine livegang ook werkelijk klein is. Hij telt de twee uitslagen van de
+     proef bij elkaar op -- de zuivere (alle routes, de beslissing) en de
+     beproefde (een steekproef, de bedrading) -- en dat mag hier omdat allebei
+     nul horen te zijn; een som van twee nullen verbergt niets. De uitslagen
+     zelf blijven in TREDEPROEF.json apart staan.
+
+     Leest, net als activeringOndergrens, het vastgelegde bestand: de proef start
+     een server en klopt zestig routes aan, en dat hoort niet in een ratel die
+     bij elke push draait. `npm run tredeproef:vast` ververst hem. */
+  { sleutel: 'tredeLekken', richting: 'omlaag', wat: 'routes buiten trede 0 die tóch antwoorden (uit TREDEPROEF.json)' },
+  /* WEKKERS DIE GEEN ENKELE FUNCTIE RAAKT (WEKKERS.json).
+
+     Een setInterval of een busabonnee die werk begint zonder dat er een
+     schakelaar in de boardroom bestaat die die code raakt. De tredeproef bewijst
+     de HTTP-kant; dit is wat daarnaast staat, en het is de gevaarlijkste vorm
+     van "uit": het ziet er dicht uit en het draait.
+
+     Alleen het ONVERKLAARDE deel telt. De bus, de database, de rem, het schild,
+     de certificaten en de bedrading horen niet aan een functieschakelaar --
+     precies de redenering die kern/platformregister/bediening.js al voert voor
+     routes -- en die staan met hun reden in scripts/lib/wekker-verklaringen.js.
+     Wegverklaren wat er wel bij hoort, is deze meter kapotmaken. */
+  /* DE RONDGANG VAN TREDE 0 (TREDEPROEF.json).
+
+     tredeLekken zegt dat er niets ANDERS opengaat; dit zegt of de trede zelf
+     WERKT. Die twee horen naast elkaar en niet op een hoop: een trede waarop
+     niemand kan inloggen scoort op tredeLekken vlekkeloos. Zes stappen --
+     binnenkomen, zien wat ik mag, mijn gegevens, aanmelden voor een pas, de
+     leden-app, De Salon -- en ze horen alle zes te slagen. */
+  { sleutel: 'tredeRondgangGezakt', richting: 'omlaag', wat: 'stappen van de trede-0-rondgang die niet slagen (uit TREDEPROEF.json)' },
+  /* DE TWEE METERS VAN DE INGANGENKAART BUITEN HTTP.
+
+     `wekkersFunctieUitToch` telt de ingangen die HET WERK VAN EEN FUNCTIE doen
+     zonder langs haar schakelaar te komen. Het scherpste geval: de functie
+     `ov-mail-binnen` heet "post van buiten aannemen" en gaat pas op trede 6
+     open, terwijl de SMTP-ontvanger op de eigen poort vanaf trede 0 gewoon post
+     aanneemt. Op het bord staat dan uit en de post komt binnen.
+
+     Dit getal mag NOOIT bij de verklaarde uitzonderingen worden opgeteld: dan
+     daalt het door er een reden bij te schrijven, en dat is precies wat het niet
+     mag meten. Het gaat naar nul door de ingang achter dezelfde poort te
+     brengen, of door een besluit dat die weg buiten de kast hoort te vallen --
+     en dat besluit is er nog niet.
+
+     `wekkersZonderTrede` telt de ingangen waarvan niet te zeggen is wanneer ze
+     horen te werken. Staat op nul; stijgt zodra iemand een ingang toevoegt die
+     aan geen enkele trede hangt. */
+  /* DE GEMETEN KANT VAN DIEZELFDE VRAAG (TREDEPROEF.json).
+
+     wekkersFunctieUitToch is een uitspraak over CODE: deze ingang komt niet
+     langs de schakelaar. tredeIngangLekken is de WAARNEMING: de proef zet de
+     SMTP- en IMAP-poort met opzet open, klopt aan, en kijkt of er antwoord komt
+     terwijl die functie op trede 0 uit staat. Er komt antwoord -- "220 rtg-mail
+     RTG Mail klaar" en "* OK RTG Mail IMAP klaar".
+
+     Luisteren is de opstelling, ANTWOORDEN is het werk; alleen het tweede telt
+     hier. Op trede 6 staan die functies aan en is het getal nul, en dat is de
+     tegenproef dat deze meter over de poort gaat en niet over ruis. */
+  /* DE VERTICALE KETEN (ZAAKWIG.json).
+
+     Geen brede meter maar EEN scenario: een lid vindt een zaak, leest de kaart,
+     bestelt, betaalt, de zaak ziet hem, zet een status, het lid ziet die status,
+     de kassa haalt hem op. Op trede 3, 4 en 6, omdat de semantiek daar
+     verandert. Wat er geteld wordt zijn niet de statuscodes maar de
+     BEDRIJFSREGELS: precies een bon, geen dubbele uitgifte, een onbekende status
+     geweigerd, en zonder betaalrail weigert ook de kassa.
+
+     Die laatste stond op de dag dat dit werd geschreven op GEZAKT, en dat was
+     een echt gat: /api/supplier/pos/redeem zette een bon administratief op
+     betaald terwijl de betaalrail uit stond. Dat hoort dus op nul te blijven. */
+  { sleutel: 'zaakwigGezakt', richting: 'omlaag', wat: 'stappen en invarianten van de verticale zaakketen die zakken (uit ZAAKWIG.json)' },
+  { sleutel: 'meetleerBlind', richting: 'omlaag', wat: 'registers die NERGENS zeggen wat ze niet aantonen -- veld noch zin (uit MEETLEER.json)' },
+  { sleutel: 'tredeIngangLekken', richting: 'omlaag', wat: 'ingangen buiten HTTP die op trede 0 antwoorden terwijl hun functie uit staat (uit TREDEPROEF.json)' },
+  { sleutel: 'wekkersFunctieUitToch', richting: 'omlaag', wat: 'ingangen buiten HTTP die het werk van een functie doen zonder langs haar schakelaar te komen (uit WEKKERS.json)' },
+  { sleutel: 'wekkersZonderTrede', richting: 'omlaag', wat: 'ingangen buiten HTTP waarvan geen trede te bepalen is (uit WEKKERS.json)' },
+  { sleutel: 'wekkersOnverklaard', richting: 'omlaag', wat: 'wekkers (klok/bus) die geen enkele functie raakt en niet verklaard zijn (uit WEKKERS.json)' },
   /* DE DEUREN NAAR db.data (scripts/deuren.js).
 
      De contractlaag is de enige weg naar een andere opslag, en de afbouw die
@@ -517,6 +638,105 @@ function telSkips(bestanden, lees) {
 /* `bronnen` is er alleen voor de IJKING (test/meterijk.test.js) en is optioneel:
    zonder argument leest deze meter alles van schijf zoals altijd. Zie de uitleg
    bij `mutaties` hieronder voor waarom dat er is. */
+/* DE LEZER VAN ACTIVERING.json, met zijn pad als parameter zodat een toets hem
+   ECHT kan beproeven -- dezelfde afspraak als bij leesPrestatie(), en daar
+   stond die uitnodiging maanden ongebruikt.
+
+   Hij WERPT bij een ontbrekend of stuk bestand. Nul teruggeven zou hier "van
+   elke functie is de envelop gemeten" betekenen, en dat is het tegenovergestelde
+   van wat een ontbrekende meting zegt. */
+function leesActivering(pad, veld) {
+  let rauw;
+  try { rauw = fs.readFileSync(pad, 'utf8'); }
+  catch (e) { throw new Error('ACTIVERING.json ontbreekt (' + e.message + '); draai npm run activering:vast'); }
+  let a;
+  try { a = JSON.parse(rauw); }
+  catch (e) { throw new Error('ACTIVERING.json is niet te lezen (' + e.message + '); draai npm run activering:vast'); }
+  /* DRIE GETALLEN UIT EEN BESTAND, en ze worden nooit opgeteld. `ondergrens` en
+     `onbepaald` zijn verschillende soorten onzekerheid -- de eerste vraagt nieuwe
+     broninformatie, de tweede een besluit -- en wie ze samentelt kan preciezer
+     worden door onzekerheid van de ene naar de andere emmer te schuiven.
+     `zonderReden` bewaakt het klaarcriterium: elke resterende onzekerheid draagt
+     een machineleesbare reden. */
+  const uit = veld === 'onbepaald' ? a.onbepaald
+    : veld === 'zonderReden' ? a.zonderReden
+    : (a.perGraad && a.perGraad.ondergrens);
+  if (typeof uit !== 'number') {
+    throw new Error('ACTIVERING.json draagt geen ' + (veld || 'perGraad.ondergrens') + '; een meter zonder invoer is geen meter');
+  }
+  return uit;
+}
+
+/* De lezer van TREDEPROEF.json, met zijn pad als parameter -- zelfde afspraak
+   en zelfde reden als leesActivering(). Werpt bij een ontbrekend of stuk
+   bestand: nul zou hier "geen enkel lek" betekenen, en dat is de gevaarlijkste
+   uitspraak die deze meter kan doen als er niets gemeten is. */
+function leesTredeproef(pad) {
+  let a;
+  try { a = JSON.parse(fs.readFileSync(pad, 'utf8')); }
+  catch (e) { throw new Error('TREDEPROEF.json ontbreekt of is stuk (' + e.message + '); draai npm run tredeproef:vast'); }
+  if (!a || typeof a.zuiverLekken !== 'number' || typeof a.beproefdNiet503 !== 'number') {
+    throw new Error('TREDEPROEF.json draagt geen zuiverLekken/beproefdNiet503; een meter zonder invoer is geen meter');
+  }
+  return a.zuiverLekken + a.beproefdNiet503;
+}
+
+/* De lezer van WEKKERS.json -- zelfde afspraak en zelfde reden als de twee
+   hierboven: het pad als parameter, en werpen in plaats van nul teruggeven. Nul
+   zou hier "elke wekker is te schakelen" betekenen. */
+function leesWekkers(pad, veld) {
+  let a;
+  try { a = JSON.parse(fs.readFileSync(pad, 'utf8')); }
+  catch (e) { throw new Error('WEKKERS.json ontbreekt of is stuk (' + e.message + '); draai npm run wekkers:vast'); }
+  const naam = veld || 'ongeschakeld';
+  if (!a || typeof a[naam] !== 'number') {
+    throw new Error('WEKKERS.json draagt geen ' + naam + '; een meter zonder invoer is geen meter');
+  }
+  return a[naam];
+}
+
+/* De rondgang uit dezelfde vastgelegde proef, met zijn pad als parameter en
+   werpend bij een ontbrekend getal -- zelfde afspraak als de drie hierboven.
+   Nul zou hier "elke stap slaagt" betekenen. */
+function leesRondgang(pad, veld) {
+  let a;
+  try { a = JSON.parse(fs.readFileSync(pad, 'utf8')); }
+  catch (e) { throw new Error('TREDEPROEF.json ontbreekt of is stuk (' + e.message + '); draai npm run tredeproef:vast'); }
+  const naam = veld || 'rondgangGezakt';
+  if (!a || typeof a[naam] !== 'number') {
+    throw new Error('TREDEPROEF.json draagt geen ' + naam + '; een meter zonder invoer is geen meter');
+  }
+  return a[naam];
+}
+
+/* De lezer van ZAAKWIG.json -- pad als parameter, werpend bij een ontbrekend
+   getal. Nul zou hier "de hele keten klopt" betekenen, en dat is precies wat je
+   niet mag aannemen als er niets gemeten is. */
+/* MEETLEER.json -> het aantal registers dat NERGENS zegt wat het niet aantoont.
+   Zelfde vorm als hierboven en om dezelfde reden: ontbreekt het bestand, dan is
+   dat een storing en geen nul. Nul zou hier "elk register remt zijn lezer"
+   betekenen, en dat is precies de conclusie die je niet mag trekken uit een
+   meting die niet heeft gedraaid. */
+function leesMeetleer(pad) {
+  let a;
+  try { a = JSON.parse(fs.readFileSync(pad, 'utf8')); }
+  catch (e) { throw new Error('MEETLEER.json ontbreekt of is stuk (' + e.message + '); draai npm run meetleer:vast'); }
+  if (!a || typeof a.blind !== 'number') {
+    throw new Error('MEETLEER.json draagt geen blind; een meter zonder invoer is geen meter');
+  }
+  return a.blind;
+}
+
+function leesZaakwig(pad) {
+  let a;
+  try { a = JSON.parse(fs.readFileSync(pad, 'utf8')); }
+  catch (e) { throw new Error('ZAAKWIG.json ontbreekt of is stuk (' + e.message + '); draai npm run zaakwig:vast'); }
+  if (!a || typeof a.gezakt !== 'number') {
+    throw new Error('ZAAKWIG.json draagt geen gezakt; een meter zonder invoer is geen meter');
+  }
+  return a.gezakt;
+}
+
 function meet(bronnen) {
   /* DE KEURING GEEFT EXITCODE 1 ZODRA HIJ IETS VINDT, en dat is precies zijn
      werk. execFileSync gooit daar standaard op, dus meet() klapte om op het
@@ -716,6 +936,28 @@ function meet(bronnen) {
   try { routesNietSchakelbaar = require('./schakelbaar').meet().ongedekt.length; }
   catch (e) { throw new Error('schakelbaarheid kon niet worden gemeten (' + e.message + '); een meter zonder invoer is geen meter'); }
 
+  /* De onverklaarde randen uit dezelfde bron als het losse script en als de
+     deltapoort. Drie lezers, een teller. */
+  let verstrengelingOnverklaard = 0;
+  try { verstrengelingOnverklaard = require('./verstrengeling').meet().onbekend; }
+  catch (e) { throw new Error('de verstrengeling kon niet worden gemeten (' + e.message + '); een meter zonder invoer is geen meter'); }
+
+  /* De activeringsgraden uit het vastgelegde bestand; zie de uitleg bij de
+     meter waarom dit er niet vers wordt gemeten. Ontbreekt het bestand, dan
+     zakt de meter in plaats van stil nul te melden -- nul zou hier "alles is
+     gemeten" betekenen en dat is het tegenovergestelde van onbekend. */
+  const activeringOndergrens = leesActivering(path.join(WORTEL, 'ACTIVERING.json'));
+  const activeringOnbepaald = leesActivering(path.join(WORTEL, 'ACTIVERING.json'), 'onbepaald');
+  const activeringZonderReden = leesActivering(path.join(WORTEL, 'ACTIVERING.json'), 'zonderReden');
+  const tredeLekken = leesTredeproef(path.join(WORTEL, 'TREDEPROEF.json'));
+  const wekkersOnverklaard = leesWekkers(path.join(WORTEL, 'WEKKERS.json'));
+  const wekkersFunctieUitToch = leesWekkers(path.join(WORTEL, 'WEKKERS.json'), 'functieUitMaarUitvoerbaar');
+  const wekkersZonderTrede = leesWekkers(path.join(WORTEL, 'WEKKERS.json'), 'zonderTrede');
+  const tredeRondgangGezakt = leesRondgang(path.join(WORTEL, 'TREDEPROEF.json'));
+  const tredeIngangLekken = leesRondgang(path.join(WORTEL, 'TREDEPROEF.json'), 'ingangLekken');
+  const zaakwigGezakt = leesZaakwig(path.join(WORTEL, 'ZAAKWIG.json'));
+  const meetleerBlind = leesMeetleer(path.join(WORTEL, 'MEETLEER.json'));
+
   /* De deuren naar db.data uit dezelfde bron als het losse script, om dezelfde
      reden als hierboven: een tweede implementatie loopt binnen een week uiteen. */
   let deuren = null;
@@ -798,6 +1040,18 @@ function meet(bronnen) {
     bewijsCellenBewezen, bewijsAchterstand,
     metersOngeijkt,
     routesNietSchakelbaar,
+    verstrengelingOnverklaard,
+    activeringOndergrens,
+    activeringOnbepaald,
+    activeringZonderReden,
+    tredeLekken,
+    tredeRondgangGezakt,
+    tredeIngangLekken,
+    zaakwigGezakt,
+    meetleerBlind,
+    wekkersOnverklaard,
+    wekkersFunctieUitToch,
+    wekkersZonderTrede,
     bronBlindeBestanden,
     delenZonderOnderwerp,
     dbDeuren: deuren.deuren,
@@ -1133,6 +1387,6 @@ function main() {
 }
 
 if (require.main === module) process.exit(main());
-module.exports = { meet, leesNorm, METERS, schoon, traagsteTanden, heeftEinde, dagenTussen, oordeel,
+module.exports = { meet, leesNorm, METERS, schoon, traagsteTanden, heeftEinde, dagenTussen, oordeel, leesActivering, leesTredeproef, leesWekkers, leesRondgang, leesZaakwig, leesMeetleer,
   PRESTATIEMETERS, leesPrestatie, bron, PRESTATIEBESTAND, telOngeijkt, telInlineStijl, telSkips,
   telBewijslaag };

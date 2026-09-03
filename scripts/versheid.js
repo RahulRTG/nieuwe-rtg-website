@@ -115,7 +115,35 @@ const REGISTERS = [
   ['RESOLVERBEREIK.json', 'npm run resolverbereik', 'de dekking van de resolver over elke toegestane route'],
   ['HERSTELPROEF.json', 'npm run herstelproef', 'of de tegenhanger werkelijk ongedaan maakt wat de heenweg deed'],
   ['DROOGLOOP.json', 'npm run droogloop', 'een plan werkelijk laten lopen, maar nergens waar het telt'],
-  ['ONDERZOEKSKETEN.json', 'npm run onderzoeksketen', 'welke stations van het onderzoek van elkaar weten']
+  ['ONDERZOEKSKETEN.json', 'npm run onderzoeksketen', 'welke stations van het onderzoek van elkaar weten'],
+
+  /* DE VIJF VAN DE BESTURINGSLAAG (MODULAIR.md).
+
+     Ze horen hier om precies de reden die hierboven al twee keer is opgeschreven,
+     en bij deze vijf weegt hij zwaarder dan gemiddeld: DRIE ervan meten tegen een
+     DRAAIENDE server (de tredeproef klopt elke trede aan, de zaakwig loopt een
+     hele bestelling, en de activering leest de kern-tas uit een echte boot). Zo'n
+     meting hoort bij de code van die dag en bij geen andere. Een verouderde
+     TREDEPROEF.json die "0 lekken" meldt terwijl er sindsdien routes bij kwamen,
+     is erger dan geen meting: hij geeft een getal, en getallen worden geloofd.
+
+     Ze staan in de volgorde waarin ze iets zeggen: eerst de structuur (wat hangt
+     waaraan), dan wat een schakelaar werkelijk aanzet, dan de treden zelf, dan de
+     ingangen die geen route zijn, en tot slot de ene keten van begin tot eind. */
+  ['VERSTRENGELING.json', 'npm run verstrengeling:vast', 'de require-graaf als laag+domein, en welke rand niemand verklaard heeft'],
+  ['ACTIVERING.json', 'npm run activering:vast', 'wat een functie aanzetten werkelijk aanzet, met de graad van zekerheid erbij'],
+  ['TREDEPROEF.json', 'node scripts/tredeproef.js --alle --vastleggen', 'of een trede lekt: zuiver, beproefd, de rondgang en de ingangen buiten HTTP'],
+  ['WEKKERS.json', 'npm run wekkers:vast', 'de ingangen die geen route zijn (klok, bus, luisteraar, werker) en welke functie ze doen'],
+  ['ZAAKWIG.json', 'npm run zaakwig:vast', 'een bestelling van het lid tot in de kassa, op drie treden, op de bedrijfsinvarianten'],
+
+  /* EN DE MEETLEER, die over deze registers zelf gaat.
+
+     Hij hoort hier om de reden die hij zelf handhaaft, en dat is geen woordspel:
+     een verouderde meetleer meldt hoeveel registers hun lezer remmen, gemeten op
+     een boom die er niet meer is. Een instrument dat over eerlijkheid van
+     metingen gaat en zelf niet onder toezicht staat, is het eerste dat niemand
+     serieus neemt. */
+  ['MEETLEER.json', 'npm run meetleer:vast', 'of een register de lezer er meer uit laat concluderen dan het aantoont']
 ];
 
 /* Het stempel van een register. Twee vormen, en dat is historie en geen smaak:

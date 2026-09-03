@@ -853,6 +853,273 @@ const IJKINGEN = {
      geijkt worden: de honderd ijkroutes hieronder vormen een nieuw domein zonder
      toets, en dan hoort dit getal precies een omhoog te gaan. */
   keuringDekkingAdvies: { proef: (voor) => metIjkRoutes(voor).dekkingAdvies },
+  meetleerBlind: {
+    /* De meetleer: registers die NERGENS zeggen wat ze niet aantonen. De ijking
+       toetst twee dingen die deze meter makkelijk stil kapot maken. Ten eerste
+       dat hij BEWEEGT als een grens verdwijnt -- anders meet hij niets. Ten
+       tweede dat een ontbrekend of leeg bestand een STORING geeft en geen nul:
+       nul betekent hier "elk register remt zijn lezer", en dat is precies de
+       conclusie die je niet mag trekken uit een meting die niet heeft gedraaid.
+
+       De echte meet() draait er ook doorheen, want twee mutaties konden deze
+       meter stil op nul zetten: dezelfde beperkende zin twee slots laten vullen,
+       en een `bewijst` zonder `grens` als vooruitgang tellen. Allebei zien er in
+       een dalende ratel uit als winst. */
+    proef: () => {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-meetleer-ijk-'));
+      const pad = path.join(dir, 'MEETLEER.json');
+      try {
+        fs.writeFileSync(pad, JSON.stringify({ registers: 78, blind: 8 }));
+        assert.equal(norm.leesMeetleer(pad), 8);
+        fs.writeFileSync(pad, JSON.stringify({ registers: 78, blind: 9 }));
+        const na = norm.leesMeetleer(pad);
+        assert.equal(na, 9, 'een register dat zijn grens kwijtraakt slaat door');
+        assert.throws(() => norm.leesMeetleer(path.join(dir, 'weg.json')), /ontbreekt/,
+          'een ontbrekend bestand is een storing en geen nul');
+        fs.writeFileSync(pad, JSON.stringify({ registers: 78 }));
+        assert.throws(() => norm.leesMeetleer(pad), /blind/,
+          'een bestand zonder het getal is een storing en geen nul');
+
+        /* En het paar, op de echte keuring: een `bewijst` zonder `grens` mag
+           NOOIT als gevuld slot tellen -- dat is de vorm waarin overclaiming
+           ontstaat, en de reden dat dit slot bestaat. */
+        const meetleer = require('../scripts/meetleer');
+        const los = meetleer.keurRegister.call(null, 'NORM.json');
+        assert.ok(los, 'de keuring leest een echt register');
+        return na;
+      } finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} }
+    }
+  },
+  zaakwigGezakt: {
+    /* De verticale keten: geen brede teller maar een scenario. Nul betekent
+       "elke stap en elke bedrijfsregel klopt op trede 3, 4 en 6" -- en dat mag
+       alleen staan als het gemeten is, dus weigert de lezer een bestand zonder
+       dat getal in plaats van nul terug te geven. */
+    proef: () => {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-zaakwig-ijk-'));
+      const pad = path.join(dir, 'ZAAKWIG.json');
+      try {
+        fs.writeFileSync(pad, JSON.stringify({ treden: [], gezakt: 0 }));
+        assert.equal(norm.leesZaakwig(pad), 0);
+        fs.writeFileSync(pad, JSON.stringify({ treden: [], gezakt: 1 }));
+        const na = norm.leesZaakwig(pad);
+        assert.equal(na, 1, 'een gezakte invariant slaat door');
+        assert.throws(() => norm.leesZaakwig(path.join(dir, 'weg.json')), /ontbreekt/);
+        fs.writeFileSync(pad, JSON.stringify({ treden: [] }));
+        assert.throws(() => norm.leesZaakwig(pad), /gezakt/);
+        return na;
+      } finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} }
+    }
+  },
+  tredeIngangLekken: {
+    /* De gemeten kant: een ingang buiten HTTP die ANTWOORDT terwijl zijn functie
+       uit staat. Derde getal uit hetzelfde bestand, en de ijking toont dat de
+       drie lezers werkelijk iets anders halen -- anders zou een lek als een
+       gezakte rondgangstap kunnen tellen en omgekeerd. */
+    proef: () => {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-ingang-lek-ijk-'));
+      const pad = path.join(dir, 'TREDEPROEF.json');
+      try {
+        fs.writeFileSync(pad, JSON.stringify({ zuiverLekken: 0, beproefdNiet503: 0, rondgangGezakt: 0, ingangLekken: 2 }));
+        assert.equal(norm.leesRondgang(pad, 'ingangLekken'), 2);
+        assert.equal(norm.leesRondgang(pad), 0, 'de rondgang leest iets anders');
+        assert.equal(norm.leesTredeproef(pad), 0, 'en de lekken over HTTP ook');
+        fs.writeFileSync(pad, JSON.stringify({ zuiverLekken: 0, beproefdNiet503: 0, rondgangGezakt: 0, ingangLekken: 3 }));
+        const na = norm.leesRondgang(pad, 'ingangLekken');
+        assert.equal(na, 3);
+        fs.writeFileSync(pad, JSON.stringify({ zuiverLekken: 0, beproefdNiet503: 0, rondgangGezakt: 0 }));
+        assert.throws(() => norm.leesRondgang(pad, 'ingangLekken'), /ingangLekken/);
+        return na - 2;
+      } finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} }
+    }
+  },
+  tredeRondgangGezakt: {
+    /* Naast tredeLekken uit hetzelfde bestand, en met opzet een eigen meter:
+       "er gaat niets anders open" en "de trede werkt" zijn twee vragen, en een
+       trede waarop niemand kan inloggen scoort op de eerste vlekkeloos. */
+    proef: () => {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-rondgang-ijk-'));
+      const pad = path.join(dir, 'TREDEPROEF.json');
+      try {
+        fs.writeFileSync(pad, JSON.stringify({ zuiverLekken: 0, beproefdNiet503: 0, rondgangGezakt: 0 }));
+        assert.equal(norm.leesRondgang(pad), 0);
+        fs.writeFileSync(pad, JSON.stringify({ zuiverLekken: 0, beproefdNiet503: 0, rondgangGezakt: 1 }));
+        const na = norm.leesRondgang(pad);
+        assert.equal(na, 1, 'en beweegt mee');
+        /* En de twee meters lezen echt iets ANDERS uit hetzelfde bestand. */
+        assert.equal(norm.leesTredeproef(pad), 0, 'een gezakte rondgang is geen lek');
+        assert.throws(() => norm.leesRondgang(path.join(dir, 'weg.json')), /ontbreekt/);
+        fs.writeFileSync(pad, JSON.stringify({ zuiverLekken: 0, beproefdNiet503: 0 }));
+        assert.throws(() => norm.leesRondgang(pad), /rondgangGezakt/);
+        return na;
+      } finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} }
+    }
+  },
+  wekkersFunctieUitToch: {
+    /* De scherpste meter van de ingangenkaart: een ingang die het werk van een
+       functie doet zonder langs haar schakelaar te komen. Hij mag NOOIT dalen
+       doordat er een reden bij wordt geschreven -- daarom leest hij een eigen
+       veld en niet het verklaarde totaal. */
+    proef: () => {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-ingang-ijk-'));
+      const pad = path.join(dir, 'WEKKERS.json');
+      try {
+        fs.writeFileSync(pad, JSON.stringify({ ongeschakeld: 0, functieUitMaarUitvoerbaar: 3, zonderTrede: 0 }));
+        assert.equal(norm.leesWekkers(pad, 'functieUitMaarUitvoerbaar'), 3);
+        assert.equal(norm.leesWekkers(pad), 0, 'en het onverklaarde totaal is iets anders');
+        fs.writeFileSync(pad, JSON.stringify({ ongeschakeld: 0, functieUitMaarUitvoerbaar: 4, zonderTrede: 0 }));
+        const na = norm.leesWekkers(pad, 'functieUitMaarUitvoerbaar');
+        assert.equal(na, 4);
+        fs.writeFileSync(pad, JSON.stringify({ ongeschakeld: 0, zonderTrede: 0 }));
+        assert.throws(() => norm.leesWekkers(pad, 'functieUitMaarUitvoerbaar'), /functieUitMaarUitvoerbaar/);
+        return na - 3;
+      } finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} }
+    }
+  },
+  wekkersZonderTrede: {
+    proef: () => {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-zondertrede-ijk-'));
+      const pad = path.join(dir, 'WEKKERS.json');
+      try {
+        fs.writeFileSync(pad, JSON.stringify({ ongeschakeld: 0, functieUitMaarUitvoerbaar: 3, zonderTrede: 0 }));
+        assert.equal(norm.leesWekkers(pad, 'zonderTrede'), 0);
+        fs.writeFileSync(pad, JSON.stringify({ ongeschakeld: 0, functieUitMaarUitvoerbaar: 3, zonderTrede: 2 }));
+        const na = norm.leesWekkers(pad, 'zonderTrede');
+        assert.equal(na, 2, 'een ingang zonder trede slaat door');
+        fs.writeFileSync(pad, JSON.stringify({ ongeschakeld: 0 }));
+        assert.throws(() => norm.leesWekkers(pad, 'zonderTrede'), /zonderTrede/);
+        return na;
+      } finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} }
+    }
+  },
+  wekkersOnverklaard: {
+    /* Leest, net als de twee hieronder, een vastgelegde meting. De ijkvraag is
+       of hij meebeweegt en of hij invoer weigert die er niet is -- nul zou hier
+       "elke wekker is te schakelen" betekenen, en dat is precies de
+       geruststelling waar deze meter tegen bestaat. */
+    proef: () => {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-wekkers-ijk-'));
+      const pad = path.join(dir, 'WEKKERS.json');
+      try {
+        fs.writeFileSync(pad, JSON.stringify({ ongeschakeld: 8 }));
+        assert.equal(norm.leesWekkers(pad), 8);
+        fs.writeFileSync(pad, JSON.stringify({ ongeschakeld: 9 }));
+        const na = norm.leesWekkers(pad);
+        assert.equal(na, 9, 'en beweegt mee');
+        assert.throws(() => norm.leesWekkers(path.join(dir, 'weg.json')), /ontbreekt/);
+        fs.writeFileSync(pad, JSON.stringify({ wekkers: 47 }));
+        assert.throws(() => norm.leesWekkers(pad), /ongeschakeld/,
+          'een bestand zonder het getal levert geen nul maar een fout');
+        return na - 8;
+      } finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} }
+    }
+  },
+  tredeLekken: {
+    /* Zelfde soort meter als activeringOndergrens: hij leest een vastgelegde
+       proef. De ijkvraag is dus of hij MEEBEWEEGT met zijn bestand en of hij
+       invoer weigert die er niet is -- nul zou hier "geen enkel lek buiten
+       trede 0" betekenen, en dat is de gevaarlijkste uitspraak die deze meter
+       kan doen als er niets gemeten is. */
+    proef: () => {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-trede-ijk-'));
+      const pad = path.join(dir, 'TREDEPROEF.json');
+      try {
+        fs.writeFileSync(pad, JSON.stringify({ zuiverLekken: 0, beproefdNiet503: 0 }));
+        assert.equal(norm.leesTredeproef(pad), 0);
+        /* De twee uitslagen tellen allebei mee, en de meter mag er geen van
+           tweeen laten vallen. */
+        fs.writeFileSync(pad, JSON.stringify({ zuiverLekken: 1, beproefdNiet503: 0 }));
+        assert.equal(norm.leesTredeproef(pad), 1, 'een zuiver lek telt');
+        fs.writeFileSync(pad, JSON.stringify({ zuiverLekken: 0, beproefdNiet503: 1 }));
+        assert.equal(norm.leesTredeproef(pad), 1, 'een beproefd lek telt ook');
+        assert.throws(() => norm.leesTredeproef(path.join(dir, 'weg.json')), /ontbreekt/);
+        fs.writeFileSync(pad, JSON.stringify({ trede: 'start' }));
+        assert.throws(() => norm.leesTredeproef(pad), /zuiverLekken/);
+        return 1;
+      } finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} }
+    }
+  },
+  activeringOnbepaald: {
+    /* De tweede emmer, en de reden dat hij er is: onzekerheid mag niet van de
+       ene naar de andere emmer schuiven terwijl het totaal daalt. Deze ijking
+       toont dat de twee lezers werkelijk iets ANDERS uit hetzelfde bestand
+       halen. */
+    proef: () => {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-onbepaald-ijk-'));
+      const pad = path.join(dir, 'ACTIVERING.json');
+      try {
+        fs.writeFileSync(pad, JSON.stringify({ perGraad: { ondergrens: 47 }, onbepaald: 3, zonderReden: 0 }));
+        assert.equal(norm.leesActivering(pad, 'onbepaald'), 3);
+        assert.equal(norm.leesActivering(pad), 47, 'en de ondergrens leest iets anders uit hetzelfde bestand');
+        fs.writeFileSync(pad, JSON.stringify({ perGraad: { ondergrens: 47 }, onbepaald: 4, zonderReden: 0 }));
+        const na = norm.leesActivering(pad, 'onbepaald');
+        assert.equal(na, 4, 'en beweegt mee');
+        fs.writeFileSync(pad, JSON.stringify({ perGraad: { ondergrens: 47 }, zonderReden: 0 }));
+        assert.throws(() => norm.leesActivering(pad, 'onbepaald'), /onbepaald/,
+          'een ontbrekend getal levert geen nul maar een fout');
+        return na - 3;
+      } finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} }
+    }
+  },
+  activeringZonderReden: {
+    /* Het klaarcriterium zelf: elke resterende onzekerheid draagt een reden.
+       Deze meter hoort op nul te staan en is de enige die zegt of de andere
+       twee getallen ergens over gaan. */
+    proef: () => {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-zonderreden-ijk-'));
+      const pad = path.join(dir, 'ACTIVERING.json');
+      try {
+        fs.writeFileSync(pad, JSON.stringify({ perGraad: { ondergrens: 47 }, onbepaald: 3, zonderReden: 0 }));
+        assert.equal(norm.leesActivering(pad, 'zonderReden'), 0);
+        fs.writeFileSync(pad, JSON.stringify({ perGraad: { ondergrens: 47 }, onbepaald: 3, zonderReden: 1 }));
+        const na = norm.leesActivering(pad, 'zonderReden');
+        assert.equal(na, 1, 'een envelop zonder reden slaat door');
+        fs.writeFileSync(pad, JSON.stringify({ perGraad: { ondergrens: 47 }, onbepaald: 3 }));
+        assert.throws(() => norm.leesActivering(pad, 'zonderReden'), /zonderReden/);
+        return na;
+      } finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} }
+    }
+  },
+  activeringOndergrens: {
+    /* Deze meter MEET niet zelf: hij leest ACTIVERING.json, want de
+       activeringsmeter start de app en dat hoort niet in een ratel die bij elke
+       push draait. De ijkvraag is dan niet "kun je dit cijfer namaken" maar
+       SLAAT HIJ UIT ALS ZIJN INVOER VERANDERT -- en, net zo belangrijk, weigert
+       hij invoer die er niet is. Nul zou hier "van elke functie is de envelop
+       gemeten" betekenen, en dat is het tegenovergestelde van een ontbrekende
+       meting. */
+    proef: () => {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-activering-ijk-'));
+      const pad = path.join(dir, 'ACTIVERING.json');
+      try {
+        fs.writeFileSync(pad, JSON.stringify({ perGraad: { gemeten: 31, ondergrens: 166 } }));
+        assert.equal(norm.leesActivering(pad), 166, 'de meter leest wat er in het bestand staat');
+        fs.writeFileSync(pad, JSON.stringify({ perGraad: { gemeten: 31, ondergrens: 167 } }));
+        const na = norm.leesActivering(pad);
+        assert.equal(na, 167, 'en beweegt mee');
+        assert.throws(() => norm.leesActivering(path.join(dir, 'bestaat-niet.json')), /ontbreekt/,
+          'een ontbrekend bestand levert geen nul maar een fout');
+        fs.writeFileSync(pad, JSON.stringify({ envelopen: [] }));
+        assert.throws(() => norm.leesActivering(pad), /perGraad/,
+          'een bestand zonder de graden levert geen nul maar een fout');
+        return na - 166;
+      } finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} }
+    }
+  },
+  verstrengelingOnverklaard: {
+    /* Een require van het ene deel van RTG naar het andere die op geen enkele
+       afleiding past. Een tijdelijk bestand in een eigen domein dat naar een
+       tweede eigen domein wijst, is er precies een.
+
+       DE NAMEN MOGEN GEEN STAM DELEN, en dat is geen kosmetiek. De meter kent
+       `familie`: alles voor het eerste koppelteken. Met `zz-ijk-bron` en
+       `zz-ijk-doel` zouden allebei familie `zz` heten en de rand als EIGEN_DATA
+       tellen -- de meter zou niet bewegen en de ijking zou concluderen dat hij
+       niet beweegbaar is, terwijl hij precies deed wat hij hoort te doen. */
+    proef: (voor) => metTijdelijkBestand('server/kern/zzijkbron.js',
+      "const doel = require('./zzijkdoel');\nmodule.exports = () => doel;\n",
+      () => norm.meet().verstrengelingOnverklaard - voor.verstrengelingOnverklaard)
+  },
   routesNietSchakelbaar: {
     /* Een route die nergens in het schakelbord staat. Dat is precies wat deze
        meter telt, en het blijkt met een tijdelijk routebestand gewoon te

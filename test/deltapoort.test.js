@@ -155,6 +155,67 @@ function metWegwerpRepo(doe) {
   } finally { fs.rmSync(map, { recursive: true, force: true }); }
 }
 
+test('nieuwe-ingang-buiten-http: een nieuwe klok of server moet worden gezegd', () => {
+  const r = regel('nieuwe-ingang-buiten-http');
+  assert.equal(r.keur('server/kern/nieuw.js', null, 'setInterval(veeg, 1000);').length, 1,
+    'een nieuw bestand met een timer hoort uit te slaan');
+  assert.equal(r.keur('server/kern/nieuw.js', null, "require('net').createServer(f);").length, 1,
+    'en een eigen server op een eigen poort ook');
+  assert.equal(r.keur('server/kern/nieuw.js', null, 'module.exports = () => 1;').length, 0,
+    'een gewoon bestand niet -- anders slaat de regel op alles uit en gaat hij uit');
+});
+
+test('nieuwe-ingang-buiten-http: de erfenis mag blijven, maar niet groeien', () => {
+  const r = regel('nieuwe-ingang-buiten-http');
+  const oud = 'setInterval(a, 1);';
+  assert.equal(r.keur('server/kern/x.js', oud, oud + '\nconst y = 1;').length, 0,
+    'een bestaande timer houden mag; anders is elke wijziging aan zo\'n bestand geblokkeerd');
+  assert.equal(r.keur('server/kern/x.js', oud, oud + 'setInterval(b, 2);').length, 1, 'een tweede erbij niet');
+  assert.equal(r.keur('server/kern/x.js', oud, '').length, 0, 'hem weghalen mag altijd');
+});
+
+test('nieuwe-ingang-buiten-http: een al verklaarde ingang wordt met rust gelaten', () => {
+  /* server/bus.js IS de bus; die vraag is beantwoord en staat met een reden in
+     de verklaringen. Een poort die daar opnieuw over begint, wordt uitgezet. */
+  const r = regel('nieuwe-ingang-buiten-http');
+  assert.equal(r.keur('server/bus.js', null, 'x.subscribe(f); x.subscribe(g);').length, 0);
+});
+
+test('nieuwe-onverklaarde-rand: een NIEUW bestand mag er geen enkele hebben', () => {
+  const r = regel('nieuwe-onverklaarde-rand');
+  /* De indeling van het hele huis komt normaal uit VERSTRENGELING.json; hier
+     gaat hij mee als context, zodat deze toets meet wat de REGEL doet en niet
+     wat de codebase vandaag toevallig bevat. */
+  const onbekendeRanden = new Set(['domein:vakwerk -> domein:klantenboek']);
+  const raak = r.keur('server/kern/vakwerk/index.js', null, "const k = require('../klantenboek');", { onbekendeRanden });
+  assert.equal(raak.length, 1, 'een nieuw bestand met een onverklaarde rand moet uitslaan');
+  assert.match(raak[0].bericht, /domein:vakwerk -> domein:klantenboek/);
+  assert.match(raak[0].hulp, /verstrengeling-verklaringen/, 'de uitweg is verklaren, en die hoort in de melding te staan');
+});
+
+test('nieuwe-onverklaarde-rand: een rand die er AL stond mag blijven', () => {
+  /* De erfenis van 111 randen hoeft niet weg om ergens aan te mogen werken.
+     Zou dit uitslaan, dan is elke wijziging aan zo'n bestand geblokkeerd en
+     gaat de poort binnen een week uit. */
+  const r = regel('nieuwe-onverklaarde-rand');
+  const onbekendeRanden = new Set(['domein:vakwerk -> domein:klantenboek']);
+  const bron = "const k = require('../klantenboek');";
+  assert.equal(r.keur('server/kern/vakwerk/index.js', bron, bron + '\nconst x = 1;', { onbekendeRanden }).length, 0);
+  assert.equal(r.keur('server/kern/vakwerk/index.js', bron, 'const x = 1;', { onbekendeRanden }).length, 0,
+    'hem weghalen mag altijd');
+});
+
+test('nieuwe-onverklaarde-rand: een VERKLAARDE rand slaat niet uit', () => {
+  /* Een regel die op elke kruisverwijzing uitslaat, houdt net zo weinig tegen
+     als een regel die op niets uitslaat: dan wordt hij uitgezet. Alleen wat in
+     de indeling ONBEKEND heet, telt. */
+  const r = regel('nieuwe-onverklaarde-rand');
+  const onbekendeRanden = new Set(['domein:vakwerk -> domein:klantenboek']);
+  assert.equal(r.keur('server/kern/vakwerk/index.js', null, "const p = require('../pay/poort');", { onbekendeRanden }).length, 0);
+  /* En een require binnen het eigen domein is helemaal geen rand. */
+  assert.equal(r.keur('server/kern/vakwerk/index.js', null, "const z = require('./zusje');", { onbekendeRanden }).length, 0);
+});
+
 test('de poort zakt op een nieuw bestand dat onder de norm staat, en is groen zodra het klopt', () => {
   metWegwerpRepo(({ git, schrijf, draai }) => {
     schrijf('leesmij.md', 'grondslag\n');

@@ -27,6 +27,18 @@ const { SPOOR } = require('../scripts/mutatie');
 
 const WORTEL = path.join(__dirname, '..');
 
+/* De twee proefbestanden hieronder staan in server/data/ omdat die map buiten
+   de repo valt (.gitignore) -- een tijdelijk .js-bestand hoort niet tussen de
+   toetsen te belanden. Maar juist DAAROM bestaat hij in een verse checkout
+   nog niet: hij wordt pas aangemaakt als een server start. Deze toetsen
+   slaagden dus alleen zolang er toevallig eerder in dezelfde scherf iets een
+   server had geboot, en dat is geen eigenschap van deze toets maar van de
+   scherfindeling. Op 2 september 2026 verschoof die indeling (vijf nieuwe
+   toetsbestanden) en zakten ze met ENOENT. De map wordt nu gemaakt in plaats
+   van aangenomen. */
+const PROEFMAP = path.join(WORTEL, 'server', 'data');
+fs.mkdirSync(PROEFMAP, { recursive: true });
+
 test('1. het scherm komt uit de toets zelf en niet uit een register', () => {
   const s = schermenVan(path.join(WORTEL, 'test/gegevenskaart-scherm.e2e.js'));
   assert.deepEqual(s, ['public/apps/mijn-gegevens.html'],
@@ -34,7 +46,7 @@ test('1. het scherm komt uit de toets zelf en niet uit een register', () => {
 });
 
 test('1b. een toets die geen pagina bezoekt levert geen gok op', () => {
-  const tmp = path.join(WORTEL, 'server', 'data', 'schermmutatie-proef.js');
+  const tmp = path.join(PROEFMAP, 'schermmutatie-proef.js');
   fs.writeFileSync(tmp, "// geen page.goto hier\n");
   try {
     assert.deepEqual(schermenVan(tmp), [], 'liever niets dan een verzonnen scherm');
@@ -42,7 +54,7 @@ test('1b. een toets die geen pagina bezoekt levert geen gok op', () => {
 });
 
 test('1c. en een pagina die niet bestaat wordt niet meegenomen', () => {
-  const tmp = path.join(WORTEL, 'server', 'data', 'schermmutatie-proef2.js');
+  const tmp = path.join(PROEFMAP, 'schermmutatie-proef2.js');
   fs.writeFileSync(tmp, "await page.goto(base + '/apps/bestaat-niet-xyz.html');\n");
   try {
     assert.deepEqual(schermenVan(tmp), []);

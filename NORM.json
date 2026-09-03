@@ -6,7 +6,7 @@
     "keuringStuk": 0,
     "keuringScheef": 18,
     "dependencies": 0,
-    "testbestanden": 1341,
+    "testbestanden": 1346,
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 18,
     "e2eBestanden": 193,
@@ -29,7 +29,7 @@
     "toetsenOngevoeligPct": 1,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
-    "ratelTanden": 51,
+    "ratelTanden": 63,
     "metingenZonderRatel": 41,
     "ladderRaak": 0,
     "ladderNietGeprobeerd": 1,
@@ -45,7 +45,19 @@
     "bewijsAchterstand": 2285,
     "schermenZonderVormtaal": 185,
     "dbDeuren": 510,
-    "dbDeurenSchrijvend": 270
+    "dbDeurenSchrijvend": 270,
+    "verstrengelingOnverklaard": 0,
+    "activeringOndergrens": 48,
+    "activeringOnbepaald": 3,
+    "activeringZonderReden": 0,
+    "tredeLekken": 0,
+    "tredeRondgangGezakt": 0,
+    "zaakwigGezakt": 0,
+    "tredeIngangLekken": 0,
+    "wekkersFunctieUitToch": 3,
+    "wekkersZonderTrede": 0,
+    "wekkersOnverklaard": 0,
+    "meetleerBlind": 8
   },
   "notities": [
     {
@@ -1415,7 +1427,7 @@
     "testbestanden": "2026-09-02",
     "toetsenNietGemeten": "2026-08-18",
     "inlineStijlAttributen": "2026-09-02",
-    "ratelTanden": "2026-08-28",
+    "ratelTanden": "2026-09-02",
     "metingenZonderRatel": "2026-08-18",
     "bewijsAchterstand": "2026-09-01",
     "toetsenOngevoeligPct": "2026-08-28",
@@ -1431,7 +1443,19 @@
     "e2eBestanden": "2026-09-02",
     "schermenZonderVormtaal": "2026-08-28",
     "bewijsCellenBewezen": "2026-09-01",
-    "beweringenZonderVulcontrole": "2026-09-02"
+    "beweringenZonderVulcontrole": "2026-09-02",
+    "verstrengelingOnverklaard": "2026-09-02",
+    "activeringOndergrens": "2026-09-02",
+    "activeringOnbepaald": "2026-09-02",
+    "activeringZonderReden": "2026-09-02",
+    "tredeLekken": "2026-09-02",
+    "tredeRondgangGezakt": "2026-09-02",
+    "zaakwigGezakt": "2026-09-02",
+    "tredeIngangLekken": "2026-09-02",
+    "wekkersFunctieUitToch": "2026-09-02",
+    "wekkersZonderTrede": "2026-09-02",
+    "wekkersOnverklaard": "2026-09-02",
+    "meetleerBlind": "2026-09-02"
   },
   "uitzonderingen": [
     {

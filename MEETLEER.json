@@ -1,0 +1,1323 @@
+{
+  "wat": "of elk register in de wortel de lezer machinaal belet er meer uit te concluderen dan het aantoont",
+  "stempel": {
+    "op": "2026-09-02T22:14:48.473Z",
+    "commit": "c629411d",
+    "boomVuil": true,
+    "boomAnders": 3,
+    "instrument": "scripts/meetleer.js",
+    "node": "v22.22.2"
+  },
+  "hoe": "npm run meetleer",
+  "bewijst": "Dat er per register en per slot IETS staat, en of dat als veld (machinaal leesbaar) of alleen als zin in vrije tekst staat. Meer niet: leesbaarheid, geen juistheid.",
+  "grens": "Dit meet of er IETS staat waar een machine bij kan, nooit of het KLOPT: een register met grens: \"geen\" haalt deze toets. Dat een mens de grenzen eerlijk opschrijft is de aanname waar deze laag op rust en die is hier niet getoetst. Proza wordt alleen herkend bij de twee beperkingsslots; bij de rest zou raden als gevuld tellen en dat maakt de meter waardeloos.",
+  "blindeVlekken": "Alleen registers in de wortel met een HOOFDLETTERnaam. Registers elders (server/data, .github) worden niet gezien, en een register dat helemaal niet geschreven wordt al helemaal niet.",
+  "registers": 79,
+  "slots": 7,
+  "onleesbaar": 382,
+  "blind": 8,
+  "losseClaims": 0,
+  "perSlot": {
+    "watMeetIk": {
+      "veld": 0,
+      "proza": 0,
+      "ontbreekt": 79
+    },
+    "hoeGemeten": {
+      "veld": 15,
+      "proza": 0,
+      "ontbreekt": 64
+    },
+    "gemetenOp": {
+      "veld": 60,
+      "proza": 0,
+      "ontbreekt": 19
+    },
+    "resultaat": {
+      "veld": 70,
+      "proza": 0,
+      "ontbreekt": 9
+    },
+    "watBewijstDit": {
+      "veld": 0,
+      "proza": 0,
+      "ontbreekt": 79
+    },
+    "watBewijstDitNiet": {
+      "veld": 25,
+      "proza": 46,
+      "ontbreekt": 8
+    },
+    "blindeVlekken": {
+      "veld": 1,
+      "proza": 0,
+      "ontbreekt": 78
+    }
+  },
+  "rijen": [
+    {
+      "register": "GRENZEN.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "ontbreekt",
+        "resultaat": "ontbreekt",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "ontbreekt",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 0,
+      "proza": 0,
+      "ontbreekt": 7
+    },
+    {
+      "register": "CAPABILITEIT.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "ontbreekt",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "ontbreekt",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 1,
+      "proza": 0,
+      "ontbreekt": 6
+    },
+    {
+      "register": "IDEMBESLUIT.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "ontbreekt",
+        "resultaat": "ontbreekt",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 0,
+      "proza": 1,
+      "ontbreekt": 6
+    },
+    {
+      "register": "MAGNAATLAB.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "ontbreekt",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "ontbreekt",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 1,
+      "proza": 0,
+      "ontbreekt": 6
+    },
+    {
+      "register": "NORM.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "ontbreekt",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "ontbreekt",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 1,
+      "proza": 0,
+      "ontbreekt": 6
+    },
+    {
+      "register": "RESOLVERBEREIK.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "ontbreekt",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "ontbreekt",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 1,
+      "proza": 0,
+      "ontbreekt": 6
+    },
+    {
+      "register": "SEMANTIEK.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "ontbreekt",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "ontbreekt",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 1,
+      "proza": 0,
+      "ontbreekt": 6
+    },
+    {
+      "register": "WETBRONNEN.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "ontbreekt",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "ontbreekt",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 1,
+      "proza": 0,
+      "ontbreekt": 6
+    },
+    {
+      "register": "BEGROTING.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "ontbreekt",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 1,
+      "proza": 1,
+      "ontbreekt": 5
+    },
+    {
+      "register": "BELOFTE.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "ontbreekt",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 1,
+      "proza": 1,
+      "ontbreekt": 5
+    },
+    {
+      "register": "DROOGLOOP.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "ontbreekt",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 1,
+      "proza": 1,
+      "ontbreekt": 5
+    },
+    {
+      "register": "EXECUTION_MAP.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "ontbreekt",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 1,
+      "proza": 1,
+      "ontbreekt": 5
+    },
+    {
+      "register": "GEZAGSNOEMER.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "ontbreekt",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 1,
+      "proza": 1,
+      "ontbreekt": 5
+    },
+    {
+      "register": "INHOUDSKAART.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "ontbreekt",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "veld",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 2,
+      "proza": 0,
+      "ontbreekt": 5
+    },
+    {
+      "register": "KRIMP.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "veld",
+        "gemetenOp": "ontbreekt",
+        "resultaat": "ontbreekt",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 1,
+      "proza": 1,
+      "ontbreekt": 5
+    },
+    {
+      "register": "LADDER.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "ontbreekt",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 1,
+      "proza": 1,
+      "ontbreekt": 5
+    },
+    {
+      "register": "LANDEN.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "ontbreekt",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 1,
+      "proza": 1,
+      "ontbreekt": 5
+    },
+    {
+      "register": "MUTATIEINVENTARIS.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "ontbreekt",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "veld",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 2,
+      "proza": 0,
+      "ontbreekt": 5
+    },
+    {
+      "register": "MUTATIES.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "ontbreekt",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "veld",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 2,
+      "proza": 0,
+      "ontbreekt": 5
+    },
+    {
+      "register": "SABOTAGE.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "ontbreekt",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "veld",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 2,
+      "proza": 0,
+      "ontbreekt": 5
+    },
+    {
+      "register": "SLO.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "ontbreekt",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 1,
+      "proza": 1,
+      "ontbreekt": 5
+    },
+    {
+      "register": "WETTEN.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "ontbreekt",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 1,
+      "proza": 1,
+      "ontbreekt": 5
+    },
+    {
+      "register": "WETWACHT.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "ontbreekt",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 2,
+      "proza": 0,
+      "ontbreekt": 5
+    },
+    {
+      "register": "AUDITPROEF.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 2,
+      "proza": 1,
+      "ontbreekt": 4
+    },
+    {
+      "register": "BEPROEVING.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "veld",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 3,
+      "proza": 0,
+      "ontbreekt": 4
+    },
+    {
+      "register": "BEREIK.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 2,
+      "proza": 1,
+      "ontbreekt": 4
+    },
+    {
+      "register": "BEWIJSMATRIX.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 2,
+      "proza": 1,
+      "ontbreekt": 4
+    },
+    {
+      "register": "BEWIJSSCHULD.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "veld",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 3,
+      "proza": 0,
+      "ontbreekt": 4
+    },
+    {
+      "register": "COMMERCE.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 2,
+      "proza": 1,
+      "ontbreekt": 4
+    },
+    {
+      "register": "CONTROLS.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 2,
+      "proza": 1,
+      "ontbreekt": 4
+    },
+    {
+      "register": "DEKKING.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 2,
+      "proza": 1,
+      "ontbreekt": 4
+    },
+    {
+      "register": "DUURZAAMHEIDSKOSTEN.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 2,
+      "proza": 1,
+      "ontbreekt": 4
+    },
+    {
+      "register": "GLUURRONDE.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 2,
+      "proza": 1,
+      "ontbreekt": 4
+    },
+    {
+      "register": "GRAAFAS.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 2,
+      "proza": 1,
+      "ontbreekt": 4
+    },
+    {
+      "register": "HANDELINGPROEF.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 2,
+      "proza": 1,
+      "ontbreekt": 4
+    },
+    {
+      "register": "HANDLERBEWAKERS.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "veld",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 3,
+      "proza": 0,
+      "ontbreekt": 4
+    },
+    {
+      "register": "HANDLERWACHT.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 2,
+      "proza": 1,
+      "ontbreekt": 4
+    },
+    {
+      "register": "HERSTEL.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "veld",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 3,
+      "proza": 0,
+      "ontbreekt": 4
+    },
+    {
+      "register": "HERSTELPROEF.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 2,
+      "proza": 1,
+      "ontbreekt": 4
+    },
+    {
+      "register": "IDEMPROEF.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 2,
+      "proza": 1,
+      "ontbreekt": 4
+    },
+    {
+      "register": "IDEMSCHULD.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 2,
+      "proza": 1,
+      "ontbreekt": 4
+    },
+    {
+      "register": "IDOR.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "veld",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 3,
+      "proza": 0,
+      "ontbreekt": 4
+    },
+    {
+      "register": "INVOERPROEF.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 2,
+      "proza": 1,
+      "ontbreekt": 4
+    },
+    {
+      "register": "KETENS.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "veld",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 3,
+      "proza": 0,
+      "ontbreekt": 4
+    },
+    {
+      "register": "KLOKWACHT.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "veld",
+        "gemetenOp": "veld",
+        "resultaat": "ontbreekt",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 2,
+      "proza": 1,
+      "ontbreekt": 4
+    },
+    {
+      "register": "MAKERS.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 2,
+      "proza": 1,
+      "ontbreekt": 4
+    },
+    {
+      "register": "MUTATIEBOEK.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 2,
+      "proza": 1,
+      "ontbreekt": 4
+    },
+    {
+      "register": "MUTATIECONTRACT.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "veld",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 3,
+      "proza": 0,
+      "ontbreekt": 4
+    },
+    {
+      "register": "MUTATIESEMANTIEK.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 2,
+      "proza": 1,
+      "ontbreekt": 4
+    },
+    {
+      "register": "OBJECTMODEL.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 2,
+      "proza": 1,
+      "ontbreekt": 4
+    },
+    {
+      "register": "ONBEWEZEN.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 2,
+      "proza": 1,
+      "ontbreekt": 4
+    },
+    {
+      "register": "ONDERZOEKSKETEN.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 2,
+      "proza": 1,
+      "ontbreekt": 4
+    },
+    {
+      "register": "OUTPUTPROEF.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "veld",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 3,
+      "proza": 0,
+      "ontbreekt": 4
+    },
+    {
+      "register": "POORTWACHT.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "veld",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 3,
+      "proza": 0,
+      "ontbreekt": 4
+    },
+    {
+      "register": "ROLPROEF.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 2,
+      "proza": 1,
+      "ontbreekt": 4
+    },
+    {
+      "register": "ROLRONDE.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 2,
+      "proza": 1,
+      "ontbreekt": 4
+    },
+    {
+      "register": "SCHERMMUTATIES.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "veld",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 3,
+      "proza": 0,
+      "ontbreekt": 4
+    },
+    {
+      "register": "SCHRIJFANALYSE.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "veld",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 3,
+      "proza": 0,
+      "ontbreekt": 4
+    },
+    {
+      "register": "STAATPROEF.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 2,
+      "proza": 1,
+      "ontbreekt": 4
+    },
+    {
+      "register": "SUITE.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "veld",
+        "gemetenOp": "veld",
+        "resultaat": "ontbreekt",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "veld",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 3,
+      "proza": 0,
+      "ontbreekt": 4
+    },
+    {
+      "register": "TIKKEN.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "veld",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 3,
+      "proza": 0,
+      "ontbreekt": 4
+    },
+    {
+      "register": "TOETSDUUR.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "veld",
+        "gemetenOp": "ontbreekt",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 2,
+      "proza": 1,
+      "ontbreekt": 4
+    },
+    {
+      "register": "UITVOERPROEF.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 2,
+      "proza": 1,
+      "ontbreekt": 4
+    },
+    {
+      "register": "VERRAAD.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 2,
+      "proza": 1,
+      "ontbreekt": 4
+    },
+    {
+      "register": "VERTROUWEN.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "veld",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 3,
+      "proza": 0,
+      "ontbreekt": 4
+    },
+    {
+      "register": "VINDBAAR.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 2,
+      "proza": 1,
+      "ontbreekt": 4
+    },
+    {
+      "register": "WAAROM.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "veld",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 3,
+      "proza": 0,
+      "ontbreekt": 4
+    },
+    {
+      "register": "WERELDSTIJL.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "ontbreekt",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 2,
+      "proza": 1,
+      "ontbreekt": 4
+    },
+    {
+      "register": "ACTIVERING.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "veld",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "veld",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 4,
+      "proza": 0,
+      "ontbreekt": 3
+    },
+    {
+      "register": "BEDRADING.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "veld",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 3,
+      "proza": 1,
+      "ontbreekt": 3
+    },
+    {
+      "register": "ENVELOP.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "veld",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 3,
+      "proza": 1,
+      "ontbreekt": 3
+    },
+    {
+      "register": "GEZAG.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "veld",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 3,
+      "proza": 1,
+      "ontbreekt": 3
+    },
+    {
+      "register": "KLOK.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "veld",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 3,
+      "proza": 1,
+      "ontbreekt": 3
+    },
+    {
+      "register": "SCHERMLEUGEN.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "veld",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "proza",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 3,
+      "proza": 1,
+      "ontbreekt": 3
+    },
+    {
+      "register": "TREDEPROEF.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "veld",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "veld",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 4,
+      "proza": 0,
+      "ontbreekt": 3
+    },
+    {
+      "register": "VERSTRENGELING.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "veld",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "veld",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 4,
+      "proza": 0,
+      "ontbreekt": 3
+    },
+    {
+      "register": "WEKKERS.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "veld",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "veld",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 4,
+      "proza": 0,
+      "ontbreekt": 3
+    },
+    {
+      "register": "ZAAKWIG.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "veld",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "veld",
+        "blindeVlekken": "ontbreekt"
+      },
+      "losseClaim": false,
+      "velden": 4,
+      "proza": 0,
+      "ontbreekt": 3
+    },
+    {
+      "register": "MEETLEER.json",
+      "slots": {
+        "watMeetIk": "ontbreekt",
+        "hoeGemeten": "veld",
+        "gemetenOp": "veld",
+        "resultaat": "veld",
+        "watBewijstDit": "ontbreekt",
+        "watBewijstDitNiet": "veld",
+        "blindeVlekken": "veld"
+      },
+      "losseClaim": false,
+      "velden": 5,
+      "proza": 0,
+      "ontbreekt": 2
+    }
+  ]
+}

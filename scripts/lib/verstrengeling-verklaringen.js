@@ -314,5 +314,21 @@ module.exports = [
   { van: 'domein:rtfos', naar: 'domein:machtiging', soort: 'BELEID',
     reden: 'kern/machtiging.js draagt met opzet DE REGELS en niet de opslag: wat een geldige SEPA-machtiging is (een maximum, geen volledig rekeningnummer, altijd per direct in te trekken) is een ding, ook al hangt hij bij een school aan een leerling en bij een gift aan de gever. kern/rtfos/gift-machtiging.js r.55 leest die regels' },
   { van: 'domein:school', naar: 'domein:machtiging', soort: 'BELEID',
-    reden: 'zelfde regels, andere houder: server/school/machtiging.js r.34 leest kern/machtiging.js. Dit IS het register waar die regels vandaan komen -- het schoolregister was er eerst, en de gift kreeg geen kopie maar dezelfde bron (SEMANTIEK.json noemt twee registers onder een naam duur)' }
+    reden: 'zelfde regels, andere houder: server/school/machtiging.js r.34 leest kern/machtiging.js. Dit IS het register waar die regels vandaan komen -- het schoolregister was er eerst, en de gift kreeg geen kopie maar dezelfde bron (SEMANTIEK.json noemt twee registers onder een naam duur)' },
+  /* ---- DE NADEN VAN DE SAMENVOEGING VAN 3 SEPTEMBER 2026 ----
+     Zes randen uit vijf takken die elk eerder vertakten dan de meter bestond
+     (#174 bracht hem mee). Geen ervan is nieuw werk van de samenvoeging; ze
+     staan hier omdat de meter ze nu voor het eerst ziet. */
+  { van: 'domein:ai', naar: 'domein:service', soort: 'DOMEINRELATIE',
+    reden: 'kern/ai.js r.27 leest service/mens: de ondergrens "ik wil een mens" (SERVICE.md). Het gesprek van de RTG Pass zet een servicezaak KLAAR in plaats van needsConcierge hard op false te houden; de AI opent zelf niets en leent geen machtiging' },
+  { van: 'domein:isolatie', naar: 'domein:beschermstand-lijst', soort: 'DOMEINRELATIE',
+    reden: 'kern/isolatie/leesset.js r.61 leest de UITZONDERINGEN van de beschermstand op de plek waar die wonen. De isolatielaag ligt BOVEN de vijf incidentstanden (ISOLATIE.md) en mag de leeslijst niet met een eigen kopie van die uitzonderingen vullen -- dan lopen twee lijsten uiteen op de dag dat er een stand bijkomt' },
+  { van: 'domein:isolatie', naar: 'domein:sessies', soort: 'DOMEINRELATIE',
+    reden: 'kern/isolatie/sessiedragers.js r.27 gebruikt tokenHash uit het sessieregister: de drager "sessie" wijst een sessie aan met DEZELFDE hash als het register zelf. Een tweede hash zou een sessie op twee manieren identificeren, en dan houdt een stand op de ene sleutel de andere niet tegen (SEC-LOCK-003)' },
+  { van: 'domein:mailaanname', naar: 'domein:mailontvanger', soort: 'DOMEINRELATIE',
+    reden: 'kern/mailaanname.js r.49 vraagt de ontvangertoets of een adres een postvak heeft (550 zo niet). De aanname bewaakt de buitenpoort, de ontvanger weet wie er woont; dat zijn twee vragen en ze horen niet in een module' },
+  { van: 'domein:rtfos', naar: 'domein:beschermzaak', soort: 'DOMEINRELATIE',
+    reden: 'kern/rtfos/index.js r.134 monteert de beschermlaag (HDI.md) op de context van de RTFoundation: de beschermzaak is een onderdeel van de stichting en geen vreemd domein, maar hij houdt met opzet een eigen dataklasse die velden WEIGERT -- vandaar een eigen module en geen tak in rtfos/' },
+  { van: 'domein:rtgid-bewijs', naar: 'domein:persoonseis-lijst', soort: 'DOMEINRELATIE',
+    reden: 'kern/rtgid-bewijs.js r.54 leest SOORTEN uit de persoonseislijst: de bewijsmap toont dat een lid aan een persoonseis voldoet zonder het registratienummer af te geven, en welke eisen er bestaan staat op EEN plek (kern/persoonseis-lijst.js), niet nog eens in de map' }
 ];

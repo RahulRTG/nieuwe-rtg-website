@@ -4,7 +4,7 @@ module.exports = (octx) => {
   const { kern, officeQueryMag } = octx;
   const { OFFICE_CODE, app, archief, crypto, db, loginFails, noteFailedTry, officeAuth, officeState,
           rememberSession, sseClients, tooManyTries, totpOk, veiligGelijk, logInlog, securityLogKeten,
-          handelingsspoor, ankerdienst, ankerpost } = kern;
+          handelingsspoor } = kern;
 app.post('/api/office/login', (req, res) => {
   const bucket = 'office:' + req.ip;
   if (tooManyTries(res, bucket)) return;

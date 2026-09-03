@@ -145,3 +145,136 @@ test('een zaak bevestigt toegang net als een lid', async () => {
       'er ging iets anders open dan wat de zaak bevestigde');
   } finally { await stop(o.srv); }
 });
+
+test('de operationele stand van een zaak gaat pas open met een machtiging', async () => {
+  const o = await opzet();
+  try {
+    const z = (await o.p('/api/supplier/service/open',
+      { onderwerp: 'zaak', titel: 'Onze werkruimte doet raar' }, o.zaakToken)).body.zaak;
+
+    /* ZONDER MACHTIGING STAAT ER NIET NIETS, MAAR DE REDEN. Een leeg vak wordt
+       ingevuld met iemands eigen aanname. */
+    const dicht = await o.p('/api/office/service/zaak', { id: z.id }, o.balie);
+    assert.equal(dicht.body.zaakstand.open, false, 'de operationele stand stond zomaar open');
+    assert.match(dicht.body.zaakstand.waarom, /machtiging/i, 'er staat geen reden waarom hij dicht is');
+    /* Het BASISprofiel blijft wel open: een medewerker moet weten met wie hij
+       praat zonder eerst iets te vragen. */
+    assert.equal(dicht.body.zaakprofiel.code, 'KIKUNOI');
+
+    const v = await o.p('/api/office/service/bevestiging/vraag',
+      { id: z.id, capabilities: ['organisatie.stand'], reden: 'de werkruimte reageert niet sinds vanmorgen' }, o.balie);
+    const wacht = await o.p('/api/supplier/service/bevestigingen', {}, o.zaakToken);
+    const ok = await o.p('/api/supplier/service/bevestig', { id: wacht.body.verzoeken[0].id }, o.zaakToken);
+    assert.equal(ok.status, 200, JSON.stringify(ok.body).slice(0, 200));
+
+    /* EN NU GAAT ER ECHT IETS DOOR DE POORT. Dit is de eerste aanroeper van
+       magNu(); daarvoor legde de machtiging toestemming vast en opende hij
+       niets -- niet voor een AI en ook niet voor een mens. */
+    const open = await o.p('/api/office/service/zaak',
+      { id: z.id, machtiging: ok.body.machtiging.id }, o.balie);
+    assert.equal(open.body.zaakstand.open, true, JSON.stringify(open.body.zaakstand).slice(0, 200));
+    assert.equal(typeof open.body.zaakstand.bestellingenOpen, 'boolean');
+
+    /* Een machtiging van deze zaak opent niets bij een andere zaak. */
+    const ander = (await o.p('/api/supplier/service/open',
+      { onderwerp: 'zaak', titel: 'Tweede melding' }, o.zaakToken)).body.zaak;
+    const kruis = await o.p('/api/office/service/zaak',
+      { id: ander.id, machtiging: ok.body.machtiging.id }, o.balie);
+    assert.equal(kruis.body.zaakstand.open, false, 'een machtiging van zaak A opende zaak B');
+  } finally { await stop(o.srv); }
+});
+
+test('een AI mag een machtiging krijgen, maar nooit zwaar werk en nooit als tweede handtekening', async () => {
+  const o = await opzet();
+  try {
+    const z = (await o.p('/api/supplier/service/open',
+      { onderwerp: 'account', titel: 'Wij komen niet in onze werkruimte' }, o.zaakToken)).body.zaak;
+    /* Op moduleniveau, want een AI vraagt niet langs de kantoorroute: die draagt
+       de sleutel van een MENS uit de sessie, en juist daarom kan niemand zich
+       voordoen als machine. */
+    const crypto = require('crypto');
+    const db = { data: {} };
+    const zaken = require('../server/kern/service/zaak')({ db, save: () => {}, crypto });
+    const mach = require('../server/kern/service/machtiging')({ db, save: () => {}, crypto, zaken });
+    const zz = zaken.open({ melder: 'zaak-X', doelgroep: 'zaak', onderwerp: 'account', titel: 'Toegang' }).zaak;
+
+    const v = mach.verleen({ zaakId: zz.id, mens: 'ai:onderzoeker',
+      capabilities: ['identiteit.uitdaging', 'identiteit.openen'],
+      reden: 'de AI kijkt mee met dit toegangsprobleem' });
+    assert.deepEqual(v.machtiging.capabilities, ['identiteit.uitdaging'],
+      'de AI kreeg zwaar werk: ' + JSON.stringify(v.machtiging.capabilities));
+    assert.ok(v.geweigerd.includes('identiteit.openen'), 'de weigering wordt niet gemeld');
+
+    /* En een machine kan nooit de tweede handtekening zijn: die eis bestaat om
+       een MENS naast een mens te zetten. */
+    const vanMens = mach.verleen({ zaakId: zz.id, mens: 'nadia',
+      capabilities: ['identiteit.openen'], reden: 'account recovery aan de balie' });
+    const bij = mach.tekenBij(vanMens.machtiging.id, { mens: 'ai:onderzoeker' });
+    assert.ok(bij.error, 'een AI kon de tweede handtekening zetten');
+    assert.match(bij.error, /MENS/i);
+    assert.equal(z.doelgroep, 'zaak');
+  } finally { await stop(o.srv); }
+});
+
+/* DE DERDE AI-ROL, VAN VRAAG TOT POORT. Het besluit van de eigenaar was: de AI
+   mag inzien, maar alleen na bevestiging door het lid. Deze toets legt die hele
+   weg af en houdt vooral de twee dingen vast die stil kapot kunnen gaan: dat er
+   VOOR de bevestiging niets opengaat, en dat de AI geen machtiging kan lenen die
+   op naam van een mens staat. */
+test('de AI-onderzoeker opent pas iets nadat het lid heeft bevestigd, en leent nooit', async () => {
+  const crypto = require('crypto');
+  const db = { data: {} };
+  const save = () => {};
+  const zaken = require('../server/kern/service/zaak')({ db, save, crypto });
+  const loop = require('../server/kern/service/loop')({ zaken, save });
+  const mach = require('../server/kern/service/machtiging')({ db, save, crypto, zaken });
+  const bev = require('../server/kern/service/bevestiging')({ db, save, crypto, zaken, machtigingen: mach });
+  const ond = require('../server/kern/service/onderzoeker')({ zaken, loop, machtigingen: mach, bevestiging: bev, save });
+
+  const z = zaken.open({ melder: 'lid-77', doelgroep: 'lid', onderwerp: 'account',
+    titel: 'Ik kom niet meer in mijn account' }).zaak;
+  const cap = require('../server/kern/service/router').benodigd(z.team).find(c => !mach.ZWAAR[c]);
+
+  /* Wat de AI zonder iets al heeft, is de zaak zelf en verder niets. */
+  const s = ond.stof(z.id);
+  assert.ok(s.stof.tijdlijn, 'de onderzoeker ziet de zaak niet');
+  assert.ok(!('melder' in s.stof), 'de onderzoeker kreeg de melder mee');
+
+  const v = ond.vraagToegang({ zaakId: z.id, capabilities: [cap, 'identiteit.openen'],
+    reden: 'om te zien waar het inloggen vastloopt' });
+  assert.ok(v.ok, JSON.stringify(v));
+  assert.equal(v.machine, true, 'de aanvraag noemt zichzelf geen machine');
+  assert.equal(v.bevestiging.machine, true, 'het lid ziet niet dat er een machine vraagt');
+  assert.ok(v.nietGevraagd.some(u => u.capability === 'identiteit.openen'),
+    'zwaar werk werd stilzwijgend meegevraagd of stilzwijgend weggelaten');
+
+  /* VOOR de bevestiging is er geen machtiging, dus is er niets te openen. */
+  assert.equal(v.bevestiging.machtiging, null, 'er ontstond een machtiging zonder het lid');
+  assert.equal(ond.poort(null, cap, { zaakId: z.id }).mag, false);
+
+  const b = bev.bevestig(v.bevestiging.id, { melder: 'lid-77' });
+  assert.ok(b.ok, JSON.stringify(b));
+  assert.equal(ond.poort(b.machtiging.id, cap, { zaakId: z.id }).mag, true, 'de poort ging niet open na bevestiging');
+
+  /* En hij leent niet: een machtiging op naam van een mens opent voor de AI
+     niets, ook al draagt hij exact dezelfde capability. */
+  const vanMens = mach.verleen({ zaakId: z.id, mens: 'nadia', capabilities: [cap],
+    reden: 'nadia kijkt zelf naar dit toegangsprobleem' });
+  const geleend = ond.poort(vanMens.machtiging.id, cap, { zaakId: z.id });
+  assert.equal(geleend.mag, false, 'de AI leende de machtiging van een mens');
+  assert.match(geleend.waarom, /mens/i);
+
+  /* EN EEN TWEEDE VRAAG SCHRIJFT NIETS. De bevestiging hergebruikt een lopend
+     verzoek; de tijdlijnregel ernaast deed dat eerst niet en liep vol met een
+     handeling die niet gebeurde. Gevonden met een kale ronde, niet met lezen. */
+  const z2 = zaken.open({ melder: 'lid-78', doelgroep: 'lid', onderwerp: 'account',
+    titel: 'Ik kom er ook niet in' }).zaak;
+  const vraag = () => ond.vraagToegang({ zaakId: z2.id, capabilities: [cap],
+    reden: 'om te zien waar het inloggen vastloopt' });
+  vraag();
+  const na1 = zaken.vind(z2.id).tijdlijn.length;
+  const tweede = vraag();
+  assert.equal(tweede.hergebruikt, true, 'er ontstond een tweede verzoek voor dezelfde vraag');
+  assert.equal(zaken.vind(z2.id).tijdlijn.length, na1,
+    'de tweede vraag schreef opnieuw op de tijdlijn terwijl er geen tweede verzoek was');
+});

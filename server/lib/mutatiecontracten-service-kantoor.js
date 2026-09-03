@@ -48,6 +48,19 @@ const CONTRACTEN = Object.assign({},
   BESCHERMD('POST /api/office/service/machtiging/intrek', 'office.service.machtiging.intrek',
     'ingetrokken blijft ingetrokken; de tweede aanroep laat de machtiging ongewijzigd'),
 
+  /* ---- de AI-onderzoeker ----
+     `mag` leest niets van het lid: hij vraagt of het TEAM van deze zaak de
+     gevraagde capability nodig heeft, en of hij niet zwaar is. `vraag` schrijft
+     wel -- hij zet een verzoek klaar -- maar hergebruikt een lopend verzoek langs
+     dezelfde weg als een medewerker, want het gaat door bevestiging.vraag(). */
+  LEEST('POST /api/office/service/ai/mag', 'office.service.ai.mag',
+    'onderzoeker.mag(): router.benodigd() en de ZWAAR-tabel, allebei zonder state'),
+  BESCHERMD('POST /api/office/service/ai/vraag', 'office.service.ai.vraag',
+    'de aanvrager is altijd dezelfde machine, dus een tweede aanroep voor dezelfde zaak en dezelfde ' +
+    'capabilities valt in het hergebruik van bevestiging.vraag() -- er komt geen tweede knop in de ' +
+    'app van het lid bij. De tijdlijnregel hangt aan de nieuwe bevestiging en wordt dus niet ' +
+    'herhaald'),
+
   /* ---- de patroon-, status- en foutlaag ---- */
   LEEST('POST /api/office/service/patronen', 'office.service.patronen',
     'patronen.vermoedens() en perIncident(); allebei groeperen ze over bestaande zaken'),

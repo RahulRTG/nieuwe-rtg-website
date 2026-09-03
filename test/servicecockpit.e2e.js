@@ -177,3 +177,30 @@ test('een medewerker vraagt toegang en opent niets uit zichzelf', { skip: geenBr
       'er ging iets open zonder dat het lid had bevestigd');
   });
 });
+
+/* DE AI VRAAGT LANGS DEZELFDE KNOP, EN HET LID ZIET DAT HET GEEN MENS IS.
+   Twee dingen die alleen in de browser te zien zijn: dat de cockpit de AI kan
+   inzetten zonder zelf iets te openen, en dat de hulp-la van het lid "RTG AI"
+   toont in plaats van de technische sleutel `ai:onderzoeker`. */
+test('de AI vraagt het lid om toegang, en opent niets uit zichzelf', { skip: geenBrowser(pw) }, async () => {
+  await metCockpit(async (page, base, lidToken, balie) => {
+    await api(base, '/api/service/open', { onderwerp: 'betaling', titel: 'Mijn uitbetaling ontbreekt' }, lidToken);
+    await page.goto(base + '/apps/service.html', { waitUntil: 'domcontentloaded' });
+    await page.waitForSelector('tbody tr[data-id]', { timeout: 20000 });
+    await page.click('tbody tr[data-id]');
+    await page.waitForSelector('#aiVraag', { timeout: 20000 });
+
+    await page.fill('#aiReden', 'uitzoeken waar de uitbetaling is blijven staan');
+    await page.click('#aiVraag');
+    await page.waitForFunction(() => /Het lid beslist/.test(document.body.textContent), null, { timeout: 20000 });
+
+    /* Er ging niets open: een verzoek is geen machtiging, ook niet voor een AI. */
+    const mijne = await api(base, '/api/office/service/machtigingen', {}, balie);
+    assert.equal(mijne.machtigingen.length, 0, 'de AI kreeg toegang zonder dat het lid bevestigde');
+
+    /* En wat het LID leest is een naam en een waarschuwing, geen sleutel. */
+    const verzoeken = await api(base, '/api/service/bevestigingen', {}, lidToken);
+    assert.equal(verzoeken.verzoeken.length, 1, JSON.stringify(verzoeken).slice(0, 200));
+    assert.equal(verzoeken.verzoeken[0].machine, true, 'het lid kan niet zien dat er een machine vraagt');
+  });
+});

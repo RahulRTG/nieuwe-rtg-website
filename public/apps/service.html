@@ -315,6 +315,16 @@ function actieBlok(z) {
     + 'Kan hij niet bij zijn app, dan leest hij zes cijfers voor.</p>'
     + '<div class="rij"><input class="veld breed" id="hCode" placeholder="Bevestigingscode van het lid" maxlength="20" inputmode="numeric">'
     + '<button class="knop" id="hCodeOk">Code invoeren</button></div>'
+    /* DE AI ERBIJ HALEN. Dezelfde weg, andere aanvrager: het lid ziet "RTG AI"
+       en dat het geen medewerker is. Een mens zet het in gang -- een machine die
+       bij elke zaak zelf om toegang vraagt, maakt van de bevestigingsknop binnen
+       een maand een reflex, en dan is die knop niets meer waard. */
+    + '<div class="rij"><select class="veld" id="aiCap">'
+    + capsVoor(z.team).map(c => '<option>' + esc(c) + '</option>').join('') + '</select>'
+    + '<input class="veld breed" id="aiReden" placeholder="Wat moet de AI uitzoeken? (het lid leest dit)" maxlength="300">'
+    + '<button class="knop doe" id="aiVraag">De AI laten vragen</button></div>'
+    + '<p class="stil">De AI opent hiermee niets: het lid krijgt hetzelfde verzoek, met een machine '
+    + 'als aanvrager. Zwaar werk gaat nooit naar de AI &mdash; dat vraagt een tweede mens.</p>'
     + '</div>';
 }
 function capsVoor(team) {
@@ -330,6 +340,9 @@ function bindZaak(z) {
   $('#hWeeg').onclick = () => doe(() => api('weeg', { id: z.id, naar: $('#hPrio').value, reden: $('#hReden').value }), 'Prioriteit gezet.');
   $('#hVraag').onclick = () => doe(() => api('bevestiging/vraag', { id: z.id, capabilities: [$('#hCap').value], doel: $('#hDoel').value, reden: $('#hDoel').value }), 'Gevraagd. Het lid ziet het in zijn app.');
   $('#hCodeOk').onclick = () => doe(() => api('bevestiging/code', { code: $('#hCode').value }), 'Bevestigd.');
+  $('#aiVraag').onclick = () => doe(() => api('ai/vraag',
+    { id: z.id, capabilities: [$('#aiCap').value], reden: $('#aiReden').value }),
+    'Gevraagd namens de AI. Het lid beslist.');
 }
 
 /* -------------------------------------------------------------- patronen -- */

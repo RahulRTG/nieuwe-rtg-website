@@ -32,6 +32,9 @@
 
 const klok = require('../../lib/klok');
 const router = require('./router');
+/* De stand, de naar-buiten-vorm en de vergelijking van de code staan in
+   ./bevestiging-vorm.js: geen levensloop, geen opslag, alleen vorm. */
+const vorm = require('./bevestiging-vorm');
 
 const MINUTEN = 5;
 
@@ -46,13 +49,11 @@ module.exports = function maakBevestiging({ db, save, crypto, zaken, machtiginge
      hij ook leeft (keuringsregel over zwakke sleutels). */
   const cijfers = () => String(crypto.randomInt(0, 1000000)).padStart(6, '0');
 
-  function stand(b) {
-    if (b.gebruiktAt) return 'gebruikt';
-    if (b.geweigerdAt) return 'geweigerd';
-    return Date.parse(b.tot) <= klok.nu() ? 'verlopen' : 'open';
-  }
+  const stand = vorm.stand;
+  const levend = vorm.levend;
+  const gelijk = vorm.gelijk;
+  const kortB = (b, o) => vorm.kortB(b, Object.assign({ minuten: MINUTEN }, o));
   const vind = (id) => B().find(b => b.id === String(id || '')) || null;
-  const levend = (b) => stand(b) === 'open';
 
   /* De medewerker vraagt. De gevraagde capabilities staan er meteen bij: wat het
      lid bevestigt moet hetzelfde zijn als wat er daarna opengaat, anders is de
@@ -95,7 +96,12 @@ module.exports = function maakBevestiging({ db, save, crypto, zaken, machtiginge
        iets verschillends. */
     const zelfde = (a, b2) => a.length === b2.length && a.every(x => b2.includes(x));
     const bestaand = B().find(b => b.zaak === z.id && b.mens === w && levend(b) && zelfde(b.capabilities, gekregen));
-    if (bestaand) return { ok: true, bevestiging: kortB(bestaand, { voorMens: true }), let: 'Er stond al een verzoek open; dat is hergebruikt.' };
+    /* `hergebruikt` is geen cosmetiek: een aanroeper die er iets NAAST schrijft
+       -- een regel op de tijdlijn bijvoorbeeld -- moet dat kunnen laten. Zonder
+       deze vlag moest hij de zin in `let` gaan lezen, en een gedragsgrens die aan
+       een zin hangt sneuvelt bij de eerste herformulering. */
+    if (bestaand) return { ok: true, bevestiging: kortB(bestaand), hergebruikt: true,
+      let: 'Er stond al een verzoek open; dat is hergebruikt.' };
 
     const at = nu();
     const b = {
@@ -110,19 +116,7 @@ module.exports = function maakBevestiging({ db, save, crypto, zaken, machtiginge
     B().unshift(b);
     if (B().length > 5000) B().pop();
     save();
-    return { ok: true, bevestiging: kortB(b, { voorMens: true }) };
-  }
-
-  /* WAT DE MEDEWERKER ZIET IS NIET WAT HET LID ZIET. De code hoort in de app
-     van het LID: een medewerker die hem van zijn eigen scherm kan aflezen,
-     bevestigt niets, en dan is de terugval een lege ceremonie. */
-  function kortB(b, { voorMens = false, voorLid = false } = {}) {
-    const basis = { id: b.id, zaak: b.zaak, mens: b.mens, doel: b.doel, reden: b.reden,
-      capabilities: b.capabilities.slice(), stand: stand(b), at: b.at, tot: b.tot,
-      machtiging: b.machtiging, via: b.via };
-    if (voorLid) return Object.assign(basis, { code: levend(b) ? b.code : null, minuten: MINUTEN });
-    if (voorMens) return basis;
-    return basis;
+    return { ok: true, bevestiging: kortB(b) };
   }
 
   /* Wat er in de app van dit lid klaarstaat. Alleen wat leeft: een verlopen
@@ -175,14 +169,6 @@ module.exports = function maakBevestiging({ db, save, crypto, zaken, machtiginge
     const kandidaat = B().find(b => levend(b) && b.mens === w && gelijk(b.code, c));
     if (!kandidaat) return { status: 404, error: 'Deze code hoort niet bij een openstaand verzoek van u. Codes gelden ' + MINUTEN + ' minuten en een keer.' };
     return bevestig(kandidaat.id, { melder: kandidaat.melder, via: 'code' });
-  }
-
-  function gelijk(a, b) {
-    const x = String(a), y = String(b);
-    if (x.length !== y.length) return false;
-    let v = 0;
-    for (let i = 0; i < x.length; i++) v |= x.charCodeAt(i) ^ y.charCodeAt(i);
-    return v === 0;
   }
 
   const lijst = (f) => {

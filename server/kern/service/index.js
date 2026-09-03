@@ -40,6 +40,11 @@ module.exports = function maakService({ db, save, crypto, inzagelog, notify, sse
      geen verbinding aan en kijkt niet in het pakket. */
   const gesprekken = require('./gesprek')({ db, save, crypto, zaken, loop, sseToCustomer, sseToOffice });
 
+  /* De derde AI-rol: de enige die iets kan OPENEN, en dus de enige die langs
+     de bevestiging van het lid moet. Hij hangt achter machtiging en bevestiging
+     omdat hij allebei nodig heeft en zelf niets bewaart. */
+  const onderzoeker = require('./onderzoeker')({ zaken, loop, machtigingen, bevestiging, save });
+
   const mens = require('./mens');
   const router = require('./router');
   const prioriteit = require('./prioriteit');
@@ -75,7 +80,7 @@ module.exports = function maakService({ db, save, crypto, inzagelog, notify, sse
     serviceZaken: zaken, serviceLoop: loop,
     serviceMachtiging: machtigingen, serviceBevestiging: bevestiging,
     servicePatronen: patronen, servicePersoonlijk: persoonlijk, serviceFoutsignaal: foutsignalen,
-    serviceKwaliteit: kwaliteit, serviceGesprek: gesprekken,
+    serviceKwaliteit: kwaliteit, serviceGesprek: gesprekken, serviceOnderzoeker: onderzoeker,
     serviceMens: mens, serviceRouter: router, servicePrioriteit: prioriteit,
     serviceKlassen: klassen, serviceKeuzes: keuzes
   };

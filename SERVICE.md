@@ -384,6 +384,55 @@ het adres van wat hem weer omlaag brengt: een lokaal spraakmodel via
 `LOCAL_AI_URL`, de deur die `meelezen.js` zelf openhoudt. Het is een schuld met
 een naam, geen getal dat vanzelf groeit.
 
+## 13b. De derde AI-rol, en de enige die iets kan openen
+
+De AI heeft in deze laag drie rollen, en twee ervan vragen niets. De eerste is
+de AI die een lid meteen helpt (`kern/ai.js`), de tweede is de AI die een zaak
+samenvat voor een medewerker; allebei lezen ze alleen wat de ZAAK zelf draagt,
+en dat is geen inzage in een mens.
+
+De derde is de gevaarlijke. Bij "waarom is mijn boeking niet doorgekomen" is het
+antwoord niet te geven zonder in de boeking te kijken -- en dat is iemands
+gegeven, niet dat van de zaak. Het besluit van de eigenaar is: **dat mag, maar
+alleen na bevestiging door het lid.** Dus geen aparte AI-poort en geen stille
+dienstsleutel: de AI vraagt langs dezelfde weg als een medewerker
+(`kern/service/onderzoeker.js` -> `bevestiging.js`), en het lid ziet dat er een
+machine vraagt.
+
+Dat laatste is niet cosmetisch. `ai:` is een voorvoegsel dat **niemand zelf kan
+zetten** -- een sessie levert de sleutel van een mens -- dus wat het draagt is
+aantoonbaar een machine, en de app leidt daaruit af wat het lid leest ("RTG AI",
+plus "dit is een machine, geen medewerker"). Zonder die regel stond er
+`ai:onderzoeker vraagt toegang`: een technische sleutel waar een naam hoort, en
+niets dat zegt dat er geen mens meekijkt.
+
+Vier grenzen, en alle vier zakken ze in `test/servicezaak.test.js`:
+
+- **de AI vraagt niet uit zichzelf.** De routes zijn die van een medewerker
+  (`/api/office/service/ai/mag` en `/ai/vraag`); een machine die bij elke zaak
+  standaard om toegang vraagt, maakt van de bevestigingsknop binnen een maand een
+  reflex, en dan is die knop niets meer waard;
+- **de AI krijgt nooit zwaar werk.** Dat vraagt een tweede MENS, en een machine
+  kan die handtekening niet zetten (`machtiging-grenzen.js`) -- dat vooraf
+  weigeren is eerlijker dan hem laten wachten op een tekening die nooit komt;
+- **de AI leent niet.** Een machtiging op naam van een mens opent voor de AI
+  niets, ook al draagt hij exact dezelfde capability;
+- **er gaat niets open voor de bevestiging.** `vraagToegang()` levert een
+  openstaand verzoek en geen machtiging.
+
+Dit is meteen de eerste plek in deze laag waar `magNu()` een AANROEPER heeft. Tot
+hier legde de machtiging toestemming vást maar opende zij niets -- voor een mens
+net zo min als voor een AI, en dat is exact "geen capability zonder caller" uit
+CONTROLPLANE.md. De eerste echte poort staat naast deze rol
+(`zaakstand()` achter `organisatie.stand`).
+
+En de kale ronde vond hier zijn elfde fout: de bevestiging hergebruikt een lopend
+verzoek, maar de tijdlijnregel ernaast deed dat niet en schreef bij elke aanroep
+opnieuw. Een tijdlijn die volloopt met een handeling die niet gebeurde. Het
+hergebruik draagt daarom nu een **vlag** (`hergebruikt`) en geen zin -- een
+gedragsgrens die aan een zin in `let` hangt, sneuvelt bij de eerste
+herformulering.
+
 ## 14. Wat er staat, en wat er niet staat
 
 **Staat** (gemeten, met toetsen die zijn zien zakken):
@@ -395,6 +444,9 @@ een naam, geen getal dat vanzelf groeit.
 - de menselijke overname als contract, ook vanuit de chat van Rahul;
 - de ServiceMachtiging met versmalling, zaakbereik, verval en tweede handtekening;
 - de supportbevestiging met eenmalige terugvalcode;
+- de AI-onderzoeker: dezelfde weg als een medewerker, met de machine als
+  zichtbare aanvrager, zonder zwaar werk, zonder lenen, en met de eerste echte
+  aanroeper van `magNu()` ernaast (par. 13b);
 - de ledenkant in de app-gids-la (Core, op elk scherm) en de kantoorkant achter
   de balie-zetel;
 - de klacht van de ledenbalie krijgt een envelop en blijft een klacht;
@@ -417,17 +469,15 @@ een naam, geen getal dat vanzelf groeit.
 - **een koppeling met de incidentstand van RTG Command**: Service weet wat zij
   zelf heeft gemeld, niet wat de gezondheidskaart zegt. Die brug is bewust niet
   gelegd zolang de melderskant geen vermogen kan aanwijzen.
-- **AI-onderzoeker en copilot**: de router kiest een team, geen techniek, en de
-  intelligentierouter (`kern/ai/router.js`) loopt in de schaduw en beslist niets.
-  Dit is bewust niet gebouwd, en de reden is hard: een copilot die "waarschijnlijk
-  een security hold" zegt, doet een uitspraak over een oorzaak. Om die te kúnnen
-  onderbouwen moet hij de betaalstand, de wijzigingsgeschiedenis en het
-  incidentbeeld kunnen lezen — precies de gegevens die deze laag achter een
-  machtiging met een bevestiging heeft gezet. Een onderzoeker bouwen betekent dus
-  eerst beslissen of een AI die machtiging mag krijgen, en dat is een besluit van
-  de eigenaar en geen bouwtaak. Tot dat besluit valt, zegt de cockpit met zoveel
-  woorden dat RTG hier geen oorzaak vaststelt (par. 10). Dat is geen gat maar de
-  eerlijke stand.
+- **de copilot die een oorzaak noemt**: de AI-ONDERZOEKER staat inmiddels wel
+  (par. 13b) — het besluit van de eigenaar is gevallen: een AI mag die machtiging
+  krijgen, maar alleen na bevestiging door het lid. Wat er niet staat is de stap
+  daarna: een copilot die "waarschijnlijk een security hold" zegt, doet een
+  uitspraak over een OORZAAK, en de router kiest een team en geen techniek —
+  `kern/ai/router.js` loopt in de schaduw en beslist niets. De cockpit zegt daarom
+  nog steeds met zoveel woorden dat RTG hier geen oorzaak vaststelt (par. 10). De
+  onderzoeker mag met een bevestiging KIJKEN; concluderen is iets anders, en dat
+  blijft mensenwerk zolang niemand die conclusie kan onderbouwen.
 - **telefonie over het telefoonnet**: geen provider en geen nummer. Bellen kán
   wel, binnen de app (par. 13); `klassen.js` draagt `telefoon` daarom als
   `gebouwd: false` met een verwijzing naar het kanaal dat er wél is.

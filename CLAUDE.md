@@ -645,7 +645,17 @@ een vaste contactpersoon, maar geen kanaal. Het systeem vraagt daar niet wie er
 meldt (de zaakcode komt uit de sessie), de doelgroep wordt door de ROUTE gezet en
 niet uit het lichaam gelezen, en een zaak krijgt een MENS en niet De Rechterhand
 -- welke tabel geldt leest `loop.mensVraag()` uit de DOELGROEP van de zaak.
-Par. 10 is de cockpit
+De AI heeft er drie rollen en maar
+een ervan kan iets OPENEN: die vraagt langs dezelfde weg als een medewerker
+(`kern/service/onderzoeker.js`) en het lid ziet dat er een MACHINE vraagt --
+afgeleid uit het voorvoegsel `ai:`, dat niemand zelf kan zetten. Vier grenzen
+eromheen: de AI vraagt niet uit zichzelf (het zijn routes van een mens, want een
+machine die overal standaard om toegang vraagt maakt van de bevestigingsknop een
+reflex), krijgt nooit zwaar werk (dat vraagt een tweede MENS, en die
+handtekening kan hij niet zetten), leent nooit een machtiging die op naam van een
+mens staat, en opent niets voordat het lid heeft gedrukt. Dat is meteen de eerste
+plek waar `magNu()` een AANROEPER heeft -- tot dan legde de machtiging toestemming
+vast maar opende zij niets, voor een mens net zo min als voor een AI. Par. 10 is de cockpit
 (`/apps/service.html`): zaakgericht en met opzet ZONDER ledenzoeker -- vrije
 inzage blijft bij de ledenbalie, met een reden en een journaalregel -- en alles
 wat het bord beweert draagt een "waarom?", inclusief wat er NIET is gewogen. Het

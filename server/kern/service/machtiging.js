@@ -8,17 +8,15 @@
    ELKE menselijke supporttoegang hoort te hebben. Deze module is diezelfde vorm,
    met de ZAAK als bereik in plaats van de organisatie.
 
-   Dat er twee zijn is bewust. Bijstand gaat over een omgeving van iemand
-   anders, met een klant die live meekijkt; dit gaat over een dossier bij RTG
-   zelf. De vorm is gedeeld, de poort niet -- samenvoegen zou de klantkant van
-   bijstand een tak geven waarin RTG zichzelf toegang geeft.
+   Dat er twee zijn is bewust: bijstand gaat over een omgeving van iemand anders,
+   dit over een dossier bij RTG zelf. De vorm is gedeeld, de poort niet.
 
    VIER DINGEN DIE STRUCTUREEL ZIJN, NIET AFGESPROKEN.
 
    1. EEN MACHTIGING VERSMALT ALLEEN. Wat erin mag staan is begrensd door wat
-      het TEAM nodig heeft (kern/service/router.js): `verleen()` rekent de
-      doorsnede uit, en er is geen pad waarlangs er iets bij komt. Zelfde
-      grammatica als kern/stuur/mandaat.js.
+      het TEAM nodig heeft (./router.js): `verleen()` rekent de doorsnede uit en
+      er is geen pad waarlangs er iets bij komt (./mandaat-grammatica in
+      kern/stuur/mandaat.js voert dezelfde regel).
    2. VERLOPEN IS EEN BEREKENDE TOESTAND. `stand()` leest de klok bij elke
       vraag. Er is geen opruimtaak, dus er valt niets te vergeten.
    3. HET BEREIK IS DE ZAAK. Een machtiging die bij zaak SUP-1 hoort, opent
@@ -40,15 +38,14 @@
 const klok = require('../../lib/klok');
 const router = require('./router');
 
-/* Capabilities die niet met een enkele handtekening opengaan. De lijst is kort
-   met opzet: elke regel hier maakt een handeling duurder, en een lijst die
-   alles bevat wordt door iedereen omzeild. */
-const ZWAAR = {
-  'identiteit.openen': 'De echte naam achter een codenaam.',
-  'bank.gegevens': 'Rekeninggegevens van een lid of zaak.',
-  'geld.compensatie': 'Geld toekennen buiten de gewone weg om.',
-  'gegevens.uitvoer': 'Een export van iemands gegevens.'
-};
+/* Wie er zwaar werk mag vragen en wat een AI-aanroeper is, staat in
+   ./machtiging-grenzen.js: pure tabel plus twee voorspellingen, zonder state.
+   Apart omdat dit bestand er anders over de omvangsgrens van keuringsregel 13
+   ging, en omdat een grens die je kunt aanwijzen makkelijker overeind blijft. */
+const { ZWAAR, AI_VOOR, isAi } = require('./machtiging-grenzen');
+/* De stand en de naar-buiten-vorm staan in ./machtiging-vorm.js, om dezelfde
+   reden en op dezelfde naad: geen levensloop, geen opslag. */
+const { stand, kortM } = require('./machtiging-vorm');
 
 const MAX_MINUTEN = 60;
 const STANDAARD_MINUTEN = 20;
@@ -60,10 +57,6 @@ module.exports = function maakMachtigingen({ db, save, crypto, zaken, inzagelog 
   const schoon = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, n);
   const inhoud = (s) => String(s || '').replace(/[^\p{L}\p{N}]/gu, '').length;
 
-  function stand(m) {
-    if (m.ingetrokken) return 'ingetrokken';
-    return Date.parse(m.tot) <= klok.nu() ? 'verlopen' : 'geldig';
-  }
   const vind = (id) => M().find(m => m.id === String(id || '')) || null;
 
   /* DE DOORSNEDE. Gevraagd ∩ wat het team nodig heeft. Wat wegvalt komt in het
@@ -87,8 +80,15 @@ module.exports = function maakMachtigingen({ db, save, crypto, zaken, inzagelog 
     const mag = router.benodigd(binnenTeam || z.team);
     const gevraagd = (Array.isArray(capabilities) ? capabilities : []).map(c => schoon(c, 60)).filter(Boolean);
     if (!gevraagd.length) return { status: 400, error: 'Zeg wat u nodig heeft. Een machtiging zonder inhoud opent niets.' };
-    const gekregen = gevraagd.filter(c => mag.includes(c));
-    const geweigerd = gevraagd.filter(c => !mag.includes(c));
+    let gekregen = gevraagd.filter(c => mag.includes(c));
+    let geweigerd = gevraagd.filter(c => !mag.includes(c));
+    if (isAi(w)) {
+      const zwaarGevraagd = gekregen.filter(c => ZWAAR[c]);
+      if (zwaarGevraagd.length) {
+        gekregen = gekregen.filter(c => !ZWAAR[c]);
+        geweigerd = geweigerd.concat(zwaarGevraagd);
+      }
+    }
     if (!gekregen.length) {
       return { status: 403, error: 'Het team ' + (binnenTeam || z.team) + ' heeft dit niet nodig voor deze zaak. Zet de zaak eerst door naar het team dat het wel mag.', geweigerd };
     }
@@ -125,11 +125,6 @@ module.exports = function maakMachtigingen({ db, save, crypto, zaken, inzagelog 
         : null };
   }
 
-  function kortM(m) {
-    return { id: m.id, zaak: m.zaak, mens: m.mens, doel: m.doel, capabilities: m.capabilities.slice(),
-      zwaar: m.zwaar.slice(), stand: stand(m), at: m.at, tot: m.tot, minuten: m.minuten,
-      tweedeMens: m.tweedeMens, gebruikt: m.gebruikt.length };
-  }
 
   /* De tweede handtekening. Nooit van de aanvrager zelf -- dat wordt hier
      gecontroleerd, want een regel die alleen in een handleiding staat, is bij
@@ -140,6 +135,7 @@ module.exports = function maakMachtigingen({ db, save, crypto, zaken, inzagelog 
     const w = schoon(mens, 60);
     if (!w) return { status: 400, error: 'Wie tekent er bij?' };
     if (w === m.mens) return { status: 403, error: 'De aanvrager kan niet zijn eigen tweede handtekening zijn.' };
+    if (isAi(w)) return { status: 403, error: 'Een tweede handtekening is een MENS. Een machine ernaast zetten haalt de eis leeg.' };
     if (stand(m) !== 'geldig') return { status: 400, error: 'Deze machtiging is ' + stand(m) + '.' };
     m.tweedeMens = w; m.tweedeAt = nu();
     m.reden2 = schoon(reden, 300) || null;
@@ -189,5 +185,5 @@ module.exports = function maakMachtigingen({ db, save, crypto, zaken, inzagelog 
      kan niet nul blijven zonder dat iemand deze laag verbouwt. */
   const tel = () => ({ geldig: M().filter(m => stand(m) === 'geldig').length, totaal: M().length, permanenteToegang: 0 });
 
-  return { verleen, tekenBij, magNu, trekIn, lijst, tel, stand, vind, ZWAAR };
+  return { verleen, tekenBij, magNu, trekIn, lijst, tel, stand, vind, ZWAAR, isAi, AI_VOOR };
 };

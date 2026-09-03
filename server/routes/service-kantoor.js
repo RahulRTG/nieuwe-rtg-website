@@ -22,26 +22,6 @@ module.exports = (kern) => {
     serviceZaken, serviceLoop, serviceMachtiging, serviceBevestiging, serviceKeuzes,
     serviceFoutsignaal, findSupplier, serviceGesprek } = kern;
 
-  /* WIE MELDT DIT, ALS HET GEEN LID IS. Een zaak hoeft zijn eigen nummer niet op
-     te zoeken om hulp te vragen: de melder draagt `zaak-<code>`, en dat is genoeg
-     om te weten met wie u praat.
-
-     Veld voor veld en nooit publicSupplier(): dat is de KLANTweergave, met
-     menu's, foto's, kamers en evenementen erin. Een medewerker die een storing
-     onderzoekt heeft daar niets aan, en alles wat hier binnenkomt is meteen ook
-     alles wat er in de wachtrij te zien is. Vijf velden, en de partnerstand
-     erbij omdat een geschorste zaak een ander gesprek is. */
-  function zaakprofiel(melder) {
-    const m = String(melder || '');
-    if (!m.startsWith('zaak-') || typeof findSupplier !== 'function') return null;
-    const code = m.slice(5);
-    let s = null;
-    try { s = findSupplier(code); } catch (e) { s = null; }
-    if (!s) return { code, gevonden: false, let: 'Deze zaakcode kennen wij niet meer; de melding blijft staan.' };
-    return { code: s.code, naam: s.name || null, soort: s.type || null, stad: s.city || null,
-      partnerStand: s.partnerStatus || 'actief', gevonden: true };
-  }
-
   const veilig = (res, werk) => {
     try { const r = werk(); res.status(r && r.status ? r.status : 200).json(r); }
     catch (e) { console.error('[service-kantoor]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
@@ -61,6 +41,13 @@ module.exports = (kern) => {
     req.balieKey = key;
     next();
   }
+
+  /* Wie er meldt als het geen lid is, en wat er van die zaak open staat, komt
+     uit ./service-kantoor-zaakbeeld.js. De naad ligt op een echte grens: dat
+     bestand is het enige dat de LEVERANCIERSlaag aanraakt, en het draagt de
+     eerste echte poort van deze machtigingslaag. */
+  const { zaakprofiel, zaakstand } = require('./service-kantoor-zaakbeeld')(
+    { findSupplier, serviceMachtiging });
 
   /* De wachtrij. Niet een lijst maar een gefilterde: per team, per stand, en met
      de tellingen erbij die zeggen waar het schuurt. `zonderEigenaar` staat er
@@ -85,8 +72,10 @@ module.exports = (kern) => {
        schermverwijzing: bij een betaling of een bestelling zegt een clientfout
        niets. */
     const b = r.zaak.betrokken;
+    const pf = zaakprofiel(r.zaak.melder);
     return Object.assign(r, {
-      zaakprofiel: zaakprofiel(r.zaak.melder),
+      zaakprofiel: pf,
+      zaakstand: zaakstand(pf, r.zaak.id, kort(lijf(req).machtiging, 40), req.balieKey),
       machtigingen: serviceMachtiging.lijst({ zaak: r.zaak.id, max: 20 }),
       bevestigingen: serviceBevestiging.lijst({ zaak: r.zaak.id, max: 20 }),
       foutsignalen: (b && b.soort === 'scherm') ? serviceFoutsignaal.bijScherm(b.code) : []
@@ -164,4 +153,9 @@ module.exports = (kern) => {
      echte grens: hierboven werkt u AAN een zaak, daar kijkt u ERLANGS. Dat
      scheelt dit bestand bovendien de omvangsgrens van keuringsregel 13. */
   require('./service-kantoor-borden')(kern, { veilig, lijf, kort, balieAuth });
+
+  /* De derde AI-rol -- de enige die iets kan openen, en dus de enige die langs
+     de bevestiging van het lid gaat. Eigen bestand om dezelfde reden als de
+     andere twee: hier is de aanvrager een MACHINE, en dat is een echte naad. */
+  require('./service-kantoor-ai')(kern, { veilig, lijf, kort, balieAuth });
 };

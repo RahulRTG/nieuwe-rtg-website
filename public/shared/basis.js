@@ -700,7 +700,13 @@
          telefoon te wachten; al het andere kan wachten. */
       ((verzoeken && verzoeken.verzoeken) || []).forEach(function (v) {
         var z = el('div', 'bss-zaak');
-        z.appendChild(el('i', null, v.mens + ' vraagt toegang'));
+        /* WIE VRAAGT DIT. `v.machine` komt van de server en wordt daar afgeleid
+           uit een voorvoegsel dat niemand zelf kan zetten. Zonder deze regel
+           las een lid hier "ai:onderzoeker vraagt toegang" -- een technische
+           sleutel waar een naam hoort te staan, en niets dat zegt dat er geen
+           mens meekijkt. */
+        z.appendChild(el('i', null, (v.machine ? 'RTG AI' : v.mens) + ' vraagt toegang'));
+        if (v.machine) z.appendChild(el('p', null, 'Dit is een machine, geen medewerker.'));
         z.appendChild(el('p', null, v.reden));
         z.appendChild(el('p', null, 'Opent: ' + v.capabilities.join(', ') + '. Zaak ' + v.zaak + '.'));
         var rij = el('div', 'bss-rij');

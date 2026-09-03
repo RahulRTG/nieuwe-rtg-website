@@ -17,6 +17,12 @@ module.exports = function bouwKernAanTwee(kern, grens) {
      koppelcode-inlog met bevestiging in de app, selectieve gegevensdeling,
      inzagelog met intrekken en herroepbare machtigingen. */
   Object.assign(kern, require('../kern/rtgid').maakRtgid({ db, save, crypto, accounts, schoon, leeftijdVan, gidsHaal, keyVanCodenaam,
+    /* De bewijzenlaag (kern/vakbewijs.js) hangt in kernlaag3 en is hier dus al
+       gemonteerd -- maar hij wordt LAAT gebonden en niet nu doorgegeven. Een
+       verwijzing die op montagemoment wordt bevroren, geeft undefined zodra de
+       volgorde ooit verschuift, en dan antwoordt de bewijsclaim stil "nee" op
+       een vraag die hij niet kon stellen. Zo antwoordt hij "niet na te gaan". */
+    vakbewijsBron: () => kern,
     /* Bevestigen vraagt een passkey (kern/rtgid.js legt uit waarom die eis daar
        staat en niet in de route). De MECHANIEK blijft in kern/webauthn.js: het
        doel waaraan de ceremonie hangt is de koppel-id, zodat een assertie die

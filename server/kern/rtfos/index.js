@@ -44,6 +44,7 @@
      risico           het risicoregister: beheerst is een bewering, niet een vinkje
      herkomst         grote en contante giften: het geld staat stil tot er gekeken is
      meldcode         de vijf wettelijke stappen bij zorg om een kind
+     beschermzaak     geweld en uitbuiting: een EIGEN klasse, in ../beschermzaak/
      ruil             de buurtruil tussen leden: spullen, zonder geld
      gift             de giftstand, het voornemen en de bevestigde gift
      winkel           kopen bij de stichting -- en dat is met opzet GEEN gift
@@ -129,6 +130,8 @@ module.exports = (state) => {
     besluitVindbaar: notulen.besluitVindbaar, anbiVan: gift.stand });
   const risico = require('./risico')(ctx);
   const meldcode = require('./meldcode')(ctx);
+  // Buiten deze map, en dat is het punt (../beschermzaak/index.js).
+  const beschermzaak = require('../beschermzaak')(ctx);
 
   const vrijwilligerportaal = require('./vrijwilligerportaal')(ctx);
   const deelnemerportaal = require('./deelnemerportaal')(ctx, { toestemmingWegDirect: casus.toestemmingWegDirect });
@@ -154,7 +157,7 @@ module.exports = (state) => {
     partners, projecten, vrijwilligers, geld, casus, integriteit, rapport, gemeente, ondernemers,
     subsidies, voorraad, ruil, gift, winkel, activiteiten, berichten,
     netwerk, inkoop, uitwisseling, campagnes, koppeling,
-    bestuur, beleid, jaarverslag, risico, herkomst, meldcode,
+    bestuur, beleid, jaarverslag, risico, herkomst, meldcode, beschermzaak,
     vrijwilligerportaal, deelnemerportaal, publiek,
     veld, donateur,
     VLAGGEN: ctx.VLAGGEN, ROLLEN: ctx.ROLLEN

@@ -69,6 +69,9 @@ module.exports = ({ kern, LAGEN, NIET_GEDEKT }) => {
     catch (e) { return { fout: 'De laag ' + naam + ': ' + (e && e.message ? e.message : 'onbekende storing') }; }
   }
 
+  // doel en termijn per rij: ./consent-termijn.js
+  const verrijk = require('./consent-termijn')(LAGEN);
+
   function consentVan(key) {
     const uit = [];
     const storingen = [];
@@ -178,7 +181,7 @@ module.exports = ({ kern, LAGEN, NIET_GEDEKT }) => {
     }
 
     return {
-      ok: true, toestemmingen: uit, lagen: LAGEN, nietGedekt: NIET_GEDEKT, storingen,
+      ok: true, toestemmingen: uit.map(verrijk), lagen: LAGEN, nietGedekt: NIET_GEDEKT, storingen,
       voorbehoud: 'Op deze lijst let een toets mee: een nieuwe toestemming van de bekende soort ' +
         'valt niet stil buiten dit scherm. Een soort die er anders uitziet nog wel, en dan is dit ' +
         'register weer mensenwerk.'

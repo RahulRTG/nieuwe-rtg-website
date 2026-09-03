@@ -2,14 +2,14 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-09-03",
   "gemeten": {
-    "bestanden": 2027,
-    "vormen": 1348,
-    "velden": 1955,
-    "modules": 728,
-    "domeinen": 254,
+    "bestanden": 2044,
+    "vormen": 1357,
+    "velden": 1965,
+    "modules": 733,
+    "domeinen": 256,
     "envelopDrempel": 16,
     "envelop": 30,
-    "veldenDomeineigen": 1390,
+    "veldenDomeineigen": 1393,
     "veldenGedeeldVanafVier": 194,
     "gelijkendeVormparen": 20
   },
@@ -71,6 +71,18 @@
       ]
     },
     {
+      "veld": "doel",
+      "domeinen": 15,
+      "waar": [
+        "kern/appstore",
+        "kern/commercie",
+        "kern/consent-register",
+        "kern/defensie",
+        "kern/labfonds",
+        "kern/magnaat-trainingslobby"
+      ]
+    },
+    {
       "veld": "supplierCode",
       "domeinen": 15,
       "waar": [
@@ -83,6 +95,18 @@
       ]
     },
     {
+      "veld": "waarom",
+      "domeinen": 15,
+      "waar": [
+        "kern/bureau",
+        "kern/command",
+        "kern/commerce",
+        "kern/commercie",
+        "kern/concern",
+        "kern/gewoonten"
+      ]
+    },
+    {
       "veld": "type",
       "domeinen": 14,
       "waar": [
@@ -92,30 +116,6 @@
         "kern/commerce",
         "kern/instant-reality",
         "kern/magnaat-werkroutefabriek"
-      ]
-    },
-    {
-      "veld": "doel",
-      "domeinen": 14,
-      "waar": [
-        "kern/appstore",
-        "kern/commercie",
-        "kern/defensie",
-        "kern/labfonds",
-        "kern/magnaat-trainingslobby",
-        "kern/pay"
-      ]
-    },
-    {
-      "veld": "waarom",
-      "domeinen": 14,
-      "waar": [
-        "kern/bureau",
-        "kern/command",
-        "kern/commerce",
-        "kern/commercie",
-        "kern/concern",
-        "kern/gewoonten"
       ]
     },
     {
@@ -419,6 +419,18 @@
       ]
     },
     {
+      "veld": "ingetrokken",
+      "domeinen": 10,
+      "waar": [
+        "bedrijf",
+        "kern/beschermzaak",
+        "kern/command",
+        "kern/festival",
+        "kern/mobiliteit",
+        "kern/reisuitnodiging-gebruik"
+      ]
+    },
+    {
       "veld": "eigenaar",
       "domeinen": 10,
       "waar": [
@@ -512,18 +524,6 @@
         "kern/kosten",
         "kern/labfonds",
         "kern/livinglab"
-      ]
-    },
-    {
-      "veld": "actie",
-      "domeinen": 9,
-      "waar": [
-        "bedrijf",
-        "kern/bankregie",
-        "kern/command",
-        "kern/frictie",
-        "kern/geldbeleid",
-        "kern/magnaat-controle"
       ]
     }
   ],

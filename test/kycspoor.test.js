@@ -17,6 +17,18 @@
    zodat er niets is om per ongeluk mee te liften: wat hier gemeten wordt, is
    het besluit zelf.
 
+   MUTATIES (LAT.md regel 2), allebei gezien zakken op 3 september 2026:
+   - de wachtvoorwaarde nooit waar laten worden -> de twee wachtende toetsen
+     ZAKKEN, en elk zegt zelf waarop hij wachtte ("wachtOpWaarde: de
+     journaalregel van de goedkeuring kwam niet binnen 15000ms") in plaats van
+     een lengtevergelijking die iets anders lijkt te zeggen. De derde haalt
+     het dan nog: na tweemaal vijftien seconden staan de regels er inmiddels
+     wel -- de regel komt, alleen later dan een gok;
+   - de grens meteen laten verlopen (ms: 1) -> alle DRIE zakken, en de derde
+     met exact het faalbeeld uit CI ("er staan besluiten in het journaal").
+     Dat is meteen het bewijs dat de diagnose klopt: de deadline liep af, er
+     was niets kapot.
+
    Draai los: node --experimental-sqlite --test test/kycspoor.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -42,6 +54,36 @@ const inzage = () => {
   try { return JSON.parse(fs.readFileSync(path.join(TMP, 'db.json'), 'utf8')).inzageLog || []; }
   catch (e) { return []; }
 };
+
+/* WACHTEN OP DE REGEL, NIET OP DE KLOK.
+
+   Hier stond `await new Promise(z => setTimeout(z, 400))`. Het schrijven naar
+   db.json gebeurt NA het antwoord, dus dat getal was een gok over hoe snel de
+   machine is -- en op een belaste scherf is het te kort. Wat er dan gebeurt is
+   niet dat deze toets een beetje wankel wordt maar dat hij een KETEN breekt:
+   de eerste bewering ziet nul regels, de tweede ziet er daarna twee (die van
+   hemzelf plus de late van de eerste), en de derde vindt geen enkel besluit
+   meer. Een gemiste wachttijd leest zo als drie verschillende defecten.
+
+   Gemeten in CI op 2 september 2026 (run 33694515961, scherf 1): `1 !== 2` op
+   de afwijzing en "er staan besluiten in het journaal" op de hashketen, terwijl
+   er niets mis was -- drie gezakte toetsen uit een te trage schrijfronde.
+
+   Dit wacht op de GEBEURTENIS in plaats van op de klok, met wachtOpWaarde() uit
+   test/helper.js die hier al voor bestond: een lus die peilt tot de regel er
+   is, met een grens van vijftien seconden die LUID zakt en daarbij zegt waarop
+   hij wachtte. Dat is het rechtstreekse antwoord op het faalbeeld hierboven:
+   een gemiste regel heet dan een gemiste regel, en geen drie losse defecten.
+   Bewust geen eigen pollus in dit bestand: het peilslaapje woont op EEN plek,
+   in de gereedschapskist, en zo blijft scripts/klokwacht.js iets zeggen.
+
+   De beweringen eronder zijn geen letter veranderd: komt de regel er wel, dan
+   eist `voor + 1` nog steeds PRECIES een regel (een late regel van een vorige
+   toets erbij zakt dus nog altijd). Dat is strenger en niet losser: 400ms was
+   een bovengrens die niemand had gemeten. */
+const wachtOpRegel = (voor, wat) => wachtOpWaarde(
+  () => { const nu = inzage(); return nu.length > voor ? nu : false; },
+  { ms: 15000, wat });
 
 let teller = 0;
 async function nieuwLid() {
@@ -74,13 +116,7 @@ test('een GOEDKEURING komt in het inzagejournaal, ook bij een lege wachtrij', as
   const r = await post('/api/office/verify', { userId: id, decision: 'approve' }, office);
   assert.equal(r.status, 200);
   assert.deepEqual(r.data.pending, [], 'de wachtrij is leeg: er valt niets mee te liften');
-  /* WACHTEN OP DE REGEL, NIET OP DE KLOK. Hier stond een vaste 400 ms. Het
-     journaal wordt na het antwoord geschreven, en op een belaste scherf haalt
-     die 400 ms het niet: dan zakt deze toets EN de toets hieronder, die op
-     twee regels rekent die deze had moeten achterlaten (CI 2 september 2026,
-     drie gezakte toetsen uit een te trage schrijfronde). */
-  const na = await wachtOpWaarde(() => { const r2 = inzage(); return r2.length > voor ? r2 : false; },
-    { ms: 8000, wat: 'de journaalregel van de goedkeuring' });
+  const na = await wachtOpRegel(voor, 'de journaalregel van de goedkeuring');
   assert.equal(na.length, voor + 1, 'het besluit hoort een regel op te leveren');
   assert.equal(na[0].overId, String(id), 'de regel wijst de persoon aan over wie besloten is');
   assert.match(na[0].waarom, /goedgekeurd/);
@@ -94,8 +130,7 @@ test('een AFWIJZING ook, en die zegt erbij dat het bewijs is gewist', async () =
   const voor = inzage().length;
   const r = await post('/api/office/verify', { userId: id, decision: 'reject' }, office);
   assert.equal(r.status, 200);
-  const na = await wachtOpWaarde(() => { const r2 = inzage(); return r2.length > voor ? r2 : false; },
-    { ms: 8000, wat: 'de journaalregel van de afwijzing' });
+  const na = await wachtOpRegel(voor, 'de journaalregel van de afwijzing');
   assert.equal(na.length, voor + 1);
   assert.match(na[0].waarom, /afgewezen/);
   assert.match(na[0].waarom, /gewist/, 'wat er met het bewijs gebeurde hoort in de reden te staan');

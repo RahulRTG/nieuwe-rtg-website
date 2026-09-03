@@ -204,6 +204,16 @@ const PUBLIEK = new Map([
   ['/api/claims', 'de publieke claims voeden de voorwaardenpagina\'s, die je zonder inlog leest'],
   ['/api/betaaldiensttarief', 'het betaaldiensttarief staat in de partnervoorwaarden'],
   ['/api/sociaalbeleid', 'de sociale afdracht is een publieke belofte (RTFoundation)'],
+  /* De voordeur van de beschermzaak (routes/rtfos/voordeur.js). Vier routes
+     zonder inlog, en dat is hier de hele bedoeling: de mens om wie het gaat
+     heeft geen kantoorinlog en heel vaak ook geen RTG-account. Een deur die
+     eerst een account vraagt, is voor hem geen deur. De klasse zelf weigert
+     adres, telefoon, naam en BSN (kern/beschermzaak/klasse.js), dus er kan
+     langs deze weg niets herleidbaars binnenkomen. */
+  ['/api/bescherming/deur/steden', 'alleen de namen van de plaatsen die zo een zaak kunnen oppakken; geen enkel getal en geen enkele zaak'],
+  ['/api/bescherming/deur/start', 'de omkering van HDI.md par. 7: hier begint een mens zelf een beschermzaak, zonder account, zonder BSN, zonder adres. Twee remmen, en ruim geremd omdat een geweigerde melding erger is dan een dubbele'],
+  ['/api/bescherming/deur/stand', 'de eigen code is de geloofsbrief, en hij is met opzet GEEN wachtwoord: dit antwoordt alleen de stand en of er iets is klaargezet, nooit wat'],
+  ['/api/bescherming/deur/intrekken', 'wie ja zei mag nee zeggen; een recht waarvoor je moet bellen naar de organisatie die je wilde stoppen, is geen recht'],
   ['/api/rtf/vacatures', 'openstaande vacatures zijn openbaar'],
   ['/api/gids/app', 'de app-gids is openbaar'],
   ['/api/krant/gids', 'de krant is openbaar; er is een toets die dat vastlegt'],

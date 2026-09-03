@@ -14,6 +14,22 @@ module.exports = [
     uitleg: 'Het eigen kantoor van de stichting: kamers, clubs en het onderzoekslab.', paden: ['/api/rtfkantoor'] },
   { id: 'dom-rtfos', categorie: 'RTFoundation', naam: 'Foundation OS', standaard: true, doelgroepen: ['foundation'],
     uitleg: 'Steden, partnerstichtingen, projecten, vrijwilligers, geld, hulpvragen en verantwoording.', paden: ['/api/rtfos'] },
+  /* DE VOORDEUR VAN DE BESCHERMZAAK STAAT APART VAN 'dom-rtfos', en dat is geen
+     ordening maar een besluit dat zichtbaar hoort te zijn. Achter deze vier
+     routes begint een mens ZELF een zaak over geweld of uitbuiting: zonder
+     account, zonder BSN, zonder adres. Hij hoort in de kast omdat een deur die
+     niemand in de boardroom ziet, ook niet per stad open of dicht kan -- en dat
+     is precies hoe hij bedoeld is: alleen open waar een stad de zaak kan
+     oppakken.
+
+     WIE HEM UITZET, ZET EEN HULPDEUR DICHT. Dat mag een besluit zijn, maar het
+     hoort er een te zijn die iemand met naam neemt. Vandaar deze uitleg en niet
+     alleen een regel. */
+  { id: 'dom-beschermdeur', categorie: 'RTFoundation', naam: 'Voordeur beschermzaak (zonder account)', standaard: true, doelgroepen: ['foundation'],
+    uitleg: 'De eigen ingang naar hulp bij geweld en uitbuiting: eerst "ben je nu veilig", dan pas de rest, en een code ' +
+      'die de mens zelf weer kan intrekken. Zonder inlog, want wie hier aanklopt heeft vaak geen account. Uitzetten sluit ' +
+      'die deur; de wegwijzer toont dan dat er geen plaats is die dit oppakt.',
+    paden: ['/api/bescherming/deur'] },
   { id: 'dom-lab', categorie: 'RTFoundation', naam: 'Het Onderzoekslab', standaard: true, doelgroepen: ['foundation'],
     uitleg: 'Projecten, fases, bevindingen en de kennisbank van het lab.', paden: ['/api/lab'] },
   /* Het Living Lab staat als TWEE schakelaars in de kast, en dat is met opzet.

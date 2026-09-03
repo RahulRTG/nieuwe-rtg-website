@@ -57,6 +57,39 @@ eligibility-motor alleen mag tóevoegen (nooit "dit is niets voor jou") en dat d
 meeteenheid van een capaciteitsmotor de taak is en nooit de mens. Paragraaf 7
 zet vijftig voorgestelde onderdelen op een rij met per stuk of hij al bestaat en
 welke grens hem eerlijk houdt.
+**`HDI.md` is de laag BOVEN de Foundation** — RTG Human Development
+Infrastructure, als richtingsdocument met per onderdeel of het **staat**, **een
+stap weg** is, **een besluit vraagt** of **jaren weg** is (zoals PLATFORM.md en
+ECONOMIE.md). Lees die vóór je aan kwetsbare doelgroepen, veiligheidszaken of
+ontwikkeltrajecten werkt. De missie: *niemand mag uit beeld verdwijnen omdat
+zorg, gemeente, corporatie, werkgever, politie, onderwijs en stichting ieder maar
+één stukje van die persoon zien.* De fundamentele eenheid schuift van de casus
+naar de mens — **en precies daarom mag die mens nergens als rij bestaan**: par.
+5.1 is de grens waar het hele project op staat of valt, en de uitweg is de vorm
+die `kern/levensgraaf/graaf.js` al gevonden heeft (een PROJECTIE, geen tweede
+database, met `deel` als poort en niet als etiket). Er komt dus geen
+`humans`-tabel, en geen route die "alles over deze mens" teruggeeft zonder dat de
+mens zelf die aanroep doet. Par. 1 is de meting die het document eerlijk houdt:
+van de acht voorgestelde lagen staan er vijf al onder een andere naam
+(`kern/levensgraaf/` is de development graph, `kern/livinglab/graden.js` de
+causale motor met drie plafonds waarvan het laagste wint, `kern/rtfos/gemeente.js`
+de outcomes ledger die telt zonder te lezen) — dus het werk is aansluiten en niet
+uitvinden. Par. 2 houdt vier namen tegen die al bezet zijn (**capability** is
+platformvermogen in OS.md, **wallet** is geld in WAARDE.md, en `NIVEAUS` en
+`FASEN` dragen er al 9 en 8 betekenissen). Vier grenzen die niet mogen sneuvelen:
+veiligheidsgegevens zijn een andere DATAKLASSE en geen gevoeliger veld (geen
+partnerkoppeling, geen adresveld, geen export, geen standaard bewaartermijn), de
+meeteenheid is nooit de mens (een voortgangsmaat mag over een cohort en nooit per
+persoon, ook niet intern als sorteersleutel), een solver toont altijd meer dan
+één pad en zegt nooit "dit is niets voor jou", en **duress mode wordt heel of
+niet gebouwd** — een webapp kan de app-switcher, de notificaties en de
+browsergeschiedenis niet garanderen, dus wat er niet verborgen kan worden staat
+er hardop bij. De Personal AI Advocate wacht op een getal en niet op een gevoel:
+`VERTROUWEN.json` staat op 0 bewezen en 4180 verzwakt, dus hij komt er eerst als
+LEZER op `levensgraaf/termijnen.js`. Par. 7 zet de volgorde vast, en de eerste
+twee regels (uitstapknop, hulpwijzer verbreden) kosten samen twee dagen en doen
+meer voor de mens uit de missie dan de acht eronder.
+
 **`ONTMOETEN.md` is het diepte-document van de twee datingapps** — Vonk en
 Rendez-vous, en vooral waarom het er twee zijn en geen drie. In één zin: **Vonk
 zoekt de juiste mensen, Rendez-vous maakt de juiste ontmoeting** — bij Vonk is de
@@ -597,8 +630,8 @@ dat RTG vandaag klopt (`MAGNAATLAB.md`) maar of hij kan voorspellen dat RTG
 mórgen nog klopt. Lees die vóór je een begrip introduceert, een register aanlegt
 of een scorecard bouwt. De opzet vraagt een semantisch register naar aanleiding
 van de twee `VERMOGENS`; de vraag ervóór is gemeten (`scripts/semantiek.js`,
-`SEMANTIEK.json`) en het was **geen incident**: van de <!--getal:semantiek.namen-->116<!--/getal--> namen die in meer dan
-één domein staan, dragen er **<!--getal:semantiek.betekenissen-->99<!--/getal--> meer dan één betekenis** — samen 284
+`SEMANTIEK.json`) en het was **geen incident**: van de <!--getal:semantiek.namen-->117<!--/getal--> namen die in meer dan
+één domein staan, dragen er **<!--getal:semantiek.betekenissen-->100<!--/getal--> meer dan één betekenis** — samen 284
 betekenissen, met `SOORTEN` op **39**. Daarnaast **29** betekenissen die op meer
 dan één plek wonen én **106** paren die dezelfde waarheid onder een ándere naam
 dragen — die tweede ronde bestaat omdat de eerste ze miste, en de duurste

@@ -87,6 +87,33 @@ module.exports = ({ db, save, crypto, schoon }) => {
     else return { status: 400, error: 'Kies bevestigd of afgerond.' };
     save(); return { ok: true, aanvraag: a };
   }
+  /* Een aanvraag intrekken. Hij hoort HIER en niet in ./opvangleden.js, want
+     db.data.opvang heeft een eigenaar en die schrijft als enige (keuringsregel
+     63). De ledenkant geeft de codenaam mee en krijgt een 404 als de aanvraag
+     niet op die naam staat -- de eigendomscontrole staat dus VOOR de wijziging,
+     zoals bij het annuleren in ./beautyleden.js.
+
+     WAAROM DIT ER MOET ZIJN EN GEEN EXTRA IS. HDI.md par. 3 stelt bij elke
+     module van die laag een toets: *kan de persoon dit uitzetten zonder iemand
+     te bellen?* Kan hij dat niet, dan is het volgen in plaats van in beeld
+     houden. Een ouder die een aanvraag heeft klaargezet en hem alleen
+     telefonisch weer weg kan krijgen, valt aan de verkeerde kant van die zin.
+
+     Een BEVESTIGDE afspraak trekt de ouder niet zelf terug: daar staat een
+     nanny voor ingepland en dat is een afspraak met een mens geworden. Dan is
+     bellen juist het goede antwoord, en dat zegt de melding ook. */
+  function nannyWeg(code, id, gezin) {
+    const o = opvangVan(code);
+    const a = o.nannyBoekingen.find(x => x.id === String(id || '') && x.gezin === gezin);
+    if (!a) return { status: 404, error: 'Deze aanvraag staat niet op uw naam.' };
+    if (a.status !== 'aangevraagd') {
+      return { status: 409, error: 'Deze aanvraag is al bevestigd. Neem contact op met de opvang; ' +
+        'er staat inmiddels iemand voor ingepland.' };
+    }
+    o.nannyBoekingen = o.nannyBoekingen.filter(x => x.id !== a.id); save();
+    return { ok: true, ingetrokken: a.datum };
+  }
+
   function verslagMaak(code, b) {
     const o = opvangVan(code);
     const voornaam = schoon(b.voornaam, 30), tekst = schoon(b.tekst, 240);
@@ -96,5 +123,11 @@ module.exports = ({ db, save, crypto, schoon }) => {
     return { ok: true, verslag: v };
   }
 
-  return { opvang: { overzicht: opvangOverzicht, kindMeld, kindOphaal, nannyVraag, nannyZet, verslagMaak } };
+  /* opvangVan gaat mee naar buiten omdat de ledenkant (./opvangleden.js) op
+     dezelfde bak moet lezen in plaats van hem opnieuw te openen -- zelfde reden
+     en zelfde vorm als salonVan in ./beauty.js. De ledenkant PROJECTEERT die
+     bak scherp: `aanwezig` draagt voornamen van kinderen en de naam van hun
+     ouder, en dat is precies wat daar nooit uit mag komen. */
+  return { opvang: { overzicht: opvangOverzicht, kindMeld, kindOphaal, nannyVraag, nannyZet,
+    nannyWeg, verslagMaak, opvangVan } };
 };

@@ -42,6 +42,12 @@ module.exports = ({ app, officeAuth, rtfos, H }) => {
   // apart, met een eigen auditregel: dit is het moment dat iemand de naam ziet
   app.post('/api/rtfos/casus/contact', officeAuth, H((req, b) => rtfos.casus.contactOpen(req, b.id)));
 
+  /* De beschermzaken (kern/beschermzaak/) staan in ./bescherming.js -- tien
+     routes plus de brug naar de meldcode, en dit bestand liep over de 10 KB van
+     keuringsregel 13. Ze delen geen enkel pad met de casus hierboven, en dat is
+     met opzet: een gedeeld pad wordt vanzelf een gedeelde export. */
+  require('./bescherming')({ app, officeAuth, rtfos, H });
+
   // ---------- integriteit ----------
   app.post('/api/rtfos/meldingen', officeAuth, H((req, b) => rtfos.integriteit.lijst(req, b.stad)));
   app.post('/api/rtfos/melding/maak', officeAuth, H((req, b) => rtfos.integriteit.meld(req, b)));

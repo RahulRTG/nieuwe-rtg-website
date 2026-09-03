@@ -22,6 +22,11 @@
 
    Alles hangt aan de codenaam (handle), niet aan een naam of een nummer:
    echte namen blijven in de kluis. */
+/* De grensregel staat in ./grens.js en niet hier: hij stond in twee versies
+   naast elkaar (kort in dit bestand, lang in public/shared/veiligheid.js), en
+   dat is LAT.md regel 4 op een belofte over wat er NIET gebeurt als het misgaat. */
+const GRENS = require('./grens');
+
 module.exports = (state) => {
   const { db, save, crypto, schoon, sociaal, kluis, meldAan, mail, appUrl } = state;
 
@@ -54,8 +59,11 @@ module.exports = (state) => {
       alarmen: alarm.alarmenVan(handle, 10),
       voorMij: alarm.alarmenVoorMij(handle, 10),
       liveCircle: moment.momentMijn(handle),
-      // eerlijk, en op elk scherm te tonen
-      grens: 'RTG is geen alarmcentrale: er wordt niemand gebeld en er kijkt geen mens mee. Bij levensgevaar belt u het alarmnummer.'
+      /* Eerlijk, en op elk scherm te tonen. De tekst staat in ./grens.js en
+         niet hier: hij stond in twee versies naast elkaar (server kort, client
+         lang), en dat is LAT.md regel 4 op een belofte over wat er NIET gebeurt
+         als het misgaat. */
+      grens: GRENS.VOLLEDIG
     };
   }
 

@@ -237,24 +237,39 @@ test('een lijst die geen toetsbestanden bevat (a11y-schermen) blijft om en om', 
    stond. Een nieuw toetsbestand heeft nog geen gewicht, en de gok die je dan
    maakt bepaalt de wandklok: nul of het gemiddelde laten de keten SNELLER
    lijken dan hij is, en dan staat er een scherf een half uur alleen na te
-   hijgen. Het zwaarste bekende gewicht gokt de andere kant op -- onbekend telt
-   als duur. Dat is de hoofdregel van KEURING.md in een regel code.
+   hijgen. Een hoge gok is de andere kant op -- onbekend telt als duur. Dat is
+   de hoofdregel van KEURING.md in een regel code.
 
-   MUTATIE (LAT.md regel 2): `gewicht.get(naam) || zwaarste` vervangen door
-   `gewicht.get(naam) || 0`
-   -> "een ongemeten bestand telt als het zwaarste" ZAKT (RAAK). */
-test('een ongemeten bestand telt als het zwaarste, niet als nul', () => {
-  zetDuren({ 'zwaar.test.js': 100000, 'licht.test.js': 1000 });
+   HOE HOOG PRECIES is sindsdien twee keer veranderd, en dat staat NIET meer in
+   deze toets: eerst het maximum, toen de p99 over alles, nu de p99 van de eigen
+   klasse. Deze toets zegt alleen nog dat de gok naar BOVEN gaat; welke prijs
+   het precies wordt en waarom, staat in scripts/lib/duurprijs.js met
+   test/duurprijs.test.js ernaast. Twee plekken die allebei een prijs bewaken,
+   lopen uit elkaar (LAT.md regel 4) -- deze bewaakt de richting, die de hoogte.
+
+   MUTATIE (LAT.md regel 2): `gewicht.get(naam) || prijsVoor(naam)` vervangen
+   door `gewicht.get(naam) || 0`
+   -> "een ongemeten bestand telt als duur" ZAKT (RAAK). */
+test('een ongemeten bestand telt als duur, niet als nul', () => {
+  /* DE OPSTELLING IS AANGEPAST OMDAT DE OUDE NIET KON ZAKKEN, en dat is pas
+     gebleken toen de mutatie hierboven werd gedraaid. Er stonden drie bestanden
+     in twee bakken (zwaar 100.000, licht 1.000, ongemeten). Bij welke prijs dan
+     ook -- de p99, het minimum, nul -- gaat het zwaarste bestand in zijn eentje,
+     want de greedy legt het eerste bestand in een lege bak en alles daarna in de
+     andere. De bewering "hij kruipt niet bij de zwaarste" was dus waar door de
+     vorm van de proef en niet door de regel. Precies wat scripts/tandeloos.js
+     telt.
+
+     Drie bijna even zware bestanden in twee bakken laat de prijs wel meetellen:
+     100 / 60 / 60 vult beide bakken tot 100 en 120, en dan beslist de prijs van
+     het ongemeten bestand of hij nog bij de zwaarste past. */
+  zetDuren({ 'zwaar.test.js': 100, 'licht-a.test.js': 60, 'licht-b.test.js': 60 });
   try {
-    /* Zou een ongemeten bestand als nul tellen, dan belandt hij bij het
-       zwaarste bestand op dezelfde scherf en is die scherf twee keer zo lang
-       bezig. Telt hij als het zwaarste, dan gaat hij juist apart. */
-    const bakken = indeling(['zwaar.test.js', 'licht.test.js', 'nieuw.test.js'], 2);
+    const bakken = indeling(
+      ['zwaar.test.js', 'licht-a.test.js', 'licht-b.test.js', 'nieuw.test.js'], 2);
     const metZwaar = bakken.find(b => b.includes('zwaar.test.js'));
     assert.ok(!metZwaar.includes('nieuw.test.js'),
       'een ongemeten bestand kruipt bij de zwaarste; dan is de gok naar beneden gedaan');
-    assert.deepEqual(bakken.find(b => b.includes('nieuw.test.js')).sort(),
-      ['licht.test.js', 'nieuw.test.js']);
   } finally { zetDuren(null); }
 });
 

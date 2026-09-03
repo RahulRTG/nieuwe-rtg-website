@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- DE TITEL IS MET OPZET NEUTRAAL, en wijkt daarmee af van elk ander scherm
+     hier ("RTFoundation - ..."). De titel staat in de tabstrip, in de
+     browsergeschiedenis en in de app-wisselaar van het toestel. Op precies deze
+     pagina is dat het verschil tussen wel of niet durven kijken. Zie het blok
+     "Wat wij niet voor je kunnen verbergen" onderaan: wat we hier NIET kunnen,
+     staat er even groot bij. -->
+<title>Wegwijzer</title>
+<!-- Deze pagina hoort niet in een zoekmachine en niet in een verwijzer: wie hem
+     opent hoeft dat nergens achter te laten. -->
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#08090C">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<script src="palet.js"></script>
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+  .topnav{display:flex;align-items:center;gap:.7rem;padding:.7rem 1rem;border-bottom:1px solid var(--lijn);}
+  .topnav .brand{font-family:var(--serif);font-weight:500;}
+  .topnav a{margin-left:auto;color:var(--zacht);text-decoration:none;font-size:.85rem;}
+  .wrap{max-width:44rem;margin:0 auto;padding:1.1rem 1.1rem 5rem;}
+  h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
+  .intro{color:var(--zacht);line-height:1.55;margin-bottom:1.3rem;}
+  .spoed{padding:1rem 1.1rem;margin-bottom:1.3rem;border:1px solid var(--goud);}
+  .spoed p{line-height:1.55;margin:0;}
+  .spoed p + p{margin-top:.5rem;}
+  .spoed b{color:var(--txt);}
+  .nr{font-weight:700;color:var(--rtg-leesgoud,var(--goud));white-space:nowrap;}
+  .cats{display:flex;flex-direction:column;gap:.7rem;}
+  .cat{padding:1rem 1.1rem;}
+  .cat summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:.7rem;font-weight:600;font-size:1.02rem;min-height:44px;}
+  .cat summary::-webkit-details-marker{display:none;}
+  .cat summary .pijl{margin-left:auto;color:var(--zacht);transition:transform .15s;}
+  .cat[open] summary .pijl{transform:rotate(90deg);}
+  .cat .body{margin-top:.4rem;display:flex;flex-direction:column;gap:.7rem;}
+  .hulp{background:var(--paneel2);border:1px solid var(--lijn);border-radius:0;padding:.7rem .9rem;}
+  .hulp b{color:var(--rtg-leesgoud,var(--goud));}
+  .hulp p{color:var(--zacht);font-size:.88rem;line-height:1.5;margin-top:.25rem;}
+  .blok{padding:1.2rem;margin:1.3rem 0 0;}
+  .blok h2{font-family:var(--serif);font-weight:500;font-size:1.15rem;margin-bottom:.5rem;}
+  .blok p{color:var(--zacht);line-height:1.55;margin:0;}
+  .blok p + p{margin-top:.6rem;}
+  .blok b{color:var(--txt);}
+  .voet{color:var(--zacht);font-size:.85rem;line-height:1.55;margin-top:1.3rem;text-align:center;}
+  /* inline-block met lucht eronder: als tekstlink haalde deze 21 px hoog en
+     dat is onder de 24 die TOEGANKELIJK.md eist op telefoonformaat. */
+  .voet a{color:var(--rtg-leesgoud,var(--goud));display:inline-block;padding:.3rem 0;}
+  .voordeur{display:block;padding:1rem 1.1rem;margin-top:1rem;border-color:var(--goud);text-decoration:none;color:inherit;}
+  .voordeur b{display:block;font-size:1.02rem;color:var(--rtg-leesgoud,var(--goud));}
+  .voordeur span{display:block;margin-top:.25rem;color:var(--zacht);font-size:.88rem;line-height:1.5;}
+</style>
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/ios.css" rel="stylesheet">
+<link rel="stylesheet" href="premium.css">
+</head>
+<body class="rtg-stijl">
+
+<div class="topnav">
+  <div class="brand">Wegwijzer</div>
+  <a href="hulpwijzer.html">Alle hulp &rsaquo;</a>
+</div>
+
+<div class="wrap" role="main">
+  <h1>Als je niet veilig bent</h1>
+  <div class="intro">Hieronder staat waar je in Nederland terechtkunt als iemand je pijn doet, dwingt, bedreigt of uitbuit - en als je vannacht geen plek hebt om te slapen. Bijna alles hier is gratis en je mag anoniem bellen. Je hoeft niet eerst te weten hoe het heet wat jou overkomt.</div>
+
+  <!-- De nooddiensten staan bovenaan en blijven daar. Deze pagina laadt met opzet
+       GEEN shared/deelmenu.js: die laag knipt een pagina in delen met een
+       keuzemenu, en dan staat 112 achter een knop. Een lijst die je in een ruk
+       kunt doorscrollen is hier het ontwerp. -->
+  <div class="spoed kaart">
+    <p><b>Direct gevaar, nu?</b> Bel <span class="nr">112</span>. Kun je niet praten, bel dan 112 en luister naar wat de centralist vraagt.</p>
+    <p><b>Onveilig thuis, of je maakt je zorgen om iemand?</b> <span class="nr">0800-2000</span> - Veilig Thuis. Gratis, dag en nacht, ook anoniem. Chatten kan op veiligthuis.nl, maandag tot en met vrijdag van 9.00 tot 17.00 uur.</p>
+  </div>
+
+  <div class="cats" id="cats"></div>
+
+  <!-- De voordeur (HDI.md par. 7 regel 4). Hij staat NA de nummers en niet
+       ervoor: wie nu iemand nodig heeft, moet bellen, en een formulier dat
+       daarboven staat leidt daarvan af. -->
+  <a class="kaart voordeur" href="wegwijzer.html">
+    <b>Liever niet bellen?</b>
+    <span>U kunt hier zelf iets in gang zetten, zonder account en zonder uw naam. U krijgt een code en
+      kunt het altijd weer intrekken. Let op: hier zit niemand klaar, dus voor nu blijft bellen sneller.</span>
+  </a>
+
+  <!-- RTG VEILIG STAAT ER AL, EN WAS HIER ONZICHTBAAR (HDI.md par. 7 regel 4b).
+       De vier standen draaien op een dodemansknop waarvan de klok op de SERVER
+       tikt, dus hij gaat ook af als het toestel uitvalt. Dat is gebouwd, het
+       werkt, en het kostte tot nu toe niemand iets -- alleen wist niemand die
+       hier kwam dat het bestond.
+
+       DE VIER ZINNEN HIERONDER ZIJN EEN KOPIE van server/kern/veiligheid/grens.js.
+       test/veiligheidgrens.test.js zakt zodra ze afwijken; zie de kop van dat
+       bestand voor waarom een kopie hier beter is dan een verzwakte belofte. -->
+  <div class="kaart blok">
+    <h2>Als u vaker bang bent dat er iets gebeurt</h2>
+    <p>RTG heeft hiervoor <b>RTG Veilig</b>. Vier dingen, in een app:</p>
+    <p>- <b>Thuiswacht</b>: u zegt "ik ben over 30 minuten thuis". Meldt u zich niet, dan krijgen de
+      mensen die u zelf koos bericht. De klok loopt op onze server, dus het gaat ook af als uw
+      telefoon leeg is, kapot is, of door iemand wordt uitgezet.</p>
+    <p>- <b>Codewoord</b>: een gewone zin die u in een gesprek kunt laten vallen, bijvoorbeeld
+      "is de kat al gevoerd". Op uw scherm gebeurt er dan <b>niets</b>: geen melding, geen geluid,
+      geen vinkje. Ondertussen heeft uw kring bericht. Dat er niets te zien is, is de functie.</p>
+    <p>- <b>Vitaal</b>: dagelijks laten weten dat het goed gaat. <b>Thuisrust</b>: stil zijn zonder
+      onbereikbaar te worden.</p>
+    <p>Het kost niets. U heeft een gratis RTG-account nodig en ten minste één contact, en dat mag
+      gewoon een e-mailadres zijn van iemand die u vertrouwt. Uw codewoord wordt niet als tekst
+      bewaard maar als een afdruk: wij kunnen uw zin niet teruglezen.</p>
+    <p><b>Wat het niet is.</b> RTG is geen alarmcentrale. Er wordt niemand gebeld, er kijkt geen mens
+      mee, en er komt geen hulpdienst. Alleen de mensen die u zelf in uw kring zet krijgen bericht.
+      Zonder internet, of als de server plat ligt, gaat er niets af. Bij levensgevaar belt u het
+      alarmnummer.</p>
+    <p><a href="/apps/veilig.html">Naar RTG Veilig</a></p>
+  </div>
+
+  <div class="kaart blok">
+    <h2>Wat wij niet voor je kunnen verbergen</h2>
+    <p>De knop <b>Weg hier</b> rechtsonder haalt dit scherm meteen weg en zet er een gewone pagina voor in de plaats. Twee keer snel op Escape doet hetzelfde. Maar wees hier alsjeblieft niet gerust op, want dit is wat die knop <b>niet</b> kan:</p>
+    <p>- Hij <b>wist je browsergeschiedenis niet</b>. Wie later door de geschiedenis van dit toestel bladert, kan zien dat je hier bent geweest. Een webpagina kan dat niet wissen, en wij doen niet alsof.</p>
+    <p>- Hij haalt deze pagina <b>niet uit de app-wisselaar</b> van je telefoon. Het venstertje dat je ziet als je tussen apps wisselt, blijft staan tot je het zelf wegveegt.</p>
+    <p>- Hij houdt <b>meldingen niet tegen</b>. Een melding van deze app kan op je vergrendelscherm verschijnen.</p>
+    <p>Daarom hebben we bewust <b>geen verborgen modus met een tweede pincode</b> gebouwd. Zo'n modus belooft dat niemand het kan zien, en op de drie punten hierboven kunnen wij die belofte niet waarmaken. Half doen is hier gevaarlijker dan niet doen, want jij zou erop rekenen.</p>
+    <p>Lees je dit op een toestel waar iemand anders bij kan? Dan is de veiligste weg een <b>ander toestel</b>: een computer in de bibliotheek, de telefoon van iemand die je vertrouwt, of gewoon bellen vanaf een plek waar je alleen bent. Bellen laat op dit scherm niets achter.</p>
+  </div>
+
+  <div class="kaart blok">
+    <h2>Wat er met deze pagina gebeurt</h2>
+    <p>Niets. Deze pagina is tekst: er wordt niets van je gevraagd, niets opgeslagen en niets verstuurd. Je hoeft niet in te loggen, en wij weten niet dat jij hier was.</p>
+    <p>Wil je wél dat er iemand met je meekijkt, dan kan dat via de organisaties hierboven. Dat is hun werk en ze zijn er dag en nacht.</p>
+  </div>
+
+  <div class="voet">Zoek je iets anders - eten, kleding, geld, hulp voor de kinderen? Dat staat in de <a href="hulpwijzer.html">Hulpwijzer</a>.</div>
+</div>
+
+<!-- uitvoer.js zonder defer en VOOR het eigen script: dat roept RTGUitvoer.bron
+     aan, en met defer bestaat die functie op dat moment nog niet. Zelfde volgorde
+     als op hulpwijzer.html. -->
+<script src="/shared/uitvoer.js"></script>
+<script>
+/* De lijst staat hier als gegeven en niet als HTML, zodat "Meenemen"
+   (shared/uitvoer.js) hem in zijn geheel kan uitschrijven -- ook de categorieen
+   die dichtgeklapt staan. Wie hulp zoekt, heeft er iets aan dit lijstje op
+   papier of op een ander toestel te hebben; zie het blok hierboven over waarom
+   een ander toestel soms veiliger is.
+
+   ELKE REGEL DRAAGT DE VOORWAARDEN. "Gratis" en "dag en nacht" zijn geen
+   opsmuk: wie geen beltegoed heeft, moet weten welk nummer niets kost, en wie
+   om drie uur 's nachts belt moet weten wie er dan opneemt. Waar iets NIET
+   gratis is (Slachtofferhulp) of NIET dag en nacht (CoMensha, de chats), staat
+   dat er ook -- een verkeerde verwachting op zo'n moment kost iemand zijn
+   laatste poging.
+
+   Nagekeken op de bronnen van de organisaties zelf, 2 september 2026. */
+var CATS = [
+  { titel: 'Seksueel geweld, verkrachting of aanranding', items: [
+    ['Centrum Seksueel Geweld - 0800-0188',
+     'Gratis, dag en nacht. Ook chatten kan, anoniem, via chatmetcsg.nl. Is het minder dan zeven dagen geleden gebeurd? Bel dan zo snel mogelijk: binnen die zeven dagen kunnen ze sporen veiligstellen en een zwangerschap of soa nog voorkomen. Je hoeft geen aangifte te doen om hulp te krijgen.'],
+    ['Fier - 088 2080 000',
+     'Hulp bij geweld waar je niet zomaar weg kunt, ook bij misbruik dat al langer geleden is. Anoniem chatten kan via fier.nl/chat.'],
+    ['Helpwanted.nl',
+     'Als het online gebeurde: naaktbeelden die worden verspreid of waarmee je wordt gechanteerd. Gratis advies, en ze kunnen helpen beelden verwijderd te krijgen.']
+  ]},
+  { titel: 'Mishandeling of geweld thuis', items: [
+    ['Veilig Thuis - 0800-2000',
+     'Gratis, dag en nacht, ook anoniem. Voor kinderen, volwassenen en ouderen, en ook als je alleen twijfelt of het wel erg genoeg is om te bellen. Dat is het.'],
+    ['Fier - 088 2080 000',
+     'Voor huiselijk geweld, eergerelateerd geweld en geweld in een relatie waar je van afhankelijk bent. Chat op fier.nl/chat.'],
+    ['Je huisarts',
+     'Ook hiervoor. Een huisarts mag niet zomaar iets doorvertellen en kent de weg naar hulp in jouw buurt.']
+  ]},
+  { titel: 'Uitbuiting, mensenhandel of gedwongen werk', items: [
+    ['Nederlandse Arbeidsinspectie - 0800-5151',
+     'Gratis. Voor onderbetaling, te lange dagen, gevaarlijk werk en arbeidsuitbuiting. Je mag anoniem melden, en ook als je het alleen vermoedt. Houdt je baas je paspoort, je loon of je woonplek vast, dan hoort dat hier.'],
+    ['CoMensha - 085 112 0600',
+     'Het landelijke punt voor slachtoffers van mensenhandel: hulp en opvang. Bereikbaar op werkdagen van 9.00 tot 17.00 uur. Is het nu acuut, of is het nacht of weekend? Bel dan de politie of 112.'],
+    ['Meld Misdaad Anoniem - 0800-7000',
+     'Gratis en echt anoniem: geen nummerherkenning, geen opname, niets bewaard. Voor als je iets wilt melden maar niet gevonden wilt worden. Ma t/m vr 8.00-22.00, weekend en feestdagen 9.00-17.00.']
+  ]},
+  { titel: 'Gedwongen tot seks of prostitutie', items: [
+    ['Fier - 088 2080 000',
+     'Hulp bij gedwongen prostitutie en bij iemand die je met liefde binnenhaalde en daarna dwong. Anoniem chatten via fier.nl/chat.'],
+    ['CoMensha - 085 112 0600',
+     'Voor opvang en hulp bij seksuele uitbuiting. Werkdagen 9.00 tot 17.00 uur.'],
+    ['Centrum Seksueel Geweld - 0800-0188',
+     'Gratis, dag en nacht, ook als je nog niet weet wat je wilt.']
+  ]},
+  { titel: 'Iemand laat je niet met rust (stalking)', items: [
+    ['Politie - 0900-8844, of 112 bij direct gevaar',
+     'Stalking is strafbaar. Houd bij wat er gebeurt - datum, tijd, berichten, foto’s - want dat is later het bewijs. Voelt het nu onveilig, bel dan 112 en niet 0900-8844.'],
+    ['Slachtofferhulp Nederland - 0900-0101',
+     'Hulp, praktische stappen en juridisch advies. De hulp is gratis; het bellen kost gewone belkosten. Ma t/m vr 8.00-20.00, zaterdag 10.00-17.00.'],
+    ['Helpwanted.nl',
+     'Als het online doorgaat: chantage met beelden, nepaccounts, of iemand die je overal blijft vinden.']
+  ]},
+  { titel: 'Geen slaapplek vannacht', items: [
+    ['Het daklozenloket van je gemeente',
+     'Hier is geen landelijk nummer voor, en we verzinnen er geen. Elke gemeente heeft een daklozenloket of Wmo-loket; bel het algemene nummer van je gemeente en vraag naar de maatschappelijke opvang. Ze regelen ook een postadres, je identiteitsbewijs en je zorgverzekering.'],
+    ['Buiten kantooruren: de crisisdienst van je regio',
+     'Na vijven, in het weekend en ’s nachts loopt het via de crisisdienst of de nachtopvang. Je gemeente noemt op haar website welk nummer dat is. In het uiterste geval: bel de politie, die weet waar de nachtopvang zit.'],
+    ['Leger des Heils',
+     'Heeft in veel plaatsen nachtopvang, dagopvang en een inloop, ook als je nergens staat ingeschreven.']
+  ]},
+  { titel: 'Kinderen en jongeren', items: [
+    ['De Kindertelefoon - 0800-0432',
+     'Gratis en anoniem, elke dag van 11.00 tot 21.00 uur. Bellen of chatten via kindertelefoon.nl. Het staat niet op de rekening van je ouders.'],
+    ['Veilig Thuis - 0800-2000',
+     'Ook voor jou, en ook als je niet zeker weet of het wel erg genoeg is.'],
+    ['Vertel het iemand op school',
+     'Een mentor, een vertrouwenspersoon of de zorgcoördinator. Zij weten wat ze moeten doen en mogen je niet zomaar in de steek laten.']
+  ]},
+  { titel: 'Er is je iets aangedaan en je weet niet wat nu', items: [
+    ['Slachtofferhulp Nederland - 0900-0101',
+     'Voor iedereen die slachtoffer werd van een misdrijf of ongeluk: een luisterend oor, hulp bij aangifte, schade en de rechtszaak. Hulp is gratis; bellen kost gewone belkosten. Ma t/m vr 8.00-20.00, zaterdag 10.00-17.00.'],
+    ['Je huisarts',
+     'Ook voor de klap die je er later van krijgt: slecht slapen, angst, niets meer voelen. Dat hoort erbij en er is hulp voor.'],
+    ['113 Zelfmoordpreventie - 0800-0113',
+     'Zie je het niet meer zitten? Gratis, dag en nacht. Chatten kan op 113.nl.']
+  ]}
+];
+
+function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+
+document.getElementById('cats').innerHTML = CATS.map(function(c){
+  return '<details class="kaart cat"><summary>' + esc(c.titel) + '<span class="pijl">›</span></summary>' +
+    '<div class="body">' + c.items.map(function(it){
+      return '<div class="hulp"><b>' + esc(it[0]) + '</b><p>' + esc(it[1]) + '</p></div>';
+    }).join('') + '</div></details>';
+}).join('');
+
+if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+  var rijen = [];
+  CATS.forEach(function (c) { c.items.forEach(function (it) { rijen.push([c.titel, it[0], it[1]]); }); });
+  if (!rijen.length) return null;
+  return { naam: 'waar-je-terechtkunt', kolommen: ['situatie', 'waar', 'toelichting'], rijen: rijen };
+});
+</script>
+<script src="/shared/uitstap.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<!-- De metgezel-laag hoort op elke app-pagina (check.js regel 9+). Zonder inlog
+     doet hij niets: geen knoppen en geen verkeer -- en deze pagina is juist
+     bedoeld om zonder inlog te lezen. -->
+<script src="/shared/metgezel.js" defer></script>
+<!-- HIER STAAT MET OPZET GEEN /shared/randen.js.
+
+     Die laag laadt de RTG-schil (rtg-edge-*), en die zet bovenin een strook met
+     het pad van de app: "RTFOUNDATION / WEGWIJZER", plus een zijrail met de
+     werelden. Dat maakt de neutrale titel van deze pagina waardeloos -- wie over
+     je schouder meekijkt leest de merknaam gewoon in de schil. De schil weglaten
+     is hier dus geen vergeten regel maar dezelfde keuze als de titel, en het is
+     de reden dat deze pagina er anders uitziet dan de rest van de app. -->
+<script src="/shared/ios.js" defer></script>
+<script src="premium.js" defer></script>
+</body>
+</html>

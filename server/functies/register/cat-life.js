@@ -45,5 +45,14 @@ module.exports = [
     uitleg: 'Een noodcontact en, als u dat wilt, uw allergenen en middelen. U toont hem zelf; niemand kan hem opvragen.', paden: ['/api/noodkaart'] },
   { id: 'verzorging', categorie: 'Eigen apps', naam: 'Verzorging (kapper, barbier, nagels)', standaard: true, doelgroepen: LEDEN,
     uitleg: 'De salonagenda vanaf de kant van het lid, op codenaam. Zorg en verzorging staan naast elkaar maar niet door elkaar: hier reist geen zorgprofiel mee.',
-    paden: ['/api/verzorging'] }
+    paden: ['/api/verzorging'] },
+  { id: 'opvangwijzer', categorie: 'Eigen apps', naam: 'Kinderopvang (ouderkant)', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'Welke kinderopvang er is en hoeveel plek daar vrij is, plus een aanvraag klaarzetten en zelf weer intrekken. ' +
+      'Een vrije plek is geen plek: inschrijven doet de opvang zelf. De aanwezigheidslijst van een groep komt hier nooit uit; ' +
+      'een ouder ziet een getal en niet de namen van andere kinderen.',
+    paden: ['/api/opvang'] },
+  { id: 'knelpunt', categorie: 'Eigen apps', naam: 'Knelpunten (welke weg ligt open)', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'Rekent uit welke weg naar een doel openligt, wat hem blokkeert en wat er niet is nagegaan. Bewaart niets: ' +
+      'alles komt binnen in het verzoek en gaat eruit als antwoord. Er wordt niets gerangschikt en geen beste weg aangewezen.',
+    paden: ['/api/knelpunt'] }
 ];

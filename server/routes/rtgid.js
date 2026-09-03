@@ -65,4 +65,18 @@ module.exports = (kern) => {
   app.post('/api/rtgid/intrek', ...lid, (req, res) => stuur(res, rtgid.intrek(req.session.key, req.body.dienst)));
   app.post('/api/rtgid/machtig', ...lid, async (req, res) => stuur(res, await rtgid.machtig(req.session.key, req.body || {})));
   app.post('/api/rtgid/machtig/intrek', ...lid, (req, res) => stuur(res, rtgid.machtigIntrek(req.session.key, req.body.id)));
+
+  /* DE BEWIJSMAP: wat kan ik aantonen, en wat verloopt er.
+
+     De sleutel komt uit de SESSIE en staat niet in het lijf. Dat is geen
+     gewoonte maar de grens zelf: deze route geeft per eis ook de REDEN terug
+     ("dit is verlopen", "een medewerker heeft het nog niet gezien"), en dat is
+     precies de informatie die nuttig is over uzelf en te veel over een ander.
+     Zou de sleutel uit het lijf komen, dan was dit een profieluitdraai met een
+     invulveld ervoor.
+
+     Er is met opzet geen route die een LIJST bewijzen naar een dienst stuurt.
+     Een dienst vraagt per eis om een vinkje via de gewone iD-koppeling
+     (`bewijs:vog`); zie kern/rtgid-bewijs.js voor waarom die knip zo scherp is. */
+  app.post('/api/rtgid/bewijzen', ...lid, (req, res) => stuur(res, rtgid.mijnBewijzen(req.session.key)));
 };

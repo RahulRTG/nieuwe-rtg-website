@@ -1,7 +1,7 @@
 {
   "vastgelegd": "2026-09-02",
   "meters": {
-    "endpointsZonderTest": 968,
+    "endpointsZonderTest": 978,
     "dekkingPct": 80,
     "keuringStuk": 0,
     "keuringScheef": 18,
@@ -10,9 +10,9 @@
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 18,
     "e2eBestanden": 193,
-    "keuringOmvang": 261,
+    "keuringOmvang": 268,
     "keuringDubbeling": 154,
-    "keuringDekkingAdvies": 52,
+    "keuringDekkingAdvies": 53,
     "endpointsNooitAangeraakt": 0,
     "onbewaakt": 0,
     "routesNietSchakelbaar": 0,
@@ -21,11 +21,11 @@
     "keuringTeGroot": 16,
     "inlineStijlAttributen": 4973,
     "browserpoortToetsen": 295,
-    "kernBreedte": 1517,
+    "kernBreedte": 1518,
     "kernGedeeld": 216,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 505,
+    "toetsenNietGemeten": 514,
     "toetsenOngevoeligPct": 1,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
@@ -40,11 +40,11 @@
     "gluurOnbewaakt": 0,
     "bronBlindeBestanden": 3,
     "delenZonderOnderwerp": 0,
-    "beweringenZonderVulcontrole": 111,
+    "beweringenZonderVulcontrole": 113,
     "bewijsCellenBewezen": 25500,
     "bewijsAchterstand": 2285,
     "schermenZonderVormtaal": 185,
-    "dbDeuren": 510,
+    "dbDeuren": 511,
     "dbDeurenSchrijvend": 270,
     "verstrengelingOnverklaard": 0,
     "activeringOndergrens": 48,
@@ -1405,7 +1405,70 @@
       "reden": "Main binnengehaald: de boom telt 4643 routes in plaats van 3282, en de idempotentieproef van main is over die nieuwe routes gedraaid. idem-ongeclassificeerd gaat daardoor van 849 naar 1477 en gevolg-onbekend van 94 naar 90 over een grotere noemer -- dezelfde schuld over een grotere boom, geen nieuwe schuld. herstel-onbevestigd ging juist omlaag (63 -> 47) doordat de herstelproef ook over de nieuwe paren is gedraaid. Geen vervaldatum, om dezelfde reden als bij 989 -> 1997: teruggaan zou betekenen dat we bestaande gaten weer onzichtbaar maken. De aflosregel blijft: doel 0, alleen omlaag, stilstand wordt gemeld."
     },
     "2026-09-01 -- EENMALIG OPGEHOOGD NA HET SAMENVOEGEN VAN TWAALF PR'S. Veertien meters stonden boven hun norm, niet door erosie maar doordat twaalf takken in een keer landden: elke tak was vertakt van een main waar de norm nog gold, en de vereniging overschrijdt hem. De ratel weigert een verslechtering vast te leggen en verwijst naar deze weg: met de hand, zodat het een besluit is en geen sluipende erosie. De nieuwe stand is de GEMETEN stand -- er is geen lucht bijgeteld -- en vanaf hier geldt de regel onverkort weer: alleen omlaag. Wat NIET is opgehoogd: routesNietSchakelbaar stond op 22 en is naar 0 gerepareerd (zes prefixen onder /api/mijn horen bij de rechtenlaag, twee command-leesmeters in de kast), en de klokschuld is van 1306 naar 1262 gebracht in plaats van opgehoogd. Opgehoogd: beweringenZonderVulcontrole 111->112, dbDeuren 507->510, dbDeurenSchrijvend 269->270, endpointsZonderTest 1038->1039, inlineStijlAttributen 4973->4993, kernBreedte 1501->1517, kernGedeeld 212->216, keuringDekkingAdvies 53->57, keuringDubbeling 145->154, keuringOmvang 237->262, keuringScheef 19->21, metingenZonderRatel 33->41, schermenZonderVormtaal 181->185, toetsenNietGemeten 427->505.",
-    "2026-09-01 -- bewijsCellenBewezen 25887 -> 25500, en dat is GEEN gedegradeerd bewijs. IDEMPROEF.json dateert van voor het samenvoegen van twaalf PR's; de IDEMPOTENCY-kolom verliest daardoor 445 bewezen cellen omdat die meting de nieuwe routes nog niet kent. Dezelfde reden staat in BEWIJSMATRIX.json, met dezelfde meting eronder. De sluiting hiervan is een idemproef-ronde (uren, en zij eist een schone boom); tot die gedraaid is hoort hier het GEMETEN getal te staan en niet het getal van gisteren. PROOF.md par. 0 gaat over bewijs dat WEGVALT, niet over een register dat nog niet is bijgewerkt -- maar het verschil hoort opgeschreven, want aan het getal alleen is het niet te zien."
+    "2026-09-01 -- bewijsCellenBewezen 25887 -> 25500, en dat is GEEN gedegradeerd bewijs. IDEMPROEF.json dateert van voor het samenvoegen van twaalf PR's; de IDEMPOTENCY-kolom verliest daardoor 445 bewezen cellen omdat die meting de nieuwe routes nog niet kent. Dezelfde reden staat in BEWIJSMATRIX.json, met dezelfde meting eronder. De sluiting hiervan is een idemproef-ronde (uren, en zij eist een schone boom); tot die gedraaid is hoort hier het GEMETEN getal te staan en niet het getal van gisteren. PROOF.md par. 0 gaat over bewijs dat WEGVALT, niet over een register dat nog niet is bijgewerkt -- maar het verschil hoort opgeschreven, want aan het getal alleen is het niet te zien.",
+    {
+      "datum": "2026-09-02",
+      "soort": "schuld",
+      "sleutel": "endpointsZonderTest",
+      "van": 968,
+      "vervalt": "2026-11-30",
+      "meter": "endpointsZonderTest 968 -> 978",
+      "reden": "De HDI-tak (PR #173: beschermlaag, knelpuntmotor, ouderingang kinderopvang, bewijsmap) brengt 20 nieuwe schrijfroutes, 7 nieuwe toetsbestanden en 1 nieuw scherm mee. Twee meters die eerst ook slechter stonden zijn WEL hersteld in plaats van hier weggeschreven: routesNietSchakelbaar (9 -> 0, de routes staan nu in de boardroomcatalogus) en schermenZonderVormtaal (186 -> 185, bewijsmap.html draagt de tokenlaag). Wat hieronder staat is wat overblijft, per meter met zijn eigen aflosweg. 10 endpoints komen in geen enkele toets LETTERLIJK voor. Ze zijn wel getoetst: test/beschermzaak.test.js roept de kantoorroutes aan via een helper die het pad opbouwt (`/api/rtfos/bescherming/` + deel), en de meter leest literalen. Aflossen is die helper vervangen door uitgeschreven paden, zoals routes/rtfos/ dat aan de bronkant al doet en om dezelfde reden. Voor de vier LEDENroutes is dit al gedaan: test/opvangroute.test.js schrijft ze voluit en bracht de meter van 983 naar 978."
+    },
+    {
+      "datum": "2026-09-02",
+      "soort": "schuld",
+      "sleutel": "keuringOmvang",
+      "van": 261,
+      "vervalt": "2026-11-30",
+      "meter": "keuringOmvang 261 -> 268",
+      "reden": "De HDI-tak (PR #173: beschermlaag, knelpuntmotor, ouderingang kinderopvang, bewijsmap) brengt 20 nieuwe schrijfroutes, 7 nieuwe toetsbestanden en 1 nieuw scherm mee. Twee meters die eerst ook slechter stonden zijn WEL hersteld in plaats van hier weggeschreven: routesNietSchakelbaar (9 -> 0, de routes staan nu in de boardroomcatalogus) en schermenZonderVormtaal (186 -> 185, bewijsmap.html draagt de tokenlaag). Wat hieronder staat is wat overblijft, per meter met zijn eigen aflosweg. 7 nieuwe bestanden zitten in de waarschuwingsband onder 10 kB (regel 13 zakt pas erboven). Twee zijn er in deze tak al geknipt op een inhoudelijke naad (consent-lezers.js -> consent-termijn.js, openingen.js -> openingen-kaart.js). Aflossen is hetzelfde doen voor de rest, en niet door commentaar weg te schaven: dat is de meter bedriegen in plaats van hem gehoorzamen."
+    },
+    {
+      "datum": "2026-09-02",
+      "soort": "schuld",
+      "sleutel": "keuringDekkingAdvies",
+      "van": 52,
+      "vervalt": "2026-11-30",
+      "meter": "keuringDekkingAdvies 52 -> 53",
+      "reden": "De HDI-tak (PR #173: beschermlaag, knelpuntmotor, ouderingang kinderopvang, bewijsmap) brengt 20 nieuwe schrijfroutes, 7 nieuwe toetsbestanden en 1 nieuw scherm mee. Twee meters die eerst ook slechter stonden zijn WEL hersteld in plaats van hier weggeschreven: routesNietSchakelbaar (9 -> 0, de routes staan nu in de boardroomcatalogus) en schermenZonderVormtaal (186 -> 185, bewijsmap.html draagt de tokenlaag). Wat hieronder staat is wat overblijft, per meter met zijn eigen aflosweg. Een domein met endpoints zonder toets erbij. Zelfde oorzaak als endpointsZonderTest en dezelfde aflosweg; stond op 56 en is door test/opvangroute.test.js naar 53 gebracht."
+    },
+    {
+      "datum": "2026-09-02",
+      "soort": "schuld",
+      "sleutel": "dbDeuren",
+      "van": 510,
+      "vervalt": "2026-11-30",
+      "meter": "dbDeuren 510 -> 511",
+      "reden": "De HDI-tak (PR #173: beschermlaag, knelpuntmotor, ouderingang kinderopvang, bewijsmap) brengt 20 nieuwe schrijfroutes, 7 nieuwe toetsbestanden en 1 nieuw scherm mee. Twee meters die eerst ook slechter stonden zijn WEL hersteld in plaats van hier weggeschreven: routesNietSchakelbaar (9 -> 0, de routes staan nu in de boardroomcatalogus) en schermenZonderVormtaal (186 -> 185, bewijsmap.html draagt de tokenlaag). Wat hieronder staat is wat overblijft, per meter met zijn eigen aflosweg. kern/verzorging/opvangleden.js leest db.data.suppliers om te bepalen welke partners het genre opvang voeren -- exact zoals kern/verzorging/beautyleden.js dat naast hem al doet. SCHRIJVEN doet hij niet: db.data.opvang heeft een eigenaar (./opvang.js) en die schrijft als enige, wat keuringsregel 63 afdwingt. Aflossen is de partnerlijst achter een leesfunctie in server/db/ zetten, voor beide bestanden tegelijk."
+    },
+    {
+      "datum": "2026-09-02",
+      "soort": "schuld",
+      "sleutel": "kernBreedte",
+      "van": 1517,
+      "vervalt": "2026-11-30",
+      "meter": "kernBreedte 1517 -> 1518",
+      "reden": "De HDI-tak (PR #173: beschermlaag, knelpuntmotor, ouderingang kinderopvang, bewijsmap) brengt 20 nieuwe schrijfroutes, 7 nieuwe toetsbestanden en 1 nieuw scherm mee. Twee meters die eerst ook slechter stonden zijn WEL hersteld in plaats van hier weggeschreven: routesNietSchakelbaar (9 -> 0, de routes staan nu in de boardroomcatalogus) en schermenZonderVormtaal (186 -> 185, bewijsmap.html draagt de tokenlaag). Wat hieronder staat is wat overblijft, per meter met zijn eigen aflosweg. Een nieuwe kern-eigenschap: `opvangwijzer`, de ouderkant van de kinderopvang. Hij staat in GRENZEN.json bij het domein verzorging, dus de domeingrens kent hem; de server weigerde te starten tot dat zo was. Aflossen is niet zinvol zonder de laag zelf weg te halen: een nieuwe capability is een nieuwe eigenschap."
+    },
+    {
+      "datum": "2026-09-02",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 505,
+      "vervalt": "2026-11-30",
+      "meter": "toetsenNietGemeten 505 -> 514",
+      "reden": "De HDI-tak (PR #173: beschermlaag, knelpuntmotor, ouderingang kinderopvang, bewijsmap) brengt 20 nieuwe schrijfroutes, 7 nieuwe toetsbestanden en 1 nieuw scherm mee. Twee meters die eerst ook slechter stonden zijn WEL hersteld in plaats van hier weggeschreven: routesNietSchakelbaar (9 -> 0, de routes staan nu in de boardroomcatalogus) en schermenZonderVormtaal (186 -> 185, bewijsmap.html draagt de tokenlaag). Wat hieronder staat is wat overblijft, per meter met zijn eigen aflosweg. 9 nieuwe toetsbestanden zijn nog niet door de mutatiemotor geweest. Elke bewering erin is wel MET DE HAND met een mutatie nagetrokken (LAT.md regel 2) en dat staat per bestand in de kop, inclusief twee mutaties die eerst niet beten. Dit is instrumentdekking en geen oordeel over de toetsen. Aflossen is de motor erover laten lopen."
+    },
+    {
+      "datum": "2026-09-02",
+      "soort": "schuld",
+      "sleutel": "beweringenZonderVulcontrole",
+      "van": 111,
+      "vervalt": "2026-11-30",
+      "meter": "beweringenZonderVulcontrole 111 -> 113",
+      "reden": "De HDI-tak (PR #173: beschermlaag, knelpuntmotor, ouderingang kinderopvang, bewijsmap) brengt 20 nieuwe schrijfroutes, 7 nieuwe toetsbestanden en 1 nieuw scherm mee. Twee meters die eerst ook slechter stonden zijn WEL hersteld in plaats van hier weggeschreven: routesNietSchakelbaar (9 -> 0, de routes staan nu in de boardroomcatalogus) en schermenZonderVormtaal (186 -> 185, bewijsmap.html draagt de tokenlaag). Wat hieronder staat is wat overblijft, per meter met zijn eigen aflosweg. 2 beweringen toetsen een verzameling die bij een vers account met opzet LEEG is (geen opvangaanvragen, geen steden zodra de module uit staat). Een derde van deze soort is in deze tak juist WEGGEWERKT: test/beschermzaak.test.js toont nu eerst dat de lijst gevuld was, zodat zijn nul iets bewijst. Bij de twee die overblijven kost dat een echte opvangpartner met een goedgekeurde vergunning (genre kinderopvang staat op `bewijs`), en dat is de aflosweg."
+    }
   ],
   "prestatie": {
     "p99Ms": 233,

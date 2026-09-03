@@ -82,6 +82,7 @@ module.exports = ({ db, save, crypto, boardroomWie, magBoardroom }) => {
     // fase drie, de governance-laag: het bestuur zelf, de regels die het stelt,
     // de verantwoording achteraf en de dingen die mis kunnen gaan
     vergaderingen: [], beleid: [], jaarverslagen: [], risicos: [], meldcodes: [],
+    beschermzaken: [],   // eigen KLASSE, gedeelde poort; zie kern/beschermzaak/klasse.js
     audit: [] };
   function S() {
     if (!db.data.rtfos || typeof db.data.rtfos !== 'object') db.data.rtfos = {};

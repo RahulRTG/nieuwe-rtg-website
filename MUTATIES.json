@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-02T20:37:09.509Z",
-    "commit": "7afad10c",
+    "op": "2026-09-02T22:31:01.973Z",
+    "commit": "80477bd7",
     "boomVuil": true,
-    "boomAnders": 5,
+    "boomAnders": 6,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -7824,6 +7824,36 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "bewijsmapscherm.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "duurprijs.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/delen.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 4
+    },
+    "scherfmeter.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/delen.js",
+      "operator": "===->!==#0",
+      "gezakt": 5,
+      "geprobeerd": 1
+    },
+    "wegwijzerscherm.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     }
   }
 }

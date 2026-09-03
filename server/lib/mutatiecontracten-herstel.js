@@ -22,7 +22,7 @@
 'use strict';
 
 const BEWIJS = { gemeten: 'test/eigenaarherstel.test.js: tien beweringen over de ceremonie met een gezette klok, twee mutaties gezien zakken', op: '2026-09-03' };
-const AFGETEKEND = { door: 'RTG', op: '2026-09-03' };
+const AFGETEKEND = { door: 'Claude (Opus 5), handler per route gelezen op 3 september 2026; de idem-vraag per route apart beantwoord, niet door een mens nagelezen', op: '2026-09-03' };
 
 const CONTRACTEN = {
   'POST /api/techniek/herstel/inrichten': {
@@ -52,13 +52,20 @@ const CONTRACTEN = {
     toegang: { klasse: 'AUTHENTICATED', deur: 'techAuth + eigenaarAlleen' },
     stand: 'NOT_APPLICABLE',
     waarom: 'leest alleen; schrijft niets.',
+    nagekeken: 'Claude, 2026-09-03: de handler is een regel -- res.json(eigenaarherstel.stand()). ' +
+      'stand() in kern/eigenaarherstel.js leest de eigen collectie via herstelstand() en stelt een ' +
+      'antwoord samen: geen save(), geen meld(), geen mail. Het enige dat het lezen kan aanraken is ' +
+      'de lazy init van de collectie (de lege log-array), en die is per definitie herhaalbaar. ' +
+      'De opslagmeter ziet dat laatste wel; hij ziet niet dat er geen mail of melding uitgaat, en ' +
+      'dat is precies het gat dat deze regel sluit.',
     bewijs: BEWIJS, afgetekend: AFGETEKEND
   },
   'POST /api/herstel/eigenaar/start': {
     mutatieId: 'eigenaarherstel.start',
     herkomst: 'mens',
     semantiek: { klasse: 'nietHerhaalbaar' },
-    toegang: { klasse: 'PUBLIC', deur: 'quorum (2 van 3) + rem per bron + vijf pogingen in de kern' },
+    toegang: { klasse: 'PUBLIC', deur: 'quorum (2 van 3) + rem per bron + vijf pogingen in de kern',
+      waarom: 'Wie hier binnenkomt heeft per definitie geen sessie: dat IS het geval dat deze weg bedient -- een eigenaar zonder toestel. Een poort ervoor zou de deur sluiten voor precies de mens waarvoor hij bestaat. Wat hem beschermt is het quorum (twee van drie delen), een wachttijd van zeven dagen waarin elke werkende passkey hem afbreekt, een rem per bron plus vijf pogingen in de kern, en een kritieke melding met mail bij elke start. Zonder ingericht quorum bestaat de weg niet (EIGENAAR.md par. 5).' },
     stand: 'INTENTIONALLY_NON_IDEMPOTENT',
     waarom: 'een geldige herhaling verandert niets, maar een ONgeldige telt een poging en kan het ' +
       'slot dichtzetten. Idempotent verklaren zou die tweede helft wegpoetsen -- en dat is precies ' +
@@ -69,7 +76,8 @@ const CONTRACTEN = {
     mutatieId: 'eigenaarherstel.voltooien',
     herkomst: 'mens',
     semantiek: { klasse: 'nietHerhaalbaar' },
-    toegang: { klasse: 'PUBLIC', deur: 'quorum (2 van 3) + verstreken wachttijd' },
+    toegang: { klasse: 'PUBLIC', deur: 'quorum (2 van 3) + verstreken wachttijd',
+      waarom: 'Wie hier binnenkomt heeft per definitie geen sessie: dat IS het geval dat deze weg bedient -- een eigenaar zonder toestel. Een poort ervoor zou de deur sluiten voor precies de mens waarvoor hij bestaat. Wat hem beschermt is het quorum (twee van drie delen), een wachttijd van zeven dagen waarin elke werkende passkey hem afbreekt, een rem per bron plus vijf pogingen in de kern, en een kritieke melding met mail bij elke start. Zonder ingericht quorum bestaat de weg niet (EIGENAAR.md par. 5).' },
     stand: 'INTENTIONALLY_NON_IDEMPOTENT',
     waarom: 'de eerste geslaagde aanroep sluit het lopende herstel en opent een venster; de tweede ' +
       'vindt geen lopend herstel meer. Hij snijdt daarnaast de sessies van het eigenaarsaccount door.',
@@ -79,7 +87,8 @@ const CONTRACTEN = {
     mutatieId: 'eigenaarherstel.passkey.opties',
     herkomst: 'mens',
     semantiek: { klasse: 'nietHerhaalbaar' },
-    toegang: { klasse: 'PUBLIC', deur: 'alleen binnen het eenmalige herstelvenster' },
+    toegang: { klasse: 'PUBLIC', deur: 'alleen binnen het eenmalige herstelvenster',
+      waarom: 'Zelfde weg, laatste stap. Een sessie is er nog steeds niet -- die ontstaat pas als de nieuwe passkey er is en de mens ermee inlogt. De poort is het eenmalige herstelvenster: buiten dat venster antwoordt hij 403, en het venster gaat een keer op.' },
     stand: 'INTENTIONALLY_NON_IDEMPOTENT',
     waarom: 'munt een verse WebAuthn-uitdaging; een herhaling die de oude teruggaf zou die ' +
       'uitdaging herbruikbaar maken.',
@@ -89,7 +98,8 @@ const CONTRACTEN = {
     mutatieId: 'eigenaarherstel.passkey',
     herkomst: 'mens',
     semantiek: { klasse: 'nietHerhaalbaar' },
-    toegang: { klasse: 'PUBLIC', deur: 'alleen binnen het eenmalige herstelvenster' },
+    toegang: { klasse: 'PUBLIC', deur: 'alleen binnen het eenmalige herstelvenster',
+      waarom: 'Zelfde weg, laatste stap. Een sessie is er nog steeds niet -- die ontstaat pas als de nieuwe passkey er is en de mens ermee inlogt. De poort is het eenmalige herstelvenster: buiten dat venster antwoordt hij 403, en het venster gaat een keer op.' },
     stand: 'INTENTIONALLY_NON_IDEMPOTENT',
     waarom: 'zet de passkey en SLUIT het venster. Een tweede aanroep hoort te stuiten op een dicht ' +
       'venster; herhaalbaar maken zou van een geslaagd herstel een kwartier lang een open deur maken.',

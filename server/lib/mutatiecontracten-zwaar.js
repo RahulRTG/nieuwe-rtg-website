@@ -21,7 +21,7 @@
 'use strict';
 
 const BEWIJS = { gemeten: 'niet gemeten: de uitkomst is per ontwerp verschillend', op: '2026-09-03' };
-const AFGETEKEND = { door: 'RTG', op: '2026-09-03' };
+const AFGETEKEND = { door: 'Claude (Opus 5), handler per route gelezen op 3 september 2026; de idem-vraag per route apart beantwoord, niet door een mens nagelezen', op: '2026-09-03' };
 
 const CONTRACTEN = {
   'POST /api/techniek/bevestig/opties': {

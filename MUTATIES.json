@@ -1,8 +1,8 @@
 {
   "stempel": {
-    "op": "2026-09-03T14:45:26.335Z",
-    "commit": "ee96807f",
-    "boomVuil": true,
+    "op": "2026-09-03T15:30:26.401Z",
+    "commit": "1bf48fd8",
+    "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
@@ -1120,12 +1120,11 @@
     },
     "comm-deelnemer.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/kern/comm/index.js"
-      ],
-      "geprobeerd": 5,
-      "posities": 8
+      "staat": "gezakt",
+      "module": "server/kern/comm/deelnemer.js",
+      "operator": "===->!==#0",
+      "gezakt": 5,
+      "geprobeerd": 2
     },
     "comm-dm.test.js": {
       "soort": "puur",
@@ -1270,12 +1269,8 @@
     },
     "consent-dekking.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/kern/consent.js"
-      ],
-      "geprobeerd": 23,
-      "posities": 8
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "een census over de broncode (welke modules bestaan en staan ze in het register), niet over rekenend gedrag; een bronoperator kan daar niet bij. De toets ijkt zichzelf al: zijn derde bewering laat de scan een nieuwe laag vinden"
     },
     "consent.test.js": {
       "soort": "server",
@@ -1646,13 +1641,8 @@
     },
     "eventloop.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/meting.js",
-        "server/meting-lus.js"
-      ],
-      "geprobeerd": 18,
-      "posities": 8
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "ijkt zichzelf met een echte blokkade van 200 ms, met onder- en bovengrens en de eis dat de mediaan niet meebeweegt. Nagetrokken: lusVertraging() nul laten melden laat drie van de vier toetsen zakken"
     },
     "excursie.test.js": {
       "soort": "server",
@@ -2594,12 +2584,11 @@
     },
     "i18n-auto.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/lib/ui-bronnen.js"
-      ],
-      "geprobeerd": 11,
-      "posities": 8
+      "staat": "gezakt",
+      "module": "public/shared/i18n/i18n-00.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "ideeen.test.js": {
       "soort": "server",
@@ -3070,12 +3059,11 @@
     },
     "ledengids-race.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/db/gidsen.js"
-      ],
-      "geprobeerd": 1,
-      "posities": 8
+      "staat": "gezakt",
+      "module": "server/db/ledengids.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "ledenladder.test.js": {
       "soort": "server",
@@ -5029,12 +5017,8 @@
     },
     "rahul-hart.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/kern/rahul.js"
-      ],
-      "geprobeerd": 4,
-      "posities": 8
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "de tekst staat in server/kern/rahul-hart.js en niet in de module die de export draagt; wat hij vastlegt zijn woorden in een system prompt, en geen bronoperator raakt een letterlijke string. Met de hand tweemaal raak: een passie weghalen laat toets 1 zakken, scrypt -> md5 laat toets 2 zakken"
     },
     "rahul-mens.test.js": {
       "soort": "puur",
@@ -5366,12 +5350,8 @@
     },
     "rtfcampus.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/kern/rtfbieb.js"
-      ],
-      "geprobeerd": 11,
-      "posities": 8
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "leest een catalogus van literalen; de betekenisvolle mutatie is een categorie weghalen en daar heeft de motor geen operator voor. Met de hand raak sinds de tegenkant erbij staat: een categorie uit rtfappcatalogus-data.js halen laat toets 2 zakken (daarvoor bleef dat onopgemerkt -- dat was het gat)"
     },
     "rtfcoderem.test.js": {
       "soort": "server",
@@ -5947,12 +5927,8 @@
     },
     "scriptbundel.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/middleware/scriptbundel.js"
-      ],
-      "geprobeerd": 15,
-      "posities": 8
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "de foutisolatie is een stringliteraal (try/catch per bestand) die de toets echt uitvoert; geen bronoperator raakt dat. Met de hand raak: de omwikkeling weghalen laat toets 1 zakken, en dat is de enige reden dat samenvoegen daar mag"
     },
     "selfhost.test.js": {
       "soort": "puur",
@@ -7553,14 +7529,8 @@
     },
     "wereldtaal.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/talen.js",
-        "server/translate/woordenboek/wereld.js",
-        "server/translate.js"
-      ],
-      "geprobeerd": 13,
-      "posities": 8
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "toetst dertig kernwoorden per taal, opgeslagen als |-gescheiden regels in wereld1..8; de motor muteert de uitpakker en niet de data. Met de hand raak: een woord uit een taalregel halen laat toets 1 zakken"
     },
     "wereldvermogens.test.js": {
       "soort": "server",
@@ -7764,12 +7734,8 @@
     },
     "wiring-contract.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/accounts/index.js"
-      ],
-      "geprobeerd": 13,
-      "posities": 8
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "vergelijkt de accounts-exportlijst met de aanroepen in de bron; geen bronoperator raakt een exportlijst. Met de hand tweemaal raak: een verzonnen aanroep laat toets 1 zakken, verifyToken uit de export halen laat beide toetsen zakken"
     },
     "wisselen-en-historie.test.js": {
       "soort": "server",

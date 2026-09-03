@@ -41,8 +41,8 @@
     "bronBlindeBestanden": 3,
     "delenZonderOnderwerp": 0,
     "beweringenZonderVulcontrole": 114,
-    "bewijsCellenBewezen": 25545,
-    "bewijsAchterstand": 2283,
+    "bewijsCellenBewezen": 25557,
+    "bewijsAchterstand": 2291,
     "schermenZonderVormtaal": 185,
     "dbDeuren": 516,
     "dbDeurenSchrijvend": 271,
@@ -1648,6 +1648,15 @@
       "vervalt": "2026-12-01",
       "meter": "inlineStijlAttributen 4973 -> 4977",
       "reden": "Samenvoeging van acht PR's op 3 september 2026. Vier style-attributen in bestaande schermen van de takken (#173 en #169). De nieuwe schermen van de samenvoeging dragen er nul (service.html is opgeschoond). Aflossen: naar een class of de stijlkop."
+    },
+    {
+      "datum": "2026-09-03",
+      "soort": "schuld",
+      "sleutel": "bewijsAchterstand",
+      "van": 2283,
+      "vervalt": "2026-12-01",
+      "meter": "bewijsAchterstand 2283 -> 2291",
+      "reden": "Samenvoeging van acht PR's op 3 september 2026. IDEMPROEF.json staat weer op de stand van main omdat de eindpoort daar de wereldmeting uit leest; die proef beoordeelde negen routes meer dan die van #176, en die negen dragen nog geen besluit in IDEMBESLUIT.json (post idem-ongeclassificeerd 1478 -> 1487, gevolg-onbekend 91 -> 90). De groei staat met dezelfde reden in BEWIJSSCHULD.json onder `groei`. Aflossen: de meetronde op deze stand."
     }
   ],
   "prestatie": {
@@ -1685,7 +1694,7 @@
     "browserpoortToetsen": "2026-09-03",
     "e2eBestanden": "2026-09-03",
     "schermenZonderVormtaal": "2026-08-28",
-    "bewijsCellenBewezen": "2026-09-01",
+    "bewijsCellenBewezen": "2026-09-03",
     "beweringenZonderVulcontrole": "2026-09-02",
     "verstrengelingOnverklaard": "2026-09-02",
     "activeringOndergrens": "2026-09-02",

@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-03T09:29:57.257Z",
-    "commit": "c5da8ec4",
+    "op": "2026-09-03T10:59:16.656Z",
+    "commit": "5c99baaa",
     "boomVuil": false,
-    "boomAnders": 5,
+    "boomAnders": 6,
     "instrument": "scripts/verstrengeling.js",
     "node": "v22.22.2"
   },

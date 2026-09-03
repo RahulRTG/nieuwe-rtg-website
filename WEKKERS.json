@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-03T09:30:03.175Z",
-    "commit": "c5da8ec4",
+    "op": "2026-09-03T10:59:16.677Z",
+    "commit": "5c99baaa",
     "boomVuil": false,
     "boomAnders": 7,
     "instrument": "scripts/wekkers.js",
@@ -501,20 +501,6 @@
       "trede": "start"
     },
     {
-      "soort": "BUS",
-      "bestand": "server/kern/sessies.js",
-      "aantal": 1,
-      "functies": 5,
-      "welke": [
-        "supplier",
-        "tg-inlog",
-        "verificatie",
-        "tg-zegel",
-        "tg-link"
-      ],
-      "trede": "partners"
-    },
-    {
       "soort": "KLOK",
       "bestand": "server/kern/webmaker-plan.js",
       "aantal": 1,
@@ -555,6 +541,23 @@
         "command-zien",
         "command-doen",
         "command-besturen"
+      ],
+      "trede": "partners"
+    },
+    {
+      "soort": "BUS",
+      "bestand": "server/kern/sessies.js",
+      "aantal": 1,
+      "functies": 11,
+      "welke": [
+        "supplier",
+        "tg-inlog",
+        "staff",
+        "verificatie",
+        "ov-zorgprofiel",
+        "kern-locatie",
+        "dom-fluister",
+        "ov-spar"
       ],
       "trede": "partners"
     },
@@ -681,7 +684,7 @@
       "soort": "KLOK",
       "bestand": "server/kern/command/alarm.js",
       "aantal": 1,
-      "functies": 192,
+      "functies": 196,
       "welke": [
         "supplier",
         "office",
@@ -698,7 +701,7 @@
       "soort": "KLOK",
       "bestand": "server/kern/command/canary.js",
       "aantal": 1,
-      "functies": 192,
+      "functies": 196,
       "welke": [
         "supplier",
         "office",
@@ -715,7 +718,7 @@
       "soort": "KLOK",
       "bestand": "server/kern/command/uitrolregie.js",
       "aantal": 1,
-      "functies": 192,
+      "functies": 196,
       "welke": [
         "supplier",
         "office",

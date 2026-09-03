@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-03T09:41:29.471Z",
-  "commit": "7c7829ff",
+  "op": "2026-09-03T10:59:28.674Z",
+  "commit": "5c99baaa",
   "boomVuil": false,
-  "boomAnders": 2,
+  "boomAnders": 11,
   "instrument": "scripts/mutatieboek.js",
   "node": "v22.22.2"
  },
@@ -28,8 +28,8 @@
  },
  "bewijsgraad": {
   "metingGebruikt": false,
-  "metingReden": "de meting is van commit df1a581a en HEAD staat op 7c7829ff; een meting van een andere stand is geen grond voor een status",
-  "metingGemetenOp": "2026-09-03T08:07:48.473Z",
+  "metingReden": "de meting is van commit 8f4b3a080 en HEAD staat op 5c99baaa; een meting van een andere stand is geen grond voor een status",
+  "metingGemetenOp": "2026-09-01T16:38:26.262Z",
   "perGraad": [
    {
     "id": "afgeleid",
@@ -144,7 +144,7 @@
   {
    "id": "BESCHERMD",
    "uitleg": "Er staat verklaard hoe een herhaling wordt herkend. De idemproef kan hierop meten.",
-   "aantal": 195,
+   "aantal": 189,
    "moetNaarNul": false,
    "semantiek": true,
    "voorbeelden": [
@@ -156,7 +156,7 @@
   {
    "id": "BEWUST_NIET_IDEMPOTENT",
    "uitleg": "Een herhaling is een echte tweede handeling, met een verplichte reden erbij. Dit is klaar en geen tekort.",
-   "aantal": 75,
+   "aantal": 81,
    "moetNaarNul": false,
    "semantiek": true,
    "voorbeelden": [
@@ -302,24 +302,24 @@
   {
    "bron": "IDEMPROEF.json",
    "veld": "routesGevonden",
-   "vastgelegd": 4643,
-   "vastgelegdOp": "2026-09-03",
+   "vastgelegd": 4729,
+   "vastgelegdOp": "2026-09-01",
    "nu": 4814,
    "zelfdeVraag": "mutaties zonder schakelpad en zonder :parameter",
-   "verschil": 171,
+   "verschil": 85,
    "gelijk": false,
-   "duiding": "de vastlegging is van 2026-09-03; sindsdien zijn er routes bijgekomen"
+   "duiding": "de vastlegging is van 2026-09-01; sindsdien zijn er routes bijgekomen"
   },
   {
    "bron": "IDEMPROEF.json",
    "veld": "routesMetRol",
-   "vastgelegd": 3803,
+   "vastgelegd": 3998,
    "nu": 4087,
-   "vastgelegdOp": "2026-09-03",
+   "vastgelegdOp": "2026-09-01",
    "zelfdeVraag": "daarvan: de routes waarvoor een proefsleutel bestaat",
-   "verschil": 284,
+   "verschil": 89,
    "gelijk": false,
-   "duiding": "de vastlegging is van 2026-09-03; sindsdien zijn er routes bijgekomen"
+   "duiding": "de vastlegging is van 2026-09-01; sindsdien zijn er routes bijgekomen"
   }
  ]
 }

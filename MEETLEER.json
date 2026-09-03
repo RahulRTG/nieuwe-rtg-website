@@ -1,10 +1,10 @@
 {
   "wat": "of elk register in de wortel de lezer machinaal belet er meer uit te concluderen dan het aantoont",
   "stempel": {
-    "op": "2026-09-03T09:29:57.233Z",
-    "commit": "c5da8ec4",
+    "op": "2026-09-03T10:59:16.655Z",
+    "commit": "5c99baaa",
     "boomVuil": false,
-    "boomAnders": 4,
+    "boomAnders": 6,
     "instrument": "scripts/meetleer.js",
     "node": "v22.22.2"
   },

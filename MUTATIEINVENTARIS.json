@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-09-03T10:01:25.794Z",
-  "commit": "b190b0b0",
+  "op": "2026-09-03T10:59:06.227Z",
+  "commit": "5c99baaa",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/mutatieinventaris.js",
@@ -14,9 +14,9 @@
   "mutatie": 4854,
   "mutatieBuitenSchakel": 4824,
   "idempotentieAanroepbaar": 4814,
-  "werkelijkAangeroepen": 4643,
-  "bewijsMetSleutel": 1564,
-  "bewijsZonderSleutel": 212,
+  "werkelijkAangeroepen": 4729,
+  "bewijsMetSleutel": 1573,
+  "bewijsZonderSleutel": 217,
   "verklaard": 386
  },
  "autorisatie": {
@@ -31,30 +31,7 @@
  "kruisingen": {
   "metParameter": 10,
   "schakelpaden": 30,
-  "gemetenBuitenInventaris": [
-   "POST /api/boardroom/reset",
-   "POST /api/office/bank/terugstorting",
-   "POST /api/office/boardroom/schakel",
-   "POST /api/office/boardroom/schakel-fijn",
-   "POST /api/office/boardroom/toegang",
-   "POST /api/office/boardroom/toegang/geef",
-   "POST /api/office/boardroom/toegang/weg",
-   "POST /api/office/techniek/lastafworp",
-   "POST /api/privacy/delete",
-   "POST /api/techniek/bewaren/veeg",
-   "POST /api/techniek/eigenaar",
-   "POST /api/techniek/fouten/wis",
-   "POST /api/techniek/functie",
-   "POST /api/techniek/functie/ai",
-   "POST /api/techniek/functie/besluit",
-   "POST /api/techniek/moderniseer",
-   "POST /api/techniek/sso/schakel",
-   "POST /api/techniek/tenant/vernietig",
-   "POST /api/techniek/toegang",
-   "POST /api/techniek/wacht/lastafworp",
-   "POST /api/techniek/wacht/quarantaine",
-   "POST /api/techniek/zekering"
-  ],
+  "gemetenBuitenInventaris": [],
   "weesVerklaringen": [
    "POST /api/office/bank/terugstorting",
    "POST /api/techniek/fouten/wis"

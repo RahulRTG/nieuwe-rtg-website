@@ -1,23 +1,23 @@
 {
   "stempel": {
-    "op": "2026-09-03T09:30:19.324Z",
-    "commit": "c5da8ec4",
+    "op": "2026-09-03T10:59:37.995Z",
+    "commit": "5c99baaa",
     "boomVuil": false,
-    "boomAnders": 10,
+    "boomAnders": 12,
     "instrument": "scripts/bewijsmatrix.js",
     "node": "v22.22.2"
   },
   "herkomst": "routekaart (draaiende server)",
   "gedegradeerd": false,
-  "journaalGelezen": null,
+  "journaalGelezen": ".routejournaal",
   "routes": 4932,
   "schakels": 11,
   "cellen": 54252,
   "telling": {
-    "bewezen": 25545,
+    "bewezen": 25557,
     "verklaard": 192,
-    "nvt": 314,
-    "ongemeten": 28201,
+    "nvt": 313,
+    "ongemeten": 28190,
     "gezakt": 0
   },
   "perSchakel": {
@@ -71,10 +71,10 @@
       "gezakt": 0
     },
     "IDEMPOTENCY": {
-      "bewezen": 1635,
+      "bewezen": 1647,
       "verklaard": 0,
-      "nvt": 79,
-      "ongemeten": 3218,
+      "nvt": 78,
+      "ongemeten": 3207,
       "gezakt": 0
     },
     "FAILURE": {
@@ -98,11 +98,6 @@
       "ongemeten": 1112,
       "gezakt": 0
     }
-  },
-  "verslechteringToegestaan": {
-    "reden": "Samenvoeging van acht PR's op 3 september 2026: de boom telt meer routes dan de proefregisters kennen. Die registers zijn gemeten op de takken (de proefregisters op #176, tegen 10b57a27) en niet op de vereniging; het bewijs is niet weggevallen maar over de nieuwe routes nog niet gemeten. Sluiting: een meetronde op deze stand (npm run meetronde), zoals de wekelijkse ronde die draait.",
-    "cellenVoor": 53306,
-    "cellenNa": 54252
   },
   "uitleg": "Gegenereerd door scripts/bewijsmatrix.js. ongemeten MAG ALLEEN KRIMPEN."
 }

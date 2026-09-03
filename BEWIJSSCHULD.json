@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-03T10:01:28.638Z",
-  "commit": "b190b0b0",
+  "op": "2026-09-03T11:02:31.275Z",
+  "commit": "5c99baaa",
   "boomVuil": false,
-  "boomAnders": 3,
+  "boomAnders": 17,
   "instrument": "scripts/bewijsschuld.js",
   "node": "v22.22.2"
  },
@@ -11,14 +11,14 @@
  "grens": "Dit is een lijst van wat we WETEN dat we niet hebben gemeten. Wat niemand heeft bedacht staat er per definitie niet in, en dat is de gevaarlijkste categorie -- een schuldenlijst is geen dekkingsbewijs. De aantallen komen uit de registers en zijn dus zo vers als de laatste ronde; zie scripts/versheid.js.",
  "telling": {
   "posten": 18,
-  "meetwerk": 1960,
+  "meetwerk": 1968,
   "instrument": 323,
   "grens": 708
  },
  "aflossing": {
   "doel": 0,
   "wat": "de achterstand (meetwerk + instrument) gaat naar nul. `grens` telt niet mee en sluit nooit -- dat is de rand van de methode en geen werk.",
-  "staat": 2283,
+  "staat": 2291,
   "regels": [
    "de achterstand mag nooit groeien zonder een reden IN dit register (--groei=...)",
    "een post mag niet van soort veranderen om onder de poort uit te komen: naar `grens` verplaatsen laat de achterstand dalen zonder dat er iets gemeten is",
@@ -28,7 +28,7 @@
  },
  "gemeten": {
   "postenTotaal": 18,
-  "achterstand": 2283,
+  "achterstand": 2291,
   "randVanDeMethode": 708,
   "auth-onbeslist": 0,
   "capability-in-handler": 612,
@@ -43,10 +43,10 @@
   "rollback-gezakt": 1,
   "object-vooraf": 323,
   "proefruis": 1,
-  "gevolg-onbekend": 91,
+  "gevolg-onbekend": 90,
   "droogloop-onbeoordeeld": 2,
   "herstel-onbevestigd": 47,
-  "idem-ongeclassificeerd": 1478,
+  "idem-ongeclassificeerd": 1487,
   "wegwerpserver-kopieen": 3
  },
  "posten": [
@@ -158,7 +158,7 @@
    "id": "gevolg-onbekend",
    "soort": "meetwerk",
    "wat": "bereikbare capabilities waarvan niemand heeft gemeten WAT ze veranderen",
-   "aantal": 91,
+   "aantal": 90,
    "waarom": "server/kern/stuur/gevolg.js projecteert een EERDERE proefronde op de stappen van een plan. Staat een pad niet in die ronde, dan is de eerlijke uitslag `onbekend` -- en een plan dat voor het merendeel uit onbekende gevolgen bestaat, is geen voorspelling.",
    "sluit": "de idempotentieproef over deze paden halen, of ze in de droogloop opnemen. Het gereedschap staat er (scripts/droogloop.js meet per stap welke collectie werkelijk bewoog); wat rest is meten."
   },
@@ -182,7 +182,7 @@
    "id": "idem-ongeclassificeerd",
    "soort": "meetwerk",
    "wat": "muterende routes zonder uitspraak over herhalen: wat gebeurt er bij een tweede keer",
-   "aantal": 1478,
+   "aantal": 1487,
    "waarom": "autonomie zonder herhaalsemantiek is niet te doen: een keten die halverwege afbreekt moet weten of opnieuw beginnen veilig is. Het doel is niet dat alles idempotent IS -- het is dat van elke route vastligt wat een tweede keer betekent.",
    "sluit": "per route beslissen en vastleggen. Het instrument staat (scripts/idemproef-route.js plus IDEMBESLUIT.json met zijn klassen); dit is meetwerk en handwerk."
   },
@@ -389,7 +389,7 @@
    },
    {
     "op": "2026-09-03",
-    "aantal": 91
+    "aantal": 90
    }
   ],
   "droogloop-onbeoordeeld": [
@@ -431,7 +431,7 @@
    },
    {
     "op": "2026-09-03",
-    "aantal": 1478
+    "aantal": 1487
    }
   ],
   "wegwerpserver-kopieen": [
@@ -467,6 +467,12 @@
    "aantal": 1,
    "meetdagen": 3,
    "reden": "staat 3 meetdagen op hetzelfde getal; de aflossing stokt hier. Sluitweg: de ruis meten: tien rondes op dezelfde commit, en per as de spreiding vastleggen. Dan weet de ratel wat een echte verslechtering is en wat niet."
+  },
+  {
+   "id": "gevolg-onbekend",
+   "aantal": 90,
+   "meetdagen": 3,
+   "reden": "staat 3 meetdagen op hetzelfde getal; de aflossing stokt hier. Sluitweg: de idempotentieproef over deze paden halen, of ze in de droogloop opnemen. Het gereedschap staat er (scripts/droogloop.js meet per stap welke collectie werkelijk bewoog); wat rest is meten."
   },
   {
    "id": "droogloop-onbeoordeeld",
@@ -529,6 +535,12 @@
    "van": 2284,
    "naar": 2285,
    "reden": "De idempotentieproef meet na de wereldopstelling en dertien lijfsleutelfamilies veel meer routes dan eerst; gevolg-onbekend gaat daardoor van 89 naar 90. Netto +1 op 2285, en de post die groeit is precies de post die zegt dat er nog geen droogloop over die route is geweest."
+  },
+  {
+   "op": "2026-09-03",
+   "van": 2283,
+   "naar": 2291,
+   "reden": "IDEMPROEF.json staat weer op de stand van main, want de eindpoort leest daar de wereldmeting uit die de stand van #176 niet kent; de proef van main beoordeelde 1573 routes tegen 1564 in die van #176, en die negen extra beproefde muterende routes dragen nog geen besluit in IDEMBESLUIT.json. Gevolg-onbekend zakte tegelijk met een. Sluit met de meetronde op deze stand"
   }
  ]
 }

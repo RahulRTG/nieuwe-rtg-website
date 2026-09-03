@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1537 bestanden en 10968 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1537 bestanden en 10970 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 1537 |
-| losse beweringen (`test(...)`) | 10968 |
+| losse beweringen (`test(...)`) | 10970 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 57 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1018 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1344 bestanden, 10641 beweringen.
+1344 bestanden, 10643 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -416,7 +416,7 @@ toets omvalt.
 | `gewichtdrift.test.js` | 12 | gezakt op `===->!==#0` | HET DRIFTCONTRACT ONDER HET GEWICHTREGISTER. Dit bestand bewaakt de reparatie van een fout die niets rood maakte. |
 | `gewichtvoorstel.test.js` | 5 | gezakt op `+->-#1` | HET VOORSTEL VOOR EEN NIEUW GEWICHTREGISTER. CI meet, CI stelt voor, een mens merget. |
 | `gewoonten.test.js` | 7 | gezakt op `liegpoort /api/` | Gewoonten (kern/gewoonten.js). Het meeste dat hier bewezen wordt is een NEGATIEF, en dat is de hele reden dat deze laag zo klein is: - de reeksteller staat UIT tot het lid hem zelf aanzet, en wat uit staat komt ook... |
-| `gezag.test.js` | 14 | gezakt op `===->!==#0` | HET GEZAG (scripts/gezag.js + GEZAG.json). WAT HIER OP HET SPEL STAAT. |
+| `gezag.test.js` | 15 | gezakt op `===->!==#0` | HET GEZAG (scripts/gezag.js + GEZAG.json). WAT HIER OP HET SPEL STAAT. |
 | `gezagshandelingen.test.js` | 8 | gezakt op `===->!==#0` | DE GEDEELDE NAMESPACE VAN HANDELINGEN (scripts/gezagshandelingen.js). WAT HIER OP HET SPEL STAAT. |
 | `gezagsnoemer.test.js` | 12 | gezakt op `===->!==#1` | DE GEDEELDE NOEMER VAN DE GEZAGSSCHALEN (scripts/gezagsnoemer.js). GEZAG.json houdt vast dat dit huis de vraag "mag de machine dit zelf?" op vijf plekken met vijf eigen woordenlijsten beantwoordt, en zegt erbij dat... |
 | `gezakte-toetsen.test.js` | 6 | te langzaam | De herhaling onderaan een rode CI-stap moet de REDEN dragen, niet alleen de naam. Dat is een belofte in .github/workflows/ci.yml ("zodat een rode stap zichzelf uitlegt"), en een belofte in tekst is een belofte in code. |
@@ -826,7 +826,7 @@ toets omvalt.
 | `ov-regie.test.js` | 3 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `ov.test.js` | 8 | gezakt op `liegpoort /api/` | RTG OV: al het vervoer in een app. Lijnen met haltes, live voertuigen via de PDA, twee snelle check-ins (oplichtende code of GPS-een-tik) en uitchecken met eerlijke km-prijs via RTG Pay. |
 | `overdracht.test.js` | 11 | -- | De Integration Fabric: wat gaat er mee bij een overstap, en in welke vorm. De beloftes die hier hard worden gemaakt: - er gaat geen dossier mee maar een pakket per doel, en het pakket zegt ALTIJD wat er niet in zit... |
-| `overheid.test.js` | 22 | gezakt op `liegpoort /api/` | De Overheid (kern/overheid.js): de landelijke laag naast de gemeente. Zes pijlers voor inwoners, ondernemers en rijksambtenaren. |
+| `overheid.test.js` | 23 | gezakt op `liegpoort /api/` | De Overheid (kern/overheid.js): de landelijke laag naast de gemeente. Zes pijlers voor inwoners, ondernemers en rijksambtenaren. |
 | `overname.test.js` | 8 | gezakt op `===->!==#0` | De overnamemodus (kern/command/overname.js): de administratie van een overgenomen bedrijf inlezen. WAT DEZE TOETS VOORAL BEWAAKT zijn de drie manieren waarop een migratie stil misgaat: 1. |
 | `ovkaart.test.js` | 12 | gezakt op `liegpoort /api/` | De OV-kaartverkoop: een vervoerbewijs mag alleen bestaan als er een geldige overeenkomst met de vervoerder onder ligt. Draai los: node --test test/ovkaart.test.js Wat deze toetsen bewaken: 1. |
 | `padgrens.test.js` | 4 | -- | Een voorvoegsel dekt een pad op een PADgrens, niet op een woordgrens. |

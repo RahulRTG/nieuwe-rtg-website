@@ -197,22 +197,49 @@ test('MUTATIE: een verdwenen beslisser maakt de meter ook stuk', () => {
   });
 });
 
-/* ---------- mutatie 3: de tegenspraak ---------- */
+/* ---------- mutatie 3: de OPGELOSTE tegenspraak, en zijn bewaking ----------
 
-test('de vastgelegde tegenspraak wordt bij elke ronde opnieuw nagetrokken', () => {
+   Hier stond de tegenspraak `vergunning-of-aanvraag-afwijzen` als OPENSTAAND:
+   ainiveau.js verbood de machine een aanvraag af te wijzen (niveau 4) terwijl
+   het AI-stuur precies dat als voorstel liet samenstellen, en magAutomatisch()
+   werd op die weg nooit aangeroepen.
+
+   Opgelost op 3 september 2026 (TAKEN.md 4.56), en daarmee verhuisd naar
+   OPGELOST -- niet verdwenen. Een bevinding die weggaat zodra hij gerepareerd
+   is, laat niets achter dat de reparatie vasthoudt: de volgende ronde haalt
+   iemand de koppeling weg en er staat geen tegenspraak meer om na te trekken.
+   Deze twee toetsen bewaken dus de andere kant op. */
+
+test('de opgeloste tegenspraak blijft BEWAAKT, en er staat er geen open meer', () => {
   const r = draai();
-  assert.match(r.uit, /tegenspraken\s*:\s*1/);
-  assert.match(r.uit, /\[staat nog\] vergunning-of-aanvraag-afwijzen/,
-    'de tegenspraak hoort nog te staan; is hij opgelost, werk dan GEZAG.json bij');
+  assert.match(r.uit, /tegenspraken\s*:\s*0/, 'er staat weer een tegenspraak open');
+  assert.match(r.uit, /opgelost, bewaakt\s*:\s*1/);
+  assert.match(r.uit, /\[blijft staan\] vergunning-of-aanvraag-afwijzen/,
+    'de reparatie hoort nog in de bron te staan');
 });
 
-test('MUTATIE: verdwijnt een kant van de tegenspraak, dan meldt hij "veranderd" en niet stilzwijgend hetzelfde', () => {
+test('MUTATIE: verdwijnt de reparatie uit de bron, dan ZAKT de meter', () => {
+  /* De duurste faalvorm die deze lijst kan hebben: een opgeloste bevinding die
+     mooie woorden draagt terwijl de koppeling eruit is gehaald. Dan is opgelost
+     erger dan openstaand. */
+  metVervangen('server/routes/supplier/ai/ambtenaar.js',
+    'magAutomatisch(AANVRAAG_BESLUIT)', "({ reden: '' })", () => {
+      const r = draai();
+      assert.match(r.uit, /\[REPARATIE WEG\] vergunning-of-aanvraag-afwijzen/);
+      assert.match(r.uit, /ZAKT: de reparatie van/);
+      assert.equal(r.code, 1, 'een weggevallen reparatie hoort de meter te laten zakken');
+    });
+});
+
+test('MUTATIE: verdwijnt het niveau uit ainiveau.js, dan ZAKT hij ook', () => {
+  /* De andere kant van dezelfde koppeling: haalt iemand de handeling van
+     niveau 4, dan is de reparatie net zo goed weg -- de reden die ambtenaar.js
+     doorgeeft komt dan uit niets. */
   metVervangen('server/kern/stadsweefsel/ainiveau.js',
     "'vergunning-weigeren': { niveau: 4", "'vergunning-weigeren': { niveau: 2", () => {
       const r = draai();
-      assert.match(r.uit, /\[veranderd\] vergunning-of-aanvraag-afwijzen/,
-        'een tegenspraak waarvan een kant wijzigt mag niet ongewijzigd blijven staan');
-      assert.match(r.uit, /werk GEZAG\.json bij/);
+      assert.match(r.uit, /\[REPARATIE WEG\] vergunning-of-aanvraag-afwijzen/);
+      assert.equal(r.code, 1);
     });
 });
 

@@ -110,14 +110,28 @@ schalen -- `stuur/beleid.js` (verboden/voorstel/direct), `command/risico.js`
 automatisch), `stadsweefsel/ainiveau.js` (waarnemen tot verboden) en
 `bureau/delegatie.js` (informeren tot autonoom). Elk van de vijf is op zichzelf
 zorgvuldig gebouwd; het bezwaar is dat geen van de vijf de andere vier kan lezen,
-dus geen mens en geen machine kan ze naast elkaar leggen. Ze zijn dan ook al
-uiteengelopen: `ainiveau.js` zet "een vergunning of aanvraag afwijzen" op niveau
-4 ("hier komt geen machine aan, met of zonder sleutel") terwijl `stuur/beleid.js`
-precies die handeling als `voorstel` toelaat, en `magAutomatisch()` -- dat in zijn
-eigen commentaar "de enige plek die daar antwoord op geeft" heet -- op die weg
-nooit wordt aangeroepen. Daarnaast staat `niveau: 'hand'` als kale tekenreeks in
-achttien Command-modules die `risico.js` niet importeren: hernoem de trede en die
-achttien schrijven zwijgend het oude woord.
+dus geen mens en geen machine kan ze naast elkaar leggen. Ze waren dan ook al
+uiteengelopen, en die twee gevallen staan hier omdat ze allebei zijn gerepareerd
+en allebei laten zien wat de kosten van vijf schalen zijn.
+
+`ainiveau.js` zette "een vergunning of aanvraag afwijzen" op niveau 4 ("hier komt
+geen machine aan, met of zonder sleutel") terwijl `stuur/beleid.js` precies die
+handeling als `voorstel` toeliet, en `magAutomatisch()` -- dat in zijn eigen
+commentaar "de enige plek die daar antwoord op geeft" heet -- werd op die weg
+nooit aangeroepen. De niveau-4-lijst was daar dus decoratie. Opgelost op
+3 september 2026 (TAKEN.md 4.56) zonder een van beide documenten te verzwakken:
+`ambtenaar.js` roept hem aan, geeft zijn reden door aan de mens die bevestigt, en
+kiest geen dossier meer uit -- want dát was het echte bezwaar, de machine koos
+zelf wie er werd afgewezen. En de bevinding is niet weggegooid maar verhuisd naar
+`OPGELOST` in `scripts/gezag.js`, met dezelfde tand: haal de koppeling weg en
+`npm run gezag` zakt. Een opgeloste bevinding die niets achterlaat, is een
+reparatie die de volgende ronde stil kan verdwijnen.
+
+Daarnaast stond `niveau: 'hand'` als kale tekenreeks in achttien Command-modules
+die `risico.js` niet importeerden: hernoem de trede en die achttien schrijven
+zwijgend het oude woord. Ook dat is dicht (TAKEN.md 4.55, `losseNiveaunamen` 22
+-> 0), en daar bleek de nul zelf zacht: de meter sloeg een bestand over zodra het
+de schaal ophaalde, ook als er een kale trede naast bleef staan.
 
 *En dezelfde fout een laag lager, waar hij het meest kost:* "wie handelt hier"
 stond op ZEVEN plekken op het verzoek -- `req.session`, `req.actor`,

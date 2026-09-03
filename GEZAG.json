@@ -63,11 +63,12 @@
       "bestuurt": "wat het concierge-bureau namens een lid uit handen krijgt"
     }
   ],
-  "tegenspraken": [
+  "tegenspraken": [],
+  "opgelost": [
     {
       "naam": "vergunning-of-aanvraag-afwijzen",
-      "wat": "ainiveau.js verbiedt de machine een aanvraag af te wijzen (niveau 4); stuur/beleid.js laat de AI precies dat als voorstel samenstellen, en magAutomatisch() wordt op die weg nooit aangeroepen.",
-      "ernst": "gesimuleerde wereld (server/kern/overheid + gemeente zijn demo, geen echte instantie), dus geen mens raakt vandaag een echte uitkering kwijt. De VORM is het bezwaar: de AI kiest bij \"wijs de volgende af\" zelf welk dossier het wordt, en de mens bevestigt een al ingevulde beslissing met een tik."
+      "wat": "De machine stelde een afwijzing samen EN koos zonder referentie zelf het dossier (arr[0] uit de lijst), terwijl ainiveau.js dat op niveau 4 zet.",
+      "hoe": "ambtenaar.js roept magAutomatisch() aan, geeft zijn reden door aan de mens die bevestigt, en weigert een dossier te kiezen zodra er geen referentie in de vraag staat."
     }
   ]
 }

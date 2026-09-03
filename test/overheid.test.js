@@ -402,16 +402,45 @@ test('16. De rijksbalie-AI behandelt een toeslag op referentie (ken toe)', async
   assert.notEqual(p.body.did, true);
 });
 
-test('17. De rijksbalie-AI pakt "de eerste subsidie" zonder referentie', async () => {
+test('17. De rijksbalie-AI kiest GEEN subsidie uit, en zegt waarom (TAKEN.md 4.56)', async () => {
+  /* HIER STOND HET DEFECT ALS BEWERING. Deze toets vroeg "wijs de eerste
+     subsidie af" en controleerde dat er daarna een subsidie was afgewezen -- de
+     machine koos dus zelf WIE het werd (arr[0] uit de lijst) en de ambtenaar
+     bevestigde een al ingevulde beslissing met een tik.
+
+     kern/stadsweefsel/ainiveau.js zei al dat 'een vergunning of aanvraag
+     afwijzen' niveau 4 is, "nooit zonder een expliciete menselijke beslissing",
+     maar magAutomatisch() werd op deze weg nooit aangeroepen. Nu wel, en de
+     reden staat in het antwoord. */
   const s = await api(base, '/api/supplier/overheid/subsidie', { regeling: 'innovatie', project: 'Slimme haven-sensoren', bedrag: 10000 }, partner);
   assert.equal(s.status, 200);
   const d = await api(base, '/api/supplier/ai', { q: 'wijs de eerste subsidie af' }, rijk);
-  assert.equal((await bevestigAi(d, rijk)).body.ok, true);
+  assert.match(d.body.reply, /kies geen subsidie/i, 'de machine kiest geen dossier meer');
+  assert.match(d.body.reply, /expliciete menselijke beslissing/,
+    'de reden komt letterlijk uit ainiveau.js en wordt hier niet overgeschreven');
+  assert.match(d.body.reply, /referentie/, 'en de weg erheen staat erbij');
+  assert.ok(!d.body.goedkeuringen || !d.body.goedkeuringen.length, 'er staat niets klaar om te bevestigen');
   const lijst = await api(base, '/api/supplier/overheid/subsidies', {}, partner);
-  assert.ok(lijst.body.subsidies.some(x => x.status === 'afgewezen'), 'een subsidie is afgewezen door de AI');
+  /* Eerst DAT er iets ligt: "geen enkele is afgewezen" slaagt op een lege lijst
+     vanzelf, en dan meet deze bewering niets (scripts/tandeloos.js). */
+  assert.ok(lijst.body.subsidies.length > 0, 'de aanvraag hierboven hoort in de lijst te staan');
+  assert.ok(!lijst.body.subsidies.some(x => x.status === 'afgewezen'), 'er is niets afgewezen');
 });
 
-test('18. De gemeentebalie-AI verleent de eerste vergunning', async () => {
+test('17b. MET een referentie stelt hij het voorstel wel samen -- en zegt dat het een afwijzing is', async () => {
+  /* De ambtenaar wijst het dossier zelf aan; dan is dit niveau 2 uit
+     ainiveau.js ("een mens keurt goed") en geen machine die kiest. */
+  const s = await api(base, '/api/supplier/overheid/subsidie', { regeling: 'innovatie', project: 'Kadeverlichting', bedrag: 4000 }, partner);
+  const ref = s.body.subsidie.ref;
+  const d = await api(base, '/api/supplier/ai', { q: 'wijs ' + ref + ' af' }, rijk);
+  assert.match(d.body.reply, /Dit is een afwijzing/, 'de mens leest waar hij voor tekent');
+  assert.match(d.body.reply, /expliciete menselijke beslissing/);
+  assert.equal((await bevestigAi(d, rijk)).body.ok, true, 'na bevestiging gaat hij wel door');
+  const lijst = await api(base, '/api/supplier/overheid/subsidies', {}, partner);
+  assert.ok(lijst.body.subsidies.some(x => x.ref === ref && x.status === 'afgewezen'));
+});
+
+test('18. De gemeentebalie-AI kiest geen vergunning uit, maar verleent er wel een op referentie', async () => {
   const g = await api(base, '/api/gemeente/vergunning', { soort: 'terras', omschrijving: 'Terras voor de zaak aan het plein' }, lid);
   assert.equal(g.status, 200);
   // log in als gemeente-medewerker
@@ -419,10 +448,21 @@ test('18. De gemeentebalie-AI verleent de eerste vergunning', async () => {
   const man = roster.body.staff.find(m => m.role === 'manager');
   const glog = await api(base, '/api/supplier/login', { code: 'GEMEENTE', staffId: man.id, pin: '1234' });
   const gem = glog.body.token;
+  /* OOK BIJ EEN TOEKENNING KIEST DE MACHINE NIET (TAKEN.md 4.56). De grens loopt
+     om de AANVRAAG en niet om het woord "afwijzen": "verleen de eerste
+     vergunning" koos net zo goed wie het werd, alleen met een andere uitkomst. */
   const d = await api(base, '/api/supplier/ai', { q: 'verleen de eerste vergunning' }, gem);
-  assert.equal((await bevestigAi(d, gem)).body.ok, true);
+  assert.match(d.body.reply, /kies geen vergunning/i);
   const mijn = await api(base, '/api/gemeente/vergunningen/mijn', {}, lid);
-  assert.ok(mijn.body.vergunningen.some(v => v.status === 'verleend'), 'een vergunning is verleend door de AI');
+  assert.ok(!mijn.body.vergunningen.some(v => v.status === 'verleend'), 'er is niets verleend');
+
+  /* Met de referentie erbij gaat het gewoon door: de ambtenaar wees het dossier aan. */
+  const ref = g.body.vergunning.ref;
+  const d2 = await api(base, '/api/supplier/ai', { q: 'verleen ' + ref }, gem);
+  assert.equal((await bevestigAi(d2, gem)).body.ok, true);
+  const mijn2 = await api(base, '/api/gemeente/vergunningen/mijn', {}, lid);
+  assert.ok(mijn2.body.vergunningen.some(v => v.ref === ref && v.status === 'verleend'),
+    'op naam van het dossier verleent hij wel');
 });
 
 /* Zelfde venster-afspraak als bij de gemeente (TAKEN.md 4.61): dezelfde melder,

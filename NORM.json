@@ -1679,9 +1679,9 @@
       "soort": "schuld",
       "sleutel": "keuringOmvang",
       "van": 284,
-      "vervalt": "2026-12-31",
+      "vervalt": "2027-03-31",
       "meter": "keuringOmvang 284 -> 286",
-      "reden": "Twee bestanden zijn onder de 10 kB-grens gebleven maar staan er nu vlak onder: server/kern/webauthn.js (10234) en server/opzet/kernlaag7.js (10121). Allebei door de zware poort: de eerste bouwt de tweede actiepoort, de tweede monteert hem. Aflossen is knippen -- kern/webauthn.js draagt registratie, login en beheer en heeft een natuurlijke naad tussen inloggen (wie ben je) en beheren (welke sleutels heb je). Niet in deze ronde gedaan omdat een knip in de passkeylaag zijn eigen toetsronde verdient en niet meelift op een andere."
+      "reden": "De knip die hier als openstaand werk stond, is in dezelfde ronde alsnog gedaan: het beheer (welke sleutels heeft dit account) is uit server/kern/webauthn.js gehaald en woont in server/kern/webauthn-beheer.js. De METER bleef toch op 286 staan, en dat is geen mislukking maar wat deze meter telt: hij telt bestanden VLAK ONDER de grens, en na de knip zit webauthn.js daar nog steeds (10103) met het nieuwe deel ernaast. Wat overblijft is server/opzet/kernlaag7.js, en dat is een montagebestand dat bij elke nieuwe kernmodule groeit -- daar helpt knippen pas als de zeven lagen zelf op de schop gaan, en dat is een eigen ronde. Aflossen betekent hier dus: de lagenindeling herzien, niet nog een bestand halveren."
     },
     {
       "datum": "2026-09-03",

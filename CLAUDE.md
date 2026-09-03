@@ -623,7 +623,14 @@ dit lid weg is. Par. 8: de persoonlijke stand zegt NOOIT "alles werkt"
 (beschikbaarheid wordt niet per lid gemeten) en houdt uit elkaar wat een storing
 IS en wat Service erover heeft GEMELD. Par. 9: foutsignalen op vingerafdruk,
 waarbij `gebruikers` op `null` staat MET de reden -- de foutingang is zonder
-inlog en kent geen mensen om te tellen. Par. 13 is bellen naar RTG BINNEN de app (geen
+inlog en kent geen mensen om te tellen. Par. 13c is RTMail als INGANG: post aan `hulp@` wordt een zaak, met de melder
+uit de identiteitskluis -- een besluit van de eigenaar met een prijs die
+uitgeschreven staat, want de mailingang wordt daarmee een LEESWEG NAAR DE KLUIS
+en draagt dus reden en journaalregel. De scherpste vraag daar is niet de kluis
+maar de AFZENDER: `From:` is door iedereen te typen, dus de kluis wordt pas
+bevraagd als DKIM of DMARC hem bevestigt (SPF alleen niet -- die spreekt over de
+envelop en niet over de From die wij opzoeken). Zonder stempel geen zaak, mét de
+reden en nooit stil. Par. 13 is bellen naar RTG BINNEN de app (geen
 provider, geen nummer, en de zaak ligt ernaast open): een dienst van Lifestyle en
 Business, terwijl EEN MENS dat nadrukkelijk niet is -- die ondergrens uit par. 3
 blijft voor elk account gelden, en de weigering om te bellen zegt er de weg naar

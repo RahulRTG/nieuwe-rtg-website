@@ -165,6 +165,16 @@
               : ((d && d.error) || 'Er ging iets mis.');
           });
       }));
+      /* EN HET ADRES, want een kanaal dat niemand kent bestaat niet. Het komt
+         van de server (kern/service/post.js is de enige plek waar het wordt
+         uitgerekend) en staat er alleen als de servicelaag hem meegeeft -- geen
+         adres in dit bestand overtypen. Het staat ONDER de knop: wie hier al
+         zit, meldt sneller met dit veld dan met zijn mailprogramma. */
+      svc('/api/service/keuzes').then(function (k) {
+        if (!k || !k.hulpAdres || !f.isConnected) return;
+        f.appendChild(el('p', null, 'Liever mailen? ' + k.hulpAdres +
+          ' -- dat wordt dezelfde melding. Mail vanaf het adres waarmee u bij RTG bekend bent.'));
+      }).catch(function () {});
       blok.appendChild(f);
       veld.focus();
     }

@@ -433,6 +433,64 @@ hergebruik draagt daarom nu een **vlag** (`hergebruikt`) en geen zin -- een
 gedragsgrens die aan een zin in `let` hangt, sneuvelt bij de eerste
 herformulering.
 
+## 13c. RTMail als ingang, en wat die keuze kost
+
+Het kanaal `mail` droeg in `klassen.js` de reden "RTMail heeft geen ingang die
+post aan een zaak koppelt". Post kwam wel binnen, maar belandde in een postvak
+waar niemand een wachtrij van maakt. Dat gat is gedicht: een bericht aan
+`hulp@rahultravelgroup.rtg` wordt een Servicezaak
+(`kern/service/post.js`).
+
+Het besluit van de eigenaar was dat de melder wordt teruggevonden **via de
+identiteitskluis**. Dat is een echte keuze met een echte prijs, en die prijs
+staat in de module uitgeschreven in plaats van in een toelichting: de mailingang
+wordt daarmee een **leesweg naar de kluis**. Een adres omzetten naar een codenaam
+is precies wat de scheiding uit CLAUDE.md tegenhoudt, dus die weg draagt dezelfde
+plichten als elke andere inzage — een reden, een regel in het inzagejournaal, en
+een aanroeper die te noemen is. Dat de aanroeper hier een systeem is en geen
+mens, maakt de regel niet lichter; het maakt hem alleen makkelijker te vergeten.
+De journaalregel hangt daarom aan de **opzoeking** en niet aan de zaak: ook als
+er geen zaak uit komt is er in de kluis gekeken, en juist die gevallen zijn de
+interessante.
+
+**Maar de scherpste vraag is niet de kluis — het is de afzender.** `From:` is
+door iedereen te typen. Wie op een vervalste From vertrouwt, opent een zaak op
+naam van een ánder lid; die zaak verschijnt daarna in de app van dat lid, met de
+tekst van een vreemde erin, en alles wat de behandelaar erover schrijft gaat naar
+de verkeerde. Dat is geen ongemak maar een lek. De kluis wordt daarom pas
+geraadpleegd als **DKIM of DMARC** de afzender bevestigt. SPF alleen is niet
+genoeg: die spreekt over de envelop-afzender en niet over de From die het lid
+ziet en die wij opzoeken. Zonder stempel geen opzoeking en geen zaak — en dat
+wordt gemeld, niet stil weggegooid, want post die verdwijnt is erger dan post die
+geweigerd wordt.
+
+Kennen wij het adres niet, dan komt er geen zaak. Niet uit strengheid: deze laag
+kent geen mensen en kan niemand beantwoorden die zij niet als melder kan noemen.
+Een wachtrij vullen waar niemand uit komt is erger dan hem niet vullen — dezelfde
+regel als in de hulp-la. Het antwoord wijst de weg die wel werkt.
+
+Twee kleinere dingen die er echt toe doen. Het adres staat op **één plek**, om
+dezelfde reden als in `kern/rtmail-wie.js`: zodra een tweede bestand uitrekent
+welk adres de servicebus is, kijken twee ingangen in een andere bus. En `hulp`
+staat nu op de gereserveerde lijst in `kern/rtmail-adres.js` — zonder die regel
+krijgt de eerste medewerker die zo heet dit adres als persoonlijk postvak, of
+erger: hij slokt de meldingen op die voor de wachtrij bedoeld waren. Precies waar
+die lijst voor bestaat.
+
+Twee bestanden zijn hierdoor over de omvangsgrens gegaan en opgeknipt, allebei
+op een naad die er al lag: `kern/service/klassen.js` zegt nu wat een zaak *is*
+(soort, doelgroep, kanaal, stand) en `kern/service/teams.js` wie eraan werkt --
+wie een stand toevoegt raakt het tweede bestand niet aan, en omgekeerd. En
+`kern/mailontvanger.js` draagt de ontvangertoets: dat is een *besluit over dit
+huis* (wie hier geen postvak heeft, krijgt geen post) en geen stap in de
+aannameketen, en beide deuren -- SMTP en HTTP -- stellen dezelfde vraag.
+
+Wat de toetsen **niet** dekken staat er even hard bij: er gaat geen écht
+ondertekend bericht door de hele buitenpoort, want daarvoor zou de proef zelf
+DKIM moeten kunnen ondertekenen. De keten tot en met de weigering is wel echt
+(`test/servicepost.test.js`, laatste toets, over `/api/mail/binnen`); de rest
+staat op moduleniveau.
+
 ## 14. Wat er staat, en wat er niet staat
 
 **Staat** (gemeten, met toetsen die zijn zien zakken):
@@ -457,15 +515,18 @@ herformulering.
 - de ingang voor een zaak, met het zaakprofiel aan de kantoorkant, en de
   werkplek erbij (`/apps/leverancier-service.html`);
 - de kwaliteitsmeting, met vooraan de maat die ertoe doet;
+- RTMail als ingang: post aan `hulp@` wordt een zaak, met de melder uit de
+  identiteitskluis en alleen op een bevestigde afzender (par. 13c);
 - bellen naar RTG binnen de app, voor Lifestyle en Business: de belknop in de
   hulp-la, het belscherm, de belrij en de aanneemkant in de cockpit, met aan
   beide zijden een meeleesbaan.
 
 **Staat niet**, met de reden en niet als lege functie:
 
-- **kanalen**: mail, telefoon, terugbellen en API staan in `klassen.js` met
-  `gebouwd: false` en een reden. Een zaak uit zo'n kanaal is dezelfde zaak;
-  alleen het transport ontbreekt, en wie er een bouwt raakt de zaak niet aan.
+- **kanalen**: telefoon, terugbellen en API staan in `klassen.js` met
+  `gebouwd: false` en een reden (mail staat er sinds par. 13c niet meer bij). Een
+  zaak uit zo'n kanaal is dezelfde zaak; alleen het transport ontbreekt, en wie er
+  een bouwt raakt de zaak niet aan.
 - **een koppeling met de incidentstand van RTG Command**: Service weet wat zij
   zelf heeft gemeld, niet wat de gezondheidskaart zegt. Die brug is bewust niet
   gelegd zolang de melderskant geen vermogen kan aanwijzen.

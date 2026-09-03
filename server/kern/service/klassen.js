@@ -101,7 +101,11 @@ const KANALEN = {
      provider, en geen nummer dat de kluis verlaat. Dienst van de Lifestyle- en
      Business Pass -- de STEM is premium, een mens is dat niet. */
   gesprek:     { naam: 'Gebeld in de app',   gebouwd: true },
-  mail:        { naam: 'Per e-mail',         gebouwd: false, waarom: 'RTMail heeft geen ingang die post aan een zaak koppelt.' },
+  /* Post aan `hulp@` wordt een zaak (kern/service/post.js). Twee dingen daar
+     zijn geen detail: de melder wordt via de identiteitskluis teruggevonden, en
+     dat gebeurt alleen als DKIM of DMARC de afzender bevestigt -- op een
+     vervalste From zou deze zaak in de app van iemand anders verschijnen. */
+  mail:        { naam: 'Per e-mail',         gebouwd: true },
   telefoon:    { naam: 'Telefonisch',        gebouwd: false, waarom: 'Geen provider en geen nummer. Bellen kan wel BINNEN de app; zie het kanaal "gesprek".' },
   terugbel:    { naam: 'Terugbelverzoek',    gebouwd: false, waarom: 'Volgt op telefonie; binnen de app belt men direct.' },
   api:         { naam: 'Via een koppeling',  gebouwd: false, waarom: 'Wacht op de App Store-brug.' }
@@ -125,42 +129,11 @@ const STANDEN = {
   gesloten:         { naam: 'Gesloten',           klokLoopt: false, eind: true }
 };
 
-/* ------------------------------------------------------------------ teams -- */
-/* Wat de melder ziet is "RTG Support". Dit is de binnenkant. Elk team noemt de
-   BEVOEGDHEDEN die zijn werk vraagt; ./machtiging.js geeft ze per zaak en
-   tijdelijk uit, en nooit permanent aan een mens. */
-/* WAAROM HIER OOK ZWAAR WERK IN STAAT. De eerste opzet hield de zware
-   capabilities uit deze tabel, "voor de zekerheid". Dat leverde een DODE TAK op:
-   ./machtiging.js versmalt naar wat het team nodig heeft, dus kon geen aanvraag
-   ooit zwaar werk bevatten, en de tweede-handtekening -- de duurste grendel van
-   deze laag -- werd nooit uitgevoerd terwijl de toets groen stond. Dezelfde fout
-   als de cap `rooms` uit PLATFORM.md. Zwaar werk staat dus bij het team dat het
-   doet; de grendel zit op de HANDELING (./machtiging.js ZWAAR), niet op de tabel. */
-const TEAMS = {
-  leden:      { naam: 'Service · Leden',        capabilities: ['zaak.lezen', 'lid.dossier', 'gegevens.uitvoer'] },
-  betalingen: { naam: 'Service · Betalingen',   capabilities: ['zaak.lezen', 'betaling.stand', 'bank.gegevens', 'geld.compensatie'] },
-  toegang:    { naam: 'Service · Toegang',      capabilities: ['zaak.lezen', 'identiteit.uitdaging', 'identiteit.openen'] },
-  zakelijk:   { naam: 'Service · Zakelijk',     capabilities: ['zaak.lezen', 'organisatie.stand', 'bank.gegevens'] },
-  techniek:   { naam: 'Service · Techniek',     capabilities: ['zaak.lezen', 'incident.koppelen'] },
-  concierge:  { naam: 'De Rechterhand',         capabilities: ['zaak.lezen'] },
-  veiligheid: { naam: 'Service · Veiligheid',   capabilities: ['zaak.lezen', 'identiteit.openen'] }
-};
-
-/* ------------------------------------------------------------ onderwerpen -- */
-/* De onderwerpen die de routering kent. Bewust kort: een lijst van veertig
-   onderwerpen wordt door de melder verkeerd gekozen en door de router genegeerd.
-   `team` is een VOORKEUR -- ./router.js mag ervan afwijken op grond van wie er
-   meldt, en legt dat dan uit. */
-const ONDERWERPEN = {
-  betaling:   { naam: 'Een betaling of uitbetaling', team: 'betalingen' },
-  bestelling: { naam: 'Een bestelling of levering',  team: 'leden' },
-  reis:       { naam: 'Een reis of boeking',         team: 'leden' },
-  account:    { naam: 'Inloggen of mijn account',    team: 'toegang' },
-  app:        { naam: 'De app of het scherm',        team: 'techniek' },
-  zaak:       { naam: 'Mijn zaak of organisatie',    team: 'zakelijk' },
-  veiligheid: { naam: 'Veiligheid of misbruik',      team: 'veiligheid' },
-  anders:     { naam: 'Iets anders',                 team: 'leden' }
-};
+/* De teams en de onderwerpen staan in ./teams.js -- zelfde kaart, andere vraag:
+   dit bestand zegt wat een zaak IS, dat bestand wie eraan werkt. Ze gaan hier
+   weer samen naar buiten, zodat geen enkele aanroeper hoeft te weten dat er twee
+   bestanden zijn. */
+const { TEAMS, ONDERWERPEN } = require('./teams');
 
 /* Een naam opzoeken zonder dat de aanroeper de kaart hoeft te kennen. Geeft de
    sleutel terug als hij onbekend is: liever een ruwe sleutel op het scherm dan

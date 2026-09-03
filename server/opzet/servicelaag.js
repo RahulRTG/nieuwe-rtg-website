@@ -25,10 +25,17 @@ const { idVanKey } = require('../lib/lidsleutel');
    niets en valt er niets om: de levering van een melding gaat nooit voor het
    bestaan van de zaak (kern/envelop.js, dezelfde afweging). */
 function hangOp(kern, hulp) {
+  const accounts = hulp.accounts;
   const { db, save, crypto } = hulp;
   Object.assign(kern, require('../kern/service')({
     db, save, crypto,
     inzagelog: require('../inzagelog'),
+    /* DE KLUIS GAAT MEE, EN MAAR VOOR EEN DING: de mailingang moet een adres
+       kunnen terugvoeren op een codenaam (kern/service/post.js). Dat is het
+       besluit van de eigenaar en niet een gemak -- de prijs ervan, een leesweg
+       naar de kluis met reden en journaalregel, staat in die module
+       uitgeschreven. Geen enkele andere module in deze laag krijgt hem. */
+    accounts,
     /* De twee live-kanalen voor het bellen. Deze laag legt zelf geen verbinding
        aan: zij geeft WebRTC-signalen door en kijkt niet in het pakket. */
     sseToCustomer: hulp.sseToCustomer, sseToOffice: hulp.sseToOffice,
@@ -38,6 +45,14 @@ function hangOp(kern, hulp) {
       hulp.sendPushToUser(id, { title: bericht.titel, body: bericht.tekst, tag: 'service-' + bericht.zaak });
     }
   }));
+
+  /* DE MAILINGANG AANZETTEN. kern/mailaanname.js is opgezet voordat deze laag
+     bestond en kent `hulp@` daarom pas vanaf hier. Zonder deze regel valt de
+     mailkant terug op "dit adres bestaat hier niet" -- geweigerd met een reden,
+     en dat is de juiste terugval. */
+  if (kern.mailAanname && typeof kern.mailAanname.zetServicePost === 'function') {
+    kern.mailAanname.zetServicePost(kern.servicePost);
+  }
 
   /* DE HAAK TERUG NAAR DE CHAT. kern/ai.js zette voor de RTG Pass hard
      `needsConcierge = false` en had daarmee geen enkele uitweg naar een mens.

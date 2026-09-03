@@ -164,3 +164,22 @@ test('de knop "ik wil een mens" staat er, en zet echt door', { skip: geenBrowser
     assert.equal(rij.zaken[0].stand, 'wachtOpMens');
   });
 });
+
+/* HET MAILADRES STAAT ER, EN KOMT VAN DE SERVER. Een kanaal dat niemand kent
+   bestaat niet; en een adres dat in dit scherm was overgetypt, zou de tweede
+   plek zijn die uitrekent welk adres de servicebus is (kern/service/post.js
+   legt uit waarom dat bij post een lek is en geen schoonheidsfout). */
+test('wie iets meldt, ziet ook waar hij het naartoe kan mailen', { skip: geenBrowser(pw) }, async () => {
+  await metLid(async (page, base) => {
+    await page.goto(base + '/apps/wallet.html', { waitUntil: 'domcontentloaded' });
+    await laHelemaalOpen(page);
+    await page.click('.bss-hulp button');            // "Iets melden"
+    await page.waitForFunction(() => /Liever mailen\?/.test(document.body.textContent), null, { timeout: 20000 });
+
+    /* Uit de BRON en niet overgetypt: verhuist het domein, dan verhuist deze
+       toets mee in plaats van stil te blijven staan op het oude adres. */
+    const adres = 'hulp@' + require('../server/kern/rtmail-adres').domeinVoor('kantoor');
+    const tekst = await page.evaluate(() => document.body.textContent);
+    assert.ok(tekst.includes(adres), 'het serviceadres staat niet in de hulp-la: ' + adres);
+  });
+});

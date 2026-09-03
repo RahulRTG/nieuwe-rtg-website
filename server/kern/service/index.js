@@ -20,7 +20,7 @@
    er een bouwt, hoeft aan deze bedrading niets te veranderen. */
 'use strict';
 
-module.exports = function maakService({ db, save, crypto, inzagelog, notify, sseToCustomer, sseToOffice }) {
+module.exports = function maakService({ db, save, crypto, inzagelog, notify, sseToCustomer, sseToOffice, accounts }) {
   const zaken = require('./zaak')({ db, save, crypto });
   const loop = require('./loop')({ zaken, save, notify });
   const machtigingen = require('./machtiging')({ db, save, crypto, zaken, inzagelog });
@@ -45,6 +45,11 @@ module.exports = function maakService({ db, save, crypto, inzagelog, notify, sse
      omdat hij allebei nodig heeft en zelf niets bewaart. */
   const onderzoeker = require('./onderzoeker')({ zaken, loop, machtigingen, bevestiging, save });
 
+  /* RTMail als INGANG. Hij hangt achteraan omdat hij zaken opent en verder
+     niets bezit, en hij krijgt als enige in deze laag de identiteitskluis mee --
+     met de plichten die daarbij horen; zie ./post.js. */
+  const post = require('./post')({ zaken, loop, accounts, inzagelog });
+
   const mens = require('./mens');
   const router = require('./router');
   const prioriteit = require('./prioriteit');
@@ -63,6 +68,11 @@ module.exports = function maakService({ db, save, crypto, inzagelog, notify, sse
          toont wat er is, laat een lezer denken dat de rest niet bestaat in
          plaats van dat hij nog niet is aangesloten. */
       nogNiet: Object.entries(klassen.KANALEN).filter(([, k]) => !k.gebouwd).map(([id, k]) => ({ id, naam: k.naam, waarom: k.waarom })),
+      /* HET SERVICEADRES, want anders bestaat het kanaal wel en weet niemand
+         het. Het komt uit ./post.js en wordt hier niet overgetypt -- een tweede
+         plek die uitrekent welk adres de servicebus is, is precies waar twee
+         ingangen in een andere bus gaan kijken. */
+      hulpAdres: post.hulpAdres(),
       teams: router.keuzelijst(),
       prioriteiten: Object.entries(prioriteit.LADDER).map(([id, p]) => ({ id, naam: p.naam, wat: p.wat }))
     };
@@ -81,6 +91,7 @@ module.exports = function maakService({ db, save, crypto, inzagelog, notify, sse
     serviceMachtiging: machtigingen, serviceBevestiging: bevestiging,
     servicePatronen: patronen, servicePersoonlijk: persoonlijk, serviceFoutsignaal: foutsignalen,
     serviceKwaliteit: kwaliteit, serviceGesprek: gesprekken, serviceOnderzoeker: onderzoeker,
+    servicePost: post,
     serviceMens: mens, serviceRouter: router, servicePrioriteit: prioriteit,
     serviceKlassen: klassen, serviceKeuzes: keuzes
   };

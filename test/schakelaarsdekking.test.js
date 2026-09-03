@@ -137,10 +137,21 @@ test('4. elke route hoort bij een functie of bij de bediening', () => {
      hier BENOEMD is), en dat stond hij voordat dit getal werd verzet. Zonder die
      volgorde is een hoger getal alleen een zachtere meter.
 
+     135 -> 139, EN DIE VIER ZIJN DE SLOTEN OP DE BEDIENING ZELF. Het loket dat
+     een zware bevestiging start (techniek en boardroom) en het inrichten,
+     aflezen en afbreken van het herstelquorum (EIGENAAR.md par. 5). Geen ervan
+     hoort aan een schakelaar: een knop waarmee je de bevestiging van een
+     eigendomsoverdracht uitzet, is de eerste knop waar iemand die binnen is
+     naar zoekt -- en afbreken moet kunnen ook als het huis half uitstaat. De
+     herstelWEG zelf is wel schakelbaar (functie `eigenaarherstel`), want dat is
+     een uitgang en geen slot. Alle vier staan met hun reden in
+     kern/bestuursroutes.js, en test/platformregister.test.js was groen voordat
+     dit getal werd verzet -- dezelfde volgorde als de vorige twee keer.
+
      De scherpe controle hierboven (`onverklaard <= 10`) is de echte poort en die
      beweegt NIET mee: een route zonder functie EN zonder register blijft
      verboden. */
-  assert.ok(zonder.length <= 135,
+  assert.ok(zonder.length <= 139,
     zonder.length + ' routes hangen aan geen enkele functie. Dat is de bediening van ' +
     'het platform (boardroom, techniek, gezondheid, isolatie) en die hoort niet schakelbaar ' +
     'te zijn, maar bij deze aantallen is er iets anders aan de hand.');

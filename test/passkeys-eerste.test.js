@@ -24,14 +24,24 @@ const PAGINA = path.join(__dirname, '..', 'public', 'apps', 'passkeys.html');
 
 /* De kleinst mogelijke DOM: elk element onthoudt zijn klassen en verder niets.
    Meer nabootsen zou betekenen dat deze toets een browser gaat naspelen, en dan
-   toetst hij zijn eigen nabootsing. */
+   toetst hij zijn eigen nabootsing.
+
+   ER WORDT HIER NIET OP DE KLOK GEWACHT. De pagina beslist asynchroon welk blok
+   verschijnt (hij vraagt eerst de lijst op), dus een toets zou geneigd zijn een
+   pauze in te lassen. Dat is precies de gewoonte die test/klokwacht.test.js
+   tegenhoudt: een pauze is een gok over hoe snel de machine is. In plaats
+   daarvan meldt de stub het MOMENT waarop een van de twee blokken zichtbaar
+   wordt, en daar wacht de toets op -- op een toestand dus, niet op een tijd. */
 function maakDom(html) {
   const elementen = new Map();
+  let meldZichtbaar = () => {};
+  const zichtbaarGeworden = new Promise((res) => { meldZichtbaar = res; });
   const maak = (id) => {
     const klassen = new Set(/class="([^"]*)"/.exec(
       new RegExp('id="' + id + '"[^>]*').exec(html)?.[0] || '')?.[1]?.split(/\s+/) || []);
     return { id, classList: {
-      add: (k) => klassen.add(k), remove: (k) => klassen.delete(k),
+      add: (k) => klassen.add(k),
+      remove: (k) => { klassen.delete(k); if (k === 'weg' && (id === 'vBeheer' || id === 'vGeenSessie')) meldZichtbaar(id); },
       contains: (k) => klassen.has(k) }, verborgen: () => klassen.has('weg'),
       addEventListener() {}, textContent: '', value: '', appendChild() {}, innerHTML: '' };
   };
@@ -39,7 +49,7 @@ function maakDom(html) {
     if (!elementen.has(m[1])) elementen.set(m[1], maak(m[1]));
   return {
     querySelector: (kies) => elementen.get(String(kies).replace(/^#/, '')) || maak('los'),
-    elementen
+    elementen, zichtbaarGeworden
   };
 }
 
@@ -64,7 +74,7 @@ function draai({ token, lijstStatus }) {
 
 test('1. zonder sessie wijst het scherm de weg naar de eerste passkey', async () => {
   const dom = draai({ token: null, lijstStatus: 200 });
-  await new Promise(r => setTimeout(r, 20));
+  assert.equal(await dom.zichtbaarGeworden, 'vGeenSessie', 'er verschijnt een blok, en het is dit');
   assert.equal(dom.querySelector('#vGeenSessie').verborgen(), false,
     'wie geen sessie heeft, hoort te LEZEN hoe hij aan zijn eerste passkey komt');
   assert.equal(dom.querySelector('#vBeheer').verborgen(), true,
@@ -73,7 +83,7 @@ test('1. zonder sessie wijst het scherm de weg naar de eerste passkey', async ()
 
 test('2. met een geldige sessie staat het beheer er, en de uitleg niet', async () => {
   const dom = draai({ token: 'een-token', lijstStatus: 200 });
-  await new Promise(r => setTimeout(r, 20));
+  assert.equal(await dom.zichtbaarGeworden, 'vBeheer');
   assert.equal(dom.querySelector('#vBeheer').verborgen(), false, 'hier maak je ze aan');
   assert.equal(dom.querySelector('#vGeenSessie').verborgen(), true,
     'en dan is de uitleg over inloggen alleen maar ruis');
@@ -81,7 +91,7 @@ test('2. met een geldige sessie staat het beheer er, en de uitleg niet', async (
 
 test('3. een token dat de server weigert telt als geen sessie', async () => {
   const dom = draai({ token: 'verlopen', lijstStatus: 401 });
-  await new Promise(r => setTimeout(r, 20));
+  assert.equal(await dom.zichtbaarGeworden, 'vGeenSessie');
   assert.equal(dom.querySelector('#vGeenSessie').verborgen(), false,
     'een verlopen token hoort dezelfde weg te wijzen als geen token -- anders is het scherm ' +
     'leeg voor iemand die gisteren nog was ingelogd');

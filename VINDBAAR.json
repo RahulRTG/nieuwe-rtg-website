@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-03T20:59:38.863Z",
-    "commit": "0fdf9ac2b",
-    "boomVuil": false,
-    "boomAnders": 1,
+    "op": "2026-09-03T21:52:43.697Z",
+    "commit": "13d8b6452",
+    "boomVuil": true,
+    "boomAnders": 6,
     "instrument": "scripts/vindbaar.js",
     "node": "v24.18.0"
   },
@@ -12,8 +12,8 @@
   "drempel": 3,
   "bestemmingen": 89,
   "woorden": 1083,
-  "gevonden": 700,
-  "dekking": 0.6464,
+  "gevonden": 701,
+  "dekking": 0.6473,
   "perBestemming": [
     {
       "naam": "Magnaat",
@@ -681,17 +681,6 @@
       ]
     },
     {
-      "naam": "Passkeys",
-      "url": "/apps/passkeys.html",
-      "woorden": 5,
-      "gevonden": 2,
-      "mist": [
-        "eerste",
-        "inloggen",
-        "inlog"
-      ]
-    },
-    {
       "naam": "Loon",
       "url": "/apps/loonstrook.html",
       "woorden": 4,
@@ -730,6 +719,16 @@
       "mist": [
         "strenger",
         "weer"
+      ]
+    },
+    {
+      "naam": "Passkeys",
+      "url": "/apps/passkeys.html",
+      "woorden": 5,
+      "gevonden": 3,
+      "mist": [
+        "eerste",
+        "inloggen"
       ]
     },
     {

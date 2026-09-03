@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-03T19:53:26.296Z",
-  "commit": "f83337847",
-  "boomVuil": false,
-  "boomAnders": 1,
+  "op": "2026-09-03T21:52:46.506Z",
+  "commit": "13d8b6452",
+  "boomVuil": true,
+  "boomAnders": 6,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v24.18.0"
  },
@@ -29214,7 +29214,7 @@
    "semantiek": {
     "klasse": "nietHerhaalbaar"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": null,
     "uitHandler": null,
@@ -29233,7 +29233,7 @@
    "semantiek": {
     "klasse": "nietHerhaalbaar"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": null,
     "uitHandler": null,
@@ -29252,7 +29252,7 @@
    "semantiek": {
     "klasse": "nietHerhaalbaar"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "PUBLIC",
     "uitHandler": null,
@@ -29271,7 +29271,7 @@
    "semantiek": {
     "klasse": "nietHerhaalbaar"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "PUBLIC",
     "uitHandler": null,
@@ -55316,7 +55316,7 @@
    "semantiek": {
     "klasse": "nietHerhaalbaar"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -119978,7 +119978,7 @@
    "semantiek": {
     "klasse": "nietHerhaalbaar"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -120056,7 +120056,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -120078,7 +120078,7 @@
    "semantiek": {
     "klasse": "nietHerhaalbaar"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -120100,7 +120100,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -125496,7 +125496,7 @@
    "semantiek": {
     "klasse": "nietHerhaalbaar"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "een eigen RTG-account",

@@ -284,4 +284,23 @@ function versheid(gemeten, huidigeCommit) {
 
 const nuCommit = () => git(['rev-parse', '--short', 'HEAD']) || null;
 
-module.exports = { stempel, eisSchoneBoom, versheid, vuileBoom, sluiting, nuCommit, CODEPADEN, WORTEL };
+/* HET STEMPEL VAN EEN REGISTER, waar het ook staat. De meeste registers zetten
+   het onder `stempel`; POORTWACHT.json zet het onder `gemeten`, met dezelfde
+   velden erin. scripts/versheid.js ving dat al op met een eigen regel, en
+   scripts/vertrouwen.js niet -- die zag POORTWACHT als "geen stempel" en liet
+   hem daarmee buiten de ouderdomsmeting EN buiten de vastlegpoort. Twee lezers
+   voor dezelfde vraag is de dubbele-waarheid-vorm van LAT.md regel 4; sindsdien
+   staat hij hier, en gebruiken beide hem.
+
+   `undefined` betekent: het bestand is er niet. `null` betekent: het is er wel
+   en het draagt geen stempel. Die twee zijn niet hetzelfde -- een ontbrekend
+   register telt niet mee, een register zonder stempel is een probleem. */
+function stempelVanRegister(pad) {
+  try {
+    const j = JSON.parse(require('fs').readFileSync(pad, 'utf8'));
+    return j.stempel || (j.gemeten && j.gemeten.op ? j.gemeten : null);
+  } catch (e) { return undefined; }
+}
+
+module.exports = {
+  stempelVanRegister, stempel, eisSchoneBoom, versheid, vuileBoom, sluiting, nuCommit, CODEPADEN, WORTEL };

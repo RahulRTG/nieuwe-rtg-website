@@ -42,7 +42,7 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
-const { stempel, eisSchoneBoom, versheid, nuCommit } = require('./lib/stempel');
+const { stempel, eisSchoneBoom, versheid, nuCommit, stempelVanRegister } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'VERTROUWEN.json');
@@ -134,7 +134,12 @@ function ouderdom(nu, lees) {
   for (const naam of BRONNEN) {
     let j;
     try { j = JSON.parse(lezer(naam)); } catch (e) { continue; }
-    const op = j && j.stempel && j.stempel.op;
+    /* Via de gedeelde lezer, want niet elk register zet zijn stempel onder
+       dezelfde naam: POORTWACHT.json gebruikt `gemeten`. Deze regel las alleen
+       `stempel`, en liet dat register daarmee stil buiten de ouderdomsmeting --
+       terwijl scripts/versheid.js het al wel goed deed. */
+    const st = j && (j.stempel || (j.gemeten && j.gemeten.op ? j.gemeten : null));
+    const op = st && st.op;
     if (!op) continue;
     const dagen = (nu - new Date(op).getTime()) / 86400000;
     bronnen[naam] = { op, dagen: Math.round(dagen * 10) / 10 };
@@ -240,7 +245,7 @@ function poortVoorSchrijven(watIsHet) {
   for (const bron of BRONNEN) {
     let j = null;
     try { j = JSON.parse(fs.readFileSync(path.join(WORTEL, bron), 'utf8')); } catch (e) { continue; }
-    const v = versheid(j.stempel, nu);
+    const v = versheid(j.stempel || (j.gemeten && j.gemeten.op ? j.gemeten : null), nu);
     if (!v.vers) oud.push(bron + ' -- ' + v.reden);
   }
   if (oud.length) {

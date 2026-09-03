@@ -28,7 +28,7 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
-const { versheid, nuCommit, WORTEL } = require('./lib/stempel');
+const { versheid, nuCommit, WORTEL, stempelVanRegister } = require('./lib/stempel');
 
 /* De registers die een instrument bijhoudt, met het instrument erbij -- zodat
    de uitslag niet alleen zegt DAT iets achterloopt maar ook wat je moet draaien.
@@ -122,11 +122,10 @@ const REGISTERS = [
    DEKKING.json zette zijn tijdstempel vanaf het begin onder `gemeten`, de rest
    krijgt hem onder `stempel`. Een van de twee hernoemen zou een bestand breken
    dat een toets al leest; hier wordt het op EEN plek opgevangen. */
+/* Woont sinds 3 september in scripts/lib/stempel.js, omdat vertrouwen.js
+   dezelfde vraag stelde met een eigen (en onvolledig) antwoord. */
 function stempelVan(naam) {
-  try {
-    const j = JSON.parse(fs.readFileSync(path.join(WORTEL, naam), 'utf8'));
-    return j.stempel || (j.gemeten && j.gemeten.op ? j.gemeten : null);
-  } catch (e) { return undefined; }   // undefined = het bestand is er niet
+  return stempelVanRegister(path.join(WORTEL, naam));
 }
 
 /* HET REGISTER ZEGT ZELF HOE HET WORDT VERVERST, en dat wint van de tabel

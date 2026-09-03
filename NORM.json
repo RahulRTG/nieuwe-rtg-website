@@ -10,7 +10,7 @@
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 18,
     "e2eBestanden": 201,
-    "keuringOmvang": 286,
+    "keuringOmvang": 287,
     "keuringDubbeling": 163,
     "keuringDekkingAdvies": 52,
     "endpointsNooitAangeraakt": 0,
@@ -22,10 +22,10 @@
     "inlineStijlAttributen": 4977,
     "browserpoortToetsen": 319,
     "kernBreedte": 1544,
-    "kernGedeeld": 234,
+    "kernGedeeld": 237,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 547,
+    "toetsenNietGemeten": 550,
     "toetsenOngevoeligPct": 1,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
@@ -1693,6 +1693,33 @@
       "vervalt": "2026-12-31",
       "meter": "toetsenNietGemeten 546 -> 547",
       "reden": "test/eigenaarbevestiging.test.js is nieuw en de mutatiemotor is er nog niet overheen geweest. De twee mutaties die ertoe doen zijn WEL met de hand gedaan en beide zakten: de poort uit /api/techniek/toegang halen (2 rood) en de twee woordenlijsten laten overlappen (2 rood). Dat is geen vervanging voor de motor -- die probeert wat een mens niet bedenkt -- maar het is ook niet niets. Aflossen is de motor erover laten lopen."
+    },
+    {
+      "datum": "2026-09-03",
+      "soort": "structureel",
+      "sleutel": "kernGedeeld",
+      "van": 234,
+      "meter": "kernGedeeld 234 -> 237",
+      "reden": "Het herstelquorum (kern/eigenaarherstel.js, kern/herstelquorum.js) hangt als kern.eigenaarherstel op de kern en wordt door de techniek-ingang gelezen; daarnaast reiken die routes naar webauthn en de twee inlogremmen. Drie namen erbij, en alle drie horen ze bij EEN weg terug naar het eigenaarsaccount. Het alternatief -- de herstelroutes hun eigen webauthn-laag en hun eigen rem geven -- zou deze meter sparen en een tweede registratieweg opleveren die naast de bestaande uit elkaar loopt.",
+      "waarheen": "GRENZEN.json draagt de reikwijdte (het domein techniek noemt eigenaarherstel, webauthn, tooManyTries en noteFailedTry bij naam en krijgt niets anders erbij), afgedwongen door server/opzet/domeingrens.js. De werking draagt test/eigenaarherstel-routes.test.js: zeven loketten over de echte routes, met de remmen en poorten die er in het echt omheen staan."
+    },
+    {
+      "datum": "2026-09-03",
+      "soort": "schuld",
+      "sleutel": "keuringOmvang",
+      "van": 286,
+      "meter": "keuringOmvang 286 -> 287",
+      "vervalt": "2027-03-31",
+      "reden": "server/routes/techniek.js staat nu vlak onder de grens (10153) doordat er een submodule bij kwam. Dezelfde soort schuld als de vorige regel op deze meter: aflossen is de montagevolgorde van dat bestand herzien, niet nog een bestand halveren. De herstelmodules zelf zijn met opzet klein gehouden (kern 6.4 kB, routes 6.4 kB) en de rekenkant staat los van de ceremonie."
+    },
+    {
+      "datum": "2026-09-03",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 547,
+      "meter": "toetsenNietGemeten 547 -> 550",
+      "vervalt": "2027-03-31",
+      "reden": "Drie nieuwe toetsbestanden (herstelquorum, eigenaarherstel, eigenaarherstel-routes) waar de mutatiemotor nog niet overheen is geweest. Met de hand zijn er VIER mutaties gedaan en alle vier gezien zakken: de wachttijd weghalen, afbreken zonder effect maken, de poort uit een route halen, en de twee woordenlijsten laten overlappen. Dat is geen vervanging voor de motor -- die probeert wat een mens niet bedenkt -- maar het is ook niet niets. Aflossen is de motor erover laten lopen."
     }
   ],
   "prestatie": {

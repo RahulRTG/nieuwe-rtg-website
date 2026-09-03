@@ -505,7 +505,7 @@ test('passkey-first opent zonder e-mailadres en landt op de lege wereldkiezer',
       await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ token }) });
     });
 
-    /* `waitUntil: 'load'` wacht op ELK subverzoek -- elk plaatje, elk lettertype
+    /* `waitUntil: 'domcontentloaded'` wacht op ELK subverzoek -- elk plaatje, elk lettertype
        -- terwijl de regel eronder al op het echte teken wacht. Dat is meer
        wachten dan de beweringen nodig hebben, en onder belasting viel het om op
        zijn 45 seconden: een rode uitslag zonder dat er iets stuk was. Dezelfde
@@ -584,7 +584,7 @@ test('na inloggen landt een lid rechtstreeks op de lege wereldkiezer',
       localStorage.setItem('rtg_cookieinfo_v1', '1');
       window.MutationObserver = class { observe() {} disconnect() {} takeRecords() { return []; } };
     }, token);
-    /* `waitUntil: 'load'` wacht op ELK subverzoek -- elk plaatje, elk lettertype
+    /* `waitUntil: 'domcontentloaded'` wacht op ELK subverzoek -- elk plaatje, elk lettertype
        -- terwijl de regel eronder al op het echte teken wacht. Dat is meer
        wachten dan de beweringen nodig hebben, en onder belasting viel het om op
        zijn 45 seconden: een rode uitslag zonder dat er iets stuk was. Dezelfde
@@ -650,7 +650,7 @@ test('na inloggen landt een lid rechtstreeks op de lege wereldkiezer',
         bladen: [{ url: '/apps/geld-command.html', titel: 'Geld' },
           { url: '/apps/media.html', titel: 'Media' }], actief: 1 }));
     });
-    await page.reload({ waitUntil: 'load', timeout: 45000 });
+    await page.reload({ waitUntil: 'domcontentloaded', timeout: 45000 });
     /* Op .cmd-pane.actief en niet op .cmd-pane: er komen er twee terug en het
        geheugen zegt dat het TWEEDE actief is, dus blad 0 staat verborgen.
        Wachten op de eerste treffer wacht dan op iets wat nooit zichtbaar wordt

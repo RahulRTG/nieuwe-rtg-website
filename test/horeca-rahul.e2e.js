@@ -57,12 +57,12 @@ test('de manager ziet wat Rahul deed en wat wacht, en bevestigt met zijn naam er
     const page = await ctx.newPage();
     const fouten = [];
     letOpFouten(page, fouten);
-    await page.goto(base + '/apps/horeca-beheer.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/horeca-beheer.html', { waitUntil: 'domcontentloaded' });
     await page.evaluate(t => {
       localStorage.setItem('rtg_cookieinfo_v1', '1');
       localStorage.setItem('rtg_sup_token', t);
     }, tok);
-    await page.goto(base + '/apps/horeca-beheer.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/horeca-beheer.html', { waitUntil: 'domcontentloaded' });
     /* De kaart tekent zich in TWEE stappen, en lees() hieronder leest ze allebei:
        /rahul/bonnen zet de bonnenlijst neer, en pas dáárna vult /rahul/register de
        zin over de grens. Wachten op alleen de bonnen treft die zin dus nog leeg

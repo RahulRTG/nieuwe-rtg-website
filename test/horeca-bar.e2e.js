@@ -45,14 +45,14 @@ test('het barscherm toont de stapel en de ronden, en zet een glas door',
     const fouten = [];
     letOpFouten(page, fouten);
 
-    await page.goto(base + '/apps/horeca-bar.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/horeca-bar.html', { waitUntil: 'domcontentloaded' });
     await page.evaluate(() => {
       localStorage.setItem('rtg_cookieinfo_v1', '1');
       localStorage.removeItem('rtg_sup_token');
       localStorage.removeItem('rtg_horeca_hand');
       localStorage.removeItem('rtg_horeca_hand-vast');
     });
-    await page.goto(base + '/apps/horeca-bar.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/horeca-bar.html', { waitUntil: 'domcontentloaded' });
     /* De deur komt niet uit het HTML maar wordt na het laden getekend
        (RTGHoreca.poort() doet dat in een setTimeout). We wachten dus tot hij er
        staat -- OF tot de pagina alsnog ergens anders heen ging, want juist dat
@@ -91,7 +91,7 @@ test('het barscherm toont de stapel en de ronden, en zet een glas door',
     await tafel('BAR-B', [{ naam: 'Gin-tonic', aantal: 1 }]);
 
     await page.evaluate(t => { localStorage.setItem('rtg_sup_token', t); }, tok);
-    await page.goto(base + '/apps/horeca-bar.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/horeca-bar.html', { waitUntil: 'domcontentloaded' });
     /* De tellers staan in het HTML op "-" en krijgen pas een waarde als teken()
        heeft gedraaid, en dat gebeurt alleen NA het antwoord van /bar. Een teller
        die niet meer "-" is, betekent dus: het bord is een keer met echte

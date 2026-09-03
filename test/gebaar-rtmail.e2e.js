@@ -78,7 +78,7 @@ test('een veeg bergt post op, de weg terug haalt hem terug, en een weigering ook
       localStorage.setItem('rtg_member_token', tok);
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, reg.token);
-    await page.goto(base + '/apps/rtmail.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/rtmail.html', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#main .rij[data-i].gb-rij', { timeout: 20000 });
 
     // 1. doorvegen bergt het bericht ECHT op, en opent het NIET

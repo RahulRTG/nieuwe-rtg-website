@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-03T09:16:38.910Z",
-    "commit": "f021f3cb",
+    "op": "2026-09-03T10:44:10.112Z",
+    "commit": "f03615bf",
     "boomVuil": true,
-    "boomAnders": 3,
+    "boomAnders": 28,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -7268,6 +7268,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 5,
       "scherp": "gezakt"
+    },
+    "wachtwijze.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/wachtwijze.js",
+      "operator": ">=->>#0",
+      "gezakt": 1,
+      "geprobeerd": 2
     },
     "wauw.test.js": {
       "soort": "server",

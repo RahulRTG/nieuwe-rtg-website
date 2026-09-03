@@ -54,6 +54,11 @@ const GEISOLEERD = [
      binnenkomt. Alle drie staan in een finally terug; alle drie zijn ze in die
      halve seconde het bestand dat een startende server leest. */
   'handeling-massa.test.js',
+  /* En de zesde (TAKEN.md 4.67): wachtwijze.test.js zet een `waitUntil` in twee
+     echte schermtoetsen om en haalt het woord `load` uit een reden, om te
+     bewijzen dat de meter zakt. Allebei in een finally terug -- en juist die
+     halve seconde is waarin een andere ronde dat bestand leest. */
+  'wachtwijze.test.js',
   /* ERBIJ OP 22 AUGUSTUS 2026, en met een eerlijke slag om de arm. Deze toets
      slaagt drie van de drie keer alleen en zakte in CI binnen een scherf van 272
      bestanden op 'de zaak laat achteraf betalen' -- een betaalinstelling van een

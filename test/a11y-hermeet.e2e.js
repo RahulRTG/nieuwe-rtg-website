@@ -77,7 +77,7 @@ test('de tweede meting laat een echte contrastfout staan en een voorbijgaande va
     /* Een scherm dat zelf schoon is, zodat wat er gemeten wordt van deze toets
        komt en niet van de pagina. Blijkt het scherm zelf iets te melden, dan
        zegt de toets dat en meet hij niet stil iets anders. */
-    await page.goto(base + '/site/404.html', { waitUntil: 'load' });
+    await page.goto(base + '/site/404.html', { waitUntil: 'domcontentloaded' });
     await stilNaLaden(page);   // de bewering hieronder geldt over het UITGEVERFDE scherm
     const schoon = await page.evaluate(KEUR);
     assert.equal(telContrast(schoon), 0, 'het meetscherm is zelf schoon');
@@ -102,7 +102,7 @@ test('de tweede meting laat een echte contrastfout staan en een voorbijgaande va
     assert.equal(telContrast(echt), 1, 'en de tweede meting ziet hem nog steeds');
 
     /* 2. voorbijgaand -- moet vallen, want dat is waar deze routine voor is */
-    await page.goto(base + '/site/404.html', { waitUntil: 'load' });
+    await page.goto(base + '/site/404.html', { waitUntil: 'domcontentloaded' });
     /* Pas als de grond van de pagina zelf stilstaat, is de enige veranderende
        grond die van de meetregel -- en dat is wat deze stap wil aantonen. */
     await stilNaLaden(page);
@@ -112,7 +112,7 @@ test('de tweede meting laat een echte contrastfout staan en een voorbijgaande va
 
     /* 3. en zonder bevinding wordt er niet twee keer gemeten: de routine geeft
        de eerste uitkomst ongewijzigd terug. */
-    await page.goto(base + '/site/404.html', { waitUntil: 'load' });
+    await page.goto(base + '/site/404.html', { waitUntil: 'domcontentloaded' });
     /* Hier is de wacht het scherpst: telt het scherm nog een bevinding omdat er
        iets aan het veranderen was, dan meet hermeet twee keer en zakt de telling
        hieronder op 2 -- op iets dat niets met deze bewering te maken heeft. */

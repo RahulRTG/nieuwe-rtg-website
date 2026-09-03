@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1541 bestanden en 11001 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1542 bestanden en 11010 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1541 |
-| losse beweringen (`test(...)`) | 11001 |
+| toetsbestanden | 1542 |
+| losse beweringen (`test(...)`) | 11010 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 57 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1024 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1025 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 48 |
 | alleen in de kop *genoemd*, nog niet gemeten | 143 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1348 bestanden, 10674 beweringen.
+1349 bestanden, 10683 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1296,6 +1296,7 @@ toets omvalt.
 | `wachtdeur.test.js` | 2 | gezakt op `liegpoort /api/` | DE WACHT AAN DE VOORDEUR -- DE DRAAD, NIET DE MOTOR. WAAROM DEZE TOETS ER IS. |
 | `wachter.test.js` | 10 | gezakt op `===->!==#0` | De storingswachter: de automaat van de schakelkast (server/functies/wachter.js). Elke regel van de wachter staat hier als eigen toets, want elke regel kan afzonderlijk wegvallen zonder dat de anderen het merken: 1. |
 | `wachtlijst.test.js` | 5 | gezakt op `liegpoort /api/` | De wachtlijst en de gemiste afspraak (kern/care/wachtlijst.js). Twee grenzen die deze laag draagt, en die allebei makkelijk te overschrijden zijn zonder dat iemand het merkt: 1. |
+| `wachtwijze.test.js` | 9 | gezakt op `>=->>#0` | DE WACHTWIJZE VAN DE SCHERMTOETSEN (scripts/wachtwijze.js + WACHTWIJZE.json). WAAROM DEZE TOETS ER IS. |
 | `wachtwoordkosten.test.js` | 4 | -- | De scrypt-kosten en het migratiepad. Waar dit over gaat: de opgeslagen wachtwoordhash droeg vroeger geen enkele parameter (`salt:hash`), en daardoor was de scrypt-kostenfactor niet te verhogen zonder elk bestaand... |
 | `wauw.test.js` | 4 | gezakt op `liegpoort /api/` | De wauw-laag (kern/wauw.js): de dag-stemming (vaste 9+-lijst) en de verjaardagsglans die overal naast de codenaam meereizen (Pulse, Berichten), het Moment van de week in de Pulse-feed en De Terugblik op je sociale week. |
 | `wbw.test.js` | 4 | gezakt op `liegpoort /api/` | Wie betaalt wat: het gedeelde uitgavenlijstje van Salon-vrienden. Uitgaven worden sluitend verdeeld in centen; de balans klopt altijd op nul; wie rood staat betaalt het eigen deel in een tik via RTG Pay (idempotent);... |

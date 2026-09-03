@@ -95,7 +95,7 @@ test('een veeg archiveert een post en draait terug; bewaren drukt de knop in en 
       localStorage.setItem('rtg_member_token', tok);
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, reg.token);
-    await page.goto(base + '/apps/salon.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/salon.html', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#main article.post.gb-rij', { timeout: 20000 });
     /* De feed staat niet leeg voor een vers lid -- er staat demo-post in. Deze
        proef zoekt daarom zijn EIGEN posts op hun tekst en telt niet op een

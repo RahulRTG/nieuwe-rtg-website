@@ -82,6 +82,7 @@ const REGISTER = {
      omlaag. Dat past niet als een enkelvoudig getal in NORM.json, dus draagt
      het register zijn eigen grondwaarde en houdt de toets hem vast. */
   'GEZAGSHANDELINGEN.json': { eigenRatel: 'test/gezagshandelingen.test.js' },
+  'WACHTWIJZE.json': { eigenRatel: 'test/wachtwijze.test.js' },
   'EXECUTION_MAP.json': { eigenRatel: 'test/executionmap.test.js' },
   'HERSTEL.json': { eigenRatel: 'test/herstel.test.js' },
   'HERSTELPROEF.json': { eigenRatel: 'test/herstelproef.test.js' },

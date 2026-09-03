@@ -97,12 +97,23 @@ const PUBLIEK = new Map([
        load balancer heeft er niets aan. Die cijfers staan sindsdien op het
        RTF-kantoor, achter een inlog.
 
-       Ronde twee (2 september 2026): wat overbleef was een leven-teken plus de
-       modus waarin de AI draait, anoniem opvraagbaar, met NUL aanroepers -- de
-       containercontrole gebruikt /api/ready. `meetpoort` geeft 404 tenzij het
-       token klopt of het verzoek intern is; in de VLOOTSTAND, waar RTG_DOMAINS
-       staat, gaat hij zonder token helemaal dicht. Voor een endpoint dat
-       niemand aanriep is dat geen verlies. */
+       Ronde twee (2 september 2026): wat overbleef was een leven-teken PLUS de
+       modus waarin de AI draait, anoniem opvraagbaar. Dat tweede hoort er niet
+       te staan, en de eerste reparatie was hem achter `meetpoort` te zetten met
+       als grond "nul aanroepers -- de containercontrole gebruikt /api/ready".
+
+       DIE GROND WAS FOUT, en de volle toetsenreeks vond het: test/vloot.test.js
+       gebruikt juist DEZE route als levensteken van de rtf-groep, en die groep
+       draait met `rtf:-` -- geen eigen routes, dus geen ander signaal. Twee
+       minuten wachten op een 200 die nooit kwam, en dan de melding "de vloot komt
+       op binnen 120s; laatste stand per groep: rtf 404". Een endpoint dat een
+       hele groep levend meldt, heeft per definitie een aanroeper.
+
+       Ronde drie (3 september 2026): het LEK eruit in plaats van de deur dicht.
+       De route geeft nu `{ok:true}` en verder niets -- geen AI-modus, geen
+       verwerkingsstand. Daarmee is de anonieme uitlek weg zonder dat de vloot
+       zijn enige levensteken kwijtraakt. Dat had ronde twee moeten zijn. */
+    ['/api/foundation/health', 'het levensteken van de rtf-groep in de vloot; geeft {ok:true} en verder niets -- geen AI-modus, geen verwerkingsstand, geen aantallen (zie de drie rondes hierboven)'],
     ['/api/foundation/impact', 'opgetelde totalen van de bijdragen -- geen namen, geen gezinnen, alleen drie getallen en een boodschap; getoetst als publiek in test/foundation.test.js'],
     ['/api/foundation/bespaartip', 'een spaartip uit een vaste lijst, gekozen op de dag; leest niets en kent niemand'],
     ['/api/foundation/gesprekskaart', 'een gespreksvraag uit een vaste lijst; leest niets en kent niemand'],

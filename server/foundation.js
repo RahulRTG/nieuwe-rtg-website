@@ -8,7 +8,6 @@
    Alles staat onder db.data.foundation, zodat het meelift op het atomische
    wegschrijven en de dagelijkse back-up van de hoofdserver. */
 const ctx = require('./foundation/basis')();
-const { meetpoort } = require('./meetpoort'); // de meetdeur van het huis, niet een tweede
 const { db, save, eigenVeld, crypto,
   encS, decS, teVaak, misluktePoging, goedePoging, ipVan, anthropic, tokenUit,
   router, F, nu, rid, schoon, LETTERS, DEMO, TIPS } = ctx;
@@ -91,14 +90,9 @@ function setAutomatisering(a) {
 const { verifieerProfiel, bewaarSollicitatie, alGesolliciteerd } = require('./foundation/sollicitaties')(ctx);
 const { setMarkt } = require('./foundation/markt')(ctx);
 
-/* Alleen het leven-teken, en sinds 2 september 2026 achter de meetpoort. De
-   hele geschiedenis van deze route -- waarom de cijfers eruit gingen en waarom
-   juist deze wel dichtging terwijl de vier leesroutes ernaast open bleven --
-   staat op een plek in scripts/lib/publiekeroutes.js. */
-router.get('/health', meetpoort, (req, res) => {
-  const s = require('./ai-stand').beschikbaarheid(anthropic);
-  res.json({ ok: true, ai: s.modus, verwerking: s.verwerking });
-});
+/* ALLEEN HET LEVEN-TEKEN, en niets meer dan dat. De hele geschiedenis van deze
+   route staat op een plek in scripts/lib/publiekeroutes.js. */
+router.get('/health', (req, res) => res.json({ ok: true }));
 
 /* De onderwijskern (het leerpaspoort) komt LAAT binnen: hij wordt in
    server.js gemaakt, na deze module. School heeft hem nodig om bewijs van

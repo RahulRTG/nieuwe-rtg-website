@@ -102,7 +102,15 @@ const VOORTGANG = path.join(WORTEL, 'server', 'data', 'mutatie-voortgang.json');
    als 'muteert zelf' en niet als gemeten. */
 const NIET_MUTEREN = new Map([
   ['meterijk.test.js', 'muteert zelf echte bestanden (waaronder MUTATIES.json) om meters te ijken'],
-  ['mutatiewacht.test.js', 'toetst de opruimwacht van deze motor; die twee om elkaar heen draaien zegt niets']
+  ['mutatiewacht.test.js', 'toetst de opruimwacht van deze motor; die twee om elkaar heen draaien zegt niets'],
+  /* Zelfde klasse, erbij op 3 september 2026 (TAKEN.md 4.53): deze toets gaat
+     over de telling van DEZE motor en laadt hem dus. De motor die zijn eigen
+     bron muteert terwijl hij draait, meet niet de toets maar zichzelf halverwege
+     een schrijfactie -- de eerste ronde kwam er dan ook uit als 'al rood'.
+     Met de hand nagetrokken op de twee foutklassen die hij bewaakt: de grens een
+     stap verschuiven (< naar <=) laat toets 1 zakken, en een ontbrekende
+     `dekking` als beproefd lezen laat toets 3 zakken. Tweemaal raak. */
+  ['mutatiedekking.test.js', 'gaat over de telling van deze motor zelf en laadt hem; de motor zijn eigen bron laten muteren terwijl hij draait meet zichzelf en niet de toets. Met de hand raak: de grens van < naar <= laat toets 1 zakken, en een ontbrekende dekking als beproefd lezen laat toets 3 zakken']
 ]);
 
 /* DE OPERATOREN. Mechanisch, klein, en elk met een reden waarom hij ECHT gedrag
@@ -760,6 +768,14 @@ const EIGEN_MODULE = new Map([
      onbetrouwbaar maken -- elke regel hier hoort een uitspraak te zijn die de
      standaardweg niet al doet. */
   ['camerascherm.e2e.js', ['public/shared/media.js']],
+  /* i18n-auto laadt de automatische vertaallaag met vm.runInNewContext en heeft
+     daar dus geen require voor. Zonder deze regel mat de motor alleen
+     server/lib/ui-bronnen.js -- de module van EEN van de zes beweringen -- en
+     noemde de toets daarna 'overleefd', terwijl vier beweringen over de
+     browsermodule gaan die hij nooit heeft aangeraakt. Bevestigd door de motor:
+     met deze regel zakt hij. Gevonden bij het inhoudelijk nalopen van de
+     overlevers (TAKEN.md 4.53). */
+  ['i18n-auto.test.js', ['public/shared/i18n/i18n-00.js', 'server/lib/ui-bronnen.js']],
   /* Het grootboek op sqlite. De toets draait een rit-bestand als kindproces,
      en dat requiret server/db -- vandaar dat de scanner niets zag. */
   ['txledger-sqlite.test.js', ['server/db/tx/index.js', 'server/db/index.js']],
@@ -943,11 +959,19 @@ const GEEN_BRONMUTATIE = new Map([
      voor. Nagetrokken en raak: een regel van veertien woorden naar dertien
      brengen laat toets 1 zakken op "het kernwoord ontbreekt". */
   ['wereldtaal.test.js', 'toetst dertig kernwoorden per taal, opgeslagen als |-gescheiden regels in wereld1..8; de motor muteert de uitpakker en niet de data. Met de hand raak: een woord uit een taalregel halen laat toets 1 zakken'],
-  /* i18n-auto is een PAGINASCAN over public/: hij leest ieder blijvend appscherm
-     en eist dat het de gedeelde taalrail laadt. Zijn onderwerp is dus welke
-     bestanden wat bevatten, niet wat een module rekent -- dezelfde klasse als
-     consent-dekking hierboven. */
-  ['i18n-auto.test.js', 'een paginascan over public/: leest ieder blijvend appscherm en eist dat het de taalrail laadt. Zijn onderwerp is de inhoud van bestanden, niet rekenend gedrag van een module'],
+  /* i18n-auto STOND HIER, en die regel was voor het grootste deel van de toets
+     onwaar (weggehaald op 3 september 2026, TAKEN.md 4.53). Hij noemde hem een
+     paginascan -- dat is bewering 3 -- terwijl vier van de zes beweringen over
+     REKENEND gedrag gaan: kandidaat() dat een adres van een zin onderscheidt, en
+     apply() dat de schriftrichting zet. Die code woont in
+     public/shared/i18n/i18n-00.js en wordt met vm.runInNewContext geladen, dus
+     modulesVan() vond hem niet -- de motor mat alleen ui-bronnen.js en de reden
+     dekte dat gat af. Hij staat nu in EIGEN_MODULE hierboven en zakt gewoon.
+
+     De les erachter is groter dan deze ene regel: een uitleg in deze lijst kan
+     een gat MASKEREN in plaats van verklaren, en dan is hij erger dan een
+     'overleefd'. Wie hier iets bijzet, schrijft de reden per BEWERING en niet
+     per bestand. */
   /* genreregister is dezelfde soort census, nu over de genre-definities: niemand
      definieert een genre buiten het register, elk genre heeft een bestaande
      sector. Een liegpoort die antwoorden leegmaakt raakt een registervergelijking
@@ -971,6 +995,37 @@ function modulesVan(bestand) {
     if (!uit.includes(rel)) uit.push(rel);
   }
   return uit;
+}
+
+/* EEN OVERLEVER MET EEN SCHOT IS GEEN OVERLEVER MET DERTIG (TAKEN.md 4.53).
+
+   Het getal 'overleefd' telde twee dingen bij elkaar op. Een toets die twintig
+   mutaties heeft doorstaan zegt iets over die toets; een die er EEN kreeg omdat
+   zijn module bijna geen muteerbaar construct draagt, zegt iets over de MOTOR.
+   Zo stond ledengids-race.test.js met een enkele poging naast consent-dekking
+   met drieentwintig, en het cijfer maakte er geen verschil tussen -- terwijl de
+   eerste geen beschuldiging verdient en de tweede wel een onderzoek.
+
+   De drempel staat op acht en dat is een keuze, geen meting: onder de acht
+   pogingen is elk van de vier operatoren hooguit een paar keer aan bod geweest,
+   en dan is "niets kreeg hem rood" een uitspraak over het aanbod. Hij is bewust
+   GEEN grens die iets wegfiltert -- een dunne overlever blijft een overlever en
+   verdwijnt niet uit de telling; hij staat er alleen apart, met zijn aantal
+   erbij, zodat niemand hem voor het andere soort aanziet. */
+const DUN_ONDER = 8;
+const dekkingVan = (geprobeerd) => (geprobeerd < DUN_ONDER ? 'dun' : 'beproefd');
+
+/* De telling die zowel de samenvatting hieronder als scripts/bewijs.js gebruikt.
+   Een eigen functie en geen twee lussen: dat is precies hoe het cijfer op het
+   scherm en het cijfer in BEWIJS.md uit elkaar zouden lopen.
+
+   Een oud verdict zonder `dekking` wordt uit `geprobeerd` afgeleid en niet als
+   beproefd gerekend -- een ontbrekend veld hoort de strengere kant op te vallen,
+   anders poetst een verouderd register de bevinding weg. */
+function overleverTelling(uitslag) {
+  const over = Object.values(uitslag || {}).filter(x => x && x.staat === 'overleefd');
+  const dun = over.filter(x => (x.dekking || dekkingVan(x.geprobeerd || 0)) === 'dun');
+  return { totaal: over.length, dun: dun.length, beproefd: over.length - dun.length };
 }
 
 /* EEN PURE TOETS. Groen zonder mutatie is een voorwaarde: staat hij al rood, dan
@@ -1034,7 +1089,8 @@ function proefPuur(naam, posities) {
      niet heeft geprobeerd, en dat is precies de fout die deze motor moet
      voorkomen in plaats van maken. Hij telt nu bij niet-gemeten. */
   if (!geprobeerd) return { soort: 'puur', staat: 'geen bruikbare mutatie', modules, posities: diep };
-  return { soort: 'puur', staat: 'overleefd', modules, geprobeerd, posities: diep };
+  return { soort: 'puur', staat: 'overleefd', modules, geprobeerd, posities: diep,
+    dekking: dekkingVan(geprobeerd) };
 }
 
 function isServerToets(naam) {
@@ -1340,7 +1396,12 @@ if (require.main === module) {
   const per = (s) => Object.values(uitslag).filter(x => x.staat === s).length;
   const perScherp = (s) => Object.values(uitslag).filter(x => x.scherp === s).length;
   console.log('\n  gezakt (bewezen gevoelig)  ' + per('gezakt'));
-  console.log('  overleefd                  ' + per('overleefd'));
+  /* GESPLITST, want een overlever met een schot en een met dertig zijn niet
+     hetzelfde soort bevinding. Zie DUN_ONDER hierboven. */
+  const over = overleverTelling(uitslag);
+  console.log('  overleefd                  ' + over.totaal +
+    (over.totaal ? '  (' + over.beproefd + ' beproefd, ' + over.dun +
+      ' met minder dan ' + DUN_ONDER + ' pogingen -- die zeggen iets over de motor)' : ''));
   console.log('  niet te meten              ' + (Object.keys(uitslag).length - per('gezakt') - per('overleefd')));
   const scherpGemeten = perScherp('gezakt') + perScherp('overleefd');
   if (scherpGemeten) {
@@ -1352,6 +1413,7 @@ if (require.main === module) {
 }
 
 module.exports = { OPERATOREN, muteer, codemasker, modulesVan, UITSLAG, VOORTGANG, NIET_MUTEREN,
+  DUN_ONDER, dekkingVan, overleverTelling,
   SPOOR, ruimEerderOp, schrijfSpoor, metMutatie, DEUREN,
   /* draaiToets naar buiten, zodat scripts/outputproef.js hem kan gebruiken in
      plaats van namaken. Hij weet dingen die je niet twee keer wilt leren: de

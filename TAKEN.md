@@ -47,7 +47,7 @@ Bijgewerkt: 2026-08-19.
 
 ## Hoe deze lijst gelezen hoort te worden
 
-**Open: 113** -- §1 11, §2 8, §3 7, §4 32, §5 33, §7 22. §6 telt niet mee: dat zijn
+**Open: 109** -- §1 11, §2 8, §3 7, §4 32, §5 33, §7 18. §6 telt niet mee: dat zijn
 eerlijkheidspunten, geen werk. Dat is geen werkvoorraad maar een muur.
 
 Die telling staat er als getal en niet als gevoel, en `test/takenlijst.test.js`

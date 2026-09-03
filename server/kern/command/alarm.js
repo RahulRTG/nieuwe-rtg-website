@@ -29,6 +29,11 @@
 
 const ERNST = { hoog: 3, midden: 2, laag: 1 };
 
+/* Stilzetten is een MENSENhandeling, en die trede komt uit de schaal in
+   ./risico.js en niet uit een overgetypte tekenreeks -- zie de kop van
+   ./alarm-uitgang.js voor waarom dat verschil telt. */
+const { NIVEAUS } = require('./risico');
+
 function maakAlarm({ opslag, save, journaal, slo, sonde, canary, kwaliteit, norm, sein, foutmelder }) {
   const D = () => {
     const n = (typeof norm === 'function' ? norm() : norm) || {};
@@ -146,7 +151,7 @@ function maakAlarm({ opslag, save, journaal, slo, sonde, canary, kwaliteit, norm
     const u = Math.max(1, Math.min(Number(uren || 8), d.stilteMaxUren));
     a.stilTot = new Date(Date.now() + u * 3600000).toISOString();
     save();
-    journaal.noteer({ actie: 'alarm stilgezet', actor: door, niveau: 'hand', objectType: 'alarm',
+    journaal.noteer({ actie: 'alarm stilgezet', actor: door, niveau: NIVEAUS.hand, objectType: 'alarm',
       objectId: a.id, reden: u + ' uur: ' + String(reden || 'geen reden opgegeven') });
     return { alarm: a, tot: a.stilTot, max: d.stilteMaxUren };
   }

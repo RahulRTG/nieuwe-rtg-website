@@ -29,6 +29,14 @@
    deze laag" is iets anders dan "ERR_WEBHOOK_URL is niet gezet". */
 'use strict';
 
+/* DE TREDE KOMT UIT DE SCHAAL, en niet als tekenreeks. `niveau: 'auto'` in een
+   journaalregel is een gezagsuitspraak: hij zegt dat de MACHINE dit heeft
+   gedaan. Wie hem overtypt, maakt een tweeentwintigste plek waar een trede
+   woont die de vier bestaande schalen niet kunnen lezen -- scripts/gezag.js telt
+   die en zakte er meteen op toen dit bestand werd afgesplitst (TAKEN.md 4.55).
+   Importeren kost een regel en houdt de naam op EEN plek. */
+const { NIVEAUS } = require('./risico');
+
 module.exports = ({ journaal, sein, foutmelder }) => {
   /* De melder wordt LAAT opgehaald: hij hangt aan de kern en die is nog niet
      compleet op het moment dat deze laag wordt gebouwd. Vandaar een functie in
@@ -58,7 +66,7 @@ module.exports = ({ journaal, sein, foutmelder }) => {
     const stil = a.stilTot && Date.parse(a.stilTot) > Date.now();
     try {
       journaal.noteer({ actie: richting === 'aan' ? 'alarm aan' : 'alarm af', actor: 'automaat',
-        niveau: 'auto', objectType: 'alarm', objectId: a.id,
+        niveau: NIVEAUS.auto, objectType: 'alarm', objectId: a.id,
         reden: a.naam + (richting === 'aan' ? ': ' + a.wat : ' is opgelost') + (stil ? ' (stilgezet)' : '') });
     } catch (e) { /* een journaalstoring mag het alarm niet dempen */ }
     if (stil) return;

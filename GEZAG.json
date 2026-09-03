@@ -3,7 +3,7 @@
   "hoe": "node scripts/gezag.js --lijst",
   "gemeten": {
     "vocabulaires": 5,
-    "losseNiveaunamen": 22
+    "losseNiveaunamen": 21
   },
   "vocabulaires": [
     {

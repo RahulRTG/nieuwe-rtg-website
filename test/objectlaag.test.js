@@ -387,7 +387,13 @@ test('een gedeeld lijstje staat er zonder bedrag', () => {
 /* DE MUTATIE: voeg een functie toe die iets bewaart. Een object dat gaat
    bewaren, laat een bijeenkomst op twee plekken bestaan (LIFE.md par. 2). */
 test('bezit niets: er is geen enkele manier om iets te schrijven', () => {
-  assert.deepEqual(Object.keys(laag()).sort(), ['CAPS', 'SOORTEN', 'object']);
+  /* De lijst blijft EXACT: een nieuwe naam hoort hier bewust bijgezet te worden,
+     zodat niemand er ongemerkt een schrijffunctie tussen schuift. `pagina`,
+     `SECTIES` en `paginabijdragers` zijn de objectpaginastructuur (pagina.js,
+     MAATSTAF.md U28) en alle drie leesbeelden: pagina() roept object() aan en
+     verder niets, en de bijdragers krijgen alleen wat object() al teruggaf. */
+  assert.deepEqual(Object.keys(laag()).sort(),
+    ['CAPS', 'SECTIES', 'SOORTEN', 'object', 'pagina', 'paginabijdragers']);
   assert.deepEqual(laag().SOORTEN.sort(), ['event', 'groep', 'persoon']);
 });
 

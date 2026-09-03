@@ -4,7 +4,7 @@ module.exports = (octx) => {
   const { kern, officeQueryMag } = octx;
   const { OFFICE_CODE, app, archief, crypto, db, loginFails, noteFailedTry, officeAuth, officeState,
           rememberSession, sseClients, tooManyTries, totpOk, veiligGelijk, logInlog, securityLogKeten,
-          handelingsspoor, ankerdienst } = kern;
+          handelingsspoor, ankerdienst, ankerpost } = kern;
 app.post('/api/office/login', (req, res) => {
   const bucket = 'office:' + req.ip;
   if (tooManyTries(res, bucket)) return;
@@ -63,11 +63,25 @@ app.post('/api/office/securitylog', officeAuth, (req, res) => {
    regel om te wijzigen. Waar het blok heen gaat is een besluit over uw
    infrastructuur, en dat hoort bij een mens. Zie server/lib/ankerdienst.js. */
 app.post('/api/office/anker', officeAuth, (req, res) => {
-  res.json(Object.assign({ ok: true }, ankerdienst.stand(req.body && req.body.blok ? req.body.blok : null)));
+  res.json(Object.assign({ ok: true, post: ankerpost.stand() },
+    ankerdienst.stand(req.body && req.body.blok ? req.body.blok : null)));
 });
 
 /* Afrekenen met een eerder naar buiten gebracht blok. Per journaal het oordeel:
    is er iets van de kop verdwenen, en zo ja hoeveel. */
+/* DE POST naar de tweede machine (server/lib/ankerpost.js). Het besluit over de
+   bestemming is genomen -- een tweede machine binnen RTG -- maar de post doet
+   niets zolang er geen adres staat, en zegt dat dan ook. */
+app.post('/api/office/anker/post', officeAuth, async (req, res) => {
+  res.json(Object.assign({ ok: true, post: ankerpost.stand() }, await ankerpost.post()));
+});
+
+/* Afrekenen met het blok dat op de tweede machine LIGT, in plaats van met een
+   blok dat iemand hier overtypt. */
+app.post('/api/office/anker/post/reken', officeAuth, async (req, res) => {
+  res.json(Object.assign({ ok: true, post: ankerpost.stand() }, await ankerpost.afrekenen()));
+});
+
 app.post('/api/office/anker/reken', officeAuth, (req, res) => {
   const blok = req.body && req.body.blok;
   if (!blok) return res.status(400).json({ error: 'Geef het eerder weggezette blok mee onder de sleutel blok.' });

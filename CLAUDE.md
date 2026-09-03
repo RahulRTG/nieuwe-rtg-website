@@ -1003,7 +1003,145 @@ en de tredeproef geeft **twee uitslagen die nooit worden opgeteld** — zuiver
 compleet zijn). Dat verschil vond meteen een webhook die 200 gaf terwijl zijn
 functie uit stond.
 
-**`LAT.md` is de technische lat** — elf regels die allemaal uit een fout komen die hier écht is gemaakt, met per regel wat hem handhaaft en waar er alleen op mensen wordt vertrouwd. Lees die vóór je code schrijft of repareert. De belangrijkste twee: repareer de oorzaak en niet het symptoom, en trek elke bewering na met een mutatie (een toets die je niet hebt zien zakken is geen toets). LAT.md gaat over de code, CLAUDE.md over het merk.
+**De doodspoormeter** (`scripts/doodspoor.js`, `DOODSPOOR.json`) vraagt of een
+handeling ergens AANKOMT: van de gemeten bronroutes staan er
+<!--getal:doodspoor.open-->85<!--/getal--> open. Dat is een triagelijst en
+geen beschuldiging (drie betekenissen lopen erin door elkaar, par. 3.3), en
+daarom een meting en nog geen poort. **De eerste gouden keten staat**
+(`scripts/tafelproef.js`, `npm run tafelproef`): de horecaketen van het openen
+van een rekening tot de afrekening, gemeten per SCHAKEL (handelt actor A, en
+ziet actor B dat?) en per STORING (houdt de keten zijn belofte als het misgaat?).
+Negen schakels gesloten, vijf storingen gehouden, en één open schakel geeft
+foutcode 1 -- dit is een proef en geen triagelijst. Drie dingen die geen losse
+routetoets kon zien: schakel 5 is een handoff die nergens beschreven stond (vóór
+`gang/vrij` staat de bestelling NIET op het keukenbord, dus het werk wacht bij de
+zaal, en beide routes zijn `supplier` dus doodspoor.js ziet hem niet), schakel 6
+laat zien dat de stoel tot op de keukenbon staat (de kok ziet voor wie hij
+kookt), en schakel 9 verried een fout in de proef zelf -- hij toetste twee velden
+uit het antwoord van de ZAAK terwijl deze proef juist de ONTVANGER meet, stond
+daardoor op groen en had nooit kunnen zakken. Wat de gast na het afrekenen
+werkelijk ziet is 401 `sessie-weg` met "Scan de QR opnieuw", en dat is een grens
+en geen gat. **En het bouwen van die keten legde een dood spoor bloot dat er
+jaren stond**: wie een regel van de rekening haalde waar de keuken al aan
+begonnen was, kreeg *"Haal hem eraf via derving, met een reden"* -- en die
+derving bestaat alleen in de KASSA (`/api/supplier/kassa/derving`, losse items,
+geen rekening). Je werd naar een deur gestuurd die er niet was; de enige
+uitwegen waren korting op de HELE bon of de hele rekening oninbaar boeken. De
+reparatie is **`kern/horeca/correctie.js`**, en vier dingen liggen daar vast: de
+regel BLIJFT staan en telt nul via `regelSom` in `kern/horeca.js` (één plek, dus
+splitsen, samenvoegen en de verdeling per stoel bewegen mee en `controleerSom()`
+blijft kloppen), grond én reden zijn allebei verplicht (vijf gronden, elk met wie
+het meldt), geld wordt KLAARGEZET en nooit verplaatst (is er al betaald, dan
+ontstaat een teruggaveRECHT met `uitgevoerd: false`; een mens voert het uit langs
+kern/pay), en een negatief `openstaand` blijft staan omdat het exact spiegelt met
+de openstaande teruggaven -- afkappen op nul zou het bedrag stil laten
+verdwijnen. Waarom dit geen `kern/commerce/retour.js` is: die laag is voor een
+koper die goederen terugstuurt naar een verkoper, met verzendstanden en een
+`orderRef` naar een vreemd domein; een gast aan tafel stuurt niets terug en de
+medewerker die corrigeert IS de verkoper. Wat de keten nog steeds NIET bewijst
+staat er even groot bij: het is de tafel-keten (bezorging, hotel en club hebben
+eigen naden), er komt geen browser aan te pas, en dat het geld werkelijk
+terugkomt loopt langs kern/pay en is met opzet niet gemeten. Pas uit zo'n keten
+volgen de status-, actor- en uitkomstcontracten -- niet andersom.
+
+**De TWEEDE keten staat, en die is er om een andere vraag te beantwoorden**
+(`scripts/ritproef.js`, `npm run ritproef`): is er een GEDEELDE VORM, of is elke
+keten zijn eigen ding? Daarom de rit en niet de bezorging -- bezorging deelt de
+rekening, de kaart en de keuken met de tafel, dus dan meet je hetzelfde nog een
+keer. Zeven schakels sluiten, zes storingen houden hun belofte, en de ritketen
+doet vier dingen ANDERS dan de tafel: eerst betalen dan leveren (`assign`
+weigert een onbetaalde rit), standen die alleen vooruit mogen, de naam van de
+werker gaat WEL naar de klant (je stapt bij iemand in de auto) en de klant heet
+een codenaam. **Eén schakel staat open, met een uitgeschreven reden** -- de
+nieuwe stand `openBekend`, in de vorm van `MET_REDEN` uit `scripts/tikken.js`:
+zonder die uitweg heeft een proef die iets echts vindt maar twee uitgangen,
+altijd zakken of de bevinding wegpoetsen. De proef meldt daarom `sluit` en
+`sluitMetBevinding` apart en nooit één cijfer.
+
+**Die bevinding werd een besluit en is uitgevoerd: er waren TWEE RITWERELDEN.** `db.data.rides` (de
+lidkant: `/api/ride/request`, `supplier/ride/*`, zes standen uit
+`kern/vervoer.js`) en `db.data.mobOpdrachten` (het dispatchcentrum:
+`/api/supplier/mob/*`, tien standen uit `kern/mobiliteit/keten.js`, met matching
+en overboeken) -- met **nul verwijzingen in beide richtingen**. Vier standen
+delen ze letterlijk, twee betekenen hetzelfde onder een andere naam
+(`aan-boord`/`ingestapt`, `afgerond`/`voltooid`), en één woord botst echt:
+`rijdt` is in de ene wereld een verouderde naam voor `aan-boord` en in de andere
+een eigen stand ná `ingestapt`. Pijnlijk detail: `kern/mobiliteit/dispatch.js`
+belooft in zijn kop dat een telefoonboeking "dezelfde keten" krijgt als een
+app-rit -- en het is juist de APP-rit die het dispatchbord nooit haalt. De eigenaar heeft besloten dat de OPDRACHT de waarheid is, en
+`kern/mobiliteit/appbrug.js` legt de brug: een app-rit wordt ook een
+vervoersopdracht en verschijnt op het dispatchbord. Vier dingen liggen daar
+vast. Een mislukte opdracht BREEKT DE RIT NIET (een bestemming die alleen een
+tekst is kan `kern/mobiliteit/plekken.js` niet oplossen; dan blijft de rit staan
+met de reden erbij -- een besluit uitvoeren mag geen aanvragen weigeren die het
+gisteren nog deed). De ritketen is GROVER, dus de brug loopt een PAD:
+`aangevraagd` naar `geaccepteerd` is in de opdrachtwereld drie gebeurtenissen,
+en het pad gaat nooit via `incident` of `geannuleerd` -- dat zou een gebeurtenis
+verzinnen die niet plaatsvond. De standen worden VERTAALD en niet overgetypt
+(toets 4 zakt zodra een ritstand naar `rijdt` vertaalt). En de brug loopt ÉÉN
+KANT OP: twee lijsten die elkaar bijwerken hebben geen waarheid meer. **De migratie is in kaart en staat stil op EEN besluit**
+(`scripts/ritmigratie.js`): van de <!--getal:ritmigratie.bestanden-->21<!--/getal-->
+plekken die `db.data.rides` noemen lezen er <!--getal:ritmigratie.stand-->7<!--/getal-->
+de lopende rit, tellen <!--getal:ritmigratie.historie-->9<!--/getal--> historie af,
+schrijven er 2 en noemen er 3 hem alleen in commentaar. De kaart bewees haar nut
+binnen het uur: de eerste versie zei "zeven kunnen nu om", maar een rit ZONDER
+opdracht valt dan uit beeld -- en dan ziet een lid zijn eigen taxi niet meer in
+`/api/live/state`. Dat is een regressie, geen migratie, en de kaart ging op nul.
+
+**Het besluit van de eigenaar hief die blokkade op: de VERVOERDER kiest zelf**
+welke soort ritten hij aanneemt -- `rittenMetDoel` en `rittenZonderDoel`, twee
+booleans in `ZAAK_OPTIES` (`kern/leverancier.js`), want "beide aan of een uit"
+IS twee booleans en dat register draagt er al. Neemt hij ritten zonder
+bestemming aan, dan krijgt zo'n rit een opdracht met een bestemming die
+expliciet `onbekend` heet (`{ onbekend: true }` in `kern/mobiliteit/plekken.js`):
+geen afstand, geen vaste prijs, wel een plek op het dispatchbord. Neemt hij hem
+niet aan, dan weigert `kern/lidacties/ritten.js` met de reden en de weg
+eromheen. Zo of zo heeft elke rit die BESTAAT voortaan een opdracht. Stand nu:
+<!--getal:ritmigratie.kanNu-->7<!--/getal--> lezers kunnen om (de stand-lezers),
+daarna <!--getal:ritmigratie.daarna-->11<!--/getal--> (historie, dan de
+schrijvers). **De losse chauffeur is geen bijzonder geval**: hij is een zaak met
+een persoon erin, meldt zich aan op eigen naam en wijst zichzelf de rit toe met
+`self: true` -- wie met het BEDRIJFSaccount inlogt heeft geen `staffId` en kan
+dat niet, en dat is de grens en geen gebrek. Wat overblijft is een restrisico en
+geen blokkade: `opdrachtMaak` kan per geval weigeren, en dan draagt de rit
+`opdrachtReden` -- elke lezer die omgaat moet zo'n rit afvangen en hem nooit
+stil uit de lijst laten vallen.
+De domeingrens (`GRENZEN.json`) hield de brug trouwens tegen tot iemand hem op
+de lijst zette, precies zoals bedoeld.
+
+**DE DERDE KETEN IS DE TOELATING** (`scripts/toelatingsproef.js`,
+`npm run toelatingsproef`): van een aanvraag zonder account naar een toegelaten
+zaak in een gereguleerd genre -- bewijs indienen, aftekenen op naam, besluit,
+zaak, herkeuring. Twee ketens dragen geen contract (twee punten liggen altijd op
+een lijn), dus hij is met opzet maximaal ANDERS: de klant is geen lid, er zit een
+KANTOOR in, het gaat over een document met een houdbaarheid, en de uitkomst is
+TOEGANG in plaats van een geleverde dienst. Zeven schakels sluiten, zeven
+storingen houden hun belofte. **Het bouwen legde een grens bloot die nergens
+stond**: aftekenen en beslissen eisen een naam, en `boardroomWie()` geeft die
+alleen als er een lid-account achter het kantoortoken hangt -- wie met de
+GEDEELDE kantoorcode inlogt, kan de keten niet afmaken. Dat is een grens en geen
+gat, en hij zit nu in de meting (storing 1 en 7) in plaats van eromheen.
+
+**En wat de ketens werkelijk delen is GEMETEN** (`scripts/ketenvorm.js`,
+`KETENVORM.json`) in plaats van verklaard -- de proeven delen met opzet geen
+module, want een gedeelde ketenklasse eroverheen zou de `Asset`-fout zijn.
+Uitkomst over drie ketens: <!--getal:ketenvorm.actorenGedeeld-->0<!--/getal-->
+van <!--getal:ketenvorm.actorenTotaal-->13<!--/getal--> actoren gedeeld
+(gast/zaal/keuken tegenover lid/vervoerder/dispatch/chauffeur tegenover
+aanvrager/kantoor/keurder/dossier/tijd) en
+<!--getal:ketenvorm.themasGedeeld-->2<!--/getal--> van
+<!--getal:ketenvorm.themasTotaal-->10<!--/getal--> beloftethema's in ALLE drie.
+Die twee gaan allebei over de MACHINE en niet over het domein: mag dit twee
+keer, en zegt een weigering waarom. Er is een woord dat twee ketens delen --
+`zaak` -- en het betekent er niet hetzelfde (ontvanger tegenover uitkomst),
+precies de vorm die `SEMANTIEK.json` meet. **Een status-, actor- of
+uitkomstcontract over domeinen heen is daarmee niet gerechtvaardigd**, en dat is
+een antwoord op MAATSTAF.md U40/U41 en geen uitstel; wat er wel onder ligt is de
+grens die OS.md trekt tussen platformvermogen en domeinvermogen, nu met bewijs
+uit drie onafhankelijke ketens. Let bij het lezen op een eerlijkheid die in de
+bron staat: de themalijst is een keer uitgebreid toen zes van de zeven beloften
+van de derde keten erbuiten vielen -- de actoren zijn niet aangeraakt, en die
+staan op nul.
 
 ## Structuur en starten (kort)
 

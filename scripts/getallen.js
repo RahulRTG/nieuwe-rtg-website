@@ -119,14 +119,58 @@ const GETALLEN = {
   'isolatie.kanalen': { bron: 'ISOLATIEPROEF.json', veld: 'noemers.herkomst.gevonden',
     wat: 'kanalen waarlangs invoer een gesprek in kan komen, elk met een vertrouwensklasse' },
   'isolatie.herkomstprijsLid': { bron: 'ISOLATIEPROEF.json', veld: 'noemers.herkomst.prijsPerRol.member.na',
-    wat: 'AI-paden die een lid overhoudt nadat onvertrouwde invoer het gesprek raakte' }
+    wat: 'AI-paden die een lid overhoudt nadat onvertrouwde invoer het gesprek raakte' },
+  'doodspoor.bronroutes': { bron: 'DOODSPOOR.json', veld: 'telling.bronroutes',
+    wat: 'routes die in de proef werk deden en een collectie aanraakten' },
+  'doodspoor.gesloten': { bron: 'DOODSPOOR.json', veld: 'telling.gesloten',
+    wat: 'bronroutes waarvan een andere actorgroep gemeten een stand zet op dezelfde collectie' },
+  'doodspoor.gezien': { bron: 'DOODSPOOR.json', veld: 'telling.gezien',
+    wat: 'bronroutes waarvan een andere groep de collectie alleen leest (vermoed of aangewezen)' },
+  'doodspoor.tussen': { bron: 'DOODSPOOR.json', veld: 'telling.tussen',
+    wat: 'bronroutes waarvan de ontvanger een ander lid is -- dezelfde actorgroep, dus onzichtbaar voor het groepenmodel' },
+  'doodspoor.terminaal': { bron: 'DOODSPOOR.json', veld: 'telling.terminaal',
+    wat: 'bronroutes op een collectie die op niemand wacht: van een mens, van het huis, of een boeking' },
+  'doodspoor.open': { bron: 'DOODSPOOR.json', veld: 'telling.open',
+    wat: 'bronroutes zonder gemeten ontvanger, zonder gevonden lezer en zonder verklaring' },
+  'doodspoor.openCollecties': { bron: 'DOODSPOOR.json', veld: 'telling.openCollecties',
+    wat: 'collecties waarop minstens een bronroute open staat' },
+  'tafel.schakels': { bron: 'TAFELPROEF.json', veld: 'telling.gesloten',
+    wat: 'schakels van de horecaketen waar de ontvangende actor de verandering aantoonbaar ziet' },
+  'tafel.storingen': { bron: 'TAFELPROEF.json', veld: 'telling.gehouden',
+    wat: 'storingen in die keten waarbij het systeem zich aan zijn uitgeschreven belofte hield' },
+  'rit.schakels': { bron: 'RITPROEF.json', veld: 'telling.gesloten',
+    wat: 'schakels van de ritketen waar de ontvangende actor de verandering aantoonbaar ziet' },
+  'rit.storingen': { bron: 'RITPROEF.json', veld: 'telling.gehouden',
+    wat: 'storingen in de ritketen waarbij het systeem zich aan zijn uitgeschreven belofte hield' },
+  'rit.bevindingen': { bron: 'RITPROEF.json', veld: 'telling.openBekend',
+    wat: 'schakels in de ritketen die aantoonbaar niet sluiten, met een uitgeschreven reden' },
+  'ketenvorm.actorenGedeeld': { bron: 'KETENVORM.json', veld: 'telling.actorenGedeeld',
+    wat: 'actornamen die in beide gouden ketens voorkomen' },
+  'ketenvorm.actorenTotaal': { bron: 'KETENVORM.json', veld: 'telling.actorenTotaal',
+    wat: 'actornamen over de twee ketens samen' },
+  'ketenvorm.themasGedeeld': { bron: 'KETENVORM.json', veld: 'telling.themasGedeeld',
+    wat: 'soorten belofte die beide ketens afvangen' },
+  'ketenvorm.themasTotaal': { bron: 'KETENVORM.json', veld: 'telling.themasTotaal',
+    wat: 'soorten belofte over de twee ketens samen' },
+  'ritmigratie.bestanden': { bron: 'RITMIGRATIE.json', veld: 'telling.bestanden',
+    wat: 'bestanden die db.data.rides noemen' },
+  'ritmigratie.stand': { bron: 'RITMIGRATIE.json', veld: 'telling.stand',
+    wat: 'lezers van db.data.rides die de LOPENDE rit tonen' },
+  'ritmigratie.historie': { bron: 'RITMIGRATIE.json', veld: 'telling.historie',
+    wat: 'lezers die historie aftellen (omzet, fooi, fiscale grondslag)' },
+  'ritmigratie.kanNu': { bron: 'RITMIGRATIE.json', veld: 'telling.kanNu',
+    wat: 'lezers die vandaag naar de opdrachtwereld kunnen zonder dat er een rit uit beeld valt' },
+  'ritmigratie.daarna': { bron: 'RITMIGRATIE.json', veld: 'telling.daarna',
+    wat: 'lezers die na de stand-lezers volgen: eerst historie, dan de schrijvers' },
+  'doodspoor.nietGemeten': { bron: 'DOODSPOOR.json', veld: 'nietGezien.nietGemeten',
+    wat: 'routes die in de idempotentieproef geen werk deden en dus buiten deze meting vallen' }
 };
 
 /* De documenten die merktekens mogen dragen. Bewust een lijst en geen glob over
    alles: een generator die elk .md-bestand mag herschrijven, herschrijft op een
    dag ook iets dat niemand had bedoeld. */
 const DOCUMENTEN = ['CLAUDE.md', 'CREATE.md', 'EXECUTIE.md', 'OS.md', 'BEWIJSMACHINE.md', 'MODULAIR.md', 'HDI.md',
-  'ISOLATIE.md'];
+  'ISOLATIE.md', 'MAATSTAF.md'];
 
 const MERK = /<!--getal:([a-zA-Z0-9._-]+)-->([\s\S]*?)<!--\/getal-->/g;
 

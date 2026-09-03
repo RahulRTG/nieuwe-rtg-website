@@ -9,7 +9,7 @@
    het ook geen paar regels meer. Gemount vanuit routes/member.js. */
 module.exports = (kern) => {
   const { app, auth, db, save, crypto, findSupplier, schoon, leeftijdVan, geborenVan,
-    optieAan, zorgVoor, boekingenVoegToe, boekingenVanKlant, betaalBoekingVoor,
+    optieAan, zorgMee, boekingenVoegToe, boekingenVanKlant, betaalBoekingVoor,
     notifySupplier, sseToSupplier, sseToOffice, PERSONAS, publicSupplier,
     isFavoriet, salonZichtbaar, plaatsOrderVoor, betaalOrderVoor, rekeningVoor, betaalRekeningVoor, ordersVanKlant,
     txLedgerActief, txLedgerVanKlant, txLedgerTel , gegevensStop, ledenInhoudVan} = kern;
@@ -40,7 +40,7 @@ module.exports = (kern) => {
       service: { id: dienst.id, name: dienst.name, soort: dienst.soort || 'dienst', duurMin: dienst.duurMin || null },
       price: dienst.price,
       wanneer, note: schoon(req.body.note, 140),
-      zorg: zorgVoor(req.session.key),
+      zorg: zorgMee(req.session.key, { zaak: s.code, reden: 'zorgprofiel meegegeven bij een boeking' }),
       betaalMoment: vooraf ? 'vooraf' : 'achteraf',
       status: vooraf ? 'wacht-op-betaling' : 'aangevraagd',
       paid: false, at: new Date().toISOString()

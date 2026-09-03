@@ -1,0 +1,206 @@
+{
+  "stempel": "2026-09-03",
+  "uitleg": "Wat drie onafhankelijk geschreven ketenproeven werkelijk delen, geteld uit hun registers. De vorm is per definitie gelijk (beide proeven zijn zo geschreven) en zegt dus niets; de actoren en de beloften zeggen wel iets. Zie de kop van scripts/ketenvorm.js.",
+  "grens": "Drie ketens is een kleine steekproef, en ze zijn door dezelfde hand geschreven -- gedeelde beloften kunnen dus ook gedeelde gewoonte zijn. Een derde keten van een andere hand zou dat scheiden. De thema-indeling gebruikt een gesloten woordenlijst; wat er niet in past staat in nietIngedeeld en verdwijnt niet.",
+  "ketens": [
+    {
+      "naam": "tafel",
+      "domein": "horeca",
+      "proef": "scripts/tafelproef.js",
+      "schakels": 11,
+      "storingen": 8,
+      "sluit": true,
+      "bevindingen": 0
+    },
+    {
+      "naam": "rit",
+      "domein": "mobiliteit",
+      "proef": "scripts/ritproef.js",
+      "schakels": 8,
+      "storingen": 11,
+      "sluit": true,
+      "bevindingen": 0
+    },
+    {
+      "naam": "toelating",
+      "domein": "aanmeldingen",
+      "proef": "scripts/toelatingsproef.js",
+      "schakels": 7,
+      "storingen": 7,
+      "sluit": true,
+      "bevindingen": 0
+    }
+  ],
+  "vorm": {
+    "gedeeld": {
+      "schakel": [
+        "fout",
+        "ms",
+        "naar",
+        "nr",
+        "stand",
+        "status",
+        "van",
+        "wat",
+        "ziet"
+      ],
+      "storing": [
+        "belofte",
+        "naam",
+        "stand",
+        "wat"
+      ]
+    },
+    "apart": {
+      "schakel": [
+        "bekend"
+      ],
+      "storing": []
+    },
+    "let": "gelijke vorm is de ondergrens en geen vondst: beide proeven zijn zo geschreven"
+  },
+  "actoren": {
+    "perKeten": {
+      "tafel": [
+        "gast",
+        "keuken",
+        "zaak",
+        "zaal"
+      ],
+      "rit": [
+        "chauffeur",
+        "dispatch",
+        "lid",
+        "vervoerder"
+      ],
+      "toelating": [
+        "aanvrager",
+        "dossier",
+        "kantoor",
+        "keurder",
+        "tijd",
+        "zaak"
+      ]
+    },
+    "gedeeld": [],
+    "eigen": {
+      "tafel": [
+        "gast",
+        "keuken",
+        "zaak",
+        "zaal"
+      ],
+      "rit": [
+        "chauffeur",
+        "dispatch",
+        "lid",
+        "vervoerder"
+      ],
+      "toelating": [
+        "aanvrager",
+        "dossier",
+        "kantoor",
+        "keurder",
+        "tijd",
+        "zaak"
+      ]
+    }
+  },
+  "beloften": {
+    "perKeten": {
+      "tafel": [
+        "bereikbareWeg",
+        "dubbelObject",
+        "geldKlaargezet",
+        "herhaling",
+        "onbekendObject",
+        "volgorde",
+        "weigeringMetReden"
+      ],
+      "rit": [
+        "herhaling",
+        "nietsKlaarZonderGrond",
+        "onbekendObject",
+        "volgorde",
+        "weigeringMetReden"
+      ],
+      "toelating": [
+        "geslotenLijst",
+        "handelingMetNaam",
+        "herhaling",
+        "nietsKlaarZonderGrond",
+        "weigeringMetReden"
+      ]
+    },
+    "gedeeld": [
+      "herhaling",
+      "weigeringMetReden"
+    ],
+    "bijna": [
+      "nietsKlaarZonderGrond",
+      "onbekendObject",
+      "volgorde"
+    ],
+    "telling": {
+      "bereikbareWeg": 1,
+      "dubbelObject": 1,
+      "geldKlaargezet": 1,
+      "herhaling": 3,
+      "onbekendObject": 2,
+      "volgorde": 2,
+      "weigeringMetReden": 3,
+      "nietsKlaarZonderGrond": 2,
+      "geslotenLijst": 1,
+      "handelingMetNaam": 1
+    },
+    "eigen": {
+      "tafel": [
+        "bereikbareWeg",
+        "dubbelObject",
+        "geldKlaargezet"
+      ],
+      "rit": [],
+      "toelating": [
+        "geslotenLijst",
+        "handelingMetNaam"
+      ]
+    },
+    "nietIngedeeld": [
+      {
+        "keten": "rit",
+        "storing": "een stand die niet in de ritketen staat",
+        "belofte": "weigert, en noemt niet stilzwijgend een andere stand"
+      },
+      {
+        "keten": "rit",
+        "storing": "een bestemming die alleen een tekst is",
+        "belofte": "wordt nooit een plek op de kaart: de opdracht draagt een bestemming die onbekend heet en geen afstand"
+      },
+      {
+        "keten": "rit",
+        "storing": "een rit die op \"aan-boord\" gaat",
+        "belofte": "de opdracht heet dan \"ingestapt\" en niet \"rijdt\" -- dat woord betekent hier iets anders"
+      },
+      {
+        "keten": "rit",
+        "storing": "een rit zonder bestemming, bij een vervoerder die die soort aanneemt",
+        "belofte": "gaat gewoon door en krijgt een opdracht met een bestemming die nog niet bekend is"
+      },
+      {
+        "keten": "rit",
+        "storing": "een losse chauffeur die zichzelf een rit toewijst",
+        "belofte": "kan dat op eigen naam, en ziet de rit op zijn eigen dispatchbord"
+      }
+    ],
+    "let": "\"gedeeld\" is in ALLE ketens; \"bijna\" in meer dan een maar niet in alle. Dat onderscheid staat er omdat een vondst anders verdwijnt zodra er een keten bijkomt die hem niet heeft."
+  },
+  "telling": {
+    "actorenGedeeld": 0,
+    "ketens": 3,
+    "actorenTotaal": 13,
+    "themasGedeeld": 2,
+    "themasBijna": 3,
+    "themasTotaal": 10,
+    "nietIngedeeld": 5
+  }
+}

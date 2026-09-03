@@ -697,6 +697,10 @@ const handelingsspoor = require('./lib/handelingsspoor')({ db, save });
    dat wordt teruggevoerd. Hij schrijft zelf niets weg: een anker dat deze
    software op dezelfde schijf zet, is geen anker. Zie ./lib/ankerdienst.js. */
 const ankerdienst = require('./lib/ankerdienst').maakAnkerdienst({ db });
+/* WAAR het blok heen gaat is inmiddels wel besloten: een tweede machine binnen
+   RTG (./lib/ankerpost.js). Zonder RTG_ANKERPOST_URL doet die post niets en
+   zegt hij dat -- geen bestemming blijft "niet in bedrijf". */
+const ankerpost = require('./lib/ankerpost').maakAnkerpost({ ankerdienst });
 function securityLogKeten() {
   const lijst = (db.data && db.data.securityLog) || [];
   return Object.assign({ top: ketenTop(lijst) }, ketenVerifieer(lijst));
@@ -2149,7 +2153,7 @@ const kern = {
   sendPushToUser, sessionFor, sessions, setRoomHk, sortRunsheet, speelOpnieuw, sseBuffer, sseClients,
   sseSend, sseToCustomer, sseToOffice, sseToSupplier, stateFor, stationsForOrder, supplierAuth, supplierState, persoonsPoort,
   toRad, tokenHash, tooManyTries, totpOk, trChat, trustVan, unlockDoor, urenVan, validDept, veiligGelijk, logInlog,
-  securityLogKeten, handelingsspoor, ankerdienst,
+  securityLogKeten, handelingsspoor, ankerdienst, ankerpost,
   zorgContact, klantSalon,
   // de stemming van Rahul + de geloofslaag (kern/rahul/stemming.js, kern/geloof/)
   geloof, stemmingToon: stemming.stemmingToon, stemmingZet: stemming.stemmingZet,

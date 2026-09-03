@@ -45,6 +45,15 @@ Object.assign(kern, require('../kern/mobiliteit').maakMobiliteit({
   // voor de dienstverbandcontrole bij zakelijke ritten
   accounts
 }));
+/* DE APPBRUG: een app-rit wordt ook een vervoersOPDRACHT en komt zo op het
+   dispatchbord. HIER en niet in kern/lidacties, dat vóór mobiliteit staat en
+   opdrachtMaak dus niet kent. Zie MAATSTAF.md par. 7.5. */
+Object.assign(kern, {
+  appbrug: require('../kern/mobiliteit/appbrug')({
+    opdrachtMaak: kern.opdrachtMaak, opdrachtMet: kern.opdrachtMet, opdrachtNaar: kern.opdrachtNaar
+  })
+});
+
 /* RTG Navigatie (kern/navigatie.js): het huiseigen navigatiesysteem. Een eigen
    wegennet met A*-route, bocht-voor-bocht en ETA per vervoerwijze; bestemmingen
    uit onze leveranciers, het OV, de loketten en de POI-lagen (tank/laad), en RTG

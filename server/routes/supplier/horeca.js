@@ -25,6 +25,7 @@ module.exports = (kern) => {
   const verzoeklaag = require('../../kern/gast/verzoek')({ save: kern.save, schoon: kern.schoon, horeca });
   const ctx = Object.assign({}, kern, { horeca, polslaag, clublaag, verzoeklaag });
   require('./horeca/rekening')(ctx);   // openen, regels, gangen, lijst
+  require('./horeca/correctie')(ctx);  // wat er eraf gaat als een gerecht misging, met grond en reden
   require('./horeca/gezelschap')(ctx); // wie zit er aan tafel, en wat staat op wiens naam
   require('./horeca/schuif')(ctx);     // verplaatsen, samenvoegen, splitsen
   require('./horeca/verdeling')(ctx);  // wie betaalt welk deel -- één rekening, geen knip

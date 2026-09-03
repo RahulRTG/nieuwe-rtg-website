@@ -2,7 +2,7 @@
    vanzelf), het aanbod, boeken, betalen, annuleren en mijn behandelingen.
    Krijgt de gedeelde context een keer bij het opstarten vanuit kern/care.js. */
 module.exports = (ctx) => {
-  const { db, save, crypto, schoon, notify, zorgVoor,
+  const { db, save, crypto, schoon, notify, zorgVoor, zorgMee,
     nu, vandaag, eur, INTAKE_DAGEN, lijsten, aanbiederVan, behandelingVan, intakeActief } = ctx;
   function careIntakeDeel(key, aanbiederIdIn, medischIn) {
     lijsten();
@@ -80,7 +80,7 @@ module.exports = (ctx) => {
       datum, tijd, duurMin: b.duurMin, prijs: b.prijs,
       // het algemene zorgprofiel reist mee (met toestemming); een aparte,
       // uitdrukkelijk gedeelde intake voor deze aanbieder gaat er bovenop
-      zorg: zorgVoor(sess.key),
+      zorg: zorgMee(sess.key, { zaak: 'care:' + a.id, reden: 'zorgprofiel meegegeven bij een zorgboeking' }),
       intake: (intakeActief(sess.key, a.id) || {}).medisch || null,
       status: 'wacht-op-betaling', paid: false, at: nu()
     };

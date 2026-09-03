@@ -2,16 +2,16 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-09-03",
   "gemeten": {
-    "bestanden": 2089,
-    "vormen": 1366,
-    "velden": 1971,
-    "modules": 739,
-    "domeinen": 258,
+    "bestanden": 2009,
+    "vormen": 1340,
+    "velden": 1939,
+    "modules": 720,
+    "domeinen": 253,
     "envelopDrempel": 16,
-    "envelop": 31,
-    "veldenDomeineigen": 1398,
-    "veldenGedeeldVanafVier": 193,
-    "gelijkendeVormparen": 20
+    "envelop": 30,
+    "veldenDomeineigen": 1379,
+    "veldenGedeeldVanafVier": 192,
+    "gelijkendeVormparen": 19
   },
   "envelop": [
     "aantal",
@@ -43,7 +43,6 @@
     "tot",
     "uitleg",
     "van",
-    "waarom",
     "wat"
   ],
   "gedeeld": [
@@ -72,18 +71,6 @@
       ]
     },
     {
-      "veld": "doel",
-      "domeinen": 15,
-      "waar": [
-        "kern/appstore",
-        "kern/commercie",
-        "kern/consent-register",
-        "kern/defensie",
-        "kern/labfonds",
-        "kern/magnaat-trainingslobby"
-      ]
-    },
-    {
       "veld": "supplierCode",
       "domeinen": 15,
       "waar": [
@@ -103,7 +90,7 @@
         "kern/comm",
         "kern/commerce",
         "kern/consent-lezers",
-        "kern/isolatie",
+        "kern/horeca",
         "kern/livinglab"
       ]
     },
@@ -117,6 +104,18 @@
         "kern/commerce",
         "kern/instant-reality",
         "kern/magnaat-werkroutefabriek"
+      ]
+    },
+    {
+      "veld": "waarom",
+      "domeinen": 14,
+      "waar": [
+        "kern/bureau",
+        "kern/command",
+        "kern/commerce",
+        "kern/commercie",
+        "kern/concern",
+        "kern/gewoonten"
       ]
     },
     {
@@ -141,6 +140,18 @@
         "kern/livinglab",
         "kern/magnaat-economenlab-rapport",
         "kern/magnaat-economie"
+      ]
+    },
+    {
+      "veld": "doel",
+      "domeinen": 13,
+      "waar": [
+        "kern/appstore",
+        "kern/commercie",
+        "kern/defensie",
+        "kern/labfonds",
+        "kern/magnaat-trainingslobby",
+        "kern/pay"
       ]
     },
     {
@@ -225,18 +236,6 @@
         "kern/magnaat-capabilities",
         "kern/magnaatwereld",
         "kern/mailsleutel"
-      ]
-    },
-    {
-      "veld": "zaak",
-      "domeinen": 11,
-      "waar": [
-        "kern/appstore",
-        "kern/avond",
-        "kern/bureau",
-        "kern/commerce",
-        "kern/fiscaal",
-        "kern/mobiliteit"
       ]
     },
     {
@@ -396,6 +395,18 @@
       ]
     },
     {
+      "veld": "zaak",
+      "domeinen": 10,
+      "waar": [
+        "kern/appstore",
+        "kern/avond",
+        "kern/bureau",
+        "kern/commerce",
+        "kern/fiscaal",
+        "kern/mobiliteit"
+      ]
+    },
+    {
       "veld": "soortLabel",
       "domeinen": 10,
       "waar": [
@@ -405,18 +416,6 @@
         "kern/gemeente",
         "kern/mall",
         "kern/overheid"
-      ]
-    },
-    {
-      "veld": "ingetrokken",
-      "domeinen": 10,
-      "waar": [
-        "bedrijf",
-        "kern/beschermzaak",
-        "kern/command",
-        "kern/festival",
-        "kern/mobiliteit",
-        "kern/reisuitnodiging-gebruik"
       ]
     },
     {
@@ -548,6 +547,20 @@
     },
     {
       "gelijkenis": 1,
+      "a": "server/kern/command/index.js",
+      "b": "server/kern/zaakcommand/beeld.js",
+      "domeinA": "kern/command",
+      "domeinB": "kern/zaakcommand",
+      "gedeeld": [
+        "niveau",
+        "score",
+        "vierOgen",
+        "waarom",
+        "waaromNiet"
+      ]
+    },
+    {
+      "gelijkenis": 1,
       "a": "server/kern/commerce/prijsvraag.js",
       "b": "server/kern/mall/aanbodrtg.js",
       "domeinA": "kern/commerce",
@@ -586,19 +599,6 @@
         "rk",
         "rt",
         "type"
-      ]
-    },
-    {
-      "gelijkenis": 1,
-      "a": "server/kern/command/index.js",
-      "b": "server/kern/zaakcommand/beeld.js",
-      "domeinA": "kern/command",
-      "domeinB": "kern/zaakcommand",
-      "gedeeld": [
-        "niveau",
-        "score",
-        "vierOgen",
-        "waaromNiet"
       ]
     },
     {
@@ -800,24 +800,6 @@
         "gratis",
         "nr",
         "prijsCenten"
-      ]
-    },
-    {
-      "gelijkenis": 0.6,
-      "a": "server/kern/gast/order-beeld.js",
-      "b": "server/kern/horeca/regel.js",
-      "domeinA": "kern/gast",
-      "domeinB": "kern/horeca",
-      "gedeeld": [
-        "allergenen",
-        "allergie",
-        "gang",
-        "gastNr",
-        "happy",
-        "ingredienten",
-        "itemId",
-        "lijstprijs",
-        "opties"
       ]
     },
     {

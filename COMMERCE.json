@@ -2,24 +2,24 @@
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
   "vastgelegd": "2026-09-03",
   "gemeten": {
-    "bestanden": 2089,
-    "domeinenTotaal": 563,
-    "koopbareVormen": 524,
+    "bestanden": 2009,
+    "domeinenTotaal": 554,
+    "koopbareVormen": 523,
     "koopbareDomeinen": 109,
     "envelopDrempel": 7,
     "envelop": 45,
-    "veldenDomeineigen": 718,
-    "veldenNietEnvelop": 934,
+    "veldenDomeineigen": 717,
+    "veldenNietEnvelop": 932,
     "gelijkendeVormparen": 9,
     "werkwoordenVolledig": 1,
     "werkwoordenOveral": 0,
     "werkwoordCombinaties": 43,
-    "wagenVormen": 33,
-    "wagenVormenUniek": 30,
+    "wagenVormen": 32,
+    "wagenVormenUniek": 29,
     "wagenDomeinen": 22,
-    "optellingen": 108,
+    "optellingen": 109,
     "optelDomeinen": 53,
-    "optelCenten": 59,
+    "optelCenten": 60,
     "optelEuro": 5,
     "optelGemengd": 0,
     "optelOnbekend": 44
@@ -2304,6 +2304,16 @@
       ]
     },
     {
+      "domein": "kern/horeca",
+      "plekken": 5,
+      "waar": [
+        "server/kern/horeca/correctie.js",
+        "server/kern/horeca/foliolaag.js",
+        "server/kern/horeca/stappen.js",
+        "server/kern/horeca/verdeling.js"
+      ]
+    },
+    {
       "domein": "kern/payroll",
       "plekken": 5,
       "waar": [
@@ -2321,16 +2331,6 @@
         "server/kern/commercie/fee.js",
         "server/kern/commercie/verrekening.js",
         "server/kern/commercie/voornemen/plan.js"
-      ]
-    },
-    {
-      "domein": "kern/horeca",
-      "plekken": 4,
-      "waar": [
-        "server/kern/horeca/foliolaag.js",
-        "server/kern/horeca/stappen.js",
-        "server/kern/horeca/verdeling.js",
-        "server/kern/horeca.js"
       ]
     },
     {

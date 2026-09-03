@@ -20,6 +20,8 @@ module.exports = (kern) => {
   const { app, save, schoon, supplierAuth, logActivity, sseToSupplier, horeca } = kern;
   const { KANALEN, H, Hlees, nu, id, totaal, openstaand } = horeca;
   const { bouwRegel } = require('../../../kern/horeca/regel')({ schoon, horeca });
+  const correctie = require('../../../kern/horeca/correctie')({ horeca, schoon });
+  kern.horecaCorrectie = correctie;
   /* Dezelfde kaartopbouw die de gastdeur leest (kern/horeca/kaart.js). Niet
      `kern.gastKaartVanZaak`: dat is een naam van het gast-domein en het
      supplier-domein hoort daar niet in te grijpen. */
@@ -122,8 +124,14 @@ module.exports = (kern) => {
     const r = rekVan(req, res); if (!r) return;
     const i = r.regels.findIndex(x => x.id === String(req.body.regelId || ''));
     if (i < 0) return res.status(404).json({ error: 'Die regel staat niet op deze rekening.' });
+    /* DE OUDE MELDING WEES NAAR EEN DEUR DIE ER NIET WAS: "via derving",
+       terwijl die alleen in de KASSA bestaat en geen rekening kent. De weg
+       bestaat nu wel; zie kern/horeca/correctie.js. */
     if (r.regels[i].stand !== 'besteld')
-      return res.status(409).json({ error: 'De keuken is hier al aan begonnen. Haal hem eraf via derving, met een reden.' });
+      return res.status(409).json({
+        error: 'De keuken is hier al aan begonnen. Haal hem eraf met een correctie, met een grond en een reden.',
+        code: 'keuken-begonnen', via: '/api/supplier/horeca/rekening/regel/corrigeer',
+        gronden: correctie.GRONDEN.map(g => ({ id: g.id, label: g.label })) });
     const weg = r.regels.splice(i, 1)[0];
     save();
     logActivity(req.supplier.code, req.actor, 'haalde ' + weg.naam + ' van de rekening');

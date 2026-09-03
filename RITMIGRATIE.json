@@ -1,0 +1,144 @@
+{
+  "stempel": "2026-09-03",
+  "uitleg": "Per lezer van db.data.rides: wat hij eruit haalt en of de opdrachtwereld dat kan leveren. Geschreven vóór de migratie, zodat die niet wordt geraden. Zie MAATSTAF.md par. 7.5.",
+  "blokkade": {
+    "stand": "opgeheven",
+    "wat": "Was: niet elke rit kan een opdracht krijgen, want zonder bestemming loste kern/mobiliteit/plekken.js geen plek op.",
+    "besluit": "De vervoerder kiest zelf welke soort ritten hij aanneemt (ZAAK_OPTIES.rittenMetDoel en .rittenZonderDoel, twee booleans). Een rit zonder bestemming krijgt een opdracht met een bestemming die expliciet `onbekend` heet; neemt de vervoerder die soort niet aan, dan wordt de rit geweigerd met de reden. Elke rit die bestaat, heeft dus een opdracht.",
+    "op": "2026-09-03"
+  },
+  "restrisico": {
+    "wat": "opdrachtMaak kan nog steeds per geval weigeren: een vervoersmodule die in dat gebied uitstaat, of een vertrekpunt dat niet op te lossen is. De rit draagt dan `opdrachtReden`.",
+    "bijOmzetting": "elke lezer die naar de opdrachtwereld gaat, moet zo'n rit afvangen -- zichtbaar, met de reden erbij, en nooit door hem stil uit de lijst te laten vallen."
+  },
+  "telling": {
+    "bestanden": 21,
+    "treffers": 36,
+    "schrijver": 2,
+    "stand": 7,
+    "historie": 9,
+    "geenLezer": 3,
+    "onbekend": 0,
+    "kanNu": 7,
+    "wachtOpBesluit": 0,
+    "daarna": 11
+  },
+  "perSoort": {
+    "schrijver": [
+      {
+        "bestand": "server/kern/lidacties/ritten.js",
+        "treffers": 2,
+        "wat": "maakt de rit (unshift) en zoekt hem terug om te betalen",
+        "naOmzetting": "wordt de plek waar de projectie ontstaat: de opdracht eerst, de rit-rij als afgeleide"
+      },
+      {
+        "bestand": "server/routes/member/kopen/tickets.js",
+        "treffers": 3,
+        "wat": "maakt een transferrit bij een ticket, en weigert een tweede op dezelfde ticketRef",
+        "naOmzetting": "idem; let op de ticketRef-controle, die kent de opdrachtwereld niet"
+      }
+    ],
+    "stand": [
+      {
+        "bestand": "server/kern/ervaring/leden/annuleren.js",
+        "treffers": 1,
+        "wat": "zoekt een rit van dit lid om te annuleren",
+        "naOmzetting": "na het besluit -- en dan met winst: opdrachtAnnuleer kent een annuleringsvoorwaarde die BIJ DE BOEKING is vastgelegd"
+      },
+      {
+        "bestand": "server/kern/ervaring/leden/waardering.js",
+        "treffers": 1,
+        "wat": "zoekt een rit op ref om er een waardering aan te hangen",
+        "naOmzetting": "na het besluit; de opdracht draagt dezelfde stabiele ref, dus de koppeling blijft"
+      },
+      {
+        "bestand": "server/kern/ghost.js",
+        "treffers": 1,
+        "wat": "ritten in de ghost-weergave (de chauffeurskant zonder eigen account)",
+        "naOmzetting": "na het besluit; deze leest alleen en heeft geen eigen standenlogica"
+      },
+      {
+        "bestand": "server/kern/leverancier/state.js",
+        "treffers": 1,
+        "wat": "alle ritten van een zaak, behalve wacht-op-betaling",
+        "naOmzetting": "na het besluit; opdrachtenVanVervoerder levert dezelfde verzameling"
+      },
+      {
+        "bestand": "server/kern/live.js",
+        "treffers": 3,
+        "wat": "de lopende rit van een lid: status, chauffeur, voertuig, betaald",
+        "naOmzetting": "na het besluit: de opdracht draagt dit rijker (tien standen, uitzonderingen). Nu niet -- een lid met een bestemmingsloze rit zou zijn taxi niet meer zien staan"
+      },
+      {
+        "bestand": "server/kern/vervoer.js",
+        "treffers": 1,
+        "wat": "de actieve ritten van een vervoerder, op vier standen",
+        "naOmzetting": "na het besluit; let op de standvertaling in kern/mobiliteit/appbrug.js"
+      },
+      {
+        "bestand": "server/routes/supplier/vervoer.js",
+        "treffers": 6,
+        "wat": "status zetten, toewijzen, voorstellen, en de historie van een vervoerder",
+        "naOmzetting": "de drie schrijfroutes zetten nu al door naar de opdracht; de leesroutes na het besluit"
+      }
+    ],
+    "historie": [
+      {
+        "bestand": "server/kern/ervaring/leden/spaarpot.js",
+        "treffers": 1,
+        "wat": "ritten die punten of spaargeld opleverden",
+        "naOmzetting": "na het besluit. Punten die verdwijnen zijn een belofte die het huis terugneemt zonder het te zeggen"
+      },
+      {
+        "bestand": "server/kern/fiscaal/index.js",
+        "treffers": 1,
+        "wat": "ritomzet als fiscale grondslag",
+        "naOmzetting": "PAS als elke rit een opdracht heeft -- anders vallen bestemmingsloze ritten uit de aangifte"
+      },
+      {
+        "bestand": "server/kern/kantoor/index.js",
+        "treffers": 3,
+        "wat": "betaalde ritten en de ritlijst voor het kantoorbeeld",
+        "naOmzetting": "na het besluit. Een lager getal zonder reden is erger dan een ouder getal: het kantoorbeeld is waar iemand ziet of het goed gaat"
+      },
+      {
+        "bestand": "server/kern/kantoor/metrics.js",
+        "treffers": 2,
+        "wat": "lopende en afgeronde ritten in de kantoormeters",
+        "naOmzetting": "na het besluit. Deze meters voeden een ratel; een stille daling leest daar als een verbetering van de belasting"
+      },
+      {
+        "bestand": "server/kern/leverancier/zaak.js",
+        "treffers": 1,
+        "wat": "fooien per dag van een zaak",
+        "naOmzetting": "na het besluit. Fooi is geld van een mens: een rit die uit de telling valt, kost een chauffeur zijn deel"
+      },
+      {
+        "bestand": "server/routes/member/zakelijk.js",
+        "treffers": 1,
+        "wat": "de vervoersuitgaven van een lid",
+        "naOmzetting": "na het besluit. Een lid dat zijn zakelijke kosten declareert, mist anders een rit zonder het te merken"
+      },
+      {
+        "bestand": "server/routes/office/toegang.js",
+        "treffers": 2,
+        "wat": "ritten in het toegangs- en inzagebeeld van het kantoor",
+        "naOmzetting": "na het besluit, en hier telt het het zwaarst: een inzagebeeld dat een rit mist, is een onvolledig antwoord op een AVG-verzoek"
+      },
+      {
+        "bestand": "server/routes/office/werk.js",
+        "treffers": 1,
+        "wat": "ritten in de werklijst van het kantoor",
+        "naOmzetting": "na het besluit. Een werklijst die een rit mist, laat werk liggen dat niemand meer ziet"
+      },
+      {
+        "bestand": "server/routes/supplier/backoffice.js",
+        "treffers": 1,
+        "wat": "betaalde ritten in de backoffice van een zaak",
+        "naOmzetting": "na het besluit. Dit is de omzet waarop een ondernemer zijn eigen boekhouding naleest"
+      }
+    ]
+  },
+  "onbekend": [],
+  "verdwenen": []
+}

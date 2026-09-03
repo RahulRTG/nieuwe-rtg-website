@@ -259,7 +259,22 @@
     "swcache:vast": "node scripts/swcache.js --schrijf",
     "herstelproef": "node scripts/herstelproef.js",
     "scherfmeter": "node scripts/scherfmeter.js",
-    "scherfmeter:vast": "node scripts/scherfmeter.js --vastleggen"
+    "scherfmeter:vast": "node scripts/scherfmeter.js --vastleggen",
+    "doodspoor": "node scripts/doodspoor.js",
+    "doodspoor:vast": "node scripts/doodspoor.js --vastleggen",
+    "doodspoor:controle": "node scripts/doodspoor.js --controle",
+    "tafelproef": "node scripts/tafelproef.js",
+    "tafelproef:vast": "node scripts/tafelproef.js --vastleggen",
+    "ritproef": "node scripts/ritproef.js",
+    "ritproef:vast": "node scripts/ritproef.js --vastleggen",
+    "ketenvorm": "node scripts/ketenvorm.js",
+    "ketenvorm:vast": "node scripts/ketenvorm.js --vastleggen",
+    "ritmigratie": "node scripts/ritmigratie.js",
+    "ritmigratie:vast": "node scripts/ritmigratie.js --vastleggen",
+    "doorwerking": "node scripts/doorwerking.js",
+    "doorwerking:vast": "node scripts/doorwerking.js --vastleggen",
+    "toelatingsproef": "node scripts/toelatingsproef.js",
+    "toelatingsproef:vast": "node scripts/toelatingsproef.js --vastleggen"
   },
   "devDependencies": {
     "playwright": "^1.62.1"

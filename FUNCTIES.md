@@ -16,14 +16,14 @@ het?**
 
 | | |
 |---|---|
-| Functieschakelaars (aan/uit per functie) | **212** in 17 categorieën |
+| Functieschakelaars (aan/uit per functie) | **205** in 17 categorieën |
 | Apps in de leden-catalogus | **84** in 8 categorieën |
 | Bedrijfsgenres | **74** in 27 sectoren |
 | Genre-caps (waar de apps op sturen) | **40** |
 | API-routes (uit de router) | **4738** |
-| Kernmodules (`server/kern/**`) | **2007** |
-| App-pagina's (`public/apps/**.html`) | **292** |
-| Testbestanden | **1601** |
+| Kernmodules (`server/kern/**`) | **1926** |
+| App-pagina's (`public/apps/**.html`) | **284** |
+| Testbestanden | **1544** |
 
 ## De vier werelden
 
@@ -54,9 +54,9 @@ ook blokkeert.
 
 ---
 
-# 1. De 212 functieschakelaars
+# 1. De 205 functieschakelaars
 
-### Leden (RTG-app) — 24
+### Leden (RTG-app) — 21
 
 - **Leden-app (algemeen)** (`member`) — Alle ledenfuncties in de RTG-app. Zet je dit uit, dan valt de hele ledenkant stil (behalve wat hieronder apart aan staat).  
   _voor: rtg, lifestyle, business, gast_
@@ -73,12 +73,6 @@ ook blokkeert.
 - **RTG Zakelijk (professioneel netwerk)** (`zakelijk`) — De LinkedIn-laag van de Lifestyle en Business Pass: zakelijk profiel, gids, verbinden, feed, aanbevelingen en het kansenbord.  
   _voor: lifestyle, business_
 - **RTG Wereld (de ene sociale app)** (`wereld`) — De laag over De Salon, Pulse, RTG Zakelijk, de genootschappen en de verhalen heen: één tijdlijn met een schakelaar (Alles, Lifestyle, Business, Communities, Privé) en de sprong naar de berichten-app. Uit zetten laat de vijf onderliggende apps gewoon staan; alleen de verbindende laag verdwijnt -- net als bij de Media OS.  
-  _voor: rtg, lifestyle, business_
-- **RTG Service (hulp vragen)** (`service`) — De hulplijn van een lid: iets melden vanuit het scherm waar je stond, je lopende zaken zien, een medewerker toegang bevestigen, en om een MENS vragen. Uit zetten sluit die weg helemaal -- ook de ondergrens dat elk lid bij een mens kan uitkomen.  
-  _voor: rtg, lifestyle, business_
-- **Bellen met RTG (in de app)** (`service-bel`) — Bellen met RTG Service binnen de app, zonder telefoonnet en zonder nummer. Hoort bij de Lifestyle en Business Pass; om een mens vragen blijft voor elk account bestaan en gaat hier niet mee uit.  
-  _voor: lifestyle, business_
-- **Automatisch ondertitelen in een gesprek** (`ondertiteling`) — Een deelnemer laat zijn eigen stem omzetten naar tekst met een LOKAAL model; de regel komt in de meeleesbaan van het gesprek. Uit zetten laat die baan staan -- meetypen blijft werken -- maar wie doof is is dan weer afhankelijk van de anderen.  
   _voor: rtg, lifestyle, business_
 - **Het Privékantoor (Lifestyle)** (`privekantoor`) — De ene app van de Lifestyle Pass: de levensgraaf over de premium-apps heen, de Control Tower met alle termijnen, het mandaat (wat mag het kantoor zelf) en zaken met een team en een tijdlijn. Uit zetten laat de onderliggende apps staan; alleen de samenhang verdwijnt.  
   _voor: lifestyle, business_
@@ -107,17 +101,6 @@ ook blokkeert.
 - **Waarderen en reageren** (`kern-waardering`) — Likes, reacties, reviews en favorieten door het hele platform.  
   _voor: rtg, lifestyle, business, gast_
 
-### Sociaal (De Salon) — 4
-
-- **De Salon (feed, volgen, deals)** (`salon`) — De Salon-tijdlijn: partner-posts volgen, aanbiedingen claimen, polls en de etalage.  
-  _voor: rtg, lifestyle, business, gast_
-- **Salon-ontmoetingen (in de buurt)** (`ontmoetingen`) — Wederzijdse connecties die vlakbij zijn spreken veilig af (18+, geverifieerd), met contract, live-locatie naar RTG en SOS.  
-  _voor: rtg, lifestyle, business_
-- **Sociale laag (RTG + RTF)** (`social`) — De gedeelde sociale laag: zoeken, verbinden, DM, snaps, verhalen en bellen op codenaam. De kinderbescherming (t/m 15 gesloten) blijft altijd gelden.  
-  _voor: rtg, lifestyle, business, foundation_
-- **RTF contacten & familiekoppeling** (`rtf-contacten`) — De contactenlaag van de RTFoundation: gezinnen koppelen, kanalen en meldingen tussen leden.  
-  _voor: rtg, lifestyle, business, foundation_
-
 ### Genres & diensten — 10
 
 - **Bestellen & bezorgen** (`bestellen`) — Bestellen bij een zaak (ophalen of laten bezorgen) met live volgen.  
@@ -141,7 +124,18 @@ ook blokkeert.
 - **RTG Commerce (mand & retour)** (`commerce`) — De verkooplaag boven de domeinen: wat er te koop staat en wat NIET met de reden erbij, een mand over verkopers heen met een afrekening per verkoper, de overdracht naar de deur die bevestigt, en de weg terug. RTG bevestigt hier zelf niets.  
   _voor: rtg, lifestyle, business_
 
-### Eigen apps — 37
+### Sociaal (De Salon) — 4
+
+- **De Salon (feed, volgen, deals)** (`salon`) — De Salon-tijdlijn: partner-posts volgen, aanbiedingen claimen, polls en de etalage.  
+  _voor: rtg, lifestyle, business, gast_
+- **Salon-ontmoetingen (in de buurt)** (`ontmoetingen`) — Wederzijdse connecties die vlakbij zijn spreken veilig af (18+, geverifieerd), met contract, live-locatie naar RTG en SOS.  
+  _voor: rtg, lifestyle, business_
+- **Sociale laag (RTG + RTF)** (`social`) — De gedeelde sociale laag: zoeken, verbinden, DM, snaps, verhalen en bellen op codenaam. De kinderbescherming (t/m 15 gesloten) blijft altijd gelden.  
+  _voor: rtg, lifestyle, business, foundation_
+- **RTF contacten & familiekoppeling** (`rtf-contacten`) — De contactenlaag van de RTFoundation: gezinnen koppelen, kanalen en meldingen tussen leden.  
+  _voor: rtg, lifestyle, business, foundation_
+
+### Eigen apps — 35
 
 - **Spelen (spellen met vrienden)** (`spellen`) — Alle spellen: schaken, dammen, rummi, Magnaat, sudoku en de partyspellen.  
   _voor: rtg, lifestyle, business, foundation_
@@ -213,16 +207,10 @@ ook blokkeert.
   _voor: rtg, lifestyle, business_
 - **Verzorging (kapper, barbier, nagels)** (`verzorging`) — De salonagenda vanaf de kant van het lid, op codenaam. Zorg en verzorging staan naast elkaar maar niet door elkaar: hier reist geen zorgprofiel mee.  
   _voor: rtg, lifestyle, business_
-- **Kinderopvang (ouderkant)** (`opvangwijzer`) — Welke kinderopvang er is en hoeveel plek daar vrij is, plus een aanvraag klaarzetten en zelf weer intrekken. Een vrije plek is geen plek: inschrijven doet de opvang zelf. De aanwezigheidslijst van een groep komt hier nooit uit; een ouder ziet een getal en niet de namen van andere kinderen.  
-  _voor: rtg, lifestyle, business_
-- **Knelpunten (welke weg ligt open)** (`knelpunt`) — Rekent uit welke weg naar een doel openligt, wat hem blokkeert en wat er niet is nagegaan. Bewaart niets: alles komt binnen in het verzoek en gaat eruit als antwoord. Er wordt niets gerangschikt en geen beste weg aangewezen.  
-  _voor: rtg, lifestyle, business_
 
-### Partners (leveranciers) — 11
+### Partners (leveranciers) — 10
 
 - **Partner-app (algemeen)** (`supplier`) — Alle leveranciersfuncties. Uit = partners kunnen niets meer doen (behalve wat hieronder apart aan staat).  
-  _voor: leverancier_
-- **Voedselveiligheid (HACCP)** (`supplier-haccp`) — Het temperatuurlogboek en de HACCP-metingen van een keuken. Een wettelijke registratieplicht.  
   _voor: leverancier_
 - **Kassa (POS)** (`supplier-pos`) — Het kassascherm per sector: afrekenen en RTG-code innen.  
   _voor: leverancier_
@@ -260,7 +248,7 @@ ook blokkeert.
 - **Tenant Control Plane (white-label)** (`tenant`) — Welke organisatie een werkruimte draait, welk merk zij daar voert, en hoe een groep van haar identiteitsprovider een rol wordt. Uit = de werkruimtes werken door onder de RTG-huisstijl, en een inlog via een provider levert geen rollen meer op.  
   _voor: intern, business_
 
-### RTFoundation — 15
+### RTFoundation — 14
 
 - **RTFoundation-app (onderwijs)** (`foundation`) — De gratis onderwijs-app: live schoolbord, leerling-schrift en de AI-bijleshulp.  
   _voor: foundation_
@@ -271,8 +259,6 @@ ook blokkeert.
 - **Het RTF-kantoor** (`dom-rtfkantoor`) — Het eigen kantoor van de stichting: kamers, clubs en het onderzoekslab.  
   _voor: foundation_
 - **Foundation OS** (`dom-rtfos`) — Steden, partnerstichtingen, projecten, vrijwilligers, geld, hulpvragen en verantwoording.  
-  _voor: foundation_
-- **Voordeur beschermzaak (zonder account)** (`dom-beschermdeur`) — De eigen ingang naar hulp bij geweld en uitbuiting: eerst "ben je nu veilig", dan pas de rest, en een code die de mens zelf weer kan intrekken. Zonder inlog, want wie hier aanklopt heeft vaak geen account. Uitzetten sluit die deur; de wegwijzer toont dan dat er geen plaats is die dit oppakt.  
   _voor: foundation_
 - **Het Onderzoekslab** (`dom-lab`) — Projecten, fases, bevindingen en de kennisbank van het lab.  
   _voor: foundation_
@@ -505,7 +491,7 @@ ook blokkeert.
 
 ### Toegang en identiteit — 8
 
-- **Inloggen en registreren** (`tg-inlog`) — De voordeur: inloggen, uitloggen, registreren en wachtwoord vergeten -- met een wachtwoord of met een passkey. Uit betekent dat niemand meer binnenkomt; de eigenaar houdt het techniekbord.  
+- **Inloggen en registreren** (`tg-inlog`) — De voordeur: inloggen, uitloggen, registreren en wachtwoord vergeten. Uit betekent dat niemand meer binnenkomt; de eigenaar houdt het techniekbord.  
   _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_
 - **Account en profiel** (`tg-account`) — Het eigen account: rollen, koppelingen en het cv van een lid.  
   _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_

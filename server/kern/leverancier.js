@@ -32,6 +32,21 @@ const ZAAK_OPTIES = {
   betaalVooraf: 'vooraf betalen',
   gastchat: 'de gastchat',
   ritten: 'ritaanvragen',
+  /* TWEE SOORTEN RITAANVRAAG, en een vervoerder kiest zelf welke hij aanneemt.
+     Besluit van de eigenaar (3 september 2026): "de taxichauffeur kan zelf
+     kiezen of hij beide wil of juist een uit", en dat geldt voor een losse
+     chauffeur net zo goed als voor een bedrijf.
+
+     Waarom twee booleans en geen keuzelijst met drie standen: dit register
+     draagt booleans (routes/supplier/toegang-settings.js toetst er letterlijk
+     op), en "beide aan, of een uit" IS twee booleans. Een derde vorm ernaast
+     zou de instellingenroute, de audit-regel en het scherm alle drie een
+     uitzondering geven.
+
+     Beide UIT betekent hetzelfde als `ritten: false`; kern/lidacties/ritten.js
+     zegt dat met zoveel woorden in plaats van een lege lijst te tonen. */
+  rittenMetDoel: 'ritten met een bestemming vooraf',
+  rittenZonderDoel: 'ritten waarbij de gast de bestemming onderweg noemt',
   deurenGast: 'de digitale gastsleutel',
   events: 'event-aanmeldingen'
 };

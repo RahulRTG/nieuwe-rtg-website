@@ -63,6 +63,8 @@ module.exports = ({ db, save, crypto, schoon, notify, notifySupplier, sseToSuppl
     return { allergenen: p.allergenen, dieet: p.dieet, medisch: p.medisch };
   }
 
+  const { zorgMee, zorgActueel } = require('./gastzorg-profiel')({ zorgVoor, nu });
+
   function noteerInzage(key, door) {
     const id = idVanKey(key);
     if (id == null) return;                       // een gast of persona heeft geen dossier
@@ -140,7 +142,7 @@ module.exports = ({ db, save, crypto, schoon, notify, notifySupplier, sseToSuppl
           km: afstand != null ? Math.round(afstand / 100) / 10 : null,
           etaMin: etaMinutes(afstand, (L && L.mode) || 'driving'),
           wachtOpLocatie: !loc,
-          zorg: zorgVoor(d.key)
+          zorg: zorgMee(d.key, { zaak: s.code, reden: 'gast deelt live locatie met deze zaak' })
         };
       })
       .sort((a, b) => (a.etaMin == null ? 999 : a.etaMin) - (b.etaMin == null ? 999 : b.etaMin));
@@ -156,5 +158,5 @@ module.exports = ({ db, save, crypto, schoon, notify, notifySupplier, sseToSuppl
     };
   }
 
-  return { zorgVan, zorgZet, zorgVoor, locDeel, locStopKlant, locStopZaak, locVoorZaak, locMijn };
+  return { zorgVan, zorgZet, zorgVoor, zorgMee, zorgActueel, locDeel, locStopKlant, locStopZaak, locVoorZaak, locMijn };
 };

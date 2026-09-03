@@ -95,6 +95,16 @@ const GETALLEN = {
     wat: 'soorten belofte die beide ketens afvangen' },
   'ketenvorm.themasTotaal': { bron: 'KETENVORM.json', veld: 'telling.themasTotaal',
     wat: 'soorten belofte over de twee ketens samen' },
+  'ritmigratie.bestanden': { bron: 'RITMIGRATIE.json', veld: 'telling.bestanden',
+    wat: 'bestanden die db.data.rides noemen' },
+  'ritmigratie.stand': { bron: 'RITMIGRATIE.json', veld: 'telling.stand',
+    wat: 'lezers van db.data.rides die de LOPENDE rit tonen' },
+  'ritmigratie.historie': { bron: 'RITMIGRATIE.json', veld: 'telling.historie',
+    wat: 'lezers die historie aftellen (omzet, fooi, fiscale grondslag)' },
+  'ritmigratie.kanNu': { bron: 'RITMIGRATIE.json', veld: 'telling.kanNu',
+    wat: 'lezers die vandaag naar de opdrachtwereld kunnen zonder dat er een rit uit beeld valt' },
+  'ritmigratie.wacht': { bron: 'RITMIGRATIE.json', veld: 'telling.wachtOpBesluit',
+    wat: 'lezers die wachten op het besluit over ritten zonder bestemming' },
   'doodspoor.nietGemeten': { bron: 'DOODSPOOR.json', veld: 'nietGezien.nietGemeten',
     wat: 'routes die in de idempotentieproef geen werk deden en dus buiten deze meting vallen' }
 };

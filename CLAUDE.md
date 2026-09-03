@@ -885,9 +885,18 @@ gisteren nog deed). De ritketen is GROVER, dus de brug loopt een PAD:
 en het pad gaat nooit via `incident` of `geannuleerd` -- dat zou een gebeurtenis
 verzinnen die niet plaatsvond. De standen worden VERTAALD en niet overgetypt
 (toets 4 zakt zodra een ritstand naar `rijdt` vertaalt). En de brug loopt ÉÉN
-KANT OP: twee lijsten die elkaar bijwerken hebben geen waarheid meer. Wat nog
-niet gebeurd is: de 34 lezers van `db.data.rides` zijn niet omgezet, dus die
-lijst is nog geen projectie -- de richting staat vast, de migratie niet.
+KANT OP: twee lijsten die elkaar bijwerken hebben geen waarheid meer. **De migratie is in kaart en staat stil op EEN besluit**
+(`scripts/ritmigratie.js`): van de <!--getal:ritmigratie.bestanden-->21<!--/getal-->
+plekken die `db.data.rides` noemen lezen er <!--getal:ritmigratie.stand-->7<!--/getal-->
+de lopende rit, tellen <!--getal:ritmigratie.historie-->9<!--/getal--> historie af,
+schrijven er 2 en noemen er 3 hem alleen in commentaar. De kaart bewees haar nut
+meteen: de eerste versie zei "zeven kunnen nu om", maar een rit ZONDER opdracht
+valt dan uit beeld -- en dan ziet een lid zijn eigen taxi niet meer in
+`/api/live/state`. Dat is een regressie, geen migratie. Stand nu:
+<!--getal:ritmigratie.kanNu-->0<!--/getal--> kunnen om,
+<!--getal:ritmigratie.wacht-->16<!--/getal--> wachten. De blokkade is dat niet
+elke rit een opdracht KAN krijgen (de app stuurt `toCode` alleen bij een gekozen
+bestemming), en het besluit dat dat opheft staat in MAATSTAF.md par. 7.5.
 De domeingrens (`GRENZEN.json`) hield de brug trouwens tegen tot iemand hem op
 de lijst zette, precies zoals bedoeld.
 

@@ -239,7 +239,9 @@
     "ritproef": "node scripts/ritproef.js",
     "ritproef:vast": "node scripts/ritproef.js --vastleggen",
     "ketenvorm": "node scripts/ketenvorm.js",
-    "ketenvorm:vast": "node scripts/ketenvorm.js --vastleggen"
+    "ketenvorm:vast": "node scripts/ketenvorm.js --vastleggen",
+    "ritmigratie": "node scripts/ritmigratie.js",
+    "ritmigratie:vast": "node scripts/ritmigratie.js --vastleggen"
   },
   "devDependencies": {
     "playwright": "^1.62.1"

@@ -624,11 +624,38 @@ vast:
    lijsten die elkaar bijwerken hebben geen waarheid meer — en het besluit was
    juist dat de opdracht dat is.
 
-De aanvraag verschijnt nu op het dispatchbord, en schakel 1 sluit. Wat nog
-**niet** is gebeurd: de 34 lezers van `db.data.rides` (fiscaal, kantoormetrics,
-waardering, spaarpot, annuleren, de leverancierstaat) zijn niet omgezet, dus
-`rides` is vandaag nog een echte lijst en geen projectie. De richting staat vast,
-de migratie niet — en dat staat in de kop van de brug, niet alleen hier.
+De aanvraag verschijnt nu op het dispatchbord, en schakel 1 sluit.
+
+**De migratie is in kaart gebracht en staat stil op één besluit.**
+`scripts/ritmigratie.js` (`npm run ritmigratie`) deelt de <!--getal:ritmigratie.bestanden-->21<!--/getal-->
+plekken die `db.data.rides` noemen in naar wat ze ermee doen:
+<!--getal:ritmigratie.stand-->7<!--/getal--> lezen de **lopende** rit,
+<!--getal:ritmigratie.historie-->9<!--/getal--> tellen **historie** af,
+2 **schrijven**, en 3 noemen hem alleen in commentaar.
+
+Die kaart is geschreven vóór er een regel verplaatst werd, en zij heeft haar nut
+meteen bewezen: de eerste versie zei *"zeven lezers kunnen nu om"*, omdat een
+stand-lezer alleen de lopende rit toont en de opdracht die rijker draagt. Wat
+daarbij werd overgezien is dat een rit **zonder** opdracht dan uit die weergave
+valt — en dan ziet een lid met een bestemmingsloze rit zijn eigen taxi niet meer
+staan in `/api/live/state`. Dat is geen migratie maar een regressie. De eerlijke
+uitkomst staat er nu: **<!--getal:ritmigratie.kanNu-->0<!--/getal--> lezers kunnen
+om, <!--getal:ritmigratie.wacht-->16<!--/getal--> wachten**, en
+`test/ritmigratie.test.js` toets 3 houdt dat vast zolang de blokkade bestaat.
+
+**De blokkade, en het besluit dat hem opheft.** Niet elke rit kán een opdracht
+krijgen: de ledenapp stuurt `toCode` alleen als het lid een bestemming heeft
+gekozen (`public/apps/app-main.js`, `verstuurRit`), en zonder bestemming lost
+`kern/mobiliteit/plekken.js` geen plek op. De vraag die de eigenaar moet
+beantwoorden staat in de uitslag onder `blokkade.besluit`:
+
+> Krijgt een rit zonder bestemming ook een opdracht (met een onbekende
+> bestemming, dus zonder afstand en zonder vaste prijs), of blijft die soort rit
+> buiten de opdrachtwereld en lezen de historie-tellers beide lijsten?
+
+Zolang dat openstaat is `rides` een echte lijst en geen projectie. De richting
+staat vast, de migratie niet — en dat staat in de kop van de brug, niet alleen
+hier.
 
 Eén ding kwam bij het bouwen naar boven en is de moeite waard: de domeingrens
 (`GRENZEN.json`) hield de brug tegen tot iemand hem op de lijst zette. Precies

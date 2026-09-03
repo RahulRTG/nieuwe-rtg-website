@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-03T10:59:23.351Z",
-    "commit": "5c99baaa",
+    "op": "2026-09-03T11:11:47.012Z",
+    "commit": "cd999c7a",
     "boomVuil": false,
-    "boomAnders": 10,
+    "boomAnders": 14,
     "instrument": "scripts/activering.js",
     "node": "v22.22.2"
   },
@@ -8889,7 +8889,7 @@
         "wervingsLink",
         "zaakBoard"
       ],
-      "bestandenBereikt": 1308,
+      "bestandenBereikt": 1309,
       "knopen": 379,
       "perLaag": {
         "domein": 264,
@@ -9418,7 +9418,7 @@
         "geparkeerd",
         "kern"
       ],
-      "bestandenBereikt": 1026,
+      "bestandenBereikt": 1027,
       "knopen": 328,
       "perLaag": {
         "domein": 219,
@@ -9792,7 +9792,7 @@
         "kern",
         "lidboard"
       ],
-      "bestandenBereikt": 764,
+      "bestandenBereikt": 765,
       "knopen": 230,
       "perLaag": {
         "domein": 159,

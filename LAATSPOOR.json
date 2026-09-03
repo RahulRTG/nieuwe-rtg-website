@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-03T10:59:16.270Z",
-  "commit": "5c99baaa",
+  "op": "2026-09-03T11:11:39.910Z",
+  "commit": "cd999c7a",
   "boomVuil": false,
-  "boomAnders": 5,
+  "boomAnders": 9,
   "instrument": "scripts/laatspoor.js",
   "node": "v22.22.2"
  },

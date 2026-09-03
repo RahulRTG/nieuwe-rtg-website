@@ -1,19 +1,18 @@
 {
  "stempel": {
-  "op": "2026-08-31T18:44:41.624Z",
-  "commit": "47c119c3",
+  "op": "2026-09-03T08:26:55.105Z",
+  "commit": "df1a581a",
   "boomVuil": false,
-  "boomAnders": 2,
-  "instrument": "scripts/handelingproef-route.js",
-  "node": "v22.22.2"
+  "node": "v22.22.2",
+  "begrenzing": 8000
  },
  "uitleg": "Per schrijfroute: liet een geslaagde oproep een geketende regel na in het handelingsspoor? Een route die hier NIET in staat is niet beproefd, en dat is ongemeten en geen groen. \"ongemeten\" betekent hier: de oproep gaf geen 2xx, dus er is niets gebeurd en er hoort geen regel te zijn.",
  "gemeten": {
-  "routesMetRol": 3638,
-  "beproefd": 3638,
-  "bewezen": 709,
+  "routesMetRol": 3643,
+  "beproefd": 3643,
+  "bewezen": 710,
   "gezakt": 0,
-  "ongemeten": 2929,
+  "ongemeten": 2933,
   "ketenOk": true,
   "begrenzing": 8000
  },
@@ -13796,11 +13795,51 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/vakbewijs/intrek",
+   "rol": "office",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/vakbewijs/nummer",
+   "rol": "office",
+   "status": 400,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 400), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/vakbewijs/teken",
+   "rol": "office",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/vakbewijzen",
    "rol": "office",
    "status": 200,
    "audit": "bewezen",
    "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/verifications",
+   "rol": "office",
+   "status": 200,
+   "audit": "bewezen",
+   "reden": "er staat een geketende regel voor dit pad"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/verify",
+   "rol": "office",
+   "status": 404,
+   "audit": "ongemeten",
+   "reden": "de oproep deed geen werk (status 404), dus er hoort geen regel te zijn"
   },
   {
    "methode": "POST",

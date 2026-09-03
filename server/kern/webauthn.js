@@ -132,7 +132,13 @@ function maakWebauthn({ db, save, accounts, schoon }) {
     cred.counter = uit.authenticationInfo.newCounter;
     cred.laatstGebruikt = new Date().toISOString();
     save();
-    return { status: 200, ok: true, user };
+    /* WELKE sleutel inlogde, gaat mee terug. De route leidt daar een stabiele
+       apparaatsleutel uit af (kern/isolatie/apparaatsleutel.js) -- dit is de
+       enige plek in het huis waar een geverifieerd toestelkenmerk bestaat, en
+       hij werd tot nu toe weggegooid. Let op: het veld `apparaat` op een
+       credential betekent iets ANDERS (single- of multiDevice uit de
+       registratie) en mag hier niet mee worden verward. */
+    return { status: 200, ok: true, user, credentialId: cred.id };
   }
 
   /* De stap-op-ceremonie (een handeling bevestigen in plaats van inloggen)

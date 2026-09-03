@@ -1,8 +1,8 @@
 {
  "stempel": {
-  "op": "2026-08-29T23:12:39.122Z",
-  "commit": "55e4a311",
-  "boomVuil": true,
+  "op": "2026-09-02T10:32:52.342Z",
+  "commit": "4075884d",
+  "boomVuil": false,
   "node": "v22.22.2"
  },
  "uitleg": "Per route of de code KAN schrijven. Alleen bruikbaar als VETO: de schrijfvormenlijst is met opzet te ruim, dus een \"ja\" weerlegt wel dat een route niets verandert, maar een \"nee\" bewijst niet dat hij dat niet doet.",
@@ -12,7 +12,7 @@
   "ja": 979,
   "nee": 49,
   "onbekend": 3413,
-  "veto": 202
+  "veto": 211
  },
  "veto": [
   {
@@ -154,6 +154,11 @@
    "route": "POST /api/geld/rahul",
    "bestand": "server/routes/geldrahul.js",
    "waarom": "schrijfvorm gevonden: lijst-mutatie"
+  },
+  {
+   "route": "POST /api/kosten/vooruitblik",
+   "bestand": "server/routes/kosten.js",
+   "waarom": "schrijfvorm gevonden: Object.assign"
   },
   {
    "route": "POST /api/leven/cockpit",
@@ -331,6 +336,11 @@
    "waarom": "schrijfvorm gevonden: lijst-mutatie"
   },
   {
+   "route": "POST /api/onderneming/intake",
+   "bestand": "server/routes/member/onderneming-verkenning.js",
+   "waarom": "schrijfvorm gevonden: save()"
+  },
+  {
    "route": "POST /api/plaats/dienst",
    "bestand": "server/routes/plaats.js",
    "waarom": "schrijfvorm gevonden: lijst-mutatie"
@@ -359,11 +369,6 @@
    "route": "POST /api/supplier/aanwezig",
    "bestand": "server/server.js",
    "waarom": "via \"aanwezigVan\" in /home/user/nieuwe-rtg-website/server/server.js schrijft: db.data toewijzing, toewijzing aan een veld"
-  },
-  {
-   "route": "POST /api/supplier/activiteit/sluit",
-   "bestand": "server/routes/supplier/tickets-dicht.js",
-   "waarom": "schrijfvorm gevonden: save()"
   },
   {
    "route": "POST /api/supplier/backoffice",
@@ -651,6 +656,11 @@
    "waarom": "schrijfvorm gevonden: save(), lijst-mutatie, toewijzing aan een veld"
   },
   {
+   "route": "POST /api/supplier/kosten/vooruitblik",
+   "bestand": "server/routes/kosten.js",
+   "waarom": "schrijfvorm gevonden: Object.assign"
+  },
+  {
    "route": "POST /api/supplier/location",
    "bestand": "server/routes/supplier/vervoer.js",
    "waarom": "schrijfvorm gevonden: save(), toewijzing aan een veld"
@@ -856,6 +866,11 @@
    "waarom": "via \"herstelStart\" in /home/user/nieuwe-rtg-website/server/routes/auth/herstel.js schrijft: save(), netwerk uit"
   },
   {
+   "route": "POST /api/bedrijf/apparaten",
+   "bestand": "server/bedrijf/it.js",
+   "waarom": "via \"A\" in /home/user/nieuwe-rtg-website/server/bedrijf/it.js schrijft: toewijzing aan een veld"
+  },
+  {
    "route": "POST /api/bedrijf/beeld",
    "bestand": "server/bedrijf/beeld.js",
    "waarom": "schrijfvorm gevonden: Object.assign"
@@ -1004,6 +1019,36 @@
    "route": "POST /api/munt/webhook",
    "bestand": "server/opzet/webhooks.js",
    "waarom": "schrijfvorm gevonden: toewijzing aan een veld"
+  },
+  {
+   "route": "POST /api/rtf/beroepen",
+   "bestand": "server/routes/rtfschool.js",
+   "waarom": "via \"profiel\" in /home/user/nieuwe-rtg-website/server/routes/rtfschool.js schrijft: toewijzing aan een veld"
+  },
+  {
+   "route": "POST /api/rtf/beroepen/mijn",
+   "bestand": "server/routes/rtfschool.js",
+   "waarom": "via \"profiel\" in /home/user/nieuwe-rtg-website/server/routes/rtfschool.js schrijft: toewijzing aan een veld"
+  },
+  {
+   "route": "POST /api/rtf/samen/weg",
+   "bestand": "server/routes/rtfschool.js",
+   "waarom": "via \"profiel\" in /home/user/nieuwe-rtg-website/server/routes/rtfschool.js schrijft: toewijzing aan een veld"
+  },
+  {
+   "route": "POST /api/rtf/school",
+   "bestand": "server/routes/rtfschool.js",
+   "waarom": "via \"profiel\" in /home/user/nieuwe-rtg-website/server/routes/rtfschool.js schrijft: toewijzing aan een veld"
+  },
+  {
+   "route": "POST /api/rtf/school/catalogus",
+   "bestand": "server/routes/rtfschool.js",
+   "waarom": "via \"profiel\" in /home/user/nieuwe-rtg-website/server/routes/rtfschool.js schrijft: toewijzing aan een veld"
+  },
+  {
+   "route": "POST /api/rtf/school/mijn",
+   "bestand": "server/routes/rtfschool.js",
+   "waarom": "via \"profiel\" in /home/user/nieuwe-rtg-website/server/routes/rtfschool.js schrijft: toewijzing aan een veld"
   },
   {
    "route": "POST /api/rtf/vacatures",

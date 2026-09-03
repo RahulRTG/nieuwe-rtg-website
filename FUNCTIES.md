@@ -16,14 +16,14 @@ het?**
 
 | | |
 |---|---|
-| Functieschakelaars (aan/uit per functie) | **205** in 17 categorieën |
+| Functieschakelaars (aan/uit per functie) | **210** in 17 categorieën |
 | Apps in de leden-catalogus | **84** in 8 categorieën |
 | Bedrijfsgenres | **74** in 27 sectoren |
 | Genre-caps (waar de apps op sturen) | **40** |
 | API-routes (uit de router) | **4738** |
-| Kernmodules (`server/kern/**`) | **1919** |
-| App-pagina's (`public/apps/**.html`) | **284** |
-| Testbestanden | **1534** |
+| Kernmodules (`server/kern/**`) | **2002** |
+| App-pagina's (`public/apps/**.html`) | **292** |
+| Testbestanden | **1593** |
 
 ## De vier werelden
 
@@ -54,9 +54,9 @@ ook blokkeert.
 
 ---
 
-# 1. De 205 functieschakelaars
+# 1. De 210 functieschakelaars
 
-### Leden (RTG-app) — 21
+### Leden (RTG-app) — 22
 
 - **Leden-app (algemeen)** (`member`) — Alle ledenfuncties in de RTG-app. Zet je dit uit, dan valt de hele ledenkant stil (behalve wat hieronder apart aan staat).  
   _voor: rtg, lifestyle, business, gast_
@@ -76,6 +76,8 @@ ook blokkeert.
   _voor: rtg, lifestyle, business_
 - **Het Privékantoor (Lifestyle)** (`privekantoor`) — De ene app van de Lifestyle Pass: de levensgraaf over de premium-apps heen, de Control Tower met alle termijnen, het mandaat (wat mag het kantoor zelf) en zaken met een team en een tijdlijn. Uit zetten laat de onderliggende apps staan; alleen de samenhang verdwijnt.  
   _voor: lifestyle, business_
+- **RTG Service (een zaak, een mens, bellen)** (`service`) — Een servicezaak met een tijdlijn, de bevestiging waarmee een lid een medewerker of de AI-onderzoeker iets laat openen, en bellen naar RTG binnen de app met een meeleesbaan. Uitzetten sluit de envelop, niet de vier hulplijnen eronder.  
+  _voor: rtg, lifestyle, business_
 - **De app-staat** (`kern-state`) — De ene aanroep waarmee de app zijn hele beeld ophaalt. Uit betekent een lege app voor iedereen.  
   _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_
 - **De live-verbinding** (`kern-live`) — De open lijn (SSE) waarover meldingen en verversingen binnenkomen, plus de verbindingsgegevens voor bellen.  
@@ -135,7 +137,7 @@ ook blokkeert.
 - **RTF contacten & familiekoppeling** (`rtf-contacten`) — De contactenlaag van de RTFoundation: gezinnen koppelen, kanalen en meldingen tussen leden.  
   _voor: rtg, lifestyle, business, foundation_
 
-### Eigen apps — 35
+### Eigen apps — 37
 
 - **Spelen (spellen met vrienden)** (`spellen`) — Alle spellen: schaken, dammen, rummi, Magnaat, sudoku en de partyspellen.  
   _voor: rtg, lifestyle, business, foundation_
@@ -207,10 +209,16 @@ ook blokkeert.
   _voor: rtg, lifestyle, business_
 - **Verzorging (kapper, barbier, nagels)** (`verzorging`) — De salonagenda vanaf de kant van het lid, op codenaam. Zorg en verzorging staan naast elkaar maar niet door elkaar: hier reist geen zorgprofiel mee.  
   _voor: rtg, lifestyle, business_
+- **Kinderopvang (ouderkant)** (`opvangwijzer`) — Welke kinderopvang er is en hoeveel plek daar vrij is, plus een aanvraag klaarzetten en zelf weer intrekken. Een vrije plek is geen plek: inschrijven doet de opvang zelf. De aanwezigheidslijst van een groep komt hier nooit uit; een ouder ziet een getal en niet de namen van andere kinderen.  
+  _voor: rtg, lifestyle, business_
+- **Knelpunten (welke weg ligt open)** (`knelpunt`) — Rekent uit welke weg naar een doel openligt, wat hem blokkeert en wat er niet is nagegaan. Bewaart niets: alles komt binnen in het verzoek en gaat eruit als antwoord. Er wordt niets gerangschikt en geen beste weg aangewezen.  
+  _voor: rtg, lifestyle, business_
 
-### Partners (leveranciers) — 10
+### Partners (leveranciers) — 11
 
 - **Partner-app (algemeen)** (`supplier`) — Alle leveranciersfuncties. Uit = partners kunnen niets meer doen (behalve wat hieronder apart aan staat).  
+  _voor: leverancier_
+- **Voedselveiligheid (HACCP)** (`supplier-haccp`) — Het temperatuurlogboek en de HACCP-metingen van een keuken. Een wettelijke registratieplicht.  
   _voor: leverancier_
 - **Kassa (POS)** (`supplier-pos`) — Het kassascherm per sector: afrekenen en RTG-code innen.  
   _voor: leverancier_
@@ -248,7 +256,7 @@ ook blokkeert.
 - **Tenant Control Plane (white-label)** (`tenant`) — Welke organisatie een werkruimte draait, welk merk zij daar voert, en hoe een groep van haar identiteitsprovider een rol wordt. Uit = de werkruimtes werken door onder de RTG-huisstijl, en een inlog via een provider levert geen rollen meer op.  
   _voor: intern, business_
 
-### RTFoundation — 14
+### RTFoundation — 15
 
 - **RTFoundation-app (onderwijs)** (`foundation`) — De gratis onderwijs-app: live schoolbord, leerling-schrift en de AI-bijleshulp.  
   _voor: foundation_
@@ -259,6 +267,8 @@ ook blokkeert.
 - **Het RTF-kantoor** (`dom-rtfkantoor`) — Het eigen kantoor van de stichting: kamers, clubs en het onderzoekslab.  
   _voor: foundation_
 - **Foundation OS** (`dom-rtfos`) — Steden, partnerstichtingen, projecten, vrijwilligers, geld, hulpvragen en verantwoording.  
+  _voor: foundation_
+- **Voordeur beschermzaak (zonder account)** (`dom-beschermdeur`) — De eigen ingang naar hulp bij geweld en uitbuiting: eerst "ben je nu veilig", dan pas de rest, en een code die de mens zelf weer kan intrekken. Zonder inlog, want wie hier aanklopt heeft vaak geen account. Uitzetten sluit die deur; de wegwijzer toont dan dat er geen plaats is die dit oppakt.  
   _voor: foundation_
 - **Het Onderzoekslab** (`dom-lab`) — Projecten, fases, bevindingen en de kennisbank van het lab.  
   _voor: foundation_
@@ -491,7 +501,7 @@ ook blokkeert.
 
 ### Toegang en identiteit — 8
 
-- **Inloggen en registreren** (`tg-inlog`) — De voordeur: inloggen, uitloggen, registreren en wachtwoord vergeten. Uit betekent dat niemand meer binnenkomt; de eigenaar houdt het techniekbord.  
+- **Inloggen en registreren** (`tg-inlog`) — De voordeur: inloggen, uitloggen, registreren en wachtwoord vergeten -- met een wachtwoord of met een passkey. Uit betekent dat niemand meer binnenkomt; de eigenaar houdt het techniekbord.  
   _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_
 - **Account en profiel** (`tg-account`) — Het eigen account: rollen, koppelingen en het cv van een lid.  
   _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_

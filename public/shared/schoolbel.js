@@ -45,7 +45,8 @@
        baan hangt IN het belvenster en niet ernaast; wat er staat is getypt door
        een mens, niet herkend uit spraak (zie de kop van shared/meelezen.js). */
     if (window.RTGMeelezen) {
-      mee = window.RTGMeelezen.maak({ stuur: function (regel) { sein('tekst', { r: regel }); } });
+      mee = window.RTGMeelezen.maak({ stuur: function (regel) { sein('tekst', { r: regel }); },
+        stroom: function () { return stream; } });
       el.appendChild(mee.el);
     }
     el.querySelector('#sbelWeg').addEventListener('click', function () { sein('hangup'); stop(); });

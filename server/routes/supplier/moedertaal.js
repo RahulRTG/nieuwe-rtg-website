@@ -22,19 +22,29 @@ module.exports = (kern) => {
     if (!db.data.staffTaal || typeof db.data.staffTaal !== 'object') db.data.staffTaal = {};
     return db.data.staffTaal;
   };
+  /* De leesbroer van bak(). Deze route is ook de VRAAG "welke taal spreek ik",
+     en een uitgezette taal wordt hier geweigerd -- allebei mogen ze de la niet
+     neerzetten voor een huis dat er nog geen had, want dan zeggen het antwoord
+     (200 met 'nl', of 400) en de database iets anders over hetzelfde verzoek.
+     Bestaat de la, dan is dit de echte; anders een lege vorm die nergens aan
+     vastzit, en die leest even goed. */
+  const kijk = () => (db.data.staffTaal && typeof db.data.staffTaal === 'object') ? db.data.staffTaal : {};
 
   app.post('/api/supplier/mijn/taal', supplierAuth, (req, res) => {
-    const b = bak();
     const k = sleutelVan(req);
     if (req.body && req.body.taal !== undefined) {
       const t = String(req.body.taal || '').toLowerCase();
-      if (!t || t === 'nl') { delete b[k]; save(); return res.json({ ok: true, taal: 'nl' }); }
-      if (!talen.isActief(t)) return res.status(400).json({ error: 'Deze taal staat (nog) niet aan. De boardroom zet wereldtalen aan of uit.' });
+      // terug naar Nederlands is het WISSEN van de eigen taal en geen taalkeuze,
+      // dus die weg vraagt de talenlijst niets -- ook niet of 'nl' aanstaat
+      const wis = (!t || t === 'nl');
+      if (!wis && !talen.isActief(t)) return res.status(400).json({ error: 'Deze taal staat (nog) niet aan. De boardroom zet wereldtalen aan of uit.' });
+      const b = bak();
+      if (wis) { delete b[k]; save(); return res.json({ ok: true, taal: 'nl' }); }
       b[k] = t;
       save();
       return res.json({ ok: true, taal: t });
     }
-    res.json({ ok: true, taal: b[k] || 'nl', talen: talen.actieve() });
+    res.json({ ok: true, taal: kijk()[k] || 'nl', talen: talen.actieve() });
   });
 
   app.post('/api/supplier/vertaal/ui', supplierAuth, async (req, res) => {

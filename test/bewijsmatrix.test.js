@@ -243,3 +243,53 @@ test('de ketensamenvoeging kent gif en geen volgorde: NVT wist een PROVEN nooit 
     try { fs.rmSync(map, { recursive: true, force: true }); } catch (e) {}
   }
 });
+
+/* ---------- de vormgrendel op de registers ----------
+   Toegevoegd 2 september 2026, na TAKEN.md 7.22: `AUDITPROEF.json` werd door twee
+   scripts geschreven in twee vormen, en de lezer in de matrix kende er maar een.
+   Hij gaf daarop stil `null` terug, en de AUDIT-kolom meldde 0 bewezen terwijl het
+   register er 860 droeg. Ruim een jaar groen op een lezer die niets las.
+
+   De reparatie is dat een vormverschil nu OMVALT in plaats van nul te tellen. Dat
+   is een oordeel over het instrument en niet over een route, en het hoort dus de
+   bouw te laten zakken. */
+const os_ = require('node:os');
+const fs_ = require('node:fs');
+const path_ = require('node:path');
+const { objectRegister, perRouteKaart } = require('../scripts/bewijsmatrix');
+
+const schrijfTijdelijk = (naam, inhoud) => {
+  const map = fs_.mkdtempSync(path_.join(os_.tmpdir(), 'rtg-vormgrendel-'));
+  const p = path_.join(map, naam);
+  fs_.writeFileSync(p, JSON.stringify(inhoud, null, 1));
+  return p;
+};
+
+test('een register met de VERKEERDE vorm valt om en telt niet als nul', () => {
+  /* De array-lezer krijgt de object-vorm voorgeschoteld. Dat is exact het geval
+     dat 7.22 opleverde, alleen andersom -- en het moet aan beide kanten knallen. */
+  const alsObject = schrijfTijdelijk('PROEF.json', { perRoute: { 'POST /api/x': { audit: 'bewezen' } } });
+  assert.throws(() => perRouteKaart(alsObject), /draagt perRoute als een object/,
+    'de array-lezer hoort te zeggen dat hij dit register niet kent');
+
+  const alsArray = schrijfTijdelijk('PROEF.json', { perRoute: [{ methode: 'POST', pad: '/api/x', staat: 'bewezen' }] });
+  assert.throws(() => objectRegister(alsArray), /draagt perRoute als een array/,
+    'en de object-lezer andersom');
+
+  /* Mutatie nagetrokken: `vormfout()` terugzetten naar `return null` laat allebei
+     deze asserties vallen -- en dan is de kolom weer stil nul. */
+});
+
+test('een register dat ONTBREEKT of leeg is, geeft wel gewoon null', () => {
+  /* De grendel mag de eerlijke gevallen niet meenemen. Er is verschil tussen
+     "er is niets te lezen" en "ik kan dit niet lezen"; alleen het tweede is een
+     defect. Zonder deze toets zou een strengere grendel de bouw laten omvallen
+     op een register dat nog niet is gedraaid, en dat is geen defect. */
+  assert.equal(perRouteKaart(null), null, 'geen pad is geen defect');
+  assert.equal(objectRegister(null), null, 'geen pad is geen defect');
+  const weg = path_.join(os_.tmpdir(), 'rtg-bestaat-niet-' + process.pid + '.json');
+  assert.equal(perRouteKaart(weg), null, 'een ontbrekend bestand is geen defect');
+  const zonder = schrijfTijdelijk('PROEF.json', { uitleg: 'nog niet gedraaid' });
+  assert.equal(perRouteKaart(zonder), null, 'een register zonder perRoute is geen defect');
+  assert.equal(objectRegister(zonder), null, 'ook niet voor de andere lezer');
+});

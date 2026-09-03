@@ -45,11 +45,9 @@
 'use strict';
 
 const fs = require('fs');
-const os = require('os');
 const path = require('path');
-const { spawn } = require('child_process');
 const { alleRoutes } = require('./lib/routes');
-const { gereedschapsomgeving } = require('./lib/wegwerpserver');
+const wegwerp = require('./lib/wegwerpserver');
 const { plausibelLijf } = require('./lib/rolproef');
 /* Wanneer is dit gemeten, en waartegen. Zonder stempel is een register niet na
    te lopen: verouderd ziet er identiek uit aan vers, en scripts/versheid.js kan
@@ -87,23 +85,25 @@ function rolVan(bewakers) {
   return null;
 }
 
-function vrijePoort() {
-  const net = require('net');
-  return new Promise((res, rej) => {
-    const s = net.createServer();
-    s.unref(); s.on('error', rej);
-    s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => res(p)); });
-  });
-}
+/* VIA DE GEDEELDE WEGWERPSERVER, en dat was hij niet. Dit bestand had een eigen
+   `vrijePoort()`, een eigen `wacht()` en een eigen `spawn` met een eigen
+   env-lijst -- alle drie een tweede uitvoering van wat scripts/lib/wegwerpserver.js
+   al doet. Dat kostte meteen twee dingen: de standaard `RTG_SCHORSPOORT_UIT=1`
+   die daar op 2 september 2026 bij kwam kreeg deze proef niet (zie de uitleg
+   daar over de lus die zichzelf dichttrok), en `RTG_MAGNAAT_TEST` ontbrak
+   waardoor de demo-deur dichtstond en de proef struikelde op "geen token voor:
+   member, supplier". Een tweede plek voor een waarheid, en de zwakste won
+   (LAT.md regel 4). */
 
-async function wacht(basis, ms) {
-  const eind = Date.now() + ms;
-  while (Date.now() < eind) {
-    try { const r = await fetch(basis + '/api/health'); if (r.ok) return true; } catch (e) {}
-    await new Promise(r => setTimeout(r, 200));
-  }
-  return false;
-}
+/* DE WACHT VOOR HET REQUIREN, en die stond hier niet.
+
+   Dit script SCHRIJFT een register. Een laadcontrole (`node -e "require(...)"`)
+   startte daarmee de hele proef met de standaardbegrenzing en schreef het
+   register terug -- dat is een keer echt gebeurd met ROLPROEF.json, dat van 3377
+   beproefde routes terugviel naar 292 en er daarna volkomen normaal uitzag.
+   scripts/meetkeuring.js handhaaft deze regel; hij zag dit bestand pas toen het
+   op 2 september 2026 een stempel kreeg en daarmee als register meetelde. */
+if (require.main !== module) return;
 
 wachtOpSchoneBoom();
 
@@ -113,26 +113,13 @@ wachtOpSchoneBoom();
 if (require.main !== module) return;
 
 (async () => {
-  const poort = await vrijePoort();
-  const datamap = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-handelingproef-'));
-  const basis = 'http://127.0.0.1:' + poort;
-
-  const kind = spawn(process.execPath, [path.join(WORTEL, 'server', 'server.js')], {
-    cwd: WORTEL, stdio: 'ignore',
-    /* RTG_DEMO=1 mint alleen de TOKENS; de routes die daarna worden beproefd
-       zijn de echte, met hun echte bewakers ervoor. Zelfde afweging als in
-       rolproef-route.js, en om dezelfde reden daar uitgelegd. */
-    /* De omgeving komt uit lib/wegwerpserver: RTG_DEMO=1 is op zichzelf een
-       no-op geworden (server/testomgeving.js), en deze twee instrumenten hebben
-       nog hun eigen spawn en zouden die reparatie dus mislopen. Dat is precies
-       hoe de andere elf hem wel kregen en deze twee niet. */
-    env: gereedschapsomgeving({ poort, datamap },
-      { RTG_DEMO: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' })
-  });
-
-  const klaar = () => { try { kind.kill('SIGKILL'); } catch (e) {} try { fs.rmSync(datamap, { recursive: true, force: true }); } catch (e) {} };
-  process.on('exit', klaar);
-  if (!await wacht(basis, 90000)) { console.error('de server kwam niet op'); klaar(); process.exit(2); }
+  /* RTG_DEMO + RTG_MAGNAAT_TEST minten alleen de TOKENS; de routes die daarna
+     worden beproefd zijn de echte, met hun echte bewakers ervoor. Zelfde
+     afweging als in rolproef-route.js, en om dezelfde reden daar uitgelegd. */
+  const server = await wegwerp.start({ naam: 'handelingproef',
+    env: { RTG_DEMO: '1', RTG_MAGNAAT_TEST: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' } });
+  const basis = server.basis;
+  const klaar = () => server.klaar();
 
   const post = async (pad, lijf, tok) => {
     try {
@@ -201,7 +188,9 @@ if (require.main !== module) return;
   console.log('  keten van het spoor       : ' + (ketenOk ? 'klopt' : 'GEBROKEN'));
 
   fs.writeFileSync(UITSLAG, JSON.stringify({
-    stempel: stempel(),
+    /* Zonder stempel is een register een meting zonder datum, en die leest als
+       vers. scripts/versheid.js en scripts/vertrouwen.js lezen hem allebei. */
+    stempel: stempel({ begrenzing: MAX || 'geen' }),
     uitleg: 'Per schrijfroute: liet een geslaagde oproep een geketende regel na in het handelingsspoor? ' +
       'Een route die hier NIET in staat is niet beproefd, en dat is ongemeten en geen groen. ' +
       '"ongemeten" betekent hier: de oproep gaf geen 2xx, dus er is niets gebeurd en er hoort geen regel te zijn.',

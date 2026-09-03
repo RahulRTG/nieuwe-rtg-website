@@ -145,9 +145,16 @@ module.exports = (ctx) => {
          Vandaar dat een doos zijn eigen tijd mag meesturen -- begrensd: niet
          in de toekomst, en niet ouder dan BUFFER_DAGEN. */
       const eigen = Number(m && m.at);
-      const grens = nu() - (ctx.apparaat ? ctx.apparaat.BUFFER_DAGEN : 30) * 86400000;
-      const at = Number.isFinite(eigen) && eigen > grens && eigen <= nu() ? Math.round(eigen) : nu();
-      if (at !== nu()) nabesteld++;
+      /* EEN KLOKSTAND PER METING, en niet een nieuwe nu() per vergelijking: de
+         klok tikt tussen twee aanroepen door, en dan telde een meting die op
+         "nu" was teruggevallen alsnog als nabesteld omdat de tweede nu() een
+         milliseconde verder stond. Onder belasting zakte de toets daarop
+         (test/stadshardware.test.js, buffer), en niet omdat er iets mis was
+         met de buffer. */
+      const tijd = nu();
+      const grens = tijd - (ctx.apparaat ? ctx.apparaat.BUFFER_DAGEN : 30) * 86400000;
+      const at = Number.isFinite(eigen) && eigen > grens && eigen <= tijd ? Math.round(eigen) : tijd;
+      if (at !== tijd) nabesteld++;
       // alleen de nieuwste meting bepaalt de huidige stand van het bord
       if (at >= (n.laatsteMeting || 0)) n.waarden[s] = waarde;
       metingen().unshift({ node: n.serial, zone: n.zone, sens: s, waarde, at });

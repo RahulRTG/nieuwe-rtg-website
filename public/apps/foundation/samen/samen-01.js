@@ -18,7 +18,8 @@
   var css = '.rsm-knop{background:var(--paneel,#151312);color:var(--txt,#eee);border:1px solid var(--goud,#857007);border-radius:0;padding:.34rem .8rem;font:600 .74rem Inter,system-ui,sans-serif;cursor:pointer;white-space:nowrap;}' +
     '.rsm-sheet{position:fixed;right:1rem;bottom:1rem;z-index:36;width:min(340px,92vw);background:var(--paneel,#151312);border:1px solid var(--goud,#857007);border-radius:0;padding:.9rem;display:flex;flex-direction:column;gap:.6rem;color:var(--txt,#eee);font-family:Inter,system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.5);}' +
     '.rsm-sheet[hidden]{display:none;}.rsm-kop{display:flex;align-items:center;justify-content:space-between;font-weight:600;}' +
-    '.rsm-x{background:transparent;border:1px solid #444;border-radius:0;color:inherit;padding:.15rem .5rem;cursor:pointer;}' +
+    // WCAG 2.5.8 als MAAT, niet als uitkomst van padding: zie samen-02.js
+    '.rsm-x{background:transparent;border:1px solid #444;border-radius:0;color:inherit;padding:.15rem .5rem;cursor:pointer;min-width:24px;min-height:24px;display:grid;place-items:center;}' +
     '.rsm-uit{font-size:.83rem;color:var(--zacht,#bbb);line-height:1.55;}' +
     '.rsm-rij{display:flex;gap:.4rem;}.rsm-rij input{flex:1;background:var(--paneel2,#0C0C0B);border:1px solid #333;border-radius:0;color:inherit;font:inherit;font-size:.85rem;padding:.5rem .7rem;}' +
     '.rsm-go{background:var(--goud,#857007);color:#000;border:none;border-radius:0;padding:.5rem .9rem;font-weight:700;cursor:pointer;}' +

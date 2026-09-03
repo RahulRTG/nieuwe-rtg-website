@@ -47,12 +47,18 @@
    de verdeling vallen -- dat is precies de faalvorm waar dit bestand voor is
    gebouwd.
 
-   Hij krijgt daarom het ZWAARSTE bekende gewicht. Niet nul en niet het
-   gemiddelde: dat zijn allebei gokken die de keten SNELLER laten lijken dan hij
-   is, en die gok kost een scherf die als laatste nog een half uur bezig is.
-   Onbekend telt hier als duur, en dat is de hoofdregel van KEURING.md in een
-   regel code -- onzekerheid mag nooit snelheid afdwingen. De prijs is wat
-   evenwicht als de gok te hoog was, en dat is de goedkope kant.
+   Hij krijgt daarom een HOGE prijs. Niet nul en niet het gemiddelde: dat zijn
+   allebei gokken die de keten SNELLER laten lijken dan hij is, en die gok kost
+   een scherf die als laatste nog een half uur bezig is. Onbekend telt hier als
+   duur, en dat is de hoofdregel van KEURING.md in een regel code -- onzekerheid
+   mag nooit snelheid afdwingen.
+
+   HOE HOOG PRECIES STAAT HIER NIET MEER. Er stond "het zwaarste bekende
+   gewicht", en dat is sinds 1 september 2026 niet meer waar (toen de p99) en
+   sinds 2 september helemaal niet (nu de p99 van de eigen klasse, met een
+   terugvalladder). Die prijs woont in ./duurprijs.js, met de metingen eronder;
+   twee plekken die allebei een prijs beschrijven lopen uiteen, en deze kop was
+   daar het bewijs van.
 
    Deze regel komt uit scripts/scherf.js, dat tot 28 augustus 2026 in ci.yml
    stond en toen door `npm run test:deel` is vervangen. Bij die verhuizing is de
@@ -69,6 +75,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { prijzen } = require('./duurprijs');
 
 const REGISTER = path.join(__dirname, '..', '..', 'TOETSDUUR.json');
 
@@ -151,16 +158,30 @@ function wegingVoor(lijst) {
   const gevraagd = gevraagdeModus();
   const { kaarten } = duren();
 
+  /* De ANDERE modi reizen mee, en worden alleen door ./duurprijs.js gebruikt en
+     alleen om een prijs te VERHOGEN. Zonder dit kon een klasse die in de
+     gevraagde modus nul metingen heeft (schermtoetsen in `dekking`) nergens op
+     terugvallen behalve de algemene p99 -- de p99 van een verzameling waar geen
+     enkele schermtoets in zit. Zie de terugvalladder daar. */
+  const anderen = (naam) => Object.entries(kaarten)
+    .filter(([n]) => n !== naam).map(([n, k]) => ({ modus: n, kaart: k }));
+
   const eigen = kaarten[gevraagd];
-  if (eigen) return { gewicht: eigen, vertrouwen: 'geldig', modus: gevraagd, gevraagd };
+  if (eigen) {
+    return { gewicht: eigen, vertrouwen: 'geldig', modus: gevraagd, gevraagd,
+      andere: anderen(gevraagd) };
+  }
 
   let beste = null;
   for (const [naam, kaart] of Object.entries(kaarten)) {
     const dekt = lijst.reduce((n, b) => n + (kaart.has(b) ? 1 : 0), 0);
     if (dekt && (!beste || dekt > beste.dekt)) beste = { naam, kaart, dekt };
   }
-  if (beste) return { gewicht: beste.kaart, vertrouwen: 'twijfelachtig', modus: beste.naam, gevraagd };
-  return { gewicht: new Map(), vertrouwen: 'ongeldig', modus: null, gevraagd };
+  if (beste) {
+    return { gewicht: beste.kaart, vertrouwen: 'twijfelachtig', modus: beste.naam, gevraagd,
+      andere: anderen(beste.naam) };
+  }
+  return { gewicht: new Map(), vertrouwen: 'ongeldig', modus: null, gevraagd, andere: [] };
 }
 
 /* Alleen voor de toetsen: een eigen weging opleggen zonder een bestand op
@@ -174,10 +195,19 @@ function zetDuren(kaart, vertrouwen) {
 }
 
 /* Wat de verdeler op dit moment onder zich heeft. De wachter leest dit, en een
-   scherm dat over de verdeling iets beweert hoort het erbij te zetten. */
+   scherm dat over de verdeling iets beweert hoort het erbij te zetten.
+
+   `onbekend` staat erbij omdat een planner die een prijs rekent, hoort te
+   kunnen zeggen WELKE prijs en op grond waarvan. Hij komt uit dezelfde functie
+   die de verdeling gebruikt (./duurprijs.js) en wordt hier niet nagerekend --
+   een tweede berekening is een tweede waarheid. */
 function weging(lijst) {
   const d = wegingVoor(lijst || []);
-  return { vertrouwen: d.vertrouwen, modus: d.modus, gevraagd: d.gevraagd, bestanden: d.gewicht.size };
+  const p = prijzen(d.gewicht, { andere: d.andere });
+  return { vertrouwen: d.vertrouwen, modus: d.modus, gevraagd: d.gevraagd, bestanden: d.gewicht.size,
+    onbekend: { algemeen: p.algemeen,
+      perKlasse: Object.fromEntries([...p.prijs].map(([k, ms]) => [k, ms])),
+      grond: Object.fromEntries([...p.grond].map(([k, g]) => [k, g])) } };
 }
 
 /* De volledige indeling: een array van `totaal` lijsten. Deterministisch --
@@ -186,7 +216,7 @@ function weging(lijst) {
 function indeling(lijst, totaal) {
   const bakken = Array.from({ length: totaal }, () => []);
   const last = new Array(totaal).fill(0);
-  const { gewicht, vertrouwen } = wegingVoor(lijst);
+  const { gewicht, vertrouwen, andere } = wegingVoor(lijst);
 
   /* De marge uit de kop: bij twijfel mag geen scherf meer dan zijn deel aan
      BESTANDEN krijgen. Bij `geldig` staat hij uit, want dan zou hij een goede
@@ -221,11 +251,12 @@ function indeling(lijst, totaal) {
      hoe duur.
 
      Is er niets bekend, dan is elk bestand even zwaar en valt de greedy samen
-     met de oude om-en-om-verdeling; de waarde zelf doet er dan niet toe. */
-  const bekend = [...gewicht.values()].filter((v) => v > 0).sort((a, b) => a - b);
-  const duur = bekend.length ? bekend[Math.min(bekend.length - 1,
-    Math.ceil(bekend.length * 0.99) - 1)] : 1;
-  const kost = (naam) => gewicht.get(naam) || duur;
+     met de oude om-en-om-verdeling; de waarde zelf doet er dan niet toe.
+
+     EN DE p99 VAN WELKE BESTANDEN? Sinds 2 september 2026: van de EIGEN
+     KLASSE. Zie ./duurprijs.js voor waarom, en voor de meting eronder. */
+  const { prijsVoor } = prijzen(gewicht, { andere });
+  const kost = (naam) => gewicht.get(naam) || prijsVoor(naam);
 
   /* Zwaarste eerst; bij een gelijk gewicht op naam, zodat de uitkomst niet van
      de volgorde van de invoer afhangt maar alleen van de lijst zelf. */
@@ -255,4 +286,10 @@ function verdeel(lijst, deel) {
   return indeling(lijst, deel.totaal)[deel.nr - 1];
 }
 
-module.exports = { ontleedDeel, verdeel, indeling, zetDuren, weging, wegingVoor, MODI, REGISTER };
+/* `gewichtenVoor` is `wegingVoor` onder een naam die zegt wat je krijgt: de
+   gewichtenkaart die de verdeler ZELF gebruikt, plus de andere modi. De
+   scherfmeter leest hem zo, in plaats van het register nog een keer uit te
+   rekenen -- twee berekeningen van hetzelfde lopen uiteen (LAT.md regel 4), en
+   dan meet de meter iets anders dan de verdeling die er staat. */
+module.exports = { ontleedDeel, verdeel, indeling, zetDuren, weging, wegingVoor,
+  gewichtenVoor: wegingVoor, MODI, REGISTER };

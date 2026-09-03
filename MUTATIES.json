@@ -1,10 +1,8 @@
 {
   "stempel": {
-    "op": "2026-09-02T16:23:59.389Z",
-    "commit": "b73f64f3b",
+    "op": "2026-09-03T02:48:53.239Z",
+    "commit": "32cf8e2a",
     "boomVuil": true,
-    "boomAnders": 14,
-    "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
@@ -66,6 +64,14 @@
       "module": "server/accounts/index.js",
       "operator": "return-weg",
       "gezakt": 5
+    },
+    "activering.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/activering.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "activiteiten.test.js": {
       "soort": "server",
@@ -6800,6 +6806,14 @@
       "gezakt": 8,
       "scherp": "gezakt"
     },
+    "tredeproef.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/tredeproef.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 3
+    },
     "trio-kleef.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -7065,6 +7079,14 @@
       "gezakt": 2,
       "geprobeerd": 1
     },
+    "verstrengeling.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/verstrengeling.js",
+      "operator": "===->!==#0",
+      "gezakt": 10,
+      "geprobeerd": 1
+    },
     "vertaal.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -7290,6 +7312,14 @@
       "operator": "&&->||#0",
       "gezakt": 1,
       "geprobeerd": 3
+    },
+    "wekkers.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/wekkers.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "wereld.test.js": {
       "soort": "server",
@@ -7687,6 +7717,14 @@
       "gezakt": 2,
       "geprobeerd": 7
     },
+    "zaakwig.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/functies/register/index.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 7
+    },
     "zakelijk.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -7784,6 +7822,114 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "bewijsmapscherm.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "duurprijs.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/delen.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 4
+    },
+    "scherfmeter.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/delen.js",
+      "operator": "===->!==#0",
+      "gezakt": 5,
+      "geprobeerd": 1
+    },
+    "wegwijzerscherm.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "gezinsuitnodiging-verval.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
+    },
+    "horeca-werklijst-modus.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
+    },
+    "lescode-rem.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "meetkeuring.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/meetkeuring.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
+    "meetserver-schorspoort.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/wegwerpserver.js",
+      "operator": "true->false#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "rollbackbesluit.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/bewijsmatrix.js",
+      "operator": "&&->||#5",
+      "gezakt": 1,
+      "geprobeerd": 28
+    },
+    "schorspoort.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/web/index.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
+    "socialebeleid-volgorde.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
+    },
+    "stempel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/stempel.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "syntaxproef.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/syntaxproef.js",
+      "operator": "+->-#0",
+      "gezakt": 4,
+      "geprobeerd": 2
+    },
+    "vijandigerand.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/webauthn/cbor.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 2
     }
   }
 }

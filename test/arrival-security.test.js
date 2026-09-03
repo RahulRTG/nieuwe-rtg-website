@@ -8,7 +8,14 @@ function omgeving(){
   const app={post(p,...handlers){routes.set(p,handlers)}};
   const supplier={code:'SAFE',name:'Maison Safe',settings:{},tables:[{name:'Tafel 1',seats:6,accessible:true,zone:'zaal'}]};
   const H=code=>{db.data.horeca[code]=db.data.horeca[code]||{rekeningen:{}};return db.data.horeca[code]};
-  const kern={app,db,crypto,supplierAuth(req,res,next){next()},accounts:{getStaffById(){return null}},save(){},schoon(v,n){return String(v||'').slice(0,n)},findSupplier(code){return code===supplier.code?supplier:null},notifySupplier(){},sseToSupplier(){},horeca:{H,nu(){return new Date().toISOString()}}};
+  /* Hlees: kijken zonder scheppen, net als in server/kern/horeca.js. De module
+     gebruikt hem sinds 2 september 2026 op de leesroutes, zodat een geweigerde
+     aanroep (404 op een onbekende arrivalId) geen verse horeca-doos achterlaat.
+     Deze namaak-kern moet hem dus ook hebben -- en juist met het ECHTE gedrag,
+     want een stub die stilletjes op H() terugvalt zou de reparatie hier
+     onzichtbaar maken. */
+  const Hlees=code=>db.data.horeca[code]||{rekeningen:{}};
+  const kern={app,db,crypto,supplierAuth(req,res,next){next()},accounts:{getStaffById(){return null}},save(){},schoon(v,n){return String(v||'').slice(0,n)},findSupplier(code){return code===supplier.code?supplier:null},notifySupplier(){},sseToSupplier(){},horeca:{H,Hlees,nu(){return new Date().toISOString()}}};
   require('../server/routes/supplier/horeca/invisible-arrival')(kern);
   async function roep(p,body,ip='127.0.0.1'){
     const req={body:body||{},ip,supplier,actor:{name:'Manager'}},antwoord={status:200,body:null};

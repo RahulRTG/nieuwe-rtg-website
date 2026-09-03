@@ -71,6 +71,31 @@ jobs:
       - name: Het verval (verlopen schulden en uitzonderingen)
         if: always()
         run: node scripts/normverval.js
+      # DE DRIE METINGEN DIE ZICHZELF NIET VERVERSEN. activeringOndergrens,
+      # tredeLekken, tredeRondgangGezakt en wekkersOnverklaard LEZEN een
+      # vastgelegd bestand; ze meten niet zelf, want de activeringsmeter en de
+      # tredeproef starten een echte server en dat hoort niet in een ratel die
+      # bij elke push draait. De keerzijde staat in de kop van elke meter: wie
+      # het bestand niet ververst, bevriest de meter -- en een bevroren meter
+      # meldt jarenlang hetzelfde getal terwijl de code eronder wegloopt.
+      #
+      # Hier verstrijkt de tijd wel, dus hier worden ze ververst. Vóór npm run
+      # norm, anders ratelt hij op de cijfers van vorige week.
+      - name: De verstrengeling (randen tussen de delen van RTG)
+        if: always()
+        run: npm run verstrengeling:vast
+      - name: De activering (wat wordt wakker per functie)
+        if: always()
+        run: npm run activering:vast
+      - name: De wekkers (wat begint werk buiten HTTP om)
+        if: always()
+        run: npm run wekkers:vast
+      - name: De tredeproef (alle zeven treden van LAUNCH.md)
+        if: always()
+        run: npm run tredeproef:alle
+      - name: De zaakwig (een bestelling van het lid tot in de kassa)
+        if: always()
+        run: npm run zaakwig:vast
       - name: De norm (structureel hard, prestatie alleen gemeten)
         if: always()
         run: npm run norm
@@ -178,9 +203,15 @@ jobs:
       - name: De sabotage (zet elke handhaver echt uit)
         if: always()
         run: node scripts/sabotage.js
+      # HIER STOND `|| true`, en dat was de laatste in deze keten die een gat was.
+      # De kop van scripts/zekerheid.js past de regel juist op ZICHZELF toe:
+      # "Ontbreekt een bron, dan staat dat er met naam EN krijgt dit script
+      # exitcode 1 -- niet omdat er iets stuk is, maar omdat 'geen oordeel' geen
+      # groen is." De `|| true` maakte exact die exitcode onzichtbaar, dus het
+      # script deed netjes wat het beloofde en niemand kon het zien.
       - name: Wat we weten, en wat niet
         if: always()
-        run: npm run zekerheid || true
+        run: npm run zekerheid
       - name: De sabotage-uitslag bewaren
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
@@ -203,12 +234,19 @@ jobs:
       - name: De meetronde (poortwacht, de vier proeven, de keten, de matrix)
         if: always()
         run: npm run meetronde
-      # Welk register hoort nog bij deze commit. Meldt en oordeelt niet: een
-      # register dat achterloopt op een commit die alleen een typefout repareerde
-      # is geen defect. || true dus.
+      # Welk register hoort nog bij deze commit.
+      #
+      # HIER STOND `|| true`, met als reden: een register dat achterloopt op een
+      # commit die alleen een typefout repareerde is geen defect. Die reden
+      # klopte zolang dit script alleen MELDDE. Sinds 3 september 2026 houdt hij
+      # zes registers tegen -- die over wie er binnenkomt en over geld -- en voor
+      # die zes is "waarschijnlijk nog goed" precies de redenering waarmee een
+      # achterstand jaren blijft liggen (TAKEN.md 7.3). De andere twaalf melden
+      # nog steeds alleen, en dat is wat de `|| true` overbodig maakt: hij hoefde
+      # er alleen te staan omdat de poort te breed was.
       - name: De versheid van de registers
         if: always()
-        run: npm run versheid || true
+        run: npm run versheid
       - name: De registers van deze ronde bewaren
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7

@@ -58,7 +58,17 @@ test('de centrale stop dekt betaalroutes maar laat gewone app- en rapportagerout
     '/api/munt/direct', '/api/bank/overboek', '/api/bank/pas/betaal',
     '/api/booking/pay', '/api/rekening/betaal', '/api/supplier/refund',
     '/api/supplier/tafelticket/afrekenen', '/api/giftcard/buy',
-    '/api/wallet/munt/wissel', '/api/office/payroll/betaalbestand'
+    '/api/wallet/munt/wissel', '/api/office/payroll/betaalbestand',
+    /* DE KASSA DIE EEN BON OPHAALT. Hij beweegt geen geld door de poort en
+       glipte daarom langs beide stoppen, maar hij zet de bon WEL op betaald
+       (kassa/innen.js: paid, betaaldMet 'rtg', paidAt, plus een verkoopregel).
+       Dat is "alleen administratief als voldaan markeren", en dat verbiedt de
+       kop van betaalstop.js met zoveel woorden.
+
+       Gevonden door scripts/zaakwig.js op trede 3: de vloer zonder betaalrail
+       gaf hier 200 en de bon stond daarna op betaald. Het precedent stond al in
+       de lijst -- giftcard/redeem, om precies dezelfde reden. */
+    '/api/supplier/pos/redeem'
   ];
   for (const pad of dicht) assert.equal(isBetaalactie('POST', pad), true, pad);
   const open = [

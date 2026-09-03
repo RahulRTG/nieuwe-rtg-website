@@ -1,0 +1,62 @@
+{
+ "stempel": {
+  "op": "2026-09-03T11:11:39.910Z",
+  "commit": "cd999c7a",
+  "boomVuil": false,
+  "boomAnders": 9,
+  "instrument": "scripts/laatspoor.js",
+  "node": "v22.22.2"
+ },
+ "uitleg": "Routes waar de opslag wordt aangeraakt VOORDAT de invoer is gekeurd: een lui aangemaakte la met daarna nog een 4xx-uitgang. Statisch gevonden, dus een LIJST en geen bewijs -- de staatproef (STAATPROEF.json, kolom ROLLBACK) meet of het er werkelijk toe doet.",
+ "grens": "zegt niet of de wijziging ertoe doet, niet of de 4xx bereikbaar is, en niets over routes waarvan de bron niet te vinden is (die staan apart geteld).",
+ "gemeten": {
+  "routes": 4932,
+  "verdacht": 3,
+  "bronOnvindbaar": 0
+ },
+ "perVorm": [
+  {
+   "vorm": "toewijzing",
+   "aantal": 1
+  },
+  {
+   "vorm": "isArray-vul",
+   "aantal": 0
+  },
+  {
+   "vorm": "bak",
+   "aantal": 0
+  },
+  {
+   "vorm": "pak-of-maak",
+   "aantal": 2
+  }
+ ],
+ "verdacht": [
+  {
+   "methode": "POST",
+   "pad": "/api/bedrijf/handeling/doe",
+   "waar": "server/bedrijf/handeling.js:130",
+   "vorm": "toewijzing",
+   "wat": "x = x || [] -- zet de la neer bij het lezen",
+   "fragment": "g.w.taken = g.w.taken || {}"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/pas/pak",
+   "waar": "server/routes/supplier/horeca/pas.js:41",
+   "vorm": "pak-of-maak",
+   "wat": "een pak-of-maak-getter (pak/store/lijstVan/mijne/vakInst/H)",
+   "fragment": "pak("
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/wijk/zet",
+   "waar": "server/routes/supplier/horeca/wijk.js:109",
+   "vorm": "pak-of-maak",
+   "wat": "een pak-of-maak-getter (pak/store/lijstVan/mijne/vakInst/H)",
+   "fragment": "H("
+  }
+ ],
+ "bronOnvindbaar": []
+}

@@ -51,7 +51,21 @@ const VERRADEN = CATALOGUS.filter(v => v.waar && v.waar.includes('db/index.js'))
 async function start(datamap, extra) {
   try {
     const s = await wegwerp({ naam: 'keten', datamap, magSterven: true, wachtMs: 45000,
-      env: { RTG_DEMO: '1', RTG_VERRAAD_SEED: SEED, ...extra } });
+      /* RTG_MAGNAAT_TEST ERBIJ, en zonder die vlag was de GELDKETEN BLIND.
+         server/testomgeving.js beslist of de synthetische accounts bestaan, en
+         vraagt OF `RTG_MAGNAAT_TEST=1`, OF `NODE_ENV=test` SAMEN met
+         `RTG_DEMO=1`. Hier stond alleen die laatste helft. Gevolg: het
+         eigenaarsaccount waar de GELD-keten op inlogt bestond niet, de inlog gaf
+         geen token, en de ronde meldde `identiteitLukte: false` met
+         `blindeKetens: 1`. Dat is eerlijk gemeld -- de proef doet niet alsof --
+         maar het betekende wel dat de zwaarste keten die dit huis heeft, die
+         onder sabotage meet of het geld er na een herstart nog is, al die tijd
+         NIET draaide. In de bewijsmatrix zakte FAILURE daardoor van 2 bewezen
+         cellen naar 1, over 4738 routes.
+         Niet `NODE_ENV=test`: zestien plekken in server/ versoepelen daaronder
+         hun controle, en dan meet een sabotageproef een losser huis dan er
+         draait. Zelfde afweging als in scripts/rolproef-route.js. */
+      env: { RTG_DEMO: '1', RTG_MAGNAAT_TEST: '1', RTG_VERRAAD_SEED: SEED, ...extra } });
     return { kind: s.kind, basis: s.basis, dood: s.dood };
   } catch (e) { return { kind: null, basis: '', dood: true }; }
 }

@@ -49,7 +49,7 @@ const KRING = { lid: 0, rechterhand: 1, kantoor: 2 };
    zijn eigen brandstof kiest, kan er maar een soort verstoken. Nu weet hij niet
    meer WAT hij projecteert, en dat is precies genoeg. */
 module.exports = (ctx) => {
-  const { db, vandaag, paspoortVervalt } = ctx;
+  const { db, vandaag, paspoortVervalt, toestemmingen } = ctx;
   const bronnen = { ALLE: ctx.bronnen || require('./bronnen').ALLE };
 
   /* De enige plek waar een knoop ontstaat. Alles loopt hierdoorheen, en daarom
@@ -111,7 +111,7 @@ module.exports = (ctx) => {
          heeft het nodig, want die leest wat het PLATFORM al van dit lid weet en
          dat staat niet in `l`. Het contract is daarmee uitgebreid en niet
          gebroken. */
-      try { uit = bron.knopen(l, knoop, { key, db, paspoortVervalt }) || []; }
+      try { uit = bron.knopen(l, knoop, { key, db, paspoortVervalt, toestemmingen }) || []; }
       catch (e) { uit = [{ __stuk: bron.kamer }]; }
       for (const k of uit) knopen.push(k);
     }
@@ -137,7 +137,19 @@ module.exports = (ctx) => {
      `kring` zegt hoe ver de kijker staat. Zichtbaar is: kring <= deel. */
   function graafVoor(key, kring, voorafG) {
     const g = voorafG || graaf(key);
-    const mag = KRING[kring] === undefined ? KRING.lid : KRING[kring];
+    /* EEN ONBEKENDE KRINGNAAM VALT NAAR DE VERSTE KIJKER, en niet naar de
+       dichtstbijzijnde. Hier stond `KRING.lid`, en dat is op een poort de
+       verkeerde richting: een typefout of een hernoemde kring gaf dan het beeld
+       van het LID zelf -- inclusief alles wat BESLOTEN is en dus juist nooit weg
+       mag (gezondheid, nalatenschap, en sinds HDI.md par. 7 regel 7 ook uw
+       toestemmingen, waar de naam van de ontvanger in staat).
+
+       Vandaag is er geen aanroeper die iets onbekends doorgeeft -- de enige die
+       een kring meegeeft is routes/member/bureau.js, met 'lid'. Dit is dus geen
+       reparatie van een lek maar het omzetten van de terugval, vóór er een
+       tweede aanroeper bijkomt. Een typefout levert nu een LEGE graaf op, en dat
+       valt op; het omgekeerde valt niet op. */
+    const mag = KRING[kring] === undefined ? KRING.kantoor : KRING[kring];
     const knopen = g.knopen.filter(k => mag <= KRING[k.deel]);
     const zichtbaar = new Set(knopen.map(k => k.id));
     return {

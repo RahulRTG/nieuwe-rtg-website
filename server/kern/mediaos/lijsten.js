@@ -51,6 +51,16 @@ module.exports = ({ db, save, schoon, crypto, catalogus, codenaamVan, keyVanCode
   };
   // van MIJ: de enige ingang voor alles wat de lijst VERANDERT
   const vind = (key, lid) => mijne(key).find(l => l.id === String(lid || '')) || null;
+  /* KIJKEN ZONDER SCHEPPEN. `mijne()` hierboven SCHRIJFT -- hij zet `t[key] = []`
+     als de lezer nog geen enkele lijst had. Op de leesweg is dat verkeerd: wie
+     een lijst opvraagt die niet bestaat, krijgt een 404 en hoort niets achter te
+     laten. De staatproef ving dat als een gezakte ROLLBACK. Op de SCHRIJFwegen
+     blijft `mijne()` staan: daar hoort de rij te ontstaan. */
+  const kijk = (key, lid) => {
+    const t = tabel();
+    const rij = Array.isArray(t[key]) ? t[key] : [];
+    return rij.find(l => l.id === String(lid || '')) || null;
+  };
   const kort = (l) => ({ id: l.id, naam: l.naam, aantal: (l.stukken || []).length, at: l.at, bijgewerkt: l.bijgewerkt || l.at,
     gedeeldMet: (l.gedeeld || []).map(x => (codenaamVan ? codenaamVan(x) : x)) });
 
@@ -132,7 +142,7 @@ module.exports = ({ db, save, schoon, crypto, catalogus, codenaamVan, keyVanCode
      niet als kaart terug maar als regel in `verdwenen` -- met de reden die de
      catalogus zelf geeft, niet met een eigen verzinsel. */
   function een(sess, lijstId) {
-    let l = vind(sess.key, lijstId), van = null;
+    let l = kijk(sess.key, lijstId), van = null;
     if (!l) {
       const g = vindGedeeld(sess.key, lijstId);
       if (!g) return { status: 404, error: 'Deze lijst bestaat niet.' };

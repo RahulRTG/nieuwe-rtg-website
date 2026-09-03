@@ -131,8 +131,17 @@ test('de pas geeft uit, en de bezorgdispatch noemt bij elk nee zijn getal',
     assert.match(tekst, /nog van niemand/, 'en heeft nog geen mens');
     assert.match(tekst, /Bij het raam/, 'met per bord waar het heen moet');
 
-    const pakknop = await page.$('#ePas [data-pak]');
-    assert.ok(pakknop, 'een complete gang krijgt een oppakknop');
+    /* EEN LOCATOR EN GEEN LOSSE GREEP. `page.$()` levert een handle naar DIT
+       element; tekent het paneel zich tussen de greep en de klik opnieuw, dan
+       klikt hij op iets wat niet meer in de DOM hangt ("Element is not attached
+       to the DOM"). Dat gebeurt hier ook echt: elke handeling laat het scherm de
+       paslijst opnieuw ophalen. Een locator zoekt bij de klik opnieuw op en
+       wacht tot het element stabiel is, dus hij overleeft precies die
+       hertekening. In de volle parallelle ronde zakte deze toets erop, los
+       slaagde hij -- de klassieke vorm van ruis die een keten onbetrouwbaar
+       maakt. */
+    const pakknop = page.locator('#ePas [data-pak]').first();
+    assert.equal(await pakknop.count() > 0, true, 'een complete gang krijgt een oppakknop');
     await pakknop.click();
     /* Oppakken zet een CLAIM en het scherm haalt de paslijst daarna opnieuw op.
        Wachten op "jij hebt hem" in #ePas is wachten op precies de bewering
@@ -145,8 +154,8 @@ test('de pas geeft uit, en de bezorgdispatch noemt bij elk nee zijn getal',
     const nogKlaar = (await api('/rekening', { rekeningId: rek2.rekening.id })).rekening.regels;
     assert.ok(nogKlaar.every(r => r.stand === 'klaar'), 'oppakken is geen uitgeven');
 
-    const gangUit = await page.$('#ePas [data-gangUit], #ePas [data-ganguit]');
-    assert.ok(gangUit, 'en de hele gang kan in een tik de deur uit');
+    const gangUit = page.locator('#ePas [data-gangUit], #ePas [data-ganguit]').first();
+    assert.equal(await gangUit.count() > 0, true, 'en de hele gang kan in een tik de deur uit');
     const voorGangUit = await tekstVan(page, '#eRegie');
     await gangUit.click();
     /* Twee panelen moeten hertekend zijn, en ze komen uit twee LOSSE verzoeken.
@@ -162,8 +171,8 @@ test('de pas geeft uit, en de bezorgdispatch noemt bij elk nee zijn getal',
     const naGang = (await api('/rekening', { rekeningId: rek2.rekening.id })).rekening.regels;
     assert.ok(naGang.every(r => r.stand === 'uitgegeven'), 'alle borden van de gang zijn uitgegeven');
 
-    const uitgeef = await page.$('[data-uit]');
-    assert.ok(uitgeef, 'een bord dat klaar is, krijgt een uitgeefknop');
+    const uitgeef = page.locator('[data-uit]').first();
+    assert.equal(await uitgeef.count() > 0, true, 'een bord dat klaar is, krijgt een uitgeefknop');
     const voorUit = await tekstVan(page, '#eRegie');
     await uitgeef.click();
     await wachtOpVerandering(page, '#eRegie', voorUit);
@@ -522,7 +531,18 @@ test('een polsband kan niet onder nul, de deur weigert met het getal erbij, en e
 
     await page.fill('#aActie', 'teruggekoeld, monteur gebeld');
     await page.click('#aMeting');
-    await wachtOpTekst(page, /teruggekoeld, monteur gebeld/);
+    /* WACHTEN OP HET LOGBOEK EN NIET OP DE PAGINA, en de oorzaak is exact aan te
+       wijzen. Het scherm draagt onder het formulier een vaste hint: "Een waarde
+       buiten de grens vraagt om wat u hebt gedaan: weggegooid, teruggekoeld,
+       monteur gebeld." Ongescopeerd matcht deze wacht dus STATISCHE tekst die er
+       altijd al stond, en hij keerde meteen terug -- voordat de server had
+       geantwoord en het logboek was bijgewerkt. Daarna las `lees(page)` een
+       scherm met nul metingen erin. Op een rustige machine won de server die
+       race; in de volle parallelle ronde niet.
+
+       Precies daarom draagt de gelijkwaardige wacht hierboven (bij de eerste
+       afwijking) wel `{ in: '#aLog' }`. Hier ontbrak hij. */
+    await wachtOpTekst(page, /teruggekoeld, monteur gebeld/, { in: '#aLog' });
     tekst = await lees(page);
     assert.match(tekst, /afwijking/i, 'met de actie erbij wordt hij wel vastgelegd, als afwijking');
     assert.match(tekst, /teruggekoeld, monteur gebeld/, 'met de genomen actie in het logboek');

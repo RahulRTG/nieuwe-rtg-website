@@ -18,7 +18,8 @@
 const MAX_BODY = 30000;   // een actie-body hoeft nooit groter dan dit
 const TIMEOUT_MS = 15000; // een interne aanroep die langer duurt is stuk
 const INTERNE_GOEDKEURING = Symbol('stuur-goedgekeurd');
-const { beleidVoor, toegestanePaden } = require('./stuur/beleid');
+const beleid = require('./stuur/beleid');
+const { beleidVoor, toegestanePaden } = beleid;
 
 // infrastructuur waar het stuur nooit aan zit, wie er ook vraagt
 const VERBODEN = [
@@ -80,7 +81,7 @@ function parseSubs(tekst) {
   return arr.filter(s => typeof s === 'string' && s.trim()).map(s => s.trim().slice(0, 140)).slice(0, 3);
 }
 
-function maakStuur({ log, anthropic, app, crypto }) {
+function maakStuur({ log, anthropic, app, crypto, isolatie }) {
   const goedkeuring = require('./stuur/goedkeuring')({ crypto, log });
 
   // Operationele noodrem, per verzoek gelezen: na een incident kan beheer het
@@ -143,30 +144,16 @@ function maakStuur({ log, anthropic, app, crypto }) {
     goedkeuring, stuurRoep, interneGoedkeuring: INTERNE_GOEDKEURING
   });
 
-  /* ---- de kaart van het stuur: alle POST-paden die dit proces kent ----
-     Rechtstreeks uit de router gelezen (dus nooit een verouderde lijst),
-     gefilterd op de verbodslijst en desgewenst op een prefix per rol. */
-  function stuurPaden(app, wereld) {
-    if (stuurUit()) return [];
-    const uit = [];
-    const stack = (app && app._router && app._router.stack) || [];
-    for (const laag of stack) {
-      const r = laag.route;
-      if (!r || !r.methods || !r.methods.post) continue;
-      const pad = r.path;
-      if (typeof pad !== 'string' || !pad.startsWith('/api/')) continue;
-      if (VERBODEN.some(re => re.test(pad))) continue;
-      uit.push(pad);
-    }
-    return toegestanePaden([...new Set(uit)].sort(), wereld);
-  }
+  /* De kaart staat in ./stuur/paden.js: dit bestand doet de AANROEP, dat bepaalt
+     de LIJST waaruit gekozen mag worden. */
+  const { stuurPaden } = require('./stuur/paden')({ VERBODEN, stuurUit, isolatie });
 
   /* ---- de tool-lus: Rahul aan het stuur ----
      Met een AI-sleutel verstaat Rahul een vrije vraag en voert hij hem ook uit
      (tools 'kaart' en 'doe'), met de inlog en de remmen van hierboven; zonder
      sleutel geeft de lus null terug. De lus zelf draait als submodule op deze
      context; zie stuur/lus.js. */
-  const stuurLus = require('./stuur/lus')({ anthropic, app, log, stuurRoep, stuurPaden, classificeer, parseSubs });
+  const stuurLus = require('./stuur/lus')({ anthropic, app, log, stuurRoep, stuurPaden, classificeer, parseSubs, isolatie });
 
   return { stuurToets, stuurRoep, stuurBevestig, stuurPaden, stuurLus, classificeer, parseSubs };
 }

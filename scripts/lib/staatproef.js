@@ -39,6 +39,31 @@
    bijkomt -- en dan komen de valse bevindingen terug. De namen staan in de
    uitslag; stil wegfilteren zou hetzelfde zijn als niet meten.
 
+   DE VIERDE KLASSE: BOEKHOUDING VAN DE AANROEP. Ruis is wat vanzelf beweegt;
+   boekhouding is wat beweegt OMDAT er is aangeroepen, en dat hoort bij elke
+   aanroep opnieuw te gebeuren. De kostenmeter schrijft een regel per verzoek
+   (KOSTEN.md: dat is de bedoeling -- een tweede aanroep kost de infrastructuur
+   echt iets), en een auditjournaal legt elke handeling vast, ook de tweede.
+
+   Het stille venster vindt die niet: ze bewegen alleen als je belt. Zonder deze
+   klasse leest de proef "de herhaling met dezelfde sleutel bewoog de toestand
+   opnieuw: kosten" -- en dat werd via de bewijsmatrix en VERTROUWEN.json een
+   `geschorst`, waarna server/middleware/schorspoort.js de route met 503
+   dichtzette. Op 2 september 2026 stonden er negen routes zo offline, waaronder
+   de boardroom-export, terwijl er in geen van de negen iets tweemaal gebeurde.
+
+   DE LEDEN ZIJN AFGELEID EN NIET VERZONNEN, want een handgeschreven lijst is
+   precies waar de ruisparagraaf hierboven tegen waarschuwt: de journalen komen
+   uit server/kern/auditsporen.js (die lijst is zelf gemeten over een volle
+   ronde), en `kosten` uit server/kern/kosten/index.js, dat die collectie bezit.
+   Komt er een journaal bij, dan komt het daar bij en hier vanzelf mee.
+
+   EN HET IS GEEN STIL GROEN. Een herhaling die alleen boekhouding raakte krijgt
+   zijn eigen woord in de reden, met de collecties erbij -- zodat op het scherm
+   te lezen blijft dat een tweede aanroep geld kost. Wat hier NIET gebeurt is
+   een oordeel over die kosten zelf; dat is een vraag voor KOSTEN.md en niet
+   voor deze proef.
+
    WAT DEZE PROEF NIET ZIET, en dat hoort erbij:
    - een effect buiten de database (een mail, een push, een betaling bij een
      derde). SIDE_EFFECT is hier "buiten de eigen collectie", niet "buiten het
@@ -49,6 +74,36 @@
      van het journaal van het verzoek zelf.
    ========================================================================== */
 'use strict';
+
+/* De boekhoudcollecties, uit de twee plekken die ze al bijhielden -- en dus
+   NIET uit een derde lijst hier. Zie DE VIERDE KLASSE hierboven.
+
+   `IDEMBESLUIT.json` heeft een sectie `vastlegging`: door mensen geschreven,
+   met per collectie de reden waarom hij bij een herhaling meegroeit zonder dat
+   er iets tweemaal gebeurt. Die lijst wordt bovendien al BEWAAKT --
+   scripts/lib/idemproef.js meldt hardop wanneer een vastlegging maar onder EEN
+   routefamilie groeit, want dan is het domeinwerk dat in de lijst is gezet en
+   verdwijnt er een bevinding achter een regel in een bestand.
+
+   `server/kern/auditsporen.js` heeft daarnaast NAMEN: de journaal-achtige
+   collecties, gemeten over een volle ronde. De twee overlappen maar zijn niet
+   gelijk (het register kent er vier, de code zeven), en allebei horen ze erbij:
+   het register draagt het BESLUIT, de code de METING.
+
+   Een handgeschreven lijst hier zou de derde plek zijn voor dezelfde waarheid,
+   en dan wint de zwakste zodra iemand hem gebruikt (LAT.md regel 4). */
+function boekhoudcollecties() {
+  const uit = new Set();
+  try { for (const n of require('../../server/kern/auditsporen').NAMEN) uit.add(n); } catch (e) {}
+  try {
+    const path = require('path');
+    const reg = JSON.parse(require('fs').readFileSync(
+      path.join(__dirname, '..', '..', 'IDEMBESLUIT.json'), 'utf8'));
+    for (const n of Object.keys(reg.vastlegging || {})) uit.add(n);
+  } catch (e) {}
+  return uit;
+}
+const BOEKHOUDING = boekhoudcollecties();
 
 const isOk = (st) => !!(st && st.status >= 200 && st.status < 300);
 
@@ -93,18 +148,32 @@ function weegStaat({ a, b, d01, d12, dStil }) {
          toe te rekenen. Gemeten, niet geraden -- een vaste negeerlijst zou
          hier de fout van de ruisvloer herhalen. */
       const stil = new Set((dStil && dStil.collecties) || []);
-      const rest = [...new Set(uit.collecties.concat((d12 && d12.collecties) || []))]
-        .filter(c => !stil.has(c));
+      const alles = [...new Set(uit.collecties.concat((d12 && d12.collecties) || []))];
+      const nietStil = alles.filter(c => !stil.has(c));
+      /* De boekhouding van de aanroep telt hier net zo min mee als bij de
+         idempotentie hieronder: dat een GEWEIGERD verzoek een kostenregel of
+         een auditregel achterlaat, is precies wat er hoort te gebeuren -- er is
+         aangeklopt, en dat wordt opgeschreven. Zie DE VIERDE KLASSE in de kop. */
+      const boek = nietStil.filter(c => BOEKHOUDING.has(c));
+      const rest = nietStil.filter(c => !BOEKHOUDING.has(c));
+      const boekStaart = boek.length ? ' (boekhouding van de aanroep: ' + boek.join(', ') + ')' : '';
       if (dStil && !rest.length) {
         uit.rollback = 'bewezen';
-        uit.reden = 'geweigerd (status ' + a.status + '); alles wat bewoog (' +
-          uit.collecties.join(', ') + ') bewoog ook in het stille venster zonder aanroep -- ' +
-          'omgevingsruis, geen gevolg van de opdracht';
+        /* De twee redenen blijven UIT ELKAAR in de tekst. Ze zeggen iets
+           verschillends -- "dat bewoog vanzelf" tegenover "dat hoort bij elke
+           aanroep" -- en een lezer die wil weten waarom deze route slaagde,
+           heeft aan "of" niets. */
+        const delen = [];
+        if (stil.size) delen.push('bewoog ook in het stille venster zonder aanroep (' +
+          alles.filter(c => stil.has(c)).join(', ') + '): omgevingsruis');
+        if (boek.length) delen.push('is boekhouding van de aanroep (' + boek.join(', ') + ')');
+        uit.reden = 'geweigerd (status ' + a.status + '); er bleef niets van de OPDRACHT staan -- ' +
+          'alles wat bewoog ' + delen.join(', en ');
       } else {
         uit.rollback = 'GEZAKT';
         uit.reden = 'geweigerd (status ' + a.status + ') en de toestand veranderde toch, ook bij de ' +
           'herhaling: ' + (dStil ? rest.join(', ') +
-            (stil.size ? ' (omgevingsruis ' + [...stil].join(', ') + ' weggelaten na stille controle)' : '')
+            (stil.size ? ' (omgevingsruis ' + [...stil].join(', ') + ' weggelaten na stille controle)' : '') + boekStaart
             : uit.collecties.join(', '));
       }
     } else {
@@ -134,15 +203,27 @@ function weegStaat({ a, b, d01, d12, dStil }) {
     /* Dezelfde stille controle als bij de weigering hierboven: een herhaling
        die alleen omgevingsruis raakte, is geen gezakte idempotentie. */
     const stil = new Set((dStil && dStil.collecties) || []);
-    const idemRest = d12.collecties.filter(c => !stil.has(c));
+    const nietStil = d12.collecties.filter(c => !stil.has(c));
+    const idemBoek = nietStil.filter(c => BOEKHOUDING.has(c));
+    const idemRest = nietStil.filter(c => !BOEKHOUDING.has(c));
     if (dStil && !idemRest.length) {
       uit.idempotentie = 'bewezen';
-      uit.idemReden = 'de herhaling bewoog alleen wat ook in het stille venster zonder aanroep ' +
-        'bewoog (' + d12.collecties.join(', ') + '): omgevingsruis, geen tweede uitvoering';
+      /* HET WOORD IS ANDERS ALS ER BOEKHOUDING BIJ ZIT, en dat is met opzet: de
+         belofte van deze kolom ("twee keer doet niet twee keer iets") gaat over
+         de OPDRACHT, en die is niet herhaald. Dat een tweede aanroep wel een
+         kostenregel oplevert blijft in de reden staan -- stil wegfilteren zou
+         hetzelfde zijn als niet meten. */
+      uit.idemReden = idemBoek.length
+        ? 'de herhaling voerde de opdracht niet opnieuw uit; wat bewoog is boekhouding van de ' +
+          'aanroep (' + idemBoek.join(', ') + ')' +
+          (stil.size ? ' plus omgevingsruis (' + [...stil].join(', ') + ')' : '')
+        : 'de herhaling bewoog alleen wat ook in het stille venster zonder aanroep ' +
+          'bewoog (' + d12.collecties.join(', ') + '): omgevingsruis, geen tweede uitvoering';
     } else {
       uit.idempotentie = 'GEZAKT';
       uit.idemReden = 'de herhaling met dezelfde sleutel bewoog de toestand opnieuw: ' +
-        (dStil ? idemRest.join(', ') : d12.collecties.join(', '));
+        (dStil ? idemRest.join(', ') : d12.collecties.join(', ')) +
+        (idemBoek.length ? ' (boekhouding van de aanroep: ' + idemBoek.join(', ') + ')' : '');
     }
   } else if (d12) {
     uit.idempotentie = 'bewezen';

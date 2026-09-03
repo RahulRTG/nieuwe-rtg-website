@@ -73,31 +73,79 @@ test('3. wat NIET actief is, is te benoemen en klein', () => {
 test('4. elke route hoort bij een functie of bij de bediening', () => {
   /* De tegenhanger van toets 2: niet "een schakelaar zonder route" maar "een
      route zonder schakelaar". Die mogen bestaan -- de bediening van het platform
-     zelf hoort niet uitschakelbaar te zijn -- maar ze horen BENOEMD te zijn, en
-     dat bewaakt test/platformregister.test.js. Hier alleen dat het er niet
-     stilletjes meer worden. */
+     zelf hoort niet uitschakelbaar te zijn -- maar ze horen BENOEMD te zijn.
+
+     DE RATEL TELDE HET VERKEERDE DING, en dat kwam uit toen deze toets op een
+     nieuwe laag zakte. Hij bewaakte "routes zonder functie <= 100", en dat is
+     een GROVER getal dan de zin eronder belooft: een route zonder functie kan
+     keurig verklaard zijn. server/kern/bestuursroutes.js is precies dat
+     register -- de enige lijst van paden die BEWUST buiten de schakelkast staan,
+     met per prefix de reden -- en test/schakelkast-dekking.test.js toets 1 eist
+     al dat élke ongedekte route daarin staat.
+
+     Deze toets vroeg dus een tweede keer, in een tweede getal, naar dezelfde
+     zaak (LAT.md regel 4). Hij telt nu wat de zin zegt: routes die aan geen
+     functie hangen EN nergens verklaard zijn. Dat is een STRENGERE grens en
+     geen ruimere: van 100 naar 10, en 10 is de gemeten stand die sinds het
+     vertrekpunt van deze tak niet is bewogen -- terwijl het ruwe getal in
+     dezelfde periode van 97 naar 112 ging doordat er een hele isolatielaag bij
+     kwam, verklaard en wel.
+
+     MUTATIES (LAT.md regel 2):
+     - de regel /api/isolatie/mijn uit bestuursroutes.js halen -> ZAKT (7 erbij).
+     - de grens op 9 zetten -> ZAKT (dat is de ratel zelf: hij mag krimpen). */
+  const { redenVoor } = require('../server/kern/bestuursroutes');
   const routes = alleRoutes();
   const paren = [];
   for (const f of F) for (const p of (f.paden || [])) paren.push(p);
   const zonder = routes.filter(r => !paren.some(p => prefixLengte(r.pad, p) > 0));
-  /* DE GRENS STOND OP 100 EN STAAT NU OP 120, EN DAT IS EEN BESLUIT.
+  /* TWEE GRENZEN, EN ZE METEN NIET HETZELFDE. Deze twee kwamen uit twee takken
+     die allebei dezelfde toets versterkten; ze staan hier naast elkaar omdat de
+     ene de andere niet vervangt.
 
-     De samenvoeging van twaalf takken bracht de zelfbedieningslaag van het lid
-     binnen: /api/mijn/tweefactor, /sessies, /herstelkanaal, /post, /toestel en
-     twee relatie-routes onder /api/toestemming. Twintig routes, en geen ervan
-     hoort aan een functieschakelaar te hangen -- een knop waarmee het huis de
-     tweefactor of het herstelkanaal van een lid uitzet, hoort niet te bestaan.
-     Ze staan daarom alle twintig als BEDIENING in kern/platformregister/bediening.js,
-     elk met de reden waarom hij niet schakelbaar is.
+     ONVERKLAARD (<= 10) is de scherpe: een route die aan geen functie hangt EN
+     in geen register staat, is niet schakelbaar terwijl niemand heeft
+     opgeschreven waarom. Dat is het echte gat.
 
-     Wat deze toets bewaakt is dat het er niet STILLETJES meer worden, en dat
-     blijft precies zo werken: de grens gaat met de hand omhoog, niet vanzelf.
-     Wat de vraag beantwoordt of die twintig terecht buiten een functie vallen
-     is test/platformregister.test.js -- die eist dat elke route hier BENOEMD is,
-     en die stond groen voordat dit getal werd verzet. Zonder die volgorde is
-     een hoger getal hier alleen een zachtere meter. */
-  assert.ok(zonder.length <= 120,
+     RUW (<= 120) is de grove, en hij komt van main met zijn eigen onderbouwing:
+     de zelfbedieningslaag van het lid (tweefactor, sessies, herstelkanaal,
+     toestel, twee relatie-routes) hoort met opzet niet aan een schakelaar --
+     een knop waarmee het huis de tweefactor van een lid uitzet, hoort niet te
+     bestaan. Die twintig staan als BEDIENING in kern/platformregister/bediening.js,
+     elk met een reden, en test/platformregister.test.js eist dat elke route daar
+     BENOEMD is. Zonder die volgorde was een hoger getal hier alleen een zachtere
+     meter geweest.
+
+     Wat allebei bewaken is hetzelfde: dat het er niet STILLETJES meer worden. */
+  const onverklaard = zonder.filter(r => !redenVoor(r.pad)).map(r => r.pad);
+
+  assert.ok(onverklaard.length <= 10,
+    onverklaard.length + ' routes hangen aan geen enkele functie EN staan in geen enkel register. ' +
+    'Ze zijn dan niet schakelbaar en niemand heeft opgeschreven waarom: ' +
+    onverklaard.sort().join(', ') + ' -- zet ze in server/kern/bestuursroutes.js met een reden, ' +
+    'of geef ze een functie. (Ruw, zonder functie maar wel verklaard: ' + zonder.length + '.)');
+
+  /* 120 -> 135, EN DIE VIJFTIEN ZIJN DE ISOLATIELAAG. Zeven ledenroutes, acht
+     kantoorroutes. Geen ervan hoort aan een functieschakelaar te hangen, en om
+     dezelfde reden als de zelfbedieningslaag hierboven: een knop waarmee het
+     huis de beschermstand van een lid uitzet, hoort niet te bestaan -- dat zou
+     de laag omkeren van bescherming naar een sluipweg. Ze staan alle vijftien
+     met hun reden in kern/bestuursroutes.js.
+
+     De VOLGORDE waarin dit getal omhoog mocht is dezelfde als de vorige keer:
+     eerst moet test/platformregister.test.js groen zijn (die eist dat elke route
+     hier BENOEMD is), en dat stond hij voordat dit getal werd verzet. Zonder die
+     volgorde is een hoger getal alleen een zachtere meter.
+
+     De scherpe controle hierboven (`onverklaard <= 10`) is de echte poort en die
+     beweegt NIET mee: een route zonder functie EN zonder register blijft
+     verboden. */
+  assert.ok(zonder.length <= 135,
     zonder.length + ' routes hangen aan geen enkele functie. Dat is de bediening van ' +
-    'het platform (boardroom, techniek, gezondheid) en die hoort niet schakelbaar te zijn, ' +
-    'maar bij deze aantallen is er iets anders aan de hand.');
+    'het platform (boardroom, techniek, gezondheid, isolatie) en die hoort niet schakelbaar ' +
+    'te zijn, maar bij deze aantallen is er iets anders aan de hand.');
+
+  /* EN HET RUWE GETAL MAG NIET NUL ZIJN: nul zou betekenen dat de meting stuk
+     is, niet dat het huis dicht is. */
+  assert.ok(zonder.length > 0, 'nul zou betekenen dat de meting stuk is, niet dat het huis dicht is');
 });

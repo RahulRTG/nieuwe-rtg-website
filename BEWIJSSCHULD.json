@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-01T16:42:52.563Z",
-  "commit": "1f26479d7",
+  "op": "2026-09-03T11:12:12.927Z",
+  "commit": "cd999c7a",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 17,
   "instrument": "scripts/bewijsschuld.js",
   "node": "v22.22.2"
  },
@@ -11,14 +11,14 @@
  "grens": "Dit is een lijst van wat we WETEN dat we niet hebben gemeten. Wat niemand heeft bedacht staat er per definitie niet in, en dat is de gevaarlijkste categorie -- een schuldenlijst is geen dekkingsbewijs. De aantallen komen uit de registers en zijn dus zo vers als de laatste ronde; zie scripts/versheid.js.",
  "telling": {
   "posten": 18,
-  "meetwerk": 1962,
+  "meetwerk": 1968,
   "instrument": 323,
-  "grens": 643
+  "grens": 708
  },
  "aflossing": {
   "doel": 0,
   "wat": "de achterstand (meetwerk + instrument) gaat naar nul. `grens` telt niet mee en sluit nooit -- dat is de rand van de methode en geen werk.",
-  "staat": 2285,
+  "staat": 2291,
   "regels": [
    "de achterstand mag nooit groeien zonder een reden IN dit register (--groei=...)",
    "een post mag niet van soort veranderen om onder de poort uit te komen: naar `grens` verplaatsen laat de achterstand dalen zonder dat er iets gemeten is",
@@ -28,19 +28,19 @@
  },
  "gemeten": {
   "postenTotaal": 18,
-  "achterstand": 2285,
-  "randVanDeMethode": 643,
-  "auth-onbeslist": 1,
-  "capability-in-handler": 547,
+  "achterstand": 2291,
+  "randVanDeMethode": 708,
+  "auth-onbeslist": 0,
+  "capability-in-handler": 612,
   "objectpoort": 52,
   "output-deuren": 18,
   "lichaamssleutel": 74,
-  "output-niet-toerekenbaar": 277,
+  "output-niet-toerekenbaar": 285,
   "output-blind": 0,
   "output-onwaarneembaar": 4,
   "audit-wisselend": null,
   "audit-verklaard": null,
-  "rollback-gezakt": 2,
+  "rollback-gezakt": 1,
   "object-vooraf": 323,
   "proefruis": 1,
   "gevolg-onbekend": 90,
@@ -54,7 +54,7 @@
    "id": "auth-onbeslist",
    "soort": "meetwerk",
    "wat": "stille routes die onder geen enkele andere post op deze lijst vallen",
-   "aantal": 1,
+   "aantal": 0,
    "waarom": "de klop gaat zonder token. Een 400 of 404 betekent dat de validatie of een opzoeking eerder aan de beurt was dan de autorisatie, en zegt niets over een slot. Na een tweede klop met een plausibel lijf bleven deze routes hetzelfde antwoord geven.",
    "sluit": "per route nakijken wat er precies wordt gevraagd. Dit is geen instrumentvraag meer maar handwerk op een handvol routes, en dat is precies wat een schuldpost hoort te zijn als het gereedschap er is."
   },
@@ -62,7 +62,7 @@
    "id": "capability-in-handler",
    "soort": "grens",
    "wat": "routes zonder bewakerslaag: de controle zit IN de handler (een capability-token)",
-   "aantal": 547,
+   "aantal": 612,
    "waarom": "de rolproef kruist ROLLEN. Deze routes kennen geen rol -- ze eisen een token dat je alleen hebt als je het hebt gekregen (de schoolborden van foundation, rtf/social). Rollen kruisen is hier niet moeilijk maar zinloos.",
    "sluit": "niets in deze proef. Een eigen proef op capability-tokens zou de goede vraag stellen; die bestaat niet en is een project, geen achterstand."
   },
@@ -94,7 +94,7 @@
    "id": "output-niet-toerekenbaar",
    "soort": "meetwerk",
    "wat": "routes waar inhoudgevoelige toetsen op zitten, maar die toetsen raken er meer",
-   "aantal": 277,
+   "aantal": 285,
    "waarom": "een toets die op de lege inhoud zakt en tien routes raakt, kan op de inhoud van een van die tien zijn gezakt. Aan DEZE route valt dan niets toe te rekenen.",
    "sluit": "node scripts/outputproef.js --meet=<n>. Die liegt over EEN route en draait alleen de toetsen die hem raken; de uitslagen stapelen in OUTPUTPROEF.json. Een paar honderd per ronde, dus dit sluit met werk en niet met een doorbraak."
   },
@@ -134,7 +134,7 @@
    "id": "rollback-gezakt",
    "soort": "meetwerk",
    "wat": "routes die weigeren en toch de toestand veranderen",
-   "aantal": 2,
+   "aantal": 1,
    "waarom": "de meeste zijn /api/rtfos/* met securityLog en sessions -- vermoedelijk de auth-laag die een geweigerde poging vastlegt, en dus mogelijk ruis in de meting en geen lek. Maar EEN ervan verspringt per ronde van plek, en een bevinding die verhuist is zelf een bevinding over de meting.",
    "sluit": "per route nalopen wat er beweegt en waarom. Dit is de oudste post op deze lijst en de enige die naar een mogelijk defect wijst."
   },
@@ -204,6 +204,10 @@
    {
     "op": "2026-09-01",
     "aantal": 1
+   },
+   {
+    "op": "2026-09-03",
+    "aantal": 0
    }
   ],
   "capability-in-handler": [
@@ -214,6 +218,10 @@
    {
     "op": "2026-09-01",
     "aantal": 547
+   },
+   {
+    "op": "2026-09-03",
+    "aantal": 612
    }
   ],
   "objectpoort": [
@@ -223,6 +231,10 @@
    },
    {
     "op": "2026-09-01",
+    "aantal": 52
+   },
+   {
+    "op": "2026-09-03",
     "aantal": 52
    }
   ],
@@ -234,6 +246,10 @@
    {
     "op": "2026-09-01",
     "aantal": 18
+   },
+   {
+    "op": "2026-09-03",
+    "aantal": 18
    }
   ],
   "lichaamssleutel": [
@@ -243,6 +259,10 @@
    },
    {
     "op": "2026-09-01",
+    "aantal": 74
+   },
+   {
+    "op": "2026-09-03",
     "aantal": 74
    }
   ],
@@ -254,6 +274,10 @@
    {
     "op": "2026-09-01",
     "aantal": 277
+   },
+   {
+    "op": "2026-09-03",
+    "aantal": 285
    }
   ],
   "output-blind": [
@@ -263,6 +287,10 @@
    },
    {
     "op": "2026-09-01",
+    "aantal": 0
+   },
+   {
+    "op": "2026-09-03",
     "aantal": 0
    }
   ],
@@ -274,6 +302,10 @@
    {
     "op": "2026-09-01",
     "aantal": 4
+   },
+   {
+    "op": "2026-09-03",
+    "aantal": 4
    }
   ],
   "audit-wisselend": [
@@ -283,6 +315,10 @@
    },
    {
     "op": "2026-09-01",
+    "aantal": null
+   },
+   {
+    "op": "2026-09-03",
     "aantal": null
    }
   ],
@@ -294,6 +330,10 @@
    {
     "op": "2026-09-01",
     "aantal": null
+   },
+   {
+    "op": "2026-09-03",
+    "aantal": null
    }
   ],
   "rollback-gezakt": [
@@ -304,6 +344,10 @@
    {
     "op": "2026-09-01",
     "aantal": 2
+   },
+   {
+    "op": "2026-09-03",
+    "aantal": 1
    }
   ],
   "object-vooraf": [
@@ -313,6 +357,10 @@
    },
    {
     "op": "2026-09-01",
+    "aantal": 323
+   },
+   {
+    "op": "2026-09-03",
     "aantal": 323
    }
   ],
@@ -324,6 +372,10 @@
    {
     "op": "2026-09-01",
     "aantal": 1
+   },
+   {
+    "op": "2026-09-03",
+    "aantal": 1
    }
   ],
   "gevolg-onbekend": [
@@ -333,6 +385,10 @@
    },
    {
     "op": "2026-09-01",
+    "aantal": 90
+   },
+   {
+    "op": "2026-09-03",
     "aantal": 90
    }
   ],
@@ -344,6 +400,10 @@
    {
     "op": "2026-09-01",
     "aantal": 2
+   },
+   {
+    "op": "2026-09-03",
+    "aantal": 2
    }
   ],
   "herstel-onbevestigd": [
@@ -353,6 +413,10 @@
    },
    {
     "op": "2026-09-01",
+    "aantal": 47
+   },
+   {
+    "op": "2026-09-03",
     "aantal": 47
    }
   ],
@@ -364,6 +428,10 @@
    {
     "op": "2026-09-01",
     "aantal": 1487
+   },
+   {
+    "op": "2026-09-03",
+    "aantal": 1487
    }
   ],
   "wegwerpserver-kopieen": [
@@ -374,10 +442,57 @@
    {
     "op": "2026-09-01",
     "aantal": 3
+   },
+   {
+    "op": "2026-09-03",
+    "aantal": 3
    }
   ]
  },
- "stilstaand": [],
+ "stilstaand": [
+  {
+   "id": "objectpoort",
+   "aantal": 52,
+   "meetdagen": 3,
+   "reden": "staat 3 meetdagen op hetzelfde getal; de aflossing stokt hier. Sluitweg: GEMETEN met de IDOR-proef (scripts/idorproef.js, IDOR.json). Member-laag: 117 routes bewezen-gescheiden, 0 lekken (de eigenaar komt uit req.session, nooit uit het lijf, wat de klasse uitsluit). Werkplek-poort, geijkt op de eigenaar zodat een weigering iets bewijst: 56 routes bewezen-gescheiden, 0 doorbraken, 26 onbereikbaar. Die 56 waren er eerst 20: de ijking ging over op twee gangen met de objectpool, zodat de eigenaar met een lijf vol ECHTE id's uit zijn eigen huis naar binnen gaat en lid B daarna met precies hetzelfde lijf. De 26 die overblijven vragen een keten die deze proef niet kan lopen (een goedgekeurd document, een toegewezen klus) en zijn hetzelfde werk als object-vooraf hieronder: geen ontbrekend instrument, maar werk per domein."
+  },
+  {
+   "id": "object-vooraf",
+   "aantal": 323,
+   "meetdagen": 3,
+   "reden": "staat 3 meetdagen op hetzelfde getal; de aflossing stokt hier. Sluitweg: de objectpool (scripts/lib/objectpool.js) oogst echte id's uit antwoorden die de ronde zelf zag en verrijkt er de lijven mee; de eerste ronde herwon zo 393 van de 1014. Wat rest zijn objecten die alleen via een eigen keten ontstaan (vier ogen, goedkeuring); daarvoor blijft de tweestapsketen per domein het antwoord."
+  },
+  {
+   "id": "proefruis",
+   "aantal": 1,
+   "meetdagen": 3,
+   "reden": "staat 3 meetdagen op hetzelfde getal; de aflossing stokt hier. Sluitweg: de ruis meten: tien rondes op dezelfde commit, en per as de spreiding vastleggen. Dan weet de ratel wat een echte verslechtering is en wat niet."
+  },
+  {
+   "id": "gevolg-onbekend",
+   "aantal": 90,
+   "meetdagen": 3,
+   "reden": "staat 3 meetdagen op hetzelfde getal; de aflossing stokt hier. Sluitweg: de idempotentieproef over deze paden halen, of ze in de droogloop opnemen. Het gereedschap staat er (scripts/droogloop.js meet per stap welke collectie werkelijk bewoog); wat rest is meten."
+  },
+  {
+   "id": "droogloop-onbeoordeeld",
+   "aantal": 2,
+   "meetdagen": 3,
+   "reden": "staat 3 meetdagen op hetzelfde getal; de aflossing stokt hier. Sluitweg: dezelfde weg als gevolg-onbekend: het pad in een proefronde krijgen. Deze post is daarvan de kleine, zichtbare kant -- hij staat er apart omdat een droogloop met vijf onbeoordeelde stappen er groen uitziet en niets bewijst."
+  },
+  {
+   "id": "herstel-onbevestigd",
+   "aantal": 47,
+   "meetdagen": 3,
+   "reden": "staat 3 meetdagen op hetzelfde getal; de aflossing stokt hier. Sluitweg: wat hier nog staat, vraagt een WERELD die de proef niet opzet: een zaak met de werkvorm journalistiek, een ingericht landpakket, een salon, een geplande reisoptie. Elk draagt in HERSTELPROEF.json wat er zou moeten bestaan (`wereldOntbreekt`). Sluiten betekent hier dus die wereld opzetten in scripts/lib/herstelwereld.js -- per stuk, en alleen langs de gewone routes. Wat de afleiding uberhaupt niet ziet blijft daarbuiten: een terugweg die anders heet, en een schakelaar met een vlag in het lichaam."
+  },
+  {
+   "id": "wegwerpserver-kopieen",
+   "aantal": 3,
+   "meetdagen": 3,
+   "reden": "staat 3 meetdagen op hetzelfde getal; de aflossing stokt hier. Sluitweg: GEDAAN: alle instrumenten delen nu scripts/lib/wegwerpserver.js. De lib kreeg de opties die de laatste vier nodig hadden -- magSterven (keten/verraad saboteren de start), een eigen/hergebruikte datamap (hersteltijd herstart erop), nodeArgs (--expose-gc + gc-hook voor de geheugen-beproevingen), een vaste poort en readiness (ladder, beproeving, tot-crash). Een tiende kopie kan er niet meer bij zonder dat de teller het ziet."
+  }
+ ],
  "groei": [
   {
    "op": "2026-08-18",
@@ -420,6 +535,12 @@
    "van": 2284,
    "naar": 2285,
    "reden": "De idempotentieproef meet na de wereldopstelling en dertien lijfsleutelfamilies veel meer routes dan eerst; gevolg-onbekend gaat daardoor van 89 naar 90. Netto +1 op 2285, en de post die groeit is precies de post die zegt dat er nog geen droogloop over die route is geweest."
+  },
+  {
+   "op": "2026-09-03",
+   "van": 2283,
+   "naar": 2291,
+   "reden": "IDEMPROEF.json staat weer op de stand van main, want de eindpoort leest daar de wereldmeting uit die de stand van #176 niet kent; de proef van main beoordeelde 1573 routes tegen 1564 in die van #176, en die negen extra beproefde muterende routes dragen nog geen besluit in IDEMBESLUIT.json. Gevolg-onbekend zakte tegelijk met een. Sluit met de meetronde op deze stand"
   }
  ]
 }

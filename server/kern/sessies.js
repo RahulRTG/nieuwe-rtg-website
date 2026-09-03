@@ -15,14 +15,28 @@ const klok = require('../lib/klok');
 // alleen als vangnet knijpt; verlopen sessies gaan sowieso eerst weg.
 const MAX_SESSIONS = Math.max(400, Number(process.env.RTG_MAX_SESSIONS) || 50000);
 
+/* DE SESSIESLEUTEL, op moduleniveau en dus zonder fabriek.
+
+   Hij stond alleen binnen maakSessies() en was daarmee niet te bereiken voor wie
+   hem BUITEN de sessie-opslag nodig heeft -- en dat is er sinds de isolatielaag
+   iemand: `stand per sessie` heeft een sessie-sleutel nodig, en die viel bij
+   gebrek daaraan stil terug op de identiteitsleutel. Twee lagen zetten dan in
+   werkelijkheid dezelfde stand.
+
+   Een tweede definitie ernaast schrijven zou LAT.md regel 4 zijn: de hash die
+   bepaalt of u bent ingelogd en de hash die bepaalt welke sessie in isolatie
+   staat, moeten dezelfde bytes zijn. Hij is puur (geen state, geen db), dus hij
+   kan gewoon hierboven staan; de fabriek geeft hem onveranderd door. */
+function tokenHash(token) {
+  return require('crypto').createHash('sha256').update(String(token)).digest('hex');
+}
+
 function maakSessies({ db, save, crypto, sessieIngetrokken }) {
   const sessions = new Map(); // hash -> { tier, key, at, ... }
   const bron = crypto.randomBytes(12).toString('hex');
   const KANAAL = 'rtg:sessies:v1';
   let bus = null;
   let gekoppeld = false;
-
-  function tokenHash(token) { return crypto.createHash('sha256').update(String(token)).digest('hex'); }
 
   function geldigeHash(h) { return /^[a-f0-9]{64}$/.test(String(h || '')); }
   function geldigeSessie(sess) {
@@ -153,4 +167,4 @@ function maakSessies({ db, save, crypto, sessieIngetrokken }) {
     koppelBus, herbouwSessions, TOKEN_TTL_MS };
 }
 
-module.exports = { maakSessies, TOKEN_TTL_MS };
+module.exports = { maakSessies, tokenHash, TOKEN_TTL_MS };

@@ -22,6 +22,11 @@ module.exports = function bouwKernAanDrie(kern, grens) {
      week geen mislukking is maar gewoon een ander pad. */
   Object.assign(kern, require('../kern/doelen')({ db, save, crypto, schoon }));
   require('../routes/doelen')(grens('doelen'));
+  /* De knelpuntmotor (kern/knelpunt/): welke weg naar een doel ligt open, wat
+     blokkeert hem, en wat is niet nagegaan. Hij staat NAAST de doelen en niet
+     erin: doelen.js rekent een pad tussen twee getallen die het lid koos, deze
+     rekent met randvoorwaarden die het lid opgeeft. Bewaart niets. */
+  require('../routes/knelpunt')(grens('knelpunt'));
   /* De dagmetingen (kern/metingen.js): slaap, beweging en water, door het lid
      zelf ingevuld. De bron die RTG Life miste; herkomst blijft zichtbaar. */
   Object.assign(kern, require('../kern/metingen')({ db, save }));

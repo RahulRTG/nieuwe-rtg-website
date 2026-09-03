@@ -82,7 +82,13 @@ app.post('/api/staff/clock', supplierAuth, (req, res) => {
    van RTG. Wat er dan gebeurt is alleen dat het beleid weer geldt. */
 app.post('/api/staff/pauze', supplierAuth, (req, res) => {
   if (!req.actor.staffId) return res.status(403).json({ error: 'Alleen met een persoonlijke login.' });
-  const lijst = db.data.klok[req.supplier.code] = db.data.klok[req.supplier.code] || [];
+  /* KIJKEN EN NIET NEERZETTEN. Een pauze hangt aan een OPEN dienst en maakt er
+     nooit een; wie hier geen klokboek heeft, heeft ook geen dienst en krijgt een
+     409. Zou de la hier lui worden aangemaakt (`= ... || []`), dan liet die 409
+     een leeg klokboek achter bij een zaak waar nog nooit iemand klokte -- en dan
+     zeggen de statuscode en de opslag twee verschillende dingen over hetzelfde
+     verzoek. De Array.isArray hieronder ving het ontbreken al op. */
+  const lijst = db.data.klok[req.supplier.code];
   const dienst = Array.isArray(lijst) ? lijst.find(e => e.staffId === req.actor.staffId && e.in && !e.out) : null;
   if (!dienst) return res.status(409).json({ error: 'Je staat niet ingeklokt; een pauze hoort bij een dienst.' });
   dienst.pauzes = dienst.pauzes || [];

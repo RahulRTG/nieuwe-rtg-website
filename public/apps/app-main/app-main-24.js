@@ -7,6 +7,11 @@
        geinstalleerde PWA komt nog steeds uit waar hij hoort. */
     ik:          { naam: 'Wie ben ik',   url: '/apps/ik.html' },
     veilig:      { naam: 'RTG Veilig',   url: '/apps/veilig.html' },
+    /* ACCOUNTbescherming en niet "Bescherming": `veilig` hierboven is de
+       veiligheid van een MENS (stil alarm, codewoord), dit die van een ACCOUNT.
+       Twee tegels die allebei "bescherming" heten, laten een lid op het
+       verkeerde moment op de verkeerde drukken. */
+    bescherming: { naam: 'Accountbescherming', url: '/apps/mijn-isolatie.html' },
     ov:          { naam: 'Openbaar vervoer',           url: '/apps/ov.html' },
     stad:        { naam: 'Stad',    url: '/apps/stad.html' },
     clips:       { naam: 'Video',        url: '/apps/clips.html' },
@@ -145,12 +150,3 @@
      als lege lijst bestaan zodat de rij later opnieuw te vullen is zonder de
      tekenlaag aan te raken -- en zodat hier staat waarom hij leeg is. */
   const FUNCTIES = [];
-
-  /* ---------- de mappen, boven de klok ----------
-     Vier mappen, en daar zit alles in waar je pas je recht op geeft. Niets
-     installeren: het staat er al. Wil je iets niet zien, dan zet je het uit
-     in de Boardroom (die zet het uit, hij hoeft het niet aan te zetten).
-
-     Een map heeft een vaste sleutel (waar je eigen naam onder bewaard wordt),
-     een standaardnaam en zijn apps. Apps die voor jouw pas niet bestaan
-     vallen er vanzelf uit (itemZichtbaar). */

@@ -219,6 +219,13 @@ jobs:
           exit "$uitslag"
         env:
           RTG_ROUTELOG: ${{ github.workspace }}/routejournaal.log
+          # EEN TIJDMETING HOORT NIET IN EEN SCHERF. Vier scherven delen een
+          # runner, dus hier is de machine per definitie belast -- en een toets
+          # die soms rood wordt zonder dat er iets stuk is, leert iedereen om
+          # rood te negeren. De vlakheidstoets van de isolatiepoort slaat hier
+          # over en draait in een eigen stille stap hieronder, waar hij WEL iets
+          # bewijst. Overslaan is dus geen verzwakking maar een verhuizing.
+          RTG_SNELLE_TOETS: '1'
       - name: De dekking van deze scherf bewaren
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
@@ -495,6 +502,14 @@ jobs:
       # was niet genoeg: deze toetsen maken en droppen dezelfde tabellen, dus
       # begon nummer vijf op wat nummer vier had achtergelaten. Daardoor stonden
       # hier drie van de acht bestanden -- de andere vijf draaiden nooit.
+      # DE TIJDMETINGEN, ALLEEN HIER. Deze job draait niet naast drie andere
+      # scherven op dezelfde runner, dus dit is de stilste plek in de keten. De
+      # vlakheidstoets bewaakt iets echts: wordt de isolatiepoort O(n), dan wordt
+      # het platform trager naarmate MEER mensen zich beschermen -- precies op
+      # het moment dat de laag gebruikt wordt.
+      - name: De vlakheid van de isolatiepoort (tijdmeting, stille runner)
+        run: node --test --test-timeout=300000 test/isolatiepoort.test.js
+
       - name: PostgreSQL-integratietests (elk in een eigen database)
         run: node scripts/pgtoetsen.js
         env:
@@ -1156,7 +1171,7 @@ jobs:
       # historie ziet -- dan verschuift het kritieke pad weer zonder besluit.
       - name: De duurmetingen van alle delen ophalen
         if: always()
-        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           pattern: toetsduur-*
           path: duurmetingen

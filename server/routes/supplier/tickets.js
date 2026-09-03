@@ -11,9 +11,12 @@ app.post('/api/supplier/activiteit', supplierAuth, (req, res) => {
   if (!managerOnly(req, res)) return;
   const s = req.supplier;
   if (!heeftTickets(s)) return res.status(409).json({ error: 'Deze sector verkoopt geen tickets.' });
-  if (!Array.isArray(s.activiteiten)) s.activiteiten = [];
+  /* KIJKEN ZONDER NEER TE ZETTEN: vier keuringen hieronder kunnen nog weigeren,
+     en een 400 hoort geen lege lijst achter te laten. Bestaat de lijst, dan is
+     dit hem ECHT. */
+  const bestaande = Array.isArray(s.activiteiten) ? s.activiteiten : [];
   if (req.body.weg) {
-    s.activiteiten = s.activiteiten.filter(a => a.id !== req.body.id);
+    s.activiteiten = bestaande.filter(a => a.id !== req.body.id);
     save(); sseToSupplier(s.code, 'sync', { scope: 'tickets' });
     return res.json({ ok: true, activiteiten: s.activiteiten });
   }
@@ -28,11 +31,13 @@ app.post('/api/supplier/activiteit', supplierAuth, (req, res) => {
   if (!tijden.length) return res.status(400).json({ error: 'Geef minstens een tijdslot op (bijv. 10:00).' });
   const velden = { name, desc: schoon(req.body.desc, 140), prijs, capaciteit, duur: schoon(req.body.duur, 30), tijden };
   if (req.body.id) {
-    const a = s.activiteiten.find(x => x.id === req.body.id);
+    const a = bestaande.find(x => x.id === req.body.id);
     if (!a) return res.status(404).json({ error: 'Activiteit niet gevonden.' });
     Object.assign(a, velden);
   } else {
-    if (s.activiteiten.length >= 30) return res.status(400).json({ error: 'Tot 30 activiteiten per zaak.' });
+    if (bestaande.length >= 30) return res.status(400).json({ error: 'Tot 30 activiteiten per zaak.' });
+    // pas hier komt er iets bij, en pas hier hoort het vak te ontstaan
+    if (!Array.isArray(s.activiteiten)) s.activiteiten = [];
     s.activiteiten.push({ id: 'a' + crypto.randomBytes(3).toString('hex'), ...velden });
   }
   save();

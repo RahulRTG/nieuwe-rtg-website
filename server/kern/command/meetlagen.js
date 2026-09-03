@@ -29,7 +29,7 @@
    dan gelooft niemand meer welk van de twee. */
 'use strict';
 
-function maakMeetlagen({ db, save, crypto, journaal, kwaliteit, canary, sseToOffice, tenant, opslag }) {
+function maakMeetlagen({ db, save, crypto, journaal, kwaliteit, canary, sseToOffice, tenant, opslag, foutmelder }) {
   /* De sonde levert de metingen van BUITENAF en de SLO-meter houdt het
      foutbudget bij; ze staan in deze volgorde omdat de meter de sonde erbij zet
      en niet andersom. De reizen komen uit dezelfde SLO.json als de doelen, via
@@ -46,7 +46,11 @@ function maakMeetlagen({ db, save, crypto, journaal, kwaliteit, canary, sseToOff
      de module -- een regeltaal in een configuratiebestand is een tweede
      implementatie die je niet kunt toetsen. */
   const alarm = require('./alarm').maakAlarm({ db, save, journaal, slo, sonde, canary, kwaliteit,
-    norm: () => slolaag.laadNorm(), sein: sseToOffice, opslag });
+    norm: () => slolaag.laadNorm(), sein: sseToOffice, opslag,
+    /* LAAT OPGEHAALD, net als tenant hierboven: de foutmelder hangt aan de kern
+       en die is nog niet compleet als deze laag wordt gebouwd. Een functie in
+       plaats van een waarde, zodat het alarm hem vindt zodra hij er is. */
+    foutmelder });
   alarm.tikker();
 
   /* DE GEZONDHEIDSKAART. Niet "wat staat er in de gegevens" (dat is ./puls.js)

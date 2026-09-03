@@ -57,6 +57,14 @@ const PUBLIEK = new Map([
   ['/api/aanmelding/aanvraag', 'een aanstaande aanvrager is nog geen lid (met rem per ip)'],
   ['/api/foundation/registratie/aanvragen', 'een school, vrijwilliger of stichting heeft vóór toelating nog geen account of code (met rem per ip)'],
   ['/api/foundation/registratie/status', 'de willekeurige, gehashte statussleutel is de geloofsbrief en toont uitsluitend die ene aanvraag (met rem per ip)'],
+  /* Vijf uit #176 ("vier bewust publieke routes gingen offline omdat twee
+     lijsten uiteenliepen"): daar stonden ze in de oude lijst van
+     publiekeroutes.js, hier in de ene lijst die overbleef. */
+  ['/api/foundation/gezin/maak', 'een gezin dat zichzelf aanmaakt heeft nog geen gezinscode en geen profiel; rem 8 per adres per half uur (server/foundation/gezin.js)'],
+  ['/api/foundation/reis/aanvraag', 'een gezin dat om een reis vraagt of wordt voorgedragen heeft geen account; rem 6 per adres per uur, want de lijst is afgekapt op duizend en volschrijven zou echte hulpvragen eruit duwen (server/foundation/onderwijs/schrift.js)'],
+  ['/api/foundation/school/personeel/aanmeld', 'oude testfixture, buiten de toetsenreeks 410: in productie geeft de directie een persoonlijke uitnodiging; rem 6 per adres per kwartier (server/school/beheer.js)'],
+  ['/api/foundation/school/personeel/uitnodiging/bekijk', 'de uitnodigingssleutel IS de geloofsbrief en toont uitsluitend die ene uitnodiging; rem 8 per adres per kwartier (server/school/personeelstoegang.js)'],
+  ['/api/foundation/school/personeel/uitnodiging/accepteer', 'de uitnodigingssleutel IS de geloofsbrief; hij verloopt, gaat na gebruik dicht en de hash wordt gewist, rem 6 per adres per kwartier (server/school/personeelstoegang.js)'],
   /* Het bewijsstuk voor de gereguleerde genres hoort bij dezelfde aanvraag en
      loopt dus dezelfde weg: wie een apotheek aanvraagt heeft op dat moment
      geen zaak, geen personeelslogin en soms geen account -- alleen zijn
@@ -204,6 +212,16 @@ const PUBLIEK = new Map([
   ['/api/claims', 'de publieke claims voeden de voorwaardenpagina\'s, die je zonder inlog leest'],
   ['/api/betaaldiensttarief', 'het betaaldiensttarief staat in de partnervoorwaarden'],
   ['/api/sociaalbeleid', 'de sociale afdracht is een publieke belofte (RTFoundation)'],
+  /* De voordeur van de beschermzaak (routes/rtfos/voordeur.js). Vier routes
+     zonder inlog, en dat is hier de hele bedoeling: de mens om wie het gaat
+     heeft geen kantoorinlog en heel vaak ook geen RTG-account. Een deur die
+     eerst een account vraagt, is voor hem geen deur. De klasse zelf weigert
+     adres, telefoon, naam en BSN (kern/beschermzaak/klasse.js), dus er kan
+     langs deze weg niets herleidbaars binnenkomen. */
+  ['/api/bescherming/deur/steden', 'alleen de namen van de plaatsen die zo een zaak kunnen oppakken; geen enkel getal en geen enkele zaak'],
+  ['/api/bescherming/deur/start', 'de omkering van HDI.md par. 7: hier begint een mens zelf een beschermzaak, zonder account, zonder BSN, zonder adres. Twee remmen, en ruim geremd omdat een geweigerde melding erger is dan een dubbele'],
+  ['/api/bescherming/deur/stand', 'de eigen code is de geloofsbrief, en hij is met opzet GEEN wachtwoord: dit antwoordt alleen de stand en of er iets is klaargezet, nooit wat'],
+  ['/api/bescherming/deur/intrekken', 'wie ja zei mag nee zeggen; een recht waarvoor je moet bellen naar de organisatie die je wilde stoppen, is geen recht'],
   ['/api/rtf/vacatures', 'openstaande vacatures zijn openbaar'],
   ['/api/gids/app', 'de app-gids is openbaar'],
   ['/api/krant/gids', 'de krant is openbaar; er is een toets die dat vastlegt'],

@@ -88,7 +88,26 @@ wachtOpSchoneBoom();
      code niet deed, en zo lopen kopieen uiteen zonder dat iemand het ziet
      (LAT.md regel 4 en 6, en de post wegwerpserver-kopieen in
      BEWIJSSCHULD.json). */
-  const server = await start({ naam: 'rolproef', env: { RTG_DEMO: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' } });
+      /* RTG_MAGNAAT_TEST=1 ERBIJ, en dat is geen tweede vlag voor hetzelfde.
+         `server/testomgeving.js` bepaalt of de synthetische demo-accounts
+         bestaan, en die vraagt sinds zijn aanscherping OF `RTG_MAGNAAT_TEST=1`,
+         OF `NODE_ENV=test` SAMEN met `RTG_DEMO=1`. Deze ronde zette alleen die
+         laatste helft, dus stond de demo-deur dicht en gaf zowel
+         /api/login als /api/supplier/login een 403 -- de proef struikelde met
+         "geen token voor: member, supplier" en het register bleef staan zoals
+         het was. Dat is precies goed van hem (een proef zonder rol hoort niet te
+         doen alsof hij die rol beproefde), maar het betekende wel dat dit
+         register stil verouderde.
+
+         WAAROM NIET `NODE_ENV=test` erbij. Dat zou ook werken en het is de
+         verkeerde helft: zestien plekken in server/ versoepelen hun controle
+         onder NODE_ENV=test (gezinsvalidatie, pincode-eisen, een limiet in
+         bedrijf/index.js). Een proefronde die dat aanzet, meet een LOSSER huis
+         dan er draait. RTG_MAGNAAT_TEST opent alleen de synthetische accounts;
+         de routes die daarna worden beproefd zijn de echte. scripts/auditproef-route.js
+         deed het al zo. */
+  const server = await start({ naam: 'rolproef',
+    env: { RTG_DEMO: '1', RTG_MAGNAAT_TEST: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' } });
   const { basis, klaar } = server;
 
   /* De objectpool: oogsten in de wikkel, verrijken via lijfVoor. Een verkeerde

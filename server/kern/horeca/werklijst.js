@@ -127,7 +127,8 @@ module.exports = ({ horeca, schoon, verzoeklaag }) => {
     const nuMs = klok.nu();
     /* De keuring keek naar de TERUGVAL en gebruikte daarna de RAUWE waarde,
        en gaf zonder modus in het lijf een harde 500 -- de gewone oproep van de
-       PDA. Zie test/horeca-werklijst.test.js voor het hele verhaal. */
+       PDA. Zie test/horeca-werklijst.test.js en test/horeca-werklijst-modus.test.js
+       (twee takken vonden hem los van elkaar) voor het hele verhaal. */
     const gevraagd = String((opties && opties.modus) || 'alles');
     const modus = MODI[gevraagd] ? gevraagd : 'alles';
     const soorten = MODI[modus].soorten;

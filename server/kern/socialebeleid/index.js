@@ -138,33 +138,40 @@ module.exports = ({ db, save, soorten }) => {
      onbekend veld wordt genegeerd en niet stilzwijgend opgeslagen: opslag die
      niemand leest, is opslag die ooit iets gaat betekenen zonder dat iemand het
      bedoelde. */
+  /* Eerst keuren, dan pakken, dan toepassen -- waarom: test/socialebeleid-volgorde.test.js */
   function zet(key, invoer) {
-    const r = pak(key);
-    if (!r) return { status: 400, error: 'Geen sleutel.' };
+    if (!String(key || '')) return { status: 400, error: 'Geen sleutel.' };
     const v = invoer && typeof invoer === 'object' ? invoer : {};
-    const was = { uit: r.uit.slice(), horizon: r.horizon, knopUit: (r.knopUit || []).slice() };
 
+    let soort = null, knop = null, horizon = null;
     if (v.soort !== undefined) {
-      const s = String(v.soort);
-      if (!SOORTEN.includes(s)) return { status: 400, error: 'Dat soort voorstel bestaat niet.' };
-      const aan = v.aan !== false;
-      r.uit = aan ? r.uit.filter(x => x !== s) : (r.uit.includes(s) ? r.uit : r.uit.concat(s));
+      soort = String(v.soort);
+      if (!SOORTEN.includes(soort)) return { status: 400, error: 'Dat soort voorstel bestaat niet.' };
     }
-
     if (v.knop !== undefined) {
-      const k = String(v.knop);
-      if (!KNOPNAMEN.includes(k)) return { status: 400, error: 'Die schakelaar bestaat niet.' };
-      const aan = v.aan !== false;
-      r.knopUit = aan ? r.knopUit.filter(x => x !== k) : (r.knopUit.includes(k) ? r.knopUit : r.knopUit.concat(k));
+      knop = String(v.knop);
+      if (!KNOPNAMEN.includes(knop)) return { status: 400, error: 'Die schakelaar bestaat niet.' };
     }
-
     if (v.horizon !== undefined) {
-      const n = Math.round(Number(v.horizon));
-      if (!Number.isFinite(n) || n < HORIZON_MIN || n > HORIZON_MAX) {
+      horizon = Math.round(Number(v.horizon));
+      if (!Number.isFinite(horizon) || horizon < HORIZON_MIN || horizon > HORIZON_MAX) {
         return { status: 400, error: 'Kies een horizon tussen ' + HORIZON_MIN + ' en ' + HORIZON_MAX + ' dagen.' };
       }
-      r.horizon = n;
     }
+
+    const r = pak(key);
+    if (!r) return { status: 400, error: 'Geen sleutel.' };
+    const was = { uit: r.uit.slice(), horizon: r.horizon, knopUit: (r.knopUit || []).slice() };
+
+    if (soort !== null) {
+      const aan = v.aan !== false;
+      r.uit = aan ? r.uit.filter(x => x !== soort) : (r.uit.includes(soort) ? r.uit : r.uit.concat(soort));
+    }
+    if (knop !== null) {
+      const aan = v.aan !== false;
+      r.knopUit = aan ? r.knopUit.filter(x => x !== knop) : (r.knopUit.includes(knop) ? r.knopUit : r.knopUit.concat(knop));
+    }
+    if (horizon !== null) r.horizon = horizon;
 
     /* EEN HANDELING DIE NIETS VERANDERT, VERANDERT NIETS -- en wordt dus ook
        niet gemeld als wijziging. Die les staat in kern/geldbeleid/actielog.js:

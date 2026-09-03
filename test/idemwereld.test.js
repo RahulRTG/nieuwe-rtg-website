@@ -20,7 +20,11 @@
    Draai los: node --test test/idemwereld.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('fs');
+const path = require('path');
 const { zetWereldKlaar, gedeeldLijf, geldLijf } = require('../scripts/lib/idemwereld');
+const wereld = require('../scripts/lib/idemwereld');
+const { alleRoutes } = require('../scripts/lib/routes');
 
 /* Een nepserver: elk pad geeft terug wat het echte huis teruggeeft, maar dan
    zonder huis. Alleen de vorm doet ertoe -- de echte ronde meet de rest. */
@@ -152,4 +156,167 @@ test('de halve-lijf-regel kijkt ook IN lijsten en posten', () => {
   assert.equal(p['/api/pay/verzoek'], undefined, 'aan: [null] is geen geldig lijf');
   assert.equal(p['/api/bank/bulk'], undefined, 'en posten[].naarIban: null ook niet');
   assert.equal(p['/api/bank/salaris'], undefined);
+});
+
+/* ============================================================================
+   WORDT ALLES WAT WORDT GEBOUWD OOK DOORGEGEVEN?
+
+   Hierboven staat wat de wereld OPLEVERT; hieronder of het ook AANKOMT. Dat
+   bleek een aparte vraag: `personeelToken` kwam gewoon klaar -- een leraar met
+   een geldig token stond in de wereld -- maar werd nergens in een lijf gezet.
+   Achttien schoolroutes gaven daardoor "Onbekende school of verkeerd
+   personeel-token" terwijl het token bestond, en de melding NIET KLAARGEKOMEN
+   zweeg, want het object was er wel.
+
+   Dat is de stilste manier waarop deze proef onderrapporteert: geen fout, geen
+   lege sleutel, geen melding. Alleen een kolom `ongemeten` die groter is dan hij
+   hoeft te zijn -- en die kolom bepaalt in kern/isolatie/leesset.js wat er onder
+   isolatie dichtgaat.
+
+   MUTATIES die zijn gedraaid en welke toets erop zakte (LAT.md regel 2):
+   - `personeelToken` weer uit het schoollijf halen  -> A ZAKT (RAAK); dit is de
+     bug waar deze toetsen voor zijn geschreven. DE EERSTE VERSIE VING HEM NIET:
+     die nam aan dat elke sleutel op -Token een rol-token is en dus niet in een
+     lijf hoeft, en `personeelToken` eindigt op -Token. De uitzondering hangt nu
+     aan wat de code DOET (belandt hij in `tokens`?) en niet aan hoe hij heet.
+   - `leerlingId` uit het schoollijf halen           -> A ZAKT (RAAK).
+   - `tokens[genre] = ...` uit de genre-lus halen    -> B ZAKT (RAAK).
+   - het voorvoegsel /api/lucht/ naar /api/luchthaven/ -> C ZAKT (RAAK).
+   - `alleenRol` weghalen bij /api/overheid/ of /api/gemeente/ -> D ZAKT (RAAK).
+   ========================================================================= */
+
+const BRON = fs.readFileSync(path.join(__dirname, '..', 'scripts', 'lib', 'idemwereld.js'), 'utf8');
+
+/* De lijst VERWACHT staat in de bron en wordt niet geexporteerd; hem hier
+   overtypen zou betekenen dat een nieuw voorwerp deze toets ontloopt. Hij wordt
+   dus uit de bron gelezen, met de sleutelnaam als anker. */
+function verwachteSleutels() {
+  const blok = BRON.slice(BRON.indexOf('const VERWACHT = ['), BRON.indexOf('function gemist('));
+  return [...blok.matchAll(/sleutel:\s*'([^']+)'/g)].map(m => m[1]);
+}
+
+/* Een wereld waarin ALLES is gelukt, zodat voorvoegselLijf() zijn volledige
+   uitkomst geeft. De waarden zijn herkenbaar aan hun naam, zodat de toets kan
+   zien WELKE sleutel waar terechtkwam. */
+function volleWereld(sleutels) {
+  const w = {};
+  for (const k of sleutels) w[k] = 'X-' + k;
+  /* De hulpsleutels die geen eigen VERWACHT-regel hebben maar wel voorwaarde
+     zijn voor een lijf. Ze staan hier apart zodat zichtbaar blijft dat ze geen
+     voorwerp zijn maar een bijproduct. */
+  for (const k of ['gezinToken', 'schoolBeheerToken', 'beheerToken', 'lidToken', 'concern',
+    'iban2', 'cn1', 'cn2', 'spaarIban', 'pasId', 'anderToken', 'rijkCode'])
+    if (!w[k]) w[k] = 'X-' + k;
+  return w;
+}
+
+test('A. elk gebouwd voorwerp wordt ook ergens doorgegeven', () => {
+  const sleutels = verwachteSleutels();
+  assert.ok(sleutels.length > 15, 'VERWACHT hoort gevuld te zijn; gelezen: ' + sleutels.length);
+
+  const w = volleWereld(sleutels);
+  const gebruikt = JSON.stringify([
+    wereld.voorvoegselLijf(w),
+    wereld.gedeeldLijf(w),
+    wereld.geldLijf(w)
+  ]);
+
+  /* WELKE SLEUTELS ALS ROL MEEGAAN IN PLAATS VAN IN EEN LIJF. Die hoeven niet
+     in een lijf te staan -- ze worden aan `tokens` toegevoegd en de proef kiest
+     ze op rol. Maar de uitzondering moet SMAL zijn: hij geldt alleen voor
+     sleutels die aantoonbaar in `tokens` belanden.
+
+     DE EERSTE VERSIE VAN DEZE TOETS LIET HIER DE BUG DOOR waarvoor hij is
+     geschreven. Hij nam aan dat elke sleutel op -Token een rol-token was, en
+     `personeelToken` eindigt op -Token. Die sleutel gaat NIET naar `tokens`: hij
+     hoort in een lijf, en dat is precies wat er ontbrak. Een uitzondering op een
+     NAAM in plaats van op wat de code doet, is hoe een toets zijn eigen
+     onderwerp mist. */
+  const alsRol = new Set();
+  for (const m of BRON.matchAll(/tokens\.(\w+)\s*=\s*w\.(\w+)/g)) alsRol.add(m[2]);
+  /* En de lus die er meer in een keer zet: de sleutelnaam staat daar in de
+     middelste kolom van de tabel waarover hij loopt. */
+  const lus = BRON.slice(BRON.indexOf('for (const [genre, sleutel, naam] of ['));
+  if (lus) for (const m of lus.slice(0, 600).matchAll(/'(\w+Token)'/g)) alsRol.add(m[1]);
+
+  const ongebruikt = sleutels.filter(k => {
+    if (gebruikt.includes('X-' + k)) return false;
+    return !alsRol.has(k);
+  });
+
+  assert.deepEqual(ongebruikt, [],
+    'deze voorwerpen worden gebouwd en nergens doorgegeven: ' + ongebruikt.join(', ') +
+    ' -- dat is de stilste manier waarop deze proef onderrapporteert');
+});
+
+test('B. een voorvoegsel met een rol wijst naar een token dat de opbouw ook zet', () => {
+  const sleutels = verwachteSleutels();
+  const w = volleWereld(sleutels);
+  const rollen = [...new Set(wereld.voorvoegselLijf(w).map(v => v.rol).filter(Boolean))];
+  assert.ok(rollen.length >= 4, 'er horen rol-voorvoegsels te zijn; gevonden: ' + rollen.join(', '));
+
+  for (const rol of rollen) {
+    /* `member`, `office`, `supplier`, `boardroom` en de andere basisrollen komen
+       uit scripts/lib/proefsleutels.js en worden niet door de wereld gezet. Wat
+       deze toets bewaakt zijn de rollen die de WERELD aanmaakt. */
+    if (['member', 'office', 'supplier', 'boardroom', 'techniek', 'werkplekbaas', 'scim'].includes(rol)) continue;
+    const gezet = new RegExp("tokens\\." + rol + "\\s*=|tokens\\[genre\\]\\s*=|tokens\\['" + rol + "'\\]").test(BRON);
+    assert.ok(gezet, 'de rol "' + rol + '" wordt als voorvoegsel doorgegeven maar nergens in ' +
+      '`tokens` gezet; dan roept de proef die routes ZONDER token aan');
+  }
+});
+
+test('C. elk voorvoegsel wijst naar routes die bestaan', () => {
+  const sleutels = verwachteSleutels();
+  const w = volleWereld(sleutels);
+  const paden = alleRoutes().map(r => r.pad);
+  const leeg = [];
+  for (const v of wereld.voorvoegselLijf(w)) {
+    const raak = paden.filter(p => p.startsWith(v.voorvoegsel)).length;
+    if (!raak) leeg.push(v.voorvoegsel);
+  }
+  assert.deepEqual(leeg, [],
+    'deze voorvoegsels raken geen enkele route: ' + leeg.join(', ') +
+    ' -- een pad dat nergens heen wijst, meet niets en zegt dat niet');
+});
+
+test('D. een voorvoegsel dat een rol oplegt, doet dat niet aan twee publieken tegelijk', () => {
+  /* DE INVARIANT DIE DEZE HELE RONDE OPLEVERDE. Een voorvoegsel mag de rol
+     overnemen -- /api/overheid/ hoort bij het rijk, dus het rijkstoken hoort daar.
+     Maar onder datzelfde voorvoegsel wonen 33 routes voor een BURGER, en die
+     kregen dat token ook. Alle 33 antwoordden "Niet ingelogd als lid" en stonden
+     in de kolom `ongemeten` om een reden die niets met de route te maken had.
+
+     Dat is niet te zien aan de uitslag: een 401 ziet eruit als een route die nu
+     eenmaal een andere sleutel wil. Het viel alleen op doordat /api/gemeente/
+     dezelfde fout herhaalde en daarbij vijf routes van GEMETEN naar ONGEMETEN
+     duwde -- een toevoeging die de meting verslechtert is het ergste wat hier kan
+     gebeuren, want hij ziet er van buiten uit als vooruitgang.
+
+     De regel: legt een voorvoegsel een rol op, dan moet hij of maar EEN soort
+     actor bedienen, of met `alleenRol` zeggen welke. */
+  const sleutels = verwachteSleutels();
+  const w = volleWereld(sleutels);
+  const routes = alleRoutes().filter(r => r.methode !== 'GET');
+
+  /* De rol per route komt uit de proefuitslag: dat is dezelfde bron als waar de
+     proef zelf zijn token op kiest. Ontbreekt hij, dan telt de route niet mee --
+     over een route die nooit is aangeroepen valt hier niets te zeggen. */
+  let rolVan = {};
+  try {
+    const proef = require('../IDEMPROEF.json').perRoute || {};
+    for (const r of Object.values(proef)) if (r.rol) rolVan[r.pad] = r.rol;
+  } catch (e) { rolVan = {}; }
+  if (!Object.keys(rolVan).length) return;   // geen uitslag om op te steunen
+
+  const gemengd = [];
+  for (const v of wereld.voorvoegselLijf(w)) {
+    if (!v.rol || v.alleenRol) continue;
+    const rollen = new Set();
+    for (const r of routes) if (r.pad.startsWith(v.voorvoegsel) && rolVan[r.pad]) rollen.add(rolVan[r.pad]);
+    if (rollen.size > 1) gemengd.push(v.voorvoegsel + ' bedient ' + [...rollen].join(' en '));
+  }
+  assert.deepEqual(gemengd, [],
+    'deze voorvoegsels leggen een rol op aan meer dan een soort actor: ' + gemengd.join('; ') +
+    ' -- zet er `alleenRol` bij, anders krijgt het verkeerde publiek het verkeerde token');
 });

@@ -323,7 +323,7 @@
   var TOKEN = null; try { TOKEN = localStorage.getItem('rtg_member_token'); } catch (e) {}
   var ZAKEN = [], KAARTEN = {}, PROFIELEN = {}, MAND = {}, GEKOZEN = null, ZONE = null, KEUKEN = '';
   var MENU_ZOEK = '', MENU_CAT = '', AANVRAAG = 0, CHECKOUT = null, CHECKOUT_IDEM = null, LOPEND_TIMER = null;
-  var BETAALKEUZE = 'ontvangst', INGANG = 'ontdekken', GROEP = '', GROEPEN = [], CONFIG_ITEM = null, ZOEK_TIMER = null;
+  var BETAALKEUZE = 'ontvangst', INGANG = 'ontdekken', GROEP = '', GROEPEN = [], CONFIG_ITEM = null, ZOEK_TIMER = null, LIJST_AANVRAAG = 0;
   var LOPENDE_ORDERS = {}, LOCATIE = null, LOCATIE_VRAAG = false, PERSONEN = null, GEWENSTE_TIJD = null;
 
   function veiligFoto(src) {
@@ -404,6 +404,39 @@
   }
 
   function laadResultaten(modus) {
+    /* WIE HET LAATST VRAAGT, WINT -- EN DAT WAS HIER NIET ZO. Deze functie kan
+       van drie kanten tegelijk lopen: de uitgestelde zoekopdracht van het typen
+       (de input-luisteraar op #zoek onderaan, 280 ms), een klik op een andere
+       ingang, en een filterwijziging. Gemeten met een teller op de verzoeken in
+       test/bestellen-scherm.e2e.js: 1x ontdekken (opstarten), 3x zoeken (het
+       typen en de zoekknop), 1x ontdekken (de klik) -- drie overlappende
+       ladingen zonder volgordebewaking. Dat ging op twee manieren mis:
+
+       1. De TRAAGSTE oproep won, niet de laatst gevraagde: landt een
+          achterblijvende zoekopdracht na Ontdekken, dan overschrijft hij de
+          lijst met zoekresultaten.
+       2. De debounce van het zoekveld werd nergens gewist. Wie iets typt en
+          daarna op Ontdekken klikt, laat die timer NA de klik aflopen: INGANG
+          springt terug op 'zoeken', en het antwoord van /ontdekken werd
+          getekend met het oude zoekwoord als filter en met de groepsknoppen
+          verborgen -- je vroeg om ontdekken en kreeg je vorige zoekopdracht
+          terug. Gemeten in een gezakte ronde: knoppen ["KIKUNOI"], "1 zaak",
+          #ontdekGroepen verborgen terwijl er drie groepen waren.
+
+       Twee regels, allebei hier bovenaan: de wachtende debounce wordt gewist,
+       en elke lading krijgt een volgnummer zodat een antwoord dat niet meer bij
+       de laatste lading hoort niets meer tekent. kiesZaak() hieronder bewaakt
+       dat al met AANVRAAG; deze had het niet, en dat was een gat en geen keuze.
+       Zelfde patroon, eigen teller.
+
+       Waarom BOVENAAN en niet pas vlak voor het verzoek: deze functie zet
+       INGANG en kan daarna op de locatievraag afbreken om zichzelf later
+       opnieuw aan te roepen. Stond de teller pas bij het verzoek, dan tekende
+       een antwoord dat nog onderweg was met de intussen veranderde INGANG;
+       bleef de debounce staan, dan liep hij tijdens die locatievraag alsnog af
+       en won het zoeken van de klik. */
+    clearTimeout(ZOEK_TIMER);
+    var lijstAanvraag = ++LIJST_AANVRAAG;
     INGANG = modus || INGANG;
     var locatieNodig = Number($('#filterAfstand').value) || $('#filterSort').value === 'afstand';
     if (locatieNodig && !LOCATIE && !LOCATIE_VRAAG) {
@@ -421,6 +454,8 @@
     if (INGANG === 'concierge') body.vraag = $('#conciergeVraag').value.trim();
     $('#zaken').innerHTML = '<div class="skelet"></div><div class="skelet"></div>';
     api(pad, body).then(function (j) {
+      /* Een antwoord op een achterhaalde vraag verandert het scherm niet meer. */
+      if (lijstAanvraag !== LIJST_AANVRAAG) return;
       if (j._fout) return meld(j._fout);
       ZAKEN = j.restaurants || [];
       var keukens = j.keukens || [];

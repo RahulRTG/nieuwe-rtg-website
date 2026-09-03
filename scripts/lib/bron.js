@@ -87,9 +87,21 @@
 */
 'use strict';
 
-function zonderCommentaar(bron) {
+function zonderCommentaar(bron, opties) {
   const s = String(bron);
   const n = s.length;
+  /* DE DERDE VORM, waar de kop hierboven om vroeg: dezelfde wandeling, maar het
+     commentaar wordt PLATGESLAGEN in plaats van weggehaald -- elk teken een
+     spatie, elke regelovergang blijft staan. Daarmee blijven zowel de
+     regelnummers als de TEKENPOSITIES gelijk aan de echte bron, en dat is wat
+     een scanner nodig heeft die een treffer wil terugmelden als bestand:regel.
+     Zonder deze stand moest zo'n scanner kiezen tussen commentaar meelezen (en
+     dan een uitgecommentarieerde route als echt melden) of zijn regelnummers
+     kwijtraken. scripts/lib/routes.js koos daardoor het eerste, en dat kostte 42
+     routes hun bron: een voorbeeld IN een commentaarblok liet twee bestanden
+     hetzelfde voorvoegsel claimen. */
+  const heel = !!(opties && opties.regelsHeel);
+  const plet = (stuk) => heel ? stuk.replace(/[^\n]/g, ' ') : '';
   let uit = '';
   let i = 0;
   while (i < n) {
@@ -98,8 +110,8 @@ function zonderCommentaar(bron) {
        dat is wat een JS-parser er ook van maakt. */
     if (c === '/' && s[i + 1] === '*') {
       const eind = s.indexOf('*/', i + 2);
-      uit += ' ';
-      if (eind < 0) break;
+      if (eind < 0) { uit += heel ? plet(s.slice(i)) : ' '; break; }
+      uit += heel ? plet(s.slice(i, eind + 2)) : ' ';
       i = eind + 2;
       continue;
     }
@@ -110,7 +122,8 @@ function zonderCommentaar(bron) {
       const voor = i > 0 ? s[i - 1] : '';
       if (voor !== ':' && voor !== '"' && voor !== "'" && voor !== '\\') {
         const nl = s.indexOf('\n', i);
-        if (nl < 0) break;
+        if (nl < 0) { uit += plet(s.slice(i)); break; }
+        uit += plet(s.slice(i, nl));
         i = nl;
         continue;
       }

@@ -90,15 +90,16 @@ function setAutomatisering(a) {
 const { verifieerProfiel, bewaarSollicitatie, alGesolliciteerd } = require('./foundation/sollicitaties')(ctx);
 const { setMarkt } = require('./foundation/markt')(ctx);
 
-/* Een health-check hoort te zeggen DAT het werkt, niet hoeveel gezinnen er in
-   de hulpverlening zitten. Dat laatste stond hier onbeschermd: aantallen
-   gezinnen en hulpaanvragen zijn bedrijfsinformatie over kwetsbare mensen, en
-   een load balancer heeft er niets aan. De cijfers staan op het RTF-kantoor,
-   achter een inlog; hier blijft alleen het leven-teken over. */
-router.get('/health', (req, res) => {
-  const s = require('./ai-stand').beschikbaarheid(anthropic);
-  res.json({ ok: true, ai: s.modus, verwerking: s.verwerking });
-});
+/* ALLEEN HET LEVEN-TEKEN -- maar wel MET DE NAAM VAN DE DIENST erbij, en dat
+   is geen versiering. Deze route is het enige levensteken van de rtf-groep in
+   de vloot (test/vloot.test.js draait die groep met `rtf:-`, dus zonder eigen
+   routes). Een kaal {ok:true} bewijst dan alleen dat IETS op dit pad antwoordde
+   -- de poortwachter ervoor kan dat net zo goed zelf zijn -- en het is ook niet
+   te onderscheiden van een vervalst antwoord, want de liegpoort vervangt elk
+   antwoord door precies {ok:true}. Wie zegt dat hij leeft, hoort te zeggen wie.
+   Verder niets: geen AI-modus, geen pid, geen looptijd. De hele geschiedenis
+   van deze route staat op een plek in scripts/lib/publiekeroutes.js. */
+router.get('/health', (req, res) => res.json({ ok: true, dienst: 'rtfoundation' }));
 
 /* De onderwijskern (het leerpaspoort) komt LAAT binnen: hij wordt in
    server.js gemaakt, na deze module. School heeft hem nodig om bewijs van

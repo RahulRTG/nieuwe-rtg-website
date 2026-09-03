@@ -27,7 +27,7 @@ volledige catalogus.
 | **0 · De smalle snee** | Binnenkomen, je gegevens beheren, aanmelden voor een pas, de leden-app, De Salon | |
 | 1 · Leden onder elkaar | Vrienden, DM, gesprekken, ontmoetingen, de sociale laag | **ja** |
 | 2 · De partners erbij | Partner-app, vacatures, solliciteren. Nog geen geld | |
-| 3 · De vloer draait | Bestellen en bezorgen, kassa, personeel, aansturing. Nog geen betaalrail | |
+| 3 · De vloer draait | Bestellen en bezorgen, kassa, personeel, aansturing — op de rekening, [zie hieronder](#trede-3-draait-op-de-rekening-en-niet-op-de-rail) | |
 | 4 · Het fundament (de wig) | De betaalrail, wallet, partnerfinanciën, uitbetalingen | **ja** |
 | 5 · De stad | Tickets, vervoer, kamers, events, eigen apps, RTFoundation | |
 | 6 · Alles open | De volledige catalogus | |
@@ -35,6 +35,28 @@ volledige catalogus.
 **Ga live op trede 0.** Niet omdat de rest niet werkt — de suite is groen — maar
 omdat je bij de eerste echte leden niet wilt ontdekken hoe 189 functies zich
 onder echt verkeer houden.
+
+### Trede 3 draait op de rekening en niet op de rail
+
+"Nog geen betaalrail" stond hier als een voetnoot, en dat was te makkelijk. Wat
+trede 3 werkelijk open zet is de vloer zoals horeca hem al kent: de gast
+bestelt, de zaak ziet de bon, de kassa en de PDA werken hem af, en er wordt
+**achteraf op de rekening** afgerekend. Dat is een complete werkdag zonder dat er
+één euro langs `kern/pay/poort.js` komt.
+
+Wat er op deze trede dus **niet** rondkomt is de vooruitbetaalde weg: een
+bestelling die met `/api/order/pay` begint blijft op `wacht-op-betaling` staan,
+en een zaak ziet hem niet (`kern/leverancier/state.js` en
+`kern/eten/partnerwerk.js` filteren precies die stand weg — een zaak hoort geen
+bon te zien die nog niet besteld ís). Die keten wordt pas compleet op trede 4.
+
+Dat is geen gebrek maar de scheidslijn zelf, en hij is gemeten en niet aangenomen:
+`scripts/zaakwig.js` loopt de hele keten op trede 3, 4 en 6 en toetst de
+bedrijfsinvarianten (één bestelling, geen dubbele bon, geldige statusovergangen,
+kassa en PDA zien dezelfde zaaktoestand). Het vinden van deze grens kostte
+trouwens een echte reparatie: `/api/supplier/pos/redeem` zette een bon
+administratief op betaald terwijl de rail uit stond, en staat sinds 2 september
+2026 in de geldacties van `server/opzet/betaalstop.js`.
 
 ### De trap klimt vanzelf
 

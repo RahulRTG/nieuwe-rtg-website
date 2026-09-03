@@ -110,51 +110,10 @@ function noteerAudit(methode, patroon, sporen, status) {
     (sporen && sporen.length ? sporen.join(',') : 'geen'));
 }
 
-/* Een scherm is geen route: een pagina komt langs de statische laag en niet
-   bij de routematcher, dus stond er in dit journaal nooit iets over. Daardoor
-   was "deze app is af" een bewering die niemand kon natrekken -- de vraag "heeft
-   een toets dit scherm ooit geopend" had geen bron. Nu wel, met dezelfde
-   ontdubbeling en hetzelfde bestand. De regel krijgt SCHERM als methode zodat
-   scripts/dekking.js (die op "METHODE patroon" leest) er geen endpoint in ziet. */
-function noteerScherm(url, req) {
-  /* De naam van de toets erachter. Die komt uit RTG_TOETS, gezet door
-     test/helper.js bij het starten van deze server. Hij hoort erbij omdat
-     "geopend" op zichzelf niets zegt: test/leven.e2e.js tikt ALLE schermen
-     even aan, dus zonder deze naam staat de schermmeter na een veegronde op
-     nul en zegt hij voorgoed "in orde". Met de naam erbij is te zien welke
-     app alleen door een veegtoets is aangeraakt en door geen enkele toets die
-     zijn eigen weg aflegt. */
-  noteer('SCHERM', url + ' ' + (process.env.RTG_TOETS || 'onbekend') + ' ' + soortVan(req));
-}
-
-/* WAS DIT EEN BEZOEK, OF HAALDE ER IETS VOOROP?
-
-   Een service worker haalt bij zijn install zijn hele schil op (cache.addAll).
-   Dat zijn echte GET-verzoeken op echte .html-paden, en ze kwamen hier binnen
-   alsof de toets die pagina's had geopend. Gemeten: een browser die eenmaal
-   /apps/foundation/rust.html bezoekt levert 45 SCHERM-regels op, alle 45 op
-   naam van dezelfde toets, terwijl die over 44 ervan niets beweert. Een meter
-   die je met een voorophaling kunt opblazen telt niet wat hij belooft.
-
-   De browser zegt zelf wat voor verzoek het is: een navigatie draagt
-   Sec-Fetch-Mode: navigate, een fetch uit een service worker draagt cors of
-   no-cors. Alleen die eerste telt hier als een bezoek, en de omkering is met
-   opzet streng: niet "alles behalve een voorophaling", maar "alleen wat zegt
-   dat het een navigatie is".
-
-   Dat raakt ook de fetch() uit een toets, die in Node altijd cors meestuurt en
-   dat niet laat overschrijven. Terecht: de twee die er in deze suite staan
-   (test/deur.e2e.js) halen een pagina op om te zien of hij 200 geeft. Dat is
-   een goede bewering over de LINK die ernaartoe wijst, maar het is niet de weg
-   van die app afleggen, en precies zulke gratis punten moet deze meter niet
-   uitdelen.
-
-   Het onderscheid staat hier en niet in de twee haken, zodat er een plek is
-   waar het antwoord op "was dit een bezoek" vandaan komt. */
-function soortVan(req) {
-  const modus = req && req.headers ? req.headers['sec-fetch-mode'] : null;
-  return modus === 'navigate' ? 'navigatie' : 'nevenverzoek';
-}
+/* Het schermjournaal staat ernaast, in ./routelog-scherm.js -- zie de kop
+   daar voor de naad. */
+const noteerScherm = require('./routelog-scherm').maakScherm(
+  (m, p) => noteer(m, p));
 
 /* Een 4xx of 5xx telt ook mee. De vraag die dit journaal beantwoordt is "is dit
    endpoint aangeraakt", niet "ging het goed" -- een test die bewijst dat een
@@ -169,7 +128,19 @@ function soortVan(req) {
 
 /* Aanzetten gebeurt bij het laden, uit de omgeving. Als losse functie zodat de
    test hem kan aansturen zonder een serverproces te starten. */
+/* EEN AAN-WAARDE IS GEEN PAD. `RTG_ROUTELOG=1` is wat iemand typt, want bijna
+   elke andere vlag hier is een boolean -- en dat gaf een bestand dat letterlijk
+   `1` heet EN een .routejournaal dat bleef staan, dus dekkingsmetingen die op
+   een oud journaal rekenden. De hele afweging staat in test/routelog.test.js. */
+const AAN_WOORDEN = new Set(['1', 'true', 'ja', 'yes', 'on', 'aan']);
+const STANDAARD = '.routejournaal';
+
 function begin(pad) {
+  if (pad && AAN_WOORDEN.has(String(pad).trim().toLowerCase())) {
+    console.log('[routelog] RTG_ROUTELOG="' + pad + '" is geen pad maar "aan"; ' +
+      'het journaal gaat naar ' + STANDAARD + '.');
+    pad = STANDAARD;
+  }
   bestand = pad ? String(pad) : null;
   gezien.clear();
   stuk = false;

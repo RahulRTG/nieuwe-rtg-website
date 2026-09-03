@@ -271,6 +271,11 @@ function maakUitrolregie({ opslag, save, meting, functies, schakelFase, nu }) {
   /* De tikker. Zonder deze betekent "klimt vanzelf": pas als er iemand kijkt.
      unref, zodat hij een proces nooit openhoudt. */
   function tikker() {
+    /* Niet in een meetserver: zie ./tikkerstand.js voor waarom een klok die
+       binnen het meetvenster afgaat, zijn schrijfactie aan een willekeurige
+       route toegerekend krijgt. Alleen de LUS gaat uit; een weeg() die een
+       route zelf aanroept blijft gewoon schrijven. */
+    if (require('./tikkerstand').tikkersUit()) return null;
     const t = setInterval(() => { try { weeg(); } catch (e) { /* nooit de lus breken */ } }, STANDAARD.tikMs);
     if (t.unref) t.unref();
     return t;

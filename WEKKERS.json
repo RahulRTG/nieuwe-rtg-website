@@ -1,0 +1,735 @@
+{
+  "stempel": {
+    "op": "2026-09-03T11:11:40.327Z",
+    "commit": "cd999c7a",
+    "boomVuil": false,
+    "boomAnders": 10,
+    "instrument": "scripts/wekkers.js",
+    "node": "v22.22.2"
+  },
+  "hoe": "npm run wekkers:vast",
+  "grens": "Dit vindt ingangen aan hun PATROON in de code (setInterval, subscribe, createServer, spawn) plus de verklaarde webhooks. Wat hij NIET aantoont: dat een gevonden wekker ook echt loopt, en dat de lijst compleet is -- een ingang in een vorm die hier niet staat, bestaat voor deze meter niet. Een wekker BINNEN de envelop van een functie gaat bovendien niet vanzelf uit als die functie uit gaat.",
+  "gemetenOp": "2026-09-03",
+  "meetAlleen": "deze meter blokkeert niets; hij loopt in de schaduw (CONTROLPLANE.md: je kunt niet afdwingen wat nooit in de schaduw heeft gelopen)",
+  "aiIsGeenGat": "kern/stuur.js r.130 roept zijn paden aan met fetch('http://127.0.0.1:'+poort+pad): de AI gaat over echte HTTP en komt dus langs dezelfde functieschakelaars als een mens",
+  "watDitNietZegt": "een wekker IN de envelop van een functie wordt niet automatisch uitgezet als die functie uit gaat -- de schakelaar staat op de route, niet op de timer. De nul is wel hard: nul functies betekent dat niets hem raakt.",
+  "wekkers": 62,
+  "perSoort": {
+    "KLOK": 41,
+    "BUS": 6,
+    "LUISTERAAR": 11,
+    "WERKER": 4
+  },
+  "webhooks": [
+    {
+      "soort": "WEBHOOK",
+      "route": "POST /api/betaal/webhook",
+      "reden": "hangt in verzoekketen stap 8, voor express.json() en dus voor de schakelkast; betalen heeft een eigen stop (RTG_BETALEN_UIT) die daar wel voor hangt"
+    },
+    {
+      "soort": "WEBHOOK",
+      "route": "POST /api/betaal/webhook/mollie",
+      "reden": "zelfde reden als /api/betaal/webhook"
+    },
+    {
+      "soort": "WEBHOOK",
+      "route": "POST /api/munt/webhook",
+      "reden": "zelfde reden: rauwe body, handtekening, en de munt-aanbieder meldt iets dat al gebeurd is"
+    }
+  ],
+  "ongeschakeld": 0,
+  "ongeschakeldVerklaard": 35,
+  "functieUitMaarUitvoerbaar": 3,
+  "functieUitMaarUitvoerbaarLijst": [
+    "server/imap-server.js doet het werk van member (opent op trede start) -- alleen met IMAP_POORT gezet",
+    "server/smtp-in-server.js doet het werk van ov-mail-binnen (opent op trede start) -- alleen met MAIL_IN_POORT gezet",
+    "server/stun.js doet het werk van kern-live (opent op trede start) -- altijd, tenzij STUN_UIT=1"
+  ],
+  "functieUitMaarUitvoerbaarAltijd": 1,
+  "zonderTrede": 0,
+  "zonderTredeLijst": [],
+  "verklaringenOngebruikt": [],
+  "ongeschakeldLijst": [],
+  "lijst": [
+    {
+      "soort": "KLOK",
+      "bestand": "server/ai-rem.js",
+      "aantal": 1,
+      "functies": 0,
+      "welke": [],
+      "verklaard": "zelfde reden, voor de AI-kant",
+      "trede": null
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/bewaarveger.js",
+      "aantal": 1,
+      "functies": 0,
+      "welke": [],
+      "verklaard": "wist gegevens die over hun bewaartermijn zijn (AVG); een wettelijke plicht hoort niet achter een functieschakelaar, en uitzetten betekent hier bewaren wat weg moet",
+      "trede": null
+    },
+    {
+      "soort": "BUS",
+      "bestand": "server/bus.js",
+      "aantal": 2,
+      "functies": 0,
+      "welke": [],
+      "verklaard": "de berichtenbus zelf; een bus die je uit kunt zetten levert geen enkel bericht meer af",
+      "trede": null
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/db/postgres.js",
+      "aantal": 2,
+      "functies": 0,
+      "welke": [],
+      "verklaard": "de database; zonder klok geen verbindingsonderhoud en dus geen opslag",
+      "trede": null
+    },
+    {
+      "soort": "BUS",
+      "bestand": "server/db/redis.js",
+      "aantal": 1,
+      "functies": 0,
+      "welke": [],
+      "verklaard": "idem: de opslagkant van diezelfde verbinding",
+      "trede": null
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/db/sqlite.js",
+      "aantal": 1,
+      "functies": 0,
+      "welke": [],
+      "verklaard": "idem voor de lokale opslag",
+      "trede": null
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/db/tx/ledger.js",
+      "aantal": 1,
+      "functies": 0,
+      "welke": [],
+      "verklaard": "het grootboek; een boekhouding met een uitknop is geen boekhouding",
+      "trede": null
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/functies/wachter.js",
+      "aantal": 1,
+      "functies": 0,
+      "welke": [],
+      "verklaard": "de storingswachter is de automaat van de schakelkast; een schakelaar die de schakelkast uitzet is geen schakelaar",
+      "trede": null
+    },
+    {
+      "soort": "LUISTERAAR",
+      "bestand": "server/imap-server.js",
+      "aantal": 2,
+      "functies": 0,
+      "welke": [],
+      "verklaard": "de IMAP-server geeft een postvak vrij aan een mailprogramma, buiten elke route om. Hier stond eerst `ov-werkmail`, en dat was FOUT: server/imap.js is een leeslaag boven kern/rtmail-vak.js -- hetzelfde postvak dat over HTTP achter /api/member/rtmail zit, en dat valt onder `member`. `ov-werkmail` gaat over de bezorging van interne werkmail (/api/werkmail) en komt hier niet langs. De vergissing kostte niets in gedrag maar wel in meting: hij liet een ingang als lek tellen die dat niet is, want `member` staat vanaf trede 0 aan",
+      "vertegenwoordigt": "member",
+      "voorwaarde": "alleen met IMAP_POORT gezet",
+      "trede": "start"
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/kern/schild.js",
+      "aantal": 1,
+      "functies": 0,
+      "welke": [],
+      "verklaard": "het schild; een beveiliging met een schakelaar is een deur met het slot aan de binnenkant",
+      "trede": null
+    },
+    {
+      "soort": "BUS",
+      "bestand": "server/kern/sse.js",
+      "aantal": 1,
+      "functies": 0,
+      "welke": [],
+      "verklaard": "de afleverlaag van realtime-berichten. Staat de functie kern-live uit, dan komt er geen verbinding tot stand en heeft deze abonnee niemand om aan te leveren -- hij begint zelf geen werk",
+      "trede": null
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/kern/zelfzorg/index.js",
+      "aantal": 1,
+      "functies": 0,
+      "welke": [],
+      "verklaard": "de stille automaat achter RTG_ZELFZORG_MS, met een eigen knop in de boardroom (api.automaatAan); op nul zetten stopt hem, en hij draait alleen op de leider",
+      "trede": null
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/lib/acme.js",
+      "aantal": 1,
+      "functies": 0,
+      "welke": [],
+      "verklaard": "de certificaten; loopt de vernieuwing niet, dan valt HTTPS om",
+      "trede": null
+    },
+    {
+      "soort": "WERKER",
+      "bestand": "server/lib/cdp.js",
+      "aantal": 1,
+      "functies": 0,
+      "welke": [],
+      "verklaard": "de browser die dit huis zelf aanstuurt voor beeld en pdf; hij begint geen werk uit zichzelf maar wordt aangeroepen",
+      "trede": null
+    },
+    {
+      "soort": "LUISTERAAR",
+      "bestand": "server/lib/http1.js",
+      "aantal": 1,
+      "functies": 0,
+      "welke": [],
+      "verklaard": "de HTTP/1-kant van diezelfde voordeur",
+      "trede": null
+    },
+    {
+      "soort": "LUISTERAAR",
+      "bestand": "server/lib/http2.js",
+      "aantal": 1,
+      "functies": 0,
+      "welke": [],
+      "verklaard": "de HTTP/2-kant van diezelfde voordeur",
+      "trede": null
+    },
+    {
+      "soort": "LUISTERAAR",
+      "bestand": "server/lib/tls-acme.js",
+      "aantal": 1,
+      "functies": 0,
+      "welke": [],
+      "verklaard": "de ACME-uitdaging voor het certificaat van diezelfde voordeur",
+      "trede": null
+    },
+    {
+      "soort": "LUISTERAAR",
+      "bestand": "server/lib/tls.js",
+      "aantal": 1,
+      "functies": 0,
+      "welke": [],
+      "verklaard": "de TLS-kant van diezelfde voordeur",
+      "trede": null
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/opzet/diensten2.js",
+      "aantal": 1,
+      "functies": 0,
+      "welke": [],
+      "verklaard": "bedrading: deze klok hoort bij het OPHANGEN van een dienst en niet bij een functie van RTG; zet je hem uit, dan is de dienst niet uit maar half opgehangen",
+      "trede": null
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/opzet/kernlaag1.js",
+      "aantal": 1,
+      "functies": 0,
+      "welke": [],
+      "verklaard": "bedrading: deze klok hoort bij het OPHANGEN van een dienst en niet bij een functie van RTG; zet je hem uit, dan is de dienst niet uit maar half opgehangen",
+      "trede": null
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/opzet/kernlaag3c.js",
+      "aantal": 1,
+      "functies": 0,
+      "welke": [],
+      "verklaard": "bedrading: deze klok hoort bij het OPHANGEN van een dienst en niet bij een functie van RTG; zet je hem uit, dan is de dienst niet uit maar half opgehangen",
+      "trede": null
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/opzet/kernlaag4b.js",
+      "aantal": 1,
+      "functies": 0,
+      "welke": [],
+      "verklaard": "bedrading: deze klok hoort bij het OPHANGEN van een dienst en niet bij een functie van RTG; zet je hem uit, dan is de dienst niet uit maar half opgehangen",
+      "trede": null
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/opzet/kernlaag4c.js",
+      "aantal": 2,
+      "functies": 0,
+      "welke": [],
+      "verklaard": "bedrading: deze klok hoort bij het OPHANGEN van een dienst en niet bij een functie van RTG; zet je hem uit, dan is de dienst niet uit maar half opgehangen",
+      "trede": null
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/opzet/kernlaag5.js",
+      "aantal": 1,
+      "functies": 0,
+      "welke": [],
+      "verklaard": "bedrading: deze klok hoort bij het OPHANGEN van een dienst en niet bij een functie van RTG; zet je hem uit, dan is de dienst niet uit maar half opgehangen",
+      "trede": null
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/opzet/kernlaag7b.js",
+      "aantal": 1,
+      "functies": 0,
+      "welke": [],
+      "verklaard": "bedrading: deze klok hoort bij het OPHANGEN van een dienst en niet bij een functie van RTG; zet je hem uit, dan is de dienst niet uit maar half opgehangen",
+      "trede": null
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/opzet/start.js",
+      "aantal": 2,
+      "functies": 0,
+      "welke": [],
+      "verklaard": "bedrading: hangt de diensten op, en is zelf geen functie",
+      "trede": null
+    },
+    {
+      "soort": "LUISTERAAR",
+      "bestand": "server/poort.js",
+      "aantal": 1,
+      "functies": 0,
+      "welke": [],
+      "verklaard": "het openen van de luisterpoort voor diezelfde webserver",
+      "trede": null
+    },
+    {
+      "soort": "BUS",
+      "bestand": "server/redis.js",
+      "aantal": 1,
+      "functies": 0,
+      "welke": [],
+      "verklaard": "de gedeelde verbinding onder die bus",
+      "trede": null
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/rem.js",
+      "aantal": 1,
+      "functies": 0,
+      "welke": [],
+      "verklaard": "de rem: hij beschermt het huis tegen te veel verkeer, en dat hoort niet af te hangen van een functiestand",
+      "trede": null
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/routes/techniek/bewaren.js",
+      "aantal": 1,
+      "functies": 0,
+      "welke": [],
+      "verklaard": "de opruimknop van diezelfde bewaartermijnen, en hij hangt onder /api/techniek -- dat is bediening en geen functie (kern/platformregister/bediening.js)",
+      "trede": null
+    },
+    {
+      "soort": "LUISTERAAR",
+      "bestand": "server/smtp-in-server.js",
+      "aantal": 1,
+      "functies": 0,
+      "welke": [],
+      "verklaard": "de SMTP-ontvanger op de eigen poort is de tweede weg waarlangs post van buiten binnenkomt en hij raadpleegt geen enkele schakelaar: met ov-mail-binnen UIT komt de post alsnog binnen. WEL alleen als de beheerder MAIL_IN_POORT zet -- opzet/luister-poorten.js doet dat met opzet niet vanzelf, want een mailpoort die overal openstaat is een deur die niemand heeft besloten open te zetten",
+      "vertegenwoordigt": "ov-mail-binnen",
+      "voorwaarde": "alleen met MAIL_IN_POORT gezet",
+      "trede": "start"
+    },
+    {
+      "soort": "LUISTERAAR",
+      "bestand": "server/stun.js",
+      "aantal": 1,
+      "functies": 0,
+      "welke": [],
+      "verklaard": "de eigen STUN-server bedient de ICE-kant van bellen; /api/ice hangt aan kern-live, de UDP-poort aan niets. Hij staat WEL standaard aan -- maar kern-live gaat al op trede 0 open, dus hier loopt de schakelaar niet achter op de deur",
+      "vertegenwoordigt": "kern-live",
+      "voorwaarde": "altijd, tenzij STUN_UIT=1",
+      "trede": "start"
+    },
+    {
+      "soort": "LUISTERAAR",
+      "bestand": "server/trio-loket.js",
+      "aantal": 1,
+      "functies": 0,
+      "welke": [],
+      "verklaard": "het CA-loket naast de voordeur: het levert het certificaatbestand uit dat een toestel nodig heeft om de voordeur te kunnen vertrouwen",
+      "trede": null
+    },
+    {
+      "soort": "WERKER",
+      "bestand": "server/trio-wacht.js",
+      "aantal": 1,
+      "functies": 0,
+      "welke": [],
+      "verklaard": "de wacht van het failover-trio; zelfde reden als trio.js",
+      "trede": null
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/trio.js",
+      "aantal": 1,
+      "functies": 0,
+      "welke": [],
+      "verklaard": "de hartslag tussen de drie servers van het failover-trio; een failover die je kunt uitzetten is geen failover",
+      "trede": null
+    },
+    {
+      "soort": "LUISTERAAR",
+      "bestand": "server/trio.js",
+      "aantal": 2,
+      "functies": 0,
+      "welke": [],
+      "verklaard": "de hartslag tussen de drie servers van het failover-trio; een failover die je kunt uitzetten is geen failover",
+      "trede": null
+    },
+    {
+      "soort": "WERKER",
+      "bestand": "server/vloot.js",
+      "aantal": 2,
+      "functies": 0,
+      "welke": [],
+      "verklaard": "het starten en bewaken van de servers zelf; infrastructuur en geen functie",
+      "trede": null
+    },
+    {
+      "soort": "LUISTERAAR",
+      "bestand": "server/web/index.js",
+      "aantal": 1,
+      "functies": 0,
+      "welke": [],
+      "verklaard": "de webserver zelf: alles wat hierachter binnenkomt gaat juist WEL langs de functieschakelaars",
+      "trede": null
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/kern/klok.js",
+      "aantal": 1,
+      "functies": 1,
+      "welke": [
+        "kern-klok"
+      ],
+      "trede": "alles"
+    },
+    {
+      "soort": "WERKER",
+      "bestand": "server/kern/residentie/index.js",
+      "aantal": 1,
+      "functies": 1,
+      "welke": [
+        "dom-residentie"
+      ],
+      "trede": "alles"
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/kern/rtgai.js",
+      "aantal": 1,
+      "functies": 1,
+      "welke": [
+        "office"
+      ],
+      "trede": "alles"
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/kern/spellen/woord.js",
+      "aantal": 1,
+      "functies": 1,
+      "welke": [
+        "spellen"
+      ],
+      "trede": "stad"
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/kern/zaakdoos/index.js",
+      "aantal": 1,
+      "functies": 1,
+      "welke": [
+        "dom-doos"
+      ],
+      "trede": "alles"
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/routes/member/boardroom.js",
+      "aantal": 1,
+      "functies": 1,
+      "welke": [
+        "member"
+      ],
+      "trede": "start"
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/routes/office/toegang.js",
+      "aantal": 1,
+      "functies": 1,
+      "welke": [
+        "office"
+      ],
+      "trede": "alles"
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/routes/supplier.js",
+      "aantal": 1,
+      "functies": 1,
+      "welke": [
+        "supplier"
+      ],
+      "trede": "partners"
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/routes/supplier/prplus.js",
+      "aantal": 1,
+      "functies": 1,
+      "welke": [
+        "supplier"
+      ],
+      "trede": "partners"
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/routes/social/gezinnen/toezicht.js",
+      "aantal": 1,
+      "functies": 2,
+      "welke": [
+        "member",
+        "social"
+      ],
+      "trede": "start"
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/kern/webmaker-plan.js",
+      "aantal": 1,
+      "functies": 5,
+      "welke": [
+        "supplier",
+        "office",
+        "ov-browser",
+        "dom-site",
+        "dom-eigendomein"
+      ],
+      "trede": "partners"
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/server.js",
+      "aantal": 1,
+      "functies": 5,
+      "welke": [
+        "supplier",
+        "kern-meldingen",
+        "kern-live",
+        "tg-zegel",
+        "kern-taal"
+      ],
+      "trede": "partners"
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/kern/payroll/bijwerken.js",
+      "aantal": 1,
+      "functies": 7,
+      "welke": [
+        "supplier",
+        "office",
+        "member",
+        "staff",
+        "command-zien",
+        "command-doen",
+        "command-besturen"
+      ],
+      "trede": "partners"
+    },
+    {
+      "soort": "BUS",
+      "bestand": "server/kern/sessies.js",
+      "aantal": 1,
+      "functies": 11,
+      "welke": [
+        "supplier",
+        "tg-inlog",
+        "staff",
+        "verificatie",
+        "ov-zorgprofiel",
+        "kern-locatie",
+        "dom-fluister",
+        "ov-spar"
+      ],
+      "trede": "partners"
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/kern/agenda-ics.js",
+      "aantal": 1,
+      "functies": 12,
+      "welke": [
+        "supplier",
+        "office",
+        "member",
+        "rtf-contacten",
+        "kern-meldingen",
+        "dom-werkplek",
+        "kern-live",
+        "foundation"
+      ],
+      "trede": "partners"
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/foundation/berichten.js",
+      "aantal": 1,
+      "functies": 13,
+      "welke": [
+        "supplier",
+        "office",
+        "member",
+        "rtf-contacten",
+        "kern-meldingen",
+        "dom-werkplek",
+        "kern-live",
+        "foundation"
+      ],
+      "trede": "partners"
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/foundation/onderwijs/les.js",
+      "aantal": 1,
+      "functies": 13,
+      "welke": [
+        "supplier",
+        "office",
+        "member",
+        "rtf-contacten",
+        "kern-meldingen",
+        "dom-werkplek",
+        "kern-live",
+        "foundation"
+      ],
+      "trede": "partners"
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/school/bellen.js",
+      "aantal": 1,
+      "functies": 13,
+      "welke": [
+        "supplier",
+        "office",
+        "member",
+        "rtf-contacten",
+        "kern-meldingen",
+        "dom-werkplek",
+        "kern-live",
+        "foundation"
+      ],
+      "trede": "partners"
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/kern/bank/index.js",
+      "aantal": 2,
+      "functies": 14,
+      "welke": [
+        "supplier",
+        "office",
+        "dom-bank-spaardoel",
+        "dom-bank-inzicht",
+        "dom-bank-vastelasten",
+        "dom-rekening",
+        "dom-bank-rekening-open",
+        "dom-bank-storten"
+      ],
+      "trede": "partners"
+    },
+    {
+      "soort": "BUS",
+      "bestand": "server/kern/link/rem.js",
+      "aantal": 1,
+      "functies": 17,
+      "welke": [
+        "supplier",
+        "office",
+        "member",
+        "kern-meldingen",
+        "kern-live",
+        "levenos",
+        "staff",
+        "ov-browser"
+      ],
+      "trede": "partners"
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/kern/pay/schaduw.js",
+      "aantal": 1,
+      "functies": 25,
+      "welke": [
+        "supplier",
+        "office",
+        "betalen",
+        "dom-bank-spaardoel",
+        "dom-bank-inzicht",
+        "dom-bank-vastelasten",
+        "supplier-pos",
+        "dom-pay-wallet"
+      ],
+      "trede": "partners"
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/kern/command/alarm.js",
+      "aantal": 1,
+      "functies": 196,
+      "welke": [
+        "supplier",
+        "office",
+        "member",
+        "rtf-contacten",
+        "kern-meldingen",
+        "dom-werkplek",
+        "kern-live",
+        "foundation"
+      ],
+      "trede": "partners"
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/kern/command/canary.js",
+      "aantal": 1,
+      "functies": 196,
+      "welke": [
+        "supplier",
+        "office",
+        "member",
+        "rtf-contacten",
+        "kern-meldingen",
+        "dom-werkplek",
+        "kern-live",
+        "foundation"
+      ],
+      "trede": "partners"
+    },
+    {
+      "soort": "KLOK",
+      "bestand": "server/kern/command/uitrolregie.js",
+      "aantal": 1,
+      "functies": 196,
+      "welke": [
+        "supplier",
+        "office",
+        "member",
+        "rtf-contacten",
+        "kern-meldingen",
+        "dom-werkplek",
+        "kern-live",
+        "foundation"
+      ],
+      "trede": "partners"
+    }
+  ]
+}

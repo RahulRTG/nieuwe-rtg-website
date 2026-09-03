@@ -29,6 +29,20 @@ const GELDACTIES = [
   /^\/api\/office\/payroll\/betaalbestand$/,
   /^\/api\/giftcard\/buy$/,
   /^\/api\/supplier\/giftcard\/(?:sell|redeem)$/,
+  /* DE KASSA DIE EEN BON OPHAALT ZET HEM OP BETAALD, en dat is precies wat de
+     kop van dit bestand verbiedt: zonder betaalrail mag er nergens een betaling
+     worden gesimuleerd of alleen administratief als voldaan gemarkeerd.
+     kassa/innen.js doet dat wel -- o.paid = true, betaaldMet = 'rtg', paidAt, en
+     een verkoopregel in het dagoverzicht -- en hij glipte langs beide stoppen:
+     de catch-all hieronder kijkt naar het LAATSTE padstuk en `redeem` staat daar
+     niet in, en de interne stop van RTG Pay (kern/pay/stand.js) wordt hier niet
+     aangeroepen omdat er geen geld door de poort gaat.
+
+     Gevonden door scripts/zaakwig.js: op trede 3 (de vloer zonder betaalrail)
+     gaf /api/supplier/pos/redeem 200 en stond de bon daarna op betaald. Het
+     precedent staat een regel hoger: giftcard/redeem staat er al in, om dezelfde
+     reden. */
+  /^\/api\/supplier\/pos\/redeem$/,
   /^\/api\/wallet\/munt\/(?:koop|wissel)$/,
   /^\/api\/supplier\/betaalverzoek(?:\/|$)/,
   /* `vooraf` en `vastleg` staan hier omdat ze geld bewegen: vooraf laat de

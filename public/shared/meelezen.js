@@ -18,16 +18,21 @@
    worden opgepoetst. Wat het wel doet is de afhankelijkheid verplaatsen: van
    "kan niet meedoen" naar "kan meedoen als de anderen meetypen".
 
-   WAAROM ER GEEN AUTOMATISCHE ONDERTITELING IN ZIT. Dat is een BESLUIT en geen
-   ontbrekende regel code. Spraakherkenning in de browser (de Web Speech API)
-   stuurt het geluid van het gesprek naar een server van de leverancier, en dit
-   huis draait op codenamen met de echte namen in een aparte kluis -- het
-   gesprek van twee leden naar buiten sturen om er tekst van te maken is precies
-   wat dat ontwerp voorkomt. De weg die hier wel past loopt langs een LOKAAL
-   model (LOCAL_AI_URL), en dat is een inrichtingskeuze. Deze module laat die
-   deur open met een naad die niets aanneemt: `voed(regel, { bron })`. Wie een
-   lokale herkenner aansluit, roept dezelfde functie aan met bron 'machine', en
-   de baan laat dan zien dat het machinetekst is.
+   AUTOMATISCHE ONDERTITELING ZIT ER INMIDDELS WEL IN, en langs precies de weg
+   die hier eerder als open deur stond beschreven: een LOKAAL model
+   (LOCAL_AI_URL) via shared/meeluister.js. Wat er NIET in zit is de Web Speech
+   API -- die stuurt het geluid van het gesprek naar een server van de
+   browserleverancier, en dit huis draait op codenamen met de echte namen in een
+   aparte kluis. Het gesprek van twee leden naar buiten sturen om er tekst van te
+   maken is precies wat dat ontwerp voorkomt, en daar is geen instelling voor.
+
+   DRIE DINGEN DIE DAARDOOR BLIJVEN GELDEN. De baan LAAT ZIEN dat een regel van
+   een machine komt (`bron: 'machine'`), want tekst die een machine heeft geraden
+   is iets anders dan tekst die iemand heeft geschreven. Meetypen blijft bestaan
+   en is niet vervangen: een herkenner die een naam verkeerd verstaat, wordt met
+   een getypte regel gecorrigeerd. En is er GEEN lokaal model ingericht, dan
+   verschijnt de knop niet en zegt de baan wat er wel is -- een ondertitelknop
+   die niets doet is erger dan geen knop.
 
    DE NAAD NAAR HET GESPREK. Elk gesprek in dit huis heeft al een seinfunctie
    die getypte signalen doorgeeft aan de andere kant (offer, answer, ice,
@@ -68,6 +73,17 @@
     knop.style.cssText = 'padding:.35rem .7rem;border:1px solid rgba(255,255,255,.22);border-radius:0;' +
       'background:transparent;color:inherit;font:inherit;font-size:.85rem;cursor:pointer;';
     kop.appendChild(knop);
+
+    /* De ondertitelknop hoort bij de LUISTERAAR en wordt daar gemaakt
+       (shared/meeluister.js): wat hij zegt en wanneer hij verschijnt staat op
+       EEN plek. */
+    /* DE LUISTERAAR WORDT HIER GEMAAKT en niet door de aanroeper. Die weet
+       alleen WAAR zijn microfoonstroom zit (`stroom`); hoe een herkende regel in
+       deze baan komt en hoe hij de andere kant bereikt, is een zaak van de baan.
+       Stond dat bij de aanroeper, dan schreven acht gesprekken dezelfde vier
+       regels over -- en dan lopen ze uiteen. */
+    var luister = (opties.stroom && w.RTGMeeluister && w.RTGMeeluister.knop)
+      ? w.RTGMeeluister.maak({ opRegel: function (t) { naarBuiten(t, 'machine'); } }) : null;
     wrap.appendChild(kop);
 
     var baan = d.createElement('div');
@@ -112,6 +128,14 @@
     }
     knop.addEventListener('click', function () { zetOpen(!open); });
 
+    if (luister) {
+      w.RTGMeeluister.knop({
+        kop: kop, wrap: wrap, luister: luister,
+        stroom: opties.stroom, stijl: knop.style.cssText,
+        open: function () { zetOpen(true); }
+      });
+    }
+
     /* Een regel erbij. `bron` zegt waar hij vandaan komt: 'mens' (iemand typte
        hem) of 'machine' (een lokale herkenner). Dat verschil staat op het
        scherm, want tekst die een machine heeft geraden is iets anders dan tekst
@@ -142,15 +166,24 @@
       return r;
     }
 
+    /* Een EIGEN regel: hij komt in de baan en gaat naar de andere kant. Apart
+       van `voed`, want die stuurt met opzet niets door -- anders zou een
+       binnengekomen regel terugkaatsen. */
+    function naarBuiten(tekst, bron) {
+      var t = schoon(tekst);
+      if (!t) return;
+      voeg(t, { wie: opties.ik || 'Jij', bron: bron || 'mens' });
+      if (typeof opties.stuur === 'function') { try { opties.stuur(t); } catch (err) {} }
+    }
+
     rij.addEventListener('submit', function (e) {
       e.preventDefault();
       var t = schoon(veld.value);
       if (!t) return;
       veld.value = '';
-      voeg(t, { wie: opties.ik || 'Jij', bron: 'mens' });
       /* De eigen regel staat er al voordat het sein de deur uit is: wie meeleest
          moet zien dat zijn regel is verzonden, ook als de ander wegvalt. */
-      if (typeof opties.stuur === 'function') { try { opties.stuur(t); } catch (err) {} }
+      naarBuiten(t, 'mens');
     });
 
     return {
@@ -169,7 +202,8 @@
       regels: function () {
         return Array.prototype.map.call(baan.children, function (x) { return x.textContent; });
       },
-      leeg: function () { while (baan.firstChild) baan.removeChild(baan.firstChild); }
+      leeg: function () { while (baan.firstChild) baan.removeChild(baan.firstChild); },
+      luistert: function () { return !!(luister && luister.loopt); }
     };
   }
 

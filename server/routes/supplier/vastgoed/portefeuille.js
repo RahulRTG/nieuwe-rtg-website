@@ -9,9 +9,8 @@ app.post('/api/supplier/pand', supplierAuth, (req, res) => {
   if (!managerOnly(req, res)) return;
   const s = req.supplier;
   if (!isVastgoed(s, res)) return;
-  if (!Array.isArray(s.panden)) s.panden = [];
   if (req.body.weg) {
-    s.panden = s.panden.filter(p => p.id !== req.body.id);
+    s.panden = (Array.isArray(s.panden) ? s.panden : []).filter(p => p.id !== req.body.id);
     save(); sseToSupplier(s.code, 'sync', { scope: 'vastgoed' });
     return res.json({ ok: true, panden: s.panden });
   }
@@ -40,6 +39,11 @@ app.post('/api/supplier/pand', supplierAuth, (req, res) => {
     Object.assign(p, velden);
   } else {
     if ((s.panden || []).length >= 300) return res.status(400).json({ error: 'Tot 300 panden per kantoor.' });
+    /* Pas hier staat vast dat er werkelijk een pand bij komt. Stond deze regel
+       bovenaan, dan liet een kantoor zonder panden na elke geweigerde titel of
+       prijs een lege portefeuille achter die er niet was -- en dan zeggen de
+       400 en de database iets anders over hetzelfde verzoek. */
+    if (!Array.isArray(s.panden)) s.panden = [];
     s.panden.push({ id: 'p' + crypto.randomBytes(3).toString('hex'), fotos: [], status: 'beschikbaar', ...velden });
   }
   save();
@@ -57,21 +61,26 @@ app.post('/api/supplier/pand/foto', express.json({ limit: '1.5mb' }), supplierAu
   if (!p) return res.status(404).json({ error: 'Pand niet gevonden.' });
   const foto = String(req.body.foto || '');
   if (!/^data:image\/(jpeg|png|webp);base64,/.test(foto) || foto.length > 500000) return res.status(400).json({ error: 'Stuur een foto (tot ~400 kB).' });
-  p.fotos = p.fotos || [];
+  /* Kijken zonder neerzetten: bestaat de rij foto's, dan is dit de ECHTE rij en
+     landt een splice gewoon in de opslag. Bestaat hij niet, dan is dit een lege
+     rij die nergens aan vastzit -- een pand zonder foto's houdt na een geweigerd
+     verzoek dus geen lege fotorij over die er niet was. */
+  const fotos = Array.isArray(p.fotos) ? p.fotos : [];
   if (req.body.weg != null) {
     /* Op index, dus met een grens eromheen -- precies zoals photo/remove die
        wel had en deze route niet. splice(-1) haalt de LAATSTE foto weg en
        splice(NaN) de eerste, dus een tikfout in het scherm haalde zomaar een
        andere foto van het pand af dan de bedoeling was. */
     const i = Number(req.body.weg);
-    if (!Number.isInteger(i) || i < 0 || i >= p.fotos.length) return res.status(400).json({ error: 'Deze foto staat er niet bij.' });
-    p.fotos.splice(i, 1);
+    if (!Number.isInteger(i) || i < 0 || i >= fotos.length) return res.status(400).json({ error: 'Deze foto staat er niet bij.' });
+    fotos.splice(i, 1);
   }
   else {
-    if (p.fotos.length >= 12) return res.status(400).json({ error: 'Tot 12 foto\'s per pand.' });
+    if (fotos.length >= 12) return res.status(400).json({ error: 'Tot 12 foto\'s per pand.' });
     // De foto naar de mediastore; in db.data komt alleen de /media-verwijzing.
     const ref = await media.bewaarPubliek(foto, 500000);
     if (!ref) return res.status(400).json({ error: 'De foto kon niet worden opgeslagen.' });
+    if (!Array.isArray(p.fotos)) p.fotos = [];
     p.fotos.push(ref);
   }
   save();

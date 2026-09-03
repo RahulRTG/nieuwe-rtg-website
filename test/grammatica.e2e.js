@@ -430,11 +430,29 @@ test('de grammatica', { skip: geenBrowser(pw), concurrency: false }, async (t) =
           getComputedStyle(rail()).visibility === 'hidden';
 
         const voor = balk().getBoundingClientRect().y;
+        /* BEZIG IS EEN VENSTER VAN 1400ms, EN DAT WERD EEN KEER AANGEZET TERWIJL
+           ER TOT TIEN SECONDEN OP GEWACHT WERD. diepte.js r.178 ruimt data-bezig
+           zelf op RUST ms na de LAATSTE beweging; duurt het inzakken op een
+           belaste runner langer dan dat, dan valt het venster dicht, komt de rail
+           terug en verschuift het dock -- terwijl er niets mis is.
+
+           Dat is niet theoretisch: 445c9c93 haalde de heenreizen al uit het
+           venster en het bleef zakken (CI 2 september 2026, 854 tegen 796). Met
+           een kunstmatig trage runner van 1800ms is het hier gereproduceerd, en
+           dan zakt de RAIL-kant -- de twee gezichten die hierboven al benoemd
+           stonden.
+
+           De reparatie is niet meer tijd maar het venster LEVEND HOUDEN zolang
+           je meet, en dat is ook wat het meet: wie blijft bewegen, blijft bezig.
+           Een echte gebruiker die leest of scrollt houdt hem net zo open. De
+           bewering verandert dus niet -- alleen de aanname dat inzakken binnen
+           1400ms lukt, en die was nergens op gebaseerd. */
         window.RTGDiepte.bezig();
         const grens = performance.now() + 10000;
         let r = rail() && rail().getBoundingClientRect();
         while (!ingezakt(r) && performance.now() < grens) {
           await frame();
+          window.RTGDiepte.bezig();
           r = rail() && rail().getBoundingClientRect();
         }
         /* Hetzelfde frame: het dock en de rail worden naast elkaar gelezen. */

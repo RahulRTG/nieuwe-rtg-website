@@ -28,6 +28,26 @@ function kopinjecties(html, nonce, req, res, magnaat) {
      moet gebeurd zijn voordat er iets getekend wordt. Zo hoeven er geen 257
      losse scripttags voor. */
   const stijl = '<script nonce="' + nonce + '">' + STIJLSTEMPEL + '</script>';
+  /* DE FOUTMELDER, huisbreed en zo vroeg als mag.
+
+     Hij stond op EEN van de 277 schermen (apps/app.html, met een eigen tag),
+     en dat was precies de verkeerde helft van de belofte: een fout die niemand
+     ziet bestaat wel, maar alleen op het beginscherm. De reden dat hij hier
+     hoort en niet in 276 losse scripttags is dezelfde als bij de hand en de
+     sprong -- en scherper: een melder die op de helft van de schermen ontbreekt,
+     laat je geloven dat het daar niet stukgaat.
+
+     ZIJN PLEK IS VOOR DE HAND EN NA DE STEMPELAAR. Voor de hand, want hij hoort
+     ook de fouten van de hand en de sprong te vangen; na de stempelaar, want die
+     moet het eerste script blijven (anders is er al een stijlblok gemaakt voordat
+     hij er is). In Magnaat gaat hij, net als de hand, achter de sandbox-blokkade:
+     die blijft het eerste EXTERNE script (test/middleware.test.js 4b).
+
+     EN HIJ WORDT NOOIT TWEE KEER GEZET. Draagt een pagina hem zelf al, dan blijft
+     die staan -- twee melders zouden elke fout dubbel melden en allebei hun eigen
+     drie-per-bezoek-grens tellen. */
+  const heeftAl = /src="[^"]*\/shared\/foutmelder\.js/.test(html);
+  const foutTag = heeftAl ? '' : '<script src="/shared/foutmelder.js" nonce="' + nonce + '"></script>';
   const handTag = '<script src="/shared/hand.js" nonce="' + nonce + '"></script>';
   /* DE SPRONG OP ELKE PAGINA (shared/sprong.js): een tik naar elke functie,
      waar u ook staat. Hij hoort hier en niet in 276 losse scripttags om
@@ -48,8 +68,8 @@ function kopinjecties(html, nonce, req, res, magnaat) {
     : stijl + html;
   const sandboxTag = /(<script[^>]*\/apps\/magnaat-sandbox\.js[^>]*><\/script>)/i;
   html = magnaat && sandboxTag.test(html)
-    ? html.replace(sandboxTag, (m) => m + handTag)
-    : html.replace(stijl, stijl + handTag);
+    ? html.replace(sandboxTag, (m) => m + foutTag + handTag)
+    : html.replace(stijl, stijl + foutTag + handTag);
   html = html.replace(handTag, handTag + sprongTag);
   /* LINKS- OF RECHTSHANDIG, voordat er iets getekend is.
 

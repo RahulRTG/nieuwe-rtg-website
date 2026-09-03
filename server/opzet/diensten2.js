@@ -179,6 +179,16 @@ function metContext(sess, sid) {
   return sess;
 }
 
+/* DE ISOLATIEPOORT DEELT resolveSession OOK, en dat moest wel. Die middleware
+   staat VOOR `auth`, dus req.session bestaat daar nog niet; zonder deze regel
+   viel de drager `identiteit` terug op null en keek de poort langs de gewoonste
+   beschermstand heen (gemeten: nul gewogen verzoeken tegenover 117 met een
+   stand op `sessie`). Inhangen en niet nabouwen: resolveSession heeft nu drie
+   takken, en een tweede kopie geeft een ander antwoord zodra er een vierde
+   bijkomt -- die derde tak (`sid` uit het sessieregister) kwam van main en had
+   een kopie meteen achterhaald. */
+require('../kern/isolatie/sessiedragers').zetSessieOplosser(resolveSession);
+
 /* De AI-poort deelt resolveSession met auth hieronder: een vertaalverzoek en een
    gewone API-aanroep horen dezelfde sessies te herkennen. */
 const aiPoort = require('../kern/aipoort').maakAiPoort({ resolveSession });

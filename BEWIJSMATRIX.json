@@ -1,108 +1,103 @@
 {
   "stempel": {
-    "op": "2026-09-01T05:51:56.653Z",
-    "commit": "9ce86fe98",
+    "op": "2026-09-03T11:12:02.380Z",
+    "commit": "cd999c7a",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 16,
     "instrument": "scripts/bewijsmatrix.js",
     "node": "v22.22.2"
   },
   "herkomst": "routekaart (draaiende server)",
   "gedegradeerd": false,
   "journaalGelezen": ".routejournaal",
-  "routes": 4846,
+  "routes": 4932,
   "schakels": 11,
-  "cellen": 53306,
+  "cellen": 54252,
   "telling": {
-    "bewezen": 25500,
-    "verklaard": 0,
-    "nvt": 308,
-    "ongemeten": 27453,
-    "gezakt": 45
+    "bewezen": 25557,
+    "verklaard": 192,
+    "nvt": 313,
+    "ongemeten": 28190,
+    "gezakt": 0
   },
   "perSchakel": {
     "AUTH": {
-      "bewezen": 4475,
-      "verklaard": 0,
+      "bewezen": 4417,
+      "verklaard": 192,
       "nvt": 0,
-      "ongemeten": 371,
+      "ongemeten": 323,
       "gezakt": 0
     },
     "ACL": {
-      "bewezen": 3827,
+      "bewezen": 3820,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 988,
-      "gezakt": 31
+      "ongemeten": 1112,
+      "gezakt": 0
     },
     "INPUT": {
-      "bewezen": 3368,
+      "bewezen": 3279,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 1478,
+      "ongemeten": 1653,
       "gezakt": 0
     },
     "OUTPUT": {
       "bewezen": 4151,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 695,
+      "ongemeten": 781,
       "gezakt": 0
     },
     "STATE": {
-      "bewezen": 424,
+      "bewezen": 410,
       "verklaard": 0,
-      "nvt": 77,
-      "ongemeten": 4345,
+      "nvt": 78,
+      "ongemeten": 4444,
       "gezakt": 0
     },
     "SIDE_EFFECT": {
-      "bewezen": 424,
+      "bewezen": 410,
       "verklaard": 0,
-      "nvt": 77,
-      "ongemeten": 4345,
+      "nvt": 78,
+      "ongemeten": 4444,
       "gezakt": 0
     },
     "AUDIT": {
-      "bewezen": 709,
+      "bewezen": 1042,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 4137,
+      "ongemeten": 3890,
       "gezakt": 0
     },
     "IDEMPOTENCY": {
-      "bewezen": 1627,
+      "bewezen": 1647,
       "verklaard": 0,
-      "nvt": 77,
-      "ongemeten": 3130,
-      "gezakt": 12
+      "nvt": 78,
+      "ongemeten": 3207,
+      "gezakt": 0
     },
     "FAILURE": {
       "bewezen": 2,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 4844,
+      "ongemeten": 4930,
       "gezakt": 0
     },
     "ROLLBACK": {
-      "bewezen": 2635,
+      "bewezen": 2559,
       "verklaard": 0,
-      "nvt": 77,
-      "ongemeten": 2132,
-      "gezakt": 2
+      "nvt": 79,
+      "ongemeten": 2294,
+      "gezakt": 0
     },
     "PRIVACY": {
-      "bewezen": 3858,
+      "bewezen": 3820,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 988,
+      "ongemeten": 1112,
       "gezakt": 0
     }
-  },
-  "verslechteringToegestaan": {
-    "reden": "Twaalf samengevoegde PR's brachten 108 nieuwe routes; elke kolom kreeg daardoor exact dezelfde +108 ongemeten. Dat is geen gezakt bewijs maar afwezig bewijs: er is nog geen meetronde langs die routes geweest, en 'ongemeten' is hier de eerlijke uitslag (BESTUUR.md: niet vast te stellen is een eersteklas uitkomst). IDEMPOTENCY verliest daarbovenop 445 bewezen omdat IDEMPROEF.json van voor de samenvoeging dateert; die ronde duurt uren en eist een schone boom, en draait apart. Vanaf deze stand geldt de ratel onverkort weer.",
-    "cellenVoor": 52118,
-    "cellenNa": 53306
   },
   "uitleg": "Gegenereerd door scripts/bewijsmatrix.js. ongemeten MAG ALLEEN KRIMPEN."
 }

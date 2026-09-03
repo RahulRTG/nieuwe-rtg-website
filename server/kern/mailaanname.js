@@ -27,67 +27,27 @@
    Gemount vanuit opzet/diensten2.js, naast de andere mail-modules. */
 'use strict';
 
-const adresLaag = require('./rtmail-adres');
 
 module.exports = ({ rtmail, mailIn, mailBijlage, mailAuth, werkmail, findSupplier, team,
   schoolAdresActief, foundationAdresActief, accounts }) => {
+
+  /* DE SERVICEBUS, LAAT GEBONDEN. RTG Service hangt pas in opzet/hulplaag.js en
+     bestaat op het moment dat deze keten wordt opgezet nog niet; hem naar boven
+     verhuizen zou de ontvangertoets NA de teams zetten die zij bevraagt.
+     Dezelfde vorm en dezelfde reden als `zetServiceOverdracht` in kern/ai.js:
+     een zetter, geen verwijzing die te vroeg leeg is. Wordt hij nooit gezet, dan
+     is `hulp@` gewoon geen adres hier -- en post weigeren die nergens heen kan is
+     eerlijker dan hem aannemen. */
+  let servicePost = null;
+  const zetServicePost = (p) => { servicePost = p || null; };
   const mailPubliek = require('./mail-publiek')({ accounts });
 
-  /* ---- Is dit adres van iemand hier? ----
-
-     Vier vragen, in deze volgorde, en alle vier zonder netwerk. De eerste die
-     "ja" zegt wint; zegt niemand ja, dan hoort dit bericht hier niet.
-
-     WAT HET NIET DOET: raden. Een adres in een domein dat wij voeren is nog
-     geen postvak -- "vanalles@rtgpass.rtg" bestaat niet omdat het domein
-     bestaat. Precies daar zou een postberg voor niemand ontstaan. */
-  function kentAdres(adres) {
-    const ruwAdres = rtmail.normAdres(adres);
-    const publiekeAlias = mailPubliek.vind(ruwAdres);
-    const publiekIntern = publiekeAlias && publiekeAlias.intern;
-    const a = publiekIntern || ruwAdres;
-    if (!a || a.indexOf('@') < 1) return null;
-    const o = adresLaag.ontleed(a);
-    const lokaal = String(o.lokaal || '');
-
-    // 1. een zaak met een eigen domein (kern/werkmail.js): het adres moet
-    //    bestaan EN aan staan -- een ingetrokken adres is geen postvak meer
-    if (werkmail && typeof werkmail.zaakAdresActief === 'function' && werkmail.zaakAdresActief(a)) {
-      return { soort: 'werkmail', adres: a, publiek:publiekeAlias && publiekeAlias.publiek };
-    }
-    if (typeof schoolAdresActief === 'function' && schoolAdresActief(a)) {
-      return { soort:'schoolmail', adres:a, publiek:publiekeAlias && publiekeAlias.publiek };
-    }
-    // Ledenaliassen bestaan alleen als hun HMAC aan een actief account hangt.
-    // Foundation-aliassen moeten daarnaast bij een levend profiel horen.
-    if (publiekeAlias && publiekeAlias.soort === 'lid' && rtmail.postvak(a, { limit:1 }).length) {
-      return { soort:'postvak', adres:a, publiek:publiekeAlias.publiek };
-    }
-    if (publiekeAlias && publiekeAlias.soort === 'foundation' &&
-        typeof foundationAdresActief === 'function' && foundationAdresActief(a)) {
-      return { soort:'foundation', adres:a, publiek:publiekeAlias.publiek };
-    }
-    // Vorm alleen maakt nooit een publiek ledenpostvak.
-    if (publiekIntern) return null;
-    // buiten onze eigen domeinen zijn wij niet de bestemming. Post doorsturen
-    // voor een ander is precies wat een open relay doet, dus: nee.
-    if (!o.binnenshuis) return null;
-
-    // 2. een zaak, op haar code
-    if (findSupplier && findSupplier(lokaal)) return { soort: 'zaak', adres: a };
-    // 3. een gedeeld postvak (team), opgezocht op adres -- de teams bewaren hun
-    //    eigen adres, en `zelfdeBus` bepaalt of twee schrijfwijzen hetzelfde zijn
-    if (team && typeof team.teamOpAdres === 'function' && team.teamOpAdres(a)) return { soort: 'team', adres: a };
-    /* 4. WAAR AL POST LIGT, WOONT IEMAND. Dit is de regel die de LEDEN dekt, en
-          hij is exacter dan hij klinkt: elk nieuw account krijgt bij aanmelding
-          een welkom in zijn postvak (test/rtmail-lid.test.js), dus een bestaand
-          lid heeft altijd post. Het alternatief -- het linkerdeel terugrekenen
-          naar een codenaam -- kan dit huis niet: de gids zoekt op codenaam en
-          niet op de geslugde vorm ervan, en de VORM herkennen zou "lijkt op een
-          codenaam" antwoorden op de vraag "bestaat deze persoon". */
-    if (rtmail.postvak(a, { limit: 1 }).length) return { soort: 'postvak', adres: a };
-    return null;
-  }
+  /* De ontvangertoets staat in ./mailontvanger.js: een BESLUIT over dit huis
+     (wie hier geen postvak heeft, krijgt geen post) en niet een stap in deze
+     keten. Zelfde vraag voor allebei de deuren, dus hij hoort er maar een keer
+     te staan. */
+  const kentAdres = require('./mailontvanger')({ rtmail, werkmail, findSupplier, team,
+    mailPubliek, schoolAdresActief, foundationAdresActief, servicePost: () => servicePost });
 
   /* ---- De keten zelf ----
 
@@ -165,12 +125,29 @@ module.exports = ({ rtmail, mailIn, mailBijlage, mailAuth, werkmail, findSupplie
        onze eigen scanner eruitzien als opslagmanipulatie. */
     if (rtmail.herzegel) rtmail.herzegel(m, true);
 
-    return { ok: true, id: m.id, origineel: bewaard.id, controles: d.controles,
+    /* EN DE SERVICEBUS MAAKT ER EEN ZAAK VAN. Pas hier, na het bewaren: gaat het
+       openen mis, dan ligt de post er nog steeds -- dezelfde volgorde als bij het
+       origineel hierboven. De uitkomst gaat MEE in het antwoord, ook als er geen
+       zaak kwam: een weigering die alleen deze module kent, is een melding die
+       niemand ziet. */
+    let zaak = null;
+    if (bestemming.soort === 'service' && servicePost) {
+      try {
+        const uit = servicePost.ontvang({ van: d.van, onderwerp: d.onderwerp, tekst: d.tekst,
+          controles: d.controles, bericht: m.id });
+        zaak = uit && uit.zaak ? { id: uit.zaak.id, team: uit.zaak.team }
+          : { geen: true, waarom: (uit && (uit.error || uit.waarom)) || 'onbekend' };
+      } catch (e) {
+        zaak = { geen: true, waarom: 'Het openen van de zaak liep vast (' + (e && e.message) + '); de post is wel bewaard.' };
+      }
+    }
+
+    return { ok: true, id: m.id, zaak, origineel: bewaard.id, controles: d.controles,
       ontvanger:bestemming.adres,
       publiekOntvanger:bestemming.publiek || mailPubliek.publiek(bestemming.adres),
       bijlagen, geweigerd: geweigerd.length,
       let: 'Het originele bericht is onveranderd bewaard; wat in het postvak staat is een afgeleide. Bijlagen zijn door de scanner gegaan; alleen wat schoon was, is bewaard.' };
   }
 
-  return { mailAanname: { neemAan, kentAdres } };
+  return { mailAanname: { neemAan, kentAdres, zetServicePost } };
 };

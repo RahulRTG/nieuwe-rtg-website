@@ -133,11 +133,54 @@ test('Bestellen: zoeken vindt het gerecht, alcohol krijgt geen plusknop, en een 
       const ontdekt = page.waitForResponse((r) => r.url().endsWith('/api/gast/eten/ontdekken'), { timeout: 20000 });
       await page.locator('[data-ingang="ontdekken"]').click();
       assert.equal((await ontdekt).status(), 200);
-      await page.waitForSelector('#zaken .zaakknop[data-zaak="PONTO"]', { state: 'visible', timeout: 15000 });
-      const kaart2 = page.waitForResponse((r) => r.url().endsWith('/api/gast/bezorg/kaart'), { timeout: 20000 });
+      /* WACHTEN TOT DE LIJST KLAAR IS, NIET TOT DE KNOP ER EVEN STAAT.
+         laadResultaten() zet #zaken eerst op skeletten en vult hem pas in de
+         .then(), dus het antwoord van /ontdekken is er voor de lijst getekend
+         is. De skelet-eis maakt van "de knop staat er" een "de lijst is af".
+
+         Dit dekt het GEVOLG af; de oorzaak lag in het scherm en is daar
+         gerepareerd. laadResultaten() kon van drie kanten tegelijk lopen zonder
+         volgordebewaking (gemeten met een teller op de verzoeken in deze toets:
+         1x ontdekken, 3x zoeken, 1x ontdekken), en het zoekveld zette een
+         debounce van 280 ms klaar die na de klik op Ontdekken alsnog afliep,
+         INGANG terugzette op 'zoeken' en het ontdek-antwoord met het oude
+         zoekwoord filterde -- gemeten in een gezakte ronde: knoppen ["KIKUNOI"],
+         groepsknoppen verborgen, #zoek nog "Gazpacho de sandia". bestellen.html
+         wist die timer nu en negeert een antwoord dat niet meer bij de laatste
+         lading hoort (LIJST_AANVRAAG, hetzelfde patroon als AANVRAAG in
+         kiesZaak()). */
+      await page.waitForFunction(() => !document.querySelector('#zaken .skelet') &&
+        !!document.querySelector('#zaken .zaakknop[data-zaak="PONTO"]'), null, { timeout: 15000 });
+      /* HIER STOND EEN WACHT OP /api/gast/bezorg/kaart, EN DIE OPROEP IS NIET
+         GEGARANDEERD. kiesZaak() in bestellen.html leest de kaart uit een cache
+         zodra hij die heeft:
+
+           var klaar = PROFIELEN[code] ? Promise.resolve(PROFIELEN[code])
+                                       : api('/api/gast/bezorg/kaart', ...)
+
+         Is het profiel warm -- en opnieuwBestellen() maakt hem warm zodra de
+         gast een eerdere bestelling met de knop "opnieuw" herhaalt -- dan gaat
+         er geen verzoek uit en wacht de toets twintig seconden op iets wat
+         nooit komt. Dat is niet traagheid maar een toets die op een
+         NETWERKOPROEP steunt terwijl hij over een SCHERM gaat.
+
+         Wat hij wil weten is of het klikken op het tweede loket de kaart van
+         dat loket toont, en dat staat eronder. Die DOM-controle is bovendien
+         sterker: hij kan alleen slagen als de kaart er werkelijk is, of die nu
+         uit het netwerk of uit de cache komt. De 200 van de heenweg voegt daar
+         niets aan toe wat kaart1 hierboven niet al aantoont.
+
+         EERLIJK ERBIJ: de CI-fout van 2 september 2026 (drie keer regel 137,
+         twintig seconden) is hier NIET gereproduceerd -- niet met een trage
+         runner, niet met twee runs achter elkaar, en de databases zijn per
+         bestand gescheiden (proefserver.js r.29). Dit haalt dus een aantoonbare
+         broosheid weg; of het exact DIE fout was, staat niet vast. */
       await page.locator('#zaken .zaakknop[data-zaak="PONTO"]').click();
-      assert.equal((await kaart2).status(), 200);
-      await page.waitForSelector('#kaartLijst [data-plus="' + gewoonB.id + '"]', { state: 'visible', timeout: 15000 });
+      /* Zelfde reden als bij de lijst hierboven: kiesZaak() zet ook #kaartLijst
+         eerst op skeletten, dus de kaart is er voordat de rijen er zijn -- ook
+         op de cacheweg, want die loopt door dezelfde .then(). */
+      await page.waitForFunction((id) => !document.querySelector('#kaartLijst .skelet') &&
+        !!document.querySelector('#kaartLijst [data-plus="' + id + '"]'), gewoonB.id, { timeout: 15000 });
       await page.locator('#kaartLijst [data-plus="' + gewoonB.id + '"]').click();
       await page.waitForFunction(() => /bij 2 loketten/.test(document.querySelector('#mandTekst').textContent),
         null, { timeout: 10000 });

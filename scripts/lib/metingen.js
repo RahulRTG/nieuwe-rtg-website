@@ -49,10 +49,31 @@ const GEEN_METING = new Set([
      register bleven als dode tak achter. Ze zijn op 1 september 2026 opgeruimd
      en de weging is in delen.js hersteld -- twee verdelers met elk een eigen
      duurregister is LAT.md regel 4 op de plek waar hij het duurst is. */
-  'TOETSDUUR.json'
+  'TOETSDUUR.json',
+  /* SCHERFMETER.json rapporteert vier getallen over de scherfverdeling (balans,
+     churn, ongemeten, prijsbron). Drie ervan HOREN geen ratel te hebben: churn
+     hangt af van hoeveel toetsen er sinds de vorige vastlegging bij kwamen,
+     balans beweegt met de echte duren mee, en prijsbron is een indeling en geen
+     getal. Een ratel daarop staat rood van gewoon werk.
+
+     Het vierde, `ongemeten`, is wel een goede kandidaat en staat er met opzet
+     nog niet aan: dat zou elke tak die een toetsbestand toevoegt rood zetten tot
+     de auteur de volle suite heeft gedraaid, en dat is een beleidsbesluit over
+     andermans werk. De stand staat in SCHERFMETER.json zelf onder
+     `meters.ongemeten` en niet hier -- een getal in een commentaar veroudert
+     stiller dan waar ook. Zie de kop van scripts/scherfmeter.js voor het besluit
+     dat daarover openstaat. */
+  'SCHERFMETER.json',
+  /* CORRECTIES.json zet getallen recht die in een PERMANENT artefact staan --
+     een commitboodschap, een PR-bericht. Geen meting en geen kwaliteitsgetal: het
+     hoort te GROEIEN naarmate er meer wordt rechtgezet, en een ratel erop zou
+     precies het rechtzetten bestraffen. */
+  'CORRECTIES.json'
 ]);
 
 const REGISTER = {
+  'LAATSPOOR.json': { meter: ['laatSpoorVerdacht'] },
+  'ROLLBACKBESLUIT.json': { meter: ['rollbackUitzonderingen'] },
   'BEPROEVING.json': { meter: ['p99Ms', 'doorvoerPerSec', 'eventLoopP99Ms', 'herstelSeconden', 'geheugenHellingMBPerMin'] },
   'MUTATIES.json': { meter: ['toetsenOngevoeligPct', 'toetsenNietGemeten'] },
   'GRENZEN.json': { meter: ['kernBreedte', 'kernGedeeld', 'kernBreedsteBestand', 'kernOngebruikt'] },
@@ -60,6 +81,12 @@ const REGISTER = {
   'LADDER.json': { meter: ['ladderRaak', 'ladderNietGeprobeerd'] },
   'ROLRONDE.json': { meter: ['rolscheidingGaten', 'rolscheidingGemeten'] },
   'GLUURRONDE.json': { meter: ['gluurGaten', 'gluurGecontroleerd'] },
+  'VERSTRENGELING.json': { meter: ['verstrengelingOnverklaard'] },
+  'ACTIVERING.json': { meter: ['activeringOndergrens'] },
+  'TREDEPROEF.json': { meter: ['tredeLekken', 'tredeRondgangGezakt', 'tredeIngangLekken'] },
+  'WEKKERS.json': { meter: ['wekkersOnverklaard', 'wekkersFunctieUitToch', 'wekkersZonderTrede'] },
+  'ZAAKWIG.json': { meter: ['zaakwigGezakt'] },
+  'MEETLEER.json': { meter: ['meetleerBlind'] },
 
   /* Deze vier dragen hun eigen grondwaarde. De ratel staat in het genoemde
      bestand en niet in NORM.json -- dat is geen tekortkoming maar een keuze:
@@ -74,6 +101,14 @@ const REGISTER = {
      dat ze zakken. Elk draagt nu zijn grondwaarde in de genoemde toets --
      dekking, bewezen paren, besloten treden -- en niet in NORM.json, want dit
      zijn lijsten en geen enkelvoudige getallen. */
+  /* De twee isolatieregisters. De tand op ISOLATIESCHADUW.json is smal met
+     opzet: `gewogen` mag nooit nul zijn. Dat is exact de regressie die hier is
+     gevonden -- de poort woog NUL verzoeken van een lid met een stand, en er was
+     niets dat klaagde. `zouSluiten` staat er bewust NIET in: dat beweegt mee met
+     elke nieuwe route, en een tand die om vreemde redenen rammelt wordt
+     weggeklikt. */
+  'ISOLATIESCHADUW.json': { eigenRatel: 'test/isolatieregisters.test.js' },
+  'ISOLATIEPROEF.json': { eigenRatel: 'test/isolatieregisters.test.js' },
   'RESOLVERBEREIK.json': { eigenRatel: 'test/resolverbereik.test.js' },
   'GEZAGSNOEMER.json': { eigenRatel: 'test/gezagsnoemer.test.js' },
   'EXECUTION_MAP.json': { eigenRatel: 'test/executionmap.test.js' },

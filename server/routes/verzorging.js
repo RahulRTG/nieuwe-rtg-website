@@ -5,7 +5,8 @@
    Onderaan staat de LEDENkant van de salon: dezelfde agenda, maar dan van de
    kant van wie er een afspraak maakt, op codenaam. */
 module.exports = (kern) => {
-  const { app, db, auth, liveCodename, supplierAuth, beauty, petcare, opvang, verzorgingLeden, gegevensStop } = kern;
+  const { app, db, auth, liveCodename, supplierAuth, beauty, petcare, opvang, verzorgingLeden,
+    opvangwijzer, gegevensStop } = kern;
   const stuur = (res, r) => { const { status, ...rest } = r; res.status(status || 200).json(rest); };
   const maak = (basis, capNaam, domein) => (pad, fn) => app.post(basis + pad, supplierAuth, (req, res) => {
     const caps = db.capsVan(req.supplier);
@@ -59,4 +60,21 @@ module.exports = (kern) => {
   });
   app.post('/api/verzorging/mijn', auth, lidRoute((sess, naam) => verzorgingLeden.mijn(naam)));
   app.post('/api/verzorging/annuleer', auth, lidRoute((sess, naam, x) => verzorgingLeden.annuleer(naam, x.code, x.id)));
+
+  /* ---- de OUDERkant van de kinderopvang ----
+     Kinderopvang bestond hier alleen aan de kant van de opvang; een ouder kon
+     er niet bij (HDI.md par. 7.10). Dezelfde vorm als de salon hierboven:
+     voluit uitgeschreven paden, op codenaam, en het klaarzetten gaat langs de
+     gegevenspoort omdat het uw codenaam en uw wens met de zaak deelt.
+
+     Er is met opzet GEEN route die een kind inschrijft. Dat is de handeling
+     waarmee een kind ergens staat, en die hoort een mens te doen die het kind
+     heeft gezien (opvang.kindMeld, en die blijft achter supplierAuth). */
+  app.post('/api/opvang', auth, lidRoute((sess, naam) => opvangwijzer.overzicht(naam)));
+  app.post('/api/opvang/vraag', auth, (req, res) => {
+    if (gegevensStop(req, res, 'bestelling')) return;
+    lidRoute((sess, naam, x) => opvangwijzer.vraag(sess, naam, x))(req, res);
+  });
+  app.post('/api/opvang/mijn', auth, lidRoute((sess, naam) => opvangwijzer.mijn(naam)));
+  app.post('/api/opvang/weg', auth, lidRoute((sess, naam, x) => opvangwijzer.weg(naam, x.code, x.id)));
 };

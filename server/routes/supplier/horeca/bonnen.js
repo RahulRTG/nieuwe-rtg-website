@@ -12,7 +12,7 @@ module.exports = (kern) => {
   /* Samenvoegen is iets anders dan herhalen; zie de kop van dit bestand bij
      /offline/handelingen en kern/horeca/samenvoegen.js. */
   const samenvoegen = require('../../../kern/horeca/samenvoegen')({ horeca, schoon });
-  const { H, nu, id, heleCenten, uitEuro, totaal, bonMaak } = horeca;
+  const { H, Hlees, nu, id, heleCenten, uitEuro, totaal, bonMaak } = horeca;
   const WIJZEN = ['contant', 'pin', 'online', 'rekening', 'kamer', 'bon', 'tegoed', 'munt'];
 
   /* ---------- bonnen ---------- */
@@ -25,8 +25,10 @@ module.exports = (kern) => {
     res.json({ ok: true, bon: b });
   });
 
+  /* OPZOEKEN IS KIJKEN: H() zet de doos van een zaak neer zodra iemand ernaar
+     vraagt, ook bij een 404 (kern/horeca.js). */
   app.post('/api/supplier/horeca/bon', supplierAuth, (req, res) => {
-    const h = H(req.supplier.code);
+    const h = Hlees(req.supplier.code);
     const code = String(req.body.bonCode || '').toUpperCase();
     const b = Object.prototype.hasOwnProperty.call(h.bonnen, code) ? h.bonnen[code] : null;
     if (!b) return res.status(404).json({ error: 'Deze bon kennen we niet.' });
@@ -57,9 +59,10 @@ module.exports = (kern) => {
      "geserveerd" dat niemand heeft gemaakt -- en de allergie is dan een veld op
      een bon die niemand meer leest. */
   app.post('/api/supplier/horeca/offline/sync', supplierAuth, (req, res) => {
-    const h = H(req.supplier.code);
     const bonnen = (Array.isArray(req.body.bonnen) ? req.body.bonnen : []).slice(0, 200);
     if (!bonnen.length) return res.status(400).json({ error: 'Er zaten geen bonnen in dit pakket.' });
+    // pas hier de doos: een leeg pakket wordt geweigerd en laat dan niets
+    const h = H(req.supplier.code);
     let nieuw = 0, dubbel = 0;
     const gemaakt = [];
     for (const b of bonnen) {
@@ -129,9 +132,10 @@ module.exports = (kern) => {
      vallen zou betekenen dat een medewerker denkt iets te hebben gedaan wat
      nooit is gebeurd. */
   app.post('/api/supplier/horeca/offline/handelingen', supplierAuth, (req, res) => {
-    const h = H(req.supplier.code);
     const lijst = Array.isArray(req.body.handelingen) ? req.body.handelingen : [];
     if (!lijst.length) return res.status(400).json({ error: 'Er zaten geen handelingen in dit pakket.' });
+    // de doos pas als er iets samen te voegen is; zie /offline/sync hierboven
+    const h = H(req.supplier.code);
     const uit = samenvoegen.verwerk(h, lijst, req.actor.name);
     save();
     if (uit.gedaan) {

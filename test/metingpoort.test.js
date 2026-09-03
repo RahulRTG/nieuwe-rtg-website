@@ -37,7 +37,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, verwachtServerfout } = require('./helper');
 
 const TOKEN = 'meet-token-dat-lang-genoeg-is';
 const servers = [];
@@ -152,4 +152,90 @@ test('7. de meting draagt geen namen en geen ingevulde ids', async () => {
   assert.equal(/roellie|@x\.nl|Gewoon Lid/i.test(r.tekst), false, 'geen namen of adressen in de meting');
   assert.equal(/route="[^"]*\/(user-\d+|NL\d\d[A-Z]{4})/.test(r.tekst), false,
     'de labels dragen het routePATROON, geen ingevulde ids');
+});
+
+/* ============================================================================
+   EN TELT ER DAN OOK IETS? -- de 5xx-teller, van de storing tot de meetregel.
+
+   `rtg_fouten_totaal` stond in server/meting-tekst.js keurig uitgeschreven met
+   een HELP- en een TYPE-regel, en `meting.telFout()` had in de hele
+   productiecode geen enkele aanroeper. De teller stond dus voor altijd op nul.
+   Dat is de stilste vorm van een kapotte meter: het endpoint antwoordt, de
+   regel staat er (met waarde 0, of helemaal niet omdat er geen soorten zijn),
+   en niemand ziet dat er nooit iets in gaat. TAKEN.md 7.10, en het "klaar als"
+   dat daar staat is precies deze toets: stuur een ECHTE 500 door de keten en
+   eis daarna een regel MET waarde.
+
+   Het gaat opzettelijk door de hele keten en niet langs meting.telFout(): dat
+   laatste zou alleen bewijzen dat een teller optelt, en dat wisten we al. Wat
+   hier bewezen moet worden is dat een storing in een route de teller BEREIKT.
+   /api/test/bug bestaat alleen onder NODE_ENV=test en gooit een async fout --
+   dezelfde weg die een echte bug zou nemen.
+   ========================================================================== */
+test('5. een echte 500 komt terug als een regel MET waarde in rtg_fouten_totaal', async () => {
+  /* AANGEKONDIGD, want de strenge poort van test/helper.js laat een toetsbestand
+     zakken zodra een kindserver een echte 5xx logt -- en dat is hier juist de
+     bedoeling. De aankondiging is smal (alleen de opzettelijke testbug) en komt
+     hij niet uit, dan zakt de run alsnog: een storing die je zegt uit te lokken
+     en die uitblijft, betekent dat deze toets niets meer bewijst. */
+  verwachtServerfout(/opzettelijke testbug/, 'de opzettelijke 500 van /api/test/bug');
+  const voor = await haal(kaal, '/api/metrics');
+  assert.equal(voor.status, 200);
+  const telVan = (tekst) => {
+    let n = 0;
+    for (const r of String(tekst).split('\n')) {
+      const m = /^rtg_fouten_totaal\{soort="[^"]*"\}\s+(\d+)/.exec(r.trim());
+      if (m) n += Number(m[1]);
+    }
+    return n;
+  };
+  const stand0 = telVan(voor.tekst);
+
+  const stuk = await fetch(kaal + '/api/test/bug', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+  assert.equal(stuk.status, 500, 'de opzettelijke testbug hoort een echte serverfout te geven');
+
+  const na = await haal(kaal, '/api/metrics');
+  assert.equal(na.status, 200);
+  assert.match(na.tekst, /^rtg_fouten_totaal\{soort="[^"]+"\}\s+[1-9]/m,
+    'er hoort nu een rtg_fouten_totaal-regel met een waarde boven nul te staan; ' +
+    'gekregen:\n' + na.tekst.split('\n').filter(r => r.includes('rtg_fouten_totaal')).join('\n'));
+  assert.ok(telVan(na.tekst) > stand0,
+    'en de teller is echt OPGELOPEN door deze storing (' + stand0 + ' -> ' + telVan(na.tekst) + ')');
+});
+
+/* De keerzijde, en die is even belangrijk: een client die onzin stuurt is geen
+   storing van ons. server/opzet/afsluiters.js meldt een 413 langs dezelfde weg
+   als een 500, met de status in de context. Telde die mee, dan meet
+   rtg_fouten_totaal "hoeveel verkeerde verzoeken kreeg ik" in plaats van
+   "hoe vaak ging er iets bij mij stuk" -- en dan gaat er een alarm af op iemand
+   die een te groot plaatje uploadt.
+
+   DIT IS EEN TOETS IN DIT PROCES EN NIET OVER DE LIJN, en dat is een keuze met
+   een reden. Mijn eerste versie stuurde een 404 over de lijn en keek of de teller
+   stil bleef. Die bleef inderdaad stil -- maar ook toen ik de statusgrens uit
+   server/log.js sloopte, want de 404 van afsluiters.js loopt helemaal niet langs
+   log.uitzondering(). De toets was groen om de verkeerde reden en kon zijn eigen
+   bewering niet zien sneuvelen (LAT.md regel 9). De grens zit in een functie, dus
+   toetsen we die functie, met precies de contexten die de twee afsluiters
+   meegeven. */
+test('6. een melding MET een 4xx-status telt niet mee; zonder status wel', () => {
+  const { log } = require('../server/log.js');
+  const meting = require('../server/meting.js');
+  const telVan = () => meting.tekst().split('\n')
+    .reduce((n, r) => { const m = /^rtg_fouten_totaal\{soort="[^"]*"\}\s+(\d+)/.exec(r.trim()); return m ? n + Number(m[1]) : n; }, 0);
+
+  const begin = telVan();
+  // zoals server/opzet/afsluiters.js een te groot verzoek meldt
+  log.uitzondering(new Error('entity too large'), { p: '/api/x', status: 413 });
+  log.uitzondering(new Error('slechte invoer'), { p: '/api/x', status: 400 });
+  assert.equal(telVan(), begin, 'een 413 en een 400 zijn de client, geen storing van ons');
+
+  // en zoals dezelfde afsluiter een echte serverfout meldt
+  log.uitzondering(new RangeError('het brak echt'), { p: '/api/x', status: 500 });
+  assert.equal(telVan(), begin + 1, 'een 5xx telt wel');
+
+  // een uitzondering zonder status is per definitie van ons, en dat is de meerderheid
+  log.uitzondering(new TypeError('nergens een status bij'), { p: '/api/y' });
+  assert.equal(telVan(), begin + 2, 'geen status betekent: dit was onze storing');
 });

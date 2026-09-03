@@ -81,9 +81,15 @@ app.post('/api/supplier/training/add', supplierAuth, (req, res) => {
   const t = schoon(req.body.titel, 80);
   const s = schoon(req.body.tekst, 400);
   if (!t || !s) return res.status(400).json({ error: 'Geef een titel en een tekst.' });
+  /* KEUREN VOOR SCHEPPEN: de dubbeltoets leest met eigenTips(), dat niets neerzet.
+     Stond de la er eerst, dan hield een zaak zonder eigen tips aan een geweigerde
+     dubbele titel een lege tiplijst over -- de 409 en de opslag zeggen dan iets
+     anders over hetzelfde verzoek. De la komt er pas waar de tip er werkelijk bij
+     komt. Een tip met een lege titel bestaat niet, dus filtert eigenTips() er ook
+     nooit een weg die deze toets had moeten zien. */
+  if (eigenTips(req.supplier.code).some(x => x.t === t)) return res.status(409).json({ error: 'Er is al een tip met deze titel.' });
   db.data.training = db.data.training || {};
   const arr = db.data.training[req.supplier.code] = db.data.training[req.supplier.code] || [];
-  if (arr.some(x => x.t === t)) return res.status(409).json({ error: 'Er is al een tip met deze titel.' });
   arr.push({ t, s, door: req.actor.name, at: new Date().toISOString() });
   save();
   logActivity(req.supplier.code, req.actor, 'voegde een trainingstip toe: ' + t);

@@ -14,7 +14,7 @@
      het jaar de omzet af. Het besluit hoort bij de chef, met het getal erbij. */
 module.exports = (kern) => {
   const { app, save, supplierAuth, managerOnly, logActivity, sseToSupplier, horeca } = kern;
-  const { H } = horeca;
+  const { H, Hlees } = horeca;
   const bord = kern.horecaBord;
   const { openWerk } = require('../../../kern/horeca/keukenlaag');
   const stappen = require('../../../kern/horeca/stappen');
@@ -104,7 +104,11 @@ module.exports = (kern) => {
      maar omdat het de planning van de hele avond verzet: een stap erbij
      verschuift elk startmoment van dat gerecht op elk bord. */
   app.post('/api/supplier/horeca/keuken/stappen', supplierAuth, (req, res) => {
-    const h = H(req.supplier.code);
+    /* Hlees en niet H: hieronder staan een leestak, een 403 en een 400, en geen
+       van drieen hoort een verse horecadoos achter te laten voor een zaak die er
+       nog geen had (zie kern/horeca.js bij Hlees). Op een zaak die er wel een
+       heeft is dit de ECHTE doos, dus schrijven kan gewoon. */
+    const h = Hlees(req.supplier.code);
     const naam = String((req.body || {}).naam || '');
     if (req.body.stappen === undefined) {
       // alleen lezen: wat staat er nu voor dit gerecht (of voor alles)
@@ -114,6 +118,12 @@ module.exports = (kern) => {
     if (!managerOnly(req, res)) return;
     const uit = stappen.zetStappen(h, naam, req.body.stappen);
     if (uit.error) return res.status(uit.status || 400).json({ error: uit.error });
+    /* Had de zaak nog geen doos, dan schreef zetStappen zojuist in de losse
+       lees-vorm. Nu de keuring gehaald is mag de doos alsnog ontstaan en gaat
+       dezelfde handeling erin. Bewust geen tweede naamcontrole hier: zetStappen
+       blijft de enige die over die naam oordeelt (LAT-regel 4). */
+    const doos = H(req.supplier.code);
+    if (doos !== h) stappen.zetStappen(doos, naam, req.body.stappen);
     save();
     logActivity(req.supplier.code, req.actor, uit.gewist
       ? 'wiste de bereidingsstappen van ' + uit.naam

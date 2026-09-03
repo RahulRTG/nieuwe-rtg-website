@@ -55,7 +55,27 @@ const argv = process.argv.slice(2);
 const JOURNAAL = (argv.find(a => a.startsWith('--lees=')) || '').slice(7) ||
   (argv.includes('--lees') ? argv[argv.indexOf('--lees') + 1] : '') ||
   path.join(WORTEL, '.routejournaal');
-const UITSLAG = path.join(WORTEL, 'AUDITPROEF.json');
+/* EEN REGISTER HEEFT EEN SCHRIJVER, EN DIT WAS DE TWEEDE.
+
+   Dit script schreef `AUDITPROEF.json`, en scripts/auditproef-route.js doet dat
+   ook -- met een ANDERE vorm. Deze schrijft `perRoute` als een OBJECT met een
+   veld `staat`; die schrijft het als een ARRAY met een veld `audit`. Wie ze door
+   elkaar draait, laat het bestand van vorm wisselen zonder dat iemand het merkt.
+
+   Dat is ook precies wat er is misgegaan. `scripts/bewijsmatrix.js` las het
+   bestand met een lezer die op de OBJECT-vorm was geschreven en op `staat`
+   toetste, terwijl er de ARRAY-vorm met `audit` op schijf stond. Die lezer gaf
+   dus altijd niets terug, en de AUDIT-kolom meldde 0 bewezen terwijl het
+   register er 860 droeg -- ruim een jaar lang, groen (TAKEN.md 7.22).
+
+   Ze meten ook niet hetzelfde, en dat is de reden dat er niet EEN van de twee
+   hoeft te verdwijnen: dit script leest het routejournaal van de gewone
+   toetsenreeks (gratis, breed, waargenomen), auditproef-route.js voert elke
+   schrijfroute ECHT uit tegen een wegwerpserver en leest het spoor terug via de
+   kantoorroute die een auditor ook heeft (duur, zwaarder bewijs). De zware is de
+   bron van de bewijsmatrix en houdt daarom de naam; deze schrijft zijn eigen
+   bestand. */
+const UITSLAG = path.join(WORTEL, 'AUDITPROEF-JOURNAAL.json');
 
 /* HET OORDEEL ALS PURE FUNCTIE, om dezelfde reden als bij de outputproef: toen
    dit binnen meet() zat, kon een toets hem alleen NABOUWEN, en zo'n toets zakt
@@ -273,5 +293,5 @@ if (uit.ongebruikteVerklaringen.length) {
   console.log('\n  LET OP -- verklaringen die nergens meer op slaan:');
   for (const r of uit.ongebruikteVerklaringen) console.log('    ' + r + ' (staat nu: ' + ((uit.perRoute[r] || {}).staat || 'ongemeten') + ')');
 }
-console.log('\n  weggeschreven in AUDITPROEF.json\n');
+console.log('\n  weggeschreven in AUDITPROEF-JOURNAAL.json\n');
 process.exitCode = 0;

@@ -18,6 +18,20 @@ module.exports = (kern) => {
     if (!db.data.gebouwPand[code]) db.data.gebouwPand[code] = { installaties: [], post: [], parkeer: [], bhv: [] };
     return db.data.gebouwPand[code];
   }
+  /* KIJKEN ZONDER SCHEPPEN, en dat onderscheid is hier geen netheid.
+
+     `bak()` zet het pandvak neer voor een zaak die er nog geen had. Op de weg
+     die werkelijk iets TOEVOEGT hoort dat ook zo, en op elke andere weg is het
+     verkeerd: wie een zending of een installatie opzoekt die niet bestaat
+     krijgt een 404, en dan hoort er niets achter te blijven -- anders zeggen de
+     statuscode en de database twee verschillende dingen over hetzelfde verzoek.
+
+     Bestaat het vak wel, dan geeft dit de ECHTE lijsten terug en geen kopie: een
+     keuringsdatum die je hier vindt en bijwerkt, landt gewoon in de opslag.
+     Bestaat het niet, dan krijg je een lege vorm die nergens aan vastzit, en
+     loopt elke zoektocht dood op een nette 404. */
+  const lees = (code) => (db.data.gebouwPand && db.data.gebouwPand[code])
+    || { installaties: [], post: [], parkeer: [], bhv: [] };
   const cap = l => { if (l.length > MAX) l.length = MAX; };
   const vandaag = () => new Date().toISOString().slice(0, 10);
   const overDagen = d => new Date(Date.now() + d * 86400000).toISOString().slice(0, 10);
@@ -49,12 +63,12 @@ module.exports = (kern) => {
   /* ---- installaties: het pand keurt zichzelf niet ---- */
   app.post('/api/supplier/gebouwpand/installatie', supplierAuth, (req, res) => {
     if (!managerOnly(req, res)) return;
-    const b = bak(req.supplier.code);
     const soort = INSTALLATIES.includes(req.body.soort) ? req.body.soort : null;
     const naam = txt(req.body.naam, 60);
     if (!soort || !naam) return res.status(400).json({ error: 'Kies een soort en geef de installatie een naam.' });
     if (!DATUM.test(req.body.keuringTot)) return res.status(400).json({ error: 'Tot wanneer is de keuring geldig (jjjj-mm-dd)?' });
     const i = { id: rid(), soort, naam, keuringTot: req.body.keuringTot, notitie: txt(req.body.notitie, 120) };
+    const b = bak(req.supplier.code);
     b.installaties.unshift(i); cap(b.installaties); save();
     sseToSupplier(req.supplier.code, 'sync', { scope: 'gebouw' });
     res.json({ ok: true, installatie: i });
@@ -62,8 +76,7 @@ module.exports = (kern) => {
 
   app.post('/api/supplier/gebouwpand/installatie/keuring', supplierAuth, (req, res) => {
     if (!managerOnly(req, res)) return;
-    const b = bak(req.supplier.code);
-    const i = b.installaties.find(x => x.id === req.body.id);
+    const i = lees(req.supplier.code).installaties.find(x => x.id === req.body.id);
     if (!i) return res.status(404).json({ error: 'Installatie niet gevonden.' });
     if (!DATUM.test(req.body.keuringTot) || req.body.keuringTot <= i.keuringTot)
       return res.status(400).json({ error: 'Kies een nieuwe keuringsdatum na de huidige.' });
@@ -75,18 +88,17 @@ module.exports = (kern) => {
 
   /* ---- de mailroom: aannemen, melden, ophalen ---- */
   app.post('/api/supplier/gebouwpand/post', supplierAuth, (req, res) => {
-    const b = bak(req.supplier.code);
     const voorWie = txt(req.body.voorWie, 60), omschrijving = txt(req.body.omschrijving, 80);
     if (!voorWie) return res.status(400).json({ error: 'Voor welke huurder is dit?' });
     const p = { id: rid(), voorWie, omschrijving: omschrijving || 'pakket', dag: vandaag(), status: 'aangekomen' };
+    const b = bak(req.supplier.code);
     b.post.unshift(p); cap(b.post); save();
     sseToSupplier(req.supplier.code, 'sync', { scope: 'gebouw' });
     res.json({ ok: true, post: p });
   });
 
   app.post('/api/supplier/gebouwpand/post/opgehaald', supplierAuth, (req, res) => {
-    const b = bak(req.supplier.code);
-    const p = b.post.find(x => x.id === req.body.id);
+    const p = lees(req.supplier.code).post.find(x => x.id === req.body.id);
     if (!p) return res.status(404).json({ error: 'Zending niet gevonden.' });
     p.status = 'opgehaald'; save();
     sseToSupplier(req.supplier.code, 'sync', { scope: 'gebouw' });
@@ -96,9 +108,9 @@ module.exports = (kern) => {
   /* ---- parkeren: vaste plekken per huurder ---- */
   app.post('/api/supplier/gebouwpand/parkeer', supplierAuth, (req, res) => {
     if (!managerOnly(req, res)) return;
-    const b = bak(req.supplier.code);
     const plek = txt(req.body.plek, 12), huurder = txt(req.body.huurder, 60);
     if (!plek) return res.status(400).json({ error: 'Welke plek (bijv. P1-04)?' });
+    const b = bak(req.supplier.code);
     const bestaand = b.parkeer.find(x => x.plek === plek);
     if (bestaand) { bestaand.huurder = huurder; }
     else b.parkeer.unshift({ id: rid(), plek, huurder });

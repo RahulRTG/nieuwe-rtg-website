@@ -35,7 +35,15 @@ function decodeer(oid, tekst) {
 function int16(n) { const b = Buffer.alloc(2); b.writeUInt16BE(n & 0xffff, 0); return b; }
 function int32(n) { const b = Buffer.alloc(4); b.writeInt32BE(n, 0); return b; }
 function leesCstrs(buf, max) { const uit = []; let o = 0; while (o < buf.length && uit.length < max) { const eind = buf.indexOf(0, o); if (eind === -1) break; uit.push(buf.toString('utf8', o, eind)); o = eind + 1; } return uit; }
-function foutVelden(p) { const uit = {}; let o = 0; while (o < p.length && p[o] !== 0) { const code = String.fromCharCode(p[o]); const eind = p.indexOf(0, o + 1); uit[code] = p.toString('utf8', o + 1, eind); o = eind + 1; } return uit; }
+/* HET VELD ZONDER AFSLUITER, en waarom die ene regel er staat. `indexOf` geeft
+   -1 als er geen NUL meer komt. Dan werd `o = -1 + 1 = 0` en begon de lus
+   overnieuw bij byte nul -- voor altijd, met de hele node-draad erin. Het is
+   maar vanaf de Postgres-KANT te bereiken en dus de lichtste van de twee
+   ontleedgaten uit STANDAARD.md par. 6, maar "onze database is te vertrouwen"
+   is precies de aanname die een ontleder niet hoort te maken: een halve TCP-
+   levering is genoeg. Een onafgesloten laatste veld wordt overgeslagen, want
+   zijn waarde is niet te kennen. */
+function foutVelden(p) { const uit = {}; let o = 0; while (o < p.length && p[o] !== 0) { const code = String.fromCharCode(p[o]); const eind = p.indexOf(0, o + 1); if (eind === -1) break; uit[code] = p.toString('utf8', o + 1, eind); o = eind + 1; } return uit; }
 function paramTekst(v) {
   if (v == null) return null;
   if (typeof v === 'boolean') return v ? 't' : 'f';

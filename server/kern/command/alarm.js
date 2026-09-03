@@ -29,7 +29,7 @@
 
 const ERNST = { hoog: 3, midden: 2, laag: 1 };
 
-function maakAlarm({ opslag, save, journaal, slo, sonde, canary, kwaliteit, norm, sein }) {
+function maakAlarm({ opslag, save, journaal, slo, sonde, canary, kwaliteit, norm, sein, foutmelder }) {
   const D = () => {
     const n = (typeof norm === 'function' ? norm() : norm) || {};
     return Object.assign({ budgetRestDeel: 0.25, defectenDrempel: 25, buitenStilUren: 24, stilteMaxUren: 72 },
@@ -131,10 +131,21 @@ function maakAlarm({ opslag, save, journaal, slo, sonde, canary, kwaliteit, norm
     return { nieuw, opgelost, actief: gevonden.length };
   }
 
-  /* De uitgang. Twee kanalen, allebei van het huis zelf: een regel in het
-     journaal (zodat het in het spoor staat) en een sein naar het kantoorbord
-     (zodat iemand het ziet zonder te zoeken). Stilgezet? Dan wel noteren en
-     niet seinen -- stilte hoort in het spoor te staan. */
+  /* De uitgang. DRIE kanalen nu, en het derde is er bijgekomen om een reden die
+     in de oude versie van dit blok zelf stond: de eerste twee eindigen allebei
+     BINNEN het huis. Een regel in het journaal staat in het spoor, een sein gaat
+     naar het kantoorbord -- en om drie uur 's nachts kijkt daar niemand naar. Een
+     alarm dat alleen op een scherm eindigt dat niemand openheeft, is een
+     rapportcijfer achteraf (TAKEN.md 7.12).
+
+     Het derde kanaal is de bestaande foutmelder (server/foutmelder.js): een dunne
+     webhook-POST met SSRF-keuring, die er al was en op nul aanroepers stond voor
+     alarmen. Hij gaat alleen af op de OVERGANG -- aan en af -- en nooit op elke
+     ronde; weeg() roept meld() ook alleen daarvoor aan.
+
+     Stilgezet? Dan wel noteren en niet seinen -- stilte hoort in het spoor te
+     staan, en dat geldt voor alle drie de kanalen. Wie een alarm stilzet, wil ook
+     geen telefoon om drie uur. */
   function meld(a, richting) {
     const stil = a.stilTot && Date.parse(a.stilTot) > Date.now();
     try {
@@ -142,9 +153,32 @@ function maakAlarm({ opslag, save, journaal, slo, sonde, canary, kwaliteit, norm
         niveau: 'auto', objectType: 'alarm', objectId: a.id,
         reden: a.naam + (richting === 'aan' ? ': ' + a.wat : ' is opgelost') + (stil ? ' (stilgezet)' : '') });
     } catch (e) { /* een journaalstoring mag het alarm niet dempen */ }
-    if (!stil && typeof sein === 'function') {
+    if (stil) return;
+    if (typeof sein === 'function') {
       try { sein('sync', { scope: 'alarm', id: a.id, richting, ernst: a.ernst, naam: a.naam }); } catch (e) {}
     }
+    naarBuiten(a, richting);
+  }
+
+  /* De melder wordt LAAT opgehaald: hij hangt aan de kern en die is nog niet
+     compleet op het moment dat deze laag wordt gebouwd. Zonder melder gebeurt er
+     niets -- en dat is geen stilte maar een stand die stand() hieronder gewoon
+     uitspreekt. */
+  const melderNu = () => { try { return typeof foutmelder === 'function' ? foutmelder() : foutmelder; } catch (e) { return null; } };
+  function naarBuiten(a, richting) {
+    const m = melderNu();
+    if (!m || !m.actief || typeof m.melden !== 'function') return;
+    try {
+      const kop = richting === 'aan'
+        ? 'ALARM ' + String(a.ernst || '').toUpperCase() + ': ' + a.naam
+        : 'Alarm opgelost: ' + a.naam;
+      /* Een Error en geen los object, want dat is wat melden() verwacht -- maar
+         de context zegt er expliciet bij dat dit een ALARM is en geen crash. Wie
+         de webhook leest, hoort die twee uit elkaar te kunnen houden. */
+      const e = new Error(kop + (richting === 'aan' ? ' -- ' + a.wat : ''));
+      e.name = 'RTGAlarm';
+      m.melden(e, { soort: 'alarm', id: a.id, ernst: a.ernst, richting, sinds: a.sinds || null });
+    } catch (e) { /* bezorging faalt liever dan het alarm te dempen */ }
   }
 
   /* Stilzetten, met een einde eraan. Een alarm dat voor onbepaalde tijd stil
@@ -162,6 +196,16 @@ function maakAlarm({ opslag, save, journaal, slo, sonde, canary, kwaliteit, norm
     return { alarm: a, tot: a.stilTot, max: d.stilteMaxUren };
   }
 
+  /* Is er een weg naar buiten, en zo nee: waarom niet. Dit is met opzet een
+     UITSPRAAK en geen stilte -- een alarmweg die niet bestaat, hoort op het bord
+     te staan naast de alarmen zelf. */
+  function buitenStand() {
+    const m = melderNu();
+    if (!m) return { actief: false, reden: 'er is geen foutmelder aangesloten op deze laag; alarmen blijven binnen het huis' };
+    if (!m.actief) return { actief: false, reden: 'ERR_WEBHOOK_URL is niet gezet of werd geweigerd; er gaat niets naar buiten' };
+    return { actief: true, reden: null };
+  }
+
   function stand() {
     const r = weeg();
     const staat = vak();
@@ -173,7 +217,12 @@ function maakAlarm({ opslag, save, journaal, slo, sonde, canary, kwaliteit, norm
       tel: { actief: actief.length, hoog: actief.filter(a => a.ernst === 'hoog').length,
         stil: actief.filter(a => a.stilTot && Date.parse(a.stilTot) > Date.now()).length },
       drempels: D(),
-      uitgangen: ['het journaal (elke aan- en afmelding)', 'het kantoorbord via de office-SSE'],
+      /* De uitgangen worden GETELD en niet beloofd. Stond ERR_WEBHOOK_URL leeg,
+         dan hoort daar niet stilzwijgend een kanaal in de lijst te staan dat er
+         niet is -- een lege url leest anders als bezorging. */
+      uitgangen: ['het journaal (elke aan- en afmelding)', 'het kantoorbord via de office-SSE']
+        .concat(buitenStand().actief ? ['de externe webhook (ERR_WEBHOOK_URL), alleen op de overgang'] : []),
+      geenUitgang: buitenStand().actief ? null : buitenStand().reden,
       let: 'er gaat geen mail en geen telefoonmelding uit. Dat is een kanaalbesluit met een piket ' +
         'eraan vast (SLO.md, punt 4) en hoort niet stilzwijgend hier ingebouwd te worden. En het alarm ' +
         'piept op verandering en niet elke ronde: een melding die elke dertig seconden terugkomt, leert ' +
@@ -192,7 +241,7 @@ function maakAlarm({ opslag, save, journaal, slo, sonde, canary, kwaliteit, norm
     return t;
   }
 
-  return { weeg, stand, stilzetten, controles, tikker };
+  return { weeg, stand, stilzetten, controles, tikker, buitenStand };
 }
 
 module.exports = { maakAlarm, ERNST };

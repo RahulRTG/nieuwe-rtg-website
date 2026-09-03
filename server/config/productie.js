@@ -99,7 +99,26 @@ function keur(env, fouten, waarschuwingen) {
        server/foutmelder.js nam zijn plaats in, op ERR_WEBHOOK_URL. De
        waarschuwing stuurde de beheerder dus naar een knop die nergens op zit.
        Zie test/alarmweg.test.js en check.js regel 27. */
-    if (!env.ERR_WEBHOOK_URL) waarschuwingen.push('ERR_WEBHOOK_URL niet gezet: geen EXTERNE alarmering. De eigen fout-aggregatie op het techniekbord draait altijd, maar die zie je alleen als je zelf kijkt -- en niet als de doos plat ligt. Zet een webhook (Slack/Discord/eigen endpoint) en beproef hem met de zelfproef op het techniekbord.');
+    /* SINDS 3 SEPTEMBER 2026 GAAT HET ALARM HIER OOK LANGS. Deze waarschuwing
+       ging over uitzonderingen; het alarm van server/kern/command/alarm.js heeft
+       er nu zijn derde uitgang op (TAKEN.md 7.12). Zonder deze url eindigen
+       ALLE alarmen binnen het huis: een regel in het journaal en een sein naar
+       het kantoorbord, en daar kijkt om drie uur 's nachts niemand naar. Dat
+       staat er nu bij, want een beheerder die deze regel leest hoort te weten
+       wat hij precies mist.
+
+       En de tweede tak is nieuw: een url die er WEL staat maar door de
+       SSRF-keuring wordt geweigerd, is gevaarlijker dan een lege. Dan denkt
+       iedereen dat de alarmering aanstaat terwijl server/foutmelder.js hem bij
+       het opstarten heeft weggegooid. Dat hoort geen waarschuwing te zijn maar
+       een fout: de belofte op het scherm klopt dan niet meer. */
+    if (!env.ERR_WEBHOOK_URL) waarschuwingen.push('ERR_WEBHOOK_URL niet gezet: geen EXTERNE alarmering. De eigen fout-aggregatie op het techniekbord draait altijd, maar die zie je alleen als je zelf kijkt -- en niet als de doos plat ligt. Ook het ALARM (SLO, journaalketen, canary) blijft dan binnen: journaal en kantoorbord, en verder niets. Zet een webhook (Slack/Discord/eigen endpoint) en beproef hem met de zelfproef op het techniekbord.');
+    else {
+      let keur = { ok: true };
+      try { keur = require('../kern/ssrf').veiligeWebhookUrl(env.ERR_WEBHOOK_URL, { intern: String(env.ERR_WEBHOOK_INTERN || '') === '1' }); }
+      catch (e) { keur = { ok: false, reden: 'de keuring kon niet draaien: ' + (e && e.message) }; }
+      if (!keur.ok) fouten.push('ERR_WEBHOOK_URL is gezet maar wordt geweigerd (' + keur.reden + '): server/foutmelder.js gooit hem bij het opstarten weg, dus er gaat NIETS naar buiten terwijl het techniekbord en de alarmstand doen alsof er een uitgang is.');
+    }
     if (env.SENTRY_DSN && !env.ERR_WEBHOOK_URL) waarschuwingen.push('SENTRY_DSN is gezet maar wordt door niets gelezen: deze codebase heeft geen Sentry-koppeling (zero dependencies). De externe alarmering loopt via ERR_WEBHOOK_URL.');
     /* RTG_OWNER_BOOTSTRAP staat BEWUST niet in deze lijst. De eenmalige sleutel
        waarmee de eerste eigenaar zijn account claimt hoort weg zodra dat account

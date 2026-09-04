@@ -194,6 +194,9 @@
      model aan met RTGUitvoer.bron(). In de <head> hield hij het parsen op
      zonder dat het iets won. -->
 <script src="/shared/uitvoer.js"></script>
+<!-- De kantoordeur van het huis: hij probeert eerst het RTG-account dat op
+     dit toestel is ingelogd en vraagt pas om de kantoorcode als dat niet gaat. -->
+<script src="/shared/kantoorgesprek.js"></script>
 <script>
 const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -451,7 +454,17 @@ function exporteer(){
 }
 
 // bediening
-if(!TOKEN){ $('#hoofd').innerHTML='<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log in via de Kantoren</h2><p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">De Website-studio hoort bij het RTG Atelier. Open de Kantoren en log in met je kantoor-account.</p><p class="h-mt100"><a class="h-raak24" href="/apps/kantoren.html">Naar de Kantoren →</a></p></div>'; }
+/* De studio stuurde je naar de Kantoren om te doen wat hier kan. De gedeelde
+   kantoordeur (shared/kantoorgesprek.js) opent hem op deze pagina zelf: eerst
+   met het RTG-account dat al is ingelogd, de kantoorcode als terugval. */
+if(!TOKEN){
+  $('#hoofd').innerHTML='<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">De Website-studio</h2>'+
+    '<p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">De studio hoort bij het RTG Atelier en draait op een kantoorsessie.</p><div id="kgDeur"></div></div>';
+  window.RTGKantoorGesprek.toon(document.getElementById('kgDeur'),token=>{
+    TOKEN=token; try{ localStorage.setItem('rtg_office_token',TOKEN); }catch(e){}
+    location.reload();
+  });
+}
 else {
   bouwSwatches(); bouwBlokkies(); bouwBeeldgrid();
   laadMijnFotos().then(bouwBeeldgrid);

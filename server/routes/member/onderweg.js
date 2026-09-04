@@ -74,6 +74,31 @@ module.exports = (kern) => {
   app.post('/api/ride/request', auth, (req, res) => {
     const r = vraagRitVoor(req.session, req.body);
     if (r.error) return res.status(r.status).json({ error: r.error });
+    /* DE APPBRUG: dezelfde aanvraag wordt ook een vervoersOPDRACHT, zodat de
+       vervoerder hem op zijn dispatchbord ziet in plaats van alleen als
+       melding (kern/mobiliteit/appbrug.js, en het besluit erachter staat in
+       MAATSTAF.md par. 7.5).
+
+       Lukt dat niet -- een bestemming die alleen een tekst is, een module die
+       hier uitstaat -- dan blijft de rit precies zoals hij was, met de reden
+       erbij. Een besluit uitvoeren mag geen aanvragen weigeren die gisteren nog
+       gewoon doorgingen. */
+    if (kern.appbrug && r.ride) {
+      /* Dezelfde terugval als de rit zelf: live locatie, anders waar de auto
+         staat. Zie de kop van appbrug.js. */
+      const L = db.data.live && db.data.live[req.session.key];
+      const zaak = findSupplier(r.ride.supplierCode);
+      const vanaf = (L && Number.isFinite(L.lat)) ? L : (zaak && zaak.loc) || null;
+      /* Neemt deze vervoerder ritten zonder bestemming aan? Zo ja, dan krijgt
+         ook zo'n rit een opdracht -- met een expliciet onbekende bestemming.
+         De rit zelf is dan al langs dezelfde optie gekomen in
+         kern/lidacties/ritten.js; hier gaat het alleen om het dispatchbord. */
+      const magZonder = zaak ? kern.optieAan(zaak, 'rittenZonderDoel') : false;
+      const b = kern.appbrug.opdrachtBijRit(r.ride, req.session, req.body || {}, vanaf, magZonder);
+      if (b.ok) { r.ride.opdrachtRef = b.ref; r.opdrachtRef = b.ref; }
+      else { r.ride.opdrachtReden = b.reden; r.opdrachtReden = b.reden; }
+      save();
+    }
     res.json(r);
   });
 

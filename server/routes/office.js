@@ -20,6 +20,7 @@ module.exports = (kern) => {
   require('./office/ondernemers')(octx);   // de ondernemerskant: regie, rechtsvormwacht, catalogus-wensen
   require('./office/instellingen')(octx);  // gemeente, luchthaven, OV en de andere interne genres aansluiten
   require('./office/toegang')(octx);
+  require('./office/anker')(octx);   // het anker: het ene getal dat naar buiten moet
   require('./office/werk')(octx);
   require('./office/bewaarverzoek')(octx);
   require('./office/concierge')(octx);

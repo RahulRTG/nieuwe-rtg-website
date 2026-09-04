@@ -127,6 +127,13 @@
   .praatrij{font-size:.92rem;line-height:1.45;}
   .praatrij .van{color:var(--zacht);margin-right:.35rem;}
   .praatrij.ik .van{color:var(--goud2);}
+
+  /* Uit inline style-attributen gehaald door scripts/inlinestijl-omzet.js (TAKEN.md 4.51). Bewezen gelijk met
+     scripts/inlinestijl-proef.js: elk element, elke aangeraakte eigenschap,
+     berekend in een echte browser. Letterlijk wat er stond -- geen ontwerpbesluit. */
+  .i-186m9v{width:100%}
+  .i-15bgfu{width:100%;margin-top:0.5rem}
+  .i-h7lf83{justify-content:center}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/dagkleur.css" rel="stylesheet">
@@ -217,9 +224,9 @@
       <div class="leeg" style="padding:.3rem 0 0;">Samen spelen maakt je niet automatisch vrienden; de ander accepteert zelf.</div>
       <div class="leeg" id="nProost" hidden style="padding:.3rem 0 0;">Proost is 18+: iedereen in het potje heeft een geverifieerde volwassen leeftijd nodig. Drink met mate; water doet ook gewoon mee.</div>
       <div class="leeg" id="nSeconden" hidden style="padding:.3rem 0 0;">30 Seconden speel je 2 tegen 2 (vier spelers): jij en speler 3 tegen speler 2 en 4. Omschrijven doe je via een belletje of aan tafel.</div>
-      <button class="knop" id="nStart" style="width:100%;margin-top:0.5rem;">Nodig uit en start</button>
+      <button class="i-15bgfu knop" id="nStart">Nodig uit en start</button>
       <div style="text-align:center;margin:0.5rem 0 0.25rem;color:var(--zacht);font-size:.8rem;">of</div>
-      <button class="knop grijs" id="nRandom" style="width:100%;">Random tegenstander</button>
+      <button class="i-186m9v knop grijs" id="nRandom">Random tegenstander</button>
       <div class="leeg" id="nFout"></div>
     </div>
   </section>
@@ -238,9 +245,9 @@
     <div id="sPesten" hidden>
       <div class="ptafel"><div class="pkaart rug" id="pStapel" title="Pak een kaart">RTG</div><div class="pkaart" id="pOpen"></div></div>
       <div class="pinfo" id="pInfo"></div>
-      <div class="keuzerij" id="pKleur" hidden style="justify-content:center;"></div>
+      <div class="i-h7lf83 keuzerij" id="pKleur" hidden></div>
       <div class="phand" id="pHand"></div>
-      <div class="knoprij"><button class="knop grijs" id="pPak" style="width:100%;">Pak een kaart</button></div>
+      <div class="knoprij"><button class="i-186m9v knop grijs" id="pPak">Pak een kaart</button></div>
     </div>
     <div id="sDam" hidden>
       <canvas class="bord" id="damBord" width="440" height="440"></canvas>
@@ -342,7 +349,7 @@
         <button class="knop grijs mini" id="npVoor">volgende &gt;</button>
         <button class="knop grijs mini" id="npLaatste" title="naar het eind">&gt;&#124;</button>
       </div>
-      <input type="range" id="npSchuif" min="0" max="0" value="0" style="width:100%;margin-top:0.5rem;" aria-label="Zet in de partij">
+      <input type="range" id="npSchuif" min="0" max="0" value="0" class="i-15bgfu" aria-label="Zet in de partij">
       <div class="klokrij" id="npStand"></div>
     </div>
   </section>
@@ -355,7 +362,7 @@
       <button class="knop grijs" id="ttL">◀</button><button class="knop grijs" id="ttR">⟳</button>
       <button class="knop grijs" id="ttRe">▶</button><button class="knop grijs" id="ttD">▼</button>
     </div>
-    <div class="knoprij"><button class="knop" id="ttStart" style="width:100%;">Start (of pijltjes)</button></div>
+    <div class="knoprij"><button class="i-186m9v knop" id="ttStart">Start (of pijltjes)</button></div>
     <div class="sec">Ranglijst onder vrienden</div>
     <div id="ttBordLijst"><div class="leeg">Nog geen scores.</div></div>
   </section>
@@ -369,7 +376,7 @@
     <div class="sec">Dagopgave <small>(dezelfde puzzel voor iedereen, vandaag)</small></div>
     <div id="suDag"><div class="leeg">Even kijken…</div></div>
     <div class="sec">Zelf een puzzel</div>
-    <div class="keuzerij" id="suNiveau" style="justify-content:center;"></div>
+    <div class="i-h7lf83 keuzerij" id="suNiveau"></div>
     <div class="sudoku" id="suGrid"></div>
     <div class="keuzerij" id="suCijfers" style="justify-content:center;margin-top:0.5rem;"></div>
     <div class="leeg" id="suInfo" style="text-align:center;">Kies een niveau en start.</div>
@@ -389,7 +396,7 @@
   <section id="vSneek" hidden>
     <div class="kop2"><h1>Sneek</h1><a class="terug" data-terug>← terug</a></div>
     <canvas class="bord" id="snBord" width="340" height="340"></canvas>
-    <div class="knoprij"><button class="knop" id="snStart" style="width:100%;">Start (pijltjes of vegen)</button></div>
+    <div class="knoprij"><button class="i-186m9v knop" id="snStart">Start (pijltjes of vegen)</button></div>
     <div class="sec">Ranglijst onder vrienden</div>
     <div id="snBordLijst"><div class="leeg">Nog geen scores.</div></div>
   </section>

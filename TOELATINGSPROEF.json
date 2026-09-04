@@ -1,0 +1,158 @@
+{
+  "stempel": "2026-09-03",
+  "uitleg": "De toelatingsketen van een zaak in een gereguleerd genre: aanvraag, bewijs, aftekenen, besluit, zaak, herkeuring. Gemeten per SCHAKEL (handelt actor A, en ziet actor B dat?) en per STORING (houdt de keten zijn belofte als het misgaat?). Derde keten naast tafelproef en ritproef -- zie MAATSTAF.md par. 7.",
+  "grens": "Alleen de zaakaanmelding in een gereguleerd genre; de ballotage van een LID en een vrij genre lopen anders. Geen browser. Dat het geld werkelijk binnenkomt is niet gemeten: de termijn wordt administratief afgetekend.",
+  "genre": "apotheek",
+  "schakels": [
+    {
+      "nr": 1,
+      "van": "aanvrager",
+      "naar": "kantoor",
+      "wat": "een aanvraag indienen zonder account, en die komt in de wachtrij van het kantoor",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "id 5ae15ba7, in de wachtrij: true",
+      "fout": null,
+      "ms": 19
+    },
+    {
+      "nr": 2,
+      "van": "kantoor",
+      "naar": "kantoor",
+      "wat": "de bewijsstand noemt het gevraagde stuk bij naam",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "stand: ontbreekt, eis: Uw aanvraag staat op de stapel. Uw zaak wordt klaargezet zodra een medewerker uw Register gevestigde apothekers en toepasselijke Farmatec-registratie heeft gezien.",
+      "fout": null,
+      "ms": 5
+    },
+    {
+      "nr": 3,
+      "van": "aanvrager",
+      "naar": "kantoor",
+      "wat": "het stuk indienen op het aanmeldnummer, en het kantoor ziet het als \"ingediend\"",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "stand na indienen: ingediend",
+      "fout": null,
+      "ms": 14
+    },
+    {
+      "nr": 4,
+      "van": "keurder",
+      "naar": "dossier",
+      "wat": "aftekenen op naam, en die naam staat daarna in het dossier",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "afgetekend door: user-1",
+      "fout": null,
+      "ms": 7
+    },
+    {
+      "nr": 5,
+      "van": "kantoor",
+      "naar": "aanvrager",
+      "wat": "het besluit over de pas landt op de aanmelding, met de naam erbij",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "status: geaccepteerd, besloten door: user-1",
+      "fout": null,
+      "ms": 31
+    },
+    {
+      "nr": 6,
+      "van": "kantoor",
+      "naar": "zaak",
+      "wat": "de eerste voldane termijn zet de zaak klaar",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "antwoord: {\"ok\":true,\"maand\":1,\"zaak\":{\"code\":\"PROEFZAAK\",\"staffId\":184,\"pin\":\"8214\"}}",
+      "fout": null,
+      "ms": 120
+    },
+    {
+      "nr": 7,
+      "van": "tijd",
+      "naar": "kantoor",
+      "wat": "een afgetekend stuk dat is verlopen, verschijnt op de herkeuringslijst",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "op de herkeuringslijst: true (1 rijen)",
+      "fout": null,
+      "ms": 26
+    }
+  ],
+  "storingen": [
+    {
+      "naam": "aftekenen vanaf de kale kantoorcode",
+      "belofte": "of het weigert, of het draagt de naam van een mens -- nooit een verzamelnaam",
+      "stand": "gehouden",
+      "wat": "status 400, naam: geen"
+    },
+    {
+      "naam": "een ingediend maar niet afgetekend stuk",
+      "belofte": "zet geen zaak klaar; een mens van RTG moet het gezien hebben",
+      "stand": "gehouden",
+      "wat": "antwoord: {\"status\":404,\"error\":\"Geen betaalschema voor deze aanmelding.\"}"
+    },
+    {
+      "naam": "twee keer aftekenen",
+      "belofte": "de tweede wordt geweigerd met een reden, en overschrijft de eerste nooit",
+      "stand": "gehouden",
+      "wat": "eerste 200, tweede 409 -- Dit stuk is al afgetekend."
+    },
+    {
+      "naam": "een stuk indienen waar het genre er geen vraagt",
+      "belofte": "wordt geweigerd met de mededeling dat het niet nodig is",
+      "stand": "gehouden",
+      "wat": "status 409 -- Voor dit genre is geen bewijs nodig."
+    },
+    {
+      "naam": "een aanmeldnummer raden op de publieke route",
+      "belofte": "levert geen gegevens over de aanvraag of de aanvrager",
+      "stand": "gehouden",
+      "wat": "status 404, antwoord: {\"status\":404,\"error\":\"Deze aanmelding bestaat niet.\"}"
+    },
+    {
+      "naam": "de wachtrij opvragen zonder kantoorcode",
+      "belofte": "wordt geweigerd en geeft geen lijst",
+      "stand": "gehouden",
+      "wat": "status 401"
+    },
+    {
+      "naam": "akkoord op een contractuele pas zonder afgesproken bedrag",
+      "belofte": "wordt geweigerd; een contractpas heeft geen lijstprijs om op terug te vallen",
+      "stand": "gehouden",
+      "wat": "status 403 -- Een Business Pass wordt alleen toegekend door een herleidbaar persoon. Log in met je eigen RTG-account (gekoppeld aan de backoffice) in plaats van met de gedeelde kantoorcode."
+    }
+  ],
+  "aanmelding": {
+    "id": "5ae15ba7",
+    "genre": "apotheek"
+  },
+  "wereld": {
+    "keurder": "ingelogd met het eigenaarsaccount (demostand); de gedeelde kantoorcode heeft geen naam en kan daarom niet aftekenen of beslissen -- zie storing 1 en 7",
+    "naamvorm": "de naam die in het dossier belandt is een SLEUTEL (user-1), geen mensennaam"
+  },
+  "verlopenId": "074f5724",
+  "telling": {
+    "schakels": 7,
+    "gesloten": 7,
+    "open": 0,
+    "openBekend": 0,
+    "stuk": 0,
+    "storingen": 7,
+    "gehouden": 7,
+    "gebroken": 0
+  },
+  "sluit": true,
+  "sluitMetBevinding": true,
+  "bevindingen": []
+}

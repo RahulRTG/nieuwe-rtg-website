@@ -21,7 +21,12 @@
     button,.button{min-height:44px;border:1px solid var(--gold);background:var(--gold);color:#0b0b0a;border-radius:0;padding:.72rem 1.15rem;font:700 .78rem Inter,sans-serif;cursor:pointer;text-decoration:none}button:disabled{opacity:.5;cursor:wait}.button.secondary{background:transparent;color:var(--text);border-color:var(--line)}
     .msg{display:none;margin-top:1rem;border:1px solid var(--line);border-radius:0;padding:.8rem 1rem;color:var(--muted);font-size:.82rem;line-height:1.55}.msg.on{display:block}.msg.bad{border-color:rgba(223,107,125,.45);color:#f2a0ad}.msg.good{border-color:rgba(120,183,138,.45);color:#a9d5b5}.steps{display:grid;gap:.8rem}.step{display:grid;grid-template-columns:2rem 1fr;gap:.7rem;align-items:start}.nr{width:2rem;height:2rem;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;color:var(--rtg-leesgoud,var(--gold));font:700 .72rem Inter}.step b{display:block;font-size:.84rem}.step span{display:block;color:var(--muted);font-size:.76rem;line-height:1.5;margin-top:.18rem}.status{margin-top:1rem;padding-top:1rem;border-top:1px solid var(--line)}.status-list{display:grid;gap:.55rem}.status-row{border:1px solid var(--line);border-radius:0;padding:.7rem}.status-row b{display:block;font-size:.82rem}.status-row span{color:var(--muted);font-size:.72rem}.pill{display:inline-block;margin-top:.35rem;border:1px solid var(--line);border-radius:0;padding:.14rem .5rem;color:var(--rtg-leesgoud,var(--gold))!important}
     @media(max-width:760px){.layout{grid-template-columns:1fr}.grid{grid-template-columns:1fr}.wide{grid-column:auto}}
-  </style>
+  
+  /* Uit inline style-attributen gehaald door scripts/inlinestijl-omzet.js (TAKEN.md 4.51). Bewezen gelijk met
+     scripts/inlinestijl-proef.js: elk element, elke aangeraakte eigenschap,
+     berekend in een echte browser. Letterlijk wat er stond -- geen ontwerpbesluit. */
+  .i-11ohe7{display:block;color:var(--muted);font-size:.75rem;margin-bottom:.4rem}
+</style>
 </head>
 <body data-osbar="Partner worden" data-oswereld="werk" data-osterug="apps/index.html">
   <header class="bar"><div class="brand">RTG <i>Partners</i></div><a href="/apps/index.html">Terug naar RTG OS</a></header>
@@ -46,12 +51,12 @@
             <label>E-mailadres<input name="email" type="email" maxlength="80" autocomplete="email" required></label>
             <label>Telefoon<input name="phone" maxlength="30" autocomplete="tel"></label>
             <label class="wide">Officiële bedrijfswebsite (optioneel)<input name="website" type="url" maxlength="240" placeholder="https://uwbedrijf.nl" autocomplete="url"></label>
-            <div class="wide"><span style="display:block;color:var(--muted);font-size:.75rem;margin-bottom:.4rem">Extra activiteiten</span><div class="checks">
+            <div class="wide"><span class="i-11ohe7">Extra activiteiten</span><div class="checks">
               <label class="check"><input name="voedsel" type="checkbox"><span>Voedsel of dranken</span></label>
               <label class="check"><input name="alcohol" type="checkbox"><span>Alcohol schenken</span></label>
               <label class="check"><input name="pakketreis" type="checkbox"><span>Pakketreizen verkopen</span></label>
             </div></div>
-            <div class="wide"><span style="display:block;color:var(--muted);font-size:.75rem;margin-bottom:.4rem">Wereldwijde handel</span><div class="checks">
+            <div class="wide"><span class="i-11ohe7">Wereldwijde handel</span><div class="checks">
               <label class="check"><input name="internationaleHandel" type="checkbox"><span>Internationaal inkopen of verkopen</span></label>
               <label class="check"><input name="goederen" type="checkbox"><span>Goederen over landsgrenzen</span></label>
               <label class="check"><input name="euBtw" type="checkbox"><span>Zakelijke EU-handel (btw/VIES)</span></label>

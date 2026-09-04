@@ -58,12 +58,12 @@ test('het vloerscherm toont de verdeling en draagt een wijk over',
     }
 
     const uitgelogd = await scherm();
-    await uitgelogd.goto(base + '/apps/horeca-vloer.html', { waitUntil: 'load' });
+    await uitgelogd.goto(base + '/apps/horeca-vloer.html', { waitUntil: 'domcontentloaded' });
     await uitgelogd.evaluate(() => {
       localStorage.setItem('rtg_cookieinfo_v1', '1');
       localStorage.removeItem('rtg_sup_token');
     });
-    await uitgelogd.goto(base + '/apps/horeca-vloer.html', { waitUntil: 'load' });
+    await uitgelogd.goto(base + '/apps/horeca-vloer.html', { waitUntil: 'domcontentloaded' });
     /* poort() tekent de deur in een setTimeout(0), dus hij staat er niet met de
        load al. WACHTEN OP DE DEUR ZELF EN NIET OP DE DISJUNCTIE VAN DE BEWERING:
        hier stond dezelfde `deur || /personeel|inlog|zaak/`-voorwaarde als in de
@@ -97,9 +97,9 @@ test('het vloerscherm toont de verdeling en draagt een wijk over',
     await post(base, '/api/gast/verzoek', { sleutel: aan.sleutel, soort: 'hulp', tekst: 'iets met VL1' });
 
     async function open(page, tok) {
-      await page.goto(base + '/apps/horeca-vloer.html', { waitUntil: 'load' });
+      await page.goto(base + '/apps/horeca-vloer.html', { waitUntil: 'domcontentloaded' });
       await page.evaluate(t => { localStorage.setItem('rtg_cookieinfo_v1', '1'); localStorage.setItem('rtg_sup_token', t); }, tok);
-      await page.goto(base + '/apps/horeca-vloer.html', { waitUntil: 'load' });
+      await page.goto(base + '/apps/horeca-vloer.html', { waitUntil: 'domcontentloaded' });
       /* Het scherm haalt zijn beeld zelf op (haal() onderaan vloer.js); tot dat
          antwoord binnen is staan de tellers nog op hun streepje uit de HTML.
          Zodra vOpen een getal draagt is teken() gelopen, en dan staan #vWijken,

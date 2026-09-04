@@ -77,5 +77,12 @@ module.exports = ({ kern }) => {
     return uit;
   }
 
-  return { objectlaag: { object, SOORTEN, CAPS } };
+  /* De objectPAGINA (./pagina.js): dezelfde tien secties over elke soort,
+     samengesteld uit bijdragers. Hij hangt HIER en niet ernaast, omdat hij
+     object() gebruikt en geen tweede weg naar de domeinen mag krijgen. */
+  const paginalaag = require('./pagina').maakPagina({
+    objectlaag: { object }, bijdragers: require('./paginabijdragers')() });
+
+  return { objectlaag: { object, SOORTEN, CAPS, pagina: paginalaag.pagina,
+    SECTIES: paginalaag.SECTIES, paginabijdragers: paginalaag.bijdragers } };
 };

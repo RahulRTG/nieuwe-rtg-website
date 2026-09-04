@@ -24,6 +24,8 @@
    één implementatie, per eigenaar één vak. */
 'use strict';
 
+const { NIVEAUS } = require('../frictie');
+
 /* De startregels van een zaak. Bewust een korte lijst: dit zijn de knoppen waar
    een ondernemer iets aan heeft, niet de volledige platformset. De grenzen voor
    risico staan er wel bij, want zonder die twee heeft "hand/assist/auto" hier
@@ -121,7 +123,7 @@ function maakZaakCommand({ db, save, crypto, anthropic, findSupplier, commGast }
       const bestaat = zaken.lijst({ max: 200 }).find(x => x.status !== zaken.KLAAR && x.bewijs && x.bewijs.signaal === sig.id);
       if (bestaat) return { zaak: bestaat, bestond: true };
       return { zaak: zaken.open({ titel: sig.nl, domein: sig.type, objectType: sig.objectId ? sig.type : null,
-        objectId: sig.objectId, oorzaak: sig.oorzaak, bron: 'signaal', door, niveau: 'hand',
+        objectId: sig.objectId, oorzaak: sig.oorzaak, bron: 'signaal', door, niveau: NIVEAUS.hand,
         reden: sig.beslissing, bewijs: { signaal: sig.id, niveau: sig.niveau, vraag: sig.beslissing } }) };
     }
 

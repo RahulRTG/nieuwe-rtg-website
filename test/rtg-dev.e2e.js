@@ -54,7 +54,7 @@ test('rtg dev in een echte browser', async (t) => {
     const pagina = await browser.newPage();
     const consolefouten = [];
     pagina.on('console', (m) => { if (m.type() === 'error') consolefouten.push(m.text()); });
-    await pagina.goto('http://localhost:' + POORT + '/', { waitUntil: 'load' });
+    await pagina.goto('http://localhost:' + POORT + '/', { waitUntil: 'domcontentloaded' });
 
     // 1 -- het kader draagt precies een sandbox-vlag en geen apparaatrechten
     const kader = pagina.locator('#cel');

@@ -64,7 +64,7 @@ test('de sprong: een tik naar elke functie, vanaf elk scherm', { skip: geenBrows
     await t.test('zonder ledensessie staat er geen greep', async () => {
       const ctx = await browser.newContext(TELEFOON);
       const page = await ctx.newPage();
-      await page.goto(srv.base + '/apps/leven.html', { waitUntil: 'load' });
+      await page.goto(srv.base + '/apps/leven.html', { waitUntil: 'domcontentloaded' });
       /* Wachten op een TOESTAND en niet op een klok (test/klokwacht.test.js):
          de sprong hangt zichzelf aan zodra hij draait, dus wachten we tot het
          script geladen is. Komt de greep er daarna alsnog, dan zakt de
@@ -82,7 +82,7 @@ test('de sprong: een tik naar elke functie, vanaf elk scherm', { skip: geenBrows
     const page = await ctx.newPage();
     /* Een gewoon ledenscherm dat app-main NIET laadt: juist daar bestond de
        korte weg niet, en juist daar moet hij nu staan. */
-    await page.goto(srv.base + '/apps/leven.html', { waitUntil: 'load' });
+    await page.goto(srv.base + '/apps/leven.html', { waitUntil: 'domcontentloaded' });
     await wachtOpGreep(page);
 
     await t.test('de greep staat er en is een duim groot', async () => {
@@ -148,7 +148,7 @@ test('de sprong: een tik naar elke functie, vanaf elk scherm', { skip: geenBrows
         page.locator('.rtgsprong-rij:visible').first().click()]);
       assert.equal(new URL(page.url()).pathname, '/apps/horeca.html',
         'een handeling brengt je naar het scherm waar hij woont');
-      await page.goto(srv.base + '/apps/leven.html', { waitUntil: 'load' });
+      await page.goto(srv.base + '/apps/leven.html', { waitUntil: 'domcontentloaded' });
       await wachtOpGreep(page);
       await page.locator('.rtgsprong-greep').click();
       await wachtTot(page, () => {
@@ -173,7 +173,7 @@ test('de sprong: een tik naar elke functie, vanaf elk scherm', { skip: geenBrows
          drukt, hoort de bovenste treffer te openen zonder de muis aan te raken.
          Deze toets ving ook een echte fout: de pijltjes werden aangehangen
          voordat de lijst bestond, en toen tekende de lade helemaal niets meer. */
-      await page.goto(srv.base + '/apps/leven.html', { waitUntil: 'load' });
+      await page.goto(srv.base + '/apps/leven.html', { waitUntil: 'domcontentloaded' });
       await wachtOpGreep(page);
       await page.locator('.rtgsprong-greep').click();
       await wachtTot(page, () => {

@@ -115,6 +115,11 @@
   .inlog a{color:var(--rtg-leesgoud,var(--gold));}
   .hint{color:var(--soft);font-size:.82rem;line-height:1.6;}
   @media(max-width:560px){ .kpis{grid-template-columns:1fr 1fr;} }
+
+  /* Uit inline style-attributen gehaald door scripts/inlinestijl-omzet.js (TAKEN.md 4.51). Bewezen gelijk met
+     scripts/inlinestijl-proef.js: elk element, elke aangeraakte eigenschap,
+     berekend in een echte browser. Letterlijk wat er stond -- geen ontwerpbesluit. */
+  .i-x8hihn{margin:0.25rem 0 0.75rem}
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
 </head>
@@ -138,7 +143,7 @@
 <!-- snel nieuws -->
 <div class="sheet" id="snelSheet"><div class="box">
   <h2>Snel nieuws plaatsen</h2>
-  <p class="hint" style="margin:0.25rem 0 0.75rem;">Schrijf kort en publiceer meteen. Je kunt het later bijschaven.</p>
+  <p class="i-x8hihn hint">Schrijf kort en publiceer meteen. Je kunt het later bijschaven.</p>
   <input class="veld" id="snTitel" maxlength="160" placeholder="Kop">
   <label class="lab">Rubriek</label><select id="snRubriek"></select>
   <label class="lab">Tekst</label><textarea id="snTekst" rows="5" maxlength="20000" placeholder="Wat is er gebeurd?"></textarea>
@@ -150,9 +155,9 @@
   <div id="snAI" class="hint h-mt60"></div>
 </div></div>
 <!-- blok-kiezer -->
-<div class="sheet" id="blokSheet"><div class="box"><h2>Nieuw blok</h2><div class="hint" style="margin:0.25rem 0 0.75rem;">Kies een blok voor je homepage.</div><div class="blokkies" id="blokkies"></div></div></div>
+<div class="sheet" id="blokSheet"><div class="box"><h2>Nieuw blok</h2><div class="i-x8hihn hint">Kies een blok voor je homepage.</div><div class="blokkies" id="blokkies"></div></div></div>
 <!-- beeld-kiezer -->
-<div class="sheet" id="beeldSheet"><div class="box"><h2>Kies beeld</h2><div class="hint" style="margin:0.25rem 0 0.75rem;">Eigen RTG-campagnebeeld. Geen stockfoto's.</div><div class="beeldgrid" id="beeldgrid"></div></div></div>
+<div class="sheet" id="beeldSheet"><div class="box"><h2>Kies beeld</h2><div class="i-x8hihn hint">Eigen RTG-campagnebeeld. Geen stockfoto's.</div><div class="beeldgrid" id="beeldgrid"></div></div></div>
 
 <div class="melding" id="melding" role="status"></div>
 

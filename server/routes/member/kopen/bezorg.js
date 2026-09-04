@@ -7,7 +7,7 @@ const { servicekostenVoor } = require('../../../kern/servicekosten');
 const bezorgvolg = require('../../../kern/bezorgvolg');
 module.exports = (kern) => {
   const { PERSONAS, app, auth, crypto, db, findPartner, findSupplier, magBezorgen, pickupCode,
-          publicPartner, save, schoon, salonZichtbaar, zorgVoor, orderMetRef, ordersVoegToe,
+          publicPartner, save, schoon, salonZichtbaar, zorgMee, orderMetRef, ordersVoegToe,
           gegevensStop } = kern;
 app.post('/api/partner', (req, res) => {
   const partner = findPartner(req.body.code);
@@ -73,7 +73,7 @@ app.post('/api/bezorg/bestel', auth, (req, res) => {
     ...(servicekosten ? { servicekosten } : {}),   // een lid krijgt geen veld, geen nul
     levering, adres, geo,
     allergyNote: schoon(req.body.note, 200),
-    zorg: zorgVoor(req.session.key),
+    zorg: zorgMee(req.session.key, { zaak: s.code, reden: 'zorgprofiel meegegeven bij een bestelling' }),
     betaalMoment: 'vooraf',
     status: 'wacht-op-betaling', paid: false, at: new Date().toISOString()
   };

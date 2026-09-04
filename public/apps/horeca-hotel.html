@@ -15,6 +15,22 @@
 <link href="/shared/ios.css" rel="stylesheet">
 <link href="/shared/workos-premium.css" rel="stylesheet">
 <link href="/shared/horeca-command.css" rel="stylesheet"><link href="/shared/horeca-enterprise-modules.css" rel="stylesheet"><script src="/shared/horeca-enterprise.js" defer></script>
+<style>
+  /* Dit scherm had geen eigen stijlblok, en dan heeft
+     scripts/inlinestijl-omzet.js nergens om zijn klassen neer te zetten: vijf
+     horeca-schermen kwamen daardoor als "omzetting mislukt" terug in plaats van
+     als bewezen of afgekeurd (TAKEN.md 4.51). */
+
+  /* Uit inline style-attributen gehaald door scripts/inlinestijl-omzet.js (TAKEN.md 4.51). Bewezen gelijk met
+     scripts/inlinestijl-proef.js: elk element, elke aangeraakte eigenschap,
+     berekend in een echte browser. Letterlijk wat er stond -- geen ontwerpbesluit. */
+  .i-12sbxv{flex:0 1 8rem}
+  .i-12sbaw{flex:0 1 7rem}
+  .i-12sa0x{flex:0 1 5rem}
+  .i-1trhhu{flex:0 1 11rem}
+  .i-1trguu{flex:0 1 10rem}
+  .i-12sckv{flex:0 1 9rem}
+</style>
 </head>
 <body class="rtg-stijl" data-rtg-eigenvlak="onyx" data-workos-premium data-workos-home="/apps/horeca.html">
 <header>
@@ -36,13 +52,13 @@
   <div class="kaart">
     <div class="kop">Kamer openen</div>
     <div class="rij">
-      <input class="veld" id="hKamer" maxlength="20" placeholder="Kamer" aria-label="Kamernummer" style="flex:0 1 7rem;">
+      <input class="i-12sbaw veld" id="hKamer" maxlength="20" placeholder="Kamer" aria-label="Kamernummer">
       <input class="veld" id="hGast" maxlength="60" placeholder="Naam van de gast" aria-label="Gastnaam">
-      <input class="veld" id="hGasten" type="number" min="1" max="20" value="2" aria-label="Aantal gasten" style="flex:0 1 5rem;">
-      <input class="veld" id="hVan" maxlength="10" placeholder="Van" aria-label="Aankomstdatum" style="flex:0 1 8rem;">
-      <input class="veld" id="hTot" maxlength="10" placeholder="Tot" aria-label="Vertrekdatum" style="flex:0 1 8rem;">
-      <input class="veld" id="hNachtprijs" type="number" min="0" step="0.01" placeholder="Nachtprijs" aria-label="Nachtprijs" style="flex:0 1 8rem;">
-      <input class="veld" id="hBelasting" type="number" min="0" step="0.01" placeholder="Toeristenbelasting p.p." aria-label="Toeristenbelasting per persoon" style="flex:0 1 11rem;">
+      <input class="i-12sa0x veld" id="hGasten" type="number" min="1" max="20" value="2" aria-label="Aantal gasten">
+      <input class="i-12sbxv veld" id="hVan" maxlength="10" placeholder="Van" aria-label="Aankomstdatum">
+      <input class="i-12sbxv veld" id="hTot" maxlength="10" placeholder="Tot" aria-label="Vertrekdatum">
+      <input class="i-12sbxv veld" id="hNachtprijs" type="number" min="0" step="0.01" placeholder="Nachtprijs" aria-label="Nachtprijs">
+      <input class="i-1trhhu veld" id="hBelasting" type="number" min="0" step="0.01" placeholder="Toeristenbelasting p.p." aria-label="Toeristenbelasting per persoon">
       <button class="knop p" id="hOpen" type="button">Openen</button>
       <button class="knop" id="hToon" type="button">Toon</button>
     </div>
@@ -53,13 +69,13 @@
     <div class="kop">De rekening</div>
     <div id="hDetail"><p class="stil">Kies een kamer.</p></div>
     <div class="rij h-mt60">
-      <select class="veld" id="hSoort" aria-label="Soort boeking" style="flex:0 1 10rem;"></select>
+      <select class="i-1trguu veld" id="hSoort" aria-label="Soort boeking"></select>
       <input class="veld" id="hOmschrijving" maxlength="100" placeholder="Omschrijving" aria-label="Omschrijving">
-      <input class="veld" id="hBedrag" type="number" min="0" step="0.01" placeholder="Bedrag" aria-label="Bedrag" style="flex:0 1 8rem;">
+      <input class="i-12sbxv veld" id="hBedrag" type="number" min="0" step="0.01" placeholder="Bedrag" aria-label="Bedrag">
       <button class="knop p" id="hBoek" type="button">Op de rekening</button>
     </div>
     <div class="rij h-mt60">
-      <select class="veld" id="hWijze" aria-label="Betaalwijze" style="flex:0 1 8rem;">
+      <select class="i-12sbxv veld" id="hWijze" aria-label="Betaalwijze">
         <option value="pin">Pin</option><option value="contant">Contant</option>
         <option value="online">Online</option><option value="rekening">Op rekening</option>
       </select>
@@ -70,7 +86,7 @@
   <div class="kaart">
     <div class="kop">Nachtrun</div>
     <div class="rij">
-      <input class="veld" id="hNachtDatum" maxlength="10" placeholder="Datum (leeg = vandaag)" aria-label="Datum van de nachtrun" style="flex:0 1 11rem;">
+      <input class="i-1trhhu veld" id="hNachtDatum" maxlength="10" placeholder="Datum (leeg = vandaag)" aria-label="Datum van de nachtrun">
       <button class="knop p" id="hNacht" type="button">Draaien</button>
     </div>
     <p class="stil h-mt40" id="hNachtUit"></p>
@@ -80,9 +96,9 @@
   <div class="kaart">
     <div class="kop">Borg</div>
     <div class="rij">
-      <input class="veld" id="hBorgBedrag" type="number" min="0" step="0.01" placeholder="Afgesproken borg" aria-label="Borgbedrag" style="flex:0 1 10rem;">
+      <input class="i-1trguu veld" id="hBorgBedrag" type="number" min="0" step="0.01" placeholder="Afgesproken borg" aria-label="Borgbedrag">
       <button class="knop" id="hBorg" type="button">Noteren</button>
-      <input class="veld" id="hBorgIn" type="number" min="0" step="0.01" placeholder="In te houden" aria-label="In te houden bedrag" style="flex:0 1 9rem;">
+      <input class="i-12sckv veld" id="hBorgIn" type="number" min="0" step="0.01" placeholder="In te houden" aria-label="In te houden bedrag">
       <input class="veld" id="hBorgReden" maxlength="160" placeholder="Reden van inhouding" aria-label="Reden van inhouding">
       <button class="knop" id="hBorgTerug" type="button">Afhandelen</button>
     </div>
@@ -93,21 +109,21 @@
   <div class="kaart">
     <div class="kop" id="sKop">Roomservice</div>
     <div class="rij">
-      <input class="veld" id="sKamer" maxlength="20" placeholder="Kamer" aria-label="Kamer voor roomservice" style="flex:0 1 7rem;">
-      <input class="veld" id="sGasten" type="number" min="1" max="20" value="1" aria-label="Aantal personen" style="flex:0 1 5rem;">
+      <input class="i-12sbaw veld" id="sKamer" maxlength="20" placeholder="Kamer" aria-label="Kamer voor roomservice">
+      <input class="i-12sa0x veld" id="sGasten" type="number" min="1" max="20" value="1" aria-label="Aantal personen">
       <button class="knop p" id="sOpen" type="button">Bestelling openen</button>
     </div>
     <div class="h-mt60" id="sLijst"></div>
     <div class="h-mt40" id="sDetail"></div>
     <div class="rij h-mt60">
       <input class="veld" id="sNaam" maxlength="80" placeholder="Wat wordt er besteld?" aria-label="Gerecht">
-      <input class="veld" id="sPrijs" type="number" min="0" step="0.01" placeholder="Prijs" aria-label="Prijs" style="flex:0 1 7rem;">
-      <input class="veld" id="sAantal" type="number" min="1" max="99" value="1" aria-label="Aantal" style="flex:0 1 5rem;">
-      <input class="veld" id="sAllergie" maxlength="120" placeholder="Allergie" aria-label="Allergie" style="flex:0 1 9rem;">
+      <input class="i-12sbaw veld" id="sPrijs" type="number" min="0" step="0.01" placeholder="Prijs" aria-label="Prijs">
+      <input class="i-12sa0x veld" id="sAantal" type="number" min="1" max="99" value="1" aria-label="Aantal">
+      <input class="i-12sckv veld" id="sAllergie" maxlength="120" placeholder="Allergie" aria-label="Allergie">
       <button class="knop p" id="sRegel" type="button">Zet erop</button>
     </div>
     <div class="rij h-mt60">
-      <input class="veld" id="sServeerOm" maxlength="5" placeholder="Serveren om" aria-label="Gewenste serveertijd" style="flex:0 1 8rem;">
+      <input class="i-12sbxv veld" id="sServeerOm" maxlength="5" placeholder="Serveren om" aria-label="Gewenste serveertijd">
       <button class="knop" id="sVrij" type="button">Naar de keuken</button>
       <button class="knop p" id="sOpKamer" type="button">Op de kamer boeken</button>
     </div>

@@ -49,7 +49,7 @@ test('De Salon: plaatsen, je eigen raster, reageren en een eerlijk einde aan de 
     const privePage = await priveContext.newPage();
     letOpFouten(privePage, fouten);
     await zetSessie(privePage);
-    await privePage.goto(base + '/apps/sociaal-prive.html', { waitUntil: 'load' });
+    await privePage.goto(base + '/apps/sociaal-prive.html', { waitUntil: 'domcontentloaded' });
     await privePage.waitForSelector('#privateRooms', { timeout: 10000 });
     const prive = await privePage.evaluate(() => ({
       pad: location.pathname,
@@ -69,7 +69,7 @@ test('De Salon: plaatsen, je eigen raster, reageren en een eerlijk einde aan de 
     const page = await browser.newPage();
     letOpFouten(page, fouten);
     await zetSessie(page);
-    await page.goto(base + '/apps/salon.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/salon.html', { waitUntil: 'domcontentloaded' });
 
     // 1. de feed komt op en houdt op bij de eerste bladzijde, met een knop
     await page.waitForSelector('[data-post]', { timeout: 15000 });

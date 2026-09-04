@@ -14,6 +14,8 @@
    heel is. Drie regels, niet dertig. */
 'use strict';
 
+const { NIVEAUS } = require('../frictie');
+
 /* Welke acties horen bij dit object, en op welk niveau staan ze nu? Hier komen
    het receptenboek van de zaak en de risicomotor bij elkaar; het objectdossier
    weet daardoor zelf niets van risico -- het krijgt de uitkomst. */
@@ -31,7 +33,7 @@ function maakActiesVoor({ catalogus, risico }) {
     }
     uit.push({ soort: 'zaak', id: 'zaak-openen', naam: 'Uitzondering openen',
       wat: 'Zet dit op de lijst, met een eigenaar en een termijn.', past: true,
-      niveau: 'hand', score: risico.beoordeel('zaak toewijzen', {}).score,
+      niveau: NIVEAUS.hand, score: risico.beoordeel('zaak toewijzen', {}).score,
       waarom: 'een uitzondering openen is altijd mensenwerk' });
     return uit;
   };

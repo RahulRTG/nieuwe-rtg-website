@@ -99,6 +99,30 @@ const SLEUTELS = {
      dingen zijn, en de schuldteller dat verschil hoort te zien. */
   'POST /api/office/anker': { leest: true },
   'POST /api/office/anker/reken': { leest: true },
+  /* De post naar de tweede machine (server/lib/ankerpost.js). Bijschrijven is
+     hier GEEN nevenwerking om tegen te houden: het anker is per ontwerp
+     append-only, en twee blokken achter elkaar zijn twee eerlijke momentopnamen
+     van dezelfde ketenkop. Wie de tweede opslikt, laat een anker missen. */
+  'POST /api/office/anker/post': { nietIdempotent: true,
+    waarom: 'brengt het blok van NU weg; twee keer wegbrengen zijn twee ankermomenten, en een laag die ' +
+      'de tweede opslikt maakt een gat in precies de reeks die kopafknipping zichtbaar moet maken' },
+  'POST /api/office/anker/post/reken': { leest: true },
+
+  /* De objectpagina (kern/objectlaag/pagina.js): tien secties over een object
+     dat de laag zelf niet bezit. Een POST die niets verandert. */
+  'POST /api/sociaal/object/pagina': { leest: true },
+
+  /* De correctie op een horecarekeningregel. GEEN `zelfdeVerzoek`, en dat is
+     een besluit: de route handelt de herhaling ZELF af met een 409 die de
+     bestaande correctie meegeeft ("dit is er al mee gebeurd, en door wie").
+     Zou de poort de tweede tik opslikken en het eerste antwoord teruggeven, dan
+     verdween juist die mededeling -- terwijl een medewerker die twee keer drukt
+     wil weten dat er al iets stond. De STAND na twee aanroepen is dezelfde als
+     na een (mutatiecontracten-horeca-correctie.js: PROTECTED, gemeten in
+     scripts/tafelproef.js storing 6); het ANTWOORD is met opzet anders. */
+  'POST /api/supplier/horeca/rekening/regel/corrigeer': { nietIdempotent: true,
+    waarom: 'de route weigert de tweede correctie zelf met een 409 die zegt wat er al is gebeurd; ' +
+      'de poort die tik laten opslikken zou die mededeling wegnemen bij precies de mens die hem nodig heeft' },
   'POST /api/office/handelingen': { leest: true },
   'POST /api/ik/workspace': { leest: true },
   'POST /api/ik/workspace/audit': { leest: true }

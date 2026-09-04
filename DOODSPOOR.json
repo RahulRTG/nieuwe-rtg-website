@@ -1,0 +1,7471 @@
+{
+  "stempel": "2026-09-03",
+  "uitleg": "Gemeten met scripts/doodspoor.js uit IDEMPROEF.json (wie raakt welke collectie aan, per rol) plus de brontekst (wie leest hem). Een handoff is gesloten, gezien, eigen of open; er is geen schaal. \"gezien\" is vermoed en \"open\" is geen oordeel over een route die niet gemeten is. Zie MAATSTAF.md par. 3.",
+  "grens": "Dit meet alleen handoffs die via een collectie lopen. Mail, sms en webhooks als ontvanger vallen erbuiten; eigenaar, termijn en verval van een stand ook (statuscontract, nog niet gebouwd). De eerste ronde is een meting en geen poort.",
+  "telling": {
+    "bronroutes": 282,
+    "gesloten": 65,
+    "gezien": 51,
+    "tussen": 18,
+    "terminaal": 56,
+    "besluit": 7,
+    "open": 85,
+    "openCollecties": 81
+  },
+  "perGroep": {
+    "consument": {
+      "bronroutes": 133,
+      "gesloten": 27,
+      "gezien": 20,
+      "tussen": 18,
+      "terminaal": 23,
+      "besluit": 0,
+      "open": 45
+    },
+    "aanbieder": {
+      "bronroutes": 70,
+      "gesloten": 26,
+      "gezien": 22,
+      "tussen": 0,
+      "terminaal": 3,
+      "besluit": 0,
+      "open": 19
+    },
+    "kantoor": {
+      "bronroutes": 79,
+      "gesloten": 12,
+      "gezien": 9,
+      "tussen": 0,
+      "terminaal": 30,
+      "besluit": 7,
+      "open": 21
+    },
+    "platform": {
+      "bronroutes": 0,
+      "gesloten": 0,
+      "gezien": 0,
+      "tussen": 0,
+      "terminaal": 0,
+      "besluit": 0,
+      "open": 0
+    }
+  },
+  "matrix": {
+    "consument": {
+      "aanbieder": 21,
+      "kantoor": 14,
+      "platform": 0
+    },
+    "aanbieder": {
+      "consument": 29,
+      "kantoor": 7,
+      "platform": 0
+    },
+    "kantoor": {
+      "consument": 12,
+      "aanbieder": 7,
+      "platform": 0
+    },
+    "platform": {
+      "consument": 0,
+      "aanbieder": 0,
+      "kantoor": 0
+    }
+  },
+  "nietGezien": {
+    "zonderRol": 255,
+    "nietGemeten": 3123,
+    "lezers": null
+  },
+  "infra": 14,
+  "terminaalVerklaard": 34,
+  "tussenVerklaard": 7,
+  "aangewezen": 1,
+  "tussenOngemeten": [
+    "contactPins -> POST /api/member/pin/zoek (de proef kreeg status 400)",
+    "contactPinRetired -> POST /api/member/pin/zoek (de proef kreeg status 400)",
+    "genootschap -> POST /api/genootschap/binnen (de proef kreeg status 400)"
+  ],
+  "verlopen": {
+    "terminaal": [],
+    "tussen": [],
+    "besluit": [],
+    "tegenroute": [],
+    "infra": [],
+    "ontvanger": []
+  },
+  "openCollecties": [
+    {
+      "collectie": "concern",
+      "bronroutes": 5
+    },
+    {
+      "collectie": "labFonds",
+      "bronroutes": 2
+    },
+    {
+      "collectie": "ondernemingen",
+      "bronroutes": 2
+    },
+    {
+      "collectie": "rendezvous",
+      "bronroutes": 2
+    },
+    {
+      "collectie": "spellen",
+      "bronroutes": 2
+    },
+    {
+      "collectie": "wallet",
+      "bronroutes": 2
+    },
+    {
+      "collectie": "werkruimtes",
+      "bronroutes": 2
+    },
+    {
+      "collectie": "appInstallaties",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "atelierSites",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "bedrijfsWensen",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "betaalVerzoeken",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "campagnes",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "commandZaken",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "drmRapport",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "economie",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "economischeRuntime",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "experiencePlatform",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "facturen",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "festivals",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "fiscaalJaargangen",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "fiscaalRegels",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "gebouwPand",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "gebouwPlus",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "gemeenteAanslagen",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "gemeenteMeldingen",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "groeigesprekken",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "handelsRegelwacht",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "homekit",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "ideeen",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "instantReality",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "kantoorTaken",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "klets",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "ledenBoard",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "magnaatBrug",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "mallLijsten",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "mallVraag",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "mediaBieb",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "mediaKamers",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "mediaLijsten",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "mediaMeldingen",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "metier",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "muziek",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "onderwijs",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "payCodes",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "payrollRegelJournaal",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "payrollRegels",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "payTegoed",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "payTikCodes",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "payTreasury",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "pulse",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "punten",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "rechtsvormRegels",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "reisInstallaties",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "reisInvoer",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "rijkBekend",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "rijkKvk",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "rijksInstallaties",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "rijkVerkiezing",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "rijkZaken",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "rtfAppInstallaties",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "rtfKantoorTaken",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "rtgid",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "rtgOne",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "samenKamers",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "spelTeams",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "stadMetingen",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "stadNodes",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "stadPaspoort",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "stadRegie",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "toestellen",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "veilig",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "vonk",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "weefsel",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "weefselKenmerk",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "weefselOrganen",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "weefselWerk",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "werkbeleid",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "werkmail",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "werkplaats",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "werkplekToegang",
+      "bronroutes": 1
+    },
+    {
+      "collectie": "zorgProfielen",
+      "bronroutes": 1
+    }
+  ],
+  "perCollectie": [
+    {
+      "collectie": "aanwezig",
+      "bronnen": 2,
+      "stand": "gezien",
+      "graad": "vermoed",
+      "zetStand": {},
+      "leest": {
+        "consument": [
+          "POST /api/notifications",
+          "POST /api/notifications/read",
+          "POST /api/push/subscribe",
+          "POST /api/talen",
+          "POST /api/translate",
+          "POST /api/vertaal/ui",
+          "POST /api/zegel/controleer",
+          "POST /api/zegel/maak"
+        ]
+      },
+      "reden": null
+    },
+    {
+      "collectie": "accountRollen",
+      "bronnen": 1,
+      "stand": "gezien",
+      "graad": "vermoed",
+      "zetStand": {},
+      "leest": {
+        "kantoor": [
+          "POST /api/office/mail/opnieuw",
+          "POST /api/office/mail/origineel",
+          "POST /api/office/mail/uit",
+          "POST /api/office/mail/wachtrij",
+          "POST /api/office/mail/werk"
+        ],
+        "aanbieder": [
+          "POST /api/supplier/aanwezig",
+          "POST /api/supplier/aanwezig/leeg",
+          "POST /api/supplier/aanwezig/pas",
+          "POST /api/supplier/mall",
+          "POST /api/supplier/mall/aanvraag/reageer",
+          "POST /api/supplier/mall/aanvragen",
+          "POST /api/supplier/mall/collectie/weg",
+          "POST /api/supplier/mall/collectie/zet",
+          "POST /api/supplier/mall/collecties",
+          "POST /api/supplier/mall/sync",
+          "POST /api/supplier/notifications/read",
+          "POST /api/supplier/pr/nieuwsbrief",
+          "POST /api/supplier/pr/overzicht",
+          "POST /api/supplier/pr/plan",
+          "POST /api/supplier/pr/plan/weg",
+          "POST /api/supplier/rtmail/afwezig",
+          "POST /api/supplier/rtmail/alias",
+          "POST /api/supplier/rtmail/antwoord",
+          "POST /api/supplier/rtmail/assist",
+          "POST /api/supplier/rtmail/bewaarbeleid",
+          "POST /api/supplier/rtmail/bewaartermijn",
+          "POST /api/supplier/rtmail/bewaring",
+          "POST /api/supplier/rtmail/bijlage",
+          "POST /api/supplier/rtmail/bijlagen",
+          "POST /api/supplier/rtmail/btw-herinner",
+          "POST /api/supplier/rtmail/concept/bewaar",
+          "POST /api/supplier/rtmail/concept/verstuur",
+          "POST /api/supplier/rtmail/concept/weg",
+          "POST /api/supplier/rtmail/concepten",
+          "POST /api/supplier/rtmail/delegatie/weg",
+          "POST /api/supplier/rtmail/delegeer",
+          "POST /api/supplier/rtmail/draad",
+          "POST /api/supplier/rtmail/etiket",
+          "POST /api/supplier/rtmail/export",
+          "POST /api/supplier/rtmail/gesprekken",
+          "POST /api/supplier/rtmail/handtekening",
+          "POST /api/supplier/rtmail/hulp",
+          "POST /api/supplier/rtmail/imap/intrekken",
+          "POST /api/supplier/rtmail/imap/sleutel",
+          "POST /api/supplier/rtmail/imap/sleutels",
+          "POST /api/supplier/rtmail/inbox",
+          "POST /api/supplier/rtmail/inkoop",
+          "POST /api/supplier/rtmail/instellingen",
+          "POST /api/supplier/rtmail/journaal",
+          "POST /api/supplier/rtmail/lees",
+          "POST /api/supplier/rtmail/ongelezen",
+          "POST /api/supplier/rtmail/opruimen",
+          "POST /api/supplier/rtmail/rechten",
+          "POST /api/supplier/rtmail/regel/maak",
+          "POST /api/supplier/rtmail/regel/weg",
+          "POST /api/supplier/rtmail/regel/zet",
+          "POST /api/supplier/rtmail/regels",
+          "POST /api/supplier/rtmail/sluimer",
+          "POST /api/supplier/rtmail/ster",
+          "POST /api/supplier/rtmail/stuur",
+          "POST /api/supplier/rtmail/vak",
+          "POST /api/supplier/rtmail/vernietigingen",
+          "POST /api/supplier/rtmail/verplaats",
+          "POST /api/supplier/rtmail/verzonden",
+          "POST /api/supplier/rtmail/zoek",
+          "POST /api/supplier/schedule",
+          "POST /api/supplier/state",
+          "POST /api/supplier/team/message",
+          "POST /api/supplier/tijdzone",
+          "POST /api/supplier/vooruit",
+          "POST /api/supplier/vooruit/post",
+          "POST /api/supplier/vooruit/post/neem",
+          "POST /api/supplier/vooruit/post/negeer",
+          "POST /api/supplier/zegel/check"
+        ]
+      },
+      "reden": null
+    },
+    {
+      "collectie": "agendas",
+      "bronnen": 4,
+      "stand": "gesloten",
+      "graad": "gemeten",
+      "zetStand": {
+        "aanbieder": [
+          "POST /api/supplier/agenda/ai",
+          "POST /api/supplier/agenda/toevoegen"
+        ]
+      },
+      "leest": {
+        "aanbieder": [
+          "POST /api/supplier/aanwezig",
+          "POST /api/supplier/aanwezig/leeg",
+          "POST /api/supplier/aanwezig/pas",
+          "POST /api/supplier/zegel/check"
+        ]
+      },
+      "reden": "de eigen agenda van een lid (LIVING); een afspraak MET iemand loopt via sociaal"
+    },
+    {
+      "collectie": "aiTegoed",
+      "bronnen": 2,
+      "stand": "gesloten",
+      "graad": "gemeten",
+      "zetStand": {
+        "kantoor": [
+          "POST /api/office/rechtsvormwacht"
+        ]
+      },
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "apiPoort",
+      "bronnen": 1,
+      "stand": "terminaal",
+      "graad": "huis",
+      "zetStand": {},
+      "leest": {},
+      "reden": "de stand van de eigen API-poort (kern/command/apipoort.js)"
+    },
+    {
+      "collectie": "appInstallaties",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "appstore",
+      "bronnen": 7,
+      "stand": "gesloten",
+      "graad": "gemeten",
+      "zetStand": {
+        "kantoor": [
+          "POST /api/appstore/kantoor/afdracht",
+          "POST /api/appstore/kantoor/hercontrole"
+        ]
+      },
+      "leest": {},
+      "reden": "de eigen tijdlijn en machtigingen van een lid (APPSTORE.md: het dossier staat bij het LID)"
+    },
+    {
+      "collectie": "architect",
+      "bronnen": 2,
+      "stand": "terminaal",
+      "graad": "huis",
+      "zetStand": {},
+      "leest": {},
+      "reden": "het RTG Architectenbureau (kern/architect/); concept en chefsblik komen uit dezelfde module, er wacht niemand op"
+    },
+    {
+      "collectie": "atelier",
+      "bronnen": 2,
+      "stand": "terminaal",
+      "graad": "huis",
+      "zetStand": {},
+      "leest": {},
+      "reden": "RTG Atelier (draagbaar); zelfde vorm als architect"
+    },
+    {
+      "collectie": "atelierSites",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "bankBoekingen",
+      "bronnen": 1,
+      "stand": "terminaal",
+      "graad": "boeking",
+      "zetStand": {},
+      "leest": {},
+      "reden": "de grootboekregels van de bank"
+    },
+    {
+      "collectie": "bankPassen",
+      "bronnen": 3,
+      "stand": "terminaal",
+      "graad": "mens",
+      "zetStand": {},
+      "leest": {},
+      "reden": "de eigen pas van een lid: bevriezen en limiet zijn eigen instellingen; uitgeven loopt via de poort"
+    },
+    {
+      "collectie": "bankregie",
+      "bronnen": 4,
+      "stand": "terminaal",
+      "graad": "huis",
+      "zetStand": {},
+      "leest": {},
+      "reden": "de regie over de ledenbank door RTG zelf (draaien, noodstand); de LEDEN zien het resultaat via hun eigen rekening, en die staat apart"
+    },
+    {
+      "collectie": "bankRekeningen",
+      "bronnen": 2,
+      "stand": "gezien",
+      "graad": "vermoed",
+      "zetStand": {},
+      "leest": {
+        "kantoor": [
+          "POST /api/office/bank/regels",
+          "POST /api/office/bank/regels/check",
+          "POST /api/office/bank/regels/geraakt",
+          "POST /api/office/bank/regels/geschiedenis",
+          "POST /api/office/bank/regels/update",
+          "POST /api/office/bank/regels/zzp",
+          "POST /api/office/bank/regels/zzp/update"
+        ],
+        "aanbieder": [
+          "POST /api/supplier/bank/zakelijk"
+        ]
+      },
+      "reden": "de eigen rekening en spaardoelen van een lid"
+    },
+    {
+      "collectie": "bankSaldi",
+      "bronnen": 1,
+      "stand": "terminaal",
+      "graad": "boeking",
+      "zetStand": {},
+      "leest": {},
+      "reden": "de saldopositie van de bank"
+    },
+    {
+      "collectie": "bankTerugkerend",
+      "bronnen": 1,
+      "stand": "terminaal",
+      "graad": "mens",
+      "zetStand": {},
+      "leest": {},
+      "reden": "eigen terugkerende overboekingen; de uitvoering loopt via bankBoekingen"
+    },
+    {
+      "collectie": "bedrijfsWensen",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "betaalVerzoeken",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "bijles",
+      "bronnen": 2,
+      "stand": "gezien",
+      "graad": "vermoed",
+      "zetStand": {},
+      "leest": {
+        "aanbieder": [
+          "POST /api/supplier/aanwezig",
+          "POST /api/supplier/aanwezig/leeg",
+          "POST /api/supplier/aanwezig/pas",
+          "POST /api/supplier/zegel/check"
+        ]
+      },
+      "reden": null
+    },
+    {
+      "collectie": "boardroom",
+      "bronnen": 2,
+      "stand": "terminaal",
+      "graad": "huis",
+      "zetStand": {},
+      "leest": {},
+      "reden": "de uitrolregie van RTG zelf (kern/command/uitrolregie.js)"
+    },
+    {
+      "collectie": "boeken",
+      "bronnen": 1,
+      "stand": "terminaal",
+      "graad": "mens",
+      "zetStand": {},
+      "leest": {},
+      "reden": "de leesvoortgang van een lid"
+    },
+    {
+      "collectie": "campagnes",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "commandAgents",
+      "bronnen": 2,
+      "stand": "terminaal",
+      "graad": "huis",
+      "zetStand": {},
+      "leest": {},
+      "reden": "de agenten van de ops-cockpit met hun laatste teken (kern/command/toezicht.js)"
+    },
+    {
+      "collectie": "commandAlarmen",
+      "bronnen": 2,
+      "stand": "gesloten",
+      "graad": "gemeten",
+      "zetStand": {
+        "consument": [
+          "POST /api/member/unblock"
+        ]
+      },
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "commandBeleid",
+      "bronnen": 1,
+      "stand": "terminaal",
+      "graad": "huis",
+      "zetStand": {},
+      "leest": {},
+      "reden": "de eigen grenzen van de cockpit (kern/command/beleid.js); een instelling wacht op niemand"
+    },
+    {
+      "collectie": "commandPlannen",
+      "bronnen": 1,
+      "stand": "terminaal",
+      "graad": "huis",
+      "zetStand": {},
+      "leest": {},
+      "reden": "de plannen van de operator (kern/command/operator.js); uitvoeren gaat langs de transactiepoorten"
+    },
+    {
+      "collectie": "commandZaken",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "concern",
+      "bronnen": 5,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "contactPinRetired",
+      "bronnen": 1,
+      "stand": "tussen",
+      "graad": "verklaard",
+      "zetStand": {},
+      "leest": {},
+      "reden": "een ingetrokken pin blijft opzoekbaar zodat een oude code niet stil bij iemand anders uitkomt"
+    },
+    {
+      "collectie": "contactPins",
+      "bronnen": 3,
+      "stand": "tussen",
+      "graad": "verklaard",
+      "zetStand": {},
+      "leest": {},
+      "reden": "een lid geeft zijn RTG-code, een ander zoekt hem op (LINK.md); de pin-deur is de ontvanger"
+    },
+    {
+      "collectie": "creatorOproepen",
+      "bronnen": 1,
+      "stand": "gezien",
+      "graad": "vermoed",
+      "zetStand": {},
+      "leest": {
+        "consument": [
+          "POST /api/notifications",
+          "POST /api/notifications/read",
+          "POST /api/push/subscribe",
+          "POST /api/talen",
+          "POST /api/translate",
+          "POST /api/vertaal/ui",
+          "POST /api/zegel/controleer",
+          "POST /api/zegel/maak"
+        ]
+      },
+      "reden": null
+    },
+    {
+      "collectie": "drmRapport",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "economie",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "economischeRuntime",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "experiencePlatform",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "facturen",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "festivals",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "fiscaalJaargangen",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "fiscaalRegels",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "fluister",
+      "bronnen": 5,
+      "stand": "terminaal",
+      "graad": "mens",
+      "zetStand": {},
+      "leest": {},
+      "reden": "het geheugen van Rahul over een lid -- weetjes die het lid zelf vertelde en de focus die het zelf opbouwde (kern/fluister.js: \"allebei van de gebruiker zelf\", wisbaar per stuk)"
+    },
+    {
+      "collectie": "gebouwPand",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "gebouwPlus",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "gedachten",
+      "bronnen": 1,
+      "stand": "terminaal",
+      "graad": "mens",
+      "zetStand": {},
+      "leest": {},
+      "reden": "het gedachtenboek; met opzet ongedeeld"
+    },
+    {
+      "collectie": "geldbeleid",
+      "bronnen": 1,
+      "stand": "terminaal",
+      "graad": "mens",
+      "zetStand": {},
+      "leest": {},
+      "reden": "de eigen geldgrens van een lid (kern/geldbeleid/grens.js); die weigert, en weigeren is geen overdracht"
+    },
+    {
+      "collectie": "gemeenteAanslagen",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "gemeenteMeldingen",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "genootschap",
+      "bronnen": 3,
+      "stand": "tussen",
+      "graad": "verklaard",
+      "zetStand": {},
+      "leest": {},
+      "reden": "lid A richt een genootschap op en nodigt uit, lid B komt binnen -- twee mensen, en de tweede handeling heeft een eigen route"
+    },
+    {
+      "collectie": "gewoonten",
+      "bronnen": 1,
+      "stand": "terminaal",
+      "graad": "mens",
+      "zetStand": {},
+      "leest": {},
+      "reden": "de eigen gewoonten van een lid; er is geen tweede partij die ze bijhoudt"
+    },
+    {
+      "collectie": "giftcards",
+      "bronnen": 1,
+      "stand": "gezien",
+      "graad": "vermoed",
+      "zetStand": {},
+      "leest": {
+        "consument": [
+          "POST /api/giftcard/buy",
+          "POST /api/giftcards/mine",
+          "POST /api/member/accountant",
+          "POST /api/member/apps",
+          "POST /api/member/zzp",
+          "POST /api/notifications",
+          "POST /api/notifications/read",
+          "POST /api/push/subscribe",
+          "POST /api/state",
+          "POST /api/talen",
+          "POST /api/translate",
+          "POST /api/vertaal/ui",
+          "POST /api/zegel/controleer",
+          "POST /api/zegel/maak"
+        ]
+      },
+      "reden": null
+    },
+    {
+      "collectie": "groeigesprekken",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "handelsRegelwacht",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "hardware",
+      "bronnen": 2,
+      "stand": "terminaal",
+      "graad": "huis",
+      "zetStand": {},
+      "leest": {},
+      "reden": "het RTG Hardwarelab (apparaten); zelfde vorm als architect"
+    },
+    {
+      "collectie": "homekit",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "horeca",
+      "bronnen": 16,
+      "stand": "gezien",
+      "graad": "vermoed",
+      "zetStand": {},
+      "leest": {
+        "consument": [
+          "POST /api/arrival/interpret",
+          "POST /api/arrival/request",
+          "POST /api/gast/eten/beoordeel",
+          "POST /api/gast/eten/concierge",
+          "POST /api/gast/eten/ontdekken",
+          "POST /api/gast/eten/probleem",
+          "POST /api/gast/eten/zoeken"
+        ]
+      },
+      "reden": null
+    },
+    {
+      "collectie": "horecaMissies",
+      "bronnen": 1,
+      "stand": "gezien",
+      "graad": "vermoed",
+      "zetStand": {},
+      "leest": {
+        "consument": [
+          "POST /api/arrival/interpret",
+          "POST /api/arrival/request"
+        ]
+      },
+      "reden": null
+    },
+    {
+      "collectie": "ideeen",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "instantReality",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "kantoorTaken",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "klets",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "klok",
+      "bronnen": 1,
+      "stand": "gezien",
+      "graad": "vermoed",
+      "zetStand": {},
+      "leest": {
+        "aanbieder": [
+          "POST /api/staff/call",
+          "POST /api/staff/clock",
+          "POST /api/staff/dm/history",
+          "POST /api/staff/dm/lijst",
+          "POST /api/staff/dm/send",
+          "POST /api/staff/klok/correctie",
+          "POST /api/staff/klok/overzicht",
+          "POST /api/staff/leave/request",
+          "POST /api/staff/mine",
+          "POST /api/staff/pauze",
+          "POST /api/supplier/aandacht",
+          "POST /api/supplier/aandacht/klaar",
+          "POST /api/supplier/aanwezig",
+          "POST /api/supplier/aanwezig/leeg",
+          "POST /api/supplier/aanwezig/pas",
+          "POST /api/supplier/agent",
+          "POST /api/supplier/agent/beslis",
+          "POST /api/supplier/agent/koppel",
+          "POST /api/supplier/agent/voorstel",
+          "POST /api/supplier/backoffice",
+          "POST /api/supplier/belasting",
+          "POST /api/supplier/coach",
+          "POST /api/supplier/horeca/arrival/promise",
+          "POST /api/supplier/horeca/arrivals",
+          "POST /api/supplier/horeca/handover/accept",
+          "POST /api/supplier/horeca/handover/start",
+          "POST /api/supplier/horeca/missions",
+          "POST /api/supplier/horeca/missions/activeer",
+          "POST /api/supplier/horeca/missions/status",
+          "POST /api/supplier/horeca/missions/voorstel",
+          "POST /api/supplier/horeca/recovery/beslis",
+          "POST /api/supplier/horeca/recovery/open",
+          "POST /api/supplier/horeca/spatial",
+          "POST /api/supplier/horeca/venue/concept",
+          "POST /api/supplier/horeca/venue/publiceer",
+          "POST /api/supplier/horeca/wave/activeer",
+          "POST /api/supplier/horeca/wave/voorstel",
+          "POST /api/supplier/mall",
+          "POST /api/supplier/mall/aanvraag/reageer",
+          "POST /api/supplier/mall/aanvragen",
+          "POST /api/supplier/mall/collectie/weg",
+          "POST /api/supplier/mall/collectie/zet",
+          "POST /api/supplier/mall/collecties",
+          "POST /api/supplier/mall/sync",
+          "POST /api/supplier/notifications/read",
+          "POST /api/supplier/rooster/beslis",
+          "POST /api/supplier/rooster/voorstel",
+          "POST /api/supplier/schedule",
+          "POST /api/supplier/state",
+          "POST /api/supplier/team/message",
+          "POST /api/supplier/tijdzone",
+          "POST /api/supplier/training",
+          "POST /api/supplier/training/add",
+          "POST /api/supplier/training/gelezen",
+          "POST /api/supplier/training/remove",
+          "POST /api/supplier/zegel/check"
+        ]
+      },
+      "reden": null
+    },
+    {
+      "collectie": "labFonds",
+      "bronnen": 2,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "ledenBoard",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "ledenSites",
+      "bronnen": 2,
+      "stand": "gesloten",
+      "graad": "gemeten",
+      "zetStand": {
+        "aanbieder": [
+          "POST /api/supplier/site/bewaar"
+        ]
+      },
+      "leest": {
+        "aanbieder": [
+          "POST /api/supplier/aanwezig",
+          "POST /api/supplier/aanwezig/leeg",
+          "POST /api/supplier/aanwezig/pas",
+          "POST /api/supplier/zegel/check"
+        ]
+      },
+      "reden": null
+    },
+    {
+      "collectie": "leren",
+      "bronnen": 3,
+      "stand": "terminaal",
+      "graad": "mens",
+      "zetStand": {},
+      "leest": {},
+      "reden": "wat een lid zelf oefent, herhaalt en opschrijft (kern/levensgraaf); School houdt vast aan \"leren is geen wedstrijd\", dus er is ook geen tweede partij die het beoordeelt"
+    },
+    {
+      "collectie": "levensbeleid",
+      "bronnen": 1,
+      "stand": "terminaal",
+      "graad": "mens",
+      "zetStand": {},
+      "leest": {},
+      "reden": "de eigen keuzes van een lid in LEVEN.md; sturen mag daar juist niet"
+    },
+    {
+      "collectie": "lifestyle",
+      "bronnen": 12,
+      "stand": "gezien",
+      "graad": "aangewezen",
+      "zetStand": {},
+      "leest": {
+        "kantoor": [
+          "POST /api/office/concierge"
+        ]
+      },
+      "reden": null
+    },
+    {
+      "collectie": "live",
+      "bronnen": 2,
+      "stand": "gezien",
+      "graad": "vermoed",
+      "zetStand": {},
+      "leest": {
+        "aanbieder": [
+          "POST /api/supplier/aanwezig",
+          "POST /api/supplier/aanwezig/leeg",
+          "POST /api/supplier/aanwezig/pas",
+          "POST /api/supplier/betaalverzoek",
+          "POST /api/supplier/betaalverzoek/intrek",
+          "POST /api/supplier/chat/history",
+          "POST /api/supplier/chat/send",
+          "POST /api/supplier/guest/connect",
+          "POST /api/supplier/klant/salon",
+          "POST /api/supplier/mall",
+          "POST /api/supplier/mall/aanvraag/reageer",
+          "POST /api/supplier/mall/aanvragen",
+          "POST /api/supplier/mall/collectie/weg",
+          "POST /api/supplier/mall/collectie/zet",
+          "POST /api/supplier/mall/collecties",
+          "POST /api/supplier/mall/sync",
+          "POST /api/supplier/notifications/read",
+          "POST /api/supplier/ontvangsten",
+          "POST /api/supplier/schedule",
+          "POST /api/supplier/state",
+          "POST /api/supplier/team/message",
+          "POST /api/supplier/tijdzone",
+          "POST /api/supplier/zegel/check"
+        ]
+      },
+      "reden": null
+    },
+    {
+      "collectie": "livingLab",
+      "bronnen": 8,
+      "stand": "gezien",
+      "graad": "vermoed",
+      "zetStand": {},
+      "leest": {
+        "consument": [
+          "POST /api/notifications",
+          "POST /api/notifications/read",
+          "POST /api/push/subscribe",
+          "POST /api/talen",
+          "POST /api/translate",
+          "POST /api/vertaal/ui",
+          "POST /api/zegel/controleer",
+          "POST /api/zegel/maak"
+        ],
+        "aanbieder": [
+          "POST /api/supplier/aanwezig",
+          "POST /api/supplier/aanwezig/leeg",
+          "POST /api/supplier/aanwezig/pas",
+          "POST /api/supplier/zegel/check"
+        ]
+      },
+      "reden": null
+    },
+    {
+      "collectie": "magnaatBrug",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "mailSleutels",
+      "bronnen": 2,
+      "stand": "gesloten",
+      "graad": "gemeten",
+      "zetStand": {
+        "aanbieder": [
+          "POST /api/supplier/rtmail/imap/sleutel"
+        ]
+      },
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "mallLijsten",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "mallVraag",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "mediaBieb",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "mediaKamers",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "mediaLijsten",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "mediaMeldingen",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "meetKamers",
+      "bronnen": 1,
+      "stand": "gezien",
+      "graad": "vermoed",
+      "zetStand": {},
+      "leest": {
+        "aanbieder": [
+          "POST /api/supplier/aanwezig",
+          "POST /api/supplier/aanwezig/leeg",
+          "POST /api/supplier/aanwezig/pas",
+          "POST /api/supplier/zegel/check"
+        ]
+      },
+      "reden": null
+    },
+    {
+      "collectie": "metier",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "muziek",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "noodkaarten",
+      "bronnen": 1,
+      "stand": "terminaal",
+      "graad": "mens",
+      "zetStand": {},
+      "leest": {},
+      "reden": "de eigen noodkaart van een lid; het DELEN ervan is een aparte handeling met een eigen route"
+    },
+    {
+      "collectie": "notifications",
+      "bronnen": 1,
+      "stand": "gezien",
+      "graad": "vermoed",
+      "zetStand": {},
+      "leest": {
+        "consument": [
+          "POST /api/member/apps",
+          "POST /api/notifications",
+          "POST /api/notifications/read",
+          "POST /api/privacy/export",
+          "POST /api/privacy/inzage",
+          "POST /api/push/subscribe",
+          "POST /api/state",
+          "POST /api/supplier/apply",
+          "POST /api/talen",
+          "POST /api/translate",
+          "POST /api/vertaal/ui",
+          "POST /api/zegel/controleer",
+          "POST /api/zegel/maak"
+        ]
+      },
+      "reden": null
+    },
+    {
+      "collectie": "officeDocs",
+      "bronnen": 20,
+      "stand": "gesloten",
+      "graad": "gemeten",
+      "zetStand": {
+        "kantoor": [
+          "POST /api/office/kantoorpakket/beheer",
+          "POST /api/office/kantoorpakket/bewaar",
+          "POST /api/office/kantoorpakket/deel",
+          "POST /api/office/kantoorpakket/maak",
+          "POST /api/office/kantoorpakket/opmerking",
+          "POST /api/office/kantoorpakket/ster",
+          "POST /api/office/kantoorpakket/weg"
+        ],
+        "aanbieder": [
+          "POST /api/supplier/kantoorpakket/beheer",
+          "POST /api/supplier/kantoorpakket/bewaar",
+          "POST /api/supplier/kantoorpakket/deel",
+          "POST /api/supplier/kantoorpakket/maak",
+          "POST /api/supplier/kantoorpakket/opmerking",
+          "POST /api/supplier/kantoorpakket/ster",
+          "POST /api/supplier/kantoorpakket/weg"
+        ]
+      },
+      "leest": {
+        "aanbieder": [
+          "POST /api/supplier/aanwezig",
+          "POST /api/supplier/aanwezig/leeg",
+          "POST /api/supplier/aanwezig/pas",
+          "POST /api/supplier/zegel/check"
+        ]
+      },
+      "reden": null
+    },
+    {
+      "collectie": "ondernemingen",
+      "bronnen": 2,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "onderwijs",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "onderzoeker",
+      "bronnen": 2,
+      "stand": "terminaal",
+      "graad": "huis",
+      "zetStand": {},
+      "leest": {},
+      "reden": "de tweede AI van het RTG Kantoor, gebouwd door de eerste (kern/rtgonderzoeker.js)"
+    },
+    {
+      "collectie": "payBoekingen",
+      "bronnen": 5,
+      "stand": "terminaal",
+      "graad": "boeking",
+      "zetStand": {},
+      "leest": {},
+      "reden": "de grootboekregels van RTG Pay (WAARDE.md: dubbel geboekt, een correctie is een nieuwe regel)"
+    },
+    {
+      "collectie": "payCodes",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "payrollRegelJournaal",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "payrollRegels",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "paySaldi",
+      "bronnen": 5,
+      "stand": "terminaal",
+      "graad": "boeking",
+      "zetStand": {},
+      "leest": {},
+      "reden": "de saldopositie in RTG Pay; een positie wacht op niemand -- wie eraan moet doen, staat in payVerzoeken"
+    },
+    {
+      "collectie": "payTegoed",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "payTikCodes",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "payTreasury",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "payVerzoeken",
+      "bronnen": 2,
+      "stand": "tussen",
+      "graad": "verklaard",
+      "zetStand": {},
+      "leest": {},
+      "reden": "lid A vraagt, lid B betaalt; twee mensen en een object dat op de tweede wacht"
+    },
+    {
+      "collectie": "postdatums",
+      "bronnen": 2,
+      "stand": "gesloten",
+      "graad": "gemeten",
+      "zetStand": {
+        "aanbieder": [
+          "POST /api/supplier/vooruit/post/negeer"
+        ]
+      },
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "posts",
+      "bronnen": 2,
+      "stand": "gezien",
+      "graad": "vermoed",
+      "zetStand": {},
+      "leest": {
+        "kantoor": [
+          "POST /api/office/atelierweb/bewaar",
+          "POST /api/office/atelierweb/etalage",
+          "POST /api/office/atelierweb/foto",
+          "POST /api/office/atelierweb/foto-weg",
+          "POST /api/office/atelierweb/fotos",
+          "POST /api/office/atelierweb/haal",
+          "POST /api/office/atelierweb/lijst",
+          "POST /api/office/atelierweb/salon",
+          "POST /api/office/atelierweb/verwijder",
+          "POST /api/office/dienst",
+          "POST /api/office/dienst/in",
+          "POST /api/office/dienst/uit",
+          "POST /api/office/doos/netwerk-zet",
+          "POST /api/office/doos/regie",
+          "POST /api/office/doos/update-zet",
+          "POST /api/office/inzage",
+          "POST /api/office/kachat",
+          "POST /api/office/kachat/stuur",
+          "POST /api/office/kamer",
+          "POST /api/office/kamer/ai",
+          "POST /api/office/kamer/taak",
+          "POST /api/office/kamer/taak-zet",
+          "POST /api/office/kamers",
+          "POST /api/office/kantine/menu",
+          "POST /api/office/kantine/menu-zet",
+          "POST /api/office/mall/collectie/weg",
+          "POST /api/office/mall/collectie/zet",
+          "POST /api/office/mall/collecties",
+          "POST /api/office/mall/kansen",
+          "POST /api/office/onboarding",
+          "POST /api/office/rampbeeld",
+          "POST /api/office/rampbeeld/ai",
+          "POST /api/office/rampbeeld/evaluatie",
+          "POST /api/office/rampbeeld/schaal",
+          "POST /api/office/salon/belang",
+          "POST /api/office/salon/belang/beoordeel",
+          "POST /api/office/stats"
+        ],
+        "aanbieder": [
+          "POST /api/supplier/aanwezig",
+          "POST /api/supplier/aanwezig/leeg",
+          "POST /api/supplier/aanwezig/pas",
+          "POST /api/supplier/boerderij/ai",
+          "POST /api/supplier/boerderij/dier",
+          "POST /api/supplier/boerderij/naar-salon",
+          "POST /api/supplier/boerderij/oogst",
+          "POST /api/supplier/boerderij/opbrengst",
+          "POST /api/supplier/boerderij/overzicht",
+          "POST /api/supplier/boerderij/perceel",
+          "POST /api/supplier/boerderij/product",
+          "POST /api/supplier/boerderij/taak",
+          "POST /api/supplier/boerderij/taak/klaar",
+          "POST /api/supplier/boerderij/type",
+          "POST /api/supplier/boerderij/voer",
+          "POST /api/supplier/boerderij/water",
+          "POST /api/supplier/boerderij/zaai",
+          "POST /api/supplier/mall",
+          "POST /api/supplier/mall/aanvraag/reageer",
+          "POST /api/supplier/mall/aanvragen",
+          "POST /api/supplier/mall/collectie/weg",
+          "POST /api/supplier/mall/collectie/zet",
+          "POST /api/supplier/mall/collecties",
+          "POST /api/supplier/mall/sync",
+          "POST /api/supplier/notifications/read",
+          "POST /api/supplier/pr/nieuwsbrief",
+          "POST /api/supplier/pr/overzicht",
+          "POST /api/supplier/pr/plan",
+          "POST /api/supplier/pr/plan/weg",
+          "POST /api/supplier/salon/bio",
+          "POST /api/supplier/salon/deal",
+          "POST /api/supplier/salon/deal/redeem",
+          "POST /api/supplier/salon/folder",
+          "POST /api/supplier/salon/poll",
+          "POST /api/supplier/salon/post",
+          "POST /api/supplier/salon/stats",
+          "POST /api/supplier/salon/status",
+          "POST /api/supplier/schedule",
+          "POST /api/supplier/state",
+          "POST /api/supplier/team/message",
+          "POST /api/supplier/tijdzone",
+          "POST /api/supplier/zegel/check"
+        ]
+      },
+      "reden": null
+    },
+    {
+      "collectie": "pulse",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "punten",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "rahulProfiel",
+      "bronnen": 1,
+      "stand": "gezien",
+      "graad": "vermoed",
+      "zetStand": {},
+      "leest": {
+        "consument": [
+          "POST /api/notifications",
+          "POST /api/notifications/read",
+          "POST /api/push/subscribe",
+          "POST /api/talen",
+          "POST /api/translate",
+          "POST /api/vertaal/ui",
+          "POST /api/zegel/controleer",
+          "POST /api/zegel/maak"
+        ],
+        "aanbieder": [
+          "POST /api/supplier/aanwezig",
+          "POST /api/supplier/aanwezig/leeg",
+          "POST /api/supplier/aanwezig/pas",
+          "POST /api/supplier/zegel/check"
+        ]
+      },
+      "reden": null
+    },
+    {
+      "collectie": "rahulStemming",
+      "bronnen": 1,
+      "stand": "terminaal",
+      "graad": "mens",
+      "zetStand": {},
+      "leest": {},
+      "reden": "hoe een lid zijn eigen Rahul wil horen; een toon is geen taak voor een ander"
+    },
+    {
+      "collectie": "rechtsvormRegels",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "redactie",
+      "bronnen": 2,
+      "stand": "gesloten",
+      "graad": "gemeten",
+      "zetStand": {
+        "kantoor": [
+          "POST /api/office/redactie/artikel/maak"
+        ]
+      },
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "reisInstallaties",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "reisInvoer",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "rendezvous",
+      "bronnen": 2,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "residentie",
+      "bronnen": 6,
+      "stand": "tussen",
+      "graad": "verklaard",
+      "zetStand": {},
+      "leest": {},
+      "reden": "De Residence is een gedeelde ruimte: wie binnenloopt of een emote doet, wordt gezien door de andere leden in dezelfde zaal -- pols() geeft de staat van de kamer terug"
+    },
+    {
+      "collectie": "rijkBekend",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "rijkKvk",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "rijksInstallaties",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "rijkVerkiezing",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "rijkZaken",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "rtfAppInstallaties",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "rtfKantoorTaken",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "rtfos",
+      "bronnen": 7,
+      "stand": "besluit",
+      "graad": "GIFT.md",
+      "zetStand": {},
+      "leest": {},
+      "reden": "de ontvanger van deze handelingen is een DONATEUR, en die bestaat niet: er is met opzet geen doneerknop en geen incasso. GIFT.md par. 1 legt drie besluiten vast die daaraan voorafgaan -- waar het geld landt, welke giftvormen opengaan, en of de stichting zelf een ANBI is."
+    },
+    {
+      "collectie": "rtgid",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "rtgOne",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "rtmail",
+      "bronnen": 1,
+      "stand": "gezien",
+      "graad": "vermoed",
+      "zetStand": {},
+      "leest": {
+        "consument": [
+          "POST /api/bedrijf/post/context",
+          "POST /api/bedrijf/post/herkomst",
+          "POST /api/bedrijf/post/omzetten",
+          "POST /api/bedrijf/werkruimte/maak",
+          "POST /api/mail/binnen",
+          "POST /api/mail/ses",
+          "POST /api/member/rtmail/bijlage",
+          "POST /api/member/rtmail/bijlagen"
+        ],
+        "kantoor": [
+          "POST /api/office/mail/opnieuw",
+          "POST /api/office/mail/origineel",
+          "POST /api/office/mail/uit",
+          "POST /api/office/mail/wachtrij",
+          "POST /api/office/mail/werk"
+        ]
+      },
+      "reden": null
+    },
+    {
+      "collectie": "rtmailBewaar",
+      "bronnen": 3,
+      "stand": "gesloten",
+      "graad": "gemeten",
+      "zetStand": {
+        "aanbieder": [
+          "POST /api/supplier/rtmail/bewaartermijn"
+        ]
+      },
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "rtmailRecht",
+      "bronnen": 4,
+      "stand": "gesloten",
+      "graad": "gemeten",
+      "zetStand": {
+        "aanbieder": [
+          "POST /api/supplier/rtmail/bewaartermijn",
+          "POST /api/supplier/rtmail/handtekening"
+        ]
+      },
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "rtmailSchrijf",
+      "bronnen": 4,
+      "stand": "gesloten",
+      "graad": "gemeten",
+      "zetStand": {
+        "aanbieder": [
+          "POST /api/supplier/rtmail/alias",
+          "POST /api/supplier/rtmail/handtekening"
+        ]
+      },
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "salon",
+      "bronnen": 2,
+      "stand": "tussen",
+      "graad": "verklaard",
+      "zetStand": {},
+      "leest": {},
+      "reden": "lid A schrijft een post of een bio, lid B leest hem in de feed; De Salon bestaat om gelezen te worden"
+    },
+    {
+      "collectie": "samenKamers",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "sondeMonsters",
+      "bronnen": 1,
+      "stand": "terminaal",
+      "graad": "huis",
+      "zetStand": {},
+      "leest": {},
+      "reden": "de monsters van de sonde (kern/command/sonde.js); een meting van de machine zelf"
+    },
+    {
+      "collectie": "spellen",
+      "bronnen": 2,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "spelTeams",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "stadMetingen",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "stadNodes",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "stadPaspoort",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "stadRegie",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "staffInvites",
+      "bronnen": 1,
+      "stand": "gezien",
+      "graad": "vermoed",
+      "zetStand": {},
+      "leest": {
+        "consument": [
+          "POST /api/supplier/staff/join",
+          "POST /api/werving/kijk",
+          "POST /api/werving/verbind"
+        ]
+      },
+      "reden": null
+    },
+    {
+      "collectie": "studio",
+      "bronnen": 2,
+      "stand": "terminaal",
+      "graad": "huis",
+      "zetStand": {},
+      "leest": {},
+      "reden": "de RTG Ontwerpstudio (voertuigen en vaartuigen); zelfde vorm als architect"
+    },
+    {
+      "collectie": "supplierNotifications",
+      "bronnen": 3,
+      "stand": "gesloten",
+      "graad": "gemeten",
+      "zetStand": {
+        "aanbieder": [
+          "POST /api/supplier/notifications/read",
+          "POST /api/supplier/security"
+        ]
+      },
+      "leest": {
+        "aanbieder": [
+          "POST /api/supplier/aanwezig",
+          "POST /api/supplier/aanwezig/leeg",
+          "POST /api/supplier/aanwezig/pas",
+          "POST /api/supplier/mall",
+          "POST /api/supplier/mall/aanvraag/reageer",
+          "POST /api/supplier/mall/aanvragen",
+          "POST /api/supplier/mall/collectie/weg",
+          "POST /api/supplier/mall/collectie/zet",
+          "POST /api/supplier/mall/collecties",
+          "POST /api/supplier/mall/sync",
+          "POST /api/supplier/notifications/read",
+          "POST /api/supplier/schedule",
+          "POST /api/supplier/state",
+          "POST /api/supplier/team/message",
+          "POST /api/supplier/tijdzone",
+          "POST /api/supplier/zegel/check"
+        ]
+      },
+      "reden": null
+    },
+    {
+      "collectie": "suppliers",
+      "bronnen": 10,
+      "stand": "gesloten",
+      "graad": "gemeten",
+      "zetStand": {
+        "aanbieder": [
+          "POST /api/supplier/activiteit/sluit",
+          "POST /api/supplier/agent",
+          "POST /api/supplier/horeca/autopilot",
+          "POST /api/supplier/mall/sync",
+          "POST /api/supplier/mode/bezorg/overzicht",
+          "POST /api/supplier/pay/rekening",
+          "POST /api/supplier/verkoop/overzicht",
+          "POST /api/supplier/werkvenster"
+        ]
+      },
+      "leest": {
+        "kantoor": [
+          "POST /api/office/aidata",
+          "POST /api/office/aidata/export",
+          "POST /api/office/asset/fees",
+          "POST /api/office/asset/overzicht",
+          "POST /api/office/asset/terugkoop",
+          "POST /api/office/asset/waarde",
+          "POST /api/office/claims/poort",
+          "POST /api/office/commercie/openstaand",
+          "POST /api/office/commercie/ronde",
+          "POST /api/office/commercie/zaakabonnement/zet",
+          "POST /api/office/commercie/zaakabonnementen",
+          "POST /api/office/handhaving",
+          "POST /api/office/handhaving/zet",
+          "POST /api/office/ontmoeting/signaal",
+          "POST /api/office/ontmoeting/sos-af",
+          "POST /api/office/ontmoetingen",
+          "POST /api/office/partner/decide",
+          "POST /api/office/partner/status",
+          "POST /api/office/payroll/loonrun",
+          "POST /api/office/payroll/match",
+          "POST /api/office/payroll/overzicht",
+          "POST /api/office/payroll/runs",
+          "POST /api/office/rechten",
+          "POST /api/office/salon-naleving",
+          "POST /api/office/sociaal",
+          "POST /api/office/terugval",
+          "POST /api/office/terugval/bevestig",
+          "POST /api/office/voornemen/staak",
+          "POST /api/office/voornemen/teken",
+          "POST /api/office/voornemens"
+        ],
+        "aanbieder": [
+          "POST /api/supplier/aanwezig",
+          "POST /api/supplier/aanwezig/leeg",
+          "POST /api/supplier/aanwezig/pas",
+          "POST /api/supplier/payroll/kansen",
+          "POST /api/supplier/payroll/openvoorwerk",
+          "POST /api/supplier/payroll/stroken",
+          "POST /api/supplier/staff/add",
+          "POST /api/supplier/staff/invite",
+          "POST /api/supplier/staff/invite/intrek",
+          "POST /api/supplier/staff/invites",
+          "POST /api/supplier/staff/remove",
+          "POST /api/supplier/staff/reset-pin",
+          "POST /api/supplier/zegel/check"
+        ]
+      },
+      "reden": null
+    },
+    {
+      "collectie": "toestellen",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "training",
+      "bronnen": 3,
+      "stand": "gesloten",
+      "graad": "gemeten",
+      "zetStand": {
+        "consument": [
+          "POST /api/training"
+        ]
+      },
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "veilig",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "vonk",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "wallet",
+      "bronnen": 2,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "webMerken",
+      "bronnen": 2,
+      "stand": "terminaal",
+      "graad": "huis",
+      "zetStand": {},
+      "leest": {},
+      "reden": "de merksjablonen van de website-maker; een sjabloon is materiaal en geen opdracht aan iemand"
+    },
+    {
+      "collectie": "weefsel",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "weefselKenmerk",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "weefselOrganen",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "weefselWerk",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "wereld",
+      "bronnen": 3,
+      "stand": "tussen",
+      "graad": "verklaard",
+      "zetStand": {},
+      "leest": {},
+      "reden": "lid A zet zijn profiellagen, lid B leest ze op codenaam -- twee mensen, en het profiel bestaat juist om gezien te worden"
+    },
+    {
+      "collectie": "werkbeleid",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "werkmail",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "werkplaats",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "werkplekToegang",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "werkruimtes",
+      "bronnen": 2,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    },
+    {
+      "collectie": "zaakCommand",
+      "bronnen": 3,
+      "stand": "terminaal",
+      "graad": "huis",
+      "zetStand": {},
+      "leest": {},
+      "reden": "het eigen bestuursvlak van een zaak (kern/zaakcommand/); per zaak een vak, en geen sleutel wijst naar buiten"
+    },
+    {
+      "collectie": "zandbakken",
+      "bronnen": 2,
+      "stand": "terminaal",
+      "graad": "huis",
+      "zetStand": {},
+      "leest": {},
+      "reden": "de zandbakken van de ops-cockpit (kern/command/zandbak.js); een proefomgeving heeft geen klant"
+    },
+    {
+      "collectie": "zelfzorg",
+      "bronnen": 5,
+      "stand": "terminaal",
+      "graad": "huis",
+      "zetStand": {},
+      "leest": {},
+      "reden": "het platform ruimt zichzelf op, beschermt en repareert zichzelf (kern/zelfzorg/index.js); wat een mens moet beslissen wordt daar al een ADVIES en dat loopt langs een andere collectie"
+    },
+    {
+      "collectie": "zorgProfielen",
+      "bronnen": 1,
+      "stand": "open",
+      "graad": null,
+      "zetStand": {},
+      "leest": {},
+      "reden": null
+    }
+  ],
+  "perRoute": [
+    {
+      "methode": "POST",
+      "pad": "/api/agenda/ai",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "agendas",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "aanbieder"
+          ],
+          "leest": [
+            "aanbieder"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/agenda/toevoegen",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "agendas",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "aanbieder"
+          ],
+          "leest": [
+            "aanbieder"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/appstore/berichten",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "appstore",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "kantoor"
+          ],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/appstore/bonnen",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "appstore",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "kantoor"
+          ],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/appstore/kantoor/afdracht",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "appstore",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "consument"
+          ],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/appstore/kantoor/hercontrole",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "appstore",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "consument"
+          ],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/appstore/mijn",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "appstore",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "kantoor"
+          ],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/appstore/tijdlijn",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "appstore",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "kantoor"
+          ],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/appstore/wis-opslag",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "appstore",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "kantoor"
+          ],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/pas/bevries",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "bankPassen",
+          "stand": "terminaal",
+          "graad": "mens",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/pas/limiet",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "bankPassen",
+          "stand": "terminaal",
+          "graad": "mens",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/pas/uitgeven",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "bankPassen",
+          "stand": "terminaal",
+          "graad": "mens",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/rekening/open",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "bankRekeningen",
+          "stand": "gezien",
+          "graad": "vermoed",
+          "zetStand": [],
+          "leest": [
+            "kantoor",
+            "aanbieder"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/spaardoel",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "bankRekeningen",
+          "stand": "gezien",
+          "graad": "vermoed",
+          "zetStand": [],
+          "leest": [
+            "kantoor",
+            "aanbieder"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/storten",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "bankSaldi",
+          "stand": "terminaal",
+          "graad": "boeking",
+          "zetStand": [],
+          "leest": []
+        },
+        {
+          "collectie": "bankBoekingen",
+          "stand": "terminaal",
+          "graad": "boeking",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/terugkerend/zet",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "bankTerugkerend",
+          "stand": "terminaal",
+          "graad": "mens",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bedrijf/lid/aanmeld",
+      "rol": "openbaar",
+      "groep": "consument",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "werkruimtes",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bedrijf/werkruimte/maak",
+      "rol": "openbaar",
+      "groep": "consument",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "werkruimtes",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bijles/gesprek",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "bijles",
+          "stand": "gezien",
+          "graad": "vermoed",
+          "zetStand": [],
+          "leest": [
+            "aanbieder"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bijles/vraag",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "bijles",
+          "stand": "gezien",
+          "graad": "vermoed",
+          "zetStand": [],
+          "leest": [
+            "aanbieder"
+          ]
+        },
+        {
+          "collectie": "onderwijs",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/boeken/voortgang",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "boeken",
+          "stand": "terminaal",
+          "graad": "mens",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/command/agent/hervat",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "commandAgents",
+          "stand": "terminaal",
+          "graad": "huis",
+          "zetStand": [],
+          "leest": []
+        },
+        {
+          "collectie": "commandBeleid",
+          "stand": "terminaal",
+          "graad": "huis",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/command/agent/stop",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "commandAgents",
+          "stand": "terminaal",
+          "graad": "huis",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/command/apipoort",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "apiPoort",
+          "stand": "terminaal",
+          "graad": "huis",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/command/incident/weeg",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "commandAlarmen",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "consument"
+          ],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/command/operator/plan",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "commandPlannen",
+          "stand": "terminaal",
+          "graad": "huis",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/command/sonde/draai",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "sondeMonsters",
+          "stand": "terminaal",
+          "graad": "huis",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/command/zaak/open",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "commandZaken",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/command/zandbak/maak",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "zandbakken",
+          "stand": "terminaal",
+          "graad": "huis",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/command/zandbak/weg",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "zandbakken",
+          "stand": "terminaal",
+          "graad": "huis",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/concern/boom",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "concern",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/concern/discovery/neem",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "concern",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/concern/entiteit/nieuw",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "concern",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/concern/nieuw",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "concern",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/concern/opname/maak",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "concern",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/drm/report",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "drmRapport",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/experience/evidence",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "experiencePlatform",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        },
+        {
+          "collectie": "genootschap",
+          "stand": "tussen",
+          "graad": "verklaard",
+          "zetStand": [],
+          "leest": []
+        },
+        {
+          "collectie": "pulse",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        },
+        {
+          "collectie": "economischeRuntime",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/festival/nieuw",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "festivals",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/fluister/focus",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "fluister",
+          "stand": "terminaal",
+          "graad": "mens",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/fluister/onthoud",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "fluister",
+          "stand": "terminaal",
+          "graad": "mens",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/fluister/profiel",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "fluister",
+          "stand": "terminaal",
+          "graad": "mens",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/gedachten/zet",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "gedachten",
+          "stand": "terminaal",
+          "graad": "mens",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/geld/cockpit",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "accountRollen",
+          "stand": "gezien",
+          "graad": "vermoed",
+          "zetStand": [],
+          "leest": [
+            "kantoor",
+            "aanbieder"
+          ]
+        },
+        {
+          "collectie": "labFonds",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/geld/grens",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "geldbeleid",
+          "stand": "terminaal",
+          "graad": "mens",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/gemeente/belasting/mijn",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "gemeenteAanslagen",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/gemeente/meld",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "supplierNotifications",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "aanbieder"
+          ],
+          "leest": [
+            "aanbieder"
+          ]
+        },
+        {
+          "collectie": "gemeenteMeldingen",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/genootschap/richt-op",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "tussen",
+      "collecties": [
+        {
+          "collectie": "genootschap",
+          "stand": "tussen",
+          "graad": "verklaard",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/gewoonten/maak",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "gewoonten",
+          "stand": "terminaal",
+          "graad": "mens",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/groothandel/mijn",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "suppliers",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "aanbieder"
+          ],
+          "leest": [
+            "kantoor",
+            "aanbieder"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/home/alles-uit",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "homekit",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/instant-reality",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "instantReality",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/inzagekaart",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "rtgid",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/kantoorpakket/beheer",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "officeDocs",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "kantoor",
+            "aanbieder"
+          ],
+          "leest": [
+            "aanbieder"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/kantoorpakket/bewaar",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "officeDocs",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "kantoor",
+            "aanbieder"
+          ],
+          "leest": [
+            "aanbieder"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/kantoorpakket/deel",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "officeDocs",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "kantoor",
+            "aanbieder"
+          ],
+          "leest": [
+            "aanbieder"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/kantoorpakket/maak",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "officeDocs",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "kantoor",
+            "aanbieder"
+          ],
+          "leest": [
+            "aanbieder"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/kantoorpakket/opmerking",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "officeDocs",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "kantoor",
+            "aanbieder"
+          ],
+          "leest": [
+            "aanbieder"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/kantoorpakket/ster",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "officeDocs",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "kantoor",
+            "aanbieder"
+          ],
+          "leest": [
+            "aanbieder"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/klets",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "klets",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/klok/mijn",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "klok",
+          "stand": "gezien",
+          "graad": "vermoed",
+          "zetStand": [],
+          "leest": [
+            "aanbieder"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/kosten/vooruitblik",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "economie",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/lab2/bewijs/dataset",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "livingLab",
+          "stand": "gezien",
+          "graad": "vermoed",
+          "zetStand": [],
+          "leest": [
+            "consument",
+            "aanbieder"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/lab2/coach/conclusie",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "livingLab",
+          "stand": "gezien",
+          "graad": "vermoed",
+          "zetStand": [],
+          "leest": [
+            "consument",
+            "aanbieder"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/lab2/metingen",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "livingLab",
+          "stand": "gezien",
+          "graad": "vermoed",
+          "zetStand": [],
+          "leest": [
+            "consument",
+            "aanbieder"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/lab2/plan/bron",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "livingLab",
+          "stand": "gezien",
+          "graad": "vermoed",
+          "zetStand": [],
+          "leest": [
+            "consument",
+            "aanbieder"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/lab2/werk/besluit",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "livingLab",
+          "stand": "gezien",
+          "graad": "vermoed",
+          "zetStand": [],
+          "leest": [
+            "consument",
+            "aanbieder"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/lab2/werk/document",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "livingLab",
+          "stand": "gezien",
+          "graad": "vermoed",
+          "zetStand": [],
+          "leest": [
+            "consument",
+            "aanbieder"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/lab2/werk/log",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "livingLab",
+          "stand": "gezien",
+          "graad": "vermoed",
+          "zetStand": [],
+          "leest": [
+            "consument",
+            "aanbieder"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/lab2/werk/taak",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "livingLab",
+          "stand": "gezien",
+          "graad": "vermoed",
+          "zetStand": [],
+          "leest": [
+            "consument",
+            "aanbieder"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/labfonds/locatie/maak",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "labFonds",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/leven/beleid/zet",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "levensbeleid",
+          "stand": "terminaal",
+          "graad": "mens",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/live/start",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "live",
+          "stand": "gezien",
+          "graad": "vermoed",
+          "zetStand": [],
+          "leest": [
+            "aanbieder"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/live/stop",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "live",
+          "stand": "gezien",
+          "graad": "vermoed",
+          "zetStand": [],
+          "leest": [
+            "aanbieder"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/mall/apps/mijn",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "appInstallaties",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/mall/lijst/nieuw",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "mallLijsten",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/mall/reis/mijn",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "reisInstallaties",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/mall/rtf/mijn",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "rtfAppInstallaties",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/mediaos/bieb",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "mediaBieb",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/mediaos/lijst/maak",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "mediaLijsten",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/mediaos/meldingen",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "mediaMeldingen",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/mediaos/samen/start",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "mediaKamers",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/meet/maak",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "meetKamers",
+          "stand": "gezien",
+          "graad": "vermoed",
+          "zetStand": [],
+          "leest": [
+            "aanbieder"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/member/ai/tegoed",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "aiTegoed",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "kantoor"
+          ],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/member/boardroom/logboek",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "ledenBoard",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/member/bureau/beveiliging/digitaal/weg",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "lifestyle",
+          "stand": "gezien",
+          "graad": "aangewezen",
+          "zetStand": [],
+          "leest": [
+            "kantoor"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/member/bureau/reputatie/lijn/weg",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "lifestyle",
+          "stand": "gezien",
+          "graad": "aangewezen",
+          "zetStand": [],
+          "leest": [
+            "kantoor"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/member/leren/herhaal",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "leren",
+          "stand": "terminaal",
+          "graad": "mens",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/member/leren/project-maak",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "leren",
+          "stand": "terminaal",
+          "graad": "mens",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/member/leren/schrijf-bewaar",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "leren",
+          "stand": "terminaal",
+          "graad": "mens",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/member/lifestyle/ai",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "lifestyle",
+          "stand": "gezien",
+          "graad": "aangewezen",
+          "zetStand": [],
+          "leest": [
+            "kantoor"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/member/lifestyle/concierge/vraag",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "lifestyle",
+          "stand": "gezien",
+          "graad": "aangewezen",
+          "zetStand": [],
+          "leest": [
+            "kantoor"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/member/lifestyle/gezondheid/dossier",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "lifestyle",
+          "stand": "gezien",
+          "graad": "aangewezen",
+          "zetStand": [],
+          "leest": [
+            "kantoor"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/member/nieuws",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "redactie",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "kantoor"
+          ],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/member/pin",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "tussen",
+      "collecties": [
+        {
+          "collectie": "contactPins",
+          "stand": "tussen",
+          "graad": "verklaard",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/member/pin/nieuw",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "tussen",
+      "collecties": [
+        {
+          "collectie": "contactPins",
+          "stand": "tussen",
+          "graad": "verklaard",
+          "zetStand": [],
+          "leest": []
+        },
+        {
+          "collectie": "contactPinRetired",
+          "stand": "tussen",
+          "graad": "verklaard",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/member/pin/uit",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "tussen",
+      "collecties": [
+        {
+          "collectie": "contactPins",
+          "stand": "tussen",
+          "graad": "verklaard",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/member/rechterhand/attenties",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "lifestyle",
+          "stand": "gezien",
+          "graad": "aangewezen",
+          "zetStand": [],
+          "leest": [
+            "kantoor"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/member/rechterhand/cercle",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "lifestyle",
+          "stand": "gezien",
+          "graad": "aangewezen",
+          "zetStand": [],
+          "leest": [
+            "kantoor"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/member/rechterhand/garderobe",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "lifestyle",
+          "stand": "gezien",
+          "graad": "aangewezen",
+          "zetStand": [],
+          "leest": [
+            "kantoor"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/member/rechterhand/logboek",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "lifestyle",
+          "stand": "gezien",
+          "graad": "aangewezen",
+          "zetStand": [],
+          "leest": [
+            "kantoor"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/member/rechterhand/maison/log",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "lifestyle",
+          "stand": "gezien",
+          "graad": "aangewezen",
+          "zetStand": [],
+          "leest": [
+            "kantoor"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/member/rechterhand/mecenaat",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "lifestyle",
+          "stand": "gezien",
+          "graad": "aangewezen",
+          "zetStand": [],
+          "leest": [
+            "kantoor"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/member/rechterhand/nalatenschap",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "lifestyle",
+          "stand": "gezien",
+          "graad": "aangewezen",
+          "zetStand": [],
+          "leest": [
+            "kantoor"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/member/rtmail/alias",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "rtmailSchrijf",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "aanbieder"
+          ],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/member/rtmail/bewaarbeleid",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "rtmailBewaar",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "aanbieder"
+          ],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/member/rtmail/bewaartermijn",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "rtmailBewaar",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "aanbieder"
+          ],
+          "leest": []
+        },
+        {
+          "collectie": "rtmailRecht",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "aanbieder"
+          ],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/member/rtmail/export",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "rtmailRecht",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "aanbieder"
+          ],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/member/rtmail/handtekening",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "rtmailSchrijf",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "aanbieder"
+          ],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/member/rtmail/imap/sleutel",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "mailSleutels",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "aanbieder"
+          ],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/member/spel/sudoku-nieuw",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "spellen",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/member/spel/team-nieuw",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "spelTeams",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/member/spel/zichtbaar",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "spellen",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/member/unblock",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "commandAlarmen",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "kantoor"
+          ],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/member/vooruit/post/negeer",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "postdatums",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "aanbieder"
+          ],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/metier/kaart",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "metier",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/muziek/maak",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "muziek",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/noodkaart/zet",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "noodkaarten",
+          "stand": "terminaal",
+          "graad": "mens",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/architect/maak",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "architect",
+          "stand": "terminaal",
+          "graad": "huis",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/architect/project",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "architect",
+          "stand": "terminaal",
+          "graad": "huis",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/atelier/collectie",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "atelier",
+          "stand": "terminaal",
+          "graad": "huis",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/atelier/maak",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "atelier",
+          "stand": "terminaal",
+          "graad": "huis",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/atelierweb/bewaar",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "atelierSites",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/bank/draai",
+      "rol": "boardroom",
+      "groep": "kantoor",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "bankregie",
+          "stand": "terminaal",
+          "graad": "huis",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/bank/leden",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "bankregie",
+          "stand": "terminaal",
+          "graad": "huis",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/bank/mislukking",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "bankregie",
+          "stand": "terminaal",
+          "graad": "huis",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/bank/nood",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "bankregie",
+          "stand": "terminaal",
+          "graad": "huis",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/bank/regels/check",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "fiscaalRegels",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/boardroom/ai",
+      "rol": "boardroom",
+      "groep": "kantoor",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "boardroom",
+          "stand": "terminaal",
+          "graad": "huis",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/boardroom/rahul/zet",
+      "rol": "boardroom",
+      "groep": "kantoor",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "rahulProfiel",
+          "stand": "gezien",
+          "graad": "vermoed",
+          "zetStand": [],
+          "leest": [
+            "consument",
+            "aanbieder"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/boardroom/verbeter",
+      "rol": "boardroom",
+      "groep": "kantoor",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "boardroom",
+          "stand": "terminaal",
+          "graad": "huis",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/hardware/maak",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "hardware",
+          "stand": "terminaal",
+          "graad": "huis",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/hardware/serie",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "hardware",
+          "stand": "terminaal",
+          "graad": "huis",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/ideeen/maak",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "ideeen",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/kamer/taak",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "kantoorTaken",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/kantoorpakket/beheer",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "officeDocs",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "consument",
+            "aanbieder"
+          ],
+          "leest": [
+            "consument",
+            "aanbieder"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/kantoorpakket/bewaar",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "officeDocs",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "consument",
+            "aanbieder"
+          ],
+          "leest": [
+            "consument",
+            "aanbieder"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/kantoorpakket/deel",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "officeDocs",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "consument",
+            "aanbieder"
+          ],
+          "leest": [
+            "consument",
+            "aanbieder"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/kantoorpakket/maak",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "officeDocs",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "consument",
+            "aanbieder"
+          ],
+          "leest": [
+            "consument",
+            "aanbieder"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/kantoorpakket/opmerking",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "officeDocs",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "consument",
+            "aanbieder"
+          ],
+          "leest": [
+            "consument",
+            "aanbieder"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/kantoorpakket/ster",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "officeDocs",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "consument",
+            "aanbieder"
+          ],
+          "leest": [
+            "consument",
+            "aanbieder"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/kantoorpakket/weg",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "officeDocs",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "consument",
+            "aanbieder"
+          ],
+          "leest": [
+            "consument",
+            "aanbieder"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/mall/kansen",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "mallVraag",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/merk/maak",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "webMerken",
+          "stand": "terminaal",
+          "graad": "huis",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/merk/sjabloon",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "webMerken",
+          "stand": "terminaal",
+          "graad": "huis",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/onderzoeker",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "onderzoeker",
+          "stand": "terminaal",
+          "graad": "huis",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/onderzoeker/ontwikkel",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "onderzoeker",
+          "stand": "terminaal",
+          "graad": "huis",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/partner/regels/check",
+      "rol": "boardroom",
+      "groep": "kantoor",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "handelsRegelwacht",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/payroll/dekking/land",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "payrollRegels",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/payroll/regels/haal",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "payrollRegelJournaal",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/rampbeeld/ai",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "weefsel",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        },
+        {
+          "collectie": "stadNodes",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        },
+        {
+          "collectie": "stadMetingen",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        },
+        {
+          "collectie": "stadRegie",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/rechtsvormwacht",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "aiTegoed",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "consument"
+          ],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/rechtsvormwacht/check",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "rechtsvormRegels",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/redactie/artikel/maak",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "redactie",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "consument"
+          ],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/rendezvous/meldingen",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "rendezvous",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/rendezvous/tafel/maak",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "rendezvous",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/stad/werk",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "stadPaspoort",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/studio/collectie",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "studio",
+          "stand": "terminaal",
+          "graad": "huis",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/studio/maak",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "studio",
+          "stand": "terminaal",
+          "graad": "huis",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/vonk/meldingen",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "vonk",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/weefsel",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "weefselKenmerk",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/weefsel/besluiten",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "weefselOrganen",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/weefsel/werk/maak",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "weefselWerk",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/werkplaats/maak",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "werkplaats",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/zelfzorg",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "zelfzorg",
+          "stand": "terminaal",
+          "graad": "huis",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/zelfzorg/bescherm",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "zelfzorg",
+          "stand": "terminaal",
+          "graad": "huis",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/zelfzorg/herstel",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "zelfzorg",
+          "stand": "terminaal",
+          "graad": "huis",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/zelfzorg/opruim",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "zelfzorg",
+          "stand": "terminaal",
+          "graad": "huis",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/zelfzorg/upgrade",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "zelfzorg",
+          "stand": "terminaal",
+          "graad": "huis",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/onboarding/salonpost",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "tussen",
+      "collecties": [
+        {
+          "collectie": "posts",
+          "stand": "gezien",
+          "graad": "vermoed",
+          "zetStand": [],
+          "leest": [
+            "kantoor",
+            "aanbieder"
+          ]
+        },
+        {
+          "collectie": "salon",
+          "stand": "tussen",
+          "graad": "verklaard",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/onderneming/kas/saldo",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "ondernemingen",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/onderneming/nieuw",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "ondernemingen",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/overheid/bekendmaking",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "rijkBekend",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/overheid/bieb/mijn",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "rijksInstallaties",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/overheid/rb/zaak",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "rijkZaken",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/overheid/verkiezing/sluit",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "rijkVerkiezing",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/kascode",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "payCodes",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/oplaad",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "payBoekingen",
+          "stand": "terminaal",
+          "graad": "boeking",
+          "zetStand": [],
+          "leest": []
+        },
+        {
+          "collectie": "paySaldi",
+          "stand": "terminaal",
+          "graad": "boeking",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/stuur",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "payBoekingen",
+          "stand": "terminaal",
+          "graad": "boeking",
+          "zetStand": [],
+          "leest": []
+        },
+        {
+          "collectie": "paySaldi",
+          "stand": "terminaal",
+          "graad": "boeking",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/tegoed/koop",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "payBoekingen",
+          "stand": "terminaal",
+          "graad": "boeking",
+          "zetStand": [],
+          "leest": []
+        },
+        {
+          "collectie": "paySaldi",
+          "stand": "terminaal",
+          "graad": "boeking",
+          "zetStand": [],
+          "leest": []
+        },
+        {
+          "collectie": "payTegoed",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/tik",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "payBoekingen",
+          "stand": "terminaal",
+          "graad": "boeking",
+          "zetStand": [],
+          "leest": []
+        },
+        {
+          "collectie": "paySaldi",
+          "stand": "terminaal",
+          "graad": "boeking",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/tikcode",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "payTikCodes",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/verzoek",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "tussen",
+      "collecties": [
+        {
+          "collectie": "payVerzoeken",
+          "stand": "tussen",
+          "graad": "verklaard",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/verzoek/betaal",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "tussen",
+      "collecties": [
+        {
+          "collectie": "payBoekingen",
+          "stand": "terminaal",
+          "graad": "boeking",
+          "zetStand": [],
+          "leest": []
+        },
+        {
+          "collectie": "payVerzoeken",
+          "stand": "tussen",
+          "graad": "verklaard",
+          "zetStand": [],
+          "leest": []
+        },
+        {
+          "collectie": "paySaldi",
+          "stand": "terminaal",
+          "graad": "boeking",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/punten",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "punten",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/rahul/stemming",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "rahulStemming",
+          "stand": "terminaal",
+          "graad": "mens",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/reis/invoer/lees",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "reisInvoer",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/residentie/betreed",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "tussen",
+      "collecties": [
+        {
+          "collectie": "residentie",
+          "stand": "tussen",
+          "graad": "verklaard",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/residentie/emote",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "tussen",
+      "collecties": [
+        {
+          "collectie": "residentie",
+          "stand": "tussen",
+          "graad": "verklaard",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/residentie/huis",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "tussen",
+      "collecties": [
+        {
+          "collectie": "residentie",
+          "stand": "tussen",
+          "graad": "verklaard",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/residentie/pols",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "tussen",
+      "collecties": [
+        {
+          "collectie": "residentie",
+          "stand": "tussen",
+          "graad": "verklaard",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/residentie/suite/zet",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "tussen",
+      "collecties": [
+        {
+          "collectie": "residentie",
+          "stand": "tussen",
+          "graad": "verklaard",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/residentie/weg",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "tussen",
+      "collecties": [
+        {
+          "collectie": "residentie",
+          "stand": "tussen",
+          "graad": "verklaard",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/rtfkantoor/advies",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "rtfKantoorTaken",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/rtfos/gift/plan/lijst",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "besluit",
+      "collecties": [
+        {
+          "collectie": "rtfos",
+          "stand": "besluit",
+          "graad": "GIFT.md",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/rtfos/gift/stand/kantoor",
+      "rol": "boardroom",
+      "groep": "kantoor",
+      "stand": "besluit",
+      "collecties": [
+        {
+          "collectie": "rtfos",
+          "stand": "besluit",
+          "graad": "GIFT.md",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/rtfos/gift/stand/zet",
+      "rol": "boardroom",
+      "groep": "kantoor",
+      "stand": "besluit",
+      "collecties": [
+        {
+          "collectie": "rtfos",
+          "stand": "besluit",
+          "graad": "GIFT.md",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/rtfos/stad/kernteam",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "besluit",
+      "collecties": [
+        {
+          "collectie": "rtfos",
+          "stand": "besluit",
+          "graad": "GIFT.md",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/rtfos/stad/maak",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "besluit",
+      "collecties": [
+        {
+          "collectie": "rtfos",
+          "stand": "besluit",
+          "graad": "GIFT.md",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/rtfos/winkel/artikelen",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "besluit",
+      "collecties": [
+        {
+          "collectie": "rtfos",
+          "stand": "besluit",
+          "graad": "GIFT.md",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/rtfos/winkel/bestellingen",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "besluit",
+      "collecties": [
+        {
+          "collectie": "rtfos",
+          "stand": "besluit",
+          "graad": "GIFT.md",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/rtgone/frictie",
+      "rol": "office",
+      "groep": "kantoor",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "rtgOne",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/salon/bio",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "tussen",
+      "collecties": [
+        {
+          "collectie": "salon",
+          "stand": "tussen",
+          "graad": "verklaard",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/salon/plaats",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "posts",
+          "stand": "gezien",
+          "graad": "vermoed",
+          "zetStand": [],
+          "leest": [
+            "kantoor",
+            "aanbieder"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/samen/maak",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "samenKamers",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/site/bewaar",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "ledenSites",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "aanbieder"
+          ],
+          "leest": [
+            "aanbieder"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/sociaal/command",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "tussen",
+      "collecties": [
+        {
+          "collectie": "genootschap",
+          "stand": "tussen",
+          "graad": "verklaard",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/spar/lijst",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "fluister",
+          "stand": "terminaal",
+          "graad": "mens",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/spar/parkeer",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "fluister",
+          "stand": "terminaal",
+          "graad": "mens",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/aanwezig",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "aanwezig",
+          "stand": "gezien",
+          "graad": "vermoed",
+          "zetStand": [],
+          "leest": [
+            "consument"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/aanwezig/leeg",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "aanwezig",
+          "stand": "gezien",
+          "graad": "vermoed",
+          "zetStand": [],
+          "leest": [
+            "consument"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/accountant/adviezen",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "fiscaalJaargangen",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/activiteit/sluit",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "suppliers",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "consument"
+          ],
+          "leest": [
+            "consument",
+            "kantoor"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/agenda/ai",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "agendas",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "consument"
+          ],
+          "leest": [
+            "consument"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/agenda/toevoegen",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "agendas",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "consument"
+          ],
+          "leest": [
+            "consument"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/agent",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "suppliers",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "consument"
+          ],
+          "leest": [
+            "consument",
+            "kantoor"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/backoffice",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "zaakCommand",
+          "stand": "terminaal",
+          "graad": "huis",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/betaalverzoek",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "betaalVerzoeken",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/command/journaal",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "zaakCommand",
+          "stand": "terminaal",
+          "graad": "huis",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/command/operator/plan",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "terminaal",
+      "collecties": [
+        {
+          "collectie": "zaakCommand",
+          "stand": "terminaal",
+          "graad": "huis",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/eten/capaciteit",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "horeca",
+          "stand": "gezien",
+          "graad": "vermoed",
+          "zetStand": [],
+          "leest": [
+            "consument"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/facturen/maak",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "notifications",
+          "stand": "gezien",
+          "graad": "vermoed",
+          "zetStand": [],
+          "leest": [
+            "consument"
+          ]
+        },
+        {
+          "collectie": "rtmail",
+          "stand": "gezien",
+          "graad": "vermoed",
+          "zetStand": [],
+          "leest": [
+            "consument",
+            "kantoor"
+          ]
+        },
+        {
+          "collectie": "facturen",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/gebouwpand/bhv",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "gebouwPand",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/gebouwplus/lead",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "gebouwPlus",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/giftcard/sell",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "giftcards",
+          "stand": "gezien",
+          "graad": "vermoed",
+          "zetStand": [],
+          "leest": [
+            "consument"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/horeca/autopilot",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "suppliers",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "consument"
+          ],
+          "leest": [
+            "consument",
+            "kantoor"
+          ]
+        },
+        {
+          "collectie": "horeca",
+          "stand": "gezien",
+          "graad": "vermoed",
+          "zetStand": [],
+          "leest": [
+            "consument"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/horeca/bon/maak",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "horeca",
+          "stand": "gezien",
+          "graad": "vermoed",
+          "zetStand": [],
+          "leest": [
+            "consument"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/horeca/club/deur",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "horeca",
+          "stand": "gezien",
+          "graad": "vermoed",
+          "zetStand": [],
+          "leest": [
+            "consument"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/horeca/folio",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "horeca",
+          "stand": "gezien",
+          "graad": "vermoed",
+          "zetStand": [],
+          "leest": [
+            "consument"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/horeca/gast",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "horeca",
+          "stand": "gezien",
+          "graad": "vermoed",
+          "zetStand": [],
+          "leest": [
+            "consument"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/horeca/keuken/stappen",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "horeca",
+          "stand": "gezien",
+          "graad": "vermoed",
+          "zetStand": [],
+          "leest": [
+            "consument"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/horeca/keuken/tijden",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "horeca",
+          "stand": "gezien",
+          "graad": "vermoed",
+          "zetStand": [],
+          "leest": [
+            "consument"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/horeca/missions",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "horecaMissies",
+          "stand": "gezien",
+          "graad": "vermoed",
+          "zetStand": [],
+          "leest": [
+            "consument"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/horeca/pols/zet",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "horeca",
+          "stand": "gezien",
+          "graad": "vermoed",
+          "zetStand": [],
+          "leest": [
+            "consument"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/horeca/rahul/doe",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "horeca",
+          "stand": "gezien",
+          "graad": "vermoed",
+          "zetStand": [],
+          "leest": [
+            "consument"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/horeca/rahul/grens",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "horeca",
+          "stand": "gezien",
+          "graad": "vermoed",
+          "zetStand": [],
+          "leest": [
+            "consument"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/horeca/rekening/open",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "horeca",
+          "stand": "gezien",
+          "graad": "vermoed",
+          "zetStand": [],
+          "leest": [
+            "consument"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/horeca/simulatie/maak",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "magnaatBrug",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/horeca/venue/concept",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "horeca",
+          "stand": "gezien",
+          "graad": "vermoed",
+          "zetStand": [],
+          "leest": [
+            "consument"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/horeca/verzoeken",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "horeca",
+          "stand": "gezien",
+          "graad": "vermoed",
+          "zetStand": [],
+          "leest": [
+            "consument"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/horeca/wijk/zet",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "horeca",
+          "stand": "gezien",
+          "graad": "vermoed",
+          "zetStand": [],
+          "leest": [
+            "consument"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/horeca/wijken",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "horeca",
+          "stand": "gezien",
+          "graad": "vermoed",
+          "zetStand": [],
+          "leest": [
+            "consument"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/hr/gesprekken",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "groeigesprekken",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/kantoorpakket/beheer",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "officeDocs",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "consument",
+            "kantoor"
+          ],
+          "leest": [
+            "consument"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/kantoorpakket/bewaar",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "officeDocs",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "consument",
+            "kantoor"
+          ],
+          "leest": [
+            "consument"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/kantoorpakket/deel",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "officeDocs",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "consument",
+            "kantoor"
+          ],
+          "leest": [
+            "consument"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/kantoorpakket/maak",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "officeDocs",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "consument",
+            "kantoor"
+          ],
+          "leest": [
+            "consument"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/kantoorpakket/opmerking",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "officeDocs",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "consument",
+            "kantoor"
+          ],
+          "leest": [
+            "consument"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/kantoorpakket/ster",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "officeDocs",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "consument",
+            "kantoor"
+          ],
+          "leest": [
+            "consument"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/kantoorpakket/weg",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "officeDocs",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "consument",
+            "kantoor"
+          ],
+          "leest": [
+            "consument"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/mall/sync",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "suppliers",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "consument"
+          ],
+          "leest": [
+            "consument",
+            "kantoor"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/mode/bezorg/overzicht",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "suppliers",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "consument"
+          ],
+          "leest": [
+            "consument",
+            "kantoor"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/notifications/read",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "supplierNotifications",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "consument"
+          ],
+          "leest": [
+            "consument"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/overheid/kvk/inschrijven",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "rijkKvk",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/pay/rekening",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "suppliers",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "consument"
+          ],
+          "leest": [
+            "consument",
+            "kantoor"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/pay/treasury/zet",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "payTreasury",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/pr/overzicht",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "campagnes",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/rtmail/alias",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "rtmailSchrijf",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "consument"
+          ],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/rtmail/bewaartermijn",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "rtmailBewaar",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "consument"
+          ],
+          "leest": []
+        },
+        {
+          "collectie": "rtmailRecht",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "consument"
+          ],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/rtmail/handtekening",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "rtmailSchrijf",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "consument"
+          ],
+          "leest": []
+        },
+        {
+          "collectie": "rtmailRecht",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "consument"
+          ],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/rtmail/imap/sleutel",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "mailSleutels",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "consument"
+          ],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/samenwerking/oproep",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "creatorOproepen",
+          "stand": "gezien",
+          "graad": "vermoed",
+          "zetStand": [],
+          "leest": [
+            "consument"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/security",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "supplierNotifications",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "consument"
+          ],
+          "leest": [
+            "consument"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/site/bewaar",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "ledenSites",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "consument"
+          ],
+          "leest": [
+            "consument"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/staff/invite",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gezien",
+      "collecties": [
+        {
+          "collectie": "staffInvites",
+          "stand": "gezien",
+          "graad": "vermoed",
+          "zetStand": [],
+          "leest": [
+            "consument"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/training/add",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "training",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "consument"
+          ],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/training/remove",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "training",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "consument"
+          ],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/veiligheid/aankomsten",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "veilig",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/verkoop/overzicht",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "suppliers",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "consument"
+          ],
+          "leest": [
+            "consument",
+            "kantoor"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/vooruit/post/negeer",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "postdatums",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "consument"
+          ],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/wensen",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "bedrijfsWensen",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/werkmail/adressen",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "werkbeleid",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        },
+        {
+          "collectie": "werkmail",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/werkvenster",
+      "rol": "supplier",
+      "groep": "aanbieder",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "suppliers",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "consument"
+          ],
+          "leest": [
+            "consument",
+            "kantoor"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/toestellen/koppel",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "toestellen",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/training",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "training",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "aanbieder"
+          ],
+          "leest": [
+            "aanbieder"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/uitgaan/mijn",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "gesloten",
+      "collecties": [
+        {
+          "collectie": "suppliers",
+          "stand": "gesloten",
+          "graad": "gemeten",
+          "zetStand": [
+            "aanbieder"
+          ],
+          "leest": [
+            "kantoor",
+            "aanbieder"
+          ]
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/wallet",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "wallet",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/wallet/voeg",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "wallet",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/wereld/bezoekers",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "tussen",
+      "collecties": [
+        {
+          "collectie": "wereld",
+          "stand": "tussen",
+          "graad": "verklaard",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/wereld/profiel",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "tussen",
+      "collecties": [
+        {
+          "collectie": "wereld",
+          "stand": "tussen",
+          "graad": "verklaard",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/wereld/profiel/van",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "tussen",
+      "collecties": [
+        {
+          "collectie": "wereld",
+          "stand": "tussen",
+          "graad": "verklaard",
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/werkplek/toegang",
+      "rol": "werkplekbaas",
+      "groep": "aanbieder",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "werkplekToegang",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/zorgprofiel/zet",
+      "rol": "member",
+      "groep": "consument",
+      "stand": "open",
+      "collecties": [
+        {
+          "collectie": "zorgProfielen",
+          "stand": "open",
+          "graad": null,
+          "zetStand": [],
+          "leest": []
+        }
+      ]
+    }
+  ]
+}

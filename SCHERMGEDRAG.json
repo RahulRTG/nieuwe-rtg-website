@@ -1,0 +1,5149 @@
+{
+ "soort": "meting",
+ "uitleg": "Wat een scherm in public/ via de API kan veroorzaken: schrijft het, welke rol vraagt het, wat is het bewijs waard, en wat doet een tweede aanroep. Samengesteld uit bestaande metingen -- hier wordt niets nieuws gemeten en niets geraden.",
+ "stempel": {
+  "op": "2026-09-03",
+  "commit": "2a51f136"
+ },
+ "grond": [
+  "SCHERMROUTES.json",
+  "ROUTEBRON.json",
+  "SCHRIJFANALYSE.json",
+  "EXECUTION_MAP.json",
+  "IDEMPROEF.json"
+ ],
+ "grens": "AFGELEID gedrag: wat het scherm via de API kan veroorzaken. NIET wat het scherm zelf doet (localStorage, DOM, een berekening). `schrijft: nee` betekent dus \"verandert niets aan de serverkant\" en niet \"verandert niets\".",
+ "samenstelregel": "schrijven: de ZWAARSTE uitkomst wint (een van de tien routes schrijft = dit scherm kan iets veranderen). Bewijs: het ZWAKSTE telt, want een keten is zo sterk als zijn zwakste schakel. Onbekend is in beide gevallen niet de gunstige uitkomst.",
+ "gemeten": {
+  "schermen": 368,
+  "metGrond": 231,
+  "zonderGrond": 137,
+  "schrijftJa": 63,
+  "schrijftNee": 1,
+  "schrijftOnbekend": 137,
+  "schrijftNietVastTeStellen": 167,
+  "bewijsVerdeling": {
+   "niet vast te stellen": 157,
+   "verzwakt": 160,
+   "ONBEPAALD": 51
+  },
+  "bewijsBewezen": 0,
+  "bewijsVerzwakt": 160,
+  "bewijsNietVastTeStellen": 157,
+  "onbekendeBewijswaarden": [],
+  "zonderRol": 41
+ },
+ "zonderUitspraak": [
+  "public/apps/agenda/app.js",
+  "public/apps/app-main/app-main-43.js",
+  "public/apps/arrival.html",
+  "public/apps/attenties.html",
+  "public/apps/backoffice/backoffice-01.js",
+  "public/apps/bestanden/app.js",
+  "public/apps/browser.html",
+  "public/apps/cellier.html",
+  "public/apps/cercle.html",
+  "public/apps/clips.html",
+  "public/apps/command/command-01.js",
+  "public/apps/concierge.html",
+  "public/apps/defensie/defensie-01.js",
+  "public/apps/dispatch.html",
+  "public/apps/entourage.html",
+  "public/apps/flits.html",
+  "public/apps/foundation/babyboek.html",
+  "public/apps/foundation/beheer.html",
+  "public/apps/foundation/beroepen.html",
+  "public/apps/foundation/bieb.html",
+  "public/apps/foundation/bord.html",
+  "public/apps/foundation/club.html",
+  "public/apps/foundation/clubswerk.html",
+  "public/apps/foundation/contact.html",
+  "public/apps/foundation/geloofbieb.html",
+  "public/apps/foundation/geven.html",
+  "public/apps/foundation/gevoel.html",
+  "public/apps/foundation/gezin-rt/gezin-rt-01.js",
+  "public/apps/foundation/gezondheid.html",
+  "public/apps/foundation/keuken.html",
+  "public/apps/foundation/klusjes.html",
+  "public/apps/foundation/leren.html",
+  "public/apps/foundation/ochtend.html",
+  "public/apps/foundation/oppasinfo.html",
+  "public/apps/foundation/os-bestuur.html",
+  "public/apps/foundation/os-deelnemer.html",
+  "public/apps/foundation/os-donateur.html",
+  "public/apps/foundation/os-portaal.html",
+  "public/apps/foundation/os-publiek.html",
+  "public/apps/foundation/os-veld.html",
+  "public/apps/foundation/os-vrijwilliger.html",
+  "public/apps/foundation/os.html",
+  "public/apps/foundation/partner.html",
+  "public/apps/foundation/realtime.js",
+  "public/apps/foundation/registreren.js",
+  "public/apps/foundation/samen/samen-01.js",
+  "public/apps/foundation/schoolbieb.html",
+  "public/apps/foundation/schrijven.html",
+  "public/apps/foundation/sessie/sessie-01.js",
+  "public/apps/foundation/sessie/sessie-02.js",
+  "public/apps/foundation/sw.js",
+  "public/apps/foundation/toetsen.html",
+  "public/apps/foundation/veilig.html",
+  "public/apps/foundation/verjaardagen.html",
+  "public/apps/foundation/werk.html",
+  "public/apps/foundation/winkel.html",
+  "public/apps/foundation/zakgeld.html",
+  "public/apps/galerij/app.js",
+  "public/apps/garderobe.html",
+  "public/apps/gast.html",
+  "public/apps/gereedschap/klok.js",
+  "public/apps/handel.js",
+  "public/apps/hangar.html",
+  "public/apps/horeca/bezorg-rit.js",
+  "public/apps/horeca/kern.js",
+  "public/apps/kassa.html",
+  "public/apps/klankwerk/kantoor.js",
+  "public/apps/klankwerk/scherm.js",
+  "public/apps/klankwerk/zaal.js",
+  "public/apps/krant.html",
+  "public/apps/lab.html",
+  "public/apps/labpas.js",
+  "public/apps/leverancier-rtmail.html",
+  "public/apps/leverancier/leverancier-84a.js",
+  "public/apps/lifestyle.html",
+  "public/apps/livinglab-kern.js",
+  "public/apps/magnaat-kantoor.html",
+  "public/apps/magnaat-partnerstudio.html",
+  "public/apps/magnaat-sandbox.js",
+  "public/apps/magnaat.html",
+  "public/apps/maison.html",
+  "public/apps/media/samen.js",
+  "public/apps/media/wereld.js",
+  "public/apps/meet/app.js",
+  "public/apps/meldkamer/meldkamer-01.js",
+  "public/apps/merken.html",
+  "public/apps/navigatie.html",
+  "public/apps/nieuws.html",
+  "public/apps/notities/app/app-01.js",
+  "public/apps/office/app/app-01.js",
+  "public/apps/ov.html",
+  "public/apps/ovroutes.html",
+  "public/apps/passkeys.html",
+  "public/apps/payroll.html",
+  "public/apps/personeel/personeel-04.js",
+  "public/apps/personeel/personeel-25.js",
+  "public/apps/pulse.html",
+  "public/apps/redactie-pda.html",
+  "public/apps/redactie.html",
+  "public/apps/redactiekantoor.html",
+  "public/apps/reisboek.html",
+  "public/apps/reisuitnodiging.html",
+  "public/apps/rendezvous.html",
+  "public/apps/rit.js",
+  "public/apps/rtg-dossier.js",
+  "public/apps/rtgid.html",
+  "public/apps/rtgkantoor.html",
+  "public/apps/rtmail.html",
+  "public/apps/salon/gebaren.js",
+  "public/apps/schoolpartner/app/app-01.js",
+  "public/apps/spelscherm.html",
+  "public/apps/sport.html",
+  "public/apps/stad.html",
+  "public/apps/table.html",
+  "public/apps/theater.html",
+  "public/apps/thuis.html",
+  "public/apps/vertaler/app.js",
+  "public/apps/vluchten.html",
+  "public/apps/voertuig.js",
+  "public/apps/vonk.html",
+  "public/apps/websitestudio.html",
+  "public/apps/wereld.html",
+  "public/apps/werk/bijstand.js",
+  "public/apps/werkplek.js",
+  "public/apps/zaakpay.html",
+  "public/apps/zaakweb.html",
+  "public/apps/zakelijk.html",
+  "public/shared/bureaupda/bureaupda-02.js",
+  "public/shared/clipdeler/clipdeler-01.js",
+  "public/shared/clipdeler/clipdeler-02.js",
+  "public/shared/experience-kernel.js",
+  "public/shared/kantoorgesprek.js",
+  "public/shared/metgezel/metgezel-03.js",
+  "public/shared/ondernemerpoort.js",
+  "public/shared/plaats.js",
+  "public/shared/plaatsdienst.js",
+  "public/sw.js"
+ ],
+ "perScherm": [
+  {
+   "bestand": "public/apps/mall.html",
+   "padenGenoemd": 54,
+   "voorvoegsels": 0,
+   "routesGeraakt": 54,
+   "schrijft": "ja",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/overheid.html",
+   "padenGenoemd": 31,
+   "voorvoegsels": 1,
+   "routesGeraakt": 31,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/belastingkantoor.html",
+   "padenGenoemd": 25,
+   "voorvoegsels": 0,
+   "routesGeraakt": 25,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "eigen-poort",
+    "openbaar",
+    "supplier"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/rijksloket.html",
+   "padenGenoemd": 25,
+   "voorvoegsels": 0,
+   "routesGeraakt": 25,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "eigen-poort",
+    "member",
+    "openbaar",
+    "supplier"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/sportclub.html",
+   "padenGenoemd": 24,
+   "voorvoegsels": 0,
+   "routesGeraakt": 24,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "eigen-poort",
+    "openbaar",
+    "supplier"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/luchthaven.html",
+   "padenGenoemd": 22,
+   "voorvoegsels": 0,
+   "routesGeraakt": 22,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "eigen-poort",
+    "openbaar",
+    "supplier"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/geld/metierc.js",
+   "padenGenoemd": 20,
+   "voorvoegsels": 0,
+   "routesGeraakt": 20,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/life.html",
+   "padenGenoemd": 20,
+   "voorvoegsels": 0,
+   "routesGeraakt": 20,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/salon.html",
+   "padenGenoemd": 19,
+   "voorvoegsels": 0,
+   "routesGeraakt": 19,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/foundation/leerpaspoort.html",
+   "padenGenoemd": 17,
+   "voorvoegsels": 1,
+   "routesGeraakt": 17,
+   "schrijft": "onbekend",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/kosten.html",
+   "padenGenoemd": 17,
+   "voorvoegsels": 0,
+   "routesGeraakt": 17,
+   "schrijft": "ja",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "boardroom"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/bestellen.html",
+   "padenGenoemd": 16,
+   "voorvoegsels": 0,
+   "routesGeraakt": 16,
+   "schrijft": "ja",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/gemeente.html",
+   "padenGenoemd": 16,
+   "voorvoegsels": 0,
+   "routesGeraakt": 16,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/overheidspda.html",
+   "padenGenoemd": 16,
+   "voorvoegsels": 0,
+   "routesGeraakt": 16,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "eigen-poort",
+    "openbaar",
+    "supplier"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/gemeenteloket.html",
+   "padenGenoemd": 12,
+   "voorvoegsels": 0,
+   "routesGeraakt": 12,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "eigen-poort",
+    "openbaar",
+    "supplier"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/rechtbank.html",
+   "padenGenoemd": 11,
+   "voorvoegsels": 0,
+   "routesGeraakt": 11,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "eigen-poort",
+    "openbaar",
+    "supplier"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/boardroom-eigenaar.js",
+   "padenGenoemd": 10,
+   "voorvoegsels": 0,
+   "routesGeraakt": 10,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "techniek"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/festival/inrichten.js",
+   "padenGenoemd": 10,
+   "voorvoegsels": 0,
+   "routesGeraakt": 10,
+   "schrijft": "onbekend",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "supplier"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/home.html",
+   "padenGenoemd": 10,
+   "voorvoegsels": 0,
+   "routesGeraakt": 10,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/living-os-data.js",
+   "padenGenoemd": 10,
+   "voorvoegsels": 0,
+   "routesGeraakt": 10,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/marechaussee.html",
+   "padenGenoemd": 10,
+   "voorvoegsels": 0,
+   "routesGeraakt": 10,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "eigen-poort",
+    "openbaar",
+    "supplier"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/reizen-samen.js",
+   "padenGenoemd": 10,
+   "voorvoegsels": 0,
+   "routesGeraakt": 10,
+   "schrijft": "onbekend",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/shared/toestelsleutel.js",
+   "padenGenoemd": 10,
+   "voorvoegsels": 5,
+   "routesGeraakt": 10,
+   "schrijft": "ja",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/commerce.html",
+   "padenGenoemd": 9,
+   "voorvoegsels": 0,
+   "routesGeraakt": 9,
+   "schrijft": "onbekend",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/geld/nalatenschapb.js",
+   "padenGenoemd": 8,
+   "voorvoegsels": 0,
+   "routesGeraakt": 8,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/appstore-kantoor.html",
+   "padenGenoemd": 7,
+   "voorvoegsels": 0,
+   "routesGeraakt": 7,
+   "schrijft": "onbekend",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "office"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/festival/vooruit.js",
+   "padenGenoemd": 7,
+   "voorvoegsels": 0,
+   "routesGeraakt": 7,
+   "schrijft": "onbekend",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "supplier"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/geld/bankb.js",
+   "padenGenoemd": 7,
+   "voorvoegsels": 0,
+   "routesGeraakt": 7,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/geld/bankc.js",
+   "padenGenoemd": 7,
+   "voorvoegsels": 1,
+   "routesGeraakt": 7,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/geld/wbwb.js",
+   "padenGenoemd": 7,
+   "voorvoegsels": 0,
+   "routesGeraakt": 7,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/leverancier-commerce.html",
+   "padenGenoemd": 7,
+   "voorvoegsels": 0,
+   "routesGeraakt": 7,
+   "schrijft": "onbekend",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "supplier"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/mijnmall.js",
+   "padenGenoemd": 7,
+   "voorvoegsels": 0,
+   "routesGeraakt": 7,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/reisbureau.html",
+   "padenGenoemd": 7,
+   "voorvoegsels": 0,
+   "routesGeraakt": 7,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/appcel.html",
+   "padenGenoemd": 6,
+   "voorvoegsels": 0,
+   "routesGeraakt": 6,
+   "schrijft": "onbekend",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/boeken/app.js",
+   "padenGenoemd": 6,
+   "voorvoegsels": 0,
+   "routesGeraakt": 6,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/festival/programma.js",
+   "padenGenoemd": 6,
+   "voorvoegsels": 0,
+   "routesGeraakt": 6,
+   "schrijft": "onbekend",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "supplier"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/foundation/mijnbanden.html",
+   "padenGenoemd": 6,
+   "voorvoegsels": 0,
+   "routesGeraakt": 6,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/geld/logboekb.js",
+   "padenGenoemd": 6,
+   "voorvoegsels": 0,
+   "routesGeraakt": 6,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/gemeentepda.html",
+   "padenGenoemd": 6,
+   "voorvoegsels": 0,
+   "routesGeraakt": 6,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "eigen-poort",
+    "openbaar",
+    "supplier"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/ik.html",
+   "padenGenoemd": 6,
+   "voorvoegsels": 0,
+   "routesGeraakt": 6,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/memo/app.js",
+   "padenGenoemd": 6,
+   "voorvoegsels": 0,
+   "routesGeraakt": 6,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/sociaal.html",
+   "padenGenoemd": 6,
+   "voorvoegsels": 1,
+   "routesGeraakt": 6,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/veilig/vitaal.js",
+   "padenGenoemd": 6,
+   "voorvoegsels": 0,
+   "routesGeraakt": 6,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/veilig/wacht.js",
+   "padenGenoemd": 6,
+   "voorvoegsels": 0,
+   "routesGeraakt": 6,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/shared/veiligheid.js",
+   "padenGenoemd": 6,
+   "voorvoegsels": 0,
+   "routesGeraakt": 6,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/avond.html",
+   "padenGenoemd": 5,
+   "voorvoegsels": 0,
+   "routesGeraakt": 5,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/doelen.html",
+   "padenGenoemd": 5,
+   "voorvoegsels": 0,
+   "routesGeraakt": 5,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/festival-gast-groep.js",
+   "padenGenoemd": 5,
+   "voorvoegsels": 0,
+   "routesGeraakt": 5,
+   "schrijft": "onbekend",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/geld/kosten.js",
+   "padenGenoemd": 5,
+   "voorvoegsels": 0,
+   "routesGeraakt": 5,
+   "schrijft": "ja",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/geld/labfondsb.js",
+   "padenGenoemd": 5,
+   "voorvoegsels": 0,
+   "routesGeraakt": 5,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/geld/mecenaatb.js",
+   "padenGenoemd": 5,
+   "voorvoegsels": 0,
+   "routesGeraakt": 5,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/geld/waardeb.js",
+   "padenGenoemd": 5,
+   "voorvoegsels": 0,
+   "routesGeraakt": 5,
+   "schrijft": "onbekend",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/geld/walletb.js",
+   "padenGenoemd": 5,
+   "voorvoegsels": 0,
+   "routesGeraakt": 5,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/hotels.html",
+   "padenGenoemd": 5,
+   "voorvoegsels": 0,
+   "routesGeraakt": 5,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/lesmaker.html",
+   "padenGenoemd": 5,
+   "voorvoegsels": 0,
+   "routesGeraakt": 5,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "openbaar"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/medicijnen.html",
+   "padenGenoemd": 5,
+   "voorvoegsels": 0,
+   "routesGeraakt": 5,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/mijn-sessies.html",
+   "padenGenoemd": 5,
+   "voorvoegsels": 0,
+   "routesGeraakt": 5,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": "de routes van dit scherm staan niet in SCHRIJFANALYSE.json, dus over schrijven is hier niets bekend"
+  },
+  {
+   "bestand": "public/apps/reizen-veilig.js",
+   "padenGenoemd": 5,
+   "voorvoegsels": 0,
+   "routesGeraakt": 5,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/residentie/residentie-03.js",
+   "padenGenoemd": 5,
+   "voorvoegsels": 1,
+   "routesGeraakt": 5,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/residentie/residentie-03d.js",
+   "padenGenoemd": 5,
+   "voorvoegsels": 0,
+   "routesGeraakt": 5,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/residentie/residentie-04.js",
+   "padenGenoemd": 5,
+   "voorvoegsels": 0,
+   "routesGeraakt": 5,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/rtgschool/leer/leer-03.js",
+   "padenGenoemd": 5,
+   "voorvoegsels": 0,
+   "routesGeraakt": 5,
+   "schrijft": "onbekend",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/techniek/techniek-01.js",
+   "padenGenoemd": 5,
+   "voorvoegsels": 0,
+   "routesGeraakt": 5,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "eigen-poort",
+    "techniek"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/training.html",
+   "padenGenoemd": 5,
+   "voorvoegsels": 0,
+   "routesGeraakt": 5,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/uitgaan.html",
+   "padenGenoemd": 5,
+   "voorvoegsels": 0,
+   "routesGeraakt": 5,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/veilig/codewoord.js",
+   "padenGenoemd": 5,
+   "voorvoegsels": 0,
+   "routesGeraakt": 5,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/shared/social-intelligence-data.js",
+   "padenGenoemd": 5,
+   "voorvoegsels": 0,
+   "routesGeraakt": 5,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/shared/verbinding/verbinding-01.js",
+   "padenGenoemd": 5,
+   "voorvoegsels": 1,
+   "routesGeraakt": 5,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/boardroom.html",
+   "padenGenoemd": 4,
+   "voorvoegsels": 0,
+   "routesGeraakt": 4,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "boardroom",
+    "office"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/chauffeur.js",
+   "padenGenoemd": 4,
+   "voorvoegsels": 0,
+   "routesGeraakt": 4,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "supplier"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/festival/kassa.js",
+   "padenGenoemd": 4,
+   "voorvoegsels": 0,
+   "routesGeraakt": 4,
+   "schrijft": "onbekend",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "supplier"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/festival/schil.js",
+   "padenGenoemd": 4,
+   "voorvoegsels": 0,
+   "routesGeraakt": 4,
+   "schrijft": "onbekend",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "supplier"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/foundation/vrienden.html",
+   "padenGenoemd": 5,
+   "voorvoegsels": 3,
+   "routesGeraakt": 4,
+   "schrijft": "onbekend",
+   "bewijs": "ONBEPAALD",
+   "rollen": [],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/juridisch/partnervoorwaarden.html",
+   "padenGenoemd": 2,
+   "voorvoegsels": 0,
+   "routesGeraakt": 4,
+   "schrijft": "onbekend",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "openbaar"
+   ],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/mijn-post.html",
+   "padenGenoemd": 4,
+   "voorvoegsels": 0,
+   "routesGeraakt": 4,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": "de routes van dit scherm staan niet in SCHRIJFANALYSE.json, dus over schrijven is hier niets bekend"
+  },
+  {
+   "bestand": "public/apps/mijnmall-mijn.js",
+   "padenGenoemd": 4,
+   "voorvoegsels": 0,
+   "routesGeraakt": 4,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/personeel/personeel-05.js",
+   "padenGenoemd": 4,
+   "voorvoegsels": 0,
+   "routesGeraakt": 4,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "eigen-poort",
+    "member"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/reizen.html",
+   "padenGenoemd": 4,
+   "voorvoegsels": 1,
+   "routesGeraakt": 4,
+   "schrijft": "onbekend",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/residentie/residentie-03k.js",
+   "padenGenoemd": 4,
+   "voorvoegsels": 0,
+   "routesGeraakt": 4,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/rtgschool/leer/leer-04.js",
+   "padenGenoemd": 4,
+   "voorvoegsels": 0,
+   "routesGeraakt": 4,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/techniek/techniek-02a-betalingen.js",
+   "padenGenoemd": 4,
+   "voorvoegsels": 0,
+   "routesGeraakt": 4,
+   "schrijft": "nee",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "techniek"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/techniek/techniek-03a.js",
+   "padenGenoemd": 4,
+   "voorvoegsels": 0,
+   "routesGeraakt": 4,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "techniek"
+   ],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/techniek/techniek-04.js",
+   "padenGenoemd": 3,
+   "voorvoegsels": 1,
+   "routesGeraakt": 4,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "techniek"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": "de routes van dit scherm staan niet in SCHRIJFANALYSE.json, dus over schrijven is hier niets bekend"
+  },
+  {
+   "bestand": "public/shared/realtime.js",
+   "padenGenoemd": 4,
+   "voorvoegsels": 1,
+   "routesGeraakt": 4,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/app-main/app-main-30.js",
+   "padenGenoemd": 3,
+   "voorvoegsels": 0,
+   "routesGeraakt": 3,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/boardroom/boardroom-01.js",
+   "padenGenoemd": 3,
+   "voorvoegsels": 0,
+   "routesGeraakt": 3,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/doos.js",
+   "padenGenoemd": 2,
+   "voorvoegsels": 0,
+   "routesGeraakt": 3,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/festival/podium.js",
+   "padenGenoemd": 3,
+   "voorvoegsels": 0,
+   "routesGeraakt": 3,
+   "schrijft": "onbekend",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "supplier"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/festival/poort.js",
+   "padenGenoemd": 3,
+   "voorvoegsels": 0,
+   "routesGeraakt": 3,
+   "schrijft": "onbekend",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "supplier"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/festival-gast.js",
+   "padenGenoemd": 3,
+   "voorvoegsels": 0,
+   "routesGeraakt": 3,
+   "schrijft": "onbekend",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/foodcourt.html",
+   "padenGenoemd": 3,
+   "voorvoegsels": 0,
+   "routesGeraakt": 3,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/foundation/klas.html",
+   "padenGenoemd": 3,
+   "voorvoegsels": 0,
+   "routesGeraakt": 3,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "openbaar"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/gedachten.html",
+   "padenGenoemd": 3,
+   "voorvoegsels": 0,
+   "routesGeraakt": 3,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/geld/overzichtc.js",
+   "padenGenoemd": 3,
+   "voorvoegsels": 1,
+   "routesGeraakt": 3,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/geld/waardec.js",
+   "padenGenoemd": 3,
+   "voorvoegsels": 0,
+   "routesGeraakt": 3,
+   "schrijft": "onbekend",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/kantoren.html",
+   "padenGenoemd": 3,
+   "voorvoegsels": 3,
+   "routesGeraakt": 3,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "boardroom",
+    "office"
+   ],
+   "herhaling": [
+    "beschermd",
+    "onbeschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/leverancier-aanvragen.js",
+   "padenGenoemd": 3,
+   "voorvoegsels": 0,
+   "routesGeraakt": 3,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "supplier"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/mijn-relaties.html",
+   "padenGenoemd": 3,
+   "voorvoegsels": 0,
+   "routesGeraakt": 3,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": "de routes van dit scherm staan niet in SCHRIJFANALYSE.json, dus over schrijven is hier niets bekend"
+  },
+  {
+   "bestand": "public/apps/mijnmall-aanvragen.js",
+   "padenGenoemd": 3,
+   "voorvoegsels": 0,
+   "routesGeraakt": 3,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/reizen-performance-taxi.js",
+   "padenGenoemd": 3,
+   "voorvoegsels": 0,
+   "routesGeraakt": 3,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/reizen-samen-delen.js",
+   "padenGenoemd": 3,
+   "voorvoegsels": 0,
+   "routesGeraakt": 3,
+   "schrijft": "onbekend",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/residentie/residentie-03b.js",
+   "padenGenoemd": 3,
+   "voorvoegsels": 0,
+   "routesGeraakt": 3,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/residentie/residentie-03c.js",
+   "padenGenoemd": 3,
+   "voorvoegsels": 0,
+   "routesGeraakt": 3,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/rtg-vandaag.js",
+   "padenGenoemd": 3,
+   "voorvoegsels": 0,
+   "routesGeraakt": 3,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/rtgschool/examen.js",
+   "padenGenoemd": 3,
+   "voorvoegsels": 0,
+   "routesGeraakt": 3,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/rtgschool/leer/leer-02.js",
+   "padenGenoemd": 3,
+   "voorvoegsels": 0,
+   "routesGeraakt": 3,
+   "schrijft": "onbekend",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/techniek/techniek-01a.js",
+   "padenGenoemd": 3,
+   "voorvoegsels": 1,
+   "routesGeraakt": 3,
+   "schrijft": "ja",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/techniek/techniek-03c.js",
+   "padenGenoemd": 3,
+   "voorvoegsels": 1,
+   "routesGeraakt": 3,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "techniek"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/toestemming.html",
+   "padenGenoemd": 3,
+   "voorvoegsels": 0,
+   "routesGeraakt": 3,
+   "schrijft": "onbekend",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/veilig/rust.js",
+   "padenGenoemd": 3,
+   "voorvoegsels": 0,
+   "routesGeraakt": 3,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/voeding.html",
+   "padenGenoemd": 3,
+   "voorvoegsels": 0,
+   "routesGeraakt": 3,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/zaakkosten.js",
+   "padenGenoemd": 3,
+   "voorvoegsels": 0,
+   "routesGeraakt": 3,
+   "schrijft": "ja",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "supplier"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/shared/handenvrij-oog.js",
+   "padenGenoemd": 3,
+   "voorvoegsels": 0,
+   "routesGeraakt": 3,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/shared/plaatsnadering.js",
+   "padenGenoemd": 3,
+   "voorvoegsels": 0,
+   "routesGeraakt": 3,
+   "schrijft": "ja",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/appstore-dossier.html",
+   "padenGenoemd": 2,
+   "voorvoegsels": 0,
+   "routesGeraakt": 2,
+   "schrijft": "onbekend",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/boardroom/boardroom-02.js",
+   "padenGenoemd": 2,
+   "voorvoegsels": 0,
+   "routesGeraakt": 2,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/foundation/kantoor.html",
+   "padenGenoemd": 2,
+   "voorvoegsels": 2,
+   "routesGeraakt": 2,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "boardroom",
+    "office"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": "de routes van dit scherm staan niet in SCHRIJFANALYSE.json, dus over schrijven is hier niets bekend"
+  },
+  {
+   "bestand": "public/apps/foundation/schrift.html",
+   "padenGenoemd": 2,
+   "voorvoegsels": 1,
+   "routesGeraakt": 2,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "verzwakt",
+   "rollen": [],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": "de routes van dit scherm staan niet in SCHRIJFANALYSE.json, dus over schrijven is hier niets bekend"
+  },
+  {
+   "bestand": "public/apps/geld/overzichtb.js",
+   "padenGenoemd": 2,
+   "voorvoegsels": 0,
+   "routesGeraakt": 2,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/horeca/edge.js",
+   "padenGenoemd": 2,
+   "voorvoegsels": 0,
+   "routesGeraakt": 2,
+   "schrijft": "ja",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "supplier"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/juridisch/voorwaarden.html",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 2,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "openbaar"
+   ],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/leven.js",
+   "padenGenoemd": 2,
+   "voorvoegsels": 0,
+   "routesGeraakt": 2,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/living-os.js",
+   "padenGenoemd": 2,
+   "voorvoegsels": 0,
+   "routesGeraakt": 2,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/media/lijst.js",
+   "padenGenoemd": 2,
+   "voorvoegsels": 0,
+   "routesGeraakt": 2,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/ovdienst.html",
+   "padenGenoemd": 2,
+   "voorvoegsels": 1,
+   "routesGeraakt": 2,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "supplier"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/pakketten.html",
+   "padenGenoemd": 2,
+   "voorvoegsels": 0,
+   "routesGeraakt": 2,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/reizen-samen-mensen.js",
+   "padenGenoemd": 2,
+   "voorvoegsels": 0,
+   "routesGeraakt": 2,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": "de routes van dit scherm staan niet in SCHRIJFANALYSE.json, dus over schrijven is hier niets bekend"
+  },
+  {
+   "bestand": "public/apps/rtgschool/bijles.js",
+   "padenGenoemd": 2,
+   "voorvoegsels": 0,
+   "routesGeraakt": 2,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/spelen.html",
+   "padenGenoemd": 2,
+   "voorvoegsels": 4,
+   "routesGeraakt": 2,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/techniek/techniek-02.js",
+   "padenGenoemd": 2,
+   "voorvoegsels": 0,
+   "routesGeraakt": 2,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "techniek"
+   ],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/werk/status.js",
+   "padenGenoemd": 2,
+   "voorvoegsels": 0,
+   "routesGeraakt": 2,
+   "schrijft": "ja",
+   "bewijs": "ONBEPAALD",
+   "rollen": [],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/shared/dyncode.js",
+   "padenGenoemd": 2,
+   "voorvoegsels": 0,
+   "routesGeraakt": 2,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/shared/handenvrij-balk/handenvrij-balk-01.js",
+   "padenGenoemd": 2,
+   "voorvoegsels": 0,
+   "routesGeraakt": 2,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member",
+    "supplier"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/shared/interface/modules/safety.js",
+   "padenGenoemd": 2,
+   "voorvoegsels": 0,
+   "routesGeraakt": 2,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/shared/interface/second-screen-modules.js",
+   "padenGenoemd": 2,
+   "voorvoegsels": 0,
+   "routesGeraakt": 2,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/shared/interface/workspace-continuity.js",
+   "padenGenoemd": 2,
+   "voorvoegsels": 0,
+   "routesGeraakt": 2,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": "de routes van dit scherm staan niet in SCHRIJFANALYSE.json, dus over schrijven is hier niets bekend"
+  },
+  {
+   "bestand": "public/shared/kluismap.js",
+   "padenGenoemd": 2,
+   "voorvoegsels": 0,
+   "routesGeraakt": 2,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/shared/metgezel/metgezel-01b2.js",
+   "padenGenoemd": 2,
+   "voorvoegsels": 0,
+   "routesGeraakt": 2,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member",
+    "supplier"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/shared/poortgesprek.js",
+   "padenGenoemd": 2,
+   "voorvoegsels": 0,
+   "routesGeraakt": 2,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/shared/rahul-tab.js",
+   "padenGenoemd": 2,
+   "voorvoegsels": 1,
+   "routesGeraakt": 2,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member",
+    "supplier"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/shared/rtg-edge-library.js",
+   "padenGenoemd": 2,
+   "voorvoegsels": 0,
+   "routesGeraakt": 2,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "de routes van dit scherm staan niet in SCHRIJFANALYSE.json, dus over schrijven is hier niets bekend"
+  },
+  {
+   "bestand": "public/shared/schoolbel.js",
+   "padenGenoemd": 2,
+   "voorvoegsels": 1,
+   "routesGeraakt": 2,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "verzwakt",
+   "rollen": [],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": "de routes van dit scherm staan niet in SCHRIJFANALYSE.json, dus over schrijven is hier niets bekend"
+  },
+  {
+   "bestand": "public/shared/toegankelijk.js",
+   "padenGenoemd": 2,
+   "voorvoegsels": 0,
+   "routesGeraakt": 2,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/agenda/paneel.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/app-main/app-main-09a2.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/app-main/app-main-10.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "de routes van dit scherm staan niet in SCHRIJFANALYSE.json, dus over schrijven is hier niets bekend"
+  },
+  {
+   "bestand": "public/apps/app-main/app-main-45.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "de routes van dit scherm staan niet in SCHRIJFANALYSE.json, dus over schrijven is hier niets bekend"
+  },
+  {
+   "bestand": "public/apps/appstore-uitgever.html",
+   "padenGenoemd": 1,
+   "voorvoegsels": 1,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "supplier"
+   ],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/backoffice/backoffice-03.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "de routes van dit scherm staan niet in SCHRIJFANALYSE.json, dus over schrijven is hier niets bekend"
+  },
+  {
+   "bestand": "public/apps/backoffice/backoffice-04.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 1,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "office"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/camera.html",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/comm.html",
+   "padenGenoemd": 1,
+   "voorvoegsels": 2,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/concern.html",
+   "padenGenoemd": 1,
+   "voorvoegsels": 1,
+   "routesGeraakt": 1,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "de routes van dit scherm staan niet in SCHRIJFANALYSE.json, dus over schrijven is hier niets bekend"
+  },
+  {
+   "bestand": "public/apps/festival/beeld.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "supplier"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/festival/dienst.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "supplier"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/festival/gereed.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "supplier"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/foundation/arena.html",
+   "padenGenoemd": 1,
+   "voorvoegsels": 1,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/foundation/buurtruil.html",
+   "padenGenoemd": 1,
+   "voorvoegsels": 1,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "openbaar"
+   ],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/foundation/campus.html",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/foundation/dromen.html",
+   "padenGenoemd": 1,
+   "voorvoegsels": 1,
+   "routesGeraakt": 1,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "de routes van dit scherm staan niet in SCHRIJFANALYSE.json, dus over schrijven is hier niets bekend"
+  },
+  {
+   "bestand": "public/apps/foundation/geld.html",
+   "padenGenoemd": 1,
+   "voorvoegsels": 1,
+   "routesGeraakt": 1,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "de routes van dit scherm staan niet in SCHRIJFANALYSE.json, dus over schrijven is hier niets bekend"
+  },
+  {
+   "bestand": "public/apps/foundation/gezin-rt/gezin-rt-02.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "de routes van dit scherm staan niet in SCHRIJFANALYSE.json, dus over schrijven is hier niets bekend"
+  },
+  {
+   "bestand": "public/apps/foundation/index.html",
+   "padenGenoemd": 1,
+   "voorvoegsels": 1,
+   "routesGeraakt": 1,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "de routes van dit scherm staan niet in SCHRIJFANALYSE.json, dus over schrijven is hier niets bekend"
+  },
+  {
+   "bestand": "public/apps/foundation/klimaatfonds.html",
+   "padenGenoemd": 1,
+   "voorvoegsels": 1,
+   "routesGeraakt": 1,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": "de routes van dit scherm staan niet in SCHRIJFANALYSE.json, dus over schrijven is hier niets bekend"
+  },
+  {
+   "bestand": "public/apps/foundation/overhoren.html",
+   "padenGenoemd": 1,
+   "voorvoegsels": 1,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/foundation/projecten.html",
+   "padenGenoemd": 1,
+   "voorvoegsels": 1,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/foundation/reis.html",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "eigen-poort"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": "de routes van dit scherm staan niet in SCHRIJFANALYSE.json, dus over schrijven is hier niets bekend"
+  },
+  {
+   "bestand": "public/apps/foundation/samen/samen-02.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/foundation/school.html",
+   "padenGenoemd": 1,
+   "voorvoegsels": 1,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/foundation/sessie/sessie-00.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 1,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/foundation/societeit.html",
+   "padenGenoemd": 1,
+   "voorvoegsels": 1,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/geld/balansb.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/geld/bank.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/geld/rtgcode.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/geld/rtgcodeb.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/geld/wallet.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/ghost.html",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "supplier"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/horeca/app.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "supplier"
+   ],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/kantoor.html",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/kassa/wachtrij.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "supplier"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/leverancier/leverancier-07.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 1,
+   "routesGeraakt": 1,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "de routes van dit scherm staan niet in SCHRIJFANALYSE.json, dus over schrijven is hier niets bekend"
+  },
+  {
+   "bestand": "public/apps/life-lagen.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/media/speler.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/meet/kamer.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "de routes van dit scherm staan niet in SCHRIJFANALYSE.json, dus over schrijven is hier niets bekend"
+  },
+  {
+   "bestand": "public/apps/mijn-gegevens.html",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": "de routes van dit scherm staan niet in SCHRIJFANALYSE.json, dus over schrijven is hier niets bekend"
+  },
+  {
+   "bestand": "public/apps/muziek.html",
+   "padenGenoemd": 1,
+   "voorvoegsels": 1,
+   "routesGeraakt": 1,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/onderneming.html",
+   "padenGenoemd": 1,
+   "voorvoegsels": 1,
+   "routesGeraakt": 1,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "de routes van dit scherm staan niet in SCHRIJFANALYSE.json, dus over schrijven is hier niets bekend"
+  },
+  {
+   "bestand": "public/apps/oog.html",
+   "padenGenoemd": 1,
+   "voorvoegsels": 1,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "supplier"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/ovcontrol.html",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "supplier"
+   ],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/pay.html",
+   "padenGenoemd": 1,
+   "voorvoegsels": 1,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "eigen-poort"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/personeel/personeel-03a.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "de routes van dit scherm staan niet in SCHRIJFANALYSE.json, dus over schrijven is hier niets bekend"
+  },
+  {
+   "bestand": "public/apps/platformregister.html",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "office"
+   ],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/podium.html",
+   "padenGenoemd": 1,
+   "voorvoegsels": 2,
+   "routesGeraakt": 1,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "de routes van dit scherm staan niet in SCHRIJFANALYSE.json, dus over schrijven is hier niets bekend"
+  },
+  {
+   "bestand": "public/apps/reizen-performance-boeken.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/reizen-performance-rahul.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/reizen-performance-reis.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/routedekking.html",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "office"
+   ],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/routedossier.html",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "office"
+   ],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/rtg-protect/rtg-protect-01.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/rtgone.html",
+   "padenGenoemd": 1,
+   "voorvoegsels": 1,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/scanner/app.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/scherm.html",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "supplier"
+   ],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/sitemaker.html",
+   "padenGenoemd": 1,
+   "voorvoegsels": 1,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/stadsdoos.html",
+   "padenGenoemd": 1,
+   "voorvoegsels": 2,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "openbaar"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/techniek/techniek-02b.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "ja",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/techniek/techniek-03.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "ja",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/tijdlijn.html",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/translate.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "openbaar"
+   ],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/werk/kern.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 1,
+   "routesGeraakt": 1,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/werk/merk.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "ONBEPAALD",
+   "rollen": [],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/werkplek-bureaus/werkplek-bureaus-01.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 1,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/werkplek-bureaus/werkplek-bureaus-02.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/shared/adresvoorstel.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/shared/basis/basis-02.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "openbaar"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/shared/deur.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "openbaar"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/shared/foutmelder.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "openbaar"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/shared/handenvrij-chat.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/shared/horeca-enterprise.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "supplier"
+   ],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/shared/i18n/i18n-00.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "openbaar"
+   ],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/shared/i18n/i18n-01.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "openbaar"
+   ],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/shared/i18n/i18n-03.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "openbaar"
+   ],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/shared/interface/modules/travel.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/shared/interface/workspace-runtime.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": "de routes van dit scherm staan niet in SCHRIJFANALYSE.json, dus over schrijven is hier niets bekend"
+  },
+  {
+   "bestand": "public/shared/journaalbord.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "boardroom"
+   ],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/shared/linkkoppelingen.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/shared/metgezel/metgezel-02.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 1,
+   "routesGeraakt": 1,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/shared/overdracht.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/shared/rahul-mond.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 1,
+   "routesGeraakt": 1,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "supplier"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/shared/teamcall/teamcall-01.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "de routes van dit scherm staan niet in SCHRIJFANALYSE.json, dus over schrijven is hier niets bekend"
+  },
+  {
+   "bestand": "public/shared/verbinding/verbinding-02.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "de routes van dit scherm staan niet in SCHRIJFANALYSE.json, dus over schrijven is hier niets bekend"
+  },
+  {
+   "bestand": "public/shared/zegelcheck.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "de routes van dit scherm staan niet in SCHRIJFANALYSE.json, dus over schrijven is hier niets bekend"
+  },
+  {
+   "bestand": "public/apps/agenda/app.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/app-main/app-main-43.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "het genoemde pad is een STAM van bestaande routes (/api/foundation), geen route op zichzelf"
+  },
+  {
+   "bestand": "public/apps/arrival.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/attenties.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/backoffice/backoffice-01.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/bestanden/app.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/browser.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/cellier.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/cercle.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/clips.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/command/command-01.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/concierge.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/defensie/defensie-01.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/dispatch.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/entourage.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/flits.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/foundation/babyboek.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 2,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/foundation/beheer.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/foundation/beroepen.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/foundation/bieb.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/foundation/bord.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 3,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/foundation/club.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/foundation/clubswerk.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/foundation/contact.html",
+   "padenGenoemd": 1,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "het genoemde pad is een STAM van bestaande routes (/api/foundation), geen route op zichzelf"
+  },
+  {
+   "bestand": "public/apps/foundation/geloofbieb.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/foundation/geven.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/foundation/gevoel.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/foundation/gezin-rt/gezin-rt-01.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "het genoemde pad is een STAM van bestaande routes (/api/foundation), geen route op zichzelf"
+  },
+  {
+   "bestand": "public/apps/foundation/gezondheid.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/foundation/keuken.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/foundation/klusjes.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/foundation/leren.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/foundation/ochtend.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/foundation/oppasinfo.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/foundation/os-bestuur.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/foundation/os-deelnemer.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/foundation/os-donateur.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/foundation/os-portaal.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/foundation/os-publiek.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/foundation/os-veld.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/foundation/os-vrijwilliger.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/foundation/os.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/foundation/partner.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/foundation/realtime.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/foundation/registreren.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 2,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/foundation/samen/samen-01.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/foundation/schoolbieb.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/foundation/schrijven.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/foundation/sessie/sessie-01.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/foundation/sessie/sessie-02.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/foundation/sw.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/foundation/toetsen.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/foundation/veilig.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/foundation/verjaardagen.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/foundation/werk.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/foundation/winkel.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/foundation/zakgeld.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/galerij/app.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/garderobe.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/gast.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/gereedschap/klok.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 2,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/handel.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/hangar.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/horeca/bezorg-rit.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/horeca/kern.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 2,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/kassa.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/klankwerk/kantoor.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/klankwerk/scherm.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/klankwerk/zaal.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/krant.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/lab.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/labpas.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/leverancier/leverancier-84a.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/leverancier-rtmail.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 2,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/lifestyle.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/livinglab-kern.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/magnaat-kantoor.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/magnaat-partnerstudio.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/magnaat-sandbox.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/magnaat.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 2,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/maison.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/media/samen.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/media/wereld.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/meet/app.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 2,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/meldkamer/meldkamer-01.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/merken.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/navigatie.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/nieuws.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/notities/app/app-01.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/office/app/app-01.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 5,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/ov.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 2,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/ovroutes.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/passkeys.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/payroll.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/personeel/personeel-04.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/personeel/personeel-25.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/pulse.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 2,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/redactie-pda.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/redactie.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/redactiekantoor.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/reisboek.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/reisuitnodiging.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/rendezvous.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/rit.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/rtg-dossier.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/rtgid.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 2,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/rtgkantoor.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/rtmail.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/salon/gebaren.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/schoolpartner/app/app-01.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/spelscherm.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/sport.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/stad.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 2,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/table.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/theater.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 4,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/thuis.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/vertaler/app.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/vluchten.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/voertuig.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/vonk.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/websitestudio.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/wereld.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/werk/bijstand.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/werkplek.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/zaakpay.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/zaakweb.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/zakelijk.html",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/shared/bureaupda/bureaupda-02.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/shared/clipdeler/clipdeler-01.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/shared/clipdeler/clipdeler-02.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/shared/experience-kernel.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/shared/kantoorgesprek.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/shared/metgezel/metgezel-03.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 2,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/shared/ondernemerpoort.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/shared/plaats.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/shared/plaatsdienst.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/sw.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  }
+ ]
+}

@@ -85,7 +85,7 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
-const { zonderCommentaar } = require('./bron');
+const { zonderCommentaar, stukken } = require('./bron');
 const { lex } = require('../ast/lexer');
 
 const OVERSLAAN = /^(node_modules|\.git|data|dist)$/;
@@ -129,30 +129,10 @@ function blindIn(bron, strip = zonderCommentaar) {
    Het knippen gebeurt op dezelfde manier als in scripts/check.js regel 12, dat
    elk inline script al ontleedt -- maar dan met de vraag "staat het er na het
    strippen nog", in plaats van "is het geldige JS". */
-const BLOK_OPEN = /<(script|style)\b[^>]*>/gi;
-
-/* De pagina in documentvolgorde uit elkaar: markup, blokinhoud, markup, ...
-   `soort` is null voor markup, 'script' of 'style' voor de inhoud van zo'n blok.
-   Een blok dat niet sluit stopt de verdeling; scripts/check.js regel 12 klaagt
-   daar al over en dit is niet de plek om dat nog eens te doen. */
-function stukken(bron) {
-  const laag = bron.toLowerCase();
-  const uit = [];
-  let i = 0;
-  BLOK_OPEN.lastIndex = 0;
-  let m;
-  while ((m = BLOK_OPEN.exec(bron))) {
-    const na = m.index + m[0].length;
-    const sluit = laag.indexOf('</' + m[1].toLowerCase() + '>', na);
-    if (sluit < 0) break;
-    uit.push({ soort: null, tekst: bron.slice(i, na) });
-    uit.push({ soort: m[1].toLowerCase(), tekst: bron.slice(na, sluit) });
-    i = sluit;
-    BLOK_OPEN.lastIndex = sluit;
-  }
-  uit.push({ soort: null, tekst: bron.slice(i) });
-  return uit;
-}
+/* stukken() komt uit ./bron.js. Hij stond hier, en toen de verwijderaar zelf
+   HTML leerde lezen zou dat de tweede kopie zijn geworden: de proef zou een
+   pagina dan anders in stukken kunnen knippen dan de verwijderaar die hij
+   meet, en dan bewijst hij iets over een andere indeling (LAT.md regel 4). */
 
 /* EEN PAGINA, TWEE SOORTEN BRON, EEN CURSOR.
 
@@ -176,7 +156,10 @@ function blindInHtml(bron, strip = zonderCommentaar) {
      tweede net. stukken() geeft dan een enkel markupdeel terug en dat hoort
      gewoon nagelopen te worden. */
   const delen = stukken(bron);
-  const gestript = strip(bron);
+  /* MET DE SOORT ERBIJ, want deze proef hoort te meten wat de keuringen ECHT
+     doen. Een meegegeven `strip` (de ijking) negeert de tweede parameter en
+     blijft dus gewoon uitslaan. */
+  const gestript = strip(bron, { soort: 'html' });
   let kwijt = 0, eerste = null, lexfout = false, cursor = 0;
   const mis = (tekst) => { kwijt++; if (eerste === null) eerste = tekst.slice(0, 80); };
 
@@ -204,6 +187,79 @@ function blindInHtml(bron, strip = zonderCommentaar) {
   return { lexfout, kwijt, eerste };
 }
 
+/* DE CSS-KANT, en die was de laatste blinde vlek van deze proef.
+
+   In een stylesheet is een blokcommentaar een ECHT commentaar en mag het weg --
+   daar verschilt CSS niet van JavaScript. Waar hij wel verschilt is de andere
+   vorm: `//` is in CSS geen commentaar maar gewoon twee schuine strepen, en die
+   staan in een stylesheet op een plek waar je ze niet verwacht:
+
+     background:url(//static.example/x.png)
+     grid-area:1//2 in een preprocessor-uitvoer
+
+   ./bron.js kent alleen JavaScript en eet daar de rest van de REGEL op. Zijn
+   uitzondering (een dubbele punt ervoor, voor `http://`) dekt `url(//` niet: het
+   teken ervoor is een haakje.
+
+   VANDAAG SLAAT DAT NERGENS UIT -- geen van de 72 stylesheets bevat zo`n vorm,
+   gemeten en niet aangenomen. Dat is precies waarom hij hier gedekt hoort te
+   worden en niet gerepareerd: de valstrik staat open, en zonder proef zou de
+   eerste die hem intrapt er stil in vallen. Dezelfde afweging als bij de
+   markuptekst hierboven.
+
+   DE TWEEDE MENING KENT CSS. Er is geen CSS-lexer in dit huis en er komt er hier
+   geen die dat woord verdient; wat deze proef nodig heeft is smaller. Hij loopt
+   de stylesheet een keer door met drie standen -- code, tekenreeks, commentaar --
+   en levert de CODE-stukken op. Elk niet-leeg stuk hoort na het strippen nog te
+   staan, in dezelfde volgorde. Dat is dezelfde belofte als hierboven (commentaar
+   eruit, de rest erin) en dezelfde cursor die ook de VOLGORDE bewaakt. */
+function stukkenCss(bron) {
+  const uit = [];
+  const n = bron.length;
+  let i = 0, begin = 0;
+  while (i < n) {
+    const c = bron[i];
+    if (c === '/' && bron[i + 1] === '*') {
+      if (i > begin) uit.push(bron.slice(begin, i));
+      const eind = bron.indexOf('*/', i + 2);
+      if (eind < 0) { begin = n; break; }          // niet gesloten: de rest is commentaar
+      i = eind + 2; begin = i;
+      continue;
+    }
+    /* Een tekenreeks wordt OVERGESLAGEN en niet apart opgeleverd: wat erin staat
+       kan er als `/*` uitzien en is dat niet. Hij blijft deel van het codestuk
+       eromheen, precies zoals ./bron.js hem laat staan. */
+    if (c === '"' || c === "'") {
+      let j = i + 1;
+      while (j < n && bron[j] !== c && bron[j] !== '\n') { if (bron[j] === '\\') j++; j++; }
+      i = (j < n && bron[j] === c) ? j + 1 : i + 1;
+      continue;
+    }
+    i++;
+  }
+  if (begin < n) uit.push(bron.slice(begin));
+  return uit;
+}
+
+/* Een stylesheet. Per CODE-stuk regel voor regel: staat elke niet-lege regel na
+   het strippen nog op zijn plek? Regels en niet tokens, want er is hier geen
+   lexer die tokens levert -- en een regel is fijn genoeg om `url(//...)` te zien
+   verdwijnen, wat het geval is waar deze proef voor bestaat. */
+function blindInCss(bron, strip = zonderCommentaar) {
+  const gestript = strip(bron, { soort: 'css' });
+  let kwijt = 0, eerste = null, cursor = 0;
+  for (const stuk of stukkenCss(bron)) {
+    for (const regel of stuk.split('\n')) {
+      const t = regel.trim();
+      if (!t) continue;
+      const q = gestript.indexOf(t, cursor);
+      if (q < 0) { kwijt++; if (eerste === null) eerste = t.slice(0, 80); }
+      else cursor = q + t.length;
+    }
+  }
+  return { lexfout: false, kwijt, eerste };
+}
+
 function bronBestanden(wortel, mappen) {
   const uit = [];
   const ga = (dir) => {
@@ -211,7 +267,7 @@ function bronBestanden(wortel, mappen) {
     for (const e of namen) {
       const p = path.join(dir, e.name);
       if (e.isDirectory()) { if (!OVERSLAAN.test(e.name)) ga(p); }
-      else if (e.name.endsWith('.js') || e.name.endsWith('.html')) uit.push(p);
+      else if (/\.(js|html|css)$/.test(e.name)) uit.push(p);
     }
   };
   for (const m of mappen) { const d = path.join(wortel, m); if (fs.existsSync(d)) ga(d); }
@@ -248,9 +304,10 @@ function meetBlind({ wortel, mappen = ['public', 'server', 'scripts', 'test'], s
     uit.bestanden++;
     const sleutel = strip ? null : vol + '|' + st.mtimeMs + '|' + st.size;
     /* Een .js-bestand is in zijn geheel code; van een .html telt alleen wat er
-       in de inline scriptblokken staat. Twee proeven, een meter -- want de vraag
-       is dezelfde: raakt de verwijderaar hier bron kwijt? */
-    const proef = vol.endsWith('.html') ? blindInHtml : blindIn;
+       in de inline scriptblokken staat, plus de eis dat er in de markup NIETS
+       verdwijnt; een .css levert zijn codestukken zelf. Drie proeven, een meter
+       -- want de vraag is dezelfde: raakt de verwijderaar hier bron kwijt? */
+    const proef = vol.endsWith('.html') ? blindInHtml : (vol.endsWith('.css') ? blindInCss : blindIn);
     const r = (sleutel && TAFEL.has(sleutel)) ? TAFEL.get(sleutel) : proef(bron, strip);
     if (sleutel) TAFEL.set(sleutel, r);
     const rel = path.relative(wortel, vol).replace(/\\/g, '/');
@@ -266,4 +323,4 @@ function meetBlind({ wortel, mappen = ['public', 'server', 'scripts', 'test'], s
   return uit;
 }
 
-module.exports = { blindIn, blindInHtml, stukken, meetBlind, bronBestanden };
+module.exports = { blindIn, blindInHtml, blindInCss, stukken, stukkenCss, meetBlind, bronBestanden };

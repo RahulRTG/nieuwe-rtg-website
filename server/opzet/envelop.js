@@ -9,18 +9,17 @@
    eerste helft van de reparatie.
 
    EN HET TWEEDE PROBLEEM DAT HIJ OPLOST. "Wie handelt hier" stond op ZEVEN
-   verschillende plekken op het verzoek: req.session, req.actor, req.boardroomKey,
-   req.techUser, req.gast, req.gezinslid en req.drive. Zeven namen voor een
-   begrip betekent dat niets er generiek op kan staan -- een teller, een rem, een
-   bonnetje of een blast radius zou zeven keer geschreven moeten worden, en de
-   achtste poortwachter zou de eerste zeven weer niet kennen (LAT.md regel 4).
+   plekken op het verzoek, en dan kan er niets generieks op staan -- een teller,
+   een rem of een bonnetje zou zeven keer geschreven moeten worden (LAT.md
+   regel 4). Er zijn er nu ZES: `req.boardroomKey` droeg alleen een identiteit
+   en is weg (TAKEN.md 4.72), de zes andere dragen domeindata die deze envelop
+   met opzet NIET draagt -- overzetten zou hem een sessieobject maken.
+   scripts/actorvormen.js meet dat verschil en ratelt het.
 
-   ADDITIEF, EN DAT IS EEN BESLUIT. Deze module HAALT NIETS WEG. De zeven vormen
-   blijven staan en elke bestaande route blijft precies doen wat hij deed; er
-   komt alleen `req.envelop` bij. Een grote vervanging in het authenticatiepad
-   van 3349 routes is precies het soort wijziging waarvan je pas maanden later
-   merkt wat er stuk ging. De schuld (zeven vormen) blijft dus geteld staan in
-   ENVELOP.json en gaat met de hand omlaag, route voor route.
+   ADDITIEF, EN DAT IS EEN BESLUIT. Deze module haalde niets weg: elke bestaande
+   route bleef doen wat hij deed, er kwam alleen `req.envelop` bij. Een grote
+   vervanging in het authenticatiepad van 3349 routes is precies het soort
+   wijziging waarvan je pas maanden later merkt wat er stuk ging.
 
    WAT ER IN ZIT, EN WAT BEWUST NIET
 
@@ -169,4 +168,12 @@ function van(req) {
   return (req && req.envelop) || null;
 }
 
-module.exports = { zet, van, SOORTEN, IDENTITEITEN };
+/* WIE HANDELT HIER -- de generieke lezer (TAKEN.md 4.72), die niet weet welke
+   poortwachter ervoor stond. Null en geen lege tekenreeks als er niemand is:
+   "niemand" en "iemand zonder naam" zijn niet hetzelfde. */
+function wie(req) {
+  const e = van(req);
+  return (e && e.actor && e.actor.id) || null;
+}
+
+module.exports = { zet, van, wie, SOORTEN, IDENTITEITEN };

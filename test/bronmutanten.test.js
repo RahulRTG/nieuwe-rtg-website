@@ -31,11 +31,37 @@
    of public/ overschrijft, en eist dat die in de isolatielijst staat. Niet meer
    en niet minder.
 
-   WAT HIJ NIET ZIET, en dat hoort erbij: een toets die op een ANDERE manier aan
-   de bron komt (execFileSync naar een script dat schrijft, of fs.writeFileSync
-   met een pad dat uit een variabele komt) valt hier buiten. De vormen hieronder
-   zijn de vormen die dit huis vandaag gebruikt; een nieuwe vorm is onzichtbaar
-   tot iemand hem hier bij zet.
+   DE TWEEDE VORM, ERBIJ OP 3 SEPTEMBER 2026 (TAKEN.md 4.77). Hier stond dat een
+   `fs.writeFileSync` met een pad uit een VARIABELE buiten de zeef viel, en dat
+   was geen theorie: het narekenen vond er 21, waarvan `capabilities.test.js`
+   (die een echt bestand in server/kern/ neerzet) en `gezagshandelingen.test.js`
+   (die kern/frictie/bodem.js muteert) niet in de isolatielijst stonden.
+
+   Die vorm vraagt een FLOW-controle en niet een patroon, en dat is de reden dat
+   hij er niet meteen bij zat: `begrotingsgrenzen.test.js` heeft een variabele
+   `map` die uit server/kern/vergeten komt en een tweede `map` die uit
+   os.tmpdir() komt. Een zeef die alleen ziet dat beide woorden in het bestand
+   staan, beschuldigt een toets die alleen LEEST -- en een zeef die onschuldige
+   toetsen aanwijst, wordt weggeklikt. Dus: een naam telt alleen als ELKE
+   toekenning eraan uit de bron komt, en als er ook echt op die naam geschreven
+   wordt.
+
+   FAIL-CLOSED OP HET ONBEKENDE. Komt de map uit een variabele
+   (`path.join(WORTEL, rel)`), dan is statisch niet te zien waar hij landt --
+   en dan telt hij mee. Dat is de goede kant om fout te staan: de kosten van een
+   onterechte isolatie zijn een tragere scherf, de kosten van een gemiste zijn
+   een rood dat een onschuldig bestand aanwijst.
+
+   WAT HIJ NOG STEEDS NIET ZIET, en dat hoort erbij:
+   - een toets die een SCRIPT start dat in de repo schrijft. Gemeten: veertien
+     toetsen starten zo'n script, maar geen van de veertien geeft een vlag mee
+     waaronder dat script schrijft (ze gebruiken --json, --lees, --controle).
+     Alle veertien isoleren zou de suite trager maken voor een gevaar dat er
+     vandaag niet is; het narekenen ervan hoort bij de vlaggen te beginnen en
+     niet bij de bestandsnamen.
+   - een schrijf naar een register in de wortel (GEZAG.json, package.json). Dat
+     is een kleiner gevaar -- geen enkele toets VOERT die bestanden uit -- en het
+     zou de zeef over een andere klasse laten gaan dan waar hij voor is.
 
    Draai los: node --test test/bronmutanten.test.js */
 const test = require('node:test');
@@ -87,6 +113,58 @@ function isolatielijst() {
    MAG-lijst in scripts/klok.js dat doet. */
 const EIGEN = 'bronmutanten.test.js';
 
+/* server/data/ is de RUNTIME-map (database, sleutels, staat er in .gitignore) en
+   geen bron: geen enkele toets voert die bestanden uit. Wie daar schrijft raakt
+   wel gedeelde staat, maar dat is een andere klasse dan een kapot .js-bestand. */
+const GEEN_BRON = /^(server\/data|\.release)\b/;
+const BRONMAP = /^(server|scripts|public)\b/;
+
+/* DE FLOW-ZEEF voor een pad uit een variabele. Geeft de namen terug waarvan
+   ELKE toekenning uit de bron komt en waarop ook echt geschreven wordt. */
+function variabeleBronschrijvers(bron) {
+  const raak = [];
+  /* Alle toekenningen per naam, ook de tweede en de derde: een naam die ook uit
+     os.tmpdir() gevuld kan worden is niet aan te wijzen. */
+  const toekenningen = new Map();
+  for (const m of bron.matchAll(/(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*([^;\n]+)/g)) {
+    if (!toekenningen.has(m[1])) toekenningen.set(m[1], []);
+    toekenningen.get(m[1]).push(m[2]);
+  }
+  for (const [naam, waarden] of toekenningen) {
+    const schrijft = new RegExp('fs\\.(writeFileSync|appendFileSync|rmSync|copyFileSync|renameSync)\\(\\s*' +
+      naam + '\\b').test(bron);
+    if (!schrijft) continue;
+    const uitBron = waarden.map(w => {
+      const j = /path\.join\(\s*WORTEL\s*,\s*(.+)$/.exec(w);
+      if (!j) return 'geen';                       // niet uit de wortel: geen bronpad
+      /* ALLE literale delen aan elkaar, en niet alleen de eerste.
+         path.join(WORTEL, 'server', 'data', 'x.js') begint met 'server' en is
+         toch geen bron -- die eerste versie beschuldigde schermmutatie.test.js. */
+      const delen = [...j[1].matchAll(/['"]([^'"]+)['"]/g)].map(m => m[1]);
+      let pad = delen.join('/');
+      if (!delen.length) {
+        /* De map komt uit een naam. Staat die als const in ditzelfde bestand,
+           dan is hij op te zoeken -- dat haalt wetten.test.js (PROEFBESTAND =
+           'server/data/...') terecht uit de verdenking. Lukt dat niet, dan is
+           het onbekend en telt hij mee: fail-closed op wat we niet kunnen zien. */
+        const naamIn = /^\s*([A-Za-z_$][\w$]*)/.exec(j[1]);
+        const con = naamIn && new RegExp('(?:const|let|var)\\s+' + naamIn[1] +
+          "\\s*=\\s*['\"]([^'\"]+)['\"]").exec(bron);
+        if (!con) return 'onbekend';
+        pad = con[1];
+      }
+      if (GEEN_BRON.test(pad)) return 'geen';
+      return BRONMAP.test(pad) ? 'bron' : 'geen';
+    });
+    /* Alleen als GEEN enkele toekenning buiten de bron valt. Eén 'geen' maakt de
+       naam dubbelzinnig, en dan wijst deze zeef misschien een lezer aan. */
+    if (uitBron.every(x => x !== 'geen') && uitBron.some(x => x === 'bron' || x === 'onbekend')) {
+      raak.push(naam);
+    }
+  }
+  return raak;
+}
+
 function muterendeToetsen() {
   const uit = [];
   for (const naam of fs.readdirSync(path.join(WORTEL, 'test')).sort()) {
@@ -95,7 +173,7 @@ function muterendeToetsen() {
     let bron;
     try { bron = fs.readFileSync(path.join(WORTEL, 'test', naam), 'utf8'); } catch (e) { continue; }
     const raak = VORMEN.filter(v => v.test(bron));
-    if (raak.length) uit.push(naam);
+    if (raak.length || variabeleBronschrijvers(bron).length) uit.push(naam);
   }
   return uit;
 }
@@ -132,6 +210,39 @@ test('DE TEGENPROEF: de zeef ziet een bronmutatie ook echt', () => {
   assert.ok(VORMEN.some(v => v.test(nep)), 'een echte bronmutatie wordt niet herkend');
   const onschuldig = "metVervangen(path.join(os.tmpdir(), 'x'), 'a', 'b', () => {});";
   assert.equal(VORMEN.some(v => v.test(onschuldig)), false, 'een tijdelijk bestand telt ten onrechte mee');
+});
+
+test('DE TEGENPROEF op de flow-zeef: een pad uit een variabele wordt gezien', () => {
+  /* De zeef die op 3 september 2026 is bijgekomen (TAKEN.md 4.77). Zonder deze
+     bewering kan hij stilletjes niets meer vinden en meldt de toets hierboven
+     voor eeuwig "alles in orde" -- de meter die groen staat omdat hij blind is. */
+  const echt = "const vol = path.join(WORTEL, 'server/kern/iets.js');\n" +
+    'fs.writeFileSync(vol, nieuw);';
+  assert.deepEqual(variabeleBronschrijvers(echt), ['vol'], 'een bronmutatie via een variabele wordt gemist');
+
+  /* Meerdere delen: path.join(WORTEL, 'server', 'data', ...) begint met server
+     en is toch geen bron. Deze regel haalde schermmutatie.test.js terecht uit
+     de verdenking. */
+  const runtime = "const tmp = path.join(WORTEL, 'server', 'data', 'proef.js');\n" +
+    'fs.writeFileSync(tmp, x);';
+  assert.deepEqual(variabeleBronschrijvers(runtime), [], 'server/data is runtime en geen bron');
+
+  /* Twee toekenningen waarvan een uit os.tmpdir(): dan is de naam dubbelzinnig
+     en wijst deze zeef misschien een LEZER aan. Dat overkwam
+     begrotingsgrenzen.test.js in de eerste versie. */
+  const dubbel = "const map = path.join(WORTEL, 'server', 'kern', 'vergeten');\n" +
+    "const map = fs.mkdtempSync(path.join(os.tmpdir(), 'x'));\n" +
+    'fs.writeFileSync(map, x);';
+  assert.deepEqual(variabeleBronschrijvers(dubbel), [], 'een dubbelzinnige naam hoort niet beschuldigd te worden');
+
+  /* Alleen LEZEN telt niet. */
+  const leest = "const map = path.join(WORTEL, 'server', 'kern');\nfs.readdirSync(map);";
+  assert.deepEqual(variabeleBronschrijvers(leest), [], 'lezen is geen muteren');
+
+  /* FAIL-CLOSED: komt de map uit een naam die hier niet staat, dan telt hij mee. */
+  const onbekend = "const vol = path.join(WORTEL, rel);\nfs.writeFileSync(vol, x);";
+  assert.deepEqual(variabeleBronschrijvers(onbekend), ['vol'],
+    'een pad dat statisch niet te zien is, hoort mee te tellen en niet weggelaten te worden');
 });
 
 test('er is precies EEN uitzondering op de zeef, en dat is dit bestand zelf', () => {

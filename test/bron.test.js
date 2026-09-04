@@ -24,7 +24,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const path = require('path');
-const { zonderCommentaar } = require('../scripts/lib/bron');
+const { zonderCommentaar, eindTag, stukken } = require('../scripts/lib/bron');
 
 const WORTEL = path.join(__dirname, '..');
 
@@ -242,4 +242,42 @@ test('een niet-afgesloten blok wordt platgeslagen en niet afgekapt', () => {
   assert.equal(heel.length, bron.length, 'even lang');
   assert.equal(heel.split('\n').length, bron.split('\n').length, 'even veel regels');
   assert.equal(heel.includes('const b'), false, 'en de inhoud is wel degelijk commentaar');
+});
+
+test('EEN SLUITTAG MET WITRUIMTE SLUIT OOK: `</script >` (CodeQL, 3 september 2026)', () => {
+  /* DE BEVINDING. CodeQL meldde op PR #180 "Bad HTML filtering regexp" (hoog) op
+     scripts/inlinestijl-omzet.js: het patroon matchte `</script>` letterlijk en
+     miste `</script >`. HTML staat die witruimte toe, dus een browser sluit het
+     element wel -- en dan liep het blok hier door tot de volgende sluiter of tot
+     het eind van het bestand. Gevolg: markup die als script wordt behandeld, of
+     script dat als markup geldt.
+
+     Dezelfde vorm stond op DRIE plekken (die omzetter, deze verwijderaar en
+     scripts/schermmutatie.js). Hij staat nu een keer, in eindTag(), en de andere
+     twee halen hem hier op.
+
+     Wat deze toets vastlegt is beide kanten: de verdeling knipt op de vorm met
+     witruimte, en de markup ERBUITEN blijft onaangeraakt -- want dat is precies
+     wat er stukging als het blok doorliep. */
+  const bron = '<p>/* dit is tekst */</p><script>var a = 1; /* weg */</script >\n<p>/* ook tekst */</p>';
+
+  const delen = stukken(bron);
+  assert.deepEqual(delen.map(d => d.soort), [null, 'script', null],
+    'de verdeling ziet het blok met witruimte in de sluittag niet');
+
+  const uit = zonderCommentaar(bron, { soort: 'html' });
+  assert.match(uit, /dit is tekst/, 'markup voor het blok is opgegeten');
+  assert.match(uit, /ook tekst/, 'markup NA het blok is opgegeten -- het blok liep door');
+  assert.doesNotMatch(uit, /weg/, 'het commentaar in het script hoort wel weg');
+});
+
+test('eindTag zoekt de vorm die een browser accepteert, en niet meer', () => {
+  assert.deepEqual(eindTag('<script>x</script>', 'script', 8), { begin: 9, eind: 18 });
+  assert.deepEqual(eindTag('<script>x</script >', 'script', 8), { begin: 9, eind: 19 });
+  assert.deepEqual(eindTag('<script>x</SCRIPT>', 'script', 8), { begin: 9, eind: 18 },
+    'een sluittag in hoofdletters sluit ook');
+  assert.equal(eindTag('<script>x', 'script', 8), null, 'geen sluiter: null en geen gok');
+  /* En niet meer dan dat: `</script foo>` is ongeldige HTML en wordt niet als
+     sluiter geteld. Een matcher die dat wel doet, sluit een blok te vroeg. */
+  assert.equal(eindTag('<script>x</script foo>', 'script', 8), null);
 });

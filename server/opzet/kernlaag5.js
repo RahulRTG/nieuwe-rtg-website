@@ -53,7 +53,7 @@ Object.assign(kern, require('../kern/lidacties')({
   // elke betaalde lidtransactie hoort een factuur op te leveren;
   // zie de kop van kern/lidacties/factuur.js
   facturatie,
-  zorgVoor: kern.zorgVoor, zorgContact, keuken: kern.keuken,
+  zorgVoor: kern.zorgVoor, zorgMee: kern.zorgMee, zorgContact, keuken: kern.keuken,
   ledenvoordeelVoor: kern.ledenvoordeelVoor
 }));
 kern.rahulActies = {
@@ -82,7 +82,7 @@ kern.rahulActies = {
    de toetsen ernaast. */
 kern.fluister = require('../kern/fluister')({
   db, save, schoon, anthropic, notify,
-  reserveerTafel, annuleerReservering, assetGebruik: kern.assetGebruik, zorgVoor: kern.zorgVoor, pay: kern.pay,
+  reserveerTafel, annuleerReservering, assetGebruik: kern.assetGebruik, zorgVoor: kern.zorgVoor, zorgMee: kern.zorgMee, pay: kern.pay,
   acties: kern.rahulActies,
   // de reislaag van Rahul: een hele reis op een vraag, kleding apart
   // leggen en voorspellen -- via exact dezelfde functies als de app-knoppen

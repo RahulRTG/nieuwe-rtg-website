@@ -12,9 +12,7 @@
 const envelop = require('../opzet/envelop');
 
 module.exports = (kern, gedeeld) => {
-  const { app, rtf, werkplek, boardroomWie, boardroomBaas, officeMijn, officeMaak, officeOpen,
-    officeBewaar, officeWeg, officeSter, officeVersies, officeTerug, officeAI, officeKring,
-    officeVul, officeUitslag, officeFase } = kern;
+  const { app, rtf, werkplek, boardroomWie, boardroomBaas, office } = kern;
   const { stuur, ruim } = gedeeld;
 
   /* RTF-leden: elk gezinsprofiel een eigen map (gezinscode + profieltoken in
@@ -43,20 +41,20 @@ module.exports = (kern, gedeeld) => {
     if (opties && opties.schrijf && s.gast) return res.status(403).json({ error: 'Als oppas of familielid lees je mee; maken en bewerken doet het gezin zelf.' });
     stuur(res, await fn(s, req.body || {}));
   };
-  app.post('/api/rtf/kantoorpakket/mijn', rtfPoort, rtfDoe((s) => officeMijn(s.key, s.kring)));
-  app.post('/api/rtf/kantoorpakket/maak', rtfPoort, rtfDoe((s, b) => officeMaak(s.key, b, s.kring), { schrijf: true }));
-  app.post('/api/rtf/kantoorpakket/open', rtfPoort, rtfDoe((s, b) => officeOpen(s.key, b.id, s.kring)));
-  app.post('/api/rtf/kantoorpakket/bewaar', ruim, rtfPoort, rtfDoe((s, b) => officeBewaar(s.key, b.id, b, s.kring), { schrijf: true, ruim: true }));
-  app.post('/api/rtf/kantoorpakket/weg', rtfPoort, rtfDoe((s, b) => officeWeg(s.key, b.id), { schrijf: true }));
-  app.post('/api/rtf/kantoorpakket/ster', rtfPoort, rtfDoe((s, b) => officeSter(s.key, b.id, b.aan), { schrijf: true }));
-  app.post('/api/rtf/kantoorpakket/versies', rtfPoort, rtfDoe((s, b) => officeVersies(s.key, b.id, s.kring)));
-  app.post('/api/rtf/kantoorpakket/terug', rtfPoort, rtfDoe((s, b) => officeTerug(s.key, b.id, b.nr), { schrijf: true }));
-  app.post('/api/rtf/kantoorpakket/ai', rtfPoort, rtfDoe((s, b) => officeAI(s.key, b.id, b.opdracht, b.vraag, s.kring), { schrijf: true }));
-  app.post('/api/rtf/kantoorpakket/fase', rtfPoort, rtfDoe((s, b) => officeFase(s.key, b.id, b, s.kring), { schrijf: true }));
-  app.post('/api/rtf/kantoorpakket/gezin', rtfPoort, rtfDoe((s, b) => officeKring(s.key, b.id, b.rechten), { schrijf: true }));
+  app.post('/api/rtf/kantoorpakket/mijn', rtfPoort, rtfDoe((s) => office.mijn(s.key, s.kring)));
+  app.post('/api/rtf/kantoorpakket/maak', rtfPoort, rtfDoe((s, b) => office.maak(s.key, b, s.kring), { schrijf: true }));
+  app.post('/api/rtf/kantoorpakket/open', rtfPoort, rtfDoe((s, b) => office.open(s.key, b.id, s.kring)));
+  app.post('/api/rtf/kantoorpakket/bewaar', ruim, rtfPoort, rtfDoe((s, b) => office.bewaar(s.key, b.id, b, s.kring), { schrijf: true, ruim: true }));
+  app.post('/api/rtf/kantoorpakket/weg', rtfPoort, rtfDoe((s, b) => office.weg(s.key, b.id), { schrijf: true }));
+  app.post('/api/rtf/kantoorpakket/ster', rtfPoort, rtfDoe((s, b) => office.ster(s.key, b.id, b.aan), { schrijf: true }));
+  app.post('/api/rtf/kantoorpakket/versies', rtfPoort, rtfDoe((s, b) => office.versies(s.key, b.id, s.kring)));
+  app.post('/api/rtf/kantoorpakket/terug', rtfPoort, rtfDoe((s, b) => office.terug(s.key, b.id, b.nr), { schrijf: true }));
+  app.post('/api/rtf/kantoorpakket/ai', rtfPoort, rtfDoe((s, b) => office.ai(s.key, b.id, b.opdracht, b.vraag, s.kring), { schrijf: true }));
+  app.post('/api/rtf/kantoorpakket/fase', rtfPoort, rtfDoe((s, b) => office.fase(s.key, b.id, b, s.kring), { schrijf: true }));
+  app.post('/api/rtf/kantoorpakket/gezin', rtfPoort, rtfDoe((s, b) => office.kring(s.key, b.id, b.rechten), { schrijf: true }));
   // invullen mag ook een oppas of familielid (gast): antwoorden is geen bewerken
-  app.post('/api/rtf/kantoorpakket/vul', rtfPoort, rtfDoe((s, b) => officeVul(s.key, b.id, b, s.kring)));
-  app.post('/api/rtf/kantoorpakket/uitslag', rtfPoort, rtfDoe((s, b) => officeUitslag(s.key, b.id, s.kring), { schrijf: true }));
+  app.post('/api/rtf/kantoorpakket/vul', rtfPoort, rtfDoe((s, b) => office.vul(s.key, b.id, b, s.kring)));
+  app.post('/api/rtf/kantoorpakket/uitslag', rtfPoort, rtfDoe((s, b) => office.uitslag(s.key, b.id, s.kring), { schrijf: true }));
 
   /* De werkplekken: elk huis zijn eigen kantoordrive, op dezelfde kern als de
      rest van RTG Office. RTG werkte al op 'rtg:kantoor'; de RTFoundation kreeg
@@ -88,16 +86,16 @@ module.exports = (kern, gedeeld) => {
     next();
   }
   const huisDoe = (fn) => async (req, res) => stuur(res, await fn(req.drive, req.body || {}));
-  app.post('/api/werkplek/kantoorpakket/mijn', huisPoort, huisDoe((s) => officeMijn(s.key, s.kring)));
-  app.post('/api/werkplek/kantoorpakket/maak', huisPoort, huisDoe((s, b) => officeMaak(s.key, b, s.kring)));
-  app.post('/api/werkplek/kantoorpakket/open', huisPoort, huisDoe((s, b) => officeOpen(s.key, b.id, s.kring)));
-  app.post('/api/werkplek/kantoorpakket/bewaar', ruim, huisPoort, huisDoe((s, b) => officeBewaar(s.key, b.id, b, s.kring), { ruim: true }));
-  app.post('/api/werkplek/kantoorpakket/weg', huisPoort, huisDoe((s, b) => officeWeg(s.key, b.id)));
-  app.post('/api/werkplek/kantoorpakket/ster', huisPoort, huisDoe((s, b) => officeSter(s.key, b.id, b.aan)));
-  app.post('/api/werkplek/kantoorpakket/versies', huisPoort, huisDoe((s, b) => officeVersies(s.key, b.id, s.kring)));
-  app.post('/api/werkplek/kantoorpakket/terug', huisPoort, huisDoe((s, b) => officeTerug(s.key, b.id, b.nr)));
-  app.post('/api/werkplek/kantoorpakket/ai', huisPoort, huisDoe((s, b) => officeAI(s.key, b.id, b.opdracht, b.vraag, s.kring)));
-  app.post('/api/werkplek/kantoorpakket/fase', huisPoort, huisDoe((s, b) => officeFase(s.key, b.id, b, s.kring)));
-  app.post('/api/werkplek/kantoorpakket/vul', huisPoort, huisDoe((s, b) => officeVul(s.key, b.id, b, s.kring)));
-  app.post('/api/werkplek/kantoorpakket/uitslag', huisPoort, huisDoe((s, b) => officeUitslag(s.key, b.id, s.kring)));
+  app.post('/api/werkplek/kantoorpakket/mijn', huisPoort, huisDoe((s) => office.mijn(s.key, s.kring)));
+  app.post('/api/werkplek/kantoorpakket/maak', huisPoort, huisDoe((s, b) => office.maak(s.key, b, s.kring)));
+  app.post('/api/werkplek/kantoorpakket/open', huisPoort, huisDoe((s, b) => office.open(s.key, b.id, s.kring)));
+  app.post('/api/werkplek/kantoorpakket/bewaar', ruim, huisPoort, huisDoe((s, b) => office.bewaar(s.key, b.id, b, s.kring), { ruim: true }));
+  app.post('/api/werkplek/kantoorpakket/weg', huisPoort, huisDoe((s, b) => office.weg(s.key, b.id)));
+  app.post('/api/werkplek/kantoorpakket/ster', huisPoort, huisDoe((s, b) => office.ster(s.key, b.id, b.aan)));
+  app.post('/api/werkplek/kantoorpakket/versies', huisPoort, huisDoe((s, b) => office.versies(s.key, b.id, s.kring)));
+  app.post('/api/werkplek/kantoorpakket/terug', huisPoort, huisDoe((s, b) => office.terug(s.key, b.id, b.nr)));
+  app.post('/api/werkplek/kantoorpakket/ai', huisPoort, huisDoe((s, b) => office.ai(s.key, b.id, b.opdracht, b.vraag, s.kring)));
+  app.post('/api/werkplek/kantoorpakket/fase', huisPoort, huisDoe((s, b) => office.fase(s.key, b.id, b, s.kring)));
+  app.post('/api/werkplek/kantoorpakket/vul', huisPoort, huisDoe((s, b) => office.vul(s.key, b.id, b, s.kring)));
+  app.post('/api/werkplek/kantoorpakket/uitslag', huisPoort, huisDoe((s, b) => office.uitslag(s.key, b.id, s.kring)));
 };

@@ -24,6 +24,8 @@
 const fs = require('fs');
 const path = require('path');
 
+const { NIVEAUS } = require('../frictie');
+
 const BESTAND = path.join(__dirname, '..', '..', '..', 'LANDEN.json');
 
 /* Ontbreekt het bestand, dan gaat deze laag NIET stilletjes op nul staan. Een
@@ -126,7 +128,7 @@ function maakLandpakket({ opslag, save, journaal, fiscaal, valuta, talen, functi
     actieve()[p.land] = { at: new Date().toISOString(), door: String(door || 'onbekend'), gezet };
     save();
     if (journaal) {
-      journaal.noteer({ actie: 'landpakket geactiveerd', actor: door, niveau: 'hand',
+      journaal.noteer({ actie: 'landpakket geactiveerd', actor: door, niveau: NIVEAUS.hand,
         objectType: 'land', objectId: p.land,
         reden: gezet.length + ' functie(s) dicht; ' + p.mensenwerk.length + ' punten blijven mensenwerk' });
     }
@@ -144,7 +146,7 @@ function maakLandpakket({ opslag, save, journaal, fiscaal, valuta, talen, functi
     }
     delete actieve()[p.land];
     save();
-    if (journaal) journaal.noteer({ actie: 'landpakket teruggedraaid', actor: door, niveau: 'hand',
+    if (journaal) journaal.noteer({ actie: 'landpakket teruggedraaid', actor: door, niveau: NIVEAUS.hand,
       objectType: 'land', objectId: p.land, reden: 'de per-land-standen zijn weer weg' });
     return stand(p.land);
   }

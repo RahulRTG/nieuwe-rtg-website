@@ -37,24 +37,12 @@
    klem -- dan blijft een kapotte betaalrail openstaan tot iemand wakker wordt.
 
    ------------------------------------------------------------------------
-   DRIE KEUZES DIE ERTOE DOEN
-
-   1. DE METING KOMT UIT server/meting.js, dezelfde tellers als /api/metrics, de
-      servicedoelen en de canary. Een uitrol die zelf telt kan een ander verhaal
-      vertellen dan het foutbudget, en dan is niet meer te zeggen welke van de
-      twee had moeten stoppen. Omdat die tellers sinds procesbegin lopen, legt
-      elke trede een NULMETING vast en rekent de regie op het verschil.
-
-   2. HERSTARTEN WIST DE NULMETING, en dan KLIMT DE REGIE NIET. Het verschil
-      staat dan lager dan de nulmeting, en dat is geen groen maar een onbekende.
-      Stilzwijgend doorrekenen geeft een negatief foutaantal en dus altijd groen
-      -- precies de kant waarop een uitrolautomaat niet fout mag gaan. Hij meldt
-      'nulmeting kwijt' en wacht tot er weer echt gemeten is.
-
-   3. HIJ MEET ALLE VERKEER EN NIET ALLEEN DE NIEUWE PADEN. Een trede openzetten
-      kan iets breken dat er niet in staat -- een nieuwe query die de database
-      belast, een laag die ineens meer werk krijgt. Alleen de nieuwe paden wegen
-      zou juist dat missen.
+   DE DRIE KEUZES OVER HET METEN staan sinds 3 september 2026 bij de meting zelf,
+   in ./uitrolmeting.js: waar de cijfers vandaan komen (server/meting.js, met een
+   nulmeting per trede), waarom een herstart NIET als groen telt, en waarom er
+   over al het verkeer wordt gemeten en niet over de nieuwe paden alleen. Ze zijn
+   met de code meeverhuisd en niet ingekort -- een reden die achterblijft bij een
+   bestand dat de code niet meer draagt, is een reden die niemand meer leest.
 
    ------------------------------------------------------------------------
    WAT DEZE REGIE NIET IS
@@ -66,6 +54,10 @@
    dat er niets omvalt, niet dat het klopt.
    ========================================================================== */
 'use strict';
+const { maakTikker } = require('./tikker');
+/* De METING staat sinds 3 september 2026 apart (TAKEN.md 5.57): "hoeveel
+   serverfouten sinds deze trede" is een andere vraag dan "mag hij klimmen". */
+const { maakUitrolmeting } = require('./uitrolmeting');
 
 const klok = require('../../lib/klok');
 
@@ -81,6 +73,7 @@ function maakUitrolregie({ opslag, save, meting, functies, schakelFase, nu }) {
   const tijd = nu || klok.nu;
   const iso = () => new Date(tijd()).toISOString();
   const TREDEN = () => (functies && functies.FASES) || [];
+  const { tel, oordeel } = maakUitrolmeting({ meting, nu: tijd, STANDAARD });
   const index = id => TREDEN().findIndex(t => t.id === id);
 
   function staat() {
@@ -91,49 +84,10 @@ function maakUitrolregie({ opslag, save, meting, functies, schakelFase, nu }) {
     return opslag.gedeeld.uitrol();
   }
 
-  /* Alle antwoorden en alle serverfouten van dit moment. Zie keuze 3 in de kop:
-     bewust over het HELE verkeer en niet over de paden van de nieuwe trede. */
-  function tel() {
-    const r = meting.reeksen();
-    let antwoorden = 0, fouten = 0;
-    for (const v of r.verzoeken) {
-      antwoorden += v.aantal;
-      if (v.status === '5xx') fouten += v.aantal;
-    }
-    return { antwoorden, fouten };
-  }
-
   function boek(u, van, naar, door, hoe, reden) {
     u.geschiedenis.unshift({ at: iso(), van: van || null, naar: naar || null,
       door: String(door || 'onbekend'), hoe, reden: reden || null });
     if (u.geschiedenis.length > STANDAARD.geschiedenisMax) u.geschiedenis.length = STANDAARD.geschiedenisMax;
-  }
-
-  /* Het oordeel over de HUIDIGE trede. Vier uitkomsten, en drie ervan zijn
-     "nog niet weten" -- die worden met opzet uit elkaar gehouden, want ze
-     vragen om ander gedrag van de bediener. */
-  function oordeel(u) {
-    if (!u.trede) return { stand: 'geen trede', klimbaar: false };
-    const nuTel = tel();
-    const antwoorden = nuTel.antwoorden - ((u.basis && u.basis.antwoorden) || 0);
-    const fouten = nuTel.fouten - ((u.basis && u.basis.fouten) || 0);
-    if (antwoorden < 0 || fouten < 0) {
-      return { stand: 'nulmeting kwijt', klimbaar: false, zakbaar: false,
-        uitleg: 'het proces is herstart, dus er valt niets te wegen tot deze trede opnieuw wordt gezet' };
-    }
-    const wachtMs = u.sinds ? (tijd() - Date.parse(u.sinds)) : 0;
-    const deel5xx = antwoorden ? Number((fouten / antwoorden).toFixed(4)) : null;
-    const genoeg = antwoorden >= STANDAARD.minimum;
-    const uitgerust = wachtMs >= STANDAARD.rustMs;
-    if (genoeg && deel5xx > STANDAARD.drempel) {
-      return { stand: 'over de drempel', klimbaar: false, zakbaar: true, antwoorden, fouten, deel5xx, wachtMs,
-        uitleg: Math.round(deel5xx * 1000) / 10 + '% serverfouten op ' + antwoorden + ' antwoorden' };
-    }
-    if (!genoeg) return { stand: 'onvoldoende gemeten', klimbaar: false, zakbaar: false, antwoorden, fouten, deel5xx, wachtMs,
-      uitleg: antwoorden + ' van de ' + STANDAARD.minimum + ' antwoorden die nodig zijn om iets te durven zeggen' };
-    if (!uitgerust) return { stand: 'nog niet uitgerust', klimbaar: false, zakbaar: false, antwoorden, fouten, deel5xx, wachtMs,
-      uitleg: 'deze trede staat ' + Math.round(wachtMs / 60000) + ' van de ' + Math.round(STANDAARD.rustMs / 60000) + ' minuten' };
-    return { stand: 'binnen de drempel', klimbaar: true, zakbaar: false, antwoorden, fouten, deel5xx, wachtMs };
   }
 
   /* Een trede zetten. `hoe` is 'hand' of 'automaat'; de nulmeting gaat MEE,
@@ -268,18 +222,8 @@ function maakUitrolregie({ opslag, save, meting, functies, schakelFase, nu }) {
     };
   }
 
-  /* De tikker. Zonder deze betekent "klimt vanzelf": pas als er iemand kijkt.
-     unref, zodat hij een proces nooit openhoudt. */
-  function tikker() {
-    /* Niet in een meetserver: zie ./tikkerstand.js voor waarom een klok die
-       binnen het meetvenster afgaat, zijn schrijfactie aan een willekeurige
-       route toegerekend krijgt. Alleen de LUS gaat uit; een weeg() die een
-       route zelf aanroept blijft gewoon schrijven. */
-    if (require('./tikkerstand').tikkersUit()) return null;
-    const t = setInterval(() => { try { weeg(); } catch (e) { /* nooit de lus breken */ } }, STANDAARD.tikMs);
-    if (t.unref) t.unref();
-    return t;
-  }
+  // Zonder tikker betekent "klimt vanzelf": pas als er iemand kijkt. Zie ./tikker.js.
+  const tikker = maakTikker(weeg, STANDAARD.tikMs);
 
   return { stand, zet, klim, pauze, bevestig, weeg, oordeel: () => oordeel(staat()), tikker, STANDAARD };
 }

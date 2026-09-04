@@ -66,6 +66,11 @@
     max-width:88vw;opacity:0;pointer-events:none;transition:opacity 0.25s;}
   .melding.zien{opacity:1;}
   @media (prefers-reduced-motion: reduce){ *{transition:none !important;} }
+
+  /* Uit inline style-attributen gehaald door scripts/inlinestijl-omzet.js (TAKEN.md 4.51). Bewezen gelijk met
+     scripts/inlinestijl-proef.js: elk element, elke aangeraakte eigenschap,
+     berekend in een echte browser. Letterlijk wat er stond -- geen ontwerpbesluit. */
+  .i-1v4gr3{position:absolute;left:-999px}
 </style>
 <!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
 <script src="/shared/media.js"></script>
@@ -98,7 +103,7 @@
     <div id="paneelSchouw">
       <h2>Voertuigschouw</h2>
       <div class="rij">
-        <label for="voertuig" style="position:absolute;left:-999px;">Voertuig</label>
+        <label for="voertuig" class="i-1v4gr3">Voertuig</label>
         <select id="voertuig"></select>
         <button class="knop" id="knopNulmeting" type="button">Nulmeting vastleggen</button>
         <button class="knop vol" id="knopSchouw" type="button">Schouw en log</button>
@@ -113,7 +118,7 @@
     <div id="paneelVloer" class="weg">
       <h2>Werkvloer</h2>
       <div class="rij">
-        <label for="leerNaam" style="position:absolute;left:-999px;">Naam van het item</label>
+        <label for="leerNaam" class="i-1v4gr3">Naam van het item</label>
         <input id="leerNaam" maxlength="40" placeholder="Naam (bijv. Kist gereedschap 2)">
         <button class="knop" id="knopLeer" type="button">Toon het en leer aan</button>
       </div>

@@ -68,6 +68,12 @@
   .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:0;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;z-index:30;}
   .inlog{max-width:420px;margin:4rem auto;text-align:center;padding:0 1.2rem;}
   .inlog a{color:var(--rtg-leesgoud,var(--gold));border-bottom:1px solid var(--gold);}
+
+  /* Uit inline style-attributen gehaald door scripts/inlinestijl-omzet.js (TAKEN.md 4.51). Bewezen gelijk met
+     scripts/inlinestijl-proef.js: elk element, elke aangeraakte eigenschap,
+     berekend in een echte browser. Letterlijk wat er stond -- geen ontwerpbesluit. */
+  .i-tafq05{margin:1.25rem 0 0.5rem}
+  .i-187ie3{width:auto}
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>
@@ -92,12 +98,12 @@
       <div class="lbl">Locatie (optioneel)</div>
       <input class="veld" id="meldLoc" maxlength="120" placeholder="Straat of plek">
       <div style="margin-top:0.5rem;display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;">
-        <button class="knop stil" id="meldGps" type="button" style="width:auto;">Gebruik mijn locatie</button>
+        <button class="i-187ie3 knop stil" id="meldGps" type="button">Gebruik mijn locatie</button>
         <span id="meldGpsUit" style="font-size:.78rem;color:var(--soft);"></span>
       </div>
       <button class="knop h-mt80" id="meldGo">Melding versturen</button>
     </div>
-    <h3 style="margin:1.25rem 0 0.5rem;">Mijn meldingen</h3>
+    <h3 class="i-tafq05">Mijn meldingen</h3>
     <div id="meldMijn"><div class="leeg">Nog geen meldingen.</div></div>
   </section>
 
@@ -119,7 +125,7 @@
       <input class="veld" id="vhDatum" type="date">
       <button class="knop h-mt80" id="vhGo">Verhuizing doorgeven</button>
     </div>
-    <h3 style="margin:1.25rem 0 0.5rem;">Mijn afspraken</h3>
+    <h3 class="i-tafq05">Mijn afspraken</h3>
     <div id="bzMijn"><div class="leeg">Nog geen afspraken.</div></div>
   </section>
 
@@ -134,7 +140,7 @@
       <input class="veld" id="vgLoc" maxlength="160" placeholder="Adres of plek">
       <button class="knop h-mt80" id="vgGo">Aanvraag indienen</button>
     </div>
-    <h3 style="margin:1.25rem 0 0.5rem;">Mijn aanvragen</h3>
+    <h3 class="i-tafq05">Mijn aanvragen</h3>
     <div id="vgMijn"><div class="leeg">Nog geen aanvragen.</div></div>
   </section>
 
@@ -142,7 +148,7 @@
     <div class="kaart">
       <h3>Afvalkalender</h3>
       <div class="lbl">Postcode</div>
-      <div style="display:flex;gap:.5rem;"><input class="veld h-flex1" id="afPost" maxlength="8" placeholder="Bijv. 07800"><button class="knop stil" id="afGo" style="width:auto;">Toon</button></div>
+      <div style="display:flex;gap:.5rem;"><input class="veld h-flex1" id="afPost" maxlength="8" placeholder="Bijv. 07800"><button class="i-187ie3 knop stil" id="afGo">Toon</button></div>
       <div class="kal h-mt80" id="afKal"></div>
       <div class="lbl">Grofvuil op afspraak</div>
       <input class="veld" id="gvWat" maxlength="300" placeholder="Wat moet opgehaald worden?">

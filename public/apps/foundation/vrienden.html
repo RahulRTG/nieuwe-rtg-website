@@ -122,6 +122,14 @@
   .skip:focus{top:0;}
   :focus-visible{outline:2px solid var(--goud,#C9A24B);outline-offset:2px;}
   .deel{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted,var(--zacht,#8A8680));margin:1.6rem 0 .5rem;}
+
+  /* Uit inline style-attributen gehaald door scripts/inlinestijl-omzet.js (TAKEN.md 4.51). Bewezen gelijk met
+     scripts/inlinestijl-proef.js: elk element, elke aangeraakte eigenschap,
+     berekend in een echte browser. Letterlijk wat er stond -- geen ontwerpbesluit. */
+  .i-l3zldl{background:#000}
+  .i-1tafc2{border-color:#222}
+  .i-16w2mv{padding:1rem;text-align:center}
+  .i-1ln2u1{color:#fff;margin-top:0.5rem}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
@@ -247,19 +255,19 @@
 </div></div>
 
 <!-- snap kijker -->
-<div class="ov" id="snapOv"><div class="ovkaart" style="background:#000;">
-  <div class="ovkop" style="border-color:#222;"><b id="snapVan"></b><button class="ovx" id="snapX">✕</button></div>
-  <div style="padding:1rem;text-align:center;"><img class="snapfull" id="snapImg" alt="" data-rtg-protect data-watermark="RTG Salon"><div id="snapTxt" style="color:#fff;margin-top:0.5rem;"></div><div style="color:#888;font-size:.75rem;margin-top:0.5rem;">Deze snap verdwijnt zodra je sluit.</div></div>
+<div class="ov" id="snapOv"><div class="i-l3zldl ovkaart">
+  <div class="i-1tafc2 ovkop"><b id="snapVan"></b><button class="ovx" id="snapX">✕</button></div>
+  <div class="i-16w2mv"><img class="snapfull" id="snapImg" alt="" data-rtg-protect data-watermark="RTG Salon"><div id="snapTxt" class="i-1ln2u1"></div><div style="color:#888;font-size:.75rem;margin-top:0.5rem;">Deze snap verdwijnt zodra je sluit.</div></div>
 </div></div>
 
 <!-- verhaal kijker -->
-<div class="ov" id="storyOv"><div class="ovkaart" style="background:#000;">
-  <div class="ovkop" style="border-color:#222;"><b id="storyVan"></b><button class="ovx" id="storyX">✕</button></div>
-  <div style="padding:1rem;text-align:center;"><img class="snapfull" id="storyImg" alt="" data-rtg-protect data-watermark="RTG Salon"><div id="storyTxt" style="color:#fff;margin-top:0.5rem;"></div><div id="storyOpdracht" style="color:var(--goud2);font-size:.8rem;margin-top:0.5rem;"></div></div>
+<div class="ov" id="storyOv"><div class="i-l3zldl ovkaart">
+  <div class="i-1tafc2 ovkop"><b id="storyVan"></b><button class="ovx" id="storyX">✕</button></div>
+  <div class="i-16w2mv"><img class="snapfull" id="storyImg" alt="" data-rtg-protect data-watermark="RTG Salon"><div id="storyTxt" class="i-1ln2u1"></div><div id="storyOpdracht" style="color:var(--goud2);font-size:.8rem;margin-top:0.5rem;"></div></div>
 </div></div>
 
 <!-- belscherm -->
-<div class="ov" id="belOv"><div class="ovkaart" style="background:#000;">
+<div class="ov" id="belOv"><div class="i-l3zldl ovkaart">
   <div class="belwrap">
     <video id="belRemote" autoplay playsinline></video>
     <video id="belLocal" autoplay playsinline muted></video>

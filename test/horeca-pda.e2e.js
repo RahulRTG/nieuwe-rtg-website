@@ -52,13 +52,13 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
     letOpFouten(page, fouten);
 
     /* ---- uitgelogd: een deur ---- */
-    await page.goto(base + '/apps/horeca-pda.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/horeca-pda.html', { waitUntil: 'domcontentloaded' });
     await page.evaluate(() => {
       localStorage.setItem('rtg_cookieinfo_v1', '1');
       localStorage.removeItem('rtg_sup_token');
       localStorage.removeItem('rtg_pda_modus');
     });
-    await page.goto(base + '/apps/horeca-pda.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/horeca-pda.html', { waitUntil: 'domcontentloaded' });
     /* Uitgelogd tekent shared/deur.js de deur IN de pagina (geen omleiding), en
        pas in een setTimeout na het laden. Deze wacht is met opzet net zo ruim als
        de bewering eronder: de deur zelf, of de tekst die naar de personeelsinlog
@@ -136,7 +136,7 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
 
     /* ---- ingelogd: de lijst ---- */
     await page.evaluate(t => { localStorage.setItem('rtg_sup_token', t); }, tok);
-    await page.goto(base + '/apps/horeca-pda.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/horeca-pda.html', { waitUntil: 'domcontentloaded' });
     /* De werklijst tekent zichzelf in EEN keer: de werkstanden, "nu", "ook open"
        en de wijken komen alle vier uit hetzelfde antwoord. De vier knoppen zijn
        dus het teken dat het hele beeld er staat -- en het is meteen de eerste

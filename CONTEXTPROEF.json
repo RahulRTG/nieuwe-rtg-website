@@ -1,0 +1,11713 @@
+{
+ "soort": "meting",
+ "uitleg": "Runtime-meting: welke naam op het contextobject een verzoek werkelijk ophaalt. Gemeten in de domeingrens-Proxy (server/opzet/contextspoor.js), het enige punt waar elke toegang langskomt. Bestaat omdat een op de zes aanroepen in dit huis statisch niet te herleiden is.",
+ "stempel": {
+  "op": "2026-09-03"
+ },
+ "grens": "REIKTE NAAR, niet \"riep aan\": `const { save } = kern` haalt een naam op zonder hem te gebruiken. En alleen over routes die deze proef aan het werk kreeg; de rest is een uitspraak over de proef, niet over de route.",
+ "gemeten": {
+  "routesGereden": 4769,
+  "routesAanHetWerk": 3214,
+  "routesMetSpoor": 213,
+  "routesZonderSpoorMaarWelAanHetWerk": 3075,
+  "verzoekenMetSpoor": 213,
+  "losseNamen": 78,
+  "buitenEenVerzoek": 2222,
+  "volledigeRonde": true
+ },
+ "nietAanHetWerk": [
+  {
+   "route": "POST /api/aandacht",
+   "status": 404
+  },
+  {
+   "route": "POST /api/aanmelding/beslis",
+   "status": 404
+  },
+  {
+   "route": "POST /api/aanmelding/bewijs/stand",
+   "status": 404
+  },
+  {
+   "route": "POST /api/aanmelding/bewijs/teken",
+   "status": 404
+  },
+  {
+   "route": "POST /api/aanmelding/een",
+   "status": 404
+  },
+  {
+   "route": "POST /api/aanmelding/opzeggen",
+   "status": 404
+  },
+  {
+   "route": "POST /api/aanmelding/termijn-voldaan",
+   "status": 404
+  },
+  {
+   "route": "POST /api/aanmelding/verleng",
+   "status": 404
+  },
+  {
+   "route": "POST /api/account/koppel",
+   "status": 403
+  },
+  {
+   "route": "POST /api/account/ontkoppel",
+   "status": 403
+  },
+  {
+   "route": "POST /api/account/rollen",
+   "status": 403
+  },
+  {
+   "route": "POST /api/account/start",
+   "status": 403
+  },
+  {
+   "route": "POST /api/appstore/brug",
+   "status": 404
+  },
+  {
+   "route": "POST /api/appstore/context/geef",
+   "status": 404
+  },
+  {
+   "route": "POST /api/appstore/context/lees",
+   "status": 404
+  },
+  {
+   "route": "POST /api/appstore/dossier",
+   "status": 404
+  },
+  {
+   "route": "POST /api/appstore/installeer",
+   "status": 404
+  },
+  {
+   "route": "POST /api/appstore/kantoor/besluit",
+   "status": 404
+  },
+  {
+   "route": "POST /api/appstore/kantoor/intrekken",
+   "status": 404
+  },
+  {
+   "route": "POST /api/appstore/kantoor/teruggave",
+   "status": 404
+  },
+  {
+   "route": "POST /api/appstore/kantoor/toegankelijk",
+   "status": 404
+  },
+  {
+   "route": "POST /api/appstore/kantoor/uitgever",
+   "status": 404
+  },
+  {
+   "route": "POST /api/appstore/open",
+   "status": 404
+  },
+  {
+   "route": "POST /api/appstore/verleen",
+   "status": 404
+  },
+  {
+   "route": "POST /api/appstore/vernietig",
+   "status": 404
+  },
+  {
+   "route": "POST /api/appstore/weg",
+   "status": 404
+  },
+  {
+   "route": "POST /api/asset/document",
+   "status": 404
+  },
+  {
+   "route": "POST /api/asset/gebruik",
+   "status": 404
+  },
+  {
+   "route": "POST /api/asset/herroep",
+   "status": 404
+  },
+  {
+   "route": "POST /api/asset/koop",
+   "status": 404
+  },
+  {
+   "route": "POST /api/asset/uitstap",
+   "status": 404
+  },
+  {
+   "route": "POST /api/asset/wachtlijst",
+   "status": 404
+  },
+  {
+   "route": "POST /api/auth/password",
+   "status": 403
+  },
+  {
+   "route": "POST /api/auth/resend",
+   "status": 403
+  },
+  {
+   "route": "POST /api/avond",
+   "status": 404
+  },
+  {
+   "route": "POST /api/avond/aanvragen",
+   "status": 404
+  },
+  {
+   "route": "POST /api/avond/koppel",
+   "status": 404
+  },
+  {
+   "route": "POST /api/bank/afschrift",
+   "status": 404
+  },
+  {
+   "route": "POST /api/bank/afschrift.csv",
+   "status": 404
+  },
+  {
+   "route": "POST /api/bank/bevries",
+   "status": 404
+  },
+  {
+   "route": "POST /api/bank/rekening",
+   "status": 404
+  },
+  {
+   "route": "POST /api/bank/storten",
+   "status": 404
+  },
+  {
+   "route": "POST /api/bank/terugkerend/stop",
+   "status": 404
+  },
+  {
+   "route": "POST /api/bedrijf/lid/koppel",
+   "status": 403
+  },
+  {
+   "route": "POST /api/bedrijf/post/context",
+   "status": 403
+  },
+  {
+   "route": "POST /api/bedrijf/post/herkomst",
+   "status": 403
+  },
+  {
+   "route": "POST /api/bestanden/deel",
+   "status": 404
+  },
+  {
+   "route": "POST /api/bestanden/haal",
+   "status": 404
+  },
+  {
+   "route": "POST /api/bestanden/herstel",
+   "status": 404
+  },
+  {
+   "route": "POST /api/bestanden/map",
+   "status": 404
+  },
+  {
+   "route": "POST /api/bestanden/pdf/notitie",
+   "status": 404
+  },
+  {
+   "route": "POST /api/bestanden/pdf/notities",
+   "status": 404
+  },
+  {
+   "route": "POST /api/bestanden/pdf/splitsen",
+   "status": 404
+  },
+  {
+   "route": "POST /api/bestanden/updeel",
+   "status": 404
+  },
+  {
+   "route": "POST /api/bestanden/upklaar",
+   "status": 404
+  },
+  {
+   "route": "POST /api/bestanden/upload",
+   "status": 404
+  },
+  {
+   "route": "POST /api/bestanden/versies",
+   "status": 404
+  },
+  {
+   "route": "POST /api/bestanden/versieterug",
+   "status": 404
+  },
+  {
+   "route": "POST /api/bestanden/weg",
+   "status": 404
+  },
+  {
+   "route": "POST /api/bestanden/wijzig",
+   "status": 404
+  },
+  {
+   "route": "POST /api/betaal/direct",
+   "status": 404
+  },
+  {
+   "route": "POST /api/betaal/verzoek/pay",
+   "status": 404
+  },
+  {
+   "route": "POST /api/bezorg/bestel",
+   "status": 404
+  },
+  {
+   "route": "POST /api/bezorg/volg",
+   "status": 404
+  },
+  {
+   "route": "POST /api/boardroom/persoon",
+   "status": 404
+  },
+  {
+   "route": "POST /api/boardroom/storing",
+   "status": 404
+  },
+  {
+   "route": "POST /api/boardroom/taal",
+   "status": 404
+  },
+  {
+   "route": "POST /api/boardroom/wachter",
+   "status": 404
+  },
+  {
+   "route": "POST /api/boardroom/zet",
+   "status": 404
+  },
+  {
+   "route": "POST /api/boeken/boek",
+   "status": 404
+  },
+  {
+   "route": "POST /api/booking/pay",
+   "status": 404
+  },
+  {
+   "route": "POST /api/booking/request",
+   "status": 404
+  },
+  {
+   "route": "POST /api/booking/slots",
+   "status": 404
+  },
+  {
+   "route": "POST /api/browser/bericht",
+   "status": 404
+  },
+  {
+   "route": "POST /api/browser/open",
+   "status": 404
+  },
+  {
+   "route": "POST /api/care/annuleer",
+   "status": 404
+  },
+  {
+   "route": "POST /api/care/betaal",
+   "status": 404
+  },
+  {
+   "route": "POST /api/care/boek",
+   "status": 404
+  },
+  {
+   "route": "POST /api/care/intake/deel",
+   "status": 404
+  },
+  {
+   "route": "POST /api/care/intake/stop",
+   "status": 404
+  },
+  {
+   "route": "POST /api/care/pakket/betaal",
+   "status": 404
+  },
+  {
+   "route": "POST /api/care/pakket/boek",
+   "status": 404
+  },
+  {
+   "route": "POST /api/care/vastleggen/deel",
+   "status": 404
+  },
+  {
+   "route": "POST /api/care/vastleggen/stop",
+   "status": 404
+  },
+  {
+   "route": "POST /api/care/wachtlijst/af",
+   "status": 404
+  },
+  {
+   "route": "POST /api/care/wachtlijst/zet",
+   "status": 404
+  },
+  {
+   "route": "POST /api/charter/boek",
+   "status": 404
+  },
+  {
+   "route": "POST /api/charter/foto",
+   "status": 404
+  },
+  {
+   "route": "POST /api/charter/locatie",
+   "status": 404
+  },
+  {
+   "route": "POST /api/charter/sos",
+   "status": 404
+  },
+  {
+   "route": "POST /api/chat/send",
+   "status": 403
+  },
+  {
+   "route": "POST /api/clips/geluid",
+   "status": 404
+  },
+  {
+   "route": "POST /api/clips/knip",
+   "status": 404
+  },
+  {
+   "route": "POST /api/clips/meld",
+   "status": 404
+  },
+  {
+   "route": "POST /api/clips/ondertitels",
+   "status": 404
+  },
+  {
+   "route": "POST /api/clips/reactie",
+   "status": 404
+  },
+  {
+   "route": "POST /api/clips/signaal",
+   "status": 404
+  },
+  {
+   "route": "POST /api/clips/volg",
+   "status": 404
+  },
+  {
+   "route": "POST /api/clips/weg",
+   "status": 404
+  },
+  {
+   "route": "POST /api/comm/ai",
+   "status": 403
+  },
+  {
+   "route": "POST /api/command/alarm/stil",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/apipoort/intrekken",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/apipoort/toelating-weg",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/beleid/geschiedenis",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/beleid/keur",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/beleid/terug",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/beleid/zet",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/bijstand/betreed",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/bijstand/inhoud",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/bijstand/kijk",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/bijstand/sessie",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/bijstand/sluit",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/bijstand/uitvoeren",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/bijstand/voorstel",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/canary/af",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/canary/breder",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/canary/start",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/canary/terug",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/gezondheid/controleer",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/gezondheid/vermogen",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/graaf/wandel",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/herkomst/spoor",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/incident",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/incident/maatregel",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/incident/neem",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/incident/open",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/incident/sluit",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/land/activeer",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/land/terug",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/mdm/gouden",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/mdm/samen",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/object",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/operator/uitvoeren",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/overname/afbeelden",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/overname/droogloop",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/overname/lees",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/overname/terug",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/overname/voer",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/overname/voorstel",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/recht/geef",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/recht/introk",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/recht/nood",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/runbook/terug",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/runbook/voer",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/stad",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/stad/stop",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/uitrol/zet",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/vloot/organisatie",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/zaak/besluit",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/zaak/neem",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/zandbak/kwaliteit",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/zandbak/runbook",
+   "status": 404
+  },
+  {
+   "route": "POST /api/command/zandbak/zoek",
+   "status": 404
+  },
+  {
+   "route": "POST /api/comment",
+   "status": 404
+  },
+  {
+   "route": "POST /api/commerce/overdracht/lees",
+   "status": 404
+  },
+  {
+   "route": "POST /api/commerce/retour/verstuurd",
+   "status": 404
+  },
+  {
+   "route": "POST /api/commerce/retour/vraag",
+   "status": 404
+  },
+  {
+   "route": "POST /api/concern/boom",
+   "status": 404
+  },
+  {
+   "route": "POST /api/concern/bulk/lees",
+   "status": 404
+  },
+  {
+   "route": "POST /api/concern/bulk/verstuur",
+   "status": 404
+  },
+  {
+   "route": "POST /api/concern/discovery",
+   "status": 404
+  },
+  {
+   "route": "POST /api/concern/discovery/neem",
+   "status": 404
+  },
+  {
+   "route": "POST /api/concern/document/bevestig",
+   "status": 404
+  },
+  {
+   "route": "POST /api/concern/document/lees",
+   "status": 404
+  },
+  {
+   "route": "POST /api/concern/entiteit",
+   "status": 404
+  },
+  {
+   "route": "POST /api/concern/entiteit/groep",
+   "status": 404
+  },
+  {
+   "route": "POST /api/concern/entiteit/onderneming",
+   "status": 404
+  },
+  {
+   "route": "POST /api/concern/entiteit/registratie",
+   "status": 404
+  },
+  {
+   "route": "POST /api/concern/entiteit/verwijder",
+   "status": 404
+  },
+  {
+   "route": "POST /api/concern/feit/beeindig",
+   "status": 404
+  },
+  {
+   "route": "POST /api/concern/feit/zet",
+   "status": 404
+  },
+  {
+   "route": "POST /api/concern/functiescheiding",
+   "status": 404
+  },
+  {
+   "route": "POST /api/concern/fusie/beeld",
+   "status": 404
+  },
+  {
+   "route": "POST /api/concern/fusie/doe",
+   "status": 404
+  },
+  {
+   "route": "POST /api/concern/geschiedenis",
+   "status": 404
+  },
+  {
+   "route": "POST /api/concern/kwalificatie/zet",
+   "status": 404
+  },
+  {
+   "route": "POST /api/concern/kwalificaties",
+   "status": 404
+  },
+  {
+   "route": "POST /api/concern/launch",
+   "status": 404
+  },
+  {
+   "route": "POST /api/concern/mag",
+   "status": 404
+  },
+  {
+   "route": "POST /api/concern/mens/nieuw",
+   "status": 404
+  },
+  {
+   "route": "POST /api/concern/mens/uitdienst",
+   "status": 404
+  },
+  {
+   "route": "POST /api/concern/mens/zet",
+   "status": 404
+  },
+  {
+   "route": "POST /api/concern/mensen",
+   "status": 404
+  },
+  {
+   "route": "POST /api/concern/opdatum",
+   "status": 404
+  },
+  {
+   "route": "POST /api/concern/opname/herstel",
+   "status": 404
+  },
+  {
+   "route": "POST /api/concern/organigram",
+   "status": 404
+  },
+  {
+   "route": "POST /api/concern/overname",
+   "status": 404
+  },
+  {
+   "route": "POST /api/concern/readiness",
+   "status": 404
+  },
+  {
+   "route": "POST /api/concern/tekenen",
+   "status": 404
+  },
+  {
+   "route": "POST /api/concern/ubo",
+   "status": 404
+  },
+  {
+   "route": "POST /api/concern/uitdienst/beeld",
+   "status": 404
+  },
+  {
+   "route": "POST /api/concern/uitdienst/doe",
+   "status": 404
+  },
+  {
+   "route": "POST /api/concern/uitnodigen",
+   "status": 404
+  },
+  {
+   "route": "POST /api/concern/uitnodiging/accepteer",
+   "status": 404
+  },
+  {
+   "route": "POST /api/concern/uitnodiging/intrek",
+   "status": 404
+  },
+  {
+   "route": "POST /api/concern/uitnodigingen",
+   "status": 404
+  },
+  {
+   "route": "POST /api/concern/verloopt",
+   "status": 404
+  },
+  {
+   "route": "POST /api/concern/vestiging/nieuw",
+   "status": 404
+  },
+  {
+   "route": "POST /api/concern/vestiging/sluit",
+   "status": 404
+  },
+  {
+   "route": "POST /api/concern/vestiging/zaak",
+   "status": 404
+  }
+ ],
+ "bijBedrading": [
+  {
+   "naam": "supplier.app",
+   "aantal": 80
+  },
+  {
+   "naam": "supplier.supplierAuth",
+   "aantal": 80
+  },
+  {
+   "naam": "member.app",
+   "aantal": 64
+  },
+  {
+   "naam": "member.auth",
+   "aantal": 60
+  },
+  {
+   "naam": "supplier.logActivity",
+   "aantal": 56
+  },
+  {
+   "naam": "supplier.save",
+   "aantal": 54
+  },
+  {
+   "naam": "supplier.sseToSupplier",
+   "aantal": 46
+  },
+  {
+   "naam": "supplier.db",
+   "aantal": 45
+  },
+  {
+   "naam": "supplier.managerOnly",
+   "aantal": 41
+  },
+  {
+   "naam": "supplier.crypto",
+   "aantal": 32
+  },
+  {
+   "naam": "supplier.schoon",
+   "aantal": 32
+  },
+  {
+   "naam": "member.db",
+   "aantal": 28
+  },
+  {
+   "naam": "member.save",
+   "aantal": 23
+  },
+  {
+   "naam": "member.liveCodename",
+   "aantal": 20
+  },
+  {
+   "naam": "member.findSupplier",
+   "aantal": 17
+  },
+  {
+   "naam": "supplier.broadcastSync",
+   "aantal": 16
+  },
+  {
+   "naam": "supplier.sseToOffice",
+   "aantal": 16
+  },
+  {
+   "naam": "office.app",
+   "aantal": 15
+  },
+  {
+   "naam": "member.crypto",
+   "aantal": 13
+  },
+  {
+   "naam": "member.notifySupplier",
+   "aantal": 13
+  },
+  {
+   "naam": "supplier.express",
+   "aantal": 13
+  },
+  {
+   "naam": "supplier.notify",
+   "aantal": 13
+  },
+  {
+   "naam": "office.officeAuth",
+   "aantal": 13
+  },
+  {
+   "naam": "member.schoon",
+   "aantal": 12
+  },
+  {
+   "naam": "supplier.sseToCustomer",
+   "aantal": 12
+  },
+  {
+   "naam": "member.geenGast",
+   "aantal": 11
+  },
+  {
+   "naam": "member.accounts",
+   "aantal": 11
+  },
+  {
+   "naam": "member.sseToSupplier",
+   "aantal": 11
+  },
+  {
+   "naam": "supplier.accounts",
+   "aantal": 11
+  },
+  {
+   "naam": "member.PERSONAS",
+   "aantal": 10
+  },
+  {
+   "naam": "member.gegevensStop",
+   "aantal": 10
+  },
+  {
+   "naam": "supplier.ordersVanZaak",
+   "aantal": 10
+  },
+  {
+   "naam": "social.app",
+   "aantal": 10
+  },
+  {
+   "naam": "festival.app",
+   "aantal": 10
+  },
+  {
+   "naam": "festival.festival",
+   "aantal": 10
+  },
+  {
+   "naam": "supplier.notifySupplier",
+   "aantal": 9
+  },
+  {
+   "naam": "supplier.anthropic",
+   "aantal": 9
+  },
+  {
+   "naam": "member.sseToOffice",
+   "aantal": 8
+  },
+  {
+   "naam": "supplier.findSupplier",
+   "aantal": 8
+  },
+  {
+   "naam": "supplier.media",
+   "aantal": 8
+  },
+  {
+   "naam": "festival.supplierAuth",
+   "aantal": 8
+  },
+  {
+   "naam": "member.salonZichtbaar",
+   "aantal": 7
+  },
+  {
+   "naam": "member.talen",
+   "aantal": 7
+  },
+  {
+   "naam": "supplier.talen",
+   "aantal": 7
+  },
+  {
+   "naam": "supplier.pickupCode",
+   "aantal": 7
+  },
+  {
+   "naam": "supplier.facturatie",
+   "aantal": 7
+  },
+  {
+   "naam": "office.db",
+   "aantal": 7
+  },
+  {
+   "naam": "office.sseToOffice",
+   "aantal": 7
+  },
+  {
+   "naam": "festival.logActivity",
+   "aantal": 7
+  },
+  {
+   "naam": "payroll-os.app",
+   "aantal": 7
+  },
+  {
+   "naam": "payroll-os.payrollOS",
+   "aantal": 7
+  },
+  {
+   "naam": "member.leeftijdVan",
+   "aantal": 6
+  },
+  {
+   "naam": "member.handelingsspoor",
+   "aantal": 6
+  },
+  {
+   "naam": "member.zorgVoor",
+   "aantal": 6
+  },
+  {
+   "naam": "supplier.salonNaarVolgers",
+   "aantal": 6
+  },
+  {
+   "naam": "supplier.orderMetRef",
+   "aantal": 6
+  },
+  {
+   "naam": "office.accounts",
+   "aantal": 6
+  },
+  {
+   "naam": "social.auth",
+   "aantal": 6
+  },
+  {
+   "naam": "social.geenGast",
+   "aantal": 6
+  },
+  {
+   "naam": "festival.managerOnly",
+   "aantal": 6
+  },
+  {
+   "naam": "payroll-os.schoon",
+   "aantal": 6
+  },
+  {
+   "naam": "pay.app",
+   "aantal": 6
+  },
+  {
+   "naam": "pay.pay",
+   "aantal": 6
+  },
+  {
+   "naam": "appstore.app",
+   "aantal": 6
+  },
+  {
+   "naam": "appstore.appstore",
+   "aantal": 6
+  },
+  {
+   "naam": "member.stateFor",
+   "aantal": 5
+  },
+  {
+   "naam": "member.anthropic",
+   "aantal": 5
+  },
+  {
+   "naam": "member.express",
+   "aantal": 5
+  },
+  {
+   "naam": "member.geborenVan",
+   "aantal": 5
+  },
+  {
+   "naam": "supplier.salon",
+   "aantal": 5
+  },
+  {
+   "naam": "office.save",
+   "aantal": 5
+  },
+  {
+   "naam": "payroll-os.officeAuth",
+   "aantal": 5
+  },
+  {
+   "naam": "member.lidboard",
+   "aantal": 4
+  },
+  {
+   "naam": "member.rtf",
+   "aantal": 4
+  },
+  {
+   "naam": "member.broadcastSync",
+   "aantal": 4
+  },
+  {
+   "naam": "member.ordersVanKlant",
+   "aantal": 4
+  },
+  {
+   "naam": "member.LANDEN",
+   "aantal": 4
+  },
+  {
+   "naam": "member.ledenInhoudVan",
+   "aantal": 4
+  },
+  {
+   "naam": "member.notify",
+   "aantal": 4
+  },
+  {
+   "naam": "member.officeAuth",
+   "aantal": 4
+  },
+  {
+   "naam": "member.optieAan",
+   "aantal": 4
+  },
+  {
+   "naam": "member.sessieregister",
+   "aantal": 4
+  },
+  {
+   "naam": "member.trChat",
+   "aantal": 4
+  },
+  {
+   "naam": "member.zorgContact",
+   "aantal": 4
+  },
+  {
+   "naam": "member.overheid",
+   "aantal": 4
+  },
+  {
+   "naam": "supplier.supplierState",
+   "aantal": 4
+  },
+  {
+   "naam": "supplier.DEMO",
+   "aantal": 4
+  },
+  {
+   "naam": "supplier.loginFails",
+   "aantal": 4
+  },
+  {
+   "naam": "supplier.noteFailedTry",
+   "aantal": 4
+  },
+  {
+   "naam": "supplier.tooManyTries",
+   "aantal": 4
+  },
+  {
+   "naam": "supplier.keyVanCodenaam",
+   "aantal": 4
+  },
+  {
+   "naam": "office.boardroomWie",
+   "aantal": 4
+  },
+  {
+   "naam": "office.schoon",
+   "aantal": 4
+  },
+  {
+   "naam": "concern.app",
+   "aantal": 4
+  },
+  {
+   "naam": "concern.auth",
+   "aantal": 4
+  },
+  {
+   "naam": "payroll-os.accounts",
+   "aantal": 4
+  },
+  {
+   "naam": "livinglab.app",
+   "aantal": 4
+  },
+  {
+   "naam": "livinglab.livinglab",
+   "aantal": 4
+  },
+  {
+   "naam": "bedrijf.auth",
+   "aantal": 4
+  },
+  {
+   "naam": "kantoren.bank",
+   "aantal": 4
+  },
+  {
+   "naam": "pay.auth",
+   "aantal": 4
+  },
+  {
+   "naam": "pay.liveCodename",
+   "aantal": 4
+  },
+  {
+   "naam": "veiligheid.app",
+   "aantal": 4
+  },
+  {
+   "naam": "veiligheid.auth",
+   "aantal": 4
+  },
+  {
+   "naam": "member.eisAccount",
+   "aantal": 3
+  },
+  {
+   "naam": "member.boekingenVoegToe",
+   "aantal": 3
+  },
+  {
+   "naam": "member.DOOR_RELOCK_MS",
+   "aantal": 3
+  },
+  {
+   "naam": "member.rtmail",
+   "aantal": 3
+  },
+  {
+   "naam": "member.applyChatVertaald",
+   "aantal": 3
+  },
+  {
+   "naam": "member.chatStuur",
+   "aantal": 3
+  },
+  {
+   "naam": "member.convOf",
+   "aantal": 3
+  },
+  {
+   "naam": "member.cvReady",
+   "aantal": 3
+  },
+  {
+   "naam": "member.findPartner",
+   "aantal": 3
+  },
+  {
+   "naam": "member.logActivity",
+   "aantal": 3
+  },
+  {
+   "naam": "member.mail",
+   "aantal": 3
+  },
+  {
+   "naam": "member.media",
+   "aantal": 3
+  },
+  {
+   "naam": "member.meldWerkgever",
+   "aantal": 3
+  },
+  {
+   "naam": "member.openVacatures",
+   "aantal": 3
+  },
+  {
+   "naam": "member.toestellen",
+   "aantal": 3
+  },
+  {
+   "naam": "member.supplierAuth",
+   "aantal": 3
+  },
+  {
+   "naam": "member.unlockDoor",
+   "aantal": 3
+  },
+  {
+   "naam": "member.codenaamVan",
+   "aantal": 3
+  },
+  {
+   "naam": "member.socialConnecties",
+   "aantal": 3
+  },
+  {
+   "naam": "member.zijnVrienden",
+   "aantal": 3
+  },
+  {
+   "naam": "member.mall",
+   "aantal": 3
+  },
+  {
+   "naam": "member.stemmingVan",
+   "aantal": 3
+  },
+  {
+   "naam": "member.berichten",
+   "aantal": 3
+  },
+  {
+   "naam": "member.commGast",
+   "aantal": 3
+  },
+  {
+   "naam": "member.commWerk",
+   "aantal": 3
+  },
+  {
+   "naam": "supplier.scheduleFor",
+   "aantal": 3
+  },
+  {
+   "naam": "supplier.sseClients",
+   "aantal": 3
+  },
+  {
+   "naam": "supplier.sseSend",
+   "aantal": 3
+  },
+  {
+   "naam": "supplier.rememberSession",
+   "aantal": 3
+  },
+  {
+   "naam": "supplier.LANDEN",
+   "aantal": 3
+  },
+  {
+   "naam": "supplier.shiftSamenvatting",
+   "aantal": 3
+  },
+  {
+   "naam": "supplier.comm",
+   "aantal": 3
+  },
+  {
+   "naam": "supplier.rtmail",
+   "aantal": 3
+  },
+  {
+   "naam": "supplier.guestsFor",
+   "aantal": 3
+  },
+  {
+   "naam": "supplier.commGast",
+   "aantal": 3
+  },
+  {
+   "naam": "supplier.sectiesForOrder",
+   "aantal": 3
+  },
+  {
+   "naam": "supplier.groothandel",
+   "aantal": 3
+  },
+  {
+   "naam": "supplier.haversine",
+   "aantal": 3
+  },
+  {
+   "naam": "supplier.pay",
+   "aantal": 3
+  },
+  {
+   "naam": "supplier.zorgketen",
+   "aantal": 3
+  },
+  {
+   "naam": "supplier.salonProfielCompleet",
+   "aantal": 3
+  },
+  {
+   "naam": "supplier.runItem",
+   "aantal": 3
+  },
+  {
+   "naam": "supplier.sortRunsheet",
+   "aantal": 3
+  },
+  {
+   "naam": "supplier.ALT_IDEE",
+   "aantal": 3
+  },
+  {
+   "naam": "supplier.factuur",
+   "aantal": 3
+  },
+  {
+   "naam": "supplier.commerce",
+   "aantal": 3
+  },
+  {
+   "naam": "office.boardroomAuth",
+   "aantal": 3
+  },
+  {
+   "naam": "office.mail",
+   "aantal": 3
+  },
+  {
+   "naam": "office.sseToSupplier",
+   "aantal": 3
+  },
+  {
+   "naam": "social.rtf",
+   "aantal": 3
+  },
+  {
+   "naam": "social.connectieTussen",
+   "aantal": 3
+  },
+  {
+   "naam": "social.verbActief",
+   "aantal": 3
+  },
+  {
+   "naam": "social.pinKaart",
+   "aantal": 3
+  },
+  {
+   "naam": "concern.entiteitVind",
+   "aantal": 3
+  },
+  {
+   "naam": "gast.db",
+   "aantal": 3
+  },
+  {
+   "naam": "gast.save",
+   "aantal": 3
+  },
+  {
+   "naam": "gast.crypto",
+   "aantal": 3
+  },
+  {
+   "naam": "gast.schoon",
+   "aantal": 3
+  },
+  {
+   "naam": "payroll-os.findSupplier",
+   "aantal": 3
+  },
+  {
+   "naam": "kantoren.weefsel",
+   "aantal": 3
+  },
+  {
+   "naam": "overheid.app",
+   "aantal": 3
+  },
+  {
+   "naam": "overheid.supplierAuth",
+   "aantal": 3
+  },
+  {
+   "naam": "kantoorpakket.app",
+   "aantal": 3
+  },
+  {
+   "naam": "mobiliteit.app",
+   "aantal": 3
+  },
+  {
+   "naam": "mobiliteit.supplierAuth",
+   "aantal": 3
+  },
+  {
+   "naam": "appstore.appstoreWinkel",
+   "aantal": 3
+  },
+  {
+   "naam": "appstore.appstoreBrug",
+   "aantal": 3
+  },
+  {
+   "naam": "appstore.auth",
+   "aantal": 3
+  },
+  {
+   "naam": "auth.sessieregister",
+   "aantal": 2
+  },
+  {
+   "naam": "member.werkgeversVan",
+   "aantal": 2
+  },
+  {
+   "naam": "member.memberTemplate",
+   "aantal": 2
+  },
+  {
+   "naam": "member.betaal",
+   "aantal": 2
+  },
+  {
+   "naam": "member.fonds",
+   "aantal": 2
+  },
+  {
+   "naam": "member.factuur",
+   "aantal": 2
+  },
+  {
+   "naam": "member.orderMetRef",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ordersVoegToe",
+   "aantal": 2
+  },
+  {
+   "naam": "member.boekingMetRef",
+   "aantal": 2
+  },
+  {
+   "naam": "member.boekingenVanKlant",
+   "aantal": 2
+  },
+  {
+   "naam": "member.boekingenVanZaak",
+   "aantal": 2
+  },
+  {
+   "naam": "member.txLedgerActief",
+   "aantal": 2
+  },
+  {
+   "naam": "member.txLedgerVanKlant",
+   "aantal": 2
+  },
+  {
+   "naam": "member.txLedgerTel",
+   "aantal": 2
+  },
+  {
+   "naam": "member.AUTHOR_TIER",
+   "aantal": 2
+  },
+  {
+   "naam": "member.UPLOAD_DIR",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ZZP",
+   "aantal": 2
+  },
+  {
+   "naam": "member.automatisering",
+   "aantal": 2
+  },
+  {
+   "naam": "member.aiSystemPrompt",
+   "aantal": 2
+  },
+  {
+   "naam": "member.appUrl",
+   "aantal": 2
+  },
+  {
+   "naam": "member.bus",
+   "aantal": 2
+  },
+  {
+   "naam": "member.canEngage",
+   "aantal": 2
+  },
+  {
+   "naam": "member.cannedAnswer",
+   "aantal": 2
+  },
+  {
+   "naam": "member.bijeen",
+   "aantal": 2
+  },
+  {
+   "naam": "member.engageError",
+   "aantal": 2
+  },
+  {
+   "naam": "member.findStaffPartner",
+   "aantal": 2
+  },
+  {
+   "naam": "member.forgetSession",
+   "aantal": 2
+  },
+  {
+   "naam": "member.fs",
+   "aantal": 2
+  },
+  {
+   "naam": "member.gcCode",
+   "aantal": 2
+  },
+  {
+   "naam": "member.idGeverifieerd",
+   "aantal": 2
+  },
+  {
+   "naam": "member.haversine",
+   "aantal": 2
+  },
+  {
+   "naam": "member.liveStateFor",
+   "aantal": 2
+  },
+  {
+   "naam": "member.memberSays",
+   "aantal": 2
+  },
+  {
+   "naam": "member.noteerBeurt",
+   "aantal": 2
+  },
+  {
+   "naam": "member.myApplications",
+   "aantal": 2
+  },
+  {
+   "naam": "member.bestanden",
+   "aantal": 2
+  },
+  {
+   "naam": "member.noteFailedTry",
+   "aantal": 2
+  },
+  {
+   "naam": "member.gidsWeg",
+   "aantal": 2
+  },
+  {
+   "naam": "member.magBezorgen",
+   "aantal": 2
+  },
+  {
+   "naam": "member.path",
+   "aantal": 2
+  },
+  {
+   "naam": "member.pickupCode",
+   "aantal": 2
+  },
+  {
+   "naam": "member.publicPartner",
+   "aantal": 2
+  },
+  {
+   "naam": "member.publicSupplier",
+   "aantal": 2
+  },
+  {
+   "naam": "member.publicTrip",
+   "aantal": 2
+  },
+  {
+   "naam": "member.pushLive",
+   "aantal": 2
+  },
+  {
+   "naam": "member.registerContact",
+   "aantal": 2
+  },
+  {
+   "naam": "member.resolveSession",
+   "aantal": 2
+  },
+  {
+   "naam": "member.tweefactor",
+   "aantal": 2
+  },
+  {
+   "naam": "member.commercieel",
+   "aantal": 2
+  },
+  {
+   "naam": "member.sessions",
+   "aantal": 2
+  },
+  {
+   "naam": "member.sseToCustomer",
+   "aantal": 2
+  },
+  {
+   "naam": "member.tooManyTries",
+   "aantal": 2
+  },
+  {
+   "naam": "member.validDept",
+   "aantal": 2
+  },
+  {
+   "naam": "member.reserveerTafel",
+   "aantal": 2
+  },
+  {
+   "naam": "member.mijnReserveringen",
+   "aantal": 2
+  },
+  {
+   "naam": "member.annuleerReservering",
+   "aantal": 2
+  },
+  {
+   "naam": "member.annuleerItem",
+   "aantal": 2
+  },
+  {
+   "naam": "member.plaatsReview",
+   "aantal": 2
+  },
+  {
+   "naam": "member.reviewsVoor",
+   "aantal": 2
+  },
+  {
+   "naam": "member.toggleFavoriet",
+   "aantal": 2
+  },
+  {
+   "naam": "member.favorietenVan",
+   "aantal": 2
+  },
+  {
+   "naam": "member.isFavoriet",
+   "aantal": 2
+  },
+  {
+   "naam": "member.agendaVoor",
+   "aantal": 2
+  },
+  {
+   "naam": "member.maakSplits",
+   "aantal": 2
+  },
+  {
+   "naam": "member.mijnSplitsen",
+   "aantal": 2
+  },
+  {
+   "naam": "member.betaalSplits",
+   "aantal": 2
+  },
+  {
+   "naam": "member.zetOpWachtlijst",
+   "aantal": 2
+  },
+  {
+   "naam": "member.mijnWachtlijst",
+   "aantal": 2
+  },
+  {
+   "naam": "member.rsvpAnnuleer",
+   "aantal": 2
+  },
+  {
+   "naam": "member.puntenVan",
+   "aantal": 2
+  },
+  {
+   "naam": "member.verdienPunten",
+   "aantal": 2
+  },
+  {
+   "naam": "member.verzilverPunten",
+   "aantal": 2
+  },
+  {
+   "naam": "member.voorkeurVan",
+   "aantal": 2
+  },
+  {
+   "naam": "member.zetVoorkeur",
+   "aantal": 2
+  },
+  {
+   "naam": "member.retailIsRetail",
+   "aantal": 2
+  },
+  {
+   "naam": "member.wishlistToggle",
+   "aantal": 2
+  },
+  {
+   "naam": "member.mijnApart",
+   "aantal": 2
+  },
+  {
+   "naam": "member.vraagPaskamer",
+   "aantal": 2
+  },
+  {
+   "naam": "member.mijnStyling",
+   "aantal": 2
+  },
+  {
+   "naam": "member.retailCatalogus",
+   "aantal": 2
+  },
+  {
+   "naam": "member.groothandel",
+   "aantal": 2
+  },
+  {
+   "naam": "member.mbAanvraag",
+   "aantal": 2
+  },
+  {
+   "naam": "member.mbMijn",
+   "aantal": 2
+  },
+  {
+   "naam": "member.avShowroom",
+   "aantal": 2
+  },
+  {
+   "naam": "member.avAanbevolen",
+   "aantal": 2
+  },
+  {
+   "naam": "member.avProefrit",
+   "aantal": 2
+  },
+  {
+   "naam": "member.avKoop",
+   "aantal": 2
+  },
+  {
+   "naam": "member.avInruil",
+   "aantal": 2
+  },
+  {
+   "naam": "member.avTeken",
+   "aantal": 2
+  },
+  {
+   "naam": "member.avMijnDeals",
+   "aantal": 2
+  },
+  {
+   "naam": "member.dpBetaalDirect",
+   "aantal": 2
+  },
+  {
+   "naam": "member.dpMijnBetalingen",
+   "aantal": 2
+  },
+  {
+   "naam": "member.dpVerzoekenVoor",
+   "aantal": 2
+  },
+  {
+   "naam": "member.dpBetaalVerzoek",
+   "aantal": 2
+  },
+  {
+   "naam": "member.PASPOORT_NIVEAUS",
+   "aantal": 2
+  },
+  {
+   "naam": "member.paspoortStatus",
+   "aantal": 2
+  },
+  {
+   "naam": "member.paspoortBeslis",
+   "aantal": 2
+  },
+  {
+   "naam": "member.paspoortTrekIn",
+   "aantal": 2
+  },
+  {
+   "naam": "member.paspoortMijn",
+   "aantal": 2
+  },
+  {
+   "naam": "member.spelVergeet",
+   "aantal": 2
+  },
+  {
+   "naam": "member.kijk",
+   "aantal": 2
+  },
+  {
+   "naam": "member.appbieb",
+   "aantal": 2
+  },
+  {
+   "naam": "member.reisbieb",
+   "aantal": 2
+  },
+  {
+   "naam": "member.rtfbieb",
+   "aantal": 2
+  },
+  {
+   "naam": "member.pestgrens",
+   "aantal": 2
+  },
+  {
+   "naam": "member.foodcourt",
+   "aantal": 2
+  },
+  {
+   "naam": "member.reisbureau",
+   "aantal": 2
+  },
+  {
+   "naam": "member.logies",
+   "aantal": 2
+  },
+  {
+   "naam": "member.uitgaan",
+   "aantal": 2
+  },
+  {
+   "naam": "member.gemeente",
+   "aantal": 2
+  },
+  {
+   "naam": "member.redactie",
+   "aantal": 2
+  },
+  {
+   "naam": "member.pay",
+   "aantal": 2
+  },
+  {
+   "naam": "member.verblijfBoek",
+   "aantal": 2
+  },
+  {
+   "naam": "member.mijnVerblijven",
+   "aantal": 2
+  },
+  {
+   "naam": "member.verblijfAnnuleer",
+   "aantal": 2
+  },
+  {
+   "naam": "member.gastDeur",
+   "aantal": 2
+  },
+  {
+   "naam": "member.zorgVan",
+   "aantal": 2
+  },
+  {
+   "naam": "member.zorgZet",
+   "aantal": 2
+  },
+  {
+   "naam": "member.locDeel",
+   "aantal": 2
+  },
+  {
+   "naam": "member.locStopKlant",
+   "aantal": 2
+  },
+  {
+   "naam": "member.locMijn",
+   "aantal": 2
+  },
+  {
+   "naam": "member.assetsOverzicht",
+   "aantal": 2
+  },
+  {
+   "naam": "member.assetDocument",
+   "aantal": 2
+  },
+  {
+   "naam": "member.assetKoop",
+   "aantal": 2
+  },
+  {
+   "naam": "member.assetHerroep",
+   "aantal": 2
+  },
+  {
+   "naam": "member.assetWachtlijstZet",
+   "aantal": 2
+  },
+  {
+   "naam": "member.assetMijn",
+   "aantal": 2
+  },
+  {
+   "naam": "member.assetGebruik",
+   "aantal": 2
+  },
+  {
+   "naam": "member.assetUitstap",
+   "aantal": 2
+  },
+  {
+   "naam": "member.conciergeVraag",
+   "aantal": 2
+  },
+  {
+   "naam": "member.conciergeIntrek",
+   "aantal": 2
+  },
+  {
+   "naam": "member.conciergeVerzoeken",
+   "aantal": 2
+  },
+  {
+   "naam": "member.lifestyleVoorkeuren",
+   "aantal": 2
+  },
+  {
+   "naam": "member.lifestyleVoorkeurenZet",
+   "aantal": 2
+  },
+  {
+   "naam": "member.bezitZet",
+   "aantal": 2
+  },
+  {
+   "naam": "member.bezitWeg",
+   "aantal": 2
+  },
+  {
+   "naam": "member.bezittingen",
+   "aantal": 2
+  },
+  {
+   "naam": "member.gzAfspraak",
+   "aantal": 2
+  },
+  {
+   "naam": "member.gzAfspraakWeg",
+   "aantal": 2
+  },
+  {
+   "naam": "member.gzDossier",
+   "aantal": 2
+  },
+  {
+   "naam": "member.gzDossierWeg",
+   "aantal": 2
+  },
+  {
+   "naam": "member.gezondheid",
+   "aantal": 2
+  },
+  {
+   "naam": "member.lifestyleOverzicht",
+   "aantal": 2
+  },
+  {
+   "naam": "member.lifestyleAI",
+   "aantal": 2
+  },
+  {
+   "naam": "member.reizen",
+   "aantal": 2
+  },
+  {
+   "naam": "member.reisZet",
+   "aantal": 2
+  },
+  {
+   "naam": "member.reisWeg",
+   "aantal": 2
+  },
+  {
+   "naam": "member.reisItem",
+   "aantal": 2
+  },
+  {
+   "naam": "member.reisItemWeg",
+   "aantal": 2
+  },
+  {
+   "naam": "member.cellier",
+   "aantal": 2
+  },
+  {
+   "naam": "member.celZet",
+   "aantal": 2
+  },
+  {
+   "naam": "member.celWeg",
+   "aantal": 2
+  },
+  {
+   "naam": "member.celSchenk",
+   "aantal": 2
+  },
+  {
+   "naam": "member.tables",
+   "aantal": 2
+  },
+  {
+   "naam": "member.tableZet",
+   "aantal": 2
+  },
+  {
+   "naam": "member.tableWeg",
+   "aantal": 2
+  },
+  {
+   "naam": "member.tableGast",
+   "aantal": 2
+  },
+  {
+   "naam": "member.tableGastZet",
+   "aantal": 2
+  },
+  {
+   "naam": "member.tableGastWeg",
+   "aantal": 2
+  },
+  {
+   "naam": "member.tableMenu",
+   "aantal": 2
+  },
+  {
+   "naam": "member.tableMenuWeg",
+   "aantal": 2
+  },
+  {
+   "naam": "member.maison",
+   "aantal": 2
+  },
+  {
+   "naam": "member.maisonStaf",
+   "aantal": 2
+  },
+  {
+   "naam": "member.maisonStafWeg",
+   "aantal": 2
+  },
+  {
+   "naam": "member.maisonTaak",
+   "aantal": 2
+  },
+  {
+   "naam": "member.maisonTaakKlaar",
+   "aantal": 2
+  },
+  {
+   "naam": "member.maisonTaakWeg",
+   "aantal": 2
+  },
+  {
+   "naam": "member.maisonLog",
+   "aantal": 2
+  },
+  {
+   "naam": "member.maisonLogWeg",
+   "aantal": 2
+  },
+  {
+   "naam": "member.garderobe",
+   "aantal": 2
+  },
+  {
+   "naam": "member.gwStuk",
+   "aantal": 2
+  },
+  {
+   "naam": "member.gwStukWeg",
+   "aantal": 2
+  },
+  {
+   "naam": "member.gwVakman",
+   "aantal": 2
+  },
+  {
+   "naam": "member.gwVakmanWeg",
+   "aantal": 2
+  },
+  {
+   "naam": "member.mecenaat",
+   "aantal": 2
+  },
+  {
+   "naam": "member.mecGift",
+   "aantal": 2
+  },
+  {
+   "naam": "member.mecGiftWeg",
+   "aantal": 2
+  },
+  {
+   "naam": "member.mecBetaald",
+   "aantal": 2
+  },
+  {
+   "naam": "member.nalatenschap",
+   "aantal": 2
+  },
+  {
+   "naam": "member.nlDoc",
+   "aantal": 2
+  },
+  {
+   "naam": "member.nlDocWeg",
+   "aantal": 2
+  },
+  {
+   "naam": "member.nlContact",
+   "aantal": 2
+  },
+  {
+   "naam": "member.nlContactWeg",
+   "aantal": 2
+  },
+  {
+   "naam": "member.nlWens",
+   "aantal": 2
+  },
+  {
+   "naam": "member.nlWensWeg",
+   "aantal": 2
+  },
+  {
+   "naam": "member.logboek",
+   "aantal": 2
+  },
+  {
+   "naam": "member.lbObject",
+   "aantal": 2
+  },
+  {
+   "naam": "member.lbObjectWeg",
+   "aantal": 2
+  },
+  {
+   "naam": "member.lbRegel",
+   "aantal": 2
+  },
+  {
+   "naam": "member.lbRegelWeg",
+   "aantal": 2
+  },
+  {
+   "naam": "member.cercle",
+   "aantal": 2
+  },
+  {
+   "naam": "member.crClub",
+   "aantal": 2
+  },
+  {
+   "naam": "member.crClubWeg",
+   "aantal": 2
+  },
+  {
+   "naam": "member.crGast",
+   "aantal": 2
+  },
+  {
+   "naam": "member.crGastTerug",
+   "aantal": 2
+  },
+  {
+   "naam": "member.crWaarheen",
+   "aantal": 2
+  },
+  {
+   "naam": "member.hangar",
+   "aantal": 2
+  },
+  {
+   "naam": "member.hgToestel",
+   "aantal": 2
+  },
+  {
+   "naam": "member.hgToestelWeg",
+   "aantal": 2
+  },
+  {
+   "naam": "member.hgVlucht",
+   "aantal": 2
+  },
+  {
+   "naam": "member.hgVluchtWeg",
+   "aantal": 2
+  },
+  {
+   "naam": "member.entourage",
+   "aantal": 2
+  },
+  {
+   "naam": "member.enPersoon",
+   "aantal": 2
+  },
+  {
+   "naam": "member.enPersoonWeg",
+   "aantal": 2
+  },
+  {
+   "naam": "member.enDoc",
+   "aantal": 2
+  },
+  {
+   "naam": "member.enDocWeg",
+   "aantal": 2
+  },
+  {
+   "naam": "member.enGezelschap",
+   "aantal": 2
+  },
+  {
+   "naam": "member.attenties",
+   "aantal": 2
+  },
+  {
+   "naam": "member.atRelatie",
+   "aantal": 2
+  },
+  {
+   "naam": "member.atRelatieWeg",
+   "aantal": 2
+  },
+  {
+   "naam": "member.atGift",
+   "aantal": 2
+  },
+  {
+   "naam": "member.atGiftWeg",
+   "aantal": 2
+  },
+  {
+   "naam": "member.rechterhandAI",
+   "aantal": 2
+  },
+  {
+   "naam": "member.levensgraaf",
+   "aantal": 2
+  },
+  {
+   "naam": "member.bureau",
+   "aantal": 2
+  },
+  {
+   "naam": "member.postdatum",
+   "aantal": 2
+  },
+  {
+   "naam": "member.rvProfielGet",
+   "aantal": 2
+  },
+  {
+   "naam": "member.rvProfiel",
+   "aantal": 2
+  },
+  {
+   "naam": "member.rvKandidaten",
+   "aantal": 2
+  },
+  {
+   "naam": "member.rvTafels",
+   "aantal": 2
+  },
+  {
+   "naam": "member.rvTafelAntwoord",
+   "aantal": 2
+  },
+  {
+   "naam": "member.rvIntroducties",
+   "aantal": 2
+  },
+  {
+   "naam": "member.rvIntroAntwoord",
+   "aantal": 2
+  },
+  {
+   "naam": "member.rvEncounter",
+   "aantal": 2
+  },
+  {
+   "naam": "member.rvMatches",
+   "aantal": 2
+  },
+  {
+   "naam": "member.rvDate",
+   "aantal": 2
+  },
+  {
+   "naam": "member.rvAanwezigWis",
+   "aantal": 2
+  },
+  {
+   "naam": "member.rvKies",
+   "aantal": 2
+  },
+  {
+   "naam": "member.rvMeldingen",
+   "aantal": 2
+  },
+  {
+   "naam": "member.rvArrange",
+   "aantal": 2
+  },
+  {
+   "naam": "member.rvAkkoord",
+   "aantal": 2
+  },
+  {
+   "naam": "member.rvSamen",
+   "aantal": 2
+  },
+  {
+   "naam": "member.rvSamenZet",
+   "aantal": 2
+  },
+  {
+   "naam": "member.STEMMINGEN",
+   "aantal": 2
+  },
+  {
+   "naam": "member.wauwStemmingZet",
+   "aantal": 2
+  },
+  {
+   "naam": "member.jarigVan",
+   "aantal": 2
+  },
+  {
+   "naam": "member.wauwTerugblik",
+   "aantal": 2
+  },
+  {
+   "naam": "member.pulsePost",
+   "aantal": 2
+  },
+  {
+   "naam": "member.pulseWeg",
+   "aantal": 2
+  },
+  {
+   "naam": "member.pulseLike",
+   "aantal": 2
+  },
+  {
+   "naam": "member.pulseReactie",
+   "aantal": 2
+  },
+  {
+   "naam": "member.pulseVolg",
+   "aantal": 2
+  },
+  {
+   "naam": "member.pulseMeld",
+   "aantal": 2
+  },
+  {
+   "naam": "member.pulseFeed",
+   "aantal": 2
+  },
+  {
+   "naam": "member.pulseProfiel",
+   "aantal": 2
+  },
+  {
+   "naam": "member.pulseBewerk",
+   "aantal": 2
+  },
+  {
+   "naam": "member.pulseVersies",
+   "aantal": 2
+  },
+  {
+   "naam": "member.pulseBewaar",
+   "aantal": 2
+  },
+  {
+   "naam": "member.pulseBewaard",
+   "aantal": 2
+  },
+  {
+   "naam": "member.salon",
+   "aantal": 2
+  },
+  {
+   "naam": "member.salonProfiel",
+   "aantal": 2
+  },
+  {
+   "naam": "member.salonReacties",
+   "aantal": 2
+  },
+  {
+   "naam": "member.salonAI",
+   "aantal": 2
+  },
+  {
+   "naam": "member.salonInzicht",
+   "aantal": 2
+  },
+  {
+   "naam": "member.metier",
+   "aantal": 2
+  },
+  {
+   "naam": "member.metierBewijs",
+   "aantal": 2
+  },
+  {
+   "naam": "member.metierNetwerk",
+   "aantal": 2
+  },
+  {
+   "naam": "member.metierAI",
+   "aantal": 2
+  },
+  {
+   "naam": "member.metierLoon",
+   "aantal": 2
+  },
+  {
+   "naam": "member.genootschap",
+   "aantal": 2
+  },
+  {
+   "naam": "member.genootschapBeheer",
+   "aantal": 2
+  },
+  {
+   "naam": "member.prikbord",
+   "aantal": 2
+  },
+  {
+   "naam": "member.bijeenkomst",
+   "aantal": 2
+  },
+  {
+   "naam": "member.genootschapAI",
+   "aantal": 2
+  },
+  {
+   "naam": "member.genootschapInzicht",
+   "aantal": 2
+  },
+  {
+   "naam": "member.genootschapUitvoer",
+   "aantal": 2
+  },
+  {
+   "naam": "member.comm",
+   "aantal": 2
+  },
+  {
+   "naam": "member.commBronnen",
+   "aantal": 2
+  },
+  {
+   "naam": "member.commAi",
+   "aantal": 2
+  },
+  {
+   "naam": "member.careOverzicht",
+   "aantal": 2
+  },
+  {
+   "naam": "member.careBoek",
+   "aantal": 2
+  },
+  {
+   "naam": "member.careBetaal",
+   "aantal": 2
+  },
+  {
+   "naam": "member.careAnnuleer",
+   "aantal": 2
+  },
+  {
+   "naam": "member.careMijn",
+   "aantal": 2
+  },
+  {
+   "naam": "member.careIntakeDeel",
+   "aantal": 2
+  },
+  {
+   "naam": "member.careIntakeStop",
+   "aantal": 2
+  },
+  {
+   "naam": "member.carePakketOverzicht",
+   "aantal": 2
+  },
+  {
+   "naam": "member.carePakketBoek",
+   "aantal": 2
+  },
+  {
+   "naam": "member.carePakketBetaal",
+   "aantal": 2
+  },
+  {
+   "naam": "member.carePakketMijn",
+   "aantal": 2
+  },
+  {
+   "naam": "member.vastleggingDeel",
+   "aantal": 2
+  },
+  {
+   "naam": "member.vastleggingStop",
+   "aantal": 2
+  },
+  {
+   "naam": "member.vastleggingenVan",
+   "aantal": 2
+  },
+  {
+   "naam": "member.wachtlijstZet",
+   "aantal": 2
+  },
+  {
+   "naam": "member.wachtlijstAf",
+   "aantal": 2
+  },
+  {
+   "naam": "member.wachtlijstVan",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ONDERNEMING_RECHTSVORMEN",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ondernemingRechtsvormenVanLand",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ondernemingRechtsvormLanden",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ondernemingVind",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ondernemingVanEigenaar",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ondernemingBeeld",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ondernemingNieuw",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ondernemingRechtsvorm",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ondernemingKoppel",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ondernemingIngeschreven",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ondernemingVerkenning",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ondernemingIntakeZet",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ondernemingIntakeBeeld",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ondernemingPlanVastleggen",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ondernemingDagbeeld",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ondernemingEersteKlant",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ondernemingMallProfiel",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ondernemingAanvraag",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ondernemingAanvraagStand",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ondernemingRelaties",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ondernemingDebiteuren",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ondernemingCrediteuren",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ondernemingContracten",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ondernemingBelasting",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ondernemingKas",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ondernemingKasSaldo",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ondernemingCapaciteit",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ondernemingPijplijn",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ondernemingVoorraad",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ondernemingKlussen",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ondernemingToegang",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ONDERNEMING_ONTWERPER",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ondernemingOntwerp",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ondernemingBestuur",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ondernemingBestuurderZet",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ondernemingBestuurderAf",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ondernemingAandeelZet",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ondernemingAandeelWeg",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ondernemingBijdrageOver",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ondernemingWerving",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ondernemingWerkruimte",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ondernemingKlantNotitie",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ondernemingOprichting",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ondernemingOprichtingZet",
+   "aantal": 2
+  },
+  {
+   "naam": "member.plaatsOrderVoor",
+   "aantal": 2
+  },
+  {
+   "naam": "member.betaalOrderVoor",
+   "aantal": 2
+  },
+  {
+   "naam": "member.rekeningVoor",
+   "aantal": 2
+  },
+  {
+   "naam": "member.betaalRekeningVoor",
+   "aantal": 2
+  },
+  {
+   "naam": "member.koopTicketVoor",
+   "aantal": 2
+  },
+  {
+   "naam": "member.betaalBoekingVoor",
+   "aantal": 2
+  },
+  {
+   "naam": "member.vraagRitVoor",
+   "aantal": 2
+  },
+  {
+   "naam": "member.betaalRitVoor",
+   "aantal": 2
+  },
+  {
+   "naam": "member.fluister",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ontmoetZet",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ontmoetPos",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ontmoetKies",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ontmoetTeken",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ontmoetHier",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ontmoetStop",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ontmoetSos",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ontmoetSignaalKantoor",
+   "aantal": 2
+  },
+  {
+   "naam": "member.ontmoetMijnState",
+   "aantal": 2
+  },
+  {
+   "naam": "member.stuurLus",
+   "aantal": 2
+  },
+  {
+   "naam": "member.gegevensNodig",
+   "aantal": 2
+  },
+  {
+   "naam": "member.gegevensStart",
+   "aantal": 2
+  },
+  {
+   "naam": "member.gegevensZeg",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.sessionFor",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.DEMO_SUPPLIER",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.checkCred",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.hasCred",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.pinSlot",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.zaakBoard",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.zaakZet",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.logInlog",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.werkvensterVan",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.zetWerkvenster",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.magWerken",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.werkAdvies",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.persoonsPoort",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.ZAAK_OPTIES",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.boekingenVanZaak",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.HK_STATUSES",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.addTicket",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.setRoomHk",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.unlockDoor",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.pushLive",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.trChat",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.klantSalon",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.dpVerzoekMaak",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.dpVerzoekIntrek",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.dpOntvangsten",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.TABLE_STATUSES",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.BOEK_KETEN",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.aiFindDoor",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.aiFindRoom",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.posDay",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.fluister",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.alcoholGrensVan",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.auth",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.isFavoriet",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.geborenVan",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.i18n",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.ledenPrijs",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.leeftijdVan",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.publicSupplier",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.ordersVoegToe",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.stationsForOrder",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.beslisReservering",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.tafelplanning",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.reserveringTafel",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.reserveringKomst",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.walkIn",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.poortBeeld",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.poortKlaar",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.rondleidingZet",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.agentKoppel",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.agentPubliek",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.agentVoorstel",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.agentBeslis",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.roosterVoorstel",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.roosterBeslis",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.reviewReageer",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.keuken",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.dagrapport",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.receptie",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.kamerplanning",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.verblijfBeslis",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.verblijfCheckin",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.verblijfCheckout",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.verblijfNoShow",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.dorpKan",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.dorpPost",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.dorpVerder",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.dorpStuurDoor",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.dorpBuurt",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.dorpOverzicht",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.dorpTools",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.dorpDrukte",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.thuis",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.locVoorZaak",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.locStopZaak",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.magBezorgen",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.etaMinutes",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.ticketsVoorSlot",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.boerderij",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.creator",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.samenwerking",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.handelsketen",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.mbSetup",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.mbWinkelOverzicht",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.mbRoute",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.mbNeem",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.mbGps",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.mbOverhandig",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.mbRetour",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.avDealerInbox",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.avZetAan",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.avZetAuto",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.avVerwijderAuto",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.avBeslis",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.AUTOVERKOOP_BRANDSTOF",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.bevIsBeveiliging",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.bevCommand",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.bevZetFunctie",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.bevZetPost",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.bevVerwijderPost",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.bevBudget",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.bevZetBudget",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.bevRooster",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.bevZetDienst",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.bevSchrapDienst",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.bevPlanAuto",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.bevAanvraag",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.bevAanvraagLijst",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.bevBeslisAanvraag",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.bevBeslisIncident",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.bevMijnDiensten",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.bevInklok",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.bevUitklok",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.bevRondeStart",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.bevRondeCheckpoint",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.bevRondeKlaar",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.bevMeldIncident",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.bevSos",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.BEVEILIGING_SHIFTS",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.BEVEILIGING_ERNST",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.careAgenda",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.careAfronden",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.careVastleg",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.careNietVerschenen",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.careGemist",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.hulpdienst",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.ketenchat",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.rampbeeld",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.defensie",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.retailState",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.RETAIL_MATEN",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.RETAIL_SEIZOENEN",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.zetCollectie",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.zetArtikel",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.pasVoorraad",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.releaseDrop",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.voorraadZoek",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.klantProfiel",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.zetKlantMaten",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.voegKlantnotitie",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.legApart",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.paskamerBreng",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.stuurStyling",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.retailVerkoop",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.retailVerkoopTerug",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.retailAnnuleer",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.retailBon",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.ANNULEERGRONDEN",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.PASPOORT_NIVEAUS",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.paspoortVraag",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.paspoortBekijk",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.paspoortIncident",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.paspoortPartner",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.zaakFunctieAan",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.salonItemsVan",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.fallbackRunsheet",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.parseRunsheetText",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.cateringDishes",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.eventCovers",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.coachCache",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.coachRules",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.weekdagFactor",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.cannedBoekhouder",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.financeVoor",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.boekhoudkennis",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.btwAangifte",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.overheid",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.herkomst",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.aansluiting",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.preflight",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.RIT_KETEN",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.RIT_LEGACY",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.ritBezetting",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.ritVerder",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.POS_METHODS",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.tafelticket",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.gcCode",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.VAC_SOORTEN",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.werkmail",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.applyChatVertaald",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.chatStuur",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.ensureApplyChat",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.notifyApplicant",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.codenaamVan",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.levensgraaf",
+   "aantal": 2
+  },
+  {
+   "naam": "supplier.postdatum",
+   "aantal": 2
+  },
+  {
+   "naam": "office.appUrl",
+   "aantal": 2
+  },
+  {
+   "naam": "office.ensureSupplierDefaults",
+   "aantal": 2
+  },
+  {
+   "naam": "office.findSupplier",
+   "aantal": 2
+  },
+  {
+   "naam": "office.logActivity",
+   "aantal": 2
+  },
+  {
+   "naam": "office.makeSupplierCode",
+   "aantal": 2
+  },
+  {
+   "naam": "office.sseClients",
+   "aantal": 2
+  },
+  {
+   "naam": "office.officeState",
+   "aantal": 2
+  },
+  {
+   "naam": "office.UPLOAD_DIR",
+   "aantal": 2
+  },
+  {
+   "naam": "office.notify",
+   "aantal": 2
+  },
+  {
+   "naam": "social.db",
+   "aantal": 2
+  },
+  {
+   "naam": "social.socialZoek",
+   "aantal": 2
+  },
+  {
+   "naam": "social.socialVerbind",
+   "aantal": 2
+  },
+  {
+   "naam": "social.socialAntwoord",
+   "aantal": 2
+  },
+  {
+   "naam": "social.socialIntrek",
+   "aantal": 2
+  },
+  {
+   "naam": "social.socialConnecties",
+   "aantal": 2
+  },
+  {
+   "naam": "social.sseToCustomer",
+   "aantal": 2
+  },
+  {
+   "naam": "social.isGeblokkeerd",
+   "aantal": 2
+  },
+  {
+   "naam": "social.pinVernieuw",
+   "aantal": 2
+  },
+  {
+   "naam": "social.pinUit",
+   "aantal": 2
+  },
+  {
+   "naam": "social.pinZoek",
+   "aantal": 2
+  },
+  {
+   "naam": "social.pinVerbind",
+   "aantal": 2
+  },
+  {
+   "naam": "social.liveMaak",
+   "aantal": 2
+  },
+  {
+   "naam": "social.liveKijk",
+   "aantal": 2
+  },
+  {
+   "naam": "social.liveVerbind",
+   "aantal": 2
+  },
+  {
+   "naam": "social.express",
+   "aantal": 2
+  },
+  {
+   "naam": "social.snapSturen",
+   "aantal": 2
+  },
+  {
+   "naam": "social.snapsVoor",
+   "aantal": 2
+  },
+  {
+   "naam": "social.snapOpenen",
+   "aantal": 2
+  },
+  {
+   "naam": "social.verhaalPlaatsen",
+   "aantal": 2
+  },
+  {
+   "naam": "social.verhalenVoor",
+   "aantal": 2
+  },
+  {
+   "naam": "social.verhaalBekijken",
+   "aantal": 2
+  },
+  {
+   "naam": "social.dagOpdracht",
+   "aantal": 2
+  },
+  {
+   "naam": "techniek.antivirus",
+   "aantal": 2
+  },
+  {
+   "naam": "vakbewijs.app",
+   "aantal": 2
+  },
+  {
+   "naam": "vakbewijs.accounts",
+   "aantal": 2
+  },
+  {
+   "naam": "vakbewijs.persoonseis",
+   "aantal": 2
+  },
+  {
+   "naam": "festival.auth",
+   "aantal": 2
+  },
+  {
+   "naam": "festival.geenGast",
+   "aantal": 2
+  },
+  {
+   "naam": "festival.liveCodename",
+   "aantal": 2
+  },
+  {
+   "naam": "sso.app",
+   "aantal": 2
+  },
+  {
+   "naam": "sso.appUrl",
+   "aantal": 2
+  },
+  {
+   "naam": "sso.logInlog",
+   "aantal": 2
+  },
+  {
+   "naam": "gast.haversine",
+   "aantal": 2
+  },
+  {
+   "naam": "avond.db",
+   "aantal": 2
+  },
+  {
+   "naam": "avond.save",
+   "aantal": 2
+  },
+  {
+   "naam": "avond.crypto",
+   "aantal": 2
+  },
+  {
+   "naam": "avond.schoon",
+   "aantal": 2
+  },
+  {
+   "naam": "bestanden.app",
+   "aantal": 2
+  },
+  {
+   "naam": "bestanden.bestanden",
+   "aantal": 2
+  },
+  {
+   "naam": "bestanden.auth",
+   "aantal": 2
+  },
+  {
+   "naam": "kosten.app",
+   "aantal": 2
+  },
+  {
+   "naam": "kosten.kosten",
+   "aantal": 2
+  },
+  {
+   "naam": "rtmail.app",
+   "aantal": 2
+  },
+  {
+   "naam": "rtmail.auth",
+   "aantal": 2
+  },
+  {
+   "naam": "rtmail.rtmail",
+   "aantal": 2
+  },
+  {
+   "naam": "leren.app",
+   "aantal": 2
+  },
+  {
+   "naam": "leren.rtf",
+   "aantal": 2
+  },
+  {
+   "naam": "leren.leren",
+   "aantal": 2
+  },
+  {
+   "naam": "livinglab.officeAuth",
+   "aantal": 2
+  },
+  {
+   "naam": "werkplek.app",
+   "aantal": 2
+  },
+  {
+   "naam": "bedrijf.crypto",
+   "aantal": 2
+  },
+  {
+   "naam": "werving.accounts",
+   "aantal": 2
+  },
+  {
+   "naam": "overheid.overheid",
+   "aantal": 2
+  },
+  {
+   "naam": "pay.supplierAuth",
+   "aantal": 2
+  },
+  {
+   "naam": "pay.managerOnly",
+   "aantal": 2
+  },
+  {
+   "naam": "pay.sseToOffice",
+   "aantal": 2
+  },
+  {
+   "naam": "sociaal.app",
+   "aantal": 2
+  },
+  {
+   "naam": "sociaal.auth",
+   "aantal": 2
+  },
+  {
+   "naam": "sociaal.geenGast",
+   "aantal": 2
+  },
+  {
+   "naam": "geld.app",
+   "aantal": 2
+  },
+  {
+   "naam": "geld.auth",
+   "aantal": 2
+  },
+  {
+   "naam": "leven.app",
+   "aantal": 2
+  },
+  {
+   "naam": "leven.auth",
+   "aantal": 2
+  },
+  {
+   "naam": "kantoorpakket.auth",
+   "aantal": 2
+  },
+  {
+   "naam": "kantoorpakket.supplierAuth",
+   "aantal": 2
+  },
+  {
+   "naam": "kantoorpakket.officeAuth",
+   "aantal": 2
+  },
+  {
+   "naam": "kantoorpakket.officeMijn",
+   "aantal": 2
+  },
+  {
+   "naam": "kantoorpakket.officeMaak",
+   "aantal": 2
+  },
+  {
+   "naam": "kantoorpakket.officeOpen",
+   "aantal": 2
+  },
+  {
+   "naam": "kantoorpakket.officeBewaar",
+   "aantal": 2
+  },
+  {
+   "naam": "kantoorpakket.officeWeg",
+   "aantal": 2
+  },
+  {
+   "naam": "kantoorpakket.officeSter",
+   "aantal": 2
+  },
+  {
+   "naam": "kantoorpakket.officeVersies",
+   "aantal": 2
+  },
+  {
+   "naam": "kantoorpakket.officeTerug",
+   "aantal": 2
+  },
+  {
+   "naam": "kantoorpakket.officeAI",
+   "aantal": 2
+  },
+  {
+   "naam": "kantoorpakket.officeVul",
+   "aantal": 2
+  },
+  {
+   "naam": "kantoorpakket.officeUitslag",
+   "aantal": 2
+  },
+  {
+   "naam": "kantoorpakket.officeFase",
+   "aantal": 2
+  },
+  {
+   "naam": "kantoorpakket.rtf",
+   "aantal": 2
+  },
+  {
+   "naam": "kantoorpakket.werkplek",
+   "aantal": 2
+  },
+  {
+   "naam": "kantoorpakket.boardroomWie",
+   "aantal": 2
+  },
+  {
+   "naam": "kantoorpakket.boardroomBaas",
+   "aantal": 2
+  },
+  {
+   "naam": "mobiliteit.auth",
+   "aantal": 2
+  },
+  {
+   "naam": "mobiliteit.schoon",
+   "aantal": 2
+  },
+  {
+   "naam": "mobiliteit.gegevensStop",
+   "aantal": 2
+  },
+  {
+   "naam": "mobiliteit.plekLijst",
+   "aantal": 2
+  },
+  {
+   "naam": "mobiliteit.dispatchBeeld",
+   "aantal": 2
+  },
+  {
+   "naam": "mobiliteit.beleidLees",
+   "aantal": 2
+  },
+  {
+   "naam": "mobiliteit.managerOnly",
+   "aantal": 2
+  },
+  {
+   "naam": "mobiliteit.officeAuth",
+   "aantal": 2
+  },
+  {
+   "naam": "rtfos.boardroomAuth",
+   "aantal": 2
+  },
+  {
+   "naam": "veiligheid.liveCodename",
+   "aantal": 2
+  },
+  {
+   "naam": "auth.PERSONAS",
+   "aantal": 1
+  },
+  {
+   "naam": "auth.PRODUCTION",
+   "aantal": 1
+  },
+  {
+   "naam": "auth.UPLOAD_DIR",
+   "aantal": 1
+  },
+  {
+   "naam": "auth.accounts",
+   "aantal": 1
+  },
+  {
+   "naam": "auth.app",
+   "aantal": 1
+  },
+  {
+   "naam": "auth.appUrl",
+   "aantal": 1
+  },
+  {
+   "naam": "auth.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "auth.checkCred",
+   "aantal": 1
+  },
+  {
+   "naam": "auth.crypto",
+   "aantal": 1
+  },
+  {
+   "naam": "auth.db",
+   "aantal": 1
+  },
+  {
+   "naam": "auth.express",
+   "aantal": 1
+  },
+  {
+   "naam": "auth.forgetSession",
+   "aantal": 1
+  },
+  {
+   "naam": "auth.fs",
+   "aantal": 1
+  },
+  {
+   "naam": "auth.hasCred",
+   "aantal": 1
+  },
+  {
+   "naam": "auth.leeftijdVan",
+   "aantal": 1
+  },
+  {
+   "naam": "auth.loginFails",
+   "aantal": 1
+  },
+  {
+   "naam": "auth.mail",
+   "aantal": 1
+  },
+  {
+   "naam": "auth.memberTemplate",
+   "aantal": 1
+  },
+  {
+   "naam": "auth.noteFailedTry",
+   "aantal": 1
+  },
+  {
+   "naam": "auth.path",
+   "aantal": 1
+  },
+  {
+   "naam": "auth.rememberSession",
+   "aantal": 1
+  },
+  {
+   "naam": "auth.save",
+   "aantal": 1
+  },
+  {
+   "naam": "auth.schoon",
+   "aantal": 1
+  },
+  {
+   "naam": "auth.sessions",
+   "aantal": 1
+  },
+  {
+   "naam": "auth.stateFor",
+   "aantal": 1
+  },
+  {
+   "naam": "auth.tooManyTries",
+   "aantal": 1
+  },
+  {
+   "naam": "auth.logInlog",
+   "aantal": 1
+  },
+  {
+   "naam": "auth.automatisering",
+   "aantal": 1
+  },
+  {
+   "naam": "auth.tweefactor",
+   "aantal": 1
+  },
+  {
+   "naam": "auth.antivirus",
+   "aantal": 1
+  },
+  {
+   "naam": "auth.webauthn",
+   "aantal": 1
+  },
+  {
+   "naam": "member.apiSpoor",
+   "aantal": 1
+  },
+  {
+   "naam": "member.DATA_DIR",
+   "aantal": 1
+  },
+  {
+   "naam": "member.chatKeyOf",
+   "aantal": 1
+  },
+  {
+   "naam": "member.managerOnly",
+   "aantal": 1
+  },
+  {
+   "naam": "member.boardroomWie",
+   "aantal": 1
+  },
+  {
+   "naam": "member.keyVanCodenaam",
+   "aantal": 1
+  },
+  {
+   "naam": "member.sseClients",
+   "aantal": 1
+  },
+  {
+   "naam": "member.sseSend",
+   "aantal": 1
+  },
+  {
+   "naam": "member.munten",
+   "aantal": 1
+  },
+  {
+   "naam": "member.dmSleutel",
+   "aantal": 1
+  },
+  {
+   "naam": "member.codewoordCheck",
+   "aantal": 1
+  },
+  {
+   "naam": "member.vakwerk",
+   "aantal": 1
+  },
+  {
+   "naam": "member.commDm",
+   "aantal": 1
+  },
+  {
+   "naam": "member.geldAiInkoop",
+   "aantal": 1
+  },
+  {
+   "naam": "member.reiswijzer",
+   "aantal": 1
+  },
+  {
+   "naam": "member.ondernemingKans",
+   "aantal": 1
+  },
+  {
+   "naam": "member.ondernemingSimuleer",
+   "aantal": 1
+  },
+  {
+   "naam": "member.ondernemingStress",
+   "aantal": 1
+  },
+  {
+   "naam": "member.ondernemingPlan",
+   "aantal": 1
+  },
+  {
+   "naam": "member.ondernemingRegie",
+   "aantal": 1
+  },
+  {
+   "naam": "member.zzpwacht",
+   "aantal": 1
+  },
+  {
+   "naam": "member.voorspel",
+   "aantal": 1
+  },
+  {
+   "naam": "member.balans",
+   "aantal": 1
+  },
+  {
+   "naam": "supplier.boekingMetRef",
+   "aantal": 1
+  },
+  {
+   "naam": "supplier.boekingenVoegToe",
+   "aantal": 1
+  },
+  {
+   "naam": "supplier.DATA_DIR",
+   "aantal": 1
+  },
+  {
+   "naam": "supplier.UPLOAD_DIR",
+   "aantal": 1
+  },
+  {
+   "naam": "supplier.fs",
+   "aantal": 1
+  },
+  {
+   "naam": "supplier.geenGast",
+   "aantal": 1
+  },
+  {
+   "naam": "supplier.liveCodename",
+   "aantal": 1
+  },
+  {
+   "naam": "supplier.officeAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "supplier.boardroomWie",
+   "aantal": 1
+  },
+  {
+   "naam": "supplier.path",
+   "aantal": 1
+  },
+  {
+   "naam": "supplier.rtf",
+   "aantal": 1
+  },
+  {
+   "naam": "supplier.mall",
+   "aantal": 1
+  },
+  {
+   "naam": "supplier.gemeente",
+   "aantal": 1
+  },
+  {
+   "naam": "supplier.vakbewijsZet",
+   "aantal": 1
+  },
+  {
+   "naam": "supplier.vakbewijsTeken",
+   "aantal": 1
+  },
+  {
+   "naam": "supplier.vakbewijsIntrek",
+   "aantal": 1
+  },
+  {
+   "naam": "supplier.vakbewijzenVan",
+   "aantal": 1
+  },
+  {
+   "naam": "supplier.vakbewijsHeeft",
+   "aantal": 1
+  },
+  {
+   "naam": "supplier.vakbewijzenVerlopend",
+   "aantal": 1
+  },
+  {
+   "naam": "supplier.sleutelLid",
+   "aantal": 1
+  },
+  {
+   "naam": "supplier.persoonseis",
+   "aantal": 1
+  },
+  {
+   "naam": "supplier.vakwerk",
+   "aantal": 1
+  },
+  {
+   "naam": "supplier.waarde",
+   "aantal": 1
+  },
+  {
+   "naam": "supplier.zaakAbonnement",
+   "aantal": 1
+  },
+  {
+   "naam": "supplier.opvang",
+   "aantal": 1
+  },
+  {
+   "naam": "supplier.nu",
+   "aantal": 1
+  },
+  {
+   "naam": "supplier.id",
+   "aantal": 1
+  },
+  {
+   "naam": "supplier.stuurRoep",
+   "aantal": 1
+  },
+  {
+   "naam": "supplier.stuurLus",
+   "aantal": 1
+  },
+  {
+   "naam": "supplier.gegevensStop",
+   "aantal": 1
+  },
+  {
+   "naam": "supplier.kassaRetourGrens",
+   "aantal": 1
+  },
+  {
+   "naam": "office.eigenaar",
+   "aantal": 1
+  },
+  {
+   "naam": "office.sessionFor",
+   "aantal": 1
+  },
+  {
+   "naam": "office.salonProfielCompleet",
+   "aantal": 1
+  },
+  {
+   "naam": "office.salonItemsVan",
+   "aantal": 1
+  },
+  {
+   "naam": "office.ontmoetKantoorState",
+   "aantal": 1
+  },
+  {
+   "naam": "office.ontmoetSosAf",
+   "aantal": 1
+  },
+  {
+   "naam": "office.ontmoetSignaalLid",
+   "aantal": 1
+  },
+  {
+   "naam": "office.handelsregelwacht",
+   "aantal": 1
+  },
+  {
+   "naam": "office.forgetSession",
+   "aantal": 1
+  },
+  {
+   "naam": "office.sessions",
+   "aantal": 1
+  },
+  {
+   "naam": "office.sseSend",
+   "aantal": 1
+  },
+  {
+   "naam": "office.ondernemingRegie",
+   "aantal": 1
+  },
+  {
+   "naam": "office.ondernemingProvisioningZet",
+   "aantal": 1
+  },
+  {
+   "naam": "office.ondernemingBijdrageZet",
+   "aantal": 1
+  },
+  {
+   "naam": "office.rechtsvormwacht",
+   "aantal": 1
+  },
+  {
+   "naam": "office.OFFICE_CODE",
+   "aantal": 1
+  },
+  {
+   "naam": "office.archief",
+   "aantal": 1
+  },
+  {
+   "naam": "office.crypto",
+   "aantal": 1
+  },
+  {
+   "naam": "office.loginFails",
+   "aantal": 1
+  },
+  {
+   "naam": "office.noteFailedTry",
+   "aantal": 1
+  },
+  {
+   "naam": "office.rememberSession",
+   "aantal": 1
+  },
+  {
+   "naam": "office.tooManyTries",
+   "aantal": 1
+  },
+  {
+   "naam": "office.totpOk",
+   "aantal": 1
+  },
+  {
+   "naam": "office.veiligGelijk",
+   "aantal": 1
+  },
+  {
+   "naam": "office.logInlog",
+   "aantal": 1
+  },
+  {
+   "naam": "office.securityLogKeten",
+   "aantal": 1
+  },
+  {
+   "naam": "office.handelingsspoor",
+   "aantal": 1
+  },
+  {
+   "naam": "office.ankerdienst",
+   "aantal": 1
+  },
+  {
+   "naam": "office.broadcastSync",
+   "aantal": 1
+  },
+  {
+   "naam": "office.conciergeInbox",
+   "aantal": 1
+  },
+  {
+   "naam": "office.fs",
+   "aantal": 1
+  },
+  {
+   "naam": "office.notifySupplier",
+   "aantal": 1
+  },
+  {
+   "naam": "office.path",
+   "aantal": 1
+  },
+  {
+   "naam": "office.talen",
+   "aantal": 1
+  },
+  {
+   "naam": "office.trChat",
+   "aantal": 1
+  },
+  {
+   "naam": "office.paspoortIncidenten",
+   "aantal": 1
+  },
+  {
+   "naam": "office.paspoortBeoordeel",
+   "aantal": 1
+  },
+  {
+   "naam": "office.kluisAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "office.pendingVerifications",
+   "aantal": 1
+  },
+  {
+   "naam": "office.conciergeDesk",
+   "aantal": 1
+  },
+  {
+   "naam": "office.conciergeVoortgang",
+   "aantal": 1
+  },
+  {
+   "naam": "office.bureauBalie",
+   "aantal": 1
+  },
+  {
+   "naam": "office.keyVanCodenaam",
+   "aantal": 1
+  },
+  {
+   "naam": "office.rvTafelMaak",
+   "aantal": 1
+  },
+  {
+   "naam": "office.rvTafelNodig",
+   "aantal": 1
+  },
+  {
+   "naam": "office.rvTafelKantoor",
+   "aantal": 1
+  },
+  {
+   "naam": "staff.DEMO",
+   "aantal": 1
+  },
+  {
+   "naam": "staff.accounts",
+   "aantal": 1
+  },
+  {
+   "naam": "staff.app",
+   "aantal": 1
+  },
+  {
+   "naam": "staff.checkCred",
+   "aantal": 1
+  },
+  {
+   "naam": "staff.commCollega",
+   "aantal": 1
+  },
+  {
+   "naam": "staff.crypto",
+   "aantal": 1
+  },
+  {
+   "naam": "staff.db",
+   "aantal": 1
+  },
+  {
+   "naam": "staff.findStaffPartner",
+   "aantal": 1
+  },
+  {
+   "naam": "staff.hasCred",
+   "aantal": 1
+  },
+  {
+   "naam": "staff.klokVan",
+   "aantal": 1
+  },
+  {
+   "naam": "staff.logActivity",
+   "aantal": 1
+  },
+  {
+   "naam": "staff.managerOnly",
+   "aantal": 1
+  },
+  {
+   "naam": "staff.notifySupplier",
+   "aantal": 1
+  },
+  {
+   "naam": "staff.publicPartner",
+   "aantal": 1
+  },
+  {
+   "naam": "staff.save",
+   "aantal": 1
+  },
+  {
+   "naam": "staff.schoon",
+   "aantal": 1
+  },
+  {
+   "naam": "staff.sseClients",
+   "aantal": 1
+  },
+  {
+   "naam": "staff.sseSend",
+   "aantal": 1
+  },
+  {
+   "naam": "staff.sseToOffice",
+   "aantal": 1
+  },
+  {
+   "naam": "staff.sseToSupplier",
+   "aantal": 1
+  },
+  {
+   "naam": "staff.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "staff.trustVan",
+   "aantal": 1
+  },
+  {
+   "naam": "staff.stuurLus",
+   "aantal": 1
+  },
+  {
+   "naam": "staff.werkbeleidPauzeStand",
+   "aantal": 1
+  },
+  {
+   "naam": "staff.WERKBELEID_PAUZE_MINUTEN",
+   "aantal": 1
+  },
+  {
+   "naam": "staff.oogVoertuigen",
+   "aantal": 1
+  },
+  {
+   "naam": "staff.oogNulmetingZet",
+   "aantal": 1
+  },
+  {
+   "naam": "staff.oogNulmetingVan",
+   "aantal": 1
+  },
+  {
+   "naam": "staff.oogSchouwLog",
+   "aantal": 1
+  },
+  {
+   "naam": "staff.oogSchouwen",
+   "aantal": 1
+  },
+  {
+   "naam": "staff.oogLeer",
+   "aantal": 1
+  },
+  {
+   "naam": "staff.oogSpullen",
+   "aantal": 1
+  },
+  {
+   "naam": "staff.oogUitgifteLog",
+   "aantal": 1
+  },
+  {
+   "naam": "staff.oogOverzicht",
+   "aantal": 1
+  },
+  {
+   "naam": "staff.plaats",
+   "aantal": 1
+  },
+  {
+   "naam": "staff.codenaamVan",
+   "aantal": 1
+  },
+  {
+   "naam": "staff.payrollOS",
+   "aantal": 1
+  },
+  {
+   "naam": "staff.fluister",
+   "aantal": 1
+  },
+  {
+   "naam": "social.webpush",
+   "aantal": 1
+  },
+  {
+   "naam": "social.pinBeveiliging",
+   "aantal": 1
+  },
+  {
+   "naam": "social.crypto",
+   "aantal": 1
+  },
+  {
+   "naam": "social.liveCodename",
+   "aantal": 1
+  },
+  {
+   "naam": "social.codenaamVan",
+   "aantal": 1
+  },
+  {
+   "naam": "social.appUrl",
+   "aantal": 1
+  },
+  {
+   "naam": "social.naamlaag",
+   "aantal": 1
+  },
+  {
+   "naam": "social.keyVanCodenaam",
+   "aantal": 1
+  },
+  {
+   "naam": "social.ouderVerbind",
+   "aantal": 1
+  },
+  {
+   "naam": "social.socialDm",
+   "aantal": 1
+  },
+  {
+   "naam": "social.socialDmSend",
+   "aantal": 1
+  },
+  {
+   "naam": "social.socialGoedkeur",
+   "aantal": 1
+  },
+  {
+   "naam": "social.socialTeKeuren",
+   "aantal": 1
+  },
+  {
+   "naam": "social.onboarding",
+   "aantal": 1
+  },
+  {
+   "naam": "social.sseClients",
+   "aantal": 1
+  },
+  {
+   "naam": "social.sseSend",
+   "aantal": 1
+  },
+  {
+   "naam": "social.speelOpnieuw",
+   "aantal": 1
+  },
+  {
+   "naam": "social.blokkeer",
+   "aantal": 1
+  },
+  {
+   "naam": "social.deblokkeer",
+   "aantal": 1
+  },
+  {
+   "naam": "social.meldMisbruik",
+   "aantal": 1
+  },
+  {
+   "naam": "social.kindContacten",
+   "aantal": 1
+  },
+  {
+   "naam": "social.kindVerwijder",
+   "aantal": 1
+  },
+  {
+   "naam": "social.lidboard",
+   "aantal": 1
+  },
+  {
+   "naam": "social.kletsAan",
+   "aantal": 1
+  },
+  {
+   "naam": "social.kletsZet",
+   "aantal": 1
+  },
+  {
+   "naam": "social.kletsLijst",
+   "aantal": 1
+  },
+  {
+   "naam": "social.kletsHaal",
+   "aantal": 1
+  },
+  {
+   "naam": "social.kletsStart",
+   "aantal": 1
+  },
+  {
+   "naam": "techniek.app",
+   "aantal": 1
+  },
+  {
+   "naam": "techniek.accounts",
+   "aantal": 1
+  },
+  {
+   "naam": "techniek.anthropic",
+   "aantal": 1
+  },
+  {
+   "naam": "techniek.archief",
+   "aantal": 1
+  },
+  {
+   "naam": "techniek.betaal",
+   "aantal": 1
+  },
+  {
+   "naam": "techniek.beveilig",
+   "aantal": 1
+  },
+  {
+   "naam": "techniek.crypto",
+   "aantal": 1
+  },
+  {
+   "naam": "techniek.db",
+   "aantal": 1
+  },
+  {
+   "naam": "techniek.mail",
+   "aantal": 1
+  },
+  {
+   "naam": "techniek.save",
+   "aantal": 1
+  },
+  {
+   "naam": "techniek.sendPushToUser",
+   "aantal": 1
+  },
+  {
+   "naam": "techniek.sessions",
+   "aantal": 1
+  },
+  {
+   "naam": "techniek.DATA_DIR",
+   "aantal": 1
+  },
+  {
+   "naam": "techniek.fs",
+   "aantal": 1
+  },
+  {
+   "naam": "techniek.path",
+   "aantal": 1
+  },
+  {
+   "naam": "techniek.LANDEN",
+   "aantal": 1
+  },
+  {
+   "naam": "techniek.keyVanCodenaam",
+   "aantal": 1
+  },
+  {
+   "naam": "techniek.talen",
+   "aantal": 1
+  },
+  {
+   "naam": "techniek.onboarding",
+   "aantal": 1
+  },
+  {
+   "naam": "techniek.geldPasprijsZet",
+   "aantal": 1
+  },
+  {
+   "naam": "techniek.geldKortingZet",
+   "aantal": 1
+  },
+  {
+   "naam": "techniek.geldCommissieZet",
+   "aantal": 1
+  },
+  {
+   "naam": "techniek.tooManyTries",
+   "aantal": 1
+  },
+  {
+   "naam": "techniek.noteFailedTry",
+   "aantal": 1
+  },
+  {
+   "naam": "techniek.loginFails",
+   "aantal": 1
+  },
+  {
+   "naam": "techniek.foutmelder",
+   "aantal": 1
+  },
+  {
+   "naam": "techniek.spelTelemetrie",
+   "aantal": 1
+  },
+  {
+   "naam": "techniek.wacht",
+   "aantal": 1
+  },
+  {
+   "naam": "techniek.betaalRegie",
+   "aantal": 1
+  },
+  {
+   "naam": "zakelijk.app",
+   "aantal": 1
+  },
+  {
+   "naam": "zakelijk.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "zakelijk.crypto",
+   "aantal": 1
+  },
+  {
+   "naam": "zakelijk.db",
+   "aantal": 1
+  },
+  {
+   "naam": "zakelijk.save",
+   "aantal": 1
+  },
+  {
+   "naam": "zakelijk.schoon",
+   "aantal": 1
+  },
+  {
+   "naam": "zakelijk.liveCodename",
+   "aantal": 1
+  },
+  {
+   "naam": "zakelijk.openVacatures",
+   "aantal": 1
+  },
+  {
+   "naam": "zakelijk.gidsHaal",
+   "aantal": 1
+  },
+  {
+   "naam": "zakelijk.talen",
+   "aantal": 1
+  },
+  {
+   "naam": "zakelijk.socialVerbind",
+   "aantal": 1
+  },
+  {
+   "naam": "zakelijk.connectieTussen",
+   "aantal": 1
+  },
+  {
+   "naam": "zakelijk.statusVan",
+   "aantal": 1
+  },
+  {
+   "naam": "zakelijk.zijnVrienden",
+   "aantal": 1
+  },
+  {
+   "naam": "zakelijk.codenaamVan",
+   "aantal": 1
+  },
+  {
+   "naam": "zakelijk.sseToCustomer",
+   "aantal": 1
+  },
+  {
+   "naam": "wereld.app",
+   "aantal": 1
+  },
+  {
+   "naam": "wereld.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "wereld.db",
+   "aantal": 1
+  },
+  {
+   "naam": "wereld.save",
+   "aantal": 1
+  },
+  {
+   "naam": "wereld.liveCodename",
+   "aantal": 1
+  },
+  {
+   "naam": "wereld.codenaamVan",
+   "aantal": 1
+  },
+  {
+   "naam": "wereld.zijnVrienden",
+   "aantal": 1
+  },
+  {
+   "naam": "wereld.keyVanCodenaam",
+   "aantal": 1
+  },
+  {
+   "naam": "wereld.gidsHaal",
+   "aantal": 1
+  },
+  {
+   "naam": "wereld.openVacatures",
+   "aantal": 1
+  },
+  {
+   "naam": "wereld.anthropic",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.accounts",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.concernNieuw",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.concernZet",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.concernBoom",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.concernUbo",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.concernBelangen",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.concernMagTekenen",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.concernGeraaktDoorVerloop",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.concernReadiness",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.concernLaunch",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.concernOverzicht",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.concernHangtAan",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.entiteitNieuw",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.entiteitVanEigenaar",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.entiteitBeeld",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.entiteitRegistratie",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.entiteitOnderneming",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.entiteitGeschiedenis",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.entiteitVerwijder",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.ondernemingVind",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.tijdZet",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.tijdBeeindig",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.tijdOpDatum",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.vestigingNieuw",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.vestigingVind",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.vestigingUnit",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.vestigingUnitLos",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.vestigingSluit",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.vestigingBeeld",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.vestigingAlleVanEntiteit",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.employmentVind",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.employmentNieuw",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.employmentBeeindig",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.employmentZet",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.employmentVanEntiteit",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.employmentVanPersoon",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.employmentOpDatum",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.employmentOrganigram",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.uitnodigingNieuw",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.uitnodigingAccepteer",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.uitnodigingIntrek",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.uitnodigingVind",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.uitnodigingVanEntiteit",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.uitnodigingBulk",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.uitnodigingBulkVerstuur",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.scopeMag",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.scopeFunctiescheiding",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.kwalificatieZet",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.kwalificatiesVan",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.werkOverzicht",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.concernImpact",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.concernOpnameMaak",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.concernOpnames",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.concernOpnameHerstel",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.concernOffboardingBeeld",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.concernOffboardingDoe",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.concernOvername",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.concernFusieBeeld",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.concernFusieDoe",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.voorstelLees",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.voorstelBevestig",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.concernDiscovery",
+   "aantal": 1
+  },
+  {
+   "naam": "concern.concernDiscoveryNeem",
+   "aantal": 1
+  },
+  {
+   "naam": "vakbewijs.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "vakbewijs.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "vakbewijs.sleutelLid",
+   "aantal": 1
+  },
+  {
+   "naam": "vakbewijs.vakbewijsZet",
+   "aantal": 1
+  },
+  {
+   "naam": "vakbewijs.vakbewijzenVan",
+   "aantal": 1
+  },
+  {
+   "naam": "vakbewijs.officeAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "vakbewijs.kluisAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "vakbewijs.vakbewijsTeken",
+   "aantal": 1
+  },
+  {
+   "naam": "vakbewijs.vakbewijsIntrek",
+   "aantal": 1
+  },
+  {
+   "naam": "vakbewijs.vakbewijzenVerlopend",
+   "aantal": 1
+  },
+  {
+   "naam": "gateway.app",
+   "aantal": 1
+  },
+  {
+   "naam": "gateway.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "gateway.officeAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "gateway.mandaat",
+   "aantal": 1
+  },
+  {
+   "naam": "gateway.gateway",
+   "aantal": 1
+  },
+  {
+   "naam": "gateway.schoon",
+   "aantal": 1
+  },
+  {
+   "naam": "fiscaal-vooruit.app",
+   "aantal": 1
+  },
+  {
+   "naam": "fiscaal-vooruit.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "fiscaal-vooruit.scenario",
+   "aantal": 1
+  },
+  {
+   "naam": "fiscaal-vooruit.verbintenis",
+   "aantal": 1
+  },
+  {
+   "naam": "fiscaal-vooruit.btwAangifte",
+   "aantal": 1
+  },
+  {
+   "naam": "fiscaal-vooruit.schoon",
+   "aantal": 1
+  },
+  {
+   "naam": "festival.db",
+   "aantal": 1
+  },
+  {
+   "naam": "festival.sseToSupplier",
+   "aantal": 1
+  },
+  {
+   "naam": "festival.pay",
+   "aantal": 1
+  },
+  {
+   "naam": "fout.app",
+   "aantal": 1
+  },
+  {
+   "naam": "fout.tooManyTries",
+   "aantal": 1
+  },
+  {
+   "naam": "onboarding.app",
+   "aantal": 1
+  },
+  {
+   "naam": "onboarding.express",
+   "aantal": 1
+  },
+  {
+   "naam": "onboarding.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "onboarding.accounts",
+   "aantal": 1
+  },
+  {
+   "naam": "onboarding.eigenaar",
+   "aantal": 1
+  },
+  {
+   "naam": "onboarding.onboarding",
+   "aantal": 1
+  },
+  {
+   "naam": "onboarding.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "onboarding.managerOnly",
+   "aantal": 1
+  },
+  {
+   "naam": "onboarding.tooManyTries",
+   "aantal": 1
+  },
+  {
+   "naam": "adres.app",
+   "aantal": 1
+  },
+  {
+   "naam": "adres.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "aanmeldgesprek.app",
+   "aantal": 1
+  },
+  {
+   "naam": "aanmeldgesprek.intakeStart",
+   "aantal": 1
+  },
+  {
+   "naam": "aanmeldgesprek.intakeZeg",
+   "aantal": 1
+  },
+  {
+   "naam": "aanmeldgesprek.accounts",
+   "aantal": 1
+  },
+  {
+   "naam": "aanmeldgesprek.stateFor",
+   "aantal": 1
+  },
+  {
+   "naam": "kantoorgesprek.app",
+   "aantal": 1
+  },
+  {
+   "naam": "kantoorgesprek.kantoorStart",
+   "aantal": 1
+  },
+  {
+   "naam": "kantoorgesprek.kantoorZeg",
+   "aantal": 1
+  },
+  {
+   "naam": "sso.accounts",
+   "aantal": 1
+  },
+  {
+   "naam": "sso.stateFor",
+   "aantal": 1
+  },
+  {
+   "naam": "scim.app",
+   "aantal": 1
+  },
+  {
+   "naam": "scim.accounts",
+   "aantal": 1
+  },
+  {
+   "naam": "gast.DATA_DIR",
+   "aantal": 1
+  },
+  {
+   "naam": "gast.UPLOAD_DIR",
+   "aantal": 1
+  },
+  {
+   "naam": "gast.accounts",
+   "aantal": 1
+  },
+  {
+   "naam": "gast.rtmail",
+   "aantal": 1
+  },
+  {
+   "naam": "gast.anthropic",
+   "aantal": 1
+  },
+  {
+   "naam": "gast.app",
+   "aantal": 1
+  },
+  {
+   "naam": "gast.appUrl",
+   "aantal": 1
+  },
+  {
+   "naam": "gast.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "gast.betaal",
+   "aantal": 1
+  },
+  {
+   "naam": "gast.betaalWaarheid",
+   "aantal": 1
+  },
+  {
+   "naam": "gast.express",
+   "aantal": 1
+  },
+  {
+   "naam": "gast.findSupplier",
+   "aantal": 1
+  },
+  {
+   "naam": "gast.fs",
+   "aantal": 1
+  },
+  {
+   "naam": "gast.geenGast",
+   "aantal": 1
+  },
+  {
+   "naam": "gast.liveCodename",
+   "aantal": 1
+  },
+  {
+   "naam": "gast.logActivity",
+   "aantal": 1
+  },
+  {
+   "naam": "gast.managerOnly",
+   "aantal": 1
+  },
+  {
+   "naam": "gast.noteFailedTry",
+   "aantal": 1
+  },
+  {
+   "naam": "gast.notifySupplier",
+   "aantal": 1
+  },
+  {
+   "naam": "gast.officeAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "gast.boardroomWie",
+   "aantal": 1
+  },
+  {
+   "naam": "gast.keyVanCodenaam",
+   "aantal": 1
+  },
+  {
+   "naam": "gast.path",
+   "aantal": 1
+  },
+  {
+   "naam": "gast.rtf",
+   "aantal": 1
+  },
+  {
+   "naam": "gast.sseClients",
+   "aantal": 1
+  },
+  {
+   "naam": "gast.sseSend",
+   "aantal": 1
+  },
+  {
+   "naam": "gast.sseToCustomer",
+   "aantal": 1
+  },
+  {
+   "naam": "gast.sseToOffice",
+   "aantal": 1
+  },
+  {
+   "naam": "gast.sseToSupplier",
+   "aantal": 1
+  },
+  {
+   "naam": "gast.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "gast.tooManyTries",
+   "aantal": 1
+  },
+  {
+   "naam": "gast.talen",
+   "aantal": 1
+  },
+  {
+   "naam": "gast.codenaamVan",
+   "aantal": 1
+  },
+  {
+   "naam": "gast.geldgraaf",
+   "aantal": 1
+  },
+  {
+   "naam": "gast.gegevensStop",
+   "aantal": 1
+  },
+  {
+   "naam": "avond.app",
+   "aantal": 1
+  },
+  {
+   "naam": "avond.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "avond.findSupplier",
+   "aantal": 1
+  },
+  {
+   "naam": "meting.app",
+   "aantal": 1
+  },
+  {
+   "naam": "algpin.app",
+   "aantal": 1
+  },
+  {
+   "naam": "algpin.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "algpin.accounts",
+   "aantal": 1
+  },
+  {
+   "naam": "algpin.appUrl",
+   "aantal": 1
+  },
+  {
+   "naam": "algpin.mail",
+   "aantal": 1
+  },
+  {
+   "naam": "algpin.pinInfo",
+   "aantal": 1
+  },
+  {
+   "naam": "algpin.pinZet",
+   "aantal": 1
+  },
+  {
+   "naam": "algpin.pinCheck",
+   "aantal": 1
+  },
+  {
+   "naam": "algpin.pinHerstelStart",
+   "aantal": 1
+  },
+  {
+   "naam": "algpin.pinHerstelZet",
+   "aantal": 1
+  },
+  {
+   "naam": "werkbeleid.app",
+   "aantal": 1
+  },
+  {
+   "naam": "werkbeleid.express",
+   "aantal": 1
+  },
+  {
+   "naam": "werkbeleid.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "werkbeleid.managerOnly",
+   "aantal": 1
+  },
+  {
+   "naam": "werkbeleid.werkbeleidOverzicht",
+   "aantal": 1
+  },
+  {
+   "naam": "werkbeleid.werkbeleidZet",
+   "aantal": 1
+  },
+  {
+   "naam": "commerce.app",
+   "aantal": 1
+  },
+  {
+   "naam": "commerce.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "commerce.commerce",
+   "aantal": 1
+  },
+  {
+   "naam": "commerce.liveCodename",
+   "aantal": 1
+  },
+  {
+   "naam": "sleutelwoorden.app",
+   "aantal": 1
+  },
+  {
+   "naam": "sleutelwoorden.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "sleutelwoorden.swInfo",
+   "aantal": 1
+  },
+  {
+   "naam": "sleutelwoorden.swZet",
+   "aantal": 1
+  },
+  {
+   "naam": "sleutelwoorden.swWeg",
+   "aantal": 1
+  },
+  {
+   "naam": "agenda.app",
+   "aantal": 1
+  },
+  {
+   "naam": "agenda.agenda",
+   "aantal": 1
+  },
+  {
+   "naam": "agenda.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "agenda.geenGast",
+   "aantal": 1
+  },
+  {
+   "naam": "agenda.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "agenda.managerOnly",
+   "aantal": 1
+  },
+  {
+   "naam": "notities.app",
+   "aantal": 1
+  },
+  {
+   "naam": "notities.notities",
+   "aantal": 1
+  },
+  {
+   "naam": "notities.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "meet.app",
+   "aantal": 1
+  },
+  {
+   "naam": "meet.meet",
+   "aantal": 1
+  },
+  {
+   "naam": "meet.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "galerij.app",
+   "aantal": 1
+  },
+  {
+   "naam": "galerij.galerij",
+   "aantal": 1
+  },
+  {
+   "naam": "galerij.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "klok.app",
+   "aantal": 1
+  },
+  {
+   "naam": "klok.klok",
+   "aantal": 1
+  },
+  {
+   "naam": "klok.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "vertaal.app",
+   "aantal": 1
+  },
+  {
+   "naam": "vertaal.i18n",
+   "aantal": 1
+  },
+  {
+   "naam": "vertaal.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "memo.app",
+   "aantal": 1
+  },
+  {
+   "naam": "memo.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "boeken.app",
+   "aantal": 1
+  },
+  {
+   "naam": "boeken.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "boeken.boeken",
+   "aantal": 1
+  },
+  {
+   "naam": "onderwijs.app",
+   "aantal": 1
+  },
+  {
+   "naam": "onderwijs.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "onderwijs.onderwijs",
+   "aantal": 1
+  },
+  {
+   "naam": "onderwijs.vervolg",
+   "aantal": 1
+  },
+  {
+   "naam": "leerstof.app",
+   "aantal": 1
+  },
+  {
+   "naam": "leerstof.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "leerstof.leerstof",
+   "aantal": 1
+  },
+  {
+   "naam": "leerstof.vervolg",
+   "aantal": 1
+  },
+  {
+   "naam": "bijles.app",
+   "aantal": 1
+  },
+  {
+   "naam": "bijles.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "bijles.bijles",
+   "aantal": 1
+  },
+  {
+   "naam": "bijles.onderwijs",
+   "aantal": 1
+  },
+  {
+   "naam": "facturatie.app",
+   "aantal": 1
+  },
+  {
+   "naam": "facturatie.facturatie",
+   "aantal": 1
+  },
+  {
+   "naam": "facturatie.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "facturatie.geenGast",
+   "aantal": 1
+  },
+  {
+   "naam": "facturatie.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "facturatie.managerOnly",
+   "aantal": 1
+  },
+  {
+   "naam": "kosten.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "kosten.geenGast",
+   "aantal": 1
+  },
+  {
+   "naam": "kosten.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "kosten.boardroomAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "kosten.boardroomWie",
+   "aantal": 1
+  },
+  {
+   "naam": "experience.app",
+   "aantal": 1
+  },
+  {
+   "naam": "experience.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "experience.experience",
+   "aantal": 1
+  },
+  {
+   "naam": "economie.app",
+   "aantal": 1
+  },
+  {
+   "naam": "economie.boardroomAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "economie.boardroomWie",
+   "aantal": 1
+  },
+  {
+   "naam": "economie.economie",
+   "aantal": 1
+  },
+  {
+   "naam": "economie.kosten",
+   "aantal": 1
+  },
+  {
+   "naam": "rtmail.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "rtmail.codenaamVan",
+   "aantal": 1
+  },
+  {
+   "naam": "rtmail.automatisering",
+   "aantal": 1
+  },
+  {
+   "naam": "rtmail.db",
+   "aantal": 1
+  },
+  {
+   "naam": "rtmail.geenGast",
+   "aantal": 1
+  },
+  {
+   "naam": "rtmail.agenda",
+   "aantal": 1
+  },
+  {
+   "naam": "rtmail.leren",
+   "aantal": 1
+  },
+  {
+   "naam": "rtmail.facturatie",
+   "aantal": 1
+  },
+  {
+   "naam": "rtmail.accounts",
+   "aantal": 1
+  },
+  {
+   "naam": "rtmail-vak.app",
+   "aantal": 1
+  },
+  {
+   "naam": "rtmail-vak.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "rtmail-vak.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "rtmail-vak.db",
+   "aantal": 1
+  },
+  {
+   "naam": "rtmail-vak.rtmail",
+   "aantal": 1
+  },
+  {
+   "naam": "rtmail-vak.rtmailVak",
+   "aantal": 1
+  },
+  {
+   "naam": "rtmail-vak.rtmailDraad",
+   "aantal": 1
+  },
+  {
+   "naam": "rtmail-vak.rtmailAi",
+   "aantal": 1
+  },
+  {
+   "naam": "rtmail-vak.codenaamVan",
+   "aantal": 1
+  },
+  {
+   "naam": "rtmail-schrijf.app",
+   "aantal": 1
+  },
+  {
+   "naam": "rtmail-schrijf.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "rtmail-schrijf.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "rtmail-schrijf.db",
+   "aantal": 1
+  },
+  {
+   "naam": "rtmail-schrijf.rtmail",
+   "aantal": 1
+  },
+  {
+   "naam": "rtmail-schrijf.rtmailSchrijf",
+   "aantal": 1
+  },
+  {
+   "naam": "rtmail-schrijf.rtmailRegels",
+   "aantal": 1
+  },
+  {
+   "naam": "rtmail-schrijf.mailSleutel",
+   "aantal": 1
+  },
+  {
+   "naam": "rtmail-schrijf.codenaamVan",
+   "aantal": 1
+  },
+  {
+   "naam": "rtmail-bestuur.app",
+   "aantal": 1
+  },
+  {
+   "naam": "rtmail-bestuur.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "rtmail-bestuur.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "rtmail-bestuur.db",
+   "aantal": 1
+  },
+  {
+   "naam": "rtmail-bestuur.rtmail",
+   "aantal": 1
+  },
+  {
+   "naam": "rtmail-bestuur.rtmailRecht",
+   "aantal": 1
+  },
+  {
+   "naam": "rtmail-bestuur.rtmailBewaar",
+   "aantal": 1
+  },
+  {
+   "naam": "rtmail-bestuur.codenaamVan",
+   "aantal": 1
+  },
+  {
+   "naam": "rtmail-team.app",
+   "aantal": 1
+  },
+  {
+   "naam": "rtmail-team.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "rtmail-team.rtmail",
+   "aantal": 1
+  },
+  {
+   "naam": "rtmail-team.rtmailTeam",
+   "aantal": 1
+  },
+  {
+   "naam": "rtmail-team.rtmailDossier",
+   "aantal": 1
+  },
+  {
+   "naam": "rtmail-team.rtmailSla",
+   "aantal": 1
+  },
+  {
+   "naam": "rtmail-team.codenaamVan",
+   "aantal": 1
+  },
+  {
+   "naam": "rtmail-team.db",
+   "aantal": 1
+  },
+  {
+   "naam": "rtmail-team.keyVanCodenaam",
+   "aantal": 1
+  },
+  {
+   "naam": "rtgone.app",
+   "aantal": 1
+  },
+  {
+   "naam": "rtgone.officeAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "rtgone.boardroomWie",
+   "aantal": 1
+  },
+  {
+   "naam": "rtgone.boardroomBaas",
+   "aantal": 1
+  },
+  {
+   "naam": "rtgone.accounts",
+   "aantal": 1
+  },
+  {
+   "naam": "rtgone.rtgone",
+   "aantal": 1
+  },
+  {
+   "naam": "werkmail.app",
+   "aantal": 1
+  },
+  {
+   "naam": "werkmail.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "werkmail.rtmail",
+   "aantal": 1
+  },
+  {
+   "naam": "werkmail.werkmail",
+   "aantal": 1
+  },
+  {
+   "naam": "mailpost.app",
+   "aantal": 1
+  },
+  {
+   "naam": "mailpost.express",
+   "aantal": 1
+  },
+  {
+   "naam": "mailpost.officeAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "mailpost.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "mailpost.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "mailpost.db",
+   "aantal": 1
+  },
+  {
+   "naam": "mailpost.save",
+   "aantal": 1
+  },
+  {
+   "naam": "mailpost.mailQ",
+   "aantal": 1
+  },
+  {
+   "naam": "mailpost.mailIn",
+   "aantal": 1
+  },
+  {
+   "naam": "mailpost.mailBijlage",
+   "aantal": 1
+  },
+  {
+   "naam": "mailpost.mailAanname",
+   "aantal": 1
+  },
+  {
+   "naam": "mailpost.rtmail",
+   "aantal": 1
+  },
+  {
+   "naam": "mailpost.rtmailRecht",
+   "aantal": 1
+  },
+  {
+   "naam": "mailpost.codenaamVan",
+   "aantal": 1
+  },
+  {
+   "naam": "payroll.app",
+   "aantal": 1
+  },
+  {
+   "naam": "payroll.officeAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "payroll.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "payroll.payroll",
+   "aantal": 1
+  },
+  {
+   "naam": "payroll.openVacatures",
+   "aantal": 1
+  },
+  {
+   "naam": "payroll.db",
+   "aantal": 1
+  },
+  {
+   "naam": "payroll.logActivity",
+   "aantal": 1
+  },
+  {
+   "naam": "payroll.schoon",
+   "aantal": 1
+  },
+  {
+   "naam": "huis.app",
+   "aantal": 1
+  },
+  {
+   "naam": "huis.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "huis.huis",
+   "aantal": 1
+  },
+  {
+   "naam": "huis.anthropic",
+   "aantal": 1
+  },
+  {
+   "naam": "muziek.app",
+   "aantal": 1
+  },
+  {
+   "naam": "muziek.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "muziek.muziekMaak",
+   "aantal": 1
+  },
+  {
+   "naam": "muziek.muziekMijn",
+   "aantal": 1
+  },
+  {
+   "naam": "muziek.muziekOpen",
+   "aantal": 1
+  },
+  {
+   "naam": "muziek.muziekBewaar",
+   "aantal": 1
+  },
+  {
+   "naam": "muziek.muziekWeg",
+   "aantal": 1
+  },
+  {
+   "naam": "muziek.muziekRahul",
+   "aantal": 1
+  },
+  {
+   "naam": "muziek.anthropic",
+   "aantal": 1
+  },
+  {
+   "naam": "muziek-samen.app",
+   "aantal": 1
+  },
+  {
+   "naam": "muziek-samen.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "muziek-samen.officeAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "muziek-samen.keyVanCodenaam",
+   "aantal": 1
+  },
+  {
+   "naam": "muziek-samen.muziekNodig",
+   "aantal": 1
+  },
+  {
+   "naam": "muziek-samen.muziekMakerEruit",
+   "aantal": 1
+  },
+  {
+   "naam": "muziek-samen.muziekVerlaat",
+   "aantal": 1
+  },
+  {
+   "naam": "muziek-samen.muziekRolZet",
+   "aantal": 1
+  },
+  {
+   "naam": "muziek-samen.muziekMakers",
+   "aantal": 1
+  },
+  {
+   "naam": "muziek-samen.muziekGeefUit",
+   "aantal": 1
+  },
+  {
+   "naam": "muziek-samen.muziekTrekIn",
+   "aantal": 1
+  },
+  {
+   "naam": "muziek-samen.muziekVraagRtg",
+   "aantal": 1
+  },
+  {
+   "naam": "muziek-samen.muziekZaal",
+   "aantal": 1
+  },
+  {
+   "naam": "muziek-samen.muziekLuister",
+   "aantal": 1
+  },
+  {
+   "naam": "muziek-samen.muziekUitgaveVan",
+   "aantal": 1
+  },
+  {
+   "naam": "muziek-samen.muziekMooi",
+   "aantal": 1
+  },
+  {
+   "naam": "muziek-samen.muziekReageer",
+   "aantal": 1
+  },
+  {
+   "naam": "muziek-samen.muziekReacties",
+   "aantal": 1
+  },
+  {
+   "naam": "muziek-samen.muziekKantoorLijst",
+   "aantal": 1
+  },
+  {
+   "naam": "muziek-samen.muziekKantoorBeslis",
+   "aantal": 1
+  },
+  {
+   "naam": "atelierweb.app",
+   "aantal": 1
+  },
+  {
+   "naam": "atelierweb.officeAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "atelierweb.atelierweb",
+   "aantal": 1
+  },
+  {
+   "naam": "atelierweb.antivirus",
+   "aantal": 1
+  },
+  {
+   "naam": "atelierweb.media",
+   "aantal": 1
+  },
+  {
+   "naam": "webmaker.app",
+   "aantal": 1
+  },
+  {
+   "naam": "webmaker.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "webmaker.webmaker",
+   "aantal": 1
+  },
+  {
+   "naam": "webmaker.webplatform",
+   "aantal": 1
+  },
+  {
+   "naam": "webmaker.webmakerAi",
+   "aantal": 1
+  },
+  {
+   "naam": "webmaker.atelierweb",
+   "aantal": 1
+  },
+  {
+   "naam": "webmaker.antivirus",
+   "aantal": 1
+  },
+  {
+   "naam": "webmaker.media",
+   "aantal": 1
+  },
+  {
+   "naam": "webmaker.liveCodename",
+   "aantal": 1
+  },
+  {
+   "naam": "webbrowser.app",
+   "aantal": 1
+  },
+  {
+   "naam": "webbrowser.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "webbrowser.db",
+   "aantal": 1
+  },
+  {
+   "naam": "webbrowser.webmaker",
+   "aantal": 1
+  },
+  {
+   "naam": "webbrowser.webplatform",
+   "aantal": 1
+  },
+  {
+   "naam": "webbrowser.webplatformTaal",
+   "aantal": 1
+  },
+  {
+   "naam": "webbrowser.findSupplier",
+   "aantal": 1
+  },
+  {
+   "naam": "webbrowser.addTicket",
+   "aantal": 1
+  },
+  {
+   "naam": "webbrowser.liveCodename",
+   "aantal": 1
+  },
+  {
+   "naam": "webbrowser.codenaamVan",
+   "aantal": 1
+  },
+  {
+   "naam": "webbrowser.connectieTussen",
+   "aantal": 1
+  },
+  {
+   "naam": "webbrowser.verbActief",
+   "aantal": 1
+  },
+  {
+   "naam": "webbrowser.sseToCustomer",
+   "aantal": 1
+  },
+  {
+   "naam": "webbrowser.notify",
+   "aantal": 1
+  },
+  {
+   "naam": "webbrowser.notifySupplier",
+   "aantal": 1
+  },
+  {
+   "naam": "webbrowser.save",
+   "aantal": 1
+  },
+  {
+   "naam": "zaakweb.app",
+   "aantal": 1
+  },
+  {
+   "naam": "zaakweb.webmaker",
+   "aantal": 1
+  },
+  {
+   "naam": "zaakweb.webplatform",
+   "aantal": 1
+  },
+  {
+   "naam": "zaakweb.webmakerAi",
+   "aantal": 1
+  },
+  {
+   "naam": "zaakweb.webmakerTeam",
+   "aantal": 1
+  },
+  {
+   "naam": "zaakweb.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "zaakweb.managerOnly",
+   "aantal": 1
+  },
+  {
+   "naam": "webmeting.app",
+   "aantal": 1
+  },
+  {
+   "naam": "webmeting.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "webmeting.webmaker",
+   "aantal": 1
+  },
+  {
+   "naam": "webmeting.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "webmeting.managerOnly",
+   "aantal": 1
+  },
+  {
+   "naam": "webmeting.officeAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "webmerk.app",
+   "aantal": 1
+  },
+  {
+   "naam": "webmerk.officeAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "webmerk.webmerk",
+   "aantal": 1
+  },
+  {
+   "naam": "journalistiek.app",
+   "aantal": 1
+  },
+  {
+   "naam": "journalistiek.db",
+   "aantal": 1
+  },
+  {
+   "naam": "journalistiek.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "journalistiek.journalistiek",
+   "aantal": 1
+  },
+  {
+   "naam": "markt.app",
+   "aantal": 1
+  },
+  {
+   "naam": "markt.markt",
+   "aantal": 1
+  },
+  {
+   "naam": "markt.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "markt.managerOnly",
+   "aantal": 1
+  },
+  {
+   "naam": "borden.app",
+   "aantal": 1
+  },
+  {
+   "naam": "borden.db",
+   "aantal": 1
+  },
+  {
+   "naam": "borden.save",
+   "aantal": 1
+  },
+  {
+   "naam": "borden.crypto",
+   "aantal": 1
+  },
+  {
+   "naam": "borden.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "borden.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "borden.sseToSupplier",
+   "aantal": 1
+  },
+  {
+   "naam": "borden.logActivity",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.app",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.geenGast",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.rtf",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.spelNieuw",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.spelAntwoord",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.spelRandom",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.mijnSpellen",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.spelVarianten",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.spelStaat",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.spelZet",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.spelOpgeven",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.spelToewijzen",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.spelKijk",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.spelReplay",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.spelNaspelen",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.spelRahul",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.spelNabespreking",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.projectieStand",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.spelKlasgenoten",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.spelOnline",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.spelUitslagen",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.spelStand",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.spelPrestaties",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.socialConnecties",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.spelZichtbaar",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.spelZichtbaarZet",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.spelPraat",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.spelPraatStuur",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.teamNieuw",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.teamNodig",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.teamAntwoord",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.teamVerlaat",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.mijnTeams",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.sudokuNieuw",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.sudokuKlaar",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.toernooiNieuw",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.toernooiAntwoord",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.mijnToernooien",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.toernooiStaat",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.sneekScore",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.sneekBord",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.arcadeScore",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.arcadeBord",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.projectieOpen",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.projectieSluit",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.dagStand",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.dagStart",
+   "aantal": 1
+  },
+  {
+   "naam": "spellen.dagKlaar",
+   "aantal": 1
+  },
+  {
+   "naam": "magnaatwereld.app",
+   "aantal": 1
+  },
+  {
+   "naam": "magnaatwereld.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "magnaatwereld.geenGast",
+   "aantal": 1
+  },
+  {
+   "naam": "magnaatwereld.boardroomAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "magnaatwereld.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "magnaatwereld.managerOnly",
+   "aantal": 1
+  },
+  {
+   "naam": "magnaatwereld.magnaatWereld",
+   "aantal": 1
+  },
+  {
+   "naam": "leren.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "leren.geenGast",
+   "aantal": 1
+  },
+  {
+   "naam": "payroll-os.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "payroll-os.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "rtfbieb.app",
+   "aantal": 1
+  },
+  {
+   "naam": "rtfbieb.rtf",
+   "aantal": 1
+  },
+  {
+   "naam": "rtfbieb.rtfbieb",
+   "aantal": 1
+  },
+  {
+   "naam": "foundationregistratie.app",
+   "aantal": 1
+  },
+  {
+   "naam": "foundationregistratie.boardroomAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "foundationregistratie.boardroomWie",
+   "aantal": 1
+  },
+  {
+   "naam": "foundationregistratie.foundationregistratie",
+   "aantal": 1
+  },
+  {
+   "naam": "foundationregistratie.mail",
+   "aantal": 1
+  },
+  {
+   "naam": "foundationregistratie.officeAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "foundationregistratie.sseToOffice",
+   "aantal": 1
+  },
+  {
+   "naam": "rtfleerling.app",
+   "aantal": 1
+  },
+  {
+   "naam": "rtfleerling.rtf",
+   "aantal": 1
+  },
+  {
+   "naam": "rtfleerling.onderwijs",
+   "aantal": 1
+  },
+  {
+   "naam": "rtfleerling.leerstof",
+   "aantal": 1
+  },
+  {
+   "naam": "rtfleerling.vervolg",
+   "aantal": 1
+  },
+  {
+   "naam": "rtfleerling.bijles",
+   "aantal": 1
+  },
+  {
+   "naam": "geloofbieb.app",
+   "aantal": 1
+  },
+  {
+   "naam": "geloofbieb.rtf",
+   "aantal": 1
+  },
+  {
+   "naam": "geloofbieb.geloofbieb",
+   "aantal": 1
+  },
+  {
+   "naam": "rtfkantoor.app",
+   "aantal": 1
+  },
+  {
+   "naam": "rtfkantoor.officeAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "rtfkantoor.boardroomWie",
+   "aantal": 1
+  },
+  {
+   "naam": "rtfkantoor.magBoardroom",
+   "aantal": 1
+  },
+  {
+   "naam": "rtfkantoor.rtfkantoor",
+   "aantal": 1
+  },
+  {
+   "naam": "rtfkantoor.rtfclubs",
+   "aantal": 1
+  },
+  {
+   "naam": "rtfkantoor.lab",
+   "aantal": 1
+  },
+  {
+   "naam": "rtfkantoor.stadsraad",
+   "aantal": 1
+  },
+  {
+   "naam": "livinglab.boardroomWie",
+   "aantal": 1
+  },
+  {
+   "naam": "livinglab.labfonds",
+   "aantal": 1
+  },
+  {
+   "naam": "werkplek.boardroomWie",
+   "aantal": 1
+  },
+  {
+   "naam": "werkplek.boardroomBaas",
+   "aantal": 1
+  },
+  {
+   "naam": "werkplek.werkplek",
+   "aantal": 1
+  },
+  {
+   "naam": "werkplek.db",
+   "aantal": 1
+  },
+  {
+   "naam": "bedrijf.app",
+   "aantal": 1
+  },
+  {
+   "naam": "bedrijf.db",
+   "aantal": 1
+  },
+  {
+   "naam": "bedrijf.save",
+   "aantal": 1
+  },
+  {
+   "naam": "bedrijf.schoon",
+   "aantal": 1
+  },
+  {
+   "naam": "bedrijf.rtmail",
+   "aantal": 1
+  },
+  {
+   "naam": "bedrijf.rtmailTeam",
+   "aantal": 1
+  },
+  {
+   "naam": "bedrijf.rtmailVak",
+   "aantal": 1
+  },
+  {
+   "naam": "bedrijf.accounts",
+   "aantal": 1
+  },
+  {
+   "naam": "bedrijf.eigenaar",
+   "aantal": 1
+  },
+  {
+   "naam": "tenant.db",
+   "aantal": 1
+  },
+  {
+   "naam": "tenant.save",
+   "aantal": 1
+  },
+  {
+   "naam": "tenant.schoon",
+   "aantal": 1
+  },
+  {
+   "naam": "tenant.findSupplier",
+   "aantal": 1
+  },
+  {
+   "naam": "tenant.app",
+   "aantal": 1
+  },
+  {
+   "naam": "tenant.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "tenant.tenant",
+   "aantal": 1
+  },
+  {
+   "naam": "tenant.bedrijf",
+   "aantal": 1
+  },
+  {
+   "naam": "labfonds.app",
+   "aantal": 1
+  },
+  {
+   "naam": "labfonds.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "labfonds.officeAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "labfonds.labfonds",
+   "aantal": 1
+  },
+  {
+   "naam": "aanmeldingen.app",
+   "aantal": 1
+  },
+  {
+   "naam": "aanmeldingen.officeAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "aanmeldingen.aanmeldingen",
+   "aantal": 1
+  },
+  {
+   "naam": "aanmeldingen.accounts",
+   "aantal": 1
+  },
+  {
+   "naam": "aanmeldingen.tooManyTries",
+   "aantal": 1
+  },
+  {
+   "naam": "aanmeldingen.boardroomWie",
+   "aantal": 1
+  },
+  {
+   "naam": "ledenregister.app",
+   "aantal": 1
+  },
+  {
+   "naam": "ledenregister.boardroomAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "ledenregister.ledenregister",
+   "aantal": 1
+  },
+  {
+   "naam": "journaal.app",
+   "aantal": 1
+  },
+  {
+   "naam": "journaal.boardroomAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "journaal.journaalLees",
+   "aantal": 1
+  },
+  {
+   "naam": "journaal.journaalBeeld",
+   "aantal": 1
+  },
+  {
+   "naam": "ledenbalie.app",
+   "aantal": 1
+  },
+  {
+   "naam": "ledenbalie.officeAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "ledenbalie.boardroomAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "ledenbalie.boardroomWie",
+   "aantal": 1
+  },
+  {
+   "naam": "ledenbalie.magBalie",
+   "aantal": 1
+  },
+  {
+   "naam": "ledenbalie.balieZetels",
+   "aantal": 1
+  },
+  {
+   "naam": "ledenbalie.balieZetelZet",
+   "aantal": 1
+  },
+  {
+   "naam": "ledenbalie.balieZetelWeg",
+   "aantal": 1
+  },
+  {
+   "naam": "ledenbalie.balieZoek",
+   "aantal": 1
+  },
+  {
+   "naam": "ledenbalie.balieDossier",
+   "aantal": 1
+  },
+  {
+   "naam": "ledenbalie.balieHerstel",
+   "aantal": 1
+  },
+  {
+   "naam": "ledenbalie.balieKlachtOpen",
+   "aantal": 1
+  },
+  {
+   "naam": "ledenbalie.balieKlachtStatus",
+   "aantal": 1
+  },
+  {
+   "naam": "ledenbalie.balieAboVoorstel",
+   "aantal": 1
+  },
+  {
+   "naam": "werving.app",
+   "aantal": 1
+  },
+  {
+   "naam": "werving.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "werving.tooManyTries",
+   "aantal": 1
+  },
+  {
+   "naam": "werving.noteFailedTry",
+   "aantal": 1
+  },
+  {
+   "naam": "werving.loginFails",
+   "aantal": 1
+  },
+  {
+   "naam": "werving.crypto",
+   "aantal": 1
+  },
+  {
+   "naam": "werving.db",
+   "aantal": 1
+  },
+  {
+   "naam": "werving.logActivity",
+   "aantal": 1
+  },
+  {
+   "naam": "werving.notifySupplier",
+   "aantal": 1
+  },
+  {
+   "naam": "werving.save",
+   "aantal": 1
+  },
+  {
+   "naam": "bieb.app",
+   "aantal": 1
+  },
+  {
+   "naam": "bieb.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "bieb.bibliothecaris",
+   "aantal": 1
+  },
+  {
+   "naam": "rtfschool.app",
+   "aantal": 1
+  },
+  {
+   "naam": "rtfschool.rtf",
+   "aantal": 1
+  },
+  {
+   "naam": "rtfschool.schoolbieb",
+   "aantal": 1
+  },
+  {
+   "naam": "rtfschool.samenRtf",
+   "aantal": 1
+  },
+  {
+   "naam": "rtfschool.beroepenbieb",
+   "aantal": 1
+  },
+  {
+   "naam": "samen.app",
+   "aantal": 1
+  },
+  {
+   "naam": "samen.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "samen.liveCodename",
+   "aantal": 1
+  },
+  {
+   "naam": "samen.samen",
+   "aantal": 1
+  },
+  {
+   "naam": "baby.app",
+   "aantal": 1
+  },
+  {
+   "naam": "baby.rtf",
+   "aantal": 1
+  },
+  {
+   "naam": "baby.baby",
+   "aantal": 1
+  },
+  {
+   "naam": "tiener.app",
+   "aantal": 1
+  },
+  {
+   "naam": "tiener.rtf",
+   "aantal": 1
+  },
+  {
+   "naam": "tiener.tiener",
+   "aantal": 1
+  },
+  {
+   "naam": "welzijn.app",
+   "aantal": 1
+  },
+  {
+   "naam": "welzijn.rtf",
+   "aantal": 1
+  },
+  {
+   "naam": "welzijn.welzijn",
+   "aantal": 1
+  },
+  {
+   "naam": "rtgkantoor.app",
+   "aantal": 1
+  },
+  {
+   "naam": "rtgkantoor.officeAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "rtgkantoor.rtgai",
+   "aantal": 1
+  },
+  {
+   "naam": "rtgkantoor.onderzoeker",
+   "aantal": 1
+  },
+  {
+   "naam": "kantoren.app",
+   "aantal": 1
+  },
+  {
+   "naam": "kantoren.officeAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "kantoren.afdelingen",
+   "aantal": 1
+  },
+  {
+   "naam": "kantoren.sseToOffice",
+   "aantal": 1
+  },
+  {
+   "naam": "kantoren.db",
+   "aantal": 1
+  },
+  {
+   "naam": "kantoren.save",
+   "aantal": 1
+  },
+  {
+   "naam": "kantoren.geldOverzicht",
+   "aantal": 1
+  },
+  {
+   "naam": "kantoren.geldPasprijzen",
+   "aantal": 1
+  },
+  {
+   "naam": "kantoren.geldPasprijsZet",
+   "aantal": 1
+  },
+  {
+   "naam": "kantoren.geldCommissieZet",
+   "aantal": 1
+  },
+  {
+   "naam": "kantoren.geldKortingZet",
+   "aantal": 1
+  },
+  {
+   "naam": "kantoren.boardroomAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "kantoren.boardroomLijst",
+   "aantal": 1
+  },
+  {
+   "naam": "kantoren.keyVanCodenaam",
+   "aantal": 1
+  },
+  {
+   "naam": "kantoren.stad",
+   "aantal": 1
+  },
+  {
+   "naam": "kantoren.pay",
+   "aantal": 1
+  },
+  {
+   "naam": "kantoren.wacht",
+   "aantal": 1
+  },
+  {
+   "naam": "kantoren.mail",
+   "aantal": 1
+  },
+  {
+   "naam": "kantoren.betaal",
+   "aantal": 1
+  },
+  {
+   "naam": "command.app",
+   "aantal": 1
+  },
+  {
+   "naam": "command.officeAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "command.boardroomWie",
+   "aantal": 1
+  },
+  {
+   "naam": "command.command",
+   "aantal": 1
+  },
+  {
+   "naam": "command.apiSpoor",
+   "aantal": 1
+  },
+  {
+   "naam": "command.bezitsbewijs",
+   "aantal": 1
+  },
+  {
+   "naam": "command.doelpoort",
+   "aantal": 1
+  },
+  {
+   "naam": "zaakcommand.app",
+   "aantal": 1
+  },
+  {
+   "naam": "zaakcommand.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "zaakcommand.managerOnly",
+   "aantal": 1
+  },
+  {
+   "naam": "zaakcommand.zaakcommand",
+   "aantal": 1
+  },
+  {
+   "naam": "gemeente.app",
+   "aantal": 1
+  },
+  {
+   "naam": "gemeente.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "gemeente.gemeente",
+   "aantal": 1
+  },
+  {
+   "naam": "overheid.rijksbieb",
+   "aantal": 1
+  },
+  {
+   "naam": "luchthaven.app",
+   "aantal": 1
+  },
+  {
+   "naam": "luchthaven.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "luchthaven.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "luchthaven.liveCodename",
+   "aantal": 1
+  },
+  {
+   "naam": "luchthaven.lucht",
+   "aantal": 1
+  },
+  {
+   "naam": "luchthaven.gegevensStop",
+   "aantal": 1
+  },
+  {
+   "naam": "marechaussee.app",
+   "aantal": 1
+  },
+  {
+   "naam": "marechaussee.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "marechaussee.kmar",
+   "aantal": 1
+  },
+  {
+   "naam": "uitgifte.app",
+   "aantal": 1
+  },
+  {
+   "naam": "uitgifte.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "uitgifte.officeAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "uitgifte.overheid",
+   "aantal": 1
+  },
+  {
+   "naam": "uitgifte.uitgifte",
+   "aantal": 1
+  },
+  {
+   "naam": "sportclub.app",
+   "aantal": 1
+  },
+  {
+   "naam": "sportclub.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "sportclub.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "sportclub.officeAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "sportclub.liveCodename",
+   "aantal": 1
+  },
+  {
+   "naam": "sportclub.sport",
+   "aantal": 1
+  },
+  {
+   "naam": "sportclub.gegevensStop",
+   "aantal": 1
+  },
+  {
+   "naam": "drm.app",
+   "aantal": 1
+  },
+  {
+   "naam": "drm.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "drm.drm",
+   "aantal": 1
+  },
+  {
+   "naam": "pay.officeAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "pay.onboarding",
+   "aantal": 1
+  },
+  {
+   "naam": "pay.factuurSaldo",
+   "aantal": 1
+  },
+  {
+   "naam": "bank.app",
+   "aantal": 1
+  },
+  {
+   "naam": "bank.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "bank.liveCodename",
+   "aantal": 1
+  },
+  {
+   "naam": "bank.bank",
+   "aantal": 1
+  },
+  {
+   "naam": "bankhart.app",
+   "aantal": 1
+  },
+  {
+   "naam": "bankhart.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "bankhart.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "bankhart.officeAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "bankhart.managerOnly",
+   "aantal": 1
+  },
+  {
+   "naam": "bankhart.liveCodename",
+   "aantal": 1
+  },
+  {
+   "naam": "bankhart.bank",
+   "aantal": 1
+  },
+  {
+   "naam": "bankhart.regelwacht",
+   "aantal": 1
+  },
+  {
+   "naam": "bankhart.zzpwacht",
+   "aantal": 1
+  },
+  {
+   "naam": "bankhart.herkomst",
+   "aantal": 1
+  },
+  {
+   "naam": "bankhart.logActivity",
+   "aantal": 1
+  },
+  {
+   "naam": "reis.app",
+   "aantal": 1
+  },
+  {
+   "naam": "reis.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "reis.reiswijzer",
+   "aantal": 1
+  },
+  {
+   "naam": "reis.reisLanden",
+   "aantal": 1
+  },
+  {
+   "naam": "kantoor.app",
+   "aantal": 1
+  },
+  {
+   "naam": "kantoor.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "sociaal.anthropic",
+   "aantal": 1
+  },
+  {
+   "naam": "sociaal.schoon",
+   "aantal": 1
+  },
+  {
+   "naam": "geld.schoon",
+   "aantal": 1
+  },
+  {
+   "naam": "geld.anthropic",
+   "aantal": 1
+  },
+  {
+   "naam": "leven.schoon",
+   "aantal": 1
+  },
+  {
+   "naam": "leven.anthropic",
+   "aantal": 1
+  },
+  {
+   "naam": "levenband.app",
+   "aantal": 1
+  },
+  {
+   "naam": "levenband.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "levenband.rtf",
+   "aantal": 1
+  },
+  {
+   "naam": "thuis.app",
+   "aantal": 1
+  },
+  {
+   "naam": "thuis.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "thuis.liveCodename",
+   "aantal": 1
+  },
+  {
+   "naam": "thuis.thuis",
+   "aantal": 1
+  },
+  {
+   "naam": "thuis.gegevensStop",
+   "aantal": 1
+  },
+  {
+   "naam": "werkvloer.app",
+   "aantal": 1
+  },
+  {
+   "naam": "werkvloer.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "werkvloer.officeAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "werkvloer.managerOnly",
+   "aantal": 1
+  },
+  {
+   "naam": "werkvloer.logActivity",
+   "aantal": 1
+  },
+  {
+   "naam": "werkvloer.koppel",
+   "aantal": 1
+  },
+  {
+   "naam": "werkvloer.tafelwensen",
+   "aantal": 1
+  },
+  {
+   "naam": "werkvloer.checklijst",
+   "aantal": 1
+  },
+  {
+   "naam": "regering.app",
+   "aantal": 1
+  },
+  {
+   "naam": "regering.officeAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "regering.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "regering.regering",
+   "aantal": 1
+  },
+  {
+   "naam": "regering.opvang",
+   "aantal": 1
+  },
+  {
+   "naam": "regering.afdelingshotel",
+   "aantal": 1
+  },
+  {
+   "naam": "regering.werkvormen",
+   "aantal": 1
+  },
+  {
+   "naam": "regering.afdelingen",
+   "aantal": 1
+  },
+  {
+   "naam": "stad.app",
+   "aantal": 1
+  },
+  {
+   "naam": "stad.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "stad.liveCodename",
+   "aantal": 1
+  },
+  {
+   "naam": "stad.stad",
+   "aantal": 1
+  },
+  {
+   "naam": "podium.app",
+   "aantal": 1
+  },
+  {
+   "naam": "podium.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "podium.officeAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "podium.podiumKanalen",
+   "aantal": 1
+  },
+  {
+   "naam": "podium.podiumKanaalMaak",
+   "aantal": 1
+  },
+  {
+   "naam": "podium.podiumKanaalZet",
+   "aantal": 1
+  },
+  {
+   "naam": "podium.podiumMijn",
+   "aantal": 1
+  },
+  {
+   "naam": "podium.podiumLiveZet",
+   "aantal": 1
+  },
+  {
+   "naam": "podium.podiumKijk",
+   "aantal": 1
+  },
+  {
+   "naam": "podium.podiumWeg",
+   "aantal": 1
+  },
+  {
+   "naam": "podium.podiumSignaal",
+   "aantal": 1
+  },
+  {
+   "naam": "podium.podiumChatStuur",
+   "aantal": 1
+  },
+  {
+   "naam": "podium.podiumCadeau",
+   "aantal": 1
+  },
+  {
+   "naam": "podium.podiumAbonneer",
+   "aantal": 1
+  },
+  {
+   "naam": "podium.podiumBlokkeer",
+   "aantal": 1
+  },
+  {
+   "naam": "podium.podiumMeld",
+   "aantal": 1
+  },
+  {
+   "naam": "podium.podiumOfficeLijst",
+   "aantal": 1
+  },
+  {
+   "naam": "podium.podiumOfficeBeslis",
+   "aantal": 1
+  },
+  {
+   "naam": "podium.podiumKaartje",
+   "aantal": 1
+  },
+  {
+   "naam": "podium.podiumNodig",
+   "aantal": 1
+  },
+  {
+   "naam": "podium.podiumWaarZet",
+   "aantal": 1
+  },
+  {
+   "naam": "podium.podiumKoop",
+   "aantal": 1
+  },
+  {
+   "naam": "ghost.app",
+   "aantal": 1
+  },
+  {
+   "naam": "ghost.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "ghost.officeAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "ghost.ghostSimuleer",
+   "aantal": 1
+  },
+  {
+   "naam": "ghost.ghostKantoor",
+   "aantal": 1
+  },
+  {
+   "naam": "flits.app",
+   "aantal": 1
+  },
+  {
+   "naam": "flits.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "flits.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "flits.liveCodename",
+   "aantal": 1
+  },
+  {
+   "naam": "flits.flitsMeld",
+   "aantal": 1
+  },
+  {
+   "naam": "flits.flitsStem",
+   "aantal": 1
+  },
+  {
+   "naam": "flits.flitsRond",
+   "aantal": 1
+  },
+  {
+   "naam": "flits.flitsVooruit",
+   "aantal": 1
+  },
+  {
+   "naam": "theater.app",
+   "aantal": 1
+  },
+  {
+   "naam": "theater.express",
+   "aantal": 1
+  },
+  {
+   "naam": "theater.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "theater.officeAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "theater.resolveSession",
+   "aantal": 1
+  },
+  {
+   "naam": "theater.theaterKanaalMaak",
+   "aantal": 1
+  },
+  {
+   "naam": "theater.theaterOfficeLijst",
+   "aantal": 1
+  },
+  {
+   "naam": "theater.theaterOfficeBeslis",
+   "aantal": 1
+  },
+  {
+   "naam": "theater.theaterVideoMaak",
+   "aantal": 1
+  },
+  {
+   "naam": "theater.theaterVideoUpload",
+   "aantal": 1
+  },
+  {
+   "naam": "theater.theaterVerwijder",
+   "aantal": 1
+  },
+  {
+   "naam": "theater.theaterStreamVan",
+   "aantal": 1
+  },
+  {
+   "naam": "theater.theaterZaal",
+   "aantal": 1
+  },
+  {
+   "naam": "theater.theaterAbonneer",
+   "aantal": 1
+  },
+  {
+   "naam": "theater.theaterReactie",
+   "aantal": 1
+  },
+  {
+   "naam": "theater.theaterReacties",
+   "aantal": 1
+  },
+  {
+   "naam": "theater.theaterMeld",
+   "aantal": 1
+  },
+  {
+   "naam": "theater.theaterThuisAanwezig",
+   "aantal": 1
+  },
+  {
+   "naam": "theater.theaterSignaal",
+   "aantal": 1
+  },
+  {
+   "naam": "theater.theaterOndertitels",
+   "aantal": 1
+  },
+  {
+   "naam": "theater.theaterZaakMaak",
+   "aantal": 1
+  },
+  {
+   "naam": "theater.theaterZaakZaal",
+   "aantal": 1
+  },
+  {
+   "naam": "theater.theaterKijkplichtZet",
+   "aantal": 1
+  },
+  {
+   "naam": "theater.theaterKijkplichtGedaan",
+   "aantal": 1
+  },
+  {
+   "naam": "theater.theaterKijkplichtMijn",
+   "aantal": 1
+  },
+  {
+   "naam": "theater.theaterKijkplichtStand",
+   "aantal": 1
+  },
+  {
+   "naam": "theater.theaterHuisstijl",
+   "aantal": 1
+  },
+  {
+   "naam": "wbw.app",
+   "aantal": 1
+  },
+  {
+   "naam": "wbw.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "wbw.wbwMaak",
+   "aantal": 1
+  },
+  {
+   "naam": "wbw.wbwMijn",
+   "aantal": 1
+  },
+  {
+   "naam": "wbw.wbwGroep",
+   "aantal": 1
+  },
+  {
+   "naam": "wbw.wbwUitgave",
+   "aantal": 1
+  },
+  {
+   "naam": "wbw.wbwVerreken",
+   "aantal": 1
+  },
+  {
+   "naam": "wbw.wbwVerzoek",
+   "aantal": 1
+  },
+  {
+   "naam": "ov.app",
+   "aantal": 1
+  },
+  {
+   "naam": "ov.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "ov.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "ov.managerOnly",
+   "aantal": 1
+  },
+  {
+   "naam": "ov.ovKaart",
+   "aantal": 1
+  },
+  {
+   "naam": "ov.ovCodeMaak",
+   "aantal": 1
+  },
+  {
+   "naam": "ov.ovHierIn",
+   "aantal": 1
+  },
+  {
+   "naam": "ov.ovCheckUit",
+   "aantal": 1
+  },
+  {
+   "naam": "ov.ovMijn",
+   "aantal": 1
+  },
+  {
+   "naam": "ov.ovDienst",
+   "aantal": 1
+  },
+  {
+   "naam": "ov.ovPos",
+   "aantal": 1
+  },
+  {
+   "naam": "ov.ovCodeIn",
+   "aantal": 1
+  },
+  {
+   "naam": "ov.ovStand",
+   "aantal": 1
+  },
+  {
+   "naam": "ov.ovOverzicht",
+   "aantal": 1
+  },
+  {
+   "naam": "ov.ovLijnenBeheer",
+   "aantal": 1
+  },
+  {
+   "naam": "ov.ovLijnZet",
+   "aantal": 1
+  },
+  {
+   "naam": "ov.ovRegie",
+   "aantal": 1
+  },
+  {
+   "naam": "ov.ovRegieZet",
+   "aantal": 1
+  },
+  {
+   "naam": "ov.ovOperatieOverzicht",
+   "aantal": 1
+  },
+  {
+   "naam": "ov.ovOperatieConcept",
+   "aantal": 1
+  },
+  {
+   "naam": "ov.ovOperatieBevestig",
+   "aantal": 1
+  },
+  {
+   "naam": "ov.ovOperatieAnnuleer",
+   "aantal": 1
+  },
+  {
+   "naam": "ov.ovOperatieSegment",
+   "aantal": 1
+  },
+  {
+   "naam": "navigatie.app",
+   "aantal": 1
+  },
+  {
+   "naam": "navigatie.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "navigatie.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "navigatie.liveCodename",
+   "aantal": 1
+  },
+  {
+   "naam": "navigatie.navBestemmingen",
+   "aantal": 1
+  },
+  {
+   "naam": "navigatie.navRoute",
+   "aantal": 1
+  },
+  {
+   "naam": "navigatie.navPoi",
+   "aantal": 1
+  },
+  {
+   "naam": "navigatie.navKaart",
+   "aantal": 1
+  },
+  {
+   "naam": "navigatie.navMeld",
+   "aantal": 1
+  },
+  {
+   "naam": "navigatie.navStatus",
+   "aantal": 1
+  },
+  {
+   "naam": "navigatie.navPartnerEvent",
+   "aantal": 1
+  },
+  {
+   "naam": "navigatie.navPartnerEvents",
+   "aantal": 1
+  },
+  {
+   "naam": "plaats.app",
+   "aantal": 1
+  },
+  {
+   "naam": "plaats.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "plaats.plaats",
+   "aantal": 1
+  },
+  {
+   "naam": "plaats.liveCodename",
+   "aantal": 1
+  },
+  {
+   "naam": "plaats.werkgeversVan",
+   "aantal": 1
+  },
+  {
+   "naam": "plaats.werkbeleidPauzeStand",
+   "aantal": 1
+  },
+  {
+   "naam": "clips.app",
+   "aantal": 1
+  },
+  {
+   "naam": "clips.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "clips.officeAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "clips.clipsMaak",
+   "aantal": 1
+  },
+  {
+   "naam": "clips.clipsWeg",
+   "aantal": 1
+  },
+  {
+   "naam": "clips.clipsAanwezig",
+   "aantal": 1
+  },
+  {
+   "naam": "clips.clipsSignaal",
+   "aantal": 1
+  },
+  {
+   "naam": "clips.clipsFeed",
+   "aantal": 1
+  },
+  {
+   "naam": "clips.clipsVolg",
+   "aantal": 1
+  },
+  {
+   "naam": "clips.clipsReactie",
+   "aantal": 1
+  },
+  {
+   "naam": "clips.clipsReacties",
+   "aantal": 1
+  },
+  {
+   "naam": "clips.clipsMeld",
+   "aantal": 1
+  },
+  {
+   "naam": "clips.clipsKnip",
+   "aantal": 1
+  },
+  {
+   "naam": "clips.clipsOndertitels",
+   "aantal": 1
+  },
+  {
+   "naam": "clips.clipsGeluid",
+   "aantal": 1
+  },
+  {
+   "naam": "clips.clipsOfficeLijst",
+   "aantal": 1
+  },
+  {
+   "naam": "clips.clipsOfficeVerwijder",
+   "aantal": 1
+  },
+  {
+   "naam": "mediaos.app",
+   "aantal": 1
+  },
+  {
+   "naam": "mediaos.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "mediaos.mediaWereld",
+   "aantal": 1
+  },
+  {
+   "naam": "mediaos.mediaStuk",
+   "aantal": 1
+  },
+  {
+   "naam": "mediaos.mediaMaker",
+   "aantal": 1
+  },
+  {
+   "naam": "mediaos.mediaVolg",
+   "aantal": 1
+  },
+  {
+   "naam": "mediaos.mediaMeldZet",
+   "aantal": 1
+  },
+  {
+   "naam": "mediaos.mediaBieb",
+   "aantal": 1
+  },
+  {
+   "naam": "mediaos.mediaBewaar",
+   "aantal": 1
+  },
+  {
+   "naam": "mediaos.mediaSmaakVan",
+   "aantal": 1
+  },
+  {
+   "naam": "mediaos.mediaSmaakStuur",
+   "aantal": 1
+  },
+  {
+   "naam": "mediaos.mediaBord",
+   "aantal": 1
+  },
+  {
+   "naam": "mediaos.mediaLijsten",
+   "aantal": 1
+  },
+  {
+   "naam": "mediaos.mediaLijst",
+   "aantal": 1
+  },
+  {
+   "naam": "mediaos.mediaLijstMaak",
+   "aantal": 1
+  },
+  {
+   "naam": "mediaos.mediaLijstZet",
+   "aantal": 1
+  },
+  {
+   "naam": "mediaos.mediaLijstStuk",
+   "aantal": 1
+  },
+  {
+   "naam": "mediaos.mediaLijstDeel",
+   "aantal": 1
+  },
+  {
+   "naam": "mediaos.mediaSamenStart",
+   "aantal": 1
+  },
+  {
+   "naam": "mediaos.mediaSamenNodig",
+   "aantal": 1
+  },
+  {
+   "naam": "mediaos.mediaSamenIn",
+   "aantal": 1
+  },
+  {
+   "naam": "mediaos.mediaSamenUit",
+   "aantal": 1
+  },
+  {
+   "naam": "mediaos.mediaSamenZet",
+   "aantal": 1
+  },
+  {
+   "naam": "mediaos.mediaSamenMijn",
+   "aantal": 1
+  },
+  {
+   "naam": "kantoorpakket.express",
+   "aantal": 1
+  },
+  {
+   "naam": "kantoorpakket.officeDeel",
+   "aantal": 1
+  },
+  {
+   "naam": "kantoorpakket.officeKring",
+   "aantal": 1
+  },
+  {
+   "naam": "kantoorpakket.officeSamen",
+   "aantal": 1
+  },
+  {
+   "naam": "kantoorpakket.officeAanwezig",
+   "aantal": 1
+  },
+  {
+   "naam": "kantoorpakket.officeOpmerking",
+   "aantal": 1
+  },
+  {
+   "naam": "kantoorpakket.officeBeheer",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.accounts",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.mobAanbod",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.mobMijn",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.mobVraag",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.mobAnnuleer",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.favZet",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.favLijst",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.opdrachtMet",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.opdrachtBeeld",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.opdrachtNaar",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.opdrachtPositie",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.pendelReserveer",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.pendelVoorMedewerker",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.besteedDezeMaand",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.modBord",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.modZet",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.modStoring",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.modAan",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.assetZet",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.assetLijst",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.matchGewichten",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.matchGewichtenZet",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.dispatchVoorstel",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.dispatchWijsToe",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.dispatchOverboek",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.dispatchTelefoonboeking",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.dispatchSpoor",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.pendelZet",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.pendelLijst",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.pendelRooster",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.pendelPlan",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.pendelNoShow",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.beleidZet",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.zakelijkWacht",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.zakelijkBesluit",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.zakelijkOverzicht",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.kaartKoop",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.kaartMijn",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.kaartAanbod",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.kaartControle",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.aboKoop",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.aboMijn",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.aboAanbod",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.storingMeld",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.storingLijst",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.storingTeruggave",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.overeenkomstZet",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.overeenkomstLijst",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.reisPlan",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.reisBoek",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.reisMijn",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.reisAnnuleer",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.dienstStart",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.dienstSoort",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.dienstEind",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.cdtBeeld",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.regimeZet",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.cdtExport",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.cdtExportLijst",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.cdtOverdracht",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.dienstverlenerZet",
+   "aantal": 1
+  },
+  {
+   "naam": "mobiliteit.koppelingStand",
+   "aantal": 1
+  },
+  {
+   "naam": "rtfos.app",
+   "aantal": 1
+  },
+  {
+   "naam": "rtfos.officeAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "rtfos.rtfos",
+   "aantal": 1
+  },
+  {
+   "naam": "rtfos.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "rtfos.geenGast",
+   "aantal": 1
+  },
+  {
+   "naam": "rtfos.liveCodename",
+   "aantal": 1
+  },
+  {
+   "naam": "rtgid.app",
+   "aantal": 1
+  },
+  {
+   "naam": "rtgid.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "rtgid.rtgid",
+   "aantal": 1
+  },
+  {
+   "naam": "rtgid.appUrl",
+   "aantal": 1
+  },
+  {
+   "naam": "rtgid.webauthnStapOpOpties",
+   "aantal": 1
+  },
+  {
+   "naam": "zorgwallet.app",
+   "aantal": 1
+  },
+  {
+   "naam": "zorgwallet.db",
+   "aantal": 1
+  },
+  {
+   "naam": "zorgwallet.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "zorgwallet.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "zorgwallet.zorgpolis",
+   "aantal": 1
+  },
+  {
+   "naam": "zorgwallet.wallet",
+   "aantal": 1
+  },
+  {
+   "naam": "zorgwallet.onboarding",
+   "aantal": 1
+  },
+  {
+   "naam": "stuur.app",
+   "aantal": 1
+  },
+  {
+   "naam": "stuur.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "stuur.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "stuur.stuurRoep",
+   "aantal": 1
+  },
+  {
+   "naam": "stuur.stuurBevestig",
+   "aantal": 1
+  },
+  {
+   "naam": "stuur.stuurPaden",
+   "aantal": 1
+  },
+  {
+   "naam": "vonk.app",
+   "aantal": 1
+  },
+  {
+   "naam": "vonk.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "vonk.officeAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "vonk.vonkProfielZet",
+   "aantal": 1
+  },
+  {
+   "naam": "vonk.vonkSelectie",
+   "aantal": 1
+  },
+  {
+   "naam": "vonk.vonkLike",
+   "aantal": 1
+  },
+  {
+   "naam": "vonk.vonkBetaal",
+   "aantal": 1
+  },
+  {
+   "naam": "vonk.vonkBericht",
+   "aantal": 1
+  },
+  {
+   "naam": "vonk.vonkMijn",
+   "aantal": 1
+  },
+  {
+   "naam": "vonk.vonkBlokkeer",
+   "aantal": 1
+  },
+  {
+   "naam": "vonk.vonkMeldingen",
+   "aantal": 1
+  },
+  {
+   "naam": "vonk.vonkHalfweg",
+   "aantal": 1
+  },
+  {
+   "naam": "vonk.vonkKies",
+   "aantal": 1
+  },
+  {
+   "naam": "voorspel.app",
+   "aantal": 1
+  },
+  {
+   "naam": "voorspel.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "voorspel.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "voorspel.liveCodename",
+   "aantal": 1
+  },
+  {
+   "naam": "voorspel.voorspel",
+   "aantal": 1
+  },
+  {
+   "naam": "synergie.app",
+   "aantal": 1
+  },
+  {
+   "naam": "synergie.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "synergie.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "synergie.liveCodename",
+   "aantal": 1
+  },
+  {
+   "naam": "synergie.synergie",
+   "aantal": 1
+  },
+  {
+   "naam": "synergie.sseToOffice",
+   "aantal": 1
+  },
+  {
+   "naam": "synergie.gegevensStop",
+   "aantal": 1
+  },
+  {
+   "naam": "balans.app",
+   "aantal": 1
+  },
+  {
+   "naam": "balans.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "balans.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "balans.liveCodename",
+   "aantal": 1
+  },
+  {
+   "naam": "balans.balans",
+   "aantal": 1
+  },
+  {
+   "naam": "account.app",
+   "aantal": 1
+  },
+  {
+   "naam": "account.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "account.accRollen",
+   "aantal": 1
+  },
+  {
+   "naam": "account.accKoppel",
+   "aantal": 1
+  },
+  {
+   "naam": "account.accStart",
+   "aantal": 1
+  },
+  {
+   "naam": "account.accOntkoppel",
+   "aantal": 1
+  },
+  {
+   "naam": "gids.app",
+   "aantal": 1
+  },
+  {
+   "naam": "gids.appgids",
+   "aantal": 1
+  },
+  {
+   "naam": "home.app",
+   "aantal": 1
+  },
+  {
+   "naam": "home.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "home.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "home.homekit",
+   "aantal": 1
+  },
+  {
+   "naam": "home.homeMerken",
+   "aantal": 1
+  },
+  {
+   "naam": "vracht.app",
+   "aantal": 1
+  },
+  {
+   "naam": "vracht.db",
+   "aantal": 1
+  },
+  {
+   "naam": "vracht.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "vracht.vracht",
+   "aantal": 1
+  },
+  {
+   "naam": "gebouw.app",
+   "aantal": 1
+  },
+  {
+   "naam": "gebouw.db",
+   "aantal": 1
+  },
+  {
+   "naam": "gebouw.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "gebouw.gebouw",
+   "aantal": 1
+  },
+  {
+   "naam": "clubs.app",
+   "aantal": 1
+  },
+  {
+   "naam": "clubs.db",
+   "aantal": 1
+  },
+  {
+   "naam": "clubs.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "clubs.golfclub",
+   "aantal": 1
+  },
+  {
+   "naam": "clubs.fitclub",
+   "aantal": 1
+  },
+  {
+   "naam": "verzorging.app",
+   "aantal": 1
+  },
+  {
+   "naam": "verzorging.db",
+   "aantal": 1
+  },
+  {
+   "naam": "verzorging.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "verzorging.liveCodename",
+   "aantal": 1
+  },
+  {
+   "naam": "verzorging.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "verzorging.beauty",
+   "aantal": 1
+  },
+  {
+   "naam": "verzorging.petcare",
+   "aantal": 1
+  },
+  {
+   "naam": "verzorging.opvang",
+   "aantal": 1
+  },
+  {
+   "naam": "verzorging.verzorgingLeden",
+   "aantal": 1
+  },
+  {
+   "naam": "verzorging.gegevensStop",
+   "aantal": 1
+  },
+  {
+   "naam": "marina.app",
+   "aantal": 1
+  },
+  {
+   "naam": "marina.db",
+   "aantal": 1
+  },
+  {
+   "naam": "marina.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "marina.marina",
+   "aantal": 1
+  },
+  {
+   "naam": "planners.app",
+   "aantal": 1
+  },
+  {
+   "naam": "planners.db",
+   "aantal": 1
+  },
+  {
+   "naam": "planners.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "planners.weddings",
+   "aantal": 1
+  },
+  {
+   "naam": "planners.advies",
+   "aantal": 1
+  },
+  {
+   "naam": "planners.polis",
+   "aantal": 1
+  },
+  {
+   "naam": "alpine.app",
+   "aantal": 1
+  },
+  {
+   "naam": "alpine.db",
+   "aantal": 1
+  },
+  {
+   "naam": "alpine.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "alpine.alpine",
+   "aantal": 1
+  },
+  {
+   "naam": "lesmaker.app",
+   "aantal": 1
+  },
+  {
+   "naam": "lesmaker.lesmaker",
+   "aantal": 1
+  },
+  {
+   "naam": "lesmaker.schoolbieb",
+   "aantal": 1
+  },
+  {
+   "naam": "lesmaker.appbieb",
+   "aantal": 1
+  },
+  {
+   "naam": "lesmaker.reisbieb",
+   "aantal": 1
+  },
+  {
+   "naam": "doos.app",
+   "aantal": 1
+  },
+  {
+   "naam": "doos.db",
+   "aantal": 1
+  },
+  {
+   "naam": "doos.save",
+   "aantal": 1
+  },
+  {
+   "naam": "doos.crypto",
+   "aantal": 1
+  },
+  {
+   "naam": "doos.beveilig",
+   "aantal": 1
+  },
+  {
+   "naam": "doos.zaakdoos",
+   "aantal": 1
+  },
+  {
+   "naam": "code.app",
+   "aantal": 1
+  },
+  {
+   "naam": "code.express",
+   "aantal": 1
+  },
+  {
+   "naam": "code.resolveSession",
+   "aantal": 1
+  },
+  {
+   "naam": "code.sessionFor",
+   "aantal": 1
+  },
+  {
+   "naam": "code.dyncode",
+   "aantal": 1
+  },
+  {
+   "naam": "link.app",
+   "aantal": 1
+  },
+  {
+   "naam": "link.express",
+   "aantal": 1
+  },
+  {
+   "naam": "link.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "link.geenGast",
+   "aantal": 1
+  },
+  {
+   "naam": "link.liveCodename",
+   "aantal": 1
+  },
+  {
+   "naam": "link.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "link.resolveSession",
+   "aantal": 1
+  },
+  {
+   "naam": "link.sessionFor",
+   "aantal": 1
+  },
+  {
+   "naam": "link.linkLos",
+   "aantal": 1
+  },
+  {
+   "naam": "link.linkKoppelingen",
+   "aantal": 1
+  },
+  {
+   "naam": "link.linkWieId",
+   "aantal": 1
+  },
+  {
+   "naam": "link.linkCapMaak",
+   "aantal": 1
+  },
+  {
+   "naam": "link.linkCapAanvaard",
+   "aantal": 1
+  },
+  {
+   "naam": "link.linkCapTrek",
+   "aantal": 1
+  },
+  {
+   "naam": "veiligheid.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "instant-reality.app",
+   "aantal": 1
+  },
+  {
+   "naam": "instant-reality.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "doelen.app",
+   "aantal": 1
+  },
+  {
+   "naam": "doelen.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "doelen.doelenVan",
+   "aantal": 1
+  },
+  {
+   "naam": "doelen.doelMaak",
+   "aantal": 1
+  },
+  {
+   "naam": "doelen.doelMeet",
+   "aantal": 1
+  },
+  {
+   "naam": "doelen.doelVerzet",
+   "aantal": 1
+  },
+  {
+   "naam": "doelen.doelStop",
+   "aantal": 1
+  },
+  {
+   "naam": "metingen.app",
+   "aantal": 1
+  },
+  {
+   "naam": "metingen.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "metingen.metingenVan",
+   "aantal": 1
+  },
+  {
+   "naam": "metingen.metingZet",
+   "aantal": 1
+  },
+  {
+   "naam": "metingen.metingWeg",
+   "aantal": 1
+  },
+  {
+   "naam": "medicatie.app",
+   "aantal": 1
+  },
+  {
+   "naam": "medicatie.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "medicatie.medicatieVan",
+   "aantal": 1
+  },
+  {
+   "naam": "medicatie.medicatieZet",
+   "aantal": 1
+  },
+  {
+   "naam": "medicatie.medicatieWeg",
+   "aantal": 1
+  },
+  {
+   "naam": "medicatie.medicatieAf",
+   "aantal": 1
+  },
+  {
+   "naam": "medicatie.medicatieVoorraad",
+   "aantal": 1
+  },
+  {
+   "naam": "trainingsschema.app",
+   "aantal": 1
+  },
+  {
+   "naam": "trainingsschema.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "trainingsschema.trainingVan",
+   "aantal": 1
+  },
+  {
+   "naam": "trainingsschema.trainingZet",
+   "aantal": 1
+  },
+  {
+   "naam": "trainingsschema.trainingWeg",
+   "aantal": 1
+  },
+  {
+   "naam": "trainingsschema.trainingDeed",
+   "aantal": 1
+  },
+  {
+   "naam": "trainingsschema.trainingWegGedaan",
+   "aantal": 1
+  },
+  {
+   "naam": "voeding.app",
+   "aantal": 1
+  },
+  {
+   "naam": "voeding.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "voeding.voedingVan",
+   "aantal": 1
+  },
+  {
+   "naam": "voeding.voedingZet",
+   "aantal": 1
+  },
+  {
+   "naam": "voeding.voedingWeg",
+   "aantal": 1
+  },
+  {
+   "naam": "noodkaart.app",
+   "aantal": 1
+  },
+  {
+   "naam": "noodkaart.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "noodkaart.noodkaartVan",
+   "aantal": 1
+  },
+  {
+   "naam": "noodkaart.noodkaartZet",
+   "aantal": 1
+  },
+  {
+   "naam": "noodkaart.noodkaartWeg",
+   "aantal": 1
+  },
+  {
+   "naam": "gewoonten.app",
+   "aantal": 1
+  },
+  {
+   "naam": "gewoonten.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "gewoonten.gewoontenVan",
+   "aantal": 1
+  },
+  {
+   "naam": "gewoonten.gewoonteMaak",
+   "aantal": 1
+  },
+  {
+   "naam": "gewoonten.gewoonteTik",
+   "aantal": 1
+  },
+  {
+   "naam": "gewoonten.gewoonteReeks",
+   "aantal": 1
+  },
+  {
+   "naam": "gewoonten.gewoonteStop",
+   "aantal": 1
+  },
+  {
+   "naam": "gemoed.app",
+   "aantal": 1
+  },
+  {
+   "naam": "gemoed.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "gemoed.gemoedVan",
+   "aantal": 1
+  },
+  {
+   "naam": "gemoed.gemoedZet",
+   "aantal": 1
+  },
+  {
+   "naam": "gemoed.gemoedWeg",
+   "aantal": 1
+  },
+  {
+   "naam": "gedachten.app",
+   "aantal": 1
+  },
+  {
+   "naam": "gedachten.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "gedachten.gedachtenVan",
+   "aantal": 1
+  },
+  {
+   "naam": "gedachten.gedachteZet",
+   "aantal": 1
+  },
+  {
+   "naam": "gedachten.gedachteWeg",
+   "aantal": 1
+  },
+  {
+   "naam": "toestellen.app",
+   "aantal": 1
+  },
+  {
+   "naam": "toestellen.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "toestellen.toestellenVan",
+   "aantal": 1
+  },
+  {
+   "naam": "toestellen.toestelKoppel",
+   "aantal": 1
+  },
+  {
+   "naam": "toestellen.toestelIntrek",
+   "aantal": 1
+  },
+  {
+   "naam": "toestellen.toestelVanSleutel",
+   "aantal": 1
+  },
+  {
+   "naam": "toestellen.toestelMeting",
+   "aantal": 1
+  },
+  {
+   "naam": "ik.app",
+   "aantal": 1
+  },
+  {
+   "naam": "ik.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "ik.schoon",
+   "aantal": 1
+  },
+  {
+   "naam": "ik.accounts",
+   "aantal": 1
+  },
+  {
+   "naam": "ik.geloof",
+   "aantal": 1
+  },
+  {
+   "naam": "ik.toegankelijkVan",
+   "aantal": 1
+  },
+  {
+   "naam": "ik.toegankelijkZet",
+   "aantal": 1
+  },
+  {
+   "naam": "ik.TOEGANKELIJK_KEUZES",
+   "aantal": 1
+  },
+  {
+   "naam": "consent.app",
+   "aantal": 1
+  },
+  {
+   "naam": "consent.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "consent.consentVan",
+   "aantal": 1
+  },
+  {
+   "naam": "consent.consentIntrek",
+   "aantal": 1
+  },
+  {
+   "naam": "consent.relatiesVan",
+   "aantal": 1
+  },
+  {
+   "naam": "consent.gevolgenVan",
+   "aantal": 1
+  },
+  {
+   "naam": "consent.relatieSluit",
+   "aantal": 1
+  },
+  {
+   "naam": "inzagekaart.app",
+   "aantal": 1
+  },
+  {
+   "naam": "inzagekaart.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "inzagekaart.inzagekaartVan",
+   "aantal": 1
+  },
+  {
+   "naam": "gegevenskaart.app",
+   "aantal": 1
+  },
+  {
+   "naam": "gegevenskaart.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "gegevenskaart.gegevenskaart",
+   "aantal": 1
+  },
+  {
+   "naam": "tijdlijn.app",
+   "aantal": 1
+  },
+  {
+   "naam": "tijdlijn.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "tijdlijn.liveCodename",
+   "aantal": 1
+  },
+  {
+   "naam": "tijdlijn.tijdlijnVoor",
+   "aantal": 1
+  },
+  {
+   "naam": "dagcoach.app",
+   "aantal": 1
+  },
+  {
+   "naam": "dagcoach.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "dagcoach.liveCodename",
+   "aantal": 1
+  },
+  {
+   "naam": "dagcoach.dagVoor",
+   "aantal": 1
+  },
+  {
+   "naam": "life.app",
+   "aantal": 1
+  },
+  {
+   "naam": "life.auth",
+   "aantal": 1
+  },
+  {
+   "naam": "life.liveCodename",
+   "aantal": 1
+  },
+  {
+   "naam": "life.lifeVoor",
+   "aantal": 1
+  },
+  {
+   "naam": "appstore.supplierAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "appstore.tenant",
+   "aantal": 1
+  },
+  {
+   "naam": "appstore.idGeverifieerd",
+   "aantal": 1
+  },
+  {
+   "naam": "appstore.leeftijdVan",
+   "aantal": 1
+  },
+  {
+   "naam": "appstore.geborenVan",
+   "aantal": 1
+  },
+  {
+   "naam": "appstore.officeAuth",
+   "aantal": 1
+  },
+  {
+   "naam": "appstore.codenaamVan",
+   "aantal": 1
+  },
+  {
+   "naam": "appstore.liveCodename",
+   "aantal": 1
+  },
+  {
+   "naam": "appstore.onboarding",
+   "aantal": 1
+  }
+ ],
+ "perVerzoek": [
+  {
+   "verzoek": "POST /api/techniek/ai",
+   "namen": [
+    {
+     "naam": "techniek.pay",
+     "aantal": 1
+    },
+    {
+     "naam": "techniek.bank",
+     "aantal": 1
+    },
+    {
+     "naam": "techniek.bankregieOverzicht",
+     "aantal": 1
+    },
+    {
+     "naam": "techniek.stad",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/geld/rahul",
+   "namen": [
+    {
+     "naam": "geld.geldgraaf",
+     "aantal": 1
+    },
+    {
+     "naam": "geld.geldbeleid",
+     "aantal": 1
+    },
+    {
+     "naam": "geld.codenaamVan",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/fluister/profiel",
+   "namen": [
+    {
+     "naam": "member.voorspel",
+     "aantal": 3
+    },
+    {
+     "naam": "member.balans",
+     "aantal": 3
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/geld/actielog",
+   "namen": [
+    {
+     "naam": "geld.codenaamVan",
+     "aantal": 1
+    },
+    {
+     "naam": "geld.geldbeleid",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/geld/beleid",
+   "namen": [
+    {
+     "naam": "geld.geldbeleid",
+     "aantal": 2
+    },
+    {
+     "naam": "geld.codenaamVan",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/geld/beleid/weg",
+   "namen": [
+    {
+     "naam": "geld.codenaamVan",
+     "aantal": 1
+    },
+    {
+     "naam": "geld.geldbeleid",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/geld/beleid/zet",
+   "namen": [
+    {
+     "naam": "geld.codenaamVan",
+     "aantal": 1
+    },
+    {
+     "naam": "geld.geldbeleid",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/geld/grens",
+   "namen": [
+    {
+     "naam": "geld.codenaamVan",
+     "aantal": 1
+    },
+    {
+     "naam": "geld.geldbeleid",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/geld/grens/weg",
+   "namen": [
+    {
+     "naam": "geld.codenaamVan",
+     "aantal": 1
+    },
+    {
+     "naam": "geld.geldbeleid",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/geld/grens/zet",
+   "namen": [
+    {
+     "naam": "geld.codenaamVan",
+     "aantal": 1
+    },
+    {
+     "naam": "geld.geldbeleid",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/geld/pot/reserveer",
+   "namen": [
+    {
+     "naam": "geld.codenaamVan",
+     "aantal": 1
+    },
+    {
+     "naam": "geld.geldbeleid",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/geld/pot/weg",
+   "namen": [
+    {
+     "naam": "geld.codenaamVan",
+     "aantal": 1
+    },
+    {
+     "naam": "geld.geldbeleid",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/geld/pot/zet",
+   "namen": [
+    {
+     "naam": "geld.codenaamVan",
+     "aantal": 1
+    },
+    {
+     "naam": "geld.geldbeleid",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/boardroom/magnaat/besluit",
+   "namen": [
+    {
+     "naam": "kantoren.magnaatLeren",
+     "aantal": 1
+    },
+    {
+     "naam": "kantoren.boardroomWie",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/reisbureau/besluit",
+   "namen": [
+    {
+     "naam": "kantoren.boardroomWie",
+     "aantal": 1
+    },
+    {
+     "naam": "kantoren.reisbureau",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/reisbureau/klaarzetten",
+   "namen": [
+    {
+     "naam": "kantoren.boardroomWie",
+     "aantal": 1
+    },
+    {
+     "naam": "kantoren.reisuitnodiging",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/reisbureau/uitnodiging-weg",
+   "namen": [
+    {
+     "naam": "kantoren.boardroomWie",
+     "aantal": 1
+    },
+    {
+     "naam": "kantoren.reisuitnodiging",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/terugval",
+   "namen": [
+    {
+     "naam": "kantoren.accounts",
+     "aantal": 165
+    },
+    {
+     "naam": "kantoren.zaakAbonnement",
+     "aantal": 2
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/auth/login",
+   "namen": [
+    {
+     "naam": "auth.werkplekkenBijLogin",
+     "aantal": 2
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/bank/leden",
+   "namen": [
+    {
+     "naam": "kantoren.bankLedenZet",
+     "aantal": 2
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/bank/storten",
+   "namen": [
+    {
+     "naam": "bank.bankLedenAan",
+     "aantal": 2
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/bank/rekening/open",
+   "namen": [
+    {
+     "naam": "bank.bankLedenAan",
+     "aantal": 2
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/bank/pas/uitgeven",
+   "namen": [
+    {
+     "naam": "bank.bankLedenAan",
+     "aantal": 2
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/bank/terugkerend/zet",
+   "namen": [
+    {
+     "naam": "bank.bankLedenAan",
+     "aantal": 2
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/bedrijf/lid/besluit",
+   "namen": [
+    {
+     "naam": "bedrijf.tenant",
+     "aantal": 2
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/instelling/aansluiten",
+   "namen": [
+    {
+     "naam": "office.instelling",
+     "aantal": 3
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/avond/voorkeuren",
+   "namen": [
+    {
+     "naam": "avond.zorgVoor",
+     "aantal": 2
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/avond/voorkeuren/proef",
+   "namen": [
+    {
+     "naam": "avond.zorgVoor",
+     "aantal": 2
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/bank/advies",
+   "namen": [
+    {
+     "naam": "bank.bankLedenAan",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/bank/afschrift",
+   "namen": [
+    {
+     "naam": "bank.bankLedenAan",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/bank/afschrift.csv",
+   "namen": [
+    {
+     "naam": "bank.bankLedenAan",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/bank/bevries",
+   "namen": [
+    {
+     "naam": "bank.bankLedenAan",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/bank/bulk",
+   "namen": [
+    {
+     "naam": "bank.bankLedenAan",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/bank/hart",
+   "namen": [
+    {
+     "naam": "bankhart.bankLedenAan",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/bank/inzichten",
+   "namen": [
+    {
+     "naam": "bankhart.bankLedenAan",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/bank/naar-wallet",
+   "namen": [
+    {
+     "naam": "bank.bankLedenAan",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/bank/overboek",
+   "namen": [
+    {
+     "naam": "bank.bankLedenAan",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/bank/pas/betaal",
+   "namen": [
+    {
+     "naam": "bank.bankLedenAan",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/bank/pas/bevries",
+   "namen": [
+    {
+     "naam": "bank.bankLedenAan",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/bank/pas/limiet",
+   "namen": [
+    {
+     "naam": "bank.bankLedenAan",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/bank/pas/sluit",
+   "namen": [
+    {
+     "naam": "bank.bankLedenAan",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/bank/passen",
+   "namen": [
+    {
+     "naam": "bank.bankLedenAan",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/bank/rekening",
+   "namen": [
+    {
+     "naam": "bank.bankLedenAan",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/bank/rente-voorbeeld",
+   "namen": [
+    {
+     "naam": "bank.bankLedenAan",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/bank/salaris",
+   "namen": [
+    {
+     "naam": "bank.bankLedenAan",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/bank/sepa",
+   "namen": [
+    {
+     "naam": "bank.bankLedenAan",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/bank/spaardoel",
+   "namen": [
+    {
+     "naam": "bank.bankLedenAan",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/bank/terugkerend",
+   "namen": [
+    {
+     "naam": "bank.bankLedenAan",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/bank/terugkerend/stop",
+   "namen": [
+    {
+     "naam": "bank.bankLedenAan",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/bank/van-wallet",
+   "namen": [
+    {
+     "naam": "bank.bankLedenAan",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/bank/vastelasten",
+   "namen": [
+    {
+     "naam": "bankhart.bankLedenAan",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/bank/veeg",
+   "namen": [
+    {
+     "naam": "bankhart.bankLedenAan",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/festival/partner/inbox",
+   "namen": [
+    {
+     "naam": "festival.db",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/fluister",
+   "namen": [
+    {
+     "naam": "member.codewoordCheck",
+     "aantal": 2
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/geld/cockpit",
+   "namen": [
+    {
+     "naam": "geld.geldgraaf",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/instant-reality",
+   "namen": [
+    {
+     "naam": "instant-reality.instantGet",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/instant-reality/event",
+   "namen": [
+    {
+     "naam": "instant-reality.instantMutate",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/instant-reality/partner",
+   "namen": [
+    {
+     "naam": "instant-reality.instantGet",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/kantoor/wereld",
+   "namen": [
+    {
+     "naam": "kantoor.kantoorwereld",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/leven/band/bevestig",
+   "namen": [
+    {
+     "naam": "levenband.levensband",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/leven/band/verbreek",
+   "namen": [
+    {
+     "naam": "levenband.levensband",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/leven/beeindigd",
+   "namen": [
+    {
+     "naam": "levenband.levensband",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/leven/beleid",
+   "namen": [
+    {
+     "naam": "levenband.levensbeleid",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/leven/beleid/zet",
+   "namen": [
+    {
+     "naam": "levenband.levensbeleid",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/leven/cockpit",
+   "namen": [
+    {
+     "naam": "leven.levenslijn",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/leven/deel/in",
+   "namen": [
+    {
+     "naam": "levenband.levensband",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/leven/deel/zet",
+   "namen": [
+    {
+     "naam": "levenband.levensband",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/leven/kring",
+   "namen": [
+    {
+     "naam": "levenband.levensband",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/leven/lijn",
+   "namen": [
+    {
+     "naam": "leven.levenslijn",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/leven/mentor",
+   "namen": [
+    {
+     "naam": "leven.levenslijn",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/aidata",
+   "namen": [
+    {
+     "naam": "kantoren.aidataOverzicht",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/aidata/export",
+   "namen": [
+    {
+     "naam": "kantoren.aidataExport",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/architect",
+   "namen": [
+    {
+     "naam": "kantoren.architect",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/architect/bouwstaat",
+   "namen": [
+    {
+     "naam": "kantoren.architect",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/architect/concept",
+   "namen": [
+    {
+     "naam": "kantoren.architect",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/architect/kritiek",
+   "namen": [
+    {
+     "naam": "kantoren.architect",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/architect/maak",
+   "namen": [
+    {
+     "naam": "kantoren.architect",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/architect/portfolio",
+   "namen": [
+    {
+     "naam": "kantoren.architect",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/architect/project",
+   "namen": [
+    {
+     "naam": "kantoren.architect",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/architect/verwijder",
+   "namen": [
+    {
+     "naam": "kantoren.architect",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/architect/zet",
+   "namen": [
+    {
+     "naam": "kantoren.architect",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/asset/fees",
+   "namen": [
+    {
+     "naam": "office.assetFeesInnen",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/asset/overzicht",
+   "namen": [
+    {
+     "naam": "office.assetKantoor",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/asset/terugkoop",
+   "namen": [
+    {
+     "naam": "office.assetTerugkoopUit",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/asset/waarde",
+   "namen": [
+    {
+     "naam": "office.assetHertaxeer",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/atelier",
+   "namen": [
+    {
+     "naam": "kantoren.atelier",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/atelier/collectie",
+   "namen": [
+    {
+     "naam": "kantoren.atelier",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/atelier/concept",
+   "namen": [
+    {
+     "naam": "kantoren.atelier",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/atelier/kritiek",
+   "namen": [
+    {
+     "naam": "kantoren.atelier",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/atelier/maak",
+   "namen": [
+    {
+     "naam": "kantoren.atelier",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/atelier/techpack",
+   "namen": [
+    {
+     "naam": "kantoren.atelier",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/atelier/verwijder",
+   "namen": [
+    {
+     "naam": "kantoren.atelier",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/atelier/zet",
+   "namen": [
+    {
+     "naam": "kantoren.atelier",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/atelierweb/salon",
+   "namen": [
+    {
+     "naam": "atelierweb.db",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/bank/autoriseer/annuleer",
+   "namen": [
+    {
+     "naam": "kantoren.bankAutoriseerAnnuleer",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/bank/autoriseer/bevestig",
+   "namen": [
+    {
+     "naam": "kantoren.bankAutoriseerBevestig",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/bank/bevoegdheid",
+   "namen": [
+    {
+     "naam": "kantoren.bevoegd",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/bank/draai",
+   "namen": [
+    {
+     "naam": "kantoren.bankDraai",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/bank/herstel",
+   "namen": [
+    {
+     "naam": "kantoren.bankNoodHerstel",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/bank/instellingen",
+   "namen": [
+    {
+     "naam": "kantoren.bankInstellingenZet",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/bank/mislukking",
+   "namen": [
+    {
+     "naam": "kantoren.bankClearingMislukt",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/bank/modus",
+   "namen": [
+    {
+     "naam": "kantoren.bankModusZet",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/bank/nood",
+   "namen": [
+    {
+     "naam": "kantoren.bankNoodMeld",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/bank/operationeel",
+   "namen": [
+    {
+     "naam": "kantoren.bankOperationeelZet",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/bank/partnerrail",
+   "namen": [
+    {
+     "naam": "kantoren.bankPartnerRailZet",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/bank/terugstorting",
+   "namen": [
+    {
+     "naam": "kantoren.bankTerugstortingZet",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/bank/vergunning",
+   "namen": [
+    {
+     "naam": "kantoren.bankVergunningZet",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/betalingen/status",
+   "namen": [
+    {
+     "naam": "kantoren.betaalRegie",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/boardroom/magnaat/leren",
+   "namen": [
+    {
+     "naam": "kantoren.magnaatLeren",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/catalogus-wens/besluit",
+   "namen": [
+    {
+     "naam": "office.catalogusWensBesluit",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/catalogus-wensen",
+   "namen": [
+    {
+     "naam": "office.catalogusWensen",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/commercie/openstaand",
+   "namen": [
+    {
+     "naam": "kantoren.commercieVerrekening",
+     "aantal": 2
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/commercie/ronde",
+   "namen": [
+    {
+     "naam": "kantoren.commercieRonde",
+     "aantal": 2
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/commercie/zaakabonnement/zet",
+   "namen": [
+    {
+     "naam": "kantoren.zaakAbonnement",
+     "aantal": 2
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/commercie/zaakabonnementen",
+   "namen": [
+    {
+     "naam": "kantoren.zaakAbonnement",
+     "aantal": 3
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/geld/ai-inkoop",
+   "namen": [
+    {
+     "naam": "kantoren.geldAiInkoopZet",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/geld/betaaldienst",
+   "namen": [
+    {
+     "naam": "kantoren.geldBetaaldienst",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/gezondheid",
+   "namen": [
+    {
+     "naam": "kantoren.capGezondheid",
+     "aantal": 3
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/gezondheid/quarantaine",
+   "namen": [
+    {
+     "naam": "kantoren.capGezondheid",
+     "aantal": 2
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/gezondheid/vrij",
+   "namen": [
+    {
+     "naam": "kantoren.capGezondheid",
+     "aantal": 2
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/handhaving",
+   "namen": [
+    {
+     "naam": "kantoren.handhavingSchaduw",
+     "aantal": 4
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/handhaving/zet",
+   "namen": [
+    {
+     "naam": "kantoren.handhavingSchaduw",
+     "aantal": 2
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/hardware",
+   "namen": [
+    {
+     "naam": "kantoren.hardware",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/hardware/concept",
+   "namen": [
+    {
+     "naam": "kantoren.hardware",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/hardware/kritiek",
+   "namen": [
+    {
+     "naam": "kantoren.hardware",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/hardware/maak",
+   "namen": [
+    {
+     "naam": "kantoren.hardware",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/hardware/productblad",
+   "namen": [
+    {
+     "naam": "kantoren.hardware",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/hardware/serie",
+   "namen": [
+    {
+     "naam": "kantoren.hardware",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/hardware/stuklijst",
+   "namen": [
+    {
+     "naam": "kantoren.hardware",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/hardware/verwijder",
+   "namen": [
+    {
+     "naam": "kantoren.hardware",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/hardware/winkel",
+   "namen": [
+    {
+     "naam": "kantoren.hardware",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/hardware/winkel-uit",
+   "namen": [
+    {
+     "naam": "kantoren.hardware",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/hardware/zet",
+   "namen": [
+    {
+     "naam": "kantoren.hardware",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/ideeen",
+   "namen": [
+    {
+     "naam": "kantoren.ideeen",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/ideeen/maak",
+   "namen": [
+    {
+     "naam": "kantoren.ideeen",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/ideeen/reactie",
+   "namen": [
+    {
+     "naam": "kantoren.ideeen",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/ideeen/spinoff",
+   "namen": [
+    {
+     "naam": "kantoren.ideeen",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/ideeen/uitwerken",
+   "namen": [
+    {
+     "naam": "kantoren.ideeen",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/ideeen/verwijder",
+   "namen": [
+    {
+     "naam": "kantoren.ideeen",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/ideeen/zet",
+   "namen": [
+    {
+     "naam": "kantoren.ideeen",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/instelling/genres",
+   "namen": [
+    {
+     "naam": "office.instelling",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/instellingen",
+   "namen": [
+    {
+     "naam": "office.instelling",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/inzage",
+   "namen": [
+    {
+     "naam": "kantoren.boardroomWie",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/mall",
+   "namen": [
+    {
+     "naam": "kantoren.mall",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/mall/collectie/weg",
+   "namen": [
+    {
+     "naam": "kantoren.mall",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/mall/collectie/zet",
+   "namen": [
+    {
+     "naam": "kantoren.mall",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/mall/collecties",
+   "namen": [
+    {
+     "naam": "kantoren.mall",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/mall/kansen",
+   "namen": [
+    {
+     "naam": "kantoren.mall",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/mall/zet",
+   "namen": [
+    {
+     "naam": "kantoren.mall",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/rampbeeld",
+   "namen": [
+    {
+     "naam": "kantoren.rampbeeld",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/rampbeeld/ai",
+   "namen": [
+    {
+     "naam": "kantoren.rampbeeld",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/rampbeeld/evaluatie",
+   "namen": [
+    {
+     "naam": "kantoren.rampbeeld",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/rampbeeld/schaal",
+   "namen": [
+    {
+     "naam": "kantoren.rampbeeld",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/rechten",
+   "namen": [
+    {
+     "naam": "kantoren.commercieRechten",
+     "aantal": 2
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/redactie",
+   "namen": [
+    {
+     "naam": "kantoren.redactie",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/redactie/ai/redactie",
+   "namen": [
+    {
+     "naam": "kantoren.redactie",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/redactie/ai/schrijf",
+   "namen": [
+    {
+     "naam": "kantoren.redactie",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/redactie/artikel/maak",
+   "namen": [
+    {
+     "naam": "kantoren.redactie",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/redactie/artikel/status",
+   "namen": [
+    {
+     "naam": "kantoren.redactie",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/redactie/artikel/verwijder",
+   "namen": [
+    {
+     "naam": "kantoren.redactie",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/redactie/artikel/zet",
+   "namen": [
+    {
+     "naam": "kantoren.redactie",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/redactie/drukproef",
+   "namen": [
+    {
+     "naam": "kantoren.redactie",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/redactie/editie/maak",
+   "namen": [
+    {
+     "naam": "kantoren.redactie",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/redactie/editie/status",
+   "namen": [
+    {
+     "naam": "kantoren.redactie",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/redactie/nieuwstips",
+   "namen": [
+    {
+     "naam": "kantoren.redactie",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/reisaanbod",
+   "namen": [
+    {
+     "naam": "kantoren.reisaanbod",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/reisaanbod/weg",
+   "namen": [
+    {
+     "naam": "kantoren.reisaanbod",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/reisaanbod/zet",
+   "namen": [
+    {
+     "naam": "kantoren.reisaanbod",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/reisbureau",
+   "namen": [
+    {
+     "naam": "kantoren.reisbureau",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/reisbureau/afwijzen",
+   "namen": [
+    {
+     "naam": "kantoren.reisbureau",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/reisbureau/bevestig",
+   "namen": [
+    {
+     "naam": "kantoren.reisbureau",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/reisbureau/lees",
+   "namen": [
+    {
+     "naam": "kantoren.invoer",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/reisbureau/uitnodigingen",
+   "namen": [
+    {
+     "naam": "kantoren.reisuitnodiging",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/rtfwallet",
+   "namen": [
+    {
+     "naam": "office.rtfWallet",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/rtfwallet/maak",
+   "namen": [
+    {
+     "naam": "office.rtfWallet",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/salon/belang",
+   "namen": [
+    {
+     "naam": "kantoren.anthropic",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/salon/belang/beoordeel",
+   "namen": [
+    {
+     "naam": "kantoren.anthropic",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/studio",
+   "namen": [
+    {
+     "naam": "kantoren.studio",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/studio/collectie",
+   "namen": [
+    {
+     "naam": "kantoren.studio",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/studio/concept",
+   "namen": [
+    {
+     "naam": "kantoren.studio",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/studio/kritiek",
+   "namen": [
+    {
+     "naam": "kantoren.studio",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/studio/lookbook",
+   "namen": [
+    {
+     "naam": "kantoren.studio",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/studio/maak",
+   "namen": [
+    {
+     "naam": "kantoren.studio",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/studio/specsheet",
+   "namen": [
+    {
+     "naam": "kantoren.studio",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/studio/verwijder",
+   "namen": [
+    {
+     "naam": "kantoren.studio",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/studio/zet",
+   "namen": [
+    {
+     "naam": "kantoren.studio",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/terugval/bevestig",
+   "namen": [
+    {
+     "naam": "kantoren.zaakAbonnement",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/vakbewijzen",
+   "namen": [
+    {
+     "naam": "vakbewijs.db",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/voornemen/staak",
+   "namen": [
+    {
+     "naam": "kantoren.voornemens",
+     "aantal": 2
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/voornemen/teken",
+   "namen": [
+    {
+     "naam": "kantoren.voornemens",
+     "aantal": 2
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/voornemens",
+   "namen": [
+    {
+     "naam": "kantoren.voornemens",
+     "aantal": 3
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/werkplaats",
+   "namen": [
+    {
+     "naam": "kantoren.werkplaats",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/werkplaats/introk",
+   "namen": [
+    {
+     "naam": "kantoren.werkplaats",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/werkplaats/kritiek",
+   "namen": [
+    {
+     "naam": "kantoren.werkplaats",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/werkplaats/maak",
+   "namen": [
+    {
+     "naam": "kantoren.werkplaats",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/werkplaats/publiceer",
+   "namen": [
+    {
+     "naam": "kantoren.werkplaats",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/werkplaats/uitwerken",
+   "namen": [
+    {
+     "naam": "kantoren.werkplaats",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/werkplaats/verwijder",
+   "namen": [
+    {
+     "naam": "kantoren.werkplaats",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/werkplaats/zet",
+   "namen": [
+    {
+     "naam": "kantoren.werkplaats",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/zelfzorg",
+   "namen": [
+    {
+     "naam": "kantoren.zelfzorg",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/zelfzorg/bescherm",
+   "namen": [
+    {
+     "naam": "kantoren.zelfzorg",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/zelfzorg/herstel",
+   "namen": [
+    {
+     "naam": "kantoren.zelfzorg",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/zelfzorg/opruim",
+   "namen": [
+    {
+     "naam": "kantoren.zelfzorg",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/office/zelfzorg/upgrade",
+   "namen": [
+    {
+     "naam": "kantoren.zelfzorg",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/techniek/alarm/proef",
+   "namen": [
+    {
+     "naam": "techniek.foutmelder",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/techniek/tenant",
+   "namen": [
+    {
+     "naam": "techniek.tenant",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/techniek/tenant/bewaringsplicht",
+   "namen": [
+    {
+     "naam": "techniek.tenant",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/techniek/tenant/bind",
+   "namen": [
+    {
+     "naam": "techniek.tenant",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/techniek/tenant/contract",
+   "namen": [
+    {
+     "naam": "techniek.tenant",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/techniek/tenant/invoer",
+   "namen": [
+    {
+     "naam": "techniek.tenant",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/techniek/tenant/levensloop",
+   "namen": [
+    {
+     "naam": "techniek.tenant",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/techniek/tenant/merk",
+   "namen": [
+    {
+     "naam": "techniek.tenant",
+     "aantal": 1
+    }
+   ]
+  },
+  {
+   "verzoek": "POST /api/techniek/tenant/vernietig",
+   "namen": [
+    {
+     "naam": "techniek.tenant",
+     "aantal": 1
+    }
+   ]
+  }
+ ]
+}

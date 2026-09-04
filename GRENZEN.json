@@ -486,6 +486,7 @@
     "kantoorpakket": [
       "boardroomBaas",
       "boardroomWie",
+      "office",
       "officeAI",
       "officeAanwezig",
       "officeBeheer",
@@ -509,6 +510,7 @@
     ],
     "kantoorpakket-huis": [
       "boardroomBaas",
+      "office",
       "officeAI",
       "officeBewaar",
       "officeFase",
@@ -528,6 +530,7 @@
     ],
     "kantoorpakket-samen": [
       "boardroomBaas",
+      "office",
       "officeAanwezig",
       "officeBeheer",
       "officeOpmerking",
@@ -767,6 +770,7 @@
       "apiSpoor",
       "appUrl",
       "appbieb",
+      "appbrug",
       "applyChatVertaald",
       "assetDocument",
       "assetGebruik",
@@ -1176,6 +1180,7 @@
       "zetVoorkeur",
       "zijnVrienden",
       "zorgContact",
+      "zorgMee",
       "zorgVan",
       "zorgVoor",
       "zorgZet",
@@ -1304,6 +1309,7 @@
     "office": [
       "OFFICE_CODE",
       "ankerdienst",
+      "ankerpost",
       "appUrl",
       "archief",
       "assetFeesInnen",
@@ -1893,6 +1899,7 @@
       "aiFindRoom",
       "alcoholGrensVan",
       "alpine",
+      "appbrug",
       "applyChatVertaald",
       "avBeslis",
       "avDealerInbox",
@@ -2007,6 +2014,7 @@
       "herkomst",
       "horeca",
       "horecaBord",
+      "horecaCorrectie",
       "horecaFolioBoek",
       "horecaGezelschap",
       "horecaPas",
@@ -2285,6 +2293,7 @@
       "trainingZet"
     ],
     "uitgifte": [
+      "naamAuth",
       "overheid",
       "uitgifte"
     ],

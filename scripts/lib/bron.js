@@ -87,7 +87,108 @@
 */
 'use strict';
 
+/* ============================================================================
+   HIJ MOET WETEN WELKE TAAL HIJ LEEST, en dat was de laatste blinde vlek.
+
+   Deze functie kreeg alleen een string binnen en behandelde alles als
+   JavaScript. Twee gevallen waarin dat fout is, en allebei zijn ze gemeten:
+
+     MARKUP. Buiten een <script> is `/*` geen commentaar maar tekst die een
+     bezoeker leest. Geen enkele pagina doet dat vandaag -- daarom sloeg het
+     nergens uit -- maar wie het schrijft, ziet zijn tekst verdwijnen uit elke
+     keuring die hierop leunt.
+
+     CSS. `//` is in een stylesheet geen commentaar. `url(//static.example/x.png)`
+     is een geldige verwijzing, en de uitzondering voor `http://` dekt hem niet:
+     het teken ervoor is een haakje en geen dubbele punt. Gemeten met
+     ./bronblind.js: die regel verdwijnt in zijn geheel. Geen van de 72
+     stylesheets in dit huis bevat hem vandaag.
+
+   DE STANDAARD BLIJFT JAVASCRIPT, en dat is geen luiheid maar de voorwaarde om
+   dit te kunnen doen: alle bestaande aanroepers -- elf in check.js, plus
+   keuring.js, norm.js, schakelbaar.js en ai-oproepen.js -- lezen precies
+   hetzelfde als eerst. Wie HTML of CSS leest, zegt dat erbij.
+   ========================================================================== */
+
+/* De blokken van een pagina in documentvolgorde: markup, blokinhoud, markup, ...
+   `soort` is null voor markup, 'script' of 'style' voor de inhoud van zo'n blok.
+   Een blok dat niet sluit stopt de verdeling; scripts/check.js regel 12 klaagt
+   daar al over en dit is niet de plek om dat nog eens te doen.
+
+   Hij woont HIER en niet in ./bronblind.js, waar hij vandaan komt: die proef en
+   deze verwijderaar moeten een pagina op precies dezelfde manier in stukken
+   knippen, anders bewijst de proef iets over een andere indeling dan degene die
+   gemeten wordt (LAT.md regel 4). */
+const BLOK_OPEN = /<(script|style)\b[^>]*>/gi;
+
+/* WAAR SLUIT DIT BLOK? -- en dat is niet `indexOf('</script>')`.
+
+   HTML staat witruimte toe VOOR de sluithaak: `</script >` sluit het element net
+   zo goed als `</script>`. Hier stond een letterlijke zoekactie, en die vond de
+   eerste vorm niet -- dan loopt het blok door tot de volgende sluiter of tot het
+   eind van het bestand, en wordt markup als script behandeld (of omgekeerd).
+
+   Gevonden door CodeQL op de PR van 3 september 2026 ("Bad HTML filtering
+   regexp", hoog), op scripts/inlinestijl-omzet.js. Diezelfde vorm stond op DRIE
+   plekken: daar, hier, en in scripts/schermmutatie.js. Hij staat nu een keer, en
+   de andere twee halen hem hier op (LAT.md regel 4).
+
+   Wat hij NIET probeert te zijn: een HTML-parser. Een sluittag met een attribuut
+   erin (`</script foo>`) is ongeldige HTML en die zoeken we niet; wat we zoeken
+   is de vorm die een browser WEL accepteert en wij misten. */
+function eindTag(bron, tag, vanaf) {
+  const re = new RegExp('</' + tag + '\\s*>', 'i');
+  const rest = bron.slice(vanaf);
+  const m = re.exec(rest);
+  return m ? { begin: vanaf + m.index, eind: vanaf + m.index + m[0].length } : null;
+}
+
+function stukken(bron) {
+  const uit = [];
+  let i = 0;
+  BLOK_OPEN.lastIndex = 0;
+  let m;
+  while ((m = BLOK_OPEN.exec(bron))) {
+    const na = m.index + m[0].length;
+    const dicht = eindTag(bron, m[1].toLowerCase(), na);
+    if (!dicht) break;
+    const sluit = dicht.begin;
+    uit.push({ soort: null, tekst: bron.slice(i, na) });
+    uit.push({ soort: m[1].toLowerCase(), tekst: bron.slice(na, sluit) });
+    i = sluit;
+    BLOK_OPEN.lastIndex = sluit;
+  }
+  uit.push({ soort: null, tekst: bron.slice(i) });
+  return uit;
+}
+
+/* De aanroep. `soort` is 'js' (standaard), 'css' of 'html'; `regelsHeel` is de
+   derde vorm uit de kop hierboven -- commentaar platgeslagen in plaats van
+   weggehaald, zodat regelnummers EN tekenposities kloppen.
+
+   DE TWEE OPTIES ZIJN OP DEZELFDE DAG UIT TWEE TAKKEN GEKOMEN en ze staan
+   loodrecht op elkaar: `soort` zegt WELKE tekens commentaar zijn, `regelsHeel`
+   wat er met dat commentaar gebeurt. Ze zijn hier samengevoegd en niet
+   uitgevochten; de walker eronder krijgt ze als twee losse vlaggen. */
 function zonderCommentaar(bron, opties) {
+  const soort = (opties && opties.soort) || 'js';
+  const heel = !!(opties && opties.regelsHeel);
+  if (soort === 'html') {
+    /* De markup blijft ONAANGERAAKT staan, inclusief de openende tags van de
+       blokken zelf: alleen wat ERIN staat is code van een andere taal. Met
+       `regelsHeel` klopt dat vanzelf -- onaangeraakte markup houdt zijn posities,
+       en de blokken worden platgeslagen in plaats van ingekort. */
+    return stukken(String(bron)).map(d =>
+      d.soort === 'script' ? kaal(d.tekst, true, heel)
+        : d.soort === 'style' ? kaal(d.tekst, false, heel)
+          : d.tekst).join('');
+  }
+  return kaal(String(bron), soort !== 'css', heel);
+}
+
+/* regelCommentaar: staat `//` voor commentaar? In JavaScript wel, in CSS niet.
+   heel: platslaan in plaats van weghalen (zie de aanroep hierboven). */
+function kaal(bron, regelCommentaar, heel) {
   const s = String(bron);
   const n = s.length;
   /* DE DERDE VORM, waar de kop hierboven om vroeg: dezelfde wandeling, maar het
@@ -100,7 +201,6 @@ function zonderCommentaar(bron, opties) {
      kwijtraken. scripts/lib/routes.js koos daardoor het eerste, en dat kostte 42
      routes hun bron: een voorbeeld IN een commentaarblok liet twee bestanden
      hetzelfde voorvoegsel claimen. */
-  const heel = !!(opties && opties.regelsHeel);
   const plet = (stuk) => heel ? stuk.replace(/[^\n]/g, ' ') : '';
   let uit = '';
   let i = 0;
@@ -118,7 +218,7 @@ function zonderCommentaar(bron, opties) {
     /* Regelcommentaar. De uitzonderingen komen uit de vorige versie: `http://`
        (voorafgegaan door een dubbele punt) en een `//` direct achter een quote
        of backslash zijn geen commentaar. */
-    if (c === '/' && s[i + 1] === '/') {
+    if (regelCommentaar && c === '/' && s[i + 1] === '/') {
       const voor = i > 0 ? s[i - 1] : '';
       if (voor !== ':' && voor !== '"' && voor !== "'" && voor !== '\\') {
         const nl = s.indexOf('\n', i);
@@ -177,4 +277,4 @@ function zonderTekst(bron) {
     m => m.replace(/[^\n]/g, ' '));
 }
 
-module.exports = { zonderCommentaar, zonderTekst };
+module.exports = { zonderCommentaar, zonderTekst, stukken, eindTag };

@@ -37,6 +37,11 @@
   .sec{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin:.2rem 0;}
   .leeg{color:var(--muted);font-size:.85rem;padding:.6rem 0;}
   .melding{position:fixed;left:50%;bottom:1.1rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:0;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;}
+
+  /* Uit inline style-attributen gehaald door scripts/inlinestijl-omzet.js (TAKEN.md 4.51). Bewezen gelijk met
+     scripts/inlinestijl-proef.js: elk element, elke aangeraakte eigenschap,
+     berekend in een echte browser. Letterlijk wat er stond -- geen ontwerpbesluit. */
+  .i-m3b83{margin-bottom:0.5rem}
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
 </head>
@@ -57,11 +62,11 @@
 <main id="main">
   <div class="kaart" id="briefKaart">
     <div class="sec">Snel briefen</div>
-    <div class="rij" style="margin-bottom:0.5rem;">
+    <div class="i-m3b83 rij">
       <select class="veld" id="pCat" style="flex:1;min-width:9rem;" aria-label="Discipline"></select>
     </div>
-    <input class="veld" id="pNaam" placeholder="Naam van het concept" maxlength="100" style="margin-bottom:0.5rem;">
-    <input class="veld" id="pBrief" placeholder="Brief: ligging, sfeer, gebruik" maxlength="600" style="margin-bottom:0.5rem;">
+    <input class="i-m3b83 veld" id="pNaam" placeholder="Naam van het concept" maxlength="100">
+    <input class="i-m3b83 veld" id="pBrief" placeholder="Brief: ligging, sfeer, gebruik" maxlength="600">
     <button class="knop prim" id="pMaak" style="width:100%;">Concept + AI</button>
   </div>
   <div class="chips" id="pFilters"></div>

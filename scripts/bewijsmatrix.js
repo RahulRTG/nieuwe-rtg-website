@@ -539,6 +539,26 @@ function bouw(invoer) {
            passeert alleen 'bewezen'. Hij kan een zwaardere bron nooit
            overstemmen, en een gezakt oordeel geeft hij niet: 'geen spoor' is in
            het journaal een vraag en geen defect-oordeel. */
+        /* EEN TWEEDE AUDIT-BLOK STOND HIER ONDER, en het was onbereikbaar.
+
+           Dat is geen slordigheid van een van de takken maar van de SAMENVOEGING:
+           twee takken hebben deze drie-blokken-knoop los van elkaar ontward, in
+           tegengestelde volgorde, en een unie van beide zette de knoop terug.
+           test/bewijsmatrix-audit.test.js ving het -- de toets die precies
+           daarvoor is geschreven, en die zijn werk deed op de dag dat hij het
+           moest doen.
+
+           WELKE VOLGORDE HET IS GEWORDEN, en waarom. De auditproef spreekt
+           eerst, ook als hij `gezakt` zegt en de handelingproef `bewezen`. Dat
+           is de conservatieve kant: de auditproef is voor deze vraag gebouwd en
+           telt het spoor voor en na de oproep, de handelingproef meet iets
+           anders en draagt `audit` als bijvangst. Een defect-oordeel van de
+           zware bron laten overstemmen door een bewezen van de lichte is precies
+           het stille promoveren dat PROOF.md verbiedt (bewijs mag alleen
+           groeien, degraderen is nooit stil).
+
+           De andere tak koos omgekeerd, en dat is een verdedigbare keuze -- maar
+           dan wel een die iemand moet NEMEN, niet een die uit een merge rolt. */
         const a = auditKaart && auditKaart.get(sleutel);
         if (a && a.audit === 'bewezen') { cellen[s.id] = { staat: 'bewezen', bron: 'auditproef', reden: a.reden }; continue; }
         if (a && a.audit === 'gezakt') { cellen[s.id] = { staat: 'gezakt', bron: 'auditproef', reden: a.reden }; continue; }
@@ -618,7 +638,6 @@ function bouw(invoer) {
         }
         continue;
       }
-
 
       if (s.id === 'ACL' || s.id === 'PRIVACY') {
         const beproefd = rol && rol.get(sleutel);

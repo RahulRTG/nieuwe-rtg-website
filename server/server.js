@@ -697,6 +697,10 @@ const handelingsspoor = require('./lib/handelingsspoor')({ db, save });
    dat wordt teruggevoerd. Hij schrijft zelf niets weg: een anker dat deze
    software op dezelfde schijf zet, is geen anker. Zie ./lib/ankerdienst.js. */
 const ankerdienst = require('./lib/ankerdienst').maakAnkerdienst({ db });
+/* WAAR het blok heen gaat is inmiddels wel besloten: een tweede machine binnen
+   RTG (./lib/ankerpost.js). Zonder RTG_ANKERPOST_URL doet die post niets en
+   zegt hij dat -- geen bestemming blijft "niet in bedrijf". */
+const ankerpost = require('./lib/ankerpost').maakAnkerpost({ ankerdienst });
 function securityLogKeten() {
   const lijst = (db.data && db.data.securityLog) || [];
   return Object.assign({ top: ketenTop(lijst) }, ketenVerifieer(lijst));
@@ -2101,7 +2105,7 @@ const { aiSystemPrompt, cannedAnswer, generateAiReply, convOf, memberSays, notee
     } });
 
 // De backoffice-laag draagt de AI-kern (conciergeInbox) mee, dus staat hij na maakAi.
-const { officeAuth, kluisAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, pendingVerifications } = maakKantoor({
+const { officeAuth, kluisAuth, naamAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, pendingVerifications } = maakKantoor({
   db, sessionFor, eigenaar, accounts, findSupplier, connectedSupplierCodes,
   publicSupplier, conciergeInbox, beveilig, archief, grootAantal, ledenAantal
 });
@@ -2142,14 +2146,14 @@ const kern = {
   guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, klokVan, ledenPrijs,
   eersteBijdrageFactuur, ledenInhoudVan, leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
   mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, handelsketen, agenda, notities, bestanden, bestandenOpslag, meet, galerij, klok, boeken, onderwijs, leerstof, bijles, vervolg, facturatie, factuurSaldo, markt,
-  noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, kluisAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, openVacatures, optieAan,
+  noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, kluisAuth, naamAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, openVacatures, optieAan,
   entreeCode, keyVanCodenaam, gidsHaal, gidsZoekCodenaam, gidsWeg, magBezorgen, parseRunsheetText, path, pendingVerifications, pickupCode, pinSlot, posDay, publicPartner, publicSupplier, ticketsVoorSlot,
   publicTrip, pushLive, registerContact, rememberSession, resolveSession, sessieregister, toestellen, bezitsbewijs, tweefactor, commercieel, commercieelStand, commercieelZet, ritBezetting, ritVerder, rtf,
   runItem, runKey, salonNaarVolgers, salonProfielCompleet, salonZichtbaar, salonItemsVan, ...ondernemerpoort, save, scheduleFor, schoon, sectiesForOrder, sendPush,
   sendPushToUser, sessionFor, sessions, setRoomHk, sortRunsheet, speelOpnieuw, sseBuffer, sseClients,
   sseSend, sseToCustomer, sseToOffice, sseToSupplier, stateFor, stationsForOrder, supplierAuth, supplierState, persoonsPoort,
   toRad, tokenHash, tooManyTries, totpOk, trChat, trustVan, unlockDoor, urenVan, validDept, veiligGelijk, logInlog,
-  securityLogKeten, handelingsspoor, ankerdienst,
+  securityLogKeten, handelingsspoor, ankerdienst, ankerpost,
   zorgContact, klantSalon,
   // de stemming van Rahul + de geloofslaag (kern/rahul/stemming.js, kern/geloof/)
   geloof, stemmingToon: stemming.stemmingToon, stemmingZet: stemming.stemmingZet,
@@ -2268,6 +2272,7 @@ require('./opzet/kernlaag4c')(kern, hulp);   // de drie kantoorkamers; NA 4b, wa
 require('./opzet/kernlaag5')(kern, hulp);
 require('./opzet/kernlaag5f')(kern, hulp);  // RTG Festival; hangt onder EEN naam, zie de kop daar
 require('./opzet/kernlaag6')(kern, hulp);
+require('./opzet/kernlaag6b')(kern, hulp);
 require('./opzet/kernlaag7')(kern, hulp);
 require('./opzet/kernlaag7b')(kern, hulp);   // de routers ophangen; zie de kop daar waarom dat NA alle Object.assign moet
 

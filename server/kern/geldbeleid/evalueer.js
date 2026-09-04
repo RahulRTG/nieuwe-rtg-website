@@ -14,6 +14,8 @@
    De bedragen in de gegevens-regels staan bewust in centen met de eenheid
    erbij: alleen het scherm maakt er euro's van, precies een keer. */
 
+const { NIVEAUS } = require('./regels');
+
 module.exports = (ctx) => {
   const { kijk, nu, potReserveer, save } = ctx;
 
@@ -31,7 +33,7 @@ module.exports = (ctx) => {
     const zonderCijfer = (regel, bron) => uit.push({ id: 'uz-' + regel.id, soort: regel.soort,
       titel: 'Regel niet te toetsen', centen: null,
       uitleg: 'De bron die deze regel nodig heeft, leverde geen cijfer; de regel is deze ronde niet beoordeeld.',
-      gegevens: ['beleid: ' + regel.soort, bron + ': geen cijfer'], niveau: 'kijken', actie: null });
+      gegevens: ['beleid: ' + regel.soort, bron + ': geen cijfer'], niveau: NIVEAUS.kijken, actie: null });
 
     for (const regel of rec.regels) {
       if (!regel.aan) continue;
@@ -62,24 +64,24 @@ module.exports = (ctx) => {
           uit.push({ id: 'uz-' + regel.id, soort: regel.soort, titel: 'Reservering kan niet lopen',
             centen: regel.drempelCenten, uitleg: 'De pot van deze regel bestaat niet meer; er is niets gereserveerd.',
             gegevens: ['beleid: regel ' + regel.id, 'potten: pot ' + (regel.potId || '?') + ' onbekend'],
-            niveau: 'kijken', actie: null });
+            niveau: NIVEAUS.kijken, actie: null });
           continue;
         }
         // een bereikt doel wordt niet doorgevuld: rust is de uitkomst, en het begrenst wat een regel ooit kan oormerken
         if (pot.doelCenten > 0 && pot.standCenten >= pot.doelCenten) continue;
-        if (regel.niveau === 'automatisch') {
+        if (regel.niveau === NIVEAUS.automatisch) {
           const r = potReserveer(codenaam, pot.id, regel.drempelCenten,
             { wie: 'rahul', waarom: 'maandelijkse reservering volgens regel ' + regel.id + ', door het lid vooraf op automatisch gezet' });
           if (r.ok) { regel.laatst = m; save(); }
           else uit.push({ id: 'uz-' + regel.id, soort: regel.soort, titel: 'Reservering kan niet lopen',
             centen: regel.drempelCenten, uitleg: 'De maandelijkse reservering is niet uitgevoerd: ' + r.error,
             gegevens: ['beleid: regel ' + regel.id, 'potten: ' + pot.naam + ' staat op ' + pot.standCenten + ' centen'],
-            niveau: 'kijken', actie: null });
+            niveau: NIVEAUS.kijken, actie: null });
         } else {
           uit.push({ id: 'uz-' + regel.id, soort: regel.soort,
             titel: 'Maandelijkse reservering voor ' + pot.naam, centen: regel.drempelCenten,
-            uitleg: regel.niveau === 'klaarzetten' ? 'De reservering staat klaar; met een bevestiging wordt het bedrag geoormerkt.'
-              : regel.niveau === 'voorstellen' ? 'Rahul stelt voor het maandbedrag te oormerken; de beslissing blijft bij het lid.'
+            uitleg: regel.niveau === NIVEAUS.klaarzetten ? 'De reservering staat klaar; met een bevestiging wordt het bedrag geoormerkt.'
+              : regel.niveau === NIVEAUS.voorstellen ? 'Rahul stelt voor het maandbedrag te oormerken; de beslissing blijft bij het lid.'
               : 'Het maandbedrag voor deze pot is deze maand nog niet geoormerkt.',
             gegevens: ['beleid: reserveer-maandelijks ' + regel.drempelCenten + ' centen',
               'potten: ' + pot.naam + ' staat op ' + pot.standCenten + ' van ' + pot.doelCenten + ' centen'],
@@ -89,7 +91,7 @@ module.exports = (ctx) => {
                deze klik opendoet (public/apps/geld/overzichtc.js). Wie hem
                ooit als hash naar de schil stuurt, komt op de eerste stand uit
                en denkt dat er niets gebeurde. */
-            actie: regel.niveau === 'kijken' ? null : { label: 'Reserveer nu', link: '#potten' } });
+            actie: regel.niveau === NIVEAUS.kijken ? null : { label: 'Reserveer nu', link: '#potten' } });
         }
 
       } else if (regel.soort === 'gift-bevestiging') {

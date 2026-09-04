@@ -90,7 +90,7 @@ test('een veeg zet een bestand in de prullenbak, en de weg terug haalt het eruit
       localStorage.setItem('rtg_member_token', tok);
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, reg.token);
-    await page.goto(base + '/apps/bestanden.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/bestanden.html', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#lijst .item.gb-rij', { timeout: 20000 });
     assert.equal(await page.locator('#lijst .item').count(), 2, 'beide bestanden horen op het bord te staan');
 
@@ -110,6 +110,27 @@ test('een veeg zet een bestand in de prullenbak, en de weg terug haalt het eruit
        stilte, en vlak na een veeg is het nog stil omdat de lade nog moet
        opengaan -- dan meet de regel hieronder een lade die er niet staat. */
     await page.waitForFunction(() => !!document.querySelector('#lijst .gb-lade'), null, { timeout: 15000 });
+    /* EN TOT HIJ UITGESCHOVEN IS, want ER ZIJN is niet BREED ZIJN. `.gb-lade`
+       heeft `width: var(--gb-lade)` met een transition erop, dus vlak na het
+       verschijnen is hij nog smaller dan zijn doel -- en dan puilen de knoppen
+       er per definitie uit. Deze toets zakte daar op ongeveer een op de drie
+       rondes op ("Prullenbak steekt 1.6px uit zijn lade"), en dat had niets met
+       de navigatie te maken: hij deed het met `load` net zo vaak als met
+       `domcontentloaded`. Gemeten door hem zes keer los te draaien.
+
+       Vergelijken met de doelbreedte en niet met "twee keer hetzelfde": een
+       transition die net begint staat twee frames lang op nul en zou zo als
+       rust doorgaan. */
+    await page.waitForFunction(() => {
+      const l = document.querySelector('#lijst .gb-lade');
+      if (!l) return false;
+      const st = getComputedStyle(l);
+      const doel = parseFloat(st.getPropertyValue('--gb-lade')) || 0;
+      /* `width` uit de berekende stijl en niet de bounding box: de lade staat op
+         content-box en draagt een rand van 1px, dus de box is altijd een pixel
+         breder dan zijn doel. */
+      return doel > 0 && Math.abs(parseFloat(st.width) - doel) < 0.5;
+    }, null, { timeout: 15000 });
     const uit = await page.evaluate(() => {
       const l = document.querySelector('#lijst .gb-lade');
       if (!l) return ['er staat geen open lade om te meten'];

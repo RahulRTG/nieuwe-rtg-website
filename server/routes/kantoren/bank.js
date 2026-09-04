@@ -3,6 +3,10 @@
    bank + het eigen betaalsysteem aanzet, plus de bank-gezondheid, de rekeningen,
    de rood-staan-ruimte, de spaarrente en de renteronde. Alles achter de office-
    inlog; elke schakeling komt in het auditlog. Afgesplitst uit kantoren/index.js. */
+/* Wie handelt hier: uit de canonieke envelop en niet uit req.boardroomKey
+   (TAKEN.md 4.72). Zie server/opzet/envelop.js voor waarom die lezer bestaat. */
+const { wie: envelopWie } = require('../../opzet/envelop');
+
 module.exports = (ctx) => {
   const { app, officeAuth, boardroomAuth, veilig, afdelingen, sseToOffice, kern } = ctx;
   const bank = kern.bank;
@@ -23,7 +27,7 @@ module.exports = (ctx) => {
      opschaalt staat daarom achter boardroomAuth, die req.boardroomKey levert.
      Blijft een route op de gedeelde code, dan zeggen we dat ook zo; precies wat
      routes/office/werk.js al deed. */
-  const naam = req => req.boardroomKey || 'backoffice (gedeelde code)';
+  const naam = req => envelopWie(req) || 'backoffice (gedeelde code)';
   const sync = () => sseToOffice('sync', { scope: 'bank' });
 
   // het volledige bord: regie (de knop), gezondheid en de rekeningen

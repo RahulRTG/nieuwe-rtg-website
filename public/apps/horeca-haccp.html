@@ -15,6 +15,21 @@
 <link href="/shared/ios.css" rel="stylesheet">
 <link href="/shared/workos-premium.css" rel="stylesheet">
 <link href="/shared/horeca-command.css" rel="stylesheet"><link href="/shared/horeca-enterprise-modules.css" rel="stylesheet"><script src="/shared/horeca-enterprise.js" defer></script>
+<style>
+  /* Dit scherm had geen eigen stijlblok, en dan heeft
+     scripts/inlinestijl-omzet.js nergens om zijn klassen neer te zetten: vijf
+     horeca-schermen kwamen daardoor als "omzetting mislukt" terug in plaats van
+     als bewezen of afgekeurd (TAKEN.md 4.51). */
+
+  /* Uit inline style-attributen gehaald door scripts/inlinestijl-omzet.js (TAKEN.md 4.51). Bewezen gelijk met
+     scripts/inlinestijl-proef.js: elk element, elke aangeraakte eigenschap,
+     berekend in een echte browser. Letterlijk wat er stond -- geen ontwerpbesluit. */
+  .i-12sckv{flex:0 1 9rem}
+  .i-12sbxv{flex:0 1 8rem}
+  .i-12sanw{flex:0 1 6rem}
+  .i-1trjet{flex:0 1 14rem}
+  .i-12sbaw{flex:0 1 7rem}
+</style>
 </head>
 <body class="rtg-stijl" data-rtg-eigenvlak="onyx" data-workos-premium data-workos-home="/apps/horeca.html">
 <header>
@@ -34,9 +49,9 @@
     <div class="kop">Meetpunten</div>
     <div class="rij">
       <input class="veld" id="aPuntNaam" maxlength="60" placeholder="Koeling 1, vriezer, bain-marie" aria-label="Naam van het meetpunt">
-      <input class="veld" id="aMin" type="number" step="0.1" placeholder="Min" aria-label="Ondergrens" style="flex:0 1 6rem;">
-      <input class="veld" id="aMax" type="number" step="0.1" placeholder="Max" aria-label="Bovengrens" style="flex:0 1 6rem;">
-      <input class="veld" id="aFrequentie" maxlength="30" value="dagelijks" aria-label="Frequentie" style="flex:0 1 8rem;">
+      <input class="i-12sanw veld" id="aMin" type="number" step="0.1" placeholder="Min" aria-label="Ondergrens">
+      <input class="i-12sanw veld" id="aMax" type="number" step="0.1" placeholder="Max" aria-label="Bovengrens">
+      <input class="i-12sbxv veld" id="aFrequentie" maxlength="30" value="dagelijks" aria-label="Frequentie">
       <button class="knop p" id="aPuntZet" type="button">Meetpunt erbij</button>
     </div>
     <p class="stil h-mt40">Zonder grens is een meting geen controle; daarom weigert de server een meetpunt zonder onder- of bovengrens.</p>
@@ -45,8 +60,8 @@
   <div class="kaart">
     <div class="kop">Meting</div>
     <div class="rij">
-      <select class="veld" id="aPunt" aria-label="Meetpunt" style="flex:0 1 14rem;"></select>
-      <input class="veld" id="aWaarde" type="number" step="0.1" placeholder="Waarde" aria-label="Gemeten waarde" style="flex:0 1 7rem;">
+      <select class="i-1trjet veld" id="aPunt" aria-label="Meetpunt"></select>
+      <input class="i-12sbaw veld" id="aWaarde" type="number" step="0.1" placeholder="Waarde" aria-label="Gemeten waarde">
       <input class="veld" id="aActie" maxlength="200" placeholder="Actie (verplicht bij een afwijking)" aria-label="Genomen actie">
       <button class="knop p" id="aMeting" type="button">Vastleggen</button>
     </div>
@@ -57,14 +72,14 @@
   <div class="kaart">
     <div class="kop">Logboek</div>
     <div class="rij">
-      <input class="veld" id="aVan" maxlength="10" placeholder="Van" aria-label="Van datum" style="flex:0 1 9rem;">
-      <input class="veld" id="aTot" maxlength="10" placeholder="Tot" aria-label="Tot datum" style="flex:0 1 9rem;">
+      <input class="i-12sckv veld" id="aVan" maxlength="10" placeholder="Van" aria-label="Van datum">
+      <input class="i-12sckv veld" id="aTot" maxlength="10" placeholder="Tot" aria-label="Tot datum">
       <button class="knop" id="aToon" type="button">Toon</button>
     </div>
     <div class="h-mt60" id="aLog"></div>
     <div class="rij h-mt60">
-      <input class="veld" id="aCorId" maxlength="10" placeholder="Meting" aria-label="Meting om te corrigeren" style="flex:0 1 7rem;">
-      <input class="veld" id="aCorWaarde" type="number" step="0.1" placeholder="Juiste waarde" aria-label="Juiste waarde" style="flex:0 1 9rem;">
+      <input class="i-12sbaw veld" id="aCorId" maxlength="10" placeholder="Meting" aria-label="Meting om te corrigeren">
+      <input class="i-12sckv veld" id="aCorWaarde" type="number" step="0.1" placeholder="Juiste waarde" aria-label="Juiste waarde">
       <input class="veld" id="aCorReden" maxlength="160" placeholder="Waarom" aria-label="Reden van de correctie">
       <button class="knop" id="aCorrigeer" type="button">Corrigeren</button>
     </div>
@@ -76,10 +91,10 @@
     <div id="bBatches"></div>
     <div class="rij h-mt60">
       <input class="veld" id="bNaam" maxlength="60" placeholder="Product" aria-label="Product">
-      <input class="veld" id="bTht" maxlength="10" placeholder="THT" aria-label="Houdbaarheidsdatum" style="flex:0 1 9rem;">
-      <input class="veld" id="bBatchNr" maxlength="40" placeholder="Batchnummer" aria-label="Batchnummer" style="flex:0 1 9rem;">
-      <input class="veld" id="bLeverancier" maxlength="60" placeholder="Leverancier" aria-label="Leverancier" style="flex:0 1 9rem;">
-      <input class="veld" id="bHoeveel" maxlength="20" placeholder="Hoeveelheid" aria-label="Hoeveelheid" style="flex:0 1 8rem;">
+      <input class="i-12sckv veld" id="bTht" maxlength="10" placeholder="THT" aria-label="Houdbaarheidsdatum">
+      <input class="i-12sckv veld" id="bBatchNr" maxlength="40" placeholder="Batchnummer" aria-label="Batchnummer">
+      <input class="i-12sckv veld" id="bLeverancier" maxlength="60" placeholder="Leverancier" aria-label="Leverancier">
+      <input class="i-12sbxv veld" id="bHoeveel" maxlength="20" placeholder="Hoeveelheid" aria-label="Hoeveelheid">
       <button class="knop p" id="bBatchZet" type="button">Batch erbij</button>
     </div>
     <div class="rij h-mt60">
@@ -92,7 +107,7 @@
     <div class="kop">Controlelijsten</div>
     <div class="rij">
       <input class="veld" id="bLijstNaam" maxlength="60" placeholder="Naam van de lijst" aria-label="Naam van de controlelijst">
-      <select class="veld" id="bMoment" aria-label="Moment" style="flex:0 1 8rem;">
+      <select class="i-12sbxv veld" id="bMoment" aria-label="Moment">
         <option value="opening">Opening</option><option value="sluiting">Sluiting</option>
         <option value="levering">Levering</option><option value="wekelijks">Wekelijks</option>
       </select>
@@ -102,7 +117,7 @@
       <textarea class="veld" id="bLijstVragen" rows="3" maxlength="1200" placeholder="Een vraag per regel" aria-label="Vragen, een per regel"></textarea>
     </div>
     <div class="rij h-mt60">
-      <select class="veld" id="bLijstKeuze" aria-label="Welke lijst afvinken" style="flex:0 1 14rem;"></select>
+      <select class="i-1trjet veld" id="bLijstKeuze" aria-label="Welke lijst afvinken"></select>
       <button class="knop p" id="bAfvinken" type="button">Afvinken</button>
     </div>
     <div class="h-mt50" id="bVragen"></div>

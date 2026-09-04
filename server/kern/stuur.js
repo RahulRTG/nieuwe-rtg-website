@@ -18,8 +18,7 @@
 const MAX_BODY = 30000;   // een actie-body hoeft nooit groter dan dit
 const TIMEOUT_MS = 15000; // een interne aanroep die langer duurt is stuk
 const INTERNE_GOEDKEURING = Symbol('stuur-goedgekeurd');
-const beleid = require('./stuur/beleid');
-const { beleidVoor, toegestanePaden } = beleid;
+const { beleidVoor, toegestanePaden, NIVEAUS } = require('./stuur/beleid');
 
 // infrastructuur waar het stuur nooit aan zit, wie er ook vraagt
 const VERBODEN = [
@@ -102,9 +101,9 @@ function maakStuur({ log, anthropic, app, crypto, isolatie }) {
     try { tekst = JSON.stringify(body == null ? {} : body); } catch (e) { return { status: 400, error: 'De body moet JSON zijn.' }; }
     if (tekst.length > MAX_BODY) return { status: 413, error: 'De actie-body is te groot.' };
     const beleid = beleidVoor(pad, o.wereld);
-    if (beleid.niveau === 'verboden')
+    if (beleid.niveau === NIVEAUS.verboden)
       return { status: 403, error: beleid.reden || 'Deze actie is niet beschikbaar voor het AI-stuur.' };
-    if (beleid.niveau === 'voorstel' && o.goedgekeurd !== INTERNE_GOEDKEURING)
+    if (beleid.niveau === NIVEAUS.voorstel && o.goedgekeurd !== INTERNE_GOEDKEURING)
       return { status: 428, bevestigNodig: true, menselijkAkkoord: true, pad,
         vraag: 'Deze actie verandert gegevens of heeft externe gevolgen. Controleer het voorstel en bevestig het zelf.' };
     return null;

@@ -21,6 +21,14 @@ const regexVeilig = (waarde) => String(waarde).replace(/[.*+?^${}()|[\]\\]/g, '\
 const { zonderCommentaar, zonderTekst } = require('./lib/bron');
 const { paginaDraagt } = require('./lib/hulpcss');
 
+/* EEN BESTAND LEZEN MET DE JUISTE TAAL (TAKEN.md 4.48). Drie keuringen hieronder
+   lopen over .html en kregen die pagina als JAVASCRIPT te lezen -- en dan is
+   `/*` in markuptekst geen tekst maar een commentaar dat vooruit eet. De soort
+   volgt hier uit de extensie, op EEN plek, zodat de volgende keuring die over
+   pagina's loopt hem niet opnieuw hoeft te bedenken. */
+const kaalBron = (f) => zonderCommentaar(fs.readFileSync(f, 'utf8'),
+  { soort: f.endsWith('.html') ? 'html' : f.endsWith('.css') ? 'css' : 'js' });
+
 function loop(dir, filter, fn) {
   for (const naam of fs.readdirSync(dir)) {
     const vol = path.join(dir, naam);
@@ -504,30 +512,31 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
     'server/opzet/leverancierpoort.js',
     'public/apps/app-main/app-main-09a.js',
     'public/shared/teamcall/teamcall-01.js',
-    /* DRIE UIT DE IDEM- EN UITROLRONDE. Ze staan hier en niet in MAG, want bij
-       alle drie is de naad aan te wijzen -- en een naad die je kunt benoemen
-       hoort geknipt te worden, niet vrijgesteld.
+    /* DRIE UIT DE IDEM- EN UITROLRONDE, en op 3 september 2026 zijn ze alle drie
+       geknipt op de naad die hier stond (TAKEN.md 5.57). Twee zijn daarmee van
+       deze lijst af:
 
-         server/lib/idem-poort.js          11,3 KB / 4,1 KB code
-           de bewaarkast IS eruit (./idem-kast.js, 4,3 KB): de ring, het venster
-           en de regel dat alleen een geslaagd antwoord erin mag, staan nu los
-           en zonder een enkel begrip uit het web erin. Wat hier over is, is het
-           http-deel -- en dat ligt nog boven de maat. De volgende naad is de
-           SLEUTELBEPALING (welke sleutel geldt, en van wie) los van wat de
-           poort met een herhaling doet.
+         server/lib/idem-poort.js          13,8 -> 9,1 KB
+           de SLEUTELBEPALING is eruit (./idem-sleutelbepaling.js): welke sleutel
+           geldt en van wie, los van wat de poort met een herhaling doet.
+         server/functies/register/index.js 15,0 -> 6,0 KB
+           de FASES-ladder is eruit (./fases.js), met de drie controles MEE --
+           die binden de ladder aan het register, en achterblijven zou de ladder
+           stil naast het register laten staan. Ze draaien nu bij het bouwen:
+           het register geeft zijn OP_ID mee.
 
-         server/kern/command/uitrolregie.js  12,7 KB / 7,6 KB code
-           naad: het METEN (5xx over al het verkeer sinds de sport) los van het
-           BESLUIT (klimmen, zakken, wachten op een mens). Nu deelt het een
-           bestand omdat het meten er ooit bij hoorde.
+       De derde is geknipt en staat er nog:
 
-         server/functies/register/index.js  12,8 KB / 5,8 KB code
-           naad: de FASES-ladder los van het register zelf. Ze hangen aan elkaar
-           via een controle bij het laden, en die controle hoort mee te
-           verhuizen -- anders valt de ladder stil naast het register. */
-    'server/lib/idem-poort.js',
+         server/kern/command/uitrolregie.js  13,0 -> 10,1 KB
+           het METEN is eruit (./uitrolmeting.js), met de drie keuzes uit de kop
+           mee -- een reden die achterblijft bij een bestand dat de code niet
+           meer draagt, leest niemand meer. Wat er nu nog over de grens staat is
+           geen tweede naad maar 113 bytes; de volgende echte naad is het BEELD
+           (`stand()`, wat de bediener ziet) los van de BEDIENING (zet, klim,
+           pauze, bevestig). Die is bewust NIET geknipt om een teller te halen:
+           `stand()` heeft zes stukken bedrading nodig, en dat is een duurdere
+           naad dan de winst. */
     'server/kern/command/uitrolregie.js',
-    'server/functies/register/index.js',
     /* Drie van de vier NOG-gevallen uit de samenvoeging van 24 augustus
        (state.js, functieschakelaars.js, poortwachters.js) staan er niet meer:
        op 26 augustus zijn ze onder de grens teruggebracht door het proza in te
@@ -1399,7 +1408,7 @@ console.log('\n22) een glyfnaam wordt getoond als beeld, niet als woord');
     let isBundel = false;
     try { isBundel = new Set(Object.keys(require('./bundel').bundels).map(k => 'public/' + k)).has(rel); } catch (e) { /* geen bundellijst */ }
     if (isBundel) return;
-    const bron = zonderCommentaar(fs.readFileSync(f, 'utf8'));
+    const bron = kaalBron(f);
     const treffers = [...bron.matchAll(/\+\s*(?:esc\()?\s*(\w+)\.icon\b\)?\s*\+/g)];
     if (!treffers.length) return;
     plekken += treffers.length;
@@ -1867,8 +1876,16 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
        Een gedeelde backoffice-code komt er niet door, want wat erachter gebeurt
        komt in het inzagejournaal en daar hoort een mens bij. Hij staat hier als
        eigen naam en niet als variant van officeAuth: dat is precies het
-       onderscheid dat deze regel zichtbaar hoort te maken. */
-    'kluisAuth', 'techAuth', 'boardroomAuth',
+       onderscheid dat deze regel zichtbaar hoort te maken.
+
+       `naamAuth` is DEZELFDE poort met een andere reden (TAKEN.md 4.73): hij
+       hangt op de vier-ogen-uitgifte, waar de ondertekenaar uit de body kwam --
+       zelfgetypte tekst onder een handtekening. Ook hij staat hier als eigen
+       naam, en dat is niet cosmetisch: toen de gedeelde implementatie eenmalig
+       een gedeelde naam kreeg, vielen beide deuren in de registers samen en
+       gingen acht routes rood. Een gedeelde implementatie mag geen gedeelde
+       identiteit worden. */
+    'kluisAuth', 'naamAuth', 'techAuth', 'boardroomAuth',
     'huisAuth', 'baasAuth', 'lid', 'geenGast', 'eigenaarAlleen', 'meetpoort', 'gastAuth',
     /* de gezinsdeur van het RTFoundation-huis (gezinscode + profieltoken, gasten
        erbuiten). Stond eerst als aanroep BINNEN de handler; is middleware geworden
@@ -2167,7 +2184,7 @@ console.log('\n29) de Authorization-kop wordt gelezen om een token te halen, nie
       'tokenUit() HAALT alleen het token uit het verzoek; de aanroepers verifieren het (profielVan zoekt het op in de profielen van dat gezin). Een extractor is geen beslissing.'],
     ["server/kern/stuur.js|const auth = req.get && req.get('authorization');",
       'geeft de kop ONGEWIJZIGD door aan een interne dienst op 127.0.0.1, die zelf verifieert. Hier wordt niets besloten.'],
-    ["server/lib/idem-poort.js|const auth = (typeof req.get === 'function' && req.get('authorization')) || '';",
+    ["server/lib/idem-sleutelbepaling.js|const auth = (typeof req.get === 'function' && req.get('authorization')) || '';",
       'hasht de kop tot een SCOPE en beslist er niets mee: de idem-poort verleent geen toegang, hij zorgt ' +
       'alleen dat twee afzenders nooit dezelfde opslagsleutel delen. De echte authenticatie staat achter de ' +
       'poort, en alleen een 2xx gaat de kast in -- een verzonnen kop levert dus nooit een bewaard antwoord op.'],
@@ -2340,7 +2357,7 @@ console.log('\n33) tekst wordt niet in een kader geperst');
   let geperst = 0;
   loop(path.join(ROOT, 'public'), /\.(js|html|svg)$/, f => {
     // commentaar eruit: een uitleg WAAROM dit niet mag, mag zelf geen alarm geven
-    const bron = zonderCommentaar(fs.readFileSync(f, 'utf8')).replace(/<!--[\s\S]*?-->/g, ' ');
+    const bron = kaalBron(f).replace(/<!--[\s\S]*?-->/g, ' ');
     if (!/spacingAndGlyphs/.test(bron)) return;
     geperst++;
     fout('spacingAndGlyphs in ' + path.relative(ROOT, f) +
@@ -3430,12 +3447,25 @@ console.log('\n48) bewijsgroen en go-live-groen blijven uit elkaar');
    OPEN, en dat is de eerlijke stand en geen slordigheid:
 
      live gesprek (6)    Een <track> kan niet bestaan voor beeld dat nu ontstaat.
-                         Wat een dove deelnemer hier nodig heeft is live tekst
-                         (spraak-naar-tekst tijdens het gesprek), en die bestaat
-                         in dit huis niet. WCAG 1.2.2 gaat hier niet over; 1.2.4
-                         wel, en die is niet gehaald.
-     live uitzending (2) Zelfde verhaal, eenrichting: het Podium en het SOS-beeld
-                         naar het kantoor.
+                         Er is sinds 2 september 2026 WEL spraak-naar-tekst
+                         (shared/spraaktekst.js, in de meeleesbaan van alle zes),
+                         maar hij staat uit tot een deelnemer hem zelf aanzet en
+                         hij transcribeert alleen de EIGEN microfoon. Zet de
+                         ander hem niet aan, dan is er van diens spraak nog geen
+                         tekst. WCAG 1.2.2 gaat hier niet over; 1.2.4 wel, en die
+                         vraagt ondertiteling die er IS -- niet een die van de
+                         goede wil van de gesprekspartner afhangt. Dus blijven ze
+                         open, en dat is het punt van dit register.
+     live uitzending (2) Zelfde verhaal, eenrichting. Het Podium: de uitzender
+                         kan zijn eigen spraak in de kanaalchat laten lopen
+                         ('Live tekst'), maar doet hij dat niet, dan is er niets.
+                         Het SOS-beeld is de enige van de acht waar het NIET om
+                         een tik vraagt -- het lid heeft bij het veiligheids-
+                         contract al toestemming gegeven voor beeld en geluid, en
+                         een noodscherm is geen plek voor een tweede tik. Ook die
+                         blijft open: hij hangt aan een browser die de Web Speech
+                         API heeft, en dat is geen voorziening waar je op kunt
+                         rekenen.
      opgenomen (0)       Dit waren er drie. Het Theater en de filmspeler van de
                          Media OS hadden geen veld voor ondertitels in het model;
                          dat veld is er nu (kern/ondertitels.js, dezelfde bron als
@@ -3580,7 +3610,7 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
   const REGISTER = new Map([
     ['public/apps/app.html#csRemote', ['gesprek', 'het beeld en geluid van de ander in een videogesprek tussen twee leden', ['public/apps/app-main.js', 'RTGMeelezen'], ['public/apps/app.html', 'meeluister.js']]],
     ['public/apps/app.html#csLocal', ['spiegel', 'je eigen beeld in de hoek van dat gesprek; stil, want jezelf terughoren is een echo']],
-    ['public/apps/backoffice.html#ontLiveVid', ['uitzending', 'SOS: het kantoor kijkt live mee met de camera van een lid, met geluid erbij. GEEN tekstbaan, en dat is de eerlijke stand: wie doof is kan geen SOS-dienst draaien. Een noodscherm is niet de plek om er een even bij te zetten -- dat is een besluit, zie TOEGANKELIJK.md']],
+    ['public/apps/backoffice.html#ontLiveVid', ['uitzending', 'SOS: het kantoor kijkt live mee met de camera van een lid, met geluid erbij. Er loopt WEL een tekstbaan mee (#ontLiveTekst): het toestel van het lid zet zijn eigen stem om naar tekst en stuurt de regels langs hetzelfde seinkanaal, zonder tweede tik -- de toestemming voor beeld en geluid staat al in het veiligheidscontract. Blijft OPEN: het hangt aan een browser die de Web Speech API heeft, en dat is geen ondertiteling waar je op kunt rekenen', ['public/apps/backoffice.js', 'ontLiveTekst']]],
     ['public/apps/camera.html#beeld', ['spiegel', 'de camera-app: je eigen beeld om een foto te maken, zonder geluid']],
     ['public/apps/clips.html#studioDoek', ['spiegel', 'het opnamedoek van de clipstudio: je eigen beeld voordat de opname loopt']],
     ['public/apps/clips.html#js1', ['ondertiteld', 'de clip in de feed; de gedeelde clipdeler zet de ondertitelband van de maker eroverheen', CLIPBAND]],
@@ -3604,7 +3634,7 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
     ['public/apps/meet/kamer.js#1', ['gesprek', 'de vergaderkamer: een tegel per deelnemer, en de eigen tegel krijgt muted', ['public/apps/meet/kamer.js', 'RTGMeelezen'], ['public/apps/meet.html', 'meeluister.js']]],
     ['public/apps/memo/app.js#1', ['ondertiteld', 'een eigen spraakmemo; het toestel maakt er een transcript bij dat in de lijst staat en samen te vatten is', ['public/apps/memo/app.js', 'transcript']]],
     ['public/apps/oog.html#cam', ['werktuig', 'het oog schouwt een voertuig of werkvloer: beeldanalyse, geen geluid']],
-    ['public/apps/podium.html#kijkVideo', ['uitzending', 'een live uitzending van het Podium; srcObject is er altijd een stroom, nooit een bestand. Er loopt WEL een tekstbaan mee: de kanaalchat (#chatKijk, aria-live), waarin de uitzender kan meeschrijven -- geen ondertiteling, wel een weg naar tekst', ['public/apps/podium.html', 'chatKijk']]],
+    ['public/apps/podium.html#kijkVideo', ['uitzending', 'een live uitzending van het Podium; srcObject is er altijd een stroom, nooit een bestand. Er loopt WEL een tekstbaan mee: de kanaalchat (#chatKijk, aria-live), waarin de uitzender meeschrijft of zijn eigen spraak laat omzetten met de knop Live tekst (#studioSpraak) -- geen ondertiteling waar je op kunt rekenen, wel een weg naar tekst', ['public/apps/podium.html', 'studioSpraak']]],
     ['public/apps/podium.html#studioVideo', ['spiegel', 'het eigen beeld van de uitzender, voor en tijdens het uitzenden']],
     ['public/apps/scanner.html#beeld', ['werktuig', 'de documentscanner leest papier: beeld als invoer']],
     ['public/apps/theater.html#doekVideo', ['ondertiteld', 'de bioscoop van het Theater: de maker schrijft de ondertitels bij zijn eigen video, en de kijker krijgt ze mee met de zaal', ['server/kern/theater/video.js', 'videoOndertitels']]],
@@ -3623,7 +3653,7 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
   loop(path.join(ROOT, 'public'), /\.(html|js)$/, (f) => {
     const rel = path.relative(ROOT, f).replace(/\\/g, '/');
     if (bundelPaden.has(rel)) return;
-    const bron = zonderCommentaar(fs.readFileSync(f, 'utf8'));
+    const bron = kaalBron(f);
     let m, n = 0, jsN = 0;
     const tag = /<(video|audio)(\s[^>]*)?>/gi;
     while ((m = tag.exec(bron))) {
@@ -5151,6 +5181,167 @@ console.log('\n65) elke servicebevoegdheid die het lid bevestigt, wordt ergens u
       }
     }
   } catch (e) { fout('de servicecap-meting kon niet draaien: ' + e.message); }
+}
+
+/* ============================================================================
+   66) EEN PAGINA DIE EEN GEDEELDE MODULE GEBRUIKT, LAADT HEM OOK
+
+   WAAR DIT UIT KOMT, en het is geen theorie. Bij het aansluiten van
+   spraak-naar-tekst (TAKEN.md 4.31) bleek shared/teamcall.js netjes
+   `w.RTGMeelezen` aan te roepen -- en personeel.html en leverancier.html laadden
+   shared/meelezen.js NERGENS. De tekstbaan van de teamcall bestond dus niet, op
+   geen van beide schermen, terwijl regel 49 hem als geregeld in zijn register
+   had staan.
+
+   Waarom regel 49 dat niet zag: zijn anker controleert of de NAAM in het
+   genoemde bestand staat. Dat is de goede tand voor "is de weg naar tekst er
+   nog uitgehaald", en de verkeerde voor "komt hij ooit aan". `if (w.RTGMeelezen)`
+   is bovendien precies de vorm die niets kapotmaakt als hij er niet is: geen
+   fout, geen log, alleen een baan die nooit verschijnt -- LAT.md regel 5.
+
+   Regel 38 doet dit al voor RTGMedia, met zoveel woorden ("de pagina die de
+   module ook echt binnenhaalt"). Deze regel maakt daar een lijst van in plaats
+   van een uitzondering, zodat de volgende gedeelde module er niet buiten valt.
+
+   WAT HIJ NIET ZIET: een module die pas na een tik wordt bijgeladen. Die vorm
+   komt hier vandaag niet voor; komt hij er, dan meldt deze regel hem als
+   ontbrekend en dat is de goede kant om fout te staan. */
+console.log('\n66) een pagina die een gedeelde module gebruikt, laadt hem ook');
+{
+  /* De globals die uit een eigen bestand komen. Elk paar: de naam op window, en
+     het bestand dat hem zet. Wie er een toevoegt, voegt hem hier toe. */
+  /* De lijst had er twee. `RTGSpraakTekst` is er bij de samenvoeging van 3
+     september 2026 uit: main had 4.31 op de SERVER gebouwd (kern/spraaktekst.js
+     met een lokaal model) en verbiedt in de kop van shared/meelezen.js met
+     zoveel woorden de Web Speech API -- die stuurt het geluid van het gesprek
+     naar de browserleverancier. Deze tak had de browserkant gebouwd; die is
+     ingetrokken en niet naast main's laag gezet. */
+  const MODULES = [
+    ['RTGMeelezen', '/shared/meelezen.js']
+  ];
+  const PUB = path.join(ROOT, 'public');
+  const web = (p) => '/' + path.relative(PUB, p).split(path.sep).join('/');
+  const lees = (f) => { try { return fs.readFileSync(f, 'utf8'); } catch (e) { return ''; } };
+
+  const stuk = MODULES.filter(([naam, bestand]) =>
+    !lees(path.join(PUB, bestand.slice(1))).includes(naam));
+  if (stuk.length) {
+    /* De zelfijking: zet de module de global niet meer, dan meet alles hieronder
+       niets. Dan hoort deze regel te zakken en niet netjes 0 te melden. */
+    stuk.forEach(([naam, bestand]) => fout(bestand + ' zet ' + naam + ' niet meer; deze regel meet dan niets'));
+  } else {
+    const paginas = [];
+    loop(PUB, /\.html$/, f => { if (!web(f).startsWith('/dist/')) paginas.push(f); });
+    let mis = 0, met = 0;
+    for (const pag of paginas) {
+      const bron = lees(pag);
+      /* De scripts die deze pagina laadt, plus de delen van een bundel. */
+      const srcs = [...bron.matchAll(/<script[^>]*src="(\/[^"]+\.js)"/g)].map(m => m[1]);
+      const geladen = new Set(srcs);
+      const code = [bron];
+      for (const src of srcs) {
+        const f = path.join(PUB, src.slice(1));
+        code.push(lees(f));
+        const delen = f.replace(/\.js$/, '');
+        let namen = []; try { namen = fs.readdirSync(delen); } catch (e) { namen = []; }
+        for (const n of namen) if (n.endsWith('.js')) code.push(lees(path.join(delen, n)));
+      }
+      for (const [naam, bestand] of MODULES) {
+        if (geladen.has(bestand)) continue;
+        /* GEBRUIKT betekent: de naam staat er, en niet alleen in een commentaar
+           of in de module zelf. Vandaar zonderCommentaar en het overslaan van
+           het eigen bestand hierboven. */
+        if (!code.some(c => new RegExp('\\b' + naam + '\\b').test(zonderCommentaar(c)))) continue;
+        met++;
+        mis++;
+        fout(web(pag) + ' gebruikt ' + naam + ' maar laadt ' + bestand + ' niet -- ' +
+          'de vorm `if (window.' + naam + ')` breekt dan niets en doet ook niets');
+      }
+    }
+    if (!mis) {
+      let gebruik = 0;
+      for (const pag of paginas) {
+        const bron = lees(pag);
+        for (const [, bestand] of MODULES) if (bron.includes('src="' + bestand + '"')) gebruik++;
+      }
+      ok(gebruik + ' pagina-koppelingen naar ' + MODULES.length + ' gedeelde modules, en geen enkele pagina ' +
+        'gebruikt er een die zij niet laadt');
+    }
+  }
+}
+
+/* ============================================================================
+   67) ELK `npm run X` IN EEN DOCUMENT BESTAAT OOK ECHT
+
+   WAAR DIT UIT KOMT. TAKEN.md 4.71 zei "Gemeten en geratelde stand in
+   ENVELOP.json (`npm run envelop:velden`)" -- en dat commando bestond niet. Het
+   getal werd door geen script berekend en door geen toets gecontroleerd; het
+   was met de hand getypt, en het VERZONNEN COMMANDO maakte dat erger. Wie het
+   wilde narekenen kreeg "Missing script" en concludeerde dat hij zelf iets fout
+   deed, niet dat het getal nergens vandaan kwam.
+
+   Het nalopen van alle documenten hierop (3 september 2026) vond er nog twee,
+   allebei in een RUNBOOK: `npm run productie:installeer` en
+   `npm run sleutels:bestand`. Dat is de duurste plek waar dit kan staan -- een
+   runbook wordt gelezen door iemand die onder druk een productiestap doet, en
+   die krijgt dan een foutmelding in plaats van een sleutelbestand.
+
+   DE REGEL IS DUS KLEIN EN HARD: staat er `npm run X` in een .md in de wortel,
+   dan staat X in package.json. Meer niet. Een document dat een commando belooft
+   dat niet bestaat, is een belofte in tekst zonder handhaver (LAT.md regel 6) in
+   de meest letterlijke vorm die er is.
+
+   WAT HIJ NIET ZIET: een commando dat WEL bestaat maar iets anders doet dan het
+   document belooft. Dat is een inhoudelijke vraag en geen bestaanscontrole.
+
+   EN WAT HIJ NIET KAN ONDERSCHEIDEN: een document dat een commando AANRAADT van
+   een document dat over een verdwenen commando SCHRIJFT. Dat is meteen gebeurd:
+   het eerlijkheidspunt dat deze regel oplevert noemde de twee dode namen als
+   voorbeeld, en werd er zelf op afgekeurd. De uitweg is niet een uitzonderings-
+   lijst maar de schrijfwijze -- noem zo'n naam zonder `npm run` ervoor, dan
+   leest hij als een naam en niet als een instructie. Een uitzonderingslijst zou
+   hier precies het gat maken dat de regel dicht. */
+console.log('\n67) elk `npm run X` in een document bestaat ook echt');
+{
+  const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8'));
+  const scripts = pkg.scripts || {};
+  if (!Object.keys(scripts).length) {
+    fout('package.json heeft geen scripts; dan meet deze regel niets');
+  } else {
+    const docs = fs.readdirSync(ROOT).filter(n => n.endsWith('.md'));
+    let gezien = 0, mis = 0;
+    for (const d of docs) {
+      let bron; try { bron = fs.readFileSync(path.join(ROOT, d), 'utf8'); } catch (e) { continue; }
+      for (const regel of bron.split('\n')) {
+        /* EEN COMMANDO IN DE EIS-KOLOM VAN EEN OPEN TAAK IS EEN BELOFTE EN GEEN
+           VERWIJZING, en dat onderscheid is bij de samenvoeging van 3 september
+           2026 gemeten in plaats van bedacht: TAKEN.md 7.4 vraagt met zoveel
+           woorden dat `npm run pariteit` per register de afstand tot de
+           productiestand noemt -- dat script MOET er komen, en dat is precies
+           het tegenovergestelde van een dode verwijzing.
+
+           Mechanisch te scheiden: het staat in de LAATSTE kolom van een rij die
+           niet is doorgestreept. Wie een commando in de beschrijving noemt of in
+           een afgeronde rij, verwijst; wie het in de eis van een open rij noemt,
+           belooft. Een uitzonderingslijst op naam zou hier makkelijker zijn en
+           precies verkeerd: dan verdwijnt de volgende dode verwijzing erin. */
+        let stuk = regel;
+        if (/^\|/.test(regel) && !/^\|\s*~~/.test(regel)) {
+          const kolommen = regel.split('|');
+          if (kolommen.length > 3) stuk = kolommen.slice(0, -2).join('|');
+        }
+        for (const m of stuk.matchAll(/npm run ([a-z0-9:_-]+)/g)) {
+          gezien++;
+          if (!scripts[m[1]]) {
+            mis++;
+            fout(d + ' noemt `npm run ' + m[1] + '` en dat script bestaat niet -- ' +
+              'wie het probeert krijgt "Missing script" en denkt dat hij zelf iets fout doet');
+          }
+        }
+      }
+    }
+    if (!mis) ok(gezien + ' verwijzingen naar `npm run ...` in ' + docs.length + ' documenten, allemaal bestaand');
+  }
 }
 
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');

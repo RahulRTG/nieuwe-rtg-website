@@ -44,6 +44,13 @@
   .chat .ik{align-self:flex-end;border-color:var(--gold);}
   .code-hoofdletters{text-transform:uppercase;}
   .demo-hint{margin-top:0.6rem;}
+
+  /* Uit inline style-attributen gehaald door scripts/inlinestijl-omzet.js (TAKEN.md 4.51). Bewezen gelijk met
+     scripts/inlinestijl-proef.js: elk element, elke aangeraakte eigenschap,
+     berekend in een echte browser. Letterlijk wat er stond -- geen ontwerpbesluit. */
+  .i-1v3d95{max-width:8rem}
+  .i-1v3bz6{max-width:6rem}
+  .i-1v3dw5{max-width:9rem}
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>
@@ -67,7 +74,7 @@
       </div>
       <div class="rij rtg-duimeind" id="lWieRij" hidden>
         <select id="lWie" aria-label="Wie bent u"></select>
-        <input class="veld" id="lPin" type="password" inputmode="numeric" placeholder="PIN" maxlength="8" style="max-width:6rem;">
+        <input class="i-1v3bz6 veld" id="lPin" type="password" inputmode="numeric" placeholder="PIN" maxlength="8">
         <button class="knop" id="lIn" type="button" data-hoofdactie>Meld aan</button>
       </div>
       <p class="stil h-mt50" id="lFout" aria-live="polite"></p>
@@ -86,8 +93,8 @@
       <div id="eenheden"></div>
       <div class="rij" id="rEenheid">
         <input class="veld" id="eNaam" placeholder="Naam eenheid" maxlength="60">
-        <input class="veld" id="eSoort" placeholder="Soort" maxlength="30" style="max-width:8rem;">
-        <input class="veld" id="eSterkte" type="number" min="0" placeholder="Sterkte" style="max-width:6rem;">
+        <input class="i-1v3d95 veld" id="eSoort" placeholder="Soort" maxlength="30">
+        <input class="i-1v3bz6 veld" id="eSterkte" type="number" min="0" placeholder="Sterkte">
         <button class="knop klein" id="eMaak" type="button">Voeg toe</button>
       </div>
     </div>
@@ -108,7 +115,7 @@
       <div class="rij">
         <select id="bSoort" aria-label="Soort"><option value="brandstof">Brandstof</option><option value="rantsoenen">Rantsoenen</option><option value="onderdelen">Onderdelen</option><option value="medisch">Medisch</option><option value="verbinding">Verbinding</option><option value="overig">Overig</option></select>
         <input class="veld" id="bWat" placeholder="Wat is er nodig?" maxlength="120">
-        <input class="veld" id="bAantal" placeholder="Aantal" maxlength="40" style="max-width:6rem;">
+        <input class="i-1v3bz6 veld" id="bAantal" placeholder="Aantal" maxlength="40">
         <select id="bPrio" aria-label="Prioriteit"><option value="hoog">Hoog</option><option value="normaal" selected>Normaal</option><option value="laag">Laag</option></select>
         <button class="knop klein" id="bMaak" type="button">Vraag aan</button>
       </div>
@@ -119,8 +126,8 @@
       <div id="oefeningen"></div>
       <div class="rij" id="rOef">
         <input class="veld" id="oNaam" placeholder="Naam oefening" maxlength="80">
-        <input class="veld" id="oWanneer" placeholder="Wanneer" maxlength="40" style="max-width:9rem;">
-        <input class="veld" id="oLocatie" placeholder="Locatie" maxlength="60" style="max-width:9rem;">
+        <input class="i-1v3dw5 veld" id="oWanneer" placeholder="Wanneer" maxlength="40">
+        <input class="i-1v3dw5 veld" id="oLocatie" placeholder="Locatie" maxlength="60">
         <button class="knop klein" id="oMaak" type="button">Plan</button>
       </div>
     </div>
@@ -140,11 +147,11 @@
       <h2 class="h-mt0">Verplaatsingen (transport over land, water en lucht)</h2>
       <div id="verplaatsingen"></div>
       <div class="rij">
-        <input class="veld" id="vpVan" placeholder="Van" maxlength="60" style="max-width:8rem;">
-        <input class="veld" id="vpNaar" placeholder="Naar" maxlength="60" style="max-width:8rem;">
+        <input class="i-1v3d95 veld" id="vpVan" placeholder="Van" maxlength="60">
+        <input class="i-1v3d95 veld" id="vpNaar" placeholder="Naar" maxlength="60">
         <select id="vpSoort" aria-label="Wijze"><option value="land">Land</option><option value="water">Water</option><option value="lucht">Lucht</option></select>
         <select id="vpLading" aria-label="Lading"><option value="troepen">Troepen</option><option value="materieel">Materieel</option><option value="gewonden">Gewonden</option><option value="voorraad">Voorraad</option></select>
-        <input class="veld" id="vpWanneer" placeholder="Wanneer" maxlength="40" style="max-width:8rem;">
+        <input class="i-1v3d95 veld" id="vpWanneer" placeholder="Wanneer" maxlength="40">
         <button class="knop klein" id="vpMaak" type="button">Plan</button>
       </div>
     </div>

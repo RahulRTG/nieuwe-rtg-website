@@ -4,6 +4,9 @@
 const crypto = require('node:crypto');
 const rtgKlok = require('../../lib/klok');
 const proef = require('./integraties-proef');
+/* Wie handelt hier: uit de canonieke envelop en niet uit req.boardroomKey
+   (TAKEN.md 4.72). Zie server/opzet/envelop.js voor waarom die lezer bestaat. */
+const { wie: envelopWie } = require('../../opzet/envelop');
 
 module.exports = (ctx) => {
   const { app, boardroomAuth, db, save, kern } = ctx;
@@ -29,7 +32,7 @@ module.exports = (ctx) => {
   const geldStand = () => betaal.sandboxStand ? betaal.sandboxStand() : { connect: {}, sepa: {} };
   function actueel(id) { return id === 'smtp' || id === 'sms' ? postStand()[id] : geldStand()[id]; }
   function zetRuntime(id, aan) { return id === 'smtp' || id === 'sms' ? mail.zetSandbox(id, aan) : betaal.zetSandbox(id, aan); }
-  const door = req => req.boardroomBaas ? 'eigenaar' : (req.boardroomKey || 'boardroom');
+  const door = req => req.boardroomBaas ? 'eigenaar' : (envelopWie(req) || 'boardroom');
   function log(soort, req, extra) {
     const s = data();
     s.log.unshift(Object.assign({ at: rtgKlok.datum().toISOString(), soort, door: door(req) }, extra || {}));

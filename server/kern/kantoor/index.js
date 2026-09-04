@@ -19,6 +19,15 @@ function maakKantoor({ db, sessionFor, eigenaar, accounts, findSupplier, connect
   /* De kluispoort staat in ./kluispoort.js: hij is geen variant van officeAuth
      maar een eigen grens, en hij werd hier de druppel over keuringsregel 13. */
   const kluisAuth = require('./kluispoort')({ officeAuth, sessionFor });
+  /* DEZELFDE POORT, EEN ANDERE REDEN (TAKEN.md 4.73): de uitgifte tekent met
+     vier ogen en las de naam uit `req.body.wie`. Zie ./kluispoort.js. */
+  const naamAuth = require('./kluispoort')({ officeAuth, sessionFor }, {
+    naam: 'naamAuth',
+    poort: 'handtekening',
+    error: 'Hiervoor is een kantoorsessie op naam nodig. Onder een handtekening hoort een mens te staan, ' +
+      'en de gedeelde backoffice-code is geen mens: met vier ogen tekenen betekent twee PERSONEN, niet ' +
+      'twee woorden uit dezelfde sessie. Log in met uw eigen RTG-account en koppel daarin de kantoorrol.'
+  });
 
   function officeAuth(req, res, next) {
     const header = req.get('authorization') || '';
@@ -147,7 +156,7 @@ function maakKantoor({ db, sessionFor, eigenaar, accounts, findSupplier, connect
     });
   }
 
-  return { officeAuth, kluisAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, pendingVerifications };
+  return { officeAuth, kluisAuth, naamAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, pendingVerifications };
 }
 
 module.exports = { maakKantoor };

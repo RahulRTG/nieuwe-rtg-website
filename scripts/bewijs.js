@@ -46,6 +46,9 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
+/* De drempel voor een DUNNE overlever komt uit de motor zelf; hem hier
+   overtypen zou een tweede grens maken die stil uit de pas kan lopen. */
+const { DUN_ONDER, overleverTelling } = require('./mutatie');
 
 const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(WORTEL, 'BEWIJS.md');
@@ -85,6 +88,11 @@ function bouw() {
   const rijen = [];
   let zonderKop = 0, toetsenTotaal = 0;
   const telling = { gezakt: 0, overleefd: 0, genoemd: 0, geen: 0, onmeetbaar: 0 };
+  /* DUN TELT APART (TAKEN.md 4.53). Een overlever die maar een paar schoten
+     kreeg zegt iets over de MOTOR en niet over de toets; op een hoop gegooid
+     leest de werkvoorraad hieronder als een lijst zwakke toetsen. De telling
+     komt uit scripts/mutatie.js, zodat er geen tweede drempel ontstaat. */
+  const overlevers = overleverTelling(meting || {});
   for (const naam of namen) {
     const bron = fs.readFileSync(path.join(TEST, naam), 'utf8');
     const kop = kopVan(bron);
@@ -127,7 +135,9 @@ function bouw() {
   p('| losse beweringen (`test(...)`) | ' + toetsenTotaal + ' |');
   p('| bestanden zonder kop (dus zonder opgeschreven bewering) | ' + zonderKop + ' |');
   p('| **gezakt** op een mutatie (bewezen gevoelig) | ' + telling.gezakt + ' |');
-  p('| **overleefd**: geen mutatie kreeg hem rood | ' + telling.overleefd + ' |');
+  p('| **overleefd**: geen mutatie kreeg hem rood | ' + telling.overleefd +
+    (telling.overleefd ? ' (waarvan ' + overlevers.dun + ' met minder dan ' + DUN_ONDER +
+      ' pogingen)' : '') + ' |');
   p('| niet te meten (al rood, geen module gevonden, ...) | ' + telling.onmeetbaar + ' |');
   p('| alleen in de kop *genoemd*, nog niet gemeten | ' + telling.genoemd + ' |');
   p('| niets van beide | ' + telling.geen + ' |');
@@ -137,6 +147,13 @@ function bouw() {
     p('alleen of de kop van een bestand een mutatie NOEMT -- en dat zegt vooral iets over');
     p('schrijfgewoonten. Draai `npm run mutatie` om het echt te proberen.');
   } else {
+    if (overlevers.dun) {
+      p('Van die overlevers kregen er **' + overlevers.dun + '** minder dan ' + DUN_ONDER +
+        ' mutaties aangeboden. Dat is geen');
+      p('uitspraak over de toets maar over de motor: zijn module draagt bijna geen construct dat');
+      p('een operator kan omzetten. Ze staan er apart omdat ze anders als zwakke toets meelezen.');
+      p('');
+    }
     p('De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo\'n');
     p('toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij');
     p('niet vast. Zie `scripts/mutatie.js` voor wat de motor wel en niet probeert -- een');

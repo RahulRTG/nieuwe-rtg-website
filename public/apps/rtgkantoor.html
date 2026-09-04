@@ -45,6 +45,11 @@
   /* markering voor het deelmenu; met het menu erbij is hij weg, zonder menu
      blijft er een rustige sectiekop staan */
   .deel{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--soft);margin:1.6rem 0 .5rem;}
+
+  /* Uit inline style-attributen gehaald door scripts/inlinestijl-omzet.js (TAKEN.md 4.51). Bewezen gelijk met
+     scripts/inlinestijl-proef.js: elk element, elke aangeraakte eigenschap,
+     berekend in een echte browser. Letterlijk wat er stond -- geen ontwerpbesluit. */
+  .i-15e9ke{justify-content:space-between}
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <script src="/shared/kantoorgesprek.js"></script>
@@ -68,12 +73,12 @@
 
     <div class="deel">Gereedheid</div>
     <div class="kaart">
-      <div class="rij" style="justify-content:space-between;">
+      <div class="i-15e9ke rij">
         <span class="fase meelezen" id="fase">…</span>
         <span class="stil" id="sinds"></span>
       </div>
       <div class="h-mt80">
-        <div class="rij" style="justify-content:space-between;"><b style="font-size:.9rem;">Gereedheid</b><b id="pct" style="color:var(--gold);font-variant-numeric:tabular-nums;"></b></div>
+        <div class="i-15e9ke rij"><b style="font-size:.9rem;">Gereedheid</b><b id="pct" style="color:var(--gold);font-variant-numeric:tabular-nums;"></b></div>
         <div class="meter"><i id="meter" style="width:0%;"></i></div>
         <span class="stil" id="meterUit"></span>
       </div>
@@ -99,7 +104,7 @@
 
     <div class="deel">De Onderzoeker</div>
     <div class="kaart">
-      <div class="rij" style="justify-content:space-between;">
+      <div class="i-15e9ke rij">
         <h2 style="font-size:1.05rem;">De Onderzoeker · de tweede AI</h2>
         <span class="fase meelezen" id="oFase">…</span>
       </div>

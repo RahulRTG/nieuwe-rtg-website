@@ -1,7 +1,7 @@
 {
-  "vastgelegd": "2026-09-03",
+  "vastgelegd": "2026-09-04",
   "meters": {
-    "endpointsZonderTest": 966,
+    "endpointsZonderTest": 967,
     "dekkingPct": 80,
     "keuringStuk": 0,
     "keuringScheef": 18,
@@ -11,7 +11,7 @@
     "zelfpoortendeToetsen": 18,
     "e2eBestanden": 201,
     "keuringOmvang": 284,
-    "keuringDubbeling": 163,
+    "keuringDubbeling": 165,
     "keuringDekkingAdvies": 52,
     "endpointsNooitAangeraakt": 0,
     "onbewaakt": 0,
@@ -25,12 +25,12 @@
     "kernGedeeld": 232,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 546,
+    "toetsenNietGemeten": 562,
     "toetsenOngevoeligPct": 1,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
     "ratelTanden": 66,
-    "metingenZonderRatel": 41,
+    "metingenZonderRatel": 49,
     "ladderRaak": 0,
     "ladderNietGeprobeerd": 1,
     "rolscheidingGaten": 0,
@@ -1657,6 +1657,51 @@
       "vervalt": "2026-12-01",
       "meter": "bewijsAchterstand 2283 -> 2291",
       "reden": "Samenvoeging van acht PR's op 3 september 2026. IDEMPROEF.json staat weer op de stand van main omdat de eindpoort daar de wereldmeting uit leest; die proef beoordeelde negen routes meer dan die van #176, en die negen dragen nog geen besluit in IDEMBESLUIT.json (post idem-ongeclassificeerd 1478 -> 1487, gevolg-onbekend 91 -> 90). De groei staat met dezelfde reden in BEWIJSSCHULD.json onder `groei`. Aflossen: de meetronde op deze stand."
+    },
+    {
+      "datum": "2026-09-03",
+      "soort": "structureel",
+      "sleutel": "toetsenNietGemeten",
+      "van": 546,
+      "meter": "toetsenNietGemeten 546 -> 547",
+      "reden": "toetsenNietGemeten 546 -> 547, en het is EEN bestand met een naam. test/mutatiedekking.test.js gaat over de telling van de mutatiemotor zelf en laadt hem; de motor zijn eigen bron laten muteren terwijl hij draait meet zichzelf halverwege een schrijfactie en niet de toets (de eerste ronde kwam er dan ook uit als 'al rood'). Hij staat daarom in NIET_MUTEREN in scripts/mutatie.js, met de handmatige proef in de reden: de grens een stap verschuiven (< naar <=) laat toets 1 zakken, en een ontbrekende `dekking` als beproefd lezen laat toets 3 zakken. Tweemaal raak.\n\nDe andere zeven nieuwe toetsbestanden van deze tak zijn WEL gemeten en alle zeven bewezen gevoelig (actorvormen, envelopvelden, gezagshandelingen, handeling-massa, handelingsklasse, inlinestijl, wachtwijze). Deze ene is dus geen restpost maar dezelfde klasse als meterijk.test.js en mutatiewacht.test.js, die er om precies dezelfde reden al in stonden.\n\nEERLIJKHEIDSHALVE: bij deze samenvoeging is NORM.json van main genomen en niet die van de tak. De ratels van de tak (keuringOmvang 262, keuringTeGroot 14, keuringScheef 16) gingen over een boom van 223 commits eerder en waren op de samengevoegde stand niet meer na te rekenen; main's getallen zijn de enige die dat wel zijn. Wat de tak aan die meters verbeterde -- drie naden geknipt, de tikker van drie plekken naar een -- staat in TAKEN.md 5.57 met de gemeten waarden erbij, en is op deze boom opnieuw te meten.",
+      "waarheen": "scripts/mutatie.js, NIET_MUTEREN: de belofte \"elke toets is door de motor gemeten\" is voor dit ene bestand vervangen door een MET DE HAND nagetrokken proef, en die staat in de reden ernaast (de grens een stap verschuiven laat toets 1 zakken, een ontbrekende `dekking` als beproefd lezen laat toets 3 zakken -- tweemaal raak). Dat is geen schuld met een afloscurve: er komt geen dag waarop de motor zijn eigen telling zinnig meet, want dan meet hij zichzelf halverwege een schrijfactie"
+    },
+    {
+      "datum": "2026-09-03",
+      "soort": "schuld",
+      "sleutel": "endpointsZonderTest",
+      "van": 966,
+      "vervalt": "2026-12-01",
+      "meter": "endpointsZonderTest 966 -> 967",
+      "reden": "Drie gelijktijdig geopende PR's (#180, #181, #182) zijn als een verzameling samengevoegd op een integratietak (#183). Elke tak bleef binnen zijn eigen norm; samen brengen ze meer mee dan de hoofdlijn had, en dat wordt hier per meter benoemd in plaats van stil verrekend. Vier endpoints kwamen er ongedekt bij; drie daarvan (de twee ankerpost-routes en de objectpagina) zijn alsnog gedekt met test/integratie-routes.test.js, en die toets vond meteen een echte fout: een Object.assign liet `ok: false` van de post het `ok: true` van de ROUTE overschrijven, waardoor 'er is nog geen tweede machine besloten' las als een mislukte aanroep. Wat overblijft is een endpoint uit een van de andere twee takken. Aflossen: die toets schrijven."
+    },
+    {
+      "datum": "2026-09-03",
+      "soort": "schuld",
+      "sleutel": "keuringDubbeling",
+      "van": 163,
+      "vervalt": "2026-12-01",
+      "meter": "keuringDubbeling 163 -> 165",
+      "reden": "Drie gelijktijdig geopende PR's (#180, #181, #182) zijn als een verzameling samengevoegd op een integratietak (#183). Elke tak bleef binnen zijn eigen norm; samen brengen ze meer mee dan de hoofdlijn had, en dat wordt hier per meter benoemd in plaats van stil verrekend. Twee functienamen staan nu in meer dan twee kernmodules doordat twee takken los van elkaar een naam kozen die de derde ook al gebruikte. Dat is precies de vorm die SEMANTIEK.json meet en waar BEWIJSMACHINE.md over gaat: dezelfde naam, mogelijk twee betekenissen. Aflossen is niet hernoemen-om-het-getal maar eerst kijken of het hetzelfde BETEKENT."
+    },
+    {
+      "datum": "2026-09-03",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 547,
+      "vervalt": "2026-12-01",
+      "meter": "toetsenNietGemeten 547 -> 562",
+      "reden": "Drie gelijktijdig geopende PR's (#180, #181, #182) zijn als een verzameling samengevoegd op een integratietak (#183). Elke tak bleef binnen zijn eigen norm; samen brengen ze meer mee dan de hoofdlijn had, en dat wordt hier per meter benoemd in plaats van stil verrekend. Vijftien toetsbestanden uit de drie takken zijn nog niet door de mutatiemotor geweest, plus de toets die deze integratie zelf toevoegde. Dit is instrumentdekking en geen oordeel over de toetsen; de ratel straft hier het TOEVOEGEN van toetsen, en dat hoort zichtbaar te zijn in plaats van te worden weggewerkt door er geen te schrijven. Aflossen: de motor erover laten lopen."
+    },
+    {
+      "datum": "2026-09-03",
+      "soort": "schuld",
+      "sleutel": "metingenZonderRatel",
+      "van": 41,
+      "vervalt": "2026-12-01",
+      "meter": "metingenZonderRatel 41 -> 49",
+      "reden": "Drie gelijktijdig geopende PR's (#180, #181, #182) zijn als een verzameling samengevoegd op een integratietak (#183). Elke tak bleef binnen zijn eigen norm; samen brengen ze meer mee dan de hoofdlijn had, en dat wordt hier per meter benoemd in plaats van stil verrekend. Vijftien nieuwe registers kwamen mee. Zeven ervan hangen inmiddels WEL aan een ratel (DOODSPOOR, TAFELPROEF, RITPROEF, TOELATINGSPROEF, KETENVORM, RITMIGRATIE, DOORWERKING -- elk met een toets die vers meet en met het register vergelijkt), waardoor de meting van 56 naar 49 zakte. De rest komt uit de andere twee takken en is hier NIET met een gok ingeschreven: de kop van scripts/lib/metingen.js zegt dat het getal hoort te dalen doordat er ratels bijkomen en niet doordat er regels bijkomen. Aflossen: per register de ratel aanwijzen die hem werkelijk vasthoudt."
     }
   ],
   "prestatie": {

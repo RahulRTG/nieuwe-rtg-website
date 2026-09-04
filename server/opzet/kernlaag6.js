@@ -16,9 +16,8 @@
      sleutelwoorden
      aanmeldgesprek
      algpin
-     werkvenster
-     eenaccount
-     kantoorgesprek */
+     (werkvenster, eenaccount en kantoorgesprek staan sinds de 10 kB-knip in
+     ./kernlaag6b.js) */
 'use strict';
 
 module.exports = (kern, hulp) => {
@@ -45,6 +44,15 @@ Object.assign(kern, require('../kern/mobiliteit').maakMobiliteit({
   // voor de dienstverbandcontrole bij zakelijke ritten
   accounts
 }));
+/* DE APPBRUG: een app-rit wordt ook een vervoersOPDRACHT en komt zo op het
+   dispatchbord. HIER en niet in kern/lidacties, dat vóór mobiliteit staat en
+   opdrachtMaak dus niet kent. Zie MAATSTAF.md par. 7.5. */
+Object.assign(kern, {
+  appbrug: require('../kern/mobiliteit/appbrug')({
+    opdrachtMaak: kern.opdrachtMaak, opdrachtMet: kern.opdrachtMet, opdrachtNaar: kern.opdrachtNaar
+  })
+});
+
 /* RTG Navigatie (kern/navigatie.js): het huiseigen navigatiesysteem. Een eigen
    wegennet met A*-route, bocht-voor-bocht en ETA per vervoerwijze; bestemmingen
    uit onze leveranciers, het OV, de loketten en de POI-lagen (tank/laad), en RTG
@@ -130,38 +138,5 @@ Object.assign(kern, require('../kern/aanmeldgesprek').maakAanmeldgesprek({ db, s
    privacygevoelige apps op het OS beschermt en waarmee de werk-apps openen
    (het ene account = bevoegdheid, de pin = bewijs). */
 Object.assign(kern, require('../kern/algpin').maakAlgPin({ db, save, crypto, slot: pinSlot }));
-/* Het werkvenster (kern/werkvenster.js): de werkgever bepaalt wanneer
-   personeel op de werkpagina en de PDA mag; de server dwingt dat af bij elke
-   ingang naar een personeelssessie. Rahul adviseert los daarvan (agenda,
-   uren, zorgprofiel) maar blokkeert nooit. */
-Object.assign(kern, require('../kern/werkvenster').maakWerkvenster({
-  db, save, klokVan, zorgVan: kern.zorgVan, haversine
-}));
-/* Een account voor alles (kern/eenaccount.js): mensen registreren zich een
-   keer; personeel, zaak en kantoor zijn daarna koppelingen aan dat ene
-   account (na bewijs van de werk-inlog), en accStart munt exact dezelfde
-   sessies als de losse logins. */
-Object.assign(kern, require('../kern/eenaccount').maakEenAccount({
-  db, save, crypto, accounts, findSupplier, checkCred: kern.checkCred, hasCred: kern.hasCred,
-  DEMO: kern.DEMO, DEMO_SUPPLIER: kern.DEMO_SUPPLIER, OFFICE_CODE: kern.OFFICE_CODE,
-  veiligGelijk: kern.veiligGelijk, totpOk: kern.totpOk, rememberSession, logInlog: kern.logInlog,
-  logActivity, supplierState, officeState: kern.officeState, magWerken: kern.magWerken,
-  pinInfo: kern.pinInfo, pinCheck: kern.pinCheck,
-  // hetzelfde doel-slot als /api/supplier/login: een pin, een teller
-  pinSlot,
-  // en dezelfde persoonseis als /api/supplier/login: het ene account is geen achterdeur
-  persoonsPoort: kern.persoonsPoort,
-  // MIJN RTG blok 3: hier ontstaat een tweede context voor dezelfde mens
-  sessieregister
-}));
-/* Het kantoorgesprek (kern/kantoorgesprek.js): de backoffice binnenkomen door
-   met Rahul te praten in plaats van een codeveld in te vullen. Zelfde slot als
-   de kantoordeur zelf (bucket 'office:<ip>'), zodat de vriendelijkere weg geen
-   zwakkere weg is; wat er ingetypt wordt gaat nergens heen. */
-Object.assign(kern, require('../kern/kantoorgesprek').maakKantoorgesprek({
-  OFFICE_CODE: kern.OFFICE_CODE, veiligGelijk: kern.veiligGelijk, totpOk: kern.totpOk,
-  crypto, rememberSession, officeState: kern.officeState, logInlog: kern.logInlog,
-  loginFails, noteFailedTry
-}));
 
 };

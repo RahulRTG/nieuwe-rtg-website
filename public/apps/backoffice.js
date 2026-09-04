@@ -499,6 +499,8 @@
   }
   function ontLiveSluit(){
     $('#ontLiveScrim').style.display = 'none';
+    const baan = $('#ontLiveTekst');
+    if (baan){ baan.hidden = true; while (baan.firstChild) baan.removeChild(baan.firstChild); }
     if (ontPc){ try { ontPc.close(); } catch(e){} ontPc = null; }
     ontLiveDate = null;
   }
@@ -519,6 +521,26 @@
       await call('/office/ontmoeting/signaal', { dateId: d.dateId, naarKey: d.van, payload: { sdp: ontPc.localDescription } });
     } else if (d.payload.ice && ontPc){
       try { await ontPc.addIceCandidate(new RTCIceCandidate(d.payload.ice)); } catch(e){}
+    } else if (d.payload.tekst){
+      /* LIVE TEKST VAN HET LID (TAKEN.md 4.31). Het toestel van het lid zet zijn
+         eigen stem om naar tekst en stuurt de regels langs ditzelfde
+         seinkanaal. Hier stond eerder dat een dove medewerker geen SOS-dienst
+         kon draaien; dit is wat daaraan doet. GEEN innerHTML -- dit is tekst van
+         buiten -- en het staat er als GERADEN tekst: een noodkamer is de laatste
+         plek waar "misschien" er als "zeker" uit mag zien. */
+      const baan = $('#ontLiveTekst');
+      if (baan){
+        baan.hidden = false;
+        const r = document.createElement('p');
+        r.textContent = String(d.payload.tekst).slice(0, 400);
+        const merk = document.createElement('span');
+        merk.textContent = ' (automatisch omgezet)';
+        merk.className = 'geraden';
+        r.appendChild(merk);
+        baan.appendChild(r);
+        while (baan.children.length > 60) baan.removeChild(baan.firstChild);
+        baan.scrollTop = baan.scrollHeight;
+      }
     }
   }
   document.getElementById('ontLiveClose').addEventListener('click', ontLiveSluit);

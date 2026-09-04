@@ -32,6 +32,8 @@
 const { veiligGelijk } = require('../util');
 const { nu: klokNu, datum: klokDatum } = require('../../lib/klok');
 
+const { NIVEAUS } = require('../frictie');
+
 const UUR = 3600000;
 const MAX_SLEUTELS = 50;
 
@@ -57,7 +59,7 @@ function maakApiPoort({ opslag, save, crypto, journaal }) {
       uitfasering: o.uitfasering ? String(o.uitfasering) : null,
       waarvoor: String(o.waarvoor || '').slice(0, 200), door: String(door || ''), at: nu() });
     save();
-    if (journaal) journaal.noteer({ actie: 'api-toelating erbij', actor: door, niveau: 'hand', reden: p });
+    if (journaal) journaal.noteer({ actie: 'api-toelating erbij', actor: door, niveau: NIVEAUS.hand, reden: p });
     return { toelating: v.toelating };
   }
 
@@ -67,7 +69,7 @@ function maakApiPoort({ opslag, save, crypto, journaal }) {
     if (i < 0) return { error: 'Dat pad staat er niet in.', status: 404 };
     v.toelating.splice(i, 1);
     save();
-    if (journaal) journaal.noteer({ actie: 'api-toelating eraf', actor: door, niveau: 'hand', reden: String(pad) });
+    if (journaal) journaal.noteer({ actie: 'api-toelating eraf', actor: door, niveau: NIVEAUS.hand, reden: String(pad) });
     return { toelating: v.toelating };
   }
 
@@ -112,7 +114,7 @@ function maakApiPoort({ opslag, save, crypto, journaal }) {
       ingetrokken: null, teller: { uur: 0, n: 0 }, laatst: null, geweigerd: 0
     };
     save();
-    if (journaal) journaal.noteer({ actie: 'api-sleutel gemaakt', actor: o.door, niveau: 'hand',
+    if (journaal) journaal.noteer({ actie: 'api-sleutel gemaakt', actor: o.door, niveau: NIVEAUS.hand,
       objectType: 'apisleutel', objectId: id, reden: String(naam || '') });
     /* Het geheim gaat één keer mee terug en wordt nergens bewaard. */
     return { sleutel: kort(v.sleutels[id]), geheim: 'RTG-' + id + '.' + geheim,
@@ -126,7 +128,7 @@ function maakApiPoort({ opslag, save, crypto, journaal }) {
     if (s.ingetrokken) return { error: 'Die sleutel is al ingetrokken.', status: 409 };
     s.ingetrokken = { at: nu(), door: String(door || ''), reden: String(reden || '') };
     save();
-    if (journaal) journaal.noteer({ actie: 'api-sleutel ingetrokken', actor: door, niveau: 'hand',
+    if (journaal) journaal.noteer({ actie: 'api-sleutel ingetrokken', actor: door, niveau: NIVEAUS.hand,
       objectType: 'apisleutel', objectId: s.id, reden: String(reden || '') });
     return { sleutel: kort(s) };
   }

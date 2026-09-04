@@ -24,6 +24,8 @@
    DE STAND IS DUS EERLIJKER DAN DE KNOP. Dat is de bedoeling. */
 'use strict';
 
+const { NIVEAUS } = require('../frictie');
+
 const MAX_STEDEN = 100;
 
 function maakStadstart({ opslag, save, journaal, landpakket, functies, plaatsNorm, weefsel }) {
@@ -147,7 +149,7 @@ function maakStadstart({ opslag, save, journaal, landpakket, functies, plaatsNor
     }
     save();
     if (journaal) {
-      journaal.noteer({ actie: 'stad gestart', actor: o.door, niveau: 'hand',
+      journaal.noteer({ actie: 'stad gestart', actor: o.door, niveau: NIVEAUS.hand,
         objectType: 'stad', objectId: sleutel,
         reden: 'in ' + land + '; ' + MENSENWERK.length + ' punten blijven mensenwerk' });
     }
@@ -164,7 +166,7 @@ function maakStadstart({ opslag, save, journaal, landpakket, functies, plaatsNor
     }
     delete alle()[sleutel];
     save();
-    if (journaal) journaal.noteer({ actie: 'stad gestopt', actor: door, niveau: 'hand',
+    if (journaal) journaal.noteer({ actie: 'stad gestopt', actor: door, niveau: NIVEAUS.hand,
       objectType: 'stad', objectId: sleutel, reden: 'de per-plaats-standen zijn weer weg' });
     return { gestopt: sleutel };
   }

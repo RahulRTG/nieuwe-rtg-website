@@ -213,7 +213,39 @@ const REGISTERS = [
      een boom die er niet meer is. Een instrument dat over eerlijkheid van
      metingen gaat en zelf niet onder toezicht staat, is het eerste dat niemand
      serieus neemt. */
-  ['MEETLEER.json', 'npm run meetleer:vast', 'of een register de lezer er meer uit laat concluderen dan het aantoont']
+  ['MEETLEER.json', 'npm run meetleer:vast', 'of een register de lezer er meer uit laat concluderen dan het aantoont'],
+
+  /* ZESTIEN METERS DIE MET DE SAMENVOEGING VAN #180, #181 EN #182 BINNENKWAMEN.
+
+     Dezelfde vorm als de acht hierboven, en dezelfde les: elke tak zette zijn
+     eigen registers neer en geen van de drie kwam eraan toe ze onder toezicht te
+     stellen -- dat valt pas op als je ze bij elkaar legt.
+     test/versheidsdekking.test.js legde ze alle zestien op tafel.
+
+     Vier ervan meten tegen een DRAAIENDE server (de drie ketenproeven en de
+     contextproef), en daar weegt veroudering het zwaarst: zo'n uitslag hoort bij
+     de code van die dag en bij geen andere. Een verouderde TAFELPROEF.json die
+     "de keten sluit" meldt terwijl er sindsdien een schakel is verlegd, is erger
+     dan geen meting.
+
+     Ze staan in de volgorde waarin ze iets zeggen: eerst de drie gouden ketens
+     en wat ze delen, dan de metingen over de code zelf, dan de twee kaarten. */
+  ['TAFELPROEF.json', 'npm run tafelproef:vast', 'of de horecaketen sluit, van tafel tot correctie'],
+  ['RITPROEF.json', 'npm run ritproef:vast', 'of de ritketen sluit, van aanvraag tot afronding'],
+  ['TOELATINGSPROEF.json', 'npm run toelatingsproef:vast', 'of de toelatingsketen sluit, van aanvraag tot zaak'],
+  ['KETENVORM.json', 'npm run ketenvorm:vast', 'wat de drie gouden ketens werkelijk delen (actoren, beloften)'],
+  ['DOODSPOOR.json', 'npm run doodspoor:vast', 'of een handeling ergens AANKOMT, of een verklaring draagt waarom niet'],
+  ['DOORWERKING.json', 'npm run doorwerking:vast', 'of een gegeven dat een keer is opgegeven doorwerkt, met doel en actualiteit'],
+  ['RITMIGRATIE.json', 'npm run ritmigratie:vast', 'welke lezers van db.data.rides wanneer naar de opdrachtwereld kunnen'],
+  ['CODEWERELD.json', 'node scripts/codewereld.js --vastleggen', 'wat de registers samen over deze code beweren'],
+  ['AANROEPGRAAF.json', 'node scripts/aanroepgraaf.js --vastleggen', 'wie wie aanroept in server/ en scripts/'],
+  ['KERNHERKOMST.json', 'node scripts/kernherkomst.js --vastleggen', 'waar een kernnaam vandaan komt en wie hem doorgeeft'],
+  ['SYMBOLEN.json', 'node scripts/symbolen.js --vastleggen', 'welke functies waar wonen'],
+  ['SCHERMGEDRAG.json', 'node scripts/schermgedrag.js --vastleggen', 'wat een scherm werkelijk doet, gelezen uit zijn eigen script'],
+  ['SCHERMROUTES.json', 'node scripts/schermroutes.js --vastleggen', 'welk bestand in public/ welk API-pad noemt, en welke daarvan dood zijn'],
+  ['ROUTEBRON.json', 'node scripts/routebron.js --vastleggen', 'de routelijst waar SCHERMROUTES tegen meet -- veroudert hij, dan verzint de dode-padenteller er'],
+  ['CONTEXTPROEF.json', 'node scripts/contextproef.js --vastleggen', 'of de async-context blijft staan waar hij moet blijven staan'],
+  ['FAALPROEF.json', 'node scripts/faalproef.js --vastleggen', 'wat er gebeurt als een afhankelijkheid wegvalt']
 ];
 
 /* De lezer van beide stempelvormen woont in ./lib/stempel.js -- hij stond hier

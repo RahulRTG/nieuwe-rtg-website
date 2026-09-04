@@ -24,6 +24,48 @@ const GEISOLEERD = [
   'meterijk.test.js',
   'gezag.test.js',
   'envelop.test.js',
+  /* ERBIJ OP 3 SEPTEMBER 2026 (TAKEN.md 4.72). Hij hernoemt `req.envelop` in
+     server/opzet/envelop.js om te bewijzen dat de meter zakt zodra de canonieke
+     vorm weg is, en hij zet req.boardroomKey terug in de boardroom-poort. Beide
+     staan in een finally weer goed -- maar precies daar gaat 4.77 over: een
+     andere toets die op dat moment een server start, leest het kapotte bestand.
+     Deze regel is niet met de hand gevonden maar door test/bronmutanten.test.js,
+     die er onmiddellijk over viel toen de toets erbij kwam. */
+  'actorvormen.test.js',
+  /* DEZE TWEE ZIJN GEVONDEN DOOR DE ZEEF ZELF, op 3 september 2026, toen die
+     leerde kijken naar een schrijf op een pad uit een VARIABELE (TAKEN.md 4.77).
+     Ze stonden hier niet en muteerden wel echte bron:
+
+       capabilities.test.js       zet server/kern/zz-capmeting-proef.js neer
+       gezagshandelingen.test.js  muteert kern/frictie/bodem.js
+
+     Allebei zetten ze het netjes terug in een finally, en allebei zijn ze
+     daarmee precies het geval waar deze lijst voor bestaat: terwijl dat halve
+     seconde duurt, start een andere toets een server. */
+  'capabilities.test.js',
+  'gezagshandelingen.test.js',
+  /* En de vierde, gevonden door dezelfde zeef een dag later (TAKEN.md 4.71):
+     envelopvelden.test.js hernoemt de tenant-regel in server/opzet/envelop.js om
+     te bewijzen dat de meter een weggevallen drager ziet. */
+  'envelopvelden.test.js',
+  /* En de vijfde (TAKEN.md 4.74): handeling-massa.test.js haalt de melding uit
+     drie echte kernbestanden -- lidboard/schakel.js, agent.js en payroll/run.js
+     -- om te bewijzen dat de massa-bewerking zonder die regel weer als nul
+     binnenkomt. Alle drie staan in een finally terug; alle drie zijn ze in die
+     halve seconde het bestand dat een startende server leest. */
+  'handeling-massa.test.js',
+  /* En de zevende, gevonden door dezelfde zeef: stempel.test.js zet een echt
+     bestand in server/kern/ neer om te bewijzen dat de boom er vuil van wordt.
+     Dat bestand is een halve seconde lang gewoon broncode voor iedereen die op
+     dat moment een server start -- precies waar deze lijst voor is. Hij ruimt
+     het in een finally op, en dat is hier geen verzachting maar de reden dat
+     niemand hem eerder betrapte. */
+  'stempel.test.js',
+  /* En de zesde (TAKEN.md 4.67): wachtwijze.test.js zet een `waitUntil` in twee
+     echte schermtoetsen om en haalt het woord `load` uit een reden, om te
+     bewijzen dat de meter zakt. Allebei in een finally terug -- en juist die
+     halve seconde is waarin een andere ronde dat bestand leest. */
+  'wachtwijze.test.js',
   /* ERBIJ OP 22 AUGUSTUS 2026, en met een eerlijke slag om de arm. Deze toets
      slaagt drie van de drie keer alleen en zakte in CI binnen een scherf van 272
      bestanden op 'de zaak laat achteraf betalen' -- een betaalinstelling van een

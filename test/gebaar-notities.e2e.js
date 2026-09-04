@@ -71,7 +71,7 @@ test('een veeg archiveert een notitie en draait terug; weggooien gaat alleen op 
       localStorage.setItem('rtg_member_token', tok);
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, reg.token);
-    await page.goto(base + '/apps/notities.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/notities.html', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#bord .nkaart.gb-rij', { timeout: 20000 });
     assert.equal(await page.locator('#bord .nkaart').count(), 2, 'beide notities horen op het bord te staan');
 

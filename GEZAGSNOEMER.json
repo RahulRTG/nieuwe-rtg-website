@@ -54,7 +54,7 @@
  "dekking": {
   "geen": [
    "server/kern/stuur/beleid.js",
-   "server/kern/command/risico.js",
+   "server/kern/frictie/motor.js",
    "server/kern/stadsweefsel/ainiveau.js"
   ],
   "tonen": [
@@ -65,14 +65,14 @@
   ],
   "klaarzetten": [
    "server/kern/stuur/beleid.js",
-   "server/kern/command/risico.js",
+   "server/kern/frictie/motor.js",
    "server/kern/geldbeleid/regels.js",
    "server/kern/stadsweefsel/ainiveau.js",
    "server/kern/bureau/delegatie.js"
   ],
   "uitvoeren": [
    "server/kern/stuur/beleid.js",
-   "server/kern/command/risico.js",
+   "server/kern/frictie/motor.js",
    "server/kern/geldbeleid/regels.js",
    "server/kern/stadsweefsel/ainiveau.js",
    "server/kern/bureau/delegatie.js"
@@ -92,7 +92,7 @@
    "trede": "voorstel",
    "noemer": "klaarzetten",
    "grond": "evident",
-   "citaat": "vereist daarom een eenmalig servervoorstel dat",
+   "citaat": "vereist een eenmalig servervoorstel dat de gebruiker",
    "bronGevonden": true
   },
   {
@@ -112,7 +112,7 @@
    "bronGevonden": true
   },
   {
-   "bestand": "server/kern/command/risico.js",
+   "bestand": "server/kern/frictie/motor.js",
    "trede": "hand",
    "noemer": "geen",
    "grond": "evident",
@@ -120,7 +120,7 @@
    "bronGevonden": true
   },
   {
-   "bestand": "server/kern/command/risico.js",
+   "bestand": "server/kern/frictie/motor.js",
    "trede": "assist",
    "noemer": "klaarzetten",
    "grond": "evident",
@@ -128,7 +128,7 @@
    "bronGevonden": true
   },
   {
-   "bestand": "server/kern/command/risico.js",
+   "bestand": "server/kern/frictie/motor.js",
    "trede": "auto",
    "noemer": "uitvoeren",
    "grond": "evident",

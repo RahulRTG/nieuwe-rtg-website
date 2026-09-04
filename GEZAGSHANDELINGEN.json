@@ -1,0 +1,109 @@
+{
+  "uitleg": "De gedeelde namespace van handelingen -- de tussenstap van TAKEN.md 4.54. Vijf schalen beantwoorden de vraag \"mag de machine dit zelf\", en scripts/gezagsnoemer.js heeft hun TREDEN al op een noemer. Wat overblijft is het ONDERWERP: zolang twee schalen niet over hetzelfde ding praten, kunnen ze elkaar niet tegenspreken -- en dan is \"geen tegenspraak gevonden\" een uitspraak over de meting en niet over het huis.",
+  "hoe": "node scripts/gezagshandelingen.js --lijst",
+  "gemeten": {
+    "schalen": 5,
+    "onderwerpen": 289,
+    "gedeeldeOnderwerpen": 4,
+    "tegenspraken": 0,
+    "schalenZonderGedeeldeSoort": 2
+  },
+  "soorten": {
+    "route": "een HTTP-pad; het fijnste wat dit huis heeft en het enige dat een machine kan nalopen",
+    "handeling": "een benoemde handeling in gewone taal, los van welke route hem uitvoert",
+    "regelsoort": "een soort beleidsregel die een lid zelf zet",
+    "domein": "een levensgebied; geen handeling maar een verzameling ervan"
+  },
+  "perSchaal": [
+    {
+      "bestand": "server/kern/stuur/beleid-lijsten.js",
+      "onderwerpen": 173,
+      "soorten": [
+        "route"
+      ]
+    },
+    {
+      "bestand": "server/kern/frictie/bodem.js",
+      "onderwerpen": 86,
+      "soorten": [
+        "handeling",
+        "route"
+      ]
+    },
+    {
+      "bestand": "server/kern/geldbeleid/regels.js",
+      "onderwerpen": 4,
+      "soorten": [
+        "regelsoort"
+      ]
+    },
+    {
+      "bestand": "server/kern/stadsweefsel/ainiveau.js",
+      "onderwerpen": 16,
+      "soorten": [
+        "handeling"
+      ]
+    },
+    {
+      "bestand": "server/kern/bureau/delegatie.js",
+      "onderwerpen": 14,
+      "soorten": [
+        "domein"
+      ]
+    }
+  ],
+  "schalenZonderGedeeldeSoort": [
+    "server/kern/geldbeleid/regels.js",
+    "server/kern/bureau/delegatie.js"
+  ],
+  "gedeeldeOnderwerpen": [
+    {
+      "sleutel": "route:/api/bank/sepa",
+      "schalen": [
+        "server/kern/stuur/beleid-lijsten.js",
+        "server/kern/frictie/bodem.js"
+      ],
+      "zegt": {
+        "server/kern/stuur/beleid-lijsten.js": "klaarzetten",
+        "server/kern/frictie/bodem.js": "ten hoogste klaarzetten"
+      },
+      "tegenspraak": false
+    },
+    {
+      "sleutel": "route:/api/bank/bulk",
+      "schalen": [
+        "server/kern/stuur/beleid-lijsten.js",
+        "server/kern/frictie/bodem.js"
+      ],
+      "zegt": {
+        "server/kern/stuur/beleid-lijsten.js": "klaarzetten",
+        "server/kern/frictie/bodem.js": "ten hoogste klaarzetten"
+      },
+      "tegenspraak": false
+    },
+    {
+      "sleutel": "route:/api/bank/salaris",
+      "schalen": [
+        "server/kern/stuur/beleid-lijsten.js",
+        "server/kern/frictie/bodem.js"
+      ],
+      "zegt": {
+        "server/kern/stuur/beleid-lijsten.js": "klaarzetten",
+        "server/kern/frictie/bodem.js": "ten hoogste klaarzetten"
+      },
+      "tegenspraak": false
+    },
+    {
+      "sleutel": "route:/api/supplier/pay/uitbetaal",
+      "schalen": [
+        "server/kern/stuur/beleid-lijsten.js",
+        "server/kern/frictie/bodem.js"
+      ],
+      "zegt": {
+        "server/kern/stuur/beleid-lijsten.js": "klaarzetten",
+        "server/kern/frictie/bodem.js": "ten hoogste klaarzetten"
+      },
+      "tegenspraak": false
+    }
+  ]
+}

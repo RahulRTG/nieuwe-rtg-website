@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-03T11:42:01.543Z",
-  "commit": "44f4c264",
+  "op": "2026-09-03T19:02:51.967Z",
+  "commit": "76a23dfc",
   "boomVuil": false,
-  "boomAnders": 15,
+  "boomAnders": 1,
   "instrument": "scripts/bewijsschuld.js",
   "node": "v22.22.2"
  },
@@ -13,7 +13,7 @@
   "posten": 18,
   "meetwerk": 1968,
   "instrument": 323,
-  "grens": 708
+  "grens": 644
  },
  "aflossing": {
   "doel": 0,
@@ -29,9 +29,9 @@
  "gemeten": {
   "postenTotaal": 18,
   "achterstand": 2291,
-  "randVanDeMethode": 708,
-  "auth-onbeslist": 0,
-  "capability-in-handler": 612,
+  "randVanDeMethode": 644,
+  "auth-onbeslist": 1,
+  "capability-in-handler": 548,
   "objectpoort": 52,
   "output-deuren": 18,
   "lichaamssleutel": 74,
@@ -46,7 +46,7 @@
   "gevolg-onbekend": 90,
   "droogloop-onbeoordeeld": 2,
   "herstel-onbevestigd": 47,
-  "idem-ongeclassificeerd": 1487,
+  "idem-ongeclassificeerd": 1486,
   "wegwerpserver-kopieen": 3
  },
  "posten": [
@@ -54,7 +54,7 @@
    "id": "auth-onbeslist",
    "soort": "meetwerk",
    "wat": "stille routes die onder geen enkele andere post op deze lijst vallen",
-   "aantal": 0,
+   "aantal": 1,
    "waarom": "de klop gaat zonder token. Een 400 of 404 betekent dat de validatie of een opzoeking eerder aan de beurt was dan de autorisatie, en zegt niets over een slot. Na een tweede klop met een plausibel lijf bleven deze routes hetzelfde antwoord geven.",
    "sluit": "per route nakijken wat er precies wordt gevraagd. Dit is geen instrumentvraag meer maar handwerk op een handvol routes, en dat is precies wat een schuldpost hoort te zijn als het gereedschap er is."
   },
@@ -62,7 +62,7 @@
    "id": "capability-in-handler",
    "soort": "grens",
    "wat": "routes zonder bewakerslaag: de controle zit IN de handler (een capability-token)",
-   "aantal": 612,
+   "aantal": 548,
    "waarom": "de rolproef kruist ROLLEN. Deze routes kennen geen rol -- ze eisen een token dat je alleen hebt als je het hebt gekregen (de schoolborden van foundation, rtf/social). Rollen kruisen is hier niet moeilijk maar zinloos.",
    "sluit": "niets in deze proef. Een eigen proef op capability-tokens zou de goede vraag stellen; die bestaat niet en is een project, geen achterstand."
   },
@@ -182,7 +182,7 @@
    "id": "idem-ongeclassificeerd",
    "soort": "meetwerk",
    "wat": "muterende routes zonder uitspraak over herhalen: wat gebeurt er bij een tweede keer",
-   "aantal": 1487,
+   "aantal": 1486,
    "waarom": "autonomie zonder herhaalsemantiek is niet te doen: een keten die halverwege afbreekt moet weten of opnieuw beginnen veilig is. Het doel is niet dat alles idempotent IS -- het is dat van elke route vastligt wat een tweede keer betekent.",
    "sluit": "per route beslissen en vastleggen. Het instrument staat (scripts/idemproef-route.js plus IDEMBESLUIT.json met zijn klassen); dit is meetwerk en handwerk."
   },
@@ -207,7 +207,7 @@
    },
    {
     "op": "2026-09-03",
-    "aantal": 0
+    "aantal": 1
    }
   ],
   "capability-in-handler": [
@@ -221,7 +221,7 @@
    },
    {
     "op": "2026-09-03",
-    "aantal": 612
+    "aantal": 548
    }
   ],
   "objectpoort": [
@@ -431,7 +431,7 @@
    },
    {
     "op": "2026-09-03",
-    "aantal": 1487
+    "aantal": 1486
    }
   ],
   "wegwerpserver-kopieen": [
@@ -450,6 +450,12 @@
   ]
  },
  "stilstaand": [
+  {
+   "id": "auth-onbeslist",
+   "aantal": 1,
+   "meetdagen": 3,
+   "reden": "staat 3 meetdagen op hetzelfde getal; de aflossing stokt hier. Sluitweg: per route nakijken wat er precies wordt gevraagd. Dit is geen instrumentvraag meer maar handwerk op een handvol routes, en dat is precies wat een schuldpost hoort te zijn als het gereedschap er is."
+  },
   {
    "id": "objectpoort",
    "aantal": 52,
@@ -540,7 +546,7 @@
    "op": "2026-09-03",
    "van": 2283,
    "naar": 2291,
-   "reden": "IDEMPROEF.json staat weer op de stand van main, want de eindpoort leest daar de wereldmeting uit die de stand van #176 niet kent; de proef van main beoordeelde 1573 routes tegen 1564 in die van #176, en die negen extra beproefde muterende routes dragen nog geen besluit in IDEMBESLUIT.json. Gevolg-onbekend zakte tegelijk met een. Sluit met de meetronde op deze stand"
+   "reden": "Drie gelijktijdig geopende PR's (#180, #181, #182) zijn als een verzameling samengevoegd op een integratietak. Elke tak bleef binnen zijn eigen schuld; samen brengen ze meer routes en meer capabilities mee dan de hoofdlijn kende, en dat telt hier op in plaats van stil verrekend te worden. De groei zit in gevolg-onbekend, herstel-onbevestigd en output-niet-toerekenbaar: nieuwe bereikbare capabilities waarvan nog niemand heeft gemeten WAT ze veranderen. Een getal dat hierbij NIET is overgenomen: rollback-gezakt stond op 5 zolang STAATPROEF.json uit een andere tak kwam; op deze code gemeten (schone boom, commit 76a23dfc) is het 1."
   }
  ]
 }

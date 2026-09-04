@@ -25,7 +25,7 @@
     "kernGedeeld": 232,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 568,
+    "toetsenNietGemeten": 569,
     "toetsenOngevoeligPct": 1,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
@@ -1720,6 +1720,15 @@
       "vervalt": "2026-12-01",
       "meter": "metingenZonderRatel 41 -> 49",
       "reden": "Drie gelijktijdig geopende PR's (#180, #181, #182) zijn als een verzameling samengevoegd op een integratietak (#183). Elke tak bleef binnen zijn eigen norm; samen brengen ze meer mee dan de hoofdlijn had, en dat wordt hier per meter benoemd in plaats van stil verrekend. Vijftien nieuwe registers kwamen mee. Zeven ervan hangen inmiddels WEL aan een ratel (DOODSPOOR, TAFELPROEF, RITPROEF, TOELATINGSPROEF, KETENVORM, RITMIGRATIE, DOORWERKING -- elk met een toets die vers meet en met het register vergelijkt), waardoor de meting van 56 naar 49 zakte. De rest komt uit de andere twee takken en is hier NIET met een gok ingeschreven: de kop van scripts/lib/metingen.js zegt dat het getal hoort te dalen doordat er ratels bijkomen en niet doordat er regels bijkomen. Aflossen: per register de ratel aanwijzen die hem werkelijk vasthoudt."
+    },
+    {
+      "datum": "2026-09-04",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 568,
+      "meter": "toetsenNietGemeten 568 -> 569",
+      "vervalt": "2027-03-31",
+      "reden": "Een nieuw toetsbestand (test/objectveld.test.js) waar de mutatiemotor nog niet overheen is geweest. Met de hand zijn er WEL twee mutaties op gedaan en gezien zakken: het objectveld van de rtf/spel-familie weghalen (31 routes vallen terug, toets 2 rood) en een opgeloste route op de lijst laten staan (toets 3 rood, want de lijst mag niet slijten). Aflossen is de motor erover laten lopen."
     }
   ],
   "prestatie": {

@@ -95,10 +95,25 @@ voornemen, en die staan hieronder ook als zodanig.
 | een route draagt een invoercontract (par. 2) | -- | **geen handhaver.** Vraagt `TAKEN.md` 7.6 |
 | een ontleder van buitenbytes hangt niet (par. 6) | een nieuwe ontleder wordt op misvormde bytes beproefd | **half.** `test/vijandigerand.test.js` bewaakt de twee gerepareerde ontleders met een tijdsbudget in een kindproces; er is nog geen fuzzer die zelf zoekt -- `TAKEN.md` 7.2 |
 | elk /api-pad draagt een poort (par. 8) | een nieuwe route zonder poort komt er niet door | **machine** -- keuringsregel 28, sinds 2 september HARD over de volle routetabel: 565 paden buiten zijn eigen uitdrukking, alle 565 geclassificeerd, nul zonder poort |
-| autorisatie is toewijsbaar (par. 8) | -- | **geen handhaver.** Een poort HEBBEN is niet hetzelfde als een toewijsbare uitslag geven; van de 716 `OBJECT_SCOPED`-routes dragen er 638 er geen -- `TAKEN.md` 7.14 sloot de eerste helft, de tweede staat open |
+| autorisatie is toewijsbaar (par. 8) | een nieuwe OBJECT_SCOPED-route noemt het veld dat het object aanwijst | **machine** -- `test/objectveld.test.js`: 734 routes, 716 dragen een objectveld, de 18 die dat niet doen staan met naam op een lijst die alleen mag KRIMPEN (huispatroon, `check.js` regel 45) |
 
-Zeven machines en vijf voornemens, en bij elk voornemen staat wat hem in de weg
-staat. De schaduwstand is er niet meer: hij is op 2 september 2026 hard geworden,
+Acht machines en vier voornemens, en bij elk voornemen staat wat hem in de weg
+staat. (In een aparte tak schuift de foutmelder er nog een op; die telling staat
+daar, want geen van beide takken mag alleen de winst van de ander claimen.)
+
+**De toewijsbaarheid schoof op 4 september 2026, met een les over het getal
+zelf.** Hier stond "van de 716 dragen er 638 geen veld". Nagemeten waren het er
+**47**, en daarvan verdwenen er **29** zodra de meting op de juiste plek keek:
+de spelroutes komen uit een lus (`app.post('/api/rtf/spel/' + naam, ...)`),
+hebben daarom geen bewaker in de routetabel staan, en hangen allemaal achter
+`rtfSpeler()` -- die exact dezelfde profielcontrole doet als `gezinsPoort`. Ze
+hadden hun deur dus altijd al; de lezer keek ernaast. Dezelfde vorm als de zeven
+"onvindbare bronnen" bij keuringsregel 28 hieronder.
+
+Wat overblijft is 18, met naam in `test/objectveld.test.js`, op een lijst die
+alleen mag krimpen -- inclusief een toets die zakt zodra iemand er een oplost en
+hem laat staan. Geen van de achttien is een bewezen lek; ze zijn ONBEPAALD, en
+dat is precies het verschil dat deze eis bewaakt. De schaduwstand is er niet meer: hij is op 2 september 2026 hard geworden,
 en dat is precies wat een schaduw hoort te doen. Die verhouding hoort te verschuiven; zij is zelf de
 voortgangsmaat van dit document. Wat er NIET hoort te gebeuren is dat een
 voornemen stilzwijgend als eis wordt gelezen omdat hij in dezelfde tabel staat.

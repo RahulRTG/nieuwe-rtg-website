@@ -1,15 +1,17 @@
 {
  "stempel": {
-  "op": "2026-09-03T07:55:35.182Z",
-  "commit": "f5ef364a",
+  "op": "2026-09-04T01:14:09.740Z",
+  "commit": "45a777a4",
   "boomVuil": false,
+  "boomAnders": 0,
+  "instrument": "scripts/test-runner.js",
   "node": "v22.22.2"
  },
  "uitleg": "De laatste VOLLE testronde: wanneer, waartegen, en of hij groen was. scripts/versheid.js leest dit als elk ander register, zodat een suite die achterloopt net zo hard opvalt als een register dat achterloopt.",
  "grens": "zegt niets over WELKE toets zakte -- dat staat in de uitvoer van de ronde zelf. Hij zegt alleen dat er een volle ronde is geweest, wanneer, en met welke uitkomst.",
  "hoe": "npm test",
  "gemeten": {
-  "bestanden": 1272,
+  "bestanden": 1415,
   "afsluitcode": 1,
   "groen": false
  }

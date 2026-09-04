@@ -1,9 +1,9 @@
 {
   "uitleg": "Elke route (METHODE + patroon) die tijdens de volledige testsuite ECHT is aangeraakt, uit het routejournaal van server/routelog.js en niet uit de tekst van de toetsen. De eis is 100%: scripts/dekking.js zakt op elk gat en kent geen norm om die eis te verlagen. Het RTG Kantoor leest dit bestand (routes/office/dekking.js) en houdt het naast wat de server op dit moment registreert, zodat een route die er na de meting bij komt meteen als ongemeten opvalt. Bijwerken met: npm run dekking:vast",
   "gemeten": {
-    "op": "2026-09-03T10:56:26.676Z",
-    "commit": "7f4ee696",
-    "routesToen": 4942
+    "op": "2026-09-04T01:14:55.538Z",
+    "commit": "45a777a4",
+    "routesToen": 4946
   },
   "aangeraakt": [
     "GET /",
@@ -2035,6 +2035,8 @@
     "POST /api/office/aidata",
     "POST /api/office/aidata/export",
     "POST /api/office/anker",
+    "POST /api/office/anker/post",
+    "POST /api/office/anker/post/reken",
     "POST /api/office/anker/reken",
     "POST /api/office/architect",
     "POST /api/office/architect/bouwstaat",
@@ -3477,6 +3479,7 @@
     "POST /api/sociaal/graaf",
     "POST /api/sociaal/lijn",
     "POST /api/sociaal/object",
+    "POST /api/sociaal/object/pagina",
     "POST /api/sociaal/rahul",
     "POST /api/sociaal/voorstel/bevestig",
     "POST /api/sociaal/wereld",
@@ -3967,6 +3970,7 @@
     "POST /api/supplier/horeca/rekening",
     "POST /api/supplier/horeca/rekening/open",
     "POST /api/supplier/horeca/rekening/regel",
+    "POST /api/supplier/horeca/rekening/regel/corrigeer",
     "POST /api/supplier/horeca/rekening/regel/stoel",
     "POST /api/supplier/horeca/rekening/regel/weg",
     "POST /api/supplier/horeca/rekening/splits",

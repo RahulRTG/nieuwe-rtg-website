@@ -9,7 +9,7 @@ module.exports = (vctx) => {
     salonZichtbaar, ontmoetZet, ontmoetPos, ontmoetKies, ontmoetTeken,
     ontmoetHier, ontmoetStop, ontmoetSos, ontmoetSignaalKantoor, ontmoetMijnState,
     avShowroom, avAanbevolen, avProefrit, avKoop, avInruil,
-    avTeken, avMijnDeals, zorgVoor, zorgContact, media,
+    avTeken, avMijnDeals, zorgVoor, zorgMee, zorgContact, media,
     boekingMetRef, boekingenVanZaak, boekingenVoegToe, openLijn, gegevensStop } = vctx;
 /* ================== autoverhuur: eerlijk huren ==================
    Tegen de schimmige verhuurders in: vaste dagprijs vooraf betaald (geen
@@ -75,7 +75,7 @@ app.post('/api/huur/boek', auth, (req, res) => {
     customerTier: req.session.tier, customerKey: req.session.key, customerCodename: codename,
     autoId: auto.id, autoNaam: auto.name, kenteken: auto.plate || null,
     van, tot, dagen,
-    zorg: zorgVoor(req.session.key),
+    zorg: zorgMee(req.session.key, { zaak: s.code, reden: 'zorgprofiel meegegeven bij autohuur' }),
     service: { id: auto.id, name: auto.name + ', ' + dagen + ' dag(en)', soort: 'huur' },
     price: (auto.dagprijs || 0) * dagen,
     wanneer: van,

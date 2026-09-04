@@ -56,6 +56,11 @@
   .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:0;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;z-index:30;}
   .login{max-width:360px;margin:3rem auto;padding:0 1rem;text-align:center;}
   .login .veld{width:100%;margin-bottom:.6rem;}
+
+  /* Uit inline style-attributen gehaald door scripts/inlinestijl-omzet.js (TAKEN.md 4.51). Bewezen gelijk met
+     scripts/inlinestijl-proef.js: elk element, elke aangeraakte eigenschap,
+     berekend in een echte browser. Letterlijk wat er stond -- geen ontwerpbesluit. */
+  .i-186m9v{width:100%}
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>
@@ -70,7 +75,7 @@
     <p style="color:var(--muted);font-size:.9rem;line-height:1.6;margin-bottom:1.25rem;">Log in als medewerker van de gemeente met je persoonlijke pincode.</p>
     <select class="veld" id="wie" aria-label="Medewerker"><option value="">Laden...</option></select>
     <input class="veld" id="pin" type="password" inputmode="numeric" maxlength="8" placeholder="Pincode">
-    <button class="knop prim" id="loginGo" style="width:100%;" data-hoofdactie>Inloggen</button>
+    <button class="i-186m9v knop prim" id="loginGo" data-hoofdactie>Inloggen</button>
   </div>
 
   <div id="app" hidden>
@@ -82,7 +87,7 @@
     <section class="paneel" id="p-bek">
       <div class="item">
         <h3>Nieuwe bekendmaking</h3>
-        <div class="lbl">Titel</div><input class="veld" id="bekTitel" maxlength="120" style="width:100%;">
+        <div class="lbl">Titel</div><input class="i-186m9v veld" id="bekTitel" maxlength="120">
         <div class="lbl">Tekst</div><textarea class="veld" id="bekTekst" maxlength="800" style="width:100%;min-height:3rem;resize:vertical;"></textarea>
         <div class="lbl">Soort</div>
         <select class="veld" id="bekSoort"><option value="algemeen">Algemeen</option><option value="raad">Raad</option><option value="verkeer">Verkeer</option><option value="vergunning">Vergunning</option></select>

@@ -51,6 +51,14 @@
   .keurvak .veld{width:100%;margin-bottom:.45rem;}
   .kpi.blok{display:block;}
   .kpi.blok.let{color:var(--rtg-leesgoud,var(--gold));}
+
+  /* Uit inline style-attributen gehaald door scripts/inlinestijl-omzet.js (TAKEN.md 4.51). Bewezen gelijk met
+     scripts/inlinestijl-proef.js: elk element, elke aangeraakte eigenschap,
+     berekend in een echte browser. Letterlijk wat er stond -- geen ontwerpbesluit. */
+  .i-m3b83{margin-bottom:0.5rem}
+  .i-7uiyo{flex:2;min-width:12rem}
+  .i-jwsivx{flex:1;min-width:7rem}
+  .i-jwtsuz{flex:1;min-width:9rem}
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
 </head>
@@ -70,7 +78,7 @@
   <section id="tabOverzicht">
     <div class="kaart">
       <div class="sec">Wie werkt waar -- met het past-signaal</div>
-      <div class="noot" style="margin-bottom:0.5rem;">Omdat RTG de klok en het rooster al kent, ziet het loonkantoor in een blik of het werk past: overbelast, rustig of in balans.</div>
+      <div class="i-m3b83 noot">Omdat RTG de klok en het rooster al kent, ziet het loonkantoor in een blik of het werk past: overbelast, rustig of in balans.</div>
       <div id="mensen"><div class="leeg">Laden...</div></div>
     </div>
   </section>
@@ -78,8 +86,8 @@
     <div class="kaart">
       <div class="sec">De loonrun: geklokte uren x uurloon, per zaak en periode</div>
       <div class="rij">
-        <select class="veld" id="lrZaak" style="flex:2;min-width:12rem;"></select>
-        <input class="veld" id="lrPeriode" style="flex:1;min-width:7rem;" placeholder="2026-07">
+        <select class="i-7uiyo veld" id="lrZaak"></select>
+        <input class="i-jwsivx veld" id="lrPeriode" placeholder="2026-07">
         <button class="knop" id="lrDraai">Draai de loonrun</button>
       </div>
       <div class="noot h-mt45">Uurloon per land (nooit onder het minimum), plus vakantiegeld, min loonheffing; de werkgeverslasten uit de fiscale landtabellen staan ernaast. Elke medewerker krijgt zijn loonstrook in de personeels-app; de uitbetaling loopt via RTG Pay.</div>
@@ -89,7 +97,7 @@
   <section id="tabMatch" hidden>
     <div class="kaart">
       <div class="sec">De matchtafel -- vacatures en mensen die bij elkaar passen</div>
-      <div class="noot" style="margin-bottom:0.5rem;">Alleen medewerkers die zichzelf "open voor werk" hebben gezet, staan op deze tafel; wie de schakelaar uit laat is voor werkgevers onvindbaar.</div>
+      <div class="i-m3b83 noot">Alleen medewerkers die zichzelf "open voor werk" hebben gezet, staan op deze tafel; wie de schakelaar uit laat is voor werkgevers onvindbaar.</div>
       <div id="matchIn"><div class="leeg">Laden...</div></div>
     </div>
   </section>
@@ -101,8 +109,8 @@
   <section id="tabOs" hidden>
     <div class="kaart">
       <div class="sec">Regelpakketten</div>
-      <div class="noot" style="margin-bottom:0.5rem;">Tarieven zijn geen constanten maar jaargangen met een versie. Een binnengehaald pakket staat <b>ongecontroleerd</b> tot iemand het aanmerkt; op zo'n pakket mag geen definitieve loonrun draaien.</div>
-      <div class="rij" style="margin-bottom:0.5rem;">
+      <div class="i-m3b83 noot">Tarieven zijn geen constanten maar jaargangen met een versie. Een binnengehaald pakket staat <b>ongecontroleerd</b> tot iemand het aanmerkt; op zo'n pakket mag geen definitieve loonrun draaien.</div>
+      <div class="i-m3b83 rij">
         <button class="knop" id="osHaal">Nu bijwerken</button>
       </div>
       <div id="osRegels"><div class="leeg">Laden...</div></div>
@@ -110,8 +118,8 @@
 
     <div class="kaart">
       <div class="sec">Looncomponenten</div>
-      <div class="noot" style="margin-bottom:0.5rem;">Een looncomponent is een <b>regel</b>, geen veld: fooien voor de horeca, wachttijd voor een vervoerder, een eindejaarsuitkering voor een school. Wat je hier vastlegt bepaalt welke grondslagen een bedrag raakt -- telt hij mee voor de loonheffing, de premies, het vakantiegeld. Een component vervalt wel, maar verdwijnt nooit: oude stroken moeten leesbaar blijven.</div>
-      <div class="rij" style="margin-bottom:0.5rem;">
+      <div class="i-m3b83 noot">Een looncomponent is een <b>regel</b>, geen veld: fooien voor de horeca, wachttijd voor een vervoerder, een eindejaarsuitkering voor een school. Wat je hier vastlegt bepaalt welke grondslagen een bedrag raakt -- telt hij mee voor de loonheffing, de premies, het vakantiegeld. Een component vervalt wel, maar verdwijnt nooit: oude stroken moeten leesbaar blijven.</div>
+      <div class="i-m3b83 rij">
         <button class="knop" id="cpLaad">Toon het register</button>
         <button class="knop" id="cpNieuw">Voeg een component toe</button>
       </div>
@@ -120,9 +128,9 @@
 
     <div class="kaart">
       <div class="sec">Contracten</div>
-      <div class="noot" style="margin-bottom:0.5rem;">Zonder contract staat iemand niet op de loonrun -- er wordt geen uurloon geraden. Een wijziging <b>overschrijft niet</b>: er komt een versie bij met een ingangsdatum, zodat een oude periode blijft rekenen met wat er toen gold.</div>
+      <div class="i-m3b83 noot">Zonder contract staat iemand niet op de loonrun -- er wordt geen uurloon geraden. Een wijziging <b>overschrijft niet</b>: er komt een versie bij met een ingangsdatum, zodat een oude periode blijft rekenen met wat er toen gold.</div>
       <div class="rij">
-        <select class="veld" id="ctZaak" style="flex:2;min-width:12rem;"></select>
+        <select class="i-7uiyo veld" id="ctZaak"></select>
         <input class="veld" id="ctDatum" style="flex:1;min-width:8rem;" placeholder="peildatum 2026-07-01">
         <button class="knop" id="ctLaad">Toon personeel</button>
       </div>
@@ -132,8 +140,8 @@
     <div class="kaart">
       <div class="sec">Loonrun openen</div>
       <div class="rij">
-        <select class="veld" id="osZaak" style="flex:2;min-width:12rem;"></select>
-        <input class="veld" id="osPeriode" style="flex:1;min-width:7rem;" placeholder="2026-07">
+        <select class="i-7uiyo veld" id="osZaak"></select>
+        <input class="i-jwsivx veld" id="osPeriode" placeholder="2026-07">
         <button class="knop" id="osOpen">Open concept</button>
       </div>
       <div class="noot h-mt45">De uren komen uit de klok van de zaak zelf; ze worden niet meegestuurd. Een ontbrekende uitklok wordt niet geschat maar gemeld.</div>
@@ -163,9 +171,9 @@
   <section id="tabWereld" hidden>
     <div class="kaart">
       <div class="sec">Dekking per land</div>
-      <div class="noot" style="margin-bottom:0.5rem;">Elk land waar RTG zaken heeft, met de vraag die telt: kan hier een loonrun draaien? Er wordt niets geschat -- ligt er geen tabel, dan staat er wat er nog moet komen.</div>
-      <div class="rij" style="margin-bottom:0.5rem;">
-        <input class="veld" id="wlPeil" style="flex:1;min-width:9rem;" placeholder="peildatum (leeg = vandaag)">
+      <div class="i-m3b83 noot">Elk land waar RTG zaken heeft, met de vraag die telt: kan hier een loonrun draaien? Er wordt niets geschat -- ligt er geen tabel, dan staat er wat er nog moet komen.</div>
+      <div class="i-m3b83 rij">
+        <input class="i-jwtsuz veld" id="wlPeil" placeholder="peildatum (leeg = vandaag)">
         <button class="knop" id="wlLaad">Toon de wereld</button>
         <button class="knop" id="wlRonde">Nu overal bijwerken</button>
       </div>
@@ -176,10 +184,10 @@
 
     <div class="kaart">
       <div class="sec">Een bron toevoegen</div>
-      <div class="noot" style="margin-bottom:0.5rem;">Een https-adres dat een regelpakket als JSON teruggeeft. De dagelijkse ronde haalt hem op, keurt hem en zet hem klaar als <b>ongecontroleerd</b>; er gaat nooit vanzelf een definitieve loonrun op iets wat geen mens heeft aangemerkt.</div>
+      <div class="i-m3b83 noot">Een https-adres dat een regelpakket als JSON teruggeeft. De dagelijkse ronde haalt hem op, keurt hem en zet hem klaar als <b>ongecontroleerd</b>; er gaat nooit vanzelf een definitieve loonrun op iets wat geen mens heeft aangemerkt.</div>
       <div class="rij">
         <input class="veld" id="brLand" style="width:6rem;" placeholder="NL" maxlength="2">
-        <input class="veld" id="brNaam" style="flex:1;min-width:9rem;" placeholder="Naam van de bron">
+        <input class="i-jwtsuz veld" id="brNaam" placeholder="Naam van de bron">
         <input class="veld" id="brUrl" style="flex:2;min-width:14rem;" placeholder="https://...">
         <button class="knop" id="brZet">Voeg toe</button>
       </div>

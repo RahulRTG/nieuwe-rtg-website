@@ -44,6 +44,11 @@
   .melding.zien{opacity:1;}
   .deel{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted,var(--zacht,#8A8680));margin:1.6rem 0 .5rem;}
   @media (prefers-reduced-motion: reduce){*{transition:none !important;}}
+
+  /* Uit inline style-attributen gehaald door scripts/inlinestijl-omzet.js (TAKEN.md 4.51). Bewezen gelijk met
+     scripts/inlinestijl-proef.js: elk element, elke aangeraakte eigenschap,
+     berekend in een echte browser. Letterlijk wat er stond -- geen ontwerpbesluit. */
+  .i-9ex6ps{margin:0.4rem 0}
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>
@@ -69,8 +74,8 @@
       <b class="groot" id="kDienst"></b>
       <div id="kAttr" style="margin:0.5rem 0;"></div>
       <select id="kNamens" style="display:none;" aria-label="Inloggen als"></select>
-      <p class="stil" id="kNiveau" style="margin:0.4rem 0;"></p>
-      <p class="stil" id="kSleutel" style="margin:0.4rem 0;"></p>
+      <p class="i-9ex6ps stil" id="kNiveau"></p>
+      <p class="i-9ex6ps stil" id="kSleutel"></p>
       <div class="rij" style="margin-top:0.4rem;">
         <button class="knop vol" id="kBevestig" type="button">Bevestig met passkey</button>
         <button class="knop" id="kMaak" type="button" style="display:none;">Passkey aanmaken</button>

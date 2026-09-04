@@ -90,7 +90,7 @@ test('plaats: een hek passeren levert een waarneming op, en geen coordinaat over
        een navigatie -- en elke evaluate die daar tussenin valt sterft aan
        "Execution context was destroyed". Dat is geen kapotte pagina maar een
        toets die op het verkeerde moment kijkt. */
-    await page.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'load' });
+    await page.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded' });
     /* Wachten op wat de PAGINA levert, en niets injecteren. Dat is meteen de
        scherpere toets: hij zakt nu ook als iemand de scripttag uit app.html
        haalt, en dat kon hij hiervoor niet zien. */

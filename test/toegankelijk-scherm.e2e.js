@@ -23,7 +23,7 @@ const wortelMaat = (page) => page.evaluate(() =>
 
 /* WAT DEZE TOETS ECHT NODIG HEEFT NA EEN NAVIGATIE, en dat is minder dan `load`.
 
-   Elke goto stond op `waitUntil: 'load'`: wachten tot ELK subverzoek binnen is,
+   Elke goto stond op `waitUntil: 'domcontentloaded'`: wachten tot ELK subverzoek binnen is,
    elk plaatje en elk lettertype. Dat houdt stand op een rustige machine en valt
    onder belasting om -- dezelfde vorm als wachten op de klok (TAKEN.md 6.5),
    alleen met een ander teken ernaast.

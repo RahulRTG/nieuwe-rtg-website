@@ -76,6 +76,11 @@
   .vraagkaart.open{opacity:1;transform:translateX(-50%) translateY(0);}
   .vraagkaart.rahul{border-color:var(--burgundy);box-shadow:0 8px 30px rgba(127,22,52,.35);}
   @media (prefers-reduced-motion: reduce){ *{transition:none !important;animation:none !important;} }
+
+  /* Uit inline style-attributen gehaald door scripts/inlinestijl-omzet.js (TAKEN.md 4.51). Bewezen gelijk met
+     scripts/inlinestijl-proef.js: elk element, elke aangeraakte eigenschap,
+     berekend in een echte browser. Letterlijk wat er stond -- geen ontwerpbesluit. */
+  .i-m6row9{margin-top:0.75rem;width:100%}
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
@@ -112,7 +117,7 @@
     <div id="gidsZalen"></div>
     <div class="sub h-mt100">open suites van leden</div>
     <div id="gidsSuites"></div>
-    <button class="knop2 stil2" id="gidsDicht" type="button" style="margin-top:0.75rem;width:100%;">Sluiten</button>
+    <button class="i-m6row9 knop2 stil2" id="gidsDicht" type="button">Sluiten</button>
   </div>
 </section>
 
@@ -130,7 +135,7 @@
     </div>
     <div class="sub h-mt70" id="atelierUitleg">Kies een meubel en tik daarna op een tegel; in de weghaal-modus tikt u op een meubel om het terug te geven.</div>
     <div class="catgrid" id="catalogus"></div>
-    <button class="knop2 stil2" id="atelierDicht" type="button" style="margin-top:0.75rem;width:100%;">Klaar met inrichten</button>
+    <button class="i-m6row9 knop2 stil2" id="atelierDicht" type="button">Klaar met inrichten</button>
   </div>
 </section>
 
@@ -143,7 +148,7 @@
     <h2>De huistelefoon</h2>
     <div class="sub">wie is er nu in het huis; nodig iemand uit in uw suite</div>
     <div id="belLijst"></div>
-    <button class="knop2 stil2" id="belDicht" type="button" style="margin-top:0.75rem;width:100%;">Ophangen</button>
+    <button class="i-m6row9 knop2 stil2" id="belDicht" type="button">Ophangen</button>
   </div>
 </section>
 

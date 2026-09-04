@@ -22,6 +22,8 @@
 'use strict';
 
 const { s } = require('./register');
+const { NIVEAUS } = require('../frictie');
+
 /* De recepten zelf staan in ./runbookcatalogus.js: gegevens, geen werking. */
 const { RUNBOOKS, OP_ID, BEVROREN } = require('./runbookcatalogus');
 
@@ -108,7 +110,7 @@ function maakRunbooks({ db, save, crypto, journaal, risico, beleid, register, ca
 
     /* De grendel: boven de mensgrens draait hij niet vanzelf, ook niet als de
        beller "echt" vroeg. Dat oordeel hoort hier en niet in het scherm. */
-    if (!droog && ord.niveau === 'hand' && !o.menselijkAkkoord) {
+    if (!droog && ord.niveau === NIVEAUS.hand && !o.menselijkAkkoord) {
       return { error: 'Dit herstel vraagt een menselijk besluit (risico ' + ord.score + ').', status: 403, oordeel: ord };
     }
 
@@ -164,7 +166,7 @@ function maakRunbooks({ db, save, crypto, journaal, risico, beleid, register, ca
     run.teruggedraaid = true; run.terugDoor = String(door); run.terugAt = new Date().toISOString();
     if (save) save();
     journaal.noteer({ actor: door, actie: 'herstel terugdraaien', objectType: 'runbook', objectId: run.runbook,
-      niveau: 'hand', reden: String(reden || 'terug naar de vorige toestand'),
+      niveau: NIVEAUS.hand, reden: String(reden || 'terug naar de vorige toestand'),
       voor: { geraakt: run.geraakt.length }, na: { teruggezet: terug, overgeslagen } });
     return { teruggezet: terug, overgeslagen, run: samenvatting(run) };
   }

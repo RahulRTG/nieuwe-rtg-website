@@ -36,6 +36,12 @@
   .chip.aan{border-color:var(--goud);color:var(--accent-tekst);}
   .ledenregel{color:var(--zacht);font-size:.85rem;margin:.2rem 0 .8rem;}
   .deel{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted,var(--zacht,#8A8680));margin:1.6rem 0 .5rem;}
+
+  /* Uit inline style-attributen gehaald door scripts/inlinestijl-omzet.js (TAKEN.md 4.51). Bewezen gelijk met
+     scripts/inlinestijl-proef.js: elk element, elke aangeraakte eigenschap,
+     berekend in een echte browser. Letterlijk wat er stond -- geen ontwerpbesluit. */
+  .i-1stvws{display:flex;gap:.5rem;margin-top:0.5rem}
+  .i-15bgfu{width:100%;margin-top:0.5rem}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
@@ -72,18 +78,18 @@
     <h2 class="sec">Taken <small style="text-transform:none;letter-spacing:0;">(tik  om een taak te pakken)</small></h2>
     <div class="kaart blok">
       <div id="pTaken"></div>
-      <div style="display:flex;gap:.5rem;margin-top:0.5rem;">
+      <div class="i-1stvws">
         <input class="veld h-flex1" id="tNieuw" placeholder="Nieuwe taak…" maxlength="140">
         <button class="knop klein" id="tMaak">+</button>
       </div>
-      <button class="knop grijs" id="pAi" style="width:100%;margin-top:0.5rem;">Laat de buddy een plan voorstellen</button>
+      <button class="i-15bgfu knop grijs" id="pAi">Laat de buddy een plan voorstellen</button>
       <div class="fout" id="pFout"></div>
     </div>
 
     <h2 class="sec">Notities en vondsten</h2>
     <div class="kaart blok">
       <div id="pNotities"><div class="leeg">Nog niets genoteerd.</div></div>
-      <div style="display:flex;gap:.5rem;margin-top:0.5rem;">
+      <div class="i-1stvws">
         <input class="veld h-flex1" id="nNotitie" placeholder="Idee, bron of afspraak…" maxlength="500">
         <button class="knop klein" id="nPlaats">+</button>
       </div>
@@ -94,7 +100,7 @@
       <div class="keuzerij" id="uVrienden"><span class="leeg">Vrienden laden…</span></div>
       <input class="veld h-mt30" id="uCodenaam" placeholder="Of nodig uit op codenaam">
       <div class="leeg" style="padding:.3rem 0 0;">Samen werken maakt je niet automatisch vrienden; de ander accepteert zelf.</div>
-      <button class="knop grijs" id="uStuur" style="width:100%;margin-top:0.5rem;">Nodig uit</button>
+      <button class="i-15bgfu knop grijs" id="uStuur">Nodig uit</button>
       <div class="fout" id="uFout"></div>
     </div>
 

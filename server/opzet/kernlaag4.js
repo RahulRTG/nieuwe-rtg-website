@@ -129,7 +129,7 @@ require('./kernlaag4-comm')(kern, hulp);
    de bouw, en een kopie op dit moment zou undefined bevriezen -- de stille
    breuk waar opzet/domeingrens.js over gaat. Bij de samenvoeging van de
    Life-tak eerst weggevallen; vier zorgtoetsen wezen hem meteen aan. */
-Object.assign(kern, require('../kern/care')({ db, save, crypto, schoon, notify, zorgVoor: kern.zorgVoor,
+Object.assign(kern, require('../kern/care')({ db, save, crypto, schoon, notify, zorgVoor: kern.zorgVoor, zorgMee: kern.zorgMee,
   metingVanBehandelaar: (...a) => kern.metingVanBehandelaar(...a) }));
 // Fluister: de persoonlijke assistent met geheugen (weetjes + focus)
 /* Geldregie (kern/geldregie.js): RTG bepaalt de geldkant vanuit de boardroom:

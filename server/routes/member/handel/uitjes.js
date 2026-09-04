@@ -6,7 +6,7 @@ module.exports = (hctx) => {
           reserveerTafel, mijnReserveringen, annuleerReservering, annuleerItem, plaatsReview,
           reviewsVoor, verblijfBoek, mijnVerblijven, verblijfAnnuleer, gastDeur, toggleFavoriet,
           favorietenVan, agendaVoor, maakSplits, mijnSplitsen, betaalSplits, zetOpWachtlijst,
-          mijnWachtlijst, rsvpAnnuleer, puntenVan, verzilverPunten, zorgVoor, idGeverifieerd,
+          mijnWachtlijst, rsvpAnnuleer, puntenVan, verzilverPunten, zorgMee, idGeverifieerd,
           gegevensStop } = kern;
 app.post('/api/verblijf', auth, (req, res) => {
   if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
@@ -15,7 +15,8 @@ app.post('/api/verblijf', auth, (req, res) => {
   const r = verblijfBoek(req.session, liveCodename(req.session), req.body);
   if (r.error) return res.status(r.status).json({ error: r.error });
   // het zorgprofiel reist mee (alleen met toestemming): de receptie weet het meteen
-  const zorg = zorgVoor(req.session.key);
+  const zorg = zorgMee(req.session.key, { zaak: r.verblijf.supplierCode,
+    reden: 'zorgprofiel meegegeven bij een verblijf' });
   if (zorg) { r.verblijf.zorg = zorg; save(); }
   res.json(r);
 });
@@ -45,7 +46,8 @@ app.post('/api/reserveer', auth, (req, res) => {
   const r = reserveerTafel(req.session, liveCodename(req.session), req.body);
   if (r.error) return res.status(r.status).json({ error: r.error });
   // het zorgprofiel reist mee (alleen met toestemming): de zaak weet het al bij het dekken
-  const zorgR = zorgVoor(req.session.key);
+  const zorgR = zorgMee(req.session.key, { zaak: r.reservering.supplierCode,
+    reden: 'zorgprofiel meegegeven bij een tafelreservering' });
   if (zorgR) { r.reservering.zorg = zorgR; save(); }
   res.json(r);
 });

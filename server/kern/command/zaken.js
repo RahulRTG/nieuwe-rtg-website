@@ -16,6 +16,8 @@
    zou hij per omgeving niet te verschuiven zijn zonder code te wijzigen. */
 'use strict';
 
+const { NIVEAUS } = require('../frictie');
+
 const OPEN = 'open', BEZIG = 'in behandeling', KLAAR = 'afgehandeld';
 
 function maakZaken({ db, save, crypto, journaal, beleid, vak, opslag }) {
@@ -74,7 +76,7 @@ function maakZaken({ db, save, crypto, journaal, beleid, vak, opslag }) {
     z.stappen.push({ at: nu(), wat: 'opgepakt', door: String(wie), reden: '' });
     if (save) save();
     journaal.noteer({ actor: wie, actie: 'zaak oppakken', objectType: 'zaak', objectId: z.id,
-      niveau: 'hand', reden: 'eigenaarschap', voor, na: { eigenaar: z.eigenaar, status: z.status } });
+      niveau: NIVEAUS.hand, reden: 'eigenaarschap', voor, na: { eigenaar: z.eigenaar, status: z.status } });
     return { zaak: z };
   }
 
@@ -95,7 +97,7 @@ function maakZaken({ db, save, crypto, journaal, beleid, vak, opslag }) {
     z.stappen.push({ at: z.besluit.at, wat: 'besloten: ' + z.besluit.keuze, door: String(wie), reden: z.besluit.reden });
     if (save) save();
     journaal.noteer({ actor: wie, actie: 'zaak besluiten', objectType: 'zaak', objectId: z.id,
-      niveau: 'hand', reden, voor, na: { status: z.status, keuze: z.besluit.keuze, opTijd: z.besluit.opTijd } });
+      niveau: NIVEAUS.hand, reden, voor, na: { status: z.status, keuze: z.besluit.keuze, opTijd: z.besluit.opTijd } });
     return { zaak: z };
   }
 

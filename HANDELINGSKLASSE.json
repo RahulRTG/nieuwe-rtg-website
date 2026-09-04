@@ -1,0 +1,23 @@
+{
+  "uitleg": "Gemeten door scripts/handelingsklasse.js (npm run handelingsklasse) over de paden in EXECUTION_MAP.json. `risicoGemarkeerd` en `omkeerbaarGemeten` zijn de ratels en mogen alleen OMHOOG; ze tellen alleen routes waarover een bron werkelijk iets zegt.",
+  "grens": "`ongemarkeerd` is geen laag risico maar de vaststelling dat geen grens in dit huis deze route aanwijst, en `onbekend` is geen onomkeerbaar maar een niet beproefde terugweg. Ze staan daarom apart en worden niet bij het gemarkeerde opgeteld.",
+  "gemeten": {
+    "paden": 4729,
+    "risicoGemarkeerd": 246,
+    "omkeerbaarGemeten": 44,
+    "beproefdePaden": 44
+  },
+  "risicoVerdeling": {
+    "geen": 58,
+    "ongemarkeerd": 4483,
+    "verhoogd": 110,
+    "hoog": 78,
+    "onbekend": 0
+  },
+  "omkeerbaarVerdeling": {
+    "onbekend": 4685,
+    "compensatie": 30,
+    "exact": 13,
+    "geen-herstel": 1
+  }
+}

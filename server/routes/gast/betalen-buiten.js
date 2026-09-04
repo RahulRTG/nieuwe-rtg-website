@@ -3,6 +3,8 @@
    en de vrijgavegrendel toe. Geen definitieve providerstand = geen keukenbon. */
 'use strict';
 
+const { NIVEAUS } = require('../../kern/geldbeleid/regels');
+
 module.exports = function betaalBuiten(ctx) {
   const { zaakVan, handleVan, horeca, orderlaag, naad } = ctx;
   const { app, auth, betaal, betaalWaarheid, geldgraaf, appUrl, save,
@@ -18,7 +20,7 @@ module.exports = function betaalBuiten(ctx) {
       const vrij = c.cijfers && Number(c.cijfers.vrijCenten);
       const einde = c.cijfers && Number(c.cijfers.eindeMaandCenten);
       const onvolledig = stil.length > 0 || !Number.isFinite(vrij);
-      const aandacht = !onvolledig && (centen > vrij || (c.uitzonderingen || []).some(x => x.niveau === 'klaarzetten'));
+      const aandacht = !onvolledig && (centen > vrij || (c.uitzonderingen || []).some(x => x.niveau === NIVEAUS.klaarzetten));
       return { niveau: onvolledig ? 'onvolledig' : aandacht ? 'aandacht' : 'rust',
         icoon: onvolledig ? '◷' : aandacht ? '!' : '✓',
         titel: onvolledig ? 'Beeld nog niet compleet' : aandacht ? 'Even bewust bekijken' : 'Past binnen je vrije ruimte',

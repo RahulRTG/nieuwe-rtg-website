@@ -45,6 +45,11 @@
   #wachtStrook{padding:.55rem 1rem;border-bottom:1px solid var(--line);font-size:.82rem;display:flex;gap:.7rem;align-items:center;flex-wrap:wrap;background:rgba(194,58,94,.12);color:var(--txt);}
   #wachtStrook b{font-weight:600;}
   #wachtStrook button{font:inherit;min-height:44px;padding:.2rem .7rem;background:transparent;color:var(--txt);border:1px solid var(--line);border-radius:0;cursor:pointer;}
+
+  /* Uit inline style-attributen gehaald door scripts/inlinestijl-omzet.js (TAKEN.md 4.51). Bewezen gelijk met
+     scripts/inlinestijl-proef.js: elk element, elke aangeraakte eigenschap,
+     berekend in een echte browser. Letterlijk wat er stond -- geen ontwerpbesluit. */
+  .i-m3b83{margin-bottom:0.5rem}
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
 </head>
@@ -106,7 +111,7 @@
 </main>
 <dialog id="dlgKg">
   <div class="sec">Gewicht</div>
-  <p class="hint" id="kgUitleg" style="margin-bottom:0.5rem;"></p>
+  <p class="i-m3b83 hint" id="kgUitleg"></p>
   <div class="rij"><input class="veld h-flex1" id="kgVeld" inputmode="decimal" placeholder="bv. 0,750"><span class="hint">kg</span></div>
   <div class="rij h-mt60"><button class="knop" id="kgOk">Op de bon</button><button class="knop stil" id="kgWeg">Annuleer</button></div>
 </dialog>
@@ -117,7 +122,7 @@
 </dialog>
 <dialog id="dlgVraag">
   <div class="sec" id="vraagKop"></div>
-  <p class="hint" id="vraagUitleg" style="margin-bottom:0.5rem;"></p>
+  <p class="i-m3b83 hint" id="vraagUitleg"></p>
   <div class="rij"><input class="veld h-flex1" id="vraagVeld" autocomplete="off" aria-labelledby="vraagKop" aria-describedby="vraagUitleg"></div>
   <div class="rij h-mt60"><button class="knop" id="vraagOk">Akkoord</button><button class="knop stil" id="vraagWeg">Annuleer</button></div>
 </dialog>
@@ -128,14 +133,14 @@
 </dialog>
 <dialog id="dlgScherm">
   <div class="sec">Welke kassa is dit toestel?</div>
-  <p class="hint" style="margin-bottom:0.5rem;">Gebruikt de zaak meerdere kassaschermen, dan krijgt elk scherm een eigen naam; elke bon draagt die naam en elk scherm kan een eigen modus hebben.</p>
+  <p class="i-m3b83 hint">Gebruikt de zaak meerdere kassaschermen, dan krijgt elk scherm een eigen naam; elke bon draagt die naam en elk scherm kan een eigen modus hebben.</p>
   <div id="schermLijst" style="display:flex;flex-direction:column;gap:.35rem;margin-bottom:0.5rem;"></div>
   <div class="rij"><input class="veld h-flex1" id="schermNieuw" placeholder='Nieuwe kassa, bv. "Kassa bar"'><button class="knop" id="schermMaak">Zet neer</button></div>
   <div class="rij h-mt60"><button class="knop stil" id="schermDicht">Sluit</button></div>
 </dialog>
 <dialog id="dlgPay">
   <div class="sec">RTG Pay</div>
-  <p class="hint" style="margin-bottom:0.5rem;">De gast toont de betaalcode (QR of cijfers) uit de app.</p>
+  <p class="i-m3b83 hint">De gast toont de betaalcode (QR of cijfers) uit de app.</p>
   <div class="rij"><input class="veld h-flex1" id="payCode" placeholder="Betaalcode" autocomplete="off"></div>
   <div class="rij h-mt60"><button class="knop" id="payOk">Innen</button><button class="knop stil" id="payWeg">Annuleer</button></div>
 </dialog>

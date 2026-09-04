@@ -26,6 +26,7 @@
    SLO.md), en het hoort niet stilzwijgend hier ingebouwd te worden. De
    uitgangen die er zijn, staan in de uitslag. */
 'use strict';
+const { maakTikker } = require('./tikker');
 
 const ERNST = { hoog: 3, midden: 2, laag: 1 };
 
@@ -183,16 +184,7 @@ function maakAlarm({ opslag, save, journaal, slo, sonde, canary, kwaliteit, norm
     };
   }
 
-  function tikker() {
-    /* Niet in een meetserver: zie ./tikkerstand.js voor waarom een klok die
-       binnen het meetvenster afgaat, zijn schrijfactie aan een willekeurige
-       route toegerekend krijgt. Alleen de LUS gaat uit; een weeg() die een
-       route zelf aanroept blijft gewoon schrijven. */
-    if (require('./tikkerstand').tikkersUit()) return null;
-    const t = setInterval(() => { try { weeg(); } catch (e) { /* nooit de lus breken */ } }, 60000);
-    if (t.unref) t.unref();
-    return t;
-  }
+  const tikker = maakTikker(weeg, 60000);   // zie ./tikker.js
 
   return { weeg, stand, stilzetten, controles, tikker, buitenStand };
 }

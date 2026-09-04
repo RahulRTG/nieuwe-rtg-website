@@ -19,6 +19,8 @@
    nooit een afgekapte lijst voor het geheel aanziet. */
 'use strict';
 
+const { NIVEAUS } = require('../frictie');
+
 const MAX = 5000;
 
 /* HET VAK. Standaard schrijft het journaal in db.data zelf -- dat is het
@@ -121,7 +123,7 @@ function maakJournaal({ db, save, crypto, vak, opslag }) {
       r.zegel = hash(zonder);
       vorig = r.zegel;
     }
-    noteer({ actor: 'systeem', actie: 'wissing in het spoor', niveau: 'auto',
+    noteer({ actor: 'systeem', actie: 'wissing in het spoor', niveau: NIVEAUS.auto,
       reden: reden || 'recht op vergetelheid (AVG art. 17)',
       uitslag: 'gedaan', voor: { kopVoorWissing: kopVoor }, na: { regelsGewist: geraakt } });
     return { geraakt, kopVoor };
@@ -169,7 +171,7 @@ function maakJournaal({ db, save, crypto, vak, opslag }) {
     return {
       van: v, tot: t, stappen: gefilterd.length,
       actoren: [...new Set(gefilterd.map(r => r.actor))],
-      automatisch: gefilterd.filter(r => r.niveau === 'auto').length,
+      automatisch: gefilterd.filter(r => r.niveau === NIVEAUS.auto).length,
       mislukt: gefilterd.filter(r => r.uitslag !== 'gedaan').length,
       lijn: gefilterd.map(r => ({ at: r.at, actor: r.actor, actie: r.actie, niveau: r.niveau,
         object: r.objectType ? r.objectType + ' ' + r.objectId : null,

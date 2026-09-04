@@ -1,0 +1,226 @@
+{
+  "bron": [
+    "server/kern/gastzorg.js",
+    "server/kern/gastzorg-profiel.js"
+  ],
+  "stempel": {
+    "op": "2026-09-03T21:20:22.663Z",
+    "commit": "98f560fd",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/doorwerking.js",
+    "node": "v22.22.2"
+  },
+  "grens": "Dit is een LEESMETING op de bron: hij telt aanroepen van zorgVoor en zorgMee en kijkt of er een zaak bij staat en of het antwoord wordt bewaard. Hij bewijst NIET dat een doorgegeven profiel klopt, niet dat de ontvanger het gebruikt, en niet dat kopieën die al in de database staan een stempel hebben gekregen. Het is een van de doorwerkingen in dit huis en niet alle.",
+  "telling": {
+    "punten": 18,
+    "eigen": 6,
+    "derde": 12,
+    "benoemd": 12,
+    "naamloos": 0,
+    "kopieen": 10,
+    "gestempeld": 10,
+    "bevroren": 0
+  },
+  "naamloos": [],
+  "bevroren": [],
+  "gestempeld": [
+    "server/kern/care/leden.js:83",
+    "server/kern/fluister/bevestig.js:98",
+    "server/kern/fluister/gegevens.js:47",
+    "server/kern/lidacties/ritten.js:79",
+    "server/kern/lidacties.js:61",
+    "server/routes/member/boeken.js:43",
+    "server/routes/member/kopen/bezorg.js:76",
+    "server/routes/member/kopen/tickets.js:78",
+    "server/routes/member/voertuigen/charter.js:72",
+    "server/routes/member/voertuigen/huur.js:78"
+  ],
+  "punten": [
+    {
+      "plek": "server/kern/avond/voorkeuren.js",
+      "regel": 121,
+      "benoemd": true,
+      "bewaard": true,
+      "gestempeld": false,
+      "eigen": true,
+      "waarom": "toont de eigen stand (\"deelt u mee?\") aan het lid zelf",
+      "code": "const zorg = zorgVoor ? zorgVoor(key, zaakcode ? { zaak: zaakcode, reden: 'voorkeuren klaarzetten voor een verblijf' } :"
+    },
+    {
+      "plek": "server/kern/avond/voorkeuren.js",
+      "regel": 139,
+      "benoemd": false,
+      "bewaard": false,
+      "gestempeld": false,
+      "eigen": true,
+      "waarom": "toont de eigen stand (\"deelt u mee?\") aan het lid zelf",
+      "code": "zorgDeeltMee: !!(zorgVoor && zorgVoor(key)),   // geen zaak: dit is de eigen stand, geen inzage"
+    },
+    {
+      "plek": "server/kern/care/leden.js",
+      "regel": 83,
+      "benoemd": true,
+      "bewaard": true,
+      "gestempeld": true,
+      "eigen": false,
+      "waarom": null,
+      "code": "zorg: zorgMee(sess.key, { zaak: 'care:' + a.id, reden: 'zorgprofiel meegegeven bij een zorgboeking' }),"
+    },
+    {
+      "plek": "server/kern/fluister/bevestig.js",
+      "regel": 49,
+      "benoemd": false,
+      "bewaard": false,
+      "gestempeld": false,
+      "eigen": true,
+      "waarom": "de zorgVoor-lezing schrijft een zin AAN het lid (de kopie verderop loopt via zorgMee en telt gewoon mee)",
+      "code": "const zorgNu = zorgVoor && zorgVoor(key);"
+    },
+    {
+      "plek": "server/kern/fluister/bevestig.js",
+      "regel": 98,
+      "benoemd": true,
+      "bewaard": true,
+      "gestempeld": true,
+      "eigen": false,
+      "waarom": "de zorgVoor-lezing schrijft een zin AAN het lid (de kopie verderop loopt via zorgMee en telt gewoon mee)",
+      "code": "const z = zorgMee && zorgMee(key, { zaak: s.code, reden: 'zorgprofiel meegegeven bij een tafelreservering' });"
+    },
+    {
+      "plek": "server/kern/fluister/gegevens.js",
+      "regel": 47,
+      "benoemd": true,
+      "bewaard": true,
+      "gestempeld": true,
+      "eigen": false,
+      "waarom": null,
+      "code": "const z = zorgMee && zorgMee(key, { zaak: b.supplierCode, reden: 'zorgprofiel meegegeven bij een tafelreservering' });"
+    },
+    {
+      "plek": "server/kern/fluister/reis/kleding.js",
+      "regel": 56,
+      "benoemd": false,
+      "bewaard": false,
+      "gestempeld": false,
+      "eigen": true,
+      "waarom": "schrijft één zin in het antwoord AAN het lid",
+      "code": "const zorgNu = zorgVoor && zorgVoor(key);"
+    },
+    {
+      "plek": "server/kern/fluister/reis/reisplan.js",
+      "regel": 70,
+      "benoemd": false,
+      "bewaard": false,
+      "gestempeld": false,
+      "eigen": true,
+      "waarom": "schrijft één zin in het antwoord AAN het lid",
+      "code": "const zorgNu = zorgVoor && zorgVoor(key);"
+    },
+    {
+      "plek": "server/kern/lidacties/bestellen.js",
+      "regel": 57,
+      "benoemd": false,
+      "bewaard": false,
+      "gestempeld": false,
+      "eigen": true,
+      "waarom": "vergelijkt de eigen allergenen met de bestelling om het lid te waarschuwen",
+      "code": "const zorg = zorgVoor(session.key);"
+    },
+    {
+      "plek": "server/kern/lidacties/ritten.js",
+      "regel": 79,
+      "benoemd": true,
+      "bewaard": true,
+      "gestempeld": true,
+      "eigen": false,
+      "waarom": null,
+      "code": "zorg: zorgMee(session.key, { zaak: s.code, reden: 'zorgprofiel meegegeven bij een rit' }),"
+    },
+    {
+      "plek": "server/kern/lidacties.js",
+      "regel": 61,
+      "benoemd": true,
+      "bewaard": true,
+      "gestempeld": true,
+      "eigen": false,
+      "waarom": null,
+      "code": "zorg: zorgMee(session.key, { zaak: s.code, reden: 'zorgprofiel meegegeven bij een boeking' }),"
+    },
+    {
+      "plek": "server/kern/tafeldek.js",
+      "regel": 26,
+      "benoemd": true,
+      "bewaard": false,
+      "gestempeld": false,
+      "eigen": false,
+      "waarom": null,
+      "code": "const zorg = zorgVoor(r.customerKey, { zaak: zaakCode, reden: 'tafel dekken op allergenen en dieet' });"
+    },
+    {
+      "plek": "server/routes/avond.js",
+      "regel": 23,
+      "benoemd": true,
+      "bewaard": false,
+      "gestempeld": false,
+      "eigen": false,
+      "waarom": null,
+      "code": "zorgVoor: (k, door) => (kern.zorgVoor ? kern.zorgVoor(k, door) : null) });"
+    },
+    {
+      "plek": "server/routes/member/boeken.js",
+      "regel": 43,
+      "benoemd": true,
+      "bewaard": true,
+      "gestempeld": true,
+      "eigen": false,
+      "waarom": null,
+      "code": "zorg: zorgMee(req.session.key, { zaak: s.code, reden: 'zorgprofiel meegegeven bij een boeking' }),"
+    },
+    {
+      "plek": "server/routes/member/kopen/bezorg.js",
+      "regel": 76,
+      "benoemd": true,
+      "bewaard": true,
+      "gestempeld": true,
+      "eigen": false,
+      "waarom": null,
+      "code": "zorg: zorgMee(req.session.key, { zaak: s.code, reden: 'zorgprofiel meegegeven bij een bestelling' }),"
+    },
+    {
+      "plek": "server/routes/member/kopen/tickets.js",
+      "regel": 78,
+      "benoemd": true,
+      "bewaard": true,
+      "gestempeld": true,
+      "eigen": false,
+      "waarom": null,
+      "code": "zorg: zorgMee(req.session.key, { zaak: s.code, reden: 'zorgprofiel meegegeven bij een ticket' }),"
+    },
+    {
+      "plek": "server/routes/member/voertuigen/charter.js",
+      "regel": 72,
+      "benoemd": true,
+      "bewaard": true,
+      "gestempeld": true,
+      "eigen": false,
+      "waarom": null,
+      "code": "zorg: zorgMee(req.session.key, { zaak: s.code, reden: 'zorgprofiel meegegeven bij een charter' }),"
+    },
+    {
+      "plek": "server/routes/member/voertuigen/huur.js",
+      "regel": 78,
+      "benoemd": true,
+      "bewaard": true,
+      "gestempeld": true,
+      "eigen": false,
+      "waarom": null,
+      "code": "zorg: zorgMee(req.session.key, { zaak: s.code, reden: 'zorgprofiel meegegeven bij autohuur' }),"
+    }
+  ],
+  "nietGemeten": [
+    "of een zaak het profiel dat zij ontving ook werkelijk gebruikt",
+    "kopieën die al in de database staan van vóór een reparatie",
+    "gegevens buiten het zorgprofiel: dit is één doorwerking, niet alle"
+  ]
+}

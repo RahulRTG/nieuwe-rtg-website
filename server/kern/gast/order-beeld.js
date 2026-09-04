@@ -80,10 +80,30 @@ module.exports = ({ horeca }) => {
         itemId: r.itemId || null, opties: r.opties || [], ingredienten: r.ingredienten || [],
         allergenen: r.allergenen || [], prijsversie: r.prijsversie || null,
         stand: r.stand, gastNr: r.gastNr || null,
+        /* DE GAST HOORT HET TE ZIEN, en dat is de helft van een correctie die
+           het makkelijkst wegvalt. Zonder dit veld verdwijnt er stil een bedrag
+           van zijn rekening en staat het gerecht er nog: dat leest als een fout
+           in de bon. `door` gaat NIET mee -- welke medewerker een fout
+           rechtzette is niets voor de gast (HORECA.md: geen ranglijst). */
+        gecorrigeerd: r.gecorrigeerd ? {
+          grondLabel: r.gecorrigeerd.grondLabel, reden: r.gecorrigeerd.reden,
+          centen: r.gecorrigeerd.centen, at: r.gecorrigeerd.at,
+          teruggave: r.gecorrigeerd.teruggave
+            ? { centen: r.gecorrigeerd.teruggave.centen, uitgevoerd: r.gecorrigeerd.teruggave.uitgevoerd,
+                let: r.gecorrigeerd.teruggave.let }
+            : null
+        } : null,
         doorHandle: r.gastNr && wie(r.gastNr) ? wie(r.gastNr).handle : null,
         bevestiging: r.bevestiging || null, bevestigingUitleg: r.bevestigingUitleg || null
       })),
       kortingen: (rek.kortingen || []).map(k => ({ reden: k.reden, procent: k.procent, centen: k.centen })),
+      /* Ook als los blok, want een correctie op een regel die deze gast niet
+         zelf bestelde (de tafel deelt een fles) staat anders nergens. */
+      correcties: (rek.correcties || []).map(c => ({
+        naam: c.naam, aantal: c.aantal, grondLabel: c.grondLabel, reden: c.reden,
+        centen: c.centen, at: c.at,
+        teruggave: c.teruggave ? { centen: c.teruggave.centen, uitgevoerd: c.teruggave.uitgevoerd, let: c.teruggave.let } : null
+      })),
       betaald: (rek.betalingen || []).map(b => ({ wijze: b.wijze, centen: b.centen, at: b.at })),
       totalen: t, openstaand: openstaand(rek), tijdlijn: tijdlijn(rek)
     };

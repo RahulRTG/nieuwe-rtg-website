@@ -228,10 +228,10 @@ bestaat. Daarom: eerst schaduw, dan tanden.
 | | aantal |
 |---|---|
 | routes met een rol | <!--getal:idem.routesMetRol-->3998<!--/getal--> |
-| beoordeeld | <!--getal:idem.beoordeeld-->1573<!--/getal--> |
-| beschermd | <!--getal:idem.beschermd-->1572<!--/getal--> |
+| beoordeeld | <!--getal:idem.beoordeeld-->1572<!--/getal--> |
+| beschermd | <!--getal:idem.beschermd-->1571<!--/getal--> |
 | onbeschermd | **<!--getal:idem.onbeschermd-->1<!--/getal-->** |
-| ongemeten | <!--getal:idem.ongemeten-->3156<!--/getal--> |
+| ongemeten | <!--getal:idem.ongemeten-->3157<!--/getal--> |
 
 Dit staat er beter voor dan `CLAUDE.md` beweert (dat noemt nog 115 gemeten; dat
 cijfer is verouderd). Van alles wat beoordeeld is, is niets onbeschermd. De
@@ -478,6 +478,35 @@ eigenaar moet nemen vóór PLAN twee schalen in één keten mengt:
    gevolgen". Dat zijn twee noemertreden in één trede: `direct` dekt zowel `tonen`
    als `uitvoeren`. Eén woord in de AI-allowlist betekent dus vandaag twee
    verschillende dingen over wat de machine zelfstandig doet.
+
+**En sinds 2 september 2026 staat de TWEEDE helft ernaast: de gedeelde namespace
+van HANDELINGEN** (`scripts/gezagshandelingen.js`, `GEZAGSHANDELINGEN.json`,
+`npm run gezagshandelingen`). De noemer bracht de TREDEN op één lijn; wat daarna
+overbleef is het ONDERWERP, en dat is een ander gebrek dan "ze zijn het oneens":
+twee uitspraken over verschillende dingen kunnen niet botsen. Elke schaal noemde
+zijn onderwerpen in zijn eigen woorden — een routepatroon, een benoemde
+handeling, een regelsoort, een levensdomein — dus een tegenspraak was niet te
+VINDEN, hoeveel je ook keek.
+
+De namespace zet ze in vier soorten (`route`, `handeling`, `regelsoort`,
+`domein`), en de soort staat in de sleutel omdat hij het vergelijken begrenst:
+een routepad en een levensdomein zijn geen twee meningen over hetzelfde. **289
+onderwerpen, en precies vier die door twee schalen worden genoemd** —
+`/api/bank/sepa`, `/api/bank/bulk`, `/api/bank/salaris` en
+`/api/supplier/pay/uitbetaal`, alle vier geldroutes, gedeeld door de AI-allowlist
+en de frictiebodem. Daar kunnen die twee elkaar nu voor het eerst tegenspreken,
+en ze doen het niet: beide zeggen `klaarzetten` (de bodem als plafond). Dat die
+nul iets betekent is met een mutatie bewezen — zet de bodem op `hand` en de meter
+meldt er twee en zakt.
+
+Twee dingen daar niet wegpoetsen. **`geldbeleid/regels.js` en
+`bureau/delegatie.js` staan ALLEEN**: ze spreken in regelsoorten en
+levensdomeinen, soorten die geen enkele andere schaal kent, dus hun uitspraken
+kunnen door niemand worden tegengesproken. En de eerste versie van de meter
+vergeleek route-PATRONEN op hun tekst en vond nul overlap — een nul die alleen
+over schrijfwijze ging. Tegen de echte routes uit `EXECUTION_MAP.json` gehouden
+vond dezelfde meter er vier. **Een namespace die op namen vergelijkt in plaats
+van op wat ze aanwijzen, meet zichzelf.**
 
 **Het is een meetlaag en geen beslisser**, en dat is afgedwongen: hij woont in
 `scripts/`, en toets 7 zakt zodra iets uit `server/` hem importeert — want dan is

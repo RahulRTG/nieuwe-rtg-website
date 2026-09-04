@@ -16,7 +16,11 @@ module.exports = (kern) => {
   const { app, db, save, crypto, schoon, auth, findSupplier } = kern;
 
   const voorkeuren = require('../kern/avond/voorkeuren')({ db, save, schoon,
-    zorgVoor: (k) => (kern.zorgVoor ? kern.zorgVoor(k) : null) });
+    /* HET TWEEDE ARGUMENT MOET MEE. Dit doorgeefluik liet `door` vallen, en
+       daarmee was de enige plek die netjes een zaak noemde (voorkeuren.js
+       regel 121) een regel die nooit in het journaal kwam. Gevonden met
+       scripts/doorwerking.js. */
+    zorgVoor: (k, door) => (kern.zorgVoor ? kern.zorgVoor(k, door) : null) });
   const planlaag = require('../kern/avond/plan')({ db, save, crypto, schoon });
   /* De pols weegt mee in het voorstel, maar alleen het GEMETEN deel -- zie de
      uitleg bij polsPunten in kern/avond/samenstellen.js. Daarom gaat hier

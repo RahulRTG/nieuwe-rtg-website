@@ -197,38 +197,89 @@ test('MUTATIE: een verdwenen beslisser maakt de meter ook stuk', () => {
   });
 });
 
-/* ---------- mutatie 3: de tegenspraak ---------- */
+/* ---------- mutatie 3: de OPGELOSTE tegenspraak, en zijn bewaking ----------
 
-test('de vastgelegde tegenspraak wordt bij elke ronde opnieuw nagetrokken', () => {
+   Hier stond de tegenspraak `vergunning-of-aanvraag-afwijzen` als OPENSTAAND:
+   ainiveau.js verbood de machine een aanvraag af te wijzen (niveau 4) terwijl
+   het AI-stuur precies dat als voorstel liet samenstellen, en magAutomatisch()
+   werd op die weg nooit aangeroepen.
+
+   Opgelost op 3 september 2026 (TAKEN.md 4.56), en daarmee verhuisd naar
+   OPGELOST -- niet verdwenen. Een bevinding die weggaat zodra hij gerepareerd
+   is, laat niets achter dat de reparatie vasthoudt: de volgende ronde haalt
+   iemand de koppeling weg en er staat geen tegenspraak meer om na te trekken.
+   Deze twee toetsen bewaken dus de andere kant op. */
+
+test('de opgeloste tegenspraak blijft BEWAAKT, en er staat er geen open meer', () => {
   const r = draai();
-  assert.match(r.uit, /tegenspraken\s*:\s*1/);
-  assert.match(r.uit, /\[staat nog\] vergunning-of-aanvraag-afwijzen/,
-    'de tegenspraak hoort nog te staan; is hij opgelost, werk dan GEZAG.json bij');
+  assert.match(r.uit, /tegenspraken\s*:\s*0/, 'er staat weer een tegenspraak open');
+  assert.match(r.uit, /opgelost, bewaakt\s*:\s*1/);
+  assert.match(r.uit, /\[blijft staan\] vergunning-of-aanvraag-afwijzen/,
+    'de reparatie hoort nog in de bron te staan');
 });
 
-test('MUTATIE: verdwijnt een kant van de tegenspraak, dan meldt hij "veranderd" en niet stilzwijgend hetzelfde', () => {
+test('MUTATIE: verdwijnt de reparatie uit de bron, dan ZAKT de meter', () => {
+  /* De duurste faalvorm die deze lijst kan hebben: een opgeloste bevinding die
+     mooie woorden draagt terwijl de koppeling eruit is gehaald. Dan is opgelost
+     erger dan openstaand. */
+  metVervangen('server/routes/supplier/ai/ambtenaar.js',
+    'magAutomatisch(AANVRAAG_BESLUIT)', "({ reden: '' })", () => {
+      const r = draai();
+      assert.match(r.uit, /\[REPARATIE WEG\] vergunning-of-aanvraag-afwijzen/);
+      assert.match(r.uit, /ZAKT: de reparatie van/);
+      assert.equal(r.code, 1, 'een weggevallen reparatie hoort de meter te laten zakken');
+    });
+});
+
+test('MUTATIE: verdwijnt het niveau uit ainiveau.js, dan ZAKT hij ook', () => {
+  /* De andere kant van dezelfde koppeling: haalt iemand de handeling van
+     niveau 4, dan is de reparatie net zo goed weg -- de reden die ambtenaar.js
+     doorgeeft komt dan uit niets. */
   metVervangen('server/kern/stadsweefsel/ainiveau.js',
     "'vergunning-weigeren': { niveau: 4", "'vergunning-weigeren': { niveau: 2", () => {
       const r = draai();
-      assert.match(r.uit, /\[veranderd\] vergunning-of-aanvraag-afwijzen/,
-        'een tegenspraak waarvan een kant wijzigt mag niet ongewijzigd blijven staan');
-      assert.match(r.uit, /werk GEZAG\.json bij/);
+      assert.match(r.uit, /\[REPARATIE WEG\] vergunning-of-aanvraag-afwijzen/);
+      assert.equal(r.code, 1);
     });
 });
 
 /* ---------- de negatieve controle ---------- */
 
-test('een module die de schaal WEL importeert telt niet mee als losse niveaunaam', () => {
+test('een module die de trede UIT de schaal leest telt niet mee als losse niveaunaam', () => {
+  /* De negatieve controle: niet "importeert hij iets" maar "haalt hij de trede
+     werkelijk op". Tot 2 september 2026 was importeren genoeg, en dat maakte de
+     nul zacht -- zie de toets hieronder, die de keerzijde vastlegt. */
   const voor = getal(draai().uit, 'losse niveaunamen');
   const bron = "'use strict';\n" +
-    "const { beleidVoor } = require('./stuur/beleid');\n" +
+    "const { beleidVoor, NIVEAUS } = require('./stuur/beleid');\n" +
     'module.exports = function zzIjk(pad, wereld) {\n' +
     '  const beleid = beleidVoor(pad, wereld);\n' +
-    "  return beleid.niveau === 'verboden' ? null : beleid;\n" +
+    '  return beleid.niveau === NIVEAUS.verboden ? null : beleid;\n' +
     '};\n';
   metNieuwBestand('server/kern/zz-gezag-ijk3.js', bron, () => {
     assert.equal(getal(draai().uit, 'losse niveaunamen'), voor,
-      'een module die zijn schaal ophaalt houdt geen kopie vast en hoort niet beschuldigd te worden');
+      'een module die zijn trede uit de bron ophaalt houdt geen kopie vast en hoort niet beschuldigd te worden');
+  });
+});
+
+test('importeren is NIET genoeg: een kale trede naast de import telt gewoon mee', () => {
+  /* De vrijstelling die hier tot 2 september 2026 stond, sloeg een heel bestand
+     over zodra het de schaal ophaalde -- ook de tredes die er als kale
+     tekenreeks naast bleven staan. Dat is precies de drift die deze meter zoekt:
+     `const { NIVEAUS } = require(...)` erboven en `niveau: 'verboden'` eronder
+     overleeft een hernoeming even stil als een bestand dat niets importeert.
+     Er stonden er tien, over vijf bestanden die alle vijf keurig importeerden. */
+  const voor = getal(draai().uit, 'losse niveaunamen');
+  const bron = "'use strict';\n" +
+    "const { beleidVoor, NIVEAUS } = require('./stuur/beleid');\n" +
+    'module.exports = function zzIjk(pad, wereld) {\n' +
+    '  const beleid = beleidVoor(pad, wereld);\n' +
+    '  if (beleid.niveau === NIVEAUS.lezen) return beleid;\n' +
+    "  return beleid.niveau === 'verboden' ? null : beleid;\n" +
+    '};\n';
+  metNieuwBestand('server/kern/zz-gezag-ijk4.js', bron, () => {
+    assert.equal(getal(draai().uit, 'losse niveaunamen'), voor + 1,
+      'een kale trede telt mee, ook als het bestand de schaal ophaalt');
   });
 });
 
@@ -236,11 +287,11 @@ test('server/kern/stuur.js blijft ongemoeid: hij leest zijn eigen, geimporteerde
   /* Dit is de valse positieve die de eerste versie van de meter maakte, met naam
      vastgelegd zodat hij niet terugkomt. 'verboden' staat in twee schalen. */
   const r = draai(['--lijst']);
-  assert.doesNotMatch(r.uit, /server\/kern\/stuur\.js\s+stadsweefsel/,
-    'stuur.js importeert stuur/beleid.js en mag niet aan ainiveau.js worden toegeschreven');
+  assert.doesNotMatch(r.uit, /server\/kern\/stuur\.js\s/,
+    'stuur.js haalt zijn tredes uit stuur/beleid.js en hoort hier niet te staan');
   const bron = fs.readFileSync(path.join(WORTEL, 'server/kern/stuur.js'), 'utf8');
   assert.ok(bron.includes("require('./stuur/beleid')"), 'de aanname onder deze toets: stuur.js haalt zijn schaal op');
-  assert.ok(bron.includes("niveau === 'verboden'"), 'en vergelijkt er ook echt tegen');
+  assert.ok(bron.includes('niveau === NIVEAUS.verboden'), 'en vergelijkt er ook echt tegen');
 });
 
 /* ---------- wat de meter NIET beweert ---------- */

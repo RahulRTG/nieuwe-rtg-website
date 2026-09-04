@@ -57,8 +57,15 @@ const INVARIANTEN = [
      kantoorroutes -- een paspoortscan beoordelen, een BIG-nummer openen -- als
      ONBEWAAKT laten melden terwijl ze juist strenger bewaakt zijn dan de rest.
      Een invariant die zijn eigen strengste slot niet kent, meldt de verkeerde
-     kant op. */
-  { voorvoegsel: '/api/office/', bewakers: ['officeAuth', 'boardroomAuth', 'kluisAuth'],
+     kant op.
+
+     `naamAuth` staat er sinds 3 september 2026 bij, en om dezelfde reden. Het
+     is DEZELFDE poort als kluisAuth met een andere reden (een handtekening in
+     plaats van een inzagejournaal, zie TAKEN.md 4.73), en hij hangt op de
+     vier-ogen-uitgifte. Toen de gedeelde implementatie eenmalig een gedeelde
+     NAAM kreeg, vielen beide deuren hier samen en gingen acht routes rood --
+     een gedeelde implementatie mag geen gedeelde identiteit worden. */
+  { voorvoegsel: '/api/office/', bewakers: ['officeAuth', 'boardroomAuth', 'kluisAuth', 'naamAuth'],
     wat: 'het kantoor' },
   { voorvoegsel: '/api/supplier/', bewakers: ['supplierAuth'],
     wat: 'de zaak' },

@@ -28,6 +28,12 @@
    motor krijgt bij een herberekening precies dat pakket terug. */
 'use strict';
 
+/* DE OMVANG MELDEN. Een loonrun is EEN rij met vierhonderd stroken erin, en
+   definitief maken raakt alleen een veld binnen die rij: de rij-telling van
+   server/opzet/handeling.js ziet daar 1 en 0 van. raakt() zegt hoe groot de
+   handeling was; hij weigert nooit. */
+const handeling = require('../../opzet/handeling');
+
 const STANDEN = ['concept', 'gecontroleerd', 'manager', 'administrateur', 'definitief'];
 
 function maakRun({ opslag, save, nu, crypto, motor, regelpakket, componenten }) {
@@ -79,6 +85,7 @@ function maakRun({ opslag, save, nu, crypto, motor, regelpakket, componenten }) 
     stempel(run, 'geopend', door, { regelversie: pakket.versie });
     bak().unshift(run);
     save();
+    handeling.raakt('loonstroken', stroken.length);
     return { ok: true, run: kort(run), waarschuwingen: stroken.flatMap(s => s.waarschuwingen) };
   }
 
@@ -124,6 +131,7 @@ function maakRun({ opslag, save, nu, crypto, motor, regelpakket, componenten }) 
     run.stand = 'definitief'; run.definitiefDoor = door || null; run.definitiefOp = tijd();
     stempel(run, 'definitief', door);
     save();
+    handeling.raakt('loonstroken', run.stroken.length);
     return { ok: true, stand: run.stand };
   }
 

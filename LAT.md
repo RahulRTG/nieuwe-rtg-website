@@ -110,14 +110,28 @@ schalen -- `stuur/beleid.js` (verboden/voorstel/direct), `command/risico.js`
 automatisch), `stadsweefsel/ainiveau.js` (waarnemen tot verboden) en
 `bureau/delegatie.js` (informeren tot autonoom). Elk van de vijf is op zichzelf
 zorgvuldig gebouwd; het bezwaar is dat geen van de vijf de andere vier kan lezen,
-dus geen mens en geen machine kan ze naast elkaar leggen. Ze zijn dan ook al
-uiteengelopen: `ainiveau.js` zet "een vergunning of aanvraag afwijzen" op niveau
-4 ("hier komt geen machine aan, met of zonder sleutel") terwijl `stuur/beleid.js`
-precies die handeling als `voorstel` toelaat, en `magAutomatisch()` -- dat in zijn
-eigen commentaar "de enige plek die daar antwoord op geeft" heet -- op die weg
-nooit wordt aangeroepen. Daarnaast staat `niveau: 'hand'` als kale tekenreeks in
-achttien Command-modules die `risico.js` niet importeren: hernoem de trede en die
-achttien schrijven zwijgend het oude woord.
+dus geen mens en geen machine kan ze naast elkaar leggen. Ze waren dan ook al
+uiteengelopen, en die twee gevallen staan hier omdat ze allebei zijn gerepareerd
+en allebei laten zien wat de kosten van vijf schalen zijn.
+
+`ainiveau.js` zette "een vergunning of aanvraag afwijzen" op niveau 4 ("hier komt
+geen machine aan, met of zonder sleutel") terwijl `stuur/beleid.js` precies die
+handeling als `voorstel` toeliet, en `magAutomatisch()` -- dat in zijn eigen
+commentaar "de enige plek die daar antwoord op geeft" heet -- werd op die weg
+nooit aangeroepen. De niveau-4-lijst was daar dus decoratie. Opgelost op
+3 september 2026 (TAKEN.md 4.56) zonder een van beide documenten te verzwakken:
+`ambtenaar.js` roept hem aan, geeft zijn reden door aan de mens die bevestigt, en
+kiest geen dossier meer uit -- want dát was het echte bezwaar, de machine koos
+zelf wie er werd afgewezen. En de bevinding is niet weggegooid maar verhuisd naar
+`OPGELOST` in `scripts/gezag.js`, met dezelfde tand: haal de koppeling weg en
+`npm run gezag` zakt. Een opgeloste bevinding die niets achterlaat, is een
+reparatie die de volgende ronde stil kan verdwijnen.
+
+Daarnaast stond `niveau: 'hand'` als kale tekenreeks in achttien Command-modules
+die `risico.js` niet importeerden: hernoem de trede en die achttien schrijven
+zwijgend het oude woord. Ook dat is dicht (TAKEN.md 4.55, `losseNiveaunamen` 22
+-> 0), en daar bleek de nul zelf zacht: de meter sloeg een bestand over zodra het
+de schaal ophaalde, ook als er een kale trede naast bleef staan.
 
 *En dezelfde fout een laag lager, waar hij het meest kost:* "wie handelt hier"
 stond op ZEVEN plekken op het verzoek -- `req.session`, `req.actor`,
@@ -129,8 +143,18 @@ moeten worden, en de achtste poortwachter zou de eerste zeven weer niet kennen.
 de elf poortwachters zetten hem. Hij is er ADDITIEF bij gezet en heeft niets
 weggehaald -- een vervanging in het authenticatiepad van 3349 routes ineens is
 precies het soort wijziging waarvan je pas maanden later merkt wat er stuk ging.
-De zeven oude vormen blijven daarom geteld in `ENVELOP.json` tot ze route voor
-route zijn afgebouwd.
+
+*En het narekenen daarvan is zelf een voorbeeld bij deze regel* (3 september
+2026, TAKEN.md 4.72). Het getal `actorVormen` in `ENVELOP.json` noemde zichzelf
+"geratelde stand, mag alleen omlaag" en werd door geen script en geen toets
+nagerekend: met de hand getypt, en dus niet in staat te zakken -- regel 6 in het
+register dat over de canonieke vorm gaat. `scripts/actorvormen.js` leidt het nu
+af. En toen bleek het er geen zeven van hetzelfde te zijn: ZES van de zeven zijn
+sessieobjecten die ook domeindata dragen (`.tier`, `.staffId`, `.zaakcode`), en
+die "overzetten op de envelop" zou de envelop een zevende sessie maken. Alleen
+`req.boardroomKey` was een kaal duplicaat, en die is weg. De les is niet dat de
+schuld kleiner was dan gedacht, maar dat een getal dat niemand narekent ook de
+VRAAG verkeerd kan stellen.
 
 **Handhaver:** `check.js` regel 26 (elke naam die je uit een module haalt bestaat
 daar), regel 25, regel 27, regel 28 (de publieke-routelijst mag geen namen

@@ -1,0 +1,189 @@
+{
+  "stempel": "2026-09-03",
+  "uitleg": "Een horecaketen van tafel tot afrekening, gemeten per SCHAKEL (handelt actor A, en ziet actor B dat?) en per STORING (houdt de keten zich aan wat hij belooft als het misgaat?). Zie MAATSTAF.md par. 7.",
+  "grens": "Alleen de tafel-keten; bezorging, hotel en club hebben eigen naden. De rekening loopt niet door tot een creditnota: de retourlaag hangt aan een leverancierbestelling en niet aan een horecarekening. Er komt geen browser aan te pas, dus dit zegt niets over de schermen.",
+  "schakels": [
+    {
+      "nr": 1,
+      "van": "zaak",
+      "naar": "gast",
+      "wat": "opent een rekening op de tafel",
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "de gast leest tafel PROEF-1 bij Sal de Mar",
+      "fout": null,
+      "ms": 13
+    },
+    {
+      "nr": 2,
+      "van": "zaak",
+      "naar": "zaak",
+      "wat": "zet een stoel aan tafel (de tweede deur, zonder sessie)",
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "1 stoel(en), stoel 1 zonder eigen sessie: true",
+      "fout": null,
+      "ms": 10
+    },
+    {
+      "nr": 3,
+      "van": "gast",
+      "naar": "zaak",
+      "wat": "schuift aan via de QR en komt op dezelfde rekening",
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "gast op rekening f93fa2a39f (zaak opende f93fa2a39f), 2 stoelen",
+      "fout": null,
+      "ms": 13
+    },
+    {
+      "nr": 4,
+      "van": "gast",
+      "naar": "zaak",
+      "wat": "bestelt twee gerechten, en de regels landen op de rekening van de zaak",
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "2 regel(s) op de bon van de zaak",
+      "fout": null,
+      "ms": 13
+    },
+    {
+      "nr": 5,
+      "van": "zaal",
+      "naar": "keuken",
+      "wat": "geeft de gang vrij, en pas dan ziet de keuken de bon",
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "keukenbord 0 -> 2 bon(nen)",
+      "fout": null,
+      "ms": 15
+    },
+    {
+      "nr": 6,
+      "van": "keuken",
+      "naar": "keuken",
+      "wat": "ziet op welke stoel het gerecht hoort",
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "bon draagt gastNr 2 (Gast)",
+      "fout": null,
+      "ms": 0
+    },
+    {
+      "nr": 7,
+      "van": "keuken",
+      "naar": "gast",
+      "wat": "zet de bon op uitgegeven, en de gast ziet dat",
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "1 van 2 uitgegeven",
+      "fout": null,
+      "ms": 9
+    },
+    {
+      "nr": 8,
+      "van": "gast",
+      "naar": "gast",
+      "wat": "splitst de rekening per stoel, en de delen sluiten op de cent",
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "2 delen, som 3200 van 3200 centen",
+      "fout": null,
+      "ms": 6
+    },
+    {
+      "nr": 9,
+      "van": "zaal",
+      "naar": "gast",
+      "wat": "corrigeert een regel met grond en reden; de gast ziet wat er misging",
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "de gast leest \"Verkeerd bereid: koud geserveerd\" bij Gazpacho de sandia",
+      "fout": null,
+      "ms": 11
+    },
+    {
+      "nr": 10,
+      "van": "zaal",
+      "naar": "zaak",
+      "wat": "de rekening zakt met het bevroren bedrag, en de regel blijft staan",
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "bruto 3200 -> 1600 (correctie 1600), regel staat er nog: true",
+      "fout": null,
+      "ms": 4
+    },
+    {
+      "nr": 11,
+      "van": "zaak",
+      "naar": "gast",
+      "wat": "rekent af; de gastsessie sluit met een reden en een weg terug",
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "zaak: openstaand 0, gesloten true | gast: 401 sessie-weg -- \"Deze tafelsessie is niet meer geldig. Scan de QR op tafel opnieuw.\"",
+      "fout": null,
+      "ms": 11
+    }
+  ],
+  "storingen": [
+    {
+      "naam": "dubbele tik op Bestellen",
+      "belofte": "dezelfde sleutel geeft geen tweede regel",
+      "stand": "gehouden",
+      "wat": "1 regel(s) na de eerste, 1 na de herhaling"
+    },
+    {
+      "naam": "een stand terugzetten zonder reden",
+      "belofte": "wordt geweigerd, en de weigering zegt waarom",
+      "stand": "gehouden",
+      "wat": "status 400: Terugzetten van \"gestart\" naar \"besteld\" kan, maar noteer waarom; dat blijft op de bon staan."
+    },
+    {
+      "naam": "betalen met een rail die de gastdeur niet heeft",
+      "belofte": "weigert, noemt de reden en zegt wat er wel kan",
+      "stand": "gehouden",
+      "wat": "status 501, rails die wel kunnen: [\"bon\",\"tegoed\",\"kamer\"]"
+    },
+    {
+      "naam": "een verzonnen gastsleutel",
+      "belofte": "opent geen enkele rekening en geeft geen leeg-maar-geldig antwoord",
+      "stand": "gehouden",
+      "wat": "status 401, rekening in het antwoord: false"
+    },
+    {
+      "naam": "een correctie op een rekening die al betaald is",
+      "belofte": "zet een teruggaverecht klaar zonder het uit te voeren, en het te veel betaalde spiegelt dat bedrag",
+      "stand": "gehouden",
+      "wat": "teruggave 3200 centen, uitgevoerd: false; openstaand -3200"
+    },
+    {
+      "naam": "dezelfde regel twee keer corrigeren",
+      "belofte": "weigert, want anders zakt de rekening twee keer voor hetzelfde gerecht",
+      "stand": "gehouden",
+      "wat": "status 409: Deze regel is al gecorrigeerd."
+    },
+    {
+      "naam": "een weigering die naar een andere weg verwijst",
+      "belofte": "die weg bestaat werkelijk en doet wat de melding belooft",
+      "stand": "gehouden",
+      "wat": "weigering wees naar /api/supplier/horeca/rekening/regel/corrigeer, en die gaf 200"
+    },
+    {
+      "naam": "een tweede rekening op dezelfde tafel",
+      "belofte": "weigert en wijst naar de bestaande",
+      "stand": "gehouden",
+      "wat": "status 409, wijst naar b24b99ccd1"
+    }
+  ],
+  "rekening": "f93fa2a39f",
+  "telling": {
+    "schakels": 11,
+    "gesloten": 11,
+    "open": 0,
+    "stuk": 0,
+    "storingen": 8,
+    "gehouden": 8,
+    "gebroken": 0
+  },
+  "sluit": true
+}

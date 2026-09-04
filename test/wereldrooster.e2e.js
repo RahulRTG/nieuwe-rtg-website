@@ -49,7 +49,7 @@ test('elk wereldhuis toont alles wat in die wereld hangt', { skip: geenBrowser(p
     const page = await ctx.newPage();
     for (const [pad, wereld] of HUIZEN) {
       await t.test(wereld + ' staat compleet op ' + pad, async () => {
-        await page.goto(srv.base + pad, { waitUntil: 'load' });
+        await page.goto(srv.base + pad, { waitUntil: 'domcontentloaded' });
         /* Op een toestand wachten en niet op een klok: het rooster staat sinds
            scripts/wereldrooster.js gewoon in de HTML, dus het is er zodra de
            pagina er is. We wachten op de eerste kaart en niet op een seconde. */

@@ -72,7 +72,14 @@ module.exports = function verzoekketen(deps) {
   // wat verandert dit verzoek: rijen per collectie voor en na (blast radius).
   // NA het logboek want hij leunt op req.id; bewust niet in save(). Zie de kop
   // van ./handeling.js voor de afweging en de gemeten kosten.
-  app.use(require('./handeling').middleware());
+  /* En de handeling draagt sinds 3 september 2026 ook WAT VOOR handeling het
+     was: risicoklasse en omkeerbaarheid, afgeleid uit vier bronnen die dit huis
+     al heeft (TAKEN.md 4.71). De classificatie wordt HIER meegegeven en niet in
+     ./handeling.js gerequired -- zo blijft die meting los te draaien zonder de
+     registers, en blijft de classificatie een laag die je kunt weglaten. */
+  app.use(require('./handeling').middleware({
+    klasse: require('../kern/handelingsklasse').maakHandelingsklasse({}).klasseVoor
+  }));
   /* De meting draait NA het logboek en VOOR de routes: hij hangt aan res.finish,
      dus hij ziet alles wat er daarna gebeurt, inclusief de 404's. */
   app.use(require('../meting').middleware());

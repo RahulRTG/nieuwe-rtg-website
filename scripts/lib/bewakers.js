@@ -117,6 +117,12 @@ const KAART = new Map([
      soort" -- precies waar die melding voor is. */
   ['kluisAuth', ['eigenrol', 'kantoor-op-naam',
     'officeAuth plus identiteit: een kantoorsessie met een sleutel. De gedeelde backoffice-code komt er niet door']],
+  /* Dezelfde poort als kluisAuth hierboven -- kern/kantoor/kluispoort.js maakt
+     ze allebei -- en dus dezelfde soort. Hij hangt sinds TAKEN.md 4.73 op de
+     uitgifteroutes van het kantoor, waar de ondertekenaar uit de SESSIE moet
+     komen en niet uit het lichaam. */
+  ['naamAuth', ['eigenrol', 'kantoor-op-naam',
+    'dezelfde kluispoort als kluisAuth: een kantoorsessie op naam. De gedeelde backoffice-code komt er niet door']],
   ['techAuth', ['eigenrol', 'techniek',
     'verifieert het token als ECHT account en toetst daarna magInzien(); een geldig lid krijgt 403 en een kritieke melding op het veiligheidsbord']],
   ['baasAuth', ['eigenrol', 'werkplekbaas',

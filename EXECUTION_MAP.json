@@ -1,11 +1,11 @@
 {
  "uitleg": "Afgeleide executiekaart: per route wat de AI ermee mag, wat het bewijs eronder zegt en of een herhaling schade doet. De herkomst staat per veldsoort in `velden`, de vertaling naar de gedeelde gezagsnoemer in `noemer`. NOOIT met de hand wijzigen: npm run executionmap:controle zakt erop.",
  "bronnen": {
-  "IDEMPROEF.json": "ce6d9f9543461ccf",
+  "IDEMPROEF.json": "f1310dd53915ec99",
   "IDEMBESLUIT.json": "a20e7b5abed335c8",
   "HERSTEL.json": "18f81fa488b39474",
   "VERTROUWEN.json": "6fb6bc1a3e8ce705",
-  "server/kern/stuur/beleid.js": "ebabb40547651cef",
+  "server/kern/stuur/beleid.js": "8dc821a9959c82e0",
   "scripts/gezagsnoemer.js": "6f03917150dcd838",
   "scripts/executionmap.js": "4577d4076ff5a79e"
  },
@@ -22274,7 +22274,7 @@
   {
    "pad": "/api/pay/tik",
    "rol": "member",
-   "herhaling": "beschermd",
+   "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, FAILURE)",
    "bereik": {

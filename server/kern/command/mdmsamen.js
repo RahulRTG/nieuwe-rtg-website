@@ -13,6 +13,8 @@
    recepten: de oude waarde gaat mee, dus terugdraaien is geen tweede motor. */
 'use strict';
 
+const { NIVEAUS } = require('../frictie');
+
 const MAX_RIJEN = 5000;
 
 function maakSamen({ db, save, journaal, PARTIJEN, bedrijven, partijen0, s, opslag }) {
@@ -70,7 +72,7 @@ function maakSamen({ db, save, journaal, PARTIJEN, bedrijven, partijen0, s, opsl
     if (!geraakt.length) return { error: 'Er viel niets samen te voegen.', status: 400 };
     save();
     if (journaal) {
-      journaal.noteer({ actie: 'partijen samengevoegd', actor: door, niveau: 'hand',
+      journaal.noteer({ actie: 'partijen samengevoegd', actor: door, niveau: NIVEAUS.hand,
         objectType: doel.soort, objectId: String(doel.id), reden: String(reden || ''),
         na: { samengevoegd: geraakt.length } });
     }
@@ -88,7 +90,7 @@ function maakSamen({ db, save, journaal, PARTIJEN, bedrijven, partijen0, s, opsl
     if (!geraakt.length) return { error: 'Er stond niets samengevoegd.', status: 400 };
     save();
     if (journaal) {
-      journaal.noteer({ actie: 'samenvoeging teruggedraaid', actor: door, niveau: 'hand',
+      journaal.noteer({ actie: 'samenvoeging teruggedraaid', actor: door, niveau: NIVEAUS.hand,
         reden: geraakt.length + ' rij(en) staan weer los' });
     }
     return { geraakt };

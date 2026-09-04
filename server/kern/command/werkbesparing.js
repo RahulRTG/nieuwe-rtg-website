@@ -19,6 +19,8 @@
    is tijd, en tijd is te controleren. */
 'use strict';
 
+const { NIVEAUS } = require('../frictie');
+
 /* De minutenprijs per handeling. Een schatting, en hij staat op één plek zodat
    hij als geheel bij te stellen is als er echte metingen komen. */
 const MINUTEN = {
@@ -74,7 +76,7 @@ function maakWerkbesparing({ journaal, zaken, runbooks }) {
       handUren: Math.round(handMin / 6) / 10,
       bespaardeUren: Math.round(bespaardMin / 6) / 10,
       automatiseringsgraad: handelingen
-        ? Math.round((rij.filter(r => r.niveau === 'auto').length / handelingen) * 100) : 0,
+        ? Math.round((rij.filter(r => r.niveau === NIVEAUS.auto).length / handelingen) * 100) : 0,
       werkstromen,
       lekken: werkstromen.filter(w => w.lek),
       /* Wat de menselijke besluiten leren: dezelfde uitzondering die steeds
@@ -95,7 +97,7 @@ function maakWerkbesparing({ journaal, zaken, runbooks }) {
         niveau: rb.oordeel.niveau, score: rb.oordeel.score,
         urenMetDeHand: handmatig, urenAutomatisch: geautomatiseerd,
         besparingUren: Math.round((handmatig - geautomatiseerd) * 10) / 10,
-        blokkade: rb.oordeel.niveau === 'auto' ? null
+        blokkade: rb.oordeel.niveau === NIVEAUS.auto ? null
           : 'staat op ' + rb.oordeel.niveau + ' -- ' + rb.oordeel.waarom };
     }).sort((a, b) => b.besparingUren - a.besparingUren);
   }

@@ -8,7 +8,7 @@ module.exports = (kern) => {
     salonZichtbaar, ontmoetZet, ontmoetPos, ontmoetKies, ontmoetTeken,
     ontmoetHier, ontmoetStop, ontmoetSos, ontmoetSignaalKantoor, ontmoetMijnState,
     avShowroom, avAanbevolen, avProefrit, avKoop, avInruil,
-    avTeken, avMijnDeals, zorgVoor, zorgContact, media,
+    avTeken, avMijnDeals, zorgVoor, zorgMee, zorgContact, media,
     boekingMetRef, boekingenVanZaak, boekingenVoegToe } = kern;
 
   // koopt of huurt het lid echt? dan opent de chatlijn met de zaak: geen
@@ -26,7 +26,7 @@ module.exports = (kern) => {
     salonZichtbaar, ontmoetZet, ontmoetPos, ontmoetKies, ontmoetTeken,
     ontmoetHier, ontmoetStop, ontmoetSos, ontmoetSignaalKantoor, ontmoetMijnState,
     avShowroom, avAanbevolen, avProefrit, avKoop, avInruil,
-    avTeken, avMijnDeals, zorgVoor, zorgContact, media, overheid: kern.overheid,
+    avTeken, avMijnDeals, zorgVoor, zorgMee, zorgContact, media, overheid: kern.overheid,
     boekingMetRef, boekingenVanZaak, boekingenVoegToe, openLijn,
     gegevensStop: kern.gegevensStop };
   require('./voertuigen/huur')(vctx);

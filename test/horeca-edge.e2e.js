@@ -50,7 +50,7 @@ test('de PDA neemt een bestelling op zonder lijn, en hij komt er alsnog',
     const fouten = [];
     letOpFouten(page, fouten);
 
-    await page.goto(base + '/apps/horeca-pda.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/horeca-pda.html', { waitUntil: 'domcontentloaded' });
     await page.evaluate(t => {
       localStorage.setItem('rtg_cookieinfo_v1', '1');
       localStorage.setItem('rtg_sup_token', t);
@@ -61,7 +61,7 @@ test('de PDA neemt een bestelling op zonder lijn, en hij komt er alsnog',
 
     /* ---- 1. eerst één keer mét lijn, zodat de kaart bewaard wordt ---- */
     const rek = (await H('/api/supplier/horeca/rekening/open', { kanaal: 'tafel', tafel: 'EDGE-WARM', gasten: 2 })).body.rekening;
-    await page.goto(base + '/apps/horeca-pda.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/horeca-pda.html', { waitUntil: 'domcontentloaded' });
     /* De werkstandknoppen komen uit het antwoord van /werklijst. Staan ze er, dan
        is die eerste tekening klaar -- en pas dan is #pNu veilig: de open tafels
        komen straks op diezelfde plek, en een werklijst die later binnenkomt zou

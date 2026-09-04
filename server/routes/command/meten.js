@@ -18,6 +18,8 @@
 
 const { meetpoort } = require('../../meetpoort');
 
+const { NIVEAUS } = require('../../kern/frictie');
+
 module.exports = (ctx) => {
   const { app, officeAuth, veilig, wie, command } = ctx;
   /* bezitsbewijs en doelpoort staan hier niet meer: die twee zijn met de
@@ -43,7 +45,7 @@ module.exports = (ctx) => {
     try {
       const r = await command.sonde.draai({ reis: req.body.reis ? String(req.body.reis) : null });
       if (r && r.error) return res.status(r.status || 400).json({ error: r.error });
-      command.journaal.noteer({ actie: 'sonde ronde', actor: wie(req), niveau: 'hand',
+      command.journaal.noteer({ actie: 'sonde ronde', actor: wie(req), niveau: NIVEAUS.hand,
         reden: r.gelukt + ' van ' + r.van_totaal + ' reizen gelukt, kant ' + r.van });
       res.json(r);
     } catch (e) {

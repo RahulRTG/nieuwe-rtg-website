@@ -51,7 +51,7 @@ beschikbaar. De server noemt zelf het adres waar de telefoon heen moet
 In deze volgorde, want de eerste stap kan de rest overbodig maken:
 
 ```bash
-npm run productie:installeer # veilige wizard voor .env.productie
+npm run sleutels -- --schrijf # maakt alle productiegeheimen en schrijft .env.productie
 npm run release:gate         # build + Rust + security + audit + echte herstelproef + hashbewijs
 npm run golive        # de eigen go-live keuring: exitcode 1 zolang er iets open staat
 npm run keuring       # 41 binaire regels over de bron

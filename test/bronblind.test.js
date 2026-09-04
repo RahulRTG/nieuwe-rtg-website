@@ -14,7 +14,8 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { blindIn, blindInHtml, stukken } = require('../scripts/lib/bronblind.js');
+const { blindIn, blindInHtml, blindInCss, stukken } = require('../scripts/lib/bronblind.js');
+const { zonderCommentaar } = require('../scripts/lib/bron.js');
 
 /* De verwijderaar zoals hij tot 17 augustus 2026 was: twee regexen die niet
    weten waar een string staat. Elke bewering hieronder gebruikt hem als
@@ -66,25 +67,49 @@ test('een pagina ZONDER script of style wordt ook nagelopen', () => {
   assert.equal(blindInHtml(bron).kwijt, 0, 'gewone markup blijft staan');
 });
 
-test('DE VALSTRIK DIE OPENSTAAT: een commentaarteken in MARKUPTEKST wordt wel opgegeten', () => {
-  /* scripts/lib/bron.js kent geen HTML. Hij haalt overal blokcommentaar weg,
-     ook buiten een <script> -- en daar is het helemaal geen commentaar maar
-     tekst die een bezoeker leest.
+test('DE VALSTRIK IS DICHT: een commentaarteken in MARKUPTEKST blijft staan', () => {
+  /* Dit stond hier als "de valstrik staat open maar niet onbewaakt":
+     scripts/lib/bron.js kende geen HTML en haalde overal blokcommentaar weg,
+     ook buiten een <script> -- waar het helemaal geen commentaar is maar tekst
+     die een bezoeker leest. Geen enkele pagina deed dat, dus het was een
+     latente blindheid, en de kruisproef zou hem betrappen.
 
-     VANDAAG DOET GEEN ENKELE PAGINA DAT: over alle 259 pagina's raakt er nul
-     markup kwijt, dus dit is een latente blindheid en geen actieve. Hem
-     repareren zou betekenen dat zonderCommentaar() moet weten of hij HTML of
-     JavaScript leest, en die functie krijgt alleen een string binnen -- dat
-     raakt vijf keuringen tegelijk en hoort een eigen ronde te zijn.
+     Op 3 september 2026 is hij DICHT (TAKEN.md 4.48): zonderCommentaar() kent
+     nu een soort, en de standaard blijft JavaScript zodat geen enkele
+     bestaande aanroeper iets anders leest dan eerst.
 
-     Wat deze toets vastlegt is dat de kruisproef hem WEL ziet. Schrijft iemand
-     zo n tekst, dan gaat bronBlindeBestanden boven nul en zakt de ratel. De
-     valstrik staat dus open, maar niet onbewaakt -- en dat is precies wat er
-     op 17 augustus ontbrak. */
+     Deze toets bewaakt nu beide kanten. De markuptekst blijft staan -- en de
+     kruisproef ziet het nog steeds zodra een verwijderaar hem toch opeet, want
+     dat is het vangnet dat op 17 augustus ontbrak. */
   const bron = '<p>slot A</p>\n<div>/* dit is tekst, geen commentaar */</div>\n<p>slot B</p>';
-  assert.ok(blindInHtml(bron).kwijt > 0,
-    'de kruisproef merkt dat er markup verdwijnt -- dat is het vangnet onder deze blindheid');
-  assert.match(blindInHtml(bron).eerste, /dit is tekst/);
+  assert.match(zonderCommentaar(bron, { soort: 'html' }), /dit is tekst, geen commentaar/,
+    'markuptekst hoort onaangeraakt te blijven');
+  assert.equal(blindInHtml(bron).kwijt, 0);
+
+  /* En het vangnet: een verwijderaar die de soort NEGEERT -- precies wat de
+     oude deed -- wordt nog altijd betrapt. */
+  const blindeStrip = (b) => zonderCommentaar(b);
+  assert.ok(blindInHtml(bron, blindeStrip).kwijt > 0,
+    'de kruisproef merkt niet meer dat er markup verdwijnt; dan is het vangnet weg');
+  assert.match(blindInHtml(bron, blindeStrip).eerste, /dit is tekst/);
+});
+
+test('CSS: `//` is daar geen commentaar, en de proef ziet het wanneer het toch weggaat', () => {
+  /* De tweede helft van 4.48. `url(//static.example/x.png)` is een geldige
+     verwijzing; de uitzondering voor `http://` dekt hem niet, want het teken
+     ervoor is een haakje. Geen van de 72 stylesheets bevat hem vandaag -- dus
+     dit is dezelfde soort latente blindheid als hierboven, en hij is nu op
+     dezelfde manier dicht. */
+  const css = '.a{background:url(//static.example/x.png);}\n/* echt commentaar */\n.b{color:red}\n';
+  const uit = zonderCommentaar(css, { soort: 'css' });
+  assert.match(uit, /url\(\/\/static\.example/, 'de verwijzing hoort te blijven staan');
+  assert.doesNotMatch(uit, /echt commentaar/, 'een blokcommentaar in CSS mag wel weg');
+  assert.equal(blindInCss(css).kwijt, 0);
+
+  const blindeStrip = (b) => zonderCommentaar(b);
+  const betrapt = blindInCss(css, blindeStrip);
+  assert.equal(betrapt.kwijt, 1, 'de proef ziet niet dat de hele regel verdwijnt');
+  assert.match(betrapt.eerste, /static\.example/);
 });
 
 test('de verdeling knipt op script en style, en laat de rest markup', () => {

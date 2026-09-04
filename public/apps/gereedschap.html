@@ -90,6 +90,12 @@
     opacity:0;transition:opacity .25s;pointer-events:none;z-index:30;}
   .melding.zie{opacity:1;}
   @media (prefers-reduced-motion: reduce){*{transition:none !important;}}
+
+  /* Uit inline style-attributen gehaald door scripts/inlinestijl-omzet.js (TAKEN.md 4.51). Bewezen gelijk met
+     scripts/inlinestijl-proef.js: elk element, elke aangeraakte eigenschap,
+     berekend in een echte browser. Letterlijk wat er stond -- geen ontwerpbesluit. */
+  .i-1ujuoy{flex:1;min-width:0}
+  .i-jwt5vg{flex:1;min-width:8rem}
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>
@@ -112,13 +118,13 @@
     <div id="rkToetsen"></div>
     <div class="zaak">
       <div class="vak"><b>Btw</b>
-        <div class="rij"><input class="veld" id="btwBedrag" inputmode="decimal" placeholder="Bedrag" style="flex:1;min-width:0;">
+        <div class="rij"><input class="i-1ujuoy veld" id="btwBedrag" inputmode="decimal" placeholder="Bedrag">
           <select class="veld" id="btwPct" aria-label="Btw-tarief"><option value="21">21%</option><option value="9">9%</option></select>
           <select class="veld" id="btwKant" aria-label="Inclusief of exclusief"><option value="ex">ex &#8594; incl</option><option value="in">incl &#8594; ex</option></select></div>
         <div class="uitkomst" id="btwUit"></div>
       </div>
       <div class="vak"><b>Rekening delen</b>
-        <div class="rij"><input class="veld" id="splitBedrag" inputmode="decimal" placeholder="Bedrag" style="flex:1;min-width:0;">
+        <div class="rij"><input class="i-1ujuoy veld" id="splitBedrag" inputmode="decimal" placeholder="Bedrag">
           <input class="veld" id="splitPersonen" inputmode="numeric" placeholder="Personen" style="width:5.5rem;">
           <select class="veld" id="splitFooi" aria-label="Fooi"><option value="0">0%</option><option value="5">5%</option><option value="10">10%</option></select></div>
         <div class="uitkomst" id="splitUit"></div>
@@ -130,7 +136,7 @@
     <div class="kop">Wekkers · de server telt, ook als de app dicht is</div>
     <div class="rij">
       <input class="veld" id="wkTijd" type="time" aria-label="Wekkertijd">
-      <input class="veld" id="wkLabel" maxlength="60" placeholder="Waarvoor?" style="flex:1;min-width:8rem;">
+      <input class="i-jwt5vg veld" id="wkLabel" maxlength="60" placeholder="Waarvoor?">
       <select class="veld" id="wkDagen" aria-label="Herhaling">
         <option value="">Een keer</option><option value="1,2,3,4,5">Doordeweeks</option>
         <option value="0,6">Weekend</option><option value="0,1,2,3,4,5,6">Elke dag</option>
@@ -141,7 +147,7 @@
     <div class="kop">Timers</div>
     <div class="rij">
       <input class="veld" id="tmMin" inputmode="numeric" placeholder="Minuten" style="width:6.5rem;">
-      <input class="veld" id="tmLabel" maxlength="60" placeholder="Waarvoor?" style="flex:1;min-width:8rem;">
+      <input class="i-jwt5vg veld" id="tmLabel" maxlength="60" placeholder="Waarvoor?">
       <button class="knop vol" id="tmStart" type="button">Start</button>
     </div>
     <div class="h-mt70" id="timers" aria-live="polite"></div>

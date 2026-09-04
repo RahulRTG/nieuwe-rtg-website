@@ -146,7 +146,7 @@ test('de publieke gastingang legt zonder QR-code de volgende stap uit',
     const page = await ctx.newPage();
     const fouten = letOpFouten(page, []);
 
-    await page.goto(base + '/apps/gast.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/gast.html', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#melding:not([hidden])', { timeout: 10000 });
 
     assert.match(await page.locator('#zaakNaam').textContent(), /Aan tafel/);

@@ -20,6 +20,8 @@ module.exports = (kern) => {
   const { app, save, schoon, supplierAuth, logActivity, sseToSupplier, horeca } = kern;
   const { KANALEN, H, Hlees, nu, id, totaal, openstaand } = horeca;
   const { bouwRegel } = require('../../../kern/horeca/regel')({ schoon, horeca });
+  const correctie = require('../../../kern/horeca/correctie')({ horeca, schoon });
+  kern.horecaCorrectie = correctie;
   /* Dezelfde kaartopbouw die de gastdeur leest (kern/horeca/kaart.js). Niet
      `kern.gastKaartVanZaak`: dat is een naam van het gast-domein en het
      supplier-domein hoort daar niet in te grijpen. */
@@ -122,47 +124,17 @@ module.exports = (kern) => {
     const r = rekVan(req, res); if (!r) return;
     const i = r.regels.findIndex(x => x.id === String(req.body.regelId || ''));
     if (i < 0) return res.status(404).json({ error: 'Die regel staat niet op deze rekening.' });
+    /* DE OUDE MELDING WEES NAAR EEN DEUR DIE ER NIET WAS: "via derving",
+       terwijl die alleen in de KASSA bestaat en geen rekening kent. De weg
+       bestaat nu wel; zie kern/horeca/correctie.js. */
     if (r.regels[i].stand !== 'besteld')
-      return res.status(409).json({ error: 'De keuken is hier al aan begonnen. Haal hem eraf via derving, met een reden.' });
+      return res.status(409).json({
+        error: 'De keuken is hier al aan begonnen. Haal hem eraf met een correctie, met een grond en een reden.',
+        code: 'keuken-begonnen', via: '/api/supplier/horeca/rekening/regel/corrigeer',
+        gronden: correctie.GRONDEN.map(g => ({ id: g.id, label: g.label })) });
     const weg = r.regels.splice(i, 1)[0];
     save();
     logActivity(req.supplier.code, req.actor, 'haalde ' + weg.naam + ' van de rekening');
     res.json({ ok: true, rekening: publiek(r) });
-  });
-
-  /* ---------- gangen ----------
-     De bediening zet een gang vrij ("laat maar komen"); de keuken zet de
-     regels daarna zelf door op het keukenscherm. Zo bepaalt de zaal het tempo
-     van het diner en de keuken het tempo van de bereiding. */
-  app.post('/api/supplier/horeca/gang/vrij', supplierAuth, (req, res) => {
-    const r = rekVan(req, res); if (!r) return;
-    const gang = Math.max(0, Math.min(9, parseInt(req.body.gang, 10) || 0));
-    const regels = r.regels.filter(x => x.gang === gang && !x.vrijAt);
-    if (!regels.length) return res.status(404).json({ error: 'Er staat niets meer open in gang ' + gang + '.' });
-    const om = schoon(req.body.serveerOm, 5) || null;
-    for (const x of regels) { x.vrijAt = nu(); x.serveerOm = om; }
-    save();
-    sseToSupplier(req.supplier.code, 'sync', { scope: 'keuken' });
-    res.json({ ok: true, gang, vrijgegeven: regels.length, serveerOm: om, rekening: publiek(r) });
-  });
-
-  /* ---------- kijken ---------- */
-  app.post('/api/supplier/horeca/rekening', supplierAuth, (req, res) => {
-    const r = rekVan(req, res); if (!r) return;
-    res.json({ ok: true, rekening: publiek(r) });
-  });
-
-  app.post('/api/supplier/horeca/rekeningen', supplierAuth, (req, res) => {
-    const h = H(req.supplier.code);
-    const status = schoon(req.body.status, 20) || 'open';
-    const kanaal = schoon(req.body.kanaal, 20);
-    const rijen = Object.values(h.rekeningen)
-      .filter(r => r.status === status && (!kanaal || r.kanaal === kanaal))
-      .sort((a, b) => String(a.geopendAt).localeCompare(String(b.geopendAt)))
-      .slice(0, 300)
-      .map(r => ({ id: r.id, kanaal: r.kanaal, tafel: r.tafel, naam: r.naam, gasten: r.gasten,
-        regels: r.regels.length, geopendAt: r.geopendAt, totalen: totaal(r), openstaand: openstaand(r) }));
-    res.json({ ok: true, aantal: rijen.length, rekeningen: rijen,
-      omzetOpen: rijen.reduce((t, r) => t + r.totalen.netto, 0) });
   });
 };

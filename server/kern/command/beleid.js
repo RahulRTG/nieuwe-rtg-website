@@ -23,6 +23,8 @@
    overgelaten, want een grendel die alleen in de knop zit, is er niet. */
 'use strict';
 
+const { NIVEAUS } = require('../frictie');
+
 /* De startregels. Dit is de enige plek waar ze staan; de rest van Command
    leest ze hier. Elke regel: wat hij betekent, zijn waarde, zijn bereik en of
    hij vier ogen vraagt. */
@@ -93,7 +95,7 @@ function maakBeleid({ db, save, crypto, journaal, vak, start, opslag }) {
       voorstellen().push(v);
       if (save) save();
       journaal.noteer({ actor: door, actie: 'beleid voorstellen', objectType: 'beleid', objectId: b.id,
-        niveau: 'hand', reden, beleid: b.id, uitslag: 'wacht op tweede paar ogen', voor: { waarde: oud.waarde }, na: { waarde: nieuweWaarde } });
+        niveau: NIVEAUS.hand, reden, beleid: b.id, uitslag: 'wacht op tweede paar ogen', voor: { waarde: oud.waarde }, na: { waarde: nieuweWaarde } });
       return { voorstel: v, vierOgen: true };
     }
     const versie = { v: oud.v + 1, waarde: nieuweWaarde, at: nu(), door: String(door), reden: String(reden) };
@@ -101,7 +103,7 @@ function maakBeleid({ db, save, crypto, journaal, vak, start, opslag }) {
     if (bereik) b.bereik = String(bereik);
     if (save) save();
     journaal.noteer({ actor: door, actie: 'beleid zetten', objectType: 'beleid', objectId: b.id,
-      niveau: 'hand', reden, beleid: b.id, voor: { waarde: oud.waarde, versie: oud.v }, na: { waarde: nieuweWaarde, versie: versie.v } });
+      niveau: NIVEAUS.hand, reden, beleid: b.id, voor: { waarde: oud.waarde, versie: oud.v }, na: { waarde: nieuweWaarde, versie: versie.v } });
     return { regel: b.id, waarde: nieuweWaarde, versie: versie.v };
   }
 
@@ -124,7 +126,7 @@ function maakBeleid({ db, save, crypto, journaal, vak, start, opslag }) {
     }
     if (save) save();
     journaal.noteer({ actor: door, actie: akkoord ? 'beleid goedkeuren' : 'beleid afwijzen', objectType: 'beleid',
-      objectId: v.regel, niveau: 'hand', reden: reden || v.reden, beleid: v.regel,
+      objectId: v.regel, niveau: NIVEAUS.hand, reden: reden || v.reden, beleid: v.regel,
       voor: { waarde: v.van, voorgesteldDoor: v.door }, na: { waarde: akkoord ? v.naar : v.van } });
     return { voorstel: v, uitkomst };
   }
@@ -141,7 +143,7 @@ function maakBeleid({ db, save, crypto, journaal, vak, start, opslag }) {
       reden: String(reden || 'terug naar versie ' + vorige.v), terugNaar: vorige.v });
     if (save) save();
     journaal.noteer({ actor: door, actie: 'beleid terugzetten', objectType: 'beleid', objectId: b.id,
-      niveau: 'hand', reden: reden || 'terug naar versie ' + vorige.v, beleid: b.id,
+      niveau: NIVEAUS.hand, reden: reden || 'terug naar versie ' + vorige.v, beleid: b.id,
       voor: { waarde: nu2.waarde, versie: nu2.v }, na: { waarde: vorige.waarde, versie: nu2.v + 1 } });
     return { regel: b.id, waarde: vorige.waarde, versie: nu2.v + 1, terugNaar: vorige.v };
   }

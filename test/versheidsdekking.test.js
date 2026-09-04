@@ -112,7 +112,17 @@ const BUITEN = {
   'HANDLERBEWAKERS.json': 'een afdruk uit de code, ververst door de keuring',
   'GEZAGSNOEMER.json': 'een afdruk uit de code, met een eigen toets (test/gezagsnoemer.test.js)',
   'HERSTEL.json': 'een afdruk uit de code op grond van NAMEN; de echte meting staat in HERSTELPROEF.json, en die valt wel onder versheid',
-  'TOETSDUUR.json': 'schrijft bij elke testronde mee, net als SUITEDUUR hierboven; geen eigen ronde die kan verouderen'
+  'TOETSDUUR.json': 'schrijft bij elke testronde mee, net als SUITEDUUR hierboven; geen eigen ronde die kan verouderen',
+  /* DE VIER VAN DEZE TAK. Alle vier zijn ze een AFDRUK UIT DE CODE en geen
+     meting van gedrag: ze zijn opnieuw te maken uit de bron, en of ze
+     achterlopen zegt hun eigen toets al -- die byte voor byte hercompileert.
+     Ouderdom voegt daar niets aan toe; een tweede melder zou alleen hetzelfde
+     nog een keer zeggen, en dat is precies de reden die BEWIJSMATRIX hierboven
+     buiten de poort houdt. */
+  'EXECUTION_MAP.json': 'een PROJECTIE uit de bronnen; test/executionmap.test.js eist byte-gelijkheid met de hercompilatie',
+  'GEZAGSHANDELINGEN.json': 'een afdruk uit de code, met een eigen toets (test/gezagshandelingen.test.js)',
+  'HANDELINGSKLASSE.json': 'een afdruk uit de code, met een eigen toets (test/handelingsklasse.test.js)',
+  'WACHTWIJZE.json': 'een afdruk uit de code, met een eigen toets (test/wachtwijze.test.js)'
 };
 
 function schrijvers() {

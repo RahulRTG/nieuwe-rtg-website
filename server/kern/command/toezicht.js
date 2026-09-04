@@ -22,6 +22,8 @@
    en grenzen. Dat is een bewuste beperking en geen gebrek. */
 'use strict';
 
+const { NIVEAUS } = require('../frictie');
+
 function maakToezicht({ opslag, save, journaal, beleid }) {
   function reg() {
     return opslag.bak('commandAgents');
@@ -101,7 +103,7 @@ function maakToezicht({ opslag, save, journaal, beleid }) {
       a.gestopt = true;
       a.stopReden = 'meer dan de helft van de laatste ' + totaal + ' handelingen mislukte';
       journaal.noteer({ actor: 'toezicht', actie: 'agent stoppen', objectType: 'agent', objectId: naam,
-        niveau: 'auto', reden: a.stopReden, na: { gestopt: true, mislukt: a.mislukt, gelukt: a.gelukt } });
+        niveau: NIVEAUS.auto, reden: a.stopReden, na: { gestopt: true, mislukt: a.mislukt, gelukt: a.gelukt } });
     }
     if (save) save();
     return budget(naam);
@@ -114,7 +116,7 @@ function maakToezicht({ opslag, save, journaal, beleid }) {
     a.mag = Array.isArray(mogen) ? mogen.map(String) : [];
     if (save) save();
     journaal.noteer({ actor: door, actie: 'agent rechten zetten', objectType: 'agent', objectId: naam,
-      niveau: 'hand', reden: String(reden || 'bevoegdheden afgebakend'), voor, na: { mag: a.mag } });
+      niveau: NIVEAUS.hand, reden: String(reden || 'bevoegdheden afgebakend'), voor, na: { mag: a.mag } });
     return { agent: naam, mag: a.mag };
   }
 
@@ -124,7 +126,7 @@ function maakToezicht({ opslag, save, journaal, beleid }) {
     a.gestopt = true; a.stopReden = String(reden || 'met de hand gestopt');
     if (save) save();
     journaal.noteer({ actor: door, actie: 'agent stoppen', objectType: 'agent', objectId: naam,
-      niveau: 'hand', reden: a.stopReden, na: { gestopt: true } });
+      niveau: NIVEAUS.hand, reden: a.stopReden, na: { gestopt: true } });
     return budget(naam);
   }
 
@@ -135,7 +137,7 @@ function maakToezicht({ opslag, save, journaal, beleid }) {
     a.gestopt = false; a.stopReden = null; a.mislukt = 0; a.gelukt = 0;
     if (save) save();
     journaal.noteer({ actor: door, actie: 'agent hervatten', objectType: 'agent', objectId: naam,
-      niveau: 'hand', reden: String(reden || 'hervat na beoordeling'), voor, na: { gestopt: false } });
+      niveau: NIVEAUS.hand, reden: String(reden || 'hervat na beoordeling'), voor, na: { gestopt: false } });
     return budget(naam);
   }
 

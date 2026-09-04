@@ -95,12 +95,20 @@ function grensFout(domein, naam) {
 /* Wat de meldstand heeft gezien, over alle domeinen samen. Buiten maakDoorkijk
    zodat een dumper er in een keer bij kan. */
 const gemeld = new Set();
+const spoor = require('./contextspoor');
 
 function maakDoorkijk(kern, domein, toegestaan) {
   const mag = new Set([].concat(INTERFACE, DOORGEEF, toegestaan || []));
   return new Proxy(kern, {
     get(doel, naam) {
       if (typeof naam !== 'string') return doel[naam];
+      /* HET CONTEXTSPOOR (./contextspoor.js) hangt hier en nergens anders: dit
+         is het enige punt waar elke toegang tot het contextobject langskomt.
+         Uit tenzij RTG_CONTEXTPROEF=1, dus in de gewone stand kost het een
+         booleaanse vergelijking. Waarom die meting bestaat: statisch is een op
+         de zes aanroepen in dit huis niet te herleiden, juist omdat modules via
+         deze zak reizen in plaats van via require. */
+      if (spoor.AAN) spoor.noteer(domein, naam);
       if (mag.has(naam)) return doel[naam];
       /* Wat er niet in de kern ZIT kan ook geen grensovertreding zijn: dan is
          het een gewone typefout of een optionele naam, en die hoort zijn eigen

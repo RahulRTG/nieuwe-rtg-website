@@ -242,7 +242,23 @@ test('een regel eraf kan zolang de keuken er niet aan begonnen is, en een bon is
   await H('/keuken/stand', { rekeningId: r.id, regelId: oesters.id, stand: 'gestart' });
   const laat = await H('/rekening/regel/weg', { rekeningId: r.id, regelId: oesters.id });
   assert.equal(laat.status, 409);
-  assert.match(laat.body.error, /derving/, 'wat de keuken al maakt, verdwijnt alleen met een reden');
+  assert.match(laat.body.error, /reden/, 'wat de keuken al maakt, verdwijnt alleen met een reden');
+
+  /* EN DE WEG DIE DE MELDING NOEMT, BESTAAT OOK ECHT. Hier stond eerst
+     `/derving/`, en dat was precies het dode spoor: de melding verwees naar
+     /api/supplier/kassa/derving, die losse items neemt en geen rekening kent.
+     Je werd naar een deur gestuurd die er niet was, en deze toets keek alleen
+     of het WOORD er stond. Sinds 3 september 2026 bestaat de weg
+     (kern/horeca/correctie.js) en wijst de melding hem aan; de toets loopt hem
+     nu af in plaats van hem te geloven. */
+  assert.ok(laat.body.via, 'de weigering noemt geen weg waarlangs het wel kan');
+  assert.ok(Array.isArray(laat.body.gronden) && laat.body.gronden.length,
+    'de weigering noemt geen gronden om uit te kiezen');
+  const heen = await H(laat.body.via.replace('/api/supplier/horeca', ''),
+    { rekeningId: r.id, regelId: oesters.id, grond: laat.body.gronden[0].id, reden: 'proef: koud geserveerd' });
+  assert.equal(heen.status, 200, 'de aangewezen weg werkt niet');
+  assert.equal(heen.body.rekening.regels.length, 1, 'de regel is weggehaald in plaats van gecorrigeerd');
+  assert.equal(heen.body.rekening.totalen.netto, 0, 'de gecorrigeerde regel telt nog mee in de rekening');
 });
 
 test('een cadeaubon is op te vragen zonder hem te verzilveren, en een onbekende code bestaat niet', async () => {

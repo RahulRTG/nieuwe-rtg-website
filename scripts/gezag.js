@@ -104,6 +104,38 @@ const REGISTER = [
     bestuurt: 'wat het concierge-bureau namens een lid uit handen krijgt' }
 ];
 
+/* DE OPGELOSTE TEGENSPRAKEN, met dezelfde tand als de openstaande.
+
+   Een bevinding die verdwijnt zodra hij gerepareerd is, laat niets achter dat
+   de reparatie vasthoudt: de volgende ronde haalt iemand de koppeling weg en
+   niemand merkt het, want er staat geen tegenspraak meer om na te trekken. Dus
+   blijft hij staan, met de zinnen die BEWIJZEN dat de reparatie er is. Valt er
+   een weg, dan meldt deze meter 'veranderd' en hoort er iemand te kijken.
+
+   'vergunning-of-aanvraag-afwijzen' stond hier als openstaande tegenspraak:
+   ainiveau.js verbood de machine een aanvraag af te wijzen (niveau 4) terwijl
+   het AI-stuur precies dat als voorstel liet samenstellen, en magAutomatisch()
+   -- "de enige plek die daar antwoord op geeft" -- werd op die weg nooit
+   aangeroepen. Opgelost op 3 september 2026 (TAKEN.md 4.56) langs de weg die
+   geen van beide documenten hoefde te verzwakken: ambtenaar.js ROEPT
+   magAutomatisch() aan en kiest geen dossier meer uit. Wie de referentie noemt
+   krijgt nog steeds een voorstel -- dat is niveau 2, "een mens keurt goed" --
+   maar de machine kiest nooit meer OVER WIE het gaat. */
+const OPGELOST = [
+  {
+    naam: 'vergunning-of-aanvraag-afwijzen',
+    wat: 'De machine stelde een afwijzing samen EN koos zonder referentie zelf het dossier ' +
+         '(arr[0] uit de lijst), terwijl ainiveau.js dat op niveau 4 zet.',
+    hoe: 'ambtenaar.js roept magAutomatisch() aan, geeft zijn reden door aan de mens die bevestigt, ' +
+         'en weigert een dossier te kiezen zodra er geen referentie in de vraag staat.',
+    kanten: [
+      { bestand: 'server/kern/stadsweefsel/ainiveau.js', zin: "'vergunning-weigeren': { niveau: 4" },
+      { bestand: 'server/routes/supplier/ai/ambtenaar.js', zin: 'magAutomatisch(AANVRAAG_BESLUIT)' },
+      { bestand: 'server/routes/supplier/ai/ambtenaar.js', zin: 'Ik kies geen ' }
+    ]
+  }
+];
+
 /* DE TEGENSPRAKEN die met de hand zijn vastgesteld en die deze meter bij elke
    ronde opnieuw natrekt. Elk stuk is een LETTERLIJKE zin uit de bron -- geen
    regex, want een patroon met ontsnapte schuine strepen erin is bij het lezen
@@ -111,33 +143,20 @@ const REGISTER = [
    Verdwijnt de zin, dan is de tegenspraak opgelost of verplaatst en moet dit
    register bij. Zo kan een bevinding niet stilletjes verdampen, en ook niet
    blijven staan als hij al gerepareerd is. */
-const TEGENSPRAKEN = [
-  {
-    naam: 'vergunning-of-aanvraag-afwijzen',
-    wat: 'ainiveau.js verbiedt de machine een aanvraag af te wijzen (niveau 4); ' +
-         'stuur/beleid.js laat de AI precies dat als voorstel samenstellen, en ' +
-         'magAutomatisch() wordt op die weg nooit aangeroepen.',
-    ernst: 'gesimuleerde wereld (server/kern/overheid + gemeente zijn demo, geen echte instantie), ' +
-           'dus geen mens raakt vandaag een echte uitkering kwijt. De VORM is het bezwaar: ' +
-           'de AI kiest bij "wijs de volgende af" zelf welk dossier het wordt, en de mens ' +
-           'bevestigt een al ingevulde beslissing met een tik.',
-    kanten: [
-      { bestand: 'server/kern/stadsweefsel/ainiveau.js', zin: "'vergunning-weigeren': { niveau: 4" },
-      /* VERHUISD, NIET OPGELOST. De drie allowlists van het AI-stuur staan sinds
-         1 september in ./beleid-lijsten.js -- beleid.js liep over de
-         tienkilobytegrens van keuringsregel 13 en is langs de naad geknipt die
-         er al lag: dat bestand draagt het BESLUIT, dit de PADEN. De tegenspraak
-         zelf is geen letter veranderd; alleen het adres. */
-      { bestand: 'server/kern/stuur/beleid-lijsten.js', zin: 'vergunning\\/beslis' },
-      { bestand: 'server/routes/supplier/ai/ambtenaar.js', zin: "besluit: goed ? 'verleend' : af ? 'geweigerd'" }
-    ]
-  }
-];
+const TEGENSPRAKEN = [];
 
 /* De bestanden waar een niveaunaam GEEN gezag betekent. Elk met een reden --
    staat er geen reden, dan hoort het hier niet; dezelfde afspraak als de
    MAG-lijst in scripts/klok.js en de PUBLIEK-lijst van de poortwacht. */
-const GEEN_GEZAG = new Map([]);
+const GEEN_GEZAG = new Map([
+  ['server/kern/levenslijn/cockpit.js',
+   "De levenscockpit draagt een EIGEN tweetrapsschaal -- 'kijken' en 'openen' -- " +
+   'en die deelt alleen het woord `kijken` met de geldbeleidschaal. De kop van dat ' +
+   'bestand schrijft het uit: deze wereld voert niets uit, en zelfs `openen` wijst ' +
+   'alleen een deur aan. Hem de geldbeleidschaal laten importeren zou een ' +
+   'afhankelijkheid maken die er inhoudelijk niet is, en hem als zesde vocabulaire ' +
+   'registreren zou de ratel omhoog duwen voor twee treden die niets besturen.']
+]);
 
 function loopJs(map, uit) {
   let namen;
@@ -250,14 +269,43 @@ function meet() {
       for (const w of v.schaal) {
         if (woorden.some(x => x.woord === w)) continue;
         if (!vorm(w).test(code)) continue;
-        // staat het woord in een schaal die dit bestand WEL ophaalt, dan leest
-        // hij zijn eigen waarheid en is er niets gekopieerd
-        const gedekt = REGISTER.some(a => a.schaal.includes(w) && heeft.has(a.bestand));
-        if (!gedekt) woorden.push({ woord: w, schaal: v.bestand });
+        /* HIER STOND EEN VRIJSTELLING, EN DIE MAAKTE DE NUL ZACHT. Een bestand
+           dat de schaal ophaalde werd niet meer geteld -- ook niet als het de
+           trede DAARNAAST nog steeds als kale tekenreeks schreef. Dat is precies
+           de drift die deze meter hoort te vinden: `const { NIVEAUS } =
+           require(...)` erboven en `niveau: 'hand'` eronder overleeft een
+           hernoeming even stil als een bestand dat niets importeert. Gemeten op
+           2 september 2026: tien van die plekken, over vijf bestanden die alle
+           vijf keurig importeerden. Ze zijn omgezet, en de vrijstelling is weg.
+
+           Wat de vrijstelling ooit moest voorkomen (een correct bestand
+           beschuldigen) doet de regel eronder al: de toets gaat PER WOORD, dus
+           een bestand dat zijn trede uit de bron ophaalt schrijft het woord
+           niet meer en valt hier vanzelf buiten.
+
+           De schaal die erbij gemeld wordt is die van het bestand zelf als het
+           er een ophaalt -- 'verboden' en 'voorbereiden' staan in twee schalen,
+           en dan wijst een willekeurige de lezer de verkeerde kant op. */
+        const eigen = REGISTER.find(a => a.schaal.includes(w) && heeft.has(a.bestand));
+        woorden.push({ woord: w, schaal: (eigen || v).bestand });
       }
     }
     for (const w of woorden) los.push({ bestand: rel, schaal: w.schaal, woorden: [w.woord] });
   }
+
+  /* DE OPGELOSTE natrekken met DEZELFDE tand: staan de zinnen die de reparatie
+     bewijzen er nog letterlijk? Valt er een weg, dan is de reparatie eruit
+     gehaald en hoort dat op te vallen -- anders laat een opgeloste bevinding
+     niets achter dat hem vasthoudt. */
+  const opgelost = OPGELOST.map(t => {
+    const kwijt = t.kanten.filter(k => {
+      const code = bron.get(k.bestand);
+      if (code == null) return true;
+      return !code.includes(k.zin);
+    }).map(k => k.bestand + ': ' + k.zin);
+    return { naam: t.naam, wat: t.wat, hoe: t.hoe,
+      staat: kwijt.length ? 'REPARATIE WEG' : 'blijft staan', kwijt };
+  });
 
   /* DE TEGENSPRAKEN natrekken: staan beide kanten er nog letterlijk? */
   const tegenspraken = TEGENSPRAKEN.map(t => {
@@ -279,7 +327,7 @@ function meet() {
     perBestand.set(l.bestand, perSchaal);
   }
 
-  return { stuk, los, perBestand, tegenspraken,
+  return { stuk, los, perBestand, tegenspraken, opgelost,
     vocabulaires: REGISTER.length, losseNiveaunamen: perBestand.size };
 }
 
@@ -296,7 +344,8 @@ function stand(nu) {
     hoe: 'node scripts/gezag.js --lijst',
     gemeten: { vocabulaires: nu.vocabulaires, losseNiveaunamen: nu.losseNiveaunamen },
     vocabulaires: REGISTER.map(v => ({ bestand: v.bestand, schaal: v.schaal, beslisser: v.beslisser, bestuurt: v.bestuurt })),
-    tegenspraken: nu.tegenspraken.map(t => ({ naam: t.naam, wat: t.wat, ernst: t.ernst }))
+    tegenspraken: nu.tegenspraken.map(t => ({ naam: t.naam, wat: t.wat, ernst: t.ernst })),
+    opgelost: nu.opgelost.map(t => ({ naam: t.naam, wat: t.wat, hoe: t.hoe }))
   };
 }
 
@@ -341,6 +390,25 @@ function main() {
   for (const t of nu.tegenspraken) {
     console.log('    [' + t.staat + '] ' + t.naam);
     if (t.staat === 'veranderd') console.log('      veranderd in: ' + t.kwijt.join(', ') + ' -- werk GEZAG.json bij');
+  }
+  console.log('  opgelost, bewaakt   : ' + nu.opgelost.length);
+  for (const t of nu.opgelost) {
+    console.log('    [' + t.staat + '] ' + t.naam);
+    if (t.staat !== 'blijft staan') console.log('      de reparatie is weg uit: ' + t.kwijt.join(', '));
+  }
+
+  /* EEN WEGGEVALLEN REPARATIE IS EEN GEZAKTE METER, en niet een regel die
+     stiller wordt. Zonder deze tak zou OPGELOST een lijst mooie woorden zijn:
+     je haalt de koppeling weg, de meter meldt het in het klein en gaat groen
+     verder. Dan is een opgeloste bevinding erger dan een openstaande. */
+  const reparatieWeg = nu.opgelost.filter(t => t.staat !== 'blijft staan');
+  if (reparatieWeg.length) {
+    console.log('\n  ZAKT: de reparatie van ' + reparatieWeg.map(t => t.naam).join(', ') +
+      ' is niet meer in de bron te vinden.');
+    console.log('  Een opgeloste tegenspraak blijft hier staan om precies deze reden: hij houdt');
+    console.log('  vast dat de koppeling er nog is. Zet hem terug, of verklaar in scripts/gezag.js');
+    console.log('  waarom hij anders is gerepareerd -- met de nieuwe zinnen erbij.');
+    return 1;
   }
 
   if (VASTLEGGEN) {

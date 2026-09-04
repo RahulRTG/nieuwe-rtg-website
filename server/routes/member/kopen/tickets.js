@@ -4,7 +4,7 @@
    routes/member/kopen.js. */
 module.exports = (kern) => {
   const { app, auth, crypto, db, findSupplier, liveCodename, notifySupplier, save, schoon, sseToOffice,
-          sseToSupplier, salonZichtbaar, zorgVoor, koopTicketVoor, gegevensStop } = kern;
+          sseToSupplier, salonZichtbaar, zorgMee, koopTicketVoor, gegevensStop } = kern;
 /* ================== tickets: activiteiten, tours en musea ==================
    Tijdsloten met capaciteit; betalen vooraf via de bestaande boekingstroom
    (/api/booking/pay). Het ticket krijgt een entreecode die het personeel aan
@@ -75,7 +75,7 @@ app.post('/api/transfer/aanvraag', auth, (req, res) => {
     passengers: t.personen || 1, luggage: 0,
     note: schoon(req.body.note, 140),
     km: null, quote: prijs, ticketRef: t.ref,
-    zorg: zorgVoor(req.session.key),
+    zorg: zorgMee(req.session.key, { zaak: s.code, reden: 'zorgprofiel meegegeven bij een ticket' }),
     driver: null, vehicle: null,
     betaalMoment: 'vooraf',
     // prijs 0 = inclusief bij het ticket: meteen definitief, geen betaalstap

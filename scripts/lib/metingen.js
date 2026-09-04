@@ -111,6 +111,30 @@ const REGISTER = {
   'ISOLATIEPROEF.json': { eigenRatel: 'test/isolatieregisters.test.js' },
   'RESOLVERBEREIK.json': { eigenRatel: 'test/resolverbereik.test.js' },
   'GEZAGSNOEMER.json': { eigenRatel: 'test/gezagsnoemer.test.js' },
+
+  /* DE ZEVEN REGISTERS VAN MAATSTAF.md, en waarom ze hier mogen staan. Elk van
+     deze toetsen doet HETZELFDE: hij meet vers en vergelijkt met wat er in het
+     register staat, zodat een achterlopend register de bouw laat zakken in
+     plaats van stil verkeerd te blijven. Dat is precies de `eigenRatel`-vorm.
+
+     Wat hier NIET staat zijn de registers waarvan ik de ratel niet ken. De kop
+     van dit bestand is daar duidelijk over: een gok hoort hier niet in, want
+     dan daalt het getal doordat er regels bijkomen in plaats van ratels. */
+  'DOODSPOOR.json': { eigenRatel: 'test/doodspoor.test.js' },
+  'TAFELPROEF.json': { eigenRatel: 'test/tafelproef.test.js' },
+  'RITPROEF.json': { eigenRatel: 'test/ritproef.test.js' },
+  'TOELATINGSPROEF.json': { eigenRatel: 'test/toelatingsproef.test.js' },
+  'KETENVORM.json': { eigenRatel: 'test/toelatingsproef.test.js' },
+  'RITMIGRATIE.json': { eigenRatel: 'test/ritmigratie.test.js' },
+  'DOORWERKING.json': { eigenRatel: 'test/doorwerking.test.js' },
+  /* De gedeelde namespace van handelingen (TAKEN.md 4.54). Drie getallen, en
+     ze lopen niet dezelfde kant op: gedeelde onderwerpen mogen alleen OMHOOG
+     (meer vergelijkbaarheid), schalen die alleen staan en tegenspraken alleen
+     omlaag. Dat past niet als een enkelvoudig getal in NORM.json, dus draagt
+     het register zijn eigen grondwaarde en houdt de toets hem vast. */
+  'GEZAGSHANDELINGEN.json': { eigenRatel: 'test/gezagshandelingen.test.js' },
+  'WACHTWIJZE.json': { eigenRatel: 'test/wachtwijze.test.js' },
+  'HANDELINGSKLASSE.json': { eigenRatel: 'test/handelingsklasse.test.js' },
   'EXECUTION_MAP.json': { eigenRatel: 'test/executionmap.test.js' },
   'HERSTEL.json': { eigenRatel: 'test/herstel.test.js' },
   'HERSTELPROEF.json': { eigenRatel: 'test/herstelproef.test.js' },

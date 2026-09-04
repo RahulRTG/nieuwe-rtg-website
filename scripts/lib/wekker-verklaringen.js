@@ -32,6 +32,26 @@
    verklaar je niet weg, die krijgt een functie. */
 'use strict';
 module.exports = [
+  /* EEN BESTAND DAT ZELF NIETS START, en dat is hier het hele punt.
+
+     server/kern/command/tikker.js draagt de vijf regels die alarm.js, canary.js
+     en uitrolregie.js elk apart overschreven (een setInterval met een try/catch
+     eromheen, unref, en de timer terug). Die drie klokken zijn niet nieuw en ze
+     zitten alle drie in de envelop van hun eigen commandfunctie; wat nieuw is,
+     is dat de LUS op een plek staat.
+
+     `maakTikker` GEEFT EEN FUNCTIE TERUG en roept hem niet aan. Dit bestand kan
+     dus niets in gang zetten: laden levert nul timers op, en pas als een van de
+     drie zijn `tikker()` aanroept begint er werk -- binnen zijn eigen envelop en
+     met zijn eigen schakelaar. Daarom staat hij hier en niet als bevinding: er is
+     geen tweede weg naar binnen bijgekomen, alleen een minder overgeschreven.
+
+     WAT HEM EERLIJK HOUDT: hij vraagt ./tikkerstand.js of hij mag lopen. In een
+     meetserver gaan alle drie de lussen daarmee uit -- en dat is precies de regel
+     die main drie keer had moeten overschrijven en die nu op een plek staat. */
+  { bestand: 'server/kern/command/tikker.js',
+    reden: 'de gedeelde achtergrondtik van alarm, canary en uitrolregie. Hij START niets: maakTikker() geeft een functie terug en roept hem niet aan, dus dit bestand levert bij laden nul timers op. De drie aanroepers zitten elk in de envelop van hun eigen commandfunctie en houden hun eigen schakelaar; wat hier weg is, is drie keer dezelfde vijf regels. Hij vraagt bovendien tikkerstand.js of hij mag lopen, zodat de lus in een meetserver uitgaat' },
+
   /* DE MACHINE ONDER HET HUIS. Zelfde soort als de bediening in het
      platformregister: dit is niet een functie van RTG maar datgene waarop elke
      functie draait. */

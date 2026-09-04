@@ -2,16 +2,16 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-09-03",
   "gemeten": {
-    "bestanden": 2084,
+    "bestanden": 2096,
     "vormen": 1366,
-    "velden": 1971,
+    "velden": 1969,
     "modules": 739,
     "domeinen": 258,
     "envelopDrempel": 16,
-    "envelop": 31,
+    "envelop": 32,
     "veldenDomeineigen": 1398,
-    "veldenGedeeldVanafVier": 193,
-    "gelijkendeVormparen": 20
+    "veldenGedeeldVanafVier": 191,
+    "gelijkendeVormparen": 19
   },
   "envelop": [
     "aantal",
@@ -44,7 +44,8 @@
     "uitleg",
     "van",
     "waarom",
-    "wat"
+    "wat",
+    "wie"
   ],
   "gedeeld": [
     {
@@ -93,18 +94,6 @@
         "kern/commercie",
         "kern/ervaring",
         "kern/gastzorg"
-      ]
-    },
-    {
-      "veld": "wie",
-      "domeinen": 15,
-      "waar": [
-        "bedrijf",
-        "kern/comm",
-        "kern/commerce",
-        "kern/consent-lezers",
-        "kern/isolatie",
-        "kern/livinglab"
       ]
     },
     {
@@ -526,6 +515,18 @@
         "kern/geldbeleid",
         "kern/magnaat-controle"
       ]
+    },
+    {
+      "veld": "stad",
+      "domeinen": 9,
+      "waar": [
+        "kern/beschermzaak",
+        "kern/foundationregistratie-uitgifte",
+        "kern/ledenbalie",
+        "kern/livinglab",
+        "kern/mobiliteit",
+        "kern/rechterhand"
+      ]
     }
   ],
   "paren": [
@@ -800,24 +801,6 @@
         "gratis",
         "nr",
         "prijsCenten"
-      ]
-    },
-    {
-      "gelijkenis": 0.6,
-      "a": "server/kern/gast/order-beeld.js",
-      "b": "server/kern/horeca/regel.js",
-      "domeinA": "kern/gast",
-      "domeinB": "kern/horeca",
-      "gedeeld": [
-        "allergenen",
-        "allergie",
-        "gang",
-        "gastNr",
-        "happy",
-        "ingredienten",
-        "itemId",
-        "lijstprijs",
-        "opties"
       ]
     },
     {

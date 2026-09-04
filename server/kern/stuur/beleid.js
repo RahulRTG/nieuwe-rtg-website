@@ -61,10 +61,35 @@ function raakt(lijst, pad) {
 
    Het stuur roept intern altijd met POST aan (zie server/kern/stuur.js), dus
    dat is de methode waarop we de staat opzoeken. */
+/* DE SCHAAL WOONT HIER, en wordt nergens anders overgeschreven. Hij stond als
+   losse tekenreeksen door dit bestand heen, en drie lezers (../stuur.js,
+   ./plan.js, ./mandaat.js) schreven diezelfde woorden nog eens over -- TAKEN.md
+   4.55. Als bevroren object is hij op te halen, zodat een hernoeming hier een
+   fout elders geeft in plaats van een tak die nooit meer vuurt. */
+/* TWEE TAKKEN ZETTEN HEM OP DEZELFDE DAG NEER, en die zijn hier samengevoegd
+   in plaats van uitgevochten. De reden was aan beide kanten dezelfde en staat
+   het scherpst in de woorden van de andere: een bestand dat een woord van deze
+   schaal op een `niveau`-veld gebruikt zonder de schaal te IMPORTEREN, houdt een
+   kopie van deze waarheid vast -- en dan zegt een hernoeming hier niets meer over
+   daar. scripts/gezag.js telt precies dat; kern/stuur/isolatiefilter.js was de
+   23e en haalt het woord nu hiervandaan.
+
+   DE SLEUTELS ZIJN KLEIN GESCHREVEN, en dat is de enige keuze die hier gemaakt
+   is: de sleutel is dezelfde tekenreeks als de waarde, zoals in de rest van dit
+   bestand. De HOOFDLETTER-vorm uit de andere tak staat er als alias naast, zodat
+   `NIVEAUS.LEZEN` blijft werken -- twee namen voor een waarde is niet mooi, maar
+   een lezer die stil `undefined` teruggeeft en dan `=== undefined` vergelijkt is
+   erger, en dat is precies wat een niveau-vergelijking met een verkeerde sleutel
+   doet. */
+const NIVEAUS = Object.freeze({
+  verboden: 'verboden', lezen: 'lezen', klein: 'klein', voorstel: 'voorstel',
+  VERBODEN: 'verboden', LEZEN: 'lezen', KLEIN: 'klein', VOORSTEL: 'voorstel'
+});
+
 function beleidVoor(pad, wereld) {
   const w = String(wereld || '');
   if (!Object.prototype.hasOwnProperty.call(LEZEN, w)) {
-    return { niveau: 'verboden', reden: 'Het AI-stuur mist een geldige, servergekozen rol.' };
+    return { niveau: NIVEAUS.verboden, reden: 'Het AI-stuur mist een geldige, servergekozen rol.' };
   }
   /* DE BODEM VAN HET HUIS -- kern/frictie/bodem.js, en dit is de tweede lezer.
 
@@ -92,21 +117,21 @@ function beleidVoor(pad, wereld) {
      EXECUTE_LOW_RISK van gemaakt. */
   const bodem = bodemVoorPad(pad);
   if (bodem && bodem.minimum === 'hand') {
-    return { niveau: 'verboden', wereld: w, bodem: bodem.id,
+    return { niveau: NIVEAUS.verboden, wereld: w, bodem: bodem.id,
       reden: bodem.reden + ' Deze handeling doet een mens zelf; het stuur biedt hem niet aan.',
       bron: bodem.bron };
   }
 
-  const opDeLijst = raakt(LEZEN[w], pad) ? 'lezen'
-    : raakt(KLEIN[w], pad) ? 'klein'
-    : (raakt(VOORSTEL[w], pad) ? 'voorstel' : null);
+  const opDeLijst = raakt(LEZEN[w], pad) ? NIVEAUS.lezen
+    : raakt(KLEIN[w], pad) ? NIVEAUS.klein
+    : (raakt(VOORSTEL[w], pad) ? NIVEAUS.voorstel : null);
   if (!opDeLijst) {
-    return { niveau: 'verboden', wereld: w,
+    return { niveau: NIVEAUS.verboden, wereld: w,
       reden: 'Deze actie staat niet op de expliciete AI-allowlist voor ' + w + '.' };
   }
   const staat = staatVan('POST', pad);
   if (staat && staat.staat === 'geschorst') {
-    return { niveau: 'verboden', wereld: w, vervalstaat: 'geschorst',
+    return { niveau: NIVEAUS.verboden, wereld: w, vervalstaat: 'geschorst',
       reden: 'Het bewijs achter deze actie is gezakt; hij is geschorst tot een hermeting slaagt. ' +
         'Het AI-stuur kiest niet uit onbewezen handelingen.' };
   }
@@ -116,14 +141,14 @@ function beleidVoor(pad, wereld) {
      tot nu toe waar bij toeval, en het is nu waar bij constructie. Wie morgen
      /api/bank/sepa op zo'n lijst zet, krijgt hier een voorstel terug in
      plaats van een stille uitvoering. */
-  const niveau = bodem && bodem.minimum === 'assist' && opDeLijst !== 'voorstel' ? 'voorstel' : opDeLijst;
+  const niveau = bodem && bodem.minimum === 'assist' && opDeLijst !== NIVEAUS.voorstel ? NIVEAUS.voorstel : opDeLijst;
   return { niveau, wereld: w,
     ...(niveau !== opDeLijst ? { bodem: bodem.id, reden: bodem.reden, bron: bodem.bron } : {}),
     ...(staat ? { vervalstaat: staat.staat } : {}) };
 }
 
 function toegestanePaden(paden, wereld) {
-  return (paden || []).filter(p => beleidVoor(p, wereld).niveau !== 'verboden');
+  return (paden || []).filter(p => beleidVoor(p, wereld).niveau !== NIVEAUS.verboden);
 }
 
 /* DIRECT blijft bestaan als de VERENIGING van lezen en klein: bestaande
@@ -132,14 +157,5 @@ function toegestanePaden(paden, wereld) {
    houdt vast dat die vereniging gelijk is aan de lijst van voor de splitsing. */
 const DIRECT = Object.freeze(Object.fromEntries(
   Object.keys(LEZEN).map(w => [w, LEZEN[w].concat(KLEIN[w] || [])])));
-
-/* DE TREDEN ALS WAARDE, zodat wie ze nodig heeft ze kan OPHALEN in plaats van
-   overschrijven. scripts/gezag.js telt precies dat: een bestand dat een woord
-   van deze schaal op een `niveau`-veld gebruikt zonder de schaal te importeren,
-   houdt een kopie van deze waarheid vast -- en dan zegt een hernoeming hier
-   niets meer over daar. kern/stuur/isolatiefilter.js was de 23e; hij krijgt het
-   woord nu hiervandaan. De volgorde is de ordening: verboden < lezen < voorstel
-   < klein is de schaal zoals het register hem kent. */
-const NIVEAUS = Object.freeze({ VERBODEN: 'verboden', LEZEN: 'lezen', KLEIN: 'klein', VOORSTEL: 'voorstel' });
 
 module.exports = { LEZEN, KLEIN, DIRECT, VOORSTEL, NIVEAUS, beleidVoor, toegestanePaden };

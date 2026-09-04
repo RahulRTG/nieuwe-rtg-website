@@ -71,7 +71,18 @@ module.exports = ({ db, save, crypto, schoon }) => {
   }
 
   // de som van een regel en van een hele rekening, altijd op dezelfde manier
-  const regelSom = (r) => heleCenten(r.centen * r.aantal);
+  /* EEN GECORRIGEERDE REGEL TELT NUL, EN DAT STAAT HIER OMDAT DIT DE ENIGE
+     PLEK IS. Een regel die verkeerd bereid of nooit gebracht is, blijft op de
+     rekening staan met `gecorrigeerd` erop (kern/horeca/correctie.js): hij mag
+     niet verdampen, want dan ziet de keuken zijn werk verdwijnen en verliest de
+     gast het spoor van wat hij bestelde. Maar hij mag ook niet meetellen.
+
+     Door het HIER te doen bewegen de totalen, het splitsen, het samenvoegen en
+     de verdeling per stoel allemaal mee, en blijft controleerSom() kloppen.
+     Zou de correctielaag de bedragen zelf aftrekken, dan zou er een tweede
+     rekenweg ontstaan die bij het splitsen van een tafel uiteenloopt met deze
+     (LAT.md regel 4). */
+  const regelSom = (r) => (r && r.gecorrigeerd) ? 0 : heleCenten(r.centen * r.aantal);
   function kortingCenten(rek) {
     const bruto = (rek.regels || []).reduce((t, r) => t + regelSom(r), 0);
     let af = 0;

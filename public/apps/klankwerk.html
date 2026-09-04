@@ -104,6 +104,13 @@
     border:1px solid var(--line);border-radius:0;padding:.5rem .95rem;font-size:.82rem;
     opacity:0;transition:opacity .25s;pointer-events:none;z-index:30;}
   .melding.zie{opacity:1;}
+
+  /* Uit inline style-attributen gehaald door scripts/inlinestijl-omzet.js (TAKEN.md 4.51). Bewezen gelijk met
+     scripts/inlinestijl-proef.js: elk element, elke aangeraakte eigenschap,
+     berekend in een echte browser. Letterlijk wat er stond -- geen ontwerpbesluit. */
+  .i-186pl3{width:4rem}
+  .i-1v4gr3{position:absolute;left:-999px}
+  .i-1cv76i{flex:1;min-width:10rem}
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>
@@ -132,7 +139,7 @@
         <label for="tBpm" class="stil">Tempo</label>
         <input class="veld" id="tBpm" type="number" min="40" max="200" style="width:5rem;">
         <label for="tMaten" class="stil">Maten</label>
-        <input class="veld" id="tMaten" type="number" min="1" max="32" style="width:4rem;">
+        <input class="i-186pl3 veld" id="tMaten" type="number" min="1" max="32">
         <label for="tLengte" class="stil">Nootlengte</label>
         <select class="veld" id="tLengte">
           <option value="1">1</option><option value="2" selected>2</option>
@@ -171,9 +178,9 @@
           <option>Brug</option><option>Slot</option>
         </select>
         <label class="stil" for="sVan">van maat</label>
-        <input class="veld" id="sVan" type="number" min="1" max="32" value="1" style="width:4rem;">
+        <input class="i-186pl3 veld" id="sVan" type="number" min="1" max="32" value="1">
         <label class="stil" for="sTot">t/m</label>
-        <input class="veld" id="sTot" type="number" min="1" max="32" value="4" style="width:4rem;">
+        <input class="i-186pl3 veld" id="sTot" type="number" min="1" max="32" value="4">
         <button class="knop" id="sBij" type="button">Deel erbij</button>
       </div>
     </div>
@@ -183,14 +190,14 @@
       <p class="stil">Wat hij maakt is een voorstel: het landt pas in uw raster als u dat zegt, en het is
         daarna gewoon te bewerken. RTG claimt niets van wat u maakt.</p>
       <div class="rij h-mt60">
-        <label class="stil" for="rVraag" style="position:absolute;left:-999px;">Wat wilt u horen?</label>
-        <input class="veld" id="rVraag" style="flex:1;min-width:10rem;" maxlength="300"
+        <label class="i-1v4gr3 stil" for="rVraag">Wat wilt u horen?</label>
+        <input class="i-1cv76i veld" id="rVraag" maxlength="300"
           placeholder="Bijv. een rustige lounge rond 90 bpm">
         <button class="knop" id="rVraagKnop" type="button">Een figuur om mee te beginnen</button>
       </div>
       <div class="rij h-mt60">
-        <label class="stil" for="rTekst" style="position:absolute;left:-999px;">Uw zin om te zingen</label>
-        <input class="veld" id="rTekst" style="flex:1;min-width:10rem;" maxlength="600"
+        <label class="i-1v4gr3 stil" for="rTekst">Uw zin om te zingen</label>
+        <input class="i-1cv76i veld" id="rTekst" maxlength="600"
           placeholder="Uw eigen zin, bijv. de zon komt op boven de haven">
         <button class="knop vol" id="rLiedKnop" type="button">Maak er een heel lied van</button>
       </div>

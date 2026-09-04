@@ -15,12 +15,14 @@
    omzetting woont op een plek (hulp.js, euroTekst). */
 'use strict';
 
+const { NIVEAUS } = require('../geldbeleid/regels');
+
 const { vandaag, euroTekst, slug, LINK } = require('./hulp');
 
 /* Actie eerst: wat klaarstaat boven wat een voorstel is, boven wat alleen
    kijken vraagt. Het command center toont van boven naar beneden en het lid
    hoort het dringendste bovenaan te zien. */
-const RANG = { klaarzetten: 0, voorstellen: 1, kijken: 2 };
+const RANG = { [NIVEAUS.klaarzetten]: 0, [NIVEAUS.voorstellen]: 1, [NIVEAUS.kijken]: 2 };
 
 /* Wat er ook uit de beleidslaag komt, het verlaat de graaf alleen in de
    contractvorm: de UI bouwt hier blind op, dus een half veld uit een
@@ -36,7 +38,7 @@ function netteUitzondering(u, i) {
     centen: u && Number.isFinite(u.centen) ? Math.round(u.centen) : null,
     uitleg: String((u && u.uitleg) || ''),
     gegevens: Array.isArray(u && u.gegevens) ? u.gegevens.map(String) : [],
-    niveau: u && RANG[u.niveau] !== undefined ? u.niveau : 'kijken',
+    niveau: u && RANG[u.niveau] !== undefined ? u.niveau : NIVEAUS.kijken,
     actie
   };
 }
@@ -58,7 +60,7 @@ function eigenUitzonderingen(patronen, feiten) {
         'wallet: ' + p.aantal + ' betalingen "' + p.titel + '" met een tussenpoos van ~' + p.interval + ' dagen',
         'wallet: vorige ' + p.vorigeCenten + ' centen, jongste ' + p.centen + ' centen'
       ],
-      niveau: 'kijken',
+      niveau: NIVEAUS.kijken,
       actie: { label: 'Bekijk in Wallet', link: LINK('wallet') }
     });
   }
@@ -71,7 +73,7 @@ function eigenUitzonderingen(patronen, feiten) {
       centen: f.centen,
       uitleg: 'De afgesproken datum (' + f.wanneer + ') is voorbij en deze gift staat nog als open toezegging in het Mecenaat. Afronden of verzetten kan daar; de graaf telt het bedrag intussen als komende last mee.',
       gegevens: ['mecenaat: toezegging "' + f.titel + '", ' + (f.centen || 0) + ' centen, datum ' + f.wanneer],
-      niveau: 'voorstellen',
+      niveau: NIVEAUS.voorstellen,
       actie: { label: 'Open Mecenaat', link: LINK('mecenaat') }
     });
   }

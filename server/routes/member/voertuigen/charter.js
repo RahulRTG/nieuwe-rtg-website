@@ -9,7 +9,7 @@ module.exports = (vctx) => {
     salonZichtbaar, ontmoetZet, ontmoetPos, ontmoetKies, ontmoetTeken,
     ontmoetHier, ontmoetStop, ontmoetSos, ontmoetSignaalKantoor, ontmoetMijnState,
     avShowroom, avAanbevolen, avProefrit, avKoop, avInruil,
-    avTeken, avMijnDeals, zorgVoor, zorgContact, media,
+    avTeken, avMijnDeals, zorgVoor, zorgMee, zorgContact, media,
     boekingMetRef, boekingenVanZaak, boekingenVoegToe, openLijn, gegevensStop } = vctx;
 /* ================== charter: boten en jachten huren ==================
    Zelfde eerlijke opzet als autoverhuur (vaste prijs vooraf, staat met foto's
@@ -69,7 +69,7 @@ app.post('/api/charter/boek', auth, (req, res) => {
     customerTier: req.session.tier, customerKey: req.session.key, customerCodename: codename,
     bootId: boot.id, bootNaam: boot.naam, bootType: boot.type,
     van, tot, dagen, gasten, metSkipper, skipperNaam: null,
-    zorg: zorgVoor(req.session.key),
+    zorg: zorgMee(req.session.key, { zaak: s.code, reden: 'zorgprofiel meegegeven bij een charter' }),
     service: { id: boot.id, name: boot.naam + ', ' + dagen + ' dag(en)' + (metSkipper ? ' met schipper' : ' bareboat'), soort: 'charter' },
     price: (boot.dagprijs || 0) * dagen + skipperKosten,
     wanneer: van,

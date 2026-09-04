@@ -87,6 +87,11 @@
   .statuspil.te-koop{background:#12241a;color:#7ecb8f;border:1px solid #2f6a45;}
   .statuspil.gereserveerd{background:#2a2a1a;color:#d8c86a;border:1px solid #6a5f2a;}
   .statuspil.verkocht{background:var(--paneel2);color:var(--zacht);border:1px solid var(--lijn);}
+
+  /* Uit inline style-attributen gehaald door scripts/inlinestijl-omzet.js (TAKEN.md 4.51). Bewezen gelijk met
+     scripts/inlinestijl-proef.js: elk element, elke aangeraakte eigenschap,
+     berekend in een echte browser. Letterlijk wat er stond -- geen ontwerpbesluit. */
+  .i-tdfgqm{float:right}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
@@ -129,7 +134,7 @@
       <div id="plaatsMelding" class="melding"></div>
       <label class="vl" for="pTitel">Wat bied je aan?</label>
       <input class="veld" id="pTitel" maxlength="80" placeholder="Bijv. Houten kinderfietsje">
-      <label class="vl" for="pCat">Categorie <button type="button" class="knop grijs klein" id="pAiCat" style="float:right;">AI: raad categorie</button></label>
+      <label class="vl" for="pCat">Categorie <button type="button" class="i-tdfgqm knop grijs klein" id="pAiCat">AI: raad categorie</button></label>
       <select class="veld" id="pCat"></select>
       <label class="vl">Staat</label>
       <div class="chips" id="pStaat">
@@ -137,7 +142,7 @@
         <button type="button" class="chip" data-staat="zgan">Zo goed als nieuw</button>
         <button type="button" class="chip" data-staat="nieuw">Nieuw</button>
       </div>
-      <label class="vl" for="pOms">Omschrijving <button type="button" class="knop grijs klein" id="pAiOms" style="float:right;">AI: schrijf voor mij</button></label>
+      <label class="vl" for="pOms">Omschrijving <button type="button" class="i-tdfgqm knop grijs klein" id="pAiOms">AI: schrijf voor mij</button></label>
       <textarea class="veld" id="pOms" maxlength="2000" placeholder="Vertel kort wat je aanbiedt, de staat en of het opgehaald of verzonden kan worden."></textarea>
       <div class="rij h-mt70">
         <div class="h-flex1">

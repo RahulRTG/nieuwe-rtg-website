@@ -22,6 +22,8 @@
 'use strict';
 
 const { s } = require('./register');
+const { NIVEAUS } = require('../frictie');
+
 /* De oorzaakmeting staat apart in ./oorzaak.js: een andere vraag (wat is er
    aan de hand) dan de rest van dit bestand (wat moet er gebeuren), en los te
    toetsen. */
@@ -150,7 +152,7 @@ function maakOperator({ db, save, crypto, journaal, risico, runbooks, zaken, bel
         nieuweZaken.push(zaken.open({
           titel: d.naam + ' -- uitzondering: ' + u.titel, domein: d.domein, objectType: d.type, objectId: u.id,
           oorzaak: d.oorzaakVeld ? d.oorzaakVeld + '-afwijking' : 'geen veilige route', bron: 'operator',
-          risico: u.score, door, niveau: 'assist',
+          risico: u.score, door, niveau: NIVEAUS.assist,
           reden: 'De operator mocht dit geval niet zelf doen: ' + u.waarom,
           bewijs: { plan: p.id, vraag: p.vraag, runbook: d.runbook, oordeel: u.waarom }
         }));
@@ -159,7 +161,7 @@ function maakOperator({ db, save, crypto, journaal, risico, runbooks, zaken, bel
     p.uitgevoerd = true; p.uitgevoerdDoor = String(door); p.uitgevoerdAt = new Date().toISOString();
     if (save) save();
     journaal.noteer({ actor: door, actie: 'operator uitvoeren', objectType: 'plan', objectId: p.id,
-      niveau: 'assist', reden: reden || p.vraag,
+      niveau: NIVEAUS.assist, reden: reden || p.vraag,
       voor: { veilig: p.veilig, uitzonderingen: p.uitzonderingen },
       na: { runs: runs.length, zaken: nieuweZaken.length, fouten: fouten.length } });
     return { hersteld: runs.reduce((n, r) => n + r.geraakt, 0), runs, zaken: nieuweZaken.length, fouten };

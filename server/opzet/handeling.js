@@ -27,38 +27,17 @@
    elke mutatie. hervat() zet de keten na de lijfpoort terug; het verhaal staat
    in test/begrotingroute.test.js, die hem vond.
 
-   WAT ER GEMETEN WORDT, en waarom juist dat. Per top-level collectie in db.data
-   het AANTAL RIJEN, bij het begin en aan het eind. Het verschil is de
-   handeling: `+1 boekingen` bij een normale reservering, `-4280 medewerkers` bij
-   een massaverwijdering. Dat tweede getal is precies waar een blast-radius-grens
-   op hoort te staan, en het is er nu.
-
-   WAT DEZE METING NIET ZIET, en dat hoort er hard bij te staan:
-
-   - EEN WIJZIGING BINNEN EEN RIJ. Vierduizend medewerkers op non-actief zetten
-     verandert geen rij-aantal en is hier onzichtbaar: de grootste blinde vlek,
-     bewust geaccepteerd, want het alternatief is een diep diff over de hele
-     database bij elk verzoek. Wie die klasse wil vangen, laat de handeling zelf
-     zeggen wat hij aanraakt -- daar is `raakt()` voor, nog nergens aangeroepen.
-   - VERVANGING MET GELIJK AANTAL. Vijf rijen weg en vijf erbij is delta nul.
-   - WAT ER NIET DOOR EEN VERZOEK KOMT. Een cronjob, de onderhoudsveger of een
-     migratie draait buiten deze context; die zijn hier onzichtbaar en horen dat
-     ook te zijn -- een actor die geen verzoek is, is een andere vraag.
-
    Er staat dus geen "alles is gedekt" onder. Er staat: dit is de vorm van
    handeling die we WEL kunnen zien, en de rest is opgeschreven in plaats van
    weggemiddeld.
 
-   WAT HET KOST, gemeten en niet geschat. Op een db.data met 450 top-level
-   sleutels (300 arrays) duurt een telling 60 microseconden; twee per verzoek plus
-   het verschil is ~0,13 ms. De lat in BEPROEVING.json staat op p50 13 ms, dus dat
-   is ongeveer een procent van een mediaan verzoek. Een snellere vorm (twee losse
-   arrays in plaats van een Map) scheelde 14 microseconden -- een tiende procent
-   van p50 -- en dat is hier de leesbaarheid niet waard.
    ========================================================================== */
 'use strict';
 
 const { AsyncLocalStorage } = require('async_hooks');
+/* De rij-telling staat apart in ./handelingtelling.js, met de kop over WAT er
+   gemeten wordt, wat die meting NIET ziet en wat hij kost erbij. */
+const { tel, verschil } = require('./handelingtelling');
 const context = new AsyncLocalStorage();
 
 /* De grens waarboven een handeling het vermelden waard is. Bewust geen blokkade:
@@ -70,34 +49,6 @@ const GRENS = (() => {
   return Number.isFinite(n) && n > 0 ? n : 250;
 })();
 
-/* Alleen top-level arrays tellen. Een object of een getal in db.data is geen
-   collectie met rijen, en meetellen zou het getal betekenisloos maken. */
-function tel(data) {
-  const uit = new Map();
-  if (!data || typeof data !== 'object') return uit;
-  for (const sleutel of Object.keys(data)) {
-    const v = data[sleutel];
-    if (Array.isArray(v)) uit.set(sleutel, v.length);
-  }
-  return uit;
-}
-
-/* Het verschil tussen twee tellingen. Een collectie die nieuw is telt als groei
-   vanaf nul; een die verdwenen is als krimp naar nul -- allebei zijn het echte
-   gebeurtenissen en geen meetruis. */
-function verschil(voor, na) {
-  const wijzigingen = [];
-  const sleutels = new Set([...voor.keys(), ...na.keys()]);
-  for (const s of sleutels) {
-    const van = voor.has(s) ? voor.get(s) : 0;
-    const naar = na.has(s) ? na.get(s) : 0;
-    if (van !== naar) wijzigingen.push({ collectie: s, van, naar, delta: naar - van });
-  }
-  // grootste beweging eerst: wie dit leest wil weten wat er het meest gebeurde
-  wijzigingen.sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta));
-  return wijzigingen;
-}
-
 /* De huidige handeling, of null buiten een verzoek. Bewust null en geen leeg
    object: wie null krijgt weet dat hij buiten een verzoek draait en kan dat
    melden, in plaats van een handeling met nul wijzigingen te lezen die er nooit
@@ -106,10 +57,10 @@ function huidige() {
   return context.getStore() || null;
 }
 
-/* Een handeling laten zeggen wat hij aanraakt, voor de gevallen die een
-   rij-telling niet ziet (een wijziging BINNEN een rij). Vandaag nog nergens
-   aangeroepen, en dat staat zo in de kop -- een functie die er is en niets doet
-   is een voornemen, geen dekking. */
+/* Een handeling laten zeggen wat hij aanraakt, voor wat een rij-telling niet
+   ziet (een wijziging BINNEN een rij). HIJ MELDT EN HIJ WEIGERT NIET: buiten een
+   verzoek geeft hij false, en een aanroeper mag dat nooit als toestemming lezen
+   -- anders liep een loonrun vast op een meting. */
 function raakt(soort, aantal) {
   const h = huidige();
   if (!h) return false;
@@ -121,9 +72,19 @@ function raakt(soort, aantal) {
 /* De meting afsluiten en de uitslag teruggeven. Apart van de middleware zodat
    een toets hem kan aanroepen zonder een server op te zetten -- en zodat de
    optelling die op het scherm komt dezelfde is als die een toets ijkt. */
-function sluit(h, data) {
+function sluit(h, data, klasse) {
   if (!h || h.gesloten) return h || null;
   h.gesloten = true;
+  /* WAT VOOR HANDELING DIT WAS (TAKEN.md 4.71). `risicoklasse` en
+     `omkeerbaarheid` waren twee van de drie dakloze envelopvelden; ze horen
+     hier en niet op de envelop, want de kop daar zegt met recht dat een
+     poortwachter ze niet kent. kern/handelingsklasse.js leidt ze af uit vier
+     bronnen die dit huis AL heeft, met een bron en een bewijsgraad per waarde
+     en `onbekend` als eersteklas uitslag. Meegegeven en niet hier gerequired:
+     zo is deze meting los te draaien zonder de registers. */
+  if (typeof klasse === 'function') {
+    try { Object.assign(h, klasse(h.methode, h.pad)); } catch (e) { h.klassefout = true; }
+  }
   try {
     h.wijzigingen = verschil(h.voor, tel(data));
     h.geraakt = h.wijzigingen.reduce((n, w) => n + Math.abs(w.delta), 0)
@@ -146,6 +107,7 @@ function middleware(deps) {
   const geefData = (deps && deps.data) || (() => {
     try { return require('../db').db.data; } catch (e) { return null; }
   });
+  const klasse = deps && deps.klasse;
   const meld = (deps && deps.log) || ((niveau, bericht, velden) => {
     try { require('../log').log[niveau](bericht, velden); } catch (e) {}
   });
@@ -169,7 +131,7 @@ function middleware(deps) {
     res.on('finish', () => {
       let laatste = null;
       try { laatste = geefData(); } catch (e) { laatste = null; }
-      sluit(h, laatste);
+      sluit(h, laatste, klasse);
       /* DE MELDING. Boven de grens is dit het enige spoor dat zegt "dit ene
          verzoek raakte zoveel rijen" -- de eerste vorm van blast radius die dit
          huis kent. Onder de grens gebeurt er niets, want een regel per verzoek

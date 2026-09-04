@@ -73,6 +73,11 @@
     color:var(--zacht);margin:.6rem 0 .2rem;}
   .twee{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;}
   .rijknoppen{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.9rem;}
+
+  /* Uit inline style-attributen gehaald door scripts/inlinestijl-omzet.js (TAKEN.md 4.51). Bewezen gelijk met
+     scripts/inlinestijl-proef.js: elk element, elke aangeraakte eigenschap,
+     berekend in een echte browser. Letterlijk wat er stond -- geen ontwerpbesluit. */
+  .i-186m9v{width:100%}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
@@ -102,21 +107,21 @@
   <div class="paneel">
     <h2 id="afKop">Agendapunt</h2>
     <label for="afTitel">Wat</label>
-    <input class="veld" id="afTitel" maxlength="80" placeholder="Bijv. Noor naar zwemles" style="width:100%;">
+    <input class="i-186m9v veld" id="afTitel" maxlength="80" placeholder="Bijv. Noor naar zwemles">
     <div class="twee">
-      <span><label for="afDatum">Datum</label><input class="veld" id="afDatum" type="date" style="width:100%;"></span>
-      <span><label for="afTijd">Tijd (mag leeg)</label><input class="veld" id="afTijd" type="time" style="width:100%;"></span>
+      <span><label for="afDatum">Datum</label><input class="i-186m9v veld" id="afDatum" type="date"></span>
+      <span><label for="afTijd">Tijd (mag leeg)</label><input class="i-186m9v veld" id="afTijd" type="time"></span>
     </div>
     <label for="afWie">Voor wie</label>
-    <select class="veld" id="afWie" style="width:100%;"><option value="">Het hele gezin</option></select>
+    <select class="i-186m9v veld" id="afWie"><option value="">Het hele gezin</option></select>
     <div class="twee">
       <span><label for="afHerhaal">Herhaal</label>
-        <select class="veld" id="afHerhaal" style="width:100%;">
+        <select class="i-186m9v veld" id="afHerhaal">
           <option value="geen">Niet</option><option value="dag">Elke dag</option>
           <option value="week">Elke week</option><option value="maand">Elke maand</option>
           <option value="jaar">Elk jaar (verjaardag)</option>
         </select></span>
-      <span><label for="afHerhaalTot">Tot (mag leeg)</label><input class="veld" id="afHerhaalTot" type="date" style="width:100%;"></span>
+      <span><label for="afHerhaalTot">Tot (mag leeg)</label><input class="i-186m9v veld" id="afHerhaalTot" type="date"></span>
     </div>
     <label for="afNotitie">Notitie (mag leeg)</label>
     <input class="veld" id="afNotitie" maxlength="120" style="width:100%;">

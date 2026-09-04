@@ -92,7 +92,7 @@ test('de twee laden onder een regel: openen, uitvoeren en de weg terug',
       localStorage.setItem('rtg_member_token', tok);
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, reg.token);
-    await page.goto(base + '/apps/kantoor.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/kantoor.html', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => !!window.RTGGebaar, null, { timeout: 20000 });
     await page.evaluate((h) => {
       document.querySelector('#werkdag').innerHTML = h;
@@ -196,7 +196,7 @@ test('doorvegen kan terug, en wat niet terug kan gaat alleen op vasthouden',
     const page = await browser.newPage({ viewport: { width: 900, height: 900 } });
     const paginaFouten = [];
     letOpFouten(page, paginaFouten);
-    await page.goto(base + '/apps/kantoor.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/kantoor.html', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => !!window.RTGGebaar, null, { timeout: 20000 });
     await page.evaluate(() => {
       document.querySelector('#werkdag').innerHTML =
@@ -305,7 +305,7 @@ test('op een aanraakscherm ligt de lade in de regel en niet over de pagina',
       localStorage.setItem('rtg_member_token', tok);
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, reg.token);
-    await page.goto(base + '/apps/kantoor.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/kantoor.html', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => !!window.RTGGebaar, null, { timeout: 20000 });
     assert.equal(await page.evaluate(() => matchMedia('(hover:hover) and (pointer:fine)').matches), false,
       'deze proef hoort in de aanraakstand te draaien; anders meet hij hetzelfde als de twee hierboven');
@@ -341,6 +341,13 @@ test('op een aanraakscherm ligt de lade in de regel en niet over de pagina',
        lid ziet. */
     await veeg(page, doos, -150, true);
     await wachtOpRust(page);
+    /* WACHTEN OP DE LADE ZELF, om dezelfde reden als bij ladeOpen() bovenaan dit
+       bestand: wachtOpRust telt stilte, en vlak na een veeg is het stil omdat de
+       lade nog moet opengaan. Op een trage bak mat de meting hierna een regel
+       waar nog niets aan hing, en dan zakt deze proef op de klok in plaats van
+       op het gedrag. De uitkomst blijft een METING en geen uitzondering: komt de
+       lade er niet, dan blijft `meting` null en spreekt de bewering eronder. */
+    await page.waitForSelector('#proefregel .gb-lade', { timeout: 15000 }).catch(() => {});
 
     const meting = await page.evaluate(() => {
       const r = document.getElementById('proefregel');

@@ -50,6 +50,12 @@
   .nvl{border-radius:0;padding:0.3rem 0.7rem;font-size:0.75rem;border:1px solid var(--line);cursor:pointer;background:var(--card);color:var(--txt);}
   .nvl.on{border-color:var(--rood);color:var(--rood);}
   .demo-hint{margin-top:0.6rem;}
+
+  /* Uit inline style-attributen gehaald door scripts/inlinestijl-omzet.js (TAKEN.md 4.51). Bewezen gelijk met
+     scripts/inlinestijl-proef.js: elk element, elke aangeraakte eigenschap,
+     berekend in een echte browser. Letterlijk wat er stond -- geen ontwerpbesluit. */
+  .i-jv5hwd{max-width:11rem}
+  .i-m3b83{margin-bottom:0.5rem}
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
 </head>
@@ -123,14 +129,14 @@
       <div class="rij">
         <input class="veld" id="cKlacht" placeholder="Klacht" maxlength="200">
         <select id="cUrgentie" aria-label="Urgentie"><option value="hoog">Hoog</option><option value="normaal" selected>Normaal</option><option value="laag">Laag</option></select>
-        <input class="veld" id="cWanneer" placeholder="Wanneer (bijv. ma 10:15)" maxlength="40" style="max-width:11rem;">
+        <input class="i-jv5hwd veld" id="cWanneer" placeholder="Wanneer (bijv. ma 10:15)" maxlength="40">
         <button class="knop" id="cMaak" type="button">Plan in</button>
       </div>
       <div id="consulten"></div>
     </div>
     <div class="kaart" id="kReceptie" hidden>
       <h2 class="h-mt0">De medische receptie</h2>
-      <p class="stil" style="margin-bottom:0.5rem;">Op dit bord staat een korte aanduiding, nooit een volledige naam: de echte naam blijft in de identiteitskluis.</p>
+      <p class="i-m3b83 stil">Op dit bord staat een korte aanduiding, nooit een volledige naam: de echte naam blijft in de identiteitskluis.</p>
       <div class="rij">
         <input class="veld" id="pAanduiding" placeholder="Aanduiding (bijv. dhr. V., 10:15)" maxlength="60">
         <input class="veld" id="pReden" placeholder="Reden (optioneel)" maxlength="120" style="max-width:12rem;">
@@ -157,7 +163,7 @@
       <div class="rij">
         <select id="rApotheek" aria-label="Apotheek"></select>
         <input class="veld" id="rMiddel" placeholder="Middel" maxlength="120">
-        <input class="veld" id="rDosering" placeholder="Dosering" maxlength="120" style="max-width:11rem;">
+        <input class="i-jv5hwd veld" id="rDosering" placeholder="Dosering" maxlength="120">
         <button class="knop" id="rSchrijf" type="button">Schrijf voor</button>
       </div>
       <div id="eigenRecepten" class="stil"></div>
@@ -179,7 +185,7 @@
       <h2 class="h-mt0">De agenda</h2>
       <div class="rij">
         <input class="veld" id="aWat" placeholder="Waarvoor is de afspraak?" maxlength="120">
-        <input class="veld" id="aWanneer" placeholder="Wanneer (bijv. di 14:30)" maxlength="40" style="max-width:11rem;">
+        <input class="i-jv5hwd veld" id="aWanneer" placeholder="Wanneer (bijv. di 14:30)" maxlength="40">
         <label class="stil" id="aIntakeRij" style="display:flex;align-items:center;gap:0.3rem;"><input type="checkbox" id="aIntake"> intake gedaan of dit is de intake</label>
         <button class="knop" id="aMaak" type="button">Plan in</button>
       </div>
@@ -188,7 +194,7 @@
     </div>
     <div class="kaart" id="kRamp" hidden>
       <h2 class="h-mt0">Het gezamenlijke rampbeeld</h2>
-      <p class="stil" style="margin-bottom:0.5rem;">De paraatheid van uw keten-partners in een overzicht. Schaal op of af zodat iedereen op hetzelfde niveau werkt.</p>
+      <p class="i-m3b83 stil">De paraatheid van uw keten-partners in een overzicht. Schaal op of af zodat iedereen op hetzelfde niveau werkt.</p>
       <div class="rij" id="rampNiveau"></div>
       <div class="kpis" id="rampKpis" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(6.5rem,1fr));gap:0.5rem;margin:0.5rem 0;"></div>
       <div id="rampDetail"></div>
@@ -204,7 +210,7 @@
     </div>
     <div class="kaart" id="kKeten">
       <h2 class="h-mt0">De ketenchat</h2>
-      <p class="stil" style="margin-bottom:0.5rem;">Nodig een korps of zorg-zaak eenmalig uit; daarna deelt u het ketenkanaal. Besloten deelgroepen zijn alleen voor de leden; de meldkamer-chefs van de betrokken korpsen kijken mee.</p>
+      <p class="i-m3b83 stil">Nodig een korps of zorg-zaak eenmalig uit; daarna deelt u het ketenkanaal. Besloten deelgroepen zijn alleen voor de leden; de meldkamer-chefs van de betrokken korpsen kijken mee.</p>
       <div class="rij">
         <select id="ktKandidaat" aria-label="Korps om uit te nodigen"></select>
         <button class="knop klein" id="ktNodig" type="button">Nodig uit</button>

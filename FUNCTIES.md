@@ -16,14 +16,14 @@ het?**
 
 | | |
 |---|---|
-| Functieschakelaars (aan/uit per functie) | **212** in 17 categorieën |
+| Functieschakelaars (aan/uit per functie) | **213** in 17 categorieën |
 | Apps in de leden-catalogus | **84** in 8 categorieën |
 | Bedrijfsgenres | **74** in 27 sectoren |
 | Genre-caps (waar de apps op sturen) | **40** |
 | API-routes (uit de router) | **4738** |
-| Kernmodules (`server/kern/**`) | **2014** |
+| Kernmodules (`server/kern/**`) | **2019** |
 | App-pagina's (`public/apps/**.html`) | **292** |
-| Testbestanden | **1616** |
+| Testbestanden | **1622** |
 
 ## De vier werelden
 
@@ -54,7 +54,7 @@ ook blokkeert.
 
 ---
 
-# 1. De 212 functieschakelaars
+# 1. De 213 functieschakelaars
 
 ### Leden (RTG-app) — 24
 
@@ -293,11 +293,13 @@ ook blokkeert.
 - **Bijles** (`ov-bijles`) — Het bijlesgesprek met de begeleider.  
   _voor: foundation_
 
-### Betalen & verificatie — 5
+### Betalen & verificatie — 6
 
 - **Betaalverkeer** (`betalen`) — Betalingen (demo of Stripe) en de RTG Pay-wallet. Uit = er kan tijdelijk niet betaald worden.  
   _voor: rtg, lifestyle, business, gast_
 - **Passkeys (WebAuthn)** (`webauthn`) — Inloggen met vingerafdruk, gezicht of beveiligingssleutel. Wachtwoord-inloggen blijft altijd werken.  
+  _voor: rtg, lifestyle, business_
+- **Herstel van het eigenaarsaccount** (`eigenaarherstel`) — De weg terug zonder toestel: twee van de drie herstel-delen, zeven dagen wachttijd, en elke werkende passkey breekt hem af. Uit = die weg is dicht; de delen blijven geldig voor als hij weer aangaat.  
   _voor: rtg, lifestyle, business_
 - **Identiteitsverificatie (KYC)** (`verificatie`) — Leden uploaden hun identiteitsbewijs en RTG beoordeelt het.  
   _voor: rtg, lifestyle, business, gast_

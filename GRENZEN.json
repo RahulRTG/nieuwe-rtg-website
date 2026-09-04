@@ -299,6 +299,12 @@
       "economie",
       "kosten"
     ],
+    "eigenaarherstel": [
+      "appUrl",
+      "eigenaarAlleen",
+      "sessieSleutel",
+      "zwaar"
+    ],
     "experience": [
       "experience"
     ],
@@ -566,6 +572,7 @@
       "bevoegd",
       "boardroomAuth",
       "boardroomLijst",
+      "boardroomUser",
       "capGezondheid",
       "commercieRechten",
       "commercieRonde",
@@ -604,6 +611,7 @@
       "werkplaats",
       "zaakAbonnement",
       "zelfzorg",
+      "zwaar",
       "zwaarbewijs"
     ],
     "klok": [
@@ -2226,6 +2234,7 @@
       "ontsluitpoort",
       "pay",
       "sendPushToUser",
+      "sessieSleutel",
       "sessions",
       "spelTelemetrie",
       "staat",
@@ -2240,6 +2249,7 @@
       "webauthnStapOpMaak",
       "webauthnStapOpOpties",
       "zekeringMag",
+      "zwaar",
       "zwaarbewijs"
     ],
     "tenant": [

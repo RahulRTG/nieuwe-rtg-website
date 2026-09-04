@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1622 bestanden en 11569 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1623 bestanden en 11571 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1622 |
-| losse beweringen (`test(...)`) | 11569 |
+| toetsbestanden | 1623 |
+| losse beweringen (`test(...)`) | 11571 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 57 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1042 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 50 |
 | alleen in de kop *genoemd*, nog niet gemeten | 168 |
-| niets van beide | 362 |
+| niets van beide | 363 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1420 bestanden, 11216 beweringen.
+1421 bestanden, 11218 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -381,6 +381,7 @@ toets omvalt.
 | `fout-client-route.test.js` | 3 | gezakt op `liegpoort /api/` | DE DEUR VOOR EEN FOUT UIT DE BROWSER (/api/fout/client). Deze route staat er met opzet ZONDER inlog: een fout die het inloggen zelf sloopt, is juist de fout die je wilt zien. |
 | `fout-client.test.js` | 9 | gezakt op `liegpoort /api/` | DE INGANG VOOR BROWSERFOUTEN: POST /api/fout/client WAAROM DEZE TOETS BESTAAT. Dit is het enige spoor van een storing die alleen op het toestel van een gebruiker gebeurt (server/routes/fout.js, gevoed door... |
 | `foutisolatie.test.js` | 6 | genoemd | DE FOUTWIKKEL, EN WAAROM HIJ EEN NAAM DRAAGT. server/lib/foutisolatie.js omhult elke route-handler zodat een (async) fout next(err) wordt in plaats van een unhandledRejection. |
+| `foutmelder-dekking.test.js` | 2 | -- | DRAAGT ELK SCHERM DE FOUTMELDER? -- van voornemen naar machine. |
 | `foutmelder.test.js` | 4 | gezakt op `===->!==` | Eigen externe fout-melder (server/foutmelder.js), die @sentry/node verving. We draaien tegen een lokale nep-webhook en controleren: er gaat een nette JSON-POST uit met de fout + context, dezelfde fout wordt binnen... |
 | `frictiebodem.test.js` | 14 | genoemd | DE BODEM ONDER DE FRICTIE. WAT HIER BEPROEFD WORDT, EN WAAROM HET ZWAAR WEEGT. |
 | `functielijst.test.js` | 6 | genoemd | DE AFDRUK VAN FUNCTIES.md LAAT NIETS VALLEN. WAAROM DIT ER IS, EN WAT HET KOSTTE. |

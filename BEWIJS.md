@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1616 bestanden en 11527 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1622 bestanden en 11569 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1616 |
-| losse beweringen (`test(...)`) | 11527 |
+| toetsbestanden | 1622 |
+| losse beweringen (`test(...)`) | 11569 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 57 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1042 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 50 |
 | alleen in de kop *genoemd*, nog niet gemeten | 168 |
-| niets van beide | 356 |
+| niets van beide | 362 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1415 bestanden, 11176 beweringen.
+1420 bestanden, 11216 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -318,6 +318,9 @@ toets omvalt.
 | `eigen-website.test.js` | 6 | gezakt op `liegpoort /api/` | DE EIGEN WEBSITE VAN EEN LID -- 5 endpoints van de Website-maker. Deze vijf wees de waargenomen dekkingsmeting aan als nooit aangeroepen: site/haal, site/publiceer, site/offline, site/fotos en site/foto-weg. |
 | `eigenaar-wedloop.test.js` | 1 | gezakt op `&&->||#0` | TWEE SERVERS DIE TEGELIJK OPKOMEN OP DEZELFDE DATABASE. In de vloot (server/vloot.js) draait elke groep als eigen proces, maar ze delen een database. |
 | `eigenaar.test.js` | 4 | gezakt op `liegpoort /api/` | De eigenaar (Roellie) heeft overal toegang tot de BEHEER-omgevingen met zijn eigen accountlogin, maar de juridische grenzen (kinderdata, privé tussen personen, ruwe identiteitsbewijzen, platte wachtwoorden) blijven... |
+| `eigenaarbevestiging.test.js` | 11 | -- | DE ZWARE POORT: vraagt een eigenaarshandeling opnieuw om de passkey? Dit bestand bestaat omdat de vorige twee niet genoeg zijn. |
+| `eigenaarherstel-routes.test.js` | 7 | -- | HET EIGENAARSHERSTEL OVER DE ECHTE ROUTES. test/eigenaarherstel.test.js toetst de ceremonie met een gezette klok; dat is de enige manier om zeven dagen wachttijd te meten. |
+| `eigenaarherstel.test.js` | 10 | -- | HET EIGENAARSHERSTEL: de ceremonie, met een klok die ik zelf vooruit zet. Waarom hier een neppe klok en geen echte server: de hele belofte van deze weg is een WACHTTIJD van zeven dagen, en een toets die zeven dagen... |
 | `eigenaarschap.test.js` | 8 | gezakt op `liegpoort /api/` | Het eigenaarschap van het platform: wie het is, en hoe het overgaat. Dit is de zwaarste bevoegdheid die het systeem kent. |
 | `eigenaarwerkplek.test.js` | 1 | gezakt op `liegpoort /api/` | De eigenaar ziet zijn werkplek, OOK in productie. server/eigenaar.js legt vast dat de eigenaar bij de beheeromgevingen kan, met zoveel woorden: "de RTG-Backoffice (met zijn eigen accountlogin, zonder aparte code)". |
 | `eigenip.test.js` | 2 | gezakt op `liegpoort /api/` | EEN ADRES DAT DE BEZOEKER ZELF MAG KIEZEN, IS GEEN ADRES. Elke snelheidslimiet, elk verbod en elke teller in dit huis rekent op het adres van de aanroeper. |
@@ -480,6 +483,7 @@ toets omvalt.
 | `herstelgat.test.js` | 2 | gezakt op `liegpoort /api/` | Het gat in de herstelroute: dev-velden aan een vreemde. WAT ER MIS WAS. |
 | `herstelkanaal.test.js` | 14 | genoemd | HET TELEFOONNUMMER IS EEN HERSTELKANAAL. DE BEVINDING DIE HIERONDER ZIT. |
 | `herstelproef.test.js` | 13 | gezakt op `liegpoort /api/` | De herstelproef beproefd op de vier oordelen die zij velt, en vooral op het onderscheid dat ze het makkelijkst kwijtraakt: `nietBeproefd` is geen `geen-herstel`, en `compensatie` is geen `exact`. De proef zelf draait... |
+| `herstelquorum.test.js` | 8 | -- | HET HERSTELQUORUM: klopt de rekenkant, en klopt vooral wat er NIET uit komt. Dit is het bestand waar een fout niet opvalt door te falen maar door te slagen: een quorum dat met een deel te openen is, doet in elke... |
 | `hersteltransactie.test.js` | 9 | gezakt op `!==->===#0` | HERSTEL ALS TRANSACTIE: negen beweringen over de twee stappen die een herstelknop normaal gesproken NIET heeft. 1. |
 | `herstelzondertelefoon.test.js` | 2 | gezakt op `liegpoort /api/` | HERSTELLEN MOET KUNNEN, OOK ZONDER TELEFOONNUMMER. WAT ER MISGING. |
 | `homekit.test.js` | 5 | gezakt op `liegpoort /api/` | De RTG Home Kit: alle elektronica op een plek, scenes met AI-hulp, en de vaste veiligheidsregel dat sloten nooit via een scene of de AI gaan. |
@@ -884,6 +888,7 @@ toets omvalt.
 | `paspoort.test.js` | 11 | gezakt op `liegpoort /api/` | End-to-end tests voor de paspoort-/identiteitslaag (kern/paspoort.js): het gecontroleerde, toestemmingsgestuurde kanaal waarlangs een partner de identiteit achter een codenaam opvraagt. Dekt: de directe... |
 | `pasprijs.test.js` | 6 | gezakt op `===->!==#0` | WAT KOST EEN PAS PER MAAND? EEN ANTWOORD. |
 | `pasroutes.test.js` | 5 | -- | De pasroutes: deuren die om een betaalde pas vragen. De eenvoudigste van de vijf verfijningen -- geen account, geen persoon, geen geverifieerde identiteit, gewoon een andere pas. |
+| `passkeys-eerste.test.js` | 4 | -- | HET PASSKEY-SCHERM VOOR WIE ER NOG GEEN HEEFT. WAAROM DIT BESTAAT. |
 | `pay-grootboek.test.js` | 6 | gezakt op `liegpoort /api/` | DE BOEKINGSHISTORIE VAN RTG PAY IN HET TRANSACTIEGROOTBOEK (TAKEN.md 4.39). De crashproef-ronde staat in test/duurzaamheid-kill.test.js: die schiet de server dood, gooit de historie-blob leeg en eist de bevestigde... |
 | `pay.test.js` | 15 | gezakt op `liegpoort /api/` | RTG Pay: de interne betaallaag. Een wallet per lid op een dubbel grootboek, alles EEN knop: opladen via de betaal-naad, Klompjes (de RTG-eigen betaalverzoeken, ook gesplitst) die je met een tik betaalt waarbij de... |
 | `paybudget.test.js` | 8 | gezakt op `liegpoort /api/` | BUDGETTEN EN SLIM BETALEN -- meerdere potjes, één tik. WAAROM DEZE TOETS ER IS Zodra een lid meer dan één positie heeft, is "betaal 72 euro" geen opdracht meer maar een vraag: waar komt het vandaan? |
@@ -1455,7 +1460,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-201 bestanden, 351 beweringen.
+202 bestanden, 353 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1535,6 +1540,7 @@ toets omvalt.
 | `isolatie-cockpit.e2e.js` | 1 | -- | SCHERM-TEST: de isolatiecockpit van het kantoor (/apps/isolatie.html). WAAROM DEZE TOETS BESTAAT, en waarom hij meer doet dan de pagina openen. |
 | `juridischeschermen.e2e.js` | 1 | -- | DE VIER JURIDISCHE PAGINA'S: STAAT ERIN WAT ERIN MOET? WAAROM DIT EEN TOETS VERDIENT Dit zijn de saaiste schermen van het huis en tegelijk de enige waar een ontbrekende alinea een boete oplevert. |
 | `kantoor.e2e.js` | 1 | -- | Scherm-test voor RTG Kantoor, de samenhanglaag over de kantoorwereld. Wat hier bewezen wordt is de belofte van laag 2 uit PLATFORM.md, en niet of de agenda werkt -- dat toetst test/agenda.e2e.js. |
+| `kantoordeur.e2e.js` | 2 | -- | DE KANTOORDEUR EN HET ENE ACCOUNT. De server laat de eigenaar met zijn EIGEN lid-token door officeAuth (server/kern/kantoor/index.js: "de eigenaar komt ook met zijn eigen accountlogin binnen"), en kern/eenaccount.js... |
 | `kantoordeuren.e2e.js` | 1 | -- | DE KANTOOR-APPS: EEN DEUR OP DE APP ZELF, GEEN OMLEIDING. WAT ER MIS WAS (TAKEN 5.5) Acht kantoor-apps stuurden een uitgelogde bezoeker weg met een location.replace() naar personeel.html. |
 | `kantoorgesprek.e2e.js` | 1 | -- | Scherm-test voor de kantoor-inlog als gesprek. De server-kant staat in test/kantoorgesprek.test.js; dit gaat over wat een mens ziet. |
 | `kantoorregisters.e2e.js` | 2 | genoemd | HET PLATFORMREGISTER EN HET ROUTEDOSSIER WORDEN ZELF AFGELEGD. WAAROM DEZE TOETS ER IS, EN HOE HIJ IS ONTSTAAN. |

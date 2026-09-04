@@ -329,6 +329,11 @@ module.exports = [
     reden: 'kern/mailaanname.js r.49 vraagt de ontvangertoets of een adres een postvak heeft (550 zo niet). De aanname bewaakt de buitenpoort, de ontvanger weet wie er woont; dat zijn twee vragen en ze horen niet in een module' },
   { van: 'domein:rtfos', naar: 'domein:beschermzaak', soort: 'DOMEINRELATIE',
     reden: 'kern/rtfos/index.js r.134 monteert de beschermlaag (HDI.md) op de context van de RTFoundation: de beschermzaak is een onderdeel van de stichting en geen vreemd domein, maar hij houdt met opzet een eigen dataklasse die velden WEIGERT -- vandaar een eigen module en geen tak in rtfos/' },
+  /* ---- HET EIGENAARSHERSTEL (EIGENAAR.md par. 5) ---- */
+  { van: 'domein:eigenaarherstel', naar: 'domein:herstelquorum', soort: 'DOMEINRELATIE',
+    reden: 'kern/eigenaarherstel.js leest de rekenkant uit kern/herstelquorum.js. De splitsing is met opzet: het quorum REKENT (delen munten, samenvoegen, verifieren) en weet niets van wachttijden, meldingen of afbreken; de ceremonie doet dat en rekent zelf niets. Zou de ene de andere overnemen, dan zit de crypto in een bestand dat ook over de klok gaat, en dan is de eerste plek onbeproefbaar zonder de tweede' },
+  { van: 'ingang:techniek', naar: 'ingang:eigenaarherstel', soort: 'DOMEINRELATIE',
+    reden: 'routes/techniek.js monteert routes/eigenaarherstel.js op zijn gedeelde context. Die context draagt techAuth en eigenaarAlleen, en die twee horen bij de technische pagina en niet op de kern -- ze daarheen tillen zou elk domein toegang geven tot de eigenaarscontrole. De publieke helft van dat bestand (/api/herstel/*) heeft alleen `app` nodig en reist mee' },
   { van: 'domein:rtgid-bewijs', naar: 'domein:persoonseis-lijst', soort: 'DOMEINRELATIE',
     reden: 'kern/rtgid-bewijs.js r.54 leest SOORTEN uit de persoonseislijst: de bewijsmap toont dat een lid aan een persoonseis voldoet zonder het registratienummer af te geven, en welke eisen er bestaan staat op EEN plek (kern/persoonseis-lijst.js), niet nog eens in de map' }
 ];

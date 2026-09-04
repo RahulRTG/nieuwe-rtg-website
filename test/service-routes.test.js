@@ -501,6 +501,21 @@ test('de zaak: keuzes met een zakelijke mens, weigeren op naam, en een stand die
     const z = (await o.p('/api/supplier/service/open', { onderwerp: 'zaak', titel: 'Onze werkruimte doet raar' }, zaakTok)).body.zaak;
     assert.equal(z.team, 'zakelijk');
 
+    /* MIJN ZAKEN, en waarom deze regel hier staat.
+
+       /api/supplier/service/mijn was alleen door een playwright-toets bereikt.
+       Daardoor kon niemand zonder browser DEKKING.json meer bijwerken: die
+       recorder eist 100%, en deze ene route hield dat tegen -- een blokkade die
+       niets met de route zelf te maken had. Hij hoort ook gewoon hier, naast
+       /open en /stand, want dit is dezelfde sessie en dezelfde vraag: wat heb
+       IK gemeld. De browsertoets blijft staan en meet het scherm; deze meet de
+       deur. */
+    const mijn = await o.p('/api/supplier/service/mijn', {}, zaakTok);
+    assert.equal(mijn.status, 200, JSON.stringify(mijn.body).slice(0, 200));
+    assert.ok(mijn.body.zaken.some(x => x.id === z.id), 'de zojuist geopende zaak staat in de eigen lijst');
+    const zonderSessie = await o.p('/api/supplier/service/mijn', {});
+    assert.notEqual(zonderSessie.status, 200, 'en zonder zaaksessie komt die lijst er niet uit');
+
     /* De stand VOOR er iets speelt: geen groen vinkje, maar de zin dat "niets
        bekend" iets anders is dan "alles werkt". */
     const voor = await o.p('/api/supplier/service/stand', {}, zaakTok);

@@ -62,6 +62,33 @@
   <p class="stil">Een passkey is uw vingerafdruk, gezicht of hardwaresleutel als inlog. Er valt bij ons niets te
     stelen: RTG bewaart alleen de publieke helft van de sleutel; de geheime helft verlaat uw apparaat nooit.</p>
 
+  <!-- DE EERSTE PASSKEY, en waarom dit blok er is.
+
+       Wie hier komt zonder sessie zag alleen "Log in met passkey" -- en dat is
+       precies de knop die je niet kunt gebruiken als je er nog geen hebt. Het
+       blok om er een te MAKEN staat achter een sessie, dus dit scherm liep dood
+       voor de enige mens die het echt nodig had: die met nul sleutels.
+
+       Het staat BOVEN de passkey-inlog en niet eronder, want wie geen passkey
+       heeft heeft ook niets aan die knop; en het verdwijnt zodra er een sessie
+       is (dan neemt "Mijn passkeys" het over). -->
+  <section id="vGeenSessie" class="weg">
+    <h2>Uw eerste passkey</h2>
+    <div class="kaart">
+      <p class="stil">Een passkey maken kan alleen vanuit uw eigen account. U bent hier nu niet
+        ingelogd, dus doe eerst dit:</p>
+      <ol class="stil">
+        <li>Log in met uw e-mailadres en wachtwoord in de app.</li>
+        <li>Kom hier terug. Dan staat er "Passkey toevoegen".</li>
+      </ol>
+      <div class="rij">
+        <a class="knop vol" href="/apps/app.html" data-hoofdactie>Naar de inlog</a>
+      </div>
+      <p class="stil h-mt50">Wachtwoord kwijt? Kies in de app "wachtwoord vergeten"; u krijgt een
+        link per e-mail. Daarmee zet u een nieuw wachtwoord en is uw e-mailadres meteen bevestigd.</p>
+    </div>
+  </section>
+
   <!-- inloggen met een passkey (zonder wachtwoord) -->
   <section id="vLogin">
     <h2>Inloggen met een passkey</h2>
@@ -200,10 +227,19 @@
       el.appendChild(d);
     }
   }
+  /* Twee blokken die elkaars tegendeel zijn: met een geldige sessie beheert u
+     uw sleutels, zonder sessie leest u hoe u er aan een komt. Precies een van
+     beide staat er, nooit allebei en nooit geen van beide -- dat laatste was de
+     doodlopende weg die dit blok komt repareren. */
+  function toonZonderSessie() {
+    $('#vBeheer').classList.add('weg');
+    $('#vGeenSessie').classList.remove('weg');
+  }
   async function start() {
-    if (!token) { $('#vBeheer').classList.add('weg'); return; }
+    if (!token) return toonZonderSessie();
     const r = await api('lijst');
-    if (r.status !== 200) { $('#vBeheer').classList.add('weg'); return; }
+    if (r.status !== 200) return toonZonderSessie();
+    $('#vGeenSessie').classList.add('weg');
     $('#vBeheer').classList.remove('weg');
     toonSleutels(r.body.sleutels);
   }

@@ -34,7 +34,16 @@ const REDENEN = [
   ['/api/metrics', 'de meetlijn mag bij een incident niet blind worden gemaakt'],
   ['/api/cluster', 'de clusterlaag bestuurt instances en blijft buiten een instance-schakelaar'],
   ['/api/sat', 'de satellietping voorkomt dat een zaakdoos gezond verkeer als offline leest'],
-  ['/api/test', 'de testhaak bestaat alleen in demostand en is geen productdienst']
+  ['/api/test', 'de testhaak bestaat alleen in demostand en is geen productdienst'],
+  /* DE ZWARE POORT EN HET HERSTEL VAN HET EIGENAARSACCOUNT (EIGENAAR.md).
+     Deze horen NIET aan een functieschakelaar: het zijn de sloten op de
+     bediening zelf. Een schakelaar die de bevestiging van een
+     eigendomsoverdracht kan uitzetten, is de eerste knop waar iemand die
+     binnen is naar zoekt. De herstelWEG is wel schakelbaar (functie
+     `eigenaarherstel`) -- dat is een uitgang en geen slot. */
+  ['/api/techniek/bevestig/opties', 'het loket dat een zware bevestiging start; uitschakelbaar maken zou de bevestiging zelf uitschakelbaar maken'],
+  ['/api/office/boardroom/bevestig/opties', 'hetzelfde loket achter de boardroomdeur, en om dezelfde reden geen schakelaar'],
+  ['/api/techniek/herstel', 'het inrichten, aflezen en AFBREKEN van een herstelquorum is bediening: afbreken moet altijd kunnen, ook als het huis half uitstaat']
 ];
 
 const BUITEN = new Map(REDENEN);

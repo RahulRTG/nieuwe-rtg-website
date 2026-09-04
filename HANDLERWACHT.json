@@ -1,18 +1,18 @@
 {
  "stempel": {
-  "op": "2026-09-03T18:26:07.072Z",
-  "commit": "16af4bfd",
+  "op": "2026-09-04T06:16:05.243Z",
+  "commit": "d5e46054b",
   "boomVuil": false,
-  "boomAnders": 6,
+  "boomAnders": 1,
   "instrument": "scripts/handlerwacht.js",
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
-  "zonderBewakerslaag": 614,
+  "zonderBewakerslaag": 618,
   "bewaakt": 531,
-  "openbaarMetReden": 47,
-  "eigenControle": 16,
+  "openbaarMetReden": 49,
+  "eigenControle": 18,
   "sleutelDoorgegeven": 12,
   "zonderWachtMetReden": 8,
   "laat": 0,
@@ -2947,6 +2947,28 @@
    "reden": "de app-gids is openbaar"
   },
   {
+   "sleutel": "POST /api/herstel/eigenaar/passkey",
+   "bestand": "server/routes/eigenaarherstel.js:103",
+   "staat": "eigenControle"
+  },
+  {
+   "sleutel": "POST /api/herstel/eigenaar/passkey/opties",
+   "bestand": "server/routes/eigenaarherstel.js:95",
+   "staat": "eigenControle"
+  },
+  {
+   "sleutel": "POST /api/herstel/eigenaar/start",
+   "bestand": "server/routes/eigenaarherstel.js:71",
+   "staat": "openbaar",
+   "reden": "herstel zonder toestel: er kan per definitie geen sessie zijn; het quorum, de wachttijd en de afbreekbaarheid doen het werk"
+  },
+  {
+   "sleutel": "POST /api/herstel/eigenaar/voltooien",
+   "bestand": "server/routes/eigenaarherstel.js:79",
+   "staat": "openbaar",
+   "reden": "zelfde ceremonie, tweede helft: opnieuw twee delen en de wachttijd moet om zijn"
+  },
+  {
    "sleutel": "POST /api/kantoor/gesprek/start",
    "bestand": "server/routes/kantoorgesprek.js:12",
    "staat": "openbaar",
@@ -3933,13 +3955,13 @@
   },
   {
    "sleutel": "POST /api/webauthn/login",
-   "bestand": "server/routes/auth/webauthn.js:50",
+   "bestand": "server/routes/auth/webauthn.js:71",
    "staat": "openbaar",
    "reden": "de tegenhanger van /api/webauthn/opties: de ondertekende uitdaging IS het bewijs, en die geldt eenmalig"
   },
   {
    "sleutel": "POST /api/webauthn/opties",
-   "bestand": "server/routes/auth/webauthn.js:43",
+   "bestand": "server/routes/auth/webauthn.js:64",
    "staat": "openbaar",
    "reden": "de uitdaging moet er zijn VOOR je hem kunt beantwoorden; het bewijs volgt bij /login"
   },

@@ -94,7 +94,8 @@
       "webauthnRegOpties",
       "webauthnWeg",
       "werkplekkenBijLogin",
-      "wisselCodeIn"
+      "wisselCodeIn",
+      "zwaarbewijs"
     ],
     "avond": [
       "favLijst",
@@ -297,6 +298,12 @@
       "boardroomAuth",
       "economie",
       "kosten"
+    ],
+    "eigenaarherstel": [
+      "appUrl",
+      "eigenaarAlleen",
+      "sessieSleutel",
+      "zwaar"
     ],
     "experience": [
       "experience"
@@ -565,6 +572,7 @@
       "bevoegd",
       "boardroomAuth",
       "boardroomLijst",
+      "boardroomUser",
       "capGezondheid",
       "commercieRechten",
       "commercieRonde",
@@ -602,7 +610,9 @@
       "weefsel",
       "werkplaats",
       "zaakAbonnement",
-      "zelfzorg"
+      "zelfzorg",
+      "zwaar",
+      "zwaarbewijs"
     ],
     "klok": [
       "klok"
@@ -2205,6 +2215,7 @@
       "eigenaar",
       "eigenaarAlleen",
       "eigenaarUser",
+      "eigenaarherstel",
       "foutmelder",
       "functies",
       "geldCommissieZet",
@@ -2223,6 +2234,7 @@
       "ontsluitpoort",
       "pay",
       "sendPushToUser",
+      "sessieSleutel",
       "sessions",
       "spelTelemetrie",
       "staat",
@@ -2230,11 +2242,15 @@
       "standen",
       "techniek",
       "tenant",
+      "tooManyTries",
       "wacht",
+      "webauthn",
       "webauthnAantal",
       "webauthnStapOpMaak",
       "webauthnStapOpOpties",
-      "zekeringMag"
+      "zekeringMag",
+      "zwaar",
+      "zwaarbewijs"
     ],
     "tenant": [
       "bedrijf",

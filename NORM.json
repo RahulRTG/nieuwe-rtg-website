@@ -10,7 +10,7 @@
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 18,
     "e2eBestanden": 201,
-    "keuringOmvang": 284,
+    "keuringOmvang": 287,
     "keuringDubbeling": 165,
     "keuringDekkingAdvies": 52,
     "endpointsNooitAangeraakt": 0,
@@ -25,7 +25,7 @@
     "kernGedeeld": 232,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 562,
+    "toetsenNietGemeten": 568,
     "toetsenOngevoeligPct": 1,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
@@ -63,6 +63,24 @@
     "rollbackUitzonderingen": 1
   },
   "notities": [
+    {
+      "datum": "2026-09-04",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 562,
+      "vervalt": "2026-12-01",
+      "meter": "toetsenNietGemeten 562 -> 568",
+      "reden": "#184 en #185 zijn als verzameling samengevoegd boven de zojuist gemergede main (#183). Elke tak bleef apart binnen zijn eigen norm; samen brengen ze zes toetsbestanden mee waar de mutatiemotor nog niet langs is: eigenaarbevestiging, eigenaarherstel, eigenaarherstel-routes, herstelquorum en passkeys-eerste (alle vijf uit #184) plus kantoordeur.e2e (#185). Dat is exact het verschil van zes, nageteld tegen main en niet geschat. Aflossen is de motor erover laten lopen; dit is instrumentdekking en geen oordeel over de toetsen -- #184 meldt zelf vier mutaties die hij heeft zien zakken, en #185 een die hij met de fix gestasht heeft zien zakken."
+    },
+    {
+      "datum": "2026-09-04",
+      "soort": "schuld",
+      "sleutel": "keuringOmvang",
+      "van": 284,
+      "vervalt": "2026-12-01",
+      "meter": "keuringOmvang 284 -> 287",
+      "reden": "Zelfde samenvoeging. Drie bestanden erbij die vlak onder de 10 kB van keuringsregel 13 zitten; de dragers uit deze twee takken zijn server/kern/webauthn.js (10103 na de knip die #184 al deed), server/kern/eigenaarherstel.js (9517) en public/shared/kantoorgesprek.js (9957). Die laatste verdient de aandacht bij het aflossen: #185 heeft hem INGEKORT tot onder de grens in plaats van hem te knippen, met als reden dat het proza was en geen tweede onderwerp. Dat is verdedigbaar en het is ook precies hoe een bestand vlak onder een grens blijft hangen. Deze meter is een waarschuwing en geen overtreding: hij telt wat er tegen de grens aan schuurt, zodat de volgende toevoeging niet als verrassing komt."
+    },
     {
       "datum": "2026-09-02",
       "soort": "schuld",

@@ -92,6 +92,9 @@ Object.assign(SLEUTELS,
   require('./idemsleutels-werelden').SLEUTELS,
   require('./idemsleutels-geld').SLEUTELS,
   require('./idemsleutels-kosten').SLEUTELS,
+  /* De zware poort en het eigenaarsherstel: negen van de tien nietIdempotent,
+     elk met een eigen reden. Zie de kop van ./idemsleutels-eigenaar.js. */
+  require('./idemsleutels-eigenaar').SLEUTELS,
   require('./idemsleutels-commerce').SLEUTELS,
   /* De kale ronde van 30 augustus 2026, met per regel het identiteitsveld. */
   require('./idemsleutels-kaleronde').SLEUTELS,

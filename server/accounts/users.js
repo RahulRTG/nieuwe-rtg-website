@@ -206,6 +206,23 @@ function zetWachtwoordHash(userId, hash) {
   mirror.markUser(userId);
   return getUserById(userId);
 }
+/* ALLEEN DE SESSIEGRENS VERZETTEN, zonder aan het wachtwoord te komen.
+
+   Nodig voor het eigenaarsherstel (kern/eigenaarherstel.js): wie met een quorum
+   terugkomt, moet de sessies van wie dan ook kunnen doorsnijden -- een herstel
+   dat de sessie van de indringer laat staan, herstelt niets. Het wachtwoord
+   hoort daar NIET bij: dat is een tweede handeling met een eigen bewijslast, en
+   ze hier samenvoegen zou betekenen dat een herstel stilzwijgend ook het
+   wachtwoord vervangt.
+
+   Zelfde kolom en dezelfde betekenis als in zetWachtwoordHash, met opzet: twee
+   manieren om sessies te verlopen zouden op een dag twee verschillende
+   antwoorden geven op "vanaf wanneer telt een token niet meer". */
+function zetSessiegrens(userId) {
+  S.zin('UPDATE users SET sessies_vanaf = ? WHERE id = ?').run(Date.now(), userId);
+  mirror.markUser(userId);
+  return getUserById(userId);
+}
 /* Wachtwoord zetten zonder await, voor het opstart-seed; verder gelijk aan
    setPassword. Blokkeren kan daar geen kwaad: dit draait voor 'listen'. */
 function setPasswordSync(userId, password) {
@@ -277,6 +294,7 @@ module.exports = {
      en alle bestaande aanroepers niets merken van de opsplitsing. */
   findByPublicMail, reservePublicMail,
   renameUser, setTier, zetActief, isActief, realNameOf, emailOf, phoneOf, setPhone, setEmail,
+  zetSessiegrens,
   issueToken, verifyToken, apparaatVanToken, sessieVan, trekIn, trekInActie, isIngetrokken, trekInSessie, sessieIngetrokken, issueActionToken, verifyActionToken,
   setEmailVerified, createReset, findByReset, setPassword, setPasswordSync, setPasswordZaai, vernieuwWachtwoordHash,
   getMemberState, saveMemberState, setVerification, listByVerification, conversations, ledenRegisterRijen, deleteUser

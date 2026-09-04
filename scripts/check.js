@@ -2180,6 +2180,13 @@ console.log('\n29) de Authorization-kop wordt gelezen om een token te halen, nie
      precies deze les al geleerd en sleutelt daarom op het routepad. Een
      regelnummer schuift op; de regel zelf niet. */
   const MAG_BETASTEN = new Map([
+    ["server/kern/zwaarbewijs.js|.update(String((req && req.get && req.get('authorization') || '').replace(/^Bearer\\s+/i, '')))",
+      'de kop wordt hier tot SLEUTELMATERIAAL gehasht en er wordt niets uit gelezen: de uitkomst is de ' +
+      'binding waaraan een passkey-ceremonie hangt, zodat een assertie uit de ene sessie niet in de andere ' +
+      'past. Beslissen doet hij niets -- wie hier komt is al langs techAuth, boardroomAuth of auth gegaan, ' +
+      'en een verzonnen kop haalt die poorten niet. Het slechtste dat een fout getal oplevert is een ' +
+      'ceremonie die NIET meer klopt, en dat is de veilige kant: de handeling gaat dan niet door. Zou de ' +
+      'uitkomst hier ooit iets gaan VERLENEN in plaats van vastpinnen, dan vervalt deze reden.'],
     ["server/foundation/basis.js|const h = ((req.get && req.get('authorization')) || '');",
       'tokenUit() HAALT alleen het token uit het verzoek; de aanroepers verifieren het (profielVan zoekt het op in de profielen van dat gezin). Een extractor is geen beslissing.'],
     ["server/kern/stuur.js|const auth = req.get && req.get('authorization');",

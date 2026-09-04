@@ -86,8 +86,20 @@ module.exports = (kern) => {
   app.post('/api/office/onboarding', officeAuth, (req, res) => veilig(res, () => afdelingen.onboarding(String(req.body.kamer || ''))));
 
   // de vier ontwerpbureaus + de Ideeenkamer, en de platformbrede regie
+  /* DE ZWARE POORT voor het hele kantoor (kern/zwaarbewijs.js), één keer
+     gebouwd. Twee delen gebruiken hem -- ./regie.js voor boardroom-toegang en
+     ./bank-bevoegd.js voor de terugstortstand -- en twee eigen exemplaren zouden
+     twee bindingen betekenen die er hetzelfde uitzien.
+
+     `boardroomUser` mag zo kort zijn omdat de boardroom-poort het zware werk al
+     deed: een anonieme kantoorcode komt daar niet doorheen, dus `boardroomKey`
+     draagt hier altijd een account. */
+  const zwaar = kern.zwaarbewijs;
+  const boardroomUser = zwaar.boardroomUser;
+
   const ctx = { app, officeAuth, boardroomAuth: kern.boardroomAuth, boardroomLijst: kern.boardroomLijst,
     keyVanCodenaam: kern.keyVanCodenaam, veilig, stuur, afdelingen, sseToOffice, db, save, kern,
+    zwaar, boardroomUser,
     geldOverzicht, geldPasprijzen, geldPasprijsZet, geldCommissieZet, geldKortingZet };
   require('./bureaus')(ctx);
   require('./regie')(ctx);

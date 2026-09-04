@@ -183,7 +183,34 @@ test('registreren, in de lijst, inloggen zonder wachtwoord, en weer weghalen', a
   assert.notEqual(nep.status, 200, 'een handtekening van een andere sleutel wordt geweigerd');
   assert.ok(!nep.body.token, 'en levert geen sessie op');
 
-  // en het lid kan zijn eigen sleutel weer weghalen
-  assert.equal((await api('/api/webauthn/weg', { id: lijst.body.sleutels[0].id }, lid)).status, 200);
-  assert.deepEqual((await api('/api/webauthn/lijst', {}, lid)).body.sleutels, [], 'daarna is het beheer weer leeg');
+  /* En het lid kan zijn eigen sleutel weer weghalen -- maar niet zomaar meer.
+     Weghalen is sinds de zware poort (kern/zwaarbewijs.js) zelf een handeling
+     die om de passkey vraagt: anders haalt een gestolen open sessie eerst de
+     sleutels weg en staat daarna alles weer open met alleen een wachtwoord.
+     Het gevolg voor een mens staat in EIGENAAR.md: wie maar één toestel heeft
+     en dat kwijtraakt, krijgt zijn eigen sleutel er niet meer af. Vandaar de
+     regel dat er twee staan. */
+  const kaal = await api('/api/webauthn/weg', { id: lijst.body.sleutels[0].id }, lid);
+  assert.equal(kaal.status, 401, 'weghalen zonder bevestiging kan niet meer');
+  assert.equal(kaal.body.actie, 'passkey-weg');
+
+  const wegOpties = await api('/api/webauthn/bevestig/opties', {}, lid);
+  assert.equal(wegOpties.status, 200, JSON.stringify(wegOpties.body).slice(0, 160));
+  const weg = await api('/api/webauthn/weg', { id: lijst.body.sleutels[0].id,
+    ceremonie: wegOpties.body.ceremonie,
+    antwoord: auth.loginAntwoord(wegOpties.body.opties.challenge, origin, 9) }, lid);
+  assert.equal(weg.status, 200, 'met de vinger erbij mag het wel: ' + JSON.stringify(weg.body).slice(0, 160));
+  assert.equal(weg.body.laatste, true,
+    'en het antwoord zegt dat dit de laatste was -- dat hoort het scherm te weten op het moment ' +
+    'zelf, want zonder sleutel valt de zware poort terug op het wachtwoord');
+
+  const na = await api('/api/webauthn/lijst', {}, lid);
+  assert.deepEqual(na.body.sleutels, [], 'daarna is het beheer weer leeg');
+  /* MAAR HET SPOOR NIET. Een weggehaalde sleutel liet niets achter, en dat is
+     precies de vraag die je stelt nadat er iets gebeurd is. */
+  assert.equal(na.body.spoor.length, 1, 'het weghalen staat in het spoor');
+  assert.equal(na.body.spoor[0].naam, 'Telefoon van het lid', 'met het label dat de mens zelf gaf');
+  assert.ok(na.body.spoor[0].weg, 'en het moment waarop hij verdween');
+  assert.ok(!('id' in na.body.spoor[0]),
+    'zonder credential-id: dat is over accounts heen te herkennen en hoort niet achter te blijven');
 });

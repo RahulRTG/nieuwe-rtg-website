@@ -122,6 +122,9 @@
      dezelfde kleur en met hetzelfde teken te zien als de mens die hier besluit
      hem te sturen. -->
 <script src="/shared/kostenbeeld.js"></script>
+<!-- De kantoordeur van het huis: hij probeert eerst het RTG-account dat op
+     dit toestel is ingelogd en vraagt pas om de kantoorcode als dat niet gaat. -->
+<script src="/shared/kantoorgesprek.js"></script>
 
 <script>
 /* HET KOSTENBORD VAN DE BOARDROOM.
@@ -145,7 +148,21 @@ function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = 
 const api = (pad, body) => fetch(pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
   body: JSON.stringify(body || {})
-}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+}).then(async r => { const d = await r.json().catch(() => ({}));
+  if (!r.ok) { const e = new Error(d.error || 'Er ging iets mis.'); e.status = r.status; throw e; }
+  return d; });
+
+/* GEEN SESSIE IS GEEN FOUT MAAR EEN DEUR. Dit scherm zei "Geen backoffice-sessie"
+   en verwees naar de boardroom, zonder een weg ernaartoe -- ook voor de eigenaar,
+   wiens eigen lid-token door officeAuth allang wordt toegelaten. De gedeelde deur
+   staat in shared/kantoorgesprek.js en is voor alle kantoorschermen dezelfde. */
+function inlog(){
+  $('#main').innerHTML = '<div id="kgDeur"></div>';
+  window.RTGKantoorGesprek.toon($('#kgDeur'), (token) => {
+    TOKEN = token; try { localStorage.setItem('rtg_office_token', TOKEN); } catch (e) {}
+    laden();
+  });
+}
 
 /* De bewijsgraad komt uit de gedeelde laag en niet uit dit bestand: hetzelfde
    woord, hetzelfde teken en dezelfde kleur als op het scherm van het lid dat
@@ -377,6 +394,7 @@ function tekenGaten(nietGemeten){
 
 let SOORTEN = [];
 async function laden(){
+  if (!TOKEN) return inlog();
   const p = $('#maand').value || undefined;
   try {
     const [o, t, n, b] = await Promise.all([
@@ -400,6 +418,7 @@ async function laden(){
       tekenGebruikers(o.gebruikers) + tekenTarieven(t.tarieven, o.ontbreekt.tarieven) +
       tekenNota(n.posten, n.ontbreekt, o.afstemming, SOORTEN, lf.facturen || []) + tekenGaten(o.nietGemeten);
   } catch (e) {
+    if (e.status === 401) return inlog();
     $('#main').innerHTML = '<div class="kaart"><h2 style="color:var(--rtg-txt,var(--txt))">Dat lukte niet</h2><p class="sub">'+esc(e.message)+
       ' Dit scherm hoort achter de boardroom; log in via de boardroom en probeer het opnieuw.</p></div>';
   }

@@ -100,6 +100,9 @@
 <script src="/shared/meelezen.js"></script>
 <script src="/shared/meeluister.js"></script>
 <script src="/shared/servicebel.js"></script>
+<!-- De kantoordeur van het huis: hij probeert eerst het RTG-account dat op
+     dit toestel is ingelogd en vraagt pas om de kantoorcode als dat niet gaat. -->
+<script src="/shared/kantoorgesprek.js"></script>
 <script>
 /* ============================================================================
    DE SERVICE-COCKPIT.
@@ -570,10 +573,28 @@ async function belStop() {
 /* ------------------------------------------------------------------ start -- */
 kop('#terug', el => { el.onclick = () => poging(wachtrij); });
 kop('#ververs', el => { el.onclick = () => poging(() => (STAND.blad === 'zaak' && STAND.zaak ? openZaak(STAND.zaak.zaak.id) : wachtrij())); });
+/* DIT SCHERM ZEI WAT ER MOEST GEBEUREN EN GAF ER GEEN KNOP BIJ.
+
+   "Meld u eerst aan bij het kantoor met uw eigen RTG-account" stond er, en dat
+   was ook precies goed -- RTG Service vraagt een zetel op naam. Alleen: er was
+   geen weg naartoe, dus wie hier belandde las een opdracht zonder deur. De
+   gedeelde kantoordeur (shared/kantoorgesprek.js) probeert nu eerst juist dat
+   RTG-account; de gedeelde code is er de terugval en geen eerste vraag. */
+function inlog() {
+  $('#main').innerHTML = '<div class="kaart"><p class="sub">RTG Service vraagt een zetel op naam; de gedeelde kantoorcode opent wel de ruimte maar wijst niemand aan.</p></div><div id="kgDeur"></div>';
+  window.RTGKantoorGesprek.toon(document.getElementById('kgDeur'), (token) => {
+    TOKEN = token; try { localStorage.setItem('rtg_office_token', TOKEN); } catch (e) {}
+    start();
+  });
+}
+
 async function start() {
-  if (!TOKEN) { $('#main').innerHTML = '<div class="kaart"><p class="sub">Meld u eerst aan bij het kantoor met uw eigen RTG-account. RTG Service vraagt een zetel op naam; de gedeelde kantoorcode opent wel de ruimte maar wijst niemand aan.</p></div>'; return; }
+  if (!TOKEN) return inlog();
   try { await wachtrij(); }
-  catch (e) { $('#main').innerHTML = '<div class="kaart"><p class="sub">' + esc(e.message) + '</p></div>'; }
+  catch (e) {
+    if (e.status === 401) return inlog();
+    $('#main').innerHTML = '<div class="kaart"><p class="sub">' + esc(e.message) + '</p></div>';
+  }
 }
 start();
 </script>

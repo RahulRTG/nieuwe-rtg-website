@@ -12,10 +12,18 @@
 'use strict';
 const klok = require('../lib/klok');
 
-module.exports = (ctx) => {
+/* De woordenlijst komt van buiten (./webauthn-acties.js) en staat hier niet
+   meer vast. Er draaien twee poorten op deze ene implementatie -- de
+   PIN-handelingen en de zware -- en die verschillen alleen in WELKE namen ze
+   accepteren. Een poort zonder lijst zou stilzwijgend alles of niets toelaten,
+   dus een lege of ontbrekende lijst is hier een programmeerfout en geen
+   standaardwaarde. */
+module.exports = (ctx, acties) => {
   const { crypto, generateAuthenticationOptions, verifyAuthenticationResponse,
     credsVan, zetChallenge, pakChallenge, vanB64, save } = ctx;
-  const ACTIES = new Set(['rtg-pin-vernieuw', 'rtg-pin-noodslot-uit', 'rtg-pin-vast-aan']);
+  if (!Array.isArray(acties) || !acties.length)
+    throw new Error('webauthn-actie: een poort zonder woordenlijst bestaat niet.');
+  const ACTIES = new Set(acties);
   const actieSchoon = actie => ACTIES.has(String(actie || '')) ? String(actie) : null;
   const bindingSchoon = binding => String(binding || '').slice(0, 120);
   function nodig(user) { return !!(user && credsVan(user.id).length); }

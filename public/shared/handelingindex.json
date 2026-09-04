@@ -1730,6 +1730,12 @@
       "url": "/apps/partner-network.html"
     },
     {
+      "label": "Naar de inlog",
+      "app": "Passkeys",
+      "wereld": "Instellingen",
+      "url": "/apps/passkeys.html"
+    },
+    {
       "label": "Passkey toevoegen",
       "app": "Passkeys",
       "wereld": "Instellingen",

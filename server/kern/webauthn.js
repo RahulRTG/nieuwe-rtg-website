@@ -24,7 +24,7 @@ function maakWebauthn({ db, save, accounts, schoon }) {
   let credentialIndex = null;            // credential-id -> userId
   const b64 = buf => Buffer.from(buf).toString('base64url');
   const vanB64 = s => new Uint8Array(Buffer.from(String(s), 'base64url'));
-  const eigen = require('./eigencollectie')({ db, domein: 'kern/webauthn', bezit: { webauthn: 'kaart' } });
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/webauthn', bezit: { webauthn: 'kaart', webauthnSpoor: 'kaart' } });
 
   const lijsten = () => eigen.bak('webauthn');   // userId -> [credentials]
   const credsVan = userId => lijsten()[userId] || [];
@@ -147,36 +147,35 @@ function maakWebauthn({ db, save, accounts, schoon }) {
   const { stapOpOpties, stapOpMaak } = require('./webauthn-stapop')({
     credsVan, zetChallenge, pakChallenge, vanB64, save,
     generateAuthenticationOptions, verifyAuthenticationResponse });
-  const { webauthnActieNodig, webauthnActieOpties, webauthnActieMaak } = require('./webauthn-actie')({
-    crypto, generateAuthenticationOptions, verifyAuthenticationResponse,
-    credsVan, zetChallenge, pakChallenge, vanB64, save });
+  // twee poorten, een motor; woordenlijsten in ./webauthn-acties.js
+  const aCtx = { crypto, generateAuthenticationOptions, verifyAuthenticationResponse,
+    credsVan, zetChallenge, pakChallenge, vanB64, save };
+  const A = require('./webauthn-acties'), poort = require('./webauthn-actie');
+  const { webauthnActieNodig, webauthnActieOpties, webauthnActieMaak } = poort(aCtx, A.PIN_ACTIES);
+  const zwaar = poort(aCtx, A.ZWARE_ACTIES);
 
-  /* ---- beheer ---- */
-  function publiekeLijst(user) {
-    return credsVan(user.id).map(c => ({ id: c.id, naam: c.naam, apparaat: c.apparaat || null,
-      at: c.at, laatstGebruikt: c.laatstGebruikt || null }));
-  }
-  function weg(user, id) {
-    const rij = credsVan(user.id);
-    if (!rij.some(c => c.id === id)) return { status: 404, error: 'Passkey niet gevonden.' };
-    lijsten()[user.id] = rij.filter(c => c.id !== id);
-    index().delete(id);
-    save();
-    return { status: 200, ok: true, sleutels: publiekeLijst(user) };
-  }
+  /* Beheer (welke sleutels heeft dit account, en wat is er weggehaald) staat in
+     ./webauthn-beheer.js -- zie de kop daar voor de naad en voor het spoor. */
+  const { publiekeLijst, weg, spoorLees } = require('./webauthn-beheer')({
+    lijsten, credsVan, index, spoorBak: () => eigen.bak('webauthnSpoor'), save });
 
-  const { webauthn, pinBeveiliging } = require('./webauthn-poorten')({
-    regOpties, regMaak, loginOpties, loginMaak, publiekeLijst, weg,
+  const { webauthn, pinBeveiliging, zwaarBeveiliging } = require('./webauthn-poorten')({
+    regOpties, regMaak, loginOpties, loginMaak, publiekeLijst, spoorLees, weg,
     actieNodig: webauthnActieNodig,
     actieOpties: webauthnActieOpties,
-    actieMaak: webauthnActieMaak
+    actieMaak: webauthnActieMaak,
+    zwaarNodig: zwaar.webauthnActieNodig,
+    zwaarOpties: zwaar.webauthnActieOpties,
+    zwaarMaak: zwaar.webauthnActieMaak
   });
 
   return { webauthnRegOpties: regOpties, webauthnRegMaak: regMaak, webauthnLoginOpties: loginOpties,
-    webauthnLoginMaak: loginMaak, webauthnLijst: user => ({ status: 200, sleutels: publiekeLijst(user) }),
+    webauthnLoginMaak: loginMaak, webauthnLijst: user => ({ status: 200, sleutels: publiekeLijst(user), spoor: spoorLees(user) }),
     webauthnWeg: weg, webauthnStapOpOpties: stapOpOpties, webauthnStapOpMaak: stapOpMaak,
+    webauthnSpoor: spoorLees,
     webauthnAantal: user => (user ? credsVan(user.id).length : 0),
-    webauthnActieNodig, webauthnActieOpties, webauthnActieMaak, webauthn, pinBeveiliging };
+    webauthnActieNodig, webauthnActieOpties, webauthnActieMaak, webauthn, pinBeveiliging,
+    zwaarBeveiliging };
 }
 
 module.exports = { maakWebauthn, maakCeremonieOpslag };

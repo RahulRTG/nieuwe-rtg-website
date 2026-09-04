@@ -22,6 +22,18 @@ const PUBLIEK = new Map([
   ['/api/auth/register', 'registreren kan alleen zonder account'],
   ['/api/mail/ses', 'AWS SES bewijst bezit met een verse HMAC over envelop, controles en exacte berichtbytes; zonder 32+ teken geheim blijft de route dicht'],
   ['/api/auth/forgot', 'wachtwoord vergeten: wie buitengesloten is heeft geen token'],
+  /* HET EIGENAARSHERSTEL. Publiek om exact dezelfde reden als 'wachtwoord
+     vergeten': dit is de weg voor iemand die GEEN toestel meer heeft, en dus
+     per definitie geen sessie. Wat hem beschermt is geen deur maar het quorum
+     (twee van drie delen), een wachttijd van zeven dagen waarin elke nog
+     werkende passkey hem afbreekt, een rem per bron plus vijf pogingen in de
+     kern, en een kritieke melding met mail bij elke start. Zonder ingericht
+     quorum bestaat de weg niet. Zie EIGENAAR.md par. 5. */
+  ['/api/herstel/eigenaar/start', 'herstel zonder toestel: er kan per definitie geen sessie zijn; het quorum, de wachttijd en de afbreekbaarheid doen het werk'],
+  ['/api/herstel/eigenaar/voltooien', 'zelfde ceremonie, tweede helft: opnieuw twee delen en de wachttijd moet om zijn'],
+  /* De twee passkey-loketten van dezelfde ceremonie staan hier NIET: de
+     keuring ziet dat ze een eigen poort in de handler hebben (het venster moet
+     openstaan) en wijst een uitzondering die niets meer uitzondert terecht af. */
   /* DE INLOGDEUR ZELF, en waarom hij hier hoort te staan in plaats van op de
      heuristiek te leunen.
 

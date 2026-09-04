@@ -17,7 +17,8 @@
    `naam(req)` komt uit ./bank.js mee via de context: wie er handelt komt uit de
    sessie, nooit uit req.body. Zie de toelichting daar. */
 module.exports = (ctx) => {
-  const { app, officeAuth, boardroomAuth, veilig, afdelingen, sseToOffice, kern, naam } = ctx;
+  const { app, officeAuth, boardroomAuth, veilig, afdelingen, sseToOffice, kern, naam,
+          zwaar, boardroomUser } = ctx;
   const bank = kern.bank;
   const sync = () => sseToOffice('sync', { scope: 'bank' });
 
@@ -71,12 +72,22 @@ module.exports = (ctx) => {
      verleggen. De auditregel zegt daarom niet alleen WAT er is omgezet maar ook
      wat dat betekent, want dat is precies het stuk dat je later terug wilt
      kunnen lezen. */
-  app.post('/api/office/bank/terugstorting', boardroomAuth, (req, res) => veilig(res, () => {
-    const r = kern.bankTerugstortingZet({ stand: String(req.body.stand || ''), wie: naam(req) });
-    if (r.ok) {
-      afdelingen.audit(naam(req), 'Terugstorten aan leden op "' + r.terugstorting + '" gezet. ' + r.uitleg);
-      sync();
-    }
-    return r;
-  }));
+  /* DE VINGER OP DE JURIDISCHE POSITIE. CLAUDE.md zegt het met zoveel woorden:
+     deze schakelaar *ís* de juridische stand van het huis -- `gesloten` maakt
+     van het saldo een besluit met een grond, `open` maakt RTG uitgever van
+     elektronisch geld. Zo'n omzetting hoort niet te kunnen uit een sessie die
+     iemand open liet staan, dus hij vraagt de passkey opnieuw. */
+  app.post('/api/office/bank/terugstorting', boardroomAuth, async (req, res) => {
+    const bewijs = await zwaar.eis(boardroomUser(req), 'eigenaar-terugstorting',
+      zwaar.sessieSleutel(req), req, 'Het omzetten van de terugstortstand');
+    if (bewijs.error) return zwaar.stuur(res, bewijs);
+    return veilig(res, () => {
+      const r = kern.bankTerugstortingZet({ stand: String(req.body.stand || ''), wie: naam(req) });
+      if (r.ok) {
+        afdelingen.audit(naam(req), 'Terugstorten aan leden op "' + r.terugstorting + '" gezet. ' + r.uitleg);
+        sync();
+      }
+      return r;
+    });
+  });
 };

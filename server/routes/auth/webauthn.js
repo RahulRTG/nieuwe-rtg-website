@@ -5,6 +5,7 @@
    opstarten vanuit routes/auth.js. */
 const { sleutelUitCredential } = require('../../kern/isolatie/apparaatsleutel');
 const { legInlogVast } = require('../../kern/identiteit/inlogherkomst');
+const { log } = require('../../log');
 
 module.exports = (actx) => {
   const { app, appUrl, auth, accounts, crypto, stateFor, pasAppOk, PAS_FOUT, isBaas, tooManyTries, noteFailedTry, loginFails,
@@ -34,8 +35,28 @@ module.exports = (actx) => {
     const u = eisAccount(req, res); if (!u) return;
     stuur(res, webauthn.lijst(u));
   });
-  app.post('/api/webauthn/weg', auth, (req, res) => {
+  /* EEN PASSKEY WEGHALEN IS ZELF EEN ZWARE HANDELING, en dat is geen
+     overdrijving maar het sluiten van de voordeur van deze hele laag. Zonder
+     deze regel is de ratel van boven af open te zetten: wie een sessie steelt
+     haalt eerst de sleutels weg, en daarna zegt de zware poort keurig dat er
+     niets te bevestigen valt (`nodig()` kijkt naar wat er STAAT). Eerst de
+     laatste vinger, dan pas het slot eraf.
+
+     Geldt voor iedereen met een passkey en niet alleen voor de eigenaar: de
+     redenering hangt aan het bezit van een sleutel, niet aan wie je bent. Wie er
+     nog geen heeft, kan er ook geen kwijtraken. */
+  const zwaar = actx.zwaarbewijs;
+  app.post('/api/webauthn/bevestig/opties', auth, async (req, res) => {
     const u = eisAccount(req, res); if (!u) return;
+    const r = await zwaar.opties(u, 'passkey-weg', zwaar.sessieSleutel(req), req);
+    if (r.error) return res.status(r.status || 400).json({ error: r.error });
+    res.json(r);
+  });
+  app.post('/api/webauthn/weg', auth, async (req, res) => {
+    const u = eisAccount(req, res); if (!u) return;
+    const bewijs = await zwaar.eis(u, 'passkey-weg', zwaar.sessieSleutel(req), req,
+      'Het verwijderen van een passkey');
+    if (bewijs.error) return zwaar.stuur(res, bewijs);
     stuur(res, webauthn.weg(u, String(req.body.id || '')));
   });
 

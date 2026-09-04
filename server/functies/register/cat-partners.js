@@ -64,6 +64,13 @@ module.exports = [
     uitleg: 'Betalingen (demo of Stripe) en de RTG Pay-wallet. Uit = er kan tijdelijk niet betaald worden.', paden: ['/api/betaal', '/api/pay'] },
   { id: 'webauthn', categorie: 'Betalen & verificatie', naam: 'Passkeys (WebAuthn)', standaard: true, doelgroepen: LEDEN,
     uitleg: 'Inloggen met vingerafdruk, gezicht of beveiligingssleutel. Wachtwoord-inloggen blijft altijd werken.', paden: ['/api/webauthn'] },
+  /* DE HERSTELWEG ALS SCHAKELAAR, en dat is met opzet. Raakt de eigenaar zijn
+     delen kwijt of vermoedt hij dat er twee in verkeerde handen zijn, dan is
+     dit de knop die de weg dichtzet tot hij opnieuw heeft ingericht -- sneller
+     dan opnieuw inrichten en zonder dat er iets aan het account verandert.
+     Standaard AAN: een vangnet dat je moet aanzetten, is geen vangnet. */
+  { id: 'eigenaarherstel', categorie: 'Betalen & verificatie', naam: 'Herstel van het eigenaarsaccount', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'De weg terug zonder toestel: twee van de drie herstel-delen, zeven dagen wachttijd, en elke werkende passkey breekt hem af. Uit = die weg is dicht; de delen blijven geldig voor als hij weer aangaat.', paden: ['/api/herstel/eigenaar'] },
   { id: 'verificatie', categorie: 'Betalen & verificatie', naam: 'Identiteitsverificatie (KYC)', standaard: true, doelgroepen: LEDEN_GAST,
     uitleg: 'Leden uploaden hun identiteitsbewijs en RTG beoordeelt het.', paden: ['/api/verify'] },
   { id: 'paspoort', categorie: 'Betalen & verificatie', naam: 'Paspoort delen (gecontroleerd)', standaard: true, doelgroepen: ['rtg', 'lifestyle', 'business', 'leverancier'],

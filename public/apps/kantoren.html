@@ -210,6 +210,13 @@
   .bk-tegel.rood{border-color:var(--burgundy);}
   .bk-tegel .lab{font-size:.72rem;color:var(--soft);}
   .bk-tegel .waarde{font-size:1.05rem;color:var(--rtg-leesgoud,var(--gold));margin-top:.25rem;}
+  /* De toestellenkaart. Eigen klassen in plaats van style="..." -- die
+     attributen houden style-src-attr in de CSP open, en NORM.json telt ze. */
+  .tstUitleg{font-size:.78rem;color:var(--soft);margin:0 0 0.5rem;}
+  .tstLijst{font-size:.82rem;}
+  .tstSpoor{margin-top:0.6rem;font-size:.78rem;color:var(--soft);}
+  .tstVoet{font-size:.74rem;color:var(--soft);line-height:1.6;margin:0.7rem 0 0;border-top:1px solid var(--line);padding-top:0.6rem;}
+  .tstMeta{color:var(--soft);font-size:.74rem;}
 </style>
 <!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
 <script src="/shared/media.js"></script>
@@ -433,6 +440,19 @@
         <button class="knop stil" id="bToegangGeef" type="button">Geef toegang</button>
       </div>
       <div id="bToegangLijst" style="margin-top:0.5rem;font-size:.82rem;"></div>
+    </div>
+
+    <!-- DE TOESTELLEN VAN DE EIGENAAR. Leest wat er al is (/api/webauthn/lijst)
+         met de eigen ledensessie; beheren gebeurt op een plek en dat is
+         /apps/passkeys.html. Twee deuren naar dezelfde handeling is precies hoe
+         de kantoor-inlog ooit op vijf schermen kwam te staan en er maar een de
+         tweede factor kreeg (keuringsregel 18). -->
+    <h3 class="sec" id="bToestelKop" hidden>Uw toestellen</h3>
+    <div class="kaart" id="bToestellen" hidden>
+      <p class="stil tstUitleg">De sleutels waarmee u de zware handelingen in dit huis bevestigt: eigendom overdragen, toegang geven, de terugstortstand omzetten. Staat hier niets, dan vraagt het huis daarvoor alleen uw wachtwoord -- en dat weet een gestolen open sessie ook.</p>
+      <div id="bToestelLijst" class="tstLijst"></div>
+      <div id="bToestelSpoor" class="tstSpoor"></div>
+      <p class="stil tstVoet">Wat deze lijst <strong>niet</strong> zegt: een sleutelhanger-passkey (iCloud, Google) reist mee met uw hanger en dekt dus meer dan één apparaat. En een sleutel bewijst dat dit dezelfde authenticator is als vorige keer -- niet wie hem vasthield. Toevoegen en intrekken doet u op <a href="/apps/passkeys.html">Passkeys</a>; dat is de enige plek, met opzet.</p>
     </div>
 
     <!-- Het papierwerk: de achttien dingen die alleen een mens kan invullen.
@@ -3314,7 +3334,7 @@ function balieTekenKlachten(){
   box.innerHTML = ks.length ? ks.map(k =>
     '<div style="border-bottom:1px solid var(--line);padding:.5rem 0;">'+
       '<div style="font-size:.85rem;"><b>'+esc(k.soort || 'klacht')+'</b> '+
-        '<span class="stil" style="color:var(--soft);font-size:.74rem;">'+esc(balDatum(k.at))+'</span></div>'+
+        '<span class="stil tstMeta">'+esc(balDatum(k.at))+'</span></div>'+
       '<div style="font-size:.82rem;color:var(--muted);">'+esc(k.tekst || '')+'</div>'+
       '<div class="taakrij"><select class="veld" style="max-width:11rem;" data-balstat="'+esc(k.id)+'" aria-label="Status van deze klacht">'+
         BALIE_STATUS.map(s => '<option value="'+s[0]+'"'+(k.status === s[0] ? ' selected' : '')+'>'+s[1]+'</option>').join('')+
@@ -3542,6 +3562,44 @@ function boardDeur(dicht, tekst){
   });
   if (dicht) $('#bDichtTekst').textContent = tekst || 'De boardroom is de kamer van de eigenaar.';
 }
+/* DE TOESTELLEN. Leest de eigen passkeys met de LEDENsessie en niet met de
+   kantoorsessie: deze sleutels horen bij een account, niet bij een kamer, en
+   daarom ziet iedereen hier alleen zijn eigen lijst -- ook zonder dat de server
+   er een aparte poort voor nodig heeft. Geen tweede route dus, en geen tweede
+   plek om in te trekken. */
+function ledenToken(){ try { return localStorage.getItem('rtg_member_token') || ''; } catch (e) { return ''; } }
+function toestelSoort(a){
+  if (a === 'multiDevice') return 'sleutelhanger';
+  if (a === 'singleDevice') return 'vast in dit toestel';
+  return 'onbekend';
+}
+function toestelDatum(s){ try { return s ? new Date(s).toLocaleDateString('nl-NL') : '--'; } catch (e) { return '--'; } }
+async function laadToestellen(baas){
+  $('#bToestelKop').hidden = $('#bToestellen').hidden = !baas;
+  if (!baas) return;
+  const t = ledenToken();
+  if (!t) {
+    $('#bToestelLijst').innerHTML = '<div class="leeg">U bent hier met de kantoordeur binnen, niet met uw eigen RTG-account. Uw sleutels staan onder dat account.</div>';
+    return;
+  }
+  try {
+    const r = await fetch('/api/webauthn/lijst', { method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + t },
+      body: '{}' }).then(x => x.json());
+    const s = (r && r.sleutels) || [];
+    $('#bToestelLijst').innerHTML = s.length ? s.map(k =>
+      '<div class="taakrij"><span class="h-flex1">' + esc(k.naam || 'Passkey') + '</span>' +
+      '<span class="stil" style="color:var(--soft);font-size:.74rem;">' + esc(toestelSoort(k.apparaat)) +
+      ' · laatst gezien ' + esc(k.laatstGebruikt ? toestelDatum(k.laatstGebruikt) : 'nog niet') + '</span></div>').join('')
+      : '<div class="leeg">Nog geen enkele sleutel. Zet er twee -- met één toestel raakt u alles kwijt zodra dat toestel weg is.</div>';
+    const sp = (r && r.spoor) || [];
+    $('#bToestelSpoor').innerHTML = sp.length
+      ? '<strong>Weggehaald:</strong> ' + sp.map(x => esc(x.naam) + ' (' + esc(toestelDatum(x.weg)) + ')').join(', ')
+      : '';
+  } catch (e) {
+    $('#bToestelLijst').innerHTML = '<div class="leeg">De lijst is nu niet op te halen.</div>';
+  }
+}
 /* De sleutel van de kamer: alleen de eigenaar ziet en beheert de lijst. */
 async function laadToegang(baas){
   $('#bToegangKop').hidden = $('#bToegang').hidden = !baas;
@@ -3646,6 +3704,7 @@ async function openBoard(){
   toon('vBoard');
   boardDeur(false);
   laadToegang(!!d.baas);
+  laadToestellen(!!d.baas);
   laadPapieren(!!d.baas);
   laadGeld();
   laadRahul();

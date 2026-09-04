@@ -6,7 +6,8 @@ const eigenaar = require('../../eigenaar');
 const { log } = require('../../log');
 module.exports = (tctx) => {
   const { app, accounts, anthropic, archief, beveilig, crypto, db, save, sendPushToUser, staat,
-          isEigenaar, techAuth, eigenaarAlleen } = tctx;
+          isEigenaar, techAuth, eigenaarAlleen, zwaar, sessieSleutel } = tctx;
+  const eisZwaar = (req, a, wat) => zwaar.eis(req.techUser, a, sessieSleutel(req), req, wat);
   /* De eigenaar vraagt ZELF om een update/modernisering, in gewone taal. De AI
      geeft een concreet, veilig plan. NIETS gaat live naar de gasten: het verzoek
      wordt vastgelegd als voorstel dat via de veilige stroom (Claude stelt voor via
@@ -55,9 +56,15 @@ module.exports = (tctx) => {
 
   /* De automatische noodrem aan- of uitzetten (alleen de eigenaar). Aan =
      bij een brede brute-force-aanval springen de zekeringen vanzelf. */
-  app.post('/api/techniek/beveiliging/auto', techAuth, eigenaarAlleen, (req, res) => {
+  app.post('/api/techniek/beveiliging/auto', techAuth, eigenaarAlleen, async (req, res) => {
     if (!beveilig) return res.status(503).json({ error: 'Beveiligingsmodule niet actief.' });
-    const aan = beveilig.zetAuto(req.body.aan !== false && req.body.aan !== 'false');
+    const wil = req.body.aan !== false && req.body.aan !== 'false';
+    // alleen UIT vraagt de vinger: een rem die je in nood niet aan kunt zetten is er geen
+    if (!wil) {
+      const bewijs = await eisZwaar(req, 'eigenaar-noodrem-uit', 'Het uitzetten van de noodrem');
+      if (bewijs.error) return zwaar.stuur(res, bewijs);
+    }
+    const aan = beveilig.zetAuto(wil);
     res.json({ ok: true, autoReactie: aan });
   });
 
@@ -71,11 +78,13 @@ module.exports = (tctx) => {
     res.json({ ok: true, dagen, verplaatst, levend: (db.data.orders || []).length, gearchiveerd: archief.stat().aantal });
   });
 
-  app.post('/api/techniek/toegang', techAuth, eigenaarAlleen, (req, res) => {
+  app.post('/api/techniek/toegang', techAuth, eigenaarAlleen, async (req, res) => {
     const t = staat();
     const doel = accounts.findByLogin(req.body.email);
     if (!doel) return res.status(404).json({ error: 'Geen account met dat e-mailadres of die gebruikersnaam.' });
     if (isEigenaar(doel)) return res.status(400).json({ error: 'De eigenaar heeft altijd al toegang.' });
+    const bewijs = await eisZwaar(req, 'eigenaar-techniektoegang', 'Het wijzigen van de toegang');
+    if (bewijs.error) return zwaar.stuur(res, bewijs);
     if (req.body.actie === 'intrek') t.toegang = t.toegang.filter(id => id !== doel.id);
     else if (!t.toegang.includes(doel.id)) t.toegang.push(doel.id);
     save();
@@ -108,6 +117,10 @@ module.exports = (tctx) => {
         { bron: 'user:' + req.techUser.id });
       return res.status(401).json({ error: 'Onjuist wachtwoord; er is niets gewijzigd.' });
     }
+
+    // slot 1b: een verse passkey -- een wachtwoord weet een gestolen sessie ook
+    const bewijs = await eisZwaar(req, 'eigenaar-overdracht', 'Het overdragen van het eigenaarschap');
+    if (bewijs.error) return zwaar.stuur(res, bewijs);
 
     // slot 2: er moet een account achter zitten, anders sluit je jezelf buiten
     const doel = accounts.findByLogin(nieuw);

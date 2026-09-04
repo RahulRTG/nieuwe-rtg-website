@@ -9,7 +9,16 @@ const { wie: envelopWie } = require('../../opzet/envelop');
 
 module.exports = (ctx) => {
   const { app, officeAuth, boardroomAuth, boardroomLijst, keyVanCodenaam, veilig, afdelingen,
-          sseToOffice, db, save, kern } = ctx;
+          sseToOffice, db, save, kern, zwaar, boardroomUser } = ctx;
+
+  /* Het loket om een zware bevestiging in de boardroom te starten. De poort
+     zelf staat in ./index.js; hier hangt alleen de deur. */
+  app.post('/api/office/boardroom/bevestig/opties', boardroomAuth, async (req, res) => {
+    const r = await zwaar.opties(boardroomUser(req), String(req.body.actie || ''),
+      zwaar.sessieSleutel(req), req);
+    if (r.error) return res.status(r.status || 400).json({ error: r.error });
+    res.json(r);
+  });
 
   /* De deur van de boardroom: alles hieronder loopt door de boardroom-poort
      (alleen de eigenaar, of wie van hem de sleutel kreeg). Het overige
@@ -46,6 +55,13 @@ module.exports = (ctx) => {
       if (!req.boardroomBaas) return res.status(403).json({ error: 'Alleen de eigenaar geeft boardroom-toegang.' });
       const t = await keyVanCodenaam(req.body.codenaam);
       if (!t) return res.status(404).json({ error: 'Deze codenaam kennen we niet.' });
+      /* Iemand anders de sleutel van deze kamer geven is de handeling waarmee
+         een gestolen sessie zichzelf een tweede, blijvende ingang maakt -- de
+         boardroom vergeet een gegeven toegang niet als het token verloopt.
+         Daarom hier de vinger, en pas nadat de codenaam is opgezocht. */
+      const bewijs = await zwaar.eis(boardroomUser(req), 'eigenaar-boardroomtoegang',
+        zwaar.sessieSleutel(req), req, 'Het geven van boardroom-toegang');
+      if (bewijs.error) return zwaar.stuur(res, bewijs);
       const lijst = boardroomLijst();
       if (!lijst.some(x => x.key === t.key)) {
         lijst.push({ key: t.key, codenaam: t.codename, at: new Date().toISOString() });

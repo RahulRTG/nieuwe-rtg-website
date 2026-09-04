@@ -175,4 +175,7 @@ kern.foundationregistratie = require('../kern/foundationregistratie-register')({
    routers van kernlaag7b, want de kern wordt hier nog gevuld. */
 require('./kernlaag7-ruimtes')(kern, hulp);
 
+/* De zware poort en het herstelquorum: ./kernlaag7-eigenaar.js. */
+require('./kernlaag7-eigenaar')(kern, hulp);
+
 };

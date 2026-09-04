@@ -67,6 +67,12 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-opvangwijzer').CONTRACTEN,
   require('./mutatiecontracten-horeca-correctie').CONTRACTEN,
   require('./mutatiecontracten-integratie').CONTRACTEN,
+  /* De zware poort: drie ceremonieloketten, alle drie met opzet niet
+     herhaalbaar. Eigen bestand, zie de kop daar. */
+  require('./mutatiecontracten-zwaar').CONTRACTEN,
+  /* Het eigenaarsherstel: zeven routes, per stuk beantwoord of een herhaling
+     een ander antwoord krijgt. Eigen bestand, zie de kop daar. */
+  require('./mutatiecontracten-herstel').CONTRACTEN,
   /* ALS LAATSTE, en dat is geen willekeur. Deze 788 vallen onder een BESLUIT
      over de bewijsstandaard en niet onder een mens die ze een voor een las. De
      vier hierboven zijn specifieker; Object.assign laat de laatste winnen, dus

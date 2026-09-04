@@ -132,7 +132,23 @@ module.exports = (kern) => {
      en die NOOIT uit een kop mag komen: zou de origin uit Origin of Host komen,
      dan kiest de aanvrager zijn eigen grens en is de binding een formaliteit.
      Zelfde afspraak als routes/rtgid.js en routes/auth/webauthn.js. */
-  const tctx = { app, accounts, anthropic, appUrl: kern.appUrl, archief, beveilig, wacht: kern.wacht, av: kern.antivirus, crypto, db, mail, save, sendPushToUser,
+  /* DE ZWARE POORT (kern/zwaarbewijs.js): de handelingen op deze pagina die een
+     gestolen open sessie nooit zelfstandig mag doen, vragen de passkey opnieuw.
+     De afleiding van de sessiesleutel komt daar vandaan en wordt hier niet
+     nagemaakt -- waarom staat in de kop van dat bestand. */
+  const zwaar = kern.zwaarbewijs;
+  const sessieSleutel = zwaar.sessieSleutel;
+
+  /* Eén loket om een zware bevestiging te starten. Het geeft alleen een
+     challenge voor de eigen passkeys van deze gebruiker terug; of de handeling
+     zelf mag, wordt bij de handeling zelf beslist en niet hier. */
+  app.post('/api/techniek/bevestig/opties', techAuth, eigenaarAlleen, async (req, res) => {
+    const r = await zwaar.opties(req.techUser, String(req.body.actie || ''), sessieSleutel(req), req);
+    if (r.error) return res.status(r.status || 400).json({ error: r.error });
+    res.json(r);
+  });
+
+  const tctx = { app, accounts, anthropic, appUrl: kern.appUrl, archief, beveilig, wacht: kern.wacht, av: kern.antivirus, crypto, db, mail, save, sendPushToUser, zwaar, sessieSleutel,
     LANDEN, keyVanCodenaam, talen, onboarding, staat, eigenaarUser, isEigenaar, magInzien, techAuth, eigenaarAlleen, ctx,
     betaalRegie: kern.betaalRegie, geldPasprijsZet, geldKortingZet, geldCommissieZet, tooManyTries, noteFailedTry, loginFails, kern };
   require('./techniek/inlog')(tctx);   // de inlog op deze pagina, met rem en gelijk antwoord
@@ -142,6 +158,7 @@ module.exports = (kern) => {
   require('./techniek/betalingen')(tctx);
   require('./techniek/aikosten')(tctx);  // de stand van de modelkraan (server/ai-meter.js)
   require('./techniek/beheer')(tctx);
+  require('./eigenaarherstel')(tctx);   // de weg terug zonder toestel (EIGENAAR.md par. 5)
   require('./techniek/wacht')(tctx);
   require('./techniek/papieren')(tctx);
   require('./techniek/sso')(tctx);

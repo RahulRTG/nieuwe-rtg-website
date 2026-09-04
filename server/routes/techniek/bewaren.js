@@ -11,7 +11,7 @@ const bewaarwacht = require('../../bewaarwacht');
 const { log } = require('../../log');
 
 module.exports = (tctx) => {
-  const { app, db, save, beveilig, techAuth, eigenaarAlleen } = tctx;
+  const { app, db, save, beveilig, techAuth, eigenaarAlleen, zwaar, sessieSleutel } = tctx;
 
   /* Het overzicht dat op het techniekbord komt. Twee getallen tellen echt:
      hoeveel er over zijn termijn is, en hoeveel takken er GEEN termijn hebben.
@@ -56,8 +56,16 @@ module.exports = (tctx) => {
      er zou verdwijnen, er verandert niets. Wissen is onomkeerbaar, en een lijst
      die je niet eerst hebt gelezen voer je niet uit -- zo raak je per ongeluk
      zeven jaar administratie kwijt. */
-  app.post('/api/techniek/bewaren/veeg', techAuth, eigenaarAlleen, (req, res) => {
+  app.post('/api/techniek/bewaren/veeg', techAuth, eigenaarAlleen, async (req, res) => {
     const echt = req.body && req.body.bevestig === 'WIS';
+    /* De PROEF blijft vrij: zien wat er zou verdwijnen verandert niets, en wie
+       daarvoor een vinger moet geven kijkt niet meer. Alleen de echte ronde is
+       onomkeerbaar, en die vraagt dus de passkey. */
+    if (echt) {
+      const bewijs = await zwaar.eis(req.techUser, 'eigenaar-bewaarveeg', sessieSleutel(req), req,
+        'De echte veegronde van de bewaartermijnen');
+      if (bewijs.error) return zwaar.stuur(res, bewijs);
+    }
     const r = bewaartermijnen.veeg(db, { echt });
     if (echt && r.totaal) {
       save();

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-04T00:41:45.830Z",
-    "commit": "1cb96293",
+    "op": "2026-09-04T08:23:33.378Z",
+    "commit": "3359f0851",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/vindbaar.js",
@@ -11,9 +11,9 @@
   "vloer": 0.6,
   "drempel": 3,
   "bestemmingen": 89,
-  "woorden": 1081,
-  "gevonden": 700,
-  "dekking": 0.6475,
+  "woorden": 1083,
+  "gevonden": 701,
+  "dekking": 0.6473,
   "perBestemming": [
     {
       "naam": "Magnaat",
@@ -722,6 +722,16 @@
       ]
     },
     {
+      "naam": "Passkeys",
+      "url": "/apps/passkeys.html",
+      "woorden": 5,
+      "gevonden": 3,
+      "mist": [
+        "eerste",
+        "inloggen"
+      ]
+    },
+    {
       "naam": "Web",
       "url": "/apps/browser.html",
       "woorden": 4,
@@ -794,15 +804,6 @@
       "gevonden": 3,
       "mist": [
         "eerstvolgende"
-      ]
-    },
-    {
-      "naam": "Passkeys",
-      "url": "/apps/passkeys.html",
-      "woorden": 3,
-      "gevonden": 2,
-      "mist": [
-        "inloggen"
       ]
     },
     {

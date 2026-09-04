@@ -46,7 +46,7 @@ const sessieSleutel = req => crypto.createHash('sha256')
    poort bedraden; een waarde meegeven zou hem op `undefined` vastzetten en dan
    verdwijnt juist de melding die de terugval zichtbaar moet houden -- stil, en
    precies bij het geval dat niemand mag missen. */
-module.exports = ({ zwaarBeveiliging, appUrl, log, beveiligVan, accounts }) => {
+module.exports = ({ zwaarBeveiliging, appUrl, log, beveiligVan, accounts, envelopWie }) => {
   const beveiligNu = () => { try { return typeof beveiligVan === 'function' ? beveiligVan() : null; } catch (e) { return null; } };
   const oorsprong = req => { try { return new URL(appUrl(req)).origin; } catch (e) { return ''; } };
   const gastheer = req => { try { return new URL(oorsprong(req)).hostname; } catch (e) { return req.hostname; } };
@@ -114,9 +114,24 @@ module.exports = ({ zwaarBeveiliging, appUrl, log, beveiligVan, accounts }) => {
      die de codenaam-scheiding uit CLAUDE.md niet wil -- het kantoor werkt op
      codenamen en hoort niet rechtstreeks in de identiteitskluis te kunnen.
      De boardroom-poort heeft het zware werk al gedaan: een anonieme kantoorcode
-     komt daar nooit doorheen, dus `boardroomKey` draagt hier altijd `user-<id>`. */
+     komt daar nooit doorheen, dus de actor draagt hier altijd `user-<id>`.
+
+     HIJ LAS `req.boardroomKey`, EN DAT VELD BESTAAT NIET MEER. Het is weggehaald
+     door TAKEN.md 4.72 (het enige echte duplicaat van de actorvormen), en
+     kern/kantoor/boardroom.js zegt op de plek waar het stond met zoveel woorden
+     waar het naartoe is: "wie er handelt staat in de envelop hieronder, en daar
+     leest envelop.wie(req) hem generiek uit". Deze module is geschreven tegen
+     een boom waarin dat veld er nog was, en beide takken waren apart groen --
+     samen gaf `boardroomUser` altijd null, en dan zakt ELKE zware handeling op
+     de boardroom met "Deze handeling hoort bij een eigen RTG-account": toegang
+     geven, de terugstortstand omzetten, de veegronde. Niet alleen in de toets.
+
+     De generieke lezer wordt INGESPOTEN en niet hier gerequired: deze module
+     hoort in kern en `opzet/` is de laag erboven. Ontbreekt hij, dan is de
+     uitkomst null en dus de veilige kant -- een zware handeling die niet kan
+     vaststellen wie er handelt, hoort niet door te gaan. */
   function boardroomUser(req) {
-    const k = String((req && req.boardroomKey) || '');
+    const k = String((envelopWie && req ? envelopWie(req) : null) || '');
     if (!k.startsWith('user-') || !accounts) return null;
     try { return accounts.getUserById(Number(k.slice(5))) || null; } catch (e) { return null; }
   }

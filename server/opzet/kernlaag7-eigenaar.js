@@ -22,7 +22,9 @@ module.exports = (kern, hulp) => {
   const eigenaar = require('../eigenaar');
 
   kern.zwaarbewijs = require('../kern/zwaarbewijs')({ zwaarBeveiliging: kern.zwaarBeveiliging,
-    accounts, log, appUrl: (req) => kern.appUrl(req), beveiligVan: () => kern.beveilig });
+    accounts, log, appUrl: (req) => kern.appUrl(req), beveiligVan: () => kern.beveilig,
+    /* De generieke actor-lezer uit de envelop; zie de kop van boardroomUser. */
+    envelopWie: require('./envelop').wie });
 
   kern.eigenaarherstel = require('../kern/eigenaarherstel')({
     db, save, log,

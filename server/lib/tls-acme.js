@@ -52,12 +52,17 @@ async function startAcme(opties) {
   const winkel = maakUitdagingWinkel();
   const vraag = (opties.maakVraag || (() => require('./http').vraag))(winkel);
   const client = maakAcme({ accountKey: laadAccountSleutel(dataDir), winkel, staging: opties.staging, vraag, directoryUrl: opties.directoryUrl });
+  const domeinLijst = (Array.isArray(domains) ? domains : []).map(x => String(x || '').trim().toLowerCase())
+    .filter(x => /^[a-z0-9](?:[a-z0-9.-]{0,251}[a-z0-9])?$/.test(x));
+  const domeinSet = new Set(domeinLijst);
 
   // Poort 80: challenge serveren + al het andere naar HTTPS sturen (301).
   const httpServer = http.createServer((req, res) => {
     const p = String(req.url || '').split('?')[0];
     if (p.startsWith('/.well-known/acme-challenge/')) return winkel.middleware(req, res, () => { res.statusCode = 404; res.end('Not Found'); });
-    const host = String(req.headers.host || (domains && domains[0]) || '').split(':')[0];
+    const gevraagd = String(req.headers.host || '').split(':')[0].toLowerCase();
+    const host = domeinSet.has(gevraagd) ? gevraagd : domeinLijst[0];
+    if (!host) { res.statusCode = 400; return res.end('Ongeldige host.'); }
     res.statusCode = 301; res.setHeader('Location', 'https://' + host + (req.url || '/')); res.end();
   });
   await new Promise((r) => httpServer.listen(opties.http01Poort != null ? opties.http01Poort : 80, r));

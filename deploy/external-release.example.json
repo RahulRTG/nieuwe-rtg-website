@@ -1,0 +1,84 @@
+{
+  "formaat": "rtg-external-release-v2",
+  "geslaagd": false,
+  "commit": "VUL-IN-VOLLEDIGE-GIT-SHA",
+  "goedgekeurdDoor": "VUL-IN-NAAM-EN-ORGANISATIE",
+  "goedgekeurdAt": "VUL-IN-ISO-8601-DATUM",
+  "controles": {
+    "tlsDdosRand": {
+      "status": "OPEN",
+      "bewijs": { "bestand": "tls-ddos-rapport.pdf", "sha256": "VUL-IN-SHA256" }
+    },
+    "onafhankelijkePentest": {
+      "status": "OPEN",
+      "bewijs": { "bestand": "pentest-rapport.pdf", "sha256": "VUL-IN-SHA256" }
+    },
+    "juridischeVrijgave": {
+      "status": "OPEN",
+      "bewijs": { "bestand": "juridische-vrijgave.pdf", "sha256": "VUL-IN-SHA256" }
+    },
+    "privacyDpia": {
+      "status": "OPEN",
+      "bewijs": { "bestand": "privacy-dpia.pdf", "sha256": "VUL-IN-SHA256" }
+    },
+    "backupHerstel": {
+      "status": "OPEN",
+      "bewijs": { "bestand": "backup-herstel.json", "sha256": "VUL-IN-SHA256" }
+    },
+    "deploymentRollback": {
+      "status": "OPEN",
+      "bewijs": { "bestand": "deployment-rollback.json", "sha256": "VUL-IN-SHA256" }
+    },
+    "observabilityIncident": {
+      "status": "OPEN",
+      "bewijs": { "bestand": "incident-repetitie.json", "sha256": "VUL-IN-SHA256" }
+    },
+    "paymentProvider": {
+      "status": "OPEN",
+      "bewijs": { "bestand": "payment-provider-live.json", "sha256": "VUL-IN-SHA256" }
+    },
+    "payoutProvider": {
+      "status": "OPEN",
+      "bewijs": { "bestand": "payout-provider-live.json", "sha256": "VUL-IN-SHA256" }
+    },
+    "webhookDelivery": {
+      "status": "OPEN",
+      "bewijs": { "bestand": "webhook-delivery-replay.json", "sha256": "VUL-IN-SHA256" }
+    },
+    "refundPayoutSettlement": {
+      "status": "OPEN",
+      "bewijs": { "bestand": "refund-payout-settlement.json", "sha256": "VUL-IN-SHA256" }
+    },
+    "reconciliation": {
+      "status": "OPEN",
+      "bewijs": { "bestand": "reconciliation.json", "sha256": "VUL-IN-SHA256" }
+    },
+    "emailDeliveryRecovery": {
+      "status": "OPEN",
+      "bewijs": { "bestand": "email-delivery-recovery.json", "sha256": "VUL-IN-SHA256" }
+    },
+    "smsDelivery": {
+      "status": "OPEN",
+      "bewijs": { "bestand": "sms-delivery-or-disabled.json", "sha256": "VUL-IN-SHA256" }
+    },
+    "malwareDefinitionsScan": {
+      "status": "OPEN",
+      "bewijs": { "bestand": "malware-definitions-scan.json", "sha256": "VUL-IN-SHA256" }
+    },
+    "objectStorage": {
+      "status": "OPEN",
+      "bewijs": { "bestand": "object-storage-delivery.json", "sha256": "VUL-IN-SHA256" }
+    },
+    "imageVulnerabilityScan": {
+      "status": "OPEN",
+      "bewijs": { "bestand": "image-vulnerability-scan.json", "sha256": "VUL-IN-SHA256" }
+    },
+    "foundationMinderjarigen": {
+      "status": "OPEN",
+      "vrijgave": "GESLOTEN",
+      "leeftijdscontrole": "NIET_VRIJGEGEVEN",
+      "moderatie": "NIET_VRIJGEGEVEN",
+      "bewijs": { "bestand": "foundation-vrijgave.pdf", "sha256": "VUL-IN-SHA256" }
+    }
+  }
+}

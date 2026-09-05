@@ -17,4 +17,5 @@ function eisSalonProfiel(req, res) {
    kern; eisSalonProfiel gaat als tweede argument mee. */
 require('./salon/publiceren')(kern, eisSalonProfiel);
 require('./salon/profiel')(kern, eisSalonProfiel);
+require('./salon/claims')(kern);
 };

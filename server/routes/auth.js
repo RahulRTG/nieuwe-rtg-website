@@ -1,7 +1,7 @@
 /* Domein "auth" (aparte module op de gedeelde kern). Alleen de routes;
    de helpers blijven in de kern (server.js) en komen via het kern-object binnen. */
 module.exports = (kern) => {
-  const { PERSONAS, PRODUCTION, UPLOAD_DIR, accounts, app, appUrl, auth, checkCred, crypto, db, express, forgetSession, fs, hasCred, leeftijdVan, loginFails, mail, memberTemplate, noteFailedTry, path, rememberSession, save, schoon, sessions, stateFor, tooManyTries, logInlog, automatisering } = kern;
+  const { PERSONAS, PRODUCTION, UPLOAD_DIR, accounts, app, appUrl, auth, checkCred, crypto, db, express, forgetSession, forgetSessionDuurzaam, fs, hasCred, leeftijdVan, loginFails, mail, memberTemplate, noteFailedTry, path, rememberSession, save, schoon, sessions, stateFor, tooManyTries, logInlog, automatisering } = kern;
   /* Snelle testinlog zonder wachtwoord: UIT, behalve in Magnaat Test.
      Echte leden loggen in via
      /api/auth/login.
@@ -67,13 +67,13 @@ module.exports = (kern) => {
   /* Inloggen en uitloggen staan in ./auth/inlog.js -- hier aangeroepen en niet
      verderop, want dit zijn de eerste vier routes van het domein en de volgorde
      van registreren is in dit huis de volgorde van afhandelen. */
-  require('./auth/inlog')({ PERSONAS, accounts, app, auth, checkCred, crypto, forgetSession, hasCred,
+  require('./auth/inlog')({ PERSONAS, accounts, app, auth, checkCred, crypto, forgetSession, forgetSessionDuurzaam, hasCred,
     loginFails, noteFailedTry, rememberSession, sessions, stateFor, tooManyTries, logInlog,
     DEMO, pasAppOk, PAS_FOUT, isBaas, kern, sessieregister: kern.sessieregister, tweefactor: kern.tweefactor });
 
   /* De registratie-, herstel- en verificatieroutes draaien als submodules
      op een gedeelde context, een keer opgebouwd bij het opstarten. */
-  const actx = { PERSONAS, PRODUCTION, UPLOAD_DIR, accounts, app, appUrl, auth, checkCred, crypto, db, express, forgetSession, fs, hasCred, leeftijdVan, loginFails, mail, memberTemplate, noteFailedTry, path, rememberSession, save, schoon, sessions, stateFor, tooManyTries, logInlog,
+  const actx = { PERSONAS, PRODUCTION, UPLOAD_DIR, accounts, app, appUrl, auth, checkCred, crypto, db, express, forgetSession, forgetSessionDuurzaam, fs, hasCred, leeftijdVan, loginFails, mail, memberTemplate, noteFailedTry, path, rememberSession, save, schoon, sessions, stateFor, tooManyTries, logInlog,
     DEMO, pasAppOk, PAS_FOUT, pasAppVan, DEV_VELDEN, isBaas, antivirus: kern.antivirus,
     webauthn: kern.webauthn, zwaarbewijs: kern.zwaarbewijs, automatisering, sessieregister: kern.sessieregister,
     /* De kern zelf reist mee voor de wervingslink. Die helpers (zoekInvite,

@@ -23,9 +23,11 @@ use rtg_motor::http::{self, Request, Response};
 use rtg_motor::json::{self, Json};
 use rtg_motor::ledengids::{self, Gids};
 use rtg_motor::pay::{Resp, State};
+use rtg_motor::duurzaam::{self, Stand as DuurzaamStand};
+use rtg_motor::snapshotkluis::Ring as SnapshotRing;
 use std::fs;
 use std::path::PathBuf;
-use std::sync::{Arc, RwLock};
+use std::sync::{Arc, Mutex, RwLock};
 use std::thread;
 use std::time::Duration;
 
@@ -35,6 +37,22 @@ fn env(key: &str, standaard: &str) -> String {
 
 fn data_pad() -> PathBuf {
     PathBuf::from(env("RTG_MOTOR_DATA", "motor-data/state.json"))
+}
+
+fn snapshot_sleutel_pad() -> Result<PathBuf, String> {
+    let pad = std::env::var("RTG_MOTOR_STATE_KEY_FILE").map(PathBuf::from)
+        .map_err(|_| "RTG_MOTOR_STATE_KEY_FILE ontbreekt (aparte geldsnapshotsleutel is verplicht)".to_string())?;
+    if !pad.is_absolute() { return Err("RTG_MOTOR_STATE_KEY_FILE moet een absoluut pad zijn".into()); }
+    Ok(pad)
+}
+
+fn verwacht_genesis() -> Result<String, String> {
+    let id = std::env::var("RTG_MOTOR_EXPECT_GENESIS")
+        .map_err(|_| "RTG_MOTOR_EXPECT_GENESIS ontbreekt; bind startup aan de geïnitialiseerde geldvolume".to_string())?;
+    if id.len() != 34 || !id.starts_with("g-") || !id[2..].bytes().all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b)) {
+        return Err("RTG_MOTOR_EXPECT_GENESIS heeft geen geldige g-<32 hex>-vorm".into());
+    }
+    Ok(id)
 }
 
 /* Luistert dit adres alleen op de eigen machine? Zonder token is dat de enige
@@ -199,20 +217,11 @@ fn kluis_route(kluis: &std::sync::Mutex<rtg_motor::kluis::Kluis>, req: &Request)
     }
 }
 
-fn laad_snapshot(state: &RwLock<State>) {
-    let pad = data_pad();
-    if let Ok(tekst) = fs::read_to_string(&pad) {
-        if let Ok(snap) = json::parse(&tekst) {
-            state.write().unwrap().laad(&snap);
-            eprintln!("[motor] snapshot geladen uit {}", pad.display());
-        }
-    }
-}
-
 /* Write-behind: elke ~200 ms een atomische snapshot als er iets veranderd is
    (temp-bestand + rename). Coalesced, buiten de aanvraag om — net als de
    write-behind flush aan de Node-kant. */
-fn start_flusher(state: Arc<RwLock<State>>) {
+fn start_flusher(state: Arc<RwLock<State>>, bestand_slot: Arc<Mutex<()>>,
+                 duurzame_stand: Arc<Mutex<DuurzaamStand>>, ring: Arc<SnapshotRing>) {
     thread::spawn(move || {
         let pad = data_pad();
         if let Some(dir) = pad.parent() {
@@ -222,18 +231,18 @@ fn start_flusher(state: Arc<RwLock<State>>) {
             thread::sleep(Duration::from_millis(200));
             // Bouw de snapshot onder een KORTE lock en serialiseer daarna BUITEN
             // de lock — de dure string-opbouw blokkeert dan geen enkele boeking.
-            let snap = {
+            let (tekst, revisie) = {
                 let mut s = state.write().unwrap();
                 if !s.vuil {
                     continue;
                 }
                 s.vuil = false;
-                s.snapshot()
+                (s.snapshot().dump(), s.revisie)
             };
-            let tekst = snap.dump();
-            let tmp = pad.with_extension("tmp");
-            if fs::write(&tmp, tekst.as_bytes()).is_ok() {
-                let _ = fs::rename(&tmp, &pad);
+            if let Err(e) = duurzaam::schrijf_indien_nieuwer(&pad, &tekst, revisie, &ring,
+                &bestand_slot, &duurzame_stand) {
+                state.write().unwrap().vuil = true;
+                eprintln!("[motor] snapshot niet duurzaam: {}", e);
             }
         }
     });
@@ -344,6 +353,14 @@ fn main() {
             }
         }
     }
+    if args.get(1).map(String::as_str) == Some("init-state") {
+        let sleutelpad = snapshot_sleutel_pad().unwrap_or_else(|e| { eprintln!("[init-state] {}", e); std::process::exit(2) });
+        let ring = SnapshotRing::laad(&sleutelpad).unwrap_or_else(|e| { eprintln!("[init-state] {}", e); std::process::exit(2) });
+        let verwacht = verwacht_genesis().unwrap_or_else(|e| { eprintln!("[init-state] {}", e); std::process::exit(2) });
+        let genesis = duurzaam::initialiseer(&data_pad(), &ring, &verwacht).unwrap_or_else(|e| { eprintln!("[init-state] {}", e); std::process::exit(1) });
+        println!("geldvolume expliciet geïnitialiseerd: {} (keyId {}, genesisId {})", data_pad().display(), ring.actief_id(), genesis);
+        return;
+    }
     let addr = env("RTG_MOTOR_ADDR", "127.0.0.1:3100");
     let maxconn: usize = env("RTG_MOTOR_MAXCONN", "1024").parse().unwrap_or(1024);
 
@@ -366,9 +383,32 @@ fn main() {
         eprintln!("[motor] poortwacht actief: elk verzoek behalve /api/leeft heeft een geldig token nodig.");
     }
 
-    let state = Arc::new(RwLock::new(State::new()));
-    laad_snapshot(&state);
-    start_flusher(Arc::clone(&state));
+    let sleutelpad = snapshot_sleutel_pad().unwrap_or_else(|e| {
+        eprintln!("[motor] WEIGER TE STARTEN: {}", e); std::process::exit(1)
+    });
+    let snapshot_ring = Arc::new(SnapshotRing::laad(&sleutelpad).unwrap_or_else(|e| {
+        eprintln!("[motor] WEIGER TE STARTEN: geldsnapshotsleutel ongeldig: {}", e); std::process::exit(1)
+    }));
+    let mut beginstand = State::new();
+    let geladen = match duurzaam::laad(&data_pad(), &snapshot_ring, &mut beginstand) {
+        Ok(v) => v,
+        Err(e) => {
+            eprintln!("[motor] WEIGER TE STARTEN: geldsnapshot vereist herstel: {}", e);
+            std::process::exit(1);
+        }
+    };
+    let verwacht = verwacht_genesis().unwrap_or_else(|e| { eprintln!("[motor] WEIGER TE STARTEN: {}", e); std::process::exit(1) });
+    if geladen.genesis_id.as_deref() != Some(verwacht.as_str()) {
+        eprintln!("[motor] WEIGER TE STARTEN: geldsnapshot hoort bij een andere genesis dan RTG_MOTOR_EXPECT_GENESIS");
+        std::process::exit(1);
+    }
+    if geladen.snapshot_geladen {
+        eprintln!("[motor] geldsnapshot geldig geladen uit {}", data_pad().display());
+    }
+    let state = Arc::new(RwLock::new(beginstand));
+    let duurzame_stand = Arc::new(Mutex::new(geladen));
+    let bestand_slot = Arc::new(Mutex::new(()));
+    start_flusher(Arc::clone(&state), Arc::clone(&bestand_slot), Arc::clone(&duurzame_stand), Arc::clone(&snapshot_ring));
 
     // ledengids: open een bestaande gids als die er is (out-of-RAM, O(1) geheugen)
     let gids: Arc<RwLock<Option<Gids>>> = Arc::new(RwLock::new(None));
@@ -398,7 +438,10 @@ fn main() {
     eprintln!("[motor] RTG-motor luistert op {} (max {} verbindingen)", addr, maxconn);
 
     let router_state = Arc::clone(&state);
+    let router_bestand_slot = Arc::clone(&bestand_slot);
+    let router_duurzame_stand = Arc::clone(&duurzame_stand);
     let router_gids = Arc::clone(&gids);
+    let router_snapshot_ring = Arc::clone(&snapshot_ring);
     let resultaat = http::serve(&addr, maxconn, move |req: &Request| {
         // kale liveness: altijd open, verraadt niets over geld of leden
         if req.path == "/api/leeft" {
@@ -421,7 +464,7 @@ fn main() {
         if req.path.starts_with("/api/reken/") {
             return reken_route(req);
         }
-        route(&router_state, req)
+        route_met_opslag(&router_state, req, Some(&router_bestand_slot), Some(&router_duurzame_stand), Some(&router_snapshot_ring))
     });
     if let Err(e) = resultaat {
         eprintln!("[motor] kon niet starten: {}", e);
@@ -542,7 +585,7 @@ mod tests {
     fn status_noemt_de_native_motoren() {
         let state = RwLock::new(State::new());
         let antwoord = route(&state, &req("/api/motor/status", ""));
-        assert_eq!(antwoord.status, 200);
+        assert_eq!(antwoord.status, 503, "zonder geladen versleutelde snapshot nooit ready");
         let body = json::parse(&antwoord.body).unwrap();
         let namen = match body.get("nativeMotoren") {
             Some(Json::Arr(v)) => v,
@@ -552,9 +595,77 @@ mod tests {
         assert!(namen.iter().any(|n| n.as_str() == Some("capability-bronscan")));
         assert!(namen.iter().any(|n| n.as_str() == Some("identiteitskluis-xchacha")));
     }
+
+    #[test]
+    fn ready_toont_duurzaamheid_en_faalt_bij_balansbreuk() {
+        let state = RwLock::new(State::new());
+        let stand = Mutex::new(DuurzaamStand::vers());
+        let rood_ongeinitialiseerd = route_met_opslag(&state, &req("/api/ready", ""), None, Some(&stand), None);
+        assert_eq!(rood_ongeinitialiseerd.status, 503);
+        let basis = std::env::temp_dir().join(format!("rtg-ready-{}-{}", std::process::id(), rtg_motor::rng::nu_ms()));
+        let pad = basis.with_extension("json"); let sleutelpad = basis.with_extension("key");
+        let ring = SnapshotRing::maak(&sleutelpad).unwrap();
+        duurzaam::initialiseer(&pad, &ring, "g-00000000000000000000000000000003").unwrap();
+        let mut geladen = State::new();
+        let stand = Mutex::new(duurzaam::laad(&pad, &ring, &mut geladen).unwrap());
+        let state = RwLock::new(geladen);
+        let groen = route_met_opslag(&state, &req("/api/ready", ""), None, Some(&stand), None);
+        assert_eq!(groen.status, 200);
+        let body = json::parse(&groen.body).unwrap();
+        assert!(body.bool_at("ok"));
+        let duurzaam = body.get("duurzaam").expect("duurzaamheidscontract");
+        assert!(duurzaam.bool_at("gereed"));
+        assert!(duurzaam.bool_at("snapshotGeladen"));
+        assert!(duurzaam.bool_at("versleuteld"));
+        assert_eq!(duurzaam.str_at("algoritme"), Some("XChaCha20-Poly1305"));
+        assert!(duurzaam.str_at("genesisId").unwrap_or("").starts_with("g-"));
+        assert_eq!(duurzaam.get("laatsteSchrijfFout"), Some(&Json::Null));
+        assert!(body.get("bank").is_some(), "bankbalans staat in dezelfde readiness");
+
+        state.write().unwrap().grb.saldi.insert("geknoeid".into(), 1);
+        let rood = route_met_opslag(&state, &req("/api/motor/status", ""), None, Some(&stand), None);
+        assert_eq!(rood.status, 503);
+        assert!(!json::parse(&rood.body).unwrap().bool_at("ok"));
+        let _ = fs::remove_file(&pad); let _ = fs::remove_file(&sleutelpad);
+        let _ = fs::remove_file(PathBuf::from(format!("{}.init", pad.display())));
+    }
+
+    #[test]
+    fn economische_snapshot_is_duurzaam_herhaalbaar() {
+        let pad = std::env::temp_dir().join(format!("rtg-motor-economisch-{}-{}.json",
+            std::process::id(), rtg_motor::rng::nu_ms()));
+        let mut s = State::new();
+        let sleutelpad = pad.with_extension("key");
+        let ring = SnapshotRing::maak(&sleutelpad).unwrap();
+        duurzaam::initialiseer(&pad, &ring, "g-00000000000000000000000000000004").unwrap();
+        let sleutel = "payout-terug:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+        let a = s.boek_guard_eenmaal("extern:uitbetaald", "lid:A", 251, "terug", "x",
+            Some("heen-2".into()), Some(sleutel));
+        assert_eq!(a.status, 200);
+        let slot = Mutex::new(());
+        let mut leeg = State::new();
+        let stand = Mutex::new(duurzaam::laad(&pad, &ring, &mut leeg).unwrap());
+        duurzaam::schrijf_indien_nieuwer(&pad, &s.snapshot().dump(), s.revisie, &ring, &slot, &stand).unwrap();
+        let mut herstart = State::new();
+        duurzaam::laad(&pad, &ring, &mut herstart).unwrap();
+        let b = herstart.boek_guard_eenmaal("extern:uitbetaald", "lid:A", 251, "terug", "retry",
+            Some("heen-2".into()), Some(sleutel));
+        assert_eq!(b.status, 200);
+        assert_eq!(b.body.bool_at("herhaald"), true);
+        assert_eq!(herstart.grb.saldo_van("lid:A"), 251);
+        let marker = PathBuf::from(format!("{}.init", pad.display()));
+        let _ = fs::remove_file(&pad);
+        let _ = fs::remove_file(marker);
+        let _ = fs::remove_file(sleutelpad);
+    }
 }
 
 fn route(state: &RwLock<State>, req: &Request) -> Response {
+    route_met_opslag(state, req, None, None, None)
+}
+
+fn route_met_opslag(state: &RwLock<State>, req: &Request, bestand_slot: Option<&Mutex<()>>,
+                    duurzame_stand: Option<&Mutex<DuurzaamStand>>, snapshot_ring: Option<&SnapshotRing>) -> Response {
     // ---- lees-paden: read-lock, lezers blokkeren elkaar niet ----
     if req.path == "/api/pay/gezond" {
         let (klopt, _som) = state.read().unwrap().gezond();
@@ -578,11 +689,24 @@ fn route(state: &RwLock<State>, req: &Request) -> Response {
     if req.path == "/api/ready" || req.path == "/api/motor/status" {
         let s = state.read().unwrap();
         let (klopt, som) = s.gezond();
+        let (bank_klopt, bank_som) = s.bank_gezond();
+        let duurzaam_json = match duurzame_stand {
+            Some(d) => d.lock().unwrap().json(s.revisie, s.vuil),
+            None => DuurzaamStand::vers().json(s.revisie, s.vuil),
+        };
+        let duurzaam_ok = duurzaam_json.bool_at("gereed");
+        let gereed = klopt && bank_klopt && duurzaam_ok;
+        let mut bank = Json::obj();
+        bank.set("klopt", Json::Bool(bank_klopt))
+            .set("som", Json::Num(bank_som as f64))
+            .set("vingerafdruk", Json::Str(s.bank_vingerafdruk()));
         let mut b = Json::obj();
-        b.set("ok", Json::Bool(true))
+        b.set("ok", Json::Bool(gereed))
             .set("klopt", Json::Bool(klopt))
             .set("som", Json::Num(som as f64))
             .set("vingerafdruk", Json::Str(s.vingerafdruk()))
+            .set("bank", bank)
+            .set("duurzaam", duurzaam_json)
             .set("leden", Json::Num(s.ledental() as f64))
             .set("nativeMotoren", Json::Arr(vec![
                 Json::Str("pay-grootboek".into()),
@@ -593,18 +717,18 @@ fn route(state: &RwLock<State>, req: &Request) -> Response {
                 Json::Str("identiteitskluis-xchacha".into()),
                 Json::Str("ontsmetter".into()),
             ]));
-        return Response { status: 200, body: b.dump() };
+        return Response { status: if gereed { 200 } else { 503 }, body: b.dump() };
     }
     // Bank-grootboek (cutover stap 3): eigen som + vingerafdruk voor de drift-detector.
     if req.path == "/api/bank/status" {
         let s = state.read().unwrap();
         let (klopt, som) = s.bank_gezond();
         let mut b = Json::obj();
-        b.set("ok", Json::Bool(true))
+        b.set("ok", Json::Bool(klopt))
             .set("klopt", Json::Bool(klopt))
             .set("som", Json::Num(som as f64))
             .set("vingerafdruk", Json::Str(s.bank_vingerafdruk()));
-        return Response { status: 200, body: b.dump() };
+        return Response { status: if klopt { 200 } else { 503 }, body: b.dump() };
     }
     // Volledige bank-saldi voor de herstart-reconcile (achter dezelfde vlag als /api/motor/saldi).
     if req.path == "/api/bank/saldi" {
@@ -631,6 +755,40 @@ fn route(state: &RwLock<State>, req: &Request) -> Response {
     let codenaam = body.str_at("codenaam").unwrap_or("");
     let supplier = body.str_at("supplier").unwrap_or("");
     let idem = body.str_at("idem");
+
+    /* Voor payout-teruggangen is `idem` een permanente economische sleutel.
+       Mutatie + sleutel zitten onder dezelfde State-lock; vóór de 200 wordt die
+       volledige stand met fsync vastgelegd. Mislukt dat, dan herstellen we de
+       oude State en antwoorden fail-closed. */
+    if idem.is_some() && (req.path == "/api/pay/boekguard" || req.path == "/api/bank/boek") {
+        let slot = match bestand_slot { Some(v) => v, None => return fout(503, "Duurzame motoropslag ontbreekt.") };
+        let stand = match duurzame_stand { Some(v) => v, None => return fout(503, "Duurzame motorstatus ontbreekt.") };
+        let ring = match snapshot_ring { Some(v) => v, None => return fout(503, "Duurzame snapshotsleutel ontbreekt.") };
+        let mut s = state.write().unwrap();
+        let voor = s.clone();
+        let r = if req.path == "/api/pay/boekguard" {
+            s.boek_guard_eenmaal(body.str_at("van").unwrap_or(""), body.str_at("naar").unwrap_or(""),
+                body.i64_at("centen").unwrap_or(0), body.str_at("soort").unwrap_or("boeking"),
+                body.str_at("oms").unwrap_or(""), body.str_at("ref").map(|x| x.to_string()), idem)
+        } else {
+            s.bank_boek_eenmaal(body.str_at("van").unwrap_or(""), body.str_at("naar").unwrap_or(""),
+                body.i64_at("centen").unwrap_or(0), body.str_at("soort").unwrap_or("boeking"),
+                body.str_at("oms").unwrap_or(""), body.str_at("ref").map(|x| x.to_string()), idem)
+        };
+        if r.status < 300 {
+            let tekst = s.snapshot().dump();
+            let revisie = s.revisie;
+            match duurzaam::schrijf_indien_nieuwer(&data_pad(), &tekst, revisie, ring, slot, stand) {
+              Ok(true) => s.vuil = false,
+              Ok(false) | Err(_) => {
+                *s = voor;
+                s.vuil = true;
+                return fout(503, "De economische boeking kon niet duurzaam worden bevestigd.");
+              }
+            }
+        }
+        return json_resp(r);
+    }
 
     // read-only endpoints met een body: alleen een read-lock
     match req.path.as_str() {

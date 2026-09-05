@@ -33,7 +33,7 @@ module.exports = function bronnen({ kern, regel, bron }, key, uit, stil) {
       const b = (d.boekingen || []).filter(x => x.status !== 'geannuleerd').map(x => regel('vlucht', {
         titel: (x.vlucht || {}).nummer, bestemming: (x.vlucht || {}).bestemming,
         van: (x.vlucht || {}).datum, tijd: (x.vlucht || {}).tijd,
-        status: x.status, kenmerk: x.code, herkomst: 'rtg',
+        status: x.status, kenmerk: x.id, herkomst: 'rtg',
         app: 'Vluchten', link: '/apps/vluchten.html'
       }));
       const c = (d.charters || []).filter(x => x.status !== 'geannuleerd').map(x => regel('charter', {

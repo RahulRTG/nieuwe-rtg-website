@@ -70,6 +70,7 @@ const tel = (v) => (Array.isArray(v) ? v.length : (v && typeof v === 'object' ? 
 
 module.exports = ({ db, save, crypto: crypt, register, merkVan }) => {
   const munt = crypt || crypto;
+  const PRODUCTIE = String(process.env.NODE_ENV || '') === 'production';
   function ruimte(code) {
     const w = db.data.werkruimtes || {};
     return Object.prototype.hasOwnProperty.call(w, String(code)) ? w[String(code)] : null;
@@ -157,16 +158,18 @@ module.exports = ({ db, save, crypto: crypt, register, merkVan }) => {
     const w = { code, naam: o.naam || kop.naam || 'Herstelde werkruimte',
       land: kop.land || 'NL', valuta: kop.valuta || 'EUR', taal: kop.taal || 'nl',
       moeder: null, kvk: kop.kvk || null, btwNummer: kop.btwNummer || null,
-      beheerToken: munt.randomBytes(24).toString('hex'), at: klokDatum().toISOString() };
+      beheerToken: PRODUCTIE ? null : munt.randomBytes(24).toString('hex'), at: klokDatum().toISOString() };
     for (const k of Object.keys(uitvoer.inhoud)) w[k] = JSON.parse(JSON.stringify(uitvoer.inhoud[k]));
 
     w.leden = w.leden || {};
     for (const l of Object.values(w.leden)) { l.token = null; }
     W[code] = w;
     save();
-    return { ok: true, werkruimte: code, beheerToken: w.beheerToken, catalogus: c.catalogus,
+    const antwoord = { ok: true, werkruimte: code, catalogus: c.catalogus,
       let: 'De leden zijn hersteld ZONDER sleutel: toegang teruggeven is een besluit en geen bijwerking van een herstel. ' +
         'De moederwerkruimte reist niet mee -- die verwijst naar een code die hier niet hoeft te bestaan.' };
+    if (!PRODUCTIE) antwoord.beheerToken = w.beheerToken;
+    return antwoord;
   }
 
   /* De leesbare vorm staat in een eigen bestand: hij is een OVERZICHT en geen

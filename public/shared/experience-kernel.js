@@ -3,6 +3,7 @@
 (function (w, d) {
   'use strict';
   if (w.RTGExperience) return;
+  if (d.body && d.body.getAttribute('data-rtg-experience') === 'off') return;
   var token = null;
   try { token = localStorage.getItem('rtg_member_token'); } catch (e) {}
   var world = d.body && d.body.getAttribute('data-rtg-world');
@@ -22,10 +23,7 @@
     if (tekst != null) e.textContent = tekst; return e;
   }
   function idem() {
-    if (w.RTGId) return w.RTGId('xp');
-    if (w.crypto && w.crypto.randomUUID) return 'xp-' + w.crypto.randomUUID();
-    var bytes = new Uint8Array(16); w.crypto.getRandomValues(bytes);
-    return 'xp-' + Array.from(bytes, function (b) { return b.toString(16).padStart(2, '0'); }).join('');
+    return w.RTGId('xp');
   }
 
   var state = { bootstrap: null, actionEvidence: null, dialog: null, trigger: null,

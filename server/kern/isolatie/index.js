@@ -49,7 +49,33 @@ module.exports = function maakIsolatie({ db, save, functies, klok, huisStand, be
   const opslag = maakOpslag({ db });
   const beschermstand = maakBeschermstand({ functies });
   const laag = maakBesluitlaag({ functies, beschermstand });
-  const ontsluiting = maakOntsluiting({ opslag, save, klok, ordening });
+  /* Een mislukte opslag mag niet alleen het ene verzoek laten falen. Vooral bij
+     een ontsluiting kan de geheugenstand dan al lager zijn dan de schijfstand.
+     Vanaf de eerste onzekere save wordt de hele laag daarom onleesbaar voor de
+     handhaver, die daar fail-closed op reageert. */
+  let opslagFout = null;
+  function eisZeker() {
+    if (!opslagFout) return;
+    const e = new Error('isolatie/opslag: duurzaamheid is onzeker na een mislukte schrijfactie');
+    e.cause = opslagFout; e.code = 'ISOLATIE_OPSLAG_ONZEKER'; throw e;
+  }
+  function bewaar() {
+    eisZeker();
+    if (!save) return;
+    try {
+      const uit = save();
+      /* Deze laag heeft een synchroon commitpunt nodig. Een Promise negeren zou
+         een latere afwijzing pas zien nadat de route al succes heeft gemeld. */
+      if (uit && typeof uit.then === 'function') {
+        throw new Error('isolatie/opslag: asynchrone save zonder commitbevestiging wordt niet vertrouwd');
+      }
+      return uit;
+    } catch (e) {
+      opslagFout = e;
+      throw e;
+    }
+  }
+  const ontsluiting = maakOntsluiting({ opslag, save: bewaar, klok, ordening });
   const nu = () => (klok && klok.datum ? klok.datum() : new Date());
   /* Lui: de meter roept besluit() aan, en die hangt aan de laag die hier nog
      wordt opgebouwd. Hem hier meteen bouwen zou een halve laag meegeven. */
@@ -76,12 +102,17 @@ module.exports = function maakIsolatie({ db, save, functies, klok, huisStand, be
   }
 
   function standVan(drager, sleutel) {
+    eisZeker();
     if (drager === 'huis') return huis();
     if (!EIGEN_DRAGERS.includes(drager)) return null;
     if (!sleutel) return null;
-    const kaart = opslag.tak(drager);
+    const kaart = opslag.leesTak(drager);
     const rij = kaart[String(sleutel)];
-    return rij ? rij.stand : null;
+    if (!rij) return null;
+    if (!rij || typeof rij !== 'object' || Array.isArray(rij) || !ordening.ontleed(rij.stand).bekend) {
+      throw new Error('isolatie/opslag: ongeldige standrij op ' + drager + '; weigeren om hem als normaal te lezen');
+    }
+    return rij.stand;
   }
 
   /* DE CONTEXT. De enige plek waar drager-kennis wordt samengesteld, zodat de
@@ -89,13 +120,41 @@ module.exports = function maakIsolatie({ db, save, functies, klok, huisStand, be
      is even belangrijk als wat er wel in staat: geen naam, geen adres, geen rol
      -- alleen sleutels en standen. */
   function context({ organisatie, identiteit, sessie, apparaat } = {}) {
+    eisZeker();
     const sleutels = { organisatie, identiteit, sessie, apparaat };
     const standen = { huis: huis() };
     for (const d of EIGEN_DRAGERS) standen[d] = standVan(d, sleutels[d]);
     return { standen, sleutels, opgesteld: nu().toISOString() };
   }
 
-  function besluit({ pad, methode, context: ctx }) { return laag.besluit({ pad, methode, context: ctx }); }
+  function besluit({ pad, methode, context: ctx }) {
+    eisZeker();
+    return laag.besluit({ pad, methode, context: ctx });
+  }
+
+  /* Volledige structurele keuring voor de productiestart. Ontbrekende takken
+     zijn een verse installatie en worden aangemaakt; BESTAANDE verkeerde
+     vormen of onbekende standen zijn onzekerheid en stoppen de start. */
+  function controleerOpslag() {
+    eisZeker();
+    opslag.wortel();
+    for (const d of EIGEN_DRAGERS) {
+      const kaart = opslag.tak(d);
+      for (const [sleutel, rij] of Object.entries(kaart)) {
+        if (!sleutel || !rij || typeof rij !== 'object' || Array.isArray(rij) ||
+            !ordening.ontleed(rij.stand).bekend) {
+          throw new Error('isolatie/opslag: ongeldige standrij in ' + d + '; de productiestart weigert');
+        }
+      }
+    }
+    for (const naam of ['ontsluitingen', 'spoor']) {
+      const lijst = opslag.tak(naam);
+      if (lijst.some(rij => !rij || typeof rij !== 'object' || Array.isArray(rij))) {
+        throw new Error('isolatie/opslag: ongeldige rij in ' + naam + '; de productiestart weigert');
+      }
+    }
+    return true;
+  }
 
   /* ---------- zetten ---------- */
 
@@ -108,18 +167,19 @@ module.exports = function maakIsolatie({ db, save, functies, klok, huisStand, be
   /* Het zetten en het aanvragen van een ontsluiting staan in ./zetten.js: dat is
      de handhaving en dit de bedrading. Zie daar waarom er geen andere weg naar
      beneden is dan een voltooide ceremonie. */
-  const { zet, vraagOntsluiting, voltooiOntsluiting } = require('./zetten')({ opslag, save, beveilig, nu, standVan,
+  const { zet, vraagOntsluiting, voltooiOntsluiting } = require('./zetten')({ opslag, save: bewaar, beveilig, nu, standVan,
     spoor, fout, EIGEN_DRAGERS, ontsluiting });
 
   /* De ceremonie van het HUIS staat in ./huisceremonie.js: het is het enige
      stuk van deze laag dat over een stand gaat die zij niet bezit. */
-  const huisdeel = require('./huisceremonie')({ ontsluiting, spoor, save, beveilig, fout });
+  const huisdeel = require('./huisceremonie')({ ontsluiting, spoor, save: bewaar, beveilig, fout });
 
   /* ---------- het overzicht ---------- */
   function overzicht() {
+    eisZeker();
     const perDrager = {};
     for (const d of EIGEN_DRAGERS) {
-      const kaart = opslag.tak(d);
+      const kaart = opslag.leesTak(d);
       const rijen = Object.entries(kaart);
       perDrager[d] = { aantal: rijen.length,
         perStand: rijen.reduce((a, [, v]) => { a[v.stand] = (a[v.stand] || 0) + 1; return a; }, {}) };
@@ -132,7 +192,7 @@ module.exports = function maakIsolatie({ db, save, functies, klok, huisStand, be
       dragersZonderBron: dragers.DRAGERS.filter(d => d.bron === null).map(d => ({ naam: d.naam, waarom: d.nietGebouwd })),
       perDrager,
       openOntsluitingen: ontsluiting.open(),
-      spoor: opslag.tak('spoor').slice(0, 50),
+      spoor: opslag.leesTak('spoor').slice(0, 50),
       /* WAT ER NOG WERKT, naast wat er dichtgaat. Wie besluit een klant dicht te
          zetten, hoort te zien wat die klant dat kost -- en de tellingen hierboven
          zeggen alleen hoeveel er weg is, wat het gevoel geeft dat meer beter is. */
@@ -145,7 +205,7 @@ module.exports = function maakIsolatie({ db, save, functies, klok, huisStand, be
     };
   }
 
-  const naarBuiten = { context, besluit, standVan, zet, vraagOntsluiting, voltooiOntsluiting,
+  const naarBuiten = { context, besluit, standVan, controleerOpslag, zet, vraagOntsluiting, voltooiOntsluiting,
     vraagHuisOntsluiting: huisdeel.vraagHuisOntsluiting,
     huisCeremoniePoort: huisdeel.huisCeremoniePoort,
     ontsluiting, overzicht, ordening, dragers, effecten, leesset, beschermstand,

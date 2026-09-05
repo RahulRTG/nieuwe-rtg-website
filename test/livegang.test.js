@@ -38,22 +38,21 @@ test.before(async () => {
        tijdens opstarten (exit 1)" -- de grendel werkte, en de toets die hem
        bewijst kwam er niet meer doorheen. */
     NODE_ENV: 'production', RTG_DEMO: '0', RTG_DATA_DIR: TMP,
+    APP_URL: 'https://livegang.voorbeeld.test/',
     SMTP_URL: 'smtp://rtg:test@mail.voorbeeld.test:587', OPENAI_API_KEY: 'test-ai-key',
+    ERR_WEBHOOK_URL: 'https://alarm.voorbeeld.test/rtg',
     RTG_ENC_KEY: 'k'.repeat(64), RTG_OWNER_EMAIL: 'eigenaar@echtdomein.nl',
     OFFICE_CODE: 'GEHEIME-CODE-123', OFFICE_TOTP_SECRET: 'JBSWY3DPEHPK3PXP',
     // sinds de sleutel-hardening (config fail-fast) eist een productiestart de
     // gedeelde kluis- en tokensleutel; zonder deze weigert de server te starten.
     RTG_VAULT_KEY: 'v'.repeat(64), RTG_SECRET_KEY: 's'.repeat(64),
-    /* En sinds de betaal-ronde eist productie ook een STRIPE_SECRET_KEY. Reden:
-       zonder sleutel draait de demo-provider, en die bevestigt ELKE betaling
-       zelf -- facturen gaan op 'paid' zonder afschrijving terwijl de
-       30%-afdracht aan de RTFoundation wel geboekt wordt. Geld eruit, niets
-       erin. Deze test gaat niet over betalen maar over de livegang-grendels,
-       dus een testsleutel volstaat; STRIPE_DEMO_BEWUST=1 zou hier ook mogen,
-       maar dan zou de test de demo-provider meenemen in "productie start
-       schoon" en dat is precies niet wat hij wil aantonen. */
-    STRIPE_SECRET_KEY: 'sk_test_livegang', STRIPE_WEBHOOK_SECRET: 'whsec_livegang',
-    STRIPE_UITGAAND_UIT_BEWUST: '1', RTG_HERSTEL_SMS_UIT_BEWUST: '1'
+    RTG_ISOLATIE_AFDWINGEN: '1',
+    /* Deze toets bewijst de schone productiestart, toegang en limiter, niet de
+       providerketen. Geld staat daarom expliciet fail-closed uit. De aparte
+       go-live- en geldproeven eisen voor READY juist een echte provider,
+       duurzame motor en settlement; een testsleutel hier zou dat onderscheid
+       vertroebelen. */
+    RTG_BETALEN_UIT: '1', RTG_HERSTEL_SMS_UIT_BEWUST: '1'
   } }));
 });
 test.after(() => {

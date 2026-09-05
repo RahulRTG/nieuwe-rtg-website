@@ -41,6 +41,10 @@ module.exports = ({ app, officeAuth, rtfos, veilig, H }) => {
   app.post('/api/rtfos/portaal/donateur/bewijs', ipRem, codeRem, (req, res) =>
     veilig(res, () => rtfos.donateur.bewijs(codeVan(req), (req.body || {}).giftId)));
   // de kantoorkant: de code uitgeven en de periodieke overeenkomst vastleggen
-  app.post('/api/rtfos/donateur/code', officeAuth, H((req, b) => rtfos.donateur.codeVoor(req, b.bronId)));
+  app.post('/api/rtfos/donateur/code', officeAuth, H((req, b) => rtfos.donateur.codeVoor(req, b.bronId, b)));
+  app.post('/api/rtfos/donateur/code/intrekken', officeAuth,
+    H((req, b) => rtfos.donateur.codeIntrekken(req, b.bronId, b.reden)));
+  app.post('/api/rtfos/donateur/code/roteren', officeAuth,
+    H((req, b) => rtfos.donateur.codeRoteren(req, b.bronId, b)));
   app.post('/api/rtfos/donateur/periodiek', officeAuth, H((req, b) => rtfos.donateur.periodiekVast(req, b.bronId, b)));
 };

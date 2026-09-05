@@ -35,7 +35,7 @@ test('1. een verse database komt op de hoogste versie en heeft alle tabellen', (
   assert.equal(r.stand, migraties.hoogsteBekend());
   assert.equal(r.gedraaid.length, MIGRATIES.length);
   const t = tabellen(db);
-  for (const naam of ['users', 'ingetrokken_tokens', 'supplier_staff', 'sso_koppelingen',
+  for (const naam of ['users', 'ingetrokken_tokens', 'intrekking_outbox', 'supplier_staff', 'sso_koppelingen',
     'sso_identiteiten', 'scim_sleutels', 'schema_versie'])
     assert.ok(t.includes(naam), 'tabel ontbreekt: ' + naam);
   assert.ok(kolommen(db, 'users').includes('actief'), 'migratie 4 heeft gedraaid');
@@ -150,5 +150,21 @@ test('8. een BESTAANDE database van voor deze laag migreert zonder gegevensverli
   assert.equal(lid.tier, 'business', 'met zijn pas');
   assert.equal(lid.codename, 'Zilveren Valk AB', 'en zijn codenaam');
   assert.equal(lid.actief, 1, 'en de nieuwe kolom staat standaard op actief');
+  db.close();
+});
+
+test('9. per zaak kan een RTG-lid maar één actief personeelsaccount hebben', () => {
+  const db = verseDb();
+  migraties.draai(db);
+  const zet = db.prepare(`INSERT INTO supplier_staff
+    (supplier_code, name, pin_hash, role, active, created_at, member_id)
+    VALUES (?, ?, ?, ?, ?, ?, ?)`);
+  zet.run('ZAAK', 'Eerste', 'hash', 'staff', 1, new Date().toISOString(), 42);
+  assert.throws(() => zet.run('ZAAK', 'Tweede', 'hash', 'staff', 1,
+    new Date().toISOString(), 42), /UNIQUE/,
+  'ook twee gelijktijdige claims eindigen op de unieke databasegrens');
+  db.prepare('UPDATE supplier_staff SET active = 0 WHERE member_id = 42').run();
+  assert.doesNotThrow(() => zet.run('ZAAK', 'Opnieuw in dienst', 'hash', 'staff', 1,
+    new Date().toISOString(), 42), 'na echte deactivering mag een nieuwe koppeling bestaan');
   db.close();
 });

@@ -1,18 +1,11 @@
-/* Supplier-werving (deelmodule): het personeel zelf: toevoegen, verwijderen,
-   uitnodigen met een kassacode, PIN-reset en het aanmelden met een eigen
-   RTG-account. Gemount vanuit routes/supplier/werving.js op de gedeelde kern. */
+/* Supplier-werving: teambeheer, uitnodigingen en aanmelden met een RTG-account. */
 module.exports = (wctx) => {
   const { kern } = wctx;
-  // alleen wat deze wervingsmodule echt gebruikt (de rest van de gedeelde kern
-  // hoort hier niet thuis; opgeruimd om dode destructuring te vermijden)
   const { DEMO, accounts, app, logActivity, loginFails, noteFailedTry,
-    notifySupplier, save, schoon, supplierAuth, tooManyTries, werkmail } = kern;
-  /* De uitnodiging zelf -- maken, terugvinden, en er iemand mee verbinden --
-     staat in ./uitnodiging.js. Hier staan de routes eromheen. */
+    notifySupplier, schoon, supplierAuth, tooManyTries, werkmail } = kern;
   const uitnodiging = require('./uitnodiging')({ kern });
-  const { invitesVan, findSupplierByName, maakInvite, wervingsLink, verbindLid } = uitnodiging;
-  // eigen sleutelruimte, net als kassaIdem en dpIdem; zie server/lib/idem.js
-  const metIdem = require('../../../lib/idem')({ d: () => kern.db.data, save, naam: 'wervingIdem', bijeen: kern.db.bijeen });
+  const { findSupplierByName, maakInvite, wervingsBasis, wervingsLink, verbindCode,
+    lijstInvites, trekInviteIn, roteerInvite } = uitnodiging;
 app.post('/api/supplier/staff/add', supplierAuth, async (req, res) => {
   if (!req.actor.manager) return res.status(403).json({ error: 'Alleen een manager kan personeel toevoegen.' });
   // Nieuw personeel gaat via een uitnodiging (kassacode) en een eigen RTG-account;
@@ -31,52 +24,68 @@ app.post('/api/supplier/staff/remove', supplierAuth, (req, res) => {
   const st = accounts.getStaffById(Number(req.body.staffId));
   if (st && String(st.supplier_code).toUpperCase() === req.supplier.code) {
     accounts.deactivateStaff(st.id);
-    /* Uit dienst is ook meteen uit de persoonlijke mailbox. Niet wachten tot
-       de volgende overzichtsaanvraag: een nog open personeelsessie mag na dit
-       besluit geen post meer lezen of versturen. */
+    // Uit dienst trekt ook de persoonlijke werkmail meteen in.
     if (werkmail && werkmail.trekPersoneelIn) werkmail.trekPersoneelIn(req.supplier.code, st.id);
     logActivity(req.supplier.code, req.actor, req.actor.name + ' verwijderde ' + st.name + ' uit het team');
   }
   res.json({ ok: true, staff: accounts.listStaff(req.supplier.code).map(accounts.publicStaff) });
 });
 
-// Manager nodigt een medewerker uit: geeft een eenmalige kassacode terug.
-/* EEN VERGETEN TWEEDE CODE IS EEN OPEN DEUR NAAR PERSONEELSTOEGANG, en dat
-   weegt zwaarder dan bij een gewone creatie-route (TAKEN.md 4.61). Twee keer
-   klikken gaf twee geldige kassacodes voor dezelfde persoon; de manager moest er
-   dan zelf een intrekken en zag de tweede meestal niet. Dezelfde sleutel geeft
-   nu dezelfde uitnodiging terug. Een VERSE sleutel is wel een echte tweede
-   uitnodiging -- twee mensen met dezelfde voornaam mag gewoon. */
+// Idempotent uitnodigen: alleen een verse sleutel mag een tweede code maken.
 app.post('/api/supplier/staff/invite', supplierAuth, async (req, res) => {
   if (!req.actor.manager) return res.status(403).json({ error: 'Alleen een manager kan medewerkers uitnodigen.' });
+  if (!wervingsBasis().ok)
+    return res.status(503).json({ error: 'Personeelsuitnodigingen zijn tijdelijk niet veilig geconfigureerd.' });
   const naam = schoon(req.body.name, 60), role = req.body.role, func = String(req.body.func || '').slice(0, 40);
-  const sleutel = req.body.idem ? 'inv:' + req.supplier.code + ':' + String(req.body.idem).slice(0, 60) : null;
-  const r = await metIdem(sleutel, 'inv|' + req.supplier.code + '|' + naam + '|' + role, () => {
-    const inv = maakInvite(req.supplier, req.actor, { naam, role, func });
-    return { ok: true, invite: { kassacode: inv.kassacode, naam: inv.naam, role: inv.role, func: inv.func, expires: inv.expires },
-      link: wervingsLink(req, inv.kassacode), bedrijf: req.supplier.name };
-  });
+  const ontvangenSleutel = req.body.idem || (req.get && req.get('Idempotency-Key'));
+  const sleutel = ontvangenSleutel
+    ? 'inv:' + req.supplier.code + ':' + String(ontvangenSleutel).slice(0, 100) : null;
+  let inv;
+  try { inv = await Promise.resolve(maakInvite(req.supplier, req.actor, { naam, role, func, idem: sleutel })); }
+  catch (e) { console.error('[staff-invite] veilige verwerking mislukt'); return res.status(503).json({ error: 'De uitnodiging kon niet veilig worden opgeslagen.' }); }
+  const r = inv && inv.ok ? { ok: true, invite: { id: inv.id, kassacode: inv.kassacode,
+    naam: inv.naam, role: inv.role, func: inv.func, expires: inv.expires, toegang: inv.toegang },
+    link: wervingsLink(req, inv.kassacode), bedrijf: req.supplier.name } : inv;
   if (r && r.error) return res.status(r.status || 409).json({ error: r.error });
   res.json(r);
 });
 
 // Manager trekt een open uitnodiging in (kassacode wordt onbruikbaar).
-app.post('/api/supplier/staff/invite/intrek', supplierAuth, (req, res) => {
+app.post('/api/supplier/staff/invite/intrek', supplierAuth, async (req, res) => {
   if (!req.actor.manager) return res.status(403).json({ error: 'Alleen een manager kan uitnodigingen intrekken.' });
-  const kassacode = String(req.body.kassacode || '').trim().toUpperCase();
-  const lijst = invitesVan(req.supplier.code);
-  const idx = lijst.findIndex(i => i.kassacode === kassacode && !i.used);
-  if (idx < 0) return res.status(404).json({ error: 'Deze uitnodiging bestaat niet (meer).' });
-  lijst.splice(idx, 1);
-  save();
+  let r;
+  try { r = await Promise.resolve(trekInviteIn(req.supplier.code, req.body.id, req.actor.name, req.body.reden)); }
+  catch (e) { console.error('[staff-invite] veilige verwerking mislukt'); return res.status(503).json({ error: 'De uitnodiging kon niet veilig worden ingetrokken.' }); }
+  if (!r || r.error) return res.status(r && r.status || 404).json(r || { error: 'Deze uitnodiging bestaat niet.' });
+  const staff = r.claimStaffId != null && accounts.getStaffByIdAny
+    ? accounts.getStaffByIdAny(r.claimStaffId)
+    : (r.claimMemberId != null ? accounts.staffByMember(req.supplier.code, r.claimMemberId) : null);
+  if (staff && String(staff.supplier_code || '').toUpperCase() === req.supplier.code)
+    accounts.deactivateStaff(staff.id);
   logActivity(req.supplier.code, req.actor, req.actor.name + ' trok een uitnodiging in');
   res.json({ ok: true });
+});
+
+app.post('/api/supplier/staff/invite/roteer', supplierAuth, async (req, res) => {
+  if (!req.actor.manager) return res.status(403).json({ error: 'Alleen een manager kan uitnodigingen roteren.' });
+  if (!wervingsBasis().ok)
+    return res.status(503).json({ error: 'Personeelsuitnodigingen zijn tijdelijk niet veilig geconfigureerd.' });
+  let inv;
+  const idem = String((req.body.idem || (req.get && req.get('Idempotency-Key'))) || '').slice(0, 200);
+  try { inv = await Promise.resolve(roteerInvite(req.supplier.code, req.body.id, req.actor.name, idem)); }
+  catch (e) { console.error('[staff-invite] veilige verwerking mislukt'); return res.status(503).json({ error: 'De uitnodiging kon niet veilig worden geroteerd.' }); }
+  if (!inv || inv.error) return res.status(inv && inv.status || 409).json(inv || { error: 'Rotatie mislukt.' });
+  res.json({ ok: true, invite: { id: inv.id, kassacode: inv.kassacode, naam: inv.naam,
+    role: inv.role, func: inv.func, expires: inv.expires, toegang: inv.toegang },
+    link: wervingsLink(req, inv.kassacode), bedrijf: req.supplier.name });
 });
 
 // Manager reset de code van een collega (vergeten of misbruik): nieuwe pincode,
 // eenmalig getoond, om door te geven.
 app.post('/api/supplier/staff/reset-pin', supplierAuth, async (req, res) => {
   if (!req.actor.manager) return res.status(403).json({ error: 'Alleen een manager kan codes resetten.' });
+  if (!accounts.legacyStaffPinToegestaan || !accounts.legacyStaffPinToegestaan())
+    return res.status(403).json({ error: 'Personeel gebruikt het persoonlijke RTG-account; er is geen personeelspin om te resetten.' });
   const st = accounts.getStaffById(Number(req.body.staffId));
   if (!st || String(st.supplier_code).toUpperCase() !== req.supplier.code)
     return res.status(404).json({ error: 'Dit teamlid kennen we niet.' });
@@ -87,13 +96,14 @@ app.post('/api/supplier/staff/reset-pin', supplierAuth, async (req, res) => {
   res.json({ ok: true, staff: accounts.publicStaff(st), pin });
 });
 
-// Manager ziet de open uitnodigingen (om een kassacode opnieuw te tonen).
-app.post('/api/supplier/staff/invites', supplierAuth, (req, res) => {
+// Manager ziet alleen lifecycle/status van open uitnodigingen. De kale code
+// wordt na uitgifte nooit opnieuw getoond; daarvoor bestaat expliciete rotatie.
+app.post('/api/supplier/staff/invites', supplierAuth, async (req, res) => {
   if (!req.actor.manager) return res.status(403).json({ error: 'Alleen een manager ziet de uitnodigingen.' });
-  const nu = Date.now();
-  const lijst = (invitesVan(req.supplier.code)).filter(i => !i.used && i.expires > nu)
-    .map(i => ({ kassacode: i.kassacode, naam: i.naam, role: i.role, func: i.func, expires: i.expires }));
-  res.json({ ok: true, invites: lijst, bedrijf: req.supplier.name });
+  try {
+    const r = await Promise.resolve(lijstInvites(req.supplier.code));
+    res.json({ ok: true, invites: r.invites, bedrijf: req.supplier.name });
+  } catch (e) { console.error('[staff-invite] veilige verwerking mislukt'); res.status(503).json({ error: 'De uitnodigingen konden niet veilig worden gelezen.' }); }
 });
 
 // De medewerker meldt zich aan: bedrijfsnaam + kassacode + eigen RTG-inlog.
@@ -102,35 +112,31 @@ app.post('/api/supplier/staff/join', async (req, res) => {
   if (tooManyTries(res, bucket)) return;
   const bedrijf = String(req.body.bedrijf || '').trim();
   const kassacode = String(req.body.kassacode || '').trim().toUpperCase();
-  /* Een pincode hoeft niet meer: wie zich met zijn eigen RTG-account aanmeldt,
-     logt daarna gewoon in op dat account en heeft zijn werk-app meteen (zie
-     kern/werkbijlogin.js). De pincode bestaat alleen nog voor de losse
-     personeelslogin op een gedeeld apparaat, dus kiest iemand er zelf geen, dan
-     maken we er een en hoeft hij er nooit aan te denken. */
-  const gekozen = String(req.body.pin || '').trim();
+  const legacyPin = !!(accounts.legacyStaffPinToegestaan && accounts.legacyStaffPinToegestaan());
+  const gekozen = legacyPin ? String(req.body.pin || '').trim() : '';
   if (!bedrijf || !kassacode) { noteFailedTry(bucket, req.ip); return res.status(400).json({ error: 'Vul de bedrijfsnaam en de kassacode in.' }); }
   if (gekozen && !/^\d{4}$/.test(gekozen)) return res.status(400).json({ error: 'Een pincode is vier cijfers; laat hem leeg als u er geen wilt.' });
-  const pin = gekozen || accounts.makePin();
+  const pin = legacyPin ? (gekozen || accounts.makePin()) : null;
   // 1) bewijs dat u een eigen RTG-account hebt (een betaalde pas is niet nodig)
   const lid = accounts.findByLogin(req.body.login);
-  if (!lid || !(await accounts.verifyPassword(String(req.body.password || ''), lid.password_hash))) {
+  if (!lid || (accounts.isActief && !accounts.isActief(lid)) ||
+      !(await accounts.verifyPassword(String(req.body.password || ''), lid.password_hash))) {
     noteFailedTry(bucket, req.ip);
     return res.status(401).json({ error: 'Onjuiste RTG-inloggegevens. Meld u aan met uw eigen RTG-account.' });
   }
   // 2) het bedrijf moet bestaan en de kassacode moet erbij horen (eenmalig)
   const s = findSupplierByName(bedrijf);
   if (!s) { noteFailedTry(bucket, req.ip); return res.status(404).json({ error: 'We kennen geen bedrijf met die naam. Controleer de bedrijfsnaam bij uw werkgever.' }); }
-  const lijst = invitesVan(s.code);
-  const inv = lijst.find(i => i.kassacode === kassacode && !i.used && i.expires > Date.now());
-  if (!inv) { noteFailedTry(bucket, req.ip); return res.status(403).json({ error: 'Deze kassacode klopt niet, is al gebruikt of verlopen. Vraag uw werkgever om een nieuwe uitnodiging.' }); }
   // 3) niet dubbel aanmelden bij hetzelfde bedrijf
   if (accounts.staffByMember(s.code, lid.id)) {
-    inv.used = true; save();
-    return res.status(409).json({ error: 'U bent al aangemeld bij dit bedrijf. Log in met uw naam en pincode.' });
+    return res.status(409).json({ error: 'U bent al aangemeld bij dit bedrijf. Log in met uw persoonlijke RTG-account.' });
   }
   loginFails.delete(bucket);
-  const { staff, naam } = await verbindLid(s, inv, lid, { pin });
-  res.json({ ok: true, code: s.code, staffId: staff.id, name: naam, role: inv.role });
+  let v;
+  try { v = await verbindCode(lid, kassacode, legacyPin ? { pin } : {}, s.code); }
+  catch (e) { console.error('[staff-join] veilige verwerking mislukt'); return res.status(503).json({ error: 'De aanmelding kon niet veilig worden voltooid. Probeer opnieuw.' }); }
+  if (!v || v.error) { noteFailedTry(bucket, req.ip); return res.status(v && v.status || 403).json(v || { error: 'Ongeldige uitnodiging.' }); }
+  res.json({ ok: true, code: s.code, staffId: v.staff.id, name: v.naam, role: v.invite.role });
 });
 
   // de sollicitatiestroom gebruikt dezelfde uitnodiging-helpers

@@ -137,7 +137,9 @@ module.exports = (kern) => {
          iemand zijn volgende poging bijstelt. */
       log.warn('saml.acs geweigerd', { org: verzoek.org, fout: e.message });
       if (typeof logInlog === 'function') logInlog('sso', false, verzoek.org, req);
-      res.status(401).json({ error: 'Inloggen via uw organisatie is niet gelukt.' });
+      const fout = binnenkomst.foutAntwoord(e);
+      if (fout.retryAfter) res.set('retry-after', fout.retryAfter);
+      res.status(fout.status).json({ error: fout.bericht });
     }
   });
 

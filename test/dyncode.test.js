@@ -12,6 +12,11 @@ function maakModule() {
   return require('../server/kern/dyncode')({ crypto, dataDir: dir });
 }
 
+function maakGedeeld(geheim) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-dyncode-shared-'));
+  return require('../server/kern/dyncode')({ crypto, dataDir: dir, sharedSecret: geheim });
+}
+
 test('een verse code round-trip: soort en code komen terug', () => {
   const dc = maakModule();
   const c = dc.maak({ soort: 'kas', code: 'A1B2C3', ttlMs: 5000 });
@@ -42,6 +47,16 @@ test('een code van een ANDERE sleutel (andere node) wordt geweigerd', () => {
   const a = maakModule(), b = maakModule();     // twee losse sleutels
   const c = a.maak({ soort: 'kas', code: 'X', ttlMs: 5000 });
   assert.equal(b.lees(c.token).ok, false, 'alleen de eigen node verifieert de eigen code');
+});
+
+test('productie-instanties verifieren met hetzelfde domeingescheiden geheim', () => {
+  const geheim = 's'.repeat(64);
+  const a = maakGedeeld(geheim), b = maakGedeeld(geheim);
+  const c = a.maak({ soort: 'contact', code: 'X', ttlMs: 5000 });
+  assert.equal(b.lees(c.token).ok, true,
+    'een load balancer mag een levende code naar een andere instance sturen');
+  assert.equal(maakGedeeld('t'.repeat(64)).lees(c.token).ok, false,
+    'een andere omgeving kan de code niet verifieren');
 });
 
 test('een verlopen code wordt geweigerd (dynamisch)', () => {

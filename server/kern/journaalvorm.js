@@ -11,6 +11,11 @@
    en staat er bovendien geen id in het journaal dat naar een persoon leidt. */
 function padVorm(p) {
   return String(p || '')
+    /* Oude wervingslinks droegen de zes-teken-bearer in het pad. Nieuwe links
+       gebruiken uitsluitend een browserfragment, maar een oude bookmark mag
+       ook bij een omleiding nooit alsnog in verzoek-, fout- of journaallogs
+       belanden. Deze specifieke vorm moet vóór de generieke id-regels. */
+    .replace(/^\/werken\/[^/]+(?=\/|$)/i, '/werken/:code')
     .replace(/\/[0-9a-f]{16,}/gi, '/:sleutel')
     .replace(/\/\d+/g, '/:id')
     .slice(0, 120);

@@ -254,8 +254,8 @@
         const d = await call('/office/partner/decide', { id: b.dataset.paok, action: 'goedkeuren' });
         const box = $('#paResult');
         box.style.display = 'block';
-        box.innerHTML = '✓ '+T('bo.pa.done','Goedgekeurd. Geef dit eenmalig door (staat ook in de welkomstmail):')+
-          '<br><b>'+T('bo.pa.code','Leverancierscode')+': '+d.code+'</b> · <b>'+T('bo.pa.pin','Manager-PIN')+': '+d.pin+'</b>';
+        box.innerHTML = '✓ '+T('bo.pa.done','Goedgekeurd. De eigenaar opent de werkplek met het persoonlijke RTG-account.')+
+          '<br><b>'+T('bo.pa.code','Leverancierscode')+': '+d.code+'</b>';
         await refresh();
       } catch(e){ alert(e.message); }
     }));

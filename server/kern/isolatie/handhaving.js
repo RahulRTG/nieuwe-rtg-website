@@ -61,4 +61,9 @@ function stand() {
   };
 }
 
-module.exports = { meldHandhaver, stand };
+/* Alleen de eigenaar van de late binding gebruikt dit bij een echte ontkoppeling
+   en in een verse toets. Zonder deze helft bleef het register na zetLaag(null)
+   ten onrechte "gemonteerd" melden. */
+function wisHandhaver() { gemeld = null; }
+
+module.exports = { meldHandhaver, wisHandhaver, stand };

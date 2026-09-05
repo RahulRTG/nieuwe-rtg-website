@@ -11,6 +11,7 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 const { leesEnv, bouwOmgeving } = require('../scripts/docker/start');
 const { valideer } = require('../server/config');
+const { bereidVoor } = require('../scripts/motor-initialisatie');
 
 const ROOT = path.join(__dirname, '..');
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-selfhost-'));
@@ -43,7 +44,10 @@ function veiligeBasis(extra) {
     RTG_SECRET_KEY: 's'.repeat(64), RTG_OWNER_EMAIL: 'eigenaar@voorbeeld.test',
     OFFICE_CODE: 'KANTOOR-CODE-12', OFFICE_TOTP_SECRET: 'JBSWY3DPEHPK3PXP',
     DATABASE_URL: 'postgresql://rtg:test@postgres/rtg',
-    REDIS_URL: 'redis://redis:6379', RTG_PRIVATE_BETA: '1', RTG_BETALEN_UIT: '1'
+    REDIS_URL: 'redis://redis:6379', RTG_PRIVATE_BETA: '1', RTG_BETALEN_UIT: '1',
+    RTG_ISOLATIE_AFDWINGEN: '1', RTG_MEDIA_BACKEND: 's3',
+    RTG_MEDIA_S3_BUCKET: 'rtg-private-beta-media', RTG_MEDIA_S3_KEY: 'test-sleutel',
+    RTG_MEDIA_S3_SECRET: 'test-geheim'
   }, extra || {});
 }
 
@@ -60,24 +64,41 @@ test('private beta is alleen op localhost, .local of een privaat LAN-adres toege
 test('selfhost:init maakt alle Docker-geheimen en overschrijft ze niet stil', () => {
   const envPad = path.join(TMP, '.env.productie');
   const pgPad = path.join(TMP, '.rtg-secrets', 'postgres_password');
+  const motorSleutelPad = path.join(TMP, '.rtg-secrets', 'motor_state_key');
   const args = ['scripts/sleutels.js', '--docker', '--prive-beta', '--schrijf',
-    '--eigenaar=eigenaar@voorbeeld.test', '--doel=' + envPad, '--postgres-doel=' + pgPad];
+    '--eigenaar=eigenaar@voorbeeld.test', '--doel=' + envPad, '--postgres-doel=' + pgPad,
+    '--motor-sleutel-doel=' + motorSleutelPad];
   const eerste = spawnSync(process.execPath, args, { cwd: ROOT, encoding: 'utf8' });
   assert.equal(eerste.status, 0, eerste.stderr);
+  const init = bereidVoor({ envPad, sleutelPad: motorSleutelPad,
+    randomBytes: () => Buffer.alloc(16, 0x42) });
   const envEerst = fs.readFileSync(envPad, 'utf8');
   const pgEerst = fs.readFileSync(pgPad, 'utf8');
+  const motorSleutelEerst = fs.readFileSync(motorSleutelPad, 'utf8');
   assert.match(envEerst, /RTG_PRIVATE_BETA=1/);
   assert.match(envEerst, /RTG_BETALEN_UIT=1/,
     'een private bouwversie gebruikt geen fictieve betaalprovider');
+  assert.match(envEerst, /RTG_ISOLATIE_AFDWINGEN=1/,
+    'ook een productie-beta mag een persoonlijke isolatiestand niet veinzen');
   assert.match(envEerst, /RTG_MOTOR_TOKEN=[a-f0-9]{64}/);
+  assert.match(envEerst, /^RTG_MOTOR_STATE_KEY_FILE=\/run\/secrets\/rtg-motor-state-key$/m);
+  assert.match(motorSleutelEerst, /^k-[a-f0-9]{16}:[a-f0-9]{64}\n$/);
   assert.doesNotMatch(envEerst, /VUL-IN/);
   assert.equal(fs.statSync(envPad).mode & 0o777, 0o600);
   assert.equal(fs.statSync(pgPad).mode & 0o777, 0o600);
+  assert.equal(fs.statSync(motorSleutelPad).mode & 0o777, 0o600);
 
   const tweede = spawnSync(process.execPath, args, { cwd: ROOT, encoding: 'utf8' });
   assert.notEqual(tweede.status, 0, 'bestaande geheimen horen de tweede run te blokkeren');
   assert.equal(fs.readFileSync(envPad, 'utf8'), envEerst);
   assert.equal(fs.readFileSync(pgPad, 'utf8'), pgEerst);
+  assert.equal(fs.readFileSync(motorSleutelPad, 'utf8'), motorSleutelEerst);
+
+  const bewust = spawnSync(process.execPath, [...args, '--force'], { cwd: ROOT, encoding: 'utf8' });
+  assert.equal(bewust.status, 0, bewust.stderr);
+  assert.match(fs.readFileSync(envPad, 'utf8'), new RegExp('^RTG_MOTOR_EXPECT_GENESIS=' + init.genesisId + '$', 'm'));
+  assert.equal(fs.readFileSync(pgPad, 'utf8'), pgEerst, '--force roteert PostgreSQL niet');
+  assert.equal(fs.readFileSync(motorSleutelPad, 'utf8'), motorSleutelEerst, '--force roteert de snapshot niet');
 });
 
 test('Compose sluit de data-laag af en geeft geheimen niet als environment door', () => {
@@ -97,10 +118,14 @@ test('Compose sluit de data-laag af en geeft geheimen niet als environment door'
   assert.equal((compose.match(/^secrets:/gm) || []).length, 1,
     'Compose heeft exact één top-level geheimenregister');
   assert.match(compose, /sentinel_token:\n\s+file: \$\{RTG_SENTINEL_TOKEN_FILE:-\.sentinel-token\}/);
+  assert.match(compose, /motor_state_key:\n\s+file: \$\{RTG_MOTOR_STATE_KEY_SECRET_FILE:-\.rtg-secrets\/motor_state_key\}/);
+  assert.match(compose, /source: motor_state_key\n\s+target: rtg-motor-state-key/);
   assert.doesNotMatch(compose, /^\s+RTG_VAULT_KEY:/m);
   assert.doesNotMatch(compose, /POSTGRES_PASSWORD:\s*\$\{/);
   assert.match(compose, /service_healthy/);
-  assert.match(compose, /scripts\/docker\/backup\.sh/);
+  assert.match(compose, /entrypoint: \["\/bin\/sh", "\/usr\/local\/bin\/rtg-backup"\]/);
+  assert.doesNotMatch(compose, /scripts\/docker\/backup\.sh:/,
+    'een hostscript mag de getekende backupimage niet overschrijven');
   assert.match(compose, /clamav\/clamav:1\.5\.3-debian13-slim/);
   assert.match(compose, /RTG_CLAMD_HOST: clamav/);
   assert.doesNotMatch(compose, /^\s+ports:\s*\n(?:.|\n){0,120}3310/m,

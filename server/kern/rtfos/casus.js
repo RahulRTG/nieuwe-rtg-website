@@ -64,6 +64,7 @@ module.exports = (ctx) => {
     toestemming: c.toestemming ? { at: c.toestemming.at, door: c.toestemming.door, tekst: c.toestemming.tekst } : null,
     ingetrokken: c.ingetrokken ? { at: c.ingetrokken.at, reden: c.ingetrokken.reden } : null,
     partnerId: c.partnerId || null, projectId: c.projectId || null,
+    heeftPersoonscode: !!c.persoonscode_id,
     stappen: (c.stappen || []).slice(0, 40), bewaarTot: c.bewaarTot || null, at: c.at });
 
   function lijst(req, stadId, filter) {
@@ -93,9 +94,8 @@ module.exports = (ctx) => {
     if (S().casussen.length >= 200000) return { status: 400, error: 'Het casusregister zit vol.' };
     const contact = schoon(b.contact, 200);
     const c = { id: rid(), stad: g.stad.id, codenaam: codenaam(), soort, urgentie: urg, vraag,
-      // de eigen ingang van de hulpvrager (deelnemerportaal.js): de stand van
-      // ZIJN vraag, en de knop om zijn toestemming in te trekken
-      code: ctx.code('RTFD'),
+      // De eigen ingang wordt apart en bevoegd uitgegeven; een nieuw dossier
+      // krijgt niet alvast een onbeperkte plain code.
       wijk: schoon(b.wijk, 60), status: 'ontvangen', toestemming: null, partnerId: null,
       projectId: null, stappen: [], bewaarTot: null,
       // Het enige veld met herleidbare gegevens, en het gaat versleuteld de db in.

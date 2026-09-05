@@ -38,7 +38,7 @@ module.exports = (ctx) => {
       if (b.key !== key || b.status === 'geannuleerd') continue;
       const v = (lucht.vluchten || []).find(x => x.id === b.vluchtId);
       if (!v || v.status === 'geannuleerd' || v.soort !== 'vertrek' || !v.datum || v.datum < van) continue;
-      items.push({ soort: 'vlucht', datum: v.datum, tijd: v.tijd || '', titel: 'Vlucht ' + v.nummer + ' naar ' + v.bestemming, status: b.status, ref: b.code });
+      items.push({ soort: 'vlucht', datum: v.datum, tijd: v.tijd || '', titel: 'Vlucht ' + v.nummer + ' naar ' + v.bestemming, status: b.status, ref: b.id });
     }
     for (const v of db.data.verblijven || []) {
       if (v.customerKey !== key || !['aangevraagd', 'bevestigd', 'ingecheckt'].includes(v.status) || !v.aankomst || v.aankomst < van) continue;

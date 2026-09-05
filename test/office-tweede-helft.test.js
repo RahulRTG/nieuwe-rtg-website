@@ -42,7 +42,7 @@ function post(pad, body, token) {
 function haal(pad) { return fetch(base + pad).then(async r => ({ status: r.status, tekst: await r.text().catch(() => '') })); }
 
 let kantoor, lid, lidId, eigenaar;
-const ko = (pad, body) => post('/api/office/' + pad, body, kantoor);
+const ko = (pad, body) => post(pad.startsWith('/api/') ? pad : '/api/office/' + pad, body, kantoor);
 const br = (pad, body) => post('/api/office/' + pad, body, eigenaar);
 
 test.before(async () => {
@@ -225,16 +225,16 @@ test('6. de concierge-inbox: lezen, antwoorden en een seintje', async () => {
   assert.ok(Array.isArray(inbox.body.conversations), 'de inbox is een lijst, ook als hij leeg is');
 
   // antwoorden vraagt een bestaand account en echte tekst
-  assert.equal((await ko('reply', { userId: 999999999, text: 'Hallo' })).status, 404);
-  assert.equal((await ko('reply', { userId: lidId, text: '   ' })).status, 400, 'een leeg bericht gaat niet de deur uit');
-  const antwoord = await ko('reply', { userId: lidId, text: 'Wij kijken er vandaag nog naar.' });
+  assert.equal((await ko('/api/office/reply', { userId: 999999999, text: 'Hallo' })).status, 404);
+  assert.equal((await ko('/api/office/reply', { userId: lidId, text: '   ' })).status, 400, 'een leeg bericht gaat niet de deur uit');
+  const antwoord = await ko('/api/office/reply', { userId: lidId, text: 'Wij kijken er vandaag nog naar.' });
   assert.equal(antwoord.status, 200, 'de concierge kan wel echt antwoorden');
 
-  const briefing = await ko('briefing', {});
+  const briefing = await ko('/api/office/briefing', {});
   assert.equal(briefing.status, 200);
 
   // het seintje wijst altijd naar een bestaande bestelling of rit
-  const nudge = await ko('nudge', { kind: 'order', ref: 'BESTAAT-NIET' });
+  const nudge = await ko('/api/office/nudge', { kind: 'order', ref: 'BESTAAT-NIET' });
   assert.equal(nudge.status, 404, 'een seintje zonder doel gaat nergens heen');
 
   // en de hele bedienlaag zit achter de kantoordeur

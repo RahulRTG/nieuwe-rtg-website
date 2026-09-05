@@ -10,7 +10,7 @@
 
 const { CONTRACTEN, gemerkt, metSleutel, tweedeHandeling } = require('./mutatiecontracten-proefronde-bouw');
 
-/* ---- 1. ook ZONDER sleutel opgevangen (27) ---- */
+/* ---- 1. ook ZONDER sleutel opgevangen (26) ---- */
 gemerkt('POST /api/foundation/school/bijdrage/maak', 'foundation.school.bijdrage.maak');
 gemerkt('POST /api/foundation/school/directie/mededeling', 'foundation.school.directie.mededeling');
 gemerkt('POST /api/foundation/school/excursie/maak', 'foundation.school.excursie.maak');
@@ -29,7 +29,6 @@ gemerkt('POST /api/rtf/baby/entry-maak', 'rtf.baby.entry-maak');
 gemerkt('POST /api/rtf/kantoorpakket/maak', 'rtf.kantoorpakket.maak');
 gemerkt('POST /api/rtf/leren/project-maak', 'rtf.leren.project-maak');
 gemerkt('POST /api/rtf/leren/schrijf-bewaar', 'rtf.leren.schrijf-bewaar');
-gemerkt('POST /api/rtf/samen/maak', 'rtf.samen.maak');
 gemerkt('POST /api/rtf/social/pin/live', 'rtf.social.pin.live');
 gemerkt('POST /api/rtf/social/pin/nieuw', 'rtf.social.pin.nieuw');
 gemerkt('POST /api/rtf/social/pin/uit', 'rtf.social.pin.uit');
@@ -39,7 +38,7 @@ gemerkt('POST /api/supplier/kantoorpakket/beheer', 'supplier.kantoorpakket.behee
 gemerkt('POST /api/supplier/kantoorpakket/deel', 'supplier.kantoorpakket.deel');
 gemerkt('POST /api/supplier/kantoorpakket/opmerking', 'supplier.kantoorpakket.opmerking');
 
-/* ---- 2. alleen MET sleutel gemeten (86) ---- */
+/* ---- 2. alleen MET sleutel gemeten (85) ---- */
 metSleutel('POST /api/foundation/school/aandacht', 'foundation.school.aandacht');
 metSleutel('POST /api/foundation/school/aanwezigheid/klas', 'foundation.school.aanwezigheid.klas');
 metSleutel('POST /api/foundation/school/belasting/klas', 'foundation.school.belasting.klas');
@@ -94,7 +93,6 @@ metSleutel('POST /api/rtf/leven/beleid/zet', 'rtf.leven.beleid.zet');
 metSleutel('POST /api/rtf/leven/kring', 'rtf.leven.kring');
 metSleutel('POST /api/rtf/link/koppelingen', 'rtf.link.koppelingen');
 metSleutel('POST /api/rtf/onboarding/status', 'rtf.onboarding.status');
-metSleutel('POST /api/rtf/samen/weg', 'rtf.samen.weg');
 metSleutel('POST /api/rtf/school', 'rtf.school');
 metSleutel('POST /api/rtf/school/catalogus', 'rtf.school.catalogus');
 metSleutel('POST /api/rtf/school/mijn', 'rtf.school.mijn');

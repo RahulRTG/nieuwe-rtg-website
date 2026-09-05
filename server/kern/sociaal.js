@@ -99,9 +99,10 @@ const { kindContacten, kindVerwijder, statusVan, socialZoek, socialVerbind, oude
 const { geldigeFoto, opschonenSnaps, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken, dagOpdracht } = deelSnaps;
 const { pinVan, pinKaart, pinVernieuw, pinUit, handleVanPin, pinHuidig, pinNormaliseer, pinToonbaar } = deelPin;
 const { pinZoek, pinVerbind, pinNaarHandle, pinKijk, pinDeurReset, MIS_PER_MINUUT } = deelPinDeur;
-const { liveMaak, liveKijk, liveVerbind, liveOpen } = deelPinLive;
+const { liveMaak, liveKijk, liveVerbind, liveTrekIn, liveSluit, liveOpen } = deelPinLive;
 
   return { dmSleutel, connectieTussen, isRtf, codeExists, codenaamVan, soortVan, isKindHandle, isBeschermdHandle, verbActief, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, sociaalRate, kindContacten, kindVerwijder, statusVan, socialZoek, socialVerbind, ouderVerbind, socialAntwoord, socialIntrek, socialConnecties, socialDm, socialDmSend, zijnVrienden, socialTeKeuren, socialGoedkeur, geldigeFoto, opschonenSnaps, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken, dagOpdracht,
     pinVan, pinKaart, pinVernieuw, pinUit, handleVanPin, pinHuidig, pinNormaliseer, pinToonbaar,
-    pinZoek, pinVerbind, pinNaarHandle, pinKijk, pinDeurReset, MIS_PER_MINUUT, liveMaak, liveKijk, liveVerbind, liveOpen };
+    pinZoek, pinVerbind, pinNaarHandle, pinKijk, pinDeurReset, MIS_PER_MINUUT,
+    liveMaak, liveKijk, liveVerbind, liveTrekIn, liveSluit, liveOpen };
 };

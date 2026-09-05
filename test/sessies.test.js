@@ -92,3 +92,64 @@ test('snapshot-reconciliatie verwijdert lokaal achtergebleven sessies', () => {
   assert.equal(s.herbouwSessions(), 0);
   assert.equal(s.sessionFor('oud-token'), null);
 });
+
+test('expliciet uitloggen van een recordsessie wacht op gedeelde duurzame intrekking', async () => {
+  const signaal = require('../server/kern/intreksignaal');
+  signaal._wis();
+  const volgorde = [];
+  signaal.koppelOutbox({
+    lijst: () => [], voltooi: () => 0, gedeeld: async () => [],
+    deel: async () => { volgorde.push('postgres'); },
+    gedeeldVoltooi: async () => { volgorde.push('voltooid'); }
+  });
+  signaal.koppelBus({ soort: 'redis', gereed: () => true, publish() {}, subscribe() {},
+    herhaal: async () => [], bewaar: async () => { volgorde.push('redis'); return 1; },
+    onStand(fn) { fn({ soort: 'redis', gereed: true }); } });
+  for (let i = 0; i < 50 && !signaal.stand().gereed; i++)
+    await new Promise(resolve => setTimeout(resolve, 10));
+  const s = nieuweStore();
+  s.rememberSession('recordsessie', { tier: 'guest', key: 'gast' });
+  const hash = s.tokenHash('recordsessie');
+  assert.equal(await s.forgetSessionDuurzaam(hash), true);
+  assert.deepEqual(volgorde, ['postgres', 'redis', 'voltooid']);
+  assert.equal(s.sessionFor('recordsessie'), null);
+  assert.equal(signaal.tokenIngetrokken('recordsessie'), true);
+  signaal._wis();
+});
+
+test('onzekere gedeelde opslag laat een recordsessie niet als succesvol ingetrokken gelden', async () => {
+  const signaal = require('../server/kern/intreksignaal');
+  signaal._wis();
+  signaal.koppelOutbox({ lijst: () => [], voltooi: () => 0,
+    gedeeld: async () => [], deel: async () => { throw new Error('postgres weg'); } });
+  const s = nieuweStore();
+  s.rememberSession('blijft-lokaal', { tier: 'guest', key: 'gast' });
+  await assert.rejects(s.forgetSessionDuurzaam(s.tokenHash('blijft-lokaal')), /postgres weg/);
+  assert.ok(s.sessionFor('blijft-lokaal'), 'zonder gedeeld bewijs volgt geen vals logoutsucces');
+  signaal._wis();
+});
+
+test('een herstart met stale recordsnapshot volgt de centrale tokenreplay', () => {
+  const signaal = require('../server/kern/intreksignaal');
+  signaal._wis();
+  const s = nieuweStore();
+  s.rememberSession('gemiste-pubsub', { tier: 'guest', key: 'gast' });
+  signaal.meldVinger(s.tokenHash('gemiste-pubsub'), Date.now() + 60000);
+  assert.equal(s.sessionFor('gemiste-pubsub'), null,
+    'de tokenvinger sluit ook als het recordsessie-wegbericht is gemist');
+  signaal._wis();
+});
+
+test('recordsessies vallen dicht zolang de geconfigureerde Redis-autoriteit onzeker is', () => {
+  const signaal = require('../server/kern/intreksignaal');
+  const oud = process.env.REDIS_URL;
+  signaal._wis(); process.env.REDIS_URL = 'redis://cluster';
+  try {
+    const s = nieuweStore();
+    s.rememberSession('onzekere-leiding', { tier: 'guest', key: 'gast' });
+    assert.equal(s.sessionFor('onzekere-leiding'), null);
+  } finally {
+    signaal._wis();
+    if (oud === undefined) delete process.env.REDIS_URL; else process.env.REDIS_URL = oud;
+  }
+});

@@ -25,23 +25,35 @@ module.exports = (kern) => {
 
   /* ---------- de QR van een tafel ---------- */
   app.post('/api/supplier/horeca/gast/qr', supplierAuth, (req, res) => {
+    if (!req.actor.manager) return res.status(403).json({ error: 'Alleen een manager kan plekcodes uitgeven, intrekken of roteren.' });
     const b = req.body || {};
     /* Een QR hoort bij een TAFEL of bij een KAMER. Het verschil zit niet in de
        sticker maar in wat er daarna geldt: op een tafel mag altijd een rekening
        open, op een kamer alleen zolang daar een gastrekening staat. */
     const soort = b.kamer ? 'kamer' : 'tafel';
     const naam = soort === 'kamer' ? b.kamer : b.tafel;
-    const uit = sessie.plekToken(req.supplier.code, naam, { soort, vernieuw: !!b.vernieuw });
+    if (b.intrek === true) {
+      const ingetrokken = sessie.trekPlekTokenIn(req.supplier.code, naam, { door: req.actor, reden: b.reden });
+      if (ingetrokken.error) return res.status(ingetrokken.status || 400).json({ error: ingetrokken.error });
+      logActivity(req.supplier.code, req.actor, 'trok de QR in voor ' + ingetrokken.plek);
+      return res.json(ingetrokken);
+    }
+    const uit = sessie.plekToken(req.supplier.code, naam, { soort, vernieuw: !!b.vernieuw, door: req.actor });
     if (uit.error) return res.status(uit.status || 400).json({ error: uit.error });
     if (uit.vernieuwd) logActivity(req.supplier.code, req.actor, 'gaf een nieuwe QR uit voor ' + uit.plek);
-    res.json({ ok: true, soort, plek: uit.plek, tafel: soort === 'tafel' ? uit.plek : null,
-      kamer: soort === 'kamer' ? uit.plek : null, token: uit.token,
-      pad: '/apps/gast.html?t=' + uit.token,
+    res.json({ ok: true, soort: uit.soort, plek: uit.plek, tafel: uit.soort === 'tafel' ? uit.plek : null,
+      kamer: uit.soort === 'kamer' ? uit.plek : null, token: uit.token,
+      pad: uit.token ? '/apps/gast.html?t=' + uit.token : null,
+      lifecycle: { issuedAt: uit.issuedAt, expiresAt: uit.expiresAt, issuer: uit.issuer,
+        purpose: uit.purpose, scope: uit.scope, maxUses: uit.maxUses, useCount: uit.useCount,
+        revokedAt: uit.revokedAt },
       let: uit.vernieuwd
         ? 'Alle eerder gedrukte QR-codes van deze plek werken nu niet meer.'
+        : (uit.bestaand
+          ? 'De code bestaat al en wordt niet opnieuw prijsgegeven. Kies vernieuwen om een nieuwe sticker te maken.'
         : (soort === 'kamer'
           ? 'Leg deze code op de kamer; hij werkt alleen zolang daar een gastrekening open staat.'
-          : 'Druk deze code af voor op tafel; hij blijft geldig als de rekening sluit.') });
+          : 'Druk deze code af voor op tafel; hij blijft geldig als de rekening sluit.')) });
   });
 
   /* ---------- uitverkocht ----------

@@ -11,7 +11,8 @@ const salonviraal = require('./salonviraal');
 const lidmaatschap = require('./lidmaatschap');
 
 function maakLid(deps) {
-  const { db, accounts, PERSONAS, findSupplier, i18n, rtf, talen, leeftijdVan, leeftijdsgroepVan, geborenVan } = deps;
+  const { db, accounts, PERSONAS, findSupplier, i18n, rtf, talen, leeftijdVan,
+    leeftijdsgroepVan, geborenVan, salonClaimcode } = deps;
   // Laat-gebonden vriendencheck: de sociale laag wordt ná de leden-kern
   // opgebouwd, dus server.js vult deps.zijnVrienden later in. Zonder die functie
   // (bijv. losse module-test) telt niemand als vriend.
@@ -79,7 +80,7 @@ function maakLid(deps) {
     const kijker = { volgt: volgtAuteur, bevriend: bevriendMet };
     const posts = db.data.posts.filter(p => salonviraal.toonInSalon(p, kijker)).map(p => {
       const sup = p.partnerCode ? findSupplier(p.partnerCode) : null;
-      const claim = p.deal ? (p.deal.claims || []).find(c => c.key === sess.key) : null;
+      const claim = p.deal && salonClaimcode ? salonClaimcode.vindVanLid(p, sess.key) : null;
       return {
         id: p.id, author: p.author, tier: p.tier, place: p.place, visual: p.visual, at: p.at || null,
         photo: p.photo || null, partner: !!p.partner,
@@ -94,7 +95,8 @@ function maakLid(deps) {
         volgIk: sup && sup.salon ? sup.salon.volgers.includes(sess.key) : false,
         volgers: sup && sup.salon ? sup.salon.volgers.length : undefined,
         deal: p.deal ? { titel: p.deal.titel, geldigTot: p.deal.geldigTot || null,
-          claims: (p.deal.claims || []).length, mijnCode: claim ? claim.code : null } : null,
+          claims: (p.deal.claims || []).length,
+          mijnClaim: claim && salonClaimcode ? salonClaimcode.publiek(p, claim) : null } : null,
         poll: p.poll ? {
           vraag: p.poll.vraag,
           totaal: p.poll.opties.reduce((n, o) => n + o.stemmen.length, 0),

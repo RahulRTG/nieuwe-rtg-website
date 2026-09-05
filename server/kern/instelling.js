@@ -77,6 +77,11 @@ function maakInstelling({ db, save, accounts, ensureSupplierDefaults, makeSuppli
     if (!plaats) return { status: 400, error: 'In welke plaats zit deze instelling?' };
     const beheerder = schoon(b.beheerder, 60);
     if (!beheerder) return { status: 400, error: 'Op wiens naam komt de eerste beheer-inlog te staan?' };
+    const beheerLid = accounts.findByLogin(schoon(b.beheerderLogin, 120));
+    const legacyPin = !!(accounts.legacyStaffPinToegestaan && accounts.legacyStaffPinToegestaan());
+    if ((!beheerLid || (accounts.isActief && !accounts.isActief(beheerLid))) && !legacyPin)
+      return { status: 409, error: 'Koppel de eerste beheerder aan een bestaand actief RTG-account.',
+        uitleg: 'Vul bij beheerder ook diens persoonlijke RTG-login in. De beheerder logt daarna met dat eigen account in; er wordt geen aparte PIN uitgegeven.' };
     if ((db.data.suppliers || []).some(s => s && s.type === genre &&
         String(s.name || '').toLowerCase() === naam.toLowerCase()))
       return { status: 409, error: 'Deze instelling is al aangesloten.' };
@@ -91,12 +96,21 @@ function maakInstelling({ db, save, accounts, ensureSupplierDefaults, makeSuppli
     db.data.suppliers.push(s);
     save();
 
-    const pin = accounts.makePin();
-    await accounts.createStaff({ supplierCode: code, name: beheerder, role: 'manager', func: 'Beheer', pin });
-    return { ok: true, code, pin, naam, genre, plaats,
+    const pin = legacyPin ? accounts.makePin() : null;
+    if (legacyPin) {
+      await accounts.createStaff({ supplierCode: code, name: beheerder, role: 'manager',
+        func: 'Beheer', pin, ...(beheerLid ? { memberId: beheerLid.id, memberTier: beheerLid.tier } : {}) });
+    } else {
+      accounts.createAccountStaff({ supplierCode: code, name: beheerder, role: 'manager',
+        func: 'Beheer', memberId: beheerLid.id, memberTier: beheerLid.tier });
+    }
+    return { ok: true, code, ...(legacyPin ? { pin } : {}), naam, genre, plaats,
+      toegang: legacyPin ? 'magnaat-test-pin' : 'persoonlijk-rtg-account',
       // wat er NU staat, in plaats van "geregeld": de instelling is er, en moet
       // zichzelf nog inrichten voordat leden hem zien
-      vervolg: 'De instelling staat op de kaart en is nog OFFLINE. Geef de code en de PIN aan de beheerder; die richt de pagina in en zet hem zelf online.' };
+      vervolg: legacyPin
+        ? 'De instelling staat op de kaart en is nog OFFLINE. Geef de testcode en test-PIN aan de beheerder.'
+        : 'De instelling staat op de kaart en is nog OFFLINE. De beheerder logt met het gekoppelde persoonlijke RTG-account in en richt de pagina in.' };
   }
 
   return { instelling: { instellingGenres, instellingen, instellingAansluiten } };

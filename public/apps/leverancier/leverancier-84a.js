@@ -27,7 +27,23 @@
     finally { etenBezig=false; }
   }
 /* Live synchronisatie, meldingen en het opstarten van het partnerwerkblad. */
-  async function loadNotifs(){ try { const d = await API.call('/supplier/notifications', {}); } catch(e){} }
+  /* De eerste POST-vulling en de live stroom kunnen in willekeurige volgorde
+     aankomen. Samenvoegen op id houdt de recente lijst compleet, voorkomt een
+     dubbele eerste melding en laat een lokaal gelezen melding niet weer
+     ongelezen worden door een iets ouder SSE-antwoord. */
+  function neemNotifs(lijst){
+    const samen = new Map();
+    (Array.isArray(lijst) ? lijst : []).forEach(n => { if (n && n.id) samen.set(n.id, n); });
+    notifs.forEach(n => { if (n && n.id) samen.set(n.id, n); });
+    notifs = [...samen.values()].sort((a,b) => String(b.at||'').localeCompare(String(a.at||''))).slice(0,40);
+    renderBell();
+  }
+  async function loadNotifs(){
+    try {
+      const d = await API.call('/supplier/notifications', {});
+      neemNotifs(d && d.notifications);
+    } catch(e){}
+  }
   $('#bell').addEventListener('click', () => { $('#notifPanel').classList.add('open'); $('#notifScrim').classList.add('open'); if (notifs.some(n=>!n.read)){ notifs.forEach(n=>n.read=true); API.call('/supplier/notifications/read').catch(()=>{}); renderBell(); } });
   $('#notifClose').addEventListener('click', () => { $('#notifPanel').classList.remove('open'); $('#notifScrim').classList.remove('open'); });
   $('#notifScrim').addEventListener('click', () => { $('#notifPanel').classList.remove('open'); $('#notifScrim').classList.remove('open'); });
@@ -39,7 +55,7 @@
     if (window.TeamCall) TeamCall.init({ API, mij: () => { const a = actor(); return a.staffId ? { staffId: a.staffId, name: a.name } : null; }, T, toast });
     if (window.CollegaChat) CollegaChat.init({ API, mij: () => ({ staffId: actor().staffId, name: actor().name }), T, toast });
     try { source = new EventSource('/api/supplier/stream?token='+encodeURIComponent(API.token)); } catch(e){ return; }
-    source.addEventListener('hello', e => { const d=JSON.parse(e.data); notifs = d.unread||[]; renderBell(); });
+    source.addEventListener('hello', e => { const d=JSON.parse(e.data); neemNotifs(d.unread); });
     source.addEventListener('buzz', e => { const d=JSON.parse(e.data); showBuzz(d.from); });
     source.addEventListener('alarm', e => { const d=JSON.parse(e.data); showAlarm(d); });
     source.addEventListener('rtc', e => { if (window.TeamCall) TeamCall.event(e); });
@@ -54,7 +70,7 @@
       } catch(err){}
     });
     source.addEventListener('notify', e => {
-      const n = JSON.parse(e.data); notifs.unshift(n); renderBell();
+      const n = JSON.parse(e.data); neemNotifs([n]);
       if ('Notification' in window && Notification.permission==='granted'){ try{ new Notification(n.title,{body:n.body,icon:'icon.svg',tag:n.id}); }catch(_){} }
       toast(n.title + ', ' + n.body);
       refresh();
@@ -71,7 +87,6 @@
   $('#aiSend').addEventListener('click', sendAI);
   $('#aiInput').addEventListener('keydown', e => { if (e.key === 'Enter') sendAI(); });
   renderAIThread();
-  buildPad();
   renderGate();
   // WerkOS: de echte stand eerst, daarna het werkregister, dock en Cmd+K.
   if (window.WerkOS) WerkOS.koppel({

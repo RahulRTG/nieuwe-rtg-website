@@ -18,6 +18,8 @@
    klant; het btw-moment is de inwisseling. Zie kern/fiscaal/index.js voor hoe
    de maandboekhouding daarmee rekent, en waarom een verzilvering `viaBon`
    draagt. */
+const moneyCredentialBlokkade = require('../../../middleware/money-credential-productiepoort').blokkade;
+
 module.exports = (kern, herhaling) => {
   const { app, db, gcCode, logActivity, save, supplierAuth } = kern;
   const metIdem = herhaling.metEigenAfdruk;
@@ -25,6 +27,8 @@ module.exports = (kern, herhaling) => {
   const { verzilver: verzilverKaart } = require('./kaart');
 
 app.post('/api/supplier/giftcard/sell', supplierAuth, async (req, res) => {
+  const dicht = moneyCredentialBlokkade('pay.giftcard_value_code');
+  if (dicht) return res.status(dicht.status).json(dicht);
   const bedrag = Math.round(Number(req.body.bedrag));
   if (!(bedrag >= 10 && bedrag <= 5000)) return res.status(400).json({ error: 'Kies een bedrag tussen € 10 en € 5.000.' });
   const idem = req.body.idem ? 'gc:' + req.supplier.code + ':' + String(req.body.idem).slice(0, 60) : null;
@@ -34,7 +38,8 @@ app.post('/api/supplier/giftcard/sell', supplierAuth, async (req, res) => {
     db.data.giftcards.unshift(kaart);
     db.data.giftcards = db.data.giftcards.slice(0, 20000);
     save();
-    logActivity(req.supplier.code, req.actor, 'verkocht een cadeaukaart van € ' + bedrag + ' (' + kaart.code + ')');
+    /* Een cadeaukaartcode draagt geld en hoort niet in het activiteitenlog. */
+    logActivity(req.supplier.code, req.actor, 'verkocht een cadeaukaart van € ' + bedrag);
     return { ok: true, kaart };
   });
   if (r && r.error) return res.status(r.status || 409).json({ error: r.error });
@@ -44,10 +49,13 @@ app.post('/api/supplier/giftcard/sell', supplierAuth, async (req, res) => {
 /* De LOSSE inwisseling is een handmatige saldo-correctie zonder kassabon. De
    maandboekhouding meldt hem apart en rekent hem niet als omzet of btw. */
 app.post('/api/supplier/giftcard/redeem', supplierAuth, (req, res) => {
+  const dicht = moneyCredentialBlokkade('pay.giftcard_value_code');
+  if (dicht) return res.status(dicht.status).json(dicht);
   const r = verzilverKaart(db, req.supplier.code, req.body.code, req.body.bedrag, req.actor.name, null);
   if (r.error) return res.status(r.status).json({ error: r.error });
   save();
-  logActivity(req.supplier.code, req.actor, 'boekte € ' + r.bedrag + ' met de hand af van cadeaukaart ' + r.kaart.code + ' (rest € ' + r.kaart.saldo + ', geen kassabon)');
+  logActivity(req.supplier.code, req.actor, 'boekte € ' + r.bedrag
+    + ' met de hand af van een cadeaukaart (rest € ' + r.kaart.saldo + ', geen kassabon)');
   res.json({ ok: true, saldo: r.kaart.saldo, kaart: { code: r.kaart.code, saldo: r.kaart.saldo } });
 });
 };

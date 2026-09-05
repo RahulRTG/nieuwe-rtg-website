@@ -95,11 +95,11 @@ test('een lid meldt iets vanuit het scherm waar hij stond', { skip: geenBrowser(
 test('een lid bevestigt in de app wat een medewerker vraagt', { skip: geenBrowser(pw) }, async () => {
   await metLid(async (page, base, token) => {
     const z = (await api(base, '/api/service/open',
-      { onderwerp: 'betaling', titel: 'Mijn uitbetaling ontbreekt' }, token)).zaak;
+      { onderwerp: 'zaak', titel: 'Mijn werkruimte reageert niet' }, token)).zaak;
     const balie = await kantoorAlsPersoon(base);
     const v = await api(base, '/api/office/service/bevestiging/vraag',
-      { id: z.id, doel: 'betaalstand bekijken', capabilities: ['betaling.stand'],
-        reden: 'de uitbetaling staat sinds gisteren op pending' }, balie);
+      { id: z.id, doel: 'organisatiestand bekijken', capabilities: ['organisatie.stand'],
+        reden: 'de operationele werkruimte reageert sinds gisteren niet' }, balie);
     assert.ok(v.bevestiging, JSON.stringify(v).slice(0, 200));
 
     await page.goto(base + '/apps/wallet.html', { waitUntil: 'domcontentloaded' });
@@ -110,15 +110,15 @@ test('een lid bevestigt in de app wat een medewerker vraagt', { skip: geenBrowse
        bevestigingsknop een blanco cheque. */
     const tekst = await page.textContent('.bss-hulp');
     assert.match(tekst, /vraagt toegang/, 'het lid ziet niet dat er iemand toegang vraagt');
-    assert.match(tekst, /betaling\.stand/, 'het lid ziet niet wat er opengaat');
-    assert.match(tekst, /pending/, 'het lid ziet de reden niet');
+    assert.match(tekst, /organisatie\.stand/, 'het lid ziet niet wat er opengaat');
+    assert.match(tekst, /reageert/, 'het lid ziet de reden niet');
 
     await page.click('.bss-zaak button.bss-ja');
     await page.waitForFunction(() => /Bevestigd\./.test(document.body.textContent), null, { timeout: 20000 });
 
     const mijne = await api(base, '/api/office/service/machtigingen', {}, balie);
     assert.equal(mijne.machtigingen.length, 1, 'de bevestiging leverde geen machtiging op');
-    assert.deepEqual(mijne.machtigingen[0].capabilities, ['betaling.stand']);
+    assert.deepEqual(mijne.machtigingen[0].capabilities, ['organisatie.stand']);
   });
 });
 

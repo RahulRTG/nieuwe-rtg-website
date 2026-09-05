@@ -18,7 +18,8 @@
 
 module.exports = function startControle({ PRODUCTION, DEMO, accounts, eigenaar }) {
   if (!PRODUCTION) return;
-  if (!process.env.OFFICE_CODE) console.warn('[start] LET OP: OFFICE_CODE staat op de demo-waarde. Zet een eigen code in de omgeving.');
+  /* OFFICE_CODE en TOTP zijn vóór deze fase al harde productievoorwaarden in
+     config/productie-identiteit.js. Hier geen zachtere, onbereikbare melding. */
   if (DEMO) console.warn('[start] LET OP: Magnaat Test is AAN in productie. Dit hoort uitsluitend op de afzonderlijke testinstallatie.');
   /* SMTP en AI worden al door config/productie.js hard geblokkeerd. Hier geen
      zachte waarschuwing meer: die suggereerde ten onrechte dat productie in

@@ -31,8 +31,8 @@ const path = require('path');
 
 function versDataDir() { return fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-werv-')); }
 
-async function post(base, pad, body, token) {
-  const headers = { 'Content-Type': 'application/json' };
+async function post(base, pad, body, token, extraHeaders) {
+  const headers = Object.assign({ 'Content-Type': 'application/json' }, extraHeaders || {});
   if (token) headers.Authorization = 'Bearer ' + token;
   const r = await fetch(base + pad, { method: 'POST', headers, body: JSON.stringify(body || {}) });
   return { status: r.status, data: await r.json().catch(() => ({})) };
@@ -64,9 +64,23 @@ test('een uitnodigingslink maakt van een nieuwe bezoeker in een handeling person
     const inv = await post(base, '/api/supplier/staff/invite', { name: 'Sam', func: 'Bediening' }, mgr);
     assert.equal(inv.status, 200, 'uitnodigen: ' + JSON.stringify(inv.data).slice(0, 200));
     const code = inv.data.invite.kassacode;
-    assert.match(code, /^[A-Z0-9]{6}$/, 'een kassacode van zes tekens');
-    assert.ok(inv.data.link && inv.data.link.endsWith('/werken/' + code),
-      'en een link die diezelfde code draagt: ' + inv.data.link);
+    assert.match(code, /^[A-Z0-9]{6}\.[A-F0-9]{32}$/,
+      'een herkenbare prefix plus een 128-bit geheim');
+    const adres = new URL(inv.data.link, base);
+    assert.equal(adres.pathname, '/apps/app.html');
+    assert.equal(adres.search, '', 'het geheim staat niet in een query die proxies loggen');
+    assert.equal(adres.hash, '#werving=' + code,
+      'de code reist uitsluitend in het browserfragment: ' + inv.data.link);
+    assert.equal(adres.pathname.includes(code), false, 'de accesslog krijgt de code niet als pad');
+
+    // Fragmenten gaan aantoonbaar niet over HTTP: de server ziet alleen het
+    // statische app-pad en antwoordt met een no-referrer-document.
+    const pagina = await fetch(adres.href);
+    assert.equal(pagina.status, 200);
+    assert.equal(pagina.headers.get('referrer-policy'), 'no-referrer');
+    const html = await pagina.text();
+    assert.match(html, /name="referrer" content="no-referrer"/);
+    assert.equal(html.includes(code), false, 'het eenmalige geheim staat niet in het serverantwoord');
 
     // 2) wie hem opent ziet waar hij is, en verder niets
     const kijk = await post(base, '/api/werving/kijk', { kassacode: code });
@@ -153,7 +167,7 @@ test('een verzonnen, verlopen of al gebruikte code opent niets', async () => {
    -- hij moest hem zelf intrekken. Dezelfde sleutel geeft nu dezelfde
    uitnodiging terug; een VERSE sleutel is wel een echte tweede, want twee
    mensen met dezelfde voornaam uitnodigen mag gewoon. */
-test('een herhaalde uitnodiging met dezelfde sleutel geeft EEN kassacode, geen twee', async () => {
+test('een herhaalde uitnodiging geeft de kale code nooit opnieuw vrij', async () => {
   const TMP = versDataDir();
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_DEMO: '1' } });
   try {
@@ -163,14 +177,18 @@ test('een herhaalde uitnodiging met dezelfde sleutel geeft EEN kassacode, geen t
     const code = eerste.data.invite.kassacode;
 
     const nogmaals = await post(base, '/api/supplier/staff/invite', { name: 'Noor', func: 'Bediening', idem: 'inv-vast' }, mgr);
-    assert.equal(nogmaals.status, 200);
-    assert.equal(nogmaals.data.invite.kassacode, code, 'dezelfde code terug, geen tweede open deur');
-    assert.equal(nogmaals.data.herhaald, true, 'de server merkt de herhaling zelf');
+    assert.equal(nogmaals.status, 409,
+      'herhalen maakt geen tweede code en heronthult de eerste niet: ' + JSON.stringify(nogmaals.data));
+    assert.equal(nogmaals.data.kassacode, undefined);
+    assert.equal(JSON.stringify(nogmaals.data).includes(code), false, 'de eenmalige code staat nergens in het antwoord');
 
     // er staat er ook maar EEN open bij de werkgever
     const lijst = await post(base, '/api/supplier/staff/invites', {}, mgr);
     const voorNoor = (lijst.data.invites || []).filter(i => i.naam === 'Noor');
     assert.equal(voorNoor.length, 1, 'de werkgever ziet een openstaande uitnodiging, niet twee');
+    assert.equal(JSON.stringify(voorNoor).includes(code), false, 'ook de latere lijst onthult geen kale code');
+    assert.equal(Object.hasOwn(voorNoor[0] || {}, 'kassacode'), false);
+    assert.equal(Object.hasOwn((voorNoor[0] || {}).toegang || {}, 'code_hash'), false);
 
     // een verse sleutel is een echte tweede uitnodiging
     const tweede = await post(base, '/api/supplier/staff/invite', { name: 'Noor', func: 'Bediening', idem: 'inv-vers' }, mgr);
@@ -180,8 +198,45 @@ test('een herhaalde uitnodiging met dezelfde sleutel geeft EEN kassacode, geen t
     const anders = await post(base, '/api/supplier/staff/invite',
       { name: 'Noor', func: 'Bediening', role: 'manager', idem: 'inv-vast' }, mgr);
     assert.equal(anders.status, 409, 'dezelfde sleutel voor een andere rol wordt geweigerd');
+
+    // Ook de standaard HTTP-herhaalsleutel wordt in het domein gebonden. De
+    // generieke antwoordcache mag een eenmalig geheim namelijk nooit replayen.
+    const viaKop = await post(base, '/api/supplier/staff/invite',
+      { name: 'Imani', func: 'Keuken' }, mgr, { 'Idempotency-Key': 'staff-imani-1' });
+    assert.equal(viaKop.status, 200);
+    const viaKopCode = viaKop.data.invite.kassacode;
+    const viaKopNogmaals = await post(base, '/api/supplier/staff/invite',
+      { name: 'Imani', func: 'Keuken' }, mgr, { 'Idempotency-Key': 'staff-imani-1' });
+    assert.equal(viaKopNogmaals.status, 409);
+    assert.equal(JSON.stringify(viaKopNogmaals.data).includes(viaKopCode), false);
+
+    // Een oudere client zonder sleutel krijgt binnen het dubbeltikvenster
+    // eveneens maar een opslagrij en nooit een tweede credential.
+    const zonderKop = await post(base, '/api/supplier/staff/invite',
+      { name: 'Mila', func: 'Salon' }, mgr);
+    assert.equal(zonderKop.status, 200);
+    const zonderKopCode = zonderKop.data.invite.kassacode;
+    const zonderKopNogmaals = await post(base, '/api/supplier/staff/invite',
+      { name: 'Mila', func: 'Salon' }, mgr);
+    assert.equal(zonderKopNogmaals.status, 409);
+    assert.equal(JSON.stringify(zonderKopNogmaals.data).includes(zonderKopCode), false);
   } finally {
     stop(child);
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
+});
+
+test('de app neemt het wervingsfragment vóór andere scripts alleen in geheugen over', () => {
+  const html = fs.readFileSync(path.join(__dirname, '..', 'public', 'apps', 'app.html'), 'utf8');
+  const bron = fs.readFileSync(path.join(__dirname, '..', 'public', 'apps', 'app-main.js'), 'utf8');
+  assert.ok(html.indexOf('__RTG_WERVING_CODE') < html.indexOf('/shared/meelezen.js'),
+    'het geheim is geschrobd voordat een ander script of verzoek start');
+  assert.match(html, /name="referrer" content="no-referrer"/);
+  assert.match(html, /history\.replaceState\(null, '', location\.pathname \+ location\.search\)/);
+  assert.match(bron, /wervingscode: wervingscode \|\| undefined/,
+    'een nieuwe registratie wisselt de geheugencredential in');
+  assert.match(bron, /\/werving\/verbind/,
+    'een bestaand of reeds ingelogd lid gebruikt dezelfde server-side claim');
+  assert.doesNotMatch(bron, /sessionStorage\.setItem\([^\n]*werving/i,
+    'de bearer blijft niet in browseropslag achter');
 });

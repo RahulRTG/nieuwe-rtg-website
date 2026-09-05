@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
+<script src="/shared/id.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Foundation OS · RTFoundation</title>
@@ -395,7 +396,7 @@ async function tabVrijwilligers() {
       vogGeldigTot: w.querySelector('.vVog').value, gedragscode: w.querySelector('.vCode').checked }, tekenTab);
   }));
   $('#tabIn').querySelectorAll('[data-vcode]').forEach(b => b.addEventListener('click', () =>
-    api('vrijwilliger/code', { id: b.dataset.vcode })
+    api(b.dataset.vcodeActie === 'roteren' ? 'vrijwilliger/code/roteren' : 'vrijwilliger/code', { id: b.dataset.vcode })
       .then(r => melding('Code ' + r.code + ' -- ' + r.melding + ' De app is /apps/foundation/os-vrijwilliger.html', true))
       .catch(e => melding(e.message, false))));
   $('#tabIn').querySelectorAll('[data-vuren]').forEach(b => b.addEventListener('click', () =>
@@ -412,7 +413,8 @@ function vrijwilligerRij(v) {
     '<input class="veld vVog" type="date" value="' + esc(v.vogGeldigTot || '') + '" aria-label="VOG geldig tot">' +
     '<label class="uitleg"><input type="checkbox" class="vCode"' + (v.gedragscode ? ' checked' : '') + '> gedragscode getekend</label>' +
     '<button class="knop stil" data-vzet="' + esc(v.id) + '">Opslaan</button>' +
-    '<button class="knop stil" data-vcode="' + esc(v.id) + '">Code voor de app</button></div>' +
+    '<button class="knop stil" data-vcode="' + esc(v.id) + '" data-vcode-actie="' +
+      (v.heeftPersoonscode ? 'roteren">Nieuwe code (oude sluiten)' : 'uitgeven">Code voor de app') + '</button></div>' +
     urenMeldingen(v) + '</div>';
 }
 
@@ -505,7 +507,7 @@ async function tabCasussen() {
      code die je opstuurt komt in een inbox te liggen die iemand anders ook
      opent. Persoonlijk overhandigen is hier de veiligste route. */
   $('#tabIn').querySelectorAll('[data-ccode]').forEach(b => b.addEventListener('click', () =>
-    api('casus/code', { id: b.dataset.ccode })
+    api(b.dataset.ccodeActie === 'roteren' ? 'casus/code/roteren' : 'casus/code', { id: b.dataset.ccode })
       .then(r => melding('Code ' + r.code + ' -- ' + r.melding + ' De pagina is /apps/foundation/os-deelnemer.html', true))
       .catch(e => melding(e.message, false))));
   $('#tabIn').querySelectorAll('[data-cstap]').forEach(b => b.addEventListener('click', () => {
@@ -519,7 +521,8 @@ function casusRij(c) {
     '<span class="pil ' + (c.urgentie === 'acuut' ? 'fout' : 'let') + '">' + esc(c.urgentie) + '</span>' +
     '<span class="pil">' + esc(c.status) + '</span>' +
     '<button class="knop stil" data-contact="' + esc(c.id) + '">Contact tonen</button>' +
-    '<button class="knop stil" data-ccode="' + esc(c.id) + '">Code voor de hulpvrager</button>' +
+    '<button class="knop stil" data-ccode="' + esc(c.id) + '" data-ccode-actie="' +
+      (c.heeftPersoonscode ? 'roteren">Nieuwe code (oude sluiten)' : 'uitgeven">Code voor de hulpvrager') + '</button>' +
     '<div class="sub">' + esc(c.vraag) + (c.wijk ? ' &middot; ' + esc(c.wijk) : '') +
     (c.toestemming ? ' &middot; toestemming vastgelegd' : ' &middot; nog geen toestemming') + '</div>' +
     '<div class="rij breed"><select class="veld cSoort" aria-label="Soort stap">' +

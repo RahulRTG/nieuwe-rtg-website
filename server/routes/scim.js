@@ -26,12 +26,68 @@ const { log } = require('../log');
 const BASIS = '/api/scim/v2';
 const MAX_PAGINA = 200;
 
+/* EEN 2xx VAN SCIM IS EEN BEVESTIGING AAN DE IDENTITEITSPROVIDER.
+
+   Bij uit dienst zijn er twee sloten: het RTG-account en de losse lid-tokens
+   van Werk OS. De eerste werd al dichtgezet voordat de tweede werd geprobeerd.
+   Deze foutvorm zorgt dat een storing in het tweede slot nooit als 200/204
+   wordt bevestigd: de IdP krijgt 503 en kan dezelfde idempotente handeling
+   herhalen. Het interne detail gaat alleen naar het logboek. */
+function cascadeFout(org, user, oorzaak) {
+  const detail = oorzaak && oorzaak.message ? oorzaak.message
+    : (oorzaak && oorzaak.reden ? oorzaak.reden : String(oorzaak || 'onbekende fout'));
+  log.error('scim.cascade mislukt', { org, id: user && user.id, fout: detail });
+  const e = new Error('De intrekking in Werk OS kon niet worden bevestigd. Probeer de deprovisioning opnieuw.');
+  e.status = 503;
+  e.code = 'SCIM_WERK_CASCADE';
+  return e;
+}
+
+function maakCascade(kern) {
+  return function cascade(org, user) {
+    const tenant = kern && kern.tenant;
+    if (!tenant || !tenant.register || typeof tenant.register.haal !== 'function') {
+      throw cascadeFout(org, user, new Error('tenantregister niet beschikbaar'));
+    }
+
+    /* Geen tenant is een bewezen lege zakelijke scope, geen overgeslagen fout:
+       zonder tenantbinding bestaan er voor deze org geen Werk OS-ruimtes om te
+       sluiten. Dit houdt SCIM ook bruikbaar voor een organisatie die alleen
+       persoonlijke RTG-accounts provisioneert. */
+    let gebonden;
+    try { gebonden = tenant.register.haal(org); }
+    catch (e) { throw cascadeFout(org, user, e); }
+    if (!gebonden) return { ok: true, geraakt: [], nietVanToepassing: 'geen-tenant' };
+
+    if (!tenant.brug || typeof tenant.brug.deprovisioneer !== 'function') {
+      throw cascadeFout(org, user, new Error('tenantbrug niet beschikbaar'));
+    }
+
+    let uit;
+    try { uit = tenant.brug.deprovisioneer(org, 'user-' + user.id); }
+    catch (e) { throw cascadeFout(org, user, e); }
+    if (!uit || uit.ok !== true || !Array.isArray(uit.geraakt)) {
+      throw cascadeFout(org, user, uit || new Error('tenantbrug gaf geen bevestiging'));
+    }
+    if (uit.geraakt.length) {
+      log.warn('scim.werkruimte-ingetrokken', { org, id: user.id, werkruimtes: uit.geraakt.length });
+    }
+    return uit;
+  };
+}
+
 module.exports = (kern) => {
   const { app, accounts } = kern;
+  const cascade = maakCascade(kern);
+  const gebruikersync = kern.scimUserSync || require('../scim/user-sync')({ accounts, scim, cascade, log });
+  kern.scimUserSync = gebruikersync;
 
   const stuurScim = (res, status, lichaam) =>
     res.status(status).set('content-type', 'application/scim+json; charset=utf-8').json(lichaam);
-  const stuurFout = (res, status, detail, type) => stuurScim(res, status, vorm.fout(status, detail, type));
+  const stuurFout = (res, status, detail, type) => {
+    if (status === 503) res.set('retry-after', '30');
+    return stuurScim(res, status, vorm.fout(status, detail, type));
+  };
 
   /* De sleutel controleren en de organisatie eraan hangen. Faalt dit, dan komt
      er geen enkel signaal terug over of de sleutel bestond of alleen fout was. */
@@ -59,16 +115,6 @@ module.exports = (kern) => {
      IdP zijn 204, dan is de toegang in elke werkruimte van deze tenant al weg.
      Een wachtrij zou van uitdiensttreding een tijdvenster maken, en bij een
      ontslag op staande voet is dat venster precies het probleem. */
-  function cascade(org, user) {
-    if (!kern.tenant) return;
-    try {
-      const uit = kern.tenant.brug.deprovisioneer(org, 'user-' + user.id);
-      if (uit.geraakt.length) log.warn('scim.werkruimte-ingetrokken', { org, id: user.id, werkruimtes: uit.geraakt.length });
-    } catch (e) {
-      log.error('scim.cascade mislukt', { org, id: user.id, fout: e.message });
-    }
-  }
-
   const remmen = rem({ windowMs: 60000, limit: 600 });
 
   /* ---------- ontdekking: wat kunnen wij ---------- */
@@ -121,8 +167,7 @@ module.exports = (kern) => {
     const { actief, herkend } = scim.uitPatch(req.body);
     if (!herkend) return stuurFout(res, 400, 'Alleen het veld `active` kan via SCIM worden gewijzigd.', 'invalidValue');
     try {
-      const u = scim.zetActief(accounts, req.scimOrg, req.params.id, actief);
-      if (!actief) cascade(req.scimOrg, u);
+      const u = gebruikersync.zetActief(req.scimOrg, req.params.id, actief);
       log.warn('scim.actief', { org: req.scimOrg, id: u.id, actief: u.actief === 1 });
       stuurScim(res, 200, vorm.gebruiker(u, accounts.emailOf(u), BASIS));
     } catch (e) { stuurFout(res, e.status || 400, e.message, e.scimType); }
@@ -134,8 +179,7 @@ module.exports = (kern) => {
   app.put(BASIS + '/Users/:id', remmen, scimAuth, (req, res) => {
     const aan = !(req.body && req.body.active === false);
     try {
-      const u = scim.zetActief(accounts, req.scimOrg, req.params.id, aan);
-      if (!aan) cascade(req.scimOrg, u);
+      const u = gebruikersync.zetActief(req.scimOrg, req.params.id, aan);
       log.warn('scim.actief', { org: req.scimOrg, id: u.id, actief: u.actief === 1, via: 'put' });
       stuurScim(res, 200, vorm.gebruiker(u, accounts.emailOf(u), BASIS));
     } catch (e) { stuurFout(res, e.status || 400, e.message, e.scimType); }
@@ -152,10 +196,13 @@ module.exports = (kern) => {
      voor waarom dat geen halve maatregel is maar de juiste. */
   app.delete(BASIS + '/Users/:id', remmen, scimAuth, (req, res) => {
     try {
-      const u = scim.zetActief(accounts, req.scimOrg, req.params.id, false);
-      cascade(req.scimOrg, u);
+      const u = gebruikersync.zetActief(req.scimOrg, req.params.id, false);
       log.warn('scim.uitdienst', { org: req.scimOrg, id: u.id });
       res.status(204).end();
     } catch (e) { stuurFout(res, e.status || 400, e.message, e.scimType); }
   });
 };
+
+/* Los zichtbaar voor de gerichte storingstoets. Dit is dezelfde functie die de
+   routes gebruiken; geen tweede proefimplementatie van de cascade. */
+module.exports.maakCascade = maakCascade;

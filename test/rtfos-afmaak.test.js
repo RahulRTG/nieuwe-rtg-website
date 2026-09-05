@@ -159,7 +159,10 @@ test('de gever ziet zijn eigen giften en waar ze heen gingen, en niets van een a
   const nogEen = await os_('bron/maak', { stad: STAD, soort: 'donatie', gever: 'Familie Bakker', bedrag: 100 });
   await os_('bron/maak', { stad: STAD, soort: 'donatie', gever: 'Iemand anders', bedrag: 5000 });
 
-  const code = await os_('donateur/code', { bronId: mijn.body.bron.id });
+  const code = await os_('donateur/code', { bronId: mijn.body.bron.id,
+    // Een naam is geen donoridentiteit: het kantoor bevestigt exact welke
+    // bronnen bij dezelfde gever horen voordat er één portaalcode ontstaat.
+    gift_ids: [mijn.body.bron.id, nogEen.body.bron.id] });
   assert.equal(code.status, 200);
   assert.match(code.body.code, /^RTFS-/);
   assert.equal(code.body.giften, 2, 'niet alle giften van dezelfde gever kwamen op een code');

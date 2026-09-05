@@ -90,3 +90,16 @@ test('lege pool: tellers en options kloppen (geen verbinding nodig)', () => {
   assert.equal(typeof p.connect, 'function');
   assert.equal(typeof p.end, 'function');
 });
+
+test('query op een gesloten client faalt direct in plaats van eeuwig te wachten', async () => {
+  const c = new pg.Client({ host: '127.0.0.1', port: 1, user: 'u', database: 'd' });
+  c._dood = true;
+  await assert.rejects(
+    Promise.race([
+      c.query('ROLLBACK'),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('query bleef wachten')), 100))
+    ]),
+    /verbinding gesloten/
+  );
+  assert.equal(c.wachtrij.length, 0, 'een onuitvoerbare rollback blijft niet in de wachtrij staan');
+});

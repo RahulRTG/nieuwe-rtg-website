@@ -11,15 +11,16 @@
 'use strict';
 
 module.exports = (ctx) => {
-  const { save, rekLid, rekPartner, saldoVan, metIdem, boekAsync, zorgSaldo,
-    betaaldienstKosten, opdrachten, grootboek, MIN_CENTEN, MAX_CENTEN, fees } = ctx;
+  const { save, rekLid, rekPartner, saldoVan, metIdem, boek, boekAsync, zorgSaldo,
+    betaaldienstKosten, opdrachten, grootboek, MIN_CENTEN, MAX_CENTEN, fees,
+    economischeBoekingEenmaal, geldModus } = ctx;
+  const boekTerugEenmaal = require('../betaalopdracht/terugboeking');
 
-  /* De teruggang van de partneruitbetaling: alleen deze kant weet dat het
-     pay-grootboek het is en dat de tegenrekening extern:uitbetaald heet. Zie
-     ../betaalopdracht/ voor waarom dit een tabel per soort is en geen gedeelde
-     functie. */
+  /* De partneruitbetaling kent zelf haar grootboek en tegenrekening. */
   opdrachten.registreerTeruggang('pay-uit', async (o) => {
-    const terug = await boekAsync({ van: 'extern:uitbetaald', naar: o.bron, centen: o.centen,
+    const terug = await boekTerugEenmaal({ domein: 'pay', grootboek, boek, boekAsync,
+      boekEenmaal: economischeBoekingEenmaal, geldModus,
+      van: 'extern:uitbetaald', naar: o.bron, centen: o.centen,
       soort: 'terug', oms: 'Uitbetaling niet verstuurd, teruggeboekt', ref: o.ledgerRef });
     return terug;
   });

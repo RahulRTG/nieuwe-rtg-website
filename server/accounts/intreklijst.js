@@ -13,8 +13,49 @@ const klok = require('../lib/klok');
    ooit omzeilbaar maakte (zie de uitleg daar bij TOKENVORM). */
 const S = require('./state');
 const kluis = require('./kluis');
+const mirror = require('./mirror');
+const intrekSignaal = require('../kern/intreksignaal');
 
 module.exports = function maakIntreklijst(strikt) {
+  function schrijfIntrekking(soort, waarde, hash, exp) {
+    const doe = () => {
+      S.zin('DELETE FROM ingetrokken_tokens WHERE verloopt < ?').run(klok.nu());
+      S.zin('DELETE FROM intrekking_outbox WHERE verloopt < ?').run(klok.nu());
+      S.zin('INSERT OR REPLACE INTO ingetrokken_tokens (hash, verloopt) VALUES (?, ?)').run(hash, exp);
+      S.zin('INSERT OR REPLACE INTO intrekking_outbox (sleutel, soort, waarde, verloopt) VALUES (?, ?, ?, ?)')
+        .run(soort + ':' + waarde, soort, waarde, exp);
+    };
+    const doelDb = S.huidigeDb();
+    if (!doelDb || typeof doelDb.exec !== 'function') return doe();
+    /* Een accountrequest heeft al een geïsoleerde lokale transactie. Daar nog
+       een BEGIN omheen zetten faalt, en op S.db beginnen terwijl S.zin naar de
+       werkkopie wijst zou zelfs twee verschillende transacties veinzen. */
+    if (doelDb !== S.db) return doe();
+    doelDb.exec('BEGIN IMMEDIATE');
+    try { doe(); doelDb.exec('COMMIT'); }
+    catch (e) { try { doelDb.exec('ROLLBACK'); } catch (e2) {} throw e; }
+  }
+
+  /* De outbox bevat alleen een tokenvinger of niet-geheime sid. Hij wordt pas
+     gewist nadat SET+PX+PUBLISH in Redis geslaagd is. */
+  intrekSignaal.koppelOutbox({
+    lijst() {
+      if (!S.db) return [];
+      return S.zin('SELECT sleutel, soort, waarde, verloopt FROM intrekking_outbox WHERE verloopt >= ? ORDER BY sleutel')
+        .all(klok.nu());
+    },
+    voltooi(sleutels) {
+      if (!S.db) return 0;
+      const weg = S.zin('DELETE FROM intrekking_outbox WHERE sleutel = ?');
+      let aantal = 0;
+      for (const sleutel of sleutels || []) aantal += Number((weg.run(sleutel) || {}).changes || 0);
+      return aantal;
+    },
+    deel: mirror.bewaarIntrekking,
+    gedeeld: mirror.gedeeldeIntrekkingen,
+    gedeeldVoltooi: mirror.voltooiIntrekkingen
+  });
+
   /* DE INTREKLIJST -- waarom een staatloos token er toch een nodig heeft.
 
      Een sessietoken is hier staatloos: alles staat erin, ondertekend met HMAC.
@@ -30,7 +71,7 @@ module.exports = function maakIntreklijst(strikt) {
      verlopen. Daarna mag het weg -- verifyToken wijst het dan af op de datum.
      We ruimen luk-raak op tijdens het intrekken zelf, zodat er geen timer bij
      hoeft. */
-  function trekIn(token) {
+  async function trekIn(token) {
     token = strikt(token);
     if (!token) return false;
     let exp = 0;
@@ -40,12 +81,13 @@ module.exports = function maakIntreklijst(strikt) {
     } catch (e) { return false; }
     if (!exp || exp < klok.nu()) return true; // al verlopen: niets te onthouden
     try {
-      // meteen opruimen wat toch al verlopen was: geen aparte taak nodig
-      S.zin('DELETE FROM ingetrokken_tokens WHERE verloopt < ?').run(klok.nu());
-      S.zin('INSERT OR REPLACE INTO ingetrokken_tokens (hash, verloopt) VALUES (?, ?)')
-        .run(kluis.sign(String(token)), exp);
+      const waarde = intrekSignaal.vingerVanToken(token);
+      await intrekSignaal.bereid({ sleutel: 'token:' + waarde, soort: 'token', waarde, verloopt: exp });
+      schrijfIntrekking('token', waarde, kluis.sign(String(token)), exp);
+      intrekSignaal.meldToken(token, exp);
+      await intrekSignaal.wachtDuurzaam();
       return true;
-    } catch (e) { return false; }
+    } catch (e) { e.code = e.code || 'INTREKOPSLAG_ONZEKER'; throw e; }
   }
   /* Een DOELGEBONDEN token intrekken (e-mailbevestiging, SSO-overdracht).
 
@@ -59,7 +101,7 @@ module.exports = function maakIntreklijst(strikt) {
      zestig seconden mee dat hij bij ons inruilt voor een echt sessietoken.
      Zonder intrekken zou dat bewijs die hele minuut opnieuw te gebruiken zijn --
      en het staat in een URL, dus het staat ook in de browsergeschiedenis. */
-  function trekInActie(token, doel) {
+  async function trekInActie(token, doel) {
     token = strikt(token);
     if (!token) return false;
     let exp = 0;
@@ -71,11 +113,13 @@ module.exports = function maakIntreklijst(strikt) {
     } catch (e) { return false; }
     if (!exp || exp < klok.nu()) return true; // al verlopen: niets te onthouden
     try {
-      S.zin('DELETE FROM ingetrokken_tokens WHERE verloopt < ?').run(klok.nu());
-      S.zin('INSERT OR REPLACE INTO ingetrokken_tokens (hash, verloopt) VALUES (?, ?)')
-        .run(kluis.sign(String(token)), exp);
+      const waarde = intrekSignaal.vingerVanToken(token);
+      await intrekSignaal.bereid({ sleutel: 'token:' + waarde, soort: 'token', waarde, verloopt: exp });
+      schrijfIntrekking('token', waarde, kluis.sign(String(token)), exp);
+      intrekSignaal.meldToken(token, exp);
+      await intrekSignaal.wachtDuurzaam();
       return true;
-    } catch (e) { return false; }
+    } catch (e) { e.code = e.code || 'INTREKOPSLAG_ONZEKER'; throw e; }
   }
   /* EEN SESSIE INTREKKEN ZONDER HET TOKEN TE HEBBEN.
 
@@ -94,36 +138,46 @@ module.exports = function maakIntreklijst(strikt) {
      De vervaldatum komt van de aanroeper en niet uit de sid: een sid draagt geen
      tijd. Wie hem niet weet, geeft de maximale levensduur van een token op; het
      ergste gevolg is dan dat een regel iets langer blijft liggen dan nodig. */
-  function trekInSessie(sid, verlooptOp) {
+  async function trekInSessie(sid, verlooptOp) {
     if (typeof sid !== 'string' || !/^[A-Za-z0-9_-]{12}$/.test(sid)) return false;
     const exp = Number(verlooptOp) || 0;
     if (!exp || exp < klok.nu()) return true; // al verlopen: niets te onthouden
     try {
-      S.zin('DELETE FROM ingetrokken_tokens WHERE verloopt < ?').run(klok.nu());
-      S.zin('INSERT OR REPLACE INTO ingetrokken_tokens (hash, verloopt) VALUES (?, ?)')
-        .run(kluis.sign('sessie:' + sid), exp);
+      await intrekSignaal.bereid({ sleutel: 'sessie:' + sid, soort: 'sessie', waarde: sid, verloopt: exp });
+      schrijfIntrekking('sessie', sid, kluis.sign('sessie:' + sid), exp);
+      intrekSignaal.meldSessie(sid, exp);
+      await intrekSignaal.wachtDuurzaam();
       return true;
-    } catch (e) { return false; }
+    } catch (e) { e.code = e.code || 'INTREKOPSLAG_ONZEKER'; throw e; }
   }
   function sessieIngetrokken(sid) {
     if (typeof sid !== 'string' || !/^[A-Za-z0-9_-]{12}$/.test(sid)) return false;
+    if (intrekSignaal.sessieIngetrokken(sid)) return true;
     try {
       const r = S.zin('SELECT verloopt FROM ingetrokken_tokens WHERE hash = ?')
         .get(kluis.sign('sessie:' + sid));
       return !!r && Number(r.verloopt) >= klok.nu();
-    } catch (e) { return false; }
+    } catch (e) { e.code = e.code || 'INTREKOPSLAG_ONZEKER'; throw e; }
   }
 
   function isIngetrokken(token) {
     token = strikt(token);
     if (!token) return true; // geen geldige vorm: behandel als ongeldig
+    if (intrekSignaal.tokenIngetrokken(token)) return true;
+    const leiding = intrekSignaal.stand();
+    if (process.env.REDIS_URL && (!leiding.gekoppeld || leiding.soort !== 'redis' || !leiding.gereed)) {
+      const e = new Error('de gedeelde intrekkingsleiding is niet aantoonbaar gereed');
+      e.code = 'INTREKOPSLAG_ONZEKER';
+      throw e;
+    }
     try {
       const r = S.zin('SELECT verloopt FROM ingetrokken_tokens WHERE hash = ?')
         .get(kluis.sign(String(token)));
       return !!r && Number(r.verloopt) >= klok.nu();
-    } catch (e) { return false; }
+    } catch (e) { e.code = e.code || 'INTREKOPSLAG_ONZEKER'; throw e; }
   }
 
 
-  return { trekIn, trekInActie, isIngetrokken, trekInSessie, sessieIngetrokken };
+  return { trekIn, trekInActie, isIngetrokken, trekInSessie, sessieIngetrokken,
+    wachtIntrekkingen: intrekSignaal.wachtDuurzaam };
 };

@@ -28,12 +28,14 @@ test.before(async () => {
 });
 test.after(() => stop(srv && srv.child));
 
-let code;
+let code, kamerId;
 test('1. een lid start een samen-sessie en een vriend doet mee met de code', async () => {
   const r = await api(base, '/api/samen/maak', {}, A);
   assert.equal(r.status, 200);
-  code = r.body.kamer.code;
-  assert.match(code, /^[A-Z0-9]{6}$/, 'een korte deelbare code');
+  code = r.body.code;
+  kamerId = r.body.kamer.id;
+  assert.match(code, /^SAMEN\.[A-F0-9]{32}$/, 'een 128-bit eenmalige deelcode');
+  assert.equal(r.body.kamer.code, undefined, 'het gewone kamerbeeld bevat geen credential');
   const mee = await api(base, '/api/samen/mee', { code }, B);
   assert.equal(mee.status, 200);
   assert.equal(mee.body.kamer.leden.length, 2, 'twee codenamen in de kamer');
@@ -100,7 +102,7 @@ test('2. "kijk hier": een lid deelt waar hij is en de kamer onthoudt het; het SS
     meldOpen();   // ook als de lijn dichtging: nooit blijven hangen
   })();
   await open;
-  const zet = await api(base, '/api/samen/zet', { code, pad: '/apps/mall.html', titel: 'De RTG Mall' }, A);
+  const zet = await api(base, '/api/samen/zet', { id: kamerId, pad: '/apps/mall.html', titel: 'De RTG Mall' }, A);
   assert.equal(zet.status, 200);
   assert.equal(zet.body.kamer.pad, '/apps/mall.html');
   await leesEven;
@@ -115,44 +117,52 @@ test('2. "kijk hier": een lid deelt waar hij is en de kamer onthoudt het; het SS
     'B kreeg het kijk-seintje live (einde: ' + reden + ', hello gezien: ' + zagHello +
     ', ontvangen: ' + JSON.stringify((events[0] || eerste).slice(0, 400)) + ')');
   // en wie later binnenkomt ziet het in de staat
-  const staat = await api(base, '/api/samen/staat', { code }, B);
+  const staat = await api(base, '/api/samen/staat', { id: kamerId }, B);
   assert.equal(staat.body.kamer.pad, '/apps/mall.html');
 });
 
 test('3. alleen plekken binnen RTG; externe adressen komen de kamer niet in', async () => {
-  assert.equal((await api(base, '/api/samen/zet', { code, pad: 'https://kwaad.example/x' }, A)).status, 400);
-  assert.equal((await api(base, '/api/samen/zet', { code, pad: '//kwaad.example' }, A)).status, 400);
+  assert.equal((await api(base, '/api/samen/zet', { id: kamerId, pad: 'https://kwaad.example/x' }, A)).status, 400);
+  assert.equal((await api(base, '/api/samen/zet', { id: kamerId, pad: '//kwaad.example' }, A)).status, 400);
+  const geheim = 'PIN-HERSTEL-GEHEIM';
+  const query = await api(base, '/api/samen/zet', {
+    id: kamerId, pad: '/apps/app.html?pinherstel=' + geheim, titel: 'Herstel'
+  }, A);
+  assert.equal(query.status, 400, 'ook een interne pagina met querycredential blijft buiten de kamer');
+  assert.equal(JSON.stringify(query.body).includes(geheim), false);
+  const staat = await api(base, '/api/samen/staat', { id: kamerId }, B);
+  assert.equal(JSON.stringify(staat.body).includes(geheim), false);
 });
 
 test('4. de kamer-chat werkt en is begrensd; buitenstaanders komen er niet in', async () => {
-  const r = await api(base, '/api/samen/chat', { code, tekst: 'Kijk deze etage!' }, B);
+  const r = await api(base, '/api/samen/chat', { id: kamerId, tekst: 'Kijk deze etage!' }, B);
   assert.equal(r.status, 200);
-  const staat = await api(base, '/api/samen/staat', { code }, A);
+  const staat = await api(base, '/api/samen/staat', { id: kamerId }, A);
   assert.ok(staat.body.kamer.chat.some(c => c.tekst === 'Kijk deze etage!'));
   // een derde lid dat NIET meedoet mag niets
   const reg3 = await api(base, '/api/auth/register', { name: 'Pottenkijker', email: 'samen3@x.nl', phone: '0612345673', password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
   const C = reg3.body.token;
-  assert.equal((await api(base, '/api/samen/staat', { code }, C)).status, 403);
-  assert.equal((await api(base, '/api/samen/chat', { code, tekst: 'ik gluur' }, C)).status, 403);
-  assert.equal((await api(base, '/api/samen/zet', { code, pad: '/apps/sport.html' }, C)).status, 403);
+  assert.equal((await api(base, '/api/samen/staat', { id: kamerId }, C)).status, 404);
+  assert.equal((await api(base, '/api/samen/chat', { id: kamerId, tekst: 'ik gluur' }, C)).status, 404);
+  assert.equal((await api(base, '/api/samen/zet', { id: kamerId, pad: '/apps/sport.html' }, C)).status, 404);
 });
 
 test('4b. samen luisteren: de gastheer deelt de muziek, de leden zien het en volgen; alleen de gastheer bepaalt', async () => {
-  const zet = await api(base, '/api/samen/muziek', { code, media: { stationId: 'sunset', seed: 4242, startOffsetMs: 12000, speelt: true } }, A);
+  const zet = await api(base, '/api/samen/muziek', { id: kamerId, media: { stationId: 'sunset', seed: 4242, startOffsetMs: 12000, speelt: true } }, A);
   assert.equal(zet.status, 200);
   assert.ok(zet.body.kamer.muziek && zet.body.kamer.muziek.stationId === 'sunset', 'de kamer draagt nu de muziek');
   // B ziet de muziek in de staat, met een serverklok om op te synchroniseren
-  const staat = await api(base, '/api/samen/staat', { code }, B);
+  const staat = await api(base, '/api/samen/staat', { id: kamerId }, B);
   assert.equal(staat.body.kamer.muziek.seed, 4242);
   assert.ok(staat.body.kamer.muziek.start > 0 && staat.body.kamer.now >= staat.body.kamer.muziek.start, 'starttijd en serverklok kloppen');
   // een lid dat niet de gastheer is, mag de muziek niet sturen
-  assert.equal((await api(base, '/api/samen/muziek', { code, media: { stationId: 'nacht', seed: 1 } }, B)).status, 403);
+  assert.equal((await api(base, '/api/samen/muziek', { id: kamerId, media: { stationId: 'nacht', seed: 1 } }, B)).status, 403);
 });
 
 test('5. verlaten: de laatste doet het licht uit en de code vervalt', async () => {
-  assert.equal((await api(base, '/api/samen/weg', { code }, B)).status, 200);
-  assert.equal((await api(base, '/api/samen/weg', { code }, A)).status, 200);
-  assert.equal((await api(base, '/api/samen/staat', { code }, A)).status, 404, 'de kamer is weg');
+  assert.equal((await api(base, '/api/samen/weg', { id: kamerId }, B)).status, 200);
+  assert.equal((await api(base, '/api/samen/weg', { id: kamerId }, A)).status, 200);
+  assert.equal((await api(base, '/api/samen/staat', { id: kamerId }, A)).status, 404, 'de kamer is weg');
 });
 
 test('6. zonder inlog blijft samen dicht', async () => {

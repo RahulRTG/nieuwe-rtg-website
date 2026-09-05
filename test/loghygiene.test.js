@@ -71,6 +71,22 @@ test('de verzoeklog schrijft geen querystring, body of headers', () => {
   assert.ok(!/token=/.test(tekst), 'geen querystring in de log');
 });
 
+test('ook een uitgefaseerde wervingscode in het pad wordt vóór elke logregel geredigeerd', () => {
+  const code = 'AB12CD';
+  const req = { headers: {}, method: 'GET', path: '/werken/' + code, get: () => null };
+  const res = nepRes();
+  const tekst = vang(() => {
+    middleware()(req, res, () => {});
+    res.klaar();
+  });
+  assert.match(tekst, /\/werken\/:code/);
+  assert.equal(tekst.includes(code), false, 'de kale legacy-code staat niet in verzoek- of journaallog');
+
+  const foutTekst = vang(() => log.uitzondering(new Error('omleiding stuk'), { p: '/werken/' + code }));
+  assert.match(foutTekst, /\/werken\/:code/);
+  assert.equal(foutTekst.includes(code), false, 'ook het generieke foutpad is geredigeerd');
+});
+
 test('de foutafhandelaar geeft de client geen stack en geen interne melding', () => {
   const err = new Error('SELECT * FROM users WHERE email = anna@voorbeeld.nl mislukt');
   const req = { id: 'abc123', path: '/api/iets' };

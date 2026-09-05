@@ -59,7 +59,7 @@ test.before(async () => {
 });
 test.after(() => { stop(srv && srv.child); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} });
 
-let LINK = null, CODE = null;
+let LINK = null, CODE = null, INV_ID = null;
 
 test('1. het kantoor leest voor en zet een reis klaar -- zonder iets over de klant te bewaren', async () => {
   // voorlezen bewaart niets; het is puur regelwerk
@@ -71,17 +71,33 @@ test('1. het kantoor leest voor en zet een reis klaar -- zonder iets over de kla
 
   /* De aanvraag stuurt met opzet OOK persoonsgegevens mee. Die horen nergens
      terecht te komen: een klaargezette reis gaat over de reis. */
-  const zet = await post('/api/office/reisbureau/klaarzetten', {
+  const aanvraag = {
     naam: 'Jan de Vries', email: 'jan@voorbeeld.nl', telefoon: '0612345678',
     onderdelen: [
       { soort: 'verblijf', titel: 'Casa Ibiza', bestemming: 'Ibiza', van: dag(40), tot: dag(45), kenmerk: 'QQ1234', herkomst: 'document' },
       { soort: 'vlucht', titel: 'RT418', bestemming: 'Ibiza', van: dag(40), herkomst: 'document' }
     ]
-  }, kantoor);
+  };
+  const zet = await post('/api/office/reisbureau/klaarzetten', aanvraag, kantoor, 'reis-klaar-vast');
   assert.equal(zet.status, 200);
-  assert.ok(zet.body.link.includes('/apps/reisuitnodiging.html?code='), 'er komt een link terug');
-  LINK = zet.body.link; CODE = LINK.split('code=')[1];
-  assert.equal(CODE.length, 32, 'de code is 128 bits en dus niet te raden');
+  assert.ok(zet.body.link.includes('/apps/reisuitnodiging.html#code='), 'er komt een fragmentlink terug');
+  LINK = zet.body.link; CODE = LINK.split('code=')[1]; INV_ID = zet.body.uitnodiging.id;
+  assert.match(CODE, /^REIS\.[A-F0-9]{32}$/, 'de code draagt 128 willekeurige bits');
+  const adres = new URL(LINK, base);
+  assert.equal(adres.search, '', 'de code staat niet in een proxy- of serverzichtbare query');
+  assert.equal(adres.pathname.includes(CODE), false, 'de accesslog krijgt de code niet in het pad');
+  assert.equal(adres.hash, '#code=' + CODE);
+  const pagina = await fetch(base + LINK);
+  assert.equal(pagina.status, 200);
+  assert.equal(pagina.headers.get('referrer-policy'), 'no-referrer');
+  const html = await pagina.text();
+  assert.match(html, /name="referrer" content="no-referrer"/);
+  assert.equal(html.includes(CODE), false, 'de HTTP-respons kent het browserfragment niet');
+
+  const herhaald = await post('/api/office/reisbureau/klaarzetten', aanvraag, kantoor, 'reis-klaar-vast');
+  assert.equal(herhaald.status, 409, 'een transportretry heronthult de eenmalige link niet');
+  assert.equal(JSON.stringify(herhaald.body).includes(CODE), false);
+  assert.equal(herhaald.body.link, undefined);
 
   const bewaard = JSON.stringify(zet.body.uitnodiging);
   assert.ok(!bewaard.includes('Jan de Vries'), 'de naam van de klant wordt niet bewaard');
@@ -140,8 +156,9 @@ test('3. wie de link opent kan lid worden en de reis overnemen', async () => {
   assert.equal((await post('/api/reis/uitnodiging/eisop', { code: CODE }, klant,
     'tweede-poging-eisop')).status, 409);
   const dicht = await post('/api/reis/uitnodiging/open', { code: CODE }, null);
-  assert.equal(dicht.body.uitnodiging.open, false);
-  assert.match(dicht.body.uitnodiging.reden, /al gebruikt/i);
+  assert.equal(dicht.status, 409);
+  assert.equal(dicht.body.uitnodiging, undefined,
+    'een verbruikte credential geeft ook geen voorbeeldmetadata meer vrij');
 });
 
 test('4. een reisgenoot wordt met zijn identiteit gecontroleerd', async () => {
@@ -188,7 +205,9 @@ test('5. je eigen uitnodiging is voor iemand anders, en intrekken kan tot hij ge
 
   const lijst = await post('/api/reis/uitnodiging/mijn', {}, klant);
   assert.ok(lijst.body.uitnodigingen.length >= 2, 'zijn eigen uitnodigingen staan bij hem');
-  const nog = lijst.body.uitnodigingen.find(x => x.link.includes(code3));
+  assert.ok(lijst.body.uitnodigingen.every(x => !x.link && !x.code &&
+    !(x.toegang || {}).code_hash), 'de kale code en zijn hash komen niet terug in een lijst');
+  const nog = lijst.body.uitnodigingen.find(x => x.id === uit.body.uitnodiging.id);
   assert.equal((await post('/api/reis/uitnodiging/weg', { id: nog.id }, klant)).status, 200);
   assert.equal((await post('/api/reis/uitnodiging/eisop', { code: code3 }, genoot)).status, 409,
     'een ingetrokken uitnodiging doet niets meer');
@@ -202,7 +221,7 @@ test('6. zonder onderdelen geen uitnodiging, en het kantoor houdt zijn eigen lij
     'een onderdeel zonder naam en datum telt niet mee');
   // de kantoorlijst is van HET kantoor en niet van een medewerker
   const lijst = await post('/api/office/reisbureau/uitnodigingen', {}, kantoor);
-  assert.ok(lijst.body.uitnodigingen.some(x => x.link.includes(CODE)), 'de klaargezette reis staat in de kantoorlijst');
+  assert.ok(lijst.body.uitnodigingen.some(x => x.id === INV_ID), 'de klaargezette reis staat in de kantoorlijst');
   // en de deur zit dicht zonder kantoorinlog
   assert.equal((await post('/api/office/reisbureau/klaarzetten', { onderdelen: [] }, klant)).status, 401);
   assert.equal((await post('/api/reis/uitnodiging/eisop', { code: CODE }, null)).status, 401);
@@ -227,8 +246,9 @@ test('7. het kantoor trekt een klaargezette reis in, en de link is daarna dood',
   const weg = await post('/api/office/reisbureau/uitnodiging-weg', { id }, kantoor);
   assert.equal(weg.status, 200);
   const beeld = await post('/api/reis/uitnodiging/open', { code }, null);
-  assert.equal(beeld.body.uitnodiging.open, false, 'de link is dood');
-  assert.match(beeld.body.uitnodiging.reden, /ingetrokken/i);
+  assert.equal(beeld.status, 409, 'de link is dood');
+  assert.equal(beeld.body.uitnodiging, undefined,
+    'intrekken sluit ook het beperkte voorbeeldbeeld');
   assert.equal((await post('/api/reis/uitnodiging/eisop', { code }, genoot)).status, 409,
     'en opeisen kan niet meer');
   // een verzonnen id trekt niets in, en zegt dat eerlijk
@@ -236,4 +256,83 @@ test('7. het kantoor trekt een klaargezette reis in, en de link is daarna dood',
   // en de ingetrokken reis staat in de kantoorlijst als ingetrokken
   const lijst = await post('/api/office/reisbureau/uitnodigingen', {}, kantoor);
   assert.equal(lijst.body.uitnodigingen.find(x => x.id === id).ingetrokken, true);
+});
+
+test('7b. een transportretry op rotatie heronthult noch vervangt de nieuwe link', async () => {
+  const zet = await post('/api/office/reisbureau/klaarzetten', {
+    onderdelen: [{ soort: 'verblijf', titel: 'Casa Palma', bestemming: 'Mallorca',
+      van: dag(55), tot: dag(57) }]
+  }, kantoor, 'reis-rotatie-bron');
+  assert.equal(zet.status, 200);
+  const oud = zet.body.link.split('code=')[1];
+  const id = zet.body.uitnodiging.id;
+  const eerste = await post('/api/office/reisbureau/uitnodiging-roteer',
+    { id }, kantoor, 'reis-rotatie-vast');
+  assert.equal(eerste.status, 200);
+  const nieuw = eerste.body.link.split('code=')[1];
+  assert.notEqual(nieuw, oud);
+
+  const retry = await post('/api/office/reisbureau/uitnodiging-roteer',
+    { id }, kantoor, 'reis-rotatie-vast');
+  assert.equal(retry.status, 409);
+  assert.equal(retry.body.link, undefined);
+  assert.equal(JSON.stringify(retry.body).includes(nieuw), false);
+  assert.notEqual((await post('/api/reis/uitnodiging/open', { code: oud })).status, 200,
+    'de oude code is na rotatie niet meer vindbaar');
+  assert.equal((await post('/api/reis/uitnodiging/open', { code: nieuw })).body.uitnodiging.open, true,
+    'de eerste nieuwe code blijft na de retry bruikbaar');
+});
+
+test('8. het beheerscherm heronthult oude links niet en biedt server-side rotatie/intrekking', () => {
+  const html = fs.readFileSync(path.join(__dirname, '..', 'public', 'apps', 'reisuitnodiging.html'), 'utf8');
+  assert.equal(/\bu\.link\b/.test(html), false, 'een latere lijst kan geen niet-bestaande of oude link kopiëren');
+  assert.match(html, /data-roteer/);
+  assert.match(html, /reis\/uitnodiging\/roteer/);
+  assert.match(html, /reis\/uitnodiging\/weg/);
+  assert.match(html, /alleen bij uitgifte getoond/i);
+  assert.match(html, /history\.replaceState\(null, '', location\.pathname\)/,
+    'het fragment wordt voor andere requests uit de adresbalk gewist');
+  assert.doesNotMatch(html, /location\.search\)\.get\(['"]code['"]\)/,
+    'een reiscredential wordt ook als tijdelijk compatibiliteitspad niet uit de query gelezen');
+  assert.match(html, /RTGIdem\(['"]reis-roteer['"]\)/,
+    'de UI bindt een herhaalsleutel aan iedere bewuste rotatie');
+});
+
+test('9. productie eist een vaste veilige APP_URL voordat een reiscredential ontstaat', () => {
+  const basis = require('../server/kern/reisuitnodiging').vasteAppBasis;
+  assert.deepEqual(basis({ NODE_ENV: 'development' }), { ok: true, basis: '' });
+  assert.equal(basis({ NODE_ENV: 'production' }).ok, false);
+  assert.equal(basis({ NODE_ENV: 'production', APP_URL: 'http://rtg.example' }).ok, false);
+  assert.deepEqual(basis({ NODE_ENV: 'production', APP_URL: 'https://rtg.example///' }),
+    { ok: true, basis: 'https://rtg.example' });
+  assert.equal(basis({ NODE_ENV: 'production', APP_URL: 'https://rtg.example/?code=lek' }).ok, false);
+});
+
+test('10. een oude querycredential sluit fail-closed en werkt pas na rotatie weer', async () => {
+  const raw = '0123456789abcdef0123456789abcdef';
+  const db = { data: { reisUitnodigingen: { 'U-legacy': {
+    id: 'U-legacy', soort: 'reisgenoot', door: 'lid:A', doorCodenaam: 'Kobalt',
+    doorWie: 'Kobalt', bestemming: 'Rome', venster: { van: dag(20), tot: dag(22) },
+    onderdelen: [{ soort: 'verblijf', titel: 'Hotel', van: dag(20), tot: dag(22) }],
+    code: raw, at: new Date().toISOString(), claim: null, opgeeist: null
+  } } } };
+  const api = require('../server/kern/reisuitnodiging').maakReisuitnodiging({
+    db, save() {}, crypto: require('node:crypto'),
+    invoer: { neemOver() { throw new Error('een ingetrokken legacy-code mag hier nooit komen'); } },
+    idGeverifieerd() { return true; }
+  }).reisuitnodiging;
+
+  const oud = await Promise.resolve(api.eisOp({ key: 'lid:B' }, raw));
+  assert.equal(oud.status, 409);
+  const rij = db.data.reisUitnodigingen['U-legacy'];
+  assert.equal(Object.hasOwn(rij, 'code'), false);
+  assert.match(rij.toegang.code_hash, /^[a-f0-9]{64}$/);
+  assert.equal(rij.toegang.intrekreden, 'legacy querycredential vereist rotatie');
+
+  const nieuw = await Promise.resolve(api.roteer('lid:A', 'U-legacy', 'Kobalt', 'legacy-rotatie'));
+  assert.match(nieuw.link, /#code=REIS\.[A-F0-9]{32}$/);
+  assert.notEqual((await Promise.resolve(api.open(raw))).status, 200,
+    'de querycode blijft na rotatie volledig nutteloos');
+  const code = nieuw.link.split('#code=')[1];
+  assert.equal((await Promise.resolve(api.open(code))).uitnodiging.open, true);
 });

@@ -41,6 +41,13 @@
     'html.rtg-command-mobiel body[data-rtg-world="travel"] .hoofdtabs,' +
     'html.rtg-command-mobiel .tos-nav' +
     '{display:none!important}' +
+    /* OP BUREAU IS DE LOKALE RIJ DE ENIGE REISNAVIGATIE. De mobiele
+       Command-balk neemt de vier reisbladen over, maar die balk staat op een
+       breed scherm niet in beeld. rtg-edge-system.css verbergt lokale chrome
+       in een embed; deze nauw begrensde tegenregel geeft daarom uitsluitend
+       in een breed Command-werkblad de bestaande TravelOS-tabs terug. */
+    'html.rtg-command-blad:not(.rtg-command-mobiel) body[data-rtg-world="travel"] .hoofdtabs' +
+    '{display:flex!important}' +
     'html.rtg-command-mobiel:has(body[data-rtg-world="travel"]){--nav:0px!important}' +
     'html.rtg-command-mobiel:has(body.travel-os){--tos-bottom:0px!important;--tos-rail:0px!important}';
   w.RTGCommandBladhaak = function (p, klein, breed, verander) {

@@ -316,15 +316,24 @@
     // element voor eventuele diepe koppelingen, maar wordt niet gevuld.
     const gl = $('#gateList');
     if (gl) gl.innerHTML = '';
-    document.querySelectorAll('[data-code]').forEach(b => b.addEventListener('click', () => pickPartner(b.dataset.code)));
+    /* De oude naam/PIN-kiezer bestaat alleen in de expliciete Magnaat Test-
+       omgeving. De server is de bron van die stand; lokaal/staging valt dus
+       niet stil terug op de oude bearer. */
+    fetch('/api/health').then(r => r.json()).then(h => {
+      legacyPinUi = h && h.testomgeving === true;
+      if (!legacyPinUi) return;
+      buildPad();
+      document.querySelectorAll('[data-code]').forEach(b => b.addEventListener('click', () => pickPartner(b.dataset.code)));
+    }).catch(() => { legacyPinUi = false; });
     const lf = document.getElementById('loginForm');
     if (lf) lf.addEventListener('submit', e => {
       e.preventDefault();
-      login({ username: document.getElementById('liUser').value, password: document.getElementById('liPass').value }, true);
+      login({ login: document.getElementById('liUser').value,
+        password: document.getElementById('liPass').value }, false);
     });
     /* De poort is een gesprek met Rahul, net als in de leden-app: hij vraagt de
        gebruikersnaam, dan het wachtwoord, en belt daarna aan bij dezelfde route
-       als het formulier hiernaast (/api/supplier/login). Er gaat niets van dit
+       als het formulier hiernaast (/api/supplier/mijn/login). Er gaat niets van dit
        gesprek naar een taalmodel en Rahul beslist niets -- de server zegt ja of
        nee. Het formulier blijft in de pagina staan als vangnet: is de poort er
        niet, dan is er gewoon het oude blok. */
@@ -337,13 +346,13 @@
         wacht: () => T('gate.rp.wacht','Een ogenblik, ik kijk het na.'),
         stuurLabel: T('gate.rp.stuur','Stuur'),
         stappen: [
-          { sleutel:'username', vraag: () => T('gate.rp.wie','Met wie heb ik het genoegen?'),
-            plho: () => T('gate.user','Gebruikersnaam'), type:'text', autocomplete:'username' },
+          { sleutel:'username', vraag: () => T('gate.rp.wie','Open uw werkplek met uw persoonlijke RTG-account. Wat is uw e-mail of gebruikersnaam?'),
+            plho: () => T('gate.user','RTG e-mail of gebruikersnaam'), type:'text', autocomplete:'username' },
           { sleutel:'password', vraag: () => T('gate.rp.pass','Dank u. En uw wachtwoord?'),
             plho: () => T('gate.pass','Wachtwoord'), type:'password', autocomplete:'current-password' }
         ],
         klaar: async (a) => {
-          const ok = await login({ username: a.username, password: a.password }, true, true);
+          const ok = await login({ login: a.username, password: a.password }, false, true);
           if (!ok) throw new Error(T('login.bad','Onjuiste gebruikersnaam of wachtwoord.'));
         }
       });
@@ -371,15 +380,14 @@
     const kassacode = document.getElementById('enCode').value.trim();
     const login2 = document.getElementById('enLogin').value.trim();
     const password = document.getElementById('enPass').value;
-    const pin = document.getElementById('enPin').value.trim();
     msg.className = 'enroll-msg';
 /* aanmelden als medewerker bij een zaak */
     msg.textContent = T('enr.busy','Bezig met aanmelden...');
     try {
-      const r = await API.call('/supplier/staff/join', { bedrijf, kassacode, login: login2, password, pin });
+      const r = await API.call('/supplier/staff/join', { bedrijf, kassacode, login: login2, password });
       msg.className = 'enroll-msg ok';
       msg.textContent = T('enr.ok','Gelukt! U bent aangemeld. U wordt ingelogd...');
-      await login({ code: r.code, staffId: r.staffId, pin }, false, true);
+      await login({ login: login2, password, bedrijf: r.code }, false, true);
     } catch (err) {
       msg.className = 'enroll-msg err';
       msg.textContent = err.message || T('enr.fail','Aanmelden mislukt. Controleer de gegevens.');
@@ -415,12 +423,13 @@
     verzekeringen: ['Adviseur'],
     wintersport: ['Resortmanager','Skischool','Liften & pistes','Verhuur','Berggids & lawinedienst']
   };
-  let pickCode = null, gateRoster = null, pendingStation = null;
+  let pickCode = null, gateRoster = null, pendingStation = null, legacyPinUi = false;
   const spH2 = () => document.querySelector('#staffPick h2');
   const spDeck = () => document.querySelector('#staffPick .sp-deck');
 
   async function pickPartner(code){
     if (!API.enabled){ toast(T('sup.needserver','Start de server (npm start) om de leverancier-app te gebruiken.')); return; }
+    if (!legacyPinUi) return toast(T('sp.accountonly','Log in met uw persoonlijke RTG-account.'));
     pickCode = code;
     gateRoster = { supplier:{ name: code }, staff: [] };
     try { gateRoster = await API.call('/supplier/roster', { code }); } catch(e){}
@@ -559,6 +568,7 @@
     document.querySelectorAll('#spDots i').forEach((el,i)=> el.classList.toggle('on', i < pinBuf.length));
   }
   function openPin(sid, name, role){
+    if (!legacyPinUi) return;
     pinFor = Number(sid); pinBuf = '';
     $('#spPinName').textContent = name;
     $('#spPinRole').textContent = T('role.'+role, role==='manager'?'Manager':'Medewerker');
@@ -578,7 +588,7 @@
     pinBuf += k; renderDots();
     if (pinBuf.length === 4){
       const pin = pinBuf;
-      const ok = await login({ code: pickCode, staffId: pinFor, pin }, false, true);
+      const ok = await login({ code: pickCode, staffId: pinFor, pin }, true, true);
       if (!ok){ $('#spDots').classList.add('bad'); pinBuf=''; setTimeout(renderDots, 400); }
     }
   }
@@ -593,24 +603,26 @@
       () => af(null), { enableHighAccuracy: true, timeout: 8000 });
   });
 
-  // Gemeenschappelijke login. Geeft true/false terug bij PIN, zodat de pad kan reageren.
-  async function login(body, isCred, silent){
+  // Productie gebruikt uitsluitend /supplier/mijn/login. Alleen de expliciete
+  // Magnaat Test-kiezer mag nog naar de oude /supplier/login.
+  async function login(body, legacy, silent){
     if (!API.enabled){ toast(T('sup.needserver','Start de server (npm start) om de leverancier-app te gebruiken.')); return false; }
     try {
       let d;
-      try { d = await API.call('/supplier/login', body); }
+      const route = legacy ? '/supplier/login' : '/supplier/mijn/login';
+      try { d = await API.call(route, body); }
       catch(e1){
         if (!(e1.data && e1.data.locatieNodig)) throw e1;
         const pos = await vraagPositie();
         if (!pos) throw e1;
-        d = await API.call('/supplier/login', Object.assign({ positie: pos }, body));
+        d = await API.call(route, Object.assign({ positie: pos }, body));
       }
       API.token = d.token;
       applyState(d.state);
-      koppelAanRtgAccount(body, isCred); // een account voor alles: stil koppelen
+      if (legacy) koppelAanRtgAccount(body, false); // uitsluitend testmigratie
     } catch(e){
       if (silent) return false;
-      toast(isCred ? T('login.bad','Onjuiste gebruikersnaam of wachtwoord.') : (e.message||T('login.failed','Inloggen mislukt.')));
+      toast(!legacy ? T('login.bad','Onjuiste RTG-inloggegevens.') : (e.message||T('login.failed','Inloggen mislukt.')));
       return false;
     }
     try { localStorage.setItem('rtg_sup_token', API.token); } catch(e){}
@@ -2558,22 +2570,27 @@
       html += '<div class="tkc"><h3>'+T('kt.team','Team & uitnodigingen')+'</h3>'+
         (state.staff||[]).map(m=>'<div class="st-row h-wrap"><span>'+m.name+'<span class="sub">'+(m.func||'')+' \u00b7 '+(m.role==='manager'?'Manager':T('kt.staff','Medewerker'))+(m.lid?' \u00b7 '+T('kt.lid','RTG-lid'):'')+'</span></span>'+
           '<span class="acts">'+(m.id!==actor().staffId
-            ? '<button class="obtn" data-kreset="'+m.id+'">'+T('kt.reset','Reset code')+'</button><button class="obtn warn" data-kdel="'+m.id+'">'+T('kt.ontslag','Ontslag')+'</button>'
+            ? (legacyPinUi ? '<button class="obtn" data-kreset="'+m.id+'">'+T('kt.reset','Reset testcode')+'</button>' : '')+
+              '<button class="obtn warn" data-kdel="'+m.id+'">'+T('kt.ontslag','Ontslag')+'</button>'
             : '')+'</span></div>').join('')+
         '<div class="tkc-who" style="margin-top:0.5rem;line-height:1.5;">'+T('kt.invite.intro','Nodig uit; de medewerker meldt zich zelf aan met bedrijfsnaam + kassacode en een eigen RTG-account.')+'</div>'+
         '<div class="st-form"><input class="st-in" id="ktName" placeholder="'+T('kt.name.opt','Naam (optioneel)')+'"><input class="st-in" id="ktFunc" placeholder="'+T('kt.func','Functie (bijv. Bediening)')+'">'+
         '<select class="st-in" id="ktRole"><option value="staff">'+T('kt.staff','Medewerker')+'</option><option value="manager">Manager</option></select>'+
         '<button class="bigbtn" id="ktInvite" class="h-mt20">'+T('kt.invite','Nodig uit, kassacode verschijnt')+'</button></div></div>';
-      // open kassacodes: teruglezen en intrekken
+      // Open uitnodigingen: de kale code is alleen bij uitgifte zichtbaar.
       if (!invData) laadInvites();
       const openInv = (invData && invData.invites) || [];
-      html += '<div class="tkc"><h3>\ud83c\udf9f '+T('kt.openinv','Open kassacodes')+(openInv.length?' ('+openInv.length+')':'')+'</h3>'+
+      html += '<div class="tkc"><h3>\ud83c\udf9f '+T('kt.openinv','Personeelsuitnodigingen')+(openInv.length?' ('+openInv.length+')':'')+'</h3>'+
         (invData
           ? (openInv.length ? openInv.map(i =>
-              '<div class="st-row"><span><span style="font-family:monospace;letter-spacing:0.14em;color:var(--rtg-leesgoud,var(--gold));">'+escT(i.kassacode)+'</span>'+
+              '<div class="st-row"><span><span style="color:var(--rtg-leesgoud,var(--gold));">'+
+              (i.status==='actief'?T('kt.codeonce','Code eenmalig uitgegeven'):
+                i.status==='verlopen'?T('kt.expired','Verlopen · code verborgen'):
+                  T('kt.revoked','Ingetrokken · code verborgen'))+'</span>'+
               '<span class="sub">'+(i.naam?escT(i.naam)+' \u00b7 ':'')+(i.func?escT(i.func)+' \u00b7 ':'')+(i.role==='manager'?'Manager \u00b7 ':'')+T('kt.geldigtot','geldig t/m')+' '+new Date(i.expires).toLocaleDateString()+'</span></span>'+
-              '<span class="acts"><button class="obtn warn" data-kinv="'+escT(i.kassacode)+'">'+T('kt.intrek','Trek in')+'</button></span></div>').join('')
-            : '<div class="tkc-who">'+T('kt.geeninv','Geen open uitnodigingen.')+'</div>')
+              '<span class="acts"><button class="obtn" data-krot="'+escT(i.id)+'">'+T('kt.roteer','Nieuwe code')+'</button>'+
+              (i.status==='actief'?'<button class="obtn warn" data-kinv="'+escT(i.id)+'">'+T('kt.intrek','Trek in')+'</button>':'')+'</span></div>').join('')
+            : '<div class="tkc-who">'+T('kt.geeninv','Geen uitnodigingen.')+'</div>')
           : '<div class="tkc-who">'+T('kt.laden','Laden...')+'</div>')+'</div>';
       html += '<div class="tkc"><h3>'+T('kt.oproep','Hele team oproepen')+'</h3><div class="tkc-who">'+T('kt.oproep.s','Laat alle telefoons trillen, bijvoorbeeld bij een briefing.')+'</div>'+
         '<button class="obtn" id="ktBuzz" class="h-mt40">\uD83D\uDCE2 '+T('kt.buzzall','Buzz iedereen')+'</button></div>';
@@ -3300,8 +3317,16 @@
         await refresh(); } catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('[data-kinv]').forEach(b => b.addEventListener('click', async () => {
-      try { await API.call('/supplier/staff/invite/intrek', { kassacode: b.dataset.kinv });
+      try { await API.call('/supplier/staff/invite/intrek', { id: b.dataset.kinv });
         invData = null; toast(T('kt.ingetrokken','Uitnodiging ingetrokken.')); renderStation(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-krot]').forEach(b => b.addEventListener('click', async () => {
+      try { const d = await API.call('/supplier/staff/invite/roteer', {
+        id: b.dataset.krot, idem: RTGIdem('inv-roteer')
+      });
+        kantoorMsg = T('kt.invite.rotated','Nieuwe uitnodigingscode; geef hem nu eenmalig door:')+'<br>'+
+          '<b style="color:var(--rtg-leesgoud,var(--gold));font-family:monospace;">'+escT(d.invite.kassacode)+'</b>';
+        invData = null; await refresh(); } catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('[data-kno]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/apply/decide', { id: b.dataset.kno, action: 'afwijzen' }); await refresh(); } catch(e){ toast(e.message); }
@@ -5172,6 +5197,30 @@
   }
 
 
+/* Een vrachtvolgcode bestaat alleen in dit dialoog zolang de expediteur haar
+   bewust kopieert. De lijst, browseropslag en latere antwoorden krijgen haar
+   nooit terug. De dialoog hoort bij de hele vrachtmodule, niet bij één kaart. */
+  function vrToonCode(code, kop){
+    if (!code) return;
+    const oud = document.getElementById('vrCodeEenmalig'); if (oud) oud.remove();
+    const laag = document.createElement('div'); laag.id = 'vrCodeEenmalig';
+    laag.style.cssText = 'position:fixed;inset:0;z-index:10050;background:rgba(5,9,13,.82);display:grid;place-items:center;padding:1rem;';
+    laag.innerHTML = '<div role="dialog" aria-modal="true" aria-labelledby="vrCodeKop" style="width:min(34rem,100%);border:1px solid var(--gold);background:var(--bg);padding:1rem;box-shadow:0 1.5rem 4rem rgba(0,0,0,.45);">'+
+      '<b id="vrCodeKop">'+esc(kop)+'</b><p class="sub">'+T('vr.codeonce','Kopieer deze klantcode nu. RTG bewaart haar niet leesbaar en toont haar later niet opnieuw.')+'</p>'+
+      '<input id="vrVerseCode" class="st-in" readonly autocomplete="off" spellcheck="false" style="width:100%;">'+
+      '<div style="display:flex;gap:.5rem;margin-top:.75rem;"><button class="obtn primary" data-vrcode-copy>'+T('vr.kopieer','Kopieer')+'</button><button class="obtn" data-vrcode-dicht>'+T('vr.sluit','Sluit')+'</button></div></div>';
+    document.body.appendChild(laag);
+    const invoer = laag.querySelector('#vrVerseCode'); invoer.value = code; invoer.focus(); invoer.select();
+    laag.querySelector('[data-vrcode-copy]').addEventListener('click', () => {
+      const klaar = () => toast(T('vr.gekopieerd','Volgcode gekopieerd.'));
+      if (navigator.clipboard && navigator.clipboard.writeText)
+        navigator.clipboard.writeText(code).then(klaar, () => invoer.select());
+      else invoer.select();
+    });
+    laag.querySelector('[data-vrcode-dicht]').addEventListener('click', () => laag.remove());
+    laag.addEventListener('keydown', e => { if (e.key === 'Escape') laag.remove(); });
+  }
+
   // ---- vracht & expeditie: internationale zendingen over lucht, water en land ----
   /* Zonder pictogrammen: de gedeelde themalaag houdt lopende tekst bewust
      zakelijk (emoticons worden eruit geveegd), dus hier alleen woorden. */
@@ -5208,17 +5257,24 @@
     const docs = z.etappes.map(e => esc(e.document)).filter((v,i,a)=>a.indexOf(v)===i).join(' · ');
     let acties = '';
 /* de statusknoppen van een vrachtzending */
+    const toegang = z.volgtoegang || null;
+    const actief = !!(toegang && toegang.stand === 'actief');
+    const codeStand = actief
+      ? T('vr.codeactief','Klantlink actief')+' · '+T('vr.tot','tot')+' '+new Date(toegang.expires_at).toLocaleDateString('nl-NL')+' · '+toegang.gebruik+'/'+toegang.max_gebruik+' '+T('vr.bekeken','keer bekeken')
+      : T('vr.codegesloten','Geen actieve klantlink');
     if (z.status==='onderweg') acties += '<button data-vret="'+z.id+'" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:0;padding:0.4rem;font-weight:600;font-family:inherit;font-size:0.75rem;">'+T('vr.etklaar','Etappe klaar')+'</button>';
     if (z.status==='douane') acties += '<button data-vrdouane="'+z.id+'" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:0;padding:0.4rem;font-weight:600;font-family:inherit;font-size:0.75rem;">'+T('vr.douane','Douane heeft ingeklaard')+'</button>';
     if (z.status==='aangekomen') acties += '<button data-vraf="'+z.id+'" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:0;padding:0.4rem;font-weight:600;font-family:inherit;font-size:0.75rem;">'+T('vr.afleveren','Afleveren')+'</button>';
     if (z.status!=='afgeleverd') acties += '<button data-vrmeld="'+z.id+'" style="background:none;border:1px solid var(--line);border-radius:0;padding:0.4rem 0.7rem;color:var(--soft);font-family:inherit;font-size:0.75rem;">'+T('vr.melding','Melding')+'</button>';
+    acties += '<button data-vrcode="'+z.id+'" data-vrcode-actief="'+(actief?'1':'0')+'" class="obtn">'+(actief?T('vr.codevernieuw','Nieuwe volgcode'):T('vr.codeuitgeven','Volgcode uitgeven'))+'</button>';
+    if (actief) acties += '<button data-vrcode-weg="'+z.id+'" class="obtn warn">'+T('vr.codeintrek','Volgcode intrekken')+'</button>';
     return '<div style="border:1px solid '+(z.status==='afgeleverd'?'var(--line)':'var(--gold)')+';border-radius:0;padding:0.7rem 0.85rem;margin-top:0.5rem;">'+
       '<div style="display:flex;gap:0.5rem;align-items:baseline;"><b style="flex:1;font-size:0.85rem;">'+esc(z.ref)+' · '+esc(z.klant)+'</b>'+
       '<span style="border:1px solid var(--line);border-radius:0;padding:0.1rem 0.55rem;font-size:0.7rem;">'+esc(T('vr.st.'+z.status, VR_STATUS[z.status]||z.status))+'</span></div>'+
       '<div class="sub">'+esc(z.inhoud)+' · '+z.gewichtKg.toLocaleString('nl-NL')+' kg · '+z.colli+' colli · '+esc(z.incoterm)+'</div>'+
       '<div class="sub">'+esc(z.van.plaats)+' ('+esc(z.van.land)+') → '+esc(z.naar.plaats)+' ('+esc(z.naar.land)+') · ETA '+esc(z.eta)+'</div>'+
       vrTijdlijn(z)+
-      '<div class="sub h-mt40">'+T('vr.docs','Documenten')+': '+docs+' · '+T('vr.volgcode','volgcode voor de klant')+': <b>'+esc(z.volgcode)+'</b></div>'+
+      '<div class="sub h-mt40">'+T('vr.docs','Documenten')+': '+docs+' · '+esc(codeStand)+'</div>'+
       (z.gebeurtenissen.length ? '<details class="h-mt35"><summary class="sub" style="cursor:pointer;">'+T('vr.logboek','Logboek')+' ('+z.gebeurtenissen.length+')</summary>'+
         z.gebeurtenissen.map(g=>'<div class="sub">'+new Date(g.at).toLocaleString('nl-NL')+' · '+esc(g.tekst)+'</div>').join('')+'</details>' : '')+
       (acties ? '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;flex-wrap:wrap;">'+acties+'</div>' : '')+'</div>';
@@ -5270,7 +5326,8 @@
     const boek = el.querySelector('#vrBoek'); if (boek) boek.addEventListener('click', async () => {
       leesEtappes();
       try {
-        await API.call('/supplier/vracht/maak', {
+        const d = await API.call('/supplier/vracht/maak', {
+          idem: RTGIdem('vracht-maak'),
           klant: $('#vrKlant').value, inhoud: $('#vrInhoud').value, gewichtKg: $('#vrGewicht').value, colli: $('#vrColli').value,
           incoterm: $('#vrIncoterm').value,
           van: { plaats: $('#vrVanPlaats').value, land: $('#vrVanLand').value },
@@ -5278,16 +5335,30 @@
           etappes: vrEtappes
         });
         vrEtappes = [{ modaliteit:'weg', van:'', naar:'' }];
+        vrToonCode(d.zending && d.zending.volgcode, T('vr.codekopnieuw','Nieuwe volgcode voor de klant'));
         toast(T('vr.geboekt','Zending geboekt; de eerste etappe loopt.')); renderVracht();
       } catch(e){ toast(e.message); }
     });
-    el.querySelectorAll('[data-vret]').forEach(b => b.addEventListener('click', async () => { try { await API.call('/supplier/vracht/etappe', { id:b.dataset.vret }); renderVracht(); } catch(e){ toast(e.message); } }));
-    el.querySelectorAll('[data-vrdouane]').forEach(b => b.addEventListener('click', async () => { try { await API.call('/supplier/vracht/douane', { id:b.dataset.vrdouane }); renderVracht(); } catch(e){ toast(e.message); } }));
-    el.querySelectorAll('[data-vraf]').forEach(b => b.addEventListener('click', async () => { try { await API.call('/supplier/vracht/afleveren', { id:b.dataset.vraf }); toast(''+T('vr.klaar','Afgeleverd en getekend.')); renderVracht(); } catch(e){ toast(e.message); } }));
+    el.querySelectorAll('[data-vret]').forEach(b => b.addEventListener('click', async () => { try { await API.call('/supplier/vracht/etappe', { id:b.dataset.vret, idem:RTGIdem('vracht-etappe') }); renderVracht(); } catch(e){ toast(e.message); } }));
+    el.querySelectorAll('[data-vrdouane]').forEach(b => b.addEventListener('click', async () => { try { await API.call('/supplier/vracht/douane', { id:b.dataset.vrdouane, idem:RTGIdem('vracht-douane') }); renderVracht(); } catch(e){ toast(e.message); } }));
+    el.querySelectorAll('[data-vraf]').forEach(b => b.addEventListener('click', async () => { try { await API.call('/supplier/vracht/afleveren', { id:b.dataset.vraf, idem:RTGIdem('vracht-afleveren') }); toast(''+T('vr.klaar','Afgeleverd en getekend.')); renderVracht(); } catch(e){ toast(e.message); } }));
 /* een melding in het vrachtlogboek */
     el.querySelectorAll('[data-vrmeld]').forEach(b => b.addEventListener('click', async () => {
       const t = prompt(T('vr.meldvraag','Korte melding voor het logboek (de klant ziet dit op de volgcode):')); if (!t) return;
-      try { await API.call('/supplier/vracht/melding', { id:b.dataset.vrmeld, tekst:t }); renderVracht(); } catch(e){ toast(e.message); }
+      try { await API.call('/supplier/vracht/melding', { id:b.dataset.vrmeld, tekst:t, idem:RTGIdem('vracht-melding') }); renderVracht(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-vrcode]').forEach(b => b.addEventListener('click', async () => {
+      if (b.dataset.vrcodeActief === '1' && !confirm(T('vr.codevervangvraag','De huidige klantcode wordt direct onbruikbaar. Een nieuwe uitgeven?'))) return;
+      try {
+        const d = await API.call('/supplier/vracht/volgcode/roteer', { id:b.dataset.vrcode, idem:RTGIdem('vracht-code') });
+        vrToonCode(d.zending && d.zending.volgcode, T('vr.codekopvernieuw','Vernieuwde volgcode voor de klant'));
+        renderVracht();
+      } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-vrcode-weg]').forEach(b => b.addEventListener('click', async () => {
+      if (!confirm(T('vr.codeintrekvraag','Deze klantcode direct intrekken?'))) return;
+      try { await API.call('/supplier/vracht/volgcode/intrek', { id:b.dataset.vrcodeWeg, reden:'ingetrokken vanuit vrachtbeheer' }); renderVracht(); }
+      catch(e){ toast(e.message); }
     }));
   }
 
@@ -5350,7 +5421,6 @@
         (j.status==='aangevraagd'?gbKnop('data-gbjb', j.id, T('gb.j.bevestig','Bevestig'), true):'')+gbKnop('data-gbja', j.id, T('gb.j.afgerond','Afgerond'))+'</div>':'')+'</div>').join('');
     h += '<p class="sub h-mt50">'+T('gb.j.regel','Een jet-transfer is een dienstverzoek aan RTG Aviation; de concierge bevestigt pas na overleg, nooit vanzelf.')+'</p>';
     el.innerHTML = h;
-
 /* het gebouwbeheer: de knoppen en hun acties */
     const doe = (sel, pad, body) => el.querySelectorAll('['+sel+']').forEach(b => b.addEventListener('click', async () => {
       try { await API.call(pad, body(b.dataset)); renderGebouw(); } catch(e){ toast(e.message); }
@@ -7167,7 +7237,7 @@
     });
     // luchtzijde: de boarding pass van de gast aan de deur of de balie checken
     const bp = $('#posPass'); if (bp) bp.addEventListener('click', async () => {
-      const code = window.prompt(T('pos.passvraag','Boarding pass-code van de gast (bijv. VL-3F2A9C):'));
+      const code = window.prompt(T('pos.passvraag','Boarding pass-code van de gast (begint met BP.):'));
       if (!code) return;
       try {
         const r = await API.call('/supplier/lucht/pass', { code });
@@ -9506,7 +9576,23 @@
     finally { etenBezig=false; }
   }
 /* Live synchronisatie, meldingen en het opstarten van het partnerwerkblad. */
-  async function loadNotifs(){ try { const d = await API.call('/supplier/notifications', {}); } catch(e){} }
+  /* De eerste POST-vulling en de live stroom kunnen in willekeurige volgorde
+     aankomen. Samenvoegen op id houdt de recente lijst compleet, voorkomt een
+     dubbele eerste melding en laat een lokaal gelezen melding niet weer
+     ongelezen worden door een iets ouder SSE-antwoord. */
+  function neemNotifs(lijst){
+    const samen = new Map();
+    (Array.isArray(lijst) ? lijst : []).forEach(n => { if (n && n.id) samen.set(n.id, n); });
+    notifs.forEach(n => { if (n && n.id) samen.set(n.id, n); });
+    notifs = [...samen.values()].sort((a,b) => String(b.at||'').localeCompare(String(a.at||''))).slice(0,40);
+    renderBell();
+  }
+  async function loadNotifs(){
+    try {
+      const d = await API.call('/supplier/notifications', {});
+      neemNotifs(d && d.notifications);
+    } catch(e){}
+  }
   $('#bell').addEventListener('click', () => { $('#notifPanel').classList.add('open'); $('#notifScrim').classList.add('open'); if (notifs.some(n=>!n.read)){ notifs.forEach(n=>n.read=true); API.call('/supplier/notifications/read').catch(()=>{}); renderBell(); } });
   $('#notifClose').addEventListener('click', () => { $('#notifPanel').classList.remove('open'); $('#notifScrim').classList.remove('open'); });
   $('#notifScrim').addEventListener('click', () => { $('#notifPanel').classList.remove('open'); $('#notifScrim').classList.remove('open'); });
@@ -9518,7 +9604,7 @@
     if (window.TeamCall) TeamCall.init({ API, mij: () => { const a = actor(); return a.staffId ? { staffId: a.staffId, name: a.name } : null; }, T, toast });
     if (window.CollegaChat) CollegaChat.init({ API, mij: () => ({ staffId: actor().staffId, name: actor().name }), T, toast });
     try { source = new EventSource('/api/supplier/stream?token='+encodeURIComponent(API.token)); } catch(e){ return; }
-    source.addEventListener('hello', e => { const d=JSON.parse(e.data); notifs = d.unread||[]; renderBell(); });
+    source.addEventListener('hello', e => { const d=JSON.parse(e.data); neemNotifs(d.unread); });
     source.addEventListener('buzz', e => { const d=JSON.parse(e.data); showBuzz(d.from); });
     source.addEventListener('alarm', e => { const d=JSON.parse(e.data); showAlarm(d); });
     source.addEventListener('rtc', e => { if (window.TeamCall) TeamCall.event(e); });
@@ -9533,7 +9619,7 @@
       } catch(err){}
     });
     source.addEventListener('notify', e => {
-      const n = JSON.parse(e.data); notifs.unshift(n); renderBell();
+      const n = JSON.parse(e.data); neemNotifs([n]);
       if ('Notification' in window && Notification.permission==='granted'){ try{ new Notification(n.title,{body:n.body,icon:'icon.svg',tag:n.id}); }catch(_){} }
       toast(n.title + ', ' + n.body);
       refresh();
@@ -9550,7 +9636,6 @@
   $('#aiSend').addEventListener('click', sendAI);
   $('#aiInput').addEventListener('keydown', e => { if (e.key === 'Enter') sendAI(); });
   renderAIThread();
-  buildPad();
   renderGate();
   // WerkOS: de echte stand eerst, daarna het werkregister, dock en Cmd+K.
   if (window.WerkOS) WerkOS.koppel({

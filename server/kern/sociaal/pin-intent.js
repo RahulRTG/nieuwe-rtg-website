@@ -120,6 +120,13 @@ module.exports = ({ crypto }) => {
      direct waardeloos, ook op een andere instance. */
   function trekInVoor() { return 0; }
 
+  async function sluit() {
+    const c = client;
+    client = null; verbinding = null;
+    if (c) await c.quit();
+  }
+
   return { pinIntentMaak: maak, pinIntentGebruik: gebruik,
-    pinIntentTrekInVoor: trekInVoor, pinIntentOpen: gebruikt, PIN_INTENT_TTL_MS: TTL_MS };
+    pinIntentTrekInVoor: trekInVoor, pinIntentSluit: sluit,
+    pinIntentOpen: gebruikt, PIN_INTENT_TTL_MS: TTL_MS };
 };

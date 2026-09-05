@@ -34,11 +34,13 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+const crypto = require('crypto');
 const { spawnSync } = require('child_process');
 const { pak } = require('./afbouw-slot');
 const { ontleedDeel, verdeel } = require('./lib/delen');
 const { IJKINGEN } = require('./lib/ijkingen');
 const { ZWAAR } = require('./lib/zwaar');
+const { tapSamenvatting } = require('./lib/schermsuite-bewijs');
 
 const WORTEL = path.join(__dirname, '..');
 /* HET SLOT NIET TWEE KEER PAKKEN. pak() werpt als het bezet is, en dat is
@@ -192,6 +194,7 @@ const TIJDGRENS = 600000;
 const TIJDGRENS_IJKING = 40 * 60 * 1000;
 
 let batch = 0;
+const batchBewijzen = [];
 function draai(namen, parallel, metVloer, tijdgrens) {
   if (!namen.length) return 0;
   /* --test-force-exit vangt de andere hanger af: alle toetsen zijn klaar, maar
@@ -212,7 +215,14 @@ function draai(namen, parallel, metVloer, tijdgrens) {
     args.push('--experimental-test-coverage',
       '--test-reporter=' + (reporter || 'tap'), '--test-reporter-destination=stdout',
       '--test-reporter=lcov', '--test-reporter-destination=' + path.join(dekkingMap, naam));
-  } else if (reporter) args.push('--test-reporter=' + reporter);
+  } else {
+    args.push('--test-reporter=' + (reporter || 'spec'), '--test-reporter-destination=stdout');
+  }
+  /* De zichtbare reporter is voor mensen; een tweede TAP-stroom is het
+     machinaal bewijs. Exitcode nul alleen ziet skips en todo's niet. Iedere
+     batch krijgt daarom een eigen, door Node geschreven TAP-samenvatting. */
+  const tapPad = path.join(os.tmpdir(), 'rtg-unit-tap-' + process.pid + '-' + (++batch) + '.tap');
+  args.push('--test-reporter=tap', '--test-reporter-destination=' + tapPad);
   args.push(...namen.map(n => path.join('test', n)));
   /* DE MODUS HOORT BIJ DEZE BATCH EN NIET BIJ DE RONDE. Dekking staat per
      aanroep aan (een vloer, of een lcov-map), dus een ronde kan batches met en
@@ -223,6 +233,11 @@ function draai(namen, parallel, metVloer, tijdgrens) {
     cwd: WORTEL, stdio: 'inherit', timeout: 90 * 60 * 1000,
     env: { ...env, RTG_TOETSMODUS: metDekking ? 'dekking' : 'normaal' }
   });
+  try {
+    batchBewijzen.push(tapSamenvatting(fs.readFileSync(tapPad, 'utf8')));
+  } catch (e) {
+    batchBewijzen.push(tapSamenvatting(''));
+  } finally { try { fs.unlinkSync(tapPad); } catch (e) {} }
   if (r.error) {
     console.error('[tests] runnerfout:', r.error.message);
     return 2;
@@ -287,20 +302,33 @@ geefAfbouwSlotVrij();
    ALLEEN BIJ EEN VOLLE RONDE. Wie `node scripts/test-runner.js pay.test.js`
    draait heeft de suite niet gedraaid; dat stempel zou de meter laten liegen
    op precies het punt waarvoor hij bestaat. */
-if (!selectie.length && !deel && !zonderIjkingen) {
+if (!selectie.length && !deel && !zonderIjkingen && !zonderZware) {
   try {
-    const { stempel } = require('./lib/stempel');
+    const { exactStempel } = require('./lib/stempel');
+    const bestandenSha256 = crypto.createHash('sha256').update(bestanden.join('\n') + '\n').digest('hex');
+    const tel = naam => batchBewijzen.reduce((t, b) => t + (Number.isSafeInteger(b[naam]) ? b[naam] : 0), 0);
+    const tapVolledig = batchBewijzen.length > 0 && batchBewijzen.every(b => b.volledig);
+    const telling = { tapVolledig, tests:tel('tests'), geslaagdeTests:tel('geslaagdeTests'),
+      mislukt:tel('mislukt'), geannuleerd:tel('geannuleerd'),
+      overgeslagen:tel('overgeslagen'), todo:tel('todo') };
+    const zonderStilte = tapVolledig && telling.tests > 0 && telling.mislukt === 0 &&
+      telling.geannuleerd === 0 && telling.overgeslagen === 0 && telling.todo === 0;
+    if (code === 0 && !zonderStilte) code = 1;
     fs.writeFileSync(path.join(WORTEL, 'SUITE.json'), JSON.stringify({
-      stempel: stempel(),
+      stempel: exactStempel(),
       uitleg: 'De laatste VOLLE testronde: wanneer, waartegen, en of hij groen was. ' +
         'scripts/versheid.js leest dit als elk ander register, zodat een suite die achterloopt ' +
         'net zo hard opvalt als een register dat achterloopt.',
       grens: 'zegt niets over WELKE toets zakte -- dat staat in de uitvoer van de ronde zelf. ' +
         'Hij zegt alleen dat er een volle ronde is geweest, wanneer, en met welke uitkomst.',
       hoe: 'npm test',
-      gemeten: { bestanden: bestanden.length, afsluitcode: code, groen: code === 0 }
+      gemeten: { volledig: true, bestanden: bestanden.length, bestandenSha256,
+        afsluitcode: code, groen: code === 0, ...telling }
     }, null, 1) + '\n');
-  } catch (e) { console.error('[tests] kon SUITE.json niet schrijven: ' + e.message); }
+  } catch (e) {
+    console.error('[tests] kon SUITE.json niet schrijven: ' + e.message);
+    if (code === 0) code = 1;
+  }
 }
 
 process.exitCode = code;

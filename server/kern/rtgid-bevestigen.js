@@ -22,29 +22,28 @@
 const { NIVEAUS, voldoet } = require('./betrouwbaarheid');
 
 module.exports = (ctx) => {
-  const { S, save, nu, iso, crypto, schoon, hash, cap, logVan, codenaamUit, accountVanKey,
+  const { metStaat, toegang, nu, iso, cap, logVan, codenaamUit, accountVanKey,
     niveauVoor, stapOp, passkeysVan, MAX_LOG, MAX_SESSIES, SESSIE_TTL_MS } = ctx;
 
   /* ---- de app-kant: de code opzoeken, bevestigen of weigeren ---- */
   function koppelZoek(key, code) {
-    const s = S();
-    const c = schoon(code, 20).toUpperCase();
-    const k = s.koppels.find(x => x.code === c && x.status === 'wacht');
-    if (!k || nu() > k.verloopt) return { status: 404, error: 'Geen wachtende inlog met die code; codes leven twee minuten.' };
-    // de machtigingen waarmee dit lid ook namens een ander kan inloggen
-    const machtigingen = s.machtigingen.filter(m => m.naarKey === key && !m.ingetrokken && nu() <= m.tot)
-      .map(m => ({ id: m.id, van: codenaamUit(m.vanKey), dienst: m.dienst }));
-    /* Hoeveel passkeys dit lid heeft, gaat mee. Bevestigen kan niet zonder, en
-       een scherm dat dat pas bij de knop ontdekt, laat iemand tegen een dichte
-       deur lopen zonder te zeggen welke sleutel eraan hoort. */
-    const u = accountVanKey(key);
-    /* De eis en of dit lid hem haalt, gaan allebei mee. Alleen de eis tonen zou
-       het lid laten uitzoeken waar hij staat; alleen "kan niet" tonen laat hem
-       raden waarom. */
-    const mijn = niveauVoor(key);
-    return { status: 200, koppelId: k.id, dienst: k.dienst, attributen: k.attributen, machtigingen,
-      passkeys: typeof passkeysVan === 'function' ? passkeysVan(u) : 0, eigenAccount: !!u,
-      minBetrouwbaarheid: k.eis || null, betrouwbaarheid: mijn, haaltEis: voldoet(mijn, k.eis) };
+    return metStaat(s => {
+      const k = toegang.zoekCode(s, code);
+      if (k && k.status === 'wacht' && nu() > k.verloopt) {
+        k.status = 'verlopen';
+        toegang.sluitCode(k, 'rtgid', 'koppelcode verlopen');
+      }
+      if (!k || k.status !== 'wacht' || toegang.codeReden(k))
+        return { status: 404, error: 'Geen wachtende inlog met die code; codes leven twee minuten.' };
+      toegang.noteerKijker(k, key);
+      const machtigingen = s.machtigingen.filter(m => m.naarKey === key && !m.ingetrokken && nu() <= m.tot)
+        .map(m => ({ id: m.id, van: codenaamUit(m.vanKey), dienst: m.dienst }));
+      const u = accountVanKey(key);
+      const mijn = niveauVoor(key);
+      return { status: 200, koppelId: k.id, dienst: k.dienst, attributen: k.attributen, machtigingen,
+        passkeys: typeof passkeysVan === 'function' ? passkeysVan(u) : 0, eigenAccount: !!u,
+        minBetrouwbaarheid: k.eis || null, betrouwbaarheid: mijn, haaltEis: voldoet(mijn, k.eis) };
+    });
   }
   /* Bevestigen vraagt ALTIJD een passkey, en die eis staat HIER en niet in de
      route.
@@ -65,17 +64,33 @@ module.exports = (ctx) => {
      bevestigen, en krijgt dat met zoveel woorden te horen in plaats van een
      vage weigering. */
   async function bevestig(key, koppelId, machtigingId, bewijs) {
-    const s = S();
-    const k = s.koppels.find(x => x.id === String(koppelId || ''));
-    if (!k || k.status !== 'wacht') return { status: 404, error: 'Deze inlog wacht niet (meer).' };
-    if (nu() > k.verloopt) { k.status = 'verlopen'; save(); return { status: 410, error: 'De code is verlopen; laat de dienst een nieuwe tonen.' }; }
-    let voorKey = key, namens = null;
-    if (machtigingId) {
-      const m = s.machtigingen.find(x => x.id === String(machtigingId));
-      if (!m || m.naarKey !== key || m.ingetrokken || nu() > m.tot) return { status: 403, error: 'Deze machtiging is niet (meer) geldig.' };
-      if (m.dienst !== k.dienst) return { status: 403, error: 'Deze machtiging geldt voor ' + m.dienst + ', niet voor ' + k.dienst + '.' };
-      voorKey = m.vanKey; namens = codenaamUit(key);
-    }
+    const controle = s => {
+      const k = s.koppels.find(x => x.id === String(koppelId || ''));
+      if (!k || k.status !== 'wacht' || !toegang.gezienDoor(k, key))
+        return { fout: { status: 404, error: 'Deze inlog wacht niet (meer).' } };
+      if (nu() > k.verloopt || toegang.codeReden(k)) {
+        k.status = 'verlopen';
+        toegang.sluitCode(k, 'rtgid', 'koppelcode verlopen');
+        return { fout: { status: 410, error: 'De code is verlopen; laat de dienst een nieuwe tonen.' } };
+      }
+      let voorKey = key, namens = null;
+      if (machtigingId) {
+        const m = s.machtigingen.find(x => x.id === String(machtigingId));
+        if (!m || m.naarKey !== key || m.ingetrokken || nu() > m.tot)
+          return { fout: { status: 403, error: 'Deze machtiging is niet (meer) geldig.' } };
+        if (m.dienst !== k.dienst)
+          return { fout: { status: 403, error: 'Deze machtiging geldt voor ' + m.dienst + ', niet voor ' + k.dienst + '.' } };
+        voorKey = m.vanKey;
+        namens = codenaamUit(key);
+      }
+      return { k, voorKey, namens };
+    };
+    const vooraf = await metStaat(s => {
+      const c = controle(s);
+      return c.fout ? c : { k: { id: c.k.id, dienst: c.k.dienst, eis: c.k.eis },
+        voorKey: c.voorKey, namens: c.namens };
+    });
+    if (vooraf.fout) return vooraf.fout;
     /* De passkey van wie er STAAT, niet van wie hij vertegenwoordigt: bij een
        machtiging tekent de gemachtigde met zijn eigen sleutel. Anders zou een
        machtiging betekenen dat iemand met de biometrie van een ander bevestigt,
@@ -84,46 +99,59 @@ module.exports = (ctx) => {
        machtiging vraagt de dienst zekerheid over de persoon wiens identiteit
        hij krijgt. En deze controle staat VOOR de passkey, want om iemands
        gezicht vragen voor een bevestiging die toch afvalt, is onbeleefd. */
-    if (k.eis) {
-      const n = niveauVoor(voorKey);
-      if (!voldoet(n, k.eis)) {
-        const eisNaam = (NIVEAUS.find(x => x.id === k.eis) || {}).naam || k.eis;
-        return { status: 403, error: k.dienst + ' vraagt betrouwbaarheidsniveau ' + k.eis + ' (' + eisNaam +
-          ')' + (namens ? ' voor de persoon namens wie u inlogt' : '') + '; u staat op ' + n.id + ' (' + n.naam + ').' };
+    if (vooraf.k.eis) {
+      const n = niveauVoor(vooraf.voorKey);
+      if (!voldoet(n, vooraf.k.eis)) {
+        const eisNaam = (NIVEAUS.find(x => x.id === vooraf.k.eis) || {}).naam || vooraf.k.eis;
+        return { status: 403, error: vooraf.k.dienst + ' vraagt betrouwbaarheidsniveau ' + vooraf.k.eis + ' (' + eisNaam +
+          ')' + (vooraf.namens ? ' voor de persoon namens wie u inlogt' : '') + '; u staat op ' + n.id + ' (' + n.naam + ').' };
       }
     }
     const ik = accountVanKey(key);
     if (!ik) return { status: 403, error: 'Bevestigen met RTG iD vraagt een passkey, en die hoort bij een eigen RTG-account. Een demo-persona of gast heeft er geen.' };
     if (typeof stapOp !== 'function') return { status: 500, error: 'De passkey-controle is niet aangesloten; bevestigen kan nu niet.' };
-    const bewijsUit = await stapOp({ user: ik, doel: k.id, bewijs: bewijs || {} });
+    const bewijsUit = await stapOp({ user: ik, doel: vooraf.k.id, bewijs: bewijs || {} });
     if (!bewijsUit || bewijsUit.error) return bewijsUit || { status: 401, error: 'De passkey kon niet worden geverifieerd.' };
     /* De koppel kan tijdens de ceremonie zijn verlopen of door een tweede
        tabblad zijn afgehandeld; na een await is de eerdere controle een
        momentopname van daarnet. */
-    if (k.status !== 'wacht') return { status: 409, error: 'Deze inlog is inmiddels afgehandeld.' };
-    if (nu() > k.verloopt) { k.status = 'verlopen'; save(); return { status: 410, error: 'De code is tijdens het bevestigen verlopen; laat de dienst een nieuwe tonen.' }; }
-    const raw = crypto.randomBytes(24).toString('hex');
-    /* De sessie draagt de MACHTIGING waarop hij draait, niet alleen de codenaam
-       van wie er tekende. Zonder dat is bij het intrekken niet te zien welke
-       lopende sessie erbij hoort, en dan gaan ze allemaal dicht -- ook die van
-       een andere gemachtigde bij een andere dienst. */
-    const sess = { tokenHash: hash(raw), dienst: k.dienst, memberKey: voorKey, attributen: k.attributen,
-      namens, machtigingId: machtigingId ? String(machtigingId) : null,
-      gemaakt: iso(), verloopt: nu() + SESSIE_TTL_MS, ingetrokken: false };
-    s.sessies.unshift(sess); cap(s.sessies, MAX_SESSIES);
-    k.status = 'bevestigd'; k.tokenEenmalig = raw;
-    const log = logVan(voorKey);
-    log.unshift({ om: iso(), dienst: k.dienst, attributen: k.attributen, met: 'passkey',
-      soort: namens ? 'inlog door gemachtigde ' + namens : 'inlog' });
-    cap(log, MAX_LOG); save();
-    return { status: 200, ok: true, dienst: k.dienst, namens: namens || undefined };
+    return metStaat(s => {
+      const c = controle(s);
+      if (c.fout) return c.fout.status === 404
+        ? { status: 409, error: 'Deze inlog is inmiddels afgehandeld.' } : c.fout;
+      if (c.k.eis) {
+        const n = niveauVoor(c.voorKey);
+        if (!voldoet(n, c.k.eis)) return { status: 403,
+          error: 'Het vereiste betrouwbaarheidsniveau is tijdens het bevestigen gewijzigd.' };
+      }
+      if (toegang.statusReden(c.k) || !toegang.gebruikCode(c.k, key))
+        return { status: 409, error: 'Deze inlog is inmiddels afgehandeld.' };
+      const sess = { tokenHash: c.k.status_toegang.code_hash, dienst: c.k.dienst,
+        memberKey: c.voorKey, attributen: c.k.attributen,
+        namens: c.namens, machtigingId: machtigingId ? String(machtigingId) : null,
+        gemaakt: iso(), verloopt: nu() + SESSIE_TTL_MS, ingetrokken: false };
+      s.sessies.unshift(sess);
+      cap(s.sessies, MAX_SESSIES);
+      c.k.status = 'bevestigd';
+      c.k.bevestigd_at = iso();
+      c.k.bevestigd_lid_hash = toegang.kijkerHash(key);
+      const log = logVan(c.voorKey, s);
+      log.unshift({ om: iso(), dienst: c.k.dienst, attributen: c.k.attributen, met: 'passkey',
+        soort: c.namens ? 'inlog door gemachtigde ' + c.namens : 'inlog' });
+      cap(log, MAX_LOG);
+      return { status: 200, ok: true, dienst: c.k.dienst, namens: c.namens || undefined };
+    });
   }
   function weiger(key, koppelId) {
-    const s = S();
-    const k = s.koppels.find(x => x.id === String(koppelId || ''));
-    if (!k || k.status !== 'wacht') return { status: 404, error: 'Deze inlog wacht niet (meer).' };
-    k.status = 'geweigerd'; save();
-    return { status: 200, ok: true };
+    return metStaat(s => {
+      const k = s.koppels.find(x => x.id === String(koppelId || ''));
+      if (!k || k.status !== 'wacht' || !toegang.gezienDoor(k, key))
+        return { status: 404, error: 'Deze inlog wacht niet (meer).' };
+      k.status = 'geweigerd';
+      k.geweigerd_at = iso();
+      toegang.sluitCode(k, toegang.kijkerHash(key), 'lid heeft koppeling geweigerd');
+      return { status: 200, ok: true };
+    });
   }
 
   return { koppelZoek, bevestig, weiger };

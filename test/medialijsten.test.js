@@ -139,9 +139,13 @@ test('5. haalt de maker een stuk weg, dan staat het er als verdwenen -- niet sti
 });
 
 test('6. een lijst weggooien haalt geen enkel stuk weg', async () => {
+  const voor = await api('/api/mediaos/lijsten', {}, maker);
+  assert.ok(voor.body.lijsten.some(l => l.id === lijstId),
+    'de concrete lijst bestaat vóór het weggooien');
   const weg = await api('/api/mediaos/lijst/zet', { id: lijstId, weg: true }, maker);
   assert.equal(weg.status, 200);
-  assert.deepEqual(weg.body.lijsten, [], 'de lijst is weg');
+  assert.equal(weg.body.lijsten.some(l => l.id === lijstId), false, 'de concrete lijst is weg');
+  assert.equal(weg.body.lijsten.length, voor.body.lijsten.length - 1, 'precies één lijst is weggehaald');
 
   /* En het werk staat er nog. Een afspeellijst is een ORDENING, geen bezit:
      wie zijn lijst opruimt, hoort niet zijn muziek kwijt te raken. */

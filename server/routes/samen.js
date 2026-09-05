@@ -1,38 +1,79 @@
-/* Domein "samen": meekijken en samen doen door het hele leden-OS. Alles
-   achter de leden-inlog en op codenaam; gasten kijken niet mee. De widget
-   (shared/metgezel.js) praat hiermee en luistert via /api/stream naar de
-   'samen'-seintjes. */
-module.exports = (kern) => {
-  const { app, auth, liveCodename, samen } = kern;
-  const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
-  const geenGast = (req, res) => {
-    if (req.session.tier === 'guest') { res.status(403).json({ error: 'Samen-sessies zijn voor leden.' }); return true; }
-    return false;
-  };
+/* LivingOS Samen-routes. Alleen de eerste toetreding gebruikt de deelcode;
+   alle kamermutaties daarna zijn object-scoped op de niet-geheime kamer-id. */
+'use strict';
 
-  app.post('/api/samen/maak', auth, (req, res) => {
-    if (geenGast(req, res)) return;
-    stuur(res, samen.maak(req.session.key, liveCodename(req.session)));
+module.exports = kern => {
+  const { app, auth, liveCodename, samen, tooManyTries,
+    noteFailedTry, loginFails } = kern;
+  const geenGast = (req, res) => {
+    if (req.session.tier !== 'guest') return false;
+    res.status(403).json({ error: 'Samen-sessies zijn voor leden.' });
+    return true;
+  };
+  const idem = req => String(((req.body || {}).idem ||
+    (req.get && req.get('idempotency-key')) || '')).slice(0, 200);
+  const status = r => Number.isInteger(r && r.status) && r.status >= 100 && r.status <= 599
+    ? r.status : 200;
+  const handel = async (res, werk) => {
+    try {
+      const r = await Promise.resolve(werk());
+      return res.status(status(r)).json(r && r.error ? { error: r.error } : r);
+    } catch (e) {
+      /* Een storagefout kan na een credentialclaim optreden. Het foutobject
+         wordt daarom nooit gelogd: route en 503 zijn voldoende. */
+      console.error('[samen] veilige verwerking mislukt');
+      return res.status(503).json({ error: 'Samen kon niet veilig worden verwerkt.' });
+    }
+  };
+  const lid = (req, res) => geenGast(req, res) ? null : liveCodename(req.session);
+
+  app.post('/api/samen/maak', auth, async (req, res) => {
+    const codenaam = lid(req, res); if (!codenaam) return;
+    await handel(res, () => samen.maak(req.session.key, codenaam, idem(req)));
   });
-  app.post('/api/samen/mee', auth, (req, res) => {
-    if (geenGast(req, res)) return;
-    stuur(res, samen.doeMee(req.session.key, liveCodename(req.session), req.body.code));
+  app.post('/api/samen/mee', auth, async (req, res) => {
+    const codenaam = lid(req, res); if (!codenaam) return;
+    const bucket = 'samen-code:' + req.ip;
+    if (tooManyTries && tooManyTries(res, bucket)) return;
+    let r;
+    try { r = await Promise.resolve(samen.doeMee(req.session.key, codenaam, (req.body || {}).code)); }
+    catch (e) {
+      console.error('[samen] veilige verwerking mislukt');
+      return res.status(503).json({ error: 'Samen kon niet veilig worden verwerkt.' });
+    }
+    if (r && r.error && r.status !== 503 && noteFailedTry) noteFailedTry(bucket, req.ip);
+    else if (r && !r.error && loginFails) loginFails.delete(bucket);
+    return res.status(status(r)).json(r && r.error ? { error: r.error } : r);
   });
-  app.post('/api/samen/zet', auth, (req, res) => {
-    if (geenGast(req, res)) return;
-    stuur(res, samen.zet(req.session.key, req.body.code, req.body.pad, req.body.titel));
+  app.post('/api/samen/code', auth, async (req, res) => {
+    if (!lid(req, res)) return;
+    await handel(res, () => samen.roteer(req.session.key, (req.body || {}).id, idem(req)));
   });
-  app.post('/api/samen/chat', auth, (req, res) => {
-    if (geenGast(req, res)) return;
-    stuur(res, samen.chat(req.session.key, req.body.code, req.body.tekst));
+  app.post('/api/samen/zet', auth, async (req, res) => {
+    if (!lid(req, res)) return;
+    const b = req.body || {};
+    await handel(res, () => samen.zet(req.session.key, b.id, b.pad, b.titel));
   });
-  app.post('/api/samen/muziek', auth, (req, res) => {
-    if (geenGast(req, res)) return;
-    stuur(res, samen.muziek(req.session.key, req.body.code, req.body.media));
+  app.post('/api/samen/chat', auth, async (req, res) => {
+    if (!lid(req, res)) return;
+    const b = req.body || {};
+    await handel(res, () => samen.chat(req.session.key, b.id, b.tekst));
   });
-  app.post('/api/samen/weg', auth, (req, res) => stuur(res, samen.weg(req.session.key, req.body.code)));
-  app.post('/api/samen/staat', auth, (req, res) => {
-    if (geenGast(req, res)) return;
-    stuur(res, samen.staat(req.session.key, req.body.code));
+  app.post('/api/samen/muziek', auth, async (req, res) => {
+    if (!lid(req, res)) return;
+    const b = req.body || {};
+    await handel(res, () => samen.muziek(req.session.key, b.id, b.media));
+  });
+  app.post('/api/samen/weg', auth, async (req, res) => {
+    if (!lid(req, res)) return;
+    await handel(res, () => samen.weg(req.session.key, (req.body || {}).id));
+  });
+  app.post('/api/samen/sluit', auth, async (req, res) => {
+    if (!lid(req, res)) return;
+    await handel(res, () => samen.sluit(req.session.key, (req.body || {}).id));
+  });
+  app.post('/api/samen/staat', auth, async (req, res) => {
+    if (!lid(req, res)) return;
+    await handel(res, () => samen.staat(req.session.key, (req.body || {}).id));
   });
 };

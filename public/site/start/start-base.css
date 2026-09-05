@@ -1,0 +1,84 @@
+@font-face{
+  font-family:"Bodoni Moda";font-style:normal;font-weight:400 900;font-display:swap;
+  src:url("../../fonts/aFTQ7PxzY382XsXX63LUYJSKSKjWXFBP.woff2") format("woff2")
+}
+@font-face{
+  font-family:"Bodoni Moda";font-style:italic;font-weight:400 900;font-display:swap;
+  src:url("../../fonts/aFTS7PxzY382XsXX63LUYJSPeKrcW3JNsao.woff2") format("woff2")
+}
+@font-face{
+  font-family:Inter;font-style:normal;font-weight:400 700;font-display:swap;
+  src:url("../../fonts/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2") format("woff2")
+}
+
+:root{
+  color-scheme:dark;
+  --wine:#7f1634;
+  --wine-bright:#a72049;
+  --gold:#c0a544;
+  --gold-deep:#857007;
+  --ivory:#f4f0e9;
+  --paper:#eee9df;
+  --ink:#0c0b0a;
+  --panel:#151310;
+  --line:rgba(255,255,255,.18);
+  --muted:rgba(244,240,233,.72);
+  --serif:"Bodoni Moda",Georgia,"Times New Roman",serif;
+  --sans:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --page:min(1420px,calc(100vw - 8vw));
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;background:var(--ink)}
+body{margin:0;overflow-x:hidden;background:var(--ivory);color:#171411;font-family:var(--sans);line-height:1.55}
+body.menu-open{overflow:hidden}
+a{color:inherit}
+button,a{-webkit-tap-highlight-color:transparent}
+button{font:inherit}
+img{display:block;max-width:100%}
+h1,h2,h3,p{margin-top:0}
+[hidden]{display:none!important}
+::selection{background:var(--wine);color:#fff}
+
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.skip-link{position:fixed;z-index:1000;top:12px;left:12px;transform:translateY(-160%);padding:.75rem 1rem;background:var(--ivory);color:var(--ink);font-weight:700;text-decoration:none}
+.skip-link:focus{transform:none}
+
+:focus-visible{outline:2px solid var(--gold);outline-offset:4px}
+
+.brand{display:inline-flex;flex-direction:column;align-items:flex-start;color:var(--ivory);text-decoration:none}
+.brand-name{display:block;padding:.35rem .75rem .42rem;background:var(--wine);border:1px solid rgba(255,255,255,.18);font-family:var(--serif);font-size:clamp(1.18rem,1.6vw,1.6rem);font-weight:600;letter-spacing:-.02em;line-height:1.05;white-space:nowrap}
+.brand-slogan{display:block;padding:.4rem .18rem 0;color:#d1b96d;font-family:var(--serif);font-size:.61rem;letter-spacing:.22em;line-height:1;text-transform:uppercase;white-space:nowrap}
+
+.site-header{position:relative;z-index:20;width:var(--page);min-height:102px;margin:0 auto;display:flex;align-items:center;gap:clamp(1.5rem,3vw,3.5rem);border-bottom:1px solid rgba(255,255,255,.16)}
+.desktop-nav{display:flex;align-items:center;justify-content:flex-end;gap:clamp(1rem,2vw,2.2rem);margin-left:auto}
+.desktop-nav a,.login-link{position:relative;color:rgba(255,255,255,.84);font-size:.74rem;font-weight:600;letter-spacing:.08em;text-decoration:none;text-transform:uppercase;white-space:nowrap}
+.desktop-nav a::after{position:absolute;right:0;bottom:-.6rem;left:0;height:1px;transform:scaleX(0);transform-origin:right;background:var(--gold);content:"";transition:transform .25s ease}
+.desktop-nav a:hover::after,.desktop-nav a:focus-visible::after{transform:scaleX(1);transform-origin:left}
+.header-actions{display:flex;align-items:center;gap:1rem}
+.language-button{display:flex;align-items:center;gap:.45rem;min-height:44px;padding:.25rem;border:0;background:transparent;color:rgba(255,255,255,.78);cursor:pointer;font-size:.72rem;font-weight:600;letter-spacing:.08em}
+.language-button svg{width:17px;fill:none;stroke:currentColor;stroke-width:1.35}
+.language-button .chevron{width:12px}
+.login-link{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:.4rem 1.05rem;border:1px solid rgba(255,255,255,.38);transition:border-color .2s ease,background .2s ease}
+.login-link:hover{border-color:var(--gold);background:rgba(0,0,0,.18)}
+.menu-button{display:none;width:44px;height:44px;padding:0;border:1px solid rgba(255,255,255,.35);background:rgba(0,0,0,.15);cursor:pointer}
+.menu-button>span:not(.sr-only){display:block;width:18px;height:1px;margin:5px auto;background:#fff}
+
+.eyebrow,.section-kicker{margin-bottom:1rem;color:var(--gold);font-size:.68rem;font-weight:600;letter-spacing:.35em;text-transform:uppercase}
+.gold-rule{display:block;width:52px;height:2px;margin:1.35rem 0;background:var(--gold)}
+.button{display:inline-flex;min-height:50px;align-items:center;justify-content:center;padding:.8rem 1.35rem;border:1px solid transparent;color:#fff;font-size:.72rem;font-weight:700;letter-spacing:.11em;text-align:center;text-decoration:none;text-transform:uppercase;transition:transform .2s ease,background .2s ease,border-color .2s ease}
+.button:hover{transform:translateY(-2px)}
+.button-primary{border-color:var(--wine-bright);background:var(--wine)}
+.button-primary:hover{background:var(--wine-bright)}
+.button-ghost{border-color:rgba(255,255,255,.45);background:rgba(6,5,4,.24);backdrop-filter:blur(6px)}
+.button-ghost:hover{border-color:var(--gold);background:rgba(6,5,4,.44)}
+.text-link{display:inline-flex;align-items:center;gap:.8rem;margin-top:1rem;padding-bottom:.35rem;border-bottom:1px solid var(--gold-deep);color:var(--wine);font-size:.72rem;font-weight:700;letter-spacing:.12em;text-decoration:none;text-transform:uppercase}
+.text-link span{font-size:1.1rem;transition:transform .2s ease}
+.text-link:hover span{transform:translateX(4px)}
+
+.mobile-nav{position:fixed;z-index:100;top:0;right:0;width:min(88vw,420px);height:100dvh;padding:1.25rem 1.5rem 2rem;background:#0b0908;color:var(--ivory);border-left:1px solid rgba(255,255,255,.15);display:flex;flex-direction:column}
+.mobile-nav-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid var(--line);color:var(--gold);font-size:.69rem;font-weight:700;letter-spacing:.25em;text-transform:uppercase}
+.mobile-nav-top button{width:44px;height:44px;border:0;background:transparent;color:var(--ivory);cursor:pointer;font-family:var(--serif);font-size:2rem;line-height:1}
+.mobile-nav>a{padding:1rem 0;border-bottom:1px solid var(--line);font-family:var(--serif);font-size:1.65rem;text-decoration:none}
+.mobile-nav .mobile-login{margin-top:auto;padding:1rem;border:1px solid var(--gold-deep);background:var(--wine);font-family:var(--sans);font-size:.78rem;font-weight:700;letter-spacing:.14em;text-align:center;text-transform:uppercase}
+.menu-backdrop{position:fixed;z-index:90;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(3px)}

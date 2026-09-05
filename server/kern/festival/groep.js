@@ -1,193 +1,193 @@
-/* RTG Festival (deelmodule): DE GROEP. Het lastigste deel van de commerce, en
-   niet omdat het technisch moeilijk is.
-
-   Een festival beleef je met mensen. Maar een groep raakt per definitie een
-   TWEEDE PERSOON, en daar geldt de regel van dit huis onverkort (LIFE.md par.
-   4): samenstellen en klaarzetten mag, bevestigen doet de mens. Alles wat een
-   ander bereikt -- een uitnodiging, een bericht, een betaling -- gebeurt nooit
-   vanzelf.
-
-   DAARUIT VOLGT DE VORM, EN HET IS EEN ONGEBRUIKELIJKE.
-
-   ER WORDT HIER NIETS VERSTUURD. Geen uitnodigingsmail, geen push, geen
-   "Kobalt heeft je toegevoegd". De maker krijgt een CODE en geeft die zelf
-   door, op de manier die hij zelf kiest. Dat is geen gemiste functie maar het
-   hele punt: RTG hoort niet namens iemand contact te leggen met zijn vrienden.
-
-   EN NIEMAND WORDT TOEGEVOEGD. Er bestaat geen functie waarmee de maker een
-   ander in zijn groep zet. Meedoen is een eigen handeling: je hebt de code en
-   je gebruikt hem. Wie dat omdraait, maakt van een groep een lijst waar je op
-   kunt staan zonder het te weten.
-
-   HET GAT IS EEN FEIT EN GEEN AANSPORING. groepStand() zegt hoeveel leden nog
-   geen pas hebben. Meer niet -- geen "nodig ze uit", geen aftelklok, geen
-   "nog 2 plekken!". CLAUDE.md verbiedt kunstmatige urgentie, en een groep is
-   precies de plek waar die verleiding het grootst is: de druk komt dan van
-   vrienden, en dat werkt beter dan welke banner ook. Juist daarom niet.
-
-   ER IS GEEN HOOFD VAN DE GROEP. Elk lid mag de code vernieuwen en elk lid mag
-   weg. Een maker met meer rechten dan de rest maakt van een vriendengroep een
-   trechter met een eigenaar, en dat is precies wat LIFE.md par. 4 verbiedt. De
-   maker staat er alleen als FEIT bij: wie hem begon.
-
-   WAT DE ORGANISATOR HIERVAN ZIET: NIETS. Een groep is tussen gasten. Dat een
-   festival groepsgroottes zou willen weten voor de camping is een echte
-   behoefte, maar het is ook precies het sociale netwerk van zijn bezoekers; dat
-   vraagt dezelfde tweezijdige toestemming als ./partner.js en verdient een
-   eigen besluit. Tot dat er is, leest de organisatorkant hier niet mee. */
+/* RTG Festival: groepen zijn uitsluitend tussen gasten. RTG stuurt niemand een
+   uitnodiging en voegt niemand namens een ander toe. Ieder lid mag de code
+   roteren of zelf vertrekken; de organisator leest de groep niet. */
 'use strict';
 
-const LEESBAAR = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-const MAX_LEDEN = 50;
-
 module.exports = (ctx) => {
-  const { save, crypto, schoon, editieVind, festivalAlle } = ctx;
+  const { db, save, bewerkCollectie, crypto, schoon } = ctx;
+  const nuIso = () => new Date().toISOString();
+  const toegang = require('./groep-toegang')({ crypto, nu: nuIso });
+  const MAX_LEDEN = toegang.MAX_LEDEN;
+  const DUBBELTIK_MS = 5000;
 
   const bak = (e) => {
     if (!e.groepen || typeof e.groepen !== 'object') e.groepen = {};
     return e.groepen;
   };
-  const nuIso = () => new Date().toISOString();
-
-  /* De code is een TOONDER: wie hem heeft, kan meedoen. Tien tekens, zelfde
-     reden als bij de pas -- en hij is te vernieuwen, want een code die je een
-     keer te breed hebt gedeeld moet je kunnen intrekken. */
-  function nieuweCode(e) {
-    for (let poging = 0; poging < 8; poging++) {
-      let c = '';
-      for (let i = 0; i < 10; i++) c += LEESBAAR[crypto.randomInt(LEESBAAR.length)];
-      if (!Object.values(bak(e)).some(g => g.code === c)) return c;
-    }
-    return null;
-  }
-
   const isLid = (g, codenaam) => (g.leden || []).some(l => l.codenaam === codenaam);
+  const festivals = () => {
+    /* model.js is de eigenaar en initialiseert deze collectie voordat groep.js
+       wordt samengesteld. Hier lezen we die referentie alleen; de mutaties
+       lopen via de collectietransactie hierboven. */
+    return db.data.festivals && typeof db.data.festivals === 'object'
+      ? db.data.festivals : {};
+  };
+  const editieIn = (bron, fid, eid) => {
+    const f = bron[String(fid || '')];
+    return f && f.edities ? f.edities[String(eid || '')] || null : null;
+  };
+  const herstel = (doel, json) => {
+    const oud = JSON.parse(json);
+    for (const sleutel of Object.keys(doel)) delete doel[sleutel];
+    Object.assign(doel, oud);
+  };
+  function transactie(werk) {
+    const doe = bron => {
+      if (!bron || typeof bron !== 'object' || Array.isArray(bron))
+        throw new Error('festivals hoort een kaart te zijn');
+      toegang.migreerLegacy(bron);
+      return werk(bron);
+    };
+    if (typeof bewerkCollectie === 'function') return bewerkCollectie('festivals', doe);
+    const bron = festivals(), voor = JSON.stringify(bron);
+    try {
+      const antwoord = doe(bron);
+      if (antwoord && typeof antwoord.then === 'function')
+        throw new Error('festivalgroep-transactie mag niet asynchroon zijn');
+      if (JSON.stringify(bron) !== voor) save();
+      return antwoord;
+    } catch (e) { herstel(bron, voor); throw e; }
+  }
+  const afdruk = waarde => crypto.createHash('sha256').update(String(waarde || '')).digest('hex');
+  const publiek = g => ({
+    id: g.id, naam: g.naam, maker: g.maker,
+    leden: (g.leden || []).map(l => ({ codenaam: l.codenaam, sinds: l.sinds })),
+    beeindigd: g.beeindigd || null, toegang: toegang.publiek(g)
+  });
+  const uitgifte = (p, code) => Object.assign(publiek(p), { code, eenmalig: true });
+  const verstreken = at => Date.now() - Date.parse(at);
 
-  function groepMaak(fid, eid, data) {
-    const e = editieVind(fid, eid);
-    if (!e) return { status: 404, error: 'Deze editie bestaat niet.' };
+  function groepMaak(fid, eid, data, idem) {
     const d = data || {};
     const naam = schoon(d.naam, 60);
     if (!naam) return { status: 400, error: 'Geef de groep een naam.' };
     const maker = schoon(d.maker, 60);
     if (!maker) return { status: 400, error: 'Op wiens codenaam komt deze groep?' };
-    if (Object.keys(bak(e)).length >= 5000) return { status: 400, error: 'Er staan te veel groepen op deze editie.' };
-    const code = nieuweCode(e);
-    if (!code) return { status: 500, error: 'Kon geen vrije groepscode maken.' };
-
-    const g = { id: 'grp' + crypto.randomBytes(5).toString('hex'), naam, code, maker,
-      leden: [{ codenaam: maker, sinds: nuIso() }], beeindigd: null, at: nuIso() };
-    bak(e)[g.id] = g;
-    save();
-    return { ok: true, groep: g };
+    const idemWaarde = String(idem || d.idem || '').trim().slice(0, 200);
+    return transactie(bron => {
+      const e = editieIn(bron, fid, eid);
+      if (!e) return { status: 404, error: 'Deze editie bestaat niet.' };
+      if (Object.keys(bak(e)).length >= 5000)
+        return { status: 400, error: 'Er staan te veel groepen op deze editie.' };
+      const vinger = afdruk(JSON.stringify({ fid: String(fid), eid: String(eid), naam, maker }));
+      const idemHash = idemWaarde ? afdruk('festivalgroep-idem|' + maker + '|' + idemWaarde) : null;
+      const tikHash = afdruk('festivalgroep-dubbeltik|' + maker + '|' + vinger);
+      const bestaand = Object.values(bak(e)).find(g => g && g.uitgifte && (
+        (idemHash && g.uitgifte.idem_hash === idemHash) ||
+        (!idemHash && g.uitgifte.dubbeltik_hash === tikHash &&
+          verstreken(g.uitgifte.at) >= 0 && verstreken(g.uitgifte.at) < DUBBELTIK_MS)
+      ));
+      if (bestaand) return { status: 409,
+        error: 'Deze groepscode is al eenmalig uitgegeven en wordt niet opnieuw getoond. Vernieuw de code als zij niet is ontvangen.',
+        herhaald: true, groep: publiek(bestaand) };
+      const g = { id: 'grp' + crypto.randomBytes(8).toString('hex'), naam, maker,
+        leden: [{ codenaam: maker, sinds: nuIso() }], beeindigd: null, at: nuIso(),
+        toegang_historie: [], uitgifte: { idem_hash: idemHash,
+          dubbeltik_hash: idemHash ? null : tikHash, fingerprint_hash: vinger, at: nuIso() } };
+      const gemaakt = toegang.nieuw(bron, e, g, maker);
+      if (!gemaakt) return { status: 500, error: 'Kon geen unieke groepscode maken.' };
+      g.toegang = gemaakt.toegang;
+      bak(e)[g.id] = g;
+      return { ok: true, groep: uitgifte(g, gemaakt.code) };
+    });
   }
 
-  /* MEEDOEN IS EEN EIGEN HANDELING. De codenaam is die van de aanroeper -- op
-     de route komt hij uit de sessie -- en de code is wat iemand zelf heeft
-     gekregen. Er is met opzet geen tegenhanger waarmee een ander jou toevoegt. */
+  /* Meedoen is een eigen handeling; de route neemt codenaam uit de sessie. */
   function groepDeelnemen(fid, eid, data) {
-    const e = editieVind(fid, eid);
-    if (!e) return { status: 404, error: 'Deze editie bestaat niet.' };
     const d = data || {};
     const codenaam = schoon(d.codenaam, 60);
     if (!codenaam) return { status: 400, error: 'Wie doet er mee?' };
-    const code = String(d.code || '').trim().toUpperCase();
-    /* De code wordt BINNEN deze editie gezocht. Een code van vorig jaar hoort
-       nergens toe te leiden -- een groep hoort bij de editie waarin hij begon. */
-    const g = Object.values(bak(e)).find(x => x.code === code && !x.beeindigd);
-    if (!g) return { status: 404, error: 'Deze groepscode klopt niet (meer).' };
-    if (isLid(g, codenaam)) return { ok: true, groep: g, al: true };
-    if ((g.leden || []).length >= MAX_LEDEN) {
-      return { status: 409, error: 'Deze groep zit vol (' + MAX_LEDEN + ').' };
-    }
-    g.leden.push({ codenaam, sinds: nuIso() });
-    save();
-    return { ok: true, groep: g };
+    const code = String(d.code || '').trim().toUpperCase().slice(0, 100);
+    return transactie(bron => {
+      if ((fid && !eid) || (!fid && eid)) return { status: 404, error: 'Deze groepscode klopt niet (meer).' };
+      if (fid && !editieIn(bron, fid, eid)) return { status: 404, error: 'Deze editie bestaat niet.' };
+      const treffers = toegang.zoek(bron, code, fid, eid);
+      if (treffers.length !== 1) return { status: 404, error: 'Deze groepscode klopt niet (meer).' };
+      const g = treffers[0].g;
+      if (toegang.reden(g)) return { status: 404, error: 'Deze groepscode klopt niet (meer).' };
+      if (isLid(g, codenaam)) return { ok: true, groep: publiek(g), al: true };
+      if ((g.leden || []).length >= MAX_LEDEN)
+        return { status: 409, error: 'Deze groep zit vol (' + MAX_LEDEN + ').' };
+      g.leden.push({ codenaam, sinds: nuIso() });
+      toegang.gebruik(g);
+      return { ok: true, groep: publiek(g) };
+    });
   }
 
-  /* WEG KAN ALTIJD, en zonder dat iemand het goedkeurt. Vertrekt de laatste,
-     dan houdt de groep op te bestaan; een lege groep die blijft staan is een
-     lijst met een naam erop en verder niets. */
+  /* Weg kan altijd. De laatste die vertrekt beëindigt groep en credential. */
   function groepVerlaat(fid, eid, data) {
-    const e = editieVind(fid, eid);
-    if (!e) return { status: 404, error: 'Deze editie bestaat niet.' };
     const d = data || {};
     const codenaam = schoon(d.codenaam, 60);
-    const g = bak(e)[String(d.id || '')];
-    if (!g || g.beeindigd || !isLid(g, codenaam)) return { status: 404, error: 'Deze groep bestaat niet.' };
-    g.leden = g.leden.filter(l => l.codenaam !== codenaam);
-    if (!g.leden.length) g.beeindigd = nuIso();
-    save();
-    return { ok: true, groep: g };
+    return transactie(bron => {
+      const e = editieIn(bron, fid, eid);
+      if (!e) return { status: 404, error: 'Deze editie bestaat niet.' };
+      const g = bak(e)[String(d.id || '')];
+      if (!g || g.beeindigd || !isLid(g, codenaam)) return { status: 404, error: 'Deze groep bestaat niet.' };
+      g.leden = g.leden.filter(l => l.codenaam !== codenaam);
+      if (!g.leden.length) {
+        g.beeindigd = nuIso();
+        toegang.intrekken(g, codenaam, 'laatste lid heeft de groep verlaten');
+      }
+      return { ok: true, groep: publiek(g) };
+    });
   }
 
-  /* ELK LID mag de code vernieuwen. Er is geen hoofd van de groep: een maker
-     met meer rechten dan de rest maakt er een trechter met een eigenaar van. */
-  function groepCodeVernieuw(fid, eid, data) {
-    const e = editieVind(fid, eid);
-    if (!e) return { status: 404, error: 'Deze editie bestaat niet.' };
+  /* Elk lid mag vernieuwen; er is geen groepshoofd. */
+  function groepCodeVernieuw(fid, eid, data, idem) {
     const d = data || {};
-    const g = bak(e)[String(d.id || '')];
     const codenaam = schoon(d.codenaam, 60);
-    if (!g || g.beeindigd || !isLid(g, codenaam)) return { status: 404, error: 'Deze groep bestaat niet.' };
-    const code = nieuweCode(e);
-    if (!code) return { status: 500, error: 'Kon geen vrije groepscode maken.' };
-    g.code = code;
-    save();
-    return { ok: true, groep: g };
+    const idemWaarde = String(idem || d.idem || '').trim().slice(0, 200);
+    return transactie(bron => {
+      const e = editieIn(bron, fid, eid);
+      if (!e) return { status: 404, error: 'Deze editie bestaat niet.' };
+      const g = bak(e)[String(d.id || '')];
+      if (!g || g.beeindigd || !isLid(g, codenaam)) return { status: 404, error: 'Deze groep bestaat niet.' };
+      const vinger = afdruk(JSON.stringify({ fid: String(fid), eid: String(eid), id: g.id, codenaam }));
+      const idemHash = idemWaarde ? afdruk('festivalgroep-roteer-idem|' + codenaam + '|' + idemWaarde) : null;
+      const tikHash = afdruk('festivalgroep-roteer-dubbeltik|' + codenaam + '|' + vinger);
+      const laatst = g.laatste_rotatie;
+      if (laatst && ((idemHash && laatst.idem_hash === idemHash) ||
+          (!idemHash && laatst.dubbeltik_hash === tikHash &&
+            verstreken(laatst.at) >= 0 && verstreken(laatst.at) < DUBBELTIK_MS))) {
+        return { status: 409,
+          error: 'Deze nieuwe groepscode is al eenmalig getoond en wordt niet herhaald.',
+          herhaald: true, groep: publiek(g) };
+      }
+      const gemaakt = toegang.roteer(bron, e, g, codenaam);
+      if (!gemaakt) return { status: 500, error: 'Kon geen unieke groepscode maken.' };
+      g.laatste_rotatie = { idem_hash: idemHash, dubbeltik_hash: idemHash ? null : tikHash,
+        fingerprint_hash: vinger, at: nuIso() };
+      return { ok: true, groep: uitgifte(g, gemaakt.code) };
+    });
   }
 
-  /* De stand, en ALLEEN voor een lid. Wie er in een groep zit is niets voor
-     buitenstaanders, ook niet voor de organisatie (zie de kop).
-
-     `zonderPas` is een GETAL en geen aansporing. Er komt hier geen tekst bij,
-     geen knop en geen klok. */
+  /* Alleen een lid ziet de stand; zonderPas blijft een getal, geen aansporing. */
   function groepStand(fid, eid, id, codenaam) {
-    const e = editieVind(fid, eid);
-    if (!e) return { status: 404, error: 'Deze editie bestaat niet.' };
-    const g = bak(e)[String(id || '')];
     const wie = schoon(codenaam, 60);
-    if (!g || g.beeindigd || !isLid(g, wie)) return { status: 404, error: 'Deze groep bestaat niet.' };
-    /* Wie een pas heeft, wordt GETELD uit de passen zelf. Een vlag op het lid
-       zou achterlopen zodra er een pas bijkomt of wordt ingetrokken. */
-    const passen = Object.values(e.passen || {});
-    const leden = g.leden.map(l => ({ codenaam: l.codenaam, sinds: l.sinds,
-      heeftPas: passen.some(p => !p.ingetrokken && p.drager === l.codenaam) }));
-    return { ok: true, id: g.id, naam: g.naam, code: g.code, maker: g.maker,
-      leden, zonderPas: leden.filter(l => !l.heeftPas).length };
+    return transactie(bron => {
+      const e = editieIn(bron, fid, eid);
+      if (!e) return { status: 404, error: 'Deze editie bestaat niet.' };
+      const g = bak(e)[String(id || '')];
+      if (!g || g.beeindigd || !isLid(g, wie)) return { status: 404, error: 'Deze groep bestaat niet.' };
+      const passen = Object.values(e.passen || {});
+      const leden = g.leden.map(l => ({ codenaam: l.codenaam, sinds: l.sinds,
+        heeftPas: passen.some(p => !p.ingetrokken && p.drager === l.codenaam) }));
+      return { ok: true, id: g.id, naam: g.naam, maker: g.maker, toegang: toegang.publiek(g),
+        leden, zonderPas: leden.filter(l => !l.heeftPas).length };
+    });
   }
 
   const groepenVan = (e, codenaam) => Object.values((e && e.groepen) || {})
-    .filter(g => !g.beeindigd && isLid(g, codenaam));
+    .filter(g => !g.beeindigd && isLid(g, codenaam)).map(publiek);
 
-  /* WELKE EDITIE HOORT BIJ DEZE CODE.
-
-     Dit bestaat om een gat dat pas in de browser zichtbaar werd: een lid dat nog
-     NIETS heeft -- geen pas, geen groep -- ziet ook geen festival, en kon dus de
-     code die hij van een vriend kreeg nergens invullen. Terwijl dat juist het
-     eerste is wat er gebeurt: iemand regelt de kaarten, de rest doet mee.
-
-     ER KOMT GEEN ZOEK-ENDPOINT OP. Deze functie wordt alleen binnen het
-     MEEDOEN gebruikt (routes/festival/groep.js): een verkeerde code geeft
-     precies dezelfde weigering als altijd, dus er ontstaat geen orakel dat
-     vertelt welke codes bestaan. Een code is tien tekens uit een leesbaar
-     alfabet -- ruim 6 x 10^13 mogelijkheden -- dus over alle edities zoeken
-     maakt raden niet merkbaar makkelijker; een eigen zoekroute wel.
-
-     BIJ TWIJFEL WEIGERT HIJ. Bestaat dezelfde code in twee edities, dan is er
-     geen goed antwoord en wordt er niet gegokt: dan hoort het lid erbij te
-     zeggen om welk festival het gaat. */
+  /* Alleen intern: een gast zonder bestaand festival kan met een code meedoen.
+     Bij nul of meerdere treffers wordt niet gegokt. */
   function groepEditieVanCode(code) {
-    const c = schoon(code, 12);
+    const c = schoon(code, 100);
     if (!c) return null;
-    const treffers = [];
-    for (const f of festivalAlle()) {
-      for (const e of Object.values(f.edities || {})) {
-        if (Object.values(e.groepen || {}).some(g => !g.beeindigd && g.code === c)) {
-          treffers.push({ fid: f.id, eid: e.id });
-        }
-      }
-    }
+    const bron = festivals();
+    const treffers = toegang.zoek(bron, c).filter(x => !toegang.reden(x.g))
+      .map(x => ({ fid: x.f.id, eid: x.e.id }));
     if (!treffers.length) return null;
     if (treffers.length > 1) return { meerdere: true };
     return treffers[0];

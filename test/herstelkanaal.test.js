@@ -155,17 +155,22 @@ test('6. de twee nummer-routes staan op de zware lijst', () => {
    tegen een typefout -- ging het meteen in, dan is een verkeerd getypte letter
    een account waar niemand meer in kan.
    ========================================================================= */
-function bouwMail({ wachtwoordKlopt, verstuurd, gezet, dossier, tokenOk }) {
+function bouwMail({ wachtwoordKlopt, verstuurd, gezet, dossier, tokenOk, geverifieerd = [] }) {
   const routes = {};
   const app = { post: (pad, a, fn) => { routes[pad] = fn || a; } };
+  const bewijsHash = token => require('crypto').createHash('sha256')
+    .update(String(token || '')).digest('hex');
   const accounts = {
     verifyPassword: async (a) => wachtwoordKlopt(a),
     emailOf: () => 'oud@example.com',
     getMemberState: () => dossier.waarde,
     saveMemberState: (id, o) => { dossier.waarde = o; },
     issueActionToken: () => 'tok-abc',
-    verifyActionToken: (t, doel) => (tokenOk && t === 'tok-abc' && doel === 'mailwissel' ? { id: 1 } : null),
+    verifyActionToken: (t, doel) => ((typeof tokenOk === 'function' ? tokenOk(t, doel) : tokenOk) && doel === 'mailwissel' ? { id: 1 } : null),
+    hashActiebewijs: bewijsHash,
+    kloptActiebewijs: (hash, token) => hash === bewijsHash(token),
     trekInActie: () => true,
+    setEmailVerified: id => { geverifieerd.push(id); return { id }; },
     setEmail: (id, adres, opties) => {
       if (!(opties && opties.vervangenMag === true)) return { error: 'herstelkanaal' };
       gezet.push(adres); return { id, adres };
@@ -179,8 +184,8 @@ function bouwMail({ wachtwoordKlopt, verstuurd, gezet, dossier, tokenOk }) {
 const dossierNu = () => ({ waarde: {} });
 
 test('8. het adres wisselt NIET bij de aanvraag -- pas na bevestiging', async () => {
-  const verstuurd = [], gezet = [], dossier = dossierNu();
-  const r = bouwMail({ wachtwoordKlopt: () => true, verstuurd, gezet, dossier, tokenOk: true });
+  const verstuurd = [], gezet = [], geverifieerd = [], dossier = dossierNu();
+  const r = bouwMail({ wachtwoordKlopt: () => true, verstuurd, gezet, dossier, tokenOk: true, geverifieerd });
   const res = antwoord();
   await r['/api/mijn/herstelkanaal/email']({ session: sessie, body: { huidig: 'goed', email: 'nieuw@example.com' } }, res);
   assert.equal(res.data.ok, true);
@@ -190,7 +195,25 @@ test('8. het adres wisselt NIET bij de aanvraag -- pas na bevestiging', async ()
   const res2 = antwoord();
   await r['/api/mijn/herstelkanaal/email/bevestig']({ body: { token: 'tok-abc' } }, res2);
   assert.deepEqual(gezet, ['nieuw@example.com']);
+  assert.deepEqual(geverifieerd, [1], 'de mailboxbevestiging maakt precies dit nieuwe adres geverifieerd');
   assert.equal(dossier.waarde.mailwissel, undefined, 'de openstaande wissel hoort daarna weg te zijn');
+});
+
+test('8a. een oudere link kan een latere wijzigingsaanvraag niet bevestigen', async () => {
+  const verstuurd = [], gezet = [], dossier = dossierNu();
+  const r = bouwMail({ wachtwoordKlopt: () => true, verstuurd, gezet, dossier,
+    tokenOk: () => true });
+  await r['/api/mijn/herstelkanaal/email']({ session: sessie,
+    body: { huidig: 'goed', email: 'eerste@example.com' } }, antwoord());
+  dossier.waarde.mailwissel = {
+    naar: 'later@example.com', tot: Date.now() + 60000,
+    bewijs: require('crypto').createHash('sha256').update('tok-later').digest('hex')
+  };
+  const res = antwoord();
+  await r['/api/mijn/herstelkanaal/email/bevestig']({ body: { token: 'tok-abc' } }, res);
+  assert.equal(res.code, 400);
+  assert.deepEqual(gezet, [], 'een link voor een eerdere mailbox bewijst geen toegang tot de latere mailbox');
+  assert.equal(dossier.waarde.mailwissel.naar, 'later@example.com');
 });
 
 test('8b. het OUDE adres krijgt bericht, zonder goedkeurlink', async () => {

@@ -270,10 +270,16 @@ test('9. de naheffing hangt achter het rijk, en de weigering komt er ongeschonde
   }
 });
 
-test('10. de zaak leest zijn eigen naheffingen en niemand anders die van hem', async () => {
-  const mijn = await api(base, '/api/supplier/btw/naheffingen', {}, partner);
-  assert.equal(mijn.status, 200);
-  assert.deepEqual(mijn.body.naheffingen, []);
+test('10. de zaakroute is managerwerk; de gevulde tenantfilter staat in de motorproef', async () => {
+  /* Deze HTTP-opzet bevat bewust geen vastgestelde naheffing: de facturen zijn
+     van vandaag. Daarom claimt deze routeproef geen scheiding op grond van een
+     lege lijst. `btw-naheffing.test.js` vult SAL en STIL naast elkaar en bewijst
+     daar dat alleen SAL zijn vastgestelde besluit terugkrijgt en een concept
+     van STIL niet wordt bekendgemaakt. Hier bewaken we de echte HTTP-poort. */
+  const lijst = await api(base, '/api/supplier/btw/naheffingen', {}, partner);
+  assert.equal(lijst.status, 200);
+  assert.equal(lijst.body.ok, true);
+  assert.ok(Array.isArray(lijst.body.naheffingen));
   // bezwaar tegen iets wat niet bestaat is een 404 en geen stille 200
   const nep = await api(base, '/api/supplier/btw/naheffing/bezwaar',
     { id: 'nhbestaatniet', reden: 'hier klopt niets van' }, partner);

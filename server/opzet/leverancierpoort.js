@@ -40,7 +40,7 @@
 const envelop = require('./envelop');
 const kostenhaak = require('../kern/kosten/haak');
 
-module.exports = ({ db, save, crypto, rtgKlok, sessionFor, DEMO,
+module.exports = ({ db, save, crypto, rtgKlok, sessionFor, DEMO, accounts,
   grootSupplierSync, busGeef, kernGeef }) => {
   const routepoort = require('../kern/commercie/routepoort');
   const bus = { publish: (a, b) => busGeef().publish(a, b) };
@@ -88,7 +88,8 @@ module.exports = ({ db, save, crypto, rtgKlok, sessionFor, DEMO,
     const header = req.get('authorization') || '';
     const token = header.startsWith('Bearer ') ? header.slice(7) : null;
     const sess = token && sessionFor(token);
-    if (!sess || sess.role !== 'supplier') return res.status(401).json({ error: 'Niet ingelogd als leverancier.' });
+    const identiteit = accounts.controleerStaffSessie(sess);
+    if (!identiteit.ok) return res.status(identiteit.status).json({ error: identiteit.error });
     req.supplier = findSupplier(sess.code);
     if (!req.supplier) return res.status(401).json({ error: 'Leverancier niet gevonden.' });
     if (req.supplier.partnerStatus === 'geschorst' || req.supplier.partnerStatus === 'beeindigd')

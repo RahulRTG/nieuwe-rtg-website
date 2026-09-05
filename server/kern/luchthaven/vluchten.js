@@ -3,9 +3,9 @@
    de passagiersketen (boeken op codenaam, inchecken met kofferlabels, mijn
    reizen). Krijgt de gedeelde ctx van ./index.js. */
 module.exports = (ctx) => {
-  const { save, crypto, nu, id, schoon, vandaag, L, seed, vluchten, vind, actief, keten, catVan,
+  const { save, nu, schoon, vandaag, L, seed, vluchten, vind, actief, keten, catVan,
     plekkenVoor, draaiTakenVoor, draaiRond, vipVan, vipRond, publiek, _vluchtMaak, visumtaakVan,
-    GATES, BANEN, BANDEN, CATEGORIEEN } = ctx;
+    boardingPass, GATES, BANEN, BANDEN, CATEGORIEEN } = ctx;
   // de visumtaak-laag is optioneel en laat gebonden; zonder haar loopt alles door
   const visum = () => (visumtaakVan && visumtaakVan()) || null;
 
@@ -26,12 +26,13 @@ module.exports = (ctx) => {
     const v = vind(vid);
     if (!v) return { status: 404, error: 'Vlucht niet gevonden.' };
     if (status === 'geannuleerd') {
-      if (!actief(v)) return { status: 409, error: 'Deze vlucht is al ' + v.status + '.' };
-      v.status = 'geannuleerd'; save();
-      // de visumtaken van de geboekte passagiers gaan mee van tafel
+      const uit = await boardingPass.annuleerVlucht({ vluchtId: v.id, actor });
+      if (uit.error) return uit;
+      // De credential en de vlucht sluiten in één commit; agenda-opruiming
+      // volgt pas daarna en gebruikt uitsluitend het openbare boekings-id.
       const vt = visum();
-      if (vt) for (const b of L().boekingen) if (b.vluchtId === v.id && b.status !== 'geannuleerd') await vt.bijAnnulering(b.key, b.code);
-      return { ok: true, vlucht: publiek(v) };
+      if (vt) for (const b of uit.refs) await vt.bijAnnulering(b.key, b.id);
+      return { ok: true, vlucht: publiek(vind(v.id)) };
     }
     const k = keten(v);
     if (!k.includes(status)) return { status: 400, error: 'Onbekende status voor deze vlucht (' + k.join(' -> ') + ').' };
@@ -85,59 +86,39 @@ module.exports = (ctx) => {
 
   /* ---------- de passagiersketen: boeken, inchecken, boarding pass ---------- */
   async function boek(sess, codenaam, vid, data) {
-    data = data || {};
-    const v = vind(vid);
-    if (!v || v.soort !== 'vertrek') return { status: 404, error: 'Vlucht niet gevonden.' };
-    if (!['gepland', 'inchecken'].includes(v.status)) return { status: 409, error: 'Deze vlucht is niet meer te boeken (' + v.status + ').' };
-    if (L().boekingen.some(b => b.key === sess.key && b.vluchtId === v.id && b.status !== 'geannuleerd'))
-      return { status: 409, error: 'Je staat al op deze vlucht.' };
-    const b = { id: id('bk'), code: 'VL-' + crypto.randomBytes(3).toString('hex').toUpperCase(), vluchtId: v.id,
-      key: sess.key, codenaam: schoon(codenaam, 60) || 'Reiziger', status: 'geboekt', stoel: null, koffers: 0, at: nu() };
-    L().boekingen.unshift(b);
-    L().boekingen = L().boekingen.slice(0, 50000);
-    save();
+    const uit = await boardingPass.boek({ key: sess.key,
+      codenaam: schoon(codenaam, 60) || 'Reiziger', vluchtId: vid });
+    if (uit.error) return uit;
+    const v = vind(uit.vluchtId);
     // vraagt de bestemming vooraf een visum of reistoestemming, dan staat de
     // taak nu in de persoonlijke agenda (kern/visumtaak.js)
     const vt = visum();
-    const taak = vt ? (await vt.bijBoeking(sess.key, { ref: b.code, bestemming: v.bestemming, vertrek: v.datum })).taak : null;
-    return { ok: true, boeking: { code: b.code, vlucht: publiek(v), status: b.status }, visumtaak: taak };
+    const taak = vt ? (await vt.bijBoeking(sess.key, { ref: uit.boekingId, bestemming: v.bestemming, vertrek: v.datum })).taak : null;
+    return { ok: true, boeking: { id: uit.boekingId, vlucht: publiek(v), status: uit.statusBoeking }, visumtaak: taak };
   }
-  function incheck(sess, code, data) {
-    data = data || {};
-    const b = L().boekingen.find(x => x.code === String(code || '').toUpperCase() && x.key === sess.key);
-    if (!b) return { status: 404, error: 'Boeking niet gevonden.' };
-    const v = vind(b.vluchtId);
-    if (!v) return { status: 404, error: 'Vlucht niet gevonden.' };
-    if (v.status === 'gepland') return { status: 409, error: 'Het inchecken voor ' + v.nummer + ' is nog niet open.' };
-    if (v.status !== 'inchecken') return { status: 409, error: 'Het inchecken voor ' + v.nummer + ' is gesloten (' + v.status + ').' };
-    if (b.status === 'ingecheckt') return { status: 409, error: 'Je bent al ingecheckt (stoel ' + b.stoel + ').' };
-    const stoelen = L().boekingen.filter(x => x.vluchtId === v.id && x.stoel).length;
-    b.stoel = (Math.floor(stoelen / 6) + 1) + 'ABCDEF'[stoelen % 6];
-    b.status = 'ingecheckt';
-    b.koffers = Math.min(3, Math.max(0, Math.round(Number(data.koffers) || 0)));
-    const tags = [];
-    for (let i = 0; i < b.koffers; i++) {
-      const kf = { tag: 'RTG-' + crypto.randomBytes(3).toString('hex').toUpperCase(), vluchtId: v.id, boekingId: b.id,
-        codenaam: b.codenaam, status: 'ingecheckt', band: null, at: nu() };
-      L().koffers.unshift(kf);
-      tags.push(kf.tag);
+  const incheck = (sess, boekingId, data) => boardingPass.incheck({
+    key: sess.key, boekingId, koffers: data && data.koffers
+  });
+  const passRoteer = (sess, boekingId, verwachteRotatie) => boardingPass.roteer({
+    key: sess.key, boekingId, verwachteRotatie
+  });
+  const passIntrek = (sess, boekingId, verwachteRotatie) => boardingPass.intrekken({
+    key: sess.key, boekingId, verwachteRotatie
+  });
+  function vulMijn(d, key) {
+    d.charters = ctx.mijnCharters(key);
+    for (const b of d.boekingen) {
+      b.vlucht = publiek(vind(b.vluchtId));
+      delete b.vluchtId;
     }
-    L().koffers = L().koffers.slice(0, 100000);
-    save();
-    return { ok: true, pass: { code: b.code, vlucht: v.nummer, bestemming: v.bestemming, datum: v.datum, tijd: v.tijd,
-      gate: v.gate, stoel: b.stoel, naam: b.codenaam, koffers: tags } };
+    return d;
   }
   function mijn(key) {
     seed();
-    const uit = [];
-    for (const b of L().boekingen.filter(x => x.key === key).slice(0, 20)) {
-      const v = vind(b.vluchtId);
-      if (!v) continue;
-      uit.push({ code: b.code, status: b.status, stoel: b.stoel, vlucht: publiek(v),
-        koffers: L().koffers.filter(k => k.boekingId === b.id).map(k => ({ tag: k.tag, status: k.status, band: k.band })) });
-    }
-    return { ok: true, boekingen: uit, charters: ctx.mijnCharters(key) };
+    return vulMijn(boardingPass.mijn(key), key);
   }
+  const mijnVeilig = async key => vulMijn(await boardingPass.mijnVeilig(key), key);
 
-  return { vluchtMaak, vluchtStatus, vluchtVertraag, vluchtGate, bord, boek, incheck, mijn };
+  return { vluchtMaak, vluchtStatus, vluchtVertraag, vluchtGate, bord, boek,
+    incheck, passRoteer, passIntrek, mijn, mijnVeilig };
 };

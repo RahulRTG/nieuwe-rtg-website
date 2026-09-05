@@ -39,7 +39,7 @@ async function zaak(code) {
   const wie = roster.body.staff.find(x => x.role === 'manager');
   return (await api('/api/supplier/login', { code, staffId: wie.id, pin: '1234' })).body.token;
 }
-const zp = (pad, body, tok) => api('/api/supplier/zorgpolis' + pad, body, tok);
+const zp = (pad, body, tok) => api(pad.startsWith('/api/') ? pad : '/api/supplier/zorgpolis' + pad, body, tok);
 const wallet = (pad, body, tok) => api('/api/wallet' + pad, body, tok);
 
 test.before(async () => {
@@ -114,13 +114,13 @@ test('4. de pas-controle en de stopzetting: sober antwoord, en de pas verdwijnt 
   const o = await zp('', {}, segur);
   const v = o.body.verzekerden.find(x => x.codenaam === lidCode);
   // de controle geeft niet meer dan actief/pakket/codenaam (kleine letters mogen ook)
-  const c = await zp('/pas', { pas: v.pas.toLowerCase() }, segur);
+  const c = await zp('/api/supplier/zorgpolis/pas', { pas: v.pas.toLowerCase() }, segur);
   assert.equal(c.status, 200);
   assert.deepEqual(Object.keys(c.body).sort(), ['actief', 'codenaam', 'pakket'], 'niet meer dan drie velden');
   assert.equal(c.body.actief, true);
   assert.equal((await zp('/pas', { pas: 'ZP-FFFF' }, segur)).status, 404);
   // stopzetten: de pas gaat uit de wallet, declareren kan niet meer, nog eens stoppen ook niet
-  assert.equal((await zp('/stop', { id: v.id }, segur)).status, 200);
+  assert.equal((await zp('/api/supplier/zorgpolis/stop', { id: v.id }, segur)).status, 200);
   assert.equal((await zp('/pas', { pas: v.pas }, segur)).body.actief, false);
   assert.equal((await zp('/stop', { id: v.id }, segur)).status, 409, 'al gestopt');
   assert.equal((await zp('/declaratie', { pas: v.pas, omschrijving: 'Nazorg', bedrag: 20 }, segur)).status, 409, 'op een gestopte pas declareert niemand');

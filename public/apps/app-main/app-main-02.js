@@ -92,6 +92,11 @@
      RTG-app, met minder functies. ZONDER ?pas= bestaat er geen brede app
      meer: dan is dit alleen een keuzescherm dat naar de pas-apps verwijst. */
   const zoekParams = new URLSearchParams(location.search);
+  /* app.html heeft het bearer-fragment vóór ieder extern script uit het adres
+     gehaald. Neem het nu uit die korte geheugenoverdracht over en wis ook de
+     globale verwijzing; niets wordt in local/sessionStorage bewaard. */
+  let wervingscode = String(window.__RTG_WERVING_CODE || '').trim().toUpperCase();
+  try { delete window.__RTG_WERVING_CODE; } catch (e) { window.__RTG_WERVING_CODE = null; }
   magnaatProef = zoekParams.get('magnaat') === '1';
   if (magnaatProef) API.enabled = false;
   let vastePas = zoekParams.get('pas');

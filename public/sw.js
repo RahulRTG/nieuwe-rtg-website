@@ -14,8 +14,8 @@
    installeerde in de periode dat de `cache: 'no-cache'` hieronder was
    gesneuveld (zie de toelichting daar). Een naam die uit de INHOUD komt kan
    niet vergeten worden. */
-const CACHE = 'rtg-app-f8a501a0';
-const SHELL = ['/apps/app.html',
+const CACHE = 'rtg-app-edb3b2b7';
+const SHELL = ['/apps/app.html', '/shared/id.js',
   /* De drie installeerbare passen starten met een betekenisvolle query. Die
      adressen staan daarom exact in de schil: ze mogen offline niet naar de
      kale Home worden omgebogen, maar moeten bij de eerste start wel openen. */

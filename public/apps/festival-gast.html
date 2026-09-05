@@ -6,6 +6,7 @@
 <title>RTG Festival · uw weekend</title>
 <link rel="icon" href="/icon.svg">
 <meta name="theme-color" content="#0C0C0B">
+<script src="/shared/id.js"></script>
 <link href="/fonts/fonts.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
 <link href="/shared/rtg-ontwerp.css" rel="stylesheet">
@@ -54,6 +55,9 @@
 [hidden]{display:none!important;}
 .fg-form .veld{flex:1 1 12rem;min-width:0;}
 .fg-form .knop{flex:0 0 auto;min-height:44px;cursor:pointer;}
+.fg-eenmalig{margin:14px 0;padding:16px;border:1px solid var(--rtg-line);}
+.fg-eenmalig .fg-code{font-size:clamp(1.15rem,5vw,1.8rem);letter-spacing:.08em;}
+.fg-eenmalig .knop{min-height:44px;cursor:pointer;}
 select#fgEditie{min-height:44px;max-width:100%;padding:0 .6rem;font:inherit;}
 </style>
 </head>
@@ -87,8 +91,15 @@ select#fgEditie{min-height:44px;max-width:100%;padding:0 .6rem;font:inherit;}
     <input class="veld" id="fgGroepNaam" maxlength="60" placeholder="Naam van de groep" autocomplete="off">
     <button class="knop" type="button" id="fgGroepMaak">Maak een groep</button>
   </div>
+  <div class="fg-eenmalig" id="fgGroepEenmalig" hidden aria-live="polite">
+    <strong id="fgGroepEenmaligKop">Uw nieuwe groepscode</strong>
+    <div class="fg-code" id="fgGroepEenmaligCode"></div>
+    <p class="fg-stil">Deze code wordt alleen nu getoond. Bewaar of deel hem zelf; RTG zet hem
+      niet in uw groepslijst.</p>
+    <button class="knop" type="button" id="fgGroepKopieer">Kopieer code</button>
+  </div>
   <div class="fg-form">
-    <input class="veld" id="fgGroepCode" maxlength="12" placeholder="Groepscode" autocomplete="off">
+    <input class="veld" id="fgGroepCode" maxlength="48" placeholder="Groepscode" autocomplete="off">
     <button class="knop" type="button" id="fgGroepMee">Doe mee</button>
   </div>
   <p class="fg-stil" id="fgGroepStil">Een groep is tussen u en de mensen met wie u gaat. RTG

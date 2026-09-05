@@ -92,6 +92,35 @@ function maakSettlement({ db, save, accounts, fonds, log, dpRegistreerMunt, dpRe
   if (!md) return { status: 404, error: 'Ledenstaat ontbreekt.' };
   const inv = (md.invoices || []).find(i => i.id === ctx.invoiceId);
   if (!inv || inv.status === 'paid') return { ok: true };
+  /* DEZELFDE PROVIDERBETALING IS EEN BEWIJS, GEEN TWEEDE DEELBETALING.
+
+     `kaartWachtend` wordt pas na deze functie verwijderd. Dat is nodig: faalt
+     deze afhandeling, dan moet de provider opnieuw kunnen aanbieden. Maar er
+     zit nog een tweede save achter: die van het verwijderen. Kon juist DIE
+     niet worden bewaard, dan kwam hetzelfde betaal-id opnieuw hier en telde
+     `deelbetaald` nog een keer op. Een betaling van 40 euro kon zo na een
+     opslagstoring 80 euro lijken.
+
+     Het bewijs gaat daarom in dezelfde ledenstaat als de bedragmutatie. Bij
+     een onzekere save houden we het ook in RAM: de retry bewaart dezelfde
+     toestand nogmaals, maar telt het bedrag niet nogmaals. Na een herstart is
+     óf het hele bewijs + bedrag aanwezig, óf geen van beide en wordt het één
+     keer toegepast. */
+  const betaalId = String(betaling && betaling.id || '').trim();
+  if (!betaalId) return { status: 400, error: 'Een providerbetaling zonder betaal-id wordt niet geboekt.' };
+  if (!Array.isArray(inv.betaalBewijzen)) inv.betaalBewijzen = [];
+  const eerder = inv.betaalBewijzen.find(x => x && x.id === betaalId);
+  const bewaar = () => ctx.own ? accounts.saveMemberState(ctx.accountId, md) : save();
+  if (eerder) {
+    const ontvangen = Math.round(Number(betaling.centen) || 0);
+    if (eerder.centen !== ontvangen)
+      return { status: 409, error: 'Hetzelfde betaal-id kwam met een ander bedrag terug.' };
+    /* De vorige save kan precies na een duurzame commit een fout hebben
+       gemeld. Nogmaals dezelfde toestand bewaren maakt beide uitkomsten
+       veilig; de bedragmutatie blijft door het bewijs enkelvoudig. */
+    await bewaar();
+    return { ok: true, herhaald: true, gedeeltelijk: inv.status !== 'paid' };
+  }
   /* BETAALD MAG ALLEEN BETAALD HETEN ALS HET HELE BEDRAG ER IS.
 
      Hier stond `inv.status = 'paid'` onvoorwaardelijk, met alleen de vraag OF er
@@ -105,11 +134,12 @@ function maakSettlement({ db, save, accounts, fonds, log, dpRegistreerMunt, dpRe
      som het gevraagde dekt gaat hij alsnog dicht. */
   const gevraagd = Math.round((inv.bijdrage || 0) * 100);
   const binnen = Math.round(betaling.centen || 0);
+  inv.betaalBewijzen.push({ id: betaalId, centen: binnen });
   inv.deelbetaald = Math.round((inv.deelbetaald || 0) + binnen);
   if (gevraagd > 0 && inv.deelbetaald < gevraagd) {
     log.warn('settlement: te weinig ontvangen, factuur blijft open',
       { factuur: inv.id, gevraagd, binnen, totaal: inv.deelbetaald, betaalId: betaling.id, hoe: betaling.hoe });
-    if (ctx.own) accounts.saveMemberState(ctx.accountId, md); else save();
+    await bewaar();
     return { ok: true, gedeeltelijk: true };
   }
   inv.status = 'paid';
@@ -119,7 +149,7 @@ function maakSettlement({ db, save, accounts, fonds, log, dpRegistreerMunt, dpRe
     try { await fonds.boekAfdracht({ invoiceId: inv.id, wie: ctx.wie, bijdrage: inv.bijdrage, betaalId: betaling.id, omschrijving: inv.desc }); }
     catch (e) { /* de afdracht mag de settlement nooit blokkeren */ }
   }
-  if (ctx.own) accounts.saveMemberState(ctx.accountId, md); else save();
+  await bewaar();
   return { ok: true };
 }
 }

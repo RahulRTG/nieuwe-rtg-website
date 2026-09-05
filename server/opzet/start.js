@@ -63,7 +63,24 @@ module.exports = function start(deps) {
      in een verzoek duizenden rijen wil weghalen, botst op de begroting -- en
      die weigering houdt zichzelf in stand. Zie kern/kappen.js. */
   const kappen = require('../kern/kappen').maakKappen({ db, save, media, log });
-  setInterval(() => onderhoudsronde({ loginFails, pinSlot, ruimBuffer, kappen }), RONDE_MS).unref();
+  setInterval(() => {
+    onderhoudsronde({ loginFails, pinSlot, ruimBuffer, kappen });
+    /* Bevestigd geld waarvan de domeinafhandeling tijdens een opslag- of
+       processtoring strandde, blijft niet op een nieuwe providerretry wachten. */
+    if (kern.betaalWaarheid && typeof kern.betaalWaarheid.ronde === 'function')
+      kern.betaalWaarheid.ronde().catch(e => log.uitzondering(e, { bron: 'betaalwaarheid-herstel' }));
+  }, RONDE_MS).unref();
+
+  /* Een IdP-retry blijft gewenst, maar is niet de enige herstelmotor. Een na
+     de accounttransactie afgebroken SCIM-verzoek wordt ook na herstart hervat. */
+  if (kern.scimUserSync && typeof kern.scimUserSync.ronde === 'function') {
+    const scimHerstel = () => {
+      try { kern.scimUserSync.ronde(); }
+      catch (e) { log.uitzondering(e, { bron: 'scim-deprovisioning-herstel' }); }
+    };
+    scimHerstel();
+    setInterval(scimHerstel, require('../scim/user-sync').HERSTEL_MS).unref();
+  }
 
   backupData();
   setInterval(backupData, 24 * 60 * 60 * 1000);

@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
+<script src="/shared/id.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RTG Vluchten</title>
@@ -83,6 +84,10 @@
 const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let TOKEN=null; try{ TOKEN=localStorage.getItem('rtg_member_token'); }catch(e){}
+const passSleutel=id=>'rtg_airport_boarding_pass_session_'+String(id||'');
+function bewaarPass(id,code){ try{ sessionStorage.setItem(passSleutel(id),String(code||'')); }catch(e){} }
+function leesPass(id){ try{ return sessionStorage.getItem(passSleutel(id))||''; }catch(e){ return ''; } }
+function vergeetPass(id){ try{ sessionStorage.removeItem(passSleutel(id)); }catch(e){} }
 function meld(t){ const m=$('#melding'); m.textContent=t; m.style.opacity='1'; clearTimeout(m._t); m._t=setTimeout(()=>m.style.opacity='0',2800); }
 const api=(pad,body)=>fetch('/api/member/vluchten'+pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok){throw new Error(d.error||'Er ging iets mis.');}return d;});
 let TAB='bord';
@@ -93,7 +98,7 @@ let BORD=null, MIJN=null;   // wat er binnenkwam; waaruit dit scherm tekent
 if(window.RTGUitvoer) RTGUitvoer.bron(()=>{
   if(TAB==='mijn'){
     const r=(MIJN&&MIJN.boekingen||[]).map(b=>[b.vlucht.datum,b.vlucht.tijd,b.vlucht.nummer,
-      b.vlucht.bestemming,b.code,b.stoel||'',b.status]);
+      b.vlucht.bestemming,b.id,b.stoel||'',b.status]);
     return r.length?{naam:'mijn-reizen',
       kolommen:['datum','tijd','vluchtnummer','bestemming','boeking','stoel','status'],rijen:r}:null;
   }
@@ -126,7 +131,7 @@ async function laadBord(){
   }).join('') : '<div class="leeg">Geen vluchten op het bord.</div>';
   $('#inhoud').innerHTML=h;
   document.querySelectorAll('[data-boek]').forEach(b=>b.onclick=async()=>{
-    try{ const r=await api('/boek',{id:b.dataset.boek}); meld('Geboekt: '+r.boeking.code+'. Inchecken kan zodra het open staat.'); }catch(e){ meld(e.message); }
+    try{ const r=await api('/boek',{id:b.dataset.boek}); meld('Geboekt: '+r.boeking.id+'. Inchecken kan zodra het open staat.'); }catch(e){ meld(e.message); }
   });
 }
 async function laadMijn(){
@@ -141,23 +146,37 @@ async function laadMijn(){
   $('#inhoud').innerHTML= charterBlok + (d.boekingen.length ? d.boekingen.map(b=>{
     const v=b.vlucht;
     if(b.status==='ingecheckt'){
+      const code=leesPass(b.id), pass=b.pass||{}, actief=pass.stand==='actief';
       return '<div class="pass"><div class="regel"><span>Vlucht</span><b>'+esc(v.nummer)+' · '+esc(v.bestemming)+'</b></div>'+
         '<div class="regel"><span>Vertrek</span><b>'+esc(v.tijd)+' · gate '+esc(v.gate)+'</b></div>'+
         '<div class="regel"><span>Stoel</span><b>'+esc(b.stoel)+'</b></div>'+
-        '<div class="code">'+esc(b.code)+'</div>'+
-        '<div class="regel" style="justify-content:center;color:var(--soft);font-size:.72rem;">Laat deze code zien bij security en de gate</div>'+
+        (code&&actief?'<div class="code">'+esc(code)+'</div><div class="regel" style="justify-content:center;color:var(--soft);font-size:.72rem;">Deze code staat alleen in dit browsertabblad. Laat haar zien bij security en de gate.</div>':
+          '<div class="meta" style="text-align:center;margin:.75rem 0;">De geheime code wordt niet door Mijn reizen teruggegeven. Geef een nieuwe uit als u haar niet meer op dit toestel heeft.</div>')+
+        '<div class="rij" style="justify-content:center;">'+
+          ((!code||!actief)&&!v.geannuleerd?'<button class="knop" data-roteer="'+esc(b.id)+'" data-rotatie="'+esc(pass.rotatie||0)+'">Nieuwe code uitgeven</button>':'')+
+          (actief?'<button class="knop stil" data-intrek="'+esc(b.id)+'" data-rotatie="'+esc(pass.rotatie||0)+'">Code intrekken</button>':'')+'</div>'+
         (b.koffers.length?'<div class="regel"><span>Koffers</span><b>'+b.koffers.map(k=>esc(k.tag)+' ('+esc(k.status)+(k.band?' · band '+k.band:'')+')').join('<br>')+'</b></div>':'')+
         (v.vertraging?'<div class="regel"><span>Let op</span><b style="color:var(--burgundy);">+'+v.vertraging.minuten+' min · '+esc(v.vertraging.reden)+'</b></div>':'')+'</div>';
     }
     const kan=v.status==='inchecken';
     return '<div class="item"><h4><span class="nr">'+esc(v.nummer)+'</span> · '+esc(v.bestemming)+'</h4>'+
-      '<div class="meta">'+esc(v.datum)+' · '+esc(v.tijd)+' · boeking '+esc(b.code)+' · <span class="status '+(v.geannuleerd?'open':'goud')+'">'+esc(v.geannuleerd?'geannuleerd':v.status)+'</span></div>'+
-      (kan?'<div class="rij"><select class="veld" data-kof="'+esc(b.code)+'"><option value="0">Geen koffer</option><option value="1">1 koffer</option><option value="2">2 koffers</option><option value="3">3 koffers</option></select><button class="knop" data-in="'+esc(b.code)+'">Inchecken</button></div>'
+      '<div class="meta">'+esc(v.datum)+' · '+esc(v.tijd)+' · boeking '+esc(b.id)+' · <span class="status '+(v.geannuleerd?'open':'goud')+'">'+esc(v.geannuleerd?'geannuleerd':v.status)+'</span></div>'+
+      (kan?'<div class="rij"><select class="veld" data-kof="'+esc(b.id)+'"><option value="0">Geen koffer</option><option value="1">1 koffer</option><option value="2">2 koffers</option><option value="3">3 koffers</option></select><button class="knop" data-in="'+esc(b.id)+'">Inchecken</button></div>'
         : v.geannuleerd?'':'<div class="meta">Inchecken kan zodra het open staat.</div>')+'</div>';
   }).join('') : '<div class="leeg">Nog geen reizen. Boek een vlucht via Het bord, of vraag hierboven een charter aan.</div>');
   document.querySelectorAll('[data-in]').forEach(b=>b.onclick=async()=>{
     const kof=document.querySelector('[data-kof="'+b.dataset.in+'"]');
-    try{ await api('/incheck',{code:b.dataset.in,koffers:kof?kof.value:0}); meld('Ingecheckt; uw boarding pass staat klaar.'); laadMijn(); }catch(e){ meld(e.message); }
+    try{ const r=await api('/incheck',{id:b.dataset.in,koffers:kof?kof.value:0});
+      bewaarPass(b.dataset.in,r.pass.code); meld('Ingecheckt; de boarding-passcode is eenmalig uitgegeven.'); laadMijn(); }catch(e){ meld(e.message); }
+  });
+  document.querySelectorAll('[data-roteer]').forEach(b=>b.onclick=async()=>{
+    try{ const r=await api('/pass/roteer',{id:b.dataset.roteer,rotatie:Number(b.dataset.rotatie)});
+      bewaarPass(b.dataset.roteer,r.pass.code); meld('Nieuwe boarding-passcode eenmalig uitgegeven.'); laadMijn(); }catch(e){ meld(e.message); }
+  });
+  document.querySelectorAll('[data-intrek]').forEach(b=>b.onclick=async()=>{
+    if(!confirm('Deze boarding-passcode direct intrekken?')) return;
+    try{ await api('/pass/intrek',{id:b.dataset.intrek,rotatie:Number(b.dataset.rotatie)});
+      vergeetPass(b.dataset.intrek); meld('Boarding-passcode ingetrokken.'); laadMijn(); }catch(e){ meld(e.message); }
   });
   $('#chDatum').value=new Date().toISOString().slice(0,10);
   $('#chVraag').onclick=async()=>{

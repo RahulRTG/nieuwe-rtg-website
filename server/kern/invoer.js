@@ -49,7 +49,7 @@ const lezer = require('./invoer-lezer');
 const MENSVELDEN = ['soort', 'titel', 'bestemming', 'van_datum', 'tot_datum', 'kenmerk'];
 const SOORTEN = ['vlucht', 'verblijf', 'vervoer', 'transfer', 'activiteit', 'tafel', 'evenement', 'spoor'];
 
-module.exports.maakInvoer = ({ db, save, crypto, bestandenUpload, plaatsVind }) => {
+module.exports.maakInvoer = ({ db, save, bewerkCollectie, crypto, bestandenUpload, plaatsVind }) => {
   const nu = () => klok.datum().toISOString();
   const schoon = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, n || 120);
   const eigen = require('./eigencollectie')({ db, domein: 'kern/invoer', bezit: { reisInvoer: 'kaart' } });
@@ -161,7 +161,8 @@ module.exports.maakInvoer = ({ db, save, crypto, bestandenUpload, plaatsVind }) 
      module is de BALIE (lezen en bevestigen); dat is een andere vraag dan wat er
      met de onderdelen daarna gebeurt. Ze delen dezelfde bak, en die wordt
      doorgegeven in plaats van overgetikt. */
-  const { mijn, weg, mijnRegels, neemOver } = require('./invoer-onderdelen')({ bak, save, crypto, nu, schoon });
+  const { mijn, weg, mijnRegels, neemOver } = require('./invoer-onderdelen')({
+    bak, save, bewerkCollectie, crypto, nu, schoon });
 
   return { invoer: { lees, leesVoor, bevestig, mijn, weg, mijnRegels, neemOver, SOORTEN } };
 };

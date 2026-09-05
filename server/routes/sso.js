@@ -115,18 +115,22 @@ module.exports = (kern) => {
          onze inrichting dan hij hoort te weten. */
       log.warn('sso.terug mislukt', { org: k.org, fout: e.message });
       if (typeof logInlog === 'function') logInlog('sso', false, k.org, req);
-      return fout('Inloggen via uw organisatie is niet gelukt.', 401);
+      const antwoord = binnenkomst.foutAntwoord(e);
+      if (antwoord.retryAfter) res.set('retry-after', antwoord.retryAfter);
+      return fout(antwoord.bericht, antwoord.status);
     }
   });
 
   /* ---------- 4. het bewijs omruilen voor een echt sessietoken ----------
      Een POST, zodat hij niet in de geschiedenis of een Referer belandt. */
-  app.post('/api/sso/wissel', rem({ windowMs: 60000, limit: 30 }), (req, res) => {
+  app.post('/api/sso/wissel', rem({ windowMs: 60000, limit: 30 }), async (req, res, next) => {
+    try {
     const bewijs = req.body && req.body.sso;
     const user = bewijs ? accounts.verifyActionToken(bewijs, OVERDRACHT) : null;
     if (!user) return res.status(401).json({ error: 'Dit overdrachtsbewijs is verlopen of al gebruikt.' });
     // meteen intrekken: een bewijs is voor een keer, niet voor zestig seconden
-    accounts.trekInActie(bewijs, OVERDRACHT);
+    await accounts.trekInActie(bewijs, OVERDRACHT);
+    if (accounts.wachtIntrekkingen) await accounts.wachtIntrekkingen();
     const token = accounts.issueToken(user.id);
     const sess = { tier: user.tier, key: 'user-' + user.id, account: user };
     /* MIJN RTG blok 1, en hier ligt de eerlijkheid het gevoeligst: wij hebben
@@ -139,5 +143,6 @@ module.exports = (kern) => {
     legInlogVast({ sessieregister: kern.sessieregister, accounts, token, lidKey: sess.key,
       type: 'overdracht', assurance: 'overgedragen', methode: 'afgeleid', bron: 'sso/overdracht' });
     res.json({ token, state: stateFor(sess, req.body.lang) });
+    } catch (e) { next(e); }
   });
 };

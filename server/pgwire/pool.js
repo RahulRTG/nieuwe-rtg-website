@@ -4,12 +4,17 @@
 'use strict';
 const { EventEmitter } = require('events');
 const { Client } = require('./client');
+const transport = require('./transport');
 
 class Pool extends EventEmitter {
   constructor(cfg) {
     super();
     this.options = Object.assign({ max: 10, connectionTimeoutMillis: 0, idleTimeoutMillis: 10000 }, cfg || {});
     this._cfg = ontleedConfig(this.options);
+    /* Niet alleen de centrale serverconfig bewaakt dit. Losse productiebanen
+       gebruiken dezelfde Pool en mogen geen tweede, zwakkere transportdeur
+       krijgen. Er bestaat bewust geen optie om deze controle uit te zetten. */
+    transport.eisProductieTransport(this.options, this._cfg, process.env);
     this._idle = [];       // vrije clients
     this._alle = new Set(); // alle levende clients
     this._wachtend = [];   // { resolve, reject, timer }
@@ -76,18 +81,38 @@ class Pool extends EventEmitter {
 
 function ontleedConfig(opts) {
   let host = opts.host, port = opts.port, user = opts.user, password = opts.password, database = opts.database, ssl = opts.ssl;
+  let sslmode = '', sslrootcert = '';
   if (opts.connectionString) {
-    const u = new URL(opts.connectionString);
+    const info = transport.ontleedUrl(opts.connectionString, process.env);
+    const u = info.url;
     host = host || u.hostname || '127.0.0.1';
     port = port || (u.port ? Number(u.port) : 5432);
     user = user || (u.username ? decodeURIComponent(u.username) : (process.env.PGUSER || 'postgres'));
     password = password != null ? password : (u.password ? decodeURIComponent(u.password) : process.env.PGPASSWORD);
     database = database || (u.pathname && u.pathname.length > 1 ? decodeURIComponent(u.pathname.slice(1)) : user);
-    const sslmode = u.searchParams.get('sslmode');
-    if (ssl == null && sslmode && sslmode !== 'disable') ssl = { rejectUnauthorized: sslmode === 'verify-full' || sslmode === 'verify-ca' };
+    sslmode = info.sslmode;
+    sslrootcert = info.caPad;
+    if (sslmode && sslmode !== 'disable') {
+      const afgeleid = { rejectUnauthorized: sslmode === 'verify-full' || sslmode === 'verify-ca' };
+      if (afgeleid.rejectUnauthorized && sslrootcert) afgeleid.ca = transport.leesCaBestand(sslrootcert);
+      if (sslmode === 'verify-full') afgeleid.servername = info.host;
+      if (ssl == null) ssl = afgeleid;
+      else if (ssl && typeof ssl === 'object') {
+        ssl = Object.assign({}, afgeleid, ssl);
+        /* De expliciete optie mag clientcert/key toevoegen, maar nooit de door
+           de URL beloofde trust anchor, hostnaam of verificatie terugdraaien. */
+        if (sslmode === 'verify-full') {
+          ssl.rejectUnauthorized = true;
+          ssl.servername = info.host;
+          if (afgeleid.ca) ssl.ca = afgeleid.ca;
+        }
+      }
+    }
   }
+  if (ssl === true) ssl = { rejectUnauthorized: true };
   return { host: host || '127.0.0.1', port: port || 5432, user: user || 'postgres', password, database,
-    ssl: ssl || false, statement_timeout: opts.statement_timeout, query_timeout: opts.query_timeout };
+    ssl: ssl || false, sslmode, sslrootcert,
+    statement_timeout: opts.statement_timeout, query_timeout: opts.query_timeout };
 }
 
 module.exports = { Pool, ontleedConfig };

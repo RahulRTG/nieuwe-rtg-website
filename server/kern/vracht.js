@@ -26,14 +26,15 @@ const DEMO = [
     etappes: [{ modaliteit: 'lucht', van: 'Milaan MXP', naar: 'Ibiza IBZ' }, { modaliteit: 'weg', van: 'Ibiza IBZ', naar: 'Cala Nova' }] }
 ];
 
-module.exports = ({ db, save, crypto, schoon }) => {
+module.exports = ({ db, save, bewerkCollectie, crypto, schoon }) => {
   const eigen = require('./eigencollectie')({ db, domein: 'kern/vracht', bezit: { vracht: 'kaart' } });
   const V = () => eigen.bak('vracht');
   const nu = () => new Date().toISOString();
+  const volgToegang = require('./vracht-toegang')({ bak: V, save, bewerkCollectie, crypto, nu });
   const meld = (z, tekst) => { z.gebeurtenissen.unshift({ at: nu(), tekst }); if (z.gebeurtenissen.length > MAX_GEBEURTENISSEN) z.gebeurtenissen.length = MAX_GEBEURTENISSEN; };
   const internationaal = z => z.van.land.toLowerCase() !== z.naar.land.toLowerCase();
 
-  function bouwZending(code, b) {
+  function bouwZending(code, b, kaart, deelcode = true) {
     const plek = (p, wat) => {
       const plaats = schoon(p && p.plaats, 60), land = schoon(p && p.land, 40);
       if (!plaats || !land) return { fout: 'Geef bij ' + wat + ' een plaats en een land op.' };
@@ -61,116 +62,69 @@ module.exports = ({ db, save, crypto, schoon }) => {
     const z = {
       id: 'z' + crypto.randomBytes(4).toString('hex'),
       ref: 'VR-' + crypto.randomBytes(3).toString('hex').toUpperCase(),
-      volgcode: 'RTG-' + crypto.randomBytes(4).toString('hex').toUpperCase(),
       klant, inhoud, gewichtKg, colli,
       incoterm: INCOTERMS.includes(b.incoterm) ? b.incoterm : 'DAP',
       van, naar, etappes, status: 'onderweg', gebeurtenissen: [], gemaakt: nu(),
       eta: new Date(Date.now() + (etappes.length * 2 + (van.land.toLowerCase() !== naar.land.toLowerCase() ? 1 : 0)) * 864e5).toISOString().slice(0, 10)
     };
+    const toegang = deelcode ? volgToegang.nieuw(kaart, z, code) : null;
+    if (deelcode && !toegang) return { status: 500, error: 'Kon geen unieke volgcode maken.' };
     z.etappes[0].status = 'bezig';
     meld(z, 'Zending geboekt (' + z.incoterm + '); eerste etappe gestart: ' + etappeTekst(z.etappes[0]) + '.');
-    return { z };
+    return { z, volgcode: toegang && toegang.code };
   }
   const etappeTekst = e => MODALITEITEN[e.modaliteit].label.toLowerCase() + ' van ' + e.van + ' naar ' + e.naar;
 
-  function zaakVan(code) {
-    const v = V();
+  function zaakIn(v, code) {
     if (!v[code]) {
       v[code] = [];
       if (code === 'TERRAMAR') for (const d of DEMO) {
-        const r = bouwZending(code, d);
+        /* Voorbeeldzendingen krijgen geen actief geheim dat niemand ooit zag.
+           De expediteur kan vanuit de kaart bewust een eerste code uitgeven. */
+        const r = bouwZending(code, d, v, false);
         if (r.z) {
           if (d.klaar) { for (const e of r.z.etappes) e.status = 'klaar'; r.z.status = 'afgeleverd'; meld(r.z, 'Afgeleverd en getekend voor ontvangst.'); }
           v[code].unshift(r.z);
         }
       }
-      save();
     }
     return v[code];
   }
-  const zoek = (code, id) => zaakVan(code).find(z => z.id === String(id || ''));
+  const zoek = (kaart, code, id) => zaakIn(kaart, code).find(z => z.id === String(id || ''));
 
   function overzicht(code) {
-    const lijst = zaakVan(code);
-    const per = {}; for (const k of Object.keys(MODALITEITEN)) per[k] = 0;
-    let onderweg = 0, douane = 0, afgeleverd = 0, kilos = 0;
-    for (const z of lijst) {
-      if (z.status === 'onderweg') { onderweg++; kilos += z.gewichtKg; }
-      if (z.status === 'douane') douane++;
-      if (z.status === 'afgeleverd') afgeleverd++;
-      if (z.status !== 'afgeleverd') for (const e of z.etappes) per[e.modaliteit]++;
-    }
-    return { zendingen: lijst, kpi: { onderweg, douane, afgeleverd, kilosOnderweg: kilos, perModaliteit: per },
-      modaliteiten: MODALITEITEN, incoterms: INCOTERMS };
+    return volgToegang.metKaart(kaart => {
+      const lijst = zaakIn(kaart, code);
+      const per = {}; for (const k of Object.keys(MODALITEITEN)) per[k] = 0;
+      let onderweg = 0, douane = 0, afgeleverd = 0, kilos = 0;
+      for (const z of lijst) {
+        if (z.status === 'onderweg') { onderweg++; kilos += z.gewichtKg; }
+        if (z.status === 'douane') douane++;
+        if (z.status === 'afgeleverd') afgeleverd++;
+        if (z.status !== 'afgeleverd') for (const e of z.etappes) per[e.modaliteit]++;
+      }
+      return { zendingen: lijst.map(z => volgToegang.toon(z, null, code)),
+        kpi: { onderweg, douane, afgeleverd, kilosOnderweg: kilos, perModaliteit: per },
+        modaliteiten: MODALITEITEN, incoterms: INCOTERMS };
+    });
   }
 
   function maak(code, body) {
-    const lijst = zaakVan(code);
-    if (lijst.length >= MAX_ZENDINGEN) return { status: 400, error: 'Tot ' + MAX_ZENDINGEN + ' zendingen per zaak; ruim eerst afgeleverde op.' };
-    const r = bouwZending(code, body || {});
-    if (!r.z) return r;
-    lijst.unshift(r.z); save();
-    return { ok: true, zending: r.z };
+    const invoer = body || {};
+    return volgToegang.maakZending({ zaak: code, invoer,
+      lijstVan: kaart => zaakIn(kaart, code),
+      bouw: kaart => bouwZending(code, invoer, kaart), max: MAX_ZENDINGEN });
   }
 
-  function etappeKlaar(code, id) {
-    const z = zoek(code, id);
-    if (!z) return { status: 404, error: 'Zending niet gevonden.' };
-    if (z.status !== 'onderweg') return { status: 400, error: 'Deze zending is niet onderweg.' };
-    const bezig = z.etappes.find(e => e.status === 'bezig');
-    if (!bezig) return { status: 400, error: 'Er loopt geen etappe.' };
-    bezig.status = 'klaar';
-    const volgende = z.etappes.find(e => e.status === 'gepland');
-    if (volgende) { volgende.status = 'bezig'; meld(z, 'Etappe klaar; nu ' + etappeTekst(volgende) + '.'); }
-    else if (internationaal(z)) { z.status = 'douane'; meld(z, 'Aangekomen in ' + z.naar.land + '; wacht op douane-inklaring.'); }
-    else { z.status = 'aangekomen'; meld(z, 'Aangekomen in ' + z.naar.plaats + '; klaar voor aflevering.'); }
-    save();
-    return { ok: true, zending: z };
-  }
+  const handelingen = require('./vracht-handelingen')({ crypto, nu,
+    metKaart:volgToegang.metKaart, zaakIn, zoek, toon:volgToegang.toon,
+    meld, schoon, internationaal, etappeTekst });
+  const { etappeKlaar, douaneVrij, afleveren, melding } = handelingen;
 
-  function douaneVrij(code, id) {
-    const z = zoek(code, id);
-    if (!z) return { status: 404, error: 'Zending niet gevonden.' };
-    if (z.status !== 'douane') return { status: 400, error: 'Deze zending staat niet bij de douane.' };
-    z.status = 'aangekomen';
-    meld(z, 'Douane heeft ingeklaard; klaar voor aflevering in ' + z.naar.plaats + '.');
-    save();
-    return { ok: true, zending: z };
-  }
+  const volg = volgToegang.volg;
+  const volgcodeRoteer = (code, id, actor, idem) => volgToegang.roteer(code, id, actor, idem);
+  const volgcodeIntrekken = (code, id, actor, reden) => volgToegang.intrekken(code, id, actor, reden);
 
-  function afleveren(code, id) {
-    const z = zoek(code, id);
-    if (!z) return { status: 404, error: 'Zending niet gevonden.' };
-    if (z.status !== 'aangekomen') return { status: 400, error: 'Eerst aankomen (en inklaren), dan afleveren.' };
-    z.status = 'afgeleverd';
-    meld(z, 'Afgeleverd en getekend voor ontvangst.');
-    save();
-    return { ok: true, zending: z };
-  }
-
-  function melding(code, id, tekst) {
-    const z = zoek(code, id);
-    if (!z) return { status: 404, error: 'Zending niet gevonden.' };
-    const t = schoon(tekst, 200);
-    if (!t) return { status: 400, error: 'Schrijf een korte melding.' };
-    meld(z, t); save();
-    return { ok: true, zending: z };
-  }
-
-  // publiek volgen op volgcode: de reis zelf, zonder klant of inhoud
-  function volg(volgcode) {
-    const wil = String(volgcode || '').trim().toUpperCase();
-    if (!wil) return { status: 400, error: 'Geef een volgcode op.' };
-    for (const lijst of Object.values(V())) {
-      const z = lijst.find(x => x.volgcode === wil);
-      if (z) return { ok: true, zending: {
-        ref: z.ref, status: z.status, eta: z.eta, van: z.van, naar: z.naar, colli: z.colli,
-        etappes: z.etappes.map(e => ({ modaliteit: e.modaliteit, van: e.van, naar: e.naar, status: e.status })),
-        gebeurtenissen: z.gebeurtenissen.map(g => ({ at: g.at, tekst: g.tekst }))
-      } };
-    }
-    return { status: 404, error: 'Geen zending gevonden op deze volgcode.' };
-  }
-
-  return { vracht: { overzicht, maak, etappeKlaar, douaneVrij, afleveren, melding, volg, MODALITEITEN } };
+  return { vracht: { overzicht, maak, etappeKlaar, douaneVrij, afleveren, melding,
+    volg, volgcodeRoteer, volgcodeIntrekken, MODALITEITEN } };
 };

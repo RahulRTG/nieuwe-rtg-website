@@ -59,10 +59,16 @@ module.exports = (kern) => {
      zelf requiren zonder een kringverwijzing. Late binding, zelfde patroon als
      zetWacht/zetScanNet in opzet/verzoekketen.js.
 
-     ZONDER `{ afdwingen: true }` LOOPT HIJ IN DE SCHADUW: hij telt wat hij zou
-     sluiten en houdt niets tegen. CONTROLPLANE.md -- je kunt niet afdwingen wat
-     nooit heeft meegelopen, en de prijs van aanzetten is hier gemeten en groot. */
-  require('../middleware/isolatiepoort').zetLaag(isolatie);
+     Buiten productie blijft de standaard schaduw. Een productiestart wordt in
+     config/productie.js echter geweigerd zolang de handhavingsvlag ontbreekt;
+     een lid mag live nooit een beschermknop zien die gewone HTTP-verzoeken
+     alleen telt. Beide route-ingangen lezen dezelfde bron, zodat de tweede
+     montage de eerste niet ongemerkt terug naar schaduw kan zetten. */
+  const isolatiepoort = require('../middleware/isolatiepoort');
+  const isolatiestand = require('../middleware/isolatiepoort-stand');
+  const isolatieRealtime = require('../middleware/isolatiepoort-realtime');
+  isolatiepoort.zetLaag(isolatie, { afdwingen: isolatiestand.afdwingenUitOmgeving(process.env) });
+  isolatiestand.eisProductieGereed(process.env);
 
   /* WAT ER NOG WERKT, voor het lid zelf. Dezelfde meter als op de cockpit en met
      opzet niet een tweede lijst: een lid dat overweegt zichzelf dicht te zetten,
@@ -154,6 +160,9 @@ module.exports = (kern) => {
       const drager = String(b.drager || 'identiteit');
       const uit = isolatie.zet({ drager, sleutel: laagOf(req, drager), naar: b.naar,
         door: actor(req), reden: b.reden, zetter: drager });
+      if (uit.richting === 'verstrengd' && uit.stand === 'isolatie') {
+        isolatieRealtime.sluitDrager(uit.drager, uit.sleutel);
+      }
       res.json({ ok: true, uit });
     } catch (e) { faal(res, e); }
   });

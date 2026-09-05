@@ -73,11 +73,24 @@
       if (API.enabled){
         try {
           const data = cred.register
-            ? await API.call('/auth/register', { name: cred.name, email: cred.u, phone: cred.phone, geboortedatum: cred.geboortedatum, password: cred.p, tier: cred.tier, pasApp: vastePas || undefined })
+            ? await API.call('/auth/register', { name: cred.name, email: cred.u, phone: cred.phone, geboortedatum: cred.geboortedatum, password: cred.p, tier: cred.tier, pasApp: vastePas || undefined,
+                wervingscode: wervingscode || undefined })
             : await API.call('/auth/login', { login: cred.u, password: cred.p, pasApp: vastePas || undefined });
           API.token = data.token;
           applyState(data.state);           // user = het echte account
           tier = user.tier;
+          /* Registratie wisselt de uitnodiging in dezelfde serverhandeling in.
+             Een terugkerend lid doet dat direct na zijn bewezen login en vóór
+             een eventuele pas-omleiding, zodat het geheim niet opnieuw hoeft
+             te reizen of in browseropslag hoeft te staan. Een verlopen
+             uitnodiging mag een geldige login niet ongedaan maken. */
+          if (wervingscode) {
+            try {
+              if (!data.werk) await API.call('/werving/verbind', { kassacode: wervingscode });
+              toast(data.werk ? 'Uw werkplek staat klaar.' : 'U bent met uw werkgever verbonden.');
+            } catch (wout) { toast(wout.message || 'De personeelsuitnodiging is niet meer geldig.'); }
+            wervingscode = '';
+          }
           // uw account weet zelf bij welke pas hij hoort: zonder ?pas= (of in
           // de verkeerde pas-app) opent meteen de juiste app, zoals de
           // leeftijdskeuze dat bij de RTFoundation doet

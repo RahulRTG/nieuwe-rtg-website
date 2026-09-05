@@ -421,7 +421,7 @@
     /* De idempotentiesleutel hoort bij DEZE bestelling en niet bij deze klik:
        hij wordt hier één keer gemaakt en blijft gelijk als de knop twee keer
        wordt geraakt of het netwerk hapert. */
-    var idem = window.RTGId ? RTGId('gastbestel') : (TOKEN + ':' + items.map(function (i) { return i.itemId + 'x' + i.aantal; }).join(',') + ':' + REK.regels.length);
+    var idem = RTGId('gastbestel');
     $('#bBestel').disabled = true;
     api('bestel', { sleutel: SLEUTEL, items: items, allergie: $('#allergie').value, idem: idem })
       .then(function (j) {
@@ -631,7 +631,7 @@
     if (w !== 'kamer' && !code) return meld('Vul de code van je bon of polsband in.');
     /* De sleutel hoort bij DEZE betaling en niet bij deze klik: twee keer tikken
        of een hapering in het netwerk mag geen tweede afschrijving worden. */
-    var idem = window.RTGId ? RTGId('gastbetaal') : TOKEN + ':betaal:' + w + ':' + code;
+    var idem = RTGId('gastbetaal');
     $('#bBetaal').disabled = true;
     api('betaal', { sleutel: SLEUTEL, wijze: w, bonCode: code || undefined, idem: idem })
       .then(function (j) {

@@ -37,14 +37,23 @@ const URL_PREFIX = '/media/';
 /* De S3-laag (SigV4-ondertekening, configuratie en backend) staat als
    deelmodule apart; sigV4 en afgeleideSleutel worden hieronder ongewijzigd
    mee geexporteerd. */
-const { afgeleideSleutel, sigV4, s3ConfigVanEnv, maakS3Backend } = require('./media/s3');
+const { MAX_OBJECT_BYTES, afgeleideSleutel, sigV4, s3ConfigVanEnv, maakS3Backend } = require('./media/s3');
 
 function maakDiskBackend(dir) {
   function ensure() { try { fs.mkdirSync(dir, { recursive: true, mode: 0o700 }); fs.chmodSync(dir, 0o700); } catch (e) { try { fs.mkdirSync(dir, { recursive: true }); } catch (x) {} } }
   return {
     naam: 'disk',
-    async put(naam, enc) { ensure(); fs.writeFileSync(path.join(dir, naam), enc, { mode: 0o600 }); },
-    async get(naam) { return fs.readFileSync(path.join(dir, naam)); },
+    async put(naam, enc) {
+      if (enc.length > MAX_OBJECT_BYTES) throw new Error('Mediaobject overschrijdt de maximale mediagrootte.');
+      ensure(); fs.writeFileSync(path.join(dir, naam), enc, { mode: 0o600 });
+    },
+    async get(naam) {
+      const p = path.join(dir, naam);
+      if (fs.statSync(p).size > MAX_OBJECT_BYTES) throw new Error('Mediaobject overschrijdt de maximale mediagrootte.');
+      const buf = fs.readFileSync(p);
+      if (buf.length > MAX_OBJECT_BYTES) throw new Error('Mediaobject overschrijdt de maximale mediagrootte.');
+      return buf;
+    },
     async del(naam) { try { fs.unlinkSync(path.join(dir, naam)); } catch (e) {} },
     async has(naam) { return fs.existsSync(path.join(dir, naam)); }
   };
@@ -82,13 +91,20 @@ function maakMedia({ dir, env }) {
     if (!buf.length) return null;
     if (maxBytes && buf.length > maxBytes) return null;
     const naam = crypto.randomBytes(16).toString('hex') + '.' + EXT_VAN_MIME[m[1]];
-    try { await put(naam, kluis.versleutelBestand(buf, naam)); } catch (e) { return null; }
+    // Ongeldige invoer geeft null; een echte opslagstoring is iets anders en
+    // moet de HTTP-foutketen bereiken. Anders kan een route 200 antwoorden
+    // terwijl de gevraagde foto nooit duurzaam is opgeslagen.
+    await put(naam, kluis.versleutelBestand(buf, naam));
     return naam;
   }
   async function bewaarPubliek(dataUrl, maxBytes) { const n = await bewaar(dataUrl, maxBytes); return n ? url(n) : null; }
 
   async function leesBuf(ref) {
-    try { const n = naamVan(ref); return kluis.ontsleutelBestand(await haal(n), n); } catch (e) { return null; }
+    try { const n = naamVan(ref); return kluis.ontsleutelBestand(await haal(n), n); }
+    catch (e) {
+      if (e && (e.code === 'ENOENT' || e.mediaNietGevonden === true)) return null;
+      throw e;
+    }
   }
   async function leesDataUrl(ref) {
     if (typeof ref === 'string' && ref.startsWith('data:')) return ref; // oude, nog-inline foto: gewoon teruggeven
@@ -104,7 +120,7 @@ function maakMedia({ dir, env }) {
     Promise.resolve(backend.del(naam)).catch(() => {});
     if (cache) Promise.resolve(cache.del(naam)).catch(() => {});
   }
-  async function bestaat(ref) { try { return await backend.has(naamVan(ref)); } catch (e) { return false; } }
+  async function bestaat(ref) { return backend.has(naamVan(ref)); }
 
   // De publieke /media-route: streamt een Salon-foto (na ontsleutelen). De naam is
   // 32 hex-tekens en dus onraadbaar; geen directory-traversal (basename + whitelist).

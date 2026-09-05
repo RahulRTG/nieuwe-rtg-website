@@ -2,6 +2,13 @@
     API.token = t;
     try {
       applyState((await API.call('/state')).state);
+      if (wervingscode) {
+        try {
+          await API.call('/werving/verbind', { kassacode: wervingscode });
+          toast('U bent met uw werkgever verbonden.');
+        } catch (wout) { toast(wout.message || 'De personeelsuitnodiging is niet meer geldig.'); }
+        wervingscode = '';
+      }
       const doelPas = user.tier === 'guest' ? 'rtg' : user.tier;
       const magHier = vastePas ? (vastePas === 'rtg' ? ['rtg','guest'] : [vastePas]) : [];
       if (!magHier.includes(user.tier)){

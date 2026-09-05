@@ -160,7 +160,7 @@
     $('zVrij').addEventListener('click', function () {
       if (!huidig) return meld('Open eerst een rekening.');
       window.RTGHorecaEdge.handel({
-        clientId: (window.RTGId ? RTGId('vrij') : 'vrij-' + Date.now()),
+        clientId: RTGId('vrij'),
         soort: 'gangvrij', rekeningId: huidig, gang: Number($('zVrijGang').value) || 0,
         serveerOm: $('zServeerOm').value.trim()
       }).then(function (r) {

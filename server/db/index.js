@@ -31,6 +31,7 @@ const snapshot = require('./snapshot');
 const sqlite = require('./sqlite');
 const geheugen = require('./geheugen');
 const postgres = require('./postgres');
+const verzoekcontext = require('./verzoekcontext');
 const gidsen = require('./gidsen');
 const tx = require('./tx');
 const redis = require('./redis');
@@ -46,6 +47,9 @@ const { STORE } = opslag;
    tweede schrijfweg is er een die het verraad niet kent. */
 const { saveDuurzaam, CONTROL_DUURZAAM, persistentieStand } = require('./duurzaam')({ save });
 const { bijeen, inBundel, bundelDoos } = require('./bijeen')({ save, saveDuurzaam });
+const economischeBoekingEenmaal = require('./economische-boeking')({
+  db, store: STORE, postgres, sqlite, bijeen, save
+});
 const { load, startSqliteSync } = require('./starten')({ save });
 const { flushBijAfsluiten, opslagKlaar } = require('./afsluiten');
 const { planSnapshot } = snapshot;
@@ -86,10 +90,14 @@ function save() {
   if (verraad.sla('schrijf-faalt')) throw new Error('[verraad] de schrijfactie mislukte (schrijf-faalt)');
   if (verraad.sla('schrijf-verloren')) return;
   if (STORE === 'postgres') {
+    /* Een HTTP-request werkt in PostgreSQL-modus op een geisoleerde
+       copy-on-write weergave. save() markeert daar alleen dat de responsepoort
+       vóór het antwoord één autoritatieve multi-collectiecommit moet doen. */
+    if (verzoekcontext.noteerSave()) return;
     // Postgres is de duurzame waarheid (write-behind via planFlush). De lokale
     // snapshot is enkel een warme cache en wordt binnen flushNu gethrotteld
     // geschreven; hem hier óók plannen zou de event-loop dubbel belasten.
-    postgres.planFlush();
+    postgres.planSave();
   } else if (STORE === 'sqlite') {
     // SQLite: kruisproces-sync via versienummers en de poll (geen Redis-mirror).
     sqlite.saveSqlite();
@@ -101,30 +109,10 @@ function save() {
   }
 }
 
-/* Eén collectie lezen, valideren en schrijven als ondeelbare handeling. In
-   productie delegeren PostgreSQL en SQLite dit aan hun eigen database-slot.
-   De overige (één-proces) opslagvormen werken op een kopie en zetten die pas
-   terug nadat save() de mutatie heeft aangenomen, zodat een gooiende save geen
-   half gewijzigde RAM-staat achterlaat. */
-function bewerkCollectie(sleutel, werk) {
-  sleutel = String(sleutel || '').trim();
-  if (!sleutel || sleutel.length > 120 || typeof werk !== 'function')
-    throw new Error('Collectietransactie vereist een geldige sleutel en bewerker.');
-  if (STORE === 'postgres') return postgres.bewerkCollectiePostgres(sleutel, werk);
-  if (STORE === 'sqlite') return sqlite.bewerkCollectieSqlite(sleutel, werk);
-  if (!db.writable) throw new Error('De opslag is niet schrijfbaar.');
-  const oud = db.data[sleutel];
-  const waarde = JSON.parse(JSON.stringify(oud == null ? {} : oud));
-  const voor = JSON.stringify(waarde);
-  const resultaat = werk(waarde);
-  if (resultaat && typeof resultaat.then === 'function')
-    throw new Error('De bewerker van een collectietransactie mag niet asynchroon zijn.');
-  if (JSON.stringify(waarde) === voor) return resultaat;
-  db.data[sleutel] = waarde;
-  try { save(); }
-  catch (e) { db.data[sleutel] = oud; throw e; }
-  return resultaat;
-}
+const bewerkCollectie = require('./collectie-bewerken')({
+  store: STORE, postgres, sqlite, db, save
+});
+
 // De tx-veegronde vraagt na een venster-verhuis een snapshot: injecteer save().
 tx.wire(save);
 
@@ -132,9 +120,10 @@ tx.wire(save);
 function onExternalChange(cb) { state.setExternCb(cb); }
 
 module.exports = {
-  db, load, save, saveDuurzaam, bijeen, inBundel, bewerkCollectie, persistentieStand, CONTROL: CONTROL_DUURZAAM, DATA_DIR: opslag.DATA_DIR, STORE, startGedeeld: redis.startGedeeld, startSqliteSync,
+  db, load, save, saveDuurzaam, bijeen, inBundel, bewerkCollectie, economischeBoekingEenmaal, persistentieStand, CONTROL: CONTROL_DUURZAAM, DATA_DIR: opslag.DATA_DIR, STORE, startGedeeld: redis.startGedeeld, startSqliteSync,
   startPostgres: postgres.startPostgres, flushBijAfsluiten, pgPing: postgres.pgPing,
-  opslagKlaar, pgPoolStatus: postgres.pgPoolStatus, onExternalChange, merge3, schrijfDuurzaam: opslag.schrijfDuurzaam,
+  opslagKlaar, pgPoolStatus: postgres.pgPoolStatus, postgresSchrijfStand: postgres.schrijfStand,
+  postgresVerzoekMiddleware: postgres.verzoekMiddleware, onExternalChange, merge3, schrijfDuurzaam: opslag.schrijfDuurzaam,
   grootSupplierSync: gidsen.grootSupplierSync, grootAantal: gidsen.grootAantal,
   ledenGidsActief: gidsen.ledenGidsActief, ledenGidsHaal: gidsen.ledenGidsHaal, ledenGidsAantal: gidsen.ledenGidsAantal,
   ledenGidsZet: gidsen.ledenGidsZet, ledenGidsExact: gidsen.ledenGidsExact, ledenGidsZoek: gidsen.ledenGidsZoek,

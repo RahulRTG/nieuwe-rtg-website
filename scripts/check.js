@@ -302,7 +302,13 @@ console.log('\n10) de 9+-keuring op alle app-pagina\'s');
     if (!/rel="icon"/.test(s)) { np++; fout('9+: geen favicon in ' + rel); }
     if (!/<main\b/i.test(s) && !/role="main"/.test(s)) { np++; fout('9+: geen main-landmark in ' + rel); }
     if (!s.includes('/shared/basis.js')) { np++; fout('9+: basis-laag (shared/basis.js) ontbreekt in ' + rel); }
-    if (!s.includes('/shared/metgezel.js')) { np++; fout('9+: metgezel-laag (Rahul + wauw + palet) ontbreekt in ' + rel); }
+    /* Een projectiescherm is uitdrukkelijk geen deelnemer. Daar zou de
+       persoonlijke metgezel bij een achtergebleven localStorage-sessie juist
+       accountknoppen en verkeer op een gedeeld apparaat zetten. Alleen deze
+       declaratieve schermvorm gebruikt daarom rechtstreeks de technische
+       wauw-laag; alle gewone apps houden de volledige metgezel. */
+    const projectie = /<body[^>]*\bdata-rtg-projectie\b/i.test(s) && s.includes('/shared/wauw.js');
+    if (!s.includes('/shared/metgezel.js') && !projectie) { np++; fout('9+: metgezel-laag (Rahul + wauw + palet) ontbreekt in ' + rel); }
     const gids = appgids.gidsVan('/' + rel);
     if (!gids || gids.algemeen) { np++; fout('9+: geen eigen app-gids voor /' + rel + ' (vul kern/appgids.js aan)'); }
   }
@@ -788,7 +794,8 @@ console.log('\n14) zero dependencies: geen externe modules, package.json klopt')
    Date.now() is milliseconde-grof (twee acties in dezelfde ms krijgen hetzelfde
    id) en Math.random().toString(36).slice(...) levert een handvol bits, waar de
    botsingskans bij honderden id's al merkbaar is. Gebruik RTGId('voorvoegsel')
-   uit shared/basis.js; die staat op elke app-pagina (zie regel 10).
+   uit shared/id.js; die staat parserblokkerend vóór iedere client die hem
+   nodig heeft. Ontbreekt Web Crypto, dan faalt die helper gesloten.
 
    Twee signaturen zijn hier hard, want die bestaan ALLEEN om een id te maken:
    `Math.random().toString(` en `Date.now().toString(36)`. Cosmetische willekeur
@@ -813,6 +820,17 @@ console.log('\n15) id\'s in de client uit de CSPRNG, niet uit de klok of Math.ra
     const bron = fs.readFileSync(f, 'utf8');
     if (/\bRTGId(em)?\s*\(/.test(bron)) gebruikers.add(rel.replace(/^public\//, ''));
     bron.split('\n').forEach((regel, i) => {
+      /* Een veilige eerste tak maakt een zwakke terugval niet veilig. De oude
+         vroege return hieronder liet precies dit ongemerkt door:
+         `window.RTGId ? RTGId('x') : Date.now()`. Nu id.js op elk betrokken
+         scherm vóór de consumer staat, is de enige goede terugval geen
+         terugval: ontbreekt de helper, dan stopt de handeling. */
+      if (/\b(?:window\.|w\.)?RTGId(?:em)?\s*\?/.test(regel)) {
+        zwak++;
+        fout('optionele RTGId met terugval: ' + rel + ':' + (i + 1) +
+          ' -- roep de parserblokkerend geladen helper rechtstreeks aan');
+        return;
+      }
       if (/RTGId\b|RTGIdem\b/.test(regel)) return;          // gebruikt de CSPRNG-helper al
       if (vast.some(k => regel.includes(k))) return;         // benoemde vaste sleutel
       const idemZwak = /\bidem\b\s*[:=]/.test(regel) && /Date\.now|Math\.random/.test(regel);
@@ -1531,7 +1549,8 @@ console.log('\n24) een coordinaat komt nooit uit een kale Number()');
    netjes over. Dat is goed. Maar `npm test` geeft die variabelen bewust NIET
    mee (die bestanden maken en droppen dezelfde tabellen en zouden elkaar bij
    parallel draaien wissen), dus ze draaien uitsluitend via
-   scripts/pgtoetsen.js -- en die heeft een met de hand bijgehouden LIJST.
+   scripts/lib/pg-toetslijst.js -- en die heeft een met de hand bijgehouden
+   LIJST die de runner en het releasebewijs allebei importeren.
 
    Twee plekken die een waarheid vasthouden. Wie een nieuw pg-toetsbestand
    schrijft en vergeet het aan die lijst toe te voegen, heeft een bestand dat
@@ -1556,11 +1575,14 @@ console.log('\n25) elk toetsbestand dat een database of Redis vraagt, staat in d
   ]);
   let contract = 0;
   try {
-    const runner = fs.readFileSync(path.join(ROOT, 'scripts/pgtoetsen.js'), 'utf8');
-    // de expliciete lijst uit de runner: alles tussen TOETSEN = [ en ]
-    const blok = (runner.match(/const TOETSEN\s*=\s*\[([\s\S]*?)\]/) || [])[1] || '';
-    const inLijst = new Set([...blok.matchAll(/'([^']+)'/g)].map(m => m[1]));
-    if (!inLijst.size) { contract++; fout('kon de TOETSEN-lijst in scripts/pgtoetsen.js niet lezen'); }
+    /* De runner, de READY-keurder en deze bronpoort lezen exact dezelfde lijst.
+       De oude regexp zocht een arrayliteral in pgtoetsen.js; na het terecht
+       afsplitsen van de releasecontractlijst zag hij elf werkelijke toetsen als
+       nul. Een meting mag niet rood worden doordat zijn parser een tweede,
+       verouderde voorstelling van het contract vasthoudt. */
+    const gedeeld = require('./lib/pg-toetslijst');
+    const inLijst = new Set(Array.isArray(gedeeld.TOETSEN) ? gedeeld.TOETSEN : []);
+    if (!inLijst.size) { contract++; fout('kon de gedeelde PostgreSQL/Redis-toetslijst niet lezen'); }
 
     // 25a) staat elk zelf-poortend bestand in de lijst?
     const testMap = path.join(ROOT, 'test');
@@ -1586,15 +1608,15 @@ console.log('\n25) elk toetsbestand dat een database of Redis vraagt, staat in d
       if (MAG_ERBUITEN.has(rel)) continue;
       if (!inLijst.has(rel)) {
         contract++;
-        fout(rel + ' poort zichzelf op een externe dienst maar staat niet in de TOETSEN-lijst van' +
-          ' scripts/pgtoetsen.js -- dan draait hij NERGENS (npm test geeft die variabele bewust niet mee)');
+        fout(rel + ' poort zichzelf op een externe dienst maar staat niet in de gedeelde TOETSEN-lijst' +
+          ' -- dan draait hij NERGENS (npm test geeft die variabele bewust niet mee)');
       }
     }
     // 25b) en verwijst de lijst alleen naar bestanden die bestaan?
     for (const rel of inLijst) {
       if (!fs.existsSync(path.join(ROOT, rel))) {
         contract++;
-        fout('scripts/pgtoetsen.js noemt ' + rel + ', maar dat bestand bestaat niet');
+        fout('scripts/lib/pg-toetslijst.js noemt ' + rel + ', maar dat bestand bestaat niet');
       }
     }
     if (!contract) ok(inLijst.size + ' bestanden in de pg-draaier, en elk zelf-poortend toetsbestand staat erin (' +
@@ -1770,7 +1792,6 @@ console.log('\n27) geen dode configuratie: elke aangeraden variabele wordt ergen
     ['POSTGRES_PASSWORD', 'idem'],
     ['POSTGRES_PASSWORD_FILE', 'gelezen door de officiele postgres-container; het geheim blijft zo buiten docker inspect'],
     ['PGDATA', 'gelezen door de officiele postgres-container om de datamap te kiezen'],
-    ['RTG_ALLOW_PLAINTEXT', 'bevestigingsvlag VOOR de keuring: "ik weet dat er geen sleutel is, start toch"'],
     ['STRIPE_DEMO_BEWUST', 'oude vlag die de productie-keuring alleen nog expliciet afwijst; runtime negeert hem'],
     ['SENTRY_DSN', 'bewust genoemd om te WAARSCHUWEN dat hij niets doet; de echte alarmweg is ERR_WEBHOOK_URL']
   ]);
@@ -5157,20 +5178,15 @@ console.log('\n64) het mutatiecontractregister loopt niet achter op de code');
    bevestigt iets dat daarna nergens wordt afgedwongen, en een keurder die de
    tabel leest denkt dat er een grendel zit.
 
-   Gemeten op 3 september 2026 met scripts/servicecaps.js: 8 van de 9
-   bevoegdheden die het lid bevestigt, hadden geen lezer -- alleen
-   `organisatie.stand` had er een. Dat is de eerlijke stand en geen slordigheid:
-   de laag is jong en elke poort is een besluit over wat een medewerker
-   werkelijk te zien krijgt. Wat deze regel doet is voorkomen dat het getal
-   GROEIT. Een negende stille bevoegdheid erbij zakt hier, en dan is de keuze:
-   er een lezer bij bouwen, of hem niet aan het lid voorleggen.
-
-   MAG ALLEEN OMLAAG, net als de ratel van regel 49. Wie hem verhoogt, schrijft
-   erbij waarom -- anders is de ratel zelf stuk.
+   Gemeten op 4 september 2026 met scripts/servicecaps.js: alleen
+   `organisatie.stand` blijft door het lid bevestigbaar en die heeft een echte
+   lezer. Acht namen zonder lezer zijn uit GROND, TEAMS en de UI gehaald. De
+   nulgrens is vanaf hier blijvend: voeg een lezer in dezelfde wijziging toe,
+   of bied de capability niet als toestemming aan.
    ========================================================================== */
 console.log('\n65) elke servicebevoegdheid die het lid bevestigt, wordt ergens uitgelezen');
 {
-  const STIL_MAX = 8;
+  const STIL_MAX = 0;
   try {
     const uit = cp.execFileSync(process.execPath, [path.join(ROOT, 'scripts', 'servicecaps.js')],
       { cwd: ROOT, encoding: 'utf8', timeout: 120000, maxBuffer: 16 * 1024 * 1024 });
@@ -5184,7 +5200,7 @@ console.log('\n65) elke servicebevoegdheid die het lid bevestigt, wordt ergens u
           'laat een lid iets bevestigen dat nergens wordt afgedwongen.');
       } else {
         ok((totaal - stil) + ' van ' + totaal + ' bevoegdheden die het lid bevestigt worden uitgelezen, ' +
-          stil + ' nog niet (ratel op ' + STIL_MAX + ', mag alleen omlaag)');
+          stil + ' zonder lezer (harde nulgrens)');
       }
     }
   } catch (e) { fout('de servicecap-meting kon niet draaien: ' + e.message); }

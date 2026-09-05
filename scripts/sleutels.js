@@ -11,7 +11,7 @@
      npm run live:init -- --eigenaar=jij@domein.nl \
        --url=https://jouw-domein.nl --smtp-url=smtps://...
 
-   --docker maakt ook een apart PostgreSQL-wachtwoordbestand. Bestaande
+   --docker maakt ook aparte PostgreSQL- en geldsnapshot-sleutelbestanden. Bestaande
    geheimen worden nooit stil overschreven; --force is bewust en expliciet.
    --stil drukt gegenereerde geheimen niet naar terminal/loggeschiedenis. */
 'use strict';
@@ -68,6 +68,7 @@ const regels = [
   ['RTG_MOTOR_TOKEN', hex(32), 'beschermt de interne Rust-geldmotor'],
   ['OFFICE_CODE', code(12), 'inlogcode van de RTG-Backoffice'],
   ['OFFICE_TOTP_SECRET', totp, 'tweede factor (2FA) van de backoffice; scan de otpauth-regel hieronder'],
+  ['RTG_ISOLATIE_AFDWINGEN', '1', 'persoonlijke bescherm- en isolatiestanden blokkeren server-side; geen schaduwstand in productie'],
   ['DEMO_PASS', hex(12), 'vervangt het demo-wachtwoord (demo staat in productie sowieso uit)'],
   ['RTG_OWNER_EMAIL', eigenaar, 'HANDMATIG: het echte e-mailadres van de eigenaar (technische pagina)'],
   ['RTG_OWNER_BOOTSTRAP', hex(16), 'EENMALIG: hiermee claimt de eigenaar zijn account bij de eerste start; daarna weghalen'],
@@ -84,6 +85,10 @@ if (priveBeta) {
     ['SMTP_URL', smtpUrl, 'HANDMATIG: anders worden e-mails niet echt verstuurd']
   );
 }
+if (docker) regels.push([
+  'RTG_MOTOR_STATE_KEY_FILE', '/run/secrets/rtg-motor-state-key',
+  'vast containerpad naar de aparte authenticated-encryption-sleutel van het geldvolume'
+]);
 if (zonderAi) regels.push(['RTG_AI_UIT', '1', 'BEWUST: geen externe AI; handmatige werkmodus blijft beschikbaar']);
 /* DE NOODREM OP DE MODELKRAAN, en die staat er ook als de AI vandaag uit is:
    wie hem later aanzet, hoort hem niet zonder plafond aan te zetten.
@@ -140,12 +145,26 @@ if (schrijven) {
     const pgDoel = docker
       ? path.resolve(optie('--postgres-doel') || path.join(path.dirname(doel), '.rtg-secrets', 'postgres_password'))
       : '';
+    const motorSleutelDoel = docker
+      ? path.resolve(optie('--motor-sleutel-doel') || path.join(path.dirname(doel), '.rtg-secrets', 'motor_state_key'))
+      : '';
     // Eerst ALLE doelen controleren; zo laat een tweede run nooit een half
     // vernieuwde sleutelset achter.
     if (fs.existsSync(doel) && !forceren)
       throw new Error(doel + ' bestaat al; bestaande sleutels blijven veilig staan. Gebruik alleen bewust --force.');
     if (docker && fs.existsSync(pgDoel) && !forceren)
       throw new Error(pgDoel + ' bestaat al; het databasewachtwoord wordt nooit stil vervangen.');
+    if (docker && fs.existsSync(motorSleutelDoel) && !forceren)
+      throw new Error(motorSleutelDoel + ' bestaat al; de geldsnapshotsleutel wordt nooit stil vervangen.');
+
+    let bewaardeGenesis = '';
+    if (docker && fs.existsSync(doel)) {
+      const bestaand = fs.readFileSync(doel, 'utf8');
+      const raak = bestaand.match(/^RTG_MOTOR_EXPECT_GENESIS=(.*)$/m);
+      if (raak && !/^g-[a-f0-9]{32}$/.test(raak[1].trim()))
+        throw new Error('bestaande RTG_MOTOR_EXPECT_GENESIS is ongeldig; weiger hem stil te vervangen.');
+      bewaardeGenesis = raak ? raak[1].trim() : '';
+    }
 
     if (docker) {
       if (fs.existsSync(pgDoel)) {
@@ -157,9 +176,22 @@ if (schrijven) {
         schrijfNieuw(pgDoel, hex(32) + '\n');
         console.log('\n# Apart PostgreSQL-geheim: ' + pgDoel + ' (rechten 600).');
       }
+      if (fs.existsSync(motorSleutelDoel)) {
+        // Een gewone sleutelrun is nooit een cryptografische rotatie. Oude
+        // snapshots moeten met hun key-id leesbaar blijven; rotatie vraagt een
+        // afzonderlijke, beproefde operatorhandeling.
+        console.log('# Bestaande geldsnapshot-sleutelring blijft ongewijzigd: ' + motorSleutelDoel);
+      } else {
+        schrijfNieuw(motorSleutelDoel, 'k-' + hex(8) + ':' + hex(32) + '\n');
+        console.log('# Aparte geldsnapshot-sleutelring: ' + motorSleutelDoel + ' (rechten 600).');
+      }
     }
-    schrijfNieuw(doel, blok.join('\n') + '\n');
+    const envTekst = blok.join('\n') + '\n' + (bewaardeGenesis
+      ? '# Bestaande geldvolume-identiteit; sleutelrotatie of --force verandert deze nooit.\nRTG_MOTOR_EXPECT_GENESIS=' + bewaardeGenesis + '\n'
+      : '');
+    schrijfNieuw(doel, envTekst);
     console.log('# Geschreven naar ' + doel + ' (rechten 600, staat in .gitignore).');
+    if (docker) console.log('# Initialiseer het geldvolume daarna EENMALIG en bewust met: npm run motor:init');
     console.log('# Controleer met: npm run selfhost:check');
   } catch (e) {
     console.error('\n# NIET geschreven: ' + e.message);

@@ -85,7 +85,7 @@
        reist dezelfde sleutel mee en herkent de server de herhaling
        (offline/sync ontdubbelt op clientId). */
     var pakket = {
-      clientId: (window.RTGId ? RTGId('pda') : 'pda-' + Date.now() + '-' + LIJST.length),
+      clientId: RTGId('pda'),
       kanaal: 'tafel', tafel: tafel,
       gasten: Math.max(1, parseInt($('lGasten').value, 10) || 1),
       at: new Date().toISOString(),

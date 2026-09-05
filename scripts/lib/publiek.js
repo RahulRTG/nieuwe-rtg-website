@@ -255,13 +255,16 @@ const PUBLIEK = new Map([
   ['/api/push/key', 'de VAPID-sleutel is per definitie de PUBLIEKE helft'],
   /* Het gedeelde scherm. Een televisie in een vakantiehuis heeft geen
      RTG-account, en er een op zetten zou betekenen dat er een ingelogde
-     sessie op een gedeeld apparaat blijft staan. De CODE is de hele
-     toegang, en hij is bewust weinig waard: hij komt van een SPELER van dat
-     potje, hij geeft alleen `zicht.publiek` van dat ene potje, hij verloopt
-     na twee uur, en er kan niets terug -- geen zet, geen chat. Wie hem heeft
-     ziet wat iedereen in de kamer toch al ziet. Er staat een rem voor tegen
-     brute kracht. Zie server/kern/spellen/projectie.js. */
-  ['/api/projectie/:code', 'een gedeeld scherm heeft geen sessie; de code geeft alleen de publieke laag van EEN potje en verloopt'],
+     sessie op een gedeeld apparaat blijft staan. Koppelen gebruikt daarom
+     een eenmalige credential van 128 bits; daarna krijgt het scherm een
+     afzonderlijke, intrekbare schermsessie. Beide reizen uitsluitend in een
+     POST-lijf, zijn gehasht opgeslagen, verlopen en geven alleen
+     `zicht.publiek` van dat ene potje. Er kan niets terug: geen zet en geen
+     chat. Beide deuren hebben een rem en antwoorden nooit cachebaar. Zie
+     server/kern/spellen/projectie.js. */
+  ['/api/projectie/koppel', 'een gedeeld scherm heeft nog geen sessie; een eenmalige 128-bits koppelcredential opent alleen de publieke laag van een potje'],
+  ['/api/projectie/kijk', 'de intrekbare schermsessie leest alleen de publieke laag van het gekoppelde potje'],
+  ['/api/projectie/:code', 'oude projectie-URL is uitsluitend een cacheloze 410-eindstatus en opent nooit meer een potje'],
   /* De rechtsvormen zijn voorlichting, geen bedrijfsdata: wat een B.V. van
      een stichting onderscheidt, en waar je met elk van de twee aan vastzit,
      hoort iemand te kunnen lezen VOORDAT hij een account maakt. Er staat
@@ -290,12 +293,6 @@ const PUBLIEK = new Map([
      blijven. Hangt een doos ooit rechtstreeks aan het internet, dan is dit
      de eerste route om alsnog achter een poort te zetten. */
   ['/api/doos/status', 'de doos vertelt hoe hij erbij staat; geen zaakdata (zie de opmerking hierboven)'],
-  /* Bewust, en met een gemeten grens: de PDA-inlog toont eerst de namenlijst
-     zodat personeel zichzelf kan aanwijzen. Zie de rem in toegang.js: dertig
-     zaken per kwartier per ip, ruim voor wie van bedrijf wisselt en te weinig
-     om alle partners leeg te trekken. */
-  ['/api/supplier/roster', 'de PDA-inlog toont de namenlijst voor de pincode; met een eigen rem'],
-
   // ---- machine naar machine, met een eigen bewijs in het verzoek ----
   ['/api/betaal/webhook', 'ondertekend door de betaalprovider; een sessie bestaat hier niet'],
   ['/api/betaal/webhook/mollie', 'Mollie heeft geen RTG-sessie; RTG vertrouwt het id niet en haalt de betaling met de eigen geheime sleutel bij Mollie op'],
@@ -306,6 +303,8 @@ const PUBLIEK = new Map([
   ['/api/stad/doos/hartslag', 'de stadsdoos stuurt zijn apparaatsleutel mee'],
   ['/api/stad/doos/meting', 'idem'],
   ['/api/rtgid/status', 'RTG iD draagt zijn bewijs als idToken in het LIJF, niet als sessie'],
+  ['/api/rtgid/roteer', 'de 128-bit statuscredential in het lijf is de dienstbevoegdheid; de kern eist daarnaast een gebonden idempotentiesleutel en trekt beide oude credentials atomair in'],
+  ['/api/rtgid/annuleer', 'de 128-bit statuscredential in het lijf is de dienstbevoegdheid; annuleren trekt code en statuscredential server-side in en een onbekende credential lekt niets'],
   ['/api/rtgid/wie', 'idem; de kluis geeft alleen attributen op een geldig idToken'],
   ['/api/vracht/volg', 'volgen op een meegestuurde vrachtcode, zoals elke track-and-trace'],
 

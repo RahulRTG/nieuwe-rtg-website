@@ -87,14 +87,26 @@ module.exports = (g) => {
     if (geldModus !== 'motor') return boek(args);
     return metSlot(() => boekMotor(args));
   }
-  async function boekMotor({ van, naar, centen, soort, oms, ref }) {
+  async function boekMotor({ van, naar, centen, soort, oms, ref, economischeSleutel }) {
     const c = Math.round(Number(centen));
     const fout = guardCheck({ van, naar, c });
     if (fout) return fout;
-    const r = await motorklant.bankBoek({ van, naar, centen: c, soort, oms, ref });
+    const r = await motorklant.bankBoek({ van, naar, centen: c, soort, oms, ref, economischeSleutel });
     if (!r || r.error) return { status: (r && r.status) || 502, error: (r && r.error) || 'Motor onbereikbaar.' };
     const b = r.boeking;
     const rij = { id: b.id, van: b.van, naar: b.naar, centen: Math.round(Number(b.centen)), soort: b.soort || 'boeking', oms: b.oms || '', ref: b.ref || null, at: b.at || nu() };
+    if (economischeSleutel) {
+      const sv = Math.round(Number(r.saldoVan)), sn = Math.round(Number(r.saldoNaar));
+      if (!Number.isFinite(sv) || !Number.isFinite(sn))
+        return { status: 502, error: 'Motor bevestigde geen actuele banksaldi; de spiegel blijft ongemoeid.' };
+      saldi()[rij.van] = sv; saldi()[rij.naar] = sn;
+      if (!grootboek().some(x => x && x.id === rij.id)) {
+        grootboek().unshift(rij);
+        if (grootboek().length > 100000) grootboek().pop();
+      }
+      save(); bordSeintje();
+      return { ok: true, boeking: rij, herhaald: !!r.herhaald };
+    }
     pasToe(rij);
     return { ok: true, boeking: rij };
   }

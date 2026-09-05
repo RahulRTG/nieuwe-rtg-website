@@ -41,8 +41,10 @@ module.exports = (ctx) => {
   /* De tijd uit de ctx van de paylaag: de wachttijd op een gewijzigd IBAN is een
      beveiligingsmaatregel, en een maatregel die je niet kunt vooruitspoelen kun
      je ook niet beproeven. */
-  const { rekLid, saldoVan, metIdem, boekAsync, waarde, opdrachten, seintje, nu } = ctx;
+  const { rekLid, saldoVan, metIdem, boek, boekAsync, grootboek, waarde, opdrachten,
+    seintje, nu, economischeBoekingEenmaal, geldModus } = ctx;
   const rekening = require('./uitbetaalrekening')(ctx);
+  const boekTerugEenmaal = require('../betaalopdracht/terugboeking');
 
   /* De bevoegdheid komt uit kern/bevoegdheid, en die laag wordt NA pay gemount
      (kernlaag4b). Late binding dus, zoals de bankdekking en de geldgrens. Niet
@@ -142,7 +144,9 @@ module.exports = (ctx) => {
      wallet. Zelfde tabel-per-soort als de partneruitbetaling -- alleen deze kant
      weet dat het pay-grootboek het is en waar het vandaan kwam. */
   opdrachten.registreerTeruggang('pay-terug', async (o) => {
-    const terug = await boekAsync({ van: 'extern:uitbetaald', naar: o.bron, centen: o.centen,
+    const terug = await boekTerugEenmaal({ domein: 'pay', grootboek, boek, boekAsync,
+      boekEenmaal: economischeBoekingEenmaal, geldModus,
+      van: 'extern:uitbetaald', naar: o.bron, centen: o.centen,
       soort: 'terug', oms: 'Terugstorting niet verstuurd, teruggeboekt', ref: o.ledgerRef });
     try { seintje(String(o.bron || '').replace(/^lid:/, '')); } catch (e) { /* een seintje mag de teruggang niet omgooien */ }
     return terug;

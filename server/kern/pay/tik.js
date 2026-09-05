@@ -18,6 +18,8 @@
    plek waar geld beweegt. */
 'use strict';
 
+const moneyCredentialBlokkade = require('../../middleware/money-credential-productiepoort').blokkade;
+
 module.exports = ({ crypto, save, nu, tikcodes, grootboek, rekLid, KASCODE_MS, stuur }) => {
 
   /* ---------- de tik: vrienden betalen elkaar met een aanraking ----------
@@ -26,6 +28,8 @@ module.exports = ({ crypto, save, nu, tikcodes, grootboek, rekLid, KASCODE_MS, s
      ONTVANGER aan; er kan dus enkel geld naar de eigenaar toe, en daarom mag
      hij binnen zijn vijf minuten door een hele tafel gebruikt worden. */
   function tikCode({ codenaam }) {
+    const dicht = moneyCredentialBlokkade('pay.tikcode');
+    if (dicht) return dicht;
     for (const k of tikcodes()) if (k.codenaam === codenaam) k.geldigTot = 0;
     const code = crypto.randomBytes(3).toString('hex').toUpperCase();
     tikcodes().unshift({ code, codenaam, geldigTot: nu() + KASCODE_MS, at: nu() });
@@ -34,6 +38,8 @@ module.exports = ({ crypto, save, nu, tikcodes, grootboek, rekLid, KASCODE_MS, s
     return { ok: true, code, geldigTot: nu() + KASCODE_MS };
   }
   async function tikBetaal({ van, code, centen, oms, idem }) {
+    const dicht = moneyCredentialBlokkade('pay.tikcode');
+    if (dicht) return dicht;
     const k = tikcodes().find(x => x.code === String(code || '').toUpperCase().trim());
     if (!k || k.geldigTot < nu()) return { status: 404, error: 'Deze tik is niet (meer) geldig; laat je vriend opnieuw op ontvangen zetten.' };
     if (k.codenaam === van) return { status: 400, error: 'Dit is je eigen tik.' };

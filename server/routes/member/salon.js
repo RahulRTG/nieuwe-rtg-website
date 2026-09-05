@@ -4,8 +4,8 @@
    komen via het kern-object binnen. Gemount vanuit routes/member.js. */
 module.exports = (kern) => {
   const { app, auth, db, save, broadcastSync, canEngage, engageError, registerContact,
-    notify, notifySupplier, findSupplier, salonZichtbaar, talen, AUTHOR_TIER, PERSONAS,
-    crypto, zorgContact, liveCodename } = kern;
+    notify, findSupplier, salonZichtbaar, talen, AUTHOR_TIER, PERSONAS,
+    zorgContact, liveCodename, salonClaimcode } = kern;
 
   /* Zodra een lid echt in contact komt met een partner (hier: de partner volgen
      of zijn Salon-etalage bekijken) openen we automatisch een open chatlijn. Zo
@@ -123,13 +123,14 @@ module.exports = (kern) => {
     openLijn(s, req); // vanaf nu geen vreemden meer: open lijn zodra je de Salon bekijkt
     const t = db.data.supplierTypes[s.type] || {};
     const eigen = db.data.posts.filter(p => p.partnerCode === s.code);
-    const claimVan = p => (p.deal && (p.deal.claims || []).find(c => c.key === key)) || null;
+    const claimVan = p => p.deal ? salonClaimcode.vindVanLid(p, key) : null;
     const items = eigen.map(p => ({
       id: p.id, at: p.at || null, text: p.text, photo: p.photo || null,
       soort: p.folder ? 'folder' : p.deal ? 'deal' : p.poll ? 'poll' : 'post',
       likes: p.baseLikes + Object.keys(p.likedBy || {}).length,
       folder: p.folder ? { titel: p.folder.titel, fotos: p.folder.fotos || [], items: p.folder.items || [] } : null,
-      deal: p.deal ? { titel: p.deal.titel, geldigTot: p.deal.geldigTot || null, mijnCode: (claimVan(p) || {}).code || null } : null,
+      deal: p.deal ? { titel: p.deal.titel, geldigTot: p.deal.geldigTot || null,
+        mijnClaim: salonClaimcode.publiek(p, claimVan(p)) } : null,
       poll: p.poll ? { vraag: p.poll.vraag, totaal: p.poll.opties.reduce((n, o) => n + o.stemmen.length, 0),
         opties: p.poll.opties.map(o => ({ tekst: o.tekst, stemmen: o.stemmen.length, mijn: o.stemmen.includes(key) })),
         gestemd: p.poll.opties.some(o => o.stemmen.includes(key)) } : null
@@ -147,21 +148,10 @@ module.exports = (kern) => {
     });
   });
 
-  app.post('/api/salon/deal/claim', auth, (req, res) => {
-    if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
-    const p = db.data.posts.find(x => x.id === Number(req.body.postId));
-    if (!p || !p.deal) return res.status(404).json({ error: 'Aanbieding niet gevonden.' });
-    if (p.deal.geldigTot && p.deal.geldigTot < new Date().toISOString().slice(0, 10))
-      return res.status(410).json({ error: 'Deze aanbieding is verlopen.' });
-    const al = p.deal.claims.find(c => c.key === req.session.key);
-    if (al) return res.json({ ok: true, code: al.code, alGeclaimd: true });
-    const codename = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename;
-    const claim = { key: req.session.key, codename, code: 'RTG-D-' + crypto.randomBytes(3).toString('hex').toUpperCase(), at: new Date().toISOString(), used: false };
-    p.deal.claims.push(claim);
-    save();
-    notifySupplier(p.partnerCode, { icon: 'attenties', title: 'Aanbieding geclaimd', body: codename + ' claimde "' + p.deal.titel + '" (' + p.deal.claims.length + 'x totaal).' });
-    res.json({ ok: true, code: claim.code });
-  });
+  /* Claimcode-uitgifte, rotatie en intrekking hebben hun eigen transactionele
+     routebestand. Zo blijft deze sociale route onder de omvanggrens en kan de
+     bearerlevenscyclus niet tussen gewone Salon-mutaties verdwijnen. */
+  require('./salon-claims')(kern);
 
   app.post('/api/salon/poll/stem', auth, (req, res) => {
     if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });

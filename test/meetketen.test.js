@@ -135,6 +135,8 @@ test('5. de poortwacht overleeft een pipe zonder afgekapt te worden', () => {
     ['scripts/poortwacht.js', '--json', '--per-route', 'http://127.0.0.1:1'],
     { cwd: WORTEL, encoding: 'utf8', maxBuffer: 256 * 1024 * 1024, timeout: 300000 });
   const uit = r.stdout || '';
+  assert.equal(r.status, 2,
+    'een ronde tegen een onbereikbare server is compleet uitgeschreven maar nooit groen');
   assert.ok(uit.length > 200000, 'de uitslag is groot genoeg om af te kappen (' + uit.length + ')');
   let j;
   assert.doesNotThrow(() => { j = JSON.parse(uit); },

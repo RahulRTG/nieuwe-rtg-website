@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "doel": "Vier dagdeelvarianten voor de GitHub Pages-startpagina van Rahul Travel Group.",
+  "gemaaktOp": "2026-09-04",
+  "generator": "OpenAI ImageGen via de ingebouwde Codex-beeldgenerator",
+  "bronconcept": "De door de gebruiker goedgekeurde RTG-startpagina-compositie met een luxe mediterrane villa aan zee.",
+  "werkwijze": "Ochtend, middag en avond zijn als afzonderlijke tijdsvarianten gemaakt. Nacht is opnieuw gegenereerd vanuit de goedgekeurde avondcompositie. Daarna zijn de beelden lokaal als JPEG met kwaliteitsinstelling 82 opgeslagen.",
+  "verklaring": "Tijdens deze wijziging is geen beeld van een externe fotobank gedownload. De composities bevatten geen herkenbare echte personen, tekst, logo of watermerk.",
+  "bestanden": [
+    {
+      "bestand": "hero-ochtend.jpg",
+      "dagdeel": "ochtend",
+      "sha256": "03af008b035f7823a391d2199a50f0279469302d3f644398086c0f7da5db1df6"
+    },
+    {
+      "bestand": "hero-middag.jpg",
+      "dagdeel": "middag",
+      "sha256": "6924d18f4b6c6035137ff1cebedc57006dc36d8f568adf02f3ac528cf4b2a16a"
+    },
+    {
+      "bestand": "hero-avond.jpg",
+      "dagdeel": "avond",
+      "sha256": "7eb0ac475740237adbc989cf226f047f2da3896cc3da127ad459f13ce4f9c3d6"
+    },
+    {
+      "bestand": "hero-nacht.jpg",
+      "dagdeel": "nacht",
+      "sha256": "a911b0cd623e593a10e5bd6277b4fb6fc8a4a8ecf77880539ffa51f156ab8fcf"
+    }
+  ]
+}

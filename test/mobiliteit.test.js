@@ -169,6 +169,11 @@ test('5. een rit naar een echt restaurant: prijs vooraf, op codenaam, met een va
      waarmee dit lid zich heeft geregistreerd. */
   assert.ok(o.reizigerCodenaam && !/Lid \d/.test(o.reizigerCodenaam), 'de rit draait op een codenaam');
 
+  const eigenVolg = await api('/api/mob/volg', { ref: o.ref }, lidA);
+  assert.equal(eigenVolg.status, 200);
+  assert.deepEqual(eigenVolg.body.opdracht.veiligheid, { noodcontact: false },
+    'een rit munt geen ongebruikte deelcredential die later kan lekken');
+
   // en een tweede lid komt daar niet bij
   const inbraak = await api('/api/mob/volg', { ref: o.ref }, lidB);
   assert.equal(inbraak.status, 403, 'de rit van een ander is niet te volgen');

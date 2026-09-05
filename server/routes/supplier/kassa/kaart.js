@@ -15,10 +15,14 @@
    ========================================================================== */
 'use strict';
 
+const moneyCredentialBlokkade = require('../../../middleware/money-credential-productiepoort').blokkade;
+
 /* Geeft { error, status } of { kaart, bedrag }. Schrijft zelf niet weg: de
    aanroeper bepaalt wanneer er wordt opgeslagen, want bij de kassabon hoort de
    afboeking bij dezelfde save als de bon. */
 function verzilver(db, supplierCode, ruweCode, ruwBedrag, actor, viaBon) {
+  const dicht = moneyCredentialBlokkade('pay.giftcard_value_code');
+  if (dicht) return dicht;
   const code = String(ruweCode || '').trim().toUpperCase();
   const g = (db.data.giftcards || []).find(x => x.code === code && x.supplierCode === supplierCode);
   if (!g) return { status: 404, error: 'Deze cadeaukaart kennen we hier niet.' };

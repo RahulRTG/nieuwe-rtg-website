@@ -18,8 +18,8 @@
       terugvalcode van datzelfde verzoek niets meer opent, en een nieuw verzoek
       met de code wel;
    3. het kantoor aan een zaak: eigenaar, gewicht, koppeling;
-   4. de tweede handtekening onder zwaar werk, en nooit van de aanvrager zelf;
-   5. de AI-onderzoeker: wat hij zou kunnen, en wat hij vraagt -- zonder dat er
+   4. de acht bevoegdheden zonder lezer: niet aanvraagbaar en geen machtiging;
+   5. de AI-onderzoeker: alleen de ene actieve capability -- zonder dat er
       iets opengaat voordat het lid drukt;
    6. de borden die over zaken heen kijken: kwaliteit, foutsignaal, kanalen;
    7. de zaak (leverancier): keuzes, weigeren, en de persoonlijke stand die na
@@ -35,17 +35,12 @@
    uitgevoerd, de gerichte toets is rood gezien, en de bron is byte voor byte
    hersteld:
 
-   - kern/service/machtiging.js tekenBij(): de regel `if (w === m.mens) return
-     403` weggehaald. Toets 4 zakte: de aanvrager kreeg 200 op zijn eigen tweede
-     handtekening in plaats van 403.
    - kern/service/bevestiging.js weiger(): `b.geweigerdAt = nu()` weggehaald.
      Toets 2 zakte: de bevestiging stond na het weigeren op 'open' in plaats van
      'geweigerd'.
    - routes/service-kantoor.js: `balieAuth` van /api/office/service/eigenaar
      gehaald. Toets 1 zakte: met alleen de gedeelde kantoorcode kwam het verzoek
      bij de handler (404 op de onbekende zaak) in plaats van bij de deur (403).
-   - kern/service/onderzoeker.js mag(): de ZWAAR-tak weggehaald. Toets 5 zakte:
-     bank.gegevens stond op `kan: true`.
    - kern/service/persoonlijk.js: `wij` altijd op 'gemeld-hersteld'. Toets 7
      zakte op de stand VOOR de herstelmelding ('gemeld-hersteld' waar 'onbekend'
      hoort). */
@@ -55,7 +50,7 @@ const assert = require('node:assert/strict');
 const { startServer, stop, kantoorAlsPersoon } = require('./helper');
 
 const OFFICE_CODE = 'RTG-OFFICE';
-const REDEN = 'de uitbetaling staat sinds gisteren op pending';
+const REDEN = 'de operationele werkruimte reageert sinds gisteren niet';
 
 const post = (base) => async (pad, body, tok) => {
   const r = await fetch(base + pad, {
@@ -95,27 +90,6 @@ async function opzet() {
   const balie = await kantoorAlsPersoon(srv.base);
   assert.ok(balie, 'geen baliezetel op naam te krijgen');
   return { srv, p, lid, balie };
-}
-
-/* Een TWEEDE mens aan de balie. kantoorAlsPersoon() levert de eigenaar, en twee
-   keer aanroepen levert twee keer dezelfde sleutel; de tweede handtekening eist
-   een ANDER mens. Dus de weg die een medewerker in het echt loopt: een eigen
-   account, een zetel van de eigenaar, en de kantoorrol starten. */
-async function tweedeMens(o) {
-  const tok = await lidMet(o.p, 'Tweede Mens', 'tweedemens@x.nl', '0612340017');
-  const st = await o.p('/api/state', {}, tok);
-  const codenaam = st.body.state && st.body.state.user && st.body.state.user.codename;
-  assert.ok(codenaam, 'het tweede account heeft geen codenaam');
-  const zoek = await o.p('/api/office/balie/zoek', { codenaam }, o.balie);
-  const id = ((zoek.body.treffers || [])[0] || {}).id;
-  assert.ok(id, 'de balie vindt het tweede account niet: ' + JSON.stringify(zoek.body).slice(0, 160));
-  const zetel = await o.p('/api/office/balie/zetel', { key: 'user-' + id }, o.balie);
-  assert.equal(zetel.status, 200, 'de zetel: ' + JSON.stringify(zetel.body).slice(0, 160));
-  const k = await o.p('/api/account/koppel', { soort: 'kantoor', code: OFFICE_CODE }, tok);
-  assert.equal(k.status, 200, 'koppelen: ' + JSON.stringify(k.body).slice(0, 160));
-  const s = await o.p('/api/account/start', { rol: 'kantoor' }, tok);
-  assert.ok(s.body.token, 'de kantoorrol start niet: ' + JSON.stringify(s.body).slice(0, 160));
-  return { token: s.body.token, key: 'user-' + id };
 }
 
 /* ------------------------------------------------------------- 1. de deur -- */
@@ -187,9 +161,9 @@ test('het lid: de keuzes noemen zijn mens, en weigeren maakt de terugvalcode waa
     assert.equal(k.body.mens.team, 'leden');
     assert.doesNotMatch(String(k.body.mens.heet), /Rechterhand/);
 
-    const z = (await o.p('/api/service/open', { onderwerp: 'betaling', titel: 'Mijn uitbetaling ontbreekt' }, o.lid)).body.zaak;
+    const z = (await o.p('/api/service/open', { onderwerp: 'zaak', titel: 'Mijn werkruimte reageert niet' }, o.lid)).body.zaak;
     const v = await o.p('/api/office/service/bevestiging/vraag',
-      { id: z.id, capabilities: ['betaling.stand'], reden: REDEN }, o.balie);
+      { id: z.id, capabilities: ['organisatie.stand'], reden: REDEN }, o.balie);
     assert.equal(v.status, 200, JSON.stringify(v.body).slice(0, 200));
     const wacht = await o.p('/api/service/bevestigingen', {}, o.lid);
     assert.equal(wacht.body.verzoeken.length, 1, 'er stond niets klaar in de app');
@@ -221,7 +195,7 @@ test('het lid: de keuzes noemen zijn mens, en weigeren maakt de terugvalcode waa
     /* De terugval die WEL werkt: een nieuw verzoek, het lid leest de cijfers
        voor, de medewerker typt ze in. Een keer -- de tweede keer is hij op. */
     const v2 = await o.p('/api/office/service/bevestiging/vraag',
-      { id: z.id, capabilities: ['betaling.stand'], reden: REDEN }, o.balie);
+      { id: z.id, capabilities: ['organisatie.stand'], reden: REDEN }, o.balie);
     assert.equal(v2.status, 200, JSON.stringify(v2.body).slice(0, 200));
     assert.notEqual(v2.body.bevestiging.id, verzoek.id, 'het geweigerde verzoek werd hergebruikt');
     const code2 = (await o.p('/api/service/bevestigingen', {}, o.lid)).body.verzoeken[0].code;
@@ -229,7 +203,7 @@ test('het lid: de keuzes noemen zijn mens, en weigeren maakt de terugvalcode waa
     assert.equal(kort.status, 400, 'iets anders dan zes cijfers werd als code aangenomen');
     const open = await o.p('/api/office/service/bevestiging/code', { code: code2 }, o.balie);
     assert.equal(open.status, 200, JSON.stringify(open.body).slice(0, 200));
-    assert.deepEqual(open.body.machtiging.capabilities, ['betaling.stand']);
+    assert.deepEqual(open.body.machtiging.capabilities, ['organisatie.stand']);
     assert.equal(open.body.bevestiging.via, 'code');
     const nogEens = await o.p('/api/office/service/bevestiging/code', { code: code2 }, o.balie);
     assert.equal(nogEens.status, 404, 'de code werkte een tweede keer');
@@ -309,69 +283,45 @@ test('het kantoor aan een zaak: eigenaar, gewicht met reden, en een koppeling di
   } finally { await stop(o.srv); }
 });
 
-/* ----------------------------------------------- 4. de tweede handtekening -- */
-test('zwaar werk vraagt een tweede mens over de echte route, en nooit de aanvrager zelf', async () => {
+/* -------------------------------------------- 4. niet-actieve bevoegdheden -- */
+test('een bevoegdheid zonder lezer komt niet via de echte route in een verzoek', async () => {
   const o = await opzet();
   try {
     const z = (await o.p('/api/service/open', { onderwerp: 'account', titel: 'Ik kom niet meer in mijn account' }, o.lid)).body.zaak;
     assert.equal(z.team, 'toegang');
     const v = await o.p('/api/office/service/bevestiging/vraag',
       { id: z.id, capabilities: ['identiteit.openen'], reden: 'account recovery, het lid meldt zich aan de balie' }, o.balie);
-    assert.equal(v.status, 200, JSON.stringify(v.body).slice(0, 200));
-    const verzoek = (await o.p('/api/service/bevestigingen', {}, o.lid)).body.verzoeken[0];
-    const ok = await o.p('/api/service/bevestig', { id: verzoek.id }, o.lid);
-    assert.equal(ok.status, 200, JSON.stringify(ok.body).slice(0, 200));
-    const m = ok.body.machtiging;
-    assert.deepEqual(m.zwaar, ['identiteit.openen'], 'zwaar werk werd niet als zwaar herkend');
-    assert.equal(m.tweedeMens, null);
-
-    /* De aanvrager zelf: nee, met de reden. De controle staat in de kern en
-       niet in de route, zodat een tweede ingang hem niet kan omzeilen -- maar
-       hij hoort wel over DEZE route te werken. */
-    const zelf = await o.p('/api/office/service/machtiging/tekenbij', { id: m.id, reden: 'ik teken zelf wel even' }, o.balie);
-    assert.equal(zelf.status, 403, 'de aanvrager kon zijn eigen tweede handtekening zetten');
-    assert.match(String(zelf.body.error), /eigen tweede handtekening/i);
-
-    const tweede = await tweedeMens(o);
-    const bij = await o.p('/api/office/service/machtiging/tekenbij', { id: m.id, reden: 'het lid staat voor mij aan de balie' }, tweede.token);
-    assert.equal(bij.status, 200, JSON.stringify(bij.body).slice(0, 200));
-    assert.equal(bij.body.machtiging.tweedeMens, tweede.key, 'de tweede handtekening staat niet op naam van de tweede mens');
-    assert.equal(bij.body.machtiging.stand, 'geldig');
-
-    const spook = await o.p('/api/office/service/machtiging/tekenbij', { id: 'MCH-BESTAATNIET' }, tweede.token);
-    assert.equal(spook.status, 404);
-
-    /* Na intrekking valt er niets meer bij te tekenen. */
-    const weg = await o.p('/api/office/service/machtiging/intrek', { id: m.id }, o.balie);
-    assert.equal(weg.body.machtiging.stand, 'ingetrokken');
-    const laat = await o.p('/api/office/service/machtiging/tekenbij', { id: m.id }, tweede.token);
-    assert.equal(laat.status, 400);
-    assert.match(String(laat.body.error), /ingetrokken/);
+    assert.equal(v.status, 403, JSON.stringify(v.body).slice(0, 200));
+    assert.deepEqual(v.body.geweigerd, ['identiteit.openen']);
+    assert.equal((await o.p('/api/service/bevestigingen', {}, o.lid)).body.verzoeken.length, 0,
+      'een verwijderde capability verscheen toch in de ledenapp');
+    assert.equal((await o.p('/api/office/service/machtigingen', {}, o.balie)).body.tel.totaal, 0,
+      'een verwijderde capability leverde toch een machtiging op');
   } finally { await stop(o.srv); }
 });
 
 /* ------------------------------------------------------- 5. de AI-onderzoeker -- */
-test('de AI-onderzoeker zegt eerst wat hij niet kan, vraagt dan langs het lid, en opent niets', async () => {
+test('de AI-onderzoeker kan alleen de ene actieve bevestigingscapability vragen', async () => {
   const o = await opzet();
   try {
-    const z = (await o.p('/api/service/open', { onderwerp: 'betaling', titel: 'Waarom is mijn uitbetaling niet doorgekomen' }, o.lid)).body.zaak;
-    assert.equal(z.team, 'betalingen');
+    const z = (await o.p('/api/service/open', { onderwerp: 'zaak', titel: 'Waarom reageert mijn werkruimte niet' }, o.lid)).body.zaak;
+    assert.equal(z.team, 'zakelijk');
 
     const mag = await o.p('/api/office/service/ai/mag',
-      { id: z.id, capabilities: ['betaling.stand', 'bank.gegevens', 'lid.dossier'] }, o.balie);
+      { id: z.id, capabilities: ['organisatie.stand', 'bank.gegevens', 'lid.dossier'] }, o.balie);
     assert.equal(mag.status, 200, JSON.stringify(mag.body).slice(0, 200));
     assert.equal(mag.body.uitkomst.length, 3, 'niet elke gevraagde capability kreeg een uitkomst');
     const per = Object.fromEntries(mag.body.uitkomst.map(u => [u.capability, u]));
-    assert.equal(per['betaling.stand'].kan, true);
-    assert.equal(per['bank.gegevens'].kan, false, 'de AI kreeg zwaar werk in het vooruitzicht');
-    assert.match(per['bank.gegevens'].waarom, /tweede MENS/);
-    assert.equal(per['lid.dossier'].kan, false, 'de AI kreeg iets dat het team niet nodig heeft');
+    assert.equal(per['organisatie.stand'].kan, true);
+    assert.equal(per['bank.gegevens'].kan, false, 'de AI kreeg een verwijderde capability in het vooruitzicht');
+    assert.match(per['bank.gegevens'].waarom, /niet nodig/);
+    assert.equal(per['lid.dossier'].kan, false, 'de AI kreeg een verwijderde capability');
     assert.match(per['lid.dossier'].waarom, /niet nodig/);
-    assert.deepEqual(mag.body.teVragen, ['betaling.stand']);
-    const onbekend = await o.p('/api/office/service/ai/mag', { id: 'SUP-BESTAATNIET', capabilities: ['betaling.stand'] }, o.balie);
+    assert.deepEqual(mag.body.teVragen, ['organisatie.stand']);
+    const onbekend = await o.p('/api/office/service/ai/mag', { id: 'SUP-BESTAATNIET', capabilities: ['organisatie.stand'] }, o.balie);
     assert.equal(onbekend.status, 404);
 
-    /* Alleen zwaar werk gevraagd: dan valt er voor de AI niets te vragen, en
+    /* Alleen niet-actief werk gevraagd: dan valt er voor de AI niets te vragen, en
        dat staat er met de uitkomst erbij in plaats van als een lege lijst. */
     const niets = await o.p('/api/office/service/ai/vraag',
       { id: z.id, capabilities: ['bank.gegevens'], reden: 'om de rekening te controleren' }, o.balie);
@@ -380,11 +330,11 @@ test('de AI-onderzoeker zegt eerst wat hij niet kan, vraagt dan langs het lid, e
     assert.equal(niets.body.uitkomst.length, 1);
 
     const vraag = await o.p('/api/office/service/ai/vraag',
-      { id: z.id, capabilities: ['betaling.stand', 'bank.gegevens', 'lid.dossier'], reden: 'om te zien waar de uitbetaling bleef steken' }, o.balie);
+      { id: z.id, capabilities: ['organisatie.stand', 'bank.gegevens', 'lid.dossier'], reden: 'om te zien waar de werkruimte vastloopt' }, o.balie);
     assert.equal(vraag.status, 200, JSON.stringify(vraag.body).slice(0, 200));
     assert.equal(vraag.body.machine, true, 'de aanvraag noemt zichzelf geen machine');
     assert.equal(vraag.body.aanvrager, 'RTG AI (onderzoeker)');
-    assert.deepEqual(vraag.body.bevestiging.capabilities, ['betaling.stand'], 'er werd meer gevraagd dan de AI mag');
+    assert.deepEqual(vraag.body.bevestiging.capabilities, ['organisatie.stand'], 'er werd meer gevraagd dan de AI mag');
     assert.equal(vraag.body.bevestiging.machtiging, null, 'er ontstond een machtiging voordat het lid drukte');
     assert.equal(vraag.body.nietGevraagd.length, 2, 'wat niet gevraagd werd, wordt niet gemeld');
     assert.equal(JSON.stringify(vraag.body).includes('"code"'), false, 'de terugvalcode lekte naar de kantoorkant');
@@ -398,7 +348,7 @@ test('de AI-onderzoeker zegt eerst wat hij niet kan, vraagt dan langs het lid, e
 
     /* Twee keer vragen is een verzoek. */
     const nog = await o.p('/api/office/service/ai/vraag',
-      { id: z.id, capabilities: ['betaling.stand'], reden: 'om te zien waar de uitbetaling bleef steken' }, o.balie);
+      { id: z.id, capabilities: ['organisatie.stand'], reden: 'om te zien waar de werkruimte vastloopt' }, o.balie);
     assert.equal(nog.body.hergebruikt, true, 'er ontstond een tweede verzoek voor dezelfde vraag');
     assert.equal((await o.p('/api/service/bevestigingen', {}, o.lid)).body.verzoeken.length, 1);
 
@@ -407,7 +357,7 @@ test('de AI-onderzoeker zegt eerst wat hij niet kan, vraagt dan langs het lid, e
     assert.equal(ok.status, 200, JSON.stringify(ok.body).slice(0, 200));
     assert.deepEqual(
       { mens: ok.body.machtiging.mens, capabilities: ok.body.machtiging.capabilities, zwaar: ok.body.machtiging.zwaar },
-      { mens: 'ai:onderzoeker', capabilities: ['betaling.stand'], zwaar: [] },
+      { mens: 'ai:onderzoeker', capabilities: ['organisatie.stand'], zwaar: [] },
       'de machtiging van de AI staat niet op naam van de machine, of draagt iets anders dan het lid las');
   } finally { await stop(o.srv); }
 });

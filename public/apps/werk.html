@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="nl" data-rtg-modus="pro">
 <head>
+<script src="/shared/id.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RTG Werk OS</title>
@@ -17,8 +18,9 @@
 <link href="/shared/ios.css" rel="stylesheet">
 <link href="/shared/werk-command.css" rel="stylesheet">
 <link href="/shared/workos-premium.css" rel="stylesheet">
+<link href="/shared/rtg-vandaag-luxe.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-workos-premium>
+<body class="rtg-stijl" data-workos-premium data-rtg-world="work" data-rtg-vandaag-surface="projecten" data-rtg-edge-2-context="work-bank,work-top" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true">
 <div class="wk-shell"><aside class="wk-bank"><nav aria-label="Werk OS"><button class="actief" data-wk="start"><i>⌂</i><span>Briefing</span></button><button data-wk="projecten"><i>◇</i><span>Werk</span></button><button data-wk="klanten"><i>◎</i><span>Relaties</span></button><button data-wk="service"><i>↗</i><span>Service</span></button><button data-wk="bouw"><i>⌁</i><span>Control</span></button><button data-wk="besluit"><i>✦</i><span>Authority</span></button></nav><footer><button data-wk="people"><i>◌</i><span>Personeel</span></button><button data-wk="settings"><i>≋</i><span>Instellingen</span></button></footer></aside>
 <main class="wk-main"><header class="wk-top"><div class="wk-tabs"><button class="actief">Enterprise Briefing<small>WORKSPACE</small></button><button id="wkContextTab">Operations Universe<small>LIVE</small></button><button id="wkRahulTab" type="button">Rahul<small>AI WORKSPACE</small></button></div><section><i></i><span id="wkVertrouwen">&nbsp;</span><button class="knop" id="ververs" type="button">Ververs</button><button class="knop" id="inlogUit" type="button">Uitloggen</button></section></header><section id="main" class="wk-stage">
   <div class="kaart" id="inlog">
@@ -132,6 +134,7 @@
   </div>
 </section><section class="wk-rahul" aria-label="Rahul AI"><header><button id="wkMouth" type="button" aria-label="Praat met Rahul">◌</button><span><b>Rahul</b><small>AI · BESCHIKBAAR</small></span><button id="wkRahulExpand" type="button" aria-label="Terug naar werkblad" aria-expanded="true">↙</button></header><div class="wk-rahul-conversation"><span>RAHUL · WORK INTELLIGENCE</span><h2>Waarmee kan ik uw organisatie helpen?</h2><small id="wkRahulContext">Ik zie wat werk blokkeert, wie bevoegd is en welke beslissing het meeste vrijgeeft.</small></div><div class="wk-rahul-compose"><input id="wkRahulInput" placeholder="Vraag Rahul…"><button id="wkRahulSend" type="button" aria-label="Verstuur naar Rahul">→</button></div></section></main></div>
 <div class="melding" id="melding" role="status"></div>
+<script src="/shared/rtg-vandaag-luxe.js" defer></script>
 <script src="/apps/werk/kern.js"></script>
 <script src="/apps/werk/merk.js"></script>
 <script src="/apps/werk/start.js"></script>

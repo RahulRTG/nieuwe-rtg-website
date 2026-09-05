@@ -35,6 +35,8 @@
    weggehaald: je weet bij een timeout juist niet of het gelukt is.
 
    Krijgt de gedeelde ctx van kern/pay/index.js. */
+const moneyCredentialBlokkade = require('../../middleware/money-credential-productiepoort').blokkade;
+
 module.exports = (ctx) => {
   const { save, nu, kascodes, rekLid, rekPartner, schoon,
     metIdem, boekAsync, zorgSaldo, betaalUit, seintje, betaaldienstKosten, waarde,
@@ -53,6 +55,8 @@ module.exports = (ctx) => {
 
   /* ---------- 1. vastzetten ---------- */
   async function kasVooraf({ supplierCode, code, maxCenten, oms, idem, urenGeldig }) {
+    const dicht = moneyCredentialBlokkade('pay.kascode_en_vooraf');
+    if (dicht) return dicht;
     if (!waarde) return uit();
     const k = codeVan(code);
     if (!k) return { status: 404, error: 'Deze betaalcode is niet (meer) geldig.' };
@@ -89,6 +93,8 @@ module.exports = (ctx) => {
 
   /* ---------- 2. vastleggen: het werkelijke bedrag ---------- */
   async function kasVastleg({ supplierCode, reservering, centen, oms, idem, genre }) {
+    const dicht = moneyCredentialBlokkade('pay.kascode_en_vooraf');
+    if (dicht) return dicht;
     if (!waarde) return uit();
     const r = reserveringVanZaak(String(reservering || ''), supplierCode);
     if (!r) return { status: 404, error: 'Deze reservering staat niet op uw naam.' };

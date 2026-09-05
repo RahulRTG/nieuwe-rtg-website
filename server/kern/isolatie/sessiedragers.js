@@ -72,11 +72,17 @@ function bearerVan(req) {
    een VERKEERDE sleutel. */
 let oplosSessie = null;
 function zetSessieOplosser(fn) { oplosSessie = typeof fn === 'function' ? fn : null; }
+function sessieOplosserGereed() { return typeof oplosSessie === 'function'; }
+function losSessie(token) {
+  if (!token) return null;
+  if (!oplosSessie) throw new Error('isolatie/sessiedragers: de centrale sessieoplosser is niet gemonteerd');
+  return oplosSessie(token) || null;
+}
 
 function dragersVanSessie(sess, token) {
   /* De sessie wordt alleen opgelost als hij er niet al is: een aanroeper die hem
      meegeeft, heeft hem via `auth` gekregen en dat is dezelfde bron. */
-  const s = sess || (token && oplosSessie ? (oplosSessie(token) || {}) : {});
+  const s = sess || (token ? (losSessie(token) || {}) : {});
 
   const sleutels = {
     /* De identiteit: dit lid, over al zijn inlogs heen. */
@@ -112,4 +118,5 @@ function dragersVanVerzoek(req) {
   return dragersVanSessie((req && req.session) || null, bearerVan(req));
 }
 
-module.exports = { zetSessieOplosser, dragersVanVerzoek, dragersVanSessie, EIGEN_LAGEN, bearerVan };
+module.exports = { zetSessieOplosser, sessieOplosserGereed, losSessie,
+  dragersVanVerzoek, dragersVanSessie, EIGEN_LAGEN, bearerVan };

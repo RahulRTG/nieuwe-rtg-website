@@ -11,6 +11,8 @@
    keuringsregel 13. */
 'use strict';
 
+const moneyCredentialBlokkade = require('../../middleware/money-credential-productiepoort').blokkade;
+
 const REK_TEGOED = 'extern:tegoed';
 const VERVAL_MS = 365 * 24 * 60 * 60 * 1000;   // een jaar; daarna haalt de koper het terug
 const MAX_RIJEN = 20000;
@@ -18,11 +20,26 @@ const MAX_RIJEN = 20000;
 module.exports = ({ d, save, crypto, nu }) => {
   function bonnen() { if (!Array.isArray(d().payTegoed)) d().payTegoed = []; return d().payTegoed; }
 
+  /* Deze helper is ook buiten de HTTP-routes bruikbaar. Zolang de bon nog raw
+     wordt opgeslagen en credentialclaim + grootboek niet in een database-
+     transactie staan, mag een taak of toekomstige route hem in productie niet
+     rechtstreeks uitgeven of bewaren. De normale domeinfuncties retourneren
+     vóór dit punt hun 503; een directe helperaanroep faalt hard. */
+  function eisVrijgegeven() {
+    const dicht = moneyCredentialBlokkade('pay.tegoedbon');
+    if (!dicht) return;
+    const fout = new Error(dicht.error);
+    fout.code = dicht.code;
+    fout.status = dicht.status;
+    throw fout;
+  }
+
   /* De code is DRAGER van waarde: wie hem heeft, kan hem verzilveren. Twaalf
      bytes uit crypto.randomBytes (96 bits) en niet uit een teller of een tijd --
      een code die te raden is, is een wallet die openstaat. In vieren geschreven
      zodat een mens hem kan overtikken; bij het zoeken wordt de opmaak genegeerd. */
   function nieuweCode() {
+    eisVrijgegeven();
     const rauw = crypto.randomBytes(12).toString('hex').toUpperCase();
     return rauw.match(/.{1,4}/g).join('-');
   }
@@ -35,6 +52,7 @@ module.exports = ({ d, save, crypto, nu }) => {
      rij het weggooien van de aanspraak. Een afgeronde bon is geschiedenis en
      mag van achteren af; open en bezig blijven staan, hoe oud ook. */
   function bewaar(t) {
+    eisVrijgegeven();
     const rijen = bonnen();
     rijen.unshift(t);
     for (let i = rijen.length - 1; i >= 0 && rijen.length > MAX_RIJEN; i--) {

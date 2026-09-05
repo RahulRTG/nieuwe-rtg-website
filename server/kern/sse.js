@@ -12,6 +12,7 @@
    even, dan stuurt EventSource bij herstel zijn laatste id mee (Last-Event-ID)
    en spelen we de gemiste events opnieuw af. */
 const SSE_BUFFER_TTL = 2 * 60 * 1000; // twee minuten terugspelen is ruim genoeg
+const isolatieRealtime = require('../middleware/isolatiepoort-realtime');
 
 function maakSse({ bus }) {
   const sseClients = [];       // { tier, res, key?, sup?, office? }
@@ -42,9 +43,13 @@ function maakSse({ bus }) {
   }
 
   function sseSend(res, event, data, id) {
-    if (id != null) res.write('id: ' + id + '\n');
-    res.write('event: ' + event + '\n');
-    res.write('data: ' + JSON.stringify(data) + '\n\n');
+    /* Eén keuring en één write: tokenintrekking kan zo nooit tussen `event:` en
+       de bijbehorende data vallen. Niet-persoonlijke streams zijn niet bij de
+       isolatiepoort geregistreerd en lopen ongewijzigd door. */
+    if (!isolatieRealtime.magSchrijven(res)) return false;
+    const idRegel = id != null ? 'id: ' + id + '\n' : '';
+    res.write(idRegel + 'event: ' + event + '\ndata: ' + JSON.stringify(data) + '\n\n');
+    return true;
   }
 
   // Een event van de bus afleveren aan alle passende open verbindingen; voor

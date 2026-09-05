@@ -50,6 +50,27 @@ function maakHerstel(getUserById) {
     return u;
   }
 
+  /* EEN HERSTELTOKEN WORDT IN DEZELFDE UPDATE VERBRUIKT ALS HET NIEUWE
+     WACHTWOORD WORDT GEZET. Eerst alleen `findByReset()` doen en daarna op id
+     schrijven laat twee gelijktijdige verzoeken allebei door: het wachtwoord
+     van de laatste schrijver wint dan. De hash en vervaltijd horen daarom in
+     de WHERE-clausule. Exact een verzoek krijgt `changes === 1`; ieder ander
+     ziet dat de geloofsbrief al is gebruikt. */
+  async function consumeReset(token, password) {
+    const hash = crypto.createHash('sha256').update(String(token || '')).digest('hex');
+    const kandidaat = S.zin('SELECT id, reset_expires FROM users WHERE reset_hash = ?').get(hash);
+    if (!kandidaat || !kandidaat.reset_expires || kandidaat.reset_expires < klokNu()) return null;
+    const nieuw = await kluis.hashPassword(password);
+    const tijd = klokNu();
+    const info = S.zin(`UPDATE users
+      SET password_hash = ?, reset_hash = NULL, reset_expires = NULL, sessies_vanaf = ?
+      WHERE id = ? AND reset_hash = ? AND reset_expires >= ?`)
+      .run(nieuw, tijd, kandidaat.id, hash, tijd);
+    if (!info.changes) return null;
+    mirror.markUser(kandidaat.id);
+    return getUserById(kandidaat.id);
+  }
+
   /* Het wachtwoord zetten ruimt de herstelcode meteen op (reset_hash en
      reset_expires op NULL): een code die na gebruik blijft staan, is een tweede
      sleutel die niemand meer in de gaten houdt. En `sessies_vanaf` gaat op nu --
@@ -61,7 +82,7 @@ function maakHerstel(getUserById) {
     return getUserById(userId);
   }
 
-  return { setEmailVerified, createReset, findByReset, setPassword };
+  return { setEmailVerified, createReset, findByReset, consumeReset, setPassword };
 }
 
 module.exports = { maakHerstel };

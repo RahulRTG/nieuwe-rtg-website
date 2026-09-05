@@ -27,6 +27,7 @@ const { eigenVeld } = require('../kern/util');
 
 module.exports = (kern) => {
   const { app, db, save, crypto, schoon } = kern;
+  const PRODUCTIE = String(process.env.NODE_ENV || '') === 'production';
 
   const nu = () => new Date().toISOString();
   const rid = (n) => crypto.randomBytes(n || 4).toString('hex');
@@ -41,6 +42,17 @@ module.exports = (kern) => {
   /* De twee deuren staan in ./deuren.js: het contractquotum en de
      organisatiemeting hangen eraan, en die horen op één plek te hangen. */
   const { ruimteVan, beheerVan, lidVan } = require('./deuren')({ kern, W, eigenVeld });
+
+  /* In productie komt ELKE bedrijfsroute eerst langs de centrale RTG-
+     accountpoort en een verse PostgreSQL-baseline. Deze mount staat bewust
+     vóór de eerste app.post hieronder. Ontwikkeling gebruikt dezelfde routes
+     zonder deze cutover, zodat bestaande lokale scenario's bruikbaar blijven. */
+  const productieIdentiteit = require('./productie-identiteit')({
+    app, auth: kern.auth, db
+  });
+  productieIdentiteit.hang('/api/bedrijf', {
+    zonderWerkruimte: ['/api/bedrijf/mijn', '/api/bedrijf/werkruimte/maak']
+  });
 
   const sctx = { app, db, save, crypto, schoon, kern, W, nu, rid, dag, ruimteVan, beheerVan, lidVan, eigenVeld };
 
@@ -74,19 +86,52 @@ module.exports = (kern) => {
     const naam = schoon(req.body.naam, 80);
     if (!naam) return res.status(400).json({ error: 'Hoe heet de organisatie?' });
     const moeder = schoon(req.body.moeder, 8).toUpperCase();
-    if (moeder && !eigenVeld(W(), moeder)) return res.status(404).json({ error: 'Die moederwerkruimte kennen we niet.' });
+    if (moeder && PRODUCTIE) {
+      const c = req.werkosContext;
+      const ouder = c && c.werkruimte;
+      const rechten = ouder && c.lid && kern.bedrijf && kern.bedrijf.rechtenVan
+        ? kern.bedrijf.rechtenVan(c.lid) : [];
+      if (!ouder || ouder.code !== moeder || !rechten.includes('werkruimte')) {
+        return res.status(404).json({ error: 'Die moederwerkruimte kennen we niet of u mag er geen werkruimte aan koppelen.' });
+      }
+    } else if (moeder) {
+      const ouder = eigenVeld(W(), moeder);
+      const moederBeheerToken = String(req.body.moederBeheerToken || '');
+      /* Een bekende werkruimtecode is geen bevoegdheid om aan die holding te
+         schrijven. Bestaande en onbekende ouders krijgen bewust hetzelfde
+         antwoord, zodat deze grens ook geen werkruimtes laat enumereren. */
+      if (!ouder || !moederBeheerToken || ouder.beheerToken !== moederBeheerToken) {
+        return res.status(404).json({ error: 'Die moederwerkruimte kennen we niet of u mag er geen werkruimte aan koppelen.' });
+      }
+    }
     const w = {
       code: code(), naam, land: schoon(req.body.land, 2).toUpperCase() || 'NL',
       valuta: schoon(req.body.valuta, 3).toUpperCase() || 'EUR',
       taal: schoon(req.body.taal, 5) || 'nl', moeder: moeder || null,
       kvk: schoon(req.body.kvk, 20) || null, btwNummer: schoon(req.body.btw, 20) || null,
-      beheerToken: crypto.randomBytes(24).toString('hex'),
+      beheerToken: PRODUCTIE ? null : crypto.randomBytes(24).toString('hex'),
       leden: {}, journaal: [], at: nu()
     };
+    if (PRODUCTIE) {
+      const sessie = req.session;
+      const naamAccount = sessie && sessie.account && kern.accounts && kern.accounts.realNameOf
+        ? kern.accounts.realNameOf(sessie.account) : null;
+      const l = { id: rid(4), naam: naamAccount || 'Directie', functie: 'directie',
+        afdeling: 'directie', extern: false,
+        rollen: [{ id: 'directie', van: null, tot: null, at: nu() }],
+        status: 'actief', token: null, rtgKey: sessie.key,
+        rtgCodenaam: sessie.account && sessie.account.codename || null,
+        gekoppeldAt: nu(), toegelatenAt: nu(), at: nu() };
+      w.leden[l.id] = l;
+    }
     W()[w.code] = w;
     save();
-    res.json({ ok: true, werkruimte: w.code, naam: w.naam, beheerToken: w.beheerToken,
-      let: 'Bewaar dit beheer-token: het wordt EEN keer getoond en is de sleutel van deze werkruimte. Leden krijgen straks hun eigen lid-token; dat is bewust een andere sleutel.' });
+    const antwoord = { ok: true, werkruimte: w.code, naam: w.naam };
+    if (!PRODUCTIE) {
+      antwoord.beheerToken = w.beheerToken;
+      antwoord.let = 'Bewaar dit beheer-token: het wordt EEN keer getoond en is de sleutel van deze werkruimte. Leden krijgen straks hun eigen lid-token; dat is bewust een andere sleutel.';
+    } else antwoord.let = 'De werkruimte is aan uw RTG-account gekoppeld. Uw huidige directierol bepaalt wat u mag.';
+    res.json(antwoord);
   });
 
   app.post('/api/bedrijf/werkruimte', (req, res) => {
@@ -156,5 +201,6 @@ module.exports = (kern) => {
      alle bakken hierboven en schrijft in geen enkele -- er staat niet eens een
      save() in. */
   require('./gevolg')(sctx);
+  sctx.hangProductieIdentiteit = productieIdentiteit.hang;
   return sctx;
 };

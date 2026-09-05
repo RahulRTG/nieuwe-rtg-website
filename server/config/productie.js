@@ -19,15 +19,18 @@ const { keurLokaleBouwstanden } = require('./productie-lokaal');
 const { keurOpslag } = require('./productie-opslag');
 const { keurMotor } = require('./productie-motor');
 const { keurPin } = require('./productie-pin');
+const { keurIdentiteit } = require('./productie-identiteit');
+const { keurMedia } = require('./productie-media');
 
 function keur(env, fouten, waarschuwingen) {
     keurInvulplekken(env, fouten);
     const priveBeta = keurLokaleBouwstanden(env, fouten, waarschuwingen);
 
-    // 2. Versleuteling-at-rest hoort aan te staan; expliciet uitzetten mag met
-    //    RTG_ALLOW_PLAINTEXT=1, zodat het een bewuste keuze is en geen ongeluk.
-    if (!env.RTG_ENC_KEY && env.RTG_ALLOW_PLAINTEXT !== '1')
-      fouten.push('RTG_ENC_KEY ontbreekt: gegevens zouden onversleuteld op schijf staan. Zet een sleutel, of bevestig bewust met RTG_ALLOW_PLAINTEXT=1.');
+    // 2. Versleuteling-at-rest is een harde productievoorwaarde. Een bewuste
+    //    keuze voor plaintext maakt gestolen productiegegevens niet minder
+    //    leesbaar en hoort daarom geen releasepoort te kunnen omzeilen.
+    if (!env.RTG_ENC_KEY)
+      fouten.push('RTG_ENC_KEY ontbreekt: productiegegevens zouden onversleuteld op schijf staan. Zet een echte sleutel uit de secrets manager.');
     if (env.RTG_ENC_KEY && env.RTG_ENC_KEY.length < 16)
       fouten.push('RTG_ENC_KEY is te kort; gebruik 32+ willekeurige tekens of 64 hex-tekens.');
 
@@ -64,36 +67,37 @@ function keur(env, fouten, waarschuwingen) {
       fouten.push('DEMO_PASS staat nog op de standaardwaarde.');
     if (env.RTG_CLUSTER_KEY && env.RTG_CLUSTER_KEY.length < 16)
       fouten.push('RTG_CLUSTER_KEY is te kort om de failover-endpoints te beschermen.');
-    /* De eigenaar van de technische pagina wordt op e-mailadres herkend. In
-       productie moet dat adres HIER staan, expliciet. server/eigenaar.js heeft
-       wel een ingebouwde standaard, maar die is voor ontwikkelen: op een verse
-       productiebak hoort bij dat adres nog geen account, dus wie het als eerste
-       registreert zou eigenaar worden (zekeringen, functieschakelaars,
-       beveiligingsmeldingen). Vandaar twee aparte, eerlijke meldingen: leeg is
-       iets anders dan het voorbeeldadres, maar allebei blokkeren ze de start. */
-    const eigenaarEnv = String(env.RTG_OWNER_EMAIL || '').trim().toLowerCase();
-    if (eigenaarEnv === 'rahul@rtg.example')
-      fouten.push('RTG_OWNER_EMAIL staat op het voorbeeldadres. Zet het echte e-mailadres van de eigenaar.');
-    else if (!eigenaarEnv)
-      fouten.push('RTG_OWNER_EMAIL ontbreekt. In productie geldt de ingebouwde standaard uit server/eigenaar.js niet: zet het echte e-mailadres van de eigenaar.');
-    if (env.OFFICE_CODE && env.OFFICE_CODE.length < 8)
-      fouten.push('OFFICE_CODE is te kort; gebruik minstens 8 tekens (of laat hem weg voor een willekeurige code).');
+    keurIdentiteit(env, fouten);
 
     // 3b. Geen grootboek, geen productie. Zie ./productie-opslag.js.
     keurOpslag(env, fouten, waarschuwingen);
     keurMotor(env, fouten, waarschuwingen);
 
-    // 4. Aanbevolen, maar niet blokkerend.
-    if (!env.APP_URL) waarschuwingen.push('APP_URL niet gezet: links in e-mails vallen terug op de Host-header.');
+    // 4. Herstel-, uitnodigings- en bevestigingslinks mogen in productie nooit
+    //    uit een door de client aangeleverde Host-kop worden afgeleid. Zonder
+    //    canoniek adres kan een vervalste Host in een gevoelige e-maillink
+    //    belanden, dus dit is een startfout en geen aanbeveling.
+    if (!env.APP_URL) {
+      fouten.push('APP_URL ontbreekt: productie mag gevoelige links niet uit de Host-header afleiden. Zet het vaste publieke HTTPS-adres.');
+    } else {
+      try {
+        const appUrl = new URL(String(env.APP_URL));
+        if (!priveBeta && appUrl.protocol !== 'https:')
+          fouten.push('APP_URL moet in publieke productie een https-adres zijn.');
+        if (appUrl.username || appUrl.password || appUrl.pathname !== '/' || appUrl.search || appUrl.hash)
+          fouten.push('APP_URL moet uitsluitend de domeinroot zijn, zonder credentials, pad, query of fragment.');
+      } catch (e) {
+        fouten.push('APP_URL is geen geldig absoluut adres.');
+      }
+    }
     /* RTG_VAULT_KEY en RTG_SECRET_KEY stonden hier vroeger als waarschuwing.
        Ze zijn nu blokkerende fouten (punt 2b hierboven) -- twee keer melden zou
        de lijst alleen langer maken zonder iets toe te voegen. */
     keurPin(env, fouten, waarschuwingen);
-    // Media (Salon-foto's, snaps) op lokale schijf worden niet gedeeld tussen
-    // instances; bij meerdere instances is S3-compatibele opslag (of een gedeeld
-    // volume) nodig zodat elke server dezelfde foto's ziet.
-    if (env.DATABASE_URL && (env.RTG_MEDIA_BACKEND || '').toLowerCase() !== 's3')
-      waarschuwingen.push('RTG_MEDIA_BACKEND niet op "s3": Salon-foto\'s en snaps staan op de lokale schijf en worden niet tussen instances gedeeld. Zet S3-compatibele opslag (RTG_MEDIA_S3_*) of gebruik een gedeeld volume.');
+    // De database en mediabytes moeten dezelfde schaalgrens delen. Deze poort
+    // gebruikt exact dezelfde S3-parser als de runtime; geen tweede, lossere
+    // voorstelling van wat een geldige configuratie is.
+    keurMedia(env, fouten);
     /* HIER STOND SENTRY_DSN. Niets in deze codebase leest die variabele -- het
        pakket @sentry/node is er nooit gekomen (zero dependencies) en
        server/foutmelder.js nam zijn plaats in, op ERR_WEBHOOK_URL. De
@@ -103,7 +107,11 @@ function keur(env, fouten, waarschuwingen) {
        staat nu in de waarschuwing. Gevaarlijker dan een lege url is een url die
        er WEL staat en wordt geweigerd: dan gooit de foutmelder hem bij het
        opstarten weg terwijl het bord "externe alarmering" toont. */
-    if (!env.ERR_WEBHOOK_URL) waarschuwingen.push('ERR_WEBHOOK_URL niet gezet: geen EXTERNE alarmering. De eigen fout-aggregatie op het techniekbord draait altijd, maar die zie je alleen als je zelf kijkt -- en niet als de doos plat ligt. Ook het ALARM (SLO, journaalketen, canary) blijft dan binnen: journaal en kantoorbord, en verder niets. Zet een webhook (Slack/Discord/eigen endpoint) en beproef hem met de zelfproef op het techniekbord.');
+    if (!env.ERR_WEBHOOK_URL) {
+      const melding = 'ERR_WEBHOOK_URL niet gezet: geen EXTERNE alarmering. De eigen fout-aggregatie op het techniekbord helpt niet als de doos plat ligt. Zet een veilige webhook en beproef hem met de zelfproef op het techniekbord.';
+      if (priveBeta) waarschuwingen.push(melding);
+      else fouten.push(melding);
+    }
     else {
       let keur = { ok: true };
       try { keur = require('../kern/ssrf').veiligeWebhookUrl(env.ERR_WEBHOOK_URL, { intern: String(env.ERR_WEBHOOK_INTERN || '') === '1' }); }
@@ -119,18 +127,6 @@ function keur(env, fouten, waarschuwingen) {
        doet (bestaat dat account al?) valt hier ook niet te beantwoorden: deze
        functie kent alleen de omgeving, niet de database. Die controle staat nu in
        server.js, na load(), waar hij het antwoord echt weet. */
-    /* DIT WAS EEN WAARSCHUWING, EN DAT PASTE NIET BIJ WAT ERACHTER LIGT.
-       Zonder dit geheim staat de backoffice -- auditlog, tijdlijn met codenamen,
-       export -- achter alleen de statische OFFICE_CODE, en die deur remt per IP,
-       dus verspreid raden komt erlangs. De tweede factor is daar de enige echte
-       rem op. Een waarschuwing bij elke start leert iedereen wegkijken, en
-       scripts/docker/controle.js eiste dit al hard voor livegang: nu zeggen die
-       twee hetzelfde. Bewust GEEN uitweg-vlag -- dat is dezelfde deur met een
-       stap ervoor. De volledige redenering staat in PRODUCTION.md. */
-    if (!env.OFFICE_TOTP_SECRET)
-      fouten.push('OFFICE_TOTP_SECRET ontbreekt: dan staat de backoffice (auditlog, tijdlijn met codenamen, export) achter alleen de statische OFFICE_CODE. Zet een base32-geheim en koppel een authenticator-app.');
-    else if (String(env.OFFICE_TOTP_SECRET).toUpperCase().replace(/[^A-Z2-7]/g, '').length < 16)
-      fouten.push('OFFICE_TOTP_SECRET is te kort om een tweede factor te zijn: na het weglaten van niet-base32-tekens blijven er minder dan 16 over. Maak er een van 32 tekens (A-Z en 2-7).');
     /* AI is een versneller, geen afhankelijkheid. Zonder provider start RTG in
        de ingebouwde werkmodus: schermen, regels, controles en handmatige routes
        blijven beschikbaar en de UI meldt eerlijk dat vrije AI niet actief is.

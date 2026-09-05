@@ -33,6 +33,15 @@
    nooit ten koste van de levering. */
 const { EventEmitter } = require('events');
 const envelop = require('./kern/envelop');
+const verzoekcontext = require('./db/verzoekcontext');
+
+/* Gewone, best-effort projectieberichten gaan in een PG-request pas na COMMIT.
+   Verlies vraagt client-resync, niet autorisatie. Kritieke intrekkingen kiezen
+   bewust `publishDirect`/de duurzame Redis-outbox. */
+function naCommit(werk) {
+  if (verzoekcontext.haakNaCommit(werk)) return true;
+  return werk();
+}
 
 /* Het bericht van een envelop voorzien.
 
@@ -71,43 +80,126 @@ function maakBus() {
       const redis = require('./redis');
       const pub = redis.createClient({ url });
       const sub = redis.createClient({ url });
-      pub.on('error', e => console.warn('[bus] redis pub:', e.message));
-      sub.on('error', e => console.warn('[bus] redis sub:', e.message));
       let klaar = false;
+      let pubKlaar = false;
+      let subKlaar = false;
+      let overvol = false;
+      const MAX_WACHT = Math.min(5000, Math.max(10, Number(process.env.RTG_BUS_WACHTRIJ_MAX) || 1000));
+      const standWachters = new Set();
       const pubWachtrij = [];      // publishes voor de verbinding klaar is
       const subWachtrij = [];      // subscribes voor de verbinding klaar is
-      (async () => {
-        await pub.connect();
-        await sub.connect();
-        for (const [k, fn] of subWachtrij) await sub.subscribe(k, m => { try { fn(JSON.parse(m)); } catch (e) {} });
-        subWachtrij.length = 0;
-        klaar = true;
-        for (const [k, b] of pubWachtrij) pub.publish(k, JSON.stringify(b));
-        pubWachtrij.length = 0;
-      })().catch(e => console.warn('[bus] redis verbinden mislukt:', e.message));
+      const stand = () => ({ soort: 'redis', gereed: klaar });
+      const meldStand = () => {
+        for (const fn of [...standWachters]) { try { fn(stand()); } catch (e) {} }
+      };
+      const zetKlaar = waarde => {
+        const volgend = !!waarde && !overvol;
+        if (klaar === volgend) return;
+        klaar = volgend; meldStand();
+      };
+      const wacht = (rij) => {
+        if (overvol) return false;
+        if (pubWachtrij.length >= MAX_WACHT) {
+          overvol = true;
+          pubWachtrij.length = 0;       // geen oude gebeurtenissen alsnog loslaten
+          zetKlaar(false);
+          console.error('[bus] redis-wachtrij vol; bus blijft fail-closed tot procesherstart');
+          return false;
+        }
+        pubWachtrij.push(rij);
+        return true;
+      };
+      const stuur = (kanaal, bericht) => pub.publish(kanaal, JSON.stringify(bericht)).catch(e => {
+        zetKlaar(false); wacht([kanaal, bericht]);
+        console.warn('[bus] redis publish:', e.message);
+      });
+      const leegPublicaties = () => {
+        if (!klaar || !pubWachtrij.length) return;
+        for (const [kanaal, bericht] of pubWachtrij.splice(0)) stuur(kanaal, bericht);
+      };
+      const hersteld = () => {
+        if (pubKlaar && subKlaar && !overvol) { zetKlaar(true); leegPublicaties(); }
+      };
+      pub.on('ready', () => { pubKlaar = true; hersteld(); });
+      sub.on('ready', async () => {
+        subKlaar = false;
+        try {
+          for (const [k, fn] of subWachtrij.splice(0))
+            await sub.subscribe(k, m => { try { fn(JSON.parse(m)); } catch (e) {} });
+          subKlaar = true; hersteld();
+        } catch (e) { subKlaar = false; zetKlaar(false); console.warn('[bus] redis subscribe:', e.message); }
+      });
+      pub.on('close', () => { pubKlaar = false; zetKlaar(false); });
+      sub.on('close', () => { subKlaar = false; zetKlaar(false); });
+      pub.on('error', e => { zetKlaar(false); console.warn('[bus] redis pub:', e.message); });
+      sub.on('error', e => { zetKlaar(false); console.warn('[bus] redis sub:', e.message); });
+      pub.connect().catch(e => console.warn('[bus] redis pub verbinden mislukt:', e.message));
+      sub.connect().catch(e => console.warn('[bus] redis sub verbinden mislukt:', e.message));
       console.log('[bus] realtime via Redis:', url);
+      const publiceer = (kanaal, bericht) => {
+        const b = stempel(kanaal, bericht);
+        return klaar ? stuur(kanaal, b) : wacht([kanaal, b]);
+      };
       return {
         soort: 'redis',
-        publish(kanaal, bericht) {
-          const b = stempel(kanaal, bericht);
-          if (klaar) pub.publish(kanaal, JSON.stringify(b));
-          else pubWachtrij.push([kanaal, b]);
+        gereed: () => klaar,
+        onStand(fn) {
+          if (typeof fn !== 'function') return () => {};
+          standWachters.add(fn); fn(stand());
+          return () => standWachters.delete(fn);
         },
+        publish: (kanaal, bericht) => naCommit(() => publiceer(kanaal, bericht)),
+        publishDirect: publiceer,
         subscribe(kanaal, fn) {
           const g = inKeten(fn);
-          if (klaar) sub.subscribe(kanaal, m => { try { g(JSON.parse(m)); } catch (e) {} });
+          if (klaar) sub.subscribe(kanaal, m => { try { g(JSON.parse(m)); } catch (e) {} })
+            .catch(() => { subWachtrij.push([kanaal, g]); subKlaar = false; zetKlaar(false); });
           else subWachtrij.push([kanaal, g]);
+        },
+        async herhaal(voorvoegsel) {
+          if (!klaar) throw new Error('redis-bus niet gereed');
+          const uit = []; let cursor = '0';
+          do {
+            const antwoord = await pub.scan(cursor, String(voorvoegsel) + '*', 200);
+            cursor = String(antwoord && antwoord[0] || '0');
+            for (const sleutel of (antwoord && antwoord[1]) || []) {
+              const tekst = await pub.get(sleutel);
+              if (tekst) { try { uit.push(JSON.parse(tekst)); } catch (e) {} }
+            }
+          } while (cursor !== '0');
+          return uit;
+        },
+        async bewaar(kanaal, sleutel, bericht, ttlMs) {
+          if (!klaar || overvol) throw new Error('redis-bus niet gereed');
+          const ttl = Math.floor(Number(ttlMs));
+          if (!(ttl > 0)) throw new Error('ongeldige bewaartermijn');
+          const tekst = JSON.stringify(stempel(kanaal, bericht));
+          const lua = "redis.call('SET',KEYS[1],ARGV[1],'PX',ARGV[2]); return redis.call('PUBLISH',KEYS[2],ARGV[1])";
+          return pub.eval(lua, [sleutel, kanaal], [tekst, String(ttl)]);
         }
       };
     } catch (e) {
-      console.warn('[bus] redis niet beschikbaar, terug naar in-proces:', e.message);
+      /* REDIS_URL betekent dat dit proces deel van een cluster wil zijn. Een
+         stille in-procesbus zou dan gezonde readiness veinzen terwijl geen
+         enkele intrekking een buur bereikt. Houd exact die stand gesloten. */
+      console.error('[bus] redisconfiguratie ongeldig; bus blijft gesloten:', e.message);
+      return {
+        soort: 'redis', gereed: () => false,
+        onStand(fn) { if (typeof fn === 'function') fn({ soort: 'redis', gereed: false }); return () => {}; },
+        publish() { return false; }, publishDirect() { return false; }, subscribe() {},
+        herhaal: async () => { throw e; }, bewaar: async () => { throw e; }
+      };
     }
   }
   const em = new EventEmitter();
   em.setMaxListeners(0);
+  const publiceer = (kanaal, bericht) => em.emit(kanaal, stempel(kanaal, bericht));
   return {
     soort: 'in-proces',
-    publish: (kanaal, bericht) => em.emit(kanaal, stempel(kanaal, bericht)),
+    gereed: () => true,
+    onStand(fn) { if (typeof fn === 'function') fn({ soort: 'in-proces', gereed: true }); return () => {}; },
+    publish: (kanaal, bericht) => naCommit(() => publiceer(kanaal, bericht)),
+    publishDirect: publiceer,
     subscribe: (kanaal, fn) => em.on(kanaal, inKeten(fn))
   };
 }

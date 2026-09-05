@@ -31,6 +31,7 @@
 const { datum: klokDatum } = require('../lib/klok');
 
 const S = require('../accounts/state');
+const groepSync = require('./groep-sync');
 
 const MAX_LEDEN = 20000;
 
@@ -46,6 +47,7 @@ function zorgTabel(db) {
     UNIQUE (org, naam)
   )`);
   d.exec('CREATE INDEX IF NOT EXISTS idx_scim_groep_org ON scim_groepen(org)');
+  groepSync.zorgTabel(d);
 }
 
 const uitRij = (r) => (r ? { id: String(r.id), org: r.org, naam: r.naam, externeId: r.externe_id || null,
@@ -78,6 +80,29 @@ function maak(org, naam, leden, externeId) {
   const r = S.db.prepare('INSERT INTO scim_groepen (org, naam, externe_id, leden, created_at) VALUES (?, ?, ?, ?, ?)')
     .run(String(org), n, externeId ? String(externeId) : null, JSON.stringify(schoonLeden(leden)), nu);
   return vind(org, r.lastInsertRowid);
+}
+
+/* De route gebruikt deze vorm voor POST: groep + herstelmarkeringen zijn een
+   enkele SQLite-commit. `maak` hierboven blijft de smalle opslagbewerking voor
+   bestaande interne aanroepers en tests. */
+function maakMetSync(org, naam, leden, externeId) {
+  const n = String(naam || '').trim();
+  if (!n) { const e = new Error('Een groep heeft een displayName nodig.'); e.status = 400; e.scimType = 'invalidValue'; throw e; }
+  const schoon = schoonLeden(leden);
+  if (opNaam(org, n)) { const e = new Error('Deze groep bestaat al.'); e.status = 409; e.scimType = 'uniqueness'; throw e; }
+  const extern = externeId ? String(externeId) : null;
+  const nu = klokDatum().toISOString();
+  const afdruk = groepSync.vingerafdruk(n, schoon, extern);
+  const id = groepSync.maakAtomair(org, schoon, afdruk, () =>
+    S.db.prepare('INSERT INTO scim_groepen (org, naam, externe_id, leden, created_at) VALUES (?, ?, ?, ?, ?)')
+      .run(String(org), n, extern, JSON.stringify(schoon), nu).lastInsertRowid);
+  return vind(org, id);
+}
+
+function isCreateRetry(org, groep, naam, leden, externeId) {
+  if (!groep) return false;
+  const afdruk = groepSync.vingerafdruk(naam, schoonLeden(leden), externeId ? String(externeId) : null);
+  return groepSync.isCreateRetry(org, groep.id, afdruk);
 }
 
 function schoonLeden(leden) {
@@ -173,4 +198,7 @@ function uitPatch(body, huidig) {
   return { leden, naam, herkend };
 }
 
-module.exports = { zorgTabel, vind, opNaam, lijst, groepenVan, maak, zetLeden, hernoem, haalWeg, uitPatch, MAX_LEDEN };
+module.exports = { zorgTabel, vind, opNaam, lijst, groepenVan,
+  markeerSync: groepSync.markeer, wachtendeSync: groepSync.wachtende, syncKlaar: groepSync.klaar,
+  maak, maakMetSync, isCreateRetry, createSyncKlaar: groepSync.createKlaar,
+  zetLeden, hernoem, haalWeg, uitPatch, schoonLeden, MAX_LEDEN };

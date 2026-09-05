@@ -19,6 +19,7 @@
 'use strict';
 
 module.exports = ({ bedrijf }) => function viaBeheerOfDirectie(req, res) {
+  const productie = String(process.env.NODE_ENV || '') === 'production';
   /* EEN LEGE BODY IS EEN VRAAG EN GEEN STORING. Zonder deze regel loopt een
      aanroep met body `null` door naar bedrijf.lidVan(), en die leest
      `req.body.lidToken` -- een 500 met een stacktrace waar een 400 hoort te
@@ -29,7 +30,7 @@ module.exports = ({ bedrijf }) => function viaBeheerOfDirectie(req, res) {
     res.status(400).json({ error: 'Stuur uw werkruimte mee, met het beheer-token of een lid-token.' });
     return null;
   }
-  if (req.body.beheerToken) return bedrijf.beheerVan(req, res);
+  if (!productie && req.body.beheerToken) return bedrijf.beheerVan(req, res);
   const s = bedrijf.lidVan(req, res); if (!s) return null;
   const rechten = bedrijf.rechtenVan ? bedrijf.rechtenVan(s.l) : [];
   if (!rechten.includes('werkruimte')) {

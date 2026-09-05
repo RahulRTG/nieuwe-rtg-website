@@ -1,6 +1,21 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
+<meta name="referrer" content="no-referrer">
+<!-- Bearer-uitnodigingen reizen alleen in het URL-fragment. Lees hem vóór het
+     eerste externe script of verzoek in het geheugen en wis hem meteen uit de
+     adresbalk, geschiedenis en verdere navigatie. -->
+<script>
+(function () {
+  try {
+    var code = new URLSearchParams(location.hash.replace(/^#/, '')).get('werving') || '';
+    code = String(code).trim().toUpperCase();
+    if (!/^[A-Z2-9]{6}\.[A-F0-9]{32}$/.test(code) && !/^[A-Z0-9]{6}$/.test(code)) return;
+    window.__RTG_WERVING_CODE = code;
+    history.replaceState(null, '', location.pathname + location.search);
+  } catch (e) {}
+})();
+</script>
 <!-- De bouwstempel. npm run build zet hier en in app-main.js hetzelfde getal;
      wijken ze af, dan draait er nieuwe html naast een oud script (of andersom)
      en bouwt het beginscherm zichzelf niet meer op: een zwart scherm zonder

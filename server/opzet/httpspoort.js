@@ -18,6 +18,12 @@
 const { lokaalAdres } = require('../lib/lokaaladres');
 
 module.exports = function httpspoort({ app, PRODUCTION }) {
+  const vasteHerkomst = (() => {
+    if (!PRODUCTION) return '';
+    try { return new URL(String(process.env.APP_URL || '')).origin; }
+    catch (e) { return ''; }
+  })();
+  const veiligHttpsAdres = req => (vasteHerkomst || ('https://' + req.get('host'))) + req.originalUrl;
   app.use((req, res, next) => {
     if (PRODUCTION) {
       /* De gezondheidsprikken gaan hier NIET doorheen. De poortwachter
@@ -41,7 +47,7 @@ module.exports = function httpspoort({ app, PRODUCTION }) {
          (zie de HOST-keuze in ./luister.js). */
       const intern = req.path === '/api/health' || req.path === '/api/ready' ||
         req.path.indexOf('/api/cluster/') === 0;
-      if (!req.secure && !intern) return res.redirect(301, 'https://' + req.get('host') + req.originalUrl);
+      if (!req.secure && !intern) return res.redirect(301, veiligHttpsAdres(req));
       if (req.secure) res.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
     }
     /* EN OOK ZONDER DIE VLAG, als de bezoeker van een ECHT DOMEIN komt.

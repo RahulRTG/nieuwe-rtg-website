@@ -97,10 +97,36 @@ test('het Werk OS toont zonder sleutel een inlogkaart, en daarbinnen een startsc
     assert.match(acties, /Nieuwe taak/, 'de snelle acties volgen de rechten van een projectleider');
     assert.ok(!/Verlof beoordelen/.test(acties), 'en tonen niets waar hij geen recht op heeft');
 
-    /* ---- de weigering van de server komt op het scherm ---- */
-    await page.click('[data-wk="projecten"]');
+    /* ---- de directe projectendeur opent hetzelfde bestaande paneel ---- */
+    await page.goto(base + '/apps/werk.html#projecten', { waitUntil: 'domcontentloaded' });
+    try {
+      await page.waitForSelector('#rtg-vandaag-luxe[data-modus="surface"][data-surface="projecten"]',
+        { state: 'attached', timeout: 15000 });
+    } catch (e) {
+      const stand = await page.evaluate(() => ({ hash: location.hash, body: document.body.outerHTML.slice(0, 400),
+        luxe: document.body.getAttribute('data-rtg-vandaag-luxe'),
+        surface: document.body.getAttribute('data-rtg-vandaag-surface'),
+        titel: document.body.getAttribute('data-rtg-vandaag-surface-title'),
+        api: !!window.RTGVandaagLuxe, fout: String(window.__rtgFout || '') }));
+      throw new Error('de projectensurface verscheen niet: ' + JSON.stringify(stand) + '\n' + e.message);
+    }
+    const luxeMaat = await page.$eval('#rtg-vandaag-luxe', el => {
+      const r = el.getBoundingClientRect();
+      const shell = document.querySelector('.wk-shell').getBoundingClientRect();
+      const voorgrond = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+      return { hoogte: r.height, breedte: r.width, onder: r.bottom, shellBoven: shell.top,
+        display: getComputedStyle(el).display, voorgrond: !!voorgrond && el.contains(voorgrond) };
+    });
+    assert.ok(luxeMaat.hoogte > 0 && luxeMaat.breedte > 0 && luxeMaat.display !== 'none',
+      'de compacte wereldkop heeft een zichtbare maat: ' + JSON.stringify(luxeMaat));
+    assert.ok(luxeMaat.onder <= luxeMaat.shellBoven + 1,
+      'de projectenschil begint onder de compacte wereldkop: ' + JSON.stringify(luxeMaat));
+    assert.equal(luxeMaat.voorgrond, true,
+      'de compacte wereldkop ligt op zijn middelpunt werkelijk op de voorgrond');
     await wachtOpTekst(page, /Vergunning aanvragen/);
     tekst = await page.evaluate(() => document.body.innerText.replace(/\s+/g, ' '));
+    assert.match(await page.textContent('#rtg-vandaag-luxe-kop'), /Projecten en taken/,
+      'de compacte wereldkop noemt het werkelijk geopende paneel');
     assert.match(tekst, /Vergunning aanvragen/, 'de taken staan in de modulelijst');
     assert.match(tekst, /wacht/, 'en een geblokkeerde taak is als zodanig gemerkt');
 
@@ -113,7 +139,16 @@ test('het Werk OS toont zonder sleutel een inlogkaart, en daarbinnen een startsc
     assert.equal(geweigerd.status, 409, 'een taak die nog wacht gaat niet af');
     assert.match(geweigerd.body.error, /Vergunning aanvragen/, 'en de weigering noemt waarop hij wacht');
 
+    /* In een werkruimte-iframe blijft de Edge-schil eigenaar van de chrome. */
+    await page.goto(base + '/apps/werk.html?embed=1#projecten', { waitUntil: 'domcontentloaded' });
+    await wachtOpTekst(page, /Vergunning aanvragen/);
+    assert.equal(await page.$('#rtg-vandaag-luxe'), null,
+      'de ingebedde projectendeur tekent geen tweede wereldkop');
+
     /* ---- uitloggen sluit de inhoud weer ---- */
+    await page.goto(base + '/apps/werk.html#projecten', { waitUntil: 'domcontentloaded' });
+    await page.waitForSelector('body[data-rtg-edge-2-rendered="true"]', { timeout: 15000 });
+    await page.click('.rtg-edge-2-context-button');
     await page.click('#inlogUit');
     await wachtOpZichtbaar(page, '#inhoud', { weg: true });
     const naUit = await page.evaluate(() => !document.getElementById('inhoud').hidden);
@@ -296,7 +331,10 @@ test('de handelingen staan op het scherm, en een weigering komt voluit in beeld'
     }, inlog.token);
     await page.goto(base + '/apps/werk.html', { waitUntil: 'domcontentloaded' });
     await wachtOpZichtbaar(page, '#inhoud');
+    await page.waitForSelector('body[data-rtg-edge-2-rendered="true"]', { timeout: 15000 });
+    await page.click('.rtg-edge-2-context-button');
     await page.click('[data-wk="projecten"]');
+    await page.click('.rtg-edge-2-context-close');
     await wachtOpZichtbaar(page, '#a_h0_naam');
     await wachtOpRust(page);
 

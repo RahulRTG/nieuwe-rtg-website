@@ -47,7 +47,9 @@ test.before(async () => {
   W = w.werkruimte; B = w.beheerToken;
   DIR = await lid('Dana', ['directie']);
   MED = await lid('Mo', ['medewerker']);
-  dochter = (await api('/werkruimte/maak', { naam: 'RTG Belgie', land: 'BE', moeder: W })).body;
+  dochter = (await api('/werkruimte/maak', {
+    naam: 'RTG Belgie', land: 'BE', moeder: W, moederBeheerToken: B
+  })).body;
 });
 test.after(() => {
   if (child) try { child.kill('SIGKILL'); } catch (e) {}

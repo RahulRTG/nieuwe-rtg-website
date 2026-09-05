@@ -1,20 +1,11 @@
-/* Foundation OS (kern/rtfos), deel "basis": de gedeelde bodem waar alle andere
-   delen op staan. Opslag, schoonmaak, het auditspoor, de zetels (wie is wie),
-   de rechtenmatrix en de vlaggen per stad.
+/* Foundation OS (kern/rtfos), deel "basis": gedeelde opslag, audit, zetels,
+   rechtenmatrix en vlaggen per stad.
 
-   WAAROM DIT EEN EIGEN LAAG IS. De RTFoundation is federatief: EEN landelijke
-   stichting, meerdere stadsafdelingen die zelfstandig werken, en per stad een
-   of meer lokale partnerstichtingen. Dat werkt alleen als "wie mag wat, waar"
-   op EEN plek staat. Zodra elke module zijn eigen controle bedenkt, lopen ze
-   uiteen -- en dan is het niet de code die de governance draagt maar het
-   geheugen van wie hem las (LAT.md regel 4).
+   De RTFoundation is federatief. Daarom staat "wie mag wat, waar" hier één
+   keer; losse rechtencontroles per module zouden uiteenlopen.
 
-   DE ZETEL IS DE IDENTITEIT, NIET DE KANTOORCODE. Een zetel hangt aan de sleutel
-   die kern/kantoor.js uit een ECHTE inlog haalt (boardroomWie): een RTG-account
-   of een kantoorsessie met een naam erachter. De gedeelde kantoorcode levert
-   geen sleutel op en krijgt dus nooit een zetel. Dat is met opzet: een stad
-   besturen, geld goedkeuren en een casus openen zijn handelingen die herleidbaar
-   moeten zijn tot een mens.
+   Een zetel hangt aan de bewezen sleutel uit boardroomWie; de gedeelde
+   kantoorcode krijgt er nooit een. Bestuur en dossierwerk blijven herleidbaar.
 
    Opslag: db.data.rtfos.{steden,zetels,partners,projecten,vrijwilligers,casussen,
    bronnen,uitgaven,subsidies,incidenten,gemeenten,ondernemers,voorraad,
@@ -50,7 +41,7 @@ const RECHTEN = {
    hoogste trede moet het landelijke bestuur eraan te pas komen. */
 const LIMIET = { projectleider: 25000, stadsbestuur: 250000 };
 
-module.exports = ({ db, save, crypto, boardroomWie, magBoardroom }) => {
+module.exports = ({ db, save, bewerkCollectie, crypto, boardroomWie, magBoardroom }) => {
   const nu = () => new Date().toISOString();
   const rid = () => crypto.randomBytes(6).toString('hex');
   const schoon = (t, n) => String(t == null ? '' : t).replace(/[<>]/g, '').trim().slice(0, n || 120);
@@ -83,6 +74,8 @@ module.exports = ({ db, save, crypto, boardroomWie, magBoardroom }) => {
     // de verantwoording achteraf en de dingen die mis kunnen gaan
     vergaderingen: [], beleid: [], jaarverslagen: [], risicos: [], meldcodes: [],
     beschermzaken: [],   // eigen KLASSE, gedeelde poort; zie kern/beschermzaak/klasse.js
+    // Persoonscodes hebben verval, gebruik, intrekking en eigen opslag.
+    codelevenscycli: [],
     audit: [] };
   function S() {
     if (!db.data.rtfos || typeof db.data.rtfos !== 'object') db.data.rtfos = {};
@@ -97,28 +90,28 @@ module.exports = ({ db, save, crypto, boardroomWie, magBoardroom }) => {
      spoor. De staart wordt begrensd (de db is geen archief), maar met een
      TELLER erbij, zodat "er staat niets meer" en "er is nooit iets geweest"
      nooit hetzelfde lezen. */
-  function audit(wie, wat, doel, extra) {
-    const rij = S().audit;
+  function audit(wie, wat, doel, extra, inStaat) {
+    const s = inStaat || S();
+    const rij = s.audit;
     rij.unshift({ id: rid(), wie: schoon(wie, 60) || 'onbekend', wat: schoon(wat, 60),
       doel: schoon(doel, 80), extra: schoon(extra, 200), at: nu() });
     if (rij.length > 20000) {
       const weg = rij.length - 20000;
       rij.splice(20000, weg);
-      S().auditAfgekapt = (Number(S().auditAfgekapt) || 0) + weg;
+      s.auditAfgekapt = (Number(s.auditAfgekapt) || 0) + weg;
     }
-    save();
+    if (!inStaat) save();
   }
 
-  /* ---------- wie ben je ----------
-     Geeft de sleutel, of het landelijke bestuur meespreekt, en de zetels die
-     deze sleutel heeft. Nooit een rol uit het verzoek: dat zou LAT.md regel 8
-     zijn (een controle op vorm is geen controle). */
-  function wie(req) {
+  /* Identiteit en zetels komen uit serverstaat, nooit uit het verzoek. De
+     `In`-vormen zijn voor een reeds vergrendelde collectietransactie. */
+  function wieIn(req, inStaat) {
     const key = boardroomWie(req) || null;
     const landelijk = !!key && magBoardroom(key);
-    const zetels = key ? S().zetels.filter(z => z.key === key) : [];
+    const zetels = key ? ((inStaat && inStaat.zetels) || []).filter(z => z.key === key) : [];
     return { key, landelijk, zetels };
   }
+  function wie(req) { return wieIn(req, S()); }
   function rolIn(w, stadId) {
     if (!w) return null;
     if (w.landelijk) return 'landelijk';
@@ -139,14 +132,14 @@ module.exports = ({ db, save, crypto, boardroomWie, magBoardroom }) => {
     return [...new Set(w.zetels.map(z => z.stad))];
   }
 
-  const stadVan = id => S().steden.find(s => s.id === String(id || '')) || null;
+  const stadVanIn = (id, inStaat) => ((inStaat && inStaat.steden) || [])
+    .find(s => s.id === String(id || '')) || null;
+  const stadVan = id => stadVanIn(id, S());
 
-  /* De poort die elke stads-handeling passeert. Vier vragen op een rij, elk met
-     een eigen antwoord -- want "u mag hier niet komen", "deze stad staat op
-     slot" en "deze module staat hier uit" zijn voor de lezer drie verschillende
-     dingen, en een gedeelde 403 maakt ze onzichtbaar. */
-  function poort(w, stadId, recht, vlag) {
-    const stad = stadVan(stadId);
+  /* Elke stadshandeling passeert dezelfde vier vragen: stad, recht, module en
+     schrijfstand. De `In`-vorm leest exact de transactionele staat. */
+  function poortIn(w, stadId, recht, vlag, inStaat) {
+    const stad = stadVanIn(stadId, inStaat);
     if (!stad) return { status: 404, error: 'Deze stadsafdeling bestaat niet.' };
     if (!magRecht(w, stad.id, recht)) {
       return { status: 403, error: 'U heeft in ' + stad.naam + ' geen bevoegdheid voor deze handeling.' };
@@ -162,6 +155,7 @@ module.exports = ({ db, save, crypto, boardroomWie, magBoardroom }) => {
     }
     return { ok: true, stad };
   }
+  function poort(w, stadId, recht, vlag) { return poortIn(w, stadId, recht, vlag, S()); }
 
   /* DE VOG IS EEN DATUM, GEEN VINKJE, en die regel staat hier omdat inmiddels
      drie modules hem stellen: het vrijwilligersregister, de activiteiten (geen
@@ -180,8 +174,13 @@ module.exports = ({ db, save, crypto, boardroomWie, magBoardroom }) => {
     return Number.isFinite(gezet) && gezet >= 0 ? Math.min(gezet, land) : land;
   }
 
-  return { nu, rid, schoon, code, naarCenten, euro, S, audit, wie, rolIn, magRecht, bereik,
-    stadVan, poort, limietVan, vogGeldig, VLAGGEN, ROLLEN, RECHTEN, LIMIET };
+  const codelevenscyclus = require('../codelevenscyclus')({
+    opslag: () => S().codelevenscycli, staat: S, nu, rid, crypto, save, bewerkCollectie
+  });
+
+  return { nu, rid, schoon, code, naarCenten, euro, S, audit, wie, wieIn,
+    rolIn, magRecht, bereik, stadVan, stadVanIn, poort, poortIn, limietVan,
+    vogGeldig, codelevenscyclus, VLAGGEN, ROLLEN, RECHTEN, LIMIET };
 };
 module.exports.VLAGGEN = VLAGGEN;
 module.exports.ROLLEN = ROLLEN;

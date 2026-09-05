@@ -109,6 +109,10 @@ module.exports = ({ db, register, brug, merkVan, bedrijf, contract, levensloop, 
   /* De weg via het lid-token: één werkruimte, want dat token hoort bij één. */
   function voorLid(code, lid) { return bouw(code, lid, 'lid-token'); }
 
+  /* Productie gebruikt dezelfde projectie, maar de identiteit komt daar uit
+     het actuele RTG-account en niet uit een tweede bearer in de body. */
+  function voorAccount(code, lid) { return bouw(code, lid, 'rtg-account'); }
+
   /* De weg via de RTG-sessie: alle werkruimtes waar dit account aan hangt.
      Hier komt het LID-TOKEN mee naar buiten, en dat is met opzet: wie via zijn
      eigen provider is binnengekomen, heeft geen tweede sleutel gekregen om in
@@ -118,10 +122,11 @@ module.exports = ({ db, register, brug, merkVan, bedrijf, contract, levensloop, 
   function voorRtg(rtgKey) {
     return brug.werkruimtesVan(rtgKey).map(({ werkruimte, lid }) => {
       const b = bouw(werkruimte, lid, 'rtg-sessie');
-      if (b && lid.status === 'actief' && lid.token) b.lidToken = lid.token;
+      if (process.env.NODE_ENV !== 'production' && b && lid.status === 'actief' && lid.token)
+        b.lidToken = lid.token;
       return b;
     }).filter(Boolean);
   }
 
-  return { voorLid, voorRtg, NIET_GEBOUWD };
+  return { voorLid, voorAccount, voorRtg, NIET_GEBOUWD };
 };

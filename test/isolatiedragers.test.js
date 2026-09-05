@@ -133,6 +133,25 @@ test('5. de migratie verplaatst een oude sessiestand en verzwakt hem nooit', () 
     'de migratie hoort bij het opstarten te draaien; alleen bestaan is niet genoeg');
 });
 
+test('5b. de migratie weigert bestaande onleesbare isolatie-opslag te wissen', () => {
+  const wortel = { data: { isolatie: 'kapot' } };
+  assert.throws(() => migreer({ db: wortel, save() {} }), /onleesbaar/);
+  assert.equal(wortel.data.isolatie, 'kapot');
+
+  const sessietak = { data: { isolatie: { sessie: [] } } };
+  assert.throws(() => migreer({ db: sessietak, save() {} }), /sessietak is onleesbaar/);
+  assert.deepEqual(sessietak.data.isolatie.sessie, [],
+    'een corrupte beveiligingstak mag niet stil een lege kaart worden');
+
+  const identiteit = { data: { isolatie: {
+    sessie: { 'user-7': { stand: 'isolatie' } }, identiteit: 'kapot'
+  } } };
+  assert.throws(() => migreer({ db: identiteit, save() {} }), /identiteitstak is onleesbaar/);
+  assert.equal(identiteit.data.isolatie.identiteit, 'kapot');
+  assert.ok(identiteit.data.isolatie.sessie['user-7'],
+    'de oude rij blijft staan wanneer de bestemming niet veilig leesbaar is');
+});
+
 test('6. de vertaling staat op EEN plek: geen s.id of s.sid meer in de code', () => {
   const wortel = path.join(__dirname, '..', 'server');
   const { codeRegelsUit } = require('../scripts/lib/werkelijkheid');

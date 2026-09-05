@@ -28,7 +28,7 @@ const DAGDELEN = ['ma-o', 'ma-m', 'ma-a', 'di-o', 'di-m', 'di-a', 'wo-o', 'wo-m'
 const VOG_VERPLICHT = ['jongeren', 'huiswerk', 'sport', 'ouderen'];
 
 module.exports = (ctx) => {
-  const { nu, rid, schoon, code, S, audit, wie, poort, save, vogGeldig } = ctx;
+  const { nu, rid, schoon, S, audit, wie, poort, save, vogGeldig } = ctx;
 
   const vind = id => S().vrijwilligers.find(v => v.id === String(id || '')) || null;
   const uren = v => (v.uren || []).reduce((s, u) => s + u.uren, 0);
@@ -37,6 +37,7 @@ module.exports = (ctx) => {
     rijbewijs: !!v.rijbewijs, voertuig: !!v.voertuig, gedragscode: !!v.gedragscode,
     vogGeldigTot: v.vogGeldigTot || null, vogGeldig: vogGeldig(v),
     trainingen: v.trainingen || [], urenTotaal: uren(v), projecten: v.projecten || [],
+    heeftPersoonscode: !!v.persoonscode_id,
     /* De uren die de vrijwilliger ZELF heeft doorgegeven en die nog op een
        bevestiging wachten (vrijwilligerportaal.js). Ze staan hier omdat de
        coordinator ze anders nergens ziet -- en een melding die niemand ziet,
@@ -74,9 +75,8 @@ module.exports = (ctx) => {
     if (naam.length < 2) return { status: 400, error: 'Hoe heet deze vrijwilliger?' };
     if (S().vrijwilligers.length >= 100000) return { status: 400, error: 'Het vrijwilligersregister zit vol.' };
     const v = { id: rid(), stad: g.stad.id, naam, contact: schoon(b.contact, 120),
-      // de eigen ingang van de vrijwilliger (vrijwilligerportaal.js); wordt
-      // pas iets waard als de coordinator hem persoonlijk overhandigt
-      code: code('RTFV'),
+      // De eigen ingang ontstaat pas bij bevoegde uitgifte. Er ligt hier geen
+      // slapende, onbeperkte code naast het dossier.
       status: 'aangemeld', beschikbaar: [], talen: [], vaardigheden: [], rijbewijs: false,
       voertuig: false, gedragscode: false, vogGeldigTot: null, trainingen: [], uren: [],
       projecten: [], evaluaties: [], at: nu() };

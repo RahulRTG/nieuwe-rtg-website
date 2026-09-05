@@ -52,28 +52,17 @@
    houdt die vlakheid vast, zodat een latere wijziging die er O(n) van maakt de
    bouw laat zakken in plaats van stil traag te worden.
 
-   DE METINGEN ZELF STAAN IN ISOLATIE.md PAR. 10 EN NIET HIER, en dat is geen
-   verwijzing uit gemak: ze stonden op allebei de plekken, en toen de meting werd
-   overgedaan liep deze kop achter met een getal dat er twee keer zo hoog naast
-   zat. Een getal met een methode hoort op een plek te wonen. Wat hier blijft is
-   de REGEL, want die stuurt de code hieronder.
-
-   De vlakke prijs wordt wel door ELK schrijvend verzoek betaald, ook waar niemand
-   een stand heeft, en het meeste ervan is crypto. Dat is bewust niet weggehaald
-   met een teller "hoeveel standen zijn er": zo'n teller moet bij elke schrijfweg
-   worden bijgewerkt, en de faalvorm als iemand er een vergeet is FAIL-OPEN. */
+   De vlakke prijs geldt voor elk schrijvend verzoek. Een globale teller
+   "hoeveel standen zijn er" lijkt goedkoper maar kan door een vergeten
+   schrijfweg op nul blijven staan; die optimalisatie faalt open. */
 
 'use strict';
-
-const { dragersVanSessie } = require('../kern/isolatie/sessiedragers');
-const handhaving = require('../kern/isolatie/handhaving');
-const openpaden = require('../kern/isolatie/openpaden');
 
 /* De montage en de schaduwtelling staan ernaast, in ./isolatiepoort-stand.js --
    zie de kop daar voor de naad. `laag` en `bijt` worden dus OPGEVRAAGD en niet
    hier bewaard: twee plekken die weten of de laag er is, is er een te veel. */
 const poortstand = require('./isolatiepoort-stand');
-const { telling } = poortstand;
+const dragerpoort = require('./isolatiepoort-drager');
 
 /* HET OORDEEL. Geeft `null` als er niets aan de hand is, en anders het besluit
    met zijn reden. Hij BLOKKEERT niet: dat doet de aanroeper, en alleen als de
@@ -96,7 +85,7 @@ function weeg(req, ctx) {
         want `dicht = huis || drager` -- het drager-oordeel is op 255 paden
         LOSSER dan dit, en het mag dit dus nooit vervangen. */
   const ic = db && db.data && db.data.techniek && db.data.techniek.incidentcontrole;
-  if (beschermstand && ic && ic.modus === 'beschermd') {
+  if (!(ctx && ctx.slaHuisOver) && beschermstand && ic && ic.modus === 'beschermd') {
     const houd = beschermstand.houdtTegen(pad, req.method);
     if (houd) {
       return { been: 'huis', antwoord: { error: HUISZIN, functie: houd.functie, naam: houd.naam,
@@ -104,61 +93,9 @@ function weeg(req, ctx) {
     }
   }
 
-  const laag = poortstand.huidig();
-  if (!laag) return null;
-
-  /* 3. DE VERKLAARDE UITGANGEN -- NA HET HUIS EN VOOR DE DRAGER, en die volgorde
-        is een correctie op mijn eigen eerste versie.
-
-        Die zette ze VOOR beide benen, met als argument dat het huis-been anders
-        ooit de uitgang van de stand zelf sluit. Dat argument klopt voor de
-        DRAGER: een lid dat zichzelf heeft dichtgezet en er niet meer uit kan, zit
-        in een val die niemand heeft gekozen. Het klopt NIET voor het huis.
-
-        SEC-LOCK-003: een lagere drager neutraliseert de beperking van een hogere
-        niet. Een vrijstellingslijst die in de LEDENlaag woont en het HUIS-oordeel
-        overrulet, is precies dat -- de eigenaar zet de noodstop om en een lijst
-        van een laag eronder houdt zeven paden open. Vandaag maakt het geen
-        verschil (nagemeten: geen van de twintig paden wordt onder `beschermd`
-        door houdtTegen gesloten), en juist daarom is dit het moment om de
-        volgorde goed te zetten: over een jaar, als iemand `bk-verblijf` in een
-        bevroren categorie zet, zou de hotelkamerdeur stil open blijven tegen het
-        besluit van de eigenaar in.
-
-        Wat de uitgang tegen het HUIS beschermt is niet deze lijst maar de
-        ceremonie van het huis zelf (kern/incidentcontrole.js), en die heeft zijn
-        eigen weg terug. */
-  const uitgang = openpaden.blijftOpen(pad);
-  if (uitgang) return null;
-
-  /* 4. STAAT ER EEN STAND VOOR DIT VERZOEK? Per drager EEN hash-opzoeking, en
-        nooit "loop de kaart af" -- zie de kop. Zonder sessie is er geen drager
-        en dus niets te wegen. */
-  const sess = req.session || null;
-  const kop = (typeof req.get === 'function' ? req.get('authorization') : '') || '';
-  const token = kop.startsWith('Bearer ') ? kop.slice(7) : null;
-  if (!sess && !token) return null;
-  const { sleutels } = dragersVanSessie(sess, token);
-  const context = laag.context(sleutels);
-  const heeftStand = Object.values(context.standen || {})
-    .some(v => v && v !== 'normaal');
-  if (!heeftStand) return null;
-
-  /* 5. PAS NU HET BESLUIT. */
-  const b = laag.besluit({ pad, methode: req.method, context });
-  telling.gewogen++;
-  if (b.toegestaan) return null;
-  telling.zouSluiten++;
-  if (telling.paden.length < 20) telling.paden.push(req.method + ' ' + pad);
-  for (const d of (b.dragers || [])) telling.dragers[d.drager] = (telling.dragers[d.drager] || 0) + 1;
-
-  /* EN IN DE SCHADUW HOUDT HIJ NIETS TEGEN. Alleen tellen; de aanroeper krijgt
-     null en het verzoek loopt gewoon door. Dat is het verschil tussen "de regel
-     bestaat" en "de regel doet iets", en dit huis heeft die twee al een keer door
-     elkaar gehaald -- toen stond `handhaaft: true` in een register boven een tak
-     die nooit draaide. */
-  if (!poortstand.bijtHij()) return null;
-  return { been: 'drager', besluit: b, antwoord: antwoordVoor(b) };
+  /* 3. Uitgangen, dragers, opslagzekerheid en schaduwtelling vormen samen het
+        persoonlijke been in isolatiepoort-drager.js. */
+  return dragerpoort.weeg(req);
 }
 
 /* WAT DE AANROEPER ERMEE DOET. In de schaduw: niets, behalve tellen. Met de vlag
@@ -172,15 +109,5 @@ function weeg(req, ctx) {
    verschillende dingen over wat er aan de hand is. */
 const HUISZIN = require('./schakelaar-antwoord').ZIN.bescherming;
 
-function antwoordVoor(besluit) {
-  return {
-    error: 'Dit staat nu dicht door een beveiligingsstand op je account.',
-    as: 'isolatie', reden: besluit.reden, regel: besluit.regel || null,
-    waarom: besluit.uitleg,
-    dragers: (besluit.dragers || []).map(d => d.drager),
-    uitweg: 'Je kunt de stand opheffen via Mijn bescherming; die weg blijft altijd open.'
-  };
-}
-
 module.exports = { zetLaag: poortstand.zetLaag, stand: poortstand.stand,
-  weeg, antwoordVoor, _wisTelling: poortstand._wisTelling };
+  weeg, antwoordVoor: dragerpoort.antwoordVoor, _wisTelling: poortstand._wisTelling };

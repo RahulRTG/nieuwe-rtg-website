@@ -7,11 +7,35 @@ const crypto = require('crypto');
 const S = require('./state');
 const kluis = require('./kluis');
 const mirror = require('./mirror');
+const users = require('./users');
+const testomgeving = require('../testomgeving');
+
+/* DE VIERCIJFERIGE PERSONEELSPIN IS GEEN PRODUCTIECREDENTIAL MEER.
+
+   Oude demo's en een groot deel van de operationele fixtures oefenen nog met
+   1234/5678. Dat mag alleen binnen de expliciet aangezette, niet-productie
+   Magnaat Test-omgeving. Een gewone lokale start is dus evenmin een stille
+   achterdeur. Alle echte personeelsrijen worden aan een persoonlijk
+   RTG-account gebonden en dragen onderstaande onbruikbare marker in de oude
+   NOT NULL-kolom. De marker is geen hash en kan nooit door verifyPassword
+   worden geaccepteerd. */
+const ACCOUNT_ONLY_HASH = '!RTG-ACCOUNT-ONLY-v1!';
+function legacyStaffPinToegestaan(env = process.env) {
+  return String(env.NODE_ENV || '') !== 'production' && testomgeving.actief(env);
+}
+function eisLegacyStaffPin(actie) {
+  if (legacyStaffPinToegestaan()) return;
+  const fout = new Error('Personeel gebruikt een persoonlijk RTG-account; een viercijferige personeelspin kan hier niet worden ' + actie + '.');
+  fout.code = 'RTG_STAFF_PIN_GESLOTEN';
+  throw fout;
+}
 
 async function createStaff(gegevens) {
+  eisLegacyStaffPin('uitgegeven');
   return schrijfStaff(gegevens, await kluis.hashPassword(String(gegevens.pin)));
 }
 function createStaffSync(gegevens) {
+  eisLegacyStaffPin('uitgegeven');
   return schrijfStaff(gegevens, kluis.hashPasswordSync(String(gegevens.pin)));
 }
 /* Alleen voor de testzaai. LET OP het verschil met createStaffSync hierboven:
@@ -19,12 +43,29 @@ function createStaffSync(gegevens) {
    bedrijfsaanmelding, kern/aanmeldingen/bedrijf.js) en houdt dus zijn eigen
    zout per rij. Zie kluis.zaaiHash. */
 function createStaffZaai(gegevens) {
+  eisLegacyStaffPin('gezaaid');
   return schrijfStaff(gegevens, kluis.zaaiHash(String(gegevens.pin)));
 }
-function schrijfStaff({ supplierCode, name, role, func, memberId, memberTier }, pinHash) {
+/* De enige echte provisioningvorm: de personeelsplek en het RTG-account
+   ontstaan als een gebonden paar. Zonder bestaand positief member-id maken we
+   geen half account dat later via een verborgen beheerhandeling gerepareerd
+   moet worden. */
+function createAccountStaff(gegevens) {
+  const memberId = Number(gegevens && gegevens.memberId);
+  const lid = Number.isSafeInteger(memberId) && memberId > 0
+    ? users.getUserById(memberId) : null;
+  if (!lid || !users.isActief(lid)) {
+    const fout = new Error('Een personeelsplek vraagt een bestaand persoonlijk RTG-account.');
+    fout.code = 'RTG_STAFF_ACCOUNT_REQUIRED';
+    throw fout;
+  }
+  return schrijfStaff({ ...gegevens, memberId, memberTier: lid.tier }, ACCOUNT_ONLY_HASH);
+}
+function schrijfStaff({ supplierCode, name, role, func, memberId, memberTier, active = true }, pinHash) {
   const vals = [String(supplierCode || '').toUpperCase(), String(name).slice(0, 60), pinHash, role === 'manager' ? 'manager' : 'staff', func ? String(func).slice(0, 40) : null, new Date().toISOString(),
-    memberId != null ? Number(memberId) : null, memberTier ? String(memberTier).slice(0, 20) : null];
-  const kolommen = 'supplier_code, name, pin_hash, role, func, created_at, member_id, member_tier';
+    memberId != null ? Number(memberId) : null, memberTier ? String(memberTier).slice(0, 20) : null,
+    active === false ? 0 : 1];
+  const kolommen = 'supplier_code, name, pin_hash, role, func, created_at, member_id, member_tier, active';
   const id = mirror.nieuwId();
   let newId;
   if (id != null) {
@@ -35,19 +76,34 @@ function schrijfStaff({ supplierCode, name, role, func, memberId, memberTier }, 
     newId = info.lastInsertRowid;
   }
   mirror.markStaff(newId);
-  return getStaffById(newId);
+  return getStaffByIdAny(newId);
 }
 function getStaffById(id) { return S.zin('SELECT * FROM supplier_staff WHERE id = ? AND active = 1').get(id) || null; }
+/* Provisioning maakt een rij bewust inactief. Alleen de uitnodigingssaga mag
+   zo'n exacte rij terugvinden en na een duurzaam voltooide claim activeren;
+   alle gewone login-/roosterpaden blijven getStaffById gebruiken. */
+function getStaffByIdAny(id) { return S.zin('SELECT * FROM supplier_staff WHERE id = ?').get(id) || null; }
 function listStaff(code) { return S.zin('SELECT * FROM supplier_staff WHERE supplier_code = ? AND active = 1 ORDER BY (role=\'manager\') DESC, id').all(String(code || '').toUpperCase()); }
 function countStaff(code) { return S.zin('SELECT COUNT(*) AS c FROM supplier_staff WHERE supplier_code = ? AND active = 1').get(String(code || '').toUpperCase()).c; }
-async function verifyStaffPin(id, pin) { const s = getStaffById(id); return (s && await kluis.verifyPassword(String(pin), s.pin_hash)) ? s : null; }
+async function verifyStaffPin(id, pin) {
+  if (!legacyStaffPinToegestaan()) return null;
+  const s = getStaffById(id);
+  if (!s || s.pin_hash === ACCOUNT_ONLY_HASH) return null;
+  return await kluis.verifyPassword(String(pin), s.pin_hash) ? s : null;
+}
 // Manager reset: geef een teamlid een nieuwe pincode (bij vergeten of misbruik).
 async function setStaffPin(id, pin) {
+  eisLegacyStaffPin('gereset');
   S.zin('UPDATE supplier_staff SET pin_hash = ? WHERE id = ?').run(await kluis.hashPassword(String(pin)), id);
   mirror.markStaff(id);
   return getStaffById(id);
 }
 function deactivateStaff(id) { S.zin('UPDATE supplier_staff SET active = 0 WHERE id = ?').run(id); mirror.markStaff(id); }
+function activateStaff(id) {
+  const info = S.zin('UPDATE supplier_staff SET active = 1 WHERE id = ? AND active = 0').run(id);
+  if (info.changes) mirror.markStaff(id);
+  return getStaffById(id);
+}
 /* Al het personeel van één zaak in één keer inactief zetten. Nodig wanneer een
    zaak uit de catalogus verdwijnt: bleef het personeel staan, dan hield de kluis
    namen en pincodes vast van een bedrijf dat niet meer bestaat -- en die mensen
@@ -115,10 +171,12 @@ function releaseStaffMember(id, memberId) {
   return true;
 }
 function publicStaff(s) { return s ? { id: s.id, name: s.name, role: s.role, func: s.func || null, lid: s.member_id != null } : null; }
-function makePin() { return String(crypto.randomInt(1000, 10000)); }
+function makePin() { eisLegacyStaffPin('uitgegeven'); return String(crypto.randomInt(1000, 10000)); }
 
 module.exports = {
-  createStaff, createStaffSync, createStaffZaai, getStaffById, listStaff, countStaff, verifyStaffPin,
-  setStaffPin, deactivateStaff, deactivateStaffVanZaak, staffByMember, staffPositions,
+  createStaff, createStaffSync, createStaffZaai, createAccountStaff,
+  legacyStaffPinToegestaan, ACCOUNT_ONLY_HASH, getStaffById, getStaffByIdAny,
+  listStaff, countStaff, verifyStaffPin, setStaffPin, activateStaff, deactivateStaff,
+  deactivateStaffVanZaak, staffByMember, staffPositions,
   setStaffMember, claimStaffMember, releaseStaffMember, publicStaff, makePin
 };

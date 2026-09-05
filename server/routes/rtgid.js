@@ -36,15 +36,34 @@ module.exports = (kern) => {
   // aanvrager te kiezen Origin- of Host-kop; zelfde afspraak als routes/auth/webauthn.js.
   const oorsprong = req => { try { return new URL(appUrl(req)).origin; } catch (e) { return ''; } };
   const gastheer = req => { try { return new URL(oorsprong(req)).hostname; } catch (e) { return req.hostname; } };
+  const idem = req => String((req.body && (req.body.idem || req.body.idempotentieSleutel)) ||
+    (req.get && req.get('Idempotency-Key')) || '');
+  /* Alleen voor de namespace van een idempotentiesleutel. Het adres verleent
+     geen recht en wordt in de kern direct gehasht; de statuscredential zelf
+     blijft de enige autoriteit van de dienst. */
+  const bron = req => String(req.ip || '') + '|' + String((req.get && req.get('user-agent')) || '').slice(0, 200);
 
   // de dienst-kant
-  app.post('/api/rtgid/start', (req, res) => stuur(res, rtgid.start(req.body || {})));
-  app.post('/api/rtgid/status', (req, res) => stuur(res, rtgid.statusVan(req.body.koppelId)));
-  app.post('/api/rtgid/wie', (req, res) => stuur(res, rtgid.wie(req.body.idToken)));
+  app.post('/api/rtgid/start', async (req, res) => stuur(res,
+    await rtgid.start(Object.assign({}, req.body || {}, { idem: idem(req) }), bron(req))));
+  app.post('/api/rtgid/status', async (req, res) => stuur(res, await rtgid.statusVan((req.body || {}).koppelId)));
+  app.post('/api/rtgid/roteer', async (req, res) => stuur(res,
+    await rtgid.roteer((req.body || {}).koppelId, idem(req), bron(req))));
+  app.post('/api/rtgid/annuleer', async (req, res) => {
+    /* Annuleren is geen eenmalige-geheimroute, maar doet wel duurzame
+       domein-idempotentie. Houd de sleutel hier zichtbaar: de centrale laag
+       mag het eerste antwoord niet vóór een latere intrekkingscontrole zetten. */
+    const b = req.body || {};
+    const sleutel = String(b.idem || b.idempotentieSleutel ||
+      (req.get && req.get('Idempotency-Key')) || '');
+    stuur(res, await rtgid.annuleer(b.koppelId, sleutel, bron(req)));
+  });
+  app.post('/api/rtgid/wie', async (req, res) => stuur(res, await rtgid.wie((req.body || {}).idToken)));
 
   // de app-kant (het lid zelf)
   const lid = [auth, eigenAccount];
-  app.post('/api/rtgid/koppel', ...lid, (req, res) => stuur(res, rtgid.koppelZoek(req.session.key, req.body.code)));
+  app.post('/api/rtgid/koppel', ...lid, async (req, res) => stuur(res,
+    await rtgid.koppelZoek(req.session.key, (req.body || {}).code)));
   /* De ceremonie voor DEZE koppel. Het account komt uit de sessie en niet uit
      de body: wie een ceremonie aanvraagt, krijgt er een voor zichzelf. */
   app.post('/api/rtgid/stapop/opties', ...lid, async (req, res) => {
@@ -60,11 +79,15 @@ module.exports = (kern) => {
   app.post('/api/rtgid/bevestig', ...lid, async (req, res) => stuur(res, await rtgid.bevestig(
     req.session.key, req.body.koppelId, req.body.machtigingId,
     { ceremonie: req.body.ceremonie, antwoord: req.body.antwoord, origin: oorsprong(req), hostnaam: gastheer(req) })));
-  app.post('/api/rtgid/weiger', ...lid, (req, res) => stuur(res, rtgid.weiger(req.session.key, req.body.koppelId)));
-  app.post('/api/rtgid/inzage', ...lid, (req, res) => stuur(res, rtgid.inzage(req.session.key)));
-  app.post('/api/rtgid/intrek', ...lid, (req, res) => stuur(res, rtgid.intrek(req.session.key, req.body.dienst)));
+  app.post('/api/rtgid/weiger', ...lid, async (req, res) => stuur(res,
+    await rtgid.weiger(req.session.key, req.body.koppelId)));
+  app.post('/api/rtgid/inzage', ...lid, async (req, res) => stuur(res,
+    await rtgid.inzage(req.session.key)));
+  app.post('/api/rtgid/intrek', ...lid, async (req, res) => stuur(res,
+    await rtgid.intrek(req.session.key, (req.body || {}).dienst)));
   app.post('/api/rtgid/machtig', ...lid, async (req, res) => stuur(res, await rtgid.machtig(req.session.key, req.body || {})));
-  app.post('/api/rtgid/machtig/intrek', ...lid, (req, res) => stuur(res, rtgid.machtigIntrek(req.session.key, req.body.id)));
+  app.post('/api/rtgid/machtig/intrek', ...lid, async (req, res) => stuur(res,
+    await rtgid.machtigIntrek(req.session.key, (req.body || {}).id)));
 
   /* DE BEWIJSMAP: wat kan ik aantonen, en wat verloopt er.
 

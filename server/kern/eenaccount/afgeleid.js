@@ -44,6 +44,17 @@ const { idVanKey } = require('../../lib/lidsleutel');
 const eigenaar = require('../../eigenaar');
 
 module.exports = ({ db, accounts }) => {
+  function personeel(key) {
+    const id = idVanKey(key);
+    if (id == null) return [];
+    let posities = [];
+    try { posities = accounts.staffPositions(id) || []; } catch (e) { return []; }
+    return posities.map(st => ({ rol: 'personeel', code: st.supplier_code,
+      staffId: st.id, naam: st.name, zaakNaam: null, staffRole: st.role,
+      manager: st.role === 'manager', sinds: st.created_at || null,
+      viaDienstverband: true }));
+  }
+
   function eigenaarKantoor(key) {
     const id = idVanKey(key);
     if (id == null) return null;
@@ -99,5 +110,5 @@ module.exports = ({ db, accounts }) => {
     return null;
   }
 
-  return { eigenaarKantoor, werkruimtes, werkruimteLid };
+  return { eigenaarKantoor, personeel, werkruimtes, werkruimteLid };
 };

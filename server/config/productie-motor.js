@@ -30,8 +30,16 @@ function keurMotor(env, fouten, waarschuwingen = []) {
   const rekenUrl = env.RTG_MOTOR_REKEN_URL || env.RTG_MOTOR_GELD_URL || env.RTG_MOTOR_SHADOW || '';
   const geldUrl = env.RTG_MOTOR_GELD_URL || env.RTG_MOTOR_SHADOW || '';
   const gebruiktNetwerk = magnaat === 'motor' || geld === 'motor' || !!env.RTG_MOTOR_SHADOW;
+  const echteGeldrail = env.RTG_BETALEN_UIT !== '1' &&
+    !!(env.STRIPE_SECRET_KEY || env.MOLLIE_API_KEY || env.ADYEN_API_KEY || env.MUNT_PROVIDER_KEY);
+  if (echteGeldrail && geld !== 'motor')
+    fouten.push('Een echte geldrail vereist RTG_MOTOR_GELD=motor; proceslokale saldi zijn niet multi-instance atomair.');
   if (magnaat === 'motor' && !rekenUrl) fouten.push('RTG_MAGNAAT_RUST=motor vereist RTG_MOTOR_REKEN_URL (of de gedeelde motor-URL).');
   if (geld === 'motor' && !geldUrl) fouten.push('RTG_MOTOR_GELD=motor vereist RTG_MOTOR_GELD_URL of RTG_MOTOR_SHADOW.');
+  if (geld === 'motor' && !String(env.RTG_MOTOR_STATE_KEY_FILE || '').startsWith('/'))
+    fouten.push('RTG_MOTOR_GELD=motor vereist RTG_MOTOR_STATE_KEY_FILE als absoluut pad naar de aparte geldsnapshotsleutel.');
+  if (geld === 'motor' && !/^g-[a-f0-9]{32}$/.test(String(env.RTG_MOTOR_EXPECT_GENESIS || '')))
+    fouten.push('RTG_MOTOR_GELD=motor vereist RTG_MOTOR_EXPECT_GENESIS voor binding aan exact de geïnitialiseerde geldvolume.');
   for (const [naam, waarde] of [
     ['RTG_MOTOR_REKEN_URL', env.RTG_MOTOR_REKEN_URL],
     ['RTG_MOTOR_GELD_URL', env.RTG_MOTOR_GELD_URL],

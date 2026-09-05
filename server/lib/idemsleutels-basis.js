@@ -83,10 +83,6 @@ const SLEUTELS = {
   'POST /api/office/kantoorpakket/maak': { nietIdempotent: true,
     waarom: 'de titel is optioneel en valt terug op "Nieuw document"; twee lege oproepen zijn ' +
       'twee verse documenten, niet dezelfde nog eens (kern/office/docs.js)' },
-  'POST /api/meet/maak': { nietIdempotent: true,
-    waarom: 'zonder agendaId ontstaat er elke keer een verse kamer met een eigen toegangscode; ' +
-      'MET agendaId dedupliceert de route zelf al (kern/meet.js geeft dan bestond:true terug), ' +
-      'dus er valt hier niets te winnen en wel iets te verliezen' },
   'POST /api/concern/opname/maak': { nietIdempotent: true,
     waarom: 'een opname is een momentopname van het concern; twee keer vragen hoort met recht ' +
       'twee momenten op te leveren, anders is de tweede opname stil de eerste' },

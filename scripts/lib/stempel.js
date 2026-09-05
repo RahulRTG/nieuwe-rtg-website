@@ -96,7 +96,18 @@ const CODEPADEN = ['server', 'scripts', 'public'];
    en juist daar is een keuring op omgevallen. AFGELEID van CODEPADEN, zodat de
    twee lijsten elkaar niet kunnen tegenspreken: wat een register veroudert,
    maakt een meting ook onreproduceerbaar. */
-const CODE = CODEPADEN.concat(['test', 'motor', 'package.json', 'package-lock.json']);
+const CODE = CODEPADEN.concat(['test', 'motor', 'package.json', 'package-lock.json',
+  'Dockerfile', '.dockerignore', 'docker-compose.yml', 'docker-compose.live.yml',
+  'deploy', '.github/workflows']);
+
+/* Compose-bestanden kunnen later een derde overlay krijgen. Die mag niet door
+   de exacte namen hierboven glippen: alles wat Docker bouwt of een uitrol
+   bestuurt is releasecode, ook als het bestand tijdens een afbouw ontstaat. */
+function isCodePad(padNaam) {
+  const p = String(padNaam || '').replace(/\\/g, '/');
+  return CODE.some(c => p === c || p.startsWith(c + '/')) ||
+    /^docker-compose(?:\.[^/]+)?\.ya?ml$/.test(p);
+}
 
 function git(args) {
   try {
@@ -207,6 +218,14 @@ function stempel(extra) {
   }, extra || {});
 }
 
+/* Productiebewijs gebruikt geen verkorte Git-identiteit. Een prefix is handig
+   voor mensen, maar twee bewijsbestanden horen exact aan dezelfde commit. */
+function exactStempel(extra) {
+  const uit = stempel(extra);
+  uit.commit = git(['rev-parse', '--verify', 'HEAD']) || null;
+  return uit;
+}
+
 /* Wat er ongecommit staat, gesplitst in code (de lijst CODE hierboven) en de
    rest. Faalt git, dan null: onbekend als schoon lezen is precies de fout die
    dit veld moet voorkomen. */
@@ -224,7 +243,7 @@ function vuileBoom() {
        hernoeming staat er "oud -> nieuw"; dan tellen beide kanten mee. */
     const pad = r.slice(3);   // XY + spatie; de regel is hier nog ongetrimd
     const delen = pad.split(' -> ');
-    (delen.some(d => CODE.some(c => d === c || d.startsWith(c + '/'))) ? code : anders).push(r.trim());
+    (delen.some(isCodePad) ? code : anders).push(r.trim());
   }
   return { code, anders };
 }
@@ -344,5 +363,5 @@ function stempelVan(bestand) {
   } catch (e) { return undefined; }   // undefined = het bestand is er niet; null = wel, maar zonder stempel
 }
 
-module.exports = { stempel, eisSchoneBoom, versheid, vuileBoom, sluiting, nuCommit, stempelVan,
-  CODEPADEN, CODE, WORTEL };
+module.exports = { stempel, exactStempel, eisSchoneBoom, versheid, vuileBoom, sluiting,
+  nuCommit, stempelVan, isCodePad, CODEPADEN, CODE, WORTEL };

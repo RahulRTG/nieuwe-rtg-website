@@ -88,7 +88,9 @@ module.exports = ({ db, save, schoon, register, uitgang }) => {
       const w = ruimte(code);
       if (!w) continue;
       for (const l of Object.values(w.leden || {})) {
-        if (!l.token) continue;
+        /* Productieleden hebben bewust geen tweede token. Hun actuele status
+           IS daar de deur, dus ook een al tokenloos actief lid moet sluiten. */
+        if (!l.token && l.status !== 'actief') continue;
         l.token = null;
         if (l.status === 'actief') { l.status = 'uit dienst'; l.uitReden = reden; l.uitAt = nu(); }
         n++;

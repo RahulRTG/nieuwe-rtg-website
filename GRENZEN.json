@@ -64,6 +64,7 @@
       "eersteBijdrageFactuur",
       "email",
       "forgetSession",
+      "forgetSessionDuurzaam",
       "geboren",
       "hasCred",
       "herstelStart",
@@ -760,6 +761,8 @@
       "status"
     ],
     "meet": [
+      "loginFails",
+      "noteFailedTry",
       "meet"
     ],
     "member": [
@@ -1135,6 +1138,7 @@
       "rvTafels",
       "salon",
       "salonAI",
+      "salonClaimcode",
       "salonInzicht",
       "salonProfiel",
       "salonReacties",
@@ -1338,6 +1342,7 @@
       "ensureSupplierDefaults",
       "findSupplier",
       "forgetSession",
+      "forgetSessionDuurzaam",
       "handelingsspoor",
       "handelsregelwacht",
       "instelling",
@@ -1545,8 +1550,11 @@
     ],
     "rtfschool": [
       "beroepenbieb",
+      "loginFails",
+      "noteFailedTry",
       "samenRtf",
-      "schoolbieb"
+      "schoolbieb",
+      "tooManyTries"
     ],
     "rtgid": [
       "appUrl",
@@ -1594,6 +1602,8 @@
       "rtmailVak"
     ],
     "samen": [
+      "loginFails",
+      "noteFailedTry",
       "samen"
     ],
     "scim": [
@@ -1701,6 +1711,7 @@
       "linkLos",
       "liveKijk",
       "liveMaak",
+      "liveTrekIn",
       "liveVerbind",
       "mediaStuk",
       "meldMisbruik",
@@ -1749,6 +1760,7 @@
       "mijnSpellen",
       "mijnTeams",
       "mijnToernooien",
+      "projectieKoppel",
       "projectieOpen",
       "projectieSluit",
       "projectieStand",
@@ -2130,6 +2142,7 @@
       "roosterVoorstel",
       "runItem",
       "salon",
+      "salonClaimcode",
       "salonItemsVan",
       "salonNaarVolgers",
       "salonProfielCompleet",

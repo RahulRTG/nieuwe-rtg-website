@@ -228,7 +228,7 @@ test('de dertig-per-uur van de contactpin geldt over de twee deuren samen', asyn
 test('een verlopen ondertekende code telt niet als misser, een vervalste wel', async () => {
   const { sociaal, link, dyncode } = maak();
   const c = sociaal.liveMaak('A');
-  for (const v of sociaal.liveOpen.values()) v.vervalt = Date.now() - 1;
+  for (const v of sociaal.liveOpen.values()) v.vervaltOp = Date.now() - 1;
   const verlopen = dyncode.maak({ soort: 'contact', code: 'weg', ttlMs: 1000 });
   await new Promise(r => setTimeout(r, 1100));
   const r1 = await link.linkLos(lid('B'), verlopen.token);

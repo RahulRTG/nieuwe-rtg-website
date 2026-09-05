@@ -109,6 +109,9 @@ Object.assign(SLEUTELS,
      bewijsmap (2 september 2026). Elf ervan LEZEN alleen, en dat is daar een
      besluit en geen gat; zie de kop van dat bestand. */
   require('./idemsleutels-bescherming').SLEUTELS,
+  require('./idemsleutels-vracht').SLEUTELS,
+  require('./idemsleutels-rtgid').SLEUTELS,
+  require('./idemsleutels-salon').SLEUTELS,
   /* De restbak: de laatste 27 uit de bron verklaard (89a36fcac). Deze regel
      verdween in de samenvoeging van twaalf PR's (2 september 2026) en dertig
      verklaringen lagen ongelezen naast het register; het bestand exporteert

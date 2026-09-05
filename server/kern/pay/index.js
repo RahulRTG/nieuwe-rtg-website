@@ -29,7 +29,7 @@
    met een zaak in ./zaakbetaling. */
 
 module.exports = (ctxIn) => {
-  const { db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon,
+  const { db, save, bijeen, economischeBoekingEenmaal, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon,
     betaaldienstKosten, betaalOpdrachten, waarde, accounts, payBoekingenVoegToe } = ctxIn;
   if (typeof payBoekingenVoegToe !== 'function')
     throw new Error('pay: payBoekingenVoegToe ontbreekt. Zonder die weg landt geen enkele grootboekregel in het transactiegrootboek.');
@@ -101,9 +101,9 @@ module.exports = (ctxIn) => {
 
   // de gedeelde ctx voor de deelbestanden
   const ctx = {
-    db, save, crypto, betaal, schoon, nu, d,
+    db, save, economischeBoekingEenmaal, crypto, betaal, schoon, nu, d,
     saldi, grootboek, klompjes, kascodes, tikcodes,
-    rekLid, rekPartner, saldoVan, id, metIdem, boek, boekAsync, zorgSaldo, seintje, bestaatLid,
+    rekLid, rekPartner, saldoVan, id, metIdem, boek, boekAsync, geldModus, zorgSaldo, seintje, bestaatLid,
     betaaldienstKosten: betaaldienstKosten || (() => 0), waarde, accounts,
     opdrachten: betaalOpdrachten,
     MIN_CENTEN, MAX_CENTEN, KASCODE_MS, KASCODE_MAX,

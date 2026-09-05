@@ -61,16 +61,25 @@ module.exports = ({ saldi, saldoVan, grootboek, payBoekingenVoegToe, save, id, s
      motor (de autoriteit); pas als die hem bevestigt, spiegelt de JS-engine
      dezelfde regel. Weigert de motor (onvoldoende saldo) of is hij onbereikbaar,
      dan verandert er NIETS aan de JS-saldi. */
-  async function boekAsync({ van, naar, centen, soort, oms, ref, genre, dagBesteed }) {
+  async function boekAsync({ van, naar, centen, soort, oms, ref, genre, dagBesteed, economischeSleutel }) {
     if (betalingenUit) return uitFout();
     if (geldModus !== 'motor') return boek({ van, naar, centen, soort, oms, ref, genre, dagBesteed });
     const dicht = waardePoort({ van, naar, centen: Math.round(Number(centen)), soort, genre, dagBesteed });
     if (dicht) return dicht;
-    const r = await motorklant.boekGuard({ van, naar, centen, soort, oms, ref });
+    const r = await motorklant.boekGuard({ van, naar, centen, soort, oms, ref, economischeSleutel });
     if (!r || r.error) return { status: (r && r.status) || 502, error: (r && r.error) || 'Motor onbereikbaar.' };
     // Neem de door de motor bevestigde boeking exact over (id, at, bedragen).
     const b = r.boeking;
     const rij = { id: b.id, van: b.van, naar: b.naar, centen: Math.round(Number(b.centen)), soort: b.soort || 'boeking', oms: b.oms || '', ref: b.ref || null, at: b.at || nu() };
+    if (economischeSleutel) {
+      const sv = Math.round(Number(r.saldoVan)), sn = Math.round(Number(r.saldoNaar));
+      if (!Number.isFinite(sv) || !Number.isFinite(sn))
+        return { status: 502, error: 'Motor bevestigde geen actuele saldi; de spiegel blijft ongemoeid.' };
+      saldi()[rij.van] = sv; saldi()[rij.naar] = sn;
+      if (!grootboek().some(x => x && x.id === rij.id)) payBoekingenVoegToe(rij);
+      save();
+      return { ok: true, boeking: rij, herhaald: !!r.herhaald };
+    }
     pasToe(rij);
     return { ok: true, boeking: rij };
   }

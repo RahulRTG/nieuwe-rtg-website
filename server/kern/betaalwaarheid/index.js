@@ -12,7 +12,6 @@ module.exports = function maakBetaalWaarheid({ d, save, crypto, betaal, nu, log 
   const nuIso = nu || (() => klokDatum().toISOString());
   const afhandelaars = new Map();
   const startend = new Map();
-  const afhandelend = new Map();
 
   function doos() {
     const data = d();
@@ -35,6 +34,8 @@ module.exports = function maakBetaalWaarheid({ d, save, crypto, betaal, nu, log 
   }
 
   const publiek = (r) => beeld.publiek(r, definitiefBetaald);
+  const afhandeling = require('./afhandeling')({ d, doos, save, nuIso, gebeurtenis,
+    STATUS, log, afhandelaars });
 
   function maak(invoer) {
     const actor = String(invoer.actor || '');
@@ -71,28 +72,6 @@ module.exports = function maakBetaalWaarheid({ d, save, crypto, betaal, nu, log 
     return true;
   }
 
-  async function handelAf(r) {
-    if (!r || r.status !== STATUS.BEVESTIGD || r.afgehandeldAt) return;
-    const eerder = afhandelend.get(r.id);
-    if (eerder) return eerder;
-    const werk = (async () => {
-      const fn = afhandelaars.get(r.soort);
-      if (!fn) return;
-      try {
-        await fn(r);
-        r.afgehandeldAt = nuIso();
-        gebeurtenis(r, 'DOMEIN_AFGEHANDELD', { bron: r.soort });
-        save();
-      } catch (e) {
-        gebeurtenis(r, 'AFHANDELING_MISLUKT', { fout: String(e && e.message || e).slice(0, 180) });
-        save();
-        if (log && log.uitzondering) log.uitzondering(e, { bron: 'betaalwaarheid', betaling: r.id });
-      }
-    })();
-    afhandelend.set(r.id, werk);
-    try { await werk; } finally { afhandelend.delete(r.id); }
-  }
-
   async function pasProviderToe(r, p, eventId, gebeurtenisType) {
     if (!r) return null;
     if (p.id && r.providerId && p.id !== r.providerId && p.id !== r.providerPaymentId) return publiek(r);
@@ -119,7 +98,7 @@ module.exports = function maakBetaalWaarheid({ d, save, crypto, betaal, nu, log 
     naar(r, providerStatus(r.provider, r.providerStatus, gebeurtenisType), {
       bron: r.provider, providerEventId: eventId || null, providerStatus: r.providerStatus });
     save();
-    await handelAf(r);
+    await afhandeling.handelAf(r);
     return publiek(r);
   }
 
@@ -130,7 +109,7 @@ module.exports = function maakBetaalWaarheid({ d, save, crypto, betaal, nu, log 
     if (bezig) return bezig;
     const werk = (async () => {
       if (r.providerId && definitiefBetaald(r.status)) {
-        await handelAf(r);
+        await afhandeling.handelAf(r);
         return { betaling: publiek(r), actie: { soort: 'klaar' } };
       }
       if (r.providerId) {
@@ -149,7 +128,10 @@ module.exports = function maakBetaalWaarheid({ d, save, crypto, betaal, nu, log 
     })();
     startend.set(id, werk);
     try { return await werk; } catch (e) {
-      gebeurtenis(r, 'PROVIDER_FOUT', { fout: String(e && e.message || e).slice(0, 180) }); save(); throw e;
+      if (!e || e.code !== 'BETAAL_AFHANDELING_MISLUKT') {
+        gebeurtenis(r, 'PROVIDER_FOUT', { fout: String(e && e.message || e).slice(0, 180) }); save();
+      }
+      throw e;
     } finally { startend.delete(id); }
   }
 
@@ -158,7 +140,7 @@ module.exports = function maakBetaalWaarheid({ d, save, crypto, betaal, nu, log 
     const eventId = String(invoer.eventId || (invoer.aanbieder + ':' + invoer.providerId + ':' + invoer.status));
     if (meldingen[eventId] && meldingen[eventId].verwerktAt) {
       const eerder = meldingen[eventId].betalingId && doos()[meldingen[eventId].betalingId];
-      if (eerder) await handelAf(eerder); /* herstel na een lokale afhandelstoring */
+      if (eerder) await afhandeling.handelAf(eerder); /* herstel na een lokale afhandelstoring */
       return meldingen[eventId].betalingId || null;
     }
     if (!meldingen[eventId]) meldingen[eventId] = { eventId, aanbieder: invoer.aanbieder,
@@ -173,8 +155,11 @@ module.exports = function maakBetaalWaarheid({ d, save, crypto, betaal, nu, log 
       save();
       throw new Error('De betaalwaarheid is nog niet zichtbaar; provider moet opnieuw proberen.');
     }
-    if (r) await pasProviderToe(r, invoer, eventId, invoer.gebeurtenis);
-    meldingen[eventId].betalingId = r ? r.id : null;
+    if (r) {
+      meldingen[eventId].betalingId = r.id;
+      save(); /* koppeling staat vast vóór de mogelijk falende domeinafhandeling */
+      await pasProviderToe(r, invoer, eventId, invoer.gebeurtenis);
+    } else meldingen[eventId].betalingId = null;
     meldingen[eventId].verwerktAt = nuIso();
     save();
     return r ? r.id : null;
@@ -185,9 +170,9 @@ module.exports = function maakBetaalWaarheid({ d, save, crypto, betaal, nu, log 
   function registreerAfhandeling(soort, fn) { afhandelaars.set(String(soort), fn); }
 
   const terug = require('./terug')({ d, doos, save, nuIso, gebeurtenis, naar, STATUS,
-    definitiefBetaald, publiek, betaal });
+    definitiefBetaald, publiek, betaal, hash });
 
   return { STATUS, maak, begin, publiek, van, vanActor, providerMelding,
     terugbetalen: terug.terugbetalen, providerTerugbetaling: terug.providerTerugbetaling,
-    registreerAfhandeling, definitiefBetaald };
+    registreerAfhandeling, ronde: afhandeling.ronde, definitiefBetaald };
 };

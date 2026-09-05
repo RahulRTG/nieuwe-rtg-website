@@ -327,11 +327,12 @@ test('elke routehandler die een id uit het verzoek pakt, noemt ook de sessie', (
        registreren (routes/auth/account.js), en DAAR hangt de controle. */
     'server/routes/werving.js GET /werken/:code': 'stuurt alleen door; de code wordt bij registreren ingewisseld en daar gecontroleerd',
     // (a) de code is de sleutel
-    /* het gedeelde spelscherm: een televisie heeft geen RTG-account, en er een
-       op zetten laat een ingelogde sessie op een gedeeld apparaat achter. De
-       korte code geeft alleen zicht.publiek van EEN potje, verloopt, en er kan
-       niets terug; de rem staat ervoor. Zie de kop boven de route zelf. */
-    'server/routes/spellen.js GET /api/projectie/:code': 'spelscherm op tv: de verlopende code is de sleutel, alleen publiek zicht, met rem',
+    /* Het gedeelde spelscherm: een televisie heeft geen RTG-account, en er een
+       op zetten laat een persoonlijke sessie op een gedeeld apparaat achter.
+       Een 128-bits eenmalige koppeling in het POST-lijf wordt atomair verbruikt
+       voor een aparte, intrekbare schermsessie. Beide geven uitsluitend
+       zicht.publiek van één potje; de rem staat ervoor. */
+    'server/routes/spellen.js POST /api/projectie/koppel': 'spelscherm op tv: eenmalige gehashte koppeling is de deur tot alleen publiek zicht',
     'server/routes/lesmaker.js POST /api/les/leraar': 'klaslokaal: leraarToken is de sleutel, geen account',
     'server/routes/lesmaker.js POST /api/les/volgende': 'klaslokaal: leraarToken is de sleutel',
     'server/routes/lesmaker.js POST /api/les/sluit': 'klaslokaal: leraarToken is de sleutel',

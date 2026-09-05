@@ -55,6 +55,43 @@ module.exports = function lijfpoort(deps) {
     next();
   });
 
+  /* Geld-dragende codes zonder bewezen atomaire lifecycle blijven in productie
+     dicht. Dit staat na de begrensde body-parser (de algemene POS-route wordt
+     alleen voor cadeaukaart/RTG Pay geraakt) en vóór idemopslag en handlers. */
+  app.use(require('../middleware/money-credential-productiepoort')());
+
+  /* Tijdelijke Travel-bewijzen waarvan bezit nog toegang geeft blijven net zo
+     hard dicht totdat hun eigen lifecycle en atomaire claim bewezen zijn.
+     Dit is geen groen vinkje: het credentialregister houdt ze als blocker. */
+  app.use(require('../middleware/travel-bearer-productiepoort')());
+
+  /* Alle WerkOS- en Tenant-routes leunen nu nog op dezelfde langlevende raw
+     beheer- en lidbearers. Tot de accountgebonden cutover bewezen is, sluit
+     productie de volledige familie centraal; een willekeurige nieuwe
+     bedrijfsroute kan zo niet buiten een losse route-allowlist vallen. */
+  app.use(require('../middleware/workos-legacy-token-productiepoort')());
+
+  /* De oude club-, partner- en organisatieportalen gebruiken nog codes zonder
+     volledige levenscyclus. In productie gaan zij altijd dicht, ook wanneer
+     Foundation juridisch is vrijgegeven. Deze poort staat vóór idemopslag en
+     domeinhandlers, zodat een code nooit een achterliggende mutatie bereikt. */
+  app.use(require('../middleware/legacy-codeportaal-productiepoort')());
+
+  /* De korte hospitality-simulatiecode koppelt twee vertrouwenscontexten en
+     heeft nog geen productiegeschikte levenscyclus. De simulatie blijft voor
+     test en training bestaan, maar alle issuers en consumers van deze brug
+     zijn in productie vroeg en centraal gesloten. */
+  app.use(require('../middleware/simulatiebrug-productiepoort')());
+
+  /* De Foundation-productiepoort staat direct na de begrensde body-ontleding
+     en voor iedere domeinhandler, idemopslag en handelingsregistratie. Alleen
+     hier ziet hij zowel de vroeg gemounte /api/foundation-router als de later
+     gemounte /api/rtf- en /api/lab2-routes; twee poorten zouden onvermijdelijk
+     uiteenlopen. Een paar gedeelde mutatieroutes mogen alleen hun beperkende
+     richting uitvoeren (bijvoorbeeld toestemming intrekken); daarvoor is de
+     begrensde body nodig, vandaar deze plek en niet vóór express.json(). */
+  app.use(require('../middleware/foundation-productiepoort')());
+
   /* 3b. De idem-poort: een verzoek met een `Idempotency-Key` header krijgt bij
      een herhaling het bewaarde antwoord in plaats van het werk nog een keer.
 

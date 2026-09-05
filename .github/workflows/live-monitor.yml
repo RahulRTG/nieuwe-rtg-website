@@ -35,9 +35,12 @@ jobs:
           node-version-file: '.nvmrc'
       - name: Meet DNS, TLS, rand en kritieke gebruikersreizen van buitenaf
         id: meet
-        run: node scripts/sonde.js "$RTG_LIVE_URL" --json=sonde.json
+        run: |
+          node scripts/publieke-tls-proef.js "$RTG_LIVE_URL" --eis-release-commit --bewijs=tls-bewijs.json
+          node scripts/sonde.js "$RTG_LIVE_URL" --json=sonde.json
         env:
           RTG_LIVE_URL: ${{ vars.RTG_LIVE_URL }}
+          RTG_RELEASE_COMMIT: ${{ vars.RTG_LIVE_COMMIT }}
       # Alleen bij rood: de kale uitslag omzetten in een duiding. De triage
       # zakt zelf ook (exitcode 1 bij een incident, 2 bij niets gemeten),
       # zodat de workflow rood blijft en herstel.yml aanslaat.
@@ -53,6 +56,7 @@ jobs:
           name: sonde
           path: |
             sonde.json
+            tls-bewijs.json
             TRIAGE.json
           retention-days: 30
           if-no-files-found: ignore

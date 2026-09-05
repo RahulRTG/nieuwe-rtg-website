@@ -56,7 +56,15 @@ module.exports = ({ app, officeAuth, rtfos, veilig, H }) => {
   /* ---------- de kantoorkant ----------
      Een code uitgeven is een besluit en geen bijvangst: er kijkt daarna iemand
      van buiten in een dossier. Beide routes laten een auditregel achter. */
-  app.post('/api/rtfos/vrijwilliger/code', officeAuth, H((req, b) => rtfos.vrijwilligerportaal.codeVoor(req, b.id)));
+  app.post('/api/rtfos/vrijwilliger/code', officeAuth, H((req, b) => rtfos.vrijwilligerportaal.codeVoor(req, b.id, b)));
+  app.post('/api/rtfos/vrijwilliger/code/intrekken', officeAuth,
+    H((req, b) => rtfos.vrijwilligerportaal.codeIntrekken(req, b.id, b.reden)));
+  app.post('/api/rtfos/vrijwilliger/code/roteren', officeAuth,
+    H((req, b) => rtfos.vrijwilligerportaal.codeRoteren(req, b.id, b)));
   app.post('/api/rtfos/vrijwilliger/uren-bevestig', officeAuth, H((req, b) => rtfos.vrijwilligerportaal.bevestigUren(req, b.id, b.meldingId)));
-  app.post('/api/rtfos/casus/code', officeAuth, H((req, b) => rtfos.deelnemerportaal.codeVoor(req, b.id)));
+  app.post('/api/rtfos/casus/code', officeAuth, H((req, b) => rtfos.deelnemerportaal.codeVoor(req, b.id, b)));
+  app.post('/api/rtfos/casus/code/intrekken', officeAuth,
+    H((req, b) => rtfos.deelnemerportaal.codeIntrekken(req, b.id, b.reden)));
+  app.post('/api/rtfos/casus/code/roteren', officeAuth,
+    H((req, b) => rtfos.deelnemerportaal.codeRoteren(req, b.id, b)));
 };

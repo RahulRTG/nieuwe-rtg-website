@@ -13,7 +13,7 @@ module.exports = (sctx) => {
   const { kern, linkBon: bon } = sctx;
   const { pinClusterRem, pinBeveiliging } = sctx;
   const { app, auth, geenGast, pinKaart, pinVernieuw, pinUit, pinZoek, pinVerbind,
-          liveMaak, liveKijk, liveVerbind, appUrl } = kern;
+          liveMaak, liveKijk, liveVerbind, liveTrekIn, appUrl } = kern;
   const PIN_ACTIES = new Set(['rtg-pin-vernieuw', 'rtg-pin-noodslot-uit', 'rtg-pin-vast-aan']);
   const oorsprong = req => { try { return new URL(appUrl(req)).origin; } catch (e) { return ''; } };
   const gastheer = req => { try { return new URL(oorsprong(req)).hostname; } catch (e) { return req.hostname; } };
@@ -87,6 +87,9 @@ app.post('/api/member/pin/uit', auth, async (req, res) => {
   }
   const r = pinUit(req.session.key, req.body.uit !== false, opties);
   if (r.error) return res.status(r.status).json({ error: r.error });
+  if (opties && opties.bevroren && liveTrekIn) {
+    try { await liveTrekIn(req.session.key); } catch (e) {}
+  }
   res.json({ pin: r.pin, toon: r.toon, uit: r.uit, versie: r.versie,
     gemaaktOp: r.gemaaktOp, laatstGewijzigd: r.laatstGewijzigd,
     bevroren: r.bevroren, bevrorenSinds: r.bevrorenSinds,
@@ -123,9 +126,9 @@ app.post('/api/member/pin/connect', auth, async (req, res) => {
    Een verse, ondertekende code die na 45 seconden niets meer is en je vaste pin
    niet draagt (kern/sociaal/pin-live.js). Het scherm haalt hem telkens opnieuw
    op zolang hij getoond wordt; daar is de code op gebouwd. */
-app.post('/api/member/pin/live', auth, (req, res) => {
+app.post('/api/member/pin/live', auth, async (req, res) => {
   if (geenGast(req, res)) return;
-  const r = liveMaak(req.session.key);
+  const r = await liveMaak(req.session.key);
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json({ token: r.token, exp: r.exp, ttlMs: r.ttlMs, doel: r.doel });
 });
@@ -139,9 +142,9 @@ app.post('/api/member/pin/live', auth, (req, res) => {
    bij je gezin" op een volstrekt geldige code. Hier aan de ledenkant zou
    `token` op zichzelf kunnen, maar twee namen voor hetzelfde ding over twee
    apps is hoe de volgende die dit leest het weer fout doet. */
-app.post('/api/member/pin/live/kijk', auth, (req, res) => {
+app.post('/api/member/pin/live/kijk', auth, async (req, res) => {
   if (geenGast(req, res)) return;
-  const r = liveKijk(req.session.key, req.body.livecode);
+  const r = await liveKijk(req.session.key, req.body.livecode);
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json({ codename: r.codename, tier: r.tier, status: r.st,
     bevestiging: r.bevestiging, bevestigingVervalt: r.bevestigingVervalt });

@@ -33,6 +33,16 @@ module.exports = ({ CONFIGURED, SMTP_SANDBOX, DIRECT, toOutbox }) => {
   let smtpSandboxAan = CONFIGURED && SMTP_SANDBOX;
   let smsSandboxAan = smsSandbox.enabled;
 
+  function toetsSms(to, text) {
+    if (smsSandbox.enabled && !smsSandboxAan) {
+      const e = new Error('De SMS-sandbox is door de Integratiekamer uitgezet.');
+      e.code = 'SMS_SANDBOX_UIT'; throw e;
+    }
+    return smsSandbox.enabled
+      ? smsSandbox.send(to, text)
+      : { ok: true, status: 'outbox', provider: 'outbox', sandbox: false, bezorgd: false };
+  }
+
   /* Providerachtige SMS-aflevering, volledig lokaal. In sandboxstand valideert
      de contractsimulator eerst het verzoek; pas bij acceptatie komt het bericht
      in de (waar mogelijk versleutelde) outbox. Zonder sandbox blijft de outbox
@@ -49,14 +59,7 @@ module.exports = ({ CONFIGURED, SMTP_SANDBOX, DIRECT, toOutbox }) => {
       try { require('./journaalhaak').meld({ richting: 'uit', wat: 'post/' + hoe, naar: 'sms:' + to, mislukt: !gelukt, reden }); } catch (e) {}
     };
     try {
-      if (smsSandbox.enabled && !smsSandboxAan) {
-        const e = new Error('De SMS-sandbox is door de Integratiekamer uitgezet.');
-        e.code = 'SMS_SANDBOX_UIT';
-        throw e;
-      }
-      const r = smsSandbox.enabled
-        ? smsSandbox.send(to, text)
-        : { ok: true, status: 'outbox', provider: 'outbox', sandbox: false, bezorgd: false };
+      const r = toetsSms(to, text);
       toOutbox('sms:' + to, subject, text);
       journaal(true, smsSandbox.enabled ? 'sms-sandbox' : 'outbox');
       return r;
@@ -90,5 +93,5 @@ module.exports = ({ CONFIGURED, SMTP_SANDBOX, DIRECT, toOutbox }) => {
 
   /* De verzendkant (send en bezorgNu in mail.js) leest deze stand; hij schrijft
      hem nooit. Een getter en geen waarde, want de vlag verandert tijdens de rit. */
-  return { sendSms, zetSandbox, sandboxStand, smtpAan: () => smtpSandboxAan };
+  return { sendSms, toetsSms, zetSandbox, sandboxStand, smtpAan: () => smtpSandboxAan };
 };

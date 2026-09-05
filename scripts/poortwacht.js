@@ -27,6 +27,8 @@
            node scripts/poortwacht.js --json
            node scripts/poortwacht.js --json --per-route
    Exitcode 1 zodra er een route OPEN staat die niet publiek hoort te zijn.
+   Exitcode 2 zodra ook maar een route onbereikbaar was: een onvolledige
+   meting mag nooit als groen bewijs worden gebruikt.
 
    --PER-ROUTE, EN WAAROM DAT ER APART IN ZIT. De uitslag hierboven telt op:
    zoveel dicht, zoveel stil, zoveel open. Dat is genoeg om te weten of er een
@@ -171,6 +173,17 @@ function oordeelVan(eerste, tweede, publiek) {
   return { oordeel: 'stil', pasNaLijf: false };
 }
 
+/* EEN ONBEREIKBARE BRON IS GEEN GROENE POORT. De eerste versie keek voor de
+   afsluitcode uitsluitend naar `open.length`. Daardoor leverde een ronde tegen
+   een volledig dode server 0 op: alle routes waren `onbereikbaar`, dus geen
+   enkele stond in `open`. Dat is een vals-groen releasebewijs. Fout gaat hier
+   bewust vóór open: zodra de ronde niet compleet is, is haar beveiligings-
+   oordeel ongeldig. De reeds gevonden open routes blijven wel in de uitvoer. */
+function afsluitcode(uitslag) {
+  if (!uitslag || Number(uitslag.fout) > 0) return 2;
+  return Array.isArray(uitslag.open) && uitslag.open.length > 0 ? 1 : 0;
+}
+
 async function ronde() {
   const routes = routekaart();
   // in blokken, anders zet je je eigen server met 2500 gelijktijdige verzoeken vast
@@ -246,7 +259,7 @@ async function ronde() {
   }
 }
 
-module.exports = { oordeelVan };
+module.exports = { oordeelVan, afsluitcode };
 
 /* DE WACHT. Hieronder start een volledige ronde: een server, een routekaart en
    tweeduizend kloppen. Zonder deze regel gebeurde dat ook bij een gewone
@@ -302,7 +315,7 @@ ronde().then(() => {
        exitcode 0 erbij. Dat is de ergste soort fout: hij ziet er geslaagd uit.
        Gevonden doordat scripts/meetronde.js de poortwacht als kindproces draait.
        Met exitCode loopt het proces netjes leeg en klopt de code nog steeds. */
-    process.exitCode = uit.open.length ? 1 : 0;
+    process.exitCode = afsluitcode(uit);
     return;
   }
   console.log('\n=== RTG poortwacht tegen ' + BASIS + ' ===\n');
@@ -315,14 +328,24 @@ ronde().then(() => {
   }
   console.log('  bewust publiek    : ' + uit.publiek);
   console.log('  onbereikbaar      : ' + uit.fout);
+  if (uit.fout) {
+    console.error('\n!!! METING ONVOLLEDIG: ' + uit.fout + ' route(s) waren onbereikbaar.');
+    console.error('Deze uitslag is GEEN beveiligingsbewijs. Start de bedoelde server en meet opnieuw.');
+    if (uit.open.length) {
+      console.error('Daarnaast deden ' + uit.open.length + ' niet-publieke route(s) open; zie de JSON-uitvoer voor details.');
+    }
+    process.exitCode = afsluitcode(uit);
+    return;
+  }
   if (!uit.open.length) {
     console.log('\nGeen enkele niet-publieke route deed open voor een vreemde.');
     console.log('Dat dekt EEN klasse fouten, niet alle: een route die 401 geeft kan tussen');
     console.log('twee ingelogde leden nog steeds lekken. Daarvoor is scripts/aanval.js.');
-    process.exit(0);
+    process.exitCode = afsluitcode(uit);
+    return;
   }
   console.log('\n!!! OPEN (' + uit.open.length + ') -- deze deden open zonder inlog:\n');
   for (const o of uit.open) console.log('  ' + o.methode + ' ' + o.pad + '  -> ' + o.status + '  ' + o.begin);
   console.log('\nZet een route hierboven in PUBLIEK (mét reden) als hij open HOORT te staan.');
-  process.exit(1);
-}).catch(e => { console.error('poortwacht viel om: ' + (e && e.message)); process.exit(2); });
+  process.exitCode = afsluitcode(uit);
+}).catch(e => { console.error('poortwacht viel om: ' + (e && e.message)); process.exitCode = 2; });

@@ -44,6 +44,30 @@
   }
 
 
+/* Een vrachtvolgcode bestaat alleen in dit dialoog zolang de expediteur haar
+   bewust kopieert. De lijst, browseropslag en latere antwoorden krijgen haar
+   nooit terug. De dialoog hoort bij de hele vrachtmodule, niet bij één kaart. */
+  function vrToonCode(code, kop){
+    if (!code) return;
+    const oud = document.getElementById('vrCodeEenmalig'); if (oud) oud.remove();
+    const laag = document.createElement('div'); laag.id = 'vrCodeEenmalig';
+    laag.style.cssText = 'position:fixed;inset:0;z-index:10050;background:rgba(5,9,13,.82);display:grid;place-items:center;padding:1rem;';
+    laag.innerHTML = '<div role="dialog" aria-modal="true" aria-labelledby="vrCodeKop" style="width:min(34rem,100%);border:1px solid var(--gold);background:var(--bg);padding:1rem;box-shadow:0 1.5rem 4rem rgba(0,0,0,.45);">'+
+      '<b id="vrCodeKop">'+esc(kop)+'</b><p class="sub">'+T('vr.codeonce','Kopieer deze klantcode nu. RTG bewaart haar niet leesbaar en toont haar later niet opnieuw.')+'</p>'+
+      '<input id="vrVerseCode" class="st-in" readonly autocomplete="off" spellcheck="false" style="width:100%;">'+
+      '<div style="display:flex;gap:.5rem;margin-top:.75rem;"><button class="obtn primary" data-vrcode-copy>'+T('vr.kopieer','Kopieer')+'</button><button class="obtn" data-vrcode-dicht>'+T('vr.sluit','Sluit')+'</button></div></div>';
+    document.body.appendChild(laag);
+    const invoer = laag.querySelector('#vrVerseCode'); invoer.value = code; invoer.focus(); invoer.select();
+    laag.querySelector('[data-vrcode-copy]').addEventListener('click', () => {
+      const klaar = () => toast(T('vr.gekopieerd','Volgcode gekopieerd.'));
+      if (navigator.clipboard && navigator.clipboard.writeText)
+        navigator.clipboard.writeText(code).then(klaar, () => invoer.select());
+      else invoer.select();
+    });
+    laag.querySelector('[data-vrcode-dicht]').addEventListener('click', () => laag.remove());
+    laag.addEventListener('keydown', e => { if (e.key === 'Escape') laag.remove(); });
+  }
+
   // ---- vracht & expeditie: internationale zendingen over lucht, water en land ----
   /* Zonder pictogrammen: de gedeelde themalaag houdt lopende tekst bewust
      zakelijk (emoticons worden eruit geveegd), dus hier alleen woorden. */
@@ -69,13 +93,3 @@
       (vrEtappes.length>1 ? '<button class="js-vretweg" data-i="'+i+'" aria-label="'+T('vr.et.weg','Etappe weghalen')+'" style="background:none;border:1px solid var(--line);border-radius:0;padding:0.35rem 0.6rem;color:var(--soft);font-family:inherit;">✕</button>' : '')+
       '</div>').join('');
   }
-  function vrTijdlijn(z){
-    return '<div style="display:flex;flex-wrap:wrap;gap:0.35rem;margin-top:0.5rem;">'+z.etappes.map(e => {
-      const stijl = e.status==='bezig' ? 'border-color:var(--gold);background:rgba(201,162,75,0.12);' : e.status==='klaar' ? 'opacity:0.6;' : 'opacity:0.85;';
-      return '<span title="'+escAttr(e.document)+'" style="border:1px solid var(--line);'+stijl+'border-radius:0;padding:0.2rem 0.6rem;font-size:0.72rem;">'+
-        T('vr.mod.'+e.modaliteit, VR_MOD[e.modaliteit].label)+' · '+esc(e.van)+' → '+esc(e.naar)+(e.status==='klaar'?' · '+T('vr.et.klaar','klaar'):e.status==='bezig'?' · '+T('vr.et.nu','nu'):'')+'</span>';
-    }).join('')+'</div>';
-  }
-  function vrKaart(z){
-    const docs = z.etappes.map(e => esc(e.document)).filter((v,i,a)=>a.indexOf(v)===i).join(' · ');
-    let acties = '';

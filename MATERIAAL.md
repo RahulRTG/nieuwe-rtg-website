@@ -115,6 +115,55 @@ voelen.
 
 ---
 
+## De vier vaste wereldcomposities
+
+*Vastgelegd op 4 september 2026. De exacte schermtokens staan in
+`ONTWERP.md` paragraaf 4a.*
+
+Een materiaal is niet automatisch een wereldkleur. Iedere wereld kiest een
+vaste compositie van grond, licht en één signatuur:
+
+| Wereld | Compositie | Waarom |
+|---|---|---|
+| LivingOS | Pearl met zacht goud | persoonlijk, warm en rustig; het enige structureel lichte huis |
+| TravelOS | Bordeaux in diepe schaduw met champagne | beweging, avond en bestemming zonder een rode paginavulling |
+| WorkOS | grafiet met gedempt teal en messing | concentratie en precisie; teal is oriëntatie, geen successtatus |
+| FoundationOS | diep institutioneel navy met mat goud | vertrouwen en publieke verantwoordelijkheid zonder corporate blauw |
+
+De signatuur verschijnt als een dunne bovenlijn, geselecteerde toestand,
+focusrand of klein metaalaccent. Zij wordt niet als groot gevuld vlak gebruikt.
+Dat geldt in het bijzonder voor bordeaux: een scherm kan onmiskenbaar TravelOS
+zijn zonder een massieve rode knop.
+
+Fotografie wordt per wereld getemperd door een kleurwas van de eigen grond. Zij
+mag sfeer en context geven, maar geen operationele waarheid suggereren. Een
+foto van Ibiza is geen bewijs dat een reis naar Ibiza is geboekt; die naam mag
+pas uit de reisbron komen.
+
+De composities gelden voor pagina's die de nieuwe wereldschil expliciet
+activeren. De oudere materiaaltoewijzing blijft tijdelijk actief op niet
+gemigreerde schermen. Daardoor kan ieder scherm afzonderlijk worden getoetst en
+teruggedraaid.
+
+### De rand erft de wereld
+
+RTG Edge 2.0 gebruikt niet één zwarte systeembalk met vier accentkleuren. Het
+hele materiaal van de bestaande rand wisselt mee: grond, paneel, inkt, gedempte
+inkt, lijn, signatuur, zachte signatuur en metaal. Daardoor is de wereld ook
+zonder titel herkenbaar:
+
+- LivingOS is structureel licht: parel en ivoor, donkere inkt, zacht goud;
+- TravelOS is diepe wijn met champagne;
+- WorkOS is grafiet met gedempt teal en messing;
+- FoundationOS is diep navy met mat goud.
+
+De contextlade is een verhoogd vlak van diezelfde wereld en nooit een vijfde
+materiaal. Compact en Focus veranderen alleen de zichtbaarheid en de ruimte van
+de rand, niet de kleuren van het scherm. Een ingebed scherm erft de rand van de
+ouder en schildert daarom geen eigen tweede navigatiemateriaal.
+
+---
+
 ## Het materiaal is licht, geen verf
 
 Gevonden op 31 augustus 2026 door naar het scherm te kijken in plaats van naar

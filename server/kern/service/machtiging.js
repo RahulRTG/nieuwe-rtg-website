@@ -23,10 +23,10 @@
       niets bij SUP-2 -- ook niet voor dezelfde mens en dezelfde capability.
       Dat is wat "case-scoped" betekent, en het is de reden dat een medewerker
       geen zoekbalk over de hele wereld nodig heeft.
-   4. ZWAAR WERK VRAAGT EEN TWEEDE MENS. Identiteit, bankgegevens, een grote
-      compensatie en een gegevensuitvoer staan in ZWAAR; die machtiging bestaat
-      wel, maar `mag()` blijft nee zeggen tot een ANDER mens heeft afgetekend.
-      Niet de aanvrager zelf -- dat wordt hier gecontroleerd en niet gevraagd.
+   4. ZWAAR WERK VRAAGT EEN TWEEDE MENS. Het actieve contract bevat nu geen
+      zware capability: namen zonder lezer zijn verwijderd. De grens blijft
+      fail-closed klaar voor een recht dat mét zijn echte lezer terugkomt;
+      nooit de aanvrager zelf en nooit een AI.
 
    WAT DEZE MODULE NIET IS: een tweede rollenmodel. Zij bakent tijdelijk en met
    een reden af wat iemand binnen DEZE zaak aanraakt, en levert de zin die het

@@ -71,7 +71,7 @@ test('van kantoorbalie naar een nieuw lid: de link doet wat hij belooft',
       await kpage.click('#kKlaarZet');
       await kpage.waitForSelector('#kKlaarUit input', { timeout: 20000 });
       link = await kpage.inputValue('#kKlaarUit input');
-      assert.match(link, /\/apps\/reisuitnodiging\.html\?code=[0-9a-f]{32}$/, 'een link met een echte sleutel: ' + link);
+      assert.match(link, /\/apps\/reisuitnodiging\.html#code=REIS\.[A-F0-9]{32}$/, 'een fragmentlink met een echte sleutel: ' + link);
     });
 
     /* ---- 2. een vreemde opent hem, zonder account ---- */
@@ -81,6 +81,7 @@ test('van kantoorbalie naar een nieuw lid: de link doet wat hij belooft',
     letOpFouten(gpage, gfouten);
     await gpage.goto(link, { waitUntil: 'domcontentloaded' });
     await gpage.waitForSelector('#rGo', { timeout: 20000 });
+    assert.equal(new URL(gpage.url()).hash, '', 'de pagina wist de code direct uit de adresbalk en geschiedenis');
 
     await t.test('de pagina toont waar en wanneer, en niet wat er geboekt is', async () => {
       const tekst = await gpage.$eval('#vak', el => el.innerText);
@@ -113,7 +114,9 @@ test('van kantoorbalie naar een nieuw lid: de link doet wat hij belooft',
 
       // en de link is op
       const nog = await post('/api/reis/uitnodiging/open', { code: link.split('code=')[1] }, null);
-      assert.equal(nog.body.uitnodiging.open, false);
+      assert.equal(nog.status, 409);
+      assert.equal(nog.body.uitnodiging, undefined,
+        'een verbruikte link onthult geen reisvoorbeeld meer');
     });
 
     assert.deepEqual(kfouten, [], 'geen scriptfouten op het kantoorscherm');

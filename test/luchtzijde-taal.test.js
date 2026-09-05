@@ -63,18 +63,24 @@ test('2. de boarding pass aan de deur: elke partner checkt de code van de gast',
   await api(base, '/api/onboarding/paspoort', { nummer: 'NX1234567', vervaldatum: '2032-01-01',
     nationaliteit: 'Nederlandse', geboortedatum: '1990-01-01' }, lidA);
   const bk = await api(base, '/api/member/vluchten/boek', { id: open.id }, lidA);
-  // voor het inchecken is de pass nog niet geldig
-  const teVroeg = await api(base, '/api/supplier/lucht/pass', { code: bk.body.boeking.code }, zaak);
+  // Test 1 zette de zaak uit: zonder expliciete luchtzijde-toestemming blijft
+  // de consumerroute dicht, ook met een geldige suppliersessie.
+  assert.equal((await api(base, '/api/supplier/lucht/pass', { code: bk.body.boeking.id }, zaak)).status, 403);
+  assert.equal((await api(base, '/api/supplier/settings', { luchtzijde: true }, zaak)).status, 200);
+  // Een openbaar boekings-id is ook na toestemming geen boarding pass.
+  const teVroeg = await api(base, '/api/supplier/lucht/pass', { code: bk.body.boeking.id }, zaak);
   assert.equal(teVroeg.body.geldig, false);
-  assert.match(teVroeg.body.reden, /niet ingecheckt/i);
-  const inc = await api(base, '/api/member/vluchten/incheck', { code: bk.body.boeking.code }, lidA);
-  const r = await api(base, '/api/supplier/lucht/pass', { code: bk.body.boeking.code }, zaak);
+  const inc = await api(base, '/api/member/vluchten/incheck', { id: bk.body.boeking.id }, lidA);
+  const r = await api(base, '/api/supplier/lucht/pass', { code: inc.body.pass.code }, zaak);
   assert.equal(r.status, 200);
   assert.equal(r.body.geldig, true);
   assert.equal(r.body.pass.vlucht, 'RT205');
   assert.equal(r.body.pass.stoel, inc.body.pass.stoel);
   // onzin blijft buiten
-  assert.equal((await api(base, '/api/supplier/lucht/pass', { code: 'VL-NIETS' }, zaak)).body.geldig, false);
+  assert.equal((await api(base, '/api/supplier/lucht/pass', { code: 'BP.NIETS' }, zaak)).body.geldig, false);
+  await api(base, '/api/supplier/settings', { luchtzijde: false }, zaak);
+  assert.equal((await api(base, '/api/supplier/lucht/pass', { code: inc.body.pass.code }, zaak)).status, 403,
+    'toestemming intrekken sluit de consumerroute direct');
   assert.equal((await api(base, '/api/supplier/lucht/pass', { code: 'x' }, null)).status, 401);
 });
 

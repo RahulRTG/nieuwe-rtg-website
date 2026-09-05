@@ -96,7 +96,8 @@ module.exports = (kern) => {
      betekenen dat "ik vertrouw dit toestel niet meer" een naamplaatje weghaalt
      terwijl de sessie erop gewoon doorwerkt -- en dat is precies het toestel
      dat iemand kwijt is. */
-  app.post('/api/mijn/toestel/introk', auth, (req, res) => {
+  app.post('/api/mijn/toestel/introk', auth, async (req, res, next) => {
+    try {
     if (!eisLid(req, res)) return;
     if (!toestellen) return res.status(503).json({ error: 'Toestelbinding is hier niet beschikbaar.' });
     const tid = String(req.body.toestelId || '');
@@ -105,12 +106,14 @@ module.exports = (kern) => {
     const gesloten = [];
     for (const s of (sessieregister ? sessieregister.vanLid(req.session.key) : [])) {
       if (s.toestelId !== tid || s.sid === req.session.sid) continue;
-      accounts.trekInSessie(s.sid, klok.nu() + TOKEN_MAX_MS);
+      await accounts.trekInSessie(s.sid, klok.nu() + TOKEN_MAX_MS);
       sessieregister.sluit(s.sid);
       gesloten.push(s.sid);
     }
+    if (accounts.wachtIntrekkingen) await accounts.wachtIntrekkingen();
     spoor(req, 'toestel-ingetrokken', { toestelId: tid, sessies: gesloten.length });
     res.json({ ok: true, toestelId: tid, sessiesGesloten: gesloten.length,
       nietGeraakt: 'Deze sessie blijft open, zodat u zichzelf niet buitensluit. De sleutel op dit toestel wordt in de browser gewist.' });
+    } catch (e) { next(e); }
   });
 };

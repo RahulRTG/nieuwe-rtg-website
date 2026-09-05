@@ -42,6 +42,7 @@
 
    Draai:
      node scripts/herkomst.js --nieuwe-sleutel
+     node scripts/herkomst.js --sleutelcontrole
      node scripts/herkomst.js --sbom --image=ghcr.io/org/app:v1 --uit=.release/sbom.json
      node scripts/herkomst.js --binden --image=ghcr.io/org/app:v1 --digest=sha256:... \
           --sbom=.release/sbom.json --uit=.release/herkomst.json
@@ -59,6 +60,12 @@ const WORTEL = path.join(__dirname, '..');
 const SLEUTELBESTAND = path.join(WORTEL, 'deploy', 'release-sleutel.pub');
 const STANDAARD_SBOM = '.release/sbom.json';
 const STANDAARD_HERKOMST = '.release/herkomst.json';
+const UITVOER_BESTANDEN = Object.freeze({
+  unit: '.release/ci-suite.json',
+  schermen: '.release/ci-schermsuite-bewijs.json',
+  pg: '.release/ci-pg-bewijs.json',
+  bron: '.release/bron-release-bewijs.json'
+});
 
 /* ---------------------------------------------------------------------------
    LEZERS. Elk van deze drie krijgt tekst en geeft gegevens; ze doen geen I/O,
@@ -76,6 +83,18 @@ function leesDpkg(tekst) {
     const [naam, versie, arch] = regel.split('\t');
     if (!naam || !versie) continue;
     uit.push({ naam: naam.trim(), versie: versie.trim(), arch: (arch || '').trim() || 'unknown' });
+  }
+  return uit.sort((a, b) => (a.naam + a.versie).localeCompare(b.naam + b.versie));
+}
+
+/* Alpine-images (onder meer de herstelcontainer) hebben geen dpkg. `apk info
+   -v` eindigt iedere regel met -<versie>; we splitsen op de laatste scheiding
+   die door een cijfer wordt gevolgd en markeren het ecosysteem voor de purl. */
+function leesApk(tekst) {
+  const uit = [];
+  for (const regel of String(tekst || '').split('\n')) {
+    const m = regel.trim().match(/^(.+)-(\d[^\s]*)$/);
+    if (m) uit.push({ naam:m[1], versie:m[2], arch:'unknown', apk:true });
   }
   return uit.sort((a, b) => (a.naam + a.versie).localeCompare(b.naam + b.versie));
 }
@@ -137,7 +156,9 @@ function maakSbom({ app, image, os, crates, npm, node, bewijs, gemaakt, serie })
 
   for (const p of os || []) voeg({
     type: 'library', name: p.naam, version: p.versie,
-    purl: 'pkg:deb/debian/' + p.naam + '@' + encodeURIComponent(p.versie) + '?arch=' + p.arch,
+    purl: p.apk
+      ? 'pkg:apk/alpine/' + p.naam + '@' + encodeURIComponent(p.versie)
+      : 'pkg:deb/debian/' + p.naam + '@' + encodeURIComponent(p.versie) + '?arch=' + p.arch,
     scope: 'required'
   });
 
@@ -214,6 +235,18 @@ function canoniek(waarde) {
 
 const sha256 = (data) => crypto.createHash('sha256').update(data).digest('hex');
 
+function uitvoeringHashes(root = WORTEL) {
+  const uit = {};
+  for (const [naam, rel] of Object.entries(UITVOER_BESTANDEN)) {
+    const pad = path.resolve(root, rel);
+    let bytes;
+    try { bytes = fs.readFileSync(pad); }
+    catch (e) { throw new Error('Verplicht bevroren CI-bewijs ontbreekt: ' + rel + '.'); }
+    uit[naam] = { pad:rel, sha256:sha256(bytes), bytes:bytes.length };
+  }
+  return uit;
+}
+
 function nieuweSleutel() {
   const { publicKey, privateKey } = crypto.generateKeyPairSync('ed25519');
   return {
@@ -244,14 +277,30 @@ function controleerHandtekening(document, handtekening, publiekPem) {
   delete zonder.handtekening;
   const bytes = Buffer.from(canoniek(zonder), 'utf8');
   try {
-    return crypto.verify(null, bytes, crypto.createPublicKey(publiekPem), Buffer.from(handtekening, 'base64'));
+    const sleutel = crypto.createPublicKey(publiekPem);
+    if (sleutel.asymmetricKeyType !== 'ed25519' ||
+        !/^[A-Za-z0-9+/]{86}==$/.test(String(handtekening || ''))) return false;
+    const sig = Buffer.from(handtekening, 'base64');
+    return sig.length === 64 && crypto.verify(null, bytes, sleutel, sig);
+  } catch (e) { return false; }
+}
+
+/* Controleer vóór publicatie dat het CI-geheim werkelijk bij het vastgelegde
+   vertrouwensanker hoort. Achteraf afkeuren is te laat: het image staat dan al
+   in de registry. Een vaste, niet-geheime proeftekst is voldoende; alleen het
+   bezit van de privésleutel moet hier worden bewezen. */
+function sleutelpaarKlopt(priveSleutel, publiekPem) {
+  try {
+    const proef = Buffer.from('rtg-release-sleutelproef-v1', 'utf8');
+    const handtekening = crypto.sign(null, proef, priveSleutel);
+    return crypto.verify(null, proef, crypto.createPublicKey(publiekPem), handtekening);
   } catch (e) { return false; }
 }
 
 /* ---------------------------------------------------------------------------
    HET HERKOMSTDOCUMENT.
    ------------------------------------------------------------------------- */
-function maakHerkomst({ image, digest, sbomBytes, sbomComponenten, bewijs, bron, bouw, gemaakt }) {
+function maakHerkomst({ image, digest, sbomBytes, sbomComponenten, bewijs, bron, bouw, uitvoering, gemaakt }) {
   return {
     formaat: 'rtg-herkomst-v1',
     gemaakt,
@@ -259,6 +308,7 @@ function maakHerkomst({ image, digest, sbomBytes, sbomComponenten, bewijs, bron,
     sbom: { sha256: sha256(sbomBytes), componenten: sbomComponenten, formaat: 'CycloneDX-1.5' },
     releasebewijs: bewijs ? { inhoudSha256: bewijs.inhoudSha256 || null, bestandAantal: bewijs.bestandAantal || null } : null,
     bron: bron || null,
+    uitvoering: uitvoering || null,
     bouw: bouw || null
   };
 }
@@ -269,6 +319,8 @@ function controleerHerkomst({ document, sbomBytes, publiekPem, draait }) {
 
   if (!document.handtekening || !document.handtekening.waarde) {
     klachten.push('Er staat geen handtekening onder dit document.');
+  } else if (document.handtekening.algoritme !== 'ed25519') {
+    klachten.push('Het herkomstdocument gebruikt niet de verplichte Ed25519-handtekening.');
   } else if (!publiekPem) {
     klachten.push('Er is geen vastgelegde publieke sleutel (deploy/release-sleutel.pub); een handtekening zonder bekende sleutel bewijst niets.');
   } else if (!controleerHandtekening(document, document.handtekening.waarde, publiekPem)) {
@@ -294,6 +346,46 @@ function controleerHerkomst({ document, sbomBytes, publiekPem, draait }) {
   return { ok: klachten.length === 0, klachten };
 }
 
+/* De productiekandidaat gebruikt de strenge vorm: een geldige handtekening
+   alleen is niet genoeg. Het document moet exact de gevraagde CI-build,
+   registrydigest, schone commit, volledige image-SBOM en release-inhoud binden. */
+function controleerKandidaatHerkomst({ document, sbomBytes, publiekPem, draait,
+  commit, image, bewijsInhoudSha256, uitvoering }) {
+  const basis = controleerHerkomst({ document, sbomBytes, publiekPem, draait });
+  const klachten = [...basis.klachten];
+  let sbom = null;
+  try { sbom = JSON.parse(Buffer.from(sbomBytes || '').toString('utf8')); }
+  catch (e) { klachten.push('De verplichte image-SBOM ontbreekt of is onleesbaar.'); }
+  const volledig = sbom && (((sbom.metadata || {}).properties) || [])
+    .some(p => p && p.name === 'rtg:volledigheid' && p.value === 'image');
+  if (!volledig || !Array.isArray(sbom && sbom.components) || !sbom.components.length)
+    klachten.push('De SBOM is geen volledige inventaris uit het gebouwde image.');
+  if (!document || !document.image || !/^sha256:[a-f0-9]{64}$/.test(String(document.image.digest || '')))
+    klachten.push('Het herkomstdocument heeft geen immutable registrydigest.');
+  if (String((document.image || {}).verwijzing || '') !== String(image || ''))
+    klachten.push('Het herkomstdocument hoort bij een andere imagereferentie.');
+  if (!document.bron || document.bron.commit !== commit || document.bron.werkboomSchoon !== true)
+    klachten.push('Het image is niet aan exact deze schone releasecommit gebonden.');
+  if (!document.bouw || document.bouw.draaier !== 'github-actions' ||
+      !document.bouw.workflow || !document.bouw.run)
+    klachten.push('De kandidaat heeft geen geautoriseerde CI-bouwherkomst.');
+  if (!/^[a-f0-9]{64}$/.test(String(bewijsInhoudSha256 || '')) ||
+      !document.releasebewijs || document.releasebewijs.inhoudSha256 !== bewijsInhoudSha256)
+    klachten.push('De kandidaat-SBOM bindt niet het exacte runtime-inhoudsbewijs.');
+  if (sbom && document.sbom && document.sbom.componenten !== sbom.components.length)
+    klachten.push('De getekende SBOM-telling wijkt af van de gemounte stuklijst.');
+  const namen = Object.keys(UITVOER_BESTANDEN).sort();
+  const vast = document && document.uitvoering;
+  if (!vast || JSON.stringify(Object.keys(vast).sort()) !== JSON.stringify(namen) ||
+      namen.some(naam => !vast[naam] || vast[naam].pad !== UITVOER_BESTANDEN[naam] ||
+        !/^[a-f0-9]{64}$/.test(String(vast[naam].sha256 || '')) ||
+        !Number.isSafeInteger(vast[naam].bytes) || vast[naam].bytes <= 0))
+    klachten.push('De signed provenance bindt niet alle bevroren CI-uitvoeringsbewijzen.');
+  if (uitvoering && JSON.stringify(vast) !== JSON.stringify(uitvoering))
+    klachten.push('Een CI-uitvoeringsbewijs wijkt af van de signed provenance.');
+  return { ok:klachten.length === 0, klachten };
+}
+
 /* ---------------------------------------------------------------------------
    HET GEREEDSCHAP ERBUITEN: git, docker, bestanden.
    ------------------------------------------------------------------------- */
@@ -307,10 +399,15 @@ function gitInfo() {
   const commit = commando('git', ['-C', WORTEL, 'rev-parse', 'HEAD']);
   if (!commit) return null;
   const status = commando('git', ['-C', WORTEL, 'status', '--porcelain']);
+  const onbekend = String(status || '').split(/\r?\n/).filter(Boolean)
+    .filter(regel => regel.slice(3) !== 'SUITE.json' || regel.slice(3).includes(' -> '));
   return {
     commit,
+    boom: commando('git', ['-C', WORTEL, 'rev-parse', 'HEAD^{tree}']) || null,
     tag: commando('git', ['-C', WORTEL, 'describe', '--tags', '--exact-match']) || null,
-    werkboomSchoon: status === ''
+    /* SUITE.json is de apart gepinde, getrackte testuitvoer en geen
+       image-invoer. Iedere andere afwijking blijft een onzuivere bouw. */
+    werkboomSchoon: onbekend.length === 0
   };
 }
 
@@ -321,7 +418,10 @@ function pakkettenUitImage(image) {
   if (!image) return null;
   const uit = commando('docker', ['run', '--rm', '--entrypoint', 'dpkg-query', image,
     '-W', '-f=${Package}\t${Version}\t${Architecture}\n'], { timeout: 180000 });
-  return uit ? leesDpkg(uit) : null;
+  if (uit) return leesDpkg(uit);
+  const apk = commando('docker', ['run', '--rm', '--entrypoint', 'apk', image,
+    'info', '-v'], { timeout: 180000 });
+  return apk ? leesApk(apk) : null;
 }
 
 function argument(naam, argv) {
@@ -360,6 +460,17 @@ function doeNieuweSleutel() {
     schrijf('deploy/release-sleutel.pub', sleutel.publiek);
     console.log('Geschreven: deploy/release-sleutel.pub -- commit dit bestand.');
   }
+}
+
+function doeSleutelcontrole() {
+  if (!fs.existsSync(SLEUTELBESTAND))
+    throw new Error('deploy/release-sleutel.pub ontbreekt; publicatie zonder vastgelegd vertrouwensanker is verboden.');
+  const prive = priveUitOmgeving();
+  if (!prive) throw new Error('RTG_RELEASE_SIGN_KEY ontbreekt; een ongetekend image mag niet worden gepubliceerd.');
+  const publiek = fs.readFileSync(SLEUTELBESTAND, 'utf8');
+  if (!sleutelpaarKlopt(prive, publiek))
+    throw new Error('RTG_RELEASE_SIGN_KEY hoort niet bij deploy/release-sleutel.pub.');
+  console.log('Release-ondertekening gereed: privésleutel en vastgelegd vertrouwensanker horen bij elkaar.');
 }
 
 function doeSbom() {
@@ -418,6 +529,7 @@ function doeBinden() {
     sbomComponenten: (sbom.components || []).length,
     bewijs: leesJson(argument('bewijs') || '.release/release-bewijs.json'),
     bron: gitInfo(),
+    uitvoering: uitvoeringHashes(),
     bouw: {
       node: process.version,
       workflow: process.env.GITHUB_WORKFLOW || null,
@@ -457,7 +569,12 @@ function doeControle() {
   try { sbomBytes = fs.readFileSync(path.resolve(WORTEL, sbomPad)); } catch (e) { /* zonder stuklijst toetsen we alleen de handtekening */ }
 
   const publiekPem = fs.existsSync(SLEUTELBESTAND) ? fs.readFileSync(SLEUTELBESTAND, 'utf8') : null;
-  const r = controleerHerkomst({ document, sbomBytes, publiekPem, draait: argument('draait') });
+  const streng = process.argv.includes('--eis-kandidaat');
+  const r = streng
+    ? controleerKandidaatHerkomst({ document, sbomBytes, publiekPem,
+      draait:argument('draait'), commit:argument('commit'), image:argument('image'),
+      bewijsInhoudSha256:argument('bewijs-inhoud'), uitvoering:uitvoeringHashes() })
+    : controleerHerkomst({ document, sbomBytes, publiekPem, draait: argument('draait') });
 
   if (!sbomBytes) console.log('LET OP: de stuklijst zelf is niet meegelezen (' + sbomPad + ' ontbreekt); alleen de handtekening is getoetst.');
   if (!r.ok) {
@@ -473,10 +590,11 @@ function doeControle() {
 
 function hoofd() {
   if (process.argv.includes('--nieuwe-sleutel')) return doeNieuweSleutel();
+  if (process.argv.includes('--sleutelcontrole')) return doeSleutelcontrole();
   if (process.argv.includes('--sbom')) return doeSbom();
   if (process.argv.includes('--binden')) return doeBinden();
   if (process.argv.includes('--controle')) return doeControle();
-  console.log('Gebruik: --nieuwe-sleutel | --sbom | --binden | --controle (zie de kop van dit bestand).');
+  console.log('Gebruik: --nieuwe-sleutel | --sleutelcontrole | --sbom | --binden | --controle (zie de kop van dit bestand).');
   process.exitCode = 1;
 }
 
@@ -485,6 +603,7 @@ if (require.main === module) {
 }
 
 module.exports = {
-  leesDpkg, leesCargoLock, leesNpmLock, maakSbom, canoniek, sha256,
-  nieuweSleutel, teken, controleerHandtekening, maakHerkomst, controleerHerkomst
+  leesDpkg, leesApk, leesCargoLock, leesNpmLock, maakSbom, canoniek, sha256,
+  nieuweSleutel, teken, controleerHandtekening, sleutelpaarKlopt, maakHerkomst,
+  controleerHerkomst, controleerKandidaatHerkomst, UITVOER_BESTANDEN, uitvoeringHashes
 };

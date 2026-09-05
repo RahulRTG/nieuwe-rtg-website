@@ -52,6 +52,7 @@ function maakSessieregister({ db, save }) {
   const eigen = require('../eigencollectie')({ db, domein: 'kern/identiteit',
     bezit: { sessiecontext: 'kaart' } });
   const bak = () => eigen.bak('sessiecontext');
+  const kijk = () => eigen.kijk('sessiecontext');
 
   const geldigeSid = (s) => typeof s === 'string' && /^[A-Za-z0-9_-]{12}$/.test(s);
 
@@ -78,8 +79,9 @@ function maakSessieregister({ db, save }) {
      zou niemand zien dat het bewijs is verdwenen. Degraderen is nooit stil
      (PROOF.md par. 9); wie echt wil verzwakken, sluit de sessie. */
   function vul(sid, ruweContext) {
-    const rij = bak()[sid];
-    if (!geldigeSid(sid) || !rij) return { ok: false, reden: 'onbekende sessie' };
+    if (!geldigeSid(sid)) return { ok: false, reden: 'onbekende sessie' };
+    const rij = kijk()[sid];
+    if (!rij) return { ok: false, reden: 'onbekende sessie' };
     const { context, geweigerd } = ctx.bouw(ruweContext || {});
     const afgewezen = [];
     for (const [naam, claim] of Object.entries(context)) {
@@ -98,7 +100,7 @@ function maakSessieregister({ db, save }) {
 
   function lees(sid) {
     if (!geldigeSid(sid)) return null;
-    const rij = bak()[sid];
+    const rij = kijk()[sid];
     if (!rij) return null;
     if (klok.nu() - new Date(rij.gezienOp || 0).getTime() > REGISTER_TTL_MS) { sluit(sid); return null; }
     return rij;
@@ -108,7 +110,8 @@ function maakSessieregister({ db, save }) {
      hoogstens eens per uur wegschrijven. Anders schrijft elk verzoek de hele
      snapshot opnieuw. */
   function raak(sid) {
-    const rij = bak()[sid];
+    if (!geldigeSid(sid)) return false;
+    const rij = kijk()[sid];
     if (!rij) return false;
     if (klok.nu() - new Date(rij.gezienOp || 0).getTime() < 3600 * 1000) return false;
     rij.gezienOp = klok.datum().toISOString();
@@ -117,8 +120,10 @@ function maakSessieregister({ db, save }) {
   }
 
   function sluit(sid) {
-    if (!geldigeSid(sid) || !bak()[sid]) return false;
-    delete bak()[sid];
+    if (!geldigeSid(sid)) return false;
+    const huidig = kijk();
+    if (!huidig[sid]) return false;
+    delete huidig[sid];
     save();
     return true;
   }
@@ -127,7 +132,7 @@ function maakSessieregister({ db, save }) {
      ./sessielijst.js -- een projectie is geen opslag, en dit bestand bezit de
      collectie. Hij krijgt `bak` als functie en niet als object, zodat hij
      altijd de huidige stand leest. */
-  const { vanLid } = require('./sessielijst').maakSessielijst({ bak, ttlMs: REGISTER_TTL_MS });
+  const { vanLid } = require('./sessielijst').maakSessielijst({ bak: kijk, ttlMs: REGISTER_TTL_MS });
 
   /* Vangnet per lid. Zonder grens groeit het register door met elke inlog op
      elk toestel; met een grens verdwijnt de OUDSTE en nooit de zojuist geopende. */
@@ -161,8 +166,9 @@ function maakSessieregister({ db, save }) {
   function wisLid(lidKey) {
     if (!lidKey) return 0;
     let weg = 0;
-    for (const [sid, rij] of Object.entries(bak())) {
-      if (rij && rij.lidKey === lidKey) { delete bak()[sid]; weg += 1; }
+    const huidig = kijk();
+    for (const [sid, rij] of Object.entries(huidig)) {
+      if (rij && rij.lidKey === lidKey) { delete huidig[sid]; weg += 1; }
     }
     if (weg) save();
     return weg;

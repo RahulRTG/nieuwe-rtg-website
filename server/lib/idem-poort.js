@@ -85,7 +85,9 @@
 'use strict';
 
 const crypto = require('crypto');
+const verzoekcontext = require('../db/verzoekcontext');
 const { VENSTER_MS } = require('./idemsleutels');
+const { isEenmalig } = require('./eenmalig-geheim-routes');
 /* De bewaarkast staat apart: dat is een gegevensstructuur (ring, vervaltijd,
    wat er wel en niet in mag) zonder een enkel begrip uit het web erin. Wat
    HIER staat is het http-deel: welke sleutel geldt, wie de afzender is, en wat
@@ -112,6 +114,7 @@ function maakIdemPoort(opties) {
 
   function middleware(req, res, next) {
     if (req.method !== 'POST' && req.method !== 'PUT' && req.method !== 'PATCH') return next();
+    if (isEenmalig(req.method, req.path)) return next();
     /* Twee bronnen, en de header wint. Stuurt een client een eigen sleutel, dan
        is dat een bewuste opdracht met een lang venster; de verklaring is de
        vangnet-vorm met het korte dubbeltikvenster. */
@@ -157,8 +160,11 @@ function maakIdemPoort(opties) {
       /* De kast beslist zelf of dit bewaard mag worden (alleen een geslaagd
          antwoord) en snoeit meteen daarna. Levert hij false, dan is er niets
          onthouden en mag een volgende poging het werk echt opnieuw doen. */
-      if (kast.zet(id, { status, lijf, afdruk }, vensterMs)) rond({ status, lijf });
-      else rond(null);
+      const bewaar = () => {
+        if (kast.zet(id, { status, lijf, afdruk }, vensterMs)) rond({ status, lijf });
+        else rond(null);
+      };
+      if (!verzoekcontext.haakNaCommit(bewaar)) bewaar();
       return echteJson(lijf);
     };
     /* Een verzoek dat nooit bij res.json komt (crash, stream, afgebroken

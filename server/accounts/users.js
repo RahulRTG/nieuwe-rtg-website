@@ -50,7 +50,7 @@ function schrijfUser({ email, username, tier, realName, phone }, passwordHash) {
     const info = S.zin(`INSERT INTO users (${kolommen}) VALUES (${vals.map(() => '?').join(', ')})`).run(...vals);
     newId = info.lastInsertRowid;
   }
-  require('./onderhoud').herzegel(S.db, newId); // id is nu bekend: kolommen eraan binden
+  require('./onderhoud').herzegel(S.huidigeDb(), newId); // id is nu bekend: kolommen eraan binden
   mirror.markUser(newId);
   return getUserById(newId);
 }
@@ -260,8 +260,8 @@ const { realNameOf, emailOf, phoneOf } = gebonden; // lezen zit bij de binding
 /* De staatloze tokens, de e-mailbevestiging en het wachtwoord-herstel staan
    in ./tokens.js; ze krijgen getUserById mee en verhuizen mee in de export,
    zodat aanroepers niets merken. */
-const { issueToken, verifyToken, apparaatVanToken, sessieVan, trekIn, trekInActie, isIngetrokken, trekInSessie, sessieIngetrokken, issueActionToken, verifyActionToken,
-  setEmailVerified, createReset, findByReset, setPassword } = require('./tokens').maakTokens(getUserById);
+const { issueToken, verifyToken, apparaatVanToken, sessieVan, trekIn, trekInActie, isIngetrokken, trekInSessie, sessieIngetrokken, wachtIntrekkingen, issueActionToken, verifyActionToken,
+  setEmailVerified, createReset, findByReset, consumeReset, setPassword } = require('./tokens').maakTokens(getUserById);
 
 /* Openbaar profiel voor de client (nooit de wachtwoord-hash of ruwe kluis). */
 function publicUser(u) {
@@ -295,7 +295,7 @@ module.exports = {
   findByPublicMail, reservePublicMail,
   renameUser, setTier, zetActief, isActief, realNameOf, emailOf, phoneOf, setPhone, setEmail,
   zetSessiegrens,
-  issueToken, verifyToken, apparaatVanToken, sessieVan, trekIn, trekInActie, isIngetrokken, trekInSessie, sessieIngetrokken, issueActionToken, verifyActionToken,
-  setEmailVerified, createReset, findByReset, setPassword, setPasswordSync, setPasswordZaai, vernieuwWachtwoordHash,
+  issueToken, verifyToken, apparaatVanToken, sessieVan, trekIn, trekInActie, isIngetrokken, trekInSessie, sessieIngetrokken, wachtIntrekkingen, issueActionToken, verifyActionToken,
+  setEmailVerified, createReset, findByReset, consumeReset, setPassword, setPasswordSync, setPasswordZaai, vernieuwWachtwoordHash,
   getMemberState, saveMemberState, setVerification, listByVerification, conversations, ledenRegisterRijen, deleteUser
 };

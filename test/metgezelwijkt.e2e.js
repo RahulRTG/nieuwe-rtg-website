@@ -29,6 +29,19 @@ const rahulStaat = () => {
   return tab.hidden || !tab.getClientRects().length ? 'weg' : 'zichtbaar';
 };
 
+const edgeStaat = () => {
+  const balk = document.querySelector('.rtg-edge-bottom');
+  if (!balk) return { roots: 0, balk: 'geen', venster: false };
+  const stijl = getComputedStyle(balk), r = balk.getBoundingClientRect();
+  const zichtbaar = stijl.display !== 'none' && stijl.visibility !== 'hidden' &&
+    stijl.pointerEvents !== 'none' && r.width > 0 && r.height > 0 && r.top < window.innerHeight;
+  return {
+    roots: document.querySelectorAll('.rtg-edge-chrome').length,
+    balk: zichtbaar ? 'zichtbaar' : 'weg',
+    venster: document.body.hasAttribute('data-rtg-edge-venster-open')
+  };
+};
+
 test('de metgezel wijkt voor een venster en komt daarna terug',
   { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-mgzwijkt-'));
@@ -60,7 +73,15 @@ test('de metgezel wijkt voor een venster en komt daarna terug',
        met zijn sluitknop precies op de plek van de balk. */
     await page.goto(base + '/apps/clips.html', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => !!document.querySelector('.rtg-rahul-tab'), null, { timeout: 20000 });
+    await page.waitForFunction(() => document.body.getAttribute('data-rtg-edge-2-rendered') === 'true',
+      null, { timeout: 20000 });
     assert.equal(await page.evaluate(rahulStaat), 'zichtbaar', 'in rust is de centrale Rahul-tab bereikbaar');
+    assert.deepEqual(await page.evaluate(edgeStaat), { roots: 1, balk: 'zichtbaar', venster: false },
+      'in rust staat exact het ene Edge-casco klaar');
+    assert.equal(await page.locator('.rtg-edge-action button').textContent(), 'Maak een clip',
+      'de ene onderrand neemt de hoofdhandeling van Clips over');
+    assert.equal(await page.locator('#studioOpen').isVisible(), false,
+      'de oude vaste duimstrook staat niet als tweede balk in beeld');
 
     /* De enterprise-workspace wordt bewust als kleine vervolgmodule geladen.
        Bewaak dat die opsplitsing niet alleen compileert, maar ook echt landt
@@ -106,17 +127,23 @@ test('de metgezel wijkt voor een venster en komt daarna terug',
     assert.equal(await page.evaluate(rahulStaat), 'zichtbaar', 'na de workspace blijft de tab bereikbaar');
 
     // het blad openen zoals een lid dat doet
-    await page.click('#studioOpen');
+    await page.click('.rtg-edge-action button');
     await page.waitForSelector('#studio.open', { timeout: 5000 });
     await page.waitForFunction(() => document.querySelector('.rtg-rahul-tab').hidden, null, { timeout: 5000 });
+    await page.waitForFunction(() => document.body.hasAttribute('data-rtg-edge-venster-open'), null, { timeout: 5000 });
     assert.equal(await page.evaluate(rahulStaat), 'weg', 'het geopende venster krijgt voorrang op Rahul');
+    assert.deepEqual(await page.evaluate(edgeStaat), { roots: 1, balk: 'weg', venster: true },
+      'dezelfde Edge wijkt tijdelijk voor het venster');
 
     /* En de knop die hier het hele geval aanwees: zonder de reparatie zit hij
        onder de balk en meldt Playwright "intercepts pointer events". */
     await page.click('#studioDicht', { timeout: 10000 });
     await page.waitForFunction(() => !document.querySelector('#studio').classList.contains('open'), null, { timeout: 5000 });
     await page.waitForFunction(() => !document.querySelector('.rtg-rahul-tab').hidden, null, { timeout: 5000 });
+    await page.waitForFunction(() => !document.body.hasAttribute('data-rtg-edge-venster-open'), null, { timeout: 5000 });
     assert.equal(await page.evaluate(rahulStaat), 'zichtbaar', 'en daarna is Rahul direct weer bereikbaar');
+    assert.deepEqual(await page.evaluate(edgeStaat), { roots: 1, balk: 'zichtbaar', venster: false },
+      'na sluiten komt dezelfde Edge terug');
 
     /* Twee keer achter elkaar, want een wijk-regel die maar een keer werkt is
        net zo goed stuk -- en dan via een ANDER blad, zodat het niet aan dat
@@ -125,11 +152,27 @@ test('de metgezel wijkt voor een venster en komt daarna terug',
     await page.locator('.clip .laag .knop', { hasText: 'Bewerken' }).first().click();
     await page.waitForSelector('#knipSheet.open', { timeout: 5000 });
     await page.waitForFunction(() => document.querySelector('.rtg-rahul-tab').hidden, null, { timeout: 5000 });
+    await page.waitForFunction(() => document.body.hasAttribute('data-rtg-edge-venster-open'), null, { timeout: 5000 });
     assert.equal(await page.evaluate(rahulStaat), 'weg', 'ook het tweede venster krijgt voorrang');
     await page.click('#knipDicht');
     await page.waitForFunction(() => !document.querySelector('#knipSheet').classList.contains('open'), null, { timeout: 5000 });
     await page.waitForFunction(() => !document.querySelector('.rtg-rahul-tab').hidden, null, { timeout: 5000 });
+    await page.waitForFunction(() => !document.body.hasAttribute('data-rtg-edge-venster-open'), null, { timeout: 5000 });
     assert.equal(await page.evaluate(rahulStaat), 'zichtbaar', 'en hij blijft terugkomen');
+
+    /* Dezelfde prioriteit op telefoonmaat. Alleen de afmetingen veranderen;
+       er mag geen tweede mobiele balk worden gebouwd. */
+    await page.setViewportSize({ width: 390, height: 844 });
+    assert.equal(await page.locator('#studioOpen').isVisible(), false,
+      'ook mobiel staat de oude duimstrook niet naast de Edge-onderrand');
+    await page.click('.rtg-edge-action button');
+    await page.waitForFunction(() => document.body.hasAttribute('data-rtg-edge-venster-open'), null, { timeout: 5000 });
+    assert.deepEqual(await page.evaluate(edgeStaat), { roots: 1, balk: 'weg', venster: true },
+      'ook mobiel wijkt het ene Edge-casco voor een venster');
+    await page.click('#studioDicht');
+    await page.waitForFunction(() => !document.body.hasAttribute('data-rtg-edge-venster-open'), null, { timeout: 5000 });
+    assert.deepEqual(await page.evaluate(edgeStaat), { roots: 1, balk: 'zichtbaar', venster: false },
+      'ook mobiel keert exact dezelfde onderrand terug');
 
     assert.deepEqual(fouten, [], 'geen fout op de pagina');
   } finally {

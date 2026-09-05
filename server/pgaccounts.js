@@ -30,6 +30,8 @@ const USER_COLS = ['id', 'email_hash', 'username', 'password_hash', 'tier', 'cod
 // koppeling kwijt zodra een volgende app-instance het verzoek afhandelde.
 const STAFF_COLS = ['id', 'supplier_code', 'name', 'pin_hash', 'role', 'active', 'created_at', 'func',
   'member_id', 'member_tier'];
+const GETAL_USER = new Set(['id', 'reset_expires', 'email_verified', 'actief', 'sessies_vanaf']);
+const GETAL_STAFF = new Set(['id', 'active', 'member_id']);
 
 /* KOLOMMEN DIE GEEN NULL VERDRAGEN, met de waarde die de tabel zelf zou hebben
    ingevuld. Een rij die zo'n kolom niet noemt, komt hier binnen als undefined,
@@ -45,12 +47,18 @@ const waarde = (row, c) => (row[c] === undefined || row[c] === null
   ? (c in NIET_NULL ? NIET_NULL[c] : null)
   : row[c]);
 
-function maakPgAccounts({ url, log }) {
+function maakPgAccounts({ url, log, onFout }) {
   const { Pool } = require('./pgwire');
   const pool = new Pool({ connectionString: url, max: Number(process.env.PG_POOL_MAX || 10) });
+  pool.on('error', e => {
+    if (log) log.warn('pgaccounts-pool', { fout: e.message });
+    if (typeof onFout === 'function') onFout(e, 'pool');
+  });
+  const intrekkingen = require('./pgaccounts-intrekking')(pool);
   let luisterClient = null;
 
   async function schema() {
+    await intrekkingen.schema();
     await pool.query(`CREATE TABLE IF NOT EXISTS users (
       id BIGINT PRIMARY KEY,
       email_hash TEXT UNIQUE, username TEXT UNIQUE, password_hash TEXT NOT NULL,
@@ -77,6 +85,9 @@ function maakPgAccounts({ url, log }) {
     await pool.query('CREATE UNIQUE INDEX IF NOT EXISTS idx_users_public_mail_hash ON users(public_mail_hash) WHERE public_mail_hash IS NOT NULL');
     await pool.query(`CREATE INDEX IF NOT EXISTS idx_staff_code ON supplier_staff(supplier_code)`);
     await pool.query(`CREATE INDEX IF NOT EXISTS idx_staff_member ON supplier_staff(member_id)`);
+    await pool.query(`CREATE UNIQUE INDEX IF NOT EXISTS idx_staff_actief_lid
+      ON supplier_staff(supplier_code, member_id)
+      WHERE active = 1 AND member_id IS NOT NULL`);
     await pool.query(`CREATE SEQUENCE IF NOT EXISTS rtg_id_seq INCREMENT BY ${BLOK} START ${BLOK_START} MINVALUE ${BLOK_START}`);
   }
 
@@ -138,13 +149,82 @@ function maakPgAccounts({ url, log }) {
     await pool.query('DELETE FROM users WHERE id = $1', [id]);
     await pool.query('SELECT pg_notify($1, $2)', [KANAAL, 'user:' + id + ':' + BRON]);
   }
+
+  /* ACCOUNTWIJZIGINGEN IN DE GEWONE REQUESTTRANSACTIE.
+
+     De client wordt door pg/verzoektransactie.js aangeleverd en heeft daar al
+     BEGIN gedaan. Daardoor zijn een accountmutatie en eventuele gewone
+     kv-collecties uit hetzelfde HTTP-verzoek één commit. De SQLite-rijen in
+     `basis` zijn uitsluitend de request-snapshot. Een exacte vergelijking na
+     FOR UPDATE is onze CAS: een resetcode, sessiegrens of staffbinding die een
+     andere instance intussen veranderde kan nooit door een oude request worden
+     teruggezet. */
+  const normaliseer = (rij, cols, getallen) => {
+    if (!rij) return null;
+    return cols.map(c => {
+      let v = waarde(rij, c);
+      if (v == null) return null;
+      if (getallen.has(c)) return Number(v);
+      return String(v);
+    });
+  };
+  const gelijk = (a, b, cols, getallen) =>
+    JSON.stringify(normaliseer(a, cols, getallen)) === JSON.stringify(normaliseer(b, cols, getallen));
+  const conflict = tekst => Object.assign(new Error(tekst), { code: 'PG_REQUEST_CONFLICT' });
+
+  async function pasAccountWijzigingenToe(client, wijzigingen) {
+    if (!client || typeof client.query !== 'function')
+      throw new Error('Accountcommit vereist de client van de PostgreSQL-requesttransactie.');
+    const lijst = (wijzigingen || []).slice().sort((a, b) =>
+      String(a.tabel).localeCompare(String(b.tabel)) || Number(a.id) - Number(b.id));
+    let geschreven = 0;
+    for (const w of lijst) {
+      const staff = w.tabel === 'supplier_staff';
+      if (!staff && w.tabel !== 'users') throw new Error('Onbekende accounttabel: ' + w.tabel);
+      const cols = staff ? STAFF_COLS : USER_COLS;
+      const getallen = staff ? GETAL_STAFF : GETAL_USER;
+      const tabel = staff ? 'supplier_staff' : 'users';
+      const id = Number(w.id);
+      if (!Number.isSafeInteger(id) || id < 1) throw new Error('Ongeldig account-id in requestcommit.');
+      await client.query("SELECT pg_advisory_xact_lock(hashtext($1)::bigint)", ['account:' + tabel + ':' + id]);
+      const huidig = await client.query(`SELECT ${cols.join(', ')} FROM ${tabel} WHERE id=$1 FOR UPDATE`, [id]);
+      const rij = huidig.rows[0] || null;
+      if (!gelijk(rij, w.basis, cols, getallen))
+        throw conflict('De account- of personeelsrij is tijdens dit verzoek gewijzigd.');
+      try {
+        if (!w.na) {
+          if (rij) { await client.query(`DELETE FROM ${tabel} WHERE id=$1`, [id]); geschreven++; }
+        } else if (!rij) {
+          const ph = cols.map((_, i) => '$' + (i + 1)).join(', ');
+          await client.query(`INSERT INTO ${tabel} (${cols.join(', ')}) VALUES (${ph})`,
+            cols.map(c => waarde(w.na, c)));
+          geschreven++;
+        } else {
+          const zet = cols.filter(c => c !== 'id');
+          await client.query(`UPDATE ${tabel} SET ${zet.map((c, i) => c + '=$' + (i + 1)).join(', ')}
+            WHERE id=$${zet.length + 1}`, zet.map(c => waarde(w.na, c)).concat(id));
+          geschreven++;
+        }
+      } catch (e) {
+        if (String(e && e.code) === '23505' || /unique|duplicate/i.test(String(e && e.message || e)))
+          throw conflict('De gekozen account- of personeelskoppeling is intussen in gebruik.');
+        throw e;
+      }
+      await client.query('SELECT pg_notify($1, $2)', [KANAAL,
+        (staff ? 'staff:' : 'user:') + id + ':' + BRON]);
+    }
+    return { geschreven, rijen: lijst.map(x => x.tabel + ':' + x.id) };
+  }
   // voor de spiegel: is deze melding van onszelf?
   const vanMij = payload => String(payload || '').split(':')[2] === BRON;
 
   async function luister(onWijziging) {
     luisterClient = await pool.connect();
     luisterClient.on('notification', (msg) => onWijziging(msg.payload));
-    luisterClient.on('error', (e) => { if (log) log.warn('pgaccounts-listen', { fout: e.message }); });
+    luisterClient.on('error', (e) => {
+      if (log) log.warn('pgaccounts-listen', { fout: e.message });
+      if (typeof onFout === 'function') onFout(e, 'listen');
+    });
     await luisterClient.query('LISTEN ' + KANAAL);
   }
 
@@ -153,7 +233,9 @@ function maakPgAccounts({ url, log }) {
     try { await pool.end(); } catch (e) {}
   }
 
-  return { schema, reserveerBlok, pullAlles, upsertUser, upsertStaff, deleteUser, luister, sluit, pool, vanMij, BRON, USER_COLS, STAFF_COLS };
+  return { schema, reserveerBlok, pullAlles, upsertUser, upsertStaff, deleteUser,
+    pasAccountWijzigingenToe, luister, sluit, pool, intrekkingen, vanMij, BRON,
+    USER_COLS, STAFF_COLS };
 }
 
 module.exports = { maakPgAccounts };

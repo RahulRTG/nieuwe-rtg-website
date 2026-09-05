@@ -1,4 +1,4 @@
-name: Productie-image
+name: Release-imagekandidaat
 
 on:
   push:
@@ -12,7 +12,26 @@ permissions:
 jobs:
   image:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 240
+    services:
+      postgres:
+        image: postgres:16-alpine@sha256:cf78e76683b9ca8c5733cbbdce6c9262b45b6767934dd0a95e671f9a0fc20685
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: rtgtest
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 10s
+          --health-timeout 5s --health-retries 5
+      redis:
+        image: redis:7-alpine@sha256:ff02b58f971e7d7d156a1267e283fcbbeee91773b6aa36c49dac28ecfe28eadf
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping" --health-interval 10s
+          --health-timeout 5s --health-retries 5
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -26,14 +45,38 @@ jobs:
       # zichzelf niet over; ubuntu-latest draagt hem niet. Zie ci.yml voor waarom.
       - name: libxml2 (de scheidsrechter van de c14n-toets)
         run: sudo apt-get update -qq && sudo apt-get install -y -qq libxml2-utils
-      - name: Releasepoort
-        run: npm run check
-      - name: Server- en integratietoetsen
-        run: npm test
+      - name: Playwright + Chromium voor de volledige schermsuite
+        run: node scripts/browserinstall.js
+      # Dit is dezelfde softwarepoort die vóór een echte uitrol draait:
+      # volledige suite op deze commit, releasegate en stagingrepetitie. Een
+      # losse check + test liet herstel, mutatiecontracten en staging buiten.
+      - name: Volledige software-afbouw
+        run: npm run afbouw:software
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/rtgtest
+          REDIS_URL: redis://localhost:6379
+          RTG_VAULT_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+          RTG_SECRET_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
+      - name: PostgreSQL/Redis-duurzaamheidsbewijs
+        run: node scripts/pgtoetsen.js
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/rtgtest
+          REDIS_URL: redis://localhost:6379
+          RTG_VAULT_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+          RTG_SECRET_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
+      - name: Bevries CI-uitvoering en exacte Git-bron
+        run: |
+          mkdir -p .release
+          cp SUITE.json .release/ci-suite.json
+          cp .release/schermsuite-bewijs.json .release/ci-schermsuite-bewijs.json
+          cp .release/pg-bewijs.json .release/ci-pg-bewijs.json
+          node scripts/bron-release-bewijs.js
       - name: Docker Compose live-overlay is geldig
         run: docker compose -f docker-compose.yml -f docker-compose.live.yml config --quiet
         env:
           RTG_BACKUP_HOST_DIR: /tmp/rtg-backups
+          RTG_BACKUP_OFFSITE_HOST_DIR: /tmp/rtg-offsite
+          RTG_BACKUP_PUBLIC_CERT_FILE: .env.example
           RTG_PUBLISH_HOST: 0.0.0.0
           RTG_PUBLISH_PORT: "443"
           RTG_CONTAINER_PORT: "443"
@@ -43,17 +86,29 @@ jobs:
         shell: bash
         run: |
           repo="${GITHUB_REPOSITORY,,}"
-          if [[ "$GITHUB_REF" == refs/tags/* ]]; then tag="${GITHUB_REF_NAME}"; else tag="sha-${GITHUB_SHA::12}"; fi
-          echo "RTG_RELEASE_IMAGE=ghcr.io/$repo:$tag" >> "$GITHUB_ENV"
+          echo "RTG_CANDIDATE_IMAGE=ghcr.io/$repo:candidate-${GITHUB_SHA::12}-${GITHUB_RUN_ID}" >> "$GITHUB_ENV"
+          echo "RTG_CANDIDATE_BACKUP_IMAGE=ghcr.io/$repo:candidate-backup-${GITHUB_SHA::12}-${GITHUB_RUN_ID}" >> "$GITHUB_ENV"
+      - name: Ondertekening vóór publicatie bewijzen
+        env:
+          RTG_RELEASE_SIGN_KEY: ${{ secrets.RTG_RELEASE_SIGN_KEY }}
+        run: node scripts/imageherkomst.js --sleutelcontrole
       - name: Login op GitHub Container Registry
         run: echo "$GHCR_TOKEN" | docker login ghcr.io --username "$GITHUB_ACTOR" --password-stdin
         env:
           GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Bouw en publiceer exact één app/motor-image
+      # Een unieke candidate-tag geeft de registry-digest die in het bewijs
+      # komt. Dit workflow publiceert bewust GEEN officiële release: daarvoor
+      # moeten container-golive, rollbackrepetitie, extern dossier en de
+      # uiteindelijke READY-uitspraak op exact hetzelfde kandidaatimage volgen.
+      - name: Bouw en publiceer het releasekandidaat
         run: |
-          docker build --pull --tag "$RTG_RELEASE_IMAGE" .
-          docker push "$RTG_RELEASE_IMAGE"
-          echo "Gepubliceerd: $RTG_RELEASE_IMAGE"
+          docker build --pull --build-arg "RTG_RELEASE_COMMIT=$GITHUB_SHA" --tag "$RTG_CANDIDATE_IMAGE" .
+          docker build --pull --build-arg "RTG_RELEASE_COMMIT=$GITHUB_SHA" --target backup-runtime --tag "$RTG_CANDIDATE_BACKUP_IMAGE" .
+          docker push "$RTG_CANDIDATE_IMAGE"
+          docker push "$RTG_CANDIDATE_BACKUP_IMAGE"
+          docker pull "$RTG_CANDIDATE_IMAGE"
+          docker pull "$RTG_CANDIDATE_BACKUP_IMAGE"
+          echo "Kandidaten gepubliceerd: $RTG_CANDIDATE_IMAGE en $RTG_CANDIDATE_BACKUP_IMAGE"
 
       # ------------------------------------------------------------------
       # DE HERKOMST. Hierboven staat WAT er gepubliceerd is; hieronder komt
@@ -66,40 +121,52 @@ jobs:
       - name: Het releasebewijs UIT het image halen (niet uit de werkboom)
         run: |
           mkdir -p .release
-          docker run --rm --entrypoint cat "$RTG_RELEASE_IMAGE" /app/release-bewijs.json > .release/release-bewijs.json
-          node -e "const b=require('./.release/release-bewijs.json');console.log('bron in image:',b.bestandAantal,'bestanden, SHA-256',b.inhoudSha256)"
+          docker run --rm --entrypoint cat "$RTG_CANDIDATE_IMAGE" /app/release-bewijs.json > .release/image-release-bewijs.json
+          node -e "const b=require('./.release/image-release-bewijs.json');console.log('runtime in image:',b.bestandAantal,'bestanden, SHA-256',b.inhoudSha256)"
 
       - name: Stuklijst (SBOM) uit het gepubliceerde image
-        run: node scripts/imageherkomst.js --sbom --image="$RTG_RELEASE_IMAGE" --uit=.release/sbom.json --eis-image
+        run: |
+          node scripts/imageherkomst.js --sbom --image="$RTG_CANDIDATE_IMAGE" --bewijs=.release/image-release-bewijs.json --uit=.release/sbom.json --eis-image
+          node scripts/imageherkomst.js --sbom --image="$RTG_CANDIDATE_BACKUP_IMAGE" --bewijs=.release/image-release-bewijs.json --uit=.release/sbom-backup.json --eis-image
 
       - name: Herkomst binden aan het digest en tekenen
         env:
           RTG_RELEASE_SIGN_KEY: ${{ secrets.RTG_RELEASE_SIGN_KEY }}
         run: |
-          digest="$(docker inspect --format='{{index .RepoDigests 0}}' "$RTG_RELEASE_IMAGE" | cut -d@ -f2)"
-          test -n "$digest" || { echo "Geen RepoDigest: er is niets om aan te binden."; exit 1; }
-          node scripts/imageherkomst.js --binden --image="$RTG_RELEASE_IMAGE" --digest="$digest" \
-            --sbom=.release/sbom.json --uit=.release/herkomst.json
+          digest="$(docker inspect --format='{{index .RepoDigests 0}}' "$RTG_CANDIDATE_IMAGE" | cut -d@ -f2)"
+          backup_digest="$(docker inspect --format='{{index .RepoDigests 0}}' "$RTG_CANDIDATE_BACKUP_IMAGE" | cut -d@ -f2)"
+          test -n "$digest" && test -n "$backup_digest" || { echo "Geen RepoDigest: er is niets om aan te binden."; exit 1; }
+          node scripts/imageherkomst.js --binden --eis-handtekening --image="$RTG_CANDIDATE_IMAGE" --digest="$digest" \
+            --bewijs=.release/image-release-bewijs.json --sbom=.release/sbom.json --uit=.release/herkomst.json
+          node scripts/imageherkomst.js --binden --eis-handtekening --image="$RTG_CANDIDATE_BACKUP_IMAGE" --digest="$backup_digest" \
+            --bewijs=.release/image-release-bewijs.json --sbom=.release/sbom-backup.json --uit=.release/herkomst-backup.json
 
-      # Wie een publieke sleutel heeft vastgelegd, krijgt hier een harde
-      # controle op zijn eigen publicatie. Zolang die er niet is, mag deze
-      # stap niet stilzwijgend groen geven: dan staat er een luide
-      # waarschuwing in plaats van een vinkje.
+      # Een publieke sleutel is geen optionele versiering. Zonder vastgelegd
+      # vertrouwensanker kan niemand bewijzen wie het image tekende.
       - name: Controleer de eigen publicatie
-        if: hashFiles('deploy/release-sleutel.pub') != ''
-        run: node scripts/imageherkomst.js --controle --herkomst=.release/herkomst.json --sbom=.release/sbom.json
-
-      - name: Zeg het hardop als de release ongetekend is
-        if: hashFiles('deploy/release-sleutel.pub') == ''
         run: |
-          echo "::warning title=Ongetekende release::deploy/release-sleutel.pub ontbreekt. De stuklijst en het herkomstdocument zijn gemaakt, maar niemand kan ze verifieren. Maak een sleutelpaar met 'npm run imageherkomst:sleutel', zet de private helft in het repository-secret RTG_RELEASE_SIGN_KEY en commit de publieke helft."
+          inhoud="$(node -e "process.stdout.write(require('./.release/image-release-bewijs.json').inhoudSha256||'')")"
+          digest="$(docker inspect --format='{{index .RepoDigests 0}}' "$RTG_CANDIDATE_IMAGE" | cut -d@ -f2)"
+          backup_digest="$(docker inspect --format='{{index .RepoDigests 0}}' "$RTG_CANDIDATE_BACKUP_IMAGE" | cut -d@ -f2)"
+          node scripts/imageherkomst.js --controle --eis-kandidaat --herkomst=.release/herkomst.json \
+            --sbom=.release/sbom.json --image="$RTG_CANDIDATE_IMAGE" --draait="$digest" \
+            --commit="$GITHUB_SHA" --bewijs-inhoud="$inhoud"
+          node scripts/imageherkomst.js --controle --eis-kandidaat --herkomst=.release/herkomst-backup.json \
+            --sbom=.release/sbom-backup.json --image="$RTG_CANDIDATE_BACKUP_IMAGE" --draait="$backup_digest" \
+            --commit="$GITHUB_SHA" --bewijs-inhoud="$inhoud"
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: herkomst
           path: |
             .release/sbom.json
+            .release/sbom-backup.json
             .release/herkomst.json
-            .release/release-bewijs.json
+            .release/herkomst-backup.json
+            .release/bron-release-bewijs.json
+            .release/image-release-bewijs.json
+            .release/ci-suite.json
+            .release/ci-pg-bewijs.json
+            .release/ci-schermsuite-bewijs.json
           if-no-files-found: error
           retention-days: 90

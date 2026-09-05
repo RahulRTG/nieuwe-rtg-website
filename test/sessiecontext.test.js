@@ -179,6 +179,17 @@ test('5d. het register bewaart geen token en geen tokenhash', () => {
     ['context', 'gezienOp', 'geopendOp', 'lidKey'].sort());
 });
 
+test('5e. een lege registerlezing schept geen opslag', () => {
+  const db = { data: {} };
+  const reg = maakSessieregister({ db, save() {
+    assert.fail('een lege registerlezing hoort niets te bewaren');
+  } });
+  assert.equal(reg.lees('abcdefghijkl'), null);
+  assert.deepEqual(reg.vanLid('user-1'), []);
+  assert.deepEqual(db.data, {},
+    'een read-only HTTP- of SSE-verzoek mag geen lege sessiecollectie aanmaken');
+});
+
 /* ---------------------------------------------------------------------------
    6. HET TOKEN draagt een sessie-identiteit, en oude tokens breken niet.
    ------------------------------------------------------------------------- */

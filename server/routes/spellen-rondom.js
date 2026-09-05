@@ -52,7 +52,7 @@ module.exports = (kern, { vriendenVan, kringVan }) => {
     /* De projectiekamer: een code openen of dichtdoen. Alleen een SPELER kan
        dat, dus deze twee staan gewoon achter de ledenpoort. Het scherm zelf
        loopt langs een andere deur, hieronder -- die heeft geen sessie. */
-    'projectie-open': (mij, b) => projectieOpen(mij, String(b.id || '')),
+    'projectie-open': (mij, b) => projectieOpen(mij, String(b.id || ''), b.idem),
     'projectie-sluit': (mij, b) => projectieSluit(mij, String(b.id || '')),
     'sudoku-nieuw': (mij, b) => sudokuNieuw(mij, String(b.niveau || '')),
     'sudoku-klaar': (mij, b) => sudokuKlaar(mij, b.rooster),

@@ -37,7 +37,9 @@ const PROD_ENV = {
      Anders dan STRIPE_DEMO_BEWUST is dit echt fail-closed: geen enkele demo- of
      echte rail mag een betaling bevestigen. */
   RTG_BETALEN_UIT: '1', RTG_AI_UIT: '1', RTG_HERSTEL_SMS_UIT_BEWUST: '1',
+  RTG_ISOLATIE_AFDWINGEN: '1',
   SMTP_URL: 'smtp://rtg:test@mail.voorbeeld.test:587',
+  ERR_WEBHOOK_URL: 'https://alarm.voorbeeld.test/rtg',
   DATABASE_URL: '', REDIS_URL: '', SENTRY_DSN: '', STRIPE_SECRET_KEY: ''
 };
 
@@ -94,6 +96,12 @@ test('de veilige productiestart komt op en gedraagt zich als productie', async (
      kanten, zodat geen van beide stilletjes kan omslaan. */
   const kaal = await fetch(BASE + '/', { redirect: 'manual' });
   assert.equal(kaal.status, 301, 'onbeveiligd http wordt doorgestuurd naar https');
+  const vergiftigd = await fetch(BASE + '/herstel?bewijs=niet-echt', {
+    redirect: 'manual', headers: { Host: 'aanvaller.example' }
+  });
+  assert.equal(vergiftigd.status, 301);
+  assert.equal(vergiftigd.headers.get('location'), 'https://rtg.example.com/herstel?bewijs=niet-echt',
+    'een vervalste Host-kop kan de productieredirect niet naar een aanvallerdomein sturen');
   const prik = await fetch(BASE + '/api/health', { redirect: 'manual' });
   assert.equal(prik.status, 200, 'de gezondheidsprik wordt NIET omgeleid');
   const klaar = await fetch(BASE + '/api/ready', { redirect: 'manual' });
@@ -170,6 +178,16 @@ test('de go-live-keuring keurt af zonder geheimen, en met alle geheimen blijft h
   const goed = spawnSync(process.execPath, [script], { env: PROD_ENV, timeout: 20000, encoding: 'utf8' });
   assert.match(goed.stdout, /Configuratie: geen blokkerende fouten/, 'de configuratie zelf is in orde');
   assert.equal(goed.status, 1, 'maar het AVG-papierwerk is de laatste, bewuste poort');
+  assert.match(goed.stdout, /geen werkende productie-uitbetaalrail/,
+    'een veilige geld-uitstand wordt niet verward met een productierijpe B2B2C-geldketen');
+  assert.match(goed.stdout, /B2B2C-opslag: DATABASE_URL ontbreekt/,
+    'een lokale SQLite-installatie krijgt geen B2B2C-go-live');
+  assert.match(goed.stdout, /B2B2C-coordinatie: REDIS_URL ontbreekt/,
+    'proceslokale frauderem en realtime krijgen geen B2B2C-go-live');
+  assert.match(goed.stdout, /RTG_OWNER_BOOTSTRAP staat nog/,
+    'het eenmalige eigenaarsgeheim mag niet in de vrijgegeven omgeving achterblijven');
+  assert.match(goed.stdout, /PG_ACCOUNTS_ATOMAIR_ONTBREEKT/,
+    'read-only accountveiligheid mag niet als productierijpe identiteit tellen');
   assert.match(goed.stdout, /open plek\(ken\)/, 'de blokkade telt de open plekken in de AVG-documenten');
   assert.match(goed.stdout, /vragen staan nog open/, 'en wijst naar de vragen die Rahul nog moet stellen');
 });

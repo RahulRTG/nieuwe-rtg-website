@@ -88,7 +88,7 @@
        zijn beeld het heeft verloren (kern/horeca/samenvoegen.js). */
     K.bind($('bGolvenLijst'), 'zet', function (b) {
       window.RTGHorecaEdge.handel({
-        clientId: (window.RTGId ? RTGId('bar') : 'bar-' + Date.now()),
+        clientId: RTGId('bar'),
         soort: 'stand', rekeningId: b.getAttribute('data-rek'),
         regelId: b.getAttribute('data-zet'), naar: b.getAttribute('data-naar')
       }).then(function (r) {

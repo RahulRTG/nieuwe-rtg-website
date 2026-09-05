@@ -1,8 +1,5 @@
-/* RTG Meet, de kamer zelf: het WebRTC-mesh (ieder toestel verbindt met
-   iedereen), microfoon en camera aan/uit, SCHERM DELEN via getDisplayMedia
-   (replaceTrack, dus zonder opnieuw verbinden) en de hand opsteken.
-   De seinen lopen via /api/meet/sein en komen binnen op het SSE-event
-   'meet' (app.js geeft ze hier af). Alles op codenaam. */
+/* RTG Meet: WebRTC-mesh, media, schermdelen en hand opsteken. Seinen lopen
+   via /api/meet/sein en het SSE-event `meet`; identiteit blijft codenaam. */
 (function () {
   'use strict';
   var $ = function (s) { return document.querySelector(s); };
@@ -11,7 +8,7 @@
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
     });
   };
-  var api = null, meld = null, kamer = null, ik = null, opWeg = null;
+  var api = null, meld = null, kamer = null, deelcode = null, ik = null, opWeg = null;
   var stream = null, scherm = null, ice = null;
   var peers = {}; // codenaam -> { pc, wachtrij, el }
   var mee = null; // de tekstbaan van het gesprek (shared/meelezen.js)
@@ -74,7 +71,8 @@
   function lijst() {
     var namen = [ik].concat(Object.keys(peers));
     $('#wieLijst').textContent = namen.join(' · ');
-    $('#kamerKop').textContent = kamer.titel + ' · ' + namen.length + ' aanwezig · code ' + kamer.code;
+    $('#kamerKop').textContent = kamer.titel + ' · ' + namen.length + ' aanwezig' +
+      (deelcode ? ' · eenmalige deelcode ' + deelcode : '');
   }
 
   /* ---- scherm delen: de videotrack omruilen, verbindingen blijven staan ---- */
@@ -150,7 +148,8 @@
 
   /* ---- starten en stoppen ---- */
   function start(opties) {
-    api = opties.api; meld = opties.meld; kamer = opties.kamer; ik = opties.ik; opWeg = opties.opWeg;
+    api = opties.api; meld = opties.meld; kamer = opties.kamer;
+    deelcode = opties.deelcode || null; ik = opties.ik; opWeg = opties.opWeg;
     /* MEELEZEN in de kamer. Anders dan bij een gesprek van twee gaat een regel
        hier naar IEDEREEN die er zit: de seinweg kent alleen een genoemd doel,
        dus we lopen de deelnemers langs. Wie later binnenkomt mist wat er voor
@@ -198,7 +197,7 @@
     stopScherm();
     if (stream) { try { stream.getTracks().forEach(function (t) { t.stop(); }); } catch (e) {} stream = null; }
     if (kamer) api('verlaat', { id: kamer.id }).catch(function () {});
-    kamer = null;
+    kamer = null; deelcode = null;
     $('#kamer').style.display = 'none';
     $('#lobby').style.display = '';
     if (opWeg) opWeg();

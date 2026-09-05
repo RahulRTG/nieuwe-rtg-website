@@ -48,6 +48,7 @@ const REDEN_UIT = 'Identiteitsprovider: groepslidmaatschap vervallen.';
 const REDEN_SCIM = 'Identiteitsprovider: account gedeactiveerd (SCIM).';
 
 module.exports = ({ db, save, register }) => {
+  const PRODUCTIE = String(process.env.NODE_ENV || '') === 'production';
   const nu = () => klokDatum().toISOString();
   const dag = () => nu().slice(0, 10);
   const bestaatRol = (id) => ROLLEN.some(r => r.id === id);
@@ -100,7 +101,7 @@ module.exports = ({ db, save, register }) => {
       if (!l) {
         l = { id: crypto.randomBytes(4).toString('hex'), naam: naam || 'Onbekend', functie: null,
           afdeling: null, extern: false, rollen: [], status: 'actief',
-          token: crypto.randomBytes(24).toString('hex'), bron: 'idp', rtgKey,
+          token: PRODUCTIE ? null : crypto.randomBytes(24).toString('hex'), bron: 'idp', rtgKey,
           at: nu(), toegelatenAt: nu() };
         w.leden = w.leden || {};
         w.leden[l.id] = l;
@@ -113,7 +114,7 @@ module.exports = ({ db, save, register }) => {
           uit.push({ werkruimte: code, rollen: [], lidId: l.id, status: l.status, geblokkeerd: true });
           continue;
         }
-        l.status = 'actief'; l.token = crypto.randomBytes(24).toString('hex');
+        l.status = 'actief'; l.token = PRODUCTIE ? null : crypto.randomBytes(24).toString('hex');
         delete l.uitReden; delete l.uitAt; delete l.laatsteDag;
         journaal(w, 'idp-lid-hersteld', l.id, 'Groepslidmaatschap opnieuw vastgesteld.');
       }
@@ -145,19 +146,29 @@ module.exports = ({ db, save, register }) => {
     const t = register.haal(org);
     if (!t) return { ok: false, reden: 'geen tenant', geraakt: [] };
     const geraakt = [];
+    let gevonden = 0;
     for (const code of t.werkruimtes) {
       const w = ruimte(code);
       if (!w) continue;
       const l = lidVanKey(w, rtgKey);
-      if (!l || l.status === 'uit dienst') continue;
+      if (!l) continue;
+      gevonden++;
+      /* Een retry na een gooiende save ziet de RAM-mutatie van de eerste
+         poging al. `status === uit dienst` mag hem dan niet langs save laten
+         glippen: pas de herhaalde schrijfactie maakt de eerdere 503
+         herstelbaar. Een al handmatig gesloten lid houden we inhoudelijk met
+         rust; alleen het opnieuw bevestigen van de opslag is hier nodig. */
+      if (l.status === 'uit dienst' && l.token == null) continue;
       l.status = 'uit dienst'; l.token = null;
       l.uitReden = reden || REDEN_SCIM; l.uitAt = nu(); l.laatsteDag = dag();
       l.rollen = handmatig(l);
       journaal(w, 'idp-deprovisioning', l.id, l.uitReden);
       geraakt.push({ werkruimte: code, lidId: l.id });
     }
-    if (geraakt.length) save();
-    return { ok: true, org: t.org, geraakt };
+    /* Ook als alles bij deze retry in RAM al dicht stond: de vorige save kan
+       juist zijn mislukt. Niets schrijven zou de IdP nu een vals succes geven. */
+    if (gevonden) save();
+    return { ok: true, org: t.org, geraakt, bevestigd: gevonden };
   }
 
   /* Bij welke werkruimtes van welke tenant hoort dit RTG-account? De bootstrap
@@ -168,7 +179,9 @@ module.exports = ({ db, save, register }) => {
       for (const code of t.werkruimtes) {
         const w = ruimte(code);
         const l = w ? lidVanKey(w, rtgKey) : null;
-        if (l) uit.push({ tenant: t.org, werkruimte: code, lid: l });
+        /* De RTG-sessie blijft persoonlijk bruikbaar na uitdiensttreding, maar
+           een historisch lidmaatschap mag geen actuele tenantbootstrap zijn. */
+        if (l && l.status === 'actief') uit.push({ tenant: t.org, werkruimte: code, lid: l });
       }
     }
     return uit;

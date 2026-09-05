@@ -18,20 +18,96 @@
    Afgesplitst uit vrijwilligerportaal.js op de 10 KB van keuringsregel 13. */
 
 module.exports = (ctx, eigen) => {
-  const { code, S, audit, wie, poort, save } = ctx;
-  const { vindCode, urenVan } = eigen;
+  const { S, audit, wie, poort, wieIn, poortIn, save, codelevenscyclus } = ctx;
+  const { urenVan, DOEL, SOORT, SCOPE } = eigen;
 
-  /* ---------- de kantoorkant: de code uitgeven en de gemelde uren ---------- */
-  function codeVoor(req, id) {
+  const opties = b => ({
+    geldig_dagen: b && (b.geldig_dagen || b.geldigDagen),
+    max_gebruik: b && (b.max_gebruik || b.maxGebruik)
+  });
+  const invoer = (w, v, b) => Object.assign({
+    prefix: 'RTFV', issuer: w.key, doel: DOEL, scope: Object.values(SCOPE),
+    onderwerp: { soort: SOORT, id: v.id }
+  }, opties(b));
+
+  function deur(req, id) {
     const v = S().vrijwilligers.find(x => x.id === String(id || ''));
-    if (!v) return { status: 404, error: 'Deze vrijwilliger staat niet in het register.' };
+    if (!v) return { fout: { status: 404, error: 'Deze vrijwilliger staat niet in het register.' } };
     const w = wie(req);
     const g = poort(w, v.stad, 'vrijwilliger.beheren', 'volunteer_management');
-    if (!g.ok) return g;
-    if (!v.code) { v.code = code('RTFV'); save(); }
-    audit(w.key, 'vrijwilliger.code', v.naam, 'code getoond');
-    return { ok: true, code: v.code,
-      melding: 'Geef deze code persoonlijk aan ' + v.naam + '. Er staan geen contactgegevens achter, wel zijn planning en uren.' };
+    return g.ok ? { v, w } : { fout: g };
+  }
+  function deurIn(req, id, staat) {
+    const v = ((staat && staat.vrijwilligers) || []).find(x => x.id === String(id || ''));
+    if (!v) return { fout: { status: 404, error: 'Deze vrijwilliger staat niet in het register.' } };
+    const w = wieIn(req, staat);
+    const g = poortIn(w, v.stad, 'vrijwilliger.beheren', 'volunteer_management', staat);
+    return g.ok ? { v, w } : { fout: g };
+  }
+
+  /* ---------- de kantoorkant: de code uitgeven en de gemelde uren ---------- */
+  function codeVoor(req, id, b) {
+    const vooraf = deur(req, id);
+    if (vooraf.fout) return vooraf.fout;
+    if (vooraf.v.persoonscode_id) {
+      return { status: 409, error: 'Er is al een uitgegeven code. Gebruik roteren om een nieuwe code uit te geven en de oude direct te sluiten.' };
+    }
+    return codelevenscyclus.transactie(tx => {
+      const staat = tx.staat || S();
+      const d = deurIn(req, id, staat);
+      if (d.fout) return d.fout;
+      const v = d.v;
+      if (v.persoonscode_id) return { status: 409, error: 'Er is intussen al een code uitgegeven. Roteer die code.' };
+      delete v.code;
+      const r = tx.uitgeven(invoer(d.w, v, b));
+      if (!r.ok) return r;
+      v.persoonscode_id = r.toegang.id;
+      audit(d.w.key, 'vrijwilliger.code-uitgegeven', v.naam,
+        'rotatie 1; vervalt ' + r.toegang.expires_at, staat);
+      return { ok: true, code: r.code, toegang: r.toegang,
+        melding: 'Geef deze code persoonlijk aan ' + v.naam + '. Er staan geen contactgegevens achter, wel zijn planning en uren.' };
+    });
+  }
+
+  function codeIntrekken(req, id, reden) {
+    const vooraf = deur(req, id);
+    if (vooraf.fout) return vooraf.fout;
+    return codelevenscyclus.transactie(tx => {
+      const staat = tx.staat || S();
+      const d = deurIn(req, id, staat);
+      if (d.fout) return d.fout;
+      const v = d.v;
+      let toegang = null;
+      if (v.persoonscode_id) {
+        const r = tx.intrekken(v.persoonscode_id, d.w.key, reden);
+        if (!r.ok) return r;
+        toegang = r.toegang;
+      }
+      delete v.code;
+      audit(d.w.key, 'vrijwilliger.code-ingetrokken', v.naam, String(reden || 'geen reden'), staat);
+      return { ok: true, ingetrokken: true, toegang };
+    });
+  }
+
+  function codeRoteren(req, id, b) {
+    const vooraf = deur(req, id);
+    if (vooraf.fout) return vooraf.fout;
+    return codelevenscyclus.transactie(tx => {
+      const staat = tx.staat || S();
+      const d = deurIn(req, id, staat);
+      if (d.fout) return d.fout;
+      const v = d.v;
+      const r = v.persoonscode_id
+        ? tx.roteer(v.persoonscode_id, Object.assign({ prefix: 'RTFV', issuer: d.w.key,
+          reden: b && b.reden }, opties(b)))
+        : tx.uitgeven(invoer(d.w, v, b));
+      if (!r.ok) return r;
+      delete v.code;
+      v.persoonscode_id = r.toegang.id;
+      audit(d.w.key, 'vrijwilliger.code-geroteerd', v.naam, 'rotatie ' + r.toegang.rotatie, staat);
+      return { ok: true, code: r.code, toegang: r.toegang,
+        melding: 'De vorige code is direct gesloten. Geef deze nieuwe code persoonlijk aan ' + v.naam + '.' };
+    });
   }
 
   function bevestigUren(req, id, meldingId) {
@@ -50,5 +126,5 @@ module.exports = (ctx, eigen) => {
     return { ok: true, urenTotaal: Math.round(urenVan(v) * 10) / 10, open: v.gemeldeUren.length };
   }
 
-  return { codeVoor, bevestigUren };
+  return { codeVoor, codeIntrekken, codeRoteren, bevestigUren };
 };

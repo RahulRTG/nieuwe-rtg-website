@@ -23,9 +23,10 @@ test('productiewizard weigert regelinjectie en onveilige productieadressen', () 
   const fouten = valideerKeuzes({
     RTG_OWNER_EMAIL: 'geen-email', APP_URL: 'http://rtg.example',
     DATABASE_URL: 'mysql://db', REDIS_URL: 'http://redis', SMTP_URL: 'file:///tmp/mail',
-    ERR_WEBHOOK_URL: 'http://alarm', RTG_BACKUP_DIR: 'relatief'
+    ERR_WEBHOOK_URL: 'http://alarm', RTG_BACKUP_DIR: 'relatief',
+    RTG_MOTOR_STATE_KEY_FILE: 'relatief.key', RTG_MOTOR_EXPECT_GENESIS: 'g-fout'
   });
-  assert.ok(fouten.length >= 7);
+  assert.ok(fouten.length >= 9);
 });
 
 test('atomair geschreven geheimenbestand krijgt uitsluitend eigenaarsrechten', () => {

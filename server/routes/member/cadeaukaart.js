@@ -7,6 +7,8 @@
    geldhandeling met een betaalpad, een volgorde en een herhaalgrendel.
 
    Gemount vanuit routes/member.js. */
+const moneyCredentialBlokkade = require('../../middleware/money-credential-productiepoort').blokkade;
+
 module.exports = (kern) => {
   const { app, auth, db, save, findSupplier, schoon, notifySupplier, sseToSupplier,
     gcCode, PERSONAS, pay } = kern;
@@ -30,6 +32,8 @@ module.exports = (kern) => {
      dat ook: daar staat de klant aan de balie en rekent hij aan de kassa af.
      Daar is de betaling het werk van de kassa, niet van deze code. */
   app.post('/api/giftcard/buy', auth, async (req, res) => {
+    const dicht = moneyCredentialBlokkade('pay.giftcard_value_code');
+    if (dicht) return res.status(dicht.status).json(dicht);
     if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
     const s = findSupplier(req.body.supplierCode);
     if (!s) return res.status(404).json({ error: 'Partner niet gevonden.' });
@@ -71,6 +75,8 @@ module.exports = (kern) => {
   });
 
   app.post('/api/giftcards/mine', auth, (req, res) => {
+    const dicht = moneyCredentialBlokkade('pay.giftcard_value_code');
+    if (dicht) return res.status(dicht.status).json(dicht);
     res.json({ kaarten: (db.data.giftcards || []).filter(g => g.customerKey === req.session.key).slice(0, 20) });
   });
 };

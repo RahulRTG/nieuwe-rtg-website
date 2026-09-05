@@ -1,0 +1,303 @@
+/* RTG Vandaag luxe, contract versie 2.
+   Opt-in: data-rtg-vandaag-luxe op body. Een lege waarde of "home" maakt de
+   wereldstart schermvullend; "surface" maakt een compacte contextkop. De
+   wereld komt uitsluitend uit data-rtg-world. Alle kleuren hieronder hebben
+   een semantische rol, zodat een modus nooit zijn eigen los palet krijgt. */
+.rtg-vandaag-luxe,
+.rtg-vandaag-luxe *{box-sizing:border-box}
+
+.rtg-vandaag-luxe{
+  --vandaag-bg:#0b0b0a;--vandaag-inkt:#f5f0e6;--vandaag-inkt-rgb:245,240,230;
+  --vandaag-zacht:#b9ad9e;--vandaag-metaal:#d4bd7c;--vandaag-metaal-rgb:212,189,124;
+  --vandaag-paneel-rgb:13,14,14;--vandaag-signatuur:#7f1634;--vandaag-was-rgb:5,6,7;
+  --vandaag-foto:saturate(.72) contrast(1.06);--vandaag-schema:dark;
+  position:relative;z-index:1;isolation:isolate;width:100%;min-height:100svh;overflow:hidden;
+  border:0;border-radius:0;background:var(--vandaag-bg);color:var(--vandaag-inkt);
+  color-scheme:var(--vandaag-schema);font-family:Inter,system-ui,sans-serif;
+  box-shadow:inset 0 2px 0 var(--vandaag-signatuur)
+}
+
+.rtg-vandaag-luxe[data-wereld="living"]{
+  --vandaag-bg:#f4f0e8;--vandaag-inkt:#211e19;--vandaag-inkt-rgb:33,30,25;
+  --vandaag-zacht:#675f54;--vandaag-metaal:#745718;--vandaag-metaal-rgb:116,87,24;
+  --vandaag-paneel-rgb:251,248,242;--vandaag-signatuur:#b89545;--vandaag-was-rgb:244,240,232;
+  --vandaag-foto:saturate(.55) contrast(.94) brightness(1.06);--vandaag-schema:light
+}
+.rtg-vandaag-luxe[data-wereld="travel"]{
+  --vandaag-bg:#14090e;--vandaag-inkt:#f7f0e6;--vandaag-inkt-rgb:247,240,230;
+  --vandaag-zacht:#c2b2aa;--vandaag-metaal:#d0b77b;--vandaag-metaal-rgb:208,183,123;
+  --vandaag-paneel-rgb:35,16,22;--vandaag-signatuur:#7f1634;--vandaag-was-rgb:20,9,14;
+  --vandaag-foto:saturate(.78) contrast(1.08);--vandaag-schema:dark
+}
+.rtg-vandaag-luxe[data-wereld="work"]{
+  --vandaag-bg:#0c1112;--vandaag-inkt:#f0f2ec;--vandaag-inkt-rgb:240,242,236;
+  --vandaag-zacht:#aab6b2;--vandaag-metaal:#c1a45f;--vandaag-metaal-rgb:193,164,95;
+  --vandaag-paneel-rgb:20,27,28;--vandaag-signatuur:#75b8b1;--vandaag-was-rgb:12,17,18;
+  --vandaag-foto:saturate(.56) contrast(1.1);--vandaag-schema:dark
+}
+.rtg-vandaag-luxe[data-wereld="foundation"]{
+  --vandaag-bg:#071522;--vandaag-inkt:#f2f2ea;--vandaag-inkt-rgb:242,242,234;
+  --vandaag-zacht:#aebccc;--vandaag-metaal:#d0b66e;--vandaag-metaal-rgb:208,182,110;
+  --vandaag-paneel-rgb:11,32,50;--vandaag-signatuur:#d0b66e;--vandaag-was-rgb:7,21,34;
+  --vandaag-foto:saturate(.62) contrast(1.08);--vandaag-schema:dark
+}
+
+/* De expliciete opt-in kleurt ook de bestaande pagina onder de presentatielaag.
+   Edge en oudere schermnamen wijzen naar dezelfde semantische wereldrollen. */
+body[data-rtg-vandaag-luxe][data-rtg-world]{
+  --rtg-bg:var(--rtg-v-bg);--rtg-grond:var(--rtg-v-bg);
+  --rtg-card:var(--rtg-v-card);--rtg-card2:var(--rtg-v-card2);--rtg-line:var(--rtg-v-line);
+  --rtg-txt:var(--rtg-v-ink);--rtg-muted:var(--rtg-v-muted);--rtg-soft:var(--rtg-v-muted);
+  --rtg-goud:var(--rtg-v-metal);--rtg-leesgoud:var(--rtg-v-metal);--rtg-leeszacht:var(--rtg-v-muted);
+  --edge-bg:var(--rtg-v-bg);--edge-panel:var(--rtg-v-card);--edge-copy:var(--rtg-v-ink);
+  --edge-dim:var(--rtg-v-muted);--edge-line:var(--rtg-v-line);
+  --edge-accent:var(--rtg-v-signature);--edge-accent-soft:var(--rtg-v-accent-soft);--edge-metal:var(--rtg-v-metal);
+  --bg:var(--rtg-v-bg);--card:var(--rtg-v-card);--card2:var(--rtg-v-card2);
+  --paneel:var(--rtg-v-card);--paneel2:var(--rtg-v-card2);--txt:var(--rtg-v-ink);
+  --muted:var(--rtg-v-muted);--soft:var(--rtg-v-muted);--zacht:var(--rtg-v-muted);
+  --line:var(--rtg-v-line);--lijn:var(--rtg-v-line);--gold:var(--rtg-v-metal);--goud:var(--rtg-v-metal);
+  --burgundy:var(--rtg-v-signature);
+  color-scheme:var(--rtg-v-schema);background:var(--rtg-v-bg)!important;color:var(--rtg-v-ink)!important
+}
+body[data-rtg-vandaag-luxe][data-rtg-world="living"]{
+  --rtg-v-bg:#f4f0e8;--rtg-v-card:#fbf8f2;--rtg-v-card2:#e8e0d2;--rtg-v-ink:#211e19;
+  --rtg-v-muted:#675f54;--rtg-v-line:rgba(33,30,25,.16);--rtg-v-signature:#b89545;
+  --rtg-v-metal:#745718;--rtg-v-accent-soft:rgba(184,149,69,.14);--rtg-v-schema:light
+}
+body[data-rtg-vandaag-luxe][data-rtg-world="travel"]{
+  --rtg-v-bg:#14090e;--rtg-v-card:#231016;--rtg-v-card2:#0e090b;--rtg-v-ink:#f7f0e6;
+  --rtg-v-muted:#c2b2aa;--rtg-v-line:rgba(247,240,230,.16);--rtg-v-signature:#7f1634;
+  --rtg-v-metal:#d0b77b;--rtg-v-accent-soft:rgba(127,22,52,.22);--rtg-v-schema:dark
+}
+body[data-rtg-vandaag-luxe][data-rtg-world="work"]{
+  --rtg-v-bg:#0c1112;--rtg-v-card:#141b1c;--rtg-v-card2:#090d0e;--rtg-v-ink:#f0f2ec;
+  --rtg-v-muted:#aab6b2;--rtg-v-line:rgba(240,242,236,.15);--rtg-v-signature:#75b8b1;
+  --rtg-v-metal:#c1a45f;--rtg-v-accent-soft:rgba(117,184,177,.16);--rtg-v-schema:dark;
+  --wo-black:#0c1112;--wo-onyx:#0c1112;--wo-panel:#141b1c;--wo-panel-hi:#192223;
+  --wo-silver:#f0f2ec;--wo-muted:#aab6b2;--wo-line:rgba(240,242,236,.15);
+  --wo-line-gold:rgba(193,164,95,.34);--wo-gold:#c1a45f;--wo-bordeaux:#4f8580;--wo-bordeaux-hi:#75b8b1;
+  --wk-bg:#0c1112;--wk-line:rgba(240,242,236,.15);--wk-text:#f0f2ec;
+  --wk-soft:#aab6b2;--wk-red:#75b8b1;--wk-gold:#c1a45f
+}
+body[data-rtg-vandaag-luxe][data-rtg-world="foundation"]{
+  --rtg-v-bg:#071522;--rtg-v-card:#0b2032;--rtg-v-card2:#06101b;--rtg-v-ink:#f2f2ea;
+  --rtg-v-muted:#aebccc;--rtg-v-line:rgba(242,242,234,.16);--rtg-v-signature:#d0b66e;
+  --rtg-v-metal:#d0b66e;--rtg-v-accent-soft:rgba(208,182,110,.16);--rtg-v-schema:dark
+}
+body[data-rtg-vandaag-luxe][data-rtg-world="work"][data-workos-premium]{
+  background:radial-gradient(85% 46% at 82% -6%,rgba(117,184,177,.14),transparent 67%),linear-gradient(135deg,#0c1112,#101718 54%,#0c1112)!important
+}
+body[data-rtg-vandaag-luxe][data-rtg-world="work"][data-workos-premium] #shell,
+body[data-rtg-vandaag-luxe][data-rtg-world="work"][data-workos-premium] .wk-shell,
+body[data-rtg-vandaag-luxe][data-rtg-world="work"][data-workos-premium] .hq-shell,
+body[data-rtg-vandaag-luxe][data-rtg-world="work"][data-workos-premium] .pn-shell{
+  background:radial-gradient(72% 46% at 82% 0,rgba(117,184,177,.16),transparent 68%),var(--wo-black)!important
+}
+body[data-rtg-vandaag-luxe][data-rtg-world="work"][data-workos-premium] .wk-bank button.actief,
+body[data-rtg-vandaag-luxe][data-rtg-world="work"][data-workos-premium] .hq-rail a.actief,
+body[data-rtg-vandaag-luxe][data-rtg-world="work"][data-workos-premium] .pn-rail button.actief{
+  background:linear-gradient(90deg,rgba(117,184,177,.36),rgba(117,184,177,.07),transparent)!important
+}
+body[data-rtg-vandaag-luxe][data-rtg-world="work"] .knop.p{
+  border-color:#75b8b1!important;background:rgba(117,184,177,.08)!important;
+  color:#f0f2ec!important;box-shadow:none!important
+}
+body[data-rtg-vandaag-luxe][data-rtg-world="foundation"] .onthaal-beeld{
+  background:linear-gradient(155deg,#0b2032,#071522 58%,#06101b)!important
+}
+body[data-rtg-vandaag-luxe][data-rtg-world="foundation"] .band{
+  background:linear-gradient(120deg,#06101b,#0b2032 62%)!important
+}
+body[data-rtg-vandaag-luxe][data-rtg-world="foundation"] .buurtknop.vol{
+  border:1px solid #d0b66e!important;background:rgba(11,32,50,.72)!important;
+  color:#f2f2ea!important;box-shadow:none!important
+}
+body[data-rtg-vandaag-luxe="surface"][data-rtg-world="living"][data-kantoor-tool="agenda"]{
+  background:#f4f0e8!important;color:#211e19!important
+}
+body[data-rtg-vandaag-luxe="surface"][data-rtg-world="living"][data-kantoor-tool="agenda"]>header{
+  background:rgba(251,248,242,.96)!important;border-bottom-color:rgba(33,30,25,.16)!important;color:#211e19
+}
+body[data-rtg-vandaag-luxe="surface"][data-rtg-world="living"][data-kantoor-tool="agenda"] .kantoor-intro,
+body[data-rtg-vandaag-luxe="surface"][data-rtg-world="living"][data-kantoor-tool="agenda"] .rahulbalk{
+  border-color:rgba(33,30,25,.16)!important;background:#fbf8f2!important
+}
+body[data-rtg-vandaag-luxe="surface"][data-rtg-world="living"][data-kantoor-tool="agenda"] .veld,
+body[data-rtg-vandaag-luxe="surface"][data-rtg-world="living"][data-kantoor-tool="agenda"] .mkop,
+body[data-rtg-vandaag-luxe="surface"][data-rtg-world="living"][data-kantoor-tool="agenda"] .paneel{
+  border-color:rgba(33,30,25,.16)!important;background:#fbf8f2!important;color:#211e19!important
+}
+body[data-rtg-vandaag-luxe="surface"][data-rtg-world="living"][data-kantoor-tool="agenda"] .mdag,
+body[data-rtg-vandaag-luxe="surface"][data-rtg-world="living"][data-kantoor-tool="agenda"] .wdag{
+  border-color:rgba(33,30,25,.16)!important;background:#f4f0e8!important;color:#211e19!important
+}
+body[data-rtg-vandaag-luxe="surface"][data-rtg-world="living"][data-kantoor-tool="agenda"] .mdag:hover{
+  background:#e8e0d2!important
+}
+
+.rtg-vandaag-luxe::before,
+.rtg-vandaag-luxe::after{content:"";position:absolute;inset:0;pointer-events:none}
+.rtg-vandaag-luxe::before{
+  z-index:-2;background-image:url("/images/worlds/vandaag/wereld-atlas.jpg");background-repeat:no-repeat;
+  background-size:200% auto;filter:var(--vandaag-foto);transform:scale(1.015);
+  animation:rtg-vandaag-adem 18s ease-out both
+}
+.rtg-vandaag-luxe::after{
+  z-index:-1;background:
+    linear-gradient(90deg,rgba(var(--vandaag-was-rgb),.96) 0%,rgba(var(--vandaag-was-rgb),.78) 39%,rgba(var(--vandaag-was-rgb),.3) 71%,rgba(var(--vandaag-was-rgb),.62) 100%),
+    linear-gradient(0deg,rgba(var(--vandaag-was-rgb),.9) 0%,transparent 49%,rgba(var(--vandaag-was-rgb),.34) 100%)
+}
+.rtg-vandaag-luxe[data-wereld="living"]::before{background-position:left top}
+.rtg-vandaag-luxe[data-wereld="work"]::before{background-position:right top}
+.rtg-vandaag-luxe[data-wereld="travel"]::before{background-position:left bottom}
+.rtg-vandaag-luxe[data-wereld="foundation"]::before{background-position:right bottom}
+
+.rtg-vandaag-luxe__binnen{
+  width:min(92rem,100%);min-height:inherit;margin-inline:auto;
+  padding:max(1.25rem,env(safe-area-inset-top)) clamp(1.25rem,5vw,5rem) max(2rem,env(safe-area-inset-bottom));
+  display:flex;flex-direction:column
+}
+.rtg-vandaag-luxe__boven{
+  display:flex;align-items:center;justify-content:space-between;gap:1.25rem;padding:0 0 1rem;
+  border-bottom:1px solid rgba(var(--vandaag-inkt-rgb),.14)
+}
+.rtg-vandaag-luxe__merk{
+  flex:0 0 auto;color:var(--vandaag-metaal);font:400 1.35rem/1 "Bodoni Moda",Georgia,serif;
+  letter-spacing:.04em;text-decoration:none
+}
+.rtg-vandaag-luxe__portalen{
+  display:flex;align-items:center;justify-content:flex-end;gap:clamp(.25rem,1vw,1rem);
+  min-width:0;overflow-x:auto;scrollbar-width:thin
+}
+body.rtg-edge-host .rtg-vandaag-luxe__boven{display:none}
+body.rtg-edge-host .rtg-vandaag-luxe__binnen{
+  padding-bottom:max(4.5rem,env(safe-area-inset-bottom))
+}
+.rtg-vandaag-luxe__portalen a{
+  flex:0 0 auto;min-height:44px;display:inline-flex;align-items:center;padding:.65rem .75rem;
+  border:1px solid transparent;border-radius:0;color:var(--vandaag-zacht);font-size:.67rem;
+  font-weight:650;letter-spacing:.06em;text-decoration:none
+}
+.rtg-vandaag-luxe__portalen a:hover,
+.rtg-vandaag-luxe__portalen a:focus-visible{
+  color:var(--vandaag-inkt);border-color:rgba(var(--vandaag-metaal-rgb),.38);
+  background:rgba(var(--vandaag-paneel-rgb),.5)
+}
+.rtg-vandaag-luxe__portalen a[aria-current="page"]{
+  color:var(--vandaag-inkt);border-bottom-color:var(--vandaag-metaal)
+}
+
+.rtg-vandaag-luxe__opstelling{
+  flex:1;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(18rem,.58fr);
+  align-items:end;gap:clamp(2rem,8vw,8rem);
+  padding-block:clamp(4.5rem,12vh,9rem) clamp(2.5rem,7vh,5.5rem)
+}
+.rtg-vandaag-luxe__intro{max-width:51rem}
+.rtg-vandaag-luxe__wereld,
+.rtg-vandaag-luxe__focuslabel{
+  margin:0;color:var(--vandaag-metaal);font-size:.62rem;font-weight:700;
+  letter-spacing:.24em;text-transform:uppercase
+}
+.rtg-vandaag-luxe h1{
+  max-width:12ch;margin:1rem 0 1.15rem;color:var(--vandaag-inkt);
+  font:400 clamp(3.15rem,7vw,7rem)/.94 "Bodoni Moda",Georgia,serif;
+  letter-spacing:-.035em;text-wrap:balance
+}
+.rtg-vandaag-luxe__belofte{
+  max-width:40rem;margin:0;color:var(--vandaag-zacht);font-size:clamp(.95rem,1.25vw,1.12rem);line-height:1.7
+}
+.rtg-vandaag-luxe__cta,
+.rtg-vandaag-luxe__focuslink{
+  min-height:48px;display:inline-flex;align-items:center;justify-content:center;margin-top:2rem;
+  padding:.75rem 1.15rem;border:1px solid var(--vandaag-metaal);border-radius:0;
+  background:rgba(var(--vandaag-paneel-rgb),.4);color:var(--vandaag-inkt);font-size:.68rem;
+  font-weight:700;letter-spacing:.12em;text-decoration:none;text-transform:uppercase;backdrop-filter:blur(12px)
+}
+.rtg-vandaag-luxe__cta:hover,
+.rtg-vandaag-luxe__focuslink:hover{
+  background:rgba(var(--vandaag-metaal-rgb),.14)
+}
+.rtg-vandaag-luxe a:focus-visible{
+  outline:2px solid var(--vandaag-metaal);outline-offset:4px
+}
+.rtg-vandaag-luxe__focus{
+  align-self:end;width:100%;min-height:16rem;padding:clamp(1.4rem,3vw,2rem);
+  border:1px solid rgba(var(--vandaag-metaal-rgb),.38);border-top:2px solid var(--vandaag-metaal);
+  border-radius:0;background:linear-gradient(145deg,rgba(var(--vandaag-paneel-rgb),.9),rgba(var(--vandaag-paneel-rgb),.58));
+  box-shadow:0 28px 60px rgba(0,0,0,.22);backdrop-filter:blur(18px)
+}
+.rtg-vandaag-luxe__focustitel{
+  margin:1.3rem 0 .65rem;color:var(--vandaag-inkt);
+  font:400 clamp(1.55rem,2.5vw,2.25rem)/1.08 "Bodoni Moda",Georgia,serif
+}
+.rtg-vandaag-luxe__focusmeta{
+  min-height:3.2em;margin:0;color:var(--vandaag-zacht);font-size:.79rem;line-height:1.6
+}
+.rtg-vandaag-luxe__focuslink{width:100%;margin-top:1.35rem}
+
+/* Surface is een eigen contextstrip, niet een verkleinde home-opstelling. */
+.rtg-vandaag-luxe[data-modus="surface"]{min-height:clamp(9rem,16svh,13rem)}
+body[data-rtg-vandaag-luxe="surface"][data-rtg-world="work"][data-rtg-vandaag-surface="projecten"]{
+  --rtg-vandaag-werk-kop:clamp(9rem,16svh,13rem)
+}
+body[data-rtg-vandaag-luxe="surface"][data-rtg-world="work"][data-rtg-vandaag-surface="projecten"][data-rtg-vandaag-render="surface"]>.rtg-vandaag-luxe{
+  position:fixed;z-index:40;inset:0 0 auto;height:var(--rtg-vandaag-werk-kop);min-height:var(--rtg-vandaag-werk-kop)
+}
+body[data-rtg-vandaag-luxe="surface"][data-rtg-world="work"][data-rtg-vandaag-surface="projecten"][data-rtg-vandaag-render="surface"]>.wk-shell{
+  inset:var(--rtg-vandaag-werk-kop) 0 0!important;height:auto!important
+}
+.rtg-vandaag-luxe[data-modus="surface"]::after{
+  background:linear-gradient(90deg,rgba(var(--vandaag-was-rgb),.96),rgba(var(--vandaag-was-rgb),.7) 62%,rgba(var(--vandaag-was-rgb),.42))
+}
+.rtg-vandaag-luxe[data-modus="surface"] .rtg-vandaag-luxe__binnen{
+  padding-block:max(1rem,env(safe-area-inset-top)) max(1rem,env(safe-area-inset-bottom))
+}
+.rtg-vandaag-luxe__surface{
+  min-height:inherit;display:grid;grid-template-columns:minmax(0,1fr) auto;
+  align-items:end;gap:2rem;padding-block:1rem
+}
+.rtg-vandaag-luxe__surface h1{
+  max-width:24ch;margin:.5rem 0 0;font-size:clamp(2.15rem,4vw,3.6rem);line-height:1
+}
+.rtg-vandaag-luxe__surface .rtg-vandaag-luxe__cta{align-self:end;margin:0}
+
+@keyframes rtg-vandaag-adem{from{transform:scale(1.04)}to{transform:scale(1.015)}}
+@media(max-width:780px){
+  .rtg-vandaag-luxe[data-modus="home"]{min-height:100svh}
+  .rtg-vandaag-luxe::after{
+    background:linear-gradient(0deg,rgba(var(--vandaag-was-rgb),.97) 0%,rgba(var(--vandaag-was-rgb),.82) 48%,rgba(var(--vandaag-was-rgb),.3) 100%),linear-gradient(90deg,rgba(var(--vandaag-was-rgb),.54),rgba(var(--vandaag-was-rgb),.16))
+  }
+  .rtg-vandaag-luxe__binnen{padding-inline:1rem}
+  .rtg-vandaag-luxe__portalen{justify-content:flex-start}
+  .rtg-vandaag-luxe__opstelling{
+    grid-template-columns:1fr;align-content:end;gap:1.5rem;padding-block:clamp(5rem,15vh,8rem) 1.5rem
+  }
+  .rtg-vandaag-luxe h1{max-width:10ch;font-size:clamp(2.9rem,14vw,4.8rem)}
+  .rtg-vandaag-luxe__belofte{max-width:34rem;font-size:.91rem}
+  .rtg-vandaag-luxe__cta{margin-top:1.35rem}
+  .rtg-vandaag-luxe__focus{min-height:0;padding:1.25rem}
+  .rtg-vandaag-luxe[data-modus="surface"]{min-height:clamp(8rem,20svh,11rem)}
+  body[data-rtg-vandaag-luxe="surface"][data-rtg-world="work"][data-rtg-vandaag-surface="projecten"]{
+    --rtg-vandaag-werk-kop:clamp(8rem,20svh,11rem)
+  }
+  .rtg-vandaag-luxe__surface{grid-template-columns:minmax(0,1fr) auto;gap:1rem;padding-block:.5rem}
+  .rtg-vandaag-luxe__surface h1{font-size:clamp(1.9rem,8.5vw,2.65rem)}
+}
+@media(max-aspect-ratio:1/1){
+  .rtg-vandaag-luxe::before{background-size:auto 200%}
+}
+@media(max-width:420px){
+  .rtg-vandaag-luxe__portalen a{padding-inline:.6rem;font-size:.61rem}
+  .rtg-vandaag-luxe__opstelling{padding-top:4rem}
+  .rtg-vandaag-luxe h1{font-size:clamp(2.65rem,13.2vw,3.75rem)}
+  .rtg-vandaag-luxe__surface .rtg-vandaag-luxe__cta{min-width:44px;padding-inline:.7rem;font-size:.58rem}
+}
+@media(prefers-reduced-motion:reduce){
+  .rtg-vandaag-luxe::before{animation:none;transform:none}
+  .rtg-vandaag-luxe *,
+  .rtg-vandaag-luxe *::before,
+  .rtg-vandaag-luxe *::after{
+    scroll-behavior:auto!important;transition-duration:.01ms!important;
+    animation-duration:.01ms!important;animation-iteration-count:1!important
+  }
+}

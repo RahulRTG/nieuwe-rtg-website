@@ -83,7 +83,6 @@ const CONTRACTEN = Object.fromEntries([
   dicht('POST /api/supplier/salon/bio', 'supplier.salon.bio', auth),          // de bio
   dicht('POST /api/supplier/samenwerking/oproep', 'supplier.samenwerking.oproep', auth), // de oproep
   dicht('POST /api/supplier/site/bewaar', 'supplier.site.bewaar', auth),      // het ontwerp
-  dicht('POST /api/supplier/staff/invite', 'supplier.staff.invite', auth),    // naam + rol + functie
   dicht('POST /api/techniek/fouten/wis', 'techniek.fouten.wis', auth),        // wist de storingslijst
   dicht('POST /api/toestellen/koppel', 'toestellen.koppel', auth),            // het toestel
   dicht('POST /api/werkplek/bureau/architect/maak', 'werkplek.bureau.architect.maak', huis), // de titel van het ontwerp

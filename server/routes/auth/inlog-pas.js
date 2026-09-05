@@ -12,7 +12,7 @@
 'use strict';
 
 module.exports = (ctx) => {
-  const { PERSONAS, accounts, app, auth, checkCred, crypto, forgetSession, hasCred, loginFails,
+  const { PERSONAS, accounts, app, auth, checkCred, crypto, forgetSessionDuurzaam, hasCred, loginFails,
     noteFailedTry, rememberSession, sessions, stateFor, tooManyTries, logInlog, DEMO, pasAppOk , PAS_FOUT } = ctx;
 
 app.post('/api/login', (req, res) => {
@@ -49,13 +49,17 @@ app.post('/api/login', (req, res) => {
    uitloggen dus niets: het antwoord was { ok: true } en het token bleef daarna
    gewoon werken. Op een geleende of gedeelde computer is dat precies het moment
    waarop iemand denkt veilig te zijn. Gevonden in aanvalsronde 2, punt 14. */
-app.post('/api/logout', auth, (req, res) => {
-  for (const [token, sess] of sessions) if (sess === req.session) forgetSession(token);
-  // en de staatloze kant: het aangeboden token op de intreklijst
-  const kop = req.get('authorization') || '';
-  const tok = kop.startsWith('Bearer ') ? kop.slice(7) : null;
-  if (tok && accounts && typeof accounts.trekIn === 'function') accounts.trekIn(tok);
-  res.json({ ok: true });
+app.post('/api/logout', auth, async (req, res, next) => {
+  try {
+    for (const [token, sess] of sessions)
+      if (sess === req.session) await forgetSessionDuurzaam(token);
+    // en de staatloze kant: het aangeboden token op de intreklijst
+    const kop = req.get('authorization') || '';
+    const tok = kop.startsWith('Bearer ') ? kop.slice(7) : null;
+    if (tok && accounts && typeof accounts.trekIn === 'function') await accounts.trekIn(tok);
+    if (accounts && typeof accounts.wachtIntrekkingen === 'function') await accounts.wachtIntrekkingen();
+    res.json({ ok: true });
+  } catch (e) { next(e); }
 });
 
 

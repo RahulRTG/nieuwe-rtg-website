@@ -94,6 +94,13 @@ test('startAcme haalt een certificaat en laadt het LIVE in de draaiende TLS-serv
     assert.equal(handle.status, 'nieuw', 'er is een nieuw certificaat opgehaald');
     assert.equal(await tlsPeek(poort), 'example.test', 'de server serveert nu LIVE het door ACME uitgegeven certificaat');
     assert.ok(fs.existsSync(path.join(tmp, 'tls', 'live', 'fullchain.pem')), 'het certificaat is op schijf bewaard voor een warme herstart');
+    const httpPoort = handle.httpServer.address().port;
+    const omleiding = await fetch('http://127.0.0.1:' + httpPoort + '/herstel?bewijs=niet-echt', {
+      redirect:'manual', headers:{ Host:'aanvaller.example' }
+    });
+    assert.equal(omleiding.status, 301);
+    assert.equal(omleiding.headers.get('location'), 'https://example.test/herstel?bewijs=niet-echt',
+      'de ACME-responder gebruikt uitsluitend een werkelijk gecertificeerd domein');
   } finally {
     if (handle) handle.stop();
     await sluit(server);

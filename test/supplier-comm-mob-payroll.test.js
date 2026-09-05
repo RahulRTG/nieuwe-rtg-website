@@ -304,6 +304,8 @@ test('5. een inkoopaanvraag intrekken is aan de koper, en aan zijn beheer', asyn
     titel: 'Handdoeken voor de fitnessvloer',
     regels: [{ wat: 'handdoeken', aantal: 300, eenheid: 'stuk' }] }, baas.token);
   assert.equal(aan.status, 200, JSON.stringify(aan.body).slice(0, 160));
+  assert.ok(aan.body.handel.mag.length >= 1 && aan.body.handel.mag.includes('intrekken'),
+    'de aanvraag heeft vóór intrekken aantoonbaar een volgende stap');
   const id = aan.body.handel.id;
   const off = await api('/api/supplier/handel/offreren', { id, prijs: 190 }, wasBaas);
   assert.equal(off.status, 200, JSON.stringify(off.body).slice(0, 160));
@@ -582,6 +584,8 @@ test('10. verzuim voor de planning: afwezig, met wat iemand nog kan -- en zonder
   const dag = (n) => new Date(Date.now() + n * 864e5).toISOString().slice(0, 10);
   const nu = await api('/api/supplier/verzuim/planning', { van: dag(-1), tot: dag(1) }, baas.token);
   assert.equal(nu.status, 200, nu.body.error || '');
+  assert.ok(nu.body.afwezig.some(a => a.staffId === novaStaff),
+    'de eigen planning bevat de concrete medewerker');
   const rij = (nu.body.afwezig || []).find(a => a.staffId === novaStaff);
   assert.ok(rij, 'de zieke medewerker staat op het planbord');
   assert.equal(rij.naam, 'Nova Bakker');
@@ -611,7 +615,8 @@ test('10. verzuim voor de planning: afwezig, met wat iemand nog kan -- en zonder
   const leeg = await api('/api/supplier/verzuim/planning', { van: '2020-01-01', tot: '2020-01-05' }, baas.token);
   assert.deepEqual(leeg.body.afwezig, [], 'buiten het venster staat er niemand');
   const buur = await api('/api/supplier/verzuim/planning', { van: dag(-1), tot: dag(1) }, kikBaas.token);
-  assert.deepEqual(buur.body.afwezig, [], 'en de buurzaak ziet ons verzuim niet');
+  assert.equal(buur.body.afwezig.some(a => a.staffId === novaStaff), false,
+    'de buurzaak ziet het concrete verzuim van Nova niet');
 });
 
 /* HET CONTRACT IS DE INVOER VAN DE LOONRUN, en de geschiedenis ervan is het

@@ -11,6 +11,7 @@ const path = require('path');
 const http = require('http');
 const { startServer, stop } = require('./helper');
 const { maakMedia, sigV4 } = require('../server/media');
+const { MAX_OBJECT_BYTES, maakS3Backend } = require('../server/media/s3');
 
 const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
 const SVG = 'data:image/svg+xml;base64,' + Buffer.from('<svg/>').toString('base64');
@@ -147,6 +148,86 @@ test('S3-backend: put/get/del tegen een lokale nep-S3 (ondertekend, versleuteld)
   } finally {
     srv.close();
   }
+});
+
+test('S3-backend weigert onveilige objectnamen en onbegrensde objectbytes', async () => {
+  const backend = maakS3Backend({
+    bucket: 'testbucket', region: 'us-east-1', endpoint: 'http://127.0.0.1:9',
+    key: 'testkey', secret: 'testsecret', prefix: 'media/', timeoutMs: 500
+  });
+  for (const naam of ['', '../geheim', 'map/foto.jpg', '.']) {
+    await assert.rejects(backend.get(naam), /veilig sleutelsegment/);
+  }
+  await assert.rejects(
+    backend.put('foto.jpg', Buffer.alloc(MAX_OBJECT_BYTES + 1)),
+    /maximale mediagrootte/);
+});
+
+test('S3-backend breekt een te groot antwoord af, ook zonder Content-Length', async () => {
+  const groot = Buffer.alloc(MAX_OBJECT_BYTES + 1, 7);
+  for (const metLengte of [true, false]) {
+    const srv = http.createServer((req, res) => {
+      if (metLengte) res.setHeader('Content-Length', groot.length);
+      res.write(groot);
+      res.end();
+    });
+    await new Promise(r => srv.listen(0, '127.0.0.1', r));
+    const backend = maakS3Backend({
+      bucket: 'testbucket', region: 'us-east-1', endpoint: 'http://127.0.0.1:' + srv.address().port,
+      key: 'testkey', secret: 'testsecret', prefix: 'media/', timeoutMs: 2000
+    });
+    try {
+      await assert.rejects(backend.get('foto.jpg'), /maximale mediagrootte/);
+    } finally {
+      await new Promise(resolve => srv.close(resolve));
+    }
+  }
+});
+
+test('mediastore maakt van een backendstoring geen gewone invoerfout', async () => {
+  const srv = http.createServer((req, res) => { res.writeHead(503).end('opslag dicht'); });
+  await new Promise(r => srv.listen(0, '127.0.0.1', r));
+  const media = maakMedia({ dir: tmp(), env: {
+    RTG_MEDIA_BACKEND: 's3', RTG_MEDIA_S3_BUCKET: 'testbucket',
+    RTG_MEDIA_S3_ENDPOINT: 'http://127.0.0.1:' + srv.address().port,
+    RTG_MEDIA_S3_KEY: 'testkey', RTG_MEDIA_S3_SECRET: 'testsecret'
+  } });
+  try {
+    await assert.rejects(media.bewaar(PNG, 900 * 1024), /S3 put 503/,
+      'de aanroeper moet de opslagstoring als serverfout afhandelen');
+  } finally {
+    await new Promise(resolve => srv.close(resolve));
+  }
+});
+
+test('mediastore onderscheidt ontbrekende bytes van een kapotte objectopslag', async () => {
+  let status = 404;
+  const srv = http.createServer((req, res) => { res.writeHead(status).end(); });
+  await new Promise(r => srv.listen(0, '127.0.0.1', r));
+  const media = maakMedia({ dir: tmp(), env: {
+    RTG_MEDIA_BACKEND: 's3', RTG_MEDIA_S3_BUCKET: 'testbucket',
+    RTG_MEDIA_S3_ENDPOINT: 'http://127.0.0.1:' + srv.address().port,
+    RTG_MEDIA_S3_KEY: 'testkey', RTG_MEDIA_S3_SECRET: 'testsecret'
+  } });
+  try {
+    assert.equal(await media.leesBuf('0'.repeat(32) + '.jpg'), null,
+      'een echte 404 betekent dat het object ontbreekt');
+    assert.equal(await media.bestaat('0'.repeat(32) + '.jpg'), false);
+    status = 503;
+    await assert.rejects(media.leesBuf('0'.repeat(32) + '.jpg'), /S3 get 503/);
+    await assert.rejects(media.bestaat('0'.repeat(32) + '.jpg'), /S3 head 503/);
+  } finally {
+    await new Promise(resolve => srv.close(resolve));
+  }
+});
+
+test('lokale mediacache weigert een onverwacht groot object vóór ontsleutelen', async () => {
+  const dir = tmp();
+  const media = maakMedia({ dir, env: {} });
+  const naam = '1'.repeat(32) + '.jpg';
+  fs.mkdirSync(media.MEDIA_DIR, { recursive: true });
+  fs.writeFileSync(media.pad(naam), Buffer.alloc(MAX_OBJECT_BYTES + 1));
+  await assert.rejects(media.leesBuf(naam), /maximale mediagrootte/);
 });
 
 test('integratie: een pagina-foto wordt als /media-URL bewaard en over HTTP geserveerd', async () => {

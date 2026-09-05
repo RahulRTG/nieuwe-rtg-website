@@ -153,7 +153,7 @@ test('het kwaliteitsbord zegt even groot wat het NIET meet', { skip: geenBrowser
 
 test('een medewerker vraagt toegang en opent niets uit zichzelf', { skip: geenBrowser(pw) }, async () => {
   await metCockpit(async (page, base, lidToken, balie) => {
-    await api(base, '/api/service/open', { onderwerp: 'betaling', titel: 'Mijn uitbetaling ontbreekt' }, lidToken);
+    await api(base, '/api/service/open', { onderwerp: 'zaak', titel: 'Mijn werkruimte reageert niet' }, lidToken);
     await page.goto(base + '/apps/service.html', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('tbody tr[data-id]', { timeout: 20000 });
     await page.click('tbody tr[data-id]');
@@ -163,11 +163,10 @@ test('een medewerker vraagt toegang en opent niets uit zichzelf', { skip: geenBr
        want dan vraagt iemand iets dat het team niet mag en krijgt hij een
        weigering waar hij niets aan heeft. */
     const caps = await page.$$eval('#hCap option', els => els.map(e => e.textContent));
-    assert.ok(caps.includes('betaling.stand'), 'het betaalteam kan zijn eigen bevoegdheid niet vragen: ' + caps);
-    assert.equal(caps.filter(c => c === 'identiteit.openen').length, 0,
-      'het betaalteam kan de identiteitskluis vragen; dat hoort bij Toegang');
+    assert.deepEqual(caps, ['organisatie.stand'],
+      'de UI toont meer dan de enige capability met een echte lezer: ' + caps);
 
-    await page.fill('#hDoel', 'de uitbetaling staat sinds gisteren op pending');
+    await page.fill('#hDoel', 'de operationele werkruimte reageert sinds gisteren niet');
     await page.click('#hVraag');
     await page.waitForFunction(() => /Het lid ziet het in zijn app/.test(document.body.textContent), null, { timeout: 20000 });
 
@@ -184,13 +183,13 @@ test('een medewerker vraagt toegang en opent niets uit zichzelf', { skip: geenBr
    toont in plaats van de technische sleutel `ai:onderzoeker`. */
 test('de AI vraagt het lid om toegang, en opent niets uit zichzelf', { skip: geenBrowser(pw) }, async () => {
   await metCockpit(async (page, base, lidToken, balie) => {
-    await api(base, '/api/service/open', { onderwerp: 'betaling', titel: 'Mijn uitbetaling ontbreekt' }, lidToken);
+    await api(base, '/api/service/open', { onderwerp: 'zaak', titel: 'Mijn werkruimte reageert niet' }, lidToken);
     await page.goto(base + '/apps/service.html', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('tbody tr[data-id]', { timeout: 20000 });
     await page.click('tbody tr[data-id]');
     await page.waitForSelector('#aiVraag', { timeout: 20000 });
 
-    await page.fill('#aiReden', 'uitzoeken waar de uitbetaling is blijven staan');
+    await page.fill('#aiReden', 'uitzoeken waar de operationele werkruimte vastloopt');
     await page.click('#aiVraag');
     await page.waitForFunction(() => /Het lid beslist/.test(document.body.textContent), null, { timeout: 20000 });
 

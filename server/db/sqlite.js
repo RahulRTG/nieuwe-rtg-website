@@ -155,12 +155,6 @@ function startSqliteSync() {
   if (pollTimer.unref) pollTimer.unref();
 }
 
-/* Netjes afronden: alles nog een keer volledig nakijken (de voorcheck mag niets
-   achterlaten) en daarna de WAL in het hoofdbestand vouwen. Zonder die
-   checkpoint blijft store.db-wal staan waar hij stond -- gemeten 4,9 MB naast
-   een database van 1,9 MB -- en moet de volgende start dat eerst inlezen.
-   TRUNCATE lukt alleen als geen ander proces meer leest; mislukt hij, dan is dat
-   geen probleem (de data staat al gecommit in de WAL), dus alleen loggen. */
 /* De WAL leegdrukken in store.db zelf.
 
    In WAL-modus staat verse data NIET in store.db maar in store.db-wal, en
@@ -198,6 +192,8 @@ const bewerkCollectieSqlite = require('./collectie-sqlite')({
   db, verbinding: () => { sqliteInit(); return kvdb; }, statements, uitStore, naarStore,
   laatsteJson, toegepast, voorcheck
 });
+const economischeBoekingSqlite = require('./economische-boeking-sqlite')({ db,
+  verbinding: () => { sqliteInit(); return kvdb; }, statements, merge3, uitStore, naarStore, laatsteJson, toegepast, voorcheck });
 
-module.exports = { loadSqlite, saveSqlite, bewerkCollectieSqlite, startSqliteSync, afrondSqlite, checkpointSqlite,
+module.exports = { loadSqlite, saveSqlite, bewerkCollectieSqlite, economischeBoekingSqlite, startSqliteSync, afrondSqlite, checkpointSqlite,
   persistentieStandSqlite };

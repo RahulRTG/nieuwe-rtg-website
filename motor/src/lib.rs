@@ -14,3 +14,5 @@ pub mod magnaat;
 pub mod capabilities;
 pub mod sha256;
 pub mod sentinel;
+pub mod duurzaam;
+pub mod snapshotkluis;

@@ -66,16 +66,23 @@ test('2. de passagiersketen: boeken, inchecken tijdens het venster, boarding pas
   // boeken kan op beide, inchecken alleen als het venster open staat
   const b1 = await api(base, '/api/member/vluchten/boek', { id: dicht.id }, lid);
   assert.equal(b1.status, 200);
+  assert.match(b1.body.boeking.id, /^bk_[a-f0-9]{32}$/);
+  assert.equal(b1.body.boeking.code, undefined, 'boeken geeft geen bearer uit');
   assert.equal((await api(base, '/api/member/vluchten/boek', { id: dicht.id }, lid)).status, 409, 'niet dubbel op dezelfde vlucht');
-  assert.equal((await api(base, '/api/member/vluchten/incheck', { code: b1.body.boeking.code }, lid)).status, 409, 'inchecken is nog niet open');
+  assert.equal((await api(base, '/api/member/vluchten/incheck', { id: b1.body.boeking.id }, lid)).status, 409, 'inchecken is nog niet open');
   const b2 = await api(base, '/api/member/vluchten/boek', { id: open.id }, lid);
-  const inc = await api(base, '/api/member/vluchten/incheck', { code: b2.body.boeking.code, koffers: 2 }, lid);
+  const inc = await api(base, '/api/member/vluchten/incheck', { id: b2.body.boeking.id, koffers: 2 }, lid);
   assert.equal(inc.status, 200);
+  assert.match(inc.body.pass.code, /^BP\.[A-F0-9]{32}$/);
   assert.match(inc.body.pass.stoel, /^\d+[A-F]$/, 'een echte stoel');
   assert.equal(inc.body.pass.koffers.length, 2, 'twee koffertags');
-  assert.equal((await api(base, '/api/member/vluchten/incheck', { code: b2.body.boeking.code }, lid)).status, 409, 'niet dubbel inchecken');
+  const dubbel = await api(base, '/api/member/vluchten/incheck', { id: b2.body.boeking.id }, lid);
+  assert.equal(dubbel.status, 409, 'niet dubbel inchecken');
+  assert.equal(dubbel.body.code, undefined, 'een retry heronthult het geheim niet');
   const mijn = await api(base, '/api/member/vluchten/mijn', {}, lid);
   assert.ok(mijn.body.boekingen.some(b => b.status === 'ingecheckt' && b.koffers.length === 2));
+  assert.equal(JSON.stringify(mijn.body).includes(inc.body.pass.code), false, 'Mijn reizen heronthult de code nooit');
+  assert.equal(mijn.body.boekingen.find(b => b.id === b2.body.boeking.id).pass.rotatie, 1);
 });
 
 test('3. de grendels: geen boarding zonder rond draai, geen vertrek zonder klaring, en de keten nooit achteruit', async () => {

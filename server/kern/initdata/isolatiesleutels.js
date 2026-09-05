@@ -49,12 +49,24 @@ function strengsteNaam(a, b) {
 }
 
 module.exports = function migreerIsolatieSleutels({ db, save }) {
+  const heeft = (o, n) => Object.prototype.hasOwnProperty.call(o, n);
+  if (!heeft(db.data, 'isolatie')) return;
   const isoTak = db.data.isolatie;
-  if (isoTak && isoTak.sessie && typeof isoTak.sessie === 'object') {
+  if (!isoTak || typeof isoTak !== 'object' || Array.isArray(isoTak)) {
+    throw new Error('isolatiemigratie: bestaande isolatie-opslag is onleesbaar; weigeren om haar te vervangen');
+  }
+  if (heeft(isoTak, 'sessie') && (!isoTak.sessie || typeof isoTak.sessie !== 'object' || Array.isArray(isoTak.sessie))) {
+    throw new Error('isolatiemigratie: bestaande sessietak is onleesbaar; weigeren om standen te verliezen');
+  }
+  if (isoTak.sessie) {
     let verhuisd = 0;
     for (const [sleutel, rij] of Object.entries(isoTak.sessie)) {
       if (/^[a-f0-9]{64}$/.test(sleutel)) continue;      // al een echte sessiesleutel
-      if (!isoTak.identiteit || typeof isoTak.identiteit !== 'object') isoTak.identiteit = {};
+      if (heeft(isoTak, 'identiteit') &&
+          (!isoTak.identiteit || typeof isoTak.identiteit !== 'object' || Array.isArray(isoTak.identiteit))) {
+        throw new Error('isolatiemigratie: bestaande identiteitstak is onleesbaar; weigeren om haar leeg te maken');
+      }
+      if (!isoTak.identiteit) isoTak.identiteit = {};
       const staand = isoTak.identiteit[sleutel];
       const samen = strengsteNaam((rij && rij.stand) || 'normaal',
         (staand && staand.stand) || 'normaal');
@@ -71,7 +83,10 @@ module.exports = function migreerIsolatieSleutels({ db, save }) {
       verhuisd++;
     }
     if (verhuisd) {
-      if (!Array.isArray(isoTak.spoor)) isoTak.spoor = [];
+      if (heeft(isoTak, 'spoor') && !Array.isArray(isoTak.spoor)) {
+        throw new Error('isolatiemigratie: bestaand isolatiespoor is onleesbaar; weigeren om het leeg te maken');
+      }
+      if (!isoTak.spoor) isoTak.spoor = [];
       isoTak.spoor.unshift({ at: new Date().toISOString(), richting: 'verplaatst',
         drager: 'sessie', aantal: verhuisd, door: 'migratie',
         reden: 'de sessiesleutel is een echte sessiesleutel geworden; de oude standen zijn naar ' +

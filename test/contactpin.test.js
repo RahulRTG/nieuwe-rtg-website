@@ -302,6 +302,8 @@ test('de levende code draagt geen enkel blijvend gegeven', () => {
      base64-tekst te vinden zijn en dan bewijst de toets niets. */
   const velden = lijf.split('|');
   assert.equal(velden[0], 'contact');
+  assert.match(velden[1], /^[A-Za-z0-9_-]{22}$/,
+    'de vluchtige verwijzing bevat 128 bits toeval');
   assert.ok(!velden.includes('A'), 'de sleutel van het lid staat er niet in');
   // en twee codes van dezelfde persoon lijken niet op elkaar
   assert.notEqual(sociaal.liveMaak('A').token, c.token);
@@ -325,6 +327,29 @@ test('een levende code wijst een mens aan, gaat pas op bij verbinden en verdraag
   assert.equal(sociaal.liveKijk('B', c.token).status, 404, 'de code is op');
 });
 
+test('een verse levende code trekt de vorige in', () => {
+  const { sociaal } = maak();
+  const oud = sociaal.liveMaak('A');
+  const vers = sociaal.liveMaak('A');
+  assert.equal(sociaal.liveKijk('B', oud.token).status, 404,
+    'rotatie laat geen tweede geldige code van dezelfde uitgever achter');
+  assert.equal(sociaal.liveKijk('B', vers.token).codename, 'Lid A');
+});
+
+test('twee bevestigingen op dezelfde levende code kunnen niet allebei winnen', async () => {
+  const { db, sociaal } = maak();
+  const code = sociaal.liveMaak('A');
+  const b = sociaal.liveKijk('B', code.token);
+  const c = sociaal.liveKijk('C', code.token);
+  const uit = await Promise.all([
+    sociaal.liveVerbind('B', code.token, b.bevestiging),
+    sociaal.liveVerbind('C', code.token, c.bevestiging)
+  ]);
+  assert.equal(uit.filter(x => x && x.status === 200).length, 1,
+    'de atomische claim kent precies een winnaar');
+  assert.equal(db.data.connections.length, 1, 'er ontstaat precies een relatieverzoek');
+});
+
 /* HET VERVAL, en die is alleen te toetsen door de klok te bedriegen: wachten
    tot een code van een minuut echt verlopen is, maakt van deze toets een toets
    die een minuut duurt. We zetten het vervalmoment daarom met de hand terug --
@@ -333,7 +358,7 @@ test('een verlopen levende code wijst niemand meer aan', () => {
   const { sociaal } = maak();
   const c = sociaal.liveMaak('A');
   assert.equal(sociaal.liveKijk('B', c.token).codename, 'Lid A');
-  for (const v of sociaal.liveOpen.values()) v.vervalt = Date.now() - 1;
+  for (const v of sociaal.liveOpen.values()) v.vervaltOp = Date.now() - 1;
   assert.equal(sociaal.liveKijk('B', c.token).status, 404, 'na het verval is er niets meer');
 });
 

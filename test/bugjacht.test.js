@@ -115,7 +115,7 @@ test('bagage: een vermiste koffer glipt niet terug naar het begin van de keten',
     nationaliteit: 'Nederlandse', geboortedatum: '1990-01-01' }, lid);
   const boek = await api('/api/member/vluchten/boek', { id: open.id }, lid);
   assert.equal(boek.status, 200);
-  const inc = await api('/api/member/vluchten/incheck', { code: boek.body.boeking.code, koffers: 1 }, lid);
+  const inc = await api('/api/member/vluchten/incheck', { id: boek.body.boeking.id, koffers: 1 }, lid);
   assert.equal(inc.status, 200, 'ingecheckt met een koffer');
   const lijst = (await api('/api/lucht/bagage', {}, ops)).body;
   const koffer = (lijst.koffers || []).find(k => k.status === 'ingecheckt');
@@ -511,6 +511,7 @@ test('het eigenaarsadres is niet via de openbare registratie te claimen', async 
     // productie weigert te starten zonder deze; dat is bewust en het hoort zo
     RTG_ENC_KEY: sleutel('x'), RTG_VAULT_KEY: sleutel('a'), RTG_SECRET_KEY: sleutel('b'),
     OFFICE_TOTP_SECRET: 'JBSWY3DPEHPK3PXP',
+    RTG_ISOLATIE_AFDWINGEN: '1',
     RTG_OWNER_EMAIL: 'eigenaar-proef@voorbeeld.test',
     // deze proef gaat niet over betalen; de rail staat daarom hard dicht
     RTG_BETALEN_UIT: '1',

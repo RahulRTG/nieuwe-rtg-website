@@ -67,7 +67,8 @@ test('Adyen gebruikt exact de live Checkout-URL en een geldige HMAC-sleutel', ()
 test('Financien krijgt provider-onafhankelijke betaalcijfers en controleproblemen', () => {
   const { r, data } = regie({}, null);
   data.betaalWaarheid = {
-    a: { id:'BW-A', provider:'stripe', status:'BEVESTIGD', centen:1299, terugbetaaldCenten:0, bijgewerktAt:'2026-08-14T09:00:00Z' },
+    a: { id:'BW-A', provider:'stripe', status:'BEVESTIGD', centen:1299, terugbetaaldCenten:0, bijgewerktAt:'2026-08-14T09:00:00Z',
+      terugbetaalOpdrachten:[{ status:'BIJ_PROVIDER' }] },
     b: { id:'BW-B', provider:'mollie', status:'CONTROLE_NODIG', centen:500, terugbetaaldCenten:0, bijgewerktAt:'2026-08-14T10:00:00Z' },
     c: { id:'BW-C', provider:'adyen', status:'TERUGBETAALD', centen:2000, terugbetaaldCenten:2000, bijgewerktAt:'2026-08-13T10:00:00Z' }
   };
@@ -76,6 +77,10 @@ test('Financien krijgt provider-onafhankelijke betaalcijfers en controleprobleme
   assert.equal(beeld.cijfers.bevestigdCenten, 3299);
   assert.equal(beeld.cijfers.terugbetaaldCenten, 2000);
   assert.equal(beeld.cijfers.controleNodig, 1);
+  assert.equal(beeld.cijfers.afhandelingWacht, 1);
+  assert.equal(beeld.cijfers.terugbetalingWacht, 1);
   assert.equal(beeld.cijfers.recent[0].id, 'BW-B');
   assert.equal(beeld.problemen.some(x => x.code === 'BETALING-CONTROLE'), true);
+  assert.equal(beeld.problemen.some(x => x.code === 'AFHANDELING-WACHT'), true);
+  assert.equal(beeld.problemen.some(x => x.code === 'TERUGBETALING-WACHT'), true);
 });

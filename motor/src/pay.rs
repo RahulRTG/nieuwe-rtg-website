@@ -52,7 +52,9 @@ fn vingerafdruk_van(saldi: &HashMap<String, i64>) -> String {
     format!("{:016x}", h)
 }
 
+#[derive(Clone)]
 struct Kascode { code: String, codenaam: String, max_centen: i64, geldig_tot: u64, gebruikt: bool }
+#[derive(Clone)]
 struct Tikcode { code: String, codenaam: String, geldig_tot: u64 }
 
 /* Constant-time vergelijk voor betaalcodes: geen vroeg-stoppen per teken, zodat
@@ -63,6 +65,7 @@ fn ct_eq(a: &str, b: &str) -> bool {
     crate::aead::ct_eq(a.as_bytes(), b.as_bytes())
 }
 
+#[derive(Clone)]
 pub struct State {
     pub grb: Ledger,
     pub bank: Ledger, // tweede grootboek (RTG Bank), cutover stap 3
@@ -76,10 +79,19 @@ pub struct State {
        af, dan is dat een 409 in plaats van een verkeerde 200. */
     idem_afdruk: HashMap<String, String>,
     idem_volgorde: Vec<String>,
+    /* Economische sleutels worden niet uit een ring verwijderd. Een payout kan
+       ook veel later nogmaals als mislukt worden gemeld; diezelfde teruggang
+       moet dan nog altijd naar exact dezelfde boeking wijzen. */
+    economisch: HashMap<String, Json>,
+    economisch_afdruk: HashMap<String, String>,
     kascodes: Vec<Kascode>,
     tikcodes: Vec<Tikcode>,
     betaaldienst_promille: i64, // kosten per mille op kassa-ontvangst; 0 in demo
     pub vuil: bool,             // write-behind vlag
+    /* Monotone staatversie voor de snapshotschrijver. Een oudere, langzaam
+       geserialiseerde momentopname mag nooit na een nieuwere sync-write op
+       schijf belanden. */
+    pub revisie: u64,
 }
 
 impl State {
@@ -91,14 +103,20 @@ impl State {
             idem: HashMap::new(),
             idem_afdruk: HashMap::new(),
             idem_volgorde: Vec::new(),
+            economisch: HashMap::new(),
+            economisch_afdruk: HashMap::new(),
             kascodes: Vec::new(),
             tikcodes: Vec::new(),
             betaaldienst_promille: 0,
             vuil: false,
+            revisie: 0,
         }
     }
 
-    fn markeer(&mut self) { self.vuil = true; }
+    fn markeer(&mut self) {
+        self.vuil = true;
+        self.revisie = self.revisie.saturating_add(1);
+    }
 
     // ---------- ledenregister (motor's eigen bestaatLid; kiem voor stap 2) ----------
     pub fn registreer_lid(&mut self, codenaam: &str) -> Resp {
@@ -147,6 +165,35 @@ impl State {
                     self.idem_afdruk.remove(&k);
                 }
             }
+            self.markeer();
+        }
+        r
+    }
+
+    fn met_economisch<F: FnOnce(&mut State) -> Resp>(&mut self, sleutel: Option<String>, afdruk: String, werk: F) -> Resp {
+        let key = match sleutel { None => return err(400, "Een economische sleutel is verplicht."), Some(k) => k };
+        if !economische_sleutel_geldig(&key) {
+            return err(400, "De economische sleutel heeft geen vaste hashvorm.");
+        }
+        if let Some(bewaard) = self.economisch.get(&key) {
+            let oud = match self.economisch_afdruk.get(&key) {
+                Some(v) => v,
+                None => return err(503, "De economische sleutel mist zijn afdruk; herstel is vereist."),
+            };
+            if !crate::aead::ct_eq(oud.as_bytes(), afdruk.as_bytes()) {
+                return err(409, "Deze economische sleutel hoort al bij een andere boeking.");
+            }
+            let mut body = bewaard.clone();
+            body.set("herhaald", Json::Bool(true));
+            return Resp { status: 200, body };
+        }
+        if self.economisch_afdruk.contains_key(&key) {
+            return err(503, "De economische afdruk mist zijn antwoord; herstel is vereist.");
+        }
+        let r = werk(self);
+        if r.status < 300 {
+            self.economisch.insert(key.clone(), r.body.clone());
+            self.economisch_afdruk.insert(key, afdruk);
             self.markeer();
         }
         r
@@ -464,6 +511,23 @@ impl State {
         out.set("boeking", b.to_json());
         ok(out)
     }
+    pub fn bank_boek_eenmaal(&mut self, van: &str, naar: &str, centen: i64, soort: &str,
+                             oms: &str, ref_: Option<String>, idem: Option<&str>) -> Resp {
+        let sleutel = idem.map(|i| format!("bank:{}", i));
+        let afdruk = economische_afdruk("bank", van, naar, centen, soort, ref_.as_deref().unwrap_or(""));
+        let ref_identiteit = ref_.clone();
+        let mut r = self.met_economisch(sleutel, afdruk, |s| s.bank_boek(van, naar, centen, soort, oms, ref_));
+        if r.status < 300 {
+            let boeking = r.body.get("boeking");
+            if !boeking.map(|j| boeking_gelijk(&self.bank, j) &&
+                boeking_is(j, van, naar, centen, soort, ref_identiteit.as_deref())).unwrap_or(false) {
+                return err(503, "De economische sleutel bestaat, maar zijn bankboekregel ontbreekt; herstel is vereist.");
+            }
+            r.body.set("saldoVan", Json::Num(self.bank.saldo_van(van) as f64));
+            r.body.set("saldoNaar", Json::Num(self.bank.saldo_van(naar) as f64));
+        }
+        r
+    }
     /* Bank-gezondheid = alleen de conservatie (som == 0). Anders dan pay MAG een
        betaalrekening in de bank rood staan (tot de bodem); die bodem-policy leeft
        in de JS-engine. De motor bewaakt hier dus enkel dat er geen geld ontstaat
@@ -504,6 +568,23 @@ impl State {
             Err((st, m)) => err(st, &m),
         }
     }
+    pub fn boek_guard_eenmaal(&mut self, van: &str, naar: &str, centen: i64, soort: &str,
+                              oms: &str, ref_: Option<String>, idem: Option<&str>) -> Resp {
+        let sleutel = idem.map(|i| format!("pay:{}", i));
+        let afdruk = economische_afdruk("pay", van, naar, centen, soort, ref_.as_deref().unwrap_or(""));
+        let ref_identiteit = ref_.clone();
+        let mut r = self.met_economisch(sleutel, afdruk, |s| s.boek_guard(van, naar, centen, soort, oms, ref_));
+        if r.status < 300 {
+            let boeking = r.body.get("boeking");
+            if !boeking.map(|j| boeking_gelijk(&self.grb, j) &&
+                boeking_is(j, van, naar, centen, soort, ref_identiteit.as_deref())).unwrap_or(false) {
+                return err(503, "De economische sleutel bestaat, maar zijn payboekregel ontbreekt; herstel is vereist.");
+            }
+            r.body.set("saldoVan", Json::Num(self.grb.saldo_van(van) as f64));
+            r.body.set("saldoNaar", Json::Num(self.grb.saldo_van(naar) as f64));
+        }
+        r
+    }
 
     // ---------- schaduw-modus: rauwe boeking van de autoritaire JS-engine ----------
     pub fn spiegel_boek(&mut self, van: &str, naar: &str, centen: i64, soort: &str, oms: &str, ref_: Option<String>) -> Resp {
@@ -541,6 +622,14 @@ impl State {
                 m.insert(k.clone(), Json::Str(v.clone()));
             }
         }
+        let mut economisch = Json::obj();
+        if let Json::Obj(m) = &mut economisch {
+            for (k, v) in &self.economisch { m.insert(k.clone(), v.clone()); }
+        }
+        let mut economisch_afdruk = Json::obj();
+        if let Json::Obj(m) = &mut economisch_afdruk {
+            for (k, v) in &self.economisch_afdruk { m.insert(k.clone(), Json::Str(v.clone())); }
+        }
         // Het bank-grootboek (cutover stap 3): eigen saldi + boekingen.
         let mut bank_saldi = Json::obj();
         if let Json::Obj(m) = &mut bank_saldi {
@@ -549,17 +638,22 @@ impl State {
         let bank_boekingen: Vec<Json> = self.bank.boekingen.iter().map(|b| b.to_json()).collect();
         let mut o = Json::obj();
         o.set("saldi", saldi)
+            .set("snapshotSchema", Json::Str("rtg-motor-state-v1".into()))
+            .set("revisie", Json::Num(self.revisie as f64))
             .set("boekingen", Json::Arr(boekingen))
             .set("leden", Json::Arr(leden))
             .set("idem", idem)
             .set("idemAfdruk", idem_afdruk)
             .set("idemVolgorde", Json::Arr(idem_volgorde))
+            .set("economisch", economisch)
+            .set("economischAfdruk", economisch_afdruk)
             .set("bankSaldi", bank_saldi)
             .set("bankBoekingen", Json::Arr(bank_boekingen));
         o
     }
 
     pub fn laad(&mut self, snap: &Json) {
+        self.revisie = snap.i64_at("revisie").unwrap_or(0).max(0) as u64;
         if let Some(Json::Obj(m)) = snap.get("saldi") {
             for (k, v) in m {
                 if let Some(c) = v.as_i64() {
@@ -604,6 +698,14 @@ impl State {
                 if let Some(s) = n.as_str() { self.idem_volgorde.push(s.to_string()); }
             }
         }
+        if let Some(Json::Obj(m)) = snap.get("economisch") {
+            for (k, v) in m { self.economisch.insert(k.clone(), v.clone()); }
+        }
+        if let Some(Json::Obj(m)) = snap.get("economischAfdruk") {
+            for (k, v) in m {
+                if let Some(s) = v.as_str() { self.economisch_afdruk.insert(k.clone(), s.to_string()); }
+            }
+        }
         // Het bank-grootboek terugladen (cutover stap 3).
         if let Some(Json::Obj(m)) = snap.get("bankSaldi") {
             for (k, v) in m {
@@ -628,6 +730,152 @@ impl State {
             }
         }
     }
+
+    /* Alleen dit pad mag een bestaande schijfsnapshot als geldwaarheid laden.
+       `laad` blijft de tolerante test-/migratiehulp; startup gebruikt deze
+       strikte variant en start nooit gezond leeg op na truncatie of drift. */
+    pub fn laad_gevalideerd(&mut self, snap: &Json) -> Result<(), String> {
+        match snap {
+            Json::Obj(_) => {},
+            _ => return Err("snapshotwortel is geen object".into()),
+        }
+        if !matches!(snap.get("saldi"), Some(Json::Obj(_))) ||
+           !matches!(snap.get("boekingen"), Some(Json::Arr(_))) {
+            return Err("snapshot mist geldsaldi of boekingen".into());
+        }
+        if let Some(schema) = snap.get("snapshotSchema") {
+            if schema.as_str() != Some("rtg-motor-state-v1") {
+                return Err("snapshot heeft een onbekend schema".into());
+            }
+        }
+        if snap.get("revisie").is_some() && snap.i64_at("revisie").filter(|v| *v >= 0).is_none() {
+            return Err("snapshot heeft een ongeldige revisie".into());
+        }
+        valideer_saldi(snap.get("saldi").unwrap())?;
+        valideer_boekingen(snap.get("boekingen").unwrap())?;
+        for naam in ["economisch", "economischAfdruk"] {
+            if snap.get(naam).is_some() && !matches!(snap.get(naam), Some(Json::Obj(_))) {
+                return Err(format!("snapshotveld {} heeft een ongeldige vorm", naam));
+            }
+        }
+        for naam in ["bankSaldi"] {
+            if snap.get(naam).is_some() && !matches!(snap.get(naam), Some(Json::Obj(_))) {
+                return Err(format!("snapshotveld {} heeft een ongeldige vorm", naam));
+            }
+        }
+        if snap.get("bankBoekingen").is_some() && !matches!(snap.get("bankBoekingen"), Some(Json::Arr(_))) {
+            return Err("snapshotveld bankBoekingen heeft een ongeldige vorm".into());
+        }
+        if let Some(v) = snap.get("bankSaldi") { valideer_saldi(v)?; }
+        if let Some(v) = snap.get("bankBoekingen") { valideer_boekingen(v)?; }
+        let mut kandidaat = State::new();
+        kandidaat.laad(snap);
+        if !kandidaat.gezond().0 || !kandidaat.bank_gezond().0 {
+            return Err("snapshotgrootboek sluit niet op nul".into());
+        }
+        if kandidaat.economisch.len() != kandidaat.economisch_afdruk.len() {
+            return Err("economische antwoorden en afdrukken lopen uiteen".into());
+        }
+        for (sleutel, antwoord) in &kandidaat.economisch {
+            if !economische_sleutel_geldig(sleutel) {
+                return Err("economische sleutel heeft geen vaste hashvorm".into());
+            }
+            let afdruk = kandidaat.economisch_afdruk.get(sleutel)
+                .ok_or_else(|| "economische sleutel mist zijn afdruk".to_string())?;
+            if afdruk.len() != 64 || !afdruk.bytes().all(|b| b.is_ascii_hexdigit()) {
+                return Err("economische afdruk is geen SHA-256".into());
+            }
+            let boeking = antwoord.get("boeking")
+                .ok_or_else(|| "economisch antwoord mist zijn boeking".to_string())?;
+            let ledger = if sleutel.starts_with("bank:") { &kandidaat.bank } else if sleutel.starts_with("pay:") { &kandidaat.grb }
+                else { return Err("economische sleutel heeft een onbekend domein".into()); };
+            if !boeking_gelijk(ledger, boeking) {
+                return Err("economische boeking en projectieregel verschillen".into());
+            }
+            let domein = if sleutel.starts_with("bank:") { "bank" } else { "pay" };
+            let herleid = economische_afdruk(domein, boeking.str_at("van").unwrap_or(""),
+                boeking.str_at("naar").unwrap_or(""), boeking.i64_at("centen").unwrap_or(0),
+                boeking.str_at("soort").unwrap_or(""), boeking.str_at("ref").unwrap_or(""));
+            if !crate::aead::ct_eq(afdruk.as_bytes(), herleid.as_bytes()) {
+                return Err("economische afdruk en boeking verschillen".into());
+            }
+        }
+        kandidaat.vuil = false;
+        *self = kandidaat;
+        Ok(())
+    }
+}
+
+/* Lengte-geprefixte canonieke identiteit, daarna SHA-256. De duurzame afdruk
+   verraadt dus geen rekeningen, soort of providerref en delimiters kunnen niet
+   botsen. Omschrijving is bewust geen economische identiteit. */
+fn economische_afdruk(domein: &str, van: &str, naar: &str, centen: i64, soort: &str, ref_: &str) -> String {
+    let velden = [domein, van, naar, soort, ref_];
+    let mut canon = b"rtg-economisch-v1".to_vec();
+    for veld in velden { canon.extend_from_slice(&(veld.as_bytes().len() as u64).to_be_bytes()); canon.extend_from_slice(veld.as_bytes()); }
+    canon.extend_from_slice(&centen.to_be_bytes());
+    crate::sha256::hex(&canon)
+}
+
+/* De ID alleen is geen economische identiteit: een herstelactie kan een regel
+   met hetzelfde ID maar andere rekening/centen/ref hebben teruggezet. */
+fn boeking_gelijk(ledger: &Ledger, verwacht: &Json) -> bool {
+    let id = match verwacht.str_at("id") { Some(v) if !v.is_empty() => v, _ => return false };
+    let ref_verwacht = verwacht.str_at("ref");
+    ledger.boekingen.iter().any(|b| b.id == id &&
+        verwacht.str_at("van") == Some(b.van.as_str()) &&
+        verwacht.str_at("naar") == Some(b.naar.as_str()) &&
+        verwacht.i64_at("centen") == Some(b.centen) &&
+        verwacht.str_at("soort") == Some(b.soort.as_str()) &&
+        ref_verwacht == b.ref_.as_deref())
+}
+
+fn boeking_is(boeking: &Json, van: &str, naar: &str, centen: i64,
+              soort: &str, ref_: Option<&str>) -> bool {
+    boeking.str_at("van") == Some(van) && boeking.str_at("naar") == Some(naar) &&
+        boeking.i64_at("centen") == Some(centen) && boeking.str_at("soort") == Some(soort) &&
+        boeking.str_at("ref") == ref_
+}
+
+fn economische_sleutel_geldig(sleutel: &str) -> bool {
+    let rest = sleutel.strip_prefix("pay:").or_else(|| sleutel.strip_prefix("bank:"));
+    let hash = match rest.and_then(|r| r.strip_prefix("payout-terug:")) {
+        Some(v) => v,
+        None => return false,
+    };
+    hash.len() == 64 && hash.bytes().all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
+}
+
+fn valideer_saldi(v: &Json) -> Result<(), String> {
+    let m = match v { Json::Obj(m) => m, _ => return Err("saldi zijn geen kaart".into()) };
+    for (rekening, saldo) in m {
+        if rekening.is_empty() || saldo.as_i64().is_none() {
+            return Err("saldo heeft een ongeldige rekening of waarde".into());
+        }
+    }
+    Ok(())
+}
+
+fn valideer_boekingen(v: &Json) -> Result<(), String> {
+    let a = match v { Json::Arr(a) => a, _ => return Err("boekingen zijn geen lijst".into()) };
+    let mut ids = HashSet::new();
+    for boeking in a {
+        let id = boeking.str_at("id").filter(|x| !x.is_empty())
+            .ok_or_else(|| "boeking mist id".to_string())?;
+        if !ids.insert(id) { return Err("boeking-id komt dubbel voor".into()); }
+        if boeking.str_at("van").filter(|x| !x.is_empty()).is_none() ||
+           boeking.str_at("naar").filter(|x| !x.is_empty()).is_none() ||
+           boeking.i64_at("centen").filter(|x| *x > 0).is_none() ||
+           boeking.str_at("soort").is_none() || boeking.str_at("oms").is_none() ||
+           boeking.i64_at("at").filter(|x| *x >= 0).is_none() {
+            return Err("boeking heeft ongeldige identiteitsvelden".into());
+        }
+        match boeking.get("ref") {
+            Some(Json::Null) | Some(Json::Str(_)) => {},
+            _ => return Err("boeking heeft een ongeldige ref".into()),
+        }
+    }
+    Ok(())
 }
 
 #[cfg(test)]
@@ -933,6 +1181,53 @@ mod tests {
         assert_eq!(s2.vingerafdruk(), s.vingerafdruk(), "pay hersteld");
         assert_eq!(s2.bank_vingerafdruk(), s.bank_vingerafdruk(), "bank hersteld");
         assert!(s2.bank_gezond().0 && s2.gezond().0);
+    }
+
+    #[test]
+    fn economische_payout_teruggang_overleeft_snapshot_en_boekt_eenmaal() {
+        let mut s = State::new();
+        let sleutel = "payout-terug:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+        let een = s.boek_guard_eenmaal("extern:uitbetaald", "lid:A", 137, "terug", "eerste",
+            Some("heen-1".into()), Some(sleutel));
+        assert_eq!(een.status, 200);
+        assert!(s.economisch_afdruk.values().all(|v| v.len() == 64 &&
+            v.bytes().all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))));
+        assert!(!s.snapshot().dump().contains("pay|extern:uitbetaald"),
+            "economische afdruk is alleen SHA-256, nooit de rauwe identiteit");
+        let id = een.body.get("boeking").unwrap().str_at("id").unwrap().to_string();
+        let snap = s.snapshot();
+        let mut herstart = State::new();
+        herstart.laad(&snap);
+        let twee = herstart.boek_guard_eenmaal("extern:uitbetaald", "lid:A", 137, "terug", "retry",
+            Some("heen-1".into()), Some(sleutel));
+        assert_eq!(twee.status, 200);
+        assert_eq!(twee.body.bool_at("herhaald"), true);
+        assert_eq!(twee.body.get("boeking").unwrap().str_at("id"), Some(id.as_str()));
+        assert_eq!(herstart.grb.saldo_van("lid:A"), 137);
+        assert_eq!(herstart.grb.boekingen.iter().filter(|b| b.id == id).count(), 1);
+        let botsing = herstart.boek_guard_eenmaal("extern:uitbetaald", "lid:A", 138, "terug", "anders",
+            Some("heen-1".into()), Some(sleutel));
+        assert_eq!(botsing.status, 409);
+        assert_eq!(herstart.grb.saldo_van("lid:A"), 137);
+    }
+
+    #[test]
+    fn economische_replay_weigert_ontbrekende_afdruk_en_zelfde_id_met_drift() {
+        let sleutel = "payout-terug:abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789";
+        let mut s = State::new();
+        assert_eq!(s.boek_guard_eenmaal("extern:uitbetaald", "lid:A", 137, "terug", "eerste",
+            Some("heen".into()), Some(sleutel)).status, 200);
+        let interne = format!("pay:{}", sleutel);
+        let afdruk = s.economisch_afdruk.remove(&interne).unwrap();
+        assert_eq!(s.boek_guard_eenmaal("extern:uitbetaald", "lid:A", 137, "terug", "retry",
+            Some("heen".into()), Some(sleutel)).status, 503);
+        s.economisch_afdruk.insert(interne, afdruk);
+        s.grb.boekingen.front_mut().unwrap().ref_ = Some("vervangen".into());
+        assert_eq!(s.boek_guard_eenmaal("extern:uitbetaald", "lid:A", 137, "terug", "retry",
+            Some("heen".into()), Some(sleutel)).status, 503,
+            "alle velden, niet alleen het id, vormen de projectie-identiteit");
+        assert!(State::new().laad_gevalideerd(&s.snapshot()).is_err(),
+            "snapshotdrift mag niet als geldwaarheid starten");
     }
 }
 

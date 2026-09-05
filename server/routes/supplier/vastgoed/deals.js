@@ -4,7 +4,7 @@
    opstarten vanuit routes/supplier/vastgoed.js. */
 module.exports = (vctx) => {
   const { app, crypto, db, express, facturatie, logActivity, keyVanCodenaam, managerOnly, media, notify, salonNaarVolgers, save, schoon, sseToCustomer, sseToSupplier, supplierAuth,
-    isVastgoed, pandVan, keylessCode } = vctx;
+    isVastgoed, pandVan, keylessCode, keylessToegang } = vctx;
 
 /* De slimme backoffice: kerncijfers, panden, en alles wat aandacht vraagt. */
 app.post('/api/supplier/vastgoed/overzicht', supplierAuth, (req, res) => {
@@ -47,8 +47,9 @@ app.post('/api/supplier/bezichtiging/beslis', supplierAuth, (req, res) => {
     b.status = 'bevestigd'; b.moment = moment;
     // keyless: een venster rond het afgesproken moment (30 min voor tot 2 uur na)
     if (p.keyless) {
-      const t = new Date(moment).getTime();
-      b.keyless = { code: keylessCode(), van: new Date(t - 30 * 60000).toISOString(), tot: new Date(t + 120 * 60000).toISOString(), gebruikt: [] };
+      const toegang = keylessToegang.maak(moment, keylessCode);
+      if (toegang) b.keyless = toegang;
+      else { delete b.keyless; b.keylessNietVrijgegeven = true; }
     }
   } else return res.status(400).json({ error: 'Onbekende actie.' });
   save();

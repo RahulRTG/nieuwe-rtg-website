@@ -44,7 +44,7 @@ app.post('/api/supplier/team/message', supplierAuth, (req, res) => {
 
 app.get('/api/supplier/stream', (req, res) => {
   const sess = sessionFor(req.query.token);
-  if (!sess || sess.role !== 'supplier') return res.status(401).end();
+  if (!accounts.controleerStaffSessie(sess).ok) return res.status(401).end();
   const supplier = findSupplier(sess.code);
   if (!supplier || supplier.partnerStatus === 'geschorst' || supplier.partnerStatus === 'beeindigd')
     return res.status(401).end();
@@ -123,6 +123,14 @@ app.post('/api/supplier/tijdzone', supplierAuth, (req, res) => {
   if (!wens || wens === 'auto') delete req.supplier.tijdzone; else req.supplier.tijdzone = wens;
   save();
   res.json({ ok: true, tijdzone: kern.mall.mallStand.zoneVoor(req.supplier) });
+});
+
+/* De eerste vulling van de bel. De zaakcode komt UITSLUITEND uit de
+   leverancierssessie: een `code` in de body is geen keuze van tenant. Dat is
+   dezelfde grens als de live stroom hierboven, maar nu ook voor het scherm dat
+   opent voordat de eerste SSE-melding binnenkomt. */
+app.post('/api/supplier/notifications', supplierAuth, (req, res) => {
+  res.json({ notifications: (db.data.supplierNotifications[req.supplier.code] || []).slice(0, 40) });
 });
 
 app.post('/api/supplier/notifications/read', supplierAuth, (req, res) => {

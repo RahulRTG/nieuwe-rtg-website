@@ -7,8 +7,6 @@ module.exports = (kern) => {
           loginFails, managerOnly, noteFailedTry, pinSlot, rememberSession, sseToSupplier, supplierAuth,
           supplierState, tooManyTries, zaakBoard, zaakZet, logInlog, werkvensterVan, zetWerkvenster,
           magWerken, werkAdvies, persoonsPoort } = kern;
-
-
 app.post('/api/supplier/zaak/board', supplierAuth, (req, res) => {
   res.json(zaakBoard(req.supplier));
 });
@@ -22,6 +20,8 @@ app.post('/api/supplier/zaak/functie', supplierAuth, (req, res) => {
 app.post('/api/supplier/login', async (req, res) => {
   let s, actor, staff = null;
   if (req.body.staffId != null) {
+    if (!accounts.legacyStaffPinToegestaan || !accounts.legacyStaffPinToegestaan())
+      return res.status(403).json({ error: 'De personeelspin is gesloten. Log in via /api/supplier/mijn/login met uw persoonlijke RTG-account.' });
     // Persoonlijke personeelslogin met PIN, binnen het bedrijfsaccount.
     s = findSupplier(req.body.code);
     if (!s) return res.status(404).json({ error: 'Deze leverancierscode kennen we niet.' });
@@ -47,7 +47,7 @@ app.post('/api/supplier/login', async (req, res) => {
     }
     actor = { name: staff.name, role: staff.role, staffId: staff.id, manager: staff.role === 'manager' };
   } else if (hasCred(req.body)) {
-    if (!DEMO) return res.status(403).json({ error: 'Demo-inlog is uitgeschakeld. Log in op uw naam met uw persoonlijke pincode.' });
+    if (!DEMO) return res.status(403).json({ error: 'De gedeelde bedrijfsinlog is uitgeschakeld. Log in met uw persoonlijke RTG-account.' });
     const bucket = 'sup:' + req.ip;
     if (tooManyTries(res, bucket)) return;
     if (!checkCred(req.body.username, req.body.password)) {
@@ -63,10 +63,10 @@ app.post('/api/supplier/login', async (req, res) => {
     s = findSupplier(DEMO_SUPPLIER);
     actor = { name: 'Beheer', role: 'manager', manager: true };
   } else {
-    // Geen anonieme toegang meer met alleen de bedrijfscode: iedereen logt in op
-    // de eigen naam met een persoonlijke pincode (of het bedrijfsaccount met
-    // gebruikersnaam en wachtwoord). Zo staat elke handeling op een persoon.
-    return res.status(401).json({ error: 'Kies wie u bent en voer uw persoonlijke pincode in.' });
+    // Geen anonieme of aparte bedrijfsidentiteit: iedere echte medewerker opent
+    // de werkplek met het eigen RTG-account. Zo staat elke handeling op een
+    // levende persoon en werkt centrale intrekking ook hier meteen door.
+    return res.status(401).json({ error: 'Log in met uw persoonlijke RTG-account via /api/supplier/mijn/login.' });
   }
   if (!s) return res.status(404).json({ error: 'Deze leverancierscode kennen we niet.' });
   if (s.partnerStatus === 'geschorst' || s.partnerStatus === 'beeindigd') {
@@ -93,10 +93,13 @@ app.post('/api/supplier/login', async (req, res) => {
      succesregel nu op de enige plek waar hij waar is, en dekt hij meteen ook
      het bedrijfsaccount, dat helemaal niets logde. */
   const token = crypto.randomBytes(24).toString('hex');
+  const binding = staff && staff.member_id != null
+    ? accounts.staffAccountBinding(staff.member_id) : null;
   logInlog('zaak', true, s.code + ' · ' + actor.name, req);
-    rememberSession(token, { role: 'supplier', code: s.code, actor: actor.name, staffId: actor.staffId,
+    const werksessie = { role: 'supplier', code: s.code, actor: actor.name, staffId: actor.staffId,
       staffRole: actor.role, manager: actor.manager,
-      ...(staff && staff.member_id != null ? { lid: Number(staff.member_id), lidKey: 'user-' + staff.member_id } : {}) });
+      ...(binding || {}) };
+    rememberSession(token, werksessie);
   logActivity(s.code, actor, actor.name + ' logde in');
   res.json({ token, state: supplierState(s, actor) });
 });
@@ -124,9 +127,8 @@ app.post('/api/supplier/werkadvies', supplierAuth, (req, res) => {
   res.json({ advies: werkAdvies({ code: req.supplier.code, staffId: req.actor.staffId, lidKey: req.actor.lidKey || null }) });
 });
 
-/* De namenlijst voor het inlogscherm van de PDA: je kiest wie je bent en typt
-   daarna je pincode. Die volgorde maakt de route noodzakelijk PUBLIEK -- er is
-   voor het inloggen nog niets om op te authenticeren.
+/* De oude namenlijst van de viercijferige PIN-fixture. Hij bestaat uitsluitend
+   in Magnaat Test en is in iedere echte omgeving hard gesloten vóór opzoeking.
 
    Wat er wel aan moest. Hij had geen enkele rem en gaf publicStaff volledig
    terug: naam, rol, functie en of het personeelslid ook RTG-lid is. Met
@@ -135,9 +137,7 @@ app.post('/api/supplier/werkadvies', supplierAuth, (req, res) => {
    tempolimiet per IP, en alleen de velden die de kiezer echt toont. Wie het
    bedrijf niet kent, krijgt dezelfde 404 als voorheen.
 
-   Blijft staan: de namen zelf zijn zichtbaar voor wie de code kent. Dat weghalen
-   vraagt een andere inlogvorm (eerst een bedrijfsgeheim, dan pas de lijst) en
-   dus een besluit over hoe personeel inlogt -- geen stille wijziging. */
+   Buiten die geïsoleerde omgeving is er dus geen publiek personeelsregister. */
 /* Een eigen, ruime teller. Bewust NIET tooManyTries/noteFailedTry: die tellen
    MISLUKTE inlogpogingen en slaan bij tien alarm ("mogelijk brute force"). Een
    inlogscherm dat de lijst ophaalt is geen mislukte poging, en van vals alarm
@@ -151,6 +151,8 @@ function rosterMag(ip) {
   return ++r.n <= 30;
 }
 app.post('/api/supplier/roster', (req, res) => {
+  if (!accounts.legacyStaffPinToegestaan || !accounts.legacyStaffPinToegestaan())
+    return res.status(403).json({ error: 'De openbare personeelskiezer bestaat alleen in Magnaat Test. Log in met uw persoonlijke RTG-account.' });
   if (!rosterMag(req.ip)) return res.status(429).json({ error: 'Te veel opvragingen. Probeer het over een kwartier opnieuw.' });
   const s = findSupplier(req.body.code);
   if (!s) return res.status(404).json({ error: 'Deze leverancierscode kennen we niet.' });

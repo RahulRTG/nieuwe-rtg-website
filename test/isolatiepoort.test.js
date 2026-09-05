@@ -249,3 +249,96 @@ test('7. de poort is VLAK: 50.000 standen kosten niet meer dan nul', () => {
     ' us bij 50.000. Ergens loopt hij nu een kaart af in plaats van er een sleutel in op te ' +
     'zoeken -- en dan wordt het platform traag op het moment dat deze laag wordt gebruikt.');
 });
+
+test('8. handhaving komt uitsluitend uit de expliciete productievlag', () => {
+  const stand = require('../server/middleware/isolatiepoort-stand');
+  assert.equal(stand.afdwingenUitOmgeving({}), false);
+  assert.equal(stand.afdwingenUitOmgeving({ NODE_ENV: 'production' }), false,
+    'alleen production noemen mag de veiligheidsbelofte niet stil aanzetten');
+  assert.equal(stand.afdwingenUitOmgeving({ RTG_ISOLATIE_AFDWINGEN: '0' }), false);
+  assert.equal(stand.afdwingenUitOmgeving({ RTG_ISOLATIE_AFDWINGEN: 'true' }), false);
+  assert.equal(stand.afdwingenUitOmgeving({ RTG_ISOLATIE_AFDWINGEN: '1' }), true,
+    'alleen de expliciet gekeurde waarde activeert de HTTP-handhaving');
+});
+
+test('9. onleesbare isolatie-opslag faalt dicht en wordt nooit als leeg hersteld', () => {
+  const db = { data: { isolatie: { identiteit: 'kapot' } } };
+  const iso = maakIsolatie({ db, save() {}, functies, klok: null, huisStand: () => 'normaal' });
+  poort.zetLaag(null);
+  poort.zetLaag(iso, { afdwingen: true });
+  const uit = poort.weeg(verzoek('/api/notifications/read'), {});
+  assert.equal(uit && uit.antwoord.reden, 'ISOLATIE_ONBEPAALD');
+  assert.equal(db.data.isolatie.identiteit, 'kapot',
+    'de fout mag niet worden weggeschreven als een lege kaart; dat zou alle standen wissen');
+  assert.equal(poort.stand().onzeker, 1);
+
+  /* In schaduw wordt de fout gemeten maar nog niet door deze nieuwe regel
+     geblokkeerd. Productie kan niet in die stand starten (toets 10). */
+  poort.zetLaag(null);
+  poort.zetLaag(iso, { afdwingen: false });
+  assert.equal(poort.weeg(verzoek('/api/notifications/read'), {}), null);
+  assert.ok(poort.stand().onzeker >= 2);
+});
+
+test('9b. een lege beveiligingslezing schept geen opslag', () => {
+  const db = { data: {} };
+  const iso = maakIsolatie({ db, save() {
+    assert.fail('een lege beveiligingslezing hoort niets te bewaren');
+  }, functies, klok: null, huisStand: () => 'normaal' });
+  assert.equal(iso.standVan('identiteit', 'user-zonder-stand'), null);
+  assert.equal(iso.context({ identiteit: 'user-zonder-stand' }).standen.identiteit, null);
+  assert.deepEqual(iso.overzicht().perDrager.identiteit, { aantal: 0, perStand: {} });
+  assert.deepEqual(db.data, {},
+    'een read-only HTTP- of SSE-verzoek mag geen lege isolatietakken aanmaken');
+});
+
+test('10. een mislukte save vergiftigt de laag; latere mutaties lopen niet door', () => {
+  let stuk = false;
+  const iso = maakIsolatie({ db: { data: {} }, save() {
+    if (stuk) throw new Error('schijf niet bereikbaar');
+  }, functies, klok: null, huisStand: () => 'normaal' });
+  stuk = true;
+  assert.throws(() => iso.zet({ drager: 'identiteit', sleutel: 'user-7', naar: 'isolatie',
+    door: 'toets', reden: 'opslagstoring tijdens containment' }), /schijf niet bereikbaar/);
+
+  poort.zetLaag(null);
+  poort.zetLaag(iso, { afdwingen: true });
+  const uit = poort.weeg(verzoek('/api/notifications/read'), {});
+  assert.equal(uit && uit.antwoord.reden, 'ISOLATIE_ONBEPAALD',
+    'ook als de geheugenmutatie al gebeurde mag duurzaamheidsonzekerheid niet doorlopen');
+  assert.throws(() => iso.standVan('identiteit', 'user-7'), /duurzaamheid is onzeker/);
+});
+
+test('11. productie eist de vlag, de echte laag, een sessieoplosser en gekeurde opslag', () => {
+  const poortstand = require('../server/middleware/isolatiepoort-stand');
+  const sessies = require('../server/kern/isolatie/sessiedragers');
+  const intrekking = require('../server/kern/intreksignaal');
+  const env = { NODE_ENV: 'production', RTG_ISOLATIE_AFDWINGEN: '1' };
+  intrekking._wis();
+  poort.zetLaag(null);
+  sessies.zetSessieOplosser(null);
+  assert.throws(() => poortstand.eisProductieGereed(env), /geen bijtende isolatielaag/);
+
+  poort.zetLaag({ context() {}, besluit() {} }, { afdwingen: true });
+  assert.throws(() => poortstand.eisProductieGereed(env), /sessieoplosser/);
+  sessies.zetSessieOplosser(() => null);
+  assert.throws(() => poortstand.eisProductieGereed(env), /opslag niet keuren/);
+
+  const iso = maakIsolatie({ db: { data: {} }, save() {}, functies, klok: null, huisStand: () => 'normaal' });
+  poort.zetLaag(null);
+  poort.zetLaag(iso, { afdwingen: true });
+  assert.throws(() => poortstand.eisProductieGereed(env), /intrekkingsleiding/);
+  intrekking.koppelBus({ soort: 'in-proces', publish() {}, subscribe() {},
+    gereed: () => true, onStand: fn => fn({ soort: 'in-proces', gereed: true }) });
+  assert.deepEqual(poortstand.eisProductieGereed(env), { nodig: true, gereed: true });
+  assert.throws(() => poortstand.eisProductieGereed({ ...env, REDIS_URL: 'redis://cluster' }),
+    /niet op Redis gemonteerd/,
+    'een ingestelde clusterleiding mag niet stil op het lokale transport terugvallen');
+
+  /* Ontkoppelen wist ook het openbare handhavingsregister; geen stale groen. */
+  poort.zetLaag(null);
+  assert.equal(poort.stand().gemonteerd, false);
+  assert.equal(poort.stand().afdwingen, false);
+  sessies.zetSessieOplosser(null);
+  intrekking._wis();
+});

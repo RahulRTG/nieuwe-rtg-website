@@ -13,10 +13,16 @@ const { maakAuthenticator } = require('./webauthn-authenticator');
 
 let srv, base, lidA, lidB, codeA, codeB, pkA, pkB, rpID, origin;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-id-'));
+let verzoekSeq = 0;
 
 function api(pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
   if (token) h.Authorization = 'Bearer ' + token;
+  /* Een RTG-iD-uitgifte bevat twee eenmalige credentials. Iedere echte dienst
+     moet daarom zelf een duurzame sleutel sturen; de bestaande ketentests
+     krijgen hier per bewuste start een unieke sleutel. */
+  if (pad === '/api/rtgid/start' && body && body.dienst && !body.idem && !body.idempotentieSleutel)
+    h['Idempotency-Key'] = 'rtgid-test-start-' + (++verzoekSeq).toString().padStart(8, '0');
   return fetch(base + pad, { method: 'POST', headers: h, body: JSON.stringify(body || {}) })
     .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 }
@@ -103,7 +109,8 @@ test.after(() => {
 
 test('1. de koppelflow: code, dienstnaam in de app, bevestigen, eenmalig token', async () => {
   const s = await api('/api/rtgid/start', { dienst: 'MijnOverheid', attributen: ['codenaam', '18plus'] });
-  assert.match(s.body.code, /^ID-[A-Z2-9]{5}$/, 'een koppelcode zonder verwarrende tekens');
+  assert.match(s.body.code, /^ID\.[A-F0-9]{32}$/, 'een 128-bit koppelcode');
+  assert.match(s.body.koppelId, /^RID\.[A-F0-9]{32}$/, 'een afzonderlijke 128-bit statuscredential');
   const k = await api('/api/rtgid/koppel', { code: s.body.code }, lidA);
   assert.equal(k.body.dienst, 'MijnOverheid', 'het lid ziet WIE er aanklopt voor er iets gebeurt');
   assert.deepEqual(k.body.attributen, ['codenaam', '18plus'], 'en welke gegevens er gevraagd worden');
@@ -113,6 +120,8 @@ test('1. de koppelflow: code, dienstnaam in de app, bevestigen, eenmalig token',
   const st = await api('/api/rtgid/status', { koppelId: s.body.koppelId });
   assert.equal(st.body.stand, 'bevestigd');
   assert.ok(st.body.idToken, 'het token komt precies een keer mee');
+  assert.equal(st.body.idToken, s.body.koppelId,
+    'de reeds door de dienst gehouden statuscredential wordt het token; er wacht geen tweede kale waarde in opslag');
   const nogEen = await api('/api/rtgid/status', { koppelId: s.body.koppelId });
   assert.ok(!nogEen.body.idToken, 'en daarna nooit meer');
   // dezelfde code is daarna waardeloos

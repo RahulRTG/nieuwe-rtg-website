@@ -23,6 +23,8 @@
    van ./tegoed.js. */
 'use strict';
 
+const moneyCredentialBlokkade = require('../../middleware/money-credential-productiepoort').blokkade;
+
 module.exports = (ctx, gedeeld) => {
   const { save, schoon, nu, rekPartner, saldoVan, id, metIdem, boekAsync, seintje, bestaatLid,
     MIN_CENTEN, MAX_CENTEN } = ctx;
@@ -30,6 +32,8 @@ module.exports = (ctx, gedeeld) => {
 
   /* ---------- de zaak zet tegoed klaar ---------- */
   async function tegoedZaakKoop({ supplierCode, centen, aanCodenaam, oms, idem }) {
+    const dicht = moneyCredentialBlokkade('pay.tegoedbon');
+    if (dicht) return dicht;
     const zaak = schoon(supplierCode, 40);
     if (!zaak) return { status: 400, error: 'Welke zaak zet dit klaar?' };
     const c = Math.round(Number(centen));
@@ -58,6 +62,8 @@ module.exports = (ctx, gedeeld) => {
      Zelfde regel als bij een lid: het geld gaat terug naar wie het betaalde en
      niet naar RTG, en niet vanzelf. */
   async function tegoedZaakTerug({ supplierCode, tegoedId, idem }) {
+    const dicht = moneyCredentialBlokkade('pay.tegoedbon');
+    if (dicht) return dicht;
     const zaak = schoon(supplierCode, 40);
     const t = bonnen().find(x => x.id === String(tegoedId || '') && x.vanSoort === 'zaak' && x.van === zaak);
     if (!t) return { status: 404, error: 'Dit tegoed is niet van deze zaak.' };
@@ -78,6 +84,8 @@ module.exports = (ctx, gedeeld) => {
   }
 
   function tegoedZaakOverzicht(supplierCode) {
+    const dicht = moneyCredentialBlokkade('pay.tegoedbon');
+    if (dicht) return dicht;
     const zaak = schoon(supplierCode, 40);
     const eigen = bonnen().filter(t => t.vanSoort === 'zaak' && t.van === zaak).slice(0, 50).map(t => {
       const r = naarBuiten(t);

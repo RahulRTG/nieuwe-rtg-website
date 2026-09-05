@@ -703,8 +703,9 @@
       <div class="gate-klok" id="gateKlok" data-rtg-klok="ring">--:--</div>
     </div>
     <form class="login-form" id="loginForm">
-      <input id="liUser" name="username" placeholder="Gebruikersnaam" data-i18n-ph="gate.user" autocomplete="username" autocapitalize="none">
-      <input id="liPass" name="password" type="password" placeholder="Wachtwoord" data-i18n-ph="gate.pass" autocomplete="current-password">
+      <p class="enroll-hint">Open uw werkplek met uw persoonlijke RTG-account.</p>
+      <input id="liUser" name="username" placeholder="RTG e-mail of gebruikersnaam" data-i18n-ph="gate.user" autocomplete="username" autocapitalize="none">
+      <input id="liPass" name="password" type="password" placeholder="Uw RTG-wachtwoord" data-i18n-ph="gate.pass" autocomplete="current-password">
       <button type="submit" data-i18n="gate.signin">Inloggen</button>
     </form>
 
@@ -716,7 +717,6 @@
         <input id="enCode" placeholder="Kassacode" data-i18n-ph="enr.code" autocapitalize="characters" autocomplete="off">
         <input id="enLogin" placeholder="Uw RTG e-mail of gebruikersnaam" data-i18n-ph="enr.login" autocomplete="username" autocapitalize="none">
         <input id="enPass" type="password" placeholder="Uw RTG wachtwoord" data-i18n-ph="enr.pass" autocomplete="current-password">
-        <input id="enPin" placeholder="Kies een pincode (4 cijfers)" data-i18n-ph="enr.pin" inputmode="numeric" autocomplete="off" maxlength="4">
         <button type="submit" data-i18n="enr.submit">Aanmelden bij mijn werkgever</button>
         <div class="enroll-msg" id="enrollMsg" role="status" aria-live="polite"></div>
       </form>
@@ -1141,10 +1141,10 @@
 window.I18N = { en: {
   'gate.title':'The supplier <em>app</em>.',
   'gate.deck':'Your business, live-connected with your guests and the RTG back office.',
-  'gate.user':'Username', 'gate.pass':'Password', 'gate.signin':'Sign in', 'gate.or':'or choose a Magnaat Test partner',
+  'gate.user':'RTG email or username', 'gate.pass':'Your RTG password', 'gate.signin':'Sign in', 'gate.or':'or choose a Magnaat Test partner',
   /* de poort is een gesprek met Rahul; dit is wat hij zegt */
   'gate.rp.groet':'Welcome back.', 'gate.rp.wacht':'One moment, let me check.',
-  'gate.rp.wie':'Who do I have the pleasure of speaking to?', 'gate.rp.pass':'Thank you. And your password?',
+  'gate.rp.wie':'Open your workplace with your personal RTG account. What is your email or username?', 'gate.rp.pass':'Thank you. And your RTG password?',
   'gate.rp.stuur':'Send',
   'tab.home':'Overview', 'tab.orders':'Orders', 'tab.rides':'Rides', 'tab.menu':'Menu', 'tab.price':'Price', 'tab.location':'Location',
   't.now':'just now', 't.ago':' ago', 't.min':' min', 't.hour':' hour', 't.days':' day(s)',

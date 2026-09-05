@@ -108,6 +108,10 @@ function valideerKeuzes(env) {
     urlFout('ERR_WEBHOOK_URL', env.ERR_WEBHOOK_URL, ['https:'], false)
   ]) if (fout) fouten.push(fout);
   if (env.RTG_BACKUP_DIR && !path.isAbsolute(env.RTG_BACKUP_DIR)) fouten.push('RTG_BACKUP_DIR moet een absoluut pad zijn.');
+  if (env.RTG_MOTOR_STATE_KEY_FILE && !path.isAbsolute(env.RTG_MOTOR_STATE_KEY_FILE))
+    fouten.push('RTG_MOTOR_STATE_KEY_FILE moet een absoluut containerpad zijn.');
+  if (env.RTG_MOTOR_EXPECT_GENESIS && !/^g-[a-f0-9]{32}$/.test(env.RTG_MOTOR_EXPECT_GENESIS))
+    fouten.push('RTG_MOTOR_EXPECT_GENESIS moet exact g-<32 lowercase hex> zijn.');
   if (env.RTG_MEDIA_BACKEND === 's3') {
     for (const naam of ['RTG_MEDIA_S3_BUCKET', 'RTG_MEDIA_S3_KEY', 'RTG_MEDIA_S3_SECRET'])
       if (!env[naam]) fouten.push(naam + ' is verplicht voor gedeelde S3-mediaopslag.');
@@ -121,7 +125,8 @@ function samenvatting(env) {
   const namen = [
     'RTG_OWNER_EMAIL', 'APP_URL', 'DATABASE_URL', 'REDIS_URL', 'SMTP_URL',
     'STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET', 'RTG_MEDIA_BACKEND',
-    'RTG_MEDIA_S3_BUCKET', 'RTG_BACKUP_DIR', 'ERR_WEBHOOK_URL', 'RTG_MOTOR_GELD'
+    'RTG_MEDIA_S3_BUCKET', 'RTG_BACKUP_DIR', 'ERR_WEBHOOK_URL', 'RTG_MOTOR_GELD',
+    'RTG_MOTOR_STATE_KEY_FILE', 'RTG_MOTOR_EXPECT_GENESIS'
   ];
   return namen.map(naam => {
     const waarde = env[naam] || '';
@@ -181,13 +186,14 @@ async function verzamel(huidig) {
   const compose = await jaNee('Draait deze installatie met de meegeleverde Docker Compose-opstelling', true);
   const pw = huidig.POSTGRES_PASSWORD || '';
   const wijzigingen = {};
+  wijzigingen.RTG_ISOLATIE_AFDWINGEN = '1';
   wijzigingen.RTG_OWNER_EMAIL = await vraag('E-mailadres van de eigenaar', { standaard: zonderPlaceholder(huidig.RTG_OWNER_EMAIL) });
   wijzigingen.APP_URL = await vraag('Publiek HTTPS-basisadres', { standaard: zonderPlaceholder(huidig.APP_URL) });
   wijzigingen.DATABASE_URL = await vraag('PostgreSQL-URL', { standaard: zonderPlaceholder(huidig.DATABASE_URL) ||
     (compose && pw ? 'postgresql://rtg:' + encodeURIComponent(pw) + '@postgres:5432/rtg' : '') });
   wijzigingen.REDIS_URL = await vraag('Redis-URL', { standaard: zonderPlaceholder(huidig.REDIS_URL) || (compose ? 'redis://redis:6379' : '') });
   wijzigingen.SMTP_URL = await vraag('SMTP-URL (wordt verborgen)', { standaard: zonderPlaceholder(huidig.SMTP_URL), geheim: true });
-  wijzigingen.ERR_WEBHOOK_URL = await vraag('HTTPS-webhook voor externe foutalarmering (optioneel)', { standaard: huidig.ERR_WEBHOOK_URL || '' });
+  wijzigingen.ERR_WEBHOOK_URL = await vraag('HTTPS-webhook voor externe foutalarmering (verplicht voor publieke productie)', { standaard: huidig.ERR_WEBHOOK_URL || '' });
   wijzigingen.RTG_BACKUP_DIR = await vraag('Absoluut pad naar een tweede backupschijf/mount (optioneel)', { standaard: huidig.RTG_BACKUP_DIR || '' });
 
   const echtGeld = await jaNee('Moeten echte Stripe-betalingen bij livegang actief zijn', !!huidig.STRIPE_SECRET_KEY);
@@ -205,7 +211,7 @@ async function verzamel(huidig) {
     wijzigingen.STRIPE_UITGAAND_UIT_BEWUST = '1';
   }
 
-  const s3 = await jaNee('Gedeelde S3-compatibele mediaopslag gebruiken (nodig voor meerdere app-instances)', compose || huidig.RTG_MEDIA_BACKEND === 's3');
+  const s3 = await jaNee('Gedeelde S3-compatibele mediaopslag gebruiken (verplicht voor B2B2C-go-live)', compose || huidig.RTG_MEDIA_BACKEND === 's3');
   wijzigingen.RTG_MEDIA_BACKEND = s3 ? 's3' : '';
   if (s3) {
     wijzigingen.RTG_MEDIA_S3_BUCKET = await vraag('S3-bucket', { standaard: huidig.RTG_MEDIA_S3_BUCKET || '' });
@@ -216,6 +222,7 @@ async function verzamel(huidig) {
     wijzigingen.RTG_MEDIA_S3_PREFIX = await vraag('S3-prefix', { standaard: huidig.RTG_MEDIA_S3_PREFIX || 'media/' });
   }
   wijzigingen.RTG_MOTOR_GELD = huidig.RTG_MOTOR_GELD || 'schaduw';
+  if (compose) wijzigingen.RTG_MOTOR_STATE_KEY_FILE = '/run/secrets/rtg-motor-state-key';
   return { wijzigingen, compose };
 }
 
@@ -248,6 +255,7 @@ async function hoofd() {
   console.log(compose
     ? 'Controleer binnen het Compose-netwerk: docker compose --env-file .env.productie run --rm app npm run golive'
     : 'Controleer nu: npm run golive');
+  if (compose) console.log('Vóór de eerste start: voer EENMALIG npm run motor:init uit. Een restart initialiseert nooit vanzelf.');
   console.log('Rond ook het papierwerk af via de eigenaarspagina; de go-live-keuring blokkeert zolang dat openstaat.');
 }
 

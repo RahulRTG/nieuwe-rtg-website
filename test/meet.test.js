@@ -39,15 +39,18 @@ test.after(() => {
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
 });
 
-test('1. een open kamer: de code is de sleutel, en de kamer kent alleen codenamen', async () => {
+test('1. een open kamer: de 128-bit code opent eenmalig toegang en de kamer kent alleen codenamen', async () => {
   const k = await api('/api/meet/maak', { titel: 'Proeverij voorbespreken' }, lidA);
   assert.equal(k.status, 200);
-  assert.match(k.body.code, /^[A-Z0-9]{6}$/);
+  assert.match(k.body.code, /^MEET\.[A-F0-9]{32}$/);
+  assert.equal(k.body.kamer.code, undefined, 'de kale code zit niet in het kamerbeeld');
 
-  const inA = await api('/api/meet/kom', { code: k.body.code }, lidA);
+  const inA = await api('/api/meet/kom', { id: k.body.id }, lidA);
   const inB = await api('/api/meet/kom', { code: k.body.code.toLowerCase() }, lidB);
   assert.equal(inB.status, 200, 'de code is niet hoofdlettergevoelig');
   assert.deepEqual(inB.body.kamer.aanwezig.sort(), [codeA, codeB].sort());
+  assert.equal(inB.body.kamer.code, undefined, 'join heronthult de code niet');
+  assert.ok(!JSON.stringify(inB.body).includes(k.body.code));
   assert.ok(!/Zaallid/.test(JSON.stringify(inB.body)), 'nergens een echte naam');
   assert.equal(inA.body.ik, codeA);
 
@@ -74,7 +77,8 @@ test('2. de agenda-afspraak is de sleutel: dezelfde afspraak geeft dezelfde besl
   assert.equal(k1.status, 200);
   const k2 = await api('/api/meet/maak', { agendaId: af.body.id }, lidB);
   assert.equal(k2.status, 200);
-  assert.equal(k2.body.code, k1.body.code, 'organisator en genodigde landen in dezelfde kamer');
+  assert.equal(k2.body.id, k1.body.id, 'organisator en genodigde landen in dezelfde kamer');
+  assert.equal(k2.body.code, undefined, 'een idempotente heropening heronthult de code niet');
 
   // wie niet op de afspraak staat, komt er niet in: niet via maak en niet via de code
   const k3 = await api('/api/meet/maak', { agendaId: af.body.id }, lidC);
@@ -82,7 +86,7 @@ test('2. de agenda-afspraak is de sleutel: dezelfde afspraak geeft dezelfde besl
   const inC = await api('/api/meet/kom', { code: k1.body.code }, lidC);
   assert.equal(inC.status, 403, 'besloten is besloten, ook met de code in de hand');
 
-  const inB = await api('/api/meet/kom', { code: k1.body.code }, lidB);
+  const inB = await api('/api/meet/kom', { id: k1.body.id }, lidB);
   assert.equal(inB.status, 200);
   assert.equal(inB.body.kamer.besloten, true);
   assert.equal(inB.body.kamer.titel, 'Kwartaaloverleg', 'de kamer erft de titel van de afspraak');
@@ -90,7 +94,7 @@ test('2. de agenda-afspraak is de sleutel: dezelfde afspraak geeft dezelfde besl
 
 test('3. verlaten, opruimen en de vollegrens', async () => {
   const k = await api('/api/meet/maak', { titel: 'Even snel' }, lidA);
-  const inA = await api('/api/meet/kom', { code: k.body.code }, lidA);
+  const inA = await api('/api/meet/kom', { id: k.body.id }, lidA);
   await api('/api/meet/kom', { code: k.body.code }, lidB);
   await api('/api/meet/verlaat', { id: inA.body.kamer.id }, lidB);
   const mijn = await api('/api/meet/mijn', {}, lidA);

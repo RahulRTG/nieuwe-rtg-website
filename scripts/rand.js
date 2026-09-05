@@ -18,6 +18,7 @@
    als de aanvalsronde, geschreven door dezelfde partij die de server schreef. */
 'use strict';
 const tls = require('tls');
+const { keurHsts, keurRedirect } = require('./lib/publieke-tls-proef');
 
 const BASIS = (process.argv[2] || 'http://127.0.0.1:3000').replace(/\/+$/, '');
 const url = new URL(BASIS);
@@ -38,18 +39,21 @@ async function haal(pad, opties) {
 /* 1. Het certificaat en het protocol. */
 function certificaat() {
   return new Promise((klaar) => {
+    let gereed = false;
+    const sluit = () => { if (!gereed) { gereed = true; klaar(); } };
     const s = tls.connect({ host: url.hostname, port: url.port || 443, servername: url.hostname, timeout: 8000 }, () => {
       const c = s.getPeerCertificate();
       const dagen = c && c.valid_to ? Math.round((Date.parse(c.valid_to) - Date.now()) / 86400000) : null;
       const proto = s.getProtocol();
       if (!s.authorized) blokkeer('Certificaat niet vertrouwd: ' + (s.authorizationError || 'onbekende reden'));
       else goed('Certificaat geldig voor ' + url.hostname + ' (' + proto + ', nog ' + dagen + ' dagen).');
-      if (dagen != null && dagen < 21) waarschuw('Het certificaat verloopt over ' + dagen + ' dagen; controleer de automatische vernieuwing.');
+      if (dagen != null && dagen < 14) blokkeer('Het certificaat is minder dan 14 dagen geldig; release/gebruik moet stoppen tot vernieuwing bewezen is.');
+      else if (dagen != null && dagen < 30) waarschuw('Het certificaat verloopt over ' + dagen + ' dagen; controleer de automatische vernieuwing.');
       if (proto && /TLSv1(\.[01])?$/.test(proto)) blokkeer('Verouderd TLS in gebruik: ' + proto + '. Alleen TLS 1.2 en 1.3 horen aan te staan.');
-      s.end(); klaar();
+      s.end(); sluit();
     });
-    s.on('error', (e) => { blokkeer('Geen TLS-verbinding mogelijk: ' + e.message); klaar(); });
-    s.on('timeout', () => { blokkeer('TLS-verbinding liep in een timeout.'); s.destroy(); klaar(); });
+    s.on('error', (e) => { blokkeer('Geen vertrouwde TLS-verbinding mogelijk: ' + e.message); sluit(); });
+    s.on('timeout', () => { blokkeer('TLS-verbinding liep in een timeout.'); s.destroy(); sluit(); });
   });
 }
 
@@ -60,11 +64,11 @@ async function koppen() {
   const k = (n) => r.kop.get(n) || '';
 
   const hsts = k('strict-transport-security');
-  const maanden = /max-age=(\d+)/.exec(hsts);
   if (!https) waarschuw('Gemeten over http, dus HSTS en certificaat zeggen hier niets. Draai dit tegen het https-adres.');
-  else if (!hsts) blokkeer('Geen Strict-Transport-Security: een bezoeker kan de eerste keer nog over http binnenkomen.');
-  else if (maanden && Number(maanden[1]) < 15552000) waarschuw('HSTS max-age is kort (' + maanden[1] + 's); een half jaar of meer is gebruikelijk.');
-  else goed('HSTS staat aan (' + hsts + ').');
+  else {
+    try { keurHsts(hsts); goed('HSTS staat voor minimaal één jaar aan, inclusief subdomeinen (' + hsts + ').'); }
+    catch (e) { blokkeer(e.message); }
+  }
 
   /* Bij de CSP telt WAAR de versoepeling staat. script-src 'unsafe-inline' is
      het gat waar cross-site scripting doorheen komt; style-src 'unsafe-inline'
@@ -114,9 +118,13 @@ async function httpNaarHttps() {
   try {
     const r = await fetch('http://' + url.hostname + '/', { redirect: 'manual' });
     const naar = r.headers.get('location') || '';
-    if (r.status >= 300 && r.status < 400 && /^https:/i.test(naar)) goed('Kaal http wordt doorgestuurd naar https (' + r.status + ').');
-    else blokkeer('http://' + url.hostname + ' stuurt NIET door naar https (status ' + r.status + ').');
-  } catch (e) { goed('Poort 80 is dicht; er valt niets onversleuteld te bereiken.'); }
+    try {
+      const bewijs = keurRedirect({ status: r.status, location: naar }, url, '/');
+      goed('Kaal http wordt permanent en canoniek doorgestuurd naar https (' + bewijs.status + ').');
+    } catch (e) { blokkeer(e.message); }
+  } catch (e) {
+    blokkeer('Poort 80 bewijst geen HTTP→HTTPS-redirect: ' + e.message + '.');
+  }
 }
 
 /* 4. Staat er iets op straat wat er niet hoort? */

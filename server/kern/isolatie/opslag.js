@@ -41,14 +41,33 @@ const WORTEL = 'isolatie';
 module.exports = function maakOpslag({ db }) {
   if (!db || !db.data) throw new Error('isolatie/opslag: zonder db.data is er niets om te bewaren');
 
-  function wortel() {
+  const heeft = (object, naam) => Object.prototype.hasOwnProperty.call(object, naam);
+  const gewoonObject = waarde => !!waarde && typeof waarde === 'object' && !Array.isArray(waarde);
+  const leeg = naam => REGISTER[naam].soort === 'lijst' ? [] : {};
+
+  function leesWortel() {
+    if (!heeft(db.data, WORTEL)) return null;
     const huidig = db.data[WORTEL];
-    if (!huidig || typeof huidig !== 'object' || Array.isArray(huidig)) db.data[WORTEL] = {};
+    if (!gewoonObject(huidig)) {
+      throw new Error('isolatie/opslag: de bestaande wortel is geen kaart; weigeren om beveiligingsstanden als leeg te lezen');
+    }
+    return huidig;
+  }
+
+  function wortel() {
+    if (!heeft(db.data, WORTEL)) db.data[WORTEL] = {};
+    const huidig = leesWortel();
+    /* Alleen AFWEZIG is een lege, nieuwe opslag. Een bestaande maar onleesbare
+       waarde stil vervangen maakte een beschadigd beveiligingsregister leeg en
+       las daarmee iedere drager als normaal. */
+    if (!gewoonObject(huidig)) {
+      throw new Error('isolatie/opslag: de bestaande wortel is geen kaart; weigeren om beveiligingsstanden als leeg te lezen');
+    }
     return db.data[WORTEL];
   }
   function klopt(naam, waarde) {
     return REGISTER[naam].soort === 'lijst' ? Array.isArray(waarde)
-      : (waarde && typeof waarde === 'object' && !Array.isArray(waarde));
+      : gewoonObject(waarde);
   }
   function eis(naam) {
     if (!REGISTER[naam]) throw new Error('isolatie/opslag: "' + naam + '" staat niet in het register. ' +
@@ -57,7 +76,25 @@ module.exports = function maakOpslag({ db }) {
   function tak(naam) {
     eis(naam);
     const w = wortel();
-    if (!klopt(naam, w[naam])) w[naam] = REGISTER[naam].soort === 'lijst' ? [] : {};
+    if (!heeft(w, naam)) w[naam] = REGISTER[naam].soort === 'lijst' ? [] : {};
+    else if (!klopt(naam, w[naam])) {
+      throw new Error('isolatie/opslag: de bestaande tak "' + naam + '" is geen ' +
+        REGISTER[naam].soort + '; weigeren om beveiligingsstanden als leeg te lezen');
+    }
+    return w[naam];
+  }
+  /* Handhaving en projecties moeten een ontbrekende tak als leeg kunnen lezen
+     zonder vanuit een GET/SSE-verzoek opslag te scheppen. Een bestaande foute
+     vorm blijft hard falen; alleen werkelijk afwezig levert een vluchtige lege
+     waarde op. */
+  function leesTak(naam) {
+    eis(naam);
+    const w = leesWortel();
+    if (!w || !heeft(w, naam)) return leeg(naam);
+    if (!klopt(naam, w[naam])) {
+      throw new Error('isolatie/opslag: de bestaande tak "' + naam + '" is geen ' +
+        REGISTER[naam].soort + '; weigeren om beveiligingsstanden als leeg te lezen');
+    }
     return w[naam];
   }
   function zetTak(naam, waarde) {
@@ -67,7 +104,7 @@ module.exports = function maakOpslag({ db }) {
     wortel()[naam] = waarde;
     return waarde;
   }
-  return { tak, zetTak, wortel, REGISTER, NIET_GEBOUWD };
+  return { tak, leesTak, zetTak, wortel, REGISTER, NIET_GEBOUWD };
 };
 
 module.exports.REGISTER = REGISTER;

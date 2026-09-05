@@ -29,22 +29,27 @@
       html += '<div class="tkc"><h3>'+T('kt.team','Team & uitnodigingen')+'</h3>'+
         (state.staff||[]).map(m=>'<div class="st-row h-wrap"><span>'+m.name+'<span class="sub">'+(m.func||'')+' \u00b7 '+(m.role==='manager'?'Manager':T('kt.staff','Medewerker'))+(m.lid?' \u00b7 '+T('kt.lid','RTG-lid'):'')+'</span></span>'+
           '<span class="acts">'+(m.id!==actor().staffId
-            ? '<button class="obtn" data-kreset="'+m.id+'">'+T('kt.reset','Reset code')+'</button><button class="obtn warn" data-kdel="'+m.id+'">'+T('kt.ontslag','Ontslag')+'</button>'
+            ? (legacyPinUi ? '<button class="obtn" data-kreset="'+m.id+'">'+T('kt.reset','Reset testcode')+'</button>' : '')+
+              '<button class="obtn warn" data-kdel="'+m.id+'">'+T('kt.ontslag','Ontslag')+'</button>'
             : '')+'</span></div>').join('')+
         '<div class="tkc-who" style="margin-top:0.5rem;line-height:1.5;">'+T('kt.invite.intro','Nodig uit; de medewerker meldt zich zelf aan met bedrijfsnaam + kassacode en een eigen RTG-account.')+'</div>'+
         '<div class="st-form"><input class="st-in" id="ktName" placeholder="'+T('kt.name.opt','Naam (optioneel)')+'"><input class="st-in" id="ktFunc" placeholder="'+T('kt.func','Functie (bijv. Bediening)')+'">'+
         '<select class="st-in" id="ktRole"><option value="staff">'+T('kt.staff','Medewerker')+'</option><option value="manager">Manager</option></select>'+
         '<button class="bigbtn" id="ktInvite" class="h-mt20">'+T('kt.invite','Nodig uit, kassacode verschijnt')+'</button></div></div>';
-      // open kassacodes: teruglezen en intrekken
+      // Open uitnodigingen: de kale code is alleen bij uitgifte zichtbaar.
       if (!invData) laadInvites();
       const openInv = (invData && invData.invites) || [];
-      html += '<div class="tkc"><h3>\ud83c\udf9f '+T('kt.openinv','Open kassacodes')+(openInv.length?' ('+openInv.length+')':'')+'</h3>'+
+      html += '<div class="tkc"><h3>\ud83c\udf9f '+T('kt.openinv','Personeelsuitnodigingen')+(openInv.length?' ('+openInv.length+')':'')+'</h3>'+
         (invData
           ? (openInv.length ? openInv.map(i =>
-              '<div class="st-row"><span><span style="font-family:monospace;letter-spacing:0.14em;color:var(--rtg-leesgoud,var(--gold));">'+escT(i.kassacode)+'</span>'+
+              '<div class="st-row"><span><span style="color:var(--rtg-leesgoud,var(--gold));">'+
+              (i.status==='actief'?T('kt.codeonce','Code eenmalig uitgegeven'):
+                i.status==='verlopen'?T('kt.expired','Verlopen · code verborgen'):
+                  T('kt.revoked','Ingetrokken · code verborgen'))+'</span>'+
               '<span class="sub">'+(i.naam?escT(i.naam)+' \u00b7 ':'')+(i.func?escT(i.func)+' \u00b7 ':'')+(i.role==='manager'?'Manager \u00b7 ':'')+T('kt.geldigtot','geldig t/m')+' '+new Date(i.expires).toLocaleDateString()+'</span></span>'+
-              '<span class="acts"><button class="obtn warn" data-kinv="'+escT(i.kassacode)+'">'+T('kt.intrek','Trek in')+'</button></span></div>').join('')
-            : '<div class="tkc-who">'+T('kt.geeninv','Geen open uitnodigingen.')+'</div>')
+              '<span class="acts"><button class="obtn" data-krot="'+escT(i.id)+'">'+T('kt.roteer','Nieuwe code')+'</button>'+
+              (i.status==='actief'?'<button class="obtn warn" data-kinv="'+escT(i.id)+'">'+T('kt.intrek','Trek in')+'</button>':'')+'</span></div>').join('')
+            : '<div class="tkc-who">'+T('kt.geeninv','Geen uitnodigingen.')+'</div>')
           : '<div class="tkc-who">'+T('kt.laden','Laden...')+'</div>')+'</div>';
       html += '<div class="tkc"><h3>'+T('kt.oproep','Hele team oproepen')+'</h3><div class="tkc-who">'+T('kt.oproep.s','Laat alle telefoons trillen, bijvoorbeeld bij een briefing.')+'</div>'+
         '<button class="obtn" id="ktBuzz" class="h-mt40">\uD83D\uDCE2 '+T('kt.buzzall','Buzz iedereen')+'</button></div>';

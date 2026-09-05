@@ -74,7 +74,8 @@ function maakZaak({ db, save, accounts }) {
       volgers: (salon.volgers || []).length, bioIngevuld: !!(salon.bio && salon.bio.trim().length >= 15),
       fotoIngevuld: !!(salon.foto || (s.photos && s.photos.length)), posts: posts.length,
       laatstePost: laatste ? { text: String(laatste.text || '').slice(0, 80), at: laatste.at } : null,
-      lopendeDeal: deal ? { titel: deal.deal.titel, claims: deal.deal.claims } : null,
+      lopendeDeal: deal ? { titel: deal.deal.titel,
+        claims: Array.isArray(deal.deal.claims) ? deal.deal.claims.length : 0 } : null,
       lopendePoll: poll ? { totaal: poll.poll.totaal } : null,
       salonActief: functieAan(s, 'salon')
     };

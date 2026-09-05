@@ -108,12 +108,15 @@ module.exports = (ctx, eigen) => {
      Een gedeelde functie en geen tweede implementatie: dezelfde regels, hetzelfde
      spoor, alleen een andere `door` (LAT.md regel 4). Wie het introk staat in
      het dossier en in het auditspoor -- 'deelnemer' als hij het zelf deed. */
-  function toestemmingWegDirect(c, door, reden) {
+  function toestemmingWegDirect(c, door, reden, inStaat) {
     if (!c.toestemming) return { status: 400, error: 'Er staat geen toestemming vastgelegd bij deze hulpvraag.' };
     c.ingetrokken = { was: c.toestemming, door: String(door || 'onbekend'), reden: schoon(reden, 300), at: nu() };
     c.toestemming = null;
-    audit(door, 'casus.toestemming-ingetrokken', c.codenaam, schoon(reden, 60));
-    save();
+    /* Het deelnemersportaal geeft `inStaat` mee: codegebruik, toestemming en
+       auditregel horen dan in dezelfde collectietransactie. Zonder die staat
+       blijft het bestaande kantoorcontract synchroon en bewaart het direct. */
+    audit(door, 'casus.toestemming-ingetrokken', c.codenaam, schoon(reden, 60), inStaat);
+    if (!inStaat) save();
     return { ok: true, casus: beeld(c) };
   }
 

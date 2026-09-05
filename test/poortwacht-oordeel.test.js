@@ -29,7 +29,7 @@
 'use strict';
 const { test } = require('node:test');
 const assert = require('node:assert');
-const { oordeelVan } = require('../scripts/poortwacht.js');
+const { oordeelVan, afsluitcode } = require('../scripts/poortwacht.js');
 
 test('1. onbeslist blijft onbeslist -- niet weten is geen slot', () => {
   /* De verleiding is om 400/404 als "dicht genoeg" te tellen: er komt immers
@@ -83,5 +83,16 @@ test('6. het requiren van de poortwacht start geen ronde', () => {
      ROLPROEF.json is ooit precies zo van 3377 beproefde routes teruggezet naar
      292 door een onschuldige laadcontrole. */
   const p = require('../scripts/poortwacht.js');
-  assert.deepStrictEqual(Object.keys(p), ['oordeelVan']);
+  assert.deepStrictEqual(Object.keys(p), ['oordeelVan', 'afsluitcode']);
+});
+
+test('7. een onbereikbare route maakt de volledige meting ongeldig', () => {
+  assert.equal(afsluitcode({ open: [], fout: 0 }), 0, 'compleet en dicht is groen');
+  assert.equal(afsluitcode({ open: [{ pad: '/api/fout' }], fout: 0 }), 1,
+    'een aantoonbaar open deur is een beveiligingsbevinding');
+  assert.equal(afsluitcode({ open: [], fout: 1 }), 2,
+    'één onbereikbare route is geen groen bewijs');
+  assert.equal(afsluitcode({ open: [{ pad: '/api/fout' }], fout: 1 }), 2,
+    'een gedeeltelijke meting blijft ongeldig, ook als zij al een opening vond');
+  assert.equal(afsluitcode(null), 2, 'een ontbrekende uitslag faalt dicht');
 });

@@ -61,23 +61,6 @@ app.post('/api/supplier/salon/deal', supplierAuth, (req, res) => {
   res.json({ ok: true, postId: post.id });
 });
 
-app.post('/api/supplier/salon/deal/redeem', supplierAuth, (req, res) => {
-  const code = String(req.body.code || '').trim().toUpperCase();
-  for (const p of db.data.posts) {
-    if (!p.deal || p.partnerCode !== req.supplier.code) continue;
-    const claim = p.deal.claims.find(c => c.code === code);
-    if (claim) {
-      if (claim.used) return res.status(409).json({ error: 'Deze code is al verzilverd.' });
-      claim.used = true;
-      claim.usedAt = new Date().toISOString();
-      save();
-      logActivity(req.supplier.code, req.actor, 'verzilverde aanbiedingscode ' + code + ' (' + claim.codename + ')');
-      return res.json({ ok: true, titel: p.deal.titel, codename: claim.codename });
-    }
-  }
-  res.status(404).json({ error: 'Deze code kennen we hier niet.' });
-});
-
 app.post('/api/supplier/salon/poll', supplierAuth, (req, res) => {
   if (!req.actor.manager) return res.status(403).json({ error: 'Alleen voor management.' });
   if (!eisSalonProfiel(req, res)) return;

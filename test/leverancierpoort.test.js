@@ -23,6 +23,7 @@ const assert = require('node:assert/strict');
 const crypto = require('crypto');
 
 const maakPoort = require('../server/opzet/leverancierpoort');
+const staffSessie = require('../server/accounts/staff-sessie');
 const persoonseisModule = require('../server/kern/persoonseis');
 
 /* Een genre MET een werk-eis en een genre zonder, uit het register zelf
@@ -38,9 +39,19 @@ function opstelling(opties) {
   const geseind = [];
   const bus = { publish: (kanaal, bericht) => geseind.push({ kanaal, ...bericht }) };
   let kern = o.kern === undefined ? {} : o.kern;
+  const accounts = o.accounts || {
+    // Deze toets gaat over de leverancierspoort, niet over de productiecutover;
+    // een aparte toets hieronder zet de accountgrens bewust dicht.
+    legacyStaffPinToegestaan: () => true,
+    getStaffById: () => null,
+    getUserById: id => ({ id, actief: 1, sessies_vanaf: 0 }),
+    isActief: () => true
+  };
+  if (typeof accounts.controleerStaffSessie !== 'function')
+    accounts.controleerStaffSessie = sess => staffSessie.controleer(accounts, sess);
   let saves = 0;
   const poort = maakPoort({
-    db, save: () => { saves++; }, crypto,
+    db, save: () => { saves++; }, crypto, accounts,
     rtgKlok: { datum: () => new Date('2026-08-19T12:00:00Z') },
     sessionFor: (t) => o.sessies && o.sessies[t],
     grootSupplierSync: () => null,   // de grote kast is hier leeg; de kleine doet het werk
@@ -50,6 +61,38 @@ function opstelling(opties) {
   });
   return { poort, db, geseind, zetKern: (k) => { kern = k; }, saves: () => saves };
 }
+
+test('de productiesupplierpoort controleert de verse staff/account-binding', () => {
+  const lid = { id: 7, actief: 1, sessies_vanaf: 0 };
+  const staff = { id: 4, supplier_code: 'AAA', member_id: 7, active: 1 };
+  const accounts = {
+    legacyStaffPinToegestaan: () => false,
+    getStaffById: id => id === 4 ? staff : null,
+    getUserById: id => id === 7 ? lid : null,
+    isActief: u => !!u && u.actief !== 0
+  };
+  const sessies = { goed: { role: 'supplier', code: 'AAA', staffId: 4, lid: 7,
+    lidKey: 'user-7', lidInlogOp: 100 } };
+  const { poort, db } = opstelling({ accounts, sessies });
+  db.data.suppliers.push({ code: 'AAA', type: VRIJ });
+  let door = false;
+  poort.supplierAuth({ get: () => 'Bearer goed', path: '/state' }, antwoord(), () => { door = true; });
+  assert.equal(door, true);
+
+  staff.active = 0;
+  accounts.getStaffById = () => null;
+  const uitDienst = antwoord();
+  poort.supplierAuth({ get: () => 'Bearer goed', path: '/state' }, uitDienst, () => assert.fail('uit dienst'));
+  assert.equal(uitDienst.uit.status, 401);
+
+  accounts.getStaffById = () => staff;
+  staff.active = 1;
+  lid.sessies_vanaf = 101;
+  const ingetrokken = antwoord();
+  poort.supplierAuth({ get: () => 'Bearer goed', path: '/state' }, ingetrokken, () => assert.fail('ingetrokken'));
+  assert.equal(ingetrokken.uit.status, 401);
+  assert.match(ingetrokken.uit.body.error, /ingetrokken/);
+});
 
 function antwoord() {
   const uit = {};

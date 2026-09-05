@@ -14,13 +14,16 @@ const cp = require('child_process');
 const STANDAARD_UIT = '.release/release-bewijs.json';
 const MAX_BESTANDEN = 20_000;
 const MAX_BESTAND = 128 * 1024 * 1024;
-const MAPPEN = ['server', 'public', 'scripts', 'motor/src'];
+const MAPPEN = ['server', 'public', 'scripts', 'motor/src', 'deploy'];
 const LOS = ['package.json', 'package-lock.json', 'motor/Cargo.toml', 'motor/Cargo.lock',
-  'Dockerfile', 'docker-compose.yml', '.env.example', 'SLO.json', 'RUST-MIGRATIES.json'];
+  'Dockerfile', '.dockerignore', 'docker-compose.yml', 'docker-compose.live.yml',
+  '.env.example', 'index.html', 'VERWERKINGSREGISTER.md', 'DATALEK.md'];
 
 function uitgesloten(rel) {
-  return rel === 'server/data' || rel.startsWith('server/data/') ||
+  return rel === 'release-bewijs.json' || rel === 'SUITE.json' ||
+    rel === 'server/data' || rel.startsWith('server/data/') ||
     rel === '.release' || rel.startsWith('.release/') ||
+    rel === 'deploy/live.env' || rel.startsWith('.rtg-') ||
     rel === 'node_modules' || rel.startsWith('node_modules/');
 }
 
@@ -41,6 +44,10 @@ function verzamel(root) {
     }
   }
   for (const rel of LOS) voeg(rel);
+  /* Elk rootregister dat de runtime meekrijgt, krijgt bewijs. Een handmatige
+     lijst liep aantoonbaar achter op BEGROTING/IDEMBESLUIT/DEKKING en maakte
+     Sentinel blind voor wijzigingen aan echte runtime-invoer. */
+  for (const naam of fs.readdirSync(root).filter(n => n.endsWith('.json')).sort()) voeg(naam);
   for (const rel of MAPPEN) voeg(rel);
   const image = fs.existsSync(path.join(root, 'rtg-motor'));
   const bins = image ? ['rtg-motor', 'rtg-sentinel']
@@ -66,10 +73,25 @@ function commando(naam, args) {
 
 function gitInfo(root) {
   const commit = cp.spawnSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' });
-  const status = cp.spawnSync('git', ['status', '--porcelain'], { cwd: root, encoding: 'utf8' });
+  const gitCommit = commit.status === 0 ? String(commit.stdout || '').trim() : null;
+  const aangeleverd = String(process.env.RTG_RELEASE_COMMIT || '').trim().toLowerCase();
+  if (gitCommit && aangeleverd && gitCommit.toLowerCase() !== aangeleverd)
+    throw new Error('Aangeleverde releasecommit wijkt af van de Git-werkboom.');
+  if (!gitCommit && !/^[a-f0-9]{40,64}$/.test(aangeleverd))
+    aangeleverd && console.error('[releasebewijs] ongeldige aangeleverde releasecommit genegeerd');
+  let vuil = null;
+  try {
+    /* Registers en rapporten zijn de UITKOMST van de ronde. Alleen gewijzigde
+       code maakt het bewijs onreproduceerbaar; dezelfde grens wordt ook vlak
+       vóór Docker nogmaals afgedwongen door scripts/uitrol.js. */
+    if (path.resolve(root) === path.resolve(path.join(__dirname, '..')))
+      vuil = require('./lib/stempel').vuileBoom();
+  } catch (e) { vuil = null; }
   return {
-    commit: commit.status === 0 ? commit.stdout.trim() : null,
-    gewijzigd: status.status === 0 ? !!status.stdout.trim() : null
+    commit: gitCommit || (/^[a-f0-9]{40,64}$/.test(aangeleverd) ? aangeleverd : null),
+    gewijzigd: vuil === null ? (gitCommit ? null : (/^[a-f0-9]{40,64}$/.test(aangeleverd) ? false : null)) : vuil.code.length > 0,
+    herkomst: gitCommit ? 'git' : (/^[a-f0-9]{40,64}$/.test(aangeleverd) ? 'gecontroleerde-buildarg' : 'onbekend'),
+    bewijsbestandenGewijzigd: vuil === null ? null : vuil.anders.length
   };
 }
 

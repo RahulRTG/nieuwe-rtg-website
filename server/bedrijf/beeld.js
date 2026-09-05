@@ -22,6 +22,7 @@
 
 module.exports = (sctx) => {
   const { app, dag, werkPoort, eigenVeld, W } = sctx;
+  const PRODUCTIE = String(process.env.NODE_ENV || '') === 'production';
 
   function beeld(w) {
     const uit = { werkruimte: { code: w.code, naam: w.naam, land: w.land, valuta: w.valuta } };
@@ -124,6 +125,33 @@ module.exports = (sctx) => {
      kijken, maakt van "de werkruimte is de grens" een leuze. */
   app.post('/api/bedrijf/geconsolideerd', (req, res) => {
     const w = sctx.beheerVan(req, res); if (!w) return;
+    if (PRODUCTIE) {
+      const gevraagd = Array.isArray(req.body.dochters)
+        ? [...new Set(req.body.dochters.map(x => String(x || '').trim().toUpperCase()).filter(Boolean))] : [];
+      const mee = [];
+      let geweigerd = 0;
+      for (const code of gevraagd) {
+        const d = eigenVeld(W(), code);
+        const l = d && d.moeder === w.code
+          ? Object.values(d.leden || {}).find(x => x && x.rtgKey === req.session.key && x.status === 'actief') : null;
+        const rechten = l && sctx.rechtenVan ? sctx.rechtenVan(l) : [];
+        if (d && l && rechten.includes('cijfer')) mee.push(d); else geweigerd++;
+      }
+      const delen = [w].concat(mee).map(beeld);
+      const som = (pad) => delen.reduce((t, b) => {
+        const v = pad.split('.').reduce((o, k) => (o == null ? null : o[k]), b);
+        return t + (typeof v === 'number' ? v : 0);
+      }, 0);
+      return res.json({ ok: true, werkruimtes: delen.map(d => d.werkruimte),
+        nietMeegeteld: geweigerd,
+        totalen: { mensenActief: som('mensen.actief'), projectenLopend: som('projecten.lopend'),
+          gewonnenCenten: som('verkoop.gewonnenCenten'), ticketsOpen: som('service.open'),
+          contractenActief: som('recht.actief') },
+        delen,
+        let: geweigerd
+          ? geweigerd + ' gekozen dochter(s) tellen niet mee: alleen een actuele eigen rol met het recht "cijfer" opent die grens.'
+          : 'Alle expliciet gekozen dochters waarvoor u nu cijferrecht heeft, tellen mee.' });
+    }
     const sleutels = req.body.dochterTokens && typeof req.body.dochterTokens === 'object' ? req.body.dochterTokens : {};
     const dochters = Object.values(W()).filter(x => x.moeder === w.code);
     const mee = [], zonder = [];

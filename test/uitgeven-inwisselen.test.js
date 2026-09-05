@@ -29,7 +29,9 @@ const { startServer, stop } = require('./helper');
 
 let srv, base, zaak, kassa, buurzaak, lid, lid2;
 let kaartCode = null, postId = null, dealCode = null;
+let idemVolg = 0;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-uitgeven-'));
+const idem = naam => 'uitgeven-' + naam + '-' + String(++idemVolg).padStart(8, '0');
 
 function api(pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -108,32 +110,66 @@ test('3. een aanbieding op De Salon: van het management, met titel en tekst', as
 });
 
 test('4. een aanbiedingscode werkt een keer, en alleen bij de eigen zaak', async () => {
-  const claim = await api('/api/salon/deal/claim', { postId }, lid);
+  const claimIdem = idem('salon-claim');
+  const claim = await api('/api/salon/deal/claim', { postId, idem: claimIdem }, lid);
   assert.equal(claim.status, 200);
   dealCode = claim.body.code;
-  assert.match(dealCode, /^RTG-D-/);
+  assert.match(dealCode, /^SAL\.[A-F0-9]{32}$/);
 
-  // twee keer claimen geeft dezelfde code terug, geen tweede korting
-  const nogmaals = await api('/api/salon/deal/claim', { postId }, lid);
-  assert.equal(nogmaals.body.code, dealCode, 'hetzelfde lid krijgt dezelfde code');
+  // Een retry maakt geen tweede korting, maar heronthult het eerste geheim ook niet.
+  const nogmaals = await api('/api/salon/deal/claim', { postId, idem: claimIdem }, lid);
+  assert.equal(nogmaals.status, 409);
+  assert.equal('code' in nogmaals.body, false, 'een eenmalige code komt niet uit een retrycache');
   assert.equal(nogmaals.body.alGeclaimd, true);
+  const lidBeeld = (await api('/api/state', {}, lid)).body.state;
+  const lidDeal = lidBeeld.posts.find(p => p.id === postId).deal;
+  assert.equal(lidDeal.mijnClaim.status, 'actief');
+  assert.equal(JSON.stringify(lidBeeld).includes(dealCode), false,
+    'de ledenstate redisclose geen kale code');
+  const etalage = await api('/api/salon/profiel', { code: 'KIKUNOI' }, lid);
+  assert.equal(etalage.body.items.find(p => p.id === postId).deal.mijnClaim.status, 'actief');
+  assert.equal(JSON.stringify(etalage.body).includes(dealCode), false,
+    'ook de partneretalage redisclose geen kale code');
 
-  assert.equal((await api('/api/supplier/salon/deal/redeem', { code: dealCode }, buurzaak)).status, 404,
+  const rotIdem = idem('salon-rotate');
+  const rotatie = await api('/api/salon/deal/claim/roteer', { postId, idem: rotIdem }, lid);
+  assert.equal(rotatie.status, 200);
+  assert.match(rotatie.body.code, /^SAL\.[A-F0-9]{32}$/);
+  assert.notEqual(rotatie.body.code, dealCode);
+  assert.equal((await api('/api/salon/deal/claim/roteer', { postId, idem: rotIdem }, lid)).body.code,
+    undefined, 'ook een rotatieretry heronthult niets');
+  assert.equal((await api('/api/supplier/salon/deal/redeem', {
+    code: dealCode, idem: idem('salon-oud') }, kassa)).status, 404,
+  'de oude code is na rotatie server-side nutteloos');
+  dealCode = rotatie.body.code;
+
+  assert.equal((await api('/api/supplier/salon/deal/redeem', {
+    code: dealCode, idem: idem('salon-buur') }, buurzaak)).status, 404,
     'een code van een andere zaak kennen we hier niet');
-  assert.equal((await api('/api/supplier/salon/deal/redeem', { code: 'RTG-D-BESTAAT' }, zaak)).status, 404);
+  assert.equal((await api('/api/supplier/salon/deal/redeem', {
+    code: 'SAL.00000000000000000000000000000000', idem: idem('salon-onbekend') }, zaak)).status, 404);
 
-  const in1 = await api('/api/supplier/salon/deal/redeem', { code: dealCode }, kassa);
+  const inIdem = idem('salon-redeem');
+  const in1 = await api('/api/supplier/salon/deal/redeem', { code: dealCode, idem: inIdem }, kassa);
   assert.equal(in1.status, 200, 'de kassa mag wel verzilveren: dat gebeurt aan de balie');
   assert.equal(in1.body.titel, 'Zomerproeverij');
   assert.ok(in1.body.codename, 'er staat bij welk lid het was');
 
-  assert.equal((await api('/api/supplier/salon/deal/redeem', { code: dealCode }, kassa)).status, 409,
+  const replay = await api('/api/supplier/salon/deal/redeem', { code: dealCode, idem: inIdem }, kassa);
+  assert.equal(replay.status, 200, 'een verloren antwoord mag exact worden herhaald');
+  assert.equal(replay.body.herhaald, true);
+  assert.equal((await api('/api/supplier/salon/deal/redeem', {
+    code: dealCode, idem: idem('salon-tweede') }, kassa)).status, 409,
     'dezelfde code een tweede keer is een korting die je twee keer geeft');
 
-  // een ander lid heeft zijn eigen code, en die werkt gewoon nog
-  const claim2 = await api('/api/salon/deal/claim', { postId }, lid2);
+  // Een ander lid heeft een eigen code; intrekken maakt haar direct nutteloos.
+  const claim2 = await api('/api/salon/deal/claim', {
+    postId, idem: idem('salon-claim-twee') }, lid2);
   assert.notEqual(claim2.body.code, dealCode, 'elk lid krijgt zijn eigen code');
-  assert.equal((await api('/api/supplier/salon/deal/redeem', { code: claim2.body.code }, kassa)).status, 200);
+  assert.equal((await api('/api/salon/deal/claim/intrek', {
+    postId, idem: idem('salon-intrek') }, lid2)).status, 200);
+  assert.equal((await api('/api/supplier/salon/deal/redeem', {
+    code: claim2.body.code, idem: idem('salon-ingetrokken') }, kassa)).status, 404);
 });
 
 test('5. een poll heeft een vraag en minstens twee opties', async () => {

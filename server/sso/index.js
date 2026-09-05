@@ -37,6 +37,7 @@
 'use strict';
 const crypto = require('crypto');
 const S = require('../accounts/state');
+const accountDuurzaamheid = require('../accounts/duurzaamheid');
 const koppelingen = require('./koppelingen');
 
 function zorgTabel(db) {
@@ -101,6 +102,11 @@ async function aanmelden(accounts, koppeling, claims) {
 
   const subject = String(claims.sub);
   const naam = String(claims.name || claims.given_name || '').trim() || email.split('@')[0];
+
+  /* Ook het bijwerken van een bestaande subject-koppeling schrijft naar de
+     lokale identiteitscache. Zolang die niet aan request-PG deelneemt, blijft
+     de hele succesvolle SSO-mutatie in productie vóór de eerste write dicht. */
+  accountDuurzaamheid.eisMutatie('SSO-accountkoppeling');
 
   /* 1. kennen we dit subject al? Dan is dat het account, ongeacht het adres. */
   const bekend = vindIdentiteit(koppeling.org, subject);

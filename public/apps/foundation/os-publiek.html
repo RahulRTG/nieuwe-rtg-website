@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
+<script src="/shared/id.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0C0C0B">
@@ -176,8 +177,10 @@
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
 <link href="/shared/wereldrooster.css" rel="stylesheet">
 <link href="/shared/experience-kernel.css?v=20260829-7" rel="stylesheet">
+<link href="/images/worlds/vandaag/wereld-atlas.jpg" rel="preload" as="image" fetchpriority="high">
+<link href="/shared/rtg-vandaag-luxe.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-rtg-world="foundation">
+<body class="rtg-stijl" data-rtg-world="foundation" data-rtg-vandaag-luxe data-rtg-vandaag-surface="public-city" data-rtg-edge-2-context="world-shell" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true">
 <!-- De wereldstrook stond hier; de vier werelden staan nu in de topbalk van de
      Edge-schil (shared/rtg-edge-system.js), die dit scherm via randen.js al
      draagt. Zie de opmerking in apps/kantoor.html. -->
@@ -280,6 +283,7 @@
   <!-- /WERELDROOSTER --></div></section>
 </main>
 
+<script src="/shared/rtg-vandaag-luxe.js" defer></script>
 <script>
 /* De publieke RTF-app: geen inlog, en daarom de strengste grens van het hele
    systeem.
@@ -309,6 +313,64 @@ const api = (pad, body) => fetch('/api/rtfos/publiek/' + pad, {
   return d;
 });
 
+/* Een stadsroute is pas een surface nadat de slug overeenkomt met een stad
+   uit de PUBLIEKE stedenlijst. De query zelf is dus nooit gezaghebbend en een
+   intern stadsendpoint komt niet in beeld. */
+function stadSlug(waarde) {
+  return String(waarde || '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 80);
+}
+
+function gevraagdeStadSlug() {
+  try {
+    const waarde = new URLSearchParams(location.search).get('stad');
+    if (!waarde || waarde.length > 120) return null;
+    return stadSlug(waarde) || null;
+  } catch (e) { return null; }
+}
+
+function isIngebed() {
+  try { if (window.self !== window.top) return true; } catch (e) { return true; }
+  try { return new URLSearchParams(location.search).get('embed') === '1'; }
+  catch (e) { return false; }
+}
+
+const STADSAANVRAAG = gevraagdeStadSlug();
+const VANDAAG_ATTR = 'data-rtg-vandaag-' + 'luxe';
+/* Dit gebeurt tijdens het parsen, dus vóór de deferred Experience-laag. Een
+   publieke city-surface haalt ook met een aanwezige member-token geen
+   persoonlijke Experience-projectie op. */
+if (STADSAANVRAAG || isIngebed()) document.body.setAttribute('data-rtg-experience', 'off');
+/* Voorkom dat eerst de volledige home wordt getekend terwijl de publieke
+   stedenlijst de slug nog valideert. Onbekend of onbeschikbaar herstelt home. */
+if (STADSAANVRAAG) document.body.removeAttribute(VANDAAG_ATTR);
+
+function zetVandaagModus(modus, titel) {
+  if (modus === 'surface') {
+    document.body.setAttribute('data-rtg-vandaag-surface-title', titel || 'Publieke stad');
+    document.body.setAttribute(VANDAAG_ATTR, 'surface');
+    document.body.setAttribute('data-rtg-edge-2-state', 'compact');
+    document.body.setAttribute('data-rtg-edge-2-auto', 'false');
+    return;
+  }
+  document.body.removeAttribute('data-rtg-vandaag-surface-title');
+  document.body.setAttribute(VANDAAG_ATTR, 'home');
+  document.body.setAttribute('data-rtg-edge-2-state', 'overview');
+  document.body.setAttribute('data-rtg-edge-2-auto', 'true');
+}
+
+function meldStad(tekst) {
+  const oud = $('#stadmelding');
+  if (oud) oud.remove();
+  if (!tekst) return;
+  const melding = document.createElement('div');
+  melding.id = 'stadmelding';
+  melding.className = 'melder';
+  melding.setAttribute('role', 'status');
+  melding.textContent = tekst;
+  $('#steden').insertAdjacentElement('afterend', melding);
+}
+
 /* De begroeting komt uit de klok van de bezoeker en niet uit een account: deze
    pagina heeft er geen. Meer dan het dagdeel weet zij dus niet, en dat is
    precies genoeg. */
@@ -336,7 +398,20 @@ async function start() {
       ? r.steden.map((_, i) => '<span class="stip' + (i === 0 ? ' aan' : '') + '"></span>').join('') : '';
     $('#steden').querySelectorAll('[data-stad]').forEach(k =>
       k.addEventListener('click', () => toonStad(k.dataset.stad)));
-  } catch (e) { $('#steden').innerHTML = '<div class="melder">' + esc(e.message) + '</div>'; }
+    if (STADSAANVRAAG) {
+      const gevonden = r.steden.find(s => stadSlug(s.naam) === STADSAANVRAAG);
+      if (!gevonden) {
+        meldStad('Deze stadsafdeling staat niet openbaar. Kies een stad uit de lijst.');
+        zetVandaagModus('home');
+      } else if (await toonStad(gevonden.id, { blijfBoven: true })) {
+        meldStad('');
+        zetVandaagModus('surface', 'RTF ' + gevonden.naam);
+      } else zetVandaagModus('home');
+    }
+  } catch (e) {
+    $('#steden').innerHTML = '<div class="melder">' + esc(e.message) + '</div>';
+    if (STADSAANVRAAG) zetVandaagModus('home');
+  }
 
   try {
     const c = await api('campagnes');
@@ -363,7 +438,7 @@ function tekenVrijePlekken(activiteiten) {
   pil.classList.remove('verborgen');
 }
 
-async function toonStad(id) {
+async function toonStad(id, opties) {
   try {
     const r = await api('stad', { id });
     GEKOZEN = id;
@@ -389,9 +464,13 @@ async function toonStad(id) {
         '<div class="uitleg ruimte">' + esc(r.meedoen.ondernemer) + '</div>' +
         '<div class="rij ruimte"><a class="buurtknop rand" href="os-vrijwilliger.html">Ik ben al vrijwilliger</a>' +
         '<a class="buurtknop rand" href="os-deelnemer.html">Ik heb een code voor mijn hulpvraag</a></div></div>';
-    ga(WACHT || 'hulp');
+    if (!opties || !opties.blijfBoven) ga(WACHT || 'hulp');
     WACHT = null;
-  } catch (e) { $('#uit').innerHTML = '<div class="buurtkaart"><div class="melder">' + esc(e.message) + '</div></div>'; }
+    return true;
+  } catch (e) {
+    $('#uit').innerHTML = '<div class="buurtkaart"><div class="melder">' + esc(e.message) + '</div></div>';
+    return false;
+  }
 }
 
 function ga(naar) {

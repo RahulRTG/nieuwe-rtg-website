@@ -63,6 +63,12 @@ test('Werkruimte: een kamer bewaren, leeghalen en met een klik terughalen',
     assert.ok(Math.abs(m.zichtbaar[0].width * 2 - m.ruimte.width) < 1);
     assert.ok(Math.abs(m.zichtbaar[0].height - m.ruimte.height) < 1);
     await page.setViewportSize({ width:390, height:844 });
+    /* Wacht tot Chromium de nieuwe CSS-viewport werkelijk publiceert en stuur
+       daarna dezelfde resize die een echt venster geeft. Onder zware parallelle
+       CI-belasting kon Playwright eerder doorlopen terwijl die ene gebeurtenis
+       nog samengevoegd was; de geometrie-eis hieronder blijft ongewijzigd. */
+    await page.waitForFunction(() => innerWidth === 390 && innerHeight === 844);
+    await page.evaluate(() => dispatchEvent(new Event('resize')));
     await page.waitForFunction(() => {
       const v = document.querySelectorAll('.rtg-surface[data-edge-visible]');
       if (v.length !== 1) return false;

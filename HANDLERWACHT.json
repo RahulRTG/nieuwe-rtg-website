@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-05T14:42:21.780Z",
-  "commit": "74216f4fd",
+  "op": "2026-09-05T19:05:13.778Z",
+  "commit": "1fb191083",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 8,
   "instrument": "scripts/handlerwacht.js",
   "node": "v24.18.0"
  },
@@ -995,7 +995,7 @@
   },
   {
    "sleutel": "POST /api/cluster/:actie",
-   "bestand": "server/server.js:926",
+   "bestand": "server/server.js:924",
    "staat": "openbaar",
    "reden": "de clustersleutel zit in een eigen kop; zonder sleutel bestaat de route niet"
   },
@@ -4006,7 +4006,7 @@
   },
   {
    "sleutel": "POST /api/zegel/controleer",
-   "bestand": "server/server.js:1382",
+   "bestand": "server/server.js:1380",
    "staat": "openbaar",
    "reden": "controleert een handtekening; het bewijs zit in het verzoek"
   }

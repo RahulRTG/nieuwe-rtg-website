@@ -9,7 +9,7 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**59 bundels, 466 delen, 3 zonder onderwerp.**
+**59 bundels, 466 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
@@ -191,12 +191,12 @@ omlaag.
 
 ## `apps/foundation/samen.js`
 
-`public/apps/foundation/samen/` -- 3 delen, 225 regels in de delen, waarvan 1 zonder onderwerp
+`public/apps/foundation/samen/` -- 3 delen, 225 regels in de delen
 
 | deel | onderwerp |
 |---|---|
 | `samen-01.js` | Rustig samenkijken voor gezin en bevestigde vrienden |
-| `samen-01b.js` | -- |
+| `samen-01b.js` | De Samen-meldingen en de rustige poller voor pagina- en chatupdates |
 | `samen-02.js` | Rahul voor het gezin: de kindveilige vraagbaak op elke RTF-pagina |
 
 ## `apps/foundation/sessie.js`
@@ -212,7 +212,7 @@ omlaag.
 
 ## `apps/leverancier.js`
 
-`public/apps/leverancier/` -- 113 delen, 9678 regels in de delen, waarvan 1 zonder onderwerp
+`public/apps/leverancier/` -- 113 delen, 9678 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -279,7 +279,7 @@ omlaag.
 | `leverancier-41.js` | de functies van een groothandel aan- en uitzetten |
 | `leverancier-42.js` | de inkoop-AI: wat is er nodig bij deze groothandel |
 | `leverancier-43.js` | een verkoopaanvraag aanvaarden of een tegenbod doen |
-| `leverancier-43z.js` | -- |
+| `leverancier-43z.js` | De vrachtkaart met etappetijdlijn, documenten en klantcode-acties |
 | `leverancier-44.js` | de statusknoppen van een vrachtzending |
 | `leverancier-45.js` | een melding in het vrachtlogboek |
 | `leverancier-46.js` | het gebouwbeheer: de knoppen en hun acties |
@@ -750,7 +750,7 @@ omlaag.
 
 ## `shared/metgezel.js`
 
-`public/shared/metgezel/` -- 8 delen, 799 regels in de delen, waarvan 1 zonder onderwerp
+`public/shared/metgezel/` -- 8 delen, 799 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -761,7 +761,7 @@ omlaag.
 | `metgezel-01d.js` | RAHUL STAAT NERGENS OVERHEEN -- OOK NIET OVER EEN VASTE LAAG |
 | `metgezel-02.js` | Rahul heeft een melding: de lippen verkleuren en bewegen |
 | `metgezel-03.js` | Lege-toestand-nudge: elke plek met data-rahul-leeg="opdracht" opent Rahul met die opdracht al ingevuld |
-| `metgezel-03b.js` | -- |
+| `metgezel-03b.js` | Live Samen-meldingen en de waarschuwing bij een onbeveiligd app-adres |
 
 ## `shared/mond.js`
 

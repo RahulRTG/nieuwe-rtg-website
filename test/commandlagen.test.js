@@ -325,5 +325,6 @@ test('open bewijs-, arrival-, webhook- en projectie-ingangen weigeren onbetrouwb
   }
 
   const projectie = await fetch(base + '/api/projectie/NIET-BESTAAND');
-  assert.equal(projectie.status, 404, 'een onbekende korte projectiecode lekt geen spelstand');
+  assert.equal(projectie.status, 410,
+    'de oude korte projectieroute is definitief gesloten en lekt geen spelstand');
 });

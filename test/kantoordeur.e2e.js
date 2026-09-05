@@ -82,23 +82,32 @@ async function opstelling() {
 
 // Eén scherm bezoeken met een schone kantoorsleutel, en teruggeven wat er staat.
 async function bezoek(page, base, app) {
-  await page.evaluate(() => { try { localStorage.removeItem('rtg_office_token'); } catch (e) {} });
-  try { await page.goto(base + '/apps/' + app + '.html', { waitUntil: 'domcontentloaded' }); }
-  catch (e) { /* een meta-refresh breekt de navigatie af; de tekst lezen we hierna */ }
-  await wachtOpRust(page).catch(() => {});
-  return page.evaluate(() => {
-    const zegt = document.querySelector('.kg .kg-zegt');
-    return {
-      pad: location.pathname,
-      deur: zegt ? zegt.textContent.replace(/\s+/g, ' ').trim() : null,
-      tekst: document.body.innerText.replace(/\s+/g, ' ').trim()
-    };
-  });
+  const doelPad = '/apps/' + app + '.html';
+  for (let poging = 0; poging < 2; poging++) {
+    await page.evaluate(() => { try { localStorage.removeItem('rtg_office_token'); } catch (e) {} });
+    try { await page.goto(base + doelPad, { waitUntil: 'domcontentloaded' }); }
+    catch (e) { /* een omleiding kan de navigatie afbreken; de URL beslist hieronder */ }
+    await wachtOpRust(page).catch(() => {});
+    const stand = await page.evaluate(() => {
+      const zegt = document.querySelector('.kg .kg-zegt');
+      return {
+        pad: location.pathname,
+        deur: zegt ? zegt.textContent.replace(/\s+/g, ' ').trim() : null,
+        tekst: document.body.innerText.replace(/\s+/g, ' ').trim()
+      };
+    });
+    if (stand.pad === doelPad) return stand;
+    if (poging === 1) assert.equal(stand.pad, doelPad,
+      'de schermtoets mag na een afgebroken navigatie niet het vorige document lezen');
+  }
 }
 
 // De sleutel van dit toestel zetten (of weghalen met null).
 async function alsLid(page, base, token) {
-  await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
+  /* Alleen een same-origin document is nodig om localStorage te zetten. Het
+     volledige beginscherm start zelf navigatie en maakte de eerstvolgende goto
+     onder zware CI-belasting soms ongedaan; /api/health heeft geen appcode. */
+  await page.goto(base + '/api/health', { waitUntil: 'domcontentloaded' });
   await page.evaluate((t) => {
     localStorage.setItem('rtg_cookieinfo_v1', '1');
     localStorage.removeItem('rtg_office_token');

@@ -67,6 +67,27 @@ async function api(base, pad, body, token) {
   return { status: r.status, body: await r.json().catch(() => ({})) };
 }
 
+/* De kaarten bewegen twee pixels bij hover en staan tussen twee vaste
+   Edge-randen. Playwrights minimale autoscroll kan daardoor onder belasting
+   heen en weer springen tussen die randen. Deze helper zet de echte knop ruim
+   in beeld, bewijst met elementFromPoint dat niets hem afdekt en stuurt daarna
+   een gewone muisklik naar dat punt. Er wordt dus niets geforceerd. */
+async function klikRaakbaar(page, selector) {
+  const knop = page.locator(selector);
+  await knop.evaluate(el => el.scrollIntoView({ block: 'center', inline: 'nearest' }));
+  const handvat = await page.waitForFunction((sel) => {
+    const el = document.querySelector(sel);
+    if (!el) return false;
+    const r = el.getBoundingClientRect();
+    const x = r.left + r.width / 2;
+    const y = r.top + r.height / 2;
+    const raak = document.elementFromPoint(x, y);
+    return (raak === el || el.contains(raak)) && { x, y };
+  }, selector);
+  const punt = await handvat.jsonValue();
+  await page.mouse.click(punt.x, punt.y);
+}
+
 /* Een echte proef-app: hij vraagt zijn stand op bij de brug, schrijft er een
    nieuwe en probeert daarna iets waar hij geen machtiging voor heeft. Alle drie
    de uitkomsten zet hij in de DOM, zodat de toets ze kan lezen. */
@@ -223,7 +244,7 @@ test('de winkel en het uitgeversbureau openen zonder fouten', { skip: !pw && 'Pl
 
     // een vinkje weglaten en installeren: dan krijgt de app er een
     await page.uncheck('#asGrid input[data-m][data-m="profiel.basis"]');
-    await page.click('#asGrid .asZet');
+    await klikRaakbaar(page, '#asGrid .asZet');
     await page.waitForSelector('#asGrid a:has-text("Openen")', { timeout: 15000 });
     const mijn = await api(base, '/api/appstore/mijn', {}, lid);
     assert.deepEqual(mijn.body.apps[0].verleend.map(m => m.id), ['opslag.eigen'],
@@ -234,7 +255,7 @@ test('de winkel en het uitgeversbureau openen zonder fouten', { skip: !pw && 'Pl
        over of een mens ze ziet. Deze laag heeft die les al een keer geleerd --
        de cel antwoordde 200 terwijl er in het venster niets stond -- en het
        dossier is juist het stuk waarvan de hele waarde is dat iemand het LEEST. */
-    await page.click('#asGrid .asDos');
+    await klikRaakbaar(page, '#asGrid .asDos');
     await page.waitForSelector('#asGrid .asDosVak:not([hidden])', { timeout: 15000 });
     await page.waitForFunction(() => !/wordt opgemaakt/.test(document.querySelector('.asDosVak').textContent),
       null, { timeout: 15000 });
@@ -442,7 +463,7 @@ test('de bon, de koop en de keuringskant in een browser', { skip: !pw && 'Playwr
     assert.deepEqual(fouten, [], 'de Mall boot zonder onopgevangen fouten');
     assert.match(await page.textContent('#asGrid .boutiek'), /9,99/, 'de prijs staat op de kaart, voordat je iets doet');
 
-    await page.click('#asGrid .asKoop');
+    await klikRaakbaar(page, '#asGrid .asKoop');
     await page.waitForSelector('#asGrid .bonBetaal, #asGrid .bonLand', { timeout: 15000 });
     if (await page.locator('#asGrid .bonLand').count()) {
       await page.selectOption('#asGrid .bonLand', 'NL');
@@ -453,7 +474,7 @@ test('de bon, de koop en de keuringskant in een browser', { skip: !pw && 'Playwr
     assert.match(bon, /btw 21%/, 'de btw van het land van het LID staat erbij');
 
     const voor = (await api(base, '/api/pay/overzicht', {}, lid)).body.saldo;
-    await page.click('#asGrid .bonBetaal');
+    await klikRaakbaar(page, '#asGrid .bonBetaal');
     await page.waitForSelector('#asGrid .asZet', { timeout: 20000 });
     assert.equal((await api(base, '/api/pay/overzicht', {}, lid)).body.saldo, voor - 999, 'er is precies een keer afgerekend');
     const gezond = await fetch(base + '/api/pay/gezond').then(async r => r.json());

@@ -21,8 +21,7 @@
 'use strict';
 
 module.exports = (sctx) => {
-  const { app, dag, werkPoort, eigenVeld, W } = sctx;
-  const PRODUCTIE = String(process.env.NODE_ENV || '') === 'production';
+  const { app, dag, werkPoort } = sctx;
 
   function beeld(w) {
     const uit = { werkruimte: { code: w.code, naam: w.naam, land: w.land, valuta: w.valuta } };
@@ -120,59 +119,7 @@ module.exports = (sctx) => {
       let: 'Elk cijfer draagt zijn noemer, en wat niet gemeten wordt staat bij nietGemeten in plaats van op nul. Er staat geen enkele voorspelling in dit beeld: wat hier staat is wat er nu is, met een tijdstempel.' }));
   });
 
-  /* Geconsolideerd: EEN handeling, en alleen met het beheer-token van elke
-     dochter erbij. Een moeder die ongemerkt in de boeken van haar dochters kan
-     kijken, maakt van "de werkruimte is de grens" een leuze. */
-  app.post('/api/bedrijf/geconsolideerd', (req, res) => {
-    const w = sctx.beheerVan(req, res); if (!w) return;
-    if (PRODUCTIE) {
-      const gevraagd = Array.isArray(req.body.dochters)
-        ? [...new Set(req.body.dochters.map(x => String(x || '').trim().toUpperCase()).filter(Boolean))] : [];
-      const mee = [];
-      let geweigerd = 0;
-      for (const code of gevraagd) {
-        const d = eigenVeld(W(), code);
-        const l = d && d.moeder === w.code
-          ? Object.values(d.leden || {}).find(x => x && x.rtgKey === req.session.key && x.status === 'actief') : null;
-        const rechten = l && sctx.rechtenVan ? sctx.rechtenVan(l) : [];
-        if (d && l && rechten.includes('cijfer')) mee.push(d); else geweigerd++;
-      }
-      const delen = [w].concat(mee).map(beeld);
-      const som = (pad) => delen.reduce((t, b) => {
-        const v = pad.split('.').reduce((o, k) => (o == null ? null : o[k]), b);
-        return t + (typeof v === 'number' ? v : 0);
-      }, 0);
-      return res.json({ ok: true, werkruimtes: delen.map(d => d.werkruimte),
-        nietMeegeteld: geweigerd,
-        totalen: { mensenActief: som('mensen.actief'), projectenLopend: som('projecten.lopend'),
-          gewonnenCenten: som('verkoop.gewonnenCenten'), ticketsOpen: som('service.open'),
-          contractenActief: som('recht.actief') },
-        delen,
-        let: geweigerd
-          ? geweigerd + ' gekozen dochter(s) tellen niet mee: alleen een actuele eigen rol met het recht "cijfer" opent die grens.'
-          : 'Alle expliciet gekozen dochters waarvoor u nu cijferrecht heeft, tellen mee.' });
-    }
-    const sleutels = req.body.dochterTokens && typeof req.body.dochterTokens === 'object' ? req.body.dochterTokens : {};
-    const dochters = Object.values(W()).filter(x => x.moeder === w.code);
-    const mee = [], zonder = [];
-    for (const d of dochters) {
-      if (eigenVeld(sleutels, d.code) === d.beheerToken) mee.push(d); else zonder.push(d.code);
-    }
-    const delen = [w].concat(mee).map(beeld);
-    const som = (pad) => delen.reduce((t, b) => {
-      const v = pad.split('.').reduce((o, k) => (o == null ? null : o[k]), b);
-      return t + (typeof v === 'number' ? v : 0);
-    }, 0);
-    res.json({ ok: true, werkruimtes: delen.map(d => d.werkruimte),
-      nietMeegeteld: zonder,
-      totalen: { mensenActief: som('mensen.actief'), projectenLopend: som('projecten.lopend'),
-        gewonnenCenten: som('verkoop.gewonnenCenten'), ticketsOpen: som('service.open'),
-        contractenActief: som('recht.actief') },
-      delen,
-      let: zonder.length
-        ? zonder.length + ' dochter(s) tellen NIET mee: zonder hun beheer-token kijkt een moeder hier niet in de boeken. Dat is geen fout maar de grens.'
-        : 'Alle dochters hebben hun sleutel meegegeven; dit totaal is compleet.' });
-  });
+  require('./beeld-consolidatie')(sctx, beeld);
 
   sctx.startBron('kpi', 'cijfer', (g) => {
     const b = beeld(g.w);

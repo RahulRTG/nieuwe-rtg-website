@@ -9,11 +9,11 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**59 bundels, 462 delen, 0 zonder onderwerp.**
+**59 bundels, 466 delen, 3 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 98 delen, 9843 regels in de delen
+`public/apps/app-main/` -- 99 delen, 9938 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -111,6 +111,7 @@ omlaag.
 | `app-main-56.js` | het zegel: aftellen en sluiten |
 | `app-main-56b.js` | RTG Scan: de scanknop van de leden-app |
 | `app-main-56c.js` | De Salon: de etalage van een partner en de tijdlijn |
+| `app-main-56d.js` | Een Salon-code is een sleutel, geen profielveld |
 | `app-main-57.js` | de zakelijke lade voor Business en Lifestyle |
 | `app-main-58.js` | de knoppen onder een Salon-bericht |
 | `app-main-59.js` | de afspraken en hun status |
@@ -118,7 +119,7 @@ omlaag.
 
 ## `apps/backoffice.js`
 
-`public/apps/backoffice/` -- 9 delen, 1121 regels in de delen
+`public/apps/backoffice/` -- 9 delen, 1127 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -190,11 +191,12 @@ omlaag.
 
 ## `apps/foundation/samen.js`
 
-`public/apps/foundation/samen/` -- 2 delen, 198 regels in de delen
+`public/apps/foundation/samen/` -- 3 delen, 224 regels in de delen, waarvan 1 zonder onderwerp
 
 | deel | onderwerp |
 |---|---|
-| `samen-01.js` | Samen voor de gezinsapps: een rustige meekijk-laag voor gezin en bevestigde vrienden |
+| `samen-01.js` | Rustig samenkijken voor gezin en bevestigde vrienden |
+| `samen-01b.js` | -- |
 | `samen-02.js` | Rahul voor het gezin: de kindveilige vraagbaak op elke RTF-pagina |
 
 ## `apps/foundation/sessie.js`
@@ -210,7 +212,7 @@ omlaag.
 
 ## `apps/leverancier.js`
 
-`public/apps/leverancier/` -- 112 delen, 9592 regels in de delen
+`public/apps/leverancier/` -- 113 delen, 9677 regels in de delen, waarvan 1 zonder onderwerp
 
 | deel | onderwerp |
 |---|---|
@@ -277,6 +279,7 @@ omlaag.
 | `leverancier-41.js` | de functies van een groothandel aan- en uitzetten |
 | `leverancier-42.js` | de inkoop-AI: wat is er nodig bij deze groothandel |
 | `leverancier-43.js` | een verkoopaanvraag aanvaarden of een tegenbod doen |
+| `leverancier-43z.js` | -- |
 | `leverancier-44.js` | de statusknoppen van een vrachtzending |
 | `leverancier-45.js` | een melding in het vrachtlogboek |
 | `leverancier-46.js` | het gebouwbeheer: de knoppen en hun acties |
@@ -747,7 +750,7 @@ omlaag.
 
 ## `shared/metgezel.js`
 
-`public/shared/metgezel/` -- 7 delen, 768 regels in de delen
+`public/shared/metgezel/` -- 8 delen, 798 regels in de delen, waarvan 1 zonder onderwerp
 
 | deel | onderwerp |
 |---|---|
@@ -758,6 +761,7 @@ omlaag.
 | `metgezel-01d.js` | RAHUL STAAT NERGENS OVERHEEN -- OOK NIET OVER EEN VASTE LAAG |
 | `metgezel-02.js` | Rahul heeft een melding: de lippen verkleuren en bewegen |
 | `metgezel-03.js` | Lege-toestand-nudge: elke plek met data-rahul-leeg="opdracht" opent Rahul met die opdracht al ingevuld |
+| `metgezel-03b.js` | -- |
 
 ## `shared/mond.js`
 

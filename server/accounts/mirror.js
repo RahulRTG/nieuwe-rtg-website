@@ -12,8 +12,6 @@ const PGMODE = !!DATABASE_URL;
 let pg = null, pgKlaar = false, idBlok = null, idRefillBezig = false, externCb = null;
 let startBezig = null, herstelTimer = null, herstelPoging = 0, gestopt = false;
 const pgLog = { warn: (m, v) => console.warn('[pgaccounts]', m, v || '') };
-const vuileUsers = new Set(), vuileStaff = new Set(), verwijderdeUsers = new Set();
-let mirrorTimer = null;
 
 function planAccountHerstel(err, bron) {
   if (!PGMODE || gestopt) return;
@@ -31,6 +29,15 @@ function planAccountHerstel(err, bron) {
 
 function rawUser(id) { return S.zin('SELECT * FROM users WHERE id = ?').get(id) || null; }
 function rawStaff(id) { return S.zin('SELECT * FROM supplier_staff WHERE id = ?').get(id) || null; }
+function transactioneleProductie() { return duurzaamheid.gesloten(); }
+const wachtrij = require('./mirror-wachtrij')({
+  postgres: () => pg,
+  rawUser,
+  rawStaff,
+  gereed: () => pgKlaar,
+  magPlannen: () => PGMODE && pgKlaar && !gestopt,
+  magMarkeren: () => PGMODE && !transactioneleProductie()
+});
 
 function nieuwId() {
   if (!PGMODE) return null;
@@ -52,32 +59,6 @@ async function refillBlok() {
   try { idBlok = await pg.reserveerBlok(); }
   catch (e) { pgLog.warn('id-blok reserveren mislukt', { fout: e.message }); }
   finally { idRefillBezig = false; }
-}
-
-function planMirror() { if (!PGMODE || !pgKlaar || mirrorTimer) return; mirrorTimer = setTimeout(flushMirror, 150); if (mirrorTimer.unref) mirrorTimer.unref(); }
-async function flushMirror() {
-  mirrorTimer = null;
-  if (!pg || !pgKlaar) return;
-  const us = [...vuileUsers]; vuileUsers.clear();
-  const ss = [...vuileStaff]; vuileStaff.clear();
-  const del = [...verwijderdeUsers]; verwijderdeUsers.clear();
-  for (const id of del) { try { await pg.deleteUser(id); } catch (e) { verwijderdeUsers.add(id); } }
-  for (const id of us) { const r = rawUser(id); if (r) { try { await pg.upsertUser(r); } catch (e) { vuileUsers.add(id); } } }
-  for (const id of ss) { const r = rawStaff(id); if (r) { try { await pg.upsertStaff(r); } catch (e) { vuileStaff.add(id); } } }
-  if (vuileUsers.size || vuileStaff.size || verwijderdeUsers.size) planMirror();
-}
-function transactioneleProductie() { return duurzaamheid.gesloten(); }
-function markUser(id) {
-  if (transactioneleProductie()) return; // de requestdeelnemer bezit deze commit
-  if (PGMODE && id != null) { vuileUsers.add(Number(id)); planMirror(); }
-}
-function markStaff(id) {
-  if (transactioneleProductie()) return;
-  if (PGMODE && id != null) { vuileStaff.add(Number(id)); planMirror(); }
-}
-function markDelete(id) {
-  if (transactioneleProductie()) return;
-  if (PGMODE && id != null) { verwijderdeUsers.add(Number(id)); vuileUsers.delete(Number(id)); planMirror(); }
 }
 
 function authoriteitKlaar() { return !PGMODE || !!(pgKlaar && pg); }
@@ -189,14 +170,16 @@ async function startPostgresEenmaal() {
     // Alleen buiten productie: eenmalige migratie van een lokale installatie.
     const pgUserIds = new Set(users.map(r => Number(r.id)));
     const pgStaffIds = new Set(staff.map(r => Number(r.id)));
-    for (const r of S.zin('SELECT id FROM users').all()) if (!pgUserIds.has(Number(r.id))) markUser(r.id);
-    for (const r of S.zin('SELECT id FROM supplier_staff').all()) if (!pgStaffIds.has(Number(r.id))) markStaff(r.id);
+    for (const r of S.zin('SELECT id FROM users').all())
+      if (!pgUserIds.has(Number(r.id))) wachtrij.markUser(r.id);
+    for (const r of S.zin('SELECT id FROM supplier_staff').all())
+      if (!pgStaffIds.has(Number(r.id))) wachtrij.markStaff(r.id);
   }
   idBlok = await nieuw.reserveerBlok();
   await nieuw.luister(pullEen);
   pgKlaar = true;
   herstelPoging = 0;
-  planMirror(); // buiten productie: duw eventuele lokaal-only rijen nu weg
+  wachtrij.plan(); // buiten productie: duw eventuele lokaal-only rijen nu weg
   console.log('[accounts] PostgreSQL-spiegel actief (gedeelde accounts over instances).');
   return true;
 }
@@ -211,13 +194,14 @@ async function flushBijAfsluiten() {
   gestopt = true;
   if (herstelTimer) clearTimeout(herstelTimer);
   herstelTimer = null;
-  if (PGMODE && pg && pgKlaar) { try { await flushMirror(); } catch (e) {} }
+  if (PGMODE && pg && pgKlaar) { try { await wachtrij.flush(); } catch (e) {} }
   if (pg) { try { await pg.sluit(); } catch (e) {} }
   pgKlaar = false;
 }
 
 module.exports = {
-  PGMODE, rawUser, rawStaff, nieuwId, markUser, markStaff, markDelete,
+  PGMODE, rawUser, rawStaff, nieuwId,
+  markUser: wachtrij.markUser, markStaff: wachtrij.markStaff, markDelete: wachtrij.markDelete,
   authoriteitKlaar, postgresKlaar: authoriteitKlaar, commitAccountWijzigingen,
   bewaarIntrekking, gedeeldeIntrekkingen, voltooiIntrekkingen,
   startPostgres, onExternalChange, flushBijAfsluiten

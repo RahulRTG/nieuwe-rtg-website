@@ -24,16 +24,15 @@ function fout(onderdeel) {
 
 function eisMutatie(onderdeel) {
   if (!gesloten() || interneDiepte) return true;
-  try {
-    require('./transactie').begin();
-    return true;
-  } catch (e) {
-    const ctx = verzoekcontext.huidige();
-    /* Ook als een oude route deze fout opvangt en een 2xx probeert te sturen,
-       houdt de centrale responsegrens het antwoord dicht. */
-    if (ctx) ctx.hardeFout = e;
-    throw e;
-  }
+  /* transactie.js bevat voorbereidende techniek, maar verzoekcontext en de
+     PostgreSQL-commitmotor dragen die participant nog niet end-to-end. De
+     aanwezigheid van dat halve pad mag deze poort dus niet openen. */
+  const e = fout(onderdeel);
+  const ctx = verzoekcontext.huidige();
+  /* Ook als een oude route deze fout opvangt en een 2xx probeert te sturen,
+     houdt de centrale responsegrens het antwoord dicht. */
+  if (ctx) ctx.hardeFout = e;
+  throw e;
 }
 
 function transactieDatabase() {

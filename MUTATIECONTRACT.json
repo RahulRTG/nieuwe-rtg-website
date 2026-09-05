@@ -1,30 +1,31 @@
 {
  "stempel": {
-  "op": "2026-09-04T06:16:16.634Z",
-  "commit": "d5e46054b",
-  "boomVuil": false,
-  "boomAnders": 3,
+  "op": "2026-09-05T14:39:02.138Z",
+  "commit": "353f7e240",
+  "boomVuil": true,
+  "boomAnders": 7,
   "instrument": "scripts/mutatiecontract.js",
-  "node": "v22.22.2"
+  "node": "v24.18.0"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 4838,
-  "geclassificeerd": 4838,
+  "totaal": 4863,
+  "geclassificeerd": 4847,
   "perStand": {
-   "BLOCKED_BY_TEST_FIXTURE": 3274,
-   "NOT_APPLICABLE": 1124,
-   "PROTECTED": 325,
-   "INTENTIONALLY_NON_IDEMPOTENT": 115
+   "BLOCKED_BY_TEST_FIXTURE": 3237,
+   "NOT_APPLICABLE": 1125,
+   "PROTECTED": 369,
+   "INTENTIONALLY_NON_IDEMPOTENT": 116,
+   "LEGACY_PENDING_CLASSIFICATION": 16
   },
-  "vastgesteldDoorMens": 1592,
-  "afgeleidDoorScript": 3246,
+  "vastgesteldDoorMens": 1638,
+  "afgeleidDoorScript": 3209,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 3985,
-   "PUBLIC": 119,
-   "OBJECT_SCOPED": 716,
-   "(niet af te leiden -- vraagt een verklaring)": 3,
+   "AUTHENTICATED": 4001,
+   "PUBLIC": 122,
+   "OBJECT_SCOPED": 718,
+   "(niet af te leiden -- vraagt een verklaring)": 7,
    "SERVICE_TO_SERVICE": 14,
    "SYSTEM_INTERNAL": 1
   },
@@ -32,9 +33,12 @@
    "kale ronde: beschermd": 129,
    "kale ronde: onbeschermd": 88,
    "kale ronde: geen uitspraak": 4512,
-   "niet gemeten": 109
+   "niet gemeten": 134
   },
-  "voorstellen": {},
+  "voorstellen": {
+   "PROTECTED": 2,
+   "BLOCKED_BY_TEST_FIXTURE": 2
+  },
   "metingVan": "2026-09-03T11:51:23.232Z"
  },
  "tegenspraken": [
@@ -3623,14 +3627,12 @@
   {
    "mutatieId": "bank.bevries",
    "route": "POST /api/bank/bevries",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": "velden",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast, en de bank moet live zijn",
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "auth"
     ]
@@ -3642,10 +3644,10 @@
     "grond": "gemerkt",
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "PROTECTED",
+   "voorstelGrond": "kale ronde (gemerkt): de server merkte de herhaling zelf (herhaald: true) terwijl er GEEN sleutel is gestuurd -- dat kan alleen van de idem-poort komen, op grond van de verklaring in idemsleutels.js"
   },
   {
    "mutatieId": "bank.bulk",
@@ -5783,16 +5785,14 @@
   {
    "mutatieId": "bedrijf.lid.koppel",
    "route": "POST /api/bedrijf/lid/koppel",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "AUTHENTICATED",
+    "waargenomen": null,
     "uitHandler": "object: werkruimte",
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
-     "auth"
+     "authEenmaal"
     ]
    },
    "bewijs": {
@@ -5802,10 +5802,10 @@
     "grond": null,
     "hindernis": "Er ging iets mis. Probeer het opnieuw."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
+   "voorstelGrond": "de proef kwam er niet bij: \"Er ging iets mis. Probeer het opnieuw.\""
   },
   {
    "mutatieId": "bedrijf.lid.ontkoppel",
@@ -5890,11 +5890,11 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "AUTHENTICATED",
+    "waargenomen": null,
     "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
-     "auth"
+     "authEenmaal"
     ]
    },
    "bewijs": {
@@ -16590,7 +16590,7 @@
    "mutatieId": "festival.groep",
    "route": "POST /api/festival/groep",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "sleutelVereist"
    },
    "duplicaatregel": null,
    "toegang": {
@@ -16608,8 +16608,8 @@
     "grond": null,
     "hindernis": "Deze editie bestaat niet."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -16617,7 +16617,7 @@
    "mutatieId": "festival.groep.code",
    "route": "POST /api/festival/groep/code",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "sleutelVereist"
    },
    "duplicaatregel": null,
    "toegang": {
@@ -16635,8 +16635,8 @@
     "grond": null,
     "hindernis": "Deze editie bestaat niet."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -16644,7 +16644,7 @@
    "mutatieId": "festival.groep.mee",
    "route": "POST /api/festival/groep/mee",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "idempotent"
    },
    "duplicaatregel": null,
    "toegang": {
@@ -16662,8 +16662,8 @@
     "grond": null,
     "hindernis": "Deze editie bestaat niet."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -36177,7 +36177,8 @@
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth",
-     "poort"
+     "poort",
+     "mw"
     ]
    },
    "bewijs": {
@@ -38413,10 +38414,31 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "meet.code.roteren",
+   "route": "POST /api/meet/code",
+   "semantiek": {
+    "klasse": "sleutelVereist"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen anonieme demo-gast",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "meet.kom",
    "route": "POST /api/meet/kom",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "idempotent"
    },
    "duplicaatregel": null,
    "toegang": {
@@ -38434,8 +38456,8 @@
     "grond": null,
     "hindernis": "Die kamercode bestaat niet (meer)."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -38443,9 +38465,9 @@
    "mutatieId": "meet.maak",
    "route": "POST /api/meet/maak",
    "semantiek": {
-    "klasse": "nietHerhaalbaar"
+    "klasse": "sleutelVereist"
    },
-   "duplicaatregel": "nietIdempotent",
+   "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
@@ -38461,7 +38483,7 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "stand": "PROTECTED",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
@@ -49899,7 +49921,8 @@
     "uitHandler": "geen gast",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
-     "auth"
+     "auth",
+     "mw"
     ]
    },
    "bewijs": {
@@ -49940,6 +49963,46 @@
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
+  },
+  {
+   "mutatieId": "member.vluchten.pass.intrek",
+   "route": "POST /api/member/vluchten/pass/intrek",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen gast",
+    "bedoeld": null,
+    "bewakers": [
+     "auth",
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "member.vluchten.pass.roteer",
+   "route": "POST /api/member/vluchten/pass/roteer",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen gast",
+    "bedoeld": null,
+    "bewakers": [
+     "auth",
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
   },
   {
    "mutatieId": "member.vooruit",
@@ -56786,14 +56849,12 @@
   {
    "mutatieId": "office.hardware.verwijder",
    "route": "POST /api/office/hardware/verwijder",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "officeAuth"
     ]
@@ -56805,10 +56866,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
    "voorstel": null,
-   "voorstelGrond": null
+   "voorstelGrond": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien"
   },
   {
    "mutatieId": "office.hardware.winkel",
@@ -62405,9 +62466,9 @@
    "mutatieId": "office.reisbureau.klaarzetten",
    "route": "POST /api/office/reisbureau/klaarzetten",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "sleutelVereist"
    },
-   "duplicaatregel": "zelfdeVerzoek",
+   "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -62423,8 +62484,8 @@
     "grond": null,
     "hindernis": "Zet eerst minstens één reisonderdeel klaar (met een naam en een datum)."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -62452,6 +62513,27 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "office.reisbureau.uitnodiging.roteren",
+   "route": "POST /api/office/reisbureau/uitnodiging-roteer",
+   "semantiek": {
+    "klasse": "sleutelVereist"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -74441,6 +74523,44 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "projectie.kijk",
+   "route": "POST /api/projectie/kijk",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "PUBLIC",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "projectie.koppel",
+   "route": "POST /api/projectie/koppel",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "PUBLIC",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
    "mutatieId": "punten",
    "route": "POST /api/punten",
    "semantiek": {
@@ -75146,7 +75266,7 @@
    "mutatieId": "reis.uitnodiging.eisop",
    "route": "POST /api/reis/uitnodiging/eisop",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "idempotent"
    },
    "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
@@ -75164,8 +75284,8 @@
     "grond": null,
     "hindernis": "Deze uitnodiging kennen we niet. Controleer de link."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -75200,9 +75320,9 @@
    "mutatieId": "reis.uitnodiging.nodig-uit",
    "route": "POST /api/reis/uitnodiging/nodig-uit",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "sleutelVereist"
    },
-   "duplicaatregel": "zelfdeVerzoek",
+   "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -75218,8 +75338,8 @@
     "grond": null,
     "hindernis": "Zet eerst minstens één reisonderdeel klaar (met een naam en een datum)."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -75227,7 +75347,7 @@
    "mutatieId": "reis.uitnodiging.open",
    "route": "POST /api/reis/uitnodiging/open",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "idempotent"
    },
    "duplicaatregel": "leest",
    "toegang": {
@@ -75243,8 +75363,29 @@
     "grond": null,
     "hindernis": "Deze uitnodiging kennen we niet. Controleer de link."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "reis.uitnodiging.roteren",
+   "route": "POST /api/reis/uitnodiging/roteer",
+   "semantiek": {
+    "klasse": "sleutelVereist"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -76088,14 +76229,12 @@
   {
    "mutatieId": "residentie.suite.zet",
    "route": "POST /api/residentie/suite/zet",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast",
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "auth"
     ]
@@ -76107,10 +76246,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
    "voorstel": null,
-   "voorstelGrond": null
+   "voorstelGrond": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien"
   },
   {
    "mutatieId": "residentie.vraag",
@@ -79586,7 +79725,7 @@
    "mutatieId": "rtf.samen.chat",
    "route": "POST /api/rtf/samen/chat",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "sleutelVereist"
    },
    "duplicaatregel": null,
    "toegang": {
@@ -79602,8 +79741,27 @@
     "grond": null,
     "hindernis": "Deze samen-code bestaat niet (meer)."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "rtf.samen.code.roteren",
+   "route": "POST /api/rtf/samen/code",
+   "semantiek": {
+    "klasse": "sleutelVereist"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": "object: code",
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": []
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -79611,7 +79769,7 @@
    "mutatieId": "rtf.samen.maak",
    "route": "POST /api/rtf/samen/maak",
    "semantiek": {
-    "klasse": "idempotent"
+    "klasse": "sleutelVereist"
    },
    "duplicaatregel": null,
    "toegang": {
@@ -79636,7 +79794,7 @@
    "mutatieId": "rtf.samen.mee",
    "route": "POST /api/rtf/samen/mee",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "idempotent"
    },
    "duplicaatregel": null,
    "toegang": {
@@ -79652,8 +79810,27 @@
     "grond": null,
     "hindernis": "Deze samen-code bestaat niet (meer)."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "rtf.samen.sluit",
+   "route": "POST /api/rtf/samen/sluit",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": "object: code",
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": []
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -79661,7 +79838,7 @@
    "mutatieId": "rtf.samen.staat",
    "route": "POST /api/rtf/samen/staat",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "idempotent"
    },
    "duplicaatregel": null,
    "toegang": {
@@ -79677,8 +79854,8 @@
     "grond": null,
     "hindernis": "Deze samen-code bestaat niet (meer)."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -79708,10 +79885,10 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "rtf.samen.zet",
+   "mutatieId": "rtf.samen.plek.zet",
    "route": "POST /api/rtf/samen/zet",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "sleutelVereist"
    },
    "duplicaatregel": null,
    "toegang": {
@@ -79727,8 +79904,8 @@
     "grond": null,
     "hindernis": "Deze samen-code bestaat niet (meer)."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -83927,6 +84104,44 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "rtfos.casus.code.intrekken",
+   "route": "POST /api/rtfos/casus/code/intrekken",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "rtfos.casus.code.roteren",
+   "route": "POST /api/rtfos/casus/code/roteren",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
    "mutatieId": "rtfos.casus.contact",
    "route": "POST /api/rtfos/casus/contact",
    "semantiek": {
@@ -84141,6 +84356,44 @@
    "herkomst": "afgeleid",
    "voorstel": null,
    "voorstelGrond": null
+  },
+  {
+   "mutatieId": "rtfos.donateur.code.intrekken",
+   "route": "POST /api/rtfos/donateur/code/intrekken",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "rtfos.donateur.code.roteren",
+   "route": "POST /api/rtfos/donateur/code/roteren",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
   },
   {
    "mutatieId": "rtfos.donateur.periodiek",
@@ -87517,6 +87770,44 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "rtfos.vrijwilliger.code.intrekken",
+   "route": "POST /api/rtfos/vrijwilliger/code/intrekken",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "rtfos.vrijwilliger.code.roteren",
+   "route": "POST /api/rtfos/vrijwilliger/code/roteren",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
    "mutatieId": "rtfos.vrijwilliger.evaluatie",
    "route": "POST /api/rtfos/vrijwilliger/evaluatie",
    "semantiek": {
@@ -87952,12 +88243,31 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "rtgid.bevestig",
+   "mutatieId": "rtgid.annuleren",
+   "route": "POST /api/rtgid/annuleer",
+   "semantiek": {
+    "klasse": "sleutelVereist"
+   },
+   "duplicaatregel": "nietIdempotent",
+   "toegang": {
+    "waargenomen": "PUBLIC",
+    "uitHandler": null,
+    "bedoeld": "PUBLIC",
+    "bewakers": []
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "rtgid.bevestigen",
    "route": "POST /api/rtgid/bevestig",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -87974,8 +88284,8 @@
     "grond": null,
     "hindernis": "RTG iD hoort bij een eigen RTG-account. Een gratis account is genoeg; een demo-gast heeft er geen."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -88061,9 +88371,9 @@
    "mutatieId": "rtgid.koppel",
    "route": "POST /api/rtgid/koppel",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -88080,8 +88390,8 @@
     "grond": null,
     "hindernis": "RTG iD hoort bij een eigen RTG-account. Een gratis account is genoeg; een demo-gast heeft er geen."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -88142,6 +88452,25 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "rtgid.roteren",
+   "route": "POST /api/rtgid/roteer",
+   "semantiek": {
+    "klasse": "sleutelVereist"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "PUBLIC",
+    "uitHandler": null,
+    "bedoeld": "PUBLIC",
+    "bewakers": []
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "rtgid.stapop.opties",
    "route": "POST /api/rtgid/stapop/opties",
    "semantiek": {
@@ -88173,7 +88502,7 @@
    "mutatieId": "rtgid.start",
    "route": "POST /api/rtgid/start",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "sleutelVereist"
    },
    "duplicaatregel": null,
    "toegang": {
@@ -88189,8 +88518,8 @@
     "grond": null,
     "hindernis": "Welke dienst vraagt de inlog?"
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -88198,9 +88527,9 @@
    "mutatieId": "rtgid.status",
    "route": "POST /api/rtgid/status",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "nietHerhaalbaar"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "PUBLIC",
     "uitHandler": null,
@@ -88214,18 +88543,18 @@
     "grond": null,
     "hindernis": "Deze inlog bestaat niet."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
   {
-   "mutatieId": "rtgid.weiger",
+   "mutatieId": "rtgid.weigeren",
    "route": "POST /api/rtgid/weiger",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -88242,8 +88571,8 @@
     "grond": null,
     "hindernis": "RTG iD hoort bij een eigen RTG-account. Een gratis account is genoeg; een demo-gast heeft er geen."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -88251,9 +88580,9 @@
    "mutatieId": "rtgid.wie",
    "route": "POST /api/rtgid/wie",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "nietHerhaalbaar"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "PUBLIC",
     "uitHandler": null,
@@ -88267,8 +88596,8 @@
     "grond": null,
     "hindernis": "Deze iD-sessie is niet (meer) geldig."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -88816,12 +89145,12 @@
    "mutatieId": "salon.deal.claim",
    "route": "POST /api/salon/deal/claim",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "sleutelVereist"
    },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "geen gast",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -88834,8 +89163,50 @@
     "grond": null,
     "hindernis": "Aanbieding niet gevonden."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "salon.deal.claim.intrekken",
+   "route": "POST /api/salon/deal/claim/intrek",
+   "semantiek": {
+    "klasse": "sleutelVereist"
+   },
+   "duplicaatregel": "nietIdempotent",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen gast",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "salon.deal.claim.roteren",
+   "route": "POST /api/salon/deal/claim/roteer",
+   "semantiek": {
+    "klasse": "sleutelVereist"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen gast",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -89334,7 +89705,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": "geen gast",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -89353,15 +89724,36 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "samen.maak",
-   "route": "POST /api/samen/maak",
+   "mutatieId": "samen.code.roteren",
+   "route": "POST /api/samen/code",
    "semantiek": {
-    "klasse": "nietHerhaalbaar"
+    "klasse": "sleutelVereist"
    },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": "geen gast",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "samen.maak",
+   "route": "POST /api/samen/maak",
+   "semantiek": {
+    "klasse": "sleutelVereist"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen gast",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -89374,7 +89766,7 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "stand": "PROTECTED",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
@@ -89383,12 +89775,12 @@
    "mutatieId": "samen.mee",
    "route": "POST /api/samen/mee",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "idempotent"
    },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": "geen gast",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -89401,8 +89793,8 @@
     "grond": null,
     "hindernis": "Deze samen-code bestaat niet (meer)."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -89415,7 +89807,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": "geen gast",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -89434,6 +89826,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "samen.sluit",
+   "route": "POST /api/samen/sluit",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen gast",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "samen.staat",
    "route": "POST /api/samen/staat",
    "semantiek": {
@@ -89442,7 +89855,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": "geen gast",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -89469,7 +89882,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "geen gast",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -89496,7 +89909,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": "geen gast",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -107175,7 +107588,9 @@
     "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
-     "supplierAuth"
+     "supplierAuth",
+     "luchtzijdePoort",
+     "mw"
     ]
    },
    "bewijs": {
@@ -109642,6 +110057,27 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "supplier.notifications",
+   "route": "POST /api/supplier/notifications",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -113509,14 +113945,12 @@
   {
    "mutatieId": "supplier.roster",
    "route": "POST /api/supplier/roster",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": null,
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": null,
     "bewakers": []
    },
    "bewijs": {
@@ -113526,10 +113960,10 @@
     "grond": null,
     "hindernis": "Te veel opvragingen. Probeer het over een kwartier opnieuw."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
+   "voorstelGrond": "de proef kwam er niet bij: \"Te veel opvragingen. Probeer het over een kwartier opnieuw.\""
   },
   {
    "mutatieId": "supplier.rtmail.afwezig",
@@ -114801,12 +115235,12 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "supplier.salon.deal.redeem",
+   "mutatieId": "supplier.salon.deal.verzilveren",
    "route": "POST /api/supplier/salon/deal/redeem",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "sleutelVereist"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -114822,8 +115256,8 @@
     "grond": null,
     "hindernis": "Deze code kennen we hier niet."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -116069,7 +116503,7 @@
    "semantiek": {
     "klasse": "sleutelVereist"
    },
-   "duplicaatregel": "zelfdeVerzoek",
+   "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -116118,6 +116552,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "supplier.staff.invite.roteren",
+   "route": "POST /api/supplier/staff/invite/roteer",
+   "semantiek": {
+    "klasse": "sleutelVereist"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "supplier.staff.invites",
    "route": "POST /api/supplier/staff/invites",
    "semantiek": {
@@ -116148,7 +116603,7 @@
    "mutatieId": "supplier.staff.join",
    "route": "POST /api/supplier/staff/join",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "idempotent"
    },
    "duplicaatregel": null,
    "toegang": {
@@ -116164,8 +116619,8 @@
     "grond": null,
     "hindernis": "Vul de bedrijfsnaam en de kassacode in."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -118441,9 +118896,9 @@
    "mutatieId": "supplier.vracht",
    "route": "POST /api/supplier/vracht",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "vracht",
@@ -118459,8 +118914,8 @@
     "grond": null,
     "hindernis": "Dit is geen vracht- of expeditiepartner."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -118468,9 +118923,9 @@
    "mutatieId": "supplier.vracht.afleveren",
    "route": "POST /api/supplier/vracht/afleveren",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "sleutelVereist"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "vracht",
@@ -118486,8 +118941,8 @@
     "grond": null,
     "hindernis": "Dit is geen vracht- of expeditiepartner."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -118495,9 +118950,9 @@
    "mutatieId": "supplier.vracht.douane",
    "route": "POST /api/supplier/vracht/douane",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "sleutelVereist"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "vracht",
@@ -118513,8 +118968,8 @@
     "grond": null,
     "hindernis": "Dit is geen vracht- of expeditiepartner."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -118522,9 +118977,9 @@
    "mutatieId": "supplier.vracht.etappe",
    "route": "POST /api/supplier/vracht/etappe",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "sleutelVereist"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "vracht",
@@ -118540,8 +118995,8 @@
     "grond": null,
     "hindernis": "Dit is geen vracht- of expeditiepartner."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -118549,7 +119004,7 @@
    "mutatieId": "supplier.vracht.maak",
    "route": "POST /api/supplier/vracht/maak",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "sleutelVereist"
    },
    "duplicaatregel": null,
    "toegang": {
@@ -118567,8 +119022,8 @@
     "grond": null,
     "hindernis": "Dit is geen vracht- of expeditiepartner."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -118576,9 +119031,9 @@
    "mutatieId": "supplier.vracht.melding",
    "route": "POST /api/supplier/vracht/melding",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "sleutelVereist"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "vracht",
@@ -118594,8 +119049,50 @@
     "grond": null,
     "hindernis": "Dit is geen vracht- of expeditiepartner."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "supplier.vracht.volgcode.intrekken",
+   "route": "POST /api/supplier/vracht/volgcode/intrek",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "zelfdeVerzoek",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "vracht",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "supplier.vracht.volgcode.roteren",
+   "route": "POST /api/supplier/vracht/volgcode/roteer",
+   "semantiek": {
+    "klasse": "sleutelVereist"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "vracht",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -121254,11 +121751,11 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "AUTHENTICATED",
+    "waargenomen": null,
     "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
-     "auth"
+     "authEenmaal"
     ]
    },
    "bewijs": {
@@ -125203,9 +125700,9 @@
    "mutatieId": "vracht.volg",
    "route": "POST /api/vracht/volg",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "nietHerhaalbaar"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "PUBLIC",
     "uitHandler": null,
@@ -125219,8 +125716,8 @@
     "grond": null,
     "hindernis": "Geen zending gevonden op deze volgcode."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -127272,14 +127769,12 @@
   {
    "mutatieId": "werkplek.bureau.redactie.artikel.verwijder",
    "route": "POST /api/werkplek/bureau/redactie/artikel/verwijder",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": "OBJECT_SCOPED",
+    "bedoeld": null,
     "bewakers": [
      "huisAuth"
     ]
@@ -127291,10 +127786,10 @@
     "grond": "opslag",
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "PROTECTED",
+   "voorstelGrond": "kale ronde (opslag): het verschil zat in wacht. NA TE KIJKEN: is dat werk van deze route, of een rem/meter die alleen de eerste keer aansloeg? In dat laatste geval is de juiste stand NOT_APPLICABLE en niet PROTECTED."
   },
   {
    "mutatieId": "werkplek.bureau.redactie.artikel.zet",
@@ -128864,7 +129359,7 @@
    "mutatieId": "werving.kijk",
    "route": "POST /api/werving/kijk",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "idempotent"
    },
    "duplicaatregel": null,
    "toegang": {
@@ -128880,8 +129375,8 @@
     "grond": null,
     "hindernis": "Deze uitnodiging bestaat niet, is al gebruikt of is verlopen. Vraag uw werkgever om een nieuwe."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -128889,7 +129384,7 @@
    "mutatieId": "werving.verbind",
    "route": "POST /api/werving/verbind",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "idempotent"
    },
    "duplicaatregel": null,
    "toegang": {
@@ -128907,8 +129402,8 @@
     "grond": null,
     "hindernis": "Meld u eerst aan met uw eigen RTG-account."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },

@@ -11,6 +11,8 @@
    terugval: ontbreekt de verse-basishook in productie, dan gaat de deur dicht. */
 'use strict';
 
+const maakLegacyTokenMigratie = require('./legacy-token-migratie');
+
 const CODE_OPSLAG = 'WORKOS_AUTHORITY_UNAVAILABLE';
 const CODE_CONTEXT = 'WORKOS_WORKSPACE_REQUIRED';
 const CODE_TOEGANG = 'WORKOS_WORKSPACE_FORBIDDEN';
@@ -36,9 +38,10 @@ function tenantOpen(t) {
   return !stand || stand === 'actief' || stand === 'opzegging';
 }
 
-module.exports = function maakProductieIdentiteit({ app, auth, db, productie } = {}) {
+module.exports = function maakProductieIdentiteit({ app, auth, db, bewerkCollectie, productie } = {}) {
   const isProductie = productie == null
     ? String(process.env.NODE_ENV || '') === 'production' : productie === true;
+  const tokenMigratie = maakLegacyTokenMigratie({ bewerkCollectie, productie: isProductie });
 
   function fout(res, status, code, error) {
     res.set('Cache-Control', 'no-store');
@@ -124,7 +127,12 @@ module.exports = function maakProductieIdentiteit({ app, auth, db, productie } =
     });
   }
 
-  return { hang, laadContext, productie: isProductie };
+  /* Bewust wel onderdeel van dezelfde cutover, maar nog niet bij opstart
+     aangeroepen. Zonder de autoritatieve collectietransactie faalt deze methode
+     hard; de centrale productiegrendel blijft dicht totdat zowel die schrijfweg
+     als de verse leesbaseline echt door PostgreSQL worden geleverd. */
+  return { hang, laadContext, migreerLegacyTokens: tokenMigratie.migreerAlles,
+    productie: isProductie };
 };
 
 module.exports.CODE_OPSLAG = CODE_OPSLAG;

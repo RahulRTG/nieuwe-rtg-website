@@ -7,6 +7,7 @@ const path = require('node:path');
 
 const ROOT = path.join(__dirname, '..');
 const maakPoort = require('../server/middleware/workos-legacy-token-productiepoort');
+const maakProductieIdentiteit = require('../server/bedrijf/productie-identiteit');
 
 function voer({ productie = true, method = 'POST', pad }) {
   const req = { method, path: pad, url: pad };
@@ -64,6 +65,28 @@ test('ontwikkeling, veilige buren en niet-schrijvende verzoeken blijven ongemoei
   assert.equal(voer({ pad: '/api/techniek/tenant' }).next, 1);
   assert.equal(voer({ pad: '/api/tenanten/status' }).next, 1);
   assert.equal(voer({ method: 'GET', pad: '/api/bedrijf/start' }).next, 1);
+});
+
+test('de kandidaat achter de grendel faalt gesloten zonder verse authority-hook', async () => {
+  for (const db of [{ data: {} }, {
+    data: {},
+    async verversVerzoekCollectie() { throw new Error('PostgreSQL niet bereikbaar'); }
+  }]) {
+    const uit = { status: 200, koppen: {}, body: null, next: 0 };
+    const res = {
+      set(k, v) { uit.koppen[String(k).toLowerCase()] = v; return this; },
+      status(code) { uit.status = code; return this; },
+      json(body) { uit.body = body; return this; }
+    };
+    await maakProductieIdentiteit({ productie: true, db }).laadContext({
+      body: { werkruimte: 'W1' },
+      session: { key: 'user-1', account: { actief: 1 } }
+    }, res, () => { uit.next++; });
+    assert.equal(uit.status, 503);
+    assert.equal(uit.body.code, maakProductieIdentiteit.CODE_OPSLAG);
+    assert.equal(uit.koppen['cache-control'], 'no-store');
+    assert.equal(uit.next, 0);
+  }
 });
 
 test('de poort staat vóór idemopslag en blijft een expliciete releaseblokkade', () => {

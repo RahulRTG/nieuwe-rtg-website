@@ -1,25 +1,25 @@
 {
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
-  "vastgelegd": "2026-09-04",
+  "vastgelegd": "2026-09-05",
   "gemeten": {
-    "bestanden": 2101,
-    "domeinenTotaal": 569,
-    "koopbareVormen": 523,
+    "bestanden": 2133,
+    "domeinenTotaal": 589,
+    "koopbareVormen": 527,
     "koopbareDomeinen": 109,
     "envelopDrempel": 7,
-    "envelop": 45,
-    "veldenDomeineigen": 717,
-    "veldenNietEnvelop": 932,
-    "gelijkendeVormparen": 9,
+    "envelop": 46,
+    "veldenDomeineigen": 718,
+    "veldenNietEnvelop": 933,
+    "gelijkendeVormparen": 8,
     "werkwoordenVolledig": 1,
     "werkwoordenOveral": 0,
     "werkwoordCombinaties": 43,
     "wagenVormen": 32,
     "wagenVormenUniek": 29,
     "wagenDomeinen": 22,
-    "optellingen": 109,
-    "optelDomeinen": 53,
-    "optelCenten": 60,
+    "optellingen": 110,
+    "optelDomeinen": 54,
+    "optelCenten": 61,
     "optelEuro": 5,
     "optelGemengd": 0,
     "optelOnbekend": 44
@@ -35,6 +35,7 @@
     "codenaam",
     "datum",
     "doel",
+    "domein",
     "door",
     "id",
     "idem",
@@ -72,13 +73,13 @@
     "zaak"
   ],
   "perWerkwoord": {
-    "toon": 86,
+    "toon": 85,
     "prijs": 36,
     "beschikbaarheid": 50,
     "reserveer": 27,
     "bevestig": 50,
-    "lever": 18,
-    "annuleer": 26,
+    "lever": 19,
+    "annuleer": 27,
     "retour": 7
   },
   "overalAanwezig": [],
@@ -145,11 +146,34 @@
       "bewijs": {
         "toon": "overzicht",
         "prijs": "koppelKosten",
-        "beschikbaarheid": "kasVrijgeef",
+        "beschikbaarheid": "eisVrijgegeven",
         "reserveer": "kasVastleg",
         "bevestig": "boek",
         "annuleer": "verzoekIntrek",
         "retour": "terugGave"
+      },
+      "telt": 7
+    },
+    {
+      "domein": "kern/rtfos",
+      "heeft": {
+        "toon": true,
+        "prijs": true,
+        "beschikbaarheid": true,
+        "reserveer": true,
+        "bevestig": true,
+        "lever": true,
+        "annuleer": true,
+        "retour": false
+      },
+      "bewijs": {
+        "toon": "aanbodBeeld",
+        "prijs": "sleutelSom",
+        "beschikbaarheid": "agendaBij",
+        "reserveer": "gereserveerd",
+        "bevestig": "bestellingen",
+        "lever": "uitgifte",
+        "annuleer": "codeIntrekken"
       },
       "telt": 7
     },
@@ -243,6 +267,28 @@
       "telt": 6
     },
     {
+      "domein": "kern/festival",
+      "heeft": {
+        "toon": true,
+        "prijs": false,
+        "beschikbaarheid": true,
+        "reserveer": true,
+        "bevestig": true,
+        "lever": true,
+        "annuleer": true,
+        "retour": false
+      },
+      "bewijs": {
+        "toon": "beeld",
+        "beschikbaarheid": "bezetting",
+        "reserveer": "reserveer",
+        "bevestig": "boekingStand",
+        "lever": "uitgifte",
+        "annuleer": "intrekken"
+      },
+      "telt": 6
+    },
+    {
       "domein": "kern/horeca",
       "heeft": {
         "toon": true,
@@ -305,28 +351,6 @@
         "reserveer": "legApart",
         "bevestig": "annuleerVerkoop",
         "annuleer": "annuleerVerkoop"
-      },
-      "telt": 6
-    },
-    {
-      "domein": "kern/rtfos",
-      "heeft": {
-        "toon": true,
-        "prijs": true,
-        "beschikbaarheid": true,
-        "reserveer": true,
-        "bevestig": true,
-        "lever": true,
-        "annuleer": false,
-        "retour": false
-      },
-      "bewijs": {
-        "toon": "aanbodBeeld",
-        "prijs": "sleutelSom",
-        "beschikbaarheid": "agendaBij",
-        "reserveer": "gereserveerd",
-        "bevestig": "bestellingen",
-        "lever": "uitgifte"
       },
       "telt": 6
     },
@@ -414,27 +438,6 @@
         "reserveer": "annuleerReservering",
         "bevestig": "plaatsReview",
         "annuleer": "annuleerItem"
-      },
-      "telt": 5
-    },
-    {
-      "domein": "kern/festival",
-      "heeft": {
-        "toon": true,
-        "prijs": false,
-        "beschikbaarheid": true,
-        "reserveer": true,
-        "bevestig": true,
-        "lever": false,
-        "annuleer": true,
-        "retour": false
-      },
-      "bewijs": {
-        "toon": "beeld",
-        "beschikbaarheid": "bezetting",
-        "reserveer": "reserveer",
-        "bevestig": "boekingStand",
-        "annuleer": "pasIntrekken"
       },
       "telt": 5
     },
@@ -1530,23 +1533,6 @@
       "telt": 1
     },
     {
-      "domein": "kern/betaalregie",
-      "heeft": {
-        "toon": true,
-        "prijs": false,
-        "beschikbaarheid": false,
-        "reserveer": false,
-        "bevestig": false,
-        "lever": false,
-        "annuleer": false,
-        "retour": false
-      },
-      "bewijs": {
-        "toon": "overzicht"
-      },
-      "telt": 1
-    },
-    {
       "domein": "kern/doorgeefjournaal",
       "heeft": {
         "toon": true,
@@ -1919,6 +1905,21 @@
       "telt": 0
     },
     {
+      "domein": "kern/betaalregie-waarheid",
+      "heeft": {
+        "toon": false,
+        "prijs": false,
+        "beschikbaarheid": false,
+        "reserveer": false,
+        "bevestig": false,
+        "lever": false,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {},
+      "telt": 0
+    },
+    {
       "domein": "kern/boekhoudkennis",
       "heeft": {
         "toon": false,
@@ -2116,21 +2117,6 @@
   ],
   "paren": [
     {
-      "gelijkenis": 0.86,
-      "a": "server/kern/command/register.js",
-      "b": "server/kern/zaakcommand/register.js",
-      "domeinA": "kern/command",
-      "domeinB": "kern/zaakcommand",
-      "gedeeld": [
-        "collectie",
-        "domein",
-        "meervoud",
-        "sleutel",
-        "sub",
-        "zoek"
-      ]
-    },
-    {
       "gelijkenis": 0.83,
       "a": "server/kern/bank/overboeken.js",
       "b": "server/kern/pay/partner.js",
@@ -2156,6 +2142,20 @@
         "idemSleutel",
         "ledgerRef",
         "rail"
+      ]
+    },
+    {
+      "gelijkenis": 0.83,
+      "a": "server/kern/command/register.js",
+      "b": "server/kern/zaakcommand/register.js",
+      "domeinA": "kern/command",
+      "domeinB": "kern/zaakcommand",
+      "gedeeld": [
+        "collectie",
+        "meervoud",
+        "sleutel",
+        "sub",
+        "zoek"
       ]
     },
     {
@@ -2203,20 +2203,6 @@
         "betaalwijze",
         "codename",
         "providerId"
-      ]
-    },
-    {
-      "gelijkenis": 0.63,
-      "a": "server/kern/command/register.js",
-      "b": "server/kern/werkcommand/soorten.js",
-      "domeinA": "kern/command",
-      "domeinB": "kern/werkcommand",
-      "gedeeld": [
-        "domein",
-        "meervoud",
-        "sleutel",
-        "sub",
-        "zoek"
       ]
     },
     {

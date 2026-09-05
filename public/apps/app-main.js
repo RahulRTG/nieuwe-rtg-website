@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '04be3a1c';
+var RTG_BOUW = '0b8652ed';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -9356,7 +9356,6 @@ var RTG_BOUW = '04be3a1c';
     ov.addEventListener('click', e => { if (e.target === ov) sluit(); });
     kaart.querySelector('#salonCodeKopieer').focus();
   }
-
   function salonClaimBediening(deal){
     const c = deal && deal.mijnClaim;
     if (!c) return '<button class="js-claim" style="margin-top:.5rem;background:var(--knop);color:var(--knop-txt);border:none;padding:.45rem .95rem;font-size:.72rem;font-weight:600;font-family:inherit;cursor:pointer;">' +
@@ -9374,7 +9373,6 @@ var RTG_BOUW = '04be3a1c';
       '<button class="js-claim-rotate" style="background:var(--knop);color:var(--knop-txt);border:none;padding:.42rem .75rem;font:600 .68rem inherit;cursor:pointer;">' + T('sal.nieuwecode','Nieuwe code') + '</button>' +
       (c.status === 'actief' ? '<button class="js-claim-revoke" style="background:none;color:var(--soft);border:1px solid var(--line);padding:.42rem .75rem;font:600 .68rem inherit;cursor:pointer;">' + T('sal.trekin','Trek in') + '</button>' : '') + '</div>';
   }
-
 /* de zakelijke lade voor Business en Lifestyle */
     if (user && (user.tier === 'business' || user.tier === 'lifestyle')){
       zakL.style.display = 'block';

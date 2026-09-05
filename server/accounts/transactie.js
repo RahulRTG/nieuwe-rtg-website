@@ -1,4 +1,7 @@
-/* De request-lokale werkkopie van users en supplier_staff.
+/* Voorbereiding voor een request-lokale werkkopie van users en supplier_staff.
+
+   Deze participant is nog niet aangesloten op de centrale requestcommit.
+   duurzaamheid.js activeert hem daarom niet en houdt productiewrites dicht.
 
    SQLite is hier nadrukkelijk GEEN waarheid. Een productieverzoek schrijft op
    een aparte verbinding binnen een nog niet gecommitte SQLite-transactie. De

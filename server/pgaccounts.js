@@ -30,8 +30,6 @@ const USER_COLS = ['id', 'email_hash', 'username', 'password_hash', 'tier', 'cod
 // koppeling kwijt zodra een volgende app-instance het verzoek afhandelde.
 const STAFF_COLS = ['id', 'supplier_code', 'name', 'pin_hash', 'role', 'active', 'created_at', 'func',
   'member_id', 'member_tier'];
-const GETAL_USER = new Set(['id', 'reset_expires', 'email_verified', 'actief', 'sessies_vanaf']);
-const GETAL_STAFF = new Set(['id', 'active', 'member_id']);
 
 /* KOLOMMEN DIE GEEN NULL VERDRAGEN, met de waarde die de tabel zelf zou hebben
    ingevuld. Een rij die zo'n kolom niet noemt, komt hier binnen als undefined,
@@ -150,71 +148,9 @@ function maakPgAccounts({ url, log, onFout }) {
     await pool.query('SELECT pg_notify($1, $2)', [KANAAL, 'user:' + id + ':' + BRON]);
   }
 
-  /* ACCOUNTWIJZIGINGEN IN DE GEWONE REQUESTTRANSACTIE.
-
-     De client wordt door pg/verzoektransactie.js aangeleverd en heeft daar al
-     BEGIN gedaan. Daardoor zijn een accountmutatie en eventuele gewone
-     kv-collecties uit hetzelfde HTTP-verzoek één commit. De SQLite-rijen in
-     `basis` zijn uitsluitend de request-snapshot. Een exacte vergelijking na
-     FOR UPDATE is onze CAS: een resetcode, sessiegrens of staffbinding die een
-     andere instance intussen veranderde kan nooit door een oude request worden
-     teruggezet. */
-  const normaliseer = (rij, cols, getallen) => {
-    if (!rij) return null;
-    return cols.map(c => {
-      let v = waarde(rij, c);
-      if (v == null) return null;
-      if (getallen.has(c)) return Number(v);
-      return String(v);
-    });
-  };
-  const gelijk = (a, b, cols, getallen) =>
-    JSON.stringify(normaliseer(a, cols, getallen)) === JSON.stringify(normaliseer(b, cols, getallen));
-  const conflict = tekst => Object.assign(new Error(tekst), { code: 'PG_REQUEST_CONFLICT' });
-
-  async function pasAccountWijzigingenToe(client, wijzigingen) {
-    if (!client || typeof client.query !== 'function')
-      throw new Error('Accountcommit vereist de client van de PostgreSQL-requesttransactie.');
-    const lijst = (wijzigingen || []).slice().sort((a, b) =>
-      String(a.tabel).localeCompare(String(b.tabel)) || Number(a.id) - Number(b.id));
-    let geschreven = 0;
-    for (const w of lijst) {
-      const staff = w.tabel === 'supplier_staff';
-      if (!staff && w.tabel !== 'users') throw new Error('Onbekende accounttabel: ' + w.tabel);
-      const cols = staff ? STAFF_COLS : USER_COLS;
-      const getallen = staff ? GETAL_STAFF : GETAL_USER;
-      const tabel = staff ? 'supplier_staff' : 'users';
-      const id = Number(w.id);
-      if (!Number.isSafeInteger(id) || id < 1) throw new Error('Ongeldig account-id in requestcommit.');
-      await client.query("SELECT pg_advisory_xact_lock(hashtext($1)::bigint)", ['account:' + tabel + ':' + id]);
-      const huidig = await client.query(`SELECT ${cols.join(', ')} FROM ${tabel} WHERE id=$1 FOR UPDATE`, [id]);
-      const rij = huidig.rows[0] || null;
-      if (!gelijk(rij, w.basis, cols, getallen))
-        throw conflict('De account- of personeelsrij is tijdens dit verzoek gewijzigd.');
-      try {
-        if (!w.na) {
-          if (rij) { await client.query(`DELETE FROM ${tabel} WHERE id=$1`, [id]); geschreven++; }
-        } else if (!rij) {
-          const ph = cols.map((_, i) => '$' + (i + 1)).join(', ');
-          await client.query(`INSERT INTO ${tabel} (${cols.join(', ')}) VALUES (${ph})`,
-            cols.map(c => waarde(w.na, c)));
-          geschreven++;
-        } else {
-          const zet = cols.filter(c => c !== 'id');
-          await client.query(`UPDATE ${tabel} SET ${zet.map((c, i) => c + '=$' + (i + 1)).join(', ')}
-            WHERE id=$${zet.length + 1}`, zet.map(c => waarde(w.na, c)).concat(id));
-          geschreven++;
-        }
-      } catch (e) {
-        if (String(e && e.code) === '23505' || /unique|duplicate/i.test(String(e && e.message || e)))
-          throw conflict('De gekozen account- of personeelskoppeling is intussen in gebruik.');
-        throw e;
-      }
-      await client.query('SELECT pg_notify($1, $2)', [KANAAL,
-        (staff ? 'staff:' : 'user:') + id + ':' + BRON]);
-    }
-    return { geschreven, rijen: lijst.map(x => x.tabel + ':' + x.id) };
-  }
+  const pasAccountWijzigingenToe = require('./pgaccounts-commit')({
+    kanaal: KANAAL, bron: BRON, userCols: USER_COLS, staffCols: STAFF_COLS, waarde
+  });
   // voor de spiegel: is deze melding van onszelf?
   const vanMij = payload => String(payload || '').split(':')[2] === BRON;
 

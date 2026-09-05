@@ -52,16 +52,54 @@ test('de oude WorkOS-werkruimtetokens blijven een zichtbare P1-releaseblokkade',
     'ook de Tenant Control Plane die deze bearers hergebruikt blijft zichtbaar');
 });
 
-test('de bron bewijst sterke entropie maar nog raw opslag, vergelijking en redisclosure', () => {
-  const index = fs.readFileSync(path.join(ROOT, 'server/bedrijf/index.js'), 'utf8');
+test('productie bewaart of heronthult geen werkruimtebearer en blijft hard gesloten', async () => {
+  const werkruimte = fs.readFileSync(path.join(ROOT, 'server/bedrijf/werkruimte.js'), 'utf8');
   const leden = fs.readFileSync(path.join(ROOT, 'server/bedrijf/leden.js'), 'utf8');
   const deuren = fs.readFileSync(path.join(ROOT, 'server/bedrijf/deuren.js'), 'utf8');
   const mijn = fs.readFileSync(path.join(ROOT, 'server/bedrijf/mijn.js'), 'utf8');
-  assert.match(index, /beheerToken:\s*crypto\.randomBytes\(24\)\.toString\('hex'\)/);
-  assert.match(leden, /token:\s*crypto\.randomBytes\(24\)\.toString\('hex'\)/);
-  assert.match(deuren, /w\.beheerToken\s*!==\s*String\(req\.body\.beheerToken/);
-  assert.match(deuren, /find\(x\s*=>\s*x\.token\s*===\s*tok\)/);
-  assert.match(mijn, /lidToken:\s*l\.token/);
+  assert.match(werkruimte,
+    /beheerToken:\s*PRODUCTIE\s*\?\s*null\s*:\s*crypto\.randomBytes\(24\)\.toString\('hex'\)/);
+  assert.match(leden,
+    /token:\s*PRODUCTIE\s*\?\s*null\s*:\s*crypto\.randomBytes\(24\)\.toString\('hex'\)/);
+  assert.match(werkruimte, /if\s*\(!PRODUCTIE\)\s*{\s*antwoord\.beheerToken\s*=\s*w\.beheerToken/);
+  assert.match(leden, /if\s*\(!PRODUCTIE\)\s*antwoord\.lidToken\s*=\s*l\.token/);
+  assert.match(mijn, /if\s*\(!PRODUCTIE\)\s*rij\.lidToken\s*=\s*l\.token/);
+  assert.match(deuren, /if\s*\(PRODUCTIE\)[\s\S]*?c\.autoritatief[\s\S]*?req\.session\.key\s*===\s*l\.rtgKey/,
+    'in productie opent alleen de verse accountgebonden requestcontext de deur');
   assert.match(leden, /l\.status\s*=\s*'uit dienst';\s*l\.token\s*=\s*null/,
     'bestaande intrekking blijft expliciet als reeds aanwezige sterke kant zichtbaar');
+
+  const werkruimtes = { W1: { beheerToken: 'oud-beheer', leden: {
+    L1: { token: 'oud-lid' }, L2: { token: null }
+  } } };
+  const maakProductieIdentiteit = require('../server/bedrijf/productie-identiteit');
+  const migratie = maakProductieIdentiteit({
+    productie: true,
+    bewerkCollectie(naam, bewerk) {
+      assert.equal(naam, 'werkruimtes');
+      return bewerk(werkruimtes);
+    }
+  });
+  assert.deepEqual(await migratie.migreerLegacyTokens(), {
+    ok: true, overgeslagen: false, werkruimtes: 1, leden: 1
+  });
+  assert.equal(werkruimtes.W1.beheerToken, null);
+  assert.equal(werkruimtes.W1.leden.L1.token, null);
+  assert.throws(() => maakProductieIdentiteit({
+    productie: true
+  }).migreerLegacyTokens(), /autoritatieve collectietransactie/,
+  'productie wist oude bearers nooit via een lokale of half-bedrade schrijfweg');
+
+  const uit = { status: 200, body: null, next: 0 };
+  const res = {
+    set() { return this; },
+    status(status) { uit.status = status; return this; },
+    json(body) { uit.body = body; return this; }
+  };
+  require('../server/middleware/workos-legacy-token-productiepoort')({ productie: true })(
+    { method: 'POST', path: '/api/bedrijf/werkruimte/maak' }, res, () => { uit.next++; }
+  );
+  assert.equal(uit.status, 503);
+  assert.equal(uit.body.code, 'WORKOS_IDENTITY_NOT_RELEASED');
+  assert.equal(uit.next, 0, 'de checkpoint opent de productieroute nog niet');
 });

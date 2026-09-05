@@ -26,6 +26,7 @@ module.exports = (kern) => {
     findSupplier: kern.findSupplier, bedrijf: () => kern.bedrijf
   });
   const { app, auth, tenant, bedrijf } = kern;
+  const PRODUCTIE = String(process.env.NODE_ENV || '') === 'production';
 
   /* Zelfde productie-identiteit als /api/bedrijf, vóór iedere tenantroute.
      bootstrap/mijn mag zonder keuze alleen de contextlijst teruggeven; zodra
@@ -41,7 +42,7 @@ module.exports = (kern) => {
      Eén werkruimte, want een lid-token hoort bij één werkruimte. */
   app.post('/api/tenant/bootstrap', (req, res) => {
     const s = bedrijf.lidVan(req, res); if (!s) return;
-    const b = tenant.bootstrap.voorAccount
+    const b = PRODUCTIE && tenant.bootstrap.voorAccount
       ? tenant.bootstrap.voorAccount(s.w.code, s.l) : tenant.bootstrap.voorLid(s.w.code, s.l);
     if (!b) return res.status(404).json({ error: 'Die werkruimte kennen we niet.' });
     res.json({ ok: true, bootstrap: b });

@@ -3,13 +3,13 @@
 /* Statische inventaris van de lokale identiteitscache. De runtimegrens in
    accounts/state.js kan alleen beschermen wat via S.zin(...) loopt. Deze scan
    maakt daarom iedere account-SQL-write buiten die gevel releaseblokkerend en
-   houdt de twee bewuste bypasses klein en benoemd. */
+   houdt iedere bewuste bypass klein, exact geteld en benoemd. */
 const fs = require('node:fs');
 const path = require('node:path');
 const { isAccountSchrijfzin } = require('../../server/accounts/duurzaamheid');
 
 const INTERNE_PUBLICATIES = Object.freeze({
-  'server/accounts/mirror.js': 3
+  'server/accounts/mirror.js': 4
 });
 
 function bestanden(map) {

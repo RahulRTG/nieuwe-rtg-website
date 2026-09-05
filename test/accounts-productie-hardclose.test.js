@@ -83,7 +83,7 @@ test('broncensus vindt alle accountwrites achter S.zin en faalt op een directe C
   const echt = accountschrijvers.controleer(path.join(__dirname, '..'));
   assert.equal(echt.ok, true, JSON.stringify(echt.onbewaakt));
   assert.ok(echt.bewaakteSchrijfzinnen >= 30, 'een lege of ingekorte scan mag niet groen zijn');
-  assert.equal(echt.internePublicaties, 3);
+  assert.equal(echt.internePublicaties, 4);
   assert.equal(echt.explicieteUitzonderingen.length, 1);
 
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-accountscan-'));

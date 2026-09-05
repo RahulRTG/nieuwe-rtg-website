@@ -96,6 +96,14 @@ module.exports = [
     reden: 'school/analyse-signalen.js r.15 gebruikt uitspraak(): het advies is een eigen onderwerp met een eigen grens, en de analyse leest het' },
   { van: 'motor:config', naar: 'motor:local-ai', soort: 'DOMEINRELATIE',
     reden: 'config/productie-ai.js r.16 gebruikt de URL-normalisatie van de lokale AI om de opstelling te keuren; de regel voor een geldige URL staat bij de client en niet twee keer' },
+  { van: 'motor:config', naar: 'motor:media', soort: 'DOMEINRELATIE',
+    reden: 'config/productie-media.js gebruikt de S3-runtimeparser om de productieopstelling te keuren; dezelfde configuratieregels horen niet in twee parsers uiteen te lopen' },
+  { van: 'motor:middleware', naar: 'motor:config', soort: 'BELEID',
+    reden: 'foundation-productiepoort.js handhaaft het ene commitgebonden Foundation-vrijgavebesluit uit config/foundation-vrijgave; de requestpoort mag dat besluit niet opnieuw interpreteren' },
+  { van: 'domein:rtfos', naar: 'domein:codelevenscyclus', soort: 'DOMEINRELATIE',
+    reden: 'rtfos/basis.js levert opslag en onderwerpbinding aan de gedeelde lifecycle die hash, verval, gebruikslimiet, rotatie en intrekking van persoonsportaalcodes bezit' },
+  { van: 'domein:spellen', naar: 'domein:spelprojectie-toegang', soort: 'DOMEINRELATIE',
+    reden: 'spellen/projectie.js orkestreert een potje met de aparte toegangscyclus voor projectieschermen; de spelprojectie blijft eigenaar van het getoonde spel, de toegang van het credential' },
 
   /* ---- EEN OPEN VRAAG, EN DIE WORDT NIET WEGGESCHREVEN ---- */
   { van: 'domein:spellen', naar: 'domein:hospitality-universe', soort: 'DOMEINRELATIE',

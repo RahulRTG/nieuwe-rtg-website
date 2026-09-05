@@ -44,3 +44,4 @@
     }
   }
 })();
+/* Live Samen-meldingen en de waarschuwing bij een onbeveiligd app-adres. */

@@ -8,3 +8,4 @@
   function vrKaart(z){
     const docs = z.etappes.map(e => esc(e.document)).filter((v,i,a)=>a.indexOf(v)===i).join(' · ');
     let acties = '';
+/* De vrachtkaart met etappetijdlijn, documenten en klantcode-acties. */

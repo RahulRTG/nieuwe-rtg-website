@@ -5256,6 +5256,7 @@
   function vrKaart(z){
     const docs = z.etappes.map(e => esc(e.document)).filter((v,i,a)=>a.indexOf(v)===i).join(' · ');
     let acties = '';
+/* De vrachtkaart met etappetijdlijn, documenten en klantcode-acties. */
 /* de statusknoppen van een vrachtzending */
     const toegang = z.volgtoegang || null;
     const actief = !!(toegang && toegang.stand === 'actief');

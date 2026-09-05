@@ -167,6 +167,12 @@ const REGISTER = {
   'MUTATIEINVENTARIS.json': { eigenRatel: 'test/mutatiecontract.test.js' },
   'HANDLERBEWAKERS.json': { eigenRatel: 'test/handlerpoorten.test.js' },
 
+  /* De credentialinventaris blijft bewust BLOCKED zolang een bekende deur of
+     bronkandidaat niet is geclassificeerd. scripts/codecredentials.js leest
+     dit register zelf en eindigt dan met een niet-nul status; release-gate.js
+     maakt die uitkomst bovendien onderdeel van iedere kandidaatkeuring. */
+  'CODECREDENTIALS.json': { eigenRatel: 'scripts/codecredentials.js' },
+
   'BEDRADING.json': { eigenRatel: 'scripts/check.js' },
   'UITVOERPROEF.json': { eigenRatel: 'scripts/bewijsmatrix.js' },
   'KLOK.json': { eigenRatel: 'scripts/klok.js' },

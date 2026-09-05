@@ -750,6 +750,7 @@
       if (chatOnder) chatEl.scrollTop = chatEl.scrollHeight;
     }).catch(function () { zetKamer(null); teken(); });
   }
+/* Live Samen-meldingen en de waarschuwing bij een onbeveiligd app-adres. */
   var bannerEl = null;
   function banner(tekst, pad) {
     if (bannerEl) bannerEl.remove();
@@ -796,4 +797,3 @@
     }
   }
 })();
-/* Live Samen-meldingen en de waarschuwing bij een onbeveiligd app-adres. */

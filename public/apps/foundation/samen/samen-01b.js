@@ -1,3 +1,4 @@
+/* De Samen-meldingen en de rustige poller voor pagina- en chatupdates. */
   var bannerEl = null;
   function banner(tekst, pad) {
     if (bannerEl) bannerEl.remove();
@@ -35,4 +36,3 @@
   }
   if (kamer) meldHier();
   setInterval(kijk, 5000);
-/* De Samen-meldingen en de rustige poller voor pagina- en chatupdates. */

@@ -128,6 +128,7 @@
       });
     }).catch(function () { zetKamer(null); teken(); });
   }
+/* De Samen-meldingen en de rustige poller voor pagina- en chatupdates. */
   var bannerEl = null;
   function banner(tekst, pad) {
     if (bannerEl) bannerEl.remove();
@@ -165,7 +166,6 @@
   }
   if (kamer) meldHier();
   setInterval(kijk, 5000);
-/* De Samen-meldingen en de rustige poller voor pagina- en chatupdates. */
   /* ---- Rahul voor het gezin: de kindveilige vraagbaak op elke RTF-pagina.
      Praat op het niveau van je leeftijdsgroep, belooft nooit iets dat geld
      kost (alles hier is gratis) en wijst bij zware onderwerpen liefdevol

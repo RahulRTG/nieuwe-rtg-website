@@ -1,3 +1,4 @@
+/* De vrachtkaart met etappetijdlijn, documenten en klantcode-acties. */
   function vrTijdlijn(z){
     return '<div style="display:flex;flex-wrap:wrap;gap:0.35rem;margin-top:0.5rem;">'+z.etappes.map(e => {
       const stijl = e.status==='bezig' ? 'border-color:var(--gold);background:rgba(201,162,75,0.12);' : e.status==='klaar' ? 'opacity:0.6;' : 'opacity:0.85;';
@@ -8,4 +9,3 @@
   function vrKaart(z){
     const docs = z.etappes.map(e => esc(e.document)).filter((v,i,a)=>a.indexOf(v)===i).join(' · ');
     let acties = '';
-/* De vrachtkaart met etappetijdlijn, documenten en klantcode-acties. */

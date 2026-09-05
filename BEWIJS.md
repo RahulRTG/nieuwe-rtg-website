@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1700 bestanden en 12013 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1700 bestanden en 12018 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 1700 |
-| losse beweringen (`test(...)`) | 12013 |
+| losse beweringen (`test(...)`) | 12018 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 99 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1042 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1496 bestanden, 11658 beweringen.
+1496 bestanden, 11663 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1031,7 +1031,7 @@ toets omvalt.
 | `reisgezelschap.test.js` | 16 | -- | HET REISGEZELSCHAP -- de tabel uit kern/reisgezelschap.js, als toets. WAAROM DIT BESTAAD ER. |
 | `reisoplosser.test.js` | 8 | -- | DE OPLOSSER (kern/reisoplosser.js) -- REIZEN.md fase 5: "Los het op". De gevaarlijkste belofte van deze knop is dat hij dingen REGELT. |
 | `reisplan.test.js` | 9 | gezakt op `liegpoort /api/` | De multimodale reisplanner: taxi, OV en lopen naast elkaar, en een geboekte reis waarin ze samen EEN reis zijn. Draai los: node --test test/reisplan.test.js Wat deze toetsen bewaken: 1. |
-| `reisuitnodiging.test.js` | 11 | -- | DE REISUITNODIGING (kern/reisuitnodiging.js): een klaargezette reis en een link. DRIE SCHAKELS: het kantoor zet een reis klaar voor iemand die nog geen lid is, die persoon wordt lid en neemt hem over, en hij nodigt... |
+| `reisuitnodiging.test.js` | 12 | -- | DE REISUITNODIGING (kern/reisuitnodiging.js): een klaargezette reis en een link. DRIE SCHAKELS: het kantoor zet een reis klaar voor iemand die nog geen lid is, die persoon wordt lid en neemt hem over, en hij nodigt... |
 | `reiswacht.test.js` | 10 | -- | DE REISWACHT (kern/reiswacht.js) -- REIZEN.md fase 3. Dit is de gevaarlijkste functie van de reiswereld, en de toetsen gaan dan ook nauwelijks over wat de wacht ZIET -- ze gaan over wat hij TOEGEEFT: 1. |
 | `reiswereld.test.js` | 11 | gezakt op `===->!==#0` | RTG Reizen: de samenhanglaag over de reisdomeinen (PLATFORM.md, laag 2). Wat hier bewezen moet worden is niet "er komt een lijst uit" maar de twee dingen die een orkestratielaag kapot kunnen maken: 1. |
 | `reiswijzer.test.js` | 7 | gezakt op `liegpoort /api/` | De Reiswijzer: van elk land van de wereld alle reisregels (visum, rijrichting, alarmnummer, water, fooi, let-op), automatisch bijgehouden door de Regelwacht en automatisch uitgereikt zodra iemand ergens naartoe gaat... |
@@ -1093,7 +1093,7 @@ toets omvalt.
 | `rtfos-uitvoering.test.js` | 8 | gezakt op `liegpoort /api/` | HET FOUNDATION OS, FASE TWEE: SUBSIDIES, VOORRAAD, ACTIVITEITEN, BERICHTEN test/rtfos.test.js toetst de governance-grendels (oormerk, vier ogen, limiet, VOG, toestemming, scheiding tussen steden). Dit bestand gaat... |
 | `rtfos-winkel.test.js` | 5 | -- | DE WINKEL VAN DE RTFOUNDATION -- en waarom een aankoop geen gift is. Dit is de scherpste grens van deze laag, en hij stond al in dit huis: kern/rtfos/herkomst.js weigert een donatie waar iets tegenover staat, en de... |
 | `rtfos.test.js` | 12 | gezakt op `liegpoort /api/` | HET FOUNDATION OS: DE GRENDELS DIE DE GOVERNANCE DRAGEN Dit toetsbestand gaat NIET over of de schermen vullen. Het gaat over de acht dingen die een federatieve stichting stukmaken zodra ze niet in code staan, en die... |
-| `rtfschool.test.js` | 6 | gezakt op `liegpoort /api/` | De School-Bibliotheek (10.000 school-apps per leeftijdsgroep, altijd gratis, met de leeftijdspoort) en Samen voor de gezinsapps (kindveilig: alleen gezin en bevestigde vrienden). Draai los: node --test... |
+| `rtfschool.test.js` | 7 | gezakt op `liegpoort /api/` | De School-Bibliotheek (10.000 school-apps per leeftijdsgroep, altijd gratis, met de leeftijdspoort) en Samen voor de gezinsapps (kindveilig: alleen gezin en bevestigde vrienden). Draai los: node --test... |
 | `rtfschool2.test.js` | 3 | gezakt op `liegpoort /api/` | RTF-golf 2: school en de toetsplanner in samenhang. De gezinsagenda leest school alleen mee (open huiswerk en toetsen als bron 'school', net als de RTG-ecosysteemlaag), de leerplanner zet huiswerk, leerstappen en... |
 | `rtfwallet.test.js` | 3 | -- | DE POSITIE VAN DE RTFOUNDATION -- waar een gift landt (kern/rtfwallet.js). Deze toets bestaat omdat er een gat zat tussen twee dingen die allebei klopten: de giftstand kan niet open zonder walletcode (terecht -- een... |
 | `rtfwelzijn.test.js` | 3 | gezakt op `liegpoort /api/` | RTF-golf 6 (deel 1): het gevoelsdagboek. Opt-in (de server bewaart alleen wat het kind zelf instuurt), prive per profiel (ook dicht voor gasten), een woord per dag (vandaag herzien mag, gisteren blijft staan), en... |
@@ -1135,7 +1135,7 @@ toets omvalt.
 | `salonviraal.test.js` | 8 | gezakt op `true->false#0` | De Salon-gate (kern/salonviraal.js): vreemden zien alleen wat viraal gaat of maatschappelijk belangrijk is; van een vriend of iemand die je volgt zie je een bericht altijd; partner-etalage en RTG-uitgelichte posts... |
 | `samen-credential.test.js` | 5 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `samen-routes-failclosed.test.js` | 1 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `samen.test.js` | 7 | gezakt op `liegpoort /api/` | Samen: meekijken en samen doen door het leden-OS. Kamers op code, alles op codenaam, live seintjes via de SSE-stroom; gasten doen niet mee en kamers verlopen vanzelf. |
+| `samen.test.js` | 8 | gezakt op `liegpoort /api/` | Samen: meekijken en samen doen door het leden-OS. Kamers op code, alles op codenaam, live seintjes via de SSE-stroom; gasten doen niet mee en kamers verlopen vanzelf. |
 | `samendelen.test.js` | 3 | gezakt op `liegpoort /api/` | SAMEN DELEN -- vrienden worden, samen uitgeven, verrekenen, en de wekker. WAAROM DIT ER IS Wie betaalt wat (WBW) is het lijstje waar vriendschappen op stuklopen: een weekend weg, vier mensen, iedereen legt iets voor,... |
 | `samenvoeging-routes.test.js` | 6 | gezakt op `liegpoort /api/` | ELF ROUTES UIT DE SAMENVOEGING DIE GEEN TOETS OVER DE DRAAD HADDEN. De twaalf takken van 1 september 2026 brachten routes mee waarvan de handler wel getoetst was (rechtstreeks aangeroepen, zoals... |
 | `samenwerking.test.js` | 5 | gezakt op `liegpoort /api/` | End-to-end tests voor de samenwerkingslaag (kern/samenwerking.js): EGn knop om als creator een leverancier voor te stellen, en een oproep waarop creators reageren en de leverancier er een kiest. We loggen als manager... |
@@ -1247,7 +1247,7 @@ toets omvalt.
 | `spelpresence.test.js` | 12 | gezakt op `true->false#0` | Wie er NU is, van je vrienden en je klasgenoten. Vijf regels, en vier ervan zijn er om iets te voorkomen -- dus staan ze hier alle vijf als toets, met de fout erbij die ze tegenhouden. |
 | `spelprestaties.test.js` | 8 | gezakt op `!==->===#0` | Prestaties, afgeleid uit de uitslagen. Drie keuzes maken dit anders dan een gewoon prestatiesysteem, en die staan hier alle drie als toets omdat ze anders stil terugdraaien: alleen wat BEHAALD is gaat terug (geen "7... |
 | `spelprojectie.pg.test.js` | 1 | -- | Echte PostgreSQL-proef voor de projectiecredential. Twee app-instanties delen uitsluitend de autoritatieve spellenrij. |
-| `spelprojectie.test.js` | 14 | gezakt op `return-weg#0` | De projectiekamer: een potje op een gedeeld scherm. De televisie heeft geen ledenaccount. |
+| `spelprojectie.test.js` | 15 | gezakt op `return-weg#0` | De projectiekamer: een potje op een gedeeld scherm. De televisie heeft geen ledenaccount. |
 | `spelquiz.test.js` | 12 | gezakt op `&&->||#0` | HET QUIZDUEL: teams, schoolvragen, en wat er NIET over de lijn gaat. Dit is het eerste spel met varianten, en dat maakt het ook het eerste spel waar "dezelfde motor, andere bron" een bewering is in plaats van een plan. |
 | `spelregels-drift.test.js` | 17 | gezakt op `===->!==#0` | Driftbewaking: twee spelregels bestaan bewust in tweevoud (server keurt, client geeft directe feedback): de Woordduel-premievelden en de Rummi-setregels. Deze test haalt de CLIENT-kopie uit spelen.html en houdt hem... |
 | `spelregister.test.js` | 32 | gezakt op `===->!==#0` | Het spelregister: elk spel beschrijft zichzelf in zijn eigen module en het register bouwt daar de dispatch-tabellen uit. Deze toets bewaakt twee dingen die anders pas midden in een potje zouden opvallen: 1. |
@@ -1280,7 +1280,7 @@ toets omvalt.
 | `stadsweefsel.test.js` | 12 | gezakt op `liegpoort /api/` | HET STADSWEEFSEL: de laag die van losse stadssystemen een stad maakt. Getest, en per toets is de bewering met een MUTATIE nagetrokken (de lat, regel 2). |
 | `staff-inzet-mob.test.js` | 6 | gezakt op `liegpoort /api/` | DRIE PERSONEELSINGANGEN VAN HET MOBILITY OS DIE DOOR NIETS WERDEN AANGEROEPEN. /api/staff/mob/kaart/storingen de storingslijst van de OV-vervoerder /api/staff/mob/mijn het dispatchbeeld op de PDA... |
 | `staff-pin-productie.test.js` | 2 | -- | Productiegrens voor de oude viercijferige personeelspin. Deze toets draait de server in de gewone, niet-synthetische stand. |
-| `staffinvite.test.js` | 11 | gezakt op `liegpoort /api/` | Personeel = RTG-account, met uitnodiging. Een manager nodigt uit en krijgt een eenmalige kassacode; pas daarna kan de medewerker zich aanmelden met de bedrijfsnaam + kassacode + eigen RTG-inlog. |
+| `staffinvite.test.js` | 12 | gezakt op `liegpoort /api/` | Personeel = RTG-account, met uitnodiging. Een manager nodigt uit en krijgt een eenmalige kassacode; pas daarna kan de medewerker zich aanmelden met de bedrijfsnaam + kassacode + eigen RTG-inlog. |
 | `startpagina.test.js` | 6 | -- | De losse GitHub Pages-voordeur: merk, routes en dagdeelbeelden. Deze pagina draait niet via de productieserver: index.html in de repositoryroot wordt rechtstreeks door GitHub Pages bediend. |
 | `stempel.test.js` | 4 | gezakt op `===->!==#0` | HET STEMPEL: WANNEER IS EEN METING ONREPRODUCEERBAAR? `boomVuil` beantwoordt een vraag met gevolgen: hoort deze uitslag bij de commit die eronder staat, of bij iets wat nergens is vastgelegd? |
 | `stijlafsplitsing.test.js` | 8 | -- | HET AFGESPLITSTE STIJLBLOK: WAT ER WEG MAG, EN VOORAL WAT NIET. Over alle 258 schermen is 74% van de HTML inline CSS en JS. |

@@ -28,8 +28,8 @@ const PAGINAS = [
   { bestand: 'public/apps/kantoor.html', context: 'wereldtabs,wereldapps', stand: 'overview', auto: 'true' },
   { bestand: 'public/apps/reizen.html', context: 'travel-header,hoofdtabs', stand: 'overview', auto: 'true' },
   { bestand: 'public/apps/foundation/os-publiek.html', context: 'world-shell', stand: 'overview', auto: 'true' },
-  { bestand: 'public/apps/agenda.html', context: 'native-header,duimbalk', stand: 'compact', auto: 'false' },
-  { bestand: 'public/apps/reisboek.html', context: 'native-header', stand: 'compact', auto: 'false' },
+  { bestand: 'public/apps/agenda.html', context: 'native-header,duimbalk', stand: 'overview', auto: 'true' },
+  { bestand: 'public/apps/reisboek.html', context: 'native-header', stand: 'overview', auto: 'true' },
   { bestand: 'public/apps/werk.html', context: 'work-bank,work-top', stand: 'overview', auto: 'true' }
 ];
 
@@ -60,11 +60,14 @@ test('acht pilots gebruiken zeven route-entrypagina\'s met de gesloten contextma
   }
 });
 
-test('de bestaande Vandaag-contracten blijven op alle zeven pagina’s intact', () => {
-  for (const bestand of ['public/apps/rtg.html', 'public/apps/kantoor.html', 'public/apps/reizen.html']) {
-    assert.match(bodyVan(lees(bestand)), /data-rtg-vandaag-luxe(?:\s|>)/, bestand);
+test('vier homes zijn native dashboards; drie subroutes houden alleen hun wereldpalet', () => {
+  for (const [bestand, wereld] of [
+    ['public/apps/rtg.html', 'living'], ['public/apps/kantoor.html', 'work'],
+    ['public/apps/reizen.html', 'travel'], ['public/apps/foundation/os-publiek.html', 'foundation']
+  ]) {
+    assert.match(bodyVan(lees(bestand)),
+      new RegExp('data-rtg-world-dashboard="' + wereld + '"[^>]+data-rtg-vandaag-luxe(?:\\s|>)'), bestand);
   }
-  assert.match(bodyVan(FOUNDATION), /data-rtg-vandaag-luxe[\s>][^>]*data-rtg-vandaag-surface="public-city"/);
   assert.match(bodyVan(lees('public/apps/agenda.html')),
     /data-rtg-vandaag-luxe="surface"[^>]*data-rtg-vandaag-surface="agenda"/);
   assert.match(bodyVan(lees('public/apps/reisboek.html')),
@@ -87,7 +90,7 @@ test('alle Edge2-assets komen één keer en in volgorde uit de centrale loader',
 
 test('de onderrand gebruikt per pilot een expliciete veilige hoofdactie', () => {
   const contracten = [
-    ["'/apps/rtg.html'", "'Bekijk uw dag'", "klik('.rtg-vandaag-luxe__cta')"],
+    ["'/apps/rtg.html'", "'Bekijk uw dag'", "klik('.rtg-dashboard-hero-cta')"],
     ["'/apps/kantoor.html'", "'Open werkbank'", "klik('.wereldtab-plus')"],
     ["'/apps/reizen.html'", "'Open reizen'", "klik('[data-tab=\"reizen\"]')"],
     ["'/apps/foundation/os-publiek.html'", "'Bekijk uw stad'", "focus('#steden')"],
@@ -103,6 +106,14 @@ test('de onderrand gebruikt per pilot een expliciete veilige hoofdactie', () => 
   assert.doesNotMatch(LOADER, /main\s+\.knop|\.click\(\).*reisWeg|fetch\s*\(/,
     'de Edge-hoofdactie mag geen willekeurige of destructieve actie kiezen');
   assert.ok(Buffer.byteLength(LOADER) < 10 * 1024, 'de centrale loader blijft onder 10 KiB');
+});
+
+test('de ene Edge volgt ook de echte geneste WorkOS-scrollstroom', () => {
+  assert.match(LOADER, /function koppelWerkScroll\(\)/);
+  assert.match(LOADER, /vind\('\.wk-stage'\)/);
+  assert.match(LOADER, /setState\('compact', \{ source: 'auto' \}\)/);
+  assert.match(LOADER, /setState\('overview', \{ source: 'auto' \}\)/);
+  assert.match(LOADER, /koppelWerkRahul\(\);\s*koppelWerkScroll\(\)/);
 });
 
 test('Edge2 verbetert exact één bestaand casco en maakt zelf geen tweede rand', () => {
@@ -219,10 +230,10 @@ function werkRoute(hash) {
   return { attrs, geklikt };
 }
 
-test('alleen de whitelisted Work-projectenroute wordt een vaste compacte surface', () => {
+test('alleen de whitelisted Work-projectenroute wordt een surface met zichtbare autorand', () => {
   const project = werkRoute('#projecten');
-  assert.equal(project.attrs.get('data-rtg-edge-2-state'), 'compact');
-  assert.equal(project.attrs.get('data-rtg-edge-2-auto'), 'false');
+  assert.equal(project.attrs.get('data-rtg-edge-2-state'), 'overview');
+  assert.equal(project.attrs.get('data-rtg-edge-2-auto'), 'true');
   assert.equal(project.attrs.get('data-rtg-vandaag-luxe'), 'surface');
   assert.equal(project.geklikt, '[data-wk="projecten"]');
 
@@ -252,14 +263,16 @@ function foundationModus(modus) {
   return attrs;
 }
 
-test('alleen een veilig opgeloste Foundation-stad schakelt naar compact zonder auto', () => {
+test('een veilig opgeloste Foundation-stad blijft dashboard met zichtbare autorand', () => {
   const stad = foundationModus('surface');
-  assert.equal(stad.get('data-rtg-vandaag-luxe'), 'surface');
-  assert.equal(stad.get('data-rtg-edge-2-state'), 'compact');
-  assert.equal(stad.get('data-rtg-edge-2-auto'), 'false');
+  assert.equal(stad.get('data-rtg-vandaag-luxe'), 'home');
+  assert.equal(stad.get('data-rtg-foundation-city'), 'true');
+  assert.equal(stad.get('data-rtg-edge-2-state'), 'overview');
+  assert.equal(stad.get('data-rtg-edge-2-auto'), 'true');
 
   const home = foundationModus('home');
   assert.equal(home.get('data-rtg-vandaag-luxe'), 'home');
+  assert.equal(home.has('data-rtg-foundation-city'), false);
   assert.equal(home.get('data-rtg-edge-2-state'), 'overview');
   assert.equal(home.get('data-rtg-edge-2-auto'), 'true');
   assert.match(FOUNDATION, /r\.steden\.find\(s => stadSlug\(s\.naam\) === STADSAANVRAAG\)/);

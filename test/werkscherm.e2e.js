@@ -99,34 +99,19 @@ test('het Werk OS toont zonder sleutel een inlogkaart, en daarbinnen een startsc
 
     /* ---- de directe projectendeur opent hetzelfde bestaande paneel ---- */
     await page.goto(base + '/apps/werk.html#projecten', { waitUntil: 'domcontentloaded' });
-    try {
-      await page.waitForSelector('#rtg-vandaag-luxe[data-modus="surface"][data-surface="projecten"]',
-        { state: 'attached', timeout: 15000 });
-    } catch (e) {
-      const stand = await page.evaluate(() => ({ hash: location.hash, body: document.body.outerHTML.slice(0, 400),
-        luxe: document.body.getAttribute('data-rtg-vandaag-luxe'),
-        surface: document.body.getAttribute('data-rtg-vandaag-surface'),
-        titel: document.body.getAttribute('data-rtg-vandaag-surface-title'),
-        api: !!window.RTGVandaagLuxe, fout: String(window.__rtgFout || '') }));
-      throw new Error('de projectensurface verscheen niet: ' + JSON.stringify(stand) + '\n' + e.message);
-    }
-    const luxeMaat = await page.$eval('#rtg-vandaag-luxe', el => {
-      const r = el.getBoundingClientRect();
-      const shell = document.querySelector('.wk-shell').getBoundingClientRect();
-      const voorgrond = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
-      return { hoogte: r.height, breedte: r.width, onder: r.bottom, shellBoven: shell.top,
-        display: getComputedStyle(el).display, voorgrond: !!voorgrond && el.contains(voorgrond) };
-    });
-    assert.ok(luxeMaat.hoogte > 0 && luxeMaat.breedte > 0 && luxeMaat.display !== 'none',
-      'de compacte wereldkop heeft een zichtbare maat: ' + JSON.stringify(luxeMaat));
-    assert.ok(luxeMaat.onder <= luxeMaat.shellBoven + 1,
-      'de projectenschil begint onder de compacte wereldkop: ' + JSON.stringify(luxeMaat));
-    assert.equal(luxeMaat.voorgrond, true,
-      'de compacte wereldkop ligt op zijn middelpunt werkelijk op de voorgrond');
+    await page.waitForSelector('body[data-rtg-edge-2-rendered="true"]', { timeout: 15000 });
     await wachtOpTekst(page, /Vergunning aanvragen/);
+    const routeSchil = await page.evaluate(() => ({
+      palet: document.body.getAttribute('data-rtg-vandaag-luxe'),
+      dashboard: document.body.hasAttribute('data-rtg-world-dashboard-ready'),
+      covers: document.querySelectorAll('#rtg-vandaag-luxe,#rtg-vandaag-surface-cover').length,
+      edges: document.querySelectorAll('.rtg-edge-chrome').length,
+      inhoud: !document.getElementById('inhoud').hidden
+    }));
+    assert.deepEqual(routeSchil, {
+      palet: 'surface', dashboard: false, covers: 0, edges: 1, inhoud: true
+    }, 'projecten gebruikt zijn echte paneel met alleen wereldpalet en één Edge');
     tekst = await page.evaluate(() => document.body.innerText.replace(/\s+/g, ' '));
-    assert.match(await page.textContent('#rtg-vandaag-luxe-kop'), /Projecten en taken/,
-      'de compacte wereldkop noemt het werkelijk geopende paneel');
     assert.match(tekst, /Vergunning aanvragen/, 'de taken staan in de modulelijst');
     assert.match(tekst, /wacht/, 'en een geblokkeerde taak is als zodanig gemerkt');
 

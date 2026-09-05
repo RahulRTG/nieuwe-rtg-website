@@ -100,6 +100,30 @@
     sync();
   }
 
+  /* WorkOS scrollt niet in window maar in zijn eigen stage. Geef die ene
+     echte scrollstroom daarom aan dezelfde Edge-state door: omlaag maakt de
+     bovenrand compact, omhoog of terug bij de kop haalt hem terug. Handmatig
+     gekozen Edge-standen blijven door RTGEdge2 zelf beschermd. */
+  function koppelWerkScroll() {
+    var stage = vind('.wk-stage');
+    if (!stage) return;
+    var laatste = stage.scrollTop || 0, gepland = false;
+    stage.addEventListener('scroll', function () {
+      if (gepland) return;
+      gepland = true;
+      var werk = function () {
+        gepland = false;
+        var nu = stage.scrollTop || 0, verschil = nu - laatste;
+        laatste = nu;
+        if (!w.RTGEdge2 || b.getAttribute('data-rtg-edge-2-auto') !== 'true' ||
+            b.getAttribute(VENSTER_ATTR) === 'true') return;
+        if (nu <= 32 || verschil < -14) w.RTGEdge2.setState('overview', { source: 'auto' });
+        else if (verschil > 14) w.RTGEdge2.setState('compact', { source: 'auto' });
+      };
+      if (w.requestAnimationFrame) w.requestAnimationFrame(werk); else w.setTimeout(werk, 0);
+    }, { passive: true });
+  }
+
   /* EEN MODAAL VENSTER HEEFT VOORRANG OP DE RANDEN. De oude Rahul-tab week
      al voor een open dialoog, maar de ene Edge-onderrand bleef erboven liggen.
      Daardoor was in Clips de knop "Sluit" zichtbaar en toch niet aan te
@@ -130,13 +154,13 @@
   }
   var pad = w.location.pathname;
   if (pad === '/apps/rtg.html') {
-    hoofdactie('Bekijk uw dag', function () { klik('.rtg-vandaag-luxe__cta'); });
+    hoofdactie('Bekijk uw dag', function () { klik('.rtg-dashboard-hero-cta'); });
     neemRandknop('.xp-trigger');
   }
   else if (pad === '/apps/kantoor.html') hoofdactie('Open werkbank', function () { klik('.wereldtab-plus'); });
   else if (pad === '/apps/reizen.html') hoofdactie('Open reizen', function () { klik('[data-tab="reizen"]'); });
   else if (pad === '/apps/foundation/os-publiek.html') hoofdactie('Bekijk uw stad', function () {
-    var a = vind('[data-heen="activiteiten"]'); if (b.getAttribute('data-rtg-vandaag-luxe') === 'surface' && a) a.click(); else focus('#steden');
+    var a = vind('[data-heen="activiteiten"]'); if (b.getAttribute('data-rtg-foundation-city') === 'true' && a) a.click(); else focus('#steden');
   });
   else if (pad === '/apps/agenda.html') hoofdactie('Nieuwe afspraak', function () { klik('#nieuwBtn'); });
   else if (pad === '/apps/reisboek.html') hoofdactie('Naar reisinhoud', function () { focus('#main'); });
@@ -146,6 +170,7 @@
       if (inlog && inlog.offsetParent !== null) inlog.click(); else focus('#a_h0_naam, #mKeuze, #main');
     });
     koppelWerkRahul();
+    koppelWerkScroll();
   }
   else if (pad === '/apps/clips.html') neemHoofdactie('Maak een clip', '#studioOpen');
 

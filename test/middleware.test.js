@@ -1,12 +1,12 @@
 /* De poortwachters die voor alle routers hangen (server/middleware/).
 
-   Waarom deze test bestaat: bij het uit elkaar halen van server.js bleek de
-   voordeur zijn scriptbeveiliging te missen. De site-root wordt intern
-   herschreven naar /apps/app.html, maar de eigen webmotor (server/web) zet
-   req.path eenmalig als gewone eigenschap in plaats van als getter. Alleen
-   req.url herschrijven liet req.path dus op '/' staan, en de nonce-laag sloeg
-   de pagina over. Gevolg: juist de meest bezochte pagina van de site viel
-   terug op een CSP met 'unsafe-inline'.
+   Waarom deze test bestaat: bij het uit elkaar halen van server.js bleek een
+   interne pagina-herschrijving zijn scriptbeveiliging te kunnen missen. De
+   eigen webmotor (server/web) zet req.path eenmalig als gewone eigenschap in
+   plaats van als getter. Alleen req.url herschrijven liet de oude waarde dus
+   staan, en de nonce-laag sloeg de pagina over. De openbare root wordt nu niet
+   meer herschreven, maar dezelfde hulp bedient nog wel de drie app-aliassen;
+   daarnaast bewaken we hier apart dat / zelf dezelfde nonce-CSP krijgt.
 
    We rijden hier geen echte HTTP-server op: de lagen krijgen een nagebouwd
    req/res-paar met precies de methoden die de webmotor ze aanreikt. Dat is
@@ -16,7 +16,8 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('path');
 
-const { herschrijf, cspNonce, bureaublad, CSP, magnaatHtml } = require('../server/middleware/voordeur');
+const { herschrijf, cspNonce, bureaublad, CSP, magnaatHtml, opPagina } = require('../server/middleware/voordeur');
+const landing = require('../server/middleware/landing');
 const { jsonGzip, statischGzip, wilGzip, wilBrotli } = require('../server/middleware/compressie');
 const { opslagPoort, hoofdzekering } = require('../server/middleware/remmen');
 const { natieNaarLand, ZIN } = require('../server/middleware/functieschakelaars');
@@ -75,16 +76,37 @@ test('2. op een getter (Express) blijft req.path met rust', () => {
   assert.equal(req.path, '/apps/app.html', 'de getter leidt het zelf af');
 });
 
-test('3. de voordeur zet beide ingangen op hetzelfde bureaublad', () => {
+test('3. de openbare voordeur blijft landing; alleen app-ingangen gaan naar het bureaublad', () => {
   const routes = {};
   bureaublad({ get: (pad, fn) => { routes[pad] = fn; } });
-  for (const ingang of ['/', '/apps/bureau.html']) {
+  const voordeur = nepReq('/');
+  let landingDoor = false;
+  routes['/'](voordeur, nepRes(), () => { landingDoor = true; });
+  assert.equal(voordeur.path, '/', 'de openbare voordeur wordt niet de leden-app in getrokken');
+  assert.ok(landingDoor, 'de canonieke landing gaat door naar de nonce-laag');
+
+  for (const ingang of ['/apps', '/apps/bureau.html', '/apps/index.html']) {
     const req = nepReq(ingang);
     let door = false;
     routes[ingang](req, nepRes(), () => { door = true; });
     assert.equal(req.path, '/apps/app.html', ingang + ' komt op het bureaublad uit');
     assert.ok(door, 'en gaat door naar de volgende laag');
   }
+});
+
+test('3b. de Node-landing gebruikt dezelfde bron met alleen lokale adressen', () => {
+  const bron = require('fs').readFileSync(landing.bronbestand(PUBLIC), 'utf8');
+  const html = landing.voorNode(bron);
+  assert.match(html, /data-page="rtg-landing"/);
+  assert.doesNotMatch(html, /(?:href|src)="\.\/public\//,
+    'Node serveert assets uit public/ rechtstreeks aan de webroot');
+  assert.doesNotMatch(html, /href="https:\/\/app\.rahultravelgroup\.com\//,
+    'app-links blijven op de origin waar de landing is geopend');
+  for (const naam of ['rtg-api-base', 'rtg-app-base', 'rtg-asset-base']) {
+    assert.match(html, new RegExp('name="' + naam + '" content="/"'), naam + ' blijft same-origin');
+  }
+  assert.match(html, /href="\/site\/start\/start-base\.css"/);
+  assert.match(html, /data-app-path="\/apps\/app\.html" href="\/apps\/app\.html"/);
 });
 
 test('4. de nonce-laag geeft kop en pagina dezelfde verse nonce', async () => {
@@ -109,6 +131,27 @@ test('4. de nonce-laag geeft kop en pagina dezelfde verse nonce', async () => {
   assert.equal((await draai(laag, nepReq('/shared/qr.js'), nepRes())).door, true);
   // en met de schakelaar uit doet hij helemaal niets
   assert.equal((await draai(cspNonce(PUBLIC, false), nepReq('/apps/app.html'), nepRes())).door, true);
+});
+
+test('4a. de openbare landing loopt door dezelfde nonce-CSP als de appschermen', async () => {
+  const gezien = [];
+  opPagina((pad) => gezien.push(pad));
+  let uit;
+  try { uit = await draai(cspNonce(PUBLIC, true), nepReq('/'), nepRes()); }
+  finally { opPagina(null); }
+  assert.ok(uit.res.klaar, 'de landing is verstuurd');
+  assert.deepEqual(gezien, ['/'], 'het schermjournaal noemt het bediende URL-pad, niet een niet-bestaande /index.html');
+  assert.match(String(uit.res.body), /data-page="rtg-landing"/);
+  assert.doesNotMatch(String(uit.res.body), /https:\/\/app\.rahultravelgroup\.com\/apps\//);
+  const nonce = /'nonce-([^']+)'/.exec(uit.res.kop['content-security-policy'] || '');
+  assert.ok(nonce, 'ook / draagt een verse nonce');
+  const tags = [...String(uit.res.body).matchAll(/<script[^>]* nonce="([^"]+)"/g)].map(m => m[1]);
+  assert.ok(tags.length > 0, 'de landingsscripts zijn gestempeld');
+  assert.ok(tags.every(n => n === nonce[1]), 'pagina en CSP dragen dezelfde nonce');
+
+  const zonderNonce = await draai(cspNonce(PUBLIC, false), nepReq('/'), nepRes());
+  assert.ok(zonderNonce.res.klaar, 'de landing blijft bereikbaar als de nonce-laag bewust uitstaat');
+  assert.match(String(zonderNonce.res.body), /src="\/site\/start\/start\.js"/);
 });
 
 test('4b. ieder appscherm krijgt in Magnaat vóór zijn eigen code de dichte trainingslaag', async () => {

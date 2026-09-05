@@ -64,7 +64,7 @@ const { db, load, save, bijeen, inBundel, bewerkCollectie, economischeBoekingEen
 /* De opslagmotor kan technisch geladen zijn terwijl een verplichte
    datamigratie nog niet gecommitte is. Verkeer blijft dan dicht; een groene
    motorstatus alleen is geen groene applicatiestatus. */
-let salonMigratieKlaar = STORE !== 'postgres';
+let salonMigratieKlaar = false;
 let rtfSamenMigratieKlaar = false;
 let boardingPassMigratieKlaar = false;
 const opslagKlaar = () => opslagMotorKlaar() && accounts.postgresKlaar() &&
@@ -780,18 +780,16 @@ const talen = maakTalen({ db, save });
 const salonClaimcode = require('./kern/salon-claimcode')({
   db, save, bewerkCollectie, crypto
 });
-/* Lokale opslag is na load() al autoritatief. PostgreSQL neemt zijn waarheid
-   pas asynchroon over; die variant draait daarom in startPostgresMetSalon en
-   niet vóór de pull. Zo blijft geen oude kale code tot de eerste klantactie op
-   schijf staan. Een migratiefout houdt de opslagstart in de bestaande
-   fail-closed retrylus. */
-if (STORE !== 'postgres') salonClaimcode.migreerAlles();
+/* PostgreSQL neemt zijn waarheid pas asynchroon over; die variant draait daarom
+   in startPostgresMetSalon en niet vóór de pull. De drie lokale migraties
+   draaien verderop samen, zodra ook Samen en Luchthaven zijn opgebouwd. */
 const startPostgresMetSalon = () => {
-  if (STORE === 'postgres') {
-    salonMigratieKlaar = false;
-    rtfSamenMigratieKlaar = false;
-    boardingPassMigratieKlaar = false;
-  }
+  /* opslagstart roept deze ingang voor elke motor aan. Een lokale standby mag
+     daardoor niet via de inerte Postgres-tak ten onrechte "gemigreerd" worden. */
+  if (STORE !== 'postgres') return Promise.resolve(false);
+  salonMigratieKlaar = false;
+  rtfSamenMigratieKlaar = false;
+  boardingPassMigratieKlaar = false;
   return Promise.resolve(startPostgres(async () => {
     await salonClaimcode.migreerAlles();
     if (!kern.samenRtf || typeof kern.samenRtf.migreerAlles !== 'function')
@@ -944,10 +942,10 @@ app.post('/api/cluster/:actie', (req, res) => {
     // realtime-tabellen (sessies, notificaties) opnieuw opbouwen.
     db.writable = true;
     db.leider = wordtLeider;
-    try { load(); initRealtime(); } catch (e) {
+    try { load(); migreerLokaleToegang(); initRealtime(); } catch (e) {
       db.writable = false;
       db.leider = false;
-      return res.status(500).json({ error: 'Data laden mislukte: ' + e.message });
+      return res.status(500).json({ error: 'Data laden of migreren mislukte: ' + e.message });
     }
     console.log('[cluster] server ' + nr + (wordtLeider ? ' neemt over en is nu actief' : ' loopt mee en neemt verkeer aan'));
     /* En meteen een backup. backupData() slaat alles over wat geen leider is
@@ -2340,22 +2338,38 @@ require('./opzet/kernlaag7')(kern, hulp);
 require('./opzet/kernlaag7b')(kern, hulp);   // de routers ophangen; zie de kop daar waarom dat NA alle Object.assign moet
 
 /* JSON/SQLite/geheugen zijn al autoritatief geladen. Verwijder oude kale
-   FoundationOS-Samen-codes daarom vóór luister() verkeer kan aannemen. De
-   lokale collectiemotor moet hier synchroon committen; als dat ooit verandert,
-   weigert de start in plaats van een half gemigreerde instance vrij te geven. */
-if (STORE !== 'postgres') {
-  if (!kern.samenRtf || typeof kern.samenRtf.migreerAlles !== 'function')
-    throw new Error('FoundationOS Samen-migratie ontbreekt bij de opslagstart.');
-  const rtfSamenMigratie = kern.samenRtf.migreerAlles();
-  if (rtfSamenMigratie && typeof rtfSamenMigratie.then === 'function')
-    throw new Error('Lokale FoundationOS Samen-migratie committe niet synchroon.');
-  rtfSamenMigratieKlaar = true;
-  if (!kern.lucht || typeof kern.lucht.migreerBoardingPasses !== 'function')
-    throw new Error('TravelOS boarding-passmigratie ontbreekt bij de opslagstart.');
-  const boardingMigratie = kern.lucht.migreerBoardingPasses();
-  if (boardingMigratie && typeof boardingMigratie.then === 'function')
-    throw new Error('Lokale TravelOS boarding-passmigratie committe niet synchroon.');
-  boardingPassMigratieKlaar = true;
+   Salon-, FoundationOS-Samen- en boarding-passcodes daarom vóór een schrijvende
+   instance verkeer kan aannemen. De lokale collectiemotor moet hier synchroon
+   committen; als dat ooit verandert, weigert de start in plaats van een half
+   gemigreerde instance vrij te geven. */
+/* Een losse server begint schrijvend en migreert vóór listen(). Een
+   trio-server begint bewust als standby: die mag de gedeelde SQLite-opslag niet
+   wijzigen en migreert pas in /api/cluster/promote, direct na zijn verse load().
+   Zo blijft opslag fail-closed zonder dat elke gezonde standby in een
+   opstart-crashlus belandt. */
+if (STORE !== 'postgres' && db.writable) migreerLokaleToegang();
+function migreerLokaleToegang() {
+  if (STORE !== 'postgres') {
+    salonMigratieKlaar = false;
+    rtfSamenMigratieKlaar = false;
+    boardingPassMigratieKlaar = false;
+    const salonMigratie = salonClaimcode.migreerAlles();
+    if (salonMigratie && typeof salonMigratie.then === 'function')
+      throw new Error('Lokale Salon-claimcodemigratie committe niet synchroon.');
+    salonMigratieKlaar = true;
+    if (!kern.samenRtf || typeof kern.samenRtf.migreerAlles !== 'function')
+      throw new Error('FoundationOS Samen-migratie ontbreekt bij de opslagstart.');
+    const rtfSamenMigratie = kern.samenRtf.migreerAlles();
+    if (rtfSamenMigratie && typeof rtfSamenMigratie.then === 'function')
+      throw new Error('Lokale FoundationOS Samen-migratie committe niet synchroon.');
+    rtfSamenMigratieKlaar = true;
+    if (!kern.lucht || typeof kern.lucht.migreerBoardingPasses !== 'function')
+      throw new Error('TravelOS boarding-passmigratie ontbreekt bij de opslagstart.');
+    const boardingMigratie = kern.lucht.migreerBoardingPasses();
+    if (boardingMigratie && typeof boardingMigratie.then === 'function')
+      throw new Error('Lokale TravelOS boarding-passmigratie committe niet synchroon.');
+    boardingPassMigratieKlaar = true;
+  }
 }
 
 /* DE TWEE SLOTEN OP PUBLIEK VERKOPEN, aan de commerce-laag gegeven als LEZERS.

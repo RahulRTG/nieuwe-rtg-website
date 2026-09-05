@@ -61,9 +61,9 @@ test.after(() => {
 });
 
 test('productie start schoon: geen demozaken, geen demopersoneel, geen voorbeeldposts', async () => {
-  // de demozaak bestaat niet (en heeft dus ook geen roster)
-  assert.equal((await api('/api/supplier/roster', { code: 'KIKUNOI' })).status, 404);
-  assert.equal((await api('/api/supplier/roster', { code: 'VORA' })).status, 404);
+  // de openbare personeelskiezer is in productie dicht, vóór een zaak wordt opgezocht
+  assert.equal((await api('/api/supplier/roster', { code: 'KIKUNOI' })).status, 403);
+  assert.equal((await api('/api/supplier/roster', { code: 'VORA' })).status, 403);
   // een gast ziet een lege Salon (geen geseede verhalen) en lege catalogus
   const gast = await (await api('/api/login', { tier: 'guest' })).json();
   const state = gast.state;

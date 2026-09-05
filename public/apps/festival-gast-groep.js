@@ -15,6 +15,18 @@
   if (!G) return;
   var api = G.api, staat = G.staat, regel = G.regel, $ = G.$, start = G.start;
 
+  function idem(voor) {
+    return window.RTGIdem('festivalgroep-' + voor);
+  }
+
+  function toonEenmalig(body, kop) {
+    var code = body && body.groep && body.groep.code;
+    if (!code) return;
+    $('fgGroepEenmaligKop').textContent = kop;
+    $('fgGroepEenmaligCode').textContent = code;
+    $('fgGroepEenmalig').hidden = false;
+  }
+
   function tekenGroepen() {
     var lijst = $('fgGroepen');
     lijst.textContent = '';
@@ -27,11 +39,29 @@
             .then(function (r) {
               var s = r.body || {};
               if (!s.ok) return;
+              var t = s.toegang || {};
+              var status = t.stand === 'actief'
+                ? 'code actief · ' + t.gebruik + '/' + t.max_gebruik + ' gebruikt'
+                : 'code gesloten';
               var d = regel(lijst, s.naam + ' · ' + s.leden.length
                 + (s.leden.length === 1 ? ' lid' : ' leden')
                 /* `zonderPas` is een GETAL en geen aansporing: er komt hier geen
                    knop bij en geen tekst die iemand ergens toe aanzet. */
-                + (s.zonderPas ? ' · ' + s.zonderPas + ' zonder pas' : ''), 'code ' + s.code);
+                + (s.zonderPas ? ' · ' + s.zonderPas + ' zonder pas' : ''), status);
+              var vernieuw = document.createElement('button');
+              vernieuw.type = 'button';
+              vernieuw.className = 'knop';
+              vernieuw.textContent = 'Vernieuw code';
+              vernieuw.addEventListener('click', function () {
+                vernieuw.disabled = true;
+                api('/api/festival/groep/code', { festival: staat.fid, editie: staat.eid,
+                  id: g.id, idem: idem('roteer') }).then(function (antwoord) {
+                    var body = antwoord.body || {};
+                    if (!body.ok) { $('fgGroepStil').textContent = body.error || 'Dat lukte niet.'; return; }
+                    toonEenmalig(body, 'Uw vernieuwde groepscode');
+                    return tekenGroepen();
+                  }).finally(function () { vernieuw.disabled = false; });
+              });
               var weg = document.createElement('button');
               weg.type = 'button';
               weg.className = 'knop';
@@ -40,6 +70,7 @@
                 api('/api/festival/groep/weg', { festival: staat.fid, editie: staat.eid, id: g.id })
                   .then(tekenGroepen);
               });
+              d.appendChild(vernieuw);
               d.appendChild(weg);
             });
         }));
@@ -47,13 +78,16 @@
   }
 
   $('fgGroepMaak').addEventListener('click', function () {
+    var knop = $('fgGroepMaak');
+    knop.disabled = true;
     api('/api/festival/groep', { festival: staat.fid, editie: staat.eid,
-      naam: $('fgGroepNaam').value.trim() }).then(function (r) {
+      naam: $('fgGroepNaam').value.trim(), idem: idem('maak') }).then(function (r) {
       var b = r.body || {};
       if (!b.ok) { $('fgGroepStil').textContent = b.error || 'Dat lukte niet.'; return; }
       $('fgGroepNaam').value = '';
-      tekenGroepen();
-    });
+      toonEenmalig(b, 'Uw nieuwe groepscode');
+      return tekenGroepen();
+    }).finally(function () { knop.disabled = false; });
   });
 
   /* MEEDOEN WERKT OOK ALS U NOG NIETS HEEFT, en dat is geen detail: dit is het
@@ -75,6 +109,14 @@
          keuzelijst. Opnieuw ophalen dus, en niet zelf iets bijtekenen. */
       if (!staat.fid) { start(); return; }
       tekenGroepen();
+    });
+  });
+
+  $('fgGroepKopieer').addEventListener('click', function () {
+    var code = $('fgGroepEenmaligCode').textContent;
+    if (!code || !navigator.clipboard) return;
+    navigator.clipboard.writeText(code).then(function () {
+      $('fgGroepStil').textContent = 'De eenmalig getoonde code is gekopieerd.';
     });
   });
 

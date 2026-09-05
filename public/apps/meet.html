@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
+<script src="/shared/id.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RTG Meet</title>
@@ -86,7 +87,7 @@
 <main id="lobby">
   <div class="kop">Kom binnen met een kamercode</div>
   <div class="rij">
-    <input class="veld" id="komCode" maxlength="6" placeholder="Bijv. XKPT47"
+    <input class="veld" id="komCode" maxlength="37" placeholder="MEET.••••••••••••••••••••••••••••••••"
       style="flex:1;text-transform:uppercase;letter-spacing:.2em;font-family:ui-monospace,monospace;" aria-label="Kamercode">
     <!-- BEWUST GEEN data-hoofdactie. Dit scherm heeft twee gelijkwaardige
      ingangen: binnenkomen met een code, of zelf een kamer maken. Er een van
@@ -101,6 +102,7 @@
   </div>
   <p class="stil h-mt40">Wie de code heeft mag erin. Een kamer vanuit RTG Agenda is besloten:
     daar is de uitnodiging de sleutel, en alleen wie op de afspraak staat komt binnen.</p>
+  <div id="eenmaligeCode" aria-live="polite"></div>
   <div class="kop">Mijn kamers</div>
   <div id="kamers" aria-live="polite"></div>
   <p class="stil">Beeld en geluid lopen rechtstreeks tussen de toestellen; de server geeft alleen seinen door.

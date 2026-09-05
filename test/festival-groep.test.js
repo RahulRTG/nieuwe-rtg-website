@@ -50,7 +50,7 @@ function wereld() {
   const mee = (code, codenaam) => k.groepDeelnemen(fid, eid, { code, codenaam });
   const stand = (id, codenaam) => k.groepStand(fid, eid, id, codenaam);
   const pas = (drager) => k.pasUitgeven(fid, eid, { drager, rechten: [{ soort: 'festival.entree' }] });
-  return { k, fid, eid, dag, maak, mee, stand, pas };
+  return { db, k, fid, eid, dag, maak, mee, stand, pas };
 }
 
 test('1. meedoen is een eigen handeling: je hebt de code en je gebruikt hem', () => {
@@ -100,7 +100,9 @@ test('2b. het opzoeken van een code voegt niemand toe, en gokt niet bij twijfel'
      niet gegokt. Gokken zou iemand in de groep van een vreemde zetten. */
   const tweede = w.k.editieNieuw(w.fid, { jaar: 2028 }).editie.id;
   const ander = w.k.groepMaak(w.fid, tweede, { naam: 'Volgend jaar', maker: 'Ivo' }).groep;
-  ander.code = g.code;
+  const eersteRij = w.db.data.festivals[w.fid].edities[w.eid].groepen[g.id];
+  const tweedeRij = w.db.data.festivals[w.fid].edities[tweede].groepen[ander.id];
+  tweedeRij.toegang.code_hash = eersteRij.toegang.code_hash;
   assert.equal(w.k.groepEditieVanCode(g.code).meerdere, true);
 });
 
@@ -193,7 +195,7 @@ test('9. het gat is een getal en geen aansporing', () => {
      en in een groep komt die druk van vrienden -- wat beter werkt dan welke
      banner ook, en juist daarom niet gebeurt. */
   const velden = Object.keys(s).sort();
-  assert.deepEqual(velden, ['code', 'id', 'leden', 'maker', 'naam', 'ok', 'zonderPas']);
+  assert.deepEqual(velden, ['id', 'leden', 'maker', 'naam', 'ok', 'toegang', 'zonderPas']);
   const alles = JSON.stringify(s).toLowerCase();
   for (const woord of ['nodig', 'herinner', 'nog maar', 'laatste kans', 'verloopt', 'urgent']) {
     assert.ok(!alles.includes(woord), 'de stand draagt geen aansporing: "' + woord + '"');
@@ -214,6 +216,115 @@ test('10. wie een pas heeft wordt geteld uit de passen zelf', () => {
      achterlopen. */
   w.k.pasIntrekken(w.fid, w.eid, p.code, 'gestolen');
   assert.equal(w.stand(g.id, 'Kobalt').zonderPas, 2);
+});
+
+test('11. de kale groepscode staat alleen in uitgifte of rotatie', () => {
+  const w = wereld();
+  const gemaakt = w.maak('Naar Testival', 'Kobalt');
+  assert.match(gemaakt.groep.code, /^GRP\.[A-F0-9]{32}$/);
+  assert.equal(gemaakt.groep.eenmalig, true);
+
+  const opgeslagen = w.db.data.festivals[w.fid].edities[w.eid].groepen[gemaakt.groep.id];
+  assert.equal(Object.hasOwn(opgeslagen, 'code'), false);
+  assert.match(opgeslagen.toegang.code_hash, /^[a-f0-9]{64}$/);
+  assert.ok(!JSON.stringify(opgeslagen).includes(gemaakt.groep.code));
+
+  const stand = w.stand(gemaakt.groep.id, 'Kobalt');
+  const lijst = w.k.groepenVan(w.k.editieVind(w.fid, w.eid), 'Kobalt');
+  for (const later of [stand, lijst]) {
+    const tekst = JSON.stringify(later);
+    assert.ok(!tekst.includes(gemaakt.groep.code));
+    assert.ok(!tekst.includes(opgeslagen.toegang.code_hash));
+  }
+});
+
+test('12. een groepscode heeft doel, scope, verval, gebruik en serverrotatie', () => {
+  const w = wereld();
+  const gemaakt = w.maak('Naar Testival', 'Kobalt');
+  const t = gemaakt.groep.toegang;
+  assert.equal(t.issuer, 'Kobalt');
+  assert.equal(t.doel, 'festivalos-groep');
+  assert.deepEqual(t.scope, ['festival.group.join']);
+  assert.ok(Date.parse(t.issued_at) < Date.parse(t.expires_at));
+  assert.equal(t.max_gebruik, 49);
+  assert.equal(t.gebruik, 0);
+
+  assert.equal(w.mee(gemaakt.groep.code, 'Amber').ok, true);
+  assert.equal(w.stand(gemaakt.groep.id, 'Kobalt').toegang.gebruik, 1);
+  const oud = gemaakt.groep.code;
+  const geroteerd = w.k.groepCodeVernieuw(w.fid, w.eid,
+    { id: gemaakt.groep.id, codenaam: 'Amber' }, 'rotatie-1');
+  assert.match(geroteerd.groep.code, /^GRP\.[A-F0-9]{32}$/);
+  assert.notEqual(geroteerd.groep.code, oud);
+  assert.equal(w.mee(oud, 'Ivo').status, 404);
+});
+
+test('13. een retry geeft geen tweede groep en toont het geheim niet opnieuw', () => {
+  const w = wereld();
+  const a = w.k.groepMaak(w.fid, w.eid, { naam: 'Bus', maker: 'Kobalt' }, 'maak-1');
+  const b = w.k.groepMaak(w.fid, w.eid, { naam: 'Bus', maker: 'Kobalt' }, 'maak-1');
+  assert.equal(a.ok, true);
+  assert.equal(b.status, 409);
+  assert.equal(b.herhaald, true);
+  assert.equal(Object.hasOwn(b.groep, 'code'), false);
+  assert.equal(Object.keys(w.db.data.festivals[w.fid].edities[w.eid].groepen).length, 1);
+});
+
+test('14. een legacy-code wordt hash-only gesloten en vereist bewuste rotatie', () => {
+  const w = wereld();
+  const gemaakt = w.maak('Oud', 'Kobalt').groep;
+  const rij = w.db.data.festivals[w.fid].edities[w.eid].groepen[gemaakt.id];
+  delete rij.toegang;
+  rij.code = 'OUDEGROEP1';
+  assert.equal(w.mee('OUDEGROEP1', 'Amber').status, 404,
+    'een korte bestaande code wordt niet stil als productiecredential vertrouwd');
+  assert.equal(Object.hasOwn(rij, 'code'), false);
+  assert.match(rij.toegang.code_hash, /^[a-f0-9]{64}$/);
+  assert.ok(rij.toegang.ingetrokken_at);
+  assert.equal(rij.toegang.intrekreden, 'legacy code vereist rotatie');
+
+  const nieuw = w.k.groepCodeVernieuw(w.fid, w.eid,
+    { id: gemaakt.id, codenaam: 'Kobalt' }, 'legacy-rotatie');
+  assert.match(nieuw.groep.code, /^GRP\.[A-F0-9]{32}$/);
+  assert.equal(w.mee(nieuw.groep.code, 'Amber').ok, true);
+});
+
+test('15. twee gelijktijdige laatste claims kunnen niet allebei winnen', async () => {
+  const db = { data: {} };
+  let rij = Promise.resolve();
+  const bewerkCollectie = (sleutel, werk) => {
+    const taak = rij.then(() => {
+      const bron = JSON.parse(JSON.stringify(db.data[sleutel] || {}));
+      const antwoord = werk(bron);
+      db.data[sleutel] = bron;
+      return antwoord;
+    });
+    rij = taak.then(() => undefined, () => undefined);
+    return taak;
+  };
+  const k = maakFestival({ db, save() {}, bewerkCollectie, crypto, schoon });
+  const fid = k.festivalNieuw('ZAAK1', { naam: 'Testival' }).festival.id;
+  const eid = k.editieNieuw(fid, { jaar: 2027 }).editie.id;
+  k.dagZet(fid, eid, { datum: '2027-07-02', open: '12:00', sluit: '02:00' });
+  const gemaakt = await k.groepMaak(fid, eid, { naam: 'Laatste plek', maker: 'Kobalt' }, 'maak-atomair');
+  db.data.festivals[fid].edities[eid].groepen[gemaakt.groep.id].toegang.max_gebruik = 1;
+
+  const antwoorden = await Promise.all([
+    k.groepDeelnemen(fid, eid, { code: gemaakt.groep.code, codenaam: 'Amber' }),
+    k.groepDeelnemen(fid, eid, { code: gemaakt.groep.code, codenaam: 'Ivo' })
+  ]);
+  assert.equal(antwoorden.filter(x => x.ok).length, 1);
+  assert.equal(antwoorden.filter(x => x.status === 404).length, 1);
+  const opgeslagen = db.data.festivals[fid].edities[eid].groepen[gemaakt.groep.id];
+  assert.equal(opgeslagen.leden.length, 2);
+  assert.equal(opgeslagen.toegang.gebruik, 1);
+});
+
+test('16. generieke antwoordcaches mogen uitgifte en rotatie niet replayen', () => {
+  const { isEenmalig } = require('../server/lib/eenmalig-geheim-routes');
+  assert.equal(isEenmalig('POST', '/api/festival/groep'), true);
+  assert.equal(isEenmalig('POST', '/api/festival/groep/code'), true);
+  assert.equal(isEenmalig('POST', '/api/festival/groep/stand'), false);
 });
 
 /* ============================================================================

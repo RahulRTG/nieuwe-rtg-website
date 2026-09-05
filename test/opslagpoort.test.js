@@ -71,6 +71,12 @@ test('2. postgres en sqlite mogen productie in', () => {
   assert.equal(keuring(gezond()).geblokkeerd, false, 'een verse installatie zonder db.json valt op sqlite en mag starten');
 });
 
+test('2b. een expliciete lokale override mag een ingestelde productiedatabase niet verbergen', () => {
+  const r = keuring(gezond({ DATABASE_URL: 'postgres://x', RTG_STORE: 'sqlite' }));
+  assert.ok(r.fouten.some(f => /RTG_STORE=sqlite.*PostgreSQL.*runtime/i.test(f)),
+    'de keuring ziet dat de runtime niet de database gebruikt die go-live zou beproeven');
+});
+
 test('3. de standen zonder grootboek worden geweigerd, met een bruikbare tekst', () => {
   for (const stand of ['json', 'geheugen']) {
     const r = keuring(gezond({ RTG_STORE: stand }));

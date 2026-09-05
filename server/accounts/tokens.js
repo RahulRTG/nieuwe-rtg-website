@@ -105,7 +105,8 @@ function maakTokens(getUserById) {
      ./intreklijst.js: dat deel schrijft als enige naar de database, de rest van
      dit bestand is pure cryptografie. Hij krijgt de strikte vorm mee, zodat er
      maar EEN opvatting bestaat van wat een token is. */
-  const { trekIn, trekInActie, isIngetrokken, trekInSessie, sessieIngetrokken } = require('./intreklijst')(strikt);
+  const { trekIn, trekInActie, isIngetrokken, trekInSessie, sessieIngetrokken,
+    wachtIntrekkingen } = require('./intreklijst')(strikt);
 
   function verifyToken(token) {
     token = strikt(token);
@@ -143,7 +144,10 @@ function maakTokens(getUserById) {
   }
   /* Doel-gebonden token (bijv. e-mailbevestiging), los van de sessie. */
   function issueActionToken(userId, purpose, ttlMs) {
-    const body = userId + '.' + purpose + '.' + (Date.now() + ttlMs);
+    /* De nonce maakt ook twee uitgiftes in dezelfde milliseconde afzonderlijk
+       intrekbaar. De eerste drie delen blijven gelijk voor oude verifiers. */
+    const body = userId + '.' + purpose + '.' + (Date.now() + ttlMs) + '.' +
+      crypto.randomBytes(16).toString('base64url');
     return Buffer.from(body).toString('base64url') + '.' + kluis.sign(body);
   }
   function verifyActionToken(token, purpose) {
@@ -172,9 +176,8 @@ function maakTokens(getUserById) {
      aanroepers niets merken van de knip. */
   const herstel = require('./herstel').maakHerstel(getUserById);
 
-  return { issueToken, verifyToken, apparaatVanToken, sessieVan, trekIn, trekInActie, isIngetrokken, trekInSessie, sessieIngetrokken, issueActionToken, verifyActionToken,
-    setEmailVerified: herstel.setEmailVerified, createReset: herstel.createReset,
-    findByReset: herstel.findByReset, setPassword: herstel.setPassword };
+  return { issueToken, verifyToken, apparaatVanToken, sessieVan, trekIn, trekInActie, isIngetrokken, trekInSessie, sessieIngetrokken, wachtIntrekkingen, issueActionToken, verifyActionToken,
+    ...herstel };
 }
 
 module.exports = { maakTokens };

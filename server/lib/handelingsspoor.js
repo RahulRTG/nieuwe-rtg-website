@@ -64,6 +64,7 @@
 const crypto = require('crypto');
 const keten = require('./keten');
 const klok = require('./klok');
+const verzoekcontext = require('../db/verzoekcontext');
 
 const MAX = 50000;          // ruim genoeg voor een jaar bij dit verkeer, en begrensd
 const SCHRIJFT = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
@@ -156,15 +157,16 @@ function maakHandelingsspoor({ db, save, nu, max }) {
      afgemaakt, en dan hoort er ook niets in het spoor. */
   function middleware(req, res, next) {
     if (!SCHRIJFT.has(req.method)) return next();
-    res.on('finish', () => {
+    const schrijf = () => {
       const status = res.statusCode || 200;
       if (!(status >= 200 && status < 300)) return;
-      try {
-        noteer({ wie: wieVan(req), methode: req.method,
-          pad: String(req.path || req.url || ''), status, afdruk: afdrukVan(req.body) });
-        save();
-      } catch (e) { /* een journaalstoring mag een handeling niet tegenhouden */ }
-    });
+      noteer({ wie: wieVan(req), methode: req.method,
+        pad: String(req.path || req.url || ''), status, afdruk: afdrukVan(req.body) });
+      save();
+    };
+    if (!verzoekcontext.haakVoorCommit(schrijf)) {
+      res.on('finish', () => { try { schrijf(); } catch (e) {} });
+    }
     next();
   }
 

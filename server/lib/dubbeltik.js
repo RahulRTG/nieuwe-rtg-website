@@ -44,6 +44,7 @@
 
 const crypto = require('crypto');
 const klok = require('./klok');
+const verzoekcontext = require('../db/verzoekcontext');
 /* De kast met zijn drie grenzen (tijd, aantal, bytes) staat in
    ./dubbeltikkast.js: dat is geheugenbeheer en niet verzoekafhandeling, en het
    is daar los te toetsen zonder server. */
@@ -151,9 +152,12 @@ function maakDubbeltik(opties) {
       const echteJson = res.json.bind(res);
       res.json = (data) => {
         if (res.statusCode >= 200 && res.statusCode < 300) {
-          rij.status = res.statusCode; rij.data = data; rij.klaar = true; rij.at = nu();
-          staat.bewaard++;
-          wek(rij, rij);
+          const bewaar = () => {
+            rij.status = res.statusCode; rij.data = data; rij.klaar = true; rij.at = nu();
+            staat.bewaard++;
+            wek(rij, rij);
+          };
+          if (!verzoekcontext.haakNaCommit(bewaar)) bewaar();
         } else {
           kast.verwijder(id);
           wek(rij, null);

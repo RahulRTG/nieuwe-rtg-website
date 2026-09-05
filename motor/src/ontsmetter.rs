@@ -337,8 +337,8 @@ mod tests {
         assert_eq!(scan(&buf, "eicar", "application/octet-stream").verdict, "besmet");
     }
 
-    #[test]
-    #[ignore]
+    // Handmatige microbenchmark; geen correctness-test en geen release-skip.
+    #[allow(dead_code)]
     fn bench_doorvoer() {
         // 8 MB schoon blok, meet scan-doorvoer
         let buf = vec![0x42u8; 8 * 1024 * 1024];

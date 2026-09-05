@@ -15,16 +15,28 @@
   }
   function start(o) {
     o = o || {};
-    if (new URLSearchParams(location.search).get('embed') === '1') { d.body.classList.add('rtg-edge-embed'); return null; }
+    var inKader = false;
+    try { inKader = w.self !== w.top; } catch (fout) { inKader = true; }
+    if (inKader || new URLSearchParams(location.search).get('embed') === '1') { d.body.classList.add('rtg-edge-embed'); return null; }
     if (A) return api;
     var key = o.world || 'work', cfg = C[key] || C.work;
     var ctx = Object.assign({ scope: cfg.kort, title: d.title.replace(/\s*[|·-].*$/, ''), actie: cfg.actie, tool: '' }, o.context || {});
-    d.body.classList.add('rtg-edge-host'); d.body.dataset.rtgWorld = key;
+    d.body.dataset.rtgWorld = key;
     var root = d.createElement('div'); root.className = 'rtg-edge-chrome';
     root.innerHTML = L.casco(cfg, s);
     d.body.appendChild(root);
     A = { root: root, cfg: cfg, key: key, ctx: ctx, layout: 1, workspace: !!o.workspace, onTool: o.onTool || null, onAction: o.onAction || null };
-    teken(); bind(); neemAI(); L.refresh(A); return api;
+    try {
+      teken(); bind(); neemAI();
+      d.body.classList.add('rtg-edge-host');
+      d.body.setAttribute('data-rtg-edge-ready', 'true');
+      var v2=d.createElement('script');v2.src='/shared/rtg-edge-2-loader.js';d.head.appendChild(v2);
+      L.refresh(A); return api;
+    } catch (fout) {
+      if (root.parentNode) root.parentNode.removeChild(root);
+      A = null; d.body.classList.remove('rtg-edge-host'); d.body.removeAttribute('data-rtg-edge-ready');
+      throw fout;
+    }
   }
   function teken() {
     if (!A) return;
@@ -66,6 +78,7 @@
     var e = A, r = e.root, menu = r.querySelector('.rtg-edge-menu'), idx = r.querySelector('.rtg-edge-index'), ai = r.querySelector('.rtg-edge-ai'), panel = r.querySelector('.rtg-edge-ai-panel'), status = r.querySelector('.rtg-edge-status-panel'), state = r.querySelector('.rtg-edge-state');
     menu.onclick = function () {
       var open = menu.getAttribute('aria-expanded') === 'true', fold = d.body.classList.contains('rtg-edge-fold');
+      if(d.body.getAttribute('data-rtg-edge-2-rendered')==='true'){if(open)sluitLagen();else openIndex(false);return;}
       if (open) { sluitLagen(); d.body.classList.add('rtg-edge-fold'); }
       else if (fold) d.body.classList.remove('rtg-edge-fold');
       else openIndex(false);

@@ -36,8 +36,11 @@
 
 const GELDWEGEN = /^\/api\/(pay|bank|pakket|podium|directpay|betaal|munt|supplier\/(kassa|betaalverzoek|giftcard))\b/;
 const GEEN_GELD = new Set(['/api/pay/kascode', '/api/pay/tikcode']);
+const { ROUTES: EENMALIGE_ROUTES } = require('../lib/eenmalig-geheim-routes');
+const EENMALIGE_PADEN = new Set([...EENMALIGE_ROUTES].map(x => x.split(' ')[1]));
 
 /* De vraag die poortwachters.js stelt: moet de dubbeltik dit pad overslaan? */
-const slaOver = (pad) => GELDWEGEN.test(pad) && !GEEN_GELD.has(pad);
+const slaOver = (pad) => EENMALIGE_PADEN.has(String(pad || '').replace(/\/$/, '')) ||
+  (GELDWEGEN.test(pad) && !GEEN_GELD.has(pad));
 
-module.exports = { GELDWEGEN, GEEN_GELD, slaOver };
+module.exports = { GELDWEGEN, GEEN_GELD, EENMALIGE_PADEN, slaOver };

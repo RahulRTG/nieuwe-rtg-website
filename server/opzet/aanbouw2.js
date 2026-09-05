@@ -11,12 +11,12 @@
 'use strict';
 
 module.exports = function bouwKernAanTwee(kern, grens) {
-  const { db, save, crypto, schoon, sseToCustomer, accounts, anthropic,
+  const { db, save, bewerkCollectie, crypto, schoon, sseToCustomer, accounts, anthropic,
     beveilig, logboek, fs, path, DATA_DIR, rtf, gidsHaal, keyVanCodenaam, leeftijdVan, leeftijdInstr } = kern;
   /* RTG iD (kern/rtgid.js): de DigiD-vervanger op de eigen identiteitskluis;
      koppelcode-inlog met bevestiging in de app, selectieve gegevensdeling,
      inzagelog met intrekken en herroepbare machtigingen. */
-  Object.assign(kern, require('../kern/rtgid').maakRtgid({ db, save, crypto, accounts, schoon, leeftijdVan, gidsHaal, keyVanCodenaam,
+  Object.assign(kern, require('../kern/rtgid').maakRtgid({ db, save, bewerkCollectie, crypto, accounts, schoon, leeftijdVan, gidsHaal, keyVanCodenaam,
     /* De bewijzenlaag (kern/vakbewijs.js) hangt in kernlaag3 en is hier dus al
        gemonteerd -- maar hij wordt LAAT gebonden en niet nu doorgegeven. Een
        verwijzing die op montagemoment wordt bevroren, geeft undefined zodra de
@@ -61,7 +61,7 @@ module.exports = function bouwKernAanTwee(kern, grens) {
   require('../routes/home')(grens('home'));
   /* RTG Vracht (kern/vracht.js): internationale vracht voor expediteurs, over
      lucht, water en land; publiek volgen op volgcode zonder klantgegevens. */
-  Object.assign(kern, require('../kern/vracht')({ db, save, crypto, schoon }));
+  Object.assign(kern, require('../kern/vracht')({ db, save, bewerkCollectie, crypto, schoon }));
   require('../routes/vracht')(grens('vracht'));
   /* RTG Enterprise (kern/gebouw.js): het complete kantoorgebouw-systeem met
      receptie, zalen, badges, facilitair, valet en de luxe jetset-laag. */

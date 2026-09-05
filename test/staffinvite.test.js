@@ -43,7 +43,8 @@ test.after(() => {
 test('alleen een manager kan uitnodigen; een medewerker niet', async () => {
   assert.equal((await api('/api/supplier/staff/invite', { name: 'Nova de Wit', func: 'Bediening' }, balieToken)).status, 403);
   const r = await json(await api('/api/supplier/staff/invite', { name: 'Nova de Wit', func: 'Bediening' }, managerToken));
-  assert.ok(r.ok && /^[A-Z2-9]{6}$/.test(r.invite.kassacode), 'de manager krijgt een kassacode');
+  assert.ok(r.ok && /^[A-Z2-9]{6}\.[A-F0-9]{32}$/.test(r.invite.kassacode),
+    'de manager krijgt een herkenbare prefix plus 128-bit kassacode');
   assert.equal(r.bedrijf, BEDRIJF);
   global.__code = r.invite.kassacode;
 });
@@ -122,13 +123,52 @@ test('een open uitnodiging intrekken maakt de kassacode onbruikbaar', async () =
   const inv = await json(await api('/api/supplier/staff/invite', { name: 'Nooit Gekomen' }, managerToken));
   // hij staat in de lijst met open uitnodigingen
   const open1 = await json(await api('/api/supplier/staff/invites', {}, managerToken));
-  assert.ok(open1.invites.some(i => i.kassacode === inv.invite.kassacode));
-  assert.equal((await api('/api/supplier/staff/invite/intrek', { kassacode: inv.invite.kassacode }, managerToken)).status, 200);
+  assert.ok(open1.invites.some(i => i.id === inv.invite.id));
+  assert.equal(JSON.stringify(open1).includes(inv.invite.kassacode), false,
+    'de kale code wordt na uitgifte niet opnieuw getoond');
+  assert.equal((await api('/api/supplier/staff/invite/intrek', { id: inv.invite.id }, managerToken)).status, 200);
   const open2 = await json(await api('/api/supplier/staff/invites', {}, managerToken));
-  assert.ok(!open2.invites.some(i => i.kassacode === inv.invite.kassacode), 'weg uit de lijst');
+  const ingetrokken = open2.invites.find(i => i.id === inv.invite.id);
+  assert.ok(ingetrokken, 'de lifecycle-status blijft voor de manager zichtbaar');
+  assert.equal(ingetrokken.status, 'ingetrokken');
+  assert.equal(Object.hasOwn(ingetrokken, 'kassacode'), false, 'de kale code wordt nooit opnieuw getoond');
+  assert.equal(Object.hasOwn(ingetrokken, 'code_hash'), false, 'ook de hash lekt niet naar de beheer-UI');
   // en aanmelden met de ingetrokken code is geweigerd
-  const r = await api('/api/supplier/staff/join', { bedrijf: BEDRIJF, kassacode: inv.invite.kassacode, login: 'nova@x.nl', password: 'geheim123', pin: '1111' });
+  await api('/api/auth/register', { name: 'Nieuwe Kandidaat', email: 'nieuw@x.nl', phone: '0612345680',
+    password: 'geheim123', geboortedatum: '1994-04-04', tier: 'rtg', pasApp: 'rtg' });
+  const r = await api('/api/supplier/staff/join', { bedrijf: BEDRIJF, kassacode: inv.invite.kassacode,
+    login: 'nieuw@x.nl', password: 'geheim123', pin: '1111' });
   assert.equal(r.status, 403);
+});
+
+test('alleen een manager roteert een uitnodiging; retry heronthult geen code', async () => {
+  const gemaakt = await json(await api('/api/supplier/staff/invite', {
+    name: 'Later Begonnen', func: 'Service', idem: 'staff-rotatie-bron'
+  }, managerToken));
+  const oud = gemaakt.invite.kassacode;
+
+  assert.equal((await api('/api/supplier/staff/invite/roteer', {
+    id: gemaakt.invite.id, idem: 'staff-rotatie-vast'
+  }, balieToken)).status, 403, 'een medewerker kan geen personeelsdeur vervangen');
+
+  const eerste = await json(await api('/api/supplier/staff/invite/roteer', {
+    id: gemaakt.invite.id, idem: 'staff-rotatie-vast'
+  }, managerToken));
+  assert.notEqual(eerste.invite.kassacode, oud);
+  assert.equal(eerste.invite.toegang.rotatie, 2);
+
+  const retryAntwoord = await api('/api/supplier/staff/invite/roteer', {
+    id: gemaakt.invite.id, idem: 'staff-rotatie-vast'
+  }, managerToken);
+  const retry = await json(retryAntwoord);
+  assert.equal(retryAntwoord.status, 409);
+  assert.equal(JSON.stringify(retry).includes(eerste.invite.kassacode), false,
+    'dezelfde herhaalsleutel onthult de eenmalige nieuwe code niet opnieuw');
+  assert.equal((await api('/api/werving/kijk', { kassacode: oud })).status, 404,
+    'de oude kassacode is na rotatie server-side dood');
+  assert.equal((await api('/api/werving/kijk', {
+    kassacode: eerste.invite.kassacode
+  })).status, 200, 'alleen de nieuwe kassacode blijft bruikbaar');
 });
 
 test('ontslag: een verwijderd teamlid kan niet meer inloggen', async () => {
@@ -147,6 +187,7 @@ test('een sollicitant aannemen levert een kassacode op, geen kant-en-klaar accou
   const open = (lijst.state.applications || []).find(x => x.status === 'nieuw');
   assert.ok(open, 'de sollicitatie staat open bij de werkgever');
   const d = await json(await api('/api/supplier/apply/decide', { id: open.id, action: 'aannemen' }, managerToken));
-  assert.ok(d.invite && /^[A-Z2-9]{6}$/.test(d.invite.kassacode), 'aannemen geeft een kassacode om door te geven');
+  assert.ok(d.invite && /^[A-Z2-9]{6}\.[A-F0-9]{32}$/.test(d.invite.kassacode),
+    'aannemen geeft een 128-bit kassacode om eenmalig door te geven');
   assert.equal(d.bedrijf, BEDRIJF);
 });

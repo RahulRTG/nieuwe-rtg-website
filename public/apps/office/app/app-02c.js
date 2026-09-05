@@ -5,7 +5,7 @@
     var sleutel = '';
     try { sleutel = sessionStorage.getItem('rtg_office_venster') || ''; } catch (e) {}
     if (!sleutel) {
-      sleutel = window.RTGId ? RTGId('office') : String(Date.now()) + Math.random().toString(36).slice(2);
+      sleutel = RTGId('office');
       try { sessionStorage.setItem('rtg_office_venster', sleutel); } catch (e) {}
     }
     return sleutel;

@@ -84,3 +84,34 @@ test('een sessie zonder RTG-koppeling (naam+pincode) kan niet wisselen tussen be
   assert.deepEqual(opt.posities, [], 'een apparaatlogin heeft geen eigen werkplekken');
   assert.equal((await api('/api/supplier/mijn/wissel', { code: 'KIKUNOI' }, login.token)).status, 403);
 });
+
+test('wachtwoordwijziging trekt een al geopende persoonlijke supplier-sessie in', async () => {
+  const werk = await json(await api('/api/supplier/mijn/login', {
+    login: 'nora@rtg.example', password: 'werk', bedrijf: 'KIKUNOI'
+  }));
+  const lid = await json(await api('/api/auth/login', { login: 'nora@rtg.example', password: 'werk' }));
+  // Zorg dat de nieuwe sessiegrens aantoonbaar na het uitgiftemoment ligt, ook
+  // op een klok met millisecondenresolutie. De toestand is een volgende kloktik,
+  // niet een gegokte vaste duur.
+  const uitgegevenVoor = Date.now();
+  while (Date.now() <= uitgegevenVoor) {
+    await new Promise(r => setTimeout(r, 1));
+  }
+  assert.equal((await api('/api/auth/password', { huidig: 'werk', nieuw: 'werk-nieuw' }, lid.token)).status, 200);
+  const oud = await api('/api/supplier/state', {}, werk.token);
+  assert.equal(oud.status, 401, 'een afgeleide werk-token overleeft de accountintrekking niet');
+});
+
+test('uit dienst maakt een al geopende persoonlijke supplier-sessie meteen nutteloos', async () => {
+  const werk = await json(await api('/api/supplier/mijn/login', {
+    login: 'nora@rtg.example', password: 'werk-nieuw', bedrijf: 'VORA'
+  }));
+  const roster = await json(await api('/api/supplier/roster', { code: 'VORA' }));
+  const manager = roster.staff.find(x => x.role === 'manager');
+  const beheer = await json(await api('/api/supplier/login', {
+    code: 'VORA', staffId: manager.id, pin: '1234'
+  }));
+  assert.equal((await api('/api/supplier/staff/remove', { staffId: werk.actor.staffId }, beheer.token)).status, 200);
+  assert.equal((await api('/api/supplier/state', {}, werk.token)).status, 401,
+    'de centrale requestpoort leest het levende dienstverband opnieuw');
+});

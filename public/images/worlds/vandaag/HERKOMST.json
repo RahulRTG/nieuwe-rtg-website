@@ -1,0 +1,16 @@
+{
+  "asset": "wereld-atlas.jpg",
+  "sha256": "a1885707023eb3cfabecabcd55616a8236a0bd37e7e2c27ff2d229636fc2e59c",
+  "gemaakt_op": "2026-09-04",
+  "generator": "OpenAI ingebouwde ImageGen",
+  "doel": "Vier fotografische achtergronden voor de Today-startschermen van LivingOS, WorkOS, TravelOS en FoundationOS.",
+  "indeling": {
+    "linksboven": "LivingOS: moderne kustvilla bij zonsondergang",
+    "rechtsboven": "WorkOS: directiekantoor in Amsterdam tijdens het blauwe uur",
+    "linksonder": "TravelOS: privejet en chauffeurauto op een natte landingsbaan",
+    "rechtsonder": "FoundationOS: diverse generaties in een Amsterdamse buurttuin"
+  },
+  "verklaring": "AI-gegenereerd voor RTG. Geen extern stockbeeld, geen echte personen en geen zichtbare merken gebruikt.",
+  "referentie": "Gebaseerd op de door de opdrachtgever goedgekeurde sfeer en interface-richting; de referentiebeelden zijn niet gekopieerd.",
+  "prompt": "Use case: photorealistic-natural. Asset type: four cinematic background plates for a premium RTG Today interface concept. Input images: the two attached RTG landing-page screenshots are style and mood references only; do not copy any UI, logo, typography, text, cards, buttons, or people from them. Primary request: create one square 2x2 editorial contact sheet with four equal edge-to-edge photographic scenes, each usable as a dark luxury interface background. Scene/backdrop: top left LivingOS - serene modern coastal villa terrace at warm dusk, inviting and personal; top right WorkOS - refined private office high above Amsterdam at blue hour, walnut desk, architectural glass, focused and executive; bottom left TravelOS - private jet and discreet chauffeur vehicle on a rain-polished runway at sunset, cinematic journey energy; bottom right FoundationOS - elegant documentary scene of a diverse multigenerational volunteer group planting an urban community garden in Amsterdam at golden hour, dignified and hopeful. Style/medium: high-end editorial hospitality photography, understated European luxury, natural materials, believable photography, cinematic but not glossy advertising. Composition/framing: each quadrant must be a clean standalone wide-feeling scene with the main subject weighted to the right and generous darker negative space on the left for interface copy; straight grid split at exactly 50 percent horizontally and vertically; no gutters or frame. Lighting/mood: warm amber practical lights, deep brown and midnight shadows, quiet confidence, cohesive color grade across all four quadrants. Constraints: absolutely no text, no lettering, no logo, no UI, no borders, no watermark; no duplicated scene; no distorted hands or faces; no visible luxury brand marks. Avoid: collage labels, split-screen dividers, excessive saturation, fantasy architecture, sterile stock-photo smiles."
+}

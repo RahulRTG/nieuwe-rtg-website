@@ -68,7 +68,6 @@ const SLEUTELS = {
   'POST /api/supplier/betaalverzoek': { zelfdeVerzoek: true },         // codename + bedrag
   'POST /api/pay/verzoek': { zelfdeVerzoek: true },                    // aan + totaalCenten
   'POST /api/supplier/giftcard/sell': { zelfdeVerzoek: true },         // bedrag
-  'POST /api/supplier/staff/invite': { zelfdeVerzoek: true },          // naam + rol + functie
 
   /* De tien bureaus van de werkplek delen een vorm: `doe('atelier', 'ontwerpMaak',
      'body')` maakt uit de body een ontwerp of een collectie. Tien routes, een

@@ -31,6 +31,7 @@ let resultaat = {
   formaat: 'rtg-staging-bewijs-v1',
   gestart: new Date().toISOString(),
   geslaagd: false,
+  bron: require('./lib/stempel').exactStempel(),
   omgeving: { afhankelijkheden: 0, opslag: 'geisoleerde-json-staging', bind: '127.0.0.1' },
   controles: {}
 };

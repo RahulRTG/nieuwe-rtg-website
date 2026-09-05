@@ -22,7 +22,7 @@ Dezelfde volgorde als bij `OBJECTMODEL.json` (waar `Asset` sneuvelde) en
 
 `npm run verstrengeling` → `VERSTRENGELING.json`
 
-<!--getal:verstrengeling.randen-->1748<!--/getal--> randen tussen de knopen van dit huis, waarvan er
+<!--getal:verstrengeling.randen-->1838<!--/getal--> randen tussen de knopen van dit huis, waarvan er
 <!--getal:verstrengeling.onverklaard-->0<!--/getal--> **onverklaard** zijn. Dat getal moet naar nul, en het
 aantal randen niet: een huis waarin domeinen elkaar nooit nodig hebben, is geen
 huis maar een map met losse programma's.
@@ -47,7 +47,7 @@ kern** — `SEMANTIEK.json` laat zien dat hetzelfde woord op drie plekken nog ge
 gedeelde betekenis is.
 
 Omgekeerd staat er wat er breekt als iets er niet is:
-<!--getal:verstrengeling.uitneembaar-->60<!--/getal--> van de <!--getal:verstrengeling.domeinen-->568<!--/getal--> domeinen sleept géén ander
+<!--getal:verstrengeling.uitneembaar-->60<!--/getal--> van de <!--getal:verstrengeling.domeinen-->595<!--/getal--> domeinen sleept géén ander
 domein mee. Bovenaan de andere kant staat `eigencollectie` met 246: dat is geen
 domein meer maar een verborgen kern, en dat is een besluit (noem het kern) of
 werk (breng de koppelingen terug).

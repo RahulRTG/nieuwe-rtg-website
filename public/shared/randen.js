@@ -30,6 +30,9 @@
 (function (w, d) {
   'use strict';
   if (w.RTGRanden) return;
+  var inKader = false;
+  try { inKader = w.self !== w.top; } catch (e) { inKader = true; }
+  var isEmbed = inKader || new URLSearchParams(w.location.search).get('embed') === '1';
 
   /* Alle Foundation-schermen laden deze module al. Dat maakt dit de ene,
      bestaande ingang voor de nieuwe Foundation-rand, zonder tientallen
@@ -51,9 +54,9 @@
        links en de balk onderin die elk ander wereldhuis wel heeft.
        Deze tak leest de wereld uit de PAGINA zelf (`data-rtg-world`), zodat er
        geen vierde lijst adressen bijkomt die kan gaan afwijken. */
-    if (!wereld && d.body && d.body.dataset.rtgWorld && (w.RTGEdgeWorlds || { travel: 1 })[d.body.dataset.rtgWorld] !== undefined) wereld = d.body.dataset.rtgWorld;
+    if (d.body && ['living', 'work', 'travel', 'foundation'].includes(d.body.dataset.rtgWorld)) wereld = d.body.dataset.rtgWorld;
     if (!wereld) return false;
-    if (new URLSearchParams(w.location.search).get('embed') === '1') {
+    if (isEmbed) {
       d.body.classList.add('rtg-edge-embed');
       d.body.dataset.rtgWorld = wereld;
       var ingebedBlad = d.createElement('link'); ingebedBlad.rel = 'stylesheet';
@@ -84,7 +87,7 @@
     });
     return true;
   }
-  if (startFoundationEdge() && new URLSearchParams(w.location.search).get('embed') === '1') return;
+  if (startFoundationEdge() && isEmbed) return;
 
   var RAND = 24;   // hoe dicht bij de rand een haal mag beginnen
   var HAAL = 40;   // hoeveel pixels de goede kant op voordat hij opengaat

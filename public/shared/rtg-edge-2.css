@@ -1,0 +1,217 @@
+/* RTG Edge 2.0 verbetert het bestaande Edge-casco en tekent geen eigen balken. */
+body[data-rtg-edge-2]{
+  --edge2-bg:var(--edge-bg,#080807);--edge2-panel:var(--edge-panel,#0c0c0b);
+  --edge2-copy:var(--edge-copy,#f2eee8);--edge2-dim:var(--edge-dim,#898582);
+  --edge2-line:var(--edge-line,rgba(255,255,255,.1));--edge2-accent:var(--edge-accent,#7f1634);
+  --edge2-accent-soft:var(--edge-accent-soft,rgba(127,22,52,.15));--edge2-metal:var(--edge-metal,#c0a544)
+}
+body[data-rtg-edge-2][data-rtg-world="living"]{
+  --edge2-bg:#f4f0e8;--edge2-panel:#fbf8f2;--edge2-copy:#211e19;--edge2-dim:#675f54;
+  --edge2-line:rgba(33,30,25,.16);--edge2-accent:#b89545;--edge2-accent-soft:rgba(184,149,69,.14);--edge2-metal:#745718
+}
+body[data-rtg-edge-2][data-rtg-world="travel"]{
+  --edge2-bg:#14090e;--edge2-panel:#231016;--edge2-copy:#f7f0e6;--edge2-dim:#c2b2aa;
+  --edge2-line:rgba(247,240,230,.16);--edge2-accent:#7f1634;--edge2-accent-soft:rgba(127,22,52,.22);--edge2-metal:#d0b77b
+}
+body[data-rtg-edge-2][data-rtg-world="work"]{
+  --edge2-bg:#0c1112;--edge2-panel:#141b1c;--edge2-copy:#f0f2ec;--edge2-dim:#aab6b2;
+  --edge2-line:rgba(240,242,236,.15);--edge2-accent:#75b8b1;--edge2-accent-soft:rgba(117,184,177,.16);--edge2-metal:#c1a45f
+}
+body[data-rtg-edge-2][data-rtg-world="foundation"]{
+  --edge2-bg:#071522;--edge2-panel:#0b2032;--edge2-copy:#f2f2ea;--edge2-dim:#aebccc;
+  --edge2-line:rgba(242,242,234,.16);--edge2-accent:#d0b66e;--edge2-accent-soft:rgba(208,182,110,.16);--edge2-metal:#d0b66e
+}
+
+body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"] .rtg-edge-chrome{
+  --edge-bg:var(--edge2-bg);--edge-panel:var(--edge2-panel);--edge-copy:var(--edge2-copy);
+  --edge-dim:var(--edge2-dim);--edge-line:var(--edge2-line);--edge-accent:var(--edge2-accent);
+  --edge-accent-soft:var(--edge2-accent-soft);--edge-metal:var(--edge2-metal)
+}
+body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"] .rtg-edge-top,
+body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"] .rtg-edge-side,
+body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"] .rtg-edge-bottom{
+  visibility:visible;pointer-events:auto;transition:transform .24s cubic-bezier(.2,.8,.2,1),visibility 0s
+}
+body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="overview"] .rtg-edge-top,
+body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="overview"] .rtg-edge-side,
+body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="overview"] .rtg-edge-bottom{transform:none!important}
+body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="compact"] .rtg-edge-top{transform:translateY(-101%)!important;visibility:hidden;pointer-events:none}
+body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="compact"] .rtg-edge-side{transform:translateX(-101%)!important;visibility:hidden;pointer-events:none}
+body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="compact"] .rtg-edge-bottom{transform:none!important}
+body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="focus"] .rtg-edge-top{transform:translateY(-101%)!important;visibility:hidden;pointer-events:none}
+body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="focus"] .rtg-edge-side{transform:translateX(-101%)!important;visibility:hidden;pointer-events:none}
+body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="focus"] .rtg-edge-bottom{transform:translateY(101%)!important;visibility:hidden;pointer-events:none}
+body.rtg-edge-host[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="compact"]{padding-top:0!important;padding-left:0!important;padding-bottom:calc(var(--edge-bottom) + env(safe-area-inset-bottom,0px))!important}
+body.rtg-edge-host[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="focus"]{padding:0!important}
+/* De ruimtelijke werktafel ligt zelf fixed en volgt daarom niet de body-inset.
+   Laat haar exact dezelfde zichtbare randen volgen wanneer Edge inklapt. */
+body.rtg-edge-workspace[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="compact"] .rtg-werkruimte{inset:0 0 calc(var(--edge-bottom) + env(safe-area-inset-bottom,0px)) 0!important}
+body.rtg-edge-workspace[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="focus"] .rtg-werkruimte{inset:0!important}
+
+/* Een zichtbaar modaal venster is tijdelijk het hele werkvlak. Het bestaande
+   Edge-casco trekt daarvoor weg en komt na sluiten in exact zijn vorige stand
+   terug; er ontstaat dus geen tweede balk en de dialoog blijft bedienbaar. */
+body[data-rtg-edge-2-rendered="true"][data-rtg-edge-venster-open="true"] .rtg-edge-top{transform:translateY(-101%)!important;visibility:hidden!important;pointer-events:none!important}
+body[data-rtg-edge-2-rendered="true"][data-rtg-edge-venster-open="true"] .rtg-edge-side{transform:translateX(-101%)!important;visibility:hidden!important;pointer-events:none!important}
+body[data-rtg-edge-2-rendered="true"][data-rtg-edge-venster-open="true"] .rtg-edge-bottom{transform:translateY(101%)!important;visibility:hidden!important;pointer-events:none!important}
+body[data-rtg-edge-2-rendered="true"][data-rtg-edge-venster-open="true"] .rtg-edge-2-reveal{display:none!important}
+
+.rtg-edge-2-modes{display:grid;grid-template-columns:1fr 1fr;gap:1px;margin-top:18px;border:1px solid var(--edge2-line);background:var(--edge2-line)}
+.rtg-edge-2-modes>strong{grid-column:1/-1;padding:9px 10px;background:var(--edge2-panel);color:var(--edge2-dim);font-size:8px;letter-spacing:.14em;text-transform:uppercase}
+.rtg-edge-2-mode{min-height:44px!important;padding:8px 10px!important;background:var(--edge2-panel)!important;color:var(--edge2-copy)!important;text-align:left;font-size:8px!important;letter-spacing:.08em;text-transform:uppercase}
+.rtg-edge-2-mode[aria-pressed="true"]{box-shadow:inset 3px 0 0 var(--edge2-accent);color:var(--edge2-metal)!important;background:color-mix(in srgb,var(--edge2-accent) 10%,var(--edge2-panel))!important}
+.rtg-edge-2-mode:focus-visible,.rtg-edge-2-context-button:focus-visible,.rtg-edge-2-context-close:focus-visible,.rtg-edge-2-reveal:focus-visible{outline:2px solid var(--edge2-metal)!important;outline-offset:2px}
+
+.rtg-edge-2-reveal{position:fixed;z-index:8810;left:max(8px,env(safe-area-inset-left,0px));top:50%;display:none;width:44px;height:44px;padding:0;border:1px solid var(--edge2-line)!important;border-radius:50%;background:color-mix(in srgb,var(--edge2-bg) 94%,transparent)!important;color:var(--edge2-metal)!important;box-shadow:0 10px 30px #0007;pointer-events:auto;transform:translateY(-50%);place-items:center}
+.rtg-edge-2-reveal::before,.rtg-edge-2-reveal::after{content:"";position:absolute;width:14px;height:1px;background:currentColor;transform-origin:center}
+.rtg-edge-2-reveal::before{transform:rotate(45deg) translateY(-4px)}
+.rtg-edge-2-reveal::after{transform:rotate(-45deg) translateY(4px)}
+body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="focus"] .rtg-edge-2-reveal{display:grid}
+
+.rtg-edge-2-context-button{min-height:30px!important;flex:0 0 auto;padding:0 10px!important;border:1px solid var(--edge2-line)!important;color:var(--edge2-metal)!important;font-size:7px!important;letter-spacing:.1em;text-transform:uppercase}
+.rtg-edge-2-context-button[aria-expanded="true"]{background:color-mix(in srgb,var(--edge2-accent) 18%,transparent)!important}
+.rtg-edge-2-context{position:absolute;z-index:8;left:var(--edge-side);right:0;bottom:calc(var(--edge-bottom) + env(safe-area-inset-bottom,0px));max-height:min(68vh,620px);overflow:auto;border-top:1px solid var(--edge2-line);background:color-mix(in srgb,var(--edge2-panel) 98%,transparent);box-shadow:0 -24px 70px #0008;pointer-events:auto}
+.rtg-edge-2-context[hidden]{display:none!important}
+.rtg-edge-2-context-head{position:sticky;z-index:2;top:0;min-height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-bottom:1px solid var(--edge2-line);background:var(--edge2-panel)}
+.rtg-edge-2-context-head strong{color:var(--edge2-dim);font-size:8px;letter-spacing:.14em;text-transform:uppercase}
+.rtg-edge-2-context-close{min-width:44px;min-height:44px;color:var(--edge2-copy)!important;font-size:8px!important;letter-spacing:.08em;text-transform:uppercase}
+.rtg-edge-2-context-slot{display:grid;gap:1px;padding:10px;background:color-mix(in srgb,var(--edge2-line) 32%,transparent)}
+.rtg-edge-2-context-slot>[data-rtg-edge-2-contextual]{position:static!important;inset:auto!important;z-index:auto!important;width:100%!important;max-width:none!important;height:auto!important;min-height:44px!important;margin:0!important;transform:none!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;background-color:var(--edge2-panel)!important}
+.rtg-edge-2-context-slot .wereldtabs,.rtg-edge-2-context-slot .wereldapps,.rtg-edge-2-context-slot .hoofdtabs,.rtg-edge-2-context-slot .rtgdeel-balk,.rtg-edge-2-context-slot .ws-balk{display:flex!important;overflow-x:auto!important;flex-wrap:nowrap!important}
+.rtg-edge-2-context-slot .wk-bank,.rtg-edge-2-context-slot .bank{display:flex!important;flex-direction:column!important;overflow:visible!important;padding:10px!important}
+.rtg-edge-2-context-slot .wk-bank nav,.rtg-edge-2-context-slot .bank nav{display:flex!important;flex-direction:row!important;overflow-x:auto!important;padding:0!important}
+.rtg-edge-2-context-slot .wk-bank footer{position:static!important;display:flex!important;padding:0!important}
+.rtg-edge-2-context-slot .wk-top,.rtg-edge-2-context-slot .topbar,.rtg-edge-2-context-slot>header{display:flex!important;overflow-x:auto!important;padding:8px 10px!important;border:0!important}
+.rtg-edge-2-context-slot .prestatiekop .rtgmerk{display:none!important}
+
+body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="wereldtabs"] .wereldtabs:not([data-rtg-edge-2-contextual]),
+body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="wereldapps"] .wereldapps:not([data-rtg-edge-2-contextual]),
+body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="hoofdtabs"] .hoofdtabs:not([data-rtg-edge-2-contextual]),
+body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="rtgdeel-balk"] .rtgdeel-balk:not([data-rtg-edge-2-contextual]),
+body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="duimbalk"] .rtg-duimbalk:not([data-rtg-edge-2-contextual]),
+body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="world-shell"] .ws-balk:not([data-rtg-edge-2-contextual]),
+body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="travel-header"]>.reisapp>.prestatiekop:not([data-rtg-edge-2-contextual]),
+body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="native-header"]>header:not(.rtg-edge-top):not([data-rtg-edge-2-contextual]){display:none!important}
+/* Zodra de onderrand een bestaande duimhandeling aantoonbaar heeft
+   overgenomen, blijft de oorspronkelijke vaste strook als veilige fallback in
+   de DOM maar is hij niet ook nog eens zichtbaar. */
+body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-hoofdactie="edge"]>.rtg-duimbalk{display:none!important}
+body[data-rtg-edge-2-rendered="true"]>.ios-thuis,
+body[data-rtg-edge-2-rendered="true"] #osMenuBtn,
+body[data-rtg-edge-2-rendered="true"] .amn-zweef{display:none!important}
+body[data-rtg-edge-2-rendered="true"][data-ios]{--ios-thuis-ruimte:0px!important}
+
+/* WerkOS bouwt zijn echte tabknoppen dynamisch. In een Edge-scherm liggen die
+   knoppen IN de actieruimte van dezelfde onderrand: geen tweede zwevende balk,
+   geen gekloonde handlers en geen onbereikbare tab onder een Edge-knop. */
+body[data-rtg-edge-2-rendered="true"]:is(.wos-aan,.wos-bord-aan):has(>.wos-dock) .rtg-edge-action{pointer-events:none;padding:0!important}
+body[data-rtg-edge-2-rendered="true"]:is(.wos-aan,.wos-bord-aan):has(>.wos-dock) .rtg-edge-action::before,
+body[data-rtg-edge-2-rendered="true"]:is(.wos-aan,.wos-bord-aan):has(>.wos-dock) .rtg-edge-action>button{display:none!important}
+body[data-rtg-edge-2-rendered="true"]>.wos-dock{
+  z-index:8801!important;left:calc(var(--edge-side) + 154px)!important;right:68px!important;
+  bottom:env(safe-area-inset-bottom,0px)!important;width:auto!important;max-width:none!important;
+  height:var(--edge-bottom)!important;transform:none!important;justify-content:center!important;
+  overflow-x:auto!important;overflow-y:hidden!important;border:0!important;background:transparent!important;
+  box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important
+}
+body[data-rtg-edge-2-rendered="true"]>.wos-dock button{flex:0 1 48px;min-width:24px;height:var(--edge-bottom)!important;pointer-events:auto}
+
+/* RTG Wereld heeft vijf echte, reeds gebonden hoofdkeuzes. Zij delen de
+   actieruimte van de ene Edge-onderrand; de oorspronkelijke nav blijft dus de
+   eigenaar van links, focus en aria-current, zonder een tweede balk of kloon. */
+body[data-rtg-edge-2-rendered="true"]:has(>nav.balk[aria-label="Hoofdnavigatie"]) .rtg-edge-action{pointer-events:none;padding:0!important}
+body[data-rtg-edge-2-rendered="true"]:has(>nav.balk[aria-label="Hoofdnavigatie"]) .rtg-edge-action::before,
+body[data-rtg-edge-2-rendered="true"]:has(>nav.balk[aria-label="Hoofdnavigatie"]) .rtg-edge-action>button{display:none!important}
+body[data-rtg-edge-2-rendered="true"]>nav.balk[aria-label="Hoofdnavigatie"]{
+  z-index:8801!important;top:auto!important;left:calc(var(--edge-side) + 154px)!important;right:68px!important;
+  bottom:env(safe-area-inset-bottom,0px)!important;width:auto!important;max-width:none!important;
+  height:var(--edge-bottom)!important;padding:0!important;transform:none!important;
+  overflow:hidden!important;border:0!important;background:transparent!important;
+  box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important
+}
+body[data-rtg-edge-2-rendered="true"]>nav.balk[aria-label="Hoofdnavigatie"] a{
+  min-width:24px;height:var(--edge-bottom)!important;padding:3px 2px!important;pointer-events:auto
+}
+
+/* Focus en een modaal werkvlak trekken ook app-eigen bediening mee. Anders
+   zou de Edge-rand verdwijnen terwijl precies dezelfde balk erbuiten bleef. */
+body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="focus"]>.wos-dock,
+body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="focus"]>nav.balk[aria-label="Hoofdnavigatie"],
+body[data-rtg-edge-2-rendered="true"][data-rtg-edge-venster-open="true"]>.wos-dock,
+body[data-rtg-edge-2-rendered="true"][data-rtg-edge-venster-open="true"]>nav.balk[aria-label="Hoofdnavigatie"]{
+  transform:translateY(101%)!important;visibility:hidden!important;pointer-events:none!important
+}
+
+body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="living-bank"] .schil{grid-template-columns:1fr!important;grid-template-rows:1fr!important}
+body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="living-bank"] .schil>.werk{grid-column:1!important}
+body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="world-shell"][data-ws]{--ws-ruimte:0px!important;--ws-eigen:0px!important}
+body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="work-bank"]>.wk-shell{grid-template-columns:1fr!important;grid-template-rows:1fr!important;height:auto!important}
+body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="work-bank"]>.wk-shell>.wk-main{grid-row:1!important;grid-template-rows:1fr!important}
+body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="work-bank"][data-rtg-edge-2-state="overview"]>.wk-shell{inset:calc(var(--rtg-vandaag-werk-kop,0px) + var(--edge-top) + env(safe-area-inset-top,0px)) 0 calc(var(--edge-bottom) + env(safe-area-inset-bottom,0px)) var(--edge-side)!important}
+body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="work-bank"][data-rtg-edge-2-state="compact"]>.wk-shell{inset:var(--rtg-vandaag-werk-kop,0px) 0 calc(var(--edge-bottom) + env(safe-area-inset-bottom,0px)) 0!important}
+body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="work-bank"][data-rtg-edge-2-state="focus"]>.wk-shell{inset:var(--rtg-vandaag-werk-kop,0px) 0 0!important}
+body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="work-bank"][data-rtg-edge-2-state="overview"]>.rtg-vandaag-luxe[data-modus="surface"]{top:calc(var(--edge-top) + env(safe-area-inset-top,0px))!important}
+body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="work-bank"]>.rtg-vandaag-luxe[data-modus="surface"]{height:var(--rtg-vandaag-werk-kop,auto)}
+
+@media(max-width:767px){
+  body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"] .rtg-edge-side{display:none!important}
+  body.rtg-edge-host[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="overview"]{padding-left:0!important}
+  body.rtg-edge-workspace[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="overview"] .rtg-werkruimte{left:0!important}
+  body[data-rtg-edge-2-rendered="true"]>.wos-dock{left:calc(var(--edge-side) + 99px)!important;right:58px!important}
+  /* Op een telefoon vervangt de wereldnav de dubbele Edge-home, maar behoudt
+     zij menu, terug/vooruit en Rahul. Zo krijgen de vijf keuzes samen ook op
+     320 px echte raakruimte binnen dezelfde enkele onderrand. */
+  body[data-rtg-edge-2-rendered="true"]:has(>nav.balk[aria-label="Hoofdnavigatie"]) .rtg-edge-bottom{
+    grid-template-columns:var(--edge-side) 59px minmax(0,1fr) 58px!important
+  }
+  body[data-rtg-edge-2-rendered="true"]:has(>nav.balk[aria-label="Hoofdnavigatie"]) .rtg-edge-bottom>a{
+    display:none!important
+  }
+  body[data-rtg-edge-2-rendered="true"]>nav.balk[aria-label="Hoofdnavigatie"]{
+    left:calc(var(--edge-side) + 59px)!important;right:58px!important;
+    display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr));overflow:hidden!important
+  }
+  body[data-rtg-edge-2-rendered="true"]>nav.balk[aria-label="Hoofdnavigatie"] a{
+    min-width:0!important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.5rem!important
+  }
+  .rtg-edge-2-context{left:0}
+  .rtg-edge-2-context-button span{display:none}
+  .rtg-edge-2-context-button{width:36px;padding:0!important}
+  .rtg-edge-2-context-button::before{content:"+";font-size:14px}
+  .rtg-edge-2-context-slot{padding:6px}
+  body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="work-bank"][data-rtg-edge-2-state="overview"]>.wk-shell{left:0!important}
+}
+@media(max-width:340px){
+  /* De toegankelijke naam blijft op de link; alleen het herhaalde tekstlabel
+     wijkt op het allerkleinste scherm voor het herkenningsteken. */
+  body[data-rtg-edge-2-rendered="true"]>nav.balk[aria-label="Hoofdnavigatie"] a{font-size:0!important}
+  body[data-rtg-edge-2-rendered="true"]>nav.balk[aria-label="Hoofdnavigatie"] a span{font-size:.9rem!important}
+  /* Vandaag heeft naast Context en de hoofdactie ook de echte Experience-
+     ingang. Op 320 px passen die alleen eerlijk als decoratie wijkt en de
+     tekstuele hoofdactie tot een pijl comprimeert; de toegankelijke naam blijft
+     de volledige knoptekst. Alle drie houden minimaal 24 px raakruimte. */
+  body[data-rtg-world="living"][data-rtg-edge-2-rendered="true"] .rtg-edge-action:has(>.xp-trigger){
+    gap:2px!important;padding:0 2px!important
+  }
+  body[data-rtg-world="living"][data-rtg-edge-2-rendered="true"] .rtg-edge-action:has(>.xp-trigger)::before{
+    display:none!important
+  }
+  body[data-rtg-world="living"][data-rtg-edge-2-rendered="true"] .rtg-edge-action>.rtg-edge-2-context-button{
+    width:28px!important;min-width:28px!important;padding:0!important
+  }
+  body[data-rtg-world="living"][data-rtg-edge-2-rendered="true"] .rtg-edge-action>button:not(.rtg-edge-2-context-button):not(.xp-trigger){
+    width:24px!important;min-width:24px!important;max-width:24px!important;font-size:0!important
+  }
+  body[data-rtg-world="living"][data-rtg-edge-2-rendered="true"] .rtg-edge-action>button:not(.rtg-edge-2-context-button):not(.xp-trigger)::after{
+    content:"\2192";font-size:14px!important
+  }
+  body[data-rtg-world="living"][data-rtg-edge-2-rendered="true"] .rtg-edge-action>.xp-trigger{
+    width:32px!important;min-width:32px!important;height:32px!important
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  body[data-rtg-edge-2] .rtg-edge-top,body[data-rtg-edge-2] .rtg-edge-side,body[data-rtg-edge-2] .rtg-edge-bottom{transition:none!important}
+}
+@media print{
+  .rtg-edge-2-reveal,.rtg-edge-2-context{display:none!important}
+}

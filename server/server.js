@@ -54,13 +54,21 @@ const rtgKlok = require('./lib/klok');
 /* De hashketen onder het inlog-auditlog; zie logInlog verderop voor waarom juist
    dat log eraan hangt. */
 const { noteerIn: ketenNoteerIn, verifieer: ketenVerifieer, top: ketenTop } = require('./lib/keten');
-const { db, load, save, bijeen, inBundel, bewerkCollectie, DATA_DIR, STORE, opslagKlaar, pgPoolStatus, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten, onExternalChange, grootSupplierSync, grootAantal,
+const { db, load, save, bijeen, inBundel, bewerkCollectie, economischeBoekingEenmaal, DATA_DIR, STORE, opslagKlaar: opslagMotorKlaar, pgPoolStatus, postgresSchrijfStand, postgresVerzoekMiddleware, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten, onExternalChange, grootSupplierSync, grootAantal,
   ledenGidsActief, ledenGidsHaal, ledenGidsAantal, ledenGidsZet, ledenGidsWeg, ledenGidsExact, ledenGidsZoek, ledenGidsHaalWacht,
   orderMetRef, ordersVanKlant, ordersVanZaak, ordersVoegToe,
   boekingMetRef, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,
   directBetalingMetRef, directBetalingenVanKlant, directBetalingenVanZaak, directBetalingenVoegToe,
   betaalVerzoekMetRef, betaalVerzoekenVoorCodenaam, betaalVerzoekenVanZaak, betaalVerzoekenVoegToe,
   txLedgerActief, txLedgerVanKlant, txLedgerVanZaak, txLedgerTel, txLedgerAantal, checkpointSqlite, checkpointGrootboek } = require('./db');
+/* De opslagmotor kan technisch geladen zijn terwijl een verplichte
+   datamigratie nog niet gecommitte is. Verkeer blijft dan dicht; een groene
+   motorstatus alleen is geen groene applicatiestatus. */
+let salonMigratieKlaar = false;
+let rtfSamenMigratieKlaar = false;
+let boardingPassMigratieKlaar = false;
+const opslagKlaar = () => opslagMotorKlaar() && accounts.postgresKlaar() &&
+  salonMigratieKlaar && rtfSamenMigratieKlaar && boardingPassMigratieKlaar;
 const i18n = require('./translate');
 const accounts = require('./accounts');
 const eigenaar = require('./eigenaar');
@@ -173,8 +181,9 @@ process.on('uncaughtException', err => {
    4. Buiten productie: gewoon de header, want daar draait het op wisselende
       poorten en is dit precies wat je wilt.
 
-   De config-controle waarschuwt al als APP_URL in productie ontbreekt; deze
-   functie zorgt dat die waarschuwing ook gevolgen heeft. */
+   De config-controle weigert inmiddels iedere productiestart zonder een vast
+   geldig APP_URL; deze terugval blijft alleen extra verdediging voor het geval
+   deze helper ooit vóór de configuratiekeuring wordt aangeroepen. */
 const APP_URL_VAST = (() => {
   const gezet = String(process.env.APP_URL || '').trim();
   if (gezet) return gezet.replace(/\/+$/, '');
@@ -462,6 +471,7 @@ if (zaakdoos.actief) {
 const PRODUCTION = process.env.NODE_ENV === 'production';
 const { schild, ssrf, zetWacht, zetRtgai } = require('./opzet/verzoekketen')({
   app, express, log, logboek, db, save, betaal, betaalWaarheid, muntbetaal, zaakdoos, PRODUCTION,
+  postgresVerzoekMiddleware,
   opslagKlaar: () => opslagKlaar(),
   // alle drie pas verderop in dit bestand gebouwd; lui doorgegeven
   beveiligVan: () => beveilig,
@@ -552,7 +562,7 @@ function alcoholGrensVan(s) {
 // maak…(state)-fabriek; de Map komt terug zodat het herstel-/migratiepad in
 // initRealtime er ongewijzigd op blijft werken.
 const { maakSessies } = require('./kern/sessies');
-const { sessions, tokenHash, rememberSession, forgetSession, sessionFor,
+const { sessions, tokenHash, rememberSession, forgetSession, forgetSessionDuurzaam, sessionFor,
   koppelBus: koppelSessiesBus, herbouwSessions, TOKEN_TTL_MS } =
   maakSessies({ db, save, crypto,
     // lui: accounts is hier al geladen, maar de pijl houdt de volgorde vrij
@@ -717,7 +727,7 @@ function securityLogKeten() {
    bestaan hier nog niet; die komen daarom als getter binnen (zie de kop daar). */
 const { sseToSupplier, sseToOffice, notifySupplier, supplierIndex,
   findSupplier, supplierAuth, persoonsPoort, logActivity } =
-  require('./opzet/leverancierpoort')({ db, save, crypto, rtgKlok, sessionFor, DEMO,
+  require('./opzet/leverancierpoort')({ db, save, crypto, rtgKlok, sessionFor, DEMO, accounts,
     grootSupplierSync, busGeef: () => bus, kernGeef: () => kern });
 
 /* De dienstenlaag -- live updates (SSE), meldingen en web-push, en de diensten
@@ -764,6 +774,37 @@ zetWacht(wacht);
    uit; iedereen chat in de eigen taal en de ander leest alles in de zijne. Vroeg
    opgezet zodat de leden-laag (en alles daarna) taalVan kan gebruiken. */
 const talen = maakTalen({ db, save });
+/* Salon-claimcodes zijn bearers en delen daarom een eigen transactionele kern
+   tussen de leden- en leveranciersroute. Hij staat vóór de ledenprojectie,
+   zodat die uitsluitend statusmetadata en nooit de kale code teruggeeft. */
+const salonClaimcode = require('./kern/salon-claimcode')({
+  db, save, bewerkCollectie, crypto
+});
+/* PostgreSQL neemt zijn waarheid pas asynchroon over; die variant draait daarom
+   in startPostgresMetSalon en niet vóór de pull. De drie lokale migraties
+   draaien verderop samen, zodra ook Samen en Luchthaven zijn opgebouwd. */
+const startPostgresMetSalon = () => {
+  /* opslagstart roept deze ingang voor elke motor aan. Een lokale standby mag
+     daardoor niet via de inerte Postgres-tak ten onrechte "gemigreerd" worden. */
+  if (STORE !== 'postgres') return Promise.resolve(false);
+  salonMigratieKlaar = false;
+  rtfSamenMigratieKlaar = false;
+  boardingPassMigratieKlaar = false;
+  return Promise.resolve(startPostgres(async () => {
+    await salonClaimcode.migreerAlles();
+    if (!kern.samenRtf || typeof kern.samenRtf.migreerAlles !== 'function')
+      throw new Error('FoundationOS Samen-migratie ontbreekt bij de opslagstart.');
+    await kern.samenRtf.migreerAlles();
+    if (!kern.lucht || typeof kern.lucht.migreerBoardingPasses !== 'function')
+      throw new Error('TravelOS boarding-passmigratie ontbreekt bij de opslagstart.');
+    await kern.lucht.migreerBoardingPasses();
+  })).then(gestart => {
+    salonMigratieKlaar = true;
+    rtfSamenMigratieKlaar = true;
+    boardingPassMigratieKlaar = true;
+    return gestart;
+  });
+};
 // De leden-kern wordt vóór de sociale laag gebouwd; deps.zijnVrienden wordt
 // hieronder laat-gebonden gevuld zodra de vriendenlaag bestaat (voor de
 // Salon-zichtbaarheid: van een vriend zie je een bericht altijd).
@@ -771,6 +812,7 @@ const talen = maakTalen({ db, save });
    verderop gemount, en de ledenfacturen worden pas op request-tijd opgebouwd.
    Zonder deze regel viel lid.js terug op eigen, hard ingetikte bedragen. */
 const lidDeps = { db, accounts, PERSONAS, findSupplier, i18n, rtf, talen, leeftijdVan, leeftijdsgroepVan, geborenVan,
+  salonClaimcode,
   geldPasprijzen: () => (kern.geldPasprijzen ? kern.geldPasprijzen() : null) };
 const lidKern = maakLid(lidDeps);
 const { hasContact, addContact, canEngage, engageError, registerContact, stateFor, myApplications,
@@ -858,12 +900,19 @@ app.get('/api/ready', (req, res) => {
   // load balancer (het boot-bottleneck-risico bij een herstart onder druk).
   let klaar = dataOk;
   try { klaar = opslagKlaar(); } catch (e) { klaar = false; }
+  let intrekking = { gekoppeld: false, soort: 'geen', gereed: false };
+  try { intrekking = require('./kern/intreksignaal').stand(); } catch (e) {}
+  const redisGereed = !process.env.REDIS_URL ||
+    (intrekking.gekoppeld && intrekking.soort === 'redis' && intrekking.gereed);
+  klaar = klaar && redisGereed;
   let pool = null;
   try { pool = pgPoolStatus(); } catch (e) { pool = null; }
   res.status(klaar ? 200 : 503).json({
     ready: klaar, data: dataOk, writable: !!db.writable, store: STORE,
+    ...(STORE === 'postgres' ? postgresSchrijfStand() : {}),
     ...(pool ? { pool } : {}),
-    redis: process.env.REDIS_URL ? 'geconfigureerd' : 'uit', up: Math.round(process.uptime())
+    redis: process.env.REDIS_URL ? 'geconfigureerd' : 'uit', redisGereed,
+    intrekking, up: Math.round(process.uptime())
   });
 });
 
@@ -893,10 +942,10 @@ app.post('/api/cluster/:actie', (req, res) => {
     // realtime-tabellen (sessies, notificaties) opnieuw opbouwen.
     db.writable = true;
     db.leider = wordtLeider;
-    try { load(); initRealtime(); } catch (e) {
+    try { load(); migreerLokaleToegang(); initRealtime(); } catch (e) {
       db.writable = false;
       db.leider = false;
-      return res.status(500).json({ error: 'Data laden mislukte: ' + e.message });
+      return res.status(500).json({ error: 'Data laden of migreren mislukte: ' + e.message });
     }
     console.log('[cluster] server ' + nr + (wordtLeider ? ' neemt over en is nu actief' : ' loopt mee en neemt verkeer aan'));
     /* En meteen een backup. backupData() slaat alles over wat geen leider is
@@ -1013,13 +1062,21 @@ function leesUploadDataUrl(fname) {
 /* Live-verbinding. EventSource kan geen Authorization-header sturen, dus het
    token gaat als query-parameter. */
 app.get('/api/stream', (req, res) => {
-  const sess = resolveSession(req.query.token);
+  const token = req.query.token;
+  const sess = resolveSession(token);
   if (!sess) return res.status(401).end();
+  const isolatieRealtime = require('./middleware/isolatiepoort-realtime');
+  const bewaakt = isolatieRealtime.registreer({ res, token, sessie: sess });
+  if (!bewaakt.toegestaan) return res.status(bewaakt.status || 503).json(bewaakt.antwoord);
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache, no-transform',
     'Connection': 'keep-alive'
   });
+  /* Open de SSE-handshake nu. De PostgreSQL-antwoordgrens buffert gewone
+     antwoorden tot COMMIT; voor deze read-only stroom is flushHeaders het
+     expliciete teken dat de stream veilig mag beginnen. */
+  if (typeof res.flushHeaders === 'function') res.flushHeaders();
   res.write('retry: 3000\n\n');
   const client = { tier: sess.tier, key: sess.key, res };
   sseClients.push(client);
@@ -1029,9 +1086,13 @@ app.get('/api/stream', (req, res) => {
   // onopgehaalde notificaties meteen meesturen
   const unread = (db.data.notifications[sess.tier] || []).filter(n => !n.read);
   sseSend(res, 'hello', { unread });
-  const ping = setInterval(() => res.write(': ping\n\n'), 25000);
+  const ping = setInterval(() => {
+    if (!isolatieRealtime.magSchrijven(res)) return clearInterval(ping);
+    res.write(': ping\n\n');
+  }, 25000);
   req.on('close', () => {
     clearInterval(ping);
+    isolatieRealtime.vergeet(res);
     const i = sseClients.indexOf(client);
     if (i >= 0) sseClients.splice(i, 1);
   });
@@ -1138,7 +1199,7 @@ const bestanden = require('./kern/bestanden').maakBestanden({
 /* RTG Meet (kern/meet.js): vergaderkamers op codenaam; de server geeft
    alleen WebRTC-seinen door, beeld en geluid lopen peer-to-peer. */
 const meet = require('./kern/meet').maakMeet({
-  db, save, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer });
+  db, save, bewerkCollectie, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer });
 /* RTG Galerij (kern/galerij.js): leest De Salon en RTG Bestanden; albums
    en favorieten zijn verwijzingen, nooit kopieen van de bytes. */
 const galerij = require('./kern/galerij').maakGalerij({ db, save, crypto, schoon });
@@ -2142,7 +2203,7 @@ const kern = {
   chatKeyOf, chatStuur, checkCred, coachCache, coachRules, conciergeInbox, connectedSupplierCodes, convOf,
   crypto, cvReady, db, bijeen, deptsFor, dirTouch, eisAccount, engageError, ensureApplyChat, foutmelder,
   ensureSupplierDefaults, etaMinutes, eventCovers, express, fallbackRunsheet, financeVoor, dagrapport, shiftSamenvatting, findPartner, findStaffPartner,
-  findSupplier, forgetSession, fs, gcCode, geborenVan, geenGast, idGeverifieerd, generateAiReply,
+  findSupplier, forgetSession, forgetSessionDuurzaam, fs, gcCode, geborenVan, geenGast, idGeverifieerd, generateAiReply,
   guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, klokVan, ledenPrijs,
   eersteBijdrageFactuur, ledenInhoudVan, leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
   mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, handelsketen, agenda, notities, bestanden, bestandenOpslag, meet, galerij, klok, boeken, onderwijs, leerstof, bijles, vervolg, facturatie, factuurSaldo, markt,
@@ -2154,7 +2215,7 @@ const kern = {
   sseSend, sseToCustomer, sseToOffice, sseToSupplier, stateFor, stationsForOrder, supplierAuth, supplierState, persoonsPoort,
   toRad, tokenHash, tooManyTries, totpOk, trChat, trustVan, unlockDoor, urenVan, validDept, veiligGelijk, logInlog,
   securityLogKeten, handelingsspoor, ankerdienst, ankerpost,
-  zorgContact, klantSalon,
+  zorgContact, klantSalon, salonClaimcode,
   // de stemming van Rahul + de geloofslaag (kern/rahul/stemming.js, kern/geloof/)
   geloof, stemmingToon: stemming.stemmingToon, stemmingZet: stemming.stemmingZet,
   stemmingVoor: stemming.stemmingVoor,
@@ -2228,7 +2289,7 @@ const kern = {
    wel wordt gebruikt, valt bij het opstarten meteen om. */
 const hulp = {
   DATA_DIR, FISCAAL_PEILJAAR, LANDEN, PERSONAS, accounts, alcoholGrensVan, annuleerReservering,
-  anthropic, app, archief, betaal, betaalOpdrachten, beveilig, capGezondheid, bijeen, bewerkCollectie, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,
+  anthropic, app, archief, betaal, betaalOpdrachten, beveilig, capGezondheid, bijeen, bewerkCollectie, economischeBoekingEenmaal, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,
   broadcastSync, centen: rondEuro, crypto, db, entreeCode, inBundel, etaMinutes, facturatie, findSupplier, fonds, fooiUit,
   geborenVan, haversine, idGeverifieerd, keyVanCodenaam, klantProfiel, klokVan, ledenAantal,
   ledenPrijs, leeftijdVan, legApart, liveCodename, log, logActivity, loginFails, maakOntmoeting,
@@ -2276,6 +2337,41 @@ require('./opzet/kernlaag6b')(kern, hulp);
 require('./opzet/kernlaag7')(kern, hulp);
 require('./opzet/kernlaag7b')(kern, hulp);   // de routers ophangen; zie de kop daar waarom dat NA alle Object.assign moet
 
+/* JSON/SQLite/geheugen zijn al autoritatief geladen. Verwijder oude kale
+   Salon-, FoundationOS-Samen- en boarding-passcodes daarom vóór een schrijvende
+   instance verkeer kan aannemen. De lokale collectiemotor moet hier synchroon
+   committen; als dat ooit verandert, weigert de start in plaats van een half
+   gemigreerde instance vrij te geven. */
+/* Een losse server begint schrijvend en migreert vóór listen(). Een
+   trio-server begint bewust als standby: die mag de gedeelde SQLite-opslag niet
+   wijzigen en migreert pas in /api/cluster/promote, direct na zijn verse load().
+   Zo blijft opslag fail-closed zonder dat elke gezonde standby in een
+   opstart-crashlus belandt. */
+if (STORE !== 'postgres' && db.writable) migreerLokaleToegang();
+function migreerLokaleToegang() {
+  if (STORE !== 'postgres') {
+    salonMigratieKlaar = false;
+    rtfSamenMigratieKlaar = false;
+    boardingPassMigratieKlaar = false;
+    const salonMigratie = salonClaimcode.migreerAlles();
+    if (salonMigratie && typeof salonMigratie.then === 'function')
+      throw new Error('Lokale Salon-claimcodemigratie committe niet synchroon.');
+    salonMigratieKlaar = true;
+    if (!kern.samenRtf || typeof kern.samenRtf.migreerAlles !== 'function')
+      throw new Error('FoundationOS Samen-migratie ontbreekt bij de opslagstart.');
+    const rtfSamenMigratie = kern.samenRtf.migreerAlles();
+    if (rtfSamenMigratie && typeof rtfSamenMigratie.then === 'function')
+      throw new Error('Lokale FoundationOS Samen-migratie committe niet synchroon.');
+    rtfSamenMigratieKlaar = true;
+    if (!kern.lucht || typeof kern.lucht.migreerBoardingPasses !== 'function')
+      throw new Error('TravelOS boarding-passmigratie ontbreekt bij de opslagstart.');
+    const boardingMigratie = kern.lucht.migreerBoardingPasses();
+    if (boardingMigratie && typeof boardingMigratie.then === 'function')
+      throw new Error('Lokale TravelOS boarding-passmigratie committe niet synchroon.');
+    boardingPassMigratieKlaar = true;
+  }
+}
+
 /* DE TWEE SLOTEN OP PUBLIEK VERKOPEN, aan de commerce-laag gegeven als LEZERS.
 
    Precies dezelfde twee reads als eigenWeb.serveer hierboven doet: de
@@ -2313,7 +2409,8 @@ const { server, backupData } = require('./opzet/start')({
   app, fs, path, PUBLIC_DIR, DATA_DIR, UPLOAD_DIR,
   log, db, accounts, save, eigenaar, webpush, kern,
   checkpointSqlite, checkpointGrootboek,
-  initRealtime, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten,
+  initRealtime, startGedeeld, startSqliteSync,
+  startPostgres: startPostgresMetSalon, flushBijAfsluiten,
   DEMO, PRODUCTION, zetEigenaarsAccount, loginFails, pinSlot, ruimBuffer,
   // voor de kappen in de onderhoudsronde: een weggeknipte snap heeft ook een
   // bestand op schijf (zie kern/kappen.js)

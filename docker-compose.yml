@@ -34,6 +34,11 @@ services:
     image: ${RTG_IMAGE:-rtg-app:local}
     build:
       context: .
+      args:
+        # Dockerfile weigert UNPROVEN. De twee productie-wrappers vullen exact
+        # de vooraf gecontroleerde HEAD in; een losse `compose build` kan dus
+        # geen schijnbaar geattesteerd app-image maken.
+        RTG_RELEASE_COMMIT: ${RTG_RELEASE_COMMIT:-UNPROVEN}
     command: ["node", "scripts/docker/start.js", "app"]
     stop_grace_period: 35s
     environment:
@@ -46,7 +51,9 @@ services:
       RTG_PIN_ENTERPRISE: ${RTG_PIN_ENTERPRISE:-1}
       RTG_MOTOR_SHADOW: http://motor:3100
       RTG_MOTOR_GELD_URL: http://motor:3100
-      RTG_MOTOR_GELD: ${RTG_MOTOR_GELD:-schaduw}
+      # De autoriteitsmodus komt uit het gemounte, gevalideerde productie-
+      # geheim. Hem hier met `schaduw` overschrijven zou een groen gekeurde
+      # motor-cutover bij de echte start ongemerkt terugdraaien.
       # Geen upload wordt vrijgegeven als deze losse engine niet antwoordt.
       RTG_CLAMD_HOST: clamav
       RTG_CLAMD_PORT: 3310
@@ -66,6 +73,9 @@ services:
       - postgres_password
     volumes:
       - rtg-data:/app/server/data
+      # Alleen-lezen en buiten /app: de Foundation-poort kan het externe bewijs
+      # toetsen, maar het app-proces kan het dossier nooit zelf herschrijven.
+      - ./.release:/run/rtg-release:ro
     networks:
       - edge
       - data
@@ -140,6 +150,8 @@ services:
     image: ${RTG_IMAGE:-rtg-app:local}
     build:
       context: .
+      args:
+        RTG_RELEASE_COMMIT: ${RTG_RELEASE_COMMIT:-UNPROVEN}
     command: ["node", "scripts/docker/start.js", "motor"]
     environment:
       NODE_ENV: production
@@ -147,24 +159,200 @@ services:
       RTG_MOTOR_ADDR: 0.0.0.0:3100
       RTG_MOTOR_SALDI: "1"
       RTG_MOTOR_DATA: /app/motor-data/state.json
+      RTG_MOTOR_STATE_KEY_FILE: /run/secrets/rtg-motor-state-key
       RTG_MOTOR_GIDS: /app/motor-data/gids.bin
       RTG_KLUIS_KEY_FILE: /app/motor-data/secret.key
       RTG_KLUIS_DATA: /app/motor-data/kluis.json
     secrets:
       - rtg_env
+      - source: motor_state_key
+        target: rtg-motor-state-key
     volumes:
       - rtg-motor:/app/motor-data
     networks:
       - data
     healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3100/api/leeft',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"]
+      test: ["CMD", "node", "scripts/motor-health.js"]
       interval: 10s
       timeout: 3s
       retries: 5
       start_period: 10s
 
+  # Niet-publieke motor voor de kandidaatkeuring. Het projectgebonden
+  # wegwerpvolume wordt eerst via de expliciete golive-operatorstap gemaakt en
+  # bij opruimen gewist; een restart initialiseert nooit. De service neemt ook
+  # nooit de productienaam `motor` over.
+  keurmotor:
+    <<: *rtg-beveiliging
+    profiles: ["release"]
+    image: ${RTG_IMAGE:-rtg-app:local}
+    command: ["node", "scripts/docker/start.js", "motor"]
+    environment:
+      NODE_ENV: production
+      RTG_ENV_FILE: /run/secrets/rtg_keur_env
+      RTG_MOTOR_TOKEN: keur-motor-token-uitsluitend-intern
+      RTG_MOTOR_ADDR: 0.0.0.0:3100
+      RTG_MOTOR_SALDI: "1"
+      RTG_MOTOR_DATA: /app/motor-data/state.json
+      RTG_MOTOR_STATE_KEY_FILE: /run/secrets/rtg-keur-motor-state-key
+      RTG_MOTOR_GIDS: /app/motor-data/gids.bin
+      RTG_KLUIS_KEY_FILE: /app/motor-data/secret.key
+      RTG_KLUIS_DATA: /app/motor-data/kluis.json
+    secrets:
+      - rtg_keur_env
+      - source: rtg_keur_motor_state_key
+        target: rtg-keur-motor-state-key
+    volumes:
+      - keur-motor-data:/app/motor-data
+    networks:
+      - keurdata
+    healthcheck:
+      test: ["CMD", "node", "scripts/motor-health.js"]
+      interval: 5s
+      timeout: 3s
+      retries: 8
+      start_period: 10s
+
+  # Werkelijk gestart kandidaatproces voor de P3-readiness/probereis. Geen
+  # poort, geen blijvend volume en geen productieservicenaam: de lopende app
+  # blijft volledig ongemoeid totdat live:deploy de bewezen image-ID kiest.
+  keurapp:
+    <<: *rtg-beveiliging
+    profiles: ["release"]
+    image: ${RTG_IMAGE:-rtg-app:local}
+    command: ["node", "scripts/docker/start.js", "app"]
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      RTG_BIND: 0.0.0.0
+      RTG_TLS: "0"
+      RTG_ACME: "0"
+      RTG_ENV_FILE: /run/secrets/rtg_keur_env
+      DATABASE_URL: postgresql://rtg_keuring:rtg-candidate-db-only@keurpostgres:5432/rtg_keuring
+      REDIS_URL: redis://keurredis:6379
+      RTG_DATA_DIR: /tmp/rtg-data
+      RTG_RUST_ALLES_UIT: "1"
+      RTG_CLAMD_HOST: keurclamav
+      RTG_CLAMD_PORT: 3310
+      RTG_CAPABILITY_RUST_BIN: /app/rtg-motor
+      RTG_STOP_GRACE_MS: 30000
+    secrets:
+      - rtg_keur_env
+    volumes:
+      - ./.release:/run/rtg-release:ro
+    networks:
+      - keurdata
+    depends_on:
+      keurredis: { condition: service_healthy }
+      keurpostgres: { condition: service_healthy }
+      keurclamav: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3000/api/ready',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 20s
+
+  # De echte productieconfiguratie wordt in deze service alleen gelezen door
+  # `scripts/golive.js`. Er start geen server of worker. Alle bereikbare state
+  # blijft de tijdelijke kandidaatstate hieronder. Alleen de opruimende S3-
+  # byteproef en herkenbare alarmzelfproef gaan via het aparte egressnetwerk
+  # echt naar buiten; betaal- of berichtenqueues worden nooit geconsumeerd.
+  keurgolive:
+    <<: *rtg-beveiliging
+    profiles: ["release"]
+    image: ${RTG_IMAGE:-rtg-app:local}
+    command: ["node", "scripts/golive.js", "--bewijs-stdout"]
+    environment:
+      NODE_ENV: production
+      RTG_ENV_FILE: /run/secrets/rtg_env
+      RTG_SENTINEL_TOKEN_FILE: /run/secrets/sentinel_token
+      RTG_MOTOR_TOKEN: keur-motor-token-uitsluitend-intern
+      DATABASE_URL: postgresql://rtg_keuring:rtg-candidate-db-only@keurpostgres:5432/rtg_keuring
+      REDIS_URL: redis://keurredis:6379
+      RTG_MOTOR_SHADOW: http://keurmotor:3100
+      RTG_MOTOR_GELD_URL: http://keurmotor:3100
+      RTG_MOTOR_EXPECT_GENESIS: ${RTG_KEUR_MOTOR_EXPECT_GENESIS:-}
+      RTG_CLAMD_HOST: keurclamav
+      RTG_CLAMD_PORT: 3310
+      RTG_CAPABILITY_RUST_BIN: /app/rtg-motor
+    secrets:
+      - rtg_env
+      - sentinel_token
+    volumes:
+      - ./.release:/run/rtg-release:ro
+    networks:
+      - keurdata
+      # Alleen deze argumentloze keurtaak krijgt uitgaand internet om de
+      # ingestelde S3- en alarmontvanger werkelijk te beproeven. Er wordt geen
+      # poort gepubliceerd en geen applicatieserver op dit netwerk gestart.
+      - keuruitgangen
+    depends_on:
+      keurpostgres: { condition: service_healthy }
+      keurredis: { condition: service_healthy }
+      keurmotor: { condition: service_healthy }
+      keurclamav: { condition: service_healthy }
+
+  # Volledig vluchtige infrastructuur voor releasekandidaten. Deze namen,
+  # tmpfs'en en het interne netwerk worden nooit door productiediensten gebruikt.
+  keurredis:
+    image: redis:7-alpine@sha256:ff02b58f971e7d7d156a1267e283fcbbeee91773b6aa36c49dac28ecfe28eadf
+    profiles: ["release"]
+    read_only: true
+    security_opt: ["no-new-privileges:true"]
+    command: ["redis-server", "--save", "", "--appendonly", "no", "--maxmemory-policy", "noeviction"]
+    tmpfs:
+      - /data:rw,noexec,nosuid,size=128m
+      - /tmp:rw,noexec,nosuid,size=32m
+    networks:
+      - keurdata
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 2s
+      retries: 15
+
+  keurpostgres:
+    image: postgres:16-alpine@sha256:cf78e76683b9ca8c5733cbbdce6c9262b45b6767934dd0a95e671f9a0fc20685
+    profiles: ["release"]
+    security_opt: ["no-new-privileges:true"]
+    environment:
+      POSTGRES_USER: rtg_keuring
+      POSTGRES_PASSWORD: rtg-candidate-db-only
+      POSTGRES_DB: rtg_keuring
+      PGDATA: /tmp/pgdata
+    tmpfs:
+      - /tmp/pgdata:rw,noexec,nosuid,size=1024m
+    networks:
+      - keurdata
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rtg_keuring -d rtg_keuring"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  keurclamav:
+    image: clamav/clamav:1.5.3-debian13-slim@sha256:741e6c447241220e0792a901befcaec1d55a755c5097fc9cd88d7fd8be251a5c
+    profiles: ["release"]
+    user: clamav
+    entrypoint: ["/init-unprivileged"]
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: ["ALL"]
+    tmpfs:
+      - /var/lib/clamav:rw,noexec,nosuid,size=512m
+      - /tmp:rw,noexec,nosuid,size=64m
+    networks:
+      - keurdata
+      - updates
+    healthcheck:
+      test: ["CMD-SHELL", "clamdcheck.sh"]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+      start_period: 30s
+
   redis:
-    image: redis:7-alpine
+    image: redis:7-alpine@sha256:ff02b58f971e7d7d156a1267e283fcbbeee91773b6aa36c49dac28ecfe28eadf
     restart: unless-stopped
     read_only: true
     security_opt:
@@ -188,7 +376,7 @@ services:
         max-file: "3"
 
   postgres:
-    image: postgres:16-alpine
+    image: postgres:16-alpine@sha256:cf78e76683b9ca8c5733cbbdce6c9262b45b6767934dd0a95e671f9a0fc20685
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
@@ -263,7 +451,6 @@ services:
     secrets:
       - postgres_password
     volumes:
-      - ./scripts/docker/backup.sh:/usr/local/bin/rtg-backup:ro
       - rtg-data:/app-data:ro
       # Zet RTG_BACKUP_HOST_DIR op een externe schijf voor bescherming tegen
       # verlies van de Docker-schijf. ./backups is alleen de veilige standaard.
@@ -286,6 +473,12 @@ services:
 secrets:
   rtg_env:
     file: ${RTG_ENV_FILE:-.env.productie}
+  rtg_keur_env:
+    file: ${RTG_KEUR_ENV_FILE:-/dev/null}
+  motor_state_key:
+    file: ${RTG_MOTOR_STATE_KEY_SECRET_FILE:-.rtg-secrets/motor_state_key}
+  rtg_keur_motor_state_key:
+    file: ${RTG_KEUR_MOTOR_STATE_KEY_FILE:-/dev/null}
   postgres_password:
     file: ${RTG_POSTGRES_PASSWORD_FILE:-.rtg-secrets/postgres_password}
   sentinel_token:
@@ -295,6 +488,11 @@ networks:
   edge:
   data:
     internal: true
+  keurdata:
+    internal: true
+  keuruitgangen:
+    # Bewust niet `internal`: uitsluitend keurgolive gebruikt dit voor de twee
+    # actieve, opruimende providerproeven vóór promotie.
   # Alleen ClamAV hangt hieraan om verse virusdefinities op te halen. De app en
   # de databases blijven uitsluitend op edge/data.
   updates:
@@ -304,5 +502,6 @@ volumes:
   rtg-redis:
   rtg-pg:
   rtg-motor:
+  keur-motor-data:
   rtg-clamav:
   rtg-sentinel:

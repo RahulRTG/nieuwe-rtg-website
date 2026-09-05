@@ -24,7 +24,7 @@
    elke reden staat in de kop van de module die wordt aangeroepen. Staat hier
    ooit een spelregel, dan hoort die ergens anders. */
 module.exports = (ctx) => {
-  const { anthropic, spelReplay, SPEL, SOORTEN, ZICHT, crypto, db, save, rid, nu, S,
+  const { anthropic, spelReplay, SPEL, SOORTEN, ZICHT, crypto, db, save, bewerkCollectie, rid, nu, S,
     codenaamVan, isGeblokkeerd, zijnVrienden, klasgenotenVan, sociaalRate,
     comm, ARCADE, DAG, ruw, progressieMag, GEEN_PROGRESSIE, opruimHaken, spelCtx } = ctx;
 
@@ -60,8 +60,8 @@ module.exports = (ctx) => {
   /* De projectiekamer: een potje op een gedeeld scherm. Een scherm is een
      PROJECTIE en geen deelnemer -- geen sessie, geen sleutel, en het krijgt
      uitsluitend `zicht.publiek`. Zie spellen/projectie.js. */
-  const { projectieOpen, projectieStand, projectieSluit, projectieSpellen } =
-    require('./projectie')({ S, save, crypto, nu, SPEL, SOORTEN, ZICHT, codenaamVan });
+  const { projectieOpen, projectieKoppel, projectieStand, projectieSluit, projectieSpellen } =
+    require('./projectie')({ S, save, bewerkCollectie, crypto, nu, SPEL, SOORTEN, ZICHT, codenaamVan });
 
   /* De arcade: spelen zonder tegenstander, waar alleen een getal van overblijft.
      Zie spellen/arcade.js voor waarom de twee soorten score niet naast elkaar
@@ -80,7 +80,7 @@ module.exports = (ctx) => {
   opruimHaken.tijd.push(dagOpschonen);
 
   return { spelRahul, spelNabespreking, spelNaspelen,
-    projectieOpen, projectieStand, projectieSluit, projectieSpellen,
+    projectieOpen, projectieKoppel, projectieStand, projectieSluit, projectieSpellen,
     teamNieuw, teamNodig, teamAntwoord, teamVerlaat, mijnTeams,
     spelPraat, spelPraatStuur, dagStand, dagStart, dagKlaar,
     arcadeScore, arcadeBord, sneekScore, sneekBord, sudokuNieuw, sudokuKlaar };

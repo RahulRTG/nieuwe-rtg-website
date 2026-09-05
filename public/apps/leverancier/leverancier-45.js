@@ -1,7 +1,20 @@
 /* een melding in het vrachtlogboek */
     el.querySelectorAll('[data-vrmeld]').forEach(b => b.addEventListener('click', async () => {
       const t = prompt(T('vr.meldvraag','Korte melding voor het logboek (de klant ziet dit op de volgcode):')); if (!t) return;
-      try { await API.call('/supplier/vracht/melding', { id:b.dataset.vrmeld, tekst:t }); renderVracht(); } catch(e){ toast(e.message); }
+      try { await API.call('/supplier/vracht/melding', { id:b.dataset.vrmeld, tekst:t, idem:RTGIdem('vracht-melding') }); renderVracht(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-vrcode]').forEach(b => b.addEventListener('click', async () => {
+      if (b.dataset.vrcodeActief === '1' && !confirm(T('vr.codevervangvraag','De huidige klantcode wordt direct onbruikbaar. Een nieuwe uitgeven?'))) return;
+      try {
+        const d = await API.call('/supplier/vracht/volgcode/roteer', { id:b.dataset.vrcode, idem:RTGIdem('vracht-code') });
+        vrToonCode(d.zending && d.zending.volgcode, T('vr.codekopvernieuw','Vernieuwde volgcode voor de klant'));
+        renderVracht();
+      } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-vrcode-weg]').forEach(b => b.addEventListener('click', async () => {
+      if (!confirm(T('vr.codeintrekvraag','Deze klantcode direct intrekken?'))) return;
+      try { await API.call('/supplier/vracht/volgcode/intrek', { id:b.dataset.vrcodeWeg, reden:'ingetrokken vanuit vrachtbeheer' }); renderVracht(); }
+      catch(e){ toast(e.message); }
     }));
   }
 
@@ -64,4 +77,3 @@
         (j.status==='aangevraagd'?gbKnop('data-gbjb', j.id, T('gb.j.bevestig','Bevestig'), true):'')+gbKnop('data-gbja', j.id, T('gb.j.afgerond','Afgerond'))+'</div>':'')+'</div>').join('');
     h += '<p class="sub h-mt50">'+T('gb.j.regel','Een jet-transfer is een dienstverzoek aan RTG Aviation; de concierge bevestigt pas na overleg, nooit vanzelf.')+'</p>';
     el.innerHTML = h;
-

@@ -88,7 +88,7 @@ async function decor(base) {
      die de coordinator nergens ziet, is hetzelfde als geen melding. */
   await post('/api/rtfos/portaal/vrijwilliger/uren', { code: vcode, uren: 4, datum: '2026-11-03' });
 
-  return { vcode, dcode, stadNaam: stad.naam, token };
+  return { vcode, dcode, stadNaam: stad.naam, token, memberToken: reg.token };
 }
 
 // de vijf dingen die op geen van de drie schermen mogen staan
@@ -104,6 +104,8 @@ async function schermMet(base, pw, pad) {
   const fouten = [];
   letOpFouten(page, fouten);
   const antwoorden = [];
+  const verzoeken = [];
+  page.on('request', req => verzoeken.push(req.url()));
   page.on('response', async res => {
     if (!res.url().includes('/api/rtfos/')) return;
     try { antwoorden.push(await res.text()); } catch (e) { /* afgebroken antwoord */ }
@@ -111,7 +113,7 @@ async function schermMet(base, pw, pad) {
   await page.goto(base + pad, { waitUntil: 'domcontentloaded' });
   await page.evaluate(() => localStorage.setItem('rtg_cookieinfo_v1', '1'));
   await page.goto(base + pad, { waitUntil: 'domcontentloaded' });
-  return { browser, page, fouten, antwoorden };
+  return { browser, page, fouten, antwoorden, verzoeken };
 }
 
 test('het vrijwilligersscherm toont zijn planning en nergens zijn nummer of een evaluatie',
@@ -197,13 +199,15 @@ test('de buurt-app toont activiteiten en geen enkel gegeven over een mens',
   const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP + '-3', OFFICE_CODE } });
   let s;
   try {
-    await decor(srv.base);
-    s = await schermMet(srv.base, pw, '/apps/foundation/os-publiek.html');
-    await s.page.waitForSelector('[data-stad]', { timeout: 15000 });
-    await s.page.click('[data-stad]');
+    const d = await decor(srv.base);
+    s = await schermMet(srv.base, pw, '/apps/foundation/os-publiek.html?stad=almere');
     await s.page.waitForSelector('#uit .buurtkaart', { timeout: 15000 });
+    await s.page.waitForSelector('#rtg-vandaag-luxe[data-modus="surface"][data-surface="public-city"]',
+      { timeout: 15000 });
     const tekst = await s.page.evaluate(() => document.body.innerText.replace(/\s+/g, ' '));
 
+    assert.match(await s.page.textContent('#rtg-vandaag-luxe-kop'), /RTF Almere/i,
+      'de publieke slug opent de compacte kop van de gevalideerde stad');
     assert.match(tekst, /RTF Almere/i, 'de stad staat niet in beeld');
     assert.match(tekst, /Buurtmaaltijd Almere/, 'de open activiteit staat niet in beeld');
     assert.match(tekst, /plekken vrij/i, 'er staat niet of er nog plek is');
@@ -219,6 +223,31 @@ test('de buurt-app toont activiteiten en geen enkel gegeven over een mens',
     assert.deepEqual(lekken(rauw), [], 'het antwoord aan de buurt lekt');
     assert.equal(/"hulpvragen"|"geholpen"|"deelnemersUniek"/.test(rauw), false,
       'er gaat een teller over hulpvragen naar de publieke app');
+
+    /* Ook met een geldige ledenpas blijft dit een puur publieke projectie. */
+    await s.page.evaluate(token => localStorage.setItem('rtg_member_token', token), d.memberToken);
+    const vanaf = s.verzoeken.length;
+    await s.page.goto(srv.base + '/apps/foundation/os-publiek.html?stad=almere',
+      { waitUntil: 'domcontentloaded' });
+    await s.page.waitForSelector('#uit .buurtkaart', { timeout: 15000 });
+    assert.equal(s.verzoeken.slice(vanaf).some(url => url.includes('/api/experience/')), false,
+      'de publieke stadsroute vraagt geen persoonlijke Experience-projectie op');
+
+    /* Een onbekende slug wordt geen intern zoekpad en houdt de kiezer open. */
+    await s.page.goto(srv.base + '/apps/foundation/os-publiek.html?stad=niet-openbaar',
+      { waitUntil: 'domcontentloaded' });
+    await s.page.waitForSelector('#stadmelding', { timeout: 15000 });
+    assert.match(await s.page.textContent('#stadmelding'), /niet openbaar|kies een stad/i);
+    assert.ok(await s.page.$('[data-stad]'), 'de veilige stedenkiezer blijft beschikbaar');
+
+    /* In Command/Edge tekent de app alleen zijn eigen publieke inhoud. */
+    await s.page.goto(srv.base + '/apps/foundation/os-publiek.html?stad=almere&embed=1',
+      { waitUntil: 'domcontentloaded' });
+    await s.page.waitForSelector('#uit .buurtkaart', { timeout: 15000 });
+    assert.equal(await s.page.getAttribute('body', 'data-rtg-vandaag-luxe'), 'surface',
+      'de embed behoudt het surface-palet na publieke validatie');
+    assert.equal(await s.page.$('#rtg-vandaag-luxe'), null,
+      'de embedded stadsroute tekent geen tweede wereldkop');
     assert.deepEqual(s.fouten, [], 'paginafouten: ' + s.fouten.join(' | '));
   } finally {
     if (s && s.browser) await s.browser.close();

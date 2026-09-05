@@ -74,9 +74,13 @@ function createClient(opts) {
   const dbNum = u.pathname && u.pathname.length > 1 ? u.pathname.slice(1) : '';
 
   let sock = null, buf = Buffer.alloc(0), wachtrij = [], dicht = false, verbondenOoit = false;
+  let waakTimer = null, pingGrens = null;
+  const PING_MS = Math.max(250, Number(process.env.RTG_BUS_PING_MS) || 2000);
   const abos = new Map();        // kanaal -> callback
-  const foutCbs = [];
-  const emitFout = e => { for (const cb of foutCbs) { try { cb(e); } catch (x) {} } };
+  const cbs = { error: [], ready: [], close: [] };
+  const emit = (naam, waarde) => {
+    for (const cb of cbs[naam]) { try { cb(waarde); } catch (e) {} }
+  };
 
   function verwerk() {
     let pos = 0;
@@ -98,6 +102,23 @@ function createClient(opts) {
     });
   }
 
+  function stopWaak() {
+    if (waakTimer) clearTimeout(waakTimer);
+    if (pingGrens) clearTimeout(pingGrens);
+    waakTimer = null; pingGrens = null;
+  }
+  function planWaak() {
+    stopWaak();
+    waakTimer = setTimeout(() => {
+      const verwacht = sock;
+      pingGrens = setTimeout(() => {
+        if (sock === verwacht && verwacht && !verwacht.destroyed) verwacht.destroy();
+      }, PING_MS);
+      stuur(['PING']).then(() => planWaak()).catch(() => {});
+    }, PING_MS);
+    if (waakTimer.unref) waakTimer.unref();
+  }
+
   function open() {
     return new Promise((resolve, reject) => {
       const klaar = async () => {
@@ -105,25 +126,36 @@ function createClient(opts) {
           if (pass) await stuur(user ? ['AUTH', user, pass] : ['AUTH', pass]);
           if (dbNum) await stuur(['SELECT', dbNum]);
           for (const kanaal of abos.keys()) await stuur(['SUBSCRIBE', kanaal]); // her-abonneren na (her)verbinden
-          verbondenOoit = true; resolve();
+          await stuur(['PING']);             // TCP-open is nog geen Redis-readiness
+          verbondenOoit = true; emit('ready'); planWaak(); resolve();
         } catch (e) { reject(e); }
       };
       sock = secure ? tls.connect(Object.assign({ host, port }, sniVan(host)), klaar) : net.connect({ host, port }, klaar);
       if (sock.setNoDelay) sock.setNoDelay(true);
       sock.on('data', c => { buf = buf.length ? Buffer.concat([buf, c]) : c; verwerk(); });
-      sock.on('error', e => { emitFout(e); if (!verbondenOoit) reject(e); });
+      sock.on('error', e => { emit('error', e); if (!verbondenOoit) reject(e); });
       sock.on('close', () => {
+        stopWaak();
+        emit('close');
         const q = wachtrij; wachtrij = [];
         for (const p of q) p.reject(new Error('redis: verbinding gesloten'));
-        if (!dicht && verbondenOoit) setTimeout(() => open().catch(e => emitFout(e)), 500); // auto-herstel + her-abonneren
+        if (!dicht) {
+          const t = setTimeout(() => open().catch(e => emit('error', e)), 500);
+          if (t.unref) t.unref();
+        } // auto-herstel + her-abonneren, ook als Redis bij de eerste poging nog niet op was
       });
     });
   }
 
   return {
     connect() { return open(); },
-    on(ev, cb) { if (ev === 'error') foutCbs.push(cb); return this; },
+    on(ev, cb) { if (cbs[ev] && typeof cb === 'function') cbs[ev].push(cb); return this; },
     get(k) { return stuur(['GET', k]); },
+    ping() { return stuur(['PING']); },
+    scan(cursor, patroon, aantal) {
+      return stuur(['SCAN', String(cursor || '0'), 'MATCH', String(patroon || '*'),
+        'COUNT', String(Math.max(1, Number(aantal) || 100))]);
+    },
     set(k, v) { return stuur(['SET', k, v]); },
     del(k) { return stuur(['DEL', k]); },
     eval(script, keys, args) {
@@ -135,14 +167,14 @@ function createClient(opts) {
     subscribe(kanaal, fn) { abos.set(kanaal, fn); return stuur(['SUBSCRIBE', kanaal]); },
     unsubscribe(kanaal) { abos.delete(kanaal); return stuur(['UNSUBSCRIBE', kanaal]); },
     quit() {
-      dicht = true;
+      dicht = true; stopWaak();
       return new Promise(resolve => {
         if (!sock || sock.destroyed) return resolve();
         sock.once('close', () => resolve());
         try { sock.end(codeer(['QUIT'])); } catch (e) { resolve(); }
       });
     },
-    disconnect() { dicht = true; try { if (sock) sock.destroy(); } catch (e) {} }
+    disconnect() { dicht = true; stopWaak(); try { if (sock) sock.destroy(); } catch (e) {} }
   };
 }
 

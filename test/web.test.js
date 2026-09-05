@@ -55,6 +55,31 @@ test('middleware-keten + next(err) belandt bij de foutafhandelaar', async () => 
   } finally { s.close(); }
 });
 
+test('verworpen async routes en mounts gaan gesloten door de foutketen', async () => {
+  const app = web();
+  app.get('/route-stuk', async () => {
+    await Promise.resolve();
+    throw new Error('route kapot');
+  });
+  app.use('/mount-stuk', async () => {
+    await Promise.resolve();
+    throw new Error('mount kapot');
+  });
+  app.get('/gezond', (req, res) => res.json({ ok: true }));
+  app.use((err, req, res, next) => res.status(500).json({ fout: err.message }));
+  const { s, poort } = await start(app);
+  try {
+    const route = await vraag(poort, '/route-stuk');
+    assert.equal(route.status, 500);
+    assert.equal(JSON.parse(route.body).fout, 'route kapot');
+    const mount = await vraag(poort, '/mount-stuk');
+    assert.equal(mount.status, 500);
+    assert.equal(JSON.parse(mount.body).fout, 'mount kapot');
+    assert.deepEqual(JSON.parse((await vraag(poort, '/gezond')).body), { ok: true },
+      'een async fout beëindigt het verzoek, niet het proces');
+  } finally { s.close(); }
+});
+
 test('json: parse, limiet -> 413 (entity.too.large), kapotte json -> 400', async () => {
   const app = web();
   app.use(web.json({ limit: '1kb' }));

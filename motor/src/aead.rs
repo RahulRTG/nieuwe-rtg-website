@@ -452,9 +452,9 @@ mod tests {
         }
     }
 
-    // Doorvoer-benchmark (draai: cargo test --release -- --ignored --nocapture bench_doorvoer)
-    #[test]
-    #[ignore]
+    // Handmatige microbenchmark, bewust geen correctness-test en dus geen
+    // `#[ignore]` die de release-inventaris als overgeslagen toets vervuilt.
+    #[allow(dead_code)]
     fn bench_doorvoer() {
         let key = [1u8; 32];
         let nonce = [2u8; 24];

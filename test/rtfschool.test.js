@@ -73,35 +73,80 @@ test('3. vak-filter en installeren: van tafels tot examentraining vwo', async ()
 });
 
 test('4. Samen voor de gezinsapps: het gezin doet mee, een vreemd gezin komt er niet in', async () => {
-  const k = await api('/api/rtf/samen/maak', {}, A.ouder);
+  const k = await api('/api/rtf/samen/maak', { idem: 'rtf-samen-route-0001' }, A.ouder);
   assert.equal(k.status, 200);
-  const code = k.body.kamer.code;
+  const code = k.body.deelcode;
+  assert.match(code, /^RTFSAMEN\.[A-F0-9]{32}$/);
+  assert.match(k.body.kamer.id, /^rsk[a-f0-9]{32}$/);
+  assert.equal(k.body.kamer.code, undefined);
   // het eigen kind mag erbij
-  const mee = await api('/api/rtf/samen/mee', { kamercode: code }, A.kind);
+  const mee = await api('/api/rtf/samen/mee', { deelcode: code }, A.kind);
   assert.equal(mee.status, 200);
   assert.equal(mee.body.kamer.leden.length, 2);
   // een vreemd gezin (geen vriend) wordt geweigerd
-  const vreemd = await api('/api/rtf/samen/mee', { kamercode: code }, B.ouder);
-  assert.equal(vreemd.status, 403, 'alleen gezin en bevestigde vrienden');
+  const vreemd = await api('/api/rtf/samen/mee', { deelcode: code }, B.ouder);
+  assert.equal(vreemd.status, 404, 'een onbevoegde ziet ook niet of de code bestaat');
+
+  const rotatie = await api('/api/rtf/samen/code', {
+    id: k.body.kamer.id,
+    idem: 'rtf-samen-route-code-0001'
+  }, A.ouder);
+  assert.equal(rotatie.status, 200);
+  assert.match(rotatie.body.deelcode, /^RTFSAMEN\.[A-F0-9]{32}$/);
+  assert.notEqual(rotatie.body.deelcode, code, 'rotatie geeft een nieuw eenmalig geheim');
+  assert.equal((await api('/api/rtf/samen/code', {
+    id: k.body.kamer.id,
+    idem: 'rtf-samen-route-code-0001'
+  }, A.ouder)).status, 409, 'een retry heronthult de nieuwe code niet');
+  assert.equal((await api('/api/rtf/samen/mee', { deelcode: code }, A.kind)).status, 404,
+    'de oude code is direct server-side ingetrokken');
+  assert.equal((await api('/api/rtf/samen/mee', {
+    deelcode: rotatie.body.deelcode
+  }, A.kind)).status, 200, 'de nieuwe code opent dezelfde kamer');
 });
 
 test('5. "kijk hier" binnen de gezinsapps + de kamer-chat; buiten de gezinsapps geweigerd', async () => {
-  const code = (await api('/api/rtf/samen/maak', {}, A.ouder)).body.kamer.code;
-  await api('/api/rtf/samen/mee', { kamercode: code }, A.kind);
-  const zet = await api('/api/rtf/samen/zet', { kamercode: code, pad: '/apps/foundation/schoolbieb.html', titel: 'School-Bibliotheek' }, A.ouder);
+  const gemaakt = (await api('/api/rtf/samen/maak', { idem: 'rtf-samen-route-0002' }, A.ouder)).body;
+  const id = gemaakt.kamer.id;
+  await api('/api/rtf/samen/mee', { deelcode: gemaakt.deelcode }, A.kind);
+  const zet = await api('/api/rtf/samen/zet', { id,
+    pad: '/apps/foundation/schoolbieb.html', titel: 'School-Bibliotheek',
+    idem: 'rtf-samen-route-zet-0001' }, A.ouder);
   assert.equal(zet.status, 200);
   assert.ok(zet.body.kamer.volg >= 1, 'het volg-tellertje loopt voor de pollende widget');
-  assert.equal((await api('/api/rtf/samen/zet', { kamercode: code, pad: '/apps/mall.html' }, A.ouder)).status, 400, 'buiten de gezinsapps: nee');
-  await api('/api/rtf/samen/chat', { kamercode: code, tekst: 'Kom je meedoen met tafels?' }, A.kind);
-  const staat = await api('/api/rtf/samen/staat', { kamercode: code }, A.ouder);
+  assert.equal((await api('/api/rtf/samen/zet', { id, pad: '/apps/mall.html',
+    idem: 'rtf-samen-route-zet-fout-1' }, A.ouder)).status, 400, 'buiten de gezinsapps: nee');
+  assert.equal((await api('/api/rtf/samen/zet', { id,
+    pad: '/apps/foundation/schoolbieb.html?reset=geheim',
+    idem: 'rtf-samen-route-zet-fout-2' }, A.ouder)).status, 400, 'querycredentials reizen nooit mee');
+  await api('/api/rtf/samen/chat', { id, tekst: 'Kom je meedoen met tafels?',
+    idem: 'rtf-samen-route-chat-0001' }, A.kind);
+  const staat = await api('/api/rtf/samen/staat', { id }, A.ouder);
   assert.equal(staat.body.kamer.pad, '/apps/foundation/schoolbieb.html');
   assert.ok(staat.body.kamer.chat.some(c => /tafels/.test(c.tekst)));
 });
 
+test('5b. alleen de gastheer sluit de kamer en trekt de deelcode direct in', async () => {
+  const gemaakt = (await api('/api/rtf/samen/maak', {
+    idem: 'rtf-samen-route-sluit-0001'
+  }, A.ouder)).body;
+  const id = gemaakt.kamer.id;
+  const deelcode = gemaakt.deelcode;
+  await api('/api/rtf/samen/mee', { deelcode }, A.kind);
+
+  assert.equal((await api('/api/rtf/samen/sluit', { id }, A.kind)).status, 403,
+    'een deelnemer kan de kamer niet voor iedereen sluiten');
+  assert.equal((await api('/api/rtf/samen/sluit', { id }, A.ouder)).status, 200);
+  assert.equal((await api('/api/rtf/samen/staat', { id }, A.ouder)).status, 404,
+    'een gesloten kamer geeft ook de gastheer geen staat meer');
+  assert.equal((await api('/api/rtf/samen/mee', { deelcode }, A.kind)).status, 404,
+    'de ingetrokken deelcode opent de kamer niet opnieuw');
+});
+
 test('6. verlaten ruimt op; zonder geldig gezin blijft alles dicht', async () => {
-  const code = (await api('/api/rtf/samen/maak', {}, A.ouder)).body.kamer.code;
-  await api('/api/rtf/samen/weg', { kamercode: code }, A.ouder);
-  assert.equal((await api('/api/rtf/samen/staat', { kamercode: code }, A.ouder)).status, 404);
+  const gemaakt = (await api('/api/rtf/samen/maak', { idem: 'rtf-samen-route-0003' }, A.ouder)).body;
+  await api('/api/rtf/samen/weg', { id: gemaakt.kamer.id }, A.ouder);
+  assert.equal((await api('/api/rtf/samen/staat', { id: gemaakt.kamer.id }, A.ouder)).status, 404);
   assert.equal((await api('/api/rtf/school', {}, { code: 'NEP', token: 'nep' })).status, 403);
   assert.equal((await api('/api/rtf/samen/maak', {}, { code: 'NEP', token: 'nep' })).status, 403);
 });

@@ -1,130 +1,212 @@
-/* Samen: met vrienden meekijken en samen doen, door het hele leden-OS heen.
-   Een lid start een samen-sessie en krijgt een korte code; vrienden doen mee
-   met die code. Wie ergens heen gaat (de Mall, het Theater, de Sport-app, een
-   bibliotheek-pagina) deelt dat met de kamer, en de anderen krijgen live een
-   seintje "ga mee" plus een kleine kamer-chat. Alles op codenaam; niemand
-   wordt gevolgd zonder dat hij zelf in de kamer stapt, en eruit stappen kan
-   altijd met een knop. Kamers zijn vluchtig: na twaalf uur stilte worden ze
-   vanzelf opgeruimd. */
+/* LivingOS Samen: een deelcode opent alleen de eerste toetreding. Daarna werkt
+   ieder lid met de niet-geheime kamer-id. Kale codes staan niet in opslag,
+   lijsten, SSE, URL's of browseropslag en worden alleen bij maak/rotatie getoond. */
+'use strict';
+const { veiligSamenPad } = require('./samen-pad');
 
-module.exports = ({ db, save, crypto, sseToCustomer, schoon }) => {
-  const eigen = require('./eigencollectie')({ db, domein: 'kern/samen', bezit: { samenKamers: 'kaart' } });
-  const UUR = 3600000;
-  const K = () => {
-    return eigen.bak('samenKamers');
-  };
-  const pub = (k) => ({ code: k.code, gastheer: k.gastheer, leden: k.leden.map(l => l.codenaam),
-    pad: k.pad, titel: k.titel, chat: k.chat.slice(-30), at: k.at,
-    muziek: k.muziek || null, now: Date.now() });
-  // een seintje naar iedereen in de kamer, behalve (meestal) de afzender zelf
-  const sein = (k, kind, data, behalveKey) => {
-    for (const l of k.leden) if (l.key !== behalveKey) {
-      try { sseToCustomer(l.key, 'samen', Object.assign({ kind, code: k.code }, data)); } catch (e) {}
+module.exports = ({ db, save, bewerkCollectie, crypto, sseToCustomer, schoon }) => {
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/samen',
+    bezit: { samenKamers: 'kaart' } });
+  const nu = () => new Date().toISOString();
+  const toegang = require('./samen-toegang')({ crypto, nu });
+  const MAX_KAMERS = 20;
+  const DUBBELTIK_MS = 5000;
+  const BEWAAR_MS = 90 * 86400000;
+
+  const bak = () => eigen.bak('samenKamers');
+  const afdruk = waarde => crypto.createHash('sha256').update(String(waarde || '')).digest('hex');
+  const lidVan = (k, key) => (k.leden || []).find(l => l.key === key) || null;
+  const publiek = (k, key) => ({ id: k.id, gastheer: k.gastheer,
+    leden: (k.leden || []).map(l => l.codenaam), pad: k.pad, titel: k.titel,
+    chat: (k.chat || []).slice(-30), at: k.at, muziek: k.muziek || null,
+    toegang: toegang.publiek(k), benGastheer: key ? k.gastheerKey === key : undefined,
+    now: Date.now() });
+  const antwoord = (waarde, seinen = []) => ({ antwoord: waarde, seinen });
+  const seinen = (k, kind, data, behalveKey) => (k.leden || [])
+    .filter(l => l.key !== behalveKey)
+    .map(l => ({ key: l.key, kind, data: Object.assign({ kind, id: k.id }, data) }));
+
+  function sluitOud(kamers) {
+    const tijd = Date.now();
+    for (const [id, k] of Object.entries(kamers)) {
+      if (!k) { delete kamers[id]; continue; }
+      /* Oude versies bewaarden location.search. Wis dat vóór enig kamerbeeld
+         of SSE-seintje; reset- en verificatiecredentials mogen niet reizen. */
+      if (k.pad && !veiligSamenPad(k.pad)) { k.pad = null; k.titel = null; }
+      const reden = !k.gesloten_at && toegang.reden(k);
+      if (reden && reden !== 'ingetrokken' && reden !== 'opgebruikt') {
+        k.gesloten_at = nu();
+        toegang.intrekken(k, 'systeem', 'verlopen');
+      }
+      if (k.gesloten_at && tijd - Date.parse(k.gesloten_at) > BEWAAR_MS) delete kamers[id];
     }
-  };
-  const vind = (code) => K()[String(code || '').toUpperCase().slice(0, 8)] || null;
-  const lidVan = (k, key) => k.leden.find(l => l.key === key) || null;
-  // alleen paden binnen ons eigen huis; nooit een externe URL de kamer in
-  const schoonPad = (p) => { p = String(p || '').slice(0, 200); return p.startsWith('/apps/') || p.startsWith('/site/') ? p : null; };
-
-  function ruimOp() {
-    const nu = Date.now();
-    for (const c of Object.keys(K())) if (nu - (K()[c].at || 0) > 12 * UUR) delete K()[c];
   }
 
-  function maak(key, codenaam) {
-    ruimOp();
-    if (Object.keys(K()).length >= 5000) return { status: 503, error: 'Alle samen-kamers zijn even bezet; probeer het zo weer.' };
-    let code;
-    do { code = crypto.randomBytes(4).toString('hex').slice(0, 6).toUpperCase(); } while (K()[code]);
-    K()[code] = { code, gastheer: codenaam, gastheerKey: key, leden: [{ key, codenaam }], pad: null, titel: null, chat: [], muziek: null, at: Date.now() };
-    save();
-    return { status: 200, ok: true, kamer: pub(K()[code]) };
+  function transactie(werk) {
+    const doe = kamers => {
+      if (!kamers || typeof kamers !== 'object' || Array.isArray(kamers))
+        throw new Error('samenKamers hoort een kaart te zijn');
+      toegang.migreerLegacy(kamers);
+      sluitOud(kamers);
+      return werk(kamers);
+    };
+    if (typeof bewerkCollectie === 'function') return bewerkCollectie('samenKamers', doe);
+    const kamers = bak(), voor = JSON.stringify(kamers);
+    try {
+      const r = doe(kamers);
+      if (r && typeof r.then === 'function')
+        throw new Error('samenKamers-transactie mag niet asynchroon zijn');
+      if (JSON.stringify(kamers) !== voor) save();
+      return r;
+    } catch (e) {
+      const oud = JSON.parse(voor);
+      for (const id of Object.keys(kamers)) delete kamers[id];
+      Object.assign(kamers, oud);
+      throw e;
+    }
+  }
+
+  function naCommit(r) {
+    for (const e of (r && r.seinen) || []) {
+      try { sseToCustomer(e.key, 'samen', e.data); } catch (fout) {}
+    }
+    return r && r.antwoord;
+  }
+  function handel(werk) {
+    const r = transactie(werk);
+    return r && typeof r.then === 'function' ? r.then(naCommit) : naCommit(r);
+  }
+  const kamer = (kamers, id) => kamers[String(id || '')] || null;
+  const actiefVoor = (kamers, id, key) => {
+    const k = kamer(kamers, id);
+    return k && !k.gesloten_at && lidVan(k, key) ? k : null;
+  };
+
+  function maak(key, codenaam, idem) {
+    const idemWaarde = String(idem || '').trim().slice(0, 200);
+    return handel(kamers => {
+      if (Object.values(kamers).filter(k => k && !k.gesloten_at && k.gastheerKey === key).length >= MAX_KAMERS)
+        return antwoord({ status: 409, error: 'Ruim eerst een oude Samen-kamer op.' });
+      const vinger = afdruk('samen-maak|' + key);
+      const idemHash = idemWaarde ? afdruk('samen-maak-idem|' + key + '|' + idemWaarde) : null;
+      const tikHash = afdruk('samen-maak-dubbeltik|' + key + '|' + vinger);
+      const bestaand = Object.values(kamers).find(k => k && k.uitgifte && (
+        (idemHash && k.uitgifte.idem_hash === idemHash) ||
+        (!idemHash && k.uitgifte.dubbeltik_hash === tikHash &&
+          Date.now() - Date.parse(k.uitgifte.at) >= 0 &&
+          Date.now() - Date.parse(k.uitgifte.at) < DUBBELTIK_MS)));
+      if (bestaand) return antwoord({ status: 409, herhaald: true,
+        error: 'Deze Samen-code is al eenmalig getoond. Vernieuw haar vanuit de kamer.',
+        kamer: publiek(bestaand, key) });
+      const id = 'sk' + crypto.randomBytes(16).toString('hex');
+      const k = { id, gastheer: codenaam, gastheerKey: key,
+        leden: [{ key, codenaam }], pad: null, titel: null, chat: [], muziek: null,
+        at: Date.now(), gesloten_at: null, toegang_historie: [], uitgifte: {
+          idem_hash: idemHash, dubbeltik_hash: idemHash ? null : tikHash,
+          fingerprint_hash: vinger, at: nu()
+        } };
+      const gemaakt = toegang.nieuw(kamers, k, codenaam || key);
+      if (!gemaakt) return antwoord({ status: 500, error: 'Kon geen unieke Samen-code maken.' });
+      k.toegang = gemaakt.toegang;
+      kamers[id] = k;
+      return antwoord({ status: 200, ok: true, code: gemaakt.code,
+        eenmalig: true, kamer: publiek(k, key) });
+    });
   }
 
   function doeMee(key, codenaam, code) {
-    const k = vind(code);
-    if (!k) return { status: 404, error: 'Deze samen-code bestaat niet (meer).' };
-    if (!lidVan(k, key)) {
-      if (k.leden.length >= 12) return { status: 400, error: 'Deze kamer zit vol (12 personen).' };
+    const kale = String(code || '').trim().toUpperCase().slice(0, 100);
+    return handel(kamers => {
+      const k = toegang.zoek(kamers, kale);
+      if (!k || toegang.reden(k))
+        return antwoord({ status: 404, error: 'Deze Samen-code bestaat niet (meer).' });
+      if (lidVan(k, key))
+        return antwoord({ status: 200, ok: true, al: true, kamer: publiek(k, key) });
+      if ((k.leden || []).length >= 12)
+        return antwoord({ status: 409, error: 'Deze kamer zit vol (12 personen).' });
       k.leden.push({ key, codenaam });
-      k.at = Date.now(); save();
-      sein(k, 'erbij', { codenaam }, key);
-    }
-    return { status: 200, ok: true, kamer: pub(k) };
+      k.at = Date.now();
+      toegang.gebruik(k);
+      return antwoord({ status: 200, ok: true, kamer: publiek(k, key) },
+        seinen(k, 'erbij', { codenaam }, key));
+    });
   }
 
-  /* "Kijk hier": een lid deelt waar hij nu is; de anderen krijgen het seintje
-     en kunnen met een knop meegaan. Iedereen in de kamer mag sturen; zo werkt
-     het als samen rondlopen, niet als een zender met publiek. */
-  function zet(key, code, pad, titel) {
-    const k = vind(code);
-    if (!k) return { status: 404, error: 'Deze samen-code bestaat niet (meer).' };
-    const lid = lidVan(k, key);
-    if (!lid) return { status: 403, error: 'Je zit niet (meer) in deze kamer.' };
-    const p = schoonPad(pad);
-    if (!p) return { status: 400, error: 'Dat is geen plek binnen RTG.' };
-    k.pad = p; k.titel = schoon(titel, 80) || null; k.at = Date.now(); save();
-    sein(k, 'kijk', { pad: k.pad, titel: k.titel, door: lid.codenaam }, key);
-    return { status: 200, ok: true, kamer: pub(k) };
+  function roteer(key, id, idem) {
+    const idemWaarde = String(idem || '').trim().slice(0, 200);
+    return handel(kamers => {
+      const k = actiefVoor(kamers, id, key);
+      if (!k) return antwoord({ status: 404, error: 'Deze kamer bestaat niet (meer).' });
+      if (k.gastheerKey !== key)
+        return antwoord({ status: 403, error: 'Alleen de gastheer vernieuwt de deelcode.' });
+      const idemHash = idemWaarde ? afdruk('samen-roteer-idem|' + key + '|' + idemWaarde) : null;
+      const tikHash = afdruk('samen-roteer-dubbeltik|' + key + '|' + k.id);
+      const laatst = k.laatste_rotatie;
+      if (laatst && ((idemHash && laatst.idem_hash === idemHash) ||
+          (!idemHash && laatst.dubbeltik_hash === tikHash &&
+            Date.now() - Date.parse(laatst.at) >= 0 &&
+            Date.now() - Date.parse(laatst.at) < DUBBELTIK_MS)))
+        return antwoord({ status: 409, herhaald: true,
+          error: 'De nieuwe Samen-code is al eenmalig getoond en wordt niet herhaald.',
+          kamer: publiek(k, key) });
+      const gemaakt = toegang.roteer(kamers, k, codenaamVan(k, key));
+      if (!gemaakt) return antwoord({ status: 500, error: 'Kon geen unieke Samen-code maken.' });
+      k.laatste_rotatie = { idem_hash: idemHash,
+        dubbeltik_hash: idemHash ? null : tikHash, at: nu() };
+      k.at = Date.now();
+      return antwoord({ status: 200, ok: true, code: gemaakt.code,
+        eenmalig: true, kamer: publiek(k, key) });
+    });
   }
+  const codenaamVan = (k, key) => (lidVan(k, key) || {}).codenaam || key;
 
-  function chat(key, code, tekst) {
-    const k = vind(code);
-    if (!k) return { status: 404, error: 'Deze samen-code bestaat niet (meer).' };
-    const lid = lidVan(k, key);
-    if (!lid) return { status: 403, error: 'Je zit niet (meer) in deze kamer.' };
-    const t = schoon(tekst, 300);
-    if (!t) return { status: 400, error: 'Zeg iets.' };
-    const regel = { van: lid.codenaam, tekst: t, at: Date.now() };
-    k.chat.push(regel);
-    if (k.chat.length > 100) k.chat.shift();
-    k.at = Date.now(); save();
-    sein(k, 'chat', regel, key);
-    return { status: 200, ok: true, regel };
-  }
-
-  /* "Samen luisteren": de gastheer deelt wat er speelt (station + seed + hoelang
-     de track al loopt). Omdat RTG Sound elke track uit die seed genereert, hoort
-     iedereen exact hetzelfde, tegelijk - van afstand of in dezelfde kamer als
-     luidsprekers. De server rekent de starttijd om naar zijn eigen klok, zodat
-     de leden hun positie los van hun eigen klok kunnen bepalen. */
-  function muziek(key, code, media) {
-    const k = vind(code);
-    if (!k) return { status: 404, error: 'Deze samen-code bestaat niet (meer).' };
-    const lid = lidVan(k, key);
-    if (!lid) return { status: 403, error: 'Je zit niet (meer) in deze kamer.' };
-    if (k.gastheerKey && k.gastheerKey !== key) return { status: 403, error: 'De gastheer bepaalt de muziek.' };
-    media = media || {};
-    const sid = String(media.stationId || '').slice(0, 40);
-    if (!sid) { k.muziek = null; k.at = Date.now(); save(); sein(k, 'muziek', { muziek: null, door: lid.codenaam }, key); return { status: 200, ok: true, kamer: pub(k) }; }
-    const seed = Math.max(0, Math.min(Math.floor(Number(media.seed) || 0), Number.MAX_SAFE_INTEGER));
-    const offset = Math.max(0, Math.min(Number(media.startOffsetMs) || 0, 24 * UUR));
-    const m = { stationId: sid, seed, start: Date.now() - offset, speelt: media.speelt !== false, door: lid.codenaam };
-    k.muziek = m; k.at = Date.now(); save();
-    sein(k, 'muziek', { muziek: m }, key);
-    return { status: 200, ok: true, kamer: pub(k) };
-  }
-
-  function weg(key, code) {
-    const k = vind(code);
-    if (!k) return { status: 200, ok: true };
-    const lid = lidVan(k, key);
-    if (lid) {
+  function weg(key, id) {
+    return handel(kamers => {
+      const k = kamer(kamers, id);
+      if (!k || k.gesloten_at) return antwoord({ status: 200, ok: true });
+      const lid = lidVan(k, key);
+      if (!lid) return antwoord({ status: 200, ok: true });
       k.leden = k.leden.filter(l => l.key !== key);
-      if (!k.leden.length) delete K()[k.code];
-      else sein(k, 'weg', { codenaam: lid.codenaam });
-      save();
-    }
-    return { status: 200, ok: true };
+      if (!k.leden.length) {
+        k.gesloten_at = nu();
+        toegang.intrekken(k, lid.codenaam, 'laatste lid vertrok');
+        return antwoord({ status: 200, ok: true });
+      }
+      if (k.gastheerKey === key) {
+        k.gastheerKey = k.leden[0].key;
+        k.gastheer = k.leden[0].codenaam;
+        toegang.intrekken(k, lid.codenaam, 'gastheer droeg kamer over');
+      }
+      k.at = Date.now();
+      return antwoord({ status: 200, ok: true },
+        seinen(k, 'weg', { codenaam: lid.codenaam }));
+    });
   }
 
-  function staat(key, code) {
-    const k = vind(code);
-    if (!k) return { status: 404, error: 'Deze samen-code bestaat niet (meer).' };
-    if (!lidVan(k, key)) return { status: 403, error: 'Je zit niet (meer) in deze kamer.' };
-    return { status: 200, ok: true, kamer: pub(k) };
+  function sluit(key, id) {
+    return handel(kamers => {
+      const k = actiefVoor(kamers, id, key);
+      if (!k) return antwoord({ status: 404, error: 'Deze kamer bestaat niet (meer).' });
+      if (k.gastheerKey !== key)
+        return antwoord({ status: 403, error: 'Alleen de gastheer sluit de kamer.' });
+      k.gesloten_at = nu();
+      toegang.intrekken(k, codenaamVan(k, key), 'kamer gesloten');
+      return antwoord({ status: 200, ok: true }, seinen(k, 'gesloten', {}, key));
+    });
   }
 
-  return { samen: { maak, doeMee, zet, chat, muziek, weg, staat, ruimOp } };
+  function staat(key, id) {
+    return handel(kamers => {
+      const k = actiefVoor(kamers, id, key);
+      return antwoord(k
+        ? { status: 200, ok: true, kamer: publiek(k, key) }
+        : { status: 404, error: 'Deze kamer bestaat niet (meer).' });
+    });
+  }
+
+  const ruimOp = () => handel(() => antwoord({ ok: true }));
+  const activiteiten = require('./samen-activiteiten')({ schoon, lidVan, publiek,
+    antwoord, seinen, actiefVoor, handel });
+  return { samen: Object.assign({ maak, doeMee, roteer, weg, sluit, staat, ruimOp },
+    activiteiten) };
 };

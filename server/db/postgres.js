@@ -1,7 +1,4 @@
-/* Opslag, deel "postgres": de write-behind koppeling met PostgreSQL (zie
-   server/pg). Postgres is de gedeelde, duurzame waarheid; het geheugen (db.data)
-   blijft de werkkopie en een lokale snapshot (DB_FILE) dient als warme cache en
-   fallback als Postgres even wegvalt. Deze module beheert de flush-pacing, de
+/* Opslag, deel "postgres": de write-behind koppeling met PostgreSQL. Deze module beheert de flush-pacing, de
    koppeling bij het opstarten (gidsen + tx-grootboek klaarzetten, gedeelde data
    ophalen, live meeluisteren via LISTEN/NOTIFY met een poll als vangnet) en de
    gezondheidschecks. */
@@ -14,19 +11,17 @@ const tx = require('./tx');
 const db = state.db;
 const { STORE, DATABASE_URL, schrijfLokaleSnapshotStil } = opslag;
 
-let pg = null, pgKlaar = false, pgVuil = false, pgFlushBezig = false, pgFlushTimer = null, pgPoll = null, pgVeilig = null;
+let pg = null, pgKlaar = false, pgBasisKlaar = false, pgOpstart = false;
+let pgVuil = false, pgFlushBezig = false, pgFlushTimer = null, pgPoll = null, pgVeilig = null;
+const metOpslagSlot = require('./opslag-slot')();
 const pgLog = { warn: (m, v) => console.warn('[pg]', m, v || '') };
 const grafsteen = require('./grafsteen');
+const verzoeken = require('./postgres-verzoeken')({
+  store: STORE, db, state, motor: () => pg, slot: metOpslagSlot,
+  topUp: () => tx.vensterTopUp(pgLog), extern: () => state.getExternCb(), basisKlaar: () => pgKlaar
+});
 
-/* De snelle rijstrook. De idempotentie-boeken van RTG Pay en RTG Bank hebben
-   geen rij-voor-rij grootboek achter zich (anders dan orders en boekingen) en
-   bestaan alleen als kv-blob. Wachten ze achter de grote blobs, dan is een
-   herstart binnen dat venster een DUBBELE BOEKING voor wie het opnieuw probeert;
-   op 100M leden gemeten liep dat op tot ~35 seconden. Ze krijgen daarom een
-   eigen, korte flush die niet achter de grote schrijfronde aansluit. Eigen
-   bezig-vlag, zodat de trage ronde deze niet blokkeert; de schrijfkant werkt per
-   collectie met een advisory lock, dus twee flushes over verschillende sleutels
-   zitten elkaar niet in de weg. Zie server/pg/sync.js (VOORRANG). */
+/* Snelle geldstrook; selectie/reden staan bij VOORRANG in pg/sync.js. */
 let snelVuil = false, snelBezig = false, snelTimer = null;
 function planSnel() {
   snelVuil = true;
@@ -39,18 +34,12 @@ async function snelNu() {
   snelTimer = null;
   if (!pg || !pgKlaar || snelBezig || !db.writable || !snelVuil || !pg.flushVoorrang) return;
   snelVuil = false; snelBezig = true;
-  snelBelofte = pg.flushVoorrang(db.data);
+  snelBelofte = metOpslagSlot(() => pg.flushVoorrang(state.getRuweData()));
   try { await snelBelofte; }
-  catch (e) { snelVuil = true; console.warn('[pg] voorrang-flush mislukt:', e.message); }
+  catch (e) { snelVuil = true; verzoeken.ongezond(e, 'voorrang-flush'); console.warn('[pg] voorrang-flush mislukt:', e.message); }
   finally { snelBezig = false; snelBelofte = null; if (snelVuil && pgKlaar) planSnel(); }
 }
-/* Wachtend op de rijstrook: voor geld dat pas "gelukt" mag zeggen als het er
-   ECHT staat. De rijstrook zelf bestond al (planSnel, 60 ms), maar een timer
-   is een venster, en de crashproef (kill -9 onder schrijflast) mat er
-   tweeentwintig BEVESTIGDE overdrachten in die na de herstart weg waren. Wie
-   hier wacht, weet dat de eigen mutatie in Postgres staat: een lopende flush
-   die haar mogelijk miste wordt afgewacht, en zolang er vuil ligt draait er
-   nog een ronde. In elke andere opslagstand is dit een no-op. */
+/* Wacht tot de voorrangsstrook leeg is; buiten PostgreSQL een no-op. */
 async function flushVoorrangDirect() {
   if (STORE !== 'postgres' || !pg || !pgKlaar || !db.writable || !pg.flushVoorrang) return;
   while (snelBezig) await (snelBelofte || new Promise(r => setTimeout(r, 5)));
@@ -67,6 +56,10 @@ function planFlush() {
   pgFlushTimer = setTimeout(flushNu, Number(process.env.PG_FLUSH_MS || 150));
   if (pgFlushTimer.unref) pgFlushTimer.unref();
 }
+/* save() buiten een request (timer/achtergrondtaak) krijgt geen vals antwoord:
+   de verkeerspoort sluit meteen en deze mutatie landt via herstel atomair. Vóór
+   de PG-start blijft de bestaande startflush gelden. */
+function planSave() { if (!verzoeken.achtergrondSave()) planFlush(); }
 
 // De lokale snapshot is met Postgres alleen een warme-start-cache: Postgres is
 // de duurzame waarheid en wint bij het opstarten. Hem bij elke flush (elke
@@ -113,13 +106,13 @@ async function flushNu() {
   if (!pg || !pgKlaar || pgFlushBezig || !db.writable || !pgVuil) return;
   pgVuil = false; pgFlushBezig = true;
   try {
-    await pg.flush(db.data);
+    await metOpslagSlot(() => pg.flush(state.getRuweData()));
     // grote collecties die door de flush-pacing zijn uitgesteld: vuil blijven,
     // zodat de her-geplande flush ze na de pauze alsnog wegschrijft
     if (pg.heeftUitgesteld && pg.heeftUitgesteld()) pgVuil = true;
     snapshotAlsHetMag();
   }
-  catch (e) { pgVuil = true; console.warn('[pg] flush mislukt:', e.message); }
+  catch (e) { pgVuil = true; verzoeken.ongezond(e, 'flush'); console.warn('[pg] flush mislukt:', e.message); }
   finally { pgFlushBezig = false; if (pgVuil && pgKlaar) planFlush(); }
 }
 
@@ -127,44 +120,49 @@ async function flushNu() {
    installeren, de gedeelde data ophalen (Postgres wint bij het opstarten), het
    RAM-venster uit het grootboek aanvullen, en daarna live meeluisteren op
    wijzigingen van andere instances (LISTEN/NOTIFY) met een poll als vangnet. */
-async function startPostgres() {
+async function startPostgres(voorGereed) {
   if (STORE !== 'postgres') return false;
-  pg = require('../pg').maakPg({ merge3, kluis, log: pgLog, url: DATABASE_URL });
-  await pg.schema();
-  // de grootboeken (bulk-zaken + ledengids) en het transactie-grootboek
-  await gidsen.init(pg.pool, pgLog);
-  await tx.initLedger(pg.pool, pgLog);
-  const pgData = await pg.laadAlles();
-  if (pgData) {
-    // Postgres is de gedeelde waarheid en wint voor elke collectie die hij heeft.
-    // Maar bij twee instances op een VERSE database kan een lezer een partiele
-    // snapshot lezen terwijl de ander nog aan het flushen is; zonder backfill zou
-    // db.data dan een collectie (bijv. live) missen en zouden lezers crashen op
-    // Object.keys(undefined). Daarom vullen we ontbrekende collecties aan met de
-    // al geseede defaults; zodra de flush rond is, synchroniseert de rest vanzelf.
-    db.data = grafsteen.samenvoegen(db.data, pgData, pgLog).dbData;
-    if (db.data.__schema == null) db.data.__schema = 1;
-    schrijfLokaleSnapshotStil();
-    const ext = state.getExternCb(); if (ext) ext();
-  } else if (db.writable) {
-    await pg.flush(db.data, true); // lege database: onze seed/snapshot erin (alles, ook grote collecties)
+  pgKlaar = false; pgBasisKlaar = false; pgOpstart = true;
+  const opstartPg = require('../pg').maakPg({ merge3, kluis, log: pgLog, url: DATABASE_URL,
+    onFout: (e, bron) => verzoeken.ongezond(e, bron) });
+  pg = opstartPg;
+  try {
+    await pg.schema();
+    await gidsen.init(pg.pool, pgLog);
+    await tx.initLedger(pg.pool, pgLog);
+    const pgData = await pg.laadAlles();
+    if (pgData) {
+      /* Postgres wint; seeded defaults vullen alleen nog ontbrekende collecties
+         op een verse database aan terwijl een tweede schrijver aan het vullen is. */
+      state.setRuweData(grafsteen.samenvoegen(state.getRuweData(), pgData, pgLog).dbData);
+      if (state.getRuweData().__schema == null) state.getRuweData().__schema = 1;
+      schrijfLokaleSnapshotStil();
+      const ext = state.getExternCb(); if (ext) ext();
+    } else if (db.writable) await pg.flush(state.getRuweData(), true);
+    await tx.vensterTopUp(pgLog);
+    pgBasisKlaar = true;
+    /* Migraties schrijven transactioneel; verkeer en timers blijven nog dicht. */
+    if (typeof voorGereed === 'function') await voorGereed();
+    await pg.luister(() => {
+      metOpslagSlot(() => pg.haalNieuwer(state.getRuweData(), state.getExternCb()))
+        .then(aantal => { if (aantal) snapshotAlsHetMag(); })
+        .catch(e => verzoeken.ongezond(e, 'listen-sync'));
+    });
+    pgKlaar = true; pgOpstart = false; verzoeken.gestart();
+    pgPoll = setInterval(() => metOpslagSlot(() => pg.haalNieuwer(state.getRuweData(), state.getExternCb()))
+      .catch(e => verzoeken.ongezond(e, 'poll')), Number(process.env.RTG_POLL_MS || 2000));
+    if (pgPoll.unref) pgPoll.unref();
+    pgVeilig = setInterval(() => { if (pgVuil) flushNu(); }, 1000);
+    if (pgVeilig.unref) pgVeilig.unref();
+    if (pgVuil) planFlush();
+    console.log('[db] PostgreSQL-opslag actief, rol:', db.writable ? 'schrijver' : 'lezer');
+    return true;
+  } catch (e) {
+    pgKlaar = false; pgBasisKlaar = false; pgOpstart = false;
+    if (pg === opstartPg) pg = null;
+    try { await opstartPg.sluit(); } catch (x) {}
+    throw e;
   }
-  // Venster-top-up uit het grootboek: items die al als rij in het grootboek staan
-  // maar nog niet in de blob, komen hier terug in het venster.
-  await tx.vensterTopUp(pgLog);
-  pgKlaar = true;
-  await pg.luister(() => {
-    pg.haalNieuwer(db.data, state.getExternCb())
-      .then(aantal => { if (aantal) snapshotAlsHetMag(); })   // gerembd, en alleen bij echte wijzigingen
-      .catch(() => {});
-  });
-  pgPoll = setInterval(() => pg.haalNieuwer(db.data, state.getExternCb()).catch(() => {}), Number(process.env.RTG_POLL_MS || 2000));
-  if (pgPoll.unref) pgPoll.unref();
-  pgVeilig = setInterval(() => { if (pgVuil) flushNu(); }, 1000);
-  if (pgVeilig.unref) pgVeilig.unref();
-  if (pgVuil) planFlush();
-  console.log('[db] PostgreSQL-opslag actief, rol:', db.writable ? 'schrijver' : 'lezer');
-  return true;
 }
 // De pg-only laatste flush bij het afsluiten (de snapshot doet index erbovenop).
 async function flushBijAfsluiten() {
@@ -174,22 +172,27 @@ async function flushBijAfsluiten() {
      juist NIET wegschrijven -- precies de bug die deze strook moest oplossen.
      En ze gaan vooraan omdat een afsluit-flush op mega-schaal door het
      grace-venster kan worden afgekapt: wat als eerste weg is, is veilig. */
-  try { if (pg.flushVoorrang) await pg.flushVoorrang(db.data); } catch (e) {}
-  try { await pg.flush(db.data, true); } catch (e) {} // force: ook de door pacing uitgestelde grote collecties
+  try { if (pg.flushVoorrang) await metOpslagSlot(() => pg.flushVoorrang(state.getRuweData())); } catch (e) {}
+  try { await metOpslagSlot(() => pg.flush(state.getRuweData(), true)); } catch (e) {} // force: ook de door pacing uitgestelde grote collecties
 }
 
 // Ping de database voor de gezondheidscheck; geeft de antwoordtijd in ms.
 async function pgPing() {
   if (STORE !== 'postgres' || !pg) throw new Error('PostgreSQL is niet actief.');
   const t = Date.now();
-  await pg.pool.query('SELECT 1');
+  try { await pg.pool.query('SELECT 1'); }
+  catch (e) { verzoeken.ongezond(e, 'ping'); throw e; }
   return Date.now() - t;
 }
 // Pool-verzadiging (alleen in Postgres-modus) voor de health/ready-checks.
 function pgPoolStatus() { return (pg && pg.poolStatus) ? pg.poolStatus() : null; }
-function klaar() { return pgKlaar; }
-const bewerkCollectiePostgres = require('./collectie-postgres')({
-  store: STORE, db, motor: () => pg, klaar: () => pgKlaar
+function klaar() { return pgKlaar && verzoeken.klaar(); }
+const { bewerkCollectiePostgres, economischeBoekingPostgres } = require('./postgres-poorten')({
+  store: STORE, db, motor: () => pg,
+  klaar: () => pgBasisKlaar && (pgOpstart || (pgKlaar && verzoeken.klaar())), slot: metOpslagSlot,
+  onFout: verzoeken.ongezond
 });
 
-module.exports = { planFlush, flushVoorrangDirect, bewerkCollectiePostgres, startPostgres, flushBijAfsluiten, pgPing, pgPoolStatus, klaar };
+module.exports = { planFlush, planSave, flushVoorrangDirect, bewerkCollectiePostgres, economischeBoekingPostgres,
+  startPostgres, flushBijAfsluiten, pgPing, pgPoolStatus, klaar,
+  verzoekMiddleware: verzoeken.middleware, schrijfStand: verzoeken.stand, herstelNu: verzoeken.herstelNu };

@@ -18,6 +18,7 @@ const { REDEN_NODIG, RECHTEN, ROLLEN } = require('./rollen-register');
 
 module.exports = (sctx) => {
   const { app, save, schoon, nu, rid, dag, beheerVan, lidVan, eigenVeld } = sctx;
+  const PRODUCTIE = String(process.env.NODE_ENV || '') === 'production';
 
   /* De geldige rollen van een lid. Een rol kan een venster hebben: `van` voor
      wie vooruit wordt klaargezet (de nieuwe collega van maandag mag vandaag
@@ -52,7 +53,7 @@ module.exports = (sctx) => {
      een reden bij, en die gaat het journaal in. */
   function werkPoort(req, res, recht) {
     const tok = String((req.body || {}).beheerToken || '');
-    if (tok) {
+    if (!PRODUCTIE && tok) {
       const w = beheerVan(req, res); if (!w) return null;
       return { w, l: { id: null, naam: 'beheer' }, directie: true, rechten: RECHTEN };
     }

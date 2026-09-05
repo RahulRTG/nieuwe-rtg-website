@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
+<script src="/shared/id.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Platformregister</title>
@@ -17,7 +18,7 @@
   main{max-width:64rem;margin:0 auto;padding:1.1rem;}
   header{display:flex;align-items:center;gap:.9rem;padding:1rem 1.1rem .7rem;
     border-bottom:1px solid var(--rtg-line);max-width:64rem;margin:0 auto;}
-  header .weg{margin-left:auto;color:var(--rtg-soft);text-decoration:none;font-size:.78rem;}
+  header .weg{display:inline-flex;align-items:center;min-height:24px;margin-left:auto;color:var(--rtg-soft);text-decoration:none;font-size:.78rem;}
   header .weg:hover,header .weg:focus-visible{color:var(--rtg-goud);}
   /* Twee wegwijzers naast elkaar: de tweede krijgt zijn lucht uit CSS en niet
      uit een style-attribuut, zodat style-src-attr dicht kan blijven. */

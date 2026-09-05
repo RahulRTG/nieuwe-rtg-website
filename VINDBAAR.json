@@ -1,19 +1,19 @@
 {
   "stempel": {
-    "op": "2026-09-04T08:23:33.378Z",
-    "commit": "3359f0851",
+    "op": "2026-09-05T19:04:08.472Z",
+    "commit": "1fb191083",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 8,
     "instrument": "scripts/vindbaar.js",
-    "node": "v22.22.2"
+    "node": "v24.18.0"
   },
   "uitleg": "Per bestemming in de sprong: welk aandeel van de ONDERSCHEIDENDE woorden van dat scherm (woorden uit zijn koppen die op hooguit 3 bestemmingen voorkomen) er ook naartoe leidt in de zoekfilter van shared/sprong.js. Meet woorden, geen mensen: of iemand op het idee komt dat woord te typen, weet deze meter niet.",
   "vloer": 0.6,
   "drempel": 3,
   "bestemmingen": 89,
   "woorden": 1083,
-  "gevonden": 701,
-  "dekking": 0.6473,
+  "gevonden": 702,
+  "dekking": 0.6482,
   "perBestemming": [
     {
       "naam": "Magnaat",
@@ -65,8 +65,8 @@
     {
       "naam": "Onderneming",
       "url": "/apps/onderneming.html",
-      "woorden": 35,
-      "gevonden": 8,
+      "woorden": 34,
+      "gevonden": 7,
       "mist": [
         "beginnen",
         "gezondheid",
@@ -409,21 +409,6 @@
       ]
     },
     {
-      "naam": "RTG One",
-      "url": "/apps/rtgone.html",
-      "woorden": 30,
-      "gevonden": 23,
-      "mist": [
-        "koppel",
-        "persoonlijke",
-        "beloften",
-        "length",
-        "persoonlijk",
-        "actieve",
-        "werkstromen"
-      ]
-    },
-    {
       "naam": "Website",
       "url": "/apps/sitemaker.html",
       "woorden": 22,
@@ -520,6 +505,20 @@
         "leest",
         "intussen",
         "nieuwere"
+      ]
+    },
+    {
+      "naam": "RTG One",
+      "url": "/apps/rtgone.html",
+      "woorden": 29,
+      "gevonden": 23,
+      "mist": [
+        "persoonlijke",
+        "beloften",
+        "length",
+        "persoonlijk",
+        "actieve",
+        "werkstromen"
       ]
     },
     {
@@ -661,8 +660,8 @@
     {
       "naam": "Muziek",
       "url": "/apps/muziek.html",
-      "woorden": 6,
-      "gevonden": 3,
+      "woorden": 7,
+      "gevonden": 4,
       "mist": [
         "stations",
         "straks",
@@ -1040,8 +1039,8 @@
     {
       "naam": "Vluchten",
       "url": "/apps/vluchten.html",
-      "woorden": 5,
-      "gevonden": 5,
+      "woorden": 6,
+      "gevonden": 6,
       "mist": []
     },
     {

@@ -66,4 +66,36 @@ function keurGeld(env, fouten, waarschuwingen) {
       fouten.push('MUNT_AAN=1 zonder MUNT_WEBHOOK_SECRET: de munt-webhook zou onondertekende berichten als waarheid aannemen (en zet een factuur op betaald). Zet een secret, of laat MUNT_AAN uit.');
 }
 
-module.exports = { keurGeld };
+/* Een meetbare CONFIGURATIEstand voor het releasebewijs. Aanwezige sleutels of
+   een geldig IBAN bewijzen geen levering, webhook of settlement; daarvoor eist
+   productie-status de afzonderlijke, ondertekende externe proefartefacten. */
+function geldigIban(waarde) {
+  const iban = String(waarde || '').replace(/\s+/g, '').toUpperCase();
+  if (!/^[A-Z]{2}\d{2}[A-Z0-9]{11,30}$/.test(iban)) return false;
+  const herschikt = iban.slice(4) + iban.slice(0, 4);
+  let rest = 0;
+  for (const teken of herschikt) {
+    const deel = /\d/.test(teken) ? teken : String(teken.charCodeAt(0) - 55);
+    for (const cijfer of deel) rest = (rest * 10 + Number(cijfer)) % 97;
+  }
+  return rest === 1;
+}
+
+function stand(env) {
+  env = env || {};
+  const inkomendProviders = [];
+  if (env.STRIPE_SECRET_KEY) inkomendProviders.push('stripe');
+  if (env.MOLLIE_API_KEY) inkomendProviders.push('mollie');
+  if (env.ADYEN_API_KEY) inkomendProviders.push('adyen');
+  const betalingenUit = env.RTG_BETALEN_UIT === '1';
+  return {
+    betalingenUit,
+    inkomendProviders,
+    inkomendGeconfigureerd: !betalingenUit && inkomendProviders.length > 0,
+    uitgaandGeconfigureerd: false,
+    uitgaandWaarom: 'Er is nog geen productie-uitbetaalprovider; de huidige SEPA-weg is uitsluitend sandbox/Magnaat Test.',
+    foundationRekeningGeconfigureerd: geldigIban(env.RTF_IBAN)
+  };
+}
+
+module.exports = { keurGeld, stand, geldigIban };

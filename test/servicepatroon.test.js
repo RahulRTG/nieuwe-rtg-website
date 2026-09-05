@@ -74,6 +74,10 @@ test('bundelen licht alle melders in een keer in, en herstellen ook', async () =
   const o = await opzet(4);
   try {
     const zaken = await vierMeldingen(o);
+    const voor = await o.p('/api/office/service/patronen', {}, o.balie);
+    assert.equal(voor.body.vermoedens.length, 1,
+      'de vier echte meldingen vormen vóór het bundelen één zichtbaar vermoeden');
+    assert.equal(voor.body.vermoedens[0].aantal, 4);
     const b = await o.p('/api/office/service/bundel', { zaken, incident: 'RTG-0042' }, o.balie);
     assert.equal(b.body.gekoppeld, 4, JSON.stringify(b.body).slice(0, 200));
 

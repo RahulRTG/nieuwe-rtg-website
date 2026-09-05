@@ -61,8 +61,17 @@ module.exports = (ctx) => {
       klacht('TERUGBOEKING MISLUKT -- geld staat van de klant af zonder bestemming', { id: o.id, ledgerRef: o.ledgerRef, fout: o.terugboekFout });
       return false;
     }
+    const voor = Object.assign({}, o);
     zet(o, STATUS.TERUGGEBOEKT, { terugboekRef: (r && r.boeking && r.boeking.id) || null, terugboekFout: null });
-    save();
+    try { save(); }
+    catch (e) {
+      /* De teruggang zelf hoort economisch idempotent te zijn. Zet bij een
+         opslagfout de opdracht terug, zodat de retry diezelfde teruggang met
+         dezelfde opdracht-id opnieuw kan bewijzen en daarna bewaren. */
+      for (const sleutel of Object.keys(o)) if (!Object.prototype.hasOwnProperty.call(voor, sleutel)) delete o[sleutel];
+      Object.assign(o, voor);
+      throw e;
+    }
     return true;
   }
 

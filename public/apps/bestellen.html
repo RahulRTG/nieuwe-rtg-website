@@ -969,8 +969,7 @@
     if (!regels.length) return;
     var m = modus();
     if (m !== 'foodcourt' && (!CHECKOUT || !CHECKOUT.bevestigbaar)) return controleerBestelling();
-    if (!CHECKOUT_IDEM) CHECKOUT_IDEM = window.RTGId ? RTGId('bestel')
-      : 'b' + regels.map(function (r) { return r.zaak + r.itemId + r.aantal; }).join('');
+    if (!CHECKOUT_IDEM) CHECKOUT_IDEM = RTGId('bestel');
     $('#bBestel').disabled = true; $('#bBevestig').disabled = true;
     $('#bBevestig').textContent = 'Wordt veilig bevestigd…';
 

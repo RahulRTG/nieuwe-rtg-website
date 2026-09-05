@@ -51,11 +51,14 @@ const FILTERS = [
   { id: 'fp', naam: 'Priority (Lifestyle en Business)' }
 ];
 
-function maakLuchthaven({ db, save, crypto, anthropic, visumtaakVan }) {
+function maakLuchthaven({ db, save, bewerkCollectie, crypto, anthropic, visumtaakVan }) {
   const nu = () => new Date().toISOString();
   const id = p => (p || 'x') + crypto.randomBytes(4).toString('hex');
   const schoon = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, n || 120);
   const vandaag = () => new Date().toISOString().slice(0, 10);
+  const boardingPass = require('./boarding-pass')({
+    db, bewerkCollectie, crypto, nu, vandaag
+  });
 
   function L() {
     if (!db.data.luchthaven || typeof db.data.luchthaven !== 'object')
@@ -129,32 +132,18 @@ function maakLuchthaven({ db, save, crypto, anthropic, visumtaakVan }) {
     return v;
   }
 
-  /* De luchtzijde-partners: elke zaak met de luchtzijde-stand aan checkt
-     hiermee de boarding pass van de gast: geldig is ingecheckt, voor een
-     vlucht van vandaag die nog niet weg is. */
-  function passCheck(code) {
-    seed();
-    const b = L().boekingen.find(x => x.code === String(code || '').trim().toUpperCase());
-    if (!b) return { ok: true, geldig: false, reden: 'Deze code kennen we niet.' };
-    const v = vind(b.vluchtId);
-    if (!v) return { ok: true, geldig: false, reden: 'De vlucht bestaat niet meer.' };
-    if (b.status !== 'ingecheckt') return { ok: true, geldig: false, reden: 'Deze reiziger is nog niet ingecheckt.' };
-    if (v.status === 'geannuleerd') return { ok: true, geldig: false, reden: 'De vlucht is geannuleerd.' };
-    if (v.status === 'vertrokken') return { ok: true, geldig: false, reden: 'Deze vlucht is al vertrokken.' };
-    if (v.datum !== vandaag()) return { ok: true, geldig: false, reden: 'Deze boarding pass is niet van vandaag (' + v.datum + ').' };
-    return { ok: true, geldig: true, pass: { naam: b.codenaam, vlucht: v.nummer, bestemming: v.bestemming, tijd: v.tijd, gate: v.gate, stoel: b.stoel } };
-  }
-
   // de gedeelde ctx voor de deelbestanden
   const ctx = { db, save, crypto, anthropic, nu, id, schoon, vandaag, visumtaakVan,
     L, seed, vluchten, vind, actief, keten, catVan, plekkenVoor, draaiTakenVoor, draaiRond,
-    vipVan, vipRond, publiek, _vluchtMaak, passCheck,
+    vipVan, vipRond, publiek, _vluchtMaak, boardingPass,
     GATES, STANDS, HELIPADS, BANEN, BANDEN, CATEGORIEEN, LOUNGES,
     VERTREK_KETEN, AANKOMST_KETEN, DRAAI_TAKEN, KOFFER_KETEN, VIP_SOORTEN, VIP_PROTOCOL };
   const royaal = require('./royaal')(ctx);
   // mijn reizen (in ./vluchten) toont ook de eigen charteraanvragen
   ctx.mijnCharters = royaal.mijnCharters;
-  const api = { seed, isLucht, passCheck,
+  const api = { seed, isLucht,
+    passCheck: (code, context) => boardingPass.controleerEnClaim(Object.assign({ code }, context || {})),
+    migreerBoardingPasses: boardingPass.migreerAlles,
     GATES, STANDS, HELIPADS, BANEN, DRAAI_TAKEN, KOFFER_KETEN, VIP_PROTOCOL };
   Object.assign(api, require('./vluchten')(ctx));
   Object.assign(api, require('./grond')(ctx));

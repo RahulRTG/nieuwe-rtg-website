@@ -1,6 +1,7 @@
 /* Centrale providerregie; geheimen blijven op de server. */
 'use strict';
 const { datum: klokDatum } = require('../lib/klok');
+const betalingCijfers = require('./betaalregie-waarheid');
 
 const PROVIDERS = Object.freeze({
   stripe: {
@@ -79,28 +80,6 @@ module.exports = function maakBetaalregie({ d, save, betaal, env, nu }) {
     try { return betaal.mogelijkheden().rails || []; } catch (e) { return []; }
   }
 
-  function betalingCijfers() {
-    const alle = Object.values((d().betaalWaarheid) || {});
-    const perStatus = {}, perProvider = {};
-    let bevestigdCenten = 0, terugbetaaldCenten = 0;
-    for (const b of alle) {
-      perStatus[b.status] = (perStatus[b.status] || 0) + 1;
-      const p = b.provider || 'nog-geen';
-      perProvider[p] = (perProvider[p] || 0) + 1;
-      if (['BEVESTIGD', 'TERUGBETALING_WACHT', 'GEDEELTELIJK_TERUGBETAALD', 'TERUGBETAALD'].includes(b.status))
-        bevestigdCenten += Number(b.centen) || 0;
-      terugbetaaldCenten += Number(b.terugbetaaldCenten) || 0;
-    }
-    const recent = alle.slice().sort((a, b) => String(b.bijgewerktAt || '').localeCompare(String(a.bijgewerktAt || '')))
-      .slice(0, 12).map(b => ({ id: b.id, provider: b.provider || null, status: b.status,
-        centen: Number(b.centen) || 0, terugbetaaldCenten: Number(b.terugbetaaldCenten) || 0,
-        bijgewerktAt: b.bijgewerktAt || b.aangemaaktAt || null }));
-    return { totaal: alle.length, perStatus, perProvider, bevestigdCenten, terugbetaaldCenten,
-      controleNodig: perStatus.CONTROLE_NODIG || 0,
-      onderweg: (perStatus.AANGEMAAKT || 0) + (perStatus.WACHT_OP_KLANT || 0) + (perStatus.IN_BEHANDELING || 0),
-      recent };
-  }
-
   function providerBeeld(id, r, actieveRails, cijfers) {
     const meta = PROVIDERS[id];
     const checklist = meta.vereist.map(([sleutel, label]) => ({ sleutel, label, ingesteld: geheimAan(sleutel) }));
@@ -121,7 +100,7 @@ module.exports = function maakBetaalregie({ d, save, betaal, env, nu }) {
 
   function overzicht() {
     const r = staat();
-    const cijfers = betalingCijfers();
+    const cijfers = betalingCijfers(d());
     const uit = betaal.BETALEN_AAN === false;
     const actieveRails = new Set(rails().filter(x => x.echt).map(x => x.id));
     const providers = Object.keys(PROVIDERS).map(id => providerBeeld(id, r.providers[id], actieveRails, cijfers));
@@ -137,6 +116,12 @@ module.exports = function maakBetaalregie({ d, save, betaal, env, nu }) {
     }
     if (cijfers.controleNodig) problemen.push({ ernst: 'kritiek', code: 'BETALING-CONTROLE',
       tekst: cijfers.controleNodig + ' betaling(en) hebben menselijke controle nodig.' });
+    if (cijfers.afhandelingWacht) problemen.push({ ernst: 'kritiek', code: 'AFHANDELING-WACHT',
+      tekst: cijfers.afhandelingWacht + ' bevestigde betaling(en) wachten nog op veilige domeinafhandeling.' });
+    if (cijfers.terugbetalingControle) problemen.push({ ernst: 'kritiek', code: 'TERUGBETALING-CONTROLE',
+      tekst: cijfers.terugbetalingControle + ' terugbetaling(en) wachten op menselijke controle.' });
+    if (cijfers.terugbetalingWacht) problemen.push({ ernst: 'waarschuwing', code: 'TERUGBETALING-WACHT',
+      tekst: cijfers.terugbetalingWacht + ' terugbetaling(en) wachten op providerbevestiging.' });
     const inbox = Object.values(d().betaalWaarheidMeldingen || {});
     const onverwerkt = inbox.filter(x => !x.verwerktAt).length;
     if (onverwerkt) problemen.push({ ernst: 'waarschuwing', code: 'WEBHOOK-WACHT',

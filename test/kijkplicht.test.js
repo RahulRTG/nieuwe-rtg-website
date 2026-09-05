@@ -163,6 +163,7 @@ test('3. de leiding ziet WIE en WANNEER -- en niets meer dan dat', async () => {
 
 test('4. de medewerker ziet dezelfde lijst, en een vreemde ziet niets', async () => {
   const mijn = await api('/api/theater/kijkplicht/mijn', {}, collega.token);
+  assert.equal(mijn.body.rijen.length, 1, 'de eigen kant is aantoonbaar gevuld');
   assert.equal(mijn.body.rijen[0].id, regelId, 'geen dossier waar hij zelf niet in kan');
 
   const ander = await api('/api/theater/kijkplicht/mijn', {}, vreemde.token);
@@ -174,11 +175,22 @@ test('4. de medewerker ziet dezelfde lijst, en een vreemde ziet niets', async ()
 });
 
 test('5. een regel weghalen kan, en de video blijft gewoon staan', async () => {
+  const medewerkerVoor = await api('/api/theater/kijkplicht/mijn', {}, collega.token);
+  assert.ok(medewerkerVoor.body.rijen.some(r => r.id === regelId),
+    'de medewerker heeft de concrete regel vóór het weghalen');
+  const leidingVoor = await api('/api/theater/kijkplicht/stand', { zaakCode: zaakA.code }, baas.token);
+  assert.ok(leidingVoor.body.lijst.some(r => r.id === regelId),
+    'de leiding heeft dezelfde concrete regel vóór het weghalen');
+
   const weg = await api('/api/theater/kijkplicht/zet', { zaakCode: zaakA.code, id: regelId, weg: true }, baas.token);
   assert.equal(weg.status, 200);
-  assert.deepEqual(weg.body.lijst, [], 'de lijst is leeg');
+  assert.equal(weg.body.lijst.some(r => r.id === regelId), false, 'de concrete regel is uit de leidinglijst');
+  assert.equal(weg.body.lijst.length, leidingVoor.body.lijst.length - 1,
+    'precies één regel is weggehaald');
   const mijn = await api('/api/theater/kijkplicht/mijn', {}, collega.token);
-  assert.deepEqual(mijn.body.rijen, []);
+  assert.equal(mijn.body.rijen.some(r => r.id === regelId), false, 'de concrete regel is ook uit de medewerkerslijst');
+  assert.equal(mijn.body.rijen.length, medewerkerVoor.body.rijen.length - 1,
+    'ook daar verdween precies één regel');
   const zaal = await api('/api/theater/zaak', {}, collega.token);
   assert.ok((zaal.body.videos || []).some(v => v.id === videoId), 'de video staat er nog: een lijst is geen bezit');
 });

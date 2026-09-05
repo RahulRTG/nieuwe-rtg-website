@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
+<script src="/shared/id.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Reisboek · Lifestyle Pass</title>
@@ -49,8 +50,9 @@
 <link href="/shared/ios.css" rel="stylesheet">
 <link href="/shared/travel-os.css" rel="stylesheet">
 <link href="/shared/rtg-edge-system.css" rel="stylesheet">
+<link href="/shared/rtg-vandaag-luxe.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl travel-os" data-rtg-eigenvlak="bordeaux" data-rtg-world="travel">
+<body class="rtg-stijl travel-os" data-rtg-eigenvlak="bordeaux" data-rtg-world="travel" data-rtg-vandaag-luxe="surface" data-rtg-vandaag-surface="reisboek" data-rtg-vandaag-surface-title="Uw reis" data-rtg-edge-2-context="native-header" data-rtg-edge-2-state="compact" data-rtg-edge-2-auto="false">
 <header><div><div class="ey">Lifestyle Pass</div><h1>Reisboek</h1></div><a class="terug" href="/apps/lifestyle.html">&#8592; kantoor</a></header>
 <main id="main"><div class="leeg">Laden…</div></main>
 <div class="melding" id="melding"></div>
@@ -120,6 +122,7 @@ function detail(r){
 }
 laad();
 </script>
+<script src="/shared/rtg-vandaag-luxe.js" defer></script>
 <script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>

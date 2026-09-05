@@ -42,7 +42,7 @@ test('Experience surface: Economic Proof en bevestigde actie zijn mobiel zichtba
     assert.equal(betaald.status, 200, JSON.stringify(betaald.body));
 
     browser = await pw.chromium.launch(browserOpties(pw));
-    const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+    const context = await browser.newContext({ viewport: { width: 320, height: 720 } });
     await context.addInitScript(tok => {
       localStorage.setItem('rtg_member_token', tok);
       localStorage.setItem('rtg_lang', 'nl');
@@ -51,11 +51,38 @@ test('Experience surface: Economic Proof en bevestigde actie zijn mobiel zichtba
     const page = await context.newPage(), fouten = [];
     letOpFouten(page, fouten);
     await page.goto(base + '/apps/rtg.html', { waitUntil: 'domcontentloaded' });
+    await page.waitForSelector('body[data-rtg-edge-2-rendered="true"]', { timeout: 15000 });
     await page.waitForFunction(() => {
-      const b = document.querySelector('.xp-trigger');
-      return b && !/Verbinden/.test(b.textContent);
+      const b = document.querySelector('.rtg-edge-action .xp-trigger');
+      if (!b || /Verbinden/.test(b.textContent)) return false;
+      const r = b.getBoundingClientRect();
+      const voor = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+      return r.width > 0 && r.height > 0 && !!voor && b.contains(voor);
     }, null, { timeout: 15000 });
-    await page.click('.xp-trigger');
+    assert.equal(await page.locator('.rtg-edge-action .xp-trigger').count(), 1,
+      'Economic Proof heeft exact één zichtbare ingang in de Edge-onderrand');
+    const randMaat = await page.evaluate(() => {
+      const slot = document.querySelector('.rtg-edge-action');
+      const sr = slot.getBoundingClientRect();
+      const knoppen = [...slot.querySelectorAll('button')].filter(x => x.offsetParent !== null).map(x => {
+        const r = x.getBoundingClientRect();
+        return { naam: x.getAttribute('aria-label') || x.textContent.trim(), left: r.left,
+          right: r.right, top: r.top, bottom: r.bottom, width: r.width, height: r.height };
+      }).sort((a, b) => a.left - b.left);
+      return { slot: { left: sr.left, right: sr.right }, knoppen };
+    });
+    assert.equal(randMaat.knoppen.length, 3,
+      'Context, dagactie en Experience delen exact dezelfde actieruimte: ' + JSON.stringify(randMaat));
+    for (const k of randMaat.knoppen) {
+      assert.ok(k.width >= 24 && k.height >= 24,
+        'raakvlak is te klein op 320 px: ' + JSON.stringify(k));
+      assert.ok(k.left >= randMaat.slot.left - 1 && k.right <= randMaat.slot.right + 1,
+        'bediening wordt op 320 px afgeknipt: ' + JSON.stringify({ randMaat, k }));
+    }
+    for (let i = 1; i < randMaat.knoppen.length; i++) assert.ok(
+      randMaat.knoppen[i - 1].right <= randMaat.knoppen[i].left + .5,
+      'bedieningen overlappen op 320 px: ' + JSON.stringify(randMaat));
+    await page.click('.rtg-edge-action .xp-trigger');
     await page.waitForSelector('.xp-dialog[open]', { timeout: 5000 });
     await page.waitForSelector('.xp-proofs .xp-proof', { timeout: 5000 });
     const valueProof = await page.textContent('.xp-proofs');

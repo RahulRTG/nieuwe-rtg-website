@@ -56,7 +56,11 @@ test('Agenda: maandraster, Rahul plant, uitnodigen op codenaam, ja zeggen en ICS
       null, { timeout: 8000 });
 
     /* ---- A: het paneel, met herhaling en plek ---- */
-    await page.click('#nieuwBtn');
+    await page.waitForSelector('body[data-rtg-edge-2-rendered="true"]', { timeout: 8000 });
+    const hoofdactie = '.rtg-edge-action > button:not(.rtg-edge-2-context-button)';
+    assert.equal(await page.textContent(hoofdactie), 'Nieuwe afspraak',
+      'de enige onderrand biedt de echte Agenda-hoofdactie aan');
+    await page.click(hoofdactie);
     await page.waitForSelector('#afScrim.open', { timeout: 5000 });
     await page.fill('#afTitel', 'Padel');
     await page.fill('#afDatum', morgen);
@@ -104,6 +108,7 @@ test('Agenda: maandraster, Rahul plant, uitnodigen op codenaam, ja zeggen en ICS
     await page.waitForFunction(() => /komt(?! niet)/.test(document.querySelector('#afDeelnemers').textContent),
       null, { timeout: 8000 });
     await page.click('#afDicht');
+    await page.click('.rtg-edge-2-context-button');
     await page.click('#icsBtn');
     await page.waitForFunction(() => /rtg-agenda\.ics/.test(document.querySelector('#melding').textContent),
       null, { timeout: 8000 });

@@ -21,13 +21,17 @@ const path = require('path');
 const { execFileSync } = require('child_process');
 const { alleRoutes } = require('../scripts/lib/routes');
 const { SLEUTELS } = require('../server/lib/idemsleutels');
+const { NOOIT } = require('../server/lib/idemsleutels-nooit');
 const vastgelegd = require('../IDEMSCHULD.json');
 
 const WORTEL = path.join(__dirname, '..');
 
 function meetNu() {
   const routes = alleRoutes().filter(r => r.pad.startsWith('/api/') && r.methode !== 'GET');
-  const schuld = routes.filter(r => !SLEUTELS[r.methode.toUpperCase() + ' ' + r.pad]);
+  const schuld = routes.filter(r => {
+    const sleutel = r.methode.toUpperCase() + ' ' + r.pad;
+    return !SLEUTELS[sleutel] && !NOOIT[sleutel];
+  });
   return { routes: routes.length, schuld: schuld.length, lijst: schuld.map(r => r.methode + ' ' + r.pad) };
 }
 
@@ -45,7 +49,7 @@ test('er staan geen verklaringen voor routes die niet bestaan', () => {
   const bekend = new Set(alleRoutes()
     .filter(r => r.pad.startsWith('/api/') && r.methode !== 'GET')
     .map(r => r.methode.toUpperCase() + ' ' + r.pad));
-  const wees = Object.keys(SLEUTELS).filter(s => !bekend.has(s));
+  const wees = [...Object.keys(SLEUTELS), ...Object.keys(NOOIT)].filter(s => !bekend.has(s));
   assert.deepEqual(wees, [],
     'een verklaring voor een verdwenen route is geen dekking maar rommel, en hij houdt het schuldgetal kunstmatig laag');
 });
@@ -56,8 +60,18 @@ test('de teller draait echt, en zakt als er een verklaring wegvalt', () => {
      gelijk is aan het aantal schrijfroutes -- dus dat hij de verklaringen
      werkelijk aftrekt in plaats van een getal op te schrijven. */
   const nu = meetNu();
-  assert.equal(nu.schuld + Object.keys(SLEUTELS).length, nu.routes,
+  assert.equal(nu.schuld + Object.keys(SLEUTELS).length + Object.keys(NOOIT).length, nu.routes,
     'verklaard + schuld hoort precies het aantal schrijfroutes te zijn');
+});
+
+test('NOOIT is een gemotiveerd besluit en nooit een verborgen duplicaatregel', () => {
+  for (const [sleutel, waarom] of Object.entries(NOOIT)) {
+    assert.ok(waarom.length > 20, sleutel + ' heeft geen dragende NOOIT-reden');
+    assert.equal(SLEUTELS[sleutel], undefined,
+      sleutel + ' mag niet tegelijk door de generieke antwoordcache worden behandeld');
+  }
+  assert.ok(!meetNu().lijst.includes('POST /api/meet/maak'),
+    'een expliciet NOOIT-besluit hoort niet als onbesliste idemschuld terug te komen');
 });
 
 test('elke verklaring is een van de vier vormen, en nietIdempotent draagt een reden', () => {

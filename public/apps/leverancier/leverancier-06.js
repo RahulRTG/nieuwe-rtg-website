@@ -43,6 +43,7 @@
     document.querySelectorAll('#spDots i').forEach((el,i)=> el.classList.toggle('on', i < pinBuf.length));
   }
   function openPin(sid, name, role){
+    if (!legacyPinUi) return;
     pinFor = Number(sid); pinBuf = '';
     $('#spPinName').textContent = name;
     $('#spPinRole').textContent = T('role.'+role, role==='manager'?'Manager':'Medewerker');
@@ -62,7 +63,7 @@
     pinBuf += k; renderDots();
     if (pinBuf.length === 4){
       const pin = pinBuf;
-      const ok = await login({ code: pickCode, staffId: pinFor, pin }, false, true);
+      const ok = await login({ code: pickCode, staffId: pinFor, pin }, true, true);
       if (!ok){ $('#spDots').classList.add('bad'); pinBuf=''; setTimeout(renderDots, 400); }
     }
   }
@@ -77,24 +78,26 @@
       () => af(null), { enableHighAccuracy: true, timeout: 8000 });
   });
 
-  // Gemeenschappelijke login. Geeft true/false terug bij PIN, zodat de pad kan reageren.
-  async function login(body, isCred, silent){
+  // Productie gebruikt uitsluitend /supplier/mijn/login. Alleen de expliciete
+  // Magnaat Test-kiezer mag nog naar de oude /supplier/login.
+  async function login(body, legacy, silent){
     if (!API.enabled){ toast(T('sup.needserver','Start de server (npm start) om de leverancier-app te gebruiken.')); return false; }
     try {
       let d;
-      try { d = await API.call('/supplier/login', body); }
+      const route = legacy ? '/supplier/login' : '/supplier/mijn/login';
+      try { d = await API.call(route, body); }
       catch(e1){
         if (!(e1.data && e1.data.locatieNodig)) throw e1;
         const pos = await vraagPositie();
         if (!pos) throw e1;
-        d = await API.call('/supplier/login', Object.assign({ positie: pos }, body));
+        d = await API.call(route, Object.assign({ positie: pos }, body));
       }
       API.token = d.token;
       applyState(d.state);
-      koppelAanRtgAccount(body, isCred); // een account voor alles: stil koppelen
+      if (legacy) koppelAanRtgAccount(body, false); // uitsluitend testmigratie
     } catch(e){
       if (silent) return false;
-      toast(isCred ? T('login.bad','Onjuiste gebruikersnaam of wachtwoord.') : (e.message||T('login.failed','Inloggen mislukt.')));
+      toast(!legacy ? T('login.bad','Onjuiste RTG-inloggegevens.') : (e.message||T('login.failed','Inloggen mislukt.')));
       return false;
     }
     try { localStorage.setItem('rtg_sup_token', API.token); } catch(e){}

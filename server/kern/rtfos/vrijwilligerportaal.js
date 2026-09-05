@@ -33,27 +33,55 @@ const DAGDELEN = ['ma-o', 'ma-m', 'ma-a', 'di-o', 'di-m', 'di-a', 'wo-o', 'wo-m'
   'do-o', 'do-m', 'do-a', 'vr-o', 'vr-m', 'vr-a', 'za', 'zo'];
 
 module.exports = (ctx) => {
-  const { nu, schoon, code, S, audit, wie, poort, save, stadVan, vogGeldig } = ctx;
+  const { nu, schoon, S, audit, stadVanIn, vogGeldig, codelevenscyclus } = ctx;
 
-  const vindCode = c => S().vrijwilligers.find(v => v.code === String(c || '').trim().toUpperCase()) || null;
+  const DOEL = 'foundation-persoonsportaal';
+  const SOORT = 'vrijwilliger';
+  const SCOPE = {
+    lezen: 'vrijwilliger:lezen', wijzigen: 'vrijwilliger:wijzigen', uren: 'vrijwilliger:uren'
+  };
+  const volg = (r, fn) => r && typeof r.then === 'function' ? r.then(fn) : fn(r);
+
+  function vindCode(c, scope) {
+    return volg(codelevenscyclus.controleer(c, { doel: DOEL, soort: SOORT, scope }, (staat, toegang) => {
+      const bron = staat || S();
+      const v = (bron.vrijwilligers || []).find(x =>
+        x.id === toegang.onderwerp.id && x.persoonscode_id === toegang.id) || null;
+      return v ? { v, staat: bron } : null;
+    }), t => {
+      if (!t.ok) return { fout: { status: t.status, error: t.error } };
+      return { v: t.gebonden.v, staat: t.gebonden.staat, toegang: t.toegang };
+    });
+  }
+  function metCode(c, scope, werk) {
+    return codelevenscyclus.transactie(tx => {
+      const staat = tx.staat || S();
+      const t = tx.controleer(c, { doel: DOEL, soort: SOORT, scope }, (bron, toegang) =>
+        ((bron || staat).vrijwilligers || []).find(x =>
+          x.id === toegang.onderwerp.id && x.persoonscode_id === toegang.id) || null);
+      if (!t.ok) return { status: t.status, error: t.error };
+      return werk(staat, t.gebonden, t.toegang);
+    });
+  }
   const urenVan = v => (v.uren || []).reduce((s, u) => s + u.uren, 0);
 
   /* Het beeld voor de vrijwilliger zelf. Een eigen functie en niet het
      kantoorbeeld met een filter erover: een filter dat je vergeet, lekt alles,
      en hier zou dat een evaluatie zijn. */
-  function eigenBeeld(v) {
-    const stad = stadVan(v.stad) || {};
-    const projecten = (v.projecten || []).map(id => S().projecten.find(p => p.id === id))
+  function eigenBeeld(v, inStaat) {
+    const staat = inStaat || S();
+    const stad = stadVanIn(v.stad, staat) || {};
+    const projecten = (v.projecten || []).map(id => (staat.projecten || []).find(p => p.id === id))
       .filter(Boolean).map(p => ({ naam: p.naam, soort: p.soort, doelgroep: p.doelgroep, status: p.status }));
     const vandaag = nu().slice(0, 10);
-    const komend = S().activiteiten.filter(a => (a.begeleiders || []).includes(v.id) &&
+    const komend = (staat.activiteiten || []).filter(a => (a.begeleiders || []).includes(v.id) &&
       (!a.wanneer || a.wanneer >= vandaag) && !['afgerond', 'afgelast'].includes(a.status))
       .map(a => ({ naam: a.naam, soort: a.soort, wanneer: a.wanneer, tijd: a.tijd, locatie: a.locatie,
         status: a.status, ingeschreven: (a.inschrijvingen || []).filter(i => i.status !== 'afgemeld').length,
         capaciteit: a.capaciteit }));
-    const uitleen = S().uitleen.filter(u => u.vrijwilligerId === v.id && u.status === 'lopend' &&
+    const uitleen = (staat.uitleen || []).filter(u => u.vrijwilligerId === v.id && u.status === 'lopend' &&
       (!u.tot || Date.parse(u.tot) >= Date.now()))
-      .map(u => ({ naarStad: (stadVan(u.naarStad) || {}).naam || null, tot: u.tot, reden: u.reden }));
+      .map(u => ({ naarStad: (stadVanIn(u.naarStad, staat) || {}).naam || null, tot: u.tot, reden: u.reden }));
     return {
       naam: v.naam, stad: stad.naam || null, status: v.status,
       beschikbaar: v.beschikbaar || [], talen: v.talen || [], vaardigheden: v.vaardigheden || [],
@@ -68,12 +96,14 @@ module.exports = (ctx) => {
   }
 
   function portaal(c) {
-    const v = vindCode(c);
-    if (!v) return { status: 404, error: 'Deze vrijwilligerscode kennen we niet. Vraag uw coördinator om een nieuwe.' };
-    if (v.status === 'gestopt') {
-      return { status: 403, error: 'Uw vrijwilligerswerk bij RTF is afgerond. Wilt u weer meedoen, neem dan contact op met de afdeling.' };
-    }
-    return { ok: true, vrijwilliger: eigenBeeld(v) };
+    return volg(vindCode(c, SCOPE.lezen), deur => {
+      if (deur.fout) return deur.fout;
+      const v = deur.v;
+      if (v.status === 'gestopt') {
+        return { status: 403, error: 'Uw vrijwilligerswerk bij RTF is afgerond. Wilt u weer meedoen, neem dan contact op met de afdeling.' };
+      }
+      return { ok: true, vrijwilliger: eigenBeeld(v, deur.staat) };
+    });
   }
 
   /* Bijwerken. Alleen de drie dingen die van HEM zijn: wanneer hij kan, welke
@@ -82,28 +112,28 @@ module.exports = (ctx) => {
      eigen VOG-datum kan zetten, maakt van de VOG-controle een formaliteit. */
   function zetEigen(c, b) {
     b = b || {};
-    const v = vindCode(c);
-    if (!v) return { status: 404, error: 'Deze vrijwilligerscode kennen we niet.' };
-    if (v.status === 'gestopt') return { status: 403, error: 'Dit dossier is afgesloten.' };
-    for (const veld of ['vogGeldigTot', 'gedragscode', 'status']) {
-      if (b[veld] !== undefined) {
-        return { status: 403, error: 'Uw VOG, de gedragscode en uw status zet de afdeling, niet u zelf. ' +
-          'Beschikbaarheid, talen en vaardigheden kunt u hier wel bijwerken.' };
+    return metCode(c, SCOPE.wijzigen, (staat, v) => {
+      if (v.status === 'gestopt') return { status: 403, error: 'Dit dossier is afgesloten.' };
+      for (const veld of ['vogGeldigTot', 'gedragscode', 'status']) {
+        if (b[veld] !== undefined) {
+          return { status: 403, error: 'Uw VOG, de gedragscode en uw status zet de afdeling, niet u zelf. ' +
+            'Beschikbaarheid, talen en vaardigheden kunt u hier wel bijwerken.' };
+        }
       }
-    }
-    if (Array.isArray(b.beschikbaar)) {
-      const on = b.beschikbaar.map(String).filter(x => !DAGDELEN.includes(x));
-      if (on.length) return { status: 400, error: 'Onbekend dagdeel: ' + on.slice(0, 3).join(', ') + '.' };
-      v.beschikbaar = [...new Set(b.beschikbaar.map(String))];
-    }
-    for (const veld of ['talen', 'vaardigheden']) {
-      if (Array.isArray(b[veld])) v[veld] = b[veld].map(x => schoon(x, 40)).filter(Boolean).slice(0, 20);
-    }
-    if (b.rijbewijs !== undefined) v.rijbewijs = b.rijbewijs === true;
-    if (b.voertuig !== undefined) v.voertuig = b.voertuig === true;
-    audit('vrijwilliger:' + v.id, 'vrijwilliger.zelf-bijgewerkt', v.naam, 'beschikbaarheid of vaardigheden');
-    save();
-    return { ok: true, vrijwilliger: eigenBeeld(v) };
+      if (Array.isArray(b.beschikbaar)) {
+        const on = b.beschikbaar.map(String).filter(x => !DAGDELEN.includes(x));
+        if (on.length) return { status: 400, error: 'Onbekend dagdeel: ' + on.slice(0, 3).join(', ') + '.' };
+        v.beschikbaar = [...new Set(b.beschikbaar.map(String))];
+      }
+      for (const veld of ['talen', 'vaardigheden']) {
+        if (Array.isArray(b[veld])) v[veld] = b[veld].map(x => schoon(x, 40)).filter(Boolean).slice(0, 20);
+      }
+      if (b.rijbewijs !== undefined) v.rijbewijs = b.rijbewijs === true;
+      if (b.voertuig !== undefined) v.voertuig = b.voertuig === true;
+      audit('vrijwilliger:' + v.id, 'vrijwilliger.zelf-bijgewerkt', v.naam,
+        'beschikbaarheid of vaardigheden', staat);
+      return { ok: true, vrijwilliger: eigenBeeld(v, staat) };
+    });
   }
 
   /* Uren die hij zelf opgeeft. Ze komen binnen als GEMELD en niet als geboekt:
@@ -112,30 +142,32 @@ module.exports = (ctx) => {
      subsidieverantwoording, en een getal dat niemand heeft gezien, draagt niets. */
   function meldUren(c, b) {
     b = b || {};
-    const v = vindCode(c);
-    if (!v) return { status: 404, error: 'Deze vrijwilligerscode kennen we niet.' };
-    if (v.status !== 'actief') return { status: 400, error: 'U staat op "' + v.status + '"; uren opgeven kan als u actief bent.' };
-    const n = Number(b.uren);
-    if (!Number.isFinite(n) || n <= 0 || n > 24) return { status: 400, error: 'Hoeveel uren? Meer dan nul, hoogstens 24 op een dag.' };
-    const pid = schoon(b.projectId, 20);
-    if (pid && !(v.projecten || []).includes(pid)) return { status: 400, error: 'U staat niet op dat project.' };
-    if (!Array.isArray(v.gemeldeUren)) v.gemeldeUren = [];
-    if (v.gemeldeUren.length >= 500) return { status: 400, error: 'Er staan te veel meldingen open; vraag uw coördinator ze te bevestigen.' };
-    v.gemeldeUren.push({ id: ctx.rid(), projectId: pid || null, uren: Math.round(n * 100) / 100,
-      datum: schoon(b.datum, 10) || nu().slice(0, 10),
-      km: Math.max(0, Math.min(2000, Math.round(Number(b.km) || 0))), at: nu() });
-    save();
-    return { ok: true, gemeld: v.gemeldeUren.length,
-      melding: 'Doorgegeven. Uw coördinator bevestigt de uren; daarna tellen ze mee.' };
+    return metCode(c, SCOPE.uren, (staat, v) => {
+      if (v.status !== 'actief') return { status: 400, error: 'U staat op "' + v.status + '"; uren opgeven kan als u actief bent.' };
+      const n = Number(b.uren);
+      if (!Number.isFinite(n) || n <= 0 || n > 24) return { status: 400, error: 'Hoeveel uren? Meer dan nul, hoogstens 24 op een dag.' };
+      const pid = schoon(b.projectId, 20);
+      if (pid && !(v.projecten || []).includes(pid)) return { status: 400, error: 'U staat niet op dat project.' };
+      if (!Array.isArray(v.gemeldeUren)) v.gemeldeUren = [];
+      if (v.gemeldeUren.length >= 500) return { status: 400, error: 'Er staan te veel meldingen open; vraag uw coördinator ze te bevestigen.' };
+      v.gemeldeUren.push({ id: ctx.rid(), projectId: pid || null, uren: Math.round(n * 100) / 100,
+        datum: schoon(b.datum, 10) || nu().slice(0, 10),
+        km: Math.max(0, Math.min(2000, Math.round(Number(b.km) || 0))), at: nu() });
+      audit('vrijwilliger:' + v.id, 'vrijwilliger.uren-gemeld', v.naam,
+        v.gemeldeUren[v.gemeldeUren.length - 1].uren + ' uur', staat);
+      return { ok: true, gemeld: v.gemeldeUren.length,
+        melding: 'Doorgegeven. Uw coördinator bevestigt de uren; daarna tellen ze mee.' };
+    });
   }
 
   /* De kantoorkant -- de code uitgeven en de gemelde uren bevestigen -- staat in
      ./vrijwilligerportaal-kantoor.js. Dat is de andere kant van dezelfde deur
      en het hoort bij elkaar; dit bestand liep tegen de 10 KB van
      keuringsregel 13. */
-  const kantoor = require('./vrijwilligerportaal-kantoor')(ctx, { vindCode, urenVan });
+  const kantoor = require('./vrijwilligerportaal-kantoor')(ctx, { vindCode, urenVan, DOEL, SOORT, SCOPE });
 
   return { portaal, zetEigen, meldUren, codeVoor: kantoor.codeVoor,
-    bevestigUren: kantoor.bevestigUren, vindCode, DAGDELEN };
+    codeIntrekken: kantoor.codeIntrekken, codeRoteren: kantoor.codeRoteren,
+    bevestigUren: kantoor.bevestigUren, vindCode, DAGDELEN, SCOPE };
 };
 module.exports.DAGDELEN = DAGDELEN;

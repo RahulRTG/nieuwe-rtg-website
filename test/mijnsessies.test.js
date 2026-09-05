@@ -57,13 +57,13 @@ test('1. de lijst toont per veld een graad, en nooit een verzonnen toestelnaam',
   assert.equal(res.data.huidige, 'aaaaaaaaaaaa');
 });
 
-test('2. sluiten trekt de sessie ECHT in -- geen ok:true zonder gevolg', () => {
+test('2. sluiten trekt de sessie ECHT in -- geen ok:true zonder gevolg', async () => {
   const reg = register();
   const ingetrokken = new Set();
   reg.open('aaaaaaaaaaaa', 'user-1', { authenticator: { type: 'passkey', authenticatorId: 'c1', herkomst: hk('cryptografisch') } });
   const routes = bouwRoutes({ reg, ingetrokken });
   const res = antwoord();
-  routes['/api/mijn/sessies/sluit'](
+  await routes['/api/mijn/sessies/sluit'](
     verzoek({ tier: 'rtg', key: 'user-1', account: {}, sid: 'bbbbbbbbbbbb' }, { sid: 'aaaaaaaaaaaa' }), res);
   assert.equal(res.data.ok, true);
   assert.ok(ingetrokken.has('aaaaaaaaaaaa'), 'het token hoort op de intreklijst te staan, anders werkt het gewoon door');
@@ -94,7 +94,7 @@ test('3b. "bestaat niet" en "niet van u" geven hetzelfde antwoord', () => {
     'een verschil hier maakt dit een manier om te ontdekken welke sessies bestaan');
 });
 
-test('4. "sluit alle andere" laat de eigen sessie met rust', () => {
+test('4. "sluit alle andere" laat de eigen sessie met rust', async () => {
   const reg = register();
   const ingetrokken = new Set();
   for (const sid of ['aaaaaaaaaaaa', 'bbbbbbbbbbbb', 'cccccccccccc']) {
@@ -102,20 +102,20 @@ test('4. "sluit alle andere" laat de eigen sessie met rust', () => {
   }
   const routes = bouwRoutes({ reg, ingetrokken });
   const res = antwoord();
-  routes['/api/mijn/sessies/sluit-overige'](verzoek({ tier: 'rtg', key: 'user-1', account: {}, sid: 'bbbbbbbbbbbb' }), res);
+  await routes['/api/mijn/sessies/sluit-overige'](verzoek({ tier: 'rtg', key: 'user-1', account: {}, sid: 'bbbbbbbbbbbb' }), res);
   assert.equal(res.data.aantal, 2);
   assert.equal(ingetrokken.has('bbbbbbbbbbbb'), false, 'wie dit doet, hoort niet zichzelf buiten te zetten');
   assert.ok(reg.lees('bbbbbbbbbbbb'), 'de eigen sessie blijft bestaan');
   assert.ok(res.data.nietGeraakt, 'en het antwoord zegt wat er NIET geraakt is');
 });
 
-test('4b. en raakt nooit de sessies van een ander lid', () => {
+test('4b. en raakt nooit de sessies van een ander lid', async () => {
   const reg = register();
   const ingetrokken = new Set();
   reg.open('aaaaaaaaaaaa', 'user-1', { authenticator: { type: 'passkey', authenticatorId: 'c', herkomst: hk('cryptografisch') } });
   reg.open('dddddddddddd', 'user-9', { authenticator: { type: 'passkey', authenticatorId: 'c', herkomst: hk('cryptografisch') } });
   const routes = bouwRoutes({ reg, ingetrokken });
-  routes['/api/mijn/sessies/sluit-overige'](verzoek({ tier: 'rtg', key: 'user-1', account: {}, sid: 'zzzzzzzzzzzz' }), antwoord());
+  await routes['/api/mijn/sessies/sluit-overige'](verzoek({ tier: 'rtg', key: 'user-1', account: {}, sid: 'zzzzzzzzzzzz' }), antwoord());
   assert.equal(ingetrokken.has('dddddddddddd'), false);
   assert.ok(reg.lees('dddddddddddd'));
 });

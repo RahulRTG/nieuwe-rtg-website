@@ -5,7 +5,7 @@ const { eigenVeld } = require('../../../kern/util');
 const { datum: klokDatum } = require('../../../lib/klok');
 const { vulVacature } = require('./vacature');
 module.exports = (wctx) => {
-  const { kern, maakKassacode, invitesVan, findSupplierByName, maakInvite, neemAan, wervingsLink } = wctx;
+  const { kern, maakInvite, neemAan, wervingsBasis, wervingsLink } = wctx;
   const { VAC_SOORTEN, app, applyChatVertaald, chatStuur, crypto, db, ensureApplyChat, talen,
           findSupplier, logActivity, managerOnly, notify, notifyApplicant, notifySupplier, save, schoon,
           sseToOffice, sseToSupplier, supplierAuth } = kern;
@@ -49,7 +49,17 @@ app.post('/api/supplier/apply/decide', supplierAuth, async (req, res) => {
     return applyChatVertaald(chat, talen.taalVan(req.body.lang)).then(c => res.json({ ok: true, chat: c }));
   }
   if (req.body.action === 'aannemen') {
-    const inv = maakInvite(req.supplier, req.actor, { naam: a.name, role: 'staff', func: a.func });
+    if (!wervingsBasis().ok)
+      return res.status(503).json({ error: 'Personeelsuitnodigingen zijn tijdelijk niet veilig geconfigureerd.' });
+    let inv;
+    try {
+      inv = await Promise.resolve(maakInvite(req.supplier, req.actor,
+        { naam: a.name, role: 'staff', func: a.func, idem: 'sollicitatie:' + a.id }));
+    } catch (e) {
+      console.error('[staff-invite] veilige verwerking mislukt');
+      return res.status(503).json({ error: 'De uitnodiging kon niet veilig worden opgeslagen.' });
+    }
+    if (!inv || inv.error) return res.status(inv && inv.status || 409).json(inv || { error: 'Uitnodiging maken mislukt.' });
     a.status = 'aangenomen';
 
     // wie via de app solliciteerde is meteen in dienst; wie daarbuiten
@@ -66,7 +76,7 @@ app.post('/api/supplier/apply/decide', supplierAuth, async (req, res) => {
         ? { icon: 'ster', title: 'Aangenomen bij ' + req.supplier.name,
             body: 'Welkom bij het team. Uw werkplek staat klaar in de app onder Mijn werkplekken; u hoeft niets meer in te vullen.' }
         : { icon: 'ster', title: 'Aangenomen bij ' + req.supplier.name,
-            body: 'Meld u aan in de leverancier-app met bedrijfsnaam "' + req.supplier.name + '" en kassacode ' + inv.kassacode + '.' });
+            body: 'Uw personeelsuitnodiging staat klaar. Vraag uw werkgever om de eenmalige beveiligde uitnodigingslink.' });
     }
     return res.json({ ok: true, bedrijf: req.supplier.name,
       // de kassacode blijft in het antwoord voor wie hem nog nodig heeft; is de

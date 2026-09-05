@@ -56,8 +56,8 @@
 const kluis = require('../../kluis');
 
 module.exports = (state) => {
-  const { db, save, crypto, boardroomWie, magBoardroom, pay } = state;
-  const ctx = require('./basis')({ db, save, crypto, boardroomWie, magBoardroom });
+  const { db, save, bewerkCollectie, crypto, boardroomWie, magBoardroom, pay } = state;
+  const ctx = require('./basis')({ db, save, bewerkCollectie, crypto, boardroomWie, magBoardroom });
   // De schrijflaag en de kluis gaan mee op dezelfde context: elk deel schrijft
   // via dezelfde save() en versleutelt via dezelfde sleutel.
   Object.assign(ctx, { db, save, crypto, kluis, pay });

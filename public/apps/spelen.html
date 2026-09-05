@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="nl" data-rtg-thema="bordeaux">
 <head>
+<script src="/shared/id.js"></script>
 <script src="/shared/schermrust.js" defer></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -916,10 +917,25 @@ $('#npVoor').addEventListener('click', ()=> npToon(Math.min(npTotaal, (npStap===
 
 $('#sScherm').addEventListener('click', async ()=>{
   if (!huidig) return;
+  if (!window.RTGIdem) return meld('Veilige browser-willekeur ontbreekt; er is geen schermcode gemaakt.');
+  if (!$('#sSchermCode').hidden &&
+      !confirm('Een nieuwe schermcode trekt de vorige code en het gekoppelde scherm meteen in. Doorgaan?')) return;
   try{
-    const d = await api('projectie-open', { id: huidig.id });
+    const d = await api('projectie-open', { id: huidig.id, idem: window.RTGIdem('spelprojectie') });
+    const link = location.origin + '/apps/spelscherm.html#' + encodeURIComponent(d.code);
     $('#sSchermCode').hidden = false;
-    $('#sSchermCode').innerHTML = 'Open <b>rtg.nl/apps/spelscherm.html</b> op de tv en typ <b>' + esc(d.code) + '</b>';
+    $('#sSchermCode').innerHTML = '<span>Deze code wordt eenmalig getoond en is 15 minuten te koppelen: ' +
+      '<b>' + esc(d.code) + '</b></span> ' +
+      '<a class="knop mini" target="_blank" rel="noopener noreferrer" href="' + esc(link) + '">Open scherm</a> ' +
+      '<button class="knop grijs mini" type="button" id="sSchermDicht">Sluit scherm</button>';
+    $('#sScherm').textContent = 'Nieuwe schermcode';
+    $('#sSchermDicht').addEventListener('click', async ()=>{
+      try{
+        await api('projectie-sluit', { id: huidig.id });
+        $('#sSchermCode').hidden = true; $('#sSchermCode').textContent = '';
+        $('#sScherm').textContent = 'Op het grote scherm';
+      }catch(e){ meld(e.message); }
+    });
   }catch(e){ meld(e.message); }
 });
 $('#sNabespreken').addEventListener('click', async ()=>{

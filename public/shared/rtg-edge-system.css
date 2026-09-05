@@ -85,6 +85,10 @@ body.rtg-edge-host .mgz-blok:not(.rtg-edge-ai-panel .mgz-blok),body.rtg-edge-hos
 
 /* De oude wereld-chrome verdwijnt pas wanneer de nieuwe schil actief is. */
 body.rtg-edge-host .tos-topbar,body.rtg-edge-host .tos-nav,body.rtg-edge-host .lo-rail,body.rtg-edge-host .lo-top,body.rtg-edge-host>.wereldapps{display:none!important}
+/* `rtg-edge-host` wordt pas gezet nadat het bestaande casco volledig is
+   gebouwd en gebonden. Vanaf die commit is zijn menuknop de ene systeemdeur;
+   wachten op de latere Edge-2-laag gaf zware pagina's kort twee hamburgers. */
+body.rtg-edge-host #osMenuBtn{display:none!important}
 /* De wereldstrook van een wereldscherm hoort bij de oude chrome: zodra de schil
    draait staan de vier werelden in de topbalk, en twee wereldkiezers boven
    elkaar zeggen twee keer waar je bent. */
@@ -128,6 +132,16 @@ body.travel-os-map.rtg-edge-host>main{top:calc(var(--edge-top) + env(safe-area-i
 body.rtg-edge-host .lo-shell{position:fixed;inset:calc(var(--edge-top) + env(safe-area-inset-top,0px)) 0 calc(var(--edge-bottom) + env(safe-area-inset-bottom,0px)) var(--edge-side);height:auto;display:block}.rtg-edge-host .lo-main{height:100%;display:block}.rtg-edge-host .lo-stage{height:100%;padding:0;grid-template-columns:repeat(var(--lo-columns,3),minmax(0,1fr))}.rtg-edge-host .lo-panel{padding-bottom:32px}.rtg-edge-host[data-rtg-layout="1"] .lo-stage{grid-template-columns:1fr}.rtg-edge-host[data-rtg-layout="1"] .lo-panel:not([data-edge-active]){display:none!important}.rtg-edge-host[data-rtg-layout="2"] .lo-stage{grid-template-columns:repeat(2,minmax(0,1fr))}.rtg-edge-host[data-rtg-layout="2"] .lo-panel:nth-of-type(n+3){display:none!important}.rtg-edge-host[data-rtg-layout="4"] .lo-stage{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr))}.rtg-edge-host[data-rtg-layout="4"] .lo-panel{display:block!important}
 body.rtg-edge-embed{padding:0!important}body.rtg-edge-embed .tos-topbar,body.rtg-edge-embed .tos-nav,body.rtg-edge-embed .prestatiekop,body.rtg-edge-embed .hoofdtabs{display:none!important}body.rtg-edge-embed .reisapp{padding-left:0!important}body.rtg-edge-embed .reisapp>main{padding-bottom:1rem!important}body.travel-os.rtg-edge-embed{padding:0!important}body.travel-os-map.rtg-edge-embed #kaart{inset:0!important;width:100%!important;height:100%!important}
 body.rtg-edge-embed .lo-rail,body.rtg-edge-embed .lo-top,body.rtg-edge-embed .lo-rahul{display:none!important}body.rtg-edge-embed .lo-shell{height:100dvh;display:block}body.rtg-edge-embed .lo-main{height:100%;display:block}body.rtg-edge-embed .lo-stage{height:100%;display:block;padding:0}body.rtg-edge-embed .lo-panel{display:none!important;height:100%;padding:22px 18px}body.rtg-edge-embed .lo-panel[data-edge-active]{display:block!important}
+/* Een ingebed scherm gebruikt de rand van zijn ouder. Ook eigen vaste koppen,
+   voeten en wereldrails blijven daarom weg: anders staat er weliswaar geen
+   tweede Edge-casco, maar visueel nog steeds een tweede bediening. */
+body.rtg-edge-embed .os-switcher,body.rtg-edge-embed .schil>.bank,body.rtg-edge-embed .schil>.topbar,
+body.rtg-edge-embed>.wereldtabs,body.rtg-edge-embed>.wereldapps,body.rtg-edge-embed>.ws-balk,
+body.rtg-edge-embed>.ios-nav,body.rtg-edge-embed>.ios-thuis,body.rtg-edge-embed #osMenuBtn,
+body.rtg-edge-embed .rtg-duimbalk,body.rtg-edge-embed .wk-bank,body.rtg-edge-embed .wk-top{display:none!important}
+body.rtg-edge-embed[data-rtg-vandaag-surface]>header:not(.rtg-edge-top){display:none!important}
+body.rtg-edge-embed .schil,body.rtg-edge-embed .wk-shell{grid-template-columns:1fr!important;grid-template-rows:1fr!important}
+body.rtg-edge-embed .schil>.werk{grid-column:1!important}body.rtg-edge-embed .wk-main{grid-row:1!important;grid-template-rows:1fr!important}
 
 @media(max-width:767px){
   :root{--edge-top:40px;--edge-side:44px;--edge-bottom:48px}

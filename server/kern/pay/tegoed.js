@@ -30,6 +30,8 @@
    Krijgt de gedeelde ctx van kern/pay/index.js. */
 'use strict';
 
+const moneyCredentialBlokkade = require('../../middleware/money-credential-productiepoort').blokkade;
+
 module.exports = (ctx) => {
   const { crypto, save, schoon, nu, d, rekLid, saldoVan, id, metIdem, boekAsync,
     zorgSaldo, seintje, bestaatLid, MIN_CENTEN, MAX_CENTEN } = ctx;
@@ -42,6 +44,8 @@ module.exports = (ctx) => {
 
   /* ---------- kopen: geld uit de wallet, vast op de escrow ---------- */
   async function tegoedKoop({ codenaam, centen, aanCodenaam, oms, idem }) {
+    const dicht = moneyCredentialBlokkade('pay.tegoedbon');
+    if (dicht) return dicht;
     const c = Math.round(Number(centen));
     if (!Number.isFinite(c) || c < MIN_CENTEN || c > MAX_CENTEN) return { status: 400, error: 'Dat bedrag kan niet.' };
     const aan = schoon(aanCodenaam, 40) || null;
@@ -68,6 +72,8 @@ module.exports = (ctx) => {
 
   /* ---------- verzilveren: van de escrow naar de wallet van de ontvanger ---------- */
   async function tegoedVerzilver({ codenaam, code, idem }) {
+    const dicht = moneyCredentialBlokkade('pay.tegoedbon');
+    if (dicht) return dicht;
     const gezocht = normaliseer(code);
     if (!gezocht) return { status: 400, error: 'Vul de tegoedcode in.' };
     const t = bonnen().find(x => normaliseer(x.code) === gezocht);
@@ -110,6 +116,8 @@ module.exports = (ctx) => {
      geld verplaatst bestaat hier niet, en GELD.md par. 3 laat alleen INTERNE
      reserveringen automatisch lopen. De koper drukt zelf. */
   async function tegoedTerug({ codenaam, tegoedId, idem }) {
+    const dicht = moneyCredentialBlokkade('pay.tegoedbon');
+    if (dicht) return dicht;
     const t = bonnen().find(x => x.id === String(tegoedId || '') && x.vanSoort !== 'zaak' && x.van === codenaam);
     if (!t) return { status: 404, error: 'Dit tegoed is niet van jou.' };
     if (t.status !== 'open') return { status: 409, error: 'Dit tegoed staat niet meer open.' };
@@ -131,6 +139,8 @@ module.exports = (ctx) => {
      immers doorgeven) en verdwijnt zodra hij verzilverd is. Wat aan het lid
      GERICHT is, staat er zonder dat er een code overgetikt hoeft te worden. */
   function tegoedOverzicht(codenaam) {
+    const dicht = moneyCredentialBlokkade('pay.tegoedbon');
+    if (dicht) return dicht;
     const alle = bonnen();
     const gekocht = alle.filter(t => t.vanSoort !== 'zaak' && t.van === codenaam).slice(0, 50).map(t => {
       const r = naarBuiten(t);

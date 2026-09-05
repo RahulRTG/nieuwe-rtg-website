@@ -407,7 +407,11 @@ test('BLINDE VLEK: er wordt niet gezocht naar een element dat nergens bestaat', 
      is in principe code die weg mag. */
   const BEKEND = new Set();
 
-  const bestanden = loop(PUB, /\.(js|html)$/).filter(f => !rel(f).startsWith('public/dist'));
+  /* De GitHub Pages-voordeur staat bewust in de repositoryroot. Zijn gedrag
+     staat in public/site/start/start.js; zonder index.html mee te lezen zag de
+     scanner de echte DOM van dat script niet. */
+  const bestanden = [path.join(ROOT, 'index.html'), ...loop(PUB, /\.(js|html)$/)]
+    .filter(f => !rel(f).startsWith('public/dist'));
   const OPZOEK = /(?:getElementById\(\s*['"]([A-Za-z][\w-]*)['"]\s*\)|querySelector(?:All)?\(\s*['"]#([A-Za-z][\w-]*)['"]\s*\))/g;
   const bestaat = new Set(), verwezen = new Map();
   for (const f of bestanden) {

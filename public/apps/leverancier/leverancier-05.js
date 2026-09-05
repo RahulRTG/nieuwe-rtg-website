@@ -1,10 +1,10 @@
 /* aanmelden als medewerker bij een zaak */
     msg.textContent = T('enr.busy','Bezig met aanmelden...');
     try {
-      const r = await API.call('/supplier/staff/join', { bedrijf, kassacode, login: login2, password, pin });
+      const r = await API.call('/supplier/staff/join', { bedrijf, kassacode, login: login2, password });
       msg.className = 'enroll-msg ok';
       msg.textContent = T('enr.ok','Gelukt! U bent aangemeld. U wordt ingelogd...');
-      await login({ code: r.code, staffId: r.staffId, pin }, false, true);
+      await login({ login: login2, password, bedrijf: r.code }, false, true);
     } catch (err) {
       msg.className = 'enroll-msg err';
       msg.textContent = err.message || T('enr.fail','Aanmelden mislukt. Controleer de gegevens.');
@@ -40,12 +40,13 @@
     verzekeringen: ['Adviseur'],
     wintersport: ['Resortmanager','Skischool','Liften & pistes','Verhuur','Berggids & lawinedienst']
   };
-  let pickCode = null, gateRoster = null, pendingStation = null;
+  let pickCode = null, gateRoster = null, pendingStation = null, legacyPinUi = false;
   const spH2 = () => document.querySelector('#staffPick h2');
   const spDeck = () => document.querySelector('#staffPick .sp-deck');
 
   async function pickPartner(code){
     if (!API.enabled){ toast(T('sup.needserver','Start de server (npm start) om de leverancier-app te gebruiken.')); return; }
+    if (!legacyPinUi) return toast(T('sp.accountonly','Log in met uw persoonlijke RTG-account.'));
     pickCode = code;
     gateRoster = { supplier:{ name: code }, staff: [] };
     try { gateRoster = await API.call('/supplier/roster', { code }); } catch(e){}

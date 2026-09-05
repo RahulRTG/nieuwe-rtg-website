@@ -36,6 +36,7 @@ const DEKKING = {
   'care/wachtlijst.js': { laag: 'wachtlijst' },
   'toestellen.js': { laag: 'toestel' },
   'gastzorg.js': { laag: 'locatie' },
+  'salon-claimcode.js': { reden: 'een tijdelijke aanbiedingsclaim; status bewaakt een bearer en is geen toestemming voor gegevensgebruik' },
   'assets/winkel.js': { reden: 'een ticket op een object; geen toestemming maar bezit' }
 };
 

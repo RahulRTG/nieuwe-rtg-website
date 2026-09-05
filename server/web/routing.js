@@ -28,6 +28,15 @@ function mountMatch(prefix, pn) {
   return null;
 }
 
+// Sync en async middleware volgen dezelfde foutketen.
+function voer(fn, args, volgende) {
+  try {
+    const uit = fn(...args);
+    if (uit && typeof uit.then === 'function') uit.catch(volgende);
+    return uit;
+  } catch (e) { return volgende(e); }
+}
+
 /* ---------- de volledige routekaart ----------
    app._router.stack (zie web/index.js) geeft alleen de BOVENSTE laag, in de
    express-vorm die kern/stuur.js verwacht. Dat is een half beeld: alles wat via
@@ -136,15 +145,12 @@ function maakRouter() {
         req.params = { ...buitenParams };
         const oudUrl = req.url;
         req.url = mm.len ? req.url.slice(mm.len) || '/' : req.url;
-        /* Het voorvoegsel meenemen naar binnen. Zonder dit heet een route in een
-           gemounte router naar zichzelf: /api/foundation/leden meldde zich als
-           /leden, en dat botst met elke andere router die ook een /leden heeft.
-           De meting telde die dan als EEN reeks, en de dekkingsmeting kon een
-           waargenomen route niet terugvinden op de routekaart. */
+        /* Het voorvoegsel voorkomt dat gelijknamige routes uit gemounte routers
+           in routekaart en meting op één hoop belanden. */
         const oudVoor = req.routeVoorvoegsel || '';
         if (mm.len) req.routeVoorvoegsel = oudVoor + laag.prefix;
         const verder = (e) => { req.url = oudUrl; req.params = buitenParams; req.routeVoorvoegsel = oudVoor; next(e); };
-        return laag.fout ? laag.fn(err, req, res, verder) : laag.fn(req, res, verder);
+        return voer(laag.fn, laag.fout ? [err, req, res, verder] : [req, res, verder], verder);
       }
 
       const params = padMatch(laag, pn);
@@ -165,10 +171,7 @@ function maakRouter() {
            een null-check. */
         if (patroonHaak) { try { patroonHaak(req.method, req.routePatroon); } catch (e) { /* nooit het verzoek raken */ } }
       }
-      try {
-        if (laag.fout) return laag.fn(err, req, res, next);
-        return laag.fn(req, res, next);
-      } catch (e) { err = e; continue; }
+      return voer(laag.fn, laag.fout ? [err, req, res, next] : [req, res, next], next);
       }
     }
     next();

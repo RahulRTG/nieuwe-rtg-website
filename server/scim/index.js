@@ -28,11 +28,13 @@ const S = require('../accounts/state');
 const sso = require('../sso');
 const koppelingen = require('../sso/koppelingen');
 const groepen = require('./groepen');
+const userSync = require('./user-sync');
 const sleutels = require('./sleutels');
 
 function zorgTabel(db) {
   sleutels.zorgTabel(db);
   groepen.zorgTabel(db);
+  userSync.zorgTabel(db);
 }
 
 /* Hoort dit account bij deze organisatie? Twee wegen, allebei geldig:
@@ -163,4 +165,4 @@ function uitPatch(body) {
   return { actief, herkend };
 }
 
-module.exports = { zorgTabel, binnenOrg, accountsVan, zoekOpEmail, maak, zetActief, lees, uitPatch, sleutels, groepen };
+module.exports = { zorgTabel, binnenOrg, accountsVan, zoekOpEmail, maak, zetActief, lees, uitPatch, sleutels, groepen, userSync };

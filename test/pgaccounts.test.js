@@ -89,4 +89,18 @@ if (!URL) {
     assert.ok(!users.find(u => Number(u.id) === 1000002), 'verwijderde gebruiker is weg');
     await a.sluit();
   });
+
+  test('pg-accounts: de database weigert twee actieve staffkoppelingen voor hetzelfde lid en zaak', async () => {
+    const a = nieuw(); await leeg(a);
+    const basis = { supplier_code: 'SAKURA', pin_hash: 'x', role: 'staff', active: 1,
+      created_at: new Date().toISOString(), func: 'Team', member_id: 1234, member_tier: 'rtg' };
+    await a.upsertStaff(Object.assign({ id: 6000001, name: 'Eerste' }, basis));
+    await assert.rejects(
+      a.upsertStaff(Object.assign({ id: 6000002, name: 'Tweede' }, basis)),
+      /unique|duplicate|idx_staff_actief_lid/i);
+    await a.upsertStaff(Object.assign({}, basis, { id: 6000001, name: 'Eerste', active: 0 }));
+    await assert.doesNotReject(
+      a.upsertStaff(Object.assign({ id: 6000002, name: 'Opnieuw' }, basis)));
+    await a.sluit();
+  });
 }

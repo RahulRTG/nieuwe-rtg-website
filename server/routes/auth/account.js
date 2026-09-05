@@ -43,13 +43,14 @@ app.post('/api/auth/register', async (req, res) => {
     // de schakelkast; genormaliseerd zodat "Den  HAAG" en "den haag" een zijn
     const pl = require('../../functies').plaatsNorm(req.body.plaats);
     if (pl) mdNieuw.plaats = pl;
+    const vtok = accounts.issueActionToken(user.id, 'verify-email', 3 * 86400000);
+    mdNieuw.emailBevestiging = { bewijs: accounts.hashActiebewijs(vtok) };
     accounts.saveMemberState(user.id, mdNieuw);
     try { require('../../kern/mail-publiek')({ accounts }).geefLid({
       user, naam:accounts.realNameOf(user), tier:user.tier }); } catch (e) {}
     // welkom-draaiboek: een automatisch bericht in het eigen RTMAIL-postvak
     try { if (automatisering) automatisering.welkomLid({ codename: user.codename, wereld: 'RTG' }); } catch (e) {}
     // bevestigingsmail met een echte, werkende link
-    const vtok = accounts.issueActionToken(user.id, 'verify-email', 3 * 86400000);
     const verifyUrl = appUrl(req) + '/apps/app.html?pas=' + pasAppVan(user.tier) + '&verify=' + vtok;
     try { mail.send(email, 'Bevestig uw e-mailadres bij Rahul Travel Group',
       'Welkom bij RTG. Bevestig uw e-mailadres via deze link:\n' + verifyUrl); } catch (e) {}
@@ -74,17 +75,29 @@ app.post('/api/auth/register', async (req, res) => {
   }
 });
 
-app.post('/api/auth/verify-email', (req, res) => {
+app.post('/api/auth/verify-email', async (req, res, next) => {
+  try {
   const u = accounts.verifyActionToken(req.body.token, 'verify-email');
   if (!u) return res.status(400).json({ error: 'Ongeldige of verlopen bevestigingslink.' });
+  const md = accounts.getMemberState(u.id) || {};
+  if (!md.emailBevestiging || !accounts.kloptActiebewijs(md.emailBevestiging.bewijs, req.body.token))
+    return res.status(400).json({ error: 'Deze bevestigingslink is vervangen of al gebruikt.' });
   accounts.setEmailVerified(u.id);
+  delete md.emailBevestiging;
+  accounts.saveMemberState(u.id, md);
+  await accounts.trekInActie(req.body.token, 'verify-email');
+  if (accounts.wachtIntrekkingen) await accounts.wachtIntrekkingen();
   res.json({ ok: true });
+  } catch (e) { next(e); }
 });
 
 app.post('/api/auth/resend', auth, (req, res) => {
   if (!req.session.account) return res.status(403).json({ error: 'Alleen voor accounts.' });
   const u = req.session.account;
   const vtok = accounts.issueActionToken(u.id, 'verify-email', 3 * 86400000);
+  const md = accounts.getMemberState(u.id) || {};
+  md.emailBevestiging = { bewijs: accounts.hashActiebewijs(vtok) };
+  accounts.saveMemberState(u.id, md);
   const url = appUrl(req) + '/apps/app.html?pas=' + pasAppVan(u.tier) + '&verify=' + vtok;
   mail.send(accounts.emailOf(u), 'Bevestig uw e-mailadres', 'Bevestig uw e-mailadres via deze link:\n' + url);
   res.json({ ok: true, ...(DEV_VELDEN(req) ? { devVerifyUrl: url } : {}) });

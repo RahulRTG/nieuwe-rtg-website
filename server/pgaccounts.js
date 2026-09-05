@@ -45,12 +45,18 @@ const waarde = (row, c) => (row[c] === undefined || row[c] === null
   ? (c in NIET_NULL ? NIET_NULL[c] : null)
   : row[c]);
 
-function maakPgAccounts({ url, log }) {
+function maakPgAccounts({ url, log, onFout }) {
   const { Pool } = require('./pgwire');
   const pool = new Pool({ connectionString: url, max: Number(process.env.PG_POOL_MAX || 10) });
+  pool.on('error', e => {
+    if (log) log.warn('pgaccounts-pool', { fout: e.message });
+    if (typeof onFout === 'function') onFout(e, 'pool');
+  });
+  const intrekkingen = require('./pgaccounts-intrekking')(pool);
   let luisterClient = null;
 
   async function schema() {
+    await intrekkingen.schema();
     await pool.query(`CREATE TABLE IF NOT EXISTS users (
       id BIGINT PRIMARY KEY,
       email_hash TEXT UNIQUE, username TEXT UNIQUE, password_hash TEXT NOT NULL,
@@ -77,6 +83,9 @@ function maakPgAccounts({ url, log }) {
     await pool.query('CREATE UNIQUE INDEX IF NOT EXISTS idx_users_public_mail_hash ON users(public_mail_hash) WHERE public_mail_hash IS NOT NULL');
     await pool.query(`CREATE INDEX IF NOT EXISTS idx_staff_code ON supplier_staff(supplier_code)`);
     await pool.query(`CREATE INDEX IF NOT EXISTS idx_staff_member ON supplier_staff(member_id)`);
+    await pool.query(`CREATE UNIQUE INDEX IF NOT EXISTS idx_staff_actief_lid
+      ON supplier_staff(supplier_code, member_id)
+      WHERE active = 1 AND member_id IS NOT NULL`);
     await pool.query(`CREATE SEQUENCE IF NOT EXISTS rtg_id_seq INCREMENT BY ${BLOK} START ${BLOK_START} MINVALUE ${BLOK_START}`);
   }
 
@@ -138,13 +147,20 @@ function maakPgAccounts({ url, log }) {
     await pool.query('DELETE FROM users WHERE id = $1', [id]);
     await pool.query('SELECT pg_notify($1, $2)', [KANAAL, 'user:' + id + ':' + BRON]);
   }
+
+  const pasAccountWijzigingenToe = require('./pgaccounts-commit')({
+    kanaal: KANAAL, bron: BRON, userCols: USER_COLS, staffCols: STAFF_COLS, waarde
+  });
   // voor de spiegel: is deze melding van onszelf?
   const vanMij = payload => String(payload || '').split(':')[2] === BRON;
 
   async function luister(onWijziging) {
     luisterClient = await pool.connect();
     luisterClient.on('notification', (msg) => onWijziging(msg.payload));
-    luisterClient.on('error', (e) => { if (log) log.warn('pgaccounts-listen', { fout: e.message }); });
+    luisterClient.on('error', (e) => {
+      if (log) log.warn('pgaccounts-listen', { fout: e.message });
+      if (typeof onFout === 'function') onFout(e, 'listen');
+    });
     await luisterClient.query('LISTEN ' + KANAAL);
   }
 
@@ -153,7 +169,9 @@ function maakPgAccounts({ url, log }) {
     try { await pool.end(); } catch (e) {}
   }
 
-  return { schema, reserveerBlok, pullAlles, upsertUser, upsertStaff, deleteUser, luister, sluit, pool, vanMij, BRON, USER_COLS, STAFF_COLS };
+  return { schema, reserveerBlok, pullAlles, upsertUser, upsertStaff, deleteUser,
+    pasAccountWijzigingenToe, luister, sluit, pool, intrekkingen, vanMij, BRON,
+    USER_COLS, STAFF_COLS };
 }
 
 module.exports = { maakPgAccounts };

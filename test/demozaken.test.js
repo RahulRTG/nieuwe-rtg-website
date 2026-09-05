@@ -87,6 +87,20 @@ async function zaakBekend(base, code) {
   return !!(d && d.supplier && d.supplier.code === code);
 }
 
+/* Buiten de demo is /api/supplier/roster terecht geen anonieme cataloguslezer
+   meer: zonder leveranciersidentiteit antwoordt die deur 403. De schoonmaak
+   toetsen daarom rechtstreeks op de autoritatieve leverancierscollectie. Een
+   403 als `niet gevonden` uitleggen maakte de oude assertions immers groen,
+   óók als de demozaak nog gewoon in de database stond. */
+function zaakBewaard(dataDir, code) {
+  const db = opslag(path.join(dataDir, 'store.db'), { readOnly: true });
+  try {
+    const rij = db.prepare("SELECT val FROM kv WHERE key = 'suppliers'").get();
+    const zaken = rij ? JSON.parse(rij.val) : [];
+    return zaken.some(z => z.code === code);
+  } finally { db.close(); }
+}
+
 function actiefPersoneel(dataDir, code) {
   const db = opslag(path.join(dataDir, 'rtg.db'), { readOnly: true });
   try {
@@ -127,10 +141,10 @@ test('zonder RTG_DEMO gaan ALLE geseede zaken eruit, ook de late en ook op een d
     const echt = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_DEMO: '' } });
     try {
       for (const [code, herkomst] of Object.entries(UIT_DE_SEED))
-        assert.equal(await zaakBekend(echt.base, code), false,
+        assert.equal(zaakBewaard(TMP, code), false,
           code + ' hoort zonder RTG_DEMO uit de catalogus te zijn (' + herkomst + ')');
       for (const code of GEMIST_OP_DE_OUDE_LIJST)
-        assert.equal(await zaakBekend(echt.base, code), false,
+        assert.equal(zaakBewaard(TMP, code), false,
           code + ' stond niet op de oude handlijst en hoort er nu wel uit te gaan');
       assert.equal(actiefPersoneel(TMP, 'CASTELL'), 0,
         'het personeel van een opgeruimde zaak hoort niet actief in de kluis te blijven');
@@ -167,7 +181,7 @@ test('een database van VOOR het merkteken wordt alsnog opgeruimd', async () => {
     const echt = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_DEMO: '' } });
     try {
       for (const [code, herkomst] of Object.entries(UIT_DE_SEED))
-        assert.equal(await zaakBekend(echt.base, code), false,
+        assert.equal(zaakBewaard(TMP, code), false,
           code + ' hoort ook op een database van voor het merkteken weg te gaan (' + herkomst + ')');
     } finally { await stop(echt); }
   } finally {
@@ -200,9 +214,9 @@ test('een echte partner overleeft de opruiming', async () => {
 
     const echt = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_DEMO: '' } });
     try {
-      assert.ok(await zaakBekend(echt.base, 'ECHTEPARTNER'),
+      assert.ok(zaakBewaard(TMP, 'ECHTEPARTNER'),
         'een partner zonder merkteken hoort de opruiming te overleven');
-      assert.equal(await zaakBekend(echt.base, 'CASTELL'), false,
+      assert.equal(zaakBewaard(TMP, 'CASTELL'), false,
         'en de geseede zaak hoort in diezelfde ronde wel weg te zijn');
     } finally { await stop(echt); }
   } finally {

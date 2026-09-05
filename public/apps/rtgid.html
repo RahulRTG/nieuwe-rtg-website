@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
+<script src="/shared/id.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RTG iD</title>
@@ -67,7 +68,8 @@
   <div class="kaart">
     <p class="stil">Staat er een koppelcode op het scherm van een dienst? Voer die hier in. U ziet eerst welke dienst het is en welke gegevens die vraagt; pas na uw bevestiging gebeurt er iets. Bevestigen doet u met uw passkey &mdash; gezicht, vinger of pincode op dit toestel. Zo bewijst u dat u het bent en niet alleen dat u deze telefoon vasthoudt.</p>
     <form id="codeForm" class="rij">
-      <input id="codeIn" maxlength="12" placeholder="Koppelcode (ID-XXXXX)" aria-label="Koppelcode" style="flex:2;text-transform:uppercase;">
+      <input id="codeIn" maxlength="40" autocomplete="one-time-code" spellcheck="false"
+        placeholder="Koppelcode (ID.…)" aria-label="Koppelcode" style="flex:2;text-transform:uppercase;">
       <button class="knop vol hoofd" type="submit" data-hoofdactie>Zoek op</button>
     </form>
     <div id="koppelKaart" style="display:none;margin-top:0.5rem;border-top:1px solid var(--line);padding-top:0.6rem;">

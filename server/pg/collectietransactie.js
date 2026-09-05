@@ -19,6 +19,8 @@
 'use strict';
 const klok = require('../lib/klok');
 const { KANAAL } = require('./schrijflanen');
+const publiceerCollectie = require('../db/collectie-publicatie');
+const { merge3 } = require('../db/merge');
 
 module.exports = (ctx) => {
   const { pool, uitStore, naarStore, toegepast, laatsteJson,
@@ -27,7 +29,7 @@ module.exports = (ctx) => {
   async function bewerkCollectie(sleutel, dataNu, werk) {
     if (!sleutel || typeof werk !== 'function') throw new Error('Collectietransactie vereist een sleutel en bewerker.');
     const client = await pool.connect();
-    let waarde, resultaat, jsonNa, versie = null;
+    let waarde, resultaat, jsonVoor, publicatieBasisJson, jsonNa, versie = null;
     try {
       await client.query('BEGIN');
       await client.query('SELECT pg_advisory_xact_lock(hashtext($1)::bigint)', [sleutel]);
@@ -38,10 +40,23 @@ module.exports = (ctx) => {
          alsnog laten herrijzen. Opnieuw vullen mag -- daarom vanaf leeg en niet
          met een weigering. */
       const bestaat = huidig.rows.length && !huidig.rows[0].weg;
-      const jsonVoor = bestaat
+      jsonVoor = bestaat
         ? uitStore(huidig.rows[0].val)
         : JSON.stringify(huidig.rows.length ? {} : (dataNu[sleutel] == null ? {} : dataNu[sleutel]));
-      waarde = JSON.parse(jsonVoor);
+      /* Neem ook lokaal openstaand werk mee dat al VOOR dit DB-slot via
+         S()/save() ontstond. Anders zou juist een ingetrokken zetel die nog op
+         de write-behind flush wacht buiten de autorisatie in `werk` vallen.
+         De extra JSON-ronde voorkomt dat `werk` via een gedeelde objectref al
+         vóór COMMIT aan db.data schrijft. */
+      const dbBasis = JSON.parse(jsonVoor);
+      const cacheBasis = laatsteJson.has(sleutel)
+        ? JSON.parse(laatsteJson.get(sleutel)) : dbBasis;
+      /* Houd live-voor apart van de verenigde werkkopie. De werkkopie kan
+         verse DB-wijzigingen bevatten die live nog niet kende; publicatie mag
+         die niet aanzien voor een wijziging die tijdens deze tx ontstond. */
+      const liveVoor = dataNu[sleutel] == null ? {} : dataNu[sleutel];
+      publicatieBasisJson = JSON.stringify(liveVoor);
+      waarde = JSON.parse(JSON.stringify(merge3(cacheBasis, liveVoor, dbBasis)));
       resultaat = werk(waarde);
       if (resultaat && typeof resultaat.then === 'function')
         throw new Error('De bewerker van een collectietransactie mag niet asynchroon zijn.');
@@ -64,12 +79,19 @@ module.exports = (ctx) => {
     } finally {
       client.release();
     }
-    dataNu[sleutel] = waarde;
-    laatsteJson.set(sleutel, jsonNa);
-    laatsteGrootte.set(sleutel, jsonNa.length);
-    laatsteLengte.set(sleutel, Array.isArray(waarde) ? waarde.length : (waarde && typeof waarde === 'object' ? Object.keys(waarde).length : 0));
-    laatsteCheck.set(sleutel, klok.nu());
-    if (versie != null) toegepast.set(sleutel, versie);
+    /* Tussen de eerste SELECT en COMMIT blijft de event-loop vrij. Een gewone
+       route kan dan dezelfde levende collectie wijzigen en save() plannen.
+       Publiceer daarom niet met een assignment: voeg de commit samen tegen de
+       exacte live-basis van vóór `werk`. laatsteJson blijft afzonderlijk
+       de commit-basis, zodat de gewone flush het live verschil nog ziet. */
+    const gepubliceerd = publiceerCollectie({ dataNu, sleutel, basisJson: publicatieBasisJson,
+      commitWaarde: waarde, commitJson: jsonNa, versie, toegepast, laatsteJson });
+    if (gepubliceerd.cacheBijgewerkt) {
+      laatsteGrootte.set(sleutel, jsonNa.length);
+      laatsteLengte.set(sleutel, Array.isArray(waarde) ? waarde.length :
+        (waarde && typeof waarde === 'object' ? Object.keys(waarde).length : 0));
+      laatsteCheck.set(sleutel, klok.nu());
+    }
     return resultaat;
   }
 

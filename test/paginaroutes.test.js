@@ -127,8 +127,10 @@ test('de wervingslink brengt je naar de app MET zijn code, en een rare code niet
      "geeft 200" zou die tweede helft niet hebben gevonden. */
   const r = await fetch(base + '/werken/AB12CD', { redirect: 'manual' });
   assert.equal(r.status, 302, 'de wervingslink stuurt door (status ' + r.status + ')');
-  assert.equal(r.headers.get('location'), '/apps/app.html?werving=AB12CD',
-    'naar de app, met de code in de query zodat de browser hem heeft');
+  assert.equal(r.headers.get('location'), '/apps/app.html#werving=AB12CD',
+    'naar de app, met de code in een fragment dat de volgende webserver niet ziet');
+  assert.equal(r.headers.get('referrer-policy'), 'no-referrer',
+    'een uitgefaseerde link draagt zijn pad nooit verder als referrer');
   // en waar hij heen stuurt, staat ook echt iets
   isHomescreen(await haal('/apps/app.html'), 'het doel van de wervingslink');
 

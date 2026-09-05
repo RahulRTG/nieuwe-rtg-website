@@ -28,6 +28,8 @@
 module.exports = (sctx) => {
   const { app, save, nu, werkPoort, eigenVeld, kern } = sctx;
   const { auth } = kern;
+  const PRODUCTIE = String(process.env.NODE_ENV || '') === 'production';
+  const authEenmaal = (req, res, next) => req.session ? next() : auth(req, res, next);
 
   function codenaamVan(sessie) {
     if (sessie && sessie.account && sessie.account.codename) return sessie.account.codename;
@@ -37,10 +39,13 @@ module.exports = (sctx) => {
 
   /* Koppelen: de RTG-sessie komt uit de auth-poort (dus uit de kop), het
      lid-token uit het lijf. Twee sleutels van dezelfde persoon. */
-  app.post('/api/bedrijf/lid/koppel', auth, (req, res) => {
+  app.post('/api/bedrijf/lid/koppel', authEenmaal, (req, res) => {
     const s = sctx.lidVan(req, res); if (!s) return;
     const key = req.session.key;
     if (!key) return res.status(403).json({ error: 'Geen RTG-sessie gevonden.' });
+    if (PRODUCTIE) return res.json({ ok: true, gekoppeld: true,
+      codenaam: s.l.rtgCodenaam || codenaamVan(req.session),
+      let: 'Dit lidmaatschap is bij toetreding al rechtstreeks aan uw RTG-account gebonden.' });
     const anders = Object.values(s.w.leden).find(l => l.rtgKey === key && l.id !== s.l.id);
     if (anders) return res.status(409).json({ error: 'Dit RTG-account is in deze werkruimte al gekoppeld aan ' + anders.naam + '.' });
     s.l.rtgKey = key;
@@ -53,6 +58,8 @@ module.exports = (sctx) => {
 
   app.post('/api/bedrijf/lid/ontkoppel', (req, res) => {
     const s = sctx.lidVan(req, res); if (!s) return;
+    if (PRODUCTIE) return res.status(409).json({
+      error: 'Een productielidmaatschap kan niet van zijn identiteit worden losgemaakt; trek het lidmaatschap in of laat een nieuw account toetreden.' });
     if (!s.l.rtgKey) return res.status(409).json({ error: 'Er is niets gekoppeld.' });
     s.l.rtgKey = null; s.l.rtgCodenaam = null; s.l.gekoppeldAt = null;
     save();

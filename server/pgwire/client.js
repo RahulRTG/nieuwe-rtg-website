@@ -4,14 +4,22 @@
    LISTEN/NOTIFY. Regel 1: geen eigen crypto -- alleen node:crypto + node:tls. */
 'use strict';
 const net = require('net');
-const tls = require('tls');
 const { EventEmitter } = require('events');
 const { cstr, bericht, int16, int32, leesCstrs, foutVelden, decodeer, paramTekst } = require('./protocol');
+const { openSsl } = require('./tls-verbinding');
 
 class Client extends EventEmitter {
   constructor(cfg) {
     super();
-    this.cfg = cfg;
+    /* Pool geeft al ontlede opties. Een rechtstreekse Client-aanroep (onder
+       andere de productie-databaseproef) gaf historisch alleen
+       `{connectionString}` door; zonder deze normalisatie verbond net.connect
+       dan met localhost en werd de URL, inclusief sslmode, volledig genegeerd. */
+    const ruw = cfg || {};
+    if (ruw.connectionString) {
+      this.cfg = require('./pool').ontleedConfig(ruw);
+    } else this.cfg = ruw;
+    require('./transport').eisProductieTransport(ruw, this.cfg, process.env);
     this.sock = null;
     this.buf = Buffer.alloc(0);
     this.klaarVerbinden = null;   // { resolve, reject } tijdens connect()
@@ -37,19 +45,7 @@ class Client extends EventEmitter {
     });
   }
   _sslVerbinden(opts, reject) {
-    // SSLRequest: Int32(8), Int32(80877103); server antwoordt met 'S' (ja) of 'N' (nee)
-    const rauw = net.connect(opts, () => { const m = Buffer.alloc(8); m.writeInt32BE(8, 0); m.writeInt32BE(80877103, 4); rauw.write(m); });
-    rauw.once('data', (antw) => {
-      if (antw[0] !== 0x53) { reject(new Error('pg: server weigert SSL')); rauw.destroy(); return; }
-      const t = tls.connect({ socket: rauw, servername: opts.host, rejectUnauthorized: this.cfg.ssl && this.cfg.ssl.rejectUnauthorized !== false }, () => this._verzendStartup());
-      this.sock = t;
-      t.setNoDelay(true);
-      t.on('data', (d) => this._ontvang(d));
-      t.on('error', (e) => this._fout(e));
-      t.on('close', () => this._sluiten());
-    });
-    rauw.on('error', (e) => this._fout(e));
-    return rauw;
+    return openSsl(this, opts, reject);
   }
   _verzendStartup() {
     const delen = [Buffer.from([0, 3, 0, 0])]; // protocol 3.0
@@ -139,6 +135,16 @@ class Client extends EventEmitter {
 
   query(text, params) {
     return new Promise((resolve, reject) => {
+      /* Een backend kan midden in een transactie verdwijnen. De aanroeper
+         probeert dan in zijn catch-pad nog ROLLBACK te sturen. Voorheen kwam
+         die taak op `wachtrij`, waarna `_volgende()` hem wegens `_dood`
+         terecht niet verzond maar ook nooit verwierp. Het HTTP-verzoek bleef
+         daardoor eeuwig open. Een dode of nog niet verbonden client is geen
+         wachtrij: hij is een onmiddellijke, herstelbare opslagfout. */
+      if (this._dood || !this.sock || this.sock.destroyed) {
+        reject(new Error('pg: verbinding gesloten'));
+        return;
+      }
       const taak = { text, params: params || null, resolve, reject, rows: [], velden: [], command: null, rowCount: null, fout: null };
       this.wachtrij.push(taak);
       if (!this.actief) this._volgende();

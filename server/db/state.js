@@ -35,22 +35,33 @@
    `data` staat daarom NIET in de letterlijke vorm hieronder maar in de
    defineProperty eronder; `writable` en `leider` wel. */
 const db = { writable: process.env.RTG_ROL !== 'standby', leider: process.env.RTG_ROL !== 'standby' };
+const verzoekcontext = require('./verzoekcontext');
 let ruweData = null;
+function zetRuw(v) {
+  let bewaakt = v;
+  try { bewaakt = require('../opzet/begroting').bewaak(v); }
+  catch (e) { bewaakt = v; }
+  ruweData = bewaakt;
+}
 Object.defineProperty(db, 'data', {
   enumerable: true,
   configurable: true,
-  get() { return ruweData; },
+  get() { return verzoekcontext.dataVoor(ruweData); },
   set(v) {
-    let bewaakt = v;
-    try { bewaakt = require('../opzet/begroting').bewaak(v); }
-    catch (e) { bewaakt = v; }   // de opslag komt op, met of zonder begroting
-    ruweData = bewaakt;
+    /* Binnen een PostgreSQL-request mag een worteltoekenning nooit de gedeelde
+       gecommitteerde werkkopie vervangen. De requestcontext neemt hem dan op
+       in dezelfde commit als alle gewone nested mutaties. Opslag-sync draait
+       buiten zo'n context en landt hieronder wel op de echte wortel. */
+    if (verzoekcontext.zetWortel(v)) return;
+    zetRuw(v);   // de opslag komt op, met of zonder begroting
   }
 });
 db.data = null;
 let externCb = null;
 module.exports = {
   db,
+  getRuweData: () => ruweData,
+  setRuweData: zetRuw,
   getExternCb: () => externCb,
   // De kern zet hier een functie neer die na een externe wijziging draait (bijv.
   // de sessie-index opnieuw vullen). db.data zelf is dan al ververst.

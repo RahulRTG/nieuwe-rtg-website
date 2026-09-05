@@ -53,7 +53,10 @@ function maakOntsluiting({ opslag, save, klok, ordening }) {
      zodat een scherm hem vooraf kan tonen. Een mens die pas halverwege hoort dat
      er een tweede paar ogen bij moet, wacht een uur voor niets. */
   function lijst() { return opslag.tak('ontsluitingen'); }
-  function vind(id) { return lijst().find(v => v.id === String(id)) || null; }
+  function kijk() { return opslag.leesTak('ontsluitingen'); }
+  function vind(id, schrijven = false) {
+    return (schrijven ? lijst() : kijk()).find(v => v.id === String(id)) || null;
+  }
 
   /* START. Bewaart een verzoek en verandert GEEN stand. */
   function start({ drager, sleutel, van, naar, door, reden, tweedeMens, passkeyMogelijk }) {
@@ -93,7 +96,7 @@ function maakOntsluiting({ opslag, save, klok, ordening }) {
 
   /* EEN STAP AFTEKENEN. Het bewijs komt van elders; hier wordt het genoteerd. */
   function stap(id, { soort, door, bewijs }) {
-    const v = vind(id);
+    const v = vind(id, true);
     if (!v) fout(404, 'Onbekend ontsluitverzoek.');
     if (v.status !== 'open') fout(409, 'Dit verzoek is al ' + v.status + '.');
     if (!STAPPEN[soort]) fout(400, 'Onbekende stap: ' + soort);
@@ -130,7 +133,7 @@ function maakOntsluiting({ opslag, save, klok, ordening }) {
      aanroeper zet hem, en die aanroeper is de enige plek waar een stand
      verandert -- zie ./index.js. */
   function commit(id, { door }) {
-    const v = vind(id);
+    const v = vind(id, true);
     if (!v) fout(404, 'Onbekend ontsluitverzoek.');
     if (v.status !== 'open') fout(409, 'Dit verzoek is al ' + v.status + '.');
     const open = ontbreekt(v);
@@ -143,7 +146,7 @@ function maakOntsluiting({ opslag, save, klok, ordening }) {
   }
 
   function afbreken(id, { door, reden }) {
-    const v = vind(id);
+    const v = vind(id, true);
     if (!v) fout(404, 'Onbekend ontsluitverzoek.');
     if (v.status !== 'open') fout(409, 'Dit verzoek is al ' + v.status + '.');
     v.status = 'afgebroken';
@@ -160,7 +163,7 @@ function maakOntsluiting({ opslag, save, klok, ordening }) {
     });
   }
 
-  function open() { return lijst().filter(v => v.status === 'open').map(openbaar); }
+  function open() { return kijk().filter(v => v.status === 'open').map(openbaar); }
 
   return { STAPPEN, WACHTTIJD_MINUTEN, doelVoor, eisenVoor, start, stap, commit, afbreken, open, vind: id => {
     const v = vind(id); return v ? openbaar(v) : null; } };

@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="nl" data-rtg-thema="bordeaux">
 <head>
+<script src="/shared/id.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RTG Clips</title>
@@ -117,7 +118,7 @@
 <main id="feed" aria-label="De dagselectie van vandaag"></main>
 
 <!-- de studio: opnemen (max 60s), lokaal bewaren (OPFS), alleen de kaart naar RTG -->
-<div class="sheet" id="studio" role="dialog" aria-label="Clip maken">
+<div class="sheet" id="studio" role="dialog" aria-modal="true" aria-label="Clip maken">
   <div class="vlak">
     <h2>Een clip maken</h2>
     <p class="stil">Maximaal 60 seconden. Het origineel blijft in het eigen bestandssysteem van deze
@@ -138,7 +139,7 @@
 
 <!-- de knipstudio: knippen, geluid en ondertitels op een eigen clip.
      Het beeld blijft op het toestel; een knip is een begin en een eind. -->
-<div class="sheet" id="knipSheet" role="dialog" aria-label="Clip bewerken">
+<div class="sheet" id="knipSheet" role="dialog" aria-modal="true" aria-label="Clip bewerken">
   <div class="vlak">
     <h2 id="knipTitel">Bewerken</h2>
     <p class="stil">Er wordt niets weggegooid: een knip is een begin en een eind, dus u kunt hem
@@ -175,7 +176,7 @@
 </div>
 
 <!-- reacties -->
-<div class="sheet" id="reactieSheet" role="dialog" aria-label="Reacties">
+<div class="sheet" id="reactieSheet" role="dialog" aria-modal="true" aria-label="Reacties">
   <div class="vlak">
     <h2>Reacties</h2>
     <div id="reactieLijst"></div>

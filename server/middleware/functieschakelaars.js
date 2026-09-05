@@ -24,13 +24,15 @@ const { natieNaarLand } = require('./functieschakelaars-tekst');
    los van de vraag OF hij erdoor mag. */
 const antwoord = require('./schakelaar-antwoord');
 const isolatiepoort = require('./isolatiepoort');
+const techniekIsolatie = require('./techniek-isolatiepoort');
 const { ZIN, bekendeBeller } = antwoord;
 
 function schakelaars({ db, accounts, functies, sessionFor, findSupplier, wachter, bevoegdVan, beschermstand }) {
   return (req, res, next) => {
     const p = req.path;
     if (!p.startsWith('/api/')) return next();
-    if (p.startsWith('/api/techniek') || p === '/api/health' || p === '/api/ready') return next();
+    if (p === '/api/health' || p === '/api/ready') return next();
+    if (techniekIsolatie.behandel(req, res, next, { db, beschermstand })) return;
     /* De meetlijn van de storingswachter: elke afgeronde API-respons meldt
        zijn status. BOVEN de vroege return hieronder, want de wachter moet ook
        meten als er nog nooit iets geschakeld is -- anders bewaakt hij alleen

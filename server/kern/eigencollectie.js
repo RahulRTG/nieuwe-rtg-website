@@ -39,13 +39,13 @@
    vielen in maar twee soorten -- dus staan ze hier, met hun aantal, in plaats
    van dat de volgende ze opnieuw ontdekt:
 
-     - EEN LEESPAD DAT NIETS MAG SCHEPPEN (vier keer: kern/socialebeleid,
-       kern/checklijst, kern/levensband, kern/levensbeleid). `bak()` maakt de
-       collectie altijd aan, en die vier hebben een `kijk()` waarvan een toets
-       vastlegt dat db.data ONAANGERAAKT blijft -- bij checklijst is het zelfs
-       een ROLLBACK-cel van de staatproef. Een kijken-zonder-scheppen is bewust
-       niet toegevoegd: dan zou elke aanroeper moeten weten welke van de twee
-       hij nodig heeft, en dat is precies de kennis die dit bestand weghaalt.
+     - EEN LEESPAD DAT NIETS MAG SCHEPPEN. `bak()` maakt de collectie altijd
+       aan. Dat mag niet vanuit een read-only HTTP- of SSE-verzoek: een lege
+       standaard zou dan een onbevestigde opslagmutatie worden. Daarom bestaat
+       daarnaast `kijk()`: dezelfde eigenaars- en vormcontrole, maar afwezig
+       blijft afwezig en levert alleen een vluchtige lege waarde op. De eigenaar
+       kiest tussen lezen en schrijven; dat verschil kan een opslagcontract niet
+       veilig raden.
      - EEN GETAL OF EEN STRING (drie keer: factuurTeller, doosSeq,
        balieSteunZout). Een teller of een zout is geen collectie; wie hem als
        kaart declareert, liegt over zijn vorm. De handgeschreven contracten
@@ -111,6 +111,20 @@ module.exports = function maakEigen({ db, domein, bezit }) {
     return db.data[naam];
   }
 
+  /* LEZEN ZONDER SCHEPPEN. Een ontbrekende collectie betekent voor een
+     projectie een lege verzameling, maar schrijft die lege standaard niet terug.
+     Een BESTAANDE verkeerde vorm is geen lege verzameling: die blijft een harde
+     fout, zodat beschadigde securitydata nooit als afwezig wordt geïnterpreteerd. */
+  function kijk(naam) {
+    const soort = eis(naam);
+    if (!Object.prototype.hasOwnProperty.call(db.data, naam)) return LEEG[soort]();
+    if (!klopt(soort, db.data[naam])) {
+      throw new Error('eigencollectie (' + domein + '): bestaande collectie "' + naam +
+        '" heeft niet de verklaarde vorm ' + soort + '; weigeren om haar als leeg te lezen.');
+    }
+    return db.data[naam];
+  }
+
   /* Een collectie VERVANGEN, voor wie kapt op een maximum of een rij opnieuw
      opbouwt. Dezelfde eigenaars- en vormcontrole als bak(); zonder die twee zou
      dit de achterdeur zijn. */
@@ -124,7 +138,7 @@ module.exports = function maakEigen({ db, domein, bezit }) {
     return waarde;
   }
 
-  return { bak, zetBak, bezit, domein };
+  return { bak, kijk, zetBak, bezit, domein };
 };
 
 module.exports.LEEG = LEEG;

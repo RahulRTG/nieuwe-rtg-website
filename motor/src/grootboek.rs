@@ -49,6 +49,7 @@ pub struct BoekArgs<'a> {
     pub ref_: Option<String>,
 }
 
+#[derive(Clone)]
 pub struct Ledger {
     pub saldi: HashMap<String, i64>,
     pub boekingen: VecDeque<Boeking>, // front = nieuwste (unshift-semantiek)
@@ -125,7 +126,10 @@ impl Ledger {
         let mut som: i64 = 0;
         let mut rood = Vec::new();
         for (rek, &c) in &self.saldi {
-            som += c;
+            som = match som.checked_add(c) {
+                Some(v) => v,
+                None => return (false, som, vec!["saldo-overloop".into()]),
+            };
             if !rek.starts_with("extern:") && c < 0 {
                 rood.push(rek.clone());
             }

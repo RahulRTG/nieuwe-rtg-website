@@ -56,15 +56,17 @@ module.exports = function maakMotorverbinding({ boekPad, saldiPad, watBoeking, w
     /* Boeken op de motor (autoriteit). NOOIT throwen op het geld-pad: de caller
        vertaalt dit naar een nette fout en past NIETS toe op de spiegel bij een
        fout. */
-    async boek({ van, naar, centen, soort, oms, ref }) {
+    async boek({ van, naar, centen, soort, oms, ref, economischeSleutel }) {
       if (!aan) return { error: 'Rust-motor staat uit; JavaScript blijft autoritatief.', status: 503 };
-      const r = await zekering.verstuur(boekPad, { van, naar, centen: Math.round(Number(centen)), soort, oms, ref });
+      const r = await zekering.verstuur(boekPad, { van, naar, centen: Math.round(Number(centen)), soort, oms, ref,
+        idem: economischeSleutel || undefined });
       if (r.fout) return r.fout;
       const { http, body } = r;
       if (http >= 300 || !body || body.ok !== true || !body.boeking) {
         return { error: (body && body.error) || ('Motor weigerde ' + watBoeking + '.'), status: http || 502 };
       }
-      return { ok: true, boeking: body.boeking };
+      return { ok: true, boeking: body.boeking, herhaald: !!body.herhaald,
+        saldoVan: body.saldoVan, saldoNaar: body.saldoNaar };
     },
 
     /* De volledige saldi-stand van de motor (autoriteit), voor de herstart-

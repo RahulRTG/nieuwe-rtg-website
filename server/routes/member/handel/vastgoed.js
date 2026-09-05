@@ -4,6 +4,8 @@ module.exports = (hctx) => {
   const { kern, openLijn } = hctx;
   const { app, auth, crypto, db, findSupplier, liveCodename, notifySupplier, save, schoon, sseToSupplier,
           salonZichtbaar } = kern;
+const keylessToegang = kern.keylessToegang ||
+  require('../../../kern/vastgoed-keyless-toegang')({ env:process.env });
 function pandPubliek(s, p) {
   return { id: p.id, titel: p.titel, soort: p.soort, transactie: p.transactie, prijs: p.prijs,
     plaats: p.plaats, adres: p.adres, slaapkamers: p.slaapkamers, badkamers: p.badkamers,
@@ -81,6 +83,7 @@ app.post('/api/vastgoed/bod', auth, (req, res) => {
 
 /* Keyless toegang tot een bevestigde bezichtiging, alleen binnen het venster. */
 app.post('/api/vastgoed/keyless', auth, (req, res) => {
+  if (keylessToegang.weigerAlsProductie(res)) return;
   const b = db.data.bezichtigingen.find(x => x.ref === String(req.body.ref || '') && x.key === req.session.key);
   if (!b || !b.keyless) return res.status(404).json({ error: 'Geen keyless toegang gevonden.' });
   const nu = Date.now();

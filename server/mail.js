@@ -16,14 +16,6 @@
    het logboek. Een tijdelijke fout (4xx) en een permanente (5xx) worden apart
    gemeld: bij de eerste heeft opnieuw proberen zin, bij de tweede niet.
 
-   De oude tekst hieronder gold voor de eerste twee standen:
-   - Met SMTP_URL in de omgeving (bijv. smtp://user:pass@smtp.provider.nl:587)
-     verstuurt de eigen SMTP-client (server/smtp.js) echte e-mail. MAIL_FROM
-     bepaalt de afzender.
-   - Zonder SMTP_URL worden berichten naar server/data/outbox geschreven en
-     gelogd. De verificatie- en herstel-links zijn ook dan echt en werken.
-   Zo is de hele mailstroom af voor livegang: alleen nog een SMTP-account
-   koppelen via twee omgevingsvariabelen.
    ========================================================================== */
 const smsSandbox = require('./sms-sandbox');
 
@@ -68,7 +60,9 @@ const { toOutbox } = require('./mail-outbox')({ FROM });
    in de SMTP-controle al zo ("de host is loopback"), en twee dingen met dezelfde
    naam in een bestand leest niemand twee keer goed. */
 const kanalen = require('./mail-lokaal')({ CONFIGURED, SMTP_SANDBOX, DIRECT, toOutbox });
-const { sendSms, zetSandbox, sandboxStand } = kanalen;
+const { sendSms: sendSmsNu, zetSandbox, sandboxStand } = kanalen;
+const wachtOpCommit = require('./mail-na-commit');
+const sendSms = wachtOpCommit(sendSmsNu, (to, _subject, text) => kanalen.toetsSms(to, text));
 
 /* Het OPSTELLEN van een bericht -- de RFC-koppen, de codering en de
    DKIM-handtekening -- staat in ./mail-opstellen.js. Zelfde soort knip als
@@ -85,7 +79,7 @@ const { bouwBericht } = require('./mail-opstellen')({ FROM, MAIL_DOMEIN, DKIM_SL
 const stuurDirect = (to, subject, text, opties) =>
   require('./mail-bezorgen').stuurDirect({ to, subject, text, FROM, bouwBericht, toOutbox, opties });
 
-function send(to, subject, text, opties) {
+function sendNu(to, subject, text, opties) {
   if (!to) return;
   /* DE KOSTENMETER (kern/kosten/haak.js), en alleen voor MAIL: een sms gaat een
      paar regels lager door sendSms, en die telt zichzelf. Twee tellingen op een
@@ -120,7 +114,7 @@ function send(to, subject, text, opties) {
     try { require('./journaalhaak').meld({ richting: 'uit', wat: 'post/' + hoe, naar: to, mislukt: !gelukt, reden }); } catch (e) {}
   };
   const isMail = /@/.test(String(to));
-  if (!isMail) return sendSms(String(to).replace(/^sms:/i, ''), subject, text);
+  if (!isMail) return sendSmsNu(String(to).replace(/^sms:/i, ''), subject, text);
   if (transporter && (!SMTP_SANDBOX || kanalen.smtpAan())) {
     transporter.sendMail({ from: opties && opties.from || FROM,
       envelopeFrom: opties && opties.envelopeFrom || FROM,
@@ -132,6 +126,7 @@ function send(to, subject, text, opties) {
   if (DIRECT) return stuurDirect(to, subject, text, opties);
   try { toOutbox(to, subject, text, opties); journaal(true, 'outbox'); } catch (e) { console.warn('[mail] mislukt:', e.message); journaal(false, 'outbox', e.message); }
 }
+const send = wachtOpCommit(sendNu);
 
 /* Alleen een alias die door de server uit een intern postvak is afgeleid, mag
    als zichtbare afzender naar buiten. De envelope-afzender blijft MAIL_FROM,

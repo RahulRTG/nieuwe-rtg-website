@@ -13,32 +13,32 @@ minderjarige) gebruikers" vraagt meer dan code alleen.
 ```bash
 npm run afbouw:snel       # releasepoort + volledige geïsoleerde stagingrepetitie
 npm run afbouw:software   # alle Node-tests + releasepoort + stagingrepetitie
-npm run afbouw:alles      # hetzelfde, daarna ook alle echte livevoorwaarden controleren
+npm run afbouw:alles      # software + CI-kandidaatkeuring + productiestatus
 ```
 
-`afbouw:alles` is de centrale nul-dependency afbouwknop. Hij stopt bij de
-eerste echte fout en geeft pas groen nadat gameplay, economie, drie afzonderlijke
-spelers, 300-verzoekenbelasting, procesfailover, Sentinel-isolatie, audit,
-backup/herstel, Rust en alle Node-tests zijn geslaagd. De repetitie bindt alleen
-aan loopback, gebruikt uitsluitend synthetische speldata en verwijdert de hele
-tijdelijke omgeving na afloop. Het machineleesbare bewijs staat in
-`.release/staging-bewijs.json`; het laatste proceslog in
-`.release/staging-laatste.log`. Gelijktijdige bronmuterende tests en releases
-worden met één exclusief afbouwslot geweigerd, zodat Sentinel nooit een tijdelijk
-ijkbestand als productiewijziging hoeft te beoordelen.
+`afbouw:software` is de lokale softwarepoort. De definitieve productieronde kan
+alleen op een schone, gecommitte bron en gebruikt vervolgens de unieke,
+ondertekende kandidaat uit de GitHub-workflow `Release-imagekandidaat`.
+`afbouw:alles` bouwt of publiceert geen lokaal image: `live:golive` trekt de
+CI-kandidaat op, verifieert digest, SBOM en herkomst en keurt hem tegen een
+volledig afgescheiden, vluchtige omgeving. De stagingrepetitie bindt alleen aan
+loopback, gebruikt synthetische data en verwijdert de tijdelijke omgeving.
 
-De knop voert bewust geen echte uitrol uit. Wanneer `afbouw:alles` groen is,
-blijft `npm run deploy:productie` de afzonderlijke, menselijke publicatieactie.
-Een domein, mailroute, betaalkeuze, juridische antwoorden of persoonsgegevens
-worden nooit door software verzonnen.
+De knop voert bewust geen echte uitrol uit. Ook READY is nog geen toestemming:
+`npm run deploy:productie` eist daarnaast een afzonderlijke Ed25519-getekende
+promotie door de release-authority, gebonden aan dezelfde commit, twee image-
+digests en alle bewijsbytes. Een domein, mailroute, betaalrail, juridische
+vrijgave of persoonsgegevens worden nooit door software verzonnen.
 
-## 1. Snel starten (Docker)
+## 1. Lokaal starten (Docker, nooit de productieroute)
 
-Eerst veilig lokaal bouwen, zonder te doen alsof mail of betalingen al echt
-zijn:
+Deze opdrachten zijn uitsluitend voor een lokale, afgeschermde installatie.
+Een image dat met `docker compose ... --build` is gemaakt, mag nooit worden
+gepromoveerd naar productie:
 
 ```bash
 npm run selfhost:init -- --eigenaar=jij@domein.nl
+npm run motor:init
 npm run selfhost:check
 docker compose up -d --build
 docker compose ps
@@ -47,21 +47,27 @@ docker compose ps
 Open `http://127.0.0.1:3000`. Docker publiceert de app bewust alleen op de
 loopback; PostgreSQL, Redis en de Rust-motor hebben helemaal geen hostpoort.
 De containers draaien met een read-only root, zonder extra Linux-capabilities
-en met begrensde, roterende logs. Geheimen komen uit `.env.productie` en
-`.rtg-secrets/postgres_password` als Docker secrets en staan niet als losse
+en met begrensde, roterende logs. Geheimen komen uit `.env.productie`,
+`.rtg-secrets/postgres_password` en de aparte
+`.rtg-secrets/motor_state_key` als Docker secrets en staan niet als losse
 waarden in `docker inspect`.
 
-`selfhost:init` overschrijft bestaande sleutels nooit. Voor publieke livegang:
-verwijder `RTG_PRIVATE_BETA=1`, zet een HTTPS-`APP_URL` en SMTP. Koppel daarna
-een echte betaalprovider, of kies expliciet `RTG_BETALEN_UIT=1`; laat externe
-AI bewust uit met `RTG_AI_UIT=1`. Draai `npm run golive`, en zet pas daarna een
-TLS-tunnel of reverse proxy voor de loopbackpoort.
+`motor:init` is een bewuste, eenmalige operatorhandeling vóór de eerste start.
+Hij legt eerst `RTG_MOTOR_EXPECT_GENESIS` atomair vast en maakt daarna precies
+één authenticated-encrypted geldsnapshot. Een gewone start of restart maakt
+nooit een sleutel, genesis of leeg vervangingsvolume; bij verlies blijft de
+motor onready totdat herstel de oorspronkelijke waarheid terugzet.
 
-Publiek zonder AI en zonder betalen, zoals voor een eerste veilige release:
+`selfhost:init` overschrijft bestaande sleutels nooit. Voor een publieke
+livegang stap je vanaf hier over op de kandidaat- en promotieketen in
+`LIVEGANG.md`; je zet deze lokale build niet open aan het internet.
+
+Afgeschermd zonder AI en zonder betalen, bijvoorbeeld voor een acceptatieproef:
 
 ```bash
 npm run sleutels -- --docker --schrijf --zonder-ai --zonder-betalen \
   --eigenaar=jij@domein.nl --url=https://jouw-domein.nl
+npm run motor:init
 npm run selfhost:check
 docker compose up -d --build
 npm run golive
@@ -70,7 +76,8 @@ npm run golive
 In deze stand is “zonder betalen” geen demo: starten, bevestigen, terugbetalen,
 uitbetalen en betaalwebhooks weigeren allemaal fail-closed. Zonder AI draait de
 app in handmatige werkmodus; navigatie, regels en overige kernprocessen blijven
-beschikbaar.
+beschikbaar. Deze stand is geen `PRODUCTION_STATUS=READY` voor de volledige
+B2B2C-operatie.
 
 - Liveness: `GET /api/health` (proces leeft)
 - Readiness: `GET /api/ready` (mag verkeer krijgen; 503 als de datalaag nog niet klaar is)
@@ -149,12 +156,14 @@ logboeken, energie-instellingen): `scripts/mac/LEESMIJ.md`. Weghalen kan met
 | Variabele | Waarom |
 |---|---|
 | `NODE_ENV=production` | Zet demo uit, https-redirect + HSTS aan |
-| `RTG_ENC_KEY` | Versleuteling-at-rest. 64 hex-tekens (`openssl rand -hex 32`). Zonder dit weigert de start, tenzij je bewust `RTG_ALLOW_PLAINTEXT=1` zet |
+| `RTG_ENC_KEY` | Versleuteling-at-rest. 64 hex-tekens (`openssl rand -hex 32`). **Zonder dit weigert iedere productiestart; er is geen plaintext-override.** |
 | `RTG_VAULT_KEY` | De sleutel van de identiteitskluis (echte naam, e-mail, telefoon). 64 hex-tekens. **Zonder dit weigert de start.** Staat hij niet in de omgeving, dan maakt de server hem als bestand `vault.key` in de datamap — naast `rtg.db`. Wie die map steelt heeft dan de data én de sleutel, en zijn de codenamen weer namen. Hoort uit een secrets manager te komen |
 | `RTG_SECRET_KEY` | Ondertekent de sessietokens. 64 hex-tekens. **Zonder dit weigert de start**, om dezelfde reden: anders komt `secret.key` naast de database te liggen, en kan wie hem heeft zelf geldige sessies maken |
-| `DATABASE_URL` | PostgreSQL voor de gedeelde data (aanbevolen voor productie en meerdere instances). Leeg = lokaal bestand |
-| `APP_URL` | Correcte links in e-mails |
-| `REDIS_URL` | Gedeelde realtime-bus én atomische RTG-PIN-antifraudegrenzen over alle instances |
+| `OFFICE_CODE` | Gedeeld backofficegeheim van minimaal 12 willekeurige tekens. Verplicht naast TOTP; nooit per proces laten wisselen |
+| `DATABASE_URL` | PostgreSQL voor gedeelde, multi-instance data. De app kan lokaal op SQLite proefdraaien, maar **go-live weigert zonder PostgreSQL** |
+| `APP_URL` | Vast publiek HTTPS-adres voor herstel-, uitnodigings- en bevestigingslinks. **Zonder dit weigert productie; de Host-kop is nooit een veilige bron.** |
+| `REDIS_URL` | Gedeelde realtime-bus, intrekking en atomische RTG-PIN-antifraudegrenzen. **Go-live weigert zonder Redis** |
+| `ERR_WEBHOOK_URL` | Beproefde externe alarmering voor fouten, SLO, journaalketen en canary. **Publieke productie weigert zonder deze uitgang.** |
 | `RTG_PIN_ENTERPRISE=1` | Laat productie fail-closed weigeren wanneer `REDIS_URL` ontbreekt; aanbevolen voor iedere publieke livegang |
 | `RTG_TLS=1` | De app termineert **zelf** TLS/HTTPS op Node's tls-stack (HTTP/2 + HTTP/1.1-terugval via ALPN, TLS 1.2 als vloer, harde ciphers) — een aparte reverse proxy voor TLS is dan niet meer nodig. Zonder cert maakt ze een self-signed voor local |
 | `RTG_ACME=1` + `RTG_TLS_DOMAIN` + `RTG_TLS_EMAIL` | Met `RTG_TLS=1`: de app haalt en vernieuwt **zelf** een echt Let's Encrypt-certificaat (eigen ACME-client, HTTP-01 op poort 80, live cert-herlaad zonder herstart). `RTG_ACME_STAGING=1` om eerst tegen de staging-CA te oefenen |
@@ -379,6 +388,9 @@ CRL die interne clients ophalen. De CA-sleutel en de intrekkingslijst staan onde
   synchrone cache. Een lokale snapshot dient als warme cache en fallback als
   Postgres even wegvalt. Zonder `DATABASE_URL` valt de app terug op een lokaal
   bestand (of `RTG_STORE=sqlite`).
+  Zet bij een PostgreSQL-installatie geen afwijkende `RTG_STORE`: de
+  productiekeuring blokkeert een combinatie waarin de ingestelde database wel
+  wordt beproefd maar de runtime door een override toch lokaal draait.
   **Let op bij meerdere instances:** zet `RTG_VAULT_KEY` en `RTG_SECRET_KEY`
   (gedeeld en gelijk), anders kan de ene instance de versleutelde naam/e-mail van
   de andere niet lezen en kloppen de e-mail-login-hash en sessietokens niet.
@@ -566,30 +578,38 @@ een generale repetitie (`test/golive.test.js`) die de server echt in
 productiestand start en bewijst: onveilige start geweigerd, demo dicht, geen
 dev-lekken, registratie/eigenaar/backoffice werken.
 
-**De snelste route (een avond werk):**
+**De enige productieroute:**
 
-1. Volg `LIVEGANG.md`: maak `deploy/live.env` en een externe back-upmap.
-2. `npm run live:init -- --eigenaar=… --url=https://… --tls-email=…
-   --smtp-url=smtps://…` genereert alle geheimen zonder ze naar terminal- of
-   CI-logs te schrijven. AI en betalingen staan in deze route fail-closed uit.
-3. `npm run live:check` keurt native TLS/ACME, 2FA, poorten, geheimen en de
-   externe back-upmount. `npm run live:deploy` bouwt daarna een immutable image,
-   start de stack en rolt bij mislukte readiness automatisch terug.
-4. `npm run live:owner` claimt het eerste eigenaarsaccount via de lokale
-   HTTPS-poort en verwijdert daarna automatisch het eenmalige bootstrapgeheim.
-   Vul het papierwerk in en draai `npm run live:golive`: die keurt vanuit de
-   app-container de echte interne database en hetzelfde datavolume.
-   `npm run live:probe` meet daarna DNS, het publieke certificaat en de
-   veiligheidsrand vanaf buiten.
+1. Volg `LIVEGANG.md`: bereid host, geheimen, externe backup en echte providers
+   voor; rond code en gegenereerde registers af en commit een schone bron.
+2. Laat `Release-imagekandidaat` op die exacte commit lopen. Download het
+   artefact `herkomst` ongewijzigd naar `.release/` en vul de twee unieke
+   kandidaat-tags in `deploy/live.env` in.
+3. Verzamel de echte onafhankelijke bewijsbestanden, vul het commitgebonden
+   externe dossier en laat de vaste releasebeoordelaar het ondertekenen.
+4. Draai `npm run live:check`, `npm run live:golive` en daarna
+   `npm run productie:status`. Stop tenzij de laatste opdracht exact
+   `PRODUCTION_STATUS=READY` en nul blokkades meldt.
+5. Laat een afzonderlijke release-authority `npm run promotie:teken` uitvoeren
+   met de bij deze commit horende bevestiging en besluitreferentie. Controleer
+   met `npm run promotie:controle`.
+6. Pas nu mag `npm run live:deploy` draaien. Deze opdracht bouwt niets, gebruikt
+   alleen de bewezen digestrefs en zet bij mislukte readiness de volledige
+   vorige immutable app- en backupset terug. Readiness accepteert geen
+   self-signed certificaat: ook bij de lokale loopbackproef blijven APP_URL,
+   SNI, hostnamecontrole en de publieke trustketen leidend. `npm run live:probe`
+   meet daarna via echte DNS de certificaatketen/SAN/looptijd, HSTS en de
+   padbehoudende HTTP→HTTPS-redirect en bewaart
+   `.release/publieke-tls-bewijs.json`; vervolgens lopen veiligheidsrand en SLO.
 
 - [ ] `npm run live:golive` geeft exitcode 0 in de productiecontainer
-- [ ] `RTG_OWNER_EMAIL` is het echte adres van de eigenaar, en er hoort al een RTG-account bij (verplicht; leeg of het voorbeeldadres blokkeert de start). Overdragen kan later op de technische pagina onder "Eigenaarschap"
+- [ ] `RTG_OWNER_EMAIL` is het echte adres van de eigenaar, en er hoort al een RTG-account bij (verplicht; leeg of het voorbeeldadres blokkeert de start). `RTG_OWNER_BOOTSTRAP` is na die eerste registratie volledig uit de productieomgeving verwijderd. Overdragen kan later op de technische pagina onder "Eigenaarschap"
 - [ ] `.env` ingevuld; `NODE_ENV=production`; `RTG_ENC_KEY` gezet
 - [ ] Versleuteling in rust bewezen op de echte machine: `node --test test/rust.test.js` is groen. Die test zet gegevens via de gewone endpoints in een server en zoekt daarna de hele datamap byte voor byte af; hij vertrouwt niet op de belofte
 - [ ] De sleutels (`RTG_ENC_KEY`, `RTG_VAULT_KEY`, `RTG_SECRET_KEY`) staan als omgevingsvariabele, **niet** in de datamap. Zonder deze regel schrijft de server ze als bestand naast de data, en dan opent een gestolen schijf zichzelf
 - [ ] Weet dat de outbox met een sleutel versleuteld is: mislukte verzendingen teruglezen gaat met `npm run outbox` (met dezelfde `RTG_ENC_KEY`)
 - [ ] `DATABASE_URL` gezet, PostgreSQL draait; back-up/restore van de database één keer geoefend
-- [ ] TLS geregeld: in de lokale-eerst live-route native in de app (`RTG_TLS=1`, `RTG_ACME=1`) met poort 80 + 443 bereikbaar; een reverse proxy is alleen een bewuste alternatieve architectuur
+- [ ] TLS geregeld: in de lokale-eerst live-route native in de app (`RTG_TLS=1`, `RTG_ACME=1`, nooit `RTG_ACME_STAGING=1`) met poort 80 + 443 bereikbaar; `npm run live:probe` is op een onafhankelijke machine groen en het rode/groene TLS-bewijs is bij de releasecommit bewaard; een reverse proxy is alleen een bewuste alternatieve architectuur
 - [ ] Redis draait; `REDIS_URL` en `RTG_PIN_ENTERPRISE=1` zijn gezet, en een
       startproef zonder Redis is aantoonbaar geblokkeerd
 - [ ] `ERR_WEBHOOK_URL` gezet, en de **zelfproef** op het techniekbord komt
@@ -598,14 +618,31 @@ dev-lekken, registratie/eigenaar/backoffice werken.
       variabele wordt door niets gelezen, dus er kwam nooit een testfout
       binnen. Vink dit pas af als de proef `ok: true` teruggeeft.
 - [ ] SMTP getest (herstel-link komt echt aan)
-- [ ] Betalingen: voor de eerste livegang staat `RTG_BETALEN_UIT=1` en weigert elke rail fail-closed. Alleen bij een latere betaalrelease vervangen door echte providerkeys + een geteste, ondertekende webhook
+- [ ] B2B2C-geld: `RTG_BETALEN_UIT` staat niet aan; een echte inkomende provider
+      én echte uitbetaalprovider zijn geconfigureerd. Ondertekend bewijs dekt
+      authorization/capture, dubbele en verkeerd geordende webhooks, timeout en
+      retry, volledige en gedeeltelijke refund, payout, settlement,
+      reconciliatie en herstel na een lokale opslagfout. Een providerkey of
+      clientcallback alleen telt nooit als geldwaarheid
+- [ ] Beschermde Foundation-/minderjarigenroutes blijven voor de eerste
+      volwassen release server-side gesloten: de runtimevlag ontbreekt en het
+      ondertekende dossier vermeldt `vrijgave: GESLOTEN` met leeftijdscontrole
+      en moderatie `NIET_VRIJGEGEVEN`. Alleen een aparte latere release mag alle
+      drie naar OPEN/PASS brengen
 - [ ] Back-up-volume gemount; herstel-uit-back-up één keer geoefend
 - [ ] `npm run check` en `npm test` groen in CI; image bouwt
-- [ ] `npm run release:gate:productie` is groen en `.release/release-bewijs.json` verifieert met `npm run release:controle`
+- [ ] De volledige Node-suite, volledige schermsuite en verplichte
+      PostgreSQL/Redis-suite zijn zonder fail, skip of todo groen op exact de
+      releasecommit; de CI-herkomst bindt deze bewijzen aan beide image-digests
+- [ ] `npm run release:gate:productie` is groen; het CI-imagebewijs, SBOM en de
+      Ed25519-herkomst zijn ongewijzigd en volledig verifieerbaar
+- [ ] `npm run productie:status` meldt exact `PRODUCTION_STATUS=READY` met nul
+      blokkades; daarna is een afzonderlijk getekend promotiebesluit gemaakt en
+      `npm run promotie:controle` is groen
 - [ ] Op het techniekbord is **Controleer alle code nu** groen en staat het releasebewijs als **extern verankerd**. `npm run deploy:productie` leest de bewijs-SHA uit het gebouwde image, geeft hem als runtime-pin terug en bewaart hem in de uitrolbon. Zie `docs/incidentcontrole.md`
 - [ ] Een rollback is op de echte host geoefend met een uitrolbon; volumes zijn daarbij niet teruggezet
 - [ ] Logs komen ergens terecht (Loki/CloudWatch/Datadog)
-- [ ] GitHub repository variable `RTG_LIVE_URL` gezet; de publieke sonde prikt elke vijf minuten van buitenaf door DNS en TLS heen
+- [ ] GitHub repository variables `RTG_LIVE_URL` én `RTG_LIVE_COMMIT` gezet; de publieke sonde prikt elke vijf minuten van buitenaf door DNS en TLS heen en bindt het bewijs aan de werkelijk uitgerolde commit
 - [ ] `OFFICE_TOTP_SECRET` gezet en de authenticator-app gekoppeld (2FA op de backoffice; **de keuring blokkeert de productiestart zolang hij ontbreekt**, en een geheim onder de 16 base32-tekens telt niet als tweede factor). Zonder deze factor staat de backoffice — auditlog, tijdlijn met codenamen, export — achter alleen de statische `OFFICE_CODE`, en de officedeur remt per IP, dus verspreid raden komt daar langs. Dit was een waarschuwing; `scripts/docker/controle.js` eiste het al hard voor livegang, en die twee zeggen nu hetzelfde
 - [ ] Inlog-auditlog gecontroleerd na de eerste inlog (RTG HQ, kaart "Inlogactiviteit")
 - [ ] Rate-limiter bevestigd: in productie geeft de API boven 300 verzoeken/minuut/IP een 429 (test/livegang.test.js bewijst dit)

@@ -14,7 +14,7 @@
    (maakt geen vriendschap), via het door de server bevestigde klasgenoten-pad,
    of via de random wachtrij per spel en groepsgrootte. Beurten gaan via polling
    plus een SSE-duwtje. */
-module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, isGeblokkeerd, socialZoek, sociaalRate, volwassen, anthropic, magnaatLeren, sseClients, lidBoardUit, comm }) => {
+module.exports = ({ db, save, bewerkCollectie, crypto, zijnVrienden, codenaamVan, sseToCustomer, isGeblokkeerd, socialZoek, sociaalRate, volwassen, anthropic, magnaatLeren, sseClients, lidBoardUit, comm }) => {
   const fs = require('fs'), zlib = require('zlib'), path = require('path');
   const { S } = require('./spellen/opslag')({ db });
   const rid = (n) => crypto.randomBytes(n).toString('hex');
@@ -139,17 +139,17 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
      van hen wordt door die laag gelezen -- dat is de naad waarop ze samen in
      spellen/rondom.js staan. */
   const rondom = require('./spellen/rondom')({
-    anthropic, spelReplay, SPEL, SOORTEN, ZICHT, crypto, db, save, rid, nu, S,
+    anthropic, spelReplay, SPEL, SOORTEN, ZICHT, crypto, db, save, bewerkCollectie, rid, nu, S,
     codenaamVan, isGeblokkeerd, zijnVrienden, klasgenotenVan, sociaalRate,
     comm, ARCADE, DAG, ruw, progressieMag, GEEN_PROGRESSIE, opruimHaken, spelCtx: ctx
   });
-  const { spelRahul, spelNabespreking, spelNaspelen, projectieOpen, projectieStand,
+  const { spelRahul, spelNabespreking, spelNaspelen, projectieOpen, projectieKoppel, projectieStand,
     projectieSluit, projectieSpellen, teamNieuw, teamNodig, teamAntwoord,
     teamVerlaat, mijnTeams, spelPraat, spelPraatStuur, arcadeScore, arcadeBord,
     sneekScore, sneekBord, sudokuNieuw, sudokuKlaar, dagStand, dagStart, dagKlaar } = rondom;
 
 
-  return { spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelVarianten, spelStaat, spelZet, spelOpgeven, spelToewijzen, spelKijk, spelReplay, spelNaspelen, spelRahul, spelNabespreking, projectieOpen, projectieStand, projectieSluit, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, spelPrestaties, spelPraat, spelPraatStuur, spelTelemetrie, teamNieuw, teamNodig, teamAntwoord, teamVerlaat, mijnTeams, sudokuNieuw, sudokuKlaar, spelVergeet, toernooiNieuw, toernooiAntwoord, mijnToernooien, toernooiStaat, sneekScore, sneekBord, arcadeScore, arcadeBord, dagStand, dagStart, dagKlaar, SPEL_SOORTEN: SOORTEN,
+  return { spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelVarianten, spelStaat, spelZet, spelOpgeven, spelToewijzen, spelKijk, spelReplay, spelNaspelen, spelRahul, spelNabespreking, projectieOpen, projectieKoppel, projectieStand, projectieSluit, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, spelPrestaties, spelPraat, spelPraatStuur, spelTelemetrie, teamNieuw, teamNodig, teamAntwoord, teamVerlaat, mijnTeams, sudokuNieuw, sudokuKlaar, spelVergeet, toernooiNieuw, toernooiAntwoord, mijnToernooien, toernooiStaat, sneekScore, sneekBord, arcadeScore, arcadeBord, dagStand, dagStart, dagKlaar, SPEL_SOORTEN: SOORTEN,
     // alleen voor de drift-test: de client heeft een eigen kopie van deze
     // regels (directe feedback); de test houdt beide kopieën tegen elkaar
     _spelregels: { rummiSet: ruw.rummiSet, W_PREMIE: ruw.W_PREMIE, SPEL, ARCADE } };

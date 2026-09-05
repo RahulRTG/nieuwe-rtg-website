@@ -65,6 +65,10 @@ module.exports = function maakDiensten(deps) {
      bereiken. Elke sseTo*-functie publiceert; elk proces levert de events af aan
      zijn eigen open verbindingen. */
   const bus = require('../bus').maakBus();
+  /* Token- en sessie-intrekkingen gebruiken dezelfde leiding. Lokaal sluiten
+     ze synchroon; via Redis sluiten ook de andere instances hun bestaande
+     persoonlijke SSE-verbinding, zonder op een heartbeat te wachten. */
+  require('../kern/intreksignaal').koppelBus(bus);
   /* De huisbrede deurrem van RTG Link deelt zijn missers over dezelfde leiding
      (kern/link/rem.js, LINK.md par. 3.7). Hier en niet in de linklaag zelf: de
      bus wordt hier gemaakt, en de rem is een singleton die maar EEN keer mag

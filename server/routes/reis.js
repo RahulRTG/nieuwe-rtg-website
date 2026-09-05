@@ -123,19 +123,29 @@ module.exports = (kern) => {
      doorgestuurde link geen boekingsnummers lekt; zie de kop van
      kern/reisuitnodiging.js. Het slot is de entropie van de code (128 bits);
      de rem hieronder houdt ruis tegen en is uitdrukkelijk geen slot. */
-  app.post('/api/reis/uitnodiging/open', (req, res) => {
+  const reisUitnodiging = async (res, werk) => {
+    try { stuur(res, await Promise.resolve(werk())); }
+    catch (e) { console.error('[reisuitnodiging] veilige verwerking mislukt'); res.status(503).json({ error: 'De uitnodiging kon niet veilig worden verwerkt. Probeer het later opnieuw.' }); }
+  };
+  const uitnodigingIdem = req => String(((req.body || {}).idem || req.get('idempotency-key') || '')).slice(0, 200);
+  app.post('/api/reis/uitnodiging/open', async (req, res) => {
     if (kern.tooManyTries && kern.tooManyTries(res, 'reisuitnodiging:' + req.ip)) return;
-    stuur(res, kern.reisuitnodiging.open((req.body || {}).code));
+    await reisUitnodiging(res, () => kern.reisuitnodiging.open((req.body || {}).code));
   });
   // opeisen kan alleen met een account: vanaf hier is er een mens met een sessie
   app.post('/api/reis/uitnodiging/eisop', auth, (req, res) =>
-    stuur(res, kern.reisuitnodiging.eisOp(req.session, (req.body || {}).code)));
+    reisUitnodiging(res, () => kern.reisuitnodiging.eisOp(req.session, (req.body || {}).code)));
   /* Een lid nodigt zijn reisgenoot uit. Hij deelt ONDERDELEN uit zijn eigen
      reis; de kern schoont die en laat er geen bewijsstukken of sleutels in. */
   app.post('/api/reis/uitnodiging/nodig-uit', auth, (req, res) =>
-    stuur(res, kern.reisuitnodiging.nodigUit(req.session.key, kern.liveCodename(req.session), (req.body || {}).onderdelen)));
+    reisUitnodiging(res, () => kern.reisuitnodiging.nodigUit(req.session.key, kern.liveCodename(req.session),
+      (req.body || {}).onderdelen, uitnodigingIdem(req))));
   app.post('/api/reis/uitnodiging/mijn', auth, (req, res) =>
-    res.json({ ok: true, uitnodigingen: kern.reisuitnodiging.lijst(req.session.key) }));
+    reisUitnodiging(res, () => kern.reisuitnodiging.lijst(req.session.key)));
   app.post('/api/reis/uitnodiging/weg', auth, (req, res) =>
-    stuur(res, kern.reisuitnodiging.trekIn(req.session.key, (req.body || {}).id)));
+    reisUitnodiging(res, () => kern.reisuitnodiging.trekIn(req.session.key, (req.body || {}).id,
+      kern.liveCodename(req.session), (req.body || {}).reden)));
+  app.post('/api/reis/uitnodiging/roteer', auth, (req, res) =>
+    reisUitnodiging(res, () => kern.reisuitnodiging.roteer(req.session.key, (req.body || {}).id,
+      kern.liveCodename(req.session), uitnodigingIdem(req))));
 };

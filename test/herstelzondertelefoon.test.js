@@ -73,3 +73,47 @@ test('met een telefoonnummer blijft de tweede stap gewoon verplicht', async () =
     assert.equal(met.status, 200, 'met de code hoort het wel te lukken: ' + JSON.stringify(met.body).slice(0, 160));
   } finally { stop(srv.child); }
 });
+
+test('een te kort wachtwoord verbruikt de geldige herstel-link niet', async () => {
+  const srv = await startServer({ env: { SMTP_URL: '' } });
+  const p = post(srv.base);
+  try {
+    const reg = await p('/api/auth/register', { name: 'Herstel Typefout', email: 'typefout@x.nl',
+      password: 'geheim123', geboortedatum: '1990-01-01', pasApp: 'rtg' });
+    assert.ok(reg.body.token);
+    const vraag = await p('/api/auth/forgot', { email: 'typefout@x.nl' });
+    const token = String(vraag.body.devResetUrl || '').split('reset=')[1];
+    assert.ok(token);
+
+    const kort = await p('/api/auth/reset', { token, password: 'kort' });
+    assert.equal(kort.status, 400);
+    const herstel = await p('/api/auth/reset', { token, password: 'wel-lang-genoeg' });
+    assert.equal(herstel.status, 200,
+      'validatiefout hoort dezelfde nog geldige herstel-link niet te verbranden');
+  } finally { stop(srv.child); }
+});
+
+test('twee gelijktijdige resetverzoeken kunnen niet allebei een wachtwoord zetten', async () => {
+  const srv = await startServer({ env: { SMTP_URL: '' } });
+  const p = post(srv.base);
+  try {
+    const reg = await p('/api/auth/register', { name: 'Herstel Race', email: 'race@x.nl',
+      password: 'geheim123', geboortedatum: '1990-01-01', pasApp: 'rtg' });
+    assert.ok(reg.body.token);
+    const vraag = await p('/api/auth/forgot', { email: 'race@x.nl' });
+    const token = String(vraag.body.devResetUrl || '').split('reset=')[1];
+    assert.ok(token);
+
+    const [a, b] = await Promise.all([
+      p('/api/auth/reset', { token, password: 'eerste-wachtwoord' }),
+      p('/api/auth/reset', { token, password: 'tweede-wachtwoord' })
+    ]);
+    assert.deepEqual([a.status, b.status].sort((x, y) => x - y), [200, 409],
+      'de conditionele reset-hash geeft exact een winnaar');
+
+    const inloggen = await Promise.all(['eerste-wachtwoord', 'tweede-wachtwoord'].map(password =>
+      p('/api/auth/login', { login: 'race@x.nl', password, pasApp: 'rtg' })));
+    assert.equal(inloggen.filter(x => x.status === 200).length, 1,
+      'slechts het wachtwoord van de ene winnaar geldt');
+  } finally { stop(srv.child); }
+});

@@ -59,12 +59,10 @@
       overschreven. Zelfde soort als de noodknop hierboven: een route die nee kan
       zeggen, moet nee kunnen zeggen.
 
-   6. /api/rtf/samen/maak. De handler is `samenRtf.maak(s)` -- hij leest NIETS
-      uit het lijf. Twee oproepen zijn dus altijd woordelijk gelijk, en de tweede
-      kreeg de kamer van de eerste terug. In test/rtfschool.test.js liep daardoor
-      een latere toets op een kamer die al opgeruimd was en kwam er 403 waar 404
-      hoorde. Dit is letterlijk de fout waar dit bestand voor waarschuwt, en ik
-      maakte hem toch: twee keer `{}` zijn twee worpen.
+   6. /api/rtf/samen/maak en /code. Zij geven nu een kale credential precies
+      eenmaal terug. De Samen-kern bindt een expliciete idem-sleutel of korte
+      dubbeltik zelf en antwoordt op herhaling zonder het geheim; een generieke
+      antwoordcache zou een ingetrokken of al getoonde code heronthullen.
 
    7. /api/supplier/horeca/folio/nacht. De nachtrun houdt per folio bij welke
       nachten geboekt zijn en meldt eerlijk `geboekt: 0, overgeslagen: 1`. Met
@@ -74,35 +72,7 @@
    ========================================================================== */
 'use strict';
 
-const NOOIT = {
-  'POST /api/office/bank/nood':
-    'een noodknop met een optionele reden: twee keer drukken is twee keer menen',
-  'POST /api/office/bank/herstel':
-    'een herstelknop met een leeg lijf: een opgeslikte tweede druk laat de bank in nood staan en zegt "ok"',
-  'POST /api/office/bank/mislukking':
-    'een leeg lijf per melding, en de route telt zelf op de sleutel van de mislukte clearing',
-  'POST /api/bedrijf/lid/aanmeld':
-    'twee mensen met dezelfde naam in dezelfde werkruimte zijn twee mensen; de tweede kreeg het ' +
-    'lidmaatschap van de eerste terug',
-  'POST /api/member/spel/sudoku-nieuw':
-    'wie twee keer op "nieuwe puzzel" drukt, wil een nieuwe puzzel',
-  'POST /api/kantoorpakket/deel':
-    'delen weigert op een strikt document; die weigering mag geen cache overschrijven',
-  'POST /api/office/kantoorpakket/deel':
-    'zelfde reden als de ledenkant: het antwoord op een herhaling is een besluit',
-  'POST /api/supplier/kantoorpakket/deel':
-    'zelfde reden als de ledenkant: het antwoord op een herhaling is een besluit',
-  'POST /api/kantoorpakket/beheer':
-    'beheren weigert zolang er toegang openstaat; die weigering mag geen cache overschrijven',
-  'POST /api/office/kantoorpakket/beheer':
-    'zelfde reden als de ledenkant',
-  'POST /api/supplier/kantoorpakket/beheer':
-    'zelfde reden als de ledenkant',
-  'POST /api/rtf/samen/maak':
-    'de handler leest niets uit het lijf, dus twee oproepen zijn altijd gelijk -- twee keer {} zijn twee kamers',
-  'POST /api/supplier/horeca/folio/nacht':
-    'de nachtrun weet zelf welke nachten al geboekt zijn en zegt dat ook -- een cache maakt van dat antwoord een leugen'
-};
+const NOOIT = require('./idemsleutels-nooit-routes');
 
 /* DE KEURING VAN DE VERKLARINGEN, alle drie bij elkaar.
 

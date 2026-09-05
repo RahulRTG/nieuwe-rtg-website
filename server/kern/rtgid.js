@@ -26,7 +26,6 @@
    Opslag in de eigen collectie rtgid; maakRtgid(state) volgt het vaste kern-patroon. */
 
 const { idVanKey } = require('../lib/lidsleutel');
-const { bestaat } = require('./betrouwbaarheid');
 
 const KOPPEL_TTL_MS = 2 * 60 * 1000;      // een koppelcode leeft twee minuten
 const SESSIE_TTL_MS = 20 * 60 * 1000;     // een iD-sessie bij een dienst: twintig minuten
@@ -40,20 +39,45 @@ const ATTRIBUTEN = ['codenaam', '18plus', 'leeftijd', 'nationaliteit', 'naam'];
 const { isBewijsAttribuut } = require('./rtgid-bewijs');
 const magVragen = (a) => ATTRIBUTEN.includes(a) || isBewijsAttribuut(a);
 
-function maakRtgid({ db, save, crypto, accounts, schoon, leeftijdVan, gidsHaal, keyVanCodenaam, stapOp, passkeysVan, vakbewijsBron }) {
+function maakRtgid({ db, save, bewerkCollectie, crypto, accounts, schoon, leeftijdVan, gidsHaal, keyVanCodenaam, stapOp, passkeysVan, vakbewijsBron }) {
   const eigen = require('./eigencollectie')({ db, domein: 'kern/rtgid', bezit: { rtgid: 'kaart' } });
   const nu = () => Date.now();
   const iso = t => new Date(t == null ? Date.now() : t).toISOString();
   const hash = t => crypto.createHash('sha256').update(String(t)).digest('hex');
-  // de koppelcode zonder verwarrende tekens (geen O/0, I/1)
-  const CODE_TEKENS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  const codeMaak = () => 'ID-' + Array.from(crypto.randomBytes(5)).map(b => CODE_TEKENS[b % CODE_TEKENS.length]).join('');
-
-  function S() {
-    return eigen.bak('rtgid', (b) => { Object.assign(b, { koppels: [], sessies: [], logs: {}, machtigingen: [] }); });
-  }
+  const vorm = b => {
+    if (!Array.isArray(b.koppels)) b.koppels = [];
+    if (!Array.isArray(b.sessies)) b.sessies = [];
+    if (!b.logs || typeof b.logs !== 'object' || Array.isArray(b.logs)) b.logs = {};
+    if (!Array.isArray(b.machtigingen)) b.machtigingen = [];
+    return b;
+  };
+  function S() { return vorm(eigen.bak('rtgid', vorm)); }
   const cap = (l, m) => { if (l.length > m) l.length = m; };
-  function logVan(key) { const s = S(); if (!s.logs[key]) s.logs[key] = []; return s.logs[key]; }
+  function logVan(key, bron) { const s = bron ? vorm(bron) : S(); if (!s.logs[key]) s.logs[key] = []; return s.logs[key]; }
+
+  const toegang = require('./rtgid-koppeltoegang')({ crypto, nu: () => iso(), koppelTtlMs: KOPPEL_TTL_MS });
+  const herstel = (doel, json) => {
+    const oud = JSON.parse(json);
+    for (const k of Object.keys(doel)) delete doel[k];
+    Object.assign(doel, oud);
+  };
+  function metStaat(werk) {
+    const doe = bron => {
+      const s = vorm(bron);
+      toegang.migreerLegacy(s);
+      const antwoord = werk(s);
+      if (antwoord && typeof antwoord.then === 'function')
+        throw new Error('Een RTG-iD-collectietransactie mag niet asynchroon zijn.');
+      return antwoord;
+    };
+    if (typeof bewerkCollectie === 'function') return bewerkCollectie('rtgid', doe);
+    const s = S(), voor = JSON.stringify(s);
+    try {
+      const antwoord = doe(s);
+      if (JSON.stringify(s) !== voor) save();
+      return antwoord;
+    } catch (e) { herstel(s, voor); throw e; }
+  }
 
   function accountVanKey(key) {
     const id = idVanKey(key);
@@ -75,86 +99,29 @@ function maakRtgid({ db, save, crypto, accounts, schoon, leeftijdVan, gidsHaal, 
        de claim "niet na te gaan" en nooit "nee". */
     vakbewijsBron });
 
-  /* ---- de dienst-kant: een inlog starten en de uitkomst ophalen ---- */
-  function start(b) {
-    const s = S();
-    const dienst = schoon(b.dienst, 60);
-    if (!dienst) return { status: 400, error: 'Welke dienst vraagt de inlog?' };
-    const gevraagd = (Array.isArray(b.attributen) ? b.attributen : []).filter(magVragen);
-    if (!gevraagd.length) gevraagd.push('codenaam');
-    /* Een dienst mag een betrouwbaarheidsniveau eisen: niet alleen "is dit lid
-       18+", maar "en hoe hard weet u dat". Een eis die niet bestaat wordt hier
-       geweigerd en niet stil genegeerd -- anders is een typefout in de eis
-       precies zo goed als geen eis, en faalt de strengste vraag het stilst. */
-    const eis = b.minBetrouwbaarheid ? String(b.minBetrouwbaarheid) : null;
-    if (eis && !bestaat(eis)) return { status: 400, error: 'Onbekend betrouwbaarheidsniveau: ' + eis + '.' };
-    const k = { id: 'k' + crypto.randomBytes(6).toString('hex'), code: codeMaak(), dienst,
-      attributen: gevraagd, eis, status: 'wacht', gemaakt: iso(), verloopt: nu() + KOPPEL_TTL_MS };
-    s.koppels.unshift(k); cap(s.koppels, MAX_KOPPELS); save();
-    return { status: 200, koppelId: k.id, code: k.code, dienst, attributen: gevraagd,
-      minBetrouwbaarheid: eis, verloopt: iso(k.verloopt) };
-  }
-  function statusVan(koppelId) {
-    const s = S();
-    const k = s.koppels.find(x => x.id === String(koppelId || ''));
-    if (!k) return { status: 404, error: 'Deze inlog bestaat niet.' };
-    if (k.status === 'wacht' && nu() > k.verloopt) { k.status = 'verlopen'; save(); }
-    const uit = { status: 200, stand: k.status, dienst: k.dienst };
-    // het token gaat precies een keer over de lijn en verdwijnt daarna
-    if (k.status === 'bevestigd' && k.tokenEenmalig) { uit.idToken = k.tokenEenmalig; delete k.tokenEenmalig; save(); }
-    return uit;
-  }
-  /* EEN INLOG IS EEN REGEL IN HET LOG; EEN OPHALING WAS DAT NIET.
-
-     Bevestigen werd genoteerd, en daarna kon een dienst binnen zijn sessie van
-     twintig minuten zo vaak `wie` aanroepen als hij wilde -- elke keer met
-     dezelfde attributen terug, en het lid zag er een regel van: "inlog". Wie
-     zijn inzagelog las, wist dus dat er een deur was opengegaan, maar niet
-     hoeveel er doorheen was gelopen.
-
-     De TELLER staat op de sessie, en er komt hoogstens een extra regel per
-     sessie bij. Een regel per ophaling zou het log vullen met ruis van een
-     dienst die elke seconde ververst; een teller zegt hetzelfde in een getal
-     dat blijft kloppen. */
-  function wie(idToken) {
-    const s = S();
-    const h = hash(String(idToken || ''));
-    const sess = s.sessies.find(x => x.tokenHash === h);
-    if (!sess || sess.ingetrokken || nu() > sess.verloopt)
-      return { status: 403, error: 'Deze iD-sessie is niet (meer) geldig.' };
-    sess.opgehaald = (sess.opgehaald || 0) + 1;
-    if (sess.opgehaald === 2) {
-      /* Pas bij de TWEEDE: de eerste ophaling hoort bij de inlog die er al
-         staat, en die twee keer melden leest als twee gebeurtenissen. */
-      const log = logVan(sess.memberKey);
-      log.unshift({ om: iso(), dienst: sess.dienst, attributen: sess.attributen,
-        soort: 'haalde uw gegevens opnieuw op binnen dezelfde inlog' });
-      cap(log, MAX_LOG);
-    }
-    save();
-    return { status: 200, dienst: sess.dienst, attributen: attributenVoor(sess.memberKey, sess.attributen),
-      namens: sess.namens || undefined, verloopt: iso(sess.verloopt), opgehaald: sess.opgehaald };
-  }
+  const { start, statusVan, roteer, annuleer, wie } = require('./rtgid-dienst')({ metStaat, nu, iso, crypto,
+    schoon, toegang, magVragen, attributenVoor, logVan, cap, MAX_LOG, MAX_KOPPELS });
 
   /* De app-kant -- de code opzoeken, bevestigen met een passkey, weigeren --
      staat in ./rtgid-bevestigen.js. Daar woont ook de passkey-eis zelf: dat is
      de enige plek waar een identiteit de deur uit gaat, en die plek hoort de
      eis te dragen. */
   const { koppelZoek, bevestig, weiger } = require('./rtgid-bevestigen')({
-    S, save, nu, iso, crypto, schoon, hash, cap, logVan, codenaamUit, accountVanKey,
+    S, save, metStaat, toegang, nu, iso, crypto, schoon, hash, cap, logVan, codenaamUit, accountVanKey,
     niveauVoor, stapOp, passkeysVan, MAX_LOG, MAX_SESSIES, SESSIE_TTL_MS });
 
   /* Inzage, regie (intrekken) en de mantelzorg-machtigingen staan apart, in
      ./rtgid-regie.js; de gedeelde interne helpers gaan mee via de context. */
   const { inzage, intrek, machtig, machtigIntrek } = require('./rtgid-regie')({
-    S, save, nu, iso, schoon, keyVanCodenaam, crypto, codenaamUit, logVan, cap, ATTRIBUTEN, MAX_LOG });
+    metStaat, nu, iso, schoon, keyVanCodenaam, crypto, codenaamUit, accountVanKey,
+    logVan, cap, ATTRIBUTEN, MAX_LOG });
 
   /* De bewijsmap van het lid zelf. Hij komt uit ./rtgid-bewijs.js en wordt hier
      alleen doorgegeven, want ./rtgid-claims.js heeft dezelfde module al voor de
      dienst-kant -- twee instanties zouden twee bronnen worden. */
   const { mijnBewijzen } = require('./rtgid-bewijs')({ accountVanKey, vakbewijsBron });
 
-  return { rtgid: { start, statusVan, wie, koppelZoek, bevestig, weiger, inzage, intrek, machtig,
+  return { rtgid: { start, statusVan, roteer, annuleer, wie, koppelZoek, bevestig, weiger, inzage, intrek, machtig,
     machtigIntrek, mijnBewijzen } };
 }
 

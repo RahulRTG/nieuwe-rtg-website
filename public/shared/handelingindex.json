@@ -536,6 +536,12 @@
       "url": "/apps/foodcourt.html"
     },
     {
+      "label": "Koppel scherm",
+      "app": "Game Night",
+      "wereld": "LivingOS",
+      "url": "/apps/spelscherm.html"
+    },
+    {
       "label": "Beheer bronnen",
       "app": "Geld",
       "wereld": "LivingOS",
@@ -1371,6 +1377,12 @@
     },
     {
       "label": "Doe mee",
+      "app": "Muziek",
+      "wereld": "LivingOS",
+      "url": "/apps/muziek.html"
+    },
+    {
+      "label": "Nieuwe deelcode",
       "app": "Muziek",
       "wereld": "LivingOS",
       "url": "/apps/muziek.html"
@@ -2420,6 +2432,12 @@
       "url": "/apps/spelen.html?pas="
     },
     {
+      "label": "Open scherm",
+      "app": "Spelen",
+      "wereld": "LivingOS",
+      "url": "/apps/spelen.html?pas="
+    },
+    {
       "label": "Opgeven",
       "app": "Spelen",
       "wereld": "LivingOS",
@@ -2457,6 +2475,12 @@
     },
     {
       "label": "Ruil alles",
+      "app": "Spelen",
+      "wereld": "LivingOS",
+      "url": "/apps/spelen.html?pas="
+    },
+    {
+      "label": "Sluit scherm",
       "app": "Spelen",
       "wereld": "LivingOS",
       "url": "/apps/spelen.html?pas="
@@ -2888,6 +2912,12 @@
       "url": "/apps/vluchten.html"
     },
     {
+      "label": "Code intrekken",
+      "app": "Vluchten",
+      "wereld": "TravelOS",
+      "url": "/apps/vluchten.html"
+    },
+    {
       "label": "Het bord",
       "app": "Vluchten",
       "wereld": "TravelOS",
@@ -2901,6 +2931,12 @@
     },
     {
       "label": "Mijn reizen",
+      "app": "Vluchten",
+      "wereld": "TravelOS",
+      "url": "/apps/vluchten.html"
+    },
+    {
+      "label": "Nieuwe code uitgeven",
       "app": "Vluchten",
       "wereld": "TravelOS",
       "url": "/apps/vluchten.html"

@@ -138,7 +138,7 @@ module.exports = (ctx) => {
       vervoerder: waar.vervoerder, voertuig: null, chauffeur: null,
       km, minuten, tarief, prijs,
       annulering: { gratisTotMin: 5, kostenDeel: 0.5 },
-      veiligheid: { deelCode: ctx.crypto.randomBytes(4).toString('hex'), noodcontact: !!body.noodcontact },
+      veiligheid: { noodcontact: !!body.noodcontact },
       notitie: schoon(body.notitie, 200) || null,
       status: 'aangevraagd', gemaakt: nu(),
       gebeurtenissen: [{ soort: 'ride.requested', at: nu(), door: actor.soort || 'lid' }],

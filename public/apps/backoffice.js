@@ -742,8 +742,8 @@
         const d = await call('/office/partner/decide', { id: b.dataset.paok, action: 'goedkeuren' });
         const box = $('#paResult');
         box.style.display = 'block';
-        box.innerHTML = '✓ '+T('bo.pa.done','Goedgekeurd. Geef dit eenmalig door (staat ook in de welkomstmail):')+
-          '<br><b>'+T('bo.pa.code','Leverancierscode')+': '+d.code+'</b> · <b>'+T('bo.pa.pin','Manager-PIN')+': '+d.pin+'</b>';
+        box.innerHTML = '✓ '+T('bo.pa.done','Goedgekeurd. De eigenaar opent de werkplek met het persoonlijke RTG-account.')+
+          '<br><b>'+T('bo.pa.code','Leverancierscode')+': '+d.code+'</b>';
         await refresh();
       } catch(e){ alert(e.message); }
     }));
@@ -950,18 +950,24 @@
 
   function instellingKnop(){
     const knop = $('#instZet'); if (!knop) return;
+    if (!$('#instBeheerderLogin')) {
+      const veld = document.createElement('input');
+      veld.id = 'instBeheerderLogin'; veld.className = 'vinput';
+      veld.placeholder = 'Persoonlijke RTG-login van beheerder';
+      knop.parentNode.insertBefore(veld, knop);
+    }
     knop.addEventListener('click', async function(){
       const box = $('#instResult');
       try {
         const d = await call('/office/instelling/aansluiten', {
           genre: $('#instGenre').value, naam: $('#instNaam').value,
-          plaats: $('#instPlaats').value, beheerder: $('#instBeheerder').value
+          plaats: $('#instPlaats').value, beheerder: $('#instBeheerder').value,
+          beheerderLogin: $('#instBeheerderLogin').value
         });
-        // de code en de PIN gaan hier één keer over het scherm; daarna nergens meer
         box.style.display = 'block';
         box.innerHTML = '✓ '+escHtml(d.vervolg || '')+
-          '<br><b>'+T('inst.code','Bedrijfscode')+': '+escHtml(d.code)+'</b> · <b>'+T('inst.pin','Beheer-PIN')+': '+escHtml(d.pin)+'</b>';
-        ['instNaam','instPlaats','instBeheerder'].forEach(function(id){ $('#'+id).value = ''; });
+          '<br><b>'+T('inst.code','Bedrijfscode')+': '+escHtml(d.code)+'</b>';
+        ['instNaam','instPlaats','instBeheerder','instBeheerderLogin'].forEach(function(id){ $('#'+id).value = ''; });
         renderInstellingen();
       } catch(e){ alert(e.message); }
     });

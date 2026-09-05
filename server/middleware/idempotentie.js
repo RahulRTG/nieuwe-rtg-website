@@ -66,53 +66,9 @@
    meet binnen een proces en na elkaar, dus die ziet precies wat dit belooft. */
 'use strict';
 const crypto = require('crypto');
-
-/* De paden waar de route zijn EIGEN idempotentie doet. Prefixen, want een
-   domein dat het begrip kent, kent het op al zijn geldroutes. Zie de kop: deze
-   lijst wordt door test/idempotentie.test.js tegen de broncode gehouden. */
-const EIGEN = [
-  '/api/pay/',            // de wallet: eigen sleutelbinding, 409 bij een ander bedrag
-  '/api/bank/',           // storten en SEPA geven de sleutel door aan de rail
-  '/api/wbw/',            // verrekenen: een tweede tik is 409, er is geen schuld meer
-  '/api/pakket/',         // synergie-pakketten melden alBetaald
-  '/api/gast/',           // de gastenkassa: bestellen, afrekenen, bezorgen, foodcourt
-  '/api/podium/',         // cadeaus, abonnementen en kaartjes lopen over de wallet
-  '/api/ov/',             // check-uit rekent af via de wallet
-  /* Deze vier vond de toets zelf, op zijn eerste ronde, en dat is precies
-     waarom hij de lijst tegen de broncode houdt in plaats van hem te geloven:
-     ze werden ook overstemd, en er was toevallig geen toets die erover viel.
-     Let op /api/supplier/ticket/ (enkelvoud, deurverkoop): het gelijkende
-     /api/supplier/tickets doet GEEN eigen idempotentie en hoort hier dus niet
-     bij -- de toets vertelde dat door de tweede kant ook te meten. */
-  '/api/betaal/',         // de betaalkern: direct betalen en een verzoek voldoen
-  '/api/supplier/pay/',   // de zaak int en betaalt uit via de wallet
-  '/api/supplier/pos/',   // kassa-checkout en losse verkoop
-  '/api/supplier/giftcard/', // kaartverkoop bindt de sleutel duurzaam aan zaak + bedrag
-  '/api/supplier/ticket/', // deurverkoop
-  '/api/supplier/staff/invite', // uitnodigingslaag bewaart zelf sleutel + verzoekafdruk
-  '/api/office/bank/mislukking', // sleutel identificeert de clearing die de bankkern ontdubbelt
-
-  /* En deze drie vond de toets op zijn TWEEDE ronde, na de samenvoeging van
-     24 takken. Ze zijn stuk voor stuk nieuw geldwerk dat zijn `idem` uit het
-     lijf leest en aan de wallet doorgeeft; de centrale kas zou hun eigen
-     antwoord overstemmen met een bewaard eerste antwoord, en juist bij geld is
-     dat antwoord afhankelijk van de toestand NA de eerste aanroep. Het zijn
-     losse routes en geen mappen, dus ze staan hier voluit. */
-  '/api/festival/verkoop/rond',  // de festivalkassa rondt af via de wallet
-  '/api/giftcard/buy',           // een cadeaukaart kopen; de sleutel gaat mee naar de wallet
-  '/api/supplier/betaalverzoek',  // directpay geeft bij dezelfde sleutel het BESTAANDE verzoek terug
-
-  /* En deze twee kwamen met de App Store van main mee, op de DERDE ronde van
-     dezelfde toets. Zelfde soort als de drie hierboven: allebei lezen ze hun
-     `idem` uit het lijf en geven hem door aan de wallet, dus de centrale kas
-     zou hun eigen antwoord overstemmen met een bewaard eerste antwoord. Bij
-     een teruggave is dat het gevaarlijkst: het antwoord hangt af van de stand
-     NA de eerste aanroep, en een bewaard antwoord zou een tweede teruggave als
-     geslaagd melden terwijl er niets is gebeurd. */
-  '/api/appstore/koop',            // een app kopen; de sleutel gaat mee naar de wallet
-  '/api/appstore/kantoor/teruggave' // terugbetalen na intrekking, via dezelfde weg terug
-];
-const doetHetZelf = (pad) => EIGEN.some(p => pad.startsWith(p));
+const verzoekcontext = require('../db/verzoekcontext');
+const { isEenmalig } = require('../lib/eenmalig-geheim-routes');
+const { EIGEN, doetHetZelf } = require('./idempotentie-eigen');
 
 const TTL_MS = 24 * 60 * 60 * 1000;
 const MAX = 50000;
@@ -145,6 +101,7 @@ module.exports = () => {
 
   return function idempotentie(req, res, next) {
     if (req.method !== 'POST' || !req.path.startsWith('/api/')) return next();
+    if (isEenmalig(req.method, req.path)) return next();
     if (doetHetZelf(req.path)) return next();
     const b = req.body;
     const sleutel = b && (typeof b.idempotentieSleutel === 'string' ? b.idempotentieSleutel
@@ -163,13 +120,16 @@ module.exports = () => {
 
     const echteJson = res.json.bind(res);
     res.json = (data) => {
-      try {
-        const lijf = JSON.stringify(data);
-        if (res.statusCode < 500 && typeof lijf === 'string' && lijf.length <= MAX_LIJF) {
-          ruim();
-          kas.set(id, { status: res.statusCode, lijf, op: Date.now() });
-        }
-      } catch (e) { /* een antwoord dat niet te serialiseren is, is niet te herhalen */ }
+      const bewaar = () => {
+        try {
+          const lijf = JSON.stringify(data);
+          if (res.statusCode < 500 && typeof lijf === 'string' && lijf.length <= MAX_LIJF) {
+            ruim();
+            kas.set(id, { status: res.statusCode, lijf, op: Date.now() });
+          }
+        } catch (e) { /* een antwoord dat niet te serialiseren is, is niet te herhalen */ }
+      };
+      if (!verzoekcontext.haakNaCommit(bewaar)) bewaar();
       return echteJson(data);
     };
     next();

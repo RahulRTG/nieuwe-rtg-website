@@ -35,12 +35,12 @@
 'use strict';
 
 module.exports = (kern, hulp) => {
-  const { DATA_DIR, accounts, anthropic, betaal, betaalOpdrachten, bijeen, boekingenVanZaak, boekingenVoegToe, crypto, db, etaMinutes, findSupplier, haversine, keyVanCodenaam, liveCodename, notify, notifySupplier, save, schoon, sseToCustomer, sseToSupplier } = hulp;
+  const { DATA_DIR, accounts, anthropic, betaal, betaalOpdrachten, bewerkCollectie, bijeen, boekingenVanZaak, boekingenVoegToe, crypto, db, economischeBoekingEenmaal, etaMinutes, findSupplier, haversine, keyVanCodenaam, liveCodename, notify, notifySupplier, save, schoon, sseToCustomer, sseToSupplier } = hulp;
 
-/* RTG Airport (kern/luchthaven.js): de gehele luchthavenoperatie ·
-   vluchtleiding, passagiersketen (boeken/inchecken op codenaam), de draai op
+/* RTG Airport (kern/luchthaven.js): luchthavenoperatie ·
+   vluchtleiding, passagiersketen (boeken/inchecken), de draai op
    het platform, de toren (baanklaring), de bagagekelder en security. */
-Object.assign(kern, require('../kern/luchthaven').maakLuchthaven({ db, save, crypto, anthropic,
+Object.assign(kern, require('../kern/luchthaven').maakLuchthaven({ db, save, bewerkCollectie, crypto, anthropic,
   visumtaakVan: () => kern.visumtaak }));
 kern.lucht.seed();
 /* De Brigade RTG Airport (kern/marechaussee.js): de Koninklijke Marechaussee
@@ -130,7 +130,7 @@ Object.assign(kern, require('../kern/vakwerk').maakVakwerk({ db, save, anthropic
    want pay raadpleegt hem bij elke boeking en niet andersom. */
 Object.assign(kern, require('../kern/waarde').maakWaarde({ db, save, crypto }));
 /* RTG Pay: wallet, grootboek en automatisch bijladen. */
-Object.assign(kern, require('../kern/pay')({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon, betaalOpdrachten, waarde: kern.waarde,
+Object.assign(kern, require('../kern/pay')({ db, save, bijeen, economischeBoekingEenmaal, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon, betaalOpdrachten, waarde: kern.waarde,
   payBoekingenVoegToe: require('../db').payBoekingenVoegToe,
   accounts, // alleen voor het uitbetaal-IBAN: dat hoort in de kluis, niet naast een codenaam
   // de geld-regie bepaalt het tarief; als thunk zodat de mount-volgorde niet uitmaakt

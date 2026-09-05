@@ -1,4 +1,4 @@
-/* De wervingslink: /werken/<kassacode>.
+/* De wervingslink: /apps/app.html#werving=<kassacode>.
 
    HET GAT DAT DIT DICHT. Personeel heeft altijd een eigen RTG-account -- dat
    was al zo, /api/supplier/staff/join vraagt erom. Maar de weg ernaartoe was
@@ -43,13 +43,15 @@ module.exports = (kern) => {
      gemount en levert ze hier aan via de kern. Zo is er een plek die weet wat
      een uitnodiging is (zie routes/supplier/werving/uitnodiging.js). */
   const uitnodiging = require('./supplier/werving/uitnodiging')({ kern });
-  const { zoekInvite, verbindLid } = uitnodiging;
+  const { zoekInvite, verbindCode } = uitnodiging;
 
   /* Wat staat er achter deze link? Genoeg om te weten waar je bent. */
-  app.post('/api/werving/kijk', (req, res) => {
+  app.post('/api/werving/kijk', async (req, res) => {
     const bucket = 'werving:' + req.ip;
     if (tooManyTries(res, bucket)) return;
-    const g = zoekInvite(req.body && req.body.kassacode);
+    let g;
+    try { g = await Promise.resolve(zoekInvite(req.body && req.body.kassacode)); }
+    catch (e) { console.error('[werving-kijk] veilige verwerking mislukt'); return res.status(503).json({ error: 'De uitnodiging kon niet veilig worden gecontroleerd.' }); }
     if (!g) {
       noteFailedTry(bucket, req.ip);
       return res.status(404).json({ error: 'Deze uitnodiging bestaat niet, is al gebruikt of is verlopen. Vraag uw werkgever om een nieuwe.' });
@@ -67,24 +69,25 @@ module.exports = (kern) => {
     if (tooManyTries(res, bucket)) return;
     const lid = req.session && req.session.account
       ? accounts.getUserById(req.session.account.id) : null;
-    if (!lid) return res.status(403).json({ error: 'Meld u eerst aan met uw eigen RTG-account.' });
+    if (!lid || (accounts.isActief && !accounts.isActief(lid)))
+      return res.status(403).json({ error: 'Meld u eerst aan met uw eigen actieve RTG-account.' });
 
-    const g = zoekInvite(req.body && req.body.kassacode);
-    if (!g) {
-      noteFailedTry(bucket, req.ip);
-      return res.status(404).json({ error: 'Deze uitnodiging bestaat niet, is al gebruikt of is verlopen. Vraag uw werkgever om een nieuwe.' });
-    }
-    if (accounts.staffByMember(g.s.code, lid.id)) {
-      // de uitnodiging verbruiken zou hem hier weggooien voor niets
-      return res.status(409).json({ error: 'U werkt hier al; log in met uw naam en pincode.' , code: g.s.code });
-    }
     loginFails.delete(bucket);
-    const pinGewenst = String((req.body || {}).pin || '').trim();
+    const legacyPin = !!(accounts.legacyStaffPinToegestaan && accounts.legacyStaffPinToegestaan());
+    const pinGewenst = legacyPin ? String((req.body || {}).pin || '').trim() : '';
     if (pinGewenst && !/^\d{4}$/.test(pinGewenst))
       return res.status(400).json({ error: 'Een pincode is vier cijfers; laat hem leeg als u er geen wilt.' });
 
-    const { staff, naam, pin } = await verbindLid(g.s, g.inv, lid, { pin: pinGewenst || null });
-    res.json({ ok: true, code: g.s.code, bedrijf: g.s.name, staffId: staff.id, name: naam, role: g.inv.role, pin,
+    let v;
+    try { v = await verbindCode(lid, req.body && req.body.kassacode,
+      legacyPin ? { pin: pinGewenst || null } : {}, null); }
+    catch (e) { console.error('[werving-verbind] veilige verwerking mislukt'); return res.status(503).json({ error: 'De aanmelding kon niet veilig worden voltooid. Probeer opnieuw.' }); }
+    if (!v || v.error) {
+      if (!(v && v.hersteld)) noteFailedTry(bucket, req.ip);
+      return res.status(v && v.status || 403).json(v || { error: 'Ongeldige uitnodiging.' });
+    }
+    res.json({ ok: true, code: v.s.code, bedrijf: v.s.name, staffId: v.staff.id,
+      name: v.naam, role: v.invite.role, ...(legacyPin && v.pin ? { pin: v.pin } : {}),
       identiteit: identiteitStap(lid) });
   });
 
@@ -97,37 +100,18 @@ module.exports = (kern) => {
       waarom: 'Uw werkgever betaalt uw loon via RTG. Daarvoor moet uw identiteit een keer zijn vastgesteld: een foto van uw identiteitsbewijs en een selfie. Uw werkgever ziet daarvan alleen of het gelukt is, niet het document zelf.' };
   }
 
-  /* Het pad dat in de link staat. De pagina zelf is de gewone RTG-app: die
-     kent de aanmelding, de onboarding en de verificatie al, en een tweede
-     aanmeldpagina zou een tweede waarheid over registreren worden.
-
-     EEN OMLEIDING EN GEEN HERSCHRIJVING. Hier stond een interne herschrijving
-     (req.url = '/apps/app.html?werving=' + code, daarna next()), naar het model
-     van de voordeur. Dat kon op deze plek niet werken, en wel om twee redenen
-     tegelijk -- gevonden doordat de dekkingsmeting ook de routes buiten /api/
-     ging meten, en deze route bij het eerste echte verzoek 404 gaf:
-
-     1. De statische laag hangt in opzet/poortwachters.js en dus VOOR de
-        domeinroutes. Wat deze route aan next() doorgaf, kwam nooit meer bij een
-        laag die een .html kan uitleveren. De nonce-laag sloeg hem ook over: die
-        eist dat req.path op .html eindigt, en hier stond de query erachter.
-     2. Een herschrijving verandert alleen wat de SERVER uitlevert. De browser
-        blijft op /werken/AB12CD staan, zonder query -- dus kon de code de pagina
-        niet eens bereiken. De herschrijving was daarmee niet alleen kapot maar
-        ook zinloos.
-
-     Een 302 lost beide op: de browser vraagt /apps/app.html?werving=... op, en
-     die komt langs de nonce-laag zoals elke andere pagina. De reden dat de
-     voordeur bij '/' juist GEEN 302 gebruikt geldt hier niet -- daar gaat het om
-     de root zelf, hier om een uitnodigingslink van buiten.
-
-     WAT HIERMEE NIET IS OPGELOST: er is nog niets in public/ dat ?werving=
-     uitleest. De link brengt de genodigde nu naar de app in plaats van naar een
-     foutpagina; de code oppikken bij het aanmelden is werk dat nog moet gebeuren. */
+  /* Oude links droegen een zes-teken-code in hun pad. Alleen dat uitgefaseerde
+     formaat krijgt nog een omleiding; een nieuwe 128-bit code accepteren we
+     hier bewust niet, want req.path komt in access- en auditlogs. De omleiding
+     zet ook de oude code in een fragment en verbiedt iedere referrer. Nieuwe
+     uitgifte komt rechtstreeks op /apps/app.html#werving=... en raakt deze
+     route dus nooit. */
   app.get('/werken/:code', (req, res, next) => {
     const code = String(req.params.code || '').trim().toUpperCase();
     if (!/^[A-Z0-9]{6}$/.test(code)) return next();
-    res.redirect(302, '/apps/app.html?werving=' + code);
+    res.set('Referrer-Policy', 'no-referrer');
+    res.set('Cache-Control', 'no-store');
+    res.redirect(302, '/apps/app.html#werving=' + encodeURIComponent(code));
   });
 
   /* zoekInvite en verbindLid gaan mee de kern in: de registratie
@@ -135,5 +119,5 @@ module.exports = (kern) => {
      nieuw account wordt aangemaakt, en moet daarvoor bij dezelfde uitnodiging
      kunnen als deze route. Een tweede kopie van die logica naast de eerste is
      precies hoe twee regels over "wie mag bij een bedrijf" ontstaan. */
-  return { identiteitStap, zoekInvite, verbindLid, wisselCodeIn: uitnodiging.wisselCodeIn };
+  return { identiteitStap, zoekInvite, verbindCode, wisselCodeIn: uitnodiging.wisselCodeIn };
 };

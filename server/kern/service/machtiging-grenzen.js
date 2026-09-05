@@ -11,12 +11,12 @@
 /* Capabilities die niet met een enkele handtekening opengaan. De lijst is kort
    met opzet: elke regel hier maakt een handeling duurder, en een lijst die
    alles bevat wordt door iedereen omzeild. */
-const ZWAAR = {
-  'identiteit.openen': 'De echte naam achter een codenaam.',
-  'bank.gegevens': 'Rekeninggegevens van een lid of zaak.',
-  'geld.compensatie': 'Geld toekennen buiten de gewone weg om.',
-  'gegevens.uitvoer': 'Een export van iemands gegevens.'
-};
+/* Er is nu geen actieve zware servicecapability. De vier namen die hier
+   stonden zijn samen met hun overige vier stille buren uit het actieve
+   contract gehaald: een tweede handtekening maakt een recht zonder lezer niet
+   alsnog echt. Zodra zo'n functie een echte magNu-poort krijgt, komt haar
+   grens in dezelfde wijziging terug. */
+const ZWAAR = {};
 
 /* EEN AI IS EEN AANROEPER MET EEN EIGEN VOORVOEGSEL, en dat is geen etiket maar
    een grens. Een sessie levert de sleutel van een MENS; niemand kan zichzelf

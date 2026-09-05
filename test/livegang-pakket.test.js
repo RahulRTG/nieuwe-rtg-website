@@ -6,6 +6,7 @@ const os = require('node:os');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 const { zonderBootstrap } = require('../scripts/eigenaar-claim');
+const { bereidVoor } = require('../scripts/motor-initialisatie');
 
 const ROOT = path.join(__dirname, '..');
 const lees = (p) => fs.readFileSync(path.join(ROOT, p), 'utf8');
@@ -17,7 +18,11 @@ test('live-compose ontsluit native HTTPS en schermt herstel af', () => {
   assert.doesNotMatch(app, /^    ports:/m, 'de basis publiceert Node niet buiten Sentinel om');
   assert.match(live, /RTG_PUBLISH_PORT:-443.*RTG_CONTAINER_PORT:-443/);
   assert.match(live, /:80:80\/tcp/);
-  assert.match(live, /port:443/);
+  assert.match(live, /PORT: 443/);
+  assert.match(live, /publieke-tls-proef\.js.*--connect-host=127\.0\.0\.1.*--readiness-only/,
+    'publieke container-readiness moet hostname en trustketen bewijzen');
+  assert.doesNotMatch(live, /rejectUnauthorized\s*:\s*false|--insecure/,
+    'een self-signed certificaat mag publieke readiness nooit groen maken');
   assert.match(live, /NET_BIND_SERVICE/);
   assert.match(live, /profiles: \["ops"\]/);
   assert.equal((live.match(/user: "1000:1000"/g) || []).length, 2);
@@ -26,10 +31,18 @@ test('live-compose ontsluit native HTTPS en schermt herstel af', () => {
   assert.match(live, /RTG_BACKUP_OFFSITE_HOST_DIR:\?/);
   assert.match(live, /backup_public_cert/);
   assert.match(live, /backup_private_key:ro/);
+  const keurgolive = basis.match(/^  keurgolive:\n[\s\S]*?(?=^  keurredis:\n)/m)[0];
+  assert.match(keurgolive, /- keurdata/);
+  assert.match(keurgolive, /- keuruitgangen/,
+    'alleen de go-live-keurtaak krijgt egress voor echte media- en alarmproeven');
+  assert.doesNotMatch(keurgolive, /^\s+ports:/m, 'de providerproef publiceert geen ingang');
+  const uitgangenNet = basis.match(/^  keuruitgangen:\n[\s\S]*?(?=^  # Alleen ClamAV)/m)[0];
+  assert.doesNotMatch(uitgangenNet, /internal:\s*true/,
+    'het afgescheiden providerproefnetwerk moet de echte HTTPS-diensten kunnen bereiken');
 });
 
-test('live-, herstel- en backupscript zijn geldige shell en herstel is dubbel bevestigd', () => {
-  for (const bestand of ['scripts/docker/live.sh', 'scripts/docker/herstel.sh', 'scripts/docker/backup.sh']) {
+test('live-, motorinit-, herstel- en backupscript zijn geldige shell en herstel is dubbel bevestigd', () => {
+  for (const bestand of ['scripts/docker/live.sh', 'scripts/docker/motor-init.sh', 'scripts/docker/herstel.sh', 'scripts/docker/backup.sh']) {
     const r = spawnSync('sh', ['-n', path.join(ROOT, bestand)], { encoding: 'utf8' });
     assert.equal(r.status, 0, bestand + ': ' + r.stderr);
   }
@@ -47,7 +60,7 @@ test('live-, herstel- en backupscript zijn geldige shell en herstel is dubbel be
   assert.doesNotMatch(lees('scripts/docker/backup.sh'), /find \/offsite[^\n]*-exec rm/,
     'de off-site boom is write-once en krijgt geen retentie-wisser');
   const liveScript = lees('scripts/docker/live.sh');
-  assert.match(liveScript, /compose exec -T app node scripts\/golive\.js/);
+  assert.match(liveScript, /keur_compose run --rm --no-deps[\s\S]*keurgolive node scripts\/golive\.js --bewijs-stdout/);
   assert.match(liveScript, /node scripts\/eigenaar-claim\.js/);
   const golive = lees('scripts/golive.js');
   assert.match(golive, /process\.env\.RTG_ENV_FILE/);
@@ -93,15 +106,31 @@ test('live:init maakt stil een valide lokale-eerst en betalingen-uit configurati
   try {
     const envPad = path.join(tmp, '.env.productie');
     const pgPad = path.join(tmp, 'postgres_password');
+    const motorSleutelPad = path.join(tmp, 'motor_state_key');
     const maak = spawnSync(process.execPath, [path.join(ROOT, 'scripts/sleutels.js'),
       '--docker', '--schrijf', '--zonder-ai', '--zonder-betalen', '--zonder-sms', '--native-tls', '--stil',
       '--eigenaar=owner@example.test', '--url=https://app.example.test',
       '--tls-email=tls@example.test', '--smtp-url=smtps://mail.example.test:465',
-      '--doel=' + envPad, '--postgres-doel=' + pgPad], { encoding: 'utf8' });
+      '--doel=' + envPad, '--postgres-doel=' + pgPad,
+      '--motor-sleutel-doel=' + motorSleutelPad], { encoding: 'utf8' });
     assert.equal(maak.status, 0, maak.stderr);
+    bereidVoor({ envPad, sleutelPad: motorSleutelPad });
+    /* De publieke hostcontrole bewijst configuratie, niet de externe diensten
+       zelf. Geef de fixture daarom expliciete niet-geheime testdoelen; de
+       latere go-live-proeven moeten deze S3- en alarmuitgangen werkelijk
+       aanraken voordat een release READY kan worden. */
+    fs.appendFileSync(envPad, [
+      'ERR_WEBHOOK_URL=https://alarm.example.test/rtg',
+      'RTG_MEDIA_BACKEND=s3',
+      'RTG_MEDIA_S3_BUCKET=rtg-productie-media',
+      'RTG_MEDIA_S3_KEY=fixture-access-key',
+      'RTG_MEDIA_S3_SECRET=fixture-secret-key',
+      ''
+    ].join('\n'));
     const env = leesEnv(envPad);
     for (const [naam, waarde] of Object.entries({
       RTG_AI_UIT: '1', RTG_BETALEN_UIT: '1', RTG_HERSTEL_SMS_UIT_BEWUST: '1',
+      RTG_ISOLATIE_AFDWINGEN: '1',
       RTG_TLS: '1', RTG_ACME: '1',
       RTG_TLS_DOMAIN: 'app.example.test', RTG_PROXY_HOPS: '0'
     })) assert.equal(env[naam], waarde, naam);
@@ -124,10 +153,20 @@ test('live:init maakt stil een valide lokale-eerst en betalingen-uit configurati
     ].join('\n'), { mode: 0o600 });
     const keur = spawnSync(process.execPath, [path.join(ROOT, 'scripts/docker/controle.js'), '--publiek'], {
       encoding: 'utf8',
-      env: { ...process.env, RTG_ENV_FILE: envPad, RTG_POSTGRES_PASSWORD_FILE: pgPad, RTG_LIVE_ENV_FILE: livePad }
+      env: { ...process.env, RTG_ENV_FILE: envPad, RTG_POSTGRES_PASSWORD_FILE: pgPad,
+        RTG_MOTOR_STATE_KEY_SECRET_FILE: motorSleutelPad, RTG_LIVE_ENV_FILE: livePad }
     });
     assert.equal(keur.status, 0, keur.stdout + keur.stderr);
     assert.match(keur.stdout, /versleutelde en off-site back-ups zijn afgedwongen/);
+
+    fs.appendFileSync(envPad, 'RTG_ACME_STAGING=1\n');
+    const staging = spawnSync(process.execPath, [path.join(ROOT, 'scripts/docker/controle.js'), '--publiek'], {
+      encoding: 'utf8',
+      env: { ...process.env, RTG_ENV_FILE: envPad, RTG_POSTGRES_PASSWORD_FILE: pgPad,
+        RTG_MOTOR_STATE_KEY_SECRET_FILE: motorSleutelPad, RTG_LIVE_ENV_FILE: livePad }
+    });
+    assert.equal(staging.status, 1, staging.stdout + staging.stderr);
+    assert.match(staging.stdout, /RTG_ACME_STAGING=1.*verboden voor livegang/);
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
   }

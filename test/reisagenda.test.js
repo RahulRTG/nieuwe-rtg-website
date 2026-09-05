@@ -54,7 +54,7 @@ test('1. een vlucht naar een toestemmingsland boeken zet de visumtaak klaar', as
   vluchtId = m.body.vlucht.id;
   const b = await api('/api/member/vluchten/boek', { id: vluchtId }, lid);
   assert.equal(b.status, 200, JSON.stringify(b.body));
-  boekCode = b.body.boeking.code;
+  boekCode = b.body.boeking.id;
   // de taak zit in het antwoord: reistoestemming (ESTA) voor de Verenigde Staten
   assert.ok(b.body.visumtaak, 'de boeking draagt de visumtaak');
   assert.match(b.body.visumtaak.titel, /Reistoestemming aanvragen voor Verenigde Staten/);

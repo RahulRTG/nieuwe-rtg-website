@@ -26,12 +26,24 @@ module.exports = (kern) => {
     findSupplier: kern.findSupplier, bedrijf: () => kern.bedrijf
   });
   const { app, auth, tenant, bedrijf } = kern;
+  const PRODUCTIE = String(process.env.NODE_ENV || '') === 'production';
+
+  /* Zelfde productie-identiteit als /api/bedrijf, vóór iedere tenantroute.
+     bootstrap/mijn mag zonder keuze alleen de contextlijst teruggeven; zodra
+     een werkruimte wordt meegestuurd geldt ook daar de gewone actieve grens. */
+  if (!bedrijf || typeof bedrijf.hangProductieIdentiteit !== 'function')
+    throw new Error('De Tenant Control Plane mist de centrale WerkOS-identiteit.');
+  bedrijf.hangProductieIdentiteit('/api/tenant', {
+    zonderWerkruimte: ['/api/tenant/bootstrap/mijn']
+  });
+  const authEenmaal = (req, res, next) => req.session ? next() : auth(req, res, next);
 
   /* ---------- de bootstrap via het lid-token ----------
      Eén werkruimte, want een lid-token hoort bij één werkruimte. */
   app.post('/api/tenant/bootstrap', (req, res) => {
     const s = bedrijf.lidVan(req, res); if (!s) return;
-    const b = tenant.bootstrap.voorLid(s.w.code, s.l);
+    const b = PRODUCTIE && tenant.bootstrap.voorAccount
+      ? tenant.bootstrap.voorAccount(s.w.code, s.l) : tenant.bootstrap.voorLid(s.w.code, s.l);
     if (!b) return res.status(404).json({ error: 'Die werkruimte kennen we niet.' });
     res.json({ ok: true, bootstrap: b });
   });
@@ -42,10 +54,12 @@ module.exports = (kern) => {
      over een POST achter de gewone auth-poort. Geeft een LIJST terug: iemand
      kan bij meerdere werkruimtes van dezelfde tenant horen, en een antwoord dat
      er stilletjes één uitkiest, kiest voor de gebruiker. */
-  app.post('/api/tenant/bootstrap/mijn', auth, (req, res) => {
+  app.post('/api/tenant/bootstrap/mijn', authEenmaal, (req, res) => {
     const key = req.session && req.session.key;
     if (!key) return res.status(403).json({ error: 'Geen RTG-sessie gevonden.' });
-    const rijen = tenant.bootstrap.voorRtg(key);
+    let rijen = tenant.bootstrap.voorRtg(key);
+    const gekozen = String((req.body || {}).werkruimte || '').trim().toUpperCase();
+    if (gekozen) rijen = rijen.filter(r => r.werkruimte && r.werkruimte.code === gekozen);
     res.json({ ok: true, aantal: rijen.length, werkruimtes: rijen,
       let: rijen.length ? null : 'Uw RTG-account hangt aan geen enkele werkruimte. Dat gebeurt pas als uw werkgever een groep van zijn identiteitsprovider aan een rol koppelt.' });
   });
@@ -131,7 +145,8 @@ module.exports = (kern) => {
   app.post('/api/tenant/herstelproef', (req, res) => {
     req.geenQuotum = true;
     const w = viaBeheerOfDirectie(req, res); if (!w) return;
-    const uit = tenant.herstelproef.doe(w.code, req.body && req.body.beheerToken ? 'beheer' : 'directie');
+    const uit = tenant.herstelproef.doe(w.code,
+      req.session && req.session.key ? 'rtg-account:' + req.session.key : 'directie');
     if (uit.error) return res.status(uit.status || 400).json(uit);
     res.json(uit);
   });

@@ -28,7 +28,7 @@
 const { maakVolwassen } = require('../kern/volwassen');
 
 module.exports = (kern, hulp) => {
-  const { DATA_DIR, PERSONAS, accounts, anthropic, boekingenVanKlant, crypto, db, findSupplier, keyVanCodenaam, ledenAantal, leeftijdVan, lidBoardUit, mail, media, ordersVanKlant, ordersVanZaak, rtf, save, schoon, sendPush, sendPushToUser, sociaal, sseClients, sseToCustomer } = hulp;
+  const { DATA_DIR, PERSONAS, accounts, anthropic, bewerkCollectie, boekingenVanKlant, crypto, db, findSupplier, keyVanCodenaam, ledenAantal, leeftijdVan, lidBoardUit, mail, media, ordersVanKlant, ordersVanZaak, rtf, save, schoon, sendPush, sendPushToUser, sociaal, sseClients, sseToCustomer } = hulp;
 
 Object.assign(kern, sociaal); // de sociale kern-helpers erbij
 /* Tafelticket (kern/tafelticket.js): de bonnen van dezelfde tafel op een
@@ -37,7 +37,8 @@ Object.assign(kern, sociaal); // de sociale kern-helpers erbij
 Object.assign(kern, { tafelticket: require('../kern/tafelticket')({ crypto, dataDir: DATA_DIR, findSupplier, ordersVanZaak }) });
 // De dynamische, gesloten RTG-code: HMAC-ondertekende, kort houdbare tokens die
 // alleen ons systeem maakt en verifieert (dyncode.key, 0600, in .gitignore).
-Object.assign(kern, { dyncode: require('../kern/dyncode')({ crypto, dataDir: DATA_DIR }) });
+Object.assign(kern, { dyncode: require('../kern/dyncode')({ crypto, dataDir: DATA_DIR,
+  sharedSecret: process.env.RTG_SECRET_KEY || null }) });
 /* Magnaat leert alleen van anonieme tellingen. De gedeelde leerkring staat
    naast het spelplatform zodat ook de boardroom exact dezelfde kandidaten ziet. */
 kern.magnaatLeren = require('../kern/spellen/magnaat/leerkring')({ db, save, crypto });
@@ -52,7 +53,7 @@ kern.magnaatLeren = require('../kern/spellen/magnaat/leerkring')({ db, save, cry
    vindbaar te zijn onder een naam. */
 kern.volwassen = maakVolwassen({ accounts: hulp.accounts });
 Object.assign(kern, require('../kern/spellen')({
-  db, save, crypto, zijnVrienden: kern.zijnVrienden, codenaamVan: kern.codenaamVan, sseToCustomer,
+  db, save, bewerkCollectie, crypto, zijnVrienden: kern.zijnVrienden, codenaamVan: kern.codenaamVan, sseToCustomer,
   isGeblokkeerd: kern.isGeblokkeerd, socialZoek: kern.socialZoek, sociaalRate: kern.sociaalRate,
   // Rahul als spelmaatje: praat met een echte sleutel, valt anders terug op vaste tips
   anthropic, magnaatLeren: kern.magnaatLeren,

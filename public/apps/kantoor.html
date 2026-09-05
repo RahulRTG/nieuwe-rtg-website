@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="nl" data-rtg-thema="royal">
 <head>
+<script src="/shared/id.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>WorkOS · RTG Kantoor</title>
@@ -72,8 +73,10 @@
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
 <link href="/shared/wereldrooster.css" rel="stylesheet">
 <link href="/shared/experience-kernel.css?v=20260829-7" rel="stylesheet">
+<link href="/images/worlds/vandaag/wereld-atlas.jpg" rel="preload" as="image" fetchpriority="high">
+<link href="/shared/rtg-vandaag-luxe.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-rtg-modus="pro" data-rtg-world="work">
+<body class="rtg-stijl" data-rtg-modus="pro" data-rtg-world="work" data-rtg-vandaag-luxe data-rtg-edge-2-context="wereldtabs,wereldapps" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true">
 <a class="skip" href="#inhoud">Naar de inhoud</a>
 <!-- DE WERELDSTROOK IS WEG EN DAT IS GEEN GAT. De vier werelden stonden hier
      als eigen balk, boven een schil die ze al kende: rtg-edge-system.js zet ze
@@ -308,6 +311,7 @@
 <!-- Het Canvas komt VOOR het scherm-script en zonder defer: het blok hieronder
      tekent de stand meteen bij het laden, en een uitgesteld blad is er dan nog
      niet. Zie CANVAS.md; de vorm staat in shared/canvas.css. -->
+<script src="/shared/rtg-vandaag-luxe.js" defer></script>
 <script src="/shared/canvas.js"></script>
 <script src="/shared/canvas-taal.js"></script>
 <script src="/apps/work-doelgroepen.js"></script>

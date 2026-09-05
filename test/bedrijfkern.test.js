@@ -206,7 +206,9 @@ test('uit dienst trekt de sleutel per direct in, met een reden en zonder het wer
 });
 
 test('een holding draagt dochters, maar geconsolideerd kijken rolt er niet vanzelf uit', async () => {
-  const dochter = (await api('/werkruimte/maak', { naam: 'RTG Belgie', land: 'BE', moeder: W })).body;
+  const dochter = (await api('/werkruimte/maak', {
+    naam: 'RTG Belgie', land: 'BE', moeder: W, moederBeheerToken: B
+  })).body;
   assert.ok(dochter.beheerToken);
 
   const beeld = (await api('/werkruimte', { werkruimte: W, beheerToken: B })).body;

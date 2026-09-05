@@ -18,7 +18,7 @@
 /* `bankregie` wordt hier verklaard en tot onderaan dit deel gebruikt; daarom
    loopt de grens met deel 4a ervoor en niet erin. */
 module.exports = (kern, hulp) => {
-  const { FISCAAL_PEILJAAR, LANDEN, accounts, anthropic, betaal, betaalOpdrachten, bijeen, rondEuro, crypto, db, findSupplier, fonds, keyVanCodenaam, log, magAi, ondernemerpoort, save, schoon, sseToCustomer, sseToOffice, sseToSupplier } = hulp;
+  const { FISCAAL_PEILJAAR, LANDEN, accounts, anthropic, betaal, betaalOpdrachten, bewerkCollectie, bijeen, rondEuro, crypto, db, economischeBoekingEenmaal, findSupplier, fonds, keyVanCodenaam, log, magAi, ondernemerpoort, save, schoon, sseToCustomer, sseToOffice, sseToSupplier } = hulp;
 
 /* Bankregie (kern/bankregie.js): de geldinfrastructuur-knop van de boardroom --
    een schakelaar met DRIE standen (partner -> hybride -> eigen) die bepaalt hoe
@@ -55,7 +55,7 @@ if (kern.pay && kern.pay.koppelBevoegdTerug) kern.pay.koppelBevoegdTerug(id => b
    dezelfde dubbele-boekhoud-tucht -- rekeningen met een echt IBAN, storten (langs
    de 3-standen knop), overboeken, de brug van/naar de wallet, uitgaande SEPA achter
    de betaal-naad, en sparen met rente. Klaar om met een knop de eigen bank te worden. */
-Object.assign(kern, require('../kern/bank')({ db, save, bijeen, crypto, schoon, betaal, pay: kern.pay, bankregie, keyVanCodenaam, accounts, sseToCustomer, sseToOffice, anthropic, betaalOpdrachten }));
+Object.assign(kern, require('../kern/bank')({ db, save, bijeen, economischeBoekingEenmaal, crypto, schoon, betaal, pay: kern.pay, bankregie, keyVanCodenaam, accounts, sseToCustomer, sseToOffice, anthropic, betaalOpdrachten }));
 /* De Reiswijzer (kern/reis.js): alle reisregels van elk land -- visum,
    rijrichting, alarmnummer, water, fooi, let-op -- in place op de gedeelde
    LANDEN-tabel gezet, VOOR de Regelwacht zodat de overlay er bovenop komt. */
@@ -67,7 +67,7 @@ Object.assign(kern, require('../kern/reis')({ LANDEN }));
    originele bewijsstuk heen gaat, met quotum en virusscan en al -- deze module
    krijgt geen eigen opslag). */
 Object.assign(kern, require('../kern/invoer').maakInvoer({
-  db, save, crypto, plaatsVind: kern.plaatsVind, bestandenUpload: kern.bestanden.bestandenUpload }));
+  db, save, bewerkCollectie, crypto, plaatsVind: kern.plaatsVind, bestandenUpload: kern.bestanden.bestandenUpload }));
 /* DE REISUITNODIGING (kern/reisuitnodiging.js): een klaargezette reis plus een
    link. Het kantoor zet een reis klaar voor iemand die nog geen lid is, en een
    lid nodigt zijn reisgenoot uit. Krijgt de Invoerbalie mee (daar landen de
@@ -75,7 +75,7 @@ Object.assign(kern, require('../kern/invoer').maakInvoer({
    "waar staat mijn reis") en de bestaande identiteitscontrole -- er komt geen
    eigen manier bij om vast te stellen wie iemand is. */
 Object.assign(kern, require('../kern/reisuitnodiging').maakReisuitnodiging({
-  db, save, crypto, invoer: kern.invoer, idGeverifieerd: kern.idGeverifieerd }));
+  db, save, bewerkCollectie, crypto, invoer: kern.invoer, idGeverifieerd: kern.idGeverifieerd }));
 /* HET REISGEZELSCHAP (kern/reisgezelschap.js): de mensen rond EEN reis, en de
    poort die bepaalt wie wat van die reis ziet. Staat hier omdat hij de
    samengestelde Reis nodig heeft (kern.mijnReizen, hierboven gemonteerd) en de

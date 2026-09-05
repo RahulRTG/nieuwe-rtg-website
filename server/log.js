@@ -14,6 +14,7 @@ const DIENST = process.env.RTG_SERVICE || 'rtg';
 
 let foutHaak = null; // (err, context) => void , bijv. Sentry.captureException
 function onError(fn) { foutHaak = typeof fn === 'function' ? fn : null; }
+const { geheimVrij, veiligeWaarde, veiligeFout } = require('./log-redactie');
 
 /* Eigen fout-aggregatie (in-memory), zodat de eigenaar op het techniekbord
    meteen ziet wat er stuk is -- zonder een externe dienst zoals Sentry.
@@ -72,12 +73,14 @@ function schrijf(niveau, bericht, velden) {
   if (NIVEAUS[niveau] < DREMPEL) return;
   const tijd = new Date().toISOString();
   if (JSON_UIT) {
-    const regel = Object.assign({ t: tijd, niveau, dienst: DIENST, bericht }, velden || {});
+    const regel = Object.assign({ t: tijd, niveau, dienst: DIENST, bericht: geheimVrij(bericht) },
+      veiligeWaarde(velden || {}));
     process.stdout.write(JSON.stringify(regel) + '\n');
   } else {
-    const extra = velden && Object.keys(velden).length ? ' ' + JSON.stringify(velden) : '';
+    const schoneVelden = veiligeWaarde(velden || {});
+    const extra = Object.keys(schoneVelden).length ? ' ' + JSON.stringify(schoneVelden) : '';
     const stroom = niveau === 'error' || niveau === 'warn' ? process.stderr : process.stdout;
-    stroom.write(`${KLEUR[niveau]}${tijd} ${niveau.toUpperCase().padEnd(5)}${KLEUR.reset} ${bericht}${extra}\n`);
+    stroom.write(`${KLEUR[niveau]}${tijd} ${niveau.toUpperCase().padEnd(5)}${KLEUR.reset} ${geheimVrij(bericht)}${extra}\n`);
   }
 }
 
@@ -93,11 +96,14 @@ const log = {
   // aggregatie, tel hem in de meting, en geef hem door aan een optionele
   // externe tracker (Sentry).
   uitzondering(err, context) {
-    const veld = Object.assign({ fout: (err && err.message) || String(err), stack: err && err.stack }, context || {});
+    const schoonErr = veiligeFout(err);
+    const veiligContext = veiligeWaarde(Object.assign({}, context || {}));
+    if (veiligContext.p != null) veiligContext.p = journaalPad(veiligContext.p);
+    const veld = Object.assign({ fout: schoonErr.message, stack: schoonErr.stack }, veiligContext);
     schrijf('error', 'uitzondering', veld);
-    try { noteerFout(err, context || {}); } catch (e) {}
-    try { require('./log-meting').telServerfout(err, context || {}); } catch (e) {}
-    if (foutHaak) { try { foutHaak(err, context || {}); } catch (e) {} }
+    try { noteerFout(schoonErr, veiligContext); } catch (e) {}
+    try { require('./log-meting').telServerfout(schoonErr, veiligContext); } catch (e) {}
+    if (foutHaak) { try { foutHaak(schoonErr, veiligContext); } catch (e) {} }
   }
 };
 
@@ -136,7 +142,8 @@ function middleware() {
       const ms = Number(process.hrtime.bigint() - start) / 1e6;
       const stil = req.path === '/api/health' || req.path === '/api/ready';
       const niveau = res.statusCode >= 500 ? 'error' : res.statusCode >= 400 ? 'warn' : (stil ? 'debug' : 'info');
-      schrijf(niveau, 'verzoek', { id, m: req.method, p: req.path, s: res.statusCode, ms: Math.round(ms) });
+      const veiligPad = journaalPad(req.path);
+      schrijf(niveau, 'verzoek', { id, m: req.method, p: veiligPad, s: res.statusCode, ms: Math.round(ms) });
       /* Ook naar het doorgeefjournaal, want een logbestand is geen scherm. Hier
          staat alles al klaar, dus dit kost niets extra's. Het pad gaat er in
          VORM in (/api/lid/:id) -- honderd verzoeken naar honderd leden tellen zo
@@ -144,7 +151,7 @@ function middleware() {
          persoon leidt. Zie kern/doorgeefjournaal.js. */
       try {
         const haak = haakMod();
-        haak.meld({ richting: 'in', wat: journaalPad(req.path), methode: req.method,
+        haak.meld({ richting: 'in', wat: veiligPad, methode: req.method,
           status: res.statusCode, ms: Math.round(ms), mislukt: res.statusCode >= 400 });
       } catch (e) {
         /* Een journaal mag nooit een verzoek raken -- maar het mag ook niet stil
@@ -163,7 +170,7 @@ function middleware() {
    mét stack, en geeft de client een nette, niet-lekkende JSON-fout terug. */
 function foutMiddleware() {
   return (err, req, res, next) => {
-    log.uitzondering(err, { id: req && req.id, p: req && req.path });
+    log.uitzondering(err, { id: req && req.id, p: req && journaalPad(req.path) });
     if (res.headersSent) return next(err);
     res.status(err.status || 500).json({ error: 'Er ging iets mis. Probeer het later opnieuw.', id: req && req.id });
   };

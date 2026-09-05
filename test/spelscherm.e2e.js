@@ -16,7 +16,7 @@
       de server hem wel zou meesturen bleef het beeld schoon: de mutatie "zet
       de kaart terug in zicht.publiek" liet deze toets gewoon slagen.
 
-      Daarom nu ook DE LIJN: elk antwoord van /api/projectie/ wordt onderschept
+      Daarom nu ook DE LIJN: elk antwoord van /api/projectie/kijk wordt onderschept
       en nagelopen. Wat niet over de lijn gaat kan een scherm niet tonen, ook
       niet na een verbouwing van de pagina -- en dat is de belofte waarop 30
       Seconden op een televisie mag.
@@ -66,6 +66,10 @@ test('een potje 30 Seconden op het gedeelde scherm, zonder inlog en zonder de ka
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
+    const legacy = await fetch(base + '/api/projectie/DEADBEEF');
+    assert.equal(legacy.status, 410, 'de oude 32-bits URL-deur blijft hard gesloten');
+    assert.match(legacy.headers.get('cache-control') || '', /no-store/);
+
     /* Vier leden die elkaars vriend zijn: 30 Seconden speel je met twee teams
        van twee, en uitnodigen kan alleen binnen je kring. */
     const leden = [];
@@ -84,11 +88,14 @@ test('een potje 30 Seconden op het gedeelde scherm, zonder inlog en zonder de ka
     const kaart = staat.potje && staat.potje.staat && staat.potje.staat.kaart;
     assert.ok(kaart && kaart.length, 'de omschrijver ziet wel degelijk een kaart met woorden');
 
-    const kamer = await api(base, t[0], 'projectie-open', { id: nieuw.id });
+    const kamer = await api(base, t[0], 'projectie-open', {
+      id: nieuw.id, idem: 'spelprojectie-e2e-' + 'a'.repeat(32)
+    });
     assert.ok(kamer.code, 'de gastheer krijgt een code: ' + JSON.stringify(kamer).slice(0, 160));
 
-    /* Het scherm. GEEN token, geen sessie, geen enkele opslag -- alleen de code.
-       Dat is precies wat een televisie in een vakantiehuis heeft. */
+    /* Het scherm heeft geen LEDENtoken. De eenmalige code uit het fragment
+       wordt voor de eerste request uit de adresbalk gehaald en atomair
+       ingewisseld voor een aparte schermsessie. */
     browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
@@ -98,17 +105,28 @@ test('een potje 30 Seconden op het gedeelde scherm, zonder inlog en zonder de ka
     /* Alles wat de projectie-ingang terugstuurt, ruw. De DOM zegt wat de pagina
        TOONT; dit zegt wat het scherm KRIJGT, en dat tweede is de eigenlijke
        belofte -- een pagina kan morgen anders tekenen. */
-    const overDeLijn = [];
+    const overDeLijn = [], projectieUrls = [];
     page.on('response', async (r) => {
-      if (!/\/api\/projectie\//.test(r.url())) return;
+      if (!/\/api\/projectie\/(koppel|kijk)$/.test(r.url())) return;
+      projectieUrls.push(r.url());
       try { overDeLijn.push(await r.text()); } catch (e) { /* afgebroken antwoord */ }
     });
 
-    await page.goto(base + '/apps/spelscherm.html#' + kamer.code, { waitUntil: 'domcontentloaded' });
+    const paginaAntwoord = await page.goto(base + '/apps/spelscherm.html#' + kamer.code,
+      { waitUntil: 'domcontentloaded' });
+    assert.equal(paginaAntwoord.headers()['referrer-policy'], 'no-referrer',
+      'ook de HTTP-kop voorkomt dat een gedeeld scherm ooit een adres doorstuurt');
     await page.waitForFunction(() => /30 Seconden/.test(document.body.textContent || ''), null, { timeout: 15000 });
 
     const tekst = await page.evaluate(() => document.body.innerText);
     const html = await page.evaluate(() => document.body.innerHTML);
+    const schermToken = await page.evaluate(() => sessionStorage.getItem('rtg_spelprojectie_sessie_v1'));
+    assert.equal(new URL(page.url()).hash, '', 'de koppeling is voor de eerste request uit de URL gehaald');
+    assert.match(schermToken, /^SCREEN\.[A-F0-9]{32}$/);
+    assert.ok(!html.includes(kamer.code), 'de eenmalige koppeling blijft niet in de DOM staan');
+    assert.ok(!html.includes(schermToken), 'de schermsessie komt niet in de DOM');
+    for (const url of projectieUrls)
+      assert.ok(!/[?&](code|token)=/i.test(url), 'geen credential reist in een URL');
 
     /* 1) de stand staat er: het spel en wie er raadt. Hoofdletterongevoelig,
           want de merkregel zet de kop in kapitalen (text-transform) en

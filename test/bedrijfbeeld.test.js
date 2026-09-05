@@ -18,7 +18,8 @@ const { startServer } = require('./helper');
 
 let BASE, child;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-bedrijfbeeld-'));
-const api = (pad, body, bearer) => fetch(BASE + '/api/bedrijf' + pad, {
+const api = (pad, body, bearer) => fetch(BASE +
+  (pad.startsWith('/api/') ? pad : '/api/bedrijf' + pad), {
   method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' },
     bearer ? { Authorization: 'Bearer ' + bearer } : {}),
   body: JSON.stringify(body || {})
@@ -47,7 +48,9 @@ test.before(async () => {
   W = w.werkruimte; B = w.beheerToken;
   DIR = await lid('Dana', ['directie']);
   MED = await lid('Mo', ['medewerker']);
-  dochter = (await api('/werkruimte/maak', { naam: 'RTG Belgie', land: 'BE', moeder: W })).body;
+  dochter = (await api('/werkruimte/maak', {
+    naam: 'RTG Belgie', land: 'BE', moeder: W, moederBeheerToken: B
+  })).body;
 });
 test.after(() => {
   if (child) try { child.kill('SIGKILL'); } catch (e) {}
@@ -84,20 +87,20 @@ test('een medewerker zonder cijferrecht komt niet bij het directiebeeld', async 
 });
 
 test('een moeder telt een dochter alleen mee met haar sleutel', async () => {
-  const zonder = (await api('/geconsolideerd', { werkruimte: W, beheerToken: B })).body;
+  const zonder = (await api('/api/bedrijf/geconsolideerd', { werkruimte: W, beheerToken: B })).body;
   assert.deepEqual(zonder.nietMeegeteld, [dochter.werkruimte], 'zonder sleutel telt de dochter niet mee');
   assert.equal(zonder.werkruimtes.length, 1);
   assert.match(zonder.let, /dat is geen fout maar de grens/i);
 
   const sleutels = {}; sleutels[dochter.werkruimte] = dochter.beheerToken;
-  const met = (await api('/geconsolideerd', { werkruimte: W, beheerToken: B, dochterTokens: sleutels })).body;
+  const met = (await api('/api/bedrijf/geconsolideerd', { werkruimte: W, beheerToken: B, dochterTokens: sleutels })).body;
   assert.equal(met.werkruimtes.length, 2);
   assert.deepEqual(met.nietMeegeteld, []);
   assert.equal(met.totalen.mensenActief, 2, 'de dochter heeft nog geen leden, dus het totaal blijft twee');
   assert.match(met.let, /compleet/i);
 
   const fout = {}; fout[dochter.werkruimte] = 'raden-maar';
-  const mis = (await api('/geconsolideerd', { werkruimte: W, beheerToken: B, dochterTokens: fout })).body;
+  const mis = (await api('/api/bedrijf/geconsolideerd', { werkruimte: W, beheerToken: B, dochterTokens: fout })).body;
   assert.deepEqual(mis.nietMeegeteld, [dochter.werkruimte], 'een verkeerde sleutel opent niets');
 });
 

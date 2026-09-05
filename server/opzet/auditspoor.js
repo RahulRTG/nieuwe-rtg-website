@@ -50,6 +50,7 @@
 
 const crypto = require('crypto');
 const { maakJournaal } = require('../kern/command/journaal');
+const verzoekcontext = require('../db/verzoekcontext');
 
 const SCHRIJFT = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 
@@ -99,18 +100,21 @@ function maakAuditspoor(deps) {
          schrijfactie. Alleen een geslaagde handeling; een geweigerde poging
          hoort in het verzoeklog en niet in een handelingenspoor -- anders staat
          een gescande deurklink straks tussen de echte besluiten. */
-      res.on('finish', () => {
-        try {
-          if (res.statusCode < 200 || res.statusCode >= 300) return;
-          journaal.noteer({
+      const noteer = () => {
+        if (res.statusCode < 200 || res.statusCode >= 300) return;
+        journaal.noteer({
             actor: wie(req),
             actie: req.method + ' ' + pad,
             niveau: 'api',
             uitslag: String(res.statusCode),
             reden: 'schrijfhandeling via de API'
-          });
-        } catch (e) { /* een spoor mag nooit een verzoek meenemen dat al geslaagd is */ }
-      });
+        });
+      };
+      /* PostgreSQL neemt het spoor mee vóór dezelfde requestcommit. Buiten die
+         stand blijft de bestaande finish-haak (en zijn best-effort gedrag). */
+      if (!verzoekcontext.haakVoorCommit(noteer)) {
+        res.on('finish', () => { try { noteer(); } catch (e) {} });
+      }
       next();
     };
   }

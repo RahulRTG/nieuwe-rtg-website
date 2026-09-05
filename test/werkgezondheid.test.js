@@ -22,7 +22,7 @@ const { startServer } = require('./helper');
 
 let BASE, child;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-werkgezondheid-'));
-const api = (pad, body) => fetch(BASE + '/api/bedrijf' + pad, {
+const api = (pad, body) => fetch(BASE + (pad.startsWith('/api/') ? pad : '/api/bedrijf' + pad), {
   method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 
@@ -41,7 +41,7 @@ test.after(() => {
 });
 
 test('1. een lege organisatie krijgt geen 100% maar geen cijfer', async () => {
-  const g = (await api('/gezondheid', CRED)).body;
+  const g = (await api('/api/bedrijf/gezondheid', CRED)).body;
   assert.equal(g.cijfer, null, 'zonder enig meetbaar signaal staat er geen cijfer');
   assert.equal(g.gemeten.meetbaar, 0);
   assert.equal(g.nietGemeten.length, g.gemeten.van, 'alle signalen staan als niet gemeten');

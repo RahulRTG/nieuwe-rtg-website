@@ -2,15 +2,15 @@
    een keer (het leden-account met codenaam in de kluis); elke andere rol op
    het platform is daarna een KOPPELING aan dat ene account, nooit een nieuw
    account:
-   - personeel:  gekoppeld door een keer de zaak-code + eigen PIN te bewijzen
+   - personeel:  afgeleid uit het levende, aan het account gebonden dienstverband
    - zaak:       gekoppeld door een keer de bedrijfsinlog te bewijzen
    - kantoor:    gekoppeld door een keer de backoffice-code (en TOTP als die
                  aanstaat) te bewijzen
    Daarna logt iedereen overal in met het ene RTG-account en kiest een rol;
    accStart munt dan precies dezelfde sessie als de losse inlog zou doen
    (zelfde rememberSession, zelfde logs), dus geen tweede toegangspad met
-   andere regels. Koppelen bewijst altijd eerst de bestaande werk-inlog; het
-   ene account wordt zo een sleutelbos, geen achterdeur.
+   andere regels. Oude PIN-koppeling bestaat alleen nog als expliciete Magnaat
+   Test-fixture; in iedere echte omgeving is het account zelf de sleutelbos.
 
    maakEenAccount(state) volgt het vaste kern-patroon. Het BEWIJZEN zelf (de
    drie soorten, met de twee remmen) staat in ./eenaccount/koppelen.js; hier de
@@ -57,6 +57,12 @@ function maakEenAccount({ db, save, crypto, accounts, findSupplier, checkCred, h
       rollen.push({ rol: 'kantoor', code: null, staffId: null, naam: eig.naam,
         zaakNaam: null, sinds: null, viaEigenaar: true });
     }
+    // Een personeelsrol volgt rechtstreeks uit het levende, aan dit account
+    // gebonden dienstverband. Er is geen PIN-koppeling of tweede opslag nodig.
+    for (const p of afgeleid.personeel(key)) {
+      if (!rollen.some(r => r.rol === 'personeel' && Number(r.staffId) === Number(p.staffId)))
+        rollen.push(p);
+    }
     // en elke werkruimte waar dit account aan gekoppeld is, apart per
     // organisatie en met de eigen functie erbij
     for (const wr of afgeleid.werkruimtes(key)) {
@@ -65,7 +71,7 @@ function maakEenAccount({ db, save, crypto, accounts, findSupplier, checkCred, h
     return { status: 200, rollen };
   }
 
-  /* ---- een rol koppelen: altijd eerst de bestaande werk-inlog bewijzen ---- */
+  /* ---- een legacy testrol koppelen: eerst de bestaande werk-inlog bewijzen ---- */
   async function accKoppel(key, body, req) {
     const uitslag = await koppelen.bewijs(key, body, req);
     if (uitslag.error) return uitslag;

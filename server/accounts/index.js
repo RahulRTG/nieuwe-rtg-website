@@ -31,6 +31,8 @@ const kluis = require('./kluis');
 const mirror = require('./mirror');
 const users = require('./users');
 const staff = require('./staff');
+const staffSessie = require('./staff-sessie');
+const actiebewijs = require('./actiebewijs');
 
 // Zelfde datamap als db.js: instelbaar met RTG_DATA_DIR (tests + productie).
 const DATA_DIR = process.env.RTG_DATA_DIR || path.join(__dirname, '..', 'data');
@@ -125,6 +127,7 @@ function init() {
   fs.mkdirSync(DATA_DIR, { recursive: true });
   const db = new DatabaseSync(DB_FILE);
   S.db = db;
+  S.DB_FILE = DB_FILE;
   zetGelijktijdigheid(db);
 }
 
@@ -156,14 +159,31 @@ function schrijfKluisRing(ring) {
   try { fs.chmodSync(RING_FILE, 0o600); } catch (e) {}
 }
 
-module.exports = {
+const api = {
   init, zetGelijktijdigheid, checkpoint, schrijfKluisRing, RING_FILE,
-  startPostgres: mirror.startPostgres, onExternalChange: mirror.onExternalChange, flushBijAfsluiten: mirror.flushBijAfsluiten,
+  startPostgres: mirror.startPostgres, postgresKlaar: mirror.postgresKlaar,
+  onExternalChange: mirror.onExternalChange, flushBijAfsluiten: mirror.flushBijAfsluiten,
   verifyPassword: kluis.verifyPassword,
   moetVernieuwen: kluis.moetVernieuwen,
   /* Een afgeleide sleutel voor een ander doel; de ruwe sessiesleutel verlaat de
      kluis nooit. Zie ./kluis.js voor waarom dat geen netheid maar scheiding is. */
   sleutelVoor: kluis.sleutelVoor,
+  /* Routes bewaren nooit een rauw eenmalig bewijs in een dossier. Ook deze
+     afdruk/vergelijking loopt via de accountsgevel, zodat geen route het
+     binnenwerk van de identiteitskluis rechtstreeks hoeft te importeren. */
+  hashActiebewijs: actiebewijs.hash,
+  kloptActiebewijs: actiebewijs.klopt,
   ...users,
   ...staff
 };
+
+/* De sessiecontrole hoort bij de identiteitskluis. Aanroepers gaan via deze
+   gevel; routes en kernmodules hoeven niet naar de interne accounts-map te
+   reiken. De wrappers binden de levende account-API aan hetzelfde oordeel. */
+api.staffAccountBinding = (lidOfId, uitgegevenOp) =>
+  staffSessie.accountBinding(api, lidOfId, uitgegevenOp);
+api.controleerStaffSessie = sess => staffSessie.controleer(api, sess);
+api.registreerStaffSessie = (sessieregister, sess, lidKey, bron) =>
+  staffSessie.registreer(sessieregister, sess, lidKey, bron);
+
+module.exports = api;

@@ -6,7 +6,7 @@
    ./index.js. */
 module.exports = (ctx) => {
   const { save, crypto, nu, id, schoon, vandaag, L, seed, vluchten, vind, actief,
-    plekkenVoor, vipVan, vipRond, publiek, _vluchtMaak, passCheck,
+    plekkenVoor, vipVan, vipRond, publiek, _vluchtMaak, boardingPass,
     CATEGORIEEN, LOUNGES, VIP_SOORTEN, VIP_PROTOCOL } = ctx;
 
   /* ---------- het charterloket: privejets en helikopters op aanvraag ----------
@@ -47,11 +47,12 @@ module.exports = (ctx) => {
       toestel: ch.soort === 'helikopter' ? 'RTG-H1' : 'RTG-J1' });
     v.status = 'inchecken';
     ch.status = 'bevestigd'; ch.vluchtId = v.id; ch.door = actor || 'operations';
-    const b = { id: id('bk'), code: 'VL-' + crypto.randomBytes(3).toString('hex').toUpperCase(), vluchtId: v.id,
-      key: ch.key, codenaam: ch.codenaam, status: 'geboekt', stoel: null, koffers: 0, at: nu() };
+    const b = { id: boardingPass.nieuwBoekingId(), vluchtId: v.id,
+      key: ch.key, codenaam: ch.codenaam, status: 'geboekt', stoel: null,
+      koffers: 0, pass_id: null, toegang: null, pass_historie: [], pass_claims: [], at: nu() };
     L().boekingen.unshift(b);
     save();
-    return { ok: true, charter: { code: ch.code, status: ch.status }, vlucht: publiek(v), boeking: { code: b.code } };
+    return { ok: true, charter: { code: ch.code, status: ch.status }, vlucht: publiek(v), boeking: { id: b.id } };
   }
   function mijnCharters(key) {
     return L().charters.filter(c => c.key === key).slice(0, 10).map(c => {
@@ -99,26 +100,9 @@ module.exports = (ctx) => {
   }
 
   /* ---------- de lounges: gastvrijheid op vertoon van de boarding pass ---------- */
-  function loungeIn(actor, loungeId, passCode) {
-    const lounge = LOUNGES[String(loungeId || '')];
-    if (!lounge) return { status: 400, error: 'Kies een lounge (salon of royal).' };
-    const check = passCheck(passCode);
-    if (!check.geldig) return { status: 409, error: 'Geen geldige boarding pass: ' + (check.reden || 'onbekend.') };
-    const b = L().boekingen.find(x => x.code === String(passCode || '').trim().toUpperCase());
-    const v = vind(b.vluchtId);
-    if (String(loungeId) === 'royal' && !vipVan(v))
-      return { status: 403, error: 'De Koninklijke Vleugel is uitsluitend voor gasten op een vlucht met een vip-protocol.' };
-    if (L().lounge.some(g => g.boekingId === b.id && !g.uit))
-      return { status: 409, error: 'Deze gast is al binnen.' };
-    const binnen = L().lounge.filter(g => g.lounge === loungeId && !g.uit).length;
-    if (binnen >= lounge.capaciteit) return { status: 409, error: lounge.naam + ' zit vol (' + lounge.capaciteit + ' plaatsen).' };
-    const g = { id: id('lg'), lounge: String(loungeId), boekingId: b.id, codenaam: b.codenaam,
-      vlucht: v.nummer, tijd: v.tijd, door: actor || 'lounge', in: nu(), uit: null };
-    L().lounge.unshift(g);
-    L().lounge = L().lounge.slice(0, 20000);
-    save();
-    return { ok: true, gast: g, lounge: lounge.naam };
-  }
+  const loungeIn = (actor, loungeId, passCode) => boardingPass.loungeIn({
+    actor, loungeId, code: passCode, lounges: LOUNGES
+  });
   function loungeUit(actor, gid) {
     const g = L().lounge.find(x => x.id === String(gid || ''));
     if (!g) return { status: 404, error: 'Gast niet gevonden.' };

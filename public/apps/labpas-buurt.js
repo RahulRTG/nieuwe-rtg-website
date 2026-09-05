@@ -53,7 +53,7 @@
          zijn voor de stemteller ÉÉN gast, en dan slikt hij de tweede stem stil
          in met "u heeft al gestemd". Precies de botsing waar keuringsregel 15
          over gaat. */
-      n = window.RTGId ? RTGId('gast') : '';
+      n = RTGId('gast');
       try { sessionStorage.setItem('rtg_labstem', n); } catch (e) {}
     }
     return n;

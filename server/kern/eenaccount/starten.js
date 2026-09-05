@@ -44,6 +44,10 @@ module.exports = (ctx) => {
     if (!r && wens.rol === 'werkruimte') {
       r = afgeleid.werkruimtes(key).find(x => !wens.code || x.code === wens.code) || null;
     }
+    if (!r && wens.rol === 'personeel') {
+      r = afgeleid.personeel(key).find(x => (!wens.code || x.code === wens.code) &&
+        (wens.staffId == null || Number(x.staffId) === wens.staffId)) || null;
+    }
     if (!r) return { status: 404, error: 'Deze rol is niet aan uw account gekoppeld.' };
     // de algemene pin: heeft dit lid er een gezet, dan opent er geen werk-app
     // zonder (bevoegdheid = het ene account, bewijs = de pin). Zonder pin in
@@ -96,18 +100,27 @@ module.exports = (ctx) => {
     }
     const s = findSupplier(r.code);
     if (!s) return { status: 404, error: 'Deze zaak bestaat niet meer.' };
+    const lidId = lidVanKey(key);
     let actor;
     if (r.rol === 'personeel') {
       // het personeelslid moet nog steeds in dienst zijn; anders vervalt de koppeling
       const staff = accounts.listStaff(s.code).find(x => x.id === r.staffId);
-      if (!staff) {
+      const personeelLid = lidVanKey(key);
+      if (!staff || personeelLid == null || Number(staff.member_id) !== personeelLid) {
         db.data.accountRollen[key] = lijst(key).filter(x => !zelfde(x, r));
         save();
         return { status: 403, error: 'Deze personeelslogin bestaat niet meer; de koppeling is opgeruimd.' };
       }
       actor = { name: staff.name, role: staff.role, staffId: staff.id, manager: staff.role === 'manager' };
     } else {
-      actor = { name: 'Beheer', role: 'manager', manager: true };
+      const staff = lidId != null ? accounts.staffByMember(s.code, lidId) : null;
+      if (staff) {
+        actor = { name: staff.name, role: staff.role, staffId: staff.id, manager: staff.role === 'manager' };
+      } else if (!accounts.legacyStaffPinToegestaan || !accounts.legacyStaffPinToegestaan()) {
+        return { status: 403, error: 'Deze bedrijfsrol is nog niet aan uw persoonlijke RTG-account gebonden. Laat de bedrijfsaanmelding veilig opnieuw provisioneren.' };
+      } else {
+        actor = { name: 'Beheer', role: 'manager', manager: true };
+      }
     }
     // het ene account is geen achterdeur: het werkvenster van de werkgever
     // geldt hier precies zo als bij de losse personeelslogin
@@ -118,7 +131,6 @@ module.exports = (ctx) => {
     /* En de persoonseis van het genre, om dezelfde reden als het werkvenster
        erboven: het ene account is geen achterdeur. Dezelfde functie als
        supplierAuth, zodat er niet twee besluiten over dezelfde vraag ontstaan. */
-    const lidId = lidVanKey(key);
     if (persoonsPoort) {
       const pp = persoonsPoort(s, { manager: actor.manager, lid: lidId });
       if (!pp.ok) return { status: 403, error: pp.error, persoonseis: pp.missend || null };
@@ -128,7 +140,11 @@ module.exports = (ctx) => {
        agenda van dit lid kan kijken; nooit naar die van iemand anders. `lid`
        reist mee omdat de persoonseis en de loonlaag het lidnummer zelf nodig
        hebben -- dat ontbrak hier, net als in kern/werkbijlogin.js. */
-    const zSess = { role: 'supplier', code: s.code, actor: actor.name, staffId: actor.staffId, staffRole: actor.role, manager: actor.manager, lidKey: key, lid: lidId };
+    const binding = accounts.staffAccountBinding(lidId);
+    if (!binding || binding.lidKey !== key)
+      return { status: 401, error: 'Uw persoonlijke RTG-account is niet meer actief.' };
+    const zSess = { role: 'supplier', code: s.code, actor: actor.name,
+      staffId: actor.staffId, staffRole: actor.role, manager: actor.manager, ...binding };
     rememberSession(token, zSess);
     legContext(zSess, key, 'zaak', s.code);
     logInlog('zaak', true, s.code + ' · ' + actor.name + ' via RTG-account', req);

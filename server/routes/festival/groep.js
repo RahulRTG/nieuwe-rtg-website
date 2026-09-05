@@ -22,6 +22,16 @@ module.exports = (kern) => {
   const httpCode = (v) => (Number.isInteger(v) && v >= 100 && v <= 599 ? v : 200);
   const stuur = (res, r) => res.status(httpCode(r && r.status)).json(r);
   const nietGevonden = { status: 404, error: 'Deze groep bestaat niet.' };
+  const handel = async (res, werk) => {
+    try { stuur(res, await Promise.resolve(werk())); }
+    catch (e) {
+      /* Een opslagfout mag nooit een zojuist aangeboden kale code naar stdout
+         kopiëren. De operationele foutteller gebruikt daarom alleen de route. */
+      console.error('[festivalgroep] veilige verwerking mislukt');
+      res.status(503).json({ error: 'De groep kon niet veilig worden verwerkt. Probeer het later opnieuw.' });
+    }
+  };
+  const idem = req => String(((req.body || {}).idem || req.get('idempotency-key') || '')).slice(0, 200);
 
   /* Het festival en de editie waar dit over gaat. Een lid bezit geen festival,
      dus er is hier geen eigendomsvraag -- de groep bewaakt zichzelf met de code
@@ -32,73 +42,63 @@ module.exports = (kern) => {
     return f ? { fid: f.id, eid: String(b.editie || '') } : null;
   };
 
-  app.post('/api/festival/groep', auth, (req, res) => {
+  app.post('/api/festival/groep', auth, async (req, res) => {
     if (geenGast(req, res)) return;
     const w = waar(req);
     if (!w) return stuur(res, nietGevonden);
-    stuur(res, festival.groepMaak(w.fid, w.eid, {
+    await handel(res, () => festival.groepMaak(w.fid, w.eid, {
       naam: (req.body || {}).naam,
       maker: liveCodename(req.session)        // uit de SESSIE, nooit uit het lichaam
-    }));
+    }, idem(req)));
   });
 
-  /* MEEDOEN KAN OOK MET ALLEEN EEN CODE, en dat is geen gemak maar een gat dat
-     dichtmoest: een lid dat nog niets heeft, ziet ook nog geen festival, en kon
-     de code die hij van een vriend kreeg dus nergens kwijt. De editie wordt dan
-     uit de code zelf afgeleid (kern/festival/groep.js, groepEditieVanCode).
-
-     EEN VERKEERDE CODE GEEFT DEZELFDE WEIGERING ALS ALTIJD. Er komt geen route
-     bij die vertelt of een code bestaat; het opzoeken gebeurt binnen deze ene
-     handeling, en het antwoord op een onbekende code is 404 -- net als voorheen. */
-  app.post('/api/festival/groep/mee', auth, (req, res) => {
+  /* Alleen een code is genoeg voor een gast die nog geen festival ziet. Het
+     zoeken en claimen gebeurt in één collectietransactie; er is geen los
+     zoek-endpoint en nul of meerdere treffers geven dezelfde weigering. */
+  app.post('/api/festival/groep/mee', auth, async (req, res) => {
     if (geenGast(req, res)) return;
-    const code = (req.body || {}).code;
-    let w = waar(req);
-    if (!w) {
-      const gevonden = festival.groepEditieVanCode(code);
-      if (gevonden && gevonden.meerdere) {
-        return stuur(res, { status: 409,
-          error: 'Deze code bestaat bij meer dan een festival. Kies eerst het festival.' });
-      }
-      w = gevonden;
-    }
-    if (!w) return stuur(res, nietGevonden);
-    stuur(res, festival.groepDeelnemen(w.fid, w.eid, {
-      code, codenaam: liveCodename(req.session)
+    const b = req.body || {}, w = waar(req);
+    if (!w && (b.festival || b.editie)) return stuur(res, nietGevonden);
+    await handel(res, () => festival.groepDeelnemen(w && w.fid, w && w.eid, {
+      code: b.code, codenaam: liveCodename(req.session)
     }));
   });
 
-  app.post('/api/festival/groep/weg', auth, (req, res) => {
+  app.post('/api/festival/groep/weg', auth, async (req, res) => {
     if (geenGast(req, res)) return;
     const w = waar(req);
     if (!w) return stuur(res, nietGevonden);
-    stuur(res, festival.groepVerlaat(w.fid, w.eid, {
+    await handel(res, () => festival.groepVerlaat(w.fid, w.eid, {
       id: (req.body || {}).id, codenaam: liveCodename(req.session)
     }));
   });
 
-  app.post('/api/festival/groep/code', auth, (req, res) => {
+  app.post('/api/festival/groep/code', auth, async (req, res) => {
     if (geenGast(req, res)) return;
     const w = waar(req);
     if (!w) return stuur(res, nietGevonden);
-    stuur(res, festival.groepCodeVernieuw(w.fid, w.eid, {
+    await handel(res, () => festival.groepCodeVernieuw(w.fid, w.eid, {
       id: (req.body || {}).id, codenaam: liveCodename(req.session)
-    }));
+    }, idem(req)));
   });
 
-  app.post('/api/festival/groep/stand', auth, (req, res) => {
+  app.post('/api/festival/groep/stand', auth, async (req, res) => {
     if (geenGast(req, res)) return;
     const w = waar(req);
     if (!w) return stuur(res, nietGevonden);
-    stuur(res, festival.groepStand(w.fid, w.eid, (req.body || {}).id, liveCodename(req.session)));
+    await handel(res, () => festival.groepStand(w.fid, w.eid,
+      (req.body || {}).id, liveCodename(req.session)));
   });
 
-  app.post('/api/festival/groep/mijn', auth, (req, res) => {
+  app.post('/api/festival/groep/mijn', auth, async (req, res) => {
     if (geenGast(req, res)) return;
     const w = waar(req);
     if (!w) return stuur(res, nietGevonden);
-    const e = festival.editieVind(w.fid, w.eid);
-    const mijn = festival.groepenVan(e, liveCodename(req.session));
-    res.json({ ok: true, groepen: mijn.map(g => ({ id: g.id, naam: g.naam, leden: g.leden.length })) });
+    await handel(res, () => {
+      const e = festival.editieVind(w.fid, w.eid);
+      const mijn = festival.groepenVan(e, liveCodename(req.session));
+      return { ok: true, groepen: mijn.map(g => ({ id: g.id, naam: g.naam,
+        leden: g.leden.length, toegang: g.toegang })) };
+    });
   });
 };

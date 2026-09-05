@@ -1,117 +1,185 @@
-/* Spellen (deelmodule): DE PROJECTIEKAMER -- een potje op een gedeeld scherm.
+/* Spellen (deelmodule): een potje op een gedeeld scherm.
 
-   Zes mensen in een vakantiehuis, een televisie, en zes telefoons. Dat is waar
-   30 Seconden voor gemaakt is, en het is precies het spel dat tot nu toe als
-   enige NIET op een scherm kon (zie ./zicht.js).
+   Een televisie is geen deelnemer en draagt nooit een ledenaccount. Hij krijgt
+   uitsluitend `zicht.publiek`, maar de toegang daartoe is wel een echte
+   credential. De vroegere 32-bits code deed twee banen tegelijk en stond in
+   iedere poll-URL. Deze laag gebruikt daarom een eenmalige koppeling en daarna
+   een afzonderlijke, gehashte schermsessie. Zie ../spelprojectie-toegang.js.
 
-   DE VRAAG DIE EERST BEANTWOORD MOET WORDEN IS: WAT IS DAT SCHERM? Een lid met
-   een sessie? Dan staat er een ingelogd RTG-account op een televisie in een
-   vakantiehuis of een hotellobby, en blijft dat daar staan. Het antwoord is
-   nee, en dat is de hele opzet van dit bestand:
+   Uitgifte, koppeling, rotatie en intrekking wijzigen dezelfde `spellen`-
+   collectie in één autoritatieve transactie. Een opslagfout kan dus nooit een
+   bruikbare code achterlaten die de aanroeper als mislukt heeft gezien. */
+'use strict';
 
-     EEN SCHERM IS EEN PROJECTIE, GEEN DEELNEMER.
+const BEWAAR_MS = 30 * 86400000;
+const MAX_UITGIFTES = 50;
 
-   Het heeft geen sessie, geen sleutel en geen identiteit. Het krijgt uitsluitend
-   `zicht.publiek(p, st)` en het kan NIETS terugsturen -- geen zet, geen chat,
-   geen antwoord. Er is dus ook niets te stelen: wie de code heeft, ziet wat
-   iedereen in de kamer toch al ziet.
-
-   Dat sluit de 30 Seconden-lekkage STRUCTUREEL. De kaart zit niet in de laag
-   die een scherm ontvangt, dus het kan hem niet krijgen -- dat is iets anders
-   dan hem niet sturen. Een spel zonder `zicht.publiek` heeft hier helemaal
-   geen kamer; Proost bijvoorbeeld niet, en met opzet: die poort is 18+ en een
-   projectie heeft geen leeftijd.
-
-   DE CODE IS DE SLEUTEL, en daarom is hij begrensd op vier manieren:
-
-   1. ALLEEN EEN SPELER opent hem, voor een potje waarin hij zelf meespeelt.
-   2. HIJ VERLOOPT -- na twee uur, of eerder als het potje klaar is. Een code
-      die blijft werken is een televisie die morgen nog meekijkt.
-   3. HIJ IS NIET TE RADEN: acht hexadecimale tekens uit crypto (32 bits). Dat
-      is bewust niet meer: hij wordt op een scherm getypt of gescand. De rem
-      hieronder is wat brute kracht tegenhoudt, niet de lengte.
-   4. ER IS ER EEN PER POTJE. Nog een keer openen geeft dezelfde kamer terug
-      zolang hij leeft, zodat een gastheer die twee keer tikt niet twee codes
-      in omloop brengt.
-
-   WAT ER NIET IN ZIT: koppelen van telefoons. Die spelen gewoon in hun eigen
-   app mee, zoals ze al deden -- de kamer is alleen het GEDEELDE beeld. Een
-   scanflow die een telefoon aan een scherm bindt (shared/scanner.js kan dat)
-   hoort bij Game Night en niet hier; dan koppel je mensen aan een SESSIE en
-   dat is een ander onderwerp met andere vragen. */
 module.exports = (ctx) => {
-  const { S, save, crypto, nu, SPEL, SOORTEN, ZICHT, codenaamVan } = ctx;
+  const { S, save, bewerkCollectie, crypto, nu, SPEL, SOORTEN, ZICHT, codenaamVan } = ctx;
+  const toegang = require('../spelprojectie-toegang')({ crypto, nu });
+  const afdruk = waarde => crypto.createHash('sha256').update(String(waarde || '')).digest('hex');
 
-  const DUUR_MS = 2 * 3600000;   // twee uur, en korter als het potje eerder klaar is
-
-  function P() {
-    const s = S();
-    if (!s.projectie) s.projectie = {};
-    return s.projectie;
+  function vorm(staat) {
+    if (!staat || typeof staat !== 'object' || Array.isArray(staat))
+      throw new Error('spellen hoort een kaart te zijn');
+    if (!staat.potjes || typeof staat.potjes !== 'object') staat.potjes = {};
+    toegang.migreerLegacy(staat);
+    if (!Array.isArray(staat.projecties)) staat.projecties = [];
+    return staat.projecties;
   }
 
-  /* Opruimen gebeurt bij elke aanraking en niet met een eigen tijdklok: het
-     zijn er weinig, ze leven kort, en een tak die alleen groeit als iemand hem
-     gebruikt hoeft niet apart geveegd te worden. */
-  function schoon() {
-    const p = P(), t = Date.now();
-    for (const [code, k] of Object.entries(p))
-      if (new Date(k.tot).getTime() < t || !S().potjes[k.potje]) delete p[code];
+  function sluit(rij, actor, waarom) {
+    if (!rij || rij.gesloten_at) return;
+    toegang.intrekActief(rij, actor, waarom);
+    rij.gesloten_at = nu();
+    rij.sluitreden = String(waarom || 'gesloten').slice(0, 200);
   }
 
-  /* Een kamer openen. Alleen een speler van dit potje, en alleen als het spel
-     een projectieweergave HEEFT -- die vraag is dezelfde als "mag dit spel op
-     een scherm", en hij wordt hier niet tweede keer beantwoord maar bij de
-     weergave opgehaald. */
-  function projectieOpen(mij, id) {
-    schoon();
-    const potje = S().potjes[String(id || '')];
-    if (!potje || !potje.spelers.includes(mij)) return { status: 404, error: 'Dit potje bestaat niet (meer).' };
-    if (potje.status === 'klaar') return { status: 409, error: 'Dit potje is klaar.' };
-    if (!ZICHT[potje.soort] || !ZICHT[potje.soort].publiek)
-      return { status: 400, error: 'Dit spel hoort niet op een gedeeld scherm.' };
-
-    // een per potje: twee keer tikken brengt geen tweede code in omloop
-    const bestaand = Object.entries(P()).find(([, k]) => k.potje === potje.id);
-    if (bestaand) return { status: 200, ok: true, code: bestaand[0], tot: bestaand[1].tot };
-
-    const code = crypto.randomBytes(4).toString('hex').toUpperCase();
-    P()[code] = { potje: potje.id, door: mij, at: nu(), tot: new Date(Date.now() + DUUR_MS).toISOString() };
-    save();
-    return { status: 200, ok: true, code, tot: P()[code].tot };
+  function ruim(staat) {
+    const rijen = vorm(staat);
+    for (const rij of rijen) {
+      if (!rij || rij.gesloten_at) continue;
+      if (!staat.potjes[rij.potje]) sluit(rij, 'systeem', 'Potje bestaat niet meer');
+      else if (toegang.redenKoppeling(rij) && toegang.redenScherm(rij))
+        sluit(rij, 'systeem', 'Projectietoegang verlopen');
+    }
+    const grens = Date.now() - BEWAAR_MS;
+    for (let i = rijen.length - 1; i >= 0; i--)
+      if (rijen[i] && rijen[i].gesloten_at && Date.parse(rijen[i].gesloten_at) < grens)
+        rijen.splice(i, 1);
+    return rijen;
   }
 
-  /* Wat het scherm ziet. GEEN sessie, GEEN sleutel: de code is het hele bewijs.
-     Er komt dan ook niets terug wat niet al in de kamer te zien is -- de
-     spelers staan er met hun codenaam in, zoals ze ook in het potje staan. */
-  function projectieStand(code) {
-    schoon();
-    const k = P()[String(code || '').trim().toUpperCase()];
-    if (!k) return { status: 404, error: 'Deze code doet het niet (meer).' };
-    const p = S().potjes[k.potje];
-    if (!p) return { status: 404, error: 'Deze code doet het niet (meer).' };
-    const uit = {
-      status: 200, spel: p.soort, naam: SOORTEN[p.soort] || p.soort,
-      spelers: p.spelers.map(codenaamVan), beurt: p.beurt, teams: p.teams.slice(0, p.spelers.length),
-      modus: p.modus, klaar: p.status === 'klaar', winnaar: p.winnaar || null, tot: k.tot
-    };
-    // de publieke laag, en verder niets: wat hier niet in zit KAN het scherm niet krijgen
-    if (p.status !== 'wacht' && p.staat) uit.staat = ZICHT[p.soort].publiek(p, p.staat);
-    return uit;
+  function transactie(werk) {
+    S();
+    const doe = staat => { const rijen = ruim(staat); return werk(staat, rijen); };
+    if (typeof bewerkCollectie === 'function') return bewerkCollectie('spellen', doe);
+    const staat = S(), voor = JSON.stringify(staat);
+    try {
+      const antwoord = doe(staat);
+      if (antwoord && typeof antwoord.then === 'function')
+        throw new Error('spellen-transactie mag niet asynchroon zijn');
+      if (JSON.stringify(staat) !== voor) save();
+      return antwoord;
+    } catch (e) {
+      const oud = JSON.parse(voor);
+      for (const k of Object.keys(staat)) delete staat[k];
+      Object.assign(staat, oud);
+      throw e;
+    }
   }
 
-  /* De kamer dichtdoen. Elke speler mag dat -- wie aan tafel zit en het beeld
-     niet wil, hoeft niet eerst de gastheer te zoeken. */
+  const geldigIdem = idem => {
+    const waarde = String(idem || '').trim();
+    return waarde.length >= 16 && waarde.length <= 200 ? waarde : null;
+  };
+  const isActief = rij => !!(rij && !rij.gesloten_at &&
+    (!toegang.redenKoppeling(rij) || !toegang.redenScherm(rij)));
+
+  /* Iedere bewuste uitgifte maakt een nieuwe code en trekt een eventueel oud
+     scherm meteen in. Een retry met dezelfde idempotentiesleutel krijgt nooit
+     het eenmalige geheim opnieuw. */
+  function projectieOpen(mij, id, idem) {
+    const idemWaarde = geldigIdem(idem);
+    if (!idemWaarde) return { status: 400, error: 'Een veilige herhaalsleutel is verplicht.' };
+    return transactie((staat, rijen) => {
+      const potje = staat.potjes[String(id || '')];
+      if (!potje || !potje.spelers.includes(mij))
+        return { status: 404, error: 'Dit potje bestaat niet (meer).' };
+      if (potje.status === 'klaar') return { status: 409, error: 'Dit potje is klaar.' };
+      if (!ZICHT[potje.soort] || !ZICHT[potje.soort].publiek)
+        return { status: 400, error: 'Dit spel hoort niet op een gedeeld scherm.' };
+
+      const vinger = afdruk(JSON.stringify({ mij, potje: potje.id }));
+      const idemHash = afdruk('spelprojectie-uitgifte|' + mij + '|' + idemWaarde);
+      for (const rij of rijen) for (const uitgifte of (rij.uitgiftes || [])) {
+        if (uitgifte.idem_hash !== idemHash) continue;
+        return uitgifte.fingerprint_hash === vinger
+          ? { status: 409, error: 'Deze schermcode is al eenmalig getoond en wordt niet herhaald.', herhaald: true }
+          : { status: 409, error: 'Deze herhaalsleutel hoort bij een ander projectieverzoek.' };
+      }
+
+      let rij = rijen.find(x => x.potje === potje.id && isActief(x));
+      const geroteerd = !!rij;
+      if (rij) toegang.intrekActief(rij, codenaamVan(mij) || mij, 'Nieuwe schermcode uitgegeven');
+      else {
+        rij = { id: 'pj' + crypto.randomBytes(16).toString('hex'), potje: potje.id,
+          door: mij, aangemaakt_at: nu(), gesloten_at: null, sluitreden: null,
+          koppeling: null, koppeling_historie: [], scherm: null,
+          scherm_historie: [], uitgiftes: [], rotatie: 0 };
+        rijen.push(rij);
+      }
+      rij.door = mij; rij.rotatie = Math.max(0, Number(rij.rotatie) || 0) + 1;
+      rij.laatst_uitgegeven_at = nu();
+      const gemaakt = toegang.nieuweKoppeling(rijen, rij, codenaamVan(mij) || mij, rij.rotatie);
+      if (!gemaakt) return { status: 503, error: 'Kon geen unieke schermcode maken.' };
+      rij.koppeling = gemaakt.toegang;
+      rij.uitgiftes.push({ idem_hash: idemHash, fingerprint_hash: vinger, at: nu() });
+      if (rij.uitgiftes.length > MAX_UITGIFTES)
+        rij.uitgiftes.splice(0, rij.uitgiftes.length - MAX_UITGIFTES);
+      return { status: 200, ok: true, id: rij.id, code: gemaakt.code,
+        eenmalig: true, geroteerd, tot: gemaakt.toegang.expires_at };
+    });
+  }
+
+  /* De televisie wisselt de eenmalige koppeling in voor een eigen sessie.
+     Beide wijzigingen staan in dezelfde transactie; een half verbruikte code
+     of een sessie zonder verbruikte code kan dus niet ontstaan. */
+  function projectieKoppel(code) {
+    return transactie((staat, rijen) => {
+      const rij = toegang.zoekKoppeling(rijen, code);
+      if (!rij || toegang.redenKoppeling(rij) || !staat.potjes[rij.potje])
+        return { status: 404, error: 'Deze schermcode doet het niet (meer).' };
+      const gemaakt = toegang.nieuweSessie(rijen, rij);
+      if (!gemaakt) return { status: 503, error: 'Kon geen veilige schermsessie maken.' };
+      toegang.gebruikKoppeling(rij);
+      rij.scherm = gemaakt.toegang;
+      rij.gekoppeld_at = nu();
+      return { status: 200, ok: true, token: gemaakt.code,
+        eenmalig: true, tot: gemaakt.toegang.expires_at };
+    });
+  }
+
+  /* Polling is read-only. De sessiehash wordt over alle actieve en historische
+     rijen vergeleken; de invoer staat in een POST-body en nooit in een URL.
+     Ook deze leesactie gaat door het autoritatieve collectieslot. Daardoor is
+     een intrekking door instance A bij de eerstvolgende poll op instance B al
+     zichtbaar en vertrouwen we niet op een later cachesein. */
+  function projectieStand(token) {
+    return transactie((staat, rijen) => {
+      const rij = toegang.zoekScherm(rijen, token);
+      if (!rij || toegang.redenScherm(rij))
+        return { status: 404, error: 'Deze schermsessie doet het niet (meer).' };
+      const p = staat.potjes[rij.potje];
+      if (!p) return { status: 404, error: 'Deze schermsessie doet het niet (meer).' };
+      const uit = {
+        status: 200, spel: p.soort, naam: SOORTEN[p.soort] || p.soort,
+        spelers: p.spelers.map(codenaamVan), beurt: p.beurt,
+        teams: p.teams.slice(0, p.spelers.length), modus: p.modus,
+        klaar: p.status === 'klaar', winnaar: p.winnaar || null,
+        tot: rij.scherm.expires_at
+      };
+      if (p.status !== 'wacht' && p.staat) uit.staat = ZICHT[p.soort].publiek(p, p.staat);
+      return uit;
+    });
+  }
+
+  /* Iedere speler kan alle actuele credentials van zijn potje intrekken. */
   function projectieSluit(mij, id) {
-    const potje = S().potjes[String(id || '')];
-    if (!potje || !potje.spelers.includes(mij)) return { status: 404, error: 'Dit potje bestaat niet (meer).' };
-    for (const [code, k] of Object.entries(P())) if (k.potje === potje.id) delete P()[code];
-    save();
-    return { status: 200, ok: true };
+    return transactie((staat, rijen) => {
+      const potje = staat.potjes[String(id || '')];
+      if (!potje || !potje.spelers.includes(mij))
+        return { status: 404, error: 'Dit potje bestaat niet (meer).' };
+      let aantal = 0;
+      for (const rij of rijen) if (rij.potje === potje.id && !rij.gesloten_at) {
+        sluit(rij, codenaamVan(mij) || mij, 'Door speler gesloten'); aantal += 1;
+      }
+      return { status: 200, ok: true, al: aantal === 0 };
+    });
   }
 
-  // welke spellen er uberhaupt een kamer kunnen hebben; de lobby toont dat
   const projectieSpellen = () => Object.keys(SPEL).filter(k => ZICHT[k] && ZICHT[k].publiek);
 
-  return { projectieOpen, projectieStand, projectieSluit, projectieSpellen, _DUUR_MS: DUUR_MS };
+  return { projectieOpen, projectieKoppel, projectieStand, projectieSluit,
+    projectieSpellen, _KOPPEL_MS: toegang.KOPPEL_MS, _SCHERM_MS: toegang.SCHERM_MS };
 };

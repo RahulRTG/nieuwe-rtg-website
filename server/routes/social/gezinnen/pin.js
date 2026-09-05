@@ -16,7 +16,7 @@
 module.exports = (sctx) => {
   const { kern, gezinsPoort, nietBeschermd, linkBon, pinClusterRem } = sctx;
   const { app, pinKaart, pinVernieuw, pinUit, pinZoek, pinVerbind,
-          liveMaak, liveKijk, liveVerbind } = kern;
+          liveMaak, liveKijk, liveVerbind, liveTrekIn } = kern;
 
 /* De twee poorten staan sinds RTG Link in ../gezinnen.js en komen hier mee: het
    zijn twee besluiten (hoor je bij dit gezin, en ben je oud genoeg om zelf
@@ -36,12 +36,15 @@ app.post('/api/rtf/social/pin/nieuw', gezinsPoort, nietBeschermd, (req, res) => 
     bevroren: r.bevroren, bevrorenSinds: r.bevrorenSinds,
     gebeurtenissen: r.gebeurtenissen });
 });
-app.post('/api/rtf/social/pin/uit', gezinsPoort, nietBeschermd, (req, res) => {
+app.post('/api/rtf/social/pin/uit', gezinsPoort, nietBeschermd, async (req, res) => {
   const s = req.gezinslid;
   const opties = Object.prototype.hasOwnProperty.call(req.body || {}, 'bevroren')
     ? { bevroren: req.body.bevroren !== false } : null;
   const r = pinUit(s.handle, req.body.uit !== false, opties);
   if (r.error) return res.status(r.status).json({ error: r.error });
+  if (opties && opties.bevroren && liveTrekIn) {
+    try { await liveTrekIn(s.handle); } catch (e) {}
+  }
   res.json({ pin: r.pin, toon: r.toon, uit: r.uit, versie: r.versie,
     gemaaktOp: r.gemaaktOp, laatstGewijzigd: r.laatstGewijzigd,
     bevroren: r.bevroren, bevrorenSinds: r.bevrorenSinds,
@@ -82,15 +85,15 @@ app.post('/api/rtf/social/pin/connect', gezinsPoort, nietBeschermd, async (req, 
    hier al bezet door de profielsessie (zie gezinsPoort hierboven). Met dezelfde
    naam overschreef de code de sessie, en antwoordde dit loket "log opnieuw in
    bij je gezin" op een code die niets mankeerde. */
-app.post('/api/rtf/social/pin/live', gezinsPoort, nietBeschermd, (req, res) => {
+app.post('/api/rtf/social/pin/live', gezinsPoort, nietBeschermd, async (req, res) => {
   const s = req.gezinslid;
-  const r = liveMaak(s.handle);
+  const r = await liveMaak(s.handle);
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json({ token: r.token, exp: r.exp, ttlMs: r.ttlMs, doel: r.doel });
 });
-app.post('/api/rtf/social/pin/live/kijk', gezinsPoort, nietBeschermd, (req, res) => {
+app.post('/api/rtf/social/pin/live/kijk', gezinsPoort, nietBeschermd, async (req, res) => {
   const s = req.gezinslid;
-  const r = liveKijk(s.handle, req.body.livecode);
+  const r = await liveKijk(s.handle, req.body.livecode);
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json({ codename: r.codename, tier: r.tier, status: r.st,
     bevestiging: r.bevestiging, bevestigingVervalt: r.bevestigingVervalt });

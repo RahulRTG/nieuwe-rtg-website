@@ -37,19 +37,46 @@ async function motorProef(env, haal = globalThis.fetch) {
   try {
     const koppen = { 'content-type': 'application/json' };
     if (env.RTG_MOTOR_TOKEN) koppen['x-rtg-motor-token'] = env.RTG_MOTOR_TOKEN;
-    const antwoord = await haal(url + '/api/motor/status', {
-      method: 'POST', headers: koppen, body: '{}', signal: af.signal
-    });
-    const body = await leesBegrensd(antwoord);
+    const vraag = async pad => {
+      const antwoord = await haal(url + pad, {
+        method: 'POST', headers: koppen, body: '{}', signal: af.signal
+      });
+      return { antwoord, body:await leesBegrensd(antwoord) };
+    };
+    const { antwoord, body } = await vraag('/api/motor/status');
     if (!antwoord.ok || !body || body.ok !== true || body.klopt !== true)
       throw new Error((body && body.error) || 'status is niet gezond (HTTP ' + antwoord.status + ')');
     const native = Array.isArray(body.nativeMotoren) ? body.nativeMotoren : [];
     const nodig = [];
     if (String(env.RTG_MAGNAAT_RUST || '').toLowerCase() === 'motor') nodig.push('magnaat-markt');
-    if (String(env.RTG_MOTOR_GELD || '').toLowerCase() === 'motor') nodig.push('pay-grootboek', 'bank-grootboek');
+    const geld = String(env.RTG_MOTOR_GELD || '').toLowerCase() === 'motor';
+    if (geld) nodig.push('pay-grootboek', 'bank-grootboek');
     const mist = nodig.filter(naam => !native.includes(naam));
     if (mist.length) throw new Error('native motor(en) ontbreken: ' + mist.join(', '));
-    return { ok: true, ms: Date.now() - begin, native, vingerafdruk: body.vingerafdruk || null };
+    let bank = null, duurzaam = null;
+    if (geld) {
+      duurzaam = body.duurzaam;
+      if (!duurzaam || duurzaam.gereed !== true || duurzaam.snapshotGeladen !== true ||
+          duurzaam.snapshotGeldig !== true || duurzaam.versleuteld !== true ||
+          duurzaam.algoritme !== 'XChaCha20-Poly1305' ||
+          !/^g-[a-f0-9]{32}$/.test(String(duurzaam.genesisId || '')) ||
+          duurzaam.genesisId !== String(env.RTG_MOTOR_EXPECT_GENESIS || '') ||
+          !/^[A-Za-z0-9._-]{1,40}$/.test(String(duurzaam.keyId || '')) ||
+          !Number.isSafeInteger(duurzaam.huidigeRevisie) ||
+          !Number.isSafeInteger(duurzaam.laatsteDuurzameRevisie) ||
+          duurzaam.huidigeRevisie !== duurzaam.laatsteDuurzameRevisie ||
+          duurzaam.laatsteSchrijfFout !== null)
+        throw new Error('geldmotor heeft geen groen duurzaamheids-/snapshotbewijs');
+      if (!Number.isSafeInteger(body.som) || body.som !== 0)
+        throw new Error('pay-grootboek meldt geen integer nulconservatie');
+      const bankAntwoord = await vraag('/api/bank/status');
+      bank = bankAntwoord.body;
+      if (!bankAntwoord.antwoord.ok || !bank || bank.ok !== true || bank.klopt !== true ||
+          !Number.isSafeInteger(bank.som) || bank.som !== 0 || !bank.vingerafdruk)
+        throw new Error('bank-grootboek is niet geladen, integer of conserverend');
+    }
+    return { ok: true, ms: Date.now() - begin, native, duurzaam, bank,
+      vingerafdruk: body.vingerafdruk || null };
   } catch (e) {
     return { ok: false, ms: Date.now() - begin, fout: e && e.name === 'AbortError' ? 'geen antwoord binnen 5 seconden' : String(e.message || e) };
   } finally { clearTimeout(timer); }

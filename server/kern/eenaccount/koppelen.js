@@ -46,6 +46,9 @@ module.exports = (kctx) => {
     const soort = String((body || {}).soort || '');
 
     if (soort === 'personeel') {
+      if (!accounts.legacyStaffPinToegestaan || !accounts.legacyStaffPinToegestaan()) {
+        return { status: 403, error: 'Personeel wordt via een uitnodiging rechtstreeks aan het persoonlijke RTG-account gebonden; een personeelspin kan niet meer worden gekoppeld.' };
+      }
       const s = findSupplier(body.code);
       if (!s) return { status: 404, error: 'Deze zaak-code kennen we niet.' };
       // hetzelfde doel-slot als /api/supplier/login: een pin, een teller

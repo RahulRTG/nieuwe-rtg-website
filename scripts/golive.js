@@ -15,6 +15,17 @@ const fs = require('fs');
 const { maskerEmail, zonderGeheim } = require('./lib/geenlek');
 const path = require('path');
 const config = require('../server/config');
+const foundationVrijgave = require('../server/config/foundation-vrijgave');
+const accountDuurzaamheid = require('../server/accounts/duurzaamheid');
+const RELEASE = path.join(__dirname, '..', '.release');
+const RAPPORT = path.join(RELEASE, 'golive-bewijs.json');
+/* De live-wrapper draait deze keuring bewust in de read-only app-container en
+   laat het proces zijn rapport via stdout aan de host overdragen. Alleen deze
+   exacte, argumentloze modus wijkt af van de normale lokale bestandsuitvoer. */
+const RAPPORT_NAAR_STDOUT = process.argv.length === 3 && process.argv[2] === '--bewijs-stdout';
+if (!RAPPORT_NAAR_STDOUT) {
+  try { fs.rmSync(RAPPORT, { force: true }); } catch (e) {}
+}
 
 const uit = [];
 const blokkeer = (t) => uit.push(['✗', t, true]);
@@ -80,6 +91,54 @@ function leesEnvBestand(pad) {
   for (const f of r.fouten) blokkeer(f);
   for (const w of r.waarschuwingen) waarschuw(w);
   if (!r.fouten.length) goed('Configuratie: geen blokkerende fouten.');
+  /* Een losse Node-instantie mag voor een afgeschermde proef op SQLite en
+     proceslokale tellers draaien. Dat is niet hetzelfde als een B2B2C-
+     go-live: geld, intrekking, rate limits en realtime moeten instanceverlies
+     en horizontale schaal overleven. De releasekeuring vereist daarom beide
+     gedeelde diensten positief, ook al kan de applicatie fail-closed opkomen. */
+  if (!env.DATABASE_URL)
+    blokkeer('B2B2C-opslag: DATABASE_URL ontbreekt; go-live vereist PostgreSQL en geen lokale SQLite-waarheid.');
+  if (!env.REDIS_URL)
+    blokkeer('B2B2C-coordinatie: REDIS_URL ontbreekt; gedeelde frauderem, realtime en intrekking zijn niet multi-instance bewezen.');
+  const accountStand = accountDuurzaamheid.releaseStand(env);
+  if (!accountStand.gereed || !accountStand.transactioneel ||
+      accountStand.productieMutaties !== 'duurzaam')
+    blokkeer('B2B2C-identiteit [' + accountStand.code + ']: users/staff zijn nog niet aan de gedeelde PostgreSQL-requesttransactie gebonden; accountmutaties blijven veilig 503.');
+  else goed('B2B2C-identiteit: accountmutaties zijn gedeeld en transactioneel duurzaam.');
+  if (env.RTG_OWNER_BOOTSTRAP)
+    blokkeer('RTG_OWNER_BOOTSTRAP staat nog in de productieomgeving. Gebruik hem uitsluitend voor de eerste eigenaarsregistratie en verwijder hem vóór go-live.');
+  /* Een server kan veilig draaien met alle geldwegen dicht. Dat maakt de
+     configuratie geldig, maar niet de volledige B2B2C-operatie productieklaar.
+     Deze drie punten zijn daarom een GO-LIVE-poort en geen startvoorwaarde:
+     het proces mag fail-closed opkomen, de release krijgt geen READY-stempel. */
+  const geldStand = require('../server/config/productie-geld').stand(env);
+  const geldMotor = { vereist: geldStand.inkomendGeconfigureerd || geldStand.uitgaandGeconfigureerd,
+    modus: String(env.RTG_MOTOR_GELD || 'schaduw').toLowerCase(),
+    bereikbaar: false, native: [], duurzaam:null, bank:null,
+    verwachtGenesis: String(env.RTG_MOTOR_EXPECT_GENESIS || '') };
+  if (!geldStand.inkomendGeconfigureerd)
+    blokkeer('B2B2C-geld: de echte inkomende betaalrail heeft geen provider geconfigureerd.');
+  if (!geldStand.uitgaandGeconfigureerd)
+    blokkeer('B2B2C-geld: er is geen werkende productie-uitbetaalrail geconfigureerd. ' + geldStand.uitgaandWaarom);
+  if (!geldStand.foundationRekeningGeconfigureerd)
+    blokkeer('B2B2C-geld: RTF_IBAN ontbreekt of is geen geldig IBAN voor Foundation-settlement.');
+  if (geldMotor.vereist && geldMotor.modus !== 'motor')
+    blokkeer('B2B2C-geld: echte geldrails vereisen RTG_MOTOR_GELD=motor; JS write-behind/schaduw is niet multi-instance duurzaam.');
+  if (geldMotor.vereist && env.RTG_RUST_ALLES_UIT === '1')
+    blokkeer('B2B2C-geld: de centrale Rust-noodstop staat aan terwijl echte geldrails actief zijn.');
+  if (geldMotor.vereist && !(env.RTG_MOTOR_GELD_URL || env.RTG_MOTOR_SHADOW))
+    blokkeer('B2B2C-geld: de duurzame geldmotor heeft geen bereikbare productie-URL.');
+  /* De env-vlag alleen is nooit een juridische of operationele vrijgave. Het
+     vaste externe dossier moet dezelfde releasecommit, drie relevante PASS-
+     controles en gehashte bewijsverwijzingen dragen. Zonder aanvraag blijven
+     de risicoroutes veilig dicht en blokkeert dit de rest van RTG niet. */
+  const foundationStand = foundationVrijgave.beoordeel({ env });
+  if (!env[foundationVrijgave.ENV_NAAM])
+    goed('Beschermde Foundation-functies blijven voor deze release server-side gesloten.');
+  else if (!foundationStand.vrijgegeven)
+    blokkeer('Foundation-vrijgave geweigerd: de vlag heeft geen geldig commit-gebonden extern dossier (' +
+      foundationStand.reden + ').');
+  else goed('Beschermde Foundation-functies zijn door een commit-gebonden extern dossier vrijgegeven.');
   if (process.env.NODE_ENV !== 'production') waarschuw('NODE_ENV staat nu op "' + (process.env.NODE_ENV || 'leeg') + '"; zet hem bij de echte start op production.');
 
   // 1b. De externe voordeur heeft een EIGEN sleutel, buiten de app-env. Wie
@@ -117,10 +176,36 @@ function leesEnvBestand(pad) {
     }
   }
 
+  /* 2a. Redis, gedeelde bytes en externe alarmering actief beproeven. Een
+     PING bewijst geen pub/sub-intrekking en geen atomaire instancebrede
+     limiter. De Redis-proef gebruikt daarom drie onafhankelijke verbindingen,
+     een eenmalig bericht en een tijdelijke EVAL-limietteller.
+     sleutel of webhook-URL in de omgeving is geen bewijs dat twee instances
+     dezelfde media zien of dat een alarm de ontvanger bereikt. Deze proeven
+     schrijven uitsluitend een willekeurig tijdelijk object en een herkenbare
+     zelfproefmelding; beide uitkomsten gaan mee in het releasebewijs. */
+  const uitgangen = require('./lib/golive-uitgangen');
+  const redisBewijs = await uitgangen.beproefRedis(env);
+  if (redisBewijs.ok)
+    goed('Redis: cross-instance pub/sub en atomische rate limit actief bewezen.');
+  else blokkeer('Redis is niet operationeel bewezen: ' + zonderGeheim(redisBewijs.reden || 'onvolledige proef') + '.');
+  const gedeeldeMedia = await uitgangen.beproefMedia(env);
+  if (gedeeldeMedia.ok)
+    goed('Gedeelde media: put/get/hash/delete over twee backendinstanties geslaagd.');
+  else blokkeer('Gedeelde media is niet actief bewezen: ' + zonderGeheim(gedeeldeMedia.reden || 'onvolledige proef') + '.');
+  const alarmering = await uitgangen.beproefAlarm(env);
+  if (alarmering.ok)
+    goed('Externe foutalarmering heeft de go-live-zelfproef met 2xx ontvangen.');
+  else blokkeer('Externe foutalarmering is niet actief bewezen: ' + zonderGeheim(alarmering.reden || 'onvolledige proef') + '.');
+
   // 2b. Een ingestelde Rust-cutover ook werkelijk aanraken. Alleen een URL en
   // vlag controleren bewijst niet dat de sidecar draait of de juiste binary is.
   if (env.RTG_MOTOR_REKEN_URL || env.RTG_MOTOR_GELD_URL || env.RTG_MOTOR_SHADOW) {
     const motor = await require('./lib/motor-proef').motorProef(env);
+    geldMotor.bereikbaar = motor.ok === true && motor.noodstop !== true;
+    geldMotor.native = Array.isArray(motor.native) ? motor.native : [];
+    geldMotor.duurzaam = motor.duurzaam || null;
+    geldMotor.bank = motor.bank || null;
     if (!motor.ok) blokkeer('Rust-motor is geconfigureerd maar niet inzetbaar: ' + motor.fout);
     else if (motor.noodstop) waarschuw('Rust-appmotoren zijn door RTG_RUST_ALLES_UIT=1 bewust overgeslagen; Sentinel blijft actief.');
     else goed('Rust-motor bereikbaar (' + motor.ms + ' ms; native: ' + motor.native.join(', ') + ').');
@@ -209,6 +294,32 @@ function leesEnvBestand(pad) {
      WELK pad ontbreekt, wordt niet gedraaid. */
   for (const [teken, tekst] of uit) console.log(' ' + teken + ' ' + zonderGeheim(tekst));
   const blokkers = uit.filter(x => x[2]).length;
+  const rapport = {
+    formaat: 'rtg-golive-bewijs-v1',
+    afgerond: new Date().toISOString(),
+    bron: require('./lib/runtime-release-stempel').lees(path.join(__dirname, '..')),
+    geslaagd: blokkers === 0,
+    blokkers,
+    waarschuwingen: uit.filter(x => x[0] === '⚠').length,
+    geld: geldStand,
+    geldMotor,
+    redis: redisBewijs,
+    gedeeldeMedia,
+    alarmering,
+    accounts: accountStand,
+    foundation: foundationStand,
+    controles: uit.map(([teken, tekst, hard]) => ({ teken, hard: !!hard, tekst: zonderGeheim(tekst) }))
+  };
+  if (RAPPORT_NAAR_STDOUT) {
+    /* Eén compacte, herkenbare regel: live.sh valideert hem en schrijft hem
+       atomair op de host. De read-only applicatie krijgt geen schrijfmount. */
+    console.log('RTG_GOLIVE_BEWIJS_JSON=' + JSON.stringify(rapport));
+  } else {
+    fs.mkdirSync(RELEASE, { recursive: true, mode: 0o700 });
+    const tijdelijk = RAPPORT + '.tmp-' + process.pid;
+    fs.writeFileSync(tijdelijk, JSON.stringify(rapport, null, 2) + '\n', { mode: 0o600 });
+    fs.renameSync(tijdelijk, RAPPORT);
+  }
 
   /* De punten die BUITEN de code liggen: geen kruisjes (de keuring kan ze
      vanaf hier niet zien), maar wel elke keer op het bord, zodat ze nooit

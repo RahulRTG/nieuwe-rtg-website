@@ -10,9 +10,8 @@
    DRIE DINGEN DIE HIER BEWUST ZO ZIJN.
 
    1. DE QR HOORT BIJ DE TAFEL, NIET BIJ DE REKENING. Een sticker op tafel 12
-      wordt een keer gedrukt en moet jaren mee. Het token staat dus per tafel in
-      de instellingen van de zaak en verandert niet als de rekening sluit. Wat
-      WEL per rekening leeft, is de sessie van de gast.
+      blijft geldig als de rekening sluit, maar is wel een echte bearer
+      credential met een eindtijd, intrekking en rotatie.
    2. HET TOKEN WORDT GEHASHT BEWAARD. Wie de database leest, kan er geen
       tafelsessie mee openen. Dat is dezelfde gedachte als bij een wachtwoord:
       wij hoeven het niet te weten, we hoeven het alleen te herkennen. De sticker
@@ -28,7 +27,8 @@ module.exports = ({ db, save, crypto, schoon, horeca }) => {
   // wie er aan een rekening zit is één rekensom; zie de opmerking bij schuifAan
   const gezelschap = require('../horeca/gezelschap')({ horeca, schoon });
 
-  const afdruk = (t) => crypto.createHash('sha256').update(String(t || '')).digest('hex');
+  const plekcode = require('./plekcode')({ db, save, crypto, horeca });
+  const afdruk = plekcode.afdruk;
 
   /* ---------- de QR van een PLEK ----------
      Een plek is een tafel of een hotelkamer. Ze delen de mechaniek -- een
@@ -41,41 +41,15 @@ module.exports = ({ db, save, crypto, schoon, horeca }) => {
      blijven werken. Ze vallen terug op 'tafel'. Opnieuw uitgeven blijft een
      aparte handeling, want stil vernieuwen maakt elke gedrukte sticker dood. */
   const SOORTEN = ['tafel', 'kamer'];
-
-  function plekToken(zaakcode, naam, { soort = 'tafel', vernieuw = false } = {}) {
-    const h = H(zaakcode);
-    if (!SOORTEN.includes(soort)) return { status: 400, error: 'Een QR hoort bij een tafel of een kamer.' };
-    if (!h.instel) h.instel = {};
-    if (!h.instel.qr) h.instel.qr = {};
-    const sleutel = String(naam || '').trim();
-    if (!sleutel) return { status: 400, error: soort === 'kamer' ? 'Voor welke kamer?' : 'Voor welke tafel?' };
-    const bestaand = h.instel.qr[sleutel];
-    if (bestaand && !vernieuw) return { plek: sleutel, tafel: sleutel, soort: bestaand.soort || 'tafel', token: bestaand.token, at: bestaand.at };
-    const token = crypto.randomBytes(9).toString('hex');
-    h.instel.qr[sleutel] = { token, hash: afdruk(token), soort, at: nu() };
-    save();
-    return { plek: sleutel, tafel: sleutel, soort, token, at: h.instel.qr[sleutel].at, vernieuwd: !!bestaand };
-  }
+  const plekToken = (zaakcode, naam, opties) => plekcode.geefUit(zaakcode, naam, opties);
+  const trekPlekTokenIn = (zaakcode, naam, opties) => plekcode.trekIn(zaakcode, naam, opties);
   // de oude naam blijft bestaan: gastbeheer.js en de toetsen gebruiken hem
   const tafelToken = (zaakcode, tafel, opties) => plekToken(zaakcode, tafel, Object.assign({ soort: 'tafel' }, opties || {}));
 
   /* Zoek de zaak en de plek bij een gescand token. Loopt over de zaken die een
      QR hebben; dat zijn er in een gewone installatie enkele tientallen en de
      vergelijking gaat over de afdruk, niet over het token. */
-  function zaakBijToken(token) {
-    const t = String(token || '').trim();
-    if (t.length < 12) return null;
-    const h = afdruk(t);
-    for (const [code, doos] of Object.entries(db.data.horeca || {})) {
-      const qr = (doos.instel && doos.instel.qr) || {};
-      for (const [plek, rij] of Object.entries(qr)) {
-        if (rij && (rij.hash === h || rij.token === t)) {
-          return { zaakcode: code, plek, tafel: plek, soort: rij.soort || 'tafel' };
-        }
-      }
-    }
-    return null;
-  }
+  const zaakBijToken = (token) => plekcode.vind(token);
 
   /* ---------- de rekening van een plek ----------
      Er is er hooguit een open per plek; die regel staat al in de
@@ -170,6 +144,6 @@ module.exports = ({ db, save, crypto, schoon, horeca }) => {
     return null;
   }
 
-  return { SOORTEN, plekToken, tafelToken, zaakBijToken,
+  return { SOORTEN, plekToken, tafelToken, trekPlekTokenIn, zaakBijToken,
     rekeningVoorPlek, rekeningVoorTafel, schuifAan, herken, afdruk };
 };

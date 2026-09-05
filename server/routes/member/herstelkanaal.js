@@ -43,27 +43,9 @@ module.exports = (kern) => {
     try { if (handelingsspoor) handelingsspoor.leg(req.session.key, wat, extra || {}); } catch (e) {}
   };
 
-  /* ------------------------------------------------------------------------
-     HET HERSTELKANAAL WIJZIGEN.
-
-     Deze route bestaat omdat accounts.setPhone een VERVANGING weigert zonder
-     her-authenticatie: het nummer is de weg waarlangs /api/auth/reset een sms
-     stuurt, en dat verleggen is de eerste stap van een accountovername.
-
-     Hij vraagt hetzelfde als /api/auth/password: het huidige wachtwoord. Dat is
-     geen nieuwe drempel maar het rechttrekken van een scheve: het wachtwoord
-     WIJZIGEN eiste al een bevestiging, terwijl het herstelkanaal -- dat je nodig
-     hebt om het wachtwoord te resetten -- zonder bevestiging te vervangen was.
-
-     Hij staat hier en niet bij /api/gegevens: dat gesprek gaat over een
-     bestelling en hoort geen wachtwoord te vragen. Twee verschillende
-     handelingen op twee verschillende plekken, elk met de zwaarte die erbij
-     hoort.
-
-     WAT DIT NIET IS: een tweede plek waar een nummer kan worden gezet. Het
-     EERSTE nummer zetten kan gewoon in het gesprek en bij de onboarding -- daar
-     is nog geen kanaal om te kapen. Deze route is er alleen voor vervangen.
-     ---------------------------------------------------------------------- */
+  /* Alleen het vervangen van een bestaand herstelnummer loopt hier. De kern
+     eist de vlag én deze route zet haar pas na herauthenticatie. Een eerste
+     nummer invullen blijft onderdeel van onboarding en gegevensgesprek. */
   app.post('/api/mijn/herstelkanaal/telefoon', auth, async (req, res) => {
     if (!eisLid(req, res)) return;
     const u = req.session.account;
@@ -124,10 +106,14 @@ module.exports = (kern) => {
        alvast kijken zou dit een manier maken om te ontdekken welke adressen een
        RTG-account hebben, en dat is precies de vraag die de kluis niet hoort te
        beantwoorden. */
-    const md = accounts.getMemberState(u.id) || {};
-    md.mailwissel = { naar: nieuw, tot: klok.nu() + WISSEL_MS };
-    accounts.saveMemberState(u.id, md);
     const tok = accounts.issueActionToken(u.id, 'mailwissel', WISSEL_MS);
+    const md = accounts.getMemberState(u.id) || {};
+    /* Bind de link aan precies deze aanvraag. Een oudere link voor adres A mag
+       nooit een later aangevraagd adres B kunnen bevestigen. Alleen de hash
+       ligt in het dossier; de ruwe geloofsbrief gaat eenmaal naar de mailbox. */
+    md.mailwissel = { naar: nieuw, tot: klok.nu() + WISSEL_MS,
+      bewijs: accounts.hashActiebewijs(tok) };
+    accounts.saveMemberState(u.id, md);
     const url = appUrl(req) + '/apps/app.html?mailwissel=' + tok;
     try {
       mail.send(nieuw, 'Bevestig uw nieuwe e-mailadres bij Rahul Travel Group',
@@ -148,7 +134,8 @@ module.exports = (kern) => {
 
   /* De bevestiging komt uit de mailbox van het NIEUWE adres en dus zonder
      sessie: dat is het hele punt -- hij bewijst dat iemand daar bij kan. */
-  app.post('/api/mijn/herstelkanaal/email/bevestig', (req, res) => {
+  app.post('/api/mijn/herstelkanaal/email/bevestig', async (req, res, next) => {
+    try {
     const u = accounts.verifyActionToken(req.body.token, 'mailwissel');
     if (!u) return res.status(400).json({ error: 'Ongeldige of verlopen bevestigingslink.' });
     const md = accounts.getMemberState(u.id) || {};
@@ -156,16 +143,22 @@ module.exports = (kern) => {
     if (!w || !w.naar || Number(w.tot || 0) < klok.nu()) {
       return res.status(400).json({ error: 'Er staat geen wijziging meer open.' });
     }
+    if (!accounts.kloptActiebewijs(w.bewijs, req.body.token)) {
+      return res.status(400).json({ error: 'Deze bevestigingslink hoort niet bij de openstaande wijziging.' });
+    }
     const uit = accounts.setEmail(u.id, w.naar, { vervangenMag: true });
     if (uit && uit.error === 'inGebruik') {
       return res.status(409).json({ error: 'Dit adres hoort inmiddels bij een ander RTG-account.' });
     }
     if (!uit || uit.error) return res.status(400).json({ error: (uit && uit.reden) || 'Kon het adres niet wijzigen.' });
+    accounts.setEmailVerified(u.id);
+    delete md.emailBevestiging;
     delete md.mailwissel;
     accounts.saveMemberState(u.id, md);
-    /* Het token is voor EEN keer. Zonder dit blijft de link een dag lang
-       bruikbaar, en een mailbox is precies de plek waar zoiets blijft liggen. */
-    try { accounts.trekInActie(req.body.token, 'mailwissel'); } catch (e) {}
+    /* Een bevestigingstoken is eenmalig. */
+    await accounts.trekInActie(req.body.token, 'mailwissel');
+    if (accounts.wachtIntrekkingen) await accounts.wachtIntrekkingen();
     res.json({ ok: true, gevolg: 'Uw inlognaam is nu dit adres. Log de volgende keer hiermee in.' });
+    } catch (e) { next(e); }
   });
 };

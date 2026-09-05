@@ -82,6 +82,11 @@ function maakRtfWallet({ db, save, accounts, ensureSupplierDefaults, makeSupplie
     const naam = schoon(b.naam, 80) || 'RTFoundation';
     const beheerder = schoon(b.beheerder, 60);
     if (!beheerder) return { status: 400, error: 'Op wiens naam komt de eerste beheer-inlog te staan? Zonder mens is er niemand die kan uitbetalen.' };
+    const beheerLid = accounts.findByLogin(schoon(b.beheerderLogin, 120));
+    const legacyPin = !!(accounts.legacyStaffPinToegestaan && accounts.legacyStaffPinToegestaan());
+    if ((!beheerLid || (accounts.isActief && !accounts.isActief(beheerLid))) && !legacyPin)
+      return { status: 409, error: 'Koppel de beheerder aan een bestaand actief persoonlijk RTG-account.',
+        uitleg: 'Vul diens persoonlijke RTG-login in. Voor de stichting wordt geen aparte personeelspin uitgegeven.' };
 
     const code = makeSupplierCode(naam);
     const s = { code, name: naam, type: GENRE, city: schoon(b.plaats, 60) || null, loc: null,
@@ -109,8 +114,14 @@ function maakRtfWallet({ db, save, accounts, ensureSupplierDefaults, makeSupplie
       if (!r || !r.ok) wereldFout = (r && r.error) || 'onbekend';
     } catch (e) { wereldFout = String((e && e.message) || e); }
 
-    const pin = accounts.makePin();
-    await accounts.createStaff({ supplierCode: code, name: beheerder, role: 'manager', func: 'Beheer', pin });
+    const pin = legacyPin ? accounts.makePin() : null;
+    if (legacyPin) {
+      await accounts.createStaff({ supplierCode: code, name: beheerder, role: 'manager',
+        func: 'Beheer', pin, ...(beheerLid ? { memberId: beheerLid.id, memberTier: beheerLid.tier } : {}) });
+    } else {
+      accounts.createAccountStaff({ supplierCode: code, name: beheerder, role: 'manager',
+        func: 'Beheer', memberId: beheerLid.id, memberTier: beheerLid.tier });
+    }
 
     /* GRENDEL 4: de ontvanger invullen, de schakelaar laten staan. */
     let giftFout = null;
@@ -121,8 +132,11 @@ function maakRtfWallet({ db, save, accounts, ensureSupplierDefaults, makeSupplie
       if (g && g.error) giftFout = g.error;
     } catch (e) { giftFout = String((e && e.message) || e); }
 
-    return { ok: true, wallet: beeld(bestaande()), code, pin, wereldFout, giftFout,
-      vervolg: 'De positie staat er. Geef de code en de PIN aan de beheerder van de stichting; die stelt in de partner-app de bankrekening in en kan daarna uitbetalen. De giftstand staat nog zoals hij stond -- die zet u zelf om.' };
+    return { ok: true, wallet: beeld(bestaande()), code, ...(legacyPin ? { pin } : {}),
+      toegang: legacyPin ? 'magnaat-test-pin' : 'persoonlijk-rtg-account', wereldFout, giftFout,
+      vervolg: legacyPin
+        ? 'De testpositie staat er. Geef de testcode en test-PIN aan de beheerder.'
+        : 'De positie staat er. De beheerder logt met het gekoppelde persoonlijke RTG-account in, stelt de bankrekening in en kan daarna uitbetalen. De giftstand staat nog zoals hij stond -- die zet u zelf om.' };
   }
 
   return { rtfWallet: { stand, maak, GENRE } };

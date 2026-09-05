@@ -7,6 +7,7 @@
    hij met dit antwoord mag doen?
    ========================================================================== */
 'use strict';
+const { isEenmalig } = require('../lib/eenmalig-geheim-routes');
 
 module.exports = function koppen({ app }) {
   app.use((req, res, next) => {
@@ -24,7 +25,17 @@ module.exports = function koppen({ app }) {
        URL vast in zijn access log. Onze eigen logger doet dat niet (die schrijft
        req.path, zonder querystring; test/loghygiene.test.js bewaakt het), maar
        de proxy moet apart worden ingesteld -- zie PRODUCTION.md. */
-    res.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+    /* De twee pagina's die een eenmalige uitnodiging uit een fragment in
+       geheugen nemen, krijgen ook op HTTP-niveau de strengste regel. De meta
+       in de pagina werkt pas nadat het document is gelezen; deze kop geldt al
+       voor de navigatie zelf en blijft overeind bij een vroege scriptfout. */
+    const geheimFragment = req.path === '/apps/app.html' || req.path === '/apps/reisuitnodiging.html' ||
+      req.path === '/apps/spelscherm.html';
+    res.set('Referrer-Policy', geheimFragment ? 'no-referrer' : 'strict-origin-when-cross-origin');
+    if (isEenmalig(req.method, req.path)) {
+      res.set('Cache-Control', 'no-store');
+      res.set('Pragma', 'no-cache');
+    }
     // 9+-hardening: eigen vensters delen geen proces met vreemden (COOP), onze
     // bestanden zijn niet als bron voor andere sites bruikbaar (CORP), de
     // browser lekt geen DNS-voorkennis, en gevoelige browser-API's staan

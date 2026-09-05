@@ -180,7 +180,10 @@ test('2. het bord van de chauffeur: de eigen vloot, en een rit die nog op de mar
 
   const na = await api('/api/staff/mob/mijn', {}, taxiPda);
   assert.ok(na.body.open.some(o => o.ref === ref), 'de aanvraag staat als open werk op het bord');
-  assert.deepEqual(na.body.lopend, [], 'maar er rijdt nog niets: hij is van niemand');
+  assert.equal(na.body.lopend.some(o => o.ref === ref), false,
+    'maar deze aanvraag rijdt nog niet: hij is van niemand');
+  assert.equal(na.body.open.concat(na.body.lopend).filter(o => o.ref === ref).length, 1,
+    'de aanvraag staat precies één keer op het bord');
   const buur = await api('/api/staff/mob/mijn', {}, ovPda);
   assert.ok(buur.body.open.some(o => o.ref === ref), 'de markt is voor elke vervoerder in dezelfde stad');
   assert.deepEqual(buur.body.vloot, [], 'maar de vloot van MKKX is niet die van de buurzaak');
@@ -189,6 +192,10 @@ test('2. het bord van de chauffeur: de eigen vloot, en een rit die nog op de mar
 test('3. de positieprik: alleen op de eigen rit, en alleen met een echt punt', async () => {
   const opMarkt = await api('/api/staff/mob/positie', { ref, lat: 38.9, lng: 1.43 }, taxiPda);
   assert.equal(opMarkt.status, 403, 'een rit die nog op de markt ligt, is ook niet van jou om op te prikken');
+
+  const buurVoor = await api('/api/staff/mob/mijn', {}, ovPda);
+  assert.ok(buurVoor.body.open.some(o => o.ref === ref),
+    'vóór toewijzing ziet de buur de concrete rit nog op de gedeelde markt');
 
   const toe = await api('/api/supplier/mob/toewijzen', { ref }, taxiBaas);
   assert.equal(toe.status, 200, toe.body.error || '');
@@ -230,7 +237,7 @@ test('3. de positieprik: alleen op de eigen rit, en alleen met een echt punt', a
   assert.deepEqual(volg.body.positie, prikPositie, 'en de reiziger ziet waar zijn taxi is');
 
   const buur = await api('/api/staff/mob/mijn', {}, ovPda);
-  assert.ok(!buur.body.open.concat(buur.body.lopend).some(o => o.ref === ref),
+  assert.equal(buur.body.open.concat(buur.body.lopend).some(o => o.ref === ref), false,
     'een toegewezen rit is voor de buurzaak van de markt af en komt nergens bij hem terug');
 });
 

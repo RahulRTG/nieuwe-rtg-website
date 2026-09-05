@@ -5,6 +5,8 @@
    naar de bank, en het pad waarlangs een lid een zaak rechtstreeks betaalt. Dat
    is een andere beweging dan deze: hier geeft een lid een KASSA toestemming, en
    daar betaalt hij zelf. Krijgt de gedeelde ctx van kern/pay/index.js. */
+const moneyCredentialBlokkade = require('../../middleware/money-credential-productiepoort').blokkade;
+
 module.exports = (ctx) => {
   const { crypto, save, nu, kascodes, grootboek, rekLid, rekPartner, saldoVan,
     metIdem, boekAsync, betaalUit, seintje, betaaldienstKosten, opdrachten, db,
@@ -25,6 +27,8 @@ module.exports = (ctx) => {
 
   /* ---------- de kassacode: contactloos bij de partner ---------- */
   function kasCode({ codenaam, maxCenten }) {
+    const dicht = moneyCredentialBlokkade('pay.kascode_en_vooraf');
+    if (dicht) return dicht;
     const max = Math.min(KASCODE_MAX, Math.max(100, Math.round(Number(maxCenten) || 15000)));
     // oude codes van dit lid vervallen: er is altijd maar een code actief
     for (const k of kascodes()) if (k.codenaam === codenaam && !k.gebruikt) k.gebruikt = true;
@@ -45,11 +49,14 @@ module.exports = (ctx) => {
      alleen te bereiken met een geldig ondertekend capability-token, en dat token
      is aan EEN code gebonden. */
   function kasStand(code) {
+    if (moneyCredentialBlokkade('pay.kascode_en_vooraf')) return null;
     const k = kascodes().find(x => x.code === String(code || '').toUpperCase().trim());
     if (!k || k.gebruikt || k.geldigTot < nu()) return null;
     return { maxCenten: k.maxCenten, geldigTot: k.geldigTot };
   }
   async function kasInt({ supplierCode, code, centen, oms, idem, genre }) {
+    const dicht = moneyCredentialBlokkade('pay.kascode_en_vooraf');
+    if (dicht) return dicht;
     const k = kascodes().find(x => x.code === String(code || '').toUpperCase().trim());
     if (!k || k.gebruikt || k.geldigTot < nu()) return { status: 404, error: 'Deze betaalcode is niet (meer) geldig.' };
     const c = Math.round(Number(centen));

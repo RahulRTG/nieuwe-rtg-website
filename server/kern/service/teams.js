@@ -42,25 +42,33 @@
                   capability zonder caller). */
 const GROND = {
   'zaak.lezen': 'zetel',
-  'lid.dossier': 'bevestiging',
-  'gegevens.uitvoer': 'bevestiging',
-  'betaling.stand': 'bevestiging',
-  'bank.gegevens': 'bevestiging',
-  'geld.compensatie': 'bevestiging',
-  'identiteit.uitdaging': 'bevestiging',
-  'identiteit.openen': 'bevestiging',
-  'organisatie.stand': 'bevestiging',
-  'incident.koppelen': 'bevestiging'
+  'organisatie.stand': 'bevestiging'
 };
 
+/* NIET ACTIEF IS OOK EEN STAND. Deze namen stonden in GROND en TEAMS en kwamen
+   daardoor als echte keuzes in de service-UI, terwijl geen enkele route de
+   bevestiging met magNu() uitleest. Ze blijven hier alleen als besluitspoor;
+   dit object wordt niet door teVragen, machtiging of UI gelezen. Een naam mag
+   pas terug naar GROND + TEAMS in dezelfde wijziging als haar echte lezer. */
+const NIET_ACTIEF = Object.freeze({
+  'lid.dossier': 'geen lezer',
+  'gegevens.uitvoer': 'geen lezer',
+  'betaling.stand': 'geen lezer',
+  'bank.gegevens': 'geen lezer',
+  'geld.compensatie': 'geen lezer',
+  'identiteit.uitdaging': 'geen lezer',
+  'identiteit.openen': 'geen lezer',
+  'incident.koppelen': 'geen lezer'
+});
+
 const TEAMS = {
-  leden:      { naam: 'Service · Leden',        capabilities: ['zaak.lezen', 'lid.dossier', 'gegevens.uitvoer'] },
-  betalingen: { naam: 'Service · Betalingen',   capabilities: ['zaak.lezen', 'betaling.stand', 'bank.gegevens', 'geld.compensatie'] },
-  toegang:    { naam: 'Service · Toegang',      capabilities: ['zaak.lezen', 'identiteit.uitdaging', 'identiteit.openen'] },
-  zakelijk:   { naam: 'Service · Zakelijk',     capabilities: ['zaak.lezen', 'organisatie.stand', 'bank.gegevens'] },
-  techniek:   { naam: 'Service · Techniek',     capabilities: ['zaak.lezen', 'incident.koppelen'] },
+  leden:      { naam: 'Service · Leden',        capabilities: ['zaak.lezen'] },
+  betalingen: { naam: 'Service · Betalingen',   capabilities: ['zaak.lezen'] },
+  toegang:    { naam: 'Service · Toegang',      capabilities: ['zaak.lezen'] },
+  zakelijk:   { naam: 'Service · Zakelijk',     capabilities: ['zaak.lezen', 'organisatie.stand'] },
+  techniek:   { naam: 'Service · Techniek',     capabilities: ['zaak.lezen'] },
   concierge:  { naam: 'De Rechterhand',         capabilities: ['zaak.lezen'] },
-  veiligheid: { naam: 'Service · Veiligheid',   capabilities: ['zaak.lezen', 'identiteit.openen'] }
+  veiligheid: { naam: 'Service · Veiligheid',   capabilities: ['zaak.lezen'] }
 };
 
 /* Wat een team via een BEVESTIGING kan vragen: de tabel min wat de zetel al
@@ -86,4 +94,4 @@ const ONDERWERPEN = {
   anders:     { naam: 'Iets anders',                 team: 'leden' }
 };
 
-module.exports = { TEAMS, ONDERWERPEN, GROND, teVragen };
+module.exports = { TEAMS, ONDERWERPEN, GROND, NIET_ACTIEF, teVragen };

@@ -89,7 +89,7 @@ function misserGeteld() {
   /* De envelop zegt hoe gevoelig dit bericht is (regel van main, 27 augustus
      2026: elke plek die zelf een bericht samenstelt, classificeert het).
      Dit is een instance-naam en een teller -- intern, geen persoonsgegeven. */
-  if (bus) { try { bus.publish(KANAAL, { van: IK, envelop: { classificatie: 'intern' } }); } catch (e) { /* de rem staat al */ } }
+  if (bus) { try { (bus.publishDirect || bus.publish)(KANAAL, { van: IK, envelop: { classificatie: 'intern' } }); } catch (e) { /* de rem staat al */ } }
 }
 
 /* Eenmalig aansluiten bij het opstarten (server/opzet/diensten.js). Een tweede

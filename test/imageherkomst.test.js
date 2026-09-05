@@ -49,6 +49,13 @@ test('dpkg-uitvoer wordt een gesorteerde pakketlijst, en half-geinstalleerde reg
   assert.ok(!uit.some(p => p.naam === 'weggehaald'), 'een pakket zonder versie is niet geinstalleerd');
 });
 
+test('Alpine-pakketten uit het backupimage behouden naam en volledige versie', () => {
+  const uit = H.leesApk('busybox-1.37.0-r12\nlibcrypto3-3.5.2-r0\ngeen-versie\n');
+  assert.deepStrictEqual(uit.map(p => [p.naam, p.versie, p.apk]), [
+    ['busybox', '1.37.0-r12', true], ['libcrypto3', '3.5.2-r0', true]
+  ]);
+});
+
 test('Cargo.lock levert elke crate met zijn checksum, en de eigen crate zonder', () => {
   const crates = H.leesCargoLock([
     '[[package]]', 'name = "rtg-motor"', 'version = "0.1.0"', '',
@@ -187,6 +194,17 @@ test('een handtekening van een VREEMDE sleutel telt niet', () => {
   assert.strictEqual(r.ok, false, 'wie zelf een sleutel meebrengt, tekent voor niemand');
 });
 
+test('de publicatievoorcheck bewijst dat private en vastgelegde publieke sleutel bij elkaar horen', () => {
+  const echte = H.nieuweSleutel();
+  const vreemde = H.nieuweSleutel();
+  const prive = crypto.createPrivateKey(echte.prive);
+  assert.equal(H.sleutelpaarKlopt(prive, echte.publiek), true);
+  assert.equal(H.sleutelpaarKlopt(prive, vreemde.publiek), false,
+    'een geldig maar vreemd vertrouwensanker werd geaccepteerd');
+  assert.equal(H.sleutelpaarKlopt(prive, 'geen sleutel'), false,
+    'onleesbare sleutelinvoer werd geaccepteerd');
+});
+
 test('zonder vastgelegde publieke sleutel is een handtekening geen bewijs', () => {
   const sleutel = H.nieuweSleutel();
   const sbomBytes = Buffer.from(JSON.stringify(stuklijst()));
@@ -204,6 +222,19 @@ test('een document zonder handtekening komt er niet mee weg', () => {
   const r = H.controleerHerkomst({ document: doc, sbomBytes, publiekPem: sleutel.publiek });
   assert.strictEqual(r.ok, false);
   assert.ok(r.klachten.some(k => k.includes('geen handtekening')));
+});
+
+test('een ander algoritmelabel of niet-Ed25519 vertrouwensanker wordt geweigerd', () => {
+  const sleutel = H.nieuweSleutel();
+  const sbomBytes = Buffer.from(JSON.stringify(stuklijst()));
+  const doc = getekendDocument(sbomBytes, sleutel);
+  doc.handtekening.algoritme = 'rsa';
+  assert.equal(H.controleerHerkomst({ document:doc, sbomBytes,
+    publiekPem:sleutel.publiek }).ok, false);
+  const rsa = crypto.generateKeyPairSync('rsa', { modulusLength:2048 }).publicKey
+    .export({ type:'spki', format:'pem' });
+  assert.equal(H.controleerHerkomst({ document:getekendDocument(sbomBytes, sleutel),
+    sbomBytes, publiekPem:rsa }).ok, false);
 });
 
 /* DE CONTROLE DIE OP DE MACHINE TELT. Een geldige handtekening onder een ANDER

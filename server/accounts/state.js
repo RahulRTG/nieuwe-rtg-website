@@ -11,7 +11,7 @@
    altijd met RING[0]; lezen probeert de sleutels op volgorde, zodat blobs van voor
    een rotatie gewoon opengaan. VAULT is altijd de laatste in de ring. Zonder
    rotatie is RING dus [VAULT] en gedraagt alles zich als voorheen. */
-module.exports = { db: null, SECRET: null, VAULT: null, RING: null };
+module.exports = { db: null, DB_FILE: null, SECRET: null, VAULT: null, RING: null };
 
 /* ============================================================================
    VOORBEREIDE STATEMENTS, EEN KEER PER ZIN.
@@ -39,10 +39,28 @@ module.exports = { db: null, SECRET: null, VAULT: null, RING: null };
    statements van de vorige handle gebruiken -- en dat faalt niet netjes. */
 let _cacheDb = null;
 let _cache = new Map();
+const duurzaamheid = require('./duurzaamheid');
+
+function schakelStatement(sql) {
+  const perDb = new WeakMap();
+  const pak = (schrijft) => {
+    if (schrijft) duurzaamheid.eisMutatie(String(sql).trim().split(/\s+/).slice(0, 3).join(' '));
+    const doelDb = duurzaamheid.transactieDatabase() || module.exports.db;
+    let s = perDb.get(doelDb);
+    if (!s) { s = doelDb.prepare(sql); perDb.set(doelDb, s); }
+    return s;
+  };
+  return {
+    run: (...args) => pak(duurzaamheid.isAccountSchrijfzin(sql)).run(...args),
+    get: (...args) => pak(false).get(...args),
+    all: (...args) => pak(false).all(...args),
+    iterate: (...args) => pak(false).iterate(...args)
+  };
+}
 module.exports.zin = function zin(sql) {
   if (_cacheDb !== module.exports.db) { _cache = new Map(); _cacheDb = module.exports.db; }
   let s = _cache.get(sql);
-  if (!s) { s = module.exports.db.prepare(sql); _cache.set(sql, s); }
+  if (!s) { s = schakelStatement(sql); _cache.set(sql, s); }
   return s;
 };
 /* Voor toetsen en onderhoud: hoeveel zinnen staan er klaar VOOR DE HUIDIGE
@@ -51,3 +69,7 @@ module.exports.zin = function zin(sql) {
    die iets anders zegt dan de cache doet. Bewust zonder bijwerking: een meter
    die de staat verandert die hij meet, is geen meter. */
 module.exports.zinnen = () => (_cacheDb === module.exports.db ? _cache.size : 0);
+/* De requestwerkkopie, als die bestaat; anders de bevestigde lokale cache.
+   Alleen code die een expliciete SQLite-transactie om meerdere S.zin-aanroepen
+   legt heeft dit nodig. Gewone aanroepers blijven via zin() lopen. */
+module.exports.huidigeDb = () => duurzaamheid.transactieDatabase() || module.exports.db;

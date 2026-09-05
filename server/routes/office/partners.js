@@ -1,12 +1,13 @@
 /* Backoffice (deelmodule): partner- en schoolbesluiten en het vertrouwenskanaal met het personeel.
    Draait op de gedeelde kern; gemount vanuit routes/office.js. */
 const { datum: klokDatum } = require('../../lib/klok');
+const { idVanKey } = require('../../lib/lidsleutel');
 const toelatingscontrole = require('../../kern/bedrijfscontrole');
 
 module.exports = (octx) => {
   const { kern } = octx;
   const { accounts, app, appUrl, boardroomAuth, boardroomWie, db, ensureSupplierDefaults, findSupplier,
-          forgetSession, logActivity, mail, makeSupplierCode, save, sessions, schoon,
+          forgetSessionDuurzaam, logActivity, mail, makeSupplierCode, save, sessions, schoon,
           sseClients, sseSend, sseToOffice, sseToSupplier } = kern;
 app.post('/api/office/partner/decide', boardroomAuth, async (req, res) => {
   const a = db.data.partnerApplications.find(x => x.id === req.body.id);
@@ -20,6 +21,15 @@ app.post('/api/office/partner/decide', boardroomAuth, async (req, res) => {
     const bewijs = a.pas || a.businessPass;
     if (!bewijs || !bewijs.key)
       return res.status(409).json({ error: 'Deze aanvraag heeft geen ledenbewijs; zonder pas geen bedrijfscode. Vraag de aanvrager de aanvraag opnieuw te doen terwijl hij is ingelogd met zijn pas.' });
+    const legacyPin = !!(accounts.legacyStaffPinToegestaan && accounts.legacyStaffPinToegestaan());
+    const beheerLidId = idVanKey(bewijs.key);
+    const beheerLid = beheerLidId != null ? accounts.getUserById(beheerLidId) : null;
+    /* Oude persona-passen hebben geen account-id. Zij mogen uitsluitend in de
+       expliciete Magnaat Test-omgeving de oude PIN-fixture blijven gebruiken;
+       in iedere echte omgeving is een levende persoonlijke accountbinding een
+       harde voorwaarde voordat de zaak ook maar wordt aangemaakt. */
+    if ((!beheerLid || (accounts.isActief && !accounts.isActief(beheerLid))) && !legacyPin)
+      return res.status(409).json({ error: 'Het RTG-account van de aanvrager is niet meer actief. Laat de eigenaar de aanvraag vanuit het eigen account opnieuw indienen.' });
 
     /* EN HET TOELATINGSDOSSIER, want een ledenbewijs is niet hetzelfde als een
        afgeronde controle. Deze poort kwam met de samenvoeging mee in een tweede
@@ -58,23 +68,31 @@ app.post('/api/office/partner/decide', boardroomAuth, async (req, res) => {
       const trede = (bewijs && bewijs.tier) || (a.businessPass && a.businessPass.pas);
       if (trede && kern.zaakAbonnement) kern.zaakAbonnement.zet(code, trede, 'partner-goedkeuring');
     } catch (e) { /* een abonnement dat niet landt, mag de goedkeuring niet blokkeren */ }
-    const pin = accounts.makePin();
-    await accounts.createStaff({ supplierCode: code, name: a.contactName, role: 'manager', func: 'Beheer', pin });
+    const pin = legacyPin ? accounts.makePin() : null;
+    if (legacyPin) {
+      await accounts.createStaff({ supplierCode: code, name: a.contactName, role: 'manager',
+        func: 'Beheer', pin,
+        ...(beheerLid ? { memberId: beheerLid.id, memberTier: beheerLid.tier } : {}) });
+    } else {
+      accounts.createAccountStaff({ supplierCode: code, name: a.contactName, role: 'manager',
+        func: 'Beheer', memberId: beheerLid.id, memberTier: beheerLid.tier });
+    }
     a.status = 'goedgekeurd'; a.code = code;
     save();
     const url = appUrl(req);
     mail.send(a.email, 'Welkom als partner van Rahul Travel Group',
       'Beste ' + a.contactName + ',\n\n' + a.company + ' is goedgekeurd als RTG-partner.\n\n' +
-      'Uw leverancierscode: ' + code + '\nUw manager-PIN: ' + pin + ' (op naam van ' + a.contactName + ')\n\n' +
-      'Open de partner-app op ' + url + '/apps/leverancier.html, kies uw bedrijf via de code, ' +
-      'log in als management met uw PIN en stel uw pagina, menukaart en team in.\n\n' +
+      'Uw leverancierscode: ' + code + '\n\n' +
+      'Open de partner-app op ' + url + '/apps/leverancier.html en log in met hetzelfde persoonlijke RTG-account waarmee u de aanvraag indiende. ' +
+      'Uw managementwerkplek staat daar direct klaar.\n\n' +
       'Uw zaak staat nog offline. Loop eerst even de ondernemer-poort door: vul uw ' +
       'Salon-pagina (een bio en een foto) en volg de korte rondleidingen door de kassa ' +
       'en de werk-apps. Daarna zet u uw zaak zelf online en bent u zichtbaar voor leden.\n\n' +
       'Uw bedrijfsaccount op De Salon is direct aangemaakt; dit is een vast onderdeel van elk RTG-partnerschap. ' +
       'Via Kantoor, Marketing stelt u uw profiel in, plaatst u berichten, aanbiedingen en polls, en ziet u uw volgers en cijfers.\n\nRahul Travel Group');
     sseToOffice('sync', { scope: 'team' });
-    return res.json({ ok: true, code, pin });
+    return res.json({ ok: true, code, ...(legacyPin ? { pin } : {}),
+      toegang: 'persoonlijk-rtg-account' });
   }
   a.status = 'afgewezen';
   save();
@@ -89,7 +107,7 @@ app.post('/api/office/partner/decide', boardroomAuth, async (req, res) => {
    alleen nieuwe logins dicht, maar wist ook alle bestaande sessies en sluit
    open liveverbindingen. De centrale supplierAuth controleert de status bij
    ieder verzoek als tweede slot voor processen met oud sessiegeheugen. */
-app.post('/api/office/partner/status', boardroomAuth, (req, res) => {
+app.post('/api/office/partner/status', boardroomAuth, async (req, res) => {
   const code = String((req.body || {}).code || '').trim().toUpperCase();
   const status = String((req.body || {}).status || '').trim().toLowerCase();
   const reden = schoon((req.body || {}).reden, 240);
@@ -112,7 +130,9 @@ app.post('/api/office/partner/status', boardroomAuth, (req, res) => {
     const hashes = [];
     for (const [hash, sess] of sessions)
       if (sess && sess.role === 'supplier' && String(sess.code || '').toUpperCase() === code) hashes.push(hash);
-    for (const hash of hashes) { forgetSession(hash); ingetrokken += 1; }
+    for (const hash of hashes) {
+      if (await forgetSessionDuurzaam(hash)) ingetrokken += 1;
+    }
     for (let i = sseClients.length - 1; i >= 0; i--) {
       const client = sseClients[i];
       if (!client || String(client.sup || '').toUpperCase() !== code) continue;

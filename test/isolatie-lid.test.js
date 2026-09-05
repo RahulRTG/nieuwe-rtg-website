@@ -337,15 +337,17 @@ test('8. het scherm belooft niet meer dan de code doet', async () => {
      stond. Een toets die het verkeerde proces vraagt, geeft dekking zonder te
      dekken.
 
-     De bron zegt het wel: `zetLaag(isolatie)` ZONDER `{ afdwingen: true }` is de
-     schaduwstand. Zodra iemand die vlag ergens omzet, hoort deze toets te zakken
-     tot ook de verwachting is bijgewerkt -- dat is precies de bedoeling, want de
-     vlag omzetten is een besluit en geen configuratiedetail. */
+     De bron zegt het wel: de route geeft de expliciet gekeurde omgevingsstand
+     door. In deze testomgeving ontbreekt die vlag en blijft het kind dus bewust
+     in schaduw; productie mag inmiddels niet meer starten zonder waarde `1`. */
   const bronnen = ['server/routes/isolatie.js', 'server/routes/techniek/isolatie.js']
     .map(f => fs2.readFileSync(path2.join(__dirname, '..', f), 'utf8')).join('\n');
-  const meldt = /zetLaag\(isolatie\)/.test(bronnen);
-  const dwingtAf = /zetLaag\(isolatie,\s*\{[^}]*afdwingen:\s*true/.test(bronnen);
+  const meldt = /zetLaag\(isolatie(?:,|\))/.test(bronnen);
+  const uitOmgeving = /afdwingenUitOmgeving\(process\.env\)/.test(bronnen);
+  const dwingtAf = /zetLaag\(isolatie,\s*\{[^}]*afdwingen:\s*true/.test(bronnen) ||
+    (uitOmgeving && process.env.RTG_ISOLATIE_AFDWINGEN === '1');
   assert.ok(meldt, 'de isolatielaag hoort zich bij de HTTP-poort aan te melden');
+  assert.ok(uitOmgeving, 'de route hoort de gekeurde omgevingsstand te gebruiken');
 
   /* DRIE STANDEN, EN ELK HEEFT ZIJN EIGEN ZIN. De middelste glijdt het makkelijkst
      weg: een poort die MEELOOPT is gemonteerd en dwingt niets af, en wie die twee

@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '04be3a1c';
+var RTG_BOUW = 'abb6f724';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -221,6 +221,11 @@ var RTG_BOUW = '04be3a1c';
      RTG-app, met minder functies. ZONDER ?pas= bestaat er geen brede app
      meer: dan is dit alleen een keuzescherm dat naar de pas-apps verwijst. */
   const zoekParams = new URLSearchParams(location.search);
+  /* app.html heeft het bearer-fragment vóór ieder extern script uit het adres
+     gehaald. Neem het nu uit die korte geheugenoverdracht over en wis ook de
+     globale verwijzing; niets wordt in local/sessionStorage bewaard. */
+  let wervingscode = String(window.__RTG_WERVING_CODE || '').trim().toUpperCase();
+  try { delete window.__RTG_WERVING_CODE; } catch (e) { window.__RTG_WERVING_CODE = null; }
   magnaatProef = zoekParams.get('magnaat') === '1';
   if (magnaatProef) API.enabled = false;
   let vastePas = zoekParams.get('pas');
@@ -429,11 +434,24 @@ var RTG_BOUW = '04be3a1c';
       if (API.enabled){
         try {
           const data = cred.register
-            ? await API.call('/auth/register', { name: cred.name, email: cred.u, phone: cred.phone, geboortedatum: cred.geboortedatum, password: cred.p, tier: cred.tier, pasApp: vastePas || undefined })
+            ? await API.call('/auth/register', { name: cred.name, email: cred.u, phone: cred.phone, geboortedatum: cred.geboortedatum, password: cred.p, tier: cred.tier, pasApp: vastePas || undefined,
+                wervingscode: wervingscode || undefined })
             : await API.call('/auth/login', { login: cred.u, password: cred.p, pasApp: vastePas || undefined });
           API.token = data.token;
           applyState(data.state);           // user = het echte account
           tier = user.tier;
+          /* Registratie wisselt de uitnodiging in dezelfde serverhandeling in.
+             Een terugkerend lid doet dat direct na zijn bewezen login en vóór
+             een eventuele pas-omleiding, zodat het geheim niet opnieuw hoeft
+             te reizen of in browseropslag hoeft te staan. Een verlopen
+             uitnodiging mag een geldige login niet ongedaan maken. */
+          if (wervingscode) {
+            try {
+              if (!data.werk) await API.call('/werving/verbind', { kassacode: wervingscode });
+              toast(data.werk ? 'Uw werkplek staat klaar.' : 'U bent met uw werkgever verbonden.');
+            } catch (wout) { toast(wout.message || 'De personeelsuitnodiging is niet meer geldig.'); }
+            wervingscode = '';
+          }
           // uw account weet zelf bij welke pas hij hoort: zonder ?pas= (of in
           // de verkeerde pas-app) opent meteen de juiste app, zoals de
           // leeftijdskeuze dat bij de RTFoundation doet
@@ -492,6 +510,13 @@ var RTG_BOUW = '04be3a1c';
     API.token = t;
     try {
       applyState((await API.call('/state')).state);
+      if (wervingscode) {
+        try {
+          await API.call('/werving/verbind', { kassacode: wervingscode });
+          toast('U bent met uw werkgever verbonden.');
+        } catch (wout) { toast(wout.message || 'De personeelsuitnodiging is niet meer geldig.'); }
+        wervingscode = '';
+      }
       const doelPas = user.tier === 'guest' ? 'rtg' : user.tier;
       const magHier = vastePas ? (vastePas === 'rtg' ? ['rtg','guest'] : [vastePas]) : [];
       if (!magHier.includes(user.tier)){
@@ -9275,7 +9300,7 @@ var RTG_BOUW = '04be3a1c';
             (it.folder ? '<div style="font-weight:600;margin-top:0.2rem;">' + escT(it.folder.titel) + '</div>' +
               ((it.folder.fotos && it.folder.fotos.length) ? '<div style="display:flex;gap:0.4rem;overflow-x:auto;margin-top:0.45rem;">' + it.folder.fotos.map(f => '<img src="' + f + '" alt="" style="height:90px;border-radius:0;flex-shrink:0;">').join('') + '</div>' : '') +
               ((it.folder.items && it.folder.items.length) ? '<div style="margin-top:0.45rem;display:grid;gap:0.2rem;">' + it.folder.items.map(x => '<div style="display:flex;justify-content:space-between;font-size:0.8rem;"><span>' + escT(x.naam) + '</span>' + (x.prijs != null ? '<span class="h-leesgoud">' + eur2(x.prijs) + '</span>' : '') + '</div>').join('') + '</div>' : '')
-              : (it.deal ? '<div style="font-weight:600;margin-top:0.2rem;">' + escT(it.deal.titel) + (it.deal.mijnCode ? ' · <span class="h-leesgoud">' + it.deal.mijnCode + '</span>' : '') + '</div>'
+              : (it.deal ? '<div style="font-weight:600;margin-top:0.2rem;">' + escT(it.deal.titel) + (it.deal.mijnClaim ? ' · <span class="h-leesgoud">' + escT(it.deal.mijnClaim.status || '') + '</span>' : '') + '</div>'
               : '<div style="font-size:0.85rem;margin-top:0.2rem;">' + escT(it.text || '') + '</div>')) +
             '</div>').join('')
           : '<div style="text-align:center;color:var(--soft);font-size:0.82rem;padding:1.4rem 0;">' + T('sal.etaleeg','Nog geen folders of aanbiedingen.') + '</div>') +
@@ -9297,6 +9322,57 @@ var RTG_BOUW = '04be3a1c';
     const isGuest = user && user.tier === 'guest';
     // RTG Zakelijk: de ingang staat aan voor de Lifestyle en Business Pass
     const zakL = $('#zakLauncher');
+  /* Een Salon-code is een sleutel, geen profielveld. Zij staat daarom alleen
+     in dit vluchtige venster na uitgifte/rotatie en nooit in app-state,
+     localStorage of een volgende API-response. */
+  function toonSalonCode(code){
+    const oud = document.getElementById('salonCodeEenmalig');
+    if (oud) oud.remove();
+    const ov = document.createElement('div');
+    ov.id = 'salonCodeEenmalig';
+    ov.className = 'salon-code-laag';
+    const kaart = document.createElement('div');
+    kaart.className = 'salon-code-kaart';
+    kaart.setAttribute('role', 'dialog');
+    kaart.setAttribute('aria-modal', 'true');
+    kaart.setAttribute('aria-labelledby', 'salonCodeTitel');
+    kaart.innerHTML = '<div id="salonCodeTitel" class="salon-code-titel">' +
+      T('sal.codeeenmalig', 'Uw eenmalige claimcode') + '</div>' +
+      '<p class="salon-code-uitleg">' +
+      T('sal.codeuitleg', 'Bewaar of kopieer deze code nu. Voor uw veiligheid toont RTG haar hierna niet opnieuw.') + '</p>' +
+      '<div id="salonCodeWaarde" class="salon-code-waarde"></div>' +
+      '<div class="salon-code-acties">' +
+      '<button id="salonCodeKopieer" class="knop">' + T('alg.kopieer', 'Kopieer') + '</button>' +
+      '<button id="salonCodeSluit" class="knop secundair">' + T('alg.klaar', 'Klaar') + '</button></div>';
+    ov.appendChild(kaart);
+    document.body.appendChild(ov);
+    kaart.querySelector('#salonCodeWaarde').textContent = String(code || '');
+    const sluit = () => ov.remove();
+    kaart.querySelector('#salonCodeSluit').addEventListener('click', sluit);
+    kaart.querySelector('#salonCodeKopieer').addEventListener('click', async () => {
+      try { await navigator.clipboard.writeText(String(code || '')); toast(T('alg.gekopieerd', 'Gekopieerd.')); }
+      catch (e) { toast(T('sal.kopieermislukt', 'Kopiëren lukte niet. Selecteer de code handmatig.')); }
+    });
+    ov.addEventListener('click', e => { if (e.target === ov) sluit(); });
+    kaart.querySelector('#salonCodeKopieer').focus();
+  }
+  function salonClaimBediening(deal){
+    const c = deal && deal.mijnClaim;
+    if (!c) return '<button class="js-claim salon-claim-hoofd">' +
+      T('sal.claim','Claim deze aanbieding') + '</button>';
+    const labels = { actief: T('sal.claimactief','Claim actief'),
+      verzilverd: T('sal.claimverzilverd','Verzilverd'),
+      ingetrokken: T('sal.claimingetrokken','Ingetrokken'),
+      verlopen: T('sal.claimverlopen','Verlopen'),
+      'legacy-gesloten': T('sal.claimvernieuw','Oude code veilig gesloten'),
+      ongeldig: T('sal.claimongeldig','Code niet actief') };
+    const status = labels[c.status] || T('sal.claimongeldig','Code niet actief');
+    if (c.status === 'verzilverd') return '<div class="salon-claim-status">✓ ' + status + '</div>';
+    return '<div class="salon-claim-status">' + status + '</div>' +
+      '<div class="salon-claim-acties">' +
+      '<button class="js-claim-rotate salon-claim-nieuw">' + T('sal.nieuwecode','Nieuwe code') + '</button>' +
+      (c.status === 'actief' ? '<button class="js-claim-revoke salon-claim-intrek">' + T('sal.trekin','Trek in') + '</button>' : '') + '</div>';
+  }
 /* de zakelijke lade voor Business en Lifestyle */
     if (user && (user.tier === 'business' || user.tier === 'lifestyle')){
       zakL.style.display = 'block';
@@ -9339,9 +9415,7 @@ var RTG_BOUW = '04be3a1c';
         ? '<div style="margin:0.6rem 1.1rem 0;border:1px solid var(--gold);border-radius:0;padding:0.7rem 0.9rem;">' +
           '<div style="font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));">' + T('sal.deal','Exclusief voor leden') + (p.deal.geldigTot ? ' · t/m ' + p.deal.geldigTot : '') + '</div>' +
           '<div style="font-weight:600;font-size:0.9rem;margin-top:0.25rem;">' + p.deal.titel + '</div>' +
-          (p.deal.mijnCode
-            ? '<div style="margin-top:0.45rem;font-size:0.8rem;color:var(--rtg-leesgoud,var(--gold));letter-spacing:0.08em;">' + T('sal.uwcode','Uw code') + ': <b>' + p.deal.mijnCode + '</b> <span style="color:var(--soft);font-size:0.68rem;">· ' + T('sal.toon','toon aan de kassa') + '</span></div>'
-            : '<button class="js-claim" style="margin-top:0.5rem;background:var(--knop);color:var(--knop-txt);border:none;border-radius:0;padding:0.45rem 0.95rem;font-size:0.72rem;font-weight:600;font-family:inherit;cursor:pointer;">' + T('sal.claim','Claim deze aanbieding') + '</button>') +
+          salonClaimBediening(p.deal) +
           '<div style="margin-top:0.35rem;font-size:0.62rem;color:var(--soft);">' + p.deal.claims + ' ' + T('sal.geclaimd','keer geclaimd') + '</div></div>'
         : '';
       const poll = p.poll
@@ -9388,7 +9462,6 @@ var RTG_BOUW = '04be3a1c';
       '</article>';
     }).join('');
     hydrateMsgs($('#feed'));
-
 /* de knoppen onder een Salon-bericht */
     document.querySelectorAll('.post').forEach(el => {
       const post = posts.find(p => p.id === Number(el.dataset.post));
@@ -9415,10 +9488,32 @@ var RTG_BOUW = '04be3a1c';
       const claimBtn = el.querySelector('.js-claim');
       if (claimBtn) claimBtn.addEventListener('click', async () => {
         try {
-          const d = await API.call('/salon/deal/claim', { postId: post.id });
-          toast('' + T('sal.claimok','Geclaimd. Uw code:') + ' ' + d.code);
+          const d = await API.call('/salon/deal/claim', { postId: post.id,
+            idem: RTGIdem('salon-claim') });
+          toonSalonCode(d.code);
           await refreshState();
           renderSalon();
+        } catch(e){ toast(e.message); }
+      });
+      const roteerBtn = el.querySelector('.js-claim-rotate');
+      if (roteerBtn) roteerBtn.addEventListener('click', async () => {
+        try {
+          const d = await API.call('/salon/deal/claim/roteer', { postId: post.id,
+            idem: RTGIdem('salon-claim-rotate') });
+          toonSalonCode(d.code);
+          await refreshState();
+          renderSalon();
+        } catch(e){ toast(e.message); }
+      });
+      const trekBtn = el.querySelector('.js-claim-revoke');
+      if (trekBtn) trekBtn.addEventListener('click', async () => {
+        if (!confirm(T('sal.intrekvraag','Deze claimcode direct ongeldig maken?'))) return;
+        try {
+          await API.call('/salon/deal/claim/intrek', { postId: post.id,
+            idem: RTGIdem('salon-claim-revoke') });
+          await refreshState();
+          renderSalon();
+          toast(T('sal.ingetrokken','Claimcode ingetrokken.'));
         } catch(e){ toast(e.message); }
       });
       const etaBtn = el.querySelector('.js-etalage');

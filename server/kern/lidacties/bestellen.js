@@ -6,6 +6,7 @@
    dit bestand hangt ze alle drie aan dezelfde ctx op. Krijgt die context een
    keer bij het opstarten vanuit kern/lidacties.js. */
 const { servicekostenVoor } = require('../servicekosten');
+const moneyCredentialBlokkade = require('../../middleware/money-credential-productiepoort').blokkade;
 
 module.exports = (ctx) => {
   /* De namen die BETALEN nodig had (fooiUit, pasTegoedToe, verdienPunten,
@@ -17,6 +18,12 @@ module.exports = (ctx) => {
     notifySupplier, sseToSupplier, sseToOffice, zorgVoor, zorgContact, keuken,
     ordersVoegToe, boekingMetRef, boekingenVoegToe, openLijnVoor } = ctx;
 function plaatsOrderVoor(session, body) {
+  /* De ophaalcode is nu nog een ruwe vierteken-bearer die fysieke uitgifte en
+     soms betaling autoriseert. De HTTP-poort sluit de bekende route; deze
+     kerngrendel voorkomt dat een taak, AI-handeling of nieuwe route toch een
+     verse productiecode uitgeeft. */
+  const dicht = moneyCredentialBlokkade('pay.order_pickup_code');
+  if (dicht) return dicht;
   // betalen bij partners mag ook zonder pas (gratis gebruiker)
   const s = findSupplier(body.supplierCode);
   if (!s) return { status: 404, error: 'Leverancier niet gevonden.' };

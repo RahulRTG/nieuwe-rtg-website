@@ -24,10 +24,32 @@
       const claimBtn = el.querySelector('.js-claim');
       if (claimBtn) claimBtn.addEventListener('click', async () => {
         try {
-          const d = await API.call('/salon/deal/claim', { postId: post.id });
-          toast('' + T('sal.claimok','Geclaimd. Uw code:') + ' ' + d.code);
+          const d = await API.call('/salon/deal/claim', { postId: post.id,
+            idem: RTGIdem('salon-claim') });
+          toonSalonCode(d.code);
           await refreshState();
           renderSalon();
+        } catch(e){ toast(e.message); }
+      });
+      const roteerBtn = el.querySelector('.js-claim-rotate');
+      if (roteerBtn) roteerBtn.addEventListener('click', async () => {
+        try {
+          const d = await API.call('/salon/deal/claim/roteer', { postId: post.id,
+            idem: RTGIdem('salon-claim-rotate') });
+          toonSalonCode(d.code);
+          await refreshState();
+          renderSalon();
+        } catch(e){ toast(e.message); }
+      });
+      const trekBtn = el.querySelector('.js-claim-revoke');
+      if (trekBtn) trekBtn.addEventListener('click', async () => {
+        if (!confirm(T('sal.intrekvraag','Deze claimcode direct ongeldig maken?'))) return;
+        try {
+          await API.call('/salon/deal/claim/intrek', { postId: post.id,
+            idem: RTGIdem('salon-claim-revoke') });
+          await refreshState();
+          renderSalon();
+          toast(T('sal.ingetrokken','Claimcode ingetrokken.'));
         } catch(e){ toast(e.message); }
       });
       const etaBtn = el.querySelector('.js-etalage');

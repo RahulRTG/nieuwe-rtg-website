@@ -110,7 +110,9 @@
         .then(function (r) { return r.json(); })
         .then(function (d) {
           if (d.error) return meld(d.error);
-          location.href = '/apps/meet.html#kamer=' + d.code;
+          /* De agenda-uitnodiging geeft al toegang. Alleen de niet-geheime
+             kamer-id reist in de URL; de eenmalige deelcode nooit. */
+          location.href = '/apps/meet.html#kamer=' + encodeURIComponent(d.id);
         }).catch(function () { meld('De vergaderruimte is nu even niet te openen.'); });
     });
 

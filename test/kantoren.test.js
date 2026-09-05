@@ -220,7 +220,7 @@ test('de paniekkamer: een knop wordt een voorstel; de boardroom discussieert en 
   // discussie over en weer
   await api('paniek/bericht', { id: v.body.voorstel.id, wie: 'boardroom', tekst: 'Welke piek precies?' });
   await api('paniek/bericht', { id: v.body.voorstel.id, wie: 'paniekkamer', tekst: 'Honderden mislukte inlogs per minuut.' });
-  const p = (await api('paniek')).body.voorstellen.find(x => x.id === v.body.voorstel.id);
+  const p = (await api('/api/office/paniek')).body.voorstellen.find(x => x.id === v.body.voorstel.id);
   assert.equal(p.discussie.length, 2);
   // de boardroom accepteert: nu pas schakelt hij echt
   assert.ok((await api('paniek/besluit', { id: v.body.voorstel.id, besluit: 'accepteer' })).body.ok);
@@ -236,7 +236,7 @@ test('de paniekkamer: een knop wordt een voorstel; de boardroom discussieert en 
 
 test('platform-statistieken, interne chat met snap en onboarding per kamer', async () => {
   // de statistieken beslaan het hele huis, van mensen tot de code zelf
-  const s = await api('stats');
+  const s = await api('/api/office/stats');
   assert.equal(s.status, 200);
   const groepen = s.body.stats.map(g => g.groep);
   for (const g of ['Mensen', 'Beweging', 'Geld', 'De code zelf']) assert.ok(groepen.includes(g), g);
@@ -251,7 +251,7 @@ test('platform-statistieken, interne chat met snap en onboarding per kamer', asy
   assert.equal(laatste.naam, 'Stagiair Bo');
   assert.ok(laatste.foto && laatste.foto.startsWith('data:image/'), 'de snap kwam mee');
   // onboarding: warm welkom, huisregels, knoppen en handelingen, per kamer
-  const o = await api('onboarding', { kamer: 'sales' });
+  const o = await api('/api/office/onboarding', { kamer: 'sales' });
   assert.equal(o.status, 200);
   assert.match(o.body.onboarding.welkom, /gehoord, gesteund/);
   assert.ok(o.body.onboarding.regels.some(r => /vertrouwenspersoon/i.test(r)), 'de vertrouwenspersoon staat erin');
@@ -266,7 +266,7 @@ test('aanmelden voor de dienst: kantoor of thuis, en iedereen ziet wie er werkt'
   assert.equal(d.body.dienst.waar, 'thuis');
   assert.equal((await api('dienst/in', { naam: 'Stagiair Bo', kamer: 'sales' })).status, 409, 'niet dubbel aanmelden');
   assert.equal((await api('dienst/in', { naam: 'X', kamer: 'kelder' })).status, 404);
-  const nu = await api('dienst');
+  const nu = await api('/api/office/dienst');
   assert.ok(nu.body.aangemeld.some(x => x.naam === 'Stagiair Bo' && x.waar === 'thuis'));
   assert.ok((await api('dienst/uit', { id: d.body.dienst.id })).body.ok);
   assert.ok(!(await api('dienst')).body.aangemeld.some(x => x.naam === 'Stagiair Bo'), 'afgemeld is weg uit de lijst');

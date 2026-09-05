@@ -83,9 +83,8 @@ module.exports = Object.assign((ctx) => {
     return code;
   }
 
-  /* De provisioning zelf: zaak + eigenaarsinlog + wensen. Idempotent --
-     een tweede aanroep doet niets. Geeft de eigenaars-PIN eenmalig terug
-     (die staat alleen gehasht in de kluis). */
+  /* De provisioning zelf: zaak + aan het persoonlijke RTG-account gebonden
+     eigenaarsplek + wensen. Idempotent: een tweede aanroep doet niets. */
   /* De bewijspoort voor de gereguleerde genres (./bewijs.js). Hij staat HIER en
      niet bij de aanroepers: provisioneer() wordt op drie plekken aangeroepen
      (de boardroom, de termijn, de directe weg), en een poort die je per
@@ -98,24 +97,31 @@ module.exports = Object.assign((ctx) => {
        mocht binnenkomen -- een plan indienen is geen beroepsuitoefening -- maar
        de zaak gaat pas klaarstaan als een mens het papier heeft gezien. */
     if (!bewijs.bewijsKlaar(a)) return null;
+    const eigenaar = a.accountId != null ? accounts.getUserById(Number(a.accountId)) : null;
+    const legacyPin = !!(accounts.legacyStaffPinToegestaan && accounts.legacyStaffPinToegestaan());
+    if ((!eigenaar || (accounts.isActief && !accounts.isActief(eigenaar))) && !legacyPin) {
+      return { status: 409,
+        error: 'Deze aanvraag is niet aan een actief persoonlijk RTG-account gebonden.',
+        uitleg: 'Laat de eigenaar de bedrijfsaanvraag opnieuw indienen terwijl die met het eigen RTG-account is ingelogd.' };
+    }
     if (!Array.isArray(db.data.suppliers)) db.data.suppliers = [];
     const code = codeVoor(a.bedrijf.naam);
     db.data.suppliers.push({ code, name: a.bedrijf.naam, type: a.bedrijf.type,
       city: a.bedrijf.plaats || '', loc: null, rate: 0, menu: [], photos: [] });
-    // de eigenaar krijgt een beheer-inlog met een eigen, eenmalig getoonde PIN
-    /* accounts.makePin() en geen Math.random(): dit is de eerste inlog van de
-       eigenaar van een nieuwe zaak, dus een echte credential. Math.random is
-       geen cryptografische bron -- uit een handvol waarnemingen is de staat
-       van de generator af te leiden en daarmee de volgende PIN. Er bestond hier
-       al een huisfunctie voor (crypto.randomInt); deze plek had er stil een
-       tweede naast gezet. */
-    const pin = accounts.makePin();
+    const pin = legacyPin ? accounts.makePin() : null;
     let staffId = null;
     try {
-      const st = accounts.createStaffSync({ supplierCode: code, name: kap(a.naam, 60) || 'Eigenaar',
-        role: 'manager', func: 'Eigenaar', pin });
+      const basis = { supplierCode: code, name: kap(a.naam, 60) || 'Eigenaar',
+        role: 'manager', func: 'Eigenaar',
+        ...(eigenaar ? { memberId: eigenaar.id, memberTier: eigenaar.tier } : {}) };
+      const st = legacyPin ? accounts.createStaffSync({ ...basis, pin })
+        : accounts.createAccountStaff(basis);
       staffId = st && st.id;
-    } catch (e) { console.error('[bedrijf] eigenaarsinlog', e.message); }
+    } catch (e) {
+      db.data.suppliers = db.data.suppliers.filter(s => s.code !== code);
+      console.error('[bedrijf] eigenaarsinlog', e.message);
+      return { status: 503, error: 'De zaak is niet klaargezet omdat de persoonlijke eigenaarswerkplek niet veilig kon worden gemaakt.' };
+    }
     // de behoeften uit de intake landen als open wensen bij de nieuwe zaak
     if (a.bedrijf.behoeften.length) {
       if (!db.data.bedrijfsWensen) db.data.bedrijfsWensen = {};
@@ -124,7 +130,8 @@ module.exports = Object.assign((ctx) => {
     a.gezaakt = { code, staffId, at: nu() };
     a.bijgewerkt = nu();
     save();
-    return { code, staffId, pin };
+    return { code, staffId, ...(legacyPin ? { pin } : {}),
+      toegang: legacyPin ? 'magnaat-test-pin' : 'persoonlijk-rtg-account' };
   }
 
   /* Het personeel tekent een termijn af als voldaan (geen betaalclaim; een
@@ -140,7 +147,15 @@ module.exports = Object.assign((ctx) => {
     t.voldaan = { door: kap(door, 60), at: nu() };
     let zaak = null;
     if (a.status === 'geaccepteerd' && !(rij.termijnen || []).some(x => x.maand < t.maand && x.status !== 'voldaan')) {
-      if (t.maand === 1) zaak = provisioneer(a);
+      if (t.maand === 1) {
+        zaak = provisioneer(a);
+        if (zaak && zaak.error) {
+          t.status = 'open';
+          delete t.voldaan;
+          save();
+          return zaak;
+        }
+      }
     }
     save();
     return { ok: true, maand: t.maand, zaak };

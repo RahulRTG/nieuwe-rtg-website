@@ -53,22 +53,34 @@ module.exports = ({ app, officeAuth, veilig, stuur, afdelingen, kern }) => {
      Het voorlezen bewaart ook niets: er is nog geen account om een voorstel aan
      te hangen en geen kluis om een origineel in te leggen. */
   app.post('/api/office/reisbureau/lees', officeAuth, (req, res) => veilig(res, () => kern.invoer.leesVoor((req.body || {}).tekst)));
-  app.post('/api/office/reisbureau/klaarzetten', officeAuth, (req, res) => {
+  const uitnodigingVeilig = async (res, werk) => {
+    try { stuur(res, await Promise.resolve(werk())); }
+    catch (e) { console.error('[reisbureau-uitnodiging] veilige verwerking mislukt'); res.status(503).json({ error: 'De uitnodiging kon niet veilig worden verwerkt. Probeer het later opnieuw.' }); }
+  };
+  app.post('/api/office/reisbureau/klaarzetten', officeAuth, async (req, res) => {
     const wie = kern.boardroomWie(req) || 'backoffice (gedeelde code)';
-    veilig(res, () => {
-      const r = kern.reisuitnodiging.zetKlaar(wie, (req.body || {}).onderdelen);
+    await uitnodigingVeilig(res, async () => {
+      const idem = String(((req.body || {}).idem || req.get('idempotency-key') || '')).slice(0, 200);
+      const r = await Promise.resolve(kern.reisuitnodiging.zetKlaar(wie, (req.body || {}).onderdelen, idem));
       if (r.ok) afdelingen.audit(wie, 'Reisbureau: reis klaargezet voor een klant (' +
-        (r.uitnodiging.bestemming || 'zonder bestemming') + ', ' + r.uitnodiging.onderdelen.length + ' onderdelen)');
+        (r.uitnodiging.bestemming || 'zonder bestemming') + ', ' + r.uitnodiging.aantal + ' onderdelen)');
       return r;
     });
   });
-  app.post('/api/office/reisbureau/uitnodigingen', officeAuth, (req, res) => veilig(res, () => ({ ok: true, uitnodigingen: kern.reisuitnodiging.lijst('kantoor') })));
-  app.post('/api/office/reisbureau/uitnodiging-weg', officeAuth, (req, res) => {
+  app.post('/api/office/reisbureau/uitnodigingen', officeAuth, (req, res) =>
+    uitnodigingVeilig(res, () => kern.reisuitnodiging.lijst('kantoor')));
+  app.post('/api/office/reisbureau/uitnodiging-weg', officeAuth, async (req, res) => {
     const wie = kern.boardroomWie(req) || 'backoffice (gedeelde code)';
-    veilig(res, () => {
-      const r = kern.reisuitnodiging.trekIn('kantoor', (req.body || {}).id);
+    await uitnodigingVeilig(res, async () => {
+      const r = await Promise.resolve(kern.reisuitnodiging.trekIn('kantoor', (req.body || {}).id, wie, (req.body || {}).reden));
       if (r.ok) afdelingen.audit(wie, 'Reisbureau: klaargezette reis ingetrokken (' + String((req.body || {}).id) + ')');
       return r;
     });
+  });
+  app.post('/api/office/reisbureau/uitnodiging-roteer', officeAuth, (req, res) => {
+    const wie = kern.boardroomWie(req) || 'backoffice (gedeelde code)';
+    const idem = String(((req.body || {}).idem || req.get('idempotency-key') || '')).slice(0, 200);
+    return uitnodigingVeilig(res, () => kern.reisuitnodiging.roteer(
+      'kantoor', (req.body || {}).id, wie, idem));
   });
 };

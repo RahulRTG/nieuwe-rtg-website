@@ -3,6 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<!-- Lees het bearer-fragment in geheugen en wis het vóór de eerste stylesheet,
+     fetch of andere navigatie. Het geheim komt daardoor niet in een HTTP-pad,
+     query, referrer of browsergeschiedenis terecht. -->
+<script>
+(function () {
+  try {
+    var code = new URLSearchParams(location.hash.replace(/^#/, '')).get('code') || '';
+    code = String(code).trim().toUpperCase();
+    if (/^REIS\.[A-F0-9]{32}$/.test(code)) window.__RTG_REISUITNODIGING_CODE = code;
+    if (code) history.replaceState(null, '', location.pathname);
+  } catch (e) {}
+})();
+</script>
+<script src="/shared/id.js"></script>
 <title>Uw reis staat klaar · RTG</title>
 <meta name="theme-color" content="#0C0C0B">
 <meta name="robots" content="noindex,nofollow">
@@ -32,7 +47,8 @@
   const $ = (s) => document.querySelector(s);
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const code = new URLSearchParams(location.search).get('code') || '';
+  const code = String(window.__RTG_REISUITNODIGING_CODE || '');
+  try { delete window.__RTG_REISUITNODIGING_CODE; } catch (e) { window.__RTG_REISUITNODIGING_CODE = null; }
   const token = () => { try { return localStorage.getItem('rtg_member_token') || ''; } catch (e) { return ''; } };
   const api = (pad, body, tok) => fetch('/api/' + pad, {
     method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' },
@@ -53,29 +69,55 @@
     $('#vak').innerHTML = '<p class="rtg-sub">' + esc(e.message) + '</p>';
   });
 
-  async function mijnUitnodigingen() {
+  async function mijnUitnodigingen(verseLink) {
     let d;
     try { d = await api('reis/uitnodiging/mijn', {}, token()); }
     catch (e) { $('#vak').innerHTML = '<p class="rtg-sub">' + esc(e.message) + '</p>'; return; }
     const rij = d.uitnodigingen || [];
     $('#vak').innerHTML = '<h2 style="font-family:\'Bodoni Moda\',serif;font-weight:500;font-size:1.4rem;margin:.6rem 0 .3rem;">Uw uitnodigingen</h2>' +
+      '<p class="rtg-sub" style="margin-bottom:.8rem;">Een uitnodigingslink wordt alleen bij uitgifte getoond. ' +
+        'Niet ontvangen? Roteer haar; de oude link wordt dan direct onbruikbaar.</p>' +
+      '<div id="eenmaligeLink" aria-live="polite"></div>' +
       (rij.length ? rij.map((u) =>
         '<div class="rtg-rij"><span class="rtg-tekst"><span class="rtg-naam">' + esc(u.bestemming || 'reis') +
           ' &middot; ' + esc(dagen(u.venster)) + '</span>' +
-          '<span class="rtg-sub">' + (u.opgeeist ? 'overgenomen' : u.ingetrokken ? 'ingetrokken' : 'geldig tot ' + esc(u.geldigTot)) + '</span></span>' +
+          '<span class="rtg-sub">' + (u.opgeeist ? 'overgenomen' : u.ingetrokken ? 'ingetrokken' :
+            'geldig tot ' + esc(u.toegang && u.toegang.expires_at)) + '</span></span>' +
           (u.opgeeist || u.ingetrokken ? '' :
-            '<button class="rtg-knop" type="button" data-kopie="' + esc(location.origin + u.link) + '">Kopieer link</button>' +
+            '<button class="rtg-knop" type="button" data-roteer="' + esc(u.id) + '">Roteer link</button>' +
             '<button class="rtg-knop" type="button" data-weg="' + esc(u.id) + '">Trek in</button>') +
         '</div>').join('')
       : '<p class="rtg-sub">U heeft nog geen uitnodigingen verstuurd. Dat doet u bij een reis in <a href="/apps/reizen.html">RTG Reizen</a>.</p>');
-    $('#vak').querySelectorAll('[data-kopie]').forEach((b) => b.addEventListener('click', async () => {
-      try { await navigator.clipboard.writeText(b.dataset.kopie); b.textContent = 'gekopieerd'; } catch (e) {}
+    if (verseLink) toonEenmaligeLink(verseLink);
+    $('#vak').querySelectorAll('[data-roteer]').forEach((b) => b.addEventListener('click', async () => {
+      b.disabled = true;
+      try {
+        const r = await api('reis/uitnodiging/roteer', {
+          id: b.dataset.roteer, idem: RTGIdem('reis-roteer')
+        }, token());
+        await mijnUitnodigingen(r.link);
+      } catch (e) { b.disabled = false; b.textContent = e.message; }
     }));
     $('#vak').querySelectorAll('[data-weg]').forEach((b) => b.addEventListener('click', async () => {
       b.disabled = true;
       try { await api('reis/uitnodiging/weg', { id: b.dataset.weg }, token()); mijnUitnodigingen(); }
       catch (e) { b.disabled = false; b.textContent = e.message; }
     }));
+  }
+
+  function toonEenmaligeLink(link) {
+    const vak = $('#eenmaligeLink');
+    if (!vak || !link) return;
+    vak.innerHTML = '<div class="rtg-groep" style="margin:.7rem 0;">' +
+      '<strong>Nieuwe link: nu eenmalig kopiëren</strong>' +
+      '<input class="rtg-veld" id="verseLink" readonly autocomplete="off" spellcheck="false" style="margin:.55rem 0;">' +
+      '<button class="rtg-knop" id="kopieerVerseLink" type="button">Kopieer link</button></div>';
+    const invoer = $('#verseLink');
+    invoer.value = new URL(link, location.origin).href;
+    $('#kopieerVerseLink').addEventListener('click', async (e) => {
+      try { await navigator.clipboard.writeText(invoer.value); e.currentTarget.textContent = 'Gekopieerd'; }
+      catch (fout) { invoer.focus(); invoer.select(); }
+    });
   }
 
   function teken(u) {

@@ -5,8 +5,9 @@
        RTG1.<base64url(body)>.<base64url(hmac)[0..16]>
 
    met body = soort|code|vervalt(base36)|nonce. De handtekening is een HMAC-SHA256
-   met een serversleutel die alleen op de node staat (dyncode.key, 0600, in
-   .gitignore -- net als de andere sleutels). Daardoor:
+   met een serversleutel. In productie wordt die domeingescheiden afgeleid van
+   het gedeelde RTG_SECRET_KEY; lokaal blijft dyncode.key (0600, in .gitignore)
+   de ontwikkelsleutel. Daardoor:
 
    - kan alleen ONS systeem een geldige code maken en verifieren; een generieke
      QR-lezer ziet enkel "RTG1.xxxx", geen URL en geen leesbare data, en kan er
@@ -22,11 +23,16 @@
 const fs = require('fs');
 const path = require('path');
 
-module.exports = ({ crypto, dataDir }) => {
+module.exports = ({ crypto, dataDir, sharedSecret }) => {
   const keyPad = path.join(dataDir, 'dyncode.key');
   let sleutel;
-  try { sleutel = fs.readFileSync(keyPad); }
-  catch (e) { sleutel = crypto.randomBytes(32); try { fs.writeFileSync(keyPad, sleutel, { mode: 0o600 }); } catch (e2) {} }
+  if (sharedSecret) {
+    sleutel = crypto.createHash('sha256')
+      .update('rtg-dyncode-v1\0' + String(sharedSecret)).digest();
+  } else {
+    try { sleutel = fs.readFileSync(keyPad); }
+    catch (e) { sleutel = crypto.randomBytes(32); try { fs.writeFileSync(keyPad, sleutel, { mode: 0o600 }); } catch (e2) {} }
+  }
 
   const DEFAULT_TTL = 45000;                 // 45 seconden: dynamisch, kort houdbaar
   const MAX_TTL = 5 * 60000;                 // nooit langer dan 5 minuten

@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
+<script src="/shared/id.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RTF-kantoor</title>
@@ -323,20 +324,19 @@ async function walletTeken(g) {
       '<div class="rij h-mt50">' +
         '<input class="veld smal" id="walletNaam" placeholder="Naam" value="RTFoundation">' +
         '<input class="veld smal" id="walletBeheer" placeholder="Naam van de beheerder">' +
+        '<input class="veld smal" id="walletBeheerLogin" placeholder="Persoonlijke RTG-login van beheerder">' +
         '<button class="knop" id="walletMaak">Positie aanmaken</button>' +
       '</div>' +
-      '<div class="kpi h-mt30">Er komt een bedrijfscode en een eenmalige beheer-PIN uit. Daarmee stelt de stichting zelf haar bankrekening in en betaalt ze zichzelf uit, langs dezelfde weg als elke zaak. Dit zet de giftknop niet open.</div>';
+      '<div class="kpi h-mt30">De beheerder wordt aan het persoonlijke RTG-account gebonden. Daarmee stelt de stichting zelf haar bankrekening in en betaalt ze zichzelf uit, langs dezelfde weg als elke zaak. Dit zet de giftknop niet open.</div>';
     $('#walletMaak').addEventListener('click', async () => {
-      const b = { naam: $('#walletNaam').value.trim(), beheerder: $('#walletBeheer').value.trim() };
+      const b = { naam: $('#walletNaam').value.trim(), beheerder: $('#walletBeheer').value.trim(),
+        beheerderLogin: $('#walletBeheerLogin').value.trim() };
       const r = await fetch('/api/office/rtfwallet/maak', { method: 'POST', headers: kop(), body: JSON.stringify(b) });
       const uit = await r.json();
       if (!r.ok) { doel.innerHTML += '<div class="melder fout">' + esc(uit.error || 'Er ging iets mis.') + '</div>'; return; }
-      /* DE PIN STAAT HIER EEN KEER EN NERGENS ANDERS. Hij is niet opnieuw op te
-         vragen; wie hem wegklikt zonder hem door te geven, moet een nieuwe
-         beheerder laten aanmaken. */
       doel.innerHTML = '<div class="sec">Positie in RTG Pay</div>' +
-        '<div class="melder">Aangemaakt. Code <b>' + esc(uit.code) + '</b>, beheer-PIN <b>' + esc(uit.pin) + '</b>. ' +
-        'Geef deze twee nu door aan de beheerder \u2014 de PIN is hierna niet meer op te vragen.</div>' +
+        '<div class="melder">Aangemaakt. Code <b>' + esc(uit.code) + '</b>. ' +
+        'De beheerder opent de werkplek met het gekoppelde persoonlijke RTG-account.</div>' +
         '<div class="kpi">' + esc(uit.vervolg) + '</div>' +
         (uit.wereldFout ? '<div class="melder fout">Let op: de economische wereld van de stichting is niet gezet (' + esc(uit.wereldFout) + '). Meld dit voordat er giften binnenkomen.</div>' : '') +
         (uit.giftFout ? '<div class="melder fout">De ontvanger van de giftstand is niet ingevuld: ' + esc(uit.giftFout) + '</div>' : '');

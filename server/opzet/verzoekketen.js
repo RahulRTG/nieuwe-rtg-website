@@ -29,7 +29,8 @@ const foutisolatie = require('../lib/foutisolatie');
 
 module.exports = function verzoekketen(deps) {
   const { app, express, log, logboek, db, save, betaal, betaalWaarheid, muntbetaal, opslagKlaar,
-    zaakdoos, PRODUCTION, beveiligVan, muntenVan, settleFactuurVan, opdrachtenVan } = deps;
+    zaakdoos, PRODUCTION, beveiligVan, muntenVan, settleFactuurVan, opdrachtenVan,
+    postgresVerzoekMiddleware } = deps;
 
   /* ---------- foutisolatie per verzoek ----------
      De wikkel zelf staat in lib/foutisolatie.js, en daar alleen. Hij stond hier
@@ -68,6 +69,10 @@ module.exports = function verzoekketen(deps) {
 
      Zonder RTG_STAATLOG hangt hij helemaal niet in de keten. */
   require('../effectmeter').haak(app);
+  /* In PostgreSQL-modus is dit de antwoordgrens: de request krijgt een
+     geisoleerde werkkopie en een 2xx passeert pas na zijn atomaire commit. Hij
+     staat vóór bodylezers en dus ook vóór de rauwe betaalwebhooks. */
+  if (typeof postgresVerzoekMiddleware === 'function') app.use(postgresVerzoekMiddleware());
   app.use(logboek.middleware()); // correlatie-id + verzoeklog (methode, pad, status, duur)
   // wat verandert dit verzoek: rijen per collectie voor en na (blast radius).
   // NA het logboek want hij leunt op req.id; bewust niet in save(). Zie de kop

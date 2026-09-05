@@ -5,6 +5,7 @@
 const { coord } = require('../../../kern/util');
 const { servicekostenVoor } = require('../../../kern/servicekosten');
 const bezorgvolg = require('../../../kern/bezorgvolg');
+const moneyCredentialBlokkade = require('../../../middleware/money-credential-productiepoort').blokkade;
 module.exports = (kern) => {
   const { PERSONAS, app, auth, crypto, db, findPartner, findSupplier, magBezorgen, pickupCode,
           publicPartner, save, schoon, salonZichtbaar, zorgMee, orderMetRef, ordersVoegToe,
@@ -30,6 +31,8 @@ app.post('/api/bezorg/partners', auth, (req, res) => {
 });
 
 app.post('/api/bezorg/bestel', auth, (req, res) => {
+  const dicht = moneyCredentialBlokkade('pay.order_pickup_code');
+  if (dicht) return res.status(dicht.status).json(dicht);
   // ophalen of bezorgen: de zaak moet je kunnen bereiken. Het bezorgadres vraagt
   // deze route zelf per bestelling, want dat is niet altijd je eigen adres.
   if (gegevensStop(req, res, 'bestelling')) return;

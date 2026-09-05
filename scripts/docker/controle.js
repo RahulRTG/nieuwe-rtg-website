@@ -8,6 +8,7 @@ const { zonderGeheim } = require('../lib/geenlek');
 const path = require('path');
 const crypto = require('crypto');
 const { leesEnv, leesGeheim } = require('./start');
+const { leesSleutelring } = require('../motor-initialisatie');
 const config = require('../../server/config');
 
 const ROOT = path.join(__dirname, '..', '..');
@@ -16,6 +17,13 @@ const pgPad = path.resolve(process.env.RTG_POSTGRES_PASSWORD_FILE || path.join(R
 const publiek = process.argv.includes('--publiek');
 const livePad = path.resolve(process.env.RTG_LIVE_ENV_FILE || path.join(ROOT, 'deploy', 'live.env'));
 const fouten = [], waarschuwingen = [];
+let live = {};
+if (publiek) {
+  try { live = { ...leesEnv(fs.readFileSync(livePad, 'utf8')), ...process.env }; }
+  catch (e) { fouten.push(livePad + ' ontbreekt of is onleesbaar.'); }
+}
+const motorSleutelPad = path.resolve(ROOT, process.env.RTG_MOTOR_STATE_KEY_SECRET_FILE ||
+  live.RTG_MOTOR_STATE_KEY_SECRET_FILE || '.rtg-secrets/motor_state_key');
 
 function rechten(pad, geheim) {
   try {
@@ -39,20 +47,26 @@ try {
   env.DATABASE_URL = 'postgresql://rtg:' + encodeURIComponent(pg) + '@postgres:5432/rtg';
 } catch (e) { fouten.push(e.message); }
 
+try {
+  leesSleutelring(motorSleutelPad);
+} catch (e) { fouten.push(e.message); }
+if (env.RTG_MOTOR_STATE_KEY_FILE !== '/run/secrets/rtg-motor-state-key')
+  fouten.push('RTG_MOTOR_STATE_KEY_FILE moet in Compose exact /run/secrets/rtg-motor-state-key zijn.');
+if (!/^g-[a-f0-9]{32}$/.test(String(env.RTG_MOTOR_EXPECT_GENESIS || '')))
+  fouten.push('Initialiseer het geldvolume eenmalig met npm run motor:init; RTG_MOTOR_EXPECT_GENESIS ontbreekt of is ongeldig.');
+
 const uitslag = config.valideer(env);
 fouten.push(...uitslag.fouten);
 waarschuwingen.push(...uitslag.waarschuwingen);
 
 if (publiek) {
-  let live = {};
-  try { live = { ...leesEnv(fs.readFileSync(livePad, 'utf8')), ...process.env }; }
-  catch (e) { fouten.push(livePad + ' ontbreekt of is onleesbaar.'); }
-
   let appUrl = null;
   try { appUrl = new URL(String(env.APP_URL || '')); }
   catch (e) { fouten.push('APP_URL is geen geldige publieke URL.'); }
   if (appUrl) {
     if (appUrl.protocol !== 'https:') fouten.push('APP_URL moet voor livegang https gebruiken.');
+    if (appUrl.username || appUrl.password) fouten.push('APP_URL mag geen inloggegevens bevatten.');
+    if (appUrl.port) fouten.push('APP_URL moet de standaard HTTPS-poort 443 gebruiken.');
     if (appUrl.pathname !== '/' || appUrl.search || appUrl.hash)
       fouten.push('APP_URL moet de domeinroot zijn, zonder subpad, query of fragment.');
     if (env.RTG_TLS_DOMAIN !== appUrl.hostname)
@@ -60,12 +74,15 @@ if (publiek) {
   }
   if (env.RTG_TLS !== '1' || env.RTG_ACME !== '1')
     fouten.push('Native live-HTTPS vereist RTG_TLS=1 en RTG_ACME=1.');
+  if (env.RTG_ACME_STAGING === '1')
+    fouten.push('RTG_ACME_STAGING=1 gebruikt geen publiek vertrouwd certificaat en is verboden voor livegang.');
   if (!env.RTG_TLS_EMAIL || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(env.RTG_TLS_EMAIL))
     fouten.push('RTG_TLS_EMAIL ontbreekt of is ongeldig; certificaatmeldingen kunnen dan niet aankomen.');
   if (env.RTG_PROXY_HOPS !== '0')
     fouten.push('Native TLS staat rechtstreeks aan internet; zet RTG_PROXY_HOPS=0 zodat bezoekers geen proxykoppen kunnen laten geloven.');
-  if (env.RTG_BETALEN_UIT !== '1')
-    fouten.push('Deze eerste livegang is zonder betalingen afgesproken; RTG_BETALEN_UIT=1 moet fail-closed aan staan.');
+  /* config.valideer heeft hierboven óf de volledig uitgeschakelde rail óf de
+     echte providerbedrading beoordeeld. Deze hostpoort legt geen verouderd
+     "eerste livegang zonder geld"-beleid meer over de B2B2C-productiepoort. */
   if (env.RTG_AI_UIT !== '1' && env.RTG_EXTERNE_AI_UIT !== '1')
     fouten.push('De lokale-eerst livegang vereist RTG_AI_UIT=1 of RTG_EXTERNE_AI_UIT=1.');
   if (!env.OFFICE_TOTP_SECRET)
@@ -119,5 +136,5 @@ if (fouten.length) {
   process.exit(1);
 }
 console.log('\n✓ Geheimen en productieconfiguratie zijn startklaar.' +
-  (publiek ? ' Native HTTPS, betalingen-uit, versleutelde en off-site back-ups zijn afgedwongen.' :
+      (publiek ? ' Native HTTPS en versleutelde en off-site back-ups zijn afgedwongen.' :
     (env.RTG_PRIVATE_BETA === '1' ? ' De app blijft een private, lokale beta.' : ' Draai voor publieke livegang ook npm run golive.')));

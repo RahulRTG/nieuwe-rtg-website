@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
+<script src="/shared/id.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RTG Airport (operations)</title>
@@ -393,7 +394,7 @@ async function laadCharters(){
 async function schermLounge(){
   $('#app').innerHTML = kopStuk('De lounges')+
     '<div class="item" style="background:var(--card2);"><h4>Gast ontvangen</h4><div class="meta">Op vertoon van een geldige boarding pass. De Koninklijke Vleugel is uitsluitend voor gasten op een vlucht met een vip-protocol.</div>'+
-    '<div class="rij"><input class="veld" id="lgCode" style="flex:1;min-width:9rem;" placeholder="Boarding pass-code (VL-...)" maxlength="12"><select class="veld" id="lgWaar"><option value="salon">Salon Lounge</option><option value="royal">De Koninklijke Vleugel</option></select><button class="knop" id="lgIn">Welkom ✓</button></div></div>'+
+    '<div class="rij"><input class="veld" id="lgCode" style="flex:1;min-width:9rem;" placeholder="Boarding pass-code (BP.… )" maxlength="80" autocomplete="off" spellcheck="false"><select class="veld" id="lgWaar"><option value="salon">Salon Lounge</option><option value="royal">De Koninklijke Vleugel</option></select><button class="knop" id="lgIn">Welkom ✓</button></div></div>'+
     '<div id="lgLijst"></div>'+aiBlok('Bijv. hoe druk wordt het rond de avondvertrekken?');
   koppelBasis();
   $('#lgIn').addEventListener('click', async () => {

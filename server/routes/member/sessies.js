@@ -92,7 +92,8 @@ module.exports = (kern) => {
   });
 
   /* ---- een sessie sluiten ---- */
-  app.post('/api/mijn/sessies/sluit', auth, (req, res) => {
+  app.post('/api/mijn/sessies/sluit', auth, async (req, res, next) => {
+    try {
     if (!eisLid(req, res)) return;
     const sid = String(req.body.sid || '');
     const rij = sessieregister && sessieregister.lees(sid);
@@ -104,25 +105,29 @@ module.exports = (kern) => {
     if (!rij || rij.lidKey !== req.session.key) {
       return res.status(404).json({ error: 'Die sessie kennen wij niet.' });
     }
-    accounts.trekInSessie(sid, klok.nu() + TOKEN_MAX_MS);
+    await accounts.trekInSessie(sid, klok.nu() + TOKEN_MAX_MS);
+    if (accounts.wachtIntrekkingen) await accounts.wachtIntrekkingen();
     sessieregister.sluit(sid);
     spoor(req, 'sessie-gesloten', { sid, eigen: sid === req.session.sid });
     res.json({ ok: true, gesloten: sid, ditWasUzelf: sid === req.session.sid,
       bewijs: 'Het token van deze sessie is ingetrokken. Een volgend verzoek ermee wordt geweigerd, ook als het toestel offline was toen u dit deed.' });
+    } catch (e) { next(e); }
   });
 
   /* ---- alle andere sluiten ---- */
-  app.post('/api/mijn/sessies/sluit-overige', auth, (req, res) => {
+  app.post('/api/mijn/sessies/sluit-overige', auth, async (req, res, next) => {
+    try {
     if (!eisLid(req, res)) return;
     const hier = req.session.sid;
     const rijen = sessieregister ? sessieregister.vanLid(req.session.key) : [];
     const gesloten = [];
     for (const r of rijen) {
       if (r.sid === hier) continue;              // nooit de sessie waarin u dit doet
-      accounts.trekInSessie(r.sid, klok.nu() + TOKEN_MAX_MS);
+      await accounts.trekInSessie(r.sid, klok.nu() + TOKEN_MAX_MS);
       sessieregister.sluit(r.sid);
       gesloten.push(r.sid);
     }
+    if (accounts.wachtIntrekkingen) await accounts.wachtIntrekkingen();
     spoor(req, 'sessies-gesloten', { aantal: gesloten.length });
     res.json({ ok: true, aantal: gesloten.length, gesloten,
       /* Eerlijk over de reikwijdte: dit sluit wat wij KENNEN. Een sessie zonder
@@ -130,5 +135,6 @@ module.exports = (kern) => {
          dat hij klaar is. */
       nietGeraakt: hier ? 'Deze sessie blijft open. Sessies van voor de invoering van sessie-identiteit staan niet in de lijst en zijn hiermee niet gesloten; wijzig uw wachtwoord als u die ook wilt beeindigen.'
         : 'Deze sessie draagt geen identiteit en kon zichzelf niet uitzonderen; er is niets gesloten.' });
+    } catch (e) { next(e); }
   });
 };

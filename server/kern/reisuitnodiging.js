@@ -1,66 +1,103 @@
-/* DE REISUITNODIGING -- een klaargezette reis, en een link.
+/* DE REISUITNODIGING -- een klaargezette reis en een eenmalige bearer-link.
 
-   DRIE SCHAKELS, EEN VORM.
-   1. Het RTG-reisbureau zet een reis klaar voor iemand die nog geen lid is, en
-      stuurt hem een link. Wie die link opent, kan lid worden en de reis
-      overnemen.
-   2. Een lid nodigt zijn REISGENOOT uit voor dezelfde reis, met dezelfde link.
-   3. Die reisgenoot kan het weer doorgeven -- maar alleen als hij zelf een reis
-      heeft om te delen. Een uitnodiging is nooit een doorgeefsleutel.
+   De link geeft nooit een pas en bewaart geen schaduwprofiel. De code zelf is
+   128 bits, verlaat alleen de uitgifte en staat daarna uitsluitend als hash in
+   reisUitnodigingen. Controle, claim, intrekking en rotatie lopen door dezelfde
+   collectietransactie. De overdracht naar reisInvoer is een herstelbare saga:
+   eerst wordt de code exclusief aan dit lid geclaimd, daarna schrijft
+   invoer.neemOver idempotent op uitnodigings-id, en pas dan wordt de claim
+   voltooid. Een crash kan daardoor worden hervat door hetzelfde lid en nooit
+   door een tweede lid.
 
-   WAT HIER MET OPZET NIET GEBEURT, en dit is de belangrijkste alinea:
-
-   ER WORDT GEEN PROFIEL AANGEMAAKT VAN IEMAND DIE GEEN LID IS. Een klaargezette
-   reis bevat de REIS en niet de PERSOON: geen naam, geen e-mailadres, geen
-   telefoonnummer. De medewerker stuurt de link zelf, via zijn eigen kanaal. Dat
-   is de striktste vorm en ook de eenvoudigste, en hij volgt rechtstreeks uit
-   LIFE.md par. 4.7 (geen schaduwprofielen): wie hier een adresboekje van
-   aanstaande klanten van maakt, bouwt precies het dossier dat dit huis niet wil
-   hebben. Wordt de reis niet opgeeist, dan verloopt hij en is er niets bewaard
-   dat over een mens gaat.
-
-   ER GAAN GEEN BESTANDEN MEE. Een bewijsstuk hoort in de kluis van zijn
-   eigenaar; een klaargezette reis heeft nog geen eigenaar, dus zou het in een
-   RTG-bak belanden -- een tijdelijke opslag met paspoortscans van niet-leden.
-   Het kantoor zet dus de GELEZEN gegevens klaar, niet de documenten. Wat er
-   nodig zou zijn om dat wel te doen (een bewaartermijn, een doelbinding en een
-   eigenaar) is een eigen besluit en geen bijvangst van deze functie.
-
-   EEN LINK GEEFT NOOIT EEN PAS. Opeisen levert de gewone weg naar een RTG Pass,
-   met de ballotage die daarbij hoort. Lifestyle en Business blijven menselijke
-   goedkeuring (CLAUDE.md); de uitnodiging draagt daarom geen tier, en er is
-   niets aan mee te geven.
-
-   EN DE SLEUTEL IS DE ENTROPIE, niet de rem. De code is 128 bits uit
-   crypto.randomBytes: die raad je niet, ook niet met een miljoen pogingen. De
-   rem op de publieke route houdt ruis tegen en is geen slot -- dat verschil
-   hoort benoemd, want een rem die je voor een slot aanziet is LAT-regel 7 in
-   zijn gevaarlijkste vorm.
-
-   WAT EEN NIET-OPGEEISTE LINK LAAT ZIEN: bestemming, periode, hoeveel
-   onderdelen en van welke soort, en van wie hij komt (het kantoor, of een
-   codenaam). NIET de titels, de kenmerken of de datums per onderdeel. Wie de
-   link doorstuurt of kwijtraakt, lekt daarmee geen boekingsnummers. Na het
-   opeisen staat alles gewoon in het eigen dossier van de opeiser. */
+   Er gaan geen bestanden mee. Alleen gelezen reisregels worden overgenomen;
+   bewijsstukken blijven in de kluis van hun eigenaar. */
 'use strict';
 const klok = require('../lib/klok');
 
 const DAGEN_GELDIG = 30;
 const SOORTEN_UIT = ['klaargezet', 'reisgenoot'];
+const DOEL = 'travelos-reisuitnodiging';
+const SCOPE = ['reis.lezen', 'reis.overnemen'];
+const DUBBELTIK_MS = 5000;
 
-module.exports.maakReisuitnodiging = ({ db, save, crypto, invoer, idGeverifieerd }) => {
+function vasteAppBasis(env = process.env) {
+  const vast = String(env.APP_URL || '').trim();
+  if (!vast) return env.NODE_ENV === 'production'
+    ? { ok: false, error: 'APP_URL ontbreekt voor reisuitnodigingen.' }
+    : { ok: true, basis: '' };
+  try {
+    const url = new URL(vast);
+    if (!/^https?:$/.test(url.protocol) || url.username || url.password || url.search || url.hash)
+      return { ok: false, error: 'APP_URL is geen veilige vaste oorsprong.' };
+    if (env.NODE_ENV === 'production' && url.protocol !== 'https:')
+      return { ok: false, error: 'APP_URL moet in productie HTTPS gebruiken.' };
+    return { ok: true, basis: url.origin };
+  } catch (e) { return { ok: false, error: 'APP_URL is geen geldige vaste oorsprong.' }; }
+}
+
+module.exports.maakReisuitnodiging = ({ db, save, bewerkCollectie, crypto, invoer, idGeverifieerd }) => {
   const nu = () => klok.datum().toISOString();
   const schoon = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, n || 120);
   const datum = (s) => /^\d{4}-\d{2}-\d{2}$/.test(String(s || '')) ? String(s) : null;
-
+  const bearer = require('./bearercode')({ crypto, namespace: 'reisuitnodiging', nu });
   const eigen = require('./eigencollectie')({ db, domein: 'kern/reisuitnodiging', bezit: { reisUitnodigingen: 'kaart' } });
   const bak = () => eigen.bak('reisUitnodigingen');
-  const vindCode = (code) => Object.values(bak()).find(u => u.code === String(code || '').trim()) || null;
-  const verlopen = (u) => !!u.geldigTot && u.geldigTot < nu().slice(0, 10);
 
-  /* De onderdelen die meegaan. Alleen wat een reisregel maakt: soort, naam,
-     bestemming, datums en het kenmerk. Geen bewijsstukken, geen sleutels, geen
-     verwijzing naar de kluis van wie dan ook. */
+  function migreerLegacy(bron) {
+    for (const u of Object.values(bron || {})) {
+      if (!u || u.toegang || !u.code) continue;
+      const issued = Number.isFinite(Date.parse(u.at)) ? u.at : nu();
+      const eind = /^\d{4}-\d{2}-\d{2}$/.test(String(u.geldigTot || ''))
+        ? u.geldigTot + 'T23:59:59.999Z'
+        : new Date(Date.parse(issued) + DAGEN_GELDIG * 86400000).toISOString();
+      u.toegang = {
+        code_hash: bearer.hash(u.code), issuer: u.doorWie || u.door || 'legacy',
+        doel: DOEL, scope: [...SCOPE], onderwerp: { soort: 'reisuitnodiging', id: u.id },
+        issued_at: issued, expires_at: eind, max_gebruik: 1,
+        gebruik: u.opgeeist ? 1 : 0, laatst_gebruikt_at: u.opgeeist && u.opgeeist.at || null,
+        /* Ook een cryptografisch sterke legacy-code stond in een query-URL en
+           kan dus in browser-, proxy- of maillogs zijn beland. Hashen maakt zo'n
+           reeds gelekt geheim niet opnieuw veilig: alleen bewuste rotatie wel. */
+        ingetrokken_at: nu(), ingetrokken_door: 'legacy-migratie',
+        intrekreden: u.ingetrokken ? 'oude uitnodiging was ingetrokken'
+          : 'legacy querycredential vereist rotatie', rotatie: 1
+      };
+      delete u.code;
+      delete u.geldigTot;
+      delete u.ingetrokken;
+    }
+  }
+
+  function transactie(werk) {
+    const doe = bron => {
+      if (!bron || typeof bron !== 'object' || Array.isArray(bron))
+        throw new Error('reisUitnodigingen hoort een kaart te zijn');
+      migreerLegacy(bron);
+      return werk(bron);
+    };
+    if (typeof bewerkCollectie === 'function') return bewerkCollectie('reisUitnodigingen', doe);
+    const bron = bak();
+    const voor = JSON.stringify(bron);
+    const antwoord = doe(bron);
+    if (antwoord && typeof antwoord.then === 'function') throw new Error('reisuitnodiging-transactie mag niet asynchroon zijn');
+    if (JSON.stringify(bron) !== voor) save();
+    return antwoord;
+  }
+
+  function vindCode(bron, code) {
+    return bearer.vind(Object.values(bron || {}), code, u => u && u.toegang && u.toegang.code_hash);
+  }
+  const statusReden = u => bearer.reden(u && u.toegang, { doel: DOEL, scope: SCOPE });
+  const publiek = (u, delen = false) => {
+    const p = { id: u.id, soort: u.soort, doorCodenaam: u.doorCodenaam || null,
+      bestemming: u.bestemming, venster: u.venster, aantal: (u.onderdelen || []).length,
+      toegang: bearer.publiek(u.toegang), opgeeist: !!u.opgeeist,
+      ingetrokken: !!(u.toegang && u.toegang.ingetrokken_at),
+      claim: u.claim ? { status: u.claim.status, at: u.claim.at, voltooid_at: u.claim.voltooid_at || null } : null };
+    if (delen) p.onderdelen = u.onderdelen;
+    return p;
+  };
+
   function schoneOnderdelen(rij) {
     const uit = [];
     for (const o of (Array.isArray(rij) ? rij : []).slice(0, 40)) {
@@ -72,42 +109,67 @@ module.exports.maakReisuitnodiging = ({ db, save, crypto, invoer, idGeverifieerd
     return uit;
   }
 
-  function maak(soort, door, doorCodenaam, onderdelen, doorWie) {
+  const afdruk = waarde => crypto.createHash('sha256').update(String(waarde || '')).digest('hex');
+
+  function maak(soort, door, doorCodenaam, onderdelen, doorWie, idem) {
     if (!SOORTEN_UIT.includes(soort)) return { status: 400, error: 'Onbekend soort uitnodiging.' };
     const rij = schoneOnderdelen(onderdelen);
     if (!rij.length) return { status: 400, error: 'Zet eerst minstens één reisonderdeel klaar (met een naam en een datum).' };
-    const dagen = rij.map(o => o.tot || o.van).concat(rij.map(o => o.van)).sort();
-    const tot = new Date(klok.nu() + DAGEN_GELDIG * 86400000).toISOString().slice(0, 10);
-    const u = {
-      id: 'U-' + crypto.randomBytes(4).toString('hex'),
-      // 128 bits: dit is het slot. Zie de kop.
-      code: crypto.randomBytes(16).toString('hex'),
-      soort, door, doorCodenaam: doorCodenaam || null,
-      /* WIE hem maakte staat er los bij, en alleen bij een kantoorbalie. De
-         uitnodiging zelf is van HET KANTOOR -- anders ziet een collega de link
-         niet die zijn buurman klaarzette, en dan gaat er een tweede lijstje
-         circuleren buiten het systeem om. Voor het auditspoor blijft de persoon
-         wel staan. */
-      doorWie: doorWie || null,
-      bestemming: (rij.find(o => o.bestemming) || {}).bestemming || '',
-      venster: { van: dagen[0], tot: dagen[dagen.length - 1] },
-      onderdelen: rij, geldigTot: tot, ingetrokken: false, opgeeist: null, at: nu()
-    };
-    bak()[u.id] = u;
-    save();
-    return { ok: true, uitnodiging: u, link: '/apps/reisuitnodiging.html?code=' + u.code };
+    const app = vasteAppBasis();
+    /* Eerst de vaste oorsprong bewijzen, pas daarna de eenmalige credential
+       maken. Anders kan een configuratiefout het geheim wel opslaan maar uit
+       het antwoord laten vallen, waardoor alleen een rotatie het kan redden. */
+    if (!app.ok) return { status: 503, error: 'Reisuitnodigingen zijn tijdelijk niet veilig geconfigureerd.' };
+    return transactie(bron => {
+      const vinger = afdruk(JSON.stringify({ soort, door, onderdelen: rij }));
+      const idemHash = String(idem || '').trim()
+        ? afdruk('reisuitnodiging-idem|' + String(door || '') + '|' + String(idem).trim()) : null;
+      const dubbeltikHash = afdruk('reisuitnodiging-dubbeltik|' + String(door || '') + '|' + vinger);
+      const bestaand = Object.values(bron).find(u => u && (
+        (idemHash && u.idem_hash === idemHash) ||
+        (!idemHash && u.dubbeltik_hash === dubbeltikHash &&
+          Date.now() - Date.parse(u.toegang && u.toegang.issued_at) >= 0 &&
+          Date.now() - Date.parse(u.toegang && u.toegang.issued_at) < DUBBELTIK_MS)
+      ));
+      if (bestaand) {
+        if (bestaand.idem_fingerprint && bestaand.idem_fingerprint !== vinger)
+          return { status: 409, error: 'Deze herhaalsleutel hoort al bij een andere reisuitnodiging.' };
+        return { status: 409,
+          error: 'Deze uitnodiging is al eenmalig uitgegeven en wordt niet opnieuw getoond. Roteer haar als de ontvanger de link niet kreeg.',
+          herhaald: true, uitnodiging: publiek(bestaand) };
+      }
+      const dagen = rij.map(o => o.tot || o.van).concat(rij.map(o => o.van)).sort();
+      const id = 'U-' + crypto.randomBytes(8).toString('hex');
+      let gemaakt;
+      do {
+        gemaakt = bearer.maak({ prefix: 'REIS', issuer: doorWie || door,
+          doel: DOEL, scope: SCOPE, onderwerp: { soort: 'reisuitnodiging', id },
+          geldigMs: DAGEN_GELDIG * 86400000, maxGebruik: 1 });
+      } while (Object.values(bron).some(x => x && x.toegang && x.toegang.code_hash === gemaakt.toegang.code_hash));
+      const u = { id, soort, door, doorCodenaam: doorCodenaam || null, doorWie: doorWie || null,
+        bestemming: (rij.find(o => o.bestemming) || {}).bestemming || '',
+        venster: { van: dagen[0], tot: dagen[dagen.length - 1] }, onderdelen: rij,
+        toegang: gemaakt.toegang, claim: null, opgeeist: null, at: nu(), code_historie: [],
+        idem_hash: idemHash, idem_fingerprint: idemHash ? vinger : null,
+        dubbeltik_hash: idemHash ? null : dubbeltikHash };
+      bron[id] = u;
+      /* Het geheim reist in het fragment. Een fragment wordt door de browser
+         niet naar RTG, een proxy of een accesslog gestuurd; de pagina wist het
+         bovendien uit de adresbalk voordat zij haar eerste verzoek doet. */
+      return { ok: true, uitnodiging: publiek(u, true),
+        link: app.basis + '/apps/reisuitnodiging.html#code=' + encodeURIComponent(gemaakt.code) };
+    });
   }
 
-  // het kantoor zet een reis klaar voor een klant die nog geen lid hoeft te zijn
-  const zetKlaar = (wie, onderdelen) => maak('klaargezet', 'kantoor', null, onderdelen, schoon(wie, 60));
-  // een lid nodigt een reisgenoot uit voor onderdelen uit zijn eigen reis
-  const nodigUit = (key, codenaam, onderdelen) => maak('reisgenoot', key, schoon(codenaam, 60), onderdelen);
+  const zetKlaar = (wie, onderdelen, idem) => maak('klaargezet', 'kantoor', null, onderdelen, schoon(wie, 60), idem);
+  const nodigUit = (key, codenaam, onderdelen, idem) =>
+    maak('reisgenoot', key, schoon(codenaam, 60), onderdelen, schoon(codenaam, 60), idem);
 
-  /* Openen, opeisen, intrekken en de lijst staan in ./reisuitnodiging-gebruik.js:
-     het MAKEN van een uitnodiging en het GEBRUIKEN ervan zijn twee kanten met
-     elk hun eigen zorgen (wat er te zien is vóór het opeisen, de
-     identiteitscontrole, wie mag intrekken). Zelfde bak, doorgegeven. */
-  const gebruik = require('./reisuitnodiging-gebruik')({ bak, save, vindCode, verlopen, invoer, idGeverifieerd, nu });
-
+  const gebruik = require('./reisuitnodiging-gebruik')({ transactie, vindCode, statusReden,
+    publiek, bearer, invoer, idGeverifieerd, nu, crypto, DOEL, SCOPE, vasteAppBasis });
   return { reisuitnodiging: Object.assign({ zetKlaar, nodigUit }, gebruik) };
 };
+
+module.exports.DOEL = DOEL;
+module.exports.SCOPE = SCOPE;
+module.exports.vasteAppBasis = vasteAppBasis;

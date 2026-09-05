@@ -13,7 +13,7 @@ test('releasebewijs accepteert exact dezelfde inhoud en merkt manipulatie', () =
     'package.json': '{"name":"x","version":"1"}', 'package-lock.json': '{}',
     'motor/Cargo.toml': '[package]', 'motor/Cargo.lock': '', Dockerfile: 'FROM scratch',
     'docker-compose.yml': 'services: {}', '.env.example': '', 'SLO.json': '{}',
-    'RUST-MIGRATIES.json': '{"versie":1}',
+    'RUST-MIGRATIES.json': '{"versie":1}', 'BEGROTING.json': '{"grens":1}',
     'server/app.js': 'ok', 'public/dist/app.js': 'bouw', 'scripts/start.js': 'start',
     'motor/src/lib.rs': 'pub fn x() {}', 'motor/target/release/rtg-motor': 'binair',
     'motor/target/release/rtg-sentinel': 'bewaker'
@@ -25,6 +25,10 @@ test('releasebewijs accepteert exact dezelfde inhoud en merkt manipulatie', () =
   });
   const manifest = { formaat: 'rtg-release-bewijs-v1', bestanden, inhoudSha256: totaalHash(bestanden) };
   assert.equal(verifieer(root, manifest).ok, true);
+  fs.writeFileSync(path.join(root, 'BEGROTING.json'), '{"grens":999}');
+  assert.ok(verifieer(root, manifest).fouten.some(f => /BEGROTING\.json/.test(f)),
+    'een gewijzigd runtime-rootregister moet Sentinel kunnen zien');
+  fs.writeFileSync(path.join(root, 'BEGROTING.json'), '{"grens":1}');
   fs.writeFileSync(path.join(root, 'server/app.js'), 'geknoeid');
   const stuk = verifieer(root, manifest);
   assert.equal(stuk.ok, false);

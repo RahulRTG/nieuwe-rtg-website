@@ -29,20 +29,34 @@
    RTG Pay en de bank; dit is de verantwoording achteraf. */
 
 module.exports = (ctx, eigen) => {
-  const { schoon, euro, S, wie, poort, audit, save, code } = ctx;
+  const { schoon, euro, S, codelevenscyclus } = ctx;
   const { cijfersVan } = eigen;
 
-  const vindCode = c => {
-    const k = String(c || '').trim().toUpperCase();
-    return k ? S().bronnen.filter(b => b.donateurcode === k) : [];
-  };
+  const DOEL = 'foundation-persoonsportaal';
+  const SOORT = 'donateur';
+  const SCOPE = { lezen: 'donateur:lezen', bewijs: 'donateur:bewijs' };
+  const volg = (r, fn) => r && typeof r.then === 'function' ? r.then(fn) : fn(r);
+
+  function vindCode(c, scope) {
+    return volg(codelevenscyclus.controleer(c, { doel: DOEL, soort: SOORT, scope }, (staat, toegang) => {
+      const bron = staat || S();
+      const giften = (bron.bronnen || []).filter(b =>
+        b.persoonscode_id === toegang.id &&
+        b.donateur_subject_id === toegang.onderwerp.id);
+      return giften.length ? { giften, staat: bron } : null;
+    }), t => {
+      if (!t.ok) return { fout: { status: t.status, error: t.error } };
+      return { giften: t.gebonden.giften, staat: t.gebonden.staat, toegang: t.toegang };
+    });
+  }
 
   /* Wat er met een gift gebeurde, op projectniveau. Zit er geen oormerk op,
      dan is het antwoord de stad -- en dat is een eerlijker antwoord dan een
      verzonnen toewijzing aan het mooiste project. */
-  function bestemming(b) {
+  function bestemming(b, inStaat) {
+    const staat = inStaat || S();
     if (b.projectId) {
-      const p = S().projecten.find(x => x.id === b.projectId);
+      const p = (staat.projecten || []).find(x => x.id === b.projectId);
       if (p) {
         const ind = (p.indicatoren || [])[0] || null;
         return { soort: 'project', naam: p.naam, status: p.status, doelgroep: p.doelgroep || null,
@@ -50,14 +64,14 @@ module.exports = (ctx, eigen) => {
           doel: ind ? { wat: ind.naam || 'doel', doel: ind.doel, bereikt: ind.bereikt } : null };
       }
     }
-    const s = ctx.stadVan(b.stad);
+    const s = ctx.stadVanIn(b.stad, staat);
     return { soort: 'stad', naam: s ? s.naam : b.stad, status: s ? s.status : null, doelgroep: null, doel: null };
   }
 
-  const giftBeeld = b => ({
+  const giftBeeld = (b, inStaat) => ({
     id: b.id, soort: b.soort, bedrag: euro(b.centen), besteed: euro(b.besteed),
     geoormerkt: !!b.projectId, ontvangenOp: String(b.at).slice(0, 10),
-    bestemming: bestemming(b),
+    bestemming: bestemming(b, inStaat),
     periodiek: b.periodiek ? { tot: b.periodiek.tot, jaren: b.periodiek.jaren, kenmerk: b.periodiek.kenmerk } : null,
     /* Waarom er wel of geen giftbewijs is. De reden staat erbij, want "geen
        bewijs" zonder uitleg leest als een fout in het systeem. */
@@ -82,22 +96,25 @@ module.exports = (ctx, eigen) => {
   }
 
   function portaal(c) {
-    const giften = vindCode(c);
-    if (!giften.length) return { status: 404, error: 'Deze code kennen we niet. Vraag de stichting om een nieuwe.' };
-    const totaal = giften.reduce((s, b) => s + b.centen, 0);
-    return { ok: true, donateur: {
-      naam: giften[0].gever, anoniem: !!giften[0].anoniem,
-      totaal: euro(totaal), aantal: giften.length,
-      giften: giften.slice(0, 100).map(giftBeeld),
-      /* Het enige landelijke cijfer dat hij ziet, en met opzet dit: waar het
-         geld van de stichting als geheel heen gaat. Geen hulpvragen, geen
-         wijken, geen mensen. */
-      stichting: overzicht()
-    } };
+    return volg(vindCode(c, SCOPE.lezen), deur => {
+      if (deur.fout) return deur.fout;
+      const giften = deur.giften;
+      const totaal = giften.reduce((s, b) => s + b.centen, 0);
+      return { ok: true, donateur: {
+        naam: giften[0].gever, anoniem: !!giften[0].anoniem,
+        totaal: euro(totaal), aantal: giften.length,
+        giften: giften.slice(0, 100).map(b => giftBeeld(b, deur.staat)),
+        /* Het enige landelijke cijfer dat hij ziet, en met opzet dit: waar het
+           geld van de stichting als geheel heen gaat. Geen hulpvragen, geen
+           wijken, geen mensen. */
+        stichting: overzicht(deur.staat)
+      } };
+    });
   }
 
-  function overzicht() {
-    const steden = S().steden.filter(s => s.status === 'actief');
+  function overzicht(inStaat) {
+    const staat = inStaat || S();
+    const steden = (staat.steden || []).filter(s => s.status === 'actief');
     const som = (a, f) => a.reduce((x, y) => x + (Number(f(y)) || 0), 0);
     const c = steden.map(s => cijfersVan(s.id));
     return { steden: steden.length,
@@ -110,12 +127,13 @@ module.exports = (ctx, eigen) => {
      wat de stichting ervan drukt is haar briefpapier. Wel alles wat de
      Belastingdienst erop wil zien staan. */
   function bewijs(c, giftId) {
-    const giften = vindCode(c);
-    if (!giften.length) return { status: 404, error: 'Deze code kennen we niet.' };
-    const b = giften.find(x => x.id === String(giftId || ''));
-    if (!b) return { status: 404, error: 'Deze gift staat niet op uw code.' };
-    const k = bewijsbaar(b);
-    if (!k.kan) return { status: 400, error: k.waarom };
+    return volg(vindCode(c, SCOPE.bewijs), deur => {
+      if (deur.fout) return deur.fout;
+      const giften = deur.giften;
+      const b = giften.find(x => x.id === String(giftId || ''));
+      if (!b) return { status: 404, error: 'Deze gift staat niet op uw code.' };
+      const k = bewijsbaar(b);
+      if (!k.kan) return { status: 400, error: k.waarom };
 
     /* PERIODIEK ALLEEN ALS HET VASTLIGT. Zonder overeenkomst is het een gewone
        gift met een drempel, en dat moet er dan ook staan. */
@@ -123,26 +141,28 @@ module.exports = (ctx, eigen) => {
        ontkenning gaf dit veld `undefined` terug bij een gewone gift, en een
        leesbaar veld dat soms verdwijnt laat de ontvangende kant raden -- terwijl
        juist dit veld bepaalt wat er op het bewijs staat. */
-    const periodiek = !!(b.periodiek && b.periodiek.jaren >= 5);
-    return { ok: true, bewijs: {
-      stichting: 'Stichting RTFoundation',
-      gever: b.anoniem ? 'anoniem (bij de stichting bekend)' : b.gever,
-      bedrag: euro(b.centen), datum: String(b.at).slice(0, 10), soort: b.soort,
-      bestemming: bestemming(b).naam,
-      periodiek,
-      overeenkomst: periodiek ? { kenmerk: b.periodiek.kenmerk, tot: b.periodiek.tot, jaren: b.periodiek.jaren } : null,
-      toelichting: periodiek
-        ? 'Periodieke gift op grond van een vastgelegde overeenkomst van ' + b.periodiek.jaren +
-          ' jaar. Volledig aftrekbaar, zonder drempel en zonder plafond.'
-        : 'Gewone gift. Aftrekbaar voor zover het totaal van uw giften boven de drempel uitkomt; ' +
-          'wilt u zonder drempel geven, vraag de stichting dan om een periodieke schenkingsovereenkomst.'
-    } };
+      const periodiek = !!(b.periodiek && b.periodiek.jaren >= 5);
+      return { ok: true, bewijs: {
+        stichting: 'Stichting RTFoundation',
+        gever: b.anoniem ? 'anoniem (bij de stichting bekend)' : b.gever,
+        bedrag: euro(b.centen), datum: String(b.at).slice(0, 10), soort: b.soort,
+        bestemming: bestemming(b, deur.staat).naam,
+        periodiek,
+        overeenkomst: periodiek ? { kenmerk: b.periodiek.kenmerk, tot: b.periodiek.tot, jaren: b.periodiek.jaren } : null,
+        toelichting: periodiek
+          ? 'Periodieke gift op grond van een vastgelegde overeenkomst van ' + b.periodiek.jaren +
+            ' jaar. Volledig aftrekbaar, zonder drempel en zonder plafond.'
+          : 'Gewone gift. Aftrekbaar voor zover het totaal van uw giften boven de drempel uitkomt; ' +
+            'wilt u zonder drempel geven, vraag de stichting dan om een periodieke schenkingsovereenkomst.'
+      } };
+    });
   }
 
   /* De kantoorkant woont in ./donateur-kantoor.js: dit bestand ging over de
      10 KB en de naad loopt langs de lezer -- hier de gever, daar de medewerker. */
-  const kantoor = require('./donateur-kantoor')(ctx, { code });
+  const kantoor = require('./donateur-kantoor')(ctx, { DOEL, SOORT, SCOPE });
 
-  return { portaal, bewijs, codeVoor: kantoor.codeVoor, periodiekVast: kantoor.periodiekVast,
-    vindCode, bewijsbaar, giftBeeld };
+  return { portaal, bewijs, codeVoor: kantoor.codeVoor,
+    codeIntrekken: kantoor.codeIntrekken, codeRoteren: kantoor.codeRoteren,
+    periodiekVast: kantoor.periodiekVast, vindCode, bewijsbaar, giftBeeld, SCOPE };
 };

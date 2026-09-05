@@ -113,7 +113,27 @@ const MIGRATIES = [
   { n: 7, naam: 'publieke-ledenmail', op: (db) => {
     voegKolomToe(db, 'users', 'public_mail_hash', 'TEXT');
     db.exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_users_public_mail_hash ON users(public_mail_hash) WHERE public_mail_hash IS NOT NULL');
-  } }
+  } },
+  /* Migratie 3 kan op bestaande installaties niet opnieuw worden uitgevoerd.
+     Deze nieuwe stap legt daarom ook daar de duurzame SCIM-herstelrijen aan. */
+  { n: 8, naam: 'scim-intrekking-outbox', op: (db) => require('../scim').zorgTabel(db) },
+  /* Een personeelsuitnodiging mag per zaak nooit twee actieve accounts voor
+     hetzelfde RTG-lid opleveren, ook niet wanneer twee app-instances precies
+     tegelijk de tweede duurzame grens (accounts) bereiken. */
+  { n: 9, naam: 'unieke-actieve-personeelskoppeling', op: (db) => {
+    db.exec(`CREATE UNIQUE INDEX IF NOT EXISTS idx_staff_actief_lid
+      ON supplier_staff(supplier_code, member_id)
+      WHERE active = 1 AND member_id IS NOT NULL`);
+  } },
+  /* Een Redis-storing mag een lokaal geslaagde intrekking niet vergeten. De
+     outbox wordt in dezelfde SQLite-transactie gezet en vóór readiness naar
+     de vervallende Redis-autoriteit herspeeld. */
+  { n: 10, naam: 'intrekking-outbox', op: (db) => db.exec(`CREATE TABLE IF NOT EXISTS intrekking_outbox (
+    sleutel TEXT PRIMARY KEY,
+    soort TEXT NOT NULL,
+    waarde TEXT NOT NULL,
+    verloopt INTEGER NOT NULL
+  )`) }
 ];
 
 module.exports = { MIGRATIES, voegKolomToe, accountsBasis };

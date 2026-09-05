@@ -76,8 +76,16 @@
         await refresh(); } catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('[data-kinv]').forEach(b => b.addEventListener('click', async () => {
-      try { await API.call('/supplier/staff/invite/intrek', { kassacode: b.dataset.kinv });
+      try { await API.call('/supplier/staff/invite/intrek', { id: b.dataset.kinv });
         invData = null; toast(T('kt.ingetrokken','Uitnodiging ingetrokken.')); renderStation(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-krot]').forEach(b => b.addEventListener('click', async () => {
+      try { const d = await API.call('/supplier/staff/invite/roteer', {
+        id: b.dataset.krot, idem: RTGIdem('inv-roteer')
+      });
+        kantoorMsg = T('kt.invite.rotated','Nieuwe uitnodigingscode; geef hem nu eenmalig door:')+'<br>'+
+          '<b class="kantoor-code-eenmalig">'+escT(d.invite.kassacode)+'</b>';
+        invData = null; await refresh(); } catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('[data-kno]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/apply/decide', { id: b.dataset.kno, action: 'afwijzen' }); await refresh(); } catch(e){ toast(e.message); }

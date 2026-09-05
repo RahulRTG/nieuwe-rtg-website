@@ -16,6 +16,8 @@
    zichzelf al eenmalig: hij weigert een code die al is uitgegeven met een 409
    ("Code X is al uitgegeven"), en de tweede oproep komt dus nooit bij het
    afrekenen. Een idem-sleutel zou daar niets aan toevoegen. */
+const moneyCredentialBlokkade = require('../../../middleware/money-credential-productiepoort').blokkade;
+
 module.exports = (kern) => {
   const { app, broadcastSync, crypto, db, facturatie, logActivity, notify, pickupCode, save,
           sseToCustomer, sseToOffice, sseToSupplier, supplierAuth, ordersVanZaak } = kern;
@@ -24,12 +26,18 @@ module.exports = (kern) => {
   const factuurVoorLid = maakFactuurVoorLid(facturatie);
 
 app.post('/api/supplier/pos/redeem', supplierAuth, (req, res) => {
+  const dicht = moneyCredentialBlokkade('pay.order_pickup_code');
+  if (dicht) return res.status(dicht.status).json(dicht);
   const code = String(req.body.code || '').trim().toUpperCase();
   if (!code) return res.status(400).json({ error: 'Voer een ophaalcode in.' });
-  const o = ordersVanZaak(req.supplier.code).find(x => x.pickup === code);
+  /* Een interne spoedbon gebruikt `pickupCode()` alleen als werknummer op de
+     keukenlijn. Hij heeft geen klant en geen uitgifterecht. Zonder de expliciete
+     scheiding hieronder maakte dit algemene loket van dat werknummer alsnog
+     een bearer waarmee iemand de interne bon kon laten aftekenen. */
+  const o = ordersVanZaak(req.supplier.code).find(x => !x.intern && x.pickup === code);
   if (!o) return res.status(404).json({ error: 'Onbekende code voor dit bedrijf.' });
   if (o.refunded || o.status === 'geweigerd') return res.status(409).json({ error: 'Deze bestelling is geannuleerd.' });
-  if (o.status === 'geserveerd') return res.status(409).json({ error: 'Code ' + code + ' is al uitgegeven.' });
+  if (o.status === 'geserveerd') return res.status(409).json({ error: 'Deze ophaalcode is al uitgegeven.' });
   const wasPaid = o.paid;
   let sale = null;
   if (!o.paid) {
@@ -48,7 +56,9 @@ app.post('/api/supplier/pos/redeem', supplierAuth, (req, res) => {
       id: crypto.randomBytes(4).toString('hex'),
       bon: pickupCode(),
       actor: req.actor.name,
-      desc: 'RTG-code ' + code + ' (' + o.ref + ')',
+      /* De bearer blijft bij de order en wordt niet nogmaals in de bontekst
+         opgeslagen. De autoritatieve orderreferentie is genoeg voor audit. */
+      desc: 'RTG-ophaalbestelling ' + o.ref,
       room: null,
       items: o.items, total: o.total, method: 'rtg',
       at: new Date().toISOString()
@@ -68,7 +78,8 @@ app.post('/api/supplier/pos/redeem', supplierAuth, (req, res) => {
   }
   o.status = 'geserveerd';
   save();
-  logActivity(req.supplier.code, req.actor, 'gaf bestelling ' + o.ref + ' uit op code ' + code + (wasPaid ? '' : ' en rekende € ' + o.total + ' af (RTG)'));
+  logActivity(req.supplier.code, req.actor, 'gaf bestelling ' + o.ref + ' uit'
+    + (wasPaid ? '' : ' en rekende € ' + o.total + ' af (RTG)'));
   broadcastSync([o.customerTier], 'orders');
   sseToCustomer(o.customerKey || o.customerTier, 'sync', { scope: 'orders' });
   sseToOffice('sync', { scope: 'orders' });

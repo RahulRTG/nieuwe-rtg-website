@@ -24,7 +24,7 @@
 
 const { KANAAL } = require('./schrijflanen');
 
-function maakPg({ merge3, kluis, log, url }) {
+function maakPg({ merge3, kluis, log, url, onFout }) {
   const { Pool } = require('../pgwire');
   // Pool-grootte: de kv-flush, het transactie-grootboek en de ledengids delen
   // deze pool; onder gelijktijdige last is 10 te krap (wachtrij = latentie).
@@ -50,7 +50,10 @@ function maakPg({ merge3, kluis, log, url }) {
   // de database sluit de verbinding, een netwerk-drop) opborrelen als een
   // 'error'-event op de pool -- en een onafgehandeld 'error'-event laat het hele
   // proces crashen. We loggen het; de pool vervangt de verbinding zelf.
-  pool.on('error', (e) => { if (log && log.warn) log.warn('pg-pool: fout op inactieve verbinding', { fout: e.message }); });
+  pool.on('error', (e) => {
+    if (log && log.warn) log.warn('pg-pool: fout op inactieve verbinding', { fout: e.message });
+    if (typeof onFout === 'function') onFout(e, 'pool');
+  });
   let luisterClient = null;
   const toegepast = new Map();   // collectie -> versie die dit proces al toepaste
   const laatsteJson = new Map(); // collectie -> laatst gesynchroniseerde JSON
@@ -77,6 +80,9 @@ function maakPg({ merge3, kluis, log, url }) {
        `weg = true`; elke node die opstart past dat verwijderen dan alsnog toe,
        ook maanden later en ook als hij die wis nooit heeft gezien. */
     await pool.query('ALTER TABLE kv ADD COLUMN IF NOT EXISTS weg BOOLEAN NOT NULL DEFAULT false');
+    await pool.query(`CREATE TABLE IF NOT EXISTS economische_boekingen(
+      sleutel TEXT PRIMARY KEY, afdruk TEXT NOT NULL, antwoord TEXT NOT NULL,
+      aangemaakt TIMESTAMPTZ NOT NULL DEFAULT now())`);
   }
 
   /* Laad alle collecties uit Postgres (of null als de tabel leeg is). Naast de
@@ -87,14 +93,19 @@ function maakPg({ merge3, kluis, log, url }) {
   async function laadAlles() {
     const { rows } = await pool.query('SELECT key, val, ver, weg FROM kv');
     if (!rows.length) return null;
-    const data = {}, grafstenen = [];
+    const data = {}, grafstenen = [], versies = new Map(), jsons = new Map();
     for (const r of rows) {
-      toegepast.set(r.key, Number(r.ver));
-      if (r.weg) { grafstenen.push(r.key); laatsteJson.delete(r.key); continue; }
+      versies.set(r.key, Number(r.ver));
+      if (r.weg) { grafstenen.push(r.key); continue; }
       const j = uitStore(r.val);
       data[r.key] = JSON.parse(j);
-      laatsteJson.set(r.key, j);
+      jsons.set(r.key, j);
     }
+    /* Publiceer de sync-caches pas nadat ALLE rijen zijn ontsleuteld en
+       geparsed. Een kapotte rij mag geen half-vernieuwde resync achterlaten. */
+    toegepast.clear(); laatsteJson.clear();
+    for (const [k, v] of versies) toegepast.set(k, v);
+    for (const [k, v] of jsons) laatsteJson.set(k, v);
     Object.defineProperty(data, '__grafstenen', { value: grafstenen, enumerable: false });
     return data;
   }
@@ -128,13 +139,18 @@ function maakPg({ merge3, kluis, log, url }) {
 
   // een autoritatieve read-modify-write op een collectie; zie ./collectietransactie.js
   const { bewerkCollectie } = require('./collectietransactie')(ctx);
+  const { boekEenmaal } = require('./economische-boeking')(ctx);
+  const { commitVerzoek, openstaandeWijzigingen } = require('./verzoektransactie')(ctx);
 
   // Luister op NOTIFY zodat wijzigingen van andere instances vrijwel direct
   // binnenkomen (geen puur pollen). De aparte client blijft open staan.
   async function luister(onWijziging) {
     luisterClient = await pool.connect();
     luisterClient.on('notification', () => { onWijziging(); });
-    luisterClient.on('error', (e) => { if (log) log.warn('pg-listen fout', { fout: e.message }); });
+    luisterClient.on('error', (e) => {
+      if (log) log.warn('pg-listen fout', { fout: e.message });
+      if (typeof onFout === 'function') onFout(e, 'listen');
+    });
     await luisterClient.query('LISTEN ' + KANAAL);
   }
 
@@ -149,7 +165,7 @@ function maakPg({ merge3, kluis, log, url }) {
   function poolStatus() {
     return { totaal: pool.totalCount, inactief: pool.idleCount, wachtend: pool.waitingCount, max: pool.options.max };
   }
-  return { schema, laadAlles, wisCollectie, flush, flushVoorrang, bewerkCollectie, haalNieuwer, luister, sluit, pool, poolStatus,
+  return { schema, laadAlles, wisCollectie, flush, flushVoorrang, bewerkCollectie, boekEenmaal, commitVerzoek, openstaandeWijzigingen, haalNieuwer, luister, sluit, pool, poolStatus,
     heeftUitgesteld: () => vlag.uitgesteld,
     _staat: { toegepast, laatsteJson } };
 }

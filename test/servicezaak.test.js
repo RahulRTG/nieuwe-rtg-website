@@ -184,11 +184,11 @@ test('de operationele stand van een zaak gaat pas open met een machtiging', asyn
   } finally { await stop(o.srv); }
 });
 
-test('een AI mag een machtiging krijgen, maar nooit zwaar werk en nooit als tweede handtekening', async () => {
+test('een AI krijgt alleen de actieve capability; verwijderde namen maken geen machtiging', async () => {
   const o = await opzet();
   try {
     const z = (await o.p('/api/supplier/service/open',
-      { onderwerp: 'account', titel: 'Wij komen niet in onze werkruimte' }, o.zaakToken)).body.zaak;
+      { onderwerp: 'zaak', titel: 'Onze werkruimte reageert niet' }, o.zaakToken)).body.zaak;
     /* Op moduleniveau, want een AI vraagt niet langs de kantoorroute: die draagt
        de sleutel van een MENS uit de sessie, en juist daarom kan niemand zich
        voordoen als machine. */
@@ -196,22 +196,23 @@ test('een AI mag een machtiging krijgen, maar nooit zwaar werk en nooit als twee
     const db = { data: {} };
     const zaken = require('../server/kern/service/zaak')({ db, save: () => {}, crypto });
     const mach = require('../server/kern/service/machtiging')({ db, save: () => {}, crypto, zaken });
-    const zz = zaken.open({ melder: 'zaak-X', doelgroep: 'zaak', onderwerp: 'account', titel: 'Toegang' }).zaak;
+    const zz = zaken.open({ melder: 'zaak-X', doelgroep: 'zaak', onderwerp: 'zaak', titel: 'Werkruimte' }).zaak;
 
     const v = mach.verleen({ zaakId: zz.id, mens: 'ai:onderzoeker',
-      capabilities: ['identiteit.uitdaging', 'identiteit.openen'],
-      reden: 'de AI kijkt mee met dit toegangsprobleem' });
-    assert.deepEqual(v.machtiging.capabilities, ['identiteit.uitdaging'],
-      'de AI kreeg zwaar werk: ' + JSON.stringify(v.machtiging.capabilities));
+      capabilities: ['organisatie.stand', 'identiteit.uitdaging', 'identiteit.openen'],
+      reden: 'de AI kijkt mee met dit werkruimteprobleem' });
+    assert.deepEqual(v.machtiging.capabilities, ['organisatie.stand'],
+      'de AI kreeg een capability zonder lezer: ' + JSON.stringify(v.machtiging.capabilities));
+    assert.ok(v.geweigerd.includes('identiteit.uitdaging'), 'de gewone verwijderde capability wordt niet gemeld');
     assert.ok(v.geweigerd.includes('identiteit.openen'), 'de weigering wordt niet gemeld');
 
-    /* En een machine kan nooit de tweede handtekening zijn: die eis bestaat om
-       een MENS naast een mens te zetten. */
+    /* Een vroegere zware naam kan niet meer tot de ceremonie komen: zonder
+       echte lezer ontstaat er helemaal geen machtiging om bij te tekenen. */
     const vanMens = mach.verleen({ zaakId: zz.id, mens: 'nadia',
       capabilities: ['identiteit.openen'], reden: 'account recovery aan de balie' });
-    const bij = mach.tekenBij(vanMens.machtiging.id, { mens: 'ai:onderzoeker' });
-    assert.ok(bij.error, 'een AI kon de tweede handtekening zetten');
-    assert.match(bij.error, /MENS/i);
+    assert.equal(vanMens.status, 403);
+    assert.deepEqual(vanMens.geweigerd, ['identiteit.openen']);
+    assert.deepEqual(mach.ZWAAR, {});
     assert.equal(z.doelgroep, 'zaak');
   } finally { await stop(o.srv); }
 });
@@ -231,8 +232,8 @@ test('de AI-onderzoeker opent pas iets nadat het lid heeft bevestigd, en leent n
   const bev = require('../server/kern/service/bevestiging')({ db, save, crypto, zaken, machtigingen: mach });
   const ond = require('../server/kern/service/onderzoeker')({ zaken, loop, machtigingen: mach, bevestiging: bev, save });
 
-  const z = zaken.open({ melder: 'lid-77', doelgroep: 'lid', onderwerp: 'account',
-    titel: 'Ik kom niet meer in mijn account' }).zaak;
+  const z = zaken.open({ melder: 'lid-77', doelgroep: 'lid', onderwerp: 'zaak',
+    titel: 'Mijn werkruimte reageert niet' }).zaak;
   /* `teVragen` en niet `benodigd`: wat de ZETEL al verleent hoort niet in een
      bevestiging, en `zaak.lezen` was de eerste die `benodigd` opleverde. Deze
      toets koos dus precies de bevoegdheid die er niet meer in thuishoort. */
@@ -245,12 +246,12 @@ test('de AI-onderzoeker opent pas iets nadat het lid heeft bevestigd, en leent n
   assert.ok(!('melder' in s.stof), 'de onderzoeker kreeg de melder mee');
 
   const v = ond.vraagToegang({ zaakId: z.id, capabilities: [cap, 'identiteit.openen'],
-    reden: 'om te zien waar het inloggen vastloopt' });
+    reden: 'om te zien waar de werkruimte vastloopt' });
   assert.ok(v.ok, JSON.stringify(v));
   assert.equal(v.machine, true, 'de aanvraag noemt zichzelf geen machine');
   assert.equal(v.bevestiging.machine, true, 'het lid ziet niet dat er een machine vraagt');
   assert.ok(v.nietGevraagd.some(u => u.capability === 'identiteit.openen'),
-    'zwaar werk werd stilzwijgend meegevraagd of stilzwijgend weggelaten');
+    'een niet-actieve capability werd stilzwijgend meegevraagd of weggelaten');
 
   /* VOOR de bevestiging is er geen machtiging, dus is er niets te openen. */
   assert.equal(v.bevestiging.machtiging, null, 'er ontstond een machtiging zonder het lid');
@@ -263,7 +264,7 @@ test('de AI-onderzoeker opent pas iets nadat het lid heeft bevestigd, en leent n
   /* En hij leent niet: een machtiging op naam van een mens opent voor de AI
      niets, ook al draagt hij exact dezelfde capability. */
   const vanMens = mach.verleen({ zaakId: z.id, mens: 'nadia', capabilities: [cap],
-    reden: 'nadia kijkt zelf naar dit toegangsprobleem' });
+    reden: 'nadia kijkt zelf naar dit werkruimteprobleem' });
   const geleend = ond.poort(vanMens.machtiging.id, cap, { zaakId: z.id });
   assert.equal(geleend.mag, false, 'de AI leende de machtiging van een mens');
   assert.match(geleend.waarom, /mens/i);
@@ -271,10 +272,10 @@ test('de AI-onderzoeker opent pas iets nadat het lid heeft bevestigd, en leent n
   /* EN EEN TWEEDE VRAAG SCHRIJFT NIETS. De bevestiging hergebruikt een lopend
      verzoek; de tijdlijnregel ernaast deed dat eerst niet en liep vol met een
      handeling die niet gebeurde. Gevonden met een kale ronde, niet met lezen. */
-  const z2 = zaken.open({ melder: 'lid-78', doelgroep: 'lid', onderwerp: 'account',
-    titel: 'Ik kom er ook niet in' }).zaak;
+  const z2 = zaken.open({ melder: 'lid-78', doelgroep: 'lid', onderwerp: 'zaak',
+    titel: 'Mijn werkruimte reageert ook niet' }).zaak;
   const vraag = () => ond.vraagToegang({ zaakId: z2.id, capabilities: [cap],
-    reden: 'om te zien waar het inloggen vastloopt' });
+    reden: 'om te zien waar de werkruimte vastloopt' });
   vraag();
   const na1 = zaken.vind(z2.id).tijdlijn.length;
   const tweede = vraag();

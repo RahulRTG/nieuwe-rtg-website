@@ -142,8 +142,10 @@ test('RTG Reizen: de klaargezette reis staat op het uitnodigingsscherm',
           van: dag(40), tot: dag(45), kenmerk: 'QQ1234', herkomst: 'document' }]
       }, kantoor);
       assert.equal(zet.status, 200, JSON.stringify(zet.body).slice(0, 160));
-      const code = String(zet.body.link).split('code=')[1];
-      assert.equal(code.length, 32, 'de code is 128 bits en dus niet te raden');
+      const link = new URL(String(zet.body.link), base);
+      const code = decodeURIComponent(link.hash.replace(/^#code=/, ''));
+      assert.match(code, /^REIS\.[A-F0-9]{32}$/, 'de code draagt 128 willekeurige bits');
+      assert.equal(link.search, '', 'de kale code staat niet in proxy-, log- of referrerzichtbare query');
 
       const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
       const page = await ctx.newPage();
@@ -151,9 +153,10 @@ test('RTG Reizen: de klaargezette reis staat op het uitnodigingsscherm',
       letOpFouten(page, fouten);
       /* UITGELOGD, want dat is de weg die deze pagina bedient: iemand krijgt een
          link van het reisbureau en heeft nog geen account. */
-      await page.goto(base + '/apps/reisuitnodiging.html?code=' + code, { waitUntil: 'domcontentloaded' });
+      await page.goto(link.href, { waitUntil: 'domcontentloaded' });
       await page.waitForFunction(() => /Ibiza/i.test(document.getElementById('vak').innerText),
         null, { timeout: 20000 });
+      assert.equal(new URL(page.url()).hash, '', 'de pagina wist het fragment vóór vervolgverzoeken');
 
       const tekst = await page.evaluate(() => document.getElementById('vak').innerText);
       assert.match(tekst, /Ibiza/i, 'de bestemming van de klaargezette reis staat er');

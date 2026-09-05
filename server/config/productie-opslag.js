@@ -33,6 +33,7 @@
 const fs = require('fs');
 const path = require('path');
 const keuze = require('../db/keuze');
+const pgTransport = require('../pgwire/transport');
 
 /* Ligt er een db.json? Dat bepaalt mee welke stand de opslag kiest, en het is
    het enige wat deze keuring van de schijf hoeft te weten. Faalt de vraag, dan
@@ -48,6 +49,24 @@ function bestaatDbJson(env) {
 
 function keurOpslag(env, fouten, waarschuwingen) {
   const store = keuze.kiesStore(env, bestaatDbJson(env));
+  const databaseUrl = env.DATABASE_URL || env.PG_URL;
+  /* RTG_STORE wint bewust van DATABASE_URL in de runtimekeuze. Daardoor kon
+     een omgeving er voor de go-live-keuring uitzien als PostgreSQL, terwijl
+     het proces door `RTG_STORE=sqlite` toch een lokaal bestand gebruikte. Een
+     ingestelde maar genegeerde productiedatabase is nooit een geldige stand:
+     laat de beheerder de override verwijderen in plaats van het verschil stil
+     te accepteren. */
+  if ((env.DATABASE_URL || env.PG_URL) && store !== 'postgres') {
+    fouten.push('RTG_STORE=' + store + ' overschrijft de ingestelde PostgreSQL-verbinding. ' +
+      'De keuring mag PostgreSQL niet bewijzen terwijl de runtime een andere opslag gebruikt; verwijder RTG_STORE of zet hem op postgres.');
+  }
+  /* Dezelfde transportuitspraak die de driver bij het openen nogmaals
+     afdwingt. Een externe database zonder verify-full is geen veilige
+     productiedatabase; `require` zonder hostnaamcontrole evenmin. */
+  if (databaseUrl) {
+    const transport = pgTransport.keurProductieUrl(databaseUrl, env);
+    fouten.push(...transport.fouten);
+  }
   if (!keuze.heeftGrootboek(env, store)) {
     fouten.push('De opslagstand "' + store + '" heeft geen transactie-grootboek: betalingen en boekingen ' +
       'buiten de grens belanden dan in archief/ in plaats van in een geindexeerd grootboek. ' +

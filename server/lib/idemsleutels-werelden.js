@@ -56,7 +56,6 @@ const SLEUTELS = {
   'POST /api/office/reisbureau/bevestig': { zelfdeVerzoek: true },  // idem, langs de losse ingang
   'POST /api/office/reisbureau/afwijzen': { zelfdeVerzoek: true },  // idem
   'POST /api/office/reisbureau/lees': { leest: true },           // voorlezen bewaart niets (zie kern/reisuitnodiging.js)
-  'POST /api/office/reisbureau/klaarzetten': { zelfdeVerzoek: true }, // de klaargezette reis; dubbeltik is een herhaling
   'POST /api/office/reisbureau/uitnodigingen': { leest: true },
   'POST /api/office/reisbureau/uitnodiging-weg': { zelfdeVerzoek: true }, // intrekken op id
   'POST /api/reis/reizen': { leest: true },                      // mijn reizen
@@ -69,7 +68,6 @@ const SLEUTELS = {
   'POST /api/reis/invoer/weg': { zelfdeVerzoek: true },          // weghalen op id
   'POST /api/reis/uitnodiging/open': { leest: true },            // kijken wat er klaarstaat; bewaart niets
   'POST /api/reis/uitnodiging/mijn': { leest: true },
-  'POST /api/reis/uitnodiging/nodig-uit': { zelfdeVerzoek: true }, // de onderdelen in de body bepalen wat er ontstaat
   'POST /api/reis/uitnodiging/eisop': { zelfdeVerzoek: true },   // opeisen op code; een gebruikte code is op
   'POST /api/reis/uitnodiging/weg': { zelfdeVerzoek: true },     // intrekken op id
 

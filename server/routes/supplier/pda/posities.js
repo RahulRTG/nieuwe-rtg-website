@@ -26,10 +26,10 @@ module.exports = (kctx) => {
    RTG-account (dezelfde die staffPositions gebruikt voor "1x aanmelden"
    hieronder). Daarop matchen we nu.
 
-   Personeel ZONDER gekoppeld RTG-account kan dus niet meer wisselen. Dat is
-   geen verlies maar de kern: zonder identiteit valt niet te bewijzen dat het
-   dezelfde persoon is, en dan hoort er geen sessie bij een andere zaak uit te
-   komen. Zo iemand logt gewoon met zijn eigen PIN in bij de andere zaak. */
+   Personeel ZONDER gekoppeld RTG-account kan dus niet wisselen. Dat is de kern:
+   zonder identiteit valt niet te bewijzen dat het dezelfde persoon is en hoort
+   er geen sessie bij een andere zaak uit te komen. De werkgever nodigt die mens
+   opnieuw uit op diens persoonlijke RTG-account. */
 function ikBij(code, staffId) {
   const ik = accounts.listStaff(code).find(m => m.id === staffId);
   return (ik && ik.member_id != null) ? ik : null;
@@ -63,8 +63,12 @@ app.post('/api/supplier/wissel', supplierAuth, (req, res) => {
   if (!ik) return res.status(403).json({ error: 'Wisselen vraagt een personeelskaart die aan uw RTG-account gekoppeld is.' });
   const daar = accounts.listStaff(doel.code).find(m => m.member_id === ik.member_id);
   if (!daar) return res.status(403).json({ error: 'U staat daar niet op het rooster.' });
+  const binding = accounts.staffAccountBinding(daar.member_id);
+  if (!binding) return res.status(403).json({ error: 'Uw persoonlijke RTG-account is niet meer actief.' });
   const token = crypto.randomBytes(24).toString('hex');
-  rememberSession(token, { role: 'supplier', code: doel.code, actor: daar.name, staffId: daar.id, staffRole: daar.role, manager: daar.role === 'manager' });
+  const sess = { role: 'supplier', code: doel.code, actor: daar.name, staffId: daar.id,
+    staffRole: daar.role, manager: daar.role === 'manager', ...binding };
+  rememberSession(token, sess);
   logActivity(doel.code, { name: daar.name }, daar.name + ' wisselde van afdeling (vanuit ' + req.supplier.name + ')');
   res.json({ token, supplier: { code: doel.code, name: doel.name } });
 });
@@ -85,9 +89,12 @@ function mijnPosities(memberId) {
   }).filter(Boolean);
 }
 function staffSessie(pos, memberId) {
+  const binding = accounts.staffAccountBinding(memberId);
+  if (!binding) return null;
   const token = crypto.randomBytes(24).toString('hex');
-  rememberSession(token, { role: 'supplier', code: pos.code, actor: pos.persoon,
-    staffId: pos.staffId, staffRole: pos.role, manager: pos.manager, lid: memberId });
+  const sess = { role: 'supplier', code: pos.code, actor: pos.persoon,
+    staffId: pos.staffId, staffRole: pos.role, manager: pos.manager, ...binding };
+  rememberSession(token, sess);
   return token;
 }
 function posantwoord(pos, memberId, posities) {
@@ -100,7 +107,8 @@ app.post('/api/supplier/mijn/login', async (req, res) => {
   const bucket = 'mijn:' + req.ip;
   if (tooManyTries(res, bucket)) return;
   const lid = accounts.findByLogin(req.body.login);
-  if (!lid || !(await accounts.verifyPassword(String(req.body.password || ''), lid.password_hash))) {
+  if (!lid || (accounts.isActief && !accounts.isActief(lid)) ||
+      !(await accounts.verifyPassword(String(req.body.password || ''), lid.password_hash))) {
     noteFailedTry(bucket, req.ip);
     return res.status(401).json({ error: 'Onjuiste RTG-inloggegevens. Log in met uw eigen RTG-account.' });
   }
@@ -112,8 +120,10 @@ app.post('/api/supplier/mijn/login', async (req, res) => {
   // land op het gevraagde bedrijf (deeplink/onthouden), anders het eerste
   const voorkeur = String(req.body.bedrijf || '').toUpperCase();
   const start = posities.find(p => p.code === voorkeur) || posities[0];
+  const antwoord = posantwoord(start, lid.id, posities);
+  if (!antwoord.token) return res.status(401).json({ error: 'Uw persoonlijke RTG-account is niet meer actief.' });
   logActivity(start.code, { name: start.persoon }, start.persoon + ' logde in (RTG-account)');
-  res.json(posantwoord(start, lid.id, posities));
+  res.json(antwoord);
 });
 // De eigen werkplekken opnieuw ophalen (na herstel van de sessie), zodat de
 // wissel-kaart ook zonder verse login weet welke bedrijven er zijn.
@@ -129,7 +139,9 @@ app.post('/api/supplier/mijn/wissel', supplierAuth, (req, res) => {
   const doel = posities.find(p => p.code === String(req.body.code || '').toUpperCase());
   if (!doel) return res.status(403).json({ error: 'U werkt daar niet, of het bedrijf bestaat niet meer.' });
   if (doel.code === req.supplier.code) return res.status(400).json({ error: 'U bent hier al.' });
+  const antwoord = posantwoord(doel, req.actor.lid, posities);
+  if (!antwoord.token) return res.status(401).json({ error: 'Uw persoonlijke RTG-account is niet meer actief.' });
   logActivity(doel.code, { name: doel.persoon }, doel.persoon + ' wisselde naar deze werkplek');
-  res.json(posantwoord(doel, req.actor.lid, posities));
+  res.json(antwoord);
 });
 };

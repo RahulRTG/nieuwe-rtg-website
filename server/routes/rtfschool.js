@@ -3,10 +3,12 @@
    leeftijdsgroep van het profiel is de poort. Gasten kijken mee in de
    bibliotheek maar installeren niet, en doen niet mee met Samen. */
 module.exports = (kern) => {
-  const { app, rtf, schoolbieb, samenRtf, beroepenbieb } = kern;
+  const { app, rtf, schoolbieb, samenRtf, beroepenbieb, tooManyTries,
+    noteFailedTry, loginFails } = kern;
 
   function profiel(req, res) {
-    const sess = rtf.verifieerProfiel(req.body.code, req.body.token);
+    const body = req.body || {};
+    const sess = rtf.verifieerProfiel(body.code, body.token);
     if (!sess) { res.status(403).json({ error: 'Log opnieuw in bij je gezin.' }); return null; }
     sess.groep = (sess.p && sess.p.groep) || (sess.kind ? 'kind' : 'volw');
     return sess;
@@ -71,12 +73,64 @@ module.exports = (kern) => {
     if (s.gast) { res.status(403).json({ error: 'Samen is voor het gezin en vrienden; als gast kijk je gewoon mee over de schouder.' }); return null; }
     return s;
   };
-  app.post('/api/rtf/samen/maak', (req, res) => { const s = samenSess(req, res); if (!s) return; stuur(res, samenRtf.maak(s)); });
-  app.post('/api/rtf/samen/mee', (req, res) => { const s = samenSess(req, res); if (!s) return; stuur(res, samenRtf.doeMee(s, req.body.kamercode)); });
-  app.post('/api/rtf/samen/zet', (req, res) => { const s = samenSess(req, res); if (!s) return; stuur(res, samenRtf.zet(s, req.body.kamercode, req.body.pad, req.body.titel)); });
-  app.post('/api/rtf/samen/chat', (req, res) => { const s = samenSess(req, res); if (!s) return; stuur(res, samenRtf.chat(s, req.body.kamercode, req.body.tekst)); });
-  app.post('/api/rtf/samen/weg', (req, res) => { const s = samenSess(req, res); if (!s) return; stuur(res, samenRtf.weg(s, req.body.kamercode)); });
-  app.post('/api/rtf/samen/staat', (req, res) => { const s = samenSess(req, res); if (!s) return; stuur(res, samenRtf.staat(s, req.body.kamercode)); });
+  const idem = req => String(((req.body || {}).idem ||
+    (req.get && req.get('idempotency-key')) || '')).slice(0, 200);
+  const status = r => Number.isInteger(r && r.status) && r.status >= 100 &&
+    r.status <= 599 ? r.status : 200;
+  const handel = async (res, werk) => {
+    try {
+      const r = await Promise.resolve(werk());
+      return res.status(status(r)).json(r && r.error ? { error: r.error } : r);
+    } catch (e) {
+      /* Het foutobject kan de aangeboden bearer bevatten. Log alleen de route,
+         nooit invoer of exceptiontekst. */
+      console.error('[rtf-samen] veilige verwerking mislukt');
+      return res.status(503).json({ error: 'Samen kon niet veilig worden verwerkt.' });
+    }
+  };
+  app.post('/api/rtf/samen/maak', async (req, res) => {
+    const s = samenSess(req, res); if (!s) return;
+    await handel(res, () => samenRtf.maak(s, idem(req)));
+  });
+  app.post('/api/rtf/samen/mee', async (req, res) => {
+    const s = samenSess(req, res); if (!s) return;
+    const bucket = 'rtf-samen-code:' + req.ip;
+    if (tooManyTries && tooManyTries(res, bucket)) return;
+    let r;
+    try { r = await Promise.resolve(samenRtf.doeMee(s, (req.body || {}).deelcode)); }
+    catch (e) {
+      console.error('[rtf-samen] veilige verwerking mislukt');
+      return res.status(503).json({ error: 'Samen kon niet veilig worden verwerkt.' });
+    }
+    if (r && r.error && r.status !== 503 && noteFailedTry)
+      noteFailedTry(bucket, req.ip);
+    else if (r && !r.error && loginFails) loginFails.delete(bucket);
+    return res.status(status(r)).json(r && r.error ? { error: r.error } : r);
+  });
+  app.post('/api/rtf/samen/code', async (req, res) => {
+    const s = samenSess(req, res); if (!s) return;
+    await handel(res, () => samenRtf.roteer(s, (req.body || {}).id, idem(req)));
+  });
+  app.post('/api/rtf/samen/zet', async (req, res) => {
+    const s = samenSess(req, res); if (!s) return; const b = req.body || {};
+    await handel(res, () => samenRtf.zet(s, b.id, b.pad, b.titel, idem(req)));
+  });
+  app.post('/api/rtf/samen/chat', async (req, res) => {
+    const s = samenSess(req, res); if (!s) return; const b = req.body || {};
+    await handel(res, () => samenRtf.chat(s, b.id, b.tekst, idem(req)));
+  });
+  app.post('/api/rtf/samen/weg', async (req, res) => {
+    const s = samenSess(req, res); if (!s) return;
+    await handel(res, () => samenRtf.weg(s, (req.body || {}).id));
+  });
+  app.post('/api/rtf/samen/sluit', async (req, res) => {
+    const s = samenSess(req, res); if (!s) return;
+    await handel(res, () => samenRtf.sluit(s, (req.body || {}).id));
+  });
+  app.post('/api/rtf/samen/staat', async (req, res) => {
+    const s = samenSess(req, res); if (!s) return;
+    await handel(res, () => samenRtf.staat(s, (req.body || {}).id));
+  });
 
   /* ---- Rahul voor het gezin: de kindveilige vraagbaak op elke RTF-pagina.
      Antwoordt op het niveau van de leeftijdsgroep, belooft nooit toegang of

@@ -18,7 +18,7 @@
 'use strict';
 
 module.exports = function bouwKernAan(kern, grens) {
-  const { db, save, crypto, schoon, sseToCustomer, accounts, anthropic, mail,
+  const { db, save, bewerkCollectie, crypto, schoon, sseToCustomer, accounts, anthropic, mail,
     beveilig, fs, path, DATA_DIR, rtf, gidsHaal, keyVanCodenaam, leeftijdVan, leeftijdInstr } = kern;
   /* De logger RECHTSTREEKS uit ./log, niet via kern.logboek. Bij het verhuizen
      van dit blok uit server.js kwam `logboek` hier uit de kern -- en daar is
@@ -42,11 +42,14 @@ module.exports = function bouwKernAan(kern, grens) {
   Object.assign(kern, require('../kern/bibliothecaris')({ appbieb: kern.appbieb, reisbieb: kern.reisbieb,
     rtfbieb: kern.rtfbieb, schoolbieb: kern.schoolbieb, beroepenbieb: kern.beroepenbieb, geloofbieb: kern.geloofbieb, anthropic, schoon }));
   require('../routes/bieb')(grens('bieb'));
-  Object.assign(kern, require('../kern/samenrtf')({ db, save, crypto, schoon, zijnVrienden: kern.zijnVrienden }));
+  Object.assign(kern, require('../kern/samenrtf')({
+    db, save, bewerkCollectie, crypto, schoon, zijnVrienden: kern.zijnVrienden
+  }));
   require('../routes/rtfschool')(grens('rtfschool'));
   /* Samen (kern/samen.js): met vrienden meekijken en samen doen door het hele
      leden-OS; kamers op code, live seintjes via de SSE-stroom. */
-  Object.assign(kern, require('../kern/samen')({ db, save, crypto, sseToCustomer, schoon }));
+  Object.assign(kern, require('../kern/samen')({
+    db, save, bewerkCollectie, crypto, sseToCustomer, schoon }));
   /* De Residence (kern/residentie): het virtuele grandhotel -- zalen en eigen
      suites waar leden als pionnen op codenaam rondlopen en praten, live over
      het bestaande SSE-kanaal. */

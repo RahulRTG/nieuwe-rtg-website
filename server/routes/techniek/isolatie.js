@@ -54,10 +54,13 @@ module.exports = (tctx) => {
      zelf requiren zonder een kringverwijzing. Late binding, zelfde patroon als
      zetWacht/zetScanNet in opzet/verzoekketen.js.
 
-     ZONDER `{ afdwingen: true }` LOOPT HIJ IN DE SCHADUW: hij telt wat hij zou
-     sluiten en houdt niets tegen. CONTROLPLANE.md -- je kunt niet afdwingen wat
-     nooit heeft meegelopen, en de prijs van aanzetten is hier gemeten en groot. */
-  require('../../middleware/isolatiepoort').zetLaag(isolatie);
+     De productiekeuring eist de expliciete handhavingsvlag. Beide aanmeldplekken
+     lezen dezelfde bron, zodat hun laadvolgorde nooit bepaalt of de poort bijt. */
+  const isolatiepoort = require('../../middleware/isolatiepoort');
+  const isolatiestand = require('../../middleware/isolatiepoort-stand');
+  const isolatieRealtime = require('../../middleware/isolatiepoort-realtime');
+  isolatiepoort.zetLaag(isolatie, { afdwingen: isolatiestand.afdwingenUitOmgeving(process.env) });
+  isolatiestand.eisProductieGereed(process.env);
 
   const filter = maakIsolatiefilter({ isolatie, beleid });
 
@@ -105,8 +108,12 @@ module.exports = (tctx) => {
   app.post('/api/techniek/isolatie/zet', techAuth, eigenaarAlleen, (req, res) => {
     const b = req.body || {};
     try {
-      res.json({ ok: true, uit: isolatie.zet({ drager: b.drager, sleutel: b.sleutel, naar: b.naar,
-        door: actor(req), reden: b.reden, zetter: 'huis' }) });
+      const uit = isolatie.zet({ drager: b.drager, sleutel: b.sleutel, naar: b.naar,
+        door: actor(req), reden: b.reden, zetter: 'huis' });
+      if (uit.richting === 'verstrengd' && uit.stand === 'isolatie') {
+        isolatieRealtime.sluitDrager(uit.drager, uit.sleutel);
+      }
+      res.json({ ok: true, uit });
     } catch (e) { faal(res, e); }
   });
 

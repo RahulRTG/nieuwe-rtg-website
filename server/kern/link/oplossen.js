@@ -32,7 +32,7 @@ async function onderwerpVan(g, wie, mij, zaakcode) {
       /* De levende code draagt zijn eigen bewijs, dus geeft pin-live met opzet
          GEEN sleutel terug: het scherm hoeft niet te weten hoe iemand in de
          database heet. Zijn eigen rem per lid staat daar al omheen. */
-      const r = liveKijk(mij, g.sleutel);
+      const r = await liveKijk(mij, g.sleutel);
       if (r.error) return { status: r.status, error: r.error };
       return { onderwerp: { codename: r.codename, tier: r.tier, status: r.st }, band: r.st,
         bevestiging: r.bevestiging, bevestigingVervalt: r.bevestigingVervalt };

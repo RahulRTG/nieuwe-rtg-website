@@ -112,7 +112,7 @@ test('de checkout rekent opnieuw op de server en laat geen lege rekening achter'
   const kaart = await kaartVan();
   const item = kaart.filter(k => !k.alcohol && !k.uitverkocht).sort((a, b) => b.centen - a.centen)[0];
   const voor = await post('/api/gast/bezorg/mijn', {}, lid);
-  assert.equal(voor.body.bestellingen.length, 0);
+  const bestellingIdsVoor = voor.body.bestellingen.map(b => b.id);
 
   const uit = await post('/api/gast/bezorg/checkout', { zaak: 'KIKUNOI', kanaal: 'bezorging',
     postcode: '1011AB', adres: 'Damstraat 8', tijd: '18:00',
@@ -138,8 +138,8 @@ test('de checkout rekent opnieuw op de server en laat geen lege rekening achter'
   assert.equal(onderMinimum.body.blokkadeCode, 'minimum');
 
   const na = await post('/api/gast/bezorg/mijn', {}, lid);
-  assert.equal(na.body.bestellingen.length, 0,
-    'controleren opent geen rekening en reserveert niets');
+  assert.deepEqual(na.body.bestellingen.map(b => b.id), bestellingIdsVoor,
+    'controleren opent geen rekening en reserveert niets: de lijst blijft exact gelijk');
 });
 
 test('bezorgkosten staan als regel op de rekening en verdwijnen boven gratis-vanaf', async () => {
@@ -291,6 +291,19 @@ test('online bestellen blijft uit de keuken tot de betaalwaarheid definitief is'
   assert.equal(betaal.body.betaling.status, 'BEVESTIGD');
   assert.equal(betaal.body.betaling.afgehandeld, true);
   assert.match(betaal.body.betaling.bewijs, /^[A-F0-9]{16}$/);
+
+  const status = await post('/api/gast/bezorg/betaling/status',
+    { betalingId: betaal.body.betaling.id }, lid);
+  assert.equal(status.status, 200, JSON.stringify(status.body));
+  assert.equal(status.body.betaling.id, betaal.body.betaling.id);
+  assert.equal(status.body.betaling.status, 'BEVESTIGD',
+    'de statusroute leest de duurzame betaalwaarheid en niet een clientcallback');
+  const vreemd = await maakLid('Andere online betaler', true);
+  const verboden = await post('/api/gast/bezorg/betaling/status',
+    { betalingId: betaal.body.betaling.id }, vreemd);
+  assert.equal(verboden.status, 404, 'een andere klant kan de bekende betaling niet opvragen');
+  assert.equal((await post('/api/gast/bezorg/betaling/status',
+    { betalingId: betaal.body.betaling.id })).status, 401, 'zonder sessie blijft de betaalstatus dicht');
 
   const na = await post('/api/supplier/horeca/keuken/bord', {}, ZAAK);
   assert.ok(na.body.bonnen.some(x => x.rekeningId === rekeningId),

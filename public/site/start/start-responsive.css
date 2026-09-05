@@ -1,0 +1,115 @@
+@media (max-width:1120px){
+  :root{--page:min(100% - 3rem,1040px)}
+  .desktop-nav{display:none}
+  .menu-button{display:block}
+  .hero-body{min-height:340px}
+  .hero-copy h1{font-size:clamp(3.7rem,8vw,5.6rem)}
+  .worlds{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .world-card{min-height:205px}
+  .trust-strip{margin-top:1rem}
+  .price-card{grid-column:span 3}
+  .price-card:nth-child(3),.price-card:nth-child(4),.price-card:nth-child(5){grid-column:span 2}
+}
+
+@media (max-width:820px){
+  :root{--page:calc(100% - 2rem)}
+  .site-header{min-height:88px;gap:1rem}
+  .brand-name{font-size:1.12rem}
+  .brand-slogan{font-size:.5rem;letter-spacing:.18em}
+  .language-button .chevron{display:none}
+  .login-link{min-height:40px;padding:.35rem .75rem;font-size:.62rem}
+  .header-actions{gap:.55rem}
+  .hero-body{min-height:390px;padding:3.2rem 0 2.4rem;align-items:flex-start}
+  .hero-copy h1{font-size:clamp(3.55rem,12vw,5rem)}
+  .hero-quote{align-self:flex-end;margin:0 0 .4rem;padding-left:1.2rem;font-size:.9rem}
+  .worlds{grid-template-columns:1fr 1fr}
+  .world-card{min-height:170px}
+  .world-card small{font-size:.54rem}
+  .trust-strip{justify-content:space-between;gap:.7rem;font-size:.54rem;letter-spacing:.07em}
+  .section-wrap{width:calc(100% - 2.5rem)}
+  .statement h2 br,.section-heading h2 br{display:none}
+  .world-detail-section{grid-template-columns:1fr}
+  .world-detail{min-height:350px;border-right:0}
+  .section-heading{grid-template-columns:1fr;gap:1.5rem}
+  .price-grid{grid-template-columns:1fr 1fr}
+  .price-card,.price-card:nth-child(3),.price-card:nth-child(4),.price-card:nth-child(5){grid-column:auto}
+  .price-card:last-child{grid-column:1/-1}
+  .pricing-action{align-items:flex-start;flex-direction:column}
+  .split-section,.split-reverse{min-height:0;grid-template-columns:1fr}
+  .split-reverse .split-visual{order:1}.split-reverse .split-copy{order:2}
+  .split-visual{min-height:52vw}
+  .split-copy{padding:4rem 2rem}
+}
+
+@media (max-width:600px){
+  .site-header{min-height:82px}
+  .brand-name{padding:.31rem .57rem .36rem;font-size:1rem}
+  .brand-slogan{padding-top:.3rem;font-size:.43rem;letter-spacing:.16em}
+  .login-link{border:0;padding:.3rem .4rem}
+  .menu-button{width:40px;height:40px}
+  .hero-media::after,:root[data-dagdeel] .hero-media::after{background:linear-gradient(90deg,rgba(5,4,3,.82),rgba(5,4,3,.36)),linear-gradient(0deg,rgba(4,3,3,.96),rgba(4,3,3,.05) 62%,rgba(4,3,3,.38))}
+  .hero-photo{object-position:62% center}
+  .hero-body{display:block;min-height:315px;padding:2.4rem .25rem 1.7rem}
+  .hero-copy .eyebrow{margin-bottom:.65rem;font-size:.58rem}
+  .hero-copy h1{font-size:clamp(3.15rem,15.2vw,4.2rem);line-height:.9}
+  .gold-rule{width:42px;margin:.95rem 0}
+  .hero-intro{font-size:1rem;line-height:1.32}
+  .hero-actions{display:none}
+  .hero-quote{display:none}
+  .worlds{display:flex;flex-direction:column;gap:.48rem}
+  .world-card{min-height:76px;border-color:rgba(255,255,255,.42)}
+  .world-card>img{object-position:center 58%}
+  .world-shade,.world-living .world-shade,.world-travel .world-shade,.world-work .world-shade,.world-foundation .world-shade{background:linear-gradient(90deg,rgba(10,8,7,.88),rgba(10,8,7,.58) 72%,rgba(10,8,7,.33))}
+  .world-card-content{display:grid;grid-template-columns:32px 1fr 36px;grid-template-rows:auto auto;align-content:center;column-gap:.7rem;padding:.62rem .8rem}
+  .world-icon{grid-row:1/3;width:28px;height:28px;margin:0;align-self:center}
+  .world-card strong{grid-column:2;font-size:1.23rem;line-height:1.05}
+  .world-card small{grid-column:2;margin-top:.12rem;font-size:.47rem;line-height:1.25}
+  .world-card small br{display:none}
+  .round-arrow{position:static;grid-column:3;grid-row:1/3;align-self:center;width:32px;height:32px}
+  .trust-strip{min-height:77px;margin-top:.8rem;justify-content:center;gap:.85rem;flex-wrap:wrap;padding:.85rem 0;font-size:.49rem}
+  .trust-strip li{gap:.32rem}
+  .trust-strip svg{width:14px;height:14px}
+  .statement{padding:4.6rem 0}
+  .statement h2{font-size:2.7rem}
+  .statement>p:last-child{font-size:.92rem}
+  .world-detail{min-height:320px;padding:3rem 1.5rem}
+  .detail-index{top:1.2rem;right:1.2rem;font-size:3rem}
+  .world-detail h2{margin-top:3rem;font-size:2.45rem}
+  .pricing{padding:4.6rem 0}
+  .section-heading h2{font-size:2.8rem}
+  .price-grid{grid-template-columns:1fr;margin-top:2.5rem}
+  .price-card,.price-card:last-child{grid-column:auto;min-height:0;padding:1.6rem}
+  .price-audience{margin-bottom:1.4rem}
+  .price{font-size:2rem}
+  .split-visual{min-height:72vw}
+  .split-copy{padding:3.5rem 1.5rem}
+  .split-copy h2{font-size:2.75rem}
+  .site-footer{min-height:0;padding:3.5rem 1.25rem 2rem;grid-template-columns:1fr;text-align:center}
+  .footer-brand,.footer-belief{justify-self:center}
+  .footer-brand{align-items:center}
+  .footer-belief{text-align:center;font-size:1.05rem}
+  .site-footer nav{grid-column:1;display:grid;grid-template-columns:1fr 1fr;gap:0;padding:0}
+  .site-footer nav a{padding:1rem;border-bottom:1px solid var(--line)}
+  .site-footer nav a:nth-child(odd){border-right:1px solid var(--line)}
+  .copyright{grid-column:1}
+}
+
+@media (min-width:1121px) and (max-height:790px){
+  .site-header{min-height:84px}
+  .hero-body{min-height:280px;padding:1.5rem 1vw 1rem}
+  .hero-copy h1{font-size:4.6rem}
+  .hero-actions{margin-top:1.1rem}
+  .world-card{min-height:190px}
+  .trust-strip{min-height:50px;margin-top:.7rem}
+}
+
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}
+  .hero-photo{transform:none}
+}
+
+@media (forced-colors:active){
+  .hero-media::after,.world-shade{background:Canvas}
+  .button,.world-card,.login-link{border:1px solid ButtonText}
+}

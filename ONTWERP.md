@@ -206,6 +206,142 @@ aandacht te trekken.
 
 ---
 
+## 4a. De vaste kleurrol van iedere wereld
+
+*Vastgelegd op 4 september 2026 na goedkeuring van de vier wereldschermen.*
+
+De vier werelden delen typografie, ritme, componenten en interactie. Ze delen
+niet dezelfde sfeer. De wereldkleur is daarom geen los thema dat een gebruiker
+kan verwisselen, maar een vaste laag van de informatiearchitectuur:
+
+| Wereld | Grond | Verhoogd vlak | Verdiept vlak | Inkt | Gedempte inkt | Signatuur | Metaal |
+|---|---|---|---|---|---|---|---|
+| LivingOS | `#F4F0E8` | `#FBF8F2` | `#E8E0D2` | `#211E19` | `#675F54` | `#B89545` | `#745718` |
+| TravelOS | `#14090E` | `#231016` | `#0E090B` | `#F7F0E6` | `#C2B2AA` | `#7F1634` | `#D0B77B` |
+| WorkOS | `#0C1112` | `#141B1C` | `#090D0E` | `#F0F2EC` | `#AAB6B2` | `#75B8B1` | `#C1A45F` |
+| FoundationOS | `#071522` | `#0B2032` | `#06101B` | `#F2F2EA` | `#AEBCCC` | `#D0B66E` | `#D0B66E` |
+
+Dit zijn **rollen**, geen verfdoos. `grond` draagt de pagina, `verhoogd vlak`
+draagt een contextpaneel, `verdiept vlak` een rail of invoergebied, en `inkt`
+en `gedempte inkt` dragen tekst,
+`signatuur` markeert de actieve wereld en `metaal` is alleen voor een klein,
+belangrijk accent. LivingOS gebruikt bewust een donkerdere metaaltoon voor
+kleine tekst; licht goud op ivoor is onvoldoende leesbaar.
+
+De merkankers blijven exact het logo-goud `#857007` en logo-bordeaux
+`#7F1634`. De tabel verandert het logo niet. Hij legt vast hoe licht, contrast
+en materiaal op een scherm worden vertaald.
+
+### Twee schalingen van dezelfde schil
+
+De nieuwe wereldschil heeft precies twee presentaties:
+
+| Modus | Gebruik | Gedrag |
+|---|---|---|
+| `home` | de vier Vandaag-ingangen | royaal, fotografisch, één actuele focus |
+| `surface` | agenda, dossier, project, stad en volgende subschermen | compacte contextkop, daarna het bestaande werkscherm |
+
+Een pagina kiest declaratief:
+
+```html
+<body data-rtg-world="travel" data-rtg-vandaag-luxe="surface">
+```
+
+De implementatie staat in `public/shared/rtg-vandaag-luxe.css` en
+`public/shared/rtg-vandaag-luxe.js`. De laag:
+
+- doet zelf geen API-aanroep en schrijft niets naar opslag;
+- verandert geen sessie, recht, tenant of routecontract;
+- toont alleen echte bestaande scherminformatie, of zegt eerlijk dat die nog
+  wordt geladen of leeg is;
+- wordt in een iframe of ingebed Command-oppervlak niet als tweede chrome
+  getekend;
+- is per pagina direct terug te draaien door het attribuut en de twee gedeelde
+  insluitingen te verwijderen.
+
+De eerste surface-proeven zijn de bestaande routes voor Agenda, Reisboek,
+Projecten en de publieke Foundation-stad. Nieuwe parallelle dashboards zijn
+niet toegestaan: de schil komt om de echte workflow heen.
+
+### De enige balk: RTG Edge 2.0
+
+*Vastgelegd op 4 september 2026 na goedkeuring van de adaptieve wereldranden.*
+
+Edge 2.0 tekent geen nieuwe top-, zij- of onderbalk. Het verbetert het bestaande
+`.rtg-edge-chrome`-casco en accepteert alleen een document waarin precies één
+`.rtg-edge-top`, één `.rtg-edge-side`, één `.rtg-edge-bottom` en één klein
+RTG-merkteken aanwezig zijn. Op een telefoon bestaat de zijbalk wel als
+onderdeel van het gedeelde casco, maar is zij nooit zichtbaar en reserveert zij
+geen ruimte.
+
+| Stand | Bureau | Telefoon | Bedoeling |
+|---|---|---|---|
+| `overview` | top + side + bottom | top + bottom | oriënteren en van wereld wisselen |
+| `compact` | alleen bottom | alleen bottom | doorwerken met de hoofdhandeling onder de duim |
+| `focus` | alle randen weg | alle randen weg | lezen, schrijven of presenteren zonder chrome |
+| `auto` | scroll omlaag compact, omhoog overview | hetzelfde | ruimte geven zonder de bediening zoek te maken |
+
+Focus heeft precies één zichtbare, toetsenbordbereikbare herstelgreep. Escape en
+de greep herstellen de vorige automatische keuze als Focus vanuit Auto kwam;
+anders herstellen zij Overview. Automatisch wisselen stopt zolang iemand in een
+invoer, dialoog, contextlade of sleepbeweging werkt.
+
+De systeemstatus bevat de vier expliciete keuzes **Overzicht, Compact,
+Automatisch en Focus**. Een vaste keuze van de gebruiker gaat voor automatische
+scrolllogica en wordt lokaal onthouden. De menuknop opent uitsluitend de
+functie-index; hij vouwt niet buiten dit toestandscontract om nog een tweede
+variant van de randen in.
+
+Schermspecifieke tabbladen en knoppen komen in één contextlade in de bestaande
+onderbalk. Edge kloont ze niet, maar verplaatst de echte DOM-node, met bestaande
+listeners, id's en rechten, en kan haar weer op de oorspronkelijke plek
+terugzetten. Alleen benoemde contexttokens zijn toegestaan. Een inhoudsmenu
+zoals de Foundation-deelbalk blijft bij de inhoud als de broneigenaar die plek
+nodig heeft.
+
+De overdracht is transactioneel:
+
+1. de bestaande Edge bereikt `data-rtg-edge-ready="true"`;
+2. Edge 2 vindt exact één volledig casco en alle gevraagde contextbronnen;
+3. pas daarna zet het `data-rtg-edge-2-rendered="true"`;
+4. alleen achter die marker mag oude, dubbele chrome verdwijnen.
+
+Bij een fout blijft de bestaande bediening zichtbaar en bruikbaar. In een
+iframe, `?embed=1` of Command-oppervlak wordt geen tweede Edge gestart en wordt
+de lokale vaste chrome van het kind onderdrukt. De hoofdactie in de onderbalk
+is per route expliciet en niet-destructief; een willekeurige eerste knop uit
+`main` is nooit een geldige systeemactie.
+
+De declaratieve ingang is:
+
+```html
+<body data-rtg-edge-2-context="hoofdtabs"
+      data-rtg-edge-2-state="overview"
+      data-rtg-edge-2-auto="true">
+```
+
+De centrale laadketen staat in `rtg-edge-system.js` en
+`rtg-edge-2-loader.js`. Pagina's laden zelf geen Edge 2-assets. De contract-,
+integratie- en browserproeven staan in `test/rtg-edge-2.test.js`,
+`test/rtg-edge-2-pilots.test.js` en `test/rtg-edge-2.e2e.js`.
+
+### Rust is de luxeregel
+
+- Eén RTG-merkanker per scherm is genoeg. Een subscherm krijgt geen herhaald
+  woordlogo in iedere kaart of balk.
+- Geen grote massieve rode knoppen. Bordeaux is een signatuur, selectie of
+  dunne actielijn; primaire acties blijven rustig omlijnd.
+- Fotografie geeft context en sfeer, nooit een verzonnen status of cijfer.
+- Rechte hoeken, dunne lijnen en één duidelijke hiërarchie blijven verplicht.
+- Een status blijft woord plus teken plus, als derde laag, kleur.
+
+De oudere toewijzingen in `rtg-worlds-2026.css` blijven uitsluitend bestaan
+voor nog niet gemigreerde schermen. Een pagina krijgt de nieuwe vaste wereldrol
+pas door deze schil expliciet te dragen. Zo is de overgang controleerbaar en
+wordt een globale kleurwissel niet vermomd als een kleine stijlaanpassing.
+
+---
+
 ## 5. Status nooit op kleur alleen
 
 Operationele informatie moet leesbaar blijven voor wie kleur niet ziet, en op een

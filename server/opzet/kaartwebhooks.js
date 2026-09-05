@@ -10,11 +10,26 @@ module.exports = function hangKaartWebhooks({ app, express, db, save, log, betaa
     if (!p || !p.id) return;
     const wacht = db.data.kaartWachtend && db.data.kaartWachtend[p.id];
     if (!wacht) return;
-    await settleFactuur(wacht, { id: p.id, centen: Math.round(Number(p.bedrag) || 0), hoe });
+    const uit = await settleFactuur(wacht, { id: p.id, centen: Math.round(Number(p.bedrag) || 0), hoe });
+    /* De settlementlaag geeft verwachte schrijf-/bedrijfsfouten als een
+       resultaat terug. Alleen `await` gebruiken maakt zo'n fout ten onrechte
+       tot webhook-succes en wist daarna zelfs de herstelcontext. */
+    if (!uit || uit.ok !== true) {
+      const fout = new Error((uit && uit.error) || 'De betaling kon nog niet veilig worden afgehandeld.');
+      fout.code = 'SETTLEMENT_MISLUKT';
+      throw fout;
+    }
     /* Pas weg nadat de domeinafhandeling is gelukt. Bij een storing antwoordt
        de route 500, blijft deze context staan en probeert de provider opnieuw. */
     delete db.data.kaartWachtend[p.id];
-    save();
+    try { save(); }
+    catch (e) {
+      /* `save()` kan falen nadat het RAM-object al is gewijzigd. Herstel ook
+         daar de wachtende context, anders krijgt dezelfde procesinstantie bij
+         de providerretry niets meer te doen en antwoordt zij vals 200. */
+      db.data.kaartWachtend[p.id] = wacht;
+      throw e;
+    }
   }
 
   async function payout(evt, object) {

@@ -357,19 +357,45 @@ test('16. een mislukte betaling geeft de plek meteen terug', async () => {
 });
 
 test('17. de ledenkant: een groep maken en meedoen met een code', async () => {
-  const g = await post('/api/festival/groep', { festival: fid, editie: eid, naam: 'Naar Testival' }, lidA);
+  const invoer = { festival: fid, editie: eid, naam: 'Naar Testival', idem: 'route-groep-17' };
+  const g = await post('/api/festival/groep', invoer, lidA);
   assert.equal(g.ok, true);
   assert.equal(g.groep.leden.length, 1);
+  assert.match(g.groep.code, /^GRP\.[A-F0-9]{32}$/);
+
+  const retry = await api('/api/festival/groep', invoer, lidA);
+  assert.equal(retry.status, 409);
+  const retryBody = await retry.json();
+  assert.equal(retryBody.herhaald, true);
+  assert.equal(Object.hasOwn(retryBody.groep, 'code'), false,
+    'een retry mag het eenmalige geheim niet opnieuw tonen');
 
   /* Lid B doet zelf mee, met de code die A hem heeft gegeven. RTG heeft niets
      verstuurd: er is geen uitnodiging, geen melding, geen mail. */
   const mee = await post('/api/festival/groep/mee', { festival: fid, editie: eid, code: g.groep.code }, lidB);
   assert.equal(mee.ok, true);
   assert.equal(mee.groep.leden.length, 2);
+  assert.equal(Object.hasOwn(mee.groep, 'code'), false);
 
   const stand = await post('/api/festival/groep/stand', { festival: fid, editie: eid, id: g.groep.id }, lidB);
   assert.equal(stand.zonderPas, 2, 'een getal, en verder niets');
-  assert.deepEqual(Object.keys(stand).sort(), ['code', 'id', 'leden', 'maker', 'naam', 'ok', 'zonderPas']);
+  assert.deepEqual(Object.keys(stand).sort(), ['id', 'leden', 'maker', 'naam', 'ok', 'toegang', 'zonderPas']);
+  assert.ok(!JSON.stringify(stand).includes(g.groep.code));
+  assert.equal(Object.hasOwn(stand.toegang, 'code_hash'), false);
+
+  const mijn = await post('/api/festival/groep/mijn', { festival: fid, editie: eid }, lidA);
+  assert.ok(!JSON.stringify(mijn).includes(g.groep.code), 'latere lijsten redisclosen de code niet');
+
+  const roteerInvoer = { festival: fid, editie: eid, id: g.groep.id, idem: 'route-groep-rotatie-17' };
+  const geroteerd = await post('/api/festival/groep/code', roteerInvoer, lidB);
+  assert.match(geroteerd.groep.code, /^GRP\.[A-F0-9]{32}$/);
+  assert.notEqual(geroteerd.groep.code, g.groep.code);
+  const roteerRetry = await api('/api/festival/groep/code', roteerInvoer, lidB);
+  assert.equal(roteerRetry.status, 409);
+  assert.equal(Object.hasOwn((await roteerRetry.json()).groep, 'code'), false);
+  assert.equal((await api('/api/festival/groep/mee',
+    { festival: fid, editie: eid, code: g.groep.code }, lidB)).status, 404,
+  'de oude code is na serverrotatie meteen waardeloos');
 });
 
 test('18. een niet-lid leest de stand niet', async () => {

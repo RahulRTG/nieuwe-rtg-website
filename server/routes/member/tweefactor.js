@@ -106,12 +106,14 @@ module.exports = (kern) => {
      3. er komt hier geen enkele route bij die het bewijs alleen al genoeg maakt.
         Het wachtwoord is stap een, de code is stap twee, en beide zijn nodig.
      ---------------------------------------------------------------------- */
-  app.post('/api/auth/tweede', (req, res) => {
+  app.post('/api/auth/tweede', async (req, res, next) => {
+    try {
     const u = accounts.verifyActionToken(req.body.bewijs, 'inlog2');
     if (!u) return res.status(401).json({ error: 'Deze inlogpoging is verlopen. Log opnieuw in.' });
     const r = tweefactor.toets(u, req.body.code);
     if (!r.ok) return res.status(403).json({ error: r.error || 'Die code klopt niet.' });
-    try { accounts.trekInActie(req.body.bewijs, 'inlog2'); } catch (e) {}
+    await accounts.trekInActie(req.body.bewijs, 'inlog2');
+    if (accounts.wachtIntrekkingen) await accounts.wachtIntrekkingen();
 
     const token = accounts.issueToken(u.id);
     const sess = { tier: u.tier, key: 'user-' + u.id, account: u };
@@ -124,6 +126,7 @@ module.exports = (kern) => {
       assurance: 'kennis+bezit', methode: 'gemeten', bron: 'auth/tweede' });
     res.json({ token, state: stateFor(sess, req.body.lang),
       ...(r.let ? { let: r.let } : {}), ...(r.soort ? { soort: r.soort } : {}) });
+    } catch (e) { next(e); }
   });
 
   /* ------------------------------------------------------------------------

@@ -50,10 +50,10 @@ test('Meet: kamer maken, binnenkomen op code, echt verbinden en de hand opsteken
     const pageA = await open(regA.token);
     await pageA.fill('#nieuwTitel', 'Proefvergadering');
     await pageA.click('#nieuwBtn');
-    await pageA.waitForFunction(() => /code [A-Z0-9]{6}/.test(document.querySelector('#kamerKop').textContent),
+    await pageA.waitForFunction(() => /eenmalige deelcode MEET\.[A-F0-9]{32}/.test(document.querySelector('#kamerKop').textContent),
       null, { timeout: 20000 });
     const kop = await pageA.evaluate(() => document.querySelector('#kamerKop').textContent);
-    const kamercode = /code ([A-Z0-9]{6})/.exec(kop)[1];
+    const kamercode = /eenmalige deelcode (MEET\.[A-F0-9]{32})/.exec(kop)[1];
 
     /* ---- B komt binnen op de code ---- */
     const pageB = await open(regB.token);

@@ -11,6 +11,7 @@
 const fs = require('fs');
 const path = require('path');
 const cp = require('child_process');
+const { eisSchoneReleasebron, leesProductiestatus } = require('./lib/productie-vrijgave');
 const ROOT = path.join(__dirname, '..');
 const ENV = path.join(ROOT, '.env.productie');
 const RELEASE_MAP = path.join(ROOT, '.release');
@@ -82,11 +83,13 @@ function vulBonAan(doel, bon, bewijs) {
   fs.writeFileSync(doel, JSON.stringify(bon, null, 2) + '\n', { mode: 0o600 });
 }
 
-function schrijfBon(images) {
+function schrijfBon(images, productie) {
   fs.mkdirSync(RELEASE_MAP, { recursive: true });
   const gemaakt = new Date().toISOString();
   const naam = 'uitrol-' + gemaakt.replace(/[:.]/g, '-') + '.json';
-  const bon = { formaat: 'rtg-uitrol-v1', gemaakt, releaseSha256: releaseHash(), images };
+  const bon = { formaat: 'rtg-uitrol-v1', gemaakt, releaseSha256: releaseHash(),
+    productieStatusSha256: productie && productie.bewijsSha256 || null,
+    productieCommit: productie && productie.commit || null, images };
   const doel = path.join(RELEASE_MAP, naam);
   fs.writeFileSync(doel, JSON.stringify(bon, null, 2) + '\n', { mode: 0o600 });
   return { bon, doel };
@@ -125,7 +128,24 @@ function eisEnv() {
     throw new Error('.env.productie is leesbaar voor anderen; zet rechten 600.');
 }
 
+function eisReleasebronOngewijzigd(commit) {
+  const huidig = cp.spawnSync('git', ['rev-parse', '--verify', 'HEAD'], {
+    cwd: ROOT, encoding: 'utf8'
+  });
+  if (huidig.error || huidig.status !== 0 || String(huidig.stdout || '').trim() !== commit)
+    throw new Error('De Git-commit veranderde tijdens de productieproef.');
+  const vuil = require('./lib/stempel').vuileBoom();
+  if (!vuil) throw new Error('De releasebron kon na de productieproef niet opnieuw worden vastgesteld.');
+  if (vuil.code.length) {
+    throw new Error('De productieproef veranderde code buiten de releasecommit: ' +
+      vuil.code.slice(0, 5).join(', ') + '.');
+  }
+  return { commit, bewijsbestanden: vuil.anders.length };
+}
+
 function hoofd() {
+  if (process.argv.includes('--uitrollen'))
+    throw new Error('Deze oude bouw-en-uitrolroute is gesloten; gebruik npm run live:golive, productie:status en daarna live:deploy.');
   eisEnv();
   const terug = process.argv.indexOf('--terug');
   if (terug >= 0) {
@@ -135,32 +155,12 @@ function hoofd() {
     console.log('Herstel ' + herstel(bon) + ' vorige images; datavolumes zijn ongemoeid gelaten.');
     return;
   }
-  if (!process.argv.includes('--uitrollen')) throw new Error('Gebruik npm run deploy:productie voor een echte uitrol.');
-
-  // Eerst alle code-, herstel- en productiepoorten. Bij rood raakt Docker niets.
-  voer('npm', ['run', 'release:gate:productie']);
-  const images = Object.fromEntries(SERVICES.map(d => [d, huidigImage(d)]));
-  const { bon, doel } = schrijfBon(images);
-  console.log('Rollback-bon: ' + path.relative(ROOT, doel));
-  try {
-    compose(['build', ...BUILD_SERVICES]);
-    const bewijs = bewijsPinVanImage();
-    process.env.RTG_RELEASE_BEWIJS_SHA256 = bewijs.pin;
-    vulBonAan(doel, bon, bewijs);
-    compose(['up', '-d', '--wait']);
-    compose(['exec', '-T', 'sentinel', '/app/rtg-sentinel', 'ctl', 'scan']);
-    console.log('UITROL GROEN. Release SHA-256: ' + (releaseHash() || 'onbekend'));
-    console.log('Live releasebewijs extern gepind: ' + bewijs.pin);
-  } catch (fout) {
-    console.error('[uitrol] nieuwe release niet gezond: ' + fout.message);
-    console.error('[uitrol] oude app- en motor-images worden nu hersteld.');
-    herstel(bon);
-    throw new Error('Uitrol teruggedraaid; datavolumes bleven staan.');
-  }
+  throw new Error('Gebruik npm run deploy:terug -- .release/uitrol-...json, of live:rollback voor de huidige liveketen.');
 }
 
 if (require.main === module) {
   try { hoofd(); } catch (e) { console.error('[uitrol] ' + e.message); process.exitCode = 1; }
 }
 
-module.exports = { geldigeImageId, geldigeTag, valideerBon, SERVICES, BUILD_SERVICES };
+module.exports = { geldigeImageId, geldigeTag, valideerBon, eisSchoneReleasebron,
+  eisReleasebronOngewijzigd, leesProductiestatus, SERVICES, BUILD_SERVICES };

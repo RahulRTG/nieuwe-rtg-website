@@ -24,7 +24,7 @@
    Toeschrijving blijft persoonlijk: de sessie draagt de naam van het
    personeelslid en lidKey, dus elke handeling staat nog steeds op een mens. */
 
-function maakWerkBijLogin({ accounts, crypto, findSupplier, magWerken, rememberSession, logInlog, logActivity, supplierState, persoonsPoort }) {
+function maakWerkBijLogin({ accounts, crypto, findSupplier, magWerken, rememberSession, logInlog, logActivity, supplierState, persoonsPoort, sessieregister }) {
   /* Alle werkplekken van dit lid, met per plek of hij nu open is. Open plekken
      krijgen meteen een sessie-token; dichte plekken de reden.
 
@@ -74,10 +74,19 @@ function maakWerkBijLogin({ accounts, crypto, findSupplier, magWerken, rememberS
          steunen viel het op: deze weg gaf een sessie waarin het lidnummer niet
          zat, terwijl de inlogger juist met zijn RTG-account binnenkwam. Alles
          wat op `actor.lid` steunt keek daardoor langs deze twee ingangen heen. */
+      const binding = accounts.staffAccountBinding(
+        st.member_id != null ? Number(st.member_id) : lidId);
+      if (!binding || binding.lidKey !== key) {
+        plek.open = false;
+        plek.reden = 'Uw persoonlijke RTG-account is niet meer actief.';
+        uit.push(plek);
+        continue;
+      }
       const token = crypto.randomBytes(24).toString('hex');
-      rememberSession(token, { role: 'supplier', code: s.code, actor: actor.name, staffId: actor.staffId,
-        staffRole: actor.role, manager: actor.manager, lidKey: key,
-        lid: st.member_id != null ? Number(st.member_id) : lidId });
+      const sess = { role: 'supplier', code: s.code, actor: actor.name, staffId: actor.staffId,
+        staffRole: actor.role, manager: actor.manager, ...binding };
+      rememberSession(token, sess);
+      accounts.registreerStaffSessie(sessieregister, sess, binding.lidKey, 'auth/inlog');
       plek.token = token;
       try { logInlog('zaak', true, s.code + ' · ' + actor.name + ' (met het RTG-account)', req); } catch (e) {}
       try { logActivity(s.code, actor, actor.name + ' kwam binnen met het RTG-account'); } catch (e) {}

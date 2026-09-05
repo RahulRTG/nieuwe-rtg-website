@@ -134,6 +134,24 @@ test('7 - een mens van RTG laat toe, en daarna gaat het gratis wel', async () =>
   assert.equal(t.status, 200, JSON.stringify(t.body));
   const r = await api('/api/appstore/persoon/inzenden', { manifest: manifest(), bestanden: [{ pad: 'index.html', inhoud: HTML }] }, lid);
   assert.equal(r.status, 200, JSON.stringify(r.body.bevindingen || r.body.fouten || r.body.error));
+
+  const toegankelijk = await api('/api/appstore/kantoor/toegankelijk',
+    { versieId: r.body.versie.id, stand: 'in-orde', fouten: 0 }, office);
+  assert.equal(toegankelijk.status, 200, JSON.stringify(toegankelijk.body));
+  const live = await api('/api/appstore/kantoor/besluit',
+    { versieId: r.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, office);
+  assert.equal(live.status, 200, JSON.stringify(live.body));
+
+  const dossier = await api('/api/appstore/persoon/dossier', { sleutel: 'van-een-mens' }, lid);
+  assert.equal(dossier.status, 200, JSON.stringify(dossier.body));
+  assert.ok(dossier.body.kanaal && Array.isArray(dossier.body.kanaal.machtigingen),
+    'de maker ziet ook exact de begrensde machtigingencatalogus van het klantkanaal');
+  assert.ok(dossier.body.watHetMag && dossier.body.waarDeGegevensBlijven,
+    'het persoonlijke dossier draagt dezelfde herleidbare inkoopinformatie als het klantdossier');
+  assert.equal((await api('/api/appstore/persoon/dossier', { sleutel: 'bestaat-niet' }, lid)).status, 404,
+    'een onbekende of andermans app lekt niet via het persoonlijke dossier');
+  assert.equal((await api('/api/appstore/persoon/dossier', { sleutel: 'van-een-mens' }, gast)).status, 403,
+    'een ongeverifieerde gast kan het uitgeversdossier niet openen');
 });
 
 test('8 - EEN PRIJS WORDT GEWEIGERD, en de reden staat erbij', async () => {

@@ -198,10 +198,7 @@ test('7. het partnerkanaal en de VIP-lijst vragen om de juiste rol', async () =>
 
 /* ================= 5. de e-mailbevestiging ================= */
 
-test('8. verify-email weigert elk verzonnen token, en hergebruik is idempotent', async () => {
-  /* Het bevestigingstoken is doelgebonden (verify-email) en eenmalig. Twee
-     fouten die hier klassiek zijn: een token van een ANDER doel accepteren, en
-     hem twee keer laten werken. */
+test('8. verify-email is doel-, aanvraaggebonden en eenmalig', async () => {
   for (const t of ['', 'onzin', 'a.b.c', 'x'.repeat(400)]) {
     const r = await post('/api/auth/verify-email', { token: t });
     assert.notEqual(r.status, 500, 'een verzonnen token valt niet om: ' + r.status);
@@ -209,29 +206,19 @@ test('8. verify-email weigert elk verzonnen token, en hergebruik is idempotent',
   }
 
   if (lid.verifyUrl) {
-    const echt = lid.verifyUrl.split('verify=')[1];
-    assert.ok(echt, 'de registratie gaf een bevestigingslink terug (dev-veld)');
-    const eerste = await post('/api/auth/verify-email', { token: echt });
+    const oud = lid.verifyUrl.split('verify=')[1];
+    assert.ok(oud, 'de registratie gaf een bevestigingslink terug (dev-veld)');
+    const opnieuw = await post('/api/auth/resend', {}, lid.token);
+    assert.equal(opnieuw.status, 200);
+    const nieuw = String(opnieuw.body.devVerifyUrl || '').split('verify=')[1];
+    assert.ok(nieuw && nieuw !== oud, 'heruitgifte levert een nieuwe geloofsbrief');
+    const vervangen = await post('/api/auth/verify-email', { token: oud });
+    assert.equal(vervangen.status, 400, 'een vervangen link bevestigt de nieuwere aanvraag niet');
+
+    const eerste = await post('/api/auth/verify-email', { token: nieuw });
     assert.equal(eerste.status, 200, 'het echte token werkt: ' + eerste.tekst.slice(0, 150));
-
-    /* HIER STAAT WAT HET NU DOET, NIET WAT IK ERVAN VERWACHTTE.
-
-       Ik ging ervan uit dat een bevestigingslink eenmalig zou zijn en schreef
-       assert.notEqual(200). Dat faalde: het token blijft zijn volle drie dagen
-       geldig en werkt opnieuw. De machinerie om hem in te trekken bestaat wel
-       (accounts.trekInActie + de isIngetrokken-controle in verifyActionToken);
-       deze route roept hem alleen niet aan.
-
-       Ik laat dat staan en verander het gedrag hier niet, om twee redenen. De
-       schade is nul -- opnieuw bevestigen zet hetzelfde vinkje nog eens, er is
-       geen rechtenwinst -- en "moet een bevestigingslink eenmalig zijn" is een
-       beleidskeuze over de auth-laag, niet iets om en passant in een
-       dekkingsronde te veranderen. Wat de test wel vastlegt: hij is IDEMPOTENT.
-       Zou hergebruik ooit meer gaan doen dan hetzelfde vinkje zetten, dan valt
-       hij hier om. */
-    const tweede = await post('/api/auth/verify-email', { token: echt });
-    assert.equal(tweede.status, 200, 'het token is (nu) herbruikbaar binnen zijn geldigheid');
-    assert.deepEqual(tweede.body, eerste.body, 'en hergebruik levert exact hetzelfde op: idempotent');
+    const tweede = await post('/api/auth/verify-email', { token: nieuw });
+    assert.equal(tweede.status, 400, 'een gebruikte mailboxlink werkt niet opnieuw');
 
     // een token van een ANDER doel hoort hier nooit te werken
     const herstel = await post('/api/auth/forgot', { login: 'onbekend@x.nl' });

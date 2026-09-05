@@ -1,15 +1,22 @@
 /* de statusknoppen van een vrachtzending */
+    const toegang = z.volgtoegang || null;
+    const actief = !!(toegang && toegang.stand === 'actief');
+    const codeStand = actief
+      ? T('vr.codeactief','Klantlink actief')+' · '+T('vr.tot','tot')+' '+new Date(toegang.expires_at).toLocaleDateString('nl-NL')+' · '+toegang.gebruik+'/'+toegang.max_gebruik+' '+T('vr.bekeken','keer bekeken')
+      : T('vr.codegesloten','Geen actieve klantlink');
     if (z.status==='onderweg') acties += '<button data-vret="'+z.id+'" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:0;padding:0.4rem;font-weight:600;font-family:inherit;font-size:0.75rem;">'+T('vr.etklaar','Etappe klaar')+'</button>';
     if (z.status==='douane') acties += '<button data-vrdouane="'+z.id+'" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:0;padding:0.4rem;font-weight:600;font-family:inherit;font-size:0.75rem;">'+T('vr.douane','Douane heeft ingeklaard')+'</button>';
     if (z.status==='aangekomen') acties += '<button data-vraf="'+z.id+'" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:0;padding:0.4rem;font-weight:600;font-family:inherit;font-size:0.75rem;">'+T('vr.afleveren','Afleveren')+'</button>';
     if (z.status!=='afgeleverd') acties += '<button data-vrmeld="'+z.id+'" style="background:none;border:1px solid var(--line);border-radius:0;padding:0.4rem 0.7rem;color:var(--soft);font-family:inherit;font-size:0.75rem;">'+T('vr.melding','Melding')+'</button>';
+    acties += '<button data-vrcode="'+z.id+'" data-vrcode-actief="'+(actief?'1':'0')+'" class="obtn">'+(actief?T('vr.codevernieuw','Nieuwe volgcode'):T('vr.codeuitgeven','Volgcode uitgeven'))+'</button>';
+    if (actief) acties += '<button data-vrcode-weg="'+z.id+'" class="obtn warn">'+T('vr.codeintrek','Volgcode intrekken')+'</button>';
     return '<div style="border:1px solid '+(z.status==='afgeleverd'?'var(--line)':'var(--gold)')+';border-radius:0;padding:0.7rem 0.85rem;margin-top:0.5rem;">'+
       '<div style="display:flex;gap:0.5rem;align-items:baseline;"><b style="flex:1;font-size:0.85rem;">'+esc(z.ref)+' · '+esc(z.klant)+'</b>'+
       '<span style="border:1px solid var(--line);border-radius:0;padding:0.1rem 0.55rem;font-size:0.7rem;">'+esc(T('vr.st.'+z.status, VR_STATUS[z.status]||z.status))+'</span></div>'+
       '<div class="sub">'+esc(z.inhoud)+' · '+z.gewichtKg.toLocaleString('nl-NL')+' kg · '+z.colli+' colli · '+esc(z.incoterm)+'</div>'+
       '<div class="sub">'+esc(z.van.plaats)+' ('+esc(z.van.land)+') → '+esc(z.naar.plaats)+' ('+esc(z.naar.land)+') · ETA '+esc(z.eta)+'</div>'+
       vrTijdlijn(z)+
-      '<div class="sub h-mt40">'+T('vr.docs','Documenten')+': '+docs+' · '+T('vr.volgcode','volgcode voor de klant')+': <b>'+esc(z.volgcode)+'</b></div>'+
+      '<div class="sub h-mt40">'+T('vr.docs','Documenten')+': '+docs+' · '+esc(codeStand)+'</div>'+
       (z.gebeurtenissen.length ? '<details class="h-mt35"><summary class="sub" style="cursor:pointer;">'+T('vr.logboek','Logboek')+' ('+z.gebeurtenissen.length+')</summary>'+
         z.gebeurtenissen.map(g=>'<div class="sub">'+new Date(g.at).toLocaleString('nl-NL')+' · '+esc(g.tekst)+'</div>').join('')+'</details>' : '')+
       (acties ? '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;flex-wrap:wrap;">'+acties+'</div>' : '')+'</div>';
@@ -61,7 +68,8 @@
     const boek = el.querySelector('#vrBoek'); if (boek) boek.addEventListener('click', async () => {
       leesEtappes();
       try {
-        await API.call('/supplier/vracht/maak', {
+        const d = await API.call('/supplier/vracht/maak', {
+          idem: RTGIdem('vracht-maak'),
           klant: $('#vrKlant').value, inhoud: $('#vrInhoud').value, gewichtKg: $('#vrGewicht').value, colli: $('#vrColli').value,
           incoterm: $('#vrIncoterm').value,
           van: { plaats: $('#vrVanPlaats').value, land: $('#vrVanLand').value },
@@ -69,9 +77,10 @@
           etappes: vrEtappes
         });
         vrEtappes = [{ modaliteit:'weg', van:'', naar:'' }];
+        vrToonCode(d.zending && d.zending.volgcode, T('vr.codekopnieuw','Nieuwe volgcode voor de klant'));
         toast(T('vr.geboekt','Zending geboekt; de eerste etappe loopt.')); renderVracht();
       } catch(e){ toast(e.message); }
     });
-    el.querySelectorAll('[data-vret]').forEach(b => b.addEventListener('click', async () => { try { await API.call('/supplier/vracht/etappe', { id:b.dataset.vret }); renderVracht(); } catch(e){ toast(e.message); } }));
-    el.querySelectorAll('[data-vrdouane]').forEach(b => b.addEventListener('click', async () => { try { await API.call('/supplier/vracht/douane', { id:b.dataset.vrdouane }); renderVracht(); } catch(e){ toast(e.message); } }));
-    el.querySelectorAll('[data-vraf]').forEach(b => b.addEventListener('click', async () => { try { await API.call('/supplier/vracht/afleveren', { id:b.dataset.vraf }); toast(''+T('vr.klaar','Afgeleverd en getekend.')); renderVracht(); } catch(e){ toast(e.message); } }));
+    el.querySelectorAll('[data-vret]').forEach(b => b.addEventListener('click', async () => { try { await API.call('/supplier/vracht/etappe', { id:b.dataset.vret, idem:RTGIdem('vracht-etappe') }); renderVracht(); } catch(e){ toast(e.message); } }));
+    el.querySelectorAll('[data-vrdouane]').forEach(b => b.addEventListener('click', async () => { try { await API.call('/supplier/vracht/douane', { id:b.dataset.vrdouane, idem:RTGIdem('vracht-douane') }); renderVracht(); } catch(e){ toast(e.message); } }));
+    el.querySelectorAll('[data-vraf]').forEach(b => b.addEventListener('click', async () => { try { await API.call('/supplier/vracht/afleveren', { id:b.dataset.vraf, idem:RTGIdem('vracht-afleveren') }); toast(''+T('vr.klaar','Afgeleverd en getekend.')); renderVracht(); } catch(e){ toast(e.message); } }));

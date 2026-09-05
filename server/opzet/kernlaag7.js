@@ -46,7 +46,8 @@ module.exports = (kern, hulp) => {
    werkvenster van de werkgever bepaalt of hij open of dicht is. */
 Object.assign(kern, require('../kern/werkbijlogin').maakWerkBijLogin({
   accounts, crypto, findSupplier, magWerken: kern.magWerken, rememberSession,
-  logInlog: kern.logInlog, logActivity, supplierState, persoonsPoort: kern.persoonsPoort
+  logInlog: kern.logInlog, logActivity, supplierState, persoonsPoort: kern.persoonsPoort,
+  sessieregister: hulp.sessieregister
 }));
 /* RTG Vonk (kern/vonk.js): dating op codenaam met de Salon-veiligheidslat
    (18+ en KYC via de podium-poort), een eindige dagselectie, en bij een
@@ -155,7 +156,7 @@ kern.weefsel.weefselKoppelEconomie(require('./weefseldraden')(kern, { db, openVa
    verantwoording aan gemeenten. Krijgt boardroomWie/magBoardroom mee: het
    landelijke bestuur IS de boardroom, en de zetels per stad hangen aan dezelfde
    sleutel uit een echte inlog (zie kern/rtfos/basis.js). */
-Object.assign(kern, require('../kern/rtfos')({ db, save, crypto,
+Object.assign(kern, require('../kern/rtfos')({ db, save, bewerkCollectie, crypto,
   // deze twee komen uit de KERN en niet uit hulp: kantoor.js hangt ze daar op
   boardroomWie: kern.boardroomWie, magBoardroom: kern.magBoardroom,
   // en de agenda: dat is de ENIGE koppeling die vandaag echt iets doet

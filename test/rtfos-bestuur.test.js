@@ -255,8 +255,10 @@ test('de voorraadlijst rekent restant en houdbaarheid bij elke lezing opnieuw', 
   assert.equal(na.body.totalen.batches, 3, 'een afgeschreven partij verdween uit de administratie');
   /* En dit is waar de aandachtslijst zich onderscheidt van een filter op datum:
      wat er niet meer ligt, vraagt geen aandacht meer. */
-  assert.deepEqual(na.body.aandacht.overDatum, [],
+  assert.equal(na.body.aandacht.overDatum.some(b => b.id === oud.body.batch.id), false,
     'de afgeschreven partij stond nog steeds als "ligt over de datum in het magazijn"');
+  assert.equal(na.body.aandacht.overDatum.length, eerst.body.aandacht.overDatum.length - 1,
+    'precies de afgeschreven partij verdween uit de aandachtslijst');
   assert.equal(na.body.batches.find(b => b.id === kleding.body.batch.id).restant, 16);
 
   // en ook hier: de stad van een ander gaat niet open

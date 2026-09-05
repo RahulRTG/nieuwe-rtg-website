@@ -117,7 +117,7 @@
     var centen = G.naarCenten(($('#wdBedrag') || {}).value);
     if (centen == null) { G.melding('Vul een bedrag in.'); return; }
     try {
-      var r = await G.api('/api/pay/terug', { centen: centen, idem: w.RTGId ? w.RTGId('terug') : 'terug-' + Date.now() });
+      var r = await G.api('/api/pay/terug', { centen: centen, idem: w.RTGId('terug') });
       G.melding(r.uitleg || 'Het bedrag staat klaar om verstuurd te worden.');
       laadTerug(); laadPortefeuille();
     } catch (e) {

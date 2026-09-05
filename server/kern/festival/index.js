@@ -52,13 +52,13 @@
 'use strict';
 
 module.exports = (ctx) => {
-  const { db, save, crypto, schoon } = ctx;
+  const { db, save, bewerkCollectie, crypto, schoon } = ctx;
 
   /* Een gedeelde context die per deel wordt aangevuld, zodat elk volgend deel
      leest wat het vorige neerzette zonder een tweede kopie van een leesfunctie. */
   /* `kern` gaat als functie mee zodat ./signalen.js hem LAAT leest: die hangt
      aan domeinen die in dezelfde ronde worden samengesteld. Zie de kop daar. */
-  const k = { db, save, crypto, schoon, kern: ctx.kern };
+  const k = { db, save, bewerkCollectie, crypto, schoon, kern: ctx.kern };
 
   Object.assign(k, require('./model')(k));
   Object.assign(k, require('./terrein')(k));

@@ -31,7 +31,8 @@ test('config: onveilige productie geeft blokkerende fouten', () => {
 
 test('config: veilige productie is foutloos', () => {
   const r = config.valideer({ NODE_ENV: 'production', RTG_ENC_KEY: 'a'.repeat(64),
-    APP_URL: 'https://x', DATABASE_URL: 'postgresql://x', RTG_VAULT_KEY: 'v'.repeat(64), RTG_SECRET_KEY: 's'.repeat(64),
+    APP_URL: 'https://x', DATABASE_URL: 'postgresql://postgres/rtg', RTG_VAULT_KEY: 'v'.repeat(64), RTG_SECRET_KEY: 's'.repeat(64),
+    OFFICE_CODE: 'KANTOORCODE12',
     /* STRIPE_WEBHOOK_SECRET hoort hier sinds de poortwacht-ronde bij: een
        betaalsleutel zonder webhook-secret is gevaarlijker dan geen van beide,
        want dan komt de "is er betaald"-melding onondertekend binnen en kan wie
@@ -46,12 +47,28 @@ test('config: veilige productie is foutloos', () => {
     REDIS_URL: 'r', ERR_WEBHOOK_URL: 'https://haak.voorbeeld.test/rtg', SMTP_URL: 'm',
     MAIL_PROVIDER_DKIM: '1', OPENAI_API_KEY: 'test-ai-key',
     STRIPE_SECRET_KEY: 'k', STRIPE_WEBHOOK_SECRET: 'whsec_k',
+    RTG_MOTOR_GELD: 'motor', RTG_MOTOR_GELD_URL: 'http://motor:3100',
+    RTG_MOTOR_TOKEN: 'test-motor-token-met-voldoende-lengte',
+    RTG_MOTOR_STATE_KEY_FILE: '/run/secrets/rtg-motor-state-key',
+    RTG_MOTOR_EXPECT_GENESIS: 'g-0123456789abcdef0123456789abcdef',
     RTF_IBAN: 'NL11FOUND0000000001', RTG_MEDIA_BACKEND: 's3',
+    RTG_MEDIA_S3_BUCKET: 'rtg-productie-media',
+    RTG_MEDIA_S3_KEY: 'AKIA0123456789PRODUCTIE', RTG_MEDIA_S3_SECRET: 'm'.repeat(40),
     RTG_HERSTEL_SMS_UIT_BEWUST: '1', STRIPE_UITGAAND_UIT_BEWUST: '1',
-    OFFICE_TOTP_SECRET: 'JBSWY3DPEHPK3PXP',
+    OFFICE_TOTP_SECRET: 'JBSWY3DPEHPK3PXP', RTG_ISOLATIE_AFDWINGEN: '1',
     RTG_OWNER_EMAIL: 'eigenaar@echtdomein.nl' });
   assert.equal(r.fouten.length, 0);
   assert.equal(r.waarschuwingen.length, 0, 'geen enkele waarschuwing: ' + JSON.stringify(r.waarschuwingen));
+});
+
+test('config: persoonlijke isolatie wordt in productie werkelijk afgedwongen', () => {
+  const basis = { NODE_ENV: 'production' };
+  const schaduw = config.valideer(basis);
+  assert.ok(schaduw.fouten.some(f => /RTG_ISOLATIE_AFDWINGEN=1/.test(f)),
+    'een productieproces in schaduwstand moet weigeren te starten');
+  const actief = config.valideer({ ...basis, RTG_ISOLATIE_AFDWINGEN: '1' });
+  assert.ok(!actief.fouten.some(f => /RTG_ISOLATIE_AFDWINGEN/.test(f)),
+    'de expliciete handhavingsstand voldoet aan deze productiepoort');
 });
 
 test('config: enterprise RTG-PIN vereist een gedeelde Redis-rem', () => {
@@ -117,9 +134,10 @@ test('config: een ongebruikte SMTP_HOST doet zich niet voor als werkende mailrou
 test('config: de alarmering wijst naar de variabele die het werk doet', () => {
   const zonder = config.valideer({ NODE_ENV: 'production', RTG_ENC_KEY: 'a'.repeat(64),
     RTG_OWNER_EMAIL: 'eigenaar@echtdomein.nl' });
-  assert.ok(zonder.waarschuwingen.some(w => /ERR_WEBHOOK_URL/.test(w)),
-    'zonder webhook waarschuwt de keuring over ERR_WEBHOOK_URL: ' + JSON.stringify(zonder.waarschuwingen));
-  assert.ok(!zonder.waarschuwingen.some(w => /^SENTRY_DSN niet gezet/.test(w)),
+  assert.ok(zonder.fouten.some(f => /ERR_WEBHOOK_URL/.test(f)),
+    'publieke productie zonder externe alarmering moet blokkeren: ' + JSON.stringify(zonder.fouten));
+  assert.ok(!zonder.waarschuwingen.some(w => /^SENTRY_DSN niet gezet/.test(w)) &&
+    !zonder.fouten.some(f => /^SENTRY_DSN niet gezet/.test(f)),
     'en stuurt niemand meer naar SENTRY_DSN');
 
   // wie hem tOch zet, hoort te horen dat het niets doet
@@ -127,6 +145,12 @@ test('config: de alarmering wijst naar de variabele die het werk doet', () => {
     RTG_OWNER_EMAIL: 'eigenaar@echtdomein.nl', SENTRY_DSN: 'https://sleutel@sentry.example/1' });
   assert.ok(misleid.waarschuwingen.some(w => /SENTRY_DSN.*door niets gelezen/.test(w)),
     'SENTRY_DSN zetten levert een waarschuwing dat hij niets doet: ' + JSON.stringify(misleid.waarschuwingen));
+
+  const lokaal = config.valideer({ NODE_ENV: 'production', RTG_PRIVATE_BETA: '1',
+    APP_URL: 'http://127.0.0.1:3000' });
+  assert.ok(!lokaal.fouten.some(f => /ERR_WEBHOOK_URL/.test(f)) &&
+    lokaal.waarschuwingen.some(w => /ERR_WEBHOOK_URL/.test(w)),
+  'een afgeschermde lokale beta mag zonder extern alarm proefdraaien, maar meldt dat luid');
 });
 
 test('config: het voorbeeld-eigenaarsadres blokkeert de productiestart', () => {
@@ -136,9 +160,14 @@ test('config: het voorbeeld-eigenaarsadres blokkeert de productiestart', () => {
   assert.ok(zonder.fouten.some(f => /RTG_OWNER_EMAIL/.test(f)));
   const standaard = config.valideer({ NODE_ENV: 'production', RTG_ENC_KEY: 'a'.repeat(64), RTG_OWNER_EMAIL: 'rahul@rtg.example' });
   assert.ok(standaard.fouten.some(f => /RTG_OWNER_EMAIL/.test(f)));
+  const ongeldig = config.valideer({ NODE_ENV: 'production', RTG_ENC_KEY: 'a'.repeat(64), RTG_OWNER_EMAIL: 'geen-adres' });
+  assert.ok(ongeldig.fouten.some(f => /RTG_OWNER_EMAIL.*geldig e-mailadres/.test(f)));
   // en een te korte backoffice-code ook
   const zwak = config.valideer({ NODE_ENV: 'production', RTG_ENC_KEY: 'a'.repeat(64), RTG_OWNER_EMAIL: 'e@x.nl', OFFICE_CODE: 'kort' });
   assert.ok(zwak.fouten.some(f => /OFFICE_CODE/.test(f)));
+  const ontbreekt = config.valideer({ NODE_ENV: 'production', RTG_ENC_KEY: 'a'.repeat(64), RTG_OWNER_EMAIL: 'e@x.nl' });
+  assert.ok(ontbreekt.fouten.some(f => /OFFICE_CODE ontbreekt/.test(f)),
+    'een per-proces wisselende backofficecode is niet productiewaardig');
 });
 
 test('config: VUL-IN-plaatshouders blokkeren ook een directe productiestart', () => {
@@ -182,9 +211,22 @@ test('config: de kluissleutels MOETEN uit de omgeving komen in productie', () =>
   assert.equal(lokaal.fouten.length, 0);
 });
 
-test('config: ontbrekende enc-key mag met bewuste opt-out', () => {
+test('config: plaintext-override kan de productiesleutel niet omzeilen', () => {
   const r = config.valideer({ NODE_ENV: 'production', RTG_ALLOW_PLAINTEXT: '1', RTG_ENC_KEY: '' });
-  assert.ok(!r.fouten.some(f => /RTG_ENC_KEY ontbreekt/.test(f)));
+  assert.ok(r.fouten.some(f => /RTG_ENC_KEY ontbreekt/.test(f)),
+    'ook een expliciete override mag onversleutelde productie niet openen');
+});
+
+test('config: productie vereist een vast adres voor gevoelige links', () => {
+  const zonder = config.valideer({ NODE_ENV: 'production' });
+  assert.ok(zonder.fouten.some(f => /APP_URL ontbreekt.*Host-header/.test(f)),
+    'de inkomende Host-kop mag nooit de basis van een herstel- of uitnodigingslink zijn');
+  const met = config.valideer({ NODE_ENV: 'production', APP_URL: 'https://app.rtg.example' });
+  assert.ok(!met.fouten.some(f => /APP_URL ontbreekt/.test(f)));
+  const http = config.valideer({ NODE_ENV: 'production', APP_URL: 'http://app.rtg.example' });
+  assert.ok(http.fouten.some(f => /APP_URL.*https/.test(f)), 'publieke productie staat nooit een http-basis toe');
+  const vervuild = config.valideer({ NODE_ENV: 'production', APP_URL: 'https://app.rtg.example/herstel?door=host' });
+  assert.ok(vervuild.fouten.some(f => /domeinroot/.test(f)), 'het vaste adres bevat geen pad of query');
 });
 
 test('config: buiten productie nooit blokkeren', () => {

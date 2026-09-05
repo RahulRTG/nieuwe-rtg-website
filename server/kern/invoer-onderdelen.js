@@ -11,7 +11,7 @@
    maand twee antwoorden (LAT-regel 4). */
 'use strict';
 
-module.exports = ({ bak, save, crypto, nu, schoon }) => {
+module.exports = ({ bak, save, bewerkCollectie, crypto, nu, schoon }) => {
 
   const mijn = (key) => (bak().items || []).filter(x => x.key === key).slice(0, 100);
 
@@ -48,22 +48,35 @@ module.exports = ({ bak, save, crypto, nu, schoon }) => {
      voor de ontvanger een ander lid), en anders houdt elk onderdeel de zijne.
      Nooit stil op 'rtg' zetten: dan zou een overgenomen reis eruitzien als iets
      wat RTG verkocht heeft. */
-  function neemOver(key, { onderdelen, herkomst, bron }) {
+  function neemOver(key, { onderdelen, herkomst, bron, uitnodigingId }) {
     const rij = Array.isArray(onderdelen) ? onderdelen : [];
     if (!rij.length) return { status: 400, error: 'Er is niets om over te nemen.' };
-    const b = bak();
-    const uit = rij.map(o => ({
-      id: 'I-' + crypto.randomBytes(4).toString('hex'),
-      key, soort: o.soort, titel: o.titel, bestemming: o.bestemming || '',
-      van: o.van, tot: o.tot || null, kenmerk: o.kenmerk || '',
-      status: 'ingelezen', herkomst: herkomst || o.herkomst || 'handmatig',
-      bewijs: null, velden: {}, onzeker: [],
-      overgenomen: schoon(bron, 120) || null, at: nu()
-    }));
-    b.items.unshift(...uit);
-    b.items = b.items.slice(0, 5000);
-    save();
-    return { ok: true, onderdelen: uit };
+    const werk = b => {
+      if (!b || typeof b !== 'object' || Array.isArray(b))
+        throw new Error('reisInvoer hoort een kaart te zijn');
+      if (!Array.isArray(b.voorstellen)) b.voorstellen = [];
+      if (!Array.isArray(b.items)) b.items = [];
+      const bronId = schoon(uitnodigingId, 80) || null;
+      if (bronId) {
+        const bestaand = b.items.filter(x => x.key === key && x.uitnodigingId === bronId);
+        if (bestaand.length) return { ok: true, onderdelen: bestaand, herhaald: true };
+      }
+      const uit = rij.map(o => ({
+        id: 'I-' + crypto.randomBytes(4).toString('hex'),
+        key, soort: o.soort, titel: o.titel, bestemming: o.bestemming || '',
+        van: o.van, tot: o.tot || null, kenmerk: o.kenmerk || '',
+        status: 'ingelezen', herkomst: herkomst || o.herkomst || 'handmatig',
+        bewijs: null, velden: {}, onzeker: [], uitnodigingId: bronId,
+        overgenomen: schoon(bron, 120) || null, at: nu()
+      }));
+      b.items.unshift(...uit);
+      b.items = b.items.slice(0, 5000);
+      return { ok: true, onderdelen: uit };
+    };
+    if (typeof bewerkCollectie === 'function') return bewerkCollectie('reisInvoer', werk);
+    const b = bak(), voor = JSON.stringify(b), antwoord = werk(b);
+    if (JSON.stringify(b) !== voor) save();
+    return antwoord;
   }
 
   return { mijn, weg, mijnRegels, neemOver };

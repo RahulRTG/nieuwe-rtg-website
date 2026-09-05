@@ -121,10 +121,10 @@ test('5. de lounges: binnen op de boarding pass, de Vleugel alleen met vip-proto
   await api(base, '/api/onboarding/paspoort', { nummer: 'NX1234567', vervaldatum: '2032-01-01',
     nationaliteit: 'Nederlandse', geboortedatum: '1990-01-01' }, lid);
   const bk = await api(base, '/api/member/vluchten/boek', { id: open.id }, lid);
-  const code = bk.body.boeking.code;
-  // zonder inchecken geen lounge
-  assert.equal((await api(base, '/api/lucht/lounge/in', { lounge: 'salon', code }, ops)).status, 409);
-  await api(base, '/api/member/vluchten/incheck', { code }, lid);
+  // Een openbaar boekings-id is geen toegangsbewijs.
+  assert.equal((await api(base, '/api/lucht/lounge/in', { lounge: 'salon', code: bk.body.boeking.id }, ops)).status, 409);
+  const inc = await api(base, '/api/member/vluchten/incheck', { id: bk.body.boeking.id }, lid);
+  const code = inc.body.pass.code;
   // de salon: welkom; maar niet dubbel
   const inr = await api(base, '/api/lucht/lounge/in', { lounge: 'salon', code }, ops);
   assert.equal(inr.status, 200);

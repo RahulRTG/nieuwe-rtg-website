@@ -122,13 +122,44 @@ module.exports = (ctx) => {
     const o = id ? vind(id) : vindOpSettlement(settlementRef);
     if (!o) return { status: 404, error: 'Die betaalopdracht bestaat niet.' };
     if (gelukt) {
-      zet(o, STATUS.AFGEWIKKELD, { settlementRef: settlementRef || o.settlementRef }); save();
-      await ctx.verwerkAfwikkeling(o);
+      const voor = Object.assign({}, o);
+      zet(o, STATUS.AFGEWIKKELD, { settlementRef: settlementRef || o.settlementRef });
+      try { save(); }
+      catch (e) {
+        /* Een mislukte persist mag niet alleen in RAM definitief worden. Een
+           providerretry moet dezelfde overgang opnieuw kunnen vastleggen. */
+        for (const sleutel of Object.keys(o)) if (!Object.prototype.hasOwnProperty.call(voor, sleutel)) delete o[sleutel];
+        Object.assign(o, voor);
+        throw e;
+      }
+      /* Een late `paid` na een al teruggeboekte mislukking is een conflict,
+         geen toestemming om alsnog de interne claim/ledgerfinalisatie te
+         draaien. Alleen de werkelijk afgewikkelde staat mag die haak bereiken. */
+      if (o.status !== STATUS.AFGEWIKKELD) return publiek(o);
+      const klaar = await ctx.verwerkAfwikkeling(o);
+      if (!klaar) {
+        const e = new Error('De payout is extern bevestigd, maar intern nog niet volledig afgehandeld.');
+        e.code = 'PAYOUT_AFHANDELING_MISLUKT';
+        throw e;
+      }
       return publiek(o);
     }
-    const week = zet(o, STATUS.MISLUKT, { laatsteFout: String(reden || 'de rail meldde een mislukking').slice(0, 300), volgendeAt: null });
-    save();
-    if (week) await ctx.draaiTerug(o);   // alleen als hij ECHT naar mislukt ging
+    if (o.status === STATUS.TERUGGEBOEKT) return publiek(o);
+    const voor = Object.assign({}, o);
+    zet(o, STATUS.MISLUKT, { laatsteFout: String(reden || 'de rail meldde een mislukking').slice(0, 300), volgendeAt: null });
+    try { save(); }
+    catch (e) {
+      for (const sleutel of Object.keys(o)) if (!Object.prototype.hasOwnProperty.call(voor, sleutel)) delete o[sleutel];
+      Object.assign(o, voor);
+      throw e;
+    }
+    /* Ook een al eerder als MISLUKT vastgelegde payout moet hier terugkomen:
+       het proces kan precies tussen die save en de teruggang zijn gestopt. */
+    if (o.status === STATUS.MISLUKT && !(await ctx.draaiTerug(o))) {
+      const e = new Error('De mislukte payout kon nog niet veilig worden teruggeboekt.');
+      e.code = 'PAYOUT_TERUGBOEKING_MISLUKT';
+      throw e;
+    }
     return publiek(o);
   }
 

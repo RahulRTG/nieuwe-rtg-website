@@ -4,7 +4,8 @@
    routes/supplier/salon.js. */
 module.exports = (kern, eisSalonProfiel) => {
   const { app, broadcastSync, db, express, talen, logActivity, salonNaarVolgers, salonProfielCompleet,
-          salonItemsVan, save, schoon, sseToOffice, supplierAuth, media, salon } = kern;
+          salonItemsVan, save, schoon, sseToOffice, supplierAuth, media, salon,
+          salonClaimcode } = kern;
 app.post('/api/supplier/salon/bio', express.json({ limit: '2mb' }), supplierAuth, async (req, res) => {
   if (!req.actor.manager) return res.status(403).json({ error: 'Alleen voor management.' });
   const s = req.supplier;
@@ -87,10 +88,15 @@ app.post('/api/supplier/salon/stats', supplierAuth, (req, res) => {
     volgers: (s.salon && s.salon.volgers.length) || 0,
     bio: (s.salon && s.salon.bio) || '',
     posts: eigen.length, likes, reacties,
-    deals: eigen.filter(p => p.deal).map(p => ({
+    deals: eigen.filter(p => p.deal).map(p => {
+      const claims = Array.isArray(p.deal.claims) ? p.deal.claims : [];
+      return {
       titel: p.deal.titel, geldigTot: p.deal.geldigTot,
-      claims: p.deal.claims.length, verzilverd: p.deal.claims.filter(c => c.used).length
-    })),
+      claims: claims.length,
+      verzilverd: claims.filter(c =>
+        salonClaimcode.publiek(p, c).status === 'verzilverd').length
+      };
+    }),
     polls: eigen.filter(p => p.poll).map(p => ({
       vraag: p.poll.vraag,
       opties: p.poll.opties.map(o => ({ tekst: o.tekst, stemmen: o.stemmen.length }))

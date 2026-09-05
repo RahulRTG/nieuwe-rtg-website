@@ -16,14 +16,13 @@
       De mutatie die hem hoort te laten zakken: zet in shared/metgezel.js de
       padtoets terug als enige voorwaarde voor `eigenRahul`.
 
-   2. ELKE APP HEEFT EEN MENU -- EN HET BEGINSCHERM JUIST NIET. De hamburger
-      rechtsboven komt van shared/appmenu.js, en die wordt door shared/ios.js
-      binnengehaald -- één plek voor elke app-pagina. Dat is de kracht en de
-      zwakte tegelijk: valt die koppeling weg, of vergeet een nieuwe pagina
-      shared/ios.js (dat was bij dispatch.html, zakelijk.html en de zeven
-      foundation/os-*.html precies wat er aan de hand was), dan is er geen
-      foutmelding en geen rood -- alleen een app zonder weg terug naar huis.
-      Deze toets loopt daarom ALLE app-pagina's af.
+   2. ELKE APP HEEFT EEN SYSTEEMDEUR -- EN NOOIT TWEE. Op een nog niet naar
+      Edge verhuisd scherm is dat de hamburger van shared/appmenu.js. Zodra
+      het bestaande Edge-casco aantoonbaar klaar is, verbergt diezelfde schil
+      de oude hamburger en wordt `.rtg-edge-menu` de enige zichtbare eigenaar. De toets moet dus
+      de zichtbare eigenaar meten, niet een historische ID. Anders noemt hij
+      juist de gewenste singleton-migratie een defect. Deze toets loopt daarom
+      ALLE app-pagina's af en meldt ook iedere dubbele eigenaar.
 
       Het beginscherm is de rustplek en heeft er met opzet géén: daar is de
       bovenrand de ingang naar het systeem. Die kant kan stil kapot -- knoppen
@@ -31,7 +30,8 @@
       hieronder haalt de bovenrand echt omlaag en kijkt of het paneel opengaat
       en of meldingen erin staan.
 
-      De mutatie: haal het blok dat appmenu.js bijlaadt uit shared/ios.js.
+      De tegenproef: verberg zowel `#osMenuBtn` als `.rtg-edge-menu`, of toon ze
+      naast elkaar. In beide gevallen hoort de census rood te worden.
 
    Draait alleen waar Playwright beschikbaar is; anders overgeslagen.
    Draai: npm run e2e */
@@ -255,6 +255,7 @@ test('Rahul heeft één balk en elk app-scherm houdt een veilige systeemdeur',
     await t.test('elke app-pagina draagt het app-menu of een beveiligde uitweg',
       { skip: geenBrowser(pw) }, async () => {
       const menuFouten = [];
+      const dubbeleDeuren = [];
       let gemeten = 0;
       for (const pad of appPaden()) {
         const page = await ctx.newPage();
@@ -269,9 +270,38 @@ test('Rahul heeft één balk en elk app-scherm houdt een veilige systeemdeur',
           } catch (e) { continue; }
           if (!meedoen || new URL(page.url()).pathname !== pad) continue;
           try {
-            await page.waitForSelector('#osMenuBtn, #rtf-toegang-slot [data-rtf-uitweg]',
-              { timeout: 8000 });
+            /* Edge verbergt de oude hamburger pas NADAT zijn bestaande casco
+               volledig is opgebouwd. Een zichtbare `.rtg-edge-menu` is
+               dan de nieuwe eigenaar van precies dezelfde systeemdeur; eisen
+               dat `#osMenuBtn` zichtbaar blijft zou juist twee menu's belonen. */
+            await page.waitForFunction(() => {
+              const zichtbaar = (el) => {
+                if (!el || el.hidden) return false;
+                const s = getComputedStyle(el), r = el.getBoundingClientRect();
+                return s.display !== 'none' && s.visibility !== 'hidden' &&
+                  Number(s.opacity || 1) > 0 && r.width > 0 && r.height > 0;
+              };
+              return zichtbaar(document.getElementById('osMenuBtn')) ||
+                zichtbaar(document.querySelector('.rtg-edge-menu')) ||
+                zichtbaar(document.querySelector('#rtf-toegang-slot [data-rtf-uitweg]'));
+            }, null, { timeout: 8000 });
+            const deuren = await page.evaluate(() => {
+              const zichtbaar = (el) => {
+                if (!el || el.hidden) return false;
+                const s = getComputedStyle(el), r = el.getBoundingClientRect();
+                return s.display !== 'none' && s.visibility !== 'hidden' &&
+                  Number(s.opacity || 1) > 0 && r.width > 0 && r.height > 0;
+              };
+              return {
+                legacy: zichtbaar(document.getElementById('osMenuBtn')),
+                edge: zichtbaar(document.querySelector('.rtg-edge-menu')),
+                uitweg: zichtbaar(document.querySelector('#rtf-toegang-slot [data-rtf-uitweg]')),
+                roots: document.querySelectorAll('.rtg-edge-chrome').length
+              };
+            });
             gemeten++;
+            if (deuren.edge && deuren.legacy) dubbeleDeuren.push(pad + ': oude hamburger naast Edge-menu');
+            if (deuren.edge && deuren.roots !== 1) dubbeleDeuren.push(pad + ': ' + deuren.roots + ' Edge-casco\'s');
           } catch (e) {
             if (new URL(page.url()).pathname === pad) menuFouten.push(pad);
           }
@@ -287,46 +317,63 @@ test('Rahul heeft één balk en elk app-scherm houdt een veilige systeemdeur',
       assert.ok(gemeten > 100, 'te weinig pagina\'s gemeten (' + gemeten + '): dan bewijst groen niets');
       assert.deepEqual(menuFouten, [],
         'deze app-pagina\'s hebben geen app-menu of veilige uitweg:\n' + menuFouten.join('\n'));
+      assert.deepEqual(dubbeleDeuren, [],
+        'deze app-pagina\'s tonen twee eigenaars van dezelfde systeemdeur:\n' + dubbeleDeuren.join('\n'));
       });
   });
 });
 
-test('het menu opent en brengt je terug naar het beginscherm',
+test('het zichtbare Edge-menu opent en houdt home en instellingen bereikbaar',
   { skip: geenBrowser(pw) }, async () => {
   await metLid(async ({ base, ctx }) => {
     const page = await ctx.newPage();
     await volgVerzoeken(page);
     await page.goto(base + '/apps/wallet.html', { waitUntil: 'domcontentloaded' });
-    await page.waitForSelector('#osMenuBtn', { timeout: 10000 });
-    await page.click('#osMenuBtn');
-    await page.waitForSelector('.amn-scrim.amn-open', { timeout: 5000 });
+    await page.waitForURL(/\/apps\/geld\.html(?:#wallet)?$/, { timeout: 10000 });
+    await page.waitForFunction(() => document.body.getAttribute('data-rtg-edge-2-rendered') === 'true' &&
+      document.querySelectorAll('.rtg-edge-chrome').length === 1, null, { timeout: 10000 });
+
+    /* Wallet is geen losse app meer maar de wallet-stand van RTG Geld. Daar is
+       Edge de zichtbare eigenaar; op de verborgen oude hamburger klikken
+       toetst alleen of Playwright door een balk heen kan klikken. */
+    await page.click('.rtg-edge-menu');
+    await page.waitForFunction(() => document.querySelector('.rtg-edge-index')
+      .getAttribute('aria-hidden') === 'false', null, { timeout: 5000 });
 
     const inhoud = await page.evaluate(() => ({
-      tegels: [...document.querySelectorAll('.amn-tegel')].map((b) => b.textContent.trim()),
-      rijen: [...document.querySelectorAll('.amn-rij')].map((b) => b.textContent.trim())
+      functies: [...document.querySelectorAll('.rtg-edge-group a')].map((a) => a.textContent.trim()),
+      werelden: [...document.querySelectorAll('.rtg-edge-worlds a')].map((a) => a.textContent.trim()),
+      oudeMenuZichtbaar: (() => {
+        const b = document.getElementById('osMenuBtn');
+        return !!(b && getComputedStyle(b).display !== 'none' && b.getBoundingClientRect().width > 0);
+      })()
     }));
-    /* "Deze app": gelezen uit het scherm zelf, niet met de hand opgeschreven.
-       De wallet draagt zijn eigen schakelrij (Passen, Tickets, Sleutels...), en
-       die hoort dus in het menu te staan. Staat er niets, dan is de hele
-       vondstlaag stilgevallen -- precies het soort storing dat je niet ziet. */
-    assert.ok(inhoud.tegels.length > 0, 'het menu vond geen enkele functie van de app zelf');
-    assert.ok(inhoud.rijen.some((t) => /Beginscherm/i.test(t)), 'geen weg naar het beginscherm');
-    assert.ok(inhoud.rijen.some((t) => /Instellingen/i.test(t)), 'geen ingang naar de instellingen');
+    assert.ok(inhoud.functies.some((t) => /RTG Geld/i.test(t)), 'het Edge-menu vond RTG Geld niet');
+    assert.deepEqual(inhoud.werelden, ['LivingOS', 'WorkOS', 'TravelOS', 'FoundationOS'],
+      'het Edge-menu draagt niet de vier vaste werelddeuren');
+    assert.equal(inhoud.oudeMenuZichtbaar, false, 'de oude hamburger staat naast het Edge-menu in beeld');
 
-    // Escape sluit, en dan brengt de rij "Beginscherm" je ook echt thuis
+    // Escape sluit de functielaag zonder een tweede menu achter te laten.
     await page.keyboard.press('Escape');
-    await page.waitForSelector('.amn-scrim.amn-open', { state: 'detached', timeout: 3000 }).catch(() => {});
-    assert.equal(await page.evaluate(() => !!document.querySelector('.amn-scrim.amn-open')), false,
-      'Escape sluit het menu niet');
+    await page.waitForFunction(() => document.querySelector('.rtg-edge-index')
+      .getAttribute('aria-hidden') === 'true', null, { timeout: 3000 });
 
-    await page.click('#osMenuBtn');
-    await page.waitForSelector('.amn-scrim.amn-open', { timeout: 5000 });
-    await page.evaluate(() => {
-      const rij = [...document.querySelectorAll('.amn-rij')].find((b) => /Beginscherm/i.test(b.textContent));
-      rij.click();
-    });
-    await page.waitForURL(/\/apps\/app\.html/, { timeout: 8000 });
-    assert.match(new URL(page.url()).pathname, /\/apps\/app\.html$/, 'het menu brengt je niet thuis');
+    /* Instellingen komen volgens het randcontract van de bovenrand. De
+       toetsenborddeur is niet decoratief: focus maakt hem zichtbaar en een
+       echte klik opent het bestaande paneel. */
+    const instellingen = page.locator('.rnd-toets', { hasText: 'Instellingen openen' });
+    await instellingen.focus();
+    await instellingen.click();
+    await page.waitForSelector('.bdn-scrim.open', { timeout: 5000 });
+    await page.keyboard.press('Escape');
+    await page.waitForFunction(() => !document.querySelector('.bdn-scrim.open'), null, { timeout: 3000 });
+
+    const thuis = page.locator('.rtg-edge-bottom > a[aria-label="Naar home"]');
+    assert.equal(await thuis.getAttribute('href'), '/apps/living-os.html',
+      'de LivingOS-rand wijst niet naar zijn eigen home');
+    await thuis.click();
+    await page.waitForURL(/\/apps\/living-os\.html/, { timeout: 8000 });
+    assert.match(new URL(page.url()).pathname, /\/apps\/living-os\.html$/, 'de Edge-deur brengt je niet thuis');
     await page.close();
   });
 });

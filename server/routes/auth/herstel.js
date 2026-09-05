@@ -126,6 +126,11 @@ app.post('/api/auth/forgot', (req, res) => {
 app.post('/api/auth/reset', async (req, res) => {
   const u = accounts.findByReset(req.body.token);
   if (!u) return res.status(400).json({ error: 'Ongeldige of verlopen herstel-link.' });
+  const pw = String(req.body.password || '');
+  /* Een ongeldig nieuw wachtwoord mag geen enkele herstelstap verbruiken. Dat
+     gebeurde bij accounts zonder telefoon al voor deze controle, waardoor een
+     gewone typefout de geldige herstel-link onbruikbaar maakte. */
+  if (pw.length < 6) return res.status(400).json({ error: 'Wachtwoord moet minstens 6 tekens zijn.' });
   // tweede stap: de code van de telefoon moet kloppen
   const entry = herstel2fa()[u.id];
   if (!entry || entry.tot < rtgKlok.nu())
@@ -134,11 +139,7 @@ app.post('/api/auth/reset', async (req, res) => {
      dezelfde aanvraag die de link maakte, dus een aanvaller kan hem niet zelf
      zetten: hij zou eerst het telefoonnummer van het account moeten weghalen,
      en daarvoor moet hij al binnen zijn. */
-  if (entry.zonderCode) {
-    delete herstel2fa()[u.id];
-    save();
-  } else
-  if (entry.hash !== codeHash(String(req.body.code || '').trim())) {
+  if (!entry.zonderCode && entry.hash !== codeHash(String(req.body.code || '').trim())) {
     entry.pogingen = (entry.pogingen || 0) + 1;
     if (entry.pogingen >= 5) {
       delete herstel2fa()[u.id];
@@ -148,11 +149,13 @@ app.post('/api/auth/reset', async (req, res) => {
     save();
     return res.status(403).json({ error: 'Onjuiste code. Kijk in het bericht op uw telefoon.' });
   }
-  const pw = String(req.body.password || '');
-  if (pw.length < 6) return res.status(400).json({ error: 'Wachtwoord moet minstens 6 tekens zijn.' });
+  /* De accountslaag vergelijkt en wist de reset-hash in dezelfde SQL-update
+     als het nieuwe wachtwoord. Twee gelijktijdige geldige verzoeken kunnen dus
+     niet allebei winnen. Pas na die commit ruimen we de tweede stap op. */
+  const gezet = await accounts.consumeReset(req.body.token, pw);
+  if (!gezet) return res.status(409).json({ error: 'Deze herstel-link is al gebruikt. Log in of vraag een nieuwe aan.' });
   delete herstel2fa()[u.id];
   save();
-  await accounts.setPassword(u.id, pw);
   res.json({ ok: true });
 });
 

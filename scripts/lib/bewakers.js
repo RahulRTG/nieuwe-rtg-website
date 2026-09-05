@@ -94,6 +94,8 @@ const KAART = new Map([
   ['auth', ['rol', 'member', 'een ingelogd lid']],
   ['eisAccount', ['rol', 'member', 'een ingelogd lid; andere naam voor dezelfde deur als auth']],
   ['lid', ['rol', 'member', 'een ingelogd lid; andere naam voor dezelfde deur als auth']],
+  ['authEenmaal', ['rol', 'member',
+    'gebruikt een reeds door de centrale identiteitslaag gezette ledensessie, en valt anders terug op auth']],
   ['supplierAuth', ['rol', 'supplier', 'een ingelogde leverancier']],
   ['officeAuth', ['rol', 'office', 'een ingelogd kantoormedewerker']],
   ['kantoorAuth', ['rol', 'office', 'een ingelogd kantoormedewerker; Nederlandse naam voor officeAuth']],
@@ -144,6 +146,8 @@ const KAART = new Map([
     'een eigen RTG-account binnen auth; een anonieme demo-gast heeft er geen']],
   ['nietBeschermd', ['verfijner', null,
     'sluit een beschermd kind uit binnen gezinsPoort; de kern weigert al, dit is het antwoord dat het scherm nodig heeft']],
+  ['luchtzijdePoort', ['verfijner', null,
+    'luchthaven of expliciet toegestane luchthavenzaak, binnen supplierAuth']],
 
   // ---- lichaamssleutel: de sleutel staat in het verzoek, niet in de kop ----
   ['gastAuth', ['lichaamssleutel', null, 'herkent req.body.sleutel als tafelsessie']],

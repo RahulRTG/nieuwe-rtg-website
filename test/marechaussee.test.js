@@ -42,7 +42,7 @@ test.before(async () => {
   await api(base, '/api/onboarding/paspoort', { nummer: 'NX1234567', vervaldatum: '2032-01-01',
     nationaliteit: 'Nederlandse', geboortedatum: '1990-01-01' }, lid);
   const bk = await api(base, '/api/member/vluchten/boek', { id: open.id }, lid);
-  await api(base, '/api/member/vluchten/incheck', { code: bk.body.boeking.code }, lid);
+  await api(base, '/api/member/vluchten/incheck', { id: bk.body.boeking.id }, lid);
 });
 test.after(() => stop(srv && srv.child));
 
@@ -85,7 +85,7 @@ test('3. het grens-signaal: een kist die boardt met ongecontroleerde reizigers v
   await api(base, '/api/onboarding/paspoort', { nummer: 'NX7654321', vervaldatum: '2032-06-01',
     nationaliteit: 'Belgische', geboortedatum: '1988-03-03' }, lid2);
   const bk = await api(base, '/api/member/vluchten/boek', { id: open.id }, lid2);
-  await api(base, '/api/member/vluchten/incheck', { code: bk.body.boeking.code }, lid2);
+  await api(base, '/api/member/vluchten/incheck', { id: bk.body.boeking.id }, lid2);
   // operations maakt de draai rond en start het boarden
   for (const t of ['brandstof', 'catering', 'schoonmaak', 'bagage-laden', 'water-en-afval', 'pushback-gereed'])
     await api(base, '/api/lucht/draai/taak', { id: open.id, taak: t }, ops);

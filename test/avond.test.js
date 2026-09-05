@@ -349,7 +349,7 @@ test('de avondplanner loopt niet om de gegevenspoort heen', async () => {
     email: 'zn' + u + '@voorbeeld.nl', password: 'geheim123',
     geboortedatum: '1990-05-05', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' });
   const kaal = reg.body.token;
-  if (!kaal) return; // registreren zonder telefoon kan niet: dan toetst dit niets
+  assert.ok(kaal, 'de proefpersoon zonder telefoon moet wel een geldige sessie krijgen');
 
   const v = await post('/api/avond/voorstel', { start: '19:00', thuisOm: '01:30',
     personen: 2, plafondPP: 20000 }, kaal);
@@ -359,6 +359,8 @@ test('de avondplanner loopt niet om de gegevenspoort heen', async () => {
   assert.ok((uit.body.ontbreekt || []).length, 'en te zeggen wat er ontbreekt');
 
   const na = await post('/api/avond', { id: v.body.avond.id }, kaal);
+  assert.ok(na.body.avond.stappen.length > 0,
+    'het voorstel bevat echte stappen; een lege avond mag deze terugroltoets niet groen maken');
   assert.ok(na.body.avond.stappen.every(s => s.staat === 'voorstel'),
     'en er hoort niets te zijn aangevraagd');
 });

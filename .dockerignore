@@ -3,14 +3,40 @@ npm-debug.log
 .git
 .gitignore
 .github
+.claude
+.ontwerp
+.codex
+.agents
+.rtg-*
 .env
 .env.*
+!.env.example
+deploy/live.env
 .sentinel-token
 sentinel-data
 server/data
+motor/target
 public/dist
 *.md
+# De go-live-keuring leest deze twee brondocumenten echt. Alleen deze
+# documenten gaan mee; overige ontwerpdocumentatie blijft buiten de runtime.
+!VERWERKINGSREGISTER.md
+!DATALEK.md
 test
+artifacts
+bin
+docs
+infra
+screenshots
+storeapps
+/*.png
+/*.log
+/.routejournaal
+/.schermjournaal
+/.toetsduur
+# Getrackte meetuitvoer, afzonderlijk door productie-status gehasht; nooit
+# runtime-invoer en dus ook nooit een reden om onbewezen bytes mee te bouwen.
+/SUITE.json
 scripts/a11y.js
 .DS_Store
 /tmp

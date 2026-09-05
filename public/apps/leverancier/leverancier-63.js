@@ -88,7 +88,7 @@
     });
     // luchtzijde: de boarding pass van de gast aan de deur of de balie checken
     const bp = $('#posPass'); if (bp) bp.addEventListener('click', async () => {
-      const code = window.prompt(T('pos.passvraag','Boarding pass-code van de gast (bijv. VL-3F2A9C):'));
+      const code = window.prompt(T('pos.passvraag','Boarding pass-code van de gast (begint met BP.):'));
       if (!code) return;
       try {
         const r = await API.call('/supplier/lucht/pass', { code });

@@ -10,31 +10,41 @@ module.exports = (kern) => {
     return true;
   }
 
-  app.post('/api/supplier/vracht', supplierAuth, (req, res) => {
+  app.post('/api/supplier/vracht', supplierAuth, async (req, res) => {
     if (!eisVracht(req, res)) return;
-    res.json(vracht.overzicht(req.supplier.code));
+    res.json(await vracht.overzicht(req.supplier.code));
   });
-  app.post('/api/supplier/vracht/maak', supplierAuth, (req, res) => {
+  app.post('/api/supplier/vracht/maak', supplierAuth, async (req, res) => {
     if (!eisVracht(req, res)) return;
-    stuur(res, vracht.maak(req.supplier.code, req.body || {}));
+    stuur(res, await vracht.maak(req.supplier.code, req.body || {}));
   });
-  app.post('/api/supplier/vracht/etappe', supplierAuth, (req, res) => {
+  app.post('/api/supplier/vracht/etappe', supplierAuth, async (req, res) => {
     if (!eisVracht(req, res)) return;
-    stuur(res, vracht.etappeKlaar(req.supplier.code, req.body.id));
+    stuur(res, await vracht.etappeKlaar(req.supplier.code, req.body.id, req.body.idem));
   });
-  app.post('/api/supplier/vracht/douane', supplierAuth, (req, res) => {
+  app.post('/api/supplier/vracht/douane', supplierAuth, async (req, res) => {
     if (!eisVracht(req, res)) return;
-    stuur(res, vracht.douaneVrij(req.supplier.code, req.body.id));
+    stuur(res, await vracht.douaneVrij(req.supplier.code, req.body.id, req.body.idem));
   });
-  app.post('/api/supplier/vracht/afleveren', supplierAuth, (req, res) => {
+  app.post('/api/supplier/vracht/afleveren', supplierAuth, async (req, res) => {
     if (!eisVracht(req, res)) return;
-    stuur(res, vracht.afleveren(req.supplier.code, req.body.id));
+    stuur(res, await vracht.afleveren(req.supplier.code, req.body.id, req.body.idem));
   });
-  app.post('/api/supplier/vracht/melding', supplierAuth, (req, res) => {
+  app.post('/api/supplier/vracht/melding', supplierAuth, async (req, res) => {
     if (!eisVracht(req, res)) return;
-    stuur(res, vracht.melding(req.supplier.code, req.body.id, req.body.tekst));
+    stuur(res, await vracht.melding(req.supplier.code, req.body.id, req.body.tekst, req.body.idem));
+  });
+  app.post('/api/supplier/vracht/volgcode/roteer', supplierAuth, async (req, res) => {
+    if (!eisVracht(req, res)) return;
+    stuur(res, await vracht.volgcodeRoteer(req.supplier.code, req.body.id,
+      req.actor && (req.actor.id || req.actor.name), req.body.idem));
+  });
+  app.post('/api/supplier/vracht/volgcode/intrek', supplierAuth, async (req, res) => {
+    if (!eisVracht(req, res)) return;
+    stuur(res, await vracht.volgcodeIntrekken(req.supplier.code, req.body.id,
+      req.actor && (req.actor.id || req.actor.name), req.body.reden));
   });
 
   // publiek: de klant volgt de zending op volgcode, zonder klantgegevens
-  app.post('/api/vracht/volg', (req, res) => stuur(res, vracht.volg((req.body || {}).code)));
+  app.post('/api/vracht/volg', async (req, res) => stuur(res, await vracht.volg((req.body || {}).code)));
 };

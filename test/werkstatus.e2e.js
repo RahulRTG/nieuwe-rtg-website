@@ -87,7 +87,12 @@ test('de tenantstand staat onder Instellingen, met de beweringen die NIET waar z
          een geweigerde sleutel blijft de kaart staan en zakt deze wacht met de
          reden -- waar 1000 ms verderop zakte op een knop die er niet was. */
       await wachtOpZichtbaar(page, '#inhoud');
+      await page.waitForSelector('body[data-rtg-edge-2-rendered="true"]', { timeout: 15000 });
+      await page.click('.rtg-edge-2-context-button');
+      await page.waitForSelector('.rtg-edge-2-context:not([hidden]) [data-wk="settings"]',
+        { timeout: 5000 });
       await page.click('[data-wk="settings"]');
+      await page.click('.rtg-edge-2-context-close');
       /* De stand is er pas als de server heeft geantwoord, en dat is aan twee
          dingen tegelijk te zien. De kop staat niet meer op de vaste tekst uit de
          HTML (status.js schrijft er de organisatienaam overheen, of bij een
@@ -212,7 +217,10 @@ test('de tenantstand staat onder Instellingen, met de beweringen die NIET waar z
        weergaven en fout werd bij de derde. Vanuit de organisatiestand sprong
        Ververs naar Modules, een scherm waar de gebruiker niet was. */
     await page.evaluate(() => { document.getElementById('stKop').textContent = 'LEEGGEMAAKT'; });
+    await page.click('.rtg-edge-2-context-button');
+    await page.waitForSelector('.rtg-edge-2-context:not([hidden]) #ververs', { timeout: 5000 });
     await page.click('#ververs');
+    await page.click('.rtg-edge-2-context-close');
     /* De regel hierboven maakte de kop met opzet leeg, en Ververs hoort hem
        opnieuw op te halen. Precies daarop wachten we: een ANDERE tekst dan
        'LEEGGEMAAKT'. Wachten op de naam zelf zou de bewering hieronder

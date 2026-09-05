@@ -670,6 +670,16 @@
   .note-soft{margin-top:0.7rem;font-size:0.72rem;color:var(--soft);}
   .txt-md{font-size:0.95rem;color:var(--txt);}
   .soft-xs{font-size:0.7rem;color:var(--soft);}
+  .kantoor-code-eenmalig{color:var(--rtg-leesgoud,var(--gold));font-family:monospace;}
+  .vr-code-laag{position:fixed;inset:0;z-index:10050;background:rgba(5,9,13,.82);
+    display:grid;place-items:center;padding:1rem;}
+  .vr-code-kaart{width:min(34rem,100%);border:1px solid var(--gold);background:var(--bg);
+    padding:1rem;box-shadow:0 1.5rem 4rem rgba(0,0,0,.45);}
+  .vr-code-acties{display:flex;gap:.5rem;margin-top:.75rem;}
+  .vr-tijdlijn{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.5rem;}
+  .vr-etappe{border:1px solid var(--line);border-radius:0;padding:.2rem .6rem;font-size:.72rem;opacity:.85;}
+  .vr-etappe.bezig{border-color:var(--gold);background:rgba(201,162,75,.12);opacity:1;}
+  .vr-etappe.klaar{opacity:.6;}
   /* Rustig, inklapbaar functieblok (zelfde beeld als de RTG Boardroom): een rij
      aan/uit-schakelaars vat zich samen tot "X/Y aan" en verschijnt alleen als er
      iets uit staat of de gebruiker het blok opent. Zo blijven veel opties
@@ -703,8 +713,9 @@
       <div class="gate-klok" id="gateKlok" data-rtg-klok="ring">--:--</div>
     </div>
     <form class="login-form" id="loginForm">
-      <input id="liUser" name="username" placeholder="Gebruikersnaam" data-i18n-ph="gate.user" autocomplete="username" autocapitalize="none">
-      <input id="liPass" name="password" type="password" placeholder="Wachtwoord" data-i18n-ph="gate.pass" autocomplete="current-password">
+      <p class="enroll-hint">Open uw werkplek met uw persoonlijke RTG-account.</p>
+      <input id="liUser" name="username" placeholder="RTG e-mail of gebruikersnaam" data-i18n-ph="gate.user" autocomplete="username" autocapitalize="none">
+      <input id="liPass" name="password" type="password" placeholder="Uw RTG-wachtwoord" data-i18n-ph="gate.pass" autocomplete="current-password">
       <button type="submit" data-i18n="gate.signin">Inloggen</button>
     </form>
 
@@ -716,7 +727,6 @@
         <input id="enCode" placeholder="Kassacode" data-i18n-ph="enr.code" autocapitalize="characters" autocomplete="off">
         <input id="enLogin" placeholder="Uw RTG e-mail of gebruikersnaam" data-i18n-ph="enr.login" autocomplete="username" autocapitalize="none">
         <input id="enPass" type="password" placeholder="Uw RTG wachtwoord" data-i18n-ph="enr.pass" autocomplete="current-password">
-        <input id="enPin" placeholder="Kies een pincode (4 cijfers)" data-i18n-ph="enr.pin" inputmode="numeric" autocomplete="off" maxlength="4">
         <button type="submit" data-i18n="enr.submit">Aanmelden bij mijn werkgever</button>
         <div class="enroll-msg" id="enrollMsg" role="status" aria-live="polite"></div>
       </form>
@@ -1141,10 +1151,10 @@
 window.I18N = { en: {
   'gate.title':'The supplier <em>app</em>.',
   'gate.deck':'Your business, live-connected with your guests and the RTG back office.',
-  'gate.user':'Username', 'gate.pass':'Password', 'gate.signin':'Sign in', 'gate.or':'or choose a Magnaat Test partner',
+  'gate.user':'RTG email or username', 'gate.pass':'Your RTG password', 'gate.signin':'Sign in', 'gate.or':'or choose a Magnaat Test partner',
   /* de poort is een gesprek met Rahul; dit is wat hij zegt */
   'gate.rp.groet':'Welcome back.', 'gate.rp.wacht':'One moment, let me check.',
-  'gate.rp.wie':'Who do I have the pleasure of speaking to?', 'gate.rp.pass':'Thank you. And your password?',
+  'gate.rp.wie':'Open your workplace with your personal RTG account. What is your email or username?', 'gate.rp.pass':'Thank you. And your RTG password?',
   'gate.rp.stuur':'Send',
   'tab.home':'Overview', 'tab.orders':'Orders', 'tab.rides':'Rides', 'tab.menu':'Menu', 'tab.price':'Price', 'tab.location':'Location',
   't.now':'just now', 't.ago':' ago', 't.min':' min', 't.hour':' hour', 't.days':' day(s)',

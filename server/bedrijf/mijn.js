@@ -34,6 +34,8 @@
 module.exports = (sctx) => {
   const { app, save, nu, rid, W, kern } = sctx;
   const { auth, accounts, eigenaar, crypto } = kern;
+  const PRODUCTIE = String(process.env.NODE_ENV || '') === 'production';
+  const authEenmaal = (req, res, next) => req.session ? next() : auth(req, res, next);
 
   // de werkruimte van de eigenaar: gevonden op een vlag, niet op een naam
   const eigenaarsRuimte = () => Object.values(W()).find(w => w.eigenaarsRuimte) || null;
@@ -48,7 +50,7 @@ module.exports = (sctx) => {
     return p ? p.codename : null;
   }
 
-  app.post('/api/bedrijf/mijn', auth, (req, res) => {
+  app.post('/api/bedrijf/mijn', authEenmaal, (req, res) => {
     const key = req.session.key;
     if (!key) return res.status(403).json({ error: 'Geen RTG-sessie gevonden.' });
 
@@ -59,7 +61,7 @@ module.exports = (sctx) => {
        directie erin, en daarna nooit meer -- de vlag `eigenaarsRuimte` is de
        enige plek waar dat aan hangt. */
     let gemaakt = null;
-    if (baas) {
+    if (baas && !PRODUCTIE) {
       let w = eigenaarsRuimte();
       if (!w) {
         const code = (() => { let c; do { c = 'W' + crypto.randomBytes(3).toString('hex').toUpperCase().slice(0, 5); } while (W()[c]); return c; })();
@@ -82,18 +84,23 @@ module.exports = (sctx) => {
       save();
     }
 
+    const { tenantVoor, tenantOpen } = require('./productie-identiteit');
     const mijne = Object.values(W()).map(w => {
       const l = lidVoor(w, key);
       if (!l) return null;
-      return { werkruimte: w.code, naam: w.naam, lidToken: l.token,
+      if (PRODUCTIE && !tenantOpen(tenantVoor(kern.db.data, w.code))) return null;
+      const rij = { werkruimte: w.code, naam: w.naam,
         lidNaam: l.naam, rollen: (l.rollen || []).map(r => r.id), functie: l.functie || null,
         eigenaarsRuimte: !!w.eigenaarsRuimte };
+      if (!PRODUCTIE) rij.lidToken = l.token;
+      return rij;
     }).filter(Boolean);
 
     res.json({ ok: true, aantal: mijne.length, werkruimtes: mijne, eigenaar: baas,
       aangemaakt: gemaakt,
       let: mijne.length
-        ? 'Dit zijn uw eigen lid-tokens; het beheer-token van een werkruimte reist hier nooit mee.'
-        : (baas ? null : 'U bent nog aan geen enkele werkruimte gekoppeld. Aanmelden kan met de werkruimtecode; een mens laat u daarna toe.') });
+        ? (PRODUCTIE ? 'Kies zelf welke werkruimte u opent; uw actuele accountrollen bepalen de toegang.'
+          : 'Dit zijn uw eigen lid-tokens; het beheer-token van een werkruimte reist hier nooit mee.')
+        : (baas && !PRODUCTIE ? null : 'U bent nog aan geen enkele actieve werkruimte gekoppeld.') });
   });
 };

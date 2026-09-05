@@ -68,7 +68,7 @@ test('zonder grootboek gaat de start NIET door: json en geheugen worden geblokke
 });
 
 test('met grootboek mag het wel: postgres zonder klacht, sqlite met een aanbeveling', () => {
-  const pg = keur({ DATABASE_URL: 'postgres://x/y' });
+  const pg = keur({ DATABASE_URL: 'postgres://postgres/y' });
   assert.equal(pg.store, 'postgres', 'een DATABASE_URL kiest postgres');
   assert.deepEqual(pg.fouten, [], 'en blokkeert niets: ' + JSON.stringify(pg.fouten));
   assert.deepEqual(pg.waarschuwingen, [], 'zonder waarschuwing');
@@ -81,6 +81,17 @@ test('met grootboek mag het wel: postgres zonder klacht, sqlite met een aanbevel
   assert.deepEqual(lite.fouten, [], 'sqlite blokkeert niet: ' + JSON.stringify(lite.fouten));
   assert.equal(lite.waarschuwingen.length, 1, 'maar krijgt wel een aanbeveling');
   assert.match(lite.waarschuwingen[0], /DATABASE_URL/, 'over PostgreSQL voor meerdere instances');
+});
+
+test('een DATABASE_URL kan niet groen lijken terwijl RTG_STORE de runtime naar sqlite stuurt', () => {
+  const r = keur({ DATABASE_URL: 'postgres://postgres/y', RTG_STORE: 'sqlite' });
+  assert.equal(r.store, 'sqlite', 'de proef bevestigt eerst de werkelijke runtimekeuze');
+  assert.ok(r.fouten.some(f => /RTG_STORE=sqlite.*PostgreSQL.*runtime/i.test(f)),
+    'de keuring blokkeert de misleidende override: ' + JSON.stringify(r.fouten));
+
+  const explicietPg = keur({ DATABASE_URL: 'postgres://postgres/y', RTG_STORE: 'postgres' });
+  assert.deepEqual(explicietPg.fouten, [],
+    'een expliciete override naar dezelfde PostgreSQL-stand blijft geldig');
 });
 
 test('het sqlite-grootboek uitzetten blokkeert ook, en de melding wijst de schakelaar aan', () => {

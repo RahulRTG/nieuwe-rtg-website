@@ -36,77 +36,27 @@ module.exports = (kern) => {
     if (!db.data.werkruimtes) db.data.werkruimtes = {};
     return db.data.werkruimtes;
   }
-  const code = () => { let c; do { c = 'W' + crypto.randomBytes(3).toString('hex').toUpperCase().slice(0, 5); } while (W()[c]); return c; };
 
   /* De twee deuren staan in ./deuren.js: het contractquotum en de
      organisatiemeting hangen eraan, en die horen op één plek te hangen. */
   const { ruimteVan, beheerVan, lidVan } = require('./deuren')({ kern, W, eigenVeld });
 
+  /* In productie komt ELKE bedrijfsroute eerst langs de centrale RTG-
+     accountpoort en een verse PostgreSQL-baseline. Deze mount staat bewust
+     vóór de eerste app.post hieronder. Ontwikkeling gebruikt dezelfde routes
+     zonder deze cutover, zodat bestaande lokale scenario's bruikbaar blijven. */
+  const productieIdentiteit = require('./productie-identiteit')({
+    app, auth: kern.auth, db
+  });
+  productieIdentiteit.hang('/api/bedrijf', {
+    zonderWerkruimte: ['/api/bedrijf/mijn', '/api/bedrijf/werkruimte/maak']
+  });
+
   const sctx = { app, db, save, crypto, schoon, kern, W, nu, rid, dag, ruimteVan, beheerVan, lidVan, eigenVeld };
-
-  /* ---------- de werkruimte zelf ----------
-     Een holding is een gewone werkruimte met kinderen eronder. Dat is bewust
-     geen apart soort: anders krijgt de tweede laag zijn eigen rechten- en
-     journaalregels, en die lopen gegarandeerd uit de pas met de eerste. */
-  /* De eerste deur van het Werk OS is BEWUST open (zie scripts/poortwacht.js,
-     PUBLIEK): wie hem aanroept heeft nog niets -- geen zaak, geen login. Maar
-     een open scheppingsdeur zonder rem is een uitnodiging om de opslag vol te
-     gieten. Vijf per afzender per tien minuten is voor een echt bedrijf ruim
-     en voor een script niets. Lokaal geteld: de gedeelde tooManyTries-emmer
-     wordt alleen door mislukte logins gevuld en zou hier dus nooit remmen. */
-  const maakBeurten = new Map();
-  // Zelfde ontsnapping als foundation/basis.js: in de testsuite delen alle
-  // aanroepers een IP, en daar remt er niets.
-  const GEEN_LIMIET = process.env.NODE_ENV === 'test';
-  function maakRem(ip) {
-    if (GEEN_LIMIET) return false;
-    const t = Date.now();
-    if (maakBeurten.size > 10000) maakBeurten.clear();
-    const b = (maakBeurten.get(ip) || []).filter(x => t - x < 10 * 60000);
-    b.push(t); maakBeurten.set(ip, b);
-    return b.length > 5;
-  }
-
-  app.post('/api/bedrijf/werkruimte/maak', (req, res) => {
-    if (maakRem(String(req.ip || ''))) {
-      return res.status(429).json({ error: 'Te veel nieuwe werkruimtes achter elkaar. Wacht een paar minuten.' });
-    }
-    const naam = schoon(req.body.naam, 80);
-    if (!naam) return res.status(400).json({ error: 'Hoe heet de organisatie?' });
-    const moeder = schoon(req.body.moeder, 8).toUpperCase();
-    if (moeder && !eigenVeld(W(), moeder)) return res.status(404).json({ error: 'Die moederwerkruimte kennen we niet.' });
-    const w = {
-      code: code(), naam, land: schoon(req.body.land, 2).toUpperCase() || 'NL',
-      valuta: schoon(req.body.valuta, 3).toUpperCase() || 'EUR',
-      taal: schoon(req.body.taal, 5) || 'nl', moeder: moeder || null,
-      kvk: schoon(req.body.kvk, 20) || null, btwNummer: schoon(req.body.btw, 20) || null,
-      beheerToken: crypto.randomBytes(24).toString('hex'),
-      leden: {}, journaal: [], at: nu()
-    };
-    W()[w.code] = w;
-    save();
-    res.json({ ok: true, werkruimte: w.code, naam: w.naam, beheerToken: w.beheerToken,
-      let: 'Bewaar dit beheer-token: het wordt EEN keer getoond en is de sleutel van deze werkruimte. Leden krijgen straks hun eigen lid-token; dat is bewust een andere sleutel.' });
-  });
-
-  app.post('/api/bedrijf/werkruimte', (req, res) => {
-    const w = beheerVan(req, res); if (!w) return;
-    const kinderen = Object.values(W()).filter(x => x.moeder === w.code).map(x => ({ code: x.code, naam: x.naam, land: x.land, valuta: x.valuta }));
-    res.json({ ok: true,
-      werkruimte: { code: w.code, naam: w.naam, land: w.land, valuta: w.valuta, taal: w.taal,
-        moeder: w.moeder, kvk: w.kvk, btwNummer: w.btwNummer, at: w.at },
-      leden: Object.values(w.leden).length, dochters: kinderen,
-      let: kinderen.length
-        ? 'Dochters staan hier met naam, meer niet. Geconsolideerd kijken is een eigen handeling met een eigen recht; het rolt er niet vanzelf uit.'
-        : null });
-  });
-
-  /* De ledenroutes staan in ./leden.js -- dit bestand ging door de mounts
-     over de 10 kB van keuringsregel 13, en de naad is echt: hier staat de
-     werkruimte, daar staan de mensen erin. */
 
   // de deellagen; de volgorde is gedrag (rollen zet de poort die de rest
   // gebruikt, en start zet de blokkenregistratie waar de rest zich op meldt)
+  require('./werkruimte')(sctx);
   require('./leden')(sctx);
   Object.assign(sctx, require('./rollen')(sctx));
   require('./start')(sctx);
@@ -156,5 +106,6 @@ module.exports = (kern) => {
      alle bakken hierboven en schrijft in geen enkele -- er staat niet eens een
      save() in. */
   require('./gevolg')(sctx);
+  sctx.hangProductieIdentiteit = productieIdentiteit.hang;
   return sctx;
 };

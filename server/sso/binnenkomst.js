@@ -18,19 +18,96 @@
 'use strict';
 const sso = require('./index');
 const scimGroepen = require('../scim/groepen');
+const eigenaar = require('../eigenaar');
 const { log } = require('../log');
 
 const OVERDRACHT = 'sso-overdracht';
 const OVERDRACHT_MS = 60000;
 
-/* De identiteitsbrug. Een fout hier laat de INLOG staan en wordt luid gelogd:
-   dit gaat over de werkplek en niet over het account. Iemand buitensluiten uit
-   zijn eigen RTG-omgeving omdat een journaalregel in een werkruimte niet wegkwam,
-   is het verkeerde antwoord op het verkeerde probleem. Stil mag het nooit zijn --
-   dan lopen rollen ongemerkt uit de pas met de provider. */
-function brug(kern, k, user, claims) {
+/* Een herkenbare tijdelijke fout voor beide vervoerlagen (OIDC en SAML). De
+   binnenkant staat in het log, de browser krijgt alleen te horen dat er GEEN
+   sessie is geopend en dat opnieuw proberen veilig is. */
+function werkSyncFout(org, oorzaak) {
+  const detail = oorzaak && oorzaak.message ? oorzaak.message
+    : (oorzaak && oorzaak.reden ? oorzaak.reden : String(oorzaak || 'onbekende fout'));
+  log.error('tenant.brug mislukt', { org, fout: detail });
+  const e = new Error('De zakelijke groepssync kon niet veilig worden bevestigd.');
+  e.status = 503;
+  e.code = 'SSO_WERKSYNC';
+  return e;
+}
+
+function foutAntwoord(e) {
+  if (e && e.code === 'SSO_WERKSYNC') {
+    return {
+      status: 503,
+      retryAfter: '30',
+      bericht: 'Uw zakelijke toegang kon niet veilig worden bijgewerkt. Er is geen sessie geopend; probeer het over een moment opnieuw.'
+    };
+  }
+  return { status: 401, retryAfter: null, bericht: 'Inloggen via uw organisatie is niet gelukt.' };
+}
+
+/* Een organisatie zonder tenant mag alleen als gewone RTG-inlog eindigen als
+   dat account aantoonbaar geen Werk OS-deur open heeft. De accounttoken is
+   namelijk niet tot een wereld beperkt: /api/bedrijf/mijn kan er elk actief
+   lid-token mee ophalen. Ontbrekende opslagcontext is daarom geen lege lijst
+   maar onbekend, en onbekend blijft dicht. Ook de platformeigenaar is niet
+   gescheiden: diens eerste aanroep maakt juist automatisch een werkruimte. */
+function persoonlijkGescheiden(kern, user) {
+  if (!kern || !kern.db || !kern.db.data || !user || user.id == null) {
+    return { ok: false, reden: 'Werk OS-koppelingen konden niet veilig worden vastgesteld' };
+  }
   try {
-    if (!kern.tenant) return;
+    if (eigenaar.isEigenaar(kern.accounts, user)) {
+      return { ok: false, reden: 'platformeigenaar krijgt automatisch Werk OS-toegang' };
+    }
+  } catch (e) {
+    return { ok: false, reden: 'eigenaarsrol kon niet veilig worden vastgesteld' };
+  }
+
+  const key = 'user-' + user.id;
+  for (const w of Object.values(kern.db.data.werkruimtes || {})) {
+    for (const l of Object.values(w && w.leden || {})) {
+      if (l && l.rtgKey === key && l.status === 'actief') {
+        return { ok: false, reden: 'actieve Werk OS-koppeling buiten een synchroniseerbare tenant' };
+      }
+    }
+  }
+  return { ok: true };
+}
+
+/* DE IDENTITEITSBRUG IS ONDERDEEL VAN DE ZAKELIJKE AUTHENTICATIE.
+
+   Een RTG-account en een Werk OS-lidmaatschap zijn twee identiteiten, maar een
+   gewone RTG-sessie kan via /api/bedrijf/mijn de lid-tokens van de tweede
+   ophalen. Daarom is "persoonlijke inlog wel, groepssync niet" hier GEEN veilige
+   scheiding. Bij een gebonden tenant ontstaat pas een overdrachtsbewijs nadat
+   de rollen opnieuw zijn vastgesteld. Faalt dat, dan ontstaat helemaal geen
+   sessie. Een org zonder tenant is alleen anders wanneer een afzonderlijke
+   controle bewijst dat dit account nergens actieve Werk OS-toegang heeft. */
+function brug(kern, k, user, claims) {
+  const tenant = kern && kern.tenant;
+  if (!tenant || !tenant.register || typeof tenant.register.haal !== 'function') {
+    throw werkSyncFout(k && k.org, new Error('tenantregister niet beschikbaar'));
+  }
+
+  let gebonden;
+  try {
+    gebonden = tenant.register.haal(k.org);
+  } catch (e) {
+    throw werkSyncFout(k.org, e);
+  }
+  if (!gebonden) {
+    const scheiding = persoonlijkGescheiden(kern, user);
+    if (!scheiding.ok) throw werkSyncFout(k.org, scheiding);
+    return { ok: true, werkruimtes: [], nietVanToepassing: 'persoonlijk-zonder-werktoegang' };
+  }
+  if (!tenant.brug || typeof tenant.brug.uitClaims !== 'function') {
+    throw werkSyncFout(k.org, new Error('tenantbrug niet beschikbaar'));
+  }
+
+  try {
     /* DE TWEE BRONNEN VAN GROEPSLIDMAATSCHAP, SAMEN. De claim zegt wat de
        provider NU meestuurt; de SCIM-tabel wat hij ons eerder heeft geduwd.
        Alleen de claim lezen zou betekenen dat een inlog de rollen wist die via
@@ -38,10 +115,19 @@ function brug(kern, k, user, claims) {
        SCIM lezen zou een provider zonder /Groups buitensluiten. Dus de UNIE. */
     const uitScim = scimGroepen.groepenVan(k.org, user.id);
     const alle = [...new Set([].concat(Array.isArray(claims.groups) ? claims.groups : [], uitScim))];
-    const uit = kern.tenant.brug.uitClaims(k.org, alle, 'user-' + user.id, claims.name);
+    const uit = tenant.brug.uitClaims(k.org, alle, 'user-' + user.id, claims.name);
+    if (!uit || uit.ok !== true || !Array.isArray(uit.werkruimtes)) {
+      throw werkSyncFout(k.org, uit || new Error('tenantbrug gaf geen bevestiging'));
+    }
+    /* Een eerdere /Groups-503 kan dit account in de blijvende herstelrij hebben
+       gezet. Deze geslaagde SSO-sync heeft exact dezelfde actuele groepen
+       verwerkt en mag die rij daarom afronden. */
+    scimGroepen.syncKlaar(k.org, user.id);
     if (uit.ok && uit.werkruimtes.length) log.info('tenant.brug', { org: k.org, werkruimtes: uit.werkruimtes.length });
+    return uit;
   } catch (e) {
-    log.error('tenant.brug mislukt', { org: k.org, fout: e.message });
+    if (e && e.code === 'SSO_WERKSYNC') throw e;
+    throw werkSyncFout(k.org, e);
   }
 }
 
@@ -53,13 +139,16 @@ async function binnen(kern, koppeling, claims, req, res, terug, soort) {
   const { accounts, logInlog } = kern;
   const { user, nieuw, gekoppeld } = await sso.aanmelden(accounts, koppeling, claims);
 
+  /* Eerst de rollen vaststellen, PAS DAN zeggen dat de inlog gelukt is en een
+     overdrachtsbewijs maken. Anders schrijft een storing zowel "gelukt" als
+     "mislukt" en, erger, heeft de browser het bewijs al in handen. */
+  brug(kern, koppeling, user, claims);
+
   /* Wat er WEL in het logboek komt: dat er is ingelogd, via welke koppeling, en
      of het een nieuw account was. Niet het e-mailadres, niet de naam -- het
      codenaam-ontwerp geldt ook voor onze eigen logregels. */
   log.info('sso.inlog', { org: koppeling.org, codenaam: user.codename, nieuw, gekoppeld, soort: soort || 'oidc' });
   if (typeof logInlog === 'function') logInlog('sso', true, koppeling.org, req);
-
-  brug(kern, koppeling, user, claims);
 
   const bewijs = accounts.issueActionToken(user.id, OVERDRACHT, OVERDRACHT_MS);
   const pas = user.tier === 'lifestyle' || user.tier === 'business' ? user.tier : 'rtg';
@@ -68,4 +157,4 @@ async function binnen(kern, koppeling, claims, req, res, terug, soort) {
   return user;
 }
 
-module.exports = { binnen, brug, OVERDRACHT, OVERDRACHT_MS };
+module.exports = { binnen, brug, foutAntwoord, werkSyncFout, persoonlijkGescheiden, OVERDRACHT, OVERDRACHT_MS };

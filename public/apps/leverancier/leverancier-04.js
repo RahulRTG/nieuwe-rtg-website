@@ -57,15 +57,24 @@
     // element voor eventuele diepe koppelingen, maar wordt niet gevuld.
     const gl = $('#gateList');
     if (gl) gl.innerHTML = '';
-    document.querySelectorAll('[data-code]').forEach(b => b.addEventListener('click', () => pickPartner(b.dataset.code)));
+    /* De oude naam/PIN-kiezer bestaat alleen in de expliciete Magnaat Test-
+       omgeving. De server is de bron van die stand; lokaal/staging valt dus
+       niet stil terug op de oude bearer. */
+    fetch('/api/health').then(r => r.json()).then(h => {
+      legacyPinUi = h && h.testomgeving === true;
+      if (!legacyPinUi) return;
+      buildPad();
+      document.querySelectorAll('[data-code]').forEach(b => b.addEventListener('click', () => pickPartner(b.dataset.code)));
+    }).catch(() => { legacyPinUi = false; });
     const lf = document.getElementById('loginForm');
     if (lf) lf.addEventListener('submit', e => {
       e.preventDefault();
-      login({ username: document.getElementById('liUser').value, password: document.getElementById('liPass').value }, true);
+      login({ login: document.getElementById('liUser').value,
+        password: document.getElementById('liPass').value }, false);
     });
     /* De poort is een gesprek met Rahul, net als in de leden-app: hij vraagt de
        gebruikersnaam, dan het wachtwoord, en belt daarna aan bij dezelfde route
-       als het formulier hiernaast (/api/supplier/login). Er gaat niets van dit
+       als het formulier hiernaast (/api/supplier/mijn/login). Er gaat niets van dit
        gesprek naar een taalmodel en Rahul beslist niets -- de server zegt ja of
        nee. Het formulier blijft in de pagina staan als vangnet: is de poort er
        niet, dan is er gewoon het oude blok. */
@@ -78,13 +87,13 @@
         wacht: () => T('gate.rp.wacht','Een ogenblik, ik kijk het na.'),
         stuurLabel: T('gate.rp.stuur','Stuur'),
         stappen: [
-          { sleutel:'username', vraag: () => T('gate.rp.wie','Met wie heb ik het genoegen?'),
-            plho: () => T('gate.user','Gebruikersnaam'), type:'text', autocomplete:'username' },
+          { sleutel:'username', vraag: () => T('gate.rp.wie','Open uw werkplek met uw persoonlijke RTG-account. Wat is uw e-mail of gebruikersnaam?'),
+            plho: () => T('gate.user','RTG e-mail of gebruikersnaam'), type:'text', autocomplete:'username' },
           { sleutel:'password', vraag: () => T('gate.rp.pass','Dank u. En uw wachtwoord?'),
             plho: () => T('gate.pass','Wachtwoord'), type:'password', autocomplete:'current-password' }
         ],
         klaar: async (a) => {
-          const ok = await login({ username: a.username, password: a.password }, true, true);
+          const ok = await login({ login: a.username, password: a.password }, false, true);
           if (!ok) throw new Error(T('login.bad','Onjuiste gebruikersnaam of wachtwoord.'));
         }
       });
@@ -112,5 +121,4 @@
     const kassacode = document.getElementById('enCode').value.trim();
     const login2 = document.getElementById('enLogin').value.trim();
     const password = document.getElementById('enPass').value;
-    const pin = document.getElementById('enPin').value.trim();
     msg.className = 'enroll-msg';

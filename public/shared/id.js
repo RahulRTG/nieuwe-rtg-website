@@ -21,19 +21,28 @@
    inlaadt -- zodat het load-order-gat niet stil terugkomt. */
 (function () {
   'use strict';
-  if (window.RTGId) return;
-  window.RTGId = function (voor) {
-    var b = new Uint8Array(16), k;
-    try {
-      crypto.getRandomValues(b);
-      k = Array.prototype.map.call(b, function (x) { return ('0' + x.toString(16)).slice(-2); }).join('');
-    } catch (e) {
-      // onbereikbaar in elke browser die de rest van deze app draait; nooit
-      // stil zonder id zitten weegt hier zwaarder dan de zwakkere bron
-      k = Date.now() + '-' + String(Math.random()).slice(2);
+
+  /* GEEN TERUGVAL OP KLOK OF Math.random(). Als Web Crypto ontbreekt, is er
+     geen veilige idempotentiesleutel. Dan moet de handeling VOOR de fetch
+     stoppen in plaats van onder een voorspelbare sleutel naar de server te
+     gaan. De functie zelf wordt wel altijd geplaatst: elke aanroeper krijgt
+     zo dezelfde, duidelijke fail-closed fout in plaats van een ReferenceError. */
+  function veiligId(voor) {
+    var c = window.crypto;
+    if (!c || typeof c.getRandomValues !== 'function') {
+      throw new Error('Veilige browser-willekeur ontbreekt; RTG voert deze handeling niet uit.');
     }
+    var b = new Uint8Array(16);
+    c.getRandomValues(b);
+    var k = Array.prototype.map.call(b, function (x) {
+      return ('0' + x.toString(16)).slice(-2);
+    }).join('');
     return (voor ? voor + '-' : '') + k;
-  };
-  // de naam waarmee de geld-paden hem kennen (zie keuringsregel 15)
-  window.RTGIdem = window.RTGId;
+  }
+
+  /* id.js is de autoritatieve definitie. Een eerder gelijknamig globaal mag
+     deze veiligheidsgrens niet ongemerkt vervangen; de parserblokkerende
+     include zet daarom beide publieke namen opnieuw op dezelfde CSPRNG-functie. */
+  window.RTGId = veiligId;
+  window.RTGIdem = veiligId;
 })();

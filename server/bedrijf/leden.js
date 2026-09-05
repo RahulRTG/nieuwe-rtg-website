@@ -13,19 +13,37 @@
 
 module.exports = (sctx) => {
   const { app, save, crypto, schoon, nu, rid, dag, ruimteVan, beheerVan, eigenVeld } = sctx;
+  const PRODUCTIE = String(process.env.NODE_ENV || '') === 'production';
 
   app.post('/api/bedrijf/lid/aanmeld', (req, res) => {
     const w = ruimteVan(req);
     if (!w) return res.status(404).json({ error: 'Die werkruimte kennen we niet.' });
-    const naam = schoon(req.body.naam, 60);
+    const c = req.werkosContext;
+    const bestaand = PRODUCTIE && c && c.lid;
+    if (bestaand) {
+      if (bestaand.status === 'wacht' || bestaand.status === 'actief')
+        return res.json({ ok: true, lidId: bestaand.id, status: bestaand.status,
+          let: bestaand.status === 'wacht' ? 'Uw account wacht op toelating.' : 'Uw account is al aan deze werkruimte gekoppeld.' });
+      return res.status(409).json({ error: 'Dit account heeft al een gesloten lidmaatschap in deze werkruimte.' });
+    }
+    const accountNaam = PRODUCTIE && c && c.account && sctx.kern.accounts && sctx.kern.accounts.realNameOf
+      ? sctx.kern.accounts.realNameOf(c.account) : null;
+    const naam = schoon(accountNaam || req.body.naam, 60);
     if (!naam) return res.status(400).json({ error: 'Onder welke naam werkt u hier?' });
     const l = { id: rid(4), naam, functie: schoon(req.body.functie, 60) || null,
       afdeling: schoon(req.body.afdeling, 40) || null, extern: req.body.extern === true,
-      rollen: [], status: 'wacht', token: crypto.randomBytes(24).toString('hex'), at: nu() };
+      rollen: [], status: 'wacht', token: PRODUCTIE ? null : crypto.randomBytes(24).toString('hex'),
+      rtgKey: PRODUCTIE ? c.accountKey : null,
+      rtgCodenaam: PRODUCTIE && c.account ? c.account.codename || null : null,
+      gekoppeldAt: PRODUCTIE ? nu() : null, at: nu() };
     w.leden[l.id] = l;
     save();
-    res.json({ ok: true, lidId: l.id, lidToken: l.token, status: l.status,
-      let: 'U staat op de lijst maar bent nog niet toegelaten. Tot iemand met het beheer-token u toelaat, werkt dit token nergens voor.' });
+    const antwoord = { ok: true, lidId: l.id, status: l.status };
+    if (!PRODUCTIE) antwoord.lidToken = l.token;
+    antwoord.let = PRODUCTIE
+      ? 'Uw RTG-account staat op de lijst. Een huidige beheerder moet dit lidmaatschap nog toelaten.'
+      : 'U staat op de lijst maar bent nog niet toegelaten. Tot iemand met het beheer-token u toelaat, werkt dit token nergens voor.';
+    res.json(antwoord);
   });
 
   app.post('/api/bedrijf/lid/besluit', (req, res) => {

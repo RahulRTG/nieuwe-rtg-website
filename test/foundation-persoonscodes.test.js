@@ -308,7 +308,9 @@ const post = (pad, body, tok) => fetch(BASE + pad, {
   headers: Object.assign({ 'Content-Type': 'application/json' }, tok ? { Authorization: 'Bearer ' + tok } : {}),
   body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
-const rtf = (pad, body, tok) => post('/api/rtfos/' + pad, body, tok === undefined ? LAND : tok);
+const rtf = (pad, body, tok) => post(
+  pad.startsWith('/api/') ? pad : '/api/rtfos/' + pad,
+  body, tok === undefined ? LAND : tok);
 
 test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE } });
@@ -332,7 +334,7 @@ test.after(() => {
 });
 
 test('de office-routes trekken in en roteren; oude codes kunnen daarna niets muteren', async () => {
-  const geenDeur = await rtf('vrijwilliger/code/roteren', { id: VRIJW }, null);
+  const geenDeur = await rtf('/api/rtfos/vrijwilliger/code/roteren', { id: VRIJW }, null);
   assert.ok([401, 403].includes(geenDeur.status), 'roteren stond buiten de bestaande officedeur');
 
   const v = await rtf('vrijwilliger/code', { id: VRIJW, max_gebruik: 8, geldig_dagen: 30 });
@@ -343,7 +345,7 @@ test('de office-routes trekken in en roteren; oude codes kunnen daarna niets mut
   assert.equal(v.body.toegang.max_gebruik, 8);
   assert.equal((await post('/api/rtfos/portaal/vrijwilliger', { code: v.body.code })).status, 200);
 
-  const dicht = await rtf('vrijwilliger/code/intrekken', { id: VRIJW, reden: 'telefoon kwijt' });
+  const dicht = await rtf('/api/rtfos/vrijwilliger/code/intrekken', { id: VRIJW, reden: 'telefoon kwijt' });
   assert.equal(dicht.status, 200);
   assert.ok(dicht.body.toegang.ingetrokken_at);
   const mutatie = await post('/api/rtfos/portaal/vrijwilliger/zet', {
@@ -353,7 +355,7 @@ test('de office-routes trekken in en roteren; oude codes kunnen daarna niets mut
   const kantoor = await rtf('vrijwilligers', { stad: STAD });
   assert.deepEqual(kantoor.body.vrijwilligers.find(x => x.id === VRIJW).beschikbaar, []);
 
-  const v2 = await rtf('vrijwilliger/code/roteren', { id: VRIJW, reden: 'heruitgifte' });
+  const v2 = await rtf('/api/rtfos/vrijwilliger/code/roteren', { id: VRIJW, reden: 'heruitgifte' });
   assert.equal(v2.status, 200, JSON.stringify(v2.body));
   assert.equal(v2.body.toegang.rotatie, 2);
   assert.notEqual(v2.body.code, v.body.code);
@@ -364,18 +366,18 @@ test('de office-routes trekken in en roteren; oude codes kunnen daarna niets mut
   assert.equal((await post('/api/rtfos/portaal/deelnemer', { code: d.body.code })).status, 200);
   assert.equal((await post('/api/rtfos/portaal/deelnemer', { code: d.body.code })).status, 403,
     'max-use liet een extra toegang toe');
-  const d2 = await rtf('casus/code/roteren', { id: CASUS, reden: 'gebruikslimiet bereikt' });
+  const d2 = await rtf('/api/rtfos/casus/code/roteren', { id: CASUS, reden: 'gebruikslimiet bereikt' });
   assert.equal(d2.body.toegang.rotatie, 2);
-  await rtf('casus/code/intrekken', { id: CASUS, reden: 'dossier overgedragen' });
+  await rtf('/api/rtfos/casus/code/intrekken', { id: CASUS, reden: 'dossier overgedragen' });
   assert.equal((await post('/api/rtfos/portaal/deelnemer/intrekken', {
     code: d2.body.code, reden: 'stop'
   })).status, 403, 'een ingetrokken deelnemerscode muteerde nog toestemming');
 
   const s = await rtf('donateur/code', { bronId: BRON, max_gebruik: 5 });
   assert.equal((await post('/api/rtfos/portaal/donateur', { code: s.body.code })).status, 200);
-  await rtf('donateur/code/intrekken', { bronId: BRON, reden: 'gever verzocht dit' });
+  await rtf('/api/rtfos/donateur/code/intrekken', { bronId: BRON, reden: 'gever verzocht dit' });
   assert.equal((await post('/api/rtfos/portaal/donateur', { code: s.body.code })).status, 403);
-  const s2 = await rtf('donateur/code/roteren', { bronId: BRON, reden: 'persoonlijk heruitgegeven' });
+  const s2 = await rtf('/api/rtfos/donateur/code/roteren', { bronId: BRON, reden: 'persoonlijk heruitgegeven' });
   assert.equal(s2.body.toegang.rotatie, 2);
   assert.equal((await post('/api/rtfos/portaal/donateur', { code: s2.body.code })).status, 200);
 

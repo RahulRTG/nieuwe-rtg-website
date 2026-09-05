@@ -86,6 +86,7 @@ module.exports = [
   /* DE AFLEVERING EN DE SESSIE. Allebei abonnees op de bus, allebei zonder eigen
      onderwerp: ze dragen niet WAT er gebeurt maar dat het aankomt. */
   { bestand: 'server/kern/sessies.js', reden: 'houdt sessies gelijk over meerdere servers; zet je dat uit, dan logt iemand uit doordat zijn verzoek bij de andere server landt' },
+  { bestand: 'server/kern/intreksignaal.js', reden: 'de fail-closed intrekkingsautoriteit voor account- en recordsessies. De busabonnee sluit ingetrokken credentials op alle processen en moet juist blijven werken als een productschakelaar uitgaat; schakelbaarheid zou uitloggen en beveiligingsintrekking onbetrouwbaar maken' },
   { bestand: 'server/kern/sse.js', reden: 'de afleverlaag van realtime-berichten. Staat de functie kern-live uit, dan komt er geen verbinding tot stand en heeft deze abonnee niemand om aan te leveren -- hij begint zelf geen werk' },
 
   /* EEN WETTELIJKE PLICHT IS GEEN FUNCTIE MET EEN SCHAKELAAR. Zelfde regel als

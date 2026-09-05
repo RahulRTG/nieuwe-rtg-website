@@ -56,6 +56,8 @@
   @keyframes gloei{0%,100%{text-shadow:0 0 6px rgba(169,143,7,.25);}50%{text-shadow:0 0 22px rgba(194,58,94,.55);}}
   .pass .regel{display:flex;justify-content:space-between;font-size:.82rem;color:var(--muted);padding:.2rem 0;}
   .pass .regel b{color:var(--txt);font-weight:600;}
+  .pass .code-ontbreekt{text-align:center;margin:.75rem 0;}
+  .pass .code-acties{justify-content:center;}
   .leeg{color:var(--soft);font-size:.9rem;text-align:center;padding:2rem 1rem;line-height:1.6;}
   .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:var(--card2);border:1px solid var(--line);border-radius:0;padding:.6rem 1rem;font-size:.85rem;opacity:0;transition:opacity .3s;z-index:30;pointer-events:none;}
   .sec{font-size:.78rem;color:var(--muted);line-height:1.6;margin:-.2rem 0 .8rem;}
@@ -151,8 +153,8 @@ async function laadMijn(){
         '<div class="regel"><span>Vertrek</span><b>'+esc(v.tijd)+' · gate '+esc(v.gate)+'</b></div>'+
         '<div class="regel"><span>Stoel</span><b>'+esc(b.stoel)+'</b></div>'+
         (code&&actief?'<div class="code">'+esc(code)+'</div><div class="regel" style="justify-content:center;color:var(--soft);font-size:.72rem;">Deze code staat alleen in dit browsertabblad. Laat haar zien bij security en de gate.</div>':
-          '<div class="meta" style="text-align:center;margin:.75rem 0;">De geheime code wordt niet door Mijn reizen teruggegeven. Geef een nieuwe uit als u haar niet meer op dit toestel heeft.</div>')+
-        '<div class="rij" style="justify-content:center;">'+
+          '<div class="meta code-ontbreekt">De geheime code wordt niet door Mijn reizen teruggegeven. Geef een nieuwe uit als u haar niet meer op dit toestel heeft.</div>')+
+        '<div class="rij code-acties">'+
           ((!code||!actief)&&!v.geannuleerd?'<button class="knop" data-roteer="'+esc(b.id)+'" data-rotatie="'+esc(pass.rotatie||0)+'">Nieuwe code uitgeven</button>':'')+
           (actief?'<button class="knop stil" data-intrek="'+esc(b.id)+'" data-rotatie="'+esc(pass.rotatie||0)+'">Code intrekken</button>':'')+'</div>'+
         (b.koffers.length?'<div class="regel"><span>Koffers</span><b>'+b.koffers.map(k=>esc(k.tag)+' ('+esc(k.status)+(k.band?' · band '+k.band:'')+')').join('<br>')+'</b></div>':'')+

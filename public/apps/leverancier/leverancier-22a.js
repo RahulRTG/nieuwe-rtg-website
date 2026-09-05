@@ -84,7 +84,7 @@
         id: b.dataset.krot, idem: RTGIdem('inv-roteer')
       });
         kantoorMsg = T('kt.invite.rotated','Nieuwe uitnodigingscode; geef hem nu eenmalig door:')+'<br>'+
-          '<b style="color:var(--rtg-leesgoud,var(--gold));font-family:monospace;">'+escT(d.invite.kassacode)+'</b>';
+          '<b class="kantoor-code-eenmalig">'+escT(d.invite.kassacode)+'</b>';
         invData = null; await refresh(); } catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('[data-kno]').forEach(b => b.addEventListener('click', async () => {

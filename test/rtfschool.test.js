@@ -109,6 +109,23 @@ test('5. "kijk hier" binnen de gezinsapps + de kamer-chat; buiten de gezinsapps 
   assert.ok(staat.body.kamer.chat.some(c => /tafels/.test(c.tekst)));
 });
 
+test('5b. alleen de gastheer sluit de kamer en trekt de deelcode direct in', async () => {
+  const gemaakt = (await api('/api/rtf/samen/maak', {
+    idem: 'rtf-samen-route-sluit-0001'
+  }, A.ouder)).body;
+  const id = gemaakt.kamer.id;
+  const deelcode = gemaakt.deelcode;
+  await api('/api/rtf/samen/mee', { deelcode }, A.kind);
+
+  assert.equal((await api('/api/rtf/samen/sluit', { id }, A.kind)).status, 403,
+    'een deelnemer kan de kamer niet voor iedereen sluiten');
+  assert.equal((await api('/api/rtf/samen/sluit', { id }, A.ouder)).status, 200);
+  assert.equal((await api('/api/rtf/samen/staat', { id }, A.ouder)).status, 404,
+    'een gesloten kamer geeft ook de gastheer geen staat meer');
+  assert.equal((await api('/api/rtf/samen/mee', { deelcode }, A.kind)).status, 404,
+    'de ingetrokken deelcode opent de kamer niet opnieuw');
+});
+
 test('6. verlaten ruimt op; zonder geldig gezin blijft alles dicht', async () => {
   const gemaakt = (await api('/api/rtf/samen/maak', { idem: 'rtf-samen-route-0003' }, A.ouder)).body;
   await api('/api/rtf/samen/weg', { id: gemaakt.kamer.id }, A.ouder);

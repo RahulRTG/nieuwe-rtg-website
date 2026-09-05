@@ -2173,6 +2173,66 @@
       "pad": "test/grafsteen.pg.test.js",
       "vervalt": "2026-10-15",
       "reden": "binnengekomen met samenvoeg-PR #137 uit PR #132; de proef vereist bewust PostgreSQL, draait in CI met die dienst en blijft lokaal expliciet overgeslagen tot de standaarddraaier PostgreSQL start"
+    },
+    {
+      "regel": "zelfpoortende-toets",
+      "pad": "test/boarding-pass.pg.test.js",
+      "vervalt": "2026-10-15",
+      "reden": "de boardingpass-raceproef vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl lokaal zonder die infrastructuur expliciet wordt overgeslagen in plaats van een lichtere opslag als bewijs te laten gelden"
+    },
+    {
+      "regel": "zelfpoortende-toets",
+      "pad": "test/contactpin-live.pg.test.js",
+      "vervalt": "2026-10-15",
+      "reden": "de live contactpinproef vereist echte PostgreSQL; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI, terwijl een lokale machine zonder database geen vervangend groen bewijs mag produceren"
+    },
+    {
+      "regel": "zelfpoortende-toets",
+      "pad": "test/foundation-persoonscodes.pg.test.js",
+      "vervalt": "2026-10-15",
+      "reden": "de multi-instance atomiciteitsproef voor persoonscodes vereist echte PostgreSQL; de centrale pg-draaier voert hem verplicht uit en de lokale skip voorkomt dat SQLite ten onrechte als hetzelfde bewijs wordt behandeld"
+    },
+    {
+      "regel": "zelfpoortende-toets",
+      "pad": "test/intrekking-multi-instance.pg.test.js",
+      "vervalt": "2026-10-15",
+      "reden": "de intrekkingsproef vereist twee processen met echte PostgreSQL en Redis; hij staat in de verplichte pg-draaier en CI levert beide diensten, terwijl lokaal zonder die topologie geen zwakker scenario als geslaagd mag tellen"
+    },
+    {
+      "regel": "zelfpoortende-toets",
+      "pad": "test/payout-terugboeking.pg.test.js",
+      "vervalt": "2026-10-15",
+      "reden": "de gelijktijdige payout-terugboeking bewijst juist de PostgreSQL-transactie en kan niet eerlijk op een ontbrekende dienst draaien; scripts/lib/pg-toetslijst.js maakt hem verplicht in CI en lokaal blijft het ontbreken zichtbaar als skip"
+    },
+    {
+      "regel": "zelfpoortende-toets",
+      "pad": "test/postgres-requestcommit.pg.test.js",
+      "vervalt": "2026-10-15",
+      "reden": "de requestcommit-proef toetst echte PostgreSQL-commit- en rollbacksemantiek; hij draait verplicht in de centrale pg-draaier en wordt lokaal zonder PostgreSQL niet vervangen door een niet-equivalente neptransactie"
+    },
+    {
+      "regel": "zelfpoortende-toets",
+      "pad": "test/rtf-samen-credential.pg.test.js",
+      "vervalt": "2026-10-15",
+      "reden": "de Samen-credentialrace vereist echte PostgreSQL; registratie in scripts/lib/pg-toetslijst.js dwingt uitvoering in CI af en de lokale skip voorkomt vals bewijs zonder gedeelde opslag"
+    },
+    {
+      "regel": "zelfpoortende-toets",
+      "pad": "test/rtgid-credential.pg.test.js",
+      "vervalt": "2026-10-15",
+      "reden": "de RTG-ID credentialrace vereist echte PostgreSQL; de CI-pg-draaier voert hem verplicht uit en lokaal zonder database blijft expliciet zichtbaar dat dit bewijs niet is geleverd"
+    },
+    {
+      "regel": "zelfpoortende-toets",
+      "pad": "test/salon-claimcode.pg.test.js",
+      "vervalt": "2026-10-15",
+      "reden": "de Salon-claimcoderace vereist echte PostgreSQL; hij staat verplicht in de CI-pg-draaier en een lokale skip is veiliger dan dezelfde invariant op een ander opslagmodel te veinzen"
+    },
+    {
+      "regel": "zelfpoortende-toets",
+      "pad": "test/spelprojectie.pg.test.js",
+      "vervalt": "2026-10-15",
+      "reden": "de spelprojectie-claimrace vereist echte PostgreSQL; scripts/lib/pg-toetslijst.js laat CI hem verplicht uitvoeren en lokaal zonder die dienst wordt geen zwakker resultaat als equivalent bewijs geaccepteerd"
     }
   ]
 }

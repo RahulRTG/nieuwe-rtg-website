@@ -3325,7 +3325,7 @@
         id: b.dataset.krot, idem: RTGIdem('inv-roteer')
       });
         kantoorMsg = T('kt.invite.rotated','Nieuwe uitnodigingscode; geef hem nu eenmalig door:')+'<br>'+
-          '<b style="color:var(--rtg-leesgoud,var(--gold));font-family:monospace;">'+escT(d.invite.kassacode)+'</b>';
+          '<b class="kantoor-code-eenmalig">'+escT(d.invite.kassacode)+'</b>';
         invData = null; await refresh(); } catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('[data-kno]').forEach(b => b.addEventListener('click', async () => {
@@ -5204,11 +5204,11 @@
     if (!code) return;
     const oud = document.getElementById('vrCodeEenmalig'); if (oud) oud.remove();
     const laag = document.createElement('div'); laag.id = 'vrCodeEenmalig';
-    laag.style.cssText = 'position:fixed;inset:0;z-index:10050;background:rgba(5,9,13,.82);display:grid;place-items:center;padding:1rem;';
-    laag.innerHTML = '<div role="dialog" aria-modal="true" aria-labelledby="vrCodeKop" style="width:min(34rem,100%);border:1px solid var(--gold);background:var(--bg);padding:1rem;box-shadow:0 1.5rem 4rem rgba(0,0,0,.45);">'+
+    laag.className = 'vr-code-laag';
+    laag.innerHTML = '<div class="vr-code-kaart" role="dialog" aria-modal="true" aria-labelledby="vrCodeKop">'+
       '<b id="vrCodeKop">'+esc(kop)+'</b><p class="sub">'+T('vr.codeonce','Kopieer deze klantcode nu. RTG bewaart haar niet leesbaar en toont haar later niet opnieuw.')+'</p>'+
-      '<input id="vrVerseCode" class="st-in" readonly autocomplete="off" spellcheck="false" style="width:100%;">'+
-      '<div style="display:flex;gap:.5rem;margin-top:.75rem;"><button class="obtn primary" data-vrcode-copy>'+T('vr.kopieer','Kopieer')+'</button><button class="obtn" data-vrcode-dicht>'+T('vr.sluit','Sluit')+'</button></div></div>';
+      '<input id="vrVerseCode" class="st-in" readonly autocomplete="off" spellcheck="false">'+
+      '<div class="vr-code-acties"><button class="obtn primary" data-vrcode-copy>'+T('vr.kopieer','Kopieer')+'</button><button class="obtn" data-vrcode-dicht>'+T('vr.sluit','Sluit')+'</button></div></div>';
     document.body.appendChild(laag);
     const invoer = laag.querySelector('#vrVerseCode'); invoer.value = code; invoer.focus(); invoer.select();
     laag.querySelector('[data-vrcode-copy]').addEventListener('click', () => {
@@ -5248,9 +5248,9 @@
   }
 /* De vrachtkaart met etappetijdlijn, documenten en klantcode-acties. */
   function vrTijdlijn(z){
-    return '<div style="display:flex;flex-wrap:wrap;gap:0.35rem;margin-top:0.5rem;">'+z.etappes.map(e => {
-      const stijl = e.status==='bezig' ? 'border-color:var(--gold);background:rgba(201,162,75,0.12);' : e.status==='klaar' ? 'opacity:0.6;' : 'opacity:0.85;';
-      return '<span title="'+escAttr(e.document)+'" style="border:1px solid var(--line);'+stijl+'border-radius:0;padding:0.2rem 0.6rem;font-size:0.72rem;">'+
+    return '<div class="vr-tijdlijn">'+z.etappes.map(e => {
+      const stand = e.status==='bezig' ? ' bezig' : e.status==='klaar' ? ' klaar' : '';
+      return '<span title="'+escAttr(e.document)+'" class="vr-etappe'+stand+'">'+
         T('vr.mod.'+e.modaliteit, VR_MOD[e.modaliteit].label)+' · '+esc(e.van)+' → '+esc(e.naar)+(e.status==='klaar'?' · '+T('vr.et.klaar','klaar'):e.status==='bezig'?' · '+T('vr.et.nu','nu'):'')+'</span>';
     }).join('')+'</div>';
   }

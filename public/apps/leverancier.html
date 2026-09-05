@@ -670,6 +670,16 @@
   .note-soft{margin-top:0.7rem;font-size:0.72rem;color:var(--soft);}
   .txt-md{font-size:0.95rem;color:var(--txt);}
   .soft-xs{font-size:0.7rem;color:var(--soft);}
+  .kantoor-code-eenmalig{color:var(--rtg-leesgoud,var(--gold));font-family:monospace;}
+  .vr-code-laag{position:fixed;inset:0;z-index:10050;background:rgba(5,9,13,.82);
+    display:grid;place-items:center;padding:1rem;}
+  .vr-code-kaart{width:min(34rem,100%);border:1px solid var(--gold);background:var(--bg);
+    padding:1rem;box-shadow:0 1.5rem 4rem rgba(0,0,0,.45);}
+  .vr-code-acties{display:flex;gap:.5rem;margin-top:.75rem;}
+  .vr-tijdlijn{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.5rem;}
+  .vr-etappe{border:1px solid var(--line);border-radius:0;padding:.2rem .6rem;font-size:.72rem;opacity:.85;}
+  .vr-etappe.bezig{border-color:var(--gold);background:rgba(201,162,75,.12);opacity:1;}
+  .vr-etappe.klaar{opacity:.6;}
   /* Rustig, inklapbaar functieblok (zelfde beeld als de RTG Boardroom): een rij
      aan/uit-schakelaars vat zich samen tot "X/Y aan" en verschijnt alleen als er
      iets uit staat of de gebruiker het blok opent. Zo blijven veel opties

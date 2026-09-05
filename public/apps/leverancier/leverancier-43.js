@@ -51,11 +51,11 @@
     if (!code) return;
     const oud = document.getElementById('vrCodeEenmalig'); if (oud) oud.remove();
     const laag = document.createElement('div'); laag.id = 'vrCodeEenmalig';
-    laag.style.cssText = 'position:fixed;inset:0;z-index:10050;background:rgba(5,9,13,.82);display:grid;place-items:center;padding:1rem;';
-    laag.innerHTML = '<div role="dialog" aria-modal="true" aria-labelledby="vrCodeKop" style="width:min(34rem,100%);border:1px solid var(--gold);background:var(--bg);padding:1rem;box-shadow:0 1.5rem 4rem rgba(0,0,0,.45);">'+
+    laag.className = 'vr-code-laag';
+    laag.innerHTML = '<div class="vr-code-kaart" role="dialog" aria-modal="true" aria-labelledby="vrCodeKop">'+
       '<b id="vrCodeKop">'+esc(kop)+'</b><p class="sub">'+T('vr.codeonce','Kopieer deze klantcode nu. RTG bewaart haar niet leesbaar en toont haar later niet opnieuw.')+'</p>'+
-      '<input id="vrVerseCode" class="st-in" readonly autocomplete="off" spellcheck="false" style="width:100%;">'+
-      '<div style="display:flex;gap:.5rem;margin-top:.75rem;"><button class="obtn primary" data-vrcode-copy>'+T('vr.kopieer','Kopieer')+'</button><button class="obtn" data-vrcode-dicht>'+T('vr.sluit','Sluit')+'</button></div></div>';
+      '<input id="vrVerseCode" class="st-in" readonly autocomplete="off" spellcheck="false">'+
+      '<div class="vr-code-acties"><button class="obtn primary" data-vrcode-copy>'+T('vr.kopieer','Kopieer')+'</button><button class="obtn" data-vrcode-dicht>'+T('vr.sluit','Sluit')+'</button></div></div>';
     document.body.appendChild(laag);
     const invoer = laag.querySelector('#vrVerseCode'); invoer.value = code; invoer.focus(); invoer.select();
     laag.querySelector('[data-vrcode-copy]').addEventListener('click', () => {

@@ -170,6 +170,44 @@ test('elke projectie blijft binnen wat de spelers al zien', async () => {
   }
 });
 
+test('de kijkroute gebruikt alleen het schermtoken en antwoordt nooit cachebaar', async () => {
+  const routes = {};
+  const app = {
+    post(pad, ...lagen) { routes[pad] = lagen.at(-1); },
+    get(pad, ...lagen) { routes[pad] = lagen.at(-1); }
+  };
+  let ontvangen;
+  const leeg = () => ({ status: 200 });
+  require('../server/routes/spellen')({
+    app, auth() {}, geenGast() { return false; },
+    rtf: { verifieerProfiel() { return null; } },
+    spelNieuw: leeg, spelAntwoord: leeg, spelRandom: leeg, mijnSpellen: () => ({}),
+    spelVarianten: () => ({}), spelStaat: leeg, spelZet: leeg, spelOpgeven: leeg,
+    spelToewijzen: leeg, spelKijk: leeg, spelReplay: leeg, spelNaspelen: leeg,
+    spelRahul: leeg, spelNabespreking: leeg, spelKlasgenoten: () => ({ klasgenoten: [] }),
+    spelOnline: leeg, spelUitslagen: leeg, spelStand: leeg, spelPrestaties: leeg,
+    socialConnecties: () => ({ connections: [] }), projectieKoppel: leeg,
+    projectieStand(token) {
+      ontvangen = token;
+      return { status: 200, staat: { ronde: 3, scores: [2, 1] } };
+    }
+  });
+  const koppen = {};
+  const req = { body: { token: 'SCREEN.' + 'A'.repeat(32) }, id: 'route-test',
+    path: '/api/projectie/kijk', ip: '127.0.0.1' };
+  const res = {
+    body: null,
+    set(naam, waarde) { koppen[naam] = waarde; return this; },
+    status() { return this; },
+    json(body) { this.body = body; return this; }
+  };
+  await routes['/api/projectie/kijk'](req, res);
+  assert.equal(ontvangen, req.body.token, 'geen ledenidentiteit of URL-code bereikt de kern');
+  assert.equal(koppen['Cache-Control'], 'no-store');
+  assert.equal(koppen.Pragma, 'no-cache');
+  assert.deepEqual(res.body.staat, { ronde: 3, scores: [2, 1] });
+});
+
 test('de browser gebruikt fragment, vaste POST-routes en geen persoonlijke schil', () => {
   const lees = rel => fs.readFileSync(path.join(__dirname, '..', rel), 'utf8');
   const html = lees('public/apps/spelscherm.html');

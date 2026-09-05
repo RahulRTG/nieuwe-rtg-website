@@ -21,7 +21,7 @@
      en bouwt het beginscherm zichzelf niet meer op: een zwart scherm zonder
      foutmelding. app-main-01.js vergelijkt de twee en haalt zichzelf dan een
      keer vers op. -->
-<meta name="rtg-bouw" content="0b8652ed">
+<meta name="rtg-bouw" content="abb6f724">
 <!-- De foutmelder staat bewust VOORAAN: hij moet de fouten van het opstarten
      kunnen zien, en die gebeuren voordat de rest geladen is. -->
 <script src="/shared/meelezen.js"></script>
@@ -580,6 +580,22 @@ try {
   }
 
   /* salon */
+  .salon-code-laag{position:fixed;inset:0;z-index:130;background:rgba(0,0,0,.7);
+    display:grid;place-items:center;padding:1rem;}
+  .salon-code-kaart{width:min(440px,100%);background:var(--bg);color:var(--txt);
+    border:1px solid var(--gold);padding:1.2rem;box-shadow:0 24px 70px rgba(0,0,0,.45);}
+  .salon-code-titel{font-family:'Bodoni Moda',serif;font-size:1.35rem;}
+  .salon-code-uitleg{color:var(--soft);font-size:.8rem;line-height:1.55;}
+  .salon-code-waarde{padding:.85rem;border:1px solid var(--line);font-weight:700;
+    letter-spacing:.08em;overflow-wrap:anywhere;}
+  .salon-code-acties{display:flex;gap:.55rem;margin-top:1rem;flex-wrap:wrap;}
+  .salon-claim-hoofd{margin-top:.5rem;background:var(--knop);color:var(--knop-txt);
+    border:none;padding:.45rem .95rem;font-size:.72rem;font-weight:600;font-family:inherit;cursor:pointer;}
+  .salon-claim-status{margin-top:.45rem;font-size:.76rem;color:var(--rtg-leesgoud,var(--gold));}
+  .salon-claim-acties{display:flex;gap:.45rem;flex-wrap:wrap;margin-top:.45rem;}
+  .salon-claim-nieuw,.salon-claim-intrek{padding:.42rem .75rem;font:600 .68rem inherit;cursor:pointer;}
+  .salon-claim-nieuw{background:var(--knop);color:var(--knop-txt);border:none;}
+  .salon-claim-intrek{background:none;color:var(--soft);border:1px solid var(--line);}
   .post{
     margin-top:1rem;
     background:linear-gradient(145deg,
@@ -1707,40 +1723,40 @@ try {
   .privrij{display:flex;gap:0.5rem;}
   .privknop.wis{border-color:rgba(194,58,94,0.4);}
 </style>
-<script src="/shared/command/catalog.js?v=0b8652ed" defer></script>
-<script src="/shared/command/console.js?v=0b8652ed" defer></script>
-<script src="/shared/command/verdeler.js?v=0b8652ed" defer></script>
-<script src="/shared/interface/module-sdk.js?v=0b8652ed" defer></script>
-<script src="/shared/interface/workspace-world-catalog.js?v=0b8652ed" defer></script>
-<script src="/shared/interface/workspace-continuity.js?v=0b8652ed" defer></script>
-<script src="/shared/interface/workspace-composer.js?v=0b8652ed" defer></script>
-<script src="/shared/interface/workspace-registries.js?v=0b8652ed" defer></script>
-<script src="/shared/interface/workspace-session.js?v=0b8652ed" defer></script>
-<script src="/shared/interface/workspace-policy.js?v=0b8652ed" defer></script>
-<script src="/shared/interface/workspace-context.js?v=0b8652ed" defer></script>
-<script src="/shared/interface/workspace-navigation.js?v=0b8652ed" defer></script>
-<script src="/shared/interface/workspace-state.js?v=0b8652ed" defer></script>
-<script src="/shared/interface/workspace-orchestrator.js?v=0b8652ed" defer></script>
-<script src="/shared/interface/workspace-blueprints.js?v=0b8652ed" defer></script>
-<script src="/shared/interface/workspace-broker.js?v=0b8652ed" defer></script>
-<script src="/shared/interface/workspace-module-host.js?v=0b8652ed" defer></script>
-<script src="/shared/interface/workspace-runtime.js?v=0b8652ed" defer></script>
-<script src="/shared/interface/workspace-legacy.js?v=0b8652ed" defer></script>
+<script src="/shared/command/catalog.js?v=abb6f724" defer></script>
+<script src="/shared/command/console.js?v=abb6f724" defer></script>
+<script src="/shared/command/verdeler.js?v=abb6f724" defer></script>
+<script src="/shared/interface/module-sdk.js?v=abb6f724" defer></script>
+<script src="/shared/interface/workspace-world-catalog.js?v=abb6f724" defer></script>
+<script src="/shared/interface/workspace-continuity.js?v=abb6f724" defer></script>
+<script src="/shared/interface/workspace-composer.js?v=abb6f724" defer></script>
+<script src="/shared/interface/workspace-registries.js?v=abb6f724" defer></script>
+<script src="/shared/interface/workspace-session.js?v=abb6f724" defer></script>
+<script src="/shared/interface/workspace-policy.js?v=abb6f724" defer></script>
+<script src="/shared/interface/workspace-context.js?v=abb6f724" defer></script>
+<script src="/shared/interface/workspace-navigation.js?v=abb6f724" defer></script>
+<script src="/shared/interface/workspace-state.js?v=abb6f724" defer></script>
+<script src="/shared/interface/workspace-orchestrator.js?v=abb6f724" defer></script>
+<script src="/shared/interface/workspace-blueprints.js?v=abb6f724" defer></script>
+<script src="/shared/interface/workspace-broker.js?v=abb6f724" defer></script>
+<script src="/shared/interface/workspace-module-host.js?v=abb6f724" defer></script>
+<script src="/shared/interface/workspace-runtime.js?v=abb6f724" defer></script>
+<script src="/shared/interface/workspace-legacy.js?v=abb6f724" defer></script>
 <!-- RTG_WORKSPACE_MODULES_START: nieuwe modules komen via scripts/workspace-module.js binnen -->
-<script src="/shared/interface/second-screen-modules.js?v=0b8652ed" defer></script>
-<script src="/shared/interface/modules/travel.js?v=0b8652ed" defer></script>
-<script src="/shared/interface/modules/safety.js?v=0b8652ed" defer></script>
+<script src="/shared/interface/second-screen-modules.js?v=abb6f724" defer></script>
+<script src="/shared/interface/modules/travel.js?v=abb6f724" defer></script>
+<script src="/shared/interface/modules/safety.js?v=abb6f724" defer></script>
 <!-- RTG_WORKSPACE_MODULES_END -->
-<script src="/shared/interface/workspace-experience.js?v=0b8652ed" defer></script>
-<script src="/shared/interface/second-screen.js?v=0b8652ed" defer></script>
-<script src="/shared/command/bank.js?v=0b8652ed" defer></script>
-<script src="/shared/command/praat.js?v=0b8652ed" defer></script>
-<script src="/shared/command/inlogpoort.js?v=0b8652ed" defer></script>
-<script src="/shared/command/bladhaak.js?v=0b8652ed" defer></script>
-<script src="/shared/command/romp.js?v=0b8652ed" defer></script>
-<script src="/shared/command/geheugen.js?v=0b8652ed" defer></script>
-<script src="/shared/command/werktafel.js?v=0b8652ed" defer></script>
-<script src="/shared/command.js?v=0b8652ed" defer></script>
+<script src="/shared/interface/workspace-experience.js?v=abb6f724" defer></script>
+<script src="/shared/interface/second-screen.js?v=abb6f724" defer></script>
+<script src="/shared/command/bank.js?v=abb6f724" defer></script>
+<script src="/shared/command/praat.js?v=abb6f724" defer></script>
+<script src="/shared/command/inlogpoort.js?v=abb6f724" defer></script>
+<script src="/shared/command/bladhaak.js?v=abb6f724" defer></script>
+<script src="/shared/command/romp.js?v=abb6f724" defer></script>
+<script src="/shared/command/geheugen.js?v=abb6f724" defer></script>
+<script src="/shared/command/werktafel.js?v=abb6f724" defer></script>
+<script src="/shared/command.js?v=abb6f724" defer></script>
 <!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
 <script src="/shared/media.js"></script>
 <link href="/shared/ios.css" rel="stylesheet">
@@ -2425,8 +2441,8 @@ try {
 <script src="/shared/glyf.js"></script>
 <script src="/shared/emoji.js"></script>
 <script src="/shared/uitvoer.js"></script>
-<script src="/apps/magnaat-sandbox.js?v=0b8652ed"></script>
-<script src="/apps/magnaat-data.js?v=0b8652ed"></script>
+<script src="/apps/magnaat-sandbox.js?v=abb6f724"></script>
+<script src="/apps/magnaat-data.js?v=abb6f724"></script>
 <script src="/apps/app-main.js" defer></script>
 <script>
 window.I18N = { en: {

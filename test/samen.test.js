@@ -159,6 +159,23 @@ test('4b. samen luisteren: de gastheer deelt de muziek, de leden zien het en vol
   assert.equal((await api(base, '/api/samen/muziek', { id: kamerId, media: { stationId: 'nacht', seed: 1 } }, B)).status, 403);
 });
 
+test('4c. alleen de gastheer sluit een kamer en trekt de deelcode direct in', async () => {
+  const gemaakt = await api(base, '/api/samen/maak', {
+    idem: 'samen-route-sluit-0001'
+  }, A);
+  const id = gemaakt.body.kamer.id;
+  const deelcode = gemaakt.body.code;
+  await api(base, '/api/samen/mee', { code: deelcode }, B);
+
+  assert.equal((await api(base, '/api/samen/sluit', { id }, B)).status, 403,
+    'een deelnemer kan de kamer niet voor iedereen sluiten');
+  assert.equal((await api(base, '/api/samen/sluit', { id }, A)).status, 200);
+  assert.equal((await api(base, '/api/samen/staat', { id }, A)).status, 404,
+    'een gesloten kamer geeft ook de gastheer geen staat meer');
+  assert.equal((await api(base, '/api/samen/mee', { code: deelcode }, B)).status, 404,
+    'de ingetrokken deelcode opent de kamer niet opnieuw');
+});
+
 test('5. verlaten: de laatste doet het licht uit en de code vervalt', async () => {
   assert.equal((await api(base, '/api/samen/weg', { id: kamerId }, B)).status, 200);
   assert.equal((await api(base, '/api/samen/weg', { id: kamerId }, A)).status, 200);

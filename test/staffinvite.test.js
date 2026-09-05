@@ -141,6 +141,36 @@ test('een open uitnodiging intrekken maakt de kassacode onbruikbaar', async () =
   assert.equal(r.status, 403);
 });
 
+test('alleen een manager roteert een uitnodiging; retry heronthult geen code', async () => {
+  const gemaakt = await json(await api('/api/supplier/staff/invite', {
+    name: 'Later Begonnen', func: 'Service', idem: 'staff-rotatie-bron'
+  }, managerToken));
+  const oud = gemaakt.invite.kassacode;
+
+  assert.equal((await api('/api/supplier/staff/invite/roteer', {
+    id: gemaakt.invite.id, idem: 'staff-rotatie-vast'
+  }, balieToken)).status, 403, 'een medewerker kan geen personeelsdeur vervangen');
+
+  const eerste = await json(await api('/api/supplier/staff/invite/roteer', {
+    id: gemaakt.invite.id, idem: 'staff-rotatie-vast'
+  }, managerToken));
+  assert.notEqual(eerste.invite.kassacode, oud);
+  assert.equal(eerste.invite.toegang.rotatie, 2);
+
+  const retryAntwoord = await api('/api/supplier/staff/invite/roteer', {
+    id: gemaakt.invite.id, idem: 'staff-rotatie-vast'
+  }, managerToken);
+  const retry = await json(retryAntwoord);
+  assert.equal(retryAntwoord.status, 409);
+  assert.equal(JSON.stringify(retry).includes(eerste.invite.kassacode), false,
+    'dezelfde herhaalsleutel onthult de eenmalige nieuwe code niet opnieuw');
+  assert.equal((await api('/api/werving/kijk', { kassacode: oud })).status, 404,
+    'de oude kassacode is na rotatie server-side dood');
+  assert.equal((await api('/api/werving/kijk', {
+    kassacode: eerste.invite.kassacode
+  })).status, 200, 'alleen de nieuwe kassacode blijft bruikbaar');
+});
+
 test('ontslag: een verwijderd teamlid kan niet meer inloggen', async () => {
   // Sara (uit de Business-test) opzoeken en ontslaan
   const roster = await json(await api('/api/supplier/roster', { code: 'KIKUNOI' }));

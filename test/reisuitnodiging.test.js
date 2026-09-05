@@ -215,6 +215,38 @@ test('5. je eigen uitnodiging is voor iemand anders, en intrekken kan tot hij ge
   assert.equal((await post('/api/reis/uitnodiging/weg', { id: nog.id }, genoot)).status, 404);
 });
 
+test('5b. alleen de uitgever roteert zijn reislink; retry heronthult hem niet', async () => {
+  const uit = await post('/api/reis/uitnodiging/nodig-uit', {
+    onderdelen: [{ soort: 'verblijf', titel: 'Casa Rotatie', bestemming: 'Ibiza',
+      van: dag(61), tot: dag(64) }]
+  }, klant, 'reis-lid-rotatie-bron');
+  assert.equal(uit.status, 200);
+  const id = uit.body.uitnodiging.id;
+  const oud = uit.body.link.split('code=')[1];
+
+  assert.equal((await post('/api/reis/uitnodiging/roteer', { id }, genoot,
+    'reis-lid-rotatie-vreemd')).status, 404,
+  'een ander lid ziet noch roteert de uitnodiging');
+
+  const eerste = await post('/api/reis/uitnodiging/roteer', { id }, klant,
+    'reis-lid-rotatie-vast');
+  assert.equal(eerste.status, 200);
+  const nieuw = eerste.body.link.split('code=')[1];
+  assert.notEqual(nieuw, oud);
+  assert.equal(eerste.body.uitnodiging.toegang.rotatie, 2);
+
+  const retry = await post('/api/reis/uitnodiging/roteer', { id }, klant,
+    'reis-lid-rotatie-vast');
+  assert.equal(retry.status, 409);
+  assert.equal(retry.body.link, undefined);
+  assert.equal(JSON.stringify(retry.body).includes(nieuw), false,
+    'dezelfde herhaalsleutel onthult de eenmalige nieuwe link niet opnieuw');
+  assert.notEqual((await post('/api/reis/uitnodiging/open', { code: oud })).status, 200,
+    'de oude link is na rotatie server-side dood');
+  assert.equal((await post('/api/reis/uitnodiging/open', { code: nieuw })).status, 200,
+    'alleen de nieuwe link blijft bruikbaar');
+});
+
 test('6. zonder onderdelen geen uitnodiging, en het kantoor houdt zijn eigen lijst', async () => {
   assert.equal((await post('/api/reis/uitnodiging/nodig-uit', { onderdelen: [] }, klant)).status, 400);
   assert.equal((await post('/api/office/reisbureau/klaarzetten', { onderdelen: [{ soort: 'verblijf' }] }, kantoor)).status, 400,

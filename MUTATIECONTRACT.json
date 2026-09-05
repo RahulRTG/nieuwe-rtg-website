@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-05T14:43:05.719Z",
-  "commit": "ba0fb537a",
+  "op": "2026-09-05T18:22:24.378Z",
+  "commit": "1d924c7fd",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 3,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v24.18.0"
  },
@@ -11,21 +11,20 @@
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
   "totaal": 4863,
-  "geclassificeerd": 4847,
+  "geclassificeerd": 4863,
   "perStand": {
-   "BLOCKED_BY_TEST_FIXTURE": 3237,
+   "BLOCKED_BY_TEST_FIXTURE": 3253,
    "NOT_APPLICABLE": 1125,
    "PROTECTED": 369,
-   "INTENTIONALLY_NON_IDEMPOTENT": 116,
-   "LEGACY_PENDING_CLASSIFICATION": 16
+   "INTENTIONALLY_NON_IDEMPOTENT": 116
   },
-  "vastgesteldDoorMens": 1638,
+  "vastgesteldDoorMens": 1654,
   "afgeleidDoorScript": 3209,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4001,
+   "AUTHENTICATED": 4004,
    "PUBLIC": 122,
    "OBJECT_SCOPED": 718,
-   "(niet af te leiden -- vraagt een verklaring)": 7,
+   "(niet af te leiden -- vraagt een verklaring)": 4,
    "SERVICE_TO_SERVICE": 14,
    "SYSTEM_INTERNAL": 1
   },
@@ -35,10 +34,7 @@
    "kale ronde: geen uitspraak": 4512,
    "niet gemeten": 134
   },
-  "voorstellen": {
-   "PROTECTED": 2,
-   "BLOCKED_BY_TEST_FIXTURE": 2
-  },
+  "voorstellen": {},
   "metingVan": "2026-09-03T11:51:23.232Z"
  },
  "tegenspraken": [
@@ -316,6 +312,12 @@
    "route": "POST /api/supplier/service/weiger",
    "bedoeld": "OBJECT_SCOPED",
    "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/werkplek/bureau/redactie/artikel/verwijder",
+   "bedoeld": "AUTHENTICATED",
+   "waargenomen": "OBJECT_SCOPED",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
   }
  ],
@@ -3627,12 +3629,14 @@
   {
    "mutatieId": "bank.bevries",
    "route": "POST /api/bank/bevries",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": "velden",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast, en de bank moet live zijn",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -3644,10 +3648,10 @@
     "grond": "gemerkt",
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "PROTECTED",
-   "voorstelGrond": "kale ronde (gemerkt): de server merkte de herhaling zelf (herhaald: true) terwijl er GEEN sleutel is gestuurd -- dat kan alleen van de idem-poort komen, op grond van de verklaring in idemsleutels.js"
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bank.bulk",
@@ -5785,12 +5789,14 @@
   {
    "mutatieId": "bedrijf.lid.koppel",
    "route": "POST /api/bedrijf/lid/koppel",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": "object: werkruimte",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "authEenmaal"
     ]
@@ -5802,10 +5808,10 @@
     "grond": null,
     "hindernis": "Er ging iets mis. Probeer het opnieuw."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Er ging iets mis. Probeer het opnieuw.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bedrijf.lid.ontkoppel",
@@ -5890,7 +5896,7 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
@@ -49967,42 +49973,46 @@
   {
    "mutatieId": "member.vluchten.pass.intrek",
    "route": "POST /api/member/vluchten/pass/intrek",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth",
      "mw"
     ]
    },
    "bewijs": null,
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "niet gemeten"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.vluchten.pass.roteer",
    "route": "POST /api/member/vluchten/pass/roteer",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth",
      "mw"
     ]
    },
    "bewijs": null,
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "niet gemeten"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.vooruit",
@@ -56849,12 +56859,14 @@
   {
    "mutatieId": "office.hardware.verwijder",
    "route": "POST /api/office/hardware/verwijder",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -56866,10 +56878,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.hardware.winkel",
@@ -74525,40 +74537,44 @@
   {
    "mutatieId": "projectie.kijk",
    "route": "POST /api/projectie/kijk",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw"
     ]
    },
    "bewijs": null,
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "niet gemeten"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "projectie.koppel",
    "route": "POST /api/projectie/koppel",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw"
     ]
    },
    "bewijs": null,
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "niet gemeten"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "punten",
@@ -76229,12 +76245,14 @@
   {
    "mutatieId": "residentie.suite.zet",
    "route": "POST /api/residentie/suite/zet",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -76246,10 +76264,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "residentie.vraag",
@@ -84106,40 +84124,44 @@
   {
    "mutatieId": "rtfos.casus.code.intrekken",
    "route": "POST /api/rtfos/casus/code/intrekken",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
    },
    "bewijs": null,
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "niet gemeten"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "rtfos.casus.code.roteren",
    "route": "POST /api/rtfos/casus/code/roteren",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
    },
    "bewijs": null,
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "niet gemeten"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "rtfos.casus.contact",
@@ -84360,40 +84382,44 @@
   {
    "mutatieId": "rtfos.donateur.code.intrekken",
    "route": "POST /api/rtfos/donateur/code/intrekken",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
    },
    "bewijs": null,
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "niet gemeten"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "rtfos.donateur.code.roteren",
    "route": "POST /api/rtfos/donateur/code/roteren",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
    },
    "bewijs": null,
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "niet gemeten"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "rtfos.donateur.periodiek",
@@ -87772,40 +87798,44 @@
   {
    "mutatieId": "rtfos.vrijwilliger.code.intrekken",
    "route": "POST /api/rtfos/vrijwilliger/code/intrekken",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
    },
    "bewijs": null,
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "niet gemeten"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "rtfos.vrijwilliger.code.roteren",
    "route": "POST /api/rtfos/vrijwilliger/code/roteren",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
    },
    "bewijs": null,
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "niet gemeten"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "rtfos.vrijwilliger.evaluatie",
@@ -110066,7 +110096,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -113945,12 +113975,14 @@
   {
    "mutatieId": "supplier.roster",
    "route": "POST /api/supplier/roster",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": null,
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": []
    },
    "bewijs": {
@@ -113960,10 +113992,10 @@
     "grond": null,
     "hindernis": "Te veel opvragingen. Probeer het over een kwartier opnieuw."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Te veel opvragingen. Probeer het over een kwartier opnieuw.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.rtmail.afwezig",
@@ -121751,7 +121783,7 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
@@ -127769,12 +127801,14 @@
   {
    "mutatieId": "werkplek.bureau.redactie.artikel.verwijder",
    "route": "POST /api/werkplek/bureau/redactie/artikel/verwijder",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "huisAuth"
     ]
@@ -127786,10 +127820,10 @@
     "grond": "opslag",
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "PROTECTED",
-   "voorstelGrond": "kale ronde (opslag): het verschil zat in wacht. NA TE KIJKEN: is dat werk van deze route, of een rem/meter die alleen de eerste keer aansloeg? In dat laatste geval is de juiste stand NOT_APPLICABLE en niet PROTECTED."
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "werkplek.bureau.redactie.artikel.zet",

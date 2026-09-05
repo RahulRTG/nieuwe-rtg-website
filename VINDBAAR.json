@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-05T17:32:31.078Z",
-    "commit": "0cbe01c27",
-    "boomVuil": true,
-    "boomAnders": 3,
+    "op": "2026-09-05T18:24:58.603Z",
+    "commit": "1d924c7fd",
+    "boomVuil": false,
+    "boomAnders": 10,
     "instrument": "scripts/vindbaar.js",
     "node": "v24.18.0"
   },
@@ -12,8 +12,8 @@
   "drempel": 3,
   "bestemmingen": 89,
   "woorden": 1083,
-  "gevonden": 699,
-  "dekking": 0.6454,
+  "gevonden": 702,
+  "dekking": 0.6482,
   "perBestemming": [
     {
       "naam": "Magnaat",
@@ -98,30 +98,6 @@
       ]
     },
     {
-      "naam": "Spelen",
-      "url": "/apps/spelen.html?pas=",
-      "woorden": 44,
-      "gevonden": 28,
-      "mist": [
-        "mens",
-        "erger",
-        "schaken",
-        "woordduel",
-        "pesten",
-        "dammen",
-        "rummi",
-        "seconden",
-        "doen",
-        "waarheid",
-        "proost",
-        "sneek",
-        "tetris",
-        "sudoku",
-        "vingerroulette",
-        "sluit"
-      ]
-    },
-    {
       "naam": "Mall",
       "url": "/apps/mall.html",
       "woorden": 41,
@@ -165,6 +141,29 @@
         "blijft",
         "weten",
         "knoop"
+      ]
+    },
+    {
+      "naam": "Spelen",
+      "url": "/apps/spelen.html?pas=",
+      "woorden": 44,
+      "gevonden": 29,
+      "mist": [
+        "mens",
+        "erger",
+        "schaken",
+        "woordduel",
+        "pesten",
+        "dammen",
+        "rummi",
+        "seconden",
+        "doen",
+        "waarheid",
+        "proost",
+        "sneek",
+        "tetris",
+        "sudoku",
+        "vingerroulette"
       ]
     },
     {
@@ -626,18 +625,6 @@
       ]
     },
     {
-      "naam": "Muziek",
-      "url": "/apps/muziek.html",
-      "woorden": 7,
-      "gevonden": 3,
-      "mist": [
-        "stations",
-        "straks",
-        "wachtrij",
-        "deelcode"
-      ]
-    },
-    {
       "naam": "Berichten",
       "url": "/apps/comm.html",
       "woorden": 4,
@@ -668,6 +655,17 @@
         "poort",
         "kanalen",
         "kijkers"
+      ]
+    },
+    {
+      "naam": "Muziek",
+      "url": "/apps/muziek.html",
+      "woorden": 7,
+      "gevonden": 4,
+      "mist": [
+        "stations",
+        "straks",
+        "wachtrij"
       ]
     },
     {
@@ -862,15 +860,6 @@
       ]
     },
     {
-      "naam": "Vluchten",
-      "url": "/apps/vluchten.html",
-      "woorden": 6,
-      "gevonden": 5,
-      "mist": [
-        "uitgeven"
-      ]
-    },
-    {
       "naam": "RTFoundation in jouw buurt",
       "url": "/apps/foundation/os-publiek.html",
       "woorden": 11,
@@ -1045,6 +1034,13 @@
       "url": "/apps/reisboek.html",
       "woorden": 2,
       "gevonden": 2,
+      "mist": []
+    },
+    {
+      "naam": "Vluchten",
+      "url": "/apps/vluchten.html",
+      "woorden": 6,
+      "gevonden": 6,
       "mist": []
     },
     {

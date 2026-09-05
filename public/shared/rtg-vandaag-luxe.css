@@ -84,6 +84,76 @@ body[data-rtg-vandaag-luxe][data-rtg-world="foundation"]{
   --rtg-v-muted:#aebccc;--rtg-v-line:rgba(242,242,234,.16);--rtg-v-signature:#d0b66e;
   --rtg-v-metal:#d0b66e;--rtg-v-accent-soft:rgba(208,182,110,.16);--rtg-v-schema:dark
 }
+
+/* Living is het lichte huis. Het bestaande Vandaag-scherm was nog volledig
+   voor een donkere grond getekend: halfdoorzichtige zwarte kaarten mengden met
+   parelmoer en lieten zowel de donkere nieuwe inkt als de oude witte actieve
+   stand onleesbaar achter. De pagina blijft functioneel dezelfde, maar ieder
+   inhoudsvlak gebruikt nu het materiaalpaar van de gekozen wereld. */
+body[data-rtg-vandaag-luxe][data-rtg-world="living"] .schil{
+  background:radial-gradient(70% 42% at 82% 0,rgba(184,149,69,.09),transparent 70%),var(--rtg-v-bg);
+  color:var(--rtg-v-ink)
+}
+body[data-rtg-vandaag-luxe][data-rtg-world="living"] .standen button.actief,
+body[data-rtg-vandaag-luxe][data-rtg-world="living"] .lifelagen button.actief,
+body[data-rtg-vandaag-luxe][data-rtg-world="living"] .lifelagen button:hover{
+  color:var(--rtg-v-ink)!important
+}
+body[data-rtg-vandaag-luxe][data-rtg-world="living"] .laagkeuze,
+body[data-rtg-vandaag-luxe][data-rtg-world="living"] .hero,
+body[data-rtg-vandaag-luxe][data-rtg-world="living"] .dagkaart,
+body[data-rtg-vandaag-luxe][data-rtg-world="living"] .kompasblok,
+body[data-rtg-vandaag-luxe][data-rtg-world="living"] .laagfocus a,
+body[data-rtg-vandaag-luxe][data-rtg-world="living"] .mag-kader,
+body[data-rtg-vandaag-luxe][data-rtg-world="living"] .kaart{
+  border-color:var(--rtg-v-line)!important;background:var(--rtg-v-card)!important;color:var(--rtg-v-ink)!important
+}
+body[data-rtg-vandaag-luxe][data-rtg-world="living"] .dagkaart:hover,
+body[data-rtg-vandaag-luxe][data-rtg-world="living"] .laagfocus a:hover{
+  background:var(--rtg-v-card2)!important
+}
+body[data-rtg-vandaag-luxe][data-rtg-world="living"] .lifelagen button{
+  border-color:var(--rtg-v-line)!important;background:var(--rtg-v-card2)!important;color:var(--rtg-v-muted)!important
+}
+body[data-rtg-vandaag-luxe][data-rtg-world="living"] .mag-knop{
+  border-color:var(--rtg-v-line);color:var(--rtg-v-ink)
+}
+body[data-rtg-vandaag-luxe][data-rtg-world="living"] .laagmelding,
+body[data-rtg-vandaag-luxe][data-rtg-world="living"] .dagwacht{
+  color:var(--rtg-v-metal)!important
+}
+body[data-rtg-vandaag-luxe][data-rtg-world="living"] .kompaslijst a:hover{
+  color:var(--rtg-v-ink)!important
+}
+body[data-rtg-vandaag-luxe][data-rtg-world="living"] .mag-knop.prim{
+  color:#fbf8f2!important
+}
+/* De oorspronkelijke Living-bank en -kop worden als echte nodes naar de
+   lichte Edge-context verplaatst. Hun oude ivoor-op-zwartkleuren mogen daar
+   niet meeverhuizen: dezelfde semantische inktrollen gelden ook in de lade. */
+body[data-rtg-vandaag-luxe][data-rtg-world="living"] .rtg-edge-2-context-slot .bank .merk,
+body[data-rtg-vandaag-luxe][data-rtg-world="living"] .rtg-edge-2-context-slot .topbar a,
+body[data-rtg-vandaag-luxe][data-rtg-world="living"] .rtg-edge-2-context-slot .topbar button{
+  color:var(--rtg-v-ink)!important
+}
+body[data-rtg-vandaag-luxe][data-rtg-world="living"] .rtg-edge-2-context-slot .bank .merk small,
+body[data-rtg-vandaag-luxe][data-rtg-world="living"] .rtg-edge-2-context-slot .bank a{
+  color:var(--rtg-v-muted)!important
+}
+body[data-rtg-vandaag-luxe][data-rtg-world="living"] .rtg-edge-2-context-slot .bank a:hover,
+body[data-rtg-vandaag-luxe][data-rtg-world="living"] .rtg-edge-2-context-slot .bank a.actief{
+  color:var(--rtg-v-ink)!important;background:var(--rtg-v-accent-soft)!important
+}
+body[data-rtg-vandaag-luxe][data-rtg-world="living"] .rtg-edge-2-context-slot .bank a span,
+body[data-rtg-vandaag-luxe][data-rtg-world="living"] .rtg-edge-2-context-slot .topbar .terug{
+  color:var(--rtg-v-metal)!important
+}
+
+/* Travel gebruikt champagne als metaal op zijn wijnkleurige grond. De gedeelde
+   springlink erfde nog witte bordeaux-inkt; op metaal hoort juist donkere inkt. */
+body[data-rtg-vandaag-luxe][data-rtg-world="travel"] .skip{
+  color:#1c1608!important
+}
 body[data-rtg-vandaag-luxe][data-rtg-world="work"][data-workos-premium]{
   background:radial-gradient(85% 46% at 82% -6%,rgba(117,184,177,.14),transparent 67%),linear-gradient(135deg,#0c1112,#101718 54%,#0c1112)!important
 }
@@ -133,6 +203,9 @@ body[data-rtg-vandaag-luxe="surface"][data-rtg-world="living"][data-kantoor-tool
 }
 body[data-rtg-vandaag-luxe="surface"][data-rtg-world="living"][data-kantoor-tool="agenda"] .mdag:hover{
   background:#e8e0d2!important
+}
+body[data-rtg-vandaag-luxe="surface"][data-rtg-world="living"][data-kantoor-tool="agenda"] .mdag.vandaag .dnr{
+  background:#745718!important;color:#fbf8f2!important
 }
 
 .rtg-vandaag-luxe::before,

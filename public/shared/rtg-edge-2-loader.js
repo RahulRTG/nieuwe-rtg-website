@@ -31,6 +31,75 @@
     b.setAttribute('data-rtg-edge-2-hoofdactie', 'edge');
   }
 
+  /* Een bediening uit een opgeheven oude strook blijft alleen geldig als zij
+     in de ene Edge-onderrand terechtkomt. We verplaatsen de echte knop, met
+     zijn eigen luisteraar; er ontstaat dus geen kloon en geen tweede status. */
+  function neemRandknop(q) {
+    var e = w.RTGEdge && w.RTGEdge.active;
+    var slot = e && e.root.querySelector('.rtg-edge-action');
+    if (!slot) return;
+    var zet = function () {
+      var oud = vind(q);
+      if (!oud) return false;
+      if (!slot.contains(oud)) slot.appendChild(oud);
+      return true;
+    };
+    if (zet() || !w.MutationObserver) return;
+    var wacht = new w.MutationObserver(function () { if (zet()) wacht.disconnect(); });
+    wacht.observe(b, { childList: true, subtree: true });
+    setTimeout(function () { wacht.disconnect(); }, 10000);
+  }
+
+  /* Werk heeft al een volwaardige Rahul-werkruimte. De zichtbare Edge-mond
+     opent daarom die bestaande ruimte; het generieke lege Edge-paneel zou een
+     tweede, minder capabele waarheid zijn. Open/dicht blijft afgeleid van het
+     oorspronkelijke paneel. */
+  function koppelWerkRahul() {
+    var e = w.RTGEdge && w.RTGEdge.active;
+    var rand = e && e.root.querySelector('.rtg-edge-ai');
+    var tab = vind('#wkRahulTab'), werk = vind('.wk-rahul'), sluit = vind('#wkRahulExpand');
+    if (!rand || !tab || !werk) return;
+    var sluitEdge = rand.onclick;
+    var sync = function () {
+      var open = !werk.hidden && werk.classList.contains('page');
+      rand.setAttribute('aria-expanded', String(open));
+      var leeg = e.root.querySelector('.rtg-edge-ai-panel');
+      if (leeg) leeg.setAttribute('aria-hidden', 'true');
+    };
+    var sluitWerk = function () {
+      if (!werk.hidden && werk.classList.contains('page') && sluit) sluit.click();
+      sync();
+    };
+    /* Exclusiviteit werkt in beide richtingen. Niet alleen Rahul sluit een al
+       geopende Edge-laag; elke echte Edge-laagbediening sluit eerst de echte
+       Werk-Rahul. Zo kunnen DOM, beeld en aria nooit twee open lagen melden. */
+    /* De contextknop wordt pas door Edge 2 toegevoegd nadat deze loader al
+       draait. Delegeer daarom op het blijvende casco; dit dekt ook een veilige
+       herbouw zonder een tweede luisteraar op een nieuwe knop. */
+    e.root.addEventListener('click', function (ev) {
+      var doel = ev.target && ev.target.closest && ev.target.closest(
+        '.rtg-edge-menu,.rtg-edge-state,.rtg-edge-2-context-button');
+      if (doel && e.root.contains(doel)) sluitWerk();
+    }, true);
+    rand.onclick = function (ev) {
+      /* Edge 2 bezit zijn contextlade; sluit haar via haar echte bediening.
+         De oorspronkelijke Rahul-handler sluit daarna index, status en het
+         generieke AI-paneel. Pas dan wisselen we naar de rijkere Werkruimte. */
+      var context = e.root.querySelector('.rtg-edge-2-context-button[aria-expanded="true"]');
+      if (context) context.click();
+      if (sluitEdge) sluitEdge.call(rand, ev);
+      if (!werk.hidden && werk.classList.contains('page') && sluit) sluit.click();
+      else tab.click();
+      var leeg = e.root.querySelector('.rtg-edge-ai-panel');
+      if (leeg) leeg.setAttribute('aria-hidden', 'true');
+      sync();
+    };
+    if (w.MutationObserver) new w.MutationObserver(sync).observe(werk, {
+      attributes: true, attributeFilter: ['class', 'hidden']
+    });
+    sync();
+  }
+
   /* EEN MODAAL VENSTER HEEFT VOORRANG OP DE RANDEN. De oude Rahul-tab week
      al voor een open dialoog, maar de ene Edge-onderrand bleef erboven liggen.
      Daardoor was in Clips de knop "Sluit" zichtbaar en toch niet aan te
@@ -60,7 +129,10 @@
     });
   }
   var pad = w.location.pathname;
-  if (pad === '/apps/rtg.html') hoofdactie('Bekijk uw dag', function () { klik('.rtg-vandaag-luxe__cta'); });
+  if (pad === '/apps/rtg.html') {
+    hoofdactie('Bekijk uw dag', function () { klik('.rtg-vandaag-luxe__cta'); });
+    neemRandknop('.xp-trigger');
+  }
   else if (pad === '/apps/kantoor.html') hoofdactie('Open werkbank', function () { klik('.wereldtab-plus'); });
   else if (pad === '/apps/reizen.html') hoofdactie('Open reizen', function () { klik('[data-tab="reizen"]'); });
   else if (pad === '/apps/foundation/os-publiek.html') hoofdactie('Bekijk uw stad', function () {
@@ -68,10 +140,13 @@
   });
   else if (pad === '/apps/agenda.html') hoofdactie('Nieuwe afspraak', function () { klik('#nieuwBtn'); });
   else if (pad === '/apps/reisboek.html') hoofdactie('Naar reisinhoud', function () { focus('#main'); });
-  else if (pad === '/apps/werk.html') hoofdactie('Nieuw project', function () {
-    var inlog = vind('#inlogGa');
-    if (inlog && inlog.offsetParent !== null) inlog.click(); else focus('#a_h0_naam, #mKeuze, #main');
-  });
+  else if (pad === '/apps/werk.html') {
+    hoofdactie('Nieuw project', function () {
+      var inlog = vind('#inlogGa');
+      if (inlog && inlog.offsetParent !== null) inlog.click(); else focus('#a_h0_naam, #mKeuze, #main');
+    });
+    koppelWerkRahul();
+  }
   else if (pad === '/apps/clips.html') neemHoofdactie('Maak een clip', '#studioOpen');
 
   function script(bron, naam, klaar) {

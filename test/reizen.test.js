@@ -49,7 +49,10 @@ function reizenMet(over) {
 }
 const verblijf = (o) => ({ id: o.id, roomName: o.titel, plaats: o.plaats, aankomst: o.van, vertrek: o.tot, status: o.status || 'bevestigd' });
 const aanvraag = (o) => ({ ref: o.ref, titel: o.titel, bestemming: o.plaats, vertrek: o.van, personen: o.personen, status: o.status || 'aangevraagd' });
-const vlucht = (o) => ({ code: o.code, status: o.status || 'geboekt', vlucht: { nummer: o.nummer, bestemming: o.plaats, datum: o.van, tijd: o.tijd } });
+/* Een vluchtboeking heeft sinds de boarding-passcutover een eigen id; `code`
+   is niet langer de publieke boekingsidentiteit. Houd beide in de fixture,
+   zodat de groeperingsproef de echte domeinvorm gebruikt. */
+const vlucht = (o) => ({ id: o.code, code: o.code, status: o.status || 'geboekt', vlucht: { nummer: o.nummer, bestemming: o.plaats, datum: o.van, tijd: o.tijd } });
 
 /* De boekhouding van elke uitkomst: geen onderdeel verdwijnt, en geen enkel
    onderdeel staat op twee plekken. Elke toets hieronder laat hem meelopen. */

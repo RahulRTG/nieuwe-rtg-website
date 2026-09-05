@@ -100,20 +100,24 @@ test('een pending intrekking wordt vóór readiness herspeeld en pas daarna gewi
   const token = 'outage-token';
   const rij = { sleutel: 'token:' + signaal.vingerVanToken(token), soort: 'token',
     waarde: signaal.vingerVanToken(token), verloopt: Date.now() + 60000 };
-  let rijen = [rij], magBewaren = false, standWachter;
+  let rijen = [rij], magBewaren = false, standWachter, pogingen = 0;
   signaal.koppelOutbox({ lijst: () => rijen.slice(),
     voltooi(s) { const voor = rijen.length; rijen = rijen.filter(r => !s.includes(r.sleutel)); return voor - rijen.length; } });
   const bus = { soort: 'redis', publish() {}, subscribe() {}, gereed: () => true,
     herhaal: async () => [],
-    bewaar: async () => { if (!magBewaren) throw new Error('redis down'); return 1; },
+    bewaar: async () => { pogingen++; if (!magBewaren) throw new Error('redis down'); return 1; },
     onStand(fn) { standWachter = fn; fn({ soort: 'redis', gereed: false }); } };
   signaal.koppelBus(bus);
   standWachter({ soort: 'redis', gereed: true });
-  await new Promise(resolve => setTimeout(resolve, 20));
+  for (let i = 0; i < 50 && pogingen === 0; i++) {
+    await new Promise(resolve => setTimeout(resolve, 2));
+  }
   assert.equal(signaal.stand().gereed, false);
   assert.equal(rijen.length, 1, 'mislukte replay blijft duurzaam pending');
   magBewaren = true;
-  await new Promise(resolve => setTimeout(resolve, 650));
+  for (let i = 0; i < 400 && rijen.length; i++) {
+    await new Promise(resolve => setTimeout(resolve, 2));
+  }
   assert.equal(rijen.length, 0);
   assert.equal(signaal.stand().gereed, true, 'readiness opent pas na SET+PUBLISH en outboxbevestiging');
   assert.equal(signaal.tokenIngetrokken(token), true);
@@ -139,8 +143,9 @@ test('een gedeelde outboxrij van een gecrashte buur wordt vóór readiness hersp
     onStand(fn) { fn({ soort: 'redis', gereed: true }); } };
   signaal.koppelBus(bus);
   assert.equal(signaal.stand().gereed, false, 'de gedeelde replay hoort bij de readinessbarrier');
-  for (let i = 0; i < 50 && !signaal.stand().gereed; i++)
+  for (let i = 0; i < 50 && !signaal.stand().gereed; i++) {
     await new Promise(resolve => setTimeout(resolve, 10));
+  }
   assert.equal(gedeeldVoltooid, true, 'wissen volgt pas na de Redis-write');
   assert.equal(gedeeld.length, 0);
   assert.equal(signaal.tokenIngetrokken(token), true);

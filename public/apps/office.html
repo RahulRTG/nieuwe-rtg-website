@@ -158,6 +158,10 @@
     max-height:min(30rem,calc(100vh - 6rem));overflow:auto;background:var(--paneel);
     border:1px solid var(--line);border-radius:0;padding:.9rem 1rem;
     box-shadow:0 18px 40px rgba(0,0,0,.45);display:grid;gap:.55rem;}
+  /* Een los Office-paneel blijft boven de ene vaste Edge-onderrand. In Focus
+     is die rand weg en krijgt het paneel die ruimte direct weer terug. */
+  body.rtg-edge-host .bladpaneel{bottom:calc(1.2rem + var(--rtg-rahul-h, 0px) + var(--edge-bottom, 48px) + env(safe-area-inset-bottom,0px));}
+  body.rtg-edge-host[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="focus"] .bladpaneel{bottom:calc(1.2rem + var(--rtg-rahul-h, 0px));}
   .bpkop{display:flex;align-items:center;justify-content:space-between;gap:.6rem;}
   .bpkop strong{font-size:.9rem;font-weight:600;}
   .bpstil{color:var(--soft);font-size:.76rem;line-height:1.5;}

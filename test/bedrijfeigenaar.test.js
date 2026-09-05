@@ -84,7 +84,7 @@ test('een gewoon lid krijgt niets automatisch, en vindt na koppelen zijn eigen w
   const leeg = (await api('/mijn', {}, lidToken)).body;
   assert.equal(leeg.eigenaar, false);
   assert.equal(leeg.aantal, 0, 'een gewoon lid krijgt geen werkruimte cadeau');
-  assert.match(leeg.let, /een mens laat u daarna toe/i);
+  assert.match(leeg.let, /nog aan geen enkele actieve werkruimte gekoppeld/i);
 
   // de gewone weg: aanmelden, toegelaten worden, koppelen
   const w = (await api('/werkruimte/maak', { naam: 'Ander bedrijf' })).body;

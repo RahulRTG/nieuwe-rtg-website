@@ -86,6 +86,23 @@ test('4. Samen voor de gezinsapps: het gezin doet mee, een vreemd gezin komt er 
   // een vreemd gezin (geen vriend) wordt geweigerd
   const vreemd = await api('/api/rtf/samen/mee', { deelcode: code }, B.ouder);
   assert.equal(vreemd.status, 404, 'een onbevoegde ziet ook niet of de code bestaat');
+
+  const rotatie = await api('/api/rtf/samen/code', {
+    id: k.body.kamer.id,
+    idem: 'rtf-samen-route-code-0001'
+  }, A.ouder);
+  assert.equal(rotatie.status, 200);
+  assert.match(rotatie.body.deelcode, /^RTFSAMEN\.[A-F0-9]{32}$/);
+  assert.notEqual(rotatie.body.deelcode, code, 'rotatie geeft een nieuw eenmalig geheim');
+  assert.equal((await api('/api/rtf/samen/code', {
+    id: k.body.kamer.id,
+    idem: 'rtf-samen-route-code-0001'
+  }, A.ouder)).status, 409, 'een retry heronthult de nieuwe code niet');
+  assert.equal((await api('/api/rtf/samen/mee', { deelcode: code }, A.kind)).status, 404,
+    'de oude code is direct server-side ingetrokken');
+  assert.equal((await api('/api/rtf/samen/mee', {
+    deelcode: rotatie.body.deelcode
+  }, A.kind)).status, 200, 'de nieuwe code opent dezelfde kamer');
 });
 
 test('5. "kijk hier" binnen de gezinsapps + de kamer-chat; buiten de gezinsapps geweigerd', async () => {

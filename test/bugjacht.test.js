@@ -513,6 +513,8 @@ test('het eigenaarsadres is niet via de openbare registratie te claimen', async 
     OFFICE_TOTP_SECRET: 'JBSWY3DPEHPK3PXP',
     RTG_ISOLATIE_AFDWINGEN: '1',
     RTG_OWNER_EMAIL: 'eigenaar-proef@voorbeeld.test',
+    APP_URL: 'https://app.voorbeeld.test',
+    ERR_WEBHOOK_URL: 'https://alarm.voorbeeld.test/rtg',
     // deze proef gaat niet over betalen; de rail staat daarom hard dicht
     RTG_BETALEN_UIT: '1',
     // er is nog geen extern SMS-kanaal; telefoonherstel blijft in deze

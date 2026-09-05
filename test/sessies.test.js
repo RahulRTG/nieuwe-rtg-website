@@ -105,8 +105,9 @@ test('expliciet uitloggen van een recordsessie wacht op gedeelde duurzame intrek
   signaal.koppelBus({ soort: 'redis', gereed: () => true, publish() {}, subscribe() {},
     herhaal: async () => [], bewaar: async () => { volgorde.push('redis'); return 1; },
     onStand(fn) { fn({ soort: 'redis', gereed: true }); } });
-  for (let i = 0; i < 50 && !signaal.stand().gereed; i++)
+  for (let i = 0; i < 50 && !signaal.stand().gereed; i++) {
     await new Promise(resolve => setTimeout(resolve, 10));
+  }
   const s = nieuweStore();
   s.rememberSession('recordsessie', { tier: 'guest', key: 'gast' });
   const hash = s.tokenHash('recordsessie');

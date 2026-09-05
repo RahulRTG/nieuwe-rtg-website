@@ -246,7 +246,7 @@ function assertInsets(overzicht, compact, focus, mobiel, label) {
   }
 }
 
-async function controleerContextlade(page, label) {
+async function controleerContextlade(page, label, route) {
   await page.click('.rtg-edge-2-context-button');
   await page.waitForFunction(() => document.body.hasAttribute('data-rtg-edge-2-context-open') &&
     !document.querySelector('.rtg-edge-2-context').hidden);
@@ -261,6 +261,27 @@ async function controleerContextlade(page, label) {
   assert.equal(open.expanded, 'true', label + ': contextknop meldt de open stand niet');
   assert.equal(open.slot, true, label + ': contextlade toont niet de oorspronkelijke bediening');
   assert.ok(open.handelingen > 1, label + ': contextlade heeft naast sluiten geen handeling');
+  if (route.pad === '/apps/rtg.html') {
+    const contrast = await page.evaluate(() => {
+      const kanaal = x => (x / 255 <= .03928 ? x / 3294 : Math.pow((x / 255 + .055) / 1.055, 2.4));
+      const rgb = waarde => (waarde.match(/[\d.]+/g) || []).slice(0, 3).map(Number);
+      const verhouding = (voor, achter) => {
+        const a = rgb(voor), b = rgb(achter);
+        const l = c => .2126 * kanaal(c[0]) + .7152 * kanaal(c[1]) + .0722 * kanaal(c[2]);
+        const x = l(a), y = l(b);
+        return (Math.max(x, y) + .05) / (Math.min(x, y) + .05);
+      };
+      return ['.bank .merk', '.bank a:not(.actief)', '.bank a.actief', '.bank a span', '.topbar a']
+        .map(selector => {
+          const el = document.querySelector('.rtg-edge-2-context-slot ' + selector);
+          const vlak = el && el.closest('[data-rtg-edge-2-contextual]');
+          return { selector, ratio: el && vlak ? verhouding(getComputedStyle(el).color,
+            getComputedStyle(vlak).backgroundColor) : 0 };
+        });
+    });
+    contrast.forEach(x => assert.ok(x.ratio >= 4.5,
+      label + ': onleesbare Living-context ' + x.selector + ' (' + x.ratio.toFixed(2) + ':1)'));
+  }
   await page.click('.rtg-edge-2-context-close');
   await page.waitForFunction(() => !document.body.hasAttribute('data-rtg-edge-2-context-open') &&
     document.querySelector('.rtg-edge-2-context').hidden);
@@ -283,7 +304,7 @@ async function controleerRoute(page, route, scherm) {
   assertStand(overzicht, { ...scherm.overzicht, reveal: false }, label + ' · overzicht');
   assert.equal(overzicht.wereld, route.wereld, label + ': verkeerde wereldkleur/context');
   assertContext(overzicht, route, label);
-  if (scherm.naam === 'desktop') await controleerContextlade(page, label);
+  if (scherm.naam === 'desktop') await controleerContextlade(page, label, route);
 
   await zetStand(page, 'compact', { top: false, side: false, bottom: true, reveal: false });
   const compact = await page.evaluate(schermToestand, route);

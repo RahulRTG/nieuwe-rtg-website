@@ -48,7 +48,7 @@ test('Werkruimte: een kamer bewaren, leeghalen en met een klik terughalen',
         }), rand:{ boven:pak('.rtg-edge-top'), links:pak('.rtg-edge-side'), onder:pak('.rtg-edge-bottom') } };
     });
     const randKlopt = (m) => {
-      assert.ok(Math.abs(m.ruimte.x - m.rand.links.width) < 1);
+      assert.ok(Math.abs(m.ruimte.x - m.rand.links.width) < 1, JSON.stringify(m));
       assert.ok(Math.abs(m.ruimte.y - m.rand.boven.height) < 1);
       assert.ok(Math.abs(m.ruimte.width + m.rand.links.width - m.scherm.width) < 1);
       assert.ok(Math.abs(m.ruimte.height + m.rand.boven.height + m.rand.onder.height - m.scherm.height) < 1);

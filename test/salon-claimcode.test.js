@@ -143,7 +143,7 @@ test('antwoordcaches en de leden-UI respecteren eenmalige uitgifte', () => {
 test('startup houdt verkeer dicht tot de autoritatieve migratie committe', () => {
   const bron = fs.readFileSync(path.join(__dirname, '..', 'server', 'server.js'), 'utf8');
   assert.match(bron, /opslagKlaar:\s*opslagMotorKlaar/);
-  assert.match(bron, /opslagMotorKlaar\(\) && salonMigratieKlaar/);
+  assert.match(bron, /opslagMotorKlaar\(\) && accounts\.postgresKlaar\(\) &&\s*salonMigratieKlaar && rtfSamenMigratieKlaar && boardingPassMigratieKlaar/);
   assert.match(bron, /salonMigratieKlaar = false/);
   assert.match(bron, /salonClaimcode\.migreerAlles\(\)/);
   assert.match(bron, /salonMigratieKlaar = true/);

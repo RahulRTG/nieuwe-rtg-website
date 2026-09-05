@@ -60,6 +60,12 @@ module.exports = Object.freeze({
     'check-in geeft de kale boarding-passcode eenmaal; een generieke antwoordcache mag haar nooit heronthullen',
   'POST /api/member/vluchten/pass/roteer':
     'rotatie geeft een nieuwe boarding-passcode eenmaal; alleen de domeinkern bewaakt de verwachte rotatie',
+  'POST /api/member/vluchten/pass/intrek':
+    'intrekking bewaakt de verwachte rotatie in de luchthavenkern; een generiek bewaard succes mag een latere of afwijkende passtand niet verhullen',
+  'POST /api/projectie/koppel':
+    'koppelen wisselt de eenmalige schermcode in voor een geheim schermtoken; dat token mag nooit in een generieke antwoordcache worden bewaard of heronthuld',
+  'POST /api/projectie/kijk':
+    'polling ruimt verlopen en legacy projecties op en moet iedere keer actuele intrekking zien; een antwoordcache zou een gesloten scherm ten onrechte open kunnen houden',
   'POST /api/festival/groep':
     'uitgifte bevat een eenmalige groepscode; de domeinkern beslist atomair over een retry',
   'POST /api/festival/groep/code':
@@ -72,6 +78,10 @@ module.exports = Object.freeze({
     'uitgifte bevat een eenmalige Samen-code; de domeinkern ontdubbelt zonder heronthulling',
   'POST /api/samen/code':
     'rotatie bevat een eenmalige Samen-code; een antwoordcache mag die nooit bewaren',
+  'POST /api/samen/sluit':
+    'de Samen-kern sluit en trekt toegang zelf atomair in; een herhaling moet de actuele eigenaars- en sluitstand opnieuw beoordelen en geen oud succes afspelen',
+  'POST /api/rtf/samen/sluit':
+    'de gezinskern sluit en trekt toegang onder haar eigen collectieslot in; een generieke cache mag een gewijzigde profiel- of sluitstand niet verhullen',
   'POST /api/supplier/horeca/folio/nacht':
     'de nachtrun weet zelf welke nachten al geboekt zijn en zegt dat ook; een cache maakt van dat antwoord een leugen'
 });

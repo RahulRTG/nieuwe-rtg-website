@@ -40,6 +40,7 @@ const { alleRoutes } = require('./lib/routes');
    die zijn eigen afwijking met de vastlegging niet kon duiden. */
 const { stempel } = require('./lib/stempel');
 const { SLEUTELS } = require('../server/lib/idemsleutels');
+const { NOOIT } = require('../server/lib/idemsleutels-nooit');
 
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'IDEMSCHULD.json');
@@ -60,19 +61,25 @@ const verklaard = [];
 const schuld = [];
 for (const r of routes) {
   const sleutel = r.methode.toUpperCase() + ' ' + r.pad;
-  if (SLEUTELS[sleutel]) verklaard.push(sleutel); else schuld.push(sleutel);
+  /* Een expliciet NOOIT-besluit is ook een verklaring. Deze routes mogen juist
+     niet in de generieke antwoordcache terechtkomen, bijvoorbeeld omdat hun
+     eerste antwoord een eenmalig geheim bevat of omdat een herhaling opnieuw
+     door de domeinkern beoordeeld moet worden. Ze als schuld blijven tellen
+     beloont de gevaarlijke stap om ze alsnog in SLEUTELS te zetten. */
+  if (SLEUTELS[sleutel] || NOOIT[sleutel]) verklaard.push(sleutel); else schuld.push(sleutel);
 }
 
 /* Een verklaring voor een route die niet meer bestaat is geen dekking maar
    rommel, en die hoort op te vallen: hij houdt het schuldgetal kunstmatig laag. */
 const bekend = new Set(routes.map(r => r.methode.toUpperCase() + ' ' + r.pad));
-const wees = Object.keys(SLEUTELS).filter(s => !bekend.has(s));
+const wees = [...Object.keys(SLEUTELS), ...Object.keys(NOOIT)].filter(s => !bekend.has(s));
 
 const uit = {
   stempel: stempel(),
-  uitleg: 'Schrijfroutes zonder verklaring in server/lib/idemsleutels.js. MAG ALLEEN KRIMPEN -- ' +
-    'zie test/idemschuld.test.js. Een route met nietIdempotent staat NIET in de schuld: daar is over ' +
-    'nagedacht. Dit telt of er een besluit is, niet of de idempotentie werkt (dat doet de idemproef).',
+  uitleg: 'Schrijfroutes zonder verklaring in server/lib/idemsleutels.js of een gemotiveerd NOOIT-besluit. ' +
+    'MAG ALLEEN KRIMPEN -- zie test/idemschuld.test.js. Een route met nietIdempotent of NOOIT staat NIET ' +
+    'in de schuld: daar is over nagedacht. Dit telt of er een besluit is, niet of de idempotentie werkt ' +
+    '(dat doet de idemproef).',
   gemeten: {
     schrijfroutes: routes.length,
     verklaard: verklaard.length,

@@ -1,19 +1,19 @@
 {
   "stempel": {
-    "op": "2026-09-04T08:23:33.378Z",
-    "commit": "3359f0851",
-    "boomVuil": false,
-    "boomAnders": 0,
+    "op": "2026-09-05T17:32:31.078Z",
+    "commit": "0cbe01c27",
+    "boomVuil": true,
+    "boomAnders": 3,
     "instrument": "scripts/vindbaar.js",
-    "node": "v22.22.2"
+    "node": "v24.18.0"
   },
   "uitleg": "Per bestemming in de sprong: welk aandeel van de ONDERSCHEIDENDE woorden van dat scherm (woorden uit zijn koppen die op hooguit 3 bestemmingen voorkomen) er ook naartoe leidt in de zoekfilter van shared/sprong.js. Meet woorden, geen mensen: of iemand op het idee komt dat woord te typen, weet deze meter niet.",
   "vloer": 0.6,
   "drempel": 3,
   "bestemmingen": 89,
   "woorden": 1083,
-  "gevonden": 701,
-  "dekking": 0.6473,
+  "gevonden": 699,
+  "dekking": 0.6454,
   "perBestemming": [
     {
       "naam": "Magnaat",
@@ -65,8 +65,8 @@
     {
       "naam": "Onderneming",
       "url": "/apps/onderneming.html",
-      "woorden": 35,
-      "gevonden": 8,
+      "woorden": 34,
+      "gevonden": 7,
       "mist": [
         "beginnen",
         "gezondheid",
@@ -95,6 +95,30 @@
         "bestuur",
         "capaciteit",
         "mensen"
+      ]
+    },
+    {
+      "naam": "Spelen",
+      "url": "/apps/spelen.html?pas=",
+      "woorden": 44,
+      "gevonden": 28,
+      "mist": [
+        "mens",
+        "erger",
+        "schaken",
+        "woordduel",
+        "pesten",
+        "dammen",
+        "rummi",
+        "seconden",
+        "doen",
+        "waarheid",
+        "proost",
+        "sneek",
+        "tetris",
+        "sudoku",
+        "vingerroulette",
+        "sluit"
       ]
     },
     {
@@ -141,29 +165,6 @@
         "blijft",
         "weten",
         "knoop"
-      ]
-    },
-    {
-      "naam": "Spelen",
-      "url": "/apps/spelen.html?pas=",
-      "woorden": 44,
-      "gevonden": 29,
-      "mist": [
-        "mens",
-        "erger",
-        "schaken",
-        "woordduel",
-        "pesten",
-        "dammen",
-        "rummi",
-        "seconden",
-        "doen",
-        "waarheid",
-        "proost",
-        "sneek",
-        "tetris",
-        "sudoku",
-        "vingerroulette"
       ]
     },
     {
@@ -409,21 +410,6 @@
       ]
     },
     {
-      "naam": "RTG One",
-      "url": "/apps/rtgone.html",
-      "woorden": 30,
-      "gevonden": 23,
-      "mist": [
-        "koppel",
-        "persoonlijke",
-        "beloften",
-        "length",
-        "persoonlijk",
-        "actieve",
-        "werkstromen"
-      ]
-    },
-    {
       "naam": "Website",
       "url": "/apps/sitemaker.html",
       "woorden": 22,
@@ -520,6 +506,20 @@
         "leest",
         "intussen",
         "nieuwere"
+      ]
+    },
+    {
+      "naam": "RTG One",
+      "url": "/apps/rtgone.html",
+      "woorden": 29,
+      "gevonden": 23,
+      "mist": [
+        "persoonlijke",
+        "beloften",
+        "length",
+        "persoonlijk",
+        "actieve",
+        "werkstromen"
       ]
     },
     {
@@ -626,6 +626,18 @@
       ]
     },
     {
+      "naam": "Muziek",
+      "url": "/apps/muziek.html",
+      "woorden": 7,
+      "gevonden": 3,
+      "mist": [
+        "stations",
+        "straks",
+        "wachtrij",
+        "deelcode"
+      ]
+    },
+    {
       "naam": "Berichten",
       "url": "/apps/comm.html",
       "woorden": 4,
@@ -656,17 +668,6 @@
         "poort",
         "kanalen",
         "kijkers"
-      ]
-    },
-    {
-      "naam": "Muziek",
-      "url": "/apps/muziek.html",
-      "woorden": 6,
-      "gevonden": 3,
-      "mist": [
-        "stations",
-        "straks",
-        "wachtrij"
       ]
     },
     {
@@ -861,6 +862,15 @@
       ]
     },
     {
+      "naam": "Vluchten",
+      "url": "/apps/vluchten.html",
+      "woorden": 6,
+      "gevonden": 5,
+      "mist": [
+        "uitgeven"
+      ]
+    },
+    {
       "naam": "RTFoundation in jouw buurt",
       "url": "/apps/foundation/os-publiek.html",
       "woorden": 11,
@@ -1035,13 +1045,6 @@
       "url": "/apps/reisboek.html",
       "woorden": 2,
       "gevonden": 2,
-      "mist": []
-    },
-    {
-      "naam": "Vluchten",
-      "url": "/apps/vluchten.html",
-      "woorden": 5,
-      "gevonden": 5,
       "mist": []
     },
     {

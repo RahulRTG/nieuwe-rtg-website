@@ -91,8 +91,12 @@ test('wachtwoordwijziging trekt een al geopende persoonlijke supplier-sessie in'
   }));
   const lid = await json(await api('/api/auth/login', { login: 'nora@rtg.example', password: 'werk' }));
   // Zorg dat de nieuwe sessiegrens aantoonbaar na het uitgiftemoment ligt, ook
-  // op een klok met millisecondenresolutie.
-  await new Promise(r => setTimeout(r, 5));
+  // op een klok met millisecondenresolutie. De toestand is een volgende kloktik,
+  // niet een gegokte vaste duur.
+  const uitgegevenVoor = Date.now();
+  while (Date.now() <= uitgegevenVoor) {
+    await new Promise(r => setTimeout(r, 1));
+  }
   assert.equal((await api('/api/auth/password', { huidig: 'werk', nieuw: 'werk-nieuw' }, lid.token)).status, 200);
   const oud = await api('/api/supplier/state', {}, werk.token);
   assert.equal(oud.status, 401, 'een afgeleide werk-token overleeft de accountintrekking niet');

@@ -161,12 +161,21 @@ test('Foundation-browser bewaart alleen kamer-id en deelt nooit querycredentials
 
 test('startup houdt verkeer dicht tot de autoritatieve Samen-migratie committe', () => {
   const bron = fs.readFileSync(path.join(__dirname, '..', 'server', 'server.js'), 'utf8');
-  assert.match(bron, /opslagMotorKlaar\(\) && salonMigratieKlaar &&\s*rtfSamenMigratieKlaar/);
+  assert.match(bron, /opslagMotorKlaar\(\) && accounts\.postgresKlaar\(\) &&\s*salonMigratieKlaar && rtfSamenMigratieKlaar && boardingPassMigratieKlaar/);
   const dicht = bron.indexOf('rtfSamenMigratieKlaar = false', bron.indexOf('const startPostgresMetSalon'));
   const migratie = bron.indexOf('samenRtf.migreerAlles()', dicht);
   const open = bron.indexOf('rtfSamenMigratieKlaar = true', migratie);
   assert.ok(dicht >= 0 && migratie > dicht && open > migratie,
     'Samen migreert binnen de pre-ready PostgreSQL-fase en opent pas na haar commit');
-  assert.match(bron, /if \(STORE !== 'postgres'\)[\s\S]*?samenRtf\.migreerAlles\(\)[\s\S]{0,320}rtfSamenMigratieKlaar = true/);
+  const lokaalBegin = bron.lastIndexOf("if (STORE !== 'postgres') {");
+  const lokaalEinde = bron.indexOf('\n}\n\n/* DE TWEE SLOTEN', lokaalBegin);
+  const lokaal = bron.slice(lokaalBegin, lokaalEinde);
+  const rtfMigreer = lokaal.indexOf('kern.samenRtf.migreerAlles()');
+  const rtfOpen = lokaal.indexOf('rtfSamenMigratieKlaar = true', rtfMigreer);
+  const passMigreer = lokaal.indexOf('kern.lucht.migreerBoardingPasses()', rtfOpen);
+  const passOpen = lokaal.indexOf('boardingPassMigratieKlaar = true', passMigreer);
+  assert.ok(lokaalBegin >= 0 && lokaalEinde > lokaalBegin && rtfMigreer >= 0 &&
+    rtfOpen > rtfMigreer && passMigreer > rtfOpen && passOpen > passMigreer,
+  'de lokale pre-ready-tak committeert Samen en boarding-pass in volgorde vóór hij beide open zet');
   assert.match(bron, /startPostgres:\s*startPostgresMetSalon/);
 });

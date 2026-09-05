@@ -207,9 +207,18 @@ test('7. de productiekeuring zegt WAT je mist zonder webhook, en weigert een url
   const doe = (env) => { const f = [], w = []; keur(Object.assign({ NODE_ENV: 'production' }, env), f, w); return { f, w }; };
 
   const leeg = doe({});
-  const wLeeg = leeg.w.filter(x => /ERR_WEBHOOK_URL/.test(x));
-  assert.equal(wLeeg.length, 1, 'precies EEN waarschuwing over de lege uitgang, niet twee op twee plekken');
-  assert.match(wLeeg[0], /ALARM/, 'en hij zegt dat ook het alarm binnen blijft, niet alleen de uitzonderingen');
+  const fLeeg = leeg.f.filter(x => /ERR_WEBHOOK_URL/.test(x));
+  assert.equal(fLeeg.length, 1, 'publieke productie zonder alarmuitgang is precies EEN blokkerende fout');
+  assert.equal(leeg.w.filter(x => /ERR_WEBHOOK_URL/.test(x)).length, 0,
+    'dezelfde ontbrekende uitgang staat niet ook nog als waarschuwing vermeld');
+  assert.match(fLeeg[0], /ALARM/i, 'en hij zegt dat ook het alarm binnen blijft, niet alleen de uitzonderingen');
+
+  /* Alleen de expliciete lokale private-beta mag nog bouwen zonder externe
+     uitgang. Daar blijft de melding een waarschuwing, zodat ook die stand niet
+     stil doet alsof er buiten de doos wordt gealarmeerd. */
+  const beta = doe({ RTG_PRIVATE_BETA: '1', APP_URL: 'http://localhost:3000' });
+  assert.equal(beta.w.filter(x => /ERR_WEBHOOK_URL/.test(x)).length, 1);
+  assert.equal(beta.f.filter(x => /ERR_WEBHOOK_URL/.test(x)).length, 0);
 
   const geweigerd = doe({ ERR_WEBHOOK_URL: 'http://127.0.0.1:9000/hook' });
   const fout = geweigerd.f.filter(x => /ERR_WEBHOOK_URL/.test(x));

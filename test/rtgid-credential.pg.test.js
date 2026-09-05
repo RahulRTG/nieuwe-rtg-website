@@ -42,7 +42,7 @@ test('RTG-iD credentials zijn hash-only en atomair over twee PostgreSQL-instance
         schoon: (v, n) => String(v || '').trim().slice(0, n),
         leeftijdVan() { return null; }, gidsHaal() { return null; },
         async keyVanCodenaam() { return null; },
-        async stapOp() { await new Promise(r => setTimeout(r, 5)); return { status: 200, ok: true }; },
+        async stapOp() { return { status: 200, ok: true }; },
         passkeysVan() { return 0; }, vakbewijsBron() { return {}; }
       }).rtgid;
       const ra = core(a, dataA), rb = core(b, dataB);

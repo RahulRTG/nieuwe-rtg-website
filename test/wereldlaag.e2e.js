@@ -110,8 +110,38 @@ test('RTG Wereld: de schakelaar, de ene feed, en de sprong naar de berichten-app
 
     // 5. het profiel: de lagen staan er, en de zichtbaarheid die je in het
     //    scherm kiest komt ECHT op de server terecht (niet alleen in de select)
+    await page.setViewportSize({ width: 320, height: 720 });
     await page.goto(base + '/apps/wereld.html', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#werelden button', { timeout: 15000 });
+    await page.waitForSelector('body[data-rtg-edge-2-rendered="true"]', { timeout: 15000 });
+    assert.equal(await page.locator('.rtg-edge-chrome').count(), 1,
+      'de wereld heeft exact één Edge-schil');
+    const navmaat = await page.evaluate(() => {
+      const nav = document.querySelector('body > nav.balk[aria-label="Hoofdnavigatie"]');
+      const rand = document.querySelector('.rtg-edge-bottom');
+      const r = nav.getBoundingClientRect(), onder = rand.getBoundingClientRect();
+      const links = [...nav.querySelectorAll('a')].map(a => {
+        const x = a.getBoundingClientRect();
+        return { naam: a.getAttribute('aria-label'), left: x.left, right: x.right,
+          top: x.top, bottom: x.bottom, width: x.width, height: x.height };
+      });
+      return { nav: { left: r.left, right: r.right, top: r.top, bottom: r.bottom,
+        width: r.width, height: r.height, scrollWidth: nav.scrollWidth },
+      onder: { left: onder.left, right: onder.right, top: onder.top, bottom: onder.bottom }, links };
+    });
+    assert.deepEqual(navmaat.links.map(x => x.naam), ['Home', 'Ontdek', 'Chat', 'Activiteit', 'Profiel']);
+    assert.ok(navmaat.nav.left >= navmaat.onder.left && navmaat.nav.right <= navmaat.onder.right + 1,
+      'de vijf wereldkeuzes horen volledig in de ene Edge-onderrand: ' + JSON.stringify(navmaat));
+    assert.ok(navmaat.nav.top >= navmaat.onder.top - 1 && navmaat.nav.bottom <= navmaat.onder.bottom + 1,
+      'de wereldnav vormt geen tweede rij boven of onder Edge: ' + JSON.stringify(navmaat));
+    assert.ok(navmaat.nav.scrollWidth <= navmaat.nav.width + 1,
+      'de wereldnav mag op 320 px niet horizontaal afknippen: ' + JSON.stringify(navmaat));
+    navmaat.links.forEach((x, i) => {
+      assert.ok(x.width >= 24 && x.height >= 24,
+        x.naam + ' heeft op 320 px geen bruikbaar raakvlak: ' + JSON.stringify(x));
+      if (i) assert.ok(navmaat.links[i - 1].right <= x.left + 0.5,
+        'wereldkeuzes overlappen op 320 px: ' + JSON.stringify(navmaat.links));
+    });
     await page.click('#profielTab');
     await page.waitForSelector('.laag .veld select', { timeout: 15000 });
 
@@ -167,6 +197,7 @@ test('RTG Wereld: de schakelaar, de ene feed, en de sprong naar de berichten-app
     }, b);
     await page2.goto(base + '/apps/wereld.html', { waitUntil: 'domcontentloaded' });
     await page2.waitForSelector('#werelden button', { timeout: 15000 });
+    await page2.waitForSelector('body[data-rtg-edge-2-rendered="true"]', { timeout: 15000 });
     assert.match(await page2.locator('#passport').innerText(), /Signature/i,
       'Lifestyle hoort als Signature in het member passport te staan');
     assert.equal(await page2.locator('#lenzen [aria-disabled="true"]').count(), 0,

@@ -43,6 +43,10 @@ body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="fo
 body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="focus"] .rtg-edge-bottom{transform:translateY(101%)!important;visibility:hidden;pointer-events:none}
 body.rtg-edge-host[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="compact"]{padding-top:0!important;padding-left:0!important;padding-bottom:calc(var(--edge-bottom) + env(safe-area-inset-bottom,0px))!important}
 body.rtg-edge-host[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="focus"]{padding:0!important}
+/* De ruimtelijke werktafel ligt zelf fixed en volgt daarom niet de body-inset.
+   Laat haar exact dezelfde zichtbare randen volgen wanneer Edge inklapt. */
+body.rtg-edge-workspace[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="compact"] .rtg-werkruimte{inset:0 0 calc(var(--edge-bottom) + env(safe-area-inset-bottom,0px)) 0!important}
+body.rtg-edge-workspace[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="focus"] .rtg-werkruimte{inset:0!important}
 
 /* Een zichtbaar modaal venster is tijdelijk het hele werkvlak. Het bestaande
    Edge-casco trekt daarvoor weg en komt na sluiten in exact zijn vorige stand
@@ -97,6 +101,47 @@ body[data-rtg-edge-2-rendered="true"] #osMenuBtn,
 body[data-rtg-edge-2-rendered="true"] .amn-zweef{display:none!important}
 body[data-rtg-edge-2-rendered="true"][data-ios]{--ios-thuis-ruimte:0px!important}
 
+/* WerkOS bouwt zijn echte tabknoppen dynamisch. In een Edge-scherm liggen die
+   knoppen IN de actieruimte van dezelfde onderrand: geen tweede zwevende balk,
+   geen gekloonde handlers en geen onbereikbare tab onder een Edge-knop. */
+body[data-rtg-edge-2-rendered="true"]:is(.wos-aan,.wos-bord-aan):has(>.wos-dock) .rtg-edge-action{pointer-events:none;padding:0!important}
+body[data-rtg-edge-2-rendered="true"]:is(.wos-aan,.wos-bord-aan):has(>.wos-dock) .rtg-edge-action::before,
+body[data-rtg-edge-2-rendered="true"]:is(.wos-aan,.wos-bord-aan):has(>.wos-dock) .rtg-edge-action>button{display:none!important}
+body[data-rtg-edge-2-rendered="true"]>.wos-dock{
+  z-index:8801!important;left:calc(var(--edge-side) + 154px)!important;right:68px!important;
+  bottom:env(safe-area-inset-bottom,0px)!important;width:auto!important;max-width:none!important;
+  height:var(--edge-bottom)!important;transform:none!important;justify-content:center!important;
+  overflow-x:auto!important;overflow-y:hidden!important;border:0!important;background:transparent!important;
+  box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important
+}
+body[data-rtg-edge-2-rendered="true"]>.wos-dock button{flex:0 1 48px;min-width:24px;height:var(--edge-bottom)!important;pointer-events:auto}
+
+/* RTG Wereld heeft vijf echte, reeds gebonden hoofdkeuzes. Zij delen de
+   actieruimte van de ene Edge-onderrand; de oorspronkelijke nav blijft dus de
+   eigenaar van links, focus en aria-current, zonder een tweede balk of kloon. */
+body[data-rtg-edge-2-rendered="true"]:has(>nav.balk[aria-label="Hoofdnavigatie"]) .rtg-edge-action{pointer-events:none;padding:0!important}
+body[data-rtg-edge-2-rendered="true"]:has(>nav.balk[aria-label="Hoofdnavigatie"]) .rtg-edge-action::before,
+body[data-rtg-edge-2-rendered="true"]:has(>nav.balk[aria-label="Hoofdnavigatie"]) .rtg-edge-action>button{display:none!important}
+body[data-rtg-edge-2-rendered="true"]>nav.balk[aria-label="Hoofdnavigatie"]{
+  z-index:8801!important;top:auto!important;left:calc(var(--edge-side) + 154px)!important;right:68px!important;
+  bottom:env(safe-area-inset-bottom,0px)!important;width:auto!important;max-width:none!important;
+  height:var(--edge-bottom)!important;padding:0!important;transform:none!important;
+  overflow:hidden!important;border:0!important;background:transparent!important;
+  box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important
+}
+body[data-rtg-edge-2-rendered="true"]>nav.balk[aria-label="Hoofdnavigatie"] a{
+  min-width:24px;height:var(--edge-bottom)!important;padding:3px 2px!important;pointer-events:auto
+}
+
+/* Focus en een modaal werkvlak trekken ook app-eigen bediening mee. Anders
+   zou de Edge-rand verdwijnen terwijl precies dezelfde balk erbuiten bleef. */
+body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="focus"]>.wos-dock,
+body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="focus"]>nav.balk[aria-label="Hoofdnavigatie"],
+body[data-rtg-edge-2-rendered="true"][data-rtg-edge-venster-open="true"]>.wos-dock,
+body[data-rtg-edge-2-rendered="true"][data-rtg-edge-venster-open="true"]>nav.balk[aria-label="Hoofdnavigatie"]{
+  transform:translateY(101%)!important;visibility:hidden!important;pointer-events:none!important
+}
+
 body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="living-bank"] .schil{grid-template-columns:1fr!important;grid-template-rows:1fr!important}
 body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="living-bank"] .schil>.werk{grid-column:1!important}
 body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="world-shell"][data-ws]{--ws-ruimte:0px!important;--ws-eigen:0px!important}
@@ -111,12 +156,58 @@ body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="work-bank"]>.rtg
 @media(max-width:767px){
   body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"] .rtg-edge-side{display:none!important}
   body.rtg-edge-host[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="overview"]{padding-left:0!important}
+  body.rtg-edge-workspace[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="overview"] .rtg-werkruimte{left:0!important}
+  body[data-rtg-edge-2-rendered="true"]>.wos-dock{left:calc(var(--edge-side) + 99px)!important;right:58px!important}
+  /* Op een telefoon vervangt de wereldnav de dubbele Edge-home, maar behoudt
+     zij menu, terug/vooruit en Rahul. Zo krijgen de vijf keuzes samen ook op
+     320 px echte raakruimte binnen dezelfde enkele onderrand. */
+  body[data-rtg-edge-2-rendered="true"]:has(>nav.balk[aria-label="Hoofdnavigatie"]) .rtg-edge-bottom{
+    grid-template-columns:var(--edge-side) 59px minmax(0,1fr) 58px!important
+  }
+  body[data-rtg-edge-2-rendered="true"]:has(>nav.balk[aria-label="Hoofdnavigatie"]) .rtg-edge-bottom>a{
+    display:none!important
+  }
+  body[data-rtg-edge-2-rendered="true"]>nav.balk[aria-label="Hoofdnavigatie"]{
+    left:calc(var(--edge-side) + 59px)!important;right:58px!important;
+    display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr));overflow:hidden!important
+  }
+  body[data-rtg-edge-2-rendered="true"]>nav.balk[aria-label="Hoofdnavigatie"] a{
+    min-width:0!important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.5rem!important
+  }
   .rtg-edge-2-context{left:0}
   .rtg-edge-2-context-button span{display:none}
   .rtg-edge-2-context-button{width:36px;padding:0!important}
   .rtg-edge-2-context-button::before{content:"+";font-size:14px}
   .rtg-edge-2-context-slot{padding:6px}
   body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="work-bank"][data-rtg-edge-2-state="overview"]>.wk-shell{left:0!important}
+}
+@media(max-width:340px){
+  /* De toegankelijke naam blijft op de link; alleen het herhaalde tekstlabel
+     wijkt op het allerkleinste scherm voor het herkenningsteken. */
+  body[data-rtg-edge-2-rendered="true"]>nav.balk[aria-label="Hoofdnavigatie"] a{font-size:0!important}
+  body[data-rtg-edge-2-rendered="true"]>nav.balk[aria-label="Hoofdnavigatie"] a span{font-size:.9rem!important}
+  /* Vandaag heeft naast Context en de hoofdactie ook de echte Experience-
+     ingang. Op 320 px passen die alleen eerlijk als decoratie wijkt en de
+     tekstuele hoofdactie tot een pijl comprimeert; de toegankelijke naam blijft
+     de volledige knoptekst. Alle drie houden minimaal 24 px raakruimte. */
+  body[data-rtg-world="living"][data-rtg-edge-2-rendered="true"] .rtg-edge-action:has(>.xp-trigger){
+    gap:2px!important;padding:0 2px!important
+  }
+  body[data-rtg-world="living"][data-rtg-edge-2-rendered="true"] .rtg-edge-action:has(>.xp-trigger)::before{
+    display:none!important
+  }
+  body[data-rtg-world="living"][data-rtg-edge-2-rendered="true"] .rtg-edge-action>.rtg-edge-2-context-button{
+    width:28px!important;min-width:28px!important;padding:0!important
+  }
+  body[data-rtg-world="living"][data-rtg-edge-2-rendered="true"] .rtg-edge-action>button:not(.rtg-edge-2-context-button):not(.xp-trigger){
+    width:24px!important;min-width:24px!important;max-width:24px!important;font-size:0!important
+  }
+  body[data-rtg-world="living"][data-rtg-edge-2-rendered="true"] .rtg-edge-action>button:not(.rtg-edge-2-context-button):not(.xp-trigger)::after{
+    content:"\2192";font-size:14px!important
+  }
+  body[data-rtg-world="living"][data-rtg-edge-2-rendered="true"] .rtg-edge-action>.xp-trigger{
+    width:32px!important;min-width:32px!important;height:32px!important
+  }
 }
 @media(prefers-reduced-motion:reduce){
   body[data-rtg-edge-2] .rtg-edge-top,body[data-rtg-edge-2] .rtg-edge-side,body[data-rtg-edge-2] .rtg-edge-bottom{transition:none!important}

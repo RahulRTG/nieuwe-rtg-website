@@ -60,6 +60,7 @@ module.exports = {
 
   'POST /api/podium/mijn': { leest: true },           // podiumMijn
   'POST /api/pakket/typen': { leest: true },          // een vaste lijst bedrijfstypen
+  'POST /api/supplier/notifications': { leest: true }, // eerste vulling van de bel voor de sessiezaak
 
   /* De exports. Alle vier zijn POST met het token in de kop en niet in de
      querystring -- de reden staat bij de routes zelf. Ze schrijven een CSV of

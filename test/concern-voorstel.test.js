@@ -116,14 +116,15 @@ test('de bewijsstap houdt een gereguleerd genre tegen tot een mens tekent', () =
   const db = { data: { suppliers: [] } };
   const M = B({ db, save: () => {}, nu: () => '2026-08-11T00:00:00Z',
     kap: (v, n) => String(v == null ? '' : v).trim().slice(0, n),
-    /* De nep-accounts gaf alleen createStaffSync terug. Toen provisioneer()
-       ging PINnen met de huisfunctie in plaats van met Math.random(), viel deze
-       toets om op "accounts.makePin is not a function" -- niet omdat het
-       product stuk was, maar omdat de dubbelganger een functie miste die het
-       echte object wel heeft. Daarom komt makePin hier uit de ECHTE module: een
-       dubbelganger die zelf een PIN verzint, bewijst niets over de PIN die de
-       eigenaar krijgt. */
-    accounts: { createStaffSync: () => ({ id: 1 }), makePin: require('../server/accounts/staff').makePin } });
+    /* Ook deze bewijsproef gebruikt de huidige productie-identiteit: de zaak
+       wordt aan een actief persoonlijk RTG-account gekoppeld, niet aan een
+       nagebootste legacy-PIN. De proef gaat over de bewijspoort, maar mag de
+       identiteitsgrens daarachter niet per ongeluk omzeilen. */
+    accounts: {
+      getUserById: id => ({ id, tier: 'rtg' }),
+      isActief: () => true,
+      createAccountStaff: () => ({ id: 1 })
+    } });
 
   /* De acht bewijs-genres zijn nu aanvraagbaar -- dat is het punt van deze
      ronde. Zou de poort hieronder niet werken, dan is dat openzetten juist de
@@ -131,7 +132,7 @@ test('de bewijsstap houdt een gereguleerd genre tegen tot een mens tekent', () =
   assert.ok(register.aanvraagbareGenres().includes('apotheek'),
     'een apotheek hoort aangevraagd te kunnen worden');
 
-  const a = { naam: 'Zorgzaam' };
+  const a = { naam: 'Zorgzaam', accountId: 1 };
   assert.equal(M.zetBedrijf(a, { naam: 'Apotheek Noord', type: 'apotheek' }).ok, true);
   assert.equal(a.bedrijf.bewijsNodig, true, 'de eis hoort op de aanmelding te staan');
 
@@ -150,7 +151,7 @@ test('de bewijsstap houdt een gereguleerd genre tegen tot een mens tekent', () =
   assert.ok(z && z.code, 'na aftekenen hoort de zaak gewoon klaargezet te worden');
 
   // en een gewoon genre loopt precies zoals altijd
-  const b2 = { naam: 'Vidal' };
+  const b2 = { naam: 'Vidal', accountId: 2 };
   M.zetBedrijf(b2, { naam: 'Cafe Vidal', type: 'restaurant' });
   assert.equal(b2.bedrijf.bewijsNodig, undefined, 'een restaurant hoort geen bewijsvraag te krijgen');
   assert.ok(M.provisioneer(b2).code, 'en meteen te kunnen draaien');

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1700 bestanden en 12019 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1701 bestanden en 12014 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1700 |
-| losse beweringen (`test(...)`) | 12019 |
+| toetsbestanden | 1701 |
+| losse beweringen (`test(...)`) | 12014 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 99 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1042 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 50 |
 | alleen in de kop *genoemd*, nog niet gemeten | 181 |
-| niets van beide | 427 |
+| niets van beide | 428 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1496 bestanden, 11664 beweringen.
+1496 bestanden, 11658 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -787,7 +787,7 @@ toets omvalt.
 | `metingen.test.js` | 9 | gezakt op `liegpoort /api/` | De dagmetingen (kern/metingen.js): slaap, beweging en water, zelf ingevuld. Wat hier bewezen wordt: een dag heeft EEN waarde en geen stapel, het beeld zegt over hoeveel dagen het gaat (een gemiddelde over een enkele... |
 | `metingpoort.test.js` | 9 | gezakt op `liegpoort /api/` | DE DEUR VOOR /api/metrics, van drie kanten. WAAROM DIT BESTAND ER MOEST KOMEN. |
 | `metingtenant.test.js` | 5 | gezakt op `>=->>#0` | DE METING DIE EEN TENANT DRAAGT -- en de vier dingen die hem eerlijk houden. BESTUUR.md par. |
-| `middleware.test.js` | 16 | gezakt op `!==->===#0` | De poortwachters die voor alle routers hangen (server/middleware/). Waarom deze test bestaat: bij het uit elkaar halen van server.js bleek de voordeur zijn scriptbeveiliging te missen. |
+| `middleware.test.js` | 18 | gezakt op `!==->===#0` | De poortwachters die voor alle routers hangen (server/middleware/). Waarom deze test bestaat: bij het uit elkaar halen van server.js bleek een interne pagina-herschrijving zijn scriptbeveiliging te kunnen missen. |
 | `migratierace.test.js` | 5 | gezakt op `getal+1#0` | TWEE PROCESSEN DIE TEGELIJK MIGREREN, EN ALLEBEI KOMEN ZE OP. WAAROM DIT BESTAAT. |
 | `migraties.test.js` | 9 | gezakt op `&&->||#0` | Schemamigraties: genummerd, precies een keer, en met een weigering om te starten op een database die nieuwer is dan de code. |
 | `mijnrtg-routes.test.js` | 12 | gezakt op `liegpoort /api/` | MIJN RTG: ELF ROUTES VAN DE IDENTITEITSLAAG DIE GEEN TOETS OVER DE DRAAD HADDEN. Toestelbinding (server/routes/member/toestellen.js), de tweede factor en de commerciele post (server/routes/member/tweefactor.js)... |
@@ -1099,7 +1099,7 @@ toets omvalt.
 | `rtfwelzijn.test.js` | 3 | gezakt op `liegpoort /api/` | RTF-golf 6 (deel 1): het gevoelsdagboek. Opt-in (de server bewaart alleen wat het kind zelf instuurt), prive per profiel (ook dicht voor gasten), een woord per dag (vandaag herzien mag, gisteren blijft staan), en... |
 | `rtfwelzijn2.test.js` | 3 | gezakt op `liegpoort /api/` | RTF-golf 6 (deel 2): de nieuwe coach-soorten voor de welzijnsapps. Zonder AI-sleutel geeft elke soort zijn EIGEN warme demotekst (de knop werkt dus altijd), een onbekende soort valt veilig terug, en de... |
 | `rtg-a11y.test.js` | 8 | -- | DE TOEGANKELIJKHEIDSADAPTER -- leest hij de keuring werkelijk goed uit? scripts/rtg-a11y.js voegt geen regels toe: hij richt de bestaande machinerie (scripts/a11ykeuring.js en scripts/raakvlakkeuring.js) op een... |
-| `rtg-edge-2-pilots.test.js` | 13 | -- | De eerste acht Vandaag-routes sluiten declaratief aan op Edge 2, terwijl het bestaande Edge-casco de enige eigenaar van top, side en bottom blijft. Deze toets bewaakt de routecontexten, de centrale loaderhandshake en... |
+| `rtg-edge-2-pilots.test.js` | 14 | -- | De eerste acht Vandaag-routes sluiten declaratief aan op Edge 2, terwijl het bestaande Edge-casco de enige eigenaar van top, side en bottom blijft. Deze toets bewaakt de routecontexten, de centrale loaderhandshake en... |
 | `rtg-edge-2.test.js` | 12 | -- | Edge 2.0 bestuurt het bestaande casco. Deze toets borgt dat er geen tweede balkenstelsel, netwerklaag of onbegrensde contextselectie ontstaat. |
 | `rtg.test.js` | 11 | genoemd | HET GEREEDSCHAP -- rtg new, check, dev en sdk. De belofte van dit gereedschap is niet "het draait" maar iets scherpers: het bouwt niets na**. |
 | `rtgai.test.js` | 4 | gezakt op `liegpoort /api/` | De RTG AI van het RTG Kantoor: leest mee, traint zichzelf, meldt zich klaar, en krijgt het roer ALLEEN via de knop; daarna draait het routinewerk automatisch door en de terug-knop werkt. |
@@ -1384,8 +1384,8 @@ toets omvalt.
 | `vakpro2.test.js` | 4 | gezakt op `liegpoort /api/` | Vakwerk Pro, laag 2: team-capaciteit (overlappende boekingen tot het aantal vaklieden), vaste afspraken (ritmes die de volgende afspraak inplannen, door beide kanten te stoppen), de wachtlijst met automatisch seintje... |
 | `vakwerk-pro.test.js` | 6 | gezakt op `liegpoort /api/` | DE PRO-LAAG VAN EEN VAKZAAK -- 5 endpoints, met een zaak die niet bestond. vak/offerte/weiger, vak/wachtlijst/uitnodig, vak/ritme/stop, vak/uren en vak/onderhoud/herinner stonden als nooit aangeroepen in de... |
 | `vakwerk.test.js` | 7 | gezakt op `liegpoort /api/` | Vakwerk: het slimme dashboard voor de dienstverlenende genres (zzp, chef, wellness). Zelfde aanbod-/boekingsmodel als voorheen, maar met een vandaag-bord, de aanvragen die op bevestiging wachten, het aanbod met... |
-| `vandaag-luxe.test.js` | 15 | -- | DE VIER VANDAAG-STARTS DELEN EEN LUXELAAG ZONDER HUN WERELDDATA TE VERMENGEN. Deze toets borgt de canonieke routes, de fotografische uitsnedes, de eerlijke datastaten en de visuele huisregels. |
-| `vandaag-surface-pilots.test.js` | 7 | -- | De eerste subschermen gebruiken dezelfde luxeschil, maar alleen nadat hun bestaande route veilig is opgelost. Deze toets borgt de twee pilotdeuren; businessdata en autorisatie blijven bij de bestaande apps. |
+| `vandaag-luxe.test.js` | 8 | -- | De vier wereldhomes zijn hun eigen luxe dashboard. De gedeelde laag annoteert uitsluitend de oorspronkelijke main en maakt geen tweede UI. |
+| `vandaag-surface-pilots.test.js` | 5 | -- | Subroutes houden het wereldpalet, maar krijgen geen cover of tweede chrome. |
 | `vastgoed-keyless-productie.test.js` | 4 | genoemd | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `vastgoed.test.js` | 6 | gezakt op `liegpoort /api/` | Vastgoed: de makelaar biedt panden aan GERICHTE leden aan (of publiek), leden tonen interesse (bezichtiging) en doen een bod, de makelaar bevestigt met keyless toegang die alleen binnen het venster werkt, en... |
 | `vastleggen.test.js` | 6 | gezakt op `liegpoort /api/` | De derde herkomst: een behandelaar die iets vastlegt (kern/care/vastleggen.js). Dit is de eerste laag waarin iemand ANDERS dan het lid in het dossier van dat lid schrijft, en daarom staan hier vooral de grenzen: -... |
@@ -1536,7 +1536,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-204 bestanden, 355 beweringen.
+205 bestanden, 356 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1740,6 +1740,7 @@ toets omvalt.
 | `werkstatus.e2e.js` | 1 | gezakt op `===->!==#0` | DE ORGANISATIESTAND OP EEN ECHT SCHERM -- en vooral wat er NIET staat. De bewijspoort (kern/tenant/bewijs.js) maakte van elke enterprisebewering een object met een bron of een reden. |
 | `werktafel.e2e.js` | 4 | genoemd | DE WERKTAFEL: wanneer hij er WEL mag staan, en wanneer niet. Deze toets bestaat om twee fouten die alleen op een breed venster bestonden, en die daarom niemand zag: de app wordt op een telefoon ontwikkeld en op een... |
 | `winkel-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | DE WINKEL VAN DE RTFOUNDATION (/apps/foundation/winkel.html) IN EEN ECHTE BROWSER. kern/rtfos/winkel.js draagt vier grendels en test/rtfos-gift-ruil-routes.test.js beproeft ze over de draad: geen voorraad geen... |
+| `world-dashboard.e2e.js` | 1 | -- | DE VIER WERELDHOMES ZIJN HUN EIGEN DASHBOARD. Deze proef bewaakt de grens die bij de nieuwe schil het makkelijkst weer vervaagt: de gedeelde laag mag de echte Living-, Work-, Travel- en Foundation-DOM alleen opmaken. |
 | `zaakpay.e2e.js` | 2 | genoemd | Schermtoets voor RTG Pay aan de ZAAKKANT (public/apps/zaakpay.html). Dit scherm bestond niet. |
 | `zaakregie.e2e.js` | 2 | -- | Schermtoets voor de Regie van de zaak: hetzelfde scherm hangt in de zaak-app (leverancier.html, breed) en in de personeels-PDA (personeel.html, duimstand), en beide moeten opkomen zonder onopgevangen JS-fouten.... |
 | `zaal.e2e.js` | 1 | -- | Scherm-test voor de hele keten van deze ronde: een LIED laten neerzetten met een eigen zin erin, het samen produceren, uitgeven, en het in DE ZAAL horen. De zwaarste bewering die hier op het scherm getoetst wordt: de... |

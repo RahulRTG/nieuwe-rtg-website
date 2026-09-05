@@ -191,7 +191,7 @@ omlaag.
 
 ## `apps/foundation/samen.js`
 
-`public/apps/foundation/samen/` -- 3 delen, 224 regels in de delen, waarvan 1 zonder onderwerp
+`public/apps/foundation/samen/` -- 3 delen, 225 regels in de delen, waarvan 1 zonder onderwerp
 
 | deel | onderwerp |
 |---|---|
@@ -212,7 +212,7 @@ omlaag.
 
 ## `apps/leverancier.js`
 
-`public/apps/leverancier/` -- 113 delen, 9677 regels in de delen, waarvan 1 zonder onderwerp
+`public/apps/leverancier/` -- 113 delen, 9678 regels in de delen, waarvan 1 zonder onderwerp
 
 | deel | onderwerp |
 |---|---|
@@ -750,7 +750,7 @@ omlaag.
 
 ## `shared/metgezel.js`
 
-`public/shared/metgezel/` -- 8 delen, 798 regels in de delen, waarvan 1 zonder onderwerp
+`public/shared/metgezel/` -- 8 delen, 799 regels in de delen, waarvan 1 zonder onderwerp
 
 | deel | onderwerp |
 |---|---|

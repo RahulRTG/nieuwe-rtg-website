@@ -80,20 +80,67 @@ async function opstelling() {
   return { browser, page };
 }
 
-// Eén scherm bezoeken met een schone kantoorsleutel, en teruggeven wat er staat.
+/* Eén scherm bezoeken met een schone kantoorsleutel, en teruggeven wat er staat.
+
+   HIJ CONTROLEERT NU EERST OF HIJ ER IS AANGEKOMEN, en dat is geen extra
+   voorzichtigheid maar een reparatie van een echte misrekening.
+
+   Wat er gebeurde: de navigatie naar het eerste scherm mislukte (de `catch`
+   hieronder slikte dat in), waarna deze functie de pagina las die er NOG stond
+   -- /apps/app.html, van alsLid(). Die pagina heeft geen `.kg`, dus `deur` was
+   null, en de lus eronder schreef dat op als "concierge: vraagt geen code". Dat
+   is een aanklacht tegen een scherm dat het gewoon goed doet: in een echte
+   browser toont /apps/concierge.html zonder enig token keurig "Welkom bij de
+   RTG-Backoffice. Wat is de kantoorcode?".
+
+   Een mislukte METING mag nooit als een bevinding over het ONDERWERP langskomen
+   -- dat is dezelfde regel als in TIKKEN.md ("niet gemeten mag nooit als in orde
+   langskomen"), hier alleen andersom: niet gemeten kwam langs als "fout". Het
+   kost een halve dag om een gat te zoeken dat er niet is, en het ergere is dat
+   het omgekeerde net zo goed kon gebeuren: was app.html toevallig een pagina
+   MET een `.kg` geweest, dan had deze toets een echt lek groen gekeurd.
+
+   Vandaar `geland`. De aanroeper hoort daarop te splitsen; hij mag hier niet
+   stilzwijgend doorlezen. De navigatiefout zelf gaat mee terug in `waarom`,
+   zodat de melding zegt wat er misging in plaats van wie het gedaan zou hebben. */
 async function bezoek(page, base, app) {
+  const doel = '/apps/' + app + '.html';
   await page.evaluate(() => { try { localStorage.removeItem('rtg_office_token'); } catch (e) {} });
-  try { await page.goto(base + '/apps/' + app + '.html', { waitUntil: 'domcontentloaded' }); }
-  catch (e) { /* een meta-refresh breekt de navigatie af; de tekst lezen we hierna */ }
-  await wachtOpRust(page).catch(() => {});
-  return page.evaluate(() => {
-    const zegt = document.querySelector('.kg .kg-zegt');
-    return {
-      pad: location.pathname,
-      deur: zegt ? zegt.textContent.replace(/\s+/g, ' ').trim() : null,
-      tekst: document.body.innerText.replace(/\s+/g, ' ').trim()
-    };
-  });
+  let waarom = null, r = null;
+  /* TWEE POGINGEN, en de tweede is geen wegkijken. Een navigatie die afbreekt is
+     hier geen uitspraak over het scherm maar over de sprong ernaartoe -- op een
+     runner met vier scherven tegelijk is dat een koude start of een afgebroken
+     load. Een keer opnieuw beantwoordt de vraag alsnog; blijft hij hangen, dan
+     is dat GEEN "vraagt geen code" maar een mislukte meting, en die wordt
+     hieronder apart gemeld. Niet in een lus: als de tweede sprong ook strandt,
+     is er iets anders aan de hand dan drukte, en dan hoort een mens te kijken. */
+  for (let poging = 1; poging <= 2; poging += 1) {
+    waarom = null;
+    try { await page.goto(base + doel, { waitUntil: 'domcontentloaded' }); }
+    catch (e) { waarom = String((e && e.message) || e).split('\n')[0].slice(0, 120); }
+    await wachtOpRust(page).catch(() => {});
+    r = await page.evaluate(() => {
+      const zegt = document.querySelector('.kg .kg-zegt');
+      return {
+        pad: location.pathname,
+        deur: zegt ? zegt.textContent.replace(/\s+/g, ' ').trim() : null,
+        tekst: document.body.innerText.replace(/\s+/g, ' ').trim()
+      };
+    });
+    if (r.pad === doel) break;
+  }
+  /* Een meta-refresh MAG het pad verzetten -- dat is de pagina die iets doet, en
+     geen mislukte meting. Daarom telt alleen of we op het gevraagde scherm zijn
+     beland; waar we anders zijn, staat in de melding. */
+  return Object.assign(r, { geland: r.pad === doel, doel, waarom });
+}
+
+/* De drie lussen stellen dezelfde vraag over een andere sleutelbos. Wat ze
+   moeten SPLITSEN is ook drie keer hetzelfde, dus staat het hier één keer. */
+function nietGemeten(r) {
+  return r.doel + ': niet gemeten -- de browser kwam uit op ' + r.pad +
+    (r.waarom ? ' (' + r.waarom + ')' : '') +
+    '. Dit zegt niets over dat scherm; het zegt dat deze meting niet is gelukt.';
 }
 
 // De sleutel van dit toestel zetten (of weghalen met null).
@@ -152,31 +199,37 @@ test('de eigenaar komt op elk kantoorscherm binnen met zijn eigen RTG-account ('
 
     // 1) met de kantoorsleutel: geen vraag, en het scherm staat er echt
     await alsLid(o.page, base, eigenaar);
-    const dicht = [];
+    const dicht = [], mis1 = [];
     for (const s of SCHERMEN) {
       const r = await bezoek(o.page, base, s.app);
+      if (!r.geland) { mis1.push(nietGemeten(r)); continue; }
       if (vraagtCode(r.deur)) { dicht.push(s.app + ': vraagt de kantoorcode aan de eigenaar'); continue; }
       if (!s.open.test(r.tekst)) dicht.push(s.app + ': niet open -- ' + r.tekst.slice(0, 140));
     }
+    assert.deepEqual(mis1, [], 'deze schermen zijn niet bezocht, dus er is niets over te zeggen:\n  ' + mis1.join('\n  '));
     assert.deepEqual(dicht, [], 'de eigenaar hoort overal binnen te komen zonder code:\n  ' + dicht.join('\n  '));
 
     /* 2) zonder lid-token: de code, en niets anders. Zou een scherm hier
        opengaan, dan had de deur iets weggegeven aan wie geen sleutel heeft. */
     await alsLid(o.page, base, null);
-    const lek = [];
+    const lek = [], mis = [];
     for (const s of SCHERMEN) {
       const r = await bezoek(o.page, base, s.app);
+      if (!r.geland) { mis.push(nietGemeten(r)); continue; }
       if (!vraagtCode(r.deur)) lek.push(s.app + ': vraagt geen code -- ' + (r.deur || r.tekst.slice(0, 140)));
     }
+    assert.deepEqual(mis, [], 'deze schermen zijn niet bezocht, dus er is niets over te zeggen:\n  ' + mis.join('\n  '));
     assert.deepEqual(lek, [], 'zonder sleutel hoort elk scherm de kantoorcode te vragen:\n  ' + lek.join('\n  '));
 
     // 3) een lid ZONDER kantoorsleutel: ook gewoon de code
     await alsLid(o.page, base, lid);
-    const lek2 = [];
+    const lek2 = [], mis2 = [];
     for (const s of SCHERMEN) {
       const r = await bezoek(o.page, base, s.app);
+      if (!r.geland) { mis2.push(nietGemeten(r)); continue; }
       if (!vraagtCode(r.deur)) lek2.push(s.app + ': vraagt geen code -- ' + (r.deur || r.tekst.slice(0, 140)));
     }
+    assert.deepEqual(mis2, [], 'deze schermen zijn niet bezocht, dus er is niets over te zeggen:\n  ' + mis2.join('\n  '));
     assert.deepEqual(lek2, [], 'een lid zonder kantoorsleutel hoort de kantoorcode te krijgen:\n  ' + lek2.join('\n  '));
   } finally {
     if (browser) await browser.close();

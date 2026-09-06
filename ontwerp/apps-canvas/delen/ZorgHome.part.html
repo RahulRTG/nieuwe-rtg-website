@@ -1,0 +1,165 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Inter:wght@300;400;500;600&display=swap">
+  <style>
+<!--STIJL-->
+  .hero{position:relative;height:322px;flex:0 0 322px;overflow:hidden;color:#F7F3EA;}
+  .hero .merk{color:#E8D3A0;}
+  .hero .cap.goud{color:#E8D3A0;}
+  .hero .ikoon{color:#F7F3EA;}
+  .hero .rond{border-color:transparent;}
+  .hero .avatar{border-color:#E8D3A0;}
+  .hero .wereld{color:#F7F3EA;}
+  .hero .tekst{position:absolute;left:18px;right:104px;bottom:22px;}
+  .hero h1{margin:0;font-size:36px;line-height:1.06;color:#FFFBF4;}
+  .hero p{margin:0;font-size:12.5px;line-height:1.6;color:rgba(247,243,234,.9);}
+  .hero .streep{background:#E8D3A0;}
+  .hero .pil{margin-top:17px;box-shadow:0 8px 22px rgba(127,22,52,.45);}
+
+  .tegels{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--lijn);
+    border-bottom:1px solid var(--lijn);}
+  .tegel{background:var(--vlak-hoog);padding:14px 6px 12px;display:flex;flex-direction:column;
+    align-items:center;gap:8px;text-align:center;min-height:92px;}
+  .tegel span{font-size:10.5px;line-height:1.35;color:var(--gedempt);}
+
+  .sectiekop{display:flex;align-items:baseline;padding:18px 18px 10px;}
+  .sectiekop h2{margin:0;font-size:24px;color:var(--inkt);}
+  .sectiekop .meer{margin-left:auto;font-size:12.5px;color:var(--bordeaux);display:flex;
+    align-items:center;gap:5px;}
+
+  .agenda{border-top:1px solid var(--lijn);}
+  .arij{display:flex;align-items:center;gap:12px;padding:11px 18px;min-height:58px;
+    border-bottom:1px solid var(--lijn);background:var(--vlak);}
+  .arij .tijd{font-variant-numeric:tabular-nums;font-size:13px;color:var(--gedempt);min-width:40px;}
+  .arij .nm{font-size:14px;font-weight:600;color:var(--inkt);}
+  .arij .wie{font-size:11.5px;color:var(--zacht);margin-top:2px;}
+  .arij .st{font-size:11px;color:var(--zacht);margin-top:2px;}
+  .arij .pijl{margin-left:auto;color:var(--zacht);}
+
+  .promo{display:flex;gap:13px;align-items:center;margin:14px 14px 0;padding:11px;
+    border-radius:var(--rk);border:1px solid var(--lijn);background:var(--vlak);}
+  .promo .bd{width:92px;height:66px;flex:0 0 92px;border-radius:8px;overflow:hidden;position:relative;}
+  .promo h3{margin:0;font-size:17px;line-height:1.15;color:var(--inkt);}
+  .promo p{margin:5px 0 0;font-size:11.5px;line-height:1.5;color:var(--zacht);}
+  .promo .gaan{margin-left:auto;width:34px;height:34px;border-radius:50%;flex:0 0 34px;
+    border:1px solid var(--lijn-goud);display:flex;align-items:center;justify-content:center;
+    color:var(--goud-donker);}
+  </style>
+</helmet>
+
+<div class="fon licht" style="width:390px;height:844px;--r:{{r}}px;--rk:{{rk}}px">
+
+  <section class="hero">
+    <div class="foto" style="position:absolute;inset:0">
+      <i class="warm"></i><i class="huid"></i>
+      <i style="background:linear-gradient(180deg,rgba(20,12,8,.62) 0%,rgba(20,12,8,.08) 38%,rgba(20,12,8,.82) 100%)"></i>
+    </div>
+    <header class="balk" style="position:relative">
+      <div>
+        <div class="merk">RTG</div>
+        <div class="cap goud" style="margin-top:3px">Zorg · Thuis · Samen</div>
+      </div>
+      <div class="wereld" style="margin-left:8px">LivingOS
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9l6 6 6-6"/></svg>
+      </div>
+      <div class="rond ikoon" style="margin-left:auto">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>
+      </div>
+      <div class="rond ikoon" style="position:relative">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 9a6 6 0 1112 0c0 4 1.5 5.5 1.5 5.5h-15S6 13 6 9zM10 19a2 2 0 004 0"/></svg>
+        <i style="position:absolute;right:4px;top:4px;width:6px;height:6px;border-radius:50%;background:#C23A5E"></i>
+      </div>
+      <div class="avatar"></div>
+    </header>
+
+    <div class="tekst">
+      <h1 class="serif">Zorg voor een<br>mooier morgen.</h1>
+      <div class="streep"></div>
+      <p>Betrouwbare zorg. Gewoon thuis.<br>Met de aandacht die telt.</p>
+      <button type="button" class="pil">Nieuwe aanvraag
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h15M13 6l6 6-6 6"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <div class="tegels">
+    <div class="tegel">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#745718" stroke-width="1.5"><path d="M4 11l8-7 8 7v8a1 1 0 01-1 1H5a1 1 0 01-1-1z"/><path d="M10 20v-5h4v5"/></svg>
+      <span>Zorg aan huis</span>
+    </div>
+    <div class="tegel">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#745718" stroke-width="1.5"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5.2 6-5.2s6 1.9 6 5.2M16 5.6a3.2 3.2 0 010 5.8M18 20c0-2.3-.7-3.8-1.9-4.8"/></svg>
+      <span>Persoonlijke begeleiding</span>
+    </div>
+    <div class="tegel">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#745718" stroke-width="1.5"><path d="M15 3l-9 9 3 3 9-9zM6 12l-2 8 8-2M17 4l3 3"/></svg>
+      <span>Huishoudelijke hulp</span>
+    </div>
+    <div class="tegel">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#745718" stroke-width="1.5"><path d="M4 5c0 9 6 15 15 15l2-3.6-4.4-2-2 2A13 13 0 019.6 9l2-2-2-4.4z"/></svg>
+      <span>24/7 ondersteuning</span>
+    </div>
+  </div>
+
+  <div class="sectiekop">
+    <h2 class="serif">Vandaag</h2>
+    <span class="meer">Bekijk agenda
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h15M13 6l6 6-6 6"/></svg>
+    </span>
+  </div>
+
+  <div class="agenda">
+    <div class="arij">
+      <span class="tijd">09:30</span>
+      <span class="stip aan"></span>
+      <span><span class="nm">Medicatieronde</span><div class="wie">Sanne de Vries</div><div class="st" style="color:#2F7D57">Onderweg</div></span>
+      <span class="pijl"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 5l7 7-7 7"/></svg></span>
+    </div>
+    <div class="arij">
+      <span class="tijd">11:00</span>
+      <span class="stip uit"></span>
+      <span><span class="nm">Persoonlijke verzorging</span><div class="wie">Sanne de Vries</div><div class="st">Gepland</div></span>
+      <span class="pijl"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 5l7 7-7 7"/></svg></span>
+    </div>
+    <div class="arij">
+      <span class="tijd">15:00</span>
+      <span class="stip uit"></span>
+      <span><span class="nm">Huishoudelijke hulp</span><div class="wie">Ali Kaya</div><div class="st">Gepland</div></span>
+      <span class="pijl"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 5l7 7-7 7"/></svg></span>
+    </div>
+  </div>
+
+  <div class="promo">
+    <span class="bd foto"><i class="warm"></i><i style="background:linear-gradient(180deg,transparent,rgba(20,12,8,.42))"></i></span>
+    <span>
+      <h3 class="serif">Zelfstandig<br>langer thuis</h3>
+      <p>Hoe RTG LivingOS thuiszorg anders maakt.</p>
+    </span>
+    <span class="gaan"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5l7 7-7 7"/></svg></span>
+  </div>
+
+  <nav class="onderbalk">
+    <button type="button" class="tab aan"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 11l8-7 8 7v8a1 1 0 01-1 1h-4v-6h-6v6H5a1 1 0 01-1-1z"/></svg>Home</button>
+    <button type="button" class="tab"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5.2 6-5.2s6 1.9 6 5.2M16 5.6a3.2 3.2 0 010 5.8"/></svg>Zorg</button>
+    <button type="button" class="fab"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
+    <button type="button" class="tab"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 5h16v12H8l-4 3z"/></svg>Berichten</button>
+    <button type="button" class="tab"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 7h16M4 12h16M4 17h10"/></svg>Meer</button>
+  </nav>
+</div>
+</x-dc>
+<script data-dc-script data-props='{"r":{"editor":"range","default":16,"min":0,"max":22,"step":1,"unit":"px","section":"Vorm"},"rk":{"editor":"range","default":12,"min":0,"max":18,"step":1,"unit":"px","section":"Vorm"}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { r: this.props.r ?? 16, rk: this.props.rk ?? 12 };
+  }
+}
+</script>
+</body>
+</html>

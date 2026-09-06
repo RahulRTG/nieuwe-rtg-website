@@ -1,0 +1,231 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Inter:wght@300;400;500;600&display=swap">
+  <style>
+  :root{
+    --bordeaux:#7F1634; --bordeaux-hoog:#9E1C40; --bordeaux-licht:#C23A5E;
+    --goud:#D4B978; --goud-warm:#C8A961; --goud-donker:#745718; --goud-licht:#B89545;
+    --display:'Bodoni Moda',Georgia,'Times New Roman',serif;
+    --interface:Inter,system-ui,-apple-system,'Segoe UI',sans-serif;
+    --r:16px; --rk:12px; --pil:999px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:var(--interface);-webkit-font-smoothing:antialiased;}
+  a{color:var(--goud);text-decoration:none;} a:hover{color:#FFFBF4;}
+  button{font:inherit;cursor:pointer;}
+
+  /* ---- de twee gronden ---- */
+  .fon{position:relative;overflow:hidden;display:flex;flex-direction:column;}
+  .donker{background:#0E0906;color:#F4F0E9;
+    --vlak:#1A120C; --vlak-hoog:#241811; --lijn:rgba(244,240,233,.10);
+    --lijn-goud:rgba(212,185,120,.30); --inkt:#F4F0E9; --gedempt:#BCAB99; --zacht:#8E8071;}
+  .licht{background:#F7F3EA;color:#211E19;
+    --vlak:#FFFFFF; --vlak-hoog:#FBF8F2; --lijn:rgba(33,30,25,.10);
+    --lijn-goud:rgba(184,149,69,.34); --inkt:#211E19; --gedempt:#4F483F; --zacht:#7A7165;}
+
+  /* ---- letterrollen ---- */
+  .serif{font-family:var(--display);font-weight:400;letter-spacing:.005em;}
+  .cap{font-size:9px;letter-spacing:.26em;text-transform:uppercase;font-weight:500;}
+  .cap.goud{color:var(--goud);} .licht .cap.goud{color:var(--goud-donker);}
+  .cap.stil{color:var(--zacht);}
+  .schrijf{font-family:var(--display);font-style:italic;font-weight:400;}
+
+  /* ---- fotografisch veld, met CSS opgebouwd ---- */
+  .foto{position:relative;overflow:hidden;background:#1E120B;}
+  .foto i{position:absolute;inset:0;display:block;}
+  .lucht{background:linear-gradient(178deg,#2E1A11 0%,#6B3116 30%,#B85C24 55%,#E08C3C 68%,#3A1F13 100%);}
+  .zon{background:radial-gradient(circle 26% 30% at 68% 62%,rgba(255,206,132,.92),rgba(232,146,64,.42) 40%,transparent 66%);}
+  .zee{top:66%;background:linear-gradient(180deg,rgba(206,116,48,.62),rgba(14,9,6,.94));}
+  .kust{top:52%;height:20%;background:
+    radial-gradient(ellipse 60% 100% at 12% 100%,rgba(24,14,9,.95),transparent 70%),
+    radial-gradient(ellipse 44% 100% at 92% 100%,rgba(24,14,9,.9),transparent 72%);}
+  .sluier{background:linear-gradient(180deg,rgba(10,6,4,.42) 0%,rgba(10,6,4,.05) 34%,rgba(10,6,4,.72) 78%,rgba(10,6,4,.95) 100%);}
+  .warm{background:linear-gradient(170deg,#3B2418 0%,#7A4A28 44%,#C08A52 72%,#2A1A12 100%);}
+  .huid{background:radial-gradient(ellipse 70% 60% at 46% 52%,rgba(226,178,140,.85),rgba(150,100,68,.5) 46%,transparent 74%);}
+
+  /* ---- kop van een scherm ---- */
+  .balk{display:flex;align-items:center;gap:12px;padding:14px 18px 10px;}
+  .merk{font-family:var(--display);font-size:22px;letter-spacing:.1em;color:var(--goud);line-height:1;}
+  .licht .merk{color:var(--goud-donker);}
+  .wereld{display:flex;align-items:center;gap:5px;font-size:15px;font-weight:500;}
+  .rond{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    flex:0 0 34px;border:1px solid var(--lijn);}
+  .avatar{width:34px;height:34px;border-radius:50%;flex:0 0 34px;border:1.5px solid var(--goud);
+    background:radial-gradient(circle at 38% 30%,#6B4A32,#2A1B12);}
+  .ikoon{color:var(--inkt);opacity:.9;}
+
+  /* ---- knoppen ---- */
+  .pil{display:inline-flex;align-items:center;justify-content:center;gap:9px;
+    min-height:46px;padding:0 22px;border-radius:var(--pil);border:0;
+    background:var(--bordeaux);color:#FCF6F0;font-size:14.5px;font-weight:500;}
+  .pil:hover{background:var(--bordeaux-hoog);}
+  .pil.omlijnd{background:none;border:1px solid var(--lijn-goud);color:var(--inkt);}
+  .pil.klein{min-height:38px;padding:0 16px;font-size:12.5px;}
+
+  /* ---- kaart ---- */
+  .kaart{background:var(--vlak);border:1px solid var(--lijn);border-radius:var(--r);overflow:hidden;}
+  .kaart.goudrand{border-color:var(--lijn-goud);}
+
+  /* ---- onderbalk met middenknop ---- */
+  .onderbalk{margin-top:auto;display:flex;align-items:center;justify-content:space-around;
+    padding:10px 12px 22px;border-top:1px solid var(--lijn);background:inherit;}
+  .tab{display:flex;flex-direction:column;align-items:center;gap:5px;
+    font-size:10.5px;color:var(--zacht);min-width:48px;min-height:46px;justify-content:center;
+    background:none;border:0;}
+  .tab.aan{color:var(--goud);} .licht .tab.aan{color:var(--goud-donker);}
+  .tab.aan::after{content:"";width:4px;height:4px;border-radius:50%;background:currentColor;}
+  .fab{width:52px;height:52px;border-radius:50%;background:var(--bordeaux);border:0;
+    display:flex;align-items:center;justify-content:center;color:#FCF6F0;
+    box-shadow:0 6px 18px rgba(127,22,52,.42);}
+
+  /* ---- rijen ---- */
+  .rij{display:flex;align-items:center;gap:12px;padding:12px 18px;min-height:52px;}
+  .rij + .rij{border-top:1px solid var(--lijn);}
+  .rij .tijd{font-variant-numeric:tabular-nums;font-size:13px;color:var(--zacht);min-width:44px;}
+  .rij .titel{font-size:14px;font-weight:500;color:var(--inkt);}
+  .rij .onder{font-size:12px;color:var(--zacht);margin-top:2px;}
+  .rij .pijl{margin-left:auto;color:var(--zacht);}
+
+  .stip{width:8px;height:8px;border-radius:50%;flex:0 0 8px;}
+  .stip.aan{background:#3E9E70;} .stip.uit{border:1.5px solid var(--zacht);}
+
+  .merkje{display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:var(--pil);
+    font-size:11px;border:1px solid var(--lijn);color:var(--gedempt);}
+  .merkje.groen{background:rgba(62,158,112,.13);border-color:rgba(62,158,112,.4);color:#2F7D57;}
+  .donker .merkje.groen{color:#7CC3A0;}
+  .merkje.goud{border-color:var(--lijn-goud);color:var(--goud);}
+  .licht .merkje.goud{color:var(--goud-donker);}
+
+  .streep{width:44px;height:1px;background:var(--goud);opacity:.85;margin:14px 0;}
+  .licht .streep{background:var(--goud-licht);}
+
+  .top{display:flex;align-items:center;padding:16px 18px 8px;}
+  .top .midden{flex:1;text-align:center;}
+  .top .midden .wat{font-size:13px;font-weight:500;margin-top:3px;}
+  .top button{background:none;border:0;color:var(--gedempt);min-width:44px;min-height:44px;
+    display:flex;align-items:center;justify-content:center;}
+
+  .hoesvak{margin:10px 24px 0;position:relative;aspect-ratio:1;border-radius:var(--rk);overflow:hidden;
+    border:1px solid var(--lijn-goud);}
+  .hoesvak .mrk{position:absolute;left:15px;top:13px;font-family:var(--display);font-size:19px;
+    letter-spacing:.1em;color:#F1DFB6;}
+  .hoesvak .staand{position:absolute;right:15px;top:15px;text-align:right;line-height:2.1;
+    font-size:8.5px;letter-spacing:.28em;text-transform:uppercase;color:rgba(244,240,233,.82);}
+
+  .titelrij{display:flex;align-items:flex-start;gap:14px;padding:22px 24px 0;}
+  .titelrij h1{margin:0;font-size:32px;line-height:1.06;color:#FFFBF4;}
+  .titelrij .ar{font-size:14px;color:var(--gedempt);margin-top:6px;}
+  .hart{margin-left:auto;margin-top:6px;flex:0 0 auto;background:none;border:0;
+    min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:flex-end;}
+
+  .baan{margin:24px 24px 0;}
+  .baan .spoor{height:3px;background:rgba(244,240,233,.16);position:relative;}
+  .baan .spoor b{position:absolute;left:0;top:0;bottom:0;width:39%;background:var(--goud);display:block;}
+  .baan .spoor i{position:absolute;left:39%;top:-3.5px;width:10px;height:10px;border-radius:50%;
+    background:var(--goud);box-shadow:0 0 0 4px rgba(212,185,120,.18);}
+  .baan .tijden{display:flex;justify-content:space-between;margin-top:9px;font-size:11.5px;
+    color:var(--zacht);font-variant-numeric:tabular-nums;}
+
+  .knoppen{display:flex;align-items:center;justify-content:space-between;padding:24px 30px 0;}
+  .knoppen button{background:none;border:0;color:var(--gedempt);min-width:46px;min-height:46px;
+    display:flex;align-items:center;justify-content:center;}
+  .knoppen .groot{width:66px;height:66px;border-radius:50%;background:var(--bordeaux);color:#FCF6F0;
+    box-shadow:0 10px 28px rgba(127,22,52,.46);}
+  .knoppen .groot:hover{background:var(--bordeaux-hoog);}
+
+  .uitrij{display:flex;align-items:center;gap:9px;padding:26px 24px 0;font-size:12.5px;color:var(--goud);}
+  .uitrij .rechts{margin-left:auto;display:flex;gap:16px;color:var(--gedempt);}
+
+  .lade{margin:22px 14px 0;border-radius:var(--r) var(--r) 0 0;border:1px solid var(--lijn);
+    border-bottom:0;background:var(--vlak);padding:9px 0 0;flex:1;min-height:0;overflow:hidden;}
+  .greep{width:38px;height:4px;border-radius:3px;background:rgba(244,240,233,.24);margin:0 auto 12px;}
+  .lade .cap{padding:0 16px 9px;}
+  .num{display:flex;align-items:center;gap:12px;padding:8px 16px;}
+  .num .hoes{width:40px;height:40px;flex:0 0 40px;border-radius:7px;overflow:hidden;position:relative;}
+  .num .nm{font-size:13.5px;font-weight:500;color:var(--inkt);}
+  .num .ar{font-size:11.5px;color:var(--zacht);margin-top:2px;}
+  .num .drie{margin-left:auto;color:var(--zacht);letter-spacing:.12em;font-size:15px;}
+  </style>
+</helmet>
+
+<div class="fon donker" style="width:390px;height:844px;--r:{{r}}px;--rk:{{rk}}px">
+
+  <header class="top">
+    <button type="button"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>
+    <div class="midden">
+      <div class="cap goud">Playing from</div>
+      <div class="wat">LivingOS</div>
+    </div>
+    <button type="button" style="letter-spacing:.12em;font-size:16px">···</button>
+  </header>
+
+  <div class="hoesvak foto">
+    <i class="lucht"></i><i class="zon"></i><i class="kust"></i><i class="zee"></i><i class="sluier" style="opacity:.5"></i>
+    <span class="mrk serif">RTG</span>
+    <div class="staand">Music<br>Travels<br>Lives<br>Together</div>
+  </div>
+
+  <div class="titelrij">
+    <div>
+      <h1 class="serif">Another Life</h1>
+      <div class="ar">Sultan + Shepard</div>
+    </div>
+    <button type="button" class="hart">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="#9E1C40" stroke="#9E1C40" stroke-width="1.4"><path d="M12 20.4S4.4 15.4 4.4 10.2A4.4 4.4 0 0112 7.4a4.4 4.4 0 017.6 2.8c0 5.2-7.6 10.2-7.6 10.2z"/></svg>
+    </button>
+  </div>
+
+  <div class="baan">
+    <div class="spoor"><b></b><i></i></div>
+    <div class="tijden"><span>2:14</span><span>−3:27</span></div>
+  </div>
+
+  <div class="knoppen">
+    <button type="button"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M17 3l3 3-3 3M3 6h5l8 12h4M20 18l-3 3M3 18h5"/></svg></button>
+    <button type="button" style="color:#F4F0E9"><svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M18 5v14l-11-7z"/><rect x="4" y="5" width="2.6" height="14"/></svg></button>
+    <button type="button" class="groot"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><rect x="6.5" y="4" width="4" height="16"/><rect x="13.5" y="4" width="4" height="16"/></svg></button>
+    <button type="button" style="color:#F4F0E9"><svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5v14l11-7z"/><rect x="17.4" y="5" width="2.6" height="14"/></svg></button>
+    <button type="button"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 8h13l-2.5-2.5M20 16H7l2.5 2.5"/></svg></button>
+  </div>
+
+  <div class="uitrij">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="5" y="3" width="14" height="18" rx="1"/><circle cx="12" cy="14" r="3.2"/><path d="M10 7h4"/></svg>
+    Living Room
+    <span class="rechts">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 9V4h5M20 15v5h-5M20 9V4h-5M4 15v5h5"/></svg>
+    </span>
+  </div>
+
+  <div class="lade">
+    <div class="greep"></div>
+    <div class="cap goud">Up next</div>
+    <div class="num">
+      <span class="hoes foto"><i style="background:linear-gradient(150deg,#2B3A4C,#101820)"></i></span>
+      <span><span class="nm">Ocean Drive</span><div class="ar">Duke Dumont</div></span>
+      <span class="drie">···</span>
+    </div>
+    <div class="num">
+      <span class="hoes foto"><i class="warm"></i></span>
+      <span><span class="nm">Lose Control</span><div class="ar">Meduza, Becky Hill</div></span>
+      <span class="drie">···</span>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{"r":{"editor":"range","default":16,"min":0,"max":22,"step":1,"unit":"px","section":"Vorm"},"rk":{"editor":"range","default":12,"min":0,"max":18,"step":1,"unit":"px","section":"Vorm"}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { r: this.props.r ?? 16, rk: this.props.rk ?? 12 };
+  }
+}
+</script>
+</body>
+</html>

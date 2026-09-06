@@ -1,0 +1,145 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Inter:wght@300;400;500;600&display=swap">
+  <style>
+<!--STIJL-->
+  .kop{padding:6px 18px 0;}
+  .kop h1{margin:9px 0 0;font-size:34px;line-height:1.06;color:#FFFBF4;}
+  .kop p{margin:12px 0 0;font-size:12.5px;line-height:1.65;color:var(--gedempt);max-width:290px;}
+
+  /* twee kringen om jou heen -- geen volgerslijst */
+  .baan{position:relative;height:300px;margin-top:6px;}
+  .kring{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:50%;
+    border:1px solid var(--lijn);}
+  .kring.binnen{width:158px;height:158px;border-color:var(--lijn-goud);}
+  .kring.buiten{width:262px;height:262px;}
+  .ik{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:58px;height:58px;
+    border-radius:50%;border:1.5px solid var(--goud);overflow:hidden;
+    background:radial-gradient(circle at 38% 30%,#6B4A32,#2A1B12);}
+  .p{position:absolute;width:44px;height:44px;border-radius:50%;overflow:hidden;
+    border:1.5px solid rgba(212,185,120,.55);transform:translate(-50%,-50%);}
+  .p.wijd{border-color:var(--lijn);width:38px;height:38px;}
+  .p i{position:absolute;inset:0;}
+  .naamvlag{position:absolute;transform:translate(-50%,0);font-size:9.5px;color:var(--zacht);
+    white-space:nowrap;margin-top:4px;}
+  .ringlabel{position:absolute;left:50%;transform:translateX(-50%);}
+
+  .lijst{padding:4px 0 0;}
+  .lijstkop{display:flex;align-items:baseline;padding:16px 18px 8px;}
+  .lijstkop h2{margin:0;font-size:19px;color:var(--inkt);}
+  .lijstkop .n{margin-left:auto;font-size:11.5px;color:var(--zacht);}
+  .mens{display:flex;align-items:center;gap:12px;padding:11px 18px;min-height:56px;}
+  .mens + .mens{border-top:1px solid var(--lijn);}
+  .mens .av{width:40px;height:40px;border-radius:50%;flex:0 0 40px;overflow:hidden;position:relative;
+    border:1px solid var(--lijn-goud);}
+  .mens .nm{font-size:14px;font-weight:500;color:var(--inkt);}
+  .mens .st{font-size:11.5px;color:var(--zacht);margin-top:2px;}
+  .mens .doe{margin-left:auto;display:flex;gap:8px;}
+  .mens .doe button{width:36px;height:36px;min-width:36px;min-height:36px;border-radius:50%;
+    border:1px solid var(--lijn);background:none;color:var(--gedempt);
+    display:flex;align-items:center;justify-content:center;}
+
+  .grens{margin:14px 14px 0;padding:13px 15px;border-radius:var(--rk);
+    border:1px solid var(--lijn-goud);background:rgba(212,185,120,.06);}
+  .grens p{margin:6px 0 0;font-size:11.5px;line-height:1.6;color:var(--gedempt);}
+  </style>
+</helmet>
+
+<div class="fon donker" style="width:390px;height:844px;--r:{{r}}px;--rk:{{rk}}px">
+
+  <header class="balk" style="padding-bottom:0">
+    <div class="merk">RTG</div>
+    <div class="wereld" style="margin-left:8px">Kringen</div>
+    <div class="rond ikoon" style="margin-left:auto;border-color:transparent">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>
+    </div>
+    <div class="avatar"></div>
+  </header>
+
+  <div class="kop">
+    <span class="cap goud">Cercle · Entourage</span>
+    <h1 class="serif">Wie er dichtbij staat</h1>
+    <p>Twee kringen, en jij in het midden. Wie in je Cercle staat, ziet meer van je dan je Entourage — dat is het enige verschil.</p>
+  </div>
+
+  <div class="baan">
+    <div class="kring buiten"></div>
+    <div class="kring binnen"></div>
+
+    <span class="ringlabel cap stil" style="top:14px">Entourage</span>
+    <span class="ringlabel cap goud" style="top:76px">Cercle</span>
+
+    <div class="ik"></div>
+
+    <span class="p" style="left:50%;top:calc(50% - 79px)"><i class="warm"></i></span>
+    <span class="p" style="left:calc(50% + 68px);top:calc(50% + 40px)"><i class="lucht"></i><i class="zon"></i></span>
+    <span class="p" style="left:calc(50% - 68px);top:calc(50% + 40px)"><i style="background:linear-gradient(150deg,#3E2A44,#171018)"></i></span>
+
+    <span class="p wijd" style="left:calc(50% + 112px);top:calc(50% - 62px)"><i style="background:linear-gradient(150deg,#25384C,#0F1720)"></i></span>
+    <span class="p wijd" style="left:calc(50% - 112px);top:calc(50% - 62px)"><i style="background:linear-gradient(150deg,#4A2A1C,#1A0F0A)"></i></span>
+    <span class="p wijd" style="left:calc(50% + 96px);top:calc(50% + 92px)"><i style="background:linear-gradient(150deg,#2C4030,#101710)"></i></span>
+    <span class="p wijd" style="left:calc(50% - 96px);top:calc(50% + 92px)"><i style="background:linear-gradient(150deg,#4A1220,#180A0E)"></i></span>
+  </div>
+
+  <div class="lijst">
+    <div class="lijstkop">
+      <h2 class="serif">Cercle</h2>
+      <span class="n">3 mensen</span>
+    </div>
+    <div class="mens">
+      <span class="av foto"><i class="warm"></i></span>
+      <span><span class="nm">Amira</span><div class="st">Samen in Ibiza, 29 augustus</div></span>
+      <span class="doe">
+        <button type="button"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 5c0 9 6 15 15 15l2-3.6-4.4-2-2 2A13 13 0 019.6 9l2-2-2-4.4z"/></svg></button>
+        <button type="button"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 5h16v12H8l-4 3z"/></svg></button>
+      </span>
+    </div>
+    <div class="mens">
+      <span class="av foto"><i class="lucht"></i><i class="zon"></i></span>
+      <span><span class="nm">Erol</span><div class="st">Deelde een moment uit Ibiza</div></span>
+      <span class="doe">
+        <button type="button"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 5c0 9 6 15 15 15l2-3.6-4.4-2-2 2A13 13 0 019.6 9l2-2-2-4.4z"/></svg></button>
+        <button type="button"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 5h16v12H8l-4 3z"/></svg></button>
+      </span>
+    </div>
+    <div class="mens">
+      <span class="av foto"><i style="background:linear-gradient(150deg,#3E2A44,#171018)"></i></span>
+      <span><span class="nm">Julia</span><div class="st">Gstaad, 17 september</div></span>
+      <span class="doe">
+        <button type="button"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 5c0 9 6 15 15 15l2-3.6-4.4-2-2 2A13 13 0 019.6 9l2-2-2-4.4z"/></svg></button>
+        <button type="button"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 5h16v12H8l-4 3z"/></svg></button>
+      </span>
+    </div>
+  </div>
+
+  <div class="grens">
+    <span class="cap goud">Wat hier niet staat</span>
+    <p>Geen volgers, geen bereik, geen cijfer op een mens. Een kring is geen trechter —
+      wie erin staat, staat erin omdat jij dat hebt gezegd.</p>
+  </div>
+
+  <nav class="onderbalk">
+    <button type="button" class="tab"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 11l8-7 8 7v8a1 1 0 01-1 1h-4v-6h-6v6H5a1 1 0 01-1-1z"/></svg>Home</button>
+    <button type="button" class="tab aan"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="8" r="3.4"/><path d="M3 20c0-3.4 2.7-5.4 6-5.4s6 2 6 5.4M16 5.4a3.4 3.4 0 010 6.4M18 20c0-2.4-.8-4-2-5"/></svg>Kringen</button>
+    <button type="button" class="fab"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
+    <button type="button" class="tab"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 5h16v12H8l-4 3z"/></svg>Berichten</button>
+    <button type="button" class="tab"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 7h16M4 12h16M4 17h10"/></svg>Meer</button>
+  </nav>
+</div>
+</x-dc>
+<script data-dc-script data-props='{"r":{"editor":"range","default":16,"min":0,"max":22,"step":1,"unit":"px","section":"Vorm"},"rk":{"editor":"range","default":12,"min":0,"max":18,"step":1,"unit":"px","section":"Vorm"}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { r: this.props.r ?? 16, rk: this.props.rk ?? 12 };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-09-03T15:30:26.401Z",
-    "commit": "1bf48fd8",
+    "op": "2026-09-06T07:33:25.382Z",
+    "commit": "1f3c64588",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 4,
     "instrument": "scripts/mutatie.js",
-    "node": "v22.22.2"
+    "node": "v24.18.0"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
@@ -2283,6 +2283,11 @@
       "operator": "liegpoort /api/",
       "gezakt": 4,
       "scherp": "gezakt"
+    },
+    "heritage-truth.test.js": {
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "inhoudscensus; een teruggebrachte vaste Kyoto-claim liet de waarheidstoets zakken"
     },
     "herkomst.test.js": {
       "soort": "puur",
@@ -5486,6 +5491,80 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "rtg-continue-key.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/rtg-continue-key.js",
+      "operator": "===->!==#0",
+      "gezakt": 8,
+      "geprobeerd": 3
+    },
+    "rtg-edge-accessibility.test.js": {
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "CSS-contract; handmutatie 44px naar 40px liet de raakdoeltoets zakken"
+    },
+    "rtg-edge-boot.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/randen.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 3
+    },
+    "rtg-edge-uitrol.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/basis/basis-01ac-edge.js",
+      "operator": "getal+1#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "rtg-heritage-first-paint.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/rtg-world-identity.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "rtg-heritage-motion.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/rtg-heritage-motion.js",
+      "operator": "true->false#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "rtg-heritage-operational.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/rtg-world-identity.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "rtg-heritage-order.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/rtg-heritage-order.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "rtg-heritage.test.js": {
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "CSS-contract; handmutatie inhoudsradius 2px naar 8px liet de geometriepoort zakken"
+    },
+    "rtg-world-identity.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/rtg-world-identity.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
     "rtgai.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -7751,6 +7830,11 @@
       "operator": "&&->||#0",
       "gezakt": 6,
       "geprobeerd": 2
+    },
+    "world-dashboard.e2e.js": {
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "browsermatrix; handmutatie naar 200vw liet de echte wereldviewporttoets zakken"
     },
     "zaaihash.test.js": {
       "soort": "server",

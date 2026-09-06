@@ -1,0 +1,81 @@
+{
+  "artboards": [
+    {
+      "file": "Main.dc.html",
+      "title": "1 · Shell met console",
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "file": "Grens.dc.html",
+      "title": "2 · De grens van vier",
+      "x": 1560,
+      "y": 0,
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "file": "Greep.dc.html",
+      "title": "3 · De greep, 1:1",
+      "x": 0,
+      "y": 1080,
+      "w": 900,
+      "h": 640
+    },
+    {
+      "file": "Zoom.dc.html",
+      "title": "4 · Glance · Work · Deep",
+      "x": 1020,
+      "y": 1080,
+      "w": 900,
+      "h": 660,
+      "is_interactive": true
+    },
+    {
+      "file": "Context.dc.html",
+      "title": "5 · Context Linking",
+      "x": 0,
+      "y": 1900,
+      "w": 1240,
+      "h": 760,
+      "is_interactive": true
+    },
+    {
+      "file": "Slepen.dc.html",
+      "title": "6 · Slepen + bevestigen",
+      "x": 1360,
+      "y": 1900,
+      "w": 1240,
+      "h": 800,
+      "is_interactive": true
+    }
+  ],
+  "annotations": [
+    {
+      "id": "bron",
+      "x": 0,
+      "y": -230,
+      "w": 460,
+      "text": "RTG Spatial Workspace — WERKRUIMTE.md, getekend in de stijl van de vijf referenties.\n\nMaten, kleuren en gedrag zijn overgenomen uit public/shared/rtg-schil.css en rtg-schil/*.js, niet benaderd.\n\nElk artboard heeft een schuif RONDING (0–18px). Op 0 staat de huisregel border-radius:0; hoger staat de pilstijl uit de foto's."
+    },
+    {
+      "id": "grens-besluit",
+      "x": 1560,
+      "y": -230,
+      "w": 520,
+      "text": "BESLUIT — vier of vijf?\n\nWERKRUIMTE.md §8 belooft 5–6 surfaces op ultrawide, §9 heet \"Rustig blijven met vijf apps open\".\n\nDe code doet iets anders: 03-surfaces.js zegt \"Vier is een systeemgrens, geen aanbeveling\" en laat de vijfde app de oudste niet-actieve vervangen. Dat geldt in de modus standaard — en werkruimte.html draait precies die modus.\n\nDit artboard tekent wat de code doet. Het document klopt dus niet, of de grens moet omhoog."
+    },
+    {
+      "id": "stijlbotsing",
+      "x": 1990,
+      "y": 1080,
+      "w": 560,
+      "text": "WAT DEZE STIJL KOST\n\nDrie dingen uit de referenties botsen met regels die dit huis machinaal handhaaft:\n\n1. Ronde hoeken — scripts/check.js regel 51 eist border-radius:0 in public/, alleen een cirkel mag.\n2. Gevulde bordeaux knoppen — ONTWERP.md, \"Rust is de luxeregel\": geen grote massieve rode knoppen.\n3. Warme gloed en fotografie met mensen — CLAUDE.md: geen beige/marmer-gradients, campagnebeeld zonder mensen.\n\nHet canvas staat buiten public/, dus er zakt vandaag niets. Landt deze stijl in de app, dan moeten die drie regels mee veranderen — anders zakt npm run check."
+    }
+  ],
+  "launch": {
+    "view": "canvas"
+  }
+}

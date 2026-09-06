@@ -1,0 +1,201 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Inter:wght@300;400;500;600&display=swap">
+  <style>
+  :root{
+    --grond:#120C09; --grond-diep:#0A0705;
+    --vlak:#1B1310; --vlak-hoog:#241A15; --vlak-diep:#150E0B;
+    --ivoor:#F4F0E9; --gedempt:#CBBDAF; --zacht:#9C8D7E;
+    --lijn:rgba(244,240,233,.09); --lijn-goud:rgba(212,185,120,.22);
+    --goud:#D4B978; --goud-diep:#C0A544; --goud-logo:#857007;
+    --bordeaux:#7F1634; --bordeaux-hoog:#9E1C40; --bordeaux-tekst:#C23A5E;
+    --salie:#4C9A75; --aandacht:#C9A24B; --incident:#DE6E92; --actief:#7E8FC4;
+    --display:'Bodoni Moda',Georgia,'Times New Roman',serif;
+    --interface:Inter,system-ui,-apple-system,'Segoe UI',sans-serif;
+    --gutter:14px;
+    --pil:calc(var(--ronding,14px) * 55);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:var(--interface);color:var(--ivoor);
+    -webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums;}
+  a{color:var(--goud);text-decoration:none;} a:hover{color:var(--ivoor);}
+
+  /* de tafel: warm bijna-zwart met twee gloeden, geen egale verf */
+  .tafel{position:relative;overflow:hidden;background:var(--grond);}
+  .tafel::before{content:"";position:absolute;inset:0;pointer-events:none;
+    background:
+      radial-gradient(ellipse 60% 45% at 88% 2%, rgba(212,185,120,.13), transparent 60%),
+      radial-gradient(ellipse 55% 50% at 4% 96%, rgba(127,22,52,.16), transparent 62%);}
+  .tafel > *{position:relative;}
+
+  /* het gouden kapitalenlabel -- de signatuur van deze stijl */
+  .label{font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;
+    color:var(--goud);font-weight:500;}
+  .label.stil{color:var(--zacht);}
+  .serif{font-family:var(--display);font-weight:400;letter-spacing:.01em;}
+
+  /* surface */
+  .surface{display:flex;flex-direction:column;background:var(--vlak);
+    border:1px solid var(--lijn);border-radius:var(--ronding,14px);overflow:hidden;
+    box-shadow:0 2px 10px rgba(0,0,0,.45);}
+  .surface[data-actief],.surface.is-actief{border-color:var(--lijn-goud);
+    box-shadow:0 10px 34px rgba(0,0,0,.5),0 0 0 1px rgba(212,185,120,.10);}
+  .greep{display:flex;align-items:center;gap:9px;padding:8px 11px 7px;
+    border-bottom:1px solid var(--lijn);position:relative;cursor:grab;user-select:none;}
+  .greep::before{content:"";position:absolute;left:11px;right:11px;top:0;height:2px;
+    background:transparent;border-radius:2px;}
+  .surface[data-actief] .greep::before,.surface.is-actief .greep::before{background:linear-gradient(90deg,var(--goud),rgba(212,185,120,.25));}
+  .greep .naam{font-size:10.5px;letter-spacing:.17em;text-transform:uppercase;color:var(--zacht);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .surface[data-actief] .greep .naam,.surface.is-actief .greep .naam{color:var(--ivoor);}
+  .greep .rek{margin-left:auto;}
+  .greep button{background:none;border:0;color:var(--zacht);cursor:pointer;
+    min-width:24px;min-height:24px;padding:2px 5px;border-radius:calc(var(--ronding,14px)/2);
+    font:inherit;font-size:12px;line-height:1;}
+  .greep button:hover{color:var(--goud);}
+  .vlak{flex:1;min-height:0;overflow:hidden;}
+
+  /* register: rijen met haarlijnen, geen kaartenstapel */
+  .rij{display:flex;align-items:center;gap:12px;min-height:var(--regel,40px);
+    padding:8px 14px;border-bottom:1px solid var(--lijn);font-size:13px;}
+  .rij:last-child{border-bottom:0;}
+  .rij .dag{font-family:var(--display);font-size:22px;line-height:1;
+    font-variant-numeric:proportional-nums;color:var(--ivoor);min-width:34px;}
+  .rij .maand{font-size:9px;letter-spacing:.2em;color:var(--goud);text-transform:uppercase;}
+  .rij .wat{flex:1;color:var(--gedempt);}
+  .rij .meta{color:var(--zacht);font-size:11.5px;white-space:nowrap;}
+
+  /* signal rail: dunne verticale lijn, geen gekleurde pil */
+  .rail{position:relative;padding-left:17px;}
+  .rail::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;
+    background:var(--lijn);}
+  .rail[data-sig="aandacht"]::before{background:var(--aandacht);}
+  .rail[data-sig="incident"]::before{background:var(--incident);}
+  .rail[data-sig="actief"]::before{background:var(--actief);}
+  .rail[data-sig="gezond"]::before{background:rgba(76,154,117,.55);}
+
+  /* knoppen */
+  .knop{display:inline-flex;align-items:center;gap:8px;font:inherit;font-size:12.5px;
+    padding:9px 18px;border-radius:var(--pil);cursor:pointer;border:1px solid var(--lijn-goud);
+    background:none;color:var(--ivoor);}
+  .knop:hover{border-color:var(--goud);}
+  .knop.vol{background:var(--bordeaux);border-color:var(--bordeaux);color:#FCF6F0;font-weight:500;}
+  .knop.vol:hover{background:var(--bordeaux-hoog);border-color:var(--bordeaux-hoog);}
+  .knop.goud{background:var(--goud);border-color:var(--goud);color:#1C1608;font-weight:600;}
+
+  /* fotografisch veld, met CSS opgebouwd -- geen stockfoto */
+  .foto{position:relative;overflow:hidden;background:#1E120B;}
+  .foto i{position:absolute;inset:0;display:block;}
+  .foto .lucht{background:linear-gradient(180deg,#3A1F13 0%,#7A3A18 38%,#C4682A 62%,#2A1710 100%);}
+  .foto .zon{background:radial-gradient(circle 30% 34% at 64% 66%,rgba(255,196,110,.85),rgba(224,124,52,.35) 42%,transparent 68%);}
+  .foto .water{top:62%;background:linear-gradient(180deg,rgba(196,104,42,.55),rgba(18,12,9,.92));}
+  .foto .sluier{background:linear-gradient(180deg,rgba(10,7,5,.15) 0%,rgba(10,7,5,.55) 55%,rgba(10,7,5,.92) 100%);}
+
+  .blad{padding:38px 44px;height:100%;display:flex;flex-direction:column;gap:26px;}
+  h1{margin:6px 0 0;font-family:var(--display);font-size:46px;line-height:1;color:#FFFBF4;}
+  .inleiding{margin:10px 0 0;max-width:520px;font-size:13px;line-height:1.65;color:var(--gedempt);}
+
+  .proef{display:flex;gap:34px;align-items:flex-start;}
+  .kolom{flex:1;min-width:0;}
+  .kolomkop{display:flex;align-items:baseline;gap:9px;margin-bottom:11px;}
+  .kolomkop .staat{font-size:11px;color:var(--zacht);}
+
+  /* de greep op ware grootte: geen surface eromheen die afleidt */
+  .proefsurface{background:var(--vlak);border:1px solid var(--lijn);
+    border-radius:var(--ronding,14px);overflow:hidden;}
+  .proefsurface[data-actief]{border-color:var(--lijn-goud);}
+  .romp{height:74px;background:linear-gradient(180deg,rgba(244,240,233,.02),transparent);}
+
+  /* maatvoering */
+  .maten{margin-top:13px;display:flex;flex-direction:column;gap:6px;}
+  .maat{display:flex;align-items:baseline;gap:10px;font-size:11.5px;color:var(--zacht);}
+  .maat b{color:var(--goud);font-weight:500;min-width:74px;}
+  .maat span{color:var(--gedempt);}
+
+  .tabel{border-top:1px solid var(--lijn);margin-top:auto;}
+  .tabelrij{display:flex;align-items:baseline;gap:18px;padding:11px 0;border-bottom:1px solid var(--lijn);font-size:13px;}
+  .tabelrij .doet{width:212px;flex:0 0 212px;color:var(--ivoor);}
+  .tabelrij .gevolg{color:var(--gedempt);}
+  .tabelrij:last-child{border-bottom:0;}
+
+  .voet{font-size:11px;color:var(--zacht);line-height:1.6;}
+  .voet code{color:var(--goud-diep);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10.5px;}
+  </style>
+</helmet>
+
+<div class="tafel blad" style="width:900px;height:640px;--ronding:{{ronding}}px">
+
+  <div>
+    <span class="label">Ware grootte · 1:1</span>
+    <h1>De greep</h1>
+    <p class="inleiding">Geen titelbalk met drie knopjes — dat is Windows in bordeaux. Eén dunne
+      gouden streep bovenaan, en die verschijnt <em>alleen</em> op de actieve surface. Zou elke
+      surface hem dragen, dan is goud geen focus meer maar behang.</p>
+  </div>
+
+  <div class="proef">
+    <div class="kolom">
+      <div class="kolomkop"><span class="label">Actief</span><span class="staat">precies één tegelijk</span></div>
+      <div class="proefsurface" data-actief>
+        <header class="greep">
+          <span class="naam">Reizen</span>
+          <span class="rek"></span>
+          <button type="button" title="Kleiner of groter">▫</button>
+          <button type="button" title="Sluiten">×</button>
+        </header>
+        <div class="romp"></div>
+      </div>
+      <div class="maten">
+        <div class="maat"><b>2 px</b><span>gouden streep, 11 px ingesprongen aan weerszijden</span></div>
+        <div class="maat"><b>#D4B978</b><span>naar transparant, links naar rechts</span></div>
+        <div class="maat"><b>rand</b><span>rgba(212,185,120,.22)</span></div>
+      </div>
+    </div>
+
+    <div class="kolom">
+      <div class="kolomkop"><span class="label stil">Rustend</span><span class="staat">de streep is er niet</span></div>
+      <div class="proefsurface">
+        <header class="greep">
+          <span class="naam">Finance</span>
+          <span class="rek"></span>
+          <button type="button" title="Kleiner of groter">▫</button>
+          <button type="button" title="Sluiten">×</button>
+        </header>
+        <div class="romp"></div>
+      </div>
+      <div class="maten">
+        <div class="maat"><b>8 / 11 / 7</b><span>padding boven · zij · onder</span></div>
+        <div class="maat"><b>10,5 px</b><span>naam, kapitaal, letterafstand .17em</span></div>
+        <div class="maat"><b>24 × 24</b><span>elke knop, ook al is het teken kleiner</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabel">
+    <div class="tabelrij"><span class="doet">Greep slepen</span><span class="gevolg">de surface beweegt</span></div>
+    <div class="tabelrij"><span class="doet">Naar de schermrand</span><span class="gevolg">hij dokt daar — je ziet eerst waar hij landt</span></div>
+    <div class="tabelrij"><span class="doet">Naar de console</span><span class="gevolg">hij koppelt eraan</span></div>
+    <div class="tabelrij"><span class="doet">Dubbelklik</span><span class="gevolg">focus — de surface gaat naar Deep</span></div>
+    <div class="tabelrij"><span class="doet">Rand aanwijzen</span><span class="gevolg">grab · resize · dock verschijnt subtiel</span></div>
+  </div>
+
+  <p class="voet">Waarden overgenomen uit <code>public/shared/rtg-schil.css</code>. De ronding is hier een schuif:
+    op <code>0</code> staat de huisregel uit CLAUDE.md, hoger staat de stijl uit de foto's.</p>
+</div>
+</x-dc>
+<script data-dc-script data-props='{"ronding":{"editor":"range","default":14,"min":0,"max":18,"step":1,"unit":"px","section":"Vorm"}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { ronding: this.props.ronding ?? 14 };
+  }
+}
+</script>
+</body>
+</html>

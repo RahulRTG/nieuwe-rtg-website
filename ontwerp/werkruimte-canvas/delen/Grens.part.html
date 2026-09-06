@@ -1,0 +1,155 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Inter:wght@300;400;500;600&display=swap">
+  <style>
+<!--STIJL-->
+  .edge{display:flex;align-items:center;gap:22px;height:54px;padding:0 20px;
+    border-bottom:1px solid var(--lijn);background:rgba(10,7,5,.55);}
+  .merk{font-family:var(--display);font-size:19px;letter-spacing:.14em;color:var(--goud);}
+  .edge .tel{margin-left:auto;font-size:11.5px;color:var(--zacht);}
+  .edge .tel b{color:var(--goud);font-weight:500;}
+
+  .werkblad{display:flex;gap:var(--gutter);padding:var(--gutter);height:calc(100% - 54px);}
+
+  /* de console gaf ruimte: ingeklapt tot een rail (WERKRUIMTE.md par. 2) */
+  .rail-console{width:206px;flex:0 0 206px;display:flex;flex-direction:column;gap:13px;
+    padding:16px 14px;background:var(--vlak);border:1px solid var(--lijn-goud);
+    border-radius:var(--ronding,14px);}
+  .rail-console .wie{font-size:11px;color:var(--zacht);margin-top:4px;}
+  .rail-console .blok{border-top:1px solid var(--lijn);padding-top:10px;}
+  .staprij{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--gedempt);padding:5px 0;}
+  .stip{width:6px;height:6px;border-radius:50%;background:var(--lijn);flex:0 0 6px;}
+  .stip[data-aan]{background:var(--goud);}
+
+  .raster{flex:1;min-width:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+    grid-template-rows:repeat(2,minmax(0,1fr));gap:var(--gutter);position:relative;}
+  .surface .vlak{padding:0;}
+  .glance{padding:13px 15px;font-size:12px;color:var(--zacht);line-height:1.6;}
+  .glance b{color:var(--ivoor);font-weight:500;}
+  .mini{display:flex;align-items:center;gap:10px;padding:7px 15px;
+    border-bottom:1px solid var(--lijn);font-size:12px;color:var(--gedempt);}
+  .mini:last-child{border-bottom:0;}
+  .mini .t{margin-left:auto;color:var(--zacht);font-size:11px;}
+
+  /* de app die wijkt: hij verdwijnt niet stiekem, je ziet het gebeuren */
+  .surface[data-wijkt]{opacity:.42;}
+  .wijkt-uitleg{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    z-index:5;display:flex;align-items:center;gap:9px;padding:7px 13px;
+    background:rgba(10,7,5,.86);border:1px solid var(--lijn-goud);
+    border-radius:var(--pil);font-size:11.5px;color:var(--ivoor);white-space:nowrap;}
+
+  /* de dockzone: een voorstel, geen sprong */
+  .dok{position:absolute;border:1px dashed rgba(212,185,120,.6);
+    background:rgba(212,185,120,.07);border-radius:var(--ronding,14px);
+    display:flex;align-items:center;justify-content:center;z-index:4;}
+  .dok span{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--goud);}
+
+  /* de vijfde, aan de muis */
+  .sleept{position:absolute;right:26px;bottom:34px;width:250px;z-index:8;
+    transform:rotate(-1.4deg);box-shadow:0 18px 46px rgba(0,0,0,.62);}
+  </style>
+</helmet>
+
+<div class="tafel" style="width:1440px;height:900px;--ronding:{{ronding}}px">
+
+  <header class="edge">
+    <span class="merk">RTG</span>
+    <span class="tel">Werktafel · <b>4</b> van 4 vakken bezet</span>
+  </header>
+
+  <div class="werkblad">
+
+    <aside class="rail-console">
+      <div>
+        <div class="label">RTG Command</div>
+        <div class="wie">Rahul · Nederland</div>
+      </div>
+      <div class="blok">
+        <div class="label stil" style="margin-bottom:7px">Actief</div>
+        <div class="staprij"><span class="stip" data-aan></span>Reizen</div>
+        <div class="staprij"><span class="stip"></span>Mail</div>
+        <div class="staprij"><span class="stip"></span>Agenda</div>
+        <div class="staprij"><span class="stip"></span>Finance</div>
+      </div>
+      <div class="blok">
+        <div class="label stil" style="margin-bottom:7px">Werkruimte</div>
+        <div class="staprij" style="color:var(--goud)">Mijn Directie</div>
+      </div>
+    </aside>
+
+    <div class="raster">
+
+      <article class="surface" data-actief>
+        <header class="greep"><span class="naam">Reizen</span><span class="rek"></span>
+          <button type="button">▫</button><button type="button">×</button></header>
+        <div class="vlak">
+          <div class="mini"><span class="dag" style="font-family:var(--display);font-size:17px">29</span><span class="maand">Aug</span><span>Ibiza</span><span class="t">chauffeur open</span></div>
+          <div class="mini"><span class="dag" style="font-family:var(--display);font-size:17px">17</span><span class="maand">Sep</span><span>Gstaad</span><span class="t">hotel onbevestigd</span></div>
+          <div class="mini"><span class="dag" style="font-family:var(--display);font-size:17px">06</span><span class="maand">Okt</span><span>Monaco</span><span class="t">compleet</span></div>
+        </div>
+      </article>
+
+      <article class="surface">
+        <header class="greep"><span class="naam">Mail</span><span class="rek"></span>
+          <button type="button">▫</button><button type="button">×</button></header>
+        <div class="vlak">
+          <div class="mini rail" data-sig="aandacht"><span>Gstaad — bevestiging chalet</span><span class="t">2u</span></div>
+          <div class="mini"><span>Villa Ibiza — sleuteloverdracht</span><span class="t">gisteren</span></div>
+          <div class="mini"><span>Monaco — paddock-toegang</span><span class="t">ma</span></div>
+        </div>
+      </article>
+
+      <article class="surface">
+        <header class="greep"><span class="naam">Agenda</span><span class="rek"></span>
+          <button type="button">▫</button><button type="button">×</button></header>
+        <div class="vlak">
+          <div class="glance">
+            <b>29 augustus</b> · Ibiza<br>
+            vertrek 09:40 · Schiphol<br>
+            <span style="color:var(--goud)">aankomst 12:15 · villa</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="surface" data-wijkt>
+        <header class="greep"><span class="naam">Finance</span><span class="rek"></span>
+          <button type="button">▫</button><button type="button">×</button></header>
+        <div class="vlak">
+          <div class="glance"><b>€ 5.830</b> open<br>3 posten · Ibiza</div>
+        </div>
+      </article>
+
+      <div class="dok" style="left:calc(50% + 7px);right:0;top:calc(50% + 7px);bottom:0">
+        <span>Bestanden landt hier</span>
+      </div>
+
+      <div class="wijkt-uitleg">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#D4B978" stroke-width="1.7"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        Finance sluit — oudste niet-actieve app
+      </div>
+
+      <article class="surface sleept" data-actief>
+        <header class="greep"><span class="naam">Bestanden</span><span class="rek"></span></header>
+        <div class="vlak"><div class="glance"><b>14</b> documenten · Ibiza</div></div>
+      </article>
+
+    </div>
+  </div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{"ronding":{"editor":"range","default":14,"min":0,"max":18,"step":1,"unit":"px","section":"Vorm"}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { ronding: this.props.ronding ?? 14 };
+  }
+}
+</script>
+</body>
+</html>

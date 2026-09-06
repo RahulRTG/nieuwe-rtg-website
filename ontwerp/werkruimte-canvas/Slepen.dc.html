@@ -1,0 +1,368 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Inter:wght@300;400;500;600&display=swap">
+  <style>
+  :root{
+    --grond:#120C09; --grond-diep:#0A0705;
+    --vlak:#1B1310; --vlak-hoog:#241A15; --vlak-diep:#150E0B;
+    --ivoor:#F4F0E9; --gedempt:#CBBDAF; --zacht:#9C8D7E;
+    --lijn:rgba(244,240,233,.09); --lijn-goud:rgba(212,185,120,.22);
+    --goud:#D4B978; --goud-diep:#C0A544; --goud-logo:#857007;
+    --bordeaux:#7F1634; --bordeaux-hoog:#9E1C40; --bordeaux-tekst:#C23A5E;
+    --salie:#4C9A75; --aandacht:#C9A24B; --incident:#DE6E92; --actief:#7E8FC4;
+    --display:'Bodoni Moda',Georgia,'Times New Roman',serif;
+    --interface:Inter,system-ui,-apple-system,'Segoe UI',sans-serif;
+    --gutter:14px;
+    --pil:calc(var(--ronding,14px) * 55);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:var(--interface);color:var(--ivoor);
+    -webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums;}
+  a{color:var(--goud);text-decoration:none;} a:hover{color:var(--ivoor);}
+
+  /* de tafel: warm bijna-zwart met twee gloeden, geen egale verf */
+  .tafel{position:relative;overflow:hidden;background:var(--grond);}
+  .tafel::before{content:"";position:absolute;inset:0;pointer-events:none;
+    background:
+      radial-gradient(ellipse 60% 45% at 88% 2%, rgba(212,185,120,.13), transparent 60%),
+      radial-gradient(ellipse 55% 50% at 4% 96%, rgba(127,22,52,.16), transparent 62%);}
+  .tafel > *{position:relative;}
+
+  /* het gouden kapitalenlabel -- de signatuur van deze stijl */
+  .label{font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;
+    color:var(--goud);font-weight:500;}
+  .label.stil{color:var(--zacht);}
+  .serif{font-family:var(--display);font-weight:400;letter-spacing:.01em;}
+
+  /* surface */
+  .surface{display:flex;flex-direction:column;background:var(--vlak);
+    border:1px solid var(--lijn);border-radius:var(--ronding,14px);overflow:hidden;
+    box-shadow:0 2px 10px rgba(0,0,0,.45);}
+  .surface[data-actief],.surface.is-actief{border-color:var(--lijn-goud);
+    box-shadow:0 10px 34px rgba(0,0,0,.5),0 0 0 1px rgba(212,185,120,.10);}
+  .greep{display:flex;align-items:center;gap:9px;padding:8px 11px 7px;
+    border-bottom:1px solid var(--lijn);position:relative;cursor:grab;user-select:none;}
+  .greep::before{content:"";position:absolute;left:11px;right:11px;top:0;height:2px;
+    background:transparent;border-radius:2px;}
+  .surface[data-actief] .greep::before,.surface.is-actief .greep::before{background:linear-gradient(90deg,var(--goud),rgba(212,185,120,.25));}
+  .greep .naam{font-size:10.5px;letter-spacing:.17em;text-transform:uppercase;color:var(--zacht);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .surface[data-actief] .greep .naam,.surface.is-actief .greep .naam{color:var(--ivoor);}
+  .greep .rek{margin-left:auto;}
+  .greep button{background:none;border:0;color:var(--zacht);cursor:pointer;
+    min-width:24px;min-height:24px;padding:2px 5px;border-radius:calc(var(--ronding,14px)/2);
+    font:inherit;font-size:12px;line-height:1;}
+  .greep button:hover{color:var(--goud);}
+  .vlak{flex:1;min-height:0;overflow:hidden;}
+
+  /* register: rijen met haarlijnen, geen kaartenstapel */
+  .rij{display:flex;align-items:center;gap:12px;min-height:var(--regel,40px);
+    padding:8px 14px;border-bottom:1px solid var(--lijn);font-size:13px;}
+  .rij:last-child{border-bottom:0;}
+  .rij .dag{font-family:var(--display);font-size:22px;line-height:1;
+    font-variant-numeric:proportional-nums;color:var(--ivoor);min-width:34px;}
+  .rij .maand{font-size:9px;letter-spacing:.2em;color:var(--goud);text-transform:uppercase;}
+  .rij .wat{flex:1;color:var(--gedempt);}
+  .rij .meta{color:var(--zacht);font-size:11.5px;white-space:nowrap;}
+
+  /* signal rail: dunne verticale lijn, geen gekleurde pil */
+  .rail{position:relative;padding-left:17px;}
+  .rail::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;
+    background:var(--lijn);}
+  .rail[data-sig="aandacht"]::before{background:var(--aandacht);}
+  .rail[data-sig="incident"]::before{background:var(--incident);}
+  .rail[data-sig="actief"]::before{background:var(--actief);}
+  .rail[data-sig="gezond"]::before{background:rgba(76,154,117,.55);}
+
+  /* knoppen */
+  .knop{display:inline-flex;align-items:center;gap:8px;font:inherit;font-size:12.5px;
+    padding:9px 18px;border-radius:var(--pil);cursor:pointer;border:1px solid var(--lijn-goud);
+    background:none;color:var(--ivoor);}
+  .knop:hover{border-color:var(--goud);}
+  .knop.vol{background:var(--bordeaux);border-color:var(--bordeaux);color:#FCF6F0;font-weight:500;}
+  .knop.vol:hover{background:var(--bordeaux-hoog);border-color:var(--bordeaux-hoog);}
+  .knop.goud{background:var(--goud);border-color:var(--goud);color:#1C1608;font-weight:600;}
+
+  /* fotografisch veld, met CSS opgebouwd -- geen stockfoto */
+  .foto{position:relative;overflow:hidden;background:#1E120B;}
+  .foto i{position:absolute;inset:0;display:block;}
+  .foto .lucht{background:linear-gradient(180deg,#3A1F13 0%,#7A3A18 38%,#C4682A 62%,#2A1710 100%);}
+  .foto .zon{background:radial-gradient(circle 30% 34% at 64% 66%,rgba(255,196,110,.85),rgba(224,124,52,.35) 42%,transparent 68%);}
+  .foto .water{top:62%;background:linear-gradient(180deg,rgba(196,104,42,.55),rgba(18,12,9,.92));}
+  .foto .sluier{background:linear-gradient(180deg,rgba(10,7,5,.15) 0%,rgba(10,7,5,.55) 55%,rgba(10,7,5,.92) 100%);}
+
+  .blad{padding:26px 30px;height:100%;display:flex;flex-direction:column;gap:16px;}
+  h1{margin:5px 0 0;font-family:var(--display);font-size:34px;line-height:1;color:#FFFBF4;}
+  .kop{display:flex;align-items:flex-end;gap:26px;}
+  .kop p{margin:8px 0 0;max-width:470px;font-size:12.5px;line-height:1.6;color:var(--gedempt);}
+  .stuur{margin-left:auto;display:flex;gap:8px;align-items:center;}
+
+  .onder{flex:1;display:flex;gap:20px;min-height:0;}
+  .tafelvak{flex:1;min-width:0;position:relative;}
+  .kwadrant{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+    grid-template-rows:repeat(2,minmax(0,1fr));gap:var(--gutter);height:100%;}
+
+  /* tijdens het slepen: wie niets kan, dimt. Zwijgen is nee. */
+  .surface{transition:opacity 180ms cubic-bezier(.22,.61,.36,1);}
+  .surface.dof{opacity:.45;}
+  .surface.kan{outline:1px solid rgba(212,185,120,.52);outline-offset:-1px;}
+  .surface.vangt{outline:2px solid var(--goud);outline-offset:-2px;}
+  .surface.kan .greep .naam{color:var(--goud);}
+
+  .paneel{padding:12px 15px;font-size:12px;line-height:1.6;color:var(--zacht);}
+  .paneel b{color:var(--ivoor);font-weight:500;}
+  .vangknop{margin:10px 15px 0;font:inherit;font-size:11.5px;padding:7px 13px;cursor:pointer;
+    border:1px solid var(--lijn-goud);border-radius:var(--pil);background:rgba(212,185,120,.08);
+    color:var(--goud);min-height:30px;}
+  .vangknop:hover{background:var(--goud);color:#1C1608;}
+
+  /* het object dat gesleept wordt */
+  .object{display:flex;align-items:center;gap:10px;margin:11px 15px;padding:9px 13px;
+    border:1px solid var(--lijn);border-radius:var(--ronding,14px);
+    background:rgba(244,240,233,.03);font-size:12px;color:var(--gedempt);}
+  .object .dag{font-family:var(--display);font-size:19px;color:var(--ivoor);
+    font-variant-numeric:proportional-nums;}
+  .object.aanmuis{position:absolute;left:44%;top:47%;z-index:20;width:224px;margin:0;
+    transform:rotate(-2deg);box-shadow:0 18px 46px rgba(0,0,0,.62);background:var(--vlak-hoog);
+    border-color:var(--lijn-goud);pointer-events:none;}
+
+  /* het voorstel -- geen toastje in een hoek maar een vraag in het midden */
+  .voorstel{position:absolute;inset:0;z-index:40;display:flex;align-items:center;
+    justify-content:center;background:rgba(6,5,5,.62);backdrop-filter:blur(4px);}
+  .doos{width:420px;background:var(--vlak);border:1px solid var(--lijn-goud);
+    border-radius:var(--ronding,14px);padding:22px 24px;box-shadow:0 24px 60px rgba(0,0,0,.55);}
+  .doos .wat{margin:0 0 7px;font-size:16px;line-height:1.35;color:var(--ivoor);}
+  .doos .wie{margin:0 0 20px;font-size:12px;line-height:1.5;color:var(--zacht);}
+  .doos .knoppen{display:flex;gap:10px;justify-content:flex-end;}
+
+  /* het protocol, dat vult zich terwijl je stapt */
+  .protocol{width:322px;flex:0 0 322px;display:flex;flex-direction:column;gap:9px;
+    padding:18px;border:1px solid var(--lijn);border-radius:var(--ronding,14px);
+    background:rgba(244,240,233,.02);}
+  .bericht{padding:9px 0;border-bottom:1px solid var(--lijn);opacity:.32;
+    transition:opacity 180ms;}
+  .bericht:last-child{border-bottom:0;}
+  .bericht.aan{opacity:1;}
+  .bericht .weg{font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--goud);
+    display:flex;gap:7px;align-items:center;}
+  .bericht .naam{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;
+    color:var(--ivoor);margin-top:4px;}
+  .bericht .uitleg{font-size:11px;color:var(--zacht);margin-top:3px;line-height:1.5;}
+  .bericht.wacht .weg{color:var(--bordeaux-tekst);}
+  .protocolvoet{margin-top:auto;padding-top:12px;border-top:1px solid var(--lijn);
+    font-size:10.5px;line-height:1.55;color:var(--zacht);}
+  .protocolvoet em{color:var(--goud);font-style:normal;}
+  </style>
+</helmet>
+
+<div class="tafel blad" style="width:1240px;height:800px;--ronding:{{ronding}}px">
+
+  <div class="kop">
+    <div>
+      <span class="label">Objecten tussen apps</span>
+      <h1>Een sleep is een voorstel</h1>
+      <p>Loslaten voert niets uit. Het toont wat er gaat gebeuren en wie het doet —
+        bevestigen is aan een mens. Dezelfde drempel als bij geld en bij Rahul.</p>
+    </div>
+    <div class="stuur">
+      <span style="font-size:11px;color:var(--zacht);margin-right:4px">{{standtekst}}</span>
+      <button type="button" class="knop {{knopKlas}}" onClick="{{hoofdknop}}">{{knoptekst}}</button>
+    </div>
+  </div>
+
+  <div class="onder">
+
+    <div class="tafelvak">
+      <div class="kwadrant">
+
+        <article class="surface {{reizen.klas}}">
+          <header class="greep"><span class="naam">Reizen</span><span class="rek"></span></header>
+          <div class="vlak">
+            <div class="paneel"><b>3</b> komende reizen</div>
+            <sc-if value="{{objectThuis}}" hint-placeholder-val="{{ true }}">
+              <div class="object">
+                <span class="dag">29</span><span class="maand">Aug</span>
+                <span>Ibiza — villa, twee gasten</span>
+              </div>
+            </sc-if>
+          </div>
+        </article>
+
+        <article class="surface {{mail.klas}}">
+          <header class="greep"><span class="naam">Mail</span><span class="rek"></span></header>
+          <div class="vlak">
+            <div class="paneel"><b>38</b> berichten<sc-if value="{{sleept}}" hint-placeholder-val="{{ true }}"><br><span style="color:var(--zacht)">kent de soort <em style="font-style:normal;color:var(--gedempt)">reis</em> niet — zwijgt, en licht dus niet op</span></sc-if></div>
+          </div>
+        </article>
+
+        <article class="surface {{agenda.klas}}">
+          <header class="greep"><span class="naam">Agenda</span><span class="rek"></span></header>
+          <div class="vlak">
+            <div class="paneel"><b>11</b> afspraken deze week</div>
+            <sc-if value="{{agenda.toonKnop}}" hint-placeholder-val="{{ true }}">
+              <button type="button" class="vangknop" onClick="{{agenda.laatLos}}">Hier loslaten — "ik zet er een afspraak van"</button>
+            </sc-if>
+            <sc-if value="{{gedaanAgenda}}" hint-placeholder-val="{{ true }}">
+              <div class="object" style="border-color:var(--lijn-goud);color:var(--ivoor)">
+                <span class="dag">29</span><span class="maand">Aug</span><span>Ibiza — reisblok</span>
+              </div>
+            </sc-if>
+          </div>
+        </article>
+
+        <article class="surface {{best.klas}}">
+          <header class="greep"><span class="naam">Bestanden</span><span class="rek"></span></header>
+          <div class="vlak">
+            <div class="paneel"><b>412</b> documenten</div>
+            <sc-if value="{{best.toonKnop}}" hint-placeholder-val="{{ true }}">
+              <button type="button" class="vangknop" onClick="{{best.laatLos}}">Hier loslaten — "ik maak er een reismap van"</button>
+            </sc-if>
+            <sc-if value="{{gedaanBest}}" hint-placeholder-val="{{ true }}">
+              <div class="object" style="border-color:var(--lijn-goud);color:var(--ivoor)">
+                <span>Reismap Ibiza — aangemaakt</span>
+              </div>
+            </sc-if>
+          </div>
+        </article>
+
+      </div>
+
+      <sc-if value="{{sleept}}" hint-placeholder-val="{{ true }}">
+        <div class="object aanmuis">
+          <span class="dag">29</span><span class="maand">Aug</span>
+          <span>Ibiza</span>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{toonVoorstel}}" hint-placeholder-val="{{ true }}">
+        <div class="voorstel">
+          <div class="doos" role="dialog" aria-modal="true" aria-label="Voorstel">
+            <p class="wat">{{voorstelWat}}</p>
+            <p class="wie">{{voorstelWie}}</p>
+            <div class="knoppen">
+              <button type="button" class="knop" onClick="{{annuleer}}">Annuleren</button>
+              <button type="button" class="knop goud" onClick="{{bevestig}}">Bevestigen</button>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+
+    <aside class="protocol">
+      <span class="label">Vier berichten, same-origin</span>
+
+      <div class="bericht {{p1}}">
+        <span class="weg">app → schil</span>
+        <div class="naam">sleep-start</div>
+        <div class="uitleg">soort, id, label en een handvol velden die al op het scherm stonden — nooit een dossier.</div>
+      </div>
+      <div class="bericht {{p2}}">
+        <span class="weg">schil → app</span>
+        <div class="naam">sleep-kan</div>
+        <div class="uitleg">"Kun jij hier iets mee?" — aan alle open surfaces tegelijk.</div>
+      </div>
+      <div class="bericht {{p3}}">
+        <span class="weg">app → schil</span>
+        <div class="naam">sleep-kan-ja</div>
+        <div class="uitleg">Alleen wie iets kan, antwoordt. Wie de soort niet kent zwijgt en blijft donker.</div>
+      </div>
+      <div class="bericht {{p4}}">
+        <span class="weg">{{p4weg}}</span>
+        <div class="naam">sleep-doe</div>
+        <div class="uitleg">{{p4uitleg}}</div>
+      </div>
+
+      <p class="protocolvoet"><em>Loslaten doet niets. Annuleren doet niets.</em>
+        Een surface die de soort niet kent, is geen doelwit — die drie regels bewaakt
+        <span style="color:var(--gedempt)">test/werkruimte-objecten.e2e.js</span>.</p>
+    </aside>
+
+  </div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{"ronding":{"editor":"range","default":14,"min":0,"max":18,"step":1,"unit":"px","section":"Vorm"}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var s = this.state || {};
+    var stap = s.stap || 'rust';
+    var doel = s.doel || null;
+    var zelf = this;
+
+    var sleept = stap === 'sleept';
+    var voorstel = stap === 'voorstel';
+    var gedaan = stap === 'gedaan';
+
+    var kanVangen = { agenda: true, best: true, reizen: false, mail: false };
+    var watDoet = { agenda: 'ik zet er een afspraak van', best: 'ik maak er een reismap van' };
+    var doelNaam = { agenda: 'Agenda', best: 'Bestanden' };
+
+    function surface(id) {
+      var kan = kanVangen[id];
+      var klas = '';
+      if (sleept || voorstel) {
+        if (!kan) klas = 'dof';
+        else if (voorstel && doel === id) klas = 'vangt';
+        else klas = 'kan';
+      }
+      return {
+        klas: klas,
+        toonKnop: sleept && kan,
+        laatLos: function () { zelf.setState({ stap: 'voorstel', doel: id }); }
+      };
+    }
+
+    var knoptekst = 'Pak "Ibiza" op';
+    var standtekst = 'Rust — niets gesleept';
+    var knopKlas = '';
+    var hoofd = function () { zelf.setState({ stap: 'sleept', doel: null }); };
+    if (sleept) {
+      knoptekst = 'Loslaten afbreken';
+      standtekst = 'Aan de muis — twee surfaces kunnen iets';
+      hoofd = function () { zelf.setState({ stap: 'rust', doel: null }); };
+    } else if (voorstel) {
+      knoptekst = 'Terug naar rust';
+      standtekst = 'Voorstel open — er is nog niets gebeurd';
+      hoofd = function () { zelf.setState({ stap: 'rust', doel: null }); };
+    } else if (gedaan) {
+      knoptekst = 'Opnieuw';
+      standtekst = 'Bevestigd door een mens';
+      knopKlas = 'goud';
+      hoofd = function () { zelf.setState({ stap: 'rust', doel: null }); };
+    }
+
+    return {
+      reizen: surface('reizen'), mail: surface('mail'),
+      agenda: surface('agenda'), best: surface('best'),
+      sleept: sleept,
+      objectThuis: !sleept,
+      toonVoorstel: voorstel,
+      gedaanAgenda: gedaan && doel === 'agenda',
+      gedaanBest: gedaan && doel === 'best',
+      voorstelWat: doel ? 'Ibiza: ' + watDoet[doel] : '',
+      voorstelWie: doel ? 'Uitgevoerd door ' + doelNaam[doel] + ', met uw rechten daar.' : '',
+      p1: stap !== 'rust' ? 'aan' : '',
+      p2: stap !== 'rust' ? 'aan' : '',
+      p3: stap !== 'rust' ? 'aan' : '',
+      p4: gedaan ? 'aan' : (voorstel ? 'aan wacht' : ''),
+      p4weg: gedaan ? 'schil → app' : (voorstel ? 'wacht op een mens' : 'schil → app'),
+      p4uitleg: gedaan
+        ? 'Verstuurd. De ontvanger voert het uit met zijn eigen sessie en zijn eigen rechten.'
+        : 'Gaat pas de deur uit nadat een mens op Bevestigen heeft gedrukt.',
+      standtekst: standtekst, knoptekst: knoptekst, knopKlas: knopKlas,
+      hoofdknop: hoofd,
+      annuleer: function () { zelf.setState({ stap: 'rust', doel: null }); },
+      bevestig: function () { zelf.setState({ stap: 'gedaan', doel: doel }); },
+      ronding: this.props.ronding ?? 14
+    };
+  }
+}
+</script>
+</body>
+</html>

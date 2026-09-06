@@ -1,0 +1,273 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Inter:wght@300;400;500;600&display=swap">
+  <style>
+  :root{
+    --grond:#120C09; --grond-diep:#0A0705;
+    --vlak:#1B1310; --vlak-hoog:#241A15; --vlak-diep:#150E0B;
+    --ivoor:#F4F0E9; --gedempt:#CBBDAF; --zacht:#9C8D7E;
+    --lijn:rgba(244,240,233,.09); --lijn-goud:rgba(212,185,120,.22);
+    --goud:#D4B978; --goud-diep:#C0A544; --goud-logo:#857007;
+    --bordeaux:#7F1634; --bordeaux-hoog:#9E1C40; --bordeaux-tekst:#C23A5E;
+    --salie:#4C9A75; --aandacht:#C9A24B; --incident:#DE6E92; --actief:#7E8FC4;
+    --display:'Bodoni Moda',Georgia,'Times New Roman',serif;
+    --interface:Inter,system-ui,-apple-system,'Segoe UI',sans-serif;
+    --gutter:14px;
+    --pil:calc(var(--ronding,14px) * 55);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:var(--interface);color:var(--ivoor);
+    -webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums;}
+  a{color:var(--goud);text-decoration:none;} a:hover{color:var(--ivoor);}
+
+  /* de tafel: warm bijna-zwart met twee gloeden, geen egale verf */
+  .tafel{position:relative;overflow:hidden;background:var(--grond);}
+  .tafel::before{content:"";position:absolute;inset:0;pointer-events:none;
+    background:
+      radial-gradient(ellipse 60% 45% at 88% 2%, rgba(212,185,120,.13), transparent 60%),
+      radial-gradient(ellipse 55% 50% at 4% 96%, rgba(127,22,52,.16), transparent 62%);}
+  .tafel > *{position:relative;}
+
+  /* het gouden kapitalenlabel -- de signatuur van deze stijl */
+  .label{font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;
+    color:var(--goud);font-weight:500;}
+  .label.stil{color:var(--zacht);}
+  .serif{font-family:var(--display);font-weight:400;letter-spacing:.01em;}
+
+  /* surface */
+  .surface{display:flex;flex-direction:column;background:var(--vlak);
+    border:1px solid var(--lijn);border-radius:var(--ronding,14px);overflow:hidden;
+    box-shadow:0 2px 10px rgba(0,0,0,.45);}
+  .surface[data-actief],.surface.is-actief{border-color:var(--lijn-goud);
+    box-shadow:0 10px 34px rgba(0,0,0,.5),0 0 0 1px rgba(212,185,120,.10);}
+  .greep{display:flex;align-items:center;gap:9px;padding:8px 11px 7px;
+    border-bottom:1px solid var(--lijn);position:relative;cursor:grab;user-select:none;}
+  .greep::before{content:"";position:absolute;left:11px;right:11px;top:0;height:2px;
+    background:transparent;border-radius:2px;}
+  .surface[data-actief] .greep::before,.surface.is-actief .greep::before{background:linear-gradient(90deg,var(--goud),rgba(212,185,120,.25));}
+  .greep .naam{font-size:10.5px;letter-spacing:.17em;text-transform:uppercase;color:var(--zacht);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .surface[data-actief] .greep .naam,.surface.is-actief .greep .naam{color:var(--ivoor);}
+  .greep .rek{margin-left:auto;}
+  .greep button{background:none;border:0;color:var(--zacht);cursor:pointer;
+    min-width:24px;min-height:24px;padding:2px 5px;border-radius:calc(var(--ronding,14px)/2);
+    font:inherit;font-size:12px;line-height:1;}
+  .greep button:hover{color:var(--goud);}
+  .vlak{flex:1;min-height:0;overflow:hidden;}
+
+  /* register: rijen met haarlijnen, geen kaartenstapel */
+  .rij{display:flex;align-items:center;gap:12px;min-height:var(--regel,40px);
+    padding:8px 14px;border-bottom:1px solid var(--lijn);font-size:13px;}
+  .rij:last-child{border-bottom:0;}
+  .rij .dag{font-family:var(--display);font-size:22px;line-height:1;
+    font-variant-numeric:proportional-nums;color:var(--ivoor);min-width:34px;}
+  .rij .maand{font-size:9px;letter-spacing:.2em;color:var(--goud);text-transform:uppercase;}
+  .rij .wat{flex:1;color:var(--gedempt);}
+  .rij .meta{color:var(--zacht);font-size:11.5px;white-space:nowrap;}
+
+  /* signal rail: dunne verticale lijn, geen gekleurde pil */
+  .rail{position:relative;padding-left:17px;}
+  .rail::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;
+    background:var(--lijn);}
+  .rail[data-sig="aandacht"]::before{background:var(--aandacht);}
+  .rail[data-sig="incident"]::before{background:var(--incident);}
+  .rail[data-sig="actief"]::before{background:var(--actief);}
+  .rail[data-sig="gezond"]::before{background:rgba(76,154,117,.55);}
+
+  /* knoppen */
+  .knop{display:inline-flex;align-items:center;gap:8px;font:inherit;font-size:12.5px;
+    padding:9px 18px;border-radius:var(--pil);cursor:pointer;border:1px solid var(--lijn-goud);
+    background:none;color:var(--ivoor);}
+  .knop:hover{border-color:var(--goud);}
+  .knop.vol{background:var(--bordeaux);border-color:var(--bordeaux);color:#FCF6F0;font-weight:500;}
+  .knop.vol:hover{background:var(--bordeaux-hoog);border-color:var(--bordeaux-hoog);}
+  .knop.goud{background:var(--goud);border-color:var(--goud);color:#1C1608;font-weight:600;}
+
+  /* fotografisch veld, met CSS opgebouwd -- geen stockfoto */
+  .foto{position:relative;overflow:hidden;background:#1E120B;}
+  .foto i{position:absolute;inset:0;display:block;}
+  .foto .lucht{background:linear-gradient(180deg,#3A1F13 0%,#7A3A18 38%,#C4682A 62%,#2A1710 100%);}
+  .foto .zon{background:radial-gradient(circle 30% 34% at 64% 66%,rgba(255,196,110,.85),rgba(224,124,52,.35) 42%,transparent 68%);}
+  .foto .water{top:62%;background:linear-gradient(180deg,rgba(196,104,42,.55),rgba(18,12,9,.92));}
+  .foto .sluier{background:linear-gradient(180deg,rgba(10,7,5,.15) 0%,rgba(10,7,5,.55) 55%,rgba(10,7,5,.92) 100%);}
+
+  .blad{padding:30px 34px;height:100%;display:flex;flex-direction:column;gap:18px;}
+  h1{margin:5px 0 0;font-family:var(--display);font-size:36px;line-height:1;color:#FFFBF4;}
+  .kop{display:flex;align-items:flex-end;gap:24px;}
+  .kop p{margin:8px 0 0;max-width:400px;font-size:12.5px;line-height:1.6;color:var(--gedempt);}
+  .schakelaars{margin-left:auto;display:flex;gap:7px;}
+  .schakelaars button{font:inherit;font-size:11.5px;padding:7px 15px;cursor:pointer;
+    border:1px solid var(--lijn);border-radius:var(--pil);background:none;color:var(--gedempt);min-height:26px;}
+  .schakelaars button:hover{border-color:var(--goud);color:var(--ivoor);}
+  .schakelaars button.aan{border-color:var(--goud);color:#1C1608;background:var(--goud);font-weight:500;}
+
+  .stapel{flex:1;display:flex;flex-direction:column;gap:var(--gutter);min-height:0;}
+  .surface{transition:height 240ms cubic-bezier(.22,.61,.36,1);cursor:pointer;}
+  .surface .vlak{overflow:hidden;}
+
+  .glancerij{display:flex;align-items:center;gap:16px;padding:13px 15px;font-size:13px;color:var(--gedempt);}
+  .glancerij b{color:var(--ivoor);font-weight:500;}
+  .glancerij .scheiding{color:var(--lijn-goud);}
+
+  .diep{display:flex;height:100%;}
+  .diepkolom{flex:1;min-width:0;border-right:1px solid var(--lijn);}
+  .diepkolom:last-child{border-right:0;}
+  .diepkop{padding:9px 14px;border-bottom:1px solid var(--lijn);}
+  .filterrij{display:flex;align-items:center;gap:8px;padding:6px 14px;font-size:11.5px;color:var(--zacht);}
+  .filterrij[data-aan]{color:var(--goud);}
+  .tijdstip{display:flex;gap:10px;padding:7px 14px;font-size:11.5px;color:var(--gedempt);}
+  .tijdstip .wanneer{color:var(--zacht);min-width:52px;}
+  .zoomvlag{margin-left:auto;font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--zacht);}
+  .surface.is-actief .zoomvlag{color:var(--goud);}
+  </style>
+</helmet>
+
+<div class="tafel blad" style="width:900px;height:660px;--ronding:{{ronding}}px">
+
+  <div class="kop">
+    <div>
+      <span class="label">Drie zoomniveaus per surface</span>
+      <h1>Glance · Work · Deep</h1>
+      <p>Klik een surface aan. Hij gaat naar Deep en de ander krimpt vanzelf naar Glance —
+        daardoor voelt de werkruimte vloeiend in plaats van als een stapel vensters.</p>
+    </div>
+    <div class="schakelaars">
+      <button type="button" onClick="{{kiesReizen}}" class="{{reizen.knopKlas}}">Reizen diep</button>
+      <button type="button" onClick="{{kiesFinance}}" class="{{finance.knopKlas}}">Finance diep</button>
+      <button type="button" onClick="{{beideWork}}" class="{{beideKlas}}">Beide op Work</button>
+    </div>
+  </div>
+
+  <div class="stapel">
+
+    <article class="surface {{reizen.klas}}" onClick="{{reizen.pick}}" style="height:{{reizen.hoogte}}">
+      <header class="greep">
+        <span class="naam">Reizen</span>
+        <span class="rek"></span>
+        <span class="zoomvlag">{{reizen.zoom}}</span>
+      </header>
+      <div class="vlak">
+        <sc-if value="{{reizen.isGlance}}" hint-placeholder-val="{{ true }}">
+          <div class="glancerij">
+            <b>3</b> komend <span class="scheiding">·</span> <b>3</b> wachten
+            <span class="scheiding">·</span> <b>€ 5.830</b>
+          </div>
+        </sc-if>
+        <sc-if value="{{reizen.isWork}}" hint-placeholder-val="{{ true }}">
+          <div class="rij rail" data-sig="actief"><span class="dag">29</span><span class="maand">Aug</span><span class="wat">Ibiza</span><span class="meta">chauffeur open</span></div>
+          <div class="rij rail" data-sig="aandacht"><span class="dag">17</span><span class="maand">Sep</span><span class="wat">Gstaad</span><span class="meta">hotel onbevestigd</span></div>
+          <div class="rij rail" data-sig="gezond"><span class="dag">06</span><span class="maand">Okt</span><span class="wat">Monaco</span><span class="meta">compleet</span></div>
+        </sc-if>
+        <sc-if value="{{reizen.isDeep}}" hint-placeholder-val="{{ true }}">
+          <div class="diep">
+            <div class="diepkolom" style="flex:0 0 150px">
+              <div class="diepkop"><span class="label stil">Filters</span></div>
+              <div class="filterrij" data-aan>Komend</div>
+              <div class="filterrij">Afgerond</div>
+              <div class="filterrij">Vraagt actie</div>
+              <div class="filterrij">Alle bestemmingen</div>
+            </div>
+            <div class="diepkolom">
+              <div class="diepkop"><span class="label stil">Register</span></div>
+              <div class="rij rail" data-sig="actief" style="min-height:34px"><span class="dag" style="font-size:18px">29</span><span class="maand">Aug</span><span class="wat">Ibiza</span></div>
+              <div class="rij rail" data-sig="aandacht" style="min-height:34px"><span class="dag" style="font-size:18px">17</span><span class="maand">Sep</span><span class="wat">Gstaad</span></div>
+              <div class="rij rail" data-sig="gezond" style="min-height:34px"><span class="dag" style="font-size:18px">06</span><span class="maand">Okt</span><span class="wat">Monaco</span></div>
+            </div>
+            <div class="diepkolom" style="flex:0 0 216px">
+              <div class="diepkop"><span class="label stil">Dossier · tijdlijn</span></div>
+              <div class="tijdstip"><span class="wanneer">12 aug</span><span>villa bevestigd</span></div>
+              <div class="tijdstip"><span class="wanneer">19 aug</span><span>vlucht geboekt</span></div>
+              <div class="tijdstip"><span class="wanneer">24 aug</span><span>chauffeur aangevraagd</span></div>
+              <div class="tijdstip" style="color:var(--goud)"><span class="wanneer" style="color:var(--goud)">29 aug</span><span>vertrek 09:40</span></div>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </article>
+
+    <article class="surface {{finance.klas}}" onClick="{{finance.pick}}" style="height:{{finance.hoogte}}">
+      <header class="greep">
+        <span class="naam">Finance</span>
+        <span class="rek"></span>
+        <span class="zoomvlag">{{finance.zoom}}</span>
+      </header>
+      <div class="vlak">
+        <sc-if value="{{finance.isGlance}}" hint-placeholder-val="{{ true }}">
+          <div class="glancerij">
+            <b>€ 5.830</b> open <span class="scheiding">·</span> <b>3</b> posten
+            <span class="scheiding">·</span> <b>1</b> wacht op akkoord
+          </div>
+        </sc-if>
+        <sc-if value="{{finance.isWork}}" hint-placeholder-val="{{ true }}">
+          <div class="rij rail" data-sig="aandacht"><span class="wat">Villa Ibiza — restant</span><span class="meta">€ 3.400 · 29 aug</span></div>
+          <div class="rij rail" data-sig="gezond"><span class="wat">Vlucht Amsterdam–Ibiza</span><span class="meta">€ 1.180 · voldaan</span></div>
+          <div class="rij rail" data-sig="actief"><span class="wat">Chauffeur, twee dagen</span><span class="meta">€ 1.250 · offerte</span></div>
+        </sc-if>
+        <sc-if value="{{finance.isDeep}}" hint-placeholder-val="{{ true }}">
+          <div class="diep">
+            <div class="diepkolom" style="flex:0 0 150px">
+              <div class="diepkop"><span class="label stil">Filters</span></div>
+              <div class="filterrij" data-aan>Open</div>
+              <div class="filterrij">Voldaan</div>
+              <div class="filterrij">Wacht op akkoord</div>
+            </div>
+            <div class="diepkolom">
+              <div class="diepkop"><span class="label stil">Posten · RTG-R-6F612F</span></div>
+              <div class="rij rail" data-sig="aandacht" style="min-height:34px"><span class="wat">Villa Ibiza — restant</span><span class="meta">€ 3.400</span></div>
+              <div class="rij rail" data-sig="gezond" style="min-height:34px"><span class="wat">Vlucht</span><span class="meta">€ 1.180</span></div>
+              <div class="rij rail" data-sig="actief" style="min-height:34px"><span class="wat">Chauffeur</span><span class="meta">€ 1.250</span></div>
+            </div>
+            <div class="diepkolom" style="flex:0 0 216px">
+              <div class="diepkop"><span class="label stil">Tijdlijn</span></div>
+              <div class="tijdstip"><span class="wanneer">19 aug</span><span>vlucht voldaan</span></div>
+              <div class="tijdstip"><span class="wanneer">24 aug</span><span>offerte chauffeur</span></div>
+              <div class="tijdstip" style="color:var(--goud)"><span class="wanneer" style="color:var(--goud)">29 aug</span><span>restant villa</span></div>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </article>
+
+  </div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{"ronding":{"editor":"range","default":14,"min":0,"max":18,"step":1,"unit":"px","section":"Vorm"}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var s = this.state || {};
+    var diep = s.diep === undefined ? 'reizen' : s.diep;
+    var zelf = this;
+    function maak(id) {
+      var z = diep === null ? 'work' : (diep === id ? 'deep' : 'glance');
+      return {
+        zoom: z,
+        isGlance: z === 'glance',
+        isWork: z === 'work',
+        isDeep: z === 'deep',
+        hoogte: z === 'deep' ? '356px' : (z === 'work' ? '224px' : '92px'),
+        klas: z === 'deep' ? 'is-actief' : '',
+        knopKlas: z === 'deep' ? 'aan' : '',
+        pick: function () { zelf.setState({ diep: id }); }
+      };
+    }
+    return {
+      reizen: maak('reizen'),
+      finance: maak('finance'),
+      beideKlas: diep === null ? 'aan' : '',
+      kiesReizen: function () { zelf.setState({ diep: 'reizen' }); },
+      kiesFinance: function () { zelf.setState({ diep: 'finance' }); },
+      beideWork: function () { zelf.setState({ diep: null }); },
+      ronding: this.props.ronding ?? 14
+    };
+  }
+}
+</script>
+</body>
+</html>

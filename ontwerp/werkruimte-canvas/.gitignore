@@ -1,0 +1,4 @@
+# Het gezaaide canvas is een bouwsel van ~2 MB (de editor zit erin). Bron is
+# delen/*.part.html + _stijl.css + canvas.json; `node _bouw.mjs` maakt de
+# .dc.html-bestanden, het zaaiscript van de design-skill maakt dit bestand.
+rtg-spatial-workspace.html

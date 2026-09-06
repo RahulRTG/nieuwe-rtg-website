@@ -1,0 +1,185 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Inter:wght@300;400;500;600&display=swap">
+  <style>
+<!--STIJL-->
+  .blad{padding:30px 34px;height:100%;display:flex;flex-direction:column;gap:18px;}
+  h1{margin:5px 0 0;font-family:var(--display);font-size:36px;line-height:1;color:#FFFBF4;}
+  .kop{display:flex;align-items:flex-end;gap:24px;}
+  .kop p{margin:8px 0 0;max-width:400px;font-size:12.5px;line-height:1.6;color:var(--gedempt);}
+  .schakelaars{margin-left:auto;display:flex;gap:7px;}
+  .schakelaars button{font:inherit;font-size:11.5px;padding:7px 15px;cursor:pointer;
+    border:1px solid var(--lijn);border-radius:var(--pil);background:none;color:var(--gedempt);min-height:26px;}
+  .schakelaars button:hover{border-color:var(--goud);color:var(--ivoor);}
+  .schakelaars button.aan{border-color:var(--goud);color:#1C1608;background:var(--goud);font-weight:500;}
+
+  .stapel{flex:1;display:flex;flex-direction:column;gap:var(--gutter);min-height:0;}
+  .surface{transition:height 240ms cubic-bezier(.22,.61,.36,1);cursor:pointer;}
+  .surface .vlak{overflow:hidden;}
+
+  .glancerij{display:flex;align-items:center;gap:16px;padding:13px 15px;font-size:13px;color:var(--gedempt);}
+  .glancerij b{color:var(--ivoor);font-weight:500;}
+  .glancerij .scheiding{color:var(--lijn-goud);}
+
+  .diep{display:flex;height:100%;}
+  .diepkolom{flex:1;min-width:0;border-right:1px solid var(--lijn);}
+  .diepkolom:last-child{border-right:0;}
+  .diepkop{padding:9px 14px;border-bottom:1px solid var(--lijn);}
+  .filterrij{display:flex;align-items:center;gap:8px;padding:6px 14px;font-size:11.5px;color:var(--zacht);}
+  .filterrij[data-aan]{color:var(--goud);}
+  .tijdstip{display:flex;gap:10px;padding:7px 14px;font-size:11.5px;color:var(--gedempt);}
+  .tijdstip .wanneer{color:var(--zacht);min-width:52px;}
+  .zoomvlag{margin-left:auto;font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--zacht);}
+  .surface.is-actief .zoomvlag{color:var(--goud);}
+  </style>
+</helmet>
+
+<div class="tafel blad" style="width:900px;height:660px;--ronding:{{ronding}}px">
+
+  <div class="kop">
+    <div>
+      <span class="label">Drie zoomniveaus per surface</span>
+      <h1>Glance · Work · Deep</h1>
+      <p>Klik een surface aan. Hij gaat naar Deep en de ander krimpt vanzelf naar Glance —
+        daardoor voelt de werkruimte vloeiend in plaats van als een stapel vensters.</p>
+    </div>
+    <div class="schakelaars">
+      <button type="button" onClick="{{kiesReizen}}" class="{{reizen.knopKlas}}">Reizen diep</button>
+      <button type="button" onClick="{{kiesFinance}}" class="{{finance.knopKlas}}">Finance diep</button>
+      <button type="button" onClick="{{beideWork}}" class="{{beideKlas}}">Beide op Work</button>
+    </div>
+  </div>
+
+  <div class="stapel">
+
+    <article class="surface {{reizen.klas}}" onClick="{{reizen.pick}}" style="height:{{reizen.hoogte}}">
+      <header class="greep">
+        <span class="naam">Reizen</span>
+        <span class="rek"></span>
+        <span class="zoomvlag">{{reizen.zoom}}</span>
+      </header>
+      <div class="vlak">
+        <sc-if value="{{reizen.isGlance}}" hint-placeholder-val="{{ true }}">
+          <div class="glancerij">
+            <b>3</b> komend <span class="scheiding">·</span> <b>3</b> wachten
+            <span class="scheiding">·</span> <b>€ 5.830</b>
+          </div>
+        </sc-if>
+        <sc-if value="{{reizen.isWork}}" hint-placeholder-val="{{ true }}">
+          <div class="rij rail" data-sig="actief"><span class="dag">29</span><span class="maand">Aug</span><span class="wat">Ibiza</span><span class="meta">chauffeur open</span></div>
+          <div class="rij rail" data-sig="aandacht"><span class="dag">17</span><span class="maand">Sep</span><span class="wat">Gstaad</span><span class="meta">hotel onbevestigd</span></div>
+          <div class="rij rail" data-sig="gezond"><span class="dag">06</span><span class="maand">Okt</span><span class="wat">Monaco</span><span class="meta">compleet</span></div>
+        </sc-if>
+        <sc-if value="{{reizen.isDeep}}" hint-placeholder-val="{{ true }}">
+          <div class="diep">
+            <div class="diepkolom" style="flex:0 0 150px">
+              <div class="diepkop"><span class="label stil">Filters</span></div>
+              <div class="filterrij" data-aan>Komend</div>
+              <div class="filterrij">Afgerond</div>
+              <div class="filterrij">Vraagt actie</div>
+              <div class="filterrij">Alle bestemmingen</div>
+            </div>
+            <div class="diepkolom">
+              <div class="diepkop"><span class="label stil">Register</span></div>
+              <div class="rij rail" data-sig="actief" style="min-height:34px"><span class="dag" style="font-size:18px">29</span><span class="maand">Aug</span><span class="wat">Ibiza</span></div>
+              <div class="rij rail" data-sig="aandacht" style="min-height:34px"><span class="dag" style="font-size:18px">17</span><span class="maand">Sep</span><span class="wat">Gstaad</span></div>
+              <div class="rij rail" data-sig="gezond" style="min-height:34px"><span class="dag" style="font-size:18px">06</span><span class="maand">Okt</span><span class="wat">Monaco</span></div>
+            </div>
+            <div class="diepkolom" style="flex:0 0 216px">
+              <div class="diepkop"><span class="label stil">Dossier · tijdlijn</span></div>
+              <div class="tijdstip"><span class="wanneer">12 aug</span><span>villa bevestigd</span></div>
+              <div class="tijdstip"><span class="wanneer">19 aug</span><span>vlucht geboekt</span></div>
+              <div class="tijdstip"><span class="wanneer">24 aug</span><span>chauffeur aangevraagd</span></div>
+              <div class="tijdstip" style="color:var(--goud)"><span class="wanneer" style="color:var(--goud)">29 aug</span><span>vertrek 09:40</span></div>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </article>
+
+    <article class="surface {{finance.klas}}" onClick="{{finance.pick}}" style="height:{{finance.hoogte}}">
+      <header class="greep">
+        <span class="naam">Finance</span>
+        <span class="rek"></span>
+        <span class="zoomvlag">{{finance.zoom}}</span>
+      </header>
+      <div class="vlak">
+        <sc-if value="{{finance.isGlance}}" hint-placeholder-val="{{ true }}">
+          <div class="glancerij">
+            <b>€ 5.830</b> open <span class="scheiding">·</span> <b>3</b> posten
+            <span class="scheiding">·</span> <b>1</b> wacht op akkoord
+          </div>
+        </sc-if>
+        <sc-if value="{{finance.isWork}}" hint-placeholder-val="{{ true }}">
+          <div class="rij rail" data-sig="aandacht"><span class="wat">Villa Ibiza — restant</span><span class="meta">€ 3.400 · 29 aug</span></div>
+          <div class="rij rail" data-sig="gezond"><span class="wat">Vlucht Amsterdam–Ibiza</span><span class="meta">€ 1.180 · voldaan</span></div>
+          <div class="rij rail" data-sig="actief"><span class="wat">Chauffeur, twee dagen</span><span class="meta">€ 1.250 · offerte</span></div>
+        </sc-if>
+        <sc-if value="{{finance.isDeep}}" hint-placeholder-val="{{ true }}">
+          <div class="diep">
+            <div class="diepkolom" style="flex:0 0 150px">
+              <div class="diepkop"><span class="label stil">Filters</span></div>
+              <div class="filterrij" data-aan>Open</div>
+              <div class="filterrij">Voldaan</div>
+              <div class="filterrij">Wacht op akkoord</div>
+            </div>
+            <div class="diepkolom">
+              <div class="diepkop"><span class="label stil">Posten · RTG-R-6F612F</span></div>
+              <div class="rij rail" data-sig="aandacht" style="min-height:34px"><span class="wat">Villa Ibiza — restant</span><span class="meta">€ 3.400</span></div>
+              <div class="rij rail" data-sig="gezond" style="min-height:34px"><span class="wat">Vlucht</span><span class="meta">€ 1.180</span></div>
+              <div class="rij rail" data-sig="actief" style="min-height:34px"><span class="wat">Chauffeur</span><span class="meta">€ 1.250</span></div>
+            </div>
+            <div class="diepkolom" style="flex:0 0 216px">
+              <div class="diepkop"><span class="label stil">Tijdlijn</span></div>
+              <div class="tijdstip"><span class="wanneer">19 aug</span><span>vlucht voldaan</span></div>
+              <div class="tijdstip"><span class="wanneer">24 aug</span><span>offerte chauffeur</span></div>
+              <div class="tijdstip" style="color:var(--goud)"><span class="wanneer" style="color:var(--goud)">29 aug</span><span>restant villa</span></div>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </article>
+
+  </div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{"ronding":{"editor":"range","default":14,"min":0,"max":18,"step":1,"unit":"px","section":"Vorm"}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var s = this.state || {};
+    var diep = s.diep === undefined ? 'reizen' : s.diep;
+    var zelf = this;
+    function maak(id) {
+      var z = diep === null ? 'work' : (diep === id ? 'deep' : 'glance');
+      return {
+        zoom: z,
+        isGlance: z === 'glance',
+        isWork: z === 'work',
+        isDeep: z === 'deep',
+        hoogte: z === 'deep' ? '356px' : (z === 'work' ? '224px' : '92px'),
+        klas: z === 'deep' ? 'is-actief' : '',
+        knopKlas: z === 'deep' ? 'aan' : '',
+        pick: function () { zelf.setState({ diep: id }); }
+      };
+    }
+    return {
+      reizen: maak('reizen'),
+      finance: maak('finance'),
+      beideKlas: diep === null ? 'aan' : '',
+      kiesReizen: function () { zelf.setState({ diep: 'reizen' }); },
+      kiesFinance: function () { zelf.setState({ diep: 'finance' }); },
+      beideWork: function () { zelf.setState({ diep: null }); },
+      ronding: this.props.ronding ?? 14
+    };
+  }
+}
+</script>
+</body>
+</html>

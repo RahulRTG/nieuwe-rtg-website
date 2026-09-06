@@ -20,7 +20,7 @@ module.exports = (ctx) => {
   };
 
   /* De kamer en de noodstop wonen in kern/integratiekamer.js; zie de kop daar. */
-  const { data, noodstop } = kern.integratiekamer;
+  const { data, noodstop } = kern.afdelingen.integratiekamer;
   const postStand = () => mail.sandboxStand ? mail.sandboxStand() : { smtp: {}, sms: {} };
   const geldStand = () => betaal.sandboxStand ? betaal.sandboxStand() : { connect: {}, sepa: {} };
   function actueel(id) { return id === 'smtp' || id === 'sms' ? postStand()[id] : geldStand()[id]; }

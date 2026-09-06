@@ -3328,7 +3328,7 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
        overhaalt. Het criterium is smal en staat daar uitgeschreven -- iets
        STOPPEN, en de bevestiging doet de mens geloven dat hij weg kan lopen.
        Allebei gemeten in FAALPROEF.json als `schrijf-verloren` -> 200. */
-    ['server/kern/integratiekamer.js', 'de noodstop: wie elke koppeling uitzet en `noodstop: true` leest, hoort dat na een herstart terug te vinden'],
+    ['server/kern/afdelingen/integratiekamer.js', 'de noodstop: wie elke koppeling uitzet en `noodstop: true` leest, hoort dat na een herstart terug te vinden'],
     ['server/kern/command/lagen.js', 'bedraadt de duurzame helper voor de uitrolpauze; kiest zelf niets'],
     ['server/kern/command/uitrolregie.js', 'de uitrolpauze: een uitrol die als `stil` is bevestigd, mag niet doorlopen na een herstart']
   ]);

@@ -14,6 +14,13 @@
    staat alles gewoon weer aan. GELDLAT.md kreeg daar op 6 september 2026 een
    derde been voor: een rem die een mens overhaalt.
 
+   WAAROM HIJ ONDER `afdelingen` HANGT EN NIET ALS EIGEN KERNNAAM. Dat was de
+   eerste opzet, en NORM.json floot hem terug: `kernBreedte` (kern-eigenschappen
+   die routes aanraken) ging van 1556 naar 1557, en die ratel mag alleen omlaag.
+   Terecht ook -- de kamer is een voorziening van het kantoor en geen zelfstandig
+   domein. Hij komt dus binnen als `kern.afdelingen.integratiekamer`, waar het
+   kantoor al woont, en de domeingrens hoeft geen naam bij te schrijven.
+
    DE HELPER WORDT UIT DE DB-MODULE GEHAALD en niet geinjecteerd, omdat `bijeen`
    en `inBundel` niet door deze bedradingsketen reizen. Acht kernmodules doen
    dat al; `save` blijft wel geinjecteerd, zodat een aanroeper die zijn eigen
@@ -21,8 +28,8 @@
 'use strict';
 
 module.exports = ({ db, save }) => {
-  const dbModule = require('../db');
-  const vastleggen = require('../lib/duurzaam')({
+  const dbModule = require('../../db');
+  const vastleggen = require('../../lib/duurzaam')({
     bijeen: dbModule.bijeen, save, inBundel: dbModule.inBundel, bron: 'integratiekamer' });
 
   /* De kamer zoals hij op schijf staat, met de vier deelbakken gegarandeerd.
@@ -57,5 +64,5 @@ module.exports = ({ db, save }) => {
     return vastleggen();
   }
 
-  return { integratiekamer: { data, noodstop } };
+  return { data, noodstop };
 };

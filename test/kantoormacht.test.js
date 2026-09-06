@@ -35,10 +35,14 @@ const { meet, EIST_MENS, KANTOORPAD } = require('../scripts/kantoormacht');
 const WORTEL = path.join(__dirname, '..');
 
 test('1. de meter beslist niets: niets in server/ importeert hem', () => {
+  /* Op de IMPORT en niet op het woord. De eerste versie grepte op "kantoormacht"
+     en sloeg aan op server/kern/kantoor/mensdeur.js, dat het script in een
+     commentaarregel NOEMT -- een valse treffer die de toets waardeloos maakt
+     zodra iemand hem wegwuift. Verwijzen mag; laden niet. */
   let treffers = '';
   try {
     treffers = execFileSync('grep',
-      ['-rl', 'kantoormacht', path.join(WORTEL, 'server'), '--include=*.js'],
+      ['-rlE', "require\\([^)]*kantoormacht", path.join(WORTEL, 'server'), '--include=*.js'],
       { encoding: 'utf8' }).trim();
   } catch (e) { treffers = ''; }  // grep geeft 1 bij nul treffers
   assert.equal(treffers, '',

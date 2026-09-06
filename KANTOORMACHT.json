@@ -3,20 +3,20 @@
   "uitleg": "Blok 0 van KANTOORMACHT.md: staat er een MENS achter elke kantoorhandeling? Zes assen, zes getallen, met opzet geen samengesteld cijfer (BEWIJSMACHINE.md verbiedt het enkele READY boven een scorecard).",
   "grens": "De as `deurEistMens` komt uit de ROUTER en is hard; `handlerKentMens` is lexicaal op BESTANDSniveau en draagt daarom `vermoed` -- een bestand dat officeKey noemt gebruikt hem misschien niet in elke route erin. `handlerKentMens` is dus een BOVENgrens en `anoniemUitvoerbaar` een ONDERgrens. Een deploy-gate hoort aan de harde as te hangen.",
   "stempel": {
-    "op": "2026-09-06T20:14:32.764Z",
-    "commit": "fa207040",
+    "op": "2026-09-06T20:53:46.474Z",
+    "commit": "620533b1",
     "node": "v22.22.2"
   },
   "gemeten": {
-    "routes": 585,
-    "deurEistMens": 125,
+    "routes": 586,
+    "deurEistMens": 126,
     "deurGedeeld": 460,
     "zonderBewakerslaag": 3,
     "handlerKentMens": 117,
     "anoniemUitvoerbaar": 385,
     "metSpoor": 130,
-    "metReden": 259,
-    "bestanden": 88
+    "metReden": 260,
+    "bestanden": 89
   },
   "graden": {
     "routes": "gemeten",
@@ -62,7 +62,7 @@
     "schaduw": {
       "wat": "een nieuwe regel loopt eerst mee zonder te blokkeren",
       "aanKantoorroute": 1,
-      "aanroepersInServer": 5
+      "aanroepersInServer": 6
     },
     "rechten": {
       "wat": "machtskaart: nominaal naast effectief",
@@ -199,7 +199,7 @@
   ],
   "deuren": {
     "officeAuth": 451,
-    "boardroomAuth": 107,
+    "boardroomAuth": 108,
     "balieAuth": 31,
     "techAuth": 16,
     "eigenaarAlleen": 10,

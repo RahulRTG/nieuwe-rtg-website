@@ -14,11 +14,15 @@ const { txLedgerAantal } = require('../../db'); // gecachete grootboek-teller (O
 const inzagelog = require('../../inzagelog');  // spoor bij elke blik in de identiteitskluis
 const envelop = require('../../opzet/envelop');
 
-function maakKantoor({ db, sessionFor, eigenaar, accounts, findSupplier, connectedSupplierCodes, publicSupplier, conciergeInbox, beveilig, archief, grootAantal, ledenAantal }) {
+function maakKantoor({ db, save, sessionFor, eigenaar, accounts, findSupplier, connectedSupplierCodes, publicSupplier, conciergeInbox, beveilig, archief, grootAantal, ledenAantal }) {
   const metrics = require('./metrics')({ db, accounts, conciergeInbox, beveilig });
   /* De kluispoort staat in ./kluispoort.js: hij is geen variant van officeAuth
      maar een eigen grens, en hij werd hier de druppel over keuringsregel 13. */
   const kluisAuth = require('./kluispoort')({ officeAuth, sessionFor });
+  /* DE SCHADUWMETING (KANTOOR.md par. 3). Telt per route of er een bewezen mens
+     achter de handeling stond; houdt niets tegen. Zie ./mensdeur.js voor waarom
+     dit een teller is en geen journaal. */
+  const mensdeur = require('./mensdeur').maakMensdeur({ db, save });
   /* DEZELFDE POORT, EEN ANDERE REDEN (TAKEN.md 4.73): de uitgifte tekent met
      vier ogen en las de naam uit `req.body.wie`. Zie ./kluispoort.js. */
   const naamAuth = require('./kluispoort')({ officeAuth, sessionFor }, {
@@ -40,6 +44,7 @@ function maakKantoor({ db, sessionFor, eigenaar, accounts, findSupplier, connect
       // het handvat van de mens: waarmee een besluit kan zien dat twee
       // handelingen niet van dezelfde persoon zijn (kern/appstore/vierogen.js)
       req.officeKey = sess.lidKey || null;
+      try { mensdeur.tel(req, res, !!sess.lidKey); } catch (e) {}
       return next();
     }
     // de eigenaar komt ook met zijn eigen accountlogin binnen (geen aparte code nodig)
@@ -50,6 +55,7 @@ function maakKantoor({ db, sessionFor, eigenaar, accounts, findSupplier, connect
         req.officeKey = 'user-' + u.id;   // zie hierboven
         envelop.zet(req, { soort: 'eigenaar', id: 'user-' + u.id,
           identiteit: 'bewezen', gezagBron: 'eigenaar', gezagBaas: true });
+        try { mensdeur.tel(req, res, true); } catch (e) {}
         return next();
       }
     } catch (e) {}
@@ -156,7 +162,9 @@ function maakKantoor({ db, sessionFor, eigenaar, accounts, findSupplier, connect
     });
   }
 
-  return { officeAuth, kluisAuth, naamAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, pendingVerifications };
+  return { officeAuth, kluisAuth, naamAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, pendingVerifications,
+    /* de schaduwmeting van ./mensdeur.js; leest alleen */
+    mensdeurStand: mensdeur.stand };
 }
 
 module.exports = { maakKantoor };

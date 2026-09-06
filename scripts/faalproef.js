@@ -58,6 +58,7 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'FAALPROEF.json');
@@ -84,15 +85,65 @@ const TOEPASBAAR = {
 const b = eisSchoneBoom('de faalproef');
 if (!b.ok) { console.error('\n  ' + b.reden + '\n'); for (const f of b.bestanden || []) console.error('    ' + f); process.exit(2); }
 
+/* `__map` is intern boekhouden en geen omgevingsvariabele: hem doorgeven zou
+   een onbekende sleutel in de serveromgeving zetten. */
+const schoonEnv = (e) => { const u = { ...e }; delete u.__map; return u; };
+
 /* Een ronde: server op, sleutels, wereld, en dan elke route een keer. Geeft per
    route wat er te zien was. */
 async function ronde(verraad, lijstUit) {
   const env = { RTG_DEMO: '1', RTG_MAGNAAT_TEST: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF', RTG_STAATLOG: '2' };
   if (verraad) { env.RTG_VERRAAD = verraad; env.RTG_VERRAAD_SEED = SEED; }
+
+  /* DE SLEUTELS WORDEN GEMUNT TERWIJL DE SCHIJF NOG HEEL IS.
+
+     Inloggen is zelf een SCHRIJFACTIE. Met `schrijf-faalt` mislukt hij dus, en
+     dan strandt de proef op "geen token voor: member, office, supplier" -- niet
+     omdat het systeem slecht faalt, maar omdat het instrument niet binnenkomt.
+     De eerste vorm hiervan was een dode server (zie ../server/lib/verraadfase.js);
+     dit is de tweede, en hij zit een laag hoger.
+
+     De uitweg is dezelfde die scripts/ketenronde.js gebruikt: EEN datamap, TWEE
+     servers. De eerste draait schoon en munt de sleutelbos; de tweede start op
+     diezelfde map met het verraad aan. Nagemeten dat dit mag: een sessie die
+     schoon is gemunt, komt de herstart door (office en supplier antwoorden 200
+     op hun eigen routes). Alleen daarom kan de sabotageronde iets meten op de
+     ~4100 routes die een rol vragen.
+
+     De schone ronde doet dit NIET: die mag zijn eigen map houden en munt zelf. */
+  let voorbereid = null;
+  if (verraad) {
+    const map = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-faalproef-'));
+    let voor;
+    try {
+      voor = await start({ naam: 'faalproef-munt', env: { RTG_DEMO: '1', RTG_MAGNAAT_TEST: '1',
+        OFFICE_CODE: 'RTG-OFFICE-PROEF', RTG_STAATLOG: '2' }, datamap: map });
+    } catch (e) {
+      fs.rmSync(map, { recursive: true, force: true });
+      return { waarnemingen: new Map(), lijst: lijstUit || [], nietGedraaid:
+        'de muntserver kwam niet op: ' + String(e && e.message || e).slice(0, 160) };
+    }
+    const muntPost = async (pad, lijf, token) => {
+      const h = { 'Content-Type': 'application/json' };
+      if (token) h.Authorization = 'Bearer ' + token;
+      try {
+        const r = await fetch(voor.basis + pad, { method: 'POST', headers: h, body: JSON.stringify(lijf || {}) });
+        const t = await r.text();
+        let data = null; try { data = JSON.parse(t); } catch (e) {}
+        return { status: r.status, data };
+      } catch (e) { return { status: 0, data: null }; }
+    };
+    voorbereid = await haalSleutels({ post: muntPost });
+    voor.klaar();
+    await new Promise(res => setTimeout(res, 800));
+    env.__map = map;
+  }
+
   let server;
   try {
-    server = await start({ naam: 'faalproef', env });
+    server = await start({ naam: 'faalproef', env: schoonEnv(env), datamap: env.__map });
   } catch (e) {
+    if (env.__map) fs.rmSync(env.__map, { recursive: true, force: true });
     /* NIET GEDRAAID IS IETS ANDERS DAN NIETS GEVONDEN. Zonder deze tak zakte de
        hele proef op het eerste verraad dat de opstart niet overleeft, en dan
        bestaat er ook geen uitslag voor het verraad dat het WEL doet. */
@@ -150,10 +201,17 @@ async function ronde(verraad, lijstUit) {
     } catch (e) { return { status: 0, data: null, staat: null, effect: null, nietGemeten: null }; }
   };
 
-  const bos = await haalSleutels({ post });
+  const bos = voorbereid || await haalSleutels({ post });
   const { tokens, tokenVoor } = bos;
   const mist = BASISROLLEN.filter(r => !tokens[r]);
-  if (mist.length) { klaar(); throw new Error('geen token voor: ' + mist.join(', ')); }
+  if (mist.length) {
+    klaar();
+    if (env.__map) fs.rmSync(env.__map, { recursive: true, force: true });
+    /* Geen sleutels is een UITSLAG en geen crash: zonder deze tak stopt de hele
+       proef en bestaat er ook geen uitslag voor het verraad dat wel werkte. */
+    return { waarnemingen: new Map(), lijst: lijstUit || [], nietGedraaid:
+      'geen token voor: ' + mist.join(', ') + (verraad ? ' (met ' + verraad + ' aan)' : '') };
+  }
   if (!verraad) meldSleutels(bos);
 
   let geldLijven = {};
@@ -186,6 +244,9 @@ async function ronde(verraad, lijstUit) {
   }
   klaar();
   await new Promise(res => setTimeout(res, 500));
+  /* Wie de datamap aanlevert, ruimt hem op -- klaar() doet dat alleen voor een
+     map die de wegwerpserver zelf heeft gemaakt. */
+  if (env.__map) fs.rmSync(env.__map, { recursive: true, force: true });
   return { waarnemingen: uit, lijst };
 }
 

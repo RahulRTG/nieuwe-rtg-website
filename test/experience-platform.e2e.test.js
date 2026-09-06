@@ -87,7 +87,18 @@ test('Tap, Search en Rahul kunnen dezelfde gebrokerde agenda-intentie veilig geb
   const boot = await post('/api/experience/bootstrap', { world: 'work' }, token);
   const definition = boot.body.intents.find(i => i.id === 'schedule.item.create');
   assert.ok(definition, 'schedule.item.create ontbreekt in het serverregister');
-  const parameters = { title: 'Golden path overleg', date: '2026-09-05', time: '10:15',
+  /* DE DATUM KOMT UIT DE KLOK EN STAAT NIET VAST, en dat is geen netheid maar
+     een reparatie. Hier stond '2026-09-05'. Deze toets eist verderop dat het
+     item in de WERKDAG-projectie verschijnt, en die toont alleen wat nog komt
+     (kern/kantoorwereld.js: `dag(i.datum) >= vandaag()`). Op 5 september 2026
+     was dat waar; vanaf 6 september viel het item eruit en zakte deze toets --
+     elke dag, op elke tak, voor iedereen. Een vaste datum in een lijf dat tegen
+     VANDAAG wordt gehouden is dus geen fixture maar een tijdbom.
+
+     Morgen en niet vandaag: `vandaag()` rekent in UTC, en een run die over
+     middernacht loopt zou bij een datum van vandaag alsnog omvallen. */
+  const morgen = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+  const parameters = { title: 'Golden path overleg', date: morgen, time: '10:15',
     note: 'Via de gedeelde intentlaag' };
 
   const fout = await post('/api/experience/intent/preview', {

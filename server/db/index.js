@@ -16,7 +16,7 @@
    (grootboek van zaken + ledengids) en ./tx (transactie-index + grootboek).
    Hier de load/save-orchestratie, het aanzetten van de opslag en het samenstellen
    van de publieke API. */
-const verraad = require('../lib/verraad');
+const verraadfase = require('../lib/verraadfase');
 const effectmeter = require('../effectmeter');
 const state = require('./state');
 const db = state.db;
@@ -87,8 +87,9 @@ function save() {
   effectmeter.tel('opslag');
   const doos = bundelDoos();
   if (doos && doos.open) { doos.nodig = true; return; } // binnen bijeen: aan het eind, in een commit
-  if (verraad.sla('schrijf-faalt')) throw new Error('[verraad] de schrijfactie mislukte (schrijf-faalt)');
-  if (verraad.sla('schrijf-verloren')) return;
+  // verraadfase = de motor ACHTER de opstartpoort; zie ../lib/verraadfase.js
+  if (verraadfase.sla('schrijf-faalt')) throw new Error('[verraad] de schrijfactie mislukte (schrijf-faalt)');
+  if (verraadfase.sla('schrijf-verloren')) return;
   if (STORE === 'postgres') {
     /* Een HTTP-request werkt in PostgreSQL-modus op een geisoleerde
        copy-on-write weergave. save() markeert daar alleen dat de responsepoort
@@ -113,8 +114,9 @@ const bewerkCollectie = require('./collectie-bewerken')({
   store: STORE, postgres, sqlite, db, save
 });
 
-// De tx-veegronde vraagt na een venster-verhuis een snapshot: injecteer save().
-tx.wire(save);
+// De tx-veegronde kapt pas na de duurzame grootboek-upsert en doet dat via de
+// autoritatieve collectiepoort; nooit als kale achtergrond-save.
+tx.wire(bewerkCollectie);
 
 // De kern zet hier een functie neer die na een externe wijziging draait.
 function onExternalChange(cb) { state.setExternCb(cb); }

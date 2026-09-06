@@ -14,6 +14,10 @@
 function maakAlgPin({ db, save, crypto, slot }) {
   const eigen = require('./eigencollectie')({ db, domein: 'kern/algpin', bezit: { algPin: 'kaart', algPinHerstel: 'kaart' } });
   const rij = () => eigen.bak('algPin');
+  /* Lezen zonder scheppen (zie kijk() in kern/eigencollectie.js). Hier telt het
+     extra: /api/pin/herstel is openbaar en /api/account/start weigert op zeven
+     plekken NA deze opzoeking. */
+  const leesRij = () => eigen.kijk('algPin');
   /* Het slot komt van buiten (server/pinslot.js) en wordt gedeeld met de
      personeelspin, de sleutelwoorden en het koppelen. Hier stond een eigen
      kopie van dezelfde teller, met dezelfde grenzen -- maar zonder de
@@ -38,19 +42,19 @@ function maakAlgPin({ db, save, crypto, slot }) {
   const teVaak = key => slot.dicht(doel(key));
   const fout = key => slot.fout(doel(key), 'de algemene pincode van ' + key);
   async function klopt(key, pin) {
-    const p = rij()[key];
+    const p = leesRij()[key];
     if (!p || !PIN_RE.test(String(pin || ''))) return false;
     const a = Buffer.from(await hash(pin, Buffer.from(p.zout, 'base64')));
     const b = Buffer.from(p.hash);
     return a.length === b.length && crypto.timingSafeEqual(a, b);
   }
 
-  function pinInfo(key) { return { gezet: !!rij()[key] }; }
+  function pinInfo(key) { return { gezet: !!leesRij()[key] }; }
 
   async function pinZet(key, body) {
     const pin = String((body || {}).pin || '');
     if (!PIN_RE.test(pin)) return { status: 400, error: 'Kies een pincode van 4 tot 8 cijfers.' };
-    if (rij()[key]) {
+    if (leesRij()[key]) {
       if (teVaak(key)) return { status: 429, error: 'Te veel foute pogingen. Wacht een minuut.' };
       if (!await klopt(key, (body || {}).oud)) { fout(key); return { status: 401, error: 'De huidige pincode klopt niet.' }; }
     }
@@ -61,7 +65,7 @@ function maakAlgPin({ db, save, crypto, slot }) {
   }
 
   async function pinCheck(key, pin) {
-    if (!rij()[key]) return { ok: true, gezet: false }; // geen pin gezet = niets te bewijzen
+    if (!leesRij()[key]) return { ok: true, gezet: false }; // geen pin gezet = niets te bewijzen
     if (teVaak(key)) return { status: 429, error: 'Te veel foute pogingen. Wacht een minuut.' };
     if (!await klopt(key, pin)) { fout(key); return { status: 401, error: 'Onjuiste pincode.' }; }
     slot.goed(doel(key));
@@ -88,6 +92,7 @@ function maakAlgPin({ db, save, crypto, slot }) {
      zwakker dan de deur die eromheen zit. */
   const HERSTEL_MS = 3600000;   // een uur, net als de wachtwoordlink
   const herstelRij = () => eigen.bak('algPinHerstel');
+  const leesHerstel = () => eigen.kijk('algPinHerstel');   // zie de uitleg bij leesRij
   const sleutelHash = t => crypto.createHash('sha256').update(String(t)).digest('hex');
 
   function pinHerstelStart(key) {
@@ -103,7 +108,7 @@ function maakAlgPin({ db, save, crypto, slot }) {
      daarna misgaat. Een sleutel die na een misgreep nog werkt is geen sleutel. */
   async function pinHerstelZet(sleutel, pin) {
     const h = sleutelHash(String(sleutel || ''));
-    const r = herstelRij()[h];
+    const r = leesHerstel()[h];
     if (!r || r.tot < Date.now()) return { status: 400, error: 'Deze herstellink is verlopen of al gebruikt. Vraag een nieuwe aan.' };
     delete herstelRij()[h];
     if (!PIN_RE.test(String(pin || ''))) { save(); return { status: 400, error: 'Kies een pincode van 4 tot 8 cijfers.' }; }

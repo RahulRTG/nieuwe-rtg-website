@@ -128,6 +128,70 @@ const VOORZIENINGEN = Object.freeze({
   '/api/bank/terugkerend/stop': ['/api/bank/akkoord', '/api/bank/terugkerend/zet']
 });
 
+/* ---- 2c. DE OPZOEKING: het onderwerp bestaat al -------------------------- */
+/* HET VERSCHIL MET EEN VOORZIENING, en dat is het hele punt van deze laag.
+   Een voorziening MAAKT het onderwerp (publiceren vraagt een website, dus
+   bewaren we er een). Een opzoeking maakt niets: zij LEEST wat de zaaiset al
+   heeft gezet en geeft de identificerende velden door.
+
+   WAAROM DIT GEEN VERZINNEN IS. De regel boven dit bestand zegt dat een proef
+   die zijn eigen meetobject verzint zichzelf meet, en die regel staat overeind.
+   Hier wordt niets gemaakt: de salon, de zorgaanbieder en hun behandelingen
+   staan in de zaaiset, en dit haalt hun eigen codes op langs de gewone
+   leesroute. Wie dat niet doet, meet niet de terugweg maar zijn eigen
+   onwetendheid over welke salon er in DEZE database staat.
+
+   HET VERSCHIL MET EEN LIJF is dat een lijf VORM is (een clip duurt 12
+   seconden) en dit IDENTITEIT (deze salon, deze behandeling, dit vrije uur).
+   Een lijf kun je opschrijven; dit moet je vragen.
+
+   HET WAS EEN ONJUISTE REDEN EN GEEN ONTBREKENDE WERELD. Hieronder stond
+   `'/api/verzorging/boek': 'een salon in de zaaiset'` -- gemeten op 6 september
+   2026 geeft /api/verzorging de salon VELVET met behandeling b1 en achttien
+   vrije tijden, en /api/care de aanbieder zenith met zt1. Die werelden waren er
+   dus; wat ontbrak was de opzoeking. Een paar dat `wereldOntbreekt` heet
+   terwijl de wereld er staat, is een meetfout die eruitziet als een besluit --
+   en juist die vorm houdt zichzelf jaren in stand.
+
+   EEN OPZOEKING MAG NIETS TERUGGEVEN. Vindt zij niets (een lege zaaiset, een
+   agenda zonder vrij uur), dan blijft het paar gewoon falen op de heenweg en
+   heet het `nietBeproefd`. Zij verzint dan geen tweede kandidaat. */
+
+/* Een datum een eind vooruit, uit de klok en nooit vast opgeschreven. Beide
+   boekroutes eisen `datum >= vandaag()`; een vaste datum in dit bestand zou op
+   de dag erna stilletjes gaan zakken, en dat is precies de fout die
+   test/experience-platform.e2e.test.js een keer heeft gemaakt. */
+const straks = () => new Date(Date.now() + 3 * 86400000).toISOString().slice(0, 10);
+
+const OPZOEKINGEN = Object.freeze({
+  /* De salon: code, behandeling en een vrij uur horen bij ELKAAR. Ze los
+     ophalen geeft een behandeling van de ene salon op een uur van de andere,
+     en dan meet je een 409 in plaats van een terugweg. */
+  '/api/verzorging/boek': async ({ roep }) => {
+    const datum = straks();
+    const r = await roep('/api/verzorging', { datum });
+    const aanbieders = (r && r.data && r.data.aanbieders) || [];
+    for (const a of aanbieders) {
+      const b = (a.behandelingen || []).find(x => (x.tijden || []).length);
+      if (b) return { code: a.code, behandelingId: b.id, datum, tijd: b.tijden[0] };
+    }
+    return null;
+  },
+  /* Care wijst zijn aanbieder met `aanbiederId` aan en niet met `code`, en de
+     vrije tijden staan bij de behandeling zelf in plaats van per dag. Twee
+     domeinen, twee talen -- de proef past zich aan de route aan en niet
+     andersom, net als bij `iban` tegenover `vanIban` hierboven. */
+  '/api/care/boek': async ({ roep }) => {
+    const r = await roep('/api/care', {});
+    const aanbieders = (r && r.data && r.data.aanbieders) || [];
+    for (const a of aanbieders) {
+      const b = (a.behandelingen || []).find(x => (x.tijden || []).length);
+      if (b) return { aanbiederId: a.id, behandelingId: b.id, datum: straks(), tijd: b.tijden[0] };
+    }
+    return null;
+  }
+});
+
 /* ---- 3. ONBEREIKBAAR: wat een andere wereld vraagt ----------------------- */
 /* Dit is geen lijst mislukkingen maar een lijst BESLUITEN: deze paren vragen
    een wereld die deze proef niet opzet, en het nabouwen ervan zou meer
@@ -141,12 +205,8 @@ const ONBEREIKBAAR = Object.freeze({
   '/api/supplier/redactie/rubriek/verwijder': 'een zaak met de werkvorm journalistiek; deze proef logt in op de zaaizaak',
   '/api/command/stad/start': 'een ingericht landpakket; een stad in een land zonder inrichting is een stad zonder munt',
   '/api/command/stad/stop': 'een ingericht landpakket; een stad in een land zonder inrichting is een stad zonder munt',
-  '/api/verzorging/boek': 'een salon in de zaaiset',
-  '/api/verzorging/annuleer': 'een salon in de zaaiset',
   '/api/thuis/boek': 'een huis in de zaaiset',
   '/api/thuis/annuleer': 'een huis in de zaaiset',
-  '/api/care/boek': 'een zorgaanbieder in de zaaiset',
-  '/api/care/annuleer': 'een zorgaanbieder in de zaaiset',
   '/api/rtfos/meldcode/open': 'een stadsafdeling in de zaaiset',
   '/api/rtfos/meldcode/sluit': 'een stadsafdeling in de zaaiset',
   '/api/office/afdelingshotel/boek': 'een afdeling in het afdelingshotel',
@@ -207,6 +267,8 @@ const voorzieningVoor = (pad) => {
   return v ? (Array.isArray(v) ? v : [v]) : null;
 };
 const onbereikbaar = (pad) => ONBEREIKBAAR[pad] || null;
+/* Een opzoeking is ASYNC: zij stelt een echte vraag aan de server. */
+const opzoekingVoor = (pad) => OPZOEKINGEN[pad] || null;
 
-module.exports = { zetWereldKlaar, lijfVoor, voorzieningVoor, onbereikbaar,
-  LIJVEN, VOORZIENINGEN, ONBEREIKBAAR };
+module.exports = { zetWereldKlaar, lijfVoor, voorzieningVoor, onbereikbaar, opzoekingVoor,
+  LIJVEN, VOORZIENINGEN, ONBEREIKBAAR, OPZOEKINGEN };

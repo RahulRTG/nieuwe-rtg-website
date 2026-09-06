@@ -243,8 +243,13 @@ for (const r of rijen) {
     /* Uit de handler, of -- als de objectpoort op de ROUTER hangt -- uit
        ROUTERPOORTEN. Dertien werkplek-routes haalden alle vier de bewijseisen en
        strandden hier op een ontbrekend veld. */
+    /* Drie bronnen, en de derde is er sinds 4 september bij: een route uit een
+       LUS heeft geen bewaker in de routetabel, want zijn poort zit in de handler
+       van die lus. Zonder die derde stonden 31 spelroutes als "zonder
+       objectveld" terwijl ze allemaal achter rtfSpeler() hangen. */
     const veld = uh.startsWith('object: ') ? uh.slice(8)
-      : ((x.toegang && x.toegang.bewakers) || []).map(n => handlerpoorten.veldVanBewaker(n)).find(Boolean);
+      : (((x.toegang && x.toegang.bewakers) || []).map(n => handlerpoorten.veldVanBewaker(n)).find(Boolean)
+        || handlerpoorten.veldVanPad(r.pad));
     if (!veld) { zonderDeur++; continue; }   // OBJECT_SCOPED zonder veld is geen contract
     rij.objectVeld = veld;
   }

@@ -125,13 +125,38 @@ function veldVanBewaker(naam) {
    Segmenten maken het verschil zichtbaar in de code zelf: dit is een voorvoegsel
    om op te vergelijken, geen pad om op te hangen. */
 const FAMILIES = [
-  { segmenten: ['api', 'rtf', 'spel'], poort: 'rtfSpeler',
+  { segmenten: ['api', 'rtf', 'spel'], poort: 'rtfSpeler', veld: 'code',
     bron: 'server/routes/spellen.js regel 139: een lus over ACTIES hangt elke actie onder dat ' +
-      'voorvoegsel op, en alle krijgen dezelfde poort' }
+      'voorvoegsel op, en alle krijgen dezelfde poort',
+    veldBron: 'server/routes/spellen.js regel 19: rtfSpeler() doet rtf.verifieerProfiel(req.body.code, ' +
+      'req.body.token) -- dezelfde profielcontrole als gezinsPoort en rtfPoort hierboven, dus hetzelfde ' +
+      'objectveld. Twee spelers met dezelfde rol krijgen op een andere code een ander antwoord.' }
 ];
 
 const voorvoegselVan = (f) => '/' + f.segmenten.join('/') + '/';
 
+/* HET OBJECTVELD VAN EEN GEGENEREERDE ROUTE.
 
-module.exports = { ROUTEPOORTEN, poortVanRouteHand, ROUTERPOORTEN, veldVanBewaker, FAMILIES, voorvoegselVan };
+   Waarom dit naast veldVanBewaker() staat en er niet in past: een route uit een
+   lus heeft geen bewaker in de routetabel staan -- de poort zit IN de handler
+   van de lus. `veldVanBewaker` kijkt naar namen die de tabel noemt en vindt daar
+   dus niets, terwijl de deur er wel degelijk is.
+
+   Dat verschil kostte 31 routes. Ze stonden als OBJECT_SCOPED "zonder
+   objectveld" in de meting, met als enige reden dat de lezer op de verkeerde
+   plek keek -- precies dezelfde vorm als de zeven "onvindbare bronnen" van
+   keuringsregel 28, die gewoon een bewaker hadden die niet in het vocabulaire
+   stond. Een gat dat verdwijnt zodra je het goed bekijkt, is geen gat; het is
+   een meetfout, en die hoort te worden gerepareerd in plaats van weggestreept. */
+function veldVanPad(pad) {
+  const p = String(pad || '');
+  for (const f of FAMILIES) {
+    if (!f.veld) continue;
+    if (p.startsWith(voorvoegselVan(f))) return f.veld;
+  }
+  return null;
+}
+
+
+module.exports = { ROUTEPOORTEN, poortVanRouteHand, ROUTERPOORTEN, veldVanBewaker, veldVanPad, FAMILIES, voorvoegselVan };
 

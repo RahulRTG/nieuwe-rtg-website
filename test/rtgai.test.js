@@ -1,6 +1,6 @@
 /* De RTG AI van het RTG Kantoor: leest mee, traint zichzelf, meldt zich
    klaar, en krijgt het roer ALLEEN via de knop; daarna draait het
-   routinewerk automatisch door en de terug-knop werkt.
+   aantoonbare rondes automatisch door en de terug-knop werkt.
    Draai los: node --test test/rtgai.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -55,11 +55,11 @@ test('2. hij traint zichzelf klaar en MELDT dat; overnemen doet hij nooit zelf',
   assert.equal((await api(base, '/api/office/rtgai', {}, office)).body.fase, 'klaar-voor-roer');
 });
 
-test('3. de knop geeft het roer; daarna draait het routinewerk vlekkeloos door', async () => {
+test('3. de knop geeft het roer; daarna lopen aantoonbare rondes veilig door', async () => {
   const r = await api(base, '/api/office/rtgai/roer/geef', {}, office);
   assert.equal(r.status, 200);
   assert.equal(r.body.fase, 'aan-het-roer');
-  // twee rondes aan het roer: elke ronde routinewerk + journaalregel
+  // twee rondes aan het roer: elke ronde krijgt een eigen journaalregel
   await api(base, '/api/office/rtgai/train', {}, office);
   await api(base, '/api/office/rtgai/train', {}, office);
   const s = (await api(base, '/api/office/rtgai', {}, office)).body;

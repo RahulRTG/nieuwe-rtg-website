@@ -45,6 +45,11 @@ module.exports = ({ db, save, crypto, anthropic, ledenAantal, accounts, keyVanCo
   const deelBewaking = require('./afdelingen/bewaking')(ctx);
   Object.assign(ctx, deelBewaking);
   const deelInzage = require('./afdelingen/inzage')(ctx);
+  /* De integratiekamer: de standen van de vier externe kanalen plus de
+     noodstop. Hij hangt hier omdat die noodstop DUURZAAM wegschrijft en dat
+     niet in een route hoort (npm run check regel 47), en niet als eigen
+     kernnaam omdat `kernBreedte` in NORM.json alleen omlaag mag. */
+  const deelIntegraties = require('./afdelingen/integratiekamer')({ db, save });
   const deelKamerAdvies = require('./afdelingen/kameradvies')(ctx);
   const { taken, taakMaak, taakZet, kamer, kamers, functiesStand, schakel, schakelFijn, schakelAlles, schakelGenre, schakelFase, bouwVoorstellen, voorstellen, boardroom, platformStats } = deelBoardroom;
   const { chatRij, chatLijst, chatStuur, HUISREGELS, ONBOARDING_EXTRA, onboarding, dienstRij, dienstIn, dienstUit, dienstNu, kantineMenu, kantineMenuZet } = deelKantoor;
@@ -52,5 +57,5 @@ module.exports = ({ db, save, crypto, anthropic, ledenAantal, accounts, keyVanCo
   const { naamInzage } = deelInzage;
   const { kamerAdvies, boardroomAdvies } = deelKamerAdvies;
 
-  return { afdelingen: { kamers, kamer, taakMaak, taakZet, boardroom, kamerAdvies, boardroomAdvies, schakel, schakelFijn, schakelAlles, schakelGenre, schakelFase, voorstellen, paniekStel, paniekBesluit, paniekBericht, paniekLijst, platformStats, chatLijst, chatStuur, onboarding, dienstIn, dienstUit, dienstNu, kantineMenu, kantineMenuZet, naamInzage, wereld, wereldActie, opdrachtVoorDoos, doosUpdateZet, doosNetwerkZet, doosRegie, audit, KAMER_IDS } };
+  return { afdelingen: { kamers, kamer, taakMaak, taakZet, boardroom, kamerAdvies, boardroomAdvies, schakel, schakelFijn, schakelAlles, schakelGenre, schakelFase, voorstellen, paniekStel, paniekBesluit, paniekBericht, paniekLijst, platformStats, chatLijst, chatStuur, onboarding, dienstIn, dienstUit, dienstNu, kantineMenu, kantineMenuZet, naamInzage, wereld, wereldActie, opdrachtVoorDoos, doosUpdateZet, doosNetwerkZet, doosRegie, audit, KAMER_IDS, integratiekamer: deelIntegraties } };
 };

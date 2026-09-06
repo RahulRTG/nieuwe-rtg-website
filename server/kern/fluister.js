@@ -68,13 +68,16 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, annulee
     return { ok: true, weetjes: p.weetjes };
   }
   function fluisterVergeet(key, wat) {
+    // lezen zonder scheppen: van() schept, dus de nummercontrole gaat ervoor
+    const i = parseInt(wat, 10);
+    if (wat !== 'alles') {
+      const bestaand = eigen.kijk('fluister')[key];
+      const n = bestaand && Array.isArray(bestaand.weetjes) ? bestaand.weetjes.length : 0;
+      if (!(i >= 0) || i >= n) return { status: 404, error: 'Dat weetje ken ik niet.' };
+    }
     const p = van(key);
     if (wat === 'alles') p.weetjes = [];
-    else {
-      const i = parseInt(wat, 10);
-      if (!(i >= 0) || i >= p.weetjes.length) return { status: 404, error: 'Dat weetje ken ik niet.' };
-      p.weetjes.splice(i, 1);
-    }
+    else p.weetjes.splice(i, 1);
     save();
     return { ok: true, weetjes: p.weetjes };
   }

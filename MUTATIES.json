@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-03T15:30:26.401Z",
-    "commit": "1bf48fd8",
+    "op": "2026-09-06T16:16:53.379Z",
+    "commit": "c8cf5916d",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -67,6 +67,14 @@
       "operator": "return-weg",
       "gezakt": 5
     },
+    "achtergrondcollecties.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/kosten/meterbatch.js",
+      "operator": "!==->===#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "activering.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -119,6 +127,14 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 2
+    },
+    "afbouwpoort.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/afbouw-slot.js",
+      "operator": "===->!==#3",
+      "gezakt": 3,
+      "geprobeerd": 17
     },
     "afleidbaar.test.js": {
       "soort": "puur",
@@ -1656,6 +1672,21 @@
       "staat": "al rood",
       "gezakteZonderMutatie": 2
     },
+    "experience-platform.e2e.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
+    },
+    "faalproefvorm.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/bewijsmatrix.js",
+      "operator": "===->!==#3",
+      "gezakt": 1,
+      "geprobeerd": 16
+    },
     "facturatie.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -1757,6 +1788,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 9,
       "scherp": "gezakt"
+    },
+    "foutmelder-dekking.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/middleware/kopinjectie.js",
+      "operator": "+->-#0",
+      "gezakt": 1,
+      "geprobeerd": 2
     },
     "foutmelder.test.js": {
       "soort": "puur",
@@ -2284,6 +2323,11 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "heritage-truth.test.js": {
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "inhoudscensus; een teruggebrachte vaste Kyoto-claim liet de waarheidstoets zakken"
+    },
     "herkomst.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -2544,6 +2588,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 7,
       "scherp": "gezakt"
+    },
+    "huisdb.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/huisdb.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "huisstijl.test.js": {
       "soort": "server",
@@ -3108,6 +3160,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 3,
       "scherp": "gezakt"
+    },
+    "leeszonderscheppen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/algpin.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 2
     },
     "leren-leden.test.js": {
       "soort": "server",
@@ -4104,6 +4164,10 @@
       "gezakt": 11,
       "scherp": "gezakt"
     },
+    "objectveld.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
+    },
     "ochtend.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -4533,6 +4597,14 @@
       "gezakt": 12,
       "scherp": "gezakt"
     },
+    "paginaroutes.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/middleware/voordeur.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
     "paginascripts.test.js": {
       "soort": "puur",
       "staat": "geen module gevonden"
@@ -4906,6 +4978,14 @@
       "gezakt": 13,
       "scherp": "gezakt"
     },
+    "postgres-requestcommit.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/web/index.js",
+      "operator": "&&->||#0",
+      "gezakt": 2,
+      "geprobeerd": 2
+    },
     "pragmavolgorde.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -5216,6 +5296,13 @@
       "gezakt": 6,
       "geprobeerd": 1
     },
+    "remduurzaam.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
+      "scherp": "gezakt"
+    },
     "rendezvous.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -5485,6 +5572,96 @@
       "operator": "liegpoort /api/",
       "gezakt": 3,
       "scherp": "gezakt"
+    },
+    "rtg-continue-key.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/rtg-continue-key.js",
+      "operator": "===->!==#0",
+      "gezakt": 8,
+      "geprobeerd": 3
+    },
+    "rtg-edge-2-pilots.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/rtg-edge-2.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 3
+    },
+    "rtg-edge-2.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/rtg-edge-2.js",
+      "operator": "===->!==#0",
+      "gezakt": 6,
+      "geprobeerd": 3
+    },
+    "rtg-edge-accessibility.test.js": {
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "CSS-contract; handmutatie 44px naar 40px liet de raakdoeltoets zakken"
+    },
+    "rtg-edge-boot.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/randen.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 3
+    },
+    "rtg-edge-uitrol.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/basis/basis-01ac-edge.js",
+      "operator": "getal+1#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "rtg-heritage-first-paint.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/rtg-world-identity.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "rtg-heritage-motion.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/rtg-heritage-motion.js",
+      "operator": "true->false#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "rtg-heritage-operational.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/rtg-world-identity.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "rtg-heritage-order.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/rtg-heritage-order.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "rtg-heritage.test.js": {
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "CSS-contract; handmutatie inhoudsradius 2px naar 8px liet de geometriepoort zakken"
+    },
+    "rtg-world-identity.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/rtg-world-identity.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
     },
     "rtgai.test.js": {
       "soort": "server",
@@ -7101,6 +7278,18 @@
       "gezakt": 7,
       "scherp": "gezakt"
     },
+    "vandaag-luxe.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/rtg-vandaag-luxe.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 3
+    },
+    "vandaag-surface-pilots.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
+    },
     "vastgoed.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -7195,6 +7384,14 @@
       "gezakt": 4,
       "geprobeerd": 1
     },
+    "verraadfase.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/verraadfase.js",
+      "operator": "false->true#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "verraadtelling.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -7217,6 +7414,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 3,
       "scherp": "gezakt"
+    },
+    "vertrouwenbronnen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/vertrouwen.js",
+      "operator": "-->+#0",
+      "gezakt": 1,
+      "geprobeerd": 5
     },
     "verzadiging.test.js": {
       "soort": "puur",

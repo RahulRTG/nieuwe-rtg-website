@@ -7,7 +7,7 @@
    langs maar direct: een terugval mag je nooit blokkeren. Krijgt de gedeelde ctx
    van kern/bankregie/index.js. */
 module.exports = (ctx) => {
-  const { d, save, MODI, RANG, AUTORISATIE_MS, _modusZet, _operationeelZet, kenmerk } = ctx;
+  const { d, kijk, save, MODI, RANG, AUTORISATIE_MS, _modusZet, _operationeelZet, kenmerk } = ctx;
 
   const pub = a => a && { id: a.id, actie: a.actie, modus: a.modus || null, door: a.door, at: a.at, verlooptOverMs: Math.max(0, AUTORISATIE_MS - (Date.now() - a.at)) };
 
@@ -76,7 +76,7 @@ module.exports = (ctx) => {
     if (res && res.error) return { status: res.status || 409, error: res.error, uitgevoerd: null, aangevraagdDoor: a.door, bevestigdDoor: wie };
     return { ok: true, uitgevoerd: a.actie, modus: d().modus, operationeel: d().operationeel, aangevraagdDoor: a.door, bevestigdDoor: wie };
   }
-  function status() { return { ok: true, autorisatie: pub(d().autorisatie) }; }
+  function status() { return { ok: true, autorisatie: pub(kijk().autorisatie) }; }
   function annuleer({ wie } = {}) { d().autorisatie = null; save(); return { ok: true, wie: wie || 'boardroom' }; }
 
   return { aanvraag, bevestig, status, annuleer, pub };

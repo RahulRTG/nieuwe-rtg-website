@@ -117,6 +117,22 @@ const STAAT = (argv.find(a => a.startsWith('--staat=')) || '').slice(8) || inWor
    het routejournaal van de gewone suite; zie scripts/outputproef.js en
    scripts/auditproef.js voor wat hun oordelen betekenen en waar ze ophouden. */
 const OUTPUT = (argv.find(a => a.startsWith('--output=')) || '').slice(9) || inWortel('OUTPUTPROEF.json');
+/* DE FAALPROEF, EN WAAROM HIJ HIER EERST NIET STOND.
+
+   scripts/faalproef.js is gebouwd om precies deze kolom te vullen -- hij haalt
+   het verraad uit server/lib/verraad.js over ALLE routes in plaats van over de
+   drie ketens -- en schrijft FAALPROEF.json in dezelfde vorm als zijn buren.
+   Alleen: dit bestand las hem nooit. De FAILURE-cel werd uitsluitend uit
+   KETENS.json gevuld, en dat zijn drie ketens, samen twee routes.
+
+   Het gevolg stond in drie registers tegelijk en zag er in geen ervan uit als
+   een bedradingsfout: FAILURE bewezen 2 van 4971 (0,0%), en omdat
+   scripts/vertrouwen.js elke route met ook maar een ongemeten schakel op
+   `verzwakt` zet, stond VERTROUWEN.json op 0 bewezen en 4716 verzwakt. De
+   bewijspoort in server/kern/stuur/beleid.js hangt daaraan, en houdt dus
+   niets tegen. Een cel die niemand kan vullen is geen lat maar een muur --
+   dat schreef faalproef.js zelf al in zijn kop, en hij had gelijk. */
+const FAALPROEF = (argv.find(a => a.startsWith('--faalproef=')) || '').slice(12) || inWortel('FAALPROEF.json');
 const IDEMBESLUIT = (argv.find(a => a.startsWith('--idembesluit=')) || '').slice(14) || inWortel('IDEMBESLUIT.json');
 const ROLLBACKBESLUIT = (argv.find(a => a.startsWith('--rollbackbesluit=')) || '').slice(18) || inWortel('ROLLBACKBESLUIT.json');
 /* `AUDITP` STOND HIER, EN HET WAS DEZELFDE REGEL ALS `AUDIT` HIERBOVEN -- zelfde
@@ -171,7 +187,8 @@ const SCHAKELS = [
     bron: 'scripts/staatproef-route.js (op de TOESTAND), met scripts/idemproef-route.js als terugval (op het ANTWOORD)',
     nvtBijLezen: true },
   { id: 'FAILURE', uitleg: 'faalt hij netjes als er iets onder hem wegvalt',
-    bron: 'scripts/ketenronde.js (echte sabotage op de keten waar deze route in zit)' },
+    bron: 'scripts/ketenronde.js (echte sabotage op de keten waar deze route in zit, en die HERSTART de server) ' +
+      'met scripts/faalproef.js daaronder (hetzelfde verraad per route, maar binnen het proces)' },
   { id: 'ROLLBACK', uitleg: 'laat een half mislukte oproep niets half achter',
     bron: 'scripts/ketenronde.js + scripts/staatproef-route.js (geweigerd, en bleef de toestand gelijk)', nvtBijLezen: true },
   { id: 'PRIVACY', uitleg: 'lekt het antwoord een echte naam, IBAN of e-mailadres',
@@ -303,6 +320,20 @@ function rolproefUitslag() {
     if (!Array.isArray(j.perRoute)) return null;
     const kaart = new Map();
     for (const r of j.perRoute) kaart.set(r.methode + ' ' + r.pad, r);
+    /* NIET TE KRUISEN IS GEEN GAT. Een route waarvan de rol geen sleutel heeft
+       (`openbaar`, `omgeving`, `eigen-poort`) kan per definitie niet met een
+       VERKEERDE rol worden bekropen: hij vraagt geen kop. Die cellen stonden
+       hier op `ongemeten` -- alsof niemand keek -- en zolang de wacht in
+       lib/rolproef.js dood was zelfs op `gezakt`, want een openbare route laat
+       een ingelogd lid gewoon binnen. Dat waren op 6 september 2026 29 van de
+       30 gezakte cellen in het hele huis.
+
+       `nvt` mag hier alleen staan met de REDEN erbij, en die komt uit het
+       register (welke lijst noemt deze route openbaar). Zonder die reden is nvt
+       een manier om een teller te verlagen. */
+    kaart.nvt = new Map();
+    for (const r of (Array.isArray(j.nietTeKruisen) ? j.nietTeKruisen : []))
+      kaart.nvt.set(r.methode + ' ' + r.pad, r);
     return kaart;
   } catch (e) { return null; }
 }
@@ -431,6 +462,7 @@ function bouw(invoer) {
   /* De journaalproef, in de object-vorm (zie AUDITJOURNAAL hierboven). Dezelfde
      naam `auditp` als vroeger, zodat een toets die hem injecteert blijft werken. */
   const auditp = inv.auditp !== undefined ? inv.auditp : objectRegister(AUDITJOURNAAL);
+  const faal = inv.faal !== undefined ? inv.faal : perRouteKaart(FAALPROEF);
 
   const rijen = [];
   for (const r of tabel.routes) {
@@ -586,6 +618,27 @@ function bouw(invoer) {
             : { staat: 'gezakt', bron: 'ketenronde', reden: 'stil verlies' };
           continue;
         }
+        /* DE FAALPROEF ALS TWEEDE BRON, en met opzet ONDER de ketenronde.
+
+           De ketenronde is de zwaardere waarneming: die HERSTART de server en
+           ziet dus of een schrijfactie de herstart overleeft. De faalproef meet
+           binnen het proces en zegt dat zelf in zijn eigen `grens`. Waar allebei
+           iets vinden, wint de zware -- daarom staat deze tak eronder en niet
+           erboven.
+
+           `ongemeten` van de faalproef krijgt hier zijn REDEN mee in plaats van
+           een lege cel. Dat is het verschil tussen "het verraad greep niet aan"
+           en "niemand heeft gekeken", en die twee horen niet op een hoop. */
+        if (s.id === 'FAILURE') {
+          const fp = faal && faal.get(sleutel);
+          if (fp && fp.failure === 'bewezen') {
+            cellen[s.id] = { staat: 'bewezen', bron: 'faalproef', reden: fp.reden }; continue;
+          }
+          if (fp && fp.failure === 'gezakt') {
+            cellen[s.id] = { staat: 'gezakt', bron: 'faalproef', reden: fp.reden }; continue;
+          }
+          if (fp) { cellen[s.id] = { staat: 'ongemeten', bron: 'faalproef', reden: fp.reden }; continue; }
+        }
         /* ROLLBACK IN DRIE STAPPEN, en de derde is de reparatie: kon er NERGENS
            iets over gezegd worden, dan zwijgt de zware bron en mag de lichte
            (de staatproef hieronder) spreken. Eerst gaf hij daar "gezakt" op, en
@@ -641,6 +694,7 @@ function bouw(invoer) {
 
       if (s.id === 'ACL' || s.id === 'PRIVACY') {
         const beproefd = rol && rol.get(sleutel);
+        const geenSleutel = rol && rol.nvt && rol.nvt.get(sleutel);
         if (beproefd) {
           /* Beproefd EN doorstaan is bewezen; beproefd en gezakt is een
              bevinding, en die hoort niet als bewijs te tellen. */
@@ -648,6 +702,8 @@ function bouw(invoer) {
           cellen[s.id] = stuk
             ? { staat: 'gezakt', bron: 'rolproef', rollen: beproefd.geprobeerd }
             : { staat: 'bewezen', bron: 'rolproef', rollen: beproefd.geprobeerd };
+        } else if (geenSleutel) {
+          cellen[s.id] = { staat: 'nvt', bron: 'rolproef', reden: geenSleutel.reden };
         } else {
           cellen[s.id] = { staat: 'ongemeten' };
         }

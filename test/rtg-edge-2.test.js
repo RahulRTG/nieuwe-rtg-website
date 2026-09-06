@@ -166,19 +166,18 @@ test('CSS toont per state alleen de bedoelde bestaande randen', () => {
   assert.doesNotMatch(CSS, /\.rtg-edge-chrome\s*\{[^}]*display:none/);
 });
 
-test('iedere wereld bezit de volledige goedgekeurde Edge-materiaalset', () => {
-  const paletten = {
-    living: ['#f4f0e8', '#fbf8f2', '#211e19', '#675f54', 'rgba(33,30,25,.16)', '#b89545', 'rgba(184,149,69,.14)', '#745718'],
-    travel: ['#14090e', '#231016', '#f7f0e6', '#c2b2aa', 'rgba(247,240,230,.16)', '#7f1634', 'rgba(127,22,52,.22)', '#d0b77b'],
-    work: ['#0c1112', '#141b1c', '#f0f2ec', '#aab6b2', 'rgba(240,242,236,.15)', '#75b8b1', 'rgba(117,184,177,.16)', '#c1a45f'],
-    foundation: ['#071522', '#0b2032', '#f2f2ea', '#aebccc', 'rgba(242,242,234,.16)', '#d0b66e', 'rgba(208,182,110,.16)', '#d0b66e']
+test('iedere wereld laat Edge dezelfde centrale Heritage-tokens consumeren', () => {
+  const rollen = {
+    bg: 'bg', panel: 'card', copy: 'ink', dim: 'muted', line: 'line',
+    accent: 'signature', 'accent-soft': 'signature-soft', metal: 'metal'
   };
-  for (const [wereld, waarden] of Object.entries(paletten)) {
+  for (const wereld of ['living', 'travel', 'work', 'foundation']) {
     const blok = CSS.match(new RegExp('data-rtg-world="' + wereld + '"\\]\\{([^}]+)\\}'));
     assert.ok(blok, wereld + ' heeft geen Edge-palet');
-    for (const waarde of waarden) assert.ok(blok[1].includes(waarde), wereld + ' mist ' + waarde);
-    for (const rol of ['bg', 'panel', 'copy', 'dim', 'line', 'accent', 'accent-soft', 'metal']) {
+    for (const [rol, token] of Object.entries(rollen)) {
       assert.ok(blok[1].includes('--edge2-' + rol + ':'), wereld + ' mist rol ' + rol);
+      assert.ok(blok[1].includes('var(--rtg-world-' + token + ','),
+        wereld + ' laat Edge-' + rol + ' niet uit de centrale wereldrol erven');
     }
   }
   const chrome = CSS.match(/\.rtg-edge-chrome\{([^}]+)\}/)[1];

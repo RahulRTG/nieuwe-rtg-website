@@ -1,38 +1,52 @@
-/* DE RAND VAN HET SCHERM -- een paneel, geen knop.
-
-   Instellingen zijn geen inhoud; ze horen niet permanent in beeld. Ze komen
-   daarom van de rand, zoals een besturingssysteem dat doet:
-
-     vanaf de BOVENRAND omlaag slepen  -> het bedieningspaneel (instellingen)
-
-   Hier zat ook een ONDERRAND: omhoog slepen riep Rahul op. Die is weg, en dat
-   is een besluit over hoe het huis werkt. Rahul heeft nu overal dezelfde
-   chatbalk (shared/metgezel.js), die je zelf klein of groot maakt. Een tweede
-   manier om diezelfde balk op te roepen -- een gebaar dat je moet kennen, dat
-   niets toont zolang je het niet doet, en dat op de onderrand van een telefoon
-   met de systeembalk vecht -- maakte het niet beter maar onvoorspelbaarder.
-   Een ding dat er altijd is, is meer waard dan twee dingen die hetzelfde doen.
-
-   Er ligt geen laag over het scherm: we luisteren gewoon mee op document en
-   kijken alleen of een aanraking of muisdruk in de buitenste 24 pixels begon.
-   Wat daaronder ligt blijft dus gewoon werken -- een tik op de statusbalk is
-   een tik op de statusbalk. Pas bij een echte haal (40 px de goede kant op)
-   gaat het paneel open, en tijdens die haal verschijnt een dun gouden streepje
-   aan die rand als enige aanwijzing.
-
-   Zonder muis en zonder vinger moet het ook kunnen: er staan twee knoppen in
-   de DOM die pas verschijnen als je er met Tab naartoe gaat, precies zoals de
-   skip-link van het huis. Verder zijn ze onzichtbaar.
-
-   De rand wordt alleen aangelegd als er iets te openen valt. Wat hij opent
-   bouwt hij niet zelf: dat is shared/bediening.js of het bedieningspaneel van
-   het leden-OS. */
+/* De bovenrand opent bestaande instellingen met haal of toetsenbord. Dezelfde
+   ingang start de ene Edge; bij een bronfout blijft de oude UI onaangeroerd. */
 (function (w, d) {
   'use strict';
-  if (w.RTGRanden) return;
+  if (w.RTGRanden || w.__RTGRandenBoot) return;
+  w.__RTGRandenBoot = true;
   var inKader = false;
   try { inKader = w.self !== w.top; } catch (e) { inKader = true; }
   var isEmbed = inKader || new URLSearchParams(w.location.search).get('embed') === '1';
+
+  function bron(tag, attribuut, pad) {
+    var lijst = d.querySelectorAll(tag + '[' + attribuut + ']');
+    for (var i = 0; i < lijst.length; i++) {
+      try { if (new URL(lijst[i].getAttribute(attribuut), w.location.href).pathname === pad) return lijst[i]; }
+      catch (fout) {}
+    }
+    return null;
+  }
+  function blad(pad, klaar) {
+    var link = bron('link[rel~="stylesheet"]', 'href', pad), nieuw = !link, gedaan = false;
+    if (!link) { link = d.createElement('link'); link.rel = 'stylesheet'; link.href = pad; }
+    function af(ok) {
+      if (gedaan) return; gedaan = true;
+      if (ok) link.setAttribute('data-rtg-geladen', 'true');
+      klaar(ok);
+    }
+    link.addEventListener('load', function () { af(true); }, { once: true });
+    link.addEventListener('error', function () { af(false); }, { once: true });
+    if (link.getAttribute('data-rtg-geladen') === 'true' || link.sheet) af(true);
+    if (nieuw) (d.head || d.documentElement).appendChild(link);
+  }
+  function laad(pad, naam, klaar) {
+    if (w[naam]) { klaar(true); return; }
+    var script = bron('script', 'src', pad), nieuw = !script, gedaan = false;
+    if (!script) script = d.createElement('script');
+    function af(ok) {
+      if (gedaan) return; gedaan = true;
+      if (ok) script.setAttribute('data-rtg-geladen', 'true');
+      klaar(ok && !!w[naam]);
+    }
+    script.addEventListener('load', function () { af(true); }, { once: true });
+    script.addEventListener('error', function () { af(false); }, { once: true });
+    if (!nieuw) {
+      if (script.getAttribute('data-rtg-geladen') === 'true') af(true);
+      return;
+    }
+    script.src = pad; script.async = true;
+    (d.head || d.documentElement).appendChild(script);
+  }
 
   /* Alle Foundation-schermen laden deze module al. Dat maakt dit de ene,
      bestaande ingang voor de nieuwe Foundation-rand, zonder tientallen
@@ -41,50 +55,39 @@
     var pad = w.location.pathname, wereld = null;
     if (pad.indexOf('/apps/foundation/') === 0 || (pad === '/apps/office.html' && new URLSearchParams(w.location.search).get('werk') === 'rtf')) wereld = 'foundation';
     else if (['/apps/leven.html','/apps/geld.html','/apps/maison.html','/apps/table.html','/apps/garderobe.html','/apps/veilig.html'].includes(pad)) wereld = 'living';
-    /* TravelOS hoort in deze lijst en stond er niet, terwijl reizen.html de vier
-       Edge-bestanden wel laadde. Ze deden niets: RTGEdge.start() werd nooit
-       aangeroepen. Vier geladen bestanden zonder werking is de stilste vorm van
-       dood hout -- het ziet eruit alsof de schil er is. */
     else if (['/apps/reizen.html'].includes(pad)) wereld = 'travel';
     else if (['/apps/kantoor.html','/apps/kantoren.html','/apps/personeel.html','/apps/agenda.html','/apps/office.html','/apps/rtmail.html','/apps/bestanden.html','/apps/sitemaker.html','/apps/browser.html','/apps/rtgone.html','/apps/onderneming.html','/apps/magnaat.html','/apps/backoffice.html','/apps/command.html','/apps/rtgschool.html'].includes(pad)) wereld = 'work';
-    /* TRAVELOS HAD ALS ENIGE WERELD GEEN SCHIL. De wereld staat compleet in
-       rtg-edge-worlds.js (drie groepen, negen snelle functies) en werd nooit
-       gestart: dit bestand kende een lijst voor Foundation, Living en Work en
-       geen voor Reizen. Het beginscherm van TravelOS miste daardoor de bank
-       links en de balk onderin die elk ander wereldhuis wel heeft.
-       Deze tak leest de wereld uit de PAGINA zelf (`data-rtg-world`), zodat er
-       geen vierde lijst adressen bijkomt die kan gaan afwijken. */
+    /* De statische wereldidentiteit is leidend; de lijsten hierboven blijven
+       alleen als uitwijk voor oudere, nog niet herbouwde documenten. */
     if (d.body && ['living', 'work', 'travel', 'foundation'].includes(d.body.dataset.rtgWorld)) wereld = d.body.dataset.rtgWorld;
     if (!wereld) return false;
     if (isEmbed) {
       d.body.classList.add('rtg-edge-embed');
       d.body.dataset.rtgWorld = wereld;
-      var ingebedBlad = d.createElement('link'); ingebedBlad.rel = 'stylesheet';
-      ingebedBlad.href = '/shared/rtg-edge-system.css'; d.head.appendChild(ingebedBlad);
+      blad('/shared/rtg-edge-system.css', function () {});
       return true;
     }
-    var link = d.createElement('link'); link.rel = 'stylesheet'; link.href = '/shared/rtg-edge-system.css'; d.head.appendChild(link);
-    function laad(bron, klaar) {
-      var script = d.createElement('script'); script.src = bron; script.onload = klaar; d.head.appendChild(script);
-    }
-    laad('/shared/rtg-edge-worlds.js', function () {
-      laad('/shared/rtg-edge-icons.js', function () {
-        laad('/shared/rtg-edge-library.js', function () {
-          laad('/shared/rtg-edge-system.js', function () {
-            var cfg = w.RTGEdgeWorlds[wereld];
-            var huidig = cfg.all.find(function (item) {
-              try { return new URL(item[3], location.href).pathname === location.pathname; } catch (fout) { return false; }
-            });
-            w.RTGEdge.start({ world: wereld, context: { scope: cfg.kort, title: huidig ? huidig[1] : d.title,
-          tool: huidig ? huidig[0] : '', actie: huidig && huidig[0] === 'foundation-home' ? 'Open Campus' : 'Ga verder' },
-          onAction: function () {
-            var knop = d.querySelector('main .knop:not([disabled]),main .campus-ingang,main [data-primary]');
-            if (knop) knop.click();
-          } });
-          });
+    var over = 4, mislukt = false;
+    function afhankelijk(ok) {
+      if (!ok) mislukt = true;
+      if (--over || mislukt) return;
+      laad('/shared/rtg-edge-system.js', 'RTGEdge', function (systeemKlaar) {
+        var cfg = w.RTGEdgeWorlds && w.RTGEdgeWorlds[wereld];
+        if (!systeemKlaar || !cfg || !w.RTGEdge || !w.RTGEdge.start) return;
+        var huidig = cfg.all.find(function (item) {
+          try { return new URL(item[3], w.location.href).pathname === w.location.pathname; } catch (fout) { return false; }
         });
+        /* Geen gegokte eerste knop. Edge 2 opent de hoofdactie uitsluitend
+           voor routes met een expliciet, getest doel. */
+        try { w.RTGEdge.start({ world: wereld, context: { scope: cfg.kort,
+          title: huidig ? huidig[1] : d.title, tool: huidig ? huidig[0] : '', actie: null } }); } catch (fout) {}
       });
-    });
+    }
+    /* Vorm, catalogus, tekens en bibliotheek zijn onderling onafhankelijk. */
+    blad('/shared/rtg-edge-system.css', afhankelijk);
+    laad('/shared/rtg-edge-worlds.js', 'RTGEdgeWorlds', afhankelijk);
+    laad('/shared/rtg-edge-icons.js', 'RTGEdgeIcons', afhankelijk);
+    laad('/shared/rtg-edge-library.js', 'RTGEdgeLibrary', afhankelijk);
     return true;
   }
   if (startFoundationEdge() && isEmbed) return;
@@ -174,9 +177,18 @@
     d.addEventListener('pointerdown', function (e) {
       if (e.pointerType === 'mouse' && e.button !== 0) return;
       gedaan = false;
-      if (e.clientY <= RAND) { bezig = 'boven'; y0 = e.clientY; }
+      if (e.clientY <= RAND) {
+        bezig = 'boven'; y0 = e.clientY;
+        /* Edge draagt echte links in de bovenrand. Pointer capture houdt de
+           haal bij ons wanneer de aanwijzer zo'n link verlaat. */
+        try { e.target.setPointerCapture(e.pointerId); } catch (fout) {}
+      }
       else bezig = null;
-    }, { passive: true });
+    }, { capture: true, passive: true });
+
+    d.addEventListener('dragstart', function (e) {
+      if (bezig === 'boven') e.preventDefault();
+    }, true);
 
     var stop = function () {
       hBoven.classList.remove('aan'); hBoven.style.width = '44px';

@@ -36,7 +36,9 @@ module.exports = (ctx) => {
   function T() {
     return eigen.bak('spelTeams');
   }
-  const teamVan = (id) => T().find(t => t.id === String(id || '')) || null;
+  // lezen zonder scheppen -- zie kijk() in kern/eigencollectie.js
+  T.lees = () => eigen.kijk('spelTeams');
+  const teamVan = (id) => T.lees().find(t => t.id === String(id || '')) || null;
   const hoortErbij = (t, key) => !!t && (t.leden.includes(key) || t.uitgenodigd.includes(key));
   const inKring = (mij, ander) => bereikbaar(mij, ander);
   // elk gebruik houdt het team levend; zie de kop over `laatst`
@@ -117,8 +119,9 @@ module.exports = (ctx) => {
 
   // je eigen teams plus de uitnodigingen die op je liggen te wachten
   function mijnTeams(mij) {
-    const mijne = T().filter(t => t.leden.includes(mij)).map(t => toon(t, mij));
-    const gevraagd = T().filter(t => t.uitgenodigd.includes(mij)).map(t => toon(t, mij));
+    const alle = T.lees();
+    const mijne = alle.filter(t => t.leden.includes(mij)).map(t => toon(t, mij));
+    const gevraagd = alle.filter(t => t.uitgenodigd.includes(mij)).map(t => toon(t, mij));
     return { status: 200, teams: mijne, uitnodigingen: gevraagd };
   }
 

@@ -36,6 +36,13 @@ function maakWallet({ db, save, crypto, schoon, pay, codenaamVan }) {
     if (!Array.isArray(w[key])) w[key] = [];
     return w[key];
   }
+  /* Lezen zonder scheppen (kijk() in ./eigencollectie.js): een lid dat nog
+     nooit iets in zijn wallet legde, houdt geen lege rij in de opslag over --
+     ook niet als de route hem daarna weigert. */
+  function kijk(key) {
+    const items = eigen.kijk('wallet')[key];
+    return Array.isArray(items) ? items : [];
+  }
 
   /* ---- de systeem-kant: een pas erin leggen of weer weghalen ---- */
   function voeg(key, item) {
@@ -51,17 +58,16 @@ function maakWallet({ db, save, crypto, schoon, pay, codenaamVan }) {
     return d;
   }
   function wegBron(key, bron, code) {
-    const items = bak(key);
-    const voor = items.length;
-    const w = eigen.bak('wallet');
-    w[key] = items.filter(x => !(x.bron === bron && (!code || x.code === code)));
-    if (w[key].length !== voor) save();
-    return voor - w[key].length;
+    const items = kijk(key);
+    const rest = items.filter(x => !(x.bron === bron && (!code || x.code === code)));
+    if (rest.length === items.length) return 0;
+    eigen.bak('wallet')[key] = rest; save();
+    return items.length - rest.length;
   }
 
   /* ---- de leden-kant ---- */
   function lijst(key) {
-    const items = bak(key);
+    const items = kijk(key);
     const perSoort = {};
     for (const s of SOORTEN) perSoort[s] = items.filter(x => x.soort === s);
     return { status: 200, items, perSoort, soorten: SOORTEN, muntPrijs: MUNT_PRIJS };
@@ -76,11 +82,10 @@ function maakWallet({ db, save, crypto, schoon, pay, codenaamVan }) {
     return { status: 200, ok: true, item: d };
   }
   function weg(key, itemId) {
-    const items = bak(key);
-    const voor = items.length;
-    const w = eigen.bak('wallet');
-    w[key] = items.filter(x => x.id !== String(itemId || ''));
-    if (w[key].length === voor) return { status: 404, error: 'Dit zit niet in uw wallet.' };
+    const items = kijk(key);
+    const rest = items.filter(x => x.id !== String(itemId || ''));
+    if (rest.length === items.length) return { status: 404, error: 'Dit zit niet in uw wallet.' };
+    eigen.bak('wallet')[key] = rest;
     save();
     return { status: 200, ok: true };
   }
@@ -91,7 +96,7 @@ function maakWallet({ db, save, crypto, schoon, pay, codenaamVan }) {
     const aantal = Math.round(Number(b.aantal));
     if (!zaak) return { status: 400, error: 'Bij welke zaak of welk feest horen de munten?' };
     if (!(aantal >= 1 && aantal <= 100)) return { status: 400, error: 'Koop 1 tot 100 munten tegelijk.' };
-    const items = bak(key);
+    const items = kijk(key);   // voeg() bakt zelf; hier alleen opzoeken
     const titel = 'Feestmunten · ' + zaak;
     let m = items.find(x => x.soort === 'munt' && x.titel === titel);
     /* DE VOLLE WALLET WORDT VOOR DE KASSA GECONTROLEERD en niet erna. Zou dat
@@ -112,7 +117,7 @@ function maakWallet({ db, save, crypto, schoon, pay, codenaamVan }) {
     return { status: 200, ok: true, item: m, prijs: centen / 100, betaaldCenten: centen, bijgeladen: betaald.bijgeladen || 0 };
   }
   function muntWissel(key, b) {
-    const items = bak(key);
+    const items = kijk(key);
     const m = items.find(x => x.id === String(b.id || '') && x.soort === 'munt');
     if (!m) return { status: 404, error: 'Deze munten zitten niet in uw wallet.' };
     const aantal = Math.max(1, Math.round(Number(b.aantal) || 1));

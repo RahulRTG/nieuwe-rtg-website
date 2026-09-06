@@ -148,8 +148,9 @@ module.exports = ({ db, save, crypto }) => {
 
   // De boardroom mag een stand vastzetten of weer loslaten.
   function stemmingZet(id, vast) {
-    const p = pot();
+    // eerst de stemming, dan pas de pot: een 400 hoort niets aan te leggen
     if (id && !OP_ID[id]) return { status: 400, error: 'Deze stemming kennen we niet.' };
+    const p = pot();
     if (id) { p.id = id; p.sinds = new Date().toISOString(); p.tot = nu() + 2 * 3600000; }
     p.vast = !!vast;
     if (!p.vast && !id) { p.tot = 0; stemmingNu(); }

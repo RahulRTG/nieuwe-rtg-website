@@ -22,6 +22,16 @@ module.exports = ({ db, save, crypto, liveCodename, notify, stemmingVan, jarigVa
     if (!p.bewaard || typeof p.bewaard !== 'object') p.bewaard = {};
     return p;
   }
+  /* Lezen zonder scheppen (kijk() in kern/eigencollectie.js). HIER NIET IN
+     SCHRIJVEN: ontbreekt de collectie, dan is dit een vluchtige lege kaart en
+     verdwijnt een schrijfactie spoorloos. Wie schrijft houdt P(). De
+     herstelregels vullen alleen deze weergave en schrijven niets terug. */
+  function kijkP() {
+    const p = eigen.kijk('pulse');
+    const kaart = w => (w && typeof w === 'object' && !Array.isArray(w)) ? w : {};
+    return { posts: Array.isArray(p.posts) ? p.posts : [],
+      volgt: kaart(p.volgt), laatstePost: kaart(p.laatstePost), bewaard: kaart(p.bewaard) };
+  }
   const codenaam = sessieOfKey => typeof sessieOfKey === 'string'
     ? (liveCodename ? liveCodename(sessieOfKey) : '') || 'Een lid'
     : (liveCodename ? liveCodename(sessieOfKey) : '') || 'Een lid';
@@ -46,21 +56,20 @@ module.exports = ({ db, save, crypto, liveCodename, notify, stemmingVan, jarigVa
     return { status: 200, ok: true, post: publiek(post, key) };
   }
   function pulseWeg(key, id) {
-    const p = P();
-    const post = p.posts.find(x => x.id === id);
+    const post = kijkP().posts.find(x => x.id === id);
     if (!post || post.key !== key) return { status: 404, error: 'Dit bericht is niet van jou of bestaat niet.' };
     post.weg = true; save();
     return { status: 200, ok: true };
   }
   function pulseLike(key, id) {
-    const post = P().posts.find(x => x.id === id && zichtbaar(x));
+    const post = kijkP().posts.find(x => x.id === id && zichtbaar(x));
     if (!post) return { status: 404, error: 'Bericht niet gevonden.' };
     if (post.likes[key]) delete post.likes[key]; else post.likes[key] = true;
     save();
     return { status: 200, ok: true, likes: Object.keys(post.likes).length, mijn: !!post.likes[key] };
   }
   function pulseReactie(key, naam, id, tekst) {
-    const post = P().posts.find(x => x.id === id && zichtbaar(x));
+    const post = kijkP().posts.find(x => x.id === id && zichtbaar(x));
     if (!post) return { status: 404, error: 'Bericht niet gevonden.' };
     const t = String(tekst || '').trim().slice(0, 280);
     if (!t) return { status: 400, error: 'Schrijf eerst iets.' };
@@ -84,7 +93,7 @@ module.exports = ({ db, save, crypto, liveCodename, notify, stemmingVan, jarigVa
   /* melden: drie unieke melders verbergen het bericht automatisch (9+ houdt
      zichzelf schoon); het kantoor kan het daarna terugzetten of weghalen */
   function pulseMeld(key, id, reden) {
-    const post = P().posts.find(x => x.id === id && !x.weg);
+    const post = kijkP().posts.find(x => x.id === id && !x.weg);
     if (!post) return { status: 404, error: 'Bericht niet gevonden.' };
     if (post.key === key) return { status: 400, error: 'Je eigen bericht meld je niet; haal het gewoon weg.' };
     post.melders[key] = { reden: String(reden || '').slice(0, 120), at: nu() };
@@ -139,7 +148,7 @@ module.exports = ({ db, save, crypto, liveCodename, notify, stemmingVan, jarigVa
 
   /* Bewerken en bewaren staan in ./vrij.js -- elders de betaalde functies van een
      microblog, hier in de pas. Ze krijgen de binnenkant van de feed mee. */
-  const vrij = require('./vrij')({ save, nu, keur, P, publiek, zichtbaar, tags });
+  const vrij = require('./vrij')({ save, nu, keur, P, kijkP, publiek, zichtbaar, tags });
 
   return Object.assign({ pulsePost, pulseWeg, pulseLike, pulseReactie, pulseVolg, pulseMeld,
     pulseFeed, pulseProfiel }, vrij);

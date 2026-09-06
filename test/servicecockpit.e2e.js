@@ -67,9 +67,12 @@ test('de wachtrij toont de zaak, en het bord heeft geen ledenzoeker', { skip: ge
     assert.match(rij, /SUP-/, 'de wachtrij toont geen zaaknummer');
     assert.match(rij, /P2/, 'de berekende prioriteit staat er niet: ' + rij);
 
-    /* GEEN LEDENZOEKER. Elk invoerveld op dit scherm hoort bij een HANDELING op
-       een zaak; er is er geen waarmee je door het ledenbestand bladert. */
-    const velden = await page.$$eval('input, select', els => els.map(e => (e.placeholder || e.id || '')));
+    /* GEEN LEDENZOEKER IN DE COCKPIT. Edge draagt als vaste systeemlaag zijn
+       eigen globale zoekingang; die zoekt functies en werelden en is dus geen
+       veld van dit werkbord. Meet hier uitsluitend de invoer binnen het
+       cockpitdocument. Elk veld daar hoort bij een HANDELING op een zaak; er
+       is er geen waarmee je door het ledenbestand bladert. */
+    const velden = await page.$$eval('#main input, #main select', els => els.map(e => (e.placeholder || e.id || '')));
     assert.equal(velden.filter(v => /codenaam|lid|zoek/i.test(v)).length, 0,
       'er staat een ledenzoeker op de cockpit: ' + JSON.stringify(velden));
   });

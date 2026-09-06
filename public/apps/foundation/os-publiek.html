@@ -177,10 +177,11 @@
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
 <link href="/shared/wereldrooster.css" rel="stylesheet">
 <link href="/shared/experience-kernel.css?v=20260829-7" rel="stylesheet">
-<link href="/images/worlds/vandaag/wereld-atlas.jpg" rel="preload" as="image" fetchpriority="high">
+<link href="/images/worlds/heritage/foundation-heritage-v2.jpg" rel="preload" as="image" fetchpriority="high">
 <link href="/shared/rtg-vandaag-luxe.css" rel="stylesheet">
+<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-rtg-world="foundation" data-rtg-vandaag-luxe data-rtg-vandaag-surface="public-city" data-rtg-edge-2-context="world-shell" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true">
+<body class="rtg-stijl" data-rtg-world="foundation" data-rtg-world-dashboard="foundation" data-rtg-vandaag-luxe data-rtg-vandaag-surface="public-city" data-rtg-edge-2-context="world-shell" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true" data-rtg-skin="heritage">
 <!-- De wereldstrook stond hier; de vier werelden staan nu in de topbalk van de
      Edge-schil (shared/rtg-edge-system.js), die dit scherm via randen.js al
      draagt. Zie de opmerking in apps/kantoor.html. -->
@@ -341,18 +342,14 @@ const VANDAAG_ATTR = 'data-rtg-vandaag-' + 'luxe';
    publieke city-surface haalt ook met een aanwezige member-token geen
    persoonlijke Experience-projectie op. */
 if (STADSAANVRAAG || isIngebed()) document.body.setAttribute('data-rtg-experience', 'off');
-/* Voorkom dat eerst de volledige home wordt getekend terwijl de publieke
-   stedenlijst de slug nog valideert. Onbekend of onbeschikbaar herstelt home. */
-if (STADSAANVRAAG) document.body.removeAttribute(VANDAAG_ATTR);
+/* Een geldige stadsquery is een toestand binnen hetzelfde dashboard. De
+   publieke controle blijft leidend, maar er wordt geen tweede city-cover meer
+   voor of boven de echte stadsinhoud gezet. */
 
 function zetVandaagModus(modus, titel) {
   if (modus === 'surface') {
-    document.body.setAttribute('data-rtg-vandaag-surface-title', titel || 'Publieke stad');
-    document.body.setAttribute(VANDAAG_ATTR, 'surface');
-    document.body.setAttribute('data-rtg-edge-2-state', 'compact');
-    document.body.setAttribute('data-rtg-edge-2-auto', 'false');
-    return;
-  }
+    document.body.setAttribute('data-rtg-foundation-city', 'true');
+  } else document.body.removeAttribute('data-rtg-foundation-city');
   document.body.removeAttribute('data-rtg-vandaag-surface-title');
   document.body.setAttribute(VANDAAG_ATTR, 'home');
   document.body.setAttribute('data-rtg-edge-2-state', 'overview');

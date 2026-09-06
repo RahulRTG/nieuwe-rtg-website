@@ -43,25 +43,28 @@ function maakReserve({ db, save, crypto, nu = klokNu }) {
   function bak() {
     return eigen.bak('waardeReserves');
   }
+  function kijk() {
+    return eigen.kijk('waardeReserves');
+  }
   const geldig = r => r.status === 'open' && r.tot > nu();
 
   /* Alle nog geldende reserveringen op een rekening. Verlopen reserveringen
      tellen hier niet mee -- ze staan nog in de lijst voor het spoor, maar ze
      zetten niets meer vast. */
-  function open(rek) { return bak().filter(r => r.rek === rek && geldig(r)); }
+  function open(rek) { return kijk().filter(r => r.rek === rek && geldig(r)); }
   function vastgezet(rek) { return open(rek).reduce((s, r) => s + r.centen, 0); }
 
   /* Dezelfde lijst, maar vanuit de andere kant bekeken: wat heeft DEZE partij
      vastgezet? Een ondernemer die een borg vraagt, wil weten wat hij mag
      verwachten -- dat is een ander getal dan zijn saldo en het hoort niet door
      elkaar te lopen. `ref` is wie de reservering liet zetten. */
-  function voorRef(ref) { return bak().filter(r => r.ref === ref && geldig(r)); }
+  function voorRef(ref) { return kijk().filter(r => r.ref === ref && geldig(r)); }
 
   /* Een reservering op id, ongeacht status. Wie hem afhandelt moet zelf de ref
      nakijken -- zonder die toets kan iedereen die een id kent het vastgezette
      bedrag van een ander innen, en een id afkijken is makkelijker dan het
      lijkt. */
-  function vind(id) { return bak().find(r => r.id === String(id || '')) || null; }
+  function vind(id) { return kijk().find(r => r.id === String(id || '')) || null; }
 
   function reserveer({ rek, centen, doel, ref, msGeldig }) {
     const c = Math.round(Number(centen));

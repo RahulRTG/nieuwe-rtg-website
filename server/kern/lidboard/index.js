@@ -37,7 +37,8 @@ function maakLidboard({ db, save }) {
 
   const eigenC = require('../eigencollectie')({ db, domein: 'kern/lidboard/index', bezit: { ledenBoard: 'kaart' } });
   function store() { return eigenC.bak('ledenBoard'); }
-  function eigen(sleutel) { const s = store(); return (s[sleutel] && typeof s[sleutel] === 'object') ? s[sleutel] : {}; }
+  function leesStore() { return eigenC.kijk('ledenBoard'); }
+  function eigen(sleutel) { const s = leesStore(); return (s[sleutel] && typeof s[sleutel] === 'object') ? s[sleutel] : {}; }
   function versie(sleutel) { const v = Number(eigen(sleutel)._v); return Number.isFinite(v) && v > 0 ? v : 0; }
 
   // Staat functie <id> aan voor deze boardroom? (voor handhaving elders)

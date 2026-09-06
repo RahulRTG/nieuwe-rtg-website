@@ -1,19 +1,19 @@
 {
   "stempel": {
-    "op": "2026-09-05T19:36:27.830Z",
-    "commit": "7df7c401e",
+    "op": "2026-09-06T17:02:08.687Z",
+    "commit": "c15f6e24c",
     "boomVuil": false,
-    "boomAnders": 4,
+    "boomAnders": 0,
     "instrument": "scripts/vindbaar.js",
-    "node": "v24.18.0"
+    "node": "v22.22.2"
   },
   "uitleg": "Per bestemming in de sprong: welk aandeel van de ONDERSCHEIDENDE woorden van dat scherm (woorden uit zijn koppen die op hooguit 3 bestemmingen voorkomen) er ook naartoe leidt in de zoekfilter van shared/sprong.js. Meet woorden, geen mensen: of iemand op het idee komt dat woord te typen, weet deze meter niet.",
   "vloer": 0.6,
   "drempel": 3,
   "bestemmingen": 89,
-  "woorden": 1083,
-  "gevonden": 702,
-  "dekking": 0.6482,
+  "woorden": 1053,
+  "gevonden": 682,
+  "dekking": 0.6477,
   "perBestemming": [
     {
       "naam": "Magnaat",
@@ -146,8 +146,8 @@
     {
       "naam": "Spelen",
       "url": "/apps/spelen.html?pas=",
-      "woorden": 44,
-      "gevonden": 29,
+      "woorden": 45,
+      "gevonden": 30,
       "mist": [
         "mens",
         "erger",
@@ -167,26 +167,26 @@
       ]
     },
     {
-      "naam": "Openbaar vervoer",
-      "url": "/apps/ov.html",
-      "woorden": 28,
-      "gevonden": 13,
+      "naam": "RTG Werk OS",
+      "url": "/apps/werk.html",
+      "woorden": 30,
+      "gevonden": 15,
       "mist": [
-        "volgende",
-        "gaat",
-        "heen",
-        "wilt",
-        "aanvraag",
-        "ritten",
-        "inchecken",
-        "snelle",
-        "opties",
-        "kaartje",
-        "vervoerbewijzen",
-        "werkgever",
-        "journey",
-        "studio",
-        "operaties"
+        "vraagt",
+        "aandacht",
+        "besluiten",
+        "menselijke",
+        "autoriteit",
+        "welkom",
+        "meesterschap",
+        "juiste",
+        "mensen",
+        "organisatie",
+        "zonder",
+        "bron",
+        "hier",
+        "waarmee",
+        "helpen"
       ]
     },
     {
@@ -234,44 +234,25 @@
       ]
     },
     {
-      "naam": "RTG Werk OS",
-      "url": "/apps/werk.html",
-      "woorden": 30,
-      "gevonden": 16,
+      "naam": "Openbaar vervoer",
+      "url": "/apps/ov.html",
+      "woorden": 28,
+      "gevonden": 14,
       "mist": [
-        "vraagt",
-        "aandacht",
-        "besluiten",
-        "menselijke",
-        "autoriteit",
-        "welkom",
-        "meesterschap",
-        "juiste",
-        "mensen",
-        "organisatie",
-        "bron",
-        "hier",
-        "waarmee",
-        "helpen"
-      ]
-    },
-    {
-      "naam": "Geld",
-      "url": "/apps/geld-command.html",
-      "woorden": 35,
-      "gevonden": 24,
-      "mist": [
-        "werkelijk",
-        "regiekaarten",
-        "ziet",
-        "aandachtspunt",
-        "ineens",
-        "zondag",
-        "iedereen",
-        "money",
-        "room",
-        "winterweek",
-        "betaling"
+        "volgende",
+        "gaat",
+        "heen",
+        "aanvraag",
+        "ritten",
+        "inchecken",
+        "snelle",
+        "opties",
+        "kaartje",
+        "vervoerbewijzen",
+        "werkgever",
+        "journey",
+        "studio",
+        "operaties"
       ]
     },
     {
@@ -313,8 +294,8 @@
     {
       "naam": "Ontdekken",
       "url": "/apps/rtg.html",
-      "woorden": 57,
-      "gevonden": 48,
+      "woorden": 58,
+      "gevonden": 49,
       "mist": [
         "acties",
         "dagelijkse",
@@ -342,6 +323,23 @@
         "label",
         "klaargezet",
         "beslist"
+      ]
+    },
+    {
+      "naam": "Partner Network",
+      "url": "/apps/partner-network.html",
+      "woorden": 24,
+      "gevonden": 15,
+      "mist": [
+        "rustige",
+        "week",
+        "vier",
+        "viering",
+        "zonder",
+        "drukte",
+        "beloften",
+        "loopt",
+        "volgens"
       ]
     },
     {
@@ -375,22 +373,6 @@
         "rating",
         "sterren",
         "aantal"
-      ]
-    },
-    {
-      "naam": "Partner Network",
-      "url": "/apps/partner-network.html",
-      "woorden": 24,
-      "gevonden": 16,
-      "mist": [
-        "rustige",
-        "week",
-        "vier",
-        "viering",
-        "drukte",
-        "beloften",
-        "loopt",
-        "volgens"
       ]
     },
     {
@@ -454,8 +436,8 @@
     {
       "naam": "Betalen",
       "url": "/apps/pay.html",
-      "woorden": 18,
-      "gevonden": 12,
+      "woorden": 19,
+      "gevonden": 13,
       "mist": [
         "tikken",
         "sturen",
@@ -603,20 +585,20 @@
     {
       "naam": "Het Vooruitzicht",
       "url": "/apps/living-os.html",
-      "woorden": 19,
-      "gevonden": 15,
+      "woorden": 16,
+      "gevonden": 12,
       "mist": [
-        "ligt",
-        "waarschijnlijke",
-        "uitvoeren",
+        "voeg",
+        "intentie",
+        "vast",
         "vrijgeven"
       ]
     },
     {
       "naam": "Maison",
       "url": "/apps/maison.html",
-      "woorden": 6,
-      "gevonden": 2,
+      "woorden": 7,
+      "gevonden": 3,
       "mist": [
         "huismeester",
         "personeel",
@@ -753,8 +735,8 @@
     {
       "naam": "Verblijven",
       "url": "/apps/residentie.html",
-      "woorden": 12,
-      "gevonden": 10,
+      "woorden": 13,
+      "gevonden": 11,
       "mist": [
         "atelier",
         "huistelefoon"
@@ -918,10 +900,17 @@
       "mist": []
     },
     {
+      "naam": "Geld",
+      "url": "/apps/geld-command.html",
+      "woorden": 2,
+      "gevonden": 2,
+      "mist": []
+    },
+    {
       "naam": "Logboek",
       "url": "/apps/geld.html#logboek",
-      "woorden": 0,
-      "gevonden": 0,
+      "woorden": 1,
+      "gevonden": 1,
       "mist": []
     },
     {

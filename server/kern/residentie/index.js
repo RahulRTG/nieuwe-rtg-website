@@ -69,6 +69,9 @@ function maakResidentie({ db, save, schoon, sseToCustomer }) {
     }
   }
   const kamerVan = key => Object.keys(R().kamers).find(id => R().kamers[id].leden[key]) || null;
+
+  // opzoeken zonder aanleggen; zie ./lezen.js voor wat dat repareert
+  const { LEEG, Rlees, kamerVanLees, potjesLees } = require('./lezen')(eigen);
   const pub = l => ({ codenaam: l.codenaam, x: l.x, y: l.y, dx: l.dx, dy: l.dy, zit: !!l.zit });
   function staat(id, p) {
     ruimOp(id);
@@ -174,7 +177,8 @@ function maakResidentie({ db, save, schoon, sseToCustomer }) {
   Object.assign(api, require('./suite')({ R, suiteVan, kamer, sein, save, schoon, MEUBELS, ZALEN, SUITE }));
   Object.assign(kop, require('./koppel')({ R, kamer, kamerVan, sein, sseToCustomer, save, zetNeer, zitplek, plattegrond }));
   Object.assign(api, { paarVraag: kop.paarVraag, paarAntwoord: kop.paarAntwoord, paarLos: k => kop.paarLos(k) });
-  Object.assign(api, require('./spel')({ R, kamer, kamerVan, sein, sseToCustomer, save, partnerVan: kop.partnerVan }));
+  Object.assign(api, require('./spel')({ R, kamer, kamerVan, kamerVanLees, potjesLees,
+    sein, sseToCustomer, save, partnerVan: kop.partnerVan }));
   return { residentie: api };
 }
 

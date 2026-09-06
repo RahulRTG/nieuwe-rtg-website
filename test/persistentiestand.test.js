@@ -47,7 +47,14 @@ test('de stand komt uit de DATABASE en niet uit het geheugen', () => {
      weggeschreven -- en dan bevestigt hij precies de leugen die hij moest
      ontmaskeren. Met het verraad `schrijf-verloren` doet save() niets, dus de
      stand hoort STIL te staan terwijl het geheugen wel verandert. */
+  /* DE OPSTARTPOORT MOET HIER MET DE HAND OPEN. server/lib/verraadfase.js houdt
+     de sabotage tegen zolang de server niet luistert -- anders komt een server
+     met `schrijf-faalt` niet eens op, want de opstart schrijft ook. In dit losse
+     proces luistert er nooit iets, dus zonder deze regel doet save() gewoon zijn
+     werk en loopt de stand op: de toets meet dan de poort en niet de opslag.
+     Zelfde reden als bij de drie toetsen in test/verraad.test.js. */
   const uit = inProces({ RTG_DATA_DIR: verseMap(), RTG_VERRAAD: 'schrijf-verloren' },
+    "require('./server/lib/verraadfase').zetVerkeerAan();" +
     "const db=require('./server/db');(async()=>{await db.load();" +
     "const a=db.persistentieStand();db.db.data.proef={t:1};db.save();" +
     "const b=db.persistentieStand();console.log(JSON.stringify([b===a, db.db.data.proef.t===1]))})()");

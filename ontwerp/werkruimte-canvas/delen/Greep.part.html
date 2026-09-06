@@ -1,0 +1,113 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Inter:wght@300;400;500;600&display=swap">
+  <style>
+<!--STIJL-->
+  .blad{padding:38px 44px;height:100%;display:flex;flex-direction:column;gap:26px;}
+  h1{margin:6px 0 0;font-family:var(--display);font-size:46px;line-height:1;color:#FFFBF4;}
+  .inleiding{margin:10px 0 0;max-width:520px;font-size:13px;line-height:1.65;color:var(--gedempt);}
+
+  .proef{display:flex;gap:34px;align-items:flex-start;}
+  .kolom{flex:1;min-width:0;}
+  .kolomkop{display:flex;align-items:baseline;gap:9px;margin-bottom:11px;}
+  .kolomkop .staat{font-size:11px;color:var(--zacht);}
+
+  /* de greep op ware grootte: geen surface eromheen die afleidt */
+  .proefsurface{background:var(--vlak);border:1px solid var(--lijn);
+    border-radius:var(--ronding,14px);overflow:hidden;}
+  .proefsurface[data-actief]{border-color:var(--lijn-goud);}
+  .romp{height:74px;background:linear-gradient(180deg,rgba(244,240,233,.02),transparent);}
+
+  /* maatvoering */
+  .maten{margin-top:13px;display:flex;flex-direction:column;gap:6px;}
+  .maat{display:flex;align-items:baseline;gap:10px;font-size:11.5px;color:var(--zacht);}
+  .maat b{color:var(--goud);font-weight:500;min-width:74px;}
+  .maat span{color:var(--gedempt);}
+
+  .tabel{border-top:1px solid var(--lijn);margin-top:auto;}
+  .tabelrij{display:flex;align-items:baseline;gap:18px;padding:11px 0;border-bottom:1px solid var(--lijn);font-size:13px;}
+  .tabelrij .doet{width:212px;flex:0 0 212px;color:var(--ivoor);}
+  .tabelrij .gevolg{color:var(--gedempt);}
+  .tabelrij:last-child{border-bottom:0;}
+
+  .voet{font-size:11px;color:var(--zacht);line-height:1.6;}
+  .voet code{color:var(--goud-diep);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10.5px;}
+  </style>
+</helmet>
+
+<div class="tafel blad" style="width:900px;height:640px;--ronding:{{ronding}}px">
+
+  <div>
+    <span class="label">Ware grootte · 1:1</span>
+    <h1>De greep</h1>
+    <p class="inleiding">Geen titelbalk met drie knopjes — dat is Windows in bordeaux. Eén dunne
+      gouden streep bovenaan, en die verschijnt <em>alleen</em> op de actieve surface. Zou elke
+      surface hem dragen, dan is goud geen focus meer maar behang.</p>
+  </div>
+
+  <div class="proef">
+    <div class="kolom">
+      <div class="kolomkop"><span class="label">Actief</span><span class="staat">precies één tegelijk</span></div>
+      <div class="proefsurface" data-actief>
+        <header class="greep">
+          <span class="naam">Reizen</span>
+          <span class="rek"></span>
+          <button type="button" title="Kleiner of groter">▫</button>
+          <button type="button" title="Sluiten">×</button>
+        </header>
+        <div class="romp"></div>
+      </div>
+      <div class="maten">
+        <div class="maat"><b>2 px</b><span>gouden streep, 11 px ingesprongen aan weerszijden</span></div>
+        <div class="maat"><b>#D4B978</b><span>naar transparant, links naar rechts</span></div>
+        <div class="maat"><b>rand</b><span>rgba(212,185,120,.22)</span></div>
+      </div>
+    </div>
+
+    <div class="kolom">
+      <div class="kolomkop"><span class="label stil">Rustend</span><span class="staat">de streep is er niet</span></div>
+      <div class="proefsurface">
+        <header class="greep">
+          <span class="naam">Finance</span>
+          <span class="rek"></span>
+          <button type="button" title="Kleiner of groter">▫</button>
+          <button type="button" title="Sluiten">×</button>
+        </header>
+        <div class="romp"></div>
+      </div>
+      <div class="maten">
+        <div class="maat"><b>8 / 11 / 7</b><span>padding boven · zij · onder</span></div>
+        <div class="maat"><b>10,5 px</b><span>naam, kapitaal, letterafstand .17em</span></div>
+        <div class="maat"><b>24 × 24</b><span>elke knop, ook al is het teken kleiner</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabel">
+    <div class="tabelrij"><span class="doet">Greep slepen</span><span class="gevolg">de surface beweegt</span></div>
+    <div class="tabelrij"><span class="doet">Naar de schermrand</span><span class="gevolg">hij dokt daar — je ziet eerst waar hij landt</span></div>
+    <div class="tabelrij"><span class="doet">Naar de console</span><span class="gevolg">hij koppelt eraan</span></div>
+    <div class="tabelrij"><span class="doet">Dubbelklik</span><span class="gevolg">focus — de surface gaat naar Deep</span></div>
+    <div class="tabelrij"><span class="doet">Rand aanwijzen</span><span class="gevolg">grab · resize · dock verschijnt subtiel</span></div>
+  </div>
+
+  <p class="voet">Waarden overgenomen uit <code>public/shared/rtg-schil.css</code>. De ronding is hier een schuif:
+    op <code>0</code> staat de huisregel uit CLAUDE.md, hoger staat de stijl uit de foto's.</p>
+</div>
+</x-dc>
+<script data-dc-script data-props='{"ronding":{"editor":"range","default":14,"min":0,"max":18,"step":1,"unit":"px","section":"Vorm"}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { ronding: this.props.ronding ?? 14 };
+  }
+}
+</script>
+</body>
+</html>

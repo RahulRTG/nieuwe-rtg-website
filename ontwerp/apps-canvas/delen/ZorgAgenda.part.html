@@ -1,0 +1,162 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Inter:wght@300;400;500;600&display=swap">
+  <style>
+<!--STIJL-->
+  .top{display:flex;align-items:center;padding:14px 14px 10px;background:var(--vlak);
+    border-bottom:1px solid var(--lijn);}
+  .top button{background:none;border:0;color:var(--gedempt);min-width:44px;min-height:44px;
+    display:flex;align-items:center;justify-content:center;}
+  .top h1{flex:1;text-align:center;margin:0;font-size:21px;color:var(--inkt);}
+
+  .week{display:flex;justify-content:space-between;padding:12px 14px 14px;background:var(--vlak);
+    border-bottom:1px solid var(--lijn);}
+  .dag{display:flex;flex-direction:column;align-items:center;gap:7px;width:40px;}
+  .dag .d{font-size:10.5px;color:var(--zacht);letter-spacing:.05em;}
+  .dag .n{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;
+    justify-content:center;font-size:14px;color:var(--gedempt);font-variant-numeric:tabular-nums;}
+  .dag.nu .d{color:var(--bordeaux);font-weight:600;}
+  .dag.nu .n{background:var(--bordeaux);color:#FCF6F0;font-weight:600;}
+
+  .datum{padding:15px 18px 6px;font-size:14.5px;font-weight:500;color:var(--inkt);}
+
+  .baan{padding:4px 14px 0;}
+  .blok{display:flex;gap:12px;}
+  .spoor{width:52px;flex:0 0 52px;display:flex;flex-direction:column;align-items:center;padding-top:12px;}
+  .spoor .tijd{font-size:12.5px;color:var(--gedempt);font-variant-numeric:tabular-nums;}
+  .spoor .stip{margin-top:8px;}
+  .spoor .lijn{flex:1;width:1px;background:var(--lijn);margin-top:6px;}
+  .kaartje{flex:1;min-width:0;margin-bottom:10px;padding:12px 13px;border-radius:var(--rk);
+    border:1px solid var(--lijn);background:var(--vlak);}
+  .kaartje .rijk{display:flex;align-items:center;gap:10px;}
+  .kaartje .av{width:32px;height:32px;border-radius:50%;flex:0 0 32px;overflow:hidden;position:relative;
+    border:1px solid var(--lijn-goud);}
+  .kaartje .nm{font-size:14px;font-weight:600;color:var(--inkt);}
+  .kaartje .wie{font-size:11.5px;color:var(--zacht);margin-top:2px;}
+  .kaartje .pijl{margin-left:auto;color:var(--zacht);}
+  .kaartje .merkje{margin-top:9px;}
+  .kaartje .doe{display:flex;gap:8px;margin-top:10px;}
+  .kaartje .doe button{flex:1;min-height:38px;border-radius:8px;border:1px solid var(--lijn);
+    background:none;color:var(--gedempt);font-size:12px;display:flex;align-items:center;
+    justify-content:center;gap:6px;}
+  .kaartje .doe button:hover{border-color:var(--lijn-goud);color:var(--inkt);}
+
+  .gerust{display:flex;gap:12px;align-items:flex-start;margin:6px 14px 0;padding:14px;
+    border-radius:var(--rk);border:1px solid var(--lijn-goud);background:var(--vlak-hoog);}
+  .gerust .hart{width:38px;height:38px;border-radius:50%;flex:0 0 38px;display:flex;
+    align-items:center;justify-content:center;background:rgba(184,149,69,.14);}
+  .gerust h3{margin:0;font-size:19px;color:var(--inkt);}
+  .gerust p{margin:4px 0 0;font-size:11.5px;line-height:1.5;color:var(--zacht);}
+  .gerust a{font-size:12.5px;color:var(--bordeaux);display:inline-flex;align-items:center;gap:5px;
+    margin-top:8px;text-decoration:underline;text-underline-offset:3px;}
+  </style>
+</helmet>
+
+<div class="fon licht" style="width:390px;height:844px;--r:{{r}}px;--rk:{{rk}}px">
+
+  <header class="top">
+    <button type="button"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <h1 class="serif">Agenda</h1>
+    <button type="button"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
+  </header>
+
+  <div class="week">
+    <div class="dag"><span class="d">Ma</span><span class="n">1</span></div>
+    <div class="dag"><span class="d">Di</span><span class="n">2</span></div>
+    <div class="dag nu"><span class="d">Wo</span><span class="n">3</span></div>
+    <div class="dag"><span class="d">Do</span><span class="n">4</span></div>
+    <div class="dag"><span class="d">Vr</span><span class="n">5</span></div>
+    <div class="dag"><span class="d">Za</span><span class="n">6</span></div>
+    <div class="dag"><span class="d">Zo</span><span class="n">7</span></div>
+  </div>
+
+  <div class="datum">Woensdag 3 september 2026</div>
+
+  <div class="baan">
+    <div class="blok">
+      <div class="spoor"><span class="tijd">09:30</span><span class="stip aan"></span><span class="lijn"></span></div>
+      <div class="kaartje">
+        <div class="rijk">
+          <span class="av foto"><i class="warm"></i><i class="huid" style="opacity:.6"></i></span>
+          <span><span class="nm">Medicatieronde</span><div class="wie">Sanne de Vries</div></span>
+          <span class="pijl"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 5l7 7-7 7"/></svg></span>
+        </div>
+        <span class="merkje groen">Onderweg</span>
+        <div class="doe">
+          <button type="button"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 5c0 9 6 15 15 15l2-3.6-4.4-2-2 2A13 13 0 019.6 9l2-2-2-4.4z"/></svg>Contact</button>
+          <button type="button"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 3h8l4 4v14H6z"/><path d="M9 12h6M9 16h4"/></svg>Details</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="blok">
+      <div class="spoor"><span class="tijd">11:00</span><span class="stip uit"></span><span class="lijn"></span></div>
+      <div class="kaartje">
+        <div class="rijk">
+          <span class="av foto"><i class="warm"></i><i class="huid" style="opacity:.6"></i></span>
+          <span><span class="nm">Persoonlijke verzorging</span><div class="wie">Sanne de Vries</div></span>
+          <span class="pijl"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 5l7 7-7 7"/></svg></span>
+        </div>
+        <span class="merkje">Gepland</span>
+        <div class="doe">
+          <button type="button"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 5c0 9 6 15 15 15l2-3.6-4.4-2-2 2A13 13 0 019.6 9l2-2-2-4.4z"/></svg>Contact</button>
+          <button type="button"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 3h8l4 4v14H6z"/><path d="M9 12h6M9 16h4"/></svg>Details</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="blok">
+      <div class="spoor"><span class="tijd">15:00</span><span class="stip uit"></span><span class="lijn"></span></div>
+      <div class="kaartje">
+        <div class="rijk">
+          <span class="av foto"><i style="background:linear-gradient(150deg,#4A3524,#1C130C)"></i></span>
+          <span><span class="nm">Huishoudelijke hulp</span><div class="wie">Ali Kaya</div></span>
+          <span class="pijl"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 5l7 7-7 7"/></svg></span>
+        </div>
+        <span class="merkje">Gepland</span>
+        <div class="doe">
+          <button type="button"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 5c0 9 6 15 15 15l2-3.6-4.4-2-2 2A13 13 0 019.6 9l2-2-2-4.4z"/></svg>Contact</button>
+          <button type="button"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 3h8l4 4v14H6z"/><path d="M9 12h6M9 16h4"/></svg>Details</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="gerust">
+    <span class="hart">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B89545" stroke-width="1.6"><path d="M12 20.4S4.4 15.4 4.4 10.2A4.4 4.4 0 0112 7.4a4.4 4.4 0 017.6 2.8c0 5.2-7.6 10.2-7.6 10.2z"/></svg>
+    </span>
+    <span>
+      <h3 class="serif">Een gerust gevoel</h3>
+      <p>Alle zorg op één plek. Voor u en uw familie.</p>
+      <a href="#">Nodig een familielid uit
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h15M13 6l6 6-6 6"/></svg>
+      </a>
+    </span>
+  </div>
+
+  <nav class="onderbalk">
+    <button type="button" class="tab"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 11l8-7 8 7v8a1 1 0 01-1 1h-4v-6h-6v6H5a1 1 0 01-1-1z"/></svg>Home</button>
+    <button type="button" class="tab aan"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5.2 6-5.2s6 1.9 6 5.2M16 5.6a3.2 3.2 0 010 5.8"/></svg>Zorg</button>
+    <button type="button" class="fab"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
+    <button type="button" class="tab"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 5h16v12H8l-4 3z"/></svg>Berichten</button>
+    <button type="button" class="tab"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 7h16M4 12h16M4 17h10"/></svg>Meer</button>
+  </nav>
+</div>
+</x-dc>
+<script data-dc-script data-props='{"r":{"editor":"range","default":16,"min":0,"max":22,"step":1,"unit":"px","section":"Vorm"},"rk":{"editor":"range","default":12,"min":0,"max":18,"step":1,"unit":"px","section":"Vorm"}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { r: this.props.r ?? 16, rk: this.props.rk ?? 12 };
+  }
+}
+</script>
+</body>
+</html>

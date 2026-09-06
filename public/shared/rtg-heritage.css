@@ -1,0 +1,235 @@
+@import url('/shared/rtg-heritage-motion.css');
+@import url('/shared/rtg-continue-key.css');
+@import url('/shared/rtg-heritage-materials.css');
+@import url('/shared/rtg-heritage-adapters.css');
+@import url('/shared/rtg-heritage-components.css');
+
+/* RTG Heritage -------------------------------------------------------------
+   De vaste beeldtaal van het huis, over ieder echt appscherm heen.
+
+   Deze laag wordt door shared/basis.js als LAATSTE stylesheet geladen. Zij
+   verandert uitsluitend materiaal, typografie en toestand; nooit de positie,
+   maat, zichtbaarheid of werking van een scherm. Daardoor blijven een kaart,
+   camera, speler, werkruimte en Edge gewoon hun eigen gereedschap, maar voelen
+   zij wel als kamers in hetzelfde huis.
+
+   Een wereld is geen vrij te kiezen thema. Living, Travel, Work en Foundation
+   hebben elk een vaste identiteit. Core blijft gedeelde techniek en verschijnt
+   niet als een vijfde visuele wereld. */
+
+body[data-rtg-skin="heritage"]{
+  /* De vaste maatvoering. Routes kiezen hieruit; zij bedenken geen eigen
+     tussenmaten voor dezelfde betekenis. */
+  --rtg-space-1:4px;--rtg-space-2:8px;--rtg-space-3:12px;
+  --rtg-space-4:16px;--rtg-space-6:24px;--rtg-space-8:32px;
+  --rtg-space-12:48px;--rtg-space-16:64px;--rtg-space-24:96px;
+  --rtg-space-32:128px;--rtg-grid-gap:clamp(20px,2vw,32px);
+  --rtg-radius-content:2px;--rtg-radius-system:22px;
+  --rtg-target:44px;
+
+  --rtg-world-bg:#0c0b0a;
+  --rtg-world-ground:linear-gradient(155deg,#171310 0%,#0c0b0a 56%,#070605 100%);
+  --rtg-world-card:#151310;
+  --rtg-world-card-strong:#1d1815;
+  --rtg-world-ink:#f4f0e9;
+  --rtg-world-muted:#c9c0b6;
+  --rtg-world-line:rgba(244,240,233,.15);
+  --rtg-world-signature:#9e1c40;
+  --rtg-world-signature-soft:rgba(127,22,52,.18);
+  --rtg-world-metal:#c0a544;
+  --rtg-world-action:#7f1634;
+  --rtg-world-action-ink:#fff;
+  --rtg-world-schema:dark;
+  --rtg-world-photo:none;
+  --rtg-world-photo-position:center;
+  --rtg-world-photo-mask:linear-gradient(115deg,rgba(12,11,10,.96),rgba(12,11,10,.77));
+  --rtg-depth-content:inset 0 1px rgba(255,255,255,.035),0 1px 0 rgba(0,0,0,.18);
+  --rtg-depth-focus:inset 0 1px rgba(255,255,255,.08),0 20px 55px rgba(0,0,0,.25);
+  --rtg-depth-system:inset 0 1px rgba(255,255,255,.11),0 28px 80px rgba(0,0,0,.38);
+  --rtg-status-ok:#62b98a;--rtg-status-warn:#d3a652;--rtg-status-danger:#d96b7c;
+  color-scheme:var(--rtg-world-schema);
+
+  /* De namen die de bestaande 277 schermen al gebruiken. De wereldtokens zijn
+     de ene waarheid; deze aliases zijn alleen stekkers op bestaande kamers. */
+  --rtg-bg:var(--rtg-world-bg);
+  --rtg-grond:var(--rtg-world-ground);
+  --rtg-card:var(--rtg-world-card);
+  --rtg-card2:var(--rtg-world-card-strong);
+  --rtg-txt:var(--rtg-world-ink);
+  --rtg-muted:var(--rtg-world-muted);
+  --rtg-soft:var(--rtg-world-muted);
+  --rtg-line:var(--rtg-world-line);
+  --rtg-goud:var(--rtg-world-metal);
+  --rtg-opgoud:var(--rtg-world-action-ink);
+  --rtg-goud-hoog:var(--rtg-world-action);
+  --rtg-leesgoud:var(--rtg-world-metal);
+  --rtg-leeszacht:var(--rtg-world-muted);
+  --rtg-acc:var(--rtg-world-signature);
+  /* rtg-ui berekent deze materialen anders op :root, dus nog voordat de
+     wereldtokens op body bekend zijn. Door ze hier te verbinden blijven een
+     lichte Living-kamer en een expliciet donker eigenvlak ieder intern
+     leesbaar, zonder route-eigen panelen opnieuw vorm te geven. */
+  --rtg-oppervlak:linear-gradient(145deg,
+    color-mix(in srgb,var(--rtg-world-card) 91%,white) 0%,
+    var(--rtg-world-card) 48%,
+    color-mix(in srgb,var(--rtg-world-card) 90%,black) 100%);
+  --rtg-oppervlak-2:linear-gradient(145deg,
+    color-mix(in srgb,var(--rtg-world-card-strong) 92%,white) 0%,
+    var(--rtg-world-card-strong) 58%,
+    color-mix(in srgb,var(--rtg-world-card-strong) 88%,black) 100%);
+  --bg:var(--rtg-world-bg);
+  --card:var(--rtg-world-card);
+  --card2:var(--rtg-world-card-strong);
+  --panel:var(--rtg-world-card);
+  --panel2:var(--rtg-world-card-strong);
+  --paneel:var(--rtg-world-card);
+  --paneel2:var(--rtg-world-card-strong);
+  --txt:var(--rtg-world-ink);
+  --text:var(--rtg-world-ink);
+  --ink:var(--rtg-world-ink);
+  --muted:var(--rtg-world-muted);
+  --soft:var(--rtg-world-muted);
+  --zacht:var(--rtg-world-muted);
+  --line:var(--rtg-world-line);
+  --line2:var(--rtg-world-line);
+  --lijn:var(--rtg-world-line);
+  --gold:var(--rtg-world-metal);
+  --goud:var(--rtg-world-metal);
+  --accent:var(--rtg-world-signature);
+  --acc:var(--rtg-world-signature);
+  --burgundy:var(--rtg-world-action);
+
+  background-color:var(--rtg-world-bg);
+  background-image:
+    radial-gradient(70rem 34rem at 82% -10rem,var(--rtg-world-signature-soft),transparent 72%),
+    var(--rtg-world-photo-mask),
+    var(--rtg-world-photo),
+    var(--rtg-world-ground);
+  background-size:auto,auto,cover,auto;
+  background-position:center,center,var(--rtg-world-photo-position),center;
+  background-repeat:no-repeat;
+  background-attachment:fixed;
+  color:var(--rtg-world-ink);
+  font-family:var(--rtg-interface,Inter,system-ui,sans-serif);
+  accent-color:var(--rtg-world-metal);
+  scrollbar-color:var(--rtg-world-metal) var(--rtg-world-bg);
+}
+
+/* LivingOS is de lichte kamer: parelmoer, bordeaux en donker champagnegoud. */
+body[data-rtg-skin="heritage"][data-rtg-world="living"]{
+  --rtg-world-bg:#f4f0e8;
+  --rtg-world-ground:linear-gradient(155deg,#fbf8f2 0%,#f4f0e8 58%,#e8e0d2 100%);
+  --rtg-world-card:#fbf8f2;
+  --rtg-world-card-strong:#e8e0d2;
+  --rtg-world-ink:#211e19;
+  --rtg-world-muted:#5f574d;
+  --rtg-world-line:rgba(33,30,25,.17);
+  --rtg-world-signature:#7f1634;
+  --rtg-world-signature-soft:rgba(127,22,52,.10);
+  --rtg-world-metal:#745718;
+  /* Status is hier tekst op ivoor. Deze drie donkere toonwaarden halen ook op
+     het lichtste Living-vlak ruim WCAG AA; de heldere donkere-wereldtokens
+     zouden hier alleen als decoratieve stip voldoende contrast hebben. */
+  --rtg-status-ok:#246a47;
+  --rtg-status-warn:#765300;
+  --rtg-status-danger:#9b2c42;
+  --rtg-world-schema:light;
+  --rtg-world-photo:url('/images/worlds/heritage/living-heritage-v2.jpg');
+  --rtg-world-photo-position:68% center;
+  --rtg-world-photo-mask:linear-gradient(112deg,rgba(244,240,232,.975),rgba(244,240,232,.89));
+  --rtg-depth-content:inset 0 1px rgba(255,255,255,.72),0 1px 0 rgba(55,40,15,.08);
+  --rtg-depth-focus:inset 0 1px rgba(255,255,255,.86),0 22px 58px rgba(55,40,15,.14);
+  --rtg-depth-system:inset 0 1px rgba(255,255,255,.9),0 30px 90px rgba(55,40,15,.2);
+}
+
+/* TravelOS draagt wijnfluweel; fotografie en route-informatie blijven ivoor. */
+body[data-rtg-skin="heritage"][data-rtg-world="travel"]{
+  --rtg-world-bg:#14090e;
+  --rtg-world-ground:linear-gradient(155deg,#281119 0%,#14090e 57%,#090608 100%);
+  --rtg-world-card:#231016;
+  --rtg-world-card-strong:#0e090b;
+  --rtg-world-ink:#f7f0e6;
+  --rtg-world-muted:#c2b2aa;
+  --rtg-world-line:rgba(247,240,230,.17);
+  --rtg-world-signature:#a72049;
+  --rtg-world-signature-soft:rgba(158,28,64,.20);
+  --rtg-world-metal:#d0b77b;
+  --rtg-world-photo:url('/images/worlds/heritage/travel-heritage-v2.jpg');
+  --rtg-world-photo-position:68% center;
+  --rtg-world-photo-mask:linear-gradient(112deg,rgba(20,9,14,.975),rgba(20,9,14,.83));
+}
+
+/* WorkOS is grafiet met gedempt teal en messing: precies, nooit koel-blauw. */
+body[data-rtg-skin="heritage"][data-rtg-world="work"]{
+  --rtg-world-bg:#0c1112;
+  --rtg-world-ground:linear-gradient(155deg,#152021 0%,#0c1112 58%,#070a0a 100%);
+  --rtg-world-card:#141b1c;
+  --rtg-world-card-strong:#090d0e;
+  --rtg-world-ink:#f0f2ec;
+  --rtg-world-muted:#aab6b2;
+  --rtg-world-line:rgba(240,242,236,.16);
+  --rtg-world-signature:#75b8b1;
+  --rtg-world-signature-soft:rgba(117,184,177,.15);
+  --rtg-world-metal:#c1a45f;
+  --rtg-world-photo:url('/images/worlds/heritage/work-heritage-v2.jpg');
+  --rtg-world-photo-position:70% center;
+  --rtg-world-photo-mask:linear-gradient(112deg,rgba(12,17,18,.975),rgba(12,17,18,.84));
+}
+
+/* FoundationOS is institutioneel nachtblauw met warm goud, niet kinderlijk. */
+body[data-rtg-skin="heritage"][data-rtg-world="foundation"]{
+  --rtg-world-bg:#071522;
+  --rtg-world-ground:linear-gradient(155deg,#102b42 0%,#071522 58%,#030b12 100%);
+  --rtg-world-card:#0b2032;
+  --rtg-world-card-strong:#06101b;
+  --rtg-world-ink:#f2f2ea;
+  --rtg-world-muted:#aebccc;
+  --rtg-world-line:rgba(242,242,234,.17);
+  --rtg-world-signature:#d0b66e;
+  --rtg-world-signature-soft:rgba(208,182,110,.14);
+  --rtg-world-metal:#d0b66e;
+  --rtg-world-photo:url('/images/worlds/heritage/foundation-heritage-v2.jpg');
+  --rtg-world-photo-position:72% center;
+  --rtg-world-photo-mask:linear-gradient(112deg,rgba(7,21,34,.975),rgba(7,21,34,.84));
+}
+
+/* Een route die zelf een donker materiaalvlak verklaart, draagt ook de hele
+   bijbehorende inktset. Zonder deze koppeling bleef een Living-route op onyx
+   of bordeaux de lichte-wereldtokens gebruiken: donker op donker, terwijl de
+   route juist expliciet had gezegd dat grond en inkt samen horen. */
+body[data-rtg-skin="heritage"][data-rtg-eigenvlak="onyx"]{
+  --rtg-world-bg:#0c0c0b;
+  --rtg-world-ground:linear-gradient(155deg,#171614 0%,#0c0c0b 58%,#050505 100%);
+  --rtg-world-card:#151312;
+  --rtg-world-card-strong:#1b1817;
+  --rtg-world-ink:#f4f0e9;
+  --rtg-world-muted:#cdc9c0;
+  --rtg-world-line:rgba(244,240,233,.15);
+  --rtg-world-signature:#9e1c40;
+  --rtg-world-signature-soft:rgba(158,28,64,.16);
+  --rtg-world-metal:#c0a544;
+  --rtg-world-action:#745718;
+  --rtg-world-action-ink:#fff;
+  --rtg-world-schema:dark;
+  --rtg-world-photo:none;
+  --rtg-world-photo-position:center;
+  --rtg-world-photo-mask:none
+}
+body[data-rtg-skin="heritage"][data-rtg-eigenvlak="bordeaux"]{
+  --rtg-world-bg:#2e0713;
+  --rtg-world-ground:linear-gradient(168deg,#7f1634 0%,#4a0c1e 44%,#2e0713 100%);
+  --rtg-world-card:#2a0713;
+  --rtg-world-card-strong:#20060e;
+  --rtg-world-ink:#f4f0e9;
+  --rtg-world-muted:#e2c9cf;
+  --rtg-world-line:rgba(244,240,233,.14);
+  --rtg-world-signature:#c23a5e;
+  --rtg-world-signature-soft:rgba(194,58,94,.16);
+  --rtg-world-metal:#e7a8b8;
+  --rtg-world-action:#7f1634;
+  --rtg-world-action-ink:#fff;
+  --rtg-world-schema:dark;
+  --rtg-world-photo:none;
+  --rtg-world-photo-position:center;
+  --rtg-world-photo-mask:none
+}

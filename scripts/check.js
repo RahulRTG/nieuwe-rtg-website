@@ -3323,7 +3323,14 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
     ['server/kern/agenda-pro.js', 'schrijft in dezelfde agenda en doet dus dezelfde belofte'],
     ['server/kern/bestanden.js', 'werk van een lid: de bytes staan al duurzaam, de verwijzing ernaartoe nu ook'],
     ['server/kern/berichten/index.js', 'werk van een lid: een weggezet gesprek hoort niet terug te komen'],
-    ['server/kern/vergeten.js', 'AVG-wissing: verwijderd mag pas worden bevestigd nadat de opslag het vastlegt']
+    ['server/kern/vergeten.js', 'AVG-wissing: verwijderd mag pas worden bevestigd nadat de opslag het vastlegt'],
+    /* HET DERDE BEEN UIT GELDLAT.md (6 september 2026): een rem die een mens
+       overhaalt. Het criterium is smal en staat daar uitgeschreven -- iets
+       STOPPEN, en de bevestiging doet de mens geloven dat hij weg kan lopen.
+       Allebei gemeten in FAALPROEF.json als `schrijf-verloren` -> 200. */
+    ['server/kern/afdelingen/integratiekamer.js', 'de noodstop: wie elke koppeling uitzet en `noodstop: true` leest, hoort dat na een herstart terug te vinden'],
+    ['server/kern/command/lagen.js', 'bedraadt de duurzame helper voor de uitrolpauze; kiest zelf niets'],
+    ['server/kern/command/uitrolregie.js', 'de uitrolpauze: een uitrol die als `stil` is bevestigd, mag niet doorlopen na een herstart']
   ]);
   /* Het BEREIK van de primitive: de naam zelf, de vlag waarmee een bundel
      duurzaam wordt, en de gedeelde helper. Zonder die laatste twee bewaakt deze
@@ -4546,15 +4553,27 @@ console.log('\n57) een browser start op EEN plek: test/helper.js');
   }
 }
 
-console.log('\n58) geen ronde hoeken: elke border-radius is 0, behalve een echte cirkel');
+console.log('\n58) vaste hoekgrammatica: rechte inhoud, afgeronde systeemlagen en echte cirkels');
 {
   const RE = /border-radius\s*:\s*([^;}"'\n\\`]+)/g;
-  const mag = (v) => {
+  const HERITAGE = new Map([
+    ['public/shared/rtg-heritage-materials.css', new Set([
+      'var(--rtg-radius-content)', 'var(--rtg-radius-system)'
+    ])],
+    ['public/shared/rtg-heritage-components.css', new Set([
+      'var(--rtg-radius-system)00var(--rtg-radius-system)'
+    ])],
+    ['public/shared/rtg-heritage-adapters.css', new Set([
+      'var(--rtg-radius-system)'
+    ])]
+  ]);
+  const mag = (v, rel) => {
     const k = String(v).trim().toLowerCase().replace(/\s+/g, '');
-    return k === '0' || k === '0!important' || k === '50%' || k === '50%!important';
+    if (k === '0' || k === '0!important' || k === '50%' || k === '50%!important') return true;
+    return HERITAGE.has(rel) && HERITAGE.get(rel).has(k);
   };
   const kapot = [];
-  let gekeken = 0, cirkels = 0;
+  let gekeken = 0, cirkels = 0, systeemhoeken = 0;
   loop(path.join(ROOT, 'public'), /\.(css|html|js)$/, f => {
     const rel = path.relative(ROOT, f);
     if (rel.endsWith('.min.js')) return;
@@ -4565,18 +4584,23 @@ console.log('\n58) geen ronde hoeken: elke border-radius is 0, behalve een echte
     RE.lastIndex = 0;
     while ((m = RE.exec(bron))) {
       const v = m[1].trim();
-      if (mag(v)) { if (v.toLowerCase().startsWith('50%')) cirkels++; continue; }
+      if (mag(v, rel)) {
+        if (v.toLowerCase().startsWith('50%')) cirkels++;
+        else if (!/^0(?:\s*!important)?$/i.test(v)) systeemhoeken++;
+        continue;
+      }
       kapot.push(rel + ' regel ' + bron.slice(0, m.index).split('\n').length + ': ' + v.slice(0, 40));
     }
   });
   if (kapot.length) {
     for (const k of kapot.slice(0, 12)) {
-      fout('ronde hoek: ' + k + ' -- zet hem op 0 (CLAUDE.md ontwerpprincipe 3);' +
-        ' een echte cirkel mag, en die schrijf je als border-radius:50%');
+      fout('ongeclassificeerde hoek: ' + k + ' -- route-inhoud blijft 0;' +
+        ' Heritage-inhoud en systeemlagen gebruiken uitsluitend de centrale contractwaarden');
     }
     if (kapot.length > 12) fout('... en nog ' + (kapot.length - 12) + ' plekken');
   } else {
-    ok(gekeken + ' bestanden met een radius: allemaal 0, plus ' + cirkels + ' echte cirkels');
+    ok(gekeken + ' bestanden met radius: 0, ' + cirkels + ' echte cirkels en ' +
+      systeemhoeken + ' centrale Heritage-systeemvormen');
   }
 }
 

@@ -1254,6 +1254,56 @@ bron staat: de themalijst is een keer uitgebreid toen zes van de zeven beloften
 van de derde keten erbuiten vielen -- de actoren zijn niet aangeraakt, en die
 staan op nul.
 
+**`INTELLIGENTIE.md` is de laag BOVEN het stuur** -- de RTG Intelligence Layer,
+als richtingsdocument met per onderdeel of het **staat**, **een stap weg** is,
+**een besluit vraagt** of **jaren weg** is. Lees die voor je iets bouwt waarmee
+de AI uit zichzelf iets opmerkt, voorbereidt of aandacht vraagt. De lat in een
+zin: *Worlds orchestrate. Domains own. Policies authorize. Runtimes execute.
+Evidence proves. Intelligence anticipates* -- en dat laatste werkwoord ontbreekt
+vandaag. De keten gaat van `mens -> opdracht -> uitvoering` naar
+`wereld verandert -> merken -> voorspellen -> klaarzetten -> handelen of vragen
+-> controleren -> leren`, waarbij de gebruiker soms niets typt. Zeven bouwstenen
+bestaan al onder een andere naam (par. 1.3: `gevolg.js` is de effectgraaf,
+`command/transactie-poorten.js` de verifier waar *een controle die niet kon
+draaien niet geslaagd is*, `service/loop.js` het open-lus-geheugen), dus het werk
+is aansluiten en niet uitvinden. **Zeven regels die niet mogen sneuvelen**, en
+vier ervan corrigeren een voorstel dat op het eerste gezicht klopt: er komt
+**geen zesde gezagsvocabulaire** (INT-01 -- het initiatiefniveau bestaat al en
+heet `kern/stuur/mandaat.js`, dat nul productie-aanroepers heeft; `autonoom` en
+`begrensd` zijn sinds 31 augustus EIGENSCHAPPEN en geen trede), het **wereldmodel
+wordt gemeten en niet verklaard** (INT-02 -- `OBJECTMODEL.json` zegt 71%
+domeineigen en `KETENVORM.json` 0 van 13 gedeelde actoren, dus een typemodel
+eroverheen is de `Asset`-fout; de uitweg is de projectievorm van
+`kern/levensgraaf/graaf.js`), het **Mensmodel hangt aan de codenaam** met een
+bewaartermijn en een `deel`-poort (INT-03 -- `scripts/afleidbaar.js` vond al
+codenaam plus bezorgadres zonder termijn, en episodisch geheugen ernaast maakt
+dat pad korter), en de **aandachtmotor geeft een besluit met zijn opbouw en nooit
+een samengesteld cijfer** (INT-04 -- `confidence` en `novelty` zijn vandaag niet
+meetbaar, en vermenigvuldigen met een verzonnen getal is erger dan het weglaten).
+Par. 3.5 draagt het duurste getal: **van de 115 AI-schrijfpaden hebben er 91 geen
+bekende terugweg**, dus de formule uit punt 11 (autonomie = impact x onzekerheid
+x reversibility) is voor 79% niet uit te rekenen -- en `HERSTELPROEF.json` toont
+dat het instrument bestaat en er 46 werelden ontbreken, geen motor. Dat getal
+KAN niet schuiven: die 91 hebben geen tegenhanger om te beproeven (`HERSTEL.json`
+leidt kandidaten af uit de NAAM van een route), dus er is niets gedraaid dat
+anders had kunnen uitvallen. **Par. 3.5a is wel verplichte kost voordat je de
+herstelproef gebruikt**: het ingecheckte `HERSTELPROEF.json` reproduceert niet op
+een andere machine (twee rondes op ongewijzigde main zijn onderling identiek maar
+wijken allebei met dezelfde vijf paren af, dus de juiste nulstand is een VERSE
+ronde op de basisbranch), en alle negentig paren delen EEN wegwerpserver -- dus
+elke wijziging die ergens schrijft verschuift wat `exact` betekent voor latere
+paren. `exact` is daar een BROZE graad; `wereldOntbreekt` wordt beslist voordat
+er een server draait en kan nooit schuiven. De maatstaf
+in par. 6 is daarom niet "wanneer heeft RTG een Intelligence Layer" maar
+**wanneer kan RTG van een zelfstandige handeling vooraf zeggen wat er verandert,
+achteraf bewijzen dat het gebeurd is, en hem terugdraaien als het misging** --
+vandaag zijn dat **7 van de 118 schrijfparen**, met naam en toenaam. Let op de
+bouwvolgorde in par. 4: er staat een **Fase 0** voor Know, want Fase E is
+gedefinieerd op getallen die nog niet bestaan, en twee van de meest waardevolle
+stappen zijn geen bouwwerk maar een besluit (`mandaat.js` een aanroeper geven, en
+`RTG_HERKOMST_AFDWINGEN` omzetten -- die prijs is gemeten: een lid gaat van 120
+naar 36 paden, een zaak van 53 naar 9).
+
 **`CODE.md` is de laag waarin RTG naar zijn EIGEN software kijkt** -- de Code
 Intelligence Plane, als richtingsdocument met per onderdeel of het **staat**,
 **een stap weg** is, **een besluit vraagt** of **jaren weg** is. Lees die vóór je
@@ -1386,15 +1436,14 @@ De eerdere **statische versie** (losse HTML-bestanden in de root + Vercel `api/c
 ### Design-principes
 1. **Premium, ook aan de onderkant.** RTG Pass is de instap, maar mag nooit budget aanvoelen.
 2. **Eén signatuurelement, geen stapeling van trucjes.** Niet steeds nieuwe visuele devices toevoegen.
-3. **Stark zwart/wit ritme**, geen beige/marmer-gradients, geen ronde hoeken of gouden randjes.
-   *Sinds 20 augustus 2026 ook in code:* elke `border-radius` in `public/` is `0`.
-   De vormtaal deed jarenlang het tegenovergestelde (18px op kaarten, 12px op
-   velden, 999px op knoppen, plus 195 losse pixelwaarden die zich aan geen van
-   beide hielden); 3169 hoeken zijn omgezet. **Eén uitzondering: een cirkel is
-   geen hoek.** Een statusstip, een monogram of een avatar is een vorm en geen
-   afgeronde rechthoek, dus `border-radius:50%` mag — en dat is de enige waarde
-   naast `0` die er nog voorkomt. `scripts/check.js` regel 51 houdt het zo; een
-   merkregel die alleen in dit document staat, is over een half jaar weer weg.
+3. **Modern Heritage-ritme**, met de geometrie uit `HERITAGE.md`: inhoudsvlakken
+   zijn recht of vrijwel recht (0-4px), terwijl uitsluitend systeemlagen zoals
+   Edge, een modale laag, Side Sheet en Continue Key herkenbaar afgerond zijn
+   (16-28px). Een statusstip, monogram of avatar mag een echte cirkel zijn.
+   Willekeurige kaart-, veld- en knopafrondingen blijven verboden: de toegestane
+   waarden wonen alleen in de centrale Heritage-tokens en componentcontracten.
+   `scripts/check.js` regel 58 bewaakt precies die grens, zodat een route niet
+   alsnog een eigen SaaS-vormtaal kan invoeren.
 4. **Veel lucht** — genereuze verticale padding; bij twijfel meer ruimte.
 5. **De Salon levert het beeld.** Site- en campagnebeeld zijn uitgelichte Salon-posts (featured, altijd met naamsvermelding — label "Uit De Salon · naam"; endpoint `/api/salon/promo`, alleen featured posts, RTG cureert). De onderliggende demo-beelden zijn AI-gegenereerd in eigen huis (`public/campagne/`, via Pollinations; quiet luxury, gedempte tinten, géén mensen) — geen stockfoto's, geen modellen, geen extern beeld. Overige visuals met CSS/SVG bouwen.
 

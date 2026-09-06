@@ -97,8 +97,8 @@ test('de nieuwe suiteschil bewaakt bruikbare bediening en responsieve panelen', 
   assert.match(css, /body\.rtg-suite-page button,[\s\S]*min-height:44px/);
   assert.match(css, /@media\(min-width:1280px\)[\s\S]*rtg-message-context/);
   assert.match(css, /@media\(max-width:900px\)[\s\S]*rtg-suitenav[\s\S]*bottom:0/);
-  assert.match(css, /rtg-social-circles>header\.ios-nav>#osMenuBtn\{display:flex!important;\}/,
-    'de mobiele Kringen-schil houdt de veilige systeemdeur zichtbaar');
+  assert.match(css, /rtg-social-circles:not\(\.rtg-edge-host\)>header\.ios-nav>#osMenuBtn\{display:flex!important;\}/,
+    'de mobiele Kringen-schil houdt zijn systeemdeur alleen zichtbaar zolang Edge geen eigenaar is');
   assert.doesNotMatch(css, /rtg-social-circles[^}]*#osMenuBtn\{[^}]*display:none/,
     'geen responsieve regel mag het appmenu verbergen');
 });

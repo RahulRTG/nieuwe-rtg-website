@@ -33,14 +33,21 @@ const meld = (soort, groep, tekst, waar, hoe) =>
   bevindingen.push({ soort, groep, tekst, waar: waar || null, hoe: hoe || null });
 
 /* ---------- de bestanden waar we naar kijken ---------- */
-function loop(dir, uit) {
+/* `work/` bevat lokale kandidaatkopieën voor de interne beta. Die map staat
+   bewust in .gitignore en kan een volledige kopie van server/public/test
+   bevatten. Zo'n kandidaat als tweede bronboom tellen verdubbelt de keuring
+   precies op de machine die een pakket heeft gebouwd. Alleen de echte wortel
+   is bron; een gelijknamige domeinmap dieper in het huis blijft dus zichtbaar. */
+function loop(dir, uit, bronWortel) {
   uit = uit || [];
+  bronWortel = bronWortel || dir;
   let items = [];
   try { items = fs.readdirSync(dir, { withFileTypes: true }); } catch (e) { return uit; }
   for (const it of items) {
-    if (it.name === 'node_modules' || it.name === '.git' || it.name === 'data') continue;
+    if (it.name === 'node_modules' || it.name === '.git' || it.name === 'data' ||
+        (dir === bronWortel && it.name === 'work')) continue;
     const p = path.join(dir, it.name);
-    if (it.isDirectory()) loop(p, uit);
+    if (it.isDirectory()) loop(p, uit, bronWortel);
     else uit.push(p);
   }
   return uit;
@@ -542,4 +549,4 @@ if (require.main === module) {
   process.exit(r.stuk ? 1 : 0);
 }
 
-module.exports = { keur, maakDekkingsIndex, DEKKING_KAP };
+module.exports = { keur, loop, maakDekkingsIndex, DEKKING_KAP };

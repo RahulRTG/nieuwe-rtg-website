@@ -542,108 +542,6 @@
       "url": "/apps/spelscherm.html"
     },
     {
-      "label": "Beheer bronnen",
-      "app": "Geld",
-      "wereld": "LivingOS",
-      "url": "/apps/geld-command.html"
-    },
-    {
-      "label": "Consequenties",
-      "app": "Geld",
-      "wereld": "LivingOS",
-      "url": "/apps/geld-command.html"
-    },
-    {
-      "label": "Controleer",
-      "app": "Geld",
-      "wereld": "LivingOS",
-      "url": "/apps/geld-command.html"
-    },
-    {
-      "label": "Mecenaat",
-      "app": "Geld",
-      "wereld": "LivingOS",
-      "url": "/apps/geld-command.html"
-    },
-    {
-      "label": "Nalatenschap",
-      "app": "Geld",
-      "wereld": "LivingOS",
-      "url": "/apps/geld-command.html"
-    },
-    {
-      "label": "Noodzakelijk",
-      "app": "Geld",
-      "wereld": "LivingOS",
-      "url": "/apps/geld-command.html"
-    },
-    {
-      "label": "Open balans",
-      "app": "Geld",
-      "wereld": "LivingOS",
-      "url": "/apps/geld-command.html"
-    },
-    {
-      "label": "Open verdeling",
-      "app": "Geld",
-      "wereld": "LivingOS",
-      "url": "/apps/geld-command.html"
-    },
-    {
-      "label": "Persoonlijk bevestigen",
-      "app": "Geld",
-      "wereld": "LivingOS",
-      "url": "/apps/geld-command.html"
-    },
-    {
-      "label": "RAHUL swipe",
-      "app": "Geld",
-      "wereld": "LivingOS",
-      "url": "/apps/geld-command.html"
-    },
-    {
-      "label": "Simuleer eerst",
-      "app": "Geld",
-      "wereld": "LivingOS",
-      "url": "/apps/geld-command.html"
-    },
-    {
-      "label": "Stel grens in",
-      "app": "Geld",
-      "wereld": "LivingOS",
-      "url": "/apps/geld-command.html"
-    },
-    {
-      "label": "Toegestaan",
-      "app": "Geld",
-      "wereld": "LivingOS",
-      "url": "/apps/geld-command.html"
-    },
-    {
-      "label": "Toekomsten",
-      "app": "Geld",
-      "wereld": "LivingOS",
-      "url": "/apps/geld-command.html"
-    },
-    {
-      "label": "Toestemming",
-      "app": "Geld",
-      "wereld": "LivingOS",
-      "url": "/apps/geld-command.html"
-    },
-    {
-      "label": "Volledig logboek",
-      "app": "Geld",
-      "wereld": "LivingOS",
-      "url": "/apps/geld-command.html"
-    },
-    {
-      "label": "Zet gecontroleerd klaar",
-      "app": "Geld",
-      "wereld": "LivingOS",
-      "url": "/apps/geld-command.html"
-    },
-    {
       "label": "Machtiging intrekken",
       "app": "Geven",
       "wereld": "FoundationOS",
@@ -728,13 +626,13 @@
       "url": "/apps/living-os.html"
     },
     {
-      "label": "Het Vooruitzicht V-",
+      "label": "Ideaal",
       "app": "Het Vooruitzicht",
       "wereld": "LivingOS",
       "url": "/apps/living-os.html"
     },
     {
-      "label": "Ideaal",
+      "label": "Schrijf",
       "app": "Het Vooruitzicht",
       "wereld": "LivingOS",
       "url": "/apps/living-os.html"
@@ -753,12 +651,6 @@
     },
     {
       "label": "Waarschijnlijk",
-      "app": "Het Vooruitzicht",
-      "wereld": "LivingOS",
-      "url": "/apps/living-os.html"
-    },
-    {
-      "label": "Wijzig",
       "app": "Het Vooruitzicht",
       "wereld": "LivingOS",
       "url": "/apps/living-os.html"

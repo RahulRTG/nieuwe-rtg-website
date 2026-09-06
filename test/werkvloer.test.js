@@ -211,3 +211,41 @@ test('een lijst die niet met mij is gedeeld, zie ik niet', async () => {
   assert.ok(gevonden, 'een lege deel-lijst betekent het hele team');
   assert.deepEqual(gevonden.meedoen, ['het hele team']);
 });
+
+test('een geweigerde tafelvraag laat geen lege tafelrij achter', () => {
+  /* GEMETEN, NIET BEDACHT. STAATPROEF.json zag `/api/werkvloer/bedieningskaart`
+     met een onbekend id keurig 404 geven en ondertussen een lege tafelrij voor
+     die zaak aanleggen -- `vanZaak()` materialiseert wat hij niet vindt -- en
+     zette ROLLBACK daarop op GEZAKT. Dezelfde vorm als eerder in de zorgketen.
+
+     Er komt geen gegeven bij, alleen leeg meubilair, en toch is het een echte
+     bevinding: zolang een weigering iets verandert, kan geen enkele meter leeg
+     meubilair onderscheiden van een half uitgevoerde mutatie.
+
+     In het GEHEUGEN gemeten en niet over HTTP: het 404-pad roept `save()` juist
+     niet aan, dus de schijf blijft gelijk -- ook mét de fout. Een toets die de
+     schijf leest, slaagt hier altijd en bewijst niets. */
+  const crypto = require('crypto');
+  const db = { data: {} };
+  let bewaard = 0;
+  const { tafelwensen: tw } = require('../server/kern/tafelwensen')({
+    db, save: () => { bewaard++; }, crypto, schoon: (v, n) => String(v == null ? '' : v).slice(0, n || 200) });
+
+  const voor = JSON.stringify(db.data);
+  assert.equal(voor, '{}', 'de proef begint met een lege opslag');
+
+  const kaart = tw.bedieningskaart('ZAAK1', 'bestaat-niet-0000');
+  assert.equal(kaart.status, 404, 'een onbekende tafel wordt geweigerd');
+  assert.equal(JSON.stringify(db.data), voor,
+    'de weigering legde leeg meubilair aan: ' + JSON.stringify(db.data));
+
+  const weg = tw.tafelWeg('ZAAK1', 'bestaat-niet-0000');
+  assert.equal(weg.status, 404);
+  assert.equal(JSON.stringify(db.data), voor, 'ook tafelWeg liet iets achter');
+
+  // en lezen van een zaak zonder tafels legt niets aan
+  tw.tafelLijst('ZAAK1', {});
+  tw.keukenbord('ZAAK1', {});
+  assert.equal(JSON.stringify(db.data), voor, 'een pure leesvraag legde iets aan');
+  assert.equal(bewaard, 0, 'een weigering of leesvraag bewaart niets');
+});

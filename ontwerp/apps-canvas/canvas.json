@@ -1,0 +1,35 @@
+{
+  "pages": [
+    { "id": "page-1", "name": "Muziek" },
+    { "id": "page-2", "name": "Sociaal" },
+    { "id": "page-3", "name": "Zorg" }
+  ],
+  "artboards": [
+    { "file": "Main.dc.html",       "title": "Muziek · Home",       "page": "page-1", "x": 0,   "y": 0, "w": 390, "h": 844 },
+    { "file": "Speler.dc.html",     "title": "Muziek · Speler",     "page": "page-1", "x": 470, "y": 0, "w": 390, "h": 844 },
+    { "file": "Feed.dc.html",       "title": "Sociaal · Feed",      "page": "page-2", "x": 0,   "y": 0, "w": 390, "h": 844 },
+    { "file": "Kringen.dc.html",    "title": "Sociaal · Kringen",   "page": "page-2", "x": 470, "y": 0, "w": 390, "h": 844 },
+    { "file": "ZorgHome.dc.html",   "title": "Zorg · Home",         "page": "page-3", "x": 0,   "y": 0, "w": 390, "h": 844 },
+    { "file": "ZorgAgenda.dc.html", "title": "Zorg · Agenda",       "page": "page-3", "x": 470, "y": 0, "w": 390, "h": 844 },
+    { "file": "Zorgmoment.dc.html", "title": "Zorg · Zorgmoment",   "page": "page-3", "x": 940, "y": 0, "w": 390, "h": 844 }
+  ],
+  "annotations": [
+    {
+      "id": "muziek-noot", "page": "page-1", "x": 0, "y": -190, "w": 860,
+      "text": "MUZIEK — donker en warm.\n\nGouden kapitalen als eyebrow, Bodoni voor de emotie, Inter voor alles wat je bedient. Bordeaux alleen op de speelknop: één gevuld vlak per scherm, verder omlijnd.\n\nDe hoesfoto's zijn met CSS opgebouwd, geen stockbeeld — dat is ook de huisregel."
+    },
+    {
+      "id": "sociaal-noot", "page": "page-2", "x": 0, "y": -230, "w": 860,
+      "text": "SOCIAAL — dezelfde stijl, ander werk.\n\nTwee dingen wijken bewust af van de referentie:\n\n1. De story-ringen zijn GOUD, niet roze-oranje. Dat verloop is van Instagram; goud is van RTG.\n2. Elk uitgelicht beeld draagt \"Uit De Salon · naam\". Dat is geen versiering maar de afspraak: RTG cureert, de maker wordt genoemd.\n\nKringen is de RTG-kant van sociaal: twee cirkels om jou heen in plaats van een volgerslijst. Geen bereik, geen cijfer op een mens."
+    },
+    {
+      "id": "zorg-noot", "page": "page-3", "x": 0, "y": -210, "w": 1330,
+      "text": "ZORG — dezelfde vormtaal op ivoor.\n\nDit is de zwaarste proef: goud dat op zwart leest, leest op ivoor niet. Daarom staat hier het donkere goud (#745718 / #B89545) en niet het champagnegoud van de andere twee. Bodoni, ritme, gouden streep en de bordeaux pil blijven identiek.\n\nDe donkere hero bovenaan is wat de twee werelden aan elkaar knoopt: je herkent RTG voordat je één woord leest."
+    },
+    {
+      "id": "statusbalk", "page": "page-1", "x": 900, "y": -190, "w": 420,
+      "text": "GEEN NAGETEKENDE STATUSBALK\n\nDe referenties hebben \"9:41 · wifi · batterij\" ingetekend. Dat is hier weggelaten: op een echt toestel tekent de telefoon zijn eigen balk over je scherm heen, en dan staat het dubbel.\n\nDe ruimte bovenin is wel gereserveerd."
+    }
+  ],
+  "launch": { "view": "canvas", "page": "page-1" }
+}

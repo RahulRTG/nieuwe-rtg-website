@@ -12,7 +12,7 @@ const fs = require('fs');
 const path = require('path');
 
 const WORTEL = path.join(__dirname, '..');
-const { keur } = require('../scripts/keuring.js');
+const { keur, loop } = require('../scripts/keuring.js');
 const uitslag = keur();
 
 test('de Keuring velt een volledig oordeel', () => {
@@ -90,6 +90,20 @@ test('bouwsels tellen niet mee, alleen bron', () => {
   for (const b of uitslag.bevindingen) {
     if (!b.waar) continue;
     assert.ok(!b.waar.includes('public/dist/'), 'een bevinding wijst naar geminificeerd bouwsel: ' + b.waar);
+  }
+});
+
+test('een genegeerde kandidaatkopie onder work telt niet als tweede bronboom', () => {
+  const map = fs.mkdtempSync(path.join(require('os').tmpdir(), 'rtg-keuring-bron-'));
+  try {
+    fs.mkdirSync(path.join(map, 'server'), { recursive: true });
+    fs.mkdirSync(path.join(map, 'work', 'kandidaat', 'server'), { recursive: true });
+    fs.writeFileSync(path.join(map, 'server', 'echt.js'), 'module.exports = true;\n');
+    fs.writeFileSync(path.join(map, 'work', 'kandidaat', 'server', 'kopie.js'),
+      'module.exports = false;\n');
+    assert.deepEqual(loop(map).map(p => path.relative(map, p)), [path.join('server', 'echt.js')]);
+  } finally {
+    fs.rmSync(map, { recursive: true, force: true });
   }
 });
 

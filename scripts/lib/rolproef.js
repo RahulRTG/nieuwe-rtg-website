@@ -29,6 +29,33 @@
    ========================================================================== */
 'use strict';
 
+/* DE ROLLEN DIE GEEN SLEUTEL HEBBEN, en waarom die lijst hier niet nog een keer
+   wordt getypt.
+
+   De regel hieronder in de kruisgang luidde jarenlang `r.rol === 'open'`. Die
+   waarde BESTAAT NIET: scripts/lib/bewakers.js noemt een route zonder bewaker en
+   met een reden `openbaar`, een inlogdeur `eigen-poort`, en een route aan een
+   omgevingsvariabele `omgeving`. De vergelijking sloeg dus nooit aan, en alle
+   112 routes met zo'n rol werden alsnog met member/supplier/office bekropen.
+
+   Dat gaf precies wat je verwacht: een OPENBARE route liet een ingelogd lid
+   binnen -- want dat is wat openbaar betekent -- en de proef schreef `acl: OPEN`.
+   Via de bewijsmatrix werd dat een GEZAKTE cel. Op 6 september 2026 stonden er
+   zo 29 van de 30 gezakte cellen in het hele huis, en alle 29 waren vals rood.
+
+   VALS ROOD IS NIET ONSCHULDIG. Een kolom met negenentwintig blijvende
+   bevindingen die iedereen leert wegkijken, is geen alarm meer: de dertigste --
+   een echte -- valt er niet meer in op. Dat is dezelfde faalvorm als vals groen,
+   alleen langs de andere kant.
+
+   De lijst komt uit ./proefsleutels.js en wordt hier niet overgetypt. Daar staat
+   hij met de reden per rol ("geen Authorization-kop is voor deze drie niet een
+   tekort maar de JUISTE invoer"), en daar wordt hij ook gemunt. Twee lijsten van
+   dezelfde rollen lopen uiteen zodra er een rol bij komt -- LAT.md regel 4, en op
+   deze lijst is dat al een keer gebeurd. */
+const { LEGE_SLEUTELS } = require('./proefsleutels');
+const ZONDER_SLEUTEL = new Set(LEGE_SLEUTELS);
+
 /* Wat er NOOIT in een antwoord aan een verkeerde rol hoort te staan. Bewust
    ruim: liever een vals alarm dat je met de hand wegstreept dan een lek dat je
    nooit ziet. De echte naam en het eigenaarsadres staan erin omdat die de
@@ -165,6 +192,11 @@ async function draaiRolproef({ post, routes, tokensVoor, maxPogingen, lijfVoor }
      PRIVACY mee. Een route die NIET is geprobeerd staat er niet in, en dat is
      het hele punt: ongemeten is geen groen. */
   const perRoute = {};
+  /* Routes die met een REDEN niet gekruist zijn. Apart van perRoute, want die
+     lijst betekent "beproefd" en telt als dekking; deze betekent "hier valt niet
+     te kruisen". Ze bij elkaar optellen zou de dekking laten groeien zonder dat
+     er iets extra's is gemeten. */
+  const nietTeKruisen = [];
   const rollen = ['member', 'supplier', 'office'];
 
   /* ---- EEN VAST TOKEN PER ROL, VOOR DE HELE PROEF ----
@@ -197,7 +229,7 @@ async function draaiRolproef({ post, routes, tokensVoor, maxPogingen, lijfVoor }
         meterStuk: 'de vingerafdruk zag een LEGITIEME wijziging niet' +
           (ijk.gelukt ? '' : ' (en de ijk-oplading zelf lukte ook niet)') +
           '; hij kan dus ook een ongeoorloofde wijziging niet zien. Gemeten: ' + JSON.stringify(ijk.voor) },
-      pogingen: 0, voor: ijk.voor, na: ijk.na, ijk
+      pogingen: 0, nietTeKruisen: [], voor: ijk.voor, na: ijk.na, ijk
     };
   }
 
@@ -205,7 +237,19 @@ async function draaiRolproef({ post, routes, tokensVoor, maxPogingen, lijfVoor }
   let gedaan = 0;
   for (const r of routes) {
     if (r.methode === 'GET') continue;                 // schrijfroutes: dit gaat over mutaties
-    if (r.rol === 'open' || !r.rol) continue;         // publiek: geen rol om te kruisen
+    if (!r.rol) continue;                              // geen rol: de trechter meldt hem al met reden
+    /* GEEN SLEUTEL, DUS GEEN VERKEERDE ROL OM MEE TE KRUISEN -- en dat wordt
+       OPGESCHREVEN in plaats van stil overgeslagen. Een `continue` zonder spoor
+       laat deze routes in de bewijsmatrix als `ongemeten` staan, en dat is hier
+       onwaar: er valt niets te meten, dat is iets anders dan dat niemand keek.
+       De reden reist mee zodat de matrix er `nvt` van kan maken en de lezer kan
+       nalopen WELKE lijst een route openbaar noemt. Zie de kop. */
+    if (ZONDER_SLEUTEL.has(r.rol)) {
+      nietTeKruisen.push({ methode: r.methode, pad: r.pad, rol: r.rol,
+        reden: 'de rol `' + r.rol + '` heeft geen sleutel (scripts/lib/proefsleutels.js): ' +
+          'er is geen verkeerde rol om mee te kruisen, want deze route vraagt geen kop' });
+      continue;
+    }
     if (r.schakel) continue;                          // de schakelkast zou de hele proef vergiftigen
     for (const rol of rollen) {
       if (rol === r.rol) continue;                    // alleen de VERKEERDE rollen
@@ -246,7 +290,7 @@ async function draaiRolproef({ post, routes, tokensVoor, maxPogingen, lijfVoor }
     if (voor[k] == null && na[k] == null) continue;
     if (voor[k] !== na[k]) bevindingen.gewijzigd.push(k + ': ' + voor[k] + ' -> ' + na[k]);
   }
-  return { bevindingen, perRoute, pogingen: gedaan, voor, na, ijk };
+  return { bevindingen, perRoute, nietTeKruisen, pogingen: gedaan, voor, na, ijk };
 }
 
 const CONTROL = {

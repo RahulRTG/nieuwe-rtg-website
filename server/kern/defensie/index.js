@@ -41,15 +41,28 @@ module.exports = ({ db, save, crypto, anthropic }) => {
     for (const k of ['eenheden', 'materieel', 'bevoorrading', 'oefeningen', 'gewonden', 'verplaatsingen']) if (!Array.isArray(d[code][k])) d[code][k] = [];
     return d[code];
   }
+  /* Lezen zonder scheppen: opzoeken mag geen zaak met zes lege vakken
+     achterlaten. Elk vak valt APART terug -- de seed van de demozaak legt er
+     maar vier aan, dus een lezer die alleen de zaak controleert maakt van een
+     404 een TypeError op d.gewonden. De lege lijst is bevroren met opzet: wie
+     erin duwt krijgt een fout in plaats van een schrijfactie die nergens
+     terechtkomt. Schrijven blijft bak(). */
+  const LEEG = Object.freeze([]);
+  function kijk(code) {
+    const d = (db.data.defensie || {})[code] || {};
+    const uit = {};
+    for (const k of ['eenheden', 'materieel', 'bevoorrading', 'oefeningen', 'gewonden', 'verplaatsingen']) uit[k] = Array.isArray(d[k]) ? d[k] : LEEG;
+    return uit;
+  }
   function gewondenGesorteerd(code) {
-    return bak(code).gewonden.filter(g => g.status !== 'ontslagen' && g.status !== 'geevacueerd')
+    return kijk(code).gewonden.filter(g => g.status !== 'ontslagen' && g.status !== 'geevacueerd')
       .slice().sort((a, b) => TRIAGE.indexOf(a.triage) - TRIAGE.indexOf(b.triage) || a.at - b.at);
   }
 
   /* ---------- het commando-overzicht ---------- */
   function overzicht(s) {
     if (!isDef(s)) return { status: 403, error: 'Dit is geen defensie-organisatie.' };
-    const d = bak(s.code);
+    const d = kijk(s.code);
     const tel = p => d.eenheden.filter(e => e.paraat === p).length;
     return {
       ok: true, code: s.code, naam: s.name,
@@ -93,7 +106,7 @@ module.exports = ({ db, save, crypto, anthropic }) => {
   }
 
   // de gedeelde ctx voor de deelbestanden
-  const ctx = { db, save, crypto, nu, schoon, bak,
+  const ctx = { db, save, crypto, nu, schoon, bak, kijk,
     PARAAT, MAT_STAAT, MAT_SOORTEN, BEV_SOORTEN, BEV_KETEN, TRIAGE, VERPL_SOORT, VERPL_LADING, VERPL_KETEN };
   const api = { DEF_TYPES, PARAAT, MAT_SOORTEN, BEV_SOORTEN, TRIAGE, VERPL_SOORT, VERPL_LADING, isDef, overzicht, stafAi };
   Object.assign(api, require('./beheer')(ctx), require('./veld')(ctx));

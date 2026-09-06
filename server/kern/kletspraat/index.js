@@ -38,10 +38,21 @@ module.exports = (state) => {
     if (!k.gesprekken) k.gesprekken = [];
     return k;
   }
+  /* Lezen zonder scheppen (kijk() in kern/eigencollectie.js): zelfde vorm als
+     lijsten(), maar hij legt niets aan en schrijft niets terug. NOOIT op een
+     schrijfpad -- bij een ontbrekende collectie is dit een vluchtig object en
+     verdwijnt een push in het niets. */
+  function lees() {
+    const k = eigen.kijk('klets') || {};
+    return {
+      aan: (k.aan && typeof k.aan === 'object') ? k.aan : {},
+      gesprekken: Array.isArray(k.gesprekken) ? k.gesprekken : []
+    };
+  }
   const paarSleutel = (a, b) => [a, b].sort().join('|');
 
   /* ---------- de schakelaar ---------- */
-  const kletsAan = (handle) => !!lijsten().aan[handle];
+  const kletsAan = (handle) => !!lees().aan[handle];
   function kletsZet(handle, aan) {
     const k = lijsten();
     if (aan) k.aan[handle] = true; else delete k.aan[handle];
@@ -52,7 +63,7 @@ module.exports = (state) => {
   /* ---------- lezen ---------- */
   const zichtbaarVoor = (g, handle) => g.a === handle || g.b === handle;
   function kletsLijst(handle) {
-    return lijsten().gesprekken.filter(g => zichtbaarVoor(g, handle)).slice(-BEWAAR).reverse()
+    return lees().gesprekken.filter(g => zichtbaarVoor(g, handle)).slice(-BEWAAR).reverse()
       .map(g => ({
         id: g.id, at: g.at, echt: !!g.echt,
         metCodenaam: sociaal.codenaamVan(g.a === handle ? g.b : g.a),
@@ -60,7 +71,7 @@ module.exports = (state) => {
       }));
   }
   function kletsHaal(handle, id) {
-    const g = lijsten().gesprekken.find(x => x.id === id && zichtbaarVoor(x, handle));
+    const g = lees().gesprekken.find(x => x.id === id && zichtbaarVoor(x, handle));
     if (!g) return { status: 404, error: 'Dit gesprek bestaat niet (meer).' };
     // "jij" en "de ander" hangen af van wie er kijkt; opgeslagen staat het als a/b
     const ik = g.a === handle ? 'a' : 'b';
@@ -74,7 +85,6 @@ module.exports = (state) => {
 
   /* ---------- maken ---------- */
   async function kletsStart(mij, vriend) {
-    const k = lijsten();
     if (!mij || !vriend || mij === vriend) return { status: 400, error: 'Kies een vriend.' };
     // Sloten 1 en 2, in deze volgorde: eerst of jullie elkaar kennen, dan of
     // jullie het allebei willen. Beide opnieuw, nu, niet uit een eerder beeld.
@@ -84,7 +94,7 @@ module.exports = (state) => {
 
     const dag = new Date().toISOString().slice(0, 10);
     const paar = paarSleutel(mij, vriend);
-    const vandaag = k.gesprekken.filter(g => g.paar === paar && String(g.at).slice(0, 10) === dag).length;
+    const vandaag = lees().gesprekken.filter(g => g.paar === paar && String(g.at).slice(0, 10) === dag).length;
     if (vandaag >= PER_DAG) return { status: 429, error: 'Voor vandaag hebben ze elkaar genoeg gesproken. Morgen weer.' };
 
     // Slot 3: het namenboek, met vers zout. Vanaf hier bestaan er geen echte
@@ -102,6 +112,7 @@ module.exports = (state) => {
     });
 
     const g = { id: 'kl' + crypto.randomBytes(5).toString('hex'), paar, a: mij, b: vriend, at: new Date().toISOString(), echt, beurten };
+    const k = lijsten();   // pas hier bakken: de schrijfkant houdt bak()
     k.gesprekken.push(g);
     /* Opruimen op het GEHEEL, niet per lid: de lijst is gedeeld. Een simpele
        staart van de laatste duizend; wie meer wil bewaren, bewaart het zelf

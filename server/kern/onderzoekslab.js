@@ -28,8 +28,10 @@ module.exports = ({ db, save, crypto, anthropic }) => {
   const schoon = (t, n) => String(t == null ? '' : t).replace(/[<>]/g, '').trim().slice(0, n || 200);
   const rid = () => crypto.randomBytes(4).toString('hex');
   const eigen = require('./eigencollectie')({ db, domein: 'kern/onderzoekslab', bezit: { labProjecten: 'lijst' } });
-  const P = () => eigen.bak('labProjecten');
-  const vind = id => P().find(p => p.id === String(id || ''));
+  const P = () => eigen.bak('labProjecten');       // schrijfpad: alleen projectMaak
+  // lezen zonder scheppen -- zie kijk() in kern/eigencollectie.js
+  const Plees = () => eigen.kijk('labProjecten');
+  const vind = id => Plees().find(p => p.id === String(id || ''));
   const fout = tekst => { const laag = tekst.toLowerCase(); return VERBODEN.some(w => laag.includes(w)); };
 
   const beeld = p => ({ id: p.id, titel: p.titel, veld: p.veld, veldNaam: (VELDEN[p.veld] || {}).naam,
@@ -47,7 +49,7 @@ module.exports = ({ db, save, crypto, anthropic }) => {
     return !!viewer.key && (p.team || []).includes(viewer.key);
   }
   function overzicht(lijst) {
-    const L = lijst || P();
+    const L = lijst || Plees();
     const perVeld = Object.keys(VELDEN).map(v => ({ veld: v, naam: VELDEN[v].naam, emoji: VELDEN[v].emoji,
       aantal: L.filter(p => p.veld === v).length }));
     const perFase = {};
@@ -58,7 +60,7 @@ module.exports = ({ db, save, crypto, anthropic }) => {
       projecten: L.slice(0, 100).map(beeld) };
   }
   // het overzicht zoals EEN kijker het mag zien (team + boardroom)
-  function overzichtVoor(viewer) { return overzicht(P().filter(p => magZien(p, viewer))); }
+  function overzichtVoor(viewer) { return overzicht(Plees().filter(p => magZien(p, viewer))); }
   // het team van een project bijwerken (de mensen die eraan werken, op sleutel)
   function teamZet(id, keys) {
     const p = vind(id); if (!p) return { status: 404, error: 'Dit project bestaat niet.' };
@@ -144,12 +146,12 @@ module.exports = ({ db, save, crypto, anthropic }) => {
      kennis verdwijnt hier nooit. */
   function kennisbank() {
     const uit = [];
-    for (const p of P()) for (const b of p.bevindingen || [])
+    for (const p of Plees()) for (const b of p.bevindingen || [])
       uit.push({ project: p.titel, veld: (VELDEN[p.veld] || {}).naam, fase: p.fase, titel: b.titel, tekst: b.tekst, at: b.at });
     uit.sort((a, b) => String(b.at).localeCompare(String(a.at)));
     return { ok: true, totaal: uit.length, bevindingen: uit.slice(0, 200) };
   }
 
-  const labAI = require('./onderzoekslab-ai')({ anthropic, schoon, P, VELDEN });
+  const labAI = require('./onderzoekslab-ai')({ anthropic, schoon, P: Plees, VELDEN });
   return { lab: { overzicht, overzichtVoor, teamZet, projectMaak, faseZet, veiligheidZet, logMaak, bevindingMaak, kennisbank, labAI, VELDEN, FASEN } };
 };

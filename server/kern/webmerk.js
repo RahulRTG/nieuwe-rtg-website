@@ -38,13 +38,15 @@ module.exports = ({ db, save, scho, webmaker, findSupplier }) => {
   function pot() {
     return eigen.bak('webMerken');
   }
+  // lezen zonder scheppen -- zie kijk() in kern/eigencollectie.js
+  const kijkPot = () => eigen.kijk('webMerken');
   const norm = c => scho(String(c || '').toUpperCase(), 30);
 
   function lijst() {
-    return Object.values(pot()).map(m => ({ code: m.code, naam: m.naam, vestigingen: (m.vestigingen || []).length,
+    return Object.values(kijkPot()).map(m => ({ code: m.code, naam: m.naam, vestigingen: (m.vestigingen || []).length,
       huisstijl: m.huisstijl, sjabloonBlokken: ((m.sjabloon || {}).blokken || []).length, bij: m.bij }));
   }
-  function haal(code) { return pot()[norm(code)] || null; }
+  function haal(code) { return kijkPot()[norm(code)] || null; }
 
   function maak(code, naam) {
     const c = norm(code);
@@ -66,7 +68,7 @@ module.exports = ({ db, save, scho, webmaker, findSupplier }) => {
     const z = norm(zaakCode);
     if (!findSupplier(z)) return { error: 'Deze zaak kennen we niet.', status: 404 };
     if (aan) {
-      const ander = Object.values(pot()).find(x => x.code !== m.code && (x.vestigingen || []).includes(z));
+      const ander = Object.values(kijkPot()).find(x => x.code !== m.code && (x.vestigingen || []).includes(z));
       if (ander) return { error: 'Deze zaak hoort al bij het merk ' + ander.naam + '.', status: 409 };
       if (m.vestigingen.length >= MAX_VESTIGINGEN) return { error: 'Dit merk zit aan het maximum aantal vestigingen.', status: 400 };
       if (!m.vestigingen.includes(z)) m.vestigingen.push(z);
@@ -104,7 +106,7 @@ module.exports = ({ db, save, scho, webmaker, findSupplier }) => {
   function huisstijlVoorZaak(zaakCode) {
     if (!zaakCode) return null;
     const z = norm(zaakCode);
-    const m = Object.values(pot()).find(x => (x.vestigingen || []).includes(z));
+    const m = Object.values(kijkPot()).find(x => (x.vestigingen || []).includes(z));
     return m ? { merk: m.code, naam: m.naam, ...m.huisstijl } : null;
   }
 

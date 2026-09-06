@@ -44,7 +44,8 @@ module.exports = (ctxIn) => {
   const nu = require('../../lib/klok').nu;
   /* De opslagvorm -- de vijf bakken in db.data en de vier naamregels ('lid:',
      'partner:', het saldo van een rekening, een nieuw id) -- staat in ./bakken.js. */
-  const { d, saldi, grootboek, klompjes, kascodes, tikcodes, rekLid, rekPartner, saldoVan, id } =
+  const { d, saldi, grootboek, klompjes, kascodes, tikcodes,
+    saldiKijk, grootboekKijk, klompjesKijk, rekLid, rekPartner, saldoVan, id } =
     require('./bakken')({ db, crypto });
   /* De stand van deze laag -- de drie schakelaars uit de omgeving en de zes
      bedragen -- staat in ./stand.js. Een keer bepaald bij het opstarten, en
@@ -99,10 +100,9 @@ module.exports = (ctxIn) => {
   const { sluitcontrole, boekingenVan, seintje, schaduwStand } =
     require('./kijken')({ saldi, grootboek, keyVanCodenaam, sseToCustomer, schaduw });
 
-  // de gedeelde ctx voor de deelbestanden
   const ctx = {
     db, save, economischeBoekingEenmaal, crypto, betaal, schoon, nu, d,
-    saldi, grootboek, klompjes, kascodes, tikcodes,
+    saldi, grootboek, klompjes, kascodes, tikcodes, saldiKijk, grootboekKijk, klompjesKijk,
     rekLid, rekPartner, saldoVan, id, metIdem, boek, boekAsync, geldModus, zorgSaldo, seintje, bestaatLid,
     betaaldienstKosten: betaaldienstKosten || (() => 0), waarde, accounts,
     opdrachten: betaalOpdrachten,

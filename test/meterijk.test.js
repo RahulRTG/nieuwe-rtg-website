@@ -1431,6 +1431,16 @@ const IJKINGEN = {
     proef: (voor) => metVervangenJson('ROLLBACKBESLUIT.json',
       (j) => { j.routes['/api/zz-ijk-verzonnen'] = { klasse: 'veilige-kant', reden: 'ijking' }; return j; },
       () => norm.meet().rollbackUitzonderingen - voor.rollbackUitzonderingen)
+  },
+  /* Zelfde vorm, en om dezelfde reden: deze meter telt een POST in een register.
+     Leest hij het verkeerde veld -- of een ontbrekend bestand als nul -- dan
+     beweegt hij niet mee, en dat is precies de faalvorm die hier moet opvallen.
+     `gezakt` en niet `bewezen`, want alleen die eerste is geratelde: zie de kop
+     van faalproefGezakt in scripts/norm.js. */
+  faalproefGezakt: {
+    proef: (voor) => metVervangenJson('FAALPROEF.json',
+      (j) => { j.gemeten.gezakt = (j.gemeten.gezakt || 0) + 5; return j; },
+      () => norm.meet().faalproefGezakt - voor.faalproefGezakt)
   }
 };
 

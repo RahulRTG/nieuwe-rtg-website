@@ -97,3 +97,60 @@ test('de gids: alle zalen met wie er is, en open suites op codenaam', async () =
   assert.ok(!JSON.stringify(g.body).includes(ECHT));
   assert.equal((await api(base, '/api/residentie/weg', {}, b.token)).status, 200);
 });
+
+test('een geweigerde spelvraag legt de residentie-collectie niet aan', () => {
+  /* GEMETEN, NIET BEDACHT. STAATPROEF.json zag `/api/residentie/spel/antwoord`
+     met een onbekende uitnodiging keurig 404 geven en ondertussen de collectie
+     `residentie` aanleggen: de opzoeking liep via kamerVan() en potjes(), en
+     allebei gaan die door R(), die materialiseert. ROLLBACK stond daarop GEZAKT.
+
+     In het GEHEUGEN gemeten en niet over HTTP: het 404-pad roept `save()` niet
+     aan, dus de schijf blijft gelijk -- ook met de fout. Een toets die de schijf
+     leest, slaagt hier altijd en bewijst niets. Die les kostte eerder een loze
+     toets in test/zorgketen.test.js.
+
+     Hij zakt zodra een opzoekpad weer een materialiserende helper gebruikt. */
+  const { maakResidentie } = require('../server/kern/residentie/index');
+  const db = { data: {} };
+  let bewaard = 0;
+  const { residentie } = maakResidentie({ db, save: () => { bewaard++; },
+    schoon: (v, n) => String(v == null ? '' : v).slice(0, n || 200), sseToCustomer: () => {} });
+
+  const leeg = JSON.stringify(db.data);
+  assert.equal(leeg, '{}', 'de proef begint met een lege opslag');
+
+  /* GEVAL 1: een sleutel die nergens binnen is. Dan valt kamerVanLees() op null
+     en hoort er niets te worden aangelegd. */
+  for (const [wat, roep] of [
+    ['spel/antwoord', () => residentie.antwoord('sleutel-bestaat-niet', { ja: true })],
+    ['spel/zet', () => residentie.spelZet('sleutel-bestaat-niet', { kracht: 50 })],
+    ['spel/stop', () => residentie.spelStop('sleutel-bestaat-niet')]
+  ]) {
+    const uit = roep();
+    assert.equal(uit.status, 404, wat + ' weigert een onbekende sleutel');
+    assert.equal(JSON.stringify(db.data), leeg, wat + ' legde leeg meubilair aan');
+  }
+
+  /* GEVAL 2, EN DIT IS HET GEVAL DAT ER EERST NIET WAS. Met een onbekende
+     sleutel is `id` null, en dan wordt potjes() door de kortsluiting
+     (`id && potjes()[id]`) helemaal niet aangeroepen -- de mutatieproef liet
+     zien dat de toets die tak dus NIET dekte: potjes() terugzetten bleef groen.
+     Daarom staat er nu iemand ECHT in een kamer, zodat `id` waar is en de
+     opzoeking het potjes-pad werkelijk in gaat. */
+  const binnen = residentie.betreed('sleutel-lid', 'CODENAAM', 'lobby');
+  assert.ok(binnen && !binnen.error, 'het lid staat in de lobby: ' + JSON.stringify(binnen));
+  const naBetreden = JSON.stringify(db.data);
+  assert.notEqual(naBetreden, leeg, 'binnenkomen schrijft wel degelijk (anders meet geval 2 niets)');
+
+  for (const [wat, roep] of [
+    ['spel/antwoord', () => residentie.antwoord('sleutel-lid', { ja: true })],
+    ['spel/zet', () => residentie.spelZet('sleutel-lid', { kracht: 50 })],
+    ['spel/stop', () => residentie.spelStop('sleutel-lid')]
+  ]) {
+    const uit = roep();
+    assert.equal(uit.status, 404, wat + ' weigert als er geen potje loopt');
+    assert.equal(JSON.stringify(db.data), naBetreden,
+      wat + ' legde een lege potjes-tak aan terwijl hij weigerde');
+  }
+  assert.equal(bewaard, 1, 'alleen het binnenkomen bewaarde; de weigeringen niet');
+});

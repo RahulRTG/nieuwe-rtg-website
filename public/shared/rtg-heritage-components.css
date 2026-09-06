@@ -1,0 +1,128 @@
+/* RTG HERITAGE COMPONENTGRAMMATICA -----------------------------------------
+   De klassen in dit bestand zijn contracten, geen los stijlpakket. Een route
+   kiest een rol; wereldkleur, diepte, toetsenbordfocus en mobiel gedrag komen
+   dan uit dezelfde centrale taal. Bestaande schermen blijven werken zonder
+   deze klassen en kunnen onderdeel voor onderdeel overstappen. */
+
+body[data-rtg-skin="heritage"] :where(.rtg-editorial-hero,.rtg-context-strip,
+  .rtg-narrative-panel,.rtg-operational-panel,.rtg-world-portal,.rtg-side-sheet){
+  min-width:0;border:1px solid var(--rtg-world-line);background-color:
+  color-mix(in srgb,var(--rtg-world-card) 92%,transparent);color:var(--rtg-world-ink)
+}
+
+/* Een home opent filmisch, maar bevat nooit een muur van statistieken. */
+.rtg-editorial-hero{
+  position:relative;isolation:isolate;min-height:clamp(340px,48vw,670px);
+  display:grid;align-content:end;overflow:hidden;padding:clamp(32px,6vw,96px)
+}
+.rtg-editorial-hero>img,.rtg-editorial-hero>[data-rtg-hero-media]{
+  position:absolute;z-index:-2;inset:0;width:100%;height:100%;object-fit:cover
+}
+.rtg-editorial-hero::before{
+  content:"";position:absolute;z-index:-1;inset:0;background:linear-gradient(90deg,
+  color-mix(in srgb,var(--rtg-world-bg) 92%,transparent) 0%,
+  color-mix(in srgb,var(--rtg-world-bg) 65%,transparent) 58%,transparent 100%)
+}
+.rtg-editorial-hero__copy{max-width:68ch}
+.rtg-editorial-hero :where(h1,h2){max-width:12ch;margin:.25em 0 .2em;
+  font-size:clamp(44px,7vw,112px);line-height:.93;text-wrap:balance}
+.rtg-editorial-hero__actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px}
+
+/* Vervolgschermen krijgen context, geen tweede homehero. */
+.rtg-context-strip{
+  display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:24px;
+  min-height:116px;padding:24px clamp(20px,4vw,48px);background-image:
+  linear-gradient(110deg,var(--rtg-world-signature-soft),transparent 58%)
+}
+.rtg-context-strip :where(h1,h2){margin:.2em 0 0;font-size:clamp(32px,4.4vw,64px);line-height:1}
+.rtg-context-strip__meta{color:var(--rtg-world-muted);font-variant-numeric:tabular-nums;text-align:right}
+
+/* Eén vraag, één volgende betekenisvolle stap. */
+.rtg-narrative-panel{
+  position:relative;padding:32px clamp(24px,4vw,52px);border-width:1px 0 0;
+  background-image:linear-gradient(135deg,var(--rtg-world-signature-soft),transparent 64%);
+  box-shadow:var(--rtg-depth-focus)
+}
+.rtg-narrative-panel::before{content:"";position:absolute;left:0;top:-1px;width:min(190px,42%);
+  border-top:2px solid var(--rtg-world-metal)}
+.rtg-narrative-panel :where(h2,h3){max-width:22ch;margin:.35em 0;font-family:var(--rtg-display,"Bodoni Moda",Georgia,serif);
+  font-size:clamp(28px,3.8vw,52px);font-weight:450;line-height:1}
+.rtg-narrative-panel>p{max-width:62ch;color:var(--rtg-world-muted);line-height:1.65}
+
+/* Operationele waarheid: compacter, stabiele kolommen, nauwelijks decoratie. */
+.rtg-operational-panel{padding:clamp(16px,2.5vw,32px);background-color:
+  color-mix(in srgb,var(--rtg-world-card) 97%,transparent);font-family:Inter,system-ui,sans-serif;
+  max-width:100%;overflow-x:auto;overscroll-behavior-inline:contain}
+.rtg-operational-panel>header{display:flex;align-items:end;justify-content:space-between;gap:16px;
+  margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--rtg-world-line)}
+.rtg-operational-panel table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.rtg-operational-panel :where(th,td){padding:12px 10px;border-bottom:1px solid var(--rtg-world-line);text-align:left}
+.rtg-operational-panel th{position:sticky;top:0;background:var(--rtg-world-card);color:var(--rtg-world-muted);
+  font-size:.76rem;letter-spacing:.1em;text-transform:uppercase}
+
+/* Agenda, route en dossier delen één rustige rijgrammatica. */
+.rtg-moment-list{margin:0;padding:0;list-style:none}
+.rtg-moment-list>li,.rtg-moment-row{display:grid;grid-template-columns:minmax(68px,.18fr) minmax(0,1fr) auto;
+  align-items:start;gap:16px;min-height:72px;padding:16px 0;border-bottom:1px solid var(--rtg-world-line)}
+.rtg-moment-list :where(time,[data-rtg-moment-status]){color:var(--rtg-world-metal);
+  font-family:Inter,system-ui,sans-serif;font-variant-numeric:tabular-nums}
+.rtg-moment-list :where(h3,strong){display:block;margin:0;color:var(--rtg-world-ink);font-size:1rem}
+.rtg-moment-list p{margin:.35em 0 0;color:var(--rtg-world-muted);line-height:1.5}
+.rtg-moment-list>[aria-current="true"],.rtg-moment-row[aria-current="true"]{
+  box-shadow:inset 2px 0 var(--rtg-world-signature);background:var(--rtg-world-signature-soft)
+}
+
+/* Een portal is fotografie + belofte + één ingang, geen gewone tegel. */
+.rtg-world-portal{position:relative;isolation:isolate;display:grid;align-content:end;min-height:250px;
+  overflow:hidden;padding:24px;text-decoration:none;box-shadow:var(--rtg-depth-content)}
+.rtg-world-portal>img{position:absolute;z-index:-2;inset:0;width:100%;height:100%;object-fit:cover;
+  transition:transform var(--rtg-time-atmospheric,600ms) var(--rtg-ease-atmospheric,ease)}
+.rtg-world-portal::before{content:"";position:absolute;z-index:-1;inset:0;background:
+  linear-gradient(0deg,rgba(4,4,4,.88),rgba(4,4,4,.06) 72%)}
+.rtg-world-portal :where(h2,h3){margin:0;color:#fff;font-family:var(--rtg-display,"Bodoni Moda",Georgia,serif);
+  font-size:clamp(26px,3vw,40px);line-height:1}
+.rtg-world-portal p{max-width:30ch;margin:.55em 0 0;color:rgba(255,255,255,.78)}
+.rtg-world-portal:is(:hover,:focus-visible)>img{transform:scale(1.018)}
+
+/* Detail blijft ruimtelijk verbonden met de geselecteerde rij. */
+.rtg-side-sheet{position:fixed;z-index:8700;top:0;right:0;bottom:0;width:min(620px,48vw);
+  overflow:auto;padding:clamp(24px,4vw,52px);border-radius:var(--rtg-radius-system) 0 0 var(--rtg-radius-system);
+  box-shadow:var(--rtg-depth-system);backdrop-filter:blur(18px) saturate(1.05)}
+.rtg-side-sheet[hidden]{display:none}
+
+/* Dezelfde eerlijke grammatica voor de minder heroïsche productmomenten. */
+.rtg-state{min-height:96px;padding:20px;border:1px solid var(--rtg-world-line);
+  background:color-mix(in srgb,var(--rtg-world-card) 94%,transparent)}
+.rtg-state__label{display:block;margin-bottom:8px;color:var(--rtg-world-metal);font-size:.75rem;
+  font-weight:650;line-height:1.35;letter-spacing:.14em;text-transform:uppercase}
+.rtg-state[data-state="loading"] .rtg-state__label,
+.rtg-state[data-state="empty"] .rtg-state__label{color:var(--rtg-world-metal)}
+.rtg-state[data-state="error"] .rtg-state__label{color:var(--rtg-status-danger)}
+.rtg-state[data-state="offline"] .rtg-state__label{color:var(--rtg-status-warn)}
+.rtg-state[data-state="confirmed"] .rtg-state__label{color:var(--rtg-status-ok)}
+.rtg-state p{max-width:62ch;margin:0;color:var(--rtg-world-muted);line-height:1.55}
+
+@media(max-width:700px){
+  .rtg-editorial-hero{min-height:410px;padding:28px 20px}
+  .rtg-editorial-hero::before{background:linear-gradient(0deg,color-mix(in srgb,var(--rtg-world-bg) 94%,transparent),
+    color-mix(in srgb,var(--rtg-world-bg) 28%,transparent))}
+  .rtg-context-strip{grid-template-columns:1fr;align-items:start;gap:12px;padding:20px}
+  .rtg-context-strip__meta{text-align:left}
+  .rtg-moment-list>li,.rtg-moment-row{grid-template-columns:64px minmax(0,1fr)}
+  .rtg-moment-list>li>:last-child,.rtg-moment-row>:last-child{grid-column:2}
+  .rtg-side-sheet{width:100%;border-radius:0;
+    padding-top:max(24px,env(safe-area-inset-top));
+    padding-right:max(20px,env(safe-area-inset-right));
+    padding-bottom:max(24px,env(safe-area-inset-bottom));
+    padding-left:max(20px,env(safe-area-inset-left))}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .rtg-world-portal>img{transition:none}
+  .rtg-world-portal:is(:hover,:focus-visible)>img{transform:none}
+}
+
+@media(forced-colors:active){
+  .rtg-editorial-hero::before,.rtg-world-portal::before{background:Canvas}
+  .rtg-editorial-hero>img,.rtg-world-portal>img{display:none}
+}

@@ -21,12 +21,14 @@ const fs = require('fs');
 const path = require('path');
 const state = require('../state');
 const ledger = require('./ledger');
+const verzoekcontext = require('../verzoekcontext');
 const opslag = require('../opslag');
 const db = state.db;
 
-// index injecteert save() (venster-verhuis vraagt een snapshot) door naar het
-// grootboek, en levert het RAM-venster aan de veegronde.
-function wire(saveFn) { ledger.wire({ txStaartNa, txVerwijder, save: saveFn }); }
+// Index levert het RAM-venster en de enige autoritatieve collectiepoort aan de
+// veegronde. De poort commit de kap vóór publicatie; een kale save() buiten een
+// request zou in PostgreSQL juist het noodherstel en een readiness-dip starten.
+function wire(bewerkCollectie) { ledger.wire({ txStaartNa, bewerkCollectie }); }
 
 /* De klantsleutel komt uit ./collecties, en dat is geen omweg maar de reparatie
    van een duplicaat: hier stond `const txKlantVan = t => t.customerKey ||
@@ -83,9 +85,10 @@ function txVoegToe(naam, t, opties) {
   if (sl != null && (achteraan ? !st.byRef.has(sl) : true)) st.byRef.set(sl, t);
   const k = txKlantVan(naam, t); if (k != null) { let l = st.byKlant.get(k); if (!l) st.byKlant.set(k, l = []); if (achteraan) l.push(t); else l.unshift(t); }
   const z = t.supplierCode; if (z != null) { let l = st.byZaak.get(z); if (!l) st.byZaak.set(z, l = []); if (achteraan) l.push(t); else l.unshift(t); }
-  // Nieuw item ook meteen (best-effort) naar het grootboek als dat actief is;
-  // de veegronde is het vangnet voor gemiste schrijfacties en statuswissels.
-  if (ledger.actief()) ledger.zet(naam, t);
+  /* Grootboek-upsert (best-effort), binnen een verzoek PAS NA DE REQUESTCOMMIT:
+     de rij raakt een andere tabel en stond anders ook na een mislukte commit --
+     de sloophamer telde zo een 503-bestelling mee. Zonder context: direct. */
+  if (ledger.actief() && !verzoekcontext.haakNaCommit(() => ledger.zet(naam, t))) ledger.zet(naam, t);
   // Begrensde collecties (boekingen): pas kappen als de grens echt overschreden
   // is, in plaats van bij elke toevoeging een kopie te slicen zoals voorheen.
   // Met een actief grootboek kapt de veegronde (die de staart eerst veilig

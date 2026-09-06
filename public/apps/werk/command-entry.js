@@ -29,8 +29,8 @@
         document.body.getAttribute('data-rtg-vandaag-surface') === 'projecten') {
       document.body.setAttribute('data-rtg-vandaag-surface-title', 'Projecten en taken');
       document.body.setAttribute('data-rtg-vandaag-luxe', 'surface');
-      document.body.setAttribute('data-rtg-edge-2-state', 'compact');
-      document.body.setAttribute('data-rtg-edge-2-auto', 'false');
+      document.body.setAttribute('data-rtg-edge-2-state', 'overview');
+      document.body.setAttribute('data-rtg-edge-2-auto', 'true');
     } else if (document.body.getAttribute('data-rtg-vandaag-surface') === 'projecten') {
       document.body.removeAttribute('data-rtg-vandaag-surface-title');
       document.body.removeAttribute('data-rtg-vandaag-luxe');

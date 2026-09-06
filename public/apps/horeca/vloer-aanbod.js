@@ -89,6 +89,12 @@
   function teken(d, opnieuw) {
     D = d; na = opnieuw;
 
+    /* Neem de zichtbare conceptreden ook vlak voor vervanging over. Een `input`
+       event is de gewone route, maar IME, autofill en een gelijktijdige duw
+       mogen nooit maken dat een reeds zichtbare zin bij hertekenen verdwijnt. */
+    Array.prototype.forEach.call($('vVoorMij').querySelectorAll('[data-reden]'), function (i) {
+      redenen[i.dataset.reden] = i.value;
+    });
     var voor = (d.overdrachten || []).filter(function (o) { return o.voorMij; });
     $('vVoorMij').innerHTML = voor.map(function (o) {
       return '<article class="v-bod"><p><b>' + esc(o.vanNaam) + '</b> biedt u ' + wat(o) +

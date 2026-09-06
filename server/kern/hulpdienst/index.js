@@ -41,9 +41,18 @@ module.exports = ({ db, save, crypto, anthropic, findSupplier }) => {
   }
   const isHulp = s => !!s && !!HULP_TYPES[s.type];
   const eenhedenVan = code => { const h = bak(); if (!Array.isArray(h.eenheden[code])) h.eenheden[code] = []; return h.eenheden[code]; };
-  const meldingVan = (code, id) => bak().meldingen.find(m => m.id === id && (m.korps === code || (m.bijstand || []).includes(code)));
+  const meldingVan = (code, id) => lijstLees('meldingen').find(m => m.id === id && (m.korps === code || (m.bijstand || []).includes(code)));
   const logboek = (m, wat) => { m.logboek.push({ at: nu(), wat: schoonTekst(wat, 120) }); if (m.logboek.length > 40) m.logboek.shift(); };
   const consultenVan = code => { const h = bak(); if (!Array.isArray(h.consulten[code])) h.consulten[code] = []; return h.consulten[code]; };
+  /* Opzoeken maakt niets aan: een 404 mag geen hulpkast met lege vakken
+     achterlaten. Bevroren met opzet -- wie erin duwt krijgt een fout in plaats
+     van een schrijfactie die nergens terechtkomt. Schrijven houdt bak(). */
+  const LEGE_RIJ = Object.freeze([]);
+  const lijstLees = vak => { const h = db.data.hulp; const r = h && h[vak]; return Array.isArray(r) ? r : LEGE_RIJ; };
+  const rijLees = (vak, sleutel) => { const h = db.data.hulp; const k = h && h[vak]; const r = k && k[sleutel]; return Array.isArray(r) ? r : LEGE_RIJ; };
+  const eenhedenLees = code => rijLees('eenheden', code);
+  const consultenLees = code => rijLees('consulten', code);
+  const opnamesLees = () => lijstLees('opnames');
 
   /* ---------- het overzicht per korps ---------- */
   function overzicht(s) {
@@ -96,6 +105,7 @@ module.exports = ({ db, save, crypto, anthropic, findSupplier }) => {
 
   // de gedeelde ctx voor de deelbestanden
   const ctx = { db, save, crypto, findSupplier, nu, schoonTekst, isHulp, bak, eenhedenVan, meldingVan, logboek, consultenVan,
+    eenhedenLees, consultenLees, opnamesLees,
     EENHEID_SOORTEN, PRIOS };
   const api = { HULP_TYPES, EENHEID_SOORTEN, isHulp, overzicht, meldkamerAi };
   Object.assign(api, require('./meldkamer')(ctx), require('./zorg')(ctx));

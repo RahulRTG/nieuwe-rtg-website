@@ -38,6 +38,8 @@ module.exports = (ctx) => {
 
   const eigenC = require('../eigencollectie')({ db, domein: 'kern/mall/aanvragen', bezit: { mallAanvragen: 'lijst' } });
   const bak = () => eigenC.bak('mallAanvragen');
+  // lezen zonder scheppen -- zie kijk() in kern/eigencollectie.js
+  const kijk = () => eigenC.kijk('mallAanvragen');
   const verlopen = (a) => (Date.now() - new Date(a.at).getTime()) > DAGEN_GELDIG * 86400000;
   const open = (a) => a.status === 'open' && !verlopen(a);
 
@@ -46,8 +48,7 @@ module.exports = (ctx) => {
      een prullenbak die niemand meer opent. */
   function plaatsAanvraag(key, codename, data) {
     data = data || {};
-    const lijst = bak();
-    const mijnOpen = lijst.filter(a => a.key === key && open(a)).length;
+    const mijnOpen = kijk().filter(a => a.key === key && open(a)).length;
     if (mijnOpen >= MAX_OPEN_PER_LID) return { status: 409, error: 'U heeft al ' + MAX_OPEN_PER_LID + ' openstaande aanvragen. Sluit er eerst een.' };
     const wat = schoon(data.wat, 300);
     if (wat.length < 5) return { status: 400, error: 'Schrijf kort wat u zoekt.' };
@@ -64,6 +65,7 @@ module.exports = (ctx) => {
       budget: Math.max(0, Math.round(Number(data.budget) || 0)) || null,
       status: 'open', reacties: [], at: nu()
     };
+    const lijst = bak();
     lijst.unshift(a);
     eigenC.zetBak('mallAanvragen', lijst.slice(0, 5000));
     save();
@@ -87,11 +89,11 @@ module.exports = (ctx) => {
   }
 
   function mijn(key) {
-    return { ok: true, aanvragen: bak().filter(a => a.key === key).slice(0, 50).map(a => publiekeAanvraag(a, true)) };
+    return { ok: true, aanvragen: kijk().filter(a => a.key === key).slice(0, 50).map(a => publiekeAanvraag(a, true)) };
   }
 
   function sluit(key, id) {
-    const a = bak().find(x => x.id === String(id || '') && x.key === key);
+    const a = kijk().find(x => x.id === String(id || '') && x.key === key);
     if (!a) return { status: 404, error: 'Aanvraag niet gevonden.' };
     a.status = 'gesloten';
     save();
@@ -103,7 +105,7 @@ module.exports = (ctx) => {
      gewone weg. Doen alsof dit een boeking is, zou een afspraak beloven die
      niemand heeft bevestigd. */
   function kies(key, id, code) {
-    const a = bak().find(x => x.id === String(id || '') && x.key === key);
+    const a = kijk().find(x => x.id === String(id || '') && x.key === key);
     if (!a) return { status: 404, error: 'Aanvraag niet gevonden.' };
     const r = (a.reacties || []).find(x => x.code === String(code || ''));
     if (!r) return { status: 404, error: 'Deze reactie staat niet bij uw aanvraag.' };
@@ -125,7 +127,7 @@ module.exports = (ctx) => {
       // hergebruikt exact de bereikregel van de Mall zelf
       return plek.bedient({ plek: mijnPlek, bereik }, a.plek);
     };
-    const lijst = bak().filter(a => open(a) && past(a));
+    const lijst = kijk().filter(a => open(a) && past(a));
     return {
       ok: true,
       verdieping: mijnVerdieping,
@@ -142,7 +144,7 @@ module.exports = (ctx) => {
      wijzigt zijn eigen reactie in plaats van er een tweede naast te zetten. */
   function reageerOpAanvraag(s, id, data) {
     data = data || {};
-    const a = bak().find(x => x.id === String(id || ''));
+    const a = kijk().find(x => x.id === String(id || ''));
     if (!a || !open(a)) return { status: 404, error: 'Deze aanvraag staat niet meer open.' };
     const zicht = aanvragenVoorZaak(s);
     if (!zicht.aanvragen.some(x => x.id === a.id)) return { status: 403, error: 'Deze aanvraag valt buiten uw vak of werkgebied.' };
@@ -164,7 +166,7 @@ module.exports = (ctx) => {
      marktinformatie die er is -- iemand heeft de moeite genomen het te vragen
      en kreeg niets. Voedt de kansenlaag (kern/mall/vraagbeeld.js). */
   function onbeantwoord() {
-    return bak().filter(a => open(a) && !(a.reacties || []).length);
+    return kijk().filter(a => open(a) && !(a.reacties || []).length);
   }
 
   const api = { plaats: plaatsAanvraag, mijn, sluit, kies, voorZaak: aanvragenVoorZaak,

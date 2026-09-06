@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-08-31T18:51:09.390Z",
-    "commit": "47c119c3",
+    "op": "2026-09-06T13:48:19.728Z",
+    "commit": "613879a6",
     "boomVuil": false,
-    "boomAnders": 6,
+    "boomAnders": 0,
     "instrument": "scripts/verraadronde.js",
     "node": "v22.22.2"
   },
@@ -37,8 +37,7 @@
         "schrijfStatus: 200 -> null",
         "terugNaHerstart: true -> null",
         "tweedeStartLukte: true -> null",
-        "eersteStartLukte: true -> false",
-        "registratieLukte: true -> undefined",
+        "registratieLukte: true -> false",
         "inlogNaHerstart: true -> undefined"
       ],
       "herhaalbaar": true

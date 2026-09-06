@@ -8,7 +8,10 @@ module.exports = (kern) => {
   const stuur = (res, r) => { const { status, ...rest } = r; res.status(status || 200).json(rest); };
 
   app.post('/api/office/rtgai', officeAuth, (req, res) => res.json(rtgai.status()));
-  app.post('/api/office/rtgai/train', officeAuth, (req, res) => res.json(rtgai.train(wie(req))));
+  app.post('/api/office/rtgai/train', officeAuth, async (req, res) => {
+    try { res.json(await rtgai.train(wie(req))); }
+    catch (e) { res.status(503).json({ error: 'De trainingsronde kon niet duurzaam worden bewaard. Probeer het opnieuw.' }); }
+  });
   app.post('/api/office/rtgai/roer/geef', officeAuth, (req, res) => stuur(res, rtgai.roerGeef(wie(req))));
   app.post('/api/office/rtgai/roer/terug', officeAuth, (req, res) => stuur(res, rtgai.roerTerug(wie(req))));
 

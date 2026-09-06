@@ -53,6 +53,12 @@ function maakOormerk({ db, save, crypto, nu = klokNu }) {
     if (!Array.isArray(b[rek])) b[rek] = [];
     return b[rek];
   }
+  /* Opzoeken doet kijk(): een 404 hoort geen lege collectie achter te laten.
+     De schrijfkant houdt lijst() -- twee deuren, geen omzetting. */
+  function kijkLijst(rek) {
+    const b = eigen.kijk('waardeOormerken');
+    return Array.isArray(b[rek]) ? b[rek] : [];
+  }
   const zicht = o => ({ id: o.id, naam: o.naam, centen: o.centen, doel: o.doel || null, sinds: o.sinds });
 
   function oormerken(rek) { const b = bak(); return Array.isArray(b[rek]) ? b[rek].map(zicht) : []; }
@@ -97,7 +103,7 @@ function maakOormerk({ db, save, crypto, nu = klokNu }) {
      en wat er in een overzicht hoort te staan, en dat woord raak je kwijt als
      het een min-teken wordt. */
   function oormerkVrij({ rek, id }) {
-    const l = lijst(rek);
+    const l = kijkLijst(rek);
     const i = l.findIndex(x => x.id === String(id || ''));
     if (i < 0) return { status: 404, error: 'Dit oormerk kennen we niet.' };
     const weg = l[i].centen;

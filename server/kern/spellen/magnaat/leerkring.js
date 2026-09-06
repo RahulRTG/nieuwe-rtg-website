@@ -44,7 +44,8 @@ module.exports=({db,save,crypto})=>{
 
   function registreerHospitality(invoer){
     const h=invoer&&invoer.simulatie;
-    const s=S();if(!h||h.status!=='afgerond')return{status:409,error:'Alleen een afgeronde simulatie kan leren.'};
+    if(!h||h.status!=='afgerond')return{status:409,error:'Alleen een afgeronde simulatie kan leren.'};
+    const s=S();
     if(!runEenmalig(s,'hospitality',invoer.potjeId))return{status:200,ok:true,herhaald:true,kandidaten:[]};
     const geraakt=[];
     for(const x of h.incidenten||[]){
@@ -86,13 +87,15 @@ module.exports=({db,save,crypto})=>{
     save();return{status:200,ok:true,kandidaten:geraakt.map(x=>x.id)};
   }
 
-  function overzicht(){const s=S();return{ok:true,contract:{bron:'uitsluitend geaggregeerde Magnaat-tellingen',
-    schrijftProductie:false,wijzigtCode:false,mensBeslist:true},runs:s.runs.length,
-    patronen:Object.values(s.patronen).length,kandidaten:s.kandidaten.slice().sort((a,b)=>
+  // lezen zonder scheppen -- zie kijk() in kern/eigencollectie.js
+  const L=()=>eigen.kijk('magnaatLeren');
+  function overzicht(){const s=L();return{ok:true,contract:{bron:'uitsluitend geaggregeerde Magnaat-tellingen',
+    schrijftProductie:false,wijzigtCode:false,mensBeslist:true},runs:(s.runs||[]).length,
+    patronen:Object.values(s.patronen||{}).length,kandidaten:(s.kandidaten||[]).slice().sort((a,b)=>
       (a.status==='kandidaat'?0:1)-(b.status==='kandidaat'?0:1)||String(b.bijgewerktAt).localeCompare(a.bijgewerktAt)),
-    besluiten:s.besluiten.slice(-50)};}
+    besluiten:(s.besluiten||[]).slice(-50)};}
   function besluit(id,keuze,wie){
-    const s=S(),k=s.kandidaten.find(x=>x.id===String(id||''));
+    const s=L(),k=(s.kandidaten||[]).find(x=>x.id===String(id||''));
     if(!k)return{status:404,error:'Verbeterkandidaat niet gevonden.'};
     if(!['naar-test','terug-naar-ontwerp','afwijzen'].includes(keuze))return{status:400,error:'Onbekend besluit.'};
     k.status=keuze==='naar-test'?'test-klaar':keuze==='afwijzen'?'afgewezen':'ontwerp';

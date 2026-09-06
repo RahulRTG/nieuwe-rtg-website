@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-03T19:02:51.967Z",
-  "commit": "76a23dfc",
+  "op": "2026-09-06T14:37:24.587Z",
+  "commit": "9edaa4ce",
   "boomVuil": false,
-  "boomAnders": 1,
+  "boomAnders": 0,
   "instrument": "scripts/bewijsschuld.js",
   "node": "v22.22.2"
  },
@@ -13,7 +13,7 @@
   "posten": 18,
   "meetwerk": 1968,
   "instrument": 323,
-  "grens": 644
+  "grens": 645
  },
  "aflossing": {
   "doel": 0,
@@ -29,9 +29,9 @@
  "gemeten": {
   "postenTotaal": 18,
   "achterstand": 2291,
-  "randVanDeMethode": 644,
+  "randVanDeMethode": 645,
   "auth-onbeslist": 1,
-  "capability-in-handler": 548,
+  "capability-in-handler": 549,
   "objectpoort": 52,
   "output-deuren": 18,
   "lichaamssleutel": 74,
@@ -62,7 +62,7 @@
    "id": "capability-in-handler",
    "soort": "grens",
    "wat": "routes zonder bewakerslaag: de controle zit IN de handler (een capability-token)",
-   "aantal": 548,
+   "aantal": 549,
    "waarom": "de rolproef kruist ROLLEN. Deze routes kennen geen rol -- ze eisen een token dat je alleen hebt als je het hebt gekregen (de schoolborden van foundation, rtf/social). Rollen kruisen is hier niet moeilijk maar zinloos.",
    "sluit": "niets in deze proef. Een eigen proef op capability-tokens zou de goede vraag stellen; die bestaat niet en is een project, geen achterstand."
   },
@@ -198,23 +198,19 @@
  "historie": {
   "auth-onbeslist": [
    {
-    "op": "2026-08-31",
-    "aantal": 1
-   },
-   {
     "op": "2026-09-01",
     "aantal": 1
    },
    {
     "op": "2026-09-03",
     "aantal": 1
+   },
+   {
+    "op": "2026-09-06",
+    "aantal": 1
    }
   ],
   "capability-in-handler": [
-   {
-    "op": "2026-08-31",
-    "aantal": 547
-   },
    {
     "op": "2026-09-01",
     "aantal": 547
@@ -222,55 +218,55 @@
    {
     "op": "2026-09-03",
     "aantal": 548
+   },
+   {
+    "op": "2026-09-06",
+    "aantal": 549
    }
   ],
   "objectpoort": [
-   {
-    "op": "2026-08-31",
-    "aantal": 52
-   },
    {
     "op": "2026-09-01",
     "aantal": 52
    },
    {
     "op": "2026-09-03",
+    "aantal": 52
+   },
+   {
+    "op": "2026-09-06",
     "aantal": 52
    }
   ],
   "output-deuren": [
    {
-    "op": "2026-08-31",
-    "aantal": 18
-   },
-   {
     "op": "2026-09-01",
     "aantal": 18
    },
    {
     "op": "2026-09-03",
+    "aantal": 18
+   },
+   {
+    "op": "2026-09-06",
     "aantal": 18
    }
   ],
   "lichaamssleutel": [
    {
-    "op": "2026-08-31",
-    "aantal": 74
-   },
-   {
     "op": "2026-09-01",
     "aantal": 74
    },
    {
     "op": "2026-09-03",
     "aantal": 74
+   },
+   {
+    "op": "2026-09-06",
+    "aantal": 74
    }
   ],
   "output-niet-toerekenbaar": [
-   {
-    "op": "2026-08-31",
-    "aantal": 277
-   },
    {
     "op": "2026-09-01",
     "aantal": 277
@@ -278,153 +274,153 @@
    {
     "op": "2026-09-03",
     "aantal": 285
+   },
+   {
+    "op": "2026-09-06",
+    "aantal": 285
    }
   ],
   "output-blind": [
-   {
-    "op": "2026-08-31",
-    "aantal": 0
-   },
    {
     "op": "2026-09-01",
     "aantal": 0
    },
    {
     "op": "2026-09-03",
+    "aantal": 0
+   },
+   {
+    "op": "2026-09-06",
     "aantal": 0
    }
   ],
   "output-onwaarneembaar": [
    {
-    "op": "2026-08-31",
-    "aantal": 4
-   },
-   {
     "op": "2026-09-01",
     "aantal": 4
    },
    {
     "op": "2026-09-03",
+    "aantal": 4
+   },
+   {
+    "op": "2026-09-06",
     "aantal": 4
    }
   ],
   "audit-wisselend": [
    {
-    "op": "2026-08-31",
-    "aantal": null
-   },
-   {
     "op": "2026-09-01",
     "aantal": null
    },
    {
     "op": "2026-09-03",
+    "aantal": null
+   },
+   {
+    "op": "2026-09-06",
     "aantal": null
    }
   ],
   "audit-verklaard": [
    {
-    "op": "2026-08-31",
-    "aantal": null
-   },
-   {
     "op": "2026-09-01",
     "aantal": null
    },
    {
     "op": "2026-09-03",
+    "aantal": null
+   },
+   {
+    "op": "2026-09-06",
     "aantal": null
    }
   ],
   "rollback-gezakt": [
    {
-    "op": "2026-08-31",
-    "aantal": 2
-   },
-   {
     "op": "2026-09-01",
     "aantal": 2
    },
    {
     "op": "2026-09-03",
+    "aantal": 1
+   },
+   {
+    "op": "2026-09-06",
     "aantal": 1
    }
   ],
   "object-vooraf": [
    {
-    "op": "2026-08-31",
-    "aantal": 323
-   },
-   {
     "op": "2026-09-01",
     "aantal": 323
    },
    {
     "op": "2026-09-03",
+    "aantal": 323
+   },
+   {
+    "op": "2026-09-06",
     "aantal": 323
    }
   ],
   "proefruis": [
    {
-    "op": "2026-08-31",
-    "aantal": 1
-   },
-   {
     "op": "2026-09-01",
     "aantal": 1
    },
    {
     "op": "2026-09-03",
+    "aantal": 1
+   },
+   {
+    "op": "2026-09-06",
     "aantal": 1
    }
   ],
   "gevolg-onbekend": [
    {
-    "op": "2026-08-31",
-    "aantal": 90
-   },
-   {
     "op": "2026-09-01",
     "aantal": 90
    },
    {
     "op": "2026-09-03",
+    "aantal": 90
+   },
+   {
+    "op": "2026-09-06",
     "aantal": 90
    }
   ],
   "droogloop-onbeoordeeld": [
    {
-    "op": "2026-08-31",
-    "aantal": 2
-   },
-   {
     "op": "2026-09-01",
     "aantal": 2
    },
    {
     "op": "2026-09-03",
+    "aantal": 2
+   },
+   {
+    "op": "2026-09-06",
     "aantal": 2
    }
   ],
   "herstel-onbevestigd": [
    {
-    "op": "2026-08-31",
-    "aantal": 47
-   },
-   {
     "op": "2026-09-01",
     "aantal": 47
    },
    {
     "op": "2026-09-03",
     "aantal": 47
+   },
+   {
+    "op": "2026-09-06",
+    "aantal": 47
    }
   ],
   "idem-ongeclassificeerd": [
-   {
-    "op": "2026-08-31",
-    "aantal": 1477
-   },
    {
     "op": "2026-09-01",
     "aantal": 1487
@@ -432,19 +428,23 @@
    {
     "op": "2026-09-03",
     "aantal": 1486
+   },
+   {
+    "op": "2026-09-06",
+    "aantal": 1486
    }
   ],
   "wegwerpserver-kopieen": [
-   {
-    "op": "2026-08-31",
-    "aantal": 3
-   },
    {
     "op": "2026-09-01",
     "aantal": 3
    },
    {
     "op": "2026-09-03",
+    "aantal": 3
+   },
+   {
+    "op": "2026-09-06",
     "aantal": 3
    }
   ]
@@ -547,6 +547,12 @@
    "van": 2283,
    "naar": 2291,
    "reden": "Drie gelijktijdig geopende PR's (#180, #181, #182) zijn als een verzameling samengevoegd op een integratietak. Elke tak bleef binnen zijn eigen schuld; samen brengen ze meer routes en meer capabilities mee dan de hoofdlijn kende, en dat telt hier op in plaats van stil verrekend te worden. De groei zit in gevolg-onbekend, herstel-onbevestigd en output-niet-toerekenbaar: nieuwe bereikbare capabilities waarvan nog niemand heeft gemeten WAT ze veranderen. Een getal dat hierbij NIET is overgenomen: rollback-gezakt stond op 5 zolang STAATPROEF.json uit een andere tak kwam; op deze code gemeten (schone boom, commit 76a23dfc) is het 1."
+  },
+  {
+   "op": "2026-09-06",
+   "van": 2291,
+   "naar": 2292,
+   "reden": "De verse staatproefronde op 277808bc mat 4119 routes in plaats van 4110 en zag rollback-gezakt van 1 naar 2 gaan: de bekende bevinding (zorgketen/afspraak-zet) staat nu op bewezen, en er kwamen er twee van dezelfde soort in beeld die er al waren maar niet waren gemeten -- supplier/overschot en werkvloer/bedieningskaart, allebei een opzoeking die materialiseert voordat zij 404 geeft. Beide zijn in deze commit gerepareerd; de post valt weg bij de volgende ronde."
   }
  ]
 }

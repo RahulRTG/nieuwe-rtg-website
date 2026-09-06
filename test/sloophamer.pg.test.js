@@ -8,10 +8,10 @@
       A en B. De server mag onder die druk geen enkele 5xx-crash geven en moet
       daarna nog gezond zijn.
    2. Netwerk-sabotage: midden in een actieve realtime-datastroom bevriezen we
-      eerst Redis en dan Postgres (SIGSTOP), en herstellen daarna (SIGCONT). Het
-      platform draait op een write-behind cache met een in-proces-bus-fallback,
-      dus de HTTP-laag moet gewoon blijven werken tijdens de storing en volledig
-      herstellen erna.
+      Postgres (SIGSTOP), en herstellen daarna (SIGCONT). Liveness blijft groen,
+      maar een mutatie mag zonder duurzame requestcommit geen succes teruggeven:
+      hij faalt begrensd met 503, readiness sluit en opent pas na volledige
+      resync. De geweigerde mutatie mag daarbij geen fantoomstaat achterlaten.
    3. Betaalrace: twee gelijktijdige betalingen op exact dezelfde bestelling
       geven precies een keer succes en een keer 409 (geen dubbele afschrijving).
 
@@ -19,6 +19,11 @@
      DATABASE_URL=postgresql://postgres@127.0.0.1:5433/rtggrand \
      REDIS_URL=redis://127.0.0.1:6399 \
      node --test test/sloophamer.pg.test.js */
+/* Draait PostgreSQL lokaal in Docker, geef dan ook de expliciete wegwerpcontainer
+   mee: RTG_POSTGRES_CONTAINER=rtg-pg-proef. Alleen onder CI mag de toets zonder
+   die variabele de ene draaiende postgres:16-alpine-servicecontainer herkennen.
+   Bij nul of meerdere kandidaten faalt de storingproef gesloten; lokaal kiest de
+   toets nooit zelf een Docker-container. */
 /* LET OP -- deze toets vraagt de database VOOR ZICHZELF. Verschillende
    PG-toetsen maken en droppen dezelfde tabellen (kv, tx_ledger, users), en
    `node --test` draait bestanden standaard PARALLEL: dan trekt de een de tabel
@@ -30,7 +35,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { execSync } = require('child_process');
+const { execFileSync } = require('child_process');
 const { startServer, stop } = require('./helper');
 
 const HEEFT_PG = !!(process.env.DATABASE_URL || process.env.PG_URL);
@@ -41,18 +46,68 @@ const OVERSLAAN = (HEEFT_PG && HEEFT_REDIS) ? false
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const jitter = () => Math.random() * 120;
 
-function api(base, pad, body, token) {
+function api(base, pad, body, token, timeoutMs) {
   const h = { 'Content-Type': 'application/json' };
   if (token) h.Authorization = 'Bearer ' + token;
-  return fetch(base + pad, { method: 'POST', headers: h, body: JSON.stringify(body || {}) })
+  return fetch(base + pad, { method: 'POST', headers: h, body: JSON.stringify(body || {}),
+    ...(timeoutMs ? { signal: AbortSignal.timeout(timeoutMs) } : {}) })
     .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 }
 const health = base => fetch(base + '/api/health').then(r => r.json()).catch(() => null);
+async function peil(base, pad) {
+  const r = await fetch(base + pad, { signal: AbortSignal.timeout(3000) });
+  return { status: r.status, body: await r.json().catch(() => ({})) };
+}
+async function wachtGereed(base, naam) {
+  const eind = Date.now() + 20000;
+  let laatste = null;
+  while (Date.now() < eind) {
+    try {
+      laatste = await peil(base, '/api/ready');
+      if (laatste.status === 200 && laatste.body.ready === true) return laatste;
+    } catch (e) { laatste = { fout: e.message }; }
+    await sleep(100);
+  }
+  throw new Error(naam + ' werd niet opnieuw gereed: ' + JSON.stringify(laatste));
+}
 
 // een proces met SIGSTOP bevriezen / met SIGCONT hervatten (netwerk-partitie)
+const IS_CI = process.env.CI === 'true' || process.env.GITHUB_ACTIONS === 'true';
+const IS_GITHUB_CI = process.env.GITHUB_ACTIONS === 'true';
+let bestuurdePostgresContainer = null;
+
+function vindCiPostgresContainer() {
+  if (!IS_GITHUB_CI) return null;
+  const uitvoer = execFileSync('docker', [
+    'ps',
+    '--filter', 'ancestor=postgres:16-alpine',
+    '--filter', 'status=running',
+    '--format', '{{.ID}}'
+  ], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+  const kandidaten = uitvoer.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+  return kandidaten.length === 1 ? kandidaten[0] : null;
+}
+
 function seinNaar(patroon, sig) {
-  try { execSync('pkill -' + sig + ' -x ' + patroon, { stdio: 'ignore' }); return true; }
-  catch (e) { return false; } // pkill geeft exit 1 als er niets matchte
+  try {
+    if (patroon === 'postgres') {
+      const expliciet = String(process.env.RTG_POSTGRES_CONTAINER || '').trim();
+      const container = expliciet
+        || (sig === 'CONT' ? bestuurdePostgresContainer : null)
+        || vindCiPostgresContainer();
+      if (container) {
+        execFileSync('docker', [sig === 'STOP' ? 'pause' : 'unpause', container], { stdio: 'ignore' });
+        bestuurdePostgresContainer = sig === 'STOP' ? container : null;
+        return true;
+      }
+      // Een CI-run zonder exact één herkenbare servicecontainer mag nooit
+      // terugvallen op een brede processelectie op de host.
+      if (IS_CI) return false;
+    }
+    execFileSync('pkill', ['-' + sig, '-x', patroon], { stdio: 'ignore' });
+    return true;
+  }
+  catch (e) { return false; } // geen proces/container of geen recht om hem te besturen
 }
 
 let seq = 0;
@@ -64,13 +119,19 @@ async function nieuwLid(base) {
   return reg.body.token;
 }
 
-test('SLOOPHAMER: stormloop, netwerk-sabotage en betaalrace op gedeelde PG + Redis',
+test('SLOOPHAMER: stormloop, PostgreSQL-sabotage en betaalrace op gedeelde PG + Redis',
   { skip: OVERSLAAN }, async (t) => {
 
   const dirA = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-sl-A-'));
   const dirB = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-sl-B-'));
-  const A = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: dirA } });
-  const B = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: dirB } });
+  // De productiegrens is 30 seconden. Voor een harde storingproef zetten we de
+  // client- en servergrens bewust lager: de test bewijst zo een BEGRENSDE 503
+  // in plaats van dertig seconden op een bevroren socket te wachten. Deze grens
+  // verandert de requestcommit-semantiek niet en blijft ruim boven een normale
+  // lokale query.
+  const opslagGrenzen = { PG_QUERY_MS: '2000', PG_STATEMENT_MS: '2000', PG_CONNECT_MS: '2000' };
+  const A = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: dirA, ...opslagGrenzen } });
+  const B = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: dirB, ...opslagGrenzen } });
 
   // leverancier (KIKUNOI) op A: menu klaarzetten zodat bestellingen slagen
   const supLogin = await api(A.base, '/api/supplier/login', { username: 'rahul', password: 'Imran' });
@@ -127,8 +188,12 @@ test('SLOOPHAMER: stormloop, netwerk-sabotage en betaalrace op gedeelde PG + Red
     assert.equal((await health(B.base)).ok, true, 'B gezond na de storm');
   });
 
-  await t.test('2. netwerk-sabotage: Redis en Postgres bevriezen tijdens een datastroom, dan herstellen', async () => {
+  await t.test('2. PostgreSQL-sabotage: mutatie faalt gesloten, readiness herstelt zonder fantoomstaat', async () => {
     const lid = pool[0];
+    const voor = await api(lid.base, '/api/orders/mine', {}, lid.token);
+    assert.equal(voor.status, 200, 'de uitgangsstand van de bestellingen is leesbaar');
+    const aantalVoor = voor.body.total;
+    assert.equal(typeof aantalVoor, 'number', 'de uitgangsstand draagt een exact totaal');
     let verstuurd = 0, opgevangen = 0;
     // achtergrond-datastroom van geo-updates op A, dwars door de storing heen
     let loop = true;
@@ -142,36 +207,64 @@ test('SLOOPHAMER: stormloop, netwerk-sabotage en betaalrace op gedeelde PG + Red
     })();
     await sleep(150); // de stroom loopt
 
-    // STEKKER ERUIT: bevries eerst de realtime-bus, dan de database
-    console.log('    STEKKER ERUIT: Redis bevriezen...');
-    seinNaar('redis-server', 'STOP');
-    await sleep(250);
-    console.log('    STEKKER ERUIT: Postgres bevriezen (write-behind moet dit opvangen)...');
-    seinNaar('postgres', 'STOP');
-    await sleep(350);
+    let pgGestopt = false;
+    let tijdensBestel, gezondTijdens, gereedTijdens, duurMs;
+    try {
+      // Redis blijft bewust draaien: de 503 en gesloten readiness hieronder
+      // kunnen daardoor alleen de PostgreSQL-waarheidsgrens bewijzen.
+      console.log('    STEKKER ERUIT: Postgres bevriezen...');
+      pgGestopt = seinNaar('postgres', 'STOP');
+      assert.equal(pgGestopt, true, 'de storingproef kon het PostgreSQL-proces niet bevriezen');
+      await sleep(350);
 
-    // MIDDEN IN DE STORING: doet de HTTP-laag het nog? (memory is de werkkopie)
-    const tijdensBestel = await api(lid.base, '/api/order', { supplierCode: supCode, items: [{ id: 'ramen', qty: 1 }] }, lid.token);
-    const gezondTijdens = await health(A.base);
-    console.log('    tijdens de storing: bestellen status', tijdensBestel.status + ',', 'health', gezondTijdens && gezondTijdens.ok);
+      const begin = Date.now();
+      tijdensBestel = await api(lid.base, '/api/order', {
+        supplierCode: supCode, items: [{ id: 'ramen', qty: 19 }]
+      }, lid.token, 7000);
+      duurMs = Date.now() - begin;
+      gezondTijdens = await peil(A.base, '/api/health');
+      gereedTijdens = await peil(A.base, '/api/ready');
+      console.log('    tijdens de storing: bestellen status', tijdensBestel.status + ',',
+        'health', gezondTijdens.status + ',', 'ready', gereedTijdens.status + ',', duurMs + 'ms');
 
-    // STEKKER ERIN: herstel bus en database
-    console.log('    STEKKER ERIN: Postgres en Redis hervatten...');
-    seinNaar('postgres', 'CONT');
-    seinNaar('redis-server', 'CONT');
-    await sleep(600); // reconnect + write-behind loopt de achterstand in
-    loop = false;
-    await stroom;
+      assert.equal(tijdensBestel.status, 503,
+        'een mutatie zonder duurzame PostgreSQL-confirmatie moet fail-closed antwoorden');
+      assert.ok(duurMs < 7000, 'de 503 kwam niet binnen de afgesproken opslaggrens (' + duurMs + 'ms)');
+      assert.equal(gezondTijdens.status, 200, 'liveness blijft bereikbaar tijdens PostgreSQL-uitval');
+      assert.equal(gezondTijdens.body.ok, true, 'het proces leeft tijdens PostgreSQL-uitval');
+      assert.equal(gereedTijdens.status, 503, 'readiness sluit na een mislukte requestcommit');
+      assert.equal(gereedTijdens.body.ready, false, 'readiness noemt de instance niet inzetbaar');
+      assert.equal(gereedTijdens.body.writeHealthy, false,
+        'de gesloten readiness komt aantoonbaar van de PostgreSQL-schrijfgrens');
+    } finally {
+      console.log('    STEKKER ERIN: Postgres hervatten...');
+      if (pgGestopt) seinNaar('postgres', 'CONT');
+      loop = false;
+      await stroom;
+    }
 
     console.log('    datastroom:', verstuurd, 'geslaagd,', opgevangen, 'opgevangen tijdens de sabotage');
-    // De lakmoesproef: het systeem doet het na herstel gewoon weer, op BEIDE instances
-    assert.equal(tijdensBestel.status, 200, 'de HTTP-laag bleef tijdens de storing werken (in-memory write-behind)');
+    await wachtGereed(A.base, 'A');
+    await wachtGereed(B.base, 'B');
+    // De lakmoesproef: liveness bleef op beide instanties bestaan, maar pas na
+    // resync komt de mutatielaag weer open.
     assert.equal((await health(A.base)).ok, true, 'A leefde de hele storing door');
     assert.equal((await health(B.base)).ok, true, 'B leefde de hele storing door');
+    const naMislukking = await api(lid.base, '/api/orders/mine', {}, lid.token);
+    assert.equal(naMislukking.status, 200, 'de autoritatieve bestelstaat is na resync leesbaar');
+    assert.equal(naMislukking.body.total, aantalVoor,
+      'de met 503 geweigerde bestelling liet geen fantoomorder achter');
     const naHerstel = await nieuwLid(B.base);
     assert.ok(naHerstel, 'na herstel komt een nieuw lid er gewoon in (B)');
     const orderNa = await api(lid.base, '/api/order', { supplierCode: supCode, items: [{ id: 'ramen', qty: 2 }] }, lid.token);
     assert.equal(orderNa.status, 200, 'na herstel loopt een verse bestelling weer normaal');
+    assert.ok(orderNa.body.order && orderNa.body.order.ref, 'de verse bestelling heeft een bevestigde referentie');
+    const naVerse = await api(lid.base, '/api/orders/mine', {}, lid.token);
+    assert.equal(naVerse.status, 200, 'de bestelstaat blijft leesbaar na de verse mutatie');
+    assert.equal(naVerse.body.total, aantalVoor + 1,
+      'alleen de verse bevestigde bestelling is duurzaam toegevoegd');
+    assert.ok((naVerse.body.orders || []).some(o => o.ref === orderNa.body.order.ref),
+      'de bevestigde bestelling staat precies in de autoritatieve bestelstaat');
   });
 
   await t.test('3. betaalrace: twee gelijktijdige betalingen op dezelfde bestelling -> 1x 200, 1x 409', async () => {

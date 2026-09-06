@@ -24,7 +24,11 @@ module.exports = ({ db, save, crypto }) => {
     if (!db.data.stadsraad) db.data.stadsraad = { partners: [], besluiten: [] };
     return db.data.stadsraad;
   };
-  const vindCode = code => S().partners.find(p => p.code === String(code || '').trim().toUpperCase() && p.actief);
+  /* Lezen zonder scheppen -- dezelfde deur als S(), maar afwezig blijft afwezig.
+     De vluchtige lege waarde gaat nooit naar buiten: elke lezer hieronder haalt
+     er met find() een ELEMENT uit of maakt met slice/filter/map een kopie. */
+  const R = () => db.data.stadsraad || { partners: [], besluiten: [] };
+  const vindCode = code => R().partners.find(p => p.code === String(code || '').trim().toUpperCase() && p.actief);
   const pubPartner = p => ({ id: p.id, stad: p.stad, naam: p.naam, soort: p.soort, actief: p.actief, at: p.at });
 
   /* ---- partners: EEN invloedrijke partner per stad ---- */
@@ -43,7 +47,7 @@ module.exports = ({ db, save, crypto }) => {
     return { ok: true, partner: Object.assign({ code: p.code }, pubPartner(p)) };
   }
   function partnerStop(id) {
-    const p = S().partners.find(x => x.id === String(id || ''));
+    const p = R().partners.find(x => x.id === String(id || ''));
     if (!p) return { status: 404, error: 'Deze partner staat niet in het register.' };
     p.actief = false;
     save();
@@ -76,7 +80,7 @@ module.exports = ({ db, save, crypto }) => {
   }
   // een stem per kant-en-naam; een partner stemt namens zijn stad
   function stem(besluitId, kant, wie, voor) {
-    const b = S().besluiten.find(x => x.id === String(besluitId || ''));
+    const b = R().besluiten.find(x => x.id === String(besluitId || ''));
     if (!b) return { status: 404, error: 'Dit besluit staat niet (meer) op tafel.' };
     if (b.status !== 'open') return { status: 409, error: 'Dit besluit is al gevallen.' };
     const k = kant === 'partner' ? 'partner' : 'rtg';
@@ -88,7 +92,7 @@ module.exports = ({ db, save, crypto }) => {
   }
   // het besluit valt pas als beide kanten gestemd hebben
   function besluitSluit(besluitId) {
-    const b = S().besluiten.find(x => x.id === String(besluitId || ''));
+    const b = R().besluiten.find(x => x.id === String(besluitId || ''));
     if (!b) return { status: 404, error: 'Dit besluit staat niet (meer) op tafel.' };
     if (b.status !== 'open') return { status: 409, error: 'Dit besluit is al gevallen.' };
     const kantTel = k => ({ voor: b.stemmen.filter(s => s.kant === k && s.voor).length,
@@ -106,9 +110,9 @@ module.exports = ({ db, save, crypto }) => {
   /* ---- de raadkamer zoals een kant hem ziet ---- */
   function raad(kant) {
     const uit = { ok: true, uitslagen: uitslagen(),
-      besluiten: S().besluiten.slice(0, 30).map(pubBesluit),
-      steden: S().partners.filter(p => p.actief).map(pubPartner) };
-    if (kant === 'rtg') uit.partners = S().partners.slice(0, 100).map(p => Object.assign({ code: p.code }, pubPartner(p)));
+      besluiten: R().besluiten.slice(0, 30).map(pubBesluit),
+      steden: R().partners.filter(p => p.actief).map(pubPartner) };
+    if (kant === 'rtg') uit.partners = R().partners.slice(0, 100).map(p => Object.assign({ code: p.code }, pubPartner(p)));
     return uit;
   }
   function portaal(code) {

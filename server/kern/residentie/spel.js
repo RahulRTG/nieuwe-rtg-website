@@ -10,14 +10,14 @@ const rahul = require('./rahul');
 const vragen = require('./vragen');
 
 module.exports = (ctx) => {
-  const { R, kamer, kamerVan, sein, sseToCustomer, save, partnerVan } = ctx;
+  const { R, kamer, kamerVanLees, potjesLees, sein, sseToCustomer, save, partnerVan } = ctx;
   const potjes = () => (R().potjes = R().potjes || {});
   const spelerIn = (id, key) => kamer(id).leden[key];
   const keyOpNaam = (id, codenaam) =>
     Object.keys(kamer(id).leden).find(k => kamer(id).leden[k].codenaam === codenaam) || null;
 
   function daag(key, body) {
-    const id = kamerVan(key);
+    const id = kamerVanLees(key);
     if (!id) return { status: 409, error: 'U bent nog geen kamer binnen.' };
     const S2 = SPELLEN[String((body || {}).spel || '')];
     if (!S2) return { status: 400, error: 'Dit spel kent het huis niet.' };
@@ -44,8 +44,9 @@ module.exports = (ctx) => {
   }
 
   function antwoord(key, body) {
-    const id = kamerVan(key);
-    const p = id && potjes()[id];
+    const id = kamerVanLees(key);
+
+    const p = id && potjesLees()[id];
     if (!p || p.status !== 'wacht' || p.spelers[1].key !== key) return { status: 404, error: 'Er is geen uitnodiging (meer).' };
     if (!(body || {}).ja) {
       delete potjes()[id]; save();
@@ -66,8 +67,8 @@ module.exports = (ctx) => {
   const teamNamen = p => [0, 1].map(t => p.spelers.filter(s => s.team === t).map(s => s.codenaam).join(' & '));
 
   function spelZet(key, body) {
-    const id = kamerVan(key);
-    const p = id && potjes()[id];
+    const id = kamerVanLees(key);
+    const p = id && potjesLees()[id];
     if (!p || p.status !== 'bezig') return { status: 404, error: 'Er loopt hier geen potje.' };
     const S2 = SPELLEN[p.spel];
     const wie = p.spelers[p.beurt % p.spelers.length];
@@ -97,8 +98,8 @@ module.exports = (ctx) => {
   }
 
   function spelStop(key) {
-    const id = kamerVan(key);
-    const p = id && potjes()[id];
+    const id = kamerVanLees(key);
+    const p = id && potjesLees()[id];
     if (!p || !p.spelers.some(s => s.key === key)) return { status: 404, error: 'Er loopt hier geen potje van u.' };
     delete potjes()[id]; save();
     sein(id, 'spel-gestopt', { van: spelerIn(id, key) ? spelerIn(id, key).codenaam : null });
@@ -111,7 +112,7 @@ module.exports = (ctx) => {
      directeur de gastheer en wisselt hij eerlijk en gewaagd af -- het paar
      (samen wandelen) is daar de toestemming voor het gewaagde dek. */
   function vraag(key) {
-    const id = kamerVan(key);
+    const id = kamerVanLees(key);
     if (!id) return { status: 409, error: 'U bent nog geen kamer binnen.' };
     if (id !== 'restaurant' && !id.startsWith('suite:')) return { status: 409, error: 'De vragen van het huis horen bij het diner (restaurant of suite).' };
     const k = kamer(id);

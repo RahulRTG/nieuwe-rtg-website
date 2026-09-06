@@ -95,5 +95,12 @@ module.exports = function start(deps) {
   const { server } = require('./luister')({ app, log, db, accounts, save, webpush, kern,
     DATA_DIR, flushBijAfsluiten });
 
+  /* VANAF HIER MAG DE WERELD LIEGEN. De verraadsmotor staat tijdens de opstart
+     uit: een `schrijf-faalt` op een zaai- of migratieschrijfactie laat de server
+     niet eens opkomen, en dan meet een sabotageronde niets. Op 'listening' en
+     niet hier direct -- luister() keert terug zodra app.listen is AANGEROEPEN.
+     Zie ../lib/verraadfase.js; dit is de enige plek die hem omzet. */
+  server.on('listening', () => require('../lib/verraadfase').zetVerkeerAan());
+
   return { server, backupData };
 };

@@ -627,7 +627,7 @@ test('Inlogpoort: het vak van de klok is vierkant, dus de schaduw is rond',
     const page = await ctx.newPage();
     await volgVerzoeken(page);
     // zonder token: dan staat de poort er, en daar hangt de klok
-    await page.goto(base + '/', { waitUntil: 'domcontentloaded' });
+    await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
 
     await page.waitForSelector('#gate .rtg-ring svg', { timeout: 15000 });
     const vak = await page.evaluate(() => {
@@ -677,7 +677,7 @@ test('Inlogpoort: de lippen van Rahul hangen onder de klok, niet erin',
       const page = await ctx.newPage();
       await volgVerzoeken(page);
       // zonder token: dan staat de poort er, en die is wat we meten
-      await page.goto(base + '/', { waitUntil: 'domcontentloaded' });
+      await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
       await page.waitForSelector('#gate .ag-mond', { timeout: 15000 });
       await wachtOpRust(page);
 

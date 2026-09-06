@@ -271,7 +271,17 @@ function vuileBoom() {
    een bestand aanraakt, krijgt nog steeds `boomVuil: true` aan het eind -- en
    dat hoort ook zo, want dat is wat er dan echt aan de hand is. Deze poort
    voorkomt de verspilling die vooraf te zien was, niet die van later. */
-function eisSchoneBoom(naam) {
+function eisSchoneBoom(naam, opties) {
+  /* EERST DE AFBOUW EN DAARNA PAS GIT, want dit is de striktere vraag. Een
+     motor die de bron muteert (de mutatiemotor, de meterijking) zet bestanden
+     neer en haalt ze weg; wie daar middenin meet, meet die aanbouw mee. Git
+     ziet dat wel, maar alleen op het moment dat je kijkt -- een ronde die in
+     een schoon venster begint en er middenin belandt, komt er anders langs.
+
+     De lezer is INJECTEERBAAR omdat de toets hierop het echte slot niet kan
+     gebruiken: scripts/test-runner.js HOUDT dat slot terwijl de suite draait. */
+  const geenAfbouw = require('../afbouw-slot').eisGeenAfbouw(naam, opties && opties.afbouw);
+  if (!geenAfbouw.ok) return geenAfbouw;
   const commit = git(['rev-parse', '--short', 'HEAD']);
   if (!commit) return { ok: true, reden: 'geen git; er valt niets te ijken' };
   if (process.env.RTG_METEN_OP_VUILE_BOOM === '1') {

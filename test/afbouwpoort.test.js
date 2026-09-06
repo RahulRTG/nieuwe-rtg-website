@@ -39,9 +39,25 @@ test('actief() leest het slot zonder het te pakken', () => {
    de LEZER en niet de uitkomst, zodat de hele weg nog door de poort loopt. */
 const alsAfbouw = (wat) => () => wat;
 
+/* EN DE TWEEDE INVOER VAN DE POORT: de vlag die zegt dat het slot van je EIGEN
+   proceslijn is. scripts/test-runner.js zet RTG_AFBOUW_SLOT_ACTIEF=1 voor de
+   hele suite, dus binnen een toets staat hij AAN -- en dan laat de poort alles
+   door. Elke bewering hieronder die over de WEIGERING gaat, moet hem dus zelf
+   uitzetten, anders slaagt hij op de omgeving in plaats van op de logica.
+
+   Dit is geen theorie: deze twee toetsen stonden groen toen ik ze los draaide
+   (buiten de runner is de vlag niet gezet) en zakten in CI. Een toets die
+   afhangt van hoe hij wordt gestart, meet zijn starter. */
+function zonderEigenSlot(werk) {
+  const oud = process.env.RTG_AFBOUW_SLOT_ACTIEF;
+  delete process.env.RTG_AFBOUW_SLOT_ACTIEF;
+  try { return werk(); }
+  finally { if (oud !== undefined) process.env.RTG_AFBOUW_SLOT_ACTIEF = oud; }
+}
+
 test('eisGeenAfbouw weigert zolang er een motor draait, en zegt WELKE', () => {
-  const r = slot.eisGeenAfbouw('een proefmeting',
-    () => ({ taak: 'toets-afbouwpoort', pid: 4242, gestart: '2026-09-06T13:00:00Z' }));
+  const r = zonderEigenSlot(() => slot.eisGeenAfbouw('een proefmeting',
+    () => ({ taak: 'toets-afbouwpoort', pid: 4242, gestart: '2026-09-06T13:00:00Z' })));
   assert.equal(r.ok, false, 'een meting naast een motor is geen geldige meting');
   assert.match(r.reden, /toets-afbouwpoort/, 'de reden noemt WELKE motor draait');
   assert.match(r.reden, /4242/, 'en zijn pid, zodat je kunt kijken of hij vastzit');
@@ -51,7 +67,7 @@ test('eisGeenAfbouw weigert zolang er een motor draait, en zegt WELKE', () => {
 test('en laat hem door zodra het slot vrij is', () => {
   /* Zonder deze bewering zou een poort die ALTIJD weigert ook groen staan --
      en dat is de gevaarlijkste vorm: elke meting stil geblokkeerd. */
-  const r = slot.eisGeenAfbouw('een proefmeting', () => null);
+  const r = zonderEigenSlot(() => slot.eisGeenAfbouw('een proefmeting', () => null));
   assert.equal(r.ok, true, 'met een vrij slot mag de meting gewoon draaien');
 });
 
@@ -62,7 +78,7 @@ test('RTG_METEN_TIJDENS_AFBOUW=1 opent hem met opzet', () => {
   const oud = process.env.RTG_METEN_TIJDENS_AFBOUW;
   process.env.RTG_METEN_TIJDENS_AFBOUW = '1';
   try {
-    const r = slot.eisGeenAfbouw('x', () => ({ taak: 'toets', pid: 1, gestart: 'x' }));
+    const r = zonderEigenSlot(() => slot.eisGeenAfbouw('x', () => ({ taak: 'toets', pid: 1, gestart: 'x' })));
     assert.equal(r.ok, true);
     assert.match(r.reden, /telt niet als bewijs/, 'en zegt erbij wat die opening kost');
   } finally {
@@ -108,11 +124,11 @@ test('het slot van je EIGEN proceslijn is geen vreemde motor', () => {
 
 test('eisSchoneBoom draagt dezelfde poort, dus de elf proeven krijgen hem gratis', () => {
   const { eisSchoneBoom } = require('../scripts/lib/stempel');
-  const r = eisSchoneBoom('een proefmeting',
-    { afbouw: () => ({ taak: 'motor-x', pid: 7, gestart: 'toen' }) });
+  const r = zonderEigenSlot(() => eisSchoneBoom('een proefmeting',
+    { afbouw: () => ({ taak: 'motor-x', pid: 7, gestart: 'toen' }) }));
   assert.equal(r.ok, false);
   assert.match(r.reden, /motor-x/);
-  const vrij = eisSchoneBoom('een proefmeting', { afbouw: () => null });
+  const vrij = zonderEigenSlot(() => eisSchoneBoom('een proefmeting', { afbouw: () => null }));
   assert.equal(/afbouw loopt/.test(String(vrij.reden || '')), false,
     'met een vrij slot is de afbouw geen reden meer (de boom mag nog wel vuil zijn)');
 });

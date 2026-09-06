@@ -109,6 +109,56 @@ lijst wordt langer, niet losser: elk nieuw pad noemt waarom een lid zijn werk
 niet mag kwijtraken. Wat er níét op komt, is even belangrijk — een cache die
 opnieuw te vullen is, hoort niet duurzaam bevestigd te worden.
 
+### De uitbreiding van 6 september 2026 — een rem die een mens overhaalt
+
+Het besluit hierboven kent twee categorieën, en de faalproef vond een derde die
+in geen van beide past. `FAALPROEF.json` (`npm run faalproef`) draait de
+verraadsmotor per route en meet wat er onder `schrijf-verloren` gebeurt: de
+opslag bevestigt en bewaart niet. Over de 139 duurzaam schrijvende routes staat
+het er zo:
+
+```
+onder schrijf-verloren    11 bewezen (5xx)   102 greep niet aan   26 GEZAKT (200)
+onder schrijf-faalt      135 bewezen (5xx)     2 ongemeten         2 GEZAKT (200)
+```
+
+De 102 zijn geen groen: daar veranderde de toestand gewoon, dus het verraad
+raakte de route niet en er is niets over gemeten. Alleen de elf antwoorden een
+fout waar de opslag stil verloor. De zesentwintig die 200 melden zijn wél
+beoordeeld, en drieëntwintig daarvan zijn leesvormige POSTs waarvan de enige
+schrijfactie het inrichten van een standaard-entiteit is; één schrijft alleen
+een auditregel. Twee niet:
+
+```
+POST /api/office/techniek/integraties/noodstop   -> antwoordt `noodstop: true`
+POST /api/command/uitrol/pauze                   -> antwoordt stand `stil`
+```
+
+Allebei is het een MENS die aan de rem trekt en een bevestiging terugkrijgt.
+Allebei is de schrijfactie niet vastgelegd, dus na een herstart staat er niets —
+dat volgt uit wat `schrijf-verloren` dóét (`save()` keert terug zonder te
+schrijven) en is voor deze twee niet apart nagemeten. Het is geen afgeleide
+toestand die je opnieuw kunt opbouwen: de integraties staan gewoon weer aan, en
+de uitrol loopt gewoon door.
+
+De twee die onder `schrijf-faalt` zakken zijn een ANDER gebrek en horen niet in
+deze uitbreiding: `POST /api/dag` en `POST /api/kosten/mij` antwoorden 200
+terwijl de opslag een uitzondering GOOIDE. Daar is geen duurzaamheidsvraag maar
+een weggevangen fout, en die reparatie zit in de route en niet in de primitive.
+
+**De reikwijdte krijgt daarom een derde been: een rem die een mens overhaalt.**
+Niet "alles wat het kantoor doet" — een kantoorscherm dat een lijst herschikt of
+een cache verwarmt hoort er nadrukkelijk niet bij. Het criterium is smal en het
+staat hier zodat de volgende het kan toetsen:
+
+> een handeling die een mens bewust uitvoert om iets te STOPPEN, en waarvan de
+> bevestiging de mens doet geloven dat hij weg kan lopen.
+
+Dat criterium sluit de twee hierboven in en laat de tweeëntwintig andere
+kantoorroutes uit de faalproef eruit. De latentieprijs uit stap 6 speelt hier
+nauwelijks: het zijn boardroom- en kantoorroutes die zelden worden aangeroepen,
+en een noodstop die twee milliseconden langer duurt is geen noodstop minder.
+
 ### Wat er inmiddels aan hangt
 
 ```
@@ -117,6 +167,8 @@ NOTITIES    kern/notities -> lib/duurzaam -> bijeen(...)        AANGESLOTEN
 AGENDA      -                                                   OPEN
 BESTANDEN   -                                                   OPEN
 BERICHTEN   -                                                   OPEN
+NOODSTOP    -                                                   OPEN
+UITROLPAUZE -                                                   OPEN
 ```
 
 Twee dingen zijn bij het aansluiten van notities geleerd, en ze horen hier omdat

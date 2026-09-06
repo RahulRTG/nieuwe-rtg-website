@@ -670,7 +670,10 @@ body[data-rtg-vandaag-luxe][data-rtg-world="living"][data-rtg-edge-2-rendered="t
 body[data-rtg-vandaag-luxe][data-rtg-world="living"][data-rtg-edge-2-rendered="true"] .rtg-edge-2-context-slot .bank a:is(:hover,:focus-visible,.actief) span{
   color:var(--rtg-v-ink)!important
 }
-body[data-rtg-vandaag-luxe][data-rtg-world="travel"] .skip{color:#1c1608!important}
+/* Donkere inkt hoort bij de gouden skip-link van rtg-ui. Onder de Heritage-huid
+   is de skip-link bordeaux met ivoor (rtg-heritage-adapters.css); deze regel
+   won daar op specificiteit en zette donkere inkt op bordeaux, 1,77:1. */
+body[data-rtg-vandaag-luxe][data-rtg-world="travel"]:not([data-rtg-skin="heritage"]) .skip{color:#1c1608!important}
 body[data-rtg-vandaag-luxe][data-rtg-world="work"][data-workos-premium]{
   background:radial-gradient(85% 46% at 82% -6%,var(--rtg-v-accent-soft),transparent 67%),var(--rtg-v-bg)!important
 }

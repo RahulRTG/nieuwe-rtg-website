@@ -275,23 +275,36 @@ async function beproefPaar(srv, token, paar) {
   const voorOpwarming = opslagBeeld(srv.datamap);
   const opwarm = await roep(srv.basis, paar.heen, token, heenLijf());
   await stilBeeld(srv.datamap, voorOpwarming);
-  /* WAT DE OPWARMRONDE MAAKTE, MOET DE VOORBEREIDING KUNNEN OPRUIMEN -- en dat
-     kon zij niet, want het antwoord van deze oproep werd nergens bewaard. De
-     `voorbereid()` hieronder draait de tegenhanger met een lijf dat het
-     onderwerp niet aanwijst (een annulering zonder ref, een verwijdering zonder
-     id): 404, en wat de opwarming maakte bleef staan.
+  /* OPRUIMEN EN VOORBEREIDEN ZIJN TWEE DINGEN, en ze zijn hier uit elkaar
+     gehaald omdat het samenvoegen ervan vier paren kostte.
 
-     Bij de meeste paren viel dat niet op, omdat de heenweg een tweede keer
-     gewoon iets nieuws maakt. Het valt wel op zodra het onderwerp SCHAARS is:
-     /api/care/boek bezet een behandelaar op een tijdslot, dus de meetronde
-     kreeg 409 "Dat tijdslot is al bezet" -- van zijn eigen opwarmronde. Dat las
-     als `nietBeproefd` en dus als een eigenschap van het paar, terwijl het een
-     restant van de proef was. /api/verzorging/boek ontsnapte er alleen aan
-     doordat een salon meer dan een stoel heeft.
+     WAT DE OPWARMRONDE MAAKTE, BLEEF STAAN. Het antwoord van de opwarmoproep
+     werd nergens bewaard, dus de voorbereiding erna draaide de tegenhanger met
+     een lijf dat het onderwerp niet aanwees (een annulering zonder ref, een
+     verwijdering zonder id): 404, en het restant bleef liggen. Bij de meeste
+     paren viel dat niet op omdat de heenweg een tweede keer gewoon iets nieuws
+     maakt. Het valt wel op zodra het onderwerp SCHAARS is: /api/care/boek bezet
+     een behandelaar op een tijdslot, dus de meetronde kreeg 409 "Dat tijdslot
+     is al bezet" -- van zijn eigen opwarmronde, en dat las als een eigenschap
+     van het paar. /api/verzorging/boek ontsnapte er alleen aan doordat een
+     salon meer dan een stoel heeft.
 
-     De sleutels van de opwarming reizen daarom mee. Zij WIJZEN alleen aan; wat
-     de tegenhanger ermee doet blijft aan de tegenhanger. */
-  uitVoorbereiding = Object.assign({}, uitVoorbereiding, sleutelsUit(opwarm.data));
+     HET ANTWOORD VAN DE OPRUIMING TELT NIET MEE, en dat is de hele reden dat
+     dit een aparte stap is. De eerste poging gaf de opwarmsleutels aan de
+     gewone voorbereiding. Die ruimde toen wel netjes op -- maar zij MERGET het
+     antwoord van de tegenhanger in `uitVoorbereiding`, en dat object voedt ook
+     `heenLijf()`. Een geslaagde verwijdering antwoordt met het id van wat zij
+     net WEGHAALDE, dus de meetronde riep /api/samen/maak aan met een dood id en
+     maakte niets meer. Vier paren zakten van `exact` en `compensatie` naar
+     `nietBeproefd` terwijl er vier verbeterden -- netto nul, met schade.
+
+     Een sleutel die de OPRUIMING aanwijst, mag de METING niet sturen. Daarom
+     wordt hier alleen opgeruimd en wordt het antwoord weggegooid; de
+     voorbereiding eronder loopt daarna onveranderd, precies zoals voor deze
+     verandering. */
+  await roep(srv.basis, paar.terug, token,
+    lijfVoor(paar.terug, Object.assign({}, uitVoorbereiding, sleutelsUit(opwarm.data))));
+  await stilBeeld(srv.datamap, voorOpwarming);
   /* NOG EEN KEER, want de opwarmronde heeft het onderwerp opgebruikt: bij een
      verwijder -> maak-paar staat er na de opwarming weer niets. De nulstand
      hoort de wereld te zijn waarin de heenweg IETS kan doen. */

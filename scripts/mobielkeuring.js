@@ -251,6 +251,7 @@ function mobielInPagina(opt) {
   var hoofd = null, hoe = '';
   var zoek = [
     ['[data-hoofdactie]', 'aangewezen (data-hoofdactie)'],
+    ['[data-rtg-edge-primary]', 'aangewezen (Continue Key)'],
     /* `.hoofd` ALLEEN op iets wat je werkelijk aanraakt. Die klasse is in dit
        huis overladen: op /apps/geld-command.html draagt een KAART van 350x236
        met "96% match" hem, en die als hoofdhandeling meten levert een getal op

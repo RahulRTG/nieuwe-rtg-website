@@ -42,7 +42,7 @@ test('vier vaste werelden delen één volledige token- en dieptegrammatica', () 
 });
 
 test('eigen donkere routevlakken dragen hun volledige Heritage-inktset', () => {
-  assert.match(TOKENS, /\[data-rtg-world="living"\]\{[^}]*--rtg-world-muted:#5f574d/s);
+  assert.match(TOKENS, /\[data-rtg-world="living"\]\{[^}]*--rtg-world-muted:#51493f/s);
   for (const vlak of ['onyx', 'bordeaux']) {
     const blok = TOKENS.match(new RegExp(`body\\[data-rtg-skin="heritage"\\]\\[data-rtg-eigenvlak="${vlak}"\\]\\{([^}]+)\\}`));
     assert.ok(blok, `${vlak} heeft een eigen Heritage-contract`);
@@ -58,7 +58,8 @@ test('eigen donkere routevlakken dragen hun volledige Heritage-inktset', () => {
 });
 
 test('Bodoni blijft redactioneel en Inter blijft operationeel', () => {
-  assert.match(MATERIALEN, /h1,h2,.rtg-ceremonie,.display,.serif/);
+  assert.match(MATERIALEN, /data-rtg-type="display"/);
+  assert.match(MATERIALEN, /:where\(h1,h2,h3,h4\)[^}]*--rtg-interface/);
   assert.doesNotMatch(MATERIALEN, /body\[data-rtg-skin="heritage"\]\s*\{[^}]*font-family:[^;}]*Bodoni/i,
     'Bodoni mag nooit de lopende bodyletter worden');
   assert.match(COMPONENTEN, /\.rtg-operational-panel[^}]*font-family:Inter/);
@@ -156,4 +157,35 @@ test('de volledige Heritage-laag reist mee in beide offline schillen', () => {
         pad + ' hoort exact één keer in iedere offline schil');
     }
   }
+});
+
+
+test('routevarianten en canvaskeuzes zijn volledig herleidbaar tot het centrale register', () => {
+  const identity = require('../public/shared/rtg-world-identity');
+  const registry = require('../public/shared/rtg-heritage-registry');
+  const seen = new Map();
+  for (const [material, routes] of Object.entries(identity.MATERIALS)) for (const route of routes) {
+    assert.equal(seen.has(route), false, route + ' heeft twee materiaalidentiteiten');
+    seen.set(route, material);
+    assert.ok(fs.existsSync(path.join(ROOT, 'public', route)), route + ' bestaat niet');
+  }
+  const variants = new Set([...Object.values(registry.profiles).flatMap(p => p.rules), ...registry.common].map(r => r.variant));
+  for (const file of fs.readdirSync(path.join(ROOT, 'public/apps'), { recursive: true }).filter(f => f.endsWith('.html'))) {
+    const html = lees('public/apps/' + file);
+    const body = (html.match(/^<body\b[^>]*>/im) || [''])[0];
+    const material = (body.match(/data-rtg-eigenvlak="([^"]+)"/) || [])[1];
+    if (material) assert.equal(seen.get('/apps/' + file), material, file + ' kiest een ongeoorloofde materiaalvariant');
+    for (const match of html.matchAll(/data-rtg-component-variant="([^"]+)"/g)) assert.ok(variants.has(match[1]), file + ': onbekende componentvariant ' + match[1]);
+  }
+  for (const route of Object.keys(registry.canvas)) {
+    const body = lees('public' + route).match(/^<body\b[^>]*>/im)[0];
+    assert.match(body, /data-rtg-edge-2-state="compact"/, route + ': canvas opent compact');
+    assert.match(body, /data-rtg-edge-2-auto="false"/, route + ': bediening wacht op de gebruiker');
+  }
+});
+
+test('beide offline shells bevatten de volledige gedeelde intelligentielaag', () => {
+  const files = ['rtg-route-memory-core.js', 'rtg-route-memory.js', 'rtg-operation.js', 'rtg-side-sheet.js', 'rtg-edge-preferences.js', 'rtg-action-dock.js', 'rtg-heritage-registry.js', 'rtg-heritage-components.js', 'rtg-heritage-transition.js', 'rtg-intelligence.css', 'rtg-intelligence-shell.css', 'rtg-world-start.css', 'rtg-world-start.js'];
+  for (const sw of ['public/sw.js','public/apps/foundation/sw.js']) for (const file of files)
+    assert.ok(lees(sw).includes("'/shared/" + file + "'"), sw + ' mist offline asset ' + file);
 });

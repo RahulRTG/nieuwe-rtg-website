@@ -134,7 +134,10 @@
       return;
     }
     if (!verzamel()) { if (knop) { knop.remove(); knop = null; } return; }   // niets te halen, geen knop
-    if (knop && knop.isConnected && (knop.offsetParent !== null || ++pogingen > 5)) return;
+    if (knop && knop.isConnected) {
+      if (gastKnop && gastKnop.isConnected) { if(knop.parentNode!==gastKnop)gastKnop.appendChild(knop); return; }
+      if (knop.offsetParent !== null || ++pogingen > 5) return;
+    }
     if (!knop) {
       knop = document.createElement('button');
       knop.type = 'button';

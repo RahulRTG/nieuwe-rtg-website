@@ -26,6 +26,7 @@ const {
 const pw = laadPlaywright();
 const OFFICE_CODE = 'WORLD-DASHBOARD-KEURING';
 const BEELDMAP = process.env.RTG_WORLD_DASHBOARD_SHOTS || '';
+const A11Y = '(function(){' + require('../scripts/a11ykeuring').BRON + '\nreturn window.__a11yKeur()})()';
 
 const WERELDEN = [
   {
@@ -56,7 +57,7 @@ const WERELDEN = [
        zin van de titel liep dwars door "DE BESTEMMING" heen, 11px over 495px
        breedte op 1440. Alleen onder 780px was er ruimte gereserveerd. Wie een
        cel deelt, hoort zijn tekst niet te delen. */
-    gestapeld: [['.dagtitel', '.dagkop-inhoud']],
+    gestapeld: [['.dagtitel', '.dagkop-inhoud'], ['.dagtitel', '#dagRaster']],
     oud: [
       '.reisapp > .prestatiekop', '.reisapp > .hoofdtabs', '.tos-topbar', '.tos-nav',
       'body > .rtgdeel-balk', 'body > header.ios-nav', 'body > .ios-thuis', '#osMenuBtn'
@@ -76,7 +77,10 @@ const WERELDEN = [
 const MATEN = [
   { naam: '320', width: 320, height: 700 },
   { naam: '390', width: 390, height: 844 },
-  { naam: 'desktop', width: 1440, height: 900 }
+  { naam: '768', width: 768, height: 1024 },
+  { naam: '1024', width: 1024, height: 768 },
+  { naam: 'desktop', width: 1440, height: 900 },
+  { naam: '1920', width: 1920, height: 1080 }
 ];
 
 async function maakPubliekeStad(base) {
@@ -191,6 +195,21 @@ async function dashboardMeting(page, route) {
       }));
     });
 
+    const controlOverlap = [], smallControls = [];
+    ['.rtg-edge-top','.rtg-edge-bottom'].forEach(selector => {
+      const controls = [...document.querySelectorAll(selector + ' button,' + selector + ' a[href]')].filter(inKijkvlak);
+      controls.forEach((a,i) => {
+        const ra = a.getBoundingClientRect();
+        if (ra.width < 43.99 || ra.height < 43.99) smallControls.push(beschrijf(a,selector));
+        controls.slice(i+1).forEach(b => {
+          if(a.contains(b)||b.contains(a))return;
+          const rb=b.getBoundingClientRect();
+          if(Math.min(ra.right,rb.right)-Math.max(ra.left,rb.left)>1 && Math.min(ra.bottom,rb.bottom)-Math.max(ra.top,rb.top)>1)
+            controlOverlap.push((a.getAttribute('aria-label')||a.textContent.trim())+' over '+(b.getAttribute('aria-label')||b.textContent.trim()));
+        });
+      });
+    });
+    const runtimeError = /\b(?:[A-Za-z_$][\w$]* is not defined|Cannot read properties of|TypeError:|ReferenceError:)/.test(document.body.innerText);
     const html = document.documentElement, body = document.body;
     const canvas = rechthoek(hoofd);
 
@@ -210,6 +229,7 @@ async function dashboardMeting(page, route) {
         onder: document.querySelectorAll('.rtg-edge-bottom').length,
         genest: document.querySelectorAll('.rtg-edge-chrome .rtg-edge-chrome').length
       },
+      controlOverlap, smallControls, runtimeError,
       contextTokens: contextueel.map((el) => el.getAttribute('data-rtg-edge-2-contextual')),
       contextBuiten, oudZichtbaar,
       canvas, panelen: panelen.length, ontbrekend, paneelBuiten, kopAfgesneden, tekstBotsingen,
@@ -232,6 +252,9 @@ function keurDashboard(m, route, maat) {
   assert.equal(m.luxe, 0, label + ': oude of dubbele luxe-cover staat nog in de DOM');
   assert.deepEqual(m.edge, { wortels: 1, boven: 1, zij: 1, onder: 1, genest: 0 },
     label + ': niet exact één Edge-casco');
+  assert.deepEqual(m.controlOverlap, [], label + ': systeemknoppen overlappen');
+  assert.deepEqual(m.smallControls, [], label + ': systeemknoppen kleiner dan 44px');
+  assert.equal(m.runtimeError,false,label + ': programmeerfout zichtbaar als bronstatus');
   assert.deepEqual(m.contextBuiten, [], label + ': lokale chrome staat buiten het ene contextslot');
   for (const token of route.context)
     assert.ok(m.contextTokens.includes(token), label + ': contextbron ontbreekt: ' + token);
@@ -298,7 +321,7 @@ async function bewijsHandeling(page, route, maat) {
     return;
   }
   if (route.wereld === 'travel') {
-    const actie = '.kaartraster [data-naar-blad="reizen"]';
+    const actie = '#reisVolgende [data-naar-blad="reizen"]';
     await page.waitForSelector(actie, { state: 'visible', timeout: geduld(15000) });
     await raakdoel(page, actie, label);
     await page.click(actie);
@@ -319,7 +342,7 @@ async function bewijsHandeling(page, route, maat) {
     label + ': stad openen deactiveerde het dashboard');
 }
 
-test('vier wereldhomes blijven native dashboards op 320, 390 en desktop',
+test('vier wereldhomes blijven native dashboards op zes schermbreedtes',
   { skip: geenBrowser(pw) }, async (t) => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', OFFICE_CODE } });
   let browser;
@@ -350,7 +373,7 @@ test('vier wereldhomes blijven native dashboards op 320, 390 en desktop',
             await page.goto(base + route.pad, { waitUntil: 'domcontentloaded' });
             await page.waitForFunction((cfg) => {
               const hoofd = document.querySelector(cfg.hoofd);
-              return document.body.getAttribute('data-rtg-world-dashboard-ready') === 'true' &&
+              return document.body.getAttribute('data-rtg-world-start') === 'ready' && document.body.getAttribute('data-rtg-world-dashboard-ready') === 'true' &&
                 document.body.getAttribute('data-rtg-edge-2-rendered') === 'true' &&
                 hoofd && hoofd.classList.contains('rtg-world-dashboard') &&
                 hoofd.getAttribute('data-rtg-dashboard-world') === cfg.wereld &&
@@ -358,13 +381,17 @@ test('vier wereldhomes blijven native dashboards op 320, 390 en desktop',
             }, route, { timeout: geduld(20000) });
             const meting = await dashboardMeting(page, route);
             keurDashboard(meting, route, maat);
-            if (BEELDMAP && (maat.width === 390 || maat.width === 1440)) {
+            const a11y = await page.evaluate(A11Y);
+            assert.deepEqual(a11y.overtredingen, [], route.naam + ' toegankelijkheid na volledige render');
+            assert.deepEqual(a11y.contrast, [], route.naam + ' contrast na volledige render');
+            if (BEELDMAP) {
               fs.mkdirSync(BEELDMAP, { recursive: true });
               await page.evaluate(() => document.fonts && document.fonts.ready);
               await page.screenshot({
                 path: path.join(BEELDMAP, route.wereld + '-' + maat.width + '.png'),
                 fullPage: true
               });
+              await page.screenshot({ path: path.join(BEELDMAP, route.wereld + '-' + maat.width + '-viewport.png') });
             }
             await bewijsHandeling(page, route, maat);
             assert.deepEqual(fouten, [], labelVoor(route, maat) + ': paginafouten: ' + fouten.join(' | '));

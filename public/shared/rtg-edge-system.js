@@ -56,7 +56,7 @@
     hoofdactie.hidden = !hoofdtekst; hoofdactie.textContent = hoofdtekst;
     e.root.querySelector('.rtg-edge-layout small').textContent = e.layout;
     e.root.querySelector('.rtg-edge-index').innerHTML = L.html(e, C, esc, s, actief);
-    e.root.querySelector('.rtg-edge-status-panel').innerHTML = L.status();
+    if (!e.root.querySelector('.rtg-edge-status-inner')) e.root.querySelector('.rtg-edge-status-panel').innerHTML = L.status();
     bindTools(); L.bind(e, sluitLagen); L.crumbs(e, openIndex, voerActie);
   }
   function bindTools() {
@@ -93,13 +93,13 @@
     state.onclick = function () { var open = state.getAttribute('aria-expanded') !== 'true'; sluitLagen(); state.setAttribute('aria-expanded', String(open)); status.setAttribute('aria-hidden', String(!open)); if(open)L.refresh(e); };
     d.addEventListener('keydown', function (ev) {
       var invoer = /^(INPUT|TEXTAREA|SELECT)$/.test((ev.target && ev.target.tagName) || '');
-      if ((ev.metaKey || ev.ctrlKey) && ev.key.toLowerCase() === 'k') { ev.preventDefault(); ev.stopImmediatePropagation(); openIndex(true); return; }
+      if ((ev.metaKey || ev.ctrlKey) && ev.key.toLowerCase() === 'k') { ev.preventDefault(); ev.stopImmediatePropagation(); if(w.RTGSprong)w.RTGSprong.open();else openIndex(true); return; }
       if (!invoer && ev.key === '/') { ev.preventDefault(); openIndex(true); return; }
       if (!invoer && ev.altKey && /^[1-9]$/.test(ev.key)) { var a = r.querySelector('[data-shortcut="' + ev.key + '"]'); if (a) { ev.preventDefault(); a.click(); } }
       if (ev.key === 'Escape') sluitLagen();
     }, true);
     w.addEventListener('resize', function () { if (innerWidth < 768 && e.layout !== 1) setLayout(1); });
-    w.addEventListener('online', teken); w.addEventListener('offline', teken);
+    ['online','offline'].forEach(function(t){w.addEventListener(t,function(){L.refresh(A);});});
   }
   function voerActie() {
     if (!A) return;

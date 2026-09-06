@@ -82,21 +82,6 @@ body[data-rtg-skin="heritage"] #onbGate[data-rtg-vlak="onyx"]{
   --card:#151310;--card2:#1d1815;--gold:#d0b77b;color:#f4f0e9
 }
 
-/* De Living-home droeg nog een legacy `bordeaux`-vlag. Voor een gewoon
-   Living-scherm is dat een lokaal eiland; op de wereldhome overschreef hij de
-   complete parelmoeren wereld en ontstonden half-transparante wijnvlakken met
-   lichte Living-tekst. De dashboardmarkering maakt de bedoelde grens exact. */
-body[data-rtg-skin="heritage"][data-rtg-world="living"][data-rtg-world-dashboard="living"]{
-  --rtg-world-bg:#f4f0e8;--rtg-world-ground:linear-gradient(155deg,#fbf8f2 0%,#f4f0e8 58%,#e8e0d2 100%);
-  --rtg-world-card:#fbf8f2;--rtg-world-card-strong:#e8e0d2;--rtg-world-ink:#211e19;
-  --rtg-world-muted:#5f574d;--rtg-world-line:rgba(33,30,25,.17);--rtg-world-signature:#7f1634;
-  --rtg-world-signature-soft:rgba(127,22,52,.10);--rtg-world-metal:#745718;
-  --rtg-world-action:#7f1634;--rtg-world-action-ink:#fff;--rtg-world-schema:light;
-  --rtg-world-photo:url('/images/worlds/heritage/living-heritage-v2.jpg');
-  --rtg-world-photo-position:68% center;
-  --rtg-world-photo-mask:linear-gradient(112deg,rgba(244,240,232,.975),rgba(244,240,232,.89))
-}
-
 /* Kleine actie- en statusvlakken gebruiken de inkt die bij hun EIGEN vulling
    hoort. Goud en lichtroze vragen donkere inkt; het diepe erfgoedgoud en
    bordeaux vragen juist ivoor. */
@@ -137,7 +122,7 @@ body[data-rtg-skin="heritage"] :where(.scrim,.backdrop,[data-backdrop])>.paneel{
 @media(max-width:700px){
   body[data-rtg-skin="heritage"] :where(.veld,input:not([type="checkbox"]):not([type="radio"]),select,
     textarea,button,.knop,.btn,.rtg-knop,[role="button"],summary,a.terug,.terug[href]){
-    min-height:var(--rtg-target)
+    min-height:var(--rtg-target);min-width:var(--rtg-target)
   }
   body[data-rtg-skin="heritage"] :where(summary,a.terug,.terug[href]){align-items:center}
   body[data-rtg-skin="heritage"] :where(.kantoor-intro,.rtg-intro){
@@ -158,7 +143,7 @@ body[data-rtg-skin="heritage"] :where(.scrim,.backdrop,[data-backdrop])>.paneel{
 @media(pointer:coarse){
   body[data-rtg-skin="heritage"] :where(.veld,input:not([type="checkbox"]):not([type="radio"]),select,
     textarea,button,.knop,.btn,.rtg-knop,[role="button"],summary,a.terug,.terug[href]){
-    min-height:var(--rtg-target)
+    min-height:var(--rtg-target);min-width:var(--rtg-target)
   }
   body[data-rtg-skin="heritage"] :where(label:has(>input[type="checkbox"]),
     label:has(>input[type="radio"])){min-height:var(--rtg-target);display:flex;align-items:center}

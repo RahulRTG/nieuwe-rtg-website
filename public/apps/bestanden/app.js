@@ -13,11 +13,9 @@
   var token = null;
   try { token = localStorage.getItem('rtg_member_token'); } catch (e) {}
   var api = function (pad, body) {
-    return fetch('/api/bestanden/' + pad, { method: 'POST',
+    return window.RTGOperation.requestJson(window.fetch.bind(window), '/api/bestanden/' + pad, { method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
       body: JSON.stringify(body || {})
-    }).then(function (r) {
-      return r.json().catch(function () { return {}; }).then(function (b) { return { status: r.status, body: b }; });
     });
   };
   var meldT; var meld = function (t) {
@@ -37,11 +35,15 @@
   };
 
   var stand = null, hier = null, bak = false;
+  window.RTGBestandenContext(function () { return { stand: stand, hier: hier, bak: bak }; }, function (next) {
+    hier = next.hier; bak = next.bak; teken();
+  });
 
   function laad() {
     return api('mijn').then(function (r) {
       if (r.status !== 200) return meld(r.body.error || 'Log eerst in op de leden-app.');
       stand = r.body;
+      window.RTGRouteMemory.ready('bestanden');
       teken();
     });
   }
@@ -106,7 +108,7 @@
       var la = $('#leegAlles');
       if (la) la.addEventListener('click', function () {
         if (!confirm('Alles in de prullenbak voorgoed weggooien?')) return;
-        api('leeg').then(function () { meld('De la is leeg.'); laad(); });
+        api('leeg').then(function (r) { if (r.status !== 200 || r.body.error) return meld(r.body.error || 'Niet bevestigd.'); meld('De la is leeg.'); laad(); });
       });
     }
     var gedeeld = bak ? [] : (stand.gedeeld || []).filter(function (it) { return !q || it.naam.toLowerCase().indexOf(q) >= 0; });

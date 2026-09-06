@@ -22,9 +22,15 @@
     }
 
     function toon(item) {
+      var transition = window.RTGHeritageTransition;
+      if (transition) return transition.run(document.activeElement, '#afScrim .paneel', function () { renderToon(item); });
+      renderToon(item);
+    }
+    function renderToon(item) {
       open = item || {};
       var eco = open.bron === 'boeking';
       var uitnodiging = !!open.van && !eco;
+      $('#afBewaar').setAttribute('data-rtg-action-state', 'idle');
       $('#afKop').textContent = eco ? 'Uit RTG (alleen-lezen)' : open.id ? 'Afspraak' : 'Nieuwe afspraak';
       $('#afTitel').value = open.titel || '';
       $('#afDatum').value = open.datum || '';
@@ -50,6 +56,7 @@
       if (!eco && !uitnodiging) $('#afTitel').focus();
     }
     function dicht() { $('#afScrim').classList.remove('open'); open = null; }
+    window.RTGSideSheet.attach($('#afScrim'), dicht);
     function tekenDeelnemers() {
       var d = (open && open.deelnemers) || [];
       $('#afDeelnemers').innerHTML = d.length ? d.map(function (x) {
@@ -61,21 +68,41 @@
 
     $('#afDicht').addEventListener('click', dicht);
     $('#afBewaar').addEventListener('click', function () {
+      if (this.disabled) return;
+      if (!$('#afTitel').reportValidity() || !$('#afDatum').reportValidity()) return;
+      var knop = this, concept = open;
+      function invoer() { return JSON.stringify(Array.from($('#afVelden').querySelectorAll('input,select,textarea')).map(function(el){return el.value;})); }
+      var ingestuurd = invoer();
+      knop.disabled = true; knop.setAttribute('aria-busy', 'true');
+      knop.setAttribute('data-rtg-action-state', 'pending');
       var b = { id: open && open.id, titel: $('#afTitel').value, datum: $('#afDatum').value,
         tijd: $('#afTijd').value || null, eind: $('#afEind').value || null, plek: $('#afPlek').value,
         notitie: $('#afNotitie').value, herhaal: $('#afHerhaal').value,
         herhaalTot: $('#afHerhaalTot').value || null,
         herinner: $('#afHerinner').value === '' ? null : +$('#afHerinner').value };
       api('bewaar', b).then(function (r) {
-        if (r.body.error) return meld(r.body.error);
+        if (open !== concept) return meld(r.status === 200 && r.body.ok === true && r.body.id && !r.body.error ? 'Vorige afspraak bewaard.' : 'Vorige afspraak niet bevestigd.');
+        if (r.status !== 200 || r.body.error || r.body.ok !== true || !r.body.id) {
+          knop.setAttribute('data-rtg-action-state', 'error'); return meld(r.body.error || 'Geen bevestiging ontvangen.');
+        }
+        if (invoer() !== ingestuurd) {
+          open.id = r.body.id; knop.setAttribute('data-rtg-action-state', 'idle');
+          meld('Bewaard. Uw nieuwe wijzigingen staan nog open.'); herlaad(); return;
+        }
+        knop.setAttribute('data-rtg-action-state', 'success');
         meld('Bewaard.'); dicht(); herlaad();
+      }).finally(function () {
+        knop.disabled = false; knop.removeAttribute('aria-busy');
       });
     });
     $('#afWeg').addEventListener('click', function () {
       if (!open || !open.id) return;
       if (!confirm(open.van ? 'Deze uitnodiging weghalen? De organisator ziet dan: komt niet.'
         : 'Deze afspraak verwijderen?' + ((open.deelnemers || []).length ? ' De genodigden zien hem vervallen.' : ''))) return;
-      api('verwijder', { id: open.id }).then(function () { meld('Verwijderd.'); dicht(); herlaad(); });
+      api('verwijder', { id: open.id }).then(function (r) {
+        if (r.status !== 200 || r.body.error || r.body.ok !== true) return meld(r.body.error || 'Verwijderen niet bevestigd.');
+        meld('Verwijderd.'); dicht(); herlaad();
+      });
     });
     $('#afNodig').addEventListener('click', function () {
       var code = $('#afCode').value.trim();

@@ -45,7 +45,7 @@
   R.eur = function (centen) {
     return new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format((Number(centen) || 0) / 100);
   };
-  R.wisselBlad = function (naam, schrijfHash) {
+  R.wisselBlad = function (naam, schrijfHash, opties) {
     /* De lijst bladen staat hier EEN keer; wie er een toevoegt aan het scherm
        moet hem hier ook noemen, anders valt de tab stil terug op Vandaag. */
     if (!['vandaag', 'reizen', 'taxi', 'samen', 'rahul'].includes(naam)) naam = 'vandaag';
@@ -61,7 +61,11 @@
        bleef er "VANDAAG" staan terwijl je op Samen keek. Een pad dat iets
        anders zegt dan het scherm is erger dan geen pad. */
     if (w.RTGEdge && w.RTGEdge.setContext) w.RTGEdge.setContext({ title: bladNaam });
-    w.scrollTo({ top: 0, behavior: 'smooth' });
+    if (!opties || !opties.restore) {
+      var rustig = w.RTGHeritageMotion && !w.RTGHeritageMotion.allowsMotion(w, d);
+      w.scrollTo({ top: 0, behavior: rustig ? 'auto' : 'smooth' });
+    }
+    if (naam === 'samen' && opties && opties.restore && R.laadSamen) R.laadSamen();
     if (naam === 'taxi' && R.laadMobiliteit) R.laadMobiliteit();
     R.meldAdaptief();
   };

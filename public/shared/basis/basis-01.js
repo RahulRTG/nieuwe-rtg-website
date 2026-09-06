@@ -53,7 +53,7 @@
   function pasWereldIdentiteitToe() {
     try {
       if (window.RTGWorldIdentity && window.RTGWorldIdentity.apply) {
-        window.RTGWorldIdentity.apply(document, location.pathname);
+        window.RTGWorldIdentity.apply(document, location.href);
       }
     } finally { laadHeritageBlad(); }
   }

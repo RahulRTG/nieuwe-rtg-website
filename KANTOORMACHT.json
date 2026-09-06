@@ -3,8 +3,8 @@
   "uitleg": "Blok 0 van KANTOORMACHT.md: staat er een MENS achter elke kantoorhandeling? Zes assen, zes getallen, met opzet geen samengesteld cijfer (BEWIJSMACHINE.md verbiedt het enkele READY boven een scorecard).",
   "grens": "De as `deurEistMens` komt uit de ROUTER en is hard; `handlerKentMens` is lexicaal op BESTANDSniveau en draagt daarom `vermoed` -- een bestand dat officeKey noemt gebruikt hem misschien niet in elke route erin. `handlerKentMens` is dus een BOVENgrens en `anoniemUitvoerbaar` een ONDERgrens. Een deploy-gate hoort aan de harde as te hangen.",
   "stempel": {
-    "op": "2026-09-06T20:53:46.474Z",
-    "commit": "620533b1",
+    "op": "2026-09-06T21:05:55.264Z",
+    "commit": "02b8f083",
     "node": "v22.22.2"
   },
   "gemeten": {

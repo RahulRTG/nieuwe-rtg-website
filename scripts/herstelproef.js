@@ -273,38 +273,44 @@ async function beproefPaar(srv, token, paar) {
      De opwarmronde laat de collectie ontstaan; pas daarna begint de meting. */
   const heenLijf = () => lijfVoor(paar.heen, uitVoorbereiding);
   const voorOpwarming = opslagBeeld(srv.datamap);
-  const opwarm = await roep(srv.basis, paar.heen, token, heenLijf());
+  await roep(srv.basis, paar.heen, token, heenLijf());
   await stilBeeld(srv.datamap, voorOpwarming);
-  /* OPRUIMEN EN VOORBEREIDEN ZIJN TWEE DINGEN, en ze zijn hier uit elkaar
-     gehaald omdat het samenvoegen ervan vier paren kostte.
+  /* WAT DE OPWARMRONDE MAAKT, BLIJFT STAAN -- EN DAT IS EEN BEVINDING DIE HIER
+     BEWUST ALS BEVINDING BLIJFT STAAN.
 
-     WAT DE OPWARMRONDE MAAKTE, BLEEF STAAN. Het antwoord van de opwarmoproep
-     werd nergens bewaard, dus de voorbereiding erna draaide de tegenhanger met
-     een lijf dat het onderwerp niet aanwees (een annulering zonder ref, een
-     verwijdering zonder id): 404, en het restant bleef liggen. Bij de meeste
-     paren viel dat niet op omdat de heenweg een tweede keer gewoon iets nieuws
-     maakt. Het valt wel op zodra het onderwerp SCHAARS is: /api/care/boek bezet
-     een behandelaar op een tijdslot, dus de meetronde kreeg 409 "Dat tijdslot
-     is al bezet" -- van zijn eigen opwarmronde, en dat las als een eigenschap
-     van het paar. /api/verzorging/boek ontsnapte er alleen aan doordat een
-     salon meer dan een stoel heeft.
+     Het antwoord van de opwarmoproep wordt nergens bewaard, dus de
+     voorbereiding hieronder draait de tegenhanger met een lijf dat het
+     onderwerp niet aanwijst: een annulering zonder ref, een verwijdering zonder
+     id. 404, en wat de opwarming maakte blijft liggen. Bij de meeste paren valt
+     dat niet op omdat de heenweg een tweede keer gewoon iets nieuws maakt. Het
+     valt wel op zodra het onderwerp SCHAARS is: /api/care/boek bezet een
+     behandelaar op een tijdslot en krijgt in de meetronde 409 "Dat tijdslot is
+     al bezet" -- van zijn eigen opwarmronde. Dat paar staat daarom op
+     `nietBeproefd`, en die uitslag is eerlijk: de proef kwam er niet bij.
 
-     HET ANTWOORD VAN DE OPRUIMING TELT NIET MEE, en dat is de hele reden dat
-     dit een aparte stap is. De eerste poging gaf de opwarmsleutels aan de
-     gewone voorbereiding. Die ruimde toen wel netjes op -- maar zij MERGET het
-     antwoord van de tegenhanger in `uitVoorbereiding`, en dat object voedt ook
-     `heenLijf()`. Een geslaagde verwijdering antwoordt met het id van wat zij
-     net WEGHAALDE, dus de meetronde riep /api/samen/maak aan met een dood id en
-     maakte niets meer. Vier paren zakten van `exact` en `compensatie` naar
-     `nietBeproefd` terwijl er vier verbeterden -- netto nul, met schade.
+     WAAROM HET HIER NIET GEREPAREERD IS, en dat is een besluit en geen
+     nalatigheid. Drie pogingen om de opwarming te laten opruimen zijn alle drie
+     door de volle ronde tegen de vorige uitslag afgekeurd:
 
-     Een sleutel die de OPRUIMING aanwijst, mag de METING niet sturen. Daarom
-     wordt hier alleen opgeruimd en wordt het antwoord weggegooid; de
-     voorbereiding eronder loopt daarna onveranderd, precies zoals voor deze
-     verandering. */
-  await roep(srv.basis, paar.terug, token,
-    lijfVoor(paar.terug, Object.assign({}, uitVoorbereiding, sleutelsUit(opwarm.data))));
-  await stilBeeld(srv.datamap, voorOpwarming);
+       1 opwarmsleutels in `uitVoorbereiding`  -> 4 beter, 5 slechter
+         (dat object voedt ook heenLijf(), dus /api/samen/maak kreeg een oud id)
+       2 sleutels alleen naar de tegenhanger   -> 4 beter, 4 slechter
+         (de voorbereiding merget het antwoord van de tegenhanger alsnog, en een
+          geslaagde verwijdering antwoordt met het id van wat zij WEGHAALDE)
+       3 opruimen als aparte stap              -> 5 beter, 6 slechter, en de
+         uitslagen werden bovendien onstabiel tussen rondes (ordeAfhankelijk 3->4)
+
+     Drie pogingen met drie verschillende schadepatronen zeggen niet dat er een
+     vierde nodig is; ze zeggen dat een extra mutatie tussen de opwarming en de
+     meting de nulstand verschuift die deze proef juist probeert vast te houden.
+     Een reparatie die vier paren wint en er vier sloopt is netto nul met
+     schade, en een register waarin dat wordt vastgelegd is erger dan een
+     register dat het gat eerlijk benoemt.
+
+     Wat het WEL zou vragen is een tweede verse server per paar in plaats van
+     een opruimoproep -- dan is er geen restant om op te ruimen. Dat is een
+     grotere ingreep met een eigen prijs (de volle ronde duurt dan een
+     veelvoud), en dus een besluit van de eigenaar en geen bijvangst. */
   /* NOG EEN KEER, want de opwarmronde heeft het onderwerp opgebruikt: bij een
      verwijder -> maak-paar staat er na de opwarming weer niets. De nulstand
      hoort de wereld te zijn waarin de heenweg IETS kan doen. */

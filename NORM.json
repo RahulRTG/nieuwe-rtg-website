@@ -6,7 +6,7 @@
     "keuringStuk": 0,
     "keuringScheef": 16,
     "dependencies": 0,
-    "testbestanden": 1502,
+    "testbestanden": 1503,
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 28,
     "e2eBestanden": 204,
@@ -41,7 +41,7 @@
     "bronBlindeBestanden": 3,
     "delenZonderOnderwerp": 0,
     "beweringenZonderVulcontrole": 100,
-    "bewijsCellenBewezen": 26447,
+    "bewijsCellenBewezen": 26449,
     "bewijsAchterstand": 2291,
     "schermenZonderVormtaal": 185,
     "dbDeuren": 524,
@@ -61,7 +61,7 @@
     "registersUitVuileBoom": 3,
     "laatSpoorVerdacht": 3,
     "rollbackUitzonderingen": 1,
-    "faalproefGezakt": 26
+    "faalproefGezakt": 24
   },
   "notities": [
     {

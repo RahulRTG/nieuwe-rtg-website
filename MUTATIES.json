@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-03T15:30:26.401Z",
-    "commit": "1bf48fd8",
+    "op": "2026-09-06T14:50:25.727Z",
+    "commit": "a799a0c5",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -119,6 +119,14 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 2
+    },
+    "afbouwpoort.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/afbouw-slot.js",
+      "operator": "===->!==#3",
+      "gezakt": 3,
+      "geprobeerd": 17
     },
     "afleidbaar.test.js": {
       "soort": "puur",
@@ -1656,6 +1664,14 @@
       "staat": "al rood",
       "gezakteZonderMutatie": 2
     },
+    "faalproefvorm.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/bewijsmatrix.js",
+      "operator": "===->!==#3",
+      "gezakt": 1,
+      "geprobeerd": 16
+    },
     "facturatie.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -2545,6 +2561,14 @@
       "gezakt": 7,
       "scherp": "gezakt"
     },
+    "huisdb.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/huisdb.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "huisstijl.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -3108,6 +3132,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 3,
       "scherp": "gezakt"
+    },
+    "leeszonderscheppen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/algpin.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 2
     },
     "leren-leden.test.js": {
       "soort": "server",
@@ -5216,6 +5248,13 @@
       "gezakt": 6,
       "geprobeerd": 1
     },
+    "remduurzaam.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
+      "scherp": "gezakt"
+    },
     "rendezvous.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -7195,6 +7234,14 @@
       "gezakt": 4,
       "geprobeerd": 1
     },
+    "verraadfase.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/verraadfase.js",
+      "operator": "false->true#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "verraadtelling.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -7217,6 +7264,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 3,
       "scherp": "gezakt"
+    },
+    "vertrouwenbronnen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/vertrouwen.js",
+      "operator": "-->+#0",
+      "gezakt": 1,
+      "geprobeerd": 5
     },
     "verzadiging.test.js": {
       "soort": "puur",

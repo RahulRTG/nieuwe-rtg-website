@@ -81,4 +81,73 @@ function pak(taak) {
   throw new Error('Het exclusieve afbouwslot kon niet veilig worden verkregen.');
 }
 
-module.exports = { pak, procesLeeft, procesStart, eigenaarLeeft };
+/* KIJKEN OF ER EEN AFBOUW LOOPT, ZONDER HET SLOT TE PAKKEN.
+
+   pak() is exclusief en gooit als een ander hem heeft. Dat is goed voor een
+   motor die de bron muteert, en verkeerd voor een LEZER: twee metingen mogen
+   prima naast elkaar draaien. Wat niet mag, is naast een motor die met opzet
+   bestanden neerzet en weghaalt.
+
+   DAT IS HIER ECHT MISGEGAAN, twee keer op een dag. test/meterijk.test.js zet
+   tijdens zijn ijking een tijdelijk scherm onder public/apps/ neer, een
+   pakketregel met diezelfde naam in package.json, en honderd proefroutes in
+   server/routes/klok.js. (Die naam staat hier niet voluit: keuringsregel 36
+   grep't de rauwe bron op de ijknaam en kan commentaar niet van code
+   onderscheiden, en de regel weigert met reden een uitzonderingslijst. Alleen
+   test/meterijk.test.js mag hem noemen, want daar wordt hij gemaakt.) -- allemaal om te bewijzen dat de tellers bewegen, en
+   allemaal netjes teruggezet in een finally. Maar wie er middenin meet, meet
+   die aanbouw mee. scripts/kaart.js telde het extra scherm en schreef het in
+   ARCHITECTUUR.md; CI zag daarna een document dat achterliep op de code.
+
+   `eisSchoneBoom` vangt dit maar bij toeval: git ziet de aanbouw wel, maar een
+   meting die START in een schoon venster en er middenin belandt, komt er
+   gewoon langs. Deze controle is deterministisch. */
+function actief() {
+  const huidig = leesEigenaar();
+  return eigenaarLeeft(huidig) ? huidig : null;
+}
+
+/* DE POORT ZELF, zodat de drie families hem niet elk overschrijven. Geeft een
+   REDEN terug en niet alleen een ja/nee: wie geweigerd wordt, hoort te zien
+   welke motor draait en sinds wanneer, anders lijkt het op een storing.
+
+   De ontsnapping (RTG_METEN_TIJDENS_AFBOUW=1) hoort bij een harde poort, en
+   mag hier alleen omdat zo'n ronde daarmee zelf zegt dat hij niet als bewijs
+   telt -- dezelfde afspraak als RTG_METEN_OP_VUILE_BOOM in lib/stempel.js. */
+function eisGeenAfbouw(naam, lees) {
+  if (process.env.RTG_METEN_TIJDENS_AFBOUW === '1') {
+    return { ok: true, reden: 'toegestaan met RTG_METEN_TIJDENS_AFBOUW=1; deze uitslag telt niet als bewijs' };
+  }
+  /* HET SLOT VAN JE EIGEN OUDER IS GEEN VREEMDE MOTOR, en dat onderscheid hoort
+     hier omdat het slot twee dingen tegelijk betekent: "ik verbouw de bron" en
+     "ik wil exclusiviteit". scripts/test-runner.js pakt het voor het tweede --
+     de suite verbouwt niets -- en geeft RTG_AFBOUW_SLOT_ACTIEF=1 door aan elk
+     kindproces, dezelfde vlag die pak() al kent.
+
+     ZONDER DEZE REGEL WEIGERT DE POORT BINNEN ELKE TOETS. Dat is precies wat er
+     gebeurde toen hij erbij kwam: test/functielijst.test.js viel om met
+     exitCode 2 (scripts/functielijst.js doet process.exit(2) op een weigering)
+     en test/schoneboom.test.js zakte twee keer, want eisSchoneBoom gaf een
+     weigering terug zonder `bestanden` en met een reden die zijn eigen
+     ontsnapping RTG_METEN_OP_VUILE_BOOM niet noemt. Een poort die het gevraagde
+     vermogen verbergt is een gebrek en geen veiligheid.
+
+     WAT DIT NIET WEGGEEFT: binnen een suite raakt alleen een IJKING de bron aan,
+     en scripts/lib/ijkingen.js draait die een voor een -- in CI zelfs elk in een
+     eigen job. Die isolatie is daar de bescherming. Deze poort gaat over een
+     motor in een ANDERE proceslijn: een shell die kaart.js draait naast een
+     lopende meterijking, het geval waarvoor hij is gebouwd. */
+  if (process.env.RTG_AFBOUW_SLOT_ACTIEF === '1') {
+    return { ok: true, reden: 'het slot is van de eigen proceslijn (RTG_AFBOUW_SLOT_ACTIEF=1); ' +
+      'de ouder die het pakte is verantwoordelijk, niet deze aanroep' };
+  }
+  const bezig = (lees || actief)();
+  if (!bezig) return { ok: true, reden: 'er loopt geen afbouw' };
+  return { ok: false, afbouw: bezig,
+    reden: (naam || 'deze meting') + ' kan niet draaien terwijl er een afbouw loopt: ' +
+      (bezig.taak || 'onbekende taak') + ' (PID ' + bezig.pid + ', gestart ' +
+      (bezig.gestart || 'onbekend') + '). Die motor zet met opzet bestanden neer en haalt ze ' +
+      'weer weg; een meting ernaast telt die aanbouw mee. Wacht tot hij klaar is.' };
+}
+
+module.exports = { pak, actief, eisGeenAfbouw, procesLeeft, procesStart, eigenaarLeeft };

@@ -42,6 +42,12 @@ function maakRtfBieb({ db, save }) {
     if (!Array.isArray(alle[handle])) alle[handle] = [];
     return alle[handle];
   };
+  /* Lezen zonder scheppen (kijk() in kern/eigencollectie.js): een handle zonder
+     installaties blijft afwezig. Alleen installeer() schept. */
+  const rijLees = (handle) => {
+    const r = eigen.kijk('rtfAppInstallaties')[handle];
+    return Array.isArray(r) ? r : [];
+  };
   const magZien = (groep, doelgroep) => (ZICHT[groep] || ZICHT.kind).includes(doelgroep);
   const appVan = (id) => OP_ID.get(String(id || '')) || null;
   const zichtbaar = (groep) => APPS.filter(a => magZien(groep, a.doelgroep));
@@ -77,14 +83,14 @@ function maakRtfBieb({ db, save }) {
   }
 
   function verwijder(handle, id) {
-    const mijn = rij(handle);
+    const mijn = rijLees(handle);
     const ix = mijn.indexOf(String(id || ''));
     if (ix < 0) return { status: 404, error: 'Deze app staat niet bij jouw apps.' };
     mijn.splice(ix, 1); save();
     return { status: 200, ok: true, aantal: mijn.length };
   }
 
-  const mijnApps = (handle) => rij(handle).map(appVan).filter(Boolean);
+  const mijnApps = (handle) => rijLees(handle).map(appVan).filter(Boolean);
 
   return { rtfbieb: { overzicht, catalogus, installeer, verwijder, mijnApps, appVan, magZien, zichtbaar, TOTAAL } };
 }

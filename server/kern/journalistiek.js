@@ -28,6 +28,10 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, claude }) => {
     }
     return alles[code];
   }
+  // lezen zonder scheppen (kern/eigencollectie.js): /api/krant/* is publiek,
+  // dus een onbekende code mag geen redactie laten ontstaan. Bij afwezigheid
+  // NULL en geen verse schil -- wie daarin duwt, schrijft in het niets.
+  const lees = code => eigen.kijk('redacties')[code] || null;
 
   /* ---- blok-schoonmaak (gedeelde bloktaal met de Website-studio); de
      schoonmakers zelf staan in ./journalistiek-blokken.js ---- */
@@ -47,7 +51,8 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, claude }) => {
 
   /* ---- rubrieken ---- */
   function rubriekBewaar(code, naam) {
-    const r = ruimte(code); const n = scho(naam, 40); if (!n) return { error: 'Geef een naam.', status: 400 };
+    const n = scho(naam, 40); if (!n) return { error: 'Geef een naam.', status: 400 };
+    const r = ruimte(code);
     if (!r.rubrieken.includes(n)) r.rubrieken.unshift(n); r.rubrieken = r.rubrieken.slice(0, 24); save();
     return { ok: true, rubrieken: r.rubrieken };
   }
@@ -79,13 +84,13 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, claude }) => {
     save(); return { ok: true, artikel: a };
   }
   function publiceer(code, artId, actor) {
-    const r = ruimte(code); const a = r.artikelen.find(x => x.id === scho(artId, 20));
+    const r = lees(code); const a = r && r.artikelen.find(x => x.id === scho(artId, 20));
     if (!a) return { error: 'Artikel niet gevonden.', status: 404 };
     a.status = 'live'; a.bij = nu(); a.gepubliceerd = nu(); save();
     return { ok: true, artikel: a };
   }
   function naarConcept(code, artId) {
-    const r = ruimte(code); const a = r.artikelen.find(x => x.id === scho(artId, 20));
+    const r = lees(code); const a = r && r.artikelen.find(x => x.id === scho(artId, 20));
     if (!a) return { error: 'Artikel niet gevonden.', status: 404 };
     a.status = 'concept'; a.bij = nu(); save(); return { ok: true, artikel: a };
   }
@@ -126,33 +131,14 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, claude }) => {
     return { lijst: lijst.slice(0, 200).map(kortArt) };
   }
   function artikelVol(code, artId) {
-    const r = ruimte(code); const a = r.artikelen.find(x => x.id === scho(artId, 20));
+    const r = lees(code); const a = r && r.artikelen.find(x => x.id === scho(artId, 20));
     return a || null;
   }
 
-  /* ---- publiek: de krant lezen ---- */
-  function krantGids() {
-    const alles = eigen.bak('redacties');
-    return Object.keys(alles).map(code => {
-      const r = alles[code]; const live = r.artikelen.filter(a => a.status === 'live');
-      return { code, naam: r.huisstijl.naam, payoff: r.huisstijl.payoff, accent: r.huisstijl.accent, artikelen: live.length };
-    }).filter(x => x.artikelen > 0).sort((a, b) => b.artikelen - a.artikelen).slice(0, 200);
-  }
-  function krant(code) {
-    const r = eigen.bak('redacties')[code];
-    if (!r) return { error: 'Geen krant op dit adres.', status: 404 };
-    const live = r.artikelen.filter(a => a.status === 'live')
-      .sort((a, b) => String(b.gepubliceerd || b.bij).localeCompare(String(a.gepubliceerd || a.bij)));
-    return { ok: true, huisstijl: r.huisstijl, site: r.site, rubrieken: r.rubrieken, artikelen: live.map(kortArt) };
-  }
-  function leesArtikel(code, artId) {
-    const r = eigen.bak('redacties')[code];
-    if (!r) return { error: 'Geen krant op dit adres.', status: 404 };
-    const a = r.artikelen.find(x => x.id === scho(artId, 20) && x.status === 'live');
-    if (!a) return { error: 'Artikel niet gevonden.', status: 404 };
-    a.gelezen = (a.gelezen || 0) + 1; save();
-    return { ok: true, artikel: { id: a.id, titel: a.titel, chapo: a.chapo, inhoud: a.inhoud, rubriek: a.rubriek, beeld: a.beeld || '', auteur: a.auteur, bij: a.gepubliceerd || a.bij, naam: r.huisstijl.naam, accent: r.huisstijl.accent, thema: r.huisstijl.thema } };
-  }
+  /* De publieke kant -- de krant zoals een bezoeker hem ziet -- woont in
+     ./journalistiek-krant.js: andere lezer, andere deur naar de opslag. */
+  const publiek = require('./journalistiek-krant')({
+    lees, kijk: () => eigen.kijk('redacties'), save, scho, kortArt });
 
   /* ---- redactie-assistent (regelgestuurd; met sleutel scherper) ---- */
   function chapoVoorstel(inhoud) {
@@ -182,6 +168,7 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, claude }) => {
   return {
     ruimte, staat, artikelen, artikelVol, bewaarArtikel, publiceer, naarConcept, verwijderArtikel, snel,
     rubriekBewaar, rubriekWeg, huisstijlBewaar, siteBewaar,
-    krantGids, krant, leesArtikel, assist, TYPES
+    krantGids: publiek.krantGids, krant: publiek.krant, leesArtikel: publiek.leesArtikel,
+    assist, TYPES
   };
 };

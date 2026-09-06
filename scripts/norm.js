@@ -435,7 +435,18 @@ const METERS = [
      op dit register en niet "het aantal besluiten", want dan zou uitzonderingen
      toevoegen de meter juist beter maken. */
   { sleutel: 'laatSpoorVerdacht', richting: 'omlaag', wat: 'schrijfroutes die de opslag aanraken voordat ze de invoer keuren (scripts/laatspoor.js)' },
-  { sleutel: 'rollbackUitzonderingen', richting: 'omlaag', wat: 'routes die met een BESLUIT een spoor mogen nalaten na een weigering (ROLLBACKBESLUIT.json)' }
+  { sleutel: 'rollbackUitzonderingen', richting: 'omlaag', wat: 'routes die met een BESLUIT een spoor mogen nalaten na een weigering (ROLLBACKBESLUIT.json)' },
+  /* `faalproefGezakt` telt de routes die onder een liegende schijf een 200 gaven
+     terwijl de schrijfactie verloren ging (scripts/faalproef.js). Geen fout,
+     geen melding, en de gegevens weg -- dat is de duurste vorm van falen die dit
+     huis kan meten, en het getal mag alleen omlaag.
+
+     ALLEEN DE GEZAKTE EN NIET DE BEWEZENE. `bewezen` zou als tweede meter
+     verleidelijk zijn, maar dat getal stijgt ook als er meer routes duurzaam
+     gaan schrijven -- dan meet hij groei en geen kwaliteit. Dezelfde les als bij
+     toetsenOngevoeligPct hierboven: een meter die stijgt van gewoon werk, leert
+     iedereen hem te negeren. */
+  { sleutel: 'faalproefGezakt', richting: 'omlaag', wat: 'routes die een schrijfactie bevestigden die verloren ging (FAALPROEF.json)' }
 ];
 
 /* De telling zelf, als losse functie met de bestandslijst als invoer -- zodat
@@ -1112,7 +1123,8 @@ function meet(bronnen) {
        register dat er morgen bijkomt, telt vanzelf mee. */
     registersUitVuileBoom: vuileRegisters(WORTEL).length,
     laatSpoorVerdacht: leesRegister('LAATSPOOR.json', (j) => j.gemeten.verdacht),
-    rollbackUitzonderingen: leesRegister('ROLLBACKBESLUIT.json', (j) => Object.keys(j.routes || {}).length)
+    rollbackUitzonderingen: leesRegister('ROLLBACKBESLUIT.json', (j) => Object.keys(j.routes || {}).length),
+    faalproefGezakt: leesRegister('FAALPROEF.json', (j) => j.gemeten.gezakt)
   };
 }
 

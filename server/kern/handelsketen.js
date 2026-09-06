@@ -41,7 +41,10 @@ function maakHandelsketen({ db, save, crypto, findSupplier, notifySupplier, sseT
   function store() {
     return eigen.bak('handel');
   }
-  function vind(id) { return store().find(h => h.id === String(id || '')); }
+  // lezen zonder scheppen (kijk() in kern/eigencollectie.js); store() blijft
+  // bak(): ./handelsketen/ingangen.js duwt daar de nieuwe handel in.
+  const lees = () => eigen.kijk('handel');
+  function vind(id) { return lees().find(h => h.id === String(id || '')); }
   function zaakInfo(s) { return { code: s.code, naam: s.name }; }
   function genreLabel(genre) {
     const t = (db.data.supplierTypes || {})[genre];
@@ -194,7 +197,7 @@ function maakHandelsketen({ db, save, crypto, findSupplier, notifySupplier, sseT
     return { handel: publiek(h, s) };
   }
 
-  const mijn = (s) => overzicht(store(), db.data.supplierTypes || {}, s);
+  const mijn = (s) => overzicht(lees(), db.data.supplierTypes || {}, s);
 
   /* De twee INGANGEN van de keten -- een aanvraag bij een heel genre, of een
      rechtstreekse bestelling bij een bekende zaak -- staan samen in een eigen

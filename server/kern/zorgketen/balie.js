@@ -4,7 +4,8 @@
    (met een vrije aanduiding, nooit kluisdata), oproepen naar een kamer, klaar. Krijgt
    de gedeelde ctx van kern/zorgketen/index.js. */
 module.exports = (ctx) => {
-  const { crypto, save, nu, schoon, soortVan, afspraakRij, receptieRij, AGENDAS, SPREEKKAMERS } = ctx;
+  const { crypto, save, nu, schoon, soortVan, afspraakRij, receptieRij,
+    afspraakRijLees, receptieRijLees, AGENDAS, SPREEKKAMERS } = ctx;
 
   /* ---------- afspraken: specialist en beauty medical ---------- */
   function afspraakMaak(code, b) {
@@ -22,7 +23,8 @@ module.exports = (ctx) => {
     return { ok: true, afspraak: a };
   }
   function afspraakZet(code, id, status) {
-    const a = afspraakRij(code).find(x => x.id === id);
+    /* LEZEN, niet materialiseren: hieronder volgt mogelijk een 404. */
+    const a = afspraakRijLees(code).find(x => x.id === id);
     if (!a) return { status: 404, error: 'Deze afspraak staat niet in de agenda.' };
     if (!['afgerond', 'geannuleerd', 'gepland'].includes(status)) return { status: 400, error: 'Kies gepland, afgerond of geannuleerd.' };
     a.status = status;
@@ -45,7 +47,7 @@ module.exports = (ctx) => {
     return { ok: true, bezoek: r };
   }
   function receptieRoep(code, id, kamer) {
-    const r = receptieRij(code).find(x => x.id === id);
+    const r = receptieRijLees(code).find(x => x.id === id);
     if (!r) return { status: 404, error: 'Dit bezoek staat niet in de wachtkamer.' };
     r.status = 'opgeroepen';
     r.kamer = schoon(kamer, 30) || 'spreekkamer';
@@ -53,7 +55,7 @@ module.exports = (ctx) => {
     return { ok: true, bezoek: r };
   }
   function receptieKlaar(code, id) {
-    const r = receptieRij(code).find(x => x.id === id);
+    const r = receptieRijLees(code).find(x => x.id === id);
     if (!r) return { status: 404, error: 'Dit bezoek staat niet in de wachtkamer.' };
     r.status = 'klaar';
     save();

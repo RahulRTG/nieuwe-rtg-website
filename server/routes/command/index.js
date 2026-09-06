@@ -25,8 +25,16 @@ module.exports = (kern) => {
   const { app, officeAuth, boardroomWie, command, apiSpoor } = kern;
 
   const stuur = (res, r) => (r && r.error) ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
-  const veilig = (res, werk) => {
-    try { stuur(res, werk()); }
+  /* HIJ WACHT HET WERK AF, en dat is geen kleinigheid. Zonder `await` stuurt
+     een async handler hier zijn PROMISE naar res.json(), en die serialiseert
+     naar `{}` met een keurige 200 -- precies de fout waar
+     test/notitiesduurzaam.test.js voor waarschuwt. Zolang geen enkele
+     command-route iets afwachtte viel dat niet op; met de duurzame uitrolpauze
+     wel. Een synchrone `werk` verandert er niets door (await op een gewone
+     waarde), en alle 104 aanroepers hebben de vorm `=> veilig(res, ...)`, dus
+     er staat nergens code NA deze aanroep die nu eerder zou lopen. */
+  const veilig = async (res, werk) => {
+    try { stuur(res, await werk()); }
     catch (e) { console.error('[command]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
   };
   const wie = (req) => boardroomWie(req) || 'kantoor (gedeelde code)';

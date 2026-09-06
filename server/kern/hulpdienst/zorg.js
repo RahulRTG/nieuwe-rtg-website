@@ -3,7 +3,7 @@
    ontslaat) en de huisarts (consulten met urgentie, doorverwijzen naar het
    ziekenhuis). Krijgt de gedeelde ctx van kern/hulpdienst/index.js. */
 module.exports = (ctx) => {
-  const { crypto, save, nu, schoonTekst, findSupplier, bak, consultenVan } = ctx;
+  const { crypto, save, nu, schoonTekst, findSupplier, bak, consultenVan, consultenLees, opnamesLees } = ctx;
 
   /* ---------- ziekenhuis: bedden en opnames ---------- */
   function beddenZet(code, totaal) {
@@ -30,7 +30,7 @@ module.exports = (ctx) => {
     return { ok: true, opname: o, waarschuwing: o.vol ? 'Let op: het beddenbord staat op vol; het ziekenhuis beslist bij aankomst.' : null };
   }
   function opnameZet(code, id, status) {
-    const o = bak().opnames.find(x => x.id === id && x.ziekenhuis === code);
+    const o = opnamesLees().find(x => x.id === id && x.ziekenhuis === code);
     if (!o) return { status: 404, error: 'Deze opname staat niet op uw bord.' };
     if (!['opgenomen', 'ontslagen', 'geweigerd'].includes(status)) return { status: 400, error: 'Kies opgenomen, ontslagen of geweigerd.' };
     const bed = bak().bedden[code] = bak().bedden[code] || { totaal: 0, bezet: 0 };
@@ -75,7 +75,7 @@ module.exports = (ctx) => {
     return { ok: true, consult: c };
   }
   function consultZet(code, id, status) {
-    const c = consultenVan(code).find(x => x.id === id);
+    const c = consultenLees(code).find(x => x.id === id);
     if (!c) return { status: 404, error: 'Dit consult staat niet in de agenda.' };
     if (!['afgerond', 'verwezen', 'gepland'].includes(status)) return { status: 400, error: 'Kies gepland, afgerond of verwezen.' };
     c.status = status;

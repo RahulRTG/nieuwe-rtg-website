@@ -24,7 +24,8 @@ module.exports = ctx => {
   const { db, save, crypto, schoon } = ctx;
   const nu = () => klokDatum().toISOString();
   const eigen = require('../eigencollectie')({ db, domein: 'kern/ov/operatie', bezit: { ovOperaties: 'lijst' } });
-  const voor = key => eigen.bak('ovOperaties').filter(o => o.key === key);
+  // lezen zonder scheppen -- zie kijk() in kern/eigencollectie.js
+  const voor = key => eigen.kijk('ovOperaties').filter(o => o.key === key);
   const beeld = o => ({ id: o.id, naam: o.naam, status: o.status, van: o.van, naar: o.naar, vertrek: o.vertrek,
     aangemaakt: o.aangemaakt, geactiveerd: o.geactiveerd || null, personen: o.personen, rollen: o.rollen,
     segmenten: o.segmenten, privacy: o.privacy, veiligheid: o.veiligheid });

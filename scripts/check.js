@@ -3323,7 +3323,14 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
     ['server/kern/agenda-pro.js', 'schrijft in dezelfde agenda en doet dus dezelfde belofte'],
     ['server/kern/bestanden.js', 'werk van een lid: de bytes staan al duurzaam, de verwijzing ernaartoe nu ook'],
     ['server/kern/berichten/index.js', 'werk van een lid: een weggezet gesprek hoort niet terug te komen'],
-    ['server/kern/vergeten.js', 'AVG-wissing: verwijderd mag pas worden bevestigd nadat de opslag het vastlegt']
+    ['server/kern/vergeten.js', 'AVG-wissing: verwijderd mag pas worden bevestigd nadat de opslag het vastlegt'],
+    /* HET DERDE BEEN UIT GELDLAT.md (6 september 2026): een rem die een mens
+       overhaalt. Het criterium is smal en staat daar uitgeschreven -- iets
+       STOPPEN, en de bevestiging doet de mens geloven dat hij weg kan lopen.
+       Allebei gemeten in FAALPROEF.json als `schrijf-verloren` -> 200. */
+    ['server/kern/afdelingen/integratiekamer.js', 'de noodstop: wie elke koppeling uitzet en `noodstop: true` leest, hoort dat na een herstart terug te vinden'],
+    ['server/kern/command/lagen.js', 'bedraadt de duurzame helper voor de uitrolpauze; kiest zelf niets'],
+    ['server/kern/command/uitrolregie.js', 'de uitrolpauze: een uitrol die als `stil` is bevestigd, mag niet doorlopen na een herstart']
   ]);
   /* Het BEREIK van de primitive: de naam zelf, de vlag waarmee een bundel
      duurzaam wordt, en de gedeelde helper. Zonder die laatste twee bewaakt deze

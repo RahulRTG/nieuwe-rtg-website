@@ -4,7 +4,7 @@
    en bijstand vragen aan een ander korps (special forces alleen via de politie).
    Krijgt de gedeelde ctx van kern/hulpdienst/index.js. */
 module.exports = (ctx) => {
-  const { crypto, save, nu, schoonTekst, findSupplier, isHulp, eenhedenVan, meldingVan, logboek, bak,
+  const { crypto, save, nu, schoonTekst, findSupplier, isHulp, eenhedenVan, eenhedenLees, meldingVan, logboek, bak,
     EENHEID_SOORTEN, PRIOS } = ctx;
 
   /* ---------- eenheden: land, water, lucht en de heli ---------- */
@@ -20,7 +20,7 @@ module.exports = (ctx) => {
     return { ok: true, eenheid: e };
   }
   function eenheidZet(code, id, status) {
-    const e = eenhedenVan(code).find(x => x.id === id);
+    const e = eenhedenLees(code).find(x => x.id === id);
     if (!e) return { status: 404, error: 'Deze eenheid staat niet op het bord.' };
     if (!['vrij', 'buiten-dienst'].includes(status)) return { status: 400, error: 'Handmatig kan alleen vrij of buiten-dienst; de rest volgt de melding.' };
     /* "De rest volgt de melding" stond er wel, maar werd niet afgedwongen: een
@@ -58,7 +58,7 @@ module.exports = (ctx) => {
     const m = meldingVan(code, meldingId);
     if (!m) return { status: 404, error: 'Deze melding staat niet op uw bord.' };
     if (m.status === 'afgerond') return { status: 409, error: 'Deze melding is al afgerond.' };
-    const e = eenhedenVan(code).find(x => x.id === eenheidId);
+    const e = eenhedenLees(code).find(x => x.id === eenheidId);
     if (!e) return { status: 404, error: 'Deze eenheid staat niet op het bord.' };
     if (e.status !== 'vrij') return { status: 409, error: e.naam + ' is niet vrij (' + e.status + ').' };
     e.status = 'onderweg';

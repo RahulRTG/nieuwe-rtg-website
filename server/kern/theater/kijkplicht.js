@@ -39,9 +39,11 @@ module.exports = (ctx) => {
   function tabel() {
     return eigen.bak('theaterKijkplicht');
   }
+  // lezen zonder scheppen -- zie kijk() in kern/eigencollectie.js
+  const lees = () => eigen.kijk('theaterKijkplicht');
   const leidtBij = (key, code) => zakenVan(key).some(z => z.code === code && z.leiding);
   const werktBij = (key, code) => zakenVan(key).some(z => z.code === code);
-  const regelMet = (rid) => tabel().find(r => r.id === String(rid || '')) || null;
+  const regelMet = (rid) => lees().find(r => r.id === String(rid || '')) || null;
 
   /* De video moet bij de INTERNE bibliotheek van diezelfde zaak horen. Een
      openbare video als "verplicht" aanwijzen zou betekenen dat de werkgever
@@ -63,14 +65,14 @@ module.exports = (ctx) => {
     if (o.weg === true) {
       const r = regelMet(o.id);
       if (!r || r.zaakCode !== code) return { status: 404, error: 'Deze regel bestaat niet.' };
-      eigen.zetBak('theaterKijkplicht', tabel().filter(x => x !== r)); save();
+      eigen.zetBak('theaterKijkplicht', lees().filter(x => x !== r)); save();
       return { status: 200, ok: true, lijst: stand(key, code).lijst };
     }
     const v = internVan(code, o.videoId);
     if (!v) return { status: 404, error: 'Kies een video uit de interne bibliotheek van deze zaak.' };
-    if (tabel().some(r => r.zaakCode === code && r.videoId === v.id))
+    if (lees().some(r => r.zaakCode === code && r.videoId === v.id))
       return { status: 409, error: 'Deze video staat er al op.' };
-    if (tabel().filter(r => r.zaakCode === code).length >= MAX_PER_ZAAK)
+    if (lees().filter(r => r.zaakCode === code).length >= MAX_PER_ZAAK)
       return { status: 409, error: 'Meer dan ' + MAX_PER_ZAAK + ' regels wordt een archief, geen lijst.' };
     const uiterlijk = /^\d{4}-\d{2}-\d{2}$/.test(String(o.uiterlijk || '')) ? String(o.uiterlijk) : null;
     tabel().push({ id: id(), zaakCode: code, videoId: v.id, uiterlijk, door: key, at: nu(), gedaan: {} });
@@ -95,7 +97,7 @@ module.exports = (ctx) => {
   function mijn(key) {
     lijsten();
     const codes = new Set(zakenVan(key).map(z => z.code));
-    const rijen = tabel().filter(r => codes.has(r.zaakCode)).map(r => {
+    const rijen = lees().filter(r => codes.has(r.zaakCode)).map(r => {
       const v = videoMet(r.videoId);
       const zaak = zakenVan(key).find(z => z.code === r.zaakCode);
       return { id: r.id, zaakCode: r.zaakCode, zaakNaam: (zaak && zaak.naam) || r.zaakCode,
@@ -113,7 +115,7 @@ module.exports = (ctx) => {
     if (!leidtBij(key, code)) return { status: 403, error: 'Alleen de leiding van de zaak ziet deze stand.' };
     lijsten();
     const mensen = personeelVan(code);
-    const lijst = tabel().filter(r => r.zaakCode === code).map(r => {
+    const lijst = lees().filter(r => r.zaakCode === code).map(r => {
       const v = videoMet(r.videoId);
       return { id: r.id, videoId: r.videoId, titel: v ? v.titel : null, weg: !v, uiterlijk: r.uiterlijk, at: r.at,
         mensen: mensen.map(p => ({ naam: p.naam,

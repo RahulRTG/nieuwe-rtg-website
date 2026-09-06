@@ -77,7 +77,9 @@ module.exports = (ctx) => {
     return { status: 200, ok: true, id: potje.id };
   }
   function spelAntwoord(mij, id, akkoord) {
-    const p = S().potjes[id];
+    /* LEZEND opzoeken: hieronder staat een 404, en die hoort de collectie niet
+       aan te leggen. Zie de kop van ./opslag.js bij Slees. */
+    const p = S.lees().potjes[id];
     if (!p || p.status !== 'wacht' || !p.uitgenodigd.includes(mij)) return { status: 404, error: 'Deze uitnodiging is er niet meer.' };
     /* Accepteren is een toetredingsmoment en gaat dus ook langs het beleid --
        maar langs de SMALLERE vraag: de leeftijdspoort geldt, de wereldpoort

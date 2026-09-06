@@ -47,10 +47,12 @@ module.exports = ({ db, save, schoon }) => {
   const eigen = require('./eigencollectie')({ db, domein: 'kern/gemoed', bezit: { gemoed: 'kaart' } });
   const bak = () => eigen.bak('gemoed');
   const rijenVan = key => { const b = bak(); if (!b[key]) b[key] = []; return b[key]; };
+  // lezen zonder scheppen -- zie kijk() in kern/eigencollectie.js
+  const rijenKijk = key => { const r = eigen.kijk('gemoed')[key]; return Array.isArray(r) ? r : []; };
 
   /* Nieuwste eerst; dat is de volgorde die aanhoudendZwaar verwacht en de
      volgorde waarin een scherm het toont. */
-  const recent = (key, n) => rijenVan(key).slice(-n).reverse();
+  const recent = (key, n) => rijenKijk(key).slice(-n).reverse();
 
   function gemoedVan(key, nu = new Date()) {
     const vandaag = dagVan(nu);
@@ -99,7 +101,7 @@ module.exports = ({ db, save, schoon }) => {
   /* Weghalen hoort erbij: wat u opschreef is van u, en van u alleen. */
   function gemoedWeg(key, body, nu = new Date()) {
     const op = /^\d{4}-\d{2}-\d{2}$/.test(String(body.op || '')) ? String(body.op) : dagVan(nu);
-    const rijen = rijenVan(key);
+    const rijen = rijenKijk(key);
     const i = rijen.findIndex(c => c.op === op);
     if (i < 0) return { status: 404, error: 'Voor die dag staat er niets.' };
     rijen.splice(i, 1); save();

@@ -39,6 +39,9 @@ function maakMandaat({ db, save, nu }) {
 
   const eigen = require('../../eigencollectie')({ db, domein: 'kern/fiscaal/gateway/mandaat', bezit: { gatewayMandaten: 'lijst' } });
   const bak = () => eigen.bak('gatewayMandaten');
+  // lezen zonder scheppen -- zie kijk() in kern/eigencollectie.js
+  const lees = () => eigen.kijk('gatewayMandaten');
+
 
   function verleen({ code, soort, van, tot, doorNaam, doorRol, kenmerk }) {
     const zaak = String(code || '').toUpperCase();
@@ -66,7 +69,7 @@ function maakMandaat({ db, save, nu }) {
   }
 
   function trekIn(id, door, reden) {
-    const m = bak().find(x => x.id === id);
+    const m = lees().find(x => x.id === id);
     if (!m) return { status: 404, error: 'Dit mandaat kennen we niet.' };
     if (m.ingetrokkenOp) return { ok: true, ongewijzigd: true, mandaat: m };
     const wie = String(door || '').trim();
@@ -83,7 +86,7 @@ function maakMandaat({ db, save, nu }) {
   function geldt(code, soort, opDatum) {
     const zaak = String(code || '').toUpperCase();
     const d = isDatum(opDatum) ? String(opDatum).slice(0, 10) : vandaag();
-    const alle = bak().filter(m => m.code === zaak && m.soort === soort);
+    const alle = lees().filter(m => m.code === zaak && m.soort === soort);
     if (!alle.length) return { ok: false, reden: 'Er is geen mandaat voor ' + zaak + ' (' + soort + ').' };
     const geldig = alle.find(m => !m.ingetrokkenOp && m.van <= d && (!m.tot || m.tot >= d));
     if (geldig) return { ok: true, mandaat: geldig,
@@ -99,7 +102,7 @@ function maakMandaat({ db, save, nu }) {
     return { ok: false, reden: 'Er geldt op ' + d + ' geen mandaat voor ' + zaak + '.' };
   }
 
-  const vanZaak = (code) => bak().filter(m => m.code === String(code || '').toUpperCase());
+  const vanZaak = (code) => lees().filter(m => m.code === String(code || '').toUpperCase());
 
   return { mandaat: { verleen, trekIn, geldt, vanZaak, SOORTEN } };
 }

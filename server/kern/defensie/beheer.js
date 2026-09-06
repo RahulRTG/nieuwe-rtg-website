@@ -3,7 +3,7 @@
    de oefen-/trainingsagenda. Puur organisatie en logistiek, geen gevechtsfunctie.
    Krijgt de gedeelde ctx van kern/defensie/index.js. */
 module.exports = (ctx) => {
-  const { crypto, save, nu, schoon, bak, PARAAT, MAT_SOORTEN, MAT_STAAT, BEV_SOORTEN, BEV_KETEN } = ctx;
+  const { crypto, save, nu, schoon, bak, kijk, PARAAT, MAT_SOORTEN, MAT_STAAT, BEV_SOORTEN, BEV_KETEN } = ctx;
 
   /* ---------- eenheden en paraatheid ---------- */
   function eenheidMaak(code, b) {
@@ -17,7 +17,7 @@ module.exports = (ctx) => {
     return { ok: true, eenheid: e };
   }
   function paraatZet(code, id, paraat, reden) {
-    const e = bak(code).eenheden.find(x => x.id === id);
+    const e = kijk(code).eenheden.find(x => x.id === id);
     if (!e) return { status: 404, error: 'Deze eenheid staat niet op het bord.' };
     if (!PARAAT.includes(paraat)) return { status: 400, error: 'Kies gevechtsgereed, beperkt, in-onderhoud of niet-inzetbaar.' };
     e.paraat = paraat;
@@ -38,7 +38,7 @@ module.exports = (ctx) => {
     return { ok: true, materieel: m };
   }
   function materieelZet(code, id, staat, notitie) {
-    const m = bak(code).materieel.find(x => x.id === id);
+    const m = kijk(code).materieel.find(x => x.id === id);
     if (!m) return { status: 404, error: 'Dit materieel staat niet in het park.' };
     if (!MAT_STAAT.includes(staat)) return { status: 400, error: 'Kies inzetbaar, in-onderhoud of defect.' };
     m.staat = staat;
@@ -61,7 +61,7 @@ module.exports = (ctx) => {
     return { ok: true, verzoek: v };
   }
   function bevoorradingZet(code, id, status) {
-    const v = bak(code).bevoorrading.find(x => x.id === id);
+    const v = kijk(code).bevoorrading.find(x => x.id === id);
     if (!v) return { status: 404, error: 'Dit verzoek staat niet op het bord.' };
     if (!BEV_KETEN.includes(status)) return { status: 400, error: 'Onbekende status.' };
     v.status = status;
@@ -81,7 +81,7 @@ module.exports = (ctx) => {
     return { ok: true, oefening: o };
   }
   function oefeningZet(code, id, status) {
-    const o = bak(code).oefeningen.find(x => x.id === id);
+    const o = kijk(code).oefeningen.find(x => x.id === id);
     if (!o) return { status: 404, error: 'Deze oefening staat niet in de agenda.' };
     if (!['gepland', 'bezig', 'afgerond', 'afgelast'].includes(status)) return { status: 400, error: 'Onbekende status.' };
     o.status = status;

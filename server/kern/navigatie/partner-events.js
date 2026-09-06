@@ -14,7 +14,9 @@ const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
 
 module.exports = function maakPartnerEvents({ db, save, crypto, haversine }) {
   const eigen = require('../eigencollectie')({ db, domein: 'kern/navigatie/partner-events', bezit: { navPartnerEvents: 'lijst' } });
-  const bak = () => eigen.bak('navPartnerEvents');
+  // lezen zonder scheppen -- zie kijk() in kern/eigencollectie.js; zet() legt
+  // aan via eigen.zetBak, dus bak() is hier verder nergens meer nodig.
+  const kijk = () => eigen.kijk('navPartnerEvents');
   const nuMs = () => Date.now();
   const beeld = e => ({
     id: e.id, soort: e.soort, naam: e.naam, lat: e.lat, lng: e.lng,
@@ -24,8 +26,9 @@ module.exports = function maakPartnerEvents({ db, save, crypto, haversine }) {
 
   function actief() {
     const nu = nuMs();
-    const rij = bak().filter(e => new Date(e.geldigVan).getTime() <= nu && new Date(e.geldigTot).getTime() > nu);
-    if (rij.length !== bak().length) eigen.zetBak('navPartnerEvents', rij);
+    const alle = kijk();
+    const rij = alle.filter(e => new Date(e.geldigVan).getTime() <= nu && new Date(e.geldigTot).getTime() > nu);
+    if (rij.length !== alle.length) eigen.zetBak('navPartnerEvents', rij);
     return rij;
   }
 

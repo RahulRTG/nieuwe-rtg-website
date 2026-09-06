@@ -38,6 +38,10 @@ module.exports = (ctx) => {
   function Z() {
     return eigen.bak('spelZetten');
   }
+  // lezen zonder scheppen -- zie kijk() in kern/eigencollectie.js
+  function Zlees() {
+    return eigen.kijk('spelZetten');
+  }
 
   /* Een geaccepteerde zet vastleggen. Wordt aangeroepen vanuit dezelfde plek
      die de zet doorlaat, dus een zet die geweigerd is komt hier nooit -- een
@@ -61,7 +65,7 @@ module.exports = (ctx) => {
   /* Het verloop van je eigen partij. Alleen wie meespeelde; een kijker of een
      toernooigenoot krijgt hier niets, ook al mocht hij live meekijken. */
   function spelReplay(mij, id) {
-    const r = Z().find(x => x.potje === String(id || ''));
+    const r = Zlees().find(x => x.potje === String(id || ''));
     if (!r || !r.spelers.includes(mij))
       return { status: 404, error: 'Van deze partij is geen verloop (meer).' };
     return {

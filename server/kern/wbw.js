@@ -25,13 +25,15 @@ function maakWbw({ db, save, crypto, schoon, codenaamVan, connectieTussen, verbA
   const nu = () => new Date().toISOString();
   const eigen = require('./eigencollectie')({ db, domein: 'kern/wbw', bezit: { wbwGroepen: 'lijst' } });
 
-  const lijsten = () => eigen.bak('wbwGroepen');
-  const groepMet = gid => lijsten().find(g => g.id === gid) || null;
+  const lijsten = () => eigen.bak('wbwGroepen');   // schrijfpad: alleen maak() duwt hier in
+  // lezen zonder scheppen -- zie kijk() in kern/eigencollectie.js
+  const gelezen = () => eigen.kijk('wbwGroepen');
+  const groepMet = gid => gelezen().find(g => g.id === gid) || null;
   const isLid = (g, key) => (g.leden || []).includes(key);
 
   /* ---- de groep ---- */
   function maak(key, data) {
-    if (lijsten().filter(g => isLid(g, key)).length >= GROEPEN_MAX)
+    if (gelezen().filter(g => isLid(g, key)).length >= GROEPEN_MAX)
       return { status: 409, error: 'Tot ' + GROEPEN_MAX + ' lijstjes per lid.' };
     const naam = schoon(data.naam, 40); if (!naam) return { status: 400, error: 'Geef het lijstje een naam.' };
     const leden = [key];
@@ -139,7 +141,7 @@ function maakWbw({ db, save, crypto, schoon, codenaamVan, connectieTussen, verbA
       mijnSaldo: saldo[key] || 0, at: g.at };
   }
   function mijn(key) {
-    const rijen = lijsten().filter(g => isLid(g, key));
+    const rijen = gelezen().filter(g => isLid(g, key));
     return { status: 200, groepen: rijen.map(g => {
       const saldo = balansVan(g);
       return { id: g.id, naam: g.naam, leden: g.leden.length, mijnSaldo: saldo[key] || 0, at: g.at };

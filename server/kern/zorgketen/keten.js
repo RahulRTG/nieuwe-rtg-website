@@ -5,7 +5,7 @@
    specialist of beauty medical. Krijgt de gedeelde ctx van kern/zorgketen/index.js. */
 module.exports = (ctx) => {
   const { crypto, save, nu, schoon, bak, soortVan, sehRij, findSupplier,
-    VOORSCHRIJVERS, VERWIJZERS, AGENDAS, TRIAGE, persoonMag } = ctx;
+    VOORSCHRIJVERS, VERWIJZERS, AGENDAS, TRIAGE, persoonMag, sehRijLees } = ctx;
 
   /* ---------- recepten: voorschrijven en uitreiken ----------
 
@@ -62,7 +62,7 @@ module.exports = (ctx) => {
   }
   function sehZet(code, id, status) {
     if (soortVan(code) !== 'ziekenhuis') return { status: 403, error: 'Alleen het ziekenhuis heeft een eerste hulp.' };
-    const e = sehRij(code).find(x => x.id === id);
+    const e = sehRijLees(code).find(x => x.id === id);
     if (!e) return { status: 404, error: 'Deze patient staat niet in de rij.' };
     if (!['in-behandeling', 'opgenomen', 'naar-huis'].includes(status)) return { status: 400, error: 'Kies in-behandeling, opgenomen of naar-huis.' };
     e.status = status;

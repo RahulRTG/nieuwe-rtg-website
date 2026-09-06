@@ -30,11 +30,15 @@ function maakSmaak({ db, save, schoon }) {
   function tabel() {
     return eigen.bak('mediaSmaak');
   }
+  // lezen zonder scheppen -- zie kijk() in kern/eigencollectie.js
+  function lees() {
+    return eigen.kijk('mediaSmaak');
+  }
   function leeg() {
     return { makers: {}, onderwerpen: {}, nooitMakers: [], nooitOnderwerpen: [], verras: false, at: null };
   }
   function van(key) {
-    const t = tabel();
+    const t = lees();
     const s = t[key] && typeof t[key] === 'object' ? t[key] : leeg();
     // altijd een volledige vorm terug, ook als er ooit iets half is opgeslagen
     return Object.assign(leeg(), s, {
@@ -52,7 +56,6 @@ function maakSmaak({ db, save, schoon }) {
     const richting = String(o.richting || '');
     if (!RICHTINGEN.includes(richting) && richting !== 'verras')
       return { status: 400, error: 'Kies: meer, minder, nooit, verras of reset.' };
-    const t = tabel();
     const s = van(key);
     const maker = schoon(o.maker, 60) || '';
     const onderwerp = schoon(o.onderwerp, 40) || '';
@@ -60,6 +63,7 @@ function maakSmaak({ db, save, schoon }) {
     if (richting === 'verras') {
       s.verras = o.aan !== false;
     } else if (richting === 'reset' && !maker && !onderwerp) {
+      const t = tabel();
       t[key] = leeg(); t[key].at = nu(); save();
       return { status: 200, ok: true, smaak: t[key], gedaan: 'Uw hele smaakprofiel is gewist.' };
     } else {
@@ -74,7 +78,7 @@ function maakSmaak({ db, save, schoon }) {
       else delete s[veld][naam];
     }
     s.at = nu();
-    t[key] = s; save();
+    tabel()[key] = s; save();
     return { status: 200, ok: true, smaak: s,
       gedaan: uitlegVanZet(richting, maker || onderwerp) };
   }

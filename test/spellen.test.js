@@ -769,3 +769,35 @@ test('achttien zijn is niet genoeg: RTG moet het bewijs hebben gezien', async ()
   const na = await json(await raw('/member/spel/arcade-score', { spel: 'sneek', punten: 9999 }, ongekeurd.token));
   assert.equal(na.bewaard, true, 'gekeurd en volwassen: nu telt het wel');
 });
+
+test('een geweigerd spelantwoord legt de spellen-collectie niet aan', () => {
+  /* GEMETEN, NIET BEDACHT. STAATPROEF.json zag `/api/member/spel/antwoord` met
+     een onbekende uitnodiging keurig 404 geven ("deze uitnodiging is er niet
+     meer") en ondertussen de collectie `spellen` aanleggen: de opzoeking liep
+     via S(), en die materialiseert. ROLLBACK stond daarop GEZAKT.
+
+     In het GEHEUGEN gemeten en niet over HTTP: het 404-pad roept `save()` niet
+     aan, dus de schijf blijft gelijk -- ook met de fout. Een toets die de schijf
+     leest, slaagt hier altijd en bewijst niets.
+
+     De toets kijkt naar de HELE opslag en niet alleen naar `spellen`: een
+     leespad dat een andere collectie aanlegt is even goed een bevinding. */
+  const crypto = require('crypto');
+  const db = { data: {} };
+  let bewaard = 0;
+  const kern = require('../server/kern/spellen')({
+    db, save: () => { bewaard++; }, bewerkCollectie: (_n, f) => f && f(),
+    crypto, zijnVrienden: () => false, codenaamVan: (k) => 'CN-' + k,
+    sseToCustomer: () => {}, isGeblokkeerd: () => false, socialZoek: () => [],
+    sociaalRate: () => true, volwassen: () => true, anthropic: null,
+    magnaatLeren: null, sseClients: new Map(), lidBoardUit: () => {}, comm: null });
+
+  const voor = JSON.stringify(db.data);
+  assert.equal(voor, '{}', 'de proef begint met een lege opslag');
+
+  const uit = kern.spelAntwoord('lid-bestaat-niet', 'potje-bestaat-niet', true);
+  assert.equal(uit.status, 404, 'een onbekende uitnodiging wordt geweigerd');
+  assert.equal(JSON.stringify(db.data), voor,
+    'de weigering legde leeg meubilair aan: ' + JSON.stringify(db.data));
+  assert.equal(bewaard, 0, 'een weigering bewaart niets');
+});

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-06T13:44:38.338Z",
-    "commit": "ab5474a7",
+    "op": "2026-09-06T14:50:25.727Z",
+    "commit": "a799a0c5",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -5247,6 +5247,13 @@
       "operator": "&&->||#0",
       "gezakt": 6,
       "geprobeerd": 1
+    },
+    "remduurzaam.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
+      "scherp": "gezakt"
     },
     "rendezvous.test.js": {
       "soort": "server",

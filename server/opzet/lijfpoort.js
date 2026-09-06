@@ -36,6 +36,9 @@ module.exports = function lijfpoort(deps) {
   const { app, express, db, save, log, betaal, betaalWaarheid, muntbetaal, opslagKlaar,
     zaakdoos, muntenVan, settleFactuurVan, opdrachtenVan } = deps;
 
+  // Eigen HMAC-webhook moet, net als betaalwebhooks, de onbewerkte bytes zien.
+  require('./storingenwebhook')({ app, express, log });
+
   /* De twee betaal-webhooks staan in ./webhooks.js. Ze horen HIER en niet in de
      gewone routebedrading: een handtekening wordt over de RAUWE body berekend,
      dus ze moeten voor express.json() gemount zijn. Welke poortwachters ze wel

@@ -12,8 +12,9 @@
    niet plat gooit. Aan te zetten met ERR_WEBHOOK_URL; zonder blijft alleen de
    eigen in-memory aggregatie draaien (net als voorheen zonder SENTRY_DSN). */
 'use strict';
-const https = require('https');
-const http = require('http');
+const crypto = require('node:crypto');
+const protocol = require('./storingen/protocol');
+const { bezorg } = require('./storingen/bezorg');
 const { URL } = require('url');
 const ssrf = require('./kern/ssrf');
 
@@ -33,6 +34,12 @@ function maakFoutmelder(opts) {
       url = '';
     }
   }
+  const sleutel = opts.sleutel || process.env.ERR_WEBHOOK_SECRET || '';
+  if (protocol.eigenEndpoint(url) && !protocol.sleutelGoed(sleutel)) {
+    logger('[foutmelder] Ondertekeningssleutel ontbreekt; eigen webhook uit.'); url = '';
+  }
+  let onafhankelijk = true;
+  try { onafhankelijk = new URL(url).origin !== new URL(opts.appUrl || process.env.APP_URL).origin; } catch (_) {}
   const app = opts.app || process.env.RTG_APP_NAAM || 'rtg';
   const timeout = opts.timeout || 5000;
   const venster = opts.vensterMs || 60000;        // per vingerafdruk max 1x per minuut
@@ -66,40 +73,20 @@ function maakFoutmelder(opts) {
      storing van een zelfproef kan onderscheiden. Geeft een belofte terug die
      ALTIJD slaagt (met ok true/false); de aanroeper mag hem negeren -- melden()
      doet dat, de zelfproef niet. */
-  function post(lijf, soort) {
-    return new Promise((klaar) => {
-      staat.geprobeerd++;
-      try {
-        const payload = Buffer.from(JSON.stringify(Object.assign({ app, soort: soort || 'fout' }, lijf)));
-        const u = new URL(url);
-        const mod = u.protocol === 'http:' ? http : https;
-        const req = mod.request({
-          method: 'POST', hostname: u.hostname, port: u.port || undefined, path: u.pathname + u.search,
-          headers: { 'content-type': 'application/json', 'content-length': payload.length, 'user-agent': 'rtg-foutmelder/1' }
-        });
-        req.on('response', (res) => {
-          res.resume();                               // lijf weggooien, verbinding vrijgeven
-          if (res.statusCode >= 200 && res.statusCode < 300) {
-            staat.bezorgd++; staat.laatsteOkAt = new Date().toISOString();
-            klaar({ ok: true, status: res.statusCode });
-          } else {
-            misging('ontvanger antwoordde ' + res.statusCode);
-            klaar({ ok: false, status: res.statusCode, reden: 'ontvanger antwoordde ' + res.statusCode });
-          }
-        });
-        // een fout-melder mag nooit zelf een fout opwerpen -- wel meetellen
-        req.on('error', (e) => { misging(e && e.message); klaar({ ok: false, reden: (e && e.message) || 'netwerkfout' }); });
-        req.setTimeout(timeout, () => { misging('geen antwoord binnen ' + timeout + ' ms'); req.destroy(); });
-        req.write(payload); req.end();
-      } catch (e) {
-        misging(e && e.message);
-        klaar({ ok: false, reden: (e && e.message) || 'kon niet versturen' });
-      }
-    });
+  async function post(lijf, soort) {
+    staat.geprobeerd++;
+    let r;
+    try {
+      const payload = Buffer.from(JSON.stringify(Object.assign({ app, soort: soort || 'fout' }, lijf)));
+      r = await bezorg({ url, payload, sleutel, id: crypto.randomUUID(), timeout });
+    } catch (_) { r = { ok: false, reden: 'kon niet versturen' }; }
+    if (r.ok) { staat.bezorgd++; staat.laatsteOkAt = new Date().toISOString(); }
+    else misging(r.reden);
+    return r;
   }
 
   function melden(err, ctx) {
-    if (!url) return;
+    if (!url || (ctx && (ctx.p === protocol.PAD || ctx.bron === 'storingen-webhook'))) return;
     try {
       const vf = vinger(err, ctx);
       const nu = Date.now();
@@ -132,7 +119,8 @@ function maakFoutmelder(opts) {
     return r;
   }
 
-  const stand = () => Object.assign({ actief: !!url }, staat);
+  const stand = () => Object.assign({ actief: !!url, onafhankelijk,
+    beperking: onafhankelijk ? null : 'Ontvangst op dezelfde app; geen bewaking bij volledige app- of hostuitval.' }, staat);
 
   return { melden, zelfproef, stand, actief: !!url };
 }

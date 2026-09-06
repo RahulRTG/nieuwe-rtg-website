@@ -102,6 +102,7 @@ const KAART = new Map([
   ['adminOnly', ['rol', 'office', 'een kantoormedewerker met beheerrechten; smaller dan officeAuth, zelfde token']],
 
   // ---- eigenrol: identiteit met een rol buiten het drietal ----
+  ['storingenAuth', ['eigenrol', 'storingen-service', 'tijdveilige HMAC over raw bytes, event-id en tijd; alleen de ingestelde afzender']],
   ['boardroomAuth', ['eigenrol', 'boardroom',
     'draait eerst officeAuth en eist daarna boardroomtoegang; member en supplier stranden op de eerste, office op de tweede']],
   /* DE KLUISPOORT (server/kern/kantoor/kluispoort.js). Hij draait eerst

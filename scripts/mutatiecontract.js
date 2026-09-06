@@ -268,7 +268,7 @@ function waargenomenToegang(r) {
      eigen geheim per organisatie. Die uitzondering staat hier bij naam, want een
      kaart die hem als 'gewone rol' doorgeeft laat een koppeling eruitzien als
      een gebruiker. */
-  if (namen.includes('scimAuth')) return 'SERVICE_TO_SERVICE';
+  if (namen.includes('scimAuth') || namen.includes('storingenAuth')) return 'SERVICE_TO_SERVICE';
   const RANG = { rol: 6, eigenrol: 5, lichaamssleutel: 4, objectpoort: 3, omgeving: 2, geenBewaker: 1, verfijner: 0, onbekend: 0 };
   const soorten = namen.map(n => bewakerskaart.soortVan(n));
   const zwaarste = soorten.slice().sort((a, b) => (RANG[b] || 0) - (RANG[a] || 0))[0];
